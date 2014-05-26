@@ -9,7 +9,7 @@ require Exporter;
 @EXPORT_OK=qw(handleAssoc getAssocTeams loadAssocDetails);
 
 #use lib '/home/tcourt/src/regoSWM/statsprofiles/web/comp/sportstats';
-use lib 'sportstats/', ".";
+use lib 'sportstats/', ".", "RegoFormBuilder";
 
 use strict;
 use Reg_common;

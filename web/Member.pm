@@ -27,7 +27,6 @@ use HTMLForm;
 use Countries;
 use Postcodes;
 use CustomFields;
-use MemberTypes;
 use FieldLabels;
 use ConfigOptions qw(ProcessPermissions);
 use GenCode;
@@ -44,7 +43,6 @@ use TransLog;
 use Transactions;
 use ConfigOptions;
 use ListMembers;
-use MemberList;
 
 use MemberRecords;
 
@@ -150,18 +148,10 @@ sub handleMember {
         ( $resultHTML, $title ) = bulkMemberRollover( $Data, $action );
     }
     elsif ( $action =~ /^M_L/ ) {
-        if ($Data->{'SystemConfig'}{'EnableMemberRecords'}) {
-            ( $resultHTML, $title ) = handle_member_list( $Data, $action, $memberID );
-        }
-        else {
-            ( $resultHTML, $title ) = listMembers( $Data, $memberID, $action );
-        }
+        ( $resultHTML, $title ) = listMembers( $Data, $memberID, $action );
     }
     elsif ( $action =~ /^M_PRS_L/ ) {
         ( $resultHTML, $title ) = listMembers( $Data, $memberID, $action );
-    }
-    elsif ( $action =~ /M_MT_/ ) {
-        ( $resultHTML, $title ) = handleMemberTypes( $action, $Data, $memberID );
     }
     elsif ( $action =~ /M_TG_/ ) {
         ( $resultHTML, $title ) = handleTags( $action, $Data, $memberID );
@@ -193,15 +183,6 @@ sub handleMember {
     }
     elsif ( $action =~ /^M_TAG/ ) {
         ( $resultHTML, $title ) = Tags::listTags( $Data, $memberID, $action );
-    }
-    elsif ( $action =~ /M_MTM_/ ) {
-        ( $resultHTML, $title ) = memberTeamFinancial( $action, $Data, $memberID );
-    }
-    elsif ( $action =~ /M_TEAMS/ ) {
-        my ( $clubStatus, $clubs, $teams ) = showClubTeams( $Data, $memberID );
-        $teams      = qq[<div class="warningmsg">No $Data->{'LevelNames'}{$Defs::LEVEL_TEAM} History found</div>] if !$teams;
-        $resultHTML = $teams;
-        $title      = 'Team History';
     }
     elsif ( $action =~ /M_CLUBS/ ) {
         my ( $clubStatus, $clubs, $teams ) = showClubTeams( $Data, $memberID );
@@ -288,116 +269,6 @@ sub updateMemberNotes {
         $db->do( $st, undef, $memberID, $assocID );
     }
 
-}
-
-sub memberTeamFinancial {
-    my ( $action, $Data, $memberID ) = @_;
-    my $cgi          = new CGI;
-    my %params       = $cgi->Vars();
-    my $memberTeamID = $params{'mtID'} ||= 0;
-    my $db           = $Data->{'db'} || undef;
-    my $client       = setClient( $Data->{'clientValues'} ) || '';
-    my $target       = $Data->{'target'} || '';
-    my $option       = ( $action =~ /_DTE$/ ) ? 'edit' : 'display';
-    my $resultHTML   = '';
-    my $st           = qq[
-		SELECT MT.intMTFinancial, T.strName as TeamName, AC.strTitle as CompName, S.strSeasonName as SeasonName
-		FROM tblMember_Teams as MT
-			INNER JOIN tblTeam as T ON (T.intTeamID = MT.intTeamID
-				AND T.intAssocID = $Data->{'clientValues'}{'assocID'})
-			LEFT JOIN tblAssoc_Comp as AC ON (AC.intCompID = MT.intCompID)
-			LEFT JOIN tblSeasons as S ON (S.intSeasonID = AC.intNewSeasonID)
-		WHERE MT.intMemberID= $Data->{'clientValues'}{'memberID'}
-			AND MT.intMemberTeamID = $memberTeamID
-	];
-    my $query = $db->prepare($st);
-    $query->execute;
-    my $dref     = $query->fetchrow_hashref();
-    my $stupdate = qq[
-    UPDATE tblMember_Teams
-    SET --VAL--
-    WHERE intMemberTeamID = $memberTeamID
-    AND intMemberID = $Data->{'clientValues'}{'memberID'}
-  ];
-    my $txt_SeasonName = $Data->{'SystemConfig'}{'txtSeason'} || 'Season';
-    my %FieldDefs = (
-        fields => {
-            TeamName => {
-                label       => "$Data->{'LevelNames'}{$Defs::LEVEL_TEAM} Name",
-                value       => $dref->{TeamName},
-                type        => 'text',
-                readonly    => 1,
-                sectionname => 'main',
-            },
-            CompName => {
-                label       => "$Data->{'LevelNames'}{$Defs::LEVEL_COMP} Name",
-                value       => $dref->{CompName},
-                type        => 'text',
-                readonly    => 1,
-                sectionname => 'main',
-            },
-            SeasonName => {
-                label       => "$txt_SeasonName Name",
-                value       => $dref->{SeasonName},
-                type        => 'text',
-                readonly    => 1,
-                sectionname => 'main',
-            },
-            intMTFinancial => {
-                label         => "Financial ?",
-                value         => $dref->{intMTFinancial},
-                type          => 'checkbox',
-                displaylookup => { 1 => 'Yes', 0 => 'No' },
-                sectionname   => 'main',
-            },
-        },
-        order   => [qw(TeamName CompName SeasonName intMTFinancial)],
-        options => {
-            labelsuffix  => ':',
-            hideblank    => 1,
-            target       => $Data->{'target'},
-            formname     => 'ms_form',
-            submitlabel  => "Update",
-            introtext    => 'auto',
-            buttonloc    => 'bottom',
-            updateSQL    => $stupdate,
-            updateOKtext => qq[
-        <div class="OKmsg">Record updated successfully</div> <br>
-        <a href="$Data->{'target'}?client=$client&amp;a=M_HOME">Return to Member Record</a>
-      ],
-            auditFunction  => \&auditLog,
-            auditAddParams => [
-                $Data,
-                'Add Team',
-                'Member'
-            ],
-            auditEditParams => [
-                $memberTeamID,
-                $Data,
-                'Update Team',
-                'Member'
-            ],
-        },
-        sections => [ [ 'main', 'Details' ], ],
-        carryfields => {
-            client => $client,
-            a      => $action,
-            mtID   => $memberTeamID,
-        },
-    );
-    ( $resultHTML, undef ) = handleHTMLForm( \%FieldDefs, undef, $option, '', $db );
-    if ( !$resultHTML ) {
-        $resultHTML .= qq[
-      <div class="warningmsg">An Error Occured</div> <br>
-      <a href="$Data->{'target'}?client=$client&amp;a=M_HOME">Return to Member Record</a>
-    ];
-    }
-    if ( $option eq 'display' ) {
-        $resultHTML .= allowedAction( $Data, 'ms_e' ) ? qq[ <a href="$target?a=M_MTM_DTE&amp;mtID=$memberTeamID&amp;client=$client">Edit Details</a> ] : '';
-    }
-    $resultHTML = qq[<div>Cannot find Member record.</div>] if !ref $dref;
-    $resultHTML = qq[<div>$resultHTML</div>];
-    return ($resultHTML, "Summary");
 }
 
 sub MemberTransfer {
@@ -2578,14 +2449,6 @@ $member_photo
 			];
         }
 
-        ## TC - 31/08/2007 ## AFL Customisation for Umpires & Coaches ##
-        if ( $Data->{'SystemConfig'}{'DisplayAccredSummary'} ) {
-            my ( $html, $heading ) = displayMemberTypes( $Data, $memberID, 0, $Data->{'SystemConfig'}{'DisplayAccredSummary'}, 0 );
-            $resultHTML .= qq[<br><br><div class="sectionheader">$heading</div> $html];
-            my $deregstatus = deregistration_check( $memberID, $Data->{'SystemConfig'}{'DisplayAccredSummary'}, $Data );
-            $resultHTML = $deregstatus . $resultHTML if $deregstatus;
-        }
-        ##
         my $defaulterstatus = defaulter_check( $memberID, $Data->{'SystemConfig'}{'Defaulter'}, $Data );
 
         my $inSeason     = 0;

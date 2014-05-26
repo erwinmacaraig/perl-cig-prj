@@ -589,46 +589,5 @@ sub seasonClubRecord {
     
 }
 
-# Returns a list of all teams that belong to a club.
-sub getTeams {
-    my $class = shift; 
-    my ($Data, $club_id, $params) = @_;
-    
-    my $assoc_id = $Data->{clientValues}{assocID};
-    
-    my $not_in_comp_where = '';
-    if ($params->{'not_in_comp'}) {
-        $not_in_comp_where = qq[
-                                AND tblTeam.intTeamID NOT IN 
-                                (
-                                 SELECT intTeamID 
-                                 FROM tblComp_Teams
-                                 INNER JOIN tblAssoc_Comp USING (intCompID)
-                                 WHERE tblAssoc_Comp.intAssocID = $assoc_id 
-                                 AND  tblComp_Teams.intRecStatus != $Defs::RECSTATUS_DELETED
-                                )
-                            ];
-    }
-    
-    my $st = qq[
-                   SELECT tblTeam.intTeamID, tblTeam.strName
-                   FROM tblTeam
-                   WHERE tblTeam.intClubID = ?
-                   $not_in_comp_where
-                   AND tblTeam.intRecStatus = $Defs::RECSTATUS_ACTIVE
-           ];
-    
-    my $q = $Data->{db}->prepare($st);
-    $q->execute($club_id);
-
-    my %Teams = ();
-
-    while (my $dref = $q->fetchrow_hashref()) {
-        $Teams{$dref->{'intTeamID'}} = $dref->{'strName'};
-   }
-
-    return \%Teams;
-    
-}
 
 1;

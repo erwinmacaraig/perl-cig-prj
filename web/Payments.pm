@@ -18,7 +18,6 @@ use SystemConfig;
 use Email;
 use PaymentSplitExport;
 use ServicesContacts;
-use SalesBlock;
 use TemplateEmail;
 #use RegoForm::RegoFormFactory;
 use RegoFormUtils;
@@ -1269,7 +1268,6 @@ sub EmailPaymentConfirmation	{
 		PaymentAssocType => $Data->{'SystemConfig'}{'paymentAssocType'} || '',
 		DollarSymbol     => $Data->{'LocalConfig'}{'DollarSymbol'} || "\$",
 	);
-    $TransData{'SalesAdBlock'} = getSalesBlock($Data, $Data->{'SystemConfig'}, 3, ) || ''; #Payment Receipt email  
 	
 	{
 		my $st = qq[

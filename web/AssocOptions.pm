@@ -151,7 +151,6 @@ sub assoc_optionsMenu	{
 		SELECT 
       intAllowRegoForm, 
       intAllowSeasons, 
-      intSWOL, 
       intUploadType
 		FROM 
       tblAssoc
@@ -160,7 +159,7 @@ sub assoc_optionsMenu	{
 		LIMIT 1
 	]);
 	$query->execute($assocID);
-	my($intAllowRegoForm, $intAllowSeasons, $intSWOL, $intUploadType) = $query->fetchrow_array();
+	my($intAllowRegoForm, $intAllowSeasons, $intUploadType) = $query->fetchrow_array();
 	$query->finish;
 
 	my $l=$Data->{'lang'};
@@ -189,10 +188,6 @@ sub assoc_optionsMenu	{
 		? qq[<li><a href="$Data->{'target'}?client=$client&amp;a=AGEGRP_L">].$l->txt($txt_AgeGroupNames).qq[</a></li>]
 		: '';
 
-	my $processlog = $intSWOL
-		? qq[<li><a href="$Data->{'target'}?client=$client&amp;a=PROCESSLOG_L">].$l->txt('Process Log').qq[</a></li>]
-		: '';
-	
 	my $optins = (!$Data->{'SystemConfig'}{'NoOptIn'})
 		? qq[<li><a href="$Data->{'target'}?client=$client&amp;a=OPTIN_L">Opt-Ins</a></li>]
 		: '';
@@ -205,7 +200,6 @@ sub assoc_optionsMenu	{
 		<div class="settings-group">
 			<div class="settings-group-name">Manage Users and Security</div>
 			<ul>
-				<li><a href="$Data->{'target'}?client=$client&amp;a=PW_">].$l->txt('Password Management').qq[</a></li>
 				<li><a href="$Data->{'target'}?client=$client&amp;a=A_O_p">].$l->txt('Permissions').qq[</a></li>
 			</ul>
 		</div>
@@ -243,25 +237,6 @@ sub assoc_optionsMenu	{
 
     $body = '' if ($Data->{'SystemConfig'}{'RestrictedConfigOptions'});    
 
-		if ($intSWOL)	{
-			$body .= qq[
-		<div class="settings-group">
-			<div class="settings-group-name">Manage Competitions</div>
-			<ul>
-        <li><a href="$Data->{'target'}?client=$client&amp;a=STATSCFG_L">].$l->txt('Statistics Templates').qq[</a></li>
-        <li><a href="$Data->{'target'}?client=$client&amp;a=LADDERCFG_L">].$l->txt('Ladder Templates').qq[</a></li>
-        <li><a href="$Data->{'target'}?client=$client&amp;a=FIXTEMPLATE_L">].$l->txt('Fixture Templates').qq[</a></li>
-				<li><a href="$Data->{'target'}?client=$client&amp;a=MEDIA_L">].$l->txt('Media Outlets').qq[</a></li>];
-			$body .=qq[	<li><a href="$Data->{'target'}?client=$client&amp;a=FEG_DTE">].$l->txt('Finals Eligibility Settings').qq[</a></li>
-			];
-		if( $Data->{'SystemConfig'}{'AssocConfig'}{'allowMatchDayPaperwork'}) {
-				$body .=qq[	<li><a href="$Data->{'target'}?client=$client&amp;a=MDR_L">].$l->txt('Match Day Reports').qq[</a></li>
-				</ul>
-			</div>
-				];
-			}
-		}
-		else	{
 			$body .= qq[
 		<div class="settings-group">
 			<div class="settings-group-name">Manage Competitions</div>
@@ -270,7 +245,6 @@ sub assoc_optionsMenu	{
 			</ul>
 		</div>
 		];
-		}
 
 
     if ($Data->{'SystemConfig'}{'RestrictedConfigOptions'}) {
@@ -279,7 +253,6 @@ sub assoc_optionsMenu	{
         <div class="settings-group">
           <div class="settings-group-name">Manager Users and Security</div>
           <ul>
-            <li><a href="$Data->{'target'}?client=$client&amp;a=PW_">].$l->txt('Password Management').qq[</a></li>
             <li><a href="$Data->{'target'}?client=$client&amp;a=A_O_p">].$l->txt('Permissions').qq[</a></li>
 	</ul>
         </div>
