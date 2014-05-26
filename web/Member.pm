@@ -32,7 +32,6 @@ use ConfigOptions qw(ProcessPermissions);
 use GenCode;
 use AuditLog;
 use MemberPackages;
-use Tags;
 use DeQuote;
 use Duplicates;
 use ProdTransactions;
@@ -153,9 +152,6 @@ sub handleMember {
     elsif ( $action =~ /^M_PRS_L/ ) {
         ( $resultHTML, $title ) = listMembers( $Data, $memberID, $action );
     }
-    elsif ( $action =~ /M_TG_/ ) {
-        ( $resultHTML, $title ) = handleTags( $action, $Data, $memberID );
-    }
     elsif ( $action =~ /M_CLB_/ ) {
         ( $resultHTML, $title ) = handleMemberClub( $action, $Data, $memberID );
     }
@@ -180,9 +176,6 @@ sub handleMember {
     }
     elsif ( $action =~ /^M_TRANSFER/ ) {
         ( $resultHTML, $title ) = MemberTransfer($Data);
-    }
-    elsif ( $action =~ /^M_TAG/ ) {
-        ( $resultHTML, $title ) = Tags::listTags( $Data, $memberID, $action );
     }
     elsif ( $action =~ /M_CLUBS/ ) {
         my ( $clubStatus, $clubs, $teams ) = showClubTeams( $Data, $memberID );
@@ -727,18 +720,6 @@ sub member_details {
 			<p>To configure which fields to display you must go into the <a href="$Data->{'target'}?a=FC_C_d&amp;client=$cl">$Data->{'LevelNames'}{$Defs::LEVEL_ASSOC} Configuration options</a>.</p>
 		];
         return ( $txt, 'Add a New Member' );
-    }
-    if ( $option eq 'add' and $Data->{'SystemConfig'}{'Schools'} and !$Data->{'SystemConfig'}{'ForgetSchool'} ) {
-
-        #Schools are enabled and we are adding a new member.
-        #Check to see if there is a school cookie and set variables appropriately
-        my $schoolcookie_val = cookie($Defs::SCHOOL_COOKIE) || '';
-        if ($schoolcookie_val) {
-            my ( $sname, $sid, $ssub ) = split /\|/, $schoolcookie_val;
-            $field->{'strSchoolName'}   ||= $sname || '';
-            $field->{'strSchoolSuburb'} ||= $ssub  || '';
-            $field->{'intSchoolID'}     ||= $sid   || 0;
-        }
     }
     my %genderoptions = ();
     for my $k ( keys %Defs::PersonGenderInfo ) {
@@ -1681,20 +1662,6 @@ sub member_details {
                 disabled       => 1,
                 SkipProcessing => 1,
             },
-            intSchoolID => {
-                label => $Data->{'SystemConfig'}{'Schools'} ? $FieldLabels->{'intSchoolID'} : '',
-                value => $field->{intSchoolID},
-                type  => 'hidden',
-
-                pretext =>
-                q[<input type="button" onclick="document.getElementById('schoolframe').style.display='block';this.style.display='none';" value="Select School" style='background-image: none; background-color:#F0F0F0;' id="schoolsearchbtn">XXXCOMPULSORYICONXXX<iframe src="schools.cgi?fn=m_form&amp;anchorid=d_intSchoolID&amp;anchorname=d_strSchoolName&amp;anchorsuburb=d_strSchoolSuburb&amp;srealm=]
-                . $Data->{'SystemConfig'}{'Schools'}
-                . q[" frameborder=0 style="margin-left:20px;margin-top:10px;height:270px;width:488px;border:0px;display:none;" name="schoolframe" id="schoolframe"></iframe>],
-
-                sectionname => 'other',
-                disabled    => 1,
-                nodisplay   => 1,
-            },
             intGradeID => {    #School Grades
                 label       => $FieldLabels->{intGradeID},
                 value       => $field->{intGradeID},
@@ -2109,206 +2076,6 @@ sub member_details {
     }
 
     # Jumper number stuff
-    if ($Data->{'SystemConfig'}{'AssocConfig'}{'AllowJumperNumberOnMembersEdit'} && $memberID){    
-        # If Assoc level, then all clubs in Assoc
-        # If at club, then get active teams in the club for this player
-        # If team, then only show team default for that team only (maybe read only for club?)
-        my $current_level = $Data->{'clientValues'}{'authLevel'};
-        my $assocID = $Data->{'clientValues'}{'assocID'};
-        my $clubID = $Data->{'clientValues'}{'clubID'};
-        my $teamID = $Data->{'clientValues'}{'teamID'};
-    
-        my $db = $Data->{'db'};
-        
-        # Search for all clubs and teams they may be in
-        my $team_search_sql = qq[
-            SELECT
-                a.intAssocID,
-                a.intCurrentSeasonID,
-                a.intNewRegoSeasonID,
-                ac.intCompID,
-                ac.strTitle,
-                ac.intNewSeasonID,
-                mt.intMemberID,
-                t.intClubID,
-                t.intTeamID,
-                t.strName,
-                s.strSeasonName
-            FROM
-                tblAssoc as a
-                INNER JOIN tblAssoc_Comp as ac on (
-                    a.intAssocID = ac.intAssocID
-                    AND ac.intNewSeasonID in (a.intCurrentSeasonID, a.intNewRegoSeasonID) 
-                )
-                INNER JOIN tblMember_Teams as mt on (
-                    ac.intCompID = mt.intCompID
-                ) 
-                LEFT JOIN tblTeam as t on (
-                    mt.intTeamID = t.intTeamID
-                    AND t.intRecStatus > 0
-                )
-                LEFT JOIN tblSeasons as s on (
-                    ac.intNewSeasonID = s.intSeasonID
-                )
-            WHERE
-                a.intAssocID = ?
-                AND mt.intMemberID = ?
-        ];
-        
-        my $club_search_sql = qq[
-            SELECT
-                a.intAssocID,
-                a.intCurrentSeasonID,
-                a.intNewRegoSeasonID,
-                ac.intClubID,
-                mc.intMemberID,
-                c.intClubID,
-                c.strName
-            FROM
-                tblAssoc as a
-                INNER JOIN tblAssoc_Clubs as ac on (
-                    a.intAssocID = ac.intAssocID
-                )
-                INNER JOIN tblMember_Clubs as mc on (
-                    ac.intClubID = mc.intClubID
-                ) 
-                LEFT JOIN tblClub as c on (
-                    mc.intClubID = c.intClubID
-                    AND c.intRecStatus > 0
-                )
-            WHERE
-                a.intAssocID = ?
-                AND mc.intMemberID = ?;
-        ];
-        
-        my $team_search_stmt = $db->prepare($team_search_sql);
-        my $club_search_stmt = $db->prepare($club_search_sql);
-        
-        $team_search_stmt->execute($assocID, $memberID);
-        $club_search_stmt->execute($assocID, $memberID);
-            
-        my $clubs_and_teams_map;
-        
-        TEAM: while (my $row = $team_search_stmt->fetchrow_hashref()){
-            my $intClubID = $row->{'intClubID'} || 0;
-            
-            if($Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_TEAM){
-                next TEAM;
-            }
-            elsif ( $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_TEAM && $row->{'intTeamID'} != $teamID ){
-                next TEAM;
-            }
-            elsif ( $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB && $intClubID != $clubID ){
-                next TEAM;
-            }
-            
-            $clubs_and_teams_map->{'clubs'}->{$intClubID}->{'teams'}->{$row->{'intTeamID'}}->{'name'} = $row->{'strName'};
-            
-            # If we want to sub sort by seasons, we can store that info as well
-            #$clubs_and_teams_map->{'clubs'}->{$intClubID}->{'seasons'}->{$row->{'intNewSeasonID'}}->{'teams'}->{$row->{'intTeamID'}}->{'name'} = $row->{'strName'};
-            #$clubs_and_teams_map->{'clubs'}->{$intClubID}->{'seasons'}->{$row->{'intNewSeasonID'}}->{'name'} = $row->{'strSeasonName'};
-        }
-        
-        CLUB: while (my $row = $club_search_stmt->fetchrow_hashref()){
-            if($Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_TEAM){
-                next CLUB;
-            }
-            elsif ( $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_TEAM && !defined $clubs_and_teams_map->{'clubs'}->{$row->{'intClubID'}} ){
-                next CLUB;
-            }
-            elsif ( $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB && $row->{'intClubID'} != $clubID ){
-                next CLUB;
-            }
-            
-            $clubs_and_teams_map->{'clubs'}->{$row->{'intClubID'}}->{'name'} = $row->{'strName'};
-            
-        }
-        
-        my $order = 0;
-        my $jumper_label = $Data->{'SystemConfig'}{'Custom_JumperNumber'} ? $Data->{'SystemConfig'}{'Custom_JumperNumber'} : 'Number';
-        
-        # Loop over the clubs and teams
-        foreach my $club (keys %{$clubs_and_teams_map->{'clubs'}}){
-            my $club_default = ''; # Club default 
-            
-            # Fetch all defaults for this club
-            my $player_numbers_refs = get_player_number({
-                'dbh' => $db,
-                'club_id' => $club,
-                'assoc_id' => $assocID,
-                'member_id' => $memberID,
-                'return_all_teams' => 1,
-            });
-            
-            # Only for legit clubs (some teams are clubless)
-            if ( $club && $club > 0 ){
-                # get club default number
-                $club_default = $player_numbers_refs->{-1}->{'strJumperNum'}; # Keyed by team, so -1 (no team) for club default
-                
-                # Need to protect valid 0 values
-                if (!defined $club_default){
-                    $club_default = '';
-                }
-    
-                # Club Header
-                $FieldDefinitions{'fields'}{"PlayerNumberClub_header_$order"} = {
-                    label             => $clubs_and_teams_map->{'clubs'}->{$club}->{'name'} || '',
-                    value             => '',
-                    type              => 'header',
-                    order             => $order,
-                    sectionname       => 'jumpers',
-                    neverHideBlank    => 1,
-                    SkipAddProcessing => 1,                
-                };
-                push @{$FieldDefinitions{'order'}}, "PlayerNumberClub_header_$order";
-                $order++;
-                
-                # Club default
-                $FieldDefinitions{'fields'}{'PlayerNumberClub_' . $assocID . '_' . $club . '_-1_' . $memberID . '_' . $order} = {
-                    label             => "Default $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} $jumper_label"|| '',
-                    value             => $club_default,
-                    type              => 'jumper', 
-                    order             => $order,
-                    sectionname       => 'jumpers',
-                    neverHideBlank    => 1,
-                    SkipAddProcessing => 1,
-                    title             => 'Number between 0 and 99',
-                };
-                push @{$FieldDefinitions{'order'}}, 'PlayerNumberClub_' . $assocID . '_' . $club . '_-1_' . $memberID . '_' . $order;
-                $order++;
-                
-            }
-    
-            foreach my $team ( keys %{$clubs_and_teams_map->{'clubs'}->{$club}->{'teams'}} ){
-                # get team default number
-                my $team_default = $player_numbers_refs->{$team}->{'strJumperNum'}; 
-                
-                # Need to protect valid 0 values
-                if (!defined $team_default){
-                    $team_default = '';
-                }
-                
-                my $team_name = $clubs_and_teams_map->{'clubs'}->{$club}->{'teams'}->{$team}->{'name'} || 'Unnamed Team';
-                
-                # Club default
-                $FieldDefinitions{'fields'}{'PlayerNumberTeam_' . $assocID . '_' . $club . '_' . $team . '_' . $memberID . '_' . $order} = {
-                    label             => $team_name . ' default ' . $jumper_label, 
-                    value             => $team_default, 
-                    type              => 'jumper', 
-                    order             => $order,
-                    sectionname       => 'jumpers',
-                    neverHideBlank    => 1,
-                    SkipAddProcessing => 1,
-                    placeholder       => $club_default,
-                    title             => 'Number between 0 and 99',
-                    
-                };
-                push @{$FieldDefinitions{'order'}}, 'PlayerNumberTeam_' . $assocID . '_' . $club . '_' . $team . '_' . $memberID . '_' . $order;
-                $order++;
-            }
-        }
-    }
-
     my $resultHTML = '';
     my $fieldperms = $Data->{'Permissions'};
 
@@ -2376,13 +2143,11 @@ $member_photo
 
         my @taboptions = ();
         my @tabdata    = ();
-        my ( $clubStatus, $clubs, $teams ) = showClubTeams( $Data, $memberID );
+        my ( $clubStatus, $clubs, undef) = showClubTeams( $Data, $memberID );
         $clubs ||= '';
         $teams ||= '';
         push @taboptions, [ 'memclubs_dat', $Data->{'LevelNames'}{ $Defs::LEVEL_CLUB . "_P" } ] if $clubs;
-        push @taboptions, [ 'memteams_dat', $Data->{'LevelNames'}{ $Defs::LEVEL_TEAM . "_P" } ] if $teams;
         push @tabdata, qq[<div id="memclubs_dat">$clubs</div>] if $clubs;
-        push @tabdata, qq[<div id="memteams_dat">$teams</div>] if $teams;
 
         my ( $memseason_vals, $memseasons ) = listMemberSeasons( $Data, $memberID );
         if ($memseasons) {
@@ -2416,16 +2181,6 @@ $member_photo
             my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
             push @taboptions, [ 'clearancehistory_dat', "$txt_Clr History" ];
         }
-        my $memhistory = '';
-        if ( $Data->{'SystemConfig'}{'showOldMemberHistory'} ) {
-            $memhistory = getMemberHistory( $Data, $memberID );
-        }
-        if ($memhistory) {
-            push @tabdata, qq[<div id="memhistory_dat">$memhistory</div>];
-            push @taboptions, [ 'memhistory_dat', 'Member History' ];
-        }
-
-        #$resultHTML .= loadMemberExpiry($Data->{'db'},$memberID) if $Data->{'SystemConfig'}{'DisplayContractExpiry'};
 
         my $tabstr    = '';
         my $tabheader = '';
@@ -2489,7 +2244,6 @@ $member_photo
 				</div>
 			];
             $txt = '' if ( $Data->{'SystemConfig'}{'LockSeasons'}      and $Data->{'clientValues'}{'authLevel'} <= $Defs::LEVEL_ASSOC );
-            $txt = '' if ( $Data->{'SystemConfig'}{'LockSeasonsCRL'}   and $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_ASSOC );
             $txt = '' if ( $Data->{'MemberClrdOut_ofCurrentClub'}      and $Data->{'clientValues'}{'authLevel'} <= $Defs::LEVEL_ASSOC );
             $txt = '' if ( $assoc_obj->getValue('intHideClubRollover') and $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_ASSOC );
             $resultHTML = $txt . $resultHTML;
