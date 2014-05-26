@@ -1,0 +1,33 @@
+DROP TABLE IF EXISTS tblClubCampaigns;
+
+CREATE TABLE tblClubCampaigns (
+  intClubCampaignID  INT          NOT NULL AUTO_INCREMENT,
+  intCampaignID      INT          NOT NULL,
+  intAssocID         INT          NOT NULL,
+  intClubID          INT          NOT NULL,
+  strClubName        VARCHAR(50)  NOT NULL,
+  strClubAddress1    VARCHAR(50)  NOT NULL,
+  strClubAddress2    VARCHAR(50),
+  strMainActivity    VARCHAR(50)  NOT NULL,
+  intPlayers         INT          DEFAULT 0,
+  strContactName     VARCHAR(50)  NOT NULL,
+  strContactPos      VARCHAR(50)  NOT NULL,
+  strContactEmail    VARCHAR(100) NOT NULL,
+  strContactMobile   VARCHAR(20)  NOT NULL,
+  strContactFax      VARCHAR(20)  NOT NULL,
+  strContactStreet   VARCHAR(50)  NOT NULL, 
+  strContactSuburb   VARCHAR(50)  NOT NULL, 
+  strContactState    VARCHAR(20)  NOT NULL, 
+  strContactPostcode VARCHAR(20)  NOT NULL, 
+  strContact2Name    VARCHAR(50),
+  strContact2Pos     VARCHAR(50),
+  strContact2Email   VARCHAR(100),
+  strContact2Mobile  VARCHAR(20),
+  strContact2Fax     VARCHAR(20),
+  strBusinessNo      VARCHAR(50),
+  intStatus          TINYINT      DEFAULT 0,
+  dtRegistered       DATETIME     NOT NULL,
+  tTimeStamp         TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (intClubCampaignID),
+  KEY index_ClubCampaign(intClubID, intCampaignID)
+);

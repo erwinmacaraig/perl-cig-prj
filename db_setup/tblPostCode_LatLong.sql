@@ -1,0 +1,1 @@
+CREATE TABLE tblPostCodes_LatLong ( strPostalCode VARCHAR(20), strSuburb VARCHAR(200), strState VARCHAR(20), strComments VARCHAR(100), strDeliveryOffice VARCHAR(100), intPreSort INT, strParcelZone VARCHAR(20), intBSPnumber INT, strBSPname VARCHAR(100), strCategory VARCHAR(100), strLat VARCHAR(100), strLong VARCHAR(100) );

@@ -1,0 +1,34 @@
+{
+	SQL => "
+    SELECT DISTINCT
+        P.intPassportID AS PassportID,
+        'Association' AS EntityType,
+        A.strName AS EntityName,
+        P.dtLastlogin AS DateLastLogin,
+        P.dtCreated AS DateAdded
+    FROM
+        tblPassportAuth AS P
+        INNER JOIN tblAssoc AS A ON ( P.intEntityTypeID=5 AND P.intEntityID=A.intAssocID AND A.intAssocID=###ASSOCID### )
+	",
+	StatsReport => 0,
+	MemberTeam => 0,
+	ReportEntity => 0,
+	ReportLevel => 0,
+	Template => 'default',
+	DistinctValues => 1,
+    TalkToPassport => 1,
+	Labels => [
+		['EntityType',   'EntityType'],
+		['EntityName',   'EntityName'],
+		['PassportID',   'PassportID'],
+		['FirstName' ,   'FirstName' ],
+		['FamilyName',   'FamilyName'],
+		['Email',        'Email'     ],
+		['DateCreated',  'DateCreated'  ],
+		['DateAdded',    'DateAdded'    ],
+		['DateLastLogin','DateLastLogin'],
+	],
+	Sort => [
+		['EntityName','ASC','string'],
+	],
+}

@@ -1,0 +1,45 @@
+[% IF Ads_DashLeaderboard %]<div>[% Ads_DashLeaderboard %]</div><div style="clear:both;"></div>[% END %]
+<div class = "pageHeading">[% Name %]</div>
+<div id="logo-status">
+  [% Logo %]
+</div>
+
+<div class = "home_details">
+<div class = "sectionheader">[% Lang.txt('Competition Configuration') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin %]<a href = "[% EditDetailsLink %]" class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>	
+<div class = "" style = "width:200px;float:left;">
+		<span class = "label">[% Lang.txt('Active') %]</span> [% Details.Active %]<br>
+		[% IF Details.Abbrev %]<span class = "label">[% Lang.txt('Abbreviation') %]</span> [% Details.Abbrev %]<br>[% END %]
+		[% IF Details.Contact %]<span class = "label">[% Lang.txt('Contact') %]</span> [% Details.Contact %]<br>[% END %]
+		[% IF Details.Season %]<span class = "label">[% Lang.txt(SeasonLabel) %]</span> [% Details.Season %]<br>[% END %]
+		[% IF Details.CompType %]<span class = "label">[% Lang.txt('Type') %]</span> [% Details.CompType %]<br>[% END %]
+		[% IF Details.CompLevel %]<span class = "label">[% Lang.txt('Level') %]</span> [% Details.CompLevel %]<br>[% END %]
+		[% IF Details.Grade %]<span class = "label">[% Lang.txt('Division') %]</span> [% Details.Grade%]<br>[% END %]
+		[% IF Details.AgeGroup %]<span class = "label">[% Lang.txt('Age Group') %]</span> [% Details.AgeGroup%]<br>[% END %]
+		[% IF Details.Gender %]<span class = "label">[% Lang.txt('Gender') %]</span> [% Details.Gender%]<br>[% END %]
+	</div>
+	<div class = "" style = "width:200px;float:left;">
+
+		[% IF Details.NumTeams%]<span class = "label">[% Lang.txt('Number of ' _ TeamsLabel) %]</span> [% Details.NumTeams %]<br>[% END %]
+		[% IF Details.NumRounds %]<span class = "label">[% Lang.txt('Number of Rounds') %]</span> [% Details.NumRounds %]<br>[% END %]
+		[% IF Details.MatchDuration %]<span class = "label">[% Lang.txt('Match Duration') %]</span> [% Details.MatchDuration%]<br>[% END %]
+		[% IF Details.StartDate %]<span class = "label">[% Lang.txt('Start Date') %]</span> [% Details.StartDate %]<br>[% END %]
+	</div>
+</div>
+[% IF Details.Notes%]<div>[% Details.Notes%]</div>[% END %]
+<div class="upcoming-matches">
+<div class = "sectionheader">[% Lang.txt('Upcoming Matches') %]</div>
+[% IF UpcomingMatches.size() >0 %]
+<table>
+	[% FOR m IN UpcomingMatches %]
+		<tr>
+			<td>[% m.datetime %]</td>
+			<td>[% m.hometeam%]</td>
+			<td>[% m.awayteam%]</td>
+			<td>[% m.venue %]</td>
+		</tr>
+	[% END %]
+</table>
+[% END %]
+</div>
+
+

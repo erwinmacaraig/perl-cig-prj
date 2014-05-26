@@ -1,0 +1,92 @@
+[% IF Ads_DashLeaderboard %]<div>[% Ads_DashLeaderboard %]</div>[% END %]
+<div class = "pageHeading dash-heading">[% Name %]
+    [% IF Extras %]
+        <script type="text/javascript">
+            function submitForm(formId){
+                jQuery("#"+formId).submit();
+            }
+        </script>
+        <div style="float:right">
+            [% IF Extras.payFeesAction %]
+                <form id="frmPayFees" method="post" action="[% Extras.target %]" style="display:none">
+                    <input type="submit" class="button" style="font-size:28px;background-color:red" value="Pay Fees">
+                    <input type="hidden" name="a" value="[% Extras.payFeesAction %]">
+                    <input type="hidden" name="client" value="[% Extras.client %]">
+                </form>
+                <input type="button" class="button cancel-button" onclick="submitForm('frmPayFees')" value="Pay Fees">
+            [% END %]
+            [% IF Extras.inviteTeammatesAction %]
+                <form id="frmInviteTeammates" method="post" action="[% Extras.target %]" style="display:none">
+                    <input type="submit" class="button" style="font-size:28px;background-color:#00ff00" value="Invite Teammates">
+                    <input type="hidden" name="a" value="[% Extras.inviteTeammatesAction %]">
+                    <input type="hidden" name="client" value="[% Extras.client %]">
+                </form>
+                <input type="button" class="button-small proceed-button" onclick="submitForm('frmInviteTeammates')" value="Invite Teammates">
+            [% END %]
+        </div>
+    [% END %]
+</div>
+<div id="logo-status">
+	[% Logo %]
+</div>
+
+<div class = "home_details">
+	<div class="sectionheader">[% Lang.txt('Details') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin  %]<a href = "[% EditDetailsLink %]" class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
+	[% IF Details.Nickname %][% Details.Nickname %]<br>[% END %]
+[% IF Details.Address1 or Details.Suburb %]
+  <div class = "details-address">
+    <span class = "label">[% Lang.txt('Address') %]</span><br>
+    [% IF Details.Address1 %][% Details.Address1 %]<br>[% END %]
+    [% IF Details.Address2 %][% Details.Address2 %]<br>[% END %]
+    [% IF Details.Suburb %][% Details.Suburb %]<br>[% END %]
+    [% IF Details.State %][% Details.State %][% END %],&nbsp;[% IF Details.Country %][% Details.Country %][% END %],&nbsp;[% IF Details.PostalCode %][% Details.PostalCode %][% END %]
+  </div>
+  [% END %]	
+		[% IF Details.Contact %]
+			[% Details.ContactTitle %] [% Details.Contact %]<br>
+			[% IF Details.Email %]<a href = "mailto:[% Details.Email %]" class="mail-link">[% Details.Email %]</a> &nbsp; [% END %]
+			[% IF Details.Phone1 %][% Details.Phone1 %] [% END %]
+			[% IF Details.Phone2 %][% Details.Phone2 %] [% END %]
+			[% IF Details.Mobile %][% Details.Mobile %] [% END %]
+		[% END %]
+		</div>
+	  <div class = "team-contacts">
+		<div class="sectionheader">Team Contacts</div>
+		[% IF Details.Contact2 %]
+		 <div class="club-contact">	
+		[% Details.ContactTitle2 %] [% Details.Contact2 %]<br>
+			[% IF Details.Contact2Email %]<a href = "mailto:[% Details.Contact2Email %]" class="mail-link">[% Details.Contact2Email %]</a> &nbsp; [% END %]
+			[% IF Details.Contact2Phone %][% Details.Contact2Phone %] [% END %]
+			[% IF Details.Contact2Mobile %]<br>[% Details.Contact2Mobile %] [% END %]
+			</div>
+		[% END %]
+		[% IF Details.Contact3 %]
+		 <div class="club-contact">
+			[% Details.ContactTitle3 %] [% Details.Contact3 %]<br>
+			[% IF Details.Contact3Email %]<a href = "mailto:[% Details.Contact3Email %]" class="mail-link">[% Details.Contact3Email %]</a> &nbsp; [% END %]
+			[% IF Details.Contact3Phone %][% Details.Contact3Phone %] [% END %]
+			[% IF Details.Contact3Mobile %][% Details.Contact3Mobile %] [% END %]
+			</div>
+		[% END %]
+</div>
+[% IF Notifications.size() > 0 and !ReadOnlyLogin  %]
+<div class = "notifications">
+  <div class="notifications-inner">
+    <div class = "sectionheader">[% Lang.txt('Notifications') %]</div>
+    <div class = "sectionsubheader">The following items require your attention:</div>
+    [% FOREACH nitem IN Notifications %]
+      <div class="notification-item">
+        <a href = "#" class="delete-icon"></a>&nbsp;&nbsp;<a href = "[% nitem.url %]" class="notification-link">[% nitem.title %]</a>
+      </div>
+    [% END %]
+  </div>
+</div>
+[% END %]
+<div class ="welcome">
+  [% Welcome %]
+</div>
+[% IF compHistory %]
+	<div style = "clear:both;"></div>
+	<div class="sectionheader">Competition History</div>
+  [% compHistory %]
+[% END %]
