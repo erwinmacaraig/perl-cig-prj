@@ -59,24 +59,6 @@ sub main	{
 				$intermediateNodes,
 			);
 		}
-		if($currentLevel > $Defs::LEVEL_TEAM)	{
-			$results{'teams'} = search_teams(
-				\%Data,
-				$sphinx,
-				$searchval,
-				$filters,
-				$intermediateNodes,
-			);
-		}
-		if($currentLevel > $Defs::LEVEL_COMP)	{
-			$results{'comps'} = search_comps(
-				\%Data,
-				$sphinx,
-				$searchval,
-				$filters,
-				$intermediateNodes,
-			);
-		}
 		if($currentLevel > $Defs::LEVEL_CLUB)	{
 			$results{'clubs'} = search_clubs(
 				\%Data,
@@ -97,7 +79,7 @@ sub main	{
 		}
 
 		my @r = ();
-		for my $k (qw(assocs clubs comps teams members))	{
+		for my $k (qw(assocs clubs members))	{
 			if($results{$k} and scalar(@{$results{$k}}))	{
 				for my $r (@{$results{$k}})	{
 					push @r, $r;
@@ -137,19 +119,7 @@ sub search_members	{
 		my $assocID = $Data->{'clientValues'}{'assocID'} || 0;
 		my $clubID = $Data->{'clientValues'}{'clubID'} || 0;
 		$clubID = 0 if $clubID == $Defs::INVALID_ID;
-		my $teamID = $Data->{'clientValues'}{'teamID'} || 0;
-		$teamID = 0 if $teamID == $Defs::INVALID_ID;
 		my $st_from = '';
-		if($teamID)	{
-			$st_from = qq[
-				INNER JOIN tblMember_Teams AS MT
-					ON (
-						tblMember.intMemberID = MT.intMemberID
-						AND MT.intTeamID = $teamID
-						AND MT.intStatus <> $Defs::RECSTATUS_DELETED
-					)
-			];	
-		}
 		elsif($clubID)	{
 			$st_from = qq[
 				INNER JOIN tblMember_Clubs AS MC
@@ -248,111 +218,16 @@ sub setupFilters	{
 	}
 	my $clubID = $Data->{'clientValues'}{'clubID'} || 0;
 	$clubID = 0 if $clubID < 0;
-	my $teamID = $Data->{'clientValues'}{'teamID'} || 0;
-	$teamID = 0 if $teamID < 0;
 
 	my %filters = (
 		realm => $realm,
 		assoc => $assocID,
 		club => $clubID,
-		team => $teamID,
 	);
 
 	return \%filters;
 }
 
-
-sub search_teams	{
-	my (
-		$Data,
-		$sphinx,
-		$searchval,
-		$filters,
-		$intermediateNodes,
-	) = @_;
-	$sphinx->ResetFilters();
-	$sphinx->SetFilter('intassocID',$filters->{'assoc'}) if $filters->{'assoc'};
-	my $results = $sphinx->Query($searchval, 'SWM_Teams');
-	my @matchlist = ();
-	if($results and $results->{'total'})  {
-		for my $r (@{$results->{'matches'}})  {
-			push @matchlist, $r->{'doc'};
-		}
-	}
-
-	my @dataarray = ();
-	if(@matchlist)	{
-		my $clubID = $Data->{'clientValues'}{'clubID'} || 0;
-		$clubID = 0 if $clubID < 0;
-		my $clubwhere = '';
-		if($clubID)	{
-			$clubwhere =  qq[ AND tblTeam.intClubID = $clubID ];
-		}
-		my $id_list = join(',',@matchlist);
-		my $st = qq[
-			SELECT DISTINCT
-				tblTeam.intTeamID,
-				tblTeam.strName,
-                tblAssoc_Comp.strTitle AS CompName
-			FROM
-				tblTeam
-                INNER JOIN tblAssoc ON tblAssoc.intAssocID = tblTeam.intAssocID
-                LEFT JOIN tblComp_Teams ON tblTeam.intTeamID=tblComp_Teams.intTeamID 
-                LEFT JOIN tblAssoc_Comp ON tblComp_Teams.intCompID=tblAssoc_Comp.intCompID AND tblAssoc_Comp.intNewSeasonID = tblAssoc.intCurrentSeasonID
-			WHERE tblTeam.intTeamID IN ($id_list)
-				$clubwhere
-			ORDER BY 
-				tblTeam.strName, tblTeam.intTeamID
-			LIMIT 10
-		];
-		my $assocID = $Data->{'clientValues'}{'assocID'} || 0;
-		$assocID = 0 if $assocID == $Defs::INVALID_ID;
-		if(!$assocID)	{
-			$st = qq[
-				SELECT DISTINCT
-					intTeamID,
-					tblTeam.strName,
-					A.intAssocID,
-					A.strName AS AssocName
-				FROM
-					tblTeam
-						INNER JOIN tblAssoc AS A ON
-							tblTeam.intAssocID = A.intAssocID
-				WHERE intTeamID IN ($id_list)
-				ORDER BY 
-					strName , A.strName
-				LIMIT 10
-			];
-		}
-print STDERR "$st\n";
-		my $q = $Data->{'db'}->prepare($st);
-		$q->execute();
-		my $numnotshown = ($results->{'total'} || 0) - 10;
-		$numnotshown = 0 if $numnotshown < 0;
-		while(my $dref = $q->fetchrow_hashref())	{
-			my $link = getSearchLink(
-				$Data,
-				$Defs::LEVEL_TEAM,
-				'teamID'	,
-				$dref->{'intTeamID'},
-				$intermediateNodes,
-				$assocID || $dref->{'intAssocID'} || 0,
-			);			
-			my $name = $dref->{'strName'} || '';
-            $name .= " ($dref->{'CompName'})" if $dref->{'CompName'};
-			$name .= "  ($dref->{'AssocName'})" if $dref->{'AssocName'};
-			push @dataarray, {
-				id => $dref->{'intTeamID'} || next,
-				label => $name,
-				category => 'Teams',
-				link => $link,
-				numnotshown => $numnotshown,
-			};
-		}
-	}
-    print STDERR Dumper(\@dataarray);
-	return \@dataarray;
-}
 
 sub search_clubs	{
 	my (
@@ -433,83 +308,6 @@ sub search_clubs	{
 	return \@dataarray;
 }
 
-sub search_comps	{
-	my (
-		$Data,
-		$sphinx,
-		$searchval,
-		$filters,
-		$intermediateNodes,
-	) = @_;
-	$sphinx->ResetFilters();
-	$sphinx->SetFilter('intassocID',$filters->{'assoc'}) if $filters->{'assoc'};
-	my $results = $sphinx->Query($searchval, 'SWM_Comps');
-	my @matchlist = ();
-	if($results and $results->{'total'})  {
-		for my $r (@{$results->{'matches'}})  {
-			push @matchlist, $r->{'doc'};
-		}
-	}
-	my @dataarray = ();
-	if(@matchlist)	{
-		my $id_list = join(',',@matchlist);
-		my $st = qq[
-			SELECT 
-				intCompID,
-				strTitle
-			FROM
-				tblAssoc_Comp
-			WHERE intCompID IN ($id_list)
-			ORDER BY 
-				strTitle
-			LIMIT 10
-		];
-		my $assocID = $Data->{'clientValues'}{'assocID'} || 0;
-		$assocID = 0 if $assocID == $Defs::INVALID_ID;
-		if(!$assocID)	{
-			$st = qq[
-				SELECT 
-					intCompID,
-					strTitle,
-					A.strName AS AssocName,
-					A.intAssocID
-				FROM
-					tblAssoc_Comp
-						INNER JOIN tblAssoc AS A ON
-							tblAssoc_Comp.intAssocID = A.intAssocID
-				WHERE intCompID IN ($id_list)
-				ORDER BY 
-					strTitle, A.strName
-				LIMIT 10
-			];
-		}
-		my $q = $Data->{'db'}->prepare($st);
-		$q->execute();
-		my $numnotshown = ($results->{'total'} || 0) - 10;
-		$numnotshown = 0 if $numnotshown < 0;
-		while(my $dref = $q->fetchrow_hashref())	{
-			my $link = getSearchLink(
-				$Data,
-				$Defs::LEVEL_COMP,
-				'compID'	,
-				$dref->{'intCompID'},
-				$intermediateNodes,
-				$assocID || $dref->{'intAssocID'} || 0,
-			);
-			my $name = $dref->{'strTitle'} || '';
-			$name .= "  ($dref->{'AssocName'})" if $dref->{'AssocName'};
-			push @dataarray, {
-				id => $dref->{'intCompID'} || next,
-				label => $name,
-				category => 'Competitions',
-				link => $link,
-				numnotshown => $numnotshown,
-			};
-		}
-	}
-	return \@dataarray;
-}
-
 sub search_assocs {
 	my (
 		$Data,
@@ -579,8 +377,6 @@ sub getSearchLink	{
 
   my %tempClientValues = %{$Data->{'clientValues'}};
   my %actions=(
-    $Defs::LEVEL_COMP => 'CO_HOME',
-    $Defs::LEVEL_TEAM => 'T_HOME',
     $Defs::LEVEL_MEMBER => 'M_HOME',
     $Defs::LEVEL_CLUB => 'C_HOME',
     $Defs::LEVEL_ASSOC => 'A_HOME',

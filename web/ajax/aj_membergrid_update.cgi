@@ -56,9 +56,6 @@ sub main    {
     my $valid_mID = validate_MemberAccess(\%Data, $memberID);
     my $done = 0;
     if($db and $valid_mID)    {
-        if ($colfield =~ /PlayerNumber/) {
-            $done = update_player_numbers(\%Data, $colfield, $memberID, $value);
-        }
         elsif ($colfield eq 'intPlayerPending') {
             $done = update_pending_status(\%Data, $memberID, $value);
         }
@@ -70,9 +67,6 @@ sub main    {
                     or $colfield eq 'MTStatus'
             )   {
                 update_Statuses(\%Data, $memberID, $value, $Defs::LEVEL_MEMBER, $colfield );
-            }
-            elsif($colfield eq 'MTCompStatus')  {
-                updateMTC(\%Data, $memberID, $value);
             }
             elsif($colfield eq 'TXNStatus') {
                 update_paidStatuses(\%Data, \@updates);
@@ -220,12 +214,6 @@ sub update_Statuses {
     my $clubID=$Data->{'clientValues'}{'clubID'} || '';
     $clubID ='' if $clubID == $Defs::INVALID_ID;
 
-    my $teamID=$Data->{'clientValues'}{'teamID'} || '';
-    $teamID ='' if $teamID == $Defs::INVALID_ID;
-
-    my $compID =$Data->{'clientValues'}{'compID'} || 0;
-    $compID ='' if $compID == $Defs::INVALID_ID;
-
     my $currentlevel=$Data->{'clientValues'}{'currentLevel'};
     return if !$assocID and $currentlevel <=$Defs::LEVEL_ASSOC;
     my($st, $st_dt, $st_ct, $st_m)=('','','', '');
@@ -248,16 +236,7 @@ sub update_Statuses {
             AND intAssocID=$assocID
             AND intRecStatus <> $Defs::RECSTATUS_DELETED
         ];
-        if ($teamID )    { # and ! $Data->{'SystemConfig'}{'AllowClubsAssocStatus'})    {
-            $st=qq[
-            UPDATE tblMember_Teams SET intStatus= ?
-            WHERE intMemberID=?
-                AND intTeamID=$teamID
-                AND intStatus <> $Defs::RECSTATUS_DELETED
-            ];
-            $st_dt='';
-        }
-        elsif ($clubID  and (! $Data->{'SystemConfig'}{'AllowClubsAssocStatus'} or $field eq 'MCStatus'))    {
+        if ($clubID  and (! $Data->{'SystemConfig'}{'AllowClubsAssocStatus'} or $field eq 'MCStatus'))    {
             $st=qq[
             UPDATE tblMember_Clubs SET intStatus=?
             WHERE intMemberID=?
@@ -286,31 +265,6 @@ sub update_Statuses {
             AND intRecStatus <> $Defs::RECSTATUS_DELETED
         ];
     }
-    elsif($level==$Defs::LEVEL_TEAM) {
-        if ($field eq 'intTeamFinancial')    {
-            $st = qq[
-            UPDATE tblComp_Teams SET intTeamFinancial=? 
-            WHERE intTeamID=?
-                AND intCompID = $compID
-            ];
-        }
-        elsif ($compID)    {
-            $st=qq[
-            UPDATE tblComp_Teams SET intRecStatus=? 
-            WHERE intTeamID=?
-                AND intCompID = $compID
-            ];
-        }    
-        else    {
-            $st=qq[
-            UPDATE tblTeam SET intRecStatus=? 
-            WHERE intTeamID=?
-                AND intAssocID=$assocID
-                AND intRecStatus <> $Defs::RECSTATUS_DELETED
-            ];
-        }
-
-    }
     return '' if !$st;
     my $q=$Data->{'db'}->prepare($st);
     my $q_ct=$Data->{'db'}->prepare($st_ct);
@@ -321,11 +275,6 @@ sub update_Statuses {
     my $newstatus = ($value and $value == 1) ? $Defs::RECSTATUS_ACTIVE : $Defs::RECSTATUS_INACTIVE;
     if ($level == $Defs::LEVEL_MEMBER)    {
         $q_m->execute($id) if ($newstatus==1); 
-    }
-    if ($level == $Defs::LEVEL_MEMBER and $teamID)    {
-        #$q->execute($Defs::RECSTATUS_INACTIVE, $id); 
-        $q->execute($newstatus, $id); 
-        return '';
     }
     if($newstatus == $Defs::RECSTATUS_ACTIVE and $st_dt)    {
         $q_dt->execute($newstatus, $id); 
@@ -339,14 +288,6 @@ sub update_Statuses {
             $q=$Data->{'db'}->prepare($st);
         }
         $q->execute($newstatus, $id); 
-    }
-    if ($level==$Defs::LEVEL_TEAM and $compID)    {
-        my $st_players=qq[
-        UPDATE tblMember_Teams SET intStatus=$Defs::RECSTATUS_INACTIVE
-        WHERE intTeamID=$id
-            AND intCompID = $compID
-            AND intStatus=$Defs::RECSTATUS_ACTIVE
-        ];
     }
 
 
@@ -485,39 +426,6 @@ sub update_paidStatuses {
     }
 }
 
-sub updateMTC {
-    my($Data, $memberID, $value)=@_;
-    my $assocID=$Data->{'clientValues'}{'assocID'} || '';
-    $assocID ='' if $assocID == $Defs::INVALID_ID;
-    my $clubID=$Data->{'clientValues'}{'clubID'} || '';
-    $clubID =0 if $clubID == $Defs::INVALID_ID;
-    my $teamID=$Data->{'clientValues'}{'teamID'} || '';
-    $teamID =0 if $teamID == $Defs::INVALID_ID;
-    my $compID = $Data->{'mtCompID'} || 0;
-    return if !$assocID;
-    return if !$memberID;
-
-    my $st_compID = qq[
-    SELECT intNewSeasonID
-    FROM tblAssoc_Comp
-    WHERE intCompID = ?
-    ];
-    my $query = $Data->{'db'}->prepare($st_compID);
-    $query->execute($compID);
-    my $seasonID = $query->fetchrow_array() || 0;
-    my $st = qq[
-    INSERT IGNORE INTO tblMember_Teams (intMemberID, intTeamID, intCompID, intStatus)
-    VALUES (?, ?, ?, ?)
-    ON DUPLICATE KEY UPDATE intStatus = ?
-    ];
-    my $q=$Data->{'db'}->prepare($st);
-
-    $value ||= 0;
-    $q->execute($memberID, $teamID, $compID, $value, $value); 
-    $Data->{'memberListIntoComp'}=1;
-    checkForMemberSeasonRecord($Data, $compID, $teamID, $memberID);
-
-}
 sub update_seasonStatus    {
     my($Data, $seasonID, $updates, $field)=@_;
     my $assocID=$Data->{'clientValues'}{'assocID'} || '';
@@ -716,14 +624,6 @@ sub validate_MemberAccess    {
             AND intStatus <> -1
         ];
     }
-    elsif($level == $Defs::LEVEL_TEAM)    {
-        $st .= qq[
-        FROM tblMember_Teams
-        WHERE intMemberID = ?
-            AND intTeamID = ?    
-            AND intStatus <> -1
-        ];
-    }
     my $q = $Data->{'db'}->prepare($st);
     $q->execute(
         $memberID, 
@@ -732,89 +632,6 @@ sub validate_MemberAccess    {
 
     my ($mID) = $q->fetchrow_array();
     return $mID || 0;
-}
-
-sub update_player_numbers {
-    my($Data, $field, $memberID, $value )=@_;
-
-    my $dbh = $Data->{'db'};
-
-    my $assocID = $Data->{'clientValues'}{'assocID'} || '';
-    $assocID = '' if $assocID == $Defs::INVALID_ID;
-
-    my $clubID = $Data->{'clientValues'}{'clubID'} || '';
-    $clubID = 0 if $clubID == $Defs::INVALID_ID;
-
-    my $teamID = $Data->{'clientValues'}{'teamID'} || '';
-    $teamID = 0 if $teamID == $Defs::INVALID_ID;
-
-    return 0 if !$assocID || !$memberID;
-
-    if (defined $value){
-        if ($value =~ /.{3,}/){
-            return 0; # Too many characters
-        }
-        elsif ( $value =~ /\D/ ){
-            return 0; # non digit characters
-        }
-    }
-
-    if ($field =~ /Team/){
-        return 0 if !$teamID;
-
-        if (!$clubID){
-            my $club_id_lookup_stmt = 'SELECT intClubID from tblTeam where intTeamID =?';
-            my $club_id_lookup_query = $dbh->prepare($club_id_lookup_stmt);
-            $club_id_lookup_query->execute($teamID);
-            if (my $dref = $club_id_lookup_query->fetchrow_hashref()){
-                $clubID = $dref->{'intClubID'} || 0;
-            }
-        }
-
-        if ( defined $value && $value ne '' ){
-            #set the new jumper number
-            set_player_number({
-                    'dbh' => $dbh,
-                    'club_id' => $clubID,
-                    'team_id' => $teamID,
-                    'assoc_id' => $assocID,
-                    'member_id' => $memberID,
-                    'jumper_num' => $value,
-                });
-        }
-        else{
-            #remove number
-            remove_player_number({
-                    'dbh' => $dbh,
-                    'club_id' => $clubID,
-                    'team_id' => $teamID,
-                    'assoc_id' => $assocID,
-                    'member_id' => $memberID,
-                });
-        }
-    }
-    else{
-        if ( defined $value && $value ne '' ){
-            #set the new jumper number
-            set_player_number({
-                    'dbh' => $dbh,
-                    'club_id' => $clubID,
-                    'assoc_id' => $assocID,
-                    'member_id' => $memberID,
-                    'jumper_num' => $value,
-                });
-        }
-        else{
-            #remove number
-            remove_player_number({
-                    'dbh' => $dbh,
-                    'club_id' => $clubID,
-                    'assoc_id' => $assocID,
-                    'member_id' => $memberID,
-                });
-        }
-    }
-    return 1;
 }
 
 

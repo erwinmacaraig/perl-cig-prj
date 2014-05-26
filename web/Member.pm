@@ -10,7 +10,6 @@ require Exporter;
   getAutoMemberNum
   member_details
   setupMemberTypes
-  TribunalHistory
   updateMemberNotes
   preMemberAdd
   check_valid_date
@@ -56,7 +55,6 @@ use GenAgeGroup;
 use GridDisplay;
 use InstanceOf;
 
-use Tribunal;
 use FieldCaseRule;
 use HomeMember;
 use InstanceOf;
@@ -199,10 +197,6 @@ sub handleMember {
     elsif ( $action =~ /M_MTM_/ ) {
         ( $resultHTML, $title ) = memberTeamFinancial( $action, $Data, $memberID );
     }
-    elsif ( $action =~ /TB_LIST/ ) {
-        ( $resultHTML, $title ) = TribunalHistory( $Data, $memberID, 1 );
-        $title = 'Tribunal History';
-    }
     elsif ( $action =~ /M_TEAMS/ ) {
         my ( $clubStatus, $clubs, $teams ) = showClubTeams( $Data, $memberID );
         $teams      = qq[<div class="warningmsg">No $Data->{'LevelNames'}{$Defs::LEVEL_TEAM} History found</div>] if !$teams;
@@ -214,9 +208,6 @@ sub handleMember {
         $clubs      = qq[<div class="warningmsg">No $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} History found</div>] if !$clubs;
         $resultHTML = $clubs;
         $title      = "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} History";
-    }
-    elsif ( $action =~ /TB_/ ) {
-        ( $resultHTML, $title ) = handleTribunal( $action, $Data );
     }
     elsif ( $action =~ /M_SEASONS/ ) {
         ( $resultHTML, $title ) = showSeasonSummary( $Data, $memberID );
@@ -2543,12 +2534,6 @@ $member_photo
         $title = $chgoptions . $title;
         $title .= " - ON PERMIT " if $Data->{'MemberOnPermit'};
 
-        my $tribunalhistory = TribunalHistory( $Data, $memberID, 1 );
-        if ($tribunalhistory) {
-            push @tabdata, qq[<div id="tribunal_dat">$tribunalhistory</div>];
-            my $txt_Tribunal = $Data->{'SystemConfig'}{'txtTribunal'} || 'Tribunal';
-            push @taboptions, [ 'tribunal_dat', $txt_Tribunal ];
-        }
         my $otherassocs = checkOtherAssocs( $Data, $memberID ) || '';
         if ($otherassocs) {
             push @tabdata, qq[<div id="otherassocs_dat">$otherassocs</div>];
@@ -3521,175 +3506,6 @@ sub loadMemberExpiry {
     return $html;
 }
 
-sub TribunalHistory {
-
-    my ( $Data, $intMemberID, $allowAddEdit ) = @_;
-    $allowAddEdit ||= 0;
-
-    return if !$Data->{'SystemConfig'}{'AllowTribunal'};
-    $intMemberID ||= 0;
-
-    return '' if !$intMemberID;
-
-    my $db = $Data->{'db'};
-    my $body;
-
-    my $client       = setClient( $Data->{'clientValues'} )   || '';
-    my $txt_Tribunal = $Data->{'SystemConfig'}{'txtTribunal'} || 'Tribunal';
-
-    my $assocID = $Data->{'clientValues'}{'assocID'} || 0;
-    $assocID = 0 if ( $assocID == $Defs::INVALID_ID );
-
-    my $allowFullTribunal = 0;
-
-    if ( $allowAddEdit and $assocID ) {
-        my $st = qq[
-			SELECT intAllowFullTribunal
-			FROM tblAssoc
-			WHERE intAssocID = $assocID
-		];
-        my $qry = $db->prepare($st) or query_error($st);
-        $qry->execute or query_error($st);
-        $allowFullTribunal = $qry->fetchrow_array() || 0;
-    }
-
-    my $addLink = ( $allowFullTribunal and $allowAddEdit and $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC )
-      ? qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=TB_DTA">Add</a></span>]
-      : '';
-    my $st = qq[
-        SELECT 
-			T.intTribunalID, 
-			T.intAssocID,
-			IF(T.intChargeID > 0, DC.strName , T.strOffence) as ChargeOffence,
-			DATE_FORMAT(T.dtCharged,'%d/%m/%Y') AS dtCharged, 
-			IF(T.strOutCome>0, TDC.strName, T.strOutcome) as strOutcome, 
-			T.intPenalty, 
-			T.strPenaltyType, 
-			DATE_FORMAT(T.dtPenaltyExp,'%d/%m/%Y') AS dtPenaltyExp, 
-			A.strName as strAssocName, 
-			C.strName as ClubName,
-			T.intSuspendedPenalty, 
-			T.strSuspendedPenaltyType,
-			AG.strAgeGroupDesc,
-			AC.strTitle as CompName
-		FROM 
-			tblTribunal as T
-			LEFT JOIN tblAssoc as A ON (A.intAssocID = T.intAssocID)
-			LEFT JOIN tblClub as C ON (C.intClubID = T.intClubID)
-			LEFT JOIN tblDefCodes as DC ON (DC.intCodeID = T.intChargeID)
-			LEFT JOIN tblDefCodes as TDC ON (TDC.intCodeID = T.strOutcome)
-			LEFT JOIN tblAssoc_Comp as AC ON (AC.intCompID = T.intCompID)
-			LEFT JOIN tblAgeGroups as AG ON (AG.intAgeGroupID = T.intTribunalAgeGroupID)
-                WHERE 
-			T.intMemberID = $intMemberID
-			AND T.intRealmID = $Data->{'Realm'}
-		ORDER BY 
-			T.dtCharged DESC, 
-			intTribunalID DESC
-        ];
-    my $query = $db->prepare($st) or query_error($st);
-    $query->execute or query_error($st);
-
-    my @headerdata = (
-        {
-           type  => 'Selector',
-           field => 'SelectLink',
-        },
-        {
-           name  => "$txt_Tribunal ID",
-           field => 'intTribunalID',
-        },
-        {
-           name  => "$Data->{'LevelNames'}{$Defs::LEVEL_ASSOC}",
-           field => 'strAssocName',
-        },
-        {
-           name  => "$Data->{'LevelNames'}{$Defs::LEVEL_COMP}",
-           field => 'CompName',
-        },
-        {
-           name  => "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB}",
-           field => 'ClubName',
-        },
-        {
-           name  => "Age Group",
-           field => 'strAgeGroupDesc',
-        },
-        {
-           name  => "Offence",
-           field => 'ChargeOffence',
-        },
-        {
-           name  => "Date Charged",
-           field => 'dtCharged',
-        },
-        {
-           name  => "Outcome",
-           field => 'strOutcome',
-        },
-        {
-           name  => "Penalty",
-           field => 'Penalty',
-        },
-        {
-           name  => "Penalty Exp. Date",
-           field => 'dtPenaltyExp',
-        },
-        {
-           name  => "Suspended Penalty",
-           field => 'Suspended',
-        },
-        {
-           name  => '&nbsp;',
-           field => 'deleteLink',
-           type  => 'HTML',
-        },
-    );
-
-    my $count   = 0;
-    my @rowdata = ();
-    while ( my $dref = $query->fetchrow_hashref() ) {
-        $count++;
-        my $selectLink = $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC ? "$Data->{'target'}?client=$client&amp;a=TB_DTE&amp;tID=$dref->{intTribunalID}" : '';
-        $selectLink = '' if ( !$allowFullTribunal or !$allowAddEdit or $dref->{intAssocID} != $Data->{clientValues}{assocID} );
-        my $deleteLink =
-          $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC
-          ? qq[<a href="$Data->{target}?client=$client&amp;a=TB_DEL&amp;tID=$dref->{intTribunalID}" onclick="return confirm('Are you sure you wish to delete this tribunal record');"><img src="images/sml_delete_icon.gif" border="0" alt="Delete $txt_Tribunal" title="Delete $txt_Tribunal"></a>]
-          : '';
-        $deleteLink = '' if ( !$allowFullTribunal or !$allowAddEdit or $dref->{intAssocID} != $Data->{clientValues}{assocID} );
-        $dref->{intPenalty} = '' if ( !$dref->{intPenalty} and !$dref->{strPenaltyType} );
-        $dref->{dtPenaltyExp} = '' if ( $dref->{dtPenaltyExp} =~ /0000$/ );
-
-        $dref->{'Penalty'}   = qq[$dref->{intPenalty} $dref->{strPenaltyType}];
-        $dref->{'Suspended'} = qq[$dref->{intSuspendedPenalty} $dref->{strSuspendedPenaltyType}];
-        push @rowdata,
-          {
-            id              => $dref->{'intTribunalID'},
-            intTribunalID   => $dref->{'intTribunalID'},
-            SelectLink      => $selectLink,
-            strAssocName    => $dref->{'strAssocName'},
-            CompName        => $dref->{'CompName'},
-            ClubName        => $dref->{'ClubName'},
-            strAgeGroupDesc => $dref->{'strAgeGroupDesc'},
-            ChargeOffence   => $dref->{'ChargeOffence'},
-            dtCharged       => $dref->{'dtCharged'},
-            strOutcome      => $dref->{'strOutcome'},
-            Penalty         => $dref->{'Penalty'},
-            dtPenaltyExp    => $dref->{'dtPenaltyExp'},
-            Suspended       => $dref->{'Suspended'},
-            deleteLink      => $deleteLink,
-          };
-    }
-    my $table = showGrid(Data=>$Data, columns=>\@headerdata, rowdata=>\@rowdata, gridid=>'grid', width=>'99%', height=>400,);
-
-    $table = qq[<div class="warningmsg">No $txt_Tribunal History found</div>] if !$count;
-    $body .= qq[$addLink$table<div style="clear:both;"></div>];
-
-    $body = qq[<div class="sectionheader">$txt_Tribunal History</div>$body] if !$allowAddEdit;
-
-    return $body;
-
-}
 
 sub check_valid_date {
     my ($date) = @_;

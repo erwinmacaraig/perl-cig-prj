@@ -46,11 +46,9 @@ sub main	{
 	    edit_facility => $Defs::LEVEL_NATIONAL,
 		edit_stat_assoc => $Defs::LEVEL_ASSOC,
 		edit_stat_club => $Defs::LEVEL_CLUB,
-		edit_stat_team => $Defs::LEVEL_TEAM,
 	);
 
 	my $changelevel = $actionlevel{$action} || 0;
-  	$ID = param('key') if($actionlevel{$action} == $Defs::LEVEL_TEAM and param('key'));
  	my $valid = validate_Access(\%Data, $changelevel, $ID, $action);
 
 	my $done = 0;
@@ -96,12 +94,6 @@ sub update_Statuses {
 	my $clubID = $Data->{'clientValues'}{'clubID'} || '';
 	$clubID = '' if $clubID == $Defs::INVALID_ID;
 
-	my $teamID = $Data->{'clientValues'}{'teamID'} || '';
-	$teamID = '' if $teamID == $Defs::INVALID_ID;
-
-	my $compID = $Data->{'clientValues'}{'compID'} || 0;
-	$compID = '' if $compID == $Defs::INVALID_ID;
-	
 	my $currentlevel=$Data->{'clientValues'}{'currentLevel'};
 	return if !$assocID and $currentlevel <=$Defs::LEVEL_ASSOC;
 
@@ -152,39 +144,6 @@ sub update_Statuses {
 		push @values, $value;
 		push @values, $ID;
 		push @values, $assocID;
-	}
-	elsif($level==$Defs::LEVEL_TEAM) {
-		if ($field eq 'intTeamFinancial')	{
-			$st = qq[
-				UPDATE tblComp_Teams SET intTeamFinancial=? 
-					WHERE intTeamID = ?
-						AND intCompID = ?
-			];
-			push @values, $value;
-			push @values, $ID;
-			push @values, $compID;
-		}
-		elsif ($compID)	{
-			$st=qq[
-				UPDATE tblComp_Teams SET intRecStatus=? 
-				WHERE intTeamID=?
-					AND intCompID = ?
-			];
-			push @values, $value;
-			push @values, $ID;
-			push @values, $compID;
-		}	
-		else	{
-			$st=qq[
-				UPDATE tblTeam SET intRecStatus =? 
-				WHERE intTeamID =?
-					AND intAssocID = ?
-					AND intRecStatus <> $Defs::RECSTATUS_DELETED
-			];
-			push @values, $value;
-			push @values, $ID;
-			push @values, $assocID;
-		}
 	}
 	return '' if !$st;
 	my $q=$Data->{'db'}->prepare($st);
@@ -262,39 +221,6 @@ sub validate_Access	{
     			FROM tblAssoc_Clubs
     			WHERE intAssocID = ?
     				AND intClubID = ?
-    		];
-    	}
-    	elsif(
-    		$changelevel == $Defs::LEVEL_TEAM
-    		and $currentlevel == $Defs::LEVEL_CLUB)	{
-    
-    		$st = qq[
-    			SELECT intTeamID
-    			FROM tblTeam
-    			WHERE intClubID = ?
-    				AND intTeamID = ?
-    		];
-    	}
-    	elsif(
-    		$changelevel == $Defs::LEVEL_TEAM
-    		and $currentlevel == $Defs::LEVEL_ASSOC)	{
-    
-    		$st = qq[
-    			SELECT intTeamID
-    			FROM tblTeam
-    			WHERE intAssocID = ?
-    				AND intTeamID = ?
-    		];
-    	}
-    	elsif(
-    		$changelevel == $Defs::LEVEL_TEAM
-    		and $currentlevel == $Defs::LEVEL_COMP)	{
-    
-    		$st = qq[
-    			SELECT intTeamID
-    			FROM tblComp_Teams
-    			WHERE intCompID = ?
-    				AND intTeamID = ?
     		];
     	}
     	my $q = $Data->{'db'}->prepare($st);

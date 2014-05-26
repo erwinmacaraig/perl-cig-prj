@@ -1,8 +1,6 @@
 #
-# $Header: svn://svn/SWM/trunk/web/Passport.pm 11577 2014-05-15 21:19:13Z eobrien $
+# $Header: svn://svn/SWM/trunk/web/Passport.pm 9161 2013-08-06 04:18:30Z eobrien $
 #
-
-use strict;
 
 package Passport;
 
@@ -10,6 +8,7 @@ use LWP::UserAgent;
 use XML::Simple;
 use CGI;
 use MCache;
+use strict;
 
 sub new {
     my $this   = shift;
@@ -19,7 +18,6 @@ sub new {
     $self->{'ID'}    = $params{'id'} || 0;
     $self->{'db'}    = $params{'db'};
     $self->{'cache'} = $params{'cache'} || new MCache();
-
     bless $self, $class;
     return $self;
 }
@@ -67,64 +65,49 @@ sub loadSession {
     my $self = shift;
     my ($sessionK) = @_;
 
+my %sessions = (
+	'40whru4h535h345' => {
+		FirstName => 'Warren',
+		FamilyName => 'Rodie',
+		Email => 'w.rodie@sportingpulseinternational.com',
+		Status => 2,
+		MemberID => 1,
+	},
+	'3490n4023894m2r' => {
+		FirstName => 'Test',
+		FamilyName => 'User',
+		Email => 'w.rodie@sportingpulseinternational.com',
+		Status => 2,
+		MemberID => 20,
+	},	
+	'9034klfj450jljr' => {
+		FirstName => 'Test',
+		FamilyName => 'User',
+		Email => 'w.rodie@sportingpulseinternational.com',
+		Status => 2,
+		MemberID => 21,
+	},
+
+
+
+
+
+);
+
     # This function returns information about the passport account
     # currently logged in
 
     my $output = new CGI;
     my $sessionkey = $sessionK || $output->cookie($Defs::COOKIE_PASSPORT) || '';
-
+$sessionkey = '40whru4h535h345';
     return undef if !$sessionkey;
 
-    my $cache = $self->{'cache'} || undef;
-
-    my ( $tokenreq_ok, $tokenreq ) = ( '', '' );
-    if ($cache) {
-        my $cacheval = $cache->get( 'swm', 'PSKEY_' . $sessionkey );
-        if ($cacheval) {
-            $tokenreq_ok = $cacheval->[0];
-            $tokenreq    = $cacheval->[1];
-        }
-    }
-    if ( !$tokenreq_ok ) {
-        ( $tokenreq_ok, $tokenreq ) =
-          $self->_connect(
-                           'GetToken',
-                           {
-                              SessionKey => $sessionkey,
-                           }
-          );
-        return undef if !$tokenreq_ok;
-        $cache->set( 'swm', "PSKEY_$sessionkey", [ $tokenreq_ok, $tokenreq ], undef, 60 * 10 ) if $cache;    #Cache for 10min
-    }
-    return undef if !$tokenreq_ok;
-    my $token = $tokenreq->{'Response'}{'Data'}{'PassportToken'} || '';
-    my $id    = $tokenreq->{'Response'}{'Data'}{'PassportID'}    || '';
-
-    $self->{'ID'} = $id if $id;
-
-    if ( $token and $id ) {
-        my ( $inforeq_ok, $inforeq ) = ( '', '' );
-        if ($cache) {
-            my $cacheval = $cache->get( 'swm', 'PTOK_' . $token );
-            if ($cacheval) {
-                $inforeq_ok = $cacheval->[0];
-                $inforeq    = $cacheval->[1];
-            }
-        }
-        if ( !$inforeq_ok ) {
-            ( $inforeq_ok, $inforeq ) =
-              $self->_connect(
-                               'PassportInfo',
-                               {
-                                  PassportToken => $token,
-                               },
-              );
-            $cache->set( 'swm', "PTOK_$token", [ $inforeq_ok, $inforeq ], undef, 60 * 10 ) if $cache;    #Cache for 10min
-        }
-        if ($inforeq_ok) {
-            $self->{'Info'} = $inforeq->{'Response'}{'Data'};
-        }
-    }
+    if(exists $sessions{$sessionkey})	{
+			my $info = $sessions{$sessionkey};
+			$self->{'ID'} = $info->{'MemberID'};
+			$self->{'Info'} = $info;
+		}
+		return undef;
 }
 
 sub bulkdetails {
@@ -271,53 +254,6 @@ sub addModule {
     return ( 0, 0 );
 }
 
-sub link_member {
-    my $self = shift;
-    my (
-         $memberID,
-         $lang,
-         $errors,
-    ) = @_;
-
-    my $passportID = $self->{ID};
-    my $existing   = 0;
-    {
-        my $st = qq[
-            SELECT intPassportID
-            FROM tblPassportMember
-            WHERE intMemberID = ?
-        ];
-        my $q = $self->{'db'}->prepare($st);
-        $q->execute( $memberID, );
-        ($existing) = $q->fetchrow_array() || 0;
-        $q->finish();
-    }
-    if ($existing) {
-        push @{$errors}, $lang->txt('That member is already linked to an SP Passport');
-    }
-    else {
-        my $st = qq[
-            INSERT INTO tblPassportMember (
-                intPassportID,
-                intMemberID,
-                tTimeStamp
-            )
-            VALUES (
-                ?,
-                ?,
-                NOW()
-            )
-        ];
-        my $q = $self->{'db'}->prepare($st);
-        $q->execute(
-                     $passportID,
-                     $memberID,
-        );
-        $q->finish();
-    }
-
-}
-
 sub create_passport {
     my $self = shift;
     my ($params) = @_;
@@ -331,7 +267,6 @@ sub create_passport {
                           'Familyname' => $params->{'Familyname'},
                           'Country'    => $params->{'Country'},
                           'State'      => $params->{'State'},
-                          'Password'   => $params->{'Password'},
                        }
       );
     if ($ok) {

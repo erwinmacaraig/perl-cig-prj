@@ -29,7 +29,6 @@ my %DefCodesTypes	= (
     -8 => 'Ethnicity',
 	-10 => 'Hair Colours',
 	-11 => 'Eye Colours',
-	#-13 => 'Tribunal Offence Types',
 	-14 => 'Official Types',
 	-15 => 'Accreditation Levels',
 	-16 => 'Misc. Official Types',
@@ -89,8 +88,6 @@ my %DefCodesTypes	= (
 	-91 => 'Languages',
 	#-92 => 'Other 1 Official Types', #(SWC ONLY)
 	#-93 => 'Other 2 Official Types', #(SWC ONLY)
-	-94 => 'Tribunal Outcomes', #(SWM ONLY)
-	-95 => 'Tribunal Hearing Venue', #(SWM ONLY)
 	-96 => 'Misc Pos Level', #(SWM ONLY)
 
     -97 => 'Custom Lookup 11',

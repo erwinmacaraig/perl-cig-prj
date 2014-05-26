@@ -6,8 +6,8 @@ package ListMembers;
 
 require Exporter;
 @ISA =    qw(Exporter);
-@EXPORT = qw(listMembers bulkMemberRollover listMemberTeams listMemberSeasons bulkMemberRolloverUpdate);
-@EXPORT_OK = qw(listMembers bulkMemberRollover listMemberTeams listMemberSeasons bulkMemberRolloverUpdate);
+@EXPORT = qw(listMembers bulkMemberRollover listMemberSeasons bulkMemberRolloverUpdate);
+@EXPORT_OK = qw(listMembers bulkMemberRollover listMemberSeasons bulkMemberRolloverUpdate);
 
 use strict;
 use CGI qw(param unescape escape);
@@ -75,11 +75,6 @@ sub listMembers {
     else    { 
         $seasonID = $assocSeasons->{'currentSeasonID'};
     }
-    if ($seasonID==-2 
-        and $Data->{'clientValues'}{'teamID'} 
-        and $Data->{'clientValues'}{'teamID'} ne $Defs::INVALID_ID) {
-            $seasonID = -1 
-    }
 
     my $lang = $Data->{'lang'};
     my $txt_SeasonName= $Data->{'SystemConfig'}{'txtSeason'} || 'Season';
@@ -92,10 +87,6 @@ sub listMembers {
         'invalidPageRequested' => $lang->txt('Invalid page requested.'),
         'seasonRollover' => $lang->txt("$txt_SeasonName Rollover"),
     );
-    my $intCompID =$Data->{'clientValues'}{'compID'} || 0;
-    my $comp_where=($intCompID and $intCompID > 0) 
-        ? " AND (tblMember_Teams.intCompID=$intCompID) " 
-        : '';
 
     my $groupBy = '';
     my $MStablename = "tblMember_Seasons_$realm_id";
@@ -121,9 +112,6 @@ sub listMembers {
         ];
     }
     my $season_WHERE = '';
-    my $teamComp_SELECT = '';
-    my $teamComp_WHERE = '';
-    my $teamComp_JOIN = '';
     my $showRecordType=1;
 
     my $mtypefilter= $Data->{'CookieMemberTypeFilter'} ? qq[ AND $Data->{'CookieMemberTypeFilter'} = 1 ] : '';
@@ -163,43 +151,6 @@ sub listMembers {
         ];
         $groupBy = qq[ GROUP BY tblMember.intMemberID, Seasons.intSeasonID];
         $season_WHERE .= qq[ AND Seasons.intClubID = $Data->{'clientValues'}{'clubID'}];
-    }
-    elsif($type == $Defs::LEVEL_TEAM) {
-        $showRecordType=0;
-
-#    $mtypefilter='';
-        $from_str=qq[ INNER JOIN tblMember_Teams INNER JOIN tblTeam ON (tblTeam.intTeamID = $Data->{'clientValues'}{'teamID'}) ];
-        $from_str.=qq[ LEFT JOIN tblMember_Clubs as MC ON (MC.intClubID = tblTeam.intClubID AND MC.intMemberID = tblMember.intMemberID and MC.intStatus=1)];
-        $sel_str=', tblMember_Teams.intStatus as MTStatus ';
-        $where_str=qq[ 
-            tblMember_Teams.intTeamID=$Data->{'clientValues'}{'teamID'} 
-            AND tblMember_Teams.intMemberID=tblMember.intMemberID
-            AND tblMember_Teams.intStatus<>$Defs::RECSTATUS_DELETED
-            AND tblMember_Associations.intAssocID=$Data->{'clientValues'}{'assocID'} 
-            AND (tblTeam.intClubID =0 or MC.intMemberClubID > 0 or tblTeam.intClubID=0)
-        $comp_where
-        ];
-        $season_WHERE .= qq[ AND Seasons.intClubID = tblTeam.intClubID];
-
-        if ($mtCompID >0 and $Data->{'clientValues'}{'teamID'} and $Data->{'clientValues'}{'teamID'} ne $Defs::INVALID_ID) {
-            $teamComp_JOIN = qq[ 
-            LEFT JOIN tblMember_Teams as MTComp ON (
-                MTComp.intMemberID = tblMember.intMemberID 
-                AND MTComp.intTeamID = $Data->{'clientValues'}{'teamID'}
-                AND MTComp.intCompID = $mtCompID
-            )
-            ];
-            $teamComp_JOIN .= qq[ LEFT JOIN tblAssoc_Comp as AC ON (AC.intCompID = tblMember_Teams.intCompID    and AC.intAssocID= tblMember_Associations.intAssocID) ] if (! $mtCompID);
-            $teamComp_SELECT = qq[, MTComp.intStatus as MTCompStatus ];
-            $teamComp_SELECT .= qq[, AC.strTitle as CompName ] if ! $mtCompID;
-        } else {
-            $season_WHERE    .= qq[ AND (AC.intNewSeasonID=Seasons.intSeasonID) ] if ($mtCompID>0);
-            $season_WHERE    .= qq[ AND (AC.intNewSeasonID=$seasonID) ] if ($seasonID>0);
-            $season_WHERE    .= qq[ AND (tblComp_Teams.intRecStatus<>-1 OR tblComp_Teams.intRecStatus IS NULL) ];
-            $teamComp_SELECT .= qq[, AC.strTitle as CompName ] if ! $mtCompID;
-            $teamComp_JOIN   .= qq[ LEFT JOIN tblAssoc_Comp as AC ON (AC.intCompID = tblMember_Teams.intCompID and AC.intAssocID= tblMember_Associations.intAssocID) ] if (! $mtCompID);
-            $teamComp_JOIN   .= qq[ LEFT JOIN tblComp_Teams ON (tblTeam.intTeamID = tblComp_Teams.intTeamID and AC.intCompID = tblComp_Teams.intCompID) ] if(!$mtCompID);
-        }
     }
     return textMessage($textLabels{'invalidPageRequested'}) if !$type;
 
@@ -252,10 +203,6 @@ sub listMembers {
         push @{$showfields}, 'SKIP_TxnTotalCount';
         $memfieldlabels->{'TxnTotalCount'} = $Data->{'lang'}->txt("Total Unpaid");
     }
-    if ($type == $Defs::LEVEL_TEAM and ! $mtCompID and $Data->{'clientValues'}{'teamID'} and $Data->{'clientValues'}{'teamID'} ne $Defs::INVALID_ID) {
-        push @{$showfields}, 'AC.strTitle';
-        $memfieldlabels->{'AC.strTitle'} = "$Data->{'LevelNames'}{$Defs::LEVEL_COMP}";
-    }
 
     my $select = '';
     my @headers = (
@@ -275,13 +222,8 @@ sub listMembers {
     my $used_miscfields = 0;
     my $used_volunteerfields = 0;
     my $used_schoolGrade    = 0;
-    my $used_club_player_number_fields = 0;
-    my $used_team_player_number_fields = 0;
 
     push @{$showfields}, 'SKIP_MCStatus' if $type == $Defs::LEVEL_CLUB and !$is_pending_registration;
-    push @{$showfields}, 'SKIP_MTStatus' if $type == $Defs::LEVEL_TEAM and ! $mtCompID;
-    push @{$showfields}, 'SKIP_MTCompStatus' if $mtCompID;
-
 
     $memfieldlabels->{'MCStatus'} = "Active in $Data->{'LevelNames'}{$type}";
     $memfieldlabels->{'MTStatus'} = "Active in $Data->{'LevelNames'}{$type}";
@@ -329,8 +271,6 @@ sub listMembers {
         $used_miscfields = 1      if $f =~/Misc\./      or $Data->{'Permissions'}{'MemberList'}{'SORT'}[0]=~/Misc\./;
         $used_volunteerfields = 1 if $f =~/Volunteer\./ or $Data->{'Permissions'}{'MemberList'}{'SORT'}[0]=~/Volunteer\./;
 
-        $used_club_player_number_fields = 1 if $f =~/PlayerNumberClub\./ or $Data->{'Permissions'}{'MemberList'}{'SORT'}[0]=~/PlayerNumberClub\./;
-        $used_team_player_number_fields = 1 if $f =~/PlayerNumberTeam\./ or $Data->{'Permissions'}{'MemberList'}{'SORT'}[0]=~/PlayerNumberTeam\./;
     }
 
     if ($is_pending_registration) {
@@ -345,17 +285,6 @@ sub listMembers {
     }
 
     my $clubID = $Data->{'clientValues'}{'clubID'} || 0;
-    my $teamID = $Data->{'clientValues'}{'teamID'} || 0;
-
-    if ($clubID <= 0 && $teamID > 0){
-        my $club_id_lookup_stmt = 'SELECT intClubID from tblTeam where intTeamID =?';
-        my $club_id_lookup_query = $db->prepare($club_id_lookup_stmt);
-        $club_id_lookup_query->execute($teamID);
-        if (my $dref = $club_id_lookup_query->fetchrow_hashref()){
-            $clubID = $dref->{'intClubID'} || 0;
-        }
-
-    }
 
     my $select_str = '';
     $select_str = ", ".join(',',@select_fields) if scalar(@select_fields);
@@ -415,29 +344,6 @@ sub listMembers {
     ]
     : '';
 
-    my $team_player_number_join = $used_team_player_number_fields
-    ? qq[
-    LEFT JOIN tblCompMatchSelectedPlayerNumbers AS PlayerNumberTeam ON (
-        PlayerNumberTeam.intMemberID=tblMember.intMemberID 
-            AND PlayerNumberTeam.intAssocID = $Data->{'clientValues'}{'assocID'}
-            AND PlayerNumberTeam.intClubID    = $clubID    
-            AND PlayerNumberTeam.intTeamID    = $teamID
-            AND PlayerNumberTeam.intMatchID = -1
-    )
-    ]
-    : '';
-
-    my $club_player_number_join = $used_club_player_number_fields
-    ? qq[
-    LEFT JOIN tblCompMatchSelectedPlayerNumbers AS PlayerNumberClub ON (
-        PlayerNumberClub.intMemberID=tblMember.intMemberID 
-            AND PlayerNumberClub.intAssocID = $Data->{'clientValues'}{'assocID'}
-            AND PlayerNumberClub.intClubID    = $clubID 
-            AND PlayerNumberClub.intTeamID <= 0
-            AND PlayerNumberClub.intMatchID = -1
-    )
-    ]
-    : '';
     $season_SELECT='';
     if($seasonID > 0)    {
         $season_WHERE .= qq[ AND Seasons.intSeasonID = $seasonID] if(!$is_pending_registration);
@@ -602,20 +508,16 @@ sub listMembers {
             $record_type_select
             $select_str
             $sel_str 
-            $teamComp_SELECT
         FROM tblMember 
         INNER JOIN tblMember_Associations ON (tblMember_Associations.intMemberID=tblMember.intMemberID)    
         LEFT JOIN tblMemberPackages ON (tblMember_Associations.intMemberPackageID=tblMemberPackages.intMemberPackagesID)    
         $from_str 
         $season_JOIN
-        $teamComp_JOIN
         $playerjoin
         $coachjoin
         $umpirejoin
         $miscjoin
         $volunteerjoin
-        $club_player_number_join
-        $team_player_number_join
         $record_type_join
         LEFT JOIN tblSchoolGrades ON (tblMember.intGradeID = tblSchoolGrades.intGradeID)
         LEFT JOIN tblMemberNotes ON tblMemberNotes.intNotesMemberID = tblMember.intMemberID
@@ -625,7 +527,6 @@ sub listMembers {
             $mtypefilter 
             $record_type_filter
             $season_WHERE
-            $teamComp_WHERE
         $groupBy
         ORDER BY $default_sort strSurname, strFirstname
     ];
@@ -653,12 +554,6 @@ sub listMembers {
         $dref->{'AgeGroups_strAgeGroupDesc'} = $dref->{'intPlayerAgeGroupID'}
         ? ($AgeGroups->{$dref->{'intPlayerAgeGroupID'}} || '')
         : '';
-        if ( !defined $dref->{'PlayerNumberClub_strJumperNum'}){
-            $dref->{'PlayerNumberClub_strJumperNum'}= '';
-        }
-        if ( !defined $dref->{'PlayerNumberTeam_strJumperNum'}){
-            $dref->{'PlayerNumberTeam_strJumperNum'}= '';
-        }
         $dref->{'intPermit'} ||= 0;
         $dref->{'intGender'} ||= 0;
         $dref->{'strFirstname'} ||= '';
@@ -712,15 +607,6 @@ sub listMembers {
     qq[<div class="listinstruction">$Data->{'SystemConfig'}{"ListInstruction_$Defs::LEVEL_MEMBER"}</div>] : '';
     $list_instruction=eval("qq[$list_instruction]") if $list_instruction;
 
-    my $comp_name = '';
-    if($mtCompID)    {
-        my $compObj = getInstanceOf($Data, 'comp', $mtCompID);
-        ($comp_name) = $compObj->getValue(['strTitle']);
-        if($comp_name)    {
-            $comp_name = qq[<b>Active in $Data->{'LevelNames'}{$Defs::LEVEL_COMP}</b> filtered for <b>$comp_name</b>];
-        }
-    }
-
     my $filterfields = [
         {
             field => 'strSurname',
@@ -737,9 +623,9 @@ sub listMembers {
             allvalue => '-99',
         };
     }
-    if( not $is_pending_registration and ($type == $Defs::LEVEL_TEAM or $type == $Defs::LEVEL_ASSOC)) {
+    if( not $is_pending_registration and $type == $Defs::LEVEL_ASSOC) {
         push @{$filterfields}, {
-            field => $type == $Defs::LEVEL_TEAM ? 'MTStatus' : 'intRecStatus_Filter',
+            field => 'intRecStatus_Filter',
             elementID => 'dd_actstatus',
             allvalue => '2',
         };
@@ -797,17 +683,6 @@ sub listMembers {
         delete $options{'addmember'} if $Data->{'SystemConfig'}{'LockMember'} or !$allowClubAdd;
     }
 
-    if (
-        $Data->{'clientValues'}{'teamID'} != $Defs::INVALID_ID 
-            and $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB 
-            and allowedAction($Data, 't_am') 
-            and !$Data->{'ReadOnlyLogin'}
-    )    {
-        $options{'modifyplayerlist'} = [ 
-        "$target?client=$client&amp;a=T_PL",
-        $textLabels{'modifyMemberList'},
-        ];
-    }
 
     if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB and $Data->{'SystemConfig'}{'Club_MemberEditOnly'}) {
         delete $options{'rollover_members'} ;
@@ -841,7 +716,6 @@ sub listMembers {
     my $rectype_options = show_recordtypes($Data, $Defs::LEVEL_MEMBER, 1, $memfieldlabels, 'Family Name',1, $omit_status, $omit_season);
 
     $resultHTML =qq[
-        $comp_name
         $list_instruction
         $msg_area_html
         <div class ="grid-filter-wrap">
@@ -901,12 +775,6 @@ sub setupMemberListFields    {
 
     # These fields are only relevant to particular levels of member lists
     my $level_relevant = {
-        'PlayerNumberClub.strJumperNum' =>{ $Defs::LEVEL_CLUB => 1,
-            $Defs::LEVEL_TEAM => 1,
-        },
-        'PlayerNumberTeam.strJumperNum' =>{
-            $Defs::LEVEL_TEAM => 1,
-        },
     };
 
     if($Data->{'Permissions'} and $Data->{'Permissions'}{'MemberList'}) {
@@ -942,14 +810,6 @@ sub getMemberListFieldOtherInfo {
 
     my %IntegerFields;
     my %TextFields;
-
-    # Only allowed to edit numbers at that level
-    if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB){
-        $TextFields{'PlayerNumberClub.strJumperNum'} = 1;
-    }
-    elsif($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_TEAM){
-        $TextFields{'PlayerNumberTeam.strJumperNum'} = 1;
-    }
 
     my %CheckBoxFields=(
         intRecStatus=> $Defs::RECSTATUS_ACTIVE,
@@ -1027,7 +887,6 @@ sub getMemberListFieldOtherInfo {
             }
         }
         $CheckBoxFields{'TXNStatus'} = $Defs::TXN_PAID if(($Data->{'SystemConfig'}{'AllowProdTXNs'} or $Data->{'SystemConfig'}{'AllowTXNs'}) and allowedAction($Data, 'm_e') and $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC);
-        #delete $CheckBoxFields{'MTCompStatus'} if ($type != $Defs::LEVEL_TEAM);
     }
     $type='tick' if ($field eq 'TXNStatus');
     if( !allowedAction($Data, 'm_e') or $Data->{'SystemConfig'}{'LockMember'}) {
@@ -1420,133 +1279,6 @@ sub rollover_choose_season {
     ];
     return $body;
 }
-
-sub listMemberTeams {
-    my ($Data, $memberID)=@_;
-    my $assocID=$Data->{'clientValues'}{'assocID'} || 0; #Current Association
-    my $client=setClient($Data->{'clientValues'});
-
-    my $txt_SeasonName= $Data->{'SystemConfig'}{'txtSeason'} || 'Season';
-
-    my $lang = $Data->{'lang'};
-    my %textLabels = ( #in lexicon 
-        'comp' => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_COMP}),
-        'season' => $lang->txt($txt_SeasonName),
-        'financial' => $lang->txt('Financial?'),
-        'teamName' => $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_TEAM} Name"),
-        'yes' => $lang->txt('Yes'),
-        'finals_link' => qq[&nbsp;],
-        'finals_eligible' => $lang->txt('Finals Eligible?'),
-        'finals_eligible_count' => $lang->txt('Finals Eligible Game Count'),
-        'finals_eligible_override' => $lang->txt('Finals Eligible Override'),
-    );
-
-    my $st=qq[
-    SELECT 
-    MT.intCompID,
-    strName, 
-    AC.strTitle, 
-    strSeasonName, 
-    intMemberTeamID,
-    MT.intFinalsEligibilityCount,
-    MT.intFinalsEligible,
-    MT.strFinalsEligibleOverride
-    FROM tblTeam
-    INNER JOIN tblMember_Teams AS MT ON (tblTeam.intTeamID=MT.intTeamID)
-    LEFT JOIN tblAssoc_Comp as AC ON (AC.intCompID = MT.intCompID)
-    LEFT JOIN tblComp_Teams as CT ON (
-        CT.intTeamID = tblTeam.intTeamID 
-            AND CT.intCompID=MT.intCompID
-    )
-    LEFT JOIN tblSeasons as S ON (AC.intNewSeasonID= S.intSeasonID)
-    WHERE MT.intMemberID = ?
-        AND tblTeam.intAssocID = ?
-        AND MT.intStatus <> $Defs::RECSTATUS_DELETED
-        AND (
-        CT.intRecStatus IS NULL 
-            OR CT.intRecStatus<>$Defs::RECSTATUS_DELETED
-    )
-    ORDER BY S.intSeasonOrder, strSeasonName, strName
-    ];
-    my $query = $Data->{'db'}->prepare($st);
-    $query->execute($memberID, $assocID);
-
-    my $assocSeasons = Seasons::getDefaultAssocSeasons($Data);
-
-    my @headers = (
-        {
-            name => $textLabels{'teamName'},
-            field => 'strName',
-        },
-        {
-            name => $textLabels{'comp'},
-            field => 'strTitle',
-        },
-        {
-            name => $textLabels{'season'},
-            field => 'strSeasonName',
-            hide => !$assocSeasons->{'allowSeasons'},
-        }
-    );
-    my @otherheaders = ({
-            name => $textLabels{'finals_eligible'},
-            field => 'intFinalsEligible',
-            editor => 'checkbox',
-            type => 'tick',
-            width => 30,
-        },
-        {
-            name => $textLabels{'finals_eligible_count'},
-            field => 'intFinalsEligibilityCount',
-        },
-        {
-            name => $textLabels{'finals_eligible_override'},
-            field => 'strFinalsEligibleOverride',
-        },
-        {
-            name => $textLabels{'finals_link'},
-            field => 'finals_qual_link',
-        },
-    );
-
-    my $assocObj = getInstanceOf($Data, 'assoc', $Data->{'clientValues'}{'assocID'});
-    my ($intSWOL) = $assocObj->getValue(['intSWOL']);
-    $intSWOL = 0 if !$Data->{'SystemConfig'}{'AllowSWOL'};
-    if($intSWOL>0) {
-        push(@headers, @otherheaders);
-
-    }
-    my $count=0;
-    my @rowdata = ();
-    while(my $dref=$query->fetchrow_hashref())            {
-        $count++;
-        my $fields='';
-        my %row = (
-            id => $count,
-        );
-        for my $f (qw(strName strTitle strSeasonName intFinalsEligible intFinalsEligibilityCount strFinalsEligibleOverride))    {
-            $row{$f} = $dref->{$f} || '';
-        }
-        $row{finals_qual_link} = '';
-        if($dref->{'intCompID'} and $Data->{'clientValues'}{'authLevel'} > $Defs::LEVEL_CLUB)
-        {
-            $row{finals_qual_link} = qq[<a href="main.cgi?a=M_FINALSQ_DTE&client=$client&mtID=$dref->{intMemberTeamID}">Edit Finals Eligibility</a>];
-        }
-        push @rowdata, \%row;
-    }
-
-    my $grid    = showGrid(
-        Data => $Data,
-        columns => \@headers,
-        rowdata => \@rowdata,
-        gridid => 'grid',
-        width => '99%',
-        simple => 1,
-    );
-
-    return ($grid);
-}
-
 
 sub listMemberSeasons     {
     my ($Data, $memberID)=@_;

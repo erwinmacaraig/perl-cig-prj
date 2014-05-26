@@ -18,7 +18,6 @@ use SystemConfig;
 use Search;
 use ReportManager;
 use ConfigOptions;
-use PassManage;
 use Clearances;
 use ClearanceSettings;
 use Duplicates;
@@ -174,10 +173,6 @@ sub main {
     elsif ( $action =~ /^REP_/ ) {
         ( $resultHTML, $report, $pageHeading ) =
           handleReports( $action, \%Data );
-    }
-    elsif ( $action =~ /^PW_/ ) {
-        ( $resultHTML, $pageHeading ) =
-          handlePasswordManagement( $action, \%Data, $typeID );
     }
     elsif ( $action =~ /^CL_/ ) {
         ( $resultHTML, $pageHeading ) = handleClearances( $action, \%Data );

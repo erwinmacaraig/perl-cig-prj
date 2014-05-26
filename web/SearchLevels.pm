@@ -112,26 +112,6 @@ sub getLevelQueryStuff	{
 		$where_levels.=qq[ tblAssoc.intAssocID=tblAssoc_Clubs.intAssocID AND tblClub.intRecStatus <> $Defs::RECSTATUS_DELETED];
 	}
 
-	if ($searchlevel > $Defs::LEVEL_TEAM and $searchentity == $Defs::LEVEL_TEAM) { #Assoc Level and above
-		$from_levels.=' INNER JOIN ' if $from_levels;
-		$select_levels.=',' if $select_levels;
-		$where_levels.=' AND ' if $where_levels;
-
-		$from_levels.=qq[ tblTeam];
-		$select_levels.=qq[ tblTeam.intTeamID, tblTeam.strName AS strTeamName ];
-		$where_levels.=qq[ tblAssoc.intAssocID=tblTeam.intAssocID AND tblTeam.intRecStatus <> $Defs::RECSTATUS_DELETED];
-	}
-
-	if ($searchlevel > $Defs::LEVEL_COMP and $searchentity == $Defs::LEVEL_COMP) { #Assoc Level and above
-		$from_levels.=' INNER JOIN ' if $from_levels;
-		$select_levels.=',' if $select_levels;
-		$where_levels.=' AND ' if $where_levels;
-
-		$from_levels.=qq[ tblAssoc_Comp];
-		$select_levels.=qq[ tblAssoc_Comp.intCompID, tblAssoc_Comp.strTitle AS strCompName ];
-		$where_levels.=qq[ tblAssoc.intAssocID=tblAssoc_Comp.intAssocID AND tblAssoc_Comp.intRecStatus <> $Defs::RECSTATUS_DELETED];
-	}
-
 	if ($searchlevel > $Defs::LEVEL_MEMBER and $searchentity == $Defs::LEVEL_MEMBER) { #Assoc Level and above
 		$from_levels.=' INNER JOIN ' if $from_levels;
 		$where_levels.=' AND ' if $where_levels;
@@ -143,8 +123,6 @@ sub getLevelQueryStuff	{
        	 	$where_levels.=' AND ' if $where_levels;
         	}
         	$where_levels.=qq[ tblAssoc.intAssocID=tblMember_Associations.intAssocID AND tblMember.intStatus <> $Defs::RECSTATUS_DELETED];
-	#	}
-	#	$where_levels.=qq[ tblAssoc.intAssocID=tblMember_Associations.intAssocID AND tblMember.intStatus <> $Defs::RECSTATUS_DELETED AND (tblMember_Teams.intCompID=tblAssoc_Comp.intCompID OR tblMember_Teams IS NULL)];
 	}
 
 	$select_levels=','.$select_levels if $select_levels;
@@ -201,38 +179,6 @@ sub getLevelQueryStuff	{
 			  $current_where.=qq[ AND tblMember_Clubs.intMemberID=tblMember.intMemberID AND tblMember_Clubs.intClubID=tblClub.intClubID AND tblMember_Clubs.intStatus=$Defs::RECSTATUS_ACTIVE ];
       }
 			$current_from.=qq[ INNER JOIN tblMember_Clubs];
-		}
-		if($searchentity == $Defs::LEVEL_TEAM) {
-			$current_where.=qq[ AND tblClub.intClubID=tblTeam.intClubID ];
-		}
-	}
-	elsif($current_level== $Defs::LEVEL_TEAM)	{
-		$current_where=qq[tblTeam.intTeamID= $clientValues_ref->{teamID} ];
-		my $t_compID= $clientValues_ref->{compID}||0;
-		my $comp_where=( $t_compID and $t_compID > 0)	?  " AND (tblMember_Teams.intCompID=$t_compID or tblMember_Teams.intCompID=0) " : '';
-		if($searchentity == $Defs::LEVEL_MEMBER) {
-			$current_from=qq[ INNER JOIN tblAssoc INNER JOIN tblTeam ON (tblTeam.intAssocID=tblAssoc.intAssocID) INNER JOIN tblMember_Teams ON (tblTeam.intTeamID=tblMember_Teams.intTeamID AND tblMember_Teams.intStatus <> $Defs::RECSTATUS_DELETED)];
-			$current_where.=qq[ AND tblMember_Teams.intMemberID=tblMember.intMemberID AND tblMember_Teams.intTeamID=tblTeam.intTeamID $comp_where ];
-		}
-		else	{
-			$current_from=qq[ INNER JOIN tblTeam INNER JOIN tblAssoc];
-
-		}
-	}
-	elsif($current_level== $Defs::LEVEL_COMP)	{
-		$current_where=qq[tblAssoc_Comp.intCompID= $clientValues_ref->{compID} ];
-		$current_from=qq[INNER JOIN tblAssoc_Comp INNER JOIN tblAssoc];
-		if($searchentity == $Defs::LEVEL_MEMBER) {
-			$current_where.=qq[ AND tblMember_Teams.intMemberID=tblMember.intMemberID AND tblMember_Teams.intTeamID=tblComp_Teams.intTeamID AND tblComp_Teams.intCompID=tblAssoc_Comp.intCompID  AND tblMember_Teams.intStatus <> $Defs::RECSTATUS_DELETED AND tblMember_Teams.intCompID=tblComp_Teams.intCompID ];
-			$current_from.=qq[ INNER JOIN tblComp_Teams INNER JOIN tblMember_Teams];
-		}
-		if($searchentity == $Defs::LEVEL_TEAM) {
-			$current_where.=qq[ AND tblAssoc.intAssocID=tblAssoc_Comp.intAssocID AND tblAssoc_Comp.intCompID=tblComp_Teams.intCompID AND tblComp_Teams.intTeamID = tblTeam.intTeamID ];
-			$current_from.=qq[ INNER JOIN tblComp_Teams];
-		}
-		if($searchentity == $Defs::LEVEL_CLUB) {
-			$current_where.=qq[ AND tblAssoc.intAssocID=tblAssoc_Comp.intAssocID AND tblAssoc_Comp.intCompID=tblComp_Teams.intCompID AND tblComp_Teams.intTeamID = tblTeam.intTeamID AND tblTeam.intClubID=tblClub.intClubID ];
-			$current_from.=qq[ INNER JOIN tblComp_Teams INNER JOIN tblTeam];
 		}
 	}
 	elsif($current_level== $Defs::LEVEL_MEMBER)	{

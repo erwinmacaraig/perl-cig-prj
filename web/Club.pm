@@ -13,7 +13,6 @@ use Reg_common;
 use Utils;
 use HTMLForm;
 use AuditLog;
-use EditClubTeamNominations;
 use CustomFields;
 use Assoc qw(loadAssocDetails);
 use ConfigOptions qw(ProcessPermissions);
@@ -52,9 +51,6 @@ sub handleClub	{
 	}
 	elsif ($action eq 'C_S') {
 		#List Club Stats
-	}
-	elsif ($action =~/^C_ECT/) {
-			($resultHTML,$title)=handleClubTeamNominations($action, $Data, $clubID);
 	}
 	elsif ($action=~/^C_HOME/) {
 			($resultHTML,$title)=showClubHome($Data,$clubID);
@@ -962,20 +958,6 @@ sub club_details	{
 	$title="Add New $Data->{'LevelNames'}{$typeID}" if $option eq 'add';
 	$resultHTML .= loadClubExpiry($Data->{'db'},$clubID) if $Data->{'SystemConfig'}{'DisplayContractExpiry'};
 
-	## CLUB TEAM NOMINATION BUTTON ##
-	if ($Data->{'SystemConfig'}{'AllowTeamNominations'} and allowedAction($Data, 'c_e')) {
-		$resultHTML .= loadClubTeamNominations($Data->{'db'},$clubID,$Data->{'Realm'});
-		my $editClubTeamsButton .= qq[
-        	   <form action="$Data->{'target'}" method="POST" style="float:right;">
-                	<input type="hidden" name="a" value="C_ECT">
-                        <input type="hidden" name="client" value="$client">
-                        <input type="submit" value="Edit Teams">
-                   </form>
-		];
-		$resultHTML .= $editClubTeamsButton;
-	}
-	##
-
 	return ($resultHTML,$title);
 }
 
@@ -1097,26 +1079,6 @@ sub loadClubExpiry {
 			$html = qq[<b>Contract Expiry Date:</b> $day/$month/$year ($strName)];
 		}
 	}
-	return $html;
-}
-
-sub loadClubTeamNominations {
-	my ($db, $clubID, $realmID)=@_;
-	my $st = qq[
-		SELECT CG.strGradeName, IF(CTN.strTeamNominations IS NULL,0, CTN.strTeamNominations) AS strTeamNominations
-                FROM tblClubGrades AS CG
-                LEFT JOIN tblClubTeamNominations AS CTN ON (CG.intGradeID=CTN.intGradeID AND CTN.intClubID=$clubID)
-                WHERE CG.intRealmID=$realmID
-                ORDER BY CG.intGradeID DESC;
-	];
-	my $q=$db->prepare($st);
-	$q->execute();
-	my $html=qq[<div class="sectionheader">Team Nominations</div><table border="0">];
-	while (my ($strGradeName, $strTeamNominations) = $q->fetchrow_array()) {;
-		$strTeamNominations = (!$strTeamNominations) ? 0 : $strTeamNominations;
-		$html .= qq[<tr><td class="label">$strGradeName:</td><td class="value">$strTeamNominations</td></tr>];
-	}
-	$html.=qq[</table>];
 	return $html;
 }
 

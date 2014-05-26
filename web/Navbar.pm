@@ -40,8 +40,6 @@ sub navBar {
     my $clientValues_ref=$Data->{'clientValues'};
     my $currentLevel = $clientValues_ref->{INTERNAL_tempLevel} ||  $clientValues_ref->{currentLevel};
     my $currentID = getID($clientValues_ref);
-    $clientValues_ref->{compID} = $Defs::INVALID_ID if $currentLevel > $Defs::LEVEL_COMP;
-    $clientValues_ref->{teamID} = $Defs::INVALID_ID if $currentLevel > $Defs::LEVEL_TEAM;
     $clientValues_ref->{memberID} = $Defs::INVALID_ID if $currentLevel > $Defs::LEVEL_MEMBER;
     $clientValues_ref->{memberID} = $Defs::INVALID_ID if $currentLevel > $Defs::LEVEL_CLUB;
     $clientValues_ref->{clubID} = $Defs::INVALID_ID  if $currentLevel >= $Defs::LEVEL_ASSOC;
@@ -88,26 +86,6 @@ sub navBar {
     }
     elsif( $currentLevel == $Defs::LEVEL_CLUB) {
         $menu_data = getClubMenuData(
-            $Data,
-            $currentLevel,
-            $currentID,
-            $client,
-            $navObjects->{$currentLevel},
-            $navObjects->{$Defs::LEVEL_ASSOC},
-        );
-    }
-    elsif( $currentLevel == $Defs::LEVEL_COMP) {
-        $menu_data = getCompMenuData(
-            $Data,
-            $currentLevel,
-            $currentID,
-            $client,
-            $navObjects->{$currentLevel},
-            $navObjects->{$Defs::LEVEL_ASSOC},
-        );
-    }
-    elsif( $currentLevel == $Defs::LEVEL_TEAM) {
-        $menu_data = getTeamMenuData(
             $Data,
             $currentLevel,
             $currentID,
@@ -490,22 +468,10 @@ sub getAssocMenuData {
             url => $baseurl."a=C_L&amp;l=$Defs::LEVEL_CLUB",
         };
     }
-    if(!$SystemConfig->{'NoTeams'}) {
-        $menuoptions{'teams'} = {
-            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_TEAM.'_P'}),
-            url => $baseurl."a=T_L&amp;l=$Defs::LEVEL_TEAM",
-        };
-    }
     if ($SystemConfig->{'AssocServices'} and !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'services'} = {
             name => $lang->txt('Locator'),
             url => $baseurl."a=A_SV_DTE",
-        };
-    }
-    if (!$SystemConfig->{'NoComps'} ) {
-        $menuoptions{'comps'} = {
-            name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_COMP.'_P'}),
-            url => $baseurl."a=CO_L&amp;l=$Defs::LEVEL_COMP",
         };
     }
 
@@ -613,102 +579,6 @@ sub getAssocMenuData {
                 };
             }
 
-            if($intSWOL) {
-                $menuoptions{'clubchampionships'} = {
-                    name => $lang->txt('Club Championships'),
-                    url => $baseurl."a=CLUBCHAMPS_L",
-                };
-                $menuoptions{'bulkstatsrebuild'} = {
-                    name => $lang->txt('Bulk Statistics Rebuild'),
-                    url => $baseurl."a=BULKSR_",
-                };
-                $menuoptions{'bulkladderrebuild'} = {
-                    name => $lang->txt('Bulk Ladder Rebuild'),
-                    url => $baseurl."a=BULKLR_",
-                };
-                $menuoptions{'bulkfixturegen'} = {
-                    name => $lang->txt('Bulk Fixture Generation'),
-                    url => $baseurl."a=BULKFG_",
-                };
-                $menuoptions{'awards'} = {
-                    name => $lang->txt('Awards'),
-                    url => $baseurl."a=AW_list",
-                };
-                $menuoptions{'clashresolution'} = {
-                    name => $lang->txt('Clash Resolution'),
-                    url => $baseurl."a=CLASHRES_L",
-                };
-                $menuoptions{'fixturegrid'} = {
-                    name => $lang->txt('Fixture Grid'),
-                    url => $baseurl."a=FIXG_",
-                };
-                $menuoptions{'publishtoweb'} = {
-                    name => $lang->txt('Publish to Web'),
-                    url => $baseurl."a=UPLOAD_",
-                };
-                $menuoptions{'compexceptiondates'} = {
-                    name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_COMP} .' Exception Dates'),
-                    url => $baseurl."a=EXDATE_L",
-                };
-                $menuoptions{'hidecomprounds'} = {
-                    name => $lang->txt('Hide ' . $Data->{'LevelNames'}{$Defs::LEVEL_COMP} .' Rounds/Dates'),
-                    url => $baseurl."a=HIDERND_L",
-                };
-                $menuoptions{'ladderadjustments'} = {
-                    name => $lang->txt('Ladder Adjustments'),
-                    url => $baseurl."a=LADDERADJ_L",
-                };
-                $menuoptions{'ladderconfig'} = {
-                    name => $lang->txt('Ladder Templates'),
-                    url => $baseurl."a=LADDERCFG_L",
-                };
-                $menuoptions{'fixturetemplates'} = {
-                    name => $lang->txt('Fixture Templates'),
-                    url => $baseurl."a=FIXTEMPLATE_L",
-                };
-                $menuoptions{'venues'} = {
-                    name => $lang->txt('Venues'),
-                    url => $baseurl."a=VENUE_L",
-                };
-                $menuoptions{'venuetimeallocation'} = {
-                    name => $lang->txt('Venue Time Allocation'),
-                    url => $baseurl."a=VENUETA_",
-                };
-                $menuoptions{'mediareports'} = {
-                    name => $lang->txt('Media Reports'),
-                    url => $baseurl."a=MEDIARPT_L",
-                };
-                $menuoptions{'bulkmatchchange'} = {
-                    name => $lang->txt('Bulk Match Change'),
-                    url => $baseurl."a=MATCHBC_",
-                };
-                $menuoptions{'bulkcompchange'} = {
-                    name => $lang->txt('Bulk Competition Change'),
-                    url => $baseurl."a=COMPBC_",
-                };
-
-                if ($SystemConfig->{'AllowBulkCompRollover'} or $SystemConfig->{'AssocConfig'}{'AllowBulkCompRollover'}){
-                    $menuoptions{'bulkcomprollover'} = {
-                        name => $lang->txt('Bulk Competition Rollover'),
-                        url => $baseurl."a=COMPBR_",
-                    };
-                }
-
-                if ($SystemConfig->{'AllowBulkLivestatsUpload'} or $SystemConfig->{'AssocConfig'}{'AllowBulkLivestatsUpload'}){
-                    $menuoptions{'bulklivestats'} = {
-                        name => $lang->txt('Bulk Livestats Upload'),
-                        url => $baseurl."a=LIVESTATSBU_",
-                    };
-                }
-
-                if ($SystemConfig->{'AssocConfig'}{'allowTeamEntry'}) {
-                    $menuoptions{'teamentry'} = {
-                        name => $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_TEAM} Entry" ),
-                        url => $baseurl."a=TEAMENTRY_L&amp;l=$Defs::LEVEL_TEAM",
-                    };
-                }
-
-            }
         }
     }
 
@@ -745,19 +615,6 @@ sub getAssocMenuData {
     }
 
 
-    if($intSWOL) {
-        $menuoptions{'playercareerstats'} = {
-            name => $lang->txt('Player Career Statistics'),
-            url => $baseurl."a=STAT_CSD",
-        };
-        $menuoptions{'processlog'} = {
-            name => $lang->txt('Process Log'),
-            url => $baseurl."a=PROCESSLOG_L",
-        };
-
-
-    }
-
     # for assoc menu
     if ($SystemConfig->{'EnableMemberRecords'}) {
         $menuoptions{'mrt_admin'} = {
@@ -782,45 +639,16 @@ sub getAssocMenuData {
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_MEMBER.'_P'}), 'menu', [
         'members',
         'duplicates',
-        'participation',
         'clearances',    
         'clearancesoff',    
         'memberrollover',
         'transfermember',
         'cardprinting',
         'pendingregistration',
-        #'bulktags',
-        'playercareerstats',
-        'injuries',
-        ]],
-        [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_COMP.'_P'}), 'menu',[
-        'comps',
-        'matchresults',
-        'publishtoweb',
-        'awards',
-        'clashresolution',
-        'compexceptiondates',
-        'hidecomprounds',
-        'ladderadjustments',
-        'fixturegrid',
-        'mediareports',
-        'venues',
-        'venuetimeallocation',
-        'bulkmatchchange',
-        'bulkcompchange',
-        'bulkcomprollover',
-        'bulklivestats',
-        'bulkstatsrebuild',
-        'bulkladderrebuild',
-        'bulkfixturegen',
         ]],
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_CLUB.'_P'}), 'menu', [
         'clubs',
         'clubchampionships',
-        ]],
-        [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_TEAM.'_P'}), 'menu', [
-        'teams',
-        'teamentry',
         ]],
         [ $lang->txt('Registrations'), 'menu',[
         'bankdetails',
@@ -874,36 +702,11 @@ sub getClubMenuData {
     my $txt_AgeGroupsNames= $SystemConfig->{'txtAgeGroups'} || 'Age Groups';
     my $txt_Clr = $SystemConfig->{'txtCLR'} || 'Clearance';
     my $txt_Clr_ListOnline = $SystemConfig->{'txtCLRListOnline'} || "List Online $txt_Clr"."s";
-    my $swol_url = $Defs::SWOL_URL;
-    $swol_url = $Defs::SWOL_URL_v6 if ($Data->{'SystemConfig'}{'AssocConfig'}{'olrv6'});
     my $DataAccess_ref = $Data->{'DataAccess'};
-
-    my $umpireAllocations = 0;
-    {
-        my $st = qq[
-        SELECT
-        COUNT(intUmpireEntityID) as CountAllocations
-        FROM
-        tblUmpireLevelConfig
-        WHERE
-        intUmpireEntityID = ?
-            AND intUmpireLevel = $Defs::LEVEL_CLUB
-            AND intUmpireAssocID = ?
-        ];
-        my $q = $Data->{'db'}->prepare($st);
-        $q->execute(
-            $cvals{clubID},
-            $cvals{assocID},
-        );
-        ($umpireAllocations)= $q->fetchrow_array();
-        $umpireAllocations ||= 0;
-        $q->finish();
-    }
 
     my (
         $intAllowClearances, 
         $intAllowClubClrAccess,
-        $intSWOL,
         $intAllowRegoForm,
         $assocID,
         $hideAssocRollover,
@@ -912,14 +715,12 @@ sub getClubMenuData {
     ) = $assocObj->getValue([
         'intAllowClearances', 
         'intAllowClubClrAccess',
-        'intSWOL',
         'intAllowRegoForm',
         'intAssocID',
         'intHideRollover',
         'intHideClubRollover',
         'intAllowSeasons',
         ]);
-    $intSWOL = 0 if !$SystemConfig->{'AllowSWOL'};
     $intAllowClubClrAccess = 1 if ($Data->{'clientValues'}{'authLevel'}>=$Defs::LEVEL_ASSOC);
 
     my $paymentSplitSettings = getPaymentSplitSettings($Data);
@@ -944,13 +745,6 @@ sub getClubMenuData {
             url => $baseurl."a=M_L&amp;l=$Defs::LEVEL_MEMBER",
         },
     );
-
-    if(!$SystemConfig->{'NoTeams'}) {
-        $menuoptions{'teams'} = {
-            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_TEAM.'_P'}),
-            url => $baseurl."a=T_L&amp;l=$Defs::LEVEL_TEAM",
-        };
-    }
     my $txt_RequestCLR = $SystemConfig->{'txtRequestCLR'} || 'Request a Clearance';
 
     if ($SystemConfig->{'AllowPendingRegistration'}) {
@@ -1011,10 +805,6 @@ sub getClubMenuData {
                 and allowedAction($Data,'c_e')
         ) {
 
-            $menuoptions{'passwordmanagement'} = {
-                name => $lang->txt('Password Management'),
-                url => $baseurl."a=PW_",
-            };
             $menuoptions{'fieldconfig'} = {
                 name => $lang->txt('Field Configuration'),
                 url => $baseurl."a=FC_C_d",
@@ -1156,322 +946,6 @@ sub getClubMenuData {
 
 }
 
-sub getCompMenuData {
-    my (
-        $Data,
-        $currentLevel,
-        $currentID,
-        $client,
-        $compObj,
-        $assocObj,
-    ) = @_;
-
-
-    my $target=$Data->{'target'} || '';
-    my $lang = $Data->{'lang'} || '';
-    my %cvals=getClient($client);
-    $cvals{'currentLevel'}=$currentLevel ;
-    $client=setClient(\%cvals);
-    my $SystemConfig = $Data->{'SystemConfig'};
-
-    my(
-        $compladder,
-        $fType
-    )= $compObj->getValue([
-        'intDisplayLadder',
-        'intFixtureType'
-        ]);
-
-    my (
-        $swol,
-        $assocID,
-    ) = $assocObj->getValue([
-        'intSWOL',
-        'intAssocID',
-        ]);
-    $swol = 0 if !$SystemConfig->{'AllowSWOL'};
-    $fType ||= 0;
-
-
-    my $baseurl = "$target?client=$client&amp;";
-    my %menuoptions = (
-        advancedsearch => {
-            name => $lang->txt('Advanced Search'),
-            url => $baseurl."a=SEARCH_F",
-        },
-        reports => {
-            name => $lang->txt('Reports'),
-            url => $baseurl."a=REP_SETUP",
-        },
-        home => {
-            name => $lang->txt('Dashboard'),
-            url => $baseurl."a=CO_HOME",
-        },
-    );
-    if(!$SystemConfig->{'NoTeams'}) {
-        $menuoptions{'teams'} = {
-            name => $Data->{'LevelNames'}{$Defs::LEVEL_TEAM.'_P'},
-            url => $baseurl."a=T_L&amp;l=$Defs::LEVEL_TEAM",
-        };
-    }
-
-    my $swol_url = $Defs::SWOL_URL;
-    $swol_url = $Defs::SWOL_URL_v6 if ($Data->{'SystemConfig'}{'AssocConfig'}{'olrv6'});
-    if($swol) {
-        $menuoptions{'matchresults'} = {
-            name => $lang->txt('Match Results'),
-            url => $swol_url."?aID=$assocID&amp;a=LIST_MATCHES",
-            target => '-blank',
-        };
-        $menuoptions{'playercompstats'} = {
-            name => $lang->txt('Player Competition Stats'),
-            url => $baseurl."a=STAT_PSD",
-        };
-        $menuoptions{'playerroundstats'} = {
-            name => $lang->txt('Player Round Stats'),
-            url => $baseurl."a=STAT_RSD",
-        };
-        $menuoptions{'finalseligibilitysettings'} = {
-            name => $lang->txt('Finals Eligibility Settings'),
-            url => $baseurl."a=FEG_DTE",
-        };
-
-        if($fType == $Defs::FIXTURE_TYPE_POOLS) {
-            $menuoptions{'phasespools'} = {
-                name => $lang->txt('Phases & Pools'),
-                url => $baseurl."a=CO_SP",
-            };
-        }
-        else {
-            $menuoptions{'fixtures'} = {
-                name => $lang->txt('Regular Season'),
-                url => $baseurl."a=FIX_COMP",
-            };
-            $menuoptions{'finals'} = {
-                name => $lang->txt('Finals'),
-                url => $baseurl."a=FIX_FINALS",
-            };
-            if($compladder) {
-                $menuoptions{'ladder'} = {
-                    name => $lang->txt('Ladder'),
-                    url => $baseurl."a=LDR_D",
-                };
-            }
-        }
-    }
-
-    if(!$SystemConfig->{'NoAuditLog'}) {
-        $menuoptions{'auditlog'} = {
-            name => $lang->txt('Audit Log'),
-            url => $baseurl."a=AL_",
-        };
-    }
-    if($compObj->numberMatches()<1 and $Data->{'SystemConfig'}{'AssocConfig'}{'allowFixtureImporter'}) {
-        $menuoptions{'fixtureimporter'} = {
-            name => $lang->txt('Fixture Importer'),
-            url => $baseurl."a=FI_",
-        };
-    }
-    my @menu_structure = (
-        [ $lang->txt('Dashboard'), 'home','home'],
-        [ $lang->txt('Fixtures'), 'menu', [
-        'fixtureimporter',
-        'fixtures',    
-        'phasespools',
-        'finals',
-        ]],
-        [ $Data->{'LevelNames'}{$Defs::LEVEL_TEAM.'_P'}, 'menu','teams'],
-        [ $lang->txt('Ladder'), 'menu','ladder'],
-        [ $lang->txt('Match Results'), 'menu','matchresults'],
-        [ $lang->txt('Statistics'), 'menu',[
-        'playercompstats',
-        'playerroundstats',
-        ]],
-        [ $lang->txt('Reports'), 'menu',[
-        'reports',
-        ]],
-        [ $lang->txt('Search'), 'search',[
-        'advancedsearch',
-        'nataccredsearch',
-        ]],
-        [ $lang->txt('System'), 'system',[
-        'finalseligibilitysettings',
-        'auditlog',
-        ]],
-    );
-
-    my $menudata = processmenudata(\%menuoptions, \@menu_structure);
-    return $menudata;
-
-}
-
-sub getTeamMenuData {
-    my (
-        $Data,
-        $currentLevel,
-        $currentID,
-        $client,
-        $teamObj,
-        $assocObj,
-    ) = @_;
-
-
-    my $target=$Data->{'target'} || '';
-    my $lang = $Data->{'lang'} || '';
-    my %cvals=getClient($client);
-    $cvals{'currentLevel'}=$currentLevel ;
-    $client=setClient(\%cvals);
-    my $SystemConfig = $Data->{'SystemConfig'};
-
-    my (
-        $assocID,
-        $swol,
-    ) = $assocObj->getValue([
-        'intAssocID',
-        'intSWOL',
-        ]);
-    $swol = 0 if !$SystemConfig->{'AllowSWOL'};
-    my $swol_url = $Defs::SWOL_URL;
-    $swol_url = $Defs::SWOL_URL_v6 if ($Data->{'SystemConfig'}{'AssocConfig'}{'olrv6'});
-
-
-    my $baseurl = "$target?client=$client&amp;";
-    my %menuoptions = (
-        advancedsearch => {
-            name => $lang->txt('Advanced Search'),
-            url => $baseurl."a=SEARCH_F",
-        },
-        reports => {
-            name => $lang->txt('Reports'),
-            url => $baseurl."a=REP_SETUP",
-        },
-        home => {
-            name => $lang->txt('Dashboard'),
-            url => $baseurl."a=T_HOME",
-        },
-        members => {
-            name => 'List '.$Data->{'LevelNames'}{$Defs::LEVEL_MEMBER.'_P'},
-            url => $baseurl."a=M_L&amp;l=$Defs::LEVEL_MEMBER",
-        },
-    );
-    if (
-        allowedAction($Data, 't_am') 
-            and $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB
-    ) {
-        $menuoptions{'modifymemberlist'} = {
-            name => $lang->txt('Modify Team List'),
-            url => $baseurl."a=T_PL",
-        };
-    }
-
-    if ($SystemConfig->{'AllowInviteTeammates'} and allowedAction($Data, 'm_e') and $cvals{'authLevel'} >= $Defs::LEVEL_TEAM) {
-        $menuoptions{'inviteteammates'} = {
-            name => $lang->txt('Invite Teammates'),
-            url => $baseurl."a=T_IT",
-        };
-    }
-
-    if($SystemConfig->{'AllowTXNs_teams'} and  $cvals{'authLevel'}>=$Defs::LEVEL_TEAM) {
-        $menuoptions{'transactions'} = {
-            name => $lang->txt($SystemConfig->{'txns_link_name'} || $lang->txt('Transactions')),
-            url => $baseurl."a=T_TXNLog_list&amp;mode=u",
-        };
-    }
-
-    if($swol) {
-        $menuoptions{'awards'} = {
-            name => $lang->txt('Awards'),
-            url => $baseurl."a=AW_list",
-        };
-        $menuoptions{'teamstaff'} = {
-            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_TEAM} . " Staff"),
-            url => $baseurl."a=T_STAFF",
-        };
-        if ( allowedAction($Data, 'e_r' ) or ( allowedAction($Data, 'c_e') and $cvals{'authLevel'} == $Defs::LEVEL_CLUB) ) {
-            $menuoptions{'matchresults'} = {
-                name => $lang->txt('Match Results'),
-                url => "$swol_url?aID=$assocID&amp;a=LIST_MATCHES",
-                target => '-blank',
-            };
-        }
-    }
-    if ($SystemConfig->{'AllowMatchCredits'}) {
-        $menuoptions{'matchcredits'} = {
-            name => $lang->txt('Match Credits'),
-            url => $baseurl."a=T_CREDIT_L",
-        };
-    }
-    if (
-        !$Data->{'ReadOnlyLogin'}
-            and (
-            allowedAction($Data,'mu')
-                or allowedAction($Data,'tu_e')
-                or allowedAction($Data,'tu_a')
-        )
-    ) {
-        $menuoptions{'usermanagement'} = {
-            name => $lang->txt('User Management'),
-            url => $baseurl."a=AM_",
-        };
-    }
-
-    if(!$SystemConfig->{'NoAuditLog'}) {
-        $menuoptions{'auditlog'} = {
-            name => $lang->txt('Audit Log'),
-            url => $baseurl."a=AL_",
-        };
-    }
-
-    if (
-        allowedAction($Data, 'm_e') 
-            and $Data->{'SystemConfig'}{'AllowBulkTags'}) {
-        $menuoptions{'bulktags'} = {
-            name => $lang->txt('Bulk Change Tags'),
-            url => $baseurl."a=M_TAG&amp;l=$Defs::LEVEL_MEMBER",
-        };
-    }
-
-    if(!$SystemConfig->{'NoOptIn'}) {
-        $menuoptions{'optin'} = {
-            name => $lang->txt('Opt-Ins'),
-            url => $baseurl."a=OPTIN_L",
-        };
-    }
-
-    my @menu_structure = (
-        [ $lang->txt('Dashboard'), 'home','home'],
-        [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_MEMBER.'_P'}), 'menu', [
-        'members',    
-        'modifymemberlist',
-        'teamstaff',
-        'inviteteammates',
-        #'bulktags',
-        'injuries',
-        ]],
-        [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_COMP.'_P'}), 'menu',[
-        'matchresults',
-        'awards',
-        'matchcredits',
-        ]],
-        [ $lang->txt('Transactions'), 'menu','transactions'],
-        [ $lang->txt('Reports'), 'menu',[
-        'reports',
-        ]],
-        [ $lang->txt('Search'), 'search',[
-        'advancedsearch',
-        'nataccredsearch',
-        ]],
-        [ $lang->txt('System'), 'system',[
-        'usermanagement',
-        'auditlog',
-        'optin',
-        ]],
-    );
-
-    my $menudata = processmenudata(\%menuoptions, \@menu_structure);
-    return $menudata;
-
-}
 sub getNextNodeType {
     my($db, $ID) = @_;
     my $nextlevelType='';
@@ -1537,9 +1011,7 @@ sub GenerateTree {
         regionID => ['node', $Defs::LEVEL_REGION, 'N_HOME', ''],
         zoneID => ['node', $Defs::LEVEL_ZONE, 'N_HOME', ''],
         assocID => ['assoc', $Defs::LEVEL_ASSOC, 'A_HOME', ''],
-        compID => ['comp', $Defs::LEVEL_COMP, 'CO_HOME', 'strTitle'],
         clubID => ['club', $Defs::LEVEL_CLUB, 'C_HOME', ''],
-        teamID => ['team', $Defs::LEVEL_TEAM, 'T_HOME', ''],
         memberID => ['member', $Defs::LEVEL_MEMBER, 'M_HOME', ''],
     );
     for my $level (qw(
@@ -1551,9 +1023,7 @@ sub GenerateTree {
         regionID
         zoneID
         assocID
-        compID
         clubID
-        teamID
         memberID
         )) {
         my $id = $clientValues_ref->{$level} || 0;
@@ -1639,33 +1109,10 @@ sub getMemberMenuData {
     my $DataAccess_ref = $Data->{'DataAccess'};
     my $accreditation_title = exists $Data->{'SystemConfig'}{'ACCRED_Custom_Name'} ? $Data->{'SystemConfig'}{'ACCRED_Custom_Name'}.'s' : "Accreditations";
 
-    my $umpireAllocations = 0;
-    {
-        my $st = qq[
-        SELECT
-        COUNT(intUmpireEntityID) as CountAllocations
-        FROM
-        tblUmpireLevelConfig
-        WHERE
-        intUmpireAssocID = ?
-        ];
-        my $q = $Data->{'db'}->prepare($st);
-        $q->execute(
-            $cvals{assocID},
-        );
-        ($umpireAllocations)= $q->fetchrow_array();
-        $umpireAllocations ||= 0;
-        $q->finish();
-    }
 
     my ($intOfficial) = $memberObj->getValue('intOfficial');
-    $umpireAllocations= ($umpireAllocations and $intOfficial) ? 1 : 0;
-    my $tribunal=$Data->{'SystemConfig'}{'AllowTribunal'};
     my $clubs = $Data->{'SystemConfig'}{'NoClubs'} ? 0 : 1;
-    my $stats = $assocObj->getValue('intSWOL');
-    my $recordtype = $assocObj->getValue('intSWOL');
     my $clr= ($assocObj->getValue('intAllowClearances') and $Data->{'SystemConfig'}{'AllowClearances'});
-    my $teams= $Data->{'SystemConfig'}{'NoTeams'} ? 0 : 1;
     my $prefs= $Data->{'SystemConfig'}{'ShowPreferences'} ? 1 : 0;
 
     my $invalid_club = 0;
@@ -1731,22 +1178,10 @@ sub getMemberMenuData {
                 url => $baseurl."a=M_TXNLog_list",
             };
         }
-        if($umpireAllocations) {
-            $menuoptions{'umpireallocations'} = {
-                name => $lang->txt(qq[$Data->{'SystemConfig'}{'TYPE_NAME_3'} Allocations]),
-                url => $baseurl."a=M_UMP",
-            };
-        }
         if(!$SystemConfig->{'NoMemberTags'}) {
             $menuoptions{'membertags'} = {
                 name => $lang->txt('Tags'),
                 url => $baseurl."a=M_TG_l",
-            };
-        }
-        if($tribunal) {
-            $menuoptions{'tribunal'} = {
-                name => $lang->txt('Tribunal'),
-                url => $baseurl."a=TB_LIST",
             };
         }
         if($clubs) {
@@ -1759,12 +1194,6 @@ sub getMemberMenuData {
             $menuoptions{'seasons'} = {
                 name => $lang->txt($txt_SeasonsNames),
                 url => $baseurl."a=M_SEASONS",
-            };
-        }
-        if($stats) {
-            $menuoptions{'stats'} = {
-                name => $lang->txt("Statistics"),
-                url => $baseurl."a=M_STATS",
             };
         }
         if($clr) {
@@ -1791,10 +1220,8 @@ sub getMemberMenuData {
         [ $lang->txt($txt_Clrs), 'menu','clr'],
         [ $lang->txt('Member History'), 'menu',[
         'clubs',
-        'teams',
         'seasons',
         ]],
-        [ $lang->txt('Statistics'), 'menu','stats'],
         [ $lang->txt('Member Records'), 'menu', 'records'],
         [ $lang->txt('System'), 'system',[
         'auditlog',

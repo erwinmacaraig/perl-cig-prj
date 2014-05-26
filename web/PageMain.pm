@@ -173,21 +173,6 @@ sub pageMain {
         'jQuery(".chzn-select").chosen({ disable_search_threshold: 5 });',
     );
 
-    $Data->{'AddToPage'}->add(
-        'js_bottom',
-        'inline',
-        'jQuery(document).ready(function(){
-            var slideTimer;
-            jQuery("#menu").hover(function(){
-                jQuery(".adwrap-leaderboard").slideUp();
-                clearTimeout(slideTimer);
-            },function(){
-                slideTimer = setInterval(function() {
-                jQuery(".adwrap-leaderboard").slideDown();
-            }, 1000);
-            });
-        });',
-    );
     my $search_js = qq[
     jQuery.widget( "custom.catcomplete", jQuery.ui.autocomplete, {
         _renderMenu: function( ul, items ) {
@@ -251,16 +236,13 @@ sub pageMain {
     my %TemplateData = (
         HelpURL => $helpURL,
         NoSPLogo => $Data->{'SystemConfig'}{'NoSPLogo'} || 0,
-            BlogURL => 'http://blog.sportingpulse.com',
+        BlogURL => 'http://blog.sportingpulse.com',
         HomeURL => "$Data->{'target'}?client=$homeClient&amp;a=HOME",
-        Wizard =>  $Data->{'WizardBubble'} || '',
         StatsCounter =>  $statscounter || '',
         Content => $body || '',
         Title => $title || '',
-        MemListName => uc($Data->{'LevelNames'}{$Defs::LEVEL_MEMBER.'_PA'}) || 'MEMBERS',
-        CompListName => uc($Data->{'LevelNames'}{$Defs::LEVEL_COMP.'_PA'}) || 'COMPS',
-        ClubListName => uc($Data->{'LevelNames'}{$Defs::LEVEL_CLUB.'_PA'}) || 'CLUBS',
-        TeamListName => uc($Data->{'LevelNames'}{$Defs::LEVEL_TEAM.'_PA'}) || 'TEAMS',
+        MemListName => uc($Data->{'LevelNames'}{$Defs::LEVEL_MEMBER.'_P'}) || 'MEMBERS',
+        ClubListName => uc($Data->{'LevelNames'}{$Defs::LEVEL_CLUB.'_P'}) || 'CLUBS',
         GlobalNav => $globalnav || '',
         Header => $Data->{'SystemConfig'}{'Header'} || '',
         NavBar => $navbar || '',
@@ -485,12 +467,7 @@ sub getPageCustomization{
 
     my $paypal = $Data->{'PAYPAL'} ? qq[<img src="images/PP-CC.jpg" alt="PayPal" border="0"></img>] : '';
 
-    my $powered='';
-    if($Data->{'Realm'} == 2) {
-        $powered = qq[<div class="footyweb-footer-wrap"><span class="footyweb-cp">].$Data->{'lang'}->txt('COPYRIGHT').qq[</span><div class="footywebline">Powered by <span class="footyweblogo"><img src="images/footyweb.png" alt="FootyWeb" border="0"></span></div></div>];
-    } else {
-        $powered = qq[<span class="footerline">].$Data->{'lang'}->txt('COPYRIGHT').qq[</span>];
-    }
+    my $powered = qq[<span class="footerline">].$Data->{'lang'}->txt('COPYRIGHT').qq[</span>];
 
     return ($html_head, $page_header, $nav, $paypal, $powered);
 }
@@ -513,9 +490,7 @@ sub getHomeClient {
         $clientValues{regionID} =0;
         $clientValues{zoneID} =0;
         $clientValues{assocID} =0;
-        $clientValues{compID} =0;
         $clientValues{clubID} =0;
-        $clientValues{teamID} =0;
         $clientValues{memberID} =0;
         $clientValues{clubAssocID} =0;
         $clientValues{eventID} =0;
@@ -547,11 +522,6 @@ sub getHomeClient {
     if ($clientValues{'currentLevel'} == $Defs::LEVEL_CLUB)    {
         $clientValues{assocID} = $Data->{'clientValues'}{'assocID'} || 0;
         $clientValues{clubID} = $Data->{'clientValues'}{'clubID'} || 0;
-    }
-    if ($clientValues{'currentLevel'} == $Defs::LEVEL_TEAM)    {
-        $clientValues{assocID} = $Data->{'clientValues'}{'assocID'} || 0;
-        $clientValues{clubID} = $Data->{'clientValues'}{'clubID'} || 0;
-        $clientValues{teamID} = $Data->{'clientValues'}{'teamID'} || 0;
     }
     my $client = setClient(\%clientValues);
     return $client; 

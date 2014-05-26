@@ -365,13 +365,13 @@ sub now_str {
 
 sub encode {
     my $data = urlsafe_b64encode( $_[0] );
-    $data =~ tr|abcdefghijklmnopqrstuvwxyz|zyxwvutsrqponmlkjihgfedcba|d;
+    $data =~ tr|abcdefghijklmnopqrstuvwxyz|zyxwvutsrqponmlkjihgfedcba|;
     return $data;
 }
 
 sub decode {
     my $data = $_[0];
-    $data =~ tr|zyxwvutsrqponmlkjihgfedcba|abcdefghijklmnopqrstuvwxyz|d;
+    $data =~ tr|zyxwvutsrqponmlkjihgfedcba|abcdefghijklmnopqrstuvwxyz|;
     $data = urlsafe_b64decode($data);
     return $data;
 }

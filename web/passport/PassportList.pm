@@ -23,9 +23,9 @@ use Reg_common;
 use Logo;
 
 sub getAuthOrgListsData {
-    my ( $Data, $passportID, $resultsentry, ) = @_;
+    my ( $Data, $passportID) = @_;
 
-    $resultsentry ||= 0;
+    my $resultsentry = 0;
 
     my $db = $Data->{'db'};
 
@@ -57,26 +57,10 @@ sub getAuthOrgListsData {
     my $club_str   = join( ',', keys %{ $orgs{$Defs::LEVEL_CLUB} } );
     my $team_str   = join( ',', keys %{ $orgs{$Defs::LEVEL_TEAM} } );
     my $venue_str  = join( ',', keys %{ $orgs{$Defs::LEVEL_VENUE} } );
-    my $event_str  = join( ',', keys %{ $orgs{$Defs::LEVEL_EVENT} } );
-    my $osep_str   = join( ',', keys %{ $orgs{$Defs::LEVEL_EDU_DA} } );
-    my $osep_str2  = join( ',', keys %{ $orgs{$Defs::LEVEL_EDU_ADMIN} } );
-
-    #my $osep_str  = join(
-    #    ',',
-    #    keys %{
-    #        $orgs{$Defs::LEVEL_EDU_ADMIN}, $orgs{$Defs::LEVEL_EDU_DA},
-    #        $orgs{$Defs::LEVEL_EDU_MODULE}
-    #    }
-    #);
 
     my $node_str = join( ',', keys %nodes );
     my %org_data = ();
     my %realms   = ();
-
-    my $swol_filter = '';
-    if ($resultsentry) {
-        $swol_filter = ' AND A.intSWOL = 1 ';
-    }
 
     my %LevelNames = ();
     if ($member_str) {
@@ -100,12 +84,8 @@ sub getAuthOrgListsData {
             my $levelname = $LevelNames{$realm}{$Defs::LEVEL_MEMBER} || 'Association';
             my $logoURL = showLogo( $Data, $Defs::LEVEL_MEMBER, $id, '', 0, 100, 0, );
 
-            my $url = "$Defs::PassportURL/login/?apk=$Defs::PassportPublicKey&amp;url=" . escape("$Defs::base_url/authenticate.cgi?i=$id&amp;t=$Defs::LEVEL_ASSOC");
-            if ($resultsentry) {
-                $url =
-                  "$Defs::PassportURL/login/?apk=$Defs::PassportPublicKey&amp;url="
-                  . escape("$Defs::base_url/results/onlineresults.cgi?aID=$id&amp;e=$id&amp;et=$Defs::LEVEL_ASSOC&amp;a=LIST_MATCHES");
-            }
+            my $url = "$Defs::base_url/authenticate.cgi?i=$id&amp;t=$Defs::LEVEL_ASSOC";
+
             push @{ $org_data{$Defs::LEVEL_MEMBER} },
               {
                 Name     => $name || next,
@@ -134,7 +114,6 @@ sub getAuthOrgListsData {
                 )
             WHERE intAssocID IN ($assoc_str)
                 AND A.intRecStatus <> -1
-                $swol_filter
             ORDER BY strName
         ];
         my $q = $db->prepare($st);
@@ -147,12 +126,7 @@ sub getAuthOrgListsData {
             my $levelname = $LevelNames{$realm}{$Defs::LEVEL_ASSOC} || 'Association';
             my $logoURL = showLogo( $Data, $Defs::LEVEL_ASSOC, $id, '', 0, 100, 0, );
 
-            my $url = "$Defs::PassportURL/login/?apk=$Defs::PassportPublicKey&amp;url=" . escape("$Defs::base_url/authenticate.cgi?i=$id&amp;t=$Defs::LEVEL_ASSOC");
-            if ($resultsentry) {
-                $url =
-                  "$Defs::PassportURL/login/?apk=$Defs::PassportPublicKey&amp;url="
-                  . escape("$Defs::base_url/results/onlineresults.cgi?aID=$id&amp;e=$id&amp;et=$Defs::LEVEL_ASSOC&amp;a=LIST_MATCHES");
-            }
+            my $url = "$Defs::base_url/authenticate.cgi?i=$id&amp;t=$Defs::LEVEL_ASSOC";
             push @{ $org_data{$Defs::LEVEL_ASSOC} },
               {
                 Name     => $name || next,
@@ -189,7 +163,6 @@ sub getAuthOrgListsData {
                 )
             WHERE C.intClubID IN ($club_str)
                 AND C.intRecStatus <> -1
-                $swol_filter
             ORDER BY C.strName, AssocName
         ];
         my $q = $db->prepare($st);
@@ -202,12 +175,7 @@ sub getAuthOrgListsData {
                 $LevelNames{$realm} = getNames( $db, $realm );
             }
             my $levelname = $LevelNames{$realm}{$Defs::LEVEL_CLUB} || 'Club';
-            my $url = "$Defs::PassportURL/login/?apk=$Defs::PassportPublicKey&amp;url=" . escape("$Defs::base_url/authenticate.cgi?i=$id&amp;t=$Defs::LEVEL_CLUB");
-            if ($resultsentry) {
-                $url =
-                  "$Defs::PassportURL/login/?apk=$Defs::PassportPublicKey&amp;url="
-                  . escape("$Defs::base_url/results/onlineresults.cgi?aID=$assocID&amp;e=$id&amp;et=$Defs::LEVEL_CLUB&amp;a=LIST_MATCHES");
-            }
+            my $url = "$Defs::base_url/authenticate.cgi?i=$id&amp;t=$Defs::LEVEL_CLUB";
             push @{ $org_data{$Defs::LEVEL_CLUB} },
               {
                 Name     => $name || next,
@@ -215,194 +183,6 @@ sub getAuthOrgListsData {
                 EntityTypeID => $Defs::LEVEL_CLUB,
                 Logo         => $logoURL,
                 AssocName    => $assocname,
-                Realm        => $realm,
-                LevelName    => $levelname,
-                URL          => $url,
-              };
-        }
-    }
-    if ($team_str) {
-        my $st = qq[
-            SELECT DISTINCT
-                T.intTeamID,
-                T.strName,
-		IF(group_concat(AC.strTitle ORDER BY AC.strTitle DESC SEPARATOR ' ||-||') LIKE "%||-||%",'Many Competitions',group_concat(AC.strTitle)) AS CompName,
-                A.strName AS AssocName,
-                A.intAssocID,
-                R.strRealmName
-            FROM
-                tblTeam AS T
-                INNER JOIN tblAssoc AS A ON (
-                    T.intAssocID = A.intAssocID
-                )
-                INNER JOIN tblRealms AS R ON A.intRealmID = R.intRealmID
-                LEFT JOIN tblComp_Teams AS CT ON T.intTeamID=CT.intTeamID AND CT.intRecStatus>-1
-                LEFT JOIN tblAssoc_Comp AS AC ON CT.intCompID=AC.intCompID AND AC.intAssocID=A.intAssocID AND AC.intRecStatus>-1 AND AC.intNewSeasonID = A.intCurrentSeasonID
-                LEFT JOIN tblUploadedFiles AS UF ON (
-                    UF.intEntityTypeID = $Defs::LEVEL_TEAM
-                    AND UF.intEntityID = T.intTeamID
-                    AND UF.intFileType = $Defs::UPLOADFILETYPE_LOGO
-                )
-            WHERE T.intTeamID IN ($team_str)
-                AND T.intRecStatus <> -1
-                $swol_filter
-		GROUP BY T.intTeamID
-            ORDER BY T.strName, AssocName
-        ];
-        my $q = $db->prepare($st);
-        $q->execute();
-        while ( my ( $id, $name, $compname, $assocname, $assocID, $realm ) = $q->fetchrow_array() ) {
-            $realms{$realm} = 1;
-            my $logoURL = showLogo( $Data, $Defs::LEVEL_TEAM, $id, '', 0, 100, 0, );
-            if ( !$LevelNames{$realm}{$Defs::LEVEL_TEAM} ) {
-                $LevelNames{$realm} = getNames( $db, $realm );
-            }
-            my $levelname = $LevelNames{$realm}{$Defs::LEVEL_TEAM} || 'Team';
-            my $url = "$Defs::PassportURL/login/?apk=$Defs::PassportPublicKey&amp;url=" . escape("$Defs::base_url/authenticate.cgi?i=$id&amp;t=$Defs::LEVEL_TEAM");
-            if ($resultsentry) {
-                $url =
-                  "$Defs::PassportURL/login/?apk=$Defs::PassportPublicKey&amp;url="
-                  . escape("$Defs::base_url/results/onlineresults.cgi?aID=$assocID&amp;e=$id&amp;et=$Defs::LEVEL_TEAM&amp;a=LIST_MATCHES");
-            }
-            push @{ $org_data{$Defs::LEVEL_TEAM} },
-              {
-                Name     => $name || next,
-                EntityID => $id   || next,
-                EntityTypeID => $Defs::LEVEL_TEAM,
-                Logo         => $logoURL,
-                CompName     => $compname,
-                AssocName    => $assocname,
-                Realm        => $realm,
-                LevelName    => $levelname,
-                URL          => $url,
-              };
-        }
-    }
-    if ($event_str) {
-        my $st = qq[
-            SELECT    
-                intEventID,
-                strEventName,
-                strRealmName
-            FROM
-                tblEvent AS E
-                INNER JOIN tblRealms AS R ON E.intRealmID = R.intRealmID
-                LEFT JOIN tblUploadedFiles AS UF ON (
-                    UF.intEntityTypeID = $Defs::LEVEL_EVENT
-                    AND UF.intEntityID = E.intEventID
-                    AND UF.intFileType = $Defs::UPLOADFILETYPE_LOGO
-                )
-            WHERE intEventID IN ($event_str)
-                $swol_filter
-            ORDER BY strEventName
-        ];
-
-        my $q = $db->prepare($st);
-        $q->execute();
-        while ( my ( $id, $name, $realm ) = $q->fetchrow_array() ) {
-            $realms{$realm} = 1;
-            my $logoURL = showLogo( $Data, $Defs::LEVEL_EVENT, $id, '', 0, 100, 0, );
-            if ( !$LevelNames{$realm}{$Defs::LEVEL_EVENT} ) {
-                $LevelNames{$realm} = getNames( $db, $realm );
-            }
-            my $levelname = $LevelNames{$realm}{$Defs::LEVEL_EVENT} || '';
-            my $url = "$Defs::PassportURL/login/?apk=$Defs::PassportPublicKey&amp;url=" . escape("$Defs::base_url/authenticate.cgi?i=$id&amp;t=$Defs::LEVEL_EVENT");
-            push @{ $org_data{$Defs::LEVEL_EVENT} },
-              {
-                Name         => $name              || next,
-                EntityID     => $id                || next,
-                EntityTypeID => $Defs::LEVEL_EVENT || next,
-                Logo         => $logoURL,
-                Realm        => $realm,
-                LevelName    => $levelname,
-                URL          => $url,
-              };
-        }
-    }
-    if ($osep_str2) {
-        my $st = qq[
-            SELECT
-                DA.intDeliveryAgentID as intID,
-                DA.strName,
-                A.intLevel,
-                R.strRealmName
-            FROM
-                tblAuth A
-                inner join tblEDUDeliveryAgent DA on A.intID = DA.intDeliveryAgentID
-                inner join tblEDUEdu E on DA.intEduID = E.intEduID
-                INNER JOIN tblRealms AS R ON E.intRealmID = R.intRealmID
-                LEFT JOIN tblUploadedFiles AS UF ON (
-                    UF.intEntityTypeID in ($Defs::LEVEL_EDU_DA)
-                    AND UF.intEntityID = A.intID
-                    AND UF.intFileType = $Defs::UPLOADFILETYPE_LOGO
-                )
-            WHERE A.intID IN ($osep_str2)
-            AND A.intLevel in ($Defs::LEVEL_EDU_ADMIN)
-                $swol_filter
-            ORDER BY DA.strName
-        ];
-
-        my $q = $db->prepare($st);
-        $q->execute();
-        while ( my ( $id, $name, $level, $realm ) = $q->fetchrow_array() ) {
-            $realms{$realm} = 1;
-            my $logoURL = showLogo( $Data, $level, $id, '', 0, 100, 0, );
-            if ( !$LevelNames{$realm}{$level} ) {
-                $LevelNames{$realm} = getNames( $db, $realm );
-            }
-            my $levelname = $LevelNames{$realm}{$level} || '';
-            my $url = "$Defs::PassportURL/login/?apk=$Defs::PassportPublicKey&amp;url=" . escape("$Defs::base_url/authenticate.cgi?i=$id&amp;t=$level");
-            push @{ $org_data{$level} },
-              {
-                Name         => $name  || next,
-                EntityID     => $id    || next,
-                EntityTypeID => $level || next,
-                Logo         => $logoURL,
-                Realm        => $realm,
-                LevelName    => $levelname,
-                URL          => $url,
-              };
-        }
-    }
-    if ($osep_str) {
-        my $st = qq[
-            SELECT
-                DA.intDeliveryAgentID as intID,
-                DA.strName,
-                A.intLevel,
-                R.strRealmName
-            FROM
-                tblAuth A
-                inner join tblEDUDeliveryAgent DA on A.intID = DA.intDeliveryAgentID
-                inner join tblEDUEdu E on DA.intEduID = E.intEduID
-                INNER JOIN tblRealms AS R ON E.intRealmID = R.intRealmID
-                LEFT JOIN tblUploadedFiles AS UF ON (
-                    UF.intEntityTypeID in ($Defs::LEVEL_EDU_DA)
-                    AND UF.intEntityID = A.intID
-                    AND UF.intFileType = $Defs::UPLOADFILETYPE_LOGO
-                )
-            WHERE A.intID IN ($osep_str)
-            AND A.intLevel in ($Defs::LEVEL_EDU_DA)
-                $swol_filter
-            ORDER BY DA.strName
-        ];
-
-        my $q = $db->prepare($st);
-        $q->execute();
-        while ( my ( $id, $name, $level, $realm ) = $q->fetchrow_array() ) {
-            $realms{$realm} = 1;
-            my $logoURL = showLogo( $Data, $level, $id, '', 0, 100, 0, );
-            if ( !$LevelNames{$realm}{$level} ) {
-                $LevelNames{$realm} = getNames( $db, $realm );
-            }
-            my $levelname = $LevelNames{$realm}{$level} || '';
-            my $url = "$Defs::PassportURL/login/?apk=$Defs::PassportPublicKey&amp;url=" . escape("$Defs::base_url/authenticate.cgi?i=$id&amp;t=$level");
-            push @{ $org_data{$level} },
-              {
-                Name         => $name  || next,
-                EntityID     => $id    || next,
-                EntityTypeID => $level || next,
-                Logo         => $logoURL,
                 Realm        => $realm,
                 LevelName    => $levelname,
                 URL          => $url,
@@ -437,7 +217,7 @@ sub getAuthOrgListsData {
                 $LevelNames{$realm} = getNames( $db, $realm );
             }
             my $levelname = $LevelNames{$realm}{$type} || '';
-            my $url = "$Defs::PassportURL/login/?apk=$Defs::PassportPublicKey&amp;url=" . escape("$Defs::base_url/authenticate.cgi?i=$id&amp;t=$type");
+            my $url = "$Defs::base_url/authenticate.cgi?i=$id&amp;t=$type";
             push @{ $org_data{$type} },
               {
                 Name         => $name || next,
@@ -451,105 +231,6 @@ sub getAuthOrgListsData {
         }
     }
     my %assocVenues = ();
-    if ($venue_str) {
-        my $st = qq[
-            SELECT    
-                V.intDefVenueID,
-                V.strName,
-                A.strName AS AssocName,
-                A.intAssocID,
-                R.strRealmName
-            FROM
-                tblDefVenue AS V
-                INNER JOIN tblAssoc AS A ON (
-                    V.intAssocID = A.intAssocID
-                )
-                INNER JOIN tblRealms AS R ON A.intRealmID = R.intRealmID
-            WHERE V.intDefVenueID IN ($venue_str)
-                AND V.intRecStatus <> -1
-                $swol_filter
-            ORDER BY V.strName, AssocName
-        ];
-        my $q = $db->prepare($st);
-        $q->execute();
-        while ( my ( $id, $name, $assocname, $assocID, $realm ) = $q->fetchrow_array() ) {
-            $realms{$realm} = 1;
-
-            if ( !$LevelNames{$realm}{$Defs::LEVEL_VENUE} ) {
-                $LevelNames{$realm} = getNames( $db, $realm );
-            }
-            my $levelname = 'Venue';
-            my $url =
-              "$Defs::PassportURL/login/?apk=$Defs::PassportPublicKey&amp;url="
-              . escape("$Defs::base_url/results/onlineresults.cgi?aID=$assocID&amp;e=$id&amp;et=$Defs::LEVEL_VENUE&amp;a=LIST_MATCHES");
-            if ( !$assocVenues{$assocID} ) {
-                push @{ $org_data{$Defs::LEVEL_VENUE} },
-                  {
-                    Name         => 'Venue Access',
-                    EntityID     => $id || next,
-                    EntityTypeID => $Defs::LEVEL_VENUE,
-                    Logo         => '',
-                    AssocName    => $assocname,
-                    Realm        => $realm,
-                    LevelName    => $levelname,
-                    URL          => $url,
-                  };
-                $assocVenues{$assocID} = 1;
-            }
-        }
-    }
-    {
-        my $st = qq[
-            SELECT PM.intMemberID, M.intRealmID
-            FROM tblPassportMember AS PM
-                INNER JOIN tblMember AS M
-                    ON PM.intMemberID = M.intMemberID
-            WHERE PM.intPassportID = ?
-        ];
-        my $q_p = $db->prepare($st);
-        $q_p->execute($passportID);
-        my %passportmembers = ();
-        while ( my ( $mID, $r ) = $q_p->fetchrow_array() ) {
-            $passportmembers{$mID} = $r || next;
-        }
-        if ( scalar( keys %passportmembers ) ) {
-            for my $mID ( keys %passportmembers ) {
-                my $realmID = $passportmembers{$mID};
-                my $st_u    = qq[
-                    SELECT DISTINCT
-                        M.intMemberID,
-                        CONCAT( M.strFirstname, ' ', M.strSurname),
-                        R.strRealmName
-                    FROM
-                        tblMember_Seasons_$realmID AS MS
-                        INNER JOIN tblMember AS M
-                            ON MS.intMemberID = M.intMemberID
-                        INNER JOIN tblRealms AS R ON M.intRealmID = R.intRealmID
-                    WHERE
-                        MS.intMemberID = ?
-                        AND intUmpireStatus = 1
-                        AND dtOutUmpire IS NULL
-                ];
-                my $q = $db->prepare($st_u);
-                $q->execute($mID);
-                while ( my ( $mID, $name, $realm ) = $q->fetchrow_array() ) {
-                    my $url = "$Defs::PassportURL/login/?apk=$Defs::PassportPublicKey&amp;url=" . escape("$Defs::base_url/results/matchofficial.cgi?e=$mID&amp;et=MO&amp;a=MO_LIST");
-                    push @{ $org_data{'MATCHOFFICIAL'} },
-                      {
-                        Name         => $name,
-                        EntityID     => $mID || next,
-                        EntityTypeID => 'MO',
-                        Logo         => '',
-                        AssocName    => '',
-                        Realm        => $realm,
-                        LevelName    => 'Match Official',
-                        URL          => $url,
-                      };
-                }
-            }
-        }
-    }
-
     my @outdata = ();
     for my $level (
                     $Defs::LEVEL_TOP,           $Defs::LEVEL_EDU_ADMIN,

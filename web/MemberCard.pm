@@ -336,7 +336,6 @@ sub show_bulk_options {
     $reports_dropdown .= qq[<option value="$report">$reports->{$report}</option>];
   }
   $reports_dropdown .= qq[</select>];
-  my $teams_dropdown = _get_team_dropdown($Data, $assocID);
   my $agegroups_dropdown = _get_agegroup_dropdown($Data, $assocID);
 	my $resultHTML=qq[
 		<p>Choose what you want to bulk print from the options below.  All the filters are additive.</p>
@@ -351,8 +350,6 @@ sub show_bulk_options {
           <td>
             <b>2. Filter By:</b>
             <p>$reports_dropdown</p>
-            <i>OR</i>
-            <p>$teams_dropdown</p>
             <i>OR</i>
             <p>$agegroups_dropdown</p>
             <i>OR</i> <br>
@@ -397,7 +394,6 @@ sub checkBulkPrint {
 	my $notprinted = param('notprinted') || 0;
 	my $needsprinting = param('needtobeprinted') || 0;
   my $reportID = param('reportID') || 0;
-  my $teamID = param('teamID') || 0;
   my $agegroupID = param('agegroupID') || 0;
 	my $inseason = param('inseason') || 1;
 	my $ctID = param('ctID') || return qq[<p class="warningmsg">You must select a card type</p>];
@@ -410,16 +406,6 @@ sub checkBulkPrint {
     $hide_mark_as_printed = 1;
     my $reportdata = getSavedReportData($Data, $reportID);
     for my $d (@{$reportdata}) {
-      next unless ($d->{'intMemberID'});
-      push @unprintedIDs, $d->{'intMemberID'} if ($printable < $limit or $limit == 0);
-      $printable++;
-    }
-  }
-  elsif ($teamID) {
-    $hide_mark_as_printed = 1;
-    my ($teamID_IN, $compID_IN) = split /\|/,$teamID;
-    my $teamdata = get_team_member_data($Data, $teamID_IN, $compID_IN);
-    for my $d (@{$teamdata}) {
       next unless ($d->{'intMemberID'});
       push @unprintedIDs, $d->{'intMemberID'} if ($printable < $limit or $limit == 0);
       $printable++;
@@ -676,47 +662,6 @@ sub toggleToPrintFlag	{
 	return '';
 }
 
-sub _get_team_dropdown {
-  my ($Data, $assocID) = @_;
-  my $season_data = getDefaultAssocSeasons($Data);
-  my $body = '';
-  my $st = qq[
-    SELECT
-      T.intTeamID,
-      T.strName,
-      AC.strTitle,
-      AC.intCompID
-    FROM
-      tblAssoc_Comp AS AC
-      INNER JOIN tblComp_Teams AS CT ON (CT.intCompID = AC.intCompID)
-      INNER JOIN tblTeam AS T ON (T.intTeamID = CT.intTeamID)
-    WHERE
-      AC.intNewSeasonID = ?
-      AND AC.intAssocID = ?
-      AND AC.intRecStatus <> -1
-      AND CT.intRecStatus <> -1
-      AND T.intRecStatus <> -1
-    ORDER BY
-      T.strName
-  ];
-  my $q = $Data->{'db'}->prepare($st);
-  $q->execute($season_data->{currentSeasonID}, $assocID);
-  $body = qq[
-    Select a team: 
-    <select name="teamID">
-      <option></option>
-  ];
-  while (my $href = $q->fetchrow_hashref()) {
-    $body .= qq[
-      <option value="$href->{intTeamID}|$href->{intCompID}">$href->{strName} - $href->{strTitle}</option>
-    ];
-  }
-  $body .= qq[
-    </select>
-  ];
-  return $body;
-}
-
 sub _get_agegroup_dropdown {
   my ($Data, $assocID) = @_;
   my $season_data = getDefaultAssocSeasons($Data);
@@ -754,52 +699,6 @@ sub _get_agegroup_dropdown {
   return $body;
 }
 
-
-sub get_team_member_data { 
-  my ($Data, $teamID, $compID) = @_;
-  $teamID ||= 0;
-  $compID ||= 0;
-  my $assocID = $Data->{'clientValues'}{'assocID'} || 0;
-  my $season_data = getDefaultAssocSeasons($Data);
-  my $seasonID = $season_data->{currentSeasonID} || 0;
-  my $st = qq[
-    SELECT 
-      DISTINCT
-      tblMember.intMemberID
-    FROM 
-      tblMember
-      INNER JOIN tblMember_Associations ON (tblMember_Associations.intMemberID=tblMember.intMemberID)   
-      INNER JOIN tblMember_Teams 
-      INNER JOIN tblTeam ON (tblTeam.intTeamID = ?)  
-      LEFT JOIN tblMember_Clubs as MC ON (
-        MC.intClubID = tblTeam.intClubID 
-        AND MC.intMemberID = tblMember.intMemberID 
-        AND MC.intStatus = $Defs::RECSTATUS_ACTIVE
-      )
-      INNER JOIN tblMember_Seasons_$Data->{Realm} AS Seasons ON (Seasons.intMemberID = tblMember.intMemberID
-        AND Seasons.intSeasonID = ?
-        AND Seasons.intAssocID = tblMember_Associations.intAssocID
-        AND Seasons.intMSRecStatus = $Defs::RECSTATUS_ACTIVE
-      )
-    WHERE 
-      tblMember.intStatus <> $Defs::RECSTATUS_DELETED 
-      AND tblMember.intRealmID = $Data->{Realm}
-      AND tblMember_Teams.intTeamID = ?
-      AND tblMember_Teams.intMemberID = tblMember.intMemberID
-      AND tblMember_Teams.intStatus <> $Defs::RECSTATUS_DELETED
-      AND tblMember_Associations.intAssocID = ?
-      AND (tblTeam.intClubID IS NULL OR MC.intMemberClubID > 0 OR tblTeam.intClubID = 0)
-      AND (tblMember_Teams.intCompID = ? OR tblMember_Teams.intCompID = 0)
-      AND Seasons.intClubID = tblTeam.intClubID
-  ];
-  my $q = $Data->{'db'}->prepare($st);
-  $q->execute($teamID, $seasonID, $teamID, $assocID, $compID);
-  my @members = ();
-  while (my $href = $q->fetchrow_hashref()) {
-    push @members, {intMemberID => $href->{'intMemberID'}};
-  }
-  return \@members;
-}
 
 sub get_age_group_member_data {
   my ($Data, $age_groupID) = @_;

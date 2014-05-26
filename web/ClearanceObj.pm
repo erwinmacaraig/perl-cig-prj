@@ -983,7 +983,6 @@ sub clearanceView	{
 	else	{
 		$resultHTML .= qq[<br><div class="warningmsg">No path details can be shown as this clearance was created offline or is a Manual $txt_Clr History record</div>];
 	}
-	$resultHTML .= Member::TribunalHistory($Data, $dref->{intMemberID}, 0);
 
 	if($option eq 'display')	{
 		$resultHTML .=qq[<br><a href="$target?a=CL_list&amp;client=$client">Return to $txt_Clr Listing</a> ] ;
@@ -3187,7 +3186,6 @@ noedit=>1,
 	}
 
 	($resultHTML, undef )=handleHTMLForm($FieldDefs{'Clearance'}, undef, $option, '',$db);
-	$resultHTML .= Member::TribunalHistory($Data, $memberID, 0);
 
 	#warn("TCTC");
 	#use Data::Dumper;

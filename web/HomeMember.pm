@@ -237,43 +237,6 @@ sub getSeasonStatus	{
  	getSeasonStuff_ClubLevel($Data, $clubID, 0, $memberID, $assocSeasons->{'newRegoSeasonID'}, 'newRego', \%TemplateData, $assoc_obj->getValue('intHideClubRollover') );
  	getSeasonStuff_ClubLevel($Data, $clubID, 1, $memberID, $assocSeasons->{'currentSeasonID'}, 'current', \%TemplateData, undef);
 
-	## Now to do Tribunal "Suspension" dates
-
-	 if($Data->{'SystemConfig'}{'IgnoreAssocsInTribunalCalculations'}) {
-
-	my $st_tribunal = qq[
-                SELECT
-                        COUNT(intTribunalID) as NumCharges
-                FROM
-                        tblTribunal
-                WHERE
-                        intMemberID=?
-                        AND dtPenaltyExp >= DATE(NOW())
-
-                        AND dtPenaltyStartDate <= DATE(NOW())
-	];
-	my $qry_tribunal = $Data->{'db'}->prepare($st_tribunal);
-	$qry_tribunal->execute($memberID);
-	$TemplateData{'isSuspended'} = $qry_tribunal->fetchrow_array() ? 1 : 0;
-	} else {
-	my $st_tribunal = qq[
-		SELECT
-			COUNT(intTribunalID) as NumCharges	
-		FROM
-			tblTribunal
-		WHERE
-			intAssocID=?
-			AND intMemberID=?
-			AND dtPenaltyExp >= DATE(NOW())
-
-			AND dtPenaltyStartDate <= DATE(NOW())
-	];
-
-	my $qry_tribunal = $Data->{'db'}->prepare($st_tribunal);
-	$qry_tribunal->execute($Data->{'clientValues'}{'assocID'}, $memberID);
-	$TemplateData{'isSuspended'} = $qry_tribunal->fetchrow_array() ? 1 : 0;
-	}
-
 	return \%TemplateData;
 
 }

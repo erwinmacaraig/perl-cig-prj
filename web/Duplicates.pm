@@ -869,7 +869,6 @@ next if $dref->{$k} eq "'0000-00-00'";
 		$Data->{'db'}->do(qq[UPDATE IGNORE tblMemberTags SET intMemberID = $existingid WHERE intMemberID = $id_of_duplicate]);
 		$Data->{'db'}->do(qq[UPDATE IGNORE tblMemberHistory SET intMemberID = $existingid WHERE intMemberID=$id_of_duplicate]);
 		$Data->{'db'}->do(qq[UPDATE tblClearance SET intMemberID = $existingid WHERE intMemberID=$id_of_duplicate]);
-		$Data->{'db'}->do(qq[UPDATE tblTribunal SET intMemberID = $existingid WHERE intMemberID=$id_of_duplicate]);
 		$Data->{'db'}->do(qq[UPDATE IGNORE tblAuth SET intID = $existingid WHERE intLevel=1 AND intID=$id_of_duplicate]);
 		#$Data->{'db'}->do(qq[UPDATE IGNORE tblLadderData SET intPlayerID = $existingid WHERE intPlayerID=$id_of_duplicate]);
     # updating System Generated Stats

@@ -157,16 +157,6 @@ sub doSearch {
 			];
 	 		$resultHTML.=search_query($db,$statement, $clientValues_ref, $Defs::LEVEL_ASSOC, 'assocName', 'assocID', $target,\$found, $Data);
     } 
-		elsif ($searchentity == $Defs::LEVEL_COMP) {
-			$statement=qq[
-				SELECT DISTINCT intCompID AS compID, tblAssoc_Comp.strTitle AS compName $select_levels
-				FROM $from_levels $current_from
-				WHERE strTitle LIKE $searchvalues $where_levels $current_where
-				ORDER BY tblAssoc_Comp.strTitle
-				LIMIT $limit
-			];
-	 		$resultHTML.=search_query($db,$statement, $clientValues_ref, $Defs::LEVEL_COMP, 'compName', 'compID', $target,\$found, $Data);
-    } 
 		elsif ($searchentity == $Defs::LEVEL_CLUB) {
 			$statement=qq[
 				SELECT DISTINCT tblClub.intClubID AS clubID, tblClub.strName AS clubName $select_levels
@@ -176,16 +166,6 @@ sub doSearch {
 				LIMIT $limit
 			];
 	 		$resultHTML.=search_query($db,$statement, $clientValues_ref, $Defs::LEVEL_CLUB, 'clubName', 'clubID', $target,\$found, $Data);
-    } 
-		elsif ($searchentity == $Defs::LEVEL_TEAM) {
-			$statement=qq[
-				SELECT DISTINCT tblTeam.intTeamID AS teamID, tblTeam.strName AS teamName $select_levels
-				FROM $from_levels $current_from
-				WHERE tblTeam.strName LIKE $searchvalues $where_levels $current_where
-				ORDER BY tblTeam.strName
-				LIMIT $limit
-			];
-	 		$resultHTML.=search_query($db,$statement, $clientValues_ref, $Defs::LEVEL_TEAM, 'teamName', 'teamID', $target,\$found, $Data);
     } 
 		elsif ($searchentity == $Defs::LEVEL_MEMBER) {
 			my $wherefields='';
@@ -343,9 +323,7 @@ sub displaySearchScreen {
 		$Defs::LEVEL_REGION,
 		$Defs::LEVEL_ZONE,
 		$Defs::LEVEL_ASSOC,
-		$Defs::LEVEL_COMP,
 		$Defs::LEVEL_CLUB,
-		$Defs::LEVEL_TEAM,
 		$Defs::LEVEL_MEMBER,
 	);
 	my $options='';
@@ -353,8 +331,6 @@ sub displaySearchScreen {
 	for my $l (sort reverse @SearchOptions)	{
 		if($currentLevel > $l and $Data->{'LevelNames'}{$l})	{
 			next if ($l==$Defs::LEVEL_CLUB and $Data->{'SystemConfig'}{'NoClubs'});
-			next if ($l==$Defs::LEVEL_COMP and $Data->{'SystemConfig'}{'NoComps'});
-			next if ($l==$Defs::LEVEL_TEAM and $Data->{'SystemConfig'}{'NoTeams'});
 			push @options, $l;
 		}
 	}
@@ -376,7 +352,6 @@ sub displaySearchScreen {
 		$searchentity=qq[<input type="hidden" name="searchentity" value="$options[0]">];
 	}
   my $natnumname=$Data->{'SystemConfig'}{'NationalNumName'} || 'National Number';
-	#my $currentdisplay=$Data->{'clientValues'}{'currentLevel'} > $Defs::LEVEL_TEAM ? 'display:none;' : '';
 	my $searchmembernum = (defined $Data->{'Permissions'}{'Member'}{'strMemberNo'} and $Data->{'Permissions'}{'Member'}{'strMemberNo'} ne 'Hidden') ? qq[
     <tr>
       <td class="label">Member Number</td>
@@ -485,8 +460,6 @@ sub search_query	{
 	$resultHTML .= qq[<table class="listTable">];
 	my %origClientValues = %{$clientValues_ref};
 	my %actions=(
-		$Defs::LEVEL_COMP => 'CO_HOME',
-		$Defs::LEVEL_TEAM => 'T_HOME',
 		$Defs::LEVEL_MEMBER => 'M_HOME',
 		$Defs::LEVEL_CLUB => 'C_HOME',
 		$Defs::LEVEL_ASSOC => 'A_HOME',
@@ -504,7 +477,6 @@ sub search_query	{
 		my %tempClientValues = %origClientValues;
 		next if (exists $displayed{$dref->{memberID}} and ! $dref->{strClubName} and $Data->{'SystemConfig'}{'ClubInSearch'});
 		$displayed{$dref->{memberID}} = 1;
-		$tempClientValues{teamID}=$dref->{intTeamID} if $dref->{intTeamID};
 		$tempClientValues{clubID}=$dref->{intClubID} if $dref->{intClubID};
 		$tempClientValues{assocID}=$dref->{intAssocID} if $dref->{intAssocID};
 		$tempClientValues{zoneID}=$dref->{intZoneID} if $dref->{ZoneStatus};

@@ -65,9 +65,6 @@ sub getWelcomeText	{
 		and $Data->{'SystemConfig'}{'NagScreen'}=~/\.templ/)  {
 		$nagscreen = show_nag_screen($Data);
 	}
-	#$nagscreen .= show_changeover_screen($Data); 
-	#$nagscreen .= show_passport_changeover_screen($Data); 
-
 
   my $days_since_last_login = param('days') || 0;
   my $login_message = '';

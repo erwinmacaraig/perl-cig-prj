@@ -380,7 +380,6 @@ sub field_changetext {
 	my %TextReplacements = (
   	Clearance => $SystemConfig->{'txtCLR'} || 'Clearance',
 	Clearances => $SystemConfig->{'txtCLRs'} || 'Clearances',
-		Tribunal => $Data->{'SystemConfig'}{'txtTribunal'} || 'Tribunal',
 		Member => $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER},
 		Members => $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER."_P"},
 		Team => $Data->{'LevelNames'}{$Defs::LEVEL_TEAM},

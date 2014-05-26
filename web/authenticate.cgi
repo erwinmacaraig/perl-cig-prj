@@ -28,7 +28,7 @@ sub main {
     my $typeID_IN = safe_param( 't',      'number' ) || 0;
 
     ## GET REDIRECT URL
-    $redirectURL = $Defs::base_url;
+    my $redirectURL = $Defs::base_url;
 
     my %Data = ();
     my $lang = Lang->get_handle() || die "Can't get a language handle!";
