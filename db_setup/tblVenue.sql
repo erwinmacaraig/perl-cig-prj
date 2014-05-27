@@ -1,5 +1,5 @@
-CREATE table tblFacility (
-    intFacilityID  INT NOT NULL AUTO_INCREMENT,
+CREATE table tblVenue (
+    intVenueID  INT NOT NULL AUTO_INCREMENT,
     intEntityID int(11) NOT NULL DEFAULT '0',
     intRealmID int(11) NOT NULL DEFAULT '0',
     intSubRealmID int(11) NOT NULL DEFAULT '0',

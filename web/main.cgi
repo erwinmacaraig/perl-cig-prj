@@ -40,6 +40,7 @@ use Seasons;
 use AgeGroups;
 
 use Notifications;
+use Venues;
 use Facility;
 use ProgramTemplates;
 use Programs;
