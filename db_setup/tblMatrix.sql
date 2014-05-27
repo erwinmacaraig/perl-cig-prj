@@ -20,7 +20,6 @@ CREATE TABLE `tblMatrix` (
 
     dtAdded date,
     intAddedUserID INT DEFAULT 0,
-    intOriginalMatrixID INT DEFAULT 0,
 
 
   PRIMARY KEY (intMatrixID),
