@@ -22,8 +22,8 @@ CREATE TABLE tblEntity (
     strAddress varchar(200) default '',
     strWebURL varchar(200) default '',
     strEmail varchar(200) default '',
-    strPhone varchar(20) DEFAULT NULL,
-    strFax varchar(20) DEFAULT NULL,
+    strPhone varchar(20) DEFAULT '',
+    strFax varchar(20) DEFAULT '',
 
     strContactTitle varchar(50) DEFAULT NULL,
     strContactEmail varchar(200) DEFAULT NULL,
