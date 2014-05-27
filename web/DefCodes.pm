@@ -16,7 +16,6 @@ use CGI qw(escape unescape param);
 use Defs;
 use Reg_common;
 use DeQuote;
-use Tags;
 require Seasons;
 require AuditLog;
 require CustomFields;
@@ -36,7 +35,6 @@ my %DefCodesTypes	= (
 	#-18 => 'Coach Types',
 	#-19 => 'Discipline Types',
 	-21 => 'Competition Levels',
-	-24 => 'Member Tags',
 	-31 => 'ID Document Types',
 	-32 => 'Accreditation Providers',
 	-33 => 'State Teams',
@@ -286,9 +284,6 @@ sub handle_defcodes	{
 	elsif($action eq 'A_LK_E') {
 		$body.=detail_defcodes($Data,$type, $id);
 	}
-	elsif($action =~ 'A_LK_CT' || $action =~ 'A_LK_ST') {
-		$body .= resetTags($Data,$type, $action, $cl);
-	}
 	else	{
 		$body.= show_menu($Data);
 	}
@@ -344,7 +339,6 @@ sub list_defcodes	{
         deleteAction  => 'A_LK_D',
         returnAction  => 'A_LK_',
         target        => $target,
-        allowBulkTags => $Data->{'SystemConfig'}{'AllowBulkTags'},
         client        => $cl,
         dcType        => $type, 
         tkey          => $typeKey,

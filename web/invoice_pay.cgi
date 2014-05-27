@@ -7,7 +7,7 @@
 use strict;
 use CGI;
 
-use lib '.','..','RegoForm', '../templates';
+use lib '.','..','RegoForm', '../templates','PaymentSplit';
 use Lang;
 use Reg_common;
 use PageMain;

@@ -1043,8 +1043,8 @@ sub regoform_notifications {
         chop($club_primary_contact);
     }
 
-    my $crCount = (@$club_rego_contacts) ? scalar(@$club_rego_contacts) : 0;
-    my $cfCount = (@$club_finc_contacts) ? scalar(@$club_finc_contacts) : 0;
+    my $crCount = (defined $club_rego_contacts ) ? scalar(@$club_rego_contacts) : 0;
+    my $cfCount = (defined $club_finc_contacts) ? scalar(@$club_finc_contacts) : 0;
 
     my %template_data = (
         formID          => $form_id,

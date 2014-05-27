@@ -5,7 +5,7 @@
 package RegoForm::RegoForm_Member;
 
 use strict;
-use lib ".", "..", "../..", "../externallms", "../comp", "../sportstats";
+use lib ".", "..", "../..", "../RegoFormBuilder";
 use RegoForm::RegoFormBaseObj;
 our @ISA =qw(RegoForm::RegoFormBaseObj);
 
@@ -611,7 +611,6 @@ sub setupMember_HTMLForm {
   $Data->{'SystemConfig'}{'hide_webcam_tab'} = '' if ($self->{ID} and $Data->{'SystemConfig'}{'hide_webcam_tab'} and  $Data->{'SystemConfig'}{'hide_webcam_tab'} != $self->{ID});
 
     my $FieldDefinitions = Member::member_details('', $Data, $memberID, $prefilldata);
-  my $campaignText = getCampaignText($self->{'Data'}, $memberID);
 
     #Deal with fields that appeared on the previous page
     for my $f (@firstpagefields)    {
@@ -699,7 +698,6 @@ sub setupMember_HTMLForm {
             (exists $self->{'Text'}{'TC_js'}{'value'}) ? $self->{'Text'}{'TC_js'}{'value'} : '', 
             $tcHdr.$self->getText('strTermsCondText',1), #$tcHdr on it's own line creates an extra linefeed...
             $self->getText('TC_AgreeBox',1),
-            $campaignText,
             $passportlinktext,
     );
     my $carryfields = $self->getCarryFields();

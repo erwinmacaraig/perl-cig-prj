@@ -9,7 +9,7 @@
 use strict;
 use CGI qw(param escape unescape);
 
-use lib '.','..','../..';
+use lib '.','..','../..',"PaymentSplit";
 use Reg_common;
 use PageMain;
 use Navbar;

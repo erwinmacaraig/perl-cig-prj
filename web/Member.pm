@@ -18,7 +18,7 @@ require Exporter;
 );
 
 use strict;
-use lib '.', '..', 'sportstats';
+use lib '.', '..', 'Clearances';
 use Defs;
 
 use Reg_common;
@@ -46,7 +46,6 @@ use ListMembers;
 use MemberRecords;
 
 use Clearances;
-use MemberHistory;
 use Seasons;
 use GenAgeGroup;
 use GridDisplay;
@@ -58,7 +57,6 @@ use InstanceOf;
 use Photo;
 use AccreditationDisplay;
 use DefCodes;
-use MemberPreferences;
 use MemberRecordType;
 
 use Log;
@@ -128,10 +126,6 @@ sub handleMember {
         ( $resultHTML, $title, $newaction ) = handle_photo( $action, $Data, $memberID );
         $action = $newaction if $newaction;
     }
-    if ( $action =~ /^M_HID/ ) {
-        delMemberHistory( $Data, $memberID );
-        $action = 'M_HOME';
-    }
     if ( $action =~ /^M_DT/ ) {
         #Member Details
         ( $resultHTML, $title ) = member_details( $action, $Data, $memberID );
@@ -178,7 +172,7 @@ sub handleMember {
         ( $resultHTML, $title ) = MemberTransfer($Data);
     }
     elsif ( $action =~ /M_CLUBS/ ) {
-        my ( $clubStatus, $clubs, $teams ) = showClubTeams( $Data, $memberID );
+        my ( $clubStatus, $clubs, undef) = showClubTeams( $Data, $memberID );
         $clubs      = qq[<div class="warningmsg">No $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} History found</div>] if !$clubs;
         $resultHTML = $clubs;
         $title      = "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} History";
@@ -197,9 +191,6 @@ sub handleMember {
     }
     elsif ( $action =~ /^M_NACCRED/ ) {
         ( $resultHTML, $title ) = handleAccreditationDisplay( $action, $Data, $memberID );
-    }
-    elsif ( $action =~ /^M_PREFS/ ) {
-        ( $resultHTML, $title ) = memberPreferences( $action, $Data, $memberID );
     }
     else {
         print STDERR "Unknown action $action\n";
@@ -2145,7 +2136,6 @@ $member_photo
         my @tabdata    = ();
         my ( $clubStatus, $clubs, undef) = showClubTeams( $Data, $memberID );
         $clubs ||= '';
-        $teams ||= '';
         push @taboptions, [ 'memclubs_dat', $Data->{'LevelNames'}{ $Defs::LEVEL_CLUB . "_P" } ] if $clubs;
         push @tabdata, qq[<div id="memclubs_dat">$clubs</div>] if $clubs;
 
@@ -3180,11 +3170,5 @@ sub showSeasonSummary {
     return ( $body, 'Season Summary' );
 }
 
-sub memberPreferences{
-    my ( $action, $Data, $memberID ) = @_;
-    return "Invalid action for member records: $action" if (not $action =~ /^M_PREFS/);
-    my ($resultHTML, $title) = handle_member_prefs($action, $Data, $memberID);
-    return ( $resultHTML, $title );
-}
 
 1;

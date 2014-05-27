@@ -7,7 +7,7 @@
 use strict;
 use CGI;
 
-use lib '.','..','RegoForm','../sportstats';
+use lib '.','..','RegoForm','../sportstats',"PaymentSplit",'RegoFormBuilder';
 use Lang;
 use Reg_common;
 use PageMain;

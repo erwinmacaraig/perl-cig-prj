@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use lib "..";
+use lib "..",'RegoFormBuilder';
 use CGI qw(param);
 use Reg_common;
 use Utils;

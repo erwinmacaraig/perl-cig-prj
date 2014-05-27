@@ -80,7 +80,6 @@ sub listMembers {
     my $txt_SeasonName= $Data->{'SystemConfig'}{'txtSeason'} || 'Season';
     my %textLabels = (
         'addMember' => $lang->txt("Add"),
-        'bulkChangeTags' => $lang->txt('Bulk Change Tags'),
         'transferMember' => $lang->txt('Transfer Member'),
         'modifyMemberList' => $lang->txt('Modify Member List'),
         'membersInLevel' => $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_MEMBER.'_P'} in $Data->{'LevelNames'}{$type}"),
@@ -688,13 +687,6 @@ sub listMembers {
         delete $options{'rollover_members'} ;
         delete $options{'activatemember'};
         delete $options{'addmember'};
-    }
-
-    if (allowedAction($Data, 'm_e') and $Data->{'SystemConfig'}{'AllowBulkTags'})    {
-        $options{'bulkchangetags'} = [
-        "$target?client=$client&amp;a=M_TAG&amp;l=$Defs::LEVEL_MEMBER",
-        $textLabels{'bulkChangeTags'},
-        ];
     }
 
     my $modoptions = '';

@@ -515,7 +515,7 @@ sub newRecord_TouchTables       {
 
         $memberID || return;
 	my $MStablename = "tblMember_Seasons_$Data->{'Realm'}";
-        my @Tables = (qw(tblMember_Associations tblMember_Clubs tblMember_Teams tblMember_Types tblMemberTags tblClearance));
+        my @Tables = (qw(tblMember_Associations tblMember_Clubs tblClearance));
         foreach my $table (@Tables)     {
                 my $st='';
                 $st = qq[
@@ -594,9 +594,6 @@ sub processMemberChange	{
 	my %StatusTables	=(
 		#tblMember_Associations => 'intRecStatus',
 		tblMember_Clubs => 'intStatus',
-		tblMember_Teams => 'intStatus',
-		tblMember_Types => 'intRecStatus',
-		tblMemberTags => 'intRecStatus',
 		tblAccreditation => 'intRecStatus',
 	);
 	for my $table (keys %StatusTables)	{
@@ -610,13 +607,6 @@ sub processMemberChange	{
 			
 			if ($table eq 'tblMember_Clubs')	{
 				$st = qq[UPDATE tblMember_Clubs as MC LEFT JOIN tblMember_Clubs as MC2 ON (MC2.intMemberID = $existingid and MC.intClubID = MC2.intClubID and MC.intStatus = MC2.intStatus) SET MC.intMemberID = $existingid WHERE MC.intMemberID = $id_of_duplicate and MC2.intMemberClubID IS NULL];
-			}
-			if ($table eq 'tblMember_Teams')	{
-				$st = qq[UPDATE tblMember_Teams as MT LEFT JOIN tblMember_Teams as MT2 ON (MT2.intMemberID = $existingid and MT.intTeamID = MT2.intTeamID and MT.intCompID = MT2.intCompID and MT.intStatus = MT2.intStatus) SET MT.intMemberID = $existingid WHERE MT.intMemberID = $id_of_duplicate and MT2.intMemberTeamID IS NULL];
-			}
-			if ($table eq 'tblMember_Types')	{
-			    next if ($Data->{'SystemConfig'}{'new_member_team_duplicate_code'}); # dont bother updating tblMember_Teams here
-				$st = qq[UPDATE IGNORE tblMember_Types SET intMemberID=$existingid WHERE intMemberID=$id_of_duplicate and intSubTypeID <> 0];
 			}
 			if ($table eq 'tblAccreditation')	{
 				$st = qq[UPDATE IGNORE tblAccreditation SET intMemberID=$existingid WHERE intMemberID=$id_of_duplicate];
@@ -849,9 +839,6 @@ next if $dref->{$k} eq "'0000-00-00'";
 	if($option eq 'del')	{ 
 		my $intAssocID = $Data->{'clientValues'}{'assocID'} || 0;
 		$Data->{'db'}->do(qq[UPDATE tblMember_Clubs as MC INNER JOIN tblAssoc_Clubs as AC ON (AC.intClubID = MC.intClubID) SET MC.intStatus=$Defs::RECSTATUS_DELETED WHERE MC.intMemberID=$id_of_duplicate and AC.intAssocID = $intAssocID]);
-		$Data->{'db'}->do(qq[UPDATE tblMember_Teams as MT INNER JOIN tblTeam as T ON (T.intTeamID = MT.intTeamID) SET MT.intStatus=$Defs::RECSTATUS_DELETED WHERE MT.intMemberID=$id_of_duplicate and T.intAssocID = $intAssocID]);
-		$Data->{'db'}->do(qq[UPDATE tblMember_Types SET intRecStatus=$Defs::RECSTATUS_DELETED WHERE intMemberID=$id_of_duplicate and intAssocID = $intAssocID]);
-		$Data->{'db'}->do(qq[UPDATE tblMemberTags SET intRecStatus=$Defs::RECSTATUS_DELETED WHERE intMemberID=$id_of_duplicate and intAssocID = $intAssocID]);
 		$Data->{'db'}->do(qq[UPDATE tblMember_Associations SET intRecStatus=$Defs::RECSTATUS_DELETED WHERE intMemberID=$id_of_duplicate and intAssocID = $intAssocID]);
 #print STDERR "DELETE DUPLICATE: $id_of_duplicate and intAssocID = $intAssocID\n";
 		$Data->{'db'}->do(qq[UPDATE tblMember as M LEFT JOIN tblMember_Associations as MA ON (MA.intMemberID = M.intMemberID and MA.intAssocID <> $intAssocID) SET M.intStatus=$Defs::RECSTATUS_DELETED WHERE M.intMemberID=$id_of_duplicate and MA.intMemberAssociationID IS NULL]);
@@ -866,8 +853,6 @@ next if $dref->{$k} eq "'0000-00-00'";
 		$Data->{'db'}->do(qq[UPDATE tblOptinMember SET intMemberID = $existingid WHERE intMemberID = $id_of_duplicate]);
 		$Data->{'db'}->do(qq[UPDATE tblOptinMember SET intActionedByID = $existingid WHERE intActionedByID = $id_of_duplicate]);
 		$Data->{'db'}->do(qq[UPDATE tblTransactions SET intID = $existingid WHERE intID = $id_of_duplicate and intTableType=$Defs::LEVEL_MEMBER]);
-		$Data->{'db'}->do(qq[UPDATE IGNORE tblMemberTags SET intMemberID = $existingid WHERE intMemberID = $id_of_duplicate]);
-		$Data->{'db'}->do(qq[UPDATE IGNORE tblMemberHistory SET intMemberID = $existingid WHERE intMemberID=$id_of_duplicate]);
 		$Data->{'db'}->do(qq[UPDATE tblClearance SET intMemberID = $existingid WHERE intMemberID=$id_of_duplicate]);
 		$Data->{'db'}->do(qq[UPDATE IGNORE tblAuth SET intID = $existingid WHERE intLevel=1 AND intID=$id_of_duplicate]);
 		#$Data->{'db'}->do(qq[UPDATE IGNORE tblLadderData SET intPlayerID = $existingid WHERE intPlayerID=$id_of_duplicate]);
@@ -885,36 +870,6 @@ next if $dref->{$k} eq "'0000-00-00'";
 		### The below update statements are required when the resolution has duplicates within the same assoc.
 		$Data->{'db'}->do(qq[UPDATE tblMember_Clubs SET intStatus=$Defs::RECSTATUS_DELETED WHERE intMemberID=$id_of_duplicate]);
 
-        if ($Data->{'SystemConfig'}{'new_member_team_duplicate_code'}){
-            # When the duplicate and the existing member played in the same comp and team
-            $Data->{'db'}->do(qq[
-                UPDATE tblMember_Teams AS MT
-                INNER JOIN tblMember_Teams AS MT2 ON ( MT2.intMemberID = $id_of_duplicate
-                                                       AND MT.intTeamID = MT2.intTeamID
-                                                       AND MT.intCompID = MT2.intCompID)
-                SET MT.intStatus = GREATEST(MT.intStatus, MT2.intStatus),
-                    MT.intMTFinancial = GREATEST(COALESCE(MT.intMTFinancial, 0), COALESCE(MT2.intMTFinancial, 0)),
-                    MT.intFinalsEligibilityCount = (MT.intFinalsEligibilityCount + MT2.intFinalsEligibilityCount),
-                    MT.intFinalsEligible = GREATEST(MT.intFinalsEligible, MT2.intFinalsEligible),
-                    MT.intFinalsEligibleOverride = GREATEST(COALESCE(MT.intFinalsEligibleOverride, 0), COALESCE(MT2.intFinalsEligibleOverride, 0)),
-                    MT.strFinalsEligibleOverride = CONCAT(MT.strFinalsEligibleOverride, MT2.strFinalsEligibleOverride),
-                    MT2.intStatus = $Defs::RECSTATUS_DELETED
-                WHERE MT.intMemberID = $existingid
-                    AND MT2.intStatus IN ($Defs::RECSTATUS_INACTIVE, $Defs::RECSTATUS_ACTIVE)
-                    AND MT.intStatus <> $Defs::RECSTATUS_DELETED
-            ]);
-            
-            # Set any other duplicate member_team records to the existing id where allowed
-            $Data->{'db'}->do(qq[UPDATE IGNORE tblMember_Teams SET intMemberID = $existingid WHERE intMemberID = $id_of_duplicate and intStatus <> $Defs::RECSTATUS_DELETED]);
-        }
-        else{
-            # Old style
-    		$Data->{'db'}->do(qq[UPDATE tblMember_Teams as MT INNER JOIN tblMember_Teams as MT2 ON (MT2.intMemberID = $id_of_duplicate and MT.intTeamID = MT2.intTeamID and MT.intCompID = MT2.intCompID) SET MT.intStatus = MT2.intStatus WHERE MT.intMemberID = $existingid and MT2.intStatus IN (0, $Defs::RECSTATUS_ACTIVE) and MT.intStatus <> $Defs::RECSTATUS_ACTIVE]);
-    		$Data->{'db'}->do(qq[UPDATE tblMember_Teams SET intStatus=$Defs::RECSTATUS_DELETED WHERE intMemberID=$id_of_duplicate]);
-        }
-		#$Data->{'db'}->do(qq[UPDATE tblMember_Types SET intRecStatus=$Defs::RECSTATUS_DELETED WHERE intMemberID=$id_of_duplicate]);
-		$Data->{'db'}->do(qq[UPDATE tblMemberTags SET intRecStatus=$Defs::RECSTATUS_DELETED WHERE intMemberID=$id_of_duplicate]);
-	
 		$Data->{'db'}->do(qq[UPDATE tblMember_Associations SET intRecStatus=$Defs::RECSTATUS_ACTIVE WHERE intMemberID=$existingid and intAssocID = $Data->{'clientValues'}{'assocID'} and intRecStatus = $Defs::RECSTATUS_DELETED LIMIT 1]);
 
 #		$Data->{'db'}->do(qq[UPDATE tblClearanceHoldingBay SET intMemberID = $existingid WHERE intMemberID=$id_of_duplicate]);

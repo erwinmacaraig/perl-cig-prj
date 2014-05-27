@@ -22,7 +22,6 @@ use CGI;
 use AddToPage;
 use TTTemplate;
 use PassportLink;
-use TagManagement;
 use Log;
 use Data::Dumper;
 
@@ -161,7 +160,7 @@ sub pageMain {
             $Data->{'SystemConfig'}{'HeaderBG'},
         );
     }
-    $Data->{'TagManager'}=getTagManager($Data);
+    $Data->{'TagManager'}=''; #getTagManager($Data);
     $Data->{'AddToPage'}->add(
     'js_bottom',
     'inline',
@@ -338,7 +337,7 @@ sub pageForm    {
     my($title, $body, $clientValues_ref,$client, $Data) = @_;
     $title ||= '';
     $body||= textMessage("Oops !<br> This shouldn't be happening!<br> Please contact <a href=\"mailto:info\@sportingpulse.com\">info\@sportingpulse.com</a>");
- $Data->{'TagManager'}=getTagManager($Data);
+ $Data->{'TagManager'}='';#getTagManager($Data);
 
     if($Data->{'WriteCookies'})    {
         my $cookies_string = '';
@@ -389,7 +388,7 @@ sub regoPageForm {
     my($title, $body, $clientValues_ref,$client, $Data) = @_;
     $title ||= '';
     $body||= textMessage("Oops !<br> This shouldn't be happening!<br> Please contact <a href=\"mailto:info\@sportingpulse.com\">info\@sportingpulse.com</a>");
-    $Data->{'TagManager'}=getTagManager($Data);
+    $Data->{'TagManager'}=''; #getTagManager($Data);
 
     if($Data->{'WriteCookies'}) {
         my $cookies_string = '';

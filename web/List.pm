@@ -8,8 +8,8 @@ package List;
 
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(listProdTransactions listTags listMemberSeasons list_row list_headers);
-@EXPORT_OK = qw(list_row list_headers listProdTransactions listTags listMemberSeasons );
+@EXPORT = qw(listProdTransactions listMemberSeasons list_row list_headers);
+@EXPORT_OK = qw(list_row list_headers listProdTransactions listMemberSeasons );
 
 use strict;
 use CGI;
@@ -329,85 +329,6 @@ warn("listProdTXNS");
 ## $resultHTML - HTML for page that is to be displayed
 ## $title - Title of page that is to be displayed
 
-sub listTags {
-        my ($Data, $id, $action) = @_;
-        my $filter=param('f') || '';
-        my $db=$Data->{'db'};
-        my $client = unescape($Data->{client});
-        my $type=$Data->{'clientValues'}{'currentLevel'};
-        my $levelName=$Data->{'LevelNames'}{$type} || '';
-        my $realmID=$Data->{'Realm'} || 0;
-        my $assocID=$Data->{'clientValues'}{'assocID'} || 0;
-        my $resultHTML = '';
-        my $edit=0;
-	my $title='List Tags';
-        my $st = qq[
-        	SELECT intCodeID, strName
-                FROM tblDefCodes
-                WHERE intAssocID=$assocID
-                	AND intRealmID=$realmID
-                        AND intType= -24
-                        AND intRecStatus<>$Defs::RECSTATUS_DELETED
-                ORDER BY strName
-    	];
-        my $q=$Data->{'db'}->prepare($st);
-        $q->execute();
-	if ($action eq "M_TAG") {
-		$resultHTML = qq[
-		<form method="post" action="main.cgi" name="frm_ms">
-		<p>Please select which tags you would like to update in bulk:</p>
-		];
-        	my ($activeTags,$inactiveTags)=('','');
-        	while(my $dref=$q->fetchrow_hashref())  {
-			$resultHTML .= qq[<input type="checkbox" name="cbx_$dref->{'intCodeID'}">$dref->{'strName'} <br>];
-        	}
-		$resultHTML .= qq[<p>
-			<input type="hidden" name="a" value="M_TAG_E">
-			<input type="hidden" name="client" value="$Data->{client}">
-			<input type="submit" name="ms_btn" value="Next &nbsp;&gt;&gt;">
-		</p></form>];
-	}
-	elsif ($action eq "M_TAG_E") {
-  		my $cgi=new CGI;
-        	my %params=$cgi->Vars();
-		my @tags=();
-		$resultHTML .= qq[Invalid Action ! <br>];
-		my %tagname = ();
-        	while(my $dref=$q->fetchrow_hashref())  {
-			$tagname{$dref->{'intCodeID'}}=$dref->{'strName'};
-		}
-		my $count=0;
-        	for my $k (keys %params)        {
-                	next if $k!~/^cbx/;
-                	my($type,$tagID)=split /_/,$k;
-                	return  if $tagID=~/[^\d]/;
-			push @tags, [$tagID,$tagname{$tagID}];
-			$count++;
-       		}
-		if ($count > 4) { 
-			($resultHTML,$title) = listTags($Data,$id,'M_TAG');
-			$resultHTML = qq[ERROR:: TOO MANY TAGS SELECTED <BR>].$resultHTML;
-			return ($resultHTML,$title);
-		}
-		elsif ($count == 0) {
-			($resultHTML,$title) = listTags($Data,$id,'M_TAG');
-			$resultHTML = qq[ERROR:: NO TAGS SELECTED <BR>].$resultHTML;
-			return ($resultHTML,$title);
-		}
-		($resultHTML,$title) = listMembers($Data, $id, $action,\@tags);
-	}
-	elsif ($action eq "M_TAG_U") {
-		update_checkboxes($Data,$Defs::LEVEL_MEMBER);
-		$resultHTML = qq[UPDATE TAGS];
-		($resultHTML,$title) = listMembers($Data, $id, 'M_L');
-	} 
-	else {
-		$resultHTML = qq[Invalid Action];
-	}
-	return ($resultHTML,$title);
-}
-
-
 sub list_row {
 	my($dref,$fields,$links,$shade, $checkbox_fields, $keyfield, $lookup_fields)=@_;
 	my $body='';
@@ -482,58 +403,6 @@ sub getTeamComps	{
 
 	return $comp_teams;
 		
-}
-
-## UPDATE TAGS ##
-## Created by TC - 7/9/2007
-## Last Updated by TC - 10/9/2007
-##
-## Updates the tags that have been selected/unselected as part of the
-## bulk tag changing option. If a tag has not previously been selected
-## a new record will be inserted otherwise the existing record will
-## simply be updated.
-##
-## IN
-## $Data - Contains generic data
-## $updates - Contains lsit of updates
-##
-## OUT
-## Nil
-
-sub update_tags {
-	my ($Data, $updates)=@_;
-	my $db = $Data->{'db'};
-	my $assocID=$Data->{'clientValues'}{'assocID'} || '';
-	my $realmID=$Data->{'Realm'} || 0;
-	my $st_update = qq[
-		UPDATE tblMemberTags
-		SET intRecStatus=?
-		WHERE intTagID=?
-		AND intMemberID=?
-		AND intAssocID=$assocID
-		AND intRealmID=$realmID
-	];
-	my $q_update = $db->prepare($st_update);
-	my $st_insert = qq[
-		INSERT INTO tblMemberTags
-		(intAssocID, intRealmID, intTagID, intMemberID, tTimeStamp, intRecStatus)
-		VALUES ($assocID,$realmID,?,?,now(),$Defs::RECSTATUS_ACTIVE)
-	];
-	my $q_insert = $db->prepare($st_insert);
- 	for my $row (@{$updates}) {
-		my $mID = $row->[0];
-		my $oldVal = $row->[1];
-		my ($newVal,$recstatus) = split /\|/,$row->[2];
-		if ($oldVal == 1 && $newVal != 0 && $recstatus == $Defs::RECSTATUS_DELETED) {
-			$q_update->execute($Defs::RECSTATUS_ACTIVE,$newVal,$mID);
-		}
-		elsif ($oldVal == 1 && $newVal && $recstatus == 0) {
-			$q_insert->execute($newVal,$mID);
-		}
-		elsif ($oldVal == 0 && $newVal && $recstatus == $Defs::RECSTATUS_ACTIVE) {
-			$q_update->execute($Defs::RECSTATUS_DELETED,$newVal,$mID);
-		}
-	}
 }
 	
 

@@ -1,4 +1,3 @@
-no warnings 'once';
 #!/usr/bin/perl -T
 
 #
