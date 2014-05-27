@@ -101,23 +101,6 @@ $Data->{'SystemConfig'}{'paymentReceiptFooterHTML'}
 	$body_html = $body_header_html. qq[<p><b>The following $count invoice/s make up this payment</b></p><br>] . $body_html;
 	$body_txt = $body_header_txt . qq[\nThe following $count invoice/s make up this payment\n\n] . $body_txt;
 
-	#if ($Data->{'SystemConfig'}{'paymentReceiptCC_Assoc'})	{
-	#	my $st = qq[
-	#		SELECT DISTINCT A.strEmail
-	#		FROM tblAssoc as A 
-	#			INNER JOIN tblTransactions as T ON (T.intAssocID = A.intAssocID)
-	#		WHERE T.intTransLogID = $intLogID
-	#	];
-    #		my $qry_assoc= $Data->{db}->prepare($st) or query_error($st);
-    #		$qry_assoc->execute or query_error($st);
-	#	while (my $dref = $qry_assoc->fetchrow_hashref())	{
-	#		$email_address .= qq[$dref->{strEmail}] if ($dref->{strEmail});
-	#	}
-	#	print STDERR "RECEIPT SENT TO: $email_address\n";
-	#	#$body_html .= qq[<p><b>The Association/Centre has been copied on in this email</b></p>];
-	#	#$body_txt .= qq[\nThe Association/Centre has been copied on in this email];
-	#}
-
     if ($Data->{'SystemConfig'}{'paymentReceiptCC_Assoc'})  {
 	    my $st = qq[
 	        SELECT DISTINCT 
