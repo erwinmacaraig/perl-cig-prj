@@ -12,15 +12,15 @@ CREATE TABLE tblPersonRegistration (
     intPersonRegistrationID int(11) NOT NULL auto_increment,
     intPersonID int(11) default 0,
     intEntityID int(11) default 0,
-    intStakeholderType INT DEFAULT 0, /* player, coach, referee */
-    strStakeholderSubType varchar(50) default '', /*?? or ID */
-    strStakeholderLevel varchar(10) DEFAULT '', /* pro, amateur */
-    strStakeholderEntityRole varchar(50) DEFAULT '', /* Referee, Head Coach, Delegate, Other */
+    strPersonType varchar(20) default '', /* player, coach, referee */
+    strPersonSubType varchar(50) default '', /*?? or ID */
+    strPersonLevel varchar(10) DEFAULT '', /* pro, amateur */
+    strPersonEntityRole varchar(50) DEFAULT '', /* Referee, Head Coach, Delegate, Other */
     
-    intStatus int default 0, /*Pending, Active,Passive, Transferred */
-    intSport int default 0,
+    strStatus varchar(20) default '', /*Pending, Active,Passive, Transferred */
+    strSport varchar(20) default '',
     intCurrent tinyint default 0,
-    intOrigin INT DEFAULT 0, /* Self, club, Reg, MA */
+    intOriginLevel TINYINT DEFAULT 0, /* Self, club, Reg, MA */
     intOriginID INT DEFAULT 0, 
     intRegistrationNature int default 0, /*First, Subsequent -- We haev a count ? */
 
@@ -38,10 +38,10 @@ CREATE TABLE tblPersonRegistration (
   PRIMARY KEY  (intPersonRegistrationID),
   KEY index_intPersonID (intPersonID),
   KEY index_intEntityID (intEntityID),
-  KEY index_intStakeholderType (intStakeholderType),
+  KEY index_intPersonType (intPersonType),
   KEY index_intStatus (intStatus),
   KEY index_IDs (intEntityID, intPersonID)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
