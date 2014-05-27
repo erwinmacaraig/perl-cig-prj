@@ -7,10 +7,10 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-DROP TABLE IF EXISTS tblMemberRegistrations;
-CREATE TABLE tblMemberRegistrations (
-    intMemberRegistrationID int(11) NOT NULL auto_increment,
-    intMemberID int(11) default 0,
+DROP TABLE IF EXISTS tblPersonRegistration;
+CREATE TABLE tblPersonRegistration (
+    intPersonRegistrationID int(11) NOT NULL auto_increment,
+    intPersonID int(11) default 0,
     intEntityID int(11) default 0,
     intStakeholderType INT DEFAULT 0, /* player, coach, referee */
     strStakeholderSubType varchar(50) default '', /*?? or ID */
@@ -35,12 +35,12 @@ CREATE TABLE tblMemberRegistrations (
     intIsPaid tinyint default 0,
     tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-  PRIMARY KEY  (intMemberRegistrationID),
-  KEY index_intMemberID (intMemberID),
+  PRIMARY KEY  (intPersonRegistrationID),
+  KEY index_intPersonID (intPersonID),
   KEY index_intEntityID (intEntityID),
   KEY index_intStakeholderType (intStakeholderType),
   KEY index_intStatus (intStatus),
-  KEY index_IDs (intEntityID, intMemberID)
+  KEY index_IDs (intEntityID, intPersonID)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

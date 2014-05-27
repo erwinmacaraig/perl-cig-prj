@@ -7,16 +7,16 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-DROP TABLE IF EXISTS tblMemberNationalities;
-CREATE TABLE tblMemberNationalities(
-    intMemberID int(11) default 0,
+DROP TABLE IF EXISTS tblPersonNationalities;
+CREATE TABLE tblPersonNationalities(
+    intPersonID int(11) default 0,
     strISONationality varchar(10) default '',
     tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     dtAdded datetime,
     dtLastUpdated datetime,
 
-  PRIMARY KEY  (intMemberID, strISONationality)
+  PRIMARY KEY  (intPersonID, strISONationality)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

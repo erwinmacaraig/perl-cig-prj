@@ -1,10 +1,10 @@
-DROP TABLE tblMember;
+DROP TABLE tblPerson;
  
-CREATE TABLE tblMember (
-    intMemberID int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE tblPerson (
+    intPersonID int(11) NOT NULL AUTO_INCREMENT,
     intRealmID int(11) NOT NULL DEFAULT 0,
     strExtKey varchar(20) NOT NULL DEFAULT ,
-    strMemberNo varchar(15) NOT NULL DEFAULT ,
+    strPersonNo varchar(15) NOT NULL DEFAULT ,
     strNationalNum varchar(30) DEFAULT '',
     intFIFAId INT(20) default 0,
 
@@ -161,8 +161,8 @@ CREATE TABLE tblMember (
     intDeRegister int(11) DEFAULT 0,
     intPhotoUseApproval tinyint(4) DEFAULT 0,
       
-  PRIMARY KEY (intMemberID),
-  KEY index_strMemberNo (strMemberNo),
+  PRIMARY KEY (intPersonID),
+  KEY index_strPersonNo (strPersonNo),
   KEY index_intStatus (intStatus),
   KEY index_strExtKey (strExtKey),
   KEY index_strLocalSurname (strLocalSurname),
@@ -175,7 +175,7 @@ CREATE TABLE tblMember (
   KEY index_RealmStatus (intRealmID,intStatus),
   KEY index_RealmNameDOB (intRealmID,strSurname,strFirstname,dtDOB),
   KEY index_RealmEmail (intRealmID,strEmail),
-  KEY index_RealmNatNumMID (intRealmID,strNationalNum,intMemberID)
+  KEY index_RealmNatNumMID (intRealmID,strNationalNum,intPersonID)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
     

@@ -10,7 +10,7 @@ CREATE TABLE tblWorkflow (
     intWorkflowID INT default 0, /* ID of the level to do task.. eg: the Entity */
     intWorkflowUserID INT default 0, /* User ID (tblUser) */
 
-    intBaseRecordType INT default 0, /*Member, MembeReg, Entity, Transfer */
+    intBaseRecordType INT default 0, /*Person, PersonReg, Entity, Transfer */
     intBaseRecordID INT default 0,
 
     intApprovalStatus INT default 0, /* Approved, Denied, Rejected to lower level */

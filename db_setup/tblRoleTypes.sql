@@ -1,10 +1,10 @@
-drop table if exists tblContactRoles;
+drop table if exists tblRoleTypes;
 
 #
 # Table               : tblContactRoles
 # Description         : Contact Roles
 #---------------------
-CREATE table tblContactRoles (
+CREATE table tblRoleTypes (
     intRoleID       	INTEGER NOT NULL AUTO_INCREMENT,
 	intRealmID			INT DEFAULT 0,
 	intRealmSubTypeID	INT DEFAULT 0,

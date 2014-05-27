@@ -1,7 +1,7 @@
 CREATE TABLE `tblMatrix` (
     intMatrixID int NOT NULL AUTO_INCREMENT,
     intRealmID  INT DEFAULT 0,
-/* IF ANY OF THE BELOW CHANGE -- ADJUST tblMember_Registrations */
+/* IF ANY OF THE BELOW CHANGE -- ADJUST tblPersonRegistration*/
     intSubRealmID  INT DEFAULT 0,
     intStakeholderType INT DEFAULT 0,
     strStakeholderLevel varchar(10) DEFAULT '', /* pro, amateur */  

@@ -861,8 +861,6 @@ next if $dref->{$k} eq "'0000-00-00'";
 
 		$Data->{'db'}->do(qq[UPDATE IGNORE tblMember_ClubsClearedOut SET intMemberID= $existingid WHERE intMemberID=$id_of_duplicate]);
 
-		$Data->{'db'}->do(qq[UPDATE IGNORE tblMemberHidePublic SET intMemberToHideID= $existingid WHERE intMemberToHideID=$id_of_duplicate]);
-
 		$Data->{'db'}->do(qq[UPDATE IGNORE tblTermsMember SET intMemberID = $existingid WHERE intMemberID=$id_of_duplicate]);
         $Data->{'db'}->do(qq[UPDATE IGNORE tblProgramEnrolment SET intMemberID = $existingid WHERE intMemberID = $id_of_duplicate]);
 

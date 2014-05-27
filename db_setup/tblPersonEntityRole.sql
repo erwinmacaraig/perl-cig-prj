@@ -1,11 +1,11 @@
-drop table IF EXISTS tblContacts;
+drop table IF EXISTS tblPersonEntityRole;
 
-CREATE table tblContacts (
-    intContactID       	INTEGER NOT NULL AUTO_INCREMENT,
-	intContactRoleID	INT DEFAULT 0,
+CREATE table tblPersonEntityRole (
+    intPersonEntityRoleID INTEGER NOT NULL AUTO_INCREMENT,
 	intRealmID			INT DEFAULT 0,
+	intPersonID			INT DEFAULT 0,
 	intEntityID			INT DEFAULT 0,
-	intMemberID			INT DEFAULT 0,
+	intRoleID	INT DEFAULT 0,
 	
 	intReceiveOffers	TINYINT DEFAULT 0,
 	intProductUpdates 	TINYINT DEFAULT 0,
@@ -23,8 +23,8 @@ CREATE table tblContacts (
 
 	tTimeStamp      	TIMESTAMP,
 
-		PRIMARY KEY (intContactID),
-		KEY index_intRealmID(intRealmID),
-		KEY index_intMemberID(intMemberID),
-		KEY index_EntityID(intEntityID)
+	PRIMARY KEY (intPersonEntityRoleID),
+	KEY index_intRealmID(intRealmID),
+	KEY index_intPersonID(intPersonID),
+	KEY index_EntityID(intEntityID)
 );

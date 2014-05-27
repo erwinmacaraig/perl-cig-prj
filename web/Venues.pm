@@ -5,8 +5,8 @@
 package Venues;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT=qw(handleVenues getVenues loadVenueDetails getVenueHeader);
-@EXPORT_OK=qw(handleVenues getVenues loadVenueDetails getVenueHeader);
+@EXPORT=qw(handleVenues getVenues loadVenueDetails );
+@EXPORT_OK=qw(handleVenues getVenues loadVenueDetails );
 
 use strict;
 use Reg_common;
@@ -15,7 +15,6 @@ use HTMLForm;
 use AuditLog;
 use CGI qw(unescape param);
 use FormHelpers;
-use AssocObj;
 use VenueObj;
 use GridDisplay;
 use Log;
@@ -36,9 +35,6 @@ sub handleVenues    {
         ($tempResultHTML,$title)=listVenues($Data);
         $resultHTML .= $tempResultHTML;
     }
-    elsif ($action =~/^VENUE_DEL/) {
-        ($resultHTML,$title)=deleteVenue($Data,$venueID);
-    }
         
     return ($resultHTML,$title);
 }
@@ -52,14 +48,15 @@ sub venue_details   {
     $venueID=0 if $option eq 'add';
     my $field=loadVenueDetails($Data->{'db'}, $venueID, $Data->{'clientValues'}{'assocID'}) || ();
     
-    my $intAssocID = $Data->{'clientValues'}{'assocID'} >= 0 ? $Data->{'clientValues'}{'assocID'} : 0;
+    my $intRealmID = $Data->{'Realm'} >= 0 ? $Data->{'Realm'} : 0;
+    my $intEntityID= $Data->{'EntityID'} >= 0 ? $Data->{'EntityID'} : 0;
     my $client=setClient($Data->{'clientValues'}) || '';
     
     my %FieldDefinitions = (
         fields => {
             intVenueID => {
                 label       => "Venue ID",
-                value       => $field->{intDefVenueID},
+                value       => $field->{intVenueID},
                 type        => 'text',
                 readonly    => 1,
                 size        => '40',
@@ -67,18 +64,18 @@ sub venue_details   {
                 compulsory  => 0,
                 sectionname => 'details',
             },
-            strName => {
+            strLocalName => {
                 label       => "Venue Name",
-                value       => $field->{strName},
+                value       => $field->{strLocalName},
                 type        => 'text',
                 size        => '40',
                 maxsize     => '100',
                 compulsory  => 1,
                 sectionname => 'details',
             },
-            intRecStatus => {
+            intStatus => { ### 
                 label         => 'Active?',
-                value         => $field->{intRecStatus},
+                value         => $field->{intStatus},
                 type          => 'checkbox',
                 default       => 1,
                 displaylookup => { 1 => 'Yes', 0 => 'No' },
@@ -169,16 +166,6 @@ sub venue_details   {
                 size        => '10',
                 sectionname => 'details',
             },
-            strLGA => {
-                label       => 'Local Government Area',
-                value       => $field->{strLGA},
-                type        => 'text',
-                size        => '40',
-                maxsize     => '150',
-                validate    => 'NOHTML',
-                sectionname => 'details',
-                class       => 'chzn-select',
-            },
             intMapNumber => {
                 label       => "Map Number (Printed Map)",
                 value       => $field->{intMapNumber},
@@ -217,7 +204,7 @@ sub venue_details   {
                 sectionname => 'mapping',
             },
         },
-        order => [ qw(intVenueID strName intRecStatus strAbbrev intTypeID strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhone strPhone2 strFax strLGA intMapNumber strMapRef mapdesc dblLat dblLong mapblock)],
+        order => [ qw(intVenueID strLocalName intStatus strAbbrev intTypeID strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhone strPhone2 strFax intMapNumber strMapRef mapdesc dblLat dblLong mapblock)],
         sections => [ 
             [ 'details', "Venue Details" ], 
             [ 'mapping', "Online Mapping" ], 
@@ -231,19 +218,21 @@ sub venue_details   {
             introtext   => 'auto',
             NoHTML      => 1,
             updateSQL   => qq[
-                UPDATE tblDefVenue
+                UPDATE tblVenue
                 SET --VAL--
                 WHERE 
-                    intDefVenueID = $venueID
-                    AND intAssocID = $intAssocID
+                    intVenueID = $venueID
+                    AND intRealmID= $intRealmID
             ],
             addSQL => qq[
-                INSERT INTO tblDefVenue (
-                    intAssocID, 
+                INSERT INTO tblVenue (
+                    intRealmID, 
+                    intEntityID, 
                     --FIELDS-- 
                 )
                 VALUES (
-                    $intAssocID, 
+                    $intRealmID, 
+                    $intEntityID, 
                     --VAL-- 
                 )
             ],
@@ -259,40 +248,24 @@ sub venue_details   {
         },
     );
     
-    if($Data->{'SystemConfig'}{'LGADropDown'})  {
-        my @lgas =split /\|/,$Data->{'SystemConfig'}{'LGADropDown'};
-        if(@lgas) {
-            my %LGAList=();
-            for my $i(@lgas)  {$LGAList{$i}=$i; }
-            $FieldDefinitions{'fields'}{'strLGA'}{'type'}='lookup';
-            $FieldDefinitions{'fields'}{'strLGA'}{'size'}=1;
-            $FieldDefinitions{'fields'}{'strLGA'}{'options'}=\%LGAList;
-            $FieldDefinitions{'fields'}{'strLGA'}{'firstoption'} = [''," "];
-        }
-    }
-    
     my $resultHTML='';
     ($resultHTML, undef )=handleHTMLForm(\%FieldDefinitions, undef, $option, '',$Data->{'db'});
-    my $title=qq[Venue- $field->{strName}];
+    my $title=qq[Venue- $field->{strLocalName}];
 
     my $chgoptions='';
-    my $assocObj =  new AssocObj(db=>$Data->{'db'}, ID=>$Data->{'clientValues'}{'assocID'},assocID=>$Data->{'clientValues'}{'assocID'});
-    $assocObj->load();
-    my $allowSWOL = $assocObj->getValue('intSWOL');
     
     if($option eq 'display')  {
         # Edit Venue.
         $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DTE&amp;venueID=$venueID">Edit Venue</a></span> ] if allowedAction($Data, 'venue_e');
     }
-    elsif ($option eq 'edit' && $allowSWOL) {
+    elsif ($option eq 'edit') {
         # Delete Venue.
-        my $venueObj = new VenueObj('db'=>$Data->{db},ID=>$venueID,assocID=>$intAssocID);
+        my $venueObj = new VenueObj('db'=>$Data->{db},ID=>$venueID,realmID=>$intRealmID, entityID=>$intEntityID);
         $venueObj->load();
         
         $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DEL&amp;venueID=$venueID" onclick="return confirm('Are you sure you want to delete this venue');">Delete Venue</a> ] if $venueObj->canDelete();
     }
     
-    $chgoptions= '' if (!$field->{intAssocID});
     $chgoptions=qq[<div class="changeoptions">$chgoptions</div>] if $chgoptions;
     $title=$chgoptions.$title;
     
@@ -361,7 +334,7 @@ sub venue_details   {
 
 
 sub loadVenueDetails {
-    my($db, $id, $assocID) = @_;
+    my($db, $id, $realmID, $entityID) = @_;
 
     $assocID ||= 0;
     my $field = {};
@@ -370,15 +343,17 @@ sub loadVenueDetails {
         my $statement=qq[
             SELECT *
             FROM 
-                tblDefVenue
+                tblVenue
             WHERE 
-                intDefVenueID = ?
-                AND intAssocID = ?
+                intVenueID = ?
+                AND intRealmID= ?
+                AND intEntityID=?
         ];
         my $query = $db->prepare($statement);
         $query->execute(
             $id,
-            $assocID,
+            $realmID,
+            $entityID
         );
         $field=$query->fetchrow_hashref();
         $query->finish;
@@ -387,70 +362,7 @@ sub loadVenueDetails {
     foreach my $key (keys %{$field})  { 
         if(!defined $field->{$key}) {$field->{$key}='';} 
     }
-    {
-        #no data - let's try and add some
-        my $st = qq[
-            SELECT
-                strCountry,
-                strState,
-                strSuburb
-            FROM tblAssoc
-            WHERE intAssocID = ?
-        ];
-        my $query = $db->prepare($st);
-        $query->execute(
-            $assocID,
-        );
-        my $assocfield=$query->fetchrow_hashref();
-        $query->finish;
-        $field->{'strCountry'} ||= $assocfield->{'strCountry'};
-        $field->{'strState'} ||= $assocfield->{'strState'};
-        $field->{'strSuburb'} ||= $assocfield->{'strSuburb'};
-    }
     return $field;
-}
-
-sub deleteVenue {
-    my ($Data,$venueID) = @_; 
-
-    my $dbh = $Data->{db};
-    my $assocID = $Data->{clientValues}{assocID};
-    my $client=setClient($Data->{'clientValues'}) || '';
-    
-    my $venueObj = new VenueObj(ID=>$venueID, assocID=>$assocID, db=>$dbh);
-    my $result = $venueObj->delete();
-    
-    my $resultHTML = '';
-    if ($result && $result !~/^ERROR/) {
-        $resultHTML .= '<p class="OKmsg">Venue successfully deleted.</p>';
-        auditLog($venueID, $Data, 'Delete', 'Venue');
-    }
-    else {
-        $resultHTML .= '<p class="warningmsg">Unable to delete Venue.<br>Venue may be assigned to matches or listed as a team venue.</p>';
-    }
-
-    $resultHTML .= qq[<p><a href="$Data->{'target'}?client=$client&amp;a=VENUE_L">Click here</a> to return to list of Venues</p>];
-    
-    return $resultHTML;
-}
-
-sub getVenueHeader  {
-
-    my ($Data, $venueID) = @_;
-
-
-    my $venue_ref=loadVenueDetails($Data->{'db'}, $venueID, $Data->{'clientValues'}{'assocID'}) || ();
-
-    my $venueBody = qq[
-        <div><span class="label">Venue Name:</span> $venue_ref->{'strName'}<br>
-    ];
-    $venueBody .= qq[<span class="label">Abbreviation:</span> $venue_ref->{'strAbbrev'}<br>] if ($venue_ref->{'strAbbrev'} ne '');
-    $venueBody .= qq[<span class="label">Address:</span> $venue_ref->{'strAddress1'}<br>$venue_ref->{'strAddress2'}] if ($venue_ref->{'strAddress1'} or $venue_ref->{'strAddress2'});
-    $venueBody .= qq[<span class="label">Suburb:</span> $venue_ref->{'strSuburb'}<br>] if ($venue_ref->{'strSuburb'});
-    $venueBody .= qq[</div><br>];
-
-    return $venueBody;
-
 }
 
 sub listVenues  {
@@ -459,40 +371,46 @@ sub listVenues  {
     my $resultHTML = '';
     my $client = unescape($Data->{client});
 
-    my $statement=qq[
+    my @BindArray = ();
+    my $st=qq[
         SELECT
           * 
         FROM 
-          tblDefVenue
+          tblVenue
         WHERE 
-          intAssocID = ?
-          AND intRecStatus <> $Defs::RECSTATUS_DELETED
-            ORDER BY 
-          strName
+          intRealmID= ?
     ];
+    push @BindArray, $Data->{'Realm'};        
+    if ($Data->{'Entity'} and $Data->{'Entity'} > 0)    {
+        $st . = qq[ AND intEntityID = ?];
+        push @BindArray, $Data->{'Entity'};        
+    }
 
-    my $query = $Data->{'db'}->prepare($statement);
-    $query->execute(
-        $Data->{'clientValues'}{'assocID'}
-    );
+    $st .= qq[
+          AND intStatus <> $Defs::RECSTATUS_DELETED
+            ORDER BY 
+          strLocalName
+    ];
+    my $query = $Data->{'db'}->prepare($st);
+    $query->execute(@BindArray);
 
     my %tempClientValues = getClient($client);
     my $currentname='';
 
     my @rowdata = ();
     while (my $dref= $query->fetchrow_hashref()) {
-        my $venueID = $dref->{intDefVenueID};
+        my $venueID = $dref->{intVenueID};
         my $tempClient = setClient(\%tempClientValues);
         $dref->{VenueType} = $Defs::VenueTypes{$dref->{intTypeID}} || '';
+        my $venueType = $dref->{'strVenueType'} || '';
         
         push @rowdata, {
             id => $venueID || next,
-            strName => $dref->{'strName'} || '',
-            SelectLink => "$Data->{'target'}?client=$tempClient&amp;a=VENUE_DTE&amp;venueID=$dref->{intDefVenueID}",
-            strAbbrev => $dref->{'strAbbrev'} || '',
-            VenueType => $dref->{'VenueType'} || '',
-            strSuburb => $dref->{'strSuburb'} || '',
-            intRecStatus => $dref->{'intRecStatus'} || 0,
+            strLocalName => $dref->{'strLocalName'} || '',
+            SelectLink => "$Data->{'target'}?client=$tempClient&amp;a=VENUE_DTE&amp;venueID=$dref->{intVenueID}",
+            strLocalShortName=> $dref->{'strLocalShortName'} || '',
+            VenueType => $venueType,
+            intStatus => $dref->{'intStatus'} || 0,
         };
     }
 
@@ -515,24 +433,20 @@ sub listVenues  {
         },
         {
             name  => $Data->{'lang'}->txt('Venue Name'),
-            field => 'strName',
+            field => 'strLocalName',
         },
         {
-            name  => $Data->{'lang'}->txt('Abbreviation'),
+            name  => $Data->{'lang'}->txt('Short Name'),
             width => 50,
-            field => 'strAbbrev',
+            field => 'strLocalShortName',
         },
         {
             name  => $Data->{'lang'}->txt('Venue Type'),
             field => 'VenueType',
         },
         {
-            name  => $Data->{'lang'}->txt('Suburb'),
-            field => 'strSuburb',
-        },
-        {
             name   => $Data->{'lang'}->txt('Status'),
-            field  => 'intRecStatus',
+            field  => 'intStatus',
             editor => 'checkbox',
             type   => 'tick',
             width  => 30,
@@ -541,12 +455,12 @@ sub listVenues  {
     
     my $filterfields = [
         {
-            field     => 'strName',
+            field     => 'strLocalName',
             elementID => 'id_textfilterfield',
             type      => 'regex',
         },
         {
-            field     => 'intRecStatus',
+            field     => 'intStatus',
             elementID => 'dd_actstatus',
             allvalue  => '2',
         },
