@@ -41,7 +41,7 @@ sub get_available_facilities {
         SELECT 
             *
         FROM
-            tblFacilities
+            tblFacility
         WHERE
             $where_statement
         ORDER BY 
@@ -116,7 +116,7 @@ sub get_facilities_by_lat_long {
               )
             ) AS strDistance
         FROM
-            tblFacilities
+            tblFacility
         WHERE
             $where_statement
         HAVING

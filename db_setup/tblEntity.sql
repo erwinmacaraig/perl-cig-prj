@@ -7,6 +7,8 @@ CREATE TABLE tblEntity (
     intRealmID INT DEFAULT 0,
     intEntityType INT DEFAULT 0, /* School, Club */
     intStatus INT DEFAULT 0, /*Approved, pending, inactive, suspended */
+    intRealmApproved tinyint default 0,
+    intCreatedByEntityID default 0,
     
     strLocalName    varchar(100) default '',
     strLocalShortName varchar(100) default '',

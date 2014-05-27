@@ -5,6 +5,8 @@ CREATE table tblFacility (
     intSubRealmID int(11) NOT NULL DEFAULT '0',
 
     intStatus tinyint(4) DEFAULT '0',
+    intRealmApproved tinyint default 0,
+    intCreatedByEntityID default 0,
 
     strLocalName varchar(150) DEFAULT '',
     strLocalShortName varchar(150) DEFAULT '',

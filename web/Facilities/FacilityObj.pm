@@ -14,10 +14,6 @@ use base qw(BaseObject);
 use Defs;
 use Log;
 
-require ProgramUtils;
-require ProgramObj;
-require ProgramTemplateObj;
-
 sub new {
 
     my $this = shift;
@@ -65,7 +61,6 @@ sub _can_delete_self {
 sub _can_delete_children {
     my $self = shift;
     
-    #TODO: check for active programs run at this facility
     
     #TODO: check for courts (when implemented) and make sure they don't have any matches or events (when implemented)
     return 1;
@@ -92,47 +87,13 @@ sub _get_sql_details{
     
     my $field_details = {
         'fields_to_ignore' => [],
-        'table_name' => 'tblFacilities',
+        'table_name' => 'tblFacility',
         'key_field' => 'intFacilityID',
     };
     
     return $field_details;
 }
 
-sub get_programs{
-    my ($self, $params) = @_;
-
-    $params->{'facility_id'} = $self->ID();
-    my $programs = ProgramUtils::get_programs($self->{'db'}, $params);
-
-    return $programs || [];
-}
-
-sub get_program_templates{
-    my ($self, $params) = @_;
-    
-    my $programs = $self->get_programs();
-    my %template_ids;
-    
-    foreach my $program (@$programs){
-        $template_ids{$program->get_template_id()} ++;
-    }
-    
-    my @program_templates;
-    
-    foreach my $template_id (sort keys %template_ids){
-        my $program_template_obj = ProgramTemplateObj->new(
-            'ID' => $template_id,
-            'db' => $self->{'db'},
-        );
-        
-        $program_template_obj->load();
-        
-        push @program_templates, $program_template_obj;
-    }
-    
-    return \@program_templates;
-}
 
 # Returns single line address string
 sub get_address {

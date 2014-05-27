@@ -7,7 +7,7 @@
 use strict;
 use CGI qw(param unescape escape);
 
-use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit','Clearances';
+use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit','Clearances', 'Facilities';
 use Lang;
 use Reg_common;
 use PageMain;
@@ -39,9 +39,8 @@ use BankAccountSetup;
 use Seasons;
 use AgeGroups;
 
-use Venues;
 use Notifications;
-use Facilities;
+use Facility;
 use ProgramTemplates;
 use Programs;
 
