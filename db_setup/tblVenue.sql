@@ -7,6 +7,7 @@ CREATE table tblVenue (
     intStatus tinyint(4) DEFAULT '0',
     intRealmApproved tinyint default 0,
     intCreatedByEntityID default 0,
+    strFIFAID varchar(30) default '',
 
     strLocalName varchar(150) DEFAULT '',
     strLocalShortName varchar(150) DEFAULT '',
@@ -22,7 +23,7 @@ CREATE table tblVenue (
     strISOCountry varchar(10) default '',
     strRegion varchar(50) default '',
     strPostalCode varchar(15) DEFAULT '',
-    strTown varchar((100) default '',
+    strTown varchar(100) default '',
     strAddress varchar(200) default '',
     strWebURL varchar(200) default '',
     strEmail varchar(200) default '',

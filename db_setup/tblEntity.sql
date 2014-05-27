@@ -1,6 +1,4 @@
 DROP TABLE IF EXISTS tblEntity;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE tblEntity (
   intEntityID int(11) NOT NULL AUTO_INCREMENT,
     intEntityLevel INT DEFAULT 0,
@@ -9,6 +7,7 @@ CREATE TABLE tblEntity (
     intStatus INT DEFAULT 0, /*Approved, pending, inactive, suspended */
     intRealmApproved tinyint default 0,
     intCreatedByEntityID default 0,
+    strFIFAID varchar(30) default '',
     
     strLocalName    varchar(100) default '',
     strLocalShortName varchar(100) default '',
@@ -20,7 +19,7 @@ CREATE TABLE tblEntity (
     strISOCountry varchar(10) default '',
     strRegion varchar(50) default '',
     strPostalCode varchar(15) DEFAULT '',
-    strTown varchar((100) default '',
+    strTown varchar(100) default '',
     strAddress varchar(200) default '',
     strWebURL varchar(200) default '',
     strEmail varchar(200) default '',
@@ -38,5 +37,4 @@ CREATE TABLE tblEntity (
   KEY `index_intRealmID` (`intRealmID`),
   KEY `index_intEntityLevel` (`intEntityLevel`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
