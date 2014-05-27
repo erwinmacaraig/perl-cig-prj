@@ -33,6 +33,7 @@ CREATE TABLE tblMemberRegistrations (
     dtAdded datetime,
     dtLastUpdated datetime,
     intIsPaid tinyint default 0,
+    tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   PRIMARY KEY  (intMemberRegistrationID),
   KEY index_intMemberID (intMemberID),
