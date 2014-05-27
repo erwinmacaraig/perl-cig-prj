@@ -1,14 +1,15 @@
 CREATE TABLE `tblMatrix` (
     intMatrixID int NOT NULL AUTO_INCREMENT,
     intRealmID  INT DEFAULT 0,
+/* IF ANY OF THE BELOW CHANGE -- ADJUST tblMember_Registrations */
     intSubRealmID  INT DEFAULT 0,
     intStakeholderType INT DEFAULT 0,
+    strStakeholderLevel varchar(10) DEFAULT '', /* pro, amateur */  
     intSport    INT DEFAULT 0,
     intOrigin INT DEFAULT 0, /* Self, club, Reg, MA */
     intOriginID INT DEFAULT 0,
     strListOfApprovals VARCHAR(250) DEFAULT '', /* OR A 1-many table ? */
     strRegTypes varchar(100) DEFAULT '', /* NEW, RENEWAL, AMEND, TRANSFER */
-    intPlayerType varchar(10) DEFAULT '', /* PRO, AMATUER, GRASSROOTS */
     intMinAge INT DEFAULT 0,
     intMaxAge INT DEFAULT 0,
 
