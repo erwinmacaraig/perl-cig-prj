@@ -15,6 +15,6 @@ CREATE TABLE `tblGenerate` (
   `tTimeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `intRealmID` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`intGenerateID`)
-) ENGINE=MyISAM AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

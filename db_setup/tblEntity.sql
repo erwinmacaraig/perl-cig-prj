@@ -58,6 +58,6 @@ CREATE TABLE `tblEntity` (
   KEY `index_strName` (`strName`),
   KEY `index_intRealmID` (`intRealmID`),
   KEY `index_intEntityLevel` (`intEntityLevel`)
-) ENGINE=MyISAM AUTO_INCREMENT=208394 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

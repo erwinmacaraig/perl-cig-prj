@@ -29,5 +29,5 @@ CREATE TABLE `tblClearancePath` (
   KEY `index_intID` (`intID`),
   KEY `index_intClearanceStatus` (`intClearanceStatus`),
   KEY `index_intClearanceID` (`intClearanceID`)
-) ENGINE=MyISAM AUTO_INCREMENT=3534918 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

@@ -14,5 +14,5 @@ CREATE TABLE `tblSystemConfig` (
   KEY `index_TypeOption` (`intTypeID`,`strOption`),
   KEY `index_intRealm` (`intRealmID`),
   KEY `index_RealmOption` (`intRealmID`,`strOption`)
-) ENGINE=MyISAM AUTO_INCREMENT=3709 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

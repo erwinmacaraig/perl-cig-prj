@@ -15,6 +15,6 @@ CREATE TABLE `tblCustomFields` (
   KEY `index_AssocID` (`intAssocID`),
   KEY `index_intRealmID` (`intRealmID`),
   KEY `IDNEX_intRecStatus` (`intRecStatus`)
-) ENGINE=MyISAM AUTO_INCREMENT=392357 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

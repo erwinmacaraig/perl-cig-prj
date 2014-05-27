@@ -18,6 +18,6 @@ CREATE TABLE `tblConfig` (
   KEY `index_EntityTypePerm` (`intLevelID`,`intEntityID`,`intTypeID`,`strPerm`),
   KEY `index_intRealmID` (`intRealmID`),
   KEY `index_multi` (`intRealmID`,`intLevelID`,`intEntityID`,`intTypeID`)
-) ENGINE=MyISAM AUTO_INCREMENT=3569546 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

@@ -181,7 +181,7 @@ CREATE TABLE `tblMember` (
   KEY `index_RealmEmail` (`intRealmID`,`strEmail`),
   KEY `index_RealmNatNumMID` (`intRealmID`,`strNationalNum`,`intMemberID`),
   KEY `index_strUmpirePassword` (`strUmpirePassword`)
-) ENGINE=MyISAM AUTO_INCREMENT=10759058 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
     
 

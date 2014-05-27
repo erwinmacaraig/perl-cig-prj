@@ -18,6 +18,6 @@ CREATE TABLE `tblAuth` (
   UNIQUE KEY `index_username` (`strUsername`,`intID`,`intLevel`),
   KEY `index_intLevel` (`intLevel`,`strPassword`,`strUsername`),
   KEY `index_dual` (`intLevel`,`intID`)
-) ENGINE=MyISAM AUTO_INCREMENT=3667386 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

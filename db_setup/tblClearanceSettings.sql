@@ -18,5 +18,5 @@ CREATE TABLE `tblClearanceSettings` (
   KEY `index_intID` (`intID`),
   KEY `index_intAssocTypeID` (`intAssocTypeID`),
   KEY `index_intTypeID` (`intTypeID`)
-) ENGINE=MyISAM AUTO_INCREMENT=18269 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

@@ -19,5 +19,5 @@ CREATE TABLE `tblAuditLog` (
   KEY `index_strUsername` (`strUsername`),
   KEY `index_AuditLog` (`intEntityTypeID`,`intEntityID`),
   KEY `index_passportID` (`intPassportID`)
-) ENGINE=MyISAM AUTO_INCREMENT=17785308 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
