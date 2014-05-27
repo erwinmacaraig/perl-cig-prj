@@ -17,7 +17,7 @@ CREATE TABLE tblPersonNationalities(
     dtLastUpdated datetime,
 
   PRIMARY KEY  (intPersonID, strISONationality)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
