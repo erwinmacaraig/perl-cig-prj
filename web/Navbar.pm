@@ -596,15 +596,6 @@ sub getAssocMenuData {
     }
 
     if (
-        allowedAction($Data, 'm_e') 
-            and $Data->{'SystemConfig'}{'AllowBulkTags'}) {
-        $menuoptions{'bulktags'} = {
-            name => $lang->txt('Bulk Change Tags'),
-            url => $baseurl."a=M_TAG&amp;l=$Defs::LEVEL_MEMBER",
-        };
-    }
-
-    if (
         $Data->{'SystemConfig'}{'AllowMemberTransfers'}
             and allowedAction($Data, 'a_e')
     ) {
@@ -877,15 +868,6 @@ sub getClubMenuData {
         };
     }
 
-    if (
-        allowedAction($Data, 'm_e') 
-            and $Data->{'SystemConfig'}{'AllowBulkTags'}) {
-        $menuoptions{'bulktags'} = {
-            name => $lang->txt('Bulk Change Tags'),
-            url => $baseurl."a=M_TAG&amp;l=$Defs::LEVEL_MEMBER",
-        };
-    }
-
     # for club menu
     if ($SystemConfig->{'EnableMemberRecords'}) {
         $menuoptions{'mrt_admin'} = {
@@ -1113,7 +1095,6 @@ sub getMemberMenuData {
     my ($intOfficial) = $memberObj->getValue('intOfficial');
     my $clubs = $Data->{'SystemConfig'}{'NoClubs'} ? 0 : 1;
     my $clr= ($assocObj->getValue('intAllowClearances') and $Data->{'SystemConfig'}{'AllowClearances'});
-    my $prefs= $Data->{'SystemConfig'}{'ShowPreferences'} ? 1 : 0;
 
     my $invalid_club = 0;
     if (
@@ -1178,12 +1159,6 @@ sub getMemberMenuData {
                 url => $baseurl."a=M_TXNLog_list",
             };
         }
-        if(!$SystemConfig->{'NoMemberTags'}) {
-            $menuoptions{'membertags'} = {
-                name => $lang->txt('Tags'),
-                url => $baseurl."a=M_TG_l",
-            };
-        }
         if($clubs) {
             $menuoptions{'clubs'} = {
                 name => $lang->txt('Clubs'),
@@ -1202,12 +1177,6 @@ sub getMemberMenuData {
                 url => $baseurl."a=M_CLR",
             };
         }
-        if($prefs) {
-            $menuoptions{'prefs'} = {
-                name => $lang->txt("Preferences"),
-                url => $baseurl."a=M_PREFS",
-            };
-        }
     }
 
 
@@ -1216,7 +1185,6 @@ sub getMemberMenuData {
         [ $lang->txt('Dashboard'), 'home','home'],
         [ $lang->txt('Types'), 'menu','membertypes'],
         [ $lang->txt($SystemConfig->{'txns_link_name'} || 'Transactions'), 'menu','transactions'],
-        [ $lang->txt('Tags'), 'menu','membertags'],
         [ $lang->txt($txt_Clrs), 'menu','clr'],
         [ $lang->txt('Member History'), 'menu',[
         'clubs',
@@ -1226,7 +1194,6 @@ sub getMemberMenuData {
         [ $lang->txt('System'), 'system',[
         'auditlog',
         ]],
-        [ $lang->txt('Preferences'), 'menu','prefs']
     );
 
     my $menudata = processmenudata(\%menuoptions, \@menu_structure );

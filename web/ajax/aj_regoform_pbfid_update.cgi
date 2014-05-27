@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use CGI qw(param);
 use JSON;
-use lib '..','../..';
+use lib '..','../..','../RegoFormBuilder','../PaymentSplit';
 use Reg_common;
 use Utils;
 use RegoFormPrimaryObj;

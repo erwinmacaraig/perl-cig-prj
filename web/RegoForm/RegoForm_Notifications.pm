@@ -14,7 +14,6 @@ use strict;
 use RegoForm_Common;
 use TemplateEmail;
 use ServicesContacts;
-use SalesBlock;
 use CGI;
 use InstanceOf;
 use RegoFormUtils;
@@ -275,8 +274,6 @@ sub sendAuthEmail {
         program_obj    => $program_obj,
         new_to_program => $self->getCarryFields('program_new') || 0,
     );
-
-    $RegEmailData{'SalesAdBlock'} = getSalesBlock($Data, $Data->{'SystemConfig'}, 2) || '';
 
     my $cc;
     $cc .= $member_email2.';' if $member_email2;

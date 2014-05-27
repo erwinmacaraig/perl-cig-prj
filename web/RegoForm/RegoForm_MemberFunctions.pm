@@ -10,9 +10,6 @@ require Exporter;
 	updateRegoFormPhoto 
 	setMemberTypes 
 	rego_postMemberUpdate 
-	getCampaignText 
-	getMemberCampaignStatus
-	campaignMemberInsert
 	getAgeGroupID
 	rego_addTempMember
 	rego_addRealMember
@@ -21,9 +18,6 @@ require Exporter;
 	updateRegoFormPhoto 
 	setMemberTypes 
 	rego_postMemberUpdate 
-	getCampaignText 
-	getMemberCampaignStatus
-	campaignMemberInsert
 	getAgeGroupID
 	rego_addTempMember
 	rego_addRealMember
@@ -36,7 +30,6 @@ use RegoForm_Notifications;
 use Reg_common;
 use Member;
 use TTTemplate;
-use CampaignPermissions;
 use Payments;
 use File::Copy;
 use MemberFunctions;
@@ -169,15 +162,6 @@ sub rego_postMemberUpdate  {
 	my $session = $self->{'Session'};
 
 	my $txns_added = [];
-
-	my $rebelCampaign = $params->{'rebelCampaign'} || 0;
-	if ($params->{'rebelCampaign_exists'} and $params->{'rebelCampaign_exists'} == 1) {
-		campaignMemberInsert($Data, $Defs::CAMPAIGN_REBEL, $id, $rebelCampaign);
-	}
-	my $amartCampaign = $params->{'AMartCampaign'} || 0;
-	if ($params->{'AMartCampaign_exists'} and $params->{'AMartCampaign_exists'} == 1) {
-		campaignMemberInsert($Data, $Defs::CAMPAIGN_AMART, $id, $amartCampaign);
-	}
 
     my $teamcode = $params->{'d_teamcode'} || $params->{'teamcode'} || 0;
 	my $clubID   = $params->{'clubID'} || 0;
@@ -831,153 +815,6 @@ sub getTeamCodeID {
 	return ($teamID, $tref);
 }
 
-sub getCampaignText {
-  my ($Data, $memberID) = @_;
-
-  my $campaignText='';
-  my $campaign_permissions = getCampaignPermission($Data->{'db'}, $Defs::CAMPAIGN_REBEL, $Data->{'Realm'}, $Data->{'clientValues'}{'assocID'}, $Data->{'clientValues'}{'clubID'});
-  # Turning REBEL and AMART off for now, only campaigns, this way we don't have to modify database and easy if we need to turn back on.
-  $campaign_permissions = 0;
-   
-  if ($campaign_permissions ==1){
-      
-    my $campaignStatus = getMemberCampaignStatus($Data->{'db'}, $Defs::CAMPAIGN_REBEL, $memberID);
-    if ($campaignStatus == -1)  {
-      $campaignText = qq[
-<style type="text/css">
-      .signup-wrap {background: url("images/rebel/optin_bg.jpg") repeat-x scroll 0 0 transparent;color: #333333;float: left;font-family: Arial,Helvetica,sans-serif;font-size: 10px;height: 174px;width: 100%;}
-      .signup-wrap p {display: inline;float: left;margin: 0;text-indent: 13px;width: 100%;}
-      .signup-wrap img {border: 0 none;}
-      .header-left{float: left;display: inline;}
-      .header-right {display: inline;float: left;margin: 0 0 0 25px;}
-      .bold-text {font-weight: bold; margin: 40px 0 0 12px;}
-      .text {width: 220px; margin: 0 0 0 12px;}
-      .links {float: left;font-size: 12px;font-weight: bold;margin: 13px 0 0 520px;padding: 0 0 0 10px;}
-      .links li {display: inline;list-style-type: none;padding: 0 2px;}
-      .links li a {text-decoration: none; color: #333;}
-      .check {float: left;font-size: 10px;font-weight: bold;line-height: 13px;margin: 12px 0 0 12px;}
-      .check input {float: left; margin:0 6px 0 0; display: inline;}
-      .agree .check {margin: 5px 0 5px 12px;text-transform: uppercase;}
-      .signup-header-wrap, .signup-content-wrap, .signup-footer-wrap, .join, .agree {width: 100%;float: left;display: inline;}
-      .signup-content-wrap {height: 50px;}
-      .HTbuttons input {height: 30px;margin: 15px 0 0;width: 100px;}
-      .HTbuttons {margin: 20px 0 0 0;}
-      .label {color: #666666;font-size: 0.95em;text-align: left;text-decoration: none;vertical-align: top;width: 200px;}
-              </style>
-              <!--[if IE]>
-                  <style type="text/css">
-                  .check {line-height: 18px;}
-                  .agree .check {margin: 5px 0 3px 12px;}
-                  .signup-wrap p {text-indent: 15px;}
-                </style>
-            <![endif]-->
-    <div class="signup-wrap">
-              <div class="signup-header-wrap">
-                <div class="header-left"><a href="http://www.seasonpass.sportingpulse.com/" target="_blank"><img src="images/rebel/join_text_left.jpg" alt="Join the Rebel Season Pass or Team Amart Loyalty Program" title="Join the Rebel Season Pass or Team Amart Loyalty Program"></a></div>
-                <div class="header-right"><a href="http://www.seasonpass.sportingpulse.com/" target="_blank"><img src="images/rebel/rebel_amart_right.jpg" alt="Join the Rebel Season Pass or Team Amart Loyalty Program" title="Join the Rebel Season Pass or Team Amart Loyalty Program"></a></div>
-          </div>
-          <div class="signup-content-wrap">
-          <div class="agree">
-            <input type="hidden" name="rebelCampaign_exists" value="1">
-            <div class="check"><input type="radio" name="rebelCampaign" value="1" checked>Thanks, I agree to the terms and conditions, sign me up</div>
-            <div class="check"><input type="radio" name="rebelCampaign" value="0">No thanks</div>
-            <p>By agreeing to the terms and conditions, you agree to receive communications from either Rebel Sport or Amart All Sports or both brands.</p>
-          </div>
-        </div>
-        <div class="signup-footer-wrap">
-          <ul class="links">
-            <li><a target="rebel_new" href="http://seasonpass.sportingpulse.com/benefits.html"><img src="images/rebel/benefits_btn.gif" alt="BENEFITS" title="BENEFITS"></a></li>
-            <li><a target="rebel_new" href="http://seasonpass.sportingpulse.com/faqs.html"><img src="images/rebel/faq_btn.gif" alt="FAQS" title="FAQS"></a></li>
-            <li><a target="rebel_new" href="http://seasonpass.sportingpulse.com/terms.html"><img src="images/rebel/terms_btn.gif" alt="TERMS" title="TERMS"></a></li>
-          </ul>
-        </div>
-      </div>
-  ];
-    }
-  }
-  $campaignText .= qq[<br>] if $campaignText;
-  $campaign_permissions = getCampaignPermission($Data->{'db'}, $Defs::CAMPAIGN_AMART, $Data->{'Realm'}, $Data->{'clientValues'}{'assocID'}, $Data->{'clientValues'}{'clubID'});
-  $campaign_permissions = 0;
-  
-  if ($campaign_permissions ==1){
-      my $campaignStatus = getMemberCampaignStatus($Data->{'db'}, $Defs::CAMPAIGN_AMART, $memberID);
-      if ($campaignStatus == -1)  {
-          $campaignText .= qq[
-                <div style="font-size:11px;border:1px solid #cccccc;padding:8px;width:100%;">
-                <input type="checkbox" name="AMartCampaign" value="1" checked>Sign me up to AMRT Season Pass so that I can get preferred pricing and exclusive member offers every time I shop at <b>Rebel Sport</b> or <b>Amart All Sports</b><br><br>
-                <a href="http://www.rebelsport.com.au/Ecom/rebel/content/content.aspx?pageid=7f55c079-c06b-4a89-b0f5-c3b72a02a8bb" target="rebel_new">Program Benefits</a>&nbsp|&nbsp;<a href="http://www.rebelsport.com.au/Ecom/rebel/content/content.aspx?pageid=afc6d67a-eaf1-4494-a1aa-35b0f97bfecb" target="rebel_new">FAQs</a>&nbsp|&nbsp;<a href="http://www.rebelsport.com.au/Ecom/rebel/content/content.aspx?pageid=492cc671-0bfb-47ab-95a6-6f929e3523d2" target="rebel_new">Terms & Conditions</a>
-                <input type="hidden" name="AMartCampaign_exists" value="1">
-                </div>
-            ];
-        }
-    }
-  return $campaignText;
-}
-
-sub getMemberCampaignStatus {
-	my ($db, $campaignID, $memberID) = @_;
-
-	my $campaignStatus=-1;
-    my $mID=0;
-	$campaignID || return $campaignStatus;
-	$memberID || return $campaignStatus;
-
-	my $st = qq[
-		SELECT
-			intMemberID, 
-			intCampaignStatus
-		FROM
-			tblMember_Campaigns
-		WHERE
-			intMemberID=?
-			AND intCampaignID=?
-	];
-
-	my $query = $db->prepare($st);
-	$query->execute($memberID, $campaignID);
-	($mID, $campaignStatus) = $query->fetchrow_array();
-    $campaignStatus ||= 0;
-    $mID ||= 0;
-	$query->finish();
-
-    $campaignStatus = -1 if (! $mID and ! $campaignStatus);
-
-	return $campaignStatus;
-}
-
-sub campaignMemberInsert    {
-	my ($Data, $campaignID, $memberID, $campaignStatus) = @_;
-
-	my $st = qq[
-		INSERT IGNORE INTO tblMember_Campaigns (
-				intMemberID,
-				intCampaignID,
-				intAssocID,
-				intClubID,
-				intRegoFormID,
-				intCampaignStatus,
-				dtAdded
-		)
-		VALUES (
-				?,
-				?,
-				?,
-				?,
-				?,
-				?,
-				NOW()
-		)
-	];
-	my $qry= $Data->{'db'}->prepare($st);
-	$qry->execute(
-		$memberID,
-		$campaignID,
-		$Data->{'clientValues'}{'assocID'},
-		$Data->{'clientValues'}{'clubID'},
-		$Data->{'RegoFormID'},
-		$campaignStatus
-	);
-}
 
 sub handleTeamAndGetClub {
 	my ($Data, $db, $params, $id, $teamID, $clubID, $assocID, $useCompID) = @_;

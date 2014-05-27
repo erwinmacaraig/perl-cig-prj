@@ -19,7 +19,6 @@ use Notifications;
 use FormHelpers;
 use Seasons;
 use UploadFiles;
-use MemberTypes;
 use Log;
 use Data::Dumper;
 

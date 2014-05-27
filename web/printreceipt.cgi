@@ -9,7 +9,7 @@
 use strict;
 use CGI qw(param escape unescape);
 
-use lib '.','..',"comp";
+use lib '.','..',"comp",'PaymentSplit','RegoFormBuilder';
 
 use Reg_common;
 use PageMain;

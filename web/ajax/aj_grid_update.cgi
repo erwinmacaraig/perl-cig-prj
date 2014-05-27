@@ -12,7 +12,6 @@ use Defs;
 use Reg_common;
 use Utils;
 use JSON;
-use Transactions;
 use Lang;
 use AuditLog;
 

@@ -18,7 +18,6 @@ use Defs;
 use Utils;
 use FormHelpers;
 use HTMLForm;
-use SWSports;
 use AuditLog;
 use ClearancesList;
 

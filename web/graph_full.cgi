@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 use CGI qw(param);
-use lib "..",".","dashboard";
+use lib "..",".","dashboard","PaymentSplit",'RegoFormBuilder';
 use Defs;
 use Reg_common;
 use Utils;

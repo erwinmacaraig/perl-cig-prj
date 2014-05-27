@@ -7,7 +7,7 @@
 use strict;
 use CGI qw(param unescape escape);
 
-use lib '.', '..', "comp", 'RegoForm', "dashboard";
+use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit','Clearances';
 use Lang;
 use Reg_common;
 use PageMain;
@@ -25,7 +25,6 @@ use AuditLog;
 use Welcome;
 use PaymentApplication;
 use Agreements;
-use AssocGrade;
 
 use Node;
 use Assoc;
@@ -203,9 +202,6 @@ sub main {
     }
     elsif ( $action =~ /^AGEGRP_/ ) {
         ( $resultHTML, $pageHeading ) = handleAgeGroups( $action, \%Data );
-    }
-    elsif ( $action =~ /^ASSGR_/ ) {
-        ( $resultHTML, $pageHeading ) = handleAssocGrades( $action, \%Data );
     }
     elsif ( $action =~ /^VENUE_/ ) {
         ( $resultHTML, $pageHeading ) = handleVenues( $action, \%Data );

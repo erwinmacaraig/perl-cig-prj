@@ -7,7 +7,7 @@
 use strict;
 use CGI qw(param);
 
-use lib '.','..','RegoForm';
+use lib '.','..','RegoForm','PaymentSplit';
 use Lang;
 use Reg_common;
 use PageMain;

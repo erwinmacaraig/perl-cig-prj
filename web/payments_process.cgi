@@ -9,7 +9,7 @@ use CGI qw(:cgi escape unescape);
 
 use strict;
 
-use lib "..",".";
+use lib "..",".",'PaymentSplit';
 #use lib "/u/rego_v6","/u/rego_v6/web";
 
 use Lang;

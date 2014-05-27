@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use CGI qw(param);
 use JSON;
-use lib "..","../../";
+use lib "..","../../",'../RegoFormBuilder','../PaymentSplit';
 use Defs;
 use Reg_common;
 use Utils;

@@ -12,7 +12,6 @@ use Utils;
 use Reg_common;
 use PageMain;
 use CGI qw(param);
-use BankAccountSetup;
 
 main();
 
