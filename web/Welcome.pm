@@ -20,19 +20,19 @@ sub getWelcomeText	{
 	my ($Data)=@_;
  
 	my $realmID=$Data->{'Realm'} || 0;
-	my $assocID=$Data->{'clientValues'}{'assocID'} || 0;
+	my $entityID=$Data->{'Entity'} || 0;
   my $clubID=$Data->{'clientValues'}{'clubID'} || 0;
   my $subtypeID=$Data->{'RealmSubType'} || 0;
 	my $st=qq[
-		SELECT intAssocID, strWelcomeText, intRealmSubTypeID
+		SELECT intEntityID, strWelcomeText, intRealmSubTypeID
 		FROM tblWelcome
 		WHERE intRealmID= ?
-			AND (intAssocID = ? OR intAssocID=0)
+			AND (intEntityID = ? OR intEntityID=0)
 	];
   my $query = $Data->{'db'}->prepare($st);
   $query->execute(
 		$realmID,
-		$assocID,
+		$entityID,
 	);
 	my %Welcomes=();
 	my $found=0;
@@ -40,14 +40,14 @@ sub getWelcomeText	{
     next if($dref->{'intRealmSubTypeID'} and $dref->{'intRealmSubTypeID'}!= $subtypeID);
 		$dref->{'strWelcomeText'}||='';
 		$dref->{'strWelcomeText'}=~s/[\n]/<br>/g;
-		$Welcomes{$dref->{'intAssocID'}}=$dref->{'strWelcomeText'};
+		$Welcomes{$dref->{'intEntityID'}}=$dref->{'strWelcomeText'};
 		$found=1 if $dref->{'strWelcomeText'} || '';
 	}
 	$Welcomes{0}||='';
-	$Welcomes{$assocID} = defaulttext($Data) if !$found;
+	$Welcomes{$entityID} = defaulttext($Data) if !$found;
 	$Welcomes{0}.='<br><br>' if $Welcomes{0};
 	if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_ASSOC)	{
-		$Welcomes{$assocID} .= qq[
+		$Welcomes{$entityID} .= qq[
 			<a href = "$Data->{'target'}?client=$Data->{'client'}&amp;a=A_WEL_" class="edit-link">Edit</a>
 		];
 	}
@@ -58,7 +58,7 @@ sub getWelcomeText	{
         ? qq[<br><br><i>].$Data->{'lang'}->txt('System developed and powered by [_1].', qq[<a href="http://www.sportingpulse.com">SportingPulse</a>]).'</i>' 
         : '';
 	linkify(\$Welcomes{0});
-	linkify(\$Welcomes{$assocID});
+	linkify(\$Welcomes{$entityID});
 
 	my $nagscreen = '';
 	if($Data->{'SystemConfig'}{'NagScreen'}
@@ -77,13 +77,13 @@ sub getWelcomeText	{
 		$nagscreen
 		$changes
 		$Welcomes{0}
-		$Welcomes{$assocID}
+		$Welcomes{$entityID}
 		$sp_welcome_txt
 	];
 
 
     my $killMsg='';
-    ($killMsg , undef) = checkServicesContacts($Data, $Defs::LEVEL_ASSOC, $assocID) if (! $clubID or $clubID == -1);
+    ($killMsg , undef) = checkServicesContacts($Data, $Defs::LEVEL_ASSOC, $entityID) if (! $clubID or $clubID == -1);
     ($killMsg , undef) = checkServicesContacts($Data, $Defs::LEVEL_CLUB, $clubID) if ($clubID>0);
 	#$body = $killMsg if $killMsg;
 	
@@ -124,15 +124,15 @@ sub edit_welcome	{
   my $target=$Data->{'target'};
   my $cl  = setClient($Data->{'clientValues'});
   my $unesc_cl=unescape($cl);
-	my $assocID=$Data->{'clientValues'}{'assocID'} || $Defs::INVALID_ID;
+	my $entityID=$Data->{'clientValues'}{'entityID'} || $Defs::INVALID_ID;
 
 	my $st=qq[
 		SELECT strWelcomeText
 		FROM tblWelcome
-		WHERE intAssocID = ?
+		WHERE intEntityID = ?
 	];
   my $query = $Data->{'db'}->prepare($st);
-  $query->execute($assocID);
+  $query->execute($entityID);
 	my $body='';
 	my %DBData=();
 	my ($welcometext) =$query->fetchrow_array();
@@ -158,24 +158,24 @@ sub edit_welcome	{
 sub update_welcome {
 	my($Data, $type, $id)=@_;
 	my $realmID=$Data->{'Realm'} || 0;
-	my $assocID=$Data->{'clientValues'}{'assocID'} || $Defs::INVALID_ID;
+	my $entityID=$Data->{'clientValues'}{'entityID'} || $Defs::INVALID_ID;
 	{
-		my $st_del=qq[DELETE FROM tblWelcome WHERE intAssocID= ? AND intRealmID= ? ];
+		my $st_del=qq[DELETE FROM tblWelcome WHERE intEntityID= ? AND intRealmID= ? ];
 		my $query = $Data->{'db'}->prepare($st_del);
 		$query->execute(
-			$assocID,
+			$entityID,
 			$realmID,
 		);
 	}
 	my $welmsg=param('welmsg') || '';
 	my $st_insert=qq[
 		INSERT INTO tblWelcome 
-			(intAssocID, intRealmID, strWelcomeText)
+			(intEntityID, intRealmID, strWelcomeText)
 			VALUES (?,?,?)
 	];
   my $query = $Data->{'db'}->prepare($st_insert);
   $query->execute(
-		$assocID,
+		$entityID,
 		$realmID,
 		$welmsg,
 	);
