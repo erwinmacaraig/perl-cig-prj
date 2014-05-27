@@ -21,7 +21,7 @@ use DeQuote;
 use ConfigOptions;
 use Digest::MD5;
 use MIME::Base64 qw(encode_base64url decode_base64url);
-use Passport;
+use UserSession;
 use GlobalAuth;
 use TempNodeStructureObj;
 use NodeLinksObj;
@@ -173,98 +173,51 @@ sub allowedTo {
     my $intID        = 0;
     my $readOnly     = 0;
     my $roleID       = 0;
-    my $PassportName = 0;
-    if (
-        (
-              !$clientValues_ref->{'userName'}
-            or $clientValues_ref->{'userName'} eq '-1'
-        )
-        and $clientValues_ref->{'passportID'}
-      )
-    {
-        #Passport login
-        my $passport = new Passport(
-            db    => $db,
-            cache => $Data->{'cache'},
-        );
-        $passport->loadSession();
-        my $passportID = $passport->id() || 0;
-        kickThemOff() if $passportID != $clientValues_ref->{'passportID'};
+    my $UserName = 0;
+    #User login
+    my $user = new UserSession(
+        db    => $db,
+        cache => $Data->{'cache'},
+    );
+    $user->load();
+    my $userID = $user->id() || 0;
+    kickThemOff() if $userID != $clientValues_ref->{'userID'};
 
-        my $st = qq[
+    my $st = qq[
       SELECT
-        intEntityTypeID,
-        intEntityID,
-        intReadOnly,
-        intRoleID
-      FROM tblPassportAuth
+        entityTypeID,
+        entityID,
+        readOnly
+      FROM tblUserAuth
       WHERE
-        intPassportID = ?
-        AND intEntityTypeID = ?
-        AND intEntityID = ?
+        userID = ?
+        AND entityTypeID = ?
+        AND entityID = ?
     ];
-        my $q = $db->prepare($st);
-        $q->execute(
-            $passportID,
+    my $q = $db->prepare($st);
+    $q->execute(
+        $userID,
+        $clientValues_ref->{authLevel},
+        getID( $clientValues_ref, $clientValues_ref->{authLevel} ),
+    );
+
+    ( $level, $intID, $readOnly, $roleID ) = $q->fetchrow_array();
+    $q->finish();
+    if ( !$level and !$intID ) {
+        my ( $valid, undef ) = validateGlobalAuth(
+            $Data, $userID,
             $clientValues_ref->{authLevel},
             getID( $clientValues_ref, $clientValues_ref->{authLevel} ),
         );
-
-        ( $level, $intID, $readOnly, $roleID ) = $q->fetchrow_array();
-        $q->finish();
-        if ( !$level and !$intID ) {
-            my ( $valid, undef ) = validateGlobalAuth(
-                $Data, $passportID,
-                $clientValues_ref->{authLevel},
-                getID( $clientValues_ref, $clientValues_ref->{authLevel} ),
-            );
-            if ($valid) {
-                $level = $clientValues_ref->{authLevel};
-                $intID =
-                  getID( $clientValues_ref, $clientValues_ref->{authLevel} );
-                $roleID   = 0;
-                $readOnly = 0;
-            }
+        if ($valid) {
+            $level = $clientValues_ref->{authLevel};
+            $intID =
+              getID( $clientValues_ref, $clientValues_ref->{authLevel} );
+            $roleID   = 0;
+            $readOnly = 0;
         }
-        $PassportName = $passport->fullname();
     }
-    else {
-        ## CHECK USERNAME AND PASSWORD
-        my $assocID =
-            $clientValues_ref->{clubAssocID}
-          ? $clientValues_ref->{clubAssocID}
-          : $clientValues_ref->{assocID};
-        my $assoc_where = '';
-        if ( $assocID and $assocID > 0 and $assocID !~ /[^\d]/ ) {
-            $assoc_where = " AND intAssocID=$assocID ";
-        }
-        my $cookie = $member_cookie;
-        my ( $intAuthID, $encString ) = split /Y/, $cookie, 2;
-
-        $intAuthID ||= 0;
-
-        my $statement = qq[
-					SELECT strPassword, intLevel, intID, intReadOnly, intRoleID
-					FROM tblAuth
-					WHERE intAuthID = ?
-			$assoc_where
-		];
-        my $query = $db->prepare($statement);
-        $query->execute($intAuthID);
-        my $strPassword = '';
-        ( $strPassword, $level, $intID, $readOnly, $roleID ) =
-          $query->fetchrow_array;
-        $strPassword ||= '';
-        $roleID      ||= 0;
-        ## Create Encrypted string
-        my $authstring = authstring( $strPassword . $intAuthID );
-        $encString ||= '';
-
-        ## COMPARE PASSWORD FROM COOKIE WITH PASSWORD FROM DB
-        if ( $authstring ne $encString ) {
-            kickThemOff();
-        }    # INVALID USER, BOOT THEM
-    }
+    $UserName = $user->fullname();
 
     ## ENSURE THE USER IS VALID FOR THE CURRENT LEVEL
 
@@ -287,7 +240,7 @@ sub allowedTo {
     $clientValues_ref->{'_intID'} = $intID;
     $Data->{'ReadOnlyLogin'}      = $readOnly || 0;
     $Data->{'AuthRoleID'}         = $roleID || 0;
-    $Data->{'PassportName'}       = $PassportName || 0;
+    $Data->{'UserName'}       = $UserName || 0;
 
     ## RETURN DATABASE POINTER
     return ($db);
@@ -314,9 +267,8 @@ sub setClient {
     $clientValues_ref->{memberID}     ||= $Defs::INVALID_ID;
     $clientValues_ref->{currentLevel} ||= -1;
     $clientValues_ref->{authLevel}    ||= -1;
-    $clientValues_ref->{userName}     ||= -1;
     $clientValues_ref->{clubAssocID}  ||= -1;
-    $clientValues_ref->{'passportID'} ||= 0;
+    $clientValues_ref->{'userID'} ||= 0;
 
     my $client =
         $clientValues_ref->{interID} . '|'
@@ -333,9 +285,8 @@ sub setClient {
       . $clientValues_ref->{memberID} . '|'
       . $clientValues_ref->{currentLevel} . '|'
       . $clientValues_ref->{authLevel} . '|'
-      . $clientValues_ref->{userName} . '|'
       . $clientValues_ref->{clubAssocID} . '|'
-      . $clientValues_ref->{'passportID'} . '|';
+      . $clientValues_ref->{'userID'} . '|';
 
     # SET EXPIRY DATE
     $client .= time;
@@ -372,8 +323,8 @@ sub getClient {
         $clientValues{compID},       $clientValues{clubID},
         $clientValues{teamID},       $clientValues{memberID},
         $clientValues{currentLevel}, $clientValues{authLevel},
-        $clientValues{userName},     $clientValues{clubAssocID},
-        $clientValues{'passportID'}, $lastAccess
+        $clientValues{clubAssocID},
+        $clientValues{'userID'}, $lastAccess
     ) = split( /\|/, $client_dec );
 
     $clientValues{interID}      ||= 0;
@@ -390,9 +341,8 @@ sub getClient {
     $clientValues{memberID}     ||= $Defs::INVALID_ID;
     $clientValues{currentLevel} ||= -1;
     $clientValues{authLevel}    ||= -1;
-    $clientValues{userName}     ||= -1;
     $clientValues{clubAssocID}  ||= -1;
-    $clientValues{passportID}   ||= 0;
+    $clientValues{userID}   ||= 0;
 
     if ( $clientValues{currentLevel} > $Defs::LEVEL_COMP ) {
         $clientValues{compID} = $Defs::INVALID_ID;

@@ -15,7 +15,7 @@ use Utils;
 use CGI qw(unescape param popup_menu);
 use AuditLog;
 use TTTemplate;
-use Passport;
+#use Passport;
 use GridDisplay;
 
 sub handleAuthMaintenance {

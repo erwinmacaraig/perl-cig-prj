@@ -527,7 +527,7 @@ sub updateCardPrinted	{
   $q->execute(
 		$cardtypeID,
 		$memberID, 
-		$Data->{clientValues}{'userName'},
+		$Data->{'UserName'},
 		$count
 	);
 	$q->finish();

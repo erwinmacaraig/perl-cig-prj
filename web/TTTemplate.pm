@@ -19,9 +19,7 @@ sub runTemplate	{
 	$InData->{'Data'}=$Data;
 	$InData->{'Lang'}=$Data->{'lang'};
 	$InData->{'BaseURL'}=$Defs::base_url;
-    $InData->{'SWWBaseURL'}=$Defs::sww_base_url;
 	$InData->{'UploadedURL'}=$Defs::uploaded_url;
-	$InData->{'PassportURL'}=$Defs::PassportURL;
   my $config = {
     INCLUDE_PATH => ["$Defs::fs_base/templates"],  # or list ref
     INTERPOLATE  => 1,               # expand "$var" in plain text

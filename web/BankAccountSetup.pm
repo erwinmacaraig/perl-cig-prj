@@ -469,7 +469,7 @@ sub paypal_detailsupdate	{
 			$newemail,
 			$Data->{'clientValues'}{'authLevel'},
 			$userID,
-			$Data->{'clientValues'}{'userName'},
+			$Data->{'UserName'},
 		);
 		$q->finish();
 		my $validated = isEmailValidated($Data->{'db'}, $newemail) || 0;

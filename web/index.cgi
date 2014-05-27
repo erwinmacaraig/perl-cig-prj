@@ -8,7 +8,6 @@ use strict;
 use lib ".", "..";
 use Defs;
 use Lang;
-use PassportLink;
 use TTTemplate;
 
 	my $lang= Lang->get_handle() || die "Can't get a language handle!";
@@ -17,18 +16,17 @@ use TTTemplate;
 	my $txtexpl=$lang->txt('Here you can sign in to your SportingPulse Membership database.');
 	my $title=$lang->txt('APPNAME') || 'SportingPulse Membership';
 
-	my $passportLink = passportURL( {}, {}, 'signup');
 	my $page=qq[
 			<span></span>
-		].loginform($lang, $passportLink).qq[
+		].loginform($lang, '').qq[
 	];
 	my %Data = (
 		lang => $lang,
 	);
   my $globalnav = runTemplate(
     \%Data,
-    { PassportLink => $passportLink },
-    'passport/globalnav.templ',
+    {},
+    'user/globalnav.templ',
   );
 
   print "Content-type: text/html\n\n";
@@ -113,7 +111,7 @@ utag_data.ss_sp_ads_string = 'advertising,noads';
   ];
 
 sub loginform	{
-	my ($lang, $passportLink)=@_;
+	my ($lang)=@_;
 	my $logindesc=$lang->txt('ENTER_USER_PASSWORD', $lang->txt('Sign In'));
 	my $un=$lang->txt('Username/Code');
 	my $pw=$lang->txt('Password');
@@ -147,7 +145,7 @@ sub loginform	{
 					<span class="spp_loggedin">
 						<p class="instruct">We see you already have <span class="sp-passport">SP Passport</span>. Sign in below to access your <span class="sp-membership">SP Membership</span> database.</p>
 					</span>
-					<span class="spp_loggedout"><span class="button special-button"><a href="$passportLink">Register</a></span></span>
+					<span class="spp_loggedout"><span class="button special-button"><a href="">Register</a></span></span>
 					<span class="button generic-button">
 		        <a href = "$Defs::base_url/authlist.cgi">Sign In</a>
 	        </span>

@@ -1,8 +1,8 @@
 #
-# $Header: svn://svn/SWM/trunk/web/passport/PassportList.pm 10973 2014-03-13 05:31:22Z eobrien $
+# $Header: svn://svn/SWM/trunk/web/user/UserList.pm 10973 2014-03-13 05:31:22Z eobrien $
 #
 
-package PassportList;
+package UserList;
 require Exporter;
 @ISA    = qw(Exporter);
 @EXPORT = qw(
@@ -23,29 +23,23 @@ use Reg_common;
 use Logo;
 
 sub getAuthOrgListsData {
-    my ( $Data, $passportID) = @_;
-
-    my $resultsentry = 0;
+    my ( $Data, $userID) = @_;
 
     my $db = $Data->{'db'};
 
     my $st_pa = qq[
         SELECT
-            intEntityTypeID,
-            intEntityID,
-            intAssocID
+            entityTypeID,
+            entityID
         FROM
-            tblPassportAuth AS PA
-        WHERE intPassportID = ?
+            tblUserAuth AS PA
+        WHERE userID = ?
     ];
     my $q_pa = $db->prepare($st_pa);
-    $q_pa->execute($passportID);
+    $q_pa->execute($userID);
     my %orgs  = ();
     my %nodes = ();
     while ( my ( $typeID, $entityID ) = $q_pa->fetchrow_array() ) {
-        if ($resultsentry) {
-            next if $typeID > $Defs::LEVEL_ASSOC;
-        }
         $orgs{$typeID}{$entityID} = 1;
         if ( $typeID > $Defs::LEVEL_ASSOC ) {
             $nodes{$entityID} = 1;
@@ -55,8 +49,6 @@ sub getAuthOrgListsData {
     my $member_str = join( ',', keys %{ $orgs{$Defs::LEVEL_MEMBER} } );
     my $assoc_str  = join( ',', keys %{ $orgs{$Defs::LEVEL_ASSOC} } );
     my $club_str   = join( ',', keys %{ $orgs{$Defs::LEVEL_CLUB} } );
-    my $team_str   = join( ',', keys %{ $orgs{$Defs::LEVEL_TEAM} } );
-    my $venue_str  = join( ',', keys %{ $orgs{$Defs::LEVEL_VENUE} } );
 
     my $node_str = join( ',', keys %nodes );
     my %org_data = ();
@@ -233,15 +225,12 @@ sub getAuthOrgListsData {
     my %assocVenues = ();
     my @outdata = ();
     for my $level (
-                    $Defs::LEVEL_TOP,           $Defs::LEVEL_EDU_ADMIN,
-                    $Defs::LEVEL_EDU_DA,        $Defs::LEVEL_EDU_MODULE,
+                    $Defs::LEVEL_TOP,
                     $Defs::LEVEL_INTERNATIONAL, $Defs::LEVEL_INTREGION,
                     $Defs::LEVEL_INTZONE,       $Defs::LEVEL_NATIONAL,
                     $Defs::LEVEL_STATE,         $Defs::LEVEL_REGION,
                     $Defs::LEVEL_ZONE,          $Defs::LEVEL_ASSOC,
-                    $Defs::LEVEL_CLUB,          $Defs::LEVEL_TEAM,
-                    $Defs::LEVEL_VENUE,         $Defs::LEVEL_EVENT,
-                    'MATCHOFFICIAL',
+                    $Defs::LEVEL_CLUB
       )
     {
         if ( $org_data{$level} ) {
@@ -253,22 +242,21 @@ sub getAuthOrgListsData {
 }
 
 sub getAuthOrgLists {
-    my ( $Data, $passportID, $resultsentry, ) = @_;
+    my ( $Data, $userID) = @_;
 
     my $db = $Data->{'db'};
 
-    my ( $authdata, $numrealms ) = getAuthOrgListsData( $Data, $passportID, $resultsentry || 0, );
+    my ( $authdata, $numrealms ) = getAuthOrgListsData( $Data, $userID );
 
-    my $templateFile = 'passport/login_orgs.templ';
+    my $templateFile = 'user/login_orgs.templ';
 
     my $body = runTemplate(
-                            $Data,
-                            {
-                               AuthData       => $authdata,
-                               NumberOfRealms => $numrealms,
-                               ResultsEntry   => $resultsentry || 0,
-                            },
-                            $templateFile,
+        $Data,
+        {
+           AuthData       => $authdata,
+           NumberOfRealms => $numrealms,
+        },
+        $templateFile,
     );
 
     return $body;
@@ -278,8 +266,8 @@ sub getNames {
     my ( $db, $realmID, ) = @_;
 
     my %tData = (
-                  db    => $db,
-                  Realm => $realmID
+      db    => $db,
+      Realm => $realmID
     );
     getDBConfig( \%tData );
     return $tData{'LevelNames'} || {};

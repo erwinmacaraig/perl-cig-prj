@@ -618,7 +618,7 @@ sub update_cardBulk	{
 		$q->execute(
 			$cardtypeID,
 			$id,
-			$Data->{clientValues}{'userName'},
+			$Data->{'UserName'},
 		);
 	}
 	{
