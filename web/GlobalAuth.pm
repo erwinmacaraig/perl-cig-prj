@@ -22,27 +22,27 @@ use strict;
 sub validateGlobalAuth {
 	my (
 		$Data,
-		$passportID,
+		$userID,
 		$entityTypeID,
 		$entityID,
 	) = @_;
 
 	my $admin = 0;
 	my $cache = $Data->{'cache'} || undef;
-	$admin = $cache->get('swm',"GLOBALADMIN_$passportID") if $cache;
+	$admin = $cache->get('swm',"GLOBALADMIN_$userID") if $cache;
 
 	if(!$admin)	{
 		my $st =qq[
-			SELECT intPassportID 
+			SELECT intUserID 
 			FROM tblGlobalAuth
-			WHERE intPassportID = ?
+			WHERE intUserID = ?
 		];
 		my $q = $Data->{'db'}->prepare($st);
-		$q->execute($passportID);
+		$q->execute($userID);
 		($admin) = $q->fetchrow_array();
 		$q->finish();
 		return (0,0) if !$admin;
-		$cache->set('swm',"GLOBALADMIN_$passportID",1,'',60*8) if $cache;
+		$cache->set('swm',"GLOBALADMIN_$userID",1,'',60*8) if $cache;
 	}
 
 	if($entityTypeID > $Defs::LEVEL_ASSOC)	{
@@ -53,7 +53,6 @@ sub validateGlobalAuth {
 	}
 	elsif(
 		$entityTypeID == $Defs::LEVEL_CLUB
-		or $entityTypeID == $Defs::LEVEL_TEAM
 	)	{
 		my $assocID = 0;
 		if($entityTypeID == $Defs::LEVEL_CLUB)	{
@@ -64,15 +63,6 @@ sub validateGlobalAuth {
 			$q->execute($entityID);
 			($assocID) = $q->fetchrow_array();
 			$q->finish();
-		}
-		elsif($entityTypeID == $Defs::LEVEL_TEAM)	{
-			my $st = qq[SELECT intAssocID FROM tblTeam WHERE intTeamID = ?];
-			my $q = $Data->{'db'}->prepare($st);
-			$q->execute($entityID);
-			($assocID) = $q->fetchrow_array();
-			$q->finish();
-			#my $obj = getInstanceOf($Data,'team',$entityID);
-			#$assocID = $obj->assocID();
 		}
 		return(1,$assocID || 0);
 	}

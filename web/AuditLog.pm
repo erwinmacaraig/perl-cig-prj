@@ -25,9 +25,7 @@ sub displayAuditLog {
   my $offset_IN = param('offset') || -1;
   my %levels = (
     $Defs::LEVEL_MEMBER => 'memberID',
-    $Defs::LEVEL_TEAM => 'teamID',
     $Defs::LEVEL_CLUB => 'clubID',
-    $Defs::LEVEL_COMP => 'compID',
     $Defs::LEVEL_ASSOC => 'assocID',
     $Defs::LEVEL_ZONE => 'zoneID',
     $Defs::LEVEL_REGION => 'regionID',
@@ -49,7 +47,7 @@ sub displayAuditLog {
   my $subBody = '';
 	my @rowdata = ();
   for my $i (@{$auditlogdata}) {
-		my $who = $i->{'PassportName'} || $i->{'strUsername'} || '';
+		my $who = $i->{'UserName'} || '';
 		push @rowdata, {
 			id => $i->{'intAuditLogID'},
 			dtUpdated => $i->{'dtUpdated'},
@@ -125,8 +123,8 @@ sub auditLog  {
   my $log = new AuditLogObj(db => $Data->{'db'});
   $log->log(
     id => $id || 0,
-    username => $Data->{'PassportName'} || $Data->{'clientValues'}{'userName'} || '',
-		passportID => $Data->{'clientValues'}{'passportID'} || 0,
+    username => $Data->{'UserName'} || '',
+	userID => $Data->{'clientValues'}{'userID'} || 0,
     type => $type,
     section => $section,
     login_entity_type => $Data->{'clientValues'}{'authLevel'} || 0,

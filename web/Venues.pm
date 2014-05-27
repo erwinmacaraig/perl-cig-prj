@@ -18,7 +18,6 @@ use FormHelpers;
 use AssocObj;
 use VenueObj;
 use GridDisplay;
-use AuthMaintenance;
 use Log;
 require RecordTypeFilter;
 

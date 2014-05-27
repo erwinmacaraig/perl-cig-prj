@@ -9,15 +9,14 @@ use CGI qw(:cgi escape unescape);
 
 use strict;
 
-use lib ".", "..", "../..", "passport";
+use lib ".", "..", "../..", "user";
 
 use Defs;
 use Utils;
-use Passport;
-use PassportList;
+use UserSession;
+use UserList;
 use PageMain;
 use Lang;
-use PassportLink;
 
 main();
 
@@ -33,31 +32,30 @@ sub main {
     $Data{'cache'}  = new MCache();
     my $resultsentry = param('results') || 0;
 
-    my $passport = new Passport( db    => $db,
+    my $user = new UserSession( db    => $db,
                                  cache => $Data{'cache'}, );
-    $passport->loadSession();
-    my $pID = $passport->id() || 0;
+    $user->load();
+    my $uID = $user->id() || 0;
 
-    if ( !$pID ) {
-        redirectPassportLogin( \%Data, );
+    if ( !$uID ) {
+        #redirectUserLogin( \%Data, );
     }
 
     my $body = getAuthOrgLists(
                                 \%Data,
-                                $pID,
-                                $resultsentry,
+                                $uID,
     );
 
-    my $title = 'Passport Authorisation';
+    my $title = 'User Authorisation';
 
-    $Data{'HTMLHead'} = '<link rel="stylesheet" type="text/css" href="css/passportstyle.css"> 
+    $Data{'HTMLHead'} = '<link rel="stylesheet" type="text/css" href="css/userstyle.css"> 
   <script type="text/javascript" src="js/noappbreak.js"></script>
   <!--[if IE]>
-    <link rel="stylesheet" type="text/css" href="css/passport_ie.css" />
+    <link rel="stylesheet" type="text/css" href="css/user_ie.css" />
   <![endif]-->
 
   <!--[if lt IE 9]>
-    <link rel="stylesheet" type="text/css" href="css/passport_ie_old.css" />
+    <link rel="stylesheet" type="text/css" href="css/user_ie_old.css" />
   <![endif]-->
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 ';

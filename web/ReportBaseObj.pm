@@ -10,7 +10,6 @@ use TTTemplate;
 use Utils;
 use Time::HiRes qw(gettimeofday tv_interval);
 use Reports::ReportEmail;
-use Passport;
 
 sub new {
 
@@ -124,9 +123,6 @@ sub runReport {
 		#print STDERR $sql;
 		$output_array = $self->processData($data_array);
 	}
-    if ( $self->{'Config'}{'TalkToPassport'} ) {
-        $output_array = _get_passport_info($output_array, $self->{'db'});
-    }
 	if($self->{'Config'}{'ProcessReturnDataFunction'})	{
 
 		my $retdata = $self->_runFunction(
@@ -460,34 +456,5 @@ sub _runFunction	{
 	return $ret;
 }
 
-sub _get_passport_info {
-    my ( $output_array, $db ) = @_;
-
-    my @authlist = ();
-    for my $output ( @{$output_array} ) {
-        push @authlist, $output->{'PassportID'};
-    }
-        
-    my $passport_hash = undef;
-    if(@authlist) {
-        my $passport = new Passport(
-            db => $db,
-        );
-        my $passport_array = $passport->bulkdetails(\@authlist);
-        for my $passport ( @{$passport_array} ) {
-            $passport_hash->{ $passport->{'PassportID'} } = $passport;
-        }
-    }
-
-    for my $output ( @{$output_array} ) {
-        my $passport_id = $output->{'PassportID'};
-        $output->{'FirstName'}   = $passport_hash->{$passport_id}->{'FirstName'};
-        $output->{'FamilyName'}  = $passport_hash->{$passport_id}->{'FamilyName'};
-        $output->{'Email'}       = $passport_hash->{$passport_id}->{'Email'};
-        $output->{'DateCreated'} = $passport_hash->{$passport_id}->{'Created'};
-    }
-
-    return $output_array;
-}
 
 1;

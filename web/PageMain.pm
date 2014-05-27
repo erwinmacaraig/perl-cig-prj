@@ -21,7 +21,6 @@ use Utils;
 use CGI;
 use AddToPage;
 use TTTemplate;
-use PassportLink;
 use Log;
 use Data::Dumper;
 
@@ -223,11 +222,10 @@ sub pageMain {
         
     my $statscounter = $Defs::NoStats ? '' : getStatsCounterCode();
 
-  my $passportLink = passportURL( {}, {}, '', 0, 0,);
   my $globalnav = runTemplate(
     $Data,
-    {PassportLink => $passportLink },
-    'passport/globalnav.templ',
+    {PassportLink => ''},
+    'user/globalnav.templ',
   );
 
     $navbar = '' if $Data->{'ClearNavBar'};
@@ -446,8 +444,7 @@ sub regoPageForm {
 sub getPageCustomization{
     my ($Data) = @_;
 
-    my $passportLink = passportURL( {}, {}, '', 0, 0,);
-    my $nav = runTemplate( $Data, {PassportLink => $passportLink }, 'passport/globalnav.templ');
+    my $nav = runTemplate( $Data, {PassportLink => ''}, 'user/globalnav.templ');
 
     my $html_head = $Data->{'HTMLHead'} || '';
     my $html_head_style = '';
