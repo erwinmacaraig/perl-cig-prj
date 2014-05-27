@@ -4,7 +4,7 @@ CREATE table tblVenue (
     intRealmID int(11) NOT NULL DEFAULT '0',
     intSubRealmID int(11) NOT NULL DEFAULT '0',
 
-    intStatus tinyint(4) DEFAULT '0',
+    strStatus varchar(20) default '',
     intRealmApproved tinyint default 0,
     intCreatedByEntityID default 0,
     strFIFAID varchar(30) default '',

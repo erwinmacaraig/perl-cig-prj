@@ -4,7 +4,7 @@ CREATE TABLE tblEntity (
     intEntityLevel INT DEFAULT 0,
     intRealmID INT DEFAULT 0,
     intEntityType INT DEFAULT 0, /* School, Club */
-    intStatus INT DEFAULT 0, /*Approved, pending, inactive, suspended */
+    strStatus VARCHAR(20) default '', /*Approved, pending, inactive, suspended */
     intRealmApproved tinyint default 0,
     intCreatedByEntityID default 0,
     strFIFAID varchar(30) default '',

@@ -3,9 +3,9 @@ CREATE TABLE `tblMatrix` (
     intRealmID  INT DEFAULT 0,
 /* IF ANY OF THE BELOW CHANGE -- ADJUST tblPersonRegistration*/
     intSubRealmID  INT DEFAULT 0,
-    intPersonType INT DEFAULT 0,
+    strPersonType VARCHAR(20) DEFAULT '',
     strPersonLevel varchar(10) DEFAULT '', /* pro, amateur */  
-    intSport    INT DEFAULT 0,
+    strSport    VARCHAR(20) DEFAULT '',
     intOriginLevel INT DEFAULT 0, /* Self, club, Reg, MA */
     intOriginID INT DEFAULT 0,
     strListOfApprovals VARCHAR(250) DEFAULT '', /* OR A 1-many table ? */
@@ -26,6 +26,4 @@ CREATE TABLE `tblMatrix` (
   KEY `index_intRealmID` (`intRealmID`),
   KEY `index_intSubRealmID` (`intSubRealmID`),
   KEY `index_intPersonType` (`intStakeholderType`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-#
+) DEFAULT CHARSET=utf8;
