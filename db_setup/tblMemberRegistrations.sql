@@ -7,8 +7,8 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-DROP TABLE IF EXISTS tblMember_Registrations;
-CREATE TABLE tblMember_Registrations (
+DROP TABLE IF EXISTS tblMemberRegistrations;
+CREATE TABLE tblMemberRegistrations (
     intMemberRegistrationID int(11) NOT NULL auto_increment,
     intMemberID int(11) default 0,
     intEntityID int(11) default 0,
