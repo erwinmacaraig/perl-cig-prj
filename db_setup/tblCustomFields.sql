@@ -1,6 +1,4 @@
 DROP TABLE IF EXISTS `tblCustomFields`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `tblCustomFields` (
   `intCustomFieldsID` int(11) NOT NULL AUTO_INCREMENT,
   `intAssocID` int(11) NOT NULL DEFAULT '0',
@@ -15,6 +13,5 @@ CREATE TABLE `tblCustomFields` (
   KEY `index_AssocID` (`intAssocID`),
   KEY `index_intRealmID` (`intRealmID`),
   KEY `IDNEX_intRecStatus` (`intRecStatus`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) DEFAULT CHARSET=utf8;
 

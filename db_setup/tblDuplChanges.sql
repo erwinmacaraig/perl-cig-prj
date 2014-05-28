@@ -1,6 +1,4 @@
 DROP TABLE IF EXISTS `tblDuplChanges`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `tblDuplChanges` (
   `intDuplChangesID` int(11) NOT NULL AUTO_INCREMENT,
   `intAssocID` int(11) NOT NULL DEFAULT '0',
@@ -14,6 +12,5 @@ CREATE TABLE `tblDuplChanges` (
   KEY `index_intNewID` (`intNewID`),
   KEY `index_intAssocIDtstampNew` (`intAssocID`,`tTimeStamp`,`intNewID`),
   KEY `index_intAssocIDtstampOld` (`intAssocID`,`tTimeStamp`,`intOldID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) DEFAULT CHARSET=utf8;
 

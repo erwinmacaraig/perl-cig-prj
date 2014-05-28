@@ -36,5 +36,5 @@ CREATE TABLE tblEntity (
   PRIMARY KEY (`intEntityID`),
   KEY `index_intRealmID` (`intRealmID`),
   KEY `index_intEntityLevel` (`intEntityLevel`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8;
 

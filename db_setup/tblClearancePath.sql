@@ -1,5 +1,4 @@
 DROP TABLE tblClearancePath;
-#
 CREATE TABLE `tblClearancePath` (
   `intClearancePathID` int(11) NOT NULL AUTO_INCREMENT,
   `intClearanceID` int(11) NOT NULL DEFAULT '0',
@@ -29,5 +28,4 @@ CREATE TABLE `tblClearancePath` (
   KEY `index_intID` (`intID`),
   KEY `index_intClearanceStatus` (`intClearanceStatus`),
   KEY `index_intClearanceID` (`intClearanceID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) DEFAULT CHARSET=utf8;

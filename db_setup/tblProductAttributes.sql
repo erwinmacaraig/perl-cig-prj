@@ -1,6 +1,4 @@
 DROP TABLE IF EXISTS `tblProductAttributes`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `tblProductAttributes` (
   `intProductAttributeID` int(11) NOT NULL AUTO_INCREMENT,
   `intProductID` int(11) NOT NULL,
@@ -13,6 +11,5 @@ CREATE TABLE `tblProductAttributes` (
   KEY `index_intRealmID` (`intRealmID`),
   KEY `index_intIDLevel` (`intID`,`intLevel`),
   KEY `index_intProductID` (`intProductID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) DEFAULT CHARSET=utf8;
 

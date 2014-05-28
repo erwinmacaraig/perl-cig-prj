@@ -19,4 +19,4 @@ CREATE table tblRoleTypes (
 
 	PRIMARY KEY (intRoleID),
 	KEY index_Realm(intRealmID, intRealmSubTypeID)
-);
+) DEFAULT CHARSET=utf8;

@@ -8,5 +8,5 @@ CREATE TABLE `tblWelcome` (
   `intRealmSubTypeID` int(11) DEFAULT '0',
   PRIMARY KEY (`intWelcomeID`),
   KEY `index_intRealmEntity` (`intRealmID`,`intEntityID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8;
 
