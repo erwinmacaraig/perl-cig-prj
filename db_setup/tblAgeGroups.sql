@@ -7,6 +7,7 @@ CREATE table tblAgeGroups	(
 	intActive 		TINYINT DEFAULT 0, 
 	intAgeFrom TINYINT NOT NULL 0,
 	intAgeTo TINYINT NOT NULL 0,
+    dtAgeAsDate DATE,
 	tTimeStamp 		TIMESTAMP,
 
 PRIMARY KEY (intAgeGroupID),
