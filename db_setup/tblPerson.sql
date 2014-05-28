@@ -31,6 +31,8 @@ CREATE TABLE tblPerson (
 
     dtDeath date DEFAULT '0000-00-00',
 
+    strFirstClubName varchar(100) default '',
+
     strAddress1 varchar(100) DEFAULT '',
     strAddress2 varchar(100) DEFAULT '',
     strSuburb varchar(100) DEFAULT '',
