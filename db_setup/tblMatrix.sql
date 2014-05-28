@@ -3,7 +3,8 @@ CREATE TABLE `tblMatrix` (
     intRealmID  INT DEFAULT 0,
 /* IF ANY OF THE BELOW CHANGE -- ADJUST tblPersonRegistration*/
     intSubRealmID  INT DEFAULT 0,
-    strPersonType VARCHAR(20) DEFAULT '', /* PLAYER, COACH */
+    intEntityLevel TINYINT DEFAULT 0, /* club/venue/person */
+    strEntityType VARCHAR(30) DEFAULT '', /* School/club /Player/COACH*/
     strPersonLevel varchar(10) DEFAULT '', /* pro, amateur */  
     strSport    VARCHAR(20) DEFAULT '',
     intOriginLevel INT DEFAULT 0, /* Self, club, Reg, MA */
@@ -11,16 +12,14 @@ CREATE TABLE `tblMatrix` (
     strRegTypes varchar(100) DEFAULT '', /* NEW, RENEWAL, AMEND, TRANSFER */
     intMinAge INT DEFAULT 0,
     intMaxAge INT DEFAULT 0,
+    dtAgeAsDate DATE,
     strListOfApprovals VARCHAR(250) DEFAULT '', /* OR A 1-many table ? */
-
     intIsPaymentRequired TINYINT DEFAULT 0,
-    strListOfDocuments VARCHAR(250) DEFAULT '', /* OR A 1-many table ? */
-    
     tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    dtAdded date,
-    intAddedUserID INT DEFAULT 0,
+    intProblemResolutionLevel INT NOT NULL DEFAULT 3,
 
+    dtAdded date,
 
   PRIMARY KEY (intMatrixID),
   KEY `index_intRealmID` (`intRealmID`, intSubRealmID),
