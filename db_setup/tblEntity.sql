@@ -3,7 +3,7 @@ CREATE TABLE tblEntity (
   intEntityID int(11) NOT NULL AUTO_INCREMENT,
     intEntityLevel INT DEFAULT 0,
     intRealmID INT DEFAULT 0,
-    intEntityType INT DEFAULT 0, /* School, Club */
+    strEntityType VARCHAR(30) DEFAULT '', /* School, Club */
     strStatus VARCHAR(20) default '', /*Approved, pending, inactive, suspended */
     intRealmApproved tinyint default 0,
     intCreatedByEntityID default 0,
