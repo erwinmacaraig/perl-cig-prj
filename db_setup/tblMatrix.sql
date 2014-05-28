@@ -3,15 +3,15 @@ CREATE TABLE `tblMatrix` (
     intRealmID  INT DEFAULT 0,
 /* IF ANY OF THE BELOW CHANGE -- ADJUST tblPersonRegistration*/
     intSubRealmID  INT DEFAULT 0,
-    strPersonType VARCHAR(20) DEFAULT '',
+    strPersonType VARCHAR(20) DEFAULT '', /* PLAYER, COACH */
     strPersonLevel varchar(10) DEFAULT '', /* pro, amateur */  
     strSport    VARCHAR(20) DEFAULT '',
     intOriginLevel INT DEFAULT 0, /* Self, club, Reg, MA */
     intOriginID INT DEFAULT 0,
-    strListOfApprovals VARCHAR(250) DEFAULT '', /* OR A 1-many table ? */
     strRegTypes varchar(100) DEFAULT '', /* NEW, RENEWAL, AMEND, TRANSFER */
     intMinAge INT DEFAULT 0,
     intMaxAge INT DEFAULT 0,
+    strListOfApprovals VARCHAR(250) DEFAULT '', /* OR A 1-many table ? */
 
     intIsPaymentRequired TINYINT DEFAULT 0,
     strListOfDocuments VARCHAR(250) DEFAULT '', /* OR A 1-many table ? */
@@ -23,7 +23,6 @@ CREATE TABLE `tblMatrix` (
 
 
   PRIMARY KEY (intMatrixID),
-  KEY `index_intRealmID` (`intRealmID`),
-  KEY `index_intSubRealmID` (`intSubRealmID`),
-  KEY `index_intPersonType` (`intStakeholderType`)
+  KEY `index_intRealmID` (`intRealmID`, intSubRealmID),
+  KEY `index_intPersonType` (`strPersonType`)
 ) DEFAULT CHARSET=utf8;
