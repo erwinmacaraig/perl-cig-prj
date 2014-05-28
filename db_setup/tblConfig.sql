@@ -1,6 +1,4 @@
 DROP TABLE IF EXISTS `tblConfig`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `tblConfig` (
   `intConfigID` int(11) NOT NULL AUTO_INCREMENT,
   `intEntityID` int(11) NOT NULL DEFAULT '0',
@@ -18,6 +16,5 @@ CREATE TABLE `tblConfig` (
   KEY `index_EntityTypePerm` (`intLevelID`,`intEntityID`,`intTypeID`,`strPerm`),
   KEY `index_intRealmID` (`intRealmID`),
   KEY `index_multi` (`intRealmID`,`intLevelID`,`intEntityID`,`intTypeID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) DEFAULT CHARSET=utf8;
 

@@ -1,10 +1,8 @@
 DROP TABLE IF EXISTS tblIdentifiers;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE tblIdentifiers (
     intIdentifierID int(11) NOT NULL AUTO_INCREMENT,
-    intTableType tinyint default 0, /*Entity, Member*/
-    intID INT DEFAULT 0, /*ID within above table */
+    intEntityLevel tinyint default 0, /*Person, Entity, Venue*/
+    intEntityID INT DEFAULT 0, /* ID of the Person, Entity or Venue */
     strIdentifier varchar(100) default '',
     strIDType varchar(30) default '', /*Define per MA ?? */
     strISOCountry varchar(10) default '',
@@ -18,6 +16,5 @@ CREATE TABLE tblIdentifiers (
 
   PRIMARY KEY (intEntityIdentifierID),
   KEY index_EntityIDType (intEntityID, strIDType)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) DEFAULT CHARSET=utf8;
 

@@ -51,5 +51,4 @@ PRIMARY KEY (intFacilityID),
   KEY index_intEntityID (intEntityID),
   KEY index_intRealmID (intRealmID),
   KEY index_intSubRealmID (intSubRealmID)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) DEFAULT CHARSET=utf8;

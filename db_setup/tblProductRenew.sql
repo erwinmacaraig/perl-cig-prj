@@ -1,6 +1,4 @@
 DROP TABLE IF EXISTS `tblProductRenew`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `tblProductRenew` (
   `intProductID` int(11) NOT NULL,
   `strRenewText1` text,
@@ -17,6 +15,5 @@ CREATE TABLE `tblProductRenew` (
   `intRenewRegoFormID` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`intProductID`),
   KEY `index_renewproduct` (`intRenewProductID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) DEFAULT CHARSET=utf8;
 

@@ -1,6 +1,4 @@
 DROP TABLE IF EXISTS `tblDefCodes`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `tblDefCodes` (
   `intCodeID` int(11) NOT NULL AUTO_INCREMENT,
   `intAssocID` int(11) NOT NULL DEFAULT '0',
@@ -19,6 +17,5 @@ CREATE TABLE `tblDefCodes` (
   KEY `IDNEX_intRecStatus` (`intRecStatus`),
   KEY `index_intRealmAssoc` (`intRealmID`,`intAssocID`),
   KEY `index_intRealmAssocType` (`intRealmID`,`intAssocID`,`intType`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) DEFAULT CHARSET=utf8;
 

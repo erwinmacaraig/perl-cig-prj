@@ -1,6 +1,4 @@
 DROP TABLE IF EXISTS `tblAuditLog`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `tblAuditLog` (
   `intAuditLogID` int(11) NOT NULL AUTO_INCREMENT,
   `intID` int(11) NOT NULL DEFAULT '0',
@@ -19,5 +17,4 @@ CREATE TABLE `tblAuditLog` (
   KEY `index_strUsername` (`strUsername`),
   KEY `index_AuditLog` (`intEntityTypeID`,`intEntityID`),
   KEY `index_passportID` (`intPassportID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) DEFAULT CHARSET=utf8;

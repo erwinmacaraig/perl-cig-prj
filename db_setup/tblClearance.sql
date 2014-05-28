@@ -55,6 +55,4 @@ CREATE TABLE `tblClearance` (
   KEY `index_intClearanceYear` (`intClearanceYear`),
   KEY `index_FromYear` (`intCreatedFrom`,`intClearanceYear`),
   KEY `index_dtApplied` (`dtApplied`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-#
+) DEFAULT CHARSET=utf8;
