@@ -24,6 +24,8 @@ CREATE TABLE tblPersonRegistration (
     intOriginID INT DEFAULT 0, 
     intRegistrationNature int default 0, /*First, Subsequent -- We haev a count ? */
 
+    intOriginalMatrixID INT DEFAULT 0,
+
     dtFrom date,
     dtTo date,
 
