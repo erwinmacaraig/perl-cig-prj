@@ -30,16 +30,14 @@ CREATE table tblVenue (
     strPhone varchar(20) DEFAULT '',
     strFax varchar(20) DEFAULT '',
     
-    strDiscipline varchar(100) default '', /* list of sports? */
     intCapacity int(11) DEFAULT '0',
     intCoveredSeats int(11) DEFAULT '0',
     intUncoveredSeats int(11) DEFAULT '0',
     intCoveredStandingPlaces int(11) DEFAULT '0',
     intUncoveredStandingPlaces int(11) DEFAULT '0',
     intLightCapacity int(11) DEFAULT '0',
-    strGroundNature varchar(30) DEFAULT '', /* Grass, Turf */
-    strVenueType varchar(30) DEFAULT '',
-  
+    strGroundNature varchar(100) DEFAULT '', /* Grass, Turf -- comma seperated ? */
+    strDiscipline varchar(100) default '', /* list of sports -- comma seperated ? */
     
     tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
