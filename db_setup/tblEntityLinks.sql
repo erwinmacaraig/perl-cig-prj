@@ -2,8 +2,9 @@ CREATE table tblEntityLinks (
     intEntityLinksID   INT NOT NULL AUTO_INCREMENT,
     intParentEntityID  INT NOT NULL,
     intChildEntityID 	 INT NOT NULL,
-		intPrimary			 TINYINT NOT NULL DEFAULT 1,
+	intPrimary			 TINYINT NOT NULL DEFAULT 1,
     intDataAccess   TINYINT NOT NULL DEFAULT 10,
+    tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
 PRIMARY KEY (intEntityLinksID),
 KEY index_intParentEntityID (intParentEntityID),

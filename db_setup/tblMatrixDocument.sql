@@ -1,4 +1,4 @@
-CREATE TABLE `tblMatrixDocuments` (
+CREATE TABLE `tblMatrixDocument` (
     intMatrixID INT NOT NULL,
     intDocumentTypeID INT NOT NULL,
     intRequired TINYINT DEFAULT 0,

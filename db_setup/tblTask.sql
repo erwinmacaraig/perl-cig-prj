@@ -9,7 +9,6 @@ CREATE TABLE tblTask(
 
     intEntityLevel TINYINT DEFAULT 0,
     intEntityID INT NOT NULL,
-    intRoleID INT NOT NULL DEFAULT 0,
 
     intID INT NOT NULL, /* registrationID for APPROVEPERSON, documentID for approveDOC */
 

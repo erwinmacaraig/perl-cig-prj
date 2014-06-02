@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS tblPersonRegistration;
-CREATE TABLE tblPersonRegistration (
+DROP TABLE IF EXISTS tblPersonRegistration_XX;
+CREATE TABLE tblPersonRegistration_XX (
     intPersonRegistrationID int(11) NOT NULL auto_increment,
     intPersonID int(11) default 0,
     intEntityID int(11) default 0,

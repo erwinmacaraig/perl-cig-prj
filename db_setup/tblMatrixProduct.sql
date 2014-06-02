@@ -1,4 +1,4 @@
-CREATE TABLE tblMatrixProducts (
+CREATE TABLE tblMatrixProduct (
     intMatrixID int DEFAULT 0,
     intProductID INT DEFAULT 0,
     intAllowDuplicates TINYINT DEFAULT 0,

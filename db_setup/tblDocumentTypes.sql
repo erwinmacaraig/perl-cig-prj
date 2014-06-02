@@ -1,6 +1,4 @@
 DROP TABLE IF EXISTS tblDocumentTypes;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE tblDocumentTypes (
     intDocumentTypeID INT NOT NULL AUTO_INCREMENT,
     intRealmID INT NOT NULL,
@@ -11,5 +9,4 @@ CREATE TABLE tblDocumentTypes (
   PRIMARY KEY (intDocumentTypeID),
     KEY index_realm(intRealmID)
 ) DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
