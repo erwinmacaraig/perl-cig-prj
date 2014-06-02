@@ -1,10 +1,10 @@
 CREATE TABLE `tblMatrix` (
     intMatrixID int NOT NULL AUTO_INCREMENT,
     intRealmID  INT DEFAULT 0,
-/* IF ANY OF THE BELOW CHANGE -- ADJUST tblPersonRegistration*/
     intSubRealmID  INT DEFAULT 0,
     intEntityLevel TINYINT DEFAULT 0, /* club/venue/person */
     strEntityType VARCHAR(30) DEFAULT '', /* School/club /Player/COACH*/
+/* IF ANY OF THE BELOW CHANGE -- ADJUST tblPersonRegistration*/
     strPersonLevel varchar(10) DEFAULT '', /* pro, amateur */  
     strSport    VARCHAR(20) DEFAULT '',
     intOriginLevel INT DEFAULT 0, /* Self, club, Reg, MA */
