@@ -336,7 +336,7 @@ sub venue_details   {
 sub loadVenueDetails {
     my($db, $id, $realmID, $entityID) = @_;
 
-    $assocID ||= 0;
+    $entityID ||= 0;
     my $field = {};
 
     if($id) {
@@ -382,7 +382,7 @@ sub listVenues  {
     ];
     push @BindArray, $Data->{'Realm'};        
     if ($Data->{'Entity'} and $Data->{'Entity'} > 0)    {
-        $st . = qq[ AND intEntityID = ?];
+        $st .= qq[ AND intEntityID = ?];
         push @BindArray, $Data->{'Entity'};        
     }
 

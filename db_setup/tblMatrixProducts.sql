@@ -1,4 +1,4 @@
-CREATE TABLE `tblMatrixProducts` (
+CREATE TABLE tblMatrixProducts (
     intMatrixID int DEFAULT 0,
     intProductID INT DEFAULT 0,
     intAllowDuplicates TINYINT DEFAULT 0,
@@ -6,5 +6,5 @@ CREATE TABLE `tblMatrixProducts` (
 
 
   PRIMARY KEY (intMatrixID, intProductID),
-  KEY `index_intProductID` (`intProductID`)
+  KEY index_intProductID (intProductID)
 ) DEFAULT CHARSET=utf8;
