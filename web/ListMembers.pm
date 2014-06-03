@@ -362,27 +362,7 @@ sub listMembers {
 
 
     my ($record_type_join, $record_type_select, $record_type_filter);
-    if ($Data->{'SystemConfig'}{'EnableMemberRecords'}) {
-        if ($Data->{'CookieRecordTypeFilter'}) {
-            $record_type_filter = "AND MR.intMemberRecordTypeID = $Data->{'CookieRecordTypeFilter'}";
-        }
-        $record_type_select = ", tblMemberRecordType.strName AS RecordTypeName";
-        $record_type_join = qq/
-        LEFT JOIN tblMemberRecords_$realm_id AS MR ON (
-                MR.intMemberID = tblMember.intMemberID 
-            AND MR.intEntityTypeID = $Defs::LEVEL_ASSOC 
-            AND MR.intEntityID = tblMember_Associations.intAssocID
-        )
-        LEFT JOIN tblMemberRecordType ON (
-            tblMemberRecordType.intMemberRecordTypeID = MR.intMemberRecordTypeID 
-        )
-        /;
-        push @headers, {
-            name => $lang->txt('Record Type'),
-            field => 'RecordTypeName',
-        };
-
-    } elsif($mtypefilter) {
+   if($mtypefilter) {
         if( $Data->{'CookieMemberTypeFilter'} eq 'intPlayer')     {
             $sel_str .= qq[, 
                 Player.intActive AS Player_intActive, 

@@ -15,7 +15,6 @@ use Logo;
 use TTTemplate;
 use RegoFormObj; #this is the more 'generic', uncoupled one.
 use RegoFormConfigObj; #similarly uncoupled.
-use OptinObj;
 use RegoFormAddedObj;
 use RegoFormConfigAddedObj;
 use RegoFormLayoutsObj;
@@ -72,13 +71,11 @@ sub new {
         ($self->isNodeForm())
             ? $self->_loadFormTextNodeForm()
             : $self->_loadFormTextLinkedForm();
-        $self->_loadOptins();
         $self->_loadFieldsNodeLinkedForm();
         $self->_loadFieldRulesNodeLinkedForm();
     }
     else {
         $self->_loadFormTextAssocClubForm();
-        $self->_loadOptins();
         $self->_loadFieldsAssocClubForm();
         $self->_loadFieldRulesAssocClubForm();
     }
@@ -152,7 +149,6 @@ sub _setFieldsToNodeValues {
     $self->{$dbData}{$nrsOverrideFields->{'multipleAdult'}}     = $regoFormObj->getValue($nrsOverrideFields->{'multipleAdult'})     || 0;
     $self->{$dbData}{$nrsOverrideFields->{'multipleChild'}}     = $regoFormObj->getValue($nrsOverrideFields->{'multipleChild'})     || 0;
     $self->{$dbData}{$nrsOverrideFields->{'newRegos'}}          = $regoFormObj->getValue($nrsOverrideFields->{'newRegos'})          || 0;
-    $self->{$dbData}{$nrsOverrideFields->{'strAllowedMemberRecordTypes'}}     = $regoFormObj->getValue($nrsOverrideFields->{'strAllowedMemberRecordTypes'})     || '';
 
 }
 
@@ -184,7 +180,6 @@ sub _setFieldsToOverrideValues {
             $self->{$dbData}{$nrsOverrideFields->{'matchOfficial'}} = $regoFormAddedObj->getValue($nrsOverrideFields->{'matchOfficial'}) || '';
             $self->{$dbData}{$nrsOverrideFields->{'misc'}}          = $regoFormAddedObj->getValue($nrsOverrideFields->{'misc'})          || '';
             $self->{$dbData}{$nrsOverrideFields->{'volunteer'}}     = $regoFormAddedObj->getValue($nrsOverrideFields->{'volunteer'})     || '';
-            $self->{$dbData}{$nrsOverrideFields->{'strAllowedMemberRecordTypes'}} = $regoFormAddedObj->getValue($nrsOverrideFields->{'strAllowedMemberRecordTypes'}) || '';
         }
 
         if ($nrsConfig->{'mrEnabled'}) { #mr = multiple registrations
@@ -756,58 +751,6 @@ sub _getTextFields {
     return \@textFields;
 }
 
-sub _loadOptins {
-    my $self = shift;
-
-    my @optins = ();
-
-    my $upperLevel = ($self->isNodeForm() or $self->isLinkedForm()) ? $Defs::LEVEL_NATIONAL : $Defs::LEVEL_ASSOC;
-
-    if ($self->isNodeForm() or $self->isLinkedForm()) {
-        if ($self->{'SystemConfig'} and $self->{'SystemConfig'}{'nrs_limitOptinsToCreatedLevel'}) {
-            if ($self->isNodeForm()) {
-                $upperLevel = $self->CreatedLevel();
-            }
-            else { #must be a linked form
-                my $regoFormObj = RegoFormObj->load(db=>$self->{'db'}, ID=>$self->ParentBodyFormID());
-                $upperLevel = $regoFormObj->getValue('intCreatedlevel');
-            }
-        }
-    }
-
-    my $entityID     = $self->ClubID();
-    my $entityTypeID = ($entityID) ? $Defs::LEVEL_CLUB : $Defs::LEVEL_ASSOC;
-    $entityID        = $self->AssocID() if !$entityID;
-
-    my $optinObjs = OptinObj->getHierarchical(dbh=>$self->{'db'}, entityTypeID=>$entityTypeID, entityID=>$entityID, assocID=>$self->AssocID(), upperLevel=>$upperLevel);
-
-    _addToOptins($optinObjs, \@optins, $self);
-
-    if (@optins) {
-        my %templateData = (optins => \@optins);
-        my $templateFile = 'regoform/common/optins.templ';
-        $self->{'Optins'} = runTemplate($self->{'Data'}, \%templateData, $templateFile);
-    }
-
-}
-
-sub _addToOptins {
-    my ($optinObjs, $optins, $self) = @_;
-
-    foreach my $optinObj(@$optinObjs) {
-        my $optinID = $optinObj->getValue('intOptinID');
-
-        push @$optins, {
-            intOptinID   => $optinID,
-            strOptinText => $optinObj->getValue('strOptinText'),
-            intDefault   => $optinObj->getValue('intDefault'),
-        };
-
-        $self->addCarryField("cbOptin_$optinID", -1); #set to -1 to force carryover. check at other end to see if val changed to 1.
-    }
-
-    return;
-}
 
 sub _loadFieldsNodeLinkedForm {
     my $self = shift;

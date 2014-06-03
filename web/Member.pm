@@ -43,8 +43,6 @@ use Transactions;
 use ConfigOptions;
 use ListMembers;
 
-use MemberRecords;
-
 use Clearances;
 use Seasons;
 use GenAgeGroup;
@@ -57,7 +55,6 @@ use InstanceOf;
 use Photo;
 use AccreditationDisplay;
 use DefCodes;
-use MemberRecordType;
 
 use Log;
 use Data::Dumper;
@@ -749,7 +746,7 @@ sub member_details {
     my $field_case_rules = get_field_case_rules({dbh=>$Data->{'db'}, client=>$client, type=>'Member'});
 	my @reverseYNOrder = ('',1,0);
 
-    my $mrt_config = ($Data->{'SystemConfig'}{'EnableMemberRecords'}) ? get_current_mrt_config($Data) : {};
+    my $mrt_config = '';
 
     my %FieldDefinitions = (
         fields => {
@@ -1713,91 +1710,9 @@ sub member_details {
             SPcontact => { type => '_SPACE_', sectionname => 'contact' },
             SPdetails => { type => '_SPACE_', sectionname => 'details' },
 
-            ($Data->{'SystemConfig'}{'EnableMemberRecords'}) ? (
-                MemberRecordTypeList => {
-                    label => 'Member Record Type',
-                    type => 'lookup',
-                    options => get_mrt_select_options($Data),
-                    (not $mrt_config->{'OneRolePerMember'}) ? (
-                        multiple => 1,
-                        size => 5,
-                    ) : (),
-                    sectionname => 'records',
-                    SkipProcessing => 1,
-                    visible_for_edit => 0,
-                }
-            ) : (
-                intPlayer => {
-                    label       => $FieldLabels->{'intPlayer'},
-                    OLDlabel    => !$memberID ? $FieldLabels->{'intPlayer'} : '',
-                    value       => $field->{intPlayer},
-                    type        => 'checkbox',
-                    sectionname => 'interests',
-                    oldreadonly => ( $option eq 'add' ) ? 0 : 1,
-                    first_page  => 1,
-
-                    default => $Data->{'SystemConfig'}{'NoPlayerDefault'} ? 0 : 1,
-
-                    readonly => ( $option eq 'add' or !$assocSeasons->{'allowSeasons'} or $Data->{'RegoFormID'} ) ? 0 : 1,
-
-                    displaylookup => { 1 => 'Yes', 0 => 'No' },
-                },
-                intCoach => {
-                    label         => $FieldLabels->{'intCoach'},
-                    value         => $field->{intCoach},
-                    type          => 'checkbox',
-                    sectionname   => 'interests',
-                    oldreadonly   => ( $option eq 'add' ) ? 0 : 1,
-                    first_page    => 1,
-                    displaylookup => { 1 => 'Yes', 0 => 'No' },
-
-                    readonly => ( $option eq 'add' or !$assocSeasons->{'allowSeasons'} or $Data->{'RegoFormID'} ) ? 0 : 1,
-                },
-                intUmpire => {
-                    label         => $FieldLabels->{'intUmpire'},
-                    value         => $field->{intUmpire},
-                    type          => 'checkbox',
-                    sectionname   => 'interests',
-                    oldreadonly   => ( $option eq 'add' ) ? 0 : 1,
-                    first_page    => 1,
-                    displaylookup => { 1 => 'Yes', 0 => 'No' },
-
-                    readonly => ( $option eq 'add' or !$assocSeasons->{'allowSeasons'} or $Data->{'RegoFormID'} ) ? 0 : 1,
-                },
-                intOfficial => {
-                    label         => $FieldLabels->{'intOfficial'},
-                    value         => $field->{intOfficial},
-                    type          => 'checkbox',
-                    sectionname   => 'interests',
-                    displaylookup => { 1 => 'Yes', 0 => 'No' },
-                    first_page    => 1,
-
-                   readonly => ( $option eq 'add' or !$assocSeasons->{'allowSeasons'} or $Data->{'RegoFormID'} ) ? 0 : 1, 
-                },
-                intMisc => {
-                    label         => $FieldLabels->{'intMisc'},
-                    value         => $field->{intMisc},
-                    type          => 'checkbox',
-                    sectionname   => 'interests',
-                    displaylookup => { 1 => 'Yes', 0 => 'No' },
-                    first_page    => 1,
-
-                    readonly => ( $option eq 'add' or !$assocSeasons->{'allowSeasons'} or $Data->{'RegoFormID'} ) ? 0 : 1, 
-                },
-                intVolunteer => {
-                    label         => $FieldLabels->{'intVolunteer'},
-                    value         => $field->{intVolunteer},
-                    type          => 'checkbox',
-                    sectionname   => 'interests',
-                    displaylookup => { 1 => 'Yes', 0 => 'No' },
-                    first_page    => 1,
-
-                    readonly => ( $option eq 'add' or !$assocSeasons->{'allowSeasons'} or $Data->{'RegoFormID'} ) ? 0 : 1, 
-                }
-            ),
         },
         order => [
-        qw(strNationalNum strMemberNo intRecStatus intDefaulter strSalutation strFirstname strPreferredName strMiddlename strSurname strMaidenName dtDOB strPlaceofBirth strCountryOfBirth strMotherCountry strFatherCountry intGender strAddress1 strAddress2 strSuburb strCityOfResidence strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intOccupationID intDeceased intDeRegister intPhotoUseApproval strLoyaltyNumber intMailingList intFinancialActive intMemberPackageID curMemberFinBal intLifeMember strPreferredLang strPassportIssueCountry strPassportNationality strPassportNo dtPassportExpiry strBirthCertNo strHealthCareNo intIdentTypeID strIdentNum dtPoliceCheck dtPoliceCheckExp strPoliceCheckRef intPlayer intCoach intUmpire intOfficial intMisc intVolunteer strEmergContName strEmergContNo strEmergContNo2 strEmergContRel strP1Salutation strP1FName strP1SName intP1Gender strP1Phone strP1Phone2 strP1PhoneMobile strP1Email strP1Email2 intP1AssistAreaID strP2Salutation strP2FName strP2SName intP2Gender strP2Phone strP2Phone2 strP2PhoneMobile strP2Email strP2Email2 intP2AssistAreaID strEyeColour strHairColour intEthnicityID strHeight strWeight MemberRecordTypeList
+        qw(strNationalNum strMemberNo intRecStatus intDefaulter strSalutation strFirstname strPreferredName strMiddlename strSurname strMaidenName dtDOB strPlaceofBirth strCountryOfBirth strMotherCountry strFatherCountry intGender strAddress1 strAddress2 strSuburb strCityOfResidence strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intOccupationID intDeceased intDeRegister intPhotoUseApproval strLoyaltyNumber intMailingList intFinancialActive intMemberPackageID curMemberFinBal intLifeMember strPreferredLang strPassportIssueCountry strPassportNationality strPassportNo dtPassportExpiry strBirthCertNo strHealthCareNo intIdentTypeID strIdentNum dtPoliceCheck dtPoliceCheckExp strPoliceCheckRef intPlayer intCoach intUmpire intOfficial intMisc intVolunteer strEmergContName strEmergContNo strEmergContNo2 strEmergContRel strP1Salutation strP1FName strP1SName intP1Gender strP1Phone strP1Phone2 strP1PhoneMobile strP1Email strP1Email2 intP1AssistAreaID strP2Salutation strP2FName strP2SName intP2Gender strP2Phone strP2Phone2 strP2PhoneMobile strP2Email strP2Email2 intP2AssistAreaID strEyeColour strHairColour intEthnicityID strHeight strWeight 
         ),
 
         map("strNatCustomStr$_", (1..15)),
@@ -2464,12 +2379,6 @@ sub postMemberUpdate {
     if ( $action eq 'add' ) {
         $types{'intMSRecStatus'} = 1;
         if ($id) {
-            # create default records for new member in MemberRecords
-            if($Data->{'SystemConfig'}{'EnableMemberRecords'}) {
-                my $cgi = new CGI();
-                my @record_types = $cgi->param('d_MemberRecordTypeList');
-                create_member_records($Data, $id, \@record_types);
-            }
 
             if ( $Data->{'clientValues'}{'assocID'} and $Data->{'clientValues'}{'assocID'} != $Defs::INVALID_ID ) {
 

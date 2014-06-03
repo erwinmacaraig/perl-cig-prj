@@ -583,7 +583,6 @@ sub getFieldsList	{
         intPhotoUseApproval
         ));
     push @memberFields, ('intSchoolID', 'intGradeID') if $data->{'SystemConfig'}{'Schools'};
-    push @memberFields, 'MemberRecordTypeList' if $data->{'SystemConfig'}{'EnableMemberRecords'};
     return \@memberFields if $fieldtype eq 'Member';
 
     my @teamFields =(qw(

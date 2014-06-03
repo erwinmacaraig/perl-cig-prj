@@ -16,14 +16,13 @@ use CGI qw(escape unescape param);
 use Defs;
 use Reg_common;
 use DeQuote;
-require Seasons;
 require AuditLog;
 require CustomFields;
 use TTTemplate;
 
 my %DefCodesTypes	= (
 	 #-2 => 'Discliplines',
-    -5 => 'Season Types',
+    #-5 => 'Season Types',
     -9 => 'Occupations',
     -8 => 'Ethnicity',
 	-10 => 'Hair Colours',
@@ -344,10 +343,8 @@ sub show_menu	{
 	my($Data) = @_;
 	my $customfieldnames = CustomFields::getCustomFieldNames($Data);
 	my $cl  = setClient($Data->{'clientValues'});
-	my $assocSeasons = Seasons::getDefaultAssocSeasons($Data);
 	my @options = ();
 	for my $key (keys %DefCodesTypes	)	{
-		next if ($key == -5 and $assocSeasons->{'allowSeasons'});
 		my $name = $DefCodesTypes{$key} || '';
 		if($CustomFieldsToTypes{$key})	{
 			$name = $customfieldnames->{$CustomFieldsToTypes{$key} || ''}[0] || $DefCodesTypes{$key} || '';

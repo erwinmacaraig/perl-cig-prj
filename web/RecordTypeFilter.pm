@@ -22,7 +22,6 @@ use Utils;
 use FormHelpers;
 
 require Seasons;
-use MemberRecordType;
 use Data::Dumper;
 use Log;
 
@@ -207,28 +206,6 @@ sub show_recordtypes	{
     my $record_type_filter = '';
 
     if($memberrecords)	{
-        if ($Data->{'SystemConfig'}{'EnableMemberRecords'}) {
-            my $record_types;
-            my $record_type_options = get_mrt_select_options($Data);
-            for my $key(sort keys %{$record_type_options}) {
-                my $selected = $Data->{'CookieRecordTypeFilter'} eq $key ? 'SELECTED' : '';;
-                $record_types .= qq[<option $selected value="$key">$record_type_options->{$key}</option>];
-            }
-            $record_type_filter = qq [
-            <select name="record_type_filter" size="1" style="font-size:10px;" id = "dd_record_type_filter">
-            <option value="">All</option>
-            $record_types
-            </select> 
-            ];
-            my $record_type_cookie = qq[
-            jQuery("#dd_record_type_filter").change(function() {
-                    SetCookie('SWOMRTF',jQuery('#dd_record_type_filter').val(),30);
-                    document.location.reload();;
-                });
-            ];
-            $Data->{'AddToPage'}->add('js_bottom','inline', $record_type_cookie);
-        } 
-        else {
             my $membertypes='';
             ### Lets show different types depending on if Seasons turned on or not
             if ($assocSeasons->{'allowSeasons'})	{
@@ -263,7 +240,6 @@ sub show_recordtypes	{
                 ];
                 $Data->{'AddToPage'}->add('js_bottom','inline',$membertypecookie);
             }
-        }
     }
     my $textfilter = '';
     if($textfilter_name)	{

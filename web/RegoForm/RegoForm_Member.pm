@@ -27,7 +27,6 @@ use FormHelpers;
 use InstanceOf;
 use PrimaryClub;
 use DuplicatePrevention;
-use MemberRecordType;
 use List::Util qw/first/;
 use Log;
 use Data::Dumper;
@@ -333,9 +332,6 @@ sub display_initial_info {
     # get allowed member record type list
     # TODO: get mrt list from current level? or regoform level?
     my $valid_member_record_types = {};
-    if ($Data->{'SystemConfig'}{'EnableMemberRecords'}) {
-        $valid_member_record_types = $self->get_register_as_mrt_list($Data);
-    }
 
     my %existingtypes = ();
     my $memberID = $memberdetails ?  $memberdetails->{'intMemberID'} || 0 : 0;
@@ -399,8 +395,6 @@ sub display_initial_info {
         PassportDetails     => \%PassportPrefilDetails,
         PassportID          => $passportID,
         CompulsoryPayment   => $self->getValue('intPaymentCompulsory') || 0,
-        enable_member_record => $Data->{'SystemConfig'}{'EnableMemberRecords'},
-        valid_member_record_types => $valid_member_record_types,
     );
 
     #Use the same template for all member forms
@@ -577,7 +571,7 @@ sub setupMember_HTMLForm {
     my $prefilldata = $self->{'Session'}->getSessionMemberDetails($self->{'db'});
     my $total_in_session = $self->{'Session'}->total() || 0;
     $prefilldata = {} if $total_in_session < 2;
-    my @firstpagefields = (qw(strFirstname strSurname dtDOB intGender MemberRecordTypeList));
+    my @firstpagefields = (qw(strFirstname strSurname dtDOB intGender ));
     for my $f (@firstpagefields)    {
         if(exists $self->{'RunParams'}{'d_'.$f})    {
             my $v = $self->{'RunParams'}{'d_'.$f} || '';
@@ -618,18 +612,7 @@ sub setupMember_HTMLForm {
     }
 
     my $registeras = '';
-    if ($Data->{'SystemConfig'}{'EnableMemberRecords'}) {
-        my $all_record_types = get_mrt_list_of_current_level($self->{'Data'});
-
-        for my $type_id (split(',', $self->{'RunParams'}{'d_MemberRecordTypeList'})) {
-            for my $item (@{$all_record_types}) {
-                if ($item->{'intMemberRecordTypeID'} == $type_id) {
-                    $registeras .= "<li>$item->{'strName'}</li>";
-                }
-            }
-        }
-        $registeras = qq[<p>Registering as:<ul>$registeras</ul></p>] if ($registeras);
-    } else {
+    {
         my $types = $self->getAllMemberTypes();
         my $allowedtypes = 0;
         for my $type (@{$types})    {

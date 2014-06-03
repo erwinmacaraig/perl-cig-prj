@@ -15,7 +15,7 @@ use Defs;
 use Utils;
 use RegoForm::RegoFormFactory;
 use SystemConfig;
-use PassportLink;
+#use PassportLink;
 use MCache;
 use Data::Dumper;
 use Gateway_Common;
@@ -61,24 +61,6 @@ sub main	{
 	}
 	my $teamcode = safe_param('teamcode','number') || safe_param('d_teamcode','number') || '';
     my $compID   = safe_param('compID','number')   || '';
-    my $programID  = safe_param('programID','number')   || '';
-
-    if ( $programID ){
-        require ProgramObj;
-
-        # Load program object
-        my $program_obj = ProgramObj->new(
-            'ID' => $programID,
-            'db' => $db,
-        );
-        $program_obj->load();
-
-        # Find assoc
-        if (ref $program_obj){
-            $assocID = $program_obj->get_assoc_id();
-        }
-
-    }
 
     # check if bulkID is valid
     my $bulkID = safe_param( 'bID', 'nubmer' ) || 0;

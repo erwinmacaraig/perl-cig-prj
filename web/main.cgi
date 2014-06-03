@@ -7,7 +7,7 @@
 use strict;
 use CGI qw(param unescape escape);
 
-use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit','Clearances', 'Facilities';
+use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit','Clearances', 'Facilities',"user";
 use Lang;
 use Reg_common;
 use PageMain;
@@ -42,8 +42,6 @@ use AgeGroups;
 use Notifications;
 use Venues;
 use Facility;
-use ProgramTemplates;
-use Programs;
 
 use MCache;
 use Contacts;
@@ -61,10 +59,6 @@ use AuthMaintenance;
 use Dashboard;
 use CheckOnLogin;
 use DashboardConfig;
-
-use Optin;
-use MemberRecords;
-use MemberRecordType;
 
 use Log;
 use Data::Dumper;
@@ -209,12 +203,6 @@ sub main {
     elsif ( $action =~ /^FACILITY_/ ) {
         ( $resultHTML, $pageHeading ) = handleFacilities( $action, \%Data );
     }
-    elsif ( $action =~ /^PROGRAM_TEMPLATE_/ ) {
-        ( $resultHTML, $pageHeading ) = handle_program_templates( $action, \%Data );
-    }
-    elsif ( $action =~ /^PROGRAM_/ ) {
-        ( $resultHTML, $pageHeading ) = handle_programs( $action, \%Data );
-    }
     elsif ( $action =~ /^AGREE_/ ) {
         ( $resultHTML, $pageHeading ) =
           handleAgreements( $action, \%Data, $typeID, $ID );
@@ -259,16 +247,6 @@ sub main {
     elsif ( $action =~ /^NOTS/ ) {
         ( $resultHTML, $pageHeading ) =
           handleNotifications( $action, \%Data, $client, $typeID, $ID );
-    }
-    elsif ($action =~/^OPTIN/) {
-        ( $resultHTML, $pageHeading ) =
-            handleOptins($action,\%Data, $client, $typeID, $ID);
-    }
-    elsif ($action =~/^MR_/) {
-        ( $resultHTML, $pageHeading ) = handle_member_records($action, \%Data);
-    }
-    elsif ($action =~/^MRT_/) {
-        ( $resultHTML, $pageHeading ) = handle_member_record_types($action, \%Data);
     }
     else {
         #$resultHTML=getWelcomeText(\%Data);

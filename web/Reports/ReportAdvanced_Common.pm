@@ -17,16 +17,10 @@ use Utils;
 use ConfigOptions;
 use CustomFields;
 use Countries;
-use MemberPackages;
 use FieldLabels;
-use FitnessTest;
-use Payments;
 use FormHelpers;
 use ClubCharacteristics;
-use MemberRecordType;
 use Log;
-use OptinObj;
-use Data::Dumper;
 
 
 sub getCommonValues {
@@ -185,20 +179,6 @@ sub getCommonValues {
 		$optvalues{'Seasons'} = \%SeasonData;
 	}
 
-    if ( $options->{'RecordTypes'} ) {
-        my $record_types = {} ;
-        my @record_type_order = ();
-        if ($Data->{'SystemConfig'}{'EnableMemberRecords'}) {
-            my $mrt_list = get_mrt_list_of_current_level($Data);
-            $record_types = hash_list_to_hash($mrt_list, 'intMemberRecordTypeID', 'strName');
-            @record_type_order = sort keys %{$record_types};
-        }
-        $optvalues{'RecordTypes'} = {
-            Order   => \@record_type_order,
-            Options => $record_types
-        };
-    }
-
 	if($options->{'AgeGroups'})	{
 
 		my %AgeGroups=();
@@ -296,137 +276,11 @@ sub getCommonValues {
 		}
 	}
 
-	if($options->{'SchoolGrades'})	{
-		if($Data->{'SystemConfig'}{'Schools'})  {
-			my %SchoolGrades=();
-			my @SchoolGradesOrder=();
-			my $statement = qq[
-				SELECT intGradeID, strName
-				FROM tblSchoolGrades
-				WHERE intSchoolRealm=$Data->{'SystemConfig'}{'Schools'}
-				ORDER BY intOrder ASC
-    	];
-    	my $query = $Data->{'db'}->prepare($statement);
-    	$query->execute;
-    	while (my($id, $strName) = $query->fetchrow_array) {
-				$SchoolGrades{$id}=$strName || '';
-				push @SchoolGradesOrder, $id;
-    	}
-			$optvalues{'SchoolGrades'} = {
-				Order => \@SchoolGradesOrder,
-				Options => \%SchoolGrades,
-			};
-		}
-	}
 	if($options->{'Countries'})	{
   	my @countries=getCountriesArray($Data);
   	my %countriesonly=();
   	for my $c (@countries)  { $countriesonly{$c}=$c;  }
 		$optvalues{'Countries'} = \%countriesonly;
-	}
-
-    if ( $options->{'Optins'} ) {
-        my $level = $clientValues_ref->{'currentLevel'} || 0;
-        my $clubID = $clientValues_ref->{'clubID'} || 0;
-        my $assocID = $clientValues_ref->{'assocID'} || 0;
-        my $stateID = $clientValues_ref->{'stateID'} || 0;
-        my $regionID = $clientValues_ref->{'regionID'} || 0;
-        my $zoneID = $clientValues_ref->{'zoneID'} || 0;
-        my $natID = $clientValues_ref->{'natID'} || 0;
-        my $realmID = $Data->{'Realm'} || 0;
-        
-        my $entityID;
-
-        if ( $level == $Defs::LEVEL_CLUB ) {
-            $entityID = $clubID;
-        }
-        elsif ( $level == $Defs::LEVEL_ASSOC ) {
-            $entityID = $assocID;
-        }
-        elsif ( $level == $Defs::LEVEL_STATE ) {
-            $entityID = $stateID;
-        }
-        elsif($level == $Defs::LEVEL_REGION){
-            $entityID = $regionID;
-        }
-        elsif($level == $Defs::LEVEL_ZONE){
-            $entityID = $zoneID;
-        }
-        elsif ( $level == $Defs::LEVEL_NATIONAL ) {
-            $entityID = $natID;
-        }
-        else {
-             # do nothing
-        }
-        my $optinObj = OptinObj->getHierarchical(dbh=>$Data->{'db'}, entityTypeID=>$level, entityID=>$entityID, assocID=>$assocID, upperLevel=>100);
-        my @optins_order = ();
-        my %optins_vals = (); 
-        foreach my $optin (@$optinObj){
-            push @optins_order, $optin->{'DBData'}{'intOptinID'};
-            $optins_vals{$optin->{'DBData'}{'intOptinID'}} = $optin->{'DBData'}{'strOptinText'};
-        }
-        $optvalues{'Optins'} = { 
-            Order  => \@optins_order,
-            Options => \%optins_vals, 
-        };
-    }
-
-    if ( $options->{'Terms'} ) {
-        my $currentLevel = $Data->{'clientValues'}{'currentLevel'};
-        my $assocID = $clientValues_ref->{'assocID'} || 0;
-        my $st_terms = qq[ SELECT DISTINCT RF.intRegoFormID, CONCAT( RF.intRegoFormID, ' - ', RF.strRegoFormName ) FROM tblTermsMember AS TM INNER JOIN tblRegoForm AS RF ON TM.intFormID=RF.intRegoFormID WHERE TM.intLevel=$currentLevel AND RF.intAssocID=$assocID ];
-		my ($terms_vals,$terms_order)=getDBdrop_down_Ref($Data->{'db'},$st_terms,'');
-		$optvalues{'Terms'} = {
-			Order => $terms_order,
-			Options => $terms_vals,
-		};
-    }
-
-	if($options->{'MemberPackages'})	{
-		$optvalues{'MemberPackages'} = getMemberPackages($Data) || undef;
-	}
-
-	if($options->{'Grades'})	{
-		my $st_grades=qq[ SELECT intAssocGradeID,strGradeDesc FROM tblAssoc_Grade WHERE intAssocID=$Data->{'clientValues'}{'assocID'}];
-		my ($grades_vals,$grades_order)=getDBdrop_down_Ref($Data->{'db'},$st_grades,'');
-		$optvalues{'Grades'} = {
-			Order => $grades_order,
-			Values => $grades_vals,
-		};
-	}
-
-	if($options->{'MYOB'})	{
-		my $st_myob=qq[ 
-			SELECT 
-				intMyobExportID, 
-				CONCAT(strCurrencyRun, ' - ', strRunName, IF(intPaymentType=2, ' PAYPAL', ' NAB')) as RunName 
-			FROM 
-				tblPaymentSplitMyobExport as P
-				INNER JOIN tblAssoc as A ON (A.intAssocID=$Data->{'clientValues'}{'assocID'}) INNER JOIN tblPaymentConfig as PC ON (PC.intPaymentConfigID=A.intPaymentConfigID)
-			WHERE 
-				P.strCurrencyRun = PC.strCurrency 
-				AND intPaymentType IN (2,3) 
-			ORDER BY 
-				dtRun DESC, intMyobExportID DESC
-		];
-		if (! $Data->{'clientValues'}{'assocID'} or $Data->{'clientValues'}{'assocID'} == $Defs::INVALID_ID)	{
-			$st_myob=qq[ 
-			SELECT 
-				intMyobExportID, 
-				CONCAT(strCurrencyRun, ' - ', strRunName, IF(intPaymentType=2, ' PAYPAL', ' NAB')) as RunName 
-			FROM 
-				tblPaymentSplitMyobExport as P
-			WHERE 
-				intPaymentType IN (2,3) 
-			ORDER BY 
-					intMyobExportID DESC
-			];
-		}
-		my ($myob_vals,$myob_order)=getDBdrop_down_Ref($Data->{'db'},$st_myob,'');
-		$optvalues{'MYOB'} = {
-			Order => $myob_order,
-			Values => $myob_vals,
-		};
 	}
 
 	if($options->{'ContactRoles'})	{
@@ -501,32 +355,6 @@ sub getCommonValues {
 		}
 		$optvalues{'EntityCategories'} = \%EntityCategories;
 	}
-
-    if($options->{'AccreName'}) {
-        
-     my %AccreName=();
-        {
-            my $statement = qq[
-               SELECT
-                    intQualificationID,
-                    strName 
-               FROM 
-                    tblQualification
-               WHERE intRealmID = ?
-            ];
-            my $query = $Data->{'db'}->prepare($statement);
-            $query->execute($Data->{'Realm'});
-            while (my ($id ,$strName) = $query->fetchrow_array) {
-
-                $AccreName{$id} = $strName || '';
-            }
-        }
-        $optvalues{'AccreName'} = {
-            Values => \%AccreName,
-        };
-
-    }  
-
 
 	return \%optvalues;
 }

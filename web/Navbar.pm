@@ -21,8 +21,6 @@ use PaymentSplitUtils;
 use MD5;
 use InstanceOf;
 use PageMain;
-use ProgramUtils;
-use ProgramTemplateUtils;
 use FacilitiesUtils;
 
 use ServicesContacts;
@@ -186,8 +184,6 @@ sub getNodeMenuData {
     my $txt_Clr_ListOnline = $SystemConfig->{'txtCLRListOnline'} || "List Online $txt_Clr"."s";
 
     my ($facility_singular, $facility_plural) = get_facility_titles($Data);
-    my ($program_template_singular, $program_template_plural) = get_program_template_titles($Data);
-    my ($program_singular, $program_plural) = get_program_titles($Data);
 
     my $paymentSplitSettings = getPaymentSplitSettings($Data);
     my $baseurl = "$target?client=$client&amp;";
@@ -308,31 +304,9 @@ sub getNodeMenuData {
                 };
             }
         }
-
-        if ($SystemConfig->{'AllowNationalFacilitiesAddLevel'} &&
-            $currentLevel >= $SystemConfig->{'AllowNationalFacilitiesAddLevel'} ) {
-            $menuoptions{'facilitieslist'} = {
-                name => $facility_plural . ' list',
-                url => $baseurl."a=FACILITY_L",
-            };
-        }
-
-        if ($SystemConfig->{'AllowProgramTemplateAddLevel'} &&
-            $currentLevel >= $SystemConfig->{'AllowProgramTemplateAddLevel'} ) {
-            $menuoptions{'programsTemplatelist'} = {
-                name => $program_template_plural . ' List',
-                url => $baseurl."a=PROGRAM_TEMPLATE_L",
-            };
-        }
     }
 
     # for Node menu
-    if ($SystemConfig->{'EnableMemberRecords'}) {
-        $menuoptions{'mrt_admin'} = {
-            name => $lang->txt('Member Record Types'),
-            url => $baseurl."a=MRT_ADMIN_LIST",
-        };
-    }
 
     if(!$SystemConfig->{'NoAuditLog'}) {
         $menuoptions{'auditlog'} = {
@@ -356,10 +330,6 @@ sub getNodeMenuData {
         ]],
         [ $lang->txt($facility_plural) , 'menu', [
         'facilitieslist',
-        ]],
-        [ $lang->txt($program_plural) , 'menu', [
-        'programslist',
-        'programsTemplatelist',
         ]],
         [ $lang->txt('Registrations'), 'menu',[
         'bankdetails',
@@ -412,7 +382,6 @@ sub getAssocMenuData {
     my $txt_Clr = $SystemConfig->{'txtCLR'} || 'Clearance';
     my $txt_Clr_ListOnline = $SystemConfig->{'txtCLRListOnline'} || "List Online $txt_Clr"."s";
     my $txt_Clr_ListOffline = "List Offline $txt_Clr"."s";
-    my ($program_singular, $program_plural) = get_program_titles($Data);
 
     my $swol_url = $Defs::SWOL_URL;
     $swol_url = $Defs::SWOL_URL_v6 if ($Data->{'SystemConfig'}{'AssocConfig'}{'olrv6'});
@@ -572,13 +541,6 @@ sub getAssocMenuData {
                 };
             }
 
-            if ($SystemConfig->{'AssocConfig'}{'AllowPrograms'} || $SystemConfig->{'AllowPrograms'}) {
-                $menuoptions{'programlist'} = {
-                    name => $lang->txt('List ' . $program_plural),
-                    url => $baseurl."a=PROGRAM_L",
-                };
-            }
-
         }
     }
 
@@ -607,13 +569,6 @@ sub getAssocMenuData {
 
 
     # for assoc menu
-    if ($SystemConfig->{'EnableMemberRecords'}) {
-        $menuoptions{'mrt_admin'} = {
-            name => $lang->txt('Member Record Types'),
-            url => $baseurl."a=MRT_ADMIN_LIST",
-        };
-    }
-
     if(!$SystemConfig->{'NoAuditLog'}) {
         $menuoptions{'auditlog'} = {
             name => $lang->txt('Audit Log'),
@@ -650,9 +605,6 @@ sub getAssocMenuData {
         ]],
         [ $lang->txt('Reports'), 'menu',[
         'reports',
-        ]],
-        [ $lang->txt($program_plural), 'menu',[
-        'programlist',
         ]],
         [ $lang->txt('Search'), 'search',[
         'advancedsearch',
@@ -869,12 +821,6 @@ sub getClubMenuData {
     }
 
     # for club menu
-    if ($SystemConfig->{'EnableMemberRecords'}) {
-        $menuoptions{'mrt_admin'} = {
-            name => $lang->txt('Member Record Types'),
-            url => $baseurl."a=MRT_ADMIN_LIST",
-        };
-    }
 
     if(!$SystemConfig->{'NoAuditLog'}) {
         $menuoptions{'auditlog'} = {
@@ -1124,12 +1070,6 @@ sub getMemberMenuData {
         },
     );
     if(!$invalid_club) {
-        if($SystemConfig->{'EnableMemberRecords'}) {
-            $menuoptions{'records'} = {
-                name => $lang->txt('Member Records'),
-                url => $baseurl."a=MR_LIST",
-            };
-        }
         if(!$SystemConfig->{'NoAuditLog'}) {
             $menuoptions{'auditlog'} = {
                 name => $lang->txt('Audit Log'),
@@ -1190,7 +1130,6 @@ sub getMemberMenuData {
         'clubs',
         'seasons',
         ]],
-        [ $lang->txt('Member Records'), 'menu', 'records'],
         [ $lang->txt('System'), 'system',[
         'auditlog',
         ]],

@@ -59,7 +59,7 @@ sub showMemberHome	{
 		}
 
 	}
-	my $accreditations = ($Data->{'SystemConfig'}{'NationalAccreditation'}) ? AccreditationDisplay::ActiveNationalAccredSummary($Data, $memberID) : ActiveAccredSummary($Data, $memberID, $Data->{'clientValues'}{'assocID'});
+	my $accreditations = ($Data->{'SystemConfig'}{'NationalAccreditation'}) ? AccreditationDisplay::ActiveNationalAccredSummary($Data, $memberID) : '';#ActiveAccredSummary($Data, $memberID, $Data->{'clientValues'}{'assocID'});
 
   my $docs = getUploadedFiles(
     $Data,
@@ -425,20 +425,10 @@ sub getSeasonStuff_ClubLevel	{
 				$td_ref->{'registerInto_'.$season.'Season_URL_add'}='';
 				$td_ref->{'registerInto_'.$season.'Season_ACTION'} = $action;
 				if ($action =~ /ADD/)	{
-                    if ($Data->{'SystemConfig'}{'EnableMemberRecords'}) {
-                        $td_ref->{'registerInto_'.$season.'Season_URL_add'} = "$Data->{'target'}?client=$Data->{'client'}&amp;a=MR_EDIT&amp;season_id=$seasonID";
-                    }
-                    else {
                         $td_ref->{'registerInto_'.$season.'Season_URL_add'} = "$Data->{'target'}?client=$Data->{'client'}&amp;a=$action&amp;d_intSeasonID=$seasonID";
-                    }
 				}
 				else	{
-                    if ($Data->{'SystemConfig'}{'EnableMemberRecords'}) {
-					    $td_ref->{'registerInto_'.$season.'Season_URL_edit'} = "$Data->{'target'}?client=$Data->{'client'}&amp;a=MR_EDIT&amp;season_id=$seasonID&mr_id=$msID";
-                    }
-                    else {
 					    $td_ref->{'registerInto_'.$season.'Season_URL_edit'} = "$Data->{'target'}?client=$Data->{'client'}&amp;a=$action&amp;d_intSeasonID=$seasonID&msID=$msID";
-                    }
 				}
 			}
 	#if we have a season record and it has a minus one status and we have blocked season access it was incorrectly flagging people as registered

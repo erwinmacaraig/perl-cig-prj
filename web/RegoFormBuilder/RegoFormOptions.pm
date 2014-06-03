@@ -42,9 +42,7 @@ use RegoFormFieldObj;
 use RegoFormRuleObj;
 use RegoFormNrsUtils;
 use TempNodeStructureObj;
-use MemberRecordType;
 use Log;
-use Data::Dumper;
 
 sub handle_regoform_options {
     my ($action, $Data, $assocID, $typeID)=@_;
@@ -1111,20 +1109,10 @@ EOS
         regoform_type_team_assoc        => $Defs::REGOFORM_TYPE_TEAM_ASSOC,
         payment_compulsory_checked      => $payment_compulsory_checked,
         allow_if_not_in_national_system => $allow_if_not_in_national_system,
-        enable_member_record            => $Data->{'SystemConfig'}{'EnableMemberRecords'},
         nrsConfig                       => $nrsConfig,
     );
 
     if ($form_type != $Defs::REGOFORM_TYPE_TEAM_ASSOC) {
-        if ($Data->{'SystemConfig'}{'EnableMemberRecords'}) {
-            $templateData{'all_member_record_types'} = get_mrt_select_list($Data);
-
-            for my $item (@{$templateData{'all_member_record_types'}}) {
-                if (first { $_ == $item->{'intMemberRecordTypeID'} } @allow_member_record_types) {
-                    $item->{'selected'} = 'selected';
-                }
-            }
-        }
 
         $templateData{'allow_player'}     = $allow_player,
         $templateData{'allow_coach'}      = $allow_coach,

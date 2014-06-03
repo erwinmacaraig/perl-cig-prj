@@ -4,7 +4,7 @@ require Exporter;
 use strict;
 use CGI;
 
-use lib "user";
+use lib "user","../user";
 use Data::Random qw(:all);
 use UserObj;
 

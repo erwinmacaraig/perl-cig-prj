@@ -40,11 +40,7 @@ use Payments;
 use Utils;
 use DBUtils;
 
-use OptinObj;
-use OptinMemberObj;
-use TermsMemberObj;
 use TempNodeStructureObj;
-use MemberRecords;
 use Log;
 
 sub setMemberTypes  {
@@ -335,10 +331,6 @@ sub rego_postMemberUpdate  {
 					)
 				], $id, $assocID, @cfieldvals);
 
-                if ($Data->{'SystemConfig'}{'EnableMemberRecords'}) {
-                    my @record_types = split(',', $params->{'d_MemberRecordTypeList'});
-                    create_member_records($Data, $id, \@record_types, 1);
-                }
 			}
 			if (!$isTemp) {#if it's not a temp then we need transactions
 				$txns_added = insertRegoTransaction($Data, $id, $params, $assocID, $Defs::LEVEL_MEMBER, $session, $teamID, $clubID);
@@ -504,7 +496,6 @@ sub rego_postMemberUpdate  {
 		}
 		
         #do update for optins and t&cs.
-        checkForOptins($id, $params, $Data, $assocID, $clubID);
         checkForTermsAndConditions($id, $params, $Data);
 
 		$Data->{'clientValues'}{'memberID'} = $id;
@@ -672,89 +663,6 @@ sub rego_postMemberUpdate  {
 		return (1, $auth_body);
 	}
 	return (1, q{});
-}
-
-#this will apply to both linked and unlinked forms.
-sub checkForOptins {
-    my ($id, $params, $Data, $assocID, $clubID) = @_;
-
-    my $dbh = $Data->{'db'};
-
-    my $checkField   = 'cbOptin_';
-
-    my @levelsForOptinGen = ();
-
-    if ($Data->{'SystemConfig'}{'LevelsForOptinGen'}) {
-        my $lfog = $Data->{'SystemConfig'}{'LevelsForOptinGen'};
-
-        $lfog =~ s/ //g; #remove all spaces
-
-        my $delimiter = ($lfog =~ /\|/) ? '\|' : ','; #either a pipe or a comma could be used as a delimiter
-
-        @levelsForOptinGen = split($delimiter, $lfog);
-    }
-
-
-    foreach my $param (keys %$params) {
-        if ($param =~ /$checkField/) {
-            my $optinID    = $param;
-            my $optinValue = $params->{$param};
-
-            $optinValue = 0 if $optinValue eq '-1'; #would initially have been set to -1 to force carryover.
-            $optinID =~ s/^$checkField//;
-     
-            my $optinObj = OptinObj->load(db=>$dbh, ID=>$optinID);
-            if ($optinObj->isDefined()) {
-                foreach my $level (@levelsForOptinGen) {
-                    my $entityTypeID = 0;
-                    my $entityID     = 0;
-                    if ($level == $Defs::LEVEL_CLUB) {
-                        if ($clubID > 0) {
-                            $entityTypeID = $Defs::LEVEL_CLUB;
-                            $entityID     = $clubID;
-                        }
-                    }
-                    elsif ($level == $Defs::LEVEL_ASSOC) {
-                        $entityTypeID = $Defs::LEVEL_ASSOC;
-                        $entityID     = $assocID;
-                    }
-                    elsif ($level <= $optinObj->getValue('intEntityTypeID')) {
-                        $entityTypeID = $level;
-                        my $tempNodeStructureObj = TempNodeStructureObj->load(db=>$dbh, ID=>$assocID);
-                        $entityID = $tempNodeStructureObj->getValue('int'.$level.'_ID');
-                    }
-                    my $retID = createMemberOptin($dbh, $optinID, $entityTypeID, $entityID, $id, $params->{'formID'}, $optinValue) if ($entityTypeID and $entityID);
-                }
-            }
-        }
-    }
-    return 1;
-}
-
-sub createMemberOptin {
-    my ($dbh, $optinID, $entityTypeID, $entityID, $memberID, $formID, $optinValue) = @_;
-
-    my $optinMemberObj = OptinMemberObj->new(db=>$dbh);
-    my $dbfields    = 'dbfields';
-    my $ondupfields = 'ondupfields';
-
-    $optinMemberObj->{$dbfields}    = ();
-    $optinMemberObj->{$ondupfields} = ();
-
-    $optinMemberObj->{$dbfields}{'intOptinID'}        = $optinID;
-    $optinMemberObj->{$dbfields}{'intEntityTypeID'}   = $entityTypeID;
-    $optinMemberObj->{$dbfields}{'intEntityID'}       = $entityID;
-    $optinMemberObj->{$dbfields}{'intMemberID'}       = $memberID;
-    $optinMemberObj->{$dbfields}{'intFormID'}         = $formID;
-    $optinMemberObj->{$dbfields}{'intAction'}         = $optinValue;
-    $optinMemberObj->{$dbfields}{'intActionedByID'}   = $memberID;
-    $optinMemberObj->{$dbfields}{'strUnsubscribeURL'} = $Defs::base_url . '/3rdparty_unsubscribe.cgi?id=' . encode( "optin=$optinID&entity_type=$entityTypeID&entity=$entityID&form=$formID&member=$memberID" );
-
-    $optinMemberObj->{$ondupfields} = ['intFormID', 'intAction', 'intActionedByID'];
-
-    my $retID = $optinMemberObj->save();
-
-    return $retID;
 }
 
 #this will apply to both linked and unlinked forms.

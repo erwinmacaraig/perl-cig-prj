@@ -850,8 +850,6 @@ next if $dref->{$k} eq "'0000-00-00'";
 	elsif($option =~ /^change/)	{ 
         $Data->{'db'}->do(qq[UPDATE tblTempMember SET intRealID = $existingid WHERE intRealID=$id_of_duplicate]);
 
-		$Data->{'db'}->do(qq[UPDATE tblOptinMember SET intMemberID = $existingid WHERE intMemberID = $id_of_duplicate]);
-		$Data->{'db'}->do(qq[UPDATE tblOptinMember SET intActionedByID = $existingid WHERE intActionedByID = $id_of_duplicate]);
 		$Data->{'db'}->do(qq[UPDATE tblTransactions SET intID = $existingid WHERE intID = $id_of_duplicate and intTableType=$Defs::LEVEL_MEMBER]);
 		$Data->{'db'}->do(qq[UPDATE tblClearance SET intMemberID = $existingid WHERE intMemberID=$id_of_duplicate]);
 		$Data->{'db'}->do(qq[UPDATE IGNORE tblAuth SET intID = $existingid WHERE intLevel=1 AND intID=$id_of_duplicate]);
@@ -860,10 +858,6 @@ next if $dref->{$k} eq "'0000-00-00'";
 		my $realmID = $Data->{'Realm'};
 
 		$Data->{'db'}->do(qq[UPDATE IGNORE tblMember_ClubsClearedOut SET intMemberID= $existingid WHERE intMemberID=$id_of_duplicate]);
-
-		$Data->{'db'}->do(qq[UPDATE IGNORE tblTermsMember SET intMemberID = $existingid WHERE intMemberID=$id_of_duplicate]);
-        $Data->{'db'}->do(qq[UPDATE IGNORE tblProgramEnrolment SET intMemberID = $existingid WHERE intMemberID = $id_of_duplicate]);
-
 
 		### The below update statements are required when the resolution has duplicates within the same assoc.
 		$Data->{'db'}->do(qq[UPDATE tblMember_Clubs SET intStatus=$Defs::RECSTATUS_DELETED WHERE intMemberID=$id_of_duplicate]);

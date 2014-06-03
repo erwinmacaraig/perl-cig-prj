@@ -28,7 +28,6 @@ require InstanceOf;
 require Seasons;
 require PaymentApplication;
 require AgeGroups;
-require ProgramObj;
 
 sub checkProductClubSplit   {
 
@@ -101,50 +100,19 @@ sub handle_products {
 	my($Data, $action)=@_;
 
 	my $id=param('lki') || 0;
-	my $program_id = param('programID') || 0;
 	
 	my $body='';
 	my $title = "Products";
 	my $breadcrumbs = '';
 	
-	my $program_obj;
-	
-	if ($program_id){
-	    # get program obj
-	    $program_obj = ProgramObj->new(
-            'ID' => $program_id,
-            'db' => $Data->{'db'},
-        );
-        
-        $program_obj->load();
-	    
-	    # Check if we have permission
-	    my $permission = $program_obj->have_permission({
-            'realm_id'    => $Data->{'Realm'}, 
-            'subrealm_id' => $Data->{'RealmSubType'},
-            'assoc_id'    => $Data->{'clientValues'}{'assocID'} || $Defs::INVALID_ID,
-            'auth_level'  => $Data->{'clientValues'}{'authLevel'},
-        });
-        
-        if ($permission) {
-            # We can look for products for this program;
-            setClientValue($Data->{'clientValues'}, $Defs::LEVEL_PROGRAM, $program_id);
-        }
-        else{
-            # Thank You Mario, But Our Princess is in Another Castle
-            return ('You do not have permission to edit products for this Program', $title);
-        }
-        
-	}
-	
 	if($action eq 'A_PR_U')	{
-		($body, $id) =update_products($Data, $id, $program_obj);
+		($body, $id) =update_products($Data, $id);
 		$action = 'A_PR_E' if $id;
 	}
 	elsif($action eq 'A_PR_DU')	{
 		$id=param('defproduct') || 0;
 		my $id_team=param('defteamproduct') || 0;
-		$body=update_defaultproduct($Data, $id, $id_team, $program_obj);
+		$body=update_defaultproduct($Data, $id, $id_team);
 		$action = 'A_PR_L';
 	}
 	elsif($action eq 'A_PR_C')	{
@@ -153,11 +121,11 @@ sub handle_products {
 	}
 	if($action eq 'A_PR_E')	{
 		my $tbody = '';
-		($tbody, $title, $breadcrumbs)=detail_products($Data,$id, $program_obj);
+		($tbody, $title, $breadcrumbs)=detail_products($Data,$id);
 		$body .= $tbody;
 	}
 	else	{
-		$body.=list_products($Data, $program_obj);
+		$body.=list_products($Data);
 	}
 	$title ||= "Products";
 	return ($body,$title, $breadcrumbs);
@@ -165,17 +133,12 @@ sub handle_products {
 
 
 sub list_products	{
-	my($Data, $program_obj) = @_;
+	my($Data) = @_;
 	my $realmID = $Data->{'Realm'} || 0;
     my $target = $Data->{'target'};
     my $client = setClient($Data->{'clientValues'});
     
     my $current_level = $Data->{'clientValues'}{'currentLevel'};
-    
-    if ( ref $program_obj ){
-        # Need to change the current level
-        $current_level = $Defs::LEVEL_PROGRAM;
-    }
     
 	my $assocID = $Data->{'clientValues'}{'assocID'} || $Defs::INVALID_ID;
 	my $intID = getID($Data->{'clientValues'}, $current_level) || 0;
@@ -258,16 +221,6 @@ sub list_products	{
         ]; 
 	}
 
-	if ( $current_level == $Defs::LEVEL_PROGRAM ){
-	    my $product_list = $program_obj->get_products();
-	    
-	    my $product_ids = join(', ', @$product_list);
-	    
-	    $st .=qq[
-                AND P.intProductID IN ($product_ids)
-        ]; 
-	}
-	
 	$st .= qq[
 		ORDER BY 
 			P.strGroup, 
@@ -293,12 +246,7 @@ sub list_products	{
 		my $link = qq[$target?client=$client&amp;lki=$dref->{'intProductID'}&amp;a=A_PR_E];
 		$link = '' if $Data->{'ReadOnlyLogin'};
 		
-		if ( $current_level == $Defs::LEVEL_PROGRAM ){
-		    if ($link){
-		        $link .= '&amp;programID=' . $program_obj->ID();
-		    }
-        }
-        elsif ($current_level != $dref->{'intCreatedLevel'} or $dref->{'intCreatedID'} != $intID) {
+        if ($current_level != $dref->{'intCreatedLevel'} or $dref->{'intCreatedID'} != $intID) {
             $link = 'Locked' if $dref->{intMinChangeLevel} > $current_level;
             $link = 'Locked' if $dref->{intMinSellLevel} > $current_level;
         }
@@ -456,23 +404,14 @@ sub list_products	{
 
 
 sub detail_products  {
-    my($Data, $id, $program_obj)=@_;
+    my($Data, $id)=@_;
 
     my $cl  = setClient($Data->{'clientValues'});
     my $unesc_cl = unescape($cl);
     
     my $current_level = $Data->{'clientValues'}{'currentLevel'};
     my $original_level = $current_level;
-    my $program_id = 0;
     
-    if ( ref $program_obj ){
-        # Need to change the current level
-        $current_level = $Defs::LEVEL_PROGRAM;
-        $program_id = $program_obj->ID();
-        setClientValue($Data->{'clientValues'}, $Defs::LEVEL_PROGRAM, $program_id);
-        $Data->{'clientValues'}{'currentLevel'} = $Defs::LEVEL_PROGRAM;
-    }
-
     my $assocID   = $Data->{'clientValues'}{'assocID'} || $Defs::INVALID_ID;
 	my $authLevel = $Data->{'clientValues'}{'authLevel'};
 
@@ -1173,42 +1112,6 @@ Older end of Date Range (eg 01 - Jan - 1970)</td>
 							</tr>
 							];
                 
-                if ( $Data->{'SystemConfig'}{'AllowProgramTemplateAddLevel'}  #program template add level 
-                    && $current_level >= $Data->{'SystemConfig'}{'AllowProgramTemplateAddLevel'}){
-                    my $product_program_new       = getProductAttributes($Defs::PRODUCT_PROGRAM_NEW, $Data, $id);
-                    my $product_program_returning = getProductAttributes($Defs::PRODUCT_PROGRAM_RETURNING, $Data, $id);
-                    
-                    my $checked = {
-                        'none' => '',
-                        $Defs::PRODUCT_PROGRAM_NEW => '',
-                        $Defs::PRODUCT_PROGRAM_RETURNING => '',
-                    };
-                    
-                    if (ref $product_program_new eq 'ARRAY' && $product_program_new->[0]){
-                        $checked->{$Defs::PRODUCT_PROGRAM_NEW} = ' CHECKED ';
-                    }
-                    elsif (ref $product_program_returning eq 'ARRAY' && $product_program_returning->[0]){
-                        $checked->{$Defs::PRODUCT_PROGRAM_RETURNING} = ' CHECKED ';
-                    }
-                    else {
-                        $checked->{'none'} = ' CHECKED ';
-                    }
-                    
-                    $body .= qq[
-                        <tr>
-                            <td class="label"><label for="programFilters">Program Filters:</label></td>
-                            <td class="data">
-                                <input type="radio" name="programFilter" value="none" $checked->{none} >No Restrictions<br>
-                                <input type="radio" name="programFilter" value="$Defs::PRODUCT_PROGRAM_NEW" $checked->{$Defs::PRODUCT_PROGRAM_NEW} >New Members Only<br>
-                                <input type="radio" name="programFilter" value="$Defs::PRODUCT_PROGRAM_RETURNING" $checked->{$Defs::PRODUCT_PROGRAM_RETURNING} >Returning Members Only
-                            </td>
-                        </tr>
-                    ];
-                
-                }
-                
-							
-							
 				$body .= qq[		</table>
 					</div>
 				];
@@ -1339,15 +1242,14 @@ $body .= qq[
                 <input type="hidden" name="a" value="A_PR_U">
                 <input type="hidden" name="client" value="$unesc_cl">
                 <input type="hidden" name="lki" value="$id">
-                <input type="hidden" name="programID" value="$program_id">
                 </form>
-               <p><a href="$Data->{target}?client=$cl&amp;a=A_PR_L&amp;programID=$program_id">Click here</a> to return to product list.</p>
+               <p><a href="$Data->{target}?client=$cl&amp;a=A_PR_L&amp;">Click here</a> to return to product list.</p>
                 ];
 		my $breadcrumbs = HTML_breadcrumbs(
 				[
             'Products',
             'main.cgi',
-            { client => $unesc_cl, a => 'A_PR_L', programID => $program_id },
+            { client => $unesc_cl, a => 'A_PR_L'},
         ],
         [ $dref->{'strName'}],
     );
@@ -1408,11 +1310,6 @@ $body .= qq[
                    ];
     
     $scripts .= $validation_js;
-    
-    if ( ref $program_obj ){
-        # Need to change the current level back to what it was
-        $Data->{'clientValues'}{'currentLevel'} = $original_level;
-    }
     
     return ( $scripts . $body, "Edit Products - $dref->{'strName'}", $breadcrumbs);
 }
@@ -1529,7 +1426,7 @@ sub checkSplitValue {
 
 
 sub update_products	{
-	my($Data, $id, $program_obj)=@_;
+	my($Data, $id)=@_;
 
 	my $realmID=$Data->{'Realm'} || 0;
   my $target=$Data->{'target'};
@@ -1537,14 +1434,6 @@ sub update_products	{
     my $current_level = $Data->{'clientValues'}{'currentLevel'};
     my $original_level = $current_level;
     
-    if ( ref $program_obj ){
-        # Need to change the current level
-        $current_level = $Defs::LEVEL_PROGRAM;
-        my $program_id = $program_obj->ID();
-        setClientValue($Data->{'clientValues'}, $Defs::LEVEL_PROGRAM, $program_id);
-        $Data->{'clientValues'}{'currentLevel'} = $Defs::LEVEL_PROGRAM;
-    }
-
 	my $assocID=$Data->{'clientValues'}{'assocID'} || $Defs::INVALID_ID;
 	$assocID = 0 if $assocID == $Defs::INVALID_ID;
 
@@ -1617,8 +1506,6 @@ sub update_products	{
 	my @memberTypes = param('memberTypes');
 	my @ageGroups = param('ageGroups');
 	
-	my $program_filters = param('programFilter');
-
 	my $expiryMemberDt = 'NULL';
 	my $expiryMemberDays = 0;
 	my $expiryProductDt = 'NULL';
@@ -1796,8 +1683,6 @@ EOS
 	    $attributes_to_update{$Defs::PRODUCT_AGE_MIN} = [ $age_min ];
         $attributes_to_update{$Defs::PRODUCT_AGE_MAX} = [ $age_max ];
 	    
-	    $attributes_to_update{$Defs::PRODUCT_PROGRAM_NEW} = [ ( $program_filters == $Defs::PRODUCT_PROGRAM_NEW ) ? 1 : 0 ];
-	    $attributes_to_update{$Defs::PRODUCT_PROGRAM_RETURNING} = [ ( $program_filters == $Defs::PRODUCT_PROGRAM_RETURNING ) ? 1 : 0 ];
 
 		_update_product_attributes($Data,$id, \%attributes_to_update );
 		update_product_renew_fields(
@@ -1953,14 +1838,6 @@ EOS
 				$attributes_to_insert{$Defs::PRODUCT_AGE_MAX} = [ $age_max ];
 		}
 		
-        if ( $program_filters and $program_filters == $Defs::PRODUCT_PROGRAM_NEW ){
-            $attributes_to_insert{$Defs::PRODUCT_PROGRAM_NEW} = [1];
-        }
-        
-        if ( $program_filters and $program_filters == $Defs::PRODUCT_PROGRAM_RETURNING ){
-            $attributes_to_insert{$Defs::PRODUCT_PROGRAM_RETURNING} = [1];
-        }
-
 		_insert_product_attributes($Data,$id, \%attributes_to_insert );
 
 		auditLog(
@@ -2038,11 +1915,6 @@ EOS
 			$dberr++ if $DBI::err;
 	}
 	
-	if ( ref $program_obj ){
-	    # Have to set the level back
-	    $Data->{'clientValues'}{'currentLevel'} = $original_level;
-	}
-
 	return ($dbErrMsg, 0) if $dberr;
 	if($amount>0 and $amount<25) {	
 		return (qq[<div class="OKmsg">The product has been successfully saved.</div><div class="warningmsg"> However this product may incur processing fees due to its low price.</div>],$id);
