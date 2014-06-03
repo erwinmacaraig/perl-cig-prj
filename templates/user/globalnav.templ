@@ -8,7 +8,7 @@
 <div class="sp-sign-in-out-wrap">
         <div class="nav-tools">
                         <div class = "navoptions">
-                                <span class="nav-link"><a href ="[% PassportURL %]/account/"><span id="SPPassportName"></span></a></span>
+                                <span class="nav-link"><a href ="[% PassportURL %]/account/">[% Data.UserName %]</a></span>
                                 <span class="nav-link"><a href ="http://support.sportingpulse.com">Support</a></span>
                                 <span class="nav-link"><a href ="[% BaseURL %]/passport/logout.cgi">Sign out</a></span>
                         </div>
@@ -17,25 +17,7 @@
 </div>
 </div>
 <script>
-jQuery(document).ready(function(){
-        jQuery("#gnav-arrow-wrap").click(function () {
-                loadglobnavdata();
-                jQuery("#pushdown-wrapper").slideToggle("slow");
-                jQuery("#globalnav").toggleClass("arrowup");
-        });
-                jQuery.getJSON("[% PassportURL %]/PassportSession/?callback=?", function(data) {
-                        if(data.name)   {
-                                jQuery('#SPPassportName').text(data.name);
-                                jQuery('.spp_loggedout').hide();
-                                jQuery('.spp_loggedin').show();
-                        }
-                });
-    if ( (jQuery.browser.msie && jQuery.browser.version < 9.0) )
-        {
-        jQuery('body').addClass('old-ie');
-    }
-
-});
+jQuery(document).ready(function());
 
   function clickclear(thisfield, defaulttext) {
     if (thisfield.value == defaulttext) {
@@ -48,16 +30,6 @@ jQuery(document).ready(function(){
     thisfield.value = defaulttext;
     }
   }
-function loadglobnavdata() {
-jQuery.ajax({
-  dataType: "jsonp",
-  url: "https://reg.sportingpulse.com/js/globalnav.js",
-  jsonpCallback : 'gncb',
-  success: function(data)       {
-     jQuery('#pushdown-wrapper').html(data.data || '');
-  }
-});
-}
 </script>
 <style>
 #global-nav-wrap {

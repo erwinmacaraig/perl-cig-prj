@@ -1,4 +1,4 @@
-package UserMemberObj;
+package UserObj;
 require Exporter;
 @ISA =  qw(Exporter);
 
@@ -17,6 +17,9 @@ sub new {
   $self->{'ID'}=$params{'id'};
   $self->{'db'}=$params{'db'};
   bless $self, $class;
+  if($self->{'ID'}) {
+    $self->load();
+  }
   return $self;
 }
 
@@ -34,9 +37,6 @@ sub load {
 
   $self->_load_Details(email => $email);
   return undef if !$self->{'DBData'};
-  $self->_load_DetailsOther();
-  $self->_load_Modules();
-  $self->_load_Subscriptions();
 
   return 1;
 }

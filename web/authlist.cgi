@@ -32,18 +32,22 @@ sub main {
     $Data{'cache'}  = new MCache();
     my $resultsentry = param('results') || 0;
 
-    my $user = new UserSession( db    => $db,
-                                 cache => $Data{'cache'}, );
+    my $user = new UserSession( 
+        db    => $db,
+        cache => $Data{'cache'}, 
+    );
     $user->load();
+
     my $uID = $user->id() || 0;
 
     if ( !$uID ) {
-        #redirectUserLogin( \%Data, );
+        $Data{'RedirectTo'} = "$Defs::base_url/";
     }
+    $Data{'UserName'} = $user->fullname();
 
     my $body = getAuthOrgLists(
-                                \%Data,
-                                $uID,
+        \%Data,
+        $uID,
     );
 
     my $title = 'User Authorisation';

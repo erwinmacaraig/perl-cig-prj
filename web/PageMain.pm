@@ -129,27 +129,6 @@ sub pageMain {
     $navbar||='';
     $body ||= textMessage($Data->{'lang'}->txt('NO_BODY'));
 
-    if($Data->{'WriteCookies'})    {
-        my $cookies_string = '';
-        my @cookie_array = ();
-        my $output = new CGI;
-        for my $i (@{$Data->{'WriteCookies'}})    {
-            push @cookie_array, $output->cookie(
-                -name=>$i->[0], 
-                -value=>$i->[1], 
-                -domain=>$Defs::cookie_domain, 
-                -secure=>0, 
-                -expires=> $i->[2] || '',
-                -path=>"/"
-            );
-            $cookies_string = join(',', @cookie_array);
-        }
-
-        print $output->header(-cookie=>[$cookies_string]); # -charset=>'UTF-8');
-    }
-    else    {
-        print "Content-type: text/html\n\n";
-    }
 
     $Data->{'AddToPage'} ||= new AddToPage;
     if($Data->{'SystemConfig'}{'HeaderBG'})    {
@@ -268,11 +247,43 @@ sub pageMain {
   }
 
     my $templateFile = 'page_wrapper/main_wrapper.templ';
-  my $page = runTemplate(
+    my $page = runTemplate(
         $Data, 
         \%TemplateData, 
         $templateFile
     );
+    my $header = '';
+    my $output = new CGI;
+    if($Data->{'WriteCookies'})    {
+        my $cookies_string = '';
+        my @cookie_array = ();
+        for my $i (@{$Data->{'WriteCookies'}})    {
+            push @cookie_array, $output->cookie(
+                -name=>$i->[0], 
+                -value=>$i->[1], 
+                -domain=>$Defs::cookie_domain, 
+                -secure=>0, 
+                -expires=> $i->[2] || '',
+                -path=>"/"
+            );
+            $cookies_string = join(',', @cookie_array);
+        }
+        my $p3p=q[policyref="/w3c/p3p.xml", CP="ALL DSP COR CURa ADMa DEVa TAIi PSAa PSDa IVAi IVDi CONi OTPi OUR BUS IND PHY ONL UNI COM NAV DEM STA"];
+
+        if($Data->{'RedirectTo'})   {
+            $header = $output->redirect (-uri => $Data->{'RedirectTo'},-cookie=>[$cookies_string], -P3P => $p3p);
+        }
+        else    {
+            $header = $output->header(-cookie=>[$cookies_string], -P3P => $p3p, -charset=>'UTF-8');
+        }
+    }
+    elsif($Data->{'RedirectTo'})    {
+        $header = $output->redirect ($Data->{'RedirectTo'});
+    }
+    else    {
+        $header = "Content-type: text/html\n\n";
+    }
+    print $header;
     print $page;
 }
 
@@ -337,27 +348,6 @@ sub pageForm    {
     $body||= textMessage("Oops !<br> This shouldn't be happening!<br> Please contact <a href=\"mailto:info\@sportingpulse.com\">info\@sportingpulse.com</a>");
  $Data->{'TagManager'}='';#getTagManager($Data);
 
-    if($Data->{'WriteCookies'})    {
-        my $cookies_string = '';
-        my @cookie_array = ();
-        my $output = new CGI;
-        for my $i (@{$Data->{'WriteCookies'}}){
-            push @cookie_array, $output->cookie(
-                -name=>$i->[0], 
-                -value=>$i->[1], 
-                -domain=>$Defs::cookie_domain, 
-                -secure=>0, 
-                -expires=> $i->[2] || '',
-                -path=>"/"
-            );
-            $cookies_string = join(',', @cookie_array);
-        }
-
-        print $output->header(-cookie=>[$cookies_string]); # -charset=>'UTF-8');
-    } else {
-        print "Content-type: text/html\n\n";
-    }
-
     my ($html_head, $page_header, $page_navigator, $paypal, $powered) = getPageCustomization($Data);
     my $meta = {};
     $meta->{'title'} = $title;
@@ -379,6 +369,38 @@ sub pageForm    {
         </script>
     ];
 
+    my $output = new CGI;
+    my $header = '';
+    if($Data->{'WriteCookies'})    {
+        my $cookies_string = '';
+        my @cookie_array = ();
+        for my $i (@{$Data->{'WriteCookies'}})    {
+            push @cookie_array, $output->cookie(
+                -name=>$i->[0],
+                -value=>$i->[1],
+                -domain=>$Defs::cookie_domain,
+                -secure=>0,
+                -expires=> $i->[2] || '',
+                -path=>"/"
+            );
+            $cookies_string = join(',', @cookie_array);
+        }
+        my $p3p=q[policyref="/w3c/p3p.xml", CP="ALL DSP COR CURa ADMa DEVa TAIi PSAa PSDa IVAi IVDi CONi OTPi OUR BUS IND PHY ONL UNI COM NAV DEM STA"];
+
+        if($Data->{'RedirectTo'})   {
+            $header = $output->redirect (-uri => $Data->{'RedirectTo'},-cookie=>[$cookies_string], -P3P => $p3p);
+        }
+        else    {
+            $header = $output->header(-cookie=>[$cookies_string], -P3P => $p3p, -charset=>'UTF-8');
+        }
+    }
+    elsif($Data->{'RedirectTo'})    {
+        $header = $output->redirect ($Data->{'RedirectTo'});
+    }
+    else    {
+        $header = "Content-type: text/html\n\n";
+    }
+    print $header;
     print runTemplate($Data, $meta, 'main.templ');
 }
 

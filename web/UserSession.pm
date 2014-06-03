@@ -4,7 +4,9 @@ require Exporter;
 use strict;
 use CGI;
 
+use lib "user";
 use Data::Random qw(:all);
+use UserObj;
 
 sub new {
   my $this = shift;
@@ -52,8 +54,21 @@ sub create  {
 
   $self->{'key'} = _newKey();
     
-  if($self->{'cache'})  {
-    $self->{'cache'}->set('pp',"USESSION-".$self->{'key'}, $self->{'UserID'},'',8*60);
+  if($self->{'UserID'}) {
+    my $user = new UserObj(db => $self->{'db'}, id => $self->{'UserID'});
+    if($user->ID()) {
+      my %cdata = (
+        UserID => $user->ID(),
+        Status => $user->Status(),       
+        FirstName => $user->FirstName(),       
+        FamilyName => $user->FamilyName(),
+        Email => $user->Email(),       
+      );
+
+      if($self->{'cache'})  {
+        $self->{'cache'}->set('pp',"USESSION-".$self->{'key'}, \%cdata,'',8*60);
+      }
+    }
   }
   return $self->{'key'};
 }
@@ -64,7 +79,7 @@ sub load {
   my ($sessionK) = @_;
 
   my $output = new CGI;
-  my $sessionkey = $sessionK || $output->cookie($Defs::COOKIE_PASSPORT) || '';
+  my $sessionkey = $sessionK || $output->cookie($Defs::COOKIE_LOGIN) || '';
   return undef if !$sessionkey;
   my $info = '';
   my $userID = 0;

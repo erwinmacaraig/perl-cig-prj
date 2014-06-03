@@ -4,7 +4,7 @@
 # $Header: svn://svn/SWM/trunk/web/admin/index.cgi 11645 2014-05-22 03:47:31Z apurcell $
 #
 
-use lib "../..","..",".","../RegoForm/","../../..";
+use lib "../..","..",".","../RegoForm/","../../..","../PaymentSplit",'../RegoFormBuilder',"../Facilities";
 #use lib "/u/regonew_live","/u/regonew_live/web","/u/regonew_live/web/admin";
 use DBI;
 use CGI qw(param unescape escape);
@@ -26,18 +26,11 @@ use ClearanceRemove;
 use MemberCardAdmin;
 use MRTConfig;
 use SystemConfigAdmin;
-use swolSetup;
 use MemberAdmin;
-use AuskickAdmin;
-use SchoolAdmin;
-use TeamSheetsAdmin;
 use DataAdmin;
 use RFTAdmin;
 use StatsAdmin;
-use RegoForm_Common;
-use AuskickComparison;
 use BankAccount;
-use TeamAdmin;
 use TempRegos;
 use CopyMemberWizard;
 use PaymentAdmin;

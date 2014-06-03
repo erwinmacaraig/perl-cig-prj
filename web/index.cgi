@@ -141,14 +141,19 @@ sub loginform	{
 					<span class="spp_loggedout"><p class="instruct">].$lang->txt("Don't have a").qq[ <span class="sp-passport">].$lang->txt("SP Passport").qq[</span>?</p>
 					<p class="instruct">].$lang->txt("No problems, just click Register to create one and gain access to your").qq[
 					 <span class="sp-membership">].$lang->txt("SP Membership").qq[</span> ].$lang->txt("database").qq[.
-					</p></span>
+</span>
+					</p>
+<p>
+<form method = "POST" action = "user/login.cgi">
+                       UN <input type = "text" name = "email"><br>
+                       PW <input type = "password" name = "pw"><br>
+                        <span class="button generic-button"><input type = "submit" value = "].$lang->txt('Sign in').qq["> </span>
+</p>
+</form>
 					<span class="spp_loggedin">
 						<p class="instruct">We see you already have <span class="sp-passport">SP Passport</span>. Sign in below to access your <span class="sp-membership">SP Membership</span> database.</p>
 					</span>
 					<span class="spp_loggedout"><span class="button special-button"><a href="">Register</a></span></span>
-					<span class="button generic-button">
-		        <a href = "$Defs::base_url/authlist.cgi">Sign In</a>
-	        </span>
 				</div>
 			</div>
 		</div>
