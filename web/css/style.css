@@ -717,80 +717,6 @@ div.eventwizheader	div.wizactive img.arrowfront{
     margin-bottom: 5px;
 }
 
-/* Communicator */
-
-fieldset.commconfig, fieldset.commcompose {
-    border: 0;
-    text-align: left;
-    margin-top: 5px;
-}
-
-fieldset.commconfig label, fieldset.commcompose label {
-    float: left;
-    text-align: left;
-}
-
-fieldset.commconfig label {
-    width: 10em;
-}
-
-fieldset.commcompose label {
-    width: 6em;
-}
-
-fieldset.commconfig p, fieldset.commcompose p {
-    clear: left;
-    margin: 0;
-    padding: 5px 0 0 0;
-}
-
-fieldset.commconfig textarea, fieldset.commconfig input#e_replyto, fieldset.commconfig input#e_subject,
-fieldset.commcompose textarea, fieldset.commcompose input#e_replyto, fieldset.commcompose input#e_subject {
-    width: 740px;
-}
-
-fieldset.commconfig input#s_replyto, fieldset.commcompose input#s_replyto {
-    width: 120px;
-}
-
-fieldset.commconfig textarea#e_message, fieldset.commcompose textarea#e_message {
-    height: 392px;
-}
-
-fieldset.commconfig textarea#s_message, fieldset.commcompose textarea#s_message {
-    height: 86px;
-    width: 400px;
-}
-
-fieldset.commconfig input#s_provider, fieldset.commcompose input#s_provider {
-    width: 50px;
-}
-
-fieldset.commconfig  input#s_username, fieldset.commconfig input#s_password, 
-fieldset.commcompose  input#s_username, fieldset.commcompose input#s_password {
-    width: 316px;
-}
-
-fieldset.commconfig input.submit {
-    margin-left: 111px;
-}
-
-form.comm input.submit {
-    margin-top: 18px;
-}
-
-form.comm div.groupname input#groupname {
-    width: 500px;
-}
-
-form.comm div.groupname input.submit {
-    margin-left: 83px;
-}
-
-.commgroupblock	{
-	margin-left:40px;
-}
-
 div q#qual {
     padding-left: 12px;
     margin-bottom: 15px;
@@ -834,11 +760,6 @@ dl.astable {
     color: black;
 }
 
-/*EDU */
-.edu_hint {border:1px solid #E0D252; padding:5px; background-color: /*#CDDCE1*/#F3EDBB}
-form.buttonForm{margin-right:6px; float:left}
-
-
 .loadmysport img	{
 	vertical-align:middle;
 }
@@ -881,85 +802,6 @@ div.warningbox	form {
 }
 
 
-dl#exception_dates {
-  padding-top:5px;
-}
-dl#exception_dates dt {
-  float:left;
-  padding-right:5px;
- 
-}
-
-dl#exception_dates dd {
-   float:left; 
-   padding-right:10px;
-}
-
-.fixture-control {
-	float:right;
-}
-
-.fixture-control a {
-  color:#3764A0;
-}
-
-.ump-config-label {
-    text-align:left;
-    width:200px;
-    display: inline-block;
-}
-
-
-#umpire-appointments {
-    width:90%;
-    margin:0 20px;
-    text-align:center;
-}
-
-#umpire-appointments div.competition {
-    padding:5px;
-    text-align:center;
-    border-top-style:solid;
-    border-top-width:1px;
-    border-bottom-style:solid;
-    border-bottom-width:1px;
-}
-
-#umpire-appointments div.umpire {
-    margin-top:40px;
-    /*margin-left:100px;
-    margin-right:100px;*/
-    padding:5px;
-    text-align:center;
-    border:solid;
-    border-width:1px;
-    font-size:150%;    
-	font-weight:bold;
-}
-
-#umpire-appointments div.details {
-    text-align:center;
-    margin-top:20px;    
-    font-size:12px;    
-}
-
-
-#umpire-appointments p.address {
-    text-align:center;
-    font-weight:bold;
-    font-size:15px;    
-}
-
-
-#umpire-appointments div.footnote {
-    padding-top:10px;
-    border-top-style:dashed;
-    border-top-width:1px;
-    text-align:left;
-    font-size:85%;
-    margin-bottom:100px;
-}
-
 td.dragHandle	{
 	width:15px;
 }
@@ -989,15 +831,6 @@ div.settings-group li	{
 	margin-bottom:5px;
 	color:#888;
 	line-height: 1.333;
-}
-
-/* Fix to get ExtJs DateField compenent to display correctly in IE8 */
-.x-date-menu > ul{
-display: inline;
-}
-
-.x-date-menu > ul li{
-display: inline;
 }
 
 #TB_ajaxWindowTitle	{
@@ -1085,104 +918,6 @@ tr.contactrowbottom	{
 	padding:1px;
 }
 
-table.fixture-grid	{
-}
-table.fixture-grid	td {
-	border-collapse: collapse;
-	width:200px;
-	vertical-align:middle;
-	font-size: 11px;
-	font-family: arial, tahoma,sans-serif;
-	border-collapse: none;
-}
-
-table.fixture-grid	td.slot {
-	width: 100px;
-	padding:4px;
-	background-color:#ccc;
-}
-
-table.fixture-grid	th	{
-	height:27px;
-	font-size: 11px;
-	font-family: arial, tahoma,sans-serif;
-	text-align:center;
-	border-collapse: collapse;
-}
-
-.fgrid-match	{
-	padding:4px;
-	border:1px solid #444;
-	-moz-border-radius: 4px;
-	border-radius: 4px;
-	font-size:9px;
-}
-
-.fgrid-match-extra	{
-	display:none;
-}
-
-.drag{
-	position: relative;
-	border:1px solid #444;
-}
-
-.fgrid-daterow	{
-	background-color:#ccc;
-}
-
-.venue-blocked	{
-	background-color:#eee;
-}
-
-table.fixture-grid	div.clash {
-	background-color: #ee0000;
-	color: #fff;
-}
-
-table.fixture-grid	td.unallocated-cell {
-	background-color:#fff;
-	vertical-align:top;
-}
-
-table.fixture-grid	td.unallocated-cell .fgrid-match-extra	{
-	display:block;
-}
-
-.fg-match-edit	{
-	float:right;
-}
-
-.introtext	{
-	margin-top:10px;
-	margin-bottom:10px;
-}
-
-.fgrid-filter, .fgrid-filter	input, .fgrid-filter select{
-	vertical-align:middle;
-	font-size:0.95em;
-	text-align:left;
-	margin: 10px 5px;
-}
-
-.slottime	{
-	text-align:center;
-}
-
-.fgrid-cell, .fgrid-header	{
-	border-right:1px solid #d0d0d0;
-	border-left:1px solid #d0d0d0;
-}
-
-.formfieldinfo	{
-	color:#000;
-	font-size:10px;
-}
-
-.fgrid-cell-disabled	{
-	background-color: #eee;
-}
-
 .daynav	{
 	margin:7px;
 	text-align:center;
@@ -1251,38 +986,8 @@ table.fixture-grid	td.unallocated-cell .fgrid-match-extra	{
 	padding-right:20px;
 }
 
-
-#wizard-bubble	{
-	position: fixed;
-	bottom: 0px;
-	right: 0px;
-	width:208px;
-	height: 470px;
-	margin: 100px 0 0 0;
-	float:right;
-	font-size:12px;
-	z-index:1000000000000;
-	background: #FFF;
-	border: 1px solid silver;
-}
-
-#wizard-bubble.minimize {
-	position: fixed;
-	bottom: 0px;
-	right: 0px;
-	height: 35px;
-}
-
 .maximize #maximize {
 	display:none;
-}
-
-#wizard-bubble.maximize  {
-
-}
-
-.wizardheader .button-small a {
-	padding: 2px 2px 1px;
 }
 
 #minimize, #maximize {
@@ -1310,59 +1015,6 @@ span.move a {
 	background-image: url(../images/glyphicons-halflings-white.png);
 	background-position: 0px 0px;
 	background-repeat: no-repeat;
-}
-
-#wizard-bubble .wizardheader	{
-	float:left;
-	color: #3B3B3B;
-	font-family:'DINBold',sans-serif;
-	height:34px;
-	width:100%;
-	line-height:34px;
-	font-size:14px;
-	text-indent:10px;
-	background: #F5F5F5;
-	border-bottom: 1px solid silver;
-}
-
-#wizard-bubble .wrap	{
-	float:left;
-	padding:8px;
-}
-#wizard-bubble .intro	{
-	font-family:'DINBold',sans-serif;
-	font-size:12px;
-	color: #3B3B3B;
-}
-
-#wizard-bubble p {
-	color: #3B3B3B;
-}
-
-#wizard-bubble .tasklist, 
-#wizard-bubble .tasklist a{
-	margin-left:2px;
-	color:#3B3B3B;
-	font-size:12px;
-}
-#wizard-bubble .tasklist .complete {
-	color:#7B7B7B;
-}
-#wizard-bubble .tasklist .current {
-	font-family:'DINBold',sans-serif;
-}
-
-#wizard-bubble ul {
-	list-style-type:none;
-	padding: 0;
-}
-
-#wizard-bubble li {
-	margin-bottom: 4px;
-}
-
-#wizard-bubble .button-small {
-	float:right;
 }
 
 .movecomboxes-right li.movecombobox-item {
@@ -1564,80 +1216,6 @@ span.move a {
 	color: #0d2680;
 	font-size:1.3em;	
 	margin-bottom:1em;
-}
-
-#salesblock	{
-	margin-top:10px;
-	position:relative;
-}
-
-div#salesblock a	{
-	padding:0px;
-}
-
-.salesblock-content {
-	padding: 6px 4px;
-}
-.salesblock-open	{
-	width:518px;
-}
-
-.salesblock-detail	{
-	float:right;
-	display:none;
-}
-.salesblock-open	.salesblock-detail {
-	display: block;
-}
-
-#salesblock	div.ads {
-	display:block;
-	background:url(../images/sales/offer_bg.png);
-	background-repeat:no-repeat;
-	height:36px;
-	font-size:10px;
-	padding: 4px;
-	cursor:pointer;
-}
-
-#salesblock	.COthumb {
-	float:left;
-	height:20px;
-	width:20px;
-	line-height:32px;
-	margin-left:8px;
-	margin-top:3px;
-	vertical-align:middle;
-	margin-right:6px;
-}
-#salesblock	.COlink {
-	height:36px;
-	width:145px;
-	float:left;
-}
-#salesblock div.salesblock-hover {
-	background:url(../images/sales/offer_rollover.png);
-	background-repeat:no-repeat;
-	color:#fff;
-}
-
-#salesblock.salesblock-open div.salesblock-hover {
-	background:url(../images/sales/offer_active.png);
-	background-repeat:no-repeat;
-	color:#fff;
-}
-
-#salesblock a.COexpand-btn	{
-	background:url(../images/sales/button_bg.png);
-	background-repeat:no-repeat;
-	color:#ff0000;
-	float:right;
-	width:42px;
-	height:15px;
-	font-size:8px;
-	text-align:center;
-	line-height:15px;
-	vertical-align:middle;
 }
 
 .fieldconfig-header	{
@@ -3451,57 +3029,6 @@ td.x-grid3-hd-over, td.sort-desc, td.sort-asc, td.x-grid3-hd-menu-open, .dragtab
 	background: ;
 }
 
-.fgrid-match {
-	background: #F5F5F5;
-	border: 1px solid #C0C0C0;
-}
-
-.fgrid-match b {
-	font-weight: normal;
-	font-family: 'DINBold',sans-serif;
-}
-
-table.fixture-grid td {
-	font-family: 'DINRegular',sans-serif;
-}
-
-table.fixture-grid td b {
-	font-weight: normal;
-	font-family: 'DINBold',sans-serif;
-}
-
-table.fixture-grid td.slot {
-	background: #F5F5F5;
-}
-
-table.fixture-grid th,  table.fixture-grid th b {
-	font-family: 'DINBold',sans-serif;
-	font-weight:normal;
-	background: #E6E6E6;
-}
-
-table.fixture-grid th {
-	border-right: 1px solid #D0D0D0;
-}
-
-table.fixture-grid th.mark {
-	background: #FFFFFF;
-	border-bottom: 1px solid #D0D0D0;
-}
-
-table.fixture-grid td.unallocated-cell {
-	background: #E6E6E6;
-	border-right: 1px solid #D0D0D0;
-}
-
-div.fgrid-filter {
-	width: auto;
-}
-
-.fgrid-filter .submitbutton {
-	padding-top: 1px;
-}
-
 /* Reporting */
 
 body.report {
@@ -4916,3 +4443,60 @@ ul.new_tabs li a.active, .new_tabs_wrap  a.active {
 .monospaced {
     font-family:'Courier New', Courier, monospace;
 }
+
+/* User Signup styles */
+#signup-email-div {
+    margin: 14px 0 0 12px;
+    clear: both;
+    color: #0065A4;
+    font-size: 18px;
+}
+
+#signup-fname-div {
+    float: left;
+    margin: 0 20px 0 0;
+}
+
+#signup-password-div {
+    float: left;
+    margin: 0 20px 0 0;
+}
+
+#signup-page-wrap #signup-email-div {
+    color: #464646;
+    margin: 0;
+}
+
+.edit-account .privacy-text, #register-form .privacy-text {
+    width:80%;
+    margin:0;
+    padding-left: 15px;
+    line-height:26px;
+    font-size:13px;
+}
+
+form#signup-form {
+    float: left;
+    width: 936px;
+    margin: 0 30px;
+}
+
+#register-form label {
+    text-align: left;
+    width: 160px;
+}
+form#signup-form .button {
+    float: left;
+    margin: 30px 0;
+}
+
+#register-form label.error {
+    font-size: 14px;
+    width: 300px;
+}
+.formfield {
+    float: left;
+    width: 100%;
+}
+
+

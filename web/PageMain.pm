@@ -297,7 +297,7 @@ sub printReport    {
   <html>
     <head>
       <title>$title</title>
-            <link rel="stylesheet" type="text/css" href="css/style.css">
+            <link rel="stylesheet" type="text/css" href="$Defs::base_url/css/style.css">
     </head>
     <body class="report">
       $body
@@ -325,7 +325,7 @@ sub printBasePage {
             <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
             <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js"></script>
             <link rel="stylesheet" type="text/css" href="js/jquery-ui/css/theme/jquery-ui-1.8.22.custom.css">
-            <script type="text/javascript" src="js/jquery.ui.touch-punch.min.js"></script>
+            <script type="text/javascript" src="$Defs::base_url/js/jquery.ui.touch-punch.min.js"></script>
       <link rel="stylesheet" type="text/css" href="$Defs::base_url/css/style.css">
 $CSSFiles
 $CSSInline

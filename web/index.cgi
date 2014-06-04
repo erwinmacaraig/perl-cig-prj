@@ -153,7 +153,7 @@ sub loginform	{
 					<span class="spp_loggedin">
 						<p class="instruct">We see you already have <span class="sp-passport">SP Passport</span>. Sign in below to access your <span class="sp-membership">SP Membership</span> database.</p>
 					</span>
-					<span class="spp_loggedout"><span class="button special-button"><a href="">Register</a></span></span>
+					<span class="spp_loggedout"><span class="button special-button"><a href="user/signup.cgi">Register</a></span></span>
 				</div>
 			</div>
 		</div>

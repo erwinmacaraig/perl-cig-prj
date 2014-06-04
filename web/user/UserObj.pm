@@ -93,7 +93,7 @@ sub write {
         ?,
         ?,
         ?,
-        $Defs::USER_STATUS_AUTO,
+        $Defs::USER_STATUS_NOTCONFIRMED,
         ?,
         NOW()
       )
