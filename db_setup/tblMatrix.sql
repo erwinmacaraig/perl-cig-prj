@@ -10,9 +10,7 @@ CREATE TABLE `tblMatrix` (
     intOriginLevel INT DEFAULT 0, /* Self, club, Reg, MA */
     intOriginID INT DEFAULT 0,
     strRegTypes varchar(100) DEFAULT '', /* NEW, RENEWAL, AMEND, TRANSFER */
-    intMinAge INT DEFAULT 0,
-    intMaxAge INT DEFAULT 0,
-    dtAgeAsDate DATE,
+    strAgeCategory VARCHAR(20) NOT NULL DEFAULT 'ALL', /* ALL,ADULT,MINOR */
     strListOfApprovals VARCHAR(250) DEFAULT '', /* OR A 1-many table ? */
     intIsPaymentRequired TINYINT DEFAULT 0,
     tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
