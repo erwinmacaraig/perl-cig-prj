@@ -24,7 +24,6 @@ use MIME::Base64 qw(encode_base64url decode_base64url);
 use UserSession;
 use GlobalAuth;
 use TempNodeStructureObj;
-use NodeLinksObj;
 
 #use Data::Dumper;
 
@@ -126,8 +125,6 @@ sub allowedTo {
     my $clr_fromclub = $output->cookie("$Defs::COOKIE_CLR_FROMCLUB");
     my $clr_toclub   = $output->cookie("$Defs::COOKIE_CLR_TOCLUB");
     my $clr_year     = $output->cookie("$Defs::COOKIE_CLR_YEAR");
-    my $fgrid_cookie = $output->cookie("$Defs::COOKIE_FGRID");
-    $Data->{'CookieFGrid'}     = $fgrid_cookie;
     $Data->{'ViewClrMName'}    = '';
     $Data->{'ViewClrMName'}    = $clr_mname if $clr_mname;
     $Data->{'ViewClrToClub'}   = '';
@@ -141,9 +138,6 @@ sub allowedTo {
 
     $Data->{'FullScreen'} = $output->cookie('SP_SWM_FULLSCREEN') || 0;
 
-    #for my $i (qw(intPlayer intCoach intUmpire intOfficial intMisc))	{
-    ## Changed for Seasons
-#for my $i (qw(intPlayer intCoach intUmpire intOfficial intMisc intVolunteer intPlayerStatus intCoachStatus intUmpireStatus Seasons.intPlayerStatus Seasons.intCoachStatus Seasons.intUmpireStatus))	{
     for my $i (
         qw(intPlayer intCoach intUmpire intOfficial intMisc intVolunteer intPlayerStatus intCoachStatus intUmpireStatus intMiscStatus intVolunteerStatus Seasons.intPlayerStatus Seasons.intCoachStatus Seasons.intUmpireStatus Seasons.intMiscStatus Seasons.intVolunteerStatus )
       )
@@ -261,13 +255,10 @@ sub setClient {
     $clientValues_ref->{regionID}     ||= 0;
     $clientValues_ref->{zoneID}       ||= 0;
     $clientValues_ref->{assocID}      ||= $Defs::INVALID_ID;
-    $clientValues_ref->{compID}       ||= $Defs::INVALID_ID;
     $clientValues_ref->{clubID}       ||= $Defs::INVALID_ID;
-    $clientValues_ref->{teamID}       ||= $Defs::INVALID_ID;
     $clientValues_ref->{memberID}     ||= $Defs::INVALID_ID;
     $clientValues_ref->{currentLevel} ||= -1;
     $clientValues_ref->{authLevel}    ||= -1;
-    $clientValues_ref->{clubAssocID}  ||= -1;
     $clientValues_ref->{'userID'} ||= 0;
 
     my $client =
@@ -278,14 +269,10 @@ sub setClient {
       . $clientValues_ref->{stateID} . '|'
       . $clientValues_ref->{regionID} . '|'
       . $clientValues_ref->{zoneID} . '|'
-      . $clientValues_ref->{assocID} . '|'
-      . $clientValues_ref->{compID} . '|'
       . $clientValues_ref->{clubID} . '|'
-      . $clientValues_ref->{teamID} . '|'
       . $clientValues_ref->{memberID} . '|'
       . $clientValues_ref->{currentLevel} . '|'
       . $clientValues_ref->{authLevel} . '|'
-      . $clientValues_ref->{clubAssocID} . '|'
       . $clientValues_ref->{'userID'} . '|';
 
     # SET EXPIRY DATE
@@ -316,15 +303,19 @@ sub getClient {
 
     my $lastAccess;
     (
-        $clientValues{interID},      $clientValues{intregID},
-        $clientValues{intzonID},     $clientValues{natID},
-        $clientValues{stateID},      $clientValues{regionID},
-        $clientValues{zoneID},       $clientValues{assocID},
-        $clientValues{compID},       $clientValues{clubID},
-        $clientValues{teamID},       $clientValues{memberID},
-        $clientValues{currentLevel}, $clientValues{authLevel},
-        $clientValues{clubAssocID},
-        $clientValues{'userID'}, $lastAccess
+        $clientValues{interID},      
+        $clientValues{intregID},
+        $clientValues{intzonID},     
+        $clientValues{natID},
+        $clientValues{stateID},      
+        $clientValues{regionID},
+        $clientValues{zoneID},       
+        $clientValues{clubID},
+        $clientValues{memberID},
+        $clientValues{currentLevel}, 
+        $clientValues{authLevel},
+        $clientValues{'userID'}, 
+        $lastAccess
     ) = split( /\|/, $client_dec );
 
     $clientValues{interID}      ||= 0;
@@ -334,30 +325,17 @@ sub getClient {
     $clientValues{stateID}      ||= 0;
     $clientValues{regionID}     ||= 0;
     $clientValues{zoneID}       ||= 0;
-    $clientValues{assocID}      ||= $Defs::INVALID_ID;
-    $clientValues{compID}       ||= $Defs::INVALID_ID;
     $clientValues{clubID}       ||= $Defs::INVALID_ID;
-    $clientValues{teamID}       ||= $Defs::INVALID_ID;
     $clientValues{memberID}     ||= $Defs::INVALID_ID;
     $clientValues{currentLevel} ||= -1;
     $clientValues{authLevel}    ||= -1;
-    $clientValues{clubAssocID}  ||= -1;
     $clientValues{userID}   ||= 0;
 
-    if ( $clientValues{currentLevel} > $Defs::LEVEL_COMP ) {
-        $clientValues{compID} = $Defs::INVALID_ID;
-    }
-    if ( $clientValues{currentLevel} > $Defs::LEVEL_TEAM ) {
-        $clientValues{teamID} = $Defs::INVALID_ID;
-    }
     if ( $clientValues{currentLevel} > $Defs::LEVEL_MEMBER ) {
         $clientValues{memberID} = $Defs::INVALID_ID;
     }
     if ( $clientValues{currentLevel} > $Defs::LEVEL_CLUB ) {
         $clientValues{memberID} = $Defs::INVALID_ID;
-    }
-    if ( $clientValues{currentLevel} >= $Defs::LEVEL_ASSOC ) {
-        $clientValues{clubID} = $Defs::INVALID_ID;
     }
     if ( $clientValues{currentLevel} >= $Defs::LEVEL_ZONE ) {
         $clientValues{assocID} = $Defs::INVALID_ID;
@@ -493,58 +471,45 @@ sub getDataAccess {
     my %AccessData = ();
 
     my $where_statement = '';
+    my @values = ();
 
-    #First getNodes
+    #First getEntitys
 
     for my $level (
-        $Defs::LEVEL_TOP,       $Defs::LEVEL_INTERNATIONAL,
-        $Defs::LEVEL_INTREGION, $Defs::LEVEL_INTZONE,
-        $Defs::LEVEL_NATIONAL,  $Defs::LEVEL_STATE,
-        $Defs::LEVEL_REGION,    $Defs::LEVEL_ZONE,
+        $Defs::LEVEL_TOP,       
+        $Defs::LEVEL_INTERNATIONAL,
+        $Defs::LEVEL_INTREGION, 
+        $Defs::LEVEL_INTZONE,
+        $Defs::LEVEL_NATIONAL,  
+        $Defs::LEVEL_STATE,
+        $Defs::LEVEL_REGION,    
+        $Defs::LEVEL_ZONE,
+        $Defs::LEVEL_CLUB,
       )
     {
         my $id = getClientValue( $Data->{'clientValues'}, $level );
-        if ( $where_statement ne "" ) { $where_statement .= " OR "; }
-        $where_statement .= qq[(intNodeID=$id AND intTypeID=$level) ];
+        if($id and $id > 0) {
+            if ($where_statement) { $where_statement .= " OR "; }
+            $where_statement .= qq[(intEntityID = ? AND intEntityLevel = ? ) ];
+            push @values, $id;
+            push @values, $level;
+        }
     }
 
     if ($where_statement) {
         my $statement = qq[
-			SELECT intNodeID, intTypeID, intDataAccess
-			FROM tblNode
+			SELECT intEntityID, intEntityLevel, intDataAccess
+			FROM tblEntity
 			WHERE $where_statement
 		];
         my $query = $Data->{'db'}->prepare($statement);
-        $query->execute();
-        while ( my ( $DB_intNodeID, $DB_intTypeID, $DB_intDataAccess ) =
+        $query->execute(@values);
+        while ( my ( $DB_intEntityID, $DB_intEntityLevel, $DB_intDataAccess ) =
             $query->fetchrow_array() )
         {
-            $DB_intDataAccess = $Defs::DATA_ACCESS_FULL
-              if !defined $DB_intDataAccess;
-            $AccessData{$DB_intTypeID}{$DB_intNodeID} = $DB_intDataAccess;
+            $DB_intDataAccess = $Defs::DATA_ACCESS_FULL if !defined $DB_intDataAccess;
+            $AccessData{$DB_intEntityLevel}{$DB_intEntityID} = $DB_intDataAccess;
         }
-    }
-
-    my $aID = getClientValue( $Data->{'clientValues'}, $Defs::LEVEL_ASSOC );
-    if ($aID) {
-        my $DB_intDataAccess = 0;
-        if ( $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_ASSOC ) {
-            $DB_intDataAccess = $Defs::DATA_ACCESS_FULL;
-        }
-        else {
-            my $statement = qq[
-				SELECT intDataAccess
-				FROM tblAssoc
-				WHERE intAssocID= ? 
-			];
-            my $query = $Data->{'db'}->prepare($statement);
-            $query->execute($aID);
-            ($DB_intDataAccess) = $query->fetchrow_array();
-            $DB_intDataAccess = $Defs::DATA_ACCESS_FULL
-              if !defined $DB_intDataAccess;
-            $query->finish();
-        }
-        $AccessData{$Defs::LEVEL_ASSOC}{$aID} = $DB_intDataAccess;
     }
 
     return \%AccessData;
@@ -873,7 +838,7 @@ qq[SELECT intRealmID, intAssocTypeID FROM tblAssoc WHERE intAssocID= ? ];
     elsif ( $cl > $Defs::LEVEL_ASSOC ) {
         my $id = getID( $Data->{'clientValues'} ) || 0;
         $st =
-          qq[SELECT intRealmID, intSubTypeID FROM tblNode WHERE intNodeID= ? ];
+          qq[SELECT intRealmID, intSubTypeID FROM tblEntity WHERE intEntityID= ? ];
         $val = $id;
     }
     if ($st) {
@@ -988,11 +953,11 @@ sub getEntityStructure {
 
     if ($entityTypeID <= $Defs::LEVEL_ASSOC) {
         my $assocID = ($entityTypeID == $Defs::LEVEL_ASSOC) ? $entityID : $Data->{'clientValues'}{'assocID'};
-        my $tempNodeStructureObj = TempNodeStructureObj->load(db=>$dbh, ID=>$assocID);
+        my $tempEntityStructureObj = TempEntityStructureObj->load(db=>$dbh, ID=>$assocID);
         my @levels = (100, 30, 20, 10);
         foreach my $level(@levels) {
             next if $upperLevel and $level > $upperLevel;
-            push @tempStructure, [$level, $tempNodeStructureObj->getValue('int'.$level.'_ID')];
+            push @tempStructure, [$level, $tempEntityStructureObj->getValue('int'.$level.'_ID')];
         }
         push @tempStructure, [$Defs::LEVEL_ASSOC, $assocID] if $entityTypeID < $Defs::LEVEL_ASSOC;
         push @tempStructure, [$entityTypeID, $entityID];
@@ -1005,8 +970,8 @@ sub getEntityStructure {
             last if $upperLevel and $level > $upperLevel;
             next if $level < $entityTypeID;
             push @tempStructure, [$level, $nodeID];
-            my $parentNodeID = NodeLinksObj->getParentNodeID(dbh=>$dbh, nodeID=>$nodeID);
-            $nodeID = $parentNodeID;
+            my $parentEntityID = EntityLinksObj->getParentEntityID(dbh=>$dbh, nodeID=>$nodeID);
+            $nodeID = $parentEntityID;
         }
         @entityStructure = ($topDown) ? reverse @tempStructure : @tempStructure;
     }

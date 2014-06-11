@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS tblGlobalAuth;
 CREATE TABLE tblGlobalAuth (
-	intPassportID INT NOT NULL,
+	intUserID INT NOT NULL,
 
-	PRIMARY KEY (intPassportID)
+	PRIMARY KEY (intUserID)
 );

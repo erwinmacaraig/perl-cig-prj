@@ -1,12 +1,8 @@
-#
-# $Header: svn://svn/SWM/trunk/web/HomeNode.pm 8251 2013-04-08 09:00:53Z rlee $
-#
-
-package HomeNode;
+package HomeEntity;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT=qw(showNodeHome);
-@EXPORT_OK =qw(showNodeHome);
+@EXPORT=qw(showEntityHome);
+@EXPORT_OK =qw(showEntityHome);
 
 use lib "dashboard";
 
@@ -21,20 +17,20 @@ use TTTemplate;
 use Dashboard;
 use Notifications;
 
-sub showNodeHome	{
-	my ($Data, $nodeID)=@_;
+sub showEntityHome	{
+	my ($Data, $entityID)=@_;
 
 	my $client = $Data->{'client'} || '';
-	my $nodeObj = getInstanceOf($Data, 'node', $nodeID);
+	my $entityObj = getInstanceOf($Data, 'entity', $entityID);
 
   my ($welcome, $killmessage) = getWelcomeText($Data);
   $killmessage ||= 0;
   return ($killmessage,'') if $killmessage;
-	my $allowedit = allowedAction($Data, 'n_e') ? 1 : 0;
+	my $allowedit = allowedAction($Data, 'e_e') ? 1 : 0;
 	my $logo = showLogo(
       $Data,
       $Defs::LEVEL_NODE,
-      $nodeID,
+      $entityID,
       $client,
       $allowedit,
     );
@@ -43,44 +39,43 @@ sub showNodeHome	{
     $Data,
     $client,
     $Defs::LEVEL_NODE,
-    $nodeID,
+    $entityID,
   );
 	my ($notifications, $notificationCount) = getNotifications(
 		$Data,
 		$Defs::LEVEL_NODE,
-    $nodeID,
+    $entityID,
 	);
 
-	my $name = $nodeObj->name();
+	my $name = $entityObj->name();
 	my %TemplateData = (
 		Welcome => $welcome,
 		Logo => $logo,
 		Name => $name,
 		ReadOnlyLogin => $Data->{'ReadOnlyLogin'},
-		EditDetailsLink => "$Data->{'target'}?client=$client&amp;a=N_DTE",
+		EditDetailsLink => "$Data->{'target'}?client=$client&amp;a=E_DTE",
 		EditDashboardLink => "$Data->{'target'}?client=$client&amp;a=DASHCFG_",
 		Dashboard => $dashboard,
 		Notifications => $notifications,
 		Details => {
-			Address1 => $nodeObj->getValue('strAddress1') || '',
-			Address2 => $nodeObj->getValue('strAddress2') || '',
-			Suburb => $nodeObj->getValue('strSuburb') || '',
-			State => $nodeObj->getValue('strState') || '',
-			Country => $nodeObj->getValue('strCountry') || '',
-			PostalCode => $nodeObj->getValue('strPostalCode') || '',
-			Phone => $nodeObj->getValue('strPhone') || '',
-			Fax => $nodeObj->getValue('strFax') || '',
-			Email => $nodeObj->getValue('strEmail') || '',
-			Contact => $nodeObj->getValue('strContact') || '',
+			Address1 => $entityObj->getValue('strAddress') || '',
+			Town => $entityObj->getValue('strTown') || '',
+			Region => $entityObj->getValue('strRegion') || '',
+			Country => $entityObj->getValue('strISOCountry') || '',
+			PostalCode => $entityObj->getValue('strPostalCode') || '',
+			Phone => $entityObj->getValue('strPhone') || '',
+			Fax => $entityObj->getValue('strFax') || '',
+			URL => $entityObj->getValue('strWebURL') || '',
+			Email => $entityObj->getValue('strEmail') || '',
+			Contact => $entityObj->getValue('strContact') || '',
 		},
 	);
 	my $resultHTML = runTemplate(
 		$Data,
 		\%TemplateData,
-		'dashboards/node.templ',
+		'dashboards/entity.templ',
 	);
 
-	$Data->{'NoHeadingAd'} = 1;
 	my $title = $name;
 	return ($resultHTML, '');
 }

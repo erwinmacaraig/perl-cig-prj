@@ -14,7 +14,6 @@ use lib 'sportstats/', ".", "RegoFormBuilder";
 use strict;
 use Reg_common;
 use Utils;
-use ListAssocs;
 use HTMLForm;
 use AssocOptions;
 use DefCodes;

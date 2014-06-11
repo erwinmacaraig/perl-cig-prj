@@ -1,7 +1,3 @@
-#
-# $Header: svn://svn/SWM/trunk/web/HTMLForm.pm 9694 2013-10-08 01:06:02Z apurcell $
-#
-
 package HTMLForm;
 
 require Exporter;
@@ -11,9 +7,6 @@ require Exporter;
 @EXPORT = qw(handleHTMLForm apply_case_rule _date_selection_box generate_clientside_validation);
 @EXPORT_OK =
   qw(handleHTMLForm _date_selection_picker _date_selection_dropdown _time_selection_box apply_case_rule _date_selection_box generate_clientside_validation);
-
-#Version: 1.06
-#Last Updated: 15/09/09 By Warren Rodie
 
 use lib '.', '..';
 
@@ -461,7 +454,6 @@ qq[<input type="hidden" name="$cf" value="$fields_ref->{'carryfields'}{$cf}">];
           generate_clientside_validation( \%clientside_validation,
             $fields_ref );
 
-#<form action="$fields_ref->{'options'}{'target'}" name="$fields_ref->{'options'}{'formname'}" method="POST" onsubmit="document.getElementById('HFsubbut').disabled=true;return true;" $enctype id = "$fields_ref->{'options'}{'formname'}ID">
         $returnstr = qq[
         $validation
         <form action="$fields_ref->{'options'}{'target'}" name="$fields_ref->{'options'}{'formname'}" method="POST" $enctype id = "$fields_ref->{'options'}{'formname'}ID">

@@ -7,7 +7,7 @@
 use strict;
 use CGI qw(param unescape escape);
 
-use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit','Clearances', 'Facilities',"user";
+use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit','Clearances', "user";
 use Lang;
 use Reg_common;
 use PageMain;
@@ -26,7 +26,7 @@ use Welcome;
 use PaymentApplication;
 use Agreements;
 
-use Node;
+use Entity;
 use Assoc;
 use Club;
 use Member;
@@ -41,7 +41,6 @@ use AgeGroups;
 
 use Notifications;
 use Venues;
-use Facility;
 
 use MCache;
 use Contacts;
@@ -133,9 +132,9 @@ sub main {
         $action = defaultAction( $clientValues{'authLevel'} );
     }
 
-    if ( $action =~ /^N_/ ) {
+    if ( $action =~ /^E_/ ) {
         ( $resultHTML, $pageHeading ) =
-          handleNode( $action, \%Data, $ID, $typeID );
+          handleEntity( $action, \%Data, $ID, $typeID );
     }
     elsif ( $action =~ /^A_/ ) {
         ( $resultHTML, $pageHeading, $breadcrumbs ) =
@@ -199,9 +198,6 @@ sub main {
     }
     elsif ( $action =~ /^VENUE_/ ) {
         ( $resultHTML, $pageHeading ) = handleVenues( $action, \%Data );
-    }
-    elsif ( $action =~ /^FACILITY_/ ) {
-        ( $resultHTML, $pageHeading ) = handleFacilities( $action, \%Data );
     }
     elsif ( $action =~ /^AGREE_/ ) {
         ( $resultHTML, $pageHeading ) =
@@ -279,7 +275,7 @@ sub defaultAction {
     return 'C_HOME'  if $level == $Defs::LEVEL_CLUB;
     return 'CO_HOME' if $level == $Defs::LEVEL_COMP;
     return 'T_HOME'  if $level == $Defs::LEVEL_TEAM;
-    return 'N_HOME'  if $level > $Defs::LEVEL_ASSOC;
+    return 'E_HOME'  if $level > $Defs::LEVEL_ASSOC;
 }
 
 sub logPageData {

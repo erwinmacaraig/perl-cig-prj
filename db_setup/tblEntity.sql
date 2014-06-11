@@ -6,10 +6,10 @@ CREATE TABLE tblEntity (
     strEntityType VARCHAR(30) DEFAULT '', /* School, Club */
     strStatus VARCHAR(20) default '', /*Approved, pending, inactive, suspended */
     intRealmApproved tinyint default 0,
-    intCreatedByEntityID default 0,
+    intCreatedByEntityID INT default 0,
     strFIFAID varchar(30) default '',
-    
-    strLocalName    varchar(100) default '',
+
+    strLocalName varchar(100) default '',
     strLocalShortName varchar(100) default '',
     strLocalFacilityName varchar(150) DEFAULT '',
     strLatinName    varchar(100) default '',
@@ -29,6 +29,7 @@ CREATE TABLE tblEntity (
     strFax varchar(20) DEFAULT '',
 
     strContactTitle varchar(50) DEFAULT NULL,
+    strContact  varchar(50) DEFAULT NULL,
     strContactEmail varchar(200) DEFAULT NULL,
     strContactPhone varchar(50) DEFAULT NULL,
     dtAdded datetime,

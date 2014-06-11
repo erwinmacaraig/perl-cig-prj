@@ -1,8 +1,4 @@
-#
-# $Header: svn://svn/SWM/trunk/web/comp/NodeObj.pm 8251 2013-04-08 09:00:53Z rlee $
-#
-
-package NodeObj;
+package EntityObj;
 
 use strict;
 use BaseObject;
@@ -13,8 +9,8 @@ sub load {
 
 	my $st=qq[
 		SELECT * 
-		FROM tblNode
-		WHERE intNodeID = ?
+		FROM tblEntity
+		WHERE intEntityID = ?
 	];
 
 	my $q = $self->{'db'}->prepare($st);

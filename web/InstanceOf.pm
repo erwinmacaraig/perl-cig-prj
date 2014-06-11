@@ -16,7 +16,7 @@ use Defs;
 use AssocObj;
 use ClubObj;
 use MemberObj;
-use NodeObj;
+use EntityObj;
 
 sub getInstanceOf	{
 	my (
@@ -102,14 +102,14 @@ sub getInstanceOf	{
 			}
 		}
 	}
-	elsif($type eq 'node')	{
+	elsif($type eq 'entity')	{
 		return undef if !$idIN;
 		my $id = $idIN;
 		return undef if !$id == $Defs::INVALID_ID;
 
-		$obj = $cache->get('swm',"NodeObj-$id") if $cache;
+		$obj = $cache->get('swm',"EntityObj-$id") if $cache;
 			if(!$obj)	{
-			$obj = new NodeObj(
+			$obj = new EntityObj(
 				db => $db,
 				ID => $id,
 			);
@@ -118,7 +118,7 @@ sub getInstanceOf	{
 			$obj->clearDB();
 			$cache->set(
 				'swm',
-				"NodeObj-$id",
+				"EntityObj-$id",
 				$obj, 
 				'',
 				60*60*5, # 5hours
@@ -162,7 +162,7 @@ sub getInstanceOf	{
 						int20_ID,
 						int10_ID,
 						intAssocID
-					FROM tblTempNodeStructure
+					FROM tblTempEntityStructure
 					WHERE intAssocID = ?
 				];
 				my $q = $db->prepare($st);
@@ -187,9 +187,9 @@ sub getInstanceOf	{
 		return undef if !$id;
 		return undef if $id == $Defs::INVALID_ID;
 
-		$obj = $cache->get('swm',"NodeObj-$id") if $cache;
+		$obj = $cache->get('swm',"EntityObj-$id") if $cache;
 			if(!$obj)	{
-			$obj = new NodeObj(
+			$obj = new EntityObj(
 				db => $db,
 				ID => $id,
 			);
@@ -198,7 +198,7 @@ sub getInstanceOf	{
 			$obj->clearDB();
 			$cache->set(
 				'swm',
-				"NodeObj-$id",
+				"EntityObj-$id",
 				$obj, 
 				'',
 				60*60*5, # 5hours
@@ -215,10 +215,7 @@ sub number_to_level	{
 
 	my %matrix = (
 		$Defs::LEVEL_MEMBER => 'member',
-		$Defs::LEVEL_TEAM => 'team',
 		$Defs::LEVEL_CLUB => 'club',
-		$Defs::LEVEL_COMP => 'comp',
-		$Defs::LEVEL_ASSOC => 'assoc',
 		$Defs::LEVEL_ZONE => 'zone',
 		$Defs::LEVEL_REGION => 'region',
 		$Defs::LEVEL_STATE => 'state',

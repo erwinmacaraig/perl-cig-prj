@@ -21,8 +21,6 @@ use PaymentSplitUtils;
 use MD5;
 use InstanceOf;
 use PageMain;
-use FacilitiesUtils;
-
 use ServicesContacts;
 use TTTemplate;
 use Log;
@@ -41,7 +39,6 @@ sub navBar {
     $clientValues_ref->{memberID} = $Defs::INVALID_ID if $currentLevel > $Defs::LEVEL_MEMBER;
     $clientValues_ref->{memberID} = $Defs::INVALID_ID if $currentLevel > $Defs::LEVEL_CLUB;
     $clientValues_ref->{clubID} = $Defs::INVALID_ID  if $currentLevel >= $Defs::LEVEL_ASSOC;
-    $clientValues_ref->{assocID} = $Defs::INVALID_ID if $currentLevel >= $Defs::LEVEL_ZONE;
     $clientValues_ref->{zoneID} = $Defs::INVALID_ID if $currentLevel >= $Defs::LEVEL_REGION;
     $clientValues_ref->{regionID} = $Defs::INVALID_ID if $currentLevel >= $Defs::LEVEL_NATIONAL;
     $clientValues_ref->{nationalID} = $Defs::INVALID_ID if $currentLevel >= $Defs::LEVEL_INTZONE;
@@ -65,16 +62,7 @@ sub navBar {
             or $currentLevel == $Defs::LEVEL_REGION
             or $currentLevel == $Defs::LEVEL_ZONE 
     ) {
-        $menu_data = getNodeMenuData(
-            $Data,
-            $currentLevel,
-            $currentID,
-            $client,
-            $navObjects->{$currentLevel},
-        );
-    }
-    elsif( $currentLevel == $Defs::LEVEL_ASSOC) {
-        $menu_data = getAssocMenuData(
+        $menu_data = getEntityMenuData(
             $Data,
             $currentLevel,
             $currentID,
@@ -89,7 +77,6 @@ sub navBar {
             $currentID,
             $client,
             $navObjects->{$currentLevel},
-            $navObjects->{$Defs::LEVEL_ASSOC},
         );
     }
     elsif( $currentLevel == $Defs::LEVEL_MEMBER) {
@@ -99,7 +86,6 @@ sub navBar {
             $currentID,
             $client,
             $navObjects->{$currentLevel},
-            $navObjects->{$Defs::LEVEL_ASSOC},
         );
     }
 
@@ -119,17 +105,14 @@ sub navBar {
     my $homeClient = getHomeClient($Data);
 
     my %HomeAction = (
-        $Defs::LEVEL_INTERNATIONAL =>  'N_HOME',
-        $Defs::LEVEL_INTREGION =>  'N_HOME',
-        $Defs::LEVEL_INTZONE =>  'N_HOME',
-        $Defs::LEVEL_NATIONAL =>  'N_HOME',
-        $Defs::LEVEL_STATE =>  'N_HOME',
-        $Defs::LEVEL_REGION =>  'N_HOME',
-        $Defs::LEVEL_ZONE =>  'N_HOME',
-        $Defs::LEVEL_ASSOC =>  'A_HOME',
-        $Defs::LEVEL_COMP =>  'CO_HOME',
+        $Defs::LEVEL_INTERNATIONAL =>  'E_HOME',
+        $Defs::LEVEL_INTREGION =>  'E_HOME',
+        $Defs::LEVEL_INTZONE =>  'E_HOME',
+        $Defs::LEVEL_NATIONAL =>  'E_HOME',
+        $Defs::LEVEL_STATE =>  'E_HOME',
+        $Defs::LEVEL_REGION =>  'E_HOME',
+        $Defs::LEVEL_ZONE =>  'E_HOME',
         $Defs::LEVEL_CLUB =>  'C_HOME',
-        $Defs::LEVEL_TEAM =>  'T_HOME',
         $Defs::LEVEL_MEMBER =>  'M_HOME',
     );
 
@@ -148,13 +131,13 @@ sub navBar {
     return $navbar;
 }
 
-sub getNodeMenuData {
+sub getEntityMenuData {
     my (
         $Data,
         $currentLevel,
         $currentID,
         $client,
-        $nodeObj,
+        $entityObj,
     ) = @_;
 
 
@@ -167,23 +150,17 @@ sub getNodeMenuData {
     my $txt_SeasonsNames= $SystemConfig->{'txtSeasons'} || 'Seasons';
     my $txt_AgeGroupsNames= $SystemConfig->{'txtAgeGroups'} || 'Age Groups';
 
-    my $nextlevel = getNextNodeType(
+    my $nextlevel = getNextEntityType(
         $Data->{'db'}, 
         $currentID,
     );
     my $next_level_name = $Data->{'LevelNames'}{$nextlevel.'_P'} || '';
 
-    my $hideClearances = $nodeObj->getValue('intHideClearances');
+    my $hideClearances = $entityObj->getValue('intHideClearances');
 
-    my $option='N_L';
-    if($currentLevel==$Defs::LEVEL_ZONE or $nextlevel == $Defs::LEVEL_ASSOC)   {
-        $nextlevel=$Defs::LEVEL_ASSOC;
-        $option='A_L';
-    }
+    my $option='E_L';
     my $txt_Clr = $SystemConfig->{'txtCLR'} || 'Clearance';
     my $txt_Clr_ListOnline = $SystemConfig->{'txtCLRListOnline'} || "List Online $txt_Clr"."s";
-
-    my ($facility_singular, $facility_plural) = get_facility_titles($Data);
 
     my $paymentSplitSettings = getPaymentSplitSettings($Data);
     my $baseurl = "$target?client=$client&amp;";
@@ -198,7 +175,7 @@ sub getNodeMenuData {
         },
         home => {
             name => $lang->txt('Dashboard'),
-            url => $baseurl."a=N_HOME",
+            url => $baseurl."a=E_HOME",
         },
     );
     if($nextlevel) {
@@ -263,8 +240,8 @@ sub getNodeMenuData {
             };
         }
 
-        #nationalrego. enable regoforms at node level.
-        if  ($SystemConfig->{'AllowOnlineRego_node'}) {
+        #nationalrego. enable regoforms at entity level.
+        if  ($SystemConfig->{'AllowOnlineRego_entity'}) {
             $menuoptions{'registrationforms'} = {
                 name => $lang->txt('Registration Forms'),
                 url => $baseurl."a=A_ORF_r",
@@ -290,7 +267,7 @@ sub getNodeMenuData {
             if ($SystemConfig->{'AllowSeasons'}) {
                 $menuoptions{'seasons'} = {
                     name => $lang->txt($txt_SeasonsNames),
-                    url => $baseurl."a=SN_L",
+                    url => $baseurl."a=SE_L",
                 };
                 $menuoptions{'agegroups'} = {
                     name => $lang->txt($txt_AgeGroupsNames),
@@ -306,18 +283,12 @@ sub getNodeMenuData {
         }
     }
 
-    # for Node menu
+    # for Entity menu
 
     if(!$SystemConfig->{'NoAuditLog'}) {
         $menuoptions{'auditlog'} = {
             name => $lang->txt('Audit Log'),
             url => $baseurl."a=AL_",
-        };
-    }
-    if(!$SystemConfig->{'NoOptIn'}) {
-        $menuoptions{'optin'} = {
-            name => $lang->txt('Opt-Ins'),
-            url => $baseurl."a=OPTIN_L",
         };
     }
 
@@ -328,15 +299,12 @@ sub getNodeMenuData {
         'clearances',    
         'clearancesAll',
         ]],
-        [ $lang->txt($facility_plural) , 'menu', [
-        'facilitieslist',
-        ]],
         [ $lang->txt('Registrations'), 'menu',[
         'bankdetails',
         'bankfileexport',
         'paymentsplitrun',
         'products',
-        'registrationforms', #nationalrego. enable regoforms at node level.
+        'registrationforms', #nationalrego. enable regoforms at entity level.
         ]],
         [ $lang->txt('Reports'), 'menu',[
         'reports',
@@ -874,7 +842,7 @@ sub getClubMenuData {
 
 }
 
-sub getNextNodeType {
+sub getNextEntityType {
     my($db, $ID) = @_;
     my $nextlevelType='';
     my $looptimes=0;
@@ -882,22 +850,22 @@ sub getNextNodeType {
         return 0 if !$ID;
         $looptimes++;
         my $st=qq[
-        SELECT CN.intNodeID as CNintNodeID, CN.intTypeID AS CNintTypeID, CN.intStatusID, PN.intTypeID AS PNType
-        FROM tblNode AS PN 
-        LEFT JOIN tblNodeLinks ON PN.intNodeID=tblNodeLinks.intParentNodeID 
-        LEFT JOIN tblNode AS CN ON CN.intNodeID=tblNodeLinks.intChildNodeID
-        WHERE PN.intNodeID = ?
+        SELECT CN.intEntityID as CNintEntityID, CN.intTypeID AS CNintTypeID, CN.intStatusID, PN.intTypeID AS PNType
+        FROM tblEntity AS PN 
+        LEFT JOIN tblEntityLinks ON PN.intEntityID=tblEntityLinks.intParentEntityID 
+        LEFT JOIN tblEntity AS CN ON CN.intEntityID=tblEntityLinks.intChildEntityID
+        WHERE PN.intEntityID = ?
         LIMIT 1
         ];
         my $query = $db->prepare($st);
         $query->execute($ID);
         my $dref=$query->fetchrow_hashref();
         $query->finish();
-        if(!$dref->{CNintNodeID})   {
-            #No child nodes
+        if(!$dref->{CNintEntityID})   {
+            #No child entitys
             #Check to see if we are a zone - if so check for assocs
             if($dref->{'PNType'} == $Defs::LEVEL_ZONE)  {
-                my $sta=qq[ SELECT COUNT(*) FROM tblAssoc_Node WHERE intNodeID= ? LIMIT 1 ];
+                my $sta=qq[ SELECT COUNT(*) FROM tblAssoc_Entity WHERE intEntityID= ? LIMIT 1 ];
                 my $q= $db->prepare($sta);
                 $q->execute($ID);
                 my ($assocs)=$q->fetchrow_array();
@@ -907,9 +875,9 @@ sub getNextNodeType {
             }
             else    {   return 0;   }
         }
-        #return 0 if !$dref->{intNodeID};
+        #return 0 if !$dref->{intEntityID};
         return $dref->{CNintTypeID} if $dref->{intStatusID} != $Defs::NODE_HIDE;
-        $ID=$dref->{CNintNodeID};
+        $ID=$dref->{CNintEntityID};
     } while ($looptimes < 8); #This shouldn't happen more than 8 times
 }   
 
@@ -931,14 +899,13 @@ sub GenerateTree {
     my @tree = ();
     my %objects = ();
     my %instancetypes = (
-        interID => ['node', $Defs::LEVEL_INTERNATIONAL, 'N_HOME', ''],
-        intregID => ['node', $Defs::LEVEL_INTREGION, 'N_HOME', ''],
-        intzonID => ['node', $Defs::LEVEL_INTZONE, 'N_HOME', ''],
-        natID => ['node', $Defs::LEVEL_NATIONAL, 'N_HOME', ''],
-        stateID => ['node', $Defs::LEVEL_STATE, 'N_HOME', ''],
-        regionID => ['node', $Defs::LEVEL_REGION, 'N_HOME', ''],
-        zoneID => ['node', $Defs::LEVEL_ZONE, 'N_HOME', ''],
-        assocID => ['assoc', $Defs::LEVEL_ASSOC, 'A_HOME', ''],
+        interID => ['entity', $Defs::LEVEL_INTERNATIONAL, 'E_HOME', ''],
+        intregID => ['entity', $Defs::LEVEL_INTREGION, 'E_HOME', ''],
+        intzonID => ['entity', $Defs::LEVEL_INTZONE, 'E_HOME', ''],
+        natID => ['entity', $Defs::LEVEL_NATIONAL, 'E_HOME', ''],
+        stateID => ['entity', $Defs::LEVEL_STATE, 'E_HOME', ''],
+        regionID => ['entity', $Defs::LEVEL_REGION, 'E_HOME', ''],
+        zoneID => ['entity', $Defs::LEVEL_ZONE, 'E_HOME', ''],
         clubID => ['club', $Defs::LEVEL_CLUB, 'C_HOME', ''],
         memberID => ['member', $Defs::LEVEL_MEMBER, 'M_HOME', ''],
     );
@@ -950,7 +917,6 @@ sub GenerateTree {
         stateID
         regionID
         zoneID
-        assocID
         clubID
         memberID
         )) {
