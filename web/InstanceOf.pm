@@ -1,19 +1,14 @@
-#
-# $Header: svn://svn/SWM/trunk/web/InstanceOf.pm 9564 2013-09-20 05:42:34Z tcourt $
-#
-
 package InstanceOf;
 require Exporter;
 @ISA =  qw(Exporter);
 @EXPORT = qw(getInstanceOf);
 @EXPORT_OK = qw(getInstanceOf);
 
-use lib "..",".","comp";
+use lib "..",".";
 
 use strict;
 use Defs;
 
-use AssocObj;
 use MemberObj;
 use EntityObj;
 
@@ -31,31 +26,7 @@ sub getInstanceOf	{
 	my $db = $Data->{'db'};
 	$type = number_to_level($type) if $type =~/^\d+$/;
 
-	my $assocID = $clientValues_ref->{assocID} || $Defs::INVALID_ID;
-	if($type eq 'assoc')	{
-		my $id = $idIN || $clientValues_ref->{assocID} || $Defs::INVALID_ID;
-		if($id != $Defs::INVALID_ID)	{
-			$obj = $cache->get('swm',"AssocObj-$id") if $cache;
-			if(!$obj)	{
-				$obj = new AssocObj(
-					db => $db,
-					ID => $id,
-					assocID => $id,
-				);
-				return undef if !$obj;
-				$obj->load();
-				$obj->clearDB();
-				$cache->set(
-					'swm',
-					"AssocObj-$id",
-					$obj, 
-					"ASSOC-$id",
-					60*60*5, # 5hours
-				) if $cache;
-			}
-		}
-	}
-	elsif($type eq 'club')	{
+	if($type eq 'club')	{
 		my $id = $idIN || $clientValues_ref->{clubID} || $Defs::INVALID_ID;
 		if($id != $Defs::INVALID_ID)	{
 			$obj = $cache->get('swm',"ClubObj-$id") if $cache;
@@ -80,21 +51,20 @@ sub getInstanceOf	{
 	elsif($type eq 'member')	{
 		my $id = $idIN || $clientValues_ref->{memberID} || $Defs::INVALID_ID;
 		if($id != $Defs::INVALID_ID)	{
-			$obj = $cache->get('swm',"MemberObj-$id-$assocID") if $cache;
+			$obj = $cache->get('swm',"MemberObj-$id") if $cache;
 			if(!$obj)	{
 				$obj = new MemberObj(
 					db => $db,
 					ID => $id,
-					assocID => $assocID,
 				);
 				return undef if !$obj;
 				$obj->load();
 				$obj->clearDB();
 				$cache->set(
 					'swm',
-					"MemberObj-$id-$assocID",
+					"MemberObj-$id",
 					$obj, 
-					"ASSOC-$assocID",
+                    '',
 					60*60*5, # 5hours
 				) if $cache;
 			}
@@ -142,7 +112,7 @@ sub getInstanceOf	{
 		$id = $clientValues_ref->{interID} if $type eq 'international';
 		if(
 			!$id
-			and $assocID
+			#and $assocID
 			and (
 				$type eq 'zone'
 				or $type eq 'region'
@@ -150,36 +120,36 @@ sub getInstanceOf	{
 				or $type eq 'national'
 			)
 		)	{
-			my $assoc_struct = $cache->get('swm',"AssocStructure-$assocID") if $cache;
-			if(!$assoc_struct)	{
-				my $st = qq[
-					SELECT
-						intRealmID,
-						int100_ID,
-						int30_ID,
-						int20_ID,
-						int10_ID,
-						intAssocID
-					FROM tblTempEntityStructure
-					WHERE intAssocID = ?
-				];
-				my $q = $db->prepare($st);
-				$q->execute($assocID);
-				my $dref = $q->fetchrow_hashref();
-				$q->finish();
-
-				$cache->set(
-					'swm',
-					"AssocStructure-$assocID",
-					$dref, 
-					'',
-					60*60*5, # 5hours
-				) if $cache;
-				$id = $dref->{'int10_ID'} if $type eq 'zone';
-				$id = $dref->{'int20_ID'} if $type eq 'region';
-				$id = $dref->{'int30_ID'} if $type eq 'state';
-				$id = $dref->{'int100_ID'} if $type eq 'national';
-			}
+			#my $assoc_struct = $cache->get('swm',"AssocStructure-$assocID") if $cache;
+			#if(!$assoc_struct)	{
+				#my $st = qq[
+					#SELECT
+						#intRealmID,
+						#int100_ID,
+						#int30_ID,
+						#int20_ID,
+						#int10_ID,
+						#intAssocID
+					#FROM tblTempEntityStructure
+					#WHERE intAssocID = ?
+				#];
+				#my $q = $db->prepare($st);
+				#$q->execute($assocID);
+				#my $dref = $q->fetchrow_hashref();
+				#$q->finish();
+#
+				#$cache->set(
+					#'swm',
+					#"AssocStructure-$assocID",
+					#$dref, 
+					#'',
+					#60*60*5, # 5hours
+				#) if $cache;
+				#$id = $dref->{'int10_ID'} if $type eq 'zone';
+				#$id = $dref->{'int20_ID'} if $type eq 'region';
+				#$id = $dref->{'int30_ID'} if $type eq 'state';
+				#$id = $dref->{'int100_ID'} if $type eq 'national';
+			#}
 		} 
 
 		return undef if !$id;

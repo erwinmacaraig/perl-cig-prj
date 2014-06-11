@@ -1,7 +1,3 @@
-#
-# $Header: svn://svn/SWM/trunk/web/Venues.pm 10395 2014-01-08 23:51:03Z apurcell $
-#
-
 package Venues;
 require Exporter;
 @ISA = qw(Exporter);
@@ -15,7 +11,6 @@ use HTMLForm;
 use AuditLog;
 use CGI qw(unescape param);
 use FormHelpers;
-use VenueObj;
 use GridDisplay;
 use Log;
 require RecordTypeFilter;
@@ -49,205 +44,342 @@ sub venue_details   {
     my $field=loadVenueDetails($Data->{'db'}, $venueID, $Data->{'clientValues'}{'assocID'}) || ();
     
     my $intRealmID = $Data->{'Realm'} >= 0 ? $Data->{'Realm'} : 0;
-    my $intEntityID= $Data->{'EntityID'} >= 0 ? $Data->{'EntityID'} : 0;
     my $client=setClient($Data->{'clientValues'}) || '';
     
     my %FieldDefinitions = (
-        fields => {
-            intVenueID => {
-                label       => "Venue ID",
-                value       => $field->{intVenueID},
-                type        => 'text',
-                readonly    => 1,
-                size        => '40',
-                maxsize     => '100',
-                compulsory  => 0,
-                sectionname => 'details',
-            },
-            strLocalName => {
-                label       => "Venue Name",
-                value       => $field->{strLocalName},
-                type        => 'text',
-                size        => '40',
-                maxsize     => '100',
-                compulsory  => 1,
-                sectionname => 'details',
-            },
-            intStatus => { ### 
-                label         => 'Active?',
-                value         => $field->{intStatus},
-                type          => 'checkbox',
-                default       => 1,
-                displaylookup => { 1 => 'Yes', 0 => 'No' },
-                sectionname   => 'details',
-            },
-            strAbbrev => {
-                label       => "Abbreviation Name",
-                value       => $field->{strAbbrev},
-                type        => 'text',
-                size        => '20',
-                sectionname => 'details',
-            },
-            intTypeID => {
-                label       => 'Venue Type',
-                value       => $field->{intTypeID},
-                type        => 'lookup',
-                options     => \%Defs::VenueTypes,
-                firstoption => [ '', " " ],
-                sectionname => 'details',
-            },
-            strAddress1 => {
-                label       => "Address 1",
-                value       => $field->{strAddress1},
-                type        => 'text',
-                size        => '40',
-                sectionname => 'details',
-            },
-            strAddress2 => {
-                label       => "Address 2",
-                value       => $field->{strAddress2},
-                type        => 'text',
-                size        => '40',
-                sectionname => 'details',
-            },
-            strSuburb => {
-                label       => "Suburb",
-                value       => $field->{strSuburb},
-                type        => 'text',
-                size        => '40',
-                sectionname => 'details',
-            },
-            strState => {
-                label       => "State",
-                value       => $field->{strState},
-                type        => 'text',
-                size        => '40',
-                sectionname => 'details',
-            },
-            strPostalCode => {
-                label       => "Postal Code",
-                value       => $field->{strPostalCode},
-                type        => 'text',
-                size        => '10',
-                sectionname => 'details',
-            },
-            strCountry => {
-                label       => "Country",
-                value       => $field->{strCountry},
-                type        => 'text',
-                size        => '40',
-                sectionname => 'details',
-            },
-            strPhone => {
-                label       => "Phone",
-                value       => $field->{strPhone},
-                type        => 'text',
-                size        => '20',
-                sectionname => 'details',
-            },
-            strPhone2 => {
-                label       => "Phone 2",
-                value       => $field->{strPhone2},
-                type        => 'text',
-                size        => '20',
-                sectionname => 'details',
-            },
-            strFax => {
-                label       => "Fax",
-                value       => $field->{strFax},
-                type        => 'text',
-                size        => '20',
-                sectionname => 'details',
-            },
-            strMapRef => {
-                label       => "Map Reference (Printed Map)",
-                value       => $field->{strMapRef},
-                type        => 'text',
-                size        => '10',
-                sectionname => 'details',
-            },
-            intMapNumber => {
-                label       => "Map Number (Printed Map)",
-                value       => $field->{intMapNumber},
-                type        => 'text',
-                size        => '10',
-                sectionname => 'details',
-            },
-            mapdesc => {
-                label => 'map desc',
-                type  => 'textvalue',
-                value => '<p>Enter Latitude and Longtitude in the boxes below or drag the map marker to the correct location.</p>',
-                sectionname    => 'mapping',
-                SkipProcessing => 1,
-            },
-            mapblock => {
-                label    => "Map",
-                value    => '',
-                posttext => ' <div id="map_canvas" style="width:450px;height:450px;border:1px solid #888;"></div>',
-                type           => 'hidden',
-                size           => '40',
-                sectionname    => 'mapping',
-                SkipProcessing => 1,
-            },
-            dblLat => {
-                label       => "Latitude",
-                value       => $field->{dblLat},
-                type        => 'text',
-                size        => '20',
-                sectionname => 'mapping',
-            },
-            dblLong => {
-                label       => "Longtitude",
-                value       => $field->{dblLong},
-                type        => 'text',
-                size        => '20',
-                sectionname => 'mapping',
-            },
-        },
-        order => [ qw(intVenueID strLocalName intStatus strAbbrev intTypeID strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhone strPhone2 strFax intMapNumber strMapRef mapdesc dblLat dblLong mapblock)],
-        sections => [ 
-            [ 'details', "Venue Details" ], 
-            [ 'mapping', "Online Mapping" ], 
-        ],
-        options => {
-            labelsuffix => ':',
-            hideblank   => 1,
-            target      => $Data->{'target'},
-            formname    => 'n_form',
-            submitlabel => "Update Venue",
-            introtext   => 'auto',
-            NoHTML      => 1,
-            updateSQL   => qq[
-                UPDATE tblVenue
-                SET --VAL--
-                WHERE 
-                    intVenueID = $venueID
-                    AND intRealmID= $intRealmID
-            ],
-            addSQL => qq[
-                INSERT INTO tblVenue (
-                    intRealmID, 
-                    intEntityID, 
-                    --FIELDS-- 
-                )
-                VALUES (
-                    $intRealmID, 
-                    $intEntityID, 
-                    --VAL-- 
-                )
-            ],
-            auditFunction   => \&auditLog,
-            auditAddParams  => [ $Data, 'Add', 'Venue' ],
-            auditEditParams => [ $venueID, $Data, 'Update', 'Venue' ],
-            LocaleMakeText  => $Data->{'lang'},
-        },
-        carryfields => {
-            client  => $client,
-            a       => $action,
-            venueID => $venueID,
-        },
-    );
-    
+    fields=>  {
+      strFIFAID => {
+        label => 'FIFA ID',
+        value => $field->{strFIFAID},
+        type  => 'text',
+        size  => '40',
+        maxsize => '150',
+        readonly =>1,
+        sectionname => 'details',
+      },
+      strLocalName => {
+        label => 'Name',
+        value => $field->{strLocalName},
+        type  => 'text',
+        size  => '40',
+        maxsize => '150',
+        readonly =>1,
+        sectionname => 'details',
+      },
+      strLocalShortName => {
+        label => 'Short Name',
+        value => $field->{strLocalShortName},
+        type  => 'text',
+        size  => '30',
+        maxsize => '50',
+        sectionname => 'details',
+      },      
+      strLatinName => {
+        label => 'Name (Latin)',
+        value => $field->{strLatinName},
+        type  => 'text',
+        size  => '40',
+        maxsize => '150',
+        sectionname => 'details',
+        readonly =>1,
+      },
+      strLatinShortName => {
+        label => 'Short Name (Latin)',
+        value => $field->{strLatinShortName},
+        type  => 'text',
+        size  => '30',
+        maxsize => '50',
+        sectionname => 'details',
+      },
+
+      strAddress => {
+        label => 'Address',
+        value => $field->{strAddress},
+        type  => 'text',
+        size  => '40',
+        maxsize => '50',
+        sectionname => 'details',
+      },
+      strTown => {
+        label => 'Town',
+        value => $field->{strTown},
+        type  => 'text',
+        size  => '30',
+        maxsize => '50',
+        sectionname => 'details',
+      },
+      strRegion => {
+        label => 'Region',
+        value => $field->{strRegion},
+        type  => 'text',
+        size  => '30',
+        maxsize => '50',
+        sectionname => 'details',
+      },
+      strISOCountry => {
+        label => 'Country (ISO)',
+        value => $field->{strISOCountry},
+        type  => 'text',
+        size  => '30',
+        maxsize => '50',
+        sectionname => 'details',
+      },
+      strPostalCode => {
+        label => 'Postal Code',
+        value => $field->{strPostalCode},
+        type  => 'text',
+        size  => '15',
+        maxsize => '15',
+        sectionname => 'details',
+      },
+      strPhone => {
+        label => 'Phone',
+        value => $field->{strPhone},
+        type  => 'text',
+        size  => '20',
+        maxsize => '20',
+        sectionname => 'details',
+      },
+      strFax => {
+        label => 'Fax',
+        value => $field->{strFax},
+        type  => 'text',
+        size  => '20',
+        maxsize => '20',
+        sectionname => 'details',
+      },
+      strEmail => {
+        label => 'Email',
+        value => $field->{strEmail},
+        type  => 'text',
+        size  => '35',
+        maxsize => '250',
+        validate => 'EMAIL',
+        sectionname => 'details',
+      },
+      strWebURL => {
+        label => 'Web',
+        value => $field->{strWebURL},
+        type  => 'text',
+        size  => '35',
+        maxsize => '250',
+        sectionname => 'details',
+      },
+      strDescription => {
+        label => 'Description',
+        value => $field->{strDescription},
+        type => 'textarea',
+        rows => '10',
+        cols => '40',
+        sectionname => 'details',
+      },
+      SP1  => {
+        type =>'_SPACE_',
+        sectionname => 'details',
+      },
+      intCapacity => {
+        label => 'Capacity',
+        value => $field->{intCapacity},
+        type  => 'text',
+        size  => '10',
+        maxsize => '10',
+        validate => 'NUMBER',
+        sectionname => 'details',
+      },
+      intCoveredSeats=> {
+        label => 'Covered Seats',
+        value => $field->{intCoveredSeats},
+        type  => 'text',
+        size  => '10',
+        maxsize => '10',
+        validate => 'NUMBER',
+        sectionname => 'details',
+      },
+      intUncoveredSeats=> {
+        label => 'Uncovered Seats',
+        value => $field->{intUncoveredSeats},
+        type  => 'text',
+        size  => '10',
+        maxsize => '10',
+        sectionname => 'details',
+        validate => 'NUMBER',
+      },
+      intCoveredStandingPlaces => {
+        label => 'Covered Standing Places',
+        value => $field->{intCoveredStandingPlaces},
+        type  => 'text',
+        size  => '10',
+        maxsize => '10',
+        validate => 'NUMBER',
+        sectionname => 'details',
+      },
+      intUncoveredStandingPlaces => {
+        label => 'Uncovered Standing Places',
+        value => $field->{intUncoveredStandingPlaces},
+        type  => 'text',
+        size  => '10',
+        maxsize => '10',
+        validate => 'NUMBER',
+        sectionname => 'details',
+      },
+      intLightCapacity=> {
+        label => 'Light Capacity',
+        value => $field->{intLightCapacity},
+        type  => 'text',
+        size  => '10',
+        maxsize => '10',
+        validate => 'NUMBER',
+        sectionname => 'details',
+      },
+      strGroundNature => {
+        label => 'Ground Nature',
+        value => $field->{strGroundNature},
+        type  => 'text',
+        size  => '30',
+        maxsize => '50',
+        sectionname => 'details',
+      },
+      strDiscipline => {
+        label => 'Discipline',
+        value => $field->{strDiscipline},
+        type  => 'text',
+        size  => '30',
+        maxsize => '50',
+        sectionname => 'details',
+      },
+      strMapRef => {
+        label       => "Map Reference (Printed Map)",
+        value       => $field->{strMapRef},
+        type        => 'text',
+        size        => '10',
+        sectionname => 'details',
+      },
+      intMapNumber => {
+        label       => "Map Number (Printed Map)",
+        value       => $field->{intMapNumber},
+        type        => 'text',
+        size        => '10',
+        sectionname => 'details',
+      },
+      mapdesc => {
+        label => 'map desc',
+        type  => 'textvalue',
+        value => '<p>Enter Latitude and Longtitude in the boxes below or drag the map marker to the correct location.</p>',
+        sectionname    => 'mapping',
+        SkipProcessing => 1,
+      },
+      mapblock => {
+        label    => "Map",
+        value    => '',
+        posttext => ' <div id="map_canvas" style="width:450px;height:450px;border:1px solid #888;"></div>',
+        type           => 'hidden',
+        size           => '40',
+        sectionname    => 'mapping',
+        SkipProcessing => 1,
+      },
+      dblLat => {
+        label       => "Latitude",
+        value       => $field->{dblLat},
+        type        => 'text',
+        size        => '20',
+        sectionname => 'mapping',
+      },
+      dblLong => {
+        label       => "Longtitude",
+        value       => $field->{dblLong},
+        type        => 'text',
+        size        => '20',
+        sectionname => 'mapping',
+      },
+    },
+    order => [qw(
+        strFIFAID
+        strLocalName
+        strLocalShortName
+        strLatinName
+        strLatinShortName
+        dtFrom
+        dtTo
+        strISOCountry
+        strRegion
+        strPostalCode
+        strTown
+        strAddress
+        strWebURL
+        strEmail
+        strPhone
+        strFax
+        intCapacity
+        intCoveredSeats
+        intUncoveredSeats
+        intCoveredStandingPlaces
+        intUncoveredStandingPlaces
+        intLightCapacity
+        strGroundNature
+        strDiscipline
+        strMapRef
+        intMapNumber
+        mapdesc
+        dblLat
+        dblLong
+        mapblock
+        strDescription
+    )],
+    sections => [ 
+        [ 'details', "Venue Details" ], 
+        [ 'mapping', "Online Mapping" ], 
+    ],
+    options => {
+      labelsuffix => ':',
+      hideblank => 1,
+      target => $Data->{'target'},
+      formname => 'n_form',
+      submitlabel => $Data->{'lang'}->txt('Update'),
+      introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
+      NoHTML => 1, 
+      updateSQL => qq[
+          UPDATE tblEntity
+            SET --VAL--
+          WHERE intEntityID=$venueID
+              AND intRealmID= $intRealmID
+      ],
+      addSQL => qq[
+          INSERT INTO tblEntity (
+              intRealmID, 
+              intEntityLevel, 
+              --FIELDS-- 
+          )
+          VALUES (
+              $intRealmID, 
+              -47, 
+              --VAL-- 
+          )
+      ],
+      auditFunction=> \&auditLog,
+      auditAddParams => [
+        $Data,
+        'Add',
+        'Venue'
+      ],
+      auditEditParams => [
+        $venueID,
+        $Data,
+        'Update',
+        'Venue'
+      ],
+
+      afteraddFunction => \&postVenueAdd,
+      afteraddParams => [$option,$Data,$Data->{'db'}],
+      afterupdateFunction => \&postVenueUpdate,
+      afterupdateParams => [$option,$Data,$Data->{'db'}, $venueID],
+
+      LocaleMakeText => $Data->{'lang'},
+    },
+    carryfields =>  {
+      client => $client,
+      a=> $action,
+    },
+  );
     my $resultHTML='';
     ($resultHTML, undef )=handleHTMLForm(\%FieldDefinitions, undef, $option, '',$Data->{'db'});
     my $title=qq[Venue- $field->{strLocalName}];
@@ -260,8 +392,7 @@ sub venue_details   {
     }
     elsif ($option eq 'edit') {
         # Delete Venue.
-        my $venueObj = new VenueObj('db'=>$Data->{db},ID=>$venueID,realmID=>$intRealmID, entityID=>$intEntityID);
-        $venueObj->load();
+        my $venueObj = new EntityObj('db'=>$Data->{db},ID=>$venueID,realmID=>$intRealmID);
         
         $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DEL&amp;venueID=$venueID" onclick="return confirm('Are you sure you want to delete this venue');">Delete Venue</a> ] if $venueObj->canDelete();
     }
@@ -332,37 +463,64 @@ sub venue_details   {
     return ($resultHTML,$title);
 }
 
-
 sub loadVenueDetails {
-    my($db, $id, $realmID, $entityID) = @_;
-
-    $entityID ||= 0;
-    my $field = {};
-
-    if($id) {
-        my $statement=qq[
-            SELECT *
-            FROM 
-                tblVenue
-            WHERE 
-                intVenueID = ?
-                AND intRealmID= ?
-                AND intEntityID=?
-        ];
-        my $query = $db->prepare($statement);
-        $query->execute(
-            $id,
-            $realmID,
-            $entityID
-        );
-        $field=$query->fetchrow_hashref();
-        $query->finish;
-    }
-
-    foreach my $key (keys %{$field})  { 
-        if(!defined $field->{$key}) {$field->{$key}='';} 
-    }
-    return $field;
+  my($db, $id) = @_;
+                                                                                                        
+  my $statement=qq[
+    SELECT 
+      intEntityID,
+      intEntityLevel,
+      intRealmID,
+      strEntityType,
+      strStatus,
+      intRealmApproved,
+      intCreatedByEntityID,
+      strFIFAID,
+      strLocalName,
+      strLocalShortName,
+      strLocalFacilityName,
+      strLatinName,
+      strLatinShortName,
+      strLatinFacilityName,
+      dtFrom,
+      dtTo,
+      strISOCountry,
+      strRegion,
+      strPostalCode,
+      strTown,
+      strAddress,
+      strWebURL,
+      strEmail,
+      strPhone,
+      strFax,
+      strContactTitle,
+      strContactEmail,
+      strContactPhone,
+      dtAdded,
+      tTimeStamp,
+      intCapacity,
+      intCoveredSeats,
+      intUncoveredSeats,
+      intCoveredStandingPlaces,
+      intUncoveredStandingPlaces,
+      intLightCapacity,
+      strGroundNature,
+      strDiscipline,
+      strMapRef,
+      intMapNumber,
+      dblLat,
+      dblLong,
+      strDescription
+    FROM tblEntity
+    WHERE intEntityID = ?
+  ];
+  my $query = $db->prepare($statement);
+  $query->execute($id);
+  my $field=$query->fetchrow_hashref();
+  $query->finish;
+                                                                                                        
+  foreach my $key (keys %{$field})  { if(!defined $field->{$key}) {$field->{$key}='';} }
+  return $field;
 }
 
 sub listVenues  {
@@ -371,48 +529,43 @@ sub listVenues  {
     my $resultHTML = '';
     my $client = unescape($Data->{client});
 
-    my @BindArray = ();
-    my $st=qq[
-        SELECT
-          * 
-        FROM 
-          tblVenue
-        WHERE 
-          intRealmID= ?
-    ];
-    push @BindArray, $Data->{'Realm'};        
-    if ($Data->{'Entity'} and $Data->{'Entity'} > 0)    {
-        $st .= qq[ AND intEntityID = ?];
-        push @BindArray, $Data->{'Entity'};        
-    }
-
-    $st .= qq[
-          AND intStatus <> $Defs::RECSTATUS_DELETED
-            ORDER BY 
-          strLocalName
-    ];
-    my $query = $Data->{'db'}->prepare($st);
-    $query->execute(@BindArray);
-
     my %tempClientValues = getClient($client);
-    my $currentname='';
 
+    my $entityID = getID($Data->{'clientValues'});
+
+    my $statement =qq[
+      SELECT 
+        PN.intEntityID AS PNintEntityID, 
+        CN.strLocalName, 
+        CN.intEntityID AS CNintEntityID, 
+        CN.intEntityLevel AS CNintEntityLevel, 
+        PN.strLocalName AS PNName, 
+        CN.strStatus
+      FROM tblEntity AS PN 
+        LEFT JOIN tblEntityLinks ON PN.intEntityID=tblEntityLinks.intParentEntityID 
+        JOIN tblEntity as CN ON CN.intEntityID=tblEntityLinks.intChildEntityID
+      WHERE PN.intEntityID = ?
+        AND CN.strStatus <> 'DELETED'
+        AND CN.intEntityLevel = ?
+        AND CN.intDataAccess>$Defs::DATA_ACCESS_NONE
+      ORDER BY CN.strLocalName
+    ];
+    my $query = $Data->{'db'}->prepare($statement);
+    $query->execute($entityID, $Defs::LEVEL_VENUE);
+    my $results=0;
     my @rowdata = ();
-    while (my $dref= $query->fetchrow_hashref()) {
-        my $venueID = $dref->{intVenueID};
-        my $tempClient = setClient(\%tempClientValues);
-        $dref->{VenueType} = $Defs::VenueTypes{$dref->{intTypeID}} || '';
-        my $venueType = $dref->{'strVenueType'} || '';
-        
-        push @rowdata, {
-            id => $venueID || next,
-            strLocalName => $dref->{'strLocalName'} || '',
-            SelectLink => "$Data->{'target'}?client=$tempClient&amp;a=VENUE_DTE&amp;venueID=$dref->{intVenueID}",
-            strLocalShortName=> $dref->{'strLocalShortName'} || '',
-            VenueType => $venueType,
-            intStatus => $dref->{'intStatus'} || 0,
-        };
+    while (my $dref = $query->fetchrow_hashref) {
+      $results=1;
+      $tempClientValues{currentLevel} = $dref->{CNintEntityLevel};
+      setClientValue(\%tempClientValues, $dref->{CNintEntityLevel}, $dref->{CNintEntityID});
+      my $tempClient = setClient(\%tempClientValues);
+      push @rowdata, {
+        id => $dref->{'CNintEntityID'} || 0,
+        strLocalName => $dref->{'strLocalName'} || '',
+        SelectLink => "$Data->{'target'}?client=$tempClient&amp;a=VENUE_DTE&amp;venueID=$dref->{'CNintEntityID'}",
+      };
     }
+    $query->finish;
 
     my $addlink='';
     my $title=qq[Venues];
@@ -434,15 +587,6 @@ sub listVenues  {
         {
             name  => $Data->{'lang'}->txt('Venue Name'),
             field => 'strLocalName',
-        },
-        {
-            name  => $Data->{'lang'}->txt('Short Name'),
-            width => 50,
-            field => 'strLocalShortName',
-        },
-        {
-            name  => $Data->{'lang'}->txt('Venue Type'),
-            field => 'VenueType',
         },
         {
             name   => $Data->{'lang'}->txt('Status'),
@@ -485,5 +629,47 @@ sub listVenues  {
     return ($resultHTML,$title);
 }
 
+sub postVenueUpdate {
+  my($id,$params,$action,$Data,$db, $entityID)=@_;
+  return undef if !$db;
+  $entityID ||= $id || 0;
+
+  $Data->{'cache'}->delete('swm',"VenueObj-$entityID") if $Data->{'cache'};
+
+}
+
+sub postVenueAdd {
+  my($id,$params,$action,$Data,$db)=@_;
+  return undef if !$db;
+  if($action eq 'add')  {
+    if($id) {
+      my $entityID = getID($Data->{'clientValues'});
+      my $st=qq[
+        INSERT INTO tblEntityLinks (intParentEntityID, intChildEntityID)
+        VALUES (?,?)
+      ];
+      my $query = $db->prepare($st);
+      $query->execute($entityID, $id);
+      $query->finish();
+    }
+
+    {
+      my $cl=setClient($Data->{'clientValues'}) || '';
+      my %cv=getClient($cl);
+      $cv{'venueID'}=$id;
+      $cv{'currentLevel'} = $Defs::LEVEL_VENUE;
+      my $clm=setClient(\%cv);
+      return (0,qq[
+        <div class="OKmsg"> $Data->{'LevelNames'}{$Defs::LEVEL_VENUE} Added Successfully</div><br>
+        <a href="$Data->{'target'}?client=$clm&amp;a=VENUE_DT">Display Details for $params->{'d_strLocalName'}</a><br><br>
+        <b>or</b><br><br>
+        <a href="$Data->{'target'}?client=$cl&amp;a=VENUE_DTA&amp;l=$Defs::LEVEL_VENUE">Add another $Data->{'LevelNames'}{$Defs::LEVEL_VENUE}</a>
+
+      ]);
+    }
+  }
+}
+
 1;
+
 

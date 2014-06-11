@@ -27,7 +27,6 @@ use PaymentApplication;
 use Agreements;
 
 use Entity;
-use Assoc;
 use Club;
 use Member;
 use Changes;
@@ -133,10 +132,6 @@ sub main {
     if ( $action =~ /^E_/ ) {
         ( $resultHTML, $pageHeading ) =
           handleEntity( $action, \%Data, $ID, $typeID );
-    }
-    elsif ( $action =~ /^A_/ ) {
-        ( $resultHTML, $pageHeading, $breadcrumbs ) =
-          handleAssoc( $action, \%Data, $ID, $typeID );
     }
     elsif ( $action =~ /^C_/ ) {
         ( $resultHTML, $pageHeading ) =

@@ -195,7 +195,7 @@ sub getEntityMenuData {
     if(exists $children->{$Defs::LEVEL_VENUE})    {
         $menuoptions{'venues'} = {
             name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}),
-            url => $baseurl."a=C_L&amp;l=$Defs::LEVEL_VENUE",
+            url => $baseurl."a=VENUE_L&amp;l=$Defs::LEVEL_VENUE",
         };
     }
     if(exists $children->{$Defs::LEVEL_PERSON})    {
@@ -661,7 +661,7 @@ sub getClubMenuData {
         },
         venues => {
             name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}),
-            url => $baseurl."a=M_L&amp;l=$Defs::LEVEL_PERSON",
+            url => $baseurl."a=VENUE_L&amp;l=$Defs::LEVEL_VENUE",
         },
     );
     my $txt_RequestCLR = $SystemConfig->{'txtRequestCLR'} || 'Request a Clearance';
