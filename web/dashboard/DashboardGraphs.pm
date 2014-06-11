@@ -111,7 +111,7 @@ sub _getGraphConfig {
 
     my %graphs = (
         member_historical => {
-            name => $Data->{'LevelNames'}{ $Defs::LEVEL_MEMBER . "_P" },
+            name => $Data->{'LevelNames'}{ $Defs::LEVEL_PERSON . "_P" },
         },
         player_historical => {
             name => 'Players',
@@ -130,27 +130,15 @@ sub _getGraphConfig {
         },
         newmembers_historical => {
             name => 'New '
-              . $Data->{'LevelNames'}{ $Defs::LEVEL_MEMBER . "_P" },
+              . $Data->{'LevelNames'}{ $Defs::LEVEL_PERSON . "_P" },
         },
         regoformembers_historical => {
-            name => $Data->{'LevelNames'}{ $Defs::LEVEL_MEMBER . "_P" }
+            name => $Data->{'LevelNames'}{ $Defs::LEVEL_PERSON . "_P" }
               . ' registered via forms',
         },
         permitmembers_historical => {
-            name => $Data->{'LevelNames'}{ $Defs::LEVEL_MEMBER . "_P" }
+            name => $Data->{'LevelNames'}{ $Defs::LEVEL_PERSON . "_P" }
               . ' on Permit',
-        },
-        comps_historical => {
-            name => $Data->{'LevelNames'}{ $Defs::LEVEL_COMP . "_P" },
-        },
-        clubs_historical => {
-            name => $Data->{'LevelNames'}{ $Defs::LEVEL_CLUB . "_P" },
-        },
-        teams_historical => {
-            name => $Data->{'LevelNames'}{ $Defs::LEVEL_TEAM . "_P" },
-        },
-        teams_historical => {
-            name => $Data->{'LevelNames'}{ $Defs::LEVEL_TEAM . "_P" },
         },
         clrin_historical => {
             name => 'Clearances In',

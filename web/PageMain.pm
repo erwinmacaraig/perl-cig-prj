@@ -1,10 +1,4 @@
-#
-# $Header: svn://svn/SWM/trunk/web/PageMain.pm 11321 2014-04-16 05:44:15Z cregnier $
-#
-
 package PageMain;
-
-## LAST EDITED -> 28/6/2001 ##
 
 require Exporter;
 @ISA =  qw(Exporter);
@@ -58,6 +52,7 @@ sub ccPageForm  {
     $meta->{'title'} = $title;
     $meta->{'head'} = qq[
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
                 $html_head
         <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.8.1/jquery.validate.min.js"></script>
         
@@ -217,8 +212,8 @@ sub pageMain {
         StatsCounter =>  $statscounter || '',
         Content => $body || '',
         Title => $title || '',
-        MemListName => uc($Data->{'LevelNames'}{$Defs::LEVEL_MEMBER.'_P'}) || 'MEMBERS',
-        ClubListName => uc($Data->{'LevelNames'}{$Defs::LEVEL_CLUB.'_P'}) || 'CLUBS',
+        MemListName => uc($Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}) || $Data->{'lang'}->txt('PEOPLE'),
+        ClubListName => uc($Data->{'LevelNames'}{$Defs::LEVEL_CLUB.'_P'}) || $Data->{'lang'}->txt('CLUBS'),
         GlobalNav => $globalnav || '',
         Header => $Data->{'SystemConfig'}{'Header'} || '',
         NavBar => $navbar || '',
@@ -232,19 +227,16 @@ sub pageMain {
     );
 
     my $authLevel = $clientValues_ref->{'authLevel'} || 0;
-    if($authLevel == $Defs::LEVEL_ASSOC)    {
+    #if($authLevel == $Defs::LEVEL_ASSOC)    {
+        #$TemplateData{'MemListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=M_L&amp;l=1";
+        #$TemplateData{'CompListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=CO_L&amp;l=4" if(!$Data->{'SystemConfig'}{'NoComps'});
+        #$TemplateData{'ClubListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=C_L&amp;l=3" if($Data->{'Permissions'}{'OtherOptions'}{'ShowClubs'} or !$Data->{'SystemConfig'}{'NoClubs'});
+        #$TemplateData{'TeamListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=T_L&amp;l=2" if(!$Data->{'SystemConfig'}{'NoTeams'});
+    #}
+    if($authLevel == $Defs::LEVEL_CLUB)    {
         $TemplateData{'MemListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=M_L&amp;l=1";
-        $TemplateData{'CompListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=CO_L&amp;l=4" if(!$Data->{'SystemConfig'}{'NoComps'});
-        $TemplateData{'ClubListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=C_L&amp;l=3" if($Data->{'Permissions'}{'OtherOptions'}{'ShowClubs'} or !$Data->{'SystemConfig'}{'NoClubs'});
         $TemplateData{'TeamListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=T_L&amp;l=2" if(!$Data->{'SystemConfig'}{'NoTeams'});
     }
-    elsif($authLevel == $Defs::LEVEL_CLUB)    {
-        $TemplateData{'MemListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=M_L&amp;l=1";
-        $TemplateData{'TeamListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=T_L&amp;l=2" if(!$Data->{'SystemConfig'}{'NoTeams'});
-    }
-    elsif($authLevel == $Defs::LEVEL_TEAM)  {
-    $TemplateData{'MemListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=M_L&amp;l=1";
-  }
 
     my $templateFile = 'page_wrapper/main_wrapper.templ';
     my $page = runTemplate(
@@ -296,6 +288,7 @@ sub printReport    {
     print qq[
   <html>
     <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
       <title>$title</title>
             <link rel="stylesheet" type="text/css" href="$Defs::base_url/css/style.css">
     </head>
@@ -321,6 +314,7 @@ sub printBasePage {
   print qq[
   <html>
     <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
       <title>$title</title>
             <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
             <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js"></script>
@@ -507,10 +501,8 @@ sub getHomeClient {
         $clientValues{stateID} =0;
         $clientValues{regionID} =0;
         $clientValues{zoneID} =0;
-        $clientValues{assocID} =0;
         $clientValues{clubID} =0;
         $clientValues{memberID} =0;
-        $clientValues{clubAssocID} =0;
         $clientValues{eventID} =0;
     }
     if ($clientValues{'currentLevel'} == $Defs::LEVEL_INTERNATIONAL)    {
@@ -533,9 +525,6 @@ sub getHomeClient {
     }
     if ($clientValues{'currentLevel'} == $Defs::LEVEL_ZONE)    {
         $clientValues{zoneID} = $Data->{'clientValues'}{'zoneID'} || 0;
-    }
-    if ($clientValues{'currentLevel'} == $Defs::LEVEL_ASSOC)    {
-        $clientValues{assocID} = $Data->{'clientValues'}{'assocID'} || 0;
     }
     if ($clientValues{'currentLevel'} == $Defs::LEVEL_CLUB)    {
         $clientValues{assocID} = $Data->{'clientValues'}{'assocID'} || 0;

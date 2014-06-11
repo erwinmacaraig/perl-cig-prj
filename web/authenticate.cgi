@@ -140,8 +140,8 @@ sub main {
     # BASED ON USERS LEVEL  SET UP CLIENT VARIABLES ETC.
 
     my $client = '';
-    if ( $level == $Defs::LEVEL_MEMBER ) {
-        $clientValues{memberID} = $idcode;
+    if ( $level == $Defs::LEVEL_PERSON ) {
+        $clientValues{personID} = $idcode;
         $clientValues{assocID}  = $assocID;
         kickThemOff( 'Invalid Login Parameters', $redirectURL );
     }

@@ -3,7 +3,6 @@ CREATE table tblEntityLinks (
     intParentEntityID  INT NOT NULL,
     intChildEntityID 	 INT NOT NULL,
 	intPrimary			 TINYINT NOT NULL DEFAULT 1,
-    intDataAccess   TINYINT NOT NULL DEFAULT 10,
     tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
 PRIMARY KEY (intEntityLinksID),

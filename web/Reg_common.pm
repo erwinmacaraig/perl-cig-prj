@@ -256,7 +256,7 @@ sub setClient {
     $clientValues_ref->{zoneID}       ||= 0;
     $clientValues_ref->{assocID}      ||= $Defs::INVALID_ID;
     $clientValues_ref->{clubID}       ||= $Defs::INVALID_ID;
-    $clientValues_ref->{memberID}     ||= $Defs::INVALID_ID;
+    $clientValues_ref->{personID}     ||= $Defs::INVALID_ID;
     $clientValues_ref->{currentLevel} ||= -1;
     $clientValues_ref->{authLevel}    ||= -1;
     $clientValues_ref->{'userID'} ||= 0;
@@ -270,7 +270,7 @@ sub setClient {
       . $clientValues_ref->{regionID} . '|'
       . $clientValues_ref->{zoneID} . '|'
       . $clientValues_ref->{clubID} . '|'
-      . $clientValues_ref->{memberID} . '|'
+      . $clientValues_ref->{personID} . '|'
       . $clientValues_ref->{currentLevel} . '|'
       . $clientValues_ref->{authLevel} . '|'
       . $clientValues_ref->{'userID'} . '|';
@@ -311,7 +311,7 @@ sub getClient {
         $clientValues{regionID},
         $clientValues{zoneID},       
         $clientValues{clubID},
-        $clientValues{memberID},
+        $clientValues{personID},
         $clientValues{currentLevel}, 
         $clientValues{authLevel},
         $clientValues{'userID'}, 
@@ -326,19 +326,19 @@ sub getClient {
     $clientValues{regionID}     ||= 0;
     $clientValues{zoneID}       ||= 0;
     $clientValues{clubID}       ||= $Defs::INVALID_ID;
-    $clientValues{memberID}     ||= $Defs::INVALID_ID;
+    $clientValues{personID}     ||= $Defs::INVALID_ID;
     $clientValues{currentLevel} ||= -1;
     $clientValues{authLevel}    ||= -1;
     $clientValues{userID}   ||= 0;
 
-    if ( $clientValues{currentLevel} > $Defs::LEVEL_MEMBER ) {
-        $clientValues{memberID} = $Defs::INVALID_ID;
+    if ( $clientValues{currentLevel} > $Defs::LEVEL_PERSON ) {
+        $clientValues{personID} = $Defs::INVALID_ID;
     }
     if ( $clientValues{currentLevel} > $Defs::LEVEL_CLUB ) {
-        $clientValues{memberID} = $Defs::INVALID_ID;
+        $clientValues{personID} = $Defs::INVALID_ID;
     }
-    if ( $clientValues{currentLevel} >= $Defs::LEVEL_ZONE ) {
-        $clientValues{assocID} = $Defs::INVALID_ID;
+    if ( $clientValues{currentLevel} > $Defs::LEVEL_CLUB ) {
+        $clientValues{clubID} = $Defs::INVALID_ID;
     }
     if ( $clientValues{currentLevel} >= $Defs::LEVEL_REGION ) {
         $clientValues{zoneID} = $Defs::INVALID_ID;
@@ -552,6 +552,8 @@ sub getDBConfig {
             [ 'Members',         1,   1, 'Members'],
             [ 'Competitions',    4,   1, 'Comps'],
             [ 'Competition',     4,   0, 'Comp'],
+            [ 'Venues',        -47,   1, 'Venues'],
+            [ 'Venue',         -47,   0, 'Venue'],
         );
         for my $name (@names) {
             if ( $name->[2] ) {
@@ -639,29 +641,14 @@ sub getLevelName {
     return '' if !$clientValues_ref;
 
     return $clientValues_ref->{Level_MemberName}
-      if $levelID == $Defs::LEVEL_MEMBER and !$plural;
+      if $levelID == $Defs::LEVEL_PERSON and !$plural;
     return $clientValues_ref->{Level_MemberNamePlural}
-      if $levelID == $Defs::LEVEL_MEMBER and $plural;
-
-    return $clientValues_ref->{Level_TeamName}
-      if $levelID == $Defs::LEVEL_TEAM and !$plural;
-    return $clientValues_ref->{Level_TeamNamePlural}
-      if $levelID == $Defs::LEVEL_TEAM and $plural;
+      if $levelID == $Defs::LEVEL_PERSON and $plural;
 
     return $clientValues_ref->{Level_ClubName}
       if $levelID == $Defs::LEVEL_CLUB and !$plural;
     return $clientValues_ref->{Level_ClubNamePlural}
       if $levelID == $Defs::LEVEL_CLUB and $plural;
-
-    return $clientValues_ref->{Level_CompName}
-      if $levelID == $Defs::LEVEL_COMP and !$plural;
-    return $clientValues_ref->{Level_CompNamePlural}
-      if $levelID == $Defs::LEVEL_COMP and $plural;
-
-    return $clientValues_ref->{Level_AssocName}
-      if $levelID == $Defs::LEVEL_ASSOC and !$plural;
-    return $clientValues_ref->{Level_AssocNamePlural}
-      if $levelID == $Defs::LEVEL_ASSOC and $plural;
 
     return $clientValues_ref->{Level_ZoneName}
       if $levelID == $Defs::LEVEL_ZONE and !$plural;
@@ -696,11 +683,8 @@ sub getID {
 
     return 0 if !$clientValues;
     my $cl = $level || $clientValues->{currentLevel} || 0;
-    return $clientValues->{compID}    || 0 if $cl == $Defs::LEVEL_COMP;
-    return $clientValues->{teamID}    || 0 if $cl == $Defs::LEVEL_TEAM;
-    return $clientValues->{memberID}  || 0 if $cl == $Defs::LEVEL_MEMBER;
+    return $clientValues->{personID}  || 0 if $cl == $Defs::LEVEL_PERSON;
     return $clientValues->{clubID}    || 0 if $cl == $Defs::LEVEL_CLUB;
-    return $clientValues->{assocID}   || 0 if $cl == $Defs::LEVEL_ASSOC;
     return $clientValues->{zoneID}    || 0 if $cl == $Defs::LEVEL_ZONE;
     return $clientValues->{regionID}  || 0 if $cl == $Defs::LEVEL_REGION;
     return $clientValues->{stateID}   || 0 if $cl == $Defs::LEVEL_STATE;
@@ -723,13 +707,9 @@ sub setClientValue {
     $clientValues_ref->{stateID}   = $val if $typeID == $Defs::LEVEL_STATE;
     $clientValues_ref->{regionID}  = $val if $typeID == $Defs::LEVEL_REGION;
     $clientValues_ref->{zoneID}    = $val if $typeID == $Defs::LEVEL_ZONE;
-    $clientValues_ref->{assocID}   = $val if $typeID == $Defs::LEVEL_ASSOC;
-    $clientValues_ref->{compID}    = $val if $typeID == $Defs::LEVEL_COMP;
     $clientValues_ref->{clubID}    = $val if $typeID == $Defs::LEVEL_CLUB;
-    $clientValues_ref->{teamID}    = $val if $typeID == $Defs::LEVEL_TEAM;
-    $clientValues_ref->{memberID}  = $val if $typeID == $Defs::LEVEL_MEMBER;
+    $clientValues_ref->{personID}  = $val if $typeID == $Defs::LEVEL_PERSON;
     $clientValues_ref->{venueID}   = $val if $typeID == $Defs::LEVEL_VENUE;
-
 }
 
 sub getClientValue {
@@ -742,12 +722,8 @@ sub getClientValue {
     return $clientValues_ref->{stateID}   if $typeID == $Defs::LEVEL_STATE;
     return $clientValues_ref->{regionID}  if $typeID == $Defs::LEVEL_REGION;
     return $clientValues_ref->{zoneID}    if $typeID == $Defs::LEVEL_ZONE;
-    return $clientValues_ref->{assocID}   if $typeID == $Defs::LEVEL_ASSOC;
-    return $clientValues_ref->{compID}    if $typeID == $Defs::LEVEL_COMP;
     return $clientValues_ref->{clubID}    if $typeID == $Defs::LEVEL_CLUB;
-    return $clientValues_ref->{teamID}    if $typeID == $Defs::LEVEL_TEAM;
-    return $clientValues_ref->{memberID}  if $typeID == $Defs::LEVEL_MEMBER;
-    return $clientValues_ref->{programID} if $typeID == $Defs::LEVEL_PROGRAM;
+    return $clientValues_ref->{personID}  if $typeID == $Defs::LEVEL_PERSON;
 
     return 0;
 }
@@ -786,41 +762,14 @@ sub allowedAction {
         }
     }
     my $currentID = getID( $Data->{'clientValues'} ) || 0;
-    my $currentlevel =
-      $Data->{'clientValues'}{'currentLevel'} || $Defs::LEVEL_NONE;
+    my $currentlevel = $Data->{'clientValues'}{'currentLevel'} || $Defs::LEVEL_NONE;
     my $parentaccess = $Data->{'DataAccess'}{$currentlevel}{$currentID} || 0;
-    if ( $currentlevel < $Defs::LEVEL_ASSOC ) {
-        $parentaccess =
-          $Data->{'DataAccess'}{$Defs::LEVEL_ASSOC}{$assocID} || 0;
-    }
     $parentaccess = $Defs::DATA_ACCESS_FULL if !defined $parentaccess;
     if ( exists $Data->{'SystemConfig'}{'ParentBodyAccess'} ) {
         $parentaccess = $Data->{'SystemConfig'}{'ParentBodyAccess'};
     }
 
-    if ($assocID) {
-        return 1
-      if (  $level > $Defs::LEVEL_ASSOC
-            and $parentaccess != $Defs::DATA_ACCESS_FULL );
-        if ( $level >= $Defs::LEVEL_ASSOC
-            and exists $Data->{'Permissions'}{'PermOptions'}{ 'a_' . $action } )
-        {
-            return 0
-              if !$Data->{'Permissions'}{'PermOptions'}{ 'a_' . $action }[0];
-            return 1;
-        }
-        return 1 if $level >= $Defs::LEVEL_ASSOC;
-        my $pre = '';
-        $pre = 'c' if $level == $Defs::LEVEL_CLUB;
-        $pre = 't' if $level == $Defs::LEVEL_TEAM;
-        $pre = 'm' if $level == $Defs::LEVEL_MEMBER;
-        return 1
-          if $Data->{'Permissions'}{'PermOptions'}{ $pre . '_' . $action }[0];
-    }
-    else {
-        #else nothing
-        return 1 if $parentaccess == $Defs::DATA_ACCESS_FULL;
-    }
+    return 1 if $parentaccess == $Defs::DATA_ACCESS_FULL;
     return 0;
 }
 
@@ -829,18 +778,10 @@ sub getRealm {
     my $cl  = $Data->{'clientValues'}{'currentLevel'} || 0;
     my $st  = '';
     my $val = 0;
-    if ( $cl <= $Defs::LEVEL_ASSOC ) {
-        my $aID = $Data->{'clientValues'}{'assocID'} || 0;
-        $st =
-qq[SELECT intRealmID, intAssocTypeID FROM tblAssoc WHERE intAssocID= ? ];
-        $val = $aID;
-    }
-    elsif ( $cl > $Defs::LEVEL_ASSOC ) {
-        my $id = getID( $Data->{'clientValues'} ) || 0;
-        $st =
-          qq[SELECT intRealmID, intSubTypeID FROM tblEntity WHERE intEntityID= ? ];
-        $val = $id;
-    }
+    my $id = getID( $Data->{'clientValues'} ) || 0;
+    $st =
+      qq[SELECT intRealmID, intSubRealmID FROM tblEntity WHERE intEntityID= ? ];
+    $val = $id;
     if ($st) {
         my $q = $Data->{'db'}->prepare($st);
         $q->execute($val);

@@ -23,4 +23,12 @@ sub load {
 	}
 }
 
+sub name {
+  my $self = shift;
+    my($db) = @_;
+    return $self->{'DBData'}{'strLocalName'} 
+        ||$self->{'DBData'}{'strLatinName'} 
+        || '';
+}
+
 1;

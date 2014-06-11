@@ -14,7 +14,6 @@ use strict;
 use Defs;
 
 use AssocObj;
-use ClubObj;
 use MemberObj;
 use EntityObj;
 
@@ -61,10 +60,9 @@ sub getInstanceOf	{
 		if($id != $Defs::INVALID_ID)	{
 			$obj = $cache->get('swm',"ClubObj-$id") if $cache;
 			if(!$obj)	{
-				$obj = new ClubObj(
-					db => $db,
-					ID => $id,
-					assocID => $id,
+                $obj = new EntityObj(
+                    db => $db,
+                    ID => $id,
 				);
 				return undef if !$obj;
 				$obj->load();
@@ -73,7 +71,7 @@ sub getInstanceOf	{
 					'swm',
 					"ClubObj-$id",
 					$obj, 
-					"ASSOC-$assocID",
+					'',
 					60*60*5, # 5hours
 				) if $cache;
 			}

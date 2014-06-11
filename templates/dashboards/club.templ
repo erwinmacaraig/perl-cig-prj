@@ -1,4 +1,3 @@
-[% IF Ads_DashLeaderboard %]<div>[% Ads_DashLeaderboard %]</div>[% END %]
 <div class = "pageHeading dash-heading">[% Name %]</div>
 <div id="logo-status">
 	[% Logo %]
@@ -7,13 +6,12 @@
 
 <div class = "home_details">
   <div class = "sectionheader">[% Lang.txt('Details') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin %]<a href = "[% EditDetailsLink %]" class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
-	[% IF Details.Address1 or Details.Suburb %]
+	[% IF Details.Address or Details.Town %]
 	<div class = "details-address">
 		<span class = "label">[% Lang.txt('Address') %]</span><br>
-		[% IF Details.Address1 %][% Details.Address1 %]<br>[% END %]
-		[% IF Details.Address2 %][% Details.Address2 %]<br>[% END %]
-		[% IF Details.Suburb %][% Details.Suburb %]<br>[% END %]
-		[% IF Details.State %][% Details.State %],&nbsp;[% END %]
+		[% IF Details.Address %][% Details.Address %]<br>[% END %]
+		[% IF Details.Town %][% Details.Town %]<br>[% END %]
+		[% IF Details.Region %][% Details.Region %],&nbsp;[% END %]
 		[% IF Details.Country %][% Details.Country %],&nbsp;[% END %]
 		[% IF Details.PostalCode %][% Details.PostalCode %][% END %]
 	</div>

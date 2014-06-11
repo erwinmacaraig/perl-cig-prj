@@ -1,7 +1,3 @@
-#
-# $Header: svn://svn/SWM/trunk/web/Navbar.pm 11450 2014-05-01 04:32:28Z sliu $
-#
-
 package Navbar;
 
 require Exporter;
@@ -36,9 +32,8 @@ sub navBar {
     my $clientValues_ref=$Data->{'clientValues'};
     my $currentLevel = $clientValues_ref->{INTERNAL_tempLevel} ||  $clientValues_ref->{currentLevel};
     my $currentID = getID($clientValues_ref);
-    $clientValues_ref->{memberID} = $Defs::INVALID_ID if $currentLevel > $Defs::LEVEL_MEMBER;
-    $clientValues_ref->{memberID} = $Defs::INVALID_ID if $currentLevel > $Defs::LEVEL_CLUB;
-    $clientValues_ref->{clubID} = $Defs::INVALID_ID  if $currentLevel >= $Defs::LEVEL_ASSOC;
+    $clientValues_ref->{memberID} = $Defs::INVALID_ID if $currentLevel > $Defs::LEVEL_PERSON;
+    $clientValues_ref->{clubID} = $Defs::INVALID_ID  if $currentLevel > $Defs::LEVEL_CLUB;
     $clientValues_ref->{zoneID} = $Defs::INVALID_ID if $currentLevel >= $Defs::LEVEL_REGION;
     $clientValues_ref->{regionID} = $Defs::INVALID_ID if $currentLevel >= $Defs::LEVEL_NATIONAL;
     $clientValues_ref->{nationalID} = $Defs::INVALID_ID if $currentLevel >= $Defs::LEVEL_INTZONE;
@@ -79,7 +74,7 @@ sub navBar {
             $navObjects->{$currentLevel},
         );
     }
-    elsif( $currentLevel == $Defs::LEVEL_MEMBER) {
+    elsif( $currentLevel == $Defs::LEVEL_PERSON) {
         $menu_data = getMemberMenuData(
             $Data,
             $currentLevel,
@@ -113,7 +108,7 @@ sub navBar {
         $Defs::LEVEL_REGION =>  'E_HOME',
         $Defs::LEVEL_ZONE =>  'E_HOME',
         $Defs::LEVEL_CLUB =>  'C_HOME',
-        $Defs::LEVEL_MEMBER =>  'M_HOME',
+        $Defs::LEVEL_PERSON =>  'M_HOME',
     );
 
     my %TemplateData= (
@@ -150,15 +145,10 @@ sub getEntityMenuData {
     my $txt_SeasonsNames= $SystemConfig->{'txtSeasons'} || 'Seasons';
     my $txt_AgeGroupsNames= $SystemConfig->{'txtAgeGroups'} || 'Age Groups';
 
-    my $nextlevel = getNextEntityType(
-        $Data->{'db'}, 
-        $currentID,
-    );
-    my $next_level_name = $Data->{'LevelNames'}{$nextlevel.'_P'} || '';
+    my $children = getEntityChildrenTypes($Data->{'db'}, $currentID, $Data->{'Realm'});
 
     my $hideClearances = $entityObj->getValue('intHideClearances');
 
-    my $option='E_L';
     my $txt_Clr = $SystemConfig->{'txtCLR'} || 'Clearance';
     my $txt_Clr_ListOnline = $SystemConfig->{'txtCLRListOnline'} || "List Online $txt_Clr"."s";
 
@@ -178,10 +168,40 @@ sub getEntityMenuData {
             url => $baseurl."a=E_HOME",
         },
     );
-    if($nextlevel) {
-        $menuoptions{'nextlevel'} = {
-            name => $lang->txt($next_level_name),
-            url => $baseurl.";a=$option&amp;l=$nextlevel",
+    if(exists $children->{$Defs::LEVEL_STATE})    {
+        $menuoptions{'states'} = {
+            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_STATE.'_P'}),
+            url => $baseurl."a=E_L&amp;l=$Defs::LEVEL_STATE",
+        };
+    }
+    if(exists $children->{$Defs::LEVEL_REGION})    {
+        $menuoptions{'regions'} = {
+            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_REGION.'_P'}),
+            url => $baseurl."a=E_L&amp;l=$Defs::LEVEL_REGION",
+        };
+    }
+    if(exists $children->{$Defs::LEVEL_ZONE})    {
+        $menuoptions{'zones'} = {
+            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_ZONE.'_P'}),
+            url => $baseurl."a=E_L&amp;l=$Defs::LEVEL_ZONE",
+        };
+    }
+    if(exists $children->{$Defs::LEVEL_CLUB})    {
+        $menuoptions{'clubs'} = {
+            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_CLUB.'_P'}),
+            url => $baseurl."a=C_L&amp;l=$Defs::LEVEL_CLUB",
+        };
+    }
+    if(exists $children->{$Defs::LEVEL_VENUE})    {
+        $menuoptions{'venues'} = {
+            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}),
+            url => $baseurl."a=C_L&amp;l=$Defs::LEVEL_VENUE",
+        };
+    }
+    if(exists $children->{$Defs::LEVEL_PERSON})    {
+        $menuoptions{'persons'} = {
+            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}),
+            url => $baseurl."a=M_L&amp;l=$Defs::LEVEL_PERSON",
         };
     }
 
@@ -197,7 +217,7 @@ sub getEntityMenuData {
         url  => $baseurl."a=AM_",
     };
 
-    if( $nextlevel ) {
+    if( scalar(keys $children)) {
         $menuoptions{'fieldconfig'} = {
             name => $lang->txt('Field Configuration'),
             url => $baseurl."a=FC_C_d",
@@ -294,7 +314,12 @@ sub getEntityMenuData {
 
     my @menu_structure = (
         [ $lang->txt('Dashboard'), 'home','home'],
-        [ $lang->txt($next_level_name), 'menu','nextlevel'],
+        [ $lang->txt('States'), 'menu','states'],
+        [ $lang->txt('Regions'), 'menu','regions'],
+        [ $lang->txt('Zones'), 'menu','zones'],
+        [ $lang->txt('Clubs'), 'menu','clubs'],
+        [ $lang->txt('Venues'), 'menu','venues'],
+        [ $lang->txt('People'), 'menu','persons'],
         [ $lang->txt($txt_Clr.'s'), 'menu', [
         'clearances',    
         'clearancesAll',
@@ -355,7 +380,6 @@ sub getAssocMenuData {
     $swol_url = $Defs::SWOL_URL_v6 if ($Data->{'SystemConfig'}{'AssocConfig'}{'olrv6'});
     my $DataAccess_ref = $Data->{'DataAccess'};
 
-
     my (
         $intAllowClearances, 
         $intSWOL,
@@ -392,8 +416,8 @@ sub getAssocMenuData {
             url => $baseurl."a=A_HOME",
         },
         members => {
-            name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_MEMBER.'_P'}),
-            url => $baseurl."a=M_L&amp;l=$Defs::LEVEL_MEMBER",
+            name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}),
+            url => $baseurl."a=M_L&amp;l=$Defs::LEVEL_PERSON",
         },
     );
 
@@ -520,8 +544,8 @@ sub getAssocMenuData {
             and !$hideAssocRollover
             and allowedAction($Data, 'm_e')) {
         $menuoptions{'memberrollover'} = {
-            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_MEMBER}.' Rollover'),
-            url => $baseurl."a=M_LSRO&amp;l=$Defs::LEVEL_MEMBER",
+            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON}.' Rollover'),
+            url => $baseurl."a=M_LSRO&amp;l=$Defs::LEVEL_PERSON",
         };
     }
 
@@ -530,7 +554,7 @@ sub getAssocMenuData {
             and allowedAction($Data, 'a_e')
     ) {
         $menuoptions{'transfermember'} = {
-            url => $baseurl."a=M_TRANSFER&amp;l=$Defs::LEVEL_MEMBER",
+            url => $baseurl."a=M_TRANSFER&amp;l=$Defs::LEVEL_PERSON",
             name => $Data->{'SystemConfig'}{'transferMemberText'} || $lang->txt('Transfer Member'),
         };
     }
@@ -550,7 +574,7 @@ sub getAssocMenuData {
 
     my @menu_structure = (
         [ $lang->txt('Dashboard'), 'home','home'],
-        [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_MEMBER.'_P'}), 'menu', [
+        [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}), 'menu', [
         'members',
         'duplicates',
         'clearances',    
@@ -615,25 +639,6 @@ sub getClubMenuData {
     my $txt_Clr_ListOnline = $SystemConfig->{'txtCLRListOnline'} || "List Online $txt_Clr"."s";
     my $DataAccess_ref = $Data->{'DataAccess'};
 
-    my (
-        $intAllowClearances, 
-        $intAllowClubClrAccess,
-        $intAllowRegoForm,
-        $assocID,
-        $hideAssocRollover,
-        $hideClubRollover,
-        $intAllowSeasons,
-    ) = $assocObj->getValue([
-        'intAllowClearances', 
-        'intAllowClubClrAccess',
-        'intAllowRegoForm',
-        'intAssocID',
-        'intHideRollover',
-        'intHideClubRollover',
-        'intAllowSeasons',
-        ]);
-    $intAllowClubClrAccess = 1 if ($Data->{'clientValues'}{'authLevel'}>=$Defs::LEVEL_ASSOC);
-
     my $paymentSplitSettings = getPaymentSplitSettings($Data);
 
     my $baseurl = "$target?client=$client&amp;";
@@ -651,9 +656,12 @@ sub getClubMenuData {
             url => $baseurl."a=C_HOME",
         },
         members => {
-
-            name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_MEMBER.'_P'}),
-            url => $baseurl."a=M_L&amp;l=$Defs::LEVEL_MEMBER",
+            name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}),
+            url => $baseurl."a=M_L&amp;l=$Defs::LEVEL_PERSON",
+        },
+        venues => {
+            name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}),
+            url => $baseurl."a=M_L&amp;l=$Defs::LEVEL_PERSON",
         },
     );
     my $txt_RequestCLR = $SystemConfig->{'txtRequestCLR'} || 'Request a Clearance';
@@ -665,10 +673,7 @@ sub getClubMenuData {
         };
     }
 
-    if($SystemConfig->{'AllowClearances'} 
-            and $intAllowClearances
-            and $intAllowClubClrAccess
-            and !$SystemConfig->{'TurnOffRequestClearance'} 
+    if($SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequestClearance'} 
     ) {
         if(!$Data->{'ReadOnlyLogin'}) {
             $menuoptions{'newclearance'} = {
@@ -677,8 +682,7 @@ sub getClubMenuData {
             };
         }
         if (
-            $Data->{'ReadOnlyLogin'} 
-                or $SystemConfig->{'Overide_ROL_RequestClearance'}) {
+            $Data->{'ReadOnlyLogin'} or $SystemConfig->{'Overide_ROL_RequestClearance'}) {
             $menuoptions{'newclearance'} = {
                 name => $lang->txt($txt_RequestCLR),
                 url => $baseurl."a=CL_createnew",
@@ -695,7 +699,6 @@ sub getClubMenuData {
     ) {
 
         if($SystemConfig->{'AllowClearances'} 
-                and $intAllowClearances
                 and (!$Data->{'ReadOnlyLogin'} or
                 $SystemConfig->{'Overide_ROL_RequestClearance'}
             )
@@ -716,17 +719,13 @@ sub getClubMenuData {
                 and allowedAction($Data,'c_e')
         ) {
 
-            $menuoptions{'fieldconfig'} = {
-                name => $lang->txt('Field Configuration'),
-                url => $baseurl."a=FC_C_d",
-            };
             $menuoptions{'usermanagement'} = {
                 name => $lang->txt('User Management'),
                 url => $baseurl."a=AM_",
             };
             if ( $Data->{'SystemConfig'}{'AllowMemberTransfers'}  and allowedAction($Data, 'c_e')) {
                 $menuoptions{'transfermember'} = {
-                    url => $baseurl."a=M_TRANSFER&amp;l=$Defs::LEVEL_MEMBER",
+                    url => $baseurl."a=M_TRANSFER&amp;l=$Defs::LEVEL_PERSON",
                     name => $Data->{'SystemConfig'}{'transferMemberText'} || $lang->txt('Transfer Member'),
                 };
             }
@@ -755,11 +754,8 @@ sub getClubMenuData {
                 };
             }   
             if (
-                $intAllowRegoForm
-                    and (
-                    $Data->{'SystemConfig'}{'AllowOnlineRego'}
-                        or $Data-> {'Permissions'}{'OtherOptions'}{'AllowOnlineRego'}
-                )
+                $Data->{'SystemConfig'}{'AllowOnlineRego'}
+                    or $Data-> {'Permissions'}{'OtherOptions'}{'AllowOnlineRego'}
                     and !$Data->{'ReadOnlyLogin'}
             ) {
                 $menuoptions{'registrationforms'} = {
@@ -771,20 +767,17 @@ sub getClubMenuData {
         }
     }
 
-    $hideClubRollover = '' if ($hideClubRollover == 2 and $Data->{'clientValues'}{'authLevel'} > $Defs::LEVEL_CLUB);
     if(
-        $intAllowSeasons
-            and ((!$Data->{'SystemConfig'}{'LockSeasons'}
+            (!$Data->{'SystemConfig'}{'LockSeasons'}
                     and !$Data->{'SystemConfig'}{'LockSeasonsCRL'}
                     and !$Data->{'SystemConfig'}{'Club_MemberEditOnly'}
                     and !$Data->{'SystemConfig'}{'Rollover_HideAll'}
-                    and !$Data->{'SystemConfig'}{'Rollover_HideClub'}) or $Data->{'SystemConfig'}{'AssocConfig'}{'Rollover_AddRollover_Override'})
-            and !$hideAssocRollover
-            and !$hideClubRollover
+                    and !$Data->{'SystemConfig'}{'Rollover_HideClub'}
+            )
             and allowedAction($Data, 'm_e')) {
         $menuoptions{'memberrollover'} = {
-            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_MEMBER}.' Rollover'),
-            url => $baseurl."a=M_LSRO&amp;l=$Defs::LEVEL_MEMBER",
+            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON}.' Rollover'),
+            url => $baseurl."a=M_LSRO&amp;l=$Defs::LEVEL_PERSON",
         };
     }
 
@@ -796,15 +789,9 @@ sub getClubMenuData {
             url => $baseurl."a=AL_",
         };
     }
-    if(!$SystemConfig->{'NoOptIn'}) {
-        $menuoptions{'optin'} = {
-            name => $lang->txt('Opt-Ins'),
-            url => $baseurl."a=OPTIN_L",
-        };
-    }
     my @menu_structure = (
         [ $lang->txt('Dashboard'), 'home','home'],
-        [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_MEMBER.'_P'}), 'menu', [
+        [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}), 'menu', [
         'members',
         'newclearance',    
         'clearances',    
@@ -812,8 +799,8 @@ sub getClubMenuData {
         'transfermember',
         'pendingregistration',
         ]],
+        [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu','venues'],
         [ $lang->txt('Registrations'), 'menu',[
-        'bankdetails',
         'products',
         'registrationforms',
         'locator',
@@ -826,14 +813,10 @@ sub getClubMenuData {
         'nataccredsearch',
         ]],
         [ $lang->txt('System'), 'system',[
-        'fieldconfig',
-        'member_record_types',
-        'passwordmanagement',
         'usermanagement',
         'clearancesettings',
         'mrt_admin',
         'auditlog',
-        'optin',
         ]],
     );
 
@@ -842,44 +825,50 @@ sub getClubMenuData {
 
 }
 
-sub getNextEntityType {
-    my($db, $ID) = @_;
-    my $nextlevelType='';
-    my $looptimes=0;
-    do  {
-        return 0 if !$ID;
-        $looptimes++;
-        my $st=qq[
-        SELECT CN.intEntityID as CNintEntityID, CN.intTypeID AS CNintTypeID, CN.intStatusID, PN.intTypeID AS PNType
-        FROM tblEntity AS PN 
-        LEFT JOIN tblEntityLinks ON PN.intEntityID=tblEntityLinks.intParentEntityID 
-        LEFT JOIN tblEntity AS CN ON CN.intEntityID=tblEntityLinks.intChildEntityID
-        WHERE PN.intEntityID = ?
+sub getEntityChildrenTypes  {
+    my($db, $ID, $realmID) = @_;
+    my %existingChildren = ();
+
+    my $st = qq[
+        SELECT 
+            CE.intEntityLevel,
+            COUNT(1) as cnt
+        FROM
+            tblEntityLinks AS EL
+            INNER JOIN tblEntity AS CE
+                ON EL.intChildEntityID = CE.intEntityID
+        WHERE
+            EL.intParentEntityID = ?
+            AND CE.intDataAccess >= $Defs::DATA_ACCESS_STATS
+        GROUP BY
+            CE.intEntityLevel
+        HAVING
+            cnt > 0
+    ];
+    my $q = $db->prepare($st);
+    $q->execute($ID);
+    while(my($level, $cnt) = $q->fetchrow_array()) {
+        $existingChildren{$level} = 1;
+    }
+    $st = qq[
+        SELECT 
+            1
+        FROM
+            tblPersonRegistration_$realmID
+        WHERE
+            intEntityID = ?
         LIMIT 1
-        ];
-        my $query = $db->prepare($st);
-        $query->execute($ID);
-        my $dref=$query->fetchrow_hashref();
-        $query->finish();
-        if(!$dref->{CNintEntityID})   {
-            #No child entitys
-            #Check to see if we are a zone - if so check for assocs
-            if($dref->{'PNType'} == $Defs::LEVEL_ZONE)  {
-                my $sta=qq[ SELECT COUNT(*) FROM tblAssoc_Entity WHERE intEntityID= ? LIMIT 1 ];
-                my $q= $db->prepare($sta);
-                $q->execute($ID);
-                my ($assocs)=$q->fetchrow_array();
-                $q->finish();
-                $assocs||=0;
-                return ($assocs ? $Defs::LEVEL_ASSOC : 0);
-            }
-            else    {   return 0;   }
-        }
-        #return 0 if !$dref->{intEntityID};
-        return $dref->{CNintTypeID} if $dref->{intStatusID} != $Defs::NODE_HIDE;
-        $ID=$dref->{CNintEntityID};
-    } while ($looptimes < 8); #This shouldn't happen more than 8 times
-}   
+    ];
+    $q = $db->prepare($st);
+    $q->execute($ID);
+    my ($foundperson) = $q->fetchrow_array();
+    $q->finish();
+    if($foundperson)    {
+        $existingChildren{$Defs::LEVEL_PERSON} = 1;
+    }
+
+    return \%existingChildren;
+}
 
 sub getNavIcons {
     my($Data,$icons)=@_;
@@ -907,7 +896,7 @@ sub GenerateTree {
         regionID => ['entity', $Defs::LEVEL_REGION, 'E_HOME', ''],
         zoneID => ['entity', $Defs::LEVEL_ZONE, 'E_HOME', ''],
         clubID => ['club', $Defs::LEVEL_CLUB, 'C_HOME', ''],
-        memberID => ['member', $Defs::LEVEL_MEMBER, 'M_HOME', ''],
+        memberID => ['member', $Defs::LEVEL_PERSON, 'M_HOME', ''],
     );
     for my $level (qw(
         interID

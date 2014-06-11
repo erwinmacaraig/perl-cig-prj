@@ -23,7 +23,7 @@ sub showEntityHome	{
 	my $client = $Data->{'client'} || '';
 	my $entityObj = getInstanceOf($Data, 'entity', $entityID);
 
-  my ($welcome, $killmessage) = getWelcomeText($Data);
+  my ($welcome, $killmessage) = getWelcomeText($Data, $entityID);
   $killmessage ||= 0;
   return ($killmessage,'') if $killmessage;
 	my $allowedit = allowedAction($Data, 'e_e') ? 1 : 0;
@@ -58,7 +58,7 @@ sub showEntityHome	{
 		Dashboard => $dashboard,
 		Notifications => $notifications,
 		Details => {
-			Address1 => $entityObj->getValue('strAddress') || '',
+			Address => $entityObj->getValue('strAddress') || '',
 			Town => $entityObj->getValue('strTown') || '',
 			Region => $entityObj->getValue('strRegion') || '',
 			Country => $entityObj->getValue('strISOCountry') || '',

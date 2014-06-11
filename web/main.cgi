@@ -86,14 +86,12 @@ sub main {
     # AUTHENTICATE
     my $db = allowedTo( \%Data );
 
-    #$Data{'Realm'}=getRealm(\%Data);
     ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
     getDBConfig( \%Data );
     $Data{'SystemConfig'} = getSystemConfig( \%Data );
     $Data{'LocalConfig'}  = getLocalConfig( \%Data );
-    my $assocID = getAssocID( \%clientValues ) || '';
 
-    logPageData( \%Data, $action, $client, $assocID, );
+    logPageData( \%Data, $action, $client);
 
     $clientValues{'currentLevel'} = safe_param( 'cl', 'number' )
       if (  safe_param( 'cl', 'number' )
@@ -244,9 +242,6 @@ sub main {
         ( $resultHTML, $pageHeading ) =
           handleNotifications( $action, \%Data, $client, $typeID, $ID );
     }
-    else {
-        #$resultHTML=getWelcomeText(\%Data);
-    }
 
     # BUILD PAGE
     if ( !$report ) {
@@ -271,15 +266,12 @@ sub main {
 
 sub defaultAction {
     my ($level) = @_;
-    return 'A_HOME'  if $level == $Defs::LEVEL_ASSOC;
     return 'C_HOME'  if $level == $Defs::LEVEL_CLUB;
-    return 'CO_HOME' if $level == $Defs::LEVEL_COMP;
-    return 'T_HOME'  if $level == $Defs::LEVEL_TEAM;
-    return 'E_HOME'  if $level > $Defs::LEVEL_ASSOC;
+    return 'E_HOME';
 }
 
 sub logPageData {
-    my ( $Data, $action, $client, $assoc_id ) = @_;
+    my ( $Data, $action, $client) = @_;
 
     my $cache     = $Data->{'cache'} || return '';
     my $processID = $$;
@@ -291,7 +283,6 @@ sub logPageData {
         querystring => $ENV{'QUERY_STRING'},
         action      => $action,
         processID   => $processID,
-        assocID     => $assoc_id,
     );
 
     my $cachekey = 'MEMACTION_' . $ENV{'SERVER_ADDR'} . '_' . $processID;

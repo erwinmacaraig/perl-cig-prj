@@ -31,7 +31,7 @@ CREATE TABLE tblPersonRegistration_XX (
   PRIMARY KEY  (intPersonRegistrationID),
   KEY index_intPersonID (intPersonID),
   KEY index_intEntityID (intEntityID),
-  KEY index_intPersonType (intPersonType),
-  KEY index_intStatus (intStatus),
+  KEY index_strPersonType (strPersonType),
+  KEY index_strStatus (strStatus),
   KEY index_IDs (intEntityID, intPersonID)
 ) DEFAULT CHARSET=utf8;

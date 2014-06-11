@@ -20,6 +20,8 @@ sub handleEntity  {
   my $resultHTML='';
   my $entityName=
   my $title='';
+  return ('','') if $entityLevel < $Defs::LEVEL_ZONE;
+
   if ($action =~/^E_DT/) {
     #Entity Details
       ($resultHTML,$title)=entity_details($action, $Data, $entityID, $entityLevel);
@@ -39,6 +41,7 @@ sub handleEntity  {
 sub entity_details  {
   my ($action, $Data, $entityID, $entityLevel)=@_;
 
+  return '' if $entityLevel < $Defs::LEVEL_ZONE;
   my $field=loadEntityDetails($Data->{'db'}, $entityID) || ();
   my $option='display';
   $option='edit' if $action eq 'E_DTE' and $Data->{'clientValues'}{'authLevel'} >= $entityLevel;
@@ -117,6 +120,13 @@ sub entity_details  {
         maxsize => '50',
       },
 
+      strAddress => {
+        label => 'Address',
+        value => $field->{strAddress},
+        type  => 'text',
+        size  => '40',
+        maxsize => '50',
+      },
       strTown => {
         label => 'Town',
         value => $field->{strTown},
@@ -339,7 +349,7 @@ sub listEntities {
       LEFT JOIN tblEntityLinks ON PN.intEntityID=tblEntityLinks.intParentEntityID 
       JOIN tblEntity as CN ON CN.intEntityID=tblEntityLinks.intChildEntityID
     WHERE PN.intEntityID = ?
-      AND CN.intStatusID <> 'DELETED'
+      AND CN.strStatus <> 'DELETED'
       AND CN.intEntityLevel = ?
       AND CN.intDataAccess>$Defs::DATA_ACCESS_NONE
     ORDER BY CN.strLocalName
@@ -385,6 +395,7 @@ sub listEntities {
     {
       name =>   $Data->{'lang'}->txt('Phone'),
       field =>  'strPhone',
+      width => 50,   
     },
     {
       name =>   $Data->{'lang'}->txt('Email'),

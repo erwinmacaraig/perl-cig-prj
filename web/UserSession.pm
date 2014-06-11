@@ -66,7 +66,7 @@ sub create  {
       );
 
       if($self->{'cache'})  {
-        $self->{'cache'}->set('pp',"USESSION-".$self->{'key'}, \%cdata,'',8*60);
+        $self->{'cache'}->set('pp',"USESSION-".$self->{'key'}, \%cdata,'',8*60*60);
       }
     }
   }

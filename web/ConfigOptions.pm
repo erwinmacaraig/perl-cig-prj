@@ -1,7 +1,3 @@
-#
-# $Header: svn://svn/SWM/trunk/web/ConfigOptions.pm 11586 2014-05-16 04:19:10Z sliu $
-#
-
 package ConfigOptions;
 require Exporter;
 @ISA =  qw(Exporter);
@@ -45,9 +41,6 @@ sub GetPermissions {
 
     my $clubID = $Data->{'clientValues'}{'clubID'};
     $clubID = 0 if $clubID < 0;
-    if(!$clubID and $EntityTypeID == $Defs::LEVEL_TEAM)	{
-        $clubID = getTeamClubID($db,$EntityID) || 0;
-    }
 
     my @structureIDs = ();
     my $levelID = $EntityID;
@@ -66,10 +59,6 @@ sub GetPermissions {
         }
         elsif($EntityTypeID == $Defs::LEVEL_ZONE)	{
             $fieldname = 'int10_ID';
-        }
-        elsif($assocID)	{
-            $fieldname = 'intAssocID';
-            $levelID = $assocID;
         }
     }
 
@@ -98,7 +87,7 @@ sub GetPermissions {
     }
 
     my $structure_where = '';
-    my @vals = ($RealmID, $assocID || 0);
+    my @vals = ($RealmID);
     push @structureIDs, [$Defs::LEVEL_CLUB, $clubID] if $clubID;
     if($EntityTypeID < 0)	{
         push @structureIDs, [$EntityTypeID, $EntityID];
@@ -123,7 +112,7 @@ sub GetPermissions {
             tblFieldPermissions
         WHERE
             intRealmID = ?
-            AND ((intEntityTypeID = 0 AND intEntityID = 0) OR ( intEntityTypeID = $Defs::LEVEL_ASSOC AND intEntityID = ?) $structure_where)
+            AND ((intEntityTypeID = 0 AND intEntityID = 0) $structure_where)
             AND intRoleID IN (0,$authRoleID)
         ORDER BY intRoleID DESC
     ];
@@ -160,9 +149,6 @@ sub GetPermissions {
         if( $dref->{'strFieldType'} eq 'Member' or $dref->{'strFieldType'} eq 'MemberChild')	{
             $fieldgroup = 'Member'; 
         }
-        elsif( $dref->{'strFieldType'} eq 'Team' or $dref->{'strFieldType'} eq 'TeamChild')	{
-            $fieldgroup = 'Team';
-        }
         elsif( $dref->{'strFieldType'} eq 'Club' or $dref->{'strFieldType'} eq 'ClubChild')	{
             $fieldgroup = 'Club' ;
         }
@@ -181,13 +167,12 @@ sub GetPermissions {
         $Defs::LEVEL_STATE,
         $Defs::LEVEL_REGION,
         $Defs::LEVEL_ZONE,
-        $Defs::LEVEL_ASSOC,
     );
     push @levels_to_check, $Defs::LEVEL_CLUB if $clubID;
 
-    my @fieldgroups = (qw(Member Team Club));
+    my @fieldgroups = (qw(Member Club));
     if($regoform)	{
-        @fieldgroups = (qw(MemberRegoForm TeamRegoForm));
+        @fieldgroups = (qw(MemberRegoForm ));
     }
     for my $fieldgroup (@fieldgroups)	{
         for my $field (keys %{$fields_by_type{$fieldgroup}})	{
@@ -585,103 +570,6 @@ sub getFieldsList	{
     push @memberFields, ('intSchoolID', 'intGradeID') if $data->{'SystemConfig'}{'Schools'};
     return \@memberFields if $fieldtype eq 'Member';
 
-    my @teamFields =(qw(
-        intClubID
-        TeamCode
-        strName
-        ClubName
-        intCompID
-        intRecStatus
-        strNickname
-        strCode
-        strContactTitle
-        strContact
-        strAddress1
-        strAddress2
-        strSuburb
-        strState
-        strCountry
-        strPostalCode
-        strPhone1
-        strPhone2
-        strMobile
-        strEmail
-        strContactTitle2
-        strContactName2
-        strContactEmail2
-        strContactPhone2
-        strContactMobile2
-        strContactTitle3
-        strContactName3
-        strContactEmail3
-        strContactPhone3
-        strContactMobile3
-        strWebURL
-        strUniformTopColour
-        strUniformBottomColour
-        strUniformNumber
-        strAltUniformTopColour
-        strAltUniformBottomColour
-        strAltUniformNumber
-        strTeamNotes
-        intCoachID
-        intManagerID
-        intExcludeClubChampionships
-        strTeamCustomStr1
-        strTeamCustomStr2
-        strTeamCustomStr3
-        strTeamCustomStr4
-        strTeamCustomStr5
-        strTeamCustomStr6
-        strTeamCustomStr7
-        strTeamCustomStr8
-        strTeamCustomStr9
-        strTeamCustomStr10
-        strTeamCustomStr11
-        strTeamCustomStr12
-        strTeamCustomStr13
-        strTeamCustomStr14
-        strTeamCustomStr15
-        dblTeamCustomDbl1
-        dblTeamCustomDbl2
-        dblTeamCustomDbl3
-        dblTeamCustomDbl4
-        dblTeamCustomDbl5
-        dblTeamCustomDbl6
-        dblTeamCustomDbl7
-        dblTeamCustomDbl8
-        dblTeamCustomDbl9
-        dblTeamCustomDbl10
-        dtTeamCustomDt1
-        dtTeamCustomDt2
-        dtTeamCustomDt3
-        dtTeamCustomDt4
-        dtTeamCustomDt5
-        intTeamCustomLU1
-        intTeamCustomLU2
-        intTeamCustomLU3
-        intTeamCustomLU4
-        intTeamCustomLU5
-        intTeamCustomLU6
-        intTeamCustomLU7
-        intTeamCustomLU8
-        intTeamCustomLU9
-        intTeamCustomLU10
-        intTeamCustomBool1
-        intTeamCustomBool2
-        intTeamCustomBool3
-        intTeamCustomBool4
-        intTeamCustomBool5
-        intVenue1ID
-        intVenue2ID
-        intVenue3ID
-        dtStartTime1
-        dtStartTime2
-        dtStartTime3
-        ));
-
-    return \@teamFields if $fieldtype eq 'Team';
-
     my @clubFields = (qw(
         strName
         intRecStatus
@@ -764,9 +652,7 @@ sub getFieldsList	{
         strNationalNum => 1,
         #strMemberNo => 1,
         dtCreatedOnline => 1,
-        Username => 1,
         ClubName => 1,
-        TeamCode => 1,
     );
 
     my @hiddenfields	= (qw(
