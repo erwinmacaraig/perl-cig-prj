@@ -23,7 +23,6 @@ use Digest::MD5;
 use MIME::Base64 qw(encode_base64url decode_base64url);
 use UserSession;
 use GlobalAuth;
-use TempNodeStructureObj;
 
 #use Data::Dumper;
 
