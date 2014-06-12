@@ -192,12 +192,12 @@ sub getEntityMenuData {
             url => $baseurl."a=C_L&amp;l=$Defs::LEVEL_CLUB",
         };
     }
-    if(exists $children->{$Defs::LEVEL_VENUE})    {
+    #if(exists $children->{$Defs::LEVEL_VENUE})    {
         $menuoptions{'venues'} = {
             name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}),
             url => $baseurl."a=VENUE_L&amp;l=$Defs::LEVEL_VENUE",
         };
-    }
+    #}
     if(exists $children->{$Defs::LEVEL_PERSON})    {
         $menuoptions{'persons'} = {
             name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}),

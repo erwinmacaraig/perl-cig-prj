@@ -37,11 +37,12 @@ sub handleVenues    {
 sub venue_details   {
     my ($action, $Data, $venueID)=@_;
 
+    return '' if !venueAllowed($Data, $venueID);
     my $option='display';
     $option='edit' if $action eq 'VENUE_DTE' and allowedAction($Data, 'venue_e');
     $option='add' if $action eq 'VENUE_DTA' and allowedAction($Data, 'venue_a');
     $venueID=0 if $option eq 'add';
-    my $field=loadVenueDetails($Data->{'db'}, $venueID, $Data->{'clientValues'}{'assocID'}) || ();
+    my $field=loadVenueDetails($Data->{'db'}, $venueID) || ();
     
     my $intRealmID = $Data->{'Realm'} >= 0 ? $Data->{'Realm'} : 0;
     my $client=setClient($Data->{'clientValues'}) || '';
@@ -513,6 +514,7 @@ sub loadVenueDetails {
       strDescription
     FROM tblEntity
     WHERE intEntityID = ?
+        AND intEntityLevel = $Defs::LEVEL_VENUE
   ];
   my $query = $db->prepare($statement);
   $query->execute($id);
@@ -670,6 +672,50 @@ sub postVenueAdd {
   }
 }
 
+
+sub venueAllowed    {
+    #Check if this user is allowed access to this venue
+    my ($Data, $venueID) = @_;
+
+    #Get parent entity and check that the user has access to that
+
+    return 0 if !$Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_VENUE;
+    my $st = qq[
+        SELECT
+            intParentEntityID
+        FROM
+            tblEntityLinks AS EL
+                INNER JOIN tblEntity AS E
+                    ON EL.intChildEntityID = E.intEntityID
+        WHERE
+            intChildEntityID = ?
+            AND intEntityLevel = $Defs::LEVEL_VENUE
+        LIMIT 1
+    ];
+    my $query = $Data->{'db'}->prepare($st);
+    $query->execute($venueID);
+    my ($parentID) = $query->fetchrow_array();
+    $query->finish();
+    return 0 if !$parentID;
+    my $authID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
+    return 1 if($authID== $parentID);
+    $st = qq[
+        SELECT
+            intRealmID
+        FROM
+            tblTempEntityStructure
+        WHERE
+            intParentID = ?
+            AND intChildID = ?
+            AND intDataAccess = $Defs::DATA_ACCESS_FULL
+        LIMIT 1
+    ];
+    $query = $Data->{'db'}->prepare($st);
+    $query->execute($authID, $parentID);
+    my ($found) = $query->fetchrow_array();
+    $query->finish();
+    return $found ? 1 : 0;
+}
 1;
 
 
