@@ -24,7 +24,7 @@ CREATE TABLE tblPersonRegistration_XX (
     dtAdded datetime,
     dtLastUpdated datetime,
     intIsPaid tinyint default 0,
-    intSeasonID INT NOT NULL DEFAULT 0,
+    intNationalPeriodID INT NOT NULL DEFAULT 0,
     intAgeGroupID  INT NOT NULL DEFAULT 0,
     tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 

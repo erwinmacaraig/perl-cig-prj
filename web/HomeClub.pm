@@ -25,7 +25,6 @@ sub showClubHome  {
   my $client = $Data->{'client'} || '';
   my $clubObj = getInstanceOf($Data, 'club');
 
-warn("OOOO");
   my ($welcome, $killmessage) = getWelcomeText($Data, $clubID);
   $killmessage ||= 0;
   return ($killmessage,'') if $killmessage;
@@ -54,7 +53,6 @@ warn("OOOO");
   );
 
   my $name = $clubObj->name();
-warn("NM $name");
   my %TemplateData = (
     Welcome => $welcome,
     ReadOnlyLogin => $Data->{'ReadOnlyLogin'},

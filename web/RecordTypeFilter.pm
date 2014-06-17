@@ -21,7 +21,6 @@ require FieldLabels;
 use Utils;
 use FormHelpers;
 
-require Seasons;
 use Data::Dumper;
 use Log;
 
@@ -84,7 +83,7 @@ sub show_recordtypes	{
         }
     }
     my $statusMCfilter='';
-    my $assocSeasons = Seasons::getDefaultAssocSeasons($Data);
+    my $assocSeasons = '';#Seasons::getDefaultAssocSeasons($Data);
     my $seasonFilter='';
 
 
@@ -92,7 +91,6 @@ sub show_recordtypes	{
     my $allseasons = 0;
     if (
             not $omit_seasonfilter
-            and $assocSeasons->{'allowSeasons'}
             and (
             (
                 $level == $Defs::LEVEL_TEAM 
@@ -150,8 +148,7 @@ sub show_recordtypes	{
     my $ageGroupFilter='';
     my $ageGroupCookie='';
     if (
-        $assocSeasons->{'allowSeasons'} 
-            and (
+            (
             (
                 $level == $Defs::LEVEL_TEAM 
                     and $Data->{'clientValues'}{'currentLevel'} != $Defs::LEVEL_COMP
@@ -208,7 +205,7 @@ sub show_recordtypes	{
     if($memberrecords)	{
             my $membertypes='';
             ### Lets show different types depending on if Seasons turned on or not
-            if ($assocSeasons->{'allowSeasons'})	{
+            if (1==2)	{
                 for my $i (qw(Seasons.intPlayerStatus Seasons.intCoachStatus Seasons.intUmpireStatus Seasons.intOther1Status Seasons.intOther2Status intOfficial intMisc intVolunteer Seasons.intMSRecStatus))	{
                     next if ($i =~ /Other1Status/ and ! $Data->{'SystemConfig'}{'Seasons_Other1'});
                     next if ($i =~ /Other2Status/ and ! $Data->{'SystemConfig'}{'Seasons_Other2'});

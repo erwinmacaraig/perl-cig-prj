@@ -375,36 +375,5 @@ sub list_headers	{
 	return qq[ <tr> $body </tr> ];
 }
 
-sub getTeamComps	{
-
-	my ($Data, $teamID) = @_;
-
-	my $st = qq[
-		SELECT CT.intCompID, AC.strTitle, strSeasonName
-		FROM	
-			tblComp_Teams as CT
-			INNER JOIN tblAssoc_Comp as AC ON (CT.intCompID = AC.intCompID)
-			LEFT JOIN tblSeasons as S ON (S.intSeasonID = AC.intNewSeasonID)
-		WHERE
-			CT.intTeamID=$teamID
-			AND CT.intRecStatus = $Defs::RECSTATUS_ACTIVE
-			AND AC.intRecStatus = $Defs::RECSTATUS_ACTIVE
-	];
-	my $query = $Data->{'db'}->prepare($st);
-	$query->execute;
-
-	my $comp_teams = qq[<select name="mtCompID"><option value="" SELECTED>--Select a $Data->{'LevelNames'}{$Defs::LEVEL_COMP}--</option>];
-	while (my $dref = $query->fetchrow_hashref())	{
-		my $name = $dref->{'strTitle'} || '';
-		$name = qq[$dref->{strSeasonName} - $name] if $dref->{strSeasonName};
-		$comp_teams.= qq[<option value="$dref->{intCompID}">$name</option>];
-	}
-	$comp_teams .= qq[</select>];
-
-	return $comp_teams;
-		
-}
-	
-
 1;
 

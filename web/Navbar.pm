@@ -108,7 +108,7 @@ sub navBar {
         $Defs::LEVEL_REGION =>  'E_HOME',
         $Defs::LEVEL_ZONE =>  'E_HOME',
         $Defs::LEVEL_CLUB =>  'C_HOME',
-        $Defs::LEVEL_PERSON =>  'M_HOME',
+        $Defs::LEVEL_PERSON =>  'P_HOME',
     );
 
     my %TemplateData= (
@@ -198,12 +198,12 @@ sub getEntityMenuData {
             url => $baseurl."a=VENUE_L&amp;l=$Defs::LEVEL_VENUE",
         };
     #}
-    if(exists $children->{$Defs::LEVEL_PERSON})    {
+    #if(exists $children->{$Defs::LEVEL_PERSON})    {
         $menuoptions{'persons'} = {
             name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}),
-            url => $baseurl."a=M_L&amp;l=$Defs::LEVEL_PERSON",
+            url => $baseurl."a=P_L&amp;l=$Defs::LEVEL_PERSON",
         };
-    }
+    #}
 
     if($paymentSplitSettings->{'psBanks'}) {
         $menuoptions{'bankdetails'} = {
@@ -256,7 +256,7 @@ sub getEntityMenuData {
         if ($SystemConfig->{'AllowPendingRegistration'}) {
             $menuoptions{'pendingregistration'} = {
                 name => $lang->txt('Pending Registration'),
-                url => $baseurl."a=M_PRS_L",
+                url => $baseurl."a=P_PRS_L",
             };
         }
 
@@ -417,7 +417,7 @@ sub getAssocMenuData {
         },
         members => {
             name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}),
-            url => $baseurl."a=M_L&amp;l=$Defs::LEVEL_PERSON",
+            url => $baseurl."a=P_L&amp;l=$Defs::LEVEL_PERSON",
         },
     );
 
@@ -510,7 +510,7 @@ sub getAssocMenuData {
             if ($SystemConfig->{'AllowPendingRegistration'}) {
                 $menuoptions{'pendingregistration'} = {
                     name => $lang->txt('Pending Registration'),
-                    url => $baseurl."a=M_PRS_L",
+                    url => $baseurl."a=P_PRS_L",
                 };
             }
 
@@ -545,7 +545,7 @@ sub getAssocMenuData {
             and allowedAction($Data, 'm_e')) {
         $menuoptions{'memberrollover'} = {
             name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON}.' Rollover'),
-            url => $baseurl."a=M_LSRO&amp;l=$Defs::LEVEL_PERSON",
+            url => $baseurl."a=P_LSRO&amp;l=$Defs::LEVEL_PERSON",
         };
     }
 
@@ -554,7 +554,7 @@ sub getAssocMenuData {
             and allowedAction($Data, 'a_e')
     ) {
         $menuoptions{'transfermember'} = {
-            url => $baseurl."a=M_TRANSFER&amp;l=$Defs::LEVEL_PERSON",
+            url => $baseurl."a=P_TRANSFER&amp;l=$Defs::LEVEL_PERSON",
             name => $Data->{'SystemConfig'}{'transferMemberText'} || $lang->txt('Transfer Member'),
         };
     }
@@ -657,7 +657,7 @@ sub getClubMenuData {
         },
         members => {
             name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}),
-            url => $baseurl."a=M_L&amp;l=$Defs::LEVEL_PERSON",
+            url => $baseurl."a=P_L&amp;l=$Defs::LEVEL_PERSON",
         },
         venues => {
             name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}),
@@ -669,7 +669,7 @@ sub getClubMenuData {
     if ($SystemConfig->{'AllowPendingRegistration'}) {
         $menuoptions{'pendingregistration'} = {
             name => $lang->txt('Pending Registration'),
-            url => $baseurl."a=M_PRS_L",
+            url => $baseurl."a=P_PRS_L",
         };
     }
 
@@ -725,7 +725,7 @@ sub getClubMenuData {
             };
             if ( $Data->{'SystemConfig'}{'AllowMemberTransfers'}  and allowedAction($Data, 'c_e')) {
                 $menuoptions{'transfermember'} = {
-                    url => $baseurl."a=M_TRANSFER&amp;l=$Defs::LEVEL_PERSON",
+                    url => $baseurl."a=P_TRANSFER&amp;l=$Defs::LEVEL_PERSON",
                     name => $Data->{'SystemConfig'}{'transferMemberText'} || $lang->txt('Transfer Member'),
                 };
             }
@@ -777,7 +777,7 @@ sub getClubMenuData {
             and allowedAction($Data, 'm_e')) {
         $menuoptions{'memberrollover'} = {
             name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON}.' Rollover'),
-            url => $baseurl."a=M_LSRO&amp;l=$Defs::LEVEL_PERSON",
+            url => $baseurl."a=P_LSRO&amp;l=$Defs::LEVEL_PERSON",
         };
     }
 
@@ -896,7 +896,7 @@ sub GenerateTree {
         regionID => ['entity', $Defs::LEVEL_REGION, 'E_HOME', ''],
         zoneID => ['entity', $Defs::LEVEL_ZONE, 'E_HOME', ''],
         clubID => ['club', $Defs::LEVEL_CLUB, 'C_HOME', ''],
-        memberID => ['member', $Defs::LEVEL_PERSON, 'M_HOME', ''],
+        memberID => ['member', $Defs::LEVEL_PERSON, 'P_HOME', ''],
     );
     for my $level (qw(
         interID
@@ -1021,7 +1021,7 @@ sub getMemberMenuData {
     my %menuoptions = (
         home => {
             name => $lang->txt('Dashboard'),
-            url => $baseurl."a=M_HOME",
+            url => $baseurl."a=P_HOME",
         },
     );
     if(!$invalid_club) {
@@ -1034,13 +1034,13 @@ sub getMemberMenuData {
         if(!$SystemConfig->{'NoMemberTypes'}) {
             $menuoptions{'membertypes'} = {
                 name => $lang->txt('Member Types'),
-                url => $baseurl."a=M_MT_LIST",
+                url => $baseurl."a=P_MT_LIST",
             };
         }
         if ($SystemConfig->{'NationalAccreditation'} or $SystemConfig->{'AssocConfig'}{'NationalAccreditation'}) {
             $menuoptions{'accreditation'} = {
                 name => $lang->txt($accreditation_title),
-                url => $baseurl."a=M_NACCRED_LIST",
+                url => $baseurl."a=P_NACCRED_LIST",
             };
         }
         if($SystemConfig->{'AllowTXNs'} 
@@ -1051,25 +1051,25 @@ sub getMemberMenuData {
         ) {
             my $txns_link_name = $SystemConfig->{'txns_link_name'} || $lang->txt('Transactions');
             $menuoptions{'transactions'} = {
-                url => $baseurl."a=M_TXNLog_list",
+                url => $baseurl."a=P_TXNLog_list",
             };
         }
         if($clubs) {
             $menuoptions{'clubs'} = {
                 name => $lang->txt('Clubs'),
-                url => $baseurl."a=M_CLUBS",
+                url => $baseurl."a=P_CLUBS",
             };
         }
         if($SystemConfig->{'AllowSeasons'})  {
             $menuoptions{'seasons'} = {
                 name => $lang->txt($txt_SeasonsNames),
-                url => $baseurl."a=M_SEASONS",
+                url => $baseurl."a=P_SEASONS",
             };
         }
         if($clr) {
             $menuoptions{'clr'} = {
                 name => $lang->txt($txt_Clrs),
-                url => $baseurl."a=M_CLR",
+                url => $baseurl."a=P_CLR",
             };
         }
     }

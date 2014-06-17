@@ -26,20 +26,19 @@ sub getFieldLabels	{
 	my $natteamname=$Data->{'SystemConfig'}{'NatTeamName'} || 'National Team';
 
 	my $CustomFieldNames=CustomFields::getCustomFieldNames($Data);
-	if($level== $Defs::LEVEL_MEMBER)	{
+	if($level== $Defs::LEVEL_PERSON)	{
 
 		%labels = (
-			'tblSchoolGrades.strName' => 'School Grade',
 			strNationalNum => $natnumname,
-			strMemberNo => 'Member Number',
-			intRecStatus => "Active in $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC}",
-            intPlayerPending => "Approve Registration",
-			intDefaulter => 'Defaulter',
-			strSalutation => 'Salutation',
-			strFirstname => 'Legal first name',
-			strMiddlename => 'Middle name',
+			strStatus => "Active",
+			strSalutation => 'Title',
+			strLocalFirstname => 'First name',
+			strLocalMiddlename => 'Middle name',
 			strPreferredName => 'Preferred name',
-			strSurname => 'Family name',
+			strLocalSurname => 'Family name',
+			strLatinSurname => 'Family name (Latin)',
+
+
 			strMaidenName => 'Maiden name',
 			strMotherCountry=> 'Country of Birth (Mother)',
 			strFatherCountry=> 'Country of Birth (Father)',

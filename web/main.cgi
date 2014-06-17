@@ -28,7 +28,7 @@ use Agreements;
 
 use Entity;
 use Club;
-use Member;
+use Person;
 use Changes;
 use MemberCard;
 
@@ -137,8 +137,8 @@ sub main {
         ( $resultHTML, $pageHeading ) =
           handleClub( $action, \%Data, $ID, $typeID );
     }
-    elsif ( $action =~ /^M_/ ) {
-        ( $resultHTML, $pageHeading ) = handleMember( $action, \%Data, $ID );
+    elsif ( $action =~ /^P_/ ) {
+        ( $resultHTML, $pageHeading ) = handlePerson( $action, \%Data, $ID );
     }
     elsif ( $action =~ /^DOC_/ ) {
         ( $resultHTML, $pageHeading ) =
@@ -149,7 +149,7 @@ sub main {
           handle_logos( $action, \%Data, $typeID, $ID, $client );
     }
     elsif ( $action =~ /^TB_/ ) {
-        ( $resultHTML, $pageHeading ) = handleMember( $action, \%Data, $ID );
+        ( $resultHTML, $pageHeading ) = handlePerson( $action, \%Data, $ID );
     }
     elsif ( $action =~ /^SEARCH_/ ) {
         ( $resultHTML, $pageHeading ) =

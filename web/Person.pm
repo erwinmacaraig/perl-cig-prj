@@ -1,12 +1,8 @@
-#
-# $Header: svn://svn/SWM/trunk/web/Member.pm 11652 2014-05-22 07:18:57Z sliu $
-#
-
-package Member;
+package Person;
 require Exporter;
 @ISA    = qw(Exporter);
 @EXPORT = @EXPORT_OK = qw(
-  handleMember
+  handlePerson
   getAutoMemberNum
   member_details
   setupMemberTypes
@@ -41,10 +37,9 @@ use Payments;
 use TransLog;
 use Transactions;
 use ConfigOptions;
-use ListMembers;
+use ListPersons;
 
 use Clearances;
-use Seasons;
 use GenAgeGroup;
 use GridDisplay;
 use InstanceOf;
@@ -61,7 +56,8 @@ use Data::Dumper;
 
 use PrimaryClub;
 use DuplicatePrevention;
-sub handleMember {
+
+sub handlePerson {
     my ( $action, $Data, $memberID ) = @_;
 
     my $resultHTML = '';
@@ -118,75 +114,75 @@ sub handleMember {
         $Data->{'MemberClrdOut_ofCurrentClub'} = $clrd_out if ( $Data->{'clientValues'}{'authLevel'} <= $Defs::LEVEL_ASSOC );
     }
 
-    if ( $action =~ /M_PH_/ ) {
+    if ( $action =~ /P_PH_/ ) {
         my $newaction = '';
         ( $resultHTML, $title, $newaction ) = handle_photo( $action, $Data, $memberID );
         $action = $newaction if $newaction;
     }
-    if ( $action =~ /^M_DT/ ) {
+    if ( $action =~ /^P_DT/ ) {
         #Member Details
         ( $resultHTML, $title ) = member_details( $action, $Data, $memberID );
     }
-    elsif ( $action =~ /^M_A/ ) {
+    elsif ( $action =~ /^P_A/ ) {
 	    #Member Details
         ( $resultHTML, $title ) = member_details( $action, $Data, $memberID );
 	}
-    elsif ( $action =~ /^M_LSROup/ ) {
+    elsif ( $action =~ /^P_LSROup/ ) {
         ( $resultHTML, $title ) = bulkMemberRolloverUpdate( $Data, $action );
     }
-    elsif ( $action =~ /^M_LSRO/ ) {
+    elsif ( $action =~ /^P_LSRO/ ) {
         ( $resultHTML, $title ) = bulkMemberRollover( $Data, $action );
     }
-    elsif ( $action =~ /^M_L/ ) {
-        ( $resultHTML, $title ) = listMembers( $Data, $memberID, $action );
+    elsif ( $action =~ /^P_L/ ) {
+        ( $resultHTML, $title ) = listPersons( $Data, getID($Data->{'clientValues'}), $action );
     }
-    elsif ( $action =~ /^M_PRS_L/ ) {
-        ( $resultHTML, $title ) = listMembers( $Data, $memberID, $action );
+    elsif ( $action =~ /^P_PRS_L/ ) {
+        ( $resultHTML, $title ) = listPersons( $Data, getID($Data->{'clientValues'}), $action );
     }
-    elsif ( $action =~ /M_CLB_/ ) {
-        ( $resultHTML, $title ) = handleMemberClub( $action, $Data, $memberID );
+    elsif ( $action =~ /P_CLB_/ ) {
+        ( $resultHTML, $title ) = handlePersonClub( $action, $Data, $memberID );
     }
-    elsif ( $action =~ /M_PRODTXN_/ ) {
+    elsif ( $action =~ /P_PRODTXN_/ ) {
         ( $resultHTML, $title ) = handleProdTransactions( $action, $Data, $memberID );
     }
-    elsif ( $action =~ /M_TXN_/ ) {
+    elsif ( $action =~ /P_TXN_/ ) {
         ( $resultHTML, $title ) = Transactions::handleTransactions( $action, $Data, $memberID );
     }
-    elsif ( $action =~ /M_TXNLog/ ) {
+    elsif ( $action =~ /P_TXNLog/ ) {
         ( $resultHTML, $title ) = TransLog::handleTransLogs( $action, $Data, $memberID );
     }
-    elsif ( $action =~ /M_PAY_/ ) {
+    elsif ( $action =~ /P_PAY_/ ) {
         ( $resultHTML, $title ) = handlePayments( $action, $Data, 0 );
     }
-    elsif ( $action =~ /^M_DUP_/ ) {
+    elsif ( $action =~ /^P_DUP_/ ) {
         ( $resultHTML, $title ) = MemberDupl( $action, $Data, $memberID );
     }
-    elsif ( $action =~ /^M_DEL/ ) {
+    elsif ( $action =~ /^P_DEL/ ) {
 
         #($resultHTML,$title)=delete_member($Data, $memberID);
     }
-    elsif ( $action =~ /^M_TRANSFER/ ) {
+    elsif ( $action =~ /^P_TRANSFER/ ) {
         ( $resultHTML, $title ) = MemberTransfer($Data);
     }
-    elsif ( $action =~ /M_CLUBS/ ) {
+    elsif ( $action =~ /P_CLUBS/ ) {
         my ( $clubStatus, $clubs, undef) = showClubTeams( $Data, $memberID );
         $clubs      = qq[<div class="warningmsg">No $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} History found</div>] if !$clubs;
         $resultHTML = $clubs;
         $title      = "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} History";
     }
-    elsif ( $action =~ /M_SEASONS/ ) {
+    elsif ( $action =~ /P_SEASONS/ ) {
         ( $resultHTML, $title ) = showSeasonSummary( $Data, $memberID );
     }
-    elsif ( $action =~ /M_CLR/ ) {
+    elsif ( $action =~ /P_CLR/ ) {
         $resultHTML = clearanceHistory( $Data, $memberID ) || '';
         my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
         $title = $txt_Clr . " History";
     }
-    elsif ( $action =~ /^M_HOME/ ) {
+    elsif ( $action =~ /^P_HOME/ ) {
         my ( $FieldDefinitions, $memperms ) = member_details( '', $Data, $memberID, {}, 1 );
         ( $resultHTML, $title ) = showMemberHome( $Data, $memberID, $FieldDefinitions, $memperms );
     }
-    elsif ( $action =~ /^M_NACCRED/ ) {
+    elsif ( $action =~ /^P_NACCRED/ ) {
         ( $resultHTML, $title ) = handleAccreditationDisplay( $action, $Data, $memberID );
     }
     else {
@@ -320,7 +316,7 @@ sub MemberTransfer {
 				<tr><td><b>OR</b></td></tr>
 				<tr><td><span class="label">Member's Date of Birth:</td><td><span class="formw"><input type="text" name="transfer_dob" value="">&nbsp;<i>dd/mm/yyyy</li></td></tr>
 			</table>
-                                <input type="hidden" name="a" value="M_TRANSFER">
+                                <input type="hidden" name="a" value="P_TRANSFER">
                                 <input type="hidden" name="client" value="$client">
                                 <input type="submit" value="Transfer Member" id="btnsubmit" name="btnsubmit"  class="button proceed-button">
                         </form>
@@ -343,7 +339,7 @@ sub MemberTransfer {
         my $count = 0;
         while ( my $dref = $query->fetchrow_hashref() ) {
             $count++;
-            my $href = qq[client=$client&amp;a=M_TRANSFER&amp;transfer_surname=$params{'transfer_surname'}&amp;transfer_dob=$params{'transfer_dob'}&amp;transfer_natnum=$params{'transfer_natnum'}];
+            my $href = qq[client=$client&amp;a=P_TRANSFER&amp;transfer_surname=$params{'transfer_surname'}&amp;transfer_dob=$params{'transfer_dob'}&amp;transfer_natnum=$params{'transfer_natnum'}];
             $body .= qq[<tr><td><a href="$Data->{'target'}?$href&amp;memberID=$dref->{intMemberID}">select</a></td>
 							<td>$dref->{strNationalNum}</td>
 							<td>$dref->{MemberName}</td>
@@ -379,7 +375,7 @@ sub MemberTransfer {
         }
         $body .= qq[
                                 </table><br>
-                                <input type="hidden" name="a" value="M_TRANSFER">
+                                <input type="hidden" name="a" value="P_TRANSFER">
                                 <input type="hidden" name="transfer_confirm" value="1">
                                 <input type="hidden" name="transfer_natnum" value="$params{'transfer_natnum'}">
                                 <input type="hidden" name="transfer_surname" value="$params{'transfer_surname'}">
@@ -466,151 +462,8 @@ sub MemberTransfer {
             $tempClientValues{memberID}     = $memberID;
             $tempClientValues{currentLevel} = $Defs::LEVEL_MEMBER;
             my $tempClient = setClient( \%tempClientValues );
-            $body = qq[ <div class="OKmsg">The member has been transferred</div><br><a href="$Data->{'target'}?client=$tempClient&amp;a=M_HOME">click here to display members record</a>];
+            $body = qq[ <div class="OKmsg">The member has been transferred</div><br><a href="$Data->{'target'}?client=$tempClient&amp;a=P_HOME">click here to display members record</a>];
 
-            if ( $Data->{'SystemConfig'}{'MemberTransferCustomFields'} ) {
-                my $st = qq[
-					INSERT IGNORE INTO tblMemberNotes
-					(
-						intNotesMemberID, 
-						intNotesAssocID, 
-						strMemberNotes, 
-						strMemberMedicalNotes, 
-						strMemberCustomNotes1, 
-						strMemberCustomNotes2, 
-						strMemberCustomNotes3, 
-						strMemberCustomNotes4, 
-						strMemberCustomNotes5
-					)
-					SELECT 
-						$memberID, 
-						$assocID, 
-						strMemberNotes, 
-						strMemberMedicalNotes, 
-						strMemberCustomNotes1, 
-						strMemberCustomNotes2, 
-						strMemberCustomNotes3, 
-						strMemberCustomNotes4, 
-						strMemberCustomNotes5
-					FROM tblMemberNotes
-						INNER JOIN tblAssoc as A ON (
-							A.intAssocID = intNotesAssocID
-							AND intAssocTypeID = $Data->{'RealmSubType'}
-						)
-					WHERE intNotesMemberID = $memberID
-						AND intNotesAssocID = $oldAssocID
-				];
-                $db->do($st);
-
-                $st = qq[
-					UPDATE tblMember_Associations as MA 
-						INNER JOIN tblMember_Associations as MAold ON (
-							MAold.intMemberID = MA.intMemberID
-							AND MAold.intAssocID=$oldAssocID
-						)
-						INNER JOIN tblAssoc as Aold ON (
-							Aold.intAssocID = MAold.intAssocID
-						)
-					SET 
-						MA.strCustomStr1 = MAold.strCustomStr1, 
-						MA.strCustomStr2 = MAold.strCustomStr2, 
-						MA.strCustomStr3 = MAold.strCustomStr3, 
-						MA.strCustomStr4 = MAold.strCustomStr4, 
-						MA.strCustomStr5 = MAold.strCustomStr5, 
-						MA.strCustomStr6 = MAold.strCustomStr6, 
-						MA.strCustomStr7 = MAold.strCustomStr7, 
-						MA.strCustomStr8 = MAold.strCustomStr8, 
-						MA.strCustomStr9 = MAold.strCustomStr9, 
-						MA.strCustomStr10= MAold.strCustomStr10,
-						MA.strCustomStr11= MAold.strCustomStr11,
-						MA.strCustomStr12= MAold.strCustomStr12,
-						MA.strCustomStr13= MAold.strCustomStr13,
-						MA.strCustomStr14= MAold.strCustomStr14, 
-						MA.strCustomStr15= MAold.strCustomStr15, 
-						MA.strCustomStr16= MAold.strCustomStr16, 
-						MA.strCustomStr17= MAold.strCustomStr17, 
-						MA.strCustomStr18= MAold.strCustomStr18, 
-						MA.strCustomStr19= MAold.strCustomStr19, 
-						MA.strCustomStr20= MAold.strCustomStr20,
-						MA.strCustomStr21= MAold.strCustomStr21,
-						MA.strCustomStr22= MAold.strCustomStr22,
-						MA.strCustomStr23= MAold.strCustomStr23,
-						MA.strCustomStr24= MAold.strCustomStr24, 
-						MA.strCustomStr25= MAold.strCustomStr25, 
-						MA.dblCustomDbl1 = MAold.dblCustomDbl1,
-						MA.dblCustomDbl2 = MAold.dblCustomDbl2,
-						MA.dblCustomDbl3 = MAold.dblCustomDbl3,
-						MA.dblCustomDbl4 = MAold.dblCustomDbl4,
-						MA.dblCustomDbl5 = MAold.dblCustomDbl5,
-						MA.dblCustomDbl6 = MAold.dblCustomDbl6,
-						MA.dblCustomDbl7 = MAold.dblCustomDbl7,
-						MA.dblCustomDbl8 = MAold.dblCustomDbl8,
-						MA.dblCustomDbl9 = MAold.dblCustomDbl9,
-						MA.dblCustomDbl10 = MAold.dblCustomDbl10,
-						MA.dblCustomDbl11 = MAold.dblCustomDbl11,
-						MA.dblCustomDbl12 = MAold.dblCustomDbl12,
-						MA.dblCustomDbl13 = MAold.dblCustomDbl13,
-						MA.dblCustomDbl14 = MAold.dblCustomDbl14,
-						MA.dblCustomDbl15 = MAold.dblCustomDbl15,
-						MA.dblCustomDbl16 = MAold.dblCustomDbl16,
-						MA.dblCustomDbl17 = MAold.dblCustomDbl17,
-						MA.dblCustomDbl18 = MAold.dblCustomDbl18,
-						MA.dblCustomDbl19 = MAold.dblCustomDbl19,
-						MA.dblCustomDbl20 = MAold.dblCustomDbl20,
-						MA.dtCustomDt1 = MAold.dtCustomDt1, 
-						MA.dtCustomDt2 = MAold.dtCustomDt2, 
-						MA.dtCustomDt3 = MAold.dtCustomDt3, 
-						MA.dtCustomDt4 = MAold.dtCustomDt4, 
-						MA.dtCustomDt5 = MAold.dtCustomDt5, 
-						MA.dtCustomDt6 = MAold.dtCustomDt6, 
-						MA.dtCustomDt7 = MAold.dtCustomDt7, 
-						MA.dtCustomDt8 = MAold.dtCustomDt8, 
-						MA.dtCustomDt9 = MAold.dtCustomDt9, 
-						MA.dtCustomDt10 = MAold.dtCustomDt10, 
-						MA.dtCustomDt11 = MAold.dtCustomDt11, 
-						MA.dtCustomDt12 = MAold.dtCustomDt12, 
-						MA.dtCustomDt13 = MAold.dtCustomDt13, 
-						MA.dtCustomDt14 = MAold.dtCustomDt14, 
-						MA.dtCustomDt15 = MAold.dtCustomDt15, 
-						MA.intCustomLU1 = MAold.intCustomLU1,
-						MA.intCustomLU2 = MAold.intCustomLU2,
-						MA.intCustomLU3 = MAold.intCustomLU3,
-						MA.intCustomLU4 = MAold.intCustomLU4,
-						MA.intCustomLU5 = MAold.intCustomLU5,
-						MA.intCustomLU6 = MAold.intCustomLU6,
-						MA.intCustomLU7 = MAold.intCustomLU7,
-						MA.intCustomLU8 = MAold.intCustomLU8,
-						MA.intCustomLU9 = MAold.intCustomLU9,
-						MA.intCustomLU10 = MAold.intCustomLU10,
-						MA.intCustomLU11 = MAold.intCustomLU11,
-						MA.intCustomLU12 = MAold.intCustomLU12,
-						MA.intCustomLU13 = MAold.intCustomLU13,
-						MA.intCustomLU14 = MAold.intCustomLU14,
-						MA.intCustomLU15 = MAold.intCustomLU15,
-						MA.intCustomLU16 = MAold.intCustomLU16,
-						MA.intCustomLU17 = MAold.intCustomLU17,
-						MA.intCustomLU18 = MAold.intCustomLU18,
-						MA.intCustomLU19 = MAold.intCustomLU19,
-						MA.intCustomLU20 = MAold.intCustomLU20,
-						MA.intCustomLU21 = MAold.intCustomLU21,
-						MA.intCustomLU22 = MAold.intCustomLU22,
-						MA.intCustomLU23 = MAold.intCustomLU23,
-						MA.intCustomLU24 = MAold.intCustomLU24,
-						MA.intCustomLU25 = MAold.intCustomLU25,
-						MA.intCustomBool1 = MAold.intCustomBool1,
-						MA.intCustomBool2 = MAold.intCustomBool2,
-						MA.intCustomBool3 = MAold.intCustomBool3,
-						MA.intCustomBool4 = MAold.intCustomBool4,
-						MA.intCustomBool5 = MAold.intCustomBool5
-						MA.intCustomBool6 = MAold.intCustomBool6,
-						MA.intCustomBool7 = MAold.intCustomBool7,
-				WHERE MA.intMemberID = $memberID
-					AND MA.intAssocID = $assocID
-					AND Aold.intAssocTypeID = $Data->{'RealmSubType'}
-				];
-                $db->do($st);
-
-            }
         }
     }
     else {
@@ -624,8 +477,8 @@ sub member_details {
     my ( $action, $Data, $memberID, $prefillData, $returndata ) = @_;
     $returndata ||= 0;
     my $option = 'display';
-    $option = 'edit' if $action eq 'M_DTE' and allowedAction( $Data, 'm_e' );
-    $option = 'add'  if $action eq 'M_A'   and allowedAction( $Data, 'm_a' );
+    $option = 'edit' if $action eq 'P_DTE' and allowedAction( $Data, 'm_e' );
+    $option = 'add'  if $action eq 'P_A'   and allowedAction( $Data, 'm_a' );
     $option = 'add' if ( $Data->{'RegoForm'} and !$memberID );
     $memberID = 0 if $option eq 'add';
     my $hideWebCamTab = $Data->{SystemConfig}{hide_webcam_tab} ? qq[&hwct=1] : '';
@@ -2021,7 +1874,7 @@ $tabs = '
 my $member_photo = qq[
         <div class="member-edit-info">
 <div class="photo">$photolink</div>
-        <span class="button-small mobile-button"><a href="?client='.$client.'&amp;a=M_PH_d">Add/Edit Photo</a></span>
+        <span class="button-small mobile-button"><a href="?client='.$client.'&amp;a=P_PH_d">Add/Edit Photo</a></span>
         <h4>Documents</h4>
         <span class="button-small generic-button"><a href="?client='.$client.'&amp;a=DOC_L">Add Document</a></span>
       </div>
@@ -2038,7 +1891,7 @@ $member_photo
     my $title = ( !$field->{strFirstname} and !$field->{strSurname} ) ? "Add New $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER}" : "$field->{strFirstname} $field->{strSurname}";
     if ( $option eq 'display' ) {
 
-        $chgoptions .= qq[<a href="$Data->{'target'}?client=$client&amp;a=M_DEL"  onclick="return confirm('Are you sure you want to Delete this $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER}');"><img src="images/delete_icon.gif" border="0" alt="Delete $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER}" title="Delete $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER}"></a>]
+        $chgoptions .= qq[<a href="$Data->{'target'}?client=$client&amp;a=P_DEL"  onclick="return confirm('Are you sure you want to Delete this $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER}');"><img src="images/delete_icon.gif" border="0" alt="Delete $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER}" title="Delete $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER}"></a>]
           if ( allowedAction( $Data, 'm_d' ) and $Data->{'SystemConfig'}{'AllowMemberDelete'} );
 
         $chgoptions = '' if $Data->{'SystemConfig'}{'LockMember'};
@@ -2183,98 +2036,6 @@ sub loadMemberDetails {
 		DATE_FORMAT(dtPoliceCheckExp,'%d/%m/%Y') AS dtPoliceCheckExp, 
 		DATE_FORMAT(dtCreatedOnline,'%d/%m/%Y') AS dtCreatedOnline, 
 		DATE_FORMAT(MA.tTimeStamp,'%d/%m/%Y') AS tTimeStamp,
-		MA.strCustomStr1, 
-		MA.strCustomStr2, 
-		MA.strCustomStr3, 
-		MA.strCustomStr4, 
-		MA.strCustomStr5, 
-		MA.strCustomStr6, 
-		MA.strCustomStr7, 
-		MA.strCustomStr8, 
-		MA.strCustomStr9, 
-		MA.strCustomStr10, 
-		MA.strCustomStr11, 
-		MA.strCustomStr12, 
-		MA.strCustomStr13, 
-		MA.strCustomStr14, 
-		MA.strCustomStr15, 
-		MA.strCustomStr16, 
-		MA.strCustomStr17, 
-		MA.strCustomStr18, 
-		MA.strCustomStr19, 
-		MA.strCustomStr20, 
-		MA.strCustomStr21, 
-		MA.strCustomStr22, 
-		MA.strCustomStr23, 
-		MA.strCustomStr24, 
-		MA.strCustomStr25, 
-		MA.dblCustomDbl1, 
-		MA.dblCustomDbl2, 
-		MA.dblCustomDbl3, 
-		MA.dblCustomDbl4, 
-		MA.dblCustomDbl5, 
-		MA.dblCustomDbl6, 
-		MA.dblCustomDbl7, 
-		MA.dblCustomDbl8, 
-		MA.dblCustomDbl9, 
-		MA.dblCustomDbl10,   
-		MA.dblCustomDbl11, 
-		MA.dblCustomDbl12, 
-		MA.dblCustomDbl13, 
-		MA.dblCustomDbl14, 
-		MA.dblCustomDbl15, 
-		MA.dblCustomDbl16, 
-		MA.dblCustomDbl17, 
-		MA.dblCustomDbl18, 
-		MA.dblCustomDbl19, 
-		MA.dblCustomDbl20,   
-		DATE_FORMAT(MA.dtCustomDt1, '%d/%m/%Y') AS dtCustomDt1, 
-		DATE_FORMAT(MA.dtCustomDt2, '%d/%m/%Y') AS dtCustomDt2, 
-		DATE_FORMAT(MA.dtCustomDt3, '%d/%m/%Y') AS dtCustomDt3,  
-		DATE_FORMAT(MA.dtCustomDt4, '%d/%m/%Y') AS dtCustomDt4,  
-		DATE_FORMAT(MA.dtCustomDt5, '%d/%m/%Y') AS dtCustomDt5, 
-		DATE_FORMAT(MA.dtCustomDt6, '%d/%m/%Y') AS dtCustomDt6, 
-		DATE_FORMAT(MA.dtCustomDt7, '%d/%m/%Y') AS dtCustomDt7, 
-		DATE_FORMAT(MA.dtCustomDt8, '%d/%m/%Y') AS dtCustomDt8,  
-		DATE_FORMAT(MA.dtCustomDt9, '%d/%m/%Y') AS dtCustomDt9,  
-		DATE_FORMAT(MA.dtCustomDt10,'%d/%m/%Y') AS dtCustomDt10, 
-		DATE_FORMAT(MA.dtCustomDt11,'%d/%m/%Y') AS dtCustomDt11, 
-		DATE_FORMAT(MA.dtCustomDt12,'%d/%m/%Y') AS dtCustomDt12, 
-		DATE_FORMAT(MA.dtCustomDt13,'%d/%m/%Y') AS dtCustomDt13,  
-		DATE_FORMAT(MA.dtCustomDt14,'%d/%m/%Y') AS dtCustomDt14,  
-		DATE_FORMAT(MA.dtCustomDt15,'%d/%m/%Y') AS dtCustomDt15, 
-		MA.intCustomLU1, 
-		MA.intCustomLU2, 
-		MA.intCustomLU3, 
-		MA.intCustomLU4, 
-		MA.intCustomLU5, 
-		MA.intCustomLU6, 
-		MA.intCustomLU7, 
-		MA.intCustomLU8, 
-		MA.intCustomLU9, 
-		MA.intCustomLU10, 
-		MA.intCustomLU11, 
-		MA.intCustomLU12, 
-		MA.intCustomLU13, 
-		MA.intCustomLU14, 
-		MA.intCustomLU15, 
-		MA.intCustomLU16, 
-		MA.intCustomLU17, 
-		MA.intCustomLU18, 
-		MA.intCustomLU19, 
-		MA.intCustomLU20, 
-		MA.intCustomLU21, 
-		MA.intCustomLU22, 
-		MA.intCustomLU23, 
-		MA.intCustomLU24, 
-		MA.intCustomLU25, 
-		MA.intCustomBool1,  
-		MA.intCustomBool2,  
-		MA.intCustomBool3,  
-		MA.intCustomBool4,  
-		MA.intCustomBool5, 
-		MA.intCustomBool6, 
-		MA.intCustomBool7, 
 		DATE_FORMAT(dtNatCustomDt3,'%d/%m/%Y') AS dtNatCustomDt3, 
 		DATE_FORMAT(dtNatCustomDt4,'%d/%m/%Y') AS dtNatCustomDt4, 
 		DATE_FORMAT(dtNatCustomDt5,'%d/%m/%Y') AS dtNatCustomDt5, 
@@ -2512,9 +2273,9 @@ sub postMemberUpdate {
             return (
                 0, qq[
                 <div class="OKmsg"> $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER} Added Successfully</div><br>
-                <a href="$Data->{'target'}?client=$clm&amp;a=M_HOME">Display Details for $params->{'d_strFirstname'} $params->{'d_strSurname'}</a><br><br>
+                <a href="$Data->{'target'}?client=$clm&amp;a=P_HOME">Display Details for $params->{'d_strFirstname'} $params->{'d_strSurname'}</a><br><br>
                 <b>or</b><br><br>
-                <a href="$Data->{'target'}?client=$cl&amp;a=M_A&amp;l=$Defs::LEVEL_MEMBER">Add another $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER}</a>
+                <a href="$Data->{'target'}?client=$cl&amp;a=P_A&amp;l=$Defs::LEVEL_MEMBER">Add another $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER}</a>
                 ]
             );
 
@@ -2849,7 +2610,7 @@ sub showClubTeams {
     if ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC and !$Data->{'SystemConfig'}{'NoClubs'} and allowedAction( $Data, 'mc_e' ) ) {
         $editclubsbutton = qq[
 			<form action="$Data->{'target'}" method="POST" >
-				<input type="hidden" name="a" value="M_CLB_">
+				<input type="hidden" name="a" value="P_CLB_">
 				<input type="hidden" name="client" value="$client">
 				<input type="submit" class="button proceed-button" value="Edit $Data->{'LevelNames'}{$Defs::LEVEL_CLUB."_P"}">
 			</form>
@@ -2958,7 +2719,7 @@ sub MemberDupl {
     return '' if !$memberID;
     return '' if !Duplicates::isCheckDupl($Data);
 
-    if ( $action eq 'M_DUP_S' ) {
+    if ( $action eq 'P_DUP_S' ) {
         my $st = qq[
 			UPDATE tblMember
 			SET intStatus = $Defs::MEMBERSTATUS_POSSIBLE_DUPLICATE
@@ -2993,7 +2754,7 @@ sub MemberDupl {
 			<p> <b>$dref->{strFirstname} $dref->{strSurname}</b></p>
 			<p>
 				<span class="warningmsg">NOTE: Only mark the duplicate $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER}, not the $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER} you believe may be the original</span>.</p><br><br>
-				<input type="hidden" name="a" value="M_DUP_S">
+				<input type="hidden" name="a" value="P_DUP_S">
 				<input type="hidden" name="client" value="$client">
 				<input type="submit" value="Mark as Duplicate" id="btnsubmit" name="btnsubmit"  class="button proceed-button">
 			</form>

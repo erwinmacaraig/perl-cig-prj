@@ -6,7 +6,7 @@ package RegoForm::RegoForm_Member_Club;
 
 use strict;
 use lib ".";
-use lib "..","../..","../sportstats";
+use lib "..","../..","../sportstats","../RegoFormBuilder","../PaymentSplit","../Clearances";
 use RegoForm::RegoFormBaseObj;
 our @ISA =qw(RegoForm::RegoForm_Member);
 
@@ -14,7 +14,7 @@ use TTTemplate;
 use CGI;
 use HTML::FillInForm;
 use Date::Calc;
-use Member;
+use Person;
 use ConfigOptions;
 use HTMLForm;
 use RegoForm_Member;

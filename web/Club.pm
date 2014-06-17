@@ -10,7 +10,6 @@ use Utils;
 use HTMLForm;
 use AuditLog;
 use CustomFields;
-use Assoc qw(loadAssocDetails);
 use ConfigOptions qw(ProcessPermissions);
 use ClubCharacteristics;
 use RecordTypeFilter;

@@ -113,7 +113,6 @@ sub main	{
     $carryfields{'cID'}            = $clubID  if $clubID;
     $carryfields{'nfEntityTypeID'} = $nfEntityTypeID;
     $carryfields{'nfEntityID'}     = $nfEntityID;
-    $carryfields{'programID'}      = $programID if $programID;
 
     #tempformobj and setting up the Data variables can be removed when everyone use passport and so config is set for this feature
     my $tempformObj = getRegoFormObj($formID, \%Data, $db, $cgi, \%carryfields, undef, 1);
