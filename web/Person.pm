@@ -3,14 +3,14 @@ require Exporter;
 @ISA    = qw(Exporter);
 @EXPORT = @EXPORT_OK = qw(
   handlePerson
-  getAutoMemberNum
-  member_details
-  setupMemberTypes
-  updateMemberNotes
-  preMemberAdd
+  getAutoPersonNum
+  person_details
+  setupPersonTypes
+  updatePersonNotes
+  prePersonAdd
   check_valid_date
-  postMemberUpdate
-  loadMemberDetails
+  postPersonUpdate
+  loadPersonDetails
 );
 
 use strict;
@@ -27,11 +27,10 @@ use FieldLabels;
 use ConfigOptions qw(ProcessPermissions);
 use GenCode;
 use AuditLog;
-use MemberPackages;
 use DeQuote;
 use Duplicates;
 use ProdTransactions;
-use EditMemberClubs;
+#use EditPersonClubs;
 use CGI qw(cookie unescape);
 use Payments;
 use TransLog;
@@ -45,7 +44,7 @@ use GridDisplay;
 use InstanceOf;
 
 use FieldCaseRule;
-use HomeMember;
+use HomePerson;
 use InstanceOf;
 use Photo;
 use AccreditationDisplay;
@@ -58,47 +57,24 @@ use PrimaryClub;
 use DuplicatePrevention;
 
 sub handlePerson {
-    my ( $action, $Data, $memberID ) = @_;
+    my ( $action, $Data, $personID ) = @_;
 
     my $resultHTML = '';
-    my $memberName = my $title = '';
+    my $personName = my $title = '';
 
-    if ( $Data->{'clientValues'}{'clubID'} ne $Defs::INVALID_ID ) {
-        my $club = $Data->{'clientValues'}{'clubID'};
-
-        #Work out if this player is on permit
-        my $st = qq[ 
-            SELECT 
-                intPermit ,
-	            intMemberClubID
-            FROM 
-                tblMember_Clubs 
-            WHERE 
-                intMemberID=$memberID 
-                AND intClubID=$club 
-                AND intStatus=$Defs::RECSTATUS_ACTIVE 
-            ORDER BY 
-                intPermit ASC
-        ];
-        my $query = $Data->{'db'}->prepare($st);
-        $query->execute;
-        my ( $onPermit, $mcID ) = $query->fetchrow_array();
-        $Data->{'MemberOnPermit'} = $onPermit || 0;
-        $Data->{'MemberActiveInClub'} = 1 if ($mcID);
-    }
     my $clrd_out = 0;
     if ( $Data->{'SystemConfig'}{'Clearances_FilterClearedOut'} ) {
         my $club = $Data->{'clientValues'}{'clubID'};
         my $st   = qq[ 
 			SELECT 
-				intMemberID, 
+				intPersonID, 
 				MCC.intClubID,
 				strName as ClubName 
 			FROM 
-				tblMember_ClubsClearedOut as MCC 
+				tblPerson_ClubsClearedOut as MCC 
 					INNER JOIN tblClub as C ON (C.intClubID = MCC.intClubID) 
 			WHERE 
-				intMemberID=$memberID 
+				intPersonID=$personID 
 				AND intAssocID = $Data->{'clientValues'}{'assocID'}
 		];
         my $query = $Data->{'db'}->prepare($st);
@@ -109,29 +85,29 @@ sub handlePerson {
             $clubs .= qq[, ] if $clubs;
             $clubs .= $dref->{'ClubName'};
         }
-        $Data->{'MemberClrdOut'} = $clubs ? qq[<b>Cleared Out of: $clubs</b>] : '';
-        $Data->{'MemberClrdOut_ofClub'}        = $clrd_out if ( $Data->{'clientValues'}{'authLevel'} <= $Defs::LEVEL_CLUB );
-        $Data->{'MemberClrdOut_ofCurrentClub'} = $clrd_out if ( $Data->{'clientValues'}{'authLevel'} <= $Defs::LEVEL_ASSOC );
+        $Data->{'PersonClrdOut'} = $clubs ? qq[<b>Cleared Out of: $clubs</b>] : '';
+        $Data->{'PersonClrdOut_ofClub'}        = $clrd_out if ( $Data->{'clientValues'}{'authLevel'} <= $Defs::LEVEL_CLUB );
+        $Data->{'PersonClrdOut_ofCurrentClub'} = $clrd_out if ( $Data->{'clientValues'}{'authLevel'} <= $Defs::LEVEL_ASSOC );
     }
 
     if ( $action =~ /P_PH_/ ) {
         my $newaction = '';
-        ( $resultHTML, $title, $newaction ) = handle_photo( $action, $Data, $memberID );
+        ( $resultHTML, $title, $newaction ) = handle_photo( $action, $Data, $personID );
         $action = $newaction if $newaction;
     }
     if ( $action =~ /^P_DT/ ) {
-        #Member Details
-        ( $resultHTML, $title ) = member_details( $action, $Data, $memberID );
+        #Person Details
+        ( $resultHTML, $title ) = person_details( $action, $Data, $personID );
     }
     elsif ( $action =~ /^P_A/ ) {
-	    #Member Details
-        ( $resultHTML, $title ) = member_details( $action, $Data, $memberID );
+	    #Person Details
+        ( $resultHTML, $title ) = person_details( $action, $Data, $personID );
 	}
     elsif ( $action =~ /^P_LSROup/ ) {
-        ( $resultHTML, $title ) = bulkMemberRolloverUpdate( $Data, $action );
+        ( $resultHTML, $title ) = bulkPersonRolloverUpdate( $Data, $action );
     }
     elsif ( $action =~ /^P_LSRO/ ) {
-        ( $resultHTML, $title ) = bulkMemberRollover( $Data, $action );
+        ( $resultHTML, $title ) = bulkPersonRollover( $Data, $action );
     }
     elsif ( $action =~ /^P_L/ ) {
         ( $resultHTML, $title ) = listPersons( $Data, getID($Data->{'clientValues'}), $action );
@@ -140,50 +116,50 @@ sub handlePerson {
         ( $resultHTML, $title ) = listPersons( $Data, getID($Data->{'clientValues'}), $action );
     }
     elsif ( $action =~ /P_CLB_/ ) {
-        ( $resultHTML, $title ) = handlePersonClub( $action, $Data, $memberID );
+        ( $resultHTML, $title ) = handlePersonClub( $action, $Data, $personID );
     }
     elsif ( $action =~ /P_PRODTXN_/ ) {
-        ( $resultHTML, $title ) = handleProdTransactions( $action, $Data, $memberID );
+        ( $resultHTML, $title ) = handleProdTransactions( $action, $Data, $personID );
     }
     elsif ( $action =~ /P_TXN_/ ) {
-        ( $resultHTML, $title ) = Transactions::handleTransactions( $action, $Data, $memberID );
+        ( $resultHTML, $title ) = Transactions::handleTransactions( $action, $Data, $personID );
     }
     elsif ( $action =~ /P_TXNLog/ ) {
-        ( $resultHTML, $title ) = TransLog::handleTransLogs( $action, $Data, $memberID );
+        ( $resultHTML, $title ) = TransLog::handleTransLogs( $action, $Data, $personID );
     }
     elsif ( $action =~ /P_PAY_/ ) {
         ( $resultHTML, $title ) = handlePayments( $action, $Data, 0 );
     }
     elsif ( $action =~ /^P_DUP_/ ) {
-        ( $resultHTML, $title ) = MemberDupl( $action, $Data, $memberID );
+        ( $resultHTML, $title ) = PersonDupl( $action, $Data, $personID );
     }
     elsif ( $action =~ /^P_DEL/ ) {
 
-        #($resultHTML,$title)=delete_member($Data, $memberID);
+        #($resultHTML,$title)=delete_person($Data, $personID);
     }
     elsif ( $action =~ /^P_TRANSFER/ ) {
-        ( $resultHTML, $title ) = MemberTransfer($Data);
+        ( $resultHTML, $title ) = PersonTransfer($Data);
     }
     elsif ( $action =~ /P_CLUBS/ ) {
-        my ( $clubStatus, $clubs, undef) = showClubTeams( $Data, $memberID );
+        my ( $clubStatus, $clubs, undef) = showClubTeams( $Data, $personID );
         $clubs      = qq[<div class="warningmsg">No $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} History found</div>] if !$clubs;
         $resultHTML = $clubs;
         $title      = "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} History";
     }
     elsif ( $action =~ /P_SEASONS/ ) {
-        ( $resultHTML, $title ) = showSeasonSummary( $Data, $memberID );
+        ( $resultHTML, $title ) = showSeasonSummary( $Data, $personID );
     }
     elsif ( $action =~ /P_CLR/ ) {
-        $resultHTML = clearanceHistory( $Data, $memberID ) || '';
+        $resultHTML = clearanceHistory( $Data, $personID ) || '';
         my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
         $title = $txt_Clr . " History";
     }
     elsif ( $action =~ /^P_HOME/ ) {
-        my ( $FieldDefinitions, $memperms ) = member_details( '', $Data, $memberID, {}, 1 );
-        ( $resultHTML, $title ) = showMemberHome( $Data, $memberID, $FieldDefinitions, $memperms );
+        my ( $FieldDefinitions, $memperms ) = person_details( '', $Data, $personID, {}, 1 );
+        ( $resultHTML, $title ) = showPersonHome( $Data, $personID, $FieldDefinitions, $memperms );
     }
     elsif ( $action =~ /^P_NACCRED/ ) {
-        ( $resultHTML, $title ) = handleAccreditationDisplay( $action, $Data, $memberID );
+        ( $resultHTML, $title ) = handleAccreditationDisplay( $action, $Data, $personID );
     }
     else {
         print STDERR "Unknown action $action\n";
@@ -191,20 +167,12 @@ sub handlePerson {
     return ( $resultHTML, $title );
 }
 
-sub updateMemberNotes {
+sub updatePersonNotes {
 
-    my ( $db, $assocID, $memberID, $notes_ref ) = @_;
-    $memberID ||= 0;
-    my $st_deceased = qq[
-        UPDATE tblMember
-        SET intDeceased = 0, tTimeStamp = tTimeStamp
-        WHERE intMemberID = ?  AND intDeceased IS NULL
-        LIMIT 1
-	];
-    $db->do( $st_deceased, undef, $memberID );
+    my ( $db, $personID, $notes_ref ) = @_;
+    $personID ||= 0;
 
-    my $fromsync    = $notes_ref->{'fromsync'} || 0;
-    my @noteFields  = (qw(strNotes strMedicalNotes strMemberCustomNotes1 strMemberCustomNotes2 strMemberCustomNotes3 strMemberCustomNotes4 strMemberCustomNotes5 ));
+    my @noteFields  = (qw(strNotes ));
     my %Notes       = ();
     my %notes_ref_l = %{$notes_ref};
 
@@ -217,8 +185,6 @@ sub updateMemberNotes {
 
         $Notes{$f} = $notes_ref_l{ 'd_' . $f } || $notes_ref_l{$f} || '';
         my $fieldname = $f;
-        $fieldname = "strMemberNotes"        if $f eq 'strNotes';
-        $fieldname = "strMemberMedicalNotes" if $f eq 'strMedicalNotes';
         $insert_cols .= qq[, $fieldname];
 
         $insert_vals .= qq[, ?];
@@ -227,28 +193,18 @@ sub updateMemberNotes {
     }
 
     my $st = qq[
-        INSERT INTO tblMemberNotes
-            (intNotesMemberID, intNotesAssocID $insert_cols)
+        INSERT INTO tblPersonNotes
+            (intPersonID, $insert_cols)
         VALUES 
-            ($memberID, $assocID $insert_vals)
+            ($personID, $insert_vals)
         ON DUPLICATE KEY UPDATE tTimeStamp=NOW() $update_vals
     ];
 
     my $query = $db->prepare($st);
     $query->execute( @value_list, @value_list );
-
-    if ( !$fromsync ) {
-        $st = qq[
-            UPDATE tblMember_Associations
-            SET tTimeStamp=NOW()
-            WHERE intMemberID = ? AND intAssocID = ?
-		];
-        $db->do( $st, undef, $memberID, $assocID );
-    }
-
 }
 
-sub MemberTransfer {
+sub PersonTransfer {
 
     my ($Data) = @_;
 
@@ -260,38 +216,38 @@ sub MemberTransfer {
     my $transfer_natnum  = $params{'transfer_natnum'} || '';
     my $transfer_surname = $params{'transfer_surname'} || '';
     my $transfer_dob     = $params{'transfer_dob'} || '';
-    my $memberID         = $params{'memberID'} || 0;
+    my $personID         = $params{'personID'} || 0;
     $transfer_dob = '' if !check_valid_date($transfer_dob);
     $transfer_dob = _fix_date($transfer_dob) if ( check_valid_date($transfer_dob) );
     deQuote( $db, \$transfer_natnum );
     deQuote( $db, \$transfer_surname );
     deQuote( $db, \$transfer_dob );
     my $confirmed = $params{'transfer_confirm'} || 0;
-    my $assocTypeIDWHERE = exists $Data->{'SystemConfig'}{'MemberTransfer_AssocType'} ? qq[ AND A.intAssocTypeID = $Data->{'SystemConfig'}{'MemberTransfer_AssocType'} ] : '';
+    my $assocTypeIDWHERE = exists $Data->{'SystemConfig'}{'PersonTransfer_AssocType'} ? qq[ AND A.intAssocTypeID = $Data->{'SystemConfig'}{'PersonTransfer_AssocType'} ] : '';
     my $st = qq[
 		SELECT 
-            M.intMemberID, 
+            M.intPersonID, 
             A.strName, 
             A.intAssocID, 
-            MA.intRecStatus, 
-            CONCAT(M.strFirstname, ' ', M.strSurname) as MemberName, 
+            MA.strStatus, 
+            CONCAT(M.strLocalFirstname, ' ', M.strLocalSurname) as PersonName, 
             DATE_FORMAT(dtDOB,'%d/%m/%Y') AS dtDOB, 
             DATE_FORMAT(dtDOB, "%Y%m%d") as DOBAgeGroup, 
             M.intGender
-		FROM tblMember as M
-			INNER JOIN tblMember_Associations as MA ON (MA.intMemberID = M.intMemberID)
+		FROM tblPerson as M
+			INNER JOIN tblPerson_Associations as MA ON (MA.intPersonID = M.intPersonID)
 			INNER JOIN tblAssoc as A ON (A.intAssocID = MA.intAssocID)
 		WHERE M.intRealmID = $Data->{'Realm'}
 			$assocTypeIDWHERE
-			AND M.strSurname = $transfer_surname
+			AND M.strLocalSurname = $transfer_surname
 			AND (M.strNationalNum = $transfer_natnum OR M.dtDOB= $transfer_dob)
-			AND M.intStatus = $Defs::MEMBERSTATUS_ACTIVE
+			AND M.intStatus = $Defs::PERSONSTATUS_ACTIVE
 	];
-    $st .= qq[ AND M.intMemberID = $memberID] if $memberID;
+    $st .= qq[ AND M.intPersonID = $personID] if $personID;
 
     if ( !$params{'transfer_surname'} and ( !$params{'transfer_dob'} or !$params{'transfer_surname'} ) ) {
         my $assocType = '';
-        my $assocTypeIDWHERE = exists $Data->{'SystemConfig'}{'MemberTransfer_AssocType'} ? qq[ AND intSubTypeID = $Data->{'SystemConfig'}{'MemberTransfer_AssocType'} ] : '';
+        my $assocTypeIDWHERE = exists $Data->{'SystemConfig'}{'PersonTransfer_AssocType'} ? qq[ AND intSubTypeID = $Data->{'SystemConfig'}{'PersonTransfer_AssocType'} ] : '';
         if ($assocTypeIDWHERE) {
             my $st = qq[
 				SELECT strSubTypeName
@@ -306,33 +262,33 @@ sub MemberTransfer {
         }
         $body .= qq[
 			<form action="$Data->{'target'}" method="POST" style="float:left;" onsubmit="document.getElementById('btnsubmit').disabled=true;return true;">
-                                <p>If you wish to Transfer a member to this Association $assocType, please fill in the Surname and $Data->{'SystemConfig'}{'NationalNumName'} or Date of Birth below and click <b>Transfer Member</b>.</p>
+                                <p>If you wish to Transfer a person to this Association $assocType, please fill in the Surname and $Data->{'SystemConfig'}{'NationalNumName'} or Date of Birth below and click <b>Transfer Person</b>.</p>
 
                         <table>
-				<tr><td><span class="label">Member's Surname:</td><td><span class="formw"><input type="text" name="transfer_surname" value=""></td></tr>
+				<tr><td><span class="label">Person's Surname:</td><td><span class="formw"><input type="text" name="transfer_surname" value=""></td></tr>
 				<tr><td><b>AND</b></td></tr>
 				<tr><td>&nbsp;</td></tr>
 				<tr><td><span class="label">$Data->{'SystemConfig'}{'NationalNumName'}:</td><td><span class="formw"><input type="text" name="transfer_natnum" value=""></td></tr>
 				<tr><td><b>OR</b></td></tr>
-				<tr><td><span class="label">Member's Date of Birth:</td><td><span class="formw"><input type="text" name="transfer_dob" value="">&nbsp;<i>dd/mm/yyyy</li></td></tr>
+				<tr><td><span class="label">Person's Date of Birth:</td><td><span class="formw"><input type="text" name="transfer_dob" value="">&nbsp;<i>dd/mm/yyyy</li></td></tr>
 			</table>
                                 <input type="hidden" name="a" value="P_TRANSFER">
                                 <input type="hidden" name="client" value="$client">
-                                <input type="submit" value="Transfer Member" id="btnsubmit" name="btnsubmit"  class="button proceed-button">
+                                <input type="submit" value="Transfer Person" id="btnsubmit" name="btnsubmit"  class="button proceed-button">
                         </form>
 		];
     }
-    elsif ( !$confirmed and !$memberID ) {
+    elsif ( !$confirmed and !$personID ) {
         my $query = $db->prepare($st);
         $query->execute;
         $body .= qq[
-                                <p>Please select a member to be transferred and click the <b>select</b> link.</p>
+                                <p>Please select a person to be transferred and click the <b>select</b> link.</p>
                         <p>
                         	<table>
                                	<tr><td>&nbsp;</td>		
 								<td><span class="label">$Data->{'SystemConfig'}{'NationalNumName'}:</td>
-                               	<td><span class="label">Member's Name:</td>
-                               	<td><span class="label">Member's Date Of Birth:</td>
+                               	<td><span class="label">Person's Name:</td>
+                               	<td><span class="label">Person's Date Of Birth:</td>
                                	<td><span class="label">Linked To:</td>
 							</tr>
 		];
@@ -340,30 +296,30 @@ sub MemberTransfer {
         while ( my $dref = $query->fetchrow_hashref() ) {
             $count++;
             my $href = qq[client=$client&amp;a=P_TRANSFER&amp;transfer_surname=$params{'transfer_surname'}&amp;transfer_dob=$params{'transfer_dob'}&amp;transfer_natnum=$params{'transfer_natnum'}];
-            $body .= qq[<tr><td><a href="$Data->{'target'}?$href&amp;memberID=$dref->{intMemberID}">select</a></td>
+            $body .= qq[<tr><td><a href="$Data->{'target'}?$href&amp;personID=$dref->{intPersonID}">select</a></td>
 							<td>$dref->{strNationalNum}</td>
-							<td>$dref->{MemberName}</td>
+							<td>$dref->{PersonName}</td>
 							<td>$dref->{dtDOB}</td>
 							<td>$dref->{strName}</td></tr>];
         }
         $body .= qq[</table>];
         if ( !$count ) {
-            $body = qq[<p class="warningmsg">No Members found</p>];
+            $body = qq[<p class="warningmsg">No Persons found</p>];
         }
 
     }
-    elsif ( !$confirmed and $memberID ) {
+    elsif ( !$confirmed and $personID ) {
         my $query = $db->prepare($st);
         $query->execute;
         $body .= qq[
                         <form action="$Data->{'target'}" method="POST" style="float:left;" onsubmit="document.getElementById('btnsubmit').disabled=true;return true;">
-                                <p>Please review the member to be transferred and click the <b>Confirm Transfer</b> button below.</p>
+                                <p>Please review the person to be transferred and click the <b>Confirm Transfer</b> button below.</p>
 
                         <p>
                                 <table>
                                 <tr><td><span class="label">$Data->{'SystemConfig'}{'NationalNumName'}:</td><td><span class="formw">:$params{'transfer_natnum'}</td></tr>
-                                <tr><td><span class="label">Member's Surname:</td><td><span class="formw">:$params{'transfer_surname'}</td></tr>
-                                <tr><td><span class="label">Member's DOB:</td><td><span class="formw">:$params{'transfer_dob'}</td></tr>
+                                <tr><td><span class="label">Person's Surname:</td><td><span class="formw">:$params{'transfer_surname'}</td></tr>
+                                <tr><td><span class="label">Person's DOB:</td><td><span class="formw">:$params{'transfer_dob'}</td></tr>
                                 <tr><td><span class="label">Linked to:</td><td>&nbsp;</td></tr>
                 ];
         my $count     = 0;
@@ -380,114 +336,105 @@ sub MemberTransfer {
                                 <input type="hidden" name="transfer_natnum" value="$params{'transfer_natnum'}">
                                 <input type="hidden" name="transfer_surname" value="$params{'transfer_surname'}">
                                 <input type="hidden" name="transfer_dob" value="$params{'transfer_dob'}">
-                                <input type="hidden" name="memberID" value="$memberID">
+                                <input type="hidden" name="personID" value="$personID">
                                 <input type="hidden" name="client" value="$client">
                                 <input type="submit" value="Confirm transfer" id="btnsubmit" name="btnsubmit"  class="button proceed-button">
                         </form>
                 ];
-        $body = qq[<p class="warningmsg">Member already exists in this Association</p>] if ($thisassoc);
+        $body = qq[<p class="warningmsg">Person already exists in this Association</p>] if ($thisassoc);
         if ( !$count ) {
-            $body = qq[<p class="warningmsg">Member not found</p>];
+            $body = qq[<p class="warningmsg">Person not found</p>];
         }
     }
     elsif ($confirmed) {
         $st .= qq[ LIMIT 1];
         my $query = $db->prepare($st);
         $query->execute;
-        my ( $memberID, undef, $oldAssocID, $recstatus, undef, undef, $DOBAgeGroup, $Gender ) = $query->fetchrow_array();
+        my ( $personID, undef, $oldAssocID, $recstatus, undef, undef, $DOBAgeGroup, $Gender ) = $query->fetchrow_array();
         $DOBAgeGroup ||= '';
         $Gender      ||= 0;
-        $memberID    ||= 0;
+        $personID    ||= 0;
         my $assocID      = $Data->{clientValues}{'assocID'} || 0;
         my $assocSeasons = Seasons::getDefaultAssocSeasons($Data);
         my %types        = ();
 
-        #$types{'int#PlayerStatus'} = 1;
-        if ( !$types{'intPlayerStatus'} and !$types{'intCoachStatus'} and !$types{'intUmpireStatus'} and !$types{'intMiscStatus'} and !$types{'intVolunteerStatus'} and !$types{'intOther1Status'} and !$types{'intOther2Status'} ) {
-            $types{'intPlayerStatus'} = 1 if ( $assocSeasons->{'defaultMemberType'} == $Defs::MEMBER_TYPE_PLAYER or $Data->{'SystemConfig'}{'TransferAsPlayer'} );
-            $types{'intCoachStatus'}  = 1 if ( $assocSeasons->{'defaultMemberType'} == $Defs::MEMBER_TYPE_COACH );
-            $types{'intUmpireStatus'} = 1 if ( $assocSeasons->{'defaultMemberType'} == $Defs::MEMBER_TYPE_UMPIRE );
-            $types{'intMiscStatus'}  = 1 if ( $assocSeasons->{'defaultMemberType'} == $Defs::MEMBER_TYPE_MISC );
-            $types{'intVolunteerStatus'}  = 1 if ( $assocSeasons->{'defaultMemberType'} == $Defs::MEMBER_TYPE_VOLUNTEER );
-        }
         $types{'intMSRecStatus'} = 1;
-        if ( $memberID and $assocID ) {
+        if ( $personID and $assocID ) {
             my $genAgeGroup ||= new GenAgeGroup( $Data->{'db'}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $assocID );
             my $ageGroupID = $genAgeGroup->getAgeGroup( $Gender, $DOBAgeGroup ) || 0;
             my $upd_st = qq[
 				UPDATE 
-					tblMember_Associations
+					tblPerson_Associations
 				SET 
-					intRecStatus=1
+					strStatus=1
 				WHERE
-					intMemberID= $memberID
+					intPersonID= $personID
 					AND intAssocID = $assocID
 				LIMIT 1
 			];
             $db->do($upd_st);
             my $ins_st = qq[
-				INSERT IGNORE INTO tblMember_Associations
-				(intMemberID, intAssocID, intRecStatus)
-				VALUES ($memberID, $assocID, 1)
+				INSERT IGNORE INTO tblPerson_Associations
+				(intPersonID, intAssocID, strStatus)
+				VALUES ($personID, $assocID, 1)
 			];
             $db->do($ins_st);
-            Seasons::insertMemberSeasonRecord( $Data, $memberID, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, 0, $ageGroupID, \%types );
+            Seasons::insertPersonSeasonRecord( $Data, $personID, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, 0, $ageGroupID, \%types );
             $ins_st = qq[
-				INSERT INTO tblMember_Types
-                    (intMemberID, intTypeID, intSubTypeID, intActive, intAssocID, intRecStatus)
+				INSERT INTO tblPerson_Types
+                    (intPersonID, intTypeID, intSubTypeID, intActive, intAssocID, strStatus)
                 VALUES 
-                    ($memberID,$Defs::MEMBER_TYPE_PLAYER,0,1,$assocID, 1)
+                    ($personID,$Defs::PERSON_TYPE_PLAYER,0,1,$assocID, 1)
 			];
             $db->do($ins_st);
-            Transactions::insertDefaultRegoTXN( $db, $Defs::LEVEL_MEMBER, $memberID, $assocID );
+            Transactions::insertDefaultRegoTXN( $db, $Defs::LEVEL_PERSON, $personID, $assocID );
 
             if ( $Data->{clientValues}{'clubID'} and $Data->{clientValues}{'clubID'} > 0 ) {
                 $ins_st = qq[
-					INSERT INTO tblMember_Clubs
-					    (intMemberID, intClubID, intStatus)
+					INSERT INTO tblPerson_Clubs
+					    (intPersonID, intClubID, intStatus)
 					VALUES 
-                        ($memberID, $Data->{clientValues}{'clubID'}, 1)
+                        ($personID, $Data->{clientValues}{'clubID'}, 1)
 				];
                 $db->do($ins_st);
-                Seasons::insertMemberSeasonRecord( $Data, $memberID, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, $Data->{'clientValues'}{'clubID'}, $ageGroupID, \%types );
+                Seasons::insertPersonSeasonRecord( $Data, $personID, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, $Data->{'clientValues'}{'clubID'}, $ageGroupID, \%types );
             }
             my $mem_st = qq[
-				UPDATE tblMember
+				UPDATE tblPerson
 				SET intPlayer = 1
-				WHERE intMemberID = $memberID
+				WHERE intPersonID = $personID
 				LIMIT 1
 			];
             $db->do($mem_st);
             my %tempClientValues = %{ $Data->{clientValues} };
-            $tempClientValues{memberID}     = $memberID;
-            $tempClientValues{currentLevel} = $Defs::LEVEL_MEMBER;
+            $tempClientValues{personID}     = $personID;
+            $tempClientValues{currentLevel} = $Defs::LEVEL_PERSON;
             my $tempClient = setClient( \%tempClientValues );
-            $body = qq[ <div class="OKmsg">The member has been transferred</div><br><a href="$Data->{'target'}?client=$tempClient&amp;a=P_HOME">click here to display members record</a>];
+            $body = qq[ <div class="OKmsg">The person has been transferred</div><br><a href="$Data->{'target'}?client=$tempClient&amp;a=P_HOME">click here to display persons record</a>];
 
         }
     }
     else {
-        return ( "Invalid Option", "Transfer Member" );
+        return ( "Invalid Option", "Transfer Person" );
     }
-    return ( $body, "Member Transfer" );
+    return ( $body, "Person Transfer" );
 
 }
 
-sub member_details {
-    my ( $action, $Data, $memberID, $prefillData, $returndata ) = @_;
+sub person_details {
+    my ( $action, $Data, $personID, $prefillData, $returndata ) = @_;
     $returndata ||= 0;
     my $option = 'display';
     $option = 'edit' if $action eq 'P_DTE' and allowedAction( $Data, 'm_e' );
     $option = 'add'  if $action eq 'P_A'   and allowedAction( $Data, 'm_a' );
-    $option = 'add' if ( $Data->{'RegoForm'} and !$memberID );
-    $memberID = 0 if $option eq 'add';
+    $option = 'add' if ( $Data->{'RegoForm'} and !$personID );
+    $personID = 0 if $option eq 'add';
     my $hideWebCamTab = $Data->{SystemConfig}{hide_webcam_tab} ? qq[&hwct=1] : '';
-    my $assoc_obj = getInstanceOf( $Data, 'assoc', $Data->{'clientValues'}{'assocID'} );
-    my $field = loadMemberDetails( $Data->{'db'}, $memberID, $Data->{'clientValues'}{'assocID'} ) || ();
+    my $field = loadPersonDetails( $Data->{'db'}, $personID ) || ();
     
 
     if ( $prefillData and ref $prefillData ) {
-        if ($memberID) {
+        if ($personID) {
             for my $k ( keys %{$prefillData} ) { $field->{$k} ||= $prefillData->{$k} if $prefillData->{$k}; }
         }
         else {
@@ -495,14 +442,13 @@ sub member_details {
         }
     }
     my $natnumname = $Data->{'SystemConfig'}{'NationalNumName'} || 'National Number';
-    my $FieldLabels   = FieldLabels::getFieldLabels( $Data, $Defs::LEVEL_MEMBER );
+    my $FieldLabels   = FieldLabels::getFieldLabels( $Data, $Defs::LEVEL_PERSON );
     my @countries     = getCountriesArray($Data);
     my %countriesonly = ();
     for my $c (@countries) {
         $countriesonly{$c} = $c;
     }
     my $countries = getCountriesHash($Data);
-    my $state_options = get_state_map();
 
     my ($DefCodes, $DefCodesOrder) = getDefCodes(
         dbh        => $Data->{'db'}, 
@@ -512,56 +458,8 @@ sub member_details {
         hideCodes  => $Data->{'SystemConfig'}{'AssocConfig'}{'hideDefCodes'},
     );
 
-    my %SchoolGrades = ();
-    my @SchoolGradesOrder = ();
-    if ( $Data->{'SystemConfig'}{'Schools'} ) {
-        my $statement = qq[
-            SELECT intGradeID, strName
-            FROM tblSchoolGrades
-            WHERE intSchoolRealm=$Data->{'SystemConfig'}{'Schools'}
-            ORDER BY intOrder 
-        ];
-        my $query = $Data->{'db'}->prepare($statement);
-        $query->execute;
-        while ( my ( $id, $strName,$intOrder ) = $query->fetchrow_array ) {
-            $SchoolGrades{$id} = $strName || '';
-            push @SchoolGradesOrder, $id;
-	    }
-    }
-    my $MemberPackages = getMemberPackages($Data) || '';
     my $CustomFieldNames = CustomFields::getCustomFieldNames( $Data, $field->{'intAssocTypeID'} ) || '';
     my $fieldsdefined = 1;
-    if ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC ) {
-
-        #Check to see if display fields are defined
-        my $found = 0;
-        if ( $Data->{'SystemConfig'}{'DontCheckAssocConfig'} ) {
-            $found = 1;
-        }
-        else {
-            for my $k ( keys %{ $Data->{'Permissions'}{'Member'} } ) {
-                if (    $Data->{'Permissions'}{'Member'}{$k} eq 'Editable'
-                     or $Data->{'Permissions'}{'Member'}{$k} eq 'ReadOnly'
-                     or $Data->{'Permissions'}{'Member'}{$k} eq 'Compulsory'
-                     or $Data->{'Permissions'}{'Member'}{$k} eq 'AddOnlyCompulsory' )
-                {
-                    $found = 1;
-                    last;
-                }
-            }
-        }
-        $fieldsdefined = 0 if !$found;
-    }
-    if ( !$fieldsdefined and !$Data->{'RegoForm'} ) {
-        my %cl = %{ $Data->{'clientValues'} };
-        $cl{'currentLevel'} = $Defs::LEVEL_ASSOC;
-        my $cl  = setClient( \%cl );
-        my $txt = qq[
-			<p class="warning">No fields have been configured to display</p>
-			<p>To configure which fields to display you must go into the <a href="$Data->{'target'}?a=FC_C_d&amp;client=$cl">$Data->{'LevelNames'}{$Defs::LEVEL_ASSOC} Configuration options</a>.</p>
-		];
-        return ( $txt, 'Add a New Member' );
-    }
     my %genderoptions = ();
     for my $k ( keys %Defs::PersonGenderInfo ) {
         next if !$k;
@@ -570,39 +468,27 @@ sub member_details {
     }
 
     my $client = setClient( $Data->{'clientValues'} ) || '';
-    my $RecStatus_readonly = ( $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_ASSOC and !$Data->{'SystemConfig'}{'AllowClubsAssocStatus'} ) ? 1 : 0;
 
-    my $assocSeasons = Seasons::getDefaultAssocSeasons($Data);
-
-    my $interestHeader = qq[Interests];
-    $interestHeader = $Data->{'SystemConfig'}{'InterestsHeader'} if $Data->{'SystemConfig'}{'InterestsHeader'};
-    if ( $assocSeasons->{'allowSeasons'} and $option eq 'add' ) {
-        my $txt_SeasonName = $Data->{'SystemConfig'}{'txtSeason'} || 'Season';
-        $interestHeader = qq[Add Member for $assocSeasons->{'newRegoSeasonName'} $txt_SeasonName as];
-    }
-    my $addressvalidation = '';
-    if ( $Data->{'SystemConfig'}{'AddressValidation'} and ( $option eq 'add' or $option eq 'edit' ) ) {
-        $addressvalidation = qq[
-			<script language="JavaScript" type="text/javascript" src="js/thickbox.js"></script>
-    <link rel="stylesheet" type="text/css" href="css/thickbox.css">
-
-
-			<script language="JavaScript" type="text/javascript" src="js/validateaddress.js"></script>
-			<br><br><br><input type="button" value="Validate Address" onclick="validateaddress('http://devel.pnp-local.com.au/warren/qas650/sample/php/control.php');">
-		];
-    }
     my $photolink = '';
-    if ($field->{'intMemberID'}) {
-        my $hash = authstring($field->{'intMemberID'});
-        $photolink = qq[<img src = "getphoto.cgi?pa=$field->{'intMemberID'}f$hash" onerror="this.style.display='none'" height='200px'>];
+    if ($field->{'intPersonID'}) {
+        my $hash = authstring($field->{'intPersonID'});
+        $photolink = qq[<img src = "getphoto.cgi?pa=$field->{'intPersonID'}f$hash" onerror="this.style.display='none'" height='200px'>];
     }
-    my $field_case_rules = get_field_case_rules({dbh=>$Data->{'db'}, client=>$client, type=>'Member'});
+    my $field_case_rules = get_field_case_rules({dbh=>$Data->{'db'}, client=>$client, type=>'Person'});
 	my @reverseYNOrder = ('',1,0);
 
     my $mrt_config = '';
 
     my %FieldDefinitions = (
         fields => {
+            strFIFAID => {
+                label       => $FieldLabels->{'strFIFAID'},
+                value       => $field->{strFIFAID},
+                type        => 'text',
+                size        => '14',
+                readonly    => 1,
+                sectionname => 'details',
+            },
             strNationalNum => {
                 label       => $FieldLabels->{'strNationalNum'},
                 value       => $field->{strNationalNum},
@@ -611,87 +497,89 @@ sub member_details {
                 readonly    => 1,
                 sectionname => 'details',
             },
-            strMemberNo => {
-                label       => $FieldLabels->{'strMemberNo'},
-                value       => $field->{strMemberNo},
+            strPersonNo => {
+                label       => $FieldLabels->{'strPersonNo'},
+                value       => $field->{strPersonNo},
                 type        => 'text',
                 size        => '15',
                 maxsize     => '15',
                 sectionname => 'details',
             },
-            intRecStatus => {
-                label         => $FieldLabels->{'intRecStatus'},
-                value         => $field->{intRecStatus},
+            strStatus => {
+                label         => $FieldLabels->{'strStatus'},
+                value         => $field->{strStatus},
                 type          => 'checkbox',
                 sectionname   => 'details',
                 default       => 1,
                 displaylookup => { 1 => 'Yes', 0 => 'No' },
                 noadd         => 1,
-                readonly      => $RecStatus_readonly,
-            },
-            intMemberToHideID => {
-                label         => $FieldLabels->{'intMemberToHideID'},
-                value         => $field->{'intMemberToHideID'} ? 0 : 1,
-                type          => 'checkbox',
-                sectionname   => 'other',
-                default       => 1,
-                displaylookup => { 1 => 'Yes', 0 => 'No' },
-                readonly => ( $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_ASSOC ) ? 1 : 0,
-                SkipProcessing => 1,
             },
 
-            ## ADDED BY TC - 01/07/08
-            intDefaulter => {
-                label => $Data->{'SystemConfig'}{'Defaulter'} ? $Data->{'SystemConfig'}{'Defaulter'} : $FieldLabels->{'intDefaulter'},
-                value => $field->{intDefaulter},
-                type  => 'checkbox',
-                sectionname   => 'details',
-                default       => 0,
-                displaylookup => { 1 => 'Yes', 0 => 'No' },
-                noadd         => 1,
-            },
-            ##
-
-            strSalutation => {
-                label       => $FieldLabels->{'strSalutation'},
-                value       => $field->{strSalutation},
+            strTitle => {
+                label       => $FieldLabels->{'strTitle'},
+                value       => $field->{strTitle},
                 type        => 'text',
                 size        => '20',
                 maxsize     => '30',
                 sectionname => 'details',
             },
-            strFirstname => {
-                label       => $FieldLabels->{'strFirstname'},
-                value       => $field->{strFirstname},
+
+            strLocalFirstname => {
+                label       => $FieldLabels->{'strLocalFirstname'},
+                value       => $field->{strLocalFirstname},
                 type        => 'text',
                 size        => '40',
                 maxsize     => '50',
                 sectionname => 'details',
                 first_page  => 1,
-
-                #onChange   => 1,
             },
-            strMiddlename => {
-                label       => $FieldLabels->{'strMiddlename'},
-                value       => $field->{strMiddlename},
+            strLocalMiddlename => {
+                label       => $FieldLabels->{'strLocalMiddlename'},
+                value       => $field->{strLocalMiddlename},
                 type        => 'text',
                 size        => '40',
                 maxsize     => '50',
                 sectionname => 'details',
-
-                #onChange   => 1,
             },
-            strSurname => {
-                label       => $Data->{'SystemConfig'}{'strSurname_Text'} ? $Data->{'SystemConfig'}{'strSurname_Text'} : $FieldLabels->{'strSurname'},
-                value       => $field->{strSurname},
+            strLocalSurname => {
+                label       => $Data->{'SystemConfig'}{'strLocalSurname_Text'} ? $Data->{'SystemConfig'}{'strLocalSurname_Text'} : $FieldLabels->{'strLocalSurname'},
+                value       => $field->{strLocalSurname},
                 type        => 'text',
                 size        => '40',
                 maxsize     => '50',
                 sectionname => 'details',
                 first_page  => 1,
-
-                #onChange   => 1,
             },
+
+
+            strLatinFirstname => {
+                label       => $FieldLabels->{'strLatinFirstname'},
+                value       => $field->{strLatinFirstname},
+                type        => 'text',
+                size        => '40',
+                maxsize     => '50',
+                sectionname => 'details',
+                first_page  => 1,
+            },
+            strLatinMiddlename => {
+                label       => $FieldLabels->{'strLatinMiddlename'},
+                value       => $field->{strLatinMiddlename},
+                type        => 'text',
+                size        => '40',
+                maxsize     => '50',
+                sectionname => 'details',
+            },
+            strLatinSurname => {
+                label       => $Data->{'SystemConfig'}{'strLocalSurname_Text'} ? $Data->{'SystemConfig'}{'strLocalSurname_Text'} : $FieldLabels->{'strLatinSurname'},
+                value       => $field->{strLatinSurname},
+                type        => 'text',
+                size        => '40',
+                maxsize     => '50',
+                sectionname => 'details',
+                first_page  => 1,
+            },
+
+
             strMaidenName => {
                 label       => $FieldLabels->{'strMaidenName'},
                 value       => $field->{strMaidenName},
@@ -728,25 +616,25 @@ sub member_details {
                 maxsize     => '45',
                 sectionname => 'details',
             },
-            strCountryOfBirth => {
-                label       => $FieldLabels->{'strCountryOfBirth'},
-                value       => $field->{strCountryOfBirth},
+            strISOCountryOfBirth => {
+                label       => $FieldLabels->{'strISOCountryOfBirth'},
+                value       => $field->{strISOCountryOfBirth},
                 type        => 'lookup',
                 options     => \%countriesonly,
                 sectionname => 'other',
                 firstoption => [ '', 'Select Country' ],
             },
-            strMotherCountry => {
-                label       => $FieldLabels->{'strMotherCountry'},
-                value       => $field->{strMotherCountry},
+            strISOMotherCountry => {
+                label       => $FieldLabels->{'strISOMotherCountry'},
+                value       => $field->{strMotherISOCountry},
                 type        => 'lookup',
                 options     => \%countriesonly,
                 sectionname => 'details',
                 firstoption => [ '', 'Select Country' ],
             },
-            strFatherCountry => {
-                label       => $FieldLabels->{'strFatherCountry'},
-                value       => $field->{strFatherCountry},
+            strISOFatherCountry => {
+                label       => $FieldLabels->{'strISOFatherCountry'},
+                value       => $field->{strISOFatherCountry},
                 type        => 'lookup',
                 options     => \%countriesonly,
                 sectionname => 'details',
@@ -794,17 +682,9 @@ sub member_details {
                 maxsize     => '100',
                 sectionname => 'contact',
             },
-            strCityOfResidence => {
-                label       => $FieldLabels->{'strCityOfResidence'},
-                value       => $field->{strCityOfResidence},
-                type        => 'text',
-                size        => '30',
-                maxsize     => '45',
-                sectionname => 'contact',
-            },
-            strCountry => {
-                label       => $FieldLabels->{'strCountry'},
-                value       => $field->{strCountry} || ( $Data->{'SystemConfig'}{'AssocConfig'}{'useAssocCountry'} ? $assoc_obj->getValue('strCountry') : '' ),
+            strISOCountry => {
+                label       => $FieldLabels->{'strISOCountry'},
+                value       => $field->{strISOCountry}, 
                 type        => 'lookup',
                 options     => \%countriesonly,
                 sectionname => 'contact',
@@ -813,58 +693,10 @@ sub member_details {
             strPostalCode => {
                 label       => $FieldLabels->{'strPostalCode'},
                 value       => $field->{strPostalCode},
-                posttext    => $addressvalidation,
                 type        => 'text',
                 size        => '15',
                 maxsize     => '15',
                 sectionname => 'contact',
-                script      => qq[
-                    function onSelectionChange( event, ui ) {
-                      event.preventDefault();
-                      if (ui.item) {
-                          jQuery('#l_strSuburb').val(ui.item.value.suburb);
-                          jQuery('#l_strPostalCode').val(ui.item.value.postcode);
-                          jQuery('#l_strState').val(ui.item.value.state);
-                      }
-                    }
-
-                    jQuery(function() {
-                      autocomplete_conf = {
-                        source: function( request, response ) {
-                          \$.ajax({
-                            url: "ajax/aj_data_request.cgi",
-                            dataType: "json",
-                            data: {
-                              client: "$client",
-                              key: 'postcode',
-                              maxRows: 12,
-                              q: request.term
-                            },
-                            success: function( data ) {
-                              response( \$.map( data.items, function( item ) {
-                                return {
-                                    label: item.postcode + ", " + item.suburb + ", " + item.state,
-                                    value: item
-                                }
-                              }));
-                            },
-                          });
-                        },
-                        minLength: 3,
-                        focus: onSelectionChange,
-                        select: onSelectionChange,
-                        open: function() {
-                          jQuery( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
-                        },
-                        close: function() {
-                          jQuery( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
-                        }
-                    };
-                    jQuery( '#l_strSuburb' ).autocomplete( autocomplete_conf );
-                    jQuery( '#l_strPostalCode' ).autocomplete( autocomplete_conf );
-                    jQuery( '#l_strState' ).autocomplete( autocomplete_conf );
-                    });
-                ],
             },
             strPhoneHome => {
                 label       => $FieldLabels->{'strPhoneHome'},
@@ -915,24 +747,6 @@ sub member_details {
                 sectionname => 'contact',
                 validate    => 'EMAIL',
             },
-            strEmail2 => {
-                label       => $FieldLabels->{'strEmail2'},
-                value       => $field->{strEmail2},
-                type        => 'text',
-                size        => '50',
-                maxsize     => '200',
-                sectionname => 'contact',
-                validate    => 'EMAIL',
-            },
-            intOccupationID => {
-                label       => $FieldLabels->{'intOccupationID'},
-                value       => $field->{intOccupationID},
-                type        => 'lookup',
-                options     => $DefCodes->{-9},
-                order       => $DefCodesOrder->{-9},
-                sectionname => 'other',
-                firstoption => [ '', " " ],
-            },
             intEthnicityID => {
                 label       => $FieldLabels->{'intEthnicityID'},
                 value       => $field->{intEthnicityID},
@@ -941,68 +755,6 @@ sub member_details {
                 order       => $DefCodesOrder->{-8},
                 sectionname => 'details',
                 firstoption => [ '', " " ],
-            },
-            intMailingList => {
-                label             => $FieldLabels->{'intMailingList'},
-                value             => $field->{intMailingList},
-                type              => 'checkbox',
-                sectionname       => 'details',
-                displaylookup     => { 1 => 'Yes', 0 => 'No' },
-                default           => 1,
-                SkipAddProcessing => 1,
-            },
-            intLifeMember => {
-                label             => $FieldLabels->{'intLifeMember'},
-                value             => $field->{intLifeMember},
-                type              => 'checkbox',
-                sectionname       => 'financial',
-                default           => 0,
-                displaylookup     => { 1 => 'Yes', 0 => 'No' },
-                SkipAddProcessing => 1,
-            },
-            intDeceased => {
-                label         => $FieldLabels->{'intDeceased'},
-                value         => $field->{intDeceased},
-                type          => 'checkbox',
-                sectionname   => 'details',
-                default       => 0,
-                displaylookup => { 1 => 'Yes', 0 => 'No' },
-            },
-            strLoyaltyNumber => {
-                label             => $FieldLabels->{'strLoyaltyNumber'},
-                value             => $field->{strLoyaltyNumber},
-                type              => 'text',
-                size              => '20',
-                maxsize           => '20',
-                sectionname       => 'other',
-                SkipAddProcessing => 1,
-            },
-            intFinancialActive => {
-                label             => $FieldLabels->{'intFinancialActive'},
-                value             => $field->{intFinancialActive},
-                type              => 'checkbox',
-                sectionname       => 'financial',
-                default           => 0,
-                displaylookup     => { 1 => 'Yes', 0 => 'No' },
-                SkipAddProcessing => 1,
-            },
-            intMemberPackageID => {
-                label             => $FieldLabels->{'intMemberPackageID'},
-                value             => $field->{intMemberPackageID},
-                type              => 'lookup',
-                options           => $MemberPackages,
-                sectionname       => 'financial',
-                firstoption       => [ '', " " ],
-                SkipAddProcessing => 1,
-            },
-            curMemberFinBal => {
-                label             => $FieldLabels->{'curMemberFinBal'},
-                value             => $field->{curMemberFinBal},
-                type              => 'text',
-                size              => '10',
-                maxsize           => '10',
-                sectionname       => 'financial',
-                SkipAddProcessing => 1,
             },
             strPreferredLang => {
                 label       => $FieldLabels->{'strPreferredLang'},
@@ -1044,39 +796,6 @@ sub member_details {
                 sectionname => 'identification',
                 validate    => 'DATE',
             },
-            strBirthCertNo => {
-                label       => $FieldLabels->{'strBirthCertNo'},
-                value       => $field->{strBirthCertNo},
-                type        => 'text',
-                size        => '20',
-                maxsize     => '50',
-                sectionname => 'identification',
-            },
-            strHealthCareNo => {
-                label       => $FieldLabels->{'strHealthCareNo'},
-                value       => $field->{strHealthCareNo},
-                type        => 'text',
-                size        => '20',
-                maxsize     => '50',
-                sectionname => 'identification',
-            },
-            intIdentTypeID => {
-                label       => $FieldLabels->{'intIdentTypeID'},
-                value       => $field->{intIdentTypeID},
-                type        => 'lookup',
-                options     => $DefCodes->{-31},
-                order       => $DefCodesOrder->{-31},
-                sectionname => 'identification',
-                firstoption => [ '', " " ],
-            },
-            strIdentNum => {
-                label => $Data->{'SystemConfig'}{'strIdentNum_Text'} ? $Data->{'SystemConfig'}{'strIdentNum_Text'} : $FieldLabels->{'strIdentNum'},
-                value => $field->{strIdentNum},
-                type  => 'text',
-                size  => '20',
-                maxsize     => '25',
-                sectionname => 'identification',
-            },
             dtPoliceCheck => {
                 label => $Data->{'SystemConfig'}{'dtPoliceCheck_Text'} ? $Data->{'SystemConfig'}{'dtPoliceCheck_Text'} : $FieldLabels->{'dtPoliceCheck'},
                 value => $field->{dtPoliceCheck},
@@ -1101,49 +820,6 @@ sub member_details {
                 maxsize     => '30',
                 sectionname => 'identification',
             },
-            intFavStateTeamID => {
-                label       => $FieldLabels->{'intFavStateTeamID'},
-                value       => $field->{intFavStateTeamID},
-                type        => 'lookup',
-                options     => $DefCodes->{-33},
-                order       => $DefCodesOrder->{-33},
-                sectionname => 'other',
-                firstoption => [ '', ' ' ],
-            },
-            intFavNationalTeamID => {
-                label       => $FieldLabels->{'intFavNationalTeamID'},
-                value       => $field->{intFavNationalTeamID},
-                type        => 'lookup',
-                options     => $DefCodes->{-34},
-                order       => $DefCodesOrder->{-34},
-                sectionname => 'other',
-                firstoption => [ '', ' ' ],
-            },
-            intFavNationalTeamMember => {
-                label         => $FieldLabels->{'intFavNationalTeamMember'},
-                value         => $field->{intFavNationalTeamMember},
-                type          => 'checkbox',
-                sectionname   => 'other',
-                displaylookup => { 1 => 'Yes', 0 => 'No' },
-            },
-            intAttendSportCount => {
-                label       => $FieldLabels->{'intAttendSportCount'},
-                value       => $field->{intAttendSportCount},
-                type        => 'text',
-                size        => '15',
-                maxsize     => '15',
-                validate    => 'NUMBER',
-                sectionname => 'other',
-            },
-            intWatchSportHowOftenID => {
-                label       => $FieldLabels->{'intWatchSportHowOftenID'},
-                value       => $field->{intWatchSportHowOftenID},
-                type        => 'lookup',
-                options     => $DefCodes->{-1004},
-                order       => $DefCodesOrder->{-1004},
-                sectionname => 'other',
-                firstoption => [ '', ' ' ],
-            },
             strEmergContName => {
                 label       => $FieldLabels->{'strEmergContName'},
                 value       => $field->{strEmergContName},
@@ -1155,14 +831,6 @@ sub member_details {
             strEmergContNo => {
                 label       => $FieldLabels->{'strEmergContNo'},
                 value       => $field->{strEmergContNo},
-                type        => 'text',
-                size        => '30',
-                maxsize     => '100',
-                sectionname => 'contact',
-            },
-            strEmergContNo2 => {
-                label       => $FieldLabels->{'strEmergContNo2'},
-                value       => $field->{strEmergContNo2},
                 type        => 'text',
                 size        => '30',
                 maxsize     => '100',
@@ -1365,34 +1033,6 @@ sub member_details {
                 format_txt  => 'kg',
             },
 
-            dtFirstRegistered => {
-                label => $Data->{'SystemConfig'}{'FirstRegistered_title'} ? $Data->{'SystemConfig'}{'FirstRegistered_title'} : $FieldLabels->{'dtFirstRegistered'},
-                value => $field->{dtFirstRegistered},
-                type  => 'date',
-                format            => 'dd/mm/yyyy',
-                sectionname       => 'other',
-                validate          => 'DATE',
-                SkipAddProcessing => 1,
-            },
-            dtLastRegistered => {
-                label             => $FieldLabels->{'dtLastRegistered'},
-                value             => $field->{dtLastRegistered},
-                type              => 'date',
-                format            => 'dd/mm/yyyy',
-                sectionname       => 'other',
-                validate          => 'DATE',
-                SkipAddProcessing => 1,
-            },
-            dtRegisteredUntil => {
-                label             => $FieldLabels->{'dtRegisteredUntil'},
-                value             => $field->{dtRegisteredUntil},
-                type              => 'date',
-                format            => 'dd/mm/yyyy',
-                sectionname       => 'other',
-                SkipAddProcessing => 1,
-                readonly          => ( $Data->{'Realm'} == 13 ) ? 0 : 1,
-                auditField        => 1, 
-            },
             dtLastUpdate => {
                 label       => 'Last Updated',
                 value       => $field->{tTimeStamp},
@@ -1401,140 +1041,15 @@ sub member_details {
                 sectionname => 'other',
                 readonly    => 1,
             },
-            dtCreatedOnline => {
-                label       => 'Date Created Online',
-                value       => $field->{dtCreatedOnline},
-                type        => 'date',
-                sectionname => 'other',
-                noedit      => 1,
-                readonly    => 1,
-            },
-            dtSuspendedUntil => {
-                label       => $FieldLabels->{'dtSuspendedUntl'},
-                value       => $field->{dtSuspendedUntil},
-                type        => 'date',
-                format      => 'dd/mm/yyyy',
-                sectionname => 'other',
-                readonly    => 1,
-            },
             strNotes => {
                 label             => $FieldLabels->{'strNotes'},
-                value             => $field->{strMemberNotes},
+                value             => $field->{strPersonNotes},
                 type              => 'textarea',
                 sectionname       => 'other',
                 rows              => 5,
                 cols              => 45,
                 SkipAddProcessing => 1,
                 SkipProcessing    => 1,
-            },
-            intHowFoundOutID => {
-                label       => $FieldLabels->{intHowFoundOutID},
-                value       => $field->{intHowFoundOutID},
-                type        => 'lookup',
-                options     => $DefCodes->{-1001},
-                order       => $DefCodesOrder->{-1001},
-                firstoption => [ '', " " ],
-                sectionname => 'other',
-            },
-            intP1AssistAreaID => {
-                label       => $FieldLabels->{intP1AssistAreaID},
-                value       => $field->{intP1AssistAreaID},
-                type        => 'lookup',
-                options     => $DefCodes->{-1002},
-                order       => $DefCodesOrder->{-1002},
-                firstoption => [ '', " " ],
-                sectionname => 'parent',
-            },
-            intP2AssistAreaID => {
-                label       => $FieldLabels->{intP2AssistAreaID},
-                value       => $field->{intP2AssistAreaID},
-                type        => 'lookup',
-                options     => $DefCodes->{-1002},
-                order       => $DefCodesOrder->{-1002},
-                firstoption => [ '', " " ],
-                sectionname => 'parent',
-            },
-            intMedicalConditions => {
-                label         => $FieldLabels->{'intMedicalConditions'},
-                value         => $field->{intMedicalConditions},
-                type          => 'checkbox',
-                sectionname   => 'medical',
-                displaylookup => { 1 => 'Yes', 0 => 'No' },
-            },
-            intAllergies => {
-                label         => $FieldLabels->{'intAllergies'},
-                value         => $field->{intAllergies},
-                type          => 'checkbox',
-                sectionname   => 'medical',
-                displaylookup => { 1 => 'Yes', 0 => 'No' },
-            },
-            intAllowMedicalTreatment => {
-                label         => $FieldLabels->{'intAllowMedicalTreatment'},
-                value         => $field->{intAllowMedicalTreatment},
-                type          => 'checkbox',
-                sectionname   => 'medical',
-                displaylookup => { 1 => 'Yes', 0 => 'No' },
-            },
-            strMedicalNotes => {
-                label             => $FieldLabels->{'strMedicalNotes'},
-                value             => $field->{strMemberMedicalNotes},
-                type              => 'textarea',
-                sectionname       => 'medical',
-                rows              => 5,
-                cols              => 45,
-                SkipAddProcessing => 1,
-                SkipProcessing    => 1,
-            },
-            strSchoolName => {
-                label => $Data->{'SystemConfig'}{'Schools'} ? $FieldLabels->{'strSchoolName'} : '',
-                value => $field->{strSchoolName},
-                type  => 'text',
-                size  => '40',
-                sectionname    => 'other',
-                disabled       => 1,
-                SkipProcessing => 1,
-            },
-            strSchoolSuburb => {
-                label => $Data->{'SystemConfig'}{'Schools'} ? $FieldLabels->{'strSchoolSuburb'} : '',
-                value => $field->{strSchoolSuburb},
-                type  => 'text',
-                size  => '30',
-                sectionname    => 'other',
-                disabled       => 1,
-                SkipProcessing => 1,
-            },
-            intGradeID => {    #School Grades
-                label       => $FieldLabels->{intGradeID},
-                value       => $field->{intGradeID},
-                type        => 'lookup',
-                options     => \%SchoolGrades,
-                order       => \@SchoolGradesOrder,
-                firstoption => [ '', " " ],
-                sectionname => 'other',
-            },
-            intConsentSignatureSighted => {
-                label => $Data->{'SystemConfig'}{'SignatureSightedText'} ? $Data->{'SystemConfig'}{'SignatureSightedText'} : $FieldLabels->{'intConsentSignatureSighted'},
-                value => $field->{intConsentSignatureSighted},
-                type  => 'checkbox',
-                sectionname   => 'other',
-                displaylookup => { 1 => 'Yes', 0 => 'No' },
-            },
-
-            intDeRegister=> {
-                label => ($Data->{'SystemConfig'}{'AllowDeRegister'} ? "DeRegister Player" : ''),
-                value => $field->{intDeRegister},
-                type  => 'checkbox',
-                sectionname => 'details',
-                displaylookup => {1 => 'Yes', 0 => 'No'},
-                readonly=>($Data->{'clientValues'}{'authLevel'}<=$Defs::LEVEL_REGION and $Data->{'SystemConfig'}{'AllowDeRegister'} ? 1 : 0),
-            },
-            intPhotoUseApproval => {
-                label       => $FieldLabels->{intPhotoUseApproval},
-                value       => $field->{intPhotoUseApproval},
-                type        => 'lookup',
-                sectionname => 'other',
-                options     => { 1 => 'Yes', 0 => 'No' },
-                order     => \@reverseYNOrder,
             },
             PhotoUpload => {
                 label => 'Photo',
@@ -1565,7 +1080,7 @@ sub member_details {
 
         },
         order => [
-        qw(strNationalNum strMemberNo intRecStatus intDefaulter strSalutation strFirstname strPreferredName strMiddlename strSurname strMaidenName dtDOB strPlaceofBirth strCountryOfBirth strMotherCountry strFatherCountry intGender strAddress1 strAddress2 strSuburb strCityOfResidence strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intOccupationID intDeceased intDeRegister intPhotoUseApproval strLoyaltyNumber intMailingList intFinancialActive intMemberPackageID curMemberFinBal intLifeMember strPreferredLang strPassportIssueCountry strPassportNationality strPassportNo dtPassportExpiry strBirthCertNo strHealthCareNo intIdentTypeID strIdentNum dtPoliceCheck dtPoliceCheckExp strPoliceCheckRef intPlayer intCoach intUmpire intOfficial intMisc intVolunteer strEmergContName strEmergContNo strEmergContNo2 strEmergContRel strP1Salutation strP1FName strP1SName intP1Gender strP1Phone strP1Phone2 strP1PhoneMobile strP1Email strP1Email2 intP1AssistAreaID strP2Salutation strP2FName strP2SName intP2Gender strP2Phone strP2Phone2 strP2PhoneMobile strP2Email strP2Email2 intP2AssistAreaID strEyeColour strHairColour intEthnicityID strHeight strWeight 
+        qw(strNationalNum strPersonNo strStatus intDefaulter strSalutation strLocalFirstname strPreferredName strMiddlename strLocalSurname strMaidenName dtDOB strPlaceofBirth strCountryOfBirth strMotherCountry strFatherCountry intGender strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased intDeRegister strPreferredLang strPassportIssueCountry strPassportNationality strPassportNo dtPassportExpiry dtPoliceCheck dtPoliceCheckExp strPoliceCheckRef strEmergContName strEmergContNo strEmergContNo2 strEmergContRel strP1Salutation strP1FName strP1SName intP1Gender strP1Phone strP1Phone2 strP1PhoneMobile strP1Email strP1Email2 strP2Salutation strP2FName strP2SName intP2Gender strP2Phone strP2Phone2 strP2PhoneMobile strP2Email strP2Email2 strEyeColour strHairColour strHeight strWeight 
         ),
 
         map("strNatCustomStr$_", (1..15)),
@@ -1573,35 +1088,19 @@ sub member_details {
         map("dtNatCustomDt$_", (1..5)),
         map("intNatCustomLU$_", (1..10)),
         map("intNatCustomBool$_", (1..5)),
-
-        map("strCustomStr$_", (1..25)),
-        map("dblCustomDbl$_", (1..20)),
-        map("dtCustomDt$_", (1..15)),
-        map("intCustomLU$_", (1..25)),
-        map("intCustomBool$_", (1..7)),
-        map("strMemberCustomNotes$_", (1..5)),
-
         qw(
-        intSchoolID strSchoolName strSchoolSuburb intGradeID
-        intFavStateTeamID intFavNationalTeamID strNotes SPdetails dtFirstRegistered dtLastRegistered dtRegisteredUntil dtLastUpdate dtCreatedOnline
-        intHowFoundOutID
-        intMedicalConditions
-        intAllergies
-        intAllowMedicalTreatment
-        strMedicalNotes
-        intConsentSignatureSighted intAttendSportCount intWatchSportHowOftenID intFavNationalTeamMember
+        strNotes SPdetails dtLastUpdate 
         )
         ],
         fieldtransform => {
             textcase => {
-                strFirstname => $field_case_rules->{'strFirstname'} || '',
-                strSurname   => $field_case_rules->{'strSurname'}   || '',
+                strLocalFirstname => $field_case_rules->{'strLocalFirstname'} || '',
+                strLocalSurname   => $field_case_rules->{'strLocalSurname'}   || '',
                 strSuburb    => $field_case_rules->{'strSuburb'}    || '',
             }
         },
         sections => [
         [ 'regoform',       q{} ],
-        [ 'interests',      $interestHeader],
         [ 'details',        'Personal Details' ],
         [ 'contact',        'Contact Details' ],
         [ 'identification', 'Identification' ],
@@ -1609,39 +1108,34 @@ sub member_details {
         [ 'contracts',      'Contracts' ],
         [ 'citizenship',    'Citizenship' ],
         [ 'parent',         'Parent/Guardian' ],
-        [ 'financial',      'Financial' ],
-        [ 'medical',        'Medical' ],
-        [ 'jumpers',        $Data->{'SystemConfig'}{'Custom_JumperNumber'} ? $Data->{'SystemConfig'}{'Custom_JumperNumber'} : 'Jumper Numbers'], 
         [ 'custom1',        $Data->{'SystemConfig'}{'MF_CustomGroup1'} ],
         [ 'other',          'Other Details' ],
-        [ 'records',        'Initial Member Records' ],
+        [ 'records',        'Initial Person Records' ],
         ],
         options => {
             labelsuffix          => ':',
             hideblank            => 1,
             target               => $Data->{'target'},
             formname             => 'm_form',
-            submitlabel          => $Data->{'lang'}->txt( 'Update ' . $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER} ),
+            submitlabel          => $Data->{'lang'}->txt( 'Update ' . $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} ),
             introtext            => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
             buttonloc            => $Data->{'SystemConfig'}{'HTMLFORM_ButtonLocation'} || 'both',
             OptionAfterProcessed => 'display',
             updateSQL            => qq[
-            UPDATE tblMember, tblMember_Associations
+            UPDATE tblPerson
             SET --VAL--
-            WHERE tblMember.intMemberID=$memberID
-                AND tblMember_Associations.intMemberID=$memberID
-                AND tblMember_Associations.intAssocID=$Data->{'clientValues'}{'assocID'}
+            WHERE tblPerson.intPersonID=$personID
             ],
             addSQL => qq[
-            INSERT INTO tblMember (intRealmID, dtCreatedOnline, --FIELDS--)
+            INSERT INTO tblPerson (intRealmID, dtCreatedOnline, --FIELDS--)
             VALUES ($Data->{'Realm'}, CURRENT_DATE(), --VAL--)
             ],
             NoHTML               => 1,
-            afterupdateFunction  => \&postMemberUpdate,
-            afterupdateParams    => [ $option, $Data, $Data->{'db'}, $memberID, $field ],
-            afteraddFunction     => \&postMemberUpdate,
+            afterupdateFunction  => \&postPersonUpdate,
+            afterupdateParams    => [ $option, $Data, $Data->{'db'}, $personID, $field ],
+            afteraddFunction     => \&postPersonUpdate,
             afteraddParams       => [ $option, $Data, $Data->{'db'} ],
-            beforeaddFunction    => \&preMemberAdd,
+            beforeaddFunction    => \&prePersonAdd,
             beforeaddParams      => [ $option, $Data, $Data->{'db'} ],
             afteraddAction       => 'edit',
 
@@ -1649,18 +1143,18 @@ sub member_details {
             auditAddParams => [
             $Data,
             'Add',
-            'Member'
+            'Person'
             ],
             auditEditParams => [
-            $memberID,
+            $personID,
             $Data,
             'Update',
-            'Member',
+            'Person',
             ],
             auditEditParamsAddFields => 1,
 
             LocaleMakeText        => $Data->{'lang'},
-            pre_button_bottomtext => $Data->{'SystemConfig'}{'MemberFooterText'} || '',
+            pre_button_bottomtext => $Data->{'SystemConfig'}{'PersonFooterText'} || '',
         },
         carryfields => {
             client => $client,
@@ -1744,113 +1238,18 @@ sub member_details {
         };
     }
 
-    # map("strCustomStr$_", (1..25)),
-    for my $i (1..25) {
-        my $fieldname = "strCustomStr$i";
-        $FieldDefinitions{'fields'}{$fieldname} = {
-            label             => $CustomFieldNames->{$fieldname}[0],
-            value             => $field->{$fieldname},
-            type              => 'text',
-            size              => '30',
-            maxsize           => '50',
-            sectionname       => 'other',
-            SkipAddProcessing => 1,
-        };
-    }
-    $FieldDefinitions{'fields'}{'strCustomStr16'}{'size'} = 50;
-    $FieldDefinitions{'fields'}{'strCustomStr16'}{'maxsize'} = 200;
-
-    # map("dblCustomDbl$_", (1..20)),
-    for my $i (1..20) {
-        my $fieldname = "dblCustomDbl$i";
-        $FieldDefinitions{'fields'}{$fieldname} = {
-            label             => $CustomFieldNames->{$fieldname}[0],
-            value             => $field->{$fieldname},
-            type              => 'text',
-            size              => '10',
-            maxsize           => '15',
-            sectionname       => 'other',
-            SkipAddProcessing => 1,
-        };
-    }
-
-    # map("dtCustomDt$_", (1..15)),
-    for my $i (1..15) {
-        my $fieldname = "dtCustomDt$i";
-        $FieldDefinitions{'fields'}{$fieldname} = {
-            label             => $CustomFieldNames->{$fieldname}[0],
-            value             => $field->{$fieldname},
-            type              => 'date',
-            format            => 'dd/mm/yyyy',
-            sectionname       => 'other',
-            validate          => 'DATE',
-            SkipAddProcessing => 1,
-        };
-    }
-
-    # map("intCustomLU$_", (1..25)),
-    my @intCustomLU_DefCodes = (undef, -50, -51, -52, -57, -58, -59, -60, -61, 
-        -62, -63, -97, -98, -99, -100, -101, -102, -103, -104, -105, -106, 
-        -107, -108, -109, -110, -111);
-    for my $i (1..25) {
-        my $fieldname = "intCustomLU$i";
-        $FieldDefinitions{'fields'}{$fieldname} = {
-            label             => $CustomFieldNames->{$fieldname}[0],
-            value             => $field->{$fieldname},
-            type              => 'lookup',
-            options           => $DefCodes->{$intCustomLU_DefCodes[$i]},
-            order             => $DefCodesOrder->{$intCustomLU_DefCodes[$i]},
-            firstoption       => [ '', " " ],
-            sectionname       => 'other',
-            SkipAddProcessing => 1,
-        };
-    }
-
-    # map("intCustomBool$_", (1..7)),
-    for my $i (1..7) {
-        my $fieldname = "intCustomBool$i";
-        $FieldDefinitions{'fields'}{$fieldname} = {
-            label             => $CustomFieldNames->{$fieldname}[0] || '',
-            value             => $field->{$fieldname},
-            type              => 'checkbox',
-            sectionname       => 'other',
-            displaylookup     => { 1 => 'Yes', 0 => 'No' },
-            SkipAddProcessing => 1,
-        };
-    }
-
-    # map("strMemberCustomNotes$_", (1..5)),
-    for my $i (1..5) {
-        my $fieldname = "strMemberCustomNotes$i";
-        $FieldDefinitions{'fields'}{$fieldname} = {
-            label             => $CustomFieldNames->{$fieldname}[0],
-            value             => $field->{$fieldname},
-            type              => 'textarea',
-            sectionname       => 'other',
-            rows              => 5,
-            cols              => 45,
-            SkipAddProcessing => 1,
-            SkipProcessing    => 1,
-        };
-    }
-
-    # Jumper number stuff
     my $resultHTML = '';
     my $fieldperms = $Data->{'Permissions'};
 
-    my $memperm = ProcessPermissions($fieldperms, \%FieldDefinitions, 'Member',);
+    my $memperm = ProcessPermissions($fieldperms, \%FieldDefinitions, 'Person',);
 
-    if ( $Data->{'SystemConfig'}{'Schools'} and $memperm->{'intSchoolID'} ) {
-        $memperm->{'strSchoolName'}   = 1;
-        $memperm->{'strSchoolSuburb'} = 1;
-    }
     if($Data->{'SystemConfig'}{'AllowDeRegister'}) {
         $memperm->{'intDeRegister'}=1;
     }
 
     my %configchanges = ();
-    if ( $Data->{'SystemConfig'}{'MemberFormReLayout'} ) {
-        %configchanges = eval( $Data->{'SystemConfig'}{'MemberFormReLayout'} );
+    if ( $Data->{'SystemConfig'}{'PersonFormReLayout'} ) {
+        %configchanges = eval( $Data->{'SystemConfig'}{'PersonFormReLayout'} );
     }
 
     return \%FieldDefinitions if $Data->{'RegoForm'};
@@ -1871,30 +1270,30 @@ $tabs = '
 	<span class="showallwrap"><a href="#showall" class="showall">Show All</a></span>
 </div>
 								';
-my $member_photo = qq[
-        <div class="member-edit-info">
+my $person_photo = qq[
+        <div class="person-edit-info">
 <div class="photo">$photolink</div>
         <span class="button-small mobile-button"><a href="?client='.$client.'&amp;a=P_PH_d">Add/Edit Photo</a></span>
         <h4>Documents</h4>
         <span class="button-small generic-button"><a href="?client='.$client.'&amp;a=DOC_L">Add Document</a></span>
       </div>
 ];
-$member_photo = '' if($option eq 'add');
+$person_photo = '' if($option eq 'add');
 $tabs = '' if($option eq 'add');
 	$resultHTML =qq[
  $tabs 
-$member_photo
-      <div class="member-edit-form">$resultHTML</div><style type="text/css">.pageHeading{font-size:48px;font-family:"DINMedium",sans-serif;letter-spacing:-2px;margin:40px 0;}.ad_heading{margin: 36px 0 0 0;}</style>] if!$processed;
-    $resultHTML = qq[<p>$Data->{'MemberClrdOut'}</p> $resultHTML] if $Data->{'MemberClrdOut'};
+$person_photo
+      <div class="person-edit-form">$resultHTML</div><style type="text/css">.pageHeading{font-size:48px;font-family:"DINMedium",sans-serif;letter-spacing:-2px;margin:40px 0;}.ad_heading{margin: 36px 0 0 0;}</style>] if!$processed;
+    $resultHTML = qq[<p>$Data->{'PersonClrdOut'}</p> $resultHTML] if $Data->{'PersonClrdOut'};
     $option = 'display' if $processed;
     my $chgoptions = '';
-    my $title = ( !$field->{strFirstname} and !$field->{strSurname} ) ? "Add New $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER}" : "$field->{strFirstname} $field->{strSurname}";
+    my $title = ( !$field->{strLocalFirstname} and !$field->{strLocalSurname} ) ? "Add New $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}" : "$field->{strLocalFirstname} $field->{strLocalSurname}";
     if ( $option eq 'display' ) {
 
-        $chgoptions .= qq[<a href="$Data->{'target'}?client=$client&amp;a=P_DEL"  onclick="return confirm('Are you sure you want to Delete this $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER}');"><img src="images/delete_icon.gif" border="0" alt="Delete $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER}" title="Delete $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER}"></a>]
-          if ( allowedAction( $Data, 'm_d' ) and $Data->{'SystemConfig'}{'AllowMemberDelete'} );
+        $chgoptions .= qq[<a href="$Data->{'target'}?client=$client&amp;a=P_DEL"  onclick="return confirm('Are you sure you want to Delete this $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}');"><img src="images/delete_icon.gif" border="0" alt="Delete $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}" title="Delete $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}"></a>]
+          if ( allowedAction( $Data, 'm_d' ) and $Data->{'SystemConfig'}{'AllowPersonDelete'} );
 
-        $chgoptions = '' if $Data->{'SystemConfig'}{'LockMember'};
+        $chgoptions = '' if $Data->{'SystemConfig'}{'LockPerson'};
 
         $chgoptions = qq[<div class="changeoptions">$chgoptions</div>] if $chgoptions;
 
@@ -1902,23 +1301,10 @@ $member_photo
 
         my @taboptions = ();
         my @tabdata    = ();
-        my ( $clubStatus, $clubs, undef) = showClubTeams( $Data, $memberID );
+        my ( $clubStatus, $clubs, undef) = showClubTeams( $Data, $personID );
         $clubs ||= '';
         push @taboptions, [ 'memclubs_dat', $Data->{'LevelNames'}{ $Defs::LEVEL_CLUB . "_P" } ] if $clubs;
         push @tabdata, qq[<div id="memclubs_dat">$clubs</div>] if $clubs;
-
-        my ( $memseason_vals, $memseasons ) = listMemberSeasons( $Data, $memberID );
-        if ($memseasons) {
-            for my $i ( @{$memseason_vals} ) {
-                push @tabdata, $i;
-            }
-            my $season_Name = $Data->{'SystemConfig'}{'txtSeason'} || 'Season';
-            my $seasonSummary = $Data->{'SystemConfig'}{'txtSeasonSummary'} ? $Data->{'SystemConfig'}{'txtSeasonSummary'} : qq[Full $season_Name Summary];
-
-            push @taboptions, [ 'assocseason_dat', $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC} . " Summary" ];
-            push @taboptions, [ 'clubseason_dat',  $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} . " Summary" ];
-            push @taboptions, [ 'allseason_dat',   $seasonSummary ];
-        }
 
         if ( $clubStatus == $Defs::RECSTATUS_INACTIVE and $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB ) {
             $chgoptions = '';
@@ -1926,14 +1312,14 @@ $member_photo
         }
 
         $title = $chgoptions . $title;
-        $title .= " - ON PERMIT " if $Data->{'MemberOnPermit'};
+        $title .= " - ON PERMIT " if $Data->{'PersonOnPermit'};
 
-        my $otherassocs = checkOtherAssocs( $Data, $memberID ) || '';
+        my $otherassocs = checkOtherAssocs( $Data, $personID ) || '';
         if ($otherassocs) {
             push @tabdata, qq[<div id="otherassocs_dat">$otherassocs</div>];
             push @taboptions, [ 'otherassocs_dat', 'Associations' ];
         }
-        my $clearancehistory = clearanceHistory( $Data, $memberID ) || '';
+        my $clearancehistory = clearanceHistory( $Data, $personID ) || '';
         if ($clearancehistory) {
             push @tabdata, qq[<div id="clearancehistory_dat">$clearancehistory</div>];
             my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
@@ -1950,132 +1336,51 @@ $member_photo
         #}
         $tabheader = qq[<ul>$tabheader</ul>] if $tabheader;
 	if ($tabstr) {
-            $Data->{'AddToPage'}->add( 'js_bottom', 'inline', "jQuery('#membertabs').tabs();" );
+            $Data->{'AddToPage'}->add( 'js_bottom', 'inline', "jQuery('#persontabs').tabs();" );
 
             $resultHTML .= qq[
 				<div class = "small-widget-text">
-				<div id="membertabs" style="float:left;clear:right;width:99%;">
+				<div id="persontabs" style="float:left;clear:right;width:99%;">
 					$tabheader
 					$tabstr
-				</div><!-- end membertabs -->
+				</div><!-- end persontabs -->
 				</div>
 			];
         }
-
-        my $defaulterstatus = defaulter_check( $memberID, $Data->{'SystemConfig'}{'Defaulter'}, $Data );
-
-        my $inSeason     = 0;
-        my $SeasonStatus = 0;
-        ( $inSeason, $SeasonStatus ) = Seasons::isMemberInSeason( $Data, $memberID, $Data->{'clientValues'}{'assocID'}, $Data->{'clientValues'}{'clubID'}, $assocSeasons->{'newRegoSeasonID'} );
-
-        if (
-             (
-                  !$Data->{'SystemConfig'}{'memberReReg_notInactive'}
-               or ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC and $Data->{'clientValues'}{'clubID'} eq $Defs::INVALID_ID )
-               or ( $Data->{'MemberActiveInClub'} and !$Data->{'MemberClrdOut_ofClub'} )
-             )
-             and $SeasonStatus < 1
-             and (allowedAction( $Data, 'm_a' ) or allowedAction( $Data, 'm_e' ) )
-          )
-        {
-            my $txt_Name = $Data->{'SystemConfig'}{'txtSeason'} || 'Season';
-            my $action = $Data->{'clientValues'}{'clubID'} > 0 ? 'SN_MSviewCADD' : 'SN_MSviewADD';
-            my $clubHidden = '';
-            if ( $Data->{'clientValues'}{'clubID'} > 0 ) {
-                $clubHidden = qq[<input type="hidden" name ="d_intClubID" value="$Data->{'clientValues'}{'clubID'}">];
-            }
-            my $msID = '';
-            if ( $SeasonStatus == -1 ) {
-                $action = $Data->{'clientValues'}{'clubID'} > 0 ? 'SN_MSviewCEDIT' : 'SN_MSviewEDIT';
-                $msID = qq[<input type="hidden" name ="msID" value="$inSeason">];
-            }
-            my $txt = qq[
-				<div class="warningbox">This Member is NOT REGISTERED in $txt_Name, $assocSeasons->{'newRegoSeasonName'}. 
-					<form action="$Data->{'target'}" method="POST">
-						<input type="submit" name="subbutton" value="Register" class="button proceed-button">
-						<input type="hidden" name ="client" value="$client">
-						<input type="hidden" name ="a" value="$action">
-						<input type="hidden" name ="d_intSeasonID" value="$assocSeasons->{'newRegoSeasonID'}">
-						$msID
-                        $clubHidden
-					</form>
-				</div>
-			];
-            $txt = '' if ( $Data->{'SystemConfig'}{'LockSeasons'}      and $Data->{'clientValues'}{'authLevel'} <= $Defs::LEVEL_ASSOC );
-            $txt = '' if ( $Data->{'MemberClrdOut_ofCurrentClub'}      and $Data->{'clientValues'}{'authLevel'} <= $Defs::LEVEL_ASSOC );
-            $txt = '' if ( $assoc_obj->getValue('intHideClubRollover') and $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_ASSOC );
-            $resultHTML = $txt . $resultHTML;
-
-        }
-
-        $resultHTML = $defaulterstatus . $resultHTML if $defaulterstatus;
 
     }
     return ( $resultHTML, $title );
 }
 
-sub loadMemberDetails {
-    my ( $db, $id, $assocID ) = @_;
+sub loadPersonDetails {
+    my ( $db, $id) = @_;
     return {} if !$id;
 
     my $statement = qq[
 	SELECT 
-		tblMember.*, 
-		MA.intRecStatus, 
+		tblPerson.*, 
 		DATE_FORMAT(dtPassportExpiry,'%d/%m/%Y') AS dtPassportExpiry, 
-		DATE_FORMAT(dtNatCustomDt1,'%d/%m/%Y') AS dtNatCustomDt1, 
-		DATE_FORMAT(dtNatCustomDt2,'%d/%m/%Y') AS dtNatCustomDt2, 
-		DATE_FORMAT(dtCustomDt1,'%d/%m/%Y') AS dtCustomDt1, 
-		DATE_FORMAT(dtCustomDt2,'%d/%m/%Y') AS dtCustomDt2, 
 		DATE_FORMAT(dtDOB,'%d/%m/%Y') AS dtDOB, 
 		dtDOB AS dtDOB_RAW, 
-		DATE_FORMAT(dtLastRegistered,'%d/%m/%Y') AS dtLastRegistered, 
-		DATE_FORMAT(dtRegisteredUntil,'%d/%m/%Y') AS dtRegisteredUntil, 
-		DATE_FORMAT(dtFirstRegistered,'%d/%m/%Y') AS dtFirstRegistered, 
 		DATE_FORMAT(dtPoliceCheck,'%d/%m/%Y') AS dtPoliceCheck, 
 		DATE_FORMAT(dtPoliceCheckExp,'%d/%m/%Y') AS dtPoliceCheckExp, 
-		DATE_FORMAT(dtCreatedOnline,'%d/%m/%Y') AS dtCreatedOnline, 
-		DATE_FORMAT(MA.tTimeStamp,'%d/%m/%Y') AS tTimeStamp,
+		DATE_FORMAT(dtNatCustomDt1,'%d/%m/%Y') AS dtNatCustomDt1, 
+		DATE_FORMAT(dtNatCustomDt2,'%d/%m/%Y') AS dtNatCustomDt2, 
 		DATE_FORMAT(dtNatCustomDt3,'%d/%m/%Y') AS dtNatCustomDt3, 
 		DATE_FORMAT(dtNatCustomDt4,'%d/%m/%Y') AS dtNatCustomDt4, 
 		DATE_FORMAT(dtNatCustomDt5,'%d/%m/%Y') AS dtNatCustomDt5, 
-		tblSchool.strName AS strSchoolName, 
-		tblSchool.strSuburb AS strSchoolSuburb, 
-		A.intAssocTypeID, 
-		MA.intLifeMember, 
-		MA.curMemberFinBal, 
-		MA.intFinancialActive, 
-		MA.intMemberPackageID,
-		MA.strLoyaltyNumber, 
-		MA.intMailingList,
-		MN.strMemberNotes,
-		MN.strMemberMedicalNotes,
-		MN.strMemberCustomNotes1,
-		MN.strMemberCustomNotes2,
-		MN.strMemberCustomNotes3,
-		MN.strMemberCustomNotes4,
-		MN.strMemberCustomNotes5
+		MN.strNotes
 		FROM 
-			tblMember 
-			LEFT  JOIN tblMember_Associations AS MA ON (
-				MA.intMemberID=tblMember.intMemberID 
-				AND MA.intAssocID = ?
-			)
-			LEFT JOIN tblAssoc AS A ON (MA.intAssocID=A.intAssocID)
-			LEFT JOIN tblSchool ON (tblMember.intSchoolID=tblSchool.intSchoolID)
-			LEFT JOIN tblMemberNotes as MN ON (
-				MN.intNotesMemberID = tblMember.intMemberID
-				AND MN.intNotesAssocID=MA.intAssocID
+			tblPerson 
+			LEFT JOIN tblPersonNotes as MN ON (
+				MN.intPersonID = tblPerson.intPersonID
 			)
     	WHERE 
-		    tblMember.intMemberID = ?
+		    tblPerson.intPersonID = ?
 	];
 
     my $query = $db->prepare($statement);
-    $query->execute(
-                     $assocID,
-                     $id,
-    );
+    $query->execute( $id);
     my $field = $query->fetchrow_hashref();
     if ($field) {
         if ( !defined $field->{dtDOB} ) {
@@ -2094,15 +1399,15 @@ sub loadMemberDetails {
     return $field;
 }
 
-sub postMemberUpdate {
-    my ( $id, $params, $action, $Data, $db, $memberID, $fields ) = @_;
+sub postPersonUpdate {
+    my ( $id, $params, $action, $Data, $db, $personID, $fields ) = @_;
 
-    $memberID ||= 0;
-    $id ||= $memberID;
+    $personID ||= 0;
+    $id ||= $personID;
     return ( 0, undef ) if !$db;
 
     my $assocID = $Data->{'clientValues'}{'assocID'} || 0;
-    $Data->{'cache'}->delete( 'swm', "MemberObj-$id-$assocID" ) if $Data->{'cache'};
+    $Data->{'cache'}->delete( 'swm', "PersonObj-$id-$assocID" ) if $Data->{'cache'};
 
     my %types        = ();
     my $assocSeasons = Seasons::getDefaultAssocSeasons($Data);
@@ -2112,21 +1417,11 @@ sub postMemberUpdate {
     $types{'intMiscStatus'}  = $params->{'d_intMisc'}  if exists( $params->{'d_intMisc'} );
     $types{'intVolunteerStatus'}  = $params->{'d_intVolunteer'}  if exists( $params->{'d_intVolunteer'} );
 
-    #$types{'intOfficialStatus'} = $params->{'d_intOfficial'} if exists ($params->{'d_intOfficial'});
-    if ( !$types{'intPlayerStatus'} and !$types{'intCoachStatus'} and !$types{'intUmpireStatus'} and !$types{'intMiscStatus'} and !$types{'intVolunteerStatus'} and !$types{'intOther1Status'} and !$types{'intOther2Status'} ) {
-        $types{'intPlayerStatus'} = 1 if ( $assocSeasons->{'defaultMemberType'} == $Defs::MEMBER_TYPE_PLAYER );
-        $types{'intCoachStatus'}  = 1 if ( $assocSeasons->{'defaultMemberType'} == $Defs::MEMBER_TYPE_COACH );
-        $types{'intUmpireStatus'} = 1 if ( $assocSeasons->{'defaultMemberType'} == $Defs::MEMBER_TYPE_UMPIRE );
-        $types{'intMiscStatus'}  = 1 if ( $assocSeasons->{'defaultMemberType'} == $Defs::MEMBER_TYPE_MISC );
-        $types{'intVolunteerStatus'}  = 1 if ( $assocSeasons->{'defaultMemberType'} == $Defs::MEMBER_TYPE_VOLUNTEER );
-
-    }
-
     my $genAgeGroup ||= new GenAgeGroup( $Data->{'db'}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $Data->{'clientValues'}{'assocID'} );
     my $st = qq[
 		SELECT DATE_FORMAT(dtDOB, "%Y%m%d"), intGender
-		FROM tblMember
-		WHERE intMemberID = ?
+		FROM tblPerson
+		WHERE intPersonID = ?
 	];
     my $qry = $db->prepare($st);
     $qry->execute($id);
@@ -2135,7 +1430,7 @@ sub postMemberUpdate {
     $Gender      ||= 0;
     my $ageGroupID = $genAgeGroup->getAgeGroup( $Gender, $DOBAgeGroup ) || 0;
 
-    updateMemberNotes( $db, $Data->{'clientValues'}{'assocID'}, $id, $params );
+    updatePersonNotes( $db, $id, $params );
 
     if ( $action eq 'add' ) {
         $types{'intMSRecStatus'} = 1;
@@ -2144,26 +1439,8 @@ sub postMemberUpdate {
             if ( $Data->{'clientValues'}{'assocID'} and $Data->{'clientValues'}{'assocID'} != $Defs::INVALID_ID ) {
 
                 my @cfieldnames = (
-                    map("strCustomStr$_", (1..20)),
-                    map("dblCustomDbl$_", (1..20)),
-                    map("dtCustomDt$_", (1..15)),
-                    map("intCustomLU$_", (1..25)),
-                    map("intCustomBool$_", (1..7)),
-                    qw(
-                    intFinancialActive
-                    intMemberPackageID
-                    dtFirstRegistered
-                    dtLastRegistered
-                    curMemberFinBal
-                    strLoyaltyNumber
-                    intLifeMember
-                    intMailingList
-                    )
                 );
                 my @cfieldvals = ();
-                $params->{'d_intMailingList'}     ||= 0;
-                $params->{'d_intFinancialActive'} ||= 0;
-                $params->{'d_intLifeMember'}      ||= 0;
                 for my $f (@cfieldnames) {
                     push @cfieldvals, $params->{ 'd_' . $f };
                 }
@@ -2172,25 +1449,25 @@ sub postMemberUpdate {
                 my $cfield_val = join( ',', @cfieldvals )  || '';
 
                 my $st = qq[
-                INSERT INTO tblMember_Associations (intMemberID,intAssocID, intRecStatus, $cfield_nam)
+                INSERT INTO tblPerson_Associations (intPersonID,intAssocID, strStatus, $cfield_nam)
                 VALUES ($id,$Data->{'clientValues'}{'assocID'}, $Defs::RECSTATUS_ACTIVE, $cfield_val)
                 ];
                 $db->do($st);
 
                 #### if ($Data->??{'addDefaultRego'})
                 ### my $st = qq[
-                Transactions::insertDefaultRegoTXN( $db, $Defs::LEVEL_MEMBER, $id, $Data->{'clientValues'}{'assocID'} );
+                Transactions::insertDefaultRegoTXN( $db, $Defs::LEVEL_PERSON, $id, $Data->{'clientValues'}{'assocID'} );
 
             }
             my $clubInserted = 0;
             if ( $Data->{'clientValues'}{'clubID'} and $Data->{'clientValues'}{'clubID'} != $Defs::INVALID_ID ) {
                 $clubInserted = 1;
                 my $st = qq[
-                INSERT INTO tblMember_Clubs (intMemberID,intClubID, intStatus)
+                INSERT INTO tblPerson_Clubs (intPersonID,intClubID, intStatus)
                 VALUES ($id,$Data->{'clientValues'}{'clubID'}, $Defs::RECSTATUS_ACTIVE)
                 ];
                 $db->do($st);
-                Seasons::insertMemberSeasonRecord( $Data, $id, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, $Data->{'clientValues'}{'clubID'}, $ageGroupID, \%types );
+                Seasons::insertPersonSeasonRecord( $Data, $id, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, $Data->{'clientValues'}{'clubID'}, $ageGroupID, \%types );
             }
             if ( $Data->{'clientValues'}{'teamID'} and $Data->{'clientValues'}{'teamID'} != $Defs::INVALID_ID ) {
                 my $st = qq[
@@ -2198,15 +1475,15 @@ sub postMemberUpdate {
                 FROM tblComp_Teams as CT
                 INNER JOIN tblAssoc_Comp as AC ON (AC.intCompID = CT.intCompID)
                 WHERE CT.intTeamID=$Data->{'clientValues'}{'teamID'}
-                AND CT.intRecStatus = $Defs::RECSTATUS_ACTIVE
-                AND AC.intRecStatus = $Defs::RECSTATUS_ACTIVE
+                AND CT.strStatus = $Defs::RECSTATUS_ACTIVE
+                AND AC.strStatus = $Defs::RECSTATUS_ACTIVE
                 ];
                 $st .= qq[ AND CT.intCompID = $Data->{'clientValues'}{'compID'}] if ( $Data->{'clientValues'}{'compID'} and $Data->{'clientValues'}{'compID'} != $Defs::INVALID_ID );    ## IF AT A COMP
                 my $qry_comps = $db->prepare($st);
                 $qry_comps->execute or query_error($st);
 
                 my $statement = qq[
-                INSERT INTO tblMember_Teams (intMemberID, intTeamID, intStatus, intCompID) VALUES ($id, $Data->{'clientValues'}{'teamID'}, $Defs::RECSTATUS_ACTIVE, ?)
+                INSERT INTO tblPerson_Teams (intPersonID, intTeamID, intStatus, intCompID) VALUES ($id, $Data->{'clientValues'}{'teamID'}, $Defs::RECSTATUS_ACTIVE, ?)
                 ];
                 my $query = $db->prepare($statement);
 
@@ -2218,9 +1495,9 @@ sub postMemberUpdate {
                     $query->execute($DB_intCompID);
                     push @Seasons, $DB_intSeasonID;
                     $doneNewRegoSeason = 1 if $DB_intSeasonID == $assocSeasons->{'newRegoSeasonID'};
-                    Seasons::insertMemberSeasonRecord( $Data, $id, $DB_intSeasonID, $Data->{'clientValues'}{'assocID'}, 0, $ageGroupID, \%types );
+                    Seasons::insertPersonSeasonRecord( $Data, $id, $DB_intSeasonID, $Data->{'clientValues'}{'assocID'}, 0, $ageGroupID, \%types );
                 }
-                Seasons::insertMemberSeasonRecord( $Data, $id, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, 0, $ageGroupID, \%types ) if ( !$doneNewRegoSeason );
+                Seasons::insertPersonSeasonRecord( $Data, $id, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, 0, $ageGroupID, \%types ) if ( !$doneNewRegoSeason );
                 $query->execute(0) if !$comp_counts;
 
                 if ( !$clubInserted ) {
@@ -2235,30 +1512,30 @@ sub postMemberUpdate {
 
                     if ($clubID) {
                         my $st = qq[
-                        INSERT INTO tblMember_Clubs (intMemberID,intClubID, intStatus)
+                        INSERT INTO tblPerson_Clubs (intPersonID,intClubID, intStatus)
                         VALUES ($id,$clubID, $Defs::RECSTATUS_ACTIVE)
                         ];
                         $db->do($st);
                         #### LOOP SEASONS HERE !!!!!!!
                         my $doneNewRegoSeason = 0;
                         for my $season (@Seasons) {
-                            Seasons::insertMemberSeasonRecord( $Data, $id, $season, $Data->{'clientValues'}{'assocID'}, $clubID, $ageGroupID, \%types );
+                            Seasons::insertPersonSeasonRecord( $Data, $id, $season, $Data->{'clientValues'}{'assocID'}, $clubID, $ageGroupID, \%types );
                             $doneNewRegoSeason = 1 if $season == $assocSeasons->{'newRegoSeasonID'};
 
                         }
-                        Seasons::insertMemberSeasonRecord( $Data, $id, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, $clubID, $ageGroupID, \%types )
+                        Seasons::insertPersonSeasonRecord( $Data, $id, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, $clubID, $ageGroupID, \%types )
                         if ( !$doneNewRegoSeason );
                     }
                 }
             }
         }
-        getAutoMemberNum( $Data, undef, $id, $Data->{'clientValues'}{'assocID'} );
-        setupMemberTypes( $Data, $id, $params, $Data->{'clientValues'}{'assocID'} );
-        Seasons::insertMemberSeasonRecord( $Data, $id, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, 0, $ageGroupID, \%types ) if ($id);
+        getAutoPersonNum( $Data, undef, $id, $Data->{'clientValues'}{'assocID'} );
+        setupPersonTypes( $Data, $id, $params, $Data->{'clientValues'}{'assocID'} );
+        Seasons::insertPersonSeasonRecord( $Data, $id, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, 0, $ageGroupID, \%types ) if ($id);
         if ( $params->{'isDuplicate'} ) {
             my $st = qq[
-                UPDATE tblMember SET intStatus=$Defs::MEMBERSTATUS_POSSIBLE_DUPLICATE 
-                WHERE intMemberID=$id
+                UPDATE tblPerson SET intStatus=$Defs::PERSONSTATUS_POSSIBLE_DUPLICATE 
+                WHERE intPersonID=$id
             ];
             $db->do($st);
             return ( 0, DuplicateExplanation($Data) );
@@ -2266,16 +1543,16 @@ sub postMemberUpdate {
         else {
             my $cl = setClient( $Data->{'clientValues'} ) || '';
             my %cv = getClient($cl);
-            $cv{'memberID'}     = $id;
-            $cv{'currentLevel'} = $Defs::LEVEL_MEMBER;
+            $cv{'personID'}     = $id;
+            $cv{'currentLevel'} = $Defs::LEVEL_PERSON;
             my $clm = setClient( \%cv );
 
             return (
                 0, qq[
-                <div class="OKmsg"> $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER} Added Successfully</div><br>
-                <a href="$Data->{'target'}?client=$clm&amp;a=P_HOME">Display Details for $params->{'d_strFirstname'} $params->{'d_strSurname'}</a><br><br>
+                <div class="OKmsg"> $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} Added Successfully</div><br>
+                <a href="$Data->{'target'}?client=$clm&amp;a=P_HOME">Display Details for $params->{'d_strLocalFirstname'} $params->{'d_strLocalSurname'}</a><br><br>
                 <b>or</b><br><br>
-                <a href="$Data->{'target'}?client=$cl&amp;a=P_A&amp;l=$Defs::LEVEL_MEMBER">Add another $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER}</a>
+                <a href="$Data->{'target'}?client=$cl&amp;a=P_A&amp;l=$Defs::LEVEL_PERSON">Add another $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}</a>
                 ]
             );
 
@@ -2283,21 +1560,21 @@ sub postMemberUpdate {
         }
     }
     else {
-        my $status = $params->{'d_intRecStatus'} || $params->{'intRecStatus'} || 0;
+        my $status = $params->{'d_strStatus'} || $params->{'strStatus'} || 0;
         if ( $status == 1 ) {
-            my $st = qq[UPDATE tblMember SET intStatus = 1 WHERE intMemberID = $id AND intStatus = 0 LIMIT 1];
+            my $st = qq[UPDATE tblPerson SET intStatus = 1 WHERE intPersonID = $id AND intStatus = 0 LIMIT 1];
             $db->do($st);
         }
-        Transactions::insertDefaultRegoTXN( $db, $Defs::LEVEL_MEMBER, $id, $Data->{'clientValues'}{'assocID'} );
+        Transactions::insertDefaultRegoTXN( $db, $Defs::LEVEL_PERSON, $id, $Data->{'clientValues'}{'assocID'} );
 
         ## CHECK IF FIRSTNAME, SURNAME OR DOB HAVE CHANGED
-        my $firstname_p = $params->{'d_strFirstname'} || $params->{'strFirstname'} || '';
-        my $lastname_p  = $params->{'d_strSurname'}   || $params->{'strSurname'}   || '';
+        my $firstname_p = $params->{'d_strLocalFirstname'} || $params->{'strLocalFirstname'} || '';
+        my $lastname_p  = $params->{'d_strLocalSurname'}   || $params->{'strLocalSurname'}   || '';
         my $dob_p       = $params->{'d_dtDOB'}        || $params->{'dtDOB'}        || '';
         my $email_p     = $params->{'d_strEmail'}     || $params->{'strEmail'}     || '';
 
-        my $firstname_f = $fields->{'strFirstname'} || '';
-        my $lastname_f  = $fields->{'strSurname'}   || '';
+        my $firstname_f = $fields->{'strLocalFirstname'} || '';
+        my $lastname_f  = $fields->{'strLocalSurname'}   || '';
         my $dob_f       = $fields->{'dtDOB'}        || '';
         my $email_f     = $fields->{'strEmail'}     || '';
 
@@ -2312,7 +1589,7 @@ sub postMemberUpdate {
         $dupl_check = 1 if ( $dob_p       and $dob_p ne $dob_f );
 
         if ( $dupl_check == 1 ) {
-            my $st = qq[UPDATE tblMember SET intStatus = 2 WHERE intMemberID = $id LIMIT 1];
+            my $st = qq[UPDATE tblPerson SET intStatus = 2 WHERE intPersonID = $id LIMIT 1];
             $db->do($st);
         }
 
@@ -2321,41 +1598,41 @@ sub postMemberUpdate {
     return ( 1, '' );
 }
 
-sub preMemberAdd {
+sub prePersonAdd {
     my ( $params, $action, $Data, $db, $typeofDuplCheck ) = @_;
 
     if ($Data->{'SystemConfig'}{'checkPrimaryClub'} or $Data->{'SystemConfig'}{'DuplicatePrevention'}) {
 
-        my %newMember = (
-            firstname => $params->{'d_strFirstname'},
-            surname   => $params->{'d_strSurname'},
+        my %newPerson = (
+            firstname => $params->{'d_strLocalFirstname'},
+            surname   => $params->{'d_strLocalSurname'},
             dob       => $params->{'d_dtDOB'},
         );
         
         my $resultHTML = '';
 
         #At some stage PrimaryClub and DuplicatePrevention may/should become intertwined.
-        #Currently, PrimaryClub workings haven't been finalised; nor has primary club been set for each member.
+        #Currently, PrimaryClub workings haven't been finalised; nor has primary club been set for each person.
 
         if ($Data->{'SystemConfig'}{'checkPrimaryClub'}) {
             my $format = 1; #This should be set to 2 when the TransferLink part is working...mick
 
-            $resultHTML = checkPrimaryClub($Data, \%newMember, $format); 
+            $resultHTML = checkPrimaryClub($Data, \%newPerson, $format); 
         }
 
         if (!$resultHTML) {
             if ($Data->{'SystemConfig'}{'DuplicatePrevention'}) {
                 my $prefix = (exists $params->{'formID'} and $params->{'formID'}) ? 'yn' : 'd_int';
  
-                my @memberTypes = ($prefix.'Player', $prefix.'Coach', $prefix.'MatchOfficial', $prefix.'Official', $prefix.' Misc', $prefix.' Volunteer');
+                my @personTypes = ($prefix.'Player', $prefix.'Coach', $prefix.'MatchOfficial', $prefix.'Official', $prefix.' Misc', $prefix.' Volunteer');
 
                 my @registeringAs = ();
 
-                foreach my $memberType (@memberTypes) {
-                    push @registeringAs, $memberType if (exists $params->{$memberType} and $params->{$memberType});
+                foreach my $personType (@personTypes) {
+                    push @registeringAs, $personType if (exists $params->{$personType} and $params->{$personType});
                 }
 
-                $resultHTML = duplicate_prevention($Data, \%newMember, \@registeringAs);
+                $resultHTML = duplicate_prevention($Data, \%newPerson, \@registeringAs);
             }
         }
 
@@ -2382,7 +1659,7 @@ sub preMemberAdd {
         my ( @st_fields, @where_fields, @joinCheck_fields );
 
         if ( $params->{'ID'} ) {
-            $wherestr .= 'AND tblMember.intMemberID <> ?';
+            $wherestr .= 'AND tblPerson.intPersonID <> ?';
             push @where_fields, $params->{'ID'};
         }
 
@@ -2401,14 +1678,14 @@ sub preMemberAdd {
         }
 
         if ( $params->{'ID_IN'} ) {
-            $wherestr     = 'AND tblMember.intMemberID = ?';
+            $wherestr     = 'AND tblPerson.intPersonID = ?';
             @where_fields = ( $params->{'ID_IN'} );
         }
 
         if ( $Data->{'RegoFormID'} and $params->{'clubID_check'} and $params->{'clubID_check'} > 0 ) {
             $joinCheck = qq[
-                INNER JOIN tblMember_Clubs as MC ON (
-                    MC.intMemberID = tblMember.intMemberID
+                INNER JOIN tblPerson_Clubs as MC ON (
+                    MC.intPersonID = tblPerson.intPersonID
                     AND MC.intClubID = ?
                     AND MC.intStatus=1
                     AND MC.intPermit=0
@@ -2419,8 +1696,8 @@ sub preMemberAdd {
         }
         if ( $Data->{'RegoFormID'} and $params->{'teamID_check'} and $params->{'teamID_check'} > 0 ) {
             $joinCheck .= qq[
-                INNER JOIN tblMember_Teams as MT ON (
-                    MT.intMemberID = tblMember.intMemberID
+                INNER JOIN tblPerson_Teams as MT ON (
+                    MT.intPersonID = tblPerson.intPersonID
                     AND MT.intTeamID = ?
                     AND MC.intStatus=1
                 )
@@ -2431,10 +1708,10 @@ sub preMemberAdd {
 
             if ( $Data->{'RegoFormID'} and $params->{'assocID_check'} and $params->{'assocID_check'} > 0 ) {
                 $joinCheck .= qq[
-                    INNER JOIN tblMember_Associations as MA ON (
-                        MA.intMemberID = tblMember.intMemberID
+                    INNER JOIN tblPerson_Associations as MA ON (
+                        MA.intPersonID = tblPerson.intPersonID
                         AND MA.intAssocID = ?
-                        AND MA.intRecStatus=1
+                        AND MA.strStatus=1
                     )
                 ];
                 push @joinCheck_fields, $params->{'assocID'};
@@ -2442,33 +1719,33 @@ sub preMemberAdd {
 
             #Check Entire realm
             $st = qq[
-				SELECT tblMember.intMemberID
-				FROM tblMember
+				SELECT tblPerson.intPersonID
+				FROM tblPerson
                     $joinCheck
-                WHERE  tblMember.intRealmID = ? AND tblMember.intStatus <> ?
+                WHERE  tblPerson.intRealmID = ? AND tblPerson.intStatus <> ?
 					$wherestr
-                ORDER BY tblMember.intStatus
+                ORDER BY tblPerson.intStatus
 				LIMIT 1
 			];
 
-            @st_fields = (@joinCheck_fields, $realmID, $Defs::MEMBERSTATUS_DELETED, @where_fields,);
+            @st_fields = (@joinCheck_fields, $realmID, $Defs::PERSONSTATUS_DELETED, @where_fields,);
         }
         else {
 
             #Just check Assoc
             $st = qq[
-				SELECT tblMember.intMemberID
-				FROM tblMember INNER JOIN tblMember_Associations
+				SELECT tblPerson.intPersonID
+				FROM tblPerson INNER JOIN tblPerson_Associations
                 $joinCheck
-                WHERE  tblMember.intRealmID = ?
-                    AND tblMember_Associations.intAssocID = ?
-                    AND tblMember.intStatus <> ?
+                WHERE  tblPerson.intRealmID = ?
+                    AND tblPerson_Associations.intAssocID = ?
+                    AND tblPerson.intStatus <> ?
 					$wherestr
-                ORDER BY tblMember.intStatus
+                ORDER BY tblPerson.intStatus
 				LIMIT 1
 			];
 
-            @st_fields = (@joinCheck_fields, $realmID, $Data->{'clientValues'}{'assocID'}, $Defs::MEMBERSTATUS_DELETED, @where_fields,);
+            @st_fields = (@joinCheck_fields, $realmID, $Data->{'clientValues'}{'assocID'}, $Defs::PERSONSTATUS_DELETED, @where_fields,);
 
         }
         my $q = $db->prepare($st);
@@ -2485,7 +1762,7 @@ sub preMemberAdd {
 sub DuplicateExplanation {
     my ($Data) = @_;
 
-    my $msg = '<div class="warningmsg">Member is Possible Duplicate</div>';
+    my $msg = '<div class="warningmsg">Person is Possible Duplicate</div>';
     my $currentLevel = $Data->{'clientValues'}{'currentLevel'} || $Defs::LEVEL_NONE;
 
     my $client = setClient( $Data->{'clientValues'} ) || '';
@@ -2493,32 +1770,32 @@ sub DuplicateExplanation {
 
     if ( $currentLevel == $Defs::LEVEL_ASSOC ) {
         $msg .= qq[
-			<p>The $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER} you have added possibly duplicates another record that already exists in this system.</p>
-			<p>This $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER} <b>has</b> been temporarily added but their details will not be available.</p>
+			<p>The $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} you have added possibly duplicates another record that already exists in this system.</p>
+			<p>This $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} <b>has</b> been temporarily added but their details will not be available.</p>
 			<p>You should resolve this and any other duplicates as soon as possible by proceeding to the <b>Duplicate Resolution</b> section.</p>
 			<p><a href="$link">Resolve Duplicates</a></p>
 		];
     }
     elsif ( $currentLevel < $Defs::LEVEL_ASSOC ) {
         $msg .= qq[
-			<p>The $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER} you have added possibly duplicates another record that already exists in this system.  </p>
-			<p>This $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER} <b>has</b> been temporarily added but their details will not be available. They will remain this way until your $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC} has resolved this issue.</p>
+			<p>The $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} you have added possibly duplicates another record that already exists in this system.  </p>
+			<p>This $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} <b>has</b> been temporarily added but their details will not be available. They will remain this way until your $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC} has resolved this issue.</p>
 		];
     }
     elsif ( $currentLevel > $Defs::LEVEL_ASSOC ) {
         $msg .= qq[
-			<p>The $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER} you have added possibly duplicates another record that already exists in this system.  </p>
-			<p>This $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER} <b>has</b> been temporarily added but their details will not be available. </p>
+			<p>The $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} you have added possibly duplicates another record that already exists in this system.  </p>
+			<p>This $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} <b>has</b> been temporarily added but their details will not be available. </p>
 			<p>You need to proceed to the $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC} and choose the <b>Duplicate Resolution</b> option to resolve this issue.</p>
 		];
     }
     return $msg;
 }
 
-sub getAutoMemberNum {
-    my ( $Data, $genCode, $memberID, $assocID ) = @_;
+sub getAutoPersonNum {
+    my ( $Data, $genCode, $personID, $assocID ) = @_;
 
-    if ( $Data->{'SystemConfig'}{'GenMemberNo'} ) {
+    if ( $Data->{'SystemConfig'}{'GenPersonNo'} ) {
         my $num_field = $Data->{'SystemConfig'}{'GenNumField'} || 'strNationalNum';
         my $CreateCodes = 0;
         if ( exists $Data->{'SystemConfig'}{'GenNumAssocIn'} ) {
@@ -2531,10 +1808,10 @@ sub getAutoMemberNum {
             my $num = $genCode->getNumber( '', '', $num_field ) || '';
             if ($num) {
                 my $st = qq[
-						UPDATE tblMember SET $num_field = ?
-						WHERE intMemberID = ?
+						UPDATE tblPerson SET $num_field = ?
+						WHERE intPersonID = ?
 				];
-                $Data->{'db'}->do( $st, undef, $num, $memberID );
+                $Data->{'db'}->do( $st, undef, $num, $personID );
                 return $num;
             }
         }
@@ -2543,7 +1820,7 @@ sub getAutoMemberNum {
 }
 
 sub showClubTeams {
-    my ( $Data, $memberID ) = @_;
+    my ( $Data, $personID ) = @_;
 
     my $aID = $Data->{'clientValues'}{'assocID'} || 0;    #Current Association
                                                           #Check and Display what other assocs this person may be in
@@ -2558,14 +1835,14 @@ sub showClubTeams {
             G.strGradeName, 
             MC.intStatus, 
             MC.intPermit, 
-            tblClub.intRecStatus
+            tblClub.strStatus
 		FROM tblClub 
-			INNER JOIN tblMember_Clubs AS MC ON (tblClub.intClubID=MC.intClubID)
+			INNER JOIN tblPerson_Clubs AS MC ON (tblClub.intClubID=MC.intClubID)
 			INNER JOIN tblAssoc_Clubs AS AC ON (tblClub.intClubID=AC.intClubID)
 			LEFT JOIN tblClubGrades AS G ON (G.intGradeID=MC.intGradeID)
-		WHERE MC.intMemberID=$memberID
+		WHERE MC.intPersonID=$personID
 			AND AC.intAssocID = $aID
-			AND AC.intRecStatus <> $Defs::RECSTATUS_DELETED
+			AND AC.strStatus <> $Defs::RECSTATUS_DELETED
 			AND MC.intStatus <> $Defs::RECSTATUS_DELETED
 		ORDER BY strName, intStatus DESC, intPermit ASC
 	];
@@ -2578,7 +1855,7 @@ sub showClubTeams {
     my $cnt        = 0;
     my %hasClub    = ();
     while ( my $dref = $query->fetchrow_hashref() ) {
-        ## GET THE NAME OF THE GRADE FOR THE MEMBER IF ALLOW CLUB GRADES IS ENABLED IN SYS CONFIG
+        ## GET THE NAME OF THE GRADE FOR THE PERSON IF ALLOW CLUB GRADES IS ENABLED IN SYS CONFIG
         my $gradeName = '&nbsp;';
         next if exists $hasClub{ $dref->{intClubID} };
         $hasClub{ $dref->{intClubID} } = 1;
@@ -2590,7 +1867,7 @@ sub showClubTeams {
 
         my $primaryClub = ( $dref->{'intPrimaryClub'} )   ? qq{[Primary Club]} : '&nbsp;';
         my $class       = $cnt % 2 == 0                   ? 'rowshade'         : '';
-        my $deleted     = ( $dref->{intRecStatus} == -1 ) ? qq[ (Deleted)]     : '';
+        my $deleted     = ( $dref->{strStatus} == -1 ) ? qq[ (Deleted)]     : '';
         $clubs .= qq[
 			<tr>
 				<td class="$class">$dref->{'strName'}$deleted</td>
@@ -2604,7 +1881,6 @@ sub showClubTeams {
         }
         $cnt++;
     }
-    my $teams           = listMemberTeams( $Data, $memberID ) || '';
     my $editclubsbutton = '';
     my $client          = setClient( $Data->{'clientValues'} ) || '';
     if ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC and !$Data->{'SystemConfig'}{'NoClubs'} and allowedAction( $Data, 'mc_e' ) ) {
@@ -2626,31 +1902,31 @@ sub showClubTeams {
 		];
     }
 
-    return ( $clubStatus, $clubs, $teams );
+    return ( $clubStatus, $clubs, '');
 }
 
 sub checkOtherAssocs {
-    my ( $Data, $memberID ) = @_;
+    my ( $Data, $personID ) = @_;
 
     my $aID = $Data->{'clientValues'}{'assocID'} || 0;    #Current Association
                                                           #Check and Display what other assocs this person may be in
 
     my $st = qq[
-		SELECT strName, MA.intRecStatus
-		FROM tblAssoc INNER JOIN tblMember_Associations AS MA ON (tblAssoc.intAssocID=MA.intAssocID)
-		WHERE intMemberID = ?
+		SELECT strName, MA.strStatus
+		FROM tblAssoc INNER JOIN tblPerson_Associations AS MA ON (tblAssoc.intAssocID=MA.intAssocID)
+		WHERE intPersonID = ?
 			AND tblAssoc.intAssocID <> ?
-			AND MA.intRecStatus <> $Defs::RECSTATUS_DELETED
+			AND MA.strStatus <> $Defs::RECSTATUS_DELETED
 		ORDER BY strName
 	];
     my $query = $Data->{'db'}->prepare($st);
     $query->execute(
-                     $memberID,
+                     $personID,
                      $aID,
     );
     my $body = '';
     while ( my $dref = $query->fetchrow_hashref() ) {
-        my $act = $dref->{'intRecStatus'} == $Defs::RECSTATUS_ACTIVE ? 'Active' : 'Inactive';
+        my $act = $dref->{'strStatus'} == $Defs::RECSTATUS_ACTIVE ? 'Active' : 'Inactive';
 
         $body .= qq[$dref->{'strName'} <i>($act)</i><br>\n];
     }
@@ -2664,16 +1940,16 @@ sub checkOtherAssocs {
     return $body;
 }
 
-sub delete_member {
-    my ( $Data, $memberID ) = @_;
+sub delete_person {
+    my ( $Data, $personID ) = @_;
 
     my $aID = $Data->{'clientValues'}{'assocID'} || 0;    #Current Association
-    return '' if ( !( allowedAction( $Data, 'm_d' ) and $Data->{'SystemConfig'}{'AllowMemberDelete'} ) );
+    return '' if ( !( allowedAction( $Data, 'm_d' ) and $Data->{'SystemConfig'}{'AllowPersonDelete'} ) );
 ######## NEEDS THINK ABOUT WR WARREN warren wsc
 
-    my $st = qq[UPDATE tblMember_Associations SET intRecStatus=$Defs::RECSTATUS_DELETED WHERE intMemberID=$memberID AND intAssocID=$aID];
+    my $st = qq[UPDATE tblPerson_Associations SET strStatus=$Defs::RECSTATUS_DELETED WHERE intPersonID=$personID AND intAssocID=$aID];
     $Data->{'db'}->do($st);
-    $Data->{'clientValues'}{'memberID'} = $Defs::INVALID_ID;
+    $Data->{'clientValues'}{'personID'} = $Defs::INVALID_ID;
     {
         if ( $Data->{'clientValues'}{'teamID'} and $Data->{'clientValues'}{'teamID'} != $Defs::INVALID_ID ) {
             $Data->{'clientValues'}{'currentLevel'} = $Defs::LEVEL_TEAM;
@@ -2687,73 +1963,73 @@ sub delete_member {
         $Data->{'clientValues'}{'currentLevel'} = $Defs::INVALID_ID if $Data->{'clientValues'}{'authLevel'} < $Data->{'clientValues'}{'currentLevel'};
     }
 
-    return ( qq[<div class="OKmsg">$Data->{'LevelNames'}{$Defs::LEVEL_MEMBER} deleted successfully</div>], "Delete $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER}" );
+    return ( qq[<div class="OKmsg">$Data->{'LevelNames'}{$Defs::LEVEL_PERSON} deleted successfully</div>], "Delete $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}" );
 
 }
 
-sub setupMemberTypes {
+sub setupPersonTypes {
     my ( $Data, $id, $params, $assocID ) = @_;
     my $st = qq[
-        INSERT INTO tblMember_Types 
-		    (intMemberID, intTypeID,intActive, intAssocID, intRecStatus)
+        INSERT INTO tblPerson_Types 
+		    (intPersonID, intTypeID,intActive, intAssocID, strStatus)
         VALUES 
             (?, ?, 1, ?, $Defs::RECSTATUS_ACTIVE)
 	];
     my $q = $Data->{'db'}->prepare($st);
     my %vals = (
-        d_intPlayer    => $Defs::MEMBER_TYPE_PLAYER,
-        d_intCoach     => $Defs::MEMBER_TYPE_COACH,
-        d_intUmpire    => $Defs::MEMBER_TYPE_UMPIRE,
-        d_intMisc      => $Defs::MEMBER_TYPE_MISC,
-        d_intVolunteer => $Defs::MEMBER_TYPE_VOLUNTEER,
+        d_intPlayer    => $Defs::PERSON_TYPE_PLAYER,
+        d_intCoach     => $Defs::PERSON_TYPE_COACH,
+        d_intUmpire    => $Defs::PERSON_TYPE_UMPIRE,
+        d_intMisc      => $Defs::PERSON_TYPE_MISC,
+        d_intVolunteer => $Defs::PERSON_TYPE_VOLUNTEER,
     );
     for my $type ( keys %vals ) {
         $q->execute( $id, $vals{$type}, $assocID ) if $params->{$type};
     }
 }
 
-sub MemberDupl {
-    my ( $action, $Data, $memberID ) = @_;
+sub PersonDupl {
+    my ( $action, $Data, $personID ) = @_;
 
-    $memberID ||= 0;
-    return '' if !$memberID;
+    $personID ||= 0;
+    return '' if !$personID;
     return '' if !Duplicates::isCheckDupl($Data);
 
     if ( $action eq 'P_DUP_S' ) {
         my $st = qq[
-			UPDATE tblMember
-			SET intStatus = $Defs::MEMBERSTATUS_POSSIBLE_DUPLICATE
-			WHERE intMemberID = $memberID
+			UPDATE tblPerson
+			SET intStatus = $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
+			WHERE intPersonID = $personID
 			LIMIT 1
 		];
         my $query = $Data->{'db'}->prepare($st);
         $query->execute;
         my $msg = qq[
-			<p class="OKmsg">$Data->{'LevelNames'}{$Defs::LEVEL_MEMBER} has been marked as a duplicate</p>
+			<p class="OKmsg">$Data->{'LevelNames'}{$Defs::LEVEL_PERSON} has been marked as a duplicate</p>
 		];
         if ( $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_ASSOC ) {
             my $client = setClient( $Data->{'clientValues'} ) || '';
             my $dupllink = "$Data->{'target'}?client=$client&amp;a=DUPL_L";
             $msg .= qq[<p>To resolve this duplicate click <a href="$dupllink">Resolve Duplicates</a>.</p>];
         }
-        auditLog( $memberID, $Data, 'Mark as Duplicates', 'Duplicates' );
-        return ( $msg, "$Data->{'LevelNames'}{$Defs::LEVEL_MEMBER} marked as a duplicate" );
+        auditLog( $personID, $Data, 'Mark as Duplicates', 'Duplicates' );
+        return ( $msg, "$Data->{'LevelNames'}{$Defs::LEVEL_PERSON} marked as a duplicate" );
     }
     else {
         my $client = setClient( $Data->{'clientValues'} ) || '';
-        my $st = qq[SELECT * FROM tblMember WHERE intMemberID = $memberID];
+        my $st = qq[SELECT * FROM tblPerson WHERE intPersonID = $personID];
         my $query = $Data->{'db'}->prepare($st);
         $query->execute;
         my $dref = $query->fetchrow_hashref();
 
         my $msg = qq[
 			<form action="$Data->{'target'}" method="POST" style="float:left;" onsubmit="document.getElementById('btnsubmit').disabled=true;return true;">
-				<p>If you believe the $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER} named below is a possible duplicate, click the <b>'Mark as Duplicate'</b> button.  </p>
+				<p>If you believe the $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} named below is a possible duplicate, click the <b>'Mark as Duplicate'</b> button.  </p>
 
-		<p>This will mark this $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER} as a duplicate for your $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC} to verify and resolve.</p>
-			<p> <b>$dref->{strFirstname} $dref->{strSurname}</b></p>
+		<p>This will mark this $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} as a duplicate for your $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC} to verify and resolve.</p>
+			<p> <b>$dref->{strLocalFirstname} $dref->{strLocalSurname}</b></p>
 			<p>
-				<span class="warningmsg">NOTE: Only mark the duplicate $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER}, not the $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER} you believe may be the original</span>.</p><br><br>
+				<span class="warningmsg">NOTE: Only mark the duplicate $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}, not the $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} you believe may be the original</span>.</p><br><br>
 				<input type="hidden" name="a" value="P_DUP_S">
 				<input type="hidden" name="client" value="$client">
 				<input type="submit" value="Mark as Duplicate" id="btnsubmit" name="btnsubmit"  class="button proceed-button">
@@ -2762,27 +2038,6 @@ sub MemberDupl {
         return ( $msg, 'Mark as Duplicate' );
     }
 }
-
-sub loadMemberExpiry {
-    my ( $db, $memberID ) = @_;
-    my $st = qq[
-        SELECT A.strName, MA.dtExpiry
-        FROM tblMember_Associations MA
-            INNER JOIN tblAssoc AS A ON MA.intAssocID=A.intAssocID
-        WHERE MA.intMemberID = ?
-    ];
-    my $q = $db->prepare($st);
-    $q->execute($memberID);
-    my $html = '';
-    while ( my ( $strName, $dtExpiry ) = $q->fetchrow_array() ) {
-        if ($dtExpiry) {
-            my ( $year, $month, $day ) = split /-/, $dtExpiry;
-            $html = qq[<b>Contract Expiry Date:</b> $day/$month/$year ($strName)];
-        }
-    }
-    return $html;
-}
-
 
 sub check_valid_date {
     my ($date) = @_;
@@ -2800,30 +2055,13 @@ sub _fix_date {
     return "$yyyy-$mm-$dd";
 }
 
-sub defaulter_check {
-    my ( $memberID, $type, $Data ) = @_;
-    my $db = $Data->{'db'};
-    my $st = qq[SELECT intDefaulter FROM tblMember WHERE intMemberID = ?  AND intRealmID = ?];
-    my $q = $db->prepare($st);
-    $q->execute( $memberID, $Data->{'Realm'} );
-    my $dref = $q->fetchrow_hashref();
-    $type = uc($type);
-
-    if ( $dref->{intDefaulter} == 1 ) {
-        return qq[<div style="font-size:14px;color:red;"><b>WARNING:</b> $type</div>];
-    }
-    else {
-        return 0;
-    }
-}
-
 
 sub showSeasonSummary {
 
-    my ( $Data, $memberID ) = @_;
+    my ( $Data, $personID ) = @_;
 
     my $body = '';
-    my ( $memseason_vals, $memseasons ) = listMemberSeasons( $Data, $memberID );
+    my ( $memseason_vals, $memseasons ) = listPersonSeasons( $Data, $personID );
     my $season_Name = $Data->{'SystemConfig'}{'txtSeason'} || 'Season';
     if ($memseasons) {
         my %Title = ();
