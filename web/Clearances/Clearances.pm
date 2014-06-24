@@ -113,16 +113,16 @@ sub clearanceReopen	{
     my $st = qq[
       SELECT
         C.intClearanceID, 
-				C1.strName as DestinationClubName, 
-				C2.strName as SourceClubName, 
+				C1.strLocalName as DestinationClubName, 
+				C2.strLocalName as SourceClubName, 
 				C.intDestinationClubID as DestinationClubID,
                 C.intSourceClubID as SourceClubID,
 				DATE_FORMAT(C.dtApplied,'%d/%m/%Y') AS AppliedDate 
       FROM
 				tblClearance as ThisClr
         INNER JOIN tblClearance as C ON (C.intMemberID=ThisClr.intMemberID and C.intClearanceID <> ThisClr.intClearanceID)
-        LEFT JOIN tblClub as C1 ON (C1.intClubID = C.intDestinationClubID)
-        LEFT JOIN tblClub as C2 ON (C2.intClubID = C.intSourceClubID)
+        LEFT JOIN tblEntity as C1 ON (C1.intEntityID = C.intDestinationClubID and C1.intEntityLevel = $Defs::LEVEL_CLUB)
+        LEFT JOIN tblEntity as C2 ON (C2.intEntityID = C.intSourceClubID and C2.intEntityLevel = $Defs::LEVEL_CLUB)
     WHERE ThisClr.intClearanceID = $clearanceID
 AND  C.intClearanceStatus = $Defs::CLR_STATUS_PENDING
       AND C.intCreatedFrom =0
@@ -217,13 +217,13 @@ sub clearanceHistory	{
 	my $st = qq[
                 SELECT 
                     C.*, 
-                    SourceClub.strName as SourceClubName, 
-                    DestinationClub.strName as DestinationClubName, 
+                    SourceClub.strLocalName as SourceClubName, 
+                    DestinationClub.strLocalName as DestinationClubName, 
                     DATE_FORMAT(dtApplied,'%d/%m/%Y') AS dtApplied, now() AS Today
                 FROM tblClearance as C
 			        LEFT JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID)
-                    LEFT JOIN tblClub as SourceClub ON (SourceClub.intClubID = C.intSourceClubID)
-                    LEFT JOIN tblClub as DestinationClub ON (DestinationClub.intClubID = C.intDestinationClubID)
+                    LEFT JOIN tblEntity as SourceClub ON (SourceClub.intEntityID= C.intSourceClubID and SourceClub.intEntityLevel = $Defs::LEVEL_CLUB)
+                    LEFT JOIN tblEntity as DestinationClub ON (DestinationClub.intEntityID = C.intDestinationClubID and DestinationClub.intEntityLevel = $Defs::LEVEL_CLUB)
                 WHERE C.intMemberID = $intMemberID
 			AND C.intRecStatus <> -1
 		GROUP BY C.intClearanceID
@@ -326,8 +326,8 @@ sub clearanceView	{
                     C.*, 
                     DATE_FORMAT(C.dtApplied,"%d/%m/%Y") AS dtApplied, 
                     CONCAT(M.strLocalSurname, " ", M.strLocalFirstname) as MemberName, 
-                    SourceClub.strName as SourceClubName, 
-                    DestinationClub.strName as DestinationClubName, 
+                    SourceClub.strLocalName as SourceClubName, 
+                    DestinationClub.strLocalName as DestinationClubName, 
                     M.strState, 
                     DATE_FORMAT(M.dtDOB,'%d/%m/%Y') AS dtDOB, 
                     strNationalNum,  
@@ -335,8 +335,8 @@ sub clearanceView	{
                 FROM tblClearance as C
                     INNER JOIN tblPerson as M ON (M.intMemberID = C.intMemberID)
 			        LEFT JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID)
-                    LEFT JOIN tblClub as SourceClub ON (SourceClub.intClubID = C.intSourceClubID)
-                    LEFT JOIN tblClub as DestinationClub ON (DestinationClub.intClubID = C.intDestinationClubID)
+                    LEFT JOIN tblEntity as SourceClub ON (SourceClub.intEntityID = C.intSourceClubID and SourceClub.intEntityLevel = $Defs::LEVEL_CLUB)
+                    LEFT JOIN tblEntity as DestinationClub ON (DestinationClub.intEntityID = C.intDestinationClubID and DestinationClub.intEntityLevel = $Defs::LEVEL_CLUB)
                 WHERE C.intClearanceID= $cID
 		GROUP BY C.intClearanceID
         ];
@@ -726,19 +726,13 @@ sub getNodeDetails	{
 	my $tablename = '';
 	my $field = '';
 	my $where = '';
-	if ($intTableType == $Defs::CLUB_LEVEL_CLEARANCE)	{
-		$tablename = 'tblClub';
-		$field = 'intClubID';
-	}
-	if ($intTableType == $Defs::NODE_LEVEL_CLEARANCE)	{
-		$tablename = 'tblEntity';
-		$field = 'intEntityID';
-		$where = qq[ AND intStatusID =$Defs::NODE_SHOW ];
-	}
+	$tablename = 'tblEntity';
+	$field = 'intEntityID';
+#		$where = qq[ AND intStatusID =$Defs::NODE_SHOW ];
 
 	my $st = qq[
 		SELECT 
-            strName, 
+            strLocalName, 
             strEmail 
 		FROM $tablename
 		WHERE $field = $intID
@@ -785,8 +779,8 @@ sub clearancePathDetails	{
                     CP.intClearanceStatus as PathStatus, 
                     CP.intClearancePathID, 
                     CONCAT(M.strLocalSurname, " ", M.strLocalFirstname) as MemberName, 
-                    SourceClub.strName as SourceClubName, 
-                    DestinationClub.strName as DestinationClubName, 
+                    SourceClub.strLocalName as SourceClubName, 
+                    DestinationClub.strLocalName as DestinationClubName, 
                     M.strState, 
                     DATE_FORMAT(M.dtDOB,'%d/%m/%Y') AS dtDOB, 
                     CP.intID, 
@@ -800,8 +794,8 @@ sub clearancePathDetails	{
                 FROM tblClearance as C
                         INNER JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID)
                         INNER JOIN tblPerson as M ON (M.intMemberID = C.intMemberID)
-                        LEFT JOIN tblClub as SourceClub ON (SourceClub.intClubID = C.intSourceClubID)
-                        LEFT JOIN tblClub as DestinationClub ON (DestinationClub.intClubID = C.intDestinationClubID)
+                        LEFT JOIN tblEntity as SourceClub ON (SourceClub.intEntityID = C.intSourceClubID and SourceClub.intEntityLevel = $Defs::LEVEL_CLUB)
+                        LEFT JOIN tblEntity as DestinationClub ON (DestinationClub.intEntityID = C.intDestinationClubID and DestinationClub.intEntityLevel = $Defs::LEVEL_CLUB)
                 WHERE C.intClearanceID= $cID
 			$cpID_WHERE
         ];
@@ -1507,7 +1501,7 @@ sub createClearance	{
                 DATE_FORMAT(M.dtDOB,'%d/%m/%Y') AS DOB, 
                 M.dtDOB, 
                 MC.intClubID, 
-                C.strName as ClubName, 
+                C.strLocalName as ClubName, 
                 DATE_FORMAT(MAX(CLR.dtFinalised),'%d/%m/%Y') AS CLR_DATE, 
                 IF(MC.intStatus = 1, 'Y', 'N') as Club_STATUS, 
                 DATE_FORMAT(MA.dtLastRegistered, '%d/%m/%Y') AS LastRegistered, 
@@ -1515,7 +1509,7 @@ sub createClearance	{
                 MAX(MC.intPrimaryClub) as PrimaryClub
 			FROM tblPerson as M 
 				INNER JOIN tblMember_Clubs as MC ON (MC.intMemberID = M.intMemberID)
-				INNER JOIN tblClub as C ON (C.intClubID = MC.intClubID)
+				INNER JOIN tblEntity as C ON (C.intEntityID= MC.intClubID)
 				LEFT JOIN tblClearance as CLR ON (CLR.intMemberID = M.intMemberID AND CLR.intDestinationClubID = C.intClubID)
 				$CLRD_OUT_JOIN
 			WHERE 
@@ -1840,15 +1834,15 @@ sub preClearanceAdd	{
 	my $st = qq[
 			SELECT
 				C.intClearanceID,
-				C1.strName as DestinationClubName, 
-				C2.strName as SourceClubName, 
-				C1.intClubID as DestinationClubID,
-                C2.intClubID as SourceClubID,
+				C1.strLocalName as DestinationClubName, 
+				C2.strLocalName as SourceClubName, 
+				C1.intEntityID as DestinationClubID,
+                C2.intEntityID as SourceClubID,
 				DATE_FORMAT(dtApplied,'%d/%m/%Y') AS AppliedDate 
 			FROM
 				tblClearance as C
-				LEFT JOIN tblClub as C1 ON (C1.intClubID = C.intDestinationClubID)
-				LEFT JOIN tblClub as C2 ON (C2.intClubID = C.intSourceClubID)
+				LEFT JOIN tblEntity as C1 ON (C1.intEntityID = C.intDestinationClubID and C1.intEntityLevel = $Defs::LEVEL_CLUB)
+				LEFT JOIN tblEntity as C2 ON (C2.intEntityID = C.intSourceClubID and C2.intEntityLevel = $Defs::LEVEL_CLUB)
 		WHERE intMemberID = $memberID
 			AND  intClearanceStatus = $Defs::CLR_STATUS_PENDING
 			AND intCreatedFrom =0
@@ -2277,8 +2271,8 @@ sub sendCLREmail	{
 		SELECT 
             CONCAT(M.strLocalFirstname, ' ', M.strLocalSurname) as MemberName, 
             C.*, 
-            IF(intDestinationClubID > 0, C1.strName, strDestinationClubName) as DestinationClubName, 
-            IF(intSourceClubID > 0 , C2.strName, strSourceClubName) as SourceClubName, 
+            IF(intDestinationClubID > 0, C1.strLocalName, strDestinationClubName) as DestinationClubName, 
+            IF(intSourceClubID > 0 , C2.strLocalName, strSourceClubName) as SourceClubName, 
             CP.intTableType, 
             CP.intTypeID, 
             CP.intID, 
@@ -2289,8 +2283,8 @@ sub sendCLREmail	{
 		FROM tblClearance as C
 			INNER JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID)
 			INNER JOIN tblPerson as M ON (M.intMemberID = C.intMemberID)
-			LEFT JOIN tblClub as C1 ON (C1.intClubID = C.intDestinationClubID)
-			LEFT JOIN tblClub as C2 ON (C2.intClubID = C.intSourceClubID)
+			LEFT JOIN tblEntity as C1 ON (C1.intEntityID = C.intDestinationClubID and C1.intEntityLevel = $Defs::LEVEL_CLUB)
+			LEFT JOIN tblEntity as C2 ON (C2.intEntityID = C.intSourceClubID and C2.intEntityLevel = $Defs::LEVEL_CLUB)
             LEFT JOIN tblDefCodes as DC ON (DC.intCodeID = CP.intDenialReasonID)
 		WHERE C.intClearanceID = $cID
 			AND CP.intClearancePathID = C.intCurrentPathID
