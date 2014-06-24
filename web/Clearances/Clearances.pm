@@ -64,7 +64,7 @@ sub clearanceCancel	{
 
 	 my $st = qq[
                 SELECT
-                        intMemberID,
+                        intPersonID,
                         intDestinationClubID,
                         intSourceClubID
                 FROM
@@ -74,7 +74,7 @@ sub clearanceCancel	{
         ]; 
         my $qry= $db->prepare($st);
         $qry->execute or query_error($st);
-        my ($intMemberID, $intDestinationClubID, $intSourceClubID) = $qry->fetchrow_array();
+        my ($intPersonID, $intDestinationClubID, $intSourceClubID) = $qry->fetchrow_array();
 
 	$st = qq[
 		UPDATE tblClearance
@@ -120,7 +120,7 @@ sub clearanceReopen	{
 				DATE_FORMAT(C.dtApplied,'%d/%m/%Y') AS AppliedDate 
       FROM
 				tblClearance as ThisClr
-        INNER JOIN tblClearance as C ON (C.intMemberID=ThisClr.intMemberID and C.intClearanceID <> ThisClr.intClearanceID)
+        INNER JOIN tblClearance as C ON (C.intPersonID=ThisClr.intPersonID and C.intClearanceID <> ThisClr.intClearanceID)
         LEFT JOIN tblEntity as C1 ON (C1.intEntityID = C.intDestinationClubID and C1.intEntityLevel = $Defs::LEVEL_CLUB)
         LEFT JOIN tblEntity as C2 ON (C2.intEntityID = C.intSourceClubID and C2.intEntityLevel = $Defs::LEVEL_CLUB)
     WHERE ThisClr.intClearanceID = $clearanceID
@@ -205,13 +205,13 @@ AND  C.intClearanceStatus = $Defs::CLR_STATUS_PENDING
 
 sub clearanceHistory	{
 
-### PURPOSE: This function displays, for given intMemberID, the clearance history that they have. This is called from within the view member screen.
+### PURPOSE: This function displays, for given intPersonID, the clearance history that they have. This is called from within the view member screen.
 
 ### At the bottom of this function is the ability to add a manual clearance history record.  For example, if they came from overseas.  These manual records don't have approval paths, but rather, are for historical purposes.
 
-	my ($Data, $intMemberID) = @_;
-	$intMemberID ||= 0;
-	return '' if ! $intMemberID;
+	my ($Data, $intPersonID) = @_;
+	$intPersonID ||= 0;
+	return '' if ! $intPersonID;
 
 	my $db = $Data->{'db'};
 	my $st = qq[
@@ -224,7 +224,7 @@ sub clearanceHistory	{
 			        LEFT JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID)
                     LEFT JOIN tblEntity as SourceClub ON (SourceClub.intEntityID= C.intSourceClubID and SourceClub.intEntityLevel = $Defs::LEVEL_CLUB)
                     LEFT JOIN tblEntity as DestinationClub ON (DestinationClub.intEntityID = C.intDestinationClubID and DestinationClub.intEntityLevel = $Defs::LEVEL_CLUB)
-                WHERE C.intMemberID = $intMemberID
+                WHERE C.intPersonID = $intPersonID
 			AND C.intRecStatus <> -1
 		GROUP BY C.intClearanceID
 		ORDER BY C.dtApplied DESC
@@ -333,7 +333,7 @@ sub clearanceView	{
                     strNationalNum,  
                     CP.strOtherDetails1
                 FROM tblClearance as C
-                    INNER JOIN tblPerson as M ON (M.intMemberID = C.intMemberID)
+                    INNER JOIN tblPerson as M ON (M.intPersonID = C.intPersonID)
 			        LEFT JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID)
                     LEFT JOIN tblEntity as SourceClub ON (SourceClub.intEntityID = C.intSourceClubID and SourceClub.intEntityLevel = $Defs::LEVEL_CLUB)
                     LEFT JOIN tblEntity as DestinationClub ON (DestinationClub.intEntityID = C.intDestinationClubID and DestinationClub.intEntityLevel = $Defs::LEVEL_CLUB)
@@ -563,7 +563,7 @@ sub postClearanceUpdate	{
 
 	 my $st = qq[
                 SELECT
-			intMemberID,
+			intPersonID,
 			intDestinationClubID,
 			intSourceClubID
                 FROM 
@@ -573,7 +573,7 @@ sub postClearanceUpdate	{
         ];
         my $qry= $db->prepare($st);
         $qry->execute or query_error($st);
-        my ($intMemberID, $intToClubID, $intFromClubID) = $qry->fetchrow_array();
+        my ($intPersonID, $intToClubID, $intFromClubID) = $qry->fetchrow_array();
 	## If in past then set as inactive
 		### ROLL BACK MEMBER
 		 my $st_updateSource = qq[
@@ -582,7 +582,7 @@ sub postClearanceUpdate	{
                         SET
                                 intStatus = $Defs::RECSTATUS_ACTIVE
                         WHERE
-                                intMemberID = $intMemberID
+                                intPersonID = $intPersonID
                                 AND intClubID = $intFromClubID
                                 AND intStatus = $Defs::RECSTATUS_INACTIVE
                         LIMIT 1
@@ -593,7 +593,7 @@ sub postClearanceUpdate	{
                         FROM
                                 tblMember_ClubsClearedOut
                         WHERE
-                                intMemberID = $intMemberID
+                                intPersonID = $intPersonID
                                 AND intClubID = $intFromClubID
                 ];
                 $db->do($st_clubsCleared);
@@ -793,7 +793,7 @@ sub clearancePathDetails	{
                     CP.strOtherDetails1
                 FROM tblClearance as C
                         INNER JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID)
-                        INNER JOIN tblPerson as M ON (M.intMemberID = C.intMemberID)
+                        INNER JOIN tblPerson as M ON (M.intPersonID = C.intPersonID)
                         LEFT JOIN tblEntity as SourceClub ON (SourceClub.intEntityID = C.intSourceClubID and SourceClub.intEntityLevel = $Defs::LEVEL_CLUB)
                         LEFT JOIN tblEntity as DestinationClub ON (DestinationClub.intEntityID = C.intDestinationClubID and DestinationClub.intEntityLevel = $Defs::LEVEL_CLUB)
                 WHERE C.intClearanceID= $cID
@@ -1051,9 +1051,9 @@ sub memberLink	{
 	$query->execute or query_error($st);
 	my $dref=$query->fetchrow_hashref();
 
-	if ($dref->{intClearanceID} and $dref->{intMemberID} and $dref->{intClearanceStatus} == $Defs::CLR_STATUS_APPROVED)	{
+	if ($dref->{intClearanceID} and $dref->{intPersonID} and $dref->{intClearanceStatus} == $Defs::CLR_STATUS_APPROVED)	{
  		my %tempClientValues = %{$Data->{clientValues}};
-        $tempClientValues{memberID} = $dref->{intMemberID};
+        $tempClientValues{memberID} = $dref->{intPersonID};
         $tempClientValues{currentLevel} = $Defs::LEVEL_MEMBER;
         my $tempClient = setClient(\%tempClientValues);
 		return qq[ <div class="OKmsg">The clearance has now been finalised</div><br><a href="$Data->{'target'}?client=$tempClient&amp;a=M_HOME">click here to display members record</a>&nbsp;|&nbsp;<a href="$Data->{'target'}?client=$tempClient&amp;a=M_DTE">click here to edit members record</a>];
@@ -1150,7 +1150,7 @@ sub checkAutoConfirms	{
             N.intNodeID, 
             intDirection
 		FROM tblClearance as C 
-			INNER JOIN tblPerson as M ON (M.intMemberID = C.intMemberID)
+			INNER JOIN tblPerson as M ON (M.intPersonID = C.intPersonID)
 			INNER JOIN tblClearancePath as CP ON (C.intClearanceID = CP.intClearanceID)
 			LEFT JOIN tblNode as N ON (N.intNodeID = CP.intID AND CP.intTableType = $Defs::NODE_LEVEL_CLEARANCE)
 		WHERE C.intClearanceID = $cID
@@ -1266,26 +1266,26 @@ sub finaliseClearance	{
 
 	my $st = qq[
 		SELECT 
-            C.intMemberID, 
+            C.intPersonID, 
             C.intDestinationClubID, 
             C.intSourceClubID, 
             M.intGender, 
             DATE_FORMAT(M.dtDOB, "%Y%m%d") as DOBAgeGroup
 		FROM tblClearance as C
-			INNER JOIN tblPerson as M ON (M.intMemberID = C.intMemberID)
+			INNER JOIN tblPerson as M ON (M.intPersonID = C.intPersonID)
 		WHERE intClearanceID = $cID
 	];
 	my $query = $db->prepare($st) or query_error($st);
 	$query->execute or query_error($st);
 
-	my ($intMemberID, $intClubID, $intSourceClubID, $Gender, $DOBAgeGroup) = $query->fetchrow_array();
-	$intMemberID ||= 0;
+	my ($intPersonID, $intClubID, $intSourceClubID, $Gender, $DOBAgeGroup) = $query->fetchrow_array();
+	$intPersonID ||= 0;
 	$intClubID ||= 0;
 	$intSourceClubID ||= 0;
 	$Gender ||= 0;
 	$DOBAgeGroup ||= '';
 
-	return if ! $intMemberID or ! $intClubID;
+	return if ! $intPersonID or ! $intClubID;
 
 	my $genAgeGroup||=new GenAgeGroup ($Data->{'db'},$Data->{'Realm'}, $Data->{'RealmSubType'});
 	my $ageGroupID =$genAgeGroup->getAgeGroup($Gender, $DOBAgeGroup) || 0;
@@ -1295,7 +1295,7 @@ sub finaliseClearance	{
 	$st = qq[
 		SELECT intMemberClubID
 		FROM tblMember_Clubs
-		WHERE intMemberID = $intMemberID
+		WHERE intPersonID = $intPersonID
 			AND intClubID = $intClubID
 			AND intStatus = $Defs::RECSTATUS_ACTIVE
 		LIMIT 1
@@ -1307,14 +1307,14 @@ sub finaliseClearance	{
 
 	$st = qq[
 		INSERT INTO tblMember_Clubs
-		(intMemberID, intClubID, intStatus)
-		VALUES ($intMemberID, $intClubID, $Defs::RECSTATUS_ACTIVE)
+		(intPersonID, intClubID, intStatus)
+		VALUES ($intPersonID, $intClubID, $Defs::RECSTATUS_ACTIVE)
 	];
 
 	$st = qq[
 		UPDATE tblMember_Clubs
 		SET intStatus = $Defs::RECSTATUS_ACTIVE
-		WHERE intMemberID = $intMemberID
+		WHERE intPersonID = $intPersonID
 			AND intMemberClubID = $intMemberClubID
 	] if $intMemberClubID;
 	$db->do($st);
@@ -1323,7 +1323,7 @@ sub finaliseClearance	{
 		$st =qq[
 			UPDATE tblMember_Clubs
 			SET intStatus = $Defs::RECSTATUS_INACTIVE
-			WHERE intMemberID = $intMemberID
+			WHERE intPersonID = $intPersonID
 				AND intClubID = $intSourceClubID
 				AND intStatus = $Defs::RECSTATUS_ACTIVE
 		];
@@ -1333,7 +1333,7 @@ sub finaliseClearance	{
 		$st = qq[
 			SELECT intMemberTypeID
 			FROM tblMember_Types
-			WHERE intMemberID = $intMemberID 
+			WHERE intPersonID = $intPersonID 
 				AND intTypeID=$Defs::MEMBER_TYPE_PLAYER
 		];
 		my $query = $db->prepare($st) or query_error($st);
@@ -1350,15 +1350,15 @@ sub finaliseClearance	{
 		else	{
 			$st = qq[
 				INSERT INTO tblMember_Types
-				(intMemberID, intRecStatus, intTypeID)
-				VALUES ($intMemberID, $Defs::RECSTATUS_ACTIVE, $Defs::MEMBER_TYPE_PLAYER)
+				(intPersonID, intRecStatus, intTypeID)
+				VALUES ($intPersonID, $Defs::RECSTATUS_ACTIVE, $Defs::MEMBER_TYPE_PLAYER)
 			];
 			$db->do($st);
 		}
 		$st = qq[
 			UPDATE tblPerson
 			SET intPlayer = 1
-			WHERE intMemberID=$intMemberID
+			WHERE intPersonID=$intPersonID
 		];
 		$db->do($st);
 	
@@ -1366,7 +1366,7 @@ sub finaliseClearance	{
 	$st = qq[
 		UPDATE tblPerson
 		SET intStatus = $Defs::RECSTATUS_ACTIVE
-		WHERE intMemberID = $intMemberID
+		WHERE intPersonID = $intPersonID
 			AND intStatus = $Defs::RECSTATUS_DELETED
 		LIMIT 1
 	];
@@ -1382,14 +1382,14 @@ sub finaliseClearance	{
 		DELETE FROM tblMember_ClubsClearedOut
 		WHERE intRealmID = $Data->{'Realm'}
 			AND intClubID = $intClubID
-			AND intMemberID = $intMemberID
+			AND intPersonID = $intPersonID
 	];
 	$db->do($st);
 
 	$st = qq[
 	    INSERT INTO tblMember_ClubsClearedOut
-		(intRealmID, intClubID, intMemberID, intClearanceID)
-		VALUES ($Data->{'Realm'}, $intSourceClubID, $intMemberID, $cID)
+		(intRealmID, intClubID, intPersonID, intClearanceID)
+		VALUES ($Data->{'Realm'}, $intSourceClubID, $intPersonID, $cID)
 	];
 	$db->do($st);
 
@@ -1489,12 +1489,12 @@ sub createClearance	{
 			$strWhere .= qq[ AND MC.intClubID = $sourceClubID];
 		}
 
-		my $CLRD_OUT_JOIN = qq[ LEFT JOIN tblMember_ClubsClearedOut as CLRD_OUT ON (CLRD_OUT.intClubID = C.intClubID AND CLRD_OUT.intMemberID = M.intMemberID)];
-		my $CLRD_OUT_WHERE = ''; #$Data->{'SystemConfig'}{'Clearances_FilterClearedOut'} ? qq[ AND CLRD_OUT.intMemberID IS NULL] : '';
+		my $CLRD_OUT_JOIN = qq[ LEFT JOIN tblMember_ClubsClearedOut as CLRD_OUT ON (CLRD_OUT.intClubID = C.intClubID AND CLRD_OUT.intPersonID = M.intPersonID)];
+		my $CLRD_OUT_WHERE = ''; #$Data->{'SystemConfig'}{'Clearances_FilterClearedOut'} ? qq[ AND CLRD_OUT.intPersonID IS NULL] : '';
 
 		my $st = qq[
 			SELECT DISTINCT 
-                M.intMemberID, 
+                M.intPersonID, 
                 M.strLocalFirstname, 
                 M.strLocalSurname, 
                 M.strNationalNum, 
@@ -1505,12 +1505,12 @@ sub createClearance	{
                 DATE_FORMAT(MAX(CLR.dtFinalised),'%d/%m/%Y') AS CLR_DATE, 
                 IF(MC.intStatus = 1, 'Y', 'N') as Club_STATUS, 
                 DATE_FORMAT(MA.dtLastRegistered, '%d/%m/%Y') AS LastRegistered, 
-                CLRD_OUT.intMemberID as CLRD_ID, 
+                CLRD_OUT.intPersonID as CLRD_ID, 
                 MAX(MC.intPrimaryClub) as PrimaryClub
 			FROM tblPerson as M 
-				INNER JOIN tblMember_Clubs as MC ON (MC.intMemberID = M.intMemberID)
+				INNER JOIN tblMember_Clubs as MC ON (MC.intPersonID = M.intPersonID)
 				INNER JOIN tblEntity as C ON (C.intEntityID= MC.intClubID)
-				LEFT JOIN tblClearance as CLR ON (CLR.intMemberID = M.intMemberID AND CLR.intDestinationClubID = C.intClubID)
+				LEFT JOIN tblClearance as CLR ON (CLR.intPersonID = M.intPersonID AND CLR.intDestinationClubID = C.intClubID)
 				$CLRD_OUT_JOIN
 			WHERE 
                 M.intRealmID = $Data->{'Realm'}
@@ -1519,12 +1519,12 @@ sub createClearance	{
 				AND MC.intStatus <> $Defs::RECSTATUS_DELETED
 				$strWhere
 				$CLRD_OUT_WHERE
-			GROUP BY M.intMemberID, C.intClubID
+			GROUP BY M.intPersonID, C.intClubID
 			ORDER BY MAX(CLR.dtFinalised) DESC, M.strLocalSurname, M.strLocalFirstname, M.dtDOB
 		];
 		
 		my $userID=getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'}) || 0;
-		$CLRD_OUT_JOIN = qq[ LEFT JOIN tblMember_ClubsClearedOut as CLRD_OUT ON (CLRD_OUT.intClubID = C.intClubID AND CLRD_OUT.intMemberID = M.intMemberID)];
+		$CLRD_OUT_JOIN = qq[ LEFT JOIN tblMember_ClubsClearedOut as CLRD_OUT ON (CLRD_OUT.intClubID = C.intClubID AND CLRD_OUT.intPersonID = M.intPersonID)];
 
 		my $query = $db->prepare($st) or query_error($st);
 	    $query->execute or query_error($st);
@@ -1566,7 +1566,7 @@ sub createClearance	{
 				$body .= qq[<td><b>CLEARED OUT</b></td>];
 			}
 			else	{
-				$body .= qq[<td><a href="$Data->{'target'}?$href&amp;memberID=$dref->{intMemberID}">select</a></td>];
+				$body .= qq[<td><a href="$Data->{'target'}?$href&amp;memberID=$dref->{intPersonID}">select</a></td>];
 			}
 			$body .= qq[
 					<td>$dref->{strLocalSurname}</td>
@@ -1627,7 +1627,7 @@ sub clearanceForm	{
             *,     
             DATE_FORMAT(dtDOB,'%d/%m/%Y') AS DOB
 		FROM tblPerson 
-		WHERE intMemberID = $memberID
+		WHERE intPersonID = $memberID
 	];
 	my $query = $db->prepare($statement);
 	$query->execute;
@@ -1655,7 +1655,7 @@ sub clearanceForm	{
 	my $intClearanceYear =$Data->{'SystemConfig'}{'clrClearanceYear'} || 0;
 
     my $clradd=qq[
-        INSERT INTO tblClearance (intMemberID, intDestinationClubID, intSourceClubID, intRealmID, --FIELDS--, dtApplied, intClearanceStatus, intRecStatus, intClearanceYear )
+        INSERT INTO tblClearance (intPersonID, intDestinationClubID, intSourceClubID, intRealmID, --FIELDS--, dtApplied, intClearanceStatus, intRecStatus, intClearanceYear )
             VALUES ($memberID, $destinationClubID, $sourceClubID, $realm, --VAL--,  SYSDATE(), $Defs::CLR_STATUS_PENDING, $Defs::RECSTATUS_ACTIVE,  $intClearanceYear)
     ];
 
@@ -1843,7 +1843,7 @@ sub preClearanceAdd	{
 				tblClearance as C
 				LEFT JOIN tblEntity as C1 ON (C1.intEntityID = C.intDestinationClubID and C1.intEntityLevel = $Defs::LEVEL_CLUB)
 				LEFT JOIN tblEntity as C2 ON (C2.intEntityID = C.intSourceClubID and C2.intEntityLevel = $Defs::LEVEL_CLUB)
-		WHERE intMemberID = $memberID
+		WHERE intPersonID = $memberID
 			AND  intClearanceStatus = $Defs::CLR_STATUS_PENDING
 			AND intCreatedFrom =0
 	];
@@ -2070,7 +2070,7 @@ sub clearanceAddManual	{
             *, 
             DATE_FORMAT(dtDOB,'%d/%m/%Y') AS DOB
 		FROM tblPerson 
-		WHERE intMemberID = $memberID
+		WHERE intPersonID = $memberID
 	];
 	my $query = $db->prepare($statement);
 	$query->execute;
@@ -2087,7 +2087,7 @@ sub clearanceAddManual	{
             DATE_FORMAT(dtApplied,'%d/%m/%Y') AS dtApplied
 		FROM tblClearance
 		WHERE intClearanceID=$id
-			AND intMemberID = $memberID
+			AND intPersonID = $memberID
 			AND intCreatedFrom = $Defs::CLR_TYPE_MANUAL
 	];
 
@@ -2099,12 +2099,12 @@ sub clearanceAddManual	{
 		UPDATE tblClearance
 			SET --VAL--
 		WHERE intClearanceID=$id
-			AND intMemberID = $memberID
+			AND intPersonID = $memberID
 			AND intCreatedFrom = $Defs::CLR_TYPE_MANUAL
 	];
 	my $intClearanceYear = $Data->{'SystemConfig'}{'clrClearanceYear'} || 0;
     my $clradd=qq[
-        INSERT INTO tblClearance (intMemberID, intRealmID, --FIELDS--, dtApplied, intClearanceStatus, intCreatedFrom, intRecStatus, intClearanceYear)
+        INSERT INTO tblClearance (intPersonID, intRealmID, --FIELDS--, dtApplied, intClearanceStatus, intCreatedFrom, intRecStatus, intClearanceYear)
         VALUES ($memberID, $realm, --VAL--,  SYSDATE(), $Defs::CLR_STATUS_APPROVED, 2, $Defs::RECSTATUS_ACTIVE, $intClearanceYear)
     ];
 
@@ -2282,7 +2282,7 @@ sub sendCLREmail	{
             C.strReasonForClearance
 		FROM tblClearance as C
 			INNER JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID)
-			INNER JOIN tblPerson as M ON (M.intMemberID = C.intMemberID)
+			INNER JOIN tblPerson as M ON (M.intPersonID = C.intPersonID)
 			LEFT JOIN tblEntity as C1 ON (C1.intEntityID = C.intDestinationClubID and C1.intEntityLevel = $Defs::LEVEL_CLUB)
 			LEFT JOIN tblEntity as C2 ON (C2.intEntityID = C.intSourceClubID and C2.intEntityLevel = $Defs::LEVEL_CLUB)
             LEFT JOIN tblDefCodes as DC ON (DC.intCodeID = CP.intDenialReasonID)
@@ -2464,7 +2464,7 @@ sub postManualClrAction	{
 			INSERT INTO tblMember_ClubsClearedOut (
 				intRealmID, 
 				intClubID, 
-				intMemberID, 
+				intPersonID, 
 				intClearanceID 
 			)
                 	VALUES (
@@ -2481,7 +2481,7 @@ sub postManualClrAction	{
                         SET
                                 intStatus = $Defs::RECSTATUS_INACTIVE
                         WHERE
-                                intMemberID = $memberID
+                                intPersonID = $memberID
                                 AND intClubID = $clubID
                                 AND intStatus = $Defs::RECSTATUS_ACTIVE
                 ];
@@ -2495,7 +2495,7 @@ sub postManualClrAction	{
                 	WHERE 
 				intRealmID = $Data->{'Realm'}
                         	AND intClubID = $clubID
-                        	AND intMemberID = $memberID
+                        	AND intPersonID = $memberID
 		];
 		$db->do($st);
 
@@ -2505,7 +2505,7 @@ sub postManualClrAction	{
                         SET
                                 intStatus = $Defs::RECSTATUS_ACTIVE
                         WHERE
-                                intMemberID = $memberID
+                                intPersonID = $memberID
                                 AND intClubID = $clubID
                                 AND intStatus = $Defs::RECSTATUS_INACTIVE
                         LIMIT 1
