@@ -26,7 +26,7 @@ sub handleClearanceSettings	{
 
 ### NOTES: Any level can have 0 to many clearance setting records.  These record handle what to do when a clearance reaches them.  The levels can approve, deny and/or apply fees.  They can do this based on a Date of Birth range.  So for example members born between 1980-1-1 and 1990-1-1 are given one settings record and people born before another.
 
-### This is launched from the Clearance Settings link on each level (and within red-spanner for Assoc level).
+### This is launched from the Clearance Settings link on each level (and within red-spanner for level).
 
 	my($action, $Data)=@_;
 
@@ -110,10 +110,8 @@ sub displayClearanceSetting	{
 
 	my %DataVals=();
 	my $statement=qq[
-		SELECT CS.*, DATE_FORMAT(dtDOBStart,'%d/%m/%Y') AS dtDOBStart, DATE_FORMAT(dtDOBEnd,'%d/%m/%Y') AS dtDOBEnd,
-            A.strName as AssocName
+		SELECT CS.*, DATE_FORMAT(dtDOBStart,'%d/%m/%Y') AS dtDOBStart, DATE_FORMAT(dtDOBEnd,'%d/%m/%Y') AS dtDOBEnd
 		FROM tblClearanceSettings as CS
-            LEFT JOIN tblAssoc as A ON (A.intAssocID=CS.intCheckAssocID)
 		WHERE intClearanceSettingID = $csID
 			AND intID = $ID
 	];
@@ -174,24 +172,11 @@ sub displayClearanceSetting	{
                                         datetype => 'dropdown',
 					                    validate => 'DATE',
                                 },
-                                intCheckAssocID=> {
-                                        label => "Override all rules with $Data->{LevelNames}{$Defs::LEVEL_ASSOC} ID",
-                                        value=> $dref->{'intCheckAssocID'},
-                                        type => 'text',
-                                        size => 5,
-                                },
                                 intPrimaryApprover=> {
                                         label =>  ($Data->{'clientValues'}{'currentLevel'} >= $Defs::LEVEL_NATIONAL) ? "Make us the Primary Approver?" : '',
                                         value=> $dref->{'intPrimaryApprover'},
                                         type => 'checkbox',
                                         size => 5,
-                                },
-                                AssocName=> {
-                                        label => "Override $Data->{LevelNames}{$Defs::LEVEL_ASSOC} Name",
-                                        value=> $dref->{'AssocName'},
-                                        type => 'text',
-                                        override=>'1',
-                                        readonly=>'1',
                                 },
 								intClearanceType => {
                                         label => $intPermits ? "Rule for $txt_Clr Type" : '',
@@ -203,7 +188,7 @@ sub displayClearanceSetting	{
 										default => 0,
                                 }
 		},
-		order => [qw(intCheckAssocID AssocName intPrimaryApprover intAutoApproval intRuleDirection curDefaultFee dtDOBStart dtDOBEnd intClearanceType)],
+		order => [qw(intPrimaryApprover intAutoApproval intRuleDirection curDefaultFee dtDOBStart dtDOBEnd intClearanceType)],
 			options => {
 				labelsuffix => ':',
 				hideblank => 1,
