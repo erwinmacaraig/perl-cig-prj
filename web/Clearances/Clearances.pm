@@ -996,7 +996,7 @@ sub memberLink	{
 	if ($dref->{intClearanceID} and $dref->{intPersonID} and $dref->{intClearanceStatus} == $Defs::CLR_STATUS_APPROVED)	{
  		my %tempClientValues = %{$Data->{clientValues}};
         $tempClientValues{memberID} = $dref->{intPersonID};
-        $tempClientValues{currentLevel} = $Defs::LEVEL_MEMBER;
+        $tempClientValues{currentLevel} = $Defs::LEVEL_PERSON;
         my $tempClient = setClient(\%tempClientValues);
 		return qq[ <div class="OKmsg">] . $lang->txt('The transfer has now been finalised') . qq[</div><br><a href="$Data->{'target'}?client=$tempClient&amp;a=M_HOME">] . $lang->txt('click here to display persons record') . qq[</a>];
 

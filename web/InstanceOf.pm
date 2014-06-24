@@ -72,8 +72,8 @@ sub getInstanceOf	{
 	}
 	elsif($type eq 'entity')	{
 		return undef if !$idIN;
-		my $id = $idIN;
-		return undef if !$id == $Defs::INVALID_ID;
+		my $id = $idIN || $Defs::INVALID_ID;
+		return undef if $id == $Defs::INVALID_ID;
 
 		$obj = $cache->get('swm',"EntityObj-$id") if $cache;
 			if(!$obj)	{

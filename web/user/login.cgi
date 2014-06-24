@@ -38,6 +38,7 @@ sub main {
 warn("TEST :$sessionKey:");
     my $body = '';
     if($sessionKey) {
+warn("IN HERE $Defs::COOKIE_LOGIN");
         push @{$Data{'WriteCookies'}}, [
             $Defs::COOKIE_LOGIN,
             $sessionKey,

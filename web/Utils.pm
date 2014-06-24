@@ -41,7 +41,7 @@ sub connectDB {
     ? $Defs::DB_DSN_REPORTING
     : $Defs::DB_DSN;
 
-    DEBUG '[', caller, "] connect DB $dsn";
+    #DEBUG '[', caller, "] connect DB $dsn";
     my $db = DBI->connect($dsn, $Defs::DB_USER, $Defs::DB_PASSWD);
 
     if (!defined $db) { return "Database Error"; }
