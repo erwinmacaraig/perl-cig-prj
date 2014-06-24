@@ -30,25 +30,23 @@ sub handleClearances	{
     ### PURPOSE: main function to handle clearances.
 
 	my($action,$Data)=@_;
-
-	
+    my $lang = $Data->{'lang'};
 	my $q=new CGI;
     my %params=$q->Vars();
 
 	my $clearanceID = $params{'cID'} || 0;
 	my $clearancePathID = $params{'cpID'} || 0;
-	my $txt_RequestCLR = $Data->{'SystemConfig'}{'txtRequestCLR'} || 'Request a Clearance';
-	my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
+	my $txt_RequestCLR = $lang->txt('Request a Transfer');
 
 	return (createClearance($action, $Data), $txt_RequestCLR) if $action eq 'CL_createnew';
-	return (clearancePathDetails($Data, $clearanceID, $clearancePathID), 'Clearance Status Selection') if $action eq 'CL_details';
+	return (clearancePathDetails($Data, $clearanceID, $clearancePathID), $lang->txt('Transfer Status Selection')) if $action eq 'CL_details';
 	return (listClearances($Data), $txt_RequestCLR) if $action eq 'CL_list';
 	return (listOfflineClearances($Data), $txt_RequestCLR) if $action eq 'CL_offlist';
-	return (clearanceView($Data, $clearanceID), 'Clearance Details') if $action eq 'CL_view';
-	return (clearanceCancel($Data, $clearanceID), "Cancel $txt_Clr") if $action eq 'CL_cancel';
-	return (clearanceReopen($Data, $clearanceID), "Reopen $txt_Clr") if $action eq 'CL_reopen';
-	return (clearanceAddManual($Data), "Add Manual $txt_Clr") if $action eq 'CL_addmanual';
-	return (clearanceAddManual($Data), "Edit Manual $txt_Clr") if $action eq 'CL_editmanual';
+	return (clearanceView($Data, $clearanceID), $lang->txt('Clearance Details')) if $action eq 'CL_view';
+	return (clearanceCancel($Data, $clearanceID), $lang->txt('Cancel Transfer')) if $action eq 'CL_cancel';
+	return (clearanceReopen($Data, $clearanceID), $lang->txt('Reopen Transfer')) if $action eq 'CL_reopen';
+	return (clearanceAddManual($Data), $lang->txt("Add Manual Transfer")) if $action eq 'CL_addmanual';
+	return (clearanceAddManual($Data), $lang->txt("Edit Manual Transfer")) if $action eq 'CL_editmanual';
 }
 
 sub clearanceCancel	{
@@ -57,9 +55,10 @@ sub clearanceCancel	{
 
 	my ($Data, $clearanceID) = @_;
 	my $db = $Data->{'db'};
+    my $lang = $Data->{'lang'};
 	$clearanceID ||= 0;
 	my $clubID = $Data->{'clientValues'}{'clubID'} || 0;
-	return qq[Clearance Unabled to be cancelled] if (! $clubID or ! $clearanceID);
+	return $lang->txt("Transfer unable to be cancelled") if (! $clubID or ! $clearanceID);
   	my $client=setClient($Data->{'clientValues'}) || '';
 
 	 my $st = qq[
@@ -94,7 +93,7 @@ sub clearanceCancel	{
 	sendCLREmail($Data, $clearanceID, 'CANCELLED');
 	my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
     auditLog($clearanceID, $Data, 'Cancelled','Clearance');
-	return qq[<p>$txt_Clr Cancelled</p><br> <a href="$Data->{'target'}?a=CL_list&amp;client=$client">Return to $txt_Clr Listing</a> ] ;
+	return qq[<p>] . $lang->txt("Transfer Cancelled") . qq[</p><br> <a href="$Data->{'target'}?a=CL_list&amp;client=$client">] . $lang->txt('Return to Transfer Listing') . qq[</a>];
 }
 
 sub clearanceReopen	{
@@ -106,8 +105,8 @@ sub clearanceReopen	{
 	my $db = $Data->{'db'};
 	$clearanceID ||= 0;
 	my $clubID = $Data->{'clientValues'}{'clubID'} || 0;
-	my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
-	return qq[$txt_Clr Unabled to be cancelled] if (! $clubID or ! $clearanceID);
+    my $lang = $Data->{'lang'};
+	return $lang->txt('Transfer unable to be Reopened') if (! $clubID or ! $clearanceID);
   	my $client=setClient($Data->{'clientValues'}) || '';
 
     my $st = qq[
@@ -168,15 +167,15 @@ AND  C.intClearanceStatus = $Defs::CLR_STATUS_PENDING
 		$dref->{DestinationEmail} = $destination_contact_email;
 		$dref->{DestinationContact} = $destination_contact_name;
 		return qq[
-			<div class="warningmsg">The selected member is already involved in a pending clearance.  Unable to continue until the below transaction is finalised.</div>
+			<div class="warningmsg">]. $lang->txt('The selected member is already involved in a pending clearance.  Unable to continue until the below transaction is finalised.') . qq[</div>
 			<p>
-					<b>Date Requested:</b> $dref->{AppliedDate}<br>
-					<b>Requested From:</b> $dref->{SourceClubName} ($source_contact_name)<br>
-					$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Contact: $dref->{SourceContact}<br>
-					Phone: $dref->{SourcePh}&nbsp;&nbsp;Email:  $dref->{SourceEmail}<br>
-					<b>Request To:</b> $dref->{DestinationClubName}<br>
-					$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Contact: $dref->{DestinationContact}<br>
-					Phone: $dref->{DestinationPh}&nbsp;&nbsp;Email: $dref->{DestinationEmail}<br>
+					<b>] . $lang->txt('Date Requested') . qq[:</b> $dref->{AppliedDate}<br>
+					<b>] . $lang->txt('Requested From') . qq[:</b> $dref->{SourceClubName} ($source_contact_name)<br>
+					$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} ] . $lang->txt('Contact') . qq[: $dref->{SourceContact}<br>
+					] . $lang->txt('Phone') . qq[: $dref->{SourcePh}&nbsp;&nbsp;] . $lang->txt('Email') . qq[:  $dref->{SourceEmail}<br>
+					<b>] . $lang->txt('Request To') . qq[:</b> $dref->{DestinationClubName}<br>
+					$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} ] . $lang->txt('Contact') . qq[: $dref->{DestinationContact}<br>
+					] . $lang->txt('Phone') . qq[: $dref->{DestinationPh}&nbsp;&nbsp;] . $lang->txt('Email') . qq[: $dref->{DestinationEmail}<br>
 				</p>
 			];
 
@@ -199,8 +198,8 @@ AND  C.intClearanceStatus = $Defs::CLR_STATUS_PENDING
 	$db->do($st);
 
 	sendCLREmail($Data, $clearanceID, 'REOPEN');
-    auditLog($clearanceID, $Data, 'Reopen','Clearance');
-	return qq[<p>$txt_Clr Reopened</p><br> <a href="$Data->{'target'}?a=CL_list&amp;client=$client">Return to $txt_Clr Listing</a> ] ;
+    auditLog($clearanceID, $Data, $lang->txt('Reopen'). $lang->txt('Transfer'));
+	return qq[<p>] . $lang->txt('Transfer Reopened') . qq[</p><br> <a href="$Data->{'target'}?a=CL_list&amp;client=$client">] . $lang->txt('Return to Transfer Listing') . qq[</a>];
 }
 
 sub clearanceHistory	{
@@ -211,6 +210,7 @@ sub clearanceHistory	{
 
 	my ($Data, $intPersonID) = @_;
 	$intPersonID ||= 0;
+    my $lang = $Data->{'lang'};
 	return '' if ! $intPersonID;
 
 	my $db = $Data->{'db'};
@@ -232,35 +232,33 @@ sub clearanceHistory	{
     	my $query = $db->prepare($st) or query_error($st);
     	$query->execute or query_error($st);
 	
-	my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
-
 	my @headerdata = (
     {
       type => 'Selector',
       field => 'SelectLink',
     },
     {
-      name => 'Ref. No.',
+      name => $lang->txt('Transfer No.'),
       field => 'intClearanceID',
     },	
     {
-      name => 'Date',
+      name => $lang->txt('Date'),
       field => 'dtApplied',
     },	
     {
-      name => 'From Club',
+      name => $lang->txt('From Club'),
       field => 'sourceDetails',
     },	
     {
-      name => 'To Club',
+      name => $lang->txt('To Club'),
       field => 'destinationDetails',
     },	
     {
-      name => 'Status',
+      name => $lang->txt('Status'),
       field => 'status',
     },	
     {
-      name => 'Type',
+      name => $lang->txt('Type'),
       field => 'type',
     },	
 	);
@@ -304,9 +302,9 @@ sub clearanceHistory	{
       width => '99%',
       height => 700,
     );
-	$body =qq[<div class="warningmsg">No $txt_Clr History found</div>] if ! $count;
+	$body =qq[<div class="warningmsg">]. $lang->txt('No Transfer History found') . qq[</div>] if ! $count;
 
-	my $addManual = qq[<a href="$Data->{'target'}?client=$client&amp;a=CL_addmanual">Add manual $txt_Clr History</a>];
+	my $addManual = qq[<a href="$Data->{'target'}?client=$client&amp;a=CL_addmanual">] . $lang->txt('Add manual Transfer History') . qq[</a>];
 	$body = qq[$addManual$body];
 	return $body;
 }
@@ -319,6 +317,7 @@ sub clearanceView	{
 	my ($Data, $cID) = @_;
 
 	my $db = $Data->{'db'};
+    my $lang = $Data->{'lang'};
 	my $body;
 
 	my $st = qq[
@@ -330,8 +329,7 @@ sub clearanceView	{
                     DestinationClub.strLocalName as DestinationClubName, 
                     M.strState, 
                     DATE_FORMAT(M.dtDOB,'%d/%m/%Y') AS dtDOB, 
-                    strNationalNum,  
-                    CP.strOtherDetails1
+                    strNationalNum  
                 FROM tblClearance as C
                     INNER JOIN tblPerson as M ON (M.intPersonID = C.intPersonID)
 			        LEFT JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID)
@@ -386,121 +384,110 @@ sub clearanceView	{
 	my $strFilingNumber = ($Data->{'SystemConfig'}{'clrHide_strFilingNumber'} == 1) ? '1' : '0';
 	my $intClearancePriority= ($Data->{'SystemConfig'}{'clrHide_intClearancePriority'}==1) ? '1' : '0';
 	my $strReason=($Data->{'SystemConfig'}{'clrHide_strReason'}==1) ? '1' : '0';
-	my $OtherDetails1= ($Data->{'SystemConfig'}{'clrOtherDetails1_Label'}) ? '0' : '1';
 	
 	$update_label = '' if $readonly;
 
-	my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
 	my %FieldDefs = (
 		CLR => {
 			fields => {
 				NatNum=> {
 					label => $Data->{'SystemConfig'}{'NationalNumName'},
 					value => $dref->{'strNationalNum'},
-                                        type  => 'text',
+                    type  => 'text',
 					readonly => '1',
-                		},
+                },
 				ClearanceID=> {
-                                        label => "$txt_Clr Ref. No.",
+                    label => $lang->txt("Transfer No."),
 					value => $dref->{'intClearanceID'},
-                                        type  => 'text',
+                    type  => 'text',
 					readonly => '1',
-                		},
+                },
 				dtApplied=> {
-					label => 'Application Date',
+					label => $lang->txt('Application Date'),
 					value => $dref->{'dtApplied'},
-                                        type  => 'text',
+                    type  => 'text',
 					readonly => '1',
 				},	
 				MemberName=> {
-					label => 'Member being Cleared',
+					label => $lang->txt('Person being Transferred'),
 					value => $dref->{'MemberName'},
-                                        type  => 'text',
+                    type  => 'text',
 					readonly => '1',
-                		},
+                },
 				dtDOB => {
-					label => 'Date of birth',
+					label => $lang->txt('Date of Birth'),
 					value => $dref->{'dtDOB'},
-                                        type  => 'text',
+                    type  => 'text',
 					readonly => '1',
 				},	
 				strState=> {
-					label => 'Address State',
+					label => $lang->txt('State'),
 					value => $dref->{'strState'},
-                                        type  => 'text',
+                    type  => 'text',
 					readonly => '1',
-                		},
+                },
 				SourceClubName => {
-					label => 'From Club',
+					label => $lang->txt('From Club'),
 					value => $dref->{'SourceClubName'},
-                                        type  => 'text',
+                    type  => 'text',
 					readonly => '1',
 				},
 				DestinationClubName => {
-					label => 'To Club',
+					label => $lang->txt('To Club'),
 					value => $dref->{'DestinationClubName'},
                     type  => 'text',
 					readonly => '1',
 
 				},
 				ClearanceStatus => {
-					label => "Overall $txt_Clr Status",
+					label => $lang->txt('Overall Transfer Status'),
 					value => qq[<b>$Defs::clearance_status{$dref->{intClearanceStatus}}</b>],
-                                        type  => 'text',
+                    type  => 'text',
 					readonly => '1',
 				},
 				ClearancePriority => {
-					label => "$txt_Clr Priority",
+					label => $lang->txt('Transfer Priority'),
 					value => $Defs::clearance_priority{$dref->{intClearancePriority}},
-                                        type  => 'text',
+                    type  => 'text',
 					readonly => '1',
 					nodisplay=>$intClearancePriority,
 					noadd=>$intClearancePriority,
 					noedit=>$intClearancePriority,
 				},
-				strOtherDetails1=> {
-					label => $Data->{'SystemConfig'}{'clrOtherDetails1_Label'},
-					value => $dref->{strOtherDetails1},
-                                        type  => 'text',
-					readonly => '1',
-					nodisplay=>$OtherDetails1,
-					noadd=>$OtherDetails1,
-					noedit=>$OtherDetails1,
-				},
 				intReasonForClearanceID => {
-        				label => "Reason for $txt_Clr",
-				        value => $dref->{intReasonForClearanceID},
-				        type  => 'lookup',
-        				options => $DefCodes->{-37},
-        				order => $DefCodesOrder->{-37},
-					firstoption => ['',"Choose Reason"],
+					label => $lang->txt('Reason for Transfer'),
+				    value => $dref->{intReasonForClearanceID},
+				    type  => 'lookup',
+        			options => $DefCodes->{-37},
+        		    order => $DefCodesOrder->{-37},
+					firstoption => ['',$lang->txt("Choose Reason")],
 					readonly => '1',
 					nodisplay=>$intReasonForClearanceID,
 					noadd=>$intReasonForClearanceID,
 					noedit=>$intReasonForClearanceID,
 	      			},
 				strReasonForClearance=> {
-					label => 'Additional Information',
+					label => $lang->txt('Additional Information'),
 					type => 'textarea',
 					value => $dref->{'strReasonForClearance'},
 					rows => 5,
-                			cols=> 45,
+                	cols=> 45,
 					readonly=>$readonly,
 					nodisplay=>$strReasonForClearance,
 					noadd=>$strReasonForClearance,
 					noedit=>$strReasonForClearance,
 				},
 				strReason=>	{
-					label => 'Reason for Clearance',
-                                        value => $dref->{'strReason'},
-                                        type  => 'text',
+					label => $lang->txt('Reason for Transfer'),
+                    value => $dref->{'strReason'},
+                    type  => 'text',
 					readonly => '1',
 					nodisplay=>$strReason,
 					noadd=>$strReason,
 					noedit=>$strReason,
 				},
 			},
-		order => [qw(ClearanceID dtApplied NatNum MemberName dtDOB strState SourceClubName DestinationClubName ClearanceStatus strOtherDetails1 ClearancePriority ClearanceReason intReasonForClearanceID strReason strReasonForClearance)],
+		order => [qw(ClearanceID dtApplied NatNum MemberName dtDOB strState SourceClubName DestinationClubName ClearanceStatus ClearancePriority ClearanceReason intReasonForClearanceID strReason strReasonForClearance)],
 			options => {
 				labelsuffix => ':',
 				hideblank => 1,
@@ -511,13 +498,11 @@ sub clearanceView	{
 				buttonloc => 'bottom',
 				updateSQL => $clrupdate,
 				afterupdateFunction => \&postClearanceUpdate,
-                        	afterupdateParams => [$option,$Data,$Data->{'db'}, $cID],
+                afterupdateParams => [$option,$Data,$Data->{'db'}, $cID],
 				stopAfterAction => 1,
-				updateOKtext => qq[
-                                        <div class="OKmsg">Record updated successfully</div> <br>                                        <a href="$Data->{'target'}?client=$client&amp;a=CL_view&amp;cID=$cID">Return to Clearance</a>
-                                ],
+				updateOKtext => qq[<div class="OKmsg">] . $lang->txt('Record updated successfully') . qq[</div> <br>                                        <a href="$Data->{'target'}?client=$client&amp;a=CL_view&amp;cID=$cID">] . $lang->txt('Return to Transfer') . qq[</a>],
 			},
-			sections => [ ['main','Details'], ],
+			sections => [ ['main',$lang->txt('Details')], ],
 			carryfields =>  {
 				client => $client,
 				a=> 'CL_view',
@@ -531,16 +516,16 @@ sub clearanceView	{
 
 
 	if ($dref->{intCreatedFrom} == 0)	{
-		$resultHTML .= qq[<a href="$Data->{'target'}?client=$client&amp;cID=$cID&amp;a=CL_cancel">Cancel $txt_Clr</a>] if ($dref->{intDestinationClubID} == $Data->{'clientValues'}{'clubID'} and $dref->{intClearanceStatus} != $Defs::CLR_STATUS_CANCELLED and $dref->{intClearanceStatus} != $Defs::CLR_STATUS_APPROVED);
-		$resultHTML .= qq[<a href="$Data->{'target'}?client=$client&amp;cID=$cID&amp;a=CL_reopen">Reopen Cancelled $txt_Clr</a>] if ($dref->{intDestinationClubID} == $Data->{'clientValues'}{'clubID'} and $dref->{intClearanceStatus} == $Defs::CLR_STATUS_CANCELLED);
+		$resultHTML .= qq[<a href="$Data->{'target'}?client=$client&amp;cID=$cID&amp;a=CL_cancel">] . $lang->txt('Cancel Transfer') . qq[</a>] if ($dref->{intDestinationClubID} == $Data->{'clientValues'}{'clubID'} and $dref->{intClearanceStatus} != $Defs::CLR_STATUS_CANCELLED and $dref->{intClearanceStatus} != $Defs::CLR_STATUS_APPROVED);
+		$resultHTML .= qq[<a href="$Data->{'target'}?client=$client&amp;cID=$cID&amp;a=CL_reopen">] . $lang->txt('Reopen Cancelled Transfer') . qq[</a>] if ($dref->{intDestinationClubID} == $Data->{'clientValues'}{'clubID'} and $dref->{intClearanceStatus} == $Defs::CLR_STATUS_CANCELLED);
 		$resultHTML .= showPathDetails($Data, $cID, $dref->{intClearanceStatus});
 	}
 	else	{
-		$resultHTML .= qq[<br><div class="warningmsg">No path details can be shown as this clearance was created offline or is a Manual $txt_Clr History record</div>];
+		$resultHTML .= qq[<br><div class="warningmsg">] . $lang->txt('No path details can be shown as this Transfer was created offline or it is a Manual Transfer History record') . qq[</div>];
 	}
 
 	if($option eq 'display')	{
-		$resultHTML .=qq[<br><a href="$target?a=CL_list&amp;client=$client">Return to $txt_Clr Listing</a> ] ;
+		$resultHTML .=qq[<br><a href="$target?a=CL_list&amp;client=$client">] . $lang->txt('Return to Transfer Listing') . qq[</a> ] ;
 	}
 
 	$resultHTML=qq[
@@ -549,54 +534,52 @@ sub clearanceView	{
 				$resultHTML
 			</div>
 	];
-	my $heading=qq[$txt_Clr Summary];
+	my $heading=$lang->txt('Transfer Summary');
 	return ($resultHTML,$heading);
 
 }
 
 sub postClearanceUpdate	{
 
- my($id,$params, $action,$Data,$db, $cID)=@_;
-        $cID||=0;
-        $id||=$cID;
-        return (0,undef) if !$db;
+    my($id,$params, $action,$Data,$db, $cID)=@_;
+    $cID||=0;
+    $id||=$cID;
+    return (0,undef) if !$db;
 
-	 my $st = qq[
-                SELECT
+	my $st = qq[
+        SELECT
 			intPersonID,
 			intDestinationClubID,
 			intSourceClubID
-                FROM 
+         FROM 
 			tblClearance
-                WHERE 
+         WHERE 
 			intClearanceID = $id
-        ];
-        my $qry= $db->prepare($st);
-        $qry->execute or query_error($st);
-        my ($intPersonID, $intToClubID, $intFromClubID) = $qry->fetchrow_array();
-	## If in past then set as inactive
-		### ROLL BACK MEMBER
-		 my $st_updateSource = qq[
-                        UPDATE
-                                tblMember_Clubs
-                        SET
-                                intStatus = $Defs::RECSTATUS_ACTIVE
-                        WHERE
-                                intPersonID = $intPersonID
-                                AND intClubID = $intFromClubID
-                                AND intStatus = $Defs::RECSTATUS_INACTIVE
-                        LIMIT 1
-                ];
-                $db->do($st_updateSource);
-                my $st_clubsCleared = qq[
-                        DELETE
-                        FROM
-                                tblMember_ClubsClearedOut
-                        WHERE
-                                intPersonID = $intPersonID
-                                AND intClubID = $intFromClubID
-                ];
-                $db->do($st_clubsCleared);
+    ];
+    my $qry= $db->prepare($st);
+    $qry->execute or query_error($st);
+    my ($intPersonID, $intToClubID, $intFromClubID) = $qry->fetchrow_array();
+	my $st_updateSource = qq[
+        UPDATE
+            tblMember_Clubs
+        SET
+            intStatus = $Defs::RECSTATUS_ACTIVE
+        WHERE
+            intPersonID = $intPersonID
+            AND intClubID = $intFromClubID
+            AND intStatus = $Defs::RECSTATUS_INACTIVE
+        LIMIT 1
+    ];
+    $db->do($st_updateSource);
+    my $st_clubsCleared = qq[
+        DELETE
+        FROM
+            tblMember_ClubsClearedOut
+        WHERE
+            intPersonID = $intPersonID
+            AND intClubID = $intFromClubID
+    ];
+    $db->do($st_clubsCleared);
 }
 
 sub showPathDetails	{
@@ -606,6 +589,7 @@ sub showPathDetails	{
 ### If the destination club (who requested clearance) have cancelled the clearance, this function has the "REOPEN" option set against the status column.
 
 	my ($Data, $cID, $clearanceStatus) = @_;
+    my $lang = $Data->{'lang'};
 
   	my $client=setClient($Data->{'clientValues'}) || '';
 	$cID ||= 0;
@@ -624,8 +608,8 @@ sub showPathDetails	{
 		WHERE CP.intClearanceID = $cID
 		ORDER BY intOrder
 	];
-    	my $query = $db->prepare($st) or query_error($st);
-    	$query->execute or query_error($st);
+    my $query = $db->prepare($st) or query_error($st);
+    $query->execute or query_error($st);
 
 	my $body = '';
 
@@ -636,27 +620,16 @@ sub showPathDetails	{
         onlyTypes  => '-38',
     );
        
-	my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
-				#<th>Level</th>
 	$body .= qq[
-        	<div class="sectionheader">$txt_Clr Approval Details</div>
+        	<div class="sectionheader">] . $lang->txt('Transfer Approval Details') . qq[</div>
                 <table class="listTable">
 			<tr>
-				<th>Name</th>
-				<th>$txt_Clr Status</th>
-	];
-	$body .= qq[
-				<th>Approved By</th>
-	] if (! $Data->{'SystemConfig'}{'clrHide_strApprovedBy'});
-	$body .= qq[
-				<th>Denial Reason</th>
-	] if (! $Data->{'SystemConfig'}{'clrHide_intDenialReasonID'});
-	$body .= qq[
-				<th>$Data->{'SystemConfig'}{'clrOtherDetails1_Label'}</th>
-	] if ($Data->{'SystemConfig'}{'clrOtherDetails1_Label'});
-	$body .= qq[
-				<th>Additional Information</th>
-				<th>Time Updated</th>
+				<th>] . $lang->txt('Name') .qq[</th>
+				<th>] . $lang->txt('Transfer Status') .qq[</th>
+				<th>] . $lang->txt('Approved By') .qq[</th>
+				<th>] . $lang->txt('Denial Reason') .qq[</th>
+				<th>] . $lang->txt('Additional Information') .qq[</th>
+				<th>] . $lang->txt('Time Updated') .qq[</th>
 			</tr>
 	];
 	my $denied = 0;
@@ -680,26 +653,16 @@ sub showPathDetails	{
 
 		$status = qq[<span style="font-weight:bold;color:green;">$status</style>] if $dref->{intClearanceStatus} == $Defs::CLR_STATUS_APPROVED;
 		$status = qq[<span style="font-weight:bold;color:red;">$status</style>] if $dref->{intClearanceStatus} == $Defs::CLR_STATUS_DENIED;
-		$status .= qq[&nbsp;&nbsp;<a href="$Data->{'target'}?client=$client&amp;a=CL_details&amp;cID=$dref->{intClearanceID}&amp;cpID=$dref->{intClearancePathID}">&nbsp;(--REOPEN CLEARANCE--)</a>] if ($dref->{intClearanceStatus} == $Defs::CLR_STATUS_DENIED and $dref->{intTypeID} == $intTypeID and $dref->{intID} == $intID);
-		$status = 'Cancelled' if ($clearanceStatus == $Defs::CLR_STATUS_CANCELLED and $dref->{intClearanceStatus} == $Defs::CLR_STATUS_PENDING);
+		$status .= qq[&nbsp;&nbsp;<a href="$Data->{'target'}?client=$client&amp;a=CL_details&amp;cID=$dref->{intClearanceID}&amp;cpID=$dref->{intClearancePathID}">&nbsp;(--]. $lang->txt('Reopen Transfer') . qq[--)</a>] if ($dref->{intClearanceStatus} == $Defs::CLR_STATUS_DENIED and $dref->{intTypeID} == $intTypeID and $dref->{intID} == $intID);
+		$status = $lang->txt('Cancelled') if ($clearanceStatus == $Defs::CLR_STATUS_CANCELLED and $dref->{intClearanceStatus} == $Defs::CLR_STATUS_PENDING);
 		my $timestamp = $dref->{intClearanceStatus} ? $dref->{TimeStamp} : '';
 		my $level = $Defs::LevelNames{$dref->{intTypeID}};
-				#<td><i>$level</i></td>
 		$body .= qq[
 			<tr>
 				<td>$pathnode</td>
 				<td>$status</td>
-		];
-		$body .= qq[
 				<td>$dref->{strApprovedBy}</td>
-	] if (! $Data->{'SystemConfig'}{'clrHide_strApprovedBy'});
-		$body .= qq[
 				<td>$DefCodes->{-38}{$dref->{intDenialReasonID}}</td>
-	] if (! $Data->{'SystemConfig'}{'clrHide_intDenialReasonID'});
-	$body .= qq[
-				<td>$dref->{'strOtherDetails1'}</td>
-	] if ($Data->{'SystemConfig'}{'clrOtherDetails1_Label'});
-	$body .= qq[
 				<td>$dref->{strPathNotes}</td>
 				<td>$timestamp</td>
 			</tr>
@@ -738,8 +701,8 @@ sub getNodeDetails	{
 		WHERE $field = $intID
 			$where
 	];
-    	my $query = $db->prepare($st) or query_error($st);
-    	$query->execute or query_error($st);
+    my $query = $db->prepare($st) or query_error($st);
+    $query->execute or query_error($st);
 	my $name='';
 	my $email='';
 	my $id = '';
@@ -766,10 +729,10 @@ sub clearancePathDetails	{
 
 	my ($Data, $cID, $cpID) = @_;
 
+    my $lang = $Data->{'lang'};
 	my $db = $Data->{'db'};
 	$cpID ||= 0;
 	my $cpID_WHERE = $cpID ? qq[ AND CP.intClearancePathID = $cpID] : '';
-	my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
 
 	my $body;
 
@@ -789,8 +752,7 @@ sub clearancePathDetails	{
                     CP.intTableType, 
                     CP.strPathNotes, 
                     CP.strPathFilingNumber, 
-                    CP.strApprovedBy, 
-                    CP.strOtherDetails1
+                    CP.strApprovedBy 
                 FROM tblClearance as C
                         INNER JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID)
                         INNER JOIN tblPerson as M ON (M.intPersonID = C.intPersonID)
@@ -818,8 +780,7 @@ sub clearancePathDetails	{
 	$extrafields_readonly = 1 if ($dref->{intTypeID} != $intTypeID or $dref->{intID} != $intID or $dref->{intCurrentPathID} < $cpID);
 	$readonly = 1 if ($dref->{intCurrentPathID} != $cpID);
 	$readonly = 1 if ($dref->{intClearanceStatus} == $Defs::CLR_STATUS_APPROVED); #BAFF
-	my $update_label = ($readonly and $extrafields_readonly) ? '' : "Update";
-	$update_label = $Data->{'SystemConfig'}{'txtUpdateLabel_UpdateCLR'} || $Data->{'SystemConfig'}{'txtUpdateLabel_CLR'} || "Update $txt_Clr";
+	my $update_label = $lang->txt('Update Transfer');
 	my $id=0;
 	my $edit=0;
   	my $client=setClient($Data->{'clientValues'}) || '';
@@ -852,94 +813,80 @@ sub clearancePathDetails	{
     $dref->{DestinationClubName} ||= $dref->{strDestinationClubName} || '';
 	my $intReasonForClearanceID = ($Data->{'SystemConfig'}{'clrHide_intReasonForClearanceID'}==1) ? '1' : '0';
 	my $strReason=($Data->{'SystemConfig'}{'clrHide_strReason'}==1) ? '1' : '0';
-	my $strApprovedBy=($Data->{'SystemConfig'}{'clrHide_strApprovedBy'}==1) ? '1' : '0';
 	my $strReasonForClearance =($Data->{'SystemConfig'}{'clrHide_strReasonForClearance'}==1) ? '1' : '0';
 	my $strFilingNumber = ($Data->{'SystemConfig'}{'clrHide_strFilingNumber'} == 1) ? '1' : '0';
 	my $intClearancePriority= ($Data->{'SystemConfig'}{'clrHide_intClearancePriority'}==1) ? '1' : '0';
-	my $intDenialReasonID= ($Data->{'SystemConfig'}{'clrHide_intDenialReasonID'}==1) ? '1' : '0';
-	my $OtherDetails1= ($Data->{'SystemConfig'}{'clrOtherDetails1_Label'}) ? '0' : '1';
 	
 	#my $update_label = $Data->{'SystemConfig'}{'txtUpdateLabel_CLR'} || 'Update Clearance';
 	my %FieldDefs = (
 		CLR => {
 			fields => {
 					intClearanceID=> {
-                                        label => "$txt_Clr Ref. No.",
-                                        value => $dref->{'intClearanceID'},
-                                        type  => 'text',
-					readonly => '1',
-                                },
-				MemberName=> {
-                                        label => 'Member being Cleared',
-                                        value => $dref->{'MemberName'},
-                                        type  => 'text',
-					readonly => '1',
-                                },
-                                dtDOB => {
-                                        label => 'Date of birth',
-                                        value => $dref->{'dtDOB'},
-                                        type  => 'text',
-					readonly => '1',
-                                },
-                                strState=> {
-                                        label => 'Address State',
-                                        value => $dref->{'strState'},
-                                        type  => 'text',
-					readonly => '1',
-                                },
-                                SourceClubName => {
-                                        label => 'From Club',
-                                        value => $dref->{'SourceClubName'},
-                                        type  => 'text',
-					readonly => '1',
-                                },
-                                DestinationClubName => {
-                                        label => 'To Club',
-                                        value => $dref->{'DestinationClubName'},
-                                        type  => 'text',
-					readonly => '1',
-                                },
-                                Reason=> {
-                                        label => "Reason for $txt_Clr",
-                                        value => $dref->{'strReason'},
-                                        type  => 'text',
-					readonly => '1',
-                                },
-				intClearanceStatus=> {
-					label => "$txt_Clr Status",
-					value => $dref->{'PathStatus'},
-                        		type  => 'lookup',
+                        label => $lang->txt('Transfer No.'),
+                        value => $dref->{'intClearanceID'},
+                        type  => 'text',
+					    readonly => '1',
+                    },
+				    MemberName=> {
+                        label => $lang->txt('Person being Transferred'),
+                        value => $dref->{'MemberName'},
+                        type  => 'text',
+					    readonly => '1',
+                    },
+                    dtDOB => {
+                        label => $lang->txt('Date of Birth'),
+                        value => $dref->{'dtDOB'},
+                        type  => 'text',
+					    readonly => '1',
+                    },
+                    strState=> {
+                        label => $lang->txt('State'),
+                        value => $dref->{'strState'},
+                        type  => 'text',
+					    readonly => '1',
+                    },
+                    SourceClubName => {
+                        label => $lang->txt('From Club'),
+                        value => $dref->{'SourceClubName'},
+                        type  => 'text',
+					    readonly => '1',
+                    },
+                    DestinationClubName => {
+                        label => $lang->txt('To Club'),
+                        value => $dref->{'DestinationClubName'},
+                        type  => 'text',
+					    readonly => '1',
+                    },
+                    Reason=> {
+                        label => $lang->txt('Reason for Transfer'),
+                        value => $dref->{'strReason'},
+                        type  => 'text',
+					    readonly => '1',
+                    },
+				    intClearanceStatus=> {
+                        label => $lang->txt('Transfer Status'),
+					    value => $dref->{'PathStatus'},
+                        type  => 'lookup',
 					options => \%Defs::clearance_status_approvals,
 					compulsory => 1,
                         		firstoption => ['','Select Status'],
 					readonly => $readonly,
                 		},
-				strOtherDetails1=> {
-					label => $Data->{'SystemConfig'}{'clrOtherDetails1_Label'},
-					value => $dref->{strOtherDetails1},
-                                        type  => 'text',
-					readonly => $readonly,
-					noadd=>$OtherDetails1,
-					noedit=>$OtherDetails1,
-				},
-
 				strPathNotes => {
-					label => 'Additional Information',
+					label => $lang->txt('Additional Information'),
 					value => $dref->{'strPathNotes'},
 					type => 'textarea',
 					readonly => $extrafields_readonly,
 				},
 				strApprovedBy=> {
-					label => 'Approved By',
+					label => $lang->txt('Approved By'),
 					value => $dref->{'strApprovedBy'},
 					type => 'text',
 					readonly => $extrafields_readonly,
-					noadd=> $strApprovedBy,
-					noedit=> $strApprovedBy,
 					compulsory => $Data->{'SystemConfig'}{'ClrApprovedBy_NotCompulsory'} ? 0 : 1,
 				},
 				strPathFilingNumber => {
-					label => 'Reference Number at this level',
+					label => $lang->txt('Reference Number at this level'),
 					value => $dref->{'strPathFilingNumber'},
 					type => 'text',
 					readonly => $extrafields_readonly,
@@ -947,18 +894,16 @@ sub clearancePathDetails	{
 					noedit=> $strFilingNumber,
 				},
 				 intDenialReasonID=> {
-        				label => "Reason for Denial",
-				        value => $dref->{intDenialReasonID},
-				        type  => 'lookup',
-        				options => $DefCodes->{-38},
-        				order => $DefCodesOrder->{-38},
-					firstoption => ['',"Choose Reason"],
+					label => $lang->txt('Reason for Denial'),
+				    value => $dref->{intDenialReasonID},
+				    type  => 'lookup',
+        			options => $DefCodes->{-38},
+        			order => $DefCodesOrder->{-38},
+					firstoption => ['',$lang->txt("Choose Reason")],
 					readonly => $readonly,
-					noadd=>$intDenialReasonID,
-					noedit=>$intDenialReasonID,
 	      			},
 		},
-		order => [qw(intClearanceID MemberName dtDOB strState SourceClubName DestinationClubName Reason intClearanceStatus strApprovedBy intDenialReasonID strOtherDetails1 strPathNotes strPathFilingNumber)],
+		order => [qw(intClearanceID MemberName dtDOB strState SourceClubName DestinationClubName Reason intClearanceStatus strApprovedBy intDenialReasonID strPathNotes strPathFilingNumber)],
 			options => {
 				labelsuffix => ':',
 				hideblank => 1,
@@ -972,28 +917,27 @@ sub clearancePathDetails	{
         auditAddParams => [
           $Data,
           'Add',
-          'Clearance Path'
+          $lang->txt('Transfer Path')
         ],
         auditEditParams => [
           $cpID,
           $Data,
           'Update',
-          'Clearance Path'
+          $lang->txt('Transfer Path')
         ],
 
 				afterupdateFunction => \&updateClearance,
 				afterupdateParams=> [$option,$Data,$Data->{'db'}, $cID, $cpID],
 				stopAfterAction => 1,
-				updateOKtext => qq[
-					<div class="OKmsg">Record updated successfully</div> <br>
-					<a href="$Data->{'target'}?client=$client&amp;a=CL_view&amp;cID=$cID&amp;cpID=$cpID">Return to $txt_Clr Details</a>
+				updateOKtext => qq[<div class="OKmsg">] . $lang->txt('Record updated successfully') . qq[</div> <br>
+					<a href="$Data->{'target'}?client=$client&amp;a=CL_view&amp;cID=$cID&amp;cpID=$cpID">] . $lang->txt('Return to Transfer Details') . qq[</a>
 				],
 				addOKtext => qq[
-					<div class="OKmsg">Record updated successfully</div> <br>
-					<a href="$Data->{'target'}?client=$client&amp;a=CL_details">Return to $txt_Clr Details</a>
+					<div class="OKmsg">] . $lang->txt('Record updated successfully') . qq[</div> <br>
+					<a href="$Data->{'target'}?client=$client&amp;a=CL_details">] . $lang->txt('Return to Transfer Details') . qq[</a>
 				],
 			},
-			sections => [ ['main','Details'], ],
+			sections => [ ['main',$lang->txt('Details')], ],
 			carryfields =>  {
 				client => $client,
 				a=> 'CL_details',
@@ -1003,7 +947,6 @@ sub clearancePathDetails	{
 		},
 	);
 	$FieldDefs{'CLR'}{'fields'}{'intDenialReasonID'}{'compulsory'}=1 if ($Data->{'SystemConfig'}{'clrDenialReason_compulsory'} and param('d_intClearanceStatus') == $Defs::CLR_STATUS_DENIED);
-	$FieldDefs{'CLR'}{'fields'}{'strOtherDetails1'}{'compulsory'}=1 if ($Data->{'SystemConfig'}{'clrOtherDetails1_Label'} );
 	($resultHTML, undef )=handleHTMLForm($FieldDefs{'CLR'}, undef, $option, '',$db);
 	$resultHTML = destinationClubText($Data) . $resultHTML if ($dref->{intDestinationClubID} == $dref->{intID} and $dref->{intTypeID} == $Defs::LEVEL_CLUB);
 
@@ -1013,15 +956,13 @@ sub clearancePathDetails	{
 	$resultHTML .= showPathDetails($Data, $cID, $dref->{intClearanceStatus});
 
 	if($option eq 'display')	{
-		#$resultHTML .=allowedAction($Data, 'clr_s_e') ?qq[ <a href="$target?a=M_TXN_EDIT&amp;tID=$dref->{'intTransactionID'}&amp;client=$client">Edit Details</a> ] : '';
-		$resultHTML .=qq[ <a href="$target?a=CL_details&amp;tID=$dref->{'intTransactionID'}&amp;client=$client">Edit Details</a> ] if !$Data->{'ReadOnlyLogin'};
+		$resultHTML .=qq[ <a href="$target?a=CL_details&amp;tID=$dref->{'intTransactionID'}&amp;client=$client">] . $lang->txt('Edit Details') . qq[</a> ] if !$Data->{'ReadOnlyLogin'};
 	}
 
 	$resultHTML .= memberLink($Data, $cID);
 
 
-		$resultHTML=qq[
-			<div>This member does not have any Transaction information to display.</div>
+		$resultHTML=qq[<div>]. $lang->txt('This member does not have any Transaction information to display') . qq[</div>
 		] if !ref $dref;
 
 		$resultHTML=qq[
@@ -1030,13 +971,14 @@ sub clearancePathDetails	{
 					$resultHTML
 				</div>
 		];
-		my $heading=qq[$txt_Clr];
+		my $heading=$lang->txt('Transfer');
 		return ($resultHTML,$heading);
 }
 
 sub memberLink	{
 
 	my ($Data, $cID) = @_;
+    my $lang = $Data->{'lang'};
 
 	my $destClubID = $Data->{'clientValues'}{'clubID'} || -1;
 	$cID ||= 0;
@@ -1056,7 +998,7 @@ sub memberLink	{
         $tempClientValues{memberID} = $dref->{intPersonID};
         $tempClientValues{currentLevel} = $Defs::LEVEL_MEMBER;
         my $tempClient = setClient(\%tempClientValues);
-		return qq[ <div class="OKmsg">The clearance has now been finalised</div><br><a href="$Data->{'target'}?client=$tempClient&amp;a=M_HOME">click here to display members record</a>&nbsp;|&nbsp;<a href="$Data->{'target'}?client=$tempClient&amp;a=M_DTE">click here to edit members record</a>];
+		return qq[ <div class="OKmsg">] . $lang->txt('The transfer has now been finalised') . qq[</div><br><a href="$Data->{'target'}?client=$tempClient&amp;a=M_HOME">] . $lang->txt('click here to display persons record') . qq[</a>];
 
 	}
 	return '';
@@ -1066,9 +1008,10 @@ sub destinationClubText	{
 ### PURPOSE: This function returns text that is displayed at the top of the clearance approval record when its the destination clubs turn to decide whether they actually want to member.  At this stage, all other levels would have approved the clearance.
 
 	my ($Data) = @_;
+    my $lang = $Data->{'lang'};
 
 	return '';
-	my $body = $Data->{'SystemConfig'}{'clr_FinalApproval_txt'} || qq[By approving this clearance, you will receive the member.<br>You also agree to pay any Fees incurred by the transferring of this player];
+	my $body = $lang->txt('By approving this transfer, you will receive the person.<br>You also agree to pay any Fees incurred by the transferring of this player');
 	return qq[<p class="heading1" style="font-size:16px;color:red;">$body</p>];
 
 }
@@ -1403,11 +1346,12 @@ sub createClearance	{
 
 	my ($action, $Data) = @_;
 
+    my $lang = $Data->{'lang'};
 
 	#my $db = $Data->{'db'};
 	my $db = connectDB('reporting');
 	my $q=new CGI;
-        my %params=$q->Vars();
+    my %params=$q->Vars();
 	my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
 
 	
@@ -1441,15 +1385,15 @@ sub createClearance	{
 	if	(! $memberID and ! $params{'member_surname'} and ! $params{'member_dob'} and ! $params{'member_natnum'} and ! $params{'member_loggedsurname'} and ! $params{'member_systemsurname'} and ! $params{'member_systemdob'})	{
 		$body .= qq[
 			<form action="$Data->{'target'}" method="POST">
-			<p>Fill in the members $Data->{'SystemConfig'}{'NationalNumName'}, or enter Surname and DOB<br></p>
+			<p>] . $lang->txt('Fill in the members National Number, or enter Surname and DOB') . qq[<br></p>
 			<table>
-			<tr><td><span class="label">Search on a $Data->{'SystemConfig'}{'NationalNumName'}:</span></td><td><span class="formw"><input type="text" name="member_natnum" value=""></span></td></tr>
+			<tr><td><span class="label">] . $lang->txt('Search on a National Number') . qq[:</span></td><td><span class="formw"><input type="text" name="member_natnum" value=""></span></td></tr>
+			<tr><td colspan="2"><b>] . $lang->txt("and/or") . qq[</b></td></tr>
+			<tr><td><span class="label">] . $lang->txt('Search on Surname') . qq[:</span></td><td><span class="formw"><input type="text" name="member_surname" value=""></span></td></tr>
 			<tr><td colspan="2"><b>and/or</b></td></tr>
-			<tr><td><span class="label">Search on Surname:</span></td><td><span class="formw"><input type="text" name="member_surname" value=""></span></td></tr>
-			<tr><td colspan="2"><b>and/or</b></td></tr>
-			<tr><td><span class="label">Search on Date of Birth (dd/mm/yyyy):</span></td><td><span class="formw"><input type="text" name="member_dob" value=""></span></td></tr>
+			<tr><td><span class="label">] . $lang->txt('Search on Date of Birth (dd/mm/yyyy)') . qq[:</span></td><td><span class="formw"><input type="text" name="member_dob" value=""></span></td></tr>
 			</table>
-			<input type="submit" name="submit" value="Select Member">	
+			<input type="submit" name="submit" value="] . $lang->txt('Select Person') . qq[">	
 			$hidden
 			</form>
 		];
@@ -1530,30 +1474,20 @@ sub createClearance	{
 	    $query->execute or query_error($st);
 
 		my ($sourceClub, undef, undef) = getNodeDetails($db, $Defs::CLUB_LEVEL_CLEARANCE, $Defs::LEVEL_CLUB, $sourceClubID);
-		my $txt_RequestCLR =  $Data->{'SystemConfig'}{'txtRequestCLR'} || 'Request a Clearance';
-		my $clrBlob=  $Data->{'SystemConfig'}{'ClearancesBlob'} || '';
+		my $txt_RequestCLR =  $lang->txt('Request a Transfer');
 		$body .= qq[
-			<p>Select a member from the club <b>$sourceClub</b> in which to $txt_RequestCLR for.</p>$clrBlob
+			<p>] . $lang->txt('Select a person from the club') . qq[ <b>$sourceClub</b> ] . $lang->txt('in which to Transfer') . qq[</p>
                 	<table class="listTable">
 				<tr>
 					<th>&nbsp;</th>
-					<th>Surname</th>
-					<th>Firstname</th>
-					<th>Club</th>
-					<th>Date Cleared To ($Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Active ?)</th>
-        ];
-        $body .= qq[
-					<th>Primary $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} ?</th>
-        ] if ($Data->{'SystemConfig'}{'ClearancesShowPrimaryClub'});
-        $body .= qq[
-					<th>Date Last Registered</th>
-					<th>DOB</th>
-		];
-		$body .= qq[
-			<th>$Data->{'SystemConfig'}{'NationalNumName'}</th>
-		];
-		$body .= qq[
-			</tr>
+					<th>] . $lang->txt('Surname') . qq[</th>
+					<th>] . $lang->txt('Firstname') . qq[</th>
+					<th>] . $lang->txt('Club') . qq[</th>
+					<th>] . $lang->txt('Date Cleared to Club') . qq[</th>
+					<th>] . $lang->txt('Date Last Registered') . qq[</th>
+					<th>] . $lang->txt('Date of Birth') . qq[</th>
+			        <th>$Data->{'SystemConfig'}{'NationalNumName'}</th>
+			    </tr>
 		];
 		while (my $dref= $query->fetchrow_hashref())	{
 			my $href = qq[client=$params{'client'}&amp;sourceClubID=$dref->{'intClubID'}&amp;a=CL_createnew&amp;member_natnum=$params{'member_natnum'}];
@@ -1563,7 +1497,7 @@ sub createClearance	{
 				<tr>
 			];
 			if ($Data->{'SystemConfig'}{'Clearances_FilterClearedOut'} and $dref->{CLRD_ID})	{
-				$body .= qq[<td><b>CLEARED OUT</b></td>];
+				$body .= qq[<td><b>] . $lang->txt('TRANSFERRED') . qq[</b></td>];
 			}
 			else	{
 				$body .= qq[<td><a href="$Data->{'target'}?$href&amp;memberID=$dref->{intPersonID}">select</a></td>];
@@ -1573,19 +1507,9 @@ sub createClearance	{
 					<td>$dref->{strLocalFirstname}</td>
 					<td>$dref->{ClubName}</td>
 					<td>$dref->{CLR_DATE} ($dref->{Club_STATUS})</td>
-            ];
-            my $primaryClub = ($dref->{PrimaryClub}) ? 'Yes' : 'No';
-            $body .= qq[
-					<td>$primaryClub</td>
-            ] if ($Data->{'SystemConfig'}{'ClearancesShowPrimaryClub'});
-            $body .= qq[
 					<td>$dref->{LastRegistered}</td>
 					<td>$dref->{DOB}</td>
-			];
-			$body .= qq[
 					<td>$dref->{strNationalNum}</td>
-			];
-			$body .= qq[
 				</tr>
 			];
 		}
@@ -1608,6 +1532,7 @@ sub clearanceForm	{
 
   my($Data, $params, $memberID, $id, $edit) = @_;
 	$id ||= 0;	
+    my $lang = $Data->{'lang'};
 
 	my $db=$Data->{'db'} || undef;
 	my $client=setClient($Data->{'clientValues'}) || '';
@@ -1666,27 +1591,25 @@ sub clearanceForm	{
         onlyTypes  => '-37',
     );
        
-	my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
 	my $intReasonForClearanceID = ($Data->{'SystemConfig'}{'clrHide_intReasonForClearanceID'}==1) ? '1' : '0';
 	my $strReasonForClearance =($Data->{'SystemConfig'}{'clrHide_strReasonForClearance'}==1) ? '1' : '0';
 	my $strReason=($Data->{'SystemConfig'}{'clrHide_strReason'}==1) ? '1' : '0';
 	my $strFilingNumber = ($Data->{'SystemConfig'}{'clrHide_strFilingNumber'} == 1) ? '1' : '0';
 	my $intClearancePriority= ($Data->{'SystemConfig'}{'clrHide_intClearancePriority'}==1) ? '1' : '0';
 
-	my $update_label = $Data->{'SystemConfig'}{'txtUpdateLabel_CLR'} || "Update $txt_Clr";
-	my $update_labelClr= $Data->{'SystemConfig'}{'txtUpdateLabelClr_CLR'} || "Update $txt_Clr";
-	my $update_labelOverride= $Data->{'SystemConfig'}{'txtUpdateLabelClrOverride'} || "Update $txt_Clr";
+	my $update_label = $lang->txt('Update Transfer');
+	my $update_labelClr = $lang->txt('Update Transfer');
 	my %FieldDefs = (
 		Clearance => {
 			fields => {
 				SourceClub => {
-					label => 'Source Club',
+					label => $lang->txt('Source Club'),
 					value => $sourceClub,
 					type=> 'text',
 					readonly => 1,
 				},
 				MemberName => {
-					label => "Member Name",
+					label => $lang->txt('Person'),
 					value => qq[$memref->{strLocalFirstname} $memref->{strLocalSurname}],
 					type=> 'text',
 					readonly => 1,
@@ -1698,34 +1621,34 @@ sub clearanceForm	{
 					readonly => '1',
                 },
 				DOB => {
-					label => 'Date of birth',
+					label => $lang->txt('Date of Birth'),
 					value => $memref->{'DOB'},
                     type  => 'text',
 					readonly => '1',
 				},	
 				strState=> {
-					label => 'Address State',
+					label => $lang->txt('State'),
 					value => $memref->{'strState'},
                     type  => 'text',
 					readonly => '1',
                 },
 				 intReasonForClearanceID => {
-        			label => "Reason for $txt_Clr",
+					label => $lang->txt('Reason for Transfer'),
 				    value => $dref->{intReasonForClearanceID},
 				    type  => 'lookup',
         			options => $DefCodes->{-37},
         			order => $DefCodesOrder->{-37},
-					firstoption => ['',"Choose Reason"],
+					firstoption => ['',$lang->txt("Choose Reason")],
 					readonly => $intReasonForClearanceID,
 	      		},
 				strReason=> {
-					label => "Reason for $txt_Clr",
+					label => $lang->txt('Reason for Transfer'),
 					value => $dref->{'strReason'},
                     type  => 'text',
 					readonly => $strReason,
 				},	
 				strReasonForClearance=> {
-					label => 'Additional Information',
+					label => $lang->txt('Additional Information'),
 					type => 'textarea',
 					value => $dref->{'strReasonForClearance'},
 					rows => 5,
@@ -1733,13 +1656,13 @@ sub clearanceForm	{
 					readonly => $strReasonForClearance,
 				},
 				strFilingNumber => {
-					label => 'Reference Number',
+					label => $lang->txt('Reference Number'),
 					value => $dref->{'strFilingNumber'},
                     type  => 'text',
 					readonly => $strFilingNumber,
 				},	
 				intClearancePriority=> {
-                    label => "$txt_Clr Priority",
+					label => $lang->txt('Transfer Priority'),
                     value => $dref->{'intClearancePriority'},
                     type  => 'lookup',
                     options => \%Defs::clearance_priority,
@@ -1754,37 +1677,34 @@ sub clearanceForm	{
 				target => $Data->{'target'},
 				formname => 'clearance_form',
 				submitlabel => $update_label,
-				submitlabelOverride => $update_labelOverride,
 				introtext => 'auto',
 				buttonloc => 'bottom',
 				updateSQL => $clrupdate,
 				addSQL => $clradd,
 				beforeaddFunction => \&preClearanceAdd,
-                                beforeaddParams => [$Data,$client, $memberID],
+                beforeaddParams => [$Data,$client, $memberID],
 				afteraddFunction => \&postClearanceAdd,
 				afteraddParams=> [$option,$Data,$Data->{'db'}],
 				auditFunction=> \&auditLog,
         auditAddParams => [
           $Data,
           'Add',
-          'Clearance'
+            $lang->txt('Transfer')
         ],
         auditEditParams => [
           $Data,
           'Update',
-          'Clearance'
+           $lang->txt('Transfer')
         ],
 				stopAfterAction => 1,
 				updateOKtext => qq[
-					<div class="OKmsg">Record updated successfully</div> <br>
-					<a href="$Data->{'target'}?client=$client&amp;a=CL_list">Return to $txt_Clr</a>
-				],
+					<div class="OKmsg">] . $lang->txt('Record updated successfully') . qq[</div> <br>
+					<a href="$Data->{'target'}?client=$client&amp;a=CL_list">] . $lang->txt('Return to Transfer') . qq[</a>],
 				addOKtext => qq[
-					<div class="OKmsg">Record updated successfully</div> <br>
-					<a href="$Data->{'target'}?client=$client&amp;a=CL_list">Return to $txt_Clr</a>
-				],
+					<div class="OKmsg">] . $lang->txt('Record updated successfully') . qq[</div> <br>
+					<a href="$Data->{'target'}?client=$client&amp;a=CL_list">] . $lang->txt('Return to Transfer') . qq[</a>],
 			},
-			sections => [ ['main','Details'], ],
+			sections => [ ['main',$lang->txt('Details')], ],
 			carryfields =>  {
 				client => $client,
 				a=> 'CL_createnew',
@@ -1800,10 +1720,7 @@ sub clearanceForm	{
 
 	($resultHTML, undef )=handleHTMLForm($FieldDefs{'Clearance'}, undef, $option, '',$db);
 
-  $resultHTML=qq[
-			<div>This member does not have any Transaction information to display.</div>
-		] if !ref $dref;
-  
+  $resultHTML=qq[<div>] . $lang->txt('This person does not have any Transaction information to display') . qq[</div>] if !ref $dref;
 
   $resultHTML=qq[
 				<div>
@@ -1821,13 +1738,13 @@ sub preClearanceAdd	{
     
     my($params, $Data, $client, $memberID)=@_;
     my $db = $Data->{'db'};
+    my $lang = $Data->{'lang'};
     
 	if ($Data->{'SystemConfig'}{'clrNoMoreAdds'})	{
-	    my $error = qq[ <div class="warningmsg">Clearances are unable to be added.  Please contact the $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC} administrator with any queries.</div> ];
+	    my $error = qq[ <div class="warningmsg">] . $lang->txt('Transfers are unable to be added') . qq[</div>];
         return (0,$error);
 	}
     
-     
 	$memberID ||= 0;
 	my $destinationClubID = $Data->{'clientValues'}{'clubID'} || 0;
 	
@@ -1888,11 +1805,11 @@ sub preClearanceAdd	{
         $dref->{DestinationContact} = $destination_contact_name; 
          $existingClearance++;
          $error_text .= qq[
-                	<div class="warningmsg">The selected member is already involved in a pending clearance.  Unable to continue until the below transaction is finalised.</div>
+                	<div class="warningmsg">] . $lang->txt('The selected person is already involved in a pending transfer.  Unable to continue until the below transaction is finalised') . qq[</div>
 				<p>
-					<b>Date Requested:</b> $dref->{AppliedDate}<br>
-					<b>Requested From:</b> $dref->{SourceClubName}<br>
-					<b>Request To:</b> $dref->{DestinationClubName}<br>
+					<b>] . $lang->txt('Date Requested') . qq[:</b> $dref->{AppliedDate}<br>
+					<b>] . $lang->txt('Requested From') . qq[:</b> $dref->{SourceClubName}<br>
+					<b>] . $lang->txt('Request To') . qq[:</b> $dref->{DestinationClubName}<br>
 				</p>
         	];
 	}
@@ -2053,6 +1970,7 @@ sub clearanceAddManual	{
 	my $q=new CGI;
   my %params=$q->Vars(); 
 	my $id = $params{'clrID'};
+    my $lang = $Data->{'lang'};
 
 	my $db=$Data->{'db'} || undef;
 	my $memberID = $Data->{'clientValues'}{'memberID'} || -1;
@@ -2115,78 +2033,77 @@ sub clearanceAddManual	{
         onlyTypes  => '-37',
     );
        
-	my $update_label = $Data->{'SystemConfig'}{'txtUpdateLabel_UpdateCLR'} || $Data->{'SystemConfig'}{'txtUpdateLabel_CLR'} || 'Update Clearance';
+	my $update_label = $lang->txt('Update Transfer');
 
-	my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
 	my %FieldDefs = (
 		Clearance => {
 			fields => {
 				strSourceClubName => {
-					label => 'From Club',
+					label => $lang->txt('From Club'),
 					value => $dref->{strSourceClubName},
 					type=> 'text',
 				},
 				strDestinationClubName => {
-					label => 'To Club',
+					label => $lang->txt('To Club'),
 					value => $dref->{strDestinationClubName},
 					type=> 'text',
 				},
 				MemberName => {
-					label => "Member Name",
+					label => $lang->txt('Person'),
 					value => qq[$memref->{strLocalFirstname} $memref->{strLocalSurname}],
 					type=> 'text',
 					readonly => 1,
 				},
 				dtApplied => {
-					label => 'Date',
+					label => $lang->txt('Date'),
 					value => $dref->{'dtApplied'},
                      type  => 'text',
 					readonly => '1',
 				},	
 				DOB => {
-					label => 'Date of birth',
+					label => $lang->txt('Date of Birth'),
 					value => $memref->{'DOB'},
                     type  => 'text',
 					readonly => '1',
 				},	
 				strState=> {
-					label => 'Address State',
+					label => $lang->txt('State'),
 					value => $memref->{'strState'},
                     type  => 'text',
 					readonly => '1',
                	},
 				 intReasonForClearanceID => {
-        			label => "Reason for $txt_Clr",
+					label => $lang->txt('Reason for Transfer'),
 				    value => $dref->{intReasonForClearanceID},
 				    type  => 'lookup',
         			options => $DefCodes->{-37},
         			order => $DefCodesOrder->{-37},
-					firstoption => ['',"Choose Reason"],
+					firstoption => ['',$lang->txt("Choose Reason")],
 	      		},
 				strReasonForClearance=> {
-					label => 'Additional Information',
+					label => $lang->txt('Additional Information'),
 					type => 'textarea',
 					value => $dref->{'strReasonForClearance'},
 					rows => 5,
                 	cols=> 45,
 				},
 				strFilingNumber => {
-					label => 'Reference Number',
+					label => $lang->txt('Reference Number'),
 					value => $dref->{'strFilingNumber'},
                     type  => 'text',
 				},	
 				intClearancePriority=> {
-                    label => "$txt_Clr Priority",
+					label => $lang->txt('Transfer Priority'),
                     value => $dref->{'intClearancePriority'},
                     type  => 'lookup',
                     options => \%Defs::clearance_priority,
-                    firstoption => ['','Select Priority'],
+                    firstoption => ['',$lang->txt('Select Priority')],
                  },
 				intClearAction=> {
-                    label => ($option eq 'add' and $Data->{'SystemConfig'}{'Clearances_ClearAction'}) ? "$txt_Clr Action" : '',
+                    label => ($option eq 'add' and $Data->{'SystemConfig'}{'Clearances_ClearAction'}) ? $lang->txt('Transfer Action') : '',
                     type  => 'lookup',
                     options => \%Defs::clearance_clearAction,
-                    firstoption => ['','Select Action'],
+                    firstoption => ['',$lang->txt('Select Action')],
 					SkipAddProcessing => 1,
 					compulsory => ($option eq 'add' and $Data->{'SystemConfig'}{'Clearances_ClearAction'}) ? 1 : 0,
                 },
@@ -2208,27 +2125,25 @@ sub clearanceAddManual	{
         auditAddParams => [
           $Data,
           'Add',
-          'Manual Clearance'
+          $lang->txt('Manual Transfer')
         ],
         auditEditParams => [
           $Data,
           'Update',
-          'Manual Clearance'
+          $lang->txt('Manual Transfer')
         ],
 
 				afteraddFunction => \&postManualClrAction,
  				afteraddParams => [$Data,$Data->{'db'}],
 				stopAfterAction => 1,
 				updateOKtext => qq[
-					<div class="OKmsg">Record updated successfully</div> <br>
-					<a href="$Data->{'target'}?client=$client&amp;a=CL_list">Return to $txt_Clr</a>
-				],
+					<div class="OKmsg">] . $lang->txt('Record updated successfully') . qq[</div> <br>
+					<a href="$Data->{'target'}?client=$client&amp;a=CL_list">] . $lang->txt('Return to Transfer') . qq[</a> ],
 				addOKtext => qq[
-					<div class="OKmsg">Record updated successfully</div> <br>
-					<a href="$Data->{'target'}?client=$client&amp;a=CL_list">Return to $txt_Clr</a>
-				],
+					<div class="OKmsg">] . $lang->txt('Record updated successfully') . qq[</div> <br>
+					<a href="$Data->{'target'}?client=$client&amp;a=CL_list">] . $lang->txt('Return to Transfer') . qq[</a> ],
 			},
-			sections => [ ['main','Details'], ],
+			sections => [ ['main',$lang->txt('Details')], ],
 			carryfields =>  {
 				client => $client,
 				a=> 'CL_addmanual',
@@ -2241,9 +2156,7 @@ sub clearanceAddManual	{
 	);
 	($resultHTML, undef )=handleHTMLForm($FieldDefs{'Clearance'}, undef, $option, '',$db);
 
-	$resultHTML=qq[
-		<div>This member does not have any Transaction information to display.</div>
-	] if !ref $dref;
+  $resultHTML=qq[<div>] . $lang->txt('This person does not have any Transaction information to display') . qq[</div>] if !ref $dref;
 
 	$resultHTML=qq[
 			<div>
@@ -2259,6 +2172,7 @@ sub sendCLREmail	{
 ### PURPOSE: This function handles the emailing to all the levels of the current status of the clearance.  It contains the text body and subject of the email.
 
 	my ($Data, $cID, $action) = @_;
+    my $lang = $Data->{'lang'};
 
 	return if ($Data->{'SystemConfig'}{'clrNoEmails'});
 	return if (($Data->{'SystemConfig'}{'clrEmails_addOnly'} and $action ne 'ADDED') and ($Data->{'SystemConfig'}{'clrEmails_Denial'} and $action ne 'DENIED') and ($Data->{'SystemConfig'}{'clrEmails_Reminder'} and $action !~ /REMINDER/));
@@ -2266,7 +2180,6 @@ sub sendCLREmail	{
 	my $db = $Data->{'db'};
 	return if ! $cID;
 
-	my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
 	my $st = qq[
 		SELECT 
             CONCAT(M.strLocalFirstname, ' ', M.strLocalSurname) as MemberName, 
@@ -2299,13 +2212,12 @@ sub sendCLREmail	{
 	###BUILD UP TEXT
 	my $additionalInformation='';
         if ($Data->{'SystemConfig'}{'clrEmailAdditionalInfo'} and $cref->{'strReasonForClearance'})     {
-                $additionalInformation = qq[Additional Information: $cref->{'strReasonForClearance'}];
+                $additionalInformation = $lang->txt('Additional Information') . qq[: $cref->{'strReasonForClearance'}];
         }
-	my $email_body = qq[
-$txt_Clr Ref. No.: $cref->{intClearanceID}
-Member name: $cref->{MemberName}
-To Club: $cref->{DestinationClubName}
-Source (From) Club: $cref->{SourceClubName}
+	my $email_body = $lang->txt('Transfer No.') . qq[: $cref->{intClearanceID}
+] . $lang->txt('Person') . qq[: $cref->{MemberName}
+] . $lang->txt('To Club') . qq[: $cref->{DestinationClubName}
+] . $lang->txt('Source (From) Club') . qq[: $cref->{SourceClubName}
 $additionalInformation
 
 ];
@@ -2313,58 +2225,51 @@ $additionalInformation
 	my ($whos_turn, undef, undef) = getNodeDetails($db, $cref->{intTableType}, $cref->{intTypeID}, $cref->{intID});
 	my $emailOnlyCurrentLevel = 0;
 
-	my $viewDetails = qq[To view details, please log into the system and click on the List $txt_Clr]. qq[s option];        
+	my $viewDetails = $lang->txt('To view details, please log into the system and click on the List Transfers option');
 	$viewDetails = $Data->{'SystemConfig'}{'clrEmail_detailsLink'} if ($Data->{'SystemConfig'}{'clrEmail_detailsLink'});
 
 	$emailOnlyCurrentLevel = 1 if ($Data->{'SystemConfig'}{'clr_EmailOnlyCurrentLevel'});
 	if ($action eq 'CANCELLED')	{
-		$email_body .= qq[This $txt_Clr has now been cancelled.  $viewDetails];
-		$email_subject = qq[$txt_Clr cancelled- Ref. No.:$cref->{intClearanceID}- $cref->{MemberName} - DOB - $cref->{dtDOB}];
+		$email_body .= $lang->txt('This Transfer has now been cancelled') . $viewDetails;
+		$email_subject = $lang->txt('Transfer cancelled- No.') . qq[:$cref->{intClearanceID}- $cref->{MemberName}];
 	}
 	if ($action eq 'DENIED')	{
 	    $emailOnlyCurrentLevel = 0;
-		if ($Data->{'Realm'} == 2)	{
-			$email_body .= qq[This $txt_Clr has been denied at $whos_turn level.  Contact should be made with $whos_turn to resolve any issues.];
-		}
-		else	{
-			$email_body .= qq[This $txt_Clr has been denied at $whos_turn level.  Contact should be made with $whos_turn to resolve any issues.  The $txt_Clr should NOT be requested again.];
-		}
-        $email_body .= qq[The reason given for the denial is: $cref->{DenialCode}] if ($cref->{DenialCode});
-		$email_subject = qq[$txt_Clr DENIED- Ref. No.:$cref->{intClearanceID}- $cref->{MemberName} - DOB - $cref->{dtDOB}];
+		$email_body .= $lang->txt('This Transfer has been denied at') . qq[ $whos_turn] . $lang->txt('level') . qq[.] . $lang->txt('The Transfer should NOT be requested again');
+        $email_body .= $lang->txt('The reason given for the denial is') . qq[: $cref->{DenialCode}] if ($cref->{DenialCode});
+		$email_subject = $lang->txt('Transfer DENIED- No.') . qq[:$cref->{intClearanceID}- $cref->{MemberName} - DOB - $cref->{dtDOB}];
 	}
 	if ($action eq 'REOPEN')	{
 	    $emailOnlyCurrentLevel = 0;
-		$email_body .= qq[The above $txt_Clr has now been reopened. 
+		$email_body .= $lang->txt('The above Transfer has now been reopened.') . qq[
 
-Current Level for Approval: $whos_turn
+]. $lang->txt('Current Level for Approval') . qq[: $whos_turn
 
 $viewDetails ];
-		$email_subject = qq[$txt_Clr reopened- Ref. No.:$cref->{intClearanceID}- $cref->{MemberName} - DOB - $cref->{dtDOB}];
+		$email_subject = $lang->txt('Transfer reopened- No.') . qq[:$cref->{intClearanceID}- $cref->{MemberName} - DOB - $cref->{dtDOB}];
 	}
 	if ($action eq 'ADDED')	{
-		$email_body .= qq[The above $txt_Clr has been added. 
+		$email_body .= $lang->txt('The above Transfer has been added') . qq[
 
-Current Level for Approval: $whos_turn
+] . $lang->txt('Current Level for Approval') . qq[: $whos_turn
 
 $viewDetails ];
-		$email_subject = qq[New request for $txt_Clr - Ref. No.:$cref->{intClearanceID}- $cref->{MemberName} - DOB - $cref->{dtDOB}];
+		$email_subject = $lang->txt('New request for Transfer- No.') . qq[:$cref->{intClearanceID}- $cref->{MemberName} - $cref->{dtDOB}];
 
 		return if ($Data->{'SystemConfig'}{'clrEmail_turnOff_New'});
 	}
 	if ($action eq 'PATH_UPDATED')	{
-		$email_body .= qq[The above $txt_Clr has been updated. 
+		$email_body .= $lang->txt('The above Transfer has been updated') . qq[
 
-Current Level for Approval: $whos_turn
+] . $lang->txt('Current Level for Approval') . qq[: $whos_turn
 
 $viewDetails
-Be sure to check the $txt_Clr to see when its your turn to approve/deny it.];
-		$email_subject = qq[$txt_Clr Updated- Ref. No.:$cref->{intClearanceID}- $cref->{MemberName} - DOB - $cref->{dtDOB}];
+] . $lang->txt('Be sure to check the Transfer to see when its your turn to approve/deny it');
+		$email_subject = $lang->txt('Transfer Updated- No.') . qq[:$cref->{intClearanceID}- $cref->{MemberName} - $cref->{dtDOB}];
 	}
 	if ($action eq 'FINALISED')	{
-		$email_body .= qq[The above $txt_Clr has been finalised.
-$viewDetails
-];
-                $email_subject = qq[$txt_Clr finalised- Ref. No.:$cref->{intClearanceID}- $cref->{MemberName} - DOB - $cref->{dtDOB}];
+		$email_body .= $lang->txt('The above Transfer has been finalised') .  $viewDetails;
+        $email_subject = $lang->txt('Transfer finalised- No.') . qq[:$cref->{intClearanceID}- $cref->{MemberName} - DOB - $cref->{dtDOB}];
 
 	}
 
