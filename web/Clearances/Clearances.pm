@@ -19,14 +19,13 @@ use FormHelpers;
 use DeQuote;
 use AuditLog;
 use Mail::Sendmail;
-use SearchLevels;
 
-use Seasons;
 use ServicesContacts;
 use GridDisplay;
 use Data::Dumper;
 use ContactsObj;
 use DefCodes;
+
 sub handleClearances	{
     ### PURPOSE: main function to handle clearances.
 
@@ -40,9 +39,8 @@ sub handleClearances	{
 	my $clearancePathID = $params{'cpID'} || 0;
 	my $txt_RequestCLR = $Data->{'SystemConfig'}{'txtRequestCLR'} || 'Request a Clearance';
 	my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
-	return (clearances_create(),$txt_RequestCLR) if $action eq 'CL_create';
+
 	return (createClearance($action, $Data), $txt_RequestCLR) if $action eq 'CL_createnew';
-	return (clearances_currentstatus(),'Clearance Status') if $action eq 'CL_currentstatus';
 	return (clearancePathDetails($Data, $clearanceID, $clearancePathID), 'Clearance Status Selection') if $action eq 'CL_details';
 	return (listClearances($Data), $txt_RequestCLR) if $action eq 'CL_list';
 	return (listOfflineClearances($Data), $txt_RequestCLR) if $action eq 'CL_offlist';
