@@ -13,8 +13,7 @@ require Exporter;
 
 use strict;
 use CGI qw(param unescape escape);
-
-use lib '.', "..";
+use lib '.', '..', '../..', "../comp", '../RegoForm', "../dashboard", "../RegoFormBuilder",'../PaymentSplit', "../user";
 use Defs;
 use Reg_common;
 use FieldLabels;
@@ -32,11 +31,10 @@ sub listClearanceSettings	{
 	my($Data, $intID, $intTypeID) = @_;
 	$intID ||= 0;
 	$intTypeID ||= 0;
-
+    my $lang = $Data->{'lang'};
 	my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
 	my $db = $Data->{'db'};
 
-	my $lang = $Data->{'lang'};
 	my %textLabels = (
 		'addClearanceSettings' => $lang->txt("Add $txt_Clr Settings"),
 		'autoApproval' => $lang->txt('Auto Approval'), 
@@ -52,9 +50,8 @@ sub listClearanceSettings	{
 
 	my $clearanceStatus = $Data->{'ViewClrStatus'} || $Defs::CLR_STATUS_PENDING || 0;
 	my $st = qq[
-		SELECT CS.*, DATE_FORMAT(dtDOBStart,'%d/%m/%Y') AS dtDOBStart, DATE_FORMAT(dtDOBEnd,'%d/%m/%Y') AS dtDOBEnd , A.strName as AssocName
+		SELECT CS.*, DATE_FORMAT(dtDOBStart,'%d/%m/%Y') AS dtDOBStart, DATE_FORMAT(dtDOBEnd,'%d/%m/%Y') AS dtDOBEnd 
 		FROM tblClearanceSettings as CS
-			LEFT JOIN tblAssoc as A ON (A.intAssocID=CS.intCheckAssocID)
 		WHERE intID = ?
 			AND intTypeID = ?
 		ORDER BY dtDOBStart
@@ -73,8 +70,7 @@ sub listClearanceSettings	{
 	my @rowdata = ();
   while (my $dref = $query->fetchrow_hashref) {
 		$dref->{ruleDirection} = $Defs::ClearanceDirections{$dref->{intRuleDirection}} || '';
-		$dref->{ruleDirection} .= qq[ (Override rule for any $txt_Clr with $Data->{LevelNames}{$Defs::LEVEL_ASSOC}: <b>$dref->{AssocName}</b>)] if $dref->{AssocName};
-		$dref->{ruleDirection} .= qq[ (for Type: $Defs::ClearanceRuleTypes{$Data->{'Realm'}}{$dref->{intClearanceType}})] if ($dref->{intClearanceType});
+		$dref->{ruleDirection} .= qq[ (] . $lang->txt('for Type') . qq[: $Defs::ClearanceRuleTypes{$Data->{'Realm'}}{$dref->{intClearanceType}})] if ($dref->{intClearanceType});
 		$dref->{delLink} = qq[<a href="$Data->{target}?a=CLRSET_DEL&amp;client=$client&amp;csID=$dref->{intClearanceSettingID}"><img border="0" src="images/sml_delete_icon.gif"></a>];
 
 		$dref->{'dtDOBStart'} = '' if $dref->{'dtDOBStart'} eq '00/00/0000';
@@ -92,7 +88,7 @@ sub listClearanceSettings	{
 		};
   }
   $query->finish;
-	my $addLink= qq[<div class="changeoptions"><span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=CLRSET_ADD">Add</a></span></div>];
+	my $addLink= qq[<div class="changeoptions"><span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=CLRSET_ADD">] . $lang->txt('Add') . qq[</a></span></div>];
 
   my @headers = (
     {
@@ -160,7 +156,6 @@ sub listOfflineClearances {
 			'createdBy' => $lang->txt('Created by'),
 			'denied' => $lang->txt('Denied'),
 			'dob' => $lang->txt('Date of Birth'), 
-			'fromAssoc' => $lang->txt('From Association'),
 			'fromClub' => $lang->txt('From Club'),
 			'listClearances' => $lang->txt('List Offline/Manual Clearances'),
 			'member' => $lang->txt('Member'),
@@ -172,7 +167,6 @@ sub listOfflineClearances {
 			'records' => $lang->txt('records'),
 			'showing' => $lang->txt('Showing'),
 			'status' => $lang->txt('Status'),
-			'toAssoc' => $lang->txt('To Association'),
 			'toClub' => $lang->txt('To Club'),
 			'transferWarning' => $lang->txt(q[Clearances for players transferring into clubs from other leagues will not appear below unless the clearance is approved and the player details are transferred to the new league/club]),
 			'year' => $lang->txt('Year'),
@@ -204,18 +198,14 @@ sub listOfflineClearances {
 	}
 
 	my $st = qq[
-		SELECT DISTINCT C.*, DATE_FORMAT(C.dtApplied,"%d/%m/%Y") AS dtApplied, CONCAT(M.strSurname, ", ", M.strFirstname) as MemberName, IF(SourceClub.intClubID, SourceClub.strName, strSourceClubName) as SourceClubName, IF(SourceAssoc.intAssocID, SourceAssoc.strName, strSourceAssocName) as SourceAssocName, IF(DestinationAssoc.intAssocID, DestinationAssoc.strName, strDestinationAssocName) as DestinationAssocName, IF (DestinationClub.intClubID, DestinationClub.strName, strDestinationClubName) as DestinationClubName, DATE_FORMAT(M.dtDOB,"%d/%m/%Y") AS DOB, YEAR(dtApplied) AS clrYear
+		SELECT DISTINCT C.*, DATE_FORMAT(C.dtApplied,"%d/%m/%Y") AS dtApplied, CONCAT(M.strSurname, ", ", M.strFirstname) as MemberName, IF(SourceClub.intClubID, SourceClub.strName, strSourceClubName) as SourceClubName, IF (DestinationClub.intClubID, DestinationClub.strName, strDestinationClubName) as DestinationClubName, DATE_FORMAT(M.dtDOB,"%d/%m/%Y") AS DOB, YEAR(dtApplied) AS clrYear
 		FROM tblClearance as C 
 			INNER JOIN tblMember as M ON (M.intMemberID = C.intMemberID) 
-			INNER JOIN tblMember_Associations as MA ON (M.intMemberID = MA.intMemberID)
 			$CLUB_JOIN
-			LEFT JOIN tblAssoc as DestinationAssoc ON (DestinationAssoc.intAssocID = C.intDestinationAssocID)
-			LEFT JOIN tblAssoc as SourceAssoc ON (SourceAssoc.intAssocID = C.intSourceAssocID)
 			LEFT JOIN tblClub as SourceClub ON (SourceClub.intClubID = C.intSourceClubID)
 			LEFT JOIN tblClub as DestinationClub ON (DestinationClub.intClubID = C.intDestinationClubID)
                 WHERE 
 			C.intCreatedFrom IN ($Defs::CLR_TYPE_SWC, $Defs::CLR_TYPE_MANUAL)
-			AND MA.intAssocID = ?
 			AND C.intRealmID = ?
 	ORDER BY C.intClearanceID 
 	];
@@ -246,7 +236,7 @@ sub listOfflineClearances {
     $cnt++;
 
     my %row = ();
-    for my $i (qw(MemberName DOB SourceAssocName SourceClubName DestinationAssocName DestinationClubName updatestatus overallstatus dtApplied createdFrom intClearanceID clrYear intClearanceStatus_RAW ))  {
+    for my $i (qw(MemberName DOB SourceClubName DestinationClubName updatestatus overallstatus dtApplied createdFrom intClearanceID clrYear intClearanceStatus_RAW ))  {
       $row{$i} = $dref->{$i};
     }
     $row{'id'} = $dref->{'intClearanceID'}.$cnt;
@@ -298,16 +288,8 @@ sub listOfflineClearances {
       field =>  'DOB',
     },
     {
-      name =>   $lang->txt('From Association'),
-      field =>  'SourceAssocName',
-    },
-    {
       name =>   $lang->txt('From Club'),
       field =>  'SourceClubName',
-    },
-    {
-      name =>   $lang->txt('To Association'),
-      field =>  'DestinationAssocName',
     },
     {
       name =>   $lang->txt('To Club'),
@@ -395,7 +377,6 @@ sub listClearances	{
     my $lang = $Data->{'lang'};
     my %textLabels = (
 			'ClearanceID' => $lang->txt('Clearance Ref'), 
-			'alertDate' => $lang->txt('Alert Date'), 
 			'all' => $lang->txt('All'),
 			'applicationDate' => $lang->txt('Application Date'),
 			'approved' => $lang->txt('Approved'),
@@ -452,22 +433,16 @@ sub listClearances	{
 		$nodeStructure = qq[
 			INNER JOIN tblTempNodeStructure as TNS ON (
 				TNS.int100_ID = $Data->{'clientValues'}{'natID'}
-				AND (
-					TNS.intAssocID = C.intSourceAssocID
-					OR TNS.intAssocID = C.intDestinationAssocID
-				)
 			)
 		];
 	}
 	
 	my $st = qq[
-			SELECT C.*, DATE_FORMAT(C.dtApplied,"%d/%m/%Y") AS dtApplied, C.dtApplied as dtApplied_RAW, CP.intClearanceStatus as PathStatus, CP.intClearancePathID, CONCAT(M.strSurname, ", ", M.strFirstname) as MemberName, SourceClub.strName as SourceClubName, DestinationClub.strName as DestinationClubName, SourceAssoc.strName as SourceAssocName, DestinationAssoc.strName as DestinationAssocName, DATE_FORMAT(CP.dtAlert,"%d/%m/%Y") AS dtAlert, IF(dtAlert <> '00/00/0000', 1, 0) as AlertType, IF(dtAlert <= NOW(), 1, 0) as AlertNow, DATE_FORMAT(M.dtDOB,"%d/%m/%Y") AS DOB, M.dtDOB AS DOB_RAW, DATE_FORMAT(C.dtDue,"%d/%m/%Y") AS dtDue, C.dtDue as dtDue_RAW, CP.dtAlert as dtAlert_RAW, CP.intTypeID, CP.intID, 
+			SELECT C.*, DATE_FORMAT(C.dtApplied,"%d/%m/%Y") AS dtApplied, C.dtApplied as dtApplied_RAW, CP.intClearanceStatus as PathStatus, CP.intClearancePathID, CONCAT(M.strSurname, ", ", M.strFirstname) as MemberName, SourceClub.strName as SourceClubName, DestinationClub.strName as DestinationClubName,  DATE_FORMAT(M.dtDOB,"%d/%m/%Y") AS DOB, M.dtDOB AS DOB_RAW, DATE_FORMAT(C.dtDue,"%d/%m/%Y") AS dtDue, C.dtDue as dtDue_RAW, CP.intTypeID, CP.intID, 
 				IF(C.intCurrentPathID = CP.intClearancePathID AND C.intClearanceStatus  = $Defs::CLR_STATUS_PENDING,1,0) AS ThisLevel
 			FROM tblClearance as C 
 				INNER JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID) 
 				INNER JOIN tblMember as M ON (M.intMemberID = C.intMemberID) 
-				INNER JOIN tblAssoc as SourceAssoc ON (SourceAssoc.intAssocID = C.intSourceAssocID)
-				INNER JOIN tblAssoc as DestinationAssoc ON (DestinationAssoc.intAssocID = C.intDestinationAssocID)
 				LEFT JOIN tblClub as SourceClub ON (SourceClub.intClubID = C.intSourceClubID)
 				LEFT JOIN tblClub as DestinationClub ON (DestinationClub.intClubID = C.intDestinationClubID)
 				$nodeStructure
@@ -478,12 +453,8 @@ sub listClearances	{
                         AND intClearanceYear = $clryear
 	] if $clryear;
 
-	if ($Data->{'SystemConfig'}{'clrFilterSubRealm'} and $showAll)        {
-			$st .= qq[ AND C.intAssocTypeID = $Data->{'RealmSubType'} ];
-	}
-
 	if ($showAll)	{
-		$st .= qq[ GROUP BY C.intClearanceID ORDER BY MemberName, dtApplied, AlertType DESC, C.intClearanceID ];
+		$st .= qq[ GROUP BY C.intClearanceID ORDER BY MemberName, dtApplied, C.intClearanceID ];
 	}else {
 
 		$st .= qq[ ORDER BY intClearanceID desc ];
@@ -535,21 +506,12 @@ sub listClearances	{
 
 		$dref->{overallstatus} = $lang->txt($Defs::clearance_status{$dref->{intClearanceStatus}}) || 'P';
 		$dref->{priority} = $lang->txt($Defs::clearance_priority{$dref->{intClearancePriority}});  
-		$dref->{SourceAssocName} ||= $dref->{strSourceAssocName} || '';
 		$dref->{SourceClubName} ||= $dref->{strSourceClubName} || '';
 		$dref->{DestinationClubName} ||= $dref->{strDestinationClubName} || '';
-		$dref->{AlertDate}  = ($dref->{'dtAlert'} and $dref->{dtAlert} ne '00/00/0000') ? $dref->{dtAlert} : '';
-		#if ($Data->{'SystemConfig'}{'Clearance_DateDue'} and $dref->{dtDue} ne '00/00/0000')	{
-			#$dref->{dtApplied} .= qq[ ($dref->{dtDue})];
-			#$hasDateDue=1;
-		#}
-		if ($dref->{AlertNow} and $dref->{dtAlert} ne '00/00/0000')	{
-			$dref->{AlertDate} = qq[<b><span style="color:red">$dref->{dtAlert}</span></b>];
-		}
 		$dref->{createdFrom} = $Defs::ClearanceTypes{$dref->{intCreatedFrom}};
 		
 		my %row = ();
-		for my $i (qw(MemberName DOB DOB_RAW SourceAssocName SourceClubName DestinationAssocName DestinationClubName updatestatus overallstatus dtApplied dtApplied_RAW createdFrom intClearanceID AlertDate intClearanceYear intClearanceStatus_RAW intClearanceStatus_RAW_filter dtDue dtDue_RAW 
+		for my $i (qw(MemberName DOB DOB_RAW SourceClubName DestinationClubName updatestatus overallstatus dtApplied dtApplied_RAW createdFrom intClearanceID intClearanceYear intClearanceStatus_RAW intClearanceStatus_RAW_filter dtDue dtDue_RAW 
 ))	{
 			$row{$i} = $dref->{$i};
 		}
@@ -616,16 +578,8 @@ sub listClearances	{
       field =>  'DOB',
     },
     {
-      name =>   $lang->txt('From Association'),
-      field =>  'SourceAssocName',
-    },
-    {
       name =>   $lang->txt('From Club'),
       field =>  'SourceClubName',
-    },
-    {
-      name =>   $lang->txt('To Association'),
-      field =>  'DestinationAssocName',
     },
     {
       name =>   $lang->txt('To Club'),
@@ -657,10 +611,6 @@ sub listClearances	{
       name =>   $lang->txt("Ref. No."),
       field =>  'intClearanceID',
 			width => 60,
-    },
-    {
-      name =>   $lang->txt("Alert Date"),
-      field =>  'AlertDate',
     },
     {
       name =>   $lang->txt("Year"),
