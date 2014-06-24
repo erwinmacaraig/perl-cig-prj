@@ -13,8 +13,7 @@ require Exporter;
 
 use strict;
 use CGI qw(param unescape escape);
-
-use lib '.', "..";
+use lib '.', '..', '../..', "../comp", '../RegoForm', "../dashboard", "../RegoFormBuilder",'../PaymentSplit', "../user";
 use Defs;
 use Reg_common;
 use FieldLabels;
@@ -32,11 +31,10 @@ sub listClearanceSettings	{
 	my($Data, $intID, $intTypeID) = @_;
 	$intID ||= 0;
 	$intTypeID ||= 0;
-
+    my $lang = $Data->{'lang'};
 	my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
 	my $db = $Data->{'db'};
 
-	my $lang = $Data->{'lang'};
 	my %textLabels = (
 		'addClearanceSettings' => $lang->txt("Add $txt_Clr Settings"),
 		'autoApproval' => $lang->txt('Auto Approval'), 

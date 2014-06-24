@@ -12,7 +12,7 @@ require Exporter;
 use strict;
 use CGI qw(param unescape escape);
 
-use lib '.';
+use lib '.', '..', '../..', "../comp", '../RegoForm', "../dashboard", "../RegoFormBuilder",'../PaymentSplit', "../user";
 use Reg_common;
 use Defs;
 use Utils;
@@ -30,6 +30,7 @@ sub handleClearanceSettings	{
 
 	my($action, $Data)=@_;
 
+    my $lang = $Data->{'lang'};
 	my $id=0;
         my $intID=0;
         $intID = $Data->{'clientValues'}{'clubID'} if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB);
@@ -58,10 +59,8 @@ sub handleClearanceSettings	{
   	elsif ($action eq 'CLRSET_DEL') {
 		($resultHTML,$heading) = deleteClearanceSetting($Data, $intID, $csID);
   	}
-	my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
-	$heading||="$txt_Clr Settings";
+	$heading||=$lang->txt('Transfer Settings');
  	return ($resultHTML,$heading);
-
 }
 
 
@@ -70,8 +69,8 @@ sub deleteClearanceSetting	{
 ## function to delete a settings record for a level.
 	my ($Data, $ID, $csID) = @_;
 	my $db=$Data->{'db'} || undef;
+    my $lang = $Data->{'lang'};
 
-	my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
   	my $client=setClient($Data->{'clientValues'}) || '';
 	my $st = qq[
 		DELETE FROM tblClearanceSettings
@@ -81,12 +80,10 @@ sub deleteClearanceSetting	{
 	my $query = $db->prepare($st);
 	$query->execute;
 
-	my $resultHTML = qq[
-	<div class="OKmsg">Record deleted successfully</div> <br> <a href="$Data->{'target'}?client=$client&amp;a=CLRSET_LIST">Return to $txt_Clr Settings</a>
-	];
-  auditLog($csID, $Data, 'Delete', 'Clearance Settings');
+	my $resultHTML = qq[<div class="OKmsg">] . $lang->txt('Record deleted successfully') . qq[</div> <br> <a href="$Data->{'target'}?client=$client&amp;a=CLRSET_LIST">] . $lang->txt('Return to Transfer Settings') . qq[</a>];
+  auditLog($csID, $Data, 'Delete', $lang->txt('Transfer Settings'));
 
-	return ($resultHTML, "$txt_Clr Settings");	
+	return ($resultHTML, $lang->txt("Transfer Settings"));	
 }
 
 sub displayClearanceSetting	{
@@ -94,12 +91,12 @@ sub displayClearanceSetting	{
 ## function that uses HTMLForm to allow insert of clearance settings.  
 
   my($Data, $ID, $intTypeID, $csID, $edit) = @_;
+    my $lang = $Data->{'lang'};
 
 	my $db=$Data->{'db'} || undef;
   	my $client=setClient($Data->{'clientValues'}) || '';
 	my $target=$Data->{'target'} || '';
 	my $option=$edit ? ($csID ? 'edit' : 'add')  :'display' ;
-	my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
 
   	my $resultHTML = '';
 	my $toplist='';
@@ -126,12 +123,11 @@ sub displayClearanceSetting	{
 			VALUES ($ID, $intTypeID, --VAL--)
 	];
     
-	my $intPermits = ($Data->{'SystemConfig'}{'clrHide_dtPermitFrom'}!=1 or $Data->{'SystemConfig'}{'clrHide_dtPermitTo'}!=1) ? 1 : 0;
 	my %FieldDefs = (
 		CLR => {
 			fields => {
 				                intAutoApproval=> {
-                                        label => 'Auto Approval',
+                                        label => $lang->txt('Auto Approval'),
                                         value => $dref->{'intAutoApproval'},
                                         type  => 'lookup',
                                         options => \%Defs::ClearanceApprovals,
@@ -139,21 +135,15 @@ sub displayClearanceSetting	{
                                         compulsory => 1,
                                 },
 				                intRuleDirection=> {
-                                        label => 'Rule Applies to',
+                                        label => $lang->txt('Rule applies to'),
                                         value => $dref->{'intRuleDirection'},
                                         type  => 'lookup',
                                         options => \%Defs::ClearanceDirections,
                                         compulsory => 1,
                                         ffirstoption => [$Defs::CLR_BOTH,$Defs::ClearanceDirections{$Defs::CLR_BOTH}],
                                 },
-                                curDefaultFee => {
-                                        label => $Data->{'SystemConfig'}{'clrHide_curDevelFee'} ? '' : 'Default Fee for Auto Approval',
-                                        value=> $dref->{'curDefaultFee'},
-                                        type => 'text',
-                                        size => 8,
-                                },
                                 dtDOBStart => {
-                                        label => 'DOB Start Range (earliest date)',
+                                        label => $lang->txt('DOB Start Range (earliest date)'),
                                         value=> $dref->{'dtDOBStart'},
 					                    format => 'dd/mm/yyyy',
                                         type => 'date',
@@ -161,36 +151,21 @@ sub displayClearanceSetting	{
 					                    validate => 'DATE',
                                 },
                                 dtDOBEnd => {
-                                        label => 'DOB End Range (latest date)',
+                                        label => $lang->txt('DOB End Range (latest date)'),
                                         value=> $dref->{'dtDOBEnd'},
 					                    format => 'dd/mm/yyyy',
                                         type => 'date',
                                         datetype => 'dropdown',
 					                    validate => 'DATE',
                                 },
-                                intPrimaryApprover=> {
-                                        label =>  ($Data->{'clientValues'}{'currentLevel'} >= $Defs::LEVEL_NATIONAL) ? "Make us the Primary Approver?" : '',
-                                        value=> $dref->{'intPrimaryApprover'},
-                                        type => 'checkbox',
-                                        size => 5,
-                                },
-								intClearanceType => {
-                                        label => $intPermits ? "Rule for $txt_Clr Type" : '',
-                                        value => $dref->{'intClearanceType'},
-                                        type  => 'lookup',
-                                        options => \%{$Defs::ClearanceRuleTypes{$Data->{'Realm'}}},
-                                        firstoption => [0, 'All Types'],
-                                        compulsory => 1,
-										default => 0,
-                                }
 		},
-		order => [qw(intPrimaryApprover intAutoApproval intRuleDirection curDefaultFee dtDOBStart dtDOBEnd intClearanceType)],
+		order => [qw(intAutoApproval intRuleDirection dtDOBStart dtDOBEnd)],
 			options => {
 				labelsuffix => ':',
 				hideblank => 1,
 				target => $Data->{'target'},
 				formname => 'clr_form',
-				submitlabel => 'Update Settings',
+				submitlabel => $lang->txt('Update Settings'),
 				introtext => 'auto',
 				buttonloc => 'bottom',
 				updateSQL => $clrupdate,
@@ -200,24 +175,20 @@ sub displayClearanceSetting	{
         auditAddParams => [
           $Data,
           'Add',
-          'Clearance Settings'
+          $lang->txt('Transfer Settings')
         ],
         auditEditParams => [
           $csID,
           $Data,
           'Update',
-          'Clearance Settings'
+          $lang->txt('Transfer Settings')
         ],
-				updateOKtext => qq[
-					<div class="OKmsg">Record updated successfully</div> <br>
-					<a href="$Data->{'target'}?client=$client&amp;a=CLRSET_LIST">Return to $txt_Clr Settings</a>
-				],
-				addOKtext => qq[
-					<div class="OKmsg">Record updated successfully</div> <br>
-					<a href="$Data->{'target'}?client=$client&amp;a=CLRSET_LIST">Return to $txt_Clr Settings</a>
-				],
+				updateOKtext => qq[<div class="OKmsg">] . $lang->txt('Record updated successfully') . qq[</div> <br>
+					<a href="$Data->{'target'}?client=$client&amp;a=CLRSET_LIST">] . $lang->txt('Return to Transfer Settings') . qq[</a>],
+				addOKtext=> qq[<div class="OKmsg">] . $lang->txt('Record updated successfully') . qq[</div> <br>
+					<a href="$Data->{'target'}?client=$client&amp;a=CLRSET_LIST">] . $lang->txt('Return to Transfer Settings') . qq[</a>],
 			},
-			sections => [ ['main','Details'], ],
+			sections => [ ['main',$lang->txt('Details')], ],
 			carryfields =>  {
 				client => $client,
 				a=> 'CLRSET_EDIT',
@@ -233,9 +204,7 @@ sub displayClearanceSetting	{
 
 
 
-		$resultHTML=qq[
-			<div>This member does not have any Transaction information to display.</div>
-		] if !ref $dref;
+		$resultHTML=qq[<div>] . $lang->txt('This member does not have any Transaction information to display') . qq[.</div>] if !ref $dref;
 
 		$resultHTML=qq[
 				<div class="alphaNav">$toplist</div>
@@ -243,7 +212,7 @@ sub displayClearanceSetting	{
 					$resultHTML
 				</div>
 		];
-		my $heading=qq[$txt_Clr Settings];
+		my $heading=$lang->txt('Transfer Settings');
 		return ($resultHTML,$heading);
 }
 1;
