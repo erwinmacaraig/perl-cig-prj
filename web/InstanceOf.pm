@@ -9,7 +9,7 @@ use lib "..",".";
 use strict;
 use Defs;
 
-use MemberObj;
+use PersonObj;
 use EntityObj;
 
 sub getInstanceOf	{
@@ -48,12 +48,12 @@ sub getInstanceOf	{
 			}
 		}
 	}
-	elsif($type eq 'member')	{
-		my $id = $idIN || $clientValues_ref->{memberID} || $Defs::INVALID_ID;
+	elsif($type eq 'person')	{
+		my $id = $idIN || $clientValues_ref->{personID} || $Defs::INVALID_ID;
 		if($id != $Defs::INVALID_ID)	{
-			$obj = $cache->get('swm',"MemberObj-$id") if $cache;
+			$obj = $cache->get('swm',"PersonObj-$id") if $cache;
 			if(!$obj)	{
-				$obj = new MemberObj(
+				$obj = new PersonObj(
 					db => $db,
 					ID => $id,
 				);
@@ -62,7 +62,7 @@ sub getInstanceOf	{
 				$obj->clearDB();
 				$cache->set(
 					'swm',
-					"MemberObj-$id",
+					"PersonObj-$id",
 					$obj, 
                     '',
 					60*60*5, # 5hours
@@ -182,7 +182,7 @@ sub number_to_level	{
 	my ($level) = @_;
 
 	my %matrix = (
-		$Defs::LEVEL_MEMBER => 'member',
+		$Defs::LEVEL_PERSON => 'person',
 		$Defs::LEVEL_CLUB => 'club',
 		$Defs::LEVEL_ZONE => 'zone',
 		$Defs::LEVEL_REGION => 'region',

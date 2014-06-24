@@ -14,7 +14,7 @@ use strict;
 use lib 'comp';
 
 use Utils;
-use MemberObj;
+use PersonObj;
 use TTTemplate;
 
 sub checkPrimaryClub {
@@ -41,7 +41,7 @@ sub checkPrimaryClub {
     }
 
     foreach my $subRealm (@subRealms) {
-        my $matchedMembersSubRealm = MemberObj->already_exists($Data, $newMember, $subRealm);
+        my $matchedMembersSubRealm = PersonObj->already_exists($Data, $newMember, $subRealm);
         push @matchedMembers, @$matchedMembersSubRealm;
     }
 

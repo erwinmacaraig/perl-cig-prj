@@ -32,7 +32,7 @@ sub navBar {
     my $clientValues_ref=$Data->{'clientValues'};
     my $currentLevel = $clientValues_ref->{INTERNAL_tempLevel} ||  $clientValues_ref->{currentLevel};
     my $currentID = getID($clientValues_ref);
-    $clientValues_ref->{memberID} = $Defs::INVALID_ID if $currentLevel > $Defs::LEVEL_PERSON;
+    $clientValues_ref->{personID} = $Defs::INVALID_ID if $currentLevel > $Defs::LEVEL_PERSON;
     $clientValues_ref->{clubID} = $Defs::INVALID_ID  if $currentLevel > $Defs::LEVEL_CLUB;
     $clientValues_ref->{zoneID} = $Defs::INVALID_ID if $currentLevel >= $Defs::LEVEL_REGION;
     $clientValues_ref->{regionID} = $Defs::INVALID_ID if $currentLevel >= $Defs::LEVEL_NATIONAL;
@@ -75,7 +75,7 @@ sub navBar {
         );
     }
     elsif( $currentLevel == $Defs::LEVEL_PERSON) {
-        $menu_data = getMemberMenuData(
+        $menu_data = getPersonMenuData(
             $Data,
             $currentLevel,
             $currentID,
@@ -415,7 +415,7 @@ sub getAssocMenuData {
             name => $lang->txt('Dashboard'),
             url => $baseurl."a=A_HOME",
         },
-        members => {
+        persons => {
             name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}),
             url => $baseurl."a=P_L&amp;l=$Defs::LEVEL_PERSON",
         },
@@ -543,19 +543,19 @@ sub getAssocMenuData {
                     and !$Data->{'SystemConfig'}{'Rollover_HideAssoc'}) or $Data->{'SystemConfig'}{'AssocConfig'}{'Rollover_AddRollover_Override'})
             and !$hideAssocRollover
             and allowedAction($Data, 'm_e')) {
-        $menuoptions{'memberrollover'} = {
+        $menuoptions{'personrollover'} = {
             name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON}.' Rollover'),
             url => $baseurl."a=P_LSRO&amp;l=$Defs::LEVEL_PERSON",
         };
     }
 
     if (
-        $Data->{'SystemConfig'}{'AllowMemberTransfers'}
+        $Data->{'SystemConfig'}{'AllowPersonTransfers'}
             and allowedAction($Data, 'a_e')
     ) {
-        $menuoptions{'transfermember'} = {
+        $menuoptions{'transferperson'} = {
             url => $baseurl."a=P_TRANSFER&amp;l=$Defs::LEVEL_PERSON",
-            name => $Data->{'SystemConfig'}{'transferMemberText'} || $lang->txt('Transfer Member'),
+            name => $Data->{'SystemConfig'}{'transferPersonText'} || $lang->txt('Transfer Person'),
         };
     }
 
@@ -575,12 +575,12 @@ sub getAssocMenuData {
     my @menu_structure = (
         [ $lang->txt('Dashboard'), 'home','home'],
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}), 'menu', [
-        'members',
+        'persons',
         'duplicates',
         'clearances',    
         'clearancesoff',    
-        'memberrollover',
-        'transfermember',
+        'personrollover',
+        'transferperson',
         'cardprinting',
         'pendingregistration',
         ]],
@@ -655,7 +655,7 @@ sub getClubMenuData {
             name => $lang->txt('Dashboard'),
             url => $baseurl."a=C_HOME",
         },
-        members => {
+        persons => {
             name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}),
             url => $baseurl."a=P_L&amp;l=$Defs::LEVEL_PERSON",
         },
@@ -723,10 +723,10 @@ sub getClubMenuData {
                 name => $lang->txt('User Management'),
                 url => $baseurl."a=AM_",
             };
-            if ( $Data->{'SystemConfig'}{'AllowMemberTransfers'}  and allowedAction($Data, 'c_e')) {
-                $menuoptions{'transfermember'} = {
+            if ( $Data->{'SystemConfig'}{'AllowPersonTransfers'}  and allowedAction($Data, 'c_e')) {
+                $menuoptions{'transferperson'} = {
                     url => $baseurl."a=P_TRANSFER&amp;l=$Defs::LEVEL_PERSON",
-                    name => $Data->{'SystemConfig'}{'transferMemberText'} || $lang->txt('Transfer Member'),
+                    name => $Data->{'SystemConfig'}{'transferPersonText'} || $lang->txt('Transfer Person'),
                 };
             }
 
@@ -770,12 +770,12 @@ sub getClubMenuData {
     if(
             (!$Data->{'SystemConfig'}{'LockSeasons'}
                     and !$Data->{'SystemConfig'}{'LockSeasonsCRL'}
-                    and !$Data->{'SystemConfig'}{'Club_MemberEditOnly'}
+                    and !$Data->{'SystemConfig'}{'Club_PersonEditOnly'}
                     and !$Data->{'SystemConfig'}{'Rollover_HideAll'}
                     and !$Data->{'SystemConfig'}{'Rollover_HideClub'}
             )
             and allowedAction($Data, 'm_e')) {
-        $menuoptions{'memberrollover'} = {
+        $menuoptions{'personrollover'} = {
             name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON}.' Rollover'),
             url => $baseurl."a=P_LSRO&amp;l=$Defs::LEVEL_PERSON",
         };
@@ -792,11 +792,11 @@ sub getClubMenuData {
     my @menu_structure = (
         [ $lang->txt('Dashboard'), 'home','home'],
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}), 'menu', [
-        'members',
+        'persons',
         'newclearance',    
         'clearances',    
-        'memberrollover',
-        'transfermember',
+        'personrollover',
+        'transferperson',
         'pendingregistration',
         ]],
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu','venues'],
@@ -896,7 +896,7 @@ sub GenerateTree {
         regionID => ['entity', $Defs::LEVEL_REGION, 'E_HOME', ''],
         zoneID => ['entity', $Defs::LEVEL_ZONE, 'E_HOME', ''],
         clubID => ['club', $Defs::LEVEL_CLUB, 'C_HOME', ''],
-        memberID => ['member', $Defs::LEVEL_PERSON, 'P_HOME', ''],
+        personID => ['person', $Defs::LEVEL_PERSON, 'P_HOME', ''],
     );
     for my $level (qw(
         interID
@@ -907,7 +907,7 @@ sub GenerateTree {
         regionID
         zoneID
         clubID
-        memberID
+        personID
         )) {
         my $id = $clientValues_ref->{$level} || 0;
         if(
@@ -971,13 +971,13 @@ sub processmenudata {
 }
 
 
-sub getMemberMenuData {
+sub getPersonMenuData {
     my (
         $Data,
         $currentLevel,
         $currentID,
         $client,
-        $memberObj,
+        $personObj,
         $assocObj,
     ) = @_;
 
@@ -993,9 +993,9 @@ sub getMemberMenuData {
     my $accreditation_title = exists $Data->{'SystemConfig'}{'ACCRED_Custom_Name'} ? $Data->{'SystemConfig'}{'ACCRED_Custom_Name'}.'s' : "Accreditations";
 
 
-    my ($intOfficial) = $memberObj->getValue('intOfficial');
+    my ($intOfficial) = $personObj->getValue('intOfficial');
     my $clubs = $Data->{'SystemConfig'}{'NoClubs'} ? 0 : 1;
-    my $clr= ($assocObj->getValue('intAllowClearances') and $Data->{'SystemConfig'}{'AllowClearances'});
+    my $clr= $Data->{'SystemConfig'}{'AllowClearances'} || 0;
 
     my $invalid_club = 0;
     if (
@@ -1005,12 +1005,12 @@ sub getMemberMenuData {
     )   {
         my $st = qq[
         SELECT MAX(intStatus)   
-        FROM tblMember_Clubs
-        WHERE intMemberID = ?
+        FROM tblPerson_Clubs
+        WHERE intPersonID = ?
             AND intClubID = ?
         ];
         my $qry= $Data->{'db'}->prepare($st);
-        $qry->execute($Data->{'clientValues'}{memberID}, $Data->{'clientValues'}{'clubID'});
+        $qry->execute($Data->{'clientValues'}{personID}, $Data->{'clientValues'}{'clubID'});
         my($mcStatus)= $qry->fetchrow_array();
         $qry->finish;
         if ($mcStatus != $Defs::RECSTATUS_ACTIVE)   {
@@ -1029,12 +1029,6 @@ sub getMemberMenuData {
             $menuoptions{'auditlog'} = {
                 name => $lang->txt('Audit Log'),
                 url => $baseurl."a=AL_",
-            };
-        }
-        if(!$SystemConfig->{'NoMemberTypes'}) {
-            $menuoptions{'membertypes'} = {
-                name => $lang->txt('Member Types'),
-                url => $baseurl."a=P_MT_LIST",
             };
         }
         if ($SystemConfig->{'NationalAccreditation'} or $SystemConfig->{'AssocConfig'}{'NationalAccreditation'}) {
@@ -1060,12 +1054,6 @@ sub getMemberMenuData {
                 url => $baseurl."a=P_CLUBS",
             };
         }
-        if($SystemConfig->{'AllowSeasons'})  {
-            $menuoptions{'seasons'} = {
-                name => $lang->txt($txt_SeasonsNames),
-                url => $baseurl."a=P_SEASONS",
-            };
-        }
         if($clr) {
             $menuoptions{'clr'} = {
                 name => $lang->txt($txt_Clrs),
@@ -1078,10 +1066,9 @@ sub getMemberMenuData {
     $Data->{'SystemConfig'}{'TYPE_NAME_3'} = '' if not exists $Data->{'SystemConfig'}{'TYPE_NAME_3'};
     my @menu_structure = (
         [ $lang->txt('Dashboard'), 'home','home'],
-        [ $lang->txt('Types'), 'menu','membertypes'],
         [ $lang->txt($SystemConfig->{'txns_link_name'} || 'Transactions'), 'menu','transactions'],
         [ $lang->txt($txt_Clrs), 'menu','clr'],
-        [ $lang->txt('Member History'), 'menu',[
+        [ $lang->txt('Person History'), 'menu',[
         'clubs',
         'seasons',
         ]],
