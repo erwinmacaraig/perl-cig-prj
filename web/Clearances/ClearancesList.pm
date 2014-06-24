@@ -70,7 +70,7 @@ sub listClearanceSettings	{
 	my @rowdata = ();
   while (my $dref = $query->fetchrow_hashref) {
 		$dref->{ruleDirection} = $Defs::ClearanceDirections{$dref->{intRuleDirection}} || '';
-		$dref->{ruleDirection} .= qq[ (for Type: $Defs::ClearanceRuleTypes{$Data->{'Realm'}}{$dref->{intClearanceType}})] if ($dref->{intClearanceType});
+		$dref->{ruleDirection} .= qq[ (] . $lang->txt('for Type') . qq[: $Defs::ClearanceRuleTypes{$Data->{'Realm'}}{$dref->{intClearanceType}})] if ($dref->{intClearanceType});
 		$dref->{delLink} = qq[<a href="$Data->{target}?a=CLRSET_DEL&amp;client=$client&amp;csID=$dref->{intClearanceSettingID}"><img border="0" src="images/sml_delete_icon.gif"></a>];
 
 		$dref->{'dtDOBStart'} = '' if $dref->{'dtDOBStart'} eq '00/00/0000';
@@ -88,7 +88,7 @@ sub listClearanceSettings	{
 		};
   }
   $query->finish;
-	my $addLink= qq[<div class="changeoptions"><span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=CLRSET_ADD">Add</a></span></div>];
+	my $addLink= qq[<div class="changeoptions"><span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=CLRSET_ADD">] . $lang->txt('Add') . qq[</a></span></div>];
 
   my @headers = (
     {
