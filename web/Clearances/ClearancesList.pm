@@ -379,7 +379,6 @@ sub listClearances	{
     my $lang = $Data->{'lang'};
     my %textLabels = (
 			'ClearanceID' => $lang->txt('Clearance Ref'), 
-			'alertDate' => $lang->txt('Alert Date'), 
 			'all' => $lang->txt('All'),
 			'applicationDate' => $lang->txt('Application Date'),
 			'approved' => $lang->txt('Approved'),
@@ -441,7 +440,7 @@ sub listClearances	{
 	}
 	
 	my $st = qq[
-			SELECT C.*, DATE_FORMAT(C.dtApplied,"%d/%m/%Y") AS dtApplied, C.dtApplied as dtApplied_RAW, CP.intClearanceStatus as PathStatus, CP.intClearancePathID, CONCAT(M.strSurname, ", ", M.strFirstname) as MemberName, SourceClub.strName as SourceClubName, DestinationClub.strName as DestinationClubName, DATE_FORMAT(CP.dtAlert,"%d/%m/%Y") AS dtAlert, IF(dtAlert <> '00/00/0000', 1, 0) as AlertType, IF(dtAlert <= NOW(), 1, 0) as AlertNow, DATE_FORMAT(M.dtDOB,"%d/%m/%Y") AS DOB, M.dtDOB AS DOB_RAW, DATE_FORMAT(C.dtDue,"%d/%m/%Y") AS dtDue, C.dtDue as dtDue_RAW, CP.dtAlert as dtAlert_RAW, CP.intTypeID, CP.intID, 
+			SELECT C.*, DATE_FORMAT(C.dtApplied,"%d/%m/%Y") AS dtApplied, C.dtApplied as dtApplied_RAW, CP.intClearanceStatus as PathStatus, CP.intClearancePathID, CONCAT(M.strSurname, ", ", M.strFirstname) as MemberName, SourceClub.strName as SourceClubName, DestinationClub.strName as DestinationClubName,  DATE_FORMAT(M.dtDOB,"%d/%m/%Y") AS DOB, M.dtDOB AS DOB_RAW, DATE_FORMAT(C.dtDue,"%d/%m/%Y") AS dtDue, C.dtDue as dtDue_RAW, CP.intTypeID, CP.intID, 
 				IF(C.intCurrentPathID = CP.intClearancePathID AND C.intClearanceStatus  = $Defs::CLR_STATUS_PENDING,1,0) AS ThisLevel
 			FROM tblClearance as C 
 				INNER JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID) 
@@ -457,7 +456,7 @@ sub listClearances	{
 	] if $clryear;
 
 	if ($showAll)	{
-		$st .= qq[ GROUP BY C.intClearanceID ORDER BY MemberName, dtApplied, AlertType DESC, C.intClearanceID ];
+		$st .= qq[ GROUP BY C.intClearanceID ORDER BY MemberName, dtApplied, C.intClearanceID ];
 	}else {
 
 		$st .= qq[ ORDER BY intClearanceID desc ];
@@ -511,18 +510,10 @@ sub listClearances	{
 		$dref->{priority} = $lang->txt($Defs::clearance_priority{$dref->{intClearancePriority}});  
 		$dref->{SourceClubName} ||= $dref->{strSourceClubName} || '';
 		$dref->{DestinationClubName} ||= $dref->{strDestinationClubName} || '';
-		$dref->{AlertDate}  = ($dref->{'dtAlert'} and $dref->{dtAlert} ne '00/00/0000') ? $dref->{dtAlert} : '';
-		#if ($Data->{'SystemConfig'}{'Clearance_DateDue'} and $dref->{dtDue} ne '00/00/0000')	{
-			#$dref->{dtApplied} .= qq[ ($dref->{dtDue})];
-			#$hasDateDue=1;
-		#}
-		if ($dref->{AlertNow} and $dref->{dtAlert} ne '00/00/0000')	{
-			$dref->{AlertDate} = qq[<b><span style="color:red">$dref->{dtAlert}</span></b>];
-		}
 		$dref->{createdFrom} = $Defs::ClearanceTypes{$dref->{intCreatedFrom}};
 		
 		my %row = ();
-		for my $i (qw(MemberName DOB DOB_RAW SourceClubName DestinationClubName updatestatus overallstatus dtApplied dtApplied_RAW createdFrom intClearanceID AlertDate intClearanceYear intClearanceStatus_RAW intClearanceStatus_RAW_filter dtDue dtDue_RAW 
+		for my $i (qw(MemberName DOB DOB_RAW SourceClubName DestinationClubName updatestatus overallstatus dtApplied dtApplied_RAW createdFrom intClearanceID intClearanceYear intClearanceStatus_RAW intClearanceStatus_RAW_filter dtDue dtDue_RAW 
 ))	{
 			$row{$i} = $dref->{$i};
 		}
@@ -622,10 +613,6 @@ sub listClearances	{
       name =>   $lang->txt("Ref. No."),
       field =>  'intClearanceID',
 			width => 60,
-    },
-    {
-      name =>   $lang->txt("Alert Date"),
-      field =>  'AlertDate',
     },
     {
       name =>   $lang->txt("Year"),

@@ -19,7 +19,6 @@ CREATE TABLE `tblClearancePath` (
   `intPlayerFinancial` int(11) DEFAULT '0',
   `intPlayerSuspended` int(11) DEFAULT '0',
   `intDenialReasonID` int(11) DEFAULT '0',
-  `dtAlert` date DEFAULT NULL,
   `strApprovedBy` varchar(100) DEFAULT NULL,
   `curDevelFee` decimal(12,2) DEFAULT '0.00',
   `strOtherDetails1` varchar(30) DEFAULT '',

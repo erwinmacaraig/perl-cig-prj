@@ -84,7 +84,8 @@ sub clearanceCancel	{
 	];
 	$db->do($st);
 	$st = qq[
-		UPDATE tblClearancePath as CP INNER JOIN tblClearance as C ON (C.intClearanceID = CP.intClearanceID)
+		UPDATE tblClearancePath as CP 
+            INNER JOIN tblClearance as C ON (C.intClearanceID = CP.intClearanceID)
 		SET CP.intClearanceStatus = $Defs::CLR_STATUS_CANCELLED
 		WHERE CP.intClearanceID = $clearanceID
 			AND CP.intClearanceStatus = $Defs::CLR_STATUS_PENDING
@@ -92,7 +93,7 @@ sub clearanceCancel	{
 	];
 	sendCLREmail($Data, $clearanceID, 'CANCELLED');
 	my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
-  auditLog($clearanceID, $Data, 'Cancelled','Clearance');
+    auditLog($clearanceID, $Data, 'Cancelled','Clearance');
 	return qq[<p>$txt_Clr Cancelled</p><br> <a href="$Data->{'target'}?a=CL_list&amp;client=$client">Return to $txt_Clr Listing</a> ] ;
 }
 
@@ -109,7 +110,7 @@ sub clearanceReopen	{
 	return qq[$txt_Clr Unabled to be cancelled] if (! $clubID or ! $clearanceID);
   	my $client=setClient($Data->{'clientValues'}) || '';
 
-my $st = qq[
+    my $st = qq[
       SELECT
         C.intClearanceID, 
 				C1.strName as DestinationClubName, 
@@ -218,14 +219,11 @@ sub clearanceHistory	{
                     C.*, 
                     SourceClub.strName as SourceClubName, 
                     DestinationClub.strName as DestinationClubName, 
-                    SUM(CDF.curDevelopmentFee) + SUM(CP.curPathFee) as SumFee, 
-                    SUM(CP.curPathFee) as SumPathFee, 
                     DATE_FORMAT(dtApplied,'%d/%m/%Y') AS dtApplied, now() AS Today
                 FROM tblClearance as C
-			LEFT JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID)
-                        LEFT JOIN tblClub as SourceClub ON (SourceClub.intClubID = C.intSourceClubID)
-                        LEFT JOIN tblClub as DestinationClub ON (DestinationClub.intClubID = C.intDestinationClubID)
-			LEFT JOIN tblClearanceDevelopmentFees as CDF ON (CP.intClearanceDevelopmentFeeID = CDF.intDevelopmentFeeID)
+			        LEFT JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID)
+                    LEFT JOIN tblClub as SourceClub ON (SourceClub.intClubID = C.intSourceClubID)
+                    LEFT JOIN tblClub as DestinationClub ON (DestinationClub.intClubID = C.intDestinationClubID)
                 WHERE C.intMemberID = $intMemberID
 			AND C.intRecStatus <> -1
 		GROUP BY C.intClearanceID
@@ -332,17 +330,13 @@ sub clearanceView	{
                     DestinationClub.strName as DestinationClubName, 
                     M.strState, 
                     DATE_FORMAT(M.dtDOB,'%d/%m/%Y') AS dtDOB, 
-                    SUM(CDF.curDevelopmentFee) + SUM(CP.curPathFee) as SumFee, 
                     strNationalNum,  
-                    SUM(CP.curPathFee) as SumPathFee, 
-                    SUM(CP.curDevelFee) as SumDevelFee, 
                     CP.strOtherDetails1
                 FROM tblClearance as C
-                        INNER JOIN tblPerson as M ON (M.intMemberID = C.intMemberID)
-			LEFT JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID)
-                        LEFT JOIN tblClub as SourceClub ON (SourceClub.intClubID = C.intSourceClubID)
-                        LEFT JOIN tblClub as DestinationClub ON (DestinationClub.intClubID = C.intDestinationClubID)
-			LEFT JOIN tblClearanceDevelopmentFees as CDF ON (CP.intClearanceDevelopmentFeeID = CDF.intDevelopmentFeeID)
+                    INNER JOIN tblPerson as M ON (M.intMemberID = C.intMemberID)
+			        LEFT JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID)
+                    LEFT JOIN tblClub as SourceClub ON (SourceClub.intClubID = C.intSourceClubID)
+                    LEFT JOIN tblClub as DestinationClub ON (DestinationClub.intClubID = C.intDestinationClubID)
                 WHERE C.intClearanceID= $cID
 		GROUP BY C.intClearanceID
         ];
@@ -351,9 +345,6 @@ sub clearanceView	{
 
 	my $dref = $query->fetchrow_hashref() || undef;
 
-	$dref->{SumFee} ||= 0.00;
-	$dref->{SumPathFee} ||= 0.00;
-	$dref->{SumDevelFee} ||= 0.00;
 	my $id=0;
 	my $edit=0;
   	my $client=setClient($Data->{'clientValues'}) || '';
@@ -394,11 +385,8 @@ sub clearanceView	{
 	my $strReasonForClearance =($Data->{'SystemConfig'}{'clrHide_strReasonForClearance'}==1) ? '1' : '0';
 	my $strFilingNumber = ($Data->{'SystemConfig'}{'clrHide_strFilingNumber'} == 1) ? '1' : '0';
 	my $intClearancePriority= ($Data->{'SystemConfig'}{'clrHide_intClearancePriority'}==1) ? '1' : '0';
-	my $ClearanceFee= ($Data->{'SystemConfig'}{'clrHide_clearanceFee'}==1) ? '1' : '0';
 	my $strReason=($Data->{'SystemConfig'}{'clrHide_strReason'}==1) ? '1' : '0';
-	my $DevelFee= ($Data->{'SystemConfig'}{'clrHide_curDevelFee'}==1) ? '1' : '0';
 	my $OtherDetails1= ($Data->{'SystemConfig'}{'clrOtherDetails1_Label'}) ? '0' : '1';
-	$DevelFee = 1 if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB);
 	
 	$update_label = '' if $readonly;
 
@@ -470,24 +458,6 @@ sub clearanceView	{
 					noadd=>$intClearancePriority,
 					noedit=>$intClearancePriority,
 				},
-				ClearanceFee => {
-					label => 'Total Fees Applied',
-					value => qq[\$$dref->{SumPathFee}],
-                                        type  => 'text',
-					readonly => '1',
-					nodisplay=>$ClearanceFee,
-					noadd=>$ClearanceFee,
-					noedit=>$ClearanceFee,
-				},
-				DevelFee => {
-					label => 'Total Development Fees Applied',
-					value => qq[\$$dref->{SumDevelFee}],
-                                        type  => 'text',
-					readonly => '1',
-					nodisplay=>$DevelFee,
-					noadd=>$DevelFee,
-					noedit=>$DevelFee,
-				},
 				strOtherDetails1=> {
 					label => $Data->{'SystemConfig'}{'clrOtherDetails1_Label'},
 					value => $dref->{strOtherDetails1},
@@ -530,7 +500,7 @@ sub clearanceView	{
 					noedit=>$strReason,
 				},
 			},
-		order => [qw(ClearanceID dtApplied NatNum MemberName dtDOB strState SourceClubName DestinationClubName ClearanceStatus ClearanceFee DevelFee strOtherDetails1 ClearancePriority ClearanceReason intReasonForClearanceID strReason strReasonForClearance)],
+		order => [qw(ClearanceID dtApplied NatNum MemberName dtDOB strState SourceClubName DestinationClubName ClearanceStatus strOtherDetails1 ClearancePriority ClearanceReason intReasonForClearanceID strReason strReasonForClearance)],
 			options => {
 				labelsuffix => ':',
 				hideblank => 1,
@@ -648,9 +618,9 @@ sub showPathDetails	{
             CP.* , 
             DATE_FORMAT(CP.tTimeStamp,'%d/%m/%Y') AS TimeStamp, 
             CLF.strTitle, 
-            CLF.curDevelopmentFee, 
             C.intCurrentPathID
-		FROM tblClearancePath as CP LEFT JOIN tblClearanceDevelopmentFees as CLF ON (CLF.intDevelopmentFeeID = CP.intClearanceDevelopmentFeeID) INNER JOIN tblClearance as C ON (C.intClearanceID = CP.intClearanceID)
+		FROM tblClearancePath as CP 
+            INNER JOIN tblClearance as C ON (C.intClearanceID = CP.intClearanceID)
 		WHERE CP.intClearanceID = $cID
 		ORDER BY intOrder
 	];
@@ -682,17 +652,8 @@ sub showPathDetails	{
 				<th>Denial Reason</th>
 	] if (! $Data->{'SystemConfig'}{'clrHide_intDenialReasonID'});
 	$body .= qq[
-				<th>Fee Applied</th>
-	] if (! $Data->{'SystemConfig'}{'clrHide_clearanceFee'});
-	$body .= qq[
 				<th>$Data->{'SystemConfig'}{'clrOtherDetails1_Label'}</th>
 	] if ($Data->{'SystemConfig'}{'clrOtherDetails1_Label'});
-	$body .= qq[
-				<th>Development Fee</th>
-	] if (! $Data->{'SystemConfig'}{'clrHide_intClearanceDevelopmentFeeID'});
-	$body .= qq[
-				<th>Development Fee</th>
-	] if (! $Data->{'SystemConfig'}{'clrHide_curDevelFee'} and $Data->{'clientValues'}{'currentLevel'} != $Defs::LEVEL_CLUB);
 	$body .= qq[
 				<th>Additional Information</th>
 				<th>Time Updated</th>
@@ -721,10 +682,6 @@ sub showPathDetails	{
 		$status = qq[<span style="font-weight:bold;color:red;">$status</style>] if $dref->{intClearanceStatus} == $Defs::CLR_STATUS_DENIED;
 		$status .= qq[&nbsp;&nbsp;<a href="$Data->{'target'}?client=$client&amp;a=CL_details&amp;cID=$dref->{intClearanceID}&amp;cpID=$dref->{intClearancePathID}">&nbsp;(--REOPEN CLEARANCE--)</a>] if ($dref->{intClearanceStatus} == $Defs::CLR_STATUS_DENIED and $dref->{intTypeID} == $intTypeID and $dref->{intID} == $intID);
 		$status = 'Cancelled' if ($clearanceStatus == $Defs::CLR_STATUS_CANCELLED and $dref->{intClearanceStatus} == $Defs::CLR_STATUS_PENDING);
-		my $fee = $dref->{curPathFee} > 0 ? qq[\$$dref->{curPathFee}] : '-';
-		my $developmentfee = $dref->{intClearanceDevelopmentFeeID} ? qq[$dref->{strTitle}] : '';
-		my $curDevelFee = $dref->{curDevelFee} eq '0.00' ? '-' : $dref->{curDevelFee};
-		$curDevelFee = '' if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB);
 		my $timestamp = $dref->{intClearanceStatus} ? $dref->{TimeStamp} : '';
 		my $level = $Defs::LevelNames{$dref->{intTypeID}};
 				#<td><i>$level</i></td>
@@ -740,17 +697,8 @@ sub showPathDetails	{
 				<td>$DefCodes->{-38}{$dref->{intDenialReasonID}}</td>
 	] if (! $Data->{'SystemConfig'}{'clrHide_intDenialReasonID'});
 	$body .= qq[
-				<td>$fee</td>
-	] if (! $Data->{'SystemConfig'}{'clrHide_clearanceFee'});
-	$body .= qq[
 				<td>$dref->{'strOtherDetails1'}</td>
 	] if ($Data->{'SystemConfig'}{'clrOtherDetails1_Label'});
-	$body .= qq[
-				<td>$developmentfee</td>
-	] if (! $Data->{'SystemConfig'}{'clrHide_intClearanceDevelopmentFeeID'});
-	$body .= qq[
-				<td>$curDevelFee</td>
-	] if (! $Data->{'SystemConfig'}{'clrHide_curDevelFee'} and $Data->{'clientValues'}{'currentLevel'} != $Defs::LEVEL_CLUB);
 	$body .= qq[
 				<td>$dref->{strPathNotes}</td>
 				<td>$timestamp</td>
@@ -839,17 +787,14 @@ sub clearancePathDetails	{
                     CONCAT(M.strLocalSurname, " ", M.strLocalFirstname) as MemberName, 
                     SourceClub.strName as SourceClubName, 
                     DestinationClub.strName as DestinationClubName, 
-                    CP.curPathFee, 
                     M.strState, 
                     DATE_FORMAT(M.dtDOB,'%d/%m/%Y') AS dtDOB, 
                     CP.intID, 
                     CP.intTypeID, 
-                    CP2.intClearanceDevelopmentFeeID as DevelopmentFeeID, 
                     CP.intDenialReasonID, 
                     CP.intTableType, 
                     CP.strPathNotes, 
                     CP.strPathFilingNumber, 
-                    CP.curDevelFee, 
                     CP.strApprovedBy, 
                     CP.strOtherDetails1
                 FROM tblClearance as C
@@ -857,7 +802,6 @@ sub clearancePathDetails	{
                         INNER JOIN tblPerson as M ON (M.intMemberID = C.intMemberID)
                         LEFT JOIN tblClub as SourceClub ON (SourceClub.intClubID = C.intSourceClubID)
                         LEFT JOIN tblClub as DestinationClub ON (DestinationClub.intClubID = C.intDestinationClubID)
-			LEFT JOIN tblClearancePath as CP2 ON (CP2.intClearanceID = C.intClearanceID and CP2.intClearanceDevelopmentFeeID > 0)
                 WHERE C.intClearanceID= $cID
 			$cpID_WHERE
         ];
@@ -903,21 +847,6 @@ sub clearancePathDetails	{
 
 	$option = 'display' if ($dref->{intClearanceStatus} == $Defs::CLR_STATUS_APPROVED and $Data->{'SystemConfig'}{'NoEditClearanceOnceApproved'}); 
 	$option = 'display' if ($Data->{'ReadOnlyLogin'} and $Data->{'clientValues'}{'authLevel'}>=$Defs::LEVEL_ASSOC); ##BAFF
-	my $st_developfees=qq[ SELECT intDevelopmentFeeID, strTitle FROM tblClearanceDevelopmentFees WHERE intRealmID = $Data->{'Realm'} and intCDRecStatus =1 ];
-  	my ($developfees_vals,$developfees_order)=getDBdrop_down_Ref($Data->{'db'},$st_developfees,'');
-
-	my $developfeeID = 1;
-
-	my $developfeeType = 'lookup';
-        my $developfeeValue = $dref->{'intClearanceDevelopmentFeeID'};
-	my $developfeeReadonly = 0;
-
-	if ($dref->{intClearanceDevelopmentFeeID})	{
-		$developfeeType='text';
-		$developfeeValue="Only one development fee is allowed for the $txt_Clr";
-		$developfeeReadonly = 1;
-	}
-
     my ($DefCodes, $DefCodesOrder) = getDefCodes(
         dbh        => $Data->{'db'}, 
         realmID    => $Data->{'Realm'},
@@ -933,11 +862,7 @@ sub clearancePathDetails	{
 	my $strReasonForClearance =($Data->{'SystemConfig'}{'clrHide_strReasonForClearance'}==1) ? '1' : '0';
 	my $strFilingNumber = ($Data->{'SystemConfig'}{'clrHide_strFilingNumber'} == 1) ? '1' : '0';
 	my $intClearancePriority= ($Data->{'SystemConfig'}{'clrHide_intClearancePriority'}==1) ? '1' : '0';
-	my $ClearanceFee= ($Data->{'SystemConfig'}{'clrHide_clearanceFee'}==1) ? '1' : '0';
-	my $intClearanceDevelopmentFeeID= ($Data->{'SystemConfig'}{'clrHide_intClearanceDevelopmentFeeID'}==1) ? '1' : '0';
 	my $intDenialReasonID= ($Data->{'SystemConfig'}{'clrHide_intDenialReasonID'}==1) ? '1' : '0';
-	my $DevelFee= ($Data->{'SystemConfig'}{'clrHide_curDevelFee'}==1) ? '1' : '0';
-	$DevelFee = 1 if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB);
 	my $OtherDetails1= ($Data->{'SystemConfig'}{'clrOtherDetails1_Label'}) ? '0' : '1';
 	
 	#my $update_label = $Data->{'SystemConfig'}{'txtUpdateLabel_CLR'} || 'Update Clearance';
@@ -995,22 +920,6 @@ sub clearancePathDetails	{
                         		firstoption => ['','Select Status'],
 					readonly => $readonly,
                 		},
-				curPathFee => {
-					label => 'Fee involved',
-					value => $dref->{'curPathFee'},
-					type => 'text',
-					readonly => $readonly,
-					noadd=> $ClearanceFee,
-					noedit=> $ClearanceFee,
-				},
-				curDevelFee => {
-					label => 'Development Fee',
-					value => $dref->{'curDevelFee'},
-					type => 'text',
-					readonly => $readonly,
-					noadd=> $DevelFee,
-					noedit=> $DevelFee,
-				},
 				strOtherDetails1=> {
 					label => $Data->{'SystemConfig'}{'clrOtherDetails1_Label'},
 					value => $dref->{strOtherDetails1},
@@ -1043,17 +952,6 @@ sub clearancePathDetails	{
 					noadd=> $strFilingNumber,
 					noedit=> $strFilingNumber,
 				},
-				intClearanceDevelopmentFeeID => {
-                 		       	label => 'Development Fee',
-                        		type => $developfeeType,
-                        		value => $developfeeValue, 
- 		                       	options =>  $developfees_vals,
-                        		firstoption => ['','Select Development Fee'],
-					readonly => $developfeeReadonly,
-					readonly => $readonly,
-					noadd=> $intClearanceDevelopmentFeeID,
-					noedit=> $intClearanceDevelopmentFeeID,
-                },
 				 intDenialReasonID=> {
         				label => "Reason for Denial",
 				        value => $dref->{intDenialReasonID},
@@ -1066,7 +964,7 @@ sub clearancePathDetails	{
 					noedit=>$intDenialReasonID,
 	      			},
 		},
-		order => [qw(intClearanceID MemberName dtDOB strState SourceClubName DestinationClubName Reason intClearanceStatus strApprovedBy intDenialReasonID curPathFee curDevelFee strOtherDetails1 strPathNotes intClearanceDevelopmentFeeID strPathFilingNumber)],
+		order => [qw(intClearanceID MemberName dtDOB strState SourceClubName DestinationClubName Reason intClearanceStatus strApprovedBy intDenialReasonID strOtherDetails1 strPathNotes strPathFilingNumber)],
 			options => {
 				labelsuffix => ':',
 				hideblank => 1,
@@ -1111,9 +1009,7 @@ sub clearancePathDetails	{
 		},
 	);
 	$FieldDefs{'CLR'}{'fields'}{'intDenialReasonID'}{'compulsory'}=1 if ($Data->{'SystemConfig'}{'clrDenialReason_compulsory'} and param('d_intClearanceStatus') == $Defs::CLR_STATUS_DENIED);
-	$FieldDefs{'CLR'}{'fields'}{'strOtherDetails1'}{'compulsory'}=1 if ($Data->{'SystemConfig'}{'clrOtherDetails1_Label'} 
-        and $Data->{'SystemConfig'}{'clrDevelFees_OtherDetails1_compulsory'} 
-        and param('d_intClearanceDevelopmentFeeID'));
+	$FieldDefs{'CLR'}{'fields'}{'strOtherDetails1'}{'compulsory'}=1 if ($Data->{'SystemConfig'}{'clrOtherDetails1_Label'} );
 	($resultHTML, undef )=handleHTMLForm($FieldDefs{'CLR'}, undef, $option, '',$db);
 	$resultHTML = destinationClubText($Data) . $resultHTML if ($dref->{intDestinationClubID} == $dref->{intID} and $dref->{intTypeID} == $Defs::LEVEL_CLUB);
 
@@ -1273,7 +1169,7 @@ sub checkAutoConfirms	{
 
 	my $st_path_update = qq[
 		UPDATE tblClearancePath
-		SET strApprovedBy = 'Auto Approved', intClearanceStatus = ?, curPathFee = ?
+		SET strApprovedBy = 'Auto Approved', intClearanceStatus = ?
 		WHERE intClearancePathID = ?
 			AND intClearanceID = $cID
 	];
@@ -1290,16 +1186,13 @@ sub checkAutoConfirms	{
 		$pathIDs{$dref->{intClearancePathID}} = 1;
 
 		$currentPathID = $dref->{intClearancePathID};
-		my ($intAutoApproval, $curDefaultFee) = getClearanceSettings($Data, $dref->{intID}, $dref->{intTypeID}, $dref->{dtDOB}, $dref->{intDirection});
-		if ($dref->{SourceSubType} and $dref->{DestSubType} and $dref->{SourceSubType} == $dref->{DestSubType} and $Data->{'SystemConfig'}{'clrSameSubTypeApproval'}) {
-			$intAutoApproval = $Defs::CLR_AUTO_APPROVE;
-		}
+		my $intAutoApproval = getClearanceSettings($Data, $dref->{intID}, $dref->{intTypeID}, $dref->{dtDOB}, $dref->{intDirection});
 		if ($dref->{intNodeID} and $dref->{intStatusID} eq '0' and $intAutoApproval == 0)	{
 			$intAutoApproval = $Defs::CLR_AUTO_APPROVE;
 		}
 		if ($intAutoApproval == $Defs::CLR_AUTO_APPROVE)	{
 			my $clearancePathStatus = $intAutoApproval;
-			$qry_path_update->execute($clearancePathStatus, $curDefaultFee, $dref->{intClearancePathID}) or query_error($st_path_update);
+			$qry_path_update->execute($clearancePathStatus, $dref->{intClearancePathID}) or query_error($st_path_update);
 			$currentPathID = $dref->{intClearancePathID};
 		}
 		 elsif ($intAutoApproval == $Defs::CLR_AUTO_DENY)	{
@@ -1340,7 +1233,6 @@ sub getClearanceSettings	{
 		SELECT 
             intClearanceSettingID, 
             intAutoApproval , 
-            curDefaultFee, 
             intRuleDirection
 		FROM tblClearanceSettings
 		WHERE intID = $intID
@@ -1354,16 +1246,15 @@ sub getClearanceSettings	{
 	my $query = $db->prepare($st) or query_error($st);
 	$query->execute or query_error($st);
 
-	my ($intClearanceSettingID, $intAutoApproval, $curDefaultFee, $intRuleDirection) = $query->fetchrow_array();
+	my ($intClearanceSettingID, $intAutoApproval, $intRuleDirection) = $query->fetchrow_array();
 	$intRuleDirection ||= $Defs::CLR_BOTH;
 	$intClearanceSettingID ||= 0;
 	$intAutoApproval ||= 0;
 	if (! $intClearanceSettingID)	{
 		$intAutoApproval = $Data->{'SystemConfig'}{'clrDefaultApprovalAction'} || 0;
 	}
-	$curDefaultFee ||= 0;
 
-	return ($intAutoApproval, $curDefaultFee);
+	return $intAutoApproval;
 	
 	
 }
@@ -1708,7 +1599,6 @@ sub createClearance	{
 	}
 	else	{
 		my ($title, $cbody) = clearanceForm($Data, \%params,0,0,'add');
-		
 		$body .= $title . $cbody;
 	}
 	return $body;
@@ -1734,7 +1624,6 @@ sub clearanceForm	{
 
 	my $member_natnum= $params->{'member_natnum'} || 0;
 	my $sourceClubID = $params->{'sourceClubID'} || 0;
-	my $sourceStateID = $params->{'sourceStateID'} || 0;
 	my $realm = $params->{'realmID'} || $Data->{'Realm'} || 0;
 
 	my ($sourceClub, undef, undef) = getNodeDetails($db, $Defs::CLUB_LEVEL_CLEARANCE, $Defs::LEVEL_CLUB, $sourceClubID);
@@ -1811,34 +1700,34 @@ sub clearanceForm	{
 				NatNum=> {
 					label => $Data->{'SystemConfig'}{'NationalNumName'},
 					value => $memref->{'strNationalNum'},
-                                        type  => 'text',
+                    type  => 'text',
 					readonly => '1',
-                		},
+                },
 				DOB => {
 					label => 'Date of birth',
 					value => $memref->{'DOB'},
-                                        type  => 'text',
+                    type  => 'text',
 					readonly => '1',
 				},	
 				strState=> {
 					label => 'Address State',
 					value => $memref->{'strState'},
-                                        type  => 'text',
+                    type  => 'text',
 					readonly => '1',
-                		},
+                },
 				 intReasonForClearanceID => {
-        				label => "Reason for $txt_Clr",
-				        value => $dref->{intReasonForClearanceID},
-				        type  => 'lookup',
-        				options => $DefCodes->{-37},
-        				order => $DefCodesOrder->{-37},
+        			label => "Reason for $txt_Clr",
+				    value => $dref->{intReasonForClearanceID},
+				    type  => 'lookup',
+        			options => $DefCodes->{-37},
+        			order => $DefCodesOrder->{-37},
 					firstoption => ['',"Choose Reason"],
 					readonly => $intReasonForClearanceID,
-	      			},
+	      		},
 				strReason=> {
 					label => "Reason for $txt_Clr",
 					value => $dref->{'strReason'},
-                                        type  => 'text',
+                    type  => 'text',
 					readonly => $strReason,
 				},	
 				strReasonForClearance=> {
@@ -1846,7 +1735,7 @@ sub clearanceForm	{
 					type => 'textarea',
 					value => $dref->{'strReasonForClearance'},
 					rows => 5,
-                			cols=> 45,
+                	cols=> 45,
 					readonly => $strReasonForClearance,
 				},
 				strFilingNumber => {
@@ -1856,15 +1745,15 @@ sub clearanceForm	{
 					readonly => $strFilingNumber,
 				},	
 				intClearancePriority=> {
-                                        label => "$txt_Clr Priority",
-                                        value => $dref->{'intClearancePriority'},
-                                        type  => 'lookup',
-                                        options => \%Defs::clearance_priority,
-                                        firstoption => ['','Select Priority'],
+                    label => "$txt_Clr Priority",
+                    value => $dref->{'intClearancePriority'},
+                    type  => 'lookup',
+                    options => \%Defs::clearance_priority,
+                    firstoption => ['','Select Priority'],
 					readonly => $intClearancePriority,
                 },
 			},
-			order => [qw(MemberName NatNum DOB develfees strState SourceClub intReasonForClearanceID strReason strReasonForClearance strFilingNumber intClearancePriority)],
+			order => [qw(MemberName NatNum DOB strState SourceClub intReasonForClearanceID strReason strReasonForClearance strFilingNumber intClearancePriority)],
 			options => {
 				labelsuffix => ':',
 				hideblank => 1,
@@ -2263,51 +2152,51 @@ sub clearanceAddManual	{
 				DOB => {
 					label => 'Date of birth',
 					value => $memref->{'DOB'},
-                                        type  => 'text',
+                    type  => 'text',
 					readonly => '1',
 				},	
 				strState=> {
 					label => 'Address State',
 					value => $memref->{'strState'},
-                                        type  => 'text',
+                    type  => 'text',
 					readonly => '1',
-                		},
+               	},
 				 intReasonForClearanceID => {
-        				label => "Reason for $txt_Clr",
-				        value => $dref->{intReasonForClearanceID},
-				        type  => 'lookup',
-        				options => $DefCodes->{-37},
-        				order => $DefCodesOrder->{-37},
+        			label => "Reason for $txt_Clr",
+				    value => $dref->{intReasonForClearanceID},
+				    type  => 'lookup',
+        			options => $DefCodes->{-37},
+        			order => $DefCodesOrder->{-37},
 					firstoption => ['',"Choose Reason"],
-	      			},
+	      		},
 				strReasonForClearance=> {
 					label => 'Additional Information',
 					type => 'textarea',
 					value => $dref->{'strReasonForClearance'},
 					rows => 5,
-                			cols=> 45,
+                	cols=> 45,
 				},
 				strFilingNumber => {
 					label => 'Reference Number',
 					value => $dref->{'strFilingNumber'},
-                                        type  => 'text',
+                    type  => 'text',
 				},	
 				intClearancePriority=> {
-                                        label => "$txt_Clr Priority",
-                                        value => $dref->{'intClearancePriority'},
-                                        type  => 'lookup',
-                                        options => \%Defs::clearance_priority,
-                                        firstoption => ['','Select Priority'],
-                                },
+                    label => "$txt_Clr Priority",
+                    value => $dref->{'intClearancePriority'},
+                    type  => 'lookup',
+                    options => \%Defs::clearance_priority,
+                    firstoption => ['','Select Priority'],
+                 },
 				intClearAction=> {
-                                        label => ($option eq 'add' and $Data->{'SystemConfig'}{'Clearances_ClearAction'}) ? "$txt_Clr Action" : '',
-                                        type  => 'lookup',
-                                        options => \%Defs::clearance_clearAction,
-                                        firstoption => ['','Select Action'],
+                    label => ($option eq 'add' and $Data->{'SystemConfig'}{'Clearances_ClearAction'}) ? "$txt_Clr Action" : '',
+                    type  => 'lookup',
+                    options => \%Defs::clearance_clearAction,
+                    firstoption => ['','Select Action'],
 					SkipAddProcessing => 1,
 					compulsory => ($option eq 'add' and $Data->{'SystemConfig'}{'Clearances_ClearAction'}) ? 1 : 0,
-                                },
-				
+                },
+			
 			},
 			order => [qw(dtApplied MemberName DOB strState strSourceClubName strDestinationClubName intReasonForClearanceID strReasonForClearance strFilingNumber intClearancePriority intClearAction)],
 			options => {

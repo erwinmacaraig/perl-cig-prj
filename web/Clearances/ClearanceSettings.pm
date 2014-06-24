@@ -33,14 +33,10 @@ sub handleClearanceSettings	{
 	my $id=0;
         my $intID=0;
         $intID = $Data->{'clientValues'}{'clubID'} if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB);
-        $intID = $Data->{'clientValues'}{'assocID'} if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_ASSOC);
         $intID = $Data->{'clientValues'}{'zoneID'} if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_ZONE);
         $intID = $Data->{'clientValues'}{'regionID'} if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_REGION);
         $intID = $Data->{'clientValues'}{'stateID'} if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_STATE);
         $intID = $Data->{'clientValues'}{'natID'} if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_NATIONAL);
-        $intID = $Data->{'clientValues'}{'intzoneID'} if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_INTZONE);
-        $intID = $Data->{'clientValues'}{'intregID'} if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_INTREGION);
-        $intID = $Data->{'clientValues'}{'interID'} if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_INTERNATIONAL);
 
         my $intTypeID = $Data->{'clientValues'}{'currentLevel'};
 
