@@ -39,7 +39,6 @@ sub main {
     $user->load();
 
     my $uID = $user->id() || 0;
-
     if ( !$uID ) {
         $Data{'RedirectTo'} = "$Defs::base_url/";
     }

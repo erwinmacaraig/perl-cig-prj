@@ -120,6 +120,7 @@ sub pageMain {
         $Data
     ) = @_;
 
+warn("IN PM");
     $title ||= '';
     $navbar||='';
     $body ||= textMessage($Data->{'lang'}->txt('NO_BODY'));
@@ -247,6 +248,7 @@ sub pageMain {
     my $header = '';
     my $output = new CGI;
     if($Data->{'WriteCookies'})    {
+warn("IN WRITE");
         my $cookies_string = '';
         my @cookie_array = ();
         for my $i (@{$Data->{'WriteCookies'}})    {
@@ -341,6 +343,7 @@ sub pageForm    {
     $title ||= '';
     $body||= textMessage("Oops !<br> This shouldn't be happening!<br> Please contact <a href=\"mailto:info\@sportingpulse.com\">info\@sportingpulse.com</a>");
  $Data->{'TagManager'}='';#getTagManager($Data);
+warn(" IN PF");
 
     my ($html_head, $page_header, $page_navigator, $paypal, $powered) = getPageCustomization($Data);
     my $meta = {};
@@ -366,9 +369,11 @@ sub pageForm    {
     my $output = new CGI;
     my $header = '';
     if($Data->{'WriteCookies'})    {
+warn("### IN WRITE COOKIES#");
         my $cookies_string = '';
         my @cookie_array = ();
         for my $i (@{$Data->{'WriteCookies'}})    {
+warn("EXPIRES $i->[2]");
             push @cookie_array, $output->cookie(
                 -name=>$i->[0],
                 -value=>$i->[1],
