@@ -125,8 +125,8 @@ sub listPersons {
         };
 
     }
-use Data::Dumper;
-print STDERR Dumper(\@headers);
+#use Data::Dumper;
+#print STDERR Dumper(\@headers);
 
     my $clubID = $Data->{'clientValues'}{'clubID'} || 0;
 
@@ -152,8 +152,8 @@ print STDERR Dumper(\@headers);
             AND PR.intEntityID = ?
         ORDER BY $default_sort strLocalSurname, strLocalFirstname
     ];
+warn($statement . $entityID);
 
-warn($statement, $entityID);
     my $query = exec_sql($statement, $entityID);
     my $found = 0;
     my @rowdata = ();
@@ -163,6 +163,7 @@ warn($statement, $entityID);
     my %tempClientValues = getClient($client);
     $tempClientValues{currentLevel} = $Defs::LEVEL_PERSON;
     while (my $dref = $query->fetchrow_hashref()) {
+warn("1111111");
         next if (defined $dref->{strStatus} and $dref->{strStatus} eq 'DELETED');
         $tempClientValues{personID} = $dref->{intPersonID};
         my $tempClient = setClient(\%tempClientValues);
@@ -287,7 +288,8 @@ warn($statement, $entityID);
     $title = $modoptions.$title;
     #$title = 'Pending ' . $title if ($is_pending_registration);
 
-    my $rectype_options = show_recordtypes($Data, $Defs::LEVEL_PERSON, 1, $memfieldlabels, 'Family Name',1, 0,0);
+warn("BRUCE SET BELOW TO OMIT SEASONS -- via LAST FUNCTION PARAM=1");
+    my $rectype_options = show_recordtypes($Data, $Defs::LEVEL_PERSON, 1, $memfieldlabels, 'Family Name',1, 0,1);
 
     $resultHTML =qq[
         $list_instruction

@@ -35,9 +35,9 @@ sub new {
   $Data{'RealmSubType'} = $fields{'realmSubTypeID'} || 0;
   $Data{'SystemConfig'} = getSystemConfig(\%Data);
 	
-	my $orderBy = qq[  ORDER BY intAssocID, DOBEnd ASC, DOBStart ASC, intRealmSubTypeID, intAgeGroupGender, intAgeGroupID ];
+	my $orderBy = qq[  ORDER BY DOBEnd ASC, DOBStart ASC, intRealmSubTypeID, intAgeGroupGender, intAgeGroupID ];
 	if ($Data{'SystemConfig'}{'AgeGroup_OrderOverride'})	{
-		$orderBy = qq[  ORDER BY intRealmSubTypeID DESC, intAssocID, DOBEnd ASC, DOBStart ASC, intAgeGroupGender, intAgeGroupID ];
+		$orderBy = qq[  ORDER BY intRealmSubTypeID DESC, DOBEnd ASC, DOBStart ASC, intAgeGroupGender, intAgeGroupID ];
 	}
 
 	#Setup Values
@@ -45,7 +45,6 @@ sub new {
 		SELECT intAgeGroupID, DATE_FORMAT(dtDOBStart, "%Y%m%d") as DOBStart, DATE_FORMAT(dtDOBEnd, "%Y%m%d") as DOBEnd, intAgeGroupGender
 		FROM tblAgeGroups
 		WHERE intRealmID = $realm
-			AND intAssocID IN (0, $assocID)
 			AND intRecStatus = 1
       $realmSubType_SQL
 		$orderBy
@@ -62,7 +61,6 @@ sub new {
         tblAgeGroups
       WHERE 
         intRealmID = $realm
-        AND intAssocID IN (0, $assocID)
         AND intRecStatus = 1
         $realmSubType_SQL
       $orderBy

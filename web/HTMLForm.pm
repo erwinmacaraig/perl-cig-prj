@@ -50,7 +50,7 @@ qq[<span class="compulsory"><img src="images/compulsory.gif" alt="$txt_compulsor
       : @{ $fields_ref->{'order'} };
     my %clientside_validation = ();
 
-    DEBUG "generating HTML form for $action fields in order (@fieldorder)";
+    #DEBUG "generating HTML form for $action fields in order (@fieldorder)";
 
     my $scripts = '';
 
@@ -93,23 +93,23 @@ qq[<span class="compulsory"><img src="images/compulsory.gif" alt="$txt_compulsor
                     and $permissions->{$fieldname} )
                 or ( defined $type and $type eq 'textblock' ) ? 1 : 0 );
 
-        DEBUG "\n\n\n", "-" x 20, " $fieldname ", "-" x 20;
-        DEBUG "$fieldname :: config:", Dumper($f);
+        #DEBUG "\n\n\n", "-" x 20, " $fieldname ", "-" x 20;
+        #DEBUG "$fieldname :: config:", Dumper($f);
 
         # check for skip condition
         if (   ( $edit and not $visible_for_edit )
             or ( $add and not $visible_for_add )
             or not $field_has_permission )
         {
-            DEBUG "$fieldname :: skip field";
-            DEBUG "    Condition - edit: $edit, visible: $visible_for_edit";
-            DEBUG "    Condition - add: $add, visible: $visible_for_add";
-            DEBUG "    Condition - has_permission: $field_has_permission";
-            DEBUG "        permissions:", ( $permissions ? 'True' : 'False' );
-            DEBUG "        permission key:",
-              ( ( exists $permissions->{$fieldname} ) ? 'True' : 'False' );
-            DEBUG "        permission value: $permissions->{$fieldname}"
-              if exists $permissions->{$fieldname};
+         #   DEBUG "$fieldname :: skip field";
+         #   DEBUG "    Condition - edit: $edit, visible: $visible_for_edit";
+         #   DEBUG "    Condition - add: $add, visible: $visible_for_add";
+         #   DEBUG "    Condition - has_permission: $field_has_permission";
+         #   DEBUG "        permissions:", ( $permissions ? 'True' : 'False' );
+         #   DEBUG "        permission key:",
+         #     ( ( exists $permissions->{$fieldname} ) ? 'True' : 'False' );
+         #   DEBUG "        permission value: $permissions->{$fieldname}"
+         #     if exists $permissions->{$fieldname};
 
             next;
         }
@@ -118,7 +118,7 @@ qq[<span class="compulsory"><img src="images/compulsory.gif" alt="$txt_compulsor
           ( $type eq 'hidden' or not $f->{'readonly'} or ($f->{'readonly'} and  $f->{'Save_readonly'})) ? 1 : 0;
 
         if ( ( $edit or $add ) and $is_editable_field ) {
-            DEBUG "$fieldname :: editable field";
+            #DEBUG "$fieldname :: editable field";
 
             #(not scalar keys %$permissions)
 
@@ -255,20 +255,20 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
             $label = qq[<label for="l_$fieldname">$label</label>] if $label;
         }
         else {
-            DEBUG "$fieldname :: readonly field";
-            DEBUG "    Condition - add: $add, edit: $edit";
-            DEBUG "    Condition - is_editable_field: $is_editable_field";
-            DEBUG "        type: $type, readonly:", $f->{'readonly'};
-            DEBUG "$fieldname ::     value: $val";
+           # DEBUG "$fieldname :: readonly field";
+           # DEBUG "    Condition - add: $add, edit: $edit";
+           # DEBUG "    Condition - is_editable_field: $is_editable_field";
+           # DEBUG "        type: $type, readonly:", $f->{'readonly'};
+           # DEBUG "$fieldname ::     value: $val";
 
             if ( $type eq 'lookup' ) {
                 $field_html = $f->{'options'}{$val} || "&nbsp;";
-                DEBUG "$fieldname ::     options: ", Dumper( $f->{'options'} );
+           #     DEBUG "$fieldname ::     options: ", Dumper( $f->{'options'} );
             }
             elsif ( $f->{'displaylookup'} ) {
                 $field_html =
                   langlookup( $fields_ref, $f->{'displaylookup'}{$val} );
-                DEBUG "$fieldname ::     displaylookup: ",
+           #     DEBUG "$fieldname ::     displaylookup: ",
                   Dumper( $f->{'displaylookup'} );
             }
             else {
@@ -279,11 +279,11 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 $val = '' if $val eq '0000-00-00';
                 $val = '' if $val eq '0000-00-00 00:00';
                 $field_html = $val;
-                DEBUG "$fieldname ::     filtered value: $val";
+           #     DEBUG "$fieldname ::     filtered value: $val";
             }
         }
 
-        DEBUG "$fieldname :: generated html: \n$field_html";
+        #DEBUG "$fieldname :: generated html: \n$field_html";
 
         if (    $fields_ref->{'options'}
             and $fields_ref->{'options'}{'labelsuffix'} )
@@ -516,7 +516,7 @@ sub drop_down {
         $multi, $pre,         $otheroptions, $onChange, $class,
         $disabled
     ) = @_;
-    DEBUG "genereate dropdown for $name";
+    #DEBUG "genereate dropdown for $name";
     return '' if ( !$name or !$options_ref );
     if ( !defined $default ) { $default = ''; }
     $multi        ||= '';

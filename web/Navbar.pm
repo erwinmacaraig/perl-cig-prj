@@ -149,8 +149,8 @@ sub getEntityMenuData {
 
     my $hideClearances = $entityObj->getValue('intHideClearances');
 
-    my $txt_Clr = $SystemConfig->{'txtCLR'} || 'Clearance';
-    my $txt_Clr_ListOnline = $SystemConfig->{'txtCLRListOnline'} || "List Online $txt_Clr"."s";
+    my $txt_Clr = $lang->txt('Transfer');
+    my $txt_Clr_ListOnline = $lang->txt('List Online Transfers');
 
     my $paymentSplitSettings = getPaymentSplitSettings($Data);
     my $baseurl = "$target?client=$client&amp;";

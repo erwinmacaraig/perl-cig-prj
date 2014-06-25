@@ -1577,8 +1577,6 @@ sub getSeasons  {
             tblSeasons 
         WHERE 
             intRealmID = $Data->{'Realm'}
-            AND (intAssocID = $assocID OR intAssocID = 0)
-            AND (intRealmSubTypeID = $subType $subTypeSeasonOnly)   
             $checkLocked
         ORDER BY intSeasonOrder
     ]; 
