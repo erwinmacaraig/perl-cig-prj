@@ -8,6 +8,7 @@ require Exporter;
 @EXPORT = qw(handleDuplicates isCheckDupl getDuplFields );
 @EXPORT_OK = qw(handleDuplicates isCheckDupl getDuplFields );
 
+use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 
 use strict;
 use Reg_common;
@@ -92,7 +93,7 @@ sub displayDuplicateProblems	{
 	];
 	my $wherestr='';
 
-	$query = $db->prepare($statement) or query_error($statement);
+	my $query = $db->prepare($statement) or query_error($statement);
 	$query->execute or query_error($statement);
 	my $where='';
 	my %ProbRecords=();
@@ -388,8 +389,8 @@ sub displayDuplicateProblems	{
 	if($noduplicates)	{
 		deleteNotification(
 			$Data,
-			$Defs::LEVEL_ASSOC,
-			$assocID,
+			$Defs::LEVEL_NODE,
+			$entityID,
 			0,
 			'duplicates',
 			0,
@@ -536,6 +537,7 @@ next if $dref->{$k} eq "'0000-00-00'";
 		#OK now set the Existing record with the new data from
 		my $updst=qq[UPDATE tblPerson SET $update_str WHERE intPersonID=$existingid];
 		$Data->{'db'}->do($updst);	
+    }
 		
 	    my $memberNoUpdate = $USE_DATA{'MemberNo'} ? qq[ strPersonNo="$USE_DATA{'MemberNo'}", ] : '';
     my $createdFrom = $USE_DATA{'DataOrigin'} ? qq[ intDataOrigin =$USE_DATA{'DataOrigin'}, ] : '';
@@ -549,8 +551,8 @@ next if $dref->{$k} eq "'0000-00-00'";
 	}
 
 		my $realmID = $Data->{'Realm'};
+		my $entityID= $Data->{'clientValues'}{'clubID'} || 0;
 	if($option eq 'del')	{ 
-		my $intAssocID = $Data->{'clientValues'}{'assocID'} || 0;
         warn("HANDLE PERSON REGO HERE");
 		$Data->{'db'}->do(qq[UPDATE tblPerson as M LEFT JOIN tblPersonRegistration_$realmID as MA ON (MA.intPersonID = M.intPersonID and MA.intEntityID<> $entityID ) SET M.intStatus=$Defs::RECSTATUS_DELETED WHERE M.intPersonID=$id_of_duplicate and MA.intPersonID IS NULL]);
 		$Data->{'db'}->do(qq[UPDATE tblPerson as M LEFT JOIN tblPersonRegistration_$realmID as MA ON (MA.intPersonID = M.intPersonID and MA.intEntityID<> $entityID) SET M.intStatus=$Defs::RECSTATUS_ACTIVE WHERE M.intPersonID=$id_of_duplicate and MA.intPersonID IS NOT NULL]);
