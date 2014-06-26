@@ -300,6 +300,14 @@ sub getEntityMenuData {
                     url => $baseurl."a=A_PR_",
                 };
             }
+            if(isCheckDupl($Data)) {
+                $menuoptions{'duplicates'} = {
+                    name => $lang->txt('Duplicate Resolution'),
+                    url => $baseurl."a=DUPL_L",
+                };
+            }
+
+
         }
     }
 
@@ -744,7 +752,12 @@ sub getClubMenuData {
                     url => $baseurl."a=A_SV_DTE",
                 };
             }
-
+            if(isCheckDupl($Data)) {
+                $menuoptions{'duplicates'} = {
+                    name => $lang->txt('Duplicate Resolution'),
+                    url => $baseurl."a=DUPL_L",
+                };
+            }
             if($SystemConfig->{'AllowTXNs'}
                     and $SystemConfig->{'AllowClubTXNs'}
             ) {
@@ -797,6 +810,7 @@ sub getClubMenuData {
         'clearances',    
         'personrollover',
         'transferperson',
+        'duplicates',
         'pendingregistration',
         ]],
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu','venues'],

@@ -5,7 +5,6 @@ require Exporter;
   handlePerson
   getAutoPersonNum
   person_details
-  setupPersonTypes
   updatePersonNotes
   prePersonAdd
   check_valid_date
@@ -172,7 +171,7 @@ sub updatePersonNotes {
     my ( $db, $personID, $notes_ref ) = @_;
     $personID ||= 0;
 
-    my @noteFields  = (qw(strNotes ));
+    my @noteFields  = (qw(strNotes));
     my %Notes       = ();
     my %notes_ref_l = %{$notes_ref};
 
@@ -194,9 +193,9 @@ sub updatePersonNotes {
 
     my $st = qq[
         INSERT INTO tblPersonNotes
-            (intPersonID, $insert_cols)
+            (intPersonID $insert_cols)
         VALUES 
-            ($personID, $insert_vals)
+            ($personID $insert_vals)
         ON DUPLICATE KEY UPDATE tTimeStamp=NOW() $update_vals
     ];
 
@@ -1127,8 +1126,8 @@ sub person_details {
             WHERE tblPerson.intPersonID=$personID
             ],
             addSQL => qq[
-            INSERT INTO tblPerson (intRealmID, dtCreatedOnline, --FIELDS--)
-            VALUES ($Data->{'Realm'}, CURRENT_DATE(), --VAL--)
+            INSERT INTO tblPerson (intRealmID, --FIELDS--)
+            VALUES ($Data->{'Realm'},  --VAL--)
             ],
             NoHTML               => 1,
             afterupdateFunction  => \&postPersonUpdate,
@@ -1436,102 +1435,9 @@ sub postPersonUpdate {
         $types{'intMSRecStatus'} = 1;
         if ($id) {
 
-            if ( $Data->{'clientValues'}{'assocID'} and $Data->{'clientValues'}{'assocID'} != $Defs::INVALID_ID ) {
-
-                my @cfieldnames = (
-                );
-                my @cfieldvals = ();
-                for my $f (@cfieldnames) {
-                    push @cfieldvals, $params->{ 'd_' . $f };
-                }
-                deQuote( $db, \@cfieldvals );
-                my $cfield_nam = join( ',', @cfieldnames ) || '';
-                my $cfield_val = join( ',', @cfieldvals )  || '';
-
-                my $st = qq[
-                INSERT INTO tblPerson_Associations (intPersonID,intAssocID, strStatus, $cfield_nam)
-                VALUES ($id,$Data->{'clientValues'}{'assocID'}, $Defs::RECSTATUS_ACTIVE, $cfield_val)
-                ];
-                $db->do($st);
-
-                #### if ($Data->??{'addDefaultRego'})
-                ### my $st = qq[
-                Transactions::insertDefaultRegoTXN( $db, $Defs::LEVEL_PERSON, $id, $Data->{'clientValues'}{'assocID'} );
-
-            }
-            my $clubInserted = 0;
-            if ( $Data->{'clientValues'}{'clubID'} and $Data->{'clientValues'}{'clubID'} != $Defs::INVALID_ID ) {
-                $clubInserted = 1;
-                my $st = qq[
-                INSERT INTO tblPerson_Clubs (intPersonID,intClubID, intStatus)
-                VALUES ($id,$Data->{'clientValues'}{'clubID'}, $Defs::RECSTATUS_ACTIVE)
-                ];
-                $db->do($st);
-                Seasons::insertPersonSeasonRecord( $Data, $id, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, $Data->{'clientValues'}{'clubID'}, $ageGroupID, \%types );
-            }
-            if ( $Data->{'clientValues'}{'teamID'} and $Data->{'clientValues'}{'teamID'} != $Defs::INVALID_ID ) {
-                my $st = qq[
-                SELECT DISTINCT CT.intCompID, AC.intNewSeasonID
-                FROM tblComp_Teams as CT
-                INNER JOIN tblAssoc_Comp as AC ON (AC.intCompID = CT.intCompID)
-                WHERE CT.intTeamID=$Data->{'clientValues'}{'teamID'}
-                AND CT.strStatus = $Defs::RECSTATUS_ACTIVE
-                AND AC.strStatus = $Defs::RECSTATUS_ACTIVE
-                ];
-                $st .= qq[ AND CT.intCompID = $Data->{'clientValues'}{'compID'}] if ( $Data->{'clientValues'}{'compID'} and $Data->{'clientValues'}{'compID'} != $Defs::INVALID_ID );    ## IF AT A COMP
-                my $qry_comps = $db->prepare($st);
-                $qry_comps->execute or query_error($st);
-
-                my $statement = qq[
-                INSERT INTO tblPerson_Teams (intPersonID, intTeamID, intStatus, intCompID) VALUES ($id, $Data->{'clientValues'}{'teamID'}, $Defs::RECSTATUS_ACTIVE, ?)
-                ];
-                my $query = $db->prepare($statement);
-
-                my $comp_counts       = 0;
-                my @Seasons           = ();
-                my $doneNewRegoSeason = 0;
-                while ( my ( $DB_intCompID, $DB_intSeasonID ) = $qry_comps->fetchrow_array() ) {
-                    $comp_counts++;
-                    $query->execute($DB_intCompID);
-                    push @Seasons, $DB_intSeasonID;
-                    $doneNewRegoSeason = 1 if $DB_intSeasonID == $assocSeasons->{'newRegoSeasonID'};
-                    Seasons::insertPersonSeasonRecord( $Data, $id, $DB_intSeasonID, $Data->{'clientValues'}{'assocID'}, 0, $ageGroupID, \%types );
-                }
-                Seasons::insertPersonSeasonRecord( $Data, $id, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, 0, $ageGroupID, \%types ) if ( !$doneNewRegoSeason );
-                $query->execute(0) if !$comp_counts;
-
-                if ( !$clubInserted ) {
-                    $st = qq[
-                    SELECT intClubID
-                    FROM tblTeam
-                    WHERE intTeamID = $Data->{'clientValues'}{'teamID'}
-                    ];
-                    my $qry_teamclub = $db->prepare($st);
-                    $qry_teamclub->execute or query_error($st);
-                    my $clubID = $qry_teamclub->fetchrow_array() || 0;
-
-                    if ($clubID) {
-                        my $st = qq[
-                        INSERT INTO tblPerson_Clubs (intPersonID,intClubID, intStatus)
-                        VALUES ($id,$clubID, $Defs::RECSTATUS_ACTIVE)
-                        ];
-                        $db->do($st);
-                        #### LOOP SEASONS HERE !!!!!!!
-                        my $doneNewRegoSeason = 0;
-                        for my $season (@Seasons) {
-                            Seasons::insertPersonSeasonRecord( $Data, $id, $season, $Data->{'clientValues'}{'assocID'}, $clubID, $ageGroupID, \%types );
-                            $doneNewRegoSeason = 1 if $season == $assocSeasons->{'newRegoSeasonID'};
-
-                        }
-                        Seasons::insertPersonSeasonRecord( $Data, $id, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, $clubID, $ageGroupID, \%types )
-                        if ( !$doneNewRegoSeason );
-                    }
-                }
-            }
         }
         getAutoPersonNum( $Data, undef, $id, $Data->{'clientValues'}{'assocID'} );
-        setupPersonTypes( $Data, $id, $params, $Data->{'clientValues'}{'assocID'} );
-        Seasons::insertPersonSeasonRecord( $Data, $id, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, 0, $ageGroupID, \%types ) if ($id);
+        #Seasons::insertPersonSeasonRecord( $Data, $id, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, 0, $ageGroupID, \%types ) if ($id);
         if ( $params->{'isDuplicate'} ) {
             my $st = qq[
                 UPDATE tblPerson SET intStatus=$Defs::PERSONSTATUS_POSSIBLE_DUPLICATE 
@@ -1682,71 +1588,16 @@ sub prePersonAdd {
             @where_fields = ( $params->{'ID_IN'} );
         }
 
-        if ( $Data->{'RegoFormID'} and $params->{'clubID_check'} and $params->{'clubID_check'} > 0 ) {
-            $joinCheck = qq[
-                INNER JOIN tblPerson_Clubs as MC ON (
-                    MC.intPersonID = tblPerson.intPersonID
-                    AND MC.intClubID = ?
-                    AND MC.intStatus=1
-                    AND MC.intPermit=0
-                )
-            ];
-            push @joinCheck_fields, $params->{'clubID'};
-
-        }
-        if ( $Data->{'RegoFormID'} and $params->{'teamID_check'} and $params->{'teamID_check'} > 0 ) {
-            $joinCheck .= qq[
-                INNER JOIN tblPerson_Teams as MT ON (
-                    MT.intPersonID = tblPerson.intPersonID
-                    AND MT.intTeamID = ?
-                    AND MC.intStatus=1
-                )
-            ];
-            push @joinCheck_fields, $params->{'teamID'};
-        }
         if ( $duplcheck eq 'realm' ) {
-
-            if ( $Data->{'RegoFormID'} and $params->{'assocID_check'} and $params->{'assocID_check'} > 0 ) {
-                $joinCheck .= qq[
-                    INNER JOIN tblPerson_Associations as MA ON (
-                        MA.intPersonID = tblPerson.intPersonID
-                        AND MA.intAssocID = ?
-                        AND MA.strStatus=1
-                    )
-                ];
-                push @joinCheck_fields, $params->{'assocID'};
-            }
-
-            #Check Entire realm
             $st = qq[
 				SELECT tblPerson.intPersonID
 				FROM tblPerson
-                    $joinCheck
                 WHERE  tblPerson.intRealmID = ? AND tblPerson.intStatus <> ?
 					$wherestr
                 ORDER BY tblPerson.intStatus
 				LIMIT 1
 			];
-
             @st_fields = (@joinCheck_fields, $realmID, $Defs::PERSONSTATUS_DELETED, @where_fields,);
-        }
-        else {
-
-            #Just check Assoc
-            $st = qq[
-				SELECT tblPerson.intPersonID
-				FROM tblPerson INNER JOIN tblPerson_Associations
-                $joinCheck
-                WHERE  tblPerson.intRealmID = ?
-                    AND tblPerson_Associations.intAssocID = ?
-                    AND tblPerson.intStatus <> ?
-					$wherestr
-                ORDER BY tblPerson.intStatus
-				LIMIT 1
-			];
-
-            @st_fields = (@joinCheck_fields, $realmID, $Data->{'clientValues'}{'assocID'}, $Defs::PERSONSTATUS_DELETED, @where_fields,);
-
         }
         my $q = $db->prepare($st);
         $q->execute(@st_fields);
@@ -1965,27 +1816,6 @@ sub delete_person {
 
     return ( qq[<div class="OKmsg">$Data->{'LevelNames'}{$Defs::LEVEL_PERSON} deleted successfully</div>], "Delete $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}" );
 
-}
-
-sub setupPersonTypes {
-    my ( $Data, $id, $params, $assocID ) = @_;
-    my $st = qq[
-        INSERT INTO tblPerson_Types 
-		    (intPersonID, intTypeID,intActive, intAssocID, strStatus)
-        VALUES 
-            (?, ?, 1, ?, $Defs::RECSTATUS_ACTIVE)
-	];
-    my $q = $Data->{'db'}->prepare($st);
-    my %vals = (
-        d_intPlayer    => $Defs::PERSON_TYPE_PLAYER,
-        d_intCoach     => $Defs::PERSON_TYPE_COACH,
-        d_intUmpire    => $Defs::PERSON_TYPE_UMPIRE,
-        d_intMisc      => $Defs::PERSON_TYPE_MISC,
-        d_intVolunteer => $Defs::PERSON_TYPE_VOLUNTEER,
-    );
-    for my $type ( keys %vals ) {
-        $q->execute( $id, $vals{$type}, $assocID ) if $params->{$type};
-    }
 }
 
 sub PersonDupl {

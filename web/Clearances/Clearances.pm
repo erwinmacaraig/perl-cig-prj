@@ -1452,8 +1452,6 @@ sub clearanceForm	{
 
 ### PURPOSE: This function is called once the createClearance() function is ready to pass control to ask the destination club (who requested the clearance) the final clearance questions and then to write to DB.
 
-### It has a preClearanceAdd() (beforeaddfunction), which checks whether the member is involved in another pending clearance (or already in destination club).
-
 ### It has a postClearanceAdd() (afteraddfunction), which will create the clearance path.
 
   my($Data, $params, $personID, $id, $edit) = @_;
@@ -1608,7 +1606,7 @@ sub clearanceForm	{
 				updateSQL => $clrupdate,
 				addSQL => $clradd,
 				beforeaddFunction => \&preClearanceAdd,
-                beforeaddParams => [$Data,$client, $personID],
+                beforeaddParams => [$Data,$client, $personID, $Data->{'clientValues'}{'clubID'}],
 				afteraddFunction => \&postClearanceAdd,
 				afteraddParams=> [$option,$Data,$Data->{'db'}],
 				auditFunction=> \&auditLog,
@@ -1662,7 +1660,7 @@ sub preClearanceAdd	{
 
     ### PURPOSE: Check whether the current member is in a pending clearance, or already in the club.
     
-    my($params, $Data, $client, $personID)=@_;
+    my($params, $Data, $client, $personID, $destinationClubID)=@_;
     my $db = $Data->{'db'};
     my $lang = $Data->{'lang'};
     
@@ -1672,8 +1670,6 @@ sub preClearanceAdd	{
 	}
     
 	$personID ||= 0;
-	my $destinationClubID = $Data->{'clientValues'}{'clubID'} || 0;
-	
 	my $st = qq[
 			SELECT
 				C.intClearanceID,
@@ -1697,38 +1693,6 @@ sub preClearanceAdd	{
 	my $existingClearance=0;
      
      while (my $dref = $query->fetchrow_hashref())	{
-        my $source_contact_name="";
-        my $source_contact_email ="";
-        my $destination_contact_name ="";
-        my $destination_contact_email="";
-        if($dref->{SourceClubID} >0){
-                my $source_contactObj = ContactsObj->getList(dbh=>$db, clubid=>$dref->{SourceClubID} , getclearances=>1)||[];
-                my $source_contactObjP = ContactsObj->getList(dbh=>$db, clubid=>$dref->{SourceClubID} , getprimary=>1)||[];
-		if(scalar(@$source_contactObj)>0){
-               		$source_contact_name =qq[@$source_contactObj[0]->{strContactFirstname} @$source_contactObj[0]->{strContactSurname}];
-                	$source_contact_email = @$source_contactObj[0]->{strContactEmail};
-        	}
-		elsif(scalar(@$source_contactObjP)>0){
-               		$source_contact_name =qq[@$source_contactObjP[0]->{strContactFirstname} @$source_contactObjP[0]->{strContactSurname}];
-                	$source_contact_email = @$source_contactObjP[0]->{strContactEmail};
-        	}	
-	}
-        if($dref->{DestinationClubID} >0){ 
-                my  $destination_contactObj = ContactsObj->getList(dbh=>$db,clubid=>$dref->{DestinationClubID} , getclearances=>1) ;
-                my  $destination_contactObjP = ContactsObj->getList(dbh=>$db,clubid=>$dref->{DestinationClubID} , getprimary=>1) ;
-		#if(scalar(@$destination_contactObj)>0){
-		#	$destination_contact_name =qq[@$destination_contactObj[0]->{strContactFirstname} @$destination_contactObj[0]->{strContactSurname}];
-        #        	$destination_contact_email = @$destination_contactObj[0]->{strContactEmail};
-        #	}
-		#elsif(scalar(@$destination_contactObjP)>0){
-		#	$destination_contact_name =qq[@$destination_contactObjP[0]->{strContactFirstname} @$destination_contactObjP[0]->{strContactSurname}];
-        #        	$destination_contact_email = @$destination_contactObjP[0]->{strContactEmail};
-        #	}
-	}
-        $dref->{SourceEmail} = $source_contact_email;
-        $dref->{SourceContact} = $source_contact_name;
-        $dref->{DestinationEmail} = $destination_contact_email;
-        $dref->{DestinationContact} = $destination_contact_name; 
          $existingClearance++;
          $error_text .= qq[
                 	<div class="warningmsg">] . $lang->txt('The selected person is already involved in a pending transfer.  Unable to continue until the below transaction is finalised') . qq[</div>

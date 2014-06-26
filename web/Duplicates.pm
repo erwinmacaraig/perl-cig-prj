@@ -26,12 +26,14 @@ sub handleDuplicates {
 
 	my $body='';
 	$action||='DUPL_L';
+#	my $entityID= $Data->{'clientValues'}{'clubID'}; #getAssocID($Data->{'clientValues'}) || 0;
+    my $entityID= getID($Data->{'clientValues'}, $Data->{'clientValues'}{'current_level'}) || 0;
 	if($action eq 'DUPL_U')	{
-		$body=updateDuplicateProblems($Data) || '';	
+		$body=updateDuplicateProblems($Data, $entityID) || '';	
 		$action='DUPL_L';
 	}
 	if($action eq 'DUPL_L')	{
-		$body.=displayDuplicateProblems($Data) || '';	
+		$body.=displayDuplicateProblems($Data, $entityID) || '';	
 	}
 	my $title='Duplicate Resolution';
 
@@ -39,13 +41,12 @@ sub handleDuplicates {
 }
 
 sub displayDuplicateProblems	{
-	my ($Data)=@_;
+	my ($Data, $entityID)=@_;
 	my $db=$Data->{'db'};
 
 	my $num_field=$Data->{'SystemConfig'}{'GenNumField'} || 'strNationalNum';
 
 	my $realm=$Data->{'Realm'}||0;
-	my $entityID= $Data->{'clientValues'}{'clubID'}; #getAssocID($Data->{'clientValues'}) || 0;
 
 	return 'Invalid Option - No Entity' if !$entityID;
 
@@ -59,7 +60,7 @@ sub displayDuplicateProblems	{
         strLocalSurname                  => 1, 
         'tblPerson.strSuburb'       => 1, 
         'tblPerson.strState'        => 1, 
-        'tblPerson.strCountry'      => 1, 
+        'tblPerson.strISOCountry'      => 1, 
         'tblPerson.tTimeStamp'      => 1, 
         'tblPerson.strAddress1'     => 1, 
         'tblPerson.strAddress2'     => 1, 
@@ -85,7 +86,7 @@ sub displayDuplicateProblems	{
 			LEFT JOIN tblTransactions as TXN ON (tblPerson.intPersonID = TXN.intID AND TXN.intTableType=$Defs::LEVEL_PERSON AND TXN.intStatus=1)
 			$extraFrom
 		WHERE PR.intEntityID = $entityID
-			AND tblPerson.intStatus=$Defs::MEMBERSTATUS_POSSIBLE_DUPLICATE
+			AND tblPerson.intStatus=$Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
 			AND tblPerson.intRealmID=$realm
 			$extraWhere
 		GROUP BY tblPerson.intPersonID
@@ -118,13 +119,13 @@ sub displayDuplicateProblems	{
 	my $noduplicates = 0;
 	if(scalar(keys %ProbRecords))	{
 		$statement=qq[
-			SELECT tblPerson.intPersonID AS intPersonID, tblEntity.intEntityID, as ClubID, tblPerson.intPhoto, tblEntity.strLocalName AS strClubName, tblPerson.strStatus, $selline
+			SELECT tblPerson.intPersonID AS intPersonID, tblEntity.intEntityID as ClubID, tblPerson.intPhoto, tblEntity.strLocalName AS strClubName, tblPerson.strStatus, $selline
 			FROM tblPerson 
 			    INNER JOIN tblPersonRegistration_$realm as PR ON (tblPerson.intPersonID= PR.intPersonID)
 			    LEFT JOIN tblEntity ON (PR.intEntityID=tblEntity.intEntityID)
 			WHERE tblPerson.intRealmID=$realm
-				AND tblPerson.intStatus <> $Defs::MEMBERSTATUS_POSSIBLE_DUPLICATE
-				AND tblPerson.intStatus<>$Defs::MEMBERSTATUS_DELETED
+				AND tblPerson.intStatus <> $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
+				AND tblPerson.intStatus<>$Defs::PERSONSTATUS_DELETED
 				AND ( $where)
 			ORDER BY strLocalSurname, strLocalFirstname, dtDOB
 		];
@@ -207,6 +208,13 @@ sub displayDuplicateProblems	{
 					<td style="padding:3px;background:#$bgcol;">&nbsp;</td>
 				</tr>
 				<tr>
+					<td class="label" style="background:#$bgcol;">PersonID&nbsp;</td>
+					<td class="value" style="background:#$bgcol;">$ProbRecords{$key}{'intPersonID'}</td>
+					<td style="padding:3px;background:#$bgcol;">&nbsp;</td>
+					<td class="value" style="background:#$bgcol;">$orig->{intPersonID}</td>
+					<td style="padding:3px;background:#$bgcol;">&nbsp;</td>
+				</tr>
+				<tr>
 					<td class="label" style="background:#$bgcol;">Firstname&nbsp;</td>
 					<td class="value" style="background:#$bgcol;">$ProbRecords{$key}{'strLocalFirstname'}</td>
 					<td style="padding:3px;background:#$bgcol;border-bottom:solid 1px #bbbbbb" rowspan="$rows_count"><span style="font-size:14px;padding:16px;">= ?</span></td>
@@ -280,8 +288,8 @@ sub displayDuplicateProblems	{
 				</tr>
 				<tr>
 					<td class="label" style="background:#$bgcol;">Country&nbsp;</td>
-					<td class="value" style="background:#$bgcol;">$ProbRecords{$key}{'strCountry'}</td>
-					<td class="value" style="background:#$bgcol;">$orig->{strCountry}</td>
+					<td class="value" style="background:#$bgcol;">$ProbRecords{$key}{'strISOCountry'}</td>
+					<td class="value" style="background:#$bgcol;">$orig->{strISOCountry}</td>
 				</tr>
 				<tr>
 					<td class="label" style="background:#$bgcol;">$Data->{'LevelNames'}{$Defs::LEVEL_ASSOC}&nbsp;</td>
@@ -319,8 +327,8 @@ sub displayDuplicateProblems	{
 			if ($intPersonID_toResolve)	{
 				my $st = qq[
 					UPDATE tblPerson
-					SET intStatus = $Defs::MEMBERSTATUS_ACTIVE
-					WHERE intStatus = $Defs::MEMBERSTATUS_POSSIBLE_DUPLICATE
+					SET intStatus = $Defs::PERSONSTATUS_ACTIVE
+					WHERE intStatus = $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
 						AND intPersonID = $intPersonID_toResolve
 					LIMIT 1
 				];
@@ -401,7 +409,8 @@ sub displayDuplicateProblems	{
 }
 
 sub updateDuplicateProblems	{
-	my ($Data) = @_;
+	my ($Data, $entityID) = @_;
+warn("UPDATE DUP PROBLEMS");
 	my $num_field=$Data->{'SystemConfig'}{'GenNumField'} || 'strNationalNum';
 	my %params=Vars();
 	my $autoOption = $params{'autooption'} || 'ignore';
@@ -412,22 +421,23 @@ sub updateDuplicateProblems	{
 			$option = $autoOption if ($option eq 'ignore' and $autoOption ne 'ignore'); #'
 
 			#First we should check that this person is actually part of this associ
-			my $inentity=checkEntity($Data->{'db'},$Data->{'Realm'}, $id_of_duplicate, $Data->{'clientValues'}{'clubID'}) || 0;
+			my $inentity=checkEntity($Data->{'db'},$Data->{'Realm'}, $id_of_duplicate, $entityID) || 0;
 
 			return '<div class="warning">Invalid attempt to modify a Member </div>' if !$inentity;
+warn("##########################$option");
 			my $id_of_existing=$params{"matchNum$id_of_duplicate"} || 0;
 			if($option eq 'new')	{
-				my $st=qq[UPDATE tblPerson SET intStatus = $Defs::MEMBERSTATUS_ACTIVE WHERE intPersonID=$id_of_duplicate];
+				my $st=qq[UPDATE tblPerson SET intStatus = $Defs::PERSONSTATUS_ACTIVE WHERE intPersonID=$id_of_duplicate];
 				$Data->{'db'}->do($st);
 			}
 			elsif($option eq 'del')	{
-				processMemberChange($Data,$id_of_duplicate,0,'del');
+				processMemberChange($Data,$entityID, $id_of_duplicate,0,'del');
 			}
 			elsif($option eq 'matchusenew')	{
-				processMemberChange($Data,$id_of_duplicate,$id_of_existing,'change_usenew') if $id_of_existing;
+				processMemberChange($Data,$entityID, $id_of_duplicate,$id_of_existing,'change_usenew') if $id_of_existing;
 			}
 			elsif($option eq 'matchuseold')	{
-				processMemberChange($Data,$id_of_duplicate,$id_of_existing,'change_useold') if $id_of_existing;
+				processMemberChange($Data,$entityID, $id_of_duplicate,$id_of_existing,'change_useold') if $id_of_existing;
 			}
 		}
 	}
@@ -454,8 +464,9 @@ sub checkEntity {
 
 
 sub processMemberChange	{
-	my ($Data,$id_of_duplicate, $existingid, $option)=@_;
+	my ($Data,$entityID, $id_of_duplicate, $existingid, $option)=@_;
 
+warn("PRCOESS MEMBER CHANGE");
 	my $natnum = '';
 	my $memberNo = '';
 	my %USE_DATA=();
@@ -512,7 +523,7 @@ sub processMemberChange	{
 		$q->finish();
 		deQuote($Data->{'db'},$dref);
 		my $update_str='';	
-		$dref->{'intStatus'}=$Defs::MEMBERSTATUS_ACTIVE;
+		$dref->{'intStatus'}=$Defs::PERSONSTATUS_ACTIVE;
 		for my $k (keys %{$dref})	{
 
 			next if !defined $dref->{$k};
@@ -551,7 +562,6 @@ next if $dref->{$k} eq "'0000-00-00'";
 	}
 
 		my $realmID = $Data->{'Realm'};
-		my $entityID= $Data->{'clientValues'}{'clubID'} || 0;
 	if($option eq 'del')	{ 
         warn("HANDLE PERSON REGO HERE");
 		$Data->{'db'}->do(qq[UPDATE tblPerson as M LEFT JOIN tblPersonRegistration_$realmID as MA ON (MA.intPersonID = M.intPersonID and MA.intEntityID<> $entityID ) SET M.intStatus=$Defs::RECSTATUS_DELETED WHERE M.intPersonID=$id_of_duplicate and MA.intPersonID IS NULL]);
@@ -579,7 +589,7 @@ next if $dref->{$k} eq "'0000-00-00'";
 
 		}
 
-		$Data->{'db'}->do(qq[DELETE M.* FROM tblPerson as M LEFT JOIN tblPersonRegistration_$realmID as MA ON (MA.intPersonID = M.intPersonID and MA.intEntityID <> $Data->{'clientValues'}{'clubID'}) WHERE M.intPersonID=$id_of_duplicate and PR.intPersonID IS NULL]);
+		$Data->{'db'}->do(qq[DELETE M.* FROM tblPerson as M LEFT JOIN tblPersonRegistration_$realmID as PR ON (PR.intPersonID = M.intPersonID and PR.intEntityID <> $entityID) WHERE M.intPersonID=$id_of_duplicate and PR.intPersonID IS NULL]);
 		if ($option eq 'del')	{
 			$Data->{'db'}->do(qq[UPDATE tblPerson SET intStatus=$Defs::RECSTATUS_ACTIVE WHERE intPersonID=$id_of_duplicate]);
 		}
