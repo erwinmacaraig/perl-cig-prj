@@ -37,12 +37,14 @@ sub handleVenues    {
 sub venue_details   {
     my ($action, $Data, $venueID)=@_;
 
+warn("ID:" . $venueID);
     return '' if ($venueID and !venueAllowed($Data, $venueID));
     my $option='display';
     $option='edit' if $action eq 'VENUE_DTE' and allowedAction($Data, 'venue_e');
     $option='add' if $action eq 'VENUE_DTA' and allowedAction($Data, 'venue_a');
     $venueID=0 if $option eq 'add';
     my $field=loadVenueDetails($Data->{'db'}, $venueID) || ();
+warn("NAME:" . $field->{strLocalName});
     
     my $intRealmID = $Data->{'Realm'} >= 0 ? $Data->{'Realm'} : 0;
     my $client=setClient($Data->{'clientValues'}) || '';
@@ -73,6 +75,7 @@ sub venue_details   {
         type  => 'text',
         size  => '30',
         maxsize => '50',
+        readonly =>1,
         sectionname => 'details',
       },      
       strLatinName => {
@@ -663,7 +666,7 @@ sub postVenueAdd {
       my $clm=setClient(\%cv);
       return (0,qq[
         <div class="OKmsg"> $Data->{'LevelNames'}{$Defs::LEVEL_VENUE} Added Successfully</div><br>
-        <a href="$Data->{'target'}?client=$clm&amp;a=VENUE_DT">Display Details for $params->{'d_strLocalName'}</a><br><br>
+        <a href="$Data->{'target'}?client=$clm&amp;venueID=$id&amp;a=VENUE_DT">Display Details for $params->{'d_strLocalName'}</a><br><br>
         <b>or</b><br><br>
         <a href="$Data->{'target'}?client=$cl&amp;a=VENUE_DTA&amp;l=$Defs::LEVEL_VENUE">Add another $Data->{'LevelNames'}{$Defs::LEVEL_VENUE}</a>
 
