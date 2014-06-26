@@ -6,8 +6,8 @@ package Transactions;
 
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(handleTransactions insertDefaultRegoTXN );
-@EXPORT_OK = qw(handleTransactions insertDefaultRegoTXN );
+@EXPORT = qw(handleTransactions );
+@EXPORT_OK = qw(handleTransactions );
 
 use strict;
 use CGI qw(param unescape escape);
@@ -29,7 +29,7 @@ require TransLog;
 sub handleTransactions	{
 	my($action, $Data, $intTableID, $assocID)=@_;
 
-	## TABLEID is MemberID or TeamID etc
+	## TABLEID is PersonID or TeamID etc
 
 	my $ID=param("tID") || 0;
 
@@ -64,90 +64,12 @@ sub handleTransactions	{
 
 }
 
-sub insertDefaultRegoTXN        {
-
-    my ($db, $level, $intID, $intAssocID) = @_;
-
-    $intAssocID ||= 0;
-    $intID ||= 0;
-	$level ||= 0;
-	return if (! $intID or ! $intAssocID);
-
-    my $statement = qq[
-        SELECT intDefaultRegoProductID, PP.curAmount, P.curDefaultAmount, tblAssoc.intRealmID, tblAssoc.intAssocTypeID
-        FROM tblAssoc LEFT JOIN tblProductPricing as PP ON (PP.intProductID = tblAssoc.intDefaultRegoProductID AND PP.intID = $intAssocID and intLevel=$Defs::LEVEL_ASSOC)
-                        LEFT JOIN tblProducts as P ON (P.intProductID = tblAssoc.intDefaultRegoProductID)
-        WHERE tblAssoc.intAssocID = $intAssocID
-    ];
-
-	if ($level == $Defs::LEVEL_TEAM)	{
-    		$statement = qq[
-        		SELECT intDefaultTeamRegoProductID, PP.curAmount, P.curDefaultAmount, tblAssoc.intRealmID, tblAssoc.intAssocTypeID
-        		FROM tblAssoc LEFT JOIN tblProductPricing as PP ON (PP.intProductID = tblAssoc.intDefaultTeamRegoProductID AND PP.intID = $intAssocID and intLevel=$Defs::LEVEL_ASSOC)
-                        	LEFT JOIN tblProducts as P ON (P.intProductID = tblAssoc.intDefaultTeamRegoProductID)
-        		WHERE tblAssoc.intAssocID = $intAssocID
-    		];
-	}
-    my $query = $db->prepare($statement) or query_error($statement);
-    $query->execute or query_error($statement);
-    my ($intDefaultProductID, $PPamount, $defaultAmount, $intRealmID, $intAssocTypeID) = $query->fetchrow_array();
-        $intDefaultProductID ||= 0;
-        $PPamount ||= 0;
-        $defaultAmount ||=0;
-	$intRealmID ||=0;
-	$intAssocTypeID||=0;
-
-    my $intProductID = $intDefaultProductID || return;
-
-        my $amount = $PPamount || $defaultAmount || 0;
-
-    $statement = qq[
-        SELECT intTransactionID
-        FROM tblTransactions
-        WHERE intID = $intID
-		AND intTableType=$level
-            AND intProductID = $intProductID
-                AND intAssocID = $intAssocID
-    ];
-    $query = $db->prepare($statement) or query_error($statement);
-    $query->execute or query_error($statement);
-    my $count = $query->fetchrow_array() || 0;
-
-    if (! $count)   {
-	my $intMemberAssociationID = 0;
-	if ($level == $Defs::LEVEL_MEMBER)	{
-		$statement = qq[	
-			SELECT intMemberAssociationID
-			FROM tblMember_Associations 
-			WHERE intMemberID = $intID
-				AND intAssocID = $intAssocID
-				AND intRecStatus = $Defs::RECSTATUS_ACTIVE
-		];
-        	$query = $db->prepare($statement) or query_error($statement);
-        	$query->execute or query_error($statement);
-		$intMemberAssociationID = $query->fetchrow_array() || 0;
-	}
-	if ($level == $Defs::LEVEL_TEAM or ($intMemberAssociationID and $level == $Defs::LEVEL_MEMBER))	{
-        	$statement = qq[
-        	    INSERT INTO tblTransactions
-        	    (intStatus, curAmount, intProductID, intQty, dtTransaction, intID, intTableType, intAssocID, intRealmID, intRealmSubTypeID)
-        	    VALUES (0,$amount, $intProductID, 1, SYSDATE(), $intID, $level, $intAssocID, $intRealmID, $intAssocTypeID)
-        	];
-        	$query = $db->prepare($statement) or query_error($statement);
-        	$query->execute or query_error($statement);
-	}
-
-    }
-    return;
-
-}
-
 sub deleteTransaction	{
-	my ($Data, $intMemberID, $id) = @_;
+	my ($Data, $intPersonID, $id) = @_;
 	my $db=$Data->{'db'} || undef;
 	my $st = qq[
 		DELETE FROM tblTransactions
-		WHERE intID = $intMemberID
+		WHERE intID = $intPersonID
 			AND intTransactionID = $id
 			AND intTableType = $Data->{'clientValues'}{'currentLevel'}
 	];
@@ -457,8 +379,8 @@ sub showTransactionChildren	{
 }
 
 sub checkTXNPricing	{
-	my($id,$params, $Data,$db, $memberID)=@_;
-        $memberID||=0;
+	my($id,$params, $Data,$db, $personID)=@_;
+        $personID||=0;
 
 	my $clubID = $Data->{'clientValues'}{'clubID'} || 0;
 	my $statement = qq[
@@ -494,9 +416,9 @@ sub checkTXNPricing	{
 
 sub preTXNAddUpdate	{
 
-	my($params, $action, $Data,$db, $client, $memberID, $transID)=@_;
+	my($params, $action, $Data,$db, $client, $personID, $transID)=@_;
 
-	$memberID ||= 0;
+	$personID ||= 0;
 	$transID ||=0;
 	my $assocID = $Data->{'clientValues'}{'assocID'} || 0;
 	my $prodID = $params->{'d_intProductID'} || 0;
@@ -504,9 +426,8 @@ sub preTXNAddUpdate	{
 	my $st = qq[
 		SELECT T.intTransactionID
 		FROM tblTransactions as T INNER JOIN tblProducts as P ON (T.intProductID = P.intProductID)
-		WHERE T.intID = $memberID
+		WHERE T.intID = $personID
 			AND T.intTableType=$Defs::LEVEL_MEMBER
-			AND T.intAssocID = $assocID
 			AND T.intProductID = $prodID
 			AND P.intAssocUnique = 1
 	];

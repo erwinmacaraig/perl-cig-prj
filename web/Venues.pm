@@ -37,7 +37,7 @@ sub handleVenues    {
 sub venue_details   {
     my ($action, $Data, $venueID)=@_;
 
-    return '' if !venueAllowed($Data, $venueID);
+    return '' if ($venueID and !venueAllowed($Data, $venueID));
     my $option='display';
     $option='edit' if $action eq 'VENUE_DTE' and allowedAction($Data, 'venue_e');
     $option='add' if $action eq 'VENUE_DTA' and allowedAction($Data, 'venue_a');

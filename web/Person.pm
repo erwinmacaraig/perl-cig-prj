@@ -28,7 +28,7 @@ use GenCode;
 use AuditLog;
 use DeQuote;
 use Duplicates;
-use ProdTransactions;
+#use ProdTransactions;
 #use EditPersonClubs;
 use CGI qw(cookie unescape);
 use Payments;
@@ -117,9 +117,9 @@ sub handlePerson {
     elsif ( $action =~ /P_CLB_/ ) {
         ( $resultHTML, $title ) = handlePersonClub( $action, $Data, $personID );
     }
-    elsif ( $action =~ /P_PRODTXN_/ ) {
-        ( $resultHTML, $title ) = handleProdTransactions( $action, $Data, $personID );
-    }
+    #elsif ( $action =~ /P_PRODTXN_/ ) {
+    #    ( $resultHTML, $title ) = handleProdTransactions( $action, $Data, $personID );
+    #}
     elsif ( $action =~ /P_TXN_/ ) {
         ( $resultHTML, $title ) = Transactions::handleTransactions( $action, $Data, $personID );
     }
@@ -361,43 +361,7 @@ sub PersonTransfer {
         if ( $personID and $assocID ) {
             my $genAgeGroup ||= new GenAgeGroup( $Data->{'db'}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $assocID );
             my $ageGroupID = $genAgeGroup->getAgeGroup( $Gender, $DOBAgeGroup ) || 0;
-            my $upd_st = qq[
-				UPDATE 
-					tblPerson_Associations
-				SET 
-					strStatus=1
-				WHERE
-					intPersonID= $personID
-					AND intAssocID = $assocID
-				LIMIT 1
-			];
-            $db->do($upd_st);
-            my $ins_st = qq[
-				INSERT IGNORE INTO tblPerson_Associations
-				(intPersonID, intAssocID, strStatus)
-				VALUES ($personID, $assocID, 1)
-			];
-            $db->do($ins_st);
-            Seasons::insertPersonSeasonRecord( $Data, $personID, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, 0, $ageGroupID, \%types );
-            $ins_st = qq[
-				INSERT INTO tblPerson_Types
-                    (intPersonID, intTypeID, intSubTypeID, intActive, intAssocID, strStatus)
-                VALUES 
-                    ($personID,$Defs::PERSON_TYPE_PLAYER,0,1,$assocID, 1)
-			];
-            $db->do($ins_st);
-            Transactions::insertDefaultRegoTXN( $db, $Defs::LEVEL_PERSON, $personID, $assocID );
-
-            if ( $Data->{clientValues}{'clubID'} and $Data->{clientValues}{'clubID'} > 0 ) {
-                $ins_st = qq[
-					INSERT INTO tblPerson_Clubs
-					    (intPersonID, intClubID, intStatus)
-					VALUES 
-                        ($personID, $Data->{clientValues}{'clubID'}, 1)
-				];
-                $db->do($ins_st);
-                Seasons::insertPersonSeasonRecord( $Data, $personID, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, $Data->{'clientValues'}{'clubID'}, $ageGroupID, \%types );
-            }
+            warn("INSERT personRego & any products");
             my $mem_st = qq[
 				UPDATE tblPerson
 				SET intPlayer = 1
@@ -1471,7 +1435,7 @@ sub postPersonUpdate {
             my $st = qq[UPDATE tblPerson SET intStatus = 1 WHERE intPersonID = $id AND intStatus = 0 LIMIT 1];
             $db->do($st);
         }
-        Transactions::insertDefaultRegoTXN( $db, $Defs::LEVEL_PERSON, $id, $Data->{'clientValues'}{'assocID'} );
+        warn("INSERT PRODUCTS");
 
         ## CHECK IF FIRSTNAME, SURNAME OR DOB HAVE CHANGED
         my $firstname_p = $params->{'d_strLocalFirstname'} || $params->{'strLocalFirstname'} || '';

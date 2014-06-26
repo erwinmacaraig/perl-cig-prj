@@ -1389,6 +1389,7 @@ sub createClearance	{
                 M.intRealmID = $Data->{'Realm'}
 				AND C.intEntityID <> $Data->{'clientValues'}{'clubID'}
 				AND PR.strStatus <> 'TRANSFERRED'
+                AND M.intStatus = $Defs::PERSONSTATUS_ACTIVE
 				$strWhere
 			GROUP BY M.intPersonID, C.intEntityID
 			ORDER BY MAX(CLR.dtFinalised) DESC, M.strLocalSurname, M.strLocalFirstname, M.dtDOB

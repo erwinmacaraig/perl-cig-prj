@@ -574,6 +574,8 @@ next if $dref->{$k} eq "'0000-00-00'";
 
 		$Data->{'db'}->do(qq[UPDATE tblUploadedFiles SET intEntityID = $existingid WHERE intEntityID=$id_of_duplicate and intEntityTypeID=1]);
 
+        checkPersonNotes($Data->{'db'}, $id_of_duplicate, $existingid);
+
 		my $pr_st = qq[
 			SELECT DISTINCT intEntityID
 			FROM tblPersonRegistration_$realmID
@@ -597,6 +599,42 @@ next if $dref->{$k} eq "'0000-00-00'";
 		movePhoto($Data->{'db'}, $existingid, $id_of_duplicate);
 	}
   #auditLog(0, $Data, 'Resolve', 'Duplicates');
+}
+
+sub checkPersonNotes    {
+
+    my ($db, $id_of_duplicate, $existingid) = @_;
+
+    my $st = qq[
+        SELECT
+            strNotes
+        FROM
+            tblPersonNotes
+        WHERE
+            intPersonID IN ($id_of_duplicate, $existingid)
+    ];
+    my $query = $db->prepare($st) or query_error($st);
+    $query->execute or query_error($st);
+
+    my %Notes=();
+
+    while (my $dref = $query->fetchrow_hashref())   {
+        $Notes{'strNotes'} .= qq[\n] if $Notes{'strNotes'};
+        $Notes{'strNotes'} .= $dref->{strNotes} || '';
+    }
+
+    $Notes{'strNotes'} ||= '';
+
+    $st = qq[
+        DELETE
+        FROM
+            tblPersonNotes
+        WHERE
+            intPersonID = $id_of_duplicate
+    ];
+  $db->do($st);
+  require Person;
+  Person::updatePersonNotes($db, $existingid ,\%Notes);
 }
 
 sub isCheckDupl	{
