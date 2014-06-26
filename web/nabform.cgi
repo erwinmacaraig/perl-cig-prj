@@ -69,7 +69,7 @@ sub main	{
     my $paymentConfigUsedID = $Data{'SystemConfig'}{'PaymentConfigUsedID'} || 0;
     my $paymentConfigID = $Data{'SystemConfig'}{'PaymentConfigID'} || 0;
 
-    my $lang= Lang->get_handle() || ''; #die "Can't get a language handle!";
+    my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     $Data{'lang'}=$lang;
     $Data{'db'}=$db;
     getDBConfig(\%Data);

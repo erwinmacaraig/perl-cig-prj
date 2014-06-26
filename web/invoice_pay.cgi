@@ -35,12 +35,10 @@ sub main	{
 	my @TXNs =split /\|/, $txns;
 	# ie: &txn=12345|12346
 
-	my $lang = Lang->get_handle() || die "Can't get a language handle!";
 	my $target = 'invoice_pay.cgi';
 	my $noheader=0;
 	my %Data = (
 		db => $db,
-		lang => $lang,
 		target => $target,
 		noheader => $noheader || 0,
 	);
@@ -69,6 +67,9 @@ sub main	{
 	my $header_css = $noheader ? ' #spheader {display:none;} ' : '';
   getDBConfig(\%Data);
   $Data{'SystemConfig'}=getSystemConfig(\%Data);
+  my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
+  $Data{'lang'}=$lang;
+
   $Data{'noheader'}=$noheader;
 	$Data{'SystemConfig'}{'OtherStyle'} = "$header_css";
 	my $header=qq[<img src="images/sp_membership.jpg" alt="" title="">];

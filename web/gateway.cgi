@@ -45,8 +45,6 @@ sub main	{
 	my ($Order, $Transactions) = payPalTransactions(\%Data, $clientTransRefID);
         $Data{'SystemConfig'}{'PaymentConfigID'} = $Data{'SystemConfig'}{'PaymentConfigUsedID'} ||  $Data{'SystemConfig'}{'PaymentConfigID'};
 
-        my $lang= Lang->get_handle() || ''; #die "Can't get a language handle!";
-        $Data{'lang'}=$lang;
         my %clientValues = getClient($client);
         $Data{'clientValues'} = \%clientValues;
 
@@ -54,6 +52,9 @@ sub main	{
         getDBConfig(\%Data);
   	$Data{'SystemConfig'}=getSystemConfig(\%Data);
   	$Data{'LocalConfig'}=getLocalConfig(\%Data);
+    my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
+    $Data{'lang'}=$lang;
+
   	my $assocID=getAssocID(\%clientValues) || '';
         # DO DATABASE THINGS
         my $DataAccess_ref=getDataAccess(\%Data);
