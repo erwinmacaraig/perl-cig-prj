@@ -160,7 +160,6 @@ sub listPersons {
     my $lookupfields = personList_lookupVals($Data);
 
     my %tempClientValues = getClient($client);
-warn("AAAAAAAAAA" . $tempClientValues{'Realm'});
     $tempClientValues{currentLevel} = $Defs::LEVEL_PERSON;
     while (my $dref = $query->fetchrow_hashref()) {
         next if (defined $dref->{strStatus} and $dref->{strStatus} eq 'DELETED');

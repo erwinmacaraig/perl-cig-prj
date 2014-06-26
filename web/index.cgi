@@ -6,6 +6,7 @@
 
 use strict;
 use lib ".", "..";
+use CGI qw(param unescape escape cookie);
 use Defs;
 use Lang;
 use TTTemplate;

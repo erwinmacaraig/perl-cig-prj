@@ -5,7 +5,7 @@
 #
 
 use strict;
-use CGI qw(param unescape escape);
+use CGI qw(param unescape escape cookie);
 
 use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit','Clearances', "user";
 use Lang;

@@ -11,6 +11,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: EN\n"
 "X-Generator: Poedit 1.5.4\n"
+"X-Poedit-KeywordsList: txt\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: /home/warren/src/spil/FIFASPOnline/web\n"
+"X-Poedit-SearchPath-1: /home/warren/src/spil/FIFASPOnline/templates\n"
 
 msgid "Club Id"
 msgstr "Club Id"
@@ -138,9 +142,6 @@ msgstr "Parent/Guardian 1 Phone 2"
 msgid "Email 2"
 msgstr "Email 2"
 
-msgid "eduListLicence"
-msgstr "Showing all licences for this delivery agent. Licences grant a delivery agent the ability to run courses and modules between specified dates."
-
 msgid "Entity ID"
 msgstr "Entity ID"
 
@@ -178,7 +179,13 @@ msgid "Emergency Contact Relationship"
 msgstr "Emergency Contact Relationship"
 
 msgid "REPORT_INTRO_DESC_TEXT"
-msgstr "<p>There are two types of reports present in the system. </p><br><ol><li><b>Quick Reports</b> - Indicated by the 'Run' button, they are predefined and allow you a quick look at your data.<br></li><li><b>Advanced Reports</b> - Indicated by the 'Configure' button, they allow you to define which fields you want to display and add custom filters to your report.<br></li></ol>"
+msgstr ""
+"<p>There are two types of reports present in the system. </"
+"p><br><ol><li><b>Quick Reports</b> - Indicated by the 'Run' button, they are "
+"predefined and allow you a quick look at your data.<br></li><li><b>Advanced "
+"Reports</b> - Indicated by the 'Configure' button, they allow you to define "
+"which fields you want to display and add custom filters to your report.<br></"
+"li></ol>"
 
 msgid "Sep"
 msgstr "Sep"
@@ -247,7 +254,8 @@ msgid "Login"
 msgstr "Login"
 
 msgid "MARK_CONSENT_FORM_RECEIVED"
-msgstr "Mark form as received by entering the Form reference number and press th"
+msgstr ""
+"Mark form as received by entering the Form reference number and press th"
 
 msgid "Member Types: Coach"
 msgstr "Member Types: Coach"
@@ -277,7 +285,9 @@ msgid "Contact Details"
 msgstr "Contact Details"
 
 msgid "FIELDS_intro"
-msgstr "Choose the the visibility and editing options for each of the available Member fields."
+msgstr ""
+"Choose the the visibility and editing options for each of the available "
+"Member fields."
 
 msgid "Edit Welcome Message"
 msgstr "Edit Welcome Message"
@@ -292,7 +302,8 @@ msgid "Nickname"
 msgstr "Nickname"
 
 msgid "AUTO_INTROTEXT"
-msgstr "To modify this information change the information in the boxes below and whe"
+msgstr ""
+"To modify this information change the information in the boxes below and whe"
 
 msgid "Association Season Member Package"
 msgstr "Association Season Member Package"
@@ -326,9 +337,6 @@ msgstr "Alternate Uniform Top Colour"
 
 msgid "Record updated successfully"
 msgstr "Record updated successfully"
-
-msgid "eduListModuleStaff"
-msgstr "Showing all staff for this module / course. Click on a name to edit their details for this course, or click <img src="images/sml_delete_icon.gif" border="0"> to remove them from this course."
 
 msgid "Menu"
 msgstr "Menu"
@@ -378,9 +386,6 @@ msgstr "Name"
 msgid "Team Name"
 msgstr "Team Name"
 
-msgid "eduListModuleInstance_da"
-msgstr "Showing all scheduled, <i>past</i> and <span style="color:red">cancelled</span> <b>courses</b> and modules. Click on a course or module code to edit it, then use the new menu in the bottom left of the screen to administer it."
-
 msgid "Details"
 msgstr "Details"
 
@@ -392,9 +397,6 @@ msgstr "Sporting Events"
 
 msgid "International Zone"
 msgstr "International Zone"
-
-msgid "eduListDAS"
-msgstr "Showing all staff for this delivery agent. Staff can be assigned to modules and courses while editing a specific module or course. Click on a name to edit details."
 
 msgid "Season"
 msgstr "Season"
@@ -429,14 +431,12 @@ msgstr "Any Medical Conditions?"
 msgid "Parent/Guardian 2 Phone"
 msgstr "Parent/Guardian 2 Phone"
 
-msgid "Please enter your username and password below and then press the Sign in button."
-msgstr "Please enter your username and password below and then press the Sign in button."
-
-msgid "eduMMTModules"
-msgstr "Check the modules and course that should show on this certificate. Only a single course and only modules which haven't already been included in a certificate can be selected."
-
-msgid "Event Abbrev"
-msgstr "Event Abbrev"
+msgid ""
+"Please enter your username and password below and then press the Sign in "
+"button."
+msgstr ""
+"Please enter your username and password below and then press the Sign in "
+"button."
 
 msgid "Search Again"
 msgstr "Search Again"
@@ -474,11 +474,9 @@ msgstr "All Records"
 msgid "Member Types: Match Official"
 msgstr "Member Types: Match Official"
 
-msgid "eduListDeliveryAgent"
-msgstr "Delivery agents can be licenced to run courses and modules."
-
 msgid "DATA_EXPORT_EMAIL_TEXT"
-msgstr "The data you requested for export ([_1]) is included in the attached file"
+msgstr ""
+"The data you requested for export ([_1]) is included in the attached file"
 
 msgid "match Official in<br>Club?"
 msgstr "Match Official in<br>Club?"
@@ -529,7 +527,8 @@ msgid "Venue 3"
 msgstr "Venue 3"
 
 msgid "CHOOSE_AND_REPORT"
-msgstr "Choose which fields you want on your report and any filters you wish to apply"
+msgstr ""
+"Choose which fields you want on your report and any filters you wish to apply"
 
 msgid "Competitions"
 msgstr "Competitions"
@@ -545,9 +544,6 @@ msgstr "Edit Event"
 
 msgid "Event Name"
 msgstr "Event Name"
-
-msgid "eduListMem_course"
-msgstr "Showing all participants in this course. Click on a member's name to edit that member and on <img src="images/sml_edit_icon.gif" border="0"> to edit their status for this course. You can use the buttons in the top right to add new members to the course and quickly approve members."
 
 msgid "Associations"
 msgstr "Associations"
@@ -589,7 +585,8 @@ msgid "Member Types: Rider Accred"
 msgstr "Member Types: Rider Accred"
 
 msgid "PLEASE_COMPLETE_BIO"
-msgstr "Please complete the Biographical Information below.  When you have finishe"
+msgstr ""
+"Please complete the Biographical Information below.  When you have finishe"
 
 msgid "Options"
 msgstr "Options"
@@ -648,9 +645,6 @@ msgstr "Family name"
 msgid "Identification Type"
 msgstr "Identification Type"
 
-msgid "eduTransList_unpaid"
-msgstr "Showing unpaid items. To view paid items, click 'Paid' above. To add a payment, tick one or more items, then enter the payment details at the bottom of the page and click 'Add Payment'."
-
 msgid "Estimated Un-Registered Players"
 msgstr "Estimated Un-Registered Players"
 
@@ -661,7 +655,7 @@ msgid "Police Check Number"
 msgstr "Police Check Number"
 
 msgid "NO_BODY"
-msgstr ""Oops, this shouldn't be happening. Please contac"
+msgstr "Oops, this shouldn't be happening. Please contact"
 
 msgid "Assign Approval Statuses"
 msgstr "Assign Approval Statuses"
@@ -691,7 +685,8 @@ msgid "Male"
 msgstr "Male"
 
 msgid "MARK_AS_DUPLICATE_WARNING"
-msgstr "NOTE: Only mark the extra [_1], not the [_1] you believe may be the origina"
+msgstr ""
+"NOTE: Only mark the extra [_1], not the [_1] you believe may be the origina"
 
 msgid "Defaulter"
 msgstr "Defaulter"
@@ -705,8 +700,12 @@ msgstr "Match Official?"
 msgid "Seasons"
 msgstr "Seasons"
 
-msgid "These configuration options allow you to modify the data and behaviour of the system."
-msgstr "These configuration options allow you to modify the data and behaviour of the system."
+msgid ""
+"These configuration options allow you to modify the data and behaviour of "
+"the system."
+msgstr ""
+"These configuration options allow you to modify the data and behaviour of "
+"the system."
 
 msgid "Sub Category Abbrev."
 msgstr "Sub Category Abbrev."
@@ -721,7 +720,9 @@ msgid "WELCOME"
 msgstr ""
 
 msgid "TO_UPD_WELCOME"
-msgstr "<p>To update the welcome message to display when you (or any of your clubs/teams) log in, fill in the box and press the <b>[_1]</b> button.</p>"
+msgstr ""
+"<p>To update the welcome message to display when you (or any of your clubs/"
+"teams) log in, fill in the box and press the <b>[_1]</b> button.</p>"
 
 msgid "Emergency Contact Number"
 msgstr "Emergency Contact Number"
@@ -768,17 +769,11 @@ msgstr "Audit Log"
 msgid "Uniform Number"
 msgstr "Uniform Number"
 
-msgid "eduListMTL"
-msgstr "Template links connect course templates to their child module templates. When a delivery agent schedules a course, the structure created here will be replicated."
-
 msgid "Courses"
 msgstr "Courses"
 
 msgid "Club"
 msgstr "Club"
-
-msgid "eduListMem_mem"
-msgstr "Showing all modules for this member. Click on a course code to edit their details in that course."
 
 msgid "Products"
 msgstr "Products"
@@ -817,7 +812,8 @@ msgid "Bulk Change"
 msgstr "Bulk Change"
 
 msgid "ACCREDITATION_DETAILS_TOP"
-msgstr "Choose the relevant options below and press the <b>'[_1]'</b> button whe"
+msgstr ""
+"Choose the relevant options below and press the <b>'[_1]'</b> button whe"
 
 msgid "First name"
 msgstr "First name"
@@ -912,9 +908,6 @@ msgstr "Coach Registration No."
 msgid "Coach?"
 msgstr "Coach?"
 
-msgid "eduListPayment"
-msgstr "Showing payments. To edit a payment, click <img src="images/player_pay.gif" border="0">. To view the items in a payment, click 'View Items'"
-
 msgid "Sportzware Membership Login Page"
 msgstr "Sportzware Membership Login Page"
 
@@ -940,13 +933,15 @@ msgid "Manage Lookup Information"
 msgstr "Manage Lookup Information"
 
 msgid "REQUIRED_PASS_STATUS"
-msgstr "Check the boxes if the status is required for pass printing.  When you hav"
+msgstr ""
+"Check the boxes if the status is required for pass printing.  When you hav"
 
 msgid "Parent/Guardian 2 Assistance Area"
 msgstr "Parent/Guardian 2 Assistance Area"
 
 msgid "BULK_PRINT_BUTTON_INFO"
-msgstr "Press the <b>'[_1]'</b> button to generate a list of passes to be printed"
+msgstr ""
+"Press the <b>'[_1]'</b> button to generate a list of passes to be printed"
 
 msgid "This member has been associated with the following tags."
 msgstr "This member has been associated with the following tags."
@@ -958,7 +953,8 @@ msgid "Payment Type"
 msgstr "Payment Type"
 
 msgid "DATA_EXPORT_DESCRIPTION"
-msgstr "The data exported includes the member name, accreditation type, entry and exi"
+msgstr ""
+"The data exported includes the member name, accreditation type, entry and exi"
 
 msgid "Passport Country of Issue"
 msgstr "Passport Country of Issue"
@@ -980,9 +976,6 @@ msgstr "No Tags Found"
 
 msgid "Address Line 1"
 msgstr "Address Line 1"
-
-msgid "eduReportMember"
-msgstr "Choose which fields you want on your report and any filters you wish to apply. When complete press the "[_1]" button."
 
 msgid "Update Association"
 msgstr "Update Association"
@@ -1041,9 +1034,6 @@ msgstr "Last Date for Departures"
 msgid "[_1] updated successfully"
 msgstr "[_1] updated successfully"
 
-msgid "eduListVenue"
-msgstr "Showing all venues. Venues can be assigned to modules and courses while editing a specific module or course. Click on a venue name to edit details."
-
 msgid "Zones"
 msgstr "Zones"
 
@@ -1092,9 +1082,6 @@ msgstr "Member Package"
 msgid "Financial?"
 msgstr "Financial?"
 
-msgid "eduListMMT"
-msgstr "Showing all certificates issued for this member. Click on the certificate name to edit it or on the <img src="images/sml_view_icon.gif" border="0"> icon to print the certificate."
-
 msgid "Membership Package"
 msgstr "Membership Package"
 
@@ -1126,7 +1113,9 @@ msgid "Starting Date for Registrations"
 msgstr "Starting Date for Registrations"
 
 msgid "COPYRIGHT"
-msgstr "&copy;&nbsp; Copyright FOX SPORTS PULSE Pty Ltd & SportingPulse International Pty Ltd &nbsp;2014.&nbsp; All rights reserved."
+msgstr ""
+"&copy;&nbsp; Copyright FOX SPORTS PULSE Pty Ltd & SportingPulse "
+"International Pty Ltd &nbsp;2014.&nbsp; All rights reserved."
 
 msgid "Parent/Guardian 1 Firstname"
 msgstr "Parent/Guardian 1 Firstname"
@@ -1140,17 +1129,11 @@ msgstr "Status Reports"
 msgid "Occupation"
 msgstr "Occupation"
 
-msgid "eduListModule_course"
-msgstr "Showing modules in this course. If you click on a module the bottom left menu will change, allowing you to administer that module."
-
 msgid "Member Types: Volunteer"
 msgstr "Member Types: Volunteer"
 
 msgid "Their Details"
 msgstr "Their Details"
-
-msgid "eduListModule_da"
-msgstr "Showing all modules and courses that you are licenced to run. Click a course code to see scheduled and past courses or click "Create Course" / "Create Module" on the right to schedule a new course or module."
 
 msgid "Life Member?"
 msgstr "Life Member?"
@@ -1159,7 +1142,8 @@ msgid "System developed and powered by [_1]"
 msgstr "System developed and powered by [_1]"
 
 msgid "EVENTCOPY_info"
-msgstr "This option allows the copying of some of the event setup information fro"
+msgstr ""
+"This option allows the copying of some of the event setup information fro"
 
 msgid "Salutation"
 msgstr "Salutation"
@@ -1225,7 +1209,8 @@ msgid "Association Summary"
 msgstr "Association Summary"
 
 msgid "PERMISSIONS_intro"
-msgstr "Choose the options below to set the permissions various users have to perfor"
+msgstr ""
+"Choose the options below to set the permissions various users have to perfor"
 
 msgid "Maximum no. of rows to display"
 msgstr "Maximum no. of rows to display"
@@ -1296,9 +1281,6 @@ msgstr "Alternate Uniform Number"
 msgid "APPNAME"
 msgstr "SportingPulse Membership"
 
-msgid "eduAddMember_course"
-msgstr "Showing all people that have participated in other courses. Click on a name to add them to this course, or click <img src="images/add_icon.gif" border="0"> to enter details for a new participant"
-
 msgid "Database Error in Update"
 msgstr "Database Error in Update"
 
@@ -1319,9 +1301,6 @@ msgstr "No Clubs of this status can be found in the database."
 
 msgid "Female"
 msgstr "Female"
-
-msgid "eduReportStaff"
-msgstr "Choose which fields you want on your report and any filters you wish to apply. When complete press the "[_1]" button."
 
 msgid "Member Financial?"
 msgstr "Member Financial?"
@@ -1414,7 +1393,8 @@ msgid "Configure Event Details"
 msgstr "Configure Event Details"
 
 msgid "DATA_EXPORT_FORMAT_DESCRIPTION"
-msgstr "You can export the data in two formats. Sportzware format is for importin"
+msgstr ""
+"You can export the data in two formats. Sportzware format is for importin"
 
 msgid "Sort By"
 msgstr "Sort By"
@@ -1429,7 +1409,9 @@ msgid "Display details for [_1]"
 msgstr "Display details for [_1]"
 
 msgid "TO_UPD_DASHBOARD"
-msgstr "<p>Choose what data you want to display in each dashboard item.</p><p>Click <b>Update</b> to save.</p>"
+msgstr ""
+"<p>Choose what data you want to display in each dashboard item.</p><p>Click "
+"<b>Update</b> to save.</p>"
 
 msgid "Parent/Guardian 2 Firstname"
 msgstr "Parent/Guardian 2 Firstname"
@@ -1438,10 +1420,12 @@ msgid "Closing Date for Registrations"
 msgstr "Closing Date for Registrations"
 
 msgid "EXPORT_WARNING"
-msgstr "This option has a specified set of fields that it exports, however filters ar"
+msgstr ""
+"This option has a specified set of fields that it exports, however filters ar"
 
 msgid "SEARCH_FOR_CONSENT_FORM"
-msgstr "Search for a person by entering their surname and/or first name and then pres"
+msgstr ""
+"Search for a person by entering their surname and/or first name and then pres"
 
 msgid "Accreditation Provider"
 msgstr "Accreditation Provider"
@@ -1469,9 +1453,6 @@ msgstr "Sports"
 
 msgid "Coach in<br>Club?"
 msgstr "Coach in<br>Club?"
-
-msgid "eduShowCourseSearch"
-msgstr "Select one or more fields, then click Search. If you select no fields, all courses will be shown"
 
 msgid "Sport Code"
 msgstr "Sport Code"
@@ -1542,20 +1523,15 @@ msgstr "Sport"
 msgid "is not a valid number"
 msgstr "is not a valid number"
 
-msgid "eduListMem_da"
-msgstr "Showing all people that have participated in a course. Click on a name to edit their details, then use the new menu in the bottom left of the screen to administer them."
-
 msgid "Member Types: FAO Accred"
 msgstr "Member Types: FAO Accred"
 
 msgid "Name (or part of)"
 msgstr "Name (or part of)"
 
-msgid "eduShowPaymentSearch"
-msgstr "Select one or more fields, then click search. If you select no fields, all payments will be shown"
-
 msgid "DATA_EXPORT_EMAIL_PROMPT"
-msgstr "The data will be emailed as an attachment to an email address. Enter the emai"
+msgstr ""
+"The data will be emailed as an attachment to an email address. Enter the emai"
 
 msgid "Name of event number (if required)"
 msgstr "Name of event number (if required)"
@@ -1581,9 +1557,6 @@ msgstr "Title of Contact"
 msgid "Member Types: Referee Position"
 msgstr "Member Types: Referee Position"
 
-msgid "eduTransList_paid"
-msgstr "Showing paid items. You can edit the payment associated with these items by clicking the <img src="images/player_pay.gif" border="0"> icon. To view all items for a single payment, click 'Filter by linked payment'. To cancel a payment, click <img src="images/player_pay.gif" border="0">, then click '*Cancel Payment*'"
-
 msgid "Fill in the appropriate filter boxes below to search."
 msgstr "Fill in the appropriate filter boxes below to search."
 
@@ -1605,9 +1578,6 @@ msgstr "Parent/Guardian 1 Surname"
 msgid "Save Options"
 msgstr "Save Options"
 
-msgid "eduListModuleTemplate"
-msgstr "Templates specify the different types of courses and modules that delivery agents can run."
-
 msgid "Venue 1"
 msgstr "Venue 1"
 
@@ -1627,7 +1597,8 @@ msgid "Home Venue Suburb"
 msgstr "Home Venue Suburb"
 
 msgid "EMAIL_REPORT"
-msgstr "Email the report in a format suitable to be imported into another product"
+msgstr ""
+"Email the report in a format suitable to be imported into another product"
 
 msgid "Current Level"
 msgstr "Current Level"
@@ -1670,4 +1641,3 @@ msgstr "Contact Person 2"
 
 msgid "School Suburb "
 msgstr "School Suburb "
-
