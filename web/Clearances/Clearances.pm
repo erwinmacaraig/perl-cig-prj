@@ -487,7 +487,7 @@ sub clearanceView	{
 					noedit=>$strReason,
 				},
 			},
-		order => [qw(ClearanceID dtApplied NatNum MemberName dtDOB strState SourceClubName DestinationClubName ClearanceStatus ClearancePriority ClearanceReason intReasonForClearanceID strReason strReasonForClearance)],
+		order => [qw(ClearanceID dtApplied NatNum MemberName dtDOB strState SourceClubName DestinationClubName ClearanceStatus ClearanceReason intReasonForClearanceID strReason strReasonForClearance)],
 			options => {
 				labelsuffix => ':',
 				hideblank => 1,
@@ -601,7 +601,6 @@ sub showPathDetails	{
 		SELECT 
             CP.* , 
             DATE_FORMAT(CP.tTimeStamp,'%d/%m/%Y') AS TimeStamp, 
-            CLF.strTitle, 
             C.intCurrentPathID
 		FROM tblClearancePath as CP 
             INNER JOIN tblClearance as C ON (C.intClearanceID = CP.intClearanceID)
@@ -900,10 +899,9 @@ sub clearancePathDetails	{
         			options => $DefCodes->{-38},
         			order => $DefCodesOrder->{-38},
 					firstoption => ['',$lang->txt("Choose Reason")],
-					readonly => $readonly,
-	      			},
+	      		},
 		},
-		order => [qw(intClearanceID MemberName dtDOB strState SourceClubName DestinationClubName Reason intClearanceStatus strApprovedBy intDenialReasonID strPathNotes strPathFilingNumber)],
+		order => [qw(intClearanceID MemberName dtDOB strState SourceClubName DestinationClubName intClearanceStatus strApprovedBy intDenialReasonID strPathNotes)],
 			options => {
 				labelsuffix => ':',
 				hideblank => 1,
@@ -995,10 +993,11 @@ sub memberLink	{
 
 	if ($dref->{intClearanceID} and $dref->{intPersonID} and $dref->{intClearanceStatus} == $Defs::CLR_STATUS_APPROVED)	{
  		my %tempClientValues = %{$Data->{clientValues}};
-        $tempClientValues{memberID} = $dref->{intPersonID};
+        $tempClientValues{personID} = $dref->{intPersonID};
+        $tempClientValues{personID} = $dref->{intPersonID};
         $tempClientValues{currentLevel} = $Defs::LEVEL_PERSON;
         my $tempClient = setClient(\%tempClientValues);
-		return qq[ <div class="OKmsg">] . $lang->txt('The transfer has now been finalised') . qq[</div><br><a href="$Data->{'target'}?client=$tempClient&amp;a=M_HOME">] . $lang->txt('click here to display persons record') . qq[</a>];
+		return qq[ <div class="OKmsg">] . $lang->txt('The transfer has now been finalised') . qq[</div><br><a href="$Data->{'target'}?client=$tempClient&amp;a=P_HOME">] . $lang->txt('click here to display persons record') . qq[</a>];
 
 	}
 	return '';
@@ -1236,84 +1235,28 @@ sub finaliseClearance	{
 	my $intMA_Status = $Defs::RECSTATUS_ACTIVE;
 
 	$st = qq[
-		SELECT intMemberClubID
-		FROM tblMember_Clubs
-		WHERE intPersonID = $intPersonID
-			AND intClubID = $intClubID
-			AND intStatus = $Defs::RECSTATUS_ACTIVE
-		LIMIT 1
+		INSERT INTO tblPersonRegistration_1
+		(intPersonID, intEntityID, strStatus)
+		VALUES ($intPersonID, $intClubID, "ACTIVE")
 	];
-	$query = $db->prepare($st) or query_error($st);
-	$query->execute or query_error($st);
-	my $intMemberClubID = $query->fetchrow_array();
-	$intMemberClubID ||= 0;
-
-	$st = qq[
-		INSERT INTO tblMember_Clubs
-		(intPersonID, intClubID, intStatus)
-		VALUES ($intPersonID, $intClubID, $Defs::RECSTATUS_ACTIVE)
-	];
-
-	$st = qq[
-		UPDATE tblMember_Clubs
-		SET intStatus = $Defs::RECSTATUS_ACTIVE
-		WHERE intPersonID = $intPersonID
-			AND intMemberClubID = $intMemberClubID
-	] if $intMemberClubID;
 	$db->do($st);
 
-	if ($Data->{'SystemConfig'}{'clrInactiveSourceClub'} and $intClubID != $intSourceClubID )   {
-		$st =qq[
-			UPDATE tblMember_Clubs
-			SET intStatus = $Defs::RECSTATUS_INACTIVE
-			WHERE intPersonID = $intPersonID
-				AND intClubID = $intSourceClubID
-				AND intStatus = $Defs::RECSTATUS_ACTIVE
-		];
-		$db->do($st);
-	}
-
-		$st = qq[
-			SELECT intMemberTypeID
-			FROM tblMember_Types
-			WHERE intPersonID = $intPersonID 
-				AND intTypeID=$Defs::MEMBER_TYPE_PLAYER
-		];
-		my $query = $db->prepare($st) or query_error($st);
-		$query->execute or query_error($st);
-		my $intMemberTypeID =$query->fetchrow_array() || 0;
-		if ($intMemberTypeID)	{
-			$st = qq[
-				UPDATE tblMember_Types
-				SET intRecStatus = $Defs::RECSTATUS_ACTIVE
-				WHERE intMemberTypeID = $intMemberTypeID
-			];
-			$db->do($st);
-		}
-		else	{
-			$st = qq[
-				INSERT INTO tblMember_Types
-				(intPersonID, intRecStatus, intTypeID)
-				VALUES ($intPersonID, $Defs::RECSTATUS_ACTIVE, $Defs::MEMBER_TYPE_PLAYER)
-			];
-			$db->do($st);
-		}
-		$st = qq[
-			UPDATE tblPerson
-			SET intPlayer = 1
-			WHERE intPersonID=$intPersonID
-		];
-		$db->do($st);
+#		$st = qq[
+#			UPDATE tblPerson
+#			SET intPlayer = 1
+#			WHERE intPersonID=$intPersonID
+#		];
+#		$db->do($st);
 	
 
-	$st = qq[
-		UPDATE tblPerson
-		SET intStatus = $Defs::RECSTATUS_ACTIVE
-		WHERE intPersonID = $intPersonID
-			AND intStatus = $Defs::RECSTATUS_DELETED
-		LIMIT 1
-	];
-	$db->do($st);
+#	$st = qq[
+#		UPDATE tblPerson
+#		SET intStatus = $Defs::RECSTATUS_ACTIVE
+#		WHERE intPersonID = $intPersonID
+#			AND intStatus = $Defs::RECSTATUS_DELETED
+#		LIMIT 1
+#	];
+#	$db->do($st);
 	$st = qq[
 		UPDATE tblClearance
 		SET intClearanceStatus = $Defs::CLR_STATUS_APPROVED, dtFinalised=NOW()
@@ -1322,17 +1265,11 @@ sub finaliseClearance	{
 	$db->do($st);
 
 	$st = qq[
-		DELETE FROM tblMember_ClubsClearedOut
-		WHERE intRealmID = $Data->{'Realm'}
-			AND intClubID = $intClubID
+		UPDATE tblPersonRegistration_1
+        SET strStatus="TRANSFERRED"
+		WHERE intEntityID= $intSourceClubID
+            AND intCurrent=1
 			AND intPersonID = $intPersonID
-	];
-	$db->do($st);
-
-	$st = qq[
-	    INSERT INTO tblMember_ClubsClearedOut
-		(intRealmID, intClubID, intPersonID, intClearanceID)
-		VALUES ($Data->{'Realm'}, $intSourceClubID, $intPersonID, $cID)
 	];
 	$db->do($st);
 
@@ -1358,7 +1295,7 @@ sub createClearance	{
 	my $destinationClubID = $Data->{'clientValues'}{'clubID'} || 0;
 	my $sourceClubID = $params{'sourceClubID'} || $params{'d_sourceClubID'} || 0;
 
-	my $memberID = $params{'memberID'} || $params{'d_memberID'} || 0;
+	my $personID = $params{'personID'} || $params{'d_personID'} || 0;
 	$params{'member_surname'} ||= '';
 	$params{'member_dob'} ||= '';
 	$params{'member_natnum'} ||= '';
@@ -1382,7 +1319,7 @@ sub createClearance	{
 		return $body;
 	}
 
-	if	(! $memberID and ! $params{'member_surname'} and ! $params{'member_dob'} and ! $params{'member_natnum'} and ! $params{'member_loggedsurname'} and ! $params{'member_systemsurname'} and ! $params{'member_systemdob'})	{
+	if	(! $personID and ! $params{'member_surname'} and ! $params{'member_dob'} and ! $params{'member_natnum'} and ! $params{'member_loggedsurname'} and ! $params{'member_systemsurname'} and ! $params{'member_systemdob'})	{
 		$body .= qq[
 			<form action="$Data->{'target'}" method="POST">
 			<p>] . $lang->txt('Fill in the members National Number, or enter Surname and DOB') . qq[<br></p>
@@ -1398,7 +1335,7 @@ sub createClearance	{
 			</form>
 		];
 	}
-	elsif	(! $memberID and ($params{'member_surname'} or $params{'member_dob'} or $params{'member_natnum'} or $params{'member_loggedsurname'} or ($params{'member_systemsurname'} and $params{'member_systemdob'})))	{
+	elsif	(! $personID and ($params{'member_surname'} or $params{'member_dob'} or $params{'member_natnum'} or $params{'member_loggedsurname'} or ($params{'member_systemsurname'} and $params{'member_systemdob'})))	{
 		my $strWhere = '';
 		my %tParams = %params;
 		deQuote($db, \%tParams);	
@@ -1423,18 +1360,15 @@ sub createClearance	{
 			$strWhere .= qq[ AND M.dtDOB =$tParams{'member_dob'}];
 		}
 		if ($sourceClubID)	{
-			$strWhere .= qq[ AND MC.intClubID = $sourceClubID];
+			$strWhere .= qq[ AND PR.intEntityID = $sourceClubID];
 		}
 
 		if ($params{'member_dob'})	{
 			$strWhere .= qq[ AND M.dtDOB =$tParams{'member_dob'}];
 		}
 		if ($sourceClubID)	{
-			$strWhere .= qq[ AND MC.intClubID = $sourceClubID];
+			$strWhere .= qq[ AND PR.intEntityID = $sourceClubID];
 		}
-
-		my $CLRD_OUT_JOIN = qq[ LEFT JOIN tblMember_ClubsClearedOut as CLRD_OUT ON (CLRD_OUT.intClubID = C.intClubID AND CLRD_OUT.intPersonID = M.intPersonID)];
-		my $CLRD_OUT_WHERE = ''; #$Data->{'SystemConfig'}{'Clearances_FilterClearedOut'} ? qq[ AND CLRD_OUT.intPersonID IS NULL] : '';
 
 		my $st = qq[
 			SELECT DISTINCT 
@@ -1444,31 +1378,24 @@ sub createClearance	{
                 M.strNationalNum, 
                 DATE_FORMAT(M.dtDOB,'%d/%m/%Y') AS DOB, 
                 M.dtDOB, 
-                MC.intClubID, 
+                C.intEntityID as intSourceEntityID,
                 C.strLocalName as ClubName, 
-                DATE_FORMAT(MAX(CLR.dtFinalised),'%d/%m/%Y') AS CLR_DATE, 
-                IF(MC.intStatus = 1, 'Y', 'N') as Club_STATUS, 
-                DATE_FORMAT(MA.dtLastRegistered, '%d/%m/%Y') AS LastRegistered, 
-                CLRD_OUT.intPersonID as CLRD_ID, 
-                MAX(MC.intPrimaryClub) as PrimaryClub
+                DATE_FORMAT(MAX(CLR.dtFinalised),'%d/%m/%Y') AS CLR_DATE
 			FROM tblPerson as M 
-				INNER JOIN tblMember_Clubs as MC ON (MC.intPersonID = M.intPersonID)
-				INNER JOIN tblEntity as C ON (C.intEntityID= MC.intClubID)
-				LEFT JOIN tblClearance as CLR ON (CLR.intPersonID = M.intPersonID AND CLR.intDestinationClubID = C.intClubID)
-				$CLRD_OUT_JOIN
+                INNER JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (PR.intPersonID=M.intPersonID)
+				INNER JOIN tblEntity as C ON (C.intEntityID= PR.intEntityID)
+				LEFT JOIN tblClearance as CLR ON (CLR.intPersonID = M.intPersonID AND CLR.intDestinationClubID = C.intEntityID)
 			WHERE 
                 M.intRealmID = $Data->{'Realm'}
-				AND C.intClubID <> $Data->{'clientValues'}{'clubID'}
-				AND C.intRecStatus <> $Defs::RECSTATUS_DELETED
-				AND MC.intStatus <> $Defs::RECSTATUS_DELETED
+				AND C.intEntityID <> $Data->{'clientValues'}{'clubID'}
+				AND PR.strStatus <> 'TRANSFERRED'
+                AND M.intStatus = $Defs::PERSONSTATUS_ACTIVE
 				$strWhere
-				$CLRD_OUT_WHERE
-			GROUP BY M.intPersonID, C.intClubID
+			GROUP BY M.intPersonID, C.intEntityID
 			ORDER BY MAX(CLR.dtFinalised) DESC, M.strLocalSurname, M.strLocalFirstname, M.dtDOB
 		];
 		
 		my $userID=getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'}) || 0;
-		$CLRD_OUT_JOIN = qq[ LEFT JOIN tblMember_ClubsClearedOut as CLRD_OUT ON (CLRD_OUT.intClubID = C.intClubID AND CLRD_OUT.intPersonID = M.intPersonID)];
 
 		my $query = $db->prepare($st) or query_error($st);
 	    $query->execute or query_error($st);
@@ -1490,7 +1417,7 @@ sub createClearance	{
 			    </tr>
 		];
 		while (my $dref= $query->fetchrow_hashref())	{
-			my $href = qq[client=$params{'client'}&amp;sourceClubID=$dref->{'intClubID'}&amp;a=CL_createnew&amp;member_natnum=$params{'member_natnum'}];
+			my $href = qq[client=$params{'client'}&amp;sourceClubID=$dref->{'intSourceEntityID'}&amp;a=CL_createnew&amp;member_natnum=$params{'member_natnum'}];
 			$href = qq[client=$params{'client'}&amp;sourceClubID=$dref->{'intClubID'}&amp;a=CL_createnew&amp;member_natnum=$params{'member_natnum'}] if ($params{'member_loggedsurname'});
 			$href = qq[client=$params{'client'}&amp;sourceClubID=$dref->{'intClubID'}&amp;a=CL_createnew&amp;member_natnum=$params{'member_natnum'}] if ($params{'member_systemsurname'});
 			$body .= qq[
@@ -1500,7 +1427,7 @@ sub createClearance	{
 				$body .= qq[<td><b>] . $lang->txt('TRANSFERRED') . qq[</b></td>];
 			}
 			else	{
-				$body .= qq[<td><a href="$Data->{'target'}?$href&amp;memberID=$dref->{intPersonID}">select</a></td>];
+				$body .= qq[<td><a href="$Data->{'target'}?$href&amp;personID=$dref->{intPersonID}">select</a></td>];
 			}
 			$body .= qq[
 					<td>$dref->{strLocalSurname}</td>
@@ -1526,11 +1453,9 @@ sub clearanceForm	{
 
 ### PURPOSE: This function is called once the createClearance() function is ready to pass control to ask the destination club (who requested the clearance) the final clearance questions and then to write to DB.
 
-### It has a preClearanceAdd() (beforeaddfunction), which checks whether the member is involved in another pending clearance (or already in destination club).
-
 ### It has a postClearanceAdd() (afteraddfunction), which will create the clearance path.
 
-  my($Data, $params, $memberID, $id, $edit) = @_;
+  my($Data, $params, $personID, $id, $edit) = @_;
 	$id ||= 0;	
     my $lang = $Data->{'lang'};
 
@@ -1546,13 +1471,13 @@ sub clearanceForm	{
 	my $realm = $params->{'realmID'} || $Data->{'Realm'} || 0;
 
 	my ($sourceClub, undef, undef) = getNodeDetails($db, $Defs::CLUB_LEVEL_CLEARANCE, $Defs::LEVEL_CLUB, $sourceClubID);
-	$memberID = $memberID || $params->{'memberID'} || 0;
+	$personID = $personID || $params->{'personID'} || 0;
 	my $statement = qq[
 		SELECT 
             *,     
             DATE_FORMAT(dtDOB,'%d/%m/%Y') AS DOB
 		FROM tblPerson 
-		WHERE intPersonID = $memberID
+		WHERE intPersonID = $personID
 	];
 	my $query = $db->prepare($statement);
 	$query->execute;
@@ -1581,7 +1506,7 @@ sub clearanceForm	{
 
     my $clradd=qq[
         INSERT INTO tblClearance (intPersonID, intDestinationClubID, intSourceClubID, intRealmID, --FIELDS--, dtApplied, intClearanceStatus, intRecStatus, intClearanceYear )
-            VALUES ($memberID, $destinationClubID, $sourceClubID, $realm, --VAL--,  SYSDATE(), $Defs::CLR_STATUS_PENDING, $Defs::RECSTATUS_ACTIVE,  $intClearanceYear)
+            VALUES ($personID, $destinationClubID, $sourceClubID, $realm, --VAL--,  SYSDATE(), $Defs::CLR_STATUS_PENDING, $Defs::RECSTATUS_ACTIVE,  $intClearanceYear)
     ];
 
     my ($DefCodes, $DefCodesOrder) = getDefCodes(
@@ -1670,7 +1595,7 @@ sub clearanceForm	{
 					readonly => $intClearancePriority,
                 },
 			},
-			order => [qw(MemberName NatNum DOB strState SourceClub intReasonForClearanceID strReason strReasonForClearance strFilingNumber intClearancePriority)],
+			order => [qw(MemberName NatNum DOB strState SourceClub intReasonForClearanceID strReasonForClearance )],
 			options => {
 				labelsuffix => ':',
 				hideblank => 1,
@@ -1682,7 +1607,7 @@ sub clearanceForm	{
 				updateSQL => $clrupdate,
 				addSQL => $clradd,
 				beforeaddFunction => \&preClearanceAdd,
-                beforeaddParams => [$Data,$client, $memberID],
+                beforeaddParams => [$Data,$client, $personID, $Data->{'clientValues'}{'clubID'}],
 				afteraddFunction => \&postClearanceAdd,
 				afteraddParams=> [$option,$Data,$Data->{'db'}],
 				auditFunction=> \&auditLog,
@@ -1712,7 +1637,7 @@ sub clearanceForm	{
 				sourceClubID => $sourceClubID,
 				destinationClubID => $destinationClubID,
 				member_natnum => $member_natnum,
-				memberID => $memberID,
+				personID => $personID,
 				realmID => $Data->{'clientValues'}{'Realm'},
 			},
 		},
@@ -1736,7 +1661,7 @@ sub preClearanceAdd	{
 
     ### PURPOSE: Check whether the current member is in a pending clearance, or already in the club.
     
-    my($params, $Data, $client, $memberID)=@_;
+    my($params, $Data, $client, $personID, $destinationClubID)=@_;
     my $db = $Data->{'db'};
     my $lang = $Data->{'lang'};
     
@@ -1745,9 +1670,7 @@ sub preClearanceAdd	{
         return (0,$error);
 	}
     
-	$memberID ||= 0;
-	my $destinationClubID = $Data->{'clientValues'}{'clubID'} || 0;
-	
+	$personID ||= 0;
 	my $st = qq[
 			SELECT
 				C.intClearanceID,
@@ -1760,7 +1683,7 @@ sub preClearanceAdd	{
 				tblClearance as C
 				LEFT JOIN tblEntity as C1 ON (C1.intEntityID = C.intDestinationClubID and C1.intEntityLevel = $Defs::LEVEL_CLUB)
 				LEFT JOIN tblEntity as C2 ON (C2.intEntityID = C.intSourceClubID and C2.intEntityLevel = $Defs::LEVEL_CLUB)
-		WHERE intPersonID = $memberID
+		WHERE intPersonID = $personID
 			AND  intClearanceStatus = $Defs::CLR_STATUS_PENDING
 			AND intCreatedFrom =0
 	];
@@ -1771,38 +1694,6 @@ sub preClearanceAdd	{
 	my $existingClearance=0;
      
      while (my $dref = $query->fetchrow_hashref())	{
-        my $source_contact_name="";
-        my $source_contact_email ="";
-        my $destination_contact_name ="";
-        my $destination_contact_email="";
-        if($dref->{SourceClubID} >0){
-                my $source_contactObj = ContactsObj->getList(dbh=>$db, clubid=>$dref->{SourceClubID} , getclearances=>1)||[];
-                my $source_contactObjP = ContactsObj->getList(dbh=>$db, clubid=>$dref->{SourceClubID} , getprimary=>1)||[];
-		if(scalar(@$source_contactObj)>0){
-               		$source_contact_name =qq[@$source_contactObj[0]->{strContactFirstname} @$source_contactObj[0]->{strContactSurname}];
-                	$source_contact_email = @$source_contactObj[0]->{strContactEmail};
-        	}
-		elsif(scalar(@$source_contactObjP)>0){
-               		$source_contact_name =qq[@$source_contactObjP[0]->{strContactFirstname} @$source_contactObjP[0]->{strContactSurname}];
-                	$source_contact_email = @$source_contactObjP[0]->{strContactEmail};
-        	}	
-	}
-        if($dref->{DestinationClubID} >0){ 
-                my  $destination_contactObj = ContactsObj->getList(dbh=>$db,clubid=>$dref->{DestinationClubID} , getclearances=>1) ;
-                my  $destination_contactObjP = ContactsObj->getList(dbh=>$db,clubid=>$dref->{DestinationClubID} , getprimary=>1) ;
-		if(scalar(@$destination_contactObj)>0){
-			$destination_contact_name =qq[@$destination_contactObj[0]->{strContactFirstname} @$destination_contactObj[0]->{strContactSurname}];
-                	$destination_contact_email = @$destination_contactObj[0]->{strContactEmail};
-        	}
-		elsif(scalar(@$destination_contactObjP)>0){
-			$destination_contact_name =qq[@$destination_contactObjP[0]->{strContactFirstname} @$destination_contactObjP[0]->{strContactSurname}];
-                	$destination_contact_email = @$destination_contactObjP[0]->{strContactEmail};
-        	}
-	}
-        $dref->{SourceEmail} = $source_contact_email;
-        $dref->{SourceContact} = $source_contact_name;
-        $dref->{DestinationEmail} = $destination_contact_email;
-        $dref->{DestinationContact} = $destination_contact_name; 
          $existingClearance++;
          $error_text .= qq[
                 	<div class="warningmsg">] . $lang->txt('The selected person is already involved in a pending transfer.  Unable to continue until the below transaction is finalised') . qq[</div>
@@ -1911,6 +1802,7 @@ sub getMeetingPoint	{
 	my ($db, $sourceClubID, $destinationClubID, $sourceNodes, $destinationNodes) = @_;
 	my $found=0;
 
+warn("SOURCE$sourceClubID DES:$destinationClubID");
 	my $st = qq[
 		SELECT 
             intChildID, 
@@ -1973,7 +1865,7 @@ sub clearanceAddManual	{
     my $lang = $Data->{'lang'};
 
 	my $db=$Data->{'db'} || undef;
-	my $memberID = $Data->{'clientValues'}{'memberID'} || -1;
+	my $personID = $Data->{'clientValues'}{'personID'} || -1;
 	my $client=setClient($Data->{'clientValues'}) || '';
 	my $target=$Data->{'target'} || '';
 	my $option=$edit ? ($id ? 'edit' : 'add')  :'display' ;
@@ -1982,13 +1874,13 @@ sub clearanceAddManual	{
 
 	my $realm = $params{'realmID'} || $Data->{'Realm'} || 0;
 
-	$memberID = $memberID || $params{'memberID'} || 0;
+	$personID = $personID || $params{'personID'} || 0;
 	my $statement = qq[
 		SELECT 
             *, 
             DATE_FORMAT(dtDOB,'%d/%m/%Y') AS DOB
 		FROM tblPerson 
-		WHERE intPersonID = $memberID
+		WHERE intPersonID = $personID
 	];
 	my $query = $db->prepare($statement);
 	$query->execute;
@@ -2005,7 +1897,7 @@ sub clearanceAddManual	{
             DATE_FORMAT(dtApplied,'%d/%m/%Y') AS dtApplied
 		FROM tblClearance
 		WHERE intClearanceID=$id
-			AND intPersonID = $memberID
+			AND intPersonID = $personID
 			AND intCreatedFrom = $Defs::CLR_TYPE_MANUAL
 	];
 
@@ -2017,13 +1909,13 @@ sub clearanceAddManual	{
 		UPDATE tblClearance
 			SET --VAL--
 		WHERE intClearanceID=$id
-			AND intPersonID = $memberID
+			AND intPersonID = $personID
 			AND intCreatedFrom = $Defs::CLR_TYPE_MANUAL
 	];
 	my $intClearanceYear = $Data->{'SystemConfig'}{'clrClearanceYear'} || 0;
     my $clradd=qq[
         INSERT INTO tblClearance (intPersonID, intRealmID, --FIELDS--, dtApplied, intClearanceStatus, intCreatedFrom, intRecStatus, intClearanceYear)
-        VALUES ($memberID, $realm, --VAL--,  SYSDATE(), $Defs::CLR_STATUS_APPROVED, 2, $Defs::RECSTATUS_ACTIVE, $intClearanceYear)
+        VALUES ($personID, $realm, --VAL--,  SYSDATE(), $Defs::CLR_STATUS_APPROVED, 2, $Defs::RECSTATUS_ACTIVE, $intClearanceYear)
     ];
 
     my ($DefCodes, $DefCodesOrder) = getDefCodes(
@@ -2109,7 +2001,7 @@ sub clearanceAddManual	{
                 },
 			
 			},
-			order => [qw(dtApplied MemberName DOB strState strSourceClubName strDestinationClubName intReasonForClearanceID strReasonForClearance strFilingNumber intClearancePriority intClearAction)],
+			order => [qw(dtApplied MemberName DOB strState strSourceClubName strDestinationClubName intReasonForClearanceID strReasonForClearance intClearAction)],
 			options => {
 				labelsuffix => ':',
 				hideblank => 1,
@@ -2149,7 +2041,7 @@ sub clearanceAddManual	{
 				a=> 'CL_addmanual',
 				clrID => $id,
 				destinationClubID => $destinationClubID,
-				memberID => $memberID,
+				personID => $personID,
 				realmID => $Data->{'clientValues'}{'Realm'},
 			},
 		},
@@ -2358,12 +2250,12 @@ sub postManualClrAction	{
 
 	my $clrAction = $params->{'d_intClearAction'} || 0;
 	my $clubID = $Data->{'clientValues'}{'clubID'} || 0;
-	my $memberID = $Data->{'clientValues'}{'memberID'} || 0;
+	my $personID = $Data->{'clientValues'}{'personID'} || 0;
 
 	$clubID = 0 if ($clubID == $Defs::INVALID_ID);
-	$memberID = 0 if ($memberID == $Defs::INVALID_ID);
+	$personID = 0 if ($personID == $Defs::INVALID_ID);
 
-	if ($params->{'d_intClearAction'} == 1 and $clubID and $memberID)	{
+	if ($params->{'d_intClearAction'} == 1 and $clubID and $personID)	{
 		## CLEAR MEMBER OUT !
 		my $st = qq[
 			INSERT INTO tblMember_ClubsClearedOut (
@@ -2375,7 +2267,7 @@ sub postManualClrAction	{
                 	VALUES (
 				$Data->{'Realm'}, 			
 				$clubID,
-				$memberID,
+				$personID,
 				$id
 			)
 		];
@@ -2386,13 +2278,13 @@ sub postManualClrAction	{
                         SET
                                 intStatus = $Defs::RECSTATUS_INACTIVE
                         WHERE
-                                intPersonID = $memberID
+                                intPersonID = $personID
                                 AND intClubID = $clubID
                                 AND intStatus = $Defs::RECSTATUS_ACTIVE
                 ];
                 $db->do($st);
 	}
-	if ($params->{'d_intClearAction'} == 2 and $clubID and $memberID)	{
+	if ($params->{'d_intClearAction'} == 2 and $clubID and $personID)	{
 		## CLEAR MEMBER IN !
 		my $st = qq[
 			DELETE FROM 
@@ -2400,7 +2292,7 @@ sub postManualClrAction	{
                 	WHERE 
 				intRealmID = $Data->{'Realm'}
                         	AND intClubID = $clubID
-                        	AND intPersonID = $memberID
+                        	AND intPersonID = $personID
 		];
 		$db->do($st);
 
@@ -2410,7 +2302,7 @@ sub postManualClrAction	{
                         SET
                                 intStatus = $Defs::RECSTATUS_ACTIVE
                         WHERE
-                                intPersonID = $memberID
+                                intPersonID = $personID
                                 AND intClubID = $clubID
                                 AND intStatus = $Defs::RECSTATUS_INACTIVE
                         LIMIT 1

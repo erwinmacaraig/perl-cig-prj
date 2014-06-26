@@ -737,10 +737,6 @@ sub generateTXNListLink {
 sub listTransactions_where {
     my ($whereClause, $txnStatus, $safeTableID, $safePaymentID, $paymentID, $Data, $db) = @_;
 
-    #$whereClause = qq[t.intStatus = $txnStatus];
-    #$whereClause .= qq[ and t.intParentTXNID=0 ] unless  $txnStatus == $Defs::TXN_PAID;
-    #$whereClause .= qq[ AND t.intID=$safeTableID and t.intTableType=$Defs::LEVEL_MEMBER]
-
     $whereClause .= qq[ AND t.intID=$safeTableID and t.intTableType=$Defs::LEVEL_MEMBER] if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_MEMBER;
     $whereClause .= qq[ AND t.intID=$safeTableID and t.intTableType=$Defs::LEVEL_TEAM]   if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_TEAM;
     $whereClause .= qq[ AND t1.intTLogID= $safePaymentID ] if $paymentID;
@@ -770,27 +766,8 @@ sub listTransactions {
     my $tempBody = '';
     my $transCount = 0;
 
-#   if ($txnStatus == $Defs::TXN_SHOWALL) {
-#     for my $i ($Defs::TXN_PAID, $Defs::TXN_UNPAID, $Defs::TXN_CANCELLED) {
-#       my $hide_list_payments_link = ($i == $Defs::TXN_CANCELLED) ? 0 : 1;
-#       @{$Data->{'listFields'}} = ();
-#       $Data->{'ViewTXNStatus'} = $i;
-#       setupStandardList($Data);
-#       $whereClause = listTransactions_where($whereClause, $i, $safeTableID, $safePaymentID, $paymentID, $Data, $db);
-#    		my $tcount = 0;
-#        ($tempBody, $tcount) = getTransList($Data, $db, $whereClause, $tempClientValues_ref, $hide_list_payments_link);
-#    		if($i == $Defs::TXN_UNPAID)	{
-#    			$transCount = $tcount;
-#    		}
-#       $body .= qq[<p class="sectionheader">$Defs::ProdTransactionStatus{$i}</p>];
-#       $body .= $tempBody;
-#     }
-#     $tempBody = '';
-#   }
-#   else {
     $whereClause = listTransactions_where($whereClause, $txnStatus, $safeTableID, $safePaymentID, $paymentID, $Data, $db);
 	($tempBody, $transCount) = getTransList($Data, $db, $whereClause, $tempClientValues_ref);
-#   }
 
 	$body .= $tempBody;
 
@@ -822,22 +799,6 @@ sub listTransactions {
     my $checked_unpaid    = $txnStatus == $Defs::TXN_UNPAID    ? 'SELECTED' : '' ;
     my $checked_cancelled = $txnStatus == $Defs::TXN_CANCELLED ? 'SELECTED' : '' ;
     my $checked_showall   = $txnStatus == $Defs::TXN_SHOWALL   ? 'SELECTED' : '' ;
-
-#   my $line = qq[
-#       <div class="showrecoptions">
-#       <script language="JavaScript1.2" type="text/javascript" src="js/jscookie.js"></script>
-#       <form action="#" onsubmit="return false;" name="recoptions">
-#         Showing
-#         <select name="txnStatus" size="1" style="font-size:10px;">
-#           <option $checked_paid value="$Defs::TXN_PAID">Paid</option>
-#           <option $checked_unpaid value="$Defs::TXN_UNPAID">Unpaid</option>
-#           <option $checked_cancelled value="$Defs::TXN_CANCELLED">Cancelled</option>
-#           <option $checked_showall value="$Defs::TXN_SHOWALL">Show All</option>
-#         </select> records
-#          <input type="button" value="Filter" onclick="SetCookie('SWOMTXNREC',document.recoptions['txnStatus'].options[document.recoptions['txnStatus'].selectedIndex].value,30); document.location.reload();return true;" style="font-size:10px;">
-#       </form>
-#       </div>
-#   ];
 
     my $line = '';
     my $addLink = qq[

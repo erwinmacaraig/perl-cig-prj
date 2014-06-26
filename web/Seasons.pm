@@ -763,7 +763,7 @@ sub postMemberSeasonUpdate    {
     $seasonID ||= 0;
     my $assocSeasons = getDefaultAssocSeasons($Data);
     if ($seasonID and $Data->{'clientValues'}{'assocID'} and $Data->{'clientValues'}{'memberID'} and $id)   {
-    Transactions::insertDefaultRegoTXN($db, $Defs::LEVEL_MEMBER, $Data->{'clientValues'}{'memberID'}, $Data->{'clientValues'}{'assocID'});
+    #Transactions::insertDefaultRegoTXN($db, $Defs::LEVEL_MEMBER, $Data->{'clientValues'}{'memberID'}, $Data->{'clientValues'}{'assocID'});
         ## I think this is to get Member.Interests updated
         my $genAgeGroup ||=new GenAgeGroup ($Data->{'db'},$Data->{'Realm'}, $Data->{'RealmSubType'}, $Data->{'clientValues'}{'assocID'});
         my $ageGroupID=$genAgeGroup->getAgeGroup ($Gender, $DOBAgeGroup) || 0;
@@ -1577,8 +1577,6 @@ sub getSeasons  {
             tblSeasons 
         WHERE 
             intRealmID = $Data->{'Realm'}
-            AND (intAssocID = $assocID OR intAssocID = 0)
-            AND (intRealmSubTypeID = $subType $subTypeSeasonOnly)   
             $checkLocked
         ORDER BY intSeasonOrder
     ]; 
@@ -1897,7 +1895,7 @@ sub seasonToClubRollover    {
                 ($mID,$Defs::MEMBER_TYPE_PLAYER,0,1,$assocToID, 1)
         ];
         $Data->{'db'}->do($ins_st);
-        Transactions::insertDefaultRegoTXN($Data->{'db'}, $Defs::LEVEL_MEMBER, $mID, $assocToID);
+#        Transactions::insertDefaultRegoTXN($Data->{'db'}, $Defs::LEVEL_MEMBER, $mID, $assocToID);
         $ins_st = qq[
             INSERT INTO tblMember_Clubs
                 (intMemberID, intClubID, intStatus)

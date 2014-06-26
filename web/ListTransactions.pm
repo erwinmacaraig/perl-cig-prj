@@ -48,11 +48,11 @@ print STDERR qq[TCTCTCTCTCTC \n\n];
     SELECT 
       P.strName, 
       T.*, 
-      A.strName as AssocName
+      E.strLocalName as EntityName
     FROM 
       tblProdTransactions as T
       INNER JOIN tblProducts as P ON P.intProductID = T.intProductID
-      LEFT JOIN tblAssoc as A ON (A.intAssocID = T.intAssocID)
+      LEFT JOIN tblEntity as E ON (E.intEntityID = T.intEntityID)
     WHERE 
       T.intMemberID = ?
   ];
@@ -84,7 +84,7 @@ print STDERR qq[TCTCTCTCTCTC \n\n];
   my @rowdata  = ();
   while (my $dref = $query->fetchrow_hashref()) {
     my %row = ();
-    for my $i (qw(intTransactionID strName intQty AssocName intAmount dtStart dtEnd strNotes)) {
+    for my $i (qw(intTransactionID strName intQty EntityName intAmount dtStart dtEnd strNotes)) {
       $row{$i} = $dref->{$i};
     }
     $row{'id'} = $dref->{'intTransactionID'};
@@ -95,15 +95,6 @@ print STDERR qq[TCTCTCTCTCTC \n\n];
     $resultHTML .= textMessage($textLabels{'noTransFound'});
   }
   else  {
-    #my $headings=list_headers([
-    #  $textLabels{'name'},
-    #  $textLabels{'assoc'},
-    #  $textLabels{'qty'},
-    #  $textLabels{'amountDue'},
-    #  $textLabels{'amountPaid'},
-    #  $textLabels{'status'},
-    #  "&nbsp;"
-    #]) || '';
 
     my $memfieldlabels=FieldLabels::getFieldLabels($Data,$Defs::LEVEL_MEMBER);
     my @headers = (

@@ -222,7 +222,6 @@ sub getAgeGroups	{
 		SELECT intAgeGroupID, strAgeGroupDesc , intAgeGroupGender
 		FROM tblAgeGroups
 		WHERE intRealmID = $Data->{'Realm'}
-			AND (intAssocID = $assocID OR intAssocID = 0)
 			AND (intRealmSubTypeID IN (0, $Data->{'RealmSubType'}))
 			AND intRecStatus=1
 		ORDER BY dtDOBStart, strAgeGroupDesc

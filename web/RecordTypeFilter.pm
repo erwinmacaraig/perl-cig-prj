@@ -47,14 +47,14 @@ sub show_recordtypes	{
             !defined $Data->{'Permissions'}{'Member'}{'intRecStatus'} 
                 or $Data->{'Permissions'}{'Member'}{'intRecStatus'} ne 'Hidden' 
                 or $level >= $Defs::LEVEL_TEAM
-                or $level== $Defs::LEVEL_MEMBER
+                or $level== $Defs::LEVEL_PERSON
         )	{
             my $checked_active= $Data->{'ViewActStatus'} == 1 ? ' selected ' : '';
             my $checked_inactive= $Data->{'ViewActStatus'} == 0 ? ' selected ' : '';
             my $checked_all = $Data->{'ViewActStatus'} == 2 ? ' selected ' : '';
 
             my $name = '';
-            if ($level == $Defs::LEVEL_MEMBER) {
+            if ($level == $Defs::LEVEL_PERSON) {
                 #$name = $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_ASSOC} Status") . ':' ;
                 $name = $lang->txt("Status") . ':' ;
             }
@@ -97,7 +97,7 @@ sub show_recordtypes	{
                     and $Data->{'clientValues'}{'currentLevel'} != $Defs::LEVEL_COMP
             ) 
                 or $level == $Defs::LEVEL_COMP
-                or $level == $Defs::LEVEL_MEMBER
+                or $level == $Defs::LEVEL_PERSON
                 or $level == $Defs::LEVEL_TEAM
             ) 
             and $Data->{'clientValues'}{'currentLevel'} >= $Defs::LEVEL_TEAM
@@ -106,7 +106,7 @@ sub show_recordtypes	{
         $blankseasons = 1 if $level == $Defs::LEVEL_TEAM;
         if (
             $level == $Defs::LEVEL_TEAM 
-                or $level==$Defs::LEVEL_MEMBER 
+                or $level==$Defs::LEVEL_PERSON 
                 or $level == $Defs::LEVEL_COMP)	{
             $allseasons = 1 
         }
@@ -116,7 +116,7 @@ sub show_recordtypes	{
         :	$assocSeasons->{'currentSeasonID'};
         if (
             $level == $Defs::LEVEL_TEAM 
-                or $level == $Defs::LEVEL_MEMBER 
+                or $level == $Defs::LEVEL_PERSON 
                 or $level == $Defs::LEVEL_COMP)	{
             ### In Teams allow for a -1 Season Filter (ie: Not in a season)
             $Data->{'ViewSeason'} ||= 0;
@@ -154,7 +154,7 @@ sub show_recordtypes	{
                     and $Data->{'clientValues'}{'currentLevel'} != $Defs::LEVEL_COMP
             ) 
                 or $level == $Defs::LEVEL_COMP 
-                or $level == $Defs::LEVEL_MEMBER
+                or $level == $Defs::LEVEL_PERSON
         ) 
             and $Data->{'clientValues'}{'currentLevel'} >= $Defs::LEVEL_TEAM
     )	{
@@ -176,7 +176,7 @@ sub show_recordtypes	{
         ];
         $Data->{'AddToPage'}->add('js_bottom','inline',$ageGroupCookie);
     }
-    if( $level == $Defs::LEVEL_MEMBER and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB ) {
+    if( $level == $Defs::LEVEL_PERSON and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB ) {
         if (!  $Data->{'SystemConfig'}{'ShowInactiveClubMembers'})	{
             $statusMCfilter = qq[<input type="hidden" name="MCstatus" id="dd_MCStatus" value="2">];
         } else	{
