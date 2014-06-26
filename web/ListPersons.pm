@@ -40,6 +40,7 @@ sub listPersons {
 
     my ($AgeGroups, undef) = AgeGroups::getAgeGroups($Data);
 
+
     my $lang = $Data->{'lang'};
     my %textLabels = (
         'addPerson' => $lang->txt("Add"),
@@ -139,7 +140,8 @@ sub listPersons {
     my $statement=qq[
         SELECT DISTINCT 
             P.intPersonID,
-            P.strStatus
+            P.strStatus,
+            P.intStatus
             $select_str
             $sel_str 
         FROM tblPerson  AS P
@@ -152,7 +154,6 @@ sub listPersons {
             AND PR.intEntityID = ?
         ORDER BY $default_sort strLocalSurname, strLocalFirstname
     ];
-warn($statement . $entityID);
 
     my $query = exec_sql($statement, $entityID);
     my $found = 0;
@@ -161,10 +162,11 @@ warn($statement . $entityID);
     my $lookupfields = personList_lookupVals($Data);
 
     my %tempClientValues = getClient($client);
+warn("AAAAAAAAAA" . $tempClientValues{'Realm'});
     $tempClientValues{currentLevel} = $Defs::LEVEL_PERSON;
     while (my $dref = $query->fetchrow_hashref()) {
-warn("1111111");
         next if (defined $dref->{strStatus} and $dref->{strStatus} eq 'DELETED');
+        next if (defined $dref->{intStatus} and $dref->{intStatus} == $Defs::PERSONSTATUS_DELETED);
         $tempClientValues{personID} = $dref->{intPersonID};
         my $tempClient = setClient(\%tempClientValues);
 
@@ -186,7 +188,7 @@ warn("1111111");
         }
 
         $dref->{'strStatus_Filter'}=$dref->{'strStatus'};
-        if($dref->{'strStatus'} ==$Defs::MEMBERSTATUS_POSSIBLE_DUPLICATE )    {
+        if($dref->{'intStatus'} ==$Defs::PERSONSTATUS_POSSIBLE_DUPLICATE )    {
             my %keepduplicatefields = (
                 id => 1,
                 intPersonID => 1,
@@ -203,7 +205,7 @@ warn("1111111");
                 }
             }
             $dref->{'strStatus_Filter'}='1';
-            $dref->{'strStatus'}='D';
+            $dref->{'strStatus'}='DUPLICATE';
         }
 
         if(allowedAction($Data, 'm_d') and $Data->{'SystemConfig'}{'AllowPersonDelete'})    {

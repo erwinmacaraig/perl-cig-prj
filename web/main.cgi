@@ -138,6 +138,7 @@ sub main {
           handleClub( $action, \%Data, $ID, $typeID );
     }
     elsif ( $action =~ /^P_/ ) {
+warn("REALM IS ". $Data{'Realm'});
         ( $resultHTML, $pageHeading ) = handlePerson( $action, \%Data, $ID );
     }
     elsif ( $action =~ /^DOC_/ ) {

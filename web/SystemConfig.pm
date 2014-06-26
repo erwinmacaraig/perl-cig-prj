@@ -35,35 +35,13 @@ sub getSystemConfig {
 	my $query = $db->prepare($statement) or query_error($statement);
 	$query->execute($realmID) or query_error($statement);
 	while(my($DB_option, $DB_val, $DB_subtypeID, $DB_blob) = $query->fetchrow_array())  {
-    next if($DB_subtypeID and $DB_subtypeID != $subtypeID);
 		$DB_val='' if !defined $DB_val;
 		$DB_blob='' if !defined $DB_blob;
 		$DB_val =$DB_blob if $DB_blob ne '';
 		$systemConfig{$DB_option}=$DB_val;
 	}
 	$query->finish;
-
-	if ($Data->{'clientValues'}{'assocID'} and $Data->{'clientValues'}{'assocID'} != $Defs::INVALID_ID)	{
-		my $statement = qq[
-			SELECT strOption, strValue
-			FROM tblAssocConfig 
-			WHERE intAssocID = ?
-		];
-		my $query = $db->prepare($statement) or query_error($statement);
-		$query->execute($Data->{'clientValues'}{'assocID'});
-		while(my($DB_option, $DB_val) = $query->fetchrow_array())  {
-			$DB_val='' if !defined $DB_val;
-			$systemConfig{'AssocConfig'}{$DB_option}=$DB_val;
-            if($DB_option eq 'unLockSeasons' and $DB_val == 1){
-                $systemConfig{'LockSeasons'}= 0 ;
-            }
-		}
-
-		$query->finish;
-
-	}
     $systemConfig{'TYPE_NAME_3'} = 'Official' if  !defined $systemConfig{'TYPE_NAME_3'};
-
 	return \%systemConfig;
 }
 

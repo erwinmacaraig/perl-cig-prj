@@ -1006,31 +1006,12 @@ sub getPersonMenuData {
     my $DataAccess_ref = $Data->{'DataAccess'};
     my $accreditation_title = exists $Data->{'SystemConfig'}{'ACCRED_Custom_Name'} ? $Data->{'SystemConfig'}{'ACCRED_Custom_Name'}.'s' : "Accreditations";
 
+warn("RRRR: $Data->{'Realm'}");
 
     my ($intOfficial) = $personObj->getValue('intOfficial');
     my $clubs = $Data->{'SystemConfig'}{'NoClubs'} ? 0 : 1;
     my $clr= $Data->{'SystemConfig'}{'AllowClearances'} || 0;
 
-    my $invalid_club = 0;
-    if (
-        $Data->{'clientValues'}{'clubID'} 
-            and $Data->{'clientValues'}{'clubID'} !=$Defs::INVALID_ID 
-            and $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB
-    )   {
-        my $st = qq[
-        SELECT MAX(intStatus)   
-        FROM tblPerson_Clubs
-        WHERE intPersonID = ?
-            AND intClubID = ?
-        ];
-        my $qry= $Data->{'db'}->prepare($st);
-        $qry->execute($Data->{'clientValues'}{personID}, $Data->{'clientValues'}{'clubID'});
-        my($mcStatus)= $qry->fetchrow_array();
-        $qry->finish;
-        if ($mcStatus != $Defs::RECSTATUS_ACTIVE)   {
-            $invalid_club = 1;
-        }
-    }
     my $baseurl = "$target?client=$client&amp;";
     my %menuoptions = (
         home => {
@@ -1038,7 +1019,6 @@ sub getPersonMenuData {
             url => $baseurl."a=P_HOME",
         },
     );
-    if(!$invalid_club) {
         if(!$SystemConfig->{'NoAuditLog'}) {
             $menuoptions{'auditlog'} = {
                 name => $lang->txt('Audit Log'),
@@ -1051,17 +1031,14 @@ sub getPersonMenuData {
                 url => $baseurl."a=P_NACCRED_LIST",
             };
         }
-        if($SystemConfig->{'AllowTXNs'} 
-                and (
-                (allowedAction($Data, 'm_tran') and $Data->{'clientValues'}{authLevel} == $Defs::LEVEL_TEAM)
-                    or $Data->{'clientValues'}{authLevel} != $Defs::LEVEL_TEAM
-            )
-        ) {
-            my $txns_link_name = $SystemConfig->{'txns_link_name'} || $lang->txt('Transactions');
-            $menuoptions{'transactions'} = {
-                url => $baseurl."a=P_TXNLog_list",
-            };
-        }
+
+     my $txns_link_name = $lang->txt('Transactions');
+warn("ALLOWTXNS" . $SystemConfig->{'AllowTXNs'});
+     if($SystemConfig->{'AllowTXNs'}) {
+        $menuoptions{'transactions'} = {
+            url => $baseurl."a=P_TXNLog_list",
+        };
+     }
         if($clubs) {
             $menuoptions{'clubs'} = {
                 name => $lang->txt('Clubs'),
@@ -1074,7 +1051,6 @@ sub getPersonMenuData {
                 url => $baseurl."a=P_CLR",
             };
         }
-    }
 
 
     $Data->{'SystemConfig'}{'TYPE_NAME_3'} = '' if not exists $Data->{'SystemConfig'}{'TYPE_NAME_3'};
