@@ -3,7 +3,7 @@
 #
 
 package Lang::en;
-use base qw(Lang);
+use base qw(LangBase);
 use strict;
 use vars qw(%Lexicon);
 %Lexicon = (

@@ -120,7 +120,6 @@ sub pageMain {
         $Data
     ) = @_;
 
-warn("IN PM");
     $title ||= '';
     $navbar||='';
     $body ||= textMessage($Data->{'lang'}->txt('NO_BODY'));

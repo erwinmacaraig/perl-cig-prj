@@ -209,38 +209,6 @@ EOS
     'Edit' => 'Éditer',
     'Edit Welcome Message' => 'Editer le message de bienvenue',
     'Editable' => 'Editable', #todo
-    'eduAddMember_course' => 'Showing all people that have participated in other courses. Click on a name to add them to this course, or click <img src="images/add_icon.gif" border="0"> to enter details for a new participant',
-    'eduListDAS' => 'Showing all staff for this delivery agent. Staff can be assigned to modules and courses while editing a specific module or course. Click on a name to edit details.',
-    'eduListDeliveryAgent' => 'Delivery agents can be licenced to run courses and modules.',
-    'eduListLicence' => 'Showing all licences for this delivery agent. Licences grant a delivery agent the ability to run courses and modules between specified dates.',
-    'eduListMem_course' => 'Showing all participants in this course. Click on a member\'s name to edit that member and on <img src="images/sml_edit_icon.gif" border="0"> to edit their status for this course. You can use the buttons in the top right to add new members to the course and quickly approve members.',
-    'eduListMem_da' => 'Showing all people that have participated in a course. Click on a name to edit their details, then use the new menu in the bottom left of the screen to administer them.',
-    'eduListMem_mem' => 'Showing all modules for this member. Click on a course code to edit their details in that course.',
-    'eduListMMT' => 'Showing all certificates issued for this member. Click on the certificate name to edit it or on the <img src="images/sml_view_icon.gif" border="0"> icon to print the certificate.',
-    'eduListMTL' => 'Template links connect course templates to their child module templates. When a delivery agent schedules a course, the structure created here will be replicated.',
-    'eduListModule_course' => 'Showing modules in this course. If you click on a module the bottom left menu will change, allowing you to administer that module.',
-    'eduListModule_da' => 'Showing all modules and courses that you are licenced to run. Click a course code to see scheduled and past courses or click "Create Course" / "Create Module" on the right to schedule a new course or module.',
-    'eduListModuleInstance_da' => 'Showing all scheduled, <i>past</i> and <span style="color:red">cancelled</span> <b>courses</b> and modules. Click on a course or module code to edit it, then use the new menu in the bottom left of the screen to administer it.',
-    'eduListVenue' => 'Showing all venues. Venues can be assigned to modules and courses while editing a specific module or course. Click on a venue name to edit details.',
-    'eduListModuleStaff' => 'Showing all staff for this module / course. Click on a name to edit their details for this course, or click <img src="images/sml_delete_icon.gif" border="0"> to remove them from this course.',
-    'eduListModuleTemplate' => 'Templates specify the different types of courses and modules that delivery agents can run.',
-    'eduMMTModules' => 'Check the modules and course that should show on this certificate. Only a single course and only modules which haven\'t already been included in a certificate can be selected.',
-    'eduShowCourseSearch' => 'Select one or more fields, then click Search. If you select no fields, all courses will be shown',
-    'eduShowPaymentSearch' => 'Select one or more fields, then click search. If you select no fields, all payments will be shown',
-    'eduTransList_unpaid' => 'Showing unpaid items. To view paid items, click \'Paid\' above. To add a payment, tick one or more items, then enter the payment details at the bottom of the page and click \'Add Payment\'.',
-    'eduTransList_paid' => 'Showing paid items. You can edit the payment associated with these items by clicking the <img src="images/player_pay.gif" border="0"> icon. To view all items for a single payment, click \'Filter by linked payment\'. To cancel a payment, click <img src="images/player_pay.gif" border="0">, then click \'*Cancel Payment*\'',
-    'eduListPayment' => 'Showing payments. To edit a payment, click <img src="images/player_pay.gif" border="0">. To view the items in a payment, click \'View Items\'',
-
-    'eduReportMember' =>
-        'Choisissez les champs que vous voulez sur votre rapport et les ' .
-        'filtres que vous souhaitez appliquer. Lorsque complété, cliquez ' .
-        'sur le bouton "[_1]".',
-
-    'eduReportStaff' =>
-        'Choisissez les champs que vous voulez sur votre rapport et les ' .
-        'filtres que vous souhaitez appliquer. Lorsque complété, cliquez ' .
-        'sur le bouton "[_1]".',
-
     'Email' => 'E-mail',
     'Email 2' => 'E-mail 2',
     'Emergency Contact Name' => 'Emergency Contact Name', #todo
@@ -249,11 +217,6 @@ EOS
     'Emergency Contact Relationship' => 'Emergency Contact Relationship', #todo
     'End Date' => 'End Date', #todo
     'Entity ID' => 'Entity ID', #todo
-    'Estimated Participants' => 'Estimation des participants',
-    'Estimated Registered Players' => 'Estimation des joueurs inscrits',
-
-    'Estimated Un-Registered Players'
-        => 'Estimation des joueurs non inscrits',
 
     'Ethnicity' => 'Ethnie',
     'Exclude from Club Championships' => 'Exclude from Club Championships', #todo
@@ -283,9 +246,6 @@ EOS
     'Home Venue Post Code' => 'Code postal du Lieu de domicile',
     'Home Venue Suburb' => 'Banlieue/Quartier du Lieu de domicile',
     'How did you find out about us?' => 'How did you find out about us?', #todo
-    'How many national games do you attend per season?' => 'How many national games do you attend per season?', #todo
-    'How often do you watch matches on TV?' => 'How often do you watch matches on TV?', #todo
-
     'I cannot find any records of changes'
         => "Il n'y a pas de rapport des modifications",
 
@@ -314,20 +274,14 @@ EOS
     'Last Recorded Game' => 'Last Recorded Game', #todo
     'Last Updated' => 'Last Updated', #todo
     'Level' => 'Niveau',
-    'Life Member?' => 'Life Member?', #todo
     'List of Payment Records' => 'Liste des rapports de paiement',
     'Login' => 'Connexion',
     'Logout' => 'Déconnexion',
     'Loyalty Number' => 'Loyalty Number', #todo
     'Maiden name' => 'Nom de jeune fille',
-    'Mailing List?' => 'Mailing List?', #todo
     'Manage Lookup Information' => 'Manage Lookup Information', #todo
     'Manager' => 'Directeur',
     'Match Official?' => 'Officiel de Match?',
-
-    'Match Official in<br>Association?'
-        => "Officiel de Match dans<br>l'Association?",
-
     'Match Official in<br>Club?' => 'Match Officiel dans<br>le Club?',
     'Match Official Active?' => 'Match Official Active?', #todo
     'Match Official Registration No.' => 'Match Official Registration No.', #todo
@@ -336,12 +290,9 @@ EOS
     'Member Financial?' => 'Member Financial?', #todo
     'Member Financial Balance' => 'Member Financial Balance', #todo
     'Member Number' => 'Member Number', #todo
-    'Member Package' => 'Member Package', #todo
-    'Member Passwords' => 'Member Passwords', #todo
     'Member Tags' => 'Member Tags', #todo
     'Member Types' => 'Member Types', #todo
     'Members' => 'Membres',
-    'Membership Package' => 'Membership Package', #todo
     'Middle name' => 'Deuxième prénom',
     'Misc?' => 'Misc?', #todo
     'Modify Member List' => 'Modifier la liste des membres',
@@ -514,23 +465,13 @@ EOS
     'Title of Contact 2' => 'Titre du Contact 2',
     'Title of Contact 3' => 'Titre du Contact 3',
     'Type' => 'Type',   #todo maybe
-    'Uniform Bottom Colour' => "Couleur basse uniforme",
-    'Uniform Colours' => "Couleurs uniformes",
-    'Uniform Number' => 'Uniform Number', #todo
-    'Uniform Number Colour' => 'Couleur uniforme du numéro',
-    'Uniform Top Colour' => 'Couleur haute uniforme',
     'Update' => 'Mettre à jour',
-    'Update Association' => 'Update Association', #todo
     'Update Club' => 'Update Club', #todo
     'Update Information' => 'Mettre à jour les Informations',
     'Update Permissions' => 'Update Permissions', #todo
-    'Update Team' => 'Update Team', #todo
     'Update Welcome Message' => 'Mettre à jour le Message de Bienvenue',
     'Username' => "Nom d'utilisateur",
     'Username/Code' => "Nom d'utilisateur/code",
-    'Venue 1' => 'Site 1',
-    'Venue 2' => 'Site 2',
-    'Venue 3' => 'Site 3',
     'Veteran?' => 'Veteran?', #todo
     'View' => 'Vue',
     'View Receipt' => 'View Receipt', #todo
@@ -559,12 +500,6 @@ EOS
 
     '[_1] updated successfully' => '[_1] a été a mis à jour avec succès',
 
-    'Event Management' => 'Gestion des événements',
-
-    'Select from the options on the left to manage your event.'
-        => 'Choisissez parmi les options sur la gauche pour gérer un ' .
-           'événement',
-
     'An invalid Action Code has been passed to me.'
         => 'Une action Code non valide a été effectuée.',
 
@@ -576,81 +511,21 @@ EOS
     'Configure Event Details'
         => "Configurez les détails de l'événement",
 
-    'Data Export'          => 'Exportation des données',
-    'Police Check'         => 'Vérifiez la police',
-    'Consent Forms'        => 'Formulaires de consentement',
     'Bulk Printing'        => 'Impression en vrac',
-    'Apply for a Day Pass' => 'Postuler pour un Pass Journalier',
-    'Event Name'           => "Nom de l'événement",
 
-    'Starting Date for Registrations'
-        => 'Date de début des inscriptions',
-
-    'Closing Date for Registrations'
-        => 'Date de clôture des inscriptions',
-
-    'Starting Date for Arrivals'
-        => 'Date de début des arrivées',
-
-    'Last Date for Departures'
-        => 'Date limite pour les départs',
-
-    'Email Address of the Organiser' => "Adresse e-mail de l'organisateur",
-
-    'Name of event number (if required)'
-        => "Nom du numéro de l'événement (si nécessaire)",
-
-    'Max number of Venues to appear on accred.' =>
-        "Nombre maximum de sites à faire apparaître sur l'accréditation",
-
-    'Max number of Zones to appear on accred.' =>
-        "Nombre maximum de zones à faire apparaître sur l'accréditation",
-
-    'Automatically Approve Selections'
-        => 'Approuver automatiquement les sélections',
-
-    'Update Event'              => "Mettre à jour l'événement",
-    'Sports'                    => 'Sports',
-    'All Sports'                => 'Tous les sports',
-    'Events'                    => 'Evénements',
-    'Sporting Event'            => 'Epreuve sportif',
-    'Sporting Events'           => 'Epreuves sportives',
-    'All Events'                => 'Tous les Manifestations sportives',
     'Accreditation'             => 'Accréditation',
-    'Accreditation Categories'  => "Catégories d'accréditation",
-    'Approval Types'            => "Types d'approbations",
     'Add new record'            => 'Ajouter nouvelle donnée',
     'None Available'            => 'Aucun disponible',
-    'Sport Name'                => 'Nom du sport',
-    'Sport Code'                => 'Code du sport',
     'Sort Order'                => 'Ordre de tri',
     'Other Code'                => 'Autre code',
-    'Event Abbrev'              => "Abréviation de l'événement",
-    'Choose a Sport'            => 'Choisir un sport',
     'Male'                      => 'Homme',
     'Female'                    => 'Femme',
     'Mixed'                     => 'Mixte',
     'None Specified'            => 'Non indiqué',
-    'Category Name'             => 'Nom de la catégorie',
-    'Sub Category'              => 'Sous-catégorie',
-    'Sub Category Abbrev.'      => 'Abbréviation de la sous-catégorie',
-    'Ask for Sports Selection?' => 'Demander pour la sélection des sports',
-
-    'Ask for Sporting Event Selection?'
-        => 'Demander pour un événement sportif',
-
-    'Ask for Job Title'       => 'Demander pour le titre du poste',
     'Ask for Photo?'          => 'Demander pour la photo',
-    'Event Approval Statuses' => "Statuts d'approbation de l'événement",
-    'Approval Name Text'      => 'Approbation du nom du texte',
-
-    'Allow Card Printing when at this status'
-        => "Laisser la carte d'impression quand à ce statut",
-
     'Name (or part of)'      => 'Nom (ou partie)',
     'Organisation'           => 'Organisation',
     'Accreditation Category' => "Catégorie d'accréditation",
-    'Select Sporting Event'  => "Sélectionnez l'événement sportif",
 
     'Fill in the appropriate filter boxes below to search.'
         => 'Remplissez les cases appropriées ci-dessous pour ' .
@@ -662,8 +537,6 @@ EOS
     'Parent/Guardian'           => 'Parent/Tuteur',
     'Medical'                   => 'Médical',
     'Other Fields'              => 'Autres domaines',
-    'Selections'                => 'Sélections',
-    'Approvals'                 => 'Approbations',
     'Click to Open/Close Group' => 'Cliquez pour ouvrir/fermer le groupe',
     'Filter Only'               => 'Filtre uniquement',
     'Run Report'                => 'Exécuter un rapport',
@@ -730,79 +603,14 @@ EOS
     'Venues'        => 'Sites',
     'Zone'          => 'Zone',
     'Zones'         => 'Zones',
-    'Seating'       => 'Siège',
-    'Ceremonies'    => 'Cérémonies',
-    'Transport'     => 'Transports',
-    'Per Diems'     => 'Les indemnités journalières',
-    'Per Diem'      => 'Indemnité journalière',
-    'Colour'        => 'Couleur',
-    'Second Colour' => 'Deuxième couleur',
-    'Colour Code 1' => 'Code Couleur 1',
-    'Colour Code 2' => 'Code Couleur 2',
-
-    'Default Accreditation Settings'
-        => "Paramètres d'accréditation par défaut",
-
     'Venue Name'             => 'Nom du site',
     'Venue Code'             => 'Code du site',
     'Zone Name'              => 'Nom de la zone',
     'Zone Code'              => 'Code de la zone',
-    'Seating Name'           => 'Nom de Siège',
-    'Seating Code'           => 'Code de Siège',
-    'Ceremony Name'          => 'Nom de la cérémonie',
-    'Ceremony Code'          => 'Code Cérémonie',
-    'Transport Name'         => 'Nom du transport',
-    'Transport Code'         => 'Code du transport',
-    'Per Diem Name'          => "Nom de l'indemnité journalière",
-    'Per Diem Code'          => "Code de l'indemnité journalière",
-    'Per Diem Currency'      => "Monnaie de l'indemnité journalière",
-    'Per Diem Amount'        => "Montant de l'indemnité journalière",
-    'Start Date of Per Diem' => "Date de début de l'indemnité journalière",
-    'End Date of Per Diem'   => "Date de fin de l'indemnité journalière",
-    'Colour Code 1 Name'     => 'Nom du Code Couleur 1',
-    'Colour Code 2 Name'     => 'Nom du Code Couleur 2',
-    'Colour Code (Hex)'      => 'Code Couleur (Hex)',
 
-    'Invalid Accreditation Type' => "Type d'accréditation non valide",
     'Choose'                     => 'Choisissez',
-
-    'Ask for Arrival and Departure information?' =>
-        "Demander pour des informations concernant l'arrivée et le départ?",
-
-    'Ask for Biographies?' => 'Demander pour une biographie?',
-
-    'Ask for Consent Form?' => 'Demander pour le consentement du formulaire?',
-
-    'Set the Statuses Required before a pass can be printed' =>
-        "Prenez connaissance des statuts requis avant qu'une " .
-        'accréditation puisse être imprimée',
-
-    'Status required for pass printing'
-        => "Statut requis pour l'impression d'une accreditation",
-
-    'Return to Accreditation Categories'
-        => "Retour aux catégories d'accréditation",
-
-    'Export Data'              => 'Exporter les données',
-    'Export Type'              => "Type d'exportation",
-    'Member Data'              => 'Données des Membres',
-    'Accreditation Data'       => "Données d'accréditation",
-    'Email Address'            => 'Adresse e-mail',
-    'Export Format'            => "Format d'exportation",
-    'Sportzware'               => 'Sportzware',
-    'Meet Manager - Athletics' => 'Meet Manager - Athlétisme',
-    'Meet Manager - Swimming'  => 'Meet Manager - Natation',
-
     'Generic (Tab Delimited)'
         => 'Générique (délimité par des tabulations)',
-
-    'Choose the type of data you wish to export, Membership or Accreditation.'
-        => 'Choisissez le type de données que vous souhaitez exporter, ' .
-           "d'adhésion ou d'accréditation.",
-
-    'Export Data for a particular sport or a particular event.' =>
-        'Export des données pour un sport particulier ou un événement ' .
-        'particulier.',
 
     'Member Number'        => 'Numéro de membre',
     'Middle Name'          => 'Deuxième prénom',
@@ -828,92 +636,15 @@ EOS
     'Event Number'             => "Numéro d'événement",
     'Arrival Date'             => "Date d'arrivée",
     'Departure Date'           => 'Date de départ',
-    'Past Performance'         => 'Rendement passé',
-    'Selected as Reserve'      => 'Sélectionné comme réserve',
-    'Accreditation Population' => "Population d'accréditation",
 
-    'Accreditation Population Abbreviation'
-        => "Population d'accréditation abréviation",
-
-    'Colour Name'             => 'Nom de la couleur',
-    'Total Consent Forms'     => 'Les formulaires de consentement total',
-    'Returned Consent Forms'  => 'Les formulaires de consentement retour',
-    'Outstanding'             => 'En circulation',
-    'Mark Form as Returned'   => 'Marquer comme forme de retour',
     'Search for Person'       => 'Recherche de personne',
     'Invalid number'          => 'Nombre incorrect',
     'You must enter a number' => 'Vous devez entrer un numéro',
     'Problem updating status' => 'Problème mise à jour le statut',
     'Status Updated'          => 'Statut mis à jour',
 
-    'Has the form been marked before?' => 'A la forme été marqués avant?',
     'View Types'                       => 'Voir les types',
-
-    'Accreditation Category Selection'
-        => "Sélection de la catégorie d'accréditation",
-
-    'Selection Wizard'          => 'Assistant de sélection',
-    'Delete Category Selection' => 'Supprimer de sélection de catégorie',
-    'Event Selection'           => 'Sélection des événements',
-    'Event Sport Questions'     => 'Questions événement sportif',
-    'Arrivals & Departures'     => 'Arrivées et départs',
-    'Arrivals/Departures'       => 'Arrivées/Départs',
-    'Arrivals'                  => 'Arrivées',
-    'Departures'                => 'Départs',
-    'Biography'                 => 'Biographie',
-    'Uniforms'                  => 'Uniformes',
-    'Consent Form'              => 'Formulaire de consentement',
-
-    'Are you sure you wish to delete this selection?'
-        => 'Etes-vous sûr de vouloir supprimer cette sélection?',
-
-    'Approval Status'    => "État d'approbation",
-    'Not Yet Approved'   => 'Pas encore approuvé',
-    'Approve?'           => 'Approuver?',
-    'Selection Approved' => 'Sélection approuvé',
-    'none selected'      => 'aucun élément sélectionné',
-    'Join an Event'      => 'Joignez-vous à un événement',
-
-    'No events available for registration'
-        => "Aucun événement disponible pour l'enregistrement",
-
-    'Hotel'                      => 'Hôtel',
-    'Other'                      => 'Autres',
-    'Flight Arrival Time'        => "Heure d'arrivée de vol",
-    'Arrival Airport'            => "Aéroport d'arrivée",
-    'Arrival Airline'            => "Compagnie aérienne d'arrivée",
-    'Flight number (Arrival)'    => 'Numéro de vol (Arrivée)',
-    'Time of flight (departure)' => 'Temps de vol (départ)',
-    'Departure Airport'          => 'Aéroport de départ',
-    'Departure Airline'          => 'Compagnie aérienne de départ',
-    'Flight number (departure)'  => 'Numéro de vol (départ)',
-
-    'Other information <br>(eg. oversize luggage, medical supplies)'
-        => 'Autres informations <br>' .
-           '(par exemple oversize bagages, des fournitures médicales)',
-
-    'Save Arrival/Departure Information'
-        => 'Enregistrer les informations de départ / arrivée',
-
-    'Biographical Information' => 'Renseignements Biographiques',
-
-    'Save Biographical Information'
-        => 'Enregister des Renseignements Biographiques',
-
-    'Bio updated successfully'
-        => 'Renseignements Biographiques à jour avec succès',
-
-    'Return to Selections' => 'Retour à Sélections',
-
-    'Update Uniform Information' => "Mise à jour d'information Uniforme",
     'Edit Details'               => 'Modifier les détails',
-
-    'This member does not have any Uniform information to display.'
-        => "Ce membre ne dispose pas d'information uniforme à afficher.",
-
-    'Consent Form Information'
-        => 'Informations sur le formulaire de consentement',
-
 
     'Upload Photo'  => 'Envoyer la photo',
     'Upload Photos' => 'Télécharger des photos',
@@ -978,20 +709,6 @@ EOS
     'Quick Link to record' => 'Lien rapide pour enregistrer',
 
     'Photo Present?'            => 'Photo inclues?',
-    'Selected Sport'            => 'Sport choisi',
-    'Selected Event'            => 'Evénement sélectionné',
-    'Job Title'                 => "Titre de l'emploi",
-    'Association (Selected By)' => 'Association (sélectionné par)',
-    'Club (Selected By)'        => 'Club (sélectionné par)',
-    'Zone (Selected By)'        => 'Zone (sélectionné par)',
-    'Region (Selected By)'      => 'Région (sélectionné par)',
-    'Card Printed'              => 'Carte imprimée',
-    'Date Selected'             => 'Date sélectionnée',
-    'Selection Last Updated'    => 'Sélection Dernière mise à jour',
-    'Zone Entitlements'         => 'Zone Droits',
-    'Site Entitlements'         => 'Site Droits',
-    'Transport Entitlement'     => 'Droit des transports',
-    'Status Date'               => 'Date État',
     'Group By'                  => 'Groupe par',
     'No Grouping'               => 'Pas de regroupement',
     'Report Output'             => 'Rapport de sortie',
@@ -1002,16 +719,10 @@ EOS
     'Save Report as'        => 'Rappelez-vous le rapport comme',
     'Field'                     => 'Domaine',
     'Filter'                    => 'Filtre',
-    'Region Name'               => 'Nom de la région',
-    'Number of Members'         => 'Nombre de membres',
-    'Number of Cards Printed'   => 'Nombre de cartes imprimées',
-    'Number of Records'         => "Nombre d'enregistrements",
     'Passport Expiry'           => "Date d'expiration du passeport",
 
-    'Seating Access'            => 'Accès siège',
     'Address 1'                 => 'Adresse 1',
     'Address 2'                 => 'Adresse 2',
-    'Entitlements'              => 'Privilèges',
 
     'Is Blank'                  => 'Vide',
     'Is Not Blank'              => 'Pas Vide',
@@ -1021,13 +732,6 @@ EOS
     'Less Than'                 => 'Moins Que',
     'More Than'                 => 'Plus Que',
     'Between'                   => 'Entre',
-
-    'Arrival Flight Number'     => 'Numéro du vol d’arrivée',
-    'Depart Date'               => 'Date de depart',
-    'Flight Depart Time'        => 'Heure de depart du vol',
-    'Depart Airport'            => 'Aéroport de depart',
-    'Depart Airline'            => 'Compagnie aérienne de départ',
-    'Depart Flight Number'      => 'Numéro du vol de depart',
 
     'Showing'                   => 'Monter',
 
@@ -1040,11 +744,6 @@ EOS
 
     'Association Status'        => "Statut de l’association",
     'All'                       => 'Tous',
-
-    'Season Player?'            => "Saison du joueur?",
-    'Season Coach?'             => "Saison de l’entraineur?",
-    'Season match official?'    => "Saison de l’officiel?",
-    'Season Participating?'     => 'Saison participée?',
 
     'Rollover'                  => 'Remaniement',
     'Show Members for Rollover' => 'Montrer les membres pour un remaniement',
@@ -1104,79 +803,6 @@ vous souhaitez appliquer. Lorsque complété, cliquez sur le bouton "[_1]".
 
 EOS
 
-    'REQUIRED_PASS_STATUS' => <<"EOS",
-Vérifiez les cases si le statut est requis pour l'impression
-d'accréditation. Lorsque terminé, cliquez sur le bouton "Mettre à jour les
-statuts requis l'impression d'une accréditation" pour valider vos réponses.
-EOS
-
-    'DATA_EXPORT_LIST_SELECTION' => <<"EOS",
-Pour l'exportation pour un sport en particulier ou tous les sports,
-sélectionnez celui que vous voulez utiliser la liste du haut. Pour seulement
-un événement particulier choisir dans la liste du bas.
-EOS
-
-    'DATA_EXPORT_DESCRIPTION' => <<"EOS",
-Les données exportées comprend le nom du membre, le type d'accréditation,
-les dates d'entrée et de sortie, le numéro d'événement, etc
-EOS
-
-    'DATA_EXPORT_EMAIL_PROMPT' => <<"EOS",
-Les données seront envoyées par courriel en pièce jointe à une adresse
-e-mail.  Entrez l'adresse e-mail dans la case ci-dessous où ous voulez que
-les données doivent être envoyés.
-EOS
-
-    'DATA_EXPORT_FORMAT_DESCRIPTION' => <<"EOS",
-Vous pouvez exporter les données dans deux formats. Sportzware format est
-pour l'importation dans le package de la concurrence Sportzware logiciel de
-gestion. Générique (délimité par des tabulations) format de fichier est
-adapté à d'autres programmes comme par exemple MS Excel. Accréditation des
-informations ne peuvent être exportés dans le format générique.
-EOS
-
-    'DATA_EXPORT_EMAIL_TEXT' => <<"EOS",
-Les données que vous avez demandé à l'exportation ([_1]) est inclus dans le
-fichier joint.
-EOS
-
-    'DATA_EXPORT_EMAIL_SENT' => <<"EOS",
-<p>Vos données a été envoyé avec succès.</ p>
-<p>Si ça n'arrive pas tout de suite s'il vous plaît soyez patient.</ p>
-EOS
-
-    'MARK_CONSENT_FORM_RECEIVED' => <<"EOS",
-Mark forme reçue par la saisie du numéro de référence formulaire et
-appuyez sur le bouton '[_1]'.
-EOS
-
-    'SEARCH_FOR_CONSENT_FORM' => <<"EOS",
-Rechercher une personne en entrant leur nom et / ou le prénom et appuyez sur
-le bouton '[_1]'.
-EOS
-
-    'ACCREDITATION_CATEGORY_SELECTION_TEXT' => <<"EOS",
-<p>
-  Vos sélections accréditation catégorie d'application sont décrites
-  ci-dessous. Cliquez sur "[_1]" pour vérifier vos informations
-  d'application.
-  <br><br>
-  Si cette sélection est incorrecte Catégorie, cliquez sur "[_2]".
-</p>
-EOS
-
-    'PLEASE_COMPLETE_BIO' => <<"EOS",
-S'il vous plaît compléter les informations biographiques ci-dessous. Lorsque
-vous avez terminé, appuyez sur le bouton '[_1]'.
-EOS
-
-    'MUST_PRINT_CONSENT_FORM' => <<"EOS",
-<p>
-  Il s'agit d'une exigence d'accréditation que le formulaire de consentement
-  doit être imprimé, signé et retourné.
-</p>
-EOS
-
     'UPLOAD_PHOTO_FORM_TEXT' => <<"EOS",
 <p>
   <b>Les photos doivent généralement se conformer à ce qui suit:</b>
@@ -1228,14 +854,6 @@ EOS
     'BULK_PRINT_BUTTON_INFO' => <<"EOS",
 Appuyez sur la <b> '[_1]' </b> bouton pour générer une liste de passages à
 imprimer.
-EOS
-
-    'ACCREDITATION_DETAILS_TOP' => <<"EOS",
-Choissiez les options pertinentes ci-dessous. Lorsque complété, cliquez sur
-le bouton "[_1]" afin de sauvegarder vos modifications. <b>Note</b> Seules des
-modifications concernant les droits par défaut d'une catégorie
-d'accréditation sont prises en compte ici. Les modifications pour
-l'accréditation d'une personne spécifique n'est pas traitée ici.
 EOS
 
     'ENTER_USER_PASSWORD' => <<"EOS",

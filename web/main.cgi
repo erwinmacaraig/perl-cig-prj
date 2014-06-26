@@ -69,8 +69,6 @@ sub main {
     my $client = param('client') || '';
     my $action = safe_param( 'a', 'action' ) || '';
     my %Data   = ();
-    my $lang   = Lang->get_handle() || die "Can't get a language handle!";
-    $Data{'lang'} = $lang;
     my $target = 'main.cgi';
     $Data{'target'} = $target;
     $Data{'cache'}  = new MCache();
@@ -89,6 +87,8 @@ sub main {
     getDBConfig( \%Data );
     $Data{'SystemConfig'} = getSystemConfig( \%Data );
     $Data{'LocalConfig'}  = getLocalConfig( \%Data );
+    my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
+    $Data{'lang'} = $lang;
 
     logPageData( \%Data, $action, $client);
 

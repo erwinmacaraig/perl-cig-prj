@@ -1,65 +1,59 @@
-#
-# $Header: svn://svn/SWM/trunk/web/Lang.pm 10039 2013-12-01 22:11:00Z tcourt $
-#
-
 package Lang;
 
-@EXPORT= (qw/txt lexicon/);
-use Locale::Maketext 1.01;
-use base ('Locale::Maketext');
+@EXPORT= (qw/get_handle/);
+use lib "..",".";
+use LangBase;
+use Defs;
 
-sub txt (@) { 
-  my $self=shift @_;
-  return '' if !$_[0];
+sub new {
 
-  my @temp = @_;
-  $temp[0] =~ s/^\n+//m;
-  $temp[0] =~ s/\n+$//m;
-
-  return $self->maketext(@temp); 
-} 
-
-# I decree that this project's first language is English.
-
-no warnings 'once';
-%Lexicon = (
-  '_AUTO' => 1,
-  # That means that lookup failures can't happen -- if we get as far
-  #  as looking for something in this lexicon, and we don't find it,
-  #  then automagically set $Lexicon{$key} = $key, before possibly
-  #  compiling it.
-  
-  # The exception is keys that start with "_" -- they aren't auto-makeable.
-
-);
-# End of lexicon.
-
-
-# a copy of quant without the print of the num first
-# maybe quantNoNum or even integrate with quant
-sub quant2 {
-    my($handle, $num, @forms) = @_;
-
-    return $num if @forms == 0; # what should this mean?
-    return $forms[2] if @forms > 2 and $num == 0; # special zeroth case
-
-    return( $handle->numerate($num, @forms) );
+  my $this   = shift;
+  my $class  = ref($this) || $this;
+  my %params = @_;
+  my $self   = {
+    'handle' => $params{'handle'}
+  };
+  ##bless selfhash to class
+  bless $self, $class;
+  return $self;
 }
 
-sub getNumberOf {
-    my $result = 'Number of ' . $_[1];
-    return $result;
+sub get_handle    {
+    my $class = shift;
+    my($locale, $SystemConfig) = @_;
+    $locale = generateLocale($SystemConfig) if !$locale;
+    my $handle = LangBase->get_handle($locale);
+    if($handle) {
+        $handle->bindtextdomain("messages", $Defs::fs_base."/translations");
+        $handle->textdomain("messages");
+        $handle->encoding("UTF-8");
+        my $o = new Lang(handle => $handle);
+        return $o;
+    }
+    return undef;
+}
+
+our $AUTOLOAD;
+sub AUTOLOAD {
+  my $self = shift;
+  my $called =  $AUTOLOAD =~ s/.*:://r;
+  return $self->{'handle'}->$called(@_);
 }
 
 
-sub getSearchingFrom {
-    my $result = 'Searching from ' . $_[1] . ' down';
-    return $result;
+sub generateLocale  {
+    my (
+        $SystemConfig,
+    ) = @_;
+
+    my $defaultLocale = $SystemConfig->{'DefaultLocale'} || '';
+    my $cgi = new CGI;
+    my $cookie_locale = $cgi->cookie($Defs::COOKIE_LANG) || '';
+    
+    return 
+        $cookie_locale 
+        || $defaultLocale
+        || 'en_US';
 }
 
-sub lexicon { eval( '%' . substr(ref(shift),0,8) . '::Lexicon') || () }
-
-1;  # End of module.
-
-
-
+1;
