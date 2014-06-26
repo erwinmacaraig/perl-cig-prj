@@ -74,7 +74,7 @@ sub main {
     $Order->{'Status'} = $Order->{'TLStatus'} >=1 ? 1 : 0;
     $Data{'SystemConfig'}{'PaymentConfigID'} = $Data{'SystemConfig'}{'PaymentConfigUsedID'} ||  $Data{'SystemConfig'}{'PaymentConfigID'};
 
-    my $lang= Lang->get_handle() || ''; #die "Can't get a language handle!";
+    my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     $Data{'lang'}=$lang;
     my %clientValues = getClient($client);
     $clientValues{'assocID'} = $Order->{'AssocID'} if ($Order->{'AssocID'} and $Order->{'AssocID'}>0 and $clientValues{'assocID'} <= 0);

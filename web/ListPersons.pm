@@ -126,8 +126,6 @@ sub listPersons {
         };
 
     }
-#use Data::Dumper;
-#print STDERR Dumper(\@headers);
 
     my $clubID = $Data->{'clientValues'}{'clubID'} || 0;
 

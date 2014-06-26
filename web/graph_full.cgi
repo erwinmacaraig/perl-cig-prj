@@ -28,8 +28,6 @@ sub main	{
 	my $graph = safe_param('g','graph') || '';
 
   my %Data=();
-  my $lang= Lang->get_handle() || die "Can't get a language handle!";
-  $Data{'lang'}=$lang;
   my $target='lookupmanage.cgi';
   $Data{'target'}=$target;
   my %clientValues = getClient($client);
@@ -41,6 +39,8 @@ sub main	{
 
   getDBConfig(\%Data);
   $Data{'SystemConfig'}=getSystemConfig(\%Data);
+  my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
+  $Data{'lang'}=$lang;
   $Data{'LocalConfig'}=getLocalConfig(\%Data);
   my $assocID=getAssocID(\%clientValues) || '';
   $clientValues{'currentLevel'} = safe_param('cl','number') if (safe_param('cl','number') and safe_param('cl','number') <= $clientValues{'authLevel'});

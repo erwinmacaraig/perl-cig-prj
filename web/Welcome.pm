@@ -91,7 +91,7 @@ sub getWelcomeText  {
 
 sub defaulttext  {
   my ($Data) = @_;
-  my $lang= Lang->get_handle() || die "Can't get a language handle!";
+  my $lang   = Lang->get_handle('', $Data->{'SystemConfig'}) || die "Can't get a language handle!";
   my $default_text = ($Data->{'SystemConfig'}{'CUSTOM_DEFAULT_TEXT'}) ? $Data->{'SystemConfig'}{'CUSTOM_DEFAULT_TEXT'} : $lang->txt('WELCOME');
   return $default_text;
 }

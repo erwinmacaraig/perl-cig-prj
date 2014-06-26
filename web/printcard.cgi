@@ -37,8 +37,6 @@ sub main	{
 	my %clientValues = getClient($client);
   my %temp_clientValues = getClient($client);
 	my %Data=();
-  my $lang= Lang->get_handle() || die "Can't get a language handle!";
-  $Data{'lang'}=$lang;
 	my $target='printcard.cgi';
 	$Data{'target'}=$target;
 	$Data{'clientValues'} = \%clientValues;
@@ -46,6 +44,9 @@ sub main	{
 	my $db=allowedTo(\%Data);
   ($Data{'Realm'}, $Data{'RealmSubType'})=getRealm(\%Data);
 	$Data{'SystemConfig'}=getSystemConfig(\%Data);
+    my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
+    $Data{'lang'}=$lang;
+
 	my $assocID=getAssocID(\%clientValues) || '';
 	my $DataAccess_ref=getDataAccess(\%Data);
 	$Data{'Permissions'}=GetPermissions(

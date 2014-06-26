@@ -52,21 +52,14 @@ sub main  {
         my $db=connectDB();
         my %Data=();
         $Data{'db'}=$db;
-        my $lang= Lang->get_handle() || ''; #die "Can't get a language handle!";
-        $Data{'lang'}=$lang;
         my %clientValues = getClient($client);
     
-    
-       
-        
-        #$clientValues{'assocID'} = $Order->{'AssocID'} if ($Order->{'AssocID'} and $Order->{'AssocID'}>0 and $clientValues{'assocID'} <= 0);
-        #$clientValues{'clubID'} = $Order->{'ClubID'} if ($Order->{'ClubID'} and $Order->{'ClubID'}>0 and $clientValues{'clubID'} <= 0);
-        #
         $Data{'clientValues'} = \%clientValues;
         
         getDBConfig(\%Data);
         $Data{'SystemConfig'}=getSystemConfig(\%Data);
-          
+        my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
+        $Data{'lang'}=$lang;
   
         my $logID = isPaid($db,$invoiceList);
         if (!$logID ) {

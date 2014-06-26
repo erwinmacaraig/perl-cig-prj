@@ -26,8 +26,6 @@ sub main	{
   my $tempfile_prefix= param('tfn') || '';
                                                                                                         
   my %Data=();
-  my $lang= Lang->get_handle() || die "Can't get a language handle!";
-  $Data{'lang'}=$lang;
   my $target='regoformphoto.cgi';
   $Data{'target'}=$target;
   my %clientValues = getClient($client);
@@ -57,7 +55,8 @@ sub main	{
 	$Data{'db'} = $db;
   ($Data{'Realm'}, $Data{'RealmSubType'})=getRealm(\%Data);
   $Data{'SystemConfig'}=getSystemConfig(\%Data);
-
+  my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
+  $Data{'lang'}=$lang;
 
 	my $body = '';
 	$action ||= 'M_PH_n';

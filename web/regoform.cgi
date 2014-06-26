@@ -137,6 +137,9 @@ sub main	{
     $Data{'spAssocID'} = $tempformObj->AssocID() if($tempformObj->AssocID()>0);
     $assocID = $Data{'clientValues'}{'assocID'};
     $Data{'SystemConfig'}=getSystemConfig(\%Data);
+    $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
+    $Data{'lang'} = $lang;
+
 
     my $usePassportFeature =  $Data{'SystemConfig'}{'usePassportInRegos'};
     my $passport;

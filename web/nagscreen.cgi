@@ -22,8 +22,6 @@ sub main	{
   my $client = param('client') || '';
                                                                                                         
   my %Data=();
-  my $lang= Lang->get_handle() || die "Can't get a language handle!";
-  $Data{'lang'}=$lang;
   my $target='main.cgi';
   $Data{'target'}=$target;
   my %clientValues = getClient($client);
@@ -34,6 +32,9 @@ sub main	{
   ($Data{'Realm'}, $Data{'RealmSubType'})=getRealm(\%Data);
 	getDBConfig(\%Data);
 	$Data{'SystemConfig'}=getSystemConfig(\%Data);
+    my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
+    $Data{'lang'}=$lang;
+
 
 	print "Content-type: text/html\n\n";
 	if($db)	{

@@ -25,8 +25,6 @@ sub main	{
     my $reportID = param('rID') || '';
                                                                                                             
     my %Data=();
-    my $lang= Lang->get_handle() || die "Can't get a language handle!";
-    $Data{'lang'}=$lang;
     my $target='main.cgi';
     $Data{'target'}=$target;
     $Data{'client'}=$client;
@@ -41,6 +39,8 @@ sub main	{
     ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
     $Data{'db'}=$db;
     $Data{'SystemConfig'} = getSystemConfig( \%Data );
+    my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
+    $Data{'lang'}=$lang;
 
 	my $body = '';
 	if($db and $reportID)	{

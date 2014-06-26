@@ -53,8 +53,6 @@ sub main	{
 		$Data{'SystemConfig'}{'PaymentConfigUsedID'} 
 		||  $Data{'SystemConfig'}{'PaymentConfigID'};
 
-	my $lang= Lang->get_handle() || ''; #die "Can't get a language handle!";
-	$Data{'lang'}=$lang;
 	my %clientValues = getClient($client);
 	$Data{'clientValues'} = \%clientValues;
 
@@ -64,6 +62,9 @@ sub main	{
 	$clientValues{'assocID'} = $assocID if ($assocID and $assocID =~ /^\d.*$/);
   $Data{'clientValues'} = \%clientValues;
   $Data{'SystemConfig'}=getSystemConfig(\%Data);
+  my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
+  $Data{'lang'}=$lang;
+
   $Data{'LocalConfig'}=getLocalConfig(\%Data);
 
 
