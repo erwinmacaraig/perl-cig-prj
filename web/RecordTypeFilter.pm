@@ -101,15 +101,9 @@ sub show_recordtypes	{
                 or $level == $Defs::LEVEL_TEAM
             ) 
             and $Data->{'clientValues'}{'currentLevel'} >= $Defs::LEVEL_TEAM
+and 1==2
     )	
     {
-        $blankseasons = 1 if $level == $Defs::LEVEL_TEAM;
-        if (
-            $level == $Defs::LEVEL_TEAM 
-                or $level==$Defs::LEVEL_PERSON 
-                or $level == $Defs::LEVEL_COMP)	{
-            $allseasons = 1 
-        }
         my ($Seasons, undef) = Seasons::getSeasons($Data, $allseasons, $blankseasons);
         my $season = ($Data->{'ViewSeason'} and exists $Seasons->{$Data->{'ViewSeason'}} and $Data->{'ViewSeason'} > 0) 
         ?	$Data->{'ViewSeason'} 

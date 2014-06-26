@@ -672,6 +672,28 @@ qq[ <input type="text" name="$name" value="$value" maxlength="$maxlength" size="
 
 }
 
+sub getLastEntityID {
+    my ( $clientValues, $level ) = @_;
+
+    return 0 if !$clientValues;
+    my $cl = $level || $clientValues->{currentLevel} || 0;
+    for my $k (qw(
+        clubID
+        zoneID
+        regionID
+        stateID
+        natID
+        intzonID
+        intregID
+        interID
+    ))  {
+        if($clientValues->{$k} > 0)   {
+            return $clientValues->{$k};
+        }
+    }
+    return 0;
+}
+
 sub getID {
 
     my ( $clientValues, $level ) = @_;
@@ -773,7 +795,7 @@ sub getRealm {
     my $cl  = $Data->{'clientValues'}{'currentLevel'} || 0;
     my $st  = '';
     my $val = 0;
-    my $id = getID( $Data->{'clientValues'} ) || 0;
+    my $id = getLastEntityID( $Data->{'clientValues'} ) || 0;
     $st =
       qq[SELECT intRealmID, intSubRealmID FROM tblEntity WHERE intEntityID= ? ];
     $val = $id;
@@ -852,14 +874,8 @@ sub getEntityID {
     elsif($level == 10){#Zone
         $entityID = $clientValues->{'zoneID'};
     }
-    elsif($level == 5){#Assoc
-        $entityID = $clientValues->{'assocID'};
-    }
     elsif ($level == 3){#club
         $entityID = $clientValues->{'clubID'};
-    }
-    elsif ($level == 2){#Team
-        $entityID = $clientValues->{'teamID'};
     }
     return $entityID;
 }

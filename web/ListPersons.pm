@@ -161,7 +161,6 @@ warn($statement . $entityID);
     my %tempClientValues = getClient($client);
     $tempClientValues{currentLevel} = $Defs::LEVEL_PERSON;
     while (my $dref = $query->fetchrow_hashref()) {
-warn("1111111");
         next if (defined $dref->{strStatus} and $dref->{strStatus} eq 'DELETED');
         $tempClientValues{personID} = $dref->{intPersonID};
         my $tempClient = setClient(\%tempClientValues);
@@ -184,7 +183,7 @@ warn("1111111");
         }
 
         $dref->{'strStatus_Filter'}=$dref->{'strStatus'};
-        if($dref->{'strStatus'} ==$Defs::MEMBERSTATUS_POSSIBLE_DUPLICATE )    {
+        if($dref->{'strStatus'} eq $Defs::MEMBERSTATUS_POSSIBLE_DUPLICATE )    {
             my %keepduplicatefields = (
                 id => 1,
                 intPersonID => 1,
