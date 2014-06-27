@@ -26,18 +26,19 @@ log4perl.appender.Screen.layout.ConversionPattern=%M %m%n
 # log4perl.appender.Screen.layout = Log::Log4perl::Layout::SimpleLayout
 /;
 
+@MemCacheServers = (
+ {
+   address => '127.0.0.1:11211',
+   weight => 30000,
+ },
+);
 
 ## DB ACCESS INFO
 
-$DB_DSN = "DBI:mysql:regoNew";
-$DB_USER = "root";
-$DB_PASSWD = '';
-$DB_DSN_REPORTING = "DBI:mysql:regoNew";
-
-$OLR_DB = 'onlineresults_newer';
-$OLR_DB_V3 = 'onlineresults_v3';
-$OLR_DB_V5 = 'onlineresults_v5';
-$SWOL_URL = 'http://devel.pnp-local.com.au/bruce/olr_v5/olrv5/web/onlineresults.cgi';
+$DB_DSN = "DBI:mysql:fifasponline"; ##CONFIG
+$DB_USER = "root"; ##CONFIG
+$DB_PASSWD = ''; ##CONFIG
+$DB_DSN_REPORTING = "DBI:mysql:fifasponline"; ##CONFIG
 
 $DevelMode = 1;
 
@@ -48,9 +49,9 @@ $PassportPublicKey = 'swmpubkey';
 $PassportMembershipKey = 'fn0534753405758047578'; #Used for passport talking to SWM
 
 $version='4.0';
-$base_url = 'http://devel.pnp-local.com.au/registration_newer/web';
-$duplicate_url = 'http://devel.pnp-local.com.au/registration_newer/web';
-$sync_logs = 'http://devel.pnp-local.com.au/registration_newer/sync/logs/';
+$base_url = 'http://elwood/FIFASPOnline/web'; ##CONFIG
+$duplicate_url = 'http://elwood/FIFASPOnline/web'; ##CONFIG
+$sync_logs = 'http://elwood/FIFASPOnline/sync/logs'; ##CONFIG
 $helpurl='http://support.sportingpulse.com';
 $sitename="SportingPulse";
 $page_title='Sportzware Membership';
@@ -60,7 +61,7 @@ $admin_email='warren@sportingpulse.com';
 $global_mail_debug='bruce@sportingpulse.com';
 $null_email = 'DoNotReply@sportingpulse.com';
 $null_email_name = 'SportingPulse';
-$fs_base="/u/web/registration_newer";
+$fs_base="/home/bruce/Development/FIFASPOnline"; ##CONFIG
 $fs_webbase="$fs_base/web";
 
 $SWOL_teamsheet_template_path = "$fs_base/teamplates/teamsheets";
@@ -75,7 +76,7 @@ $fs_customreports_dir="$fs_base/customreports";
 
 $mail_log_file="/var/log/sp-mail/mail.log";
 
-$cookie_domain=".pnp-local.com.au";
+$cookie_domain="elwood"; ##CONFIG
 $COOKIE_MEMBER="reg_m";
 $COOKIE_LOGIN="_SP_M";
 $COOKIE_ENTITY ="_SP_M_E";
@@ -111,7 +112,8 @@ $expiryseconds = 60 * 400;
 
  # ACCESS LEVEL CODES
   $LEVEL_NONE = -1;
-  $LEVEL_MEMBER = 1;
+  $LEVEL_PERSON = 1;
+  $LEVEL_MEMBER= 1;
   $LEVEL_TEAM = 2;
   $LEVEL_CLUB = 3;
   $LEVEL_COMP = 4;
@@ -143,9 +145,9 @@ $NODE_SHOW=1;
 
 ## GENERAL STATUS VALUES
 
-$MEMBERSTATUS_ACTIVE=1;
-$MEMBERSTATUS_POSSIBLE_DUPLICATE=2;
-$MEMBERSTATUS_DELETED=-1;
+$PERSONSTATUS_ACTIVE=1;
+$PERSONSTATUS_POSSIBLE_DUPLICATE=2;
+$PERSONSTATUS_DELETED=-1;
 
 $RECSTATUS_DELETED=-1;
 $RECSTATUS_ACTIVE=1;
@@ -1167,65 +1169,6 @@ $VENUE_LEVEL = -5;
 $ASSOC_LEVEL = 5;
 $TEAM_LEVEL = 2;
 $CLUB_LEVEL = 3;
-
-$BUSINESSRULE_OUTCOME_NOTIFICATION = '';
-$NAB_DIRECTLINK_FILES = '';
-$CREATED_BY_SWCIMPORTER = '';
-$assocClrStatus = '';
-$notify_payment_email = '';
-$UPLOADFILETYPE_STATEMENT = '';
-$clearance_clearAction = '';
-$LEVEL_EDU = '';
-$memberTypeNames = '';
-$NAB_GATEWAY_PWD = '';
-$NAB_DEMO_FINGERPRINT_URL = '';
-$NAB_LIVE_CC_URL = '';
-$NAB_LIVE_FINGERPRINT_URL = '';
-$NAB_DEMO_CC_URL = '';
-$PAYMENT_ONLINEPAYNAB = '';
-$typeID = '';
-$NAB_SALT = '';
-$PROCESSLOG_RUNNING = '';
-$PROCESSLOG_COMPLETED = '';
-$processLogStatuses = '';
-$REBUILD_REQUEST_STATUS_COMPLETED = '';
-$LEVEL_INVALID = '';
-$CreatedBy = '';
-$admin_email = '';
-$mail_log_file = '';
-$SC_CONTACTS_REGOS = '';
-$sww_base_url = '';
-$TealiumURLBase = '';
-$donotreply_email = '';
-$donotreply_email_name = '';
-$SPORT_LAWN_BOWLS = '';
-$GATEWAY_NAB = '';
-$Sphinx_Host = '';
-$Sphinx_Port = '';
-$RECSTATUS_DELETED = '';
-$RECSTATUS_ACTIVE = '';
-$COMP_ROUND_HOMEAWAY = '';
-$TEAM_ENTRY_STATUS_PENDING = '';
-$UPLOAD_SWM_TO_SWW_SALT = '';
-$UPLOAD_SYNC_POSTURL = '';
-$SPORT_VOLLEYBALL = '';
-$RECSTATUS_INACTIVE = '';
-$INVALID_ID = '';
-$LEVEL_CLUB = '';
-$TEAM_ENTRY_STATUS_ACCEPTED = '';
-$TEAM_ENTRY_STATUS_PENDING = '';
-$Tera_Wurfl = '';
-$SPORT_GENERIC = '';
-$SC_CONTACTS_COMPS = '';
-$SECRET_SALT = '';
-$NAB_DIRECTLINK_NZ_FILES = '';
-$REBUILD_REQUEST_TYPE_LADDER = '';
-$AUTH_TYPE_TEAM = '';
-$DEBUG_INFO = '';
-$accounts_email = '';
-$NoStats = '';
-$SendGrid_API_Password = '';
-$SendGrid_API_Username = '';
 
 %notificationStatus=(
   0=>'Pending',
