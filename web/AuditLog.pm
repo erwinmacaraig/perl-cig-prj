@@ -24,7 +24,7 @@ sub displayAuditLog {
 	my($Data)=@_;
   my $offset_IN = param('offset') || -1;
   my %levels = (
-    $Defs::LEVEL_MEMBER => 'memberID',
+    $Defs::LEVEL_PERSON => 'personID',
     $Defs::LEVEL_CLUB => 'clubID',
     $Defs::LEVEL_ASSOC => 'assocID',
     $Defs::LEVEL_ZONE => 'zoneID',

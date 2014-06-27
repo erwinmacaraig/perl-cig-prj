@@ -46,10 +46,10 @@ sub _getConfiguration {
 
 		Fields => {
 
-        intClearanceID=> ["$txt_Clr Ref No.",{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'M.strFirstname'}],
+        intClearanceID=> ["$txt_Clr Ref No.",{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'M.strLocalFirstname'}],
         strNationalNum=> [$natnumname,{displaytype=>'text', fieldtype=>'text', allowsort=>1, dbfield=>'M.strNationalNum'}, active=>1],
-        strFirstname=> ["First name",{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'M.strFirstname'}],
-        strSurname=> ["Family name",{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'M.strSurname'}],
+        strLocalFirstname=> ["First name",{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'M.strLocalFirstname'}],
+        strLocalSurname=> ["Family name",{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'M.strLocalSurname'}],
         dtDOB=> ['Date of Birth',{displaytype=>'date', fieldtype=>'date', dbfield=>'M.dtDOB', dbformat=>' DATE_FORMAT(M.dtDOB,"%d/%m/%Y")'}, active=>1],
         dtYOB=> ['Year of Birth',{displaytype=>'date', fieldtype=>'text', allowgrouping=>1, allowsort=>1, dbfield=>'YEAR(M.dtDOB)', dbformat=>' YEAR(M.dtDOB)'}],
         SourceAssocName=> ['Source Association',{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'SourceAssoc.strName', allowgrouping=>1}],
@@ -123,8 +123,8 @@ sub _getConfiguration {
 		Order => [qw(
 			intClearanceID
 			strNationalNum
-			strFirstname
-			strSurname
+			strLocalFirstname
+			strLocalSurname
 			dtDOB
 			dtYOB
 			SourceAssocName
@@ -198,8 +198,8 @@ sub SQLBuilder  {
 				DATE_FORMAT(C.dtPermitFrom, "%d/%m/%Y") AS dtPermitFrom,
 				CP.intClearanceStatus as PathStatus,
 				CP.intClearancePathID,
-				M.strSurname,
-				M.strFirstname,
+				M.strLocalSurname,
+				M.strLocalFirstname,
 				SourceClub.strName as SourceClubName,
 				DestinationClub.strName as DestinationClubName,
 				SourceAssoc.strName as SourceAssocName,
@@ -212,11 +212,11 @@ sub SQLBuilder  {
 				DATE_FORMAT(M.dtDOB, "%Y") as dtYOB
 				FROM tblClearance as C
 					INNER JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID)
-					INNER JOIN tblMember as M ON (M.intMemberID = C.intMemberID)
+					INNER JOIN tblPerson as M ON (M.intPersonID = C.intPersonID)
 					INNER JOIN tblAssoc as SourceAssoc ON (SourceAssoc.intAssocID = C.intSourceAssocID)
 					INNER JOIN tblAssoc as DestinationAssoc ON (DestinationAssoc.intAssocID = C.intDestinationAssocID)
-					LEFT JOIN tblClub as SourceClub ON (SourceClub.intClubID = C.intSourceClubID)
-					LEFT JOIN tblClub as DestinationClub ON (DestinationClub.intClubID = C.intDestinationClubID)
+					LEFT JOIN tblEntity as SourceClub ON (SourceClub.intEntityID = C.intSourceClubID)
+					LEFT JOIN tblEntity as DestinationClub ON (DestinationClub.intEntityID = C.intDestinationClubID)
 				WHERE CP.intTypeID = $currentLevel
 					AND CP.intID = $self->{'EntityID'}
 					AND C.intRecStatus <> -1

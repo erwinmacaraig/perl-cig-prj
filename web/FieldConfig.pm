@@ -130,7 +130,7 @@ sub show_fieldconfig {
     my $teamFields = getFieldsList($Data, 'Team');
     my $subBody = '';
     my @fieldtypelist = ();
-    push @fieldtypelist, ['Member', $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER} || 'Member'];
+    push @fieldtypelist, ['Member', $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} || 'Member'];
     if($currentLevel > $Defs::LEVEL_CLUB and !$Data->{'SystemConfig'}{'NoClubs'})    {
         push @fieldtypelist, ['Club', $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} || 'Club'];
     }
@@ -151,7 +151,7 @@ sub show_fieldconfig {
         my $field_list = undef;
         if($fieldtype eq 'Member')    {
             $field_list = $memberFields;
-            $FieldLabels=getFieldLabels($Data, $Defs::LEVEL_MEMBER);
+            $FieldLabels=getFieldLabels($Data, $Defs::LEVEL_PERSON);
         }
         elsif($fieldtype eq 'Club')    {
             $field_list = $clubFields;
@@ -384,7 +384,7 @@ sub update_fieldconfig {
     ];
     my $currentLevel = $Data->{'clientValues'}{'currentLevel'} || 0,
     my @fieldtypelist = ();
-    push @fieldtypelist, ['Member', $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER} || 'Member'];
+    push @fieldtypelist, ['Member', $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} || 'Member'];
     if($currentLevel > $Defs::LEVEL_CLUB and !$Data->{'SystemConfig'}{'NoClubs'})    {
         push @fieldtypelist, ['Club', $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} || 'Club'];
     }
