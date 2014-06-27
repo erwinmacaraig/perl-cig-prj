@@ -52,10 +52,8 @@ sub _getConfiguration {
         strLocalSurname=> ["Family name",{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'M.strLocalSurname'}],
         dtDOB=> ['Date of Birth',{displaytype=>'date', fieldtype=>'date', dbfield=>'M.dtDOB', dbformat=>' DATE_FORMAT(M.dtDOB,"%d/%m/%Y")'}, active=>1],
         dtYOB=> ['Year of Birth',{displaytype=>'date', fieldtype=>'text', allowgrouping=>1, allowsort=>1, dbfield=>'YEAR(M.dtDOB)', dbformat=>' YEAR(M.dtDOB)'}],
-        SourceAssocName=> ['Source Association',{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'SourceAssoc.strName', allowgrouping=>1}],
-        SourceClubName=> ['Source Club',{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'SourceClub.strName', allowgrouping=>1}],
-        DestinationAssocName=> ['Destination Association',{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'DestinationAssoc.strName', allowgrouping=>1}],
-        DestinationClubName=> ['Destination Club',{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'DestinationClub.strName', allowgrouping=>1}],
+        SourceClubName=> ['Source Club',{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'SourceClub.strLocalName', allowgrouping=>1}],
+        DestinationClubName=> ['Destination Club',{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'DestinationClub.strLocalName', allowgrouping=>1}],
         intClearanceYear=> ["$txt_Clr Year",{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'C.intClearanceYear'}],
         intReasonForClearanceID => [
 					"Reason for $txt_Clr" ,
@@ -91,19 +89,7 @@ sub _getConfiguration {
 						enabled => !$Data->{'SystemConfig'}{'clrHide_intDenialReasonID'},
 					}
 				],
-        intPermitType => [
-					"Permit Type",
-					{
-						fieldtype=>'dropdown', 
-						displaytype=>'lookup', 
-						dropdownoptions => $Defs::clearancePermitType{$Data->{'Realm'}},
-						allowsort=>1, 
-						allowgrouping=>1,
-					}
-        ],
 
-        dtPermitFrom => ['Permit From',{displaytype=>'date', fieldtype=>'date', dbfield=>'C.dtPermitFrom', dbformat=>' DATE_FORMAT(C.dtPermitFrom,"%d/%m/%Y")'}],
-        dtPermitTo => ['Permit To',{displaytype=>'date', fieldtype=>'date', dbfield=>'C.dtPermitTo', dbformat=>' DATE_FORMAT(C.dtPermitTo,"%d/%m/%Y")'}],
 
 
         intClearanceStatus=> ["Overall $txt_Clr Status" ,{displaytype=>'lookup', active=>1, fieldtype=>'dropdown', dropdownoptions => \%Defs::clearance_status, allowsort=>1, dbfield => 'C.intClearanceStatus', allowgrouping=>1}],
@@ -127,9 +113,7 @@ sub _getConfiguration {
 			strLocalSurname
 			dtDOB
 			dtYOB
-			SourceAssocName
 			SourceClubName
-			DestinationAssocName
 			DestinationClubName
 			intClearanceYear
 			PathStatus
@@ -140,16 +124,6 @@ sub _getConfiguration {
 			intClearanceStatus
 			dtApplied
 			dtFinalised
-			intPermitType
-			dtPermitFrom
-			dtPermitTo
-			intHasAgent
-			strAgentFirstname
-			strAgentSurname
-			strAgentNationality
-			strAgentLicenseNum
-			strAgencyName
-			strAgencyEmail
 		)],
     OptionGroups => {
       default => ['Details',{}],
@@ -194,27 +168,18 @@ sub SQLBuilder  {
 				C.*,
 				IF(C.intCurrentPathID = CP.intClearancePathID AND C.intClearanceStatus  = $Defs::CLR_STATUS_PENDING,1,0) AS ThisLevel,	
 				DATE_FORMAT(C.dtApplied, "%d/%m/%Y") AS dtApplied,
-				DATE_FORMAT(C.dtPermitTo, "%d/%m/%Y") AS dtPermitTo,
-				DATE_FORMAT(C.dtPermitFrom, "%d/%m/%Y") AS dtPermitFrom,
 				CP.intClearanceStatus as PathStatus,
 				CP.intClearancePathID,
 				M.strLocalSurname,
 				M.strLocalFirstname,
-				SourceClub.strName as SourceClubName,
-				DestinationClub.strName as DestinationClubName,
-				SourceAssoc.strName as SourceAssocName,
-				DestinationAssoc.strName as DestinationAssocName,
-				DATE_FORMAT(CP.dtAlert, "%d/%m/%Y") AS dtAlert,
-				IF(dtAlert <> '00/00/0000', 1, 0) as AlertType,
-				IF(dtAlert <= NOW(), 1, 0) as AlertNow,
+				SourceClub.strLocalName as SourceClubName,
+				DestinationClub.strLocalName as DestinationClubName,
 				M.strNationalNum,
 				DATE_FORMAT(M.dtDOB, "%d/%m/%Y") as dtDOB,
 				DATE_FORMAT(M.dtDOB, "%Y") as dtYOB
 				FROM tblClearance as C
 					INNER JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID)
 					INNER JOIN tblPerson as M ON (M.intPersonID = C.intPersonID)
-					INNER JOIN tblAssoc as SourceAssoc ON (SourceAssoc.intAssocID = C.intSourceAssocID)
-					INNER JOIN tblAssoc as DestinationAssoc ON (DestinationAssoc.intAssocID = C.intDestinationAssocID)
 					LEFT JOIN tblEntity as SourceClub ON (SourceClub.intEntityID = C.intSourceClubID)
 					LEFT JOIN tblEntity as DestinationClub ON (DestinationClub.intEntityID = C.intDestinationClubID)
 				WHERE CP.intTypeID = $currentLevel
