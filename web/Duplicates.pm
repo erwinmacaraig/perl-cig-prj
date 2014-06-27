@@ -86,7 +86,7 @@ sub displayDuplicateProblems	{
 			LEFT JOIN tblTransactions as TXN ON (tblPerson.intPersonID = TXN.intID AND TXN.intTableType=$Defs::LEVEL_PERSON AND TXN.intStatus=1)
 			$extraFrom
 		WHERE PR.intEntityID = $entityID
-			AND tblPerson.intStatus=$Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
+			AND tblPerson.intSystemStatus=$Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
 			AND tblPerson.intRealmID=$realm
 			$extraWhere
 		GROUP BY tblPerson.intPersonID
@@ -124,8 +124,8 @@ sub displayDuplicateProblems	{
 			    INNER JOIN tblPersonRegistration_$realm as PR ON (tblPerson.intPersonID= PR.intPersonID)
 			    LEFT JOIN tblEntity ON (PR.intEntityID=tblEntity.intEntityID)
 			WHERE tblPerson.intRealmID=$realm
-				AND tblPerson.intStatus <> $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
-				AND tblPerson.intStatus<>$Defs::PERSONSTATUS_DELETED
+				AND tblPerson.intSystemStatus <> $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
+				AND tblPerson.intSystemStatus<>$Defs::PERSONSTATUS_DELETED
 				AND ( $where)
 			ORDER BY strLocalSurname, strLocalFirstname, dtDOB
 		];
@@ -327,8 +327,8 @@ sub displayDuplicateProblems	{
 			if ($intPersonID_toResolve)	{
 				my $st = qq[
 					UPDATE tblPerson
-					SET intStatus = $Defs::PERSONSTATUS_ACTIVE
-					WHERE intStatus = $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
+					SET intSystemStatus = $Defs::PERSONSTATUS_ACTIVE
+					WHERE intSystemStatus = $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
 						AND intPersonID = $intPersonID_toResolve
 					LIMIT 1
 				];
@@ -427,7 +427,7 @@ warn("UPDATE DUP PROBLEMS");
 warn("##########################$option");
 			my $id_of_existing=$params{"matchNum$id_of_duplicate"} || 0;
 			if($option eq 'new')	{
-				my $st=qq[UPDATE tblPerson SET intStatus = $Defs::PERSONSTATUS_ACTIVE WHERE intPersonID=$id_of_duplicate];
+				my $st=qq[UPDATE tblPerson SET intSystemStatus = $Defs::PERSONSTATUS_ACTIVE WHERE intPersonID=$id_of_duplicate];
 				$Data->{'db'}->do($st);
 			}
 			elsif($option eq 'del')	{
@@ -523,7 +523,7 @@ warn("PRCOESS MEMBER CHANGE");
 		$q->finish();
 		deQuote($Data->{'db'},$dref);
 		my $update_str='';	
-		$dref->{'intStatus'}=$Defs::PERSONSTATUS_ACTIVE;
+		$dref->{'intSystemStatus'}=$Defs::PERSONSTATUS_ACTIVE;
 		for my $k (keys %{$dref})	{
 
 			next if !defined $dref->{$k};
@@ -564,8 +564,8 @@ next if $dref->{$k} eq "'0000-00-00'";
 		my $realmID = $Data->{'Realm'};
 	if($option eq 'del')	{ 
         warn("HANDLE PERSON REGO HERE");
-		$Data->{'db'}->do(qq[UPDATE tblPerson as M LEFT JOIN tblPersonRegistration_$realmID as MA ON (MA.intPersonID = M.intPersonID and MA.intEntityID<> $entityID ) SET M.intStatus=$Defs::RECSTATUS_DELETED WHERE M.intPersonID=$id_of_duplicate and MA.intPersonID IS NULL]);
-		$Data->{'db'}->do(qq[UPDATE tblPerson as M LEFT JOIN tblPersonRegistration_$realmID as MA ON (MA.intPersonID = M.intPersonID and MA.intEntityID<> $entityID) SET M.intStatus=$Defs::RECSTATUS_ACTIVE WHERE M.intPersonID=$id_of_duplicate and MA.intPersonID IS NOT NULL]);
+		$Data->{'db'}->do(qq[UPDATE tblPerson as M LEFT JOIN tblPersonRegistration_$realmID as MA ON (MA.intPersonID = M.intPersonID and MA.intEntityID<> $entityID ) SET M.intSystemStatus=$Defs::RECSTATUS_DELETED WHERE M.intPersonID=$id_of_duplicate and MA.intPersonID IS NULL]);
+		$Data->{'db'}->do(qq[UPDATE tblPerson as M LEFT JOIN tblPersonRegistration_$realmID as MA ON (MA.intPersonID = M.intPersonID and MA.intEntityID<> $entityID) SET M.intSystemStatus=$Defs::RECSTATUS_ACTIVE WHERE M.intPersonID=$id_of_duplicate and MA.intPersonID IS NOT NULL]);
 	}
 	elsif($option =~ /^change/)	{ 
 		$Data->{'db'}->do(qq[UPDATE tblTransactions SET intID = $existingid WHERE intID = $id_of_duplicate and intTableType=$Defs::LEVEL_PERSON]);
@@ -593,9 +593,9 @@ next if $dref->{$k} eq "'0000-00-00'";
 
 		$Data->{'db'}->do(qq[DELETE M.* FROM tblPerson as M LEFT JOIN tblPersonRegistration_$realmID as PR ON (PR.intPersonID = M.intPersonID and PR.intEntityID <> $entityID) WHERE M.intPersonID=$id_of_duplicate and PR.intPersonID IS NULL]);
 		if ($option eq 'del')	{
-			$Data->{'db'}->do(qq[UPDATE tblPerson SET intStatus=$Defs::RECSTATUS_ACTIVE WHERE intPersonID=$id_of_duplicate]);
+			$Data->{'db'}->do(qq[UPDATE tblPerson SET intSystemStatus=$Defs::RECSTATUS_ACTIVE WHERE intPersonID=$id_of_duplicate]);
 		}
-		$Data->{'db'}->do(qq[UPDATE tblPerson SET intStatus=$Defs::RECSTATUS_ACTIVE WHERE intPersonID=$existingid ]);
+		$Data->{'db'}->do(qq[UPDATE tblPerson SET intSystemStatus=$Defs::RECSTATUS_ACTIVE WHERE intPersonID=$existingid ]);
 		movePhoto($Data->{'db'}, $existingid, $id_of_duplicate);
 	}
   #auditLog(0, $Data, 'Resolve', 'Duplicates');

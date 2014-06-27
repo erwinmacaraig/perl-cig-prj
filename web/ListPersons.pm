@@ -139,7 +139,7 @@ sub listPersons {
         SELECT DISTINCT 
             P.intPersonID,
             P.strStatus,
-            P.intStatus
+            P.intSystemStatus
             $select_str
             $sel_str 
         FROM tblPerson  AS P
@@ -163,7 +163,7 @@ sub listPersons {
     $tempClientValues{currentLevel} = $Defs::LEVEL_PERSON;
     while (my $dref = $query->fetchrow_hashref()) {
         next if (defined $dref->{strStatus} and $dref->{strStatus} eq 'DELETED');
-        next if (defined $dref->{intStatus} and $dref->{intStatus} == $Defs::PERSONSTATUS_DELETED);
+        next if (defined $dref->{intSystemStatus} and $dref->{intSystemStatus} == $Defs::PERSONSTATUS_DELETED);
         $tempClientValues{personID} = $dref->{intPersonID};
         my $tempClient = setClient(\%tempClientValues);
 
@@ -185,7 +185,7 @@ sub listPersons {
         }
 
         $dref->{'strStatus_Filter'}=$dref->{'strStatus'};
-        if($dref->{'intStatus'} ==$Defs::PERSONSTATUS_POSSIBLE_DUPLICATE )    {
+        if($dref->{'intSystemStatus'} ==$Defs::PERSONSTATUS_POSSIBLE_DUPLICATE )    {
             my %keepduplicatefields = (
                 id => 1,
                 intPersonID => 1,

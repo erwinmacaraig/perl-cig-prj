@@ -240,7 +240,7 @@ sub PersonTransfer {
 			$assocTypeIDWHERE
 			AND M.strLocalSurname = $transfer_surname
 			AND (M.strNationalNum = $transfer_natnum OR M.dtDOB= $transfer_dob)
-			AND M.intStatus = $Defs::PERSONSTATUS_ACTIVE
+			AND M.intSystemStatus = $Defs::PERSONSTATUS_ACTIVE
 	];
     $st .= qq[ AND M.intPersonID = $personID] if $personID;
 
@@ -1404,7 +1404,7 @@ sub postPersonUpdate {
         #Seasons::insertPersonSeasonRecord( $Data, $id, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, 0, $ageGroupID, \%types ) if ($id);
         if ( $params->{'isDuplicate'} ) {
             my $st = qq[
-                UPDATE tblPerson SET intStatus=$Defs::PERSONSTATUS_POSSIBLE_DUPLICATE 
+                UPDATE tblPerson SET intSystemStatus=$Defs::PERSONSTATUS_POSSIBLE_DUPLICATE 
                 WHERE intPersonID=$id
             ];
             $db->do($st);
@@ -1432,7 +1432,7 @@ sub postPersonUpdate {
     else {
         my $status = $params->{'d_strStatus'} || $params->{'strStatus'} || 0;
         if ( $status == 1 ) {
-            my $st = qq[UPDATE tblPerson SET intStatus = 1 WHERE intPersonID = $id AND intStatus = 0 LIMIT 1];
+            my $st = qq[UPDATE tblPerson SET intSystemStatus = 1 WHERE intPersonID = $id AND intSystemStatus = 0 LIMIT 1];
             $db->do($st);
         }
         warn("INSERT PRODUCTS");
@@ -1459,7 +1459,7 @@ sub postPersonUpdate {
         $dupl_check = 1 if ( $dob_p       and $dob_p ne $dob_f );
 
         if ( $dupl_check == 1 ) {
-            my $st = qq[UPDATE tblPerson SET intStatus = 2 WHERE intPersonID = $id LIMIT 1];
+            my $st = qq[UPDATE tblPerson SET intSystemStatus = 2 WHERE intPersonID = $id LIMIT 1];
             $db->do($st);
         }
 
@@ -1556,9 +1556,9 @@ sub prePersonAdd {
             $st = qq[
 				SELECT tblPerson.intPersonID
 				FROM tblPerson
-                WHERE  tblPerson.intRealmID = ? AND tblPerson.intStatus <> ?
+                WHERE  tblPerson.intRealmID = ? AND tblPerson.intSystemStatus <> ?
 					$wherestr
-                ORDER BY tblPerson.intStatus
+                ORDER BY tblPerson.intSystemStatus
 				LIMIT 1
 			];
             @st_fields = (@joinCheck_fields, $realmID, $Defs::PERSONSTATUS_DELETED, @where_fields,);
@@ -1792,7 +1792,7 @@ sub PersonDupl {
     if ( $action eq 'P_DUP_S' ) {
         my $st = qq[
 			UPDATE tblPerson
-			SET intStatus = $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
+			SET intSystemStatus = $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
 			WHERE intPersonID = $personID
 			LIMIT 1
 		];

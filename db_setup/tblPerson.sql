@@ -10,7 +10,7 @@ CREATE TABLE tblPerson (
     intDataOrigin INT DEFAULT 0,
 
     strStatus varchar(20) DEFAULT '', /* pending/registered/de-registered/transferred/deceased */
-    intStatus TINYINT DEFAULT 0, /* for things like duplicate etc */
+    intSystemStatus TINYINT DEFAULT 0, /* for things like duplicate etc */
     intPhoto TINYINT DEFAULT 0, 
 
     strLocalTitle varchar(30) DEFAULT '',
