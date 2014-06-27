@@ -33,8 +33,6 @@ sub handleReports	{
 	my $reportID = param('rID') || '';
 	my $target=$Data->{'target'};
 
-	getUmpireSettings($Data);
-
 	# GET CLIENT VALUES
 	my $clientValues_ref=$Data->{'clientValues'};
 	my $client=$Data->{'client'};
@@ -88,41 +86,6 @@ sub handleReports	{
 	}
 	
 	return ($body, $report, $title);
-}
-
-sub getUmpireSettings	{
-
-	my ($Data) = @_;
-
-	my $assocID = $Data->{'clientValues'}{'assocID'} || 0;
-	return if (! $assocID);
-	my $clubID = $Data->{'clientValues'}{'clubID'} || 0;
-	$clubID = 0 if ($clubID == $Defs::INVALID_ID);
-
-	my $clubWHERE = '';
-
-	if ($clubID)	{
-		$clubWHERE =qq[
-    		AND intUmpireEntityID=$clubID
-    		AND intUmpireLevel = $Defs::LEVEL_CLUB
-		];
-	}
-
-	my $query = $Data->{'db'}->prepare(qq[
-    	SELECT
-    		COUNT(intUmpireEntityID) as CountAllocations
-    	FROM
-    		tblUmpireLevelConfig
-    	WHERE
-    		intUmpireAssocID = $assocID
-			$clubWHERE
-    ]);
-
-    $query->execute;
-    my($umpireAllocations)= $query->fetchrow_array();
-    $umpireAllocations ||= 0;
-    $Data->{'SystemConfig'}{'umpireAllocationsOn'} = 1 if ($umpireAllocations);
-
 }
 
 sub getReportObj {
