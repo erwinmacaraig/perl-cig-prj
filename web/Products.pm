@@ -1018,11 +1018,11 @@ my $warning_note = $Data->{'SystemConfig'}{'ProductEditNote'} || '';
 					$body .= qq[
 						<tr><td class="settings-group-name" colspan="2"><br>Non-Season Based (Over all seasons)</td></tr>
 						<tr>
-							<td width="35%" class="label"><label for="setMemberActive">Set $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER} Active in $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC}:</label></td>
+							<td width="35%" class="label"><label for="setMemberActive">Set $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} Active in $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC}:</label></td>
 							<td class="data"><input type="checkbox" name="setMemberActive" value="1" $checkedActive /></td>
 						</tr>
 						<tr>
-							<td class="label"><label for="setMemberFinancial">Set $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER} Financial Status:</label></td>
+							<td class="label"><label for="setMemberFinancial">Set $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} Financial Status:</label></td>
 							<td class="data"><input type="checkbox" name="setMemberFinancial" value="1" $checkedFinancial /></td>
 						</tr>
 						<tr>
@@ -2071,7 +2071,7 @@ sub update_defaultproduct	{
 			SELECT intRegoFormProductsID, intProductID, intRegoTypeLevel
 			FROM tblRegoFormProducts
 			WHERE intAssocID = $assocID
-				AND (intProductID = $id and intRegoTypeLevel = $Defs::LEVEL_MEMBER
+				AND (intProductID = $id and intRegoTypeLevel = $Defs::LEVEL_PERSON
 				OR intProductID = $id_team and intRegoTypeLevel = $Defs::LEVEL_TEAM)
 		];
     		my $query = $Data->{'db'}->prepare($st);
@@ -2079,14 +2079,14 @@ sub update_defaultproduct	{
 		my $hasMemberProduct=0;
 		my $hasTeamProduct=0;	
     		while (my $dref=$query->fetchrow_hashref())	{
-			$hasMemberProduct=1 if ($dref->{intRegoTypeLevel} == $Defs::LEVEL_MEMBER);
+			$hasMemberProduct=1 if ($dref->{intRegoTypeLevel} == $Defs::LEVEL_PERSON);
 			$hasTeamProduct=1 if ($dref->{intRegoTypeLevel} == $Defs::LEVEL_TEAM);
 		}
 		if (! $hasMemberProduct)	{
 			$st = qq[
 				INSERT INTO tblRegoFormProducts 
 				(intAssocID, intRealmID, intSubRealmID, intProductID, intRegoTypeLevel)
-				VALUES ($assocID, $realmID, $Data->{RealmSubType}, $id, $Defs::LEVEL_MEMBER)
+				VALUES ($assocID, $realmID, $Data->{RealmSubType}, $id, $Defs::LEVEL_PERSON)
 			];
 			$Data->{'db'}->do($st);
 		}
@@ -2108,7 +2108,7 @@ sub update_defaultproduct	{
 
 sub getDefaultRegoProduct	{
 	my($db, $assocID, $level)=@_;
-	$level ||= $Defs::LEVEL_MEMBER;
+	$level ||= $Defs::LEVEL_PERSON;
 	my $defaultField = 'intDefaultRegoProductID';
 	$defaultField = 'intDefaultTeamRegoProductID' if ($level == $Defs::LEVEL_TEAM);
     my $st= qq[
@@ -2363,9 +2363,9 @@ sub product_apply_transaction {
 		];
     my $q = $db->prepare($st);
     $q->execute($transLogID);
-    while( my ($productID,$memberID) = $q->fetchrow_array())	{
-        if ($productID && $memberID) {
-            apply_product_rules($Data,$productID,$memberID,$transLogID);
+    while( my ($productID,$personID) = $q->fetchrow_array())	{
+        if ($productID && $personID) {
+            apply_product_rules($Data,$productID,$personID,$transLogID);
         }
     }
     $q->finish();
@@ -2375,7 +2375,7 @@ sub product_apply_transaction {
 
 
 sub apply_product_rules {
-    my ($Data,$productID,$memberID,$transID) = @_;
+    my ($Data,$productID,$personID,$transID) = @_;
         
     
     # For each product purchased apply appropriate rules.
@@ -2405,7 +2405,7 @@ sub apply_product_rules {
 					PR.intRenewProductID = ?
 					AND T.dtEnd > DATE_SUB(SYSDATE(), INTERVAL 100 DAY)
 					AND T.dtPaid > '1970-01-01'
-					AND T.intTableType = $Defs::LEVEL_MEMBER
+					AND T.intTableType = $Defs::LEVEL_PERSON
 					AND T.intID = ?
 				ORDER BY T.dtEnd
 				LIMIT 1
@@ -2413,7 +2413,7 @@ sub apply_product_rules {
 			my $q = $Data->{'db'}->prepare($st);
 			$q->execute(
 				$productID,
-				$memberID,
+				$personID,
 			);
 			my($tid_to_be_renewed) = $q->fetchrow_array();
 			$q->finish();
@@ -2448,13 +2448,13 @@ sub apply_product_rules {
 							PR.intRenewProductID = ?
 							AND T.dtEnd > SYSDATE()
 							AND T.dtPaid > '1970-01-01'
-							AND T.intTableType = $Defs::LEVEL_MEMBER
+							AND T.intTableType = $Defs::LEVEL_PERSON
 							AND T.intID = ?
 					];
 					my $q = $Data->{'db'}->prepare($st);
 					$q->execute(
 						$productID,
-						$memberID,
+						$personID,
 					);
 					my($dt) = $q->fetchrow_array();
 					$q->finish();
@@ -2488,7 +2488,7 @@ sub apply_product_rules {
     # - Check if we should set the members financial status or registered until date.
     my %ColumnsValues = ();
     my $query2 = qq[
-                        UPDATE tblMember_Associations SET
+                        UPDATE tblPerson_Associations SET
                         ];
     
     if ($product->{intProductMemberPackageID}) {
@@ -2518,7 +2518,7 @@ sub apply_product_rules {
             $query2 .= "$column = $value,";
         }
         $query2 =~s/\,$//;
-        $query2 .= " WHERE intMemberID = $memberID AND intAssocID = $assocID ";
+        $query2 .= " WHERE intPersonID = $personID AND intAssocID = $assocID ";
         
         $Data->{'db'}->do($query2);
     }
@@ -2533,11 +2533,11 @@ sub apply_product_rules {
 
     my $assocSeasons = Seasons::getDefaultAssocSeasons($Data);
 
-    my $ageGroupID = getAgeGroupID($Data, $Data->{'db'}, $assocID, $memberID);
+    my $ageGroupID = getAgeGroupID($Data, $Data->{'db'}, $assocID, $personID);
 
 	Seasons::insertMemberSeasonRecord(
 		$Data, 
-		$memberID, 
+		$personID, 
 		$assocSeasons->{'newRegoSeasonID'}, 
 		$Data->{'clientValues'}{'assocID'}, 
 		$Data->{'clientValues'}{'clubID'}, 
@@ -2549,7 +2549,7 @@ sub apply_product_rules {
 	if($Data->{'clientValues'}{'clubID'}>0 and $Data->{'SystemConfig'}{'AssocConfig'}{'ClubFinancialMakesAssocFinancial'}) {
 		Seasons::insertMemberSeasonRecord(
         	        $Data,
-        	        $memberID,
+        	        $personID,
         	        $assocSeasons->{'newRegoSeasonID'},
        		        $Data->{'clientValues'}{'assocID'},
 	                0,

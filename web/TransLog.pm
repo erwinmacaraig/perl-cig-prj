@@ -32,7 +32,7 @@ my $entityNameURL    = 'M_TXNLog';
 
 
 sub handleTransLogs {
-  my($action, $Data, $intMemberID) = @_;
+  my($action, $Data, $intPersonID) = @_;
 	my $q=new CGI;
 	$Data->{'params'} = $q->Vars();
   my $clientValues_ref = $Data->{'clientValues'};
@@ -64,7 +64,7 @@ sub handleTransLogs {
 	  ($body, $header) = listTransactions($Data, $db, $clientValues_ref, $action, $resultMessage);
   }
   if ($action=~/payLIST/) {
-	  ($body, $header) = listTransLog($Data, $intMemberID, $Data->{'clientValues'}{'assocID'});
+	  ($body, $header) = listTransLog($Data, $intPersonID, $Data->{'clientValues'}{'assocID'});
   }
 	if ($action =~/payVIEW/)	{
 		($body, $header) = viewTransLog($Data, $Data->{'params'}{'tlID'},0,0);
@@ -96,7 +96,7 @@ sub handleTransLogs {
 
 sub delTransLog	{
 	my ($Data) = @_;
-	my $intMemberID = $Data->{'clientValues'}{'memberID'} || 0;
+	my $intPersonID = $Data->{'clientValues'}{'personID'} || 0;
 	my $intLogID = $Data->{'params'}{'tlID'} || 0;
 	my $db = $Data->{'db'};
 	my $st = qq[
@@ -267,7 +267,7 @@ sub step2 {
 	my $intAssocID = $Data->{'clientValues'}{'assocID'}; 
 	my $intClubID = $Data->{'clientValues'}{'clubID'} || 0; 
     $intClubID = 0 if ($intClubID == $Defs::INVALID_ID);
-	my $intMemberID= $Data->{'clientValues'}{'memberID'}; 
+	my $intPersonID= $Data->{'clientValues'}{'personID'}; 
 	my $statement = qq[
 			INSERT INTO tblTransLog (intAssocPaymentID, intClubPaymentID, dtLog, intAmount, strResponseCode, strResponseText, strComments, intPaymentType, strBSB, strBank, strAccountName, strAccountNum, intRealmID, intCurrencyID, strReceiptRef, intStatus) VALUES
 	($intAssocID, $intClubID, $dtLog, $intAmount, $strResponseCode, $strResponseText, $strComments, $paymentType, $strBSB, $strBank, $strAccountName, $strAccountNum, $Data->{Realm}, $currencyID, $strReceiptRef, $Defs::TXNLOG_PENDING) 
@@ -404,21 +404,21 @@ sub step2 {
 		     <p class="error">$warnings</p>
 		 ] if $warnings;
 
-	my ($link, $mode, $memberID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('M_TXNLoglist', $Data, $clientValues_ref);
+	my ($link, $mode, $personID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('M_TXNLoglist', $Data, $clientValues_ref);
 
 
 	$body.=qq[	<br>
 			<form action="$Data->{'target'}" method="POST">
 				<input type="hidden" name="a" value="M_TXNLogstep3">
 				<input type="hidden" name="client" value="$client">
-				<input type="hidden" name="mode" value="$mode"><input type="hidden" name="memberID" value="$memberID"><input type="hidden" name="client" value="$client"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="transLogID" value="$transLogID">
+				<input type="hidden" name="mode" value="$mode"><input type="hidden" name="personID" value="$personID"><input type="hidden" name="client" value="$client"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="transLogID" value="$transLogID">
 				<input type="submit" name="subbut" value=" Confirm Payment " class="HF_submit button proceed-button">
 			</form>
 			<div style="clear:both;"></div>
 			<form action="$Data->{'target'}" method="POST">
 				<input type="hidden" name="a" value="M_TXNLoglist">
 				<input type="hidden" name="client" value="$client">
-				<input type="hidden" name="mode" value="$mode"><input type="hidden" name="memberID" value="$memberID"><input type="hidden" name="client" value="$client"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="dt_start_paid" value="$dtStart_paid"><input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
+				<input type="hidden" name="mode" value="$mode"><input type="hidden" name="personID" value="$personID"><input type="hidden" name="client" value="$client"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="dt_start_paid" value="$dtStart_paid"><input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
 				<input type="submit" name="subbut" value=" Cancel Payment " class="HF_submit button cancel-button">
 			</form>
 		 ]; 
@@ -606,7 +606,7 @@ my $query = $db->prepare($statement);
       }
       $row_data->{$header->{Field}} = $row->{$header->{Field}};
     }
-    $row_data->{SelectLink} = qq[main.cgi?client=$client&a=M_TXN_EDIT&memberID=$row->{intID}&id=$row->{intTransLogID}&tID=$row->{intTransactionID}];
+    $row_data->{SelectLink} = qq[main.cgi?client=$client&a=M_TXN_EDIT&personID=$row->{intID}&id=$row->{intTransLogID}&tID=$row->{intTransactionID}];
     if ($row->{StatusText} eq 'Paid') {
       $row_data->{stuff} = qq[<a href="main.cgi?a=M_TXNLog_payVIEW&client=$client&tlID=$row->{intTransLogID}">View Payment Record</a>];
       $row_data->{strReceipt} = qq[<a href="printreceipt.cgi?client=$client&ids=$row->{intTransLogID}"  target="receipt">View Receipt</a>];
@@ -716,8 +716,8 @@ sub generateTXNListLink {
 	my $dtEnd_paid = $Data->{params}{dt_end_paid} || 0;
 	my $mode = $Data->{params}{mode} || 'u';
 	my $tableID = 0;
-	if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_MEMBER)	{
-		$tableID = $tempClientValues_ref->{memberID} || $Data->{params}{memberID} ||  0;
+	if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON)	{
+		$tableID = $tempClientValues_ref->{personID} || $Data->{params}{personID} ||  0;
 	}
 	if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_TEAM)	{
 		$tableID = $tempClientValues_ref->{teamID} || $Data->{params}{teamID} ||  0;
@@ -726,7 +726,7 @@ sub generateTXNListLink {
 	$tableID = 0 if $tableID == $Defs::INVALID_ID;
 	my $link = "$Data->{target}?client=$client";
 	$link .= "&amp;a=$action" if $action;
-	$link .= "&amp;memberID=$tableID" if $tableID and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_MEMBER;
+	$link .= "&amp;personID=$tableID" if $tableID and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON;
 	$link .= "&amp;teamID=$tableID" if $tableID and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_TEAM;
 	$link .= "&amp;dt_start_paid=$dtStart_paid" if $dtStart_paid;
 	$link .= "&amp;dt_end_paid=$dtEnd_paid" if $dtEnd_paid;
@@ -737,7 +737,7 @@ sub generateTXNListLink {
 sub listTransactions_where {
     my ($whereClause, $txnStatus, $safeTableID, $safePaymentID, $paymentID, $Data, $db) = @_;
 
-    $whereClause .= qq[ AND t.intID=$safeTableID and t.intTableType=$Defs::LEVEL_MEMBER] if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_MEMBER;
+    $whereClause .= qq[ AND t.intID=$safeTableID and t.intTableType=$Defs::LEVEL_PERSON] if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON;
     $whereClause .= qq[ AND t.intID=$safeTableID and t.intTableType=$Defs::LEVEL_TEAM]   if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_TEAM;
     $whereClause .= qq[ AND t1.intTLogID= $safePaymentID ] if $paymentID;
 
@@ -870,7 +870,7 @@ sub listTransactions {
 		  my $allowManualPayments = 1;
 		  $allowManualPayments = 0 if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_TEAM and ! allowedAction($Data, 'm_mp'));
 		  $allowManualPayments = 0 if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB 
-			  and $Data->{'clientValues'}{'currentLevel'}  == $Defs::LEVEL_MEMBER 
+			  and $Data->{'clientValues'}{'currentLevel'}  == $Defs::LEVEL_PERSON 
 			  and ! allowedAction($Data, 'm_mp')
 		  );
 		  $allowManualPayments = 0 if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB 
@@ -978,7 +978,7 @@ sub listTransactions {
 			
 						<div class="HTbuttons"><input type="submit" name="subbut" value="Submit Manual Payment" class="HF_submit button generic-button" id = "btn-manualpay"></div>
 
-						<input type="hidden" name="memberID" value="$TableID"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="dt_start_paid" value="$dtStart_paid"><input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
+						<input type="hidden" name="personID" value="$TableID"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="dt_start_paid" value="$dtStart_paid"><input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
 					</form> 
 				</div>
 			] if $allowMP;
@@ -1115,7 +1115,7 @@ my $currencySQL = qq[SELECT intCurrencyID, strCurrencyName from tblCurrencies WH
 	
         my $field= ($option=~/add/) ? () : (loadDetails($db, $id, $tempClientValues_ref) || ());
 
-	my (undef, $mode, $memberID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('M_TXNLoglist', $Data, $tempClientValues_ref);
+	my (undef, $mode, $personID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('M_TXNLoglist', $Data, $tempClientValues_ref);
 	
 
 my %FieldDefinitions=(
@@ -1242,7 +1242,7 @@ my %FieldDefinitions=(
 	dt_start_paid=>$dtStart_paid,
 	dt_end_paid=>$dtEnd_paid,
         mode=>$mode,
-	memberID=>$memberID,
+	personID=>$personID,
 	payment=>$paymentID,
       }, 
    );
@@ -1259,7 +1259,7 @@ my %FieldDefinitions=(
 			<input type="hidden" name="dt_start_paid" value="$dtStart_paid">
 			<input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
 			<input type="hidden" name="mode" value="$mode">
-			<input type="hidden" name="memberID" value="$memberID">
+			<input type="hidden" name="personID" value="$personID">
 			<input type="hidden" name="payment" value="$paymentID">
 		</form>
 	    ] if $body=~/subbut/;
@@ -1272,9 +1272,9 @@ sub afterUpdate {
 
 my (undef, undef, $id, $Data, $option, $tempClientValues_ref) = @_;
 
-	my ($linklist, $mode, $memberID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('M_TXNLoglist', $Data, $tempClientValues_ref);
+	my ($linklist, $mode, $personID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('M_TXNLoglist', $Data, $tempClientValues_ref);
 	my $linkedit='';
-	($linkedit, $mode, $memberID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('M_TXNLogedit', $Data, $tempClientValues_ref);
+	($linkedit, $mode, $personID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('M_TXNLogedit', $Data, $tempClientValues_ref);
 
 	my $body=qq[
                                <div class="OKmsg">Payment edited successfully</div><br><br>
@@ -1299,7 +1299,7 @@ sub viewTransLog	{
 		SELECT tblTransLog.*, IF(T.intTableType = $Defs::LEVEL_TEAM, Team.strName, CONCAT(strFirstname,' ',strSurname)) as Name, DATE_FORMAT(dtSettlement,'%d/%m/%Y') as dtSettlement
 		FROM tblTransLog INNER JOIN tblTXNLogs as TXNLog ON (TXNLog.intTLogID = tblTransLog.intLogID)
 			INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLog.intTXNID)
-			LEFT JOIN tblMember as M ON (M.intMemberID = T.intID and T.intTableType=$Defs::LEVEL_MEMBER)
+			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
 			LEFT JOIN tblTeam as Team on (Team.intTeamID = T.intID and T.intTableType=$Defs::LEVEL_TEAM)
 		WHERE intLogID = $intTransLogID
 		AND T.intRealmID = $Data->{'Realm'}
@@ -1315,7 +1315,7 @@ sub viewTransLog	{
 	my $st_trans = qq[
 		SELECT M.strSurname, M.strFirstName, T.*, P.strName, P.strGroup, Team.strName as TeamName
 		FROM tblTransactions as T
-			LEFT JOIN tblMember as M ON (M.intMemberID = T.intID and T.intTableType=$Defs::LEVEL_MEMBER)
+			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
 			LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
 			LEFT JOIN tblTeam as Team on (Team.intTeamID = T.intID and T.intTableType=$Defs::LEVEL_TEAM)
 		WHERE intTransLogID = $intTransLogID
@@ -1473,7 +1473,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 		$thisassoc=1 if ($dref->{intAssocID} == $Data->{'clientValues'}{'assocID'});
 		$count++;
         my $paymentFor = '';
-        $paymentFor = qq[$dref->{strSurname}, $dref->{strFirstName}] if ($dref->{intTableType} == $Defs::LEVEL_MEMBER);
+        $paymentFor = qq[$dref->{strSurname}, $dref->{strFirstName}] if ($dref->{intTableType} == $Defs::LEVEL_PERSON);
         $paymentFor = qq[$dref->{TeamName}] if ($dref->{intTableType} == $Defs::LEVEL_TEAM);
 		my $productname = $dref->{strName};
 		$productname = qq[$dref->{strGroup}-].$productname if ($dref->{strGroup});
@@ -1529,7 +1529,7 @@ sub viewPayLaterTransLog    {
 		SELECT tblTransLog.*, IF(T.intTableType = $Defs::LEVEL_TEAM, Team.strName, CONCAT(strFirstname,' ',strSurname)) as Name, DATE_FORMAT(dtSettlement,'%d/%m/%Y') as dtSettlement
 		FROM tblTransLog INNER JOIN tblTXNLogs as TXNLog ON (TXNLog.intTLogID = tblTransLog.intLogID)
 			INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLog.intTXNID)
-			LEFT JOIN tblMember as M ON (M.intMemberID = T.intID and T.intTableType=$Defs::LEVEL_MEMBER)
+			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
 			LEFT JOIN tblTeam as Team on (Team.intTeamID = T.intID and T.intTableType=$Defs::LEVEL_TEAM)
 		WHERE intLogID = $intTransLogID
 		AND T.intRealmID = $Data->{'Realm'}
@@ -1543,7 +1543,7 @@ sub viewPayLaterTransLog    {
 		SELECT M.strSurname, M.strFirstName, T.*, P.strName, P.strGroup
 		FROM tblTransactions as T
             LEFT JOIN tblTXNLogs as TXNLog ON (TXNLog.intTXNID = T.intTransactionID)
-			LEFT JOIN tblMember as M ON (M.intMemberID = T.intID and T.intTableType=$Defs::LEVEL_MEMBER)
+			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
 			LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
 			LEFT JOIN tblTeam as Team on (Team.intTeamID = T.intID and T.intTableType=$Defs::LEVEL_TEAM)
 		WHERE TXNLog.intTLogID = $intTransLogID
@@ -1658,8 +1658,8 @@ sub listTransLog	{
 	my $WHERE = '';
 	if ($tableID)	{
 		$WHERE = qq[ AND T.intID = $tableID];
-		if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_MEMBER)	{
-			$WHERE .= qq[ AND T.intTableType=$Defs::LEVEL_MEMBER] 
+		if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON)	{
+			$WHERE .= qq[ AND T.intTableType=$Defs::LEVEL_PERSON] 
 		}
 		elsif ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_TEAM)	{
 			$WHERE .= qq[ AND T.intTableType=$Defs::LEVEL_TEAM] 

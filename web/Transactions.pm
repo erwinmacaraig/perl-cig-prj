@@ -427,7 +427,7 @@ sub preTXNAddUpdate	{
 		SELECT T.intTransactionID
 		FROM tblTransactions as T INNER JOIN tblProducts as P ON (T.intProductID = P.intProductID)
 		WHERE T.intID = $personID
-			AND T.intTableType=$Defs::LEVEL_MEMBER
+			AND T.intTableType=$Defs::LEVEL_PERSON
 			AND T.intProductID = $prodID
 			AND P.intAssocUnique = 1
 	];

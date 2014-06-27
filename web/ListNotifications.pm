@@ -77,7 +77,7 @@ sub listNotifications {
     $resultHTML .= textMessage($textLabels{'noNotficationsFound'});
   }
   else  {
-    my $memfieldlabels=FieldLabels::getFieldLabels($Data,$Defs::LEVEL_MEMBER);
+    my $memfieldlabels=FieldLabels::getFieldLabels($Data,$Defs::LEVEL_PERSON);
     my @headers = (
 			{
 			    type => 'Selector',

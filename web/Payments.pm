@@ -818,8 +818,8 @@ sub displayPaymentLaterResult        {
 	my $db = $Data->{'db'};
         $intLogID ||= 0;
 
-	my $ID = $Data->{'clientValues'}{'memberID'} || 0;
-                my $EntityType=$Defs::LEVEL_MEMBER;
+	my $ID = $Data->{'clientValues'}{'personID'} || 0;
+                my $EntityType=$Defs::LEVEL_PERSON;
                 if ($Data->{'clientValues'}{'teamID'} and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_TEAM) {
                         $ID = $Data->{'clientValues'}{'teamID'} || 0;
                         $EntityType = $Defs::LEVEL_TEAM;
@@ -858,7 +858,7 @@ sub displayPaymentLaterResult        {
     			$qry->execute or query_error($st);
 			while (my $dref = $qry->fetchrow_hashref())	{
 				push @txns, $dref->{intTransactionID};
-				#$intMemberID = $dref->{intMemberID} || 0;
+				#$intPersonID = $dref->{intPersonID} || 0;
 			}
 		}
 	my ($viewTLBody, $header) = TransLog::viewPayLaterTransLog($Data, $intLogID, $ID, $EntityType);
@@ -873,8 +873,8 @@ sub displayPaymentResult        {
 	my $db = $Data->{'db'};
         $intLogID ||= 0;
 
-	my $ID = $Data->{'clientValues'}{'memberID'} || 0;
-                my $EntityType=$Defs::LEVEL_MEMBER;
+	my $ID = $Data->{'clientValues'}{'personID'} || 0;
+                my $EntityType=$Defs::LEVEL_PERSON;
                 if ($Data->{'clientValues'}{'teamID'} and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_TEAM) {
                         $ID = $Data->{'clientValues'}{'teamID'} || 0;
                         $EntityType = $Defs::LEVEL_TEAM;
@@ -929,7 +929,7 @@ sub displayPaymentResult        {
     			$qry->execute or query_error($st);
 			while (my $dref = $qry->fetchrow_hashref())	{
 				push @txns, $dref->{intTransactionID};
-				#$intMemberID = $dref->{intMemberID} || 0;
+				#$intPersonID = $dref->{intPersonID} || 0;
 			}
 					
 			$re_pay_body= checkoutConfirm($Data, \@txns, 1);
@@ -1079,7 +1079,7 @@ sub invoiceNumForm      {
                 
                 <form method="POST" action="$Data->{'SystemConfig'}{'invoiceNumFormPOST'}">
                 <input type="hidden" name="a" value="PAY">
-                <input type="hidden" name="intMemberID" value="$fields{'intMemberID'}">
+                <input type="hidden" name="intPersonID" value="$fields{'intPersonID'}">
                 <input type="hidden" name="all_nums" value="$all_nums_list">
                  $all_nums_body<br>
                 <!--<p style="margin-left:10px;font-size:14px;color:green">Once all invoices have been added, click <b>Continue to confirmation</b> button to view payment summary screen (prior to entering Credit Card details).<br><br><input type="submit" value="Continue to confirmation"></p>-->
@@ -1094,7 +1094,7 @@ sub invoiceNumForm      {
 	$body .= qq[<form method="POST" action="$Data->{'SystemConfig'}{'invoiceNumFormPOST'}">
                 <p class="text" style="margin-left:10px;">Please enter invoice number to include: <input type="text" name="invoice_num" value="" size="10">
                 <input type="hidden" name="all_nums" value="$all_nums_list">
-                <input type="hidden" name="intMemberID" value="$fields{'intMemberID'}">
+                <input type="hidden" name="intPersonID" value="$fields{'intPersonID'}">
 	];
 	$body .= $count ? qq[ <input type="submit" value="Add another Invoice"> ] : qq[ <input type="submit" value="Add Invoice"> ];
 	$body .= qq[</p>
@@ -1142,8 +1142,8 @@ sub getTXNDetails	{
                         strP1Email2,
                         strP2Email,
                         strP2Email2
-                	FROM tblMember
-                	WHERE intMemberID = $dref->{intID}
+                	FROM tblPerson
+                	WHERE intPersonID = $dref->{intID}
                 		AND intRealmID = $Data->{'Realm'}
                 ];
         	my $qry_mem = $db->prepare($st_mem) or query_error($st_mem);

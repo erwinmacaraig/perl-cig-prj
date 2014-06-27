@@ -23,11 +23,11 @@ use GridDisplay;
 use Seasons;
 
 sub listProdTransactions {
-  my($Data, $memberID, $assocID) = @_;
+  my($Data, $personID, $assocID) = @_;
 
 print STDERR qq[TCTCTCTCTCTC \n\n];
 
-  $memberID ||= 0;
+  $personID ||= 0;
   $assocID ||= 0;
   my $db=$Data->{'db'};
   my $resultHTML = '';
@@ -54,7 +54,7 @@ print STDERR qq[TCTCTCTCTCTC \n\n];
       INNER JOIN tblProducts as P ON P.intProductID = T.intProductID
       LEFT JOIN tblEntity as E ON (E.intEntityID = T.intEntityID)
     WHERE 
-      T.intMemberID = ?
+      T.intPersonID = ?
   ];
   if ($Data->{'clientValues'}{'assocID'})  {
     $statement .= qq[
@@ -65,7 +65,7 @@ print STDERR qq[TCTCTCTCTCTC \n\n];
     ORDER BY T.dtTransaction
   ];
   my $query = $db->prepare($statement);
-  $query->execute($memberID);
+  $query->execute($personID);
   my $found = 0;
   my $client=setClient($Data->{'clientValues'});
   my $currentname='';
@@ -96,7 +96,7 @@ print STDERR qq[TCTCTCTCTCTC \n\n];
   }
   else  {
 
-    my $memfieldlabels=FieldLabels::getFieldLabels($Data,$Defs::LEVEL_MEMBER);
+    my $memfieldlabels=FieldLabels::getFieldLabels($Data,$Defs::LEVEL_PERSON);
     my @headers = (
       {
         type => 'RowCheckbox',
