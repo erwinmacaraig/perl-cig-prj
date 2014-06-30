@@ -14,7 +14,7 @@ use DBI;
 use CGI qw(param unescape escape);
 use AdminPageGen;
 use TTTemplate;
-use approval;
+use Approval;
 
 main();
 

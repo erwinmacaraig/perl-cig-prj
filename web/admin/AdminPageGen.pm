@@ -28,8 +28,8 @@ sub print_adminpageGen {
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 			<script type="text/javascript" src="../js/chosen/chosen.jquery.min.js"></script>
 			<link rel="stylesheet" type="text/css" href="../js/chosen/chosen.css">
- <script type="text/javascript" src="../js/ext-2.2/adapter/jquery/ext-jquery-adapter.js"></script>
-    <script type="text/javascript" src="../js/ext-2.2/ext-all.js"></script>
+ <!--<script type="text/javascript" src="../js/ext-2.2/adapter/jquery/ext-jquery-adapter.js"></script>
+    <script type="text/javascript" src="../js/ext-2.2/ext-all.js"></script>-->
  <script type="text/javascript" src="table2csv.js"></script>
 
 			<script type="text/javascript">

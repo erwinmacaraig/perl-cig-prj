@@ -1,4 +1,4 @@
-package approval;
+package Approval;
 
 require Exporter;
 @ISA =  qw(Exporter);
@@ -33,10 +33,10 @@ sub list_tasks {
     }
     
     my $st = qq[
-		SELECT r.intRoleID, p.strFirstName, p.strSurname, e.strLocalName, r.strTitle
+		SELECT r.intRoleID, p.strLocalFirstname, p.strLocalSurname, e.strLocalName, r.strTitle
 		FROM tblRole r
 		INNER JOIN tblEntity e on r.intEntityID = e.intEntityID
-		INNER JOIN tblPersonRole pr on r.intRoleID = pr.intRoleID
+		INNER JOIN tblRolePerson pr on r.intRoleID = pr.intRoleID
 		INNER JOIN tblPerson p on pr.intPersonID = p.intPersonID
         ORDER BY r.intRoleID
     ];
@@ -49,7 +49,7 @@ sub list_tasks {
 	    $body .= qq[
 	      <tr>
 	        <td class="listborder">$dref->{intRoleID}</td>
-	        <td class="listborder">$dref->{strFirstName} $dref->{strSurname}</td>
+	        <td class="listborder">$dref->{strLocalFirstname} $dref->{strLocalSurname}</td>
 	        <td>&nbsp;</td>
 	        <td class="listborder"><a href="approval.cgi?RID=$dref->{intRoleID}">$dref->{strLocalName} - $dref->{strTitle}</a></td>
 	      </tr>
@@ -72,14 +72,14 @@ sub list_tasks {
 	    . '<tr style="margin: 10px;"><th>TaskID</th><th>Name</th><th>Status</th><th>TaskType</th><th>PersonLevel</th><th>AgeLevel</th><th>Sport</th><th>Registration<br>Type</th><th>Document</th><th>&nbsp;</th><th>Approve</th><th>Reject</th></tr>';
 
     $st = qq[
-		SELECT t.intWFTaskID, t.strTaskStatus, t.strTaskType, pr.strPersonLevel, pr.strAgeLevel, pr.strSport, pr.strRegistrationType, dt.strDocumentName,
-		p.strFirstName, p.strSurName, p.intPersonID
+		SELECT t.intWFTaskID, t.strTaskStatus, t.strTaskType, pr.strPersonLevel, pr.strAgeLevel, pr.strSport, pr.intRegistrationNature, dt.strDocumentName,
+		p.strLocalFirstname, p.strLocalSurname, p.intPersonID
 		FROM tblWFTask t
-		INNER JOIN tblPersonRegistration pr ON t.intPersonRegistrationID = pr.intPersonRegistrationID
+		INNER JOIN tblPersonRegistration_1 pr ON t.intPersonRegistrationID = pr.intPersonRegistrationID
 		INNER JOIN tblPerson p on t.intPersonID = p.intPersonID
 		LEFT OUTER JOIN tblDocumentType dt ON t.intDocumentTypeID = dt.intDocumentTypeID
 		WHERE t.intWFRoleID = ?
-		ORDER BY p.strSurname, p.strFirstname, p.intPersonID, t.strTaskType, dt.strDocumentName
+		ORDER BY p.strLocalSurname, p.strLocalFirstname, p.intPersonID, t.strTaskType, dt.strDocumentName
     ];
  
     $query = $db->prepare($st);
@@ -99,13 +99,13 @@ sub list_tasks {
 	    $body .= qq[
 	      <tr>
 	        <td class="listborder">$dref->{intWFTaskID}</td>
-	        <td class="listborder">$dref->{strFirstName} $dref->{strSurName}</td>
+	        <td class="listborder">$dref->{strLocalFirstname} $dref->{strLocalSurname}</td>
 	        <td class="listborder">$dref->{strTaskStatus}</td>
 	        <td class="listborder">$dref->{strTaskType}</td>
 	        <td class="listborder">$dref->{strPersonLevel}</td>
 	        <td class="listborder">$dref->{strAgeLevel}</td>
 	        <td class="listborder">$dref->{istrSport}</td>
-	        <td class="listborder">$dref->{strRegistrationType}</td>
+	        <td class="listborder">$dref->{intRegistrationNature}</td>
 	        <td class="listborder">$dref->{strDocumentName}</td>
 	        <td>&nbsp;</td>
 	   		$link
@@ -260,7 +260,7 @@ else {
         
         if (!$q->fetchrow_array()) {
             $st = qq[
-            	UPDATE tblPersonRegistration SET
+            	UPDATE tblPersonRegistration_1 SET
             	strStatus = ?,
             	dtFrom = Now()
     	        WHERE intPersonRegistrationID = ?

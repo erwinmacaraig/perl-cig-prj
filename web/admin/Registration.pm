@@ -36,10 +36,10 @@ sub display_screen{
 	my $surname = 'Scuttle';
 	my $gender = '1';
 	my $DOB = '29 Jan 1955';
-	my $entityID = '4';
+	my $entityID = '35';
 	my $personLevel = 'AMATEUR';
 	my $sport = 'FOOTBALL';
-	my $registrationType = 'REGISTRATION';
+	my $registrationType = 0; #'REGISTRATION';
 	my $ageLevel = 'SENIOR';
 	my $personType = 'PLAYER';
    
@@ -50,9 +50,8 @@ sub display_screen{
 
     my %btn_entityID = (
 		'1'=>'FIFA',	
-		'2'=>'Australia',	
-		'3'=>'Victoria',	
-		'4'=>'Sandringham',	
+		'14'=>'Region',	
+		'35'=>'Alands Clubs',	
 	);
 
     my %btn_personType = (
@@ -73,8 +72,8 @@ sub display_screen{
 	);	
 	
     my %btn_registrationType = (
-		'REGISTRATION'=>'Registration',	
-		'RENEWAL'=>'Renewal',	
+		'0'=>'Registration',	
+		'1'=>'Renewal',	
 	);
 
     my %btn_ageLevel = (
@@ -162,7 +161,7 @@ sub add_registration {
     my $personLevel 	 = param('personLevel') || '';
     my $personType  	 = param('personType') || '';
     my $sport       	 = param('sport') || '';
-    my $registrationType = param('registrationType') || '';
+    my $registrationType = param('registrationType') || 0;
     my $ageLevel    	 = param('ageLevel') || '';
 
   	my $st = '';
@@ -171,13 +170,16 @@ sub add_registration {
 	$st = qq[
    		INSERT INTO tblPerson
 		(
-		strFirstName,
-		strSurname,
+        intRealmID,
+        intSystemStatus,
+		strLocalFirstname,
+		strLocalSurname,
 		intGender,
 		dtDOB
 		)
 		VALUES
-		(?,
+		(1,1,
+        ?,
 		?,
 		?,
 		?)
@@ -197,7 +199,7 @@ sub add_registration {
   	my $personID = $q->{mysql_insertid};
 
 	$st = qq[
-   		INSERT INTO tblPersonRegistration
+   		INSERT INTO tblPersonRegistration_1
 		(
 		intPersonID,
 		intRealmID,
@@ -207,9 +209,9 @@ sub add_registration {
 		strPersonLevel,
 		strStatus,
 		strSport,
-		strRegistrationType,
+        intRegistrationNature,
 		strAgeLevel,
-		intSeasonID
+        intNationalPeriodID 
 		)
 		VALUES
 		(?,
@@ -262,14 +264,14 @@ sub fncNewRegistration {
 	$st = qq[
 		INSERT INTO tblWFTask (intWFRuleID, intWFRoleID, intWFEntityID, strTaskType, intDocumentTypeID, strTaskStatus, intPersonID, intPersonRegistrationID, intEntityID, intEntityLinksID)
 		SELECT r.intWFRuleID, r.intRoleID, r.intEntityID, r.strTaskType, r.intDocumentTypeID, r.strTaskStatus, pr.intPersonID, pr.intPersonRegistrationID, 0, 0
-		FROM tblPersonRegistration pr
+		FROM tblPersonRegistration_1 pr
 		INNER JOIN tblWFRule r
 		ON pr.intEntityID = r.intEntityID
 		AND pr.strPersonLevel = r.strPersonLevel
 		AND pr.strAgeLevel = r.strAgeLevel
 		AND pr.strSport = r.strSport
-		AND pr.strRegistrationType = r.strRegistrationType
-		AND pr.intSeasonID = r.intSeasonID
+		AND pr.intRegistrationNature = r.intRegistrationNature
+		AND pr.intNationalPeriodID= r.intNationalPeriodID
 		WHERE pr.intPersonRegistrationID = ?;
 		];
 		

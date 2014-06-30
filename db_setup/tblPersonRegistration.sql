@@ -14,6 +14,7 @@ CREATE TABLE tblPersonRegistration_XX (
     intOriginLevel TINYINT DEFAULT 0, /* Self, club, Reg, MA */
     intOriginID INT DEFAULT 0, 
     intRegistrationNature int default 0, /*First, Subsequent -- We haev a count ? */
+    strAgeLevel VARCHAR(100) default '',
 
     dtFrom date,
     dtTo date,
