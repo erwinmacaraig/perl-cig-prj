@@ -340,7 +340,8 @@ sub fncRadioBtns {
 	
 	#PP How do I get a sorted list?
 	my $i = -1;
-    foreach my $key(keys %{$button_fin_inst}) {
+    foreach my $key (sort { $button_fin_inst->{$a} cmp $button_fin_inst->{$b}} keys %{$button_fin_inst})   {
+#    foreach my $key(keys %{$button_fin_inst}) {
        	$i = $i + 1;
         if ($key eq $field_value) { 
             $sfx = ' checked ';
