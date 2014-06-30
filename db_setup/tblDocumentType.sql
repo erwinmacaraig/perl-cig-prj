@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS tblDocumentTypes;
-CREATE TABLE tblDocumentTypes (
+DROP TABLE IF EXISTS tblDocumentType;
+CREATE TABLE tblDocumentType (
     intDocumentTypeID INT NOT NULL AUTO_INCREMENT,
     intRealmID INT NOT NULL,
     strDocumentName VARCHAR(100) default '',
