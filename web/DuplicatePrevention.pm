@@ -11,35 +11,35 @@ use Utils;
 use TTTemplate;
 
 sub duplicate_prevention {
-	my ($Data, $new_member, $registering_as, $current_member_id) = @_; 
+	my ($Data, $new_person, $registering_as, $current_person_id) = @_; 
 
     return '' if '12' !~ /$Data->{'SystemConfig'}{'DuplicatePrevention'}/;
 
-    #$new_member contains the new member's details to be used for dup checking.
+    #$new_person contains the new person's details to be used for dup checking.
 
     $registering_as ||= [];
     return '' if !@$registering_as;
 
-    my @new_member_types = ();
+    my @new_person_types = ();
 
-    #$registering_as contains the types that the member is registering as or being added as/changed to.
+    #$registering_as contains the types that the person is registering as or being added as/changed to.
     #Because it can come from different sources, a bit of manipulation is done to each of the types.
-    foreach my $member_type (@$registering_as) {
-        $member_type =  lc($member_type);
-        $member_type =~ s/^yn//;
-        $member_type =~ s/^d_int//;
-        $member_type =~ s/^matchofficial/umpire/;
-        $member_type =  ucfirst($member_type);
+    foreach my $person_type (@$registering_as) {
+        $person_type =  lc($person_type);
+        $person_type =~ s/^yn//;
+        $person_type =~ s/^d_int//;
+        $person_type =~ s/^matchofficial/umpire/;
+        $person_type =  ucfirst($person_type);
 
-        my $config_name   = 'DuplicatePrevention_'.$member_type;
+        my $config_name   = 'DuplicatePrevention_'.$person_type;
         my $do_prevention = (exists $Data->{'SystemConfig'}{$config_name}) ? $Data->{'SystemConfig'}->{$config_name} : 1;
 
-        push @new_member_types, $member_type if $do_prevention;
+        push @new_person_types, $person_type if $do_prevention;
     }
 
-    return '' if !@new_member_types;
+    return '' if !@new_person_types;
 
-    # at this point @new_member_types will contain the types to be checked eg (Player Coach Umpire...Volunteer).
+    # at this point @new_person_types will contain the types to be checked eg (Player Coach Umpire...Volunteer).
 
     my @sub_realms = ($Data->{'RealmSubType'}); #at a minumum, check the current sub realm.
 
@@ -51,27 +51,27 @@ sub duplicate_prevention {
         push @sub_realms, split($delimiter, $other_sub_realms);
     }
 
-    my $by_member_type   = ($Data->{'SystemConfig'}{'DuplicatePrevention'} == 1) ? 1 : 0; #1 = by member type, 2 (really anything other than 0 or 1) = across all types.
-    my $across_all_types = !$by_member_type * 1;
+    my $by_person_type   = ($Data->{'SystemConfig'}{'DuplicatePrevention'} == 1) ? 1 : 0; #1 = by person type, 2 (really anything other than 0 or 1) = across all types.
+    my $across_all_types = !$by_person_type * 1;
 
-    my @member_types = ($by_member_type)
-        ? @new_member_types
+    my @person_types = ($by_person_type)
+        ? @new_person_types
         : qw(Player Coach Umpire Official Misc Volunteer);
 
     my $result_html = '';
 
     #only DuplicatePrevention_IgnorePending taken into account; AllowPendingRegistration (also on SystemConfig) is deliberately ignored.
-    my $matched_members = get_matched_members(
+    my $matched_persons = get_matched_persons(
         $Data->{'db'}, 
-        $new_member, 
-        \@member_types, 
+        $new_person, 
+        \@person_types, 
         $Data->{'Realm'}, 
         \@sub_realms, $Data->{'SystemConfig'}{'DuplicatePrevention_IgnorePending'},
-        $current_member_id
+        $current_person_id
     );
 
-    if (@$matched_members) {
-        my %template_data = (matched=>$matched_members);  #no need to set format arg. 
+    if (@$matched_persons) {
+        my %template_data = (matched=>$matched_persons);  #no need to set format arg. 
         my $template_file = 'primaryclub/matchedMembers.templ'; #makes minimal use of the template.
         $result_html = runTemplate($Data, \%template_data, $template_file);
     }
@@ -79,18 +79,18 @@ sub duplicate_prevention {
     return $result_html;
 }
 
-#check to see if the player has a member season record for any of the types within the subrealms.
-sub get_matched_members {
-    my ($dbh, $new_member, $member_types, $realm_id, $sub_realms, $ignore_pending, $current_member_id) = @_;
+#check to see if the player has a person season record for any of the types within the subrealms.
+sub get_matched_persons {
+    my ($dbh, $new_person, $person_types, $realm_id, $sub_realms, $ignore_pending, $current_person_id) = @_;
 
     $ignore_pending    ||= 0;
-    $current_member_id ||= 0; #should only be set if the member is currently in pending and being approved.
+    $current_person_id ||= 0; #should only be set if the person is currently in pending and being approved.
 
-    my $source = "tblMember_Seasons_$realm_id AS MS";
+    my $source = "tblPerson as M ";
 
-    $source .= ' INNER JOIN tblMember  AS M USING (intMemberID)';
-    $source .= ' INNER JOIN tblAssoc   AS A USING (intAssocID)';
-    $source .= ' INNER JOIN tblSeasons AS S USING (intSeasonID)';
+#    $source .= ' INNER JOIN tblMember  AS M USING (intPersonID)';
+#    $source .= ' INNER JOIN tblAssoc   AS A USING (intAssocID)';
+#    $source .= ' INNER JOIN tblSeasons AS S USING (intSeasonID)';
 
     my @fields = (
         'DISTINCT M.strFirstname', 
@@ -100,14 +100,12 @@ sub get_matched_members {
         'M.strPhoneMobile',
         'M.dtDOB', 
         'M.strNationalNum',
-        'A.strName AS AssocName',
-        'S.strSeasonName AS SeasonName',
     );
      
      my %tempHash = ();
  
-     foreach my $member_type (@$member_types) {
-         $tempHash{"MS.int$member_type".'Status'} = 1;
+     foreach my $person_type (@$person_types) {
+         $tempHash{"MS.int$person_type".'Status'} = 1;
      }
 
     #intPlayerPending will be 0 if not pending, 1 if pending, -1 if rejected.
@@ -120,15 +118,12 @@ sub get_matched_members {
     my @where = (
         -and => [
             {
-                'A.intRealmID'        => $realm_id,
-                'A.intAssocTypeID'    => {-in => [@{$sub_realms}]},
-                'M.strFirstname'      => $new_member->{'firstname'},
-                'M.strSurname'        => $new_member->{'surname'},
-                'M.dtDOB'             => $new_member->{'dob'},
-                'M.intMemberID'       => {'!=', $current_member_id},
-                'M.intStatus'         => {-in => [1, 2]}, #include members marked as possible dupes.
-                'MS.intMSRecStatus'   => {-in => [@ms_rec_status]},
-                'MS.intPlayerPending' => {-in => [@player_pending]},
+                'M.intRealmID'        => $realm_id,
+                'M.strLocalFirstname'      => $new_person->{'firstname'},
+                'M.strLocalSurname'        => $new_person->{'surname'},
+                'M.dtDOB'             => $new_person->{'dob'},
+                'M.intPersonID'       => {'!=', $current_person_id},
+                'M.intStatus'         => {-in => [1, 2]}, #include persons marked as possible dupes.
             },
             -nest => [
                 -or => [ %tempHash]
@@ -136,7 +131,7 @@ sub get_matched_members {
         ]
     );
 
-    my @order = ('AssocName', 'SeasonName');
+    my @order = ('strNationalNum'); #('AssocName', 'SeasonName');
 
     my ($sql, @bind_values) = getSelectSQL($source, \@fields, \@where, \@order);
 
@@ -144,9 +139,9 @@ sub get_matched_members {
 
     $q->execute(@bind_values);
 
-    my $matched_members = $q->fetchall_arrayref();
+    my $matched_persons = $q->fetchall_arrayref();
 
-    return $matched_members;
+    return $matched_persons;
 }
 
 1;
