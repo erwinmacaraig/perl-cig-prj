@@ -1992,7 +1992,7 @@ sub clearanceAddManual	{
                     firstoption => ['',$lang->txt('Select Priority')],
                  },
 				intClearAction=> {
-                    label => ($option eq 'add' and $Data->{'SystemConfig'}{'Clearances_ClearAction'}) ? $lang->txt('Transfer Action') : '',
+                    label => $lang->txt('Transfer Action'),
                     type  => 'lookup',
                     options => \%Defs::clearance_clearAction,
                     firstoption => ['',$lang->txt('Select Action')],

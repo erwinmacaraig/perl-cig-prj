@@ -121,7 +121,7 @@ LANDINGPAGE=>"Billing",
 	}
 	else	{
 		my $body .= displayPaymentResult($Data, $logID, 1);
-		$body .= qq[<br><p><a href="$Defs::base_url/main.cgi?client=$client&a=M_TXNLog_list&mode=p">Return to Membership System</a></p>] if ! $external;
+		$body .= qq[<br><p><a href="$Defs::base_url/main.cgi?client=$client&a=P_TXNLog_list&mode=p">Return to Membership System</a></p>] if ! $external;
 		return $body;
 	}
 	return '';
@@ -143,7 +143,7 @@ sub payPalUpdate	{
 
 	if ($temp_encryptedID ne $encryptedID)	{
 		my $body = qq[<p>There was an error with your payment</p>];
-		$body .= qq[<br><p><a href="$Defs::base_url/main.cgi?client=$client&a=M_TXNLog_list&mode=p">Return to Membership System</a></p>] if ! $external;
+		$body .= qq[<br><p><a href="$Defs::base_url/main.cgi?client=$client&a=P_TXNLog_list&mode=p">Return to Membership System</a></p>] if ! $external;
 		return $body;
 	}
 
@@ -182,7 +182,7 @@ print STDERR "LOGID: $logID PP1: $key | $val\n";
 	my $payerID = $returnvals{'PAYERID'};
 	if ($returnvals{'ACK'} !~ /Success/)	{	
 		my $body = qq[<p>There was an error with your payment</p>];
-		$body .= qq[<br><p><a href="$Defs::base_url/main.cgi?client=$client&a=M_TXNLog_list&mode=p">Return to Membership System</a></p>] if ! $external;
+		$body .= qq[<br><p><a href="$Defs::base_url/main.cgi?client=$client&a=P_TXNLog_list&mode=p">Return to Membership System</a></p>] if ! $external;
 		return $body;
 	}
 
@@ -278,7 +278,7 @@ print STDERR "PAYPAL CART DONE ABOUT TO EMAIL FOR $logID\n";
 			}
 	}
 	my $body = displayPaymentResult($Data, $logID, 1);
-	$body .= qq[<br><p><a href="$Defs::base_url/main.cgi?client=$client&a=M_TXNLog_list&mode=p">Return to Membership System</a></p>] if ! $external;
+	$body .= qq[<br><p><a href="$Defs::base_url/main.cgi?client=$client&a=P_TXNLog_list&mode=p">Return to Membership System</a></p>] if ! $external;
 	return $body;
 }
 

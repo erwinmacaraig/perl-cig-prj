@@ -297,7 +297,7 @@ sub getEntityMenuData {
             if($SystemConfig->{'AllowTXNs'}) {
                 $menuoptions{'products'} = {
                     name => $lang->txt('Products'),
-                    url => $baseurl."a=A_PR_",
+                    url => $baseurl."a=E_PR_",
                 };
             }
             if(isCheckDupl($Data)) {
@@ -525,7 +525,7 @@ sub getAssocMenuData {
             if($SystemConfig->{'AllowTXNs'}) {
                 $menuoptions{'products'} = {
                     name => $lang->txt('Products'),
-                    url => $baseurl."a=A_PR_",
+                    url => $baseurl."a=E_PR_",
                 };
             }   
             if (

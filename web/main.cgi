@@ -37,6 +37,7 @@ use PaymentSplitRun;
 use BankAccountSetup;
 use Seasons;
 use AgeGroups;
+use Products;
 
 use Notifications;
 use Venues;
@@ -237,6 +238,10 @@ warn("REALM IS ". $Data{'Realm'});
     elsif ( $action =~ /^NOTS/ ) {
         ( $resultHTML, $pageHeading ) =
           handleNotifications( $action, \%Data, $client, $typeID, $ID );
+    }
+    elsif ( $action =~ /_PR_/ ) {
+        ( $resultHTML, $pageHeading ) =
+          handle_products(\%Data, $action);
     }
 
     # BUILD PAGE

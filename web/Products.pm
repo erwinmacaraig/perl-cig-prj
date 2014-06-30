@@ -340,26 +340,6 @@ sub list_products	{
 	my $allowadds = 1;
 	my $addlink = qq[<a href="$target?client=$client&amp;a=A_PR_E">Add a New Product</a>];
 
-    my $regoformlink = qq[<a href="$target?client=$client&amp;a=A_ORF_r">Registration Forms Menu</a>];
-
-    if ($current_level > $Defs::LEVEL_ASSOC) {
-        if (!$Data->{'SystemConfig'}{"AllowOnlineRego_node"}) {
-            $regoformlink = '';
-        }
-    }
-    else {
-        my $assocObj = InstanceOf::getInstanceOf($Data, 'assoc', $Data->{'clientValues'}{'assocID'});
-        my $allowReg = $assocObj->getValue(['intAllowRegoForm']);
-        if ($allowReg and (
-                        $Data->{'SystemConfig'}{'AllowOnlineRego'}
-                        or $Data-> {'Permissions'}{'OtherOptions'}{'AllowOnlineRego'}
-                )
-                and !$Data->{'ReadOnlyLogin'})
-            {
-                $regoformlink = '';
-            }
-    }
-
 	my $addstr = $allowadds ? qq[If you wish to add a new product click the '$addlink' link.] : '';
 	$addlink = '' if !$allowadds;
     my $group_ddl = '';
@@ -398,7 +378,6 @@ sub list_products	{
 		<p>$addlink</p>
 	];
 	$body .= default_product($Data) if ($current_level == $Defs::LEVEL_ASSOC);
-    $body .= "<br><br><p>$regoformlink</p>";
 	return $body;
 }
 

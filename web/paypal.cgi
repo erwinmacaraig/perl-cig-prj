@@ -172,7 +172,7 @@ $Data{'clientValues'}{'assocID'} = $assocID if ($assocID and $assocID > 0);
 	elsif ($action eq 'C')	{
 		my $msg = qq[<div align="center" class="warningmsg" style="font-size:14px;">You cancelled the Transaction</div>];
 		my $body = displayPaymentResult(\%Data, $clientTransRefID, 1, $msg);
-		$body .= qq[<br><p><a href="$Defs::base_url/main.cgi?client=$client&a=M_TXNLog_list&mode=p">Return to Membership System</a></p>] if ! $external;
+		$body .= qq[<br><p><a href="$Defs::base_url/main.cgi?client=$client&a=P_TXNLog_list&mode=p">Return to Membership System</a></p>] if ! $external;
 		pageForm( 'Sportzware Membership', $body, $Data{'clientValues'}, q{}, \%Data);
 	}
 	elsif ($action eq 'S')	{

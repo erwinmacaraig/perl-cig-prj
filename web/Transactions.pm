@@ -91,8 +91,8 @@ sub displayTransaction	{
 	my $type2=param("ty2") || '';
 #($Data->{'Realm'},$Data->{'RealmSubType'})=getRealm($Data);
 
-	my $action = 'M_TXN_EDIT';
-	$action = 'T_TXN_EDIT' if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_TEAM;
+	my $action = 'P_TXN_EDIT';
+	$action = 'T_TXN_EDIT' if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB;
   my $resultHTML = '';
 	my $toplist='';
 
@@ -281,7 +281,7 @@ sub displayTransaction	{
 				],
 				addOKtext => qq[
 					<div class="OKmsg">Record updated successfully</div> <br>
-					<a href="$Data->{'target'}?client=$client&amp;a=M_TXN_LIST">Return to Transaction</a>
+					<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_LIST">Return to Transaction</a>
 				],
 			},
 			sections => [ ['main','Details'], ],
@@ -442,7 +442,7 @@ sub preTXNAddUpdate	{
 
 	my $error_text = qq[
 		<div class="warningmsg">You are only allowed to have one instance of the selected product</div>
-		<a href="$Data->{'target'}?client=$client&amp;a=M_TXN_LIST">Return to Transaction</a>
+		<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_LIST">Return to Transaction</a>
 	];
 	return (0,$error_text) if $intExistingTransactionID;
 	return (1,'');

@@ -28,7 +28,7 @@ require Payments;
 #require List;
 
 my $entityName       = 'Transaction';
-my $entityNameURL    = 'M_TXNLog';
+my $entityNameURL    = 'P_TXNLog';
 
 
 sub handleTransLogs {
@@ -78,14 +78,14 @@ sub handleTransLogs {
 	  if ($error)	{
 		  $body = qq[
 			  <div class="warningmsg">$error</div>
-	 		  <a href="$Data->{'target'}?client=$client&amp;a=M_TXNLog_payLIST">Return to Payment records</a>
+	 		  <a href="$Data->{'target'}?client=$client&amp;a=P_TXNLog_payLIST">Return to Payment records</a>
 		  ];	
 	  }
 	  else	{
 		  $body = qq[
 			  <div class="OKmsg">Record deleted successfully</div> <br>
 			  Payment record has been deleted and transactions rolled back to Unpaid.<br><br>
-	 		  <a href="$Data->{'target'}?client=$client&amp;a=M_TXNLog_payLIST">Return to Payment records</a>];	
+	 		  <a href="$Data->{'target'}?client=$client&amp;a=P_TXNLog_payLIST">Return to Payment records</a>];	
 	  }
 	  $header = qq[Delete Payment record];
   }
@@ -208,6 +208,21 @@ sub validateStep1 {
 	return ($success, $body);
 }
 
+sub fixDate  {
+  my($date)=@_;
+  return $date if $date!~/\//;
+  my ($day, $month, $year)=split /\//,$date;
+
+  if(defined $year and $year ne '' and defined $month and $month ne '' and defined $day and $day ne '') {
+    $month='0'.$month if length($month) ==1;
+    $day='0'.$day if length($day) ==1;
+    if($year > 20 and $year < 100)  {$year+=1900;}
+    elsif($year <=20) {$year+=2000;}
+    $date="$year-$month-$day";
+  }
+  else  { $date='';}
+  return $date;
+}
 
 sub step2 {
 
@@ -218,7 +233,8 @@ sub step2 {
 
 	my ($currencyID, $intAmount, $dtLog, $paymentType, $strBSB, $strAccountName, $strAccountNum, $strResponseCode, $strResponseText, $strComments, $strBank, $strReceiptRef) = ($Data->{params}{currencyID}, $Data->{params}{intAmount}, $Data->{params}{dtLog}, $Data->{params}{paymentType}, $Data->{params}{strBSB}, $Data->{params}{strAccountName}, $Data->{params}{strAccountNum}, $Data->{params}{strResponseCode}, $Data->{params}{strResponseCode}, $Data->{params}{strComments}, $Data->{params}{strBank}, $Data->{params}{strReceiptRef});
 
-	$dtLog=convertDateToYYYYMMDD($dtLog);
+	#$dtLog=convertDateToYYYYMMDD($dtLog);
+	$dtLog=fixDate($dtLog);
 	deQuote($db, (\$currencyID, \$intAmount, \$dtLog, \$paymentType, \$strBSB, \$strAccountName, \$strAccountNum, \$strResponseCode, \$strResponseText, \$strComments, \$strBank, \$strReceiptRef));
 
 
@@ -404,19 +420,19 @@ sub step2 {
 		     <p class="error">$warnings</p>
 		 ] if $warnings;
 
-	my ($link, $mode, $personID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('M_TXNLoglist', $Data, $clientValues_ref);
+	my ($link, $mode, $personID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('P_TXNLoglist', $Data, $clientValues_ref);
 
 
 	$body.=qq[	<br>
 			<form action="$Data->{'target'}" method="POST">
-				<input type="hidden" name="a" value="M_TXNLogstep3">
+				<input type="hidden" name="a" value="P_TXNLogstep3">
 				<input type="hidden" name="client" value="$client">
 				<input type="hidden" name="mode" value="$mode"><input type="hidden" name="personID" value="$personID"><input type="hidden" name="client" value="$client"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="transLogID" value="$transLogID">
 				<input type="submit" name="subbut" value=" Confirm Payment " class="HF_submit button proceed-button">
 			</form>
 			<div style="clear:both;"></div>
 			<form action="$Data->{'target'}" method="POST">
-				<input type="hidden" name="a" value="M_TXNLoglist">
+				<input type="hidden" name="a" value="P_TXNLoglist">
 				<input type="hidden" name="client" value="$client">
 				<input type="hidden" name="mode" value="$mode"><input type="hidden" name="personID" value="$personID"><input type="hidden" name="client" value="$client"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="dt_start_paid" value="$dtStart_paid"><input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
 				<input type="submit" name="subbut" value=" Cancel Payment " class="HF_submit button cancel-button">
@@ -474,7 +490,7 @@ EOS
 		<div class="OKmsg">Your payment has been Confirmed</div>
 		<br>
 		<br><a href="$receiptLink" target="receipt">Print Receipt</a><br>
-	<br><a href="$Data->{'target'}?client=$cl&amp;a=M_TXN_LIST">Return to Transactions</a><br>
+	<br><a href="$Data->{'target'}?client=$cl&amp;a=P_TXN_LIST">Return to Transactions</a><br>
 
 	], '');		
 }
@@ -606,9 +622,9 @@ my $query = $db->prepare($statement);
       }
       $row_data->{$header->{Field}} = $row->{$header->{Field}};
     }
-    $row_data->{SelectLink} = qq[main.cgi?client=$client&a=M_TXN_EDIT&personID=$row->{intID}&id=$row->{intTransLogID}&tID=$row->{intTransactionID}];
+    $row_data->{SelectLink} = qq[main.cgi?client=$client&a=P_TXN_EDIT&personID=$row->{intID}&id=$row->{intTransLogID}&tID=$row->{intTransactionID}];
     if ($row->{StatusText} eq 'Paid') {
-      $row_data->{stuff} = qq[<a href="main.cgi?a=M_TXNLog_payVIEW&client=$client&tlID=$row->{intTransLogID}">View Payment Record</a>];
+      $row_data->{stuff} = qq[<a href="main.cgi?a=P_TXNLog_payVIEW&client=$client&tlID=$row->{intTransLogID}">View Payment Record</a>];
       $row_data->{strReceipt} = qq[<a href="printreceipt.cgi?client=$client&ids=$row->{intTransLogID}"  target="receipt">View Receipt</a>];
       $row_data->{manual_payment} = '';
     }
@@ -620,7 +636,7 @@ my $query = $db->prepare($statement);
       $allowUD = 0 if $Data->{'SystemConfig'}{'DontAllowUnpaidDelete'}; 
 
       $row_data->{stuff} = ($allowUD) 
-          ? qq[<a href="main.cgi?a=M_TXN_DEL&client=$client&tID=$row->{intTransactionID}">Delete Transaction</a>]
+          ? qq[<a href="main.cgi?a=P_TXN_DEL&client=$client&tID=$row->{intTransactionID}">Delete Transaction</a>]
           : '';
       $row_data->{manual_payment} = qq[<input type="checkbox" name="act_$row->{intTransactionID}" value="" class = "paytxn_chk">];
     }
@@ -666,7 +682,7 @@ my $query = $db->prepare($statement);
 		</div>
   ];
   my $cl=setClient($Data->{'clientValues'}) || '';
-        my $payment_records_link=qq[<br><br><a href="$Data->{'target'}?client=$cl&amp;a=M_TXNLog_payLIST">].$Data->{'lang'}->txt('List All Payment Records')."</a>" ;
+        my $payment_records_link=qq[<br><br><a href="$Data->{'target'}?client=$cl&amp;a=P_TXNLog_payLIST">].$Data->{'lang'}->txt('List All Payment Records')."</a>" ;
   $payment_records_link = '' if ($hide_list_payments_link);
   $grid = $grid ? qq[$grid $payment_records_link]  : qq[<p class="error">No records were found with this filter</p>$payment_records_link]; 
 
@@ -802,7 +818,7 @@ sub listTransactions {
 
     my $line = '';
     my $addLink = qq[
-        <div class="changeoptions"><span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=M_TXN_ADD">Add Transaction</a></span></div>
+        <div class="changeoptions"><span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=P_TXN_ADD">Add Transaction</a></span></div>
     ];
     $addLink = '' if $Data->{'ReadOnlyLogin'};
 
@@ -886,7 +902,7 @@ sub listTransactions {
 		  
 		$body=qq[
 			<form action="$Data->{target}" name="n_form" method="POST">
-            <input type="hidden" name="a" value="M_TXNLogstep2">
+            <input type="hidden" name="a" value="P_TXNLogstep2">
             <input type="hidden" name="client" value="$client">
 	
 		$body
@@ -987,7 +1003,7 @@ sub listTransactions {
 		  $body = qq[
 			 <form action="$Data->{target}" name="n_form" method="POST">
         		 $body
-			<input type="hidden" name="a" value="M_TXNLogstep2">
+			<input type="hidden" name="a" value="P_TXNLogstep2">
             		 <input type="hidden" name="client" value="$client">
 			$CC_body
 			</form>];
@@ -1115,7 +1131,7 @@ my $currencySQL = qq[SELECT intCurrencyID, strCurrencyName from tblCurrencies WH
 	
         my $field= ($option=~/add/) ? () : (loadDetails($db, $id, $tempClientValues_ref) || ());
 
-	my (undef, $mode, $personID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('M_TXNLoglist', $Data, $tempClientValues_ref);
+	my (undef, $mode, $personID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('P_TXNLoglist', $Data, $tempClientValues_ref);
 	
 
 my %FieldDefinitions=(
@@ -1253,7 +1269,7 @@ my %FieldDefinitions=(
   $body.=qq[
 		<form action="$Data->{target}" method="POST">
 			<input type="submit" style="margin-left:120px" name="subbutcancel" value=" *Cancel Payment* " class="HF_submit" onclick="return confirm('This will remove this payment and set all linked transactions to unpaid. Continue?')">
-			<input type="hidden" name="a" value="M_TXNLogcancel">
+			<input type="hidden" name="a" value="P_TXNLogcancel">
 			<input type="hidden" name="client" value="$client">
 			<input type="hidden" name="id" value="$id">
 			<input type="hidden" name="dt_start_paid" value="$dtStart_paid">
@@ -1272,9 +1288,9 @@ sub afterUpdate {
 
 my (undef, undef, $id, $Data, $option, $tempClientValues_ref) = @_;
 
-	my ($linklist, $mode, $personID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('M_TXNLoglist', $Data, $tempClientValues_ref);
+	my ($linklist, $mode, $personID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('P_TXNLoglist', $Data, $tempClientValues_ref);
 	my $linkedit='';
-	($linkedit, $mode, $personID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('M_TXNLogedit', $Data, $tempClientValues_ref);
+	($linkedit, $mode, $personID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('P_TXNLogedit', $Data, $tempClientValues_ref);
 
 	my $body=qq[
                                <div class="OKmsg">Payment edited successfully</div><br><br>
@@ -1496,7 +1512,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 	
 	my $chgoptions='';
     
-	$chgoptions.= qq[<a href="$Data->{target}?a=M_TXNLog_DEL&amp;client=$client&amp;tlID=$TLref->{intLogID}" onclick="return confirm('This will remove this payment and set all linked transactions to unpaid. Continue?')"><img src="images/delete.png" border="0" alt="Delete Payment Record" title="Delete Payment Record"></a>] if (
+	$chgoptions.= qq[<a href="$Data->{target}?a=P_TXNLog_DEL&amp;client=$client&amp;tlID=$TLref->{intLogID}" onclick="return confirm('This will remove this payment and set all linked transactions to unpaid. Continue?')"><img src="images/delete.png" border="0" alt="Delete Payment Record" title="Delete Payment Record"></a>] if (
 		$Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC 
 		and $thisassoc 
 		and (
@@ -1701,7 +1717,7 @@ sub listTransLog	{
     $total += $dref->{intAmount};
 		$dref->{paymentType} =$Defs::paymentTypes{$dref->{intPaymentType}};
 		$dref->{intAmount} = qq[$dollarSymbol $dref->{intAmount}];
-		my $action = 'M_TXNLog_payVIEW';
+		my $action = 'P_TXNLog_payVIEW';
 		$action = 'T_TXNLog_payVIEW' if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_TEAM;
 		push @rowdata, {
 			id => $dref->{'intLogID'},
