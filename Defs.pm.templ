@@ -279,18 +279,6 @@ $TYPE_VENUE = 5;
     $TYPE_VENUE => 'Venue',
 );
 
-#Past Performance Lookups
-%PastPerformanceNames	= (
-	1 => 'Best Time',
-	2 => 'Best Distance',
-	3 => 'Best Height',
-	4 => 'Most Points',
-	5 => 'Best Weight',
-	6 => 'Placing at Last Games of this type',
-	7 => 'Best Score',
-	8 => 'Handicap',
-);
-
 %NationalityType	= (
 	1 => 'National',
 	2 => 'Indigene',
@@ -458,32 +446,6 @@ $TABLE_TYPE_MEMBERMODULE = 1;
 
 %tableTypeName = (
     $TABLE_TYPE_MEMBERMODULE => 'tblMemberModule',
-);
-
-$PAYMENT_NONE = 0;
-$PAYMENT_PERSONALCHEQUE = 2;
-$PAYMENT_CASH = 3;
-$PAYMENT_INTERNATIONALCHEQUE = 4;
-$PAYMENT_MONEYORDER = 5;
-$PAYMENT_BANKCHEQUE = 6;
-$PAYMENT_EFTPOSMASTERCARD = 7;
-$PAYMENT_EFTPOSVISA = 8;
-$PAYMENT_EFTPOSBANKCARD = 9;
-$PAYMENT_EFTPOSSAVINGS = 10;
-$PAYMENT_BARTER = 20;
-
-%paymentTypes = (
-        $PAYMENT_NONE => '[none]',
-        $PAYMENT_PERSONALCHEQUE => 'Personal Cheque',
-        $PAYMENT_CASH => 'Cash',
-        $PAYMENT_INTERNATIONALCHEQUE =>'International Cheque',
-        $PAYMENT_MONEYORDER => 'Money Order',
-        $PAYMENT_BANKCHEQUE => 'Bank Cheque',
-        $PAYMENT_EFTPOSMASTERCARD => 'Eftpos - Mastercard',
-        $PAYMENT_EFTPOSVISA => 'Eftpos - Visa',
-        $PAYMENT_EFTPOSBANKCARD => 'Eftpos - Bankcard',
-        $PAYMENT_EFTPOSSAVINGS => 'Eftpos - Savings',
-        $PAYMENT_BARTER => 'Other / Barter',
 );
 
 
@@ -808,23 +770,6 @@ $PS_REMAINDER_SPLIT = $PS_MAX_SPLITS + 1;
   2 => 'Bank Fees',
 );
 
-#
-### TRIBUNAL SUSPENSION TYPES
-%TribunalTypes=    (
-        'Matches'=>'Matches',
-        'Points'=>'Points',
-        'Weeks'=>'Weeks',
-        'Fine'=>'Fine',
-        'Months' => 'Months',
-        'Years' => 'Years',
-        'Life' => 'Life',
-);
-
-%TribunalAppeal = (
-  '1' => 'Upheld',
-  '2' => 'Overturned',
-);
-
 ### Venue Types
 %VenueTypes=    (
         1=>'Ground',
@@ -861,13 +806,6 @@ $PROCESSLOG_FAILED = 4;
 $MESSAGE_TYPE_EMAIL = 1; 
 $MESSAGE_TYPE_SMS = 2;
 
-%UmpirePayRates= (
-        1=> "Base Pay",
-        2=> "Double Pay Rate",
-        3=> "Triple Pay Rate",
-        4=> "Quad Pay Rate",
-);
-
 $PRODUCT_AGE_GROUPS = 1;
 $PRODUCT_MEMBER_TYPES = 2;
 
@@ -885,28 +823,6 @@ $MEMBER_NAME_FAMILY = 3;
                      $MEMBER_NAME_FAMILY_INITIAL => 'Family Name and Initial',
                      $MEMBER_NAME_FAMILY => 'Family Name Only',
                  );
-
-$COMP_ROUND_HOMEAWAY = 0;
-$COMP_ROUND_FINALS = 2;
-
-### RESULT TYPE:
-$RESULT_WON=1;
-$RESULT_LOST=2;
-$RESULT_DRAW=3;
-$RESULT_FORFEIT_AGAINST=4;
-$RESULT_FORFEIT_TO=5;
-
-%MatchResults = (
-    $RESULT_WON => 'Won',
-    $RESULT_LOST => 'Lost',
-    $RESULT_DRAW => 'Draw',
-    $RESULT_FORFEIT_AGAINST=> 'Giving Forfeit',
-    $RESULT_FORFEIT_TO=>'Receiving Forfeit',
-);
-%MatchStatus = (
-    0=> '',
-    1=> 'Results Entered',
-);
 
 $PRODUCTS_MINLEVEL_NATIONAL= 1;
 
@@ -1013,134 +929,10 @@ $RFCOPYTYPE_WITHIN_ASSOC = 3;
 $RFCOPYTYPE_TEMPLATE_TO_CLUB = 4;
 $RFCOPYTYPE_WITHIN_CLUB = 5;
 
-%MatchStatus= (
-    0=>'No Result Entered',
-    1=>'Results Entered',
-    2=>'Washed Out',
-);
-
-%MatchTeamResult = (
-    0=>'No Result Entered',
-    1=>'Won',
-    2=>'Lost',
-    3=>'Draw',
-    4=>'Walkover Given (Giving Forfeit)',
-    5=>'Walkover To (Receiving Forfeit)',
-    6=>'Washed Out',
-);
-
-%SWOL_LADDER_FIELDS_OVERIDE = (
-  3 => { GoalDiff => 'Points Difference' }
-);
-
-%SWOL_LADDER_FIELDS = (
-  Against => 'Against',
-  For => 'For',
-  ForfeitsReceived => 'Forfeits Received',
-  ForfeitsGiven => 'Forfeits Given',
-  Byes => ' Byes',
-  Drawn => ' Draws',
-  Lost => ' Lost',
-  Won => ' Won',
-  Played => 'Played',
-  Percentage => 'Percentage',
-  Points => 'Points',
-  GoalDiff => 'Goal Difference'
-);
-
-%SWOL_LADDER_FIELDS_ABBREV_OVERIDE = (
-  3 => { GoalDiff => 'PD' }
-);
-
-%SWOL_LADDER_FIELDS_ABBREV = (
-  Against => 'Agst',
-  For => 'For',
-  ForfeitsReceived => 'FF',
-  Byes => ' B',
-  Drawn => ' D',
-  Lost => ' L',
-  Won => ' W',
-  Played => 'P',
-  Percentage => '%',
-  Points => 'PTS',
-  GoalDiff => 'GD'
-);
-
-%CompFixtureType= (
-    1=>'Normal',
-    2=>'Knockout',
-    3=>'Round Robin',
-);
-
 $UPLOADFILETYPE_DOC = 1;
 $UPLOADFILETYPE_LOGO = 2;
 $UPLOADFILETYPE_PRODIMAGE = 3;
 $UPLOADFILETYPE_APPLICATION= 4;
-
-
-$STATS_PLAYERSEASON = 1;
-$STATS_PLAYERCAREER = 2;
-
-$FIXTURE_IMPORT_FILES_PATH = '';
-$FIXTURE_TYPE_POOLS = 2;
-%CompStageType = (
-                0=> "none",
-                1=> "Phase 1",
-                2=> "Intermediate",
-                3=> "Finals",
-);
-%CompPoolType = (
-                0=> "none",
-                1=> "Type 1",
-                2=> "Type 2",
-);
-
-$COMP_PROG_TYPE_POSITION = 1;
-$COMP_PROG_TYPE_PERCENT = 2;
-$COMP_PROG_TYPE_WINS= 3;
-%CompProgressionType= (
-                0=> "none",
-                $COMP_PROG_TYPE_POSITION=> "Position",
-                $COMP_PROG_TYPE_PERCENT=> "%",
-                $COMP_PROG_TYPE_WINS=> "Wins",
-);
-
-$PLAYER_MATCH_STATS = 1;
-$PLAYER_COMP_STATS = 2;
-$TEAM_MATCH_STATS = 3;
-$PLAYER_ROUND_STATS = 4;
-$PLAYER_CAREER_STATS = 9;
-
-$SPORT_HOCKEY = 1; #23
-$SPORT_CRICKET = 2; #3
-$SPORT_FOOTBALL = 3; #4
-$SPORT_LACROSSE = 4; #65
-$SPORT_SOCCER = 5; #13
-$SPORT_NETBALL = 6; #2
-$SPORT_BASKETBALL = 7; # 1
-$SPORT_LEAGUE = 8; #11
-$SPORT_TOUCH_FOOTBALL = 9; #5
-$SPORT_TEAM_POKER = 10;
-$SPORT_WATER_POLO = 11; #68
-$SPORT_UNION = 12;
-$SPORT_BASEBALL = 13;
-
-## Campaigns
-$CAMPAIGN_REBEL = 1;
-$CAMPAIGN_AMART= 2;
-$CAMPAIGN_SYS_REBEL = 3;
-$CAMPAIGN_SYS_AMART = 4;
-
-
-$TEAM_ENTRY_STATUS_PENDING = 1;
-$TEAM_ENTRY_STATUS_ACCEPTED = 2;
-$TEAM_ENTRY_STATUS_REJECTED = 3;
-
-%TeamEntryStatus = (
-                    $TEAM_ENTRY_STATUS_PENDING => 'Pending',
-                    $TEAM_ENTRY_STATUS_ACCEPTED => 'Accepted',
-                    $TEAM_ENTRY_STATUS_REJECTED => 'Rejected',
-                );
 
 ## LOGIN LEVEL
 $VENUE_LEVEL = -5;
@@ -1158,20 +950,7 @@ $CLUB_LEVEL = 3;
 $PROCESSLOG_COURTSIDE_STADIUM_SCORING = '';
 $GOVBODY_AUTH_TYPE = '';
 
-%matchCreditStatus=(
-  0=>'Available',
-  1=>'Used',
-  -1=>'Cancelled',
-);
-
-%matchCreditUsedFor=(
-  0=>'',
-  1=>'This Team',
-  2=>'Other Team',
-);
-
 $PROCESSLOG_FINALSELIGIBILITY = '';
-$COURTSIDE_LIVESTATS = '';
 
 $PRICING_TYPE_SINGLE = 0;
 $PRICING_TYPE_MULTI  = 1;
