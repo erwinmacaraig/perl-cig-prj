@@ -239,7 +239,7 @@ warn("REALM IS ". $Data{'Realm'});
         ( $resultHTML, $pageHeading ) =
           handleNotifications( $action, \%Data, $client, $typeID, $ID );
     }
-    elsif ( $action =~ /_PR_/ ) {
+    elsif ( $action =~ /^PR_/ ) {
         ( $resultHTML, $pageHeading ) =
           handle_products(\%Data, $action);
     }

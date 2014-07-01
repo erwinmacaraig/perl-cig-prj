@@ -294,12 +294,6 @@ sub getEntityMenuData {
                     url => $baseurl."a=AGEGRP_L",
                 };
             }
-            if($SystemConfig->{'AllowTXNs'}) {
-                $menuoptions{'products'} = {
-                    name => $lang->txt('Products'),
-                    url => $baseurl."a=E_PR_",
-                };
-            }
             if(isCheckDupl($Data)) {
                 $menuoptions{'duplicates'} = {
                     name => $lang->txt('Duplicate Resolution'),
@@ -310,6 +304,10 @@ sub getEntityMenuData {
 
         }
     }
+                $menuoptions{'products'} = {
+                    name => $lang->txt('Products'),
+                    url => $baseurl."a=PR_",
+                };
 
     # for Entity menu
 
@@ -328,15 +326,16 @@ sub getEntityMenuData {
         [ $lang->txt('Clubs'), 'menu','clubs'],
         [ $lang->txt('Venues'), 'menu','venues'],
         [ $lang->txt('People'), 'menu','persons'],
-        [ $lang->txt($txt_Clr.'s'), 'menu', [
+        [ $lang->txt('Transfers'), 'menu', [
         'clearances',    
         'clearancesAll',
         ]],
         [ $lang->txt('Registrations'), 'menu',[
+        'products',
+        'products',
         'bankdetails',
         'bankfileexport',
         'paymentsplitrun',
-        'products',
         'registrationforms', #nationalrego. enable regoforms at entity level.
         ]],
         [ $lang->txt('Reports'), 'menu',[
@@ -525,7 +524,7 @@ sub getAssocMenuData {
             if($SystemConfig->{'AllowTXNs'}) {
                 $menuoptions{'products'} = {
                     name => $lang->txt('Products'),
-                    url => $baseurl."a=E_PR_",
+                    url => $baseurl."a=PR_",
                 };
             }   
             if (
@@ -763,7 +762,7 @@ sub getClubMenuData {
             ) {
                 $menuoptions{'products'} = {
                     name => $lang->txt('Products'),
-                    url => $baseurl."a=A_PR_",
+                    url => $baseurl."a=PR_",
                 };
             }   
             if (

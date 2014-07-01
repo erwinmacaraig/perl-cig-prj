@@ -11,7 +11,7 @@ require Exporter;
 use strict;
 use MD5;
 use CGI qw(param);
-use Products qw(getDefaultRegoProduct product_apply_transaction);
+use Products qw(product_apply_transaction);
 use Payments;
 
 use HTTP::Request::Common qw(POST);

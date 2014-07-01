@@ -6,8 +6,8 @@ package Products;
 
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(getProducts handle_products getDefaultRegoProduct get_product get_product_list product_apply_transaction getProductDependencies getFormProductAttributes updateProductTXNPricing checkProductClubSplit );
-@EXPORT_OK = qw(getProducts handle_products getDefaultRegoProduct get_product get_product_list product_apply_transaction getProductDependencies getFormProductAttributes updateProductTXNPricing checkProductClubSplit );
+@EXPORT = qw(getProducts handle_products get_product get_product_list product_apply_transaction getProductDependencies getFormProductAttributes updateProductTXNPricing checkProductClubSplit );
+@EXPORT_OK = qw(getProducts handle_products get_product get_product_list product_apply_transaction getProductDependencies getFormProductAttributes updateProductTXNPricing checkProductClubSplit );
 
 use strict;
 use lib  '.', '..';#, "..", ".";
@@ -61,8 +61,8 @@ sub getProducts	{
 	$allowInactive ||= 0;
 
 	my $realmID=$Data->{'Realm'} || 0;
-	my $assocID=$Data->{'clientValues'}{'assocID'} || $Defs::INVALID_ID;
-
+    my $entityTypeID = $Data->{'clientValues'}{'currentLevel'};
+    my $entityID = getID($Data->{'clientValues'}, $entityTypeID);
 	my $authLevel = $Data->{'clientValues'}{'authLevel'}||=$Defs::INVALID_ID;
 	my $clubID=$Data->{'clientValues'}{'clubID'} || $Defs::INVALID_ID;
 	$clubID ||= 0;
@@ -79,7 +79,7 @@ sub getProducts	{
 		SELECT intProductID, strName, strGroup
 		FROM tblProducts
 		WHERE intRealmID=$realmID	
-			AND (intAssocID = $assocID or intAssocID=0)
+			AND (intEntityID IN ($entityID, 0)
 			AND intProductType NOT IN ($Defs::PROD_TYPE_MINFEE)
             AND intProductSubRealmID IN (0, $Data->{'RealmSubType'})
 			$inactive
@@ -105,21 +105,15 @@ sub handle_products {
 	my $title = "Products";
 	my $breadcrumbs = '';
 	
-	if($action eq 'A_PR_U')	{
+	if($action eq 'PR_U')	{
 		($body, $id) =update_products($Data, $id);
-		$action = 'A_PR_E' if $id;
+		$action = 'PR_E' if $id;
 	}
-	elsif($action eq 'A_PR_DU')	{
-		$id=param('defproduct') || 0;
-		my $id_team=param('defteamproduct') || 0;
-		$body=update_defaultproduct($Data, $id, $id_team);
-		$action = 'A_PR_L';
-	}
-	elsif($action eq 'A_PR_C')	{
+	elsif($action eq 'PR_C')	{
 		($body, $title) = copy_product($Data, $id);
-		$action = 'A_PR_L';
+		$action = 'PR_L';
 	}
-	if($action eq 'A_PR_E')	{
+	if($action eq 'PR_E')	{
 		my $tbody = '';
 		($tbody, $title, $breadcrumbs)=detail_products($Data,$id);
 		$body .= $tbody;
@@ -140,8 +134,8 @@ sub list_products	{
     
     my $current_level = $Data->{'clientValues'}{'currentLevel'};
     
-	my $assocID = $Data->{'clientValues'}{'assocID'} || $Defs::INVALID_ID;
-	my $intID = getID($Data->{'clientValues'}, $current_level) || 0;
+    my $entityTypeID = $Data->{'clientValues'}{'currentLevel'};
+    my $entityID = getID($Data->{'clientValues'}, $entityTypeID);
 
     my $output = new CGI;
     my $view_products_status = $output->cookie("SWOMPRODREC") || '';
@@ -166,7 +160,7 @@ sub list_products	{
 		SELECT  
 			P.intProductID, 
 			P.strName, 
-			P.intAssocID, 
+			P.intEntityID, 
 			P.curDefaultAmount, 
 			P.intMinChangeLevel, 
 			P.intMinSellLevel, 
@@ -186,17 +180,14 @@ sub list_products	{
 			P.intInactive, 
 			IF((P.intCreatedLevel = $Defs::LEVEL_CLUB), 
 				CONCAT(C.strName, ' (CLUB)'), 
-				IF((P.intCreatedLevel = $Defs::LEVEL_ASSOC), 
-					'Association', 
-					IF(P.intAssocID=0, 'National','')
-				)
+					IF(P.intEntityID=0, 'National','')
 			) as CreatedName
 		FROM 
 			tblProducts as P 
 			LEFT JOIN tblProductPricing as PP 
 				ON (
 					PP.intProductID = P.intProductID 
-						AND intID = $intID 
+						AND intID = $entityID 
 						AND intLevel = $current_level 
 						AND PP.intRealmID = $realmID
 				)
@@ -205,27 +196,21 @@ sub list_products	{
 		WHERE 
 			P.intRealmID= $realmID
 			AND P.intProductType NOT IN ($Defs::PROD_TYPE_MINFEE)
-			AND (P.intAssocID = $assocID OR P.intAssocID=0)
+			AND P.intEntityID IN (0, $entityID)
             AND P.intProductSubRealmID IN (0, $Data->{'RealmSubType'})
-	];
-		
-	if ($current_level != $Defs::LEVEL_ASSOC){
-	   $st .=qq[
-                AND ((P.intCreatedLevel = 0) 
-            OR (
-              P.intCreatedLevel = $current_level 
-              AND P.intCreatedID = $intID) 
-              OR (P.intCreatedLevel > $current_level
+            AND (
+                (P.intCreatedLevel = 0) 
+                OR (
+                    P.intCreatedLevel = $current_level 
+                    AND P.intCreatedID = $entityID
+                ) 
+                OR P.intCreatedLevel > $current_level
             )
-          )
-        ]; 
-	}
-
-	$st .= qq[
-		ORDER BY 
-			P.strGroup, 
-			P.strName
+		    ORDER BY 
+			    P.strGroup, 
+			    P.strName
 	];
+warn($st);
   my $query = $Data->{'db'}->prepare($st);
   $query->execute();
 	my $body = '';
@@ -234,25 +219,17 @@ sub list_products	{
   my %GroupNames = ();
 	my @rowdata=();
 	while (my $dref = $query->fetchrow_hashref())	{
-        #if ($view_products_status == 1) {
-        #  next if $dref->{'intInactive'} != 1;
-        #}
-        #elsif ($view_products_status == 0) {
-        #  next if $dref->{'intInactive'} != 0;
-        #}
         $GroupNames{$dref->{'strGroup'}} += 1;
-        #next if ($current_group and $dref->{'strGroup'} ne $current_group);
-		#my $link = qq[<a href="$target?client=$client&amp;lki=$dref->{'intProductID'}&amp;a=A_PR_E">Edit</a>];
-		my $link = qq[$target?client=$client&amp;lki=$dref->{'intProductID'}&amp;a=A_PR_E];
+		my $link = qq[$target?client=$client&amp;lki=$dref->{'intProductID'}&amp;a=PR_E];
 		$link = '' if $Data->{'ReadOnlyLogin'};
 		
-        if ($current_level != $dref->{'intCreatedLevel'} or $dref->{'intCreatedID'} != $intID) {
+        if ($current_level != $dref->{'intCreatedLevel'} or $dref->{'intCreatedID'} != $entityID) {
             $link = 'Locked' if $dref->{intMinChangeLevel} > $current_level;
             $link = 'Locked' if $dref->{intMinSellLevel} > $current_level;
         }
         my $copy_link = 'Not created at this level';
         if ($current_level == $dref->{'intCreatedLevel'}) { 
-            $copy_link = qq[<a href="$target?client=$client&amp;lki=$dref->{'intProductID'}&amp;a=A_PR_C" onclick="return confirm('Are you sure you want to make a copy of product &quot;$dref->{strName}&quot;?');">Copy</a>];
+            $copy_link = qq[<a href="$target?client=$client&amp;lki=$dref->{'intProductID'}&amp;a=PR_C" onclick="return confirm('Are you sure you want to make a copy of product &quot;$dref->{strName}&quot;?');">Copy</a>];
         }
 		my $active = ! $dref->{intInactive} || 0;
 		my $shade=$i%2==0? 'class="rowshade" ' : '';
@@ -338,9 +315,9 @@ sub list_products	{
   ];
 
 	my $allowadds = 1;
-	my $addlink = qq[<a href="$target?client=$client&amp;a=A_PR_E">Add a New Product</a>];
+	my $addlink = qq[<a href="$target?client=$client&amp;a=PR_E">Add a New Product</a>];
+	my $addlink = qq[<span class = "button-small generic-button"><a href="$target?client=$client&amp;a=PR_E">Add</a></span></a>];
 
-	my $addstr = $allowadds ? qq[If you wish to add a new product click the '$addlink' link.] : '';
 	$addlink = '' if !$allowadds;
     my $group_ddl = '';
     foreach my $group (sort (keys %GroupNames)) {
@@ -369,7 +346,7 @@ sub list_products	{
         </div>
   ];
 	$body = qq[
-		<p>Choose a value from the list below to edit. Some options may be locked by your national/international body and cannot be edited. $addstr</p>
+		<p>Choose a value from the list below to edit. Some options may be locked by your national/international body and cannot be edited. $addlink</p>
     $list_instruction
 		<div class = "grid-filter-wrap">
 			$line
@@ -377,7 +354,6 @@ sub list_products	{
 		</div>
 		<p>$addlink</p>
 	];
-	$body .= default_product($Data) if ($current_level == $Defs::LEVEL_ASSOC);
 	return $body;
 }
 
@@ -391,11 +367,11 @@ sub detail_products  {
     my $current_level = $Data->{'clientValues'}{'currentLevel'};
     my $original_level = $current_level;
     
-    my $assocID   = $Data->{'clientValues'}{'assocID'} || $Defs::INVALID_ID;
 	my $authLevel = $Data->{'clientValues'}{'authLevel'};
 
-    my $intID=getID($Data->{'clientValues'}) || 0;
-		my $l = $Data->{'lang'};
+    my $entityTypeID = $Data->{'clientValues'}{'currentLevel'};
+    my $entityID = getID($Data->{'clientValues'}, $entityTypeID);
+	my $l = $Data->{'lang'};
 
     my $dref = get_product($Data,$id);
 	my $name=$dref->{'strName'} || '';
@@ -406,15 +382,15 @@ sub detail_products  {
     #$body = qq[<p>Enter the name of the product in the box provided and its default cost, then press the Update button.</p>
 		my $fulledit = (
 			$id == 0 
-			or ($current_level == $dref->{intCreatedLevel} and $dref->{'intCreatedID'} == $intID) 
-			or ($current_level == $Defs::LEVEL_NATIONAL and $dref->{intAssocID} == 0)
+			or ($current_level == $dref->{intCreatedLevel} and $dref->{'intCreatedID'} == $entityID) 
+			or ($current_level == $Defs::LEVEL_NATIONAL)
 		) ? 1 : 0;
 
 	my $hasSplits=0;
-	if ($dref->{intAssocID} or $id == 0) {
+	if ($dref->{intEntityID} or $id == 0) {
 		my $paymentSplitSettings = PaymentSplitUtils::getPaymentSplitSettings($Data);
         if ($paymentSplitSettings->{'psProds'}) {
-            my $paymentSplits = PaymentSplitObj->getList($assocID, $Defs::LEVEL_ASSOC, $Data->{'db'});
+            my $paymentSplits = PaymentSplitObj->getList($entityID, $entityID, $Data->{'db'});
             for my $paymentSplit(@{$paymentSplits}) {
 				$hasSplits++;
             }
@@ -438,7 +414,7 @@ sub detail_products  {
 
     my $links_list = '';
 
-    if ($current_level != $dref->{intCreatedLevel} and $intID != $dref->{'intCreatedID'} and $dref->{intProductID}) {
+    if ($current_level != $dref->{intCreatedLevel} and $entityID!= $dref->{'intCreatedID'} and $dref->{intProductID}) {
         $body .= qq[<p><b>You do not have permission to modify all the information relating to this product.</b></p>];
     }
     else {
@@ -524,10 +500,7 @@ my $warning_note = $Data->{'SystemConfig'}{'ProductEditNote'} || '';
 	$selected = ($dref->{intMinChangeLevel} == $Defs::LEVEL_CLUB) ? "SELECTED" : '';
 	$minChangeLevel .= qq[ <option value="$Defs::LEVEL_CLUB" $selected>$Data->{'LevelNames'}{$Defs::LEVEL_CLUB}</option>];
 
-	$selected = ($dref->{intMinChangeLevel} == $Defs::LEVEL_ASSOC) ? "SELECTED" : '';
-	$minChangeLevel .= qq[ <option value="$Defs::LEVEL_ASSOC" $selected>$Data->{'LevelNames'}{$Defs::LEVEL_ASSOC}</option>];
-
-	if ($dref->{intAssocID} == 0)	{
+	if ($dref->{intEntityID} == 0)	{
 		$selected = ($dref->{intMinChangeLevel} == $Defs::LEVEL_NATIONAL) ? "SELECTED" : '';
 		$minChangeLevel .= qq[ <option value="$Defs::LEVEL_NATIONAL" $selected>$Data->{'LevelNames'}{$Defs::LEVEL_NATIONAL}</option>];
 	}
@@ -803,13 +776,13 @@ my $warning_note = $Data->{'SystemConfig'}{'ProductEditNote'} || '';
 
     my $splitRow   = '';
     my %splits     = ();
-    if ( $dref->{intAssocID}>-1 or $id == 0) {
+    if ( $dref->{intEntityID}>-1 or $id == 0) {
 		my $hasSplits=0;
         my $paymentSplitSettings = PaymentSplitUtils::getPaymentSplitSettings($Data);
         if ($paymentSplitSettings->{'psProds'}) {
             my $splitID   = '';
             my $splitName = '';
-            my $paymentSplits = PaymentSplitObj->getList($assocID, $Defs::LEVEL_ASSOC, $Data->{'db'});
+            my $paymentSplits = PaymentSplitObj->getList($entityID, $entityTypeID, $Data->{'db'});
              $paymentSplits = PaymentSplitObj->getList(getID($Data->{'clientValues'}), $current_level, $Data->{'db'}) if($current_level>$Defs::LEVEL_ASSOC);
 	 for my $paymentSplit(@{$paymentSplits}) {
                 $splitName = $paymentSplit->{'strSplitName'};
@@ -866,7 +839,7 @@ my $warning_note = $Data->{'SystemConfig'}{'ProductEditNote'} || '';
     if(
 			$id == 0 
 			or ($current_level == $dref->{intCreatedLevel} 
-						and $dref->{'intCreatedID'} == $intID
+						and $dref->{'intCreatedID'} == $entityID
 				 )
 		)  {
 
@@ -993,27 +966,6 @@ my $warning_note = $Data->{'SystemConfig'}{'ProductEditNote'} || '';
 				];
 
         
-				if($assocID > 0 and $prodlevel == $Defs::LEVEL_ASSOC)	{
-					$body .= qq[
-						<tr><td class="settings-group-name" colspan="2"><br>Non-Season Based (Over all seasons)</td></tr>
-						<tr>
-							<td width="35%" class="label"><label for="setMemberActive">Set $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} Active in $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC}:</label></td>
-							<td class="data"><input type="checkbox" name="setMemberActive" value="1" $checkedActive /></td>
-						</tr>
-						<tr>
-							<td class="label"><label for="setMemberFinancial">Set $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} Financial Status:</label></td>
-							<td class="data"><input type="checkbox" name="setMemberFinancial" value="1" $checkedFinancial /></td>
-						</tr>
-						<tr>
-							<td width="35%" class="label"><label for="setMemberActive">Set Membership Package to: </label></td>
-							<td class="data">$mp_select</td>
-						</tr>
-						<tr>
-							<th class="label">Set Member Registered Until:</th>
-							<td class="data">to $regexpiry <span class="HTdateformat">(dd-mon-yyyy)</span><br><b>or</b><br>for <input type="textbox" size="2" value="$dref->{intMemberExpiryDays}" name="d_registrationExpiry_days"/> (days from registration date) </td>
-						</tr>
-					];
-				}
 				my $ProductMemberTypes = getProductAttributes($Defs::PRODUCT_MEMBER_TYPES,$Data,$id);
         my $ProductAgeGroups = getProductAttributes($Defs::PRODUCT_AGE_GROUPS,$Data,$id);
         my $ProductDOB_Min = getProductAttributes($Defs::PRODUCT_DOB_MIN,$Data,$id);
@@ -1175,7 +1127,7 @@ Older end of Date Range (eg 01 - Jan - 1970)</td>
 					my $st = qq[
 							SELECT intRegoFormID, strRegoFormName
 							FROM   tblRegoForm
-							WHERE  intAssocID = $assocID
+							WHERE  intEntityID = $entityID
 									AND intClubID = $clubID
 									AND intStatus <> -1
 					];
@@ -1218,17 +1170,17 @@ $body .= qq[
 
 $body .= qq[
             <input type="submit" value=" Update " /> <br><br>
-                <input type="hidden" name="a" value="A_PR_U">
+                <input type="hidden" name="a" value="PR_U">
                 <input type="hidden" name="client" value="$unesc_cl">
                 <input type="hidden" name="lki" value="$id">
                 </form>
-               <p><a href="$Data->{target}?client=$cl&amp;a=A_PR_L&amp;">Click here</a> to return to product list.</p>
+               <p><a href="$Data->{target}?client=$cl&amp;a=PR_L&amp;">Click here</a> to return to product list.</p>
                 ];
 		my $breadcrumbs = HTML_breadcrumbs(
 				[
             'Products',
             'main.cgi',
-            { client => $unesc_cl, a => 'A_PR_L'},
+            { client => $unesc_cl, a => 'PR_L'},
         ],
         [ $dref->{'strName'}],
     );
@@ -1380,9 +1332,9 @@ sub checkSplitValue {
     $prodCost = sprintf("%.2f", $prodCost); # round to 2 dp
 
     my ($splitValue, $fees_total) = getSplitValue($Data, $splitID, $prodCost);
+    my $entityTypeID = $Data->{'currentLevel'};
+    my $entityID = getID($Data->{'clientValues'}, $entityTypeID);
     
-		my $entityID = $Data->{'clientValues'}{'assocID'} || 0;
-		my $entityTypeID = 5;
 		if ($Data->{'clientValues'}{'clubID'} and $Data->{'clientValues'}{'clubID'} != $Defs::INVALID_ID)	{
 			$entityID = $Data->{'clientValues'}{'clubID'} || 0;
 			$entityTypeID = 3;
@@ -1413,8 +1365,11 @@ sub update_products	{
     my $current_level = $Data->{'clientValues'}{'currentLevel'};
     my $original_level = $current_level;
     
-	my $assocID=$Data->{'clientValues'}{'assocID'} || $Defs::INVALID_ID;
-	$assocID = 0 if $assocID == $Defs::INVALID_ID;
+	my $entityID=$Data->{'clientValues'}{'clubID'} || $Defs::INVALID_ID;
+	$entityID = 0 if $entityID == $Defs::INVALID_ID;
+
+    my $entityTypeID = $Data->{'currentLevel'};
+    my $entityID = getID($Data->{'clientValues'}, $entityTypeID);
 
 	my $name=param('name') || '';
 	return ('<div class="warningmsg">Unable to Add Product. You must have a name for the Product</div>',0) if ! $name;
@@ -1524,7 +1479,6 @@ EOS
 	}
     
 	my $st='';
-	my $intID = getID($Data->{'clientValues'}) || 0;
 	my $dbErrMsg =  '<div class="warningmsg">There was a problem adding or updating the product</div>';
 
 	my $prod_avail_from_date = getExpiryDt('d_from_date',1,'-');
@@ -1561,14 +1515,14 @@ EOS
 		$query->execute(
 			$id,
 			$realmID,
-			$intID,
+			$entityID,
 			$current_level,
 		);	
 
 
 		if (
 			$current_level != $intCreatedLevel 
-			and $intID != $intCreatedID 
+			and $entityID!= $intCreatedID 
 			and $current_level != $Defs::LEVEL_NATIONAL)  {
 		}
 		else  {
@@ -1605,7 +1559,7 @@ EOS
 					dtDateAvailableTo = ?,
 
 				WHERE intRealmID= ?
-					AND intAssocID = ?
+					AND intEntityID= ?
 					AND intProductID = ?
 			];
 			$query = $Data->{'db'}->prepare($st);
@@ -1639,7 +1593,7 @@ EOS
 				$prod_avail_from_date,
 				$prod_avail_to_date,
 				$realmID,
-				$assocID,
+				$entityID,
 				$id,
 			);
 			
@@ -1649,7 +1603,7 @@ EOS
 			    updateProductRangePricing($Data->{'db'}, $id, $curAmountMin, $curAmountMax);    
             };
 		}
-		updateProductTXNPricing($Data->{'db'}, $assocID, $id, $amount) if ($current_level == $Defs::LEVEL_ASSOC);
+		updateProductTXNPricing($Data->{'db'}, $entityID, $id, $amount) if ($current_level == $Defs::LEVEL_ASSOC);
 		_update_product_dependencies($Data,$id);
 
 		my %attributes_to_update = (
@@ -1678,13 +1632,13 @@ EOS
 		);
 	}
 	else  {
-		if ($assocID == -1)	{
-			$assocID = 0;
+		if ($entityID== -1)	{
+			$entityID= 0;
 		}
 
 		$st=qq[
 			INSERT INTO tblProducts (
-				intAssocID,
+				intEntityID,
 				intMinSellLevel,
 				intRealmID,
 				strName,
@@ -1755,13 +1709,13 @@ EOS
 		my $query = $Data->{'db'}->prepare($st);
 
 		$query->execute(
-			$assocID,
+			$entityID,
 			$minSellLevel,
 			$realmID,
 			$name,
 			$amount,
 			$current_level,
-			$intID,
+			$entityID,
 			$notes,
 			$group,
 			$mandatoryProductID,
@@ -1866,7 +1820,7 @@ EOS
 		$amount, 
 		$id, 
 		$realmID, 
-		$intID, 
+		$entityID, 
 		$current_level,
 		$intPricingType,
 		$curAmount_Adult1,
@@ -1888,7 +1842,7 @@ EOS
 			$st = qq[
 					UPDATE tblProducts
 					SET intPaymentSplitID=$splitID
-					WHERE intRealmID=$realmID AND intAssocID=$assocID AND intProductID=$id
+					WHERE intRealmID=$realmID AND intEntityID = $entityID AND intProductID=$id
 			];
 			$Data->{'db'}->do($st);
 			$dberr++ if $DBI::err;
@@ -1909,6 +1863,8 @@ sub _update_product_dependencies {
 
   my $realmID=$Data->{'Realm'} || 0;
   my $intLevel = $Data->{'clientValues'}{'currentLevel'};
+my $entityTypeID = $Data->{'currentLevel'};
+    my $entityID = getID($Data->{'clientValues'}, $entityTypeID);
   my $intID = getID($Data->{'clientValues'}) || 0;
 
   # Remove previously selected dependent products;
@@ -1916,8 +1872,8 @@ sub _update_product_dependencies {
            DELETE FROM tblProductDependencies
            WHERE intProductID = $id
            AND intRealmID = $realmID
-           AND intID = $intID
-           AND intLevel = $intLevel
+           AND intID = $entityID
+           AND intLevel = $entityTypeID
            ];
   $Data->{'db'}->do($query);
 
@@ -1928,8 +1884,8 @@ sub _insert_product_dependencies {
   my ($Data,$id)= @_;
 
   my $realmID=$Data->{'Realm'} || 0;
-   my $intLevel = $Data->{'clientValues'}{'currentLevel'};
-  my $intID = getID($Data->{'clientValues'}) || 0;
+my $entityTypeID = $Data->{'currentLevel'};
+    my $entityID = getID($Data->{'clientValues'}, $entityTypeID);
 
   # Now insert the selected mandatory products into tblProductsDependencies.
   if (!scalar(param('intDependentProductIDs'))) {
@@ -1938,7 +1894,7 @@ sub _insert_product_dependencies {
   else {
     my $query = qq[
              INSERT INTO tblProductDependencies(intProductID,intDependentProductID,intRealmID,intID,intLevel)
-             VALUES($id,?,$realmID,$intID,$intLevel)
+             VALUES($id,?,$realmID,$entityID, $entityTypeID)
              ];
     my $sth = $Data->{'db'}->prepare($query);
     foreach my $mID(param('intDependentProductIDs')) {
@@ -1953,16 +1909,16 @@ sub _update_product_attributes {
   my ($Data,$productID,$attributesValues) = @_;
 
    my $realmID=$Data->{'Realm'} || 0;
-   my $intLevel = $Data->{'clientValues'}{'currentLevel'};
-  my $intID = getID($Data->{'clientValues'}) || 0;
+    my $entityTypeID = $Data->{'currentLevel'};
+    my $entityID = getID($Data->{'clientValues'}, $entityTypeID);
 
   # Remove previously selected product attributes for this type.
   my $query = qq[
            DELETE FROM tblProductAttributes
            WHERE intProductID = $productID
            AND intRealmID = $realmID
-           AND intID = $intID
-           AND intLevel = $intLevel
+           AND intID = $entityID
+           AND intLevel = $entityTypeID
            AND intAttributeType = ?
             ];
   my $sth = $Data->{'db'}->prepare($query);
@@ -1976,13 +1932,13 @@ sub _update_product_attributes {
 sub _insert_product_attributes {
   my ($Data,$productID,$attributesValues) = @_;
   my $realmID=$Data->{'Realm'} || 0;
-  my $intLevel = $Data->{'clientValues'}{'currentLevel'};
-    my $intID = getID($Data->{'clientValues'}) || 0;
+my $entityTypeID = $Data->{'currentLevel'};
+    my $entityID = getID($Data->{'clientValues'}, $entityTypeID);
 
   my $query = qq[
            INSERT INTO tblProductAttributes
            (intProductID,intAttributeType,strAttributeValue,intRealmID,intID,intLevel)
-           VALUES($productID,?,?,$realmID,$intID,$intLevel)
+           VALUES($productID,?,?,$realmID,$entityID, $entityTypeID)
            ];
 
   my $sth = $Data->{'db'}->prepare($query);
@@ -1990,115 +1946,11 @@ sub _insert_product_attributes {
   TYPE: foreach my $type(keys %{$attributesValues}) {
     VALUE: for my $value(@{$attributesValues->{$type}}) {
         next VALUE if (($type == $Defs::PRODUCT_DOB_MIN or $type == $Defs::PRODUCT_DOB_MAX or $type == $Defs::PRODUCT_AGE_MIN or $type == $Defs::PRODUCT_AGE_MAX) and ($value eq 'NULL'));
-        next VALUE if (($type == $Defs::PRODUCT_PROGRAM_NEW or $type == $Defs::PRODUCT_PROGRAM_RETURNING) and (!$value));
+        next VALUE if (($type == $Defs::PRODUCTOGRAM_NEW or $type == $Defs::PRODUCT_PROGRAM_RETURNING) and (!$value));
       $sth->execute($type, $value); 
     }
   }
   return;
-}
-
-sub default_product	{
-	#Display the default Rego Product
-	my($Data)=@_;
-	my $realmID=$Data->{'Realm'} || 0;
-  my $assocID=$Data->{'clientValues'}{'assocID'} || $Defs::INVALID_ID;
-	my $Products=getProducts($Data, 1);
-  my $cl  = setClient($Data->{'clientValues'});
-	my $defaultProductID= getDefaultRegoProduct($Data->{'db'}, $assocID);
-	my $defaultTeamProductID= getDefaultRegoProduct($Data->{'db'}, $assocID, $Defs::LEVEL_TEAM);
-	$Products->{0}='&nbsp;'; #Provide blank option
-
-    my $formHeader = $Data->{'SystemConfig'}{'lockDefaultProducts'} ? '' : qq[ <form action="$Data->{'target'}" method="post"> ] ;
-
-    my $formFooter = $Data->{'SystemConfig'}{'lockDefaultProducts'} ? '' : qq[ <br><br><input type="submit" value=" Update " class = "button proceed-button"></form>];
-
-	my $subBody=qq[
-		<div class="sectionheader">Default Registration Product</div>
-		<p>Choose your default <b>Member</b> registration product from the list below. Press the 'Update' button to save your selection.</p>
-           $formHeader
-			].drop_down('defproduct',$Products,undef,$defaultProductID,1,0).qq[
-
-		<p>Choose your default <b>Team</b> registration product from the list below. Press the 'Update' button to save your selection.</p>
-			].drop_down('defteamproduct',$Products,undef,$defaultTeamProductID,1,0).qq[
-			<input type="hidden" name="a" value="A_PR_DU">
-			<input type="hidden" name="client" value="].unescape($cl).qq[">
-               $formFooter
-	];
-	return $subBody;
-}
-
-sub update_defaultproduct	{
-	my($Data, $id, $id_team)=@_;
-
-	$id ||= 0;
-	$id_team ||= 0;
-	my $realmID=$Data->{'Realm'} || 0;
-  my $target=$Data->{'target'};
-	my $assocID=$Data->{'clientValues'}{'assocID'} || $Defs::INVALID_ID;
-
-	if($assocID)	{
-		my $st=qq[
-			UPDATE tblAssoc
-			SET intDefaultRegoProductID=$id, intDefaultTeamRegoProductID = $id_team
-			WHERE intRealmID= $realmID
-				AND intAssocID = $assocID 
-		];
-		$Data->{'db'}->do($st);
-
-		### INSERT INTO tblRegoFormProducts ???
-		$st = qq[
-			SELECT intRegoFormProductsID, intProductID, intRegoTypeLevel
-			FROM tblRegoFormProducts
-			WHERE intAssocID = $assocID
-				AND (intProductID = $id and intRegoTypeLevel = $Defs::LEVEL_PERSON
-				OR intProductID = $id_team and intRegoTypeLevel = $Defs::LEVEL_TEAM)
-		];
-    		my $query = $Data->{'db'}->prepare($st);
-    		$query->execute();
-		my $hasMemberProduct=0;
-		my $hasTeamProduct=0;	
-    		while (my $dref=$query->fetchrow_hashref())	{
-			$hasMemberProduct=1 if ($dref->{intRegoTypeLevel} == $Defs::LEVEL_PERSON);
-			$hasTeamProduct=1 if ($dref->{intRegoTypeLevel} == $Defs::LEVEL_TEAM);
-		}
-		if (! $hasMemberProduct)	{
-			$st = qq[
-				INSERT INTO tblRegoFormProducts 
-				(intAssocID, intRealmID, intSubRealmID, intProductID, intRegoTypeLevel)
-				VALUES ($assocID, $realmID, $Data->{RealmSubType}, $id, $Defs::LEVEL_PERSON)
-			];
-			$Data->{'db'}->do($st);
-		}
-
-		if (! $hasTeamProduct)	{
-			$st = qq[
-				INSERT INTO tblRegoFormProducts 
-				(intAssocID, intRealmID, intSubRealmID, intProductID, intRegoTypeLevel)
-				VALUES ($assocID, $realmID, $Data->{RealmSubType}, $id_team, $Defs::LEVEL_TEAM)
-			];
-			$Data->{'db'}->do($st);
-		}
-	}
-	if($DBI::err)	{
-		return '<div class="warningmsg">There was a problem updating that product</div>';
-	}
-	return '';
-}
-
-sub getDefaultRegoProduct	{
-	my($db, $assocID, $level)=@_;
-	$level ||= $Defs::LEVEL_PERSON;
-	my $defaultField = 'intDefaultRegoProductID';
-	$defaultField = 'intDefaultTeamRegoProductID' if ($level == $Defs::LEVEL_TEAM);
-    my $st= qq[
-        SELECT $defaultField
-        FROM tblAssoc
-        WHERE tblAssoc.intAssocID = $assocID
-    ];
-    my $query = $db->prepare($st);
-    $query->execute();
-    my($defaultProductID)=$query->fetchrow_array();
-		return $defaultProductID || 0;
 }
 
 sub getProductDependencies {
@@ -2108,6 +1960,8 @@ sub getProductDependencies {
 
     my $realmID=$Data->{'Realm'} || 0;
 
+my $entityTypeID = $Data->{'currentLevel'};
+    my $entityID = getID($Data->{'clientValues'}, $entityTypeID);
     my $intLevel = $Data->{'clientValues'}{'currentLevel'};
 #  $intLevel=$Defs::LEVEL_ASSOC if $intLevel < $Defs::LEVEL_CLUB;
 
@@ -2115,8 +1969,6 @@ sub getProductDependencies {
     my $WHERE = qq[
         AND (
             ( pd.intLevel = $Defs::LEVEL_CLUB AND pd.intID = ? )
-            OR 
-            ( pd.intLevel = $Defs::LEVEL_ASSOC AND pd.intID = ? )
             OR
             ( pd.intLevel = $Defs::LEVEL_NATIONAL AND pd.intID = ? )
         ) 
@@ -2138,7 +1990,6 @@ sub getProductDependencies {
     $sth->execute(
         $realmID,
         $clubID,
-        $Data->{'clientValues'}{'assocID'},
         $Data->{'clientValues'}{'natID'},
 				@productIDs,
     );
@@ -2153,8 +2004,10 @@ sub getProductDependencies {
 sub getProductAttributes {
   my ($attributeType,$Data,$productID) = @_;
   my $realmID=$Data->{'Realm'} || 0;
-  my $intLevel = $Data->{'clientValues'}{'currentLevel'};
-  my $intID = getID($Data->{'clientValues'}) || 0;
+    
+my $entityTypeID = $Data->{'currentLevel'};
+    my $entityID = getID($Data->{'clientValues'}, $entityTypeID);
+
   my $query=qq[
     SELECT 
       strAttributeValue 
@@ -2171,8 +2024,8 @@ sub getProductAttributes {
   $sth->execute(
     $productID,
     $realmID,
-    $intID,
-    $intLevel,
+    $entityID,
+    $entityTypeID,
     $attributeType
   );
   my @AttributeValues=();
@@ -2223,15 +2076,14 @@ sub get_product {
     my $realmID=$Data->{'Realm'} || 0;
     my $target=$Data->{'target'};
 
-    my $assocID=$Data->{'clientValues'}{'assocID'} || $Defs::INVALID_ID;
-
-    my $intID=getID($Data->{'clientValues'}) || 0;
+my $entityTypeID = $Data->{'currentLevel'};
+    my $entityID = getID($Data->{'clientValues'}, $entityTypeID);
 
     my $st=qq[
 			SELECT 	
 				P.intProductID, 	
 				P.strName, 	
-				P.intAssocID, 	
+				P.intEntityID, 	
 				P.curDefaultAmount, 	
 				P.intMinChangeLevel, 	
 				P.intMinSellLevel, 	
@@ -2297,7 +2149,7 @@ sub get_product {
 					LEFT JOIN tblProductPricing as PP 
 						ON (
 							PP.intProductID = P.intProductID 
-							AND PP.intID = $intID 
+							AND PP.intID = $entityID
 							AND PP.intLevel = $Data->{'clientValues'}{'currentLevel'} 
 							AND PP.intRealmID = $realmID
 						)
@@ -2490,55 +2342,18 @@ sub apply_product_rules {
     elsif($product->{dtMemberExpiry} and $product->{dtMemberExpiry} ne '0000-00-00 00:00:00' and $product->{dtMemberExpiry} ne '0000-00-00' ){
         $ColumnsValues{'dtRegisteredUntil'} = "'$product->{dtMemberExpiry}'";
     }
-	my $assocID = $Data->{'clientValues'}{'assocID'} || 0;
     
     if(scalar (keys %ColumnsValues)) {
         while(my ($column, $value) = (each %ColumnsValues)){
             $query2 .= "$column = $value,";
         }
         $query2 =~s/\,$//;
-        $query2 .= " WHERE intPersonID = $personID AND intAssocID = $assocID ";
+        $query2 .= " WHERE intPersonID = $personID ";
         
         $Data->{'db'}->do($query2);
     }
 
-	my %types = ();
-    $types{'intPlayerFinancialStatus'} = $product->{'intSeasonPlayerFinancial'} if $product->{'intSeasonPlayerFinancial'};
-    $types{'intCoachFinancialStatus'}  = $product->{'intCoachFinancialStatus'}  if $product->{'intCoachFinancialStatus'};
-    $types{'intUmpireFinancialStatus'} = $product->{'intUmpireFinancialStatus'} if $product->{'intUmpireFinancialStatus'};
-    $types{'intOther1FinancialStatus'} = $product->{'intOther1FinancialStatus'} if $product->{'intOther1FinancialStatus'};
-    $types{'intOther2FinancialStatus'} = $product->{'intOther2FinancialStatus'} if $product->{'intOther2FinancialStatus'};
-    $types{'intSeasonMemberPackageID'} = $product->{'intSeasonMemberPackageID'} if $product->{'intSeasonMemberPackageID'};
-
-    my $assocSeasons = Seasons::getDefaultAssocSeasons($Data);
-
-    my $ageGroupID = getAgeGroupID($Data, $Data->{'db'}, $assocID, $personID);
-
-	Seasons::insertMemberSeasonRecord(
-		$Data, 
-		$personID, 
-		$assocSeasons->{'newRegoSeasonID'}, 
-		$Data->{'clientValues'}{'assocID'}, 
-		$Data->{'clientValues'}{'clubID'}, 
-		$ageGroupID, 
-		\%types,
-        0,
-		2
-	);
-	if($Data->{'clientValues'}{'clubID'}>0 and $Data->{'SystemConfig'}{'AssocConfig'}{'ClubFinancialMakesAssocFinancial'}) {
-		Seasons::insertMemberSeasonRecord(
-        	        $Data,
-        	        $personID,
-        	        $assocSeasons->{'newRegoSeasonID'},
-       		        $Data->{'clientValues'}{'assocID'},
-	                0,
-	                $ageGroupID,
-	                \%types,
-                    0,		
-	                2	        
-);
-	}
-	
+    warn("PERSON REGO RECORD HERE ?");
 
 }
 
@@ -2577,15 +2392,13 @@ sub getFormProductAttributes {
             tblRegoFormProductsAdded
         WHERE
             intRegoFormID = ?
-            AND intAssocID = ?
             AND intClubID = ?
     ];
     my $added_search_sth = $Data->{'db'}->prepare($added_search_sql);
     
-    my $assocID = $Data->{'clientValues'}{'assocID'}>0 ? $Data->{'clientValues'}{'assocID'} : 0;
     my $clubID = $Data->{'clientValues'}{'clubID'}>0 ? $Data->{'clientValues'}{'clubID'} : 0;
     
-    $added_search_sth->execute($formID, $assocID, $clubID);
+    $added_search_sth->execute($formID, $clubID);
     
     my $added_products = $added_search_sth->fetchall_arrayref([0]);
     
@@ -2618,10 +2431,10 @@ sub getFormProductAttributes {
 
 sub updateProductTXNPricing {
 
-    my ($db, $assocID, $productID, $amount) = @_;
+    my ($db, $entityID, $productID, $amount) = @_;
 
     $productID || return 0;
-    $assocID || return 0;
+    $entityID || return 0;
     $amount || return 0;
 
     my $st = qq[
@@ -2631,7 +2444,7 @@ sub updateProductTXNPricing {
             curAmount= ?
         WHERE
             intProductID= ?
-            AND intAssocID = ?
+            AND intEntityID= ?
             AND intStatus=0
             AND curAmount=0
             AND dtTransaction <= DATE_ADD(CURRENT_DATE(), INTERVAL -15 MINUTE)
@@ -2640,7 +2453,7 @@ sub updateProductTXNPricing {
 		$q->execute(
 			$amount,
 			$productID,
-			$assocID,
+			$entityID,
 		);
 		$q->finish();
 }
@@ -2854,7 +2667,7 @@ sub copy_product {
 
     my $products_st = qq[
         INSERT INTO tblProducts (
-            intAssocID,
+            intEntityID,
             intMinSellLevel,
             intRealmID,
             strName,
@@ -2889,7 +2702,7 @@ sub copy_product {
             intPaymentSplitID
         )
         SELECT
-            intAssocID,
+            intEntityID,
             intMinSellLevel,
             intRealmID,
             CONCAT(strName, ' (Copy)'),

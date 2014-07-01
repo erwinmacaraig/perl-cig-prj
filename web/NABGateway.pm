@@ -16,7 +16,7 @@ use HTMLForm;
 use MD5;
 use DeQuote;
 use CGI qw(param);
-use Products qw(getDefaultRegoProduct product_apply_transaction);
+use Products qw(product_apply_transaction);
 use TransLog qw(viewTransLog);
 use SystemConfig;
 use TTTemplate;

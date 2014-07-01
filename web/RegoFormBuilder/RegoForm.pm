@@ -642,10 +642,7 @@ sub regoform_products {
         $currentProductsSequence{$id}  = $sequence;
     }
 
-    my $defaultProductID='';
     my $level = ($mprods) ? $Defs::LEVEL_MEMBER : $Defs::LEVEL_TEAM;
-
-    $defaultProductID= Products::getDefaultRegoProduct($Data->{'db'}, $assocID, $level);
 
     $st = get_products_sql();
     $query = $Data->{'db'}->prepare($st);
@@ -705,7 +702,7 @@ sub regoform_products {
             $splits_count++;
         }
    
-        $active = 'Compulsory' if !$active and $defaultProductID == $productID;
+        #$active = 'Compulsory' if !$active and $defaultProductID == $productID;
 
          if (!$active and $mprods and $tempProductID == -1) {
              $active = ($regoFormObj->isNodeForm() and $regoFormObj->isOwnForm(entityID=>$currID)) ? '' : 'Yes';

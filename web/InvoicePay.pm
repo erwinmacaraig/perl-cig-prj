@@ -16,7 +16,7 @@ use CGI qw(param);
 use Defs;
 use MD5;
 #use RegoForm;
-#use Products; #qw(getDefaultRegoProduct product_apply_transaction);
+#use Products; #qw(product_apply_transaction);
 #use Reg_common;
 #use Utils;
 #use DeQuote;
