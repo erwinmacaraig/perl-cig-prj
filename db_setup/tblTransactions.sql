@@ -29,7 +29,6 @@ CREATE TABLE tblTransactions (
   PRIMARY KEY  (intTransactionID),
   KEY index_intStatus (intStatus),
   KEY index_intTXNEntityID(intTXNEntityID),
-  KEY index_intAssocID (intAssocID),
   KEY transLogID (intTransLogID),
   KEY index_intRealmIDintRealmSubTypeID (intRealmID, intRealmSubTypeID),
   KEY intRealmSubTypeID (intRealmSubTypeID),
