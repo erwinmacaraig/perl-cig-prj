@@ -255,7 +255,7 @@ sub step2 {
 					DISTINCT intProductID
 				FROM
 					tblTransactions
-				WHERE intAssocID=$Data->{'clientValues'}{'assocID'}
+				WHERE intRealmID = $Data->{'Realm'}
 				AND  $whereClause
 			];
 			my $query = $db->prepare($st);
@@ -280,13 +280,12 @@ sub step2 {
 
 
 #Make DB Changes
-	my $intAssocID = $Data->{'clientValues'}{'assocID'}; 
 	my $intClubID = $Data->{'clientValues'}{'clubID'} || 0; 
     $intClubID = 0 if ($intClubID == $Defs::INVALID_ID);
 	my $intPersonID= $Data->{'clientValues'}{'personID'}; 
 	my $statement = qq[
-			INSERT INTO tblTransLog (intAssocPaymentID, intClubPaymentID, dtLog, intAmount, strResponseCode, strResponseText, strComments, intPaymentType, strBSB, strBank, strAccountName, strAccountNum, intRealmID, intCurrencyID, strReceiptRef, intStatus) VALUES
-	($intAssocID, $intClubID, $dtLog, $intAmount, $strResponseCode, $strResponseText, $strComments, $paymentType, $strBSB, $strBank, $strAccountName, $strAccountNum, $Data->{Realm}, $currencyID, $strReceiptRef, $Defs::TXNLOG_PENDING) 
+			INSERT INTO tblTransLog (intEntityPaymentID, dtLog, intAmount, strResponseCode, strResponseText, strComments, intPaymentType, strBSB, strBank, strAccountName, strAccountNum, intRealmID, intCurrencyID, strReceiptRef, intStatus) VALUES
+	($intClubID, $dtLog, $intAmount, $strResponseCode, $strResponseText, $strComments, $paymentType, $strBSB, $strBank, $strAccountName, $strAccountNum, $Data->{Realm}, $currencyID, $strReceiptRef, $Defs::TXNLOG_PENDING) 
 	];
 	my $query = $db->prepare($statement);
   	$query->execute;
@@ -510,12 +509,6 @@ sub getTransList {
     ];
   }
 	my $exposeNationalProducts = '';
-	if ($Data->{'SystemConfig'}{'TXN_ExposeNationalProducts'})	{
-		$exposeNationalProducts = qq[
-			OR 
-			P.intAssocID=0 and t.intStatus=1
-		];
-	}
 
 	my $prodSellLevel = qq[ 
     AND ( 
@@ -544,21 +537,15 @@ sub getTransList {
       DATE_FORMAT( t.dtEnd, '%d/%m/%Y') AS dtEnd, 
       IF(strGroup <> '', 
       CONCAT(strGroup,'-',P.strName), P.strName) as strName, 
-      A.strName as AssocName, 
       t.strNotes
     FROM 
       tblTransactions as t
       INNER JOIN tblProducts as P ON (P.intProductID = t.intProductID)
       LEFT JOIN tblTransLog as tl ON (t.intTransLogID = tl.intLogID)
-    	LEFT JOIN tblAssoc as A ON (t.intAssocID = A.intAssocID)
     WHERE
       t.intRealmID = $Data->{Realm}
 			AND P.intProductType<>2
 	    $prodSellLevel
-      AND (
-	  	  t.intAssocID = $Data->{'clientValues'}{'assocID'} 
-		    $exposeNationalProducts
-	    )
       $whereClause
 	  GROUP BY 
 		  t.intTransactionID
@@ -567,14 +554,12 @@ sub getTransList {
 	$statement =~ s/AND  AND/AND/g;
 my $query = $db->prepare($statement);
   $query->execute or print STDERR $statement;
-  my $assocID = $Data->{'clientValues'}{'assocID'};
   my $client = setClient($Data->{clientValues});
   my @Columns = ();
   push (@Columns, {Name => '', Field => 'SelectLink', type => 'Selector', hide => $displayonly});
   push (@Columns, {Name => 'Invoice Number', Field => 'intTransactionID', width => 20});
   push (@Columns, {Name => 'Item Name', Field => 'strName'});
   push (@Columns, {Name => 'Quantity', Field => 'intQty', width => 15});
-  push (@Columns, {Name => 'Assoc Name', Field => 'AssocName'});
   push (@Columns, {Name => 'Amount', Field => 'curAmount', width =>20});
   push (@Columns, {Name => 'Start', Field => 'dtStart', width => 20});
   push (@Columns, {Name => 'Start_RAW', Field => 'dtStart_RAW', hide=>1});
@@ -764,7 +749,7 @@ sub listTransactions_where {
         $clubID = Team::getTeamClubID($db, $Data->{'clientValues'}{'teamID'}) 
     }
 
-    $whereClause .= qq[ AND intTXNClubID IN (0, $clubID)] if $clubID;
+    $whereClause .= qq[ AND intTXNEntityID IN (0, $clubID)] if $clubID;
     $whereClause .= qq[ AND P.intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) ] if $txnStatus != $Defs::TXN_PAID;
 
     return $whereClause;
@@ -843,7 +828,6 @@ sub listTransactions {
 				<div style= "clear:both;"></div>
 			</div>
 	 ];          
-	  my $intAssocID = $Data->{'clientValues'}{'assocID'}; 
 	  my $intClubID = $Data->{'clientValues'}{'clubID'}; 
 	  $intClubID=0 if ($intClubID == $Defs::INVALID_ID);
 	  my $intAllowPayment = 0;
@@ -862,20 +846,6 @@ sub listTransactions {
 		  my $qry_club= $db->prepare($st_club);
   	  $qry_club->execute;
 		  $intAllowPayment = $qry_club->fetchrow_array() || 0;
-	  }
-	  if (!$intAllowPayment)	{
-	 	  my $st_assoc = qq[
-        SELECT 
-				  intPaymentConfigID
-        FROM 
-				  tblAssoc
-        WHERE 
-				  intAssocID = $intAssocID
-				  AND intAllowPayment=1
-   	  ];
-		  my $qry_assoc = $db->prepare($st_assoc);
-  	  $qry_assoc->execute;
-		  $intAllowPayment = $qry_assoc->fetchrow_array() || 0;
 	  }
 	  $CC_body = '' if ! $intAllowPayment;
 	  $CC_body = '' if ! $Data->{'SystemConfig'}{'AllowTXNs_CCs'};
@@ -1484,9 +1454,8 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 	my $client=setClient($Data->{'clientValues'});
 	my $count=0;
 	my $thisassoc=0;
-	$thisassoc=1 if ($TLref->{intAssocPaymentID} == $Data->{'clientValues'}{'assocID'});
+	$thisassoc=1 if ($TLref->{intEntityPaymentID} == $Data->{'clientValues'}{'assocID'});
 	while (my $dref = $qry_trans->fetchrow_hashref())	{
-		$thisassoc=1 if ($dref->{intAssocID} == $Data->{'clientValues'}{'assocID'});
 		$count++;
         my $paymentFor = '';
         $paymentFor = qq[$dref->{strSurname}, $dref->{strFirstName}] if ($dref->{intTableType} == $Defs::LEVEL_PERSON);
@@ -1627,7 +1596,6 @@ sub viewPayLaterTransLog    {
 	my $count=0;
 	my $thisassoc=0;
 	while (my $dref = $qry_trans->fetchrow_hashref())	{
-		$thisassoc=1 if ($dref->{intAssocID} == $Data->{'clientValues'}{'assocID'});
 		$count++;
 		my $productname = $dref->{strName};
 		$productname = qq[$dref->{strGroup}-].$productname if ($dref->{strGroup});
@@ -1697,7 +1665,7 @@ sub listTransLog	{
 			INNER JOIN tblTXNLogs as TXNLog ON (TXNLog.intTLogID= TL.intLogID)
 			INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLog.intTXNID)
 		WHERE 
-      T.intAssocID = ?
+      T.intRealmID= ?
       AND TL.intStatus<>0
 		  $WHERE
 		ORDER BY 
@@ -1705,7 +1673,7 @@ sub listTransLog	{
       TL.intLogID
 	];
 	my $query = $db->prepare($statement);
-	$query->execute($assocID);
+	$query->execute($Data->{'Realm'});
 	my $found = 0;
 	my $client=setClient($Data->{'clientValues'});
 	my $currentname='';

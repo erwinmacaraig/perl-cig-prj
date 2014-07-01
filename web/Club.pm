@@ -21,6 +21,8 @@ use Logo;
 use HomeClub;
 use FieldCaseRule;
 use DefCodes;
+use TransLog;
+use Transactions;
 
 sub handleClub  {
   my ($action, $Data, $clubID, $typeID)=@_;
@@ -42,6 +44,12 @@ sub handleClub  {
   elsif ($action=~/^C_HOME/) {
       ($resultHTML,$title)=showClubHome($Data,$clubID);
   }
+  elsif ( $action =~ /^C_TXN_/ ) {
+        ( $resultHTML, $title ) = Transactions::handleTransactions( $action, $Data, $clubID);
+    }
+  elsif ( $action =~ /C^_TXNLog/ ) {
+        ( $resultHTML, $title ) = TransLog::handleTransLogs( $action, $Data, $clubID);
+    }
 
 
   return ($resultHTML,$title);

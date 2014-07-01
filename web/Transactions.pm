@@ -27,7 +27,7 @@ require TransLog;
 # GET INFORMATION RELATING TO THIS MEMBERS TYPE (IE. COACH, PLAYER ETC)
 
 sub handleTransactions	{
-	my($action, $Data, $intTableID, $assocID)=@_;
+	my($action, $Data, $intTableID, $entityID)=@_;
 
 	## TABLEID is PersonID or TeamID etc
 
@@ -84,8 +84,7 @@ sub displayTransaction	{
   my($Data, $TableID, $id, $edit) = @_;
 
 	my $db=$Data->{'db'} || undef;
-	my $assocID= $Data->{'clientValues'}{'assocID'} || -1;
-  my $client=setClient($Data->{'clientValues'}) || '';
+    my $client=setClient($Data->{'clientValues'}) || '';
 	my $target=$Data->{'target'} || '';
 	my $option=$edit ? ($id ? 'edit' : 'add')  :'display' ;
 	my $type2=param("ty2") || '';
@@ -96,10 +95,8 @@ sub displayTransaction	{
   my $resultHTML = '';
 	my $toplist='';
 
-	my $clubID= $Data->{'clientValues'}{'clubID'} || 0;
-  $clubID=0 if ($clubID == $Defs::INVALID_ID);
-	my $teamID= $Data->{'clientValues'}{'teamID'} || 0;
-  $teamID=0 if ($teamID == $Defs::INVALID_ID);
+	my $entityID= $Data->{'clientValues'}{'clubID'} || 0;
+  $entityID=0 if ($entityID== $Defs::INVALID_ID);
 	my %DataVals=();
 	my $statement=qq[
 		SELECT 
@@ -133,25 +130,23 @@ sub displayTransaction	{
 		WHERE intTransactionID=$id
 	];
 	my $txnadd=qq[
-		INSERT INTO tblTransactions (intTXNTeamID, intTXNClubID, intID, intTableType, intRealmID, intRealmSubTypeID, intAssocID, dtTransaction, --FIELDS--)
-			VALUES ($teamID, $clubID, $TableID, $Data->{'clientValues'}{'currentLevel'}, $Data->{'Realm'}, $Data->{'RealmSubType'},$Data->{'clientValues'}{'assocID'}, SYSDATE(), --VAL--)
+		INSERT INTO tblTransactions (intTXNEntityID, intID, intTableType, intRealmID, intRealmSubTypeID, dtTransaction, --FIELDS--)
+			VALUES ($entityID, $TableID, $Data->{'clientValues'}{'currentLevel'}, $Data->{'Realm'}, $Data->{'RealmSubType'}, SYSDATE(), --VAL--)
 	];
 
-	 #$clubID=$Data->{'clientValues'}{'clubID'} || $Defs::INVALID_ID;
-     #$clubID ||= 0;
 	 my $authLevel = $Data->{'clientValues'}{'authLevel'}||=$Defs::INVALID_ID;
 
         my $WHEREClub = '';
-        if ($clubID) { # and $authLevel == $Defs::LEVEL_CLUB)        {
+        if ($entityID) { # and $authLevel == $Defs::LEVEL_CLUB)        {
                 $WHEREClub = qq[
-                        AND ((intCreatedLevel=0 or intCreatedLevel > 3) or (intCreatedLevel = $Defs::LEVEL_CLUB and intCreatedID = $clubID))
+                        AND ((intCreatedLevel=0 or intCreatedLevel > 3) or (intCreatedLevel = $Defs::LEVEL_CLUB and intCreatedID = $entityID))
                 ];
         }
 
   my $prodSellLevel = qq[ AND (intMinSellLevel <= $Data->{'clientValues'}{'authLevel'} or intMinSellLevel=0)];
-  my $st_prods=qq[ SELECT intProductID, strName FROM tblProducts WHERE intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) AND intRealmID = $Data->{'Realm'} and (intAssocID =0 or intAssocID=$Data->{'clientValues'}{'assocID'}) AND intInactive = 0 $WHEREClub AND intProductSubRealmID IN (0, $Data->{'RealmSubType'}) $prodSellLevel];
+  my $st_prods=qq[ SELECT intProductID, strName FROM tblProducts WHERE intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) AND intRealmID = $Data->{'Realm'} and  intInactive = 0 $WHEREClub AND intProductSubRealmID IN (0, $Data->{'RealmSubType'}) $prodSellLevel];
 
-  my $st_paymenttypes=qq[ SELECT intPaymentTypeID, strPaymentType FROM tblPaymentTypes WHERE intRealmID = $Data->{'Realm'} and (intAssocID =0 or intAssocID=$Data->{'clientValues'}{'assocID'})];
+  my $st_paymenttypes=qq[ SELECT intPaymentTypeID, strPaymentType FROM tblPaymentTypes WHERE intRealmID = $Data->{'Realm'}];
   my ($prods_vals,$prods_order)=getDBdrop_down_Ref($Data->{'db'},$st_prods,'');
   my ($paytypes_vals,$paytypes_order)=getDBdrop_down_Ref($Data->{'db'},$st_paymenttypes,'');
 
@@ -335,14 +330,14 @@ sub showTransactionChildren	{
 			)
 		WHERE 
 			T.intParentTXNID = ?
-			AND T.intAssocID = ?
+			AND T.intTXNEntityID= ?
 			AND T.intParentTXNID > 0
 			AND T.intStatus=1
 			AND P.intProductType<>2
 	];
 
 	my $qry = $Data->{'db'}->prepare($st);
-	$qry->execute($id, $Data->{'clientValues'}{'assocID'});
+	$qry->execute($id, $Data->{'clientValues'}{'clubID'});
 	my $count=0;
 	my $body = qq[
 		<div class="pageHeading">Part Payment records</div>
@@ -387,7 +382,7 @@ sub checkTXNPricing	{
         SELECT PP.curAmount, P.curDefaultAmount, T.intQty
 	FROM tblTransactions as T
 	        LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
-			LEFT JOIN tblProductPricing as PP ON (PP.intProductID = P.intProductID AND PP.intRealmID = $Data->{'Realm'} AND ((PP.intID = T.intAssocID AND intLevel = $Defs::LEVEL_ASSOC)
+			LEFT JOIN tblProductPricing as PP ON (PP.intProductID = P.intProductID AND PP.intRealmID = $Data->{'Realm'} AND ((PP.intID = T.intTXNEntityID AND intLevel = $Defs::LEVEL_CLUB)
 ];          
     $statement .= qq[ OR (PP.intID = $clubID AND intLevel=$Defs::LEVEL_CLUB)] if ($clubID and $clubID != $Defs::INVALID_ID);
     $statement .= qq[))
@@ -420,7 +415,6 @@ sub preTXNAddUpdate	{
 
 	$personID ||= 0;
 	$transID ||=0;
-	my $assocID = $Data->{'clientValues'}{'assocID'} || 0;
 	my $prodID = $params->{'d_intProductID'} || 0;
 	
 	my $st = qq[

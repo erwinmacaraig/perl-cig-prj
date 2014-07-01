@@ -35,4 +35,4 @@ CREATE TABLE tblTransactions (
   KEY index_intIDintTableType (intID, intTableType),
   KEY intTableType (intTableType),
   KEY intProductID (intProductID)
-) DEFAULT CHARSET=utf8;;
+) DEFAULT CHARSET=utf8;
