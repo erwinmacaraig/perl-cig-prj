@@ -131,26 +131,24 @@ sub getInvoiceTransactionsDetails {
 			T.intTransactionID,
 			T.curAmount,
 			P.strName as productName,
-			A.intRealmID as Realm,
-			A.intAssocTypeID as RealmSubType,
-			A.intAssocID,
-			T.intTXNClubID,
+			T.intRealmID as Realm,
+			E.intSubRealmID as RealmSubType,
+			T.intTXNEntityID,
 			T.intStatus,
 			T.intProductID,
 			T.intID,
 			T.intTableType,
-			A.strName as AssocName,
-			C.strName as ClubName,
-			CONCAT(M.strSurname, ", ", M.strFirstname) as MemberForName,
-			tblTeam.strName as TeamForName,
+			E.strLocalName as EntityName,
+			C.strLocalName as ClubName,
+			CONCAT(M.strLocalSurname, ", ", M.strLocalFirstname) as MemberForName,
 			SUM(TXNPaidParts.curAmount) as AmountAlreadyPaid
 		FROM
 			tblTransactions as T
 			INNER JOIN tblProducts as P ON (
 				P.intProductID = T.intProductID
 			)
-			INNER JOIN tblAssoc as A ON (
-				A.intAssocID = T.intAssocID
+			INNER JOIN tblEntity as E ON (
+				E.intEntityID = T.intTXNEntityID
 			)
 			LEFT JOIN tblTransactions as TXNPaidParts on (
 				TXNPaidParts.intParentTXNID= T.intTransactionID
@@ -158,13 +156,10 @@ sub getInvoiceTransactionsDetails {
 				AND TXNPaidParts.intProductID=T.intProductID
 			)
 			LEFT JOIN tblClub as C ON (
-				C.intClubID=T.intTXNClubID
+                C.intEntityID = T.intID and T.intTableType=3
 			)
-			LEFT JOIN tblTeam ON (
-				tblTeam.intTeamID=T.intID AND T.intTableType=2
-			)
-			LEFT JOIN tblMember as M ON (
-				M.intMemberID=T.intID AND T.intTableType=1
+			LEFT JOIN tblPerson as M ON (
+				M.intPersonID=T.intID AND T.intTableType=1
 			)
 		WHERE 
 			T.intTransactionID IN ($txnIN)
@@ -178,8 +173,6 @@ sub getInvoiceTransactionsDetails {
 	my %TransLog=();
 	my $assocID = 0;
   while (my $dref = $query->fetchrow_hashref())	{
-		next if $assocID and $dref->{'intAssocID'} != $assocID;
-		$assocID = $dref->{'intAssocID'} if (!$assocID);
 		my %Transaction = ();
 		$Transaction{'intTransactionID'} = $dref->{'intTransactionID'} || next;
 		$Transaction{'intID'} = $dref->{'intID'} || next;
@@ -195,9 +188,8 @@ sub getInvoiceTransactionsDetails {
 		$TransLog{'intAmount'} = $dref->{'intAmount'};
 		$TransLog{'Realm'} = $dref->{'Realm'};
 		$TransLog{'RealmSubType'} = $dref->{'RealmSubType'};
-		$TransLog{'assocID'} = $dref->{'intAssocID'};
-		$TransLog{'clubID'} = $dref->{'intTXNClubID'};
-		$TransLog{'AssocName'} = $dref->{'AssocName'};
+		$TransLog{'entityID'} = $dref->{'intTXNEntityID'};
+		$TransLog{'EntityName'} = $dref->{'EntityName'};
 		$TransLog{'ClubName'} = $dref->{'ClubName'};
 		$TransLog{'ok'} = 1;
 	}
@@ -209,22 +201,18 @@ sub createPartPayment	{
 
 	my ($db, $transLog_ref, $txn_ref, $params_ref)= @_;
 
-	#print STDERR "IN HERE\n";
 	return undef if (! $txn_ref->{'intTransactionID'});
-	#print STDERR "STILL IN HERE\n";
 	return undef if (! $params_ref->{'amount_paying'} or $params_ref->{'amount_paying'} <0);
-	#print STDERR "STILL STILL IN HERE\n";
 
 	my $st = qq[
 		INSERT INTO tblTransactions
 		(
 			intRealmID,
 			intRealmSubTypeID,
-			intAssocID,
 			intProductID,
 			intID,
 			intTableType,
-			intTXNClubID,
+			intTXNEntityID,
 			curAmount,
 			intQty,
 			intParentTXNID,
@@ -244,7 +232,6 @@ sub createPartPayment	{
 			?,
 			?,
 			?,
-			?,
 			NOW()
 		)
 	];
@@ -252,11 +239,10 @@ sub createPartPayment	{
   $query->execute(
 		$transLog_ref->{'Realm'},
 		$transLog_ref->{'RealmSubType'},
-		$transLog_ref->{'assocID'},
 		$txn_ref->{'intProductID'},
 		$txn_ref->{'intID'},
 		$txn_ref->{'intTableType'},
-		$transLog_ref->{'clubID'},
+		$transLog_ref->{'entityID'},
 		$params_ref->{'amount_paying'},
 		1,
 		$txn_ref->{'intTransactionID'},

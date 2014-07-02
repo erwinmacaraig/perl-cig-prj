@@ -45,10 +45,10 @@ sub handleClub  {
       ($resultHTML,$title)=showClubHome($Data,$clubID);
   }
   elsif ( $action =~ /^C_TXN_/ ) {
-        ( $resultHTML, $title ) = Transactions::handleTransactions( $action, $Data, $clubID);
+        ( $resultHTML, $title ) = Transactions::handleTransactions( $action, $Data, $clubID, 0);
     }
-  elsif ( $action =~ /C^_TXNLog/ ) {
-        ( $resultHTML, $title ) = TransLog::handleTransLogs( $action, $Data, $clubID);
+  elsif ( $action =~ /^C_TXNLog/ ) {
+        ( $resultHTML, $title ) = TransLog::handleTransLogs( $action, $Data, $clubID, 0);
     }
 
 

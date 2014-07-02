@@ -64,20 +64,16 @@ sub main	{
 		my $st =qq[
 			SELECT 
 				tblTransLog.*, 
-				IF(T.intTableType = $Defs::LEVEL_TEAM, Team.strName, CONCAT(strFirstname,' ',strSurname)) as Name, 
+				IF(T.intTableType = $Defs::LEVEL_CLUB, Entity.strLocalName, CONCAT(strLocalFirstname,' ',strLocalSurname)) as Name, 
 				DATE_FORMAT(dtLog,'%d/%m/%Y %h:%i') as dtLog_FMT,
 				DATE_FORMAT(dtSettlement,'%d/%m/%Y') as dtSettlement,
-				A.strName AS strAssocName,
-				Club.strName AS strClubName,
-				A.intAssocID
+				Entity.strLocalName as strEntityName
 
 			FROM tblTransLog 
 				INNER JOIN tblTXNLogs as TXNLog ON (TXNLog.intTLogID = tblTransLog.intLogID)
 				INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLog.intTXNID)
-				INNER JOIN tblAssoc as A ON (T.intAssocID = A.intAssocID )
-				LEFT JOIN tblMember as M ON (M.intMemberID = T.intID and T.intTableType=$Defs::LEVEL_MEMBER)
-				LEFT JOIN tblTeam as Team on (Team.intTeamID = T.intID and T.intTableType=$Defs::LEVEL_TEAM)
-				LEFT JOIN tblClub as Club on (Club.intClubID = T.intTXNClubID)
+				LEFT JOIN tblPerson as M ON (M.intPersonID= T.intID and T.intTableType=$Defs::LEVEL_MEMBER)
+				LEFT JOIN tblEntity as Entity on (Entity.intEntityID= T.intID and T.intTableType=$Defs::LEVEL_CLUB)
 			WHERE intLogID  IN (?)
 				AND T.intRealmID = ?
 		];
@@ -96,15 +92,15 @@ sub main	{
 
 		my $st_trans = qq[
 			SELECT 
-				M.strSurname, 
-				M.strFirstName, 
-				T.*, 
+				M.strLocalSurname, 
+				M.strLocalFirstName, 
+				E.*, 
 				P.strName, 
 				P.strGroup
 			FROM tblTransactions as T
-				LEFT JOIN tblMember as M ON (M.intMemberID = T.intID and T.intTableType=$Defs::LEVEL_MEMBER)
+				LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_MEMBER)
 				LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
-				LEFT JOIN tblTeam as Team on (Team.intTeamID = T.intID and T.intTableType=$Defs::LEVEL_TEAM)
+				LEFT JOIN tblEntity as E on (E.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
 			WHERE intTransLogID IN (?)
 			AND T.intRealmID = ?
 		];

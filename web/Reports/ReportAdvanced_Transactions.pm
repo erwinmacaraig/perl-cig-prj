@@ -53,18 +53,11 @@ sub _getConfiguration {
 
 		Fields => {
 			
-			AssocName=> [ qq[$Data->{'LevelNames'}{$Defs::LEVEL_ASSOC}], { active=>1, displaytype=>'text', fieldtype=>'text', allowsort => 1, 'dbfield'=>'A.strName' } ],
 			StateName=> [ ($currentLevel>= $Defs::LEVEL_STATE) ? qq[$Data->{'LevelNames'}{$Defs::LEVEL_STATE}] : '', { 'dbfield'=>'NState.strName', active=>1, displaytype=>'text', fieldtype=>'text', allowsort => 1, dbfield=>'NState.strName'  } ],
 			RegionName=> [ ($currentLevel>= $Defs::LEVEL_REGION) ? qq[$Data->{'LevelNames'}{$Defs::LEVEL_REGION}] : '', {dbfield=>'NRegion.strName', active=>1, displaytype=>'text', fieldtype=>'text', allowsort => 1, dbfield=>'NRegion.strName' } ],
 			ZoneName=> [ ($currentLevel>= $Defs::LEVEL_ZONE) ? qq[$Data->{'LevelNames'}{$Defs::LEVEL_ZONE}] : '', { dbfield=>'NZone.strName',active=>1, displaytype=>'text', fieldtype=>'text', allowsort => 1,, dbfield=>'NZone.strName'  } ],
 			strTitle=> ["Competition Name",{displaytype=>'text', fieldtype=>'text', active=>1, allowgrouping=>1, allowsort=>1 , dbfield=>'strTitle'}],
-			intNewSeasonID=> ["Competition $txt_SeasonName",{displaytype=>'lookup', fieldtype=>'dropdown', dropdownoptions => $CommonVals->{'Seasons'}{'Options'},  dropdownorder=>$CommonVals->{'Seasons'}{'Order'}, allowsort=>1, active=>0, multiple=>1, size=>3, disable=>$hideSeasons }],
 
-
-
-
-      intAssocTypeID => [((scalar(keys %{$CommonVals->{'SubRealms'}}) and  $currentLevel > $Defs::LEVEL_ASSOC)? ($Data->{'LevelNames'}{$Defs::LEVEL_ASSOC}.' Type') : ''),{displaytype=>'lookup', fieldtype=>'dropdown', dropdownoptions=> $CommonVals->{'SubRealms'}, allowsort=>1, allowgrouping => 1}],
-			 intAssocCategoryID => [((scalar(keys %{$CommonVals->{'EntityCategories'}{$Defs::LEVEL_ASSOC}}) and  $currentLevel > $Defs::LEVEL_ASSOC)? ($Data->{'LevelNames'}{$Defs::LEVEL_ASSOC}.' Category') : ''),{displaytype=>'lookup', fieldtype=>'dropdown', dropdownoptions=> $CommonVals->{'EntityCategories'}{$Defs::LEVEL_ASSOC}, allowsort=>1, allowgrouping => 1}],
 			intTransactionID => [
 				'Transaction ID' ,
 				{
@@ -247,24 +240,14 @@ sub _getConfiguration {
 					dbfield=>'intExportAssocBankFileID'
 				}
 			],
-			ClubPaymentID=> [
-				qq[$Data->{'LevelNames'}{$Defs::LEVEL_MEMBER} $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}],
+			EntityPaymentID=> [
+				qq[$Data->{'LevelNames'}{$Defs::LEVEL_PERSON} $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}],
 				{
 					displaytype=>'text', 
 					fieldtype=>'text', 
-					dbfield=>'PaymentClub.strName', 
+					dbfield=>'PaymentEntity.strLocalName', 
 				}
 			],
-		intClubCategoryID=> [
-        (keys %{$CommonVals->{'EntityCategories'}{$Defs::LEVEL_CLUB}}) ? "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Category" : '',
-        {
-          displaytype=>'lookup',
-          fieldtype=>'dropdown',
-          dropdownoptions=> $CommonVals->{'EntityCategories'}{$Defs::LEVEL_CLUB},
-          allowgrouping=>1,
-					dbfield=>'PaymentClub.intClubCategoryID', 
-        }
-      ],
 		},
 
 		Order => [qw(
@@ -284,16 +267,9 @@ sub _getConfiguration {
 			dtPaid
 			intStatus
 			TXNNotes
-			ClubPaymentID
-			intClubCategoryID
-			AssocName
+			EntityPaymentID
 			strTitle
 			intNewSeasonID
-			StateName
-			RegionName
-			ZoneName
-			intAssocTypeID
-			intAssocCategoryID
 		)],
 		OptionGroups => {
 			default => ['Details',{}],
@@ -339,11 +315,10 @@ sub SQLBuilder  {
     my $Club_JOIN= '';
     if ($currentLevel == $Defs::LEVEL_CLUB and $self->{'EntityID'})  {
             $txnClub_WHERE= qq[ AND T.intTXNClubID IN (0, $self->{'EntityID'})];
-            $txnClub_WHERE.= qq[ AND ((TL.intClubPaymentID IN (0, $self->{'EntityID'}) or TL.intClubPaymentID IS NULL) AND  (Team.intClubID = $self->{'EntityID'} OR MC.intClubID=$self->{'EntityID'})) ];
-						$Club_JOIN = qq[ LEFT JOIN tblMember_Clubs as MC ON (M.intMemberID=MC.intMemberID AND MC.intClubID=$self->{'EntityID'} AND MC.intStatus=1) ];
+            $txnClub_WHERE.= qq[ AND ((TL.intEntityPaymentID IN (0, $self->{'EntityID'}) or TL.intEntityPaymentID IS NULL) AND  (Team.intClubID = $self->{'EntityID'} OR MC.intClubID=$self->{'EntityID'})) ];
+						$Club_JOIN = qq[ LEFT JOIN tblPerson_Clubs as MC ON (M.intPersonID=MC.intMemberID AND MC.intClubID=$self->{'EntityID'} AND MC.intStatus=1) ];
 		}
-		my $tns_WHERE = qq[AND T.intAssocID = $clientValues->{'assocID'} ];
-
+        my $tns_WHERE = '';
 		$tns_WHERE = qq[AND int100_ID=$clientValues->{'natID'}] if ($currentLevel == $Defs::LEVEL_NATIONAL);
 		$tns_WHERE = qq[AND int30_ID=$clientValues->{'stateID'}] if ($currentLevel == $Defs::LEVEL_STATE);
 		$tns_WHERE = qq[AND int20_ID=$clientValues->{'regionID'}] if ($currentLevel == $Defs::LEVEL_REGION);
@@ -361,7 +336,7 @@ sub SQLBuilder  {
 				T.intExportAssocBankFileID, 
 				IF(
 					T.intTableType=$Defs::LEVEL_MEMBER, 
-					CONCAT(M.strSurname, ", ", M.strFirstname), 
+					CONCAT(M.strLocalSurname, ", ", M.strLocalFirstname), 
 					Team.strName
 				) as PaymentFor, 
 				TL.intAmount, 
@@ -373,29 +348,14 @@ sub SQLBuilder  {
 				TL.intLogID, 
 				T.strNotes as TXNNotes,  
 				TL.strComments as TLComments,  
-				PaymentClub.strName AS ClubPaymentID,
-				A.strName as AssocName,
-				A.intAssocTypeID,
-				NState.strName as StateName,
-				NRegion.strName as RegionName,
-				NZone.strName as ZoneName,
-				intAssocCategoryID,
-				intClubCategoryID,
+				PaymentEntity.strLocalName AS EntityPaymentID,
 				P.strName,
-				tblAssoc_Comp.strTitle,
-				tblAssoc_Comp.intNewSeasonID
 			FROM tblTransactions as T
 				LEFT JOIN tblProducts as P ON (P.intProductID=T.intProductID)
 				LEFT JOIN tblTransLog as TL ON (TL.intLogID = T.intTransLogID)
-				LEFT JOIN tblAssoc_Comp ON (tblAssoc_Comp.intCompID = T.intTXNCompID)
-				LEFT JOIN tblAssoc as A ON (T.intAssocID = A.intAssocID)
-				LEFT JOIN tblMember as M ON (M.intMemberID = T.intID AND T.intTableType = $Defs::LEVEL_MEMBER AND M.intStatus!=-1)
-				LEFT JOIN tblTeam as Team ON (Team.intTeamID = T.intID AND T.intTableType = $Defs::LEVEL_TEAM)
-				LEFT JOIN tblClub as PaymentClub ON (PaymentClub.intClubID=TL.intClubPaymentID)
-				LEFT JOIN tblTempNodeStructure as TNS ON (TNS.intAssocID=T.intAssocID)
-				LEFT JOIN tblNode as NState ON (NState.intNodeID = TNS.int30_ID)
-				LEFT JOIN tblNode as NRegion ON (NRegion.intNodeID = TNS.int20_ID)
-				LEFT JOIN tblNode as NZone ON (NZone.intNodeID = TNS.int10_ID)
+				LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID AND T.intTableType = $Defs::LEVEL_MEMBER AND M.intStatus!=-1)
+				LEFT JOIN tblEntity as Entity ON (Entity.intEntityID = T.intID AND T.intTableType = $Defs::LEVEL_CLUB)
+				LEFT JOIN tblEntity as PaymentEntity ON (PaymentEntity.intEntityID = TL.intEntityPaymentID)
 				$Club_JOIN
 			WHERE T.intRealmID = $Data->{'Realm'}
 				 AND NOT (
@@ -403,8 +363,8 @@ sub SQLBuilder  {
          	AND T.intStatus = 0 
          )
 				AND (
-					(T.intTableType=$Defs::LEVEL_MEMBER AND M.intMemberID IS NOT NULL) OR
-					(T.intTableType=$Defs::LEVEL_TEAM AND Team.intTeamID IS NOT NULL)
+					(T.intTableType=$Defs::LEVEL_MEMBER AND M.intPersonID IS NOT NULL) OR
+					(T.intTableType=$Defs::LEVEL_CLUB AND Team.intTeamID IS NOT NULL)
 				    ) 
 				 AND T.intStatus <> -1
 				$tns_WHERE

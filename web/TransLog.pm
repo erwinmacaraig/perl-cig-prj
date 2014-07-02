@@ -32,7 +32,7 @@ my $entityNameURL    = 'P_TXNLog';
 
 
 sub handleTransLogs {
-  my($action, $Data, $intPersonID) = @_;
+  my($action, $Data, $entityID, $personID) = @_;
 	my $q=new CGI;
 	$Data->{'params'} = $q->Vars();
   my $clientValues_ref = $Data->{'clientValues'};
@@ -61,10 +61,10 @@ sub handleTransLogs {
   }
   if ($action=~/list/) {
 	  setupStandardList($Data);
-	  ($body, $header) = listTransactions($Data, $db, $clientValues_ref, $action, $resultMessage);
+	  ($body, $header) = listTransactions($Data, $db, $entityID, $personID, $clientValues_ref, $action, $resultMessage);
   }
   if ($action=~/payLIST/) {
-	  ($body, $header) = listTransLog($Data, $intPersonID, $Data->{'clientValues'}{'assocID'});
+	  ($body, $header) = listTransLog($Data, $entityID, $personID);
   }
 	if ($action =~/payVIEW/)	{
 		($body, $header) = viewTransLog($Data, $Data->{'params'}{'tlID'},0,0);
@@ -276,16 +276,21 @@ sub step2 {
 	my $whereClause = 'AND t.intTransactionID in ('.join(",", @transactionIDs).')';	
 	setupStep2List($Data);
 	my $displayonly = 1;
-	my ($transHTML, $transcount, $transCurrency_ref, $transAmount_ref)=getTransList($Data, $db, $whereClause, $clientValues_ref, 0, $displayonly);
+
+    my $authLevel = $Data->{'clientValues'}{'authLevel'}||=$Defs::INVALID_ID;
+    my $entityID = getID($Data->{'clientValues'}, $authLevel) || 0;
+
+	my $intClubID = $Data->{'clientValues'}{'clubID'} || 0; 
+#BAFF
+    $intClubID = 0 if ($intClubID == $Defs::INVALID_ID);
+	my $intPersonID= $Data->{'clientValues'}{'personID'}; 
+	my ($transHTML, $transcount, $transCurrency_ref, $transAmount_ref)=getTransList($Data, $db, $intClubID, $intPersonID, $whereClause, $clientValues_ref, 0, $displayonly);
 
 
 #Make DB Changes
-	my $intClubID = $Data->{'clientValues'}{'clubID'} || 0; 
-    $intClubID = 0 if ($intClubID == $Defs::INVALID_ID);
-	my $intPersonID= $Data->{'clientValues'}{'personID'}; 
 	my $statement = qq[
 			INSERT INTO tblTransLog (intEntityPaymentID, dtLog, intAmount, strResponseCode, strResponseText, strComments, intPaymentType, strBSB, strBank, strAccountName, strAccountNum, intRealmID, intCurrencyID, strReceiptRef, intStatus) VALUES
-	($intClubID, $dtLog, $intAmount, $strResponseCode, $strResponseText, $strComments, $paymentType, $strBSB, $strBank, $strAccountName, $strAccountNum, $Data->{Realm}, $currencyID, $strReceiptRef, $Defs::TXNLOG_PENDING) 
+	($entityID, $dtLog, $intAmount, $strResponseCode, $strResponseText, $strComments, $paymentType, $strBSB, $strBank, $strAccountName, $strAccountNum, $Data->{Realm}, $currencyID, $strReceiptRef, $Defs::TXNLOG_PENDING) 
 	];
 	my $query = $db->prepare($statement);
   	$query->execute;
@@ -495,19 +500,23 @@ EOS
 }
 
 sub getTransList {
-	my ($Data, $db, $whereClause, $tempClientValues_ref, $hide_list_payments_link, $displayonly) = @_;
+	my ($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref, $hide_list_payments_link, $displayonly) = @_;
 	$displayonly ||= 0;
-  my $realmID = $Data->{'Realm'};
+    my $hidePayment=1;
+    $hidePayment=0 if ($personID and $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB);
+    $hidePayment=0 if ($entityID and ! $personID and $Data->{'clientValues'}{'authLevel'} > $Defs::LEVEL_CLUB);
+
+    my $realmID = $Data->{'Realm'};
 	my $orderBy = $Data->{'SystemConfig'}{'TransListOrderBy'} || '';
-  my $clubWHERE = '';
-  if ($Data->{'clientValues'}{'clubID'} and $Data->{'clientValues'}{'clubID'} != $Defs::INVALID_ID)  {
-    $clubWHERE = qq[ 
-      AND (
-        tl.intLogID IS NULL 
-        OR tl.intClubPaymentID IN (0, $Data->{'clientValues'}{'clubID'})
-      ) 
-    ];
-  }
+    my $clubWHERE = '';
+    if ($entityID)   {
+        $clubWHERE = qq[ 
+            AND (
+                tl.intLogID IS NULL 
+                OR tl.intEntityPaymentID IN (0, $entityID)
+            ) 
+        ];
+    }
 	my $exposeNationalProducts = '';
 
 	my $prodSellLevel = qq[ 
@@ -551,55 +560,53 @@ sub getTransList {
 		  t.intTransactionID
 		$orderBy
   ];
-	$statement =~ s/AND  AND/AND/g;
-my $query = $db->prepare($statement);
-  $query->execute or print STDERR $statement;
-  my $client = setClient($Data->{clientValues});
-  my @Columns = ();
-  push (@Columns, {Name => '', Field => 'SelectLink', type => 'Selector', hide => $displayonly});
-  push (@Columns, {Name => 'Invoice Number', Field => 'intTransactionID', width => 20});
-  push (@Columns, {Name => 'Item Name', Field => 'strName'});
-  push (@Columns, {Name => 'Quantity', Field => 'intQty', width => 15});
-  push (@Columns, {Name => 'Amount', Field => 'curAmount', width =>20});
-  push (@Columns, {Name => 'Start', Field => 'dtStart', width => 20});
-  push (@Columns, {Name => 'Start_RAW', Field => 'dtStart_RAW', hide=>1});
-  push (@Columns, {Name => 'End', Field => 'dtEnd', width => 20});
-  push (@Columns, {Name => 'End_RAW', Field => 'dtEnd_RAW', hide=>1});
-  push (@Columns, {Name => 'Status', Field => 'StatusText', width => 20});
-  push (@Columns, {Name => 'Status_raw', Field => 'intStatus', hide => 1});
-  push (@Columns, {Name => '&nbsp;', Field => 'stuff', type => 'HTML', hide => $displayonly});
-  push (@Columns, {Name => 'Pay', Field => 'manual_payment', type => 'HTML', width => 10, hide => $displayonly});
-  push (@Columns, {Name => 'Notes', Field => 'strNotes',  width => 50, hide => $displayonly});
-  push (@Columns, {Name => 'View Receipt', Field => 'strReceipt', type=>"HTML", width => 50, hide => $displayonly});
+    $statement =~ s/AND  AND/AND/g;
+    my $query = $db->prepare($statement);
+    $query->execute or print STDERR $statement;
+    my $client = setClient($Data->{clientValues});
+    my @Columns = ();
+    push (@Columns, {Name => '', Field => 'SelectLink', type => 'Selector', hide => $displayonly});
+    push (@Columns, {Name => 'Invoice Number', Field => 'intTransactionID', width => 20});
+    push (@Columns, {Name => 'Item Name', Field => 'strName'});
+    push (@Columns, {Name => 'Quantity', Field => 'intQty', width => 15});
+    push (@Columns, {Name => 'Amount', Field => 'curAmount', width =>20});
+    push (@Columns, {Name => 'Start', Field => 'dtStart', width => 20});
+    push (@Columns, {Name => 'Start_RAW', Field => 'dtStart_RAW', hide=>1});
+    push (@Columns, {Name => 'End', Field => 'dtEnd', width => 20});
+    push (@Columns, {Name => 'End_RAW', Field => 'dtEnd_RAW', hide=>1});
+    push (@Columns, {Name => 'Status', Field => 'StatusText', width => 20});
+    push (@Columns, {Name => 'Status_raw', Field => 'intStatus', hide => 1});
+    push (@Columns, {Name => '&nbsp;', Field => 'stuff', type => 'HTML', hide => $displayonly});
+    push (@Columns, {Name => 'Pay', Field => 'manual_payment', type => 'HTML', width => 10, hide => $hidePayment});
+    push (@Columns, {Name => 'Notes', Field => 'strNotes',  width => 50, hide => $displayonly});
+    push (@Columns, {Name => 'View Receipt', Field => 'strReceipt', type=>"HTML", width => 50, hide => $displayonly});
 
-  my @headers = ();
-  foreach my $header (@Columns) {
-    my $sorttype = ($header->{Field} =~ m/int/) ? 'number' : 'text';
-    my $width = $header->{width} || "200";
-    my %href = (
-      name => $header->{Name},
-      field => $header->{Field},
-      sorttype => $sorttype,
-      hide => $header->{hide},
-      type => $header->{type},
-      width => $width
-    );
-    push @headers, \%href;
-  }
-  my @rowdata = ();
-  my @transCurrency = ();
-  my @transAmount = ();
-  $query->execute;
-  my $i = 0;
-  while (my $row = $query->fetchrow_hashref()) {
-
-    push @transCurrency, $row->{intCurrencyID};
-    push @transAmount, $row->{curAmount};
-
-    my $row_data = {};
-    $row_data->{id} = $i;
+    my @headers = ();
     foreach my $header (@Columns) {
-      if ($header->{Field} eq 'StatusText') {
+        my $sorttype = ($header->{Field} =~ m/int/) ? 'number' : 'text';
+        my $width = $header->{width} || "200";
+        my %href = (
+            name => $header->{Name},
+            field => $header->{Field},
+            sorttype => $sorttype,
+            hide => $header->{hide},
+            type => $header->{type},
+            width => $width
+        );
+        push @headers, \%href;
+    }
+    my @rowdata = ();
+    my @transCurrency = ();
+    my @transAmount = ();
+    $query->execute;
+    my $i = 0;
+    while (my $row = $query->fetchrow_hashref()) {
+        push @transCurrency, $row->{intCurrencyID};
+        push @transAmount, $row->{curAmount};
+        my $row_data = {};
+        $row_data->{id} = $i;
+        foreach my $header (@Columns) {
+            if ($header->{Field} eq 'StatusText') {
         my $status = $row->{intStatus};
         $row->{StatusText} = 'Unpaid' if ($status == 0);
         $row->{StatusText} = 'Paid' if ($status == 1);
@@ -617,7 +624,7 @@ my $query = $db->prepare($statement);
       $row_data->{strReceipt} = qq[];
 
       my $allowUD = 1;
-	  $allowUD = 0 if $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_TEAM;
+	  $allowUD = 0 if $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB;
       $allowUD = 0 if $Data->{'SystemConfig'}{'DontAllowUnpaidDelete'}; 
 
       $row_data->{stuff} = ($allowUD) 
@@ -720,15 +727,15 @@ sub generateTXNListLink {
 	if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON)	{
 		$tableID = $tempClientValues_ref->{personID} || $Data->{params}{personID} ||  0;
 	}
-	if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_TEAM)	{
-		$tableID = $tempClientValues_ref->{teamID} || $Data->{params}{teamID} ||  0;
+	if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB)	{
+		$tableID = $tempClientValues_ref->{clubID} || $Data->{params}{clubID} ||  0;
 	}
 	my $paymentID = $Data->{params}{paymentID} || 0;
 	$tableID = 0 if $tableID == $Defs::INVALID_ID;
 	my $link = "$Data->{target}?client=$client";
 	$link .= "&amp;a=$action" if $action;
 	$link .= "&amp;personID=$tableID" if $tableID and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON;
-	$link .= "&amp;teamID=$tableID" if $tableID and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_TEAM;
+	$link .= "&amp;clubID=$tableID" if $tableID and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB;
 	$link .= "&amp;dt_start_paid=$dtStart_paid" if $dtStart_paid;
 	$link .= "&amp;dt_end_paid=$dtEnd_paid" if $dtEnd_paid;
 	$link .= "&amp;paymentID=$paymentID" if $paymentID;
@@ -739,15 +746,10 @@ sub listTransactions_where {
     my ($whereClause, $txnStatus, $safeTableID, $safePaymentID, $paymentID, $Data, $db) = @_;
 
     $whereClause .= qq[ AND t.intID=$safeTableID and t.intTableType=$Defs::LEVEL_PERSON] if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON;
-    $whereClause .= qq[ AND t.intID=$safeTableID and t.intTableType=$Defs::LEVEL_TEAM]   if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_TEAM;
+    $whereClause .= qq[ AND t.intID=$safeTableID and t.intTableType=$Defs::LEVEL_CLUB]   if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB;
     $whereClause .= qq[ AND t1.intTLogID= $safePaymentID ] if $paymentID;
 
     my $clubID = $Data->{'clientValues'}{'clubID'} || 0;
-
-    $clubID = 0 if ($clubID == $Defs::INVALID_ID);
-    if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_TEAM or $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_TEAM) {
-        $clubID = Team::getTeamClubID($db, $Data->{'clientValues'}{'teamID'}) 
-    }
 
     $whereClause .= qq[ AND intTXNEntityID IN (0, $clubID)] if $clubID;
     $whereClause .= qq[ AND P.intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) ] if $txnStatus != $Defs::TXN_PAID;
@@ -756,8 +758,8 @@ sub listTransactions_where {
 }
 
 sub listTransactions {
-    my ($Data, $db, $tempClientValues_ref, $action, $resultMessage) = @_;
-    my ($body, $whereClause, $paidLink, $unpaidLink, $cancelledLink, $query) = ('', '', '', '', '', '');
+    my ($Data, $db, $entityID, $personID, $tempClientValues_ref, $action, $resultMessage) = @_;
+    my ($body, $paidLink, $unpaidLink, $cancelledLink, $query) = ('', '', '', '', '');
     my $txnStatus = $Data->{'ViewTXNStatus'} || $Defs::TXN_UNPAID;
     my ($link, $mode, $TableID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('', $Data, $tempClientValues_ref);
     my ($safeTableID, $safePaymentID) = ($TableID, $paymentID);
@@ -767,8 +769,16 @@ sub listTransactions {
     my $tempBody = '';
     my $transCount = 0;
 
-    $whereClause = listTransactions_where($whereClause, $txnStatus, $safeTableID, $safePaymentID, $paymentID, $Data, $db);
-	($tempBody, $transCount) = getTransList($Data, $db, $whereClause, $tempClientValues_ref);
+    my $whereClause = '';
+    $whereClause .= qq[ AND t.intID=$personID and t.intTableType=$Defs::LEVEL_PERSON] if ($personID and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON);
+    $whereClause .= qq[ AND t.intID=$entityID and t.intTableType=$Defs::LEVEL_CLUB] if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB;
+    $whereClause .= qq[ AND t1.intTLogID= $safePaymentID ] if $paymentID;
+
+    $whereClause .= qq[ AND intTXNEntityID IN (0, $entityID)] if $entityID;
+    $whereClause .= qq[ AND P.intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) ] if $txnStatus != $Defs::TXN_PAID;
+
+
+	($tempBody, $transCount) = getTransList($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref);
 
 	$body .= $tempBody;
 
@@ -806,6 +816,7 @@ sub listTransactions {
         <div class="changeoptions"><span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=P_TXN_ADD">Add Transaction</a></span></div>
     ];
     $addLink = '' if $Data->{'ReadOnlyLogin'};
+    $addLink = '' if ($Data->{'clientValues'}{'currentLevel'} == $Data->{'clientValues'}{'authLevel'});
 
     my $entityNamePlural = 'Transactions';
     $entityNamePlural= ($Data->{'SystemConfig'}{'txns_link_name'}) ? $Data->{'SystemConfig'}{'txns_link_name'} : $entityNamePlural;
@@ -854,13 +865,13 @@ sub listTransactions {
 	  }
 	  if ($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB) { 
 		  my $allowManualPayments = 1;
-		  $allowManualPayments = 0 if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_TEAM and ! allowedAction($Data, 'm_mp'));
+		  $allowManualPayments = 0 if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB and ! allowedAction($Data, 'm_mp'));
 		  $allowManualPayments = 0 if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB 
 			  and $Data->{'clientValues'}{'currentLevel'}  == $Defs::LEVEL_PERSON 
 			  and ! allowedAction($Data, 'm_mp')
 		  );
 		  $allowManualPayments = 0 if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB 
-			  and $Data->{'clientValues'}{'currentLevel'}  == $Defs::LEVEL_TEAM 
+			  and $Data->{'clientValues'}{'currentLevel'}  == $Defs::LEVEL_CLUB 
 			  and ! allowedAction($Data, 't_tp')
 		  );
       $allowManualPayments = 0 if $Data->{'ReadOnlyLogin'};
@@ -979,8 +990,8 @@ sub listTransactions {
 			</form>];
 
           if ($CC_body) {
-              if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_TEAM) { 
-                  if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_TEAM) { 
+              if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB) { 
+                  if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB) { 
                       $body .= qq[
                           <script type="text/javascript">
                               jQuery(".paytxn_chk").live('change',function() {
@@ -1282,11 +1293,11 @@ sub viewTransLog	{
 	my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
 
 	my $st = qq[
-		SELECT tblTransLog.*, IF(T.intTableType = $Defs::LEVEL_TEAM, Team.strName, CONCAT(strFirstname,' ',strSurname)) as Name, DATE_FORMAT(dtSettlement,'%d/%m/%Y') as dtSettlement
+		SELECT tblTransLog.*, IF(T.intTableType = $Defs::LEVEL_CLUB, Entity.strLocalName, CONCAT(strLocalFirstname,' ',strLocalSurname)) as Name, DATE_FORMAT(dtSettlement,'%d/%m/%Y') as dtSettlement
 		FROM tblTransLog INNER JOIN tblTXNLogs as TXNLog ON (TXNLog.intTLogID = tblTransLog.intLogID)
 			INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLog.intTXNID)
 			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
-			LEFT JOIN tblTeam as Team on (Team.intTeamID = T.intID and T.intTableType=$Defs::LEVEL_TEAM)
+			LEFT JOIN tblEntity as Entity on (Entity.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
 		WHERE intLogID = $intTransLogID
 		AND T.intRealmID = $Data->{'Realm'}
 	];
@@ -1299,11 +1310,11 @@ sub viewTransLog	{
 	my $TLref = $qry->fetchrow_hashref();
 
 	my $st_trans = qq[
-		SELECT M.strSurname, M.strFirstName, T.*, P.strName, P.strGroup, Team.strName as TeamName
+		SELECT M.strLocalSurname, M.strLocalFirstName, E.*, P.strName, P.strGroup, Entity.strLocalNameas EntityName
 		FROM tblTransactions as T
 			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
 			LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
-			LEFT JOIN tblTeam as Team on (Team.intTeamID = T.intID and T.intTableType=$Defs::LEVEL_TEAM)
+			LEFT JOIN tblEntity as Entity on (Entity.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
 		WHERE intTransLogID = $intTransLogID
 		AND T.intRealmID = $Data->{'Realm'}
 	];
@@ -1458,8 +1469,8 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 	while (my $dref = $qry_trans->fetchrow_hashref())	{
 		$count++;
         my $paymentFor = '';
-        $paymentFor = qq[$dref->{strSurname}, $dref->{strFirstName}] if ($dref->{intTableType} == $Defs::LEVEL_PERSON);
-        $paymentFor = qq[$dref->{TeamName}] if ($dref->{intTableType} == $Defs::LEVEL_TEAM);
+        $paymentFor = qq[$dref->{strLocalSurname}, $dref->{strFirstName}] if ($dref->{intTableType} == $Defs::LEVEL_PERSON);
+        $paymentFor = qq[$dref->{EntityName}] if ($dref->{intTableType} == $Defs::LEVEL_CLUB);
 		my $productname = $dref->{strName};
 		$productname = qq[$dref->{strGroup}-].$productname if ($dref->{strGroup});
 		$body .= qq[
@@ -1511,11 +1522,11 @@ sub viewPayLaterTransLog    {
 	my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
 
 	my $st = qq[
-		SELECT tblTransLog.*, IF(T.intTableType = $Defs::LEVEL_TEAM, Team.strName, CONCAT(strFirstname,' ',strSurname)) as Name, DATE_FORMAT(dtSettlement,'%d/%m/%Y') as dtSettlement
+		SELECT tblTransLog.*, IF(T.intTableType = $Defs::LEVEL_CLUB, Entity.strLocalName, CONCAT(strLocalFirstname,' ',strLocalSurname)) as Name, DATE_FORMAT(dtSettlement,'%d/%m/%Y') as dtSettlement
 		FROM tblTransLog INNER JOIN tblTXNLogs as TXNLog ON (TXNLog.intTLogID = tblTransLog.intLogID)
 			INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLog.intTXNID)
 			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
-			LEFT JOIN tblTeam as Team on (Team.intTeamID = T.intID and T.intTableType=$Defs::LEVEL_TEAM)
+			LEFT JOIN tblEntity as Entity on (Entity.intEntityID= T.intID and T.intTableType=$Defs::LEVEL_CLUB)
 		WHERE intLogID = $intTransLogID
 		AND T.intRealmID = $Data->{'Realm'}
 	];
@@ -1525,12 +1536,12 @@ sub viewPayLaterTransLog    {
 	my $TLref = $qry->fetchrow_hashref();
 
 	my $st_trans = qq[
-		SELECT M.strSurname, M.strFirstName, T.*, P.strName, P.strGroup
+		SELECT M.strLocalSurname, M.strLocalFirstName, E.*, P.strName, P.strGroup
 		FROM tblTransactions as T
             LEFT JOIN tblTXNLogs as TXNLog ON (TXNLog.intTXNID = T.intTransactionID)
 			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
 			LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
-			LEFT JOIN tblTeam as Team on (Team.intTeamID = T.intID and T.intTableType=$Defs::LEVEL_TEAM)
+			LEFT JOIN tblEntity as Entity on (Entity.intEntityID= T.intID and T.intTableType=$Defs::LEVEL_CLUB)
 		WHERE TXNLog.intTLogID = $intTransLogID
 		AND T.intRealmID = $Data->{'Realm'}
         AND P.intProductType<>2
@@ -1620,9 +1631,9 @@ sub viewPayLaterTransLog    {
 }
 
 sub listTransLog	{
-  my($Data, $tableID, $assocID) = @_;
-	$tableID ||= 0;
-	$assocID ||= 0;
+  my($Data, $entityID, $personID) = @_;
+    $entityID ||= 0;
+    $personID ||= 0;
 	my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
 	my $db=$Data->{'db'};
 	my $resultHTML = '';
@@ -1640,15 +1651,16 @@ sub listTransLog	{
     'comments' => $lang->txt('Comments'),
   );
 	my $WHERE = '';
-	if ($tableID)	{
-		$WHERE = qq[ AND T.intID = $tableID];
-		if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON)	{
+		if ($personID and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON)	{
+		    $WHERE = qq[ AND T.intID = $personID];
+		    $WHERE .= qq[ AND T.intTXNEntityID = $entityID] if ($entityID);
 			$WHERE .= qq[ AND T.intTableType=$Defs::LEVEL_PERSON] 
 		}
-		elsif ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_TEAM)	{
-			$WHERE .= qq[ AND T.intTableType=$Defs::LEVEL_TEAM] 
+		elsif ($entityID and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB)	{
+		    $WHERE = qq[ AND T.intID = $entityID];
+		    $WHERE .= qq[ AND T.intTXNEntityID = $entityID];
+			$WHERE .= qq[ AND T.intTableType=$Defs::LEVEL_CLUB] 
 		}
-	}
   my $clubWHERE = '';
   if (
 		$Data->{'clientValues'}{'clubID'} 
@@ -1686,7 +1698,7 @@ sub listTransLog	{
 		$dref->{paymentType} =$Defs::paymentTypes{$dref->{intPaymentType}};
 		$dref->{intAmount} = qq[$dollarSymbol $dref->{intAmount}];
 		my $action = 'P_TXNLog_payVIEW';
-		$action = 'T_TXNLog_payVIEW' if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_TEAM;
+		$action = 'C_TXNLog_payVIEW' if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB;
 		push @rowdata, {
 			id => $dref->{'intLogID'},
 			intLogID => $dref->{'intLogID'},

@@ -14,8 +14,6 @@ sub load {
     DATE_FORMAT(dtPassportExpiry,'%d/%m/%Y') AS dtPassportExpiry,
     DATE_FORMAT(dtDOB,'%d/%m/%Y') AS dtDOB,
     tblPerson.dtDOB AS dtDOB_RAW,
-    DATE_FORMAT(dtPoliceCheck,'%d/%m/%Y') AS dtPoliceCheck,
-    DATE_FORMAT(dtPoliceCheckExp,'%d/%m/%Y') AS dtPoliceCheckExp,
     DATE_FORMAT(tblPerson.tTimeStamp,'%d/%m/%Y') AS tTimeStamp,
     DATE_FORMAT(dtNatCustomDt1,'%d/%m/%Y') AS dtNatCustomDt1,
     DATE_FORMAT(dtNatCustomDt2,'%d/%m/%Y') AS dtNatCustomDt2,
@@ -53,11 +51,6 @@ sub name {
 }
 
 
-sub assocID {
-  my $self = shift;
-  return $self->{'assocID'} || 0;
-}
-
 # Across realm check to see there is an existing member with this firstname/surname/dob and with primary club set.
 # Static method.
 sub already_exists {
@@ -71,37 +64,19 @@ sub already_exists {
 
     my $st = qq[
         SELECT
-            MC.intMemberID,
+            M.intPersonID,
             M.strLocalFirstname,
             M.strLocalSurname,
             M.strEmail,
             M.dtDOB,
-            M.strNationalNum,
-            DATE_FORMAT(MT.dtDate1, '%d/%m/%Y') AS LastPlayed,
-            MC.intClubID,
-            C.strName  AS ClubName,
-            A.intAssocID,
-            A.strName  AS AssocName,
-            A.strState AS AssocState,
-            TNS.int30_ID AS SourceStateID
-        FROM tblMember_Clubs                AS MC
-            INNER JOIN tblMember            AS M  ON (M.intMemberID =  MC.intMemberID) 
-            INNER JOIN tblClub              AS C  ON (C.intClubID = MC.intClubID)
-            INNER JOIN tblAssoc_Clubs       AS AC ON (AC.intClubID = C.intClubID)
-            INNER JOIN tblAssoc             AS A  ON (A.intAssocID=AC.intAssocID)
-            LEFT  JOIN tblMember_Types      AS MT ON (MT.intAssocID=A.intAssocID AND MT.intMemberID=MC.intMemberID)
-            INNER JOIN tblTempNodeStructure AS TNS ON TNS.intAssocID=A.intAssocID
+            M.strNationalNum
+        FROM tblPerson as M 
         WHERE
-            A.intRealmID=?
-            AND A.intAssocTypeID=?
-#            AND M.intPlayer=1
-            AND M.strFirstname=?
-            AND M.strSurname=?
+            M.intRealmID=?
+            AND M.strLocalFirstname=?
+            AND M.strLocalSurname=?
             AND M.dtDOB=?
             AND M.intStatus=1
-#           AND MC.intPrimaryClub=1 #temporary patch for natrego demo purposes.
-        ORDER BY
-            LastPlayed, AssocName
      ];
 
     my $q = $Data->{'db'}->prepare($st);

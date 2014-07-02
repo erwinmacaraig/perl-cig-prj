@@ -331,8 +331,6 @@ sub getEntityMenuData {
         'clearancesAll',
         ]],
         [ $lang->txt('Registrations'), 'menu',[
-        'products',
-        'products',
         'bankdetails',
         'bankfileexport',
         'paymentsplitrun',
@@ -597,7 +595,6 @@ sub getAssocMenuData {
         ]],
         [ $lang->txt('Registrations'), 'menu',[
         'bankdetails',
-        'products',
         'registrationforms',
         'paymentsplits',
         'services',
@@ -801,6 +798,13 @@ sub getClubMenuData {
             url => $baseurl."a=AL_",
         };
     }
+     if($SystemConfig->{'AllowTXNs'} and $SystemConfig->{'AllowClubTXNs'}) {
+        $menuoptions{'transactions'} = {
+            name => $lang->txt('Transactions'),
+            url => $baseurl."a=C_TXNLog_list",
+        };
+     }
+ 
     my @menu_structure = (
         [ $lang->txt('Dashboard'), 'home','home'],
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}), 'menu', [
@@ -814,8 +818,8 @@ sub getClubMenuData {
         ]],
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu','venues'],
         [ $lang->txt('Registrations'), 'menu',[
-        'products',
         'registrationforms',
+        'transactions',
         'locator',
         ]],
         [ $lang->txt('Reports'), 'menu',[

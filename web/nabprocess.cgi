@@ -77,18 +77,16 @@ sub main {
     my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     $Data{'lang'}=$lang;
     my %clientValues = getClient($client);
-    $clientValues{'assocID'} = $Order->{'AssocID'} if ($Order->{'AssocID'} and $Order->{'AssocID'}>0 and $clientValues{'assocID'} <= 0);
     $clientValues{'clubID'} = $Order->{'ClubID'} if ($Order->{'ClubID'} and $Order->{'ClubID'}>0 and $clientValues{'clubID'} <= 0);
 
     $Data{'clientValues'} = \%clientValues;
     my $realm = $Data{'Realm'};
-    my $assocID = $clientValues{'assocID'};    
     if(!$realm){
         my $st = qq[
-        SELECT intRealmID FROM tblAssoc WHERE intAssocID = ?
+        SELECT intRealmID FROM tblEntity WHERE intEntityID= ?
         ];
         my $qry= $db->prepare($st);
-        $qry->execute($assocID);
+        $qry->execute($Data->{'clientValues'}{'clubID'});
 
         $realm = $qry->fetchrow_array() || 0;
         $Data{'Realm'}= $realm;
@@ -118,7 +116,7 @@ sub main {
     
     my $body='';
     if ($Order->{'Status'} != 0) {
-        $body  = qq[<div align="center" class="warningmsg" style="font-size:14px;">here was an error</div>BB$Order->{'Status'} $Order->{'AssocID'}];
+        $body  = qq[<div align="center" class="warningmsg" style="font-size:14px;">here was an error</div>BB$Order->{'Status'}];
         if ($Order->{'AssocID'}) {
             my $template_ref = getPaymentTemplate(\%Data, $Order->{'AssocID'});
             my $templateBody = $template_ref->{'strFailureTemplate'} || 'payment_failure.templ';

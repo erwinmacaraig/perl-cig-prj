@@ -575,15 +575,11 @@ sub getCheckoutAmount 	{
 	 $st = qq[
         SELECT T.intTransactionID, T.curAmount
                 FROM tblTransactions as T
-                    INNER JOIN tblAssoc as A ON (A.intAssocID = T.intAssocID)
+                    INNER JOIN tblEntity as E ON (E.intEntityID = intTXNEntityID)
                 WHERE T.intTransactionID = ?
-                        AND A.intAllowPayment > 0
-                        AND A.intAssocTypeID = $Data->{'RealmSubType'}
                         AND T.intRealmID = $Data->{'Realm'}
                         AND T.intStatus=0
     ];
-                        #AND T.intRealmSubTypeID= $Data->{'RealmSubType'}
-
     	my $qry = $db->prepare($st);
 	for my $transid (@{$trans})	{
 		$transid || next;
@@ -647,29 +643,6 @@ sub getPaymentSettings	{
 		$where = qq[intPaymentConfigID = $Data->{'SystemConfig'}{'PaymentConfigID'}];
 	}
     my $softDescriptor='';
-	if ($clientValues->{'assocID'} and $clientValues->{'assocID'} >0)	{
-		$where .= qq[ OR ] if $where;
-		$where .= qq[
-			 (intEntityID = $clientValues->{'assocID'}
-                        AND intLevelID = $Defs::LEVEL_ASSOC)
-		];
-
-		my $assoc_st = qq[
-                        SELECT intPaymentConfigID
-                        FROM tblAssoc
-                        WHERE intAssocID = $clientValues->{'assocID'}
-                ];
-                                #AND intAllowPayment=1
-                my $qry_assoc = $db->prepare($assoc_st) or query_error($assoc_st);
-                $qry_assoc->execute or query_error($assoc_st);
-                $softDescriptor = getSoftDescriptor($Data, undef, $Defs::LEVEL_ASSOC, $clientValues->{'assocID'}, 0);
-                my $aref = $qry_assoc->fetchrow_hashref();
-		if ($aref->{'intPaymentConfigID'})	{
-            $where = qq[ intPaymentConfigID = $aref->{'intPaymentConfigID'} ];
-		}
-        return undef if (! $aref->{'intPaymentConfigID'} and ! $PaymentOwnerClubID and ! $Data->{'SystemConfig'}{'PaymentConfigID'});
-	}
-	#if ($clientValues->{'clubID'} and $clientValues->{'clubID'} >0)	{
 	if ($PaymentOwnerClubID and $clientValues->{'clubID'} and $clientValues->{'clubID'} >0)	{  #Use this if $PaymentOwnerClubID
 		$where .= qq[ OR ] if $where;
 		$where .= qq[
@@ -820,21 +793,21 @@ sub displayPaymentLaterResult        {
 
 	my $ID = $Data->{'clientValues'}{'personID'} || 0;
                 my $EntityType=$Defs::LEVEL_PERSON;
-                if ($Data->{'clientValues'}{'teamID'} and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_TEAM) {
-                        $ID = $Data->{'clientValues'}{'teamID'} || 0;
-                        $EntityType = $Defs::LEVEL_TEAM;
+                if ($Data->{'clientValues'}{'clubID'} and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB) {
+                        $ID = $Data->{'clientValues'}{'clubID'} || 0;
+                        $EntityType = $Defs::LEVEL_CLUB;
                 }
         my $st= qq[
-                SELECT TL.*, A.intAssocTypeID
-                FROM tblTransLog as TL
-					LEFT JOIN tblAssoc as A ON (A.intAssocID = TL.intAssocPaymentID)
+                SELECT TL.*, E.intSubRealmID
+                FRO tblTransLog as TL
+					LEFT JOIN tblEntity as E ON (E.intEntityID = TL.intEntityPaymentID)
                 WHERE TL.intLogID = ?
         ];
     	my $qry = $db->prepare($st) or query_error($st);
     	$qry->execute($intLogID) or query_error($st);
         my $transref = $qry->fetchrow_hashref();
 	$Data->{'RegoFormID'} = $transref->{'intRegoFormID'} || 0;
-	$Data->{'RealmSubType'} ||= $transref->{'intAssocTypeID'} || 0;
+	$Data->{'RealmSubType'} ||= $transref->{'intSubRealmID'} || 0;
 	$Data->{'Realm'} ||= $transref->{'intRealmID'} || 0;
 	$Data->{'clientValues'}{'assocID'} ||= $transref->{intAssocPaymentID} || 0;
 
@@ -848,7 +821,6 @@ sub displayPaymentLaterResult        {
 					INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLog.intTXNID)
 				WHERE intTLogID= $intLogID
 					AND T.intRealmID = $Data->{'Realm'}
-					AND T.intAssocID = $Data->{'clientValues'}{'assocID'}
 					AND T.intStatus <> -1
 			];
 					#AND T.intID = $ID AND T.intTableType=$EntityType
@@ -875,24 +847,22 @@ sub displayPaymentResult        {
 
 	my $ID = $Data->{'clientValues'}{'personID'} || 0;
                 my $EntityType=$Defs::LEVEL_PERSON;
-                if ($Data->{'clientValues'}{'teamID'} and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_TEAM) {
-                        $ID = $Data->{'clientValues'}{'teamID'} || 0;
-                        $EntityType = $Defs::LEVEL_TEAM;
+                if ($Data->{'clientValues'}{'clubID'} and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB) {
+                        $ID = $Data->{'clientValues'}{'clubID'} || 0;
+                        $EntityType = $Defs::LEVEL_CLUB;
                 }
         my $st= qq[
-                SELECT TL.*, A.intAssocTypeID
+                SELECT TL.*, E.intSubRealmID
                 FROM tblTransLog as TL
-					LEFT JOIN tblAssoc as A ON (A.intAssocID = TL.intAssocPaymentID)
+					LEFT JOIN tblEntity as E ON (E.intEntityID = TL.intEntityPaymentID)
                 WHERE TL.intLogID = $intLogID
         ];
     	my $qry = $db->prepare($st) or query_error($st);
     	$qry->execute or query_error($st);
         my $transref = $qry->fetchrow_hashref();
 	$Data->{'RegoFormID'} = $transref->{'intRegoFormID'} || 0;
-	$Data->{'RealmSubType'} ||= $transref->{'intAssocTypeID'} || 0;
+	$Data->{'RealmSubType'} ||= $transref->{'intSubRealmID'} || 0;
 	$Data->{'Realm'} ||= $transref->{'intRealmID'} || 0;
-	$Data->{'clientValues'}{'assocID'} ||= $transref->{intAssocPaymentID} || 0;
-    $Data->{'clientValues'}{'assocID'} = $transref->{intAssocPaymentID} if ($Data->{'clientValues'}{'assocID'} and $Data->{'clientValues'}{'assocID'} == -1 and $transref->{intAssocPaymentID});
 
         my $body = '';
         my $re_pay_body = '';
@@ -919,7 +889,6 @@ sub displayPaymentResult        {
 					INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLog.intTXNID)
 				WHERE intTLogID= $intLogID
 					AND T.intRealmID = $Data->{'Realm'}
-					AND T.intAssocID = $Data->{'clientValues'}{'assocID'}
 					AND T.intStatus <> -1
 			];
 					#AND T.intID = $ID AND T.intTableType=$EntityType
@@ -1114,7 +1083,7 @@ sub getTXNDetails	{
 	my $db = $Data->{'db'};
 	my $statusWHERE = $statusCHECK ? qq[ AND T.intStatus=0] : '';
 	my $st = qq[
-        	SELECT T.intTransactionID, T.intTableType, T.intID, T.curAmount, A.strName, P.strName as ProductName, A.intPaymentConfigID, A.strPaymentReceiptBodyHTML,A.strPaymentReceiptBodyTEXT , P.strGSTText, T.intQty, P.strProductNotes, P.strGroup as ProductGroup, A.strBusinessNo, T.intAssocID
+        	SELECT T.intTransactionID, T.intTableType, T.intID, T.curAmount, P.strName as ProductName, A.intPaymentConfigID, A.strPaymentReceiptBodyHTML,A.strPaymentReceiptBodyTEXT , P.strGSTText, T.intQty, P.strProductNotes, P.strGroup as ProductGroup, A.strBusinessNo, T.intAssocID
                 FROM tblTransactions as T
                 	INNER JOIN tblAssoc as A ON (A.intAssocID = T.intAssocID)
 			INNER JOIN tblProducts as P ON (P.intProductID = T.intProductID)
@@ -1272,20 +1241,13 @@ sub EmailPaymentConfirmation	{
 	{
 		my $st = qq[
 			SELECT DISTINCT
-				A.strEmail as AssocEmail,
-				A.strName AS AssocName,
+				E.strLocalName as EntityName.
+                E.strEmail as EntityEmail,
 				intNoPMSEmail,
-				intCCAssocOnClubPayments,
-				A.intAssocID,
-				C.intClubID,
-				C.strName AS ClubName,
-				C.strEmail as ClubEmail,
-				A.strBusinessNo,
-				IF(TL.intSWMPaymentAuthLevel = 3 OR RF.intClubID >0, 'CLUB', 'ASSOC') as SoldBy
+				IF(TL.intSWMPaymentAuthLevel = 3 OR RF.intClubID >0, 'CLUB', 'MA') as SoldBy
 			FROM
 				tblTransLog as TL
-				INNER JOIN tblAssoc as A ON (A.intAssocID=TL.intAssocPaymentID)
-				LEFT JOIN tblClub as C ON (C.intClubID = TL.intClubPaymentID)
+				INNER JOIN tblEntity as E ON (E.intEntityID = TL.intEntityPaymentID)
 				LEFT JOIN tblRegoForm as RF ON (RF.intRegoFormID = TL.intRegoFormID)
 			WHERE
 				TL.intLogID = ?
@@ -1296,9 +1258,6 @@ sub EmailPaymentConfirmation	{
 		my $orgname = '';
 		my $assocID=0;
 		while (my $dref = $qry_assoc->fetchrow_hashref())   {
-			my $from_email_to_use = 'assoc';
-			$assocID=$dref->{'intAssocID'};
-			my $assocEmail = '';
 			my $clubEmail = '';
 			if($dref->{'SoldBy'} eq 'CLUB')	{
 				$from_email_to_use = 'club';
@@ -1314,33 +1273,14 @@ sub EmailPaymentConfirmation	{
                 my $clubID = $dref->{'intClubID'};
 
                 #assoc & club emails dupes will already be filtered out. however, still need to be checked against the rest.
-                my $assoc_emails_aref = ($send_to_assoc) ? get_emails_list(ContactsObj->getList(dbh=>$dbh, associd=>$assocID, getpayments=>1)) : '';
                 my $club_emails_aref  = ($send_to_club and $clubID)  ? get_emails_list(ContactsObj->getList(dbh=>$dbh, associd=>$assocID, clubid=>$clubID, getpayments=>1)) : ''; #will be false for a team to assoc (type 2) form
 		
-                #get rid of dupes. %EmailsUsed should have retained the to and cc addresses.
-                if ($assoc_emails_aref) {
-                    foreach my $email (@$assoc_emails_aref) {
-                        $assocEmail .= check_email_address(\%EmailsUsed, $email) if $email;
-                    }
-                }
-
                 if ($club_emails_aref) {
                     foreach my $email (@$club_emails_aref) {
                         $clubEmail .= check_email_address(\%EmailsUsed, $email) if $email;
                     }
                 }
             }
-            elsif ($Data->{'SystemConfig'}{'paymentReceiptCC_Assoc'} and ! $dref->{intNoPMSEmail})   {
-				$assocEmail = getServicesContactsEmail($Data, $Defs::LEVEL_ASSOC, $dref->{'intAssocID'}, $Defs::SC_CONTACTS_PAYMENTS) || $dref->{'AssocEmail'} . ";"; 
-				if ($dref->{intClubID}) {
-					$clubEmail = getServicesContactsEmail($Data, $Defs::LEVEL_CLUB, $dref->{'intClubID'}, $Defs::SC_CONTACTS_PAYMENTS) || $dref->{'ClubEmail'} . ";";
-				}
-				if (! $dref->{intClubID} or ($dref->{intClubID} and $dref->{'intCCAssocOnClubPayments'})) {
-				    $bcc_address .= qq[$assocEmail] if $assocEmail;
-				}
-				$bcc_address .= qq[$clubEmail] if $clubEmail;
-			}
-
 			$TransData{'OrgName'} = $orgname || '';
 			$TransData{'strBusinessNo'} = $dref->{'strBusinessNo'} ? qq[<b>ABN:</b> $dref->{'strBusinessNo'}<br>] : '';
 
@@ -1363,11 +1303,6 @@ sub EmailPaymentConfirmation	{
 		$Data->{'SystemConfig'}=getSystemConfig($Data);
 	}
 	$TransData{'AssocPaymentExtraDetails'} = $Data->{'SystemConfig'}{'AssocConfig'}{'AssocPaymentExtraDetails'} || '';
-	if ($Data->{'SystemConfig'}{'AssocConfig'}{'AssocPaymentOrgName'})	{
-		$TransData{'OrgName'} = $Data->{'SystemConfig'}{'AssocConfig'}{'AssocPaymentOrgName'};
-		$TransData{'strBusinessNo'} =' ';
-	}
-
 	sendTemplateEmail(
         $Data,
         'payments/payment_receipt.templ',

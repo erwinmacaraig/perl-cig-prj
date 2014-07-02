@@ -23,10 +23,10 @@ use CGI qw(param unescape escape);
 sub gatewayTransactions	{
 	my ($Data, $logID) = @_;
 	my $st = qq[
-                SELECT T.intRealmSubTypeID, T.intRealmID, A.intPaymentConfigID, TL.intPaymentConfigUsedID, TL.intAmount as Amount, TL.intStatus, P.strName as ProductName, P.strGroup as ProductGroup, T.curAmount as TxnAmount, intQty, T.intTransactionID, A.strName as AssocName, strGSTText, strRealmName, T.curPerItem, T.intStatus as TXNStatus, T.intAssocID, intClubPaymentID, intAssocPaymentID, PC.strCurrency, RF.intAssocID as intAssocFormOwner, RF.intClubID as ClubFormOwner, TL.intRegoFormID, intSWMPaymentAuthLevel
+                SELECT T.intRealmSubTypeID, T.intRealmID, E.intPaymentConfigID, TL.intPaymentConfigUsedID, TL.intAmount as Amount, TL.intStatus, P.strName as ProductName, P.strGroup as ProductGroup, T.curAmount as TxnAmount, intQty, T.intTransactionID, strGSTText, strRealmName, T.curPerItem, T.intStatus as TXNStatus, T.intTXNEntityID, intEntityPaymentID, PC.strCurrency, RF.intAssocID as intAssocFormOwner, RF.intClubID as ClubFormOwner, TL.intRegoFormID, intSWMPaymentAuthLevel
                         FROM tblTransactions as T
                         INNER JOIN tblTXNLogs as TLogs ON (T.intTransactionID = TLogs.intTXNID and TLogs.intTLogID = $logID)
-                        INNER JOIN tblAssoc as A ON (A.intAssocID = T.intAssocID)
+                        LEFT JOIN tblEntity as E ON (E.intEntityID = T.intTXNEntityID)
                         INNER JOIN tblTransLog as TL ON (TL.intLogID = TLogs.intTLogID)
                         INNER JOIN tblProducts as P ON (P.intProductID = T.intProductID)
                         INNER JOIN tblRealms as R ON (R.intRealmID=T.intRealmID)
@@ -44,13 +44,13 @@ sub gatewayTransactions	{
         while (my $dref=$qry->fetchrow_hashref())       {
                 $Data->{'RealmSubType'} = $dref->{intRealmSubTypeID} || 0;
                 $Data->{'Realm'} = $dref->{intRealmID} || 0;
+                $Data->{'EntityID'} = $dref->{intTXNEntityID} || 0;
                 $Data->{'SystemConfig'}{'PaymentConfigID'} = $dref->{intPaymentConfigID} || 0;
                 $Data->{'SystemConfig'}{'PaymentConfigUsedID'} = $dref->{intPaymentConfigUsedID} || 0;
 		$Order{'TransLogStatus'}=$dref->{'intStatus'} || 0;
                 $Order{'TotalAmount'} = $dref->{'Amount'};
                 $Order{'Status'} = $dref->{'intStatus'};
                 $Order{'TLStatus'} = $dref->{'intStatus'};
-                $Order{'AssocID'} = $dref->{'intAssocID'};
                 $Order{'Currency'} = $dref->{'strCurrency'};
 		next if ($dref->{intStatus} >= 1);
                 next if ($dref->{TXNStatus} == 1);
@@ -61,8 +61,7 @@ sub gatewayTransactions	{
                 $Transactions{$count}{'amountPerItem'} = $dref->{'curPerItem'};
                 $Transactions{$count}{'qty'} = $dref->{'intQty'};
 		$totalAmount = $totalAmount + $dref->{'TxnAmount'};
-                $Order{'AssocName'} = qq[$dref->{'AssocName'} ];
-                $Order{'ClubID'} = $dref->{'intClubPaymentID'};
+                $Order{'EntityID'} = $dref->{'intEntityPaymentID'};
                 $Order{'Realm'} = $dref->{'strRealmName'};
                 $Order{'ClubFormOwner'} = 0;
 				#Lets get the ID of the Club in RegoForm to see the form owner
@@ -89,12 +88,10 @@ sub gatewayTransLog	{
 	my $st = qq[
 		SELECT
 			TL.*,
-			A.strName as AssocName,
-			C.strName as ClubName
+			E.strLocalName as EntityName
 		FROM
 			tblTransLog as TL
-			LEFT JOIN tblAssoc as A ON (A.intAssocID = TL.intAssocPaymentID)
-			LEFT JOIN tblClub as C ON (C.intClubID = intClubPaymentID)
+			LEFT JOIN tblEntity as E ON (E.intEntityID = TL.intEntityPaymentID)
 		WHERE 
 			TL.intLogID=?
 	];
@@ -107,18 +104,18 @@ sub gatewayTransLog	{
 		SELECT
 			T.* ,
 			P.strName as ProductName,
-			M.strFirstname,
-			M.strSurname,
-			Team.strName as TeamName
+			M.strLocalFirstname,
+			M.strLocalSurname,
+            Entity.strLocalName as EntityName
 		FROM
 			tblTransactions as T
 			INNER JOIN tblProducts as P ON (P.intProductID = T.intProductID)
-			LEFT JOIN tblTeam as Team ON (
-				Team.intTeamID = T.intID
-				AND T.intTableType=2
+			LEFT JOIN tblEntity as Entity ON (
+				Entity.intEntityID = T.intID
+				AND T.intTableType=3
 			)
-			LEFT JOIN tblMember as M ON (
-				M.intMemberID= T.intID
+			LEFT JOIN tblPerson as M ON (
+				M.intPersonID= T.intID
 				AND T.intTableType=1
 			)
 		WHERE
@@ -134,9 +131,9 @@ sub gatewayTransLog	{
 		if ($tref->{'intQty'}>1)	{
          $tref->{'QtyAmount'} = qq[$tref->{'intQty'} @ \$$tref->{'curPerItem'}];
 		}
-		$tref->{'MemberTeamFor'} = qq[$tref->{'strFirstname'} $tref->{'strSurname'}];
-		if ($tref->{'intTableType'} == 2)	{
-			$tref->{'MemberTeamFor'} = $tref->{'TeamName'}
+		$tref->{'MemberEntityFor'} = qq[$tref->{'strLocalFirstname'} $tref->{'strLocalSurname'}];
+		if ($tref->{'intTableType'} == 3)	{
+			$tref->{'MemberEntityFor'} = $tref->{'EntityName'}
 		}
 
 		push @TXNs, $tref;
@@ -148,9 +145,9 @@ sub gatewayTransLog	{
 }
 sub getPaymentTemplate  {
 
-  my ($Data, $assocID, $templateType) = @_;
+  my ($Data, $entityID, $templateType) = @_;
 
-  $assocID ||= 0;
+  $entityID ||= 0;
   my $realmID = $Data->{'Realm'} || 0;
   my $realmSubTypeID = $Data->{'RealmSubType'} || 0;
 
@@ -162,9 +159,9 @@ sub getPaymentTemplate  {
     WHERE
       intRealmID IN (0, $realmID)
       AND intRealmSubTypeID IN (0, $realmSubTypeID)
-      AND intAssocID IN (0, $assocID)
+      AND intEntityID IN (0, $entityID)
     ORDER BY
-      intAssocID DESC, intRealmSubTypeID DESC, intRealmID DESC
+      intEntityID DESC, intRealmSubTypeID DESC, intRealmID DESC
     LIMIT 1
   ];
   my $qry= $Data->{'db'}->prepare($st) or query_error($st);
