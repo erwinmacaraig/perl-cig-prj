@@ -103,7 +103,7 @@ print STDERR "HANDLE: ERROR value\n";
 			push @newTXNs, createPartPayment($db, $trans_ref, $thisTXN, \%params);
 		}
 		$Data{'clientValues'}{'clubID'} = $clubID;
-		my $checkOut = Payments::checkoutConfirm(\%Data, \@newTXNs,1) || q{};
+		my $checkOut = Payments::checkoutConfirm(\%Data, $paymentType, \@newTXNs,1) || q{};
 		$trans_ref->{'checkout'} = $checkOut;
 	}
 	else	{

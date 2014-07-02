@@ -34,8 +34,6 @@ sub main	{
 	my $body = '';
 	## GENERAL VARIABLES
 
-#	my $paymentSettings = getPaymentSettings($Data);
-
 	processTransLogFailure($db, $clientTransRefID, '', '', '', '', '');
 
 disconnectDB($db);

@@ -112,7 +112,7 @@ sub application_details	{
     	$feedefault = getFeeTypeDefault($Data, $entityTypeID, $entityID);
 	} 
     my $paymentSettings = Payments::getPaymentSettings($Data, 0); 
-    my $softDescriptor = Payments::getSoftDescriptor($Data, $paymentSettings, $entityTypeID, $entityID, 1);
+    my $softDescriptor = Payments::getSoftDescriptor($Data, $paymentSettings, $entityTypeID, $entityID);
     my $charCount = 22-length($softDescriptor)-1; ## Extra 1 for space after current text
 
 	my %FieldDefinitions=(
@@ -793,7 +793,7 @@ sub nab_application_details	{
         }
 	
 	my $paymentSettings = Payments::getPaymentSettings($Data, 0); 
-	my $softDescriptor = Payments::getSoftDescriptor($Data, $paymentSettings, $entityTypeID, $entityID, 0);
+	my $softDescriptor = Payments::getSoftDescriptor($Data, $paymentSettings, $entityTypeID, $entityID);
 	my $charCount = 22-length($softDescriptor)-1; ## Extra 1 for space after current text
 
 	my $contact1 = $field->{'Contacts'} ? $field->{'Contacts'}[0]  : ();

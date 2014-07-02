@@ -539,7 +539,7 @@ sub rego_postMemberUpdate  {
 		}
 
 		if($txns_added and  @{$txns_added} ) {
-			$checkOut = Payments::checkoutConfirm($Data, $txns_added,1) || q{};
+			$checkOut = Payments::checkoutConfirm($Data, $paymentType, $txns_added,1) || q{};
 		}
 		
 		
@@ -990,7 +990,7 @@ sub rego_addTempMember  {
     my $checkOut ='';
 	$Data->{'sessionKey'} = $session->id();
     if($txns_added and  @{$txns_added} ) {
-	    $checkOut = Payments::checkoutConfirm($Data, $txns_added,1) || q{};
+	    $checkOut = Payments::checkoutConfirm($Data, $paymentType, $txns_added,1) || q{};
     }
 =c
         if( $params->{'d_PhotoUpload'} )  {

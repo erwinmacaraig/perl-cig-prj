@@ -69,35 +69,27 @@ sub main	{
 
 
 	#if (! $assocID or $assocID !~ /^\d.*$/)	{
+    my $paymentType=0;
 	{
 		my $st = qq[
 			SELECT 
-				intAssocPaymentID
+				intEntityPaymentID, intPaymentType, intEntityType, intRealmID
 			FROM 
-				tblTransLog 
+				tblTransLog LEFT JOIN tblEntity as E ON (intEntityPaymentID = intEntityID)
 			WHERE
 				intLogID = ?
 			LIMIT 1
 		];
 		my $qry = $db->prepare($st);
 		$qry->execute($clientTransRefID);
-		my $TassocID = $qry->fetchrow_array() || 0;
+		my $TassocID = 0;
+        ($TentityID, $paymentType, $entityType, $realmID) = $qry->fetchrow_array();
 		$assocID=$TassocID if ($TassocID);
 		$Data{'clientValues'}{'assocID'} = $assocID if ($assocID and $assocID > 0);
 		$clientValues{'assocID'} = $assocID if ($assocID and $assocID =~ /^\d.*$/);
+        $Data{'Realm'} = $realmID if (! $Data{'Realm'});
 
 	}
-        my $realm = $Data{'Realm'};
-        if(!$realm){
-            my $st = qq[
-                        SELECT intRealmID FROM tblAssoc WHERE intAssocID = ?
-                    ];
-                my $qry= $db->prepare($st);
-                $qry->execute($assocID);
-
-            $realm = $qry->fetchrow_array() || 0;
-            $Data{'Realm'}= $realm;
-        }
         # DO DATABASE THINGS
         my $DataAccess_ref=getDataAccess(\%Data);
     $Data{'Permissions'}=GetPermissions(
@@ -117,7 +109,7 @@ $Data{'clientValues'}{'assocID'} = $assocID if ($assocID and $assocID > 0);
         $client= setClient(\%clientValues);
   	$Data{'client'}=$client;
 
-	my $paymentSettings = getPaymentSettings(\%Data,$external);
+	my $paymentSettings = getPaymentSettings(\%Data,$paymentType, $external);
 	$paymentSettings->{'PAYPAL'}=1;
 
     	my $header_css = $noheader ? ' #spheader {display:none;} ' : '';

@@ -29,15 +29,13 @@ sub handleBankAccount	{
 	my $nab = 0;
 	my $paytype ||= param('paytype') || '';
 
-	my $paymentsettings = getPaymentSettings($Data);
+	my $paymentsettings = getPaymentSettings($Data, $paytype);
 
-	$paypal = 1 if(!$Data->{'SystemConfig'}{'DisallowPaypalSignup'} and $paymentsettings and $paymentsettings->{'gatewayType'} == $Defs::GATEWAY_PAYPAL);
-	$nab = 1 if($paymentsettings and $paymentsettings->{'gatewayType'} == $Defs::GATEWAY_NAB);
+	$paypal = 1 if(!$Data->{'SystemConfig'}{'DisallowPaypalSignup'} and $paymentsettings and $paymentsettings->{'paymentType'} == $Defs::PAYMENT_ONLINEPAYPAL);
+	$nab = 1 if($paymentsettings and $paymentsettings->{'paymentType'} == $Defs::PAYMENT_ONLINENAB);
 
 	$nab = 1 if ($Data->{'SystemConfig'}{'AllowNABSignup'}  and $EntityTypeID == $Defs::LEVEL_ASSOC);
-	$nab = 1 if ($Data->{'SystemConfig'}{'AssocConfig'}{'AllowNABSignup'} and $EntityTypeID == $Defs::LEVEL_ASSOC);
 	$nab = 1 if ($Data->{'SystemConfig'}{'AllowNABSignupClub'} and $EntityTypeID == $Defs::LEVEL_CLUB);
-	$nab = 1 if ($Data->{'SystemConfig'}{'AssocConfig'}{'AllowNABSignupClub'} and $EntityTypeID == $Defs::LEVEL_CLUB);
 
 	if($action eq 'BA_RESEND')	{
 	   my $field=loadBankAccountDetails($Data->{'db'}, $EntityID, $EntityTypeID) || ();

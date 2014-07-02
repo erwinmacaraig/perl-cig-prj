@@ -67,7 +67,7 @@ sub handleTransLogs {
 	  ($body, $header) = listTransLog($Data, $entityID, $personID);
   }
 	if ($action =~/payVIEW/)	{
-		($body, $header) = viewTransLog($Data, $Data->{'params'}{'tlID'},0,0);
+		($body, $header) = viewTransLog($Data, $Data->{'params'}{'tlID'});
 	}
   if ($action=~/(edit|display|add)/) {
 	  ($body, $header)=entityDetails($action, $Data, $clientValues_ref, $db);
@@ -269,7 +269,7 @@ sub step2 {
 		
 
 			
-		my $bb = Payments::checkoutConfirm($Data, \@transactionIDs,1);
+		my $bb = Payments::checkoutConfirm($Data, $Data->{params}{paymentType}, \@transactionIDs,1);
 		return ($bb, "Payments Checkout");
 	}
 
@@ -1284,9 +1284,7 @@ my (undef, undef, $id, $Data, $option, $tempClientValues_ref) = @_;
 
 sub viewTransLog	{
 
-	my ($Data, $intTransLogID, $entityID, $entityType)= @_;
-	$entityID ||=0;
-	$entityType ||=0;
+	my ($Data, $intTransLogID)= @_;
 
 	$intTransLogID ||= 0;
 	my $db = $Data->{'db'};
@@ -1301,9 +1299,6 @@ sub viewTransLog	{
 		WHERE intLogID = $intTransLogID
 		AND T.intRealmID = $Data->{'Realm'}
 	];
-#	$st .= qq[
-#			AND T.intID = $entityID AND T.intTableType=$entityType
-#	] if ($entityID and $entityType);
 
 	my $qry = $db->prepare($st);
   	$qry->execute;
@@ -1318,9 +1313,6 @@ sub viewTransLog	{
 		WHERE intTransLogID = $intTransLogID
 		AND T.intRealmID = $Data->{'Realm'}
 	];
-#	$st_trans .= qq[
-#			AND T.intID = $entityID AND T.intTableType=$entityType
-#	] if ($entityID and $entityType);
 	my $qry_trans = $db->prepare($st_trans);
   	$qry_trans->execute;
 		
@@ -1513,9 +1505,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 
 sub viewPayLaterTransLog    {
 
-	my ($Data, $intTransLogID, $entityID, $entityType)= @_;
-	$entityID ||=0;
-	$entityType ||=0;
+	my ($Data, $intTransLogID)= @_;
 
 	$intTransLogID ||= 0;
 	my $db = $Data->{'db'};

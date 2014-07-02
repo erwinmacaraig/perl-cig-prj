@@ -75,7 +75,7 @@ sub main	{
         $client= setClient(\%clientValues);
   	$Data{'client'}=$client;
 
-	my $paymentSettings = getPaymentSettings(\%Data,$external);
+	my $paymentSettings = getPaymentSettings(\%Data,$Defs::PAYMENT_ONLINEPAYPAL);
 	$paymentSettings->{'PAYPAL'}=1;
 
     	my $header_css = $noheader ? ' #spheader {display:none;} ' : '';

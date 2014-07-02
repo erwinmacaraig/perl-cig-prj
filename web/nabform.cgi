@@ -84,7 +84,7 @@ sub main	{
     $Data{'client'}=$client;
 
     $Data{'SystemConfig'}{'PaymentConfigID'} = $paymentConfigUsedID || $paymentConfigID;
-    my $paymentSettings = getPaymentSettings(\%Data, $external);
+    my $paymentSettings = getPaymentSettings(\%Data, $Order{'PaymentType'}, $external);
     $paymentSettings->{'NAB'}=1;
 
     my $header_css = $noheader ? ' #spheader {display:none;} ' : '';

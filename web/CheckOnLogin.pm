@@ -28,7 +28,7 @@ sub checkOnLogin	{
 	my $numduplicatesstr='';
 	my $clrRequests ='';
     my $nab = 0;
-    my $paymentsettings = getPaymentSettings($Data);
+    my $paymentsettings = getPaymentSettings($Data, $Defs::PAYMENT_ONLINEPAYPAL);
     my $paymentSplitSettings = getPaymentSplitSettings($Data);
     if($paymentSplitSettings->{'psBanks'}){
     $nab = 1 if($paymentsettings and $paymentsettings->{'gatewayType'} == $Defs::GATEWAY_NAB);

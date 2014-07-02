@@ -23,7 +23,7 @@ use CGI qw(param unescape escape);
 sub gatewayTransactions	{
 	my ($Data, $logID) = @_;
 	my $st = qq[
-                SELECT T.intRealmSubTypeID, T.intRealmID, E.intPaymentConfigID, TL.intPaymentConfigUsedID, TL.intAmount as Amount, TL.intStatus, P.strName as ProductName, P.strGroup as ProductGroup, T.curAmount as TxnAmount, intQty, T.intTransactionID, strGSTText, strRealmName, T.curPerItem, T.intStatus as TXNStatus, T.intTXNEntityID, intEntityPaymentID, PC.strCurrency, RF.intAssocID as intAssocFormOwner, RF.intClubID as ClubFormOwner, TL.intRegoFormID, intSWMPaymentAuthLevel
+                SELECT T.intRealmSubTypeID, T.intRealmID, E.intPaymentConfigID, TL.intPaymentConfigUsedID, TL.intAmount as Amount, TL.intStatus, P.strName as ProductName, P.strGroup as ProductGroup, T.curAmount as TxnAmount, intQty, T.intTransactionID, strGSTText, strRealmName, T.curPerItem, T.intStatus as TXNStatus, T.intTXNEntityID, intEntityPaymentID, PC.strCurrency, RF.intAssocID as intAssocFormOwner, RF.intClubID as ClubFormOwner, TL.intRegoFormID, intSWMPaymentAuthLevel, intPaymentType
                         FROM tblTransactions as T
                         INNER JOIN tblTXNLogs as TLogs ON (T.intTransactionID = TLogs.intTXNID and TLogs.intTLogID = $logID)
                         LEFT JOIN tblEntity as E ON (E.intEntityID = T.intTXNEntityID)
@@ -48,6 +48,7 @@ sub gatewayTransactions	{
                 $Data->{'SystemConfig'}{'PaymentConfigID'} = $dref->{intPaymentConfigID} || 0;
                 $Data->{'SystemConfig'}{'PaymentConfigUsedID'} = $dref->{intPaymentConfigUsedID} || 0;
 		$Order{'TransLogStatus'}=$dref->{'intStatus'} || 0;
+                $Order{'PaymentType'} = $dref->{'intPaymentType'};
                 $Order{'TotalAmount'} = $dref->{'Amount'};
                 $Order{'Status'} = $dref->{'intStatus'};
                 $Order{'TLStatus'} = $dref->{'intStatus'};

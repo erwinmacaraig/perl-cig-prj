@@ -1002,7 +1002,7 @@ sub regoform_edit_form {
     my $is_payment_on =""; #intAllowPayment
     my $has_merchant;
     my $check_merchant = 0;
-    my $useNAB = $paymentsettings->{'gatewayType'} == $Defs::GATEWAY_NAB ? 1 : 0;
+    my $useNAB = $paymentsettings->{'paymentType'} == $Defs::PAYMENT_ONLINENAB ? 1 : 0;
     my $check_bank = qq[<span style="color:red">Bank Account has not been verified. Contact support if you feel this is incorrect.</span>];
     if (Payments::getVerifiedBankAccount($Data, $useNAB)){
         $check_bank =qq[<span style="color:green">Bank Account has been verified.</span>];

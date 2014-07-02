@@ -452,9 +452,9 @@ sub getReportDisplayConfig	{
 		$options{$k} = $Data->{'EventOptions'}{$k};
 	}
   my $paymentsettings = getPaymentSettings($Data, 0);
-  my $paypal = $paymentsettings->{'gatewayType'} == $Defs::GATEWAY_PAYPAL ? 1 : 0;
+  my $paypal = $paymentsettings->{'paymentType'} == $Defs::PAYMENT_ONLINEPAYPAL ? 1 : 0;
 	$options{'PayPal'} = $paypal;
-  my $nab = $paymentsettings->{'gatewayType'} == $Defs::GATEWAY_NAB ? 1 : 0;
+  my $nab = $paymentsettings->{'paymentType'} == $Defs::PAYMENT_ONLINENAB ? 1 : 0;
 	$options{'NAB'} = $nab;
 	$options{'ReceiveFunds'} = $nab || $paypal;
 

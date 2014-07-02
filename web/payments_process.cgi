@@ -33,19 +33,20 @@ sub main	{
 
 	my $client = param('client') || 0;
 	my $clientTransRefID= param('ci') || 0;
-        my $db=connectDB();
+    my $paymentType=0;
+
+    my $db=connectDB();
 	my %Data=();
 	my $st = qq[
-		SELECT T.intRealmSubTypeID, T.intRealmID, A.intPaymentConfigID, TL.intPaymentConfigUsedID
+		SELECT T.intRealmSubTypeID, T.intRealmID, T.intPaymentSetupID, T.intPaymentSetupID, intPaymentType
 			FROM tblTransactions as T
 			INNER JOIN tblTXNLogs as TLogs ON (T.intTransactionID = TLogs.intTXNID and TLogs.intTLogID = ?)
-			INNER JOIN tblAssoc as A ON (A.intAssocID = T.intAssocID)
 			INNER JOIN tblTransLog as TL ON (TL.intLogID = TLogs.intTLogID )
 		LIMIT 1
 	];
     my $qry= $db->prepare($st) or query_error($st);
     $qry->execute($clientTransRefID) or query_error($st);
-	($Data{'RealmSubType'}, $Data{'Realm'}, $Data{'SystemConfig'}{'PaymentConfigID'}, $Data{'SystemConfig'}{'PaymentConfigUsedID'}) = $qry->fetchrow_array();
+	($Data{'RealmSubType'}, $Data{'Realm'}, $Data{'SystemConfig'}{'PaymentConfigID'}, $Data{'SystemConfig'}{'PaymentConfigUsedID'}, $paymentType) = $qry->fetchrow_array();
 	$Data{'SystemConfig'}{'PaymentConfigID'} = $Data{'SystemConfig'}{'PaymentConfigUsedID'} ||  $Data{'SystemConfig'}{'PaymentConfigID'};
 	my $paymentConfigID = $Data{'SystemConfig'}{'PaymentConfigID'} || 0;
 	
@@ -99,7 +100,7 @@ sub main	{
 	my $settlement_date = param('dtSettlement') || '';
 	$Data{'SystemConfig'}{'PaymentConfigID'} = $paymentConfigID;
 	
-	my $paymentSettings = getPaymentSettings(\%Data,0);
+	my $paymentSettings = getPaymentSettings(\%Data,$paymentType, 0);
 
 	my $intLogID = processTransLog($db, $txn, $responsecode, $responsetext, $clientTransRefID, $paymentSettings, $chkv, $settlement_date,'', '', '', '', '');
 	#if ($intMemberID and ($responsecode eq "00" or $responsecode eq "08" or $responsecode eq "OK" or $responsecode eq "1"))    {
