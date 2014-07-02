@@ -968,8 +968,8 @@ sub getTXNDetails	{
         	my $qry_entity= $db->prepare($st_entity) or query_error($st_entity);
         	$qry_entity->execute or query_error($st_entity);
         	my $eref = $qry_entity->fetchrow_hashref();
-		    $dref->{Name} = $cref->{strLocalName} || '';
-		    $dref->{Email} = $cref->{strEmail} || '';
+		    $dref->{Name} = $eref->{strLocalName} || '';
+		    $dref->{Email} = $eref->{strEmail} || '';
         }
 	    return $dref;
 	
