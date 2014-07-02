@@ -19,25 +19,23 @@ sub get_notif_bits {
     #the bits will come out as 16, 8, 4, 2, 1 respectively.
     my $assoc_bit   = $char & (1<<4);
     my $club_bit    = $char & (1<<3);
-    my $team_bit    = $char & (1<<2);
     my $member_bit  = $char & (1<<1);
     my $parents_bit = $char & (1<<0);
 
     #the bits will be left with their values unaltered because calling programs will (at this point at least) test for > 0 value.
-    return ($assoc_bit, $club_bit, $team_bit, $member_bit, $parents_bit);
+    return ($assoc_bit, $club_bit, $member_bit, $parents_bit);
 }
 
 sub pack_notif_bits {
-    my ($assoc_bit, $club_bit, $team_bit, $member_bit, $parents_bit) = @_;
+    my ($assoc_bit, $club_bit, $member_bit, $parents_bit) = @_;
 
     #just a precaution because if bits are rewritten with their extracted values (see get_notif_bits), things will be thrown out.
     $assoc_bit   = 1 if $assoc_bit   > 1;
     $club_bit    = 1 if $club_bit    > 1;
-    $team_bit    = 1 if $team_bit    > 1;
     $member_bit  = 1 if $member_bit  > 1;
     $parents_bit = 1 if $parents_bit > 1;
 
-    my @arr  = (0, 0, 0, $assoc_bit, $club_bit, $team_bit, $member_bit, $parents_bit);
+    my @arr  = (0, 0, 0, $assoc_bit, $club_bit, $member_bit, $parents_bit);
     my $str  = join('', @arr);
     my $char = ord pack ('B8', $str);
 

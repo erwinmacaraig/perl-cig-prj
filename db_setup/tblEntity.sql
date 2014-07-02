@@ -52,7 +52,6 @@ CREATE TABLE tblEntity (
     dblLong double DEFAULT '0',
     strDescription text, 
 
-
   PRIMARY KEY (`intEntityID`),
   KEY `index_intRealmID` (`intRealmID`),
   KEY `index_intEntityLevel` (`intEntityLevel`)
