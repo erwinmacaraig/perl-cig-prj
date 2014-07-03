@@ -96,13 +96,14 @@ LANDINGPAGE=>"Billing",
 
 
 	my $APIurl= $paymentSettings->{'gatewayStatus'} == 1 ? $Defs::PAYPAL_LIVE_URL_EXPRESS : $Defs::PAYPAL_DEMO_URL_EXPRESS;
+warn("APIURL FOR PAYPAL: $APIurl");
         my $req = POST $APIurl, \%Values;
         my $ua = LWP::UserAgent->new();
         $ua->timeout(360);
-
         my $content = $ua->request($req)->as_string;
         my %returnvals=();
         for my $line (split /\n|&/,$content)  {
+warn("LLLLine: $line");
                 $line=~s/[\n\r]$//g;
                 my($key,$val)=split /=/,$line;
                 $returnvals{$key}=$val;

@@ -1313,11 +1313,11 @@ sub viewTransLog	{
 	my $TLref = $qry->fetchrow_hashref();
 
 	my $st_trans = qq[
-		SELECT M.strLocalSurname, M.strLocalFirstName, E.*, P.strName, P.strGroup, Entity.strLocalNameas EntityName
+		SELECT M.strLocalSurname, M.strLocalFirstName, E.*, P.strName, P.strGroup, E.strLocalName as EntityName
 		FROM tblTransactions as T
 			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
 			LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
-			LEFT JOIN tblEntity as Entity on (Entity.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
+			LEFT JOIN tblEntity as E ON (E.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
 		WHERE intTransLogID = $intTransLogID
 		AND T.intRealmID = $Data->{'Realm'}
 	];

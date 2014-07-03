@@ -40,6 +40,7 @@ sub main	{
 	my $session= param('session') || 0;
 	my $compulsory= param('compulsory') || 0;
 	
+print STDERR "AAAAA: $action";
 	my $db=connectDB();
 	my %Data=();
 	$Data{'db'}=$db;
@@ -73,7 +74,7 @@ sub main	{
 	{
 		my $st = qq[
 			SELECT 
-				intEntityPaymentID, intPaymentType, intEntityType, intRealmID
+				intEntityPaymentID, intPaymentType, intEntityLevel, tblTransLog.intRealmID
 			FROM 
 				tblTransLog LEFT JOIN tblEntity as E ON (intEntityPaymentID = intEntityID)
 			WHERE
@@ -82,30 +83,31 @@ sub main	{
 		];
 		my $qry = $db->prepare($st);
 		$qry->execute($clientTransRefID);
-		my $TassocID = 0;
+		my $TentityID= 0;
+		my $entityType= 0;
+        my $realmID=0;
         ($TentityID, $paymentType, $entityType, $realmID) = $qry->fetchrow_array();
-		$assocID=$TassocID if ($TassocID);
-		$Data{'clientValues'}{'assocID'} = $assocID if ($assocID and $assocID > 0);
-		$clientValues{'assocID'} = $assocID if ($assocID and $assocID =~ /^\d.*$/);
+		#$Data{'clientValues'}{'assocID'} = $assocID if ($assocID and $assocID > 0);
+		#$clientValues{'assocID'} = $assocID if ($assocID and $assocID =~ /^\d.*$/);
         $Data{'Realm'} = $realmID if (! $Data{'Realm'});
 
 	}
         # DO DATABASE THINGS
-        my $DataAccess_ref=getDataAccess(\%Data);
-    $Data{'Permissions'}=GetPermissions(
-      \%Data,
-      $Defs::LEVEL_ASSOC,
-      $assocID,
-      $Data{'Realm'},
-      $Data{'RealmSubType'},
-      $Defs::LEVEL_ASSOC,
-      0,
-    );
+        #my $DataAccess_ref=getDataAccess(\%Data);
+    #$Data{'Permissions'}=GetPermissions(
+     # \%Data,
+     # $Defs::LEVEL_ASSOC,
+     # $assocID,
+     # $Data{'Realm'},
+     # $Data{'RealmSubType'},
+     # $Defs::LEVEL_ASSOC,
+     # 0,
+    #);
 
-        $Data{'DataAccess'}=$DataAccess_ref;
+     #   $Data{'DataAccess'}=$DataAccess_ref;
 
         $Data{'clientValues'}=\%clientValues;
-$Data{'clientValues'}{'assocID'} = $assocID if ($assocID and $assocID > 0);
+#$Data{'clientValues'}{'assocID'} = $assocID if ($assocID and $assocID > 0);
         $client= setClient(\%clientValues);
   	$Data{'client'}=$client;
 
@@ -157,6 +159,7 @@ $Data{'clientValues'}{'assocID'} = $assocID if ($assocID and $assocID > 0);
 	}
 	elsif ($action eq 'P')	{
 		## CALL SetExpressCheckoutAPI
+print STDERR "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD";
 		my $body = payPalProcess(\%Data, $client, $paymentSettings, $clientTransRefID, $Order, $Transactions, $external);
 		pageForm( 'Sportzware Membership', $body, $Data{'clientValues'}, q{}, \%Data) if $body;
 		
