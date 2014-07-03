@@ -180,7 +180,6 @@ sub processFeeDetails {
 
 sub checkoutConfirm	{
 	my($Data, $paymentType, $trans, $external)=@_;
-print STDERR ")))))))))))))))$paymentType";
 	$external ||= 0; ## Pop CC in NEW window ?
 
 	$Data->{'SystemConfig'}=getSystemConfig($Data);
