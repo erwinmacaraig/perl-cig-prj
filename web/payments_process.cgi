@@ -85,7 +85,7 @@ warn("AAAAAAAAAAAAAAAAAAAA$clientTransRefID");
 	my $settlement_date = param('dtSettlement') || '';
 	$Data{'SystemConfig'}{'PaymentConfigID'} = $paymentConfigID;
 	
-	my $paymentSettings = getPaymentSettings(\%Data,$paymentType, 0, 0);
+	my ($paymentSettings, undef) = getPaymentSettings(\%Data,$paymentType, $paymentConfigID, 0);
 
 	my $intLogID = processTransLog($db, $txn, $responsecode, $responsetext, $clientTransRefID, $paymentSettings, $chkv, $settlement_date,'', '', '', '', '');
 warn("ABOUT TO BEALL OK FOR $intLogID $paymentType");

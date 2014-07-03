@@ -38,7 +38,9 @@ sub main	{
 			TL.intRealmID,
 			TL.intPaymentConfigUsedID,
 			T.intRealmSubTypeID,
-			SC.strValue
+			SC.strValue,
+            TL.intPaymentType,
+            TL.intPaymentConfigID
 		FROM
 		 	tblTransLog as TL
 			INNER JOIN tblTransactions as T ON (T.intTransLogID = TL.intLogID)
@@ -54,7 +56,7 @@ sub main	{
 	$q->execute();
 
 	my $error=0;
-	my ($realmID, $pcID, $realmSubTypeID, $ruleID) = $q->fetchrow_array();
+	my ($realmID, $pcID, $realmSubTypeID, $ruleID, $payType, $payConfigID) = $q->fetchrow_array();
 	$error =1 if ! $realmID;
 	$Data{'SystemConfig'}{'PaymentConfigID'} = $pcID || 0;
 
@@ -65,7 +67,7 @@ sub main	{
 	$Data{'Realm'} = $realmID;
 	$Data{'RealmSubType'} = $realmSubTypeID;
 	$Data{'SystemConfig'}{'PaymentSplitRuleID'} = $ruleID;
-	my $paymentSettings = getPaymentSettings(\%Data);
+	my ($paymentSettings, undef) = getPaymentSettings(\%Data, $payType, $payConfigID);
 	calcMoneyLog(\%Data, $paymentSettings, $logID);
 print "DONE";
 	exit;

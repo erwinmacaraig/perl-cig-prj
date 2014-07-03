@@ -58,7 +58,7 @@ sub getPaymentSplitSettings {
                         my %tempClientValues = getClient($client);
                         $tempClientValues{'assocID'} = 0;
                         $tempClientValues{'clubID'}  = 0;
-                        my $natPaymentSettings = getPaymentSettings($Data, 0, \%tempClientValues);
+                        my ($natPaymentSettings, undef) = getPaymentSettings($Data, 0, 0, \%tempClientValues);
 			 #$natPaymentSettings->{'gatewayType'} = $paymentSettings->{'gatewayType'};
                         $psSettings{'psSplits'} = 1 if ($paymentSettings->{'gatewayType'} == $natPaymentSettings->{'gatewayType'});
                     }
