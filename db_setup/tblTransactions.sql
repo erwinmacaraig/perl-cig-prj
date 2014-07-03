@@ -18,6 +18,7 @@ CREATE TABLE tblTransactions (
     intTransLogID int(11) default '0',
     intCurrencyID int(11) default '0',
     intTempLogID int(11) default '0',
+    intTempID int(11) default '0',
     intExportAssocBankFileID INT DEFAULT 0,
     dtStart DATETIME,
     dtEnd DATETIME,

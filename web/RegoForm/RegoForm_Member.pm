@@ -5,7 +5,7 @@
 package RegoForm::RegoForm_Member;
 
 use strict;
-use lib ".", "..", "../..", "../RegoFormBuilder";
+use lib '.', '..', '../..', "../comp", '../RegoForm', "../dashboard", "../RegoFormBuilder",'../PaymentSplit', "../user";
 use RegoForm::RegoFormBaseObj;
 our @ISA =qw(RegoForm::RegoFormBaseObj);
 
@@ -13,7 +13,7 @@ use TTTemplate;
 use CGI;
 use HTML::FillInForm;
 use Date::Calc;
-use Member;
+use Person;
 use ConfigOptions;
 use HTMLForm;
 use RegoForm_Common;

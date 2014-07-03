@@ -72,9 +72,9 @@ sub checkMinFeeAmount	{
 
         my $st = qq[
         	SELECT T.intTableType, T.intID, T.intTempID
-                FROM tblTransactions as T
-                WHERE T.intTransactionID = ?
-                        AND T.intRealmID = $Data->{'Realm'}
+            FROM tblTransactions as T
+            WHERE T.intTransactionID = ?
+                AND T.intRealmID = $Data->{'Realm'}
     	];
 
         my $qry = $Data->{'db'}->prepare($st);
@@ -229,7 +229,6 @@ sub checkoutConfirm	{
 
 	# Need to create TransLog record
     my $intLogID = $count ? createTransLog($Data, $paymentSettings, $entityID, $trans, $amount) : 0;
-
 	my $payLater = '';
     if ($Data->{'RegoFormID'} and $Data->{'SystemConfig'}{'regoform_showPayLater'} and !$compulsory)   {
         my $m;
@@ -252,6 +251,7 @@ sub checkoutConfirm	{
     my $allowPayment = $paymentSettings->{'allowPayment'} || 0;
 	$allowPayment=0	if (! $external and $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_CLUB);
 
+
     my $session = $Data->{'sessionKey'};
 	my $paymentURL = qq[$Defs::base_url/paypal.cgi?nh=$Data->{'noheader'}&amp;ext=$external&amp;a=P&amp;client=$client&amp;ci=$intLogID&amp;formID=$formID&amp;session=$session;compulsory=$compulsory];
 	my $formTarget = $external ? qq[ target="other" onClick="window.open('$paymentURL','other','location=no,directories=no,menubar=no,statusbar=no,toolbar=no,scrollbars=yes,height=820,width=870,resizable=yes');return false;" ] : '';
@@ -268,6 +268,7 @@ sub checkoutConfirm	{
         $m->add($Defs::NAB_SALT, $chkvalue);
         $chkvalue = $m->hexdigest();
         $paymentURL = qq[$Defs::base_url/nabform.cgi?nh=$Data->{'noheader'}&amp;ext=$external&amp;a=P&amp;formID=$formID&amp;client=$client&amp;ci=$intLogID&amp;chkv=$chkvalue&amp;session=$session;compulsory=$compulsory];
+        $paymentURL = qq[http://elwood/FIFASPOnlineOtherGateway/NAB/nabform.cgi?nh=$Data->{'noheader'}&amp;ext=$external&amp;a=P&amp;formID=$formID&amp;client=$client&amp;ci=$intLogID&amp;chkv=$chkvalue&amp;session=$session;compulsory=$compulsory&amp;amount=$amount];
         my $formTarget = $external ? qq[ target="other" onClick="window.open('$paymentURL','other','location=no,directories=no,menubar=no,statusbar=no,toolbar=no,scrollbars=yes,height=820,width=870,resizable=yes');return false;" ] : '';
         $externalGateway= qq[
           	<div class="accepted">
@@ -280,7 +281,7 @@ sub checkoutConfirm	{
     	    $externalGateway .= qq[ <a href="$paymentURL"  id ="payment" type="button" style="padding:2px 30px;font-size:16px;"><img src="images/paynow.gif" alt="Pay Now"></a>];
 	  	}
 	  	else	{
-    	    $externalGateway .= qq[<span class="button proceed-button"><a href="$paymentURL">Proceed to Payment</a></span>];
+    	    $externalGateway .= qq[<span class="button proceed-button"><a target="paywin" href="$paymentURL">Proceed to Payment</a></span>];
 	  	}
     }
 
@@ -289,8 +290,8 @@ sub checkoutConfirm	{
         my $txn = 'Zero-' . time(); 
 		processTransLog($Data->{'db'}, $txn, 'OK', $responsetext, $intLogID, $paymentSettings, undef, undef, '', '', '', '', '');
 		UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $intLogID);
-        EmailPaymentConfirmation($Data, $paymentSettings, $intLogID, $client, $RegoFormObj);
-        Products::product_apply_transaction($Data,$intLogID);
+#        EmailPaymentConfirmation($Data, $paymentSettings, $intLogID, $client, $RegoFormObj);
+#        Products::product_apply_transaction($Data,$intLogID);
 		return '';
 	}
 
@@ -361,14 +362,14 @@ sub checkoutConfirm	{
 					$paymenttext<br>
 				];
 				if (($onlinePayment) and $externalGateway)	{
-                    if (getVerifiedBankAccount($Data, $paymentType))   { 
+                    #if (getVerifiedBankAccount($Data, $paymentType))   { 
 						$body.=qq[<div class="payment_note"><p>Please confirm the details above, then click the <b>Pay Now</b> button to make an online payment.</p>] if ! $paymenttext;
 						$body .=qq[ $externalGateway</div><p id ="final_msg"></p>];
 						
-                    }
-                    else    {
-					    $body.=qq[<p>Purchase cannot be made until this organisation fully configures their payment details</p>];
-                    }
+                    #}
+                    #else    {
+					#    $body.=qq[<p>Purchase cannot be made until this organisation fully configures their payment details</p>];
+                    #}
 				}
 				else	{
 					$body.=qq[<p>Please confirm the details above, then click the <b>Continue to Credit Card Payment</b> button to make an online payment.</p>] if ! $paymenttext;
@@ -485,10 +486,12 @@ sub getPaymentSettings	{
 	$settings{'paymentType'} = $dref->{intPaymentType} || 0;
 	$settings{'gatewayType'} = $dref->{intGatewayType} || 0;
 	$settings{'gatewayPrefix'} = $dref->{strPrefix} || '';
+	$settings{'paymentBusinessNumber'} = $dref->{PaymentBusinessNumber} || '';
+	$settings{'notification_address'} = $dref->{strNotificationAddress} || '';
 	$settings{'gatewayCreditCardNoteRealm'} = $dref->{strCCNote} || '';
 	$settings{'gatewayCreditCardNote'} = $dref->{strCCNote} || '';
 	$settings{'gatewayCreditCardNote'} = qq[$softDescriptor] if $softDescriptor;
-	$settings{'gateway_string'} = $dref->{strSalt};
+	$settings{'gateway_string'} = $dref->{strGatewaySalt};
 	$settings{'gateway_url'} = $dref->{strGatewayURL1};
 	$settings{'gateway_url2'} = $dref->{strGatewayURL2};
 	$settings{'gateway_url3'} = $dref->{strGatewayURL3};
@@ -508,14 +511,13 @@ sub getPaymentSettings	{
 	$settings{'return_url'} .= qq[&amp;client=$client] if $client and $settings{'return_url'};
 	$settings{'return_failure_url'} .= qq[&amp;client=$client] if $client and $settings{'return_failure_url'};
 	$settings{'currency'} = $dref->{strCurrency} || 'AUD';
-	$settings{'notification_address'} = $dref->{strNotificationAddress} || '';
 
 	return \%settings;
 }
 
 
 sub createTransLog	{
-    my ($Data, $paymentSettings, $trans, $amount) = @_;
+    my ($Data, $paymentSettings, $entityID, $trans, $amount) = @_;
 	my $db = $Data->{'db'};
     my %fields=();
     $fields{amount} = $amount || 0;
@@ -849,12 +851,10 @@ sub getTXNDetails	{
 	my $db = $Data->{'db'};
 	my $statusWHERE = $statusCHECK ? qq[ AND T.intStatus=0] : '';
 	my $st = qq[
-        	SELECT T.intTransactionID, T.intTableType, T.intID, T.curAmount, P.strName as ProductName, A.intPaymentConfigID, A.strPaymentReceiptBodyHTML,A.strPaymentReceiptBodyTEXT , P.strGSTText, T.intQty, P.strProductNotes, P.strGroup as ProductGroup, A.strBusinessNo, T.intAssocID
+        	SELECT T.intTransactionID, T.intTableType, T.intID, T.curAmount, P.strName as ProductName, P.strGSTText, T.intQty, P.strProductNotes, P.strGroup as ProductGroup
                 FROM tblTransactions as T
-                	INNER JOIN tblAssoc as A ON (A.intAssocID = T.intAssocID)
 			INNER JOIN tblProducts as P ON (P.intProductID = T.intProductID)
                 WHERE T.intTransactionID = $txnID
-                        AND A.intAllowPayment > 0
                         AND T.intRealmID = $Data->{'Realm'}
 			            $statusWHERE
                 LIMIT 1
@@ -871,7 +871,6 @@ sub getTXNDetails	{
                     CONCAT(strLocalFirstname,' ',strLocalSurname) as Name, 
                     strEmail,
                     strP1Email,
-                    strEmail2,
                     strP1Email2,
                     strP2Email,
                     strP2Email2
@@ -884,7 +883,6 @@ sub getTXNDetails	{
         	my $mref = $qry_mem->fetchrow_hashref();
 		    $dref->{Name}     = $mref->{Name}        || '';
 		    $dref->{Email}    = $mref->{strEmail}    || '';
-		    $dref->{Email2}   = $mref->{strEmail2}   || '';
 		    $dref->{P1Email}  = $mref->{strP1Email}  || '';
 		    $dref->{P1Email2} = $mref->{strP1Email2} || '';
 		    $dref->{P2Email}  = $mref->{strP2Email}  || '';
@@ -987,9 +985,10 @@ sub EmailPaymentConfirmation	{
 		my $st = qq[
 			SELECT DISTINCT
                 E.intEntityID,
-				E.strLocalName as EntityName.
+				E.strLocalName as EntityName,
                 E.strEmail as EntityEmail,
-				intNoPMSEmail,
+                E.strPaymentNotificationAddress as PaymentNotificationAddress,
+                E.strEntityPaymentBusinessNumber as PaymentBusinessNumber,
 				IF(TL.intSWMPaymentAuthLevel = 3 OR RF.intClubID >0, 'CLUB', 'MA') as SoldBy
 			FROM
 				tblTransLog as TL
@@ -1029,14 +1028,11 @@ sub EmailPaymentConfirmation	{
                 }
             }
 			$TransData{'OrgName'} = $orgname || '';
-			$TransData{'strBusinessNo'} = $dref->{'strBusinessNo'} ? qq[<b>ABN:</b> $dref->{'strBusinessNo'}<br>] : '';
+			$TransData{'strBusinessNo'} = $dref->{'PaymentBusinessNumber'} || $paymentSettings->{'paymentBusinessNumber'} || '';
 
             my $first_club_email  = ($clubEmail)  ? extract_first($clubEmail)  : '';
-			$paymentSettings->{notification_address} =$paymentSettings->{notification_address};
+			$paymentSettings->{notification_address} =$dref->{'PaymentNotificationAddress'} || $paymentSettings->{notification_address};
 
-		    if($from_email_to_use eq 'club') {
-			    $paymentSettings->{notification_address} = $first_club_email || $dref->{ClubEmail} || $paymentSettings->{notification_address};
- 		    }
 		}
 		$Data->{'clientValues'}{'assocID'} = $assocID;
 		$Data->{'SystemConfig'}=getSystemConfig($Data);

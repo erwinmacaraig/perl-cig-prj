@@ -2,19 +2,17 @@ DROP TABLE IF EXISTS tblPaymentConfig;
 CREATE TABLE tblPaymentConfig (
     intPaymentConfigID int(11) NOT NULL AUTO_INCREMENT,
     intRealmID INT DEFAULT 0,
-    intRealmSubTypeID INT NOT NULL,
+    intRealmSubTypeID INT DEFAULT 0,
     intPaymentType TINYINT DEFAULT 0, /*setup for a payment type */
 
-    intAllowPaymentBackend TINY INT DEFAULT 0,
-    intAllowPaymentRegoForm TINY INT DEFAULT 0,
-    intAllowPayment TINY INT DEFAULT 0,
+    intAllowPaymentBackend TINYINT DEFAULT 0,
+    intAllowPaymentRegoForm TINYINT DEFAULT 0,
+    intAllowPayment TINYINT DEFAULT 0,
 
     intGatewayStatus TINYINT DEFAULT 0,
     intFeeAllocationType TINYINT DEFAULT 0,
 
     strCurrency CHAR(5) DEFAULT 'AUD',
-
-    strNotificationAddress VARCHAR(250),
 
     intPaymentGatewayID INT DEFAULT 0, /*ID to external gateway*/
     strGatewayURL1 VARCHAR(200) DEFAULT '',
@@ -30,8 +28,8 @@ CREATE TABLE tblPaymentConfig (
     strGatewaySalt VARCHAR(50) DEFAULT '',
     
     strNotificationAddress VARCHAR(250),
-    strEntityPaymentABN VARCHAR(100) DEFAULT '',
-    strEntityPaymentInfo TEXT, 
+    strPaymentBusinessNumber VARCHAR(100) DEFAULT '',
+    strPaymentInfo TEXT, 
     strPaymentReceiptBodyTEXT TEXT,
     strPaymentReceiptBodyHTML TEXT,
     

@@ -28,7 +28,6 @@ use LWP::UserAgent;
 use CGI qw(param unescape escape);
 
 use RegoForm_MemberFunctions qw(rego_addRealMember);
-use RegoForm_TeamFunctions qw(rego_addRealTeam);
 use RegoForm::RegoFormFactory;
 
 use PageMain;
@@ -290,7 +289,7 @@ sub finalize_registration {
             my $form_entity_type = $formObj->FormEntityType();
         		
 		    #Add Member
-		    ($intRealID,undef) =  ($form_entity_type eq 'Member') ? rego_addRealMember($Data,$db,$intTempID,$session, $formObj) : rego_addRealTeam($Data,$db,$intTempID,$session, $formObj) ;        
+		    ($intRealID,undef) =  ($form_entity_type eq 'Member') ? rego_addRealMember($Data,$db,$intTempID,$session, $formObj) : (0,0);
             warn "NAB::CompulsoryPayment: RealID:: $intRealID";
 		    my $st_update = qq[
 					UPDATE tblTransactions
@@ -332,7 +331,8 @@ sub NABPaymentForm  {
   my $NABReferenceID=$paymentSettings->{'gatewayPrefix'}."-".$logID;
   my $merchant_ref = getMerchantDetails($Data, $Order->{'AssocID'}, $Order->{'ClubFormOwner'});
   my $NABPassword=$merchant_ref->{'strMerchantAccPassword'} || $Defs::NAB_GATEWAY_PWD;
-	$NABUsername = $merchant_ref->{'strMerchantAccUsername'};
+	$NABUsername = 'TEST';#$merchant_ref->{'strMerchantAccUsername'};
+    
 
 	if (! $NABUsername)	{
 		return "NO USERNAME FOUND!\n";
@@ -367,9 +367,8 @@ sub NABPaymentForm  {
      }
 
 	$error = 0 if (length($Values{'FINGERPRINT_RESPONSE'}) == 40);
-    #$body .= qq[<b>FINGER PRINT</b>$Values{'FINGERPRINT_RESPONSE'}<br><br>];
     if ($error) {
-        return qq[Error with Fingerprint identification];
+    #    return qq[Error with Fingerprint identification];
     }
     $Values{'EPS_FINGERPRINT'} = $Values{'FINGERPRINT_RESPONSE'};
     $Values{'chkv'} = $Order->{'chkv'};

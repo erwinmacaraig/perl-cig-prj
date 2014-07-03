@@ -35,10 +35,11 @@ sub main	{
 	my $clientTransRefID= param('ci') || 0;
     my $paymentType=0;
 
+warn("AAAAAAAAAAAAAAAAAAAA$clientTransRefID");
     my $db=connectDB();
 	my %Data=();
 	my $st = qq[
-		SELECT T.intRealmSubTypeID, T.intRealmID, T.intPaymentSetupID, T.intPaymentSetupID, intPaymentType
+		SELECT T.intRealmSubTypeID, T.intRealmID, TL.intPaymentConfigID, TL.intPaymentConfigID, intPaymentType
 			FROM tblTransactions as T
 			INNER JOIN tblTXNLogs as TLogs ON (T.intTransactionID = TLogs.intTXNID and TLogs.intTLogID = ?)
 			INNER JOIN tblTransLog as TL ON (TL.intLogID = TLogs.intTLogID )
@@ -50,16 +51,13 @@ sub main	{
 	$Data{'SystemConfig'}{'PaymentConfigID'} = $Data{'SystemConfig'}{'PaymentConfigUsedID'} ||  $Data{'SystemConfig'}{'PaymentConfigID'};
 	my $paymentConfigID = $Data{'SystemConfig'}{'PaymentConfigID'} || 0;
 	
-
 	### NEED TO CREATE $DATA !!!
-        my $target='main.cgi';
-        $Data{'target'}=$target;
-        my %clientValues = getClient($client);
-        $Data{'clientValues'} = \%clientValues;
+    my $target='main.cgi';
+    $Data{'target'}=$target;
+    my %clientValues = getClient($client);
+    $Data{'clientValues'} = \%clientValues;
 
 	$Data{'db'}=$db;
-#	$Data{'clientValues'}{currentLevel}=100;
-       # ($Data{'Realm'},$Data{'RealmSubType'})=getRealm(\%Data);
 	getDBConfig(\%Data);
   $Data{'SystemConfig'}=getSystemConfig(\%Data);
   my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
@@ -68,18 +66,6 @@ sub main	{
   $Data{'LocalConfig'}=getLocalConfig(\%Data);
   my $assocID=getAssocID(\%clientValues) || '';
         # DO DATABASE THINGS
-        my $DataAccess_ref=getDataAccess(\%Data);
-    $Data{'Permissions'}=GetPermissions(
-      \%Data,
-      $Defs::LEVEL_ASSOC,
-      $assocID,
-      $Data{'Realm'},
-      $Data{'RealmSubType'},
-      $Defs::LEVEL_ASSOC,
-      0,
-    );
-
-        $Data{'DataAccess'}=$DataAccess_ref;
 
         my $resultHTML = '';
         my $pageHeading= '';
@@ -93,7 +79,6 @@ sub main	{
 	## GENERAL VARIABLES
 	my $responsecode= param('responsecode') || '';
 	my $responsetext= param('responsetext') || '';
-	my $amount = param('amount') || 0;
 	my $txn = param('txn') || 0;
 	my $chkv = param('chkv') || 0;
 
@@ -103,11 +88,12 @@ sub main	{
 	my $paymentSettings = getPaymentSettings(\%Data,$paymentType, 0);
 
 	my $intLogID = processTransLog($db, $txn, $responsecode, $responsetext, $clientTransRefID, $paymentSettings, $chkv, $settlement_date,'', '', '', '', '');
-	#if ($intMemberID and ($responsecode eq "00" or $responsecode eq "08" or $responsecode eq "OK" or $responsecode eq "1"))    {
+warn("ABOUT TO BEALL OK FOR $intLogID $paymentType");
 	if ($intLogID and ($responsecode eq "00" or $responsecode eq "08" or $responsecode eq "OK" or $responsecode eq "1"))    {
+warn("ALL OK");
 		UpdateCart(\%Data, $paymentSettings, $client, $txn, $responsecode, $clientTransRefID);
-		EmailPaymentConfirmation(\%Data, $paymentSettings, $clientTransRefID, $client);
-        	product_apply_transaction(\%Data,$intLogID);
+		#EmailPaymentConfirmation(\%Data, $paymentSettings, $clientTransRefID, $client);
+        #product_apply_transaction(\%Data,$intLogID);
 	}
 
 disconnectDB($db);

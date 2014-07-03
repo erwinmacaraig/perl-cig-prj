@@ -9,7 +9,7 @@ require Exporter;
 @EXPORT = qw(sendAuthEmail sendTeamAuthEmail);
 @EXPORT_OK = qw(sendAuthEmail sendTeamAuthEmail);
 
-use lib ".","..","../..";
+use lib '.', '..', '../..', "../comp", '../RegoForm', "../dashboard", "../RegoFormBuilder",'../PaymentSplit', "../user";
 use strict;
 use RegoForm_Common;
 use TemplateEmail;
@@ -18,7 +18,6 @@ use CGI;
 use InstanceOf;
 use RegoFormUtils;
 use ContactsObj;
-use Passport;
 use Log;
 use Data::Dumper;
 
@@ -357,11 +356,11 @@ sub sendTeamAuthEmail {
 
     my $team_email = ($send_to_team) ? $dref->{'TeamEmail'} : '';
     
-    my $passport = new Passport(db=>$dbh);
-    my ($passportID, $passportStatus) = $passport->isMember($team_email);
+#    my $passport = new Passport(db=>$dbh);
+ #   my ($passportID, $passportStatus) = $passport->isMember($team_email);
     my $templatefile = 'regoform/team/signup-coordinator.templ';
-	$templatefile = 'regoform/team/signup-afl9-coordinator.templ' if($realmSubType==7);
-	$templatefile = 'regoform/team/signup-afl9-coordinator-new.templ' if($realmSubType==7 and !$passportID);
+#	$templatefile = 'regoform/team/signup-afl9-coordinator.templ' if($realmSubType==7);
+#	$templatefile = 'regoform/team/signup-afl9-coordinator-new.templ' if($realmSubType==7 and !$passportID);
 
     my $assoc_emails_aref = ($send_to_assoc) ? get_emails_list(ContactsObj->getList(dbh=>$dbh, associd=>$assocID, getregistrations=>1)) : '';
     my $club_emails_aref  = ($send_to_club and $clubID)  ? get_emails_list(ContactsObj->getList(dbh=>$dbh, associd=>$assocID, clubid=>$clubID, getregistrations=>1)) : '';

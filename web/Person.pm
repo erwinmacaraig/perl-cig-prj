@@ -124,7 +124,9 @@ sub handlePerson {
         ( $resultHTML, $title ) = Transactions::handleTransactions( $action, $Data, $personID );
     }
     elsif ( $action =~ /P_TXNLog/ ) {
-        ( $resultHTML, $title ) = TransLog::handleTransLogs( $action, $Data, $personID );
+        my $club = $Data->{'clientValues'}{'clubID'} || 0;
+        $club = 0 if ($club == $Defs::INVALID_ID);
+        ( $resultHTML, $title ) = TransLog::handleTransLogs( $action, $Data, $club, $personID );
     }
     elsif ( $action =~ /P_PAY_/ ) {
         ( $resultHTML, $title ) = handlePayments( $action, $Data, 0 );

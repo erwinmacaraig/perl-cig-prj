@@ -52,6 +52,9 @@ CREATE TABLE tblEntity (
     dblLong double DEFAULT '0',
     strDescription text, 
 
+    strPaymentNotificationAddress VARCHAR(250),
+    strEntityPaymentBusinessNumber VARCHAR(100) DEFAULT '',
+    strEntityPaymentInfo TEXT,
   PRIMARY KEY (`intEntityID`),
   KEY `index_intRealmID` (`intRealmID`),
   KEY `index_intEntityLevel` (`intEntityLevel`)

@@ -41,6 +41,8 @@ sub calcMoneyLog	{
 
 	my ($Data, $paymentSettings, $intLogID)= @_;
 
+warn("ML NOT OWRKING");
+return;
 	$intLogID || return;
 	
 	my $mpFeesEmail = '';
@@ -89,7 +91,7 @@ sub calcMoneyLog	{
 			TL.intAmount, 
 			TL.intRealmID,
 			TL.intPaymentType,
-			TL.intClubPaymentID,
+			TL.intEntityPaymentID,
 			IF(TL.intSWMPaymentAuthLevel = 3 OR RF.intClubID >0, 'CLUB', 'ASSOC') as CreatedBy
 		FROM 
 			tblTransLog as TL
@@ -101,7 +103,6 @@ sub calcMoneyLog	{
     	$query = $Data->{'db'}->prepare($st);
     	$query->execute;
 	my $tref= $query->fetchrow_hashref();
-#	if ($Data->{'clientValues'}{'authLevel'} != $Defs::LEVEL_CLUB and $tref->{'intClubPaymentID'} and (! $Data->{'clientValues'}{'clubID'} or $Data->{'clientValues'}{'clubID'} == $Defs::INVALID_ID) and $tref->{'CreatedBy'} eq 'CLUB')	{
 	if ($tref->{'intClubPaymentID'} and $tref->{'CreatedBy'} eq 'CLUB')	{
 		$Data->{'clientValues'}{'clubID'} = $tref->{'intClubPaymentID'};
 		$Data->{'clientValues'}{'authLevel'} = $Defs::LEVEL_CLUB;

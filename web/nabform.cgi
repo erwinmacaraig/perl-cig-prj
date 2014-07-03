@@ -9,8 +9,7 @@ use CGI qw(:cgi escape unescape);
 
 use strict;
 
-#use lib "/u/rego_v6","/u/rego_v6/web", "/u/rego_v6/web/comp";
-use lib "..",".","comp";
+use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 
 use Lang;
 use Utils;
@@ -45,6 +44,7 @@ sub main	{
     my $session= param('session') || 0;
     my $compulsory= param('compulsory') || 0;
     my %Data=();
+warn("######$action");
 
     my %clientValues = getClient($client);
     $Data{'clientValues'} = \%clientValues;
@@ -84,7 +84,7 @@ sub main	{
     $Data{'client'}=$client;
 
     $Data{'SystemConfig'}{'PaymentConfigID'} = $paymentConfigUsedID || $paymentConfigID;
-    my $paymentSettings = getPaymentSettings(\%Data, $Order{'PaymentType'}, $external);
+    my $paymentSettings = getPaymentSettings(\%Data, $Defs::PAYMENT_ONLINENAB, $external);
     $paymentSettings->{'NAB'}=1;
 
     my $header_css = $noheader ? ' #spheader {display:none;} ' : '';
@@ -94,7 +94,6 @@ sub main	{
     DEBUG("DDDN", Dumper($Data{'SystemConfig'}{'Header'}));
     my $m;
     my $chkvalue= $Order->{'TotalAmount'}. $clientTransRefID. $paymentSettings->{'currency'};
-#print STDERR "OM: $Order->{'TotalAmount'}. $clientTransRefID. $paymentSettings->{'currency'} - $Order->{'Status'}\n";
     $m = new MD5;
     $m->reset();
     $m->add($Defs::NAB_SALT, $chkvalue);
@@ -103,15 +102,8 @@ sub main	{
         $Order->{'Status'} = -1;
         $Order->{'TransLogStatus'} = -1;
     }
-    #$Order->{'Status'} = -1;
 
     my $template_ref = getPaymentTemplate(\%Data, $assocID);
-    # ignore the header html of payment template to have consistent header with
-    # regoform
-    #if ($template_ref->{'strHeaderHTML'})	{
-    #    $Data{'SystemConfig'}{'Header'} = $template_ref->{'strHeaderHTML'};
-    #    $Data{'SystemConfig'}{'HeaderBG'} = ' ';
-    #}
     if ($Order->{'Status'} != 0)	{
         my $body='';
         my $trans_ref=undef;

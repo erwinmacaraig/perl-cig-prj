@@ -23,16 +23,17 @@ use CGI qw(param unescape escape);
 sub gatewayTransactions	{
 	my ($Data, $logID) = @_;
 	my $st = qq[
-                SELECT T.intRealmSubTypeID, T.intRealmID, E.intPaymentConfigID, TL.intPaymentConfigUsedID, TL.intAmount as Amount, TL.intStatus, P.strName as ProductName, P.strGroup as ProductGroup, T.curAmount as TxnAmount, intQty, T.intTransactionID, strGSTText, strRealmName, T.curPerItem, T.intStatus as TXNStatus, T.intTXNEntityID, intEntityPaymentID, PC.strCurrency, RF.intAssocID as intAssocFormOwner, RF.intClubID as ClubFormOwner, TL.intRegoFormID, intSWMPaymentAuthLevel, intPaymentType
+                SELECT T.intRealmSubTypeID, T.intRealmID, TL.intPaymentConfigID, TL.intAmount as Amount, TL.intStatus, P.strName as ProductName, P.strGroup as ProductGroup, T.curAmount as TxnAmount, intQty, T.intTransactionID, strGSTText, strRealmName, T.curPerItem, T.intStatus as TXNStatus, T.intTXNEntityID, intEntityPaymentID, PC.strCurrency, RF.intAssocID as intAssocFormOwner, RF.intClubID as ClubFormOwner, TL.intRegoFormID, intSWMPaymentAuthLevel
                         FROM tblTransactions as T
                         INNER JOIN tblTXNLogs as TLogs ON (T.intTransactionID = TLogs.intTXNID and TLogs.intTLogID = $logID)
                         LEFT JOIN tblEntity as E ON (E.intEntityID = T.intTXNEntityID)
                         INNER JOIN tblTransLog as TL ON (TL.intLogID = TLogs.intTLogID)
                         INNER JOIN tblProducts as P ON (P.intProductID = T.intProductID)
                         INNER JOIN tblRealms as R ON (R.intRealmID=T.intRealmID)
-						LEFT JOIN tblPaymentConfig as PC ON (PC.intPaymentConfigID = TL.intPaymentConfigUsedID)
+						LEFT JOIN tblPaymentConfig as PC ON (PC.intPaymentConfigID = TL.intPaymentConfigID)
 						LEFT JOIN tblRegoForm as RF ON (RF.intRegoFormID=TL.intRegoFormID)
         ];
+warn($st);
 
         my $qry= $Data->{'db'}->prepare($st) or query_error($st);
 #print STDERR $st;
@@ -75,7 +76,10 @@ sub gatewayTransactions	{
 				}
                 $count ++;
         }
+        $totalAmount= sprintf("%.2f", $totalAmount);
+warn("TTTTM".$Order{'TotalAmount'} . "--" . $totalAmount);
 		$Order{'Status'}=-1 if ($Order{'TotalAmount'} != $totalAmount);
+warn("STATUS: " . $Order{'Status'});
 #print STDERR "LOGGGGG:$logID $Order{'ClubFormOwner'} | $Data->{'clientValues'}{'authLevel'}\n";
 	return (\%Order, \%Transactions);
 
@@ -160,9 +164,8 @@ sub getPaymentTemplate  {
     WHERE
       intRealmID IN (0, $realmID)
       AND intRealmSubTypeID IN (0, $realmSubTypeID)
-      AND intEntityID IN (0, $entityID)
     ORDER BY
-      intEntityID DESC, intRealmSubTypeID DESC, intRealmID DESC
+      intRealmSubTypeID DESC, intRealmID DESC
     LIMIT 1
   ];
   my $qry= $Data->{'db'}->prepare($st) or query_error($st);

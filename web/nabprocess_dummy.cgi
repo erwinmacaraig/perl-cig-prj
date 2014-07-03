@@ -43,16 +43,6 @@ sub main	{
   warn "nabProcess $session ID::$session";
   my %returnVals = ();
   my $redirect =0;
-#FF remove
-  $returnVals{'GATEWAY_TXN_ID'}= param('txnid') || '1111';
-  $returnVals{'GATEWAY_AUTH_ID'}= param('authid') || '2222';
-  $returnVals{'GATEWAY_SIG'}= param('sig') || '';
-  $returnVals{'GATEWAY_SETTLEMENT_DATE'}= param('settdate') || '20130726';
-  $returnVals{'GATEWAY_RESPONSE_CODE'}= param('rescode') || '00';
-  $returnVals{'GATEWAY_RESPONSE_TEXT'}= param('restext') || 'Approved';
-  $returnVals{'ResponseCode'} = 'ERROR';
-
-=c FF add
   $returnVals{'GATEWAY_TXN_ID'}= param('txnid') || '';
   $returnVals{'GATEWAY_AUTH_ID'}= param('authid') || '';
   $returnVals{'GATEWAY_SIG'}= param('sig') || '';
@@ -60,13 +50,11 @@ sub main	{
   $returnVals{'GATEWAY_RESPONSE_CODE'}= param('rescode') || '';
   $returnVals{'GATEWAY_RESPONSE_TEXT'}= param('restext') || '';
   $returnVals{'ResponseCode'} = 'ERROR';
-=cut
+
   $returnVals{'ResponseText'} = NABResponseCodes($returnVals{'GATEWAY_RESPONSE_CODE'});
   if ($returnVals{'GATEWAY_RESPONSE_CODE'} =~/^00|08|11$/)  {
     $returnVals{'ResponseCode'} = 'OK';
   }
-#print STDERR Dumper(\%returnVals);
-#print STDERR "NAB FOR $logID | $returnVals{'GATEWAY_RESPONSE_CODE'} | $returnVals{'GATEWAY_RESPONSE_TEXT'}\n";
 	
   my $db=connectDB();
 	my %Data=();
@@ -81,10 +69,9 @@ sub main	{
 	$qry->execute($logID, $returnVals{'GATEWAY_RESPONSE_CODE'});
 
 
-  
 	my ($Order, $Transactions) = gatewayTransactions(\%Data, $logID);
-    #print STDERR Dumper($Order);
 	 $Order->{'Status'} = $Order->{'TLStatus'} >=1 ? 1 : 0;
+warn("AAASTATUS" . $Order->{'Status'});
   $Data{'SystemConfig'}{'PaymentConfigID'} = $Data{'SystemConfig'}{'PaymentConfigUsedID'} ||  $Data{'SystemConfig'}{'PaymentConfigID'};
 
   my %clientValues = getClient($client);
@@ -106,7 +93,7 @@ sub main	{
   $Data{'client'}=$client;
 
   {
-    my $chkvalue= $Order->{'TotalAmount'}. $logID. $Order->{'Currency'};
+    my $chkvalue= param('rescode') . $Order->{'TotalAmount'}. $logID; ## NOTE: Different to one being sent
     my $m;
     $m = new MD5;
     $m->reset();
@@ -115,11 +102,9 @@ sub main	{
     warn "chkv VS. chkvalue :: $chkv :::::  $chkvalue ";
     $Order->{'Status'} = -1 if ($chkv ne $chkvalue);
   }
-  
-  
    my $body='';
 	if ($Order->{'Status'} != 0)	{
-		$body  = qq[<div align="center" class="warningmsg" style="font-size:14px;">here was an error</div>BB$Order->{'Status'} $Order->{'AssocID'}];
+		$body  = qq[<div align="center" class="warningmsg" style="font-size:14px;">There was an error</div>BB$Order->{'Status'} $Order->{'AssocID'}];
 		if ($Order->{'AssocID'})	{
 			my $template_ref = getPaymentTemplate(\%Data, $Order->{'AssocID'});
 			my $templateBody = $template_ref->{'strFailureTemplate'} || 'payment_failure.templ';

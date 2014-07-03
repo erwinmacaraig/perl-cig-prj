@@ -20,7 +20,6 @@ use MD5;
 use CGI qw(param unescape escape);
 
 use RegoForm_MemberFunctions qw(rego_addRealMember);
-use RegoForm_TeamFunctions qw(rego_addRealTeam);
 use RegoForm::RegoFormFactory;
 
 sub payPalProcess	{
@@ -360,7 +359,7 @@ sub finalize_registration {
         my $form_entity_type = $formObj->FormEntityType();
 	
 		#Add Member
-		($intRealID,undef) =  ($form_entity_type eq 'Member') ? rego_addRealMember($Data,$db,$intTempID,$session, $formObj) : rego_addRealTeam($Data,$db,$intTempID,$session, $formObj) ;        
+		($intRealID,undef) =  ($form_entity_type eq 'Member') ? rego_addRealMember($Data,$db,$intTempID,$session, $formObj) : (0,0);
         warn "PAYPAL::CompulsoryPayment: RealID:: $intRealID";
 		my $st_update = qq[
 					UPDATE tblTransactions

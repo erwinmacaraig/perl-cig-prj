@@ -23,12 +23,12 @@ require Exporter;
 	rego_addRealMember
 );
 
-use lib "..","../..","../sportstats";
+use lib '.', '..', '../..', "../comp", '../RegoForm', "../dashboard", "../RegoFormBuilder",'../PaymentSplit', "../user";
 use RegoForm_Products;
 use RegoForm_Common;
 use RegoForm_Notifications;
 use Reg_common;
-use Member;
+use Person;
 use TTTemplate;
 use Payments;
 use File::Copy;
@@ -40,7 +40,7 @@ use Payments;
 use Utils;
 use DBUtils;
 
-use TempNodeStructureObj;
+#use TempNodeStructureObj;
 use Log;
 
 sub setMemberTypes  {
@@ -539,7 +539,7 @@ sub rego_postMemberUpdate  {
 		}
 
 		if($txns_added and  @{$txns_added} ) {
-			$checkOut = Payments::checkoutConfirm($Data, $paymentType, $txns_added,1) || q{};
+			$checkOut = Payments::checkoutConfirm($Data, $Defs::PAYMENT_ONLINENAB, $txns_added,1) || q{};
 		}
 		
 		
@@ -990,7 +990,7 @@ sub rego_addTempMember  {
     my $checkOut ='';
 	$Data->{'sessionKey'} = $session->id();
     if($txns_added and  @{$txns_added} ) {
-	    $checkOut = Payments::checkoutConfirm($Data, $paymentType, $txns_added,1) || q{};
+	    $checkOut = Payments::checkoutConfirm($Data, $Defs::PAYMENT_ONLINENAB, $txns_added,1) || q{};
     }
 =c
         if( $params->{'d_PhotoUpload'} )  {

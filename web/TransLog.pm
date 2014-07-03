@@ -269,7 +269,7 @@ sub step2 {
 		
 
 			
-		my $bb = Payments::checkoutConfirm($Data, $Data->{params}{paymentType}, \@transactionIDs,1);
+		my $bb = Payments::checkoutConfirm($Data, $Defs::PAYMENT_ONLINENAB, \@transactionIDs,1);
 		return ($bb, "Payments Checkout");
 	}
 
@@ -839,26 +839,24 @@ sub listTransactions {
 				<div style= "clear:both;"></div>
 			</div>
 	 ];          
-	  my $intClubID = $Data->{'clientValues'}{'clubID'}; 
-	  $intClubID=0 if ($intClubID == $Defs::INVALID_ID);
-	  my $intAllowPayment = 0;
-	  if ($intClubID)	{
-	 	  my $st_club = qq[
-        	SELECT 
-				intPaymentConfigID
-            FROM 
-				tblPaymentConfig
-            WHERE 
-				intEntityID = $intClubID
-				AND intLevelID=3
-				AND intStatus=1
-				
+      my $SRWhere = '';
+      $SRWhere = qq[ AND intRealmSubTypeID IN (0, $Data->{'RealmSubType'} ] if ($Data->{'RealmSubType'});
+      my $stpc = qq[
+            SELECT
+                intPaymentType
+            FROM
+                tblPaymentConfig
+            WHERE
+                intRealmID = $Data->{'Realm'}
+                $SRWhere
       ];
-		  my $qry_club= $db->prepare($st_club);
-  	  $qry_club->execute;
-		  $intAllowPayment = $qry_club->fetchrow_array() || 0;
-	  }
-	  $CC_body = '' if ! $intAllowPayment;
+      my $qrypc= $db->prepare($stpc);
+      $qrypc->execute;
+      my %allowPaymentTypes= ();
+      while (my $pref = $qrypc->fetchrow_hashref())  {
+          $allowPaymentTypes{$pref->{'intPaymentType'}} = 1;
+      }
+	  $CC_body = '' if ! $allowPaymentTypes{$Defs::PAYMENT_ONLINENAB};
 	  $CC_body = '' if ! $Data->{'SystemConfig'}{'AllowTXNs_CCs'};
 	  for my $i (qw(intAmount strBank strBSB strAccountNum strAccountName strResponseCode strResponseText strReceiptRef strComments intPartialPayment))	{
 		  $Data->{params}{$i}='' if !defined $Data->{params}{$i};

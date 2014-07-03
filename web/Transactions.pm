@@ -37,7 +37,7 @@ sub handleTransactions	{
 	my $heading='';
 
   if ($action =~ /_TXN_LIST/) {
-		($resultHTML,$heading) = TransLog::handleTransLogs('list', $Data, $intTableID);
+		($resultHTML,$heading) = TransLog::handleTransLogs('list', $Data, $entityID, $intTableID);
   }
   elsif ($action =~ /_TXN_EDIT/) {
 		($resultHTML,$heading) = displayTransaction($Data, $intTableID, $ID, 1);

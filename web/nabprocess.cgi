@@ -102,15 +102,24 @@ sub main {
     $Data{'client'}=$client;
     $Data{'sessionKey'} = $session;
     $Data{'CompulsoryPayment'} = $compulsory;
+    #{
+    #    my $chkvalue= $Order->{'TotalAmount'}. $logID. $Order->{'Currency'};
+    #    my $m;
+    #    $m = new MD5;
+    #    $m->reset();
+    #    $m->add($Defs::NAB_SALT, $chkvalue);
+    #    $chkvalue = $m->hexdigest();
+    #    $Order->{'Status'} = -1 if ($chkv ne $chkvalue);
+    #}
     {
-        my $chkvalue= $Order->{'TotalAmount'}. $logID. $Order->{'Currency'};
-        my $m;
-        $m = new MD5;
-        $m->reset();
-        $m->add($Defs::NAB_SALT, $chkvalue);
-        $chkvalue = $m->hexdigest();
-        $Order->{'Status'} = -1 if ($chkv ne $chkvalue);
-    }
+     my $chkvalue= param('rescode') . $Order->{'TotalAmount'}. $logID; ## NOTE: Different to one being sent
+     my $m;
+     $m = new MD5;
+     $m->reset();
+     $m->add($Defs::NAB_SALT, $chkvalue);
+     $chkvalue = $m->hexdigest();
+     $Order->{'Status'} = -1 if ($chkv ne $chkvalue);
+   }
 
     my ($html_head, $page_header, $page_navigator, $paypal, $powered) = getPageCustomization(\%Data);
     
