@@ -94,7 +94,7 @@ sub main {
 
     getDBConfig(\%Data);
     $Data{'SystemConfig'}=getSystemConfig(\%Data);
-    my $paymentSettings = getPaymentSettings(\%Data,$external);
+    my ($paymentSettings, undef) = getPaymentSettings(\%Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, $external);
     $paymentSettings->{'gateway_string'} = $Defs::NAB_SALT;
 
     $Data{'clientValues'}=\%clientValues;

@@ -49,6 +49,7 @@ warn($st);
                 $Data->{'SystemConfig'}{'PaymentConfigID'} = $dref->{intPaymentConfigID} || 0;
                 $Data->{'SystemConfig'}{'PaymentConfigUsedID'} = $dref->{intPaymentConfigUsedID} || 0;
 		$Order{'TransLogStatus'}=$dref->{'intStatus'} || 0;
+                $Order{'PaymentConfigID'} = $dref->{'intPaymentConfigID'};
                 $Order{'PaymentType'} = $dref->{'intPaymentType'};
                 $Order{'TotalAmount'} = $dref->{'Amount'};
                 $Order{'Status'} = $dref->{'intStatus'};

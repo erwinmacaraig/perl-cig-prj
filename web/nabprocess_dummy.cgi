@@ -85,7 +85,7 @@ warn("AAASTATUS" . $Order->{'Status'});
   my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
   $Data{'lang'}=$lang;
 
-  my $paymentSettings = getPaymentSettings(\%Data,$external);
+  my ($paymentSettings, undef) = getPaymentSettings(\%Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, $external);
   $paymentSettings->{'gateway_string'} = $Defs::NAB_SALT;
 
   $Data{'clientValues'}=\%clientValues;

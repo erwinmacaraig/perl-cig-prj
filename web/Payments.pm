@@ -180,6 +180,7 @@ sub processFeeDetails {
 
 sub checkoutConfirm	{
 	my($Data, $paymentType, $trans, $external)=@_;
+print STDERR ")))))))))))))))$paymentType";
 	$external ||= 0; ## Pop CC in NEW window ?
 
 	$Data->{'SystemConfig'}=getSystemConfig($Data);
@@ -213,9 +214,9 @@ sub checkoutConfirm	{
     $m->reset();
     $amount =  sprintf("%.2f", $amount);
 
-	my $paymentSettings = getPaymentSettings($Data, $paymentType, $external);
+    my ($paymentSettings, @PaymentSettings_array) = getPaymentSettings($Data, $paymentType, 0, $external);
+    
     my $onlinePayment = $paymentSettings->{'onlinePayment'} || 0;
-
 	if ($onlinePayment) {
 	    my ($minFeeTrans, $fee) = (0,0);
 		($minFeeTrans, $fee) = checkMinFeeAmount($Data, $paymentSettings, $entityID, $trans, $amount) if ($amount>0);
@@ -226,7 +227,6 @@ sub checkoutConfirm	{
         	$amount =  sprintf("%.2f", $amount);
 		}
     }
-
 	# Need to create TransLog record
     my $intLogID = $count ? createTransLog($Data, $paymentSettings, $entityID, $trans, $amount) : 0;
 	my $payLater = '';
@@ -244,13 +244,10 @@ sub checkoutConfirm	{
     my $values = $amount . $intLogID . $paymentSettings->{'paymentGatewayID'} . $paymentSettings->{'currency'};
     $m->add($paymentSettings->{'gateway_string'}, $values);
     $values = $m->hexdigest();
-    my $cr = $paymentSettings->{'currency'} || 'AUD';
+    my $cr = $paymentSettings->{'currency'} || '';
 
-	# Need to show Pay button
-		
     my $allowPayment = $paymentSettings->{'allowPayment'} || 0;
 	$allowPayment=0	if (! $external and $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_CLUB);
-
 
     my $session = $Data->{'sessionKey'};
 	my $paymentURL = qq[$Defs::base_url/paypal.cgi?nh=$Data->{'noheader'}&amp;ext=$external&amp;a=P&amp;client=$client&amp;ci=$intLogID&amp;formID=$formID&amp;session=$session;compulsory=$compulsory];
@@ -267,8 +264,7 @@ sub checkoutConfirm	{
         $m->reset();
         $m->add($Defs::NAB_SALT, $chkvalue);
         $chkvalue = $m->hexdigest();
-        $paymentURL = qq[$Defs::base_url/nabform.cgi?nh=$Data->{'noheader'}&amp;ext=$external&amp;a=P&amp;formID=$formID&amp;client=$client&amp;ci=$intLogID&amp;chkv=$chkvalue&amp;session=$session;compulsory=$compulsory];
-        $paymentURL = qq[http://elwood/FIFASPOnlineOtherGateway/NAB/nabform.cgi?nh=$Data->{'noheader'}&amp;ext=$external&amp;a=P&amp;formID=$formID&amp;client=$client&amp;ci=$intLogID&amp;chkv=$chkvalue&amp;session=$session;compulsory=$compulsory&amp;amount=$amount];
+        $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data->{'noheader'}&amp;ext=$external&amp;a=P&amp;formID=$formID&amp;client=$client&amp;ci=$intLogID&amp;chkv=$chkvalue&amp;session=$session;compulsory=$compulsory&amp;amount=$amount];
         my $formTarget = $external ? qq[ target="other" onClick="window.open('$paymentURL','other','location=no,directories=no,menubar=no,statusbar=no,toolbar=no,scrollbars=yes,height=820,width=870,resizable=yes');return false;" ] : '';
         $externalGateway= qq[
           	<div class="accepted">
@@ -448,7 +444,7 @@ sub getCheckoutAmount 	{
 }
 
 sub getPaymentSettings	{
-    my ($Data, $paymentType, $external, $tempClientValues) = @_;
+    my ($Data, $paymentType, $paymentConfigID, $external, $tempClientValues) = @_;
 	$external ||= 0;
 	my $db = $Data->{'db'};
 	my $client='';
@@ -459,12 +455,14 @@ sub getPaymentSettings	{
 	if ($Data->{'RealmSubType'})	{
 	    $where = qq[ AND intRealmSubTypeID IN (0, $Data->{'RealmSubType'}) ];
 	}
+    if ($paymentConfigID)   {
+        $where .= qq[ AND intPaymentConfigID= $paymentConfigID];
+    }
     if ($paymentType)   {
         $where .= qq[ AND intPaymentType = $paymentType ];
     }
 
     my $softDescriptor='';
-	my %settings = ();
 
 	my $st = qq[
 		SELECT * 
@@ -473,46 +471,56 @@ sub getPaymentSettings	{
             intRealmID = $Data->{'Realm'}
             $where
 		ORDER BY intRealmSubTypeID DESC
-		LIMIT 1
 	];
+print STDERR $st;
     my $qry = $db->prepare($st) or query_error($st);
 	$qry->execute or query_error($st);
-	my $dref = $qry->fetchrow_hashref();
+    my @Settings=();
+    my %Setting=();
+    my $count=0;
+    while (my $dref = $qry->fetchrow_hashref()) {
+	    my %settings = ();
+        my $paymentConfigID = $dref->{intPaymentConfigID} || next;
+	    $settings{'intPaymentConfigID'} = $dref->{intPaymentConfigID} || 0;
+	    $settings{'gatewayName'} = $dref->{strGatewayName} || '';
+        $settings{'feeAllocationType'} = $dref->{'intFeeAllocationType'} || 0;
+        $settings{'gatewayStatus'} = $dref->{'intGatewayStatus'} || 0;
+        $settings{'paymentGatewayID'} = $dref->{intPaymentGatewayID} || 0;
+        $settings{'paymentType'} = $dref->{intPaymentType} || 0;
+        $settings{'gatewayType'} = $dref->{intGatewayType} || 0;
+        $settings{'gatewayPrefix'} = $dref->{strPrefix} || '';
+        $settings{'paymentBusinessNumber'} = $dref->{PaymentBusinessNumber} || '';
+        $settings{'notification_address'} = $dref->{strNotificationAddress} || '';
+        $settings{'gatewayCreditCardNoteRealm'} = $dref->{strCCNote} || '';
+        $settings{'gatewayCreditCardNote'} = $dref->{strCCNote} || '';
+        $settings{'gatewayCreditCardNote'} = qq[$softDescriptor] if $softDescriptor;
+        $settings{'gateway_string'} = $dref->{strGatewaySalt};
+        $settings{'gateway_url'} = $dref->{strGatewayURL1};
+        $settings{'gateway_url2'} = $dref->{strGatewayURL2};
+        $settings{'gateway_url3'} = $dref->{strGatewayURL3};
+        $settings{'gatewayLevel'} = $dref->{intLevelID} || 0;
+        $settings{'gatewayRuleID'} = $dref->{intPaymentSplitRuleID} || 0;
+        $settings{'allowPayment'} = $dref->{intAllowPayment} || 0;
+        $settings{'onlinePayment'} = (exists $Defs::onlinePaymentTypes{$paymentType}) ? 1 : 0; 
 
-	$settings{'intPaymentConfigID'} = $dref->{intPaymentConfigID} || 0;
-    $settings{'feeAllocationType'} = $dref->{'intFeeAllocationType'} || 0;
-    $settings{'gatewayStatus'} = $dref->{'intGatewayStatus'} || 0;
-	$settings{'paymentGatewayID'} = $dref->{intPaymentGatewayID} || 0;
-	$settings{'paymentType'} = $dref->{intPaymentType} || 0;
-	$settings{'gatewayType'} = $dref->{intGatewayType} || 0;
-	$settings{'gatewayPrefix'} = $dref->{strPrefix} || '';
-	$settings{'paymentBusinessNumber'} = $dref->{PaymentBusinessNumber} || '';
-	$settings{'notification_address'} = $dref->{strNotificationAddress} || '';
-	$settings{'gatewayCreditCardNoteRealm'} = $dref->{strCCNote} || '';
-	$settings{'gatewayCreditCardNote'} = $dref->{strCCNote} || '';
-	$settings{'gatewayCreditCardNote'} = qq[$softDescriptor] if $softDescriptor;
-	$settings{'gateway_string'} = $dref->{strGatewaySalt};
-	$settings{'gateway_url'} = $dref->{strGatewayURL1};
-	$settings{'gateway_url2'} = $dref->{strGatewayURL2};
-	$settings{'gateway_url3'} = $dref->{strGatewayURL3};
-	$settings{'gatewayLevel'} = $dref->{intLevelID} || 0;
-	$settings{'gatewayRuleID'} = $dref->{intPaymentSplitRuleID} || 0;
-	$settings{'allowPayment'} = $dref->{intAllowPayment} || 0;
-    $settings{'onlinePayment'} = (exists $Defs::onlinePaymentTypes{$paymentType}) ? 1 : 0; 
+        if ($external)	{
+            $settings{'return_url'} = $dref->{strReturnExternalURL};
+            $settings{'return_failure_url'} = $dref->{strReturnExternalFailureURL};
+        }
+        else	{
+            $settings{'return_url'} = $dref->{strReturnURL};
+            $settings{'return_failure_url'} = $dref->{strReturnFailureURL};
+        }
+        $settings{'return_url'} .= qq[&amp;client=$client] if $client and $settings{'return_url'};
+        $settings{'return_failure_url'} .= qq[&amp;client=$client] if $client and $settings{'return_failure_url'};
+        $settings{'currency'} = $dref->{strCurrency} || 'AUD';
+        push @Settings, \%settings;
+        %Setting = %settings;
+        $count++;
+    }
+        
 
-	if ($external)	{
-		$settings{'return_url'} = $dref->{strReturnExternalURL};
-		$settings{'return_failure_url'} = $dref->{strReturnExternalFailureURL};
-	}
-	else	{
-		$settings{'return_url'} = $dref->{strReturnURL};
-		$settings{'return_failure_url'} = $dref->{strReturnFailureURL};
-	}
-	$settings{'return_url'} .= qq[&amp;client=$client] if $client and $settings{'return_url'};
-	$settings{'return_failure_url'} .= qq[&amp;client=$client] if $client and $settings{'return_failure_url'};
-	$settings{'currency'} = $dref->{strCurrency} || 'AUD';
-
-	return \%settings;
+	return (\%Setting, \@Settings);
 }
 
 

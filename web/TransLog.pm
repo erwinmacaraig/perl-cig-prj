@@ -24,7 +24,7 @@ use AuditLog;
 use GridDisplay;
 
 require Products;
-require Payments;
+use Payments;
 #require List;
 
 my $entityName       = 'Transaction';
@@ -37,15 +37,25 @@ sub handleTransLogs {
 	$Data->{'params'} = $q->Vars();
   my $clientValues_ref = $Data->{'clientValues'};
   my ($body, $header, $db, $step1Success, $resultMessage)=('','', $Data->{'db'}, 0, '');
+
+    my $gCount = $Data->{'params'}{'gatewayCount'} || 0;
+    my $cc_submit = '';
+    foreach my $i (1 .. $gCount)    {
+        if ($Data->{'params'}{"cc_submit[$i]"}) {
+            $cc_submit = $Data->{'params'}{"pt_submit[$i]"};
+        }
+        print STDERR "THE VALUE IS " . $cc_submit;
+    }
+
   if ($action=~/step2/) {	
-	  if ($Data->{'params'}{'cc_submit'})	{
+	  if ($cc_submit)	{
 		  ($step1Success, $resultMessage) = (1,'');
 	  }
 	  else	{
 		  ($step1Success, $resultMessage) = validateStep1($Data,$db,$clientValues_ref);
 	  }
 	  if ($step1Success) {
-		  ($body, $header) = step2($Data, $db, $clientValues_ref);
+		  ($body, $header) = step2($Data, $db, $cc_submit, $clientValues_ref);
 	  }
 	  else {
 	    $action = 'list'; 
@@ -227,11 +237,15 @@ sub fixDate  {
 sub step2 {
 
 #Handles the 'Payment Confirmation' Screen, tblTransactions records get intTempLogID set and new tblTransLog record gets added with intStatus=pending
-	my ($Data, $db, $clientValues_ref) = @_;
+	my ($Data, $db, $paymentTypeSubmitted, $clientValues_ref) = @_;
 
+print STDERR "SDSDSDSD $paymentTypeSubmitted";
 	my ($body, $header) = ('', '');
 
 	my ($currencyID, $intAmount, $dtLog, $paymentType, $strBSB, $strAccountName, $strAccountNum, $strResponseCode, $strResponseText, $strComments, $strBank, $strReceiptRef) = ($Data->{params}{currencyID}, $Data->{params}{intAmount}, $Data->{params}{dtLog}, $Data->{params}{paymentType}, $Data->{params}{strBSB}, $Data->{params}{strAccountName}, $Data->{params}{strAccountNum}, $Data->{params}{strResponseCode}, $Data->{params}{strResponseCode}, $Data->{params}{strComments}, $Data->{params}{strBank}, $Data->{params}{strReceiptRef});
+print STDERR "SDSDSDSD|$paymentType";
+    $paymentType ||= $paymentTypeSubmitted;
+print STDERR "SDSDSDSD|$paymentType";
 
 	#$dtLog=convertDateToYYYYMMDD($dtLog);
 	$dtLog=fixDate($dtLog);
@@ -247,7 +261,7 @@ sub step2 {
 		push @transactionIDs, $id;
         }
 		
-	if ($Data->{params}{'cc_submit'})	{
+	if ($paymentTypeSubmitted)	{
 		if (! $Data->{'clientValues'}{'clubID'} or $Data->{'clientValues'}{'clubID'} == $Defs::INVALID_ID)	{
 			my $whereClause = 'intTransactionID in ('.join(",", @transactionIDs).')';	
 			my $st = qq[
@@ -269,7 +283,8 @@ sub step2 {
 		
 
 			
-		my $bb = Payments::checkoutConfirm($Data, $Defs::PAYMENT_ONLINENAB, \@transactionIDs,1);
+print STDERR "****************$paymentType|\n";
+		my $bb = Payments::checkoutConfirm($Data, $paymentType, \@transactionIDs,1);
 		return ($bb, "Payments Checkout");
 	}
 
@@ -823,9 +838,8 @@ sub listTransactions {
 
 	my $header=qq[$addLink$entityNamePlural];
 
+
     if ($transCount>0) {
-	    my $currencySQL = qq[SELECT intCurrencyID, strCurrencyName from tblCurrencies WHERE intRealmID = $Data->{Realm}];
-	    my %currencies;
 	    my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
         $Year+=1900;
         $Month++;
@@ -833,30 +847,26 @@ sub listTransactions {
 	    $currentDate = $Data->{params}{dtLog} if $Data->{params}{dtLog};
 	    $resultMessage = qq[<p class="error">$resultMessage</p>] if $resultMessage;
 	    my $paymentType = $Data->{params}{paymentType} || 0;
-	    my $CC_body = qq[
-			<div id = "payment_cc" style= "display:none;"><br>
-				<input type="submit" name="cc_submit" value="Pay via Online Credit Card Gateway" class = "button proceed-button"><br><br>
-				<div style= "clear:both;"></div>
-			</div>
-	 ];          
-      my $SRWhere = '';
-      $SRWhere = qq[ AND intRealmSubTypeID IN (0, $Data->{'RealmSubType'} ] if ($Data->{'RealmSubType'});
-      my $stpc = qq[
-            SELECT
-                intPaymentType
-            FROM
-                tblPaymentConfig
-            WHERE
-                intRealmID = $Data->{'Realm'}
-                $SRWhere
-      ];
-      my $qrypc= $db->prepare($stpc);
-      $qrypc->execute;
-      my %allowPaymentTypes= ();
-      while (my $pref = $qrypc->fetchrow_hashref())  {
-          $allowPaymentTypes{$pref->{'intPaymentType'}} = 1;
-      }
-	  $CC_body = '' if ! $allowPaymentTypes{$Defs::PAYMENT_ONLINENAB};
+        my (undef, $paymentTypes) = getPaymentSettings($Data, $paymentType, 0, $tempClientValues_ref);
+    
+        my $CC_body = qq[<div id = "payment_cc" style= "display:none;"><br>];
+        my $gatewayCount = 0;
+        foreach my $gateway (@{$paymentTypes})  {
+            $gatewayCount++;
+            my $id = $gateway->{'intPaymentConfigID'};
+            my $pType = $gateway->{'paymentType'};
+            my $name = $gateway->{'gatewayName'};
+            $CC_body .= qq[
+				    <input type="submit" name="cc_submit[$gatewayCount]" value="Pay via $name" class = "button proceed-button"><br><br>
+                    <input type="hidden" value="$pType" name="pt_submit[$gatewayCount]">
+            ];
+        }
+        $CC_body .= qq[
+                    <input type="hidden" value="$gatewayCount" name="gatewayCount">
+				    <div style= "clear:both;"></div>
+			    </div>
+	    ];          
+	  $CC_body = '' if ! $gatewayCount;
 	  $CC_body = '' if ! $Data->{'SystemConfig'}{'AllowTXNs_CCs'};
 	  for my $i (qw(intAmount strBank strBSB strAccountNum strAccountName strResponseCode strResponseText strReceiptRef strComments intPartialPayment))	{
 		  $Data->{params}{$i}='' if !defined $Data->{params}{$i};

@@ -109,7 +109,7 @@ $Data{'clientValues'}{'assocID'} = $assocID if ($assocID and $assocID > 0);
         $client= setClient(\%clientValues);
   	$Data{'client'}=$client;
 
-	my $paymentSettings = getPaymentSettings(\%Data,$paymentType, $external);
+    my ($paymentSettings, undef) = getPaymentSettings(\%Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, $external);
 	$paymentSettings->{'PAYPAL'}=1;
 
     	my $header_css = $noheader ? ' #spheader {display:none;} ' : '';

@@ -84,7 +84,7 @@ warn("######$action");
     $Data{'client'}=$client;
 
     $Data{'SystemConfig'}{'PaymentConfigID'} = $paymentConfigUsedID || $paymentConfigID;
-    my $paymentSettings = getPaymentSettings(\%Data, $Defs::PAYMENT_ONLINENAB, $external);
+    my $paymentSettings = getPaymentSettings(\%Data, $Defs::PAYMENT_ONLINENAB, 0, $external);
     $paymentSettings->{'NAB'}=1;
 
     my $header_css = $noheader ? ' #spheader {display:none;} ' : '';
