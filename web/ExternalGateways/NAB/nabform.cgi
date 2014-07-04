@@ -35,7 +35,7 @@ sub main	{
     my $chkvalue= $amount . $clientTransRefID. 'NZD';
     my $m = new MD5;
     $m->reset();
-    $m->add('1234', $chkvalue);
+    $m->add('1234A', $chkvalue);
     $chkvalue = $m->hexdigest();
     my $body = '';
     print qq[Content-type: text/html\n\n];

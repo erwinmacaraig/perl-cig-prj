@@ -164,8 +164,6 @@ sub NABUpdate {
   my $otherRef4 = '';
   my $responseText = $returnVals->{'ResponseText'} || '';
 
-  $paymentSettings->{'gateway_string'} = $Defs::NAB_SALT;
-
 	my $exportOK = 0;
 	$exportOK=1 if ($returnVals->{'ResponseCode'} eq 'OK');
   	processTransLog($Data->{'db'}, $txn, $returnVals->{'ResponseCode'}, $responseText, $logID, $paymentSettings, undef, $settlement_date, $otherRef1, $otherRef2, $otherRef3, $otherRef4, '', $exportOK);

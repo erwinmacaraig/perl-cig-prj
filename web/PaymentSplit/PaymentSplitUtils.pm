@@ -45,7 +45,7 @@ sub getPaymentSplitSettings {
             $psSettings{'psProds'} = 1 if ($authLevel >= $Defs::LEVEL_CLUB);
 
             # allow Payment Split Run into menu?
-	        my $isPayPal = ($paymentSettings->{'gatewayType'} == $Defs::GATEWAY_PAYPAL);
+	        my $isPayPal = ($paymentSettings->{'paymentType'} == $Defs::PAYMENT_ONLINEPAYPAL);
             #$psSettings{'psRun'} = 1 if (!$isPayPal and $currentLevel == $Defs::LEVEL_NATIONAL);
 
             # allow Payment Splits to be entered?

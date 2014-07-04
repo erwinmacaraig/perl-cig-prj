@@ -241,7 +241,7 @@ sub checkoutConfirm	{
 
 
     my $values = $amount . $intLogID . $paymentSettings->{'paymentGatewayID'} . $paymentSettings->{'currency'};
-    $m->add($paymentSettings->{'gateway_string'}, $values);
+    $m->add($paymentSettings->{'gatewaySalt'}, $values);
     $values = $m->hexdigest();
     my $cr = $paymentSettings->{'currency'} || '';
 
@@ -262,7 +262,7 @@ sub checkoutConfirm	{
         my $chkvalue= $amount . $intLogID . $paymentSettings->{'currency'};
         $m = new MD5;
         $m->reset();
-        $m->add($Defs::NAB_SALT, $chkvalue);
+        $m->add($paymentSettings->{'gatewaySalt'}, $chkvalue);
         $chkvalue = $m->hexdigest();
         $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data->{'noheader'}&amp;ext=$external&amp;a=P&amp;formID=$formID&amp;client=$client&amp;ci=$intLogID&amp;chkv=$chkvalue&amp;session=$session;compulsory=$compulsory&amp;amount=$amount];
         my $formTarget = $external ? qq[ target="other" onClick="window.open('$paymentURL','other','location=no,directories=no,menubar=no,statusbar=no,toolbar=no,scrollbars=yes,height=820,width=870,resizable=yes');return false;" ] : '';
@@ -493,7 +493,7 @@ sub getPaymentSettings	{
         $settings{'gatewayCreditCardNoteRealm'} = $dref->{strCCNote} || '';
         $settings{'gatewayCreditCardNote'} = $dref->{strCCNote} || '';
         $settings{'gatewayCreditCardNote'} = qq[$softDescriptor] if $softDescriptor;
-        $settings{'gateway_string'} = $dref->{strGatewaySalt};
+        $settings{'gatewaySalt'} = $dref->{strGatewaySalt};
         $settings{'gateway_url'} = $dref->{strGatewayURL1};
         $settings{'gateway_url2'} = $dref->{strGatewayURL2};
         $settings{'gateway_url3'} = $dref->{strGatewayURL3};
@@ -1308,7 +1308,7 @@ sub processTransLog    {
     $m = new MD5;
     $m->reset();
 
-    $m->add($paymentSettings->{'gateway_string'}, $chkvalue);
+    $m->add($paymentSettings->{'gatewaySalt'}, $chkvalue);
     $chkvalue = $m->hexdigest();
 
     deQuote($db, \%fields);

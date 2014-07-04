@@ -95,7 +95,6 @@ sub main {
     getDBConfig(\%Data);
     $Data{'SystemConfig'}=getSystemConfig(\%Data);
     my ($paymentSettings, undef) = getPaymentSettings(\%Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, $external);
-    $paymentSettings->{'gateway_string'} = $Defs::NAB_SALT;
 
     $Data{'clientValues'}=\%clientValues;
     $client= setClient(\%clientValues);
@@ -107,7 +106,7 @@ sub main {
     #    my $m;
     #    $m = new MD5;
     #    $m->reset();
-    #    $m->add($Defs::NAB_SALT, $chkvalue);
+    #    $m->add($paymentSettings->{'gatewaySalt'}, $chkvalue);
     #    $chkvalue = $m->hexdigest();
     #    $Order->{'Status'} = -1 if ($chkv ne $chkvalue);
     #}
@@ -116,7 +115,7 @@ sub main {
      my $m;
      $m = new MD5;
      $m->reset();
-     $m->add($Defs::NAB_SALT, $chkvalue);
+     $m->add($paymentSettings->{'gatewaySalt'}, $chkvalue);
      $chkvalue = $m->hexdigest();
      $Order->{'Status'} = -1 if ($chkv ne $chkvalue);
    }

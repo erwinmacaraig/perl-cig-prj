@@ -96,7 +96,7 @@ warn("######$action");
     my $chkvalue= $Order->{'TotalAmount'}. $clientTransRefID. $paymentSettings->{'currency'};
     $m = new MD5;
     $m->reset();
-    $m->add($Defs::NAB_SALT, $chkvalue);
+    $m->add($paymentSettings->{'gatewaySalt'}, $chkvalue);
     $chkvalue = $m->hexdigest();
     if ($chkv ne $chkvalue)	{
         $Order->{'Status'} = -1;

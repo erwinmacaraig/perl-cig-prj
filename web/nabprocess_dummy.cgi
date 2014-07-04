@@ -86,7 +86,6 @@ warn("AAASTATUS" . $Order->{'Status'});
   $Data{'lang'}=$lang;
 
   my ($paymentSettings, undef) = getPaymentSettings(\%Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, $external);
-  $paymentSettings->{'gateway_string'} = $Defs::NAB_SALT;
 
   $Data{'clientValues'}=\%clientValues;
   $client= setClient(\%clientValues);
@@ -97,7 +96,7 @@ warn("AAASTATUS" . $Order->{'Status'});
     my $m;
     $m = new MD5;
     $m->reset();
-    $m->add($Defs::NAB_SALT, $chkvalue);
+    $m->add($paymentSettings->{'gatewaySalt'}, $chkvalue);
     $chkvalue = $m->hexdigest();
     warn "chkv VS. chkvalue :: $chkv :::::  $chkvalue ";
     $Order->{'Status'} = -1 if ($chkv ne $chkvalue);
