@@ -308,7 +308,7 @@ sub getCommonValues {
 
 
 	if($options->{'FieldLabels'})	{
-		$optvalues{'FieldLabels'} = getFieldLabels($Data, $Defs::LEVEL_MEMBER);
+		$optvalues{'FieldLabels'} = getFieldLabels($Data, $Defs::LEVEL_PERSON);
 	}
 
 	if($options->{'ClubCharacteristics'})	{

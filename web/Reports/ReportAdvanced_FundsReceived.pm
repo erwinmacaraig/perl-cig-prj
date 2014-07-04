@@ -341,8 +341,8 @@ sub SQLBuilder  {
 				DATE_FORMAT(T.dtPaid,"%d/%m/%Y %H:%i") AS dtPaid, 
 				T.dtPaid AS dtPaid_RAW,
 				T.intExportAssocBankFileID,
-				IF(T.intTableType=$Defs::LEVEL_MEMBER, CONCAT(M.strSurname, ", ", M.strFirstname), Team.strName) as PaymentFor,
-				IF(T.intTableType=$Defs::LEVEL_MEMBER, M.strNationalNum, Team.intTeamID) as PaymentForID,
+				IF(T.intTableType=$Defs::LEVEL_PERSON, CONCAT(M.strLocalSurname, ", ", M.strLocalFirstname), Entity.strLocalName) as PaymentFor,
+				IF(T.intTableType=$Defs::LEVEL_PERSON, M.strNationalNum, Entity.intEntityID) as PaymentForID,
 				TL.intAmount,
 				TL.strTXN,
 				TL.intPaymentType,
@@ -355,28 +355,22 @@ sub SQLBuilder  {
 				DATE_FORMAT(BFE.dtRun,"%d/%m/%Y") AS dtRun,
 				BFE.dtRun AS dtRun_RAW,
 				ML.intMyobExportID,
-				A.strName as AssocName,
-				A.intAssocTypeID,
 				NState.strName as StateName,
 				NRegion.strName as RegionName,
 				NZone.strName as ZoneName,
-				intAssocCategoryID,
-				C.intClubCategoryID,
-				TXNClub.strName as TXNClub,
-				PaymentClub.strName as ClubPaymentID
+				TXNEntity.strLocalName as TXNEntity,
+				PaymentEntity.strLocalName as EntityPaymentID
 			FROM tblMoneyLog as ML
 				LEFT JOIN tblTransactions as T ON (T.intTransactionID = ML.intTransactionID)
 				LEFT JOIN tblTransLog as TL ON (TL.intLogID = T.intTransLogID)
 				LEFT JOIN tblRegoForm as RF ON (RF.intRegoFormID= TL.intRegoFormID)
-				LEFT JOIN tblAssoc as A ON (A.intAssocID =T.intAssocID)
-				LEFT JOIN tblClub as C ON (C.intClubID = RF.intClubID)
-				LEFT JOIN tblMember as M ON (
-					M.intMemberID = T.intID
-					AND T.intTableType = $Defs::LEVEL_MEMBER
+				LEFT JOIN tblPerson as M ON (
+					M.intPersonID = T.intID
+					AND T.intTableType = $Defs::LEVEL_PERSON
 				)
-				LEFT JOIN tblTeam as Team ON (
-					Team.intTeamID = T.intID
-					AND T.intTableType = $Defs::LEVEL_TEAM
+				LEFT JOIN tblEntity as Entity ON (
+					Entity.intEntityID = T.intID
+					AND T.intTableType > $Defs::LEVEL_PERSON
 				)
 				LEFT JOIN tblExportBankFile as BFE ON (
 					BFE.intExportBSID= ML.intExportBankFileID
@@ -385,8 +379,8 @@ sub SQLBuilder  {
 				LEFT JOIN tblNode as NState ON (NState.intNodeID = TNS.int30_ID)
 				LEFT JOIN tblNode as NRegion ON (NRegion.intNodeID = TNS.int20_ID)
 				LEFT JOIN tblNode as NZone ON (NZone.intNodeID = TNS.int10_ID)
-LEFT JOIN tblClub as TXNClub ON (TXNClub.intClubID=T.intTXNClubID)
-LEFT JOIN tblClub as PaymentClub ON (PaymentClub.intClubID=intClubPaymentID)
+LEFT JOIN tblEntity as TXNEntity ON (TXNEntity.intEntityID=T.intTXNEntityID)
+LEFT JOIN tblEntity as PaymentEntity ON (PaymentEntity.intEntityID=intEntityPaymentID)
 				WHERE T.intRealmID = $Data->{'Realm'}
 					AND ML.intLogType IN ($Defs::ML_TYPE_SPLIT)
 					AND ML.intEntityID = $intID

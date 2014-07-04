@@ -335,7 +335,7 @@ sub SQLBuilder  {
 				T.dtPaid, 
 				T.intExportAssocBankFileID, 
 				IF(
-					T.intTableType=$Defs::LEVEL_MEMBER, 
+					T.intTableType=$Defs::LEVEL_PERSON, 
 					CONCAT(M.strLocalSurname, ", ", M.strLocalFirstname), 
 					Team.strName
 				) as PaymentFor, 
@@ -353,7 +353,7 @@ sub SQLBuilder  {
 			FROM tblTransactions as T
 				LEFT JOIN tblProducts as P ON (P.intProductID=T.intProductID)
 				LEFT JOIN tblTransLog as TL ON (TL.intLogID = T.intTransLogID)
-				LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID AND T.intTableType = $Defs::LEVEL_MEMBER AND M.intStatus!=-1)
+				LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID AND T.intTableType = $Defs::LEVEL_PERSON AND M.intStatus!=-1)
 				LEFT JOIN tblEntity as Entity ON (Entity.intEntityID = T.intID AND T.intTableType = $Defs::LEVEL_CLUB)
 				LEFT JOIN tblEntity as PaymentEntity ON (PaymentEntity.intEntityID = TL.intEntityPaymentID)
 				$Club_JOIN
@@ -363,7 +363,7 @@ sub SQLBuilder  {
          	AND T.intStatus = 0 
          )
 				AND (
-					(T.intTableType=$Defs::LEVEL_MEMBER AND M.intPersonID IS NOT NULL) OR
+					(T.intTableType=$Defs::LEVEL_PERSON AND M.intPersonID IS NOT NULL) OR
 					(T.intTableType=$Defs::LEVEL_CLUB AND Team.intTeamID IS NOT NULL)
 				    ) 
 				 AND T.intStatus <> -1

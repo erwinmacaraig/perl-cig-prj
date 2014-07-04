@@ -49,7 +49,7 @@ sub makeSQL {
 	$self->{'RunParams'}{'ActiveFields'} = $activefields;
 	$self->afterSubmission();
 	my $reportLevel = $self->{'Config'}{'ReportLevel'} || $self->{'EntityTypeID'} || 0;
-	my $reportEntity = $self->{'Config'}{'ReportEntity'} || $Defs::LEVEL_MEMBER;
+	my $reportEntity = $self->{'Config'}{'ReportEntity'} || $Defs::LEVEL_PERSON;
 	my $reportStats = $self->{'Config'}{'StatsReport'} || 0;
 	my %otheroptions = ($self->{'SystemConfig'}{'ShowInactiveMembersInClubSearch'})
       ? (ShowInactiveMembersInClubSearch => 1)

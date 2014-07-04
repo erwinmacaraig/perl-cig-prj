@@ -38,17 +38,14 @@ sub makeSQL {
 	my $self = shift;
 
 	my $reportLevel = $self->{'Config'}{'ReportLevel'} || $self->{'EntityTypeID'} || 0;
-	my $reportEntity = $self->{'Config'}{'ReportEntity'} || $Defs::LEVEL_MEMBER;
+	my $reportEntity = $self->{'Config'}{'ReportEntity'} || $Defs::LEVEL_PERSON;
 	my $reportStats = $self->{'Config'}{'StatsReport'} || 0;
 	my $reportNotMemberTeam = !($self->{'Config'}{'MemberTeam'} || 0);
 
 	my %OptVals = (
 		REPORT_LEVEL => $reportLevel,
 		REPORT_ENTITY => $reportEntity,
-		ASSOCID => $self->{'ClientValues'}{'assocID'} || 0,
 		CLUBID => $self->{'ClientValues'}{'clubID'} || 0,
-		TEAMID => $self->{'ClientValues'}{'teamID'} || 0,
-		COMPID => $self->{'ClientValues'}{'compID'} || 0,
         REGIONID => $self->{'ClientValues'}{'regionID'} || 0,
 		REALMID => $self->{'Data'}{'Realm'} || 0,
 	);

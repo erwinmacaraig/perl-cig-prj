@@ -214,17 +214,15 @@ sub SQLBuilder  {
 				ML.intEntityType,
 				ML.intMyobExportID,
 				dtSettlement,
-				IF(T.intTableType=$Defs::LEVEL_MEMBER, CONCAT(M.strSurname, ", ", M.strFirstname), Team.strName) as PaymentFor,
+				IF(T.intTableType=$Defs::LEVEL_PERSON, CONCAT(M.strLocalSurname, ", ", M.strLocalFirstname), Entity.strLocalName) as PaymentFor,
 				SUM(ML.curMoney) as SplitAmount,
 				IF(ML.intEntityType = $Defs::LEVEL_NATIONAL, 'National Split',
 						IF(ML.intEntityType = $Defs::LEVEL_STATE, 'State Split',
 								IF(ML.intEntityType = $Defs::LEVEL_REGION, 'Region Split',
 										IF(ML.intEntityType = $Defs::LEVEL_ZONE, 'Zone Split',
-												IF(ML.intEntityType = $Defs::LEVEL_ASSOC, 'Association Split',
-														IF(ML.intEntityType = $Defs::LEVEL_CLUB, 'Club Split',
-																IF((ML.intEntityType = 0 AND intLogType IN (2,3)), 'Fees', '')
-														)
-												)
+										    IF(ML.intEntityType = $Defs::LEVEL_CLUB, 'Club Split',
+										        IF((ML.intEntityType = 0 AND intLogType IN (2,3)), 'Fees', '')
+										    )
 										)
 								)
 						)
@@ -238,19 +236,18 @@ sub SQLBuilder  {
 				LEFT JOIN tblTransactions as T ON (
 						T.intTransactionID = ML.intTransactionID
 				)
-				LEFT JOIN tblMember as M ON (
-						M.intMemberID = T.intID
-						AND T.intTableType = $Defs::LEVEL_MEMBER
+				LEFT JOIN tblPerson as M ON (
+						M.intPersonID = T.intID
+						AND T.intTableType = $Defs::LEVEL_PERSON
 				)
-				LEFT JOIN tblTeam as Team ON (
-						Team.intTeamID = T.intID
-						AND T.intTableType = $Defs::LEVEL_TEAM
+				LEFT JOIN tblEntity as Entity ON (
+						Entity.intEntityID = T.intID
+						AND T.intTableType = $Defs::LEVEL_PERSON
 				)
 				LEFT JOIN tblRegoForm as RF ON (
 						RF.intRegoFormID= TL.intRegoFormID
 				)
 			WHERE TL.intRealmID = $Data->{'Realm'}
-				AND ML.intAssocID = $clientValues->{'assocID'}
 				$clubWHERE
 				$where_list
 			GROUP BY TL.intLogID

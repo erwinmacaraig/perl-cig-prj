@@ -46,15 +46,6 @@ sub _getConfiguration {
 
 		Fields => {
 
-			AssocName=> [
-				qq[$Data->{'LevelNames'}{$Defs::LEVEL_ASSOC}],
-				{
-					active=>1, 
-					displaytype=>'text', 
-					fieldtype=>'text', 
-					allowsort => 1
-				}
-			],
 			StateName=> [ ($currentLevel>= $Defs::LEVEL_STATE) ? qq[$Data->{'LevelNames'}{$Defs::LEVEL_STATE}] : '', { active=>1, displaytype=>'text', fieldtype=>'text', allowsort => 1 } ],
 			RegionName=> [ ($currentLevel>= $Defs::LEVEL_REGION) ? qq[$Data->{'LevelNames'}{$Defs::LEVEL_REGION}] : '', { active=>1, displaytype=>'text', fieldtype=>'text', allowsort => 1 } ],
 			ZoneName=> [ ($currentLevel>= $Defs::LEVEL_ZONE) ? qq[$Data->{'LevelNames'}{$Defs::LEVEL_ZONE}] : '', { active=>1, displaytype=>'text', fieldtype=>'text', allowsort => 1 } ],
@@ -84,7 +75,7 @@ sub _getConfiguration {
 					displaytype=>'text', 
 					fieldtype=>'text', 
 					allowsort => 1,
-					dbfield=>'IF(T.intTableType=1, CONCAT(M.strSurname, ", ", M.strFirstname), Team.strName)'
+					dbfield=>'IF(T.intTableType=1, CONCAT(M.strLocalSurname, ", ", M.strLocalFirstname), Entity.strLocalName)'
 				}
 			],
 			PaymentForID => [	
@@ -94,7 +85,7 @@ sub _getConfiguration {
 					displaytype=>'text', 
 					fieldtype=>'text', 
 					allowsort => 1,
-					dbfield=>'IF(T.intTableType=1, M.strNationalNum, Team.intTeamID)',
+					dbfield=>'IF(T.intTableType=1, M.strNationalNum, Entity.intEntityID)',
 				}
 			],
 			PaymentFrom => [
@@ -340,10 +331,6 @@ strProductName => [
 			intExportBankFileID
 			dtRun
 			intMyobExportID
-			AssocName
-			intAssocTypeID
-			intClubCategoryID
-			intAssocCategoryID
 			StateName
 			RegionName
 			ZoneName
@@ -402,13 +389,13 @@ sub SQLBuilder  {
 				T.dtTransaction,
 				DATE_FORMAT(T.dtPaid,"%d/%m/%Y %H:%i") AS dtPaid, 
 				T.intExportAssocBankFileID,
-				IF(T.intTableType=$Defs::LEVEL_MEMBER, CONCAT(M.strSurname, ", ", M.strFirstname), Team.strName) as PaymentFor,
-				IF(T.intTableType=$Defs::LEVEL_MEMBER, M.strNationalNum, Team.intTeamID) as PaymentForID,
+				IF(T.intTableType=$Defs::LEVEL_PERSON, CONCAT(M.strLocalSurname, ", ", M.strLocalFirstname), Entity.strLocalName) as PaymentFor,
+				IF(T.intTableType=$Defs::LEVEL_PERSON, M.strNationalNum, Entity.intEntityID) as PaymentForID,
 				TL.intAmount,
 				TL.strTXN,
 				TL.intPaymentType,
 				P.strName as strProductName,
-        P.strGroup as strProductGroup,
+                P.strGroup as strProductGroup,
 				T.intProductID,
 				TL.intPaymentType,
 				TL.intLogID,
@@ -422,13 +409,9 @@ sub SQLBuilder  {
 				IF(RF.intClubID>0, C.strName, A.strName) as PaymentFrom,
 				DATE_FORMAT(BFE.dtRun,"%d/%m/%Y") AS dtRun,
 				ML.intMyobExportID,
-				A.strName as AssocName,
-				A.intAssocTypeID,
 				NState.strName as StateName,
 				NRegion.strName as RegionName,
-				NZone.strName as ZoneName,
-				intAssocCategoryID,
-				intClubCategoryID
+				NZone.strName as ZoneName
 			FROM tblMoneyLog as ML
 				LEFT JOIN tblTransactions as T ON (T.intTransactionID = ML.intTransactionID)
 				LEFT JOIN tblTransLog as TL ON (TL.intLogID = T.intTransLogID)
@@ -436,15 +419,15 @@ sub SQLBuilder  {
 				LEFT JOIN tblAssoc as A ON (A.intAssocID =T.intAssocID)
 				LEFT JOIN tblClub as C ON (C.intClubID = RF.intClubID)
 				LEFT JOIN tblProducts as P ON (P.intProductID=T.intProductID)
-				LEFT JOIN tblMember as M ON (
-					M.intMemberID = T.intID
-					AND T.intTableType = $Defs::LEVEL_MEMBER
+				LEFT JOIN tblPerson as M ON (
+					M.intPersonID = T.intID
+					AND T.intTableType = $Defs::LEVEL_PERSON
 				)
-				LEFT JOIN tblTeam as Team ON (
-					Team.intTeamID = T.intID
-					AND T.intTableType = $Defs::LEVEL_TEAM
+				LEFT JOIN tblEntity as Entity ON (
+					Entity.intEntityID = T.intID
+					AND T.intTableType > $Defs::LEVEL_PERSON
 				)
-				LEFT JOIN tblTeam as TXNTeam ON ( T.intTXNTeamID = TXNTeam.intTeamID)
+				LEFT JOIN tblEntity as TXNEntity ON ( T.intTXNEntityID = TXNEntity.intEntityID)
 				LEFT JOIN tblExportBankFile as BFE ON (
 					BFE.intExportBSID= ML.intExportBankFileID
 				)

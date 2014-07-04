@@ -75,7 +75,7 @@ sub _getConfiguration {
 					displaytype=>'text', 
 					fieldtype=>'text', 
 					allowsort => 1,
-					dbfield=>'IF(T.intTableType=1, M.strNationalNum, Team.intTeamID)'
+					dbfield=>'IF(T.intTableType=1, M.strNationalNum, Entity.intEntityID)'
 				}
 			],
 
@@ -95,7 +95,7 @@ sub _getConfiguration {
 					displaytype=>'text', 
 					fieldtype=>'text', 
 					allowsort => 1,
-					dbfield=>'IF(T.intTableType=1, CONCAT(M.strSurname, ", ", M.strFirstname), Team.strName)'
+					dbfield=>'IF(T.intTableType=1, CONCAT(M.strLocalSurname, ", ", M.strLocalFirstname), Entity.strLocalName)'
 				}
 			],
 
@@ -403,8 +403,8 @@ sub SQLBuilder  {
 				T.dtTransaction,
 				DATE_FORMAT(T.dtPaid,"%d/%m/%Y %H:%i") AS dtPaid, 
 				T.intExportAssocBankFileID,
-				IF(T.intTableType=$Defs::LEVEL_MEMBER, CONCAT(M.strSurname, ", ", M.strFirstname), Team.strName) as PaymentFor,
-				IF(T.intTableType=$Defs::LEVEL_MEMBER, M.strNationalNum, Team.intTeamID) as PaymentForID,
+				IF(T.intTableType=$Defs::LEVEL_PERSON, CONCAT(M.strLocalSurname, ", ", M.strLocalFirstname), Entity.strLocalName) as PaymentFor,
+				IF(T.intTableType=$Defs::LEVEL_PERSON, M.strNationalNum, Entity.intEntityID) as PaymentForID,
 				TL.intAmount,
 				TL.strTXN,
 				TL.intPaymentType,
@@ -422,30 +422,25 @@ sub SQLBuilder  {
 				TXNTeam.strName as TXNTeamJoined,
 				DATE_FORMAT(BFE.dtRun,"%d/%m/%Y") AS dtRun,
 				ML.intMyobExportID,
-				A.strName as AssocName,
-				A.intAssocTypeID,
 				NState.strName as StateName,
 				NRegion.strName as RegionName,
-				NZone.strName as ZoneName,
-				intAssocCategoryID,
-				intClubCategoryID
+				NZone.strName as ZoneName
 			FROM tblMoneyLog as ML
 				LEFT JOIN tblBankAccount as BA ON (BA.intEntityID=$intID and BA.intEntityTypeID=$currentLevel)
 				LEFT JOIN tblTransactions as T ON (T.intTransactionID = ML.intTransactionID)
 				LEFT JOIN tblProducts as P ON (P.intProductID=T.intProductID)
 				LEFT JOIN tblTransLog as TL ON (TL.intLogID = T.intTransLogID)
 				LEFT JOIN tblRegoForm as RF ON (RF.intRegoFormID= TL.intRegoFormID)
-				LEFT JOIN tblAssoc as A ON (A.intAssocID =T.intAssocID)
 				LEFT JOIN tblClub as C ON (C.intClubID = RF.intClubID)
-				LEFT JOIN tblMember as M ON (
-					M.intMemberID = T.intID
-					AND T.intTableType = $Defs::LEVEL_MEMBER
+				LEFT JOIN tblPerson as M ON (
+					M.intPersonID = T.intID
+					AND T.intTableType = $Defs::LEVEL_PERSON
 				)
-				LEFT JOIN tblTeam as Team ON (
-					Team.intTeamID = T.intID
-					AND T.intTableType = $Defs::LEVEL_TEAM
+				LEFT JOIN tblEntity as Entity ON (
+					Entity.intEntityID = T.intID
+					AND T.intTableType > $Defs::LEVEL_PERSON
 				)
-				LEFT JOIN tblTeam as TXNTeam ON ( T.intTXNTeamID = TXNTeam.intTeamID)
+				LEFT JOIN tblEntity as TXNEntity ON ( T.intTXNEntityID= TXNEntity.intEntityID)
 				LEFT JOIN tblExportBankFile as BFE ON (
 					BFE.intExportBSID= ML.intExportBankFileID
 				)
