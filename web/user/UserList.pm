@@ -41,13 +41,12 @@ sub getAuthOrgListsData {
     my %nodes = ();
     while ( my ( $typeID, $entityID ) = $q_pa->fetchrow_array() ) {
         $orgs{$typeID}{$entityID} = 1;
-        if ( $typeID > $Defs::LEVEL_ASSOC ) {
+        if ( $typeID >= $Defs::LEVEL_CLUB) {
             $nodes{$entityID} = 1;
         }
     }
 
     my $member_str = join( ',', keys %{ $orgs{$Defs::LEVEL_MEMBER} } );
-    my $assoc_str  = join( ',', keys %{ $orgs{$Defs::LEVEL_ASSOC} } );
     my $club_str   = join( ',', keys %{ $orgs{$Defs::LEVEL_CLUB} } );
 
     my $node_str = join( ',', keys %nodes );
@@ -90,76 +89,27 @@ sub getAuthOrgListsData {
               };
         }
     }
-    if ($assoc_str) {
+    if ($club_str) {
         my $st = qq[
             SELECT    
-                intAssocID,
-                strName,
-                strRealmName
+                E.intEntityID,
+                E.strLocalName,
+                R.strRealmName
             FROM
-                tblAssoc AS A
-                INNER JOIN tblRealms AS R ON A.intRealmID = R.intRealmID
+                tblEntity AS E
+                INNER JOIN tblRealms AS R ON E.intRealmID = R.intRealmID
                 LEFT JOIN tblUploadedFiles AS UF ON (
-                    UF.intEntityTypeID = $Defs::LEVEL_ASSOC
-                    AND UF.intEntityID = A.intAssocID
+                    UF.intEntityTypeID = $Defs::LEVEL_CLUB
+                    AND UF.intEntityID = E.intEntityID
                     AND UF.intFileType = $Defs::UPLOADFILETYPE_LOGO
                 )
-            WHERE intAssocID IN ($assoc_str)
-                AND A.intRecStatus <> -1
-            ORDER BY strName
+            WHERE E.intEntityID IN ($club_str)
+                AND E.intEntityLevel = $Defs::LEVEL_CLUB
+            ORDER BY E.strLocalName
         ];
         my $q = $db->prepare($st);
         $q->execute();
         while ( my ( $id, $name, $realm ) = $q->fetchrow_array() ) {
-            $realms{$realm} = 1;
-            if ( !$LevelNames{$realm}{$Defs::LEVEL_ASSOC} ) {
-                $LevelNames{$realm} = getNames( $db, $realm );
-            }
-            my $levelname = $LevelNames{$realm}{$Defs::LEVEL_ASSOC} || 'Association';
-            my $logoURL = showLogo( $Data, $Defs::LEVEL_ASSOC, $id, '', 0, 100, 0, );
-
-            my $url = "$Defs::base_url/authenticate.cgi?i=$id&amp;t=$Defs::LEVEL_ASSOC";
-            push @{ $org_data{$Defs::LEVEL_ASSOC} },
-              {
-                Name     => $name || next,
-                EntityID => $id   || next,
-                EntityTypeID => $Defs::LEVEL_ASSOC,
-                Logo         => $logoURL,
-                Realm        => $realm,
-                LevelName    => $levelname,
-                URL          => $url,
-              };
-        }
-    }
-    if ($club_str) {
-        my $st = qq[
-            SELECT    
-                C.intClubID,
-                C.strName,
-                A.strName AS AssocName,
-                A.intAssocID,
-                R.strRealmName
-            FROM
-                tblClub AS C
-                INNER JOIN tblAssoc_Clubs AS AC ON (
-                    C.intClubID = AC.intClubID
-                )
-                INNER JOIN tblAssoc AS A ON (
-                    AC.intAssocID = A.intAssocID
-                )
-                INNER JOIN tblRealms AS R ON A.intRealmID = R.intRealmID
-                LEFT JOIN tblUploadedFiles AS UF ON (
-                    UF.intEntityTypeID = $Defs::LEVEL_CLUB
-                    AND UF.intEntityID = C.intClubID
-                    AND UF.intFileType = $Defs::UPLOADFILETYPE_LOGO
-                )
-            WHERE C.intClubID IN ($club_str)
-                AND C.intRecStatus <> -1
-            ORDER BY C.strName, AssocName
-        ];
-        my $q = $db->prepare($st);
-        $q->execute();
-        while ( my ( $id, $name, $assocname, $assocID, $realm ) = $q->fetchrow_array() ) {
             $realms{$realm} = 1;
             my $logoURL = showLogo( $Data, $Defs::LEVEL_CLUB, $id, '', 0, 100, 0, );
 
@@ -174,7 +124,6 @@ sub getAuthOrgListsData {
                 EntityID => $id   || next,
                 EntityTypeID => $Defs::LEVEL_CLUB,
                 Logo         => $logoURL,
-                AssocName    => $assocname,
                 Realm        => $realm,
                 LevelName    => $levelname,
                 URL          => $url,
@@ -184,21 +133,21 @@ sub getAuthOrgListsData {
     if ($node_str) {
         my $st = qq[
             SELECT    
-                N.intNodeID,
-                N.strName,
-                N.intTypeID,
+                E.intEntityID,
+                E.strLocalName,
+                E.intEntityLevel,
                 R.strRealmName
             FROM
-                tblNode AS N
-                INNER JOIN tblRealms AS R ON N.intRealmID = R.intRealmID
+                tblEntity AS E
+                INNER JOIN tblRealms AS R ON E.intRealmID = R.intRealmID
                 LEFT JOIN tblUploadedFiles AS UF ON (
-                    UF.intEntityTypeID = N.intTypeID
-                    AND UF.intEntityID = N.intNodeID
+                    UF.intEntityTypeID = E.intEntityLevel
+                    AND UF.intEntityID = E.intEntityID
                     AND UF.intFileType = $Defs::UPLOADFILETYPE_LOGO
                 )
-            WHERE N.intNodeID IN ($node_str)
-                AND N.intStatusID <> -1
-            ORDER BY N.strName
+            WHERE E.intEntityID IN ($node_str)
+                AND E.intEntityLevel > $Defs::LEVEL_CLUB
+            ORDER BY E.strLocalName
         ];
         my $q = $db->prepare($st);
         $q->execute();
@@ -229,7 +178,7 @@ sub getAuthOrgListsData {
                     $Defs::LEVEL_INTERNATIONAL, $Defs::LEVEL_INTREGION,
                     $Defs::LEVEL_INTZONE,       $Defs::LEVEL_NATIONAL,
                     $Defs::LEVEL_STATE,         $Defs::LEVEL_REGION,
-                    $Defs::LEVEL_ZONE,          $Defs::LEVEL_ASSOC,
+                    $Defs::LEVEL_ZONE,          
                     $Defs::LEVEL_CLUB
       )
     {

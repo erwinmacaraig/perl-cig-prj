@@ -518,7 +518,7 @@ sub getTransList {
 	$displayonly ||= 0;
     my $hidePayment=1;
     $hidePayment=0 if ($personID and $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB);
-    $hidePayment=0 if ($entityID and ! $personID and $Data->{'clientValues'}{'authLevel'} > $Defs::LEVEL_CLUB);
+    $hidePayment=0 if ($entityID and ! $personID and $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB);
 
     my $realmID = $Data->{'Realm'};
 	my $orderBy = $Data->{'SystemConfig'}{'TransListOrderBy'} || '';
