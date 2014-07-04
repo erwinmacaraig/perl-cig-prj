@@ -251,9 +251,10 @@ sub checkoutConfirm	{
     my $session = $Data->{'sessionKey'};
 	my $paymentURL = qq[$Defs::base_url/paypal.cgi?nh=$Data->{'noheader'}&amp;ext=$external&amp;a=P&amp;client=$client&amp;ci=$intLogID&amp;formID=$formID&amp;session=$session;compulsory=$compulsory];
 	my $formTarget = $external ? qq[ target="other" onClick="window.open('$paymentURL','other','location=no,directories=no,menubar=no,statusbar=no,toolbar=no,scrollbars=yes,height=820,width=870,resizable=yes');return false;" ] : '';
+    my $gatewayImage = $paymentSettings->{'gatewayImage'} || '';
 	my $externalGateway= qq[
 	    <div><img src="images/PP-CC.jpg" border="0"></div><br>
-		<br><a $formTarget id ="payment" href="$paymentURL"><img src="$Defs::PAYPAL_CHECKOUT_IMAGE" border="0"  alt="Pay Now"></a>
+		<br><a $formTarget id ="payment" href="$paymentURL"><img src="$gatewayImage" border="0"  alt="Pay Now"></a>
 	];
 
     if ($paymentType == $Defs::PAYMENT_ONLINENAB)    {
@@ -471,7 +472,6 @@ sub getPaymentSettings	{
             $where
 		ORDER BY intRealmSubTypeID DESC
 	];
-print STDERR $st;
     my $qry = $db->prepare($st) or query_error($st);
 	$qry->execute or query_error($st);
     my @Settings=();
@@ -497,6 +497,13 @@ print STDERR $st;
         $settings{'gateway_url'} = $dref->{strGatewayURL1};
         $settings{'gateway_url2'} = $dref->{strGatewayURL2};
         $settings{'gateway_url3'} = $dref->{strGatewayURL3};
+        $settings{'gatewayImage'} = $dref->{strGatewayImage} || '';
+        $settings{'gatewayReturnURL'} = $dref->{strReturnURL};
+        $settings{'gatewayCancelURL'} = $dref->{strCancelURL};
+        $settings{'gatewayUsername'} = $dref->{strGatewayUsername} || '';
+        $settings{'gatewayPassword'} = $dref->{strGatewayPassword} || '';
+        $settings{'gatewaySignature'} = $dref->{strGatewaySignature} || '';
+        $settings{'gatewayVersion'} = $dref->{strGatewayVersion} || '';
         $settings{'gatewayLevel'} = $dref->{intLevelID} || 0;
         $settings{'gatewayRuleID'} = $dref->{intPaymentSplitRuleID} || 0;
         $settings{'allowPayment'} = $dref->{intAllowPayment} || 0;

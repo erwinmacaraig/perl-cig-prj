@@ -15,9 +15,11 @@ CREATE TABLE tblPaymentConfig (
     strCurrency CHAR(5) DEFAULT 'AUD',
 
     intPaymentGatewayID INT DEFAULT 0, /*ID to external gateway*/
+    strGatewayImage VARCHAR(200) DEFAULT '',
     strGatewayURL1 VARCHAR(200) DEFAULT '',
     strGatewayURL2 VARCHAR(200) DEFAULT '',
     strGatewayURL3 VARCHAR(200) DEFAULT '',
+    strCancelURL VARCHAR(150) NOT NULL,
     strReturnURL VARCHAR(150) NOT NULL,
     strReturnExternalURL VARCHAR(150) NOT NULL,
     strReturnFailureURL VARCHAR(150) NOT NULL,
@@ -26,6 +28,7 @@ CREATE TABLE tblPaymentConfig (
     strGatewayPassword VARCHAR(100) DEFAULT '',
     strGatewaySignature VARCHAR(100) DEFAULT '',
     strGatewaySalt VARCHAR(50) DEFAULT '',
+    strGatewayVersion VARCHAR(50) DEFAULT '',
     
     strNotificationAddress VARCHAR(250),
     strPaymentBusinessNumber VARCHAR(100) DEFAULT '',

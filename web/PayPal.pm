@@ -29,17 +29,17 @@ sub payPalProcess	{
 	my ($Data, $client, $paymentSettings, $logID, $Order, $Transactions, $external) = @_;
 	my $cgi = new CGI;
 
-        my $returnPayPalURL = $Defs::PAYPAL_RETURN_URL . qq[&amp;ci=$logID&client=$client];
-        my $cancelPayPalURL = $Defs::PAYPAL_CANCEL_URL . qq[&amp;ci=$logID&client=$client];
+    my $returnPayPalURL = $Defs::base_url . $paymentSettings->{'gatewayReturnURL'} . qq[&amp;ci=$logID&client=$client]; ##$Defs::paypal_RETURN_URL
+    my $cancelPayPalURL = $Defs::base_url . $paymentSettings->{'gatewayCancelURL'} . qq[&amp;ci=$logID&client=$client]; ##$Defs::paypal_CANCEL_URL
 
 	my $m = new MD5;
-        $m->reset();
-        $m->add($Defs::REGO_FORM_SALT, $logID);
-        my $encryptedID = $m->hexdigest();
+    $m->reset();
+    $m->add($Defs::REGO_FORM_SALT, $logID);
+    my $encryptedID = $m->hexdigest();
 
-        my $currency=$paymentSettings->{'currency'} || 'AUD';
-        my $payPalAction = "Sale";
-        my $payPalMethod = "SetExpressCheckout";
+    my $currency=$paymentSettings->{'currency'} || 'AUD';
+    my $payPalAction = "Sale";
+    my $payPalMethod = "SetExpressCheckout";
 	my $header=qq[$Defs::base_url/images/memb_hdr_750.jpg];
 	$header=qq[$Defs::base_url/images/$Data->{'SystemConfig'}{'PayPalHeader'}] if $Data->{'SystemConfig'}{'PayPalHeader'};
 	$header='' if $Data->{'noheader'};
@@ -47,24 +47,22 @@ sub payPalProcess	{
 	my $bgcolor = $Data->{'SystemConfig'}{'PayPalHeaderBGColor'} ?  $Data->{'SystemConfig'}{'PayPalHeaderBGColor'} : 'FFFFFF';
 	my $bordercolor = $Data->{'SystemConfig'}{'PayPalHeaderBorderColor'} ?  $Data->{'SystemConfig'}{'PayPalHeaderBorderColor'} : 'FFFFFF';
 
-    #TEST PAYPAL ::
-     #$paymentSettings->{'gatewayStatus'} = 0;
-	my $APIusername= $paymentSettings->{'gatewayStatus'} == 1 ? $Defs::PAYPAL_LIVE_USERNAME : $Defs::PAYPAL_DEMO_USERNAME;
-	my $APIpassword= $paymentSettings->{'gatewayStatus'} == 1 ? $Defs::PAYPAL_LIVE_PASSWORD : $Defs::PAYPAL_DEMO_PASSWORD;
-	my $APIsignature= $paymentSettings->{'gatewayStatus'} == 1 ? $Defs::PAYPAL_LIVE_SIGNATURE : $Defs::PAYPAL_DEMO_SIGNATURE;
+	my $APIusername= $paymentSettings->{'gatewayUsername'};
+	my $APIpassword= $paymentSettings->{'gatewayPassword'};
+	my $APIsignature= $paymentSettings->{'gatewaySignature'};
+	my $gatewayVersion= $paymentSettings->{'gatewayVersion'};
 
 
     my $formID = $Data->{'formID'} ||0 ;
     my $session = $Data->{'sessionKey'} ||0;
     my $compulsory = $Data->{'CompulsoryPayment'} ||0;
 
-    warn "FARIBA:: PAYPAL :: payPalProcess: formID: $formID , session: $session ,Compulsory:: $compulsory";
 	my $amount=0;
 	my %Values= (
 USER=>$APIusername,
 PWD=>$APIpassword,
 SIGNATURE=>$APIsignature,
-VERSION=>$Defs::PAYPAL_VERSION,
+VERSION=>$gatewayVersion,
 METHOD=>$payPalMethod,
 PAYMENTACTION=>$payPalAction,
 RETURNURL=>$returnPayPalURL.qq[&amp;ext=$external&amp;ei=$encryptedID&amp;nh=$Data->{'noheader'}&amp;formID=$formID&amp;session=$session;compulsory=$compulsory],
@@ -95,8 +93,7 @@ LANDINGPAGE=>"Billing",
 	$Values{"MAXAMT"} = $Order->{TotalAmount};
 
 
-	my $APIurl= $paymentSettings->{'gatewayStatus'} == 1 ? $Defs::PAYPAL_LIVE_URL_EXPRESS : $Defs::PAYPAL_DEMO_URL_EXPRESS;
-warn("APIURL FOR PAYPAL: $APIurl");
+	my $APIurl= $paymentSettings->{'gateway_url'}; #$Defs::paypal_LIVE_URL_EXPRESS
         my $req = POST $APIurl, \%Values;
         my $ua = LWP::UserAgent->new();
         $ua->timeout(360);
@@ -110,10 +107,10 @@ warn("LLLLine: $line");
         }
 
 
-        ## Redirect to PAYPAL
+        ## Redirect to paypal
         my $token = $returnvals{'TOKEN'};
         $token =~ s/\%2d/-/g;
-	$APIurl= $paymentSettings->{'gatewayStatus'} == 1 ? $Defs::PAYPAL_LIVE_URL_REDIRECT : $Defs::PAYPAL_DEMO_URL_REDIRECT;
+	    $APIurl= $paymentSettings->{'gateway_url2'}; #$Defs::paypal_LIVE_URL_REDIRECT
         my $url = $APIurl . qq[&amp;token=$token&amp;useraction=commit];
 
 	if ($returnvals{'ACK'} =~ /Success/)	{
@@ -151,17 +148,17 @@ sub payPalUpdate	{
         my $currency=$paymentSettings->{'currency'} || 'AUD';
 	my $payPalMethod = "GetExpressCheckoutDetails";
 
-	my $APIusername= $paymentSettings->{'gatewayStatus'} == 1 ? $Defs::PAYPAL_LIVE_USERNAME : $Defs::PAYPAL_DEMO_USERNAME;
-	my $APIpassword= $paymentSettings->{'gatewayStatus'} == 1 ? $Defs::PAYPAL_LIVE_PASSWORD : $Defs::PAYPAL_DEMO_PASSWORD;
-	my $APIsignature= $paymentSettings->{'gatewayStatus'} == 1 ? $Defs::PAYPAL_LIVE_SIGNATURE : $Defs::PAYPAL_DEMO_SIGNATURE;
-	my $APIurl= $paymentSettings->{'gatewayStatus'} == 1 ? $Defs::PAYPAL_LIVE_URL_EXPRESS : $Defs::PAYPAL_DEMO_URL_EXPRESS;
-	
+	my $APIusername= $paymentSettings->{'gatewayUsername'};
+	my $APIpassword= $paymentSettings->{'gatewayPassword'};
+	my $APIsignature= $paymentSettings->{'gatewaySignature'};
+	my $gatewayVersion= $paymentSettings->{'gatewayVersion'};
+	my $APIurl= $paymentSettings->{'gateway_url'}; #$Defs::paypal_LIVE_URL_EXPRESS
 
         my $req = POST $APIurl, [
 USER=>$APIusername,
 PWD=>$APIpassword,
 SIGNATURE=>$APIsignature,
-VERSION=>$Defs::PAYPAL_VERSION,
+VERSION=>$gatewayVersion,
 METHOD=>$payPalMethod,
 SOFTDESCRIPTOR=>$paymentSettings->{'gatewayCreditCardNote'},
 TOKEN=>$token];
@@ -192,7 +189,7 @@ print STDERR "LOGID: $logID PP1: $key | $val\n";
 USER=>$APIusername,
 PWD=>$APIpassword,
 SIGNATURE=>$APIsignature,
-VERSION=>$Defs::PAYPAL_VERSION,
+VERSION=>$gatewayVersion,
 AMT=>$Order->{'TotalAmount'},
 MAXAMT=>$Order->{'TotalAmount'},
 CURRENCYCODE=>$currency,
@@ -217,26 +214,26 @@ print STDERR "LOGID: $logID PP2: $key | $val\n";
 
 	#if ($returnvals{'ResponseText'} eq '500 Server closed')	{
 	if ($returnvals{'ACK'} !~ /Success/)	{
-			print STDERR "RETRYING PAYPAL FOR $logID\n";
+			print STDERR "RETRYING paypal FOR $logID\n";
 		## RECHECK
         my %values = (
             USER => $APIusername,
             PWD => $APIpassword,
             SIGNATURE => $APIsignature,
-            VERSION => $Defs::PAYPAL_VERSION,
+            VERSION => $gatewayVersion,
             METHOD => 'TransactionSearch',
 	INVNUM=>$paymentSettings->{'gatewayPrefix'}.'-'.$logID,
-            STARTDATE => '2011-1-1T10:00:00Z',
-            ENDDATE => '2013-1-1T11:00:00Z',
+            STARTDATE => '2014-1-1T10:00:00Z',
+            ENDDATE => '2019-1-1T11:00:00Z',
         );
 		my $live = ($paymentSettings->{'gatewayStatus'}==1) ? 1 : 0;
-		payPalCheckTXN($Data->{'db'}, $live, $logID, \%values, \%returnvals);
+		payPalCheckTXN($Data->{'db'}, $paymentSettings, $live, $logID, \%values, \%returnvals);
 		$returnvals{'ResponseText'} = 'Self Fixed' if ($returnvals{'ACK'}  =~ /Success/);
 		if ($returnvals{'ACK'} !~ /Success/)	{
-			print STDERR "RETRYING PAYPAL AGAIN FOR $logID\n";
+			print STDERR "RETRYING PayPal AGAIN FOR $logID\n";
 			sleep(2);
-			print STDERR "RETRYING SLEEP DONE AWAKE - PAYPAL AGAIN FOR $logID\n";
-			payPalCheckTXN($Data->{'db'}, $live, $logID, \%values, \%returnvals);
+			print STDERR "RETRYING SLEEP DONE AWAKE - paypal AGAIN FOR $logID\n";
+			payPalCheckTXN($Data->{'db'}, $paymentSettings, $live, $logID, \%values, \%returnvals);
 			$returnvals{'ResponseText'} = 'Self Fixed' if ($returnvals{'ACK'}  =~ /Success/);
 		}
 	}
@@ -255,7 +252,7 @@ print STDERR "RT:$returnvals{'ACK'}|\n";
 	processTransLog($Data->{'db'}, $txn, $returnvals{'ResponseCode'}, $returnvals{'ResponseText'}, $logID, $paymentSettings, undef, $settlement_date, $otherRef1, $otherRef2, $otherRef3, $otherRef4, '');
 	if ($returnvals{'ResponseCode'} eq 'OK')	{	
 		UpdateCart($Data, $paymentSettings, $client, undef, undef, $logID);
-print STDERR "PAYPAL CART DONE ABOUT TO EMAIL FOR $logID\n";
+print STDERR "paypal CART DONE ABOUT TO EMAIL FOR $logID\n";
 		$itemData = finalize_registration($Data,$logID);
         	EmailPaymentConfirmation($Data, $paymentSettings, $logID, $client);
         	product_apply_transaction($Data,$logID);
@@ -361,7 +358,7 @@ sub finalize_registration {
 	
 		#Add Member
 		($intRealID,undef) =  ($form_entity_type eq 'Member') ? rego_addRealMember($Data,$db,$intTempID,$session, $formObj) : (0,0);
-        warn "PAYPAL::CompulsoryPayment: RealID:: $intRealID";
+        warn "paypal::CompulsoryPayment: RealID:: $intRealID";
 		my $st_update = qq[
 					UPDATE tblTransactions
 					SET
@@ -390,12 +387,12 @@ sub finalize_registration {
 
 sub payPalCheckTXN {
 
-    my ($db, $live, $logID, $values_ref, $returnvals_ref) = @_;
+    my ($db, $paymentSettings, $live, $logID, $values_ref, $returnvals_ref) = @_;
 
 
     my %output=();
     my $ua = LWP::UserAgent->new();
-    my $APIurl= $live == 1 ? $Defs::PAYPAL_LIVE_URL_EXPRESS : $Defs::PAYPAL_DEMO_URL_EXPRESS;
+	my $APIurl= $paymentSettings->{'gateway_url'}; #$Defs::paypal_LIVE_URL_EXPRESS
     my $req = POST $APIurl, $values_ref;
     my $res= $ua->request($req);
     my $retval = $res->content() || '';
