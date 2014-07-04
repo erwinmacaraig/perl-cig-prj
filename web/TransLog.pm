@@ -283,7 +283,6 @@ print STDERR "SDSDSDSD|$paymentType";
 		
 
 			
-print STDERR "****************$paymentType|\n";
 		my $bb = Payments::checkoutConfirm($Data, $paymentType, \@transactionIDs,1);
 		return ($bb, "Payments Checkout");
 	}
@@ -886,6 +885,7 @@ sub listTransactions {
 
       my $allowMP = 1;
       $allowMP = 0 if !$allowManualPayments;
+      $allowMP = 0 if !$personID and $entityID;
       $allowMP = 0 if $Data->{'SystemConfig'}{'DontAllowManualPayments'};
       $allowMP = 0 if $Data->{'SystemConfig'}{'AssocConfig'}{'DontAllowManualPayments'};
 		  
