@@ -17,6 +17,7 @@ use CGI qw(param unescape escape);
 use strict;
 use Defs;
 use Utils;
+use PersonRegistration;
 use AdminCommon;
 use TTTemplate;
 use Data::Dumper;
@@ -39,7 +40,7 @@ sub display_screen{
 	my $entityID = '35';
 	my $personLevel = 'AMATEUR';
 	my $sport = 'FOOTBALL';
-	my $registrationType = 0; #'REGISTRATION';
+	my $registrationNature = 0; #'REGISTRATION';
 	my $ageLevel = 'SENIOR';
 	my $personType = 'PLAYER';
    
@@ -71,7 +72,7 @@ sub display_screen{
 		'FUTSAL'=>'Futsal',	
 	);	
 	
-    my %btn_registrationType = (
+    my %btn_registrationNature = (
 		'0'=>'Registration',	
 		'1'=>'Renewal',	
 	);
@@ -85,7 +86,7 @@ sub display_screen{
 	my $btn_entityID = fncRadioBtns($entityID,'entityID',\%btn_entityID);
 	my $btn_personLevel = fncRadioBtns($personLevel,'personLevel',\%btn_personLevel);
 	my $btn_sport = fncRadioBtns($sport,'sport',\%btn_sport);
-	my $btn_registrationType = fncRadioBtns($registrationType,'registrationType',\%btn_registrationType);
+	my $btn_registrationNature = fncRadioBtns($registrationNature,'registrationNature',\%btn_registrationNature);
 	my $btn_ageLevel = fncRadioBtns($ageLevel,'ageLevel',\%btn_ageLevel);
 	my $btn_personType = fncRadioBtns($personType,'personType',\%btn_personType);
 		
@@ -126,7 +127,7 @@ sub display_screen{
 	</tr>
 	<tr>
 		<td class="formbg fieldlabel">Registration/Renewal:</td>
-		<td class="formbg">$btn_registrationType</td>
+		<td class="formbg">$btn_registrationNature</td>
 	</tr>
 	<tr>
 		<td class="formbg fieldlabel">Age Level:</td>
@@ -161,7 +162,7 @@ sub add_registration {
     my $personLevel 	 = param('personLevel') || '';
     my $personType  	 = param('personType') || '';
     my $sport       	 = param('sport') || '';
-    my $registrationType = param('registrationType') || 0;
+    my $registrationNature = param('registrationNature') || 0;
     my $ageLevel    	 = param('ageLevel') || '';
 
   	my $st = '';
@@ -198,136 +199,38 @@ sub add_registration {
 	}
   	my $personID = $q->{mysql_insertid};
 
-	$st = qq[
-   		INSERT INTO tblPersonRegistration_1
-		(
-		intPersonID,
-		intRealmID,
-		intSubRealmID,
-		intEntityID,
-		strPersonType,
-		strPersonLevel,
-		strStatus,
-		strSport,
-        intRegistrationNature,
-		strAgeLevel,
-        intNationalPeriodID 
-		)
-		VALUES
-		(?,
-		?,
-		?,
-		?,
-		?,
-		?,
-		?,
-		?,
-		?,
-		?,
-		?)
-		];
+	my %registration_data = (
+		personID => $personID,
+		entityID => $entityID,
+		personLevel => $personLevel,
+		personType => $personType,
+		registrationNature => $registrationNature,
+		sport => $sport,
+		dtFrom => '2013-01-01',
+		dtTo => '2013-12-31',
+		ageLevel => $ageLevel,
+	 	);
 
-  	$q = $db->prepare($st);
-  	$q->execute(
-  		$personID,
-  		1,
-  		2,
-  		$entityID,
-  		$personType,
-  		$personLevel,
-  		'PENDING',
-  		$sport,
-  		$registrationType,
-  		$ageLevel,
-  		0
-  		);
-	
-	if ($q->errstr) {
-		return $q->errstr . '<br>' . $st
-	}
-  	my $personRegistrationID = $q->{mysql_insertid};
+	#Fudge to setup %Data
+	my %Data = (
+		db => $db,
+		RealmID => 1,
+		SubRealm => 0,
+	 	);	
 
-	# my $body = $personID . '<br>' . $personRegistrationID;
+	my $personRegistrationID = addRegistration (\%Data,\%registration_data);
+			
+ 	my $returnCode = addTasks(\%Data, $personRegistrationID);
 
-	my $body = fncNewRegistration($db, $personRegistrationID);
+	if ($returnCode == 0) {
+		return('<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;Your registration has been received and you will be notified in due course when it has been approved.<br>
+			<p>&nbsp;</p><p>&nbsp;</p>
+			<p>&nbsp;<a href=approval.cgi>View Approval Tasks</a>') 
+			}
+	else {
+		return 'Error. Return Code: ' . $returnCode;		
+	};
 
- return $body ;
-
-}
-
-sub fncNewRegistration {
- my($db, $personRegistrationID)=@_;
- 
-   	my $st = '';
-	my $q = '';
-
-	$st = qq[
-		INSERT INTO tblWFTask (intWFRuleID, intWFRoleID, intWFEntityID, strTaskType, intDocumentTypeID, strTaskStatus, intPersonID, intPersonRegistrationID, intEntityID, intEntityLinksID)
-		SELECT r.intWFRuleID, r.intRoleID, r.intEntityID, r.strTaskType, r.intDocumentTypeID, r.strTaskStatus, pr.intPersonID, pr.intPersonRegistrationID, 0, 0
-		FROM tblPersonRegistration_1 pr
-		INNER JOIN tblWFRule r
-		ON pr.intEntityID = r.intEntityID
-		AND pr.strPersonLevel = r.strPersonLevel
-		AND pr.strAgeLevel = r.strAgeLevel
-		AND pr.strSport = r.strSport
-		AND pr.intRegistrationNature = r.intRegistrationNature
-		AND pr.intNationalPeriodID= r.intNationalPeriodID
-		WHERE pr.intPersonRegistrationID = ?;
-		];
-		
-	$q = $db->prepare($st);
-  	$q->execute($personRegistrationID);
-	
-	if ($q->errstr) {
-		return $q->errstr . '<br>' . $st
-	}			
-	$st = qq[
-		INSERT INTO tblWFTaskPreReq (intWFTaskID, intWFRuleID, intPreReqWFRuleID)
-		SELECT t.intWFTaskID, t.intWFRuleID, rpr.intPreReqWFRuleID 
-		FROM tblWFTask t
-		INNER JOIN tblWFRulePreReq rpr ON t.intWFRuleID = rpr.intWFRuleID
-		WHERE t.intPersonRegistrationID = ?;
-		];
-
-  	$q = $db->prepare($st);
-  	$q->execute($personRegistrationID);
-	
-	if ($q->errstr) {
-		return $q->errstr . '<br>' . $st
-	}
-
-	return('<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;Your registration has been received and you will be notified in due course when it has been approved.<br>
-		<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;<a href=approval.cgi>View Approval Tasks</a>') 
-}
-
-sub get_name {
- my($string)=@_;
- 
- 	my $name = $string;
-
-	my %string_name = (
-		CLUB => 'Club', 
-		SCHOOL => 'School', 
-		AMATEUR => 'Amateur', 		
-		PROFESSIONAL => 'Professional', 	
- 		FOOTBALL => 'Football', 	
- 		FUTSAL => 'Futsal', 	
- 		BEACH_SOCCER => 'Beach Soccer', 	
- 		NEW => 'Registration', 	
- 		RENEWAL => 'Renewal', 	
- 		JUNIOR => 'Junior',
- 		SENIOR => 'Senior',
- 		ALL => 'All',
- 		VENUE => 'Venue',
- 		MEMBER => 'Member'
-	);
-
-	if(exists $string_name{$string}) {
-		$name =  $string_name{$string} || 0;
-	}
-	
-	return $name;
-	
 }
 
 sub fncRadioBtns {

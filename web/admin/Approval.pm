@@ -15,6 +15,7 @@ use CGI qw(param unescape escape);
 use strict;
 use Defs;
 use Utils;
+use PersonRegistration;
 use AdminCommon;
 use TTTemplate;
 use Data::Dumper;
@@ -27,9 +28,16 @@ sub list_tasks {
         $WFTaskID,
     ) = @_;
     
+   	#Fudge to setup %Data
+	my %Data = (
+		db => $db,
+		RealmID => 1,
+		SubRealm => 0,
+	 	);
     
     if ($WFTaskID) {
-    	fncApproveTask($db, $WFTaskID)
+    	my $PersonRegistrationID = approveTask(\%Data, $WFTaskID);
+    	my $rc = checkForOutstandingTasks(\%Data, $PersonRegistrationID)
     }
     
     my $st = qq[
@@ -118,163 +126,8 @@ sub list_tasks {
     
 }
 
-sub fncApproveTask {
-    my(
-        $db,
-        $WFTaskID,
-    ) = @_;
-	
-	#Q - Add in the PersonID of whoever is logged on
-	my $st = '';
-	my $q = '';
-	my $query = '';
-	
-	#First update this task to COMPLETE
-	$st = qq[
-	  	UPDATE tblWFTask SET 
-	  		strTaskStatus = 'COMPLETE',
-	  		dtApprovedDate = Now(),
-	  		intApprovedPersonID = 1
-	  	WHERE intWFTaskID = ?; 
-		];
-		
-  	$q = $db->prepare($st);
-  	$q->execute(
-  		$WFTaskID,
-  		);
-  		
-	if ($q->errstr) {
-		return $q->errstr . '<br>' . $st
-	}
-	
-    $st = qq[
-        SELECT intPersonRegistrationID
-        FROM tblWFTask
-        WHERE intWFTaskID = ?
-    ];
-        
-    $q = $db->prepare($st);
-    $q->execute($WFTaskID);
-            
-    my $dref= $q->fetchrow_hashref();
-    my $PersonRegistrationID = $dref->{intPersonRegistrationID};
-		
-	#As a result of this update, check to see if there are any Tasks that now have all their pre-reqs completed
-	$st = qq[	
-		SELECT distinct pt.intWFTaskID, ct.strTaskStatus 
-		FROM tblWFTask pt
-		INNER JOIN tblWFTaskPreReq ptpr ON pt.intWFTaskID = ptpr.intWFTaskID
-		INNER JOIN tblWFTask ct on ptpr.intPreReqWFRuleID = ct.intWFRuleID 
-		WHERE pt.intPersonRegistrationID = ? 
-		AND pt.strTaskStatus = ?
-		AND ct.intPersonRegistrationID = ?
-		AND ct.strTaskStatus IN (?,?)
-		ORDER by pt.intWFTaskID;
-	];
-	
-	$q = $db->prepare($st);
-  	$q->execute(
-  		$PersonRegistrationID,
-  		'PENDING',
-  		$PersonRegistrationID,
-  		'ACTIVE',
-  		'COMPLETE',
-  		);
-  		
-	if ($q->errstr) {
-		return $q->errstr . '<br>' . $st
-	}
 
-	my $prev_WFTaskID = 0;
-   	my $updateThisTask = '';
-   	my $pfx = '';
-   	my $list_WFTaskID = '';
-   	my $update_count = 0;
-   	my $count = 0;
-   		
-   	#Should be a cleverer way to do this, but check all the Pending Tasks and see if all of their
-   	# pre-reqs have been completed. If so, update their status from Pending to Active.
-	while(my $dref= $q->fetchrow_hashref()) {
-		++ $count;
-		
-	
-   		if ($dref->{intWFTaskID} != $prev_WFTaskID) {
-   			if ($prev_WFTaskID != 0) {
-   				if ($updateThisTask eq 'YES') {
-   					$list_WFTaskID .= $pfx . $prev_WFTaskID;
-   					$pfx = ",";
-					++ $update_count;
-			   			}
-   			}
-   			$updateThisTask = 'YES';
-   			$prev_WFTaskID = $dref->{intWFTaskID};
-   		}
-   		
-   		if ($dref->{strTaskStatus} eq 'ACTIVE') {
-   			$updateThisTask = "nope";
-   		}
-    }
-   	if ($prev_WFTaskID != 0) {
-   		if ($updateThisTask eq 'YES') {
-   			$list_WFTaskID .= $pfx . $prev_WFTaskID;
-			++ $update_count;
-		}
-   	}
-	 
-	if ($update_count > 0) {
-		#Update the Tasks to Active as their pre-reqs have been completed
-		$st = qq[
-		  	UPDATE tblWFTask SET 
-		  		strTaskStatus = 'ACTIVE',
-		  		dtActiveDate = Now(),
-		  		intActivePersonID = 1
-		  	WHERE intWFTaskID IN ($list_WFTaskID); 
-			];
-			
-	  	$q = $db->prepare($st);
-	  	$q->execute();
-	  		
-		if ($q->errstr) {
-			return $q->errstr . '<br>' . $st
-		}
-		
 
-    
-	} 
-else {	
-		# Nothing to update. Do a check to see if there all tasks have been completed
-		$st = qq[
-            SELECT count(*) as NumRows
-            FROM tblWFTask
-            WHERE intPersonRegistrationID = ?
-			AND strTaskStatus IN (?,?)
-        ];
-        
-        $q = $db->prepare($st);
-        $q->execute(
-       		$PersonRegistrationID,
-	  		'PENDING',
-	  		'ACTIVE'
-	  	);
-  
-        
-        if (!$q->fetchrow_array()) {
-            $st = qq[
-            	UPDATE tblPersonRegistration_1 SET
-            	strStatus = ?,
-            	dtFrom = Now()
-    	        WHERE intPersonRegistrationID = ?
-        ];
-    
-        $q = $db->prepare($st);
-        $q->execute(
-        	'ACTIVE',
-       		$PersonRegistrationID
-  			);         
-        }
-}      
-    
-       	
-}
+
 
 

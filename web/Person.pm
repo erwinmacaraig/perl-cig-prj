@@ -58,6 +58,13 @@ use DuplicatePrevention;
 sub handlePerson {
     my ( $action, $Data, $personID ) = @_;
 
+print "Content-type: text/html\n\n";
+use Data::Dumper;
+print "<pre>";
+print Dumper(\$Data); 
+print "</pre>";
+
+
     my $resultHTML = '';
     my $personName = my $title = '';
 
@@ -124,9 +131,7 @@ sub handlePerson {
         ( $resultHTML, $title ) = Transactions::handleTransactions( $action, $Data, $personID );
     }
     elsif ( $action =~ /P_TXNLog/ ) {
-        my $club = $Data->{'clientValues'}{'clubID'} || 0;
-        $club = 0 if ($club == $Defs::INVALID_ID);
-        ( $resultHTML, $title ) = TransLog::handleTransLogs( $action, $Data, $club, $personID );
+        ( $resultHTML, $title ) = TransLog::handleTransLogs( $action, $Data, $personID );
     }
     elsif ( $action =~ /P_PAY_/ ) {
         ( $resultHTML, $title ) = handlePayments( $action, $Data, 0 );
