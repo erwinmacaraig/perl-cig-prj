@@ -33,7 +33,6 @@ sub handlePayments	{
 
 	my ($action, $Data, $external) = @_;
 	$external ||= 0;
-
 	my $body = '';
 	if ($action =~ /DISPLAY/)	{
 		my $intLogID = param('ci') || 0;
