@@ -14,6 +14,7 @@ use TTTemplate;
 use Notifications;
 use FormHelpers;
 use Seasons;
+use PersonRegistration;
 use UploadFiles;
 use Log;
 use Data::Dumper;
@@ -99,23 +100,16 @@ sub showPersonHome	{
 		},
 
 	);
-	my $personSummary_ref = undef;#getSeasonStatus($Data, $personID, $personObj);
-	for my $i (keys %{$personSummary_ref})	{
-		if(ref $personSummary_ref->{$i} eq 'HASH')	{
-			for my $j (keys %{$personSummary_ref->{$i}} )	{
-				$TemplateData{$i}{$j} = $personSummary_ref->{$i}{$j};
-			}
-		}
-		else	{
-			$TemplateData{$i} = $personSummary_ref->{$i};
-		}
-	}
+	
+	getRegistrationData($Data, $personID, \%TemplateData);
+
 	my $statuspanel= runTemplate(
 		$Data,
 		\%TemplateData,
-		'dashboards/personstatus.templ',
+		'dashboards/personregistration.templ',
 	);
 	$TemplateData{'StatusPanel'} = $statuspanel || '';
+	
 	my $resultHTML = runTemplate(
 		$Data,
 		\%TemplateData,
@@ -127,7 +121,6 @@ sub showPersonHome	{
 	my $title = $name;
 	return ($resultHTML, '');
 }
-
 
 sub getMemFields {
 	my ($Data, $personID, $FieldDefinitions, $memperms, $personObj, $override_config) = @_;
@@ -169,162 +162,6 @@ sub getMemFields {
 	return (\%fields_grouped, \%fields);
 }
 
-
-sub getSeasonStuff_ClubLevel	{
-
-	my ($Data, $clubID, $otherClubs, $personID, $seasonID, $season, $td_ref, $hideClubRollover) = @_;
-
-	my $MStablename = "tblPerson_Seasons_$Data->{'Realm'}";
-	my $clubWHERE = qq[ AND MC.intClubID = $clubID AND MC.intStatus>-1];
-	if ($otherClubs)	{
-		$clubWHERE = qq[ AND MC.intStatus>-1 AND MC.intClubID <> $clubID];
-	}
-	my $st_clubs = qq[
-		SELECT
-			MC.intStatus as PersonClubStatus,
-			C.strName as ClubName,
-			C.intClubID as ClubID,
-			MS.intPersonSeasonID as PersonSeasonID,
-			MS.intSeasonID as SeasonID,
-			MS.intMSRecStatus as MSRecStatus,
-			MS.intPlayerStatus as PlayerStatus,
-			MS.intCoachStatus as CoachStatus,
-			MS.intUmpireStatus as UmpireStatus,
-			MS.intMiscStatus as MiscStatus,
-			MS.intVolunteerStatus as VolunteerStatus,
-			MS.intOther1Status as Other1Status,
-			MS.intOther2Status as Other2Status,
-			MS.intPlayerFinancialStatus as PlayerFinancialStatus,
-			MS.intCoachFinancialStatus as CoachFinancialStatus,
-			MS.intUmpireFinancialStatus as UmpireFinancialStatus,
-			MS.intMiscFinancialStatus as MiscFinancialStatus,
-			MS.intVolunteerFinancialStatus as VolunteerFinancialStatus,
-			MS.intOther1FinancialStatus as Other1FinancialStatus,
-			MS.intOther2FinancialStatus as Other2FinancialStatus,
-			IF(MCCO.intPersonID,1,0) as ClearedOut,
-			MC.intPermit as PersonClubPermit,
-			DATE_FORMAT(MC.dtPermitStart,'%d/%m/%Y') AS dtPermitStart,
-			DATE_FORMAT(MC.dtPermitEnd,'%d/%m/%Y') AS dtPermitEnd,
-			DATE_FORMAT(MC.dtPermitEnd,'%Y-%m-%d') AS dtPermitEnd_RAW
-		FROM
-			tblPerson_Clubs as MC
-			INNER JOIN tblAssoc_Clubs as AC ON (
-				AC.intClubID=MC.intClubID
-				AND AC.intAssocID= ?
-			)
-			INNER JOIN tblClub as C ON (
-				C.intClubID=MC.intClubID
-			)
-			LEFT JOIN $MStablename as MS ON (
-				MS.intPersonID=MC.intPersonID
-				AND MS.intClubID=MC.intClubID
-				AND MS.intAssocID=AC.intAssocID
-				AND MS.intSeasonID = ?
-			)
-			LEFT JOIN tblPerson_ClubsClearedOut as MCCO ON (
-				MCCO.intPersonID = MC.intPersonID
-				AND MCCO.intClubID=MC.intClubID
-			)
-		WHERE
-			MC.intPersonID=?
-			$clubWHERE
-		ORDER BY 
-			C.strName,
-			C.intClubID,
-			MC.intStatus ASC, 
-			MC.intPermit DESC
-	];
-	my $qry_clubs = $Data->{'db'}->prepare($st_clubs);
-	$qry_clubs->execute($Data->{'clientValues'}{'assocID'}, $seasonID, $personID);
-
-	my @PersonClubs=();
-	my %OtherClubs=();
-	my $ClubClrdOut = 0;
-	my $ClubActive = 0;
-	my $seasonStatus = 0;
-	my($day, $month, $year)=(localtime)[3,4,5];
-	my $date = ($year+1900)."-".($month+1)."-".$day;
-	while (my $cref=$qry_clubs->fetchrow_hashref())	{
-		$seasonStatus = $cref->{'MSRecStatus'} ;
-		push @PersonClubs, $cref if ($cref->{'ClubID'} != $clubID and $OtherClubs{$cref->{'ClubID'}} != 1 and  $OtherClubs{$cref->{'ClubID'}} != 2);
-		$OtherClubs{$cref->{'ClubID'}} = 2 if ($cref->{'ClubID'} != $clubID);
-		$cref->{'SeasonID'} ||=0;
-		$cref->{'MSRecStatus'} ||=0;
-		$td_ref->{'registerInto_'.$season.'Season'} = 1 if ( (!$cref->{'PersonClubPermit'} or ($Data->{'SystemConfig'}{'AssocConfig'}->{'IgnorePermitReReg'} and $cref->{'dtPermitEnd_RAW'}>$date)) and $cref->{'ClubID'} == $clubID and (! $cref->{'SeasonID'} or ! $cref->{'MSRecStatus'} or $cref->{'MSRecStatus'} < 1) and ! $cref->{'ClearedOut'});
-		$td_ref->{'MSThisClub_'.$season.'Season_MSID'} = $cref->{'PersonSeasonID'} if ($cref->{'ClubID'} == $clubID and $cref->{'SeasonID'});
-
-		if ($cref->{'ClubID'} == $clubID)	{
-			$ClubActive = $cref->{'PersonClubStatus'} || 0;
-		}
-		next unless $cref->{'MSRecStatus'} ==1;
-		if ($cref->{'ClubID'} == $clubID and $cref->{'SeasonID'})	{
-			$ClubClrdOut = $cref->{'ClearedOut'} || 0;
-			$td_ref->{'MSThisClub_'.$season.'Season'} = $cref;
-		}
-	}
-	$td_ref->{'MSOtherClubs'} = \@PersonClubs if ($otherClubs);
-	return if $otherClubs;
-
-  if (! allowedAction($Data, 'm_a') and ! allowedAction($Data, 'm_e'))	{
-		$td_ref->{'registerInto_'.$season.'Season'} = 0;
-	}
-
-	if (
-		($Data->{'SystemConfig'}{'LockSeasons'} and $Data->{'clientValues'}{'authLevel'} <= $Defs::LEVEL_ASSOC)
-		or 
-		($Data->{'SystemConfig'}{'LockSeasonsCRL'} and $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_ASSOC)
-		or
-		($hideClubRollover and $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_ASSOC)
-	)	{
-		
-		$td_ref->{'registerInto_'.$season.'Season'} = 0;
-	}
-
-	if ($clubID)	{
-	  if (
-			($ClubClrdOut and $Data->{'clientValues'}{'authLevel'} <= $Defs::LEVEL_ASSOC)
-			or 
-		 	($Data->{'SystemConfig'}{'personReReg_notInactive'} and (! $ClubActive or $ClubClrdOut))
-			)	{
-			$td_ref->{'registerInto_'.$season.'Season'} = 0;
-		}
-	}
-
-		### Now lets work out the action & URL based on the IDs
-			if ($td_ref->{'registerInto_'.$season.'Season'})	{
-				my $action = '';
-				my $msID=0;
-				if ($clubID)	{
-					$action = 'SN_MSviewCADD&d_intClubID='.$clubID;
-					if ($td_ref->{'MSThisClub_'.$season.'Season_MSID'})	{
-						$msID = $td_ref->{'MSThisClub_'.$season.'Season_MSID'};
-						$action = 'SN_MSviewCEDIT';
-					}
-				}
-				else	{
-					$action = 'SN_MSviewADD';
-					if ($td_ref->{$season.'Season_MSID'})	{
-						$action = 'SN_MSviewCEDIT';
-						$msID = $td_ref->{$season.'Season_MSID'};
-					}
-				}
-				$td_ref->{'registerInto_'.$season.'Season_URL_edit'}='';
-				$td_ref->{'registerInto_'.$season.'Season_URL_add'}='';
-				$td_ref->{'registerInto_'.$season.'Season_ACTION'} = $action;
-				if ($action =~ /ADD/)	{
-                        $td_ref->{'registerInto_'.$season.'Season_URL_add'} = "$Data->{'target'}?client=$Data->{'client'}&amp;a=$action&amp;d_intSeasonID=$seasonID";
-				}
-				else	{
-					    $td_ref->{'registerInto_'.$season.'Season_URL_edit'} = "$Data->{'target'}?client=$Data->{'client'}&amp;a=$action&amp;d_intSeasonID=$seasonID&msID=$msID";
-				}
-			}
-	#if we have a season record and it has a minus one status and we have blocked season access it was incorrectly flagging people as registered
-	if($td_ref->{'registerInto_'.$season.'Season'}==0 and $td_ref->{'MSThisClub_'.$season.'Season_MSID'} and $seasonStatus == -1)
-	{
-		$td_ref->{'MSThisClub_'.$season.'Season_MSID'} =0;
-	}  
-
-}
 sub deregistration_check___duplicated {
         my ($personID,$type,$Data)=@_;
         my $db=$Data->{'db'};
