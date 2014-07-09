@@ -259,10 +259,12 @@ sub checkoutConfirm	{
     if ($paymentType == $Defs::PAYMENT_ONLINENAB)    {
         my $m;
         my $chkvalue= $amount . $intLogID . $paymentSettings->{'currency'};
+#warn("AM:$amount $intLogID " . $paymentSettings->{'currency'} . "#######" . $paymentSettings->{'gatewaySalt'});
         $m = new MD5;
         $m->reset();
         $m->add($paymentSettings->{'gatewaySalt'}, $chkvalue);
         $chkvalue = $m->hexdigest();
+#warn("################## SWM END $chkvalue");
         $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data->{'noheader'}&amp;ext=$external&amp;a=P&amp;formID=$formID&amp;client=$client&amp;ci=$intLogID&amp;chkv=$chkvalue&amp;session=$session;compulsory=$compulsory&amp;amount=$amount];
         my $formTarget = $external ? qq[ target="other" onClick="window.open('$paymentURL','other','location=no,directories=no,menubar=no,statusbar=no,toolbar=no,scrollbars=yes,height=820,width=870,resizable=yes');return false;" ] : '';
         $externalGateway= qq[
@@ -518,7 +520,7 @@ sub getPaymentSettings	{
         }
         $settings{'return_url'} .= qq[&amp;client=$client] if $client and $settings{'return_url'};
         $settings{'return_failure_url'} .= qq[&amp;client=$client] if $client and $settings{'return_failure_url'};
-        $settings{'currency'} = $dref->{strCurrency} || 'AUD';
+        $settings{'currency'} = $dref->{strCurrency} || '';
         push @Settings, \%settings;
         %Setting = %settings;
         $count++;

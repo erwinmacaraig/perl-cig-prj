@@ -62,7 +62,7 @@ sub NABProcess  {
     my $chkvalue= $respCode . $amount . $logID; #Different checkvalue for way back
     my $m = new MD5;
     $m->reset();
-    $m->add('1234', $chkvalue);
+    $m->add('1234A', $chkvalue);
     $chkvalue = $m->hexdigest();
        
     my $url = qq[http://elwood/FIFASPOnline/web/nabprocess_dummy.cgi?a=S&amp;client=$client&amp;ext=$external&amp;ci=$logID&amp;chkv=$chkvalue&amp;formID=$formID&amp;session=$session&amp;restext=$respText&amp;rescode=$respCode&amp;txnid=111&amp;authid=123];

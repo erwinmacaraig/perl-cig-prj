@@ -451,12 +451,12 @@ sub getReportDisplayConfig	{
 	for my $k (keys %{$Data->{'EventOptions'}})	{
 		$options{$k} = $Data->{'EventOptions'}{$k};
 	}
-  my $paymentsettings = getPaymentSettings($Data, 0);
-  my $paypal = $paymentsettings->{'paymentType'} == $Defs::PAYMENT_ONLINEPAYPAL ? 1 : 0;
-	$options{'PayPal'} = $paypal;
-  my $nab = $paymentsettings->{'paymentType'} == $Defs::PAYMENT_ONLINENAB ? 1 : 0;
-	$options{'NAB'} = $nab;
-	$options{'ReceiveFunds'} = $nab || $paypal;
+  #my $paymentsettings = getPaymentSettings($Data, 0);
+  #my $paypal = $paymentsettings->{'paymentType'} == $Defs::PAYMENT_ONLINEPAYPAL ? 1 : 0;
+#	$options{'PayPal'} = $paypal;
+ # my $nab = $paymentsettings->{'paymentType'} == $Defs::PAYMENT_ONLINENAB ? 1 : 0;
+#	$options{'NAB'} = $nab;
+#	$options{'ReceiveFunds'} = $nab || $paypal;
 
 	return \%options;
 }
