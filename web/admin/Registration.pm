@@ -218,19 +218,18 @@ sub add_registration {
 		SubRealm => 0,
 	 	);	
 
-	my $personRegistrationID = addRegistration (\%Data,\%registration_data);
-			
- 	my $returnCode = addTasks(\%Data, $personRegistrationID);
+	my $rc = addRegistration (\%Data,\%registration_data);
 
-	if ($returnCode == 0) {
+	if ($rc == 0) {
 		return('<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;Your registration has been received and you will be notified in due course when it has been approved.<br>
 			<p>&nbsp;</p><p>&nbsp;</p>
-			<p>&nbsp;<a href=approval.cgi>View Approval Tasks</a>') 
-			}
+			<p>&nbsp;<a href="/main.cgi?client=MHwwfDB8MXwtMXwxNHwtMXwzNXwxMDczMzU1MXwxfDEwMHw1fDE0MDQ5MDYzMzN8OGQyNWQ3N2ZiY2ZiZTU2YWZjOGUwYzJmNjNhY2Y2N2Q&a=WF_xxx">View Approval Tasks</a>') 
+	}
 	else {
-		return 'Error. Return Code: ' . $returnCode;		
-	};
-
+		return('<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;Your registration has been completed and approved.<br>
+			<p>&nbsp;</p><p>&nbsp;</p>
+			<p>&nbsp;<a href="/main.cgi?client=MHwwfDB8MXwtMXwxNHwtMXwzNXwxMDczMzU1MXwxfDEwMHw1fDE0MDQ5MDYzMzN8OGQyNWQ3N2ZiY2ZiZTU2YWZjOGUwYzJmNjNhY2Y2N2Q&a=WF_xxx">View Approval Tasks</a>') 
+			};
 }
 
 sub fncRadioBtns {

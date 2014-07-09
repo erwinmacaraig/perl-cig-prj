@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS tblWFRule;
 CREATE TABLE `tblWFRule` (
   `intWFRuleID` int(11) NOT NULL AUTO_INCREMENT,
   `intRealmID` int(11) NOT NULL DEFAULT '0',
@@ -9,11 +10,12 @@ CREATE TABLE `tblWFRule` (
   `strPersonLevel` varchar(20) NOT NULL DEFAULT '' COMMENT 'AMATEUR,PROFESSIONAL',
   `strSport` varchar(20) NOT NULL DEFAULT '' COMMENT 'FOOTBALL,FUTSAL,BEACH SOCCER',
   `strRegistrationType` varchar(20) NOT NULL DEFAULT '' COMMENT 'NEW,RENEWAL',
-    intRegistrationNature INT DEFAULT 0,
+  `intRegistrationNature` int(11) DEFAULT '0',
   `strAgeLevel` varchar(20) NOT NULL DEFAULT '' COMMENT 'SENIOR,JUNIOR',
   `intSeasonID` int(11) DEFAULT '0',
-    intNationalPeriodID INT DEFAULT 0,
+  `intNationalPeriodID` int(11) DEFAULT '0',
   `intRoleID` int(11) NOT NULL DEFAULT '0',
+  `intRoleEntityID` int(11) NOT NULL DEFAULT '0',
   `intVersionID` int(11) NOT NULL DEFAULT '0',
   `intOriginLevel` int(11) NOT NULL DEFAULT '0' COMMENT 'From intEntityLevel',
   `strTaskType` varchar(20) NOT NULL DEFAULT 'APPROVAL',
@@ -21,7 +23,8 @@ CREATE TABLE `tblWFRule` (
   `strTaskStatus` varchar(20) DEFAULT 'PENDING',
   `tTimeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `intOriginID` int(11) NOT NULL DEFAULT '0',
-  `intProblemResolutionLevel` int(11) NOT NULL DEFAULT '0',
+  `intProblemResolutionRoleID` int(11) NOT NULL DEFAULT '0',
+  `intProblemResolutionEntityID` int(11) DEFAULT NULL,
   `tDeletedDate` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`intWFRuleID`),
   KEY `Entity` (`intEntityID`,`intWFRuleID`)

@@ -1,0 +1,21 @@
+<div class="task-list-wrap">
+<p>[% TaskMsg %]</p>
+	<div class="tasklist-content">
+		[% FOREACH task IN TaskList %]
+			<div class="member-data"> [% task.WFTaskID %] </div>
+			<div class="member-data"> [% task.TaskType %] </div>
+			<div class="member-data"> [% task.AgeLevel %] </div>			
+			<div class="member-data"> [% task.RegistrationNature %] </div>			
+			<div class="member-data"> [% task.DocumentName %] </div>			
+			<div class="member-data"> [% task.LocalFirstname %] </div>			
+			<div class="member-data"> [% task.LocalSurname %] </div>			
+			<div class="member-data"> [% task.PersonID %] </div>	
+			<div class="member-data">
+				<a href="main.cgi?client=[% client %]&a=WF_Approve&EID=[% TaskEntityID %]&RID=[% TaskRoleID %]&TID=[% task.WFTaskID %]">Approve</a>
+			</div>
+			<div class="member-data">
+				<a href="main.cgi?client=[% client %]&a=WF_Reject&TID=[% task.WFTaskID %]">Reject</a>
+			</div>					
+		[% END %]
+	</div>
+</div>

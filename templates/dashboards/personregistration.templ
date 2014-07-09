@@ -1,20 +1,14 @@
-<div class = "member-status-wrap">
-		<div class = "sectionheader">Registration</div>
-			<div class="members-seasonstatus-content">
-
-			<table>
-				[% FOREACH entity IN RegistrationInfo %]
-				<tr>
-					<td> [% entity.strLocalName %] </td>
-					<td> [% entity.strSport %] </td>
-					<td> [% entity.strPersonType %] </td>
-					<td> [% entity.strPersonLevel %] </td>
-					<td> [% entity.dtFrom %] </td>
-					<td> [% entity.dtTo %] </td>
-				</tr>
-				[% END %]
-			</table>
-	
-			</div>
+<div class="member-status-wrap">
+	<div class="sectionheader">Registration</div>
+		<div class="members-seasonstatus-content">
+			[% FOREACH entity IN RegistrationInfo %]
+				<div class="member-data"> [% entity.strLocalName %] </div>
+				<div class="member-data"> [% entity.strSport %] </div>
+				<div class="member-data"> [% entity.strPersonType %] </div>
+				<div class="member-data"> [% entity.strPersonLevel %] </div>
+				<div class="member-data"> [% entity.dtFrom %] </div>
+				<div class="member-data"> [% entity.dtTo %] </div>
+			[% END %]
 		</div>
+	</div>
 </div>

@@ -1,10 +1,11 @@
+DROP TABLE IF EXISTS tblWFTask;
 CREATE TABLE `tblWFTask` (
   `intWFTaskID` int(11) NOT NULL AUTO_INCREMENT,
   `intWFRuleID` int(11) NOT NULL DEFAULT '0',
   `strTaskStatus` varchar(20) NOT NULL DEFAULT 'ACTIVE',
   `intWFEventID` int(11) NOT NULL DEFAULT '0',
-  `intWFRoleID` int(11) NOT NULL,
-  `intWFEntityID` int(11) NOT NULL,
+  `intWFRoleID` int(11) NOT NULL DEFAULT '0',
+  `intWFRoleEntityID` int(11) NOT NULL DEFAULT '0',
   `strTaskType` varchar(20) NOT NULL,
   `intDocumentTypeID` int(11) NOT NULL DEFAULT '0',
   `intPersonID` int(11) NOT NULL DEFAULT '0',
@@ -17,7 +18,9 @@ CREATE TABLE `tblWFTask` (
   `intApprovedPersonID` int(11) DEFAULT NULL,
   `dtApprovedDate` datetime DEFAULT NULL,
   `intActivePersonID` int(11) DEFAULT NULL,
+  `intProblemResolutionEntityID` int(11) DEFAULT NULL,
+  `intProblemResolutionRoleID` int(11) DEFAULT NULL,
   `dtActiveDate` datetime DEFAULT NULL,
   PRIMARY KEY (`intWFTaskID`),
   KEY `index_intEntityID` (`intWFRoleID`)
-)  DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8;
