@@ -50,7 +50,7 @@ sub main {
 
     use Data::Dumper;
     $returnVals{'ResponseText'} = NABResponseCodes($returnVals{'GATEWAY_RESPONSE_CODE'});
-    if ($returnVals{'GATEWAY_RESPONSE_CODE'} =~/^00|08|11$/)  {
+    if ($returnVals{'GATEWAY_RESPONSE_CODE'} =~/^00|08|OK$/)  {
         $returnVals{'ResponseCode'} = 'OK';
     }
 #print STDERR Dumper(\%returnVals);
