@@ -40,7 +40,7 @@ sub display_screen{
 	my $entityID = '35';
 	my $personLevel = 'AMATEUR';
 	my $sport = 'FOOTBALL';
-	my $registrationNature = 0; #'REGISTRATION';
+	my $registrationNature = 'NEW'; #'REGISTRATION';
 	my $ageLevel = 'SENIOR';
 	my $personType = 'PLAYER';
    
@@ -73,8 +73,8 @@ sub display_screen{
 	);	
 	
     my %btn_registrationNature = (
-		'0'=>'Registration',	
-		'1'=>'Renewal',	
+		'NEW'=>'Registration',	
+		'RENEWAL'=>'Renewal',	
 	);
 
     my %btn_ageLevel = (
@@ -214,7 +214,7 @@ sub add_registration {
 	#Fudge to setup %Data
 	my %Data = (
 		db => $db,
-		RealmID => 1,
+		Realm => 1,
 		SubRealm => 0,
 	 	);	
 

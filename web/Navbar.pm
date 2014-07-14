@@ -212,6 +212,12 @@ sub getEntityMenuData {
         };
     }
 
+
+        $menuoptions{'approvals'} = {
+            name => $lang->txt('Approvals'),
+            url => $baseurl."a=WF_",
+        };
+    
     $menuoptions{'usermanagement'} = {
         name => $lang->txt('User Management'),
         url  => $baseurl."a=AM_",
@@ -326,6 +332,7 @@ sub getEntityMenuData {
         [ $lang->txt('Clubs'), 'menu','clubs'],
         [ $lang->txt('Venues'), 'menu','venues'],
         [ $lang->txt('People'), 'menu','persons'],
+        [ $lang->txt('Approvals'), 'menu','approvals'],
         [ $lang->txt('Transfers'), 'menu', [
         'clearances',    
         'clearancesAll',
