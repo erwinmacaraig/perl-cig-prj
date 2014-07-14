@@ -1,7 +1,7 @@
 CREATE table tblEntityTypes (
     intEntityTypeID INT NOT NULL AUTO_INCREMENT,
     intEntityID INT DEFAULT 0,
-    strSport VARCHAR(20) DEFAULT '',
+    strSport VARCHAR(20) DEFAULT '', /*futsal, beach, football*/
     strPersonLevel varchar(10) DEFAULT '', /* pro/amateur */
     intGender TINYINT DEFAULT 0,
 
