@@ -54,41 +54,14 @@ sub display_screen{
 		'14'=>'Region',	
 		'35'=>'Alands Clubs',	
 	);
-
-    my %btn_personType = (
-		'PLAYER'=>'Player',	
-		'COACH'=>'Coach',	
-		'REFEREE'=>'Referee',	
-	);
-	
-    my %btn_personLevel = (
-		'AMATEUR'=>'Amateur',	
-		'PROFESSIONAL'=>'Professional',	
-	);	
-
-    my %btn_sport = (
-		'FOOTBALL'=>'Football',	
-		'BEACHSOCCER'=>'Beach Soccer',	
-		'FUTSAL'=>'Futsal',	
-	);	
-	
-    my %btn_registrationNature = (
-		'NEW'=>'Registration',	
-		'RENEWAL'=>'Renewal',	
-	);
-
-    my %btn_ageLevel = (
-		'SENIOR'=>'Senior',	
-		'YOUTH'=>'Youth',	
-	);
 	
 	my $btn_gender = fncRadioBtns($gender,'gender',\%btn_gender);
 	my $btn_entityID = fncRadioBtns($entityID,'entityID',\%btn_entityID);
-	my $btn_personLevel = fncRadioBtns($personLevel,'personLevel',\%btn_personLevel);
-	my $btn_sport = fncRadioBtns($sport,'sport',\%btn_sport);
-	my $btn_registrationNature = fncRadioBtns($registrationNature,'registrationNature',\%btn_registrationNature);
-	my $btn_ageLevel = fncRadioBtns($ageLevel,'ageLevel',\%btn_ageLevel);
-	my $btn_personType = fncRadioBtns($personType,'personType',\%btn_personType);
+	my $btn_personLevel = fncRadioBtns($personLevel,'personLevel',\%Defs::personLevel);
+	my $btn_sport = fncRadioBtns($sport,'sport',\%Defs::sportType);
+	my $btn_registrationNature = fncRadioBtns($registrationNature,'registrationNature',\%Defs::registrationNature);
+	my $btn_ageLevel = fncRadioBtns($ageLevel,'ageLevel',\%Defs::ageLevel);
+	my $btn_personType = fncRadioBtns($personType,'personType',\%Defs::personType);
 		
 	# Create the form
 	my $body = '';
