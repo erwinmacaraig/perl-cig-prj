@@ -1835,10 +1835,10 @@ warn("SOURCE$sourceEntityID DES:$destinationEntityID");
             tblTempEntityStructure
 		WHERE 
             intChildID IN ($sourceEntityID, $destinationEntityID)
-            AND intChildLevel = 3
             AND intParentLevel > 3
         ORDER BY intParentLevel ASC
 	];
+            #AND intChildLevel = 3
     my $query = $db->prepare($st) or query_error($st);
     $query->execute or query_error($st);
 
