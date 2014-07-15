@@ -1392,7 +1392,7 @@ sub createClearance	{
                 M.intRealmID = $Data->{'Realm'}
 				AND C.intEntityID <> $entityID 
 				AND PR.strStatus <> 'TRANSFERRED'
-                AND M.intStatus = $Defs::PERSONSTATUS_ACTIVE
+                AND M.intSystemStatus = $Defs::PERSONSTATUS_ACTIVE
 				$strWhere
 			GROUP BY M.intPersonID, C.intEntityID
 			ORDER BY MAX(CLR.dtFinalised) DESC, M.strLocalSurname, M.strLocalFirstname, M.dtDOB
@@ -1725,7 +1725,7 @@ sub getEntityLevel {
         WHERE intEntityID = ?
     ];
 	my $query = $db->prepare($st) or query_error($st);
-    $query->execute or query_error($st);
+    $query->execute($entityID) or query_error($st);
     return $query->fetchrow_array() || 0;
 }
 
@@ -1747,10 +1747,12 @@ sub postClearanceAdd	{
 		my $destinationTypeID =0;
 		my $destinationStatusID =0;
 		my $sourceStatusID =0;
+#$params->{'destinationEntityID'}=14;
 	
 		my $destinationEntityPathID = 0;
 		
 		my $found = getMeetingPoint($db, $params->{'sourceEntityID'}, $params->{'destinationEntityID'}, \@sourceNodes, \@destinationNodes);
+        my %EntitiesUsed=();
 	
 		if ($found)	{
 			my $insert_st = qq[
@@ -1758,30 +1760,38 @@ sub postClearanceAdd	{
 				(intClearanceID, intTypeID, intTableType, intID, intOrder, intDirection, intClearanceStatus)
 				VALUES ($id, ?, ?, ?, ?, ?, $Defs::CLR_STATUS_PENDING)
 			];
-	    		my $qry_insert = $db->prepare($insert_st) or query_error($insert_st);
+	    	my $qry_insert = $db->prepare($insert_st) or query_error($insert_st);
 			my $count=1;
 		
 
             my $srcLevel = getEntityLevel($db, $params->{'sourceEntityID'});
 			$qry_insert->execute($srcLevel, $Defs::CLUB_LEVEL_CLEARANCE, $params->{'sourceEntityID'}, $count, $Defs::DIRECTION_FROM_SOURCE) if $params->{'sourceEntityID'};
+            $EntitiesUsed{$params->{'sourceEntityID'}} = 1;
 			my $firstPathID = $qry_insert->{mysql_insertid} || 0;
 			
 			$count++ if $params->{'sourceEntityID'};
 
 			for my $node (reverse @sourceNodes)	{
+                next if exists $EntitiesUsed{$node->[0]};
 				$qry_insert->execute($node->[1], 3, $node->[0], $count, $Defs::DIRECTION_FROM_SOURCE);
+                $EntitiesUsed{$node->[0]}  = 1;
 				$count++;
 			}
 			my $skip_first = 0;
 			for my $node (@destinationNodes)	{
 				$skip_first++;
 				next if $skip_first == 1; ## SKIP FIRST Destination NODE (ie: Its the top one).  IT WAS HANDLED IN SOURCE.
+                next if exists $EntitiesUsed{$node->[0]};
 				$qry_insert->execute($node->[1], 3, $node->[0], $count, $Defs::DIRECTION_TO_DESTINATION);
+                $EntitiesUsed{$node->[0]}  = 1;
+                $destinationEntityPathID = $qry_insert->{mysql_insertid} || 0;
 				$count++;
 			}
-            my $destLevel = getEntityLevel($db, $params->{'sourceEntityID'});
-			$qry_insert->execute($destLevel, $Defs::CLUB_LEVEL_CLEARANCE, $params->{'destinationEntityID'}, $count, $Defs::DIRECTION_TO_DESTINATION) if $params->{'destinationEntityID'};
-			$destinationEntityPathID = $qry_insert->{mysql_insertid} || 0;
+            my $destLevel = getEntityLevel($db, $params->{'destinationEntityID'});
+            if (! exists $EntitiesUsed{$params->{'destinationEntityID'}})   {
+    			$qry_insert->execute($destLevel, $Defs::CLUB_LEVEL_CLEARANCE, $params->{'destinationEntityID'}, $count, $Defs::DIRECTION_TO_DESTINATION) if $params->{'destinationEntityID'};
+	    		$destinationEntityPathID = $qry_insert->{mysql_insertid} || 0;
+            }
 
 			my $st = qq[
 				UPDATE tblClearance
@@ -1849,13 +1859,13 @@ warn("SOURCE$sourceEntityID DES:$destinationEntityID");
 
     my @Levels = (10,20,30,100);
     foreach my $level (@Levels) {
-        my $sourceEntityID = $EntityStructure{$sourceEntityID}{$level} || 0;
-        my $destinationEntityID = $EntityStructure{$destinationEntityID}{$level} || 0;
-        if ($sourceEntityID and $destinationEntityID and $sourceEntityID == $destinationEntityID)   {
-            $found=1;
-        }
-	    push @{$sourceNodes}, [$sourceEntityID, $level] if ($sourceEntityID);
-	    push @{$destinationNodes}, [$destinationEntityID, $level] if ($destinationEntityID);
+        my $srcEntityID = $EntityStructure{$sourceEntityID}{$level} || 0;
+        my $destEntityID = $EntityStructure{$destinationEntityID}{$level} || 0;
+        $found =1 if ($srcEntityID and $destEntityID and $srcEntityID == $destEntityID);
+        $found= 1 if ($srcEntityID and $srcEntityID == $destinationEntityID);
+        $found=1 if ($destEntityID and $sourceEntityID == $destEntityID);
+	    push @{$sourceNodes}, [$srcEntityID, $level] if ($srcEntityID);
+	    push @{$destinationNodes}, [$destEntityID, $level] if ($destEntityID);
         last if $found;
     }
 
