@@ -1,21 +1,42 @@
 <div class="task-list-wrap">
 <p>[% TaskMsg %]</p>
 	<div class="tasklist-content">
+		<!-- use tables until UI/UX sorted -->
+		<table cellpadding="5">
+		<tr>
+			<th>TaskID</th>
+			<th>Type</th>
+			<th>Age<br>Level</th>
+			<th>Reg<br>Nature</th>
+			<th>Document<br>Type</th>
+			<th>First<br>Name</th>
+			<th>Last<br>Name</th>
+			<th>PersonID</th>
+			<th>Status</th>
+		</tr>
 		[% FOREACH task IN TaskList %]
-			<div class="member-data"> [% task.WFTaskID %] </div>
-			<div class="member-data"> [% task.TaskType %] </div>
-			<div class="member-data"> [% task.AgeLevel %] </div>			
-			<div class="member-data"> [% task.RegistrationNature %] </div>			
-			<div class="member-data"> [% task.DocumentName %] </div>			
-			<div class="member-data"> [% task.LocalFirstname %] </div>			
-			<div class="member-data"> [% task.LocalSurname %] </div>			
-			<div class="member-data"> [% task.PersonID %] </div>	
-			<div class="member-data">
-				<a href="main.cgi?client=[% client %]&a=WF_Approve&EID=[% TaskEntityID %]&RID=[% TaskRoleID %]&TID=[% task.WFTaskID %]">Approve</a>
-			</div>
-			<div class="member-data">
-				<a href="main.cgi?client=[% client %]&a=WF_Reject&TID=[% task.WFTaskID %]">Reject</a>
-			</div>					
+			<tr>
+			<td><div class="member-data"> [% task.WFTaskID %] </div></td>
+			<td><div class="member-data"> [% task.TaskType %] </div></td>
+			<td><div class="member-data"> [% task.AgeLevel %] </div></td>			
+			<td><div class="member-data"> [% task.RegistrationNature %] </div></td>			
+			<td><div class="member-data"> [% task.DocumentName %] </div></td>			
+			<td><div class="member-data"> [% task.LocalFirstname %] </div></td>			
+			<td><div class="member-data"> [% task.LocalSurname %] </div></td>			
+			<td><div class="member-data"> [% task.PersonID %] </div></td>	
+			<td><div class="member-data"> [% task.TaskStatus %] </div></td>	
+			<td><div class="member-data">
+				<span class = "button-small generic-button">
+					<a href="main.cgi?client=[% client %]&a=WF_Approve&TID=[% task.WFTaskID %]">Approve</a>
+				</span>
+			</div></td>
+			<td><div class="member-data">
+				<span class = "button-small generic-button">
+					<a href="main.cgi?client=[% client %]&a=WF_Reject&TID=[% task.WFTaskID %]">Reject</a>
+				</span>
+			</div></td>	
+			</tr>				
 		[% END %]
+		</table>
 	</div>
 </div>

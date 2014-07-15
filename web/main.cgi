@@ -83,12 +83,6 @@ sub main {
 
     $Data{'clientValues'} = \%clientValues;
 
-    #PP Should these be setup in main.cgi and passed in? Or how do we setup an encrypted QS?
-    my $roleID = param('RID') || '';
-    my $entityID = param('EID') || '';
-    my $WFTaskID = param('TID') || '';
-    
-
     # AUTHENTICATE
     my $db = allowedTo( \%Data );
 
@@ -252,7 +246,7 @@ warn("REALM IS ". $Data{'Realm'});
           handle_products(\%Data, $action);
     }
     elsif ( $action =~ /^WF_/ ) {
-        ( $resultHTML, $pageHeading ) = handleWorkflow($action, \%Data, $roleID, $entityID, $WFTaskID);
+        ( $resultHTML, $pageHeading ) = handleWorkflow($action, \%Data);
     }
 
     # BUILD PAGE
