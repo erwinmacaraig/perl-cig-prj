@@ -191,19 +191,14 @@ sub listOfflineClearances {
 	my $clryear= $Data->{'ViewClrYear'} || '';
 	$clryear = '' if ($clryear !~ /^\d*$/);
 
-	$intID = $Data->{'clientValues'}{'clubID'} if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB);
-	my $CLUB_JOIN = '';
-        if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB)	{
-		$CLUB_JOIN = qq[ INNER JOIN tblMember_Clubs as MC ON (MC.intMemberID = M.intPersonID and MC.intClubID = $intID and MC.intStatus = $Defs::RECSTATUS_ACTIVE) ];
-	}
+	$intID = getID($Data->{'clientValues'}) || 0; #$Data->{'clientValues'}{'clubID'} if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB);
 
 	my $st = qq[
-		SELECT DISTINCT C.*, DATE_FORMAT(C.dtApplied,"%d/%m/%Y") AS dtApplied, CONCAT(M.strLocalSurname, ", ", M.strLocalFirstname) as MemberName, IF(SourceClub.intClubID, SourceClub.strName, strSourceClubName) as SourceClubName, IF (DestinationClub.intClubID, DestinationClub.strName, strDestinationClubName) as DestinationClubName, DATE_FORMAT(M.dtDOB,"%d/%m/%Y") AS DOB, YEAR(dtApplied) AS clrYear
+		SELECT DISTINCT C.*, DATE_FORMAT(C.dtApplied,"%d/%m/%Y") AS dtApplied, CONCAT(M.strLocalSurname, ", ", M.strLocalFirstname) as MemberName, IF(SourceEntity.intClubID, SourceEntity.strName, strSourceEntityName) as SourceEntityName, IF (DestinationEntity.intClubID, DestinationEntity.strName, strDestinationEntityName) as DestinationEntityName, DATE_FORMAT(M.dtDOB,"%d/%m/%Y") AS DOB, YEAR(dtApplied) AS clrYear
 		FROM tblClearance as C 
 			INNER JOIN tblPerson as M ON (M.intPersonID = C.intPersonID) 
-			$CLUB_JOIN
-			LEFT JOIN tblClub as SourceClub ON (SourceClub.intClubID = C.intSourceClubID)
-			LEFT JOIN tblClub as DestinationClub ON (DestinationClub.intClubID = C.intDestinationClubID)
+			LEFT JOIN tblClub as SourceEntity ON (SourceEntity.intClubID = C.intSourceEntityID)
+			LEFT JOIN tblClub as DestinationEntity ON (DestinationEntity.intClubID = C.intDestinationEntityID)
                 WHERE 
 			C.intCreatedFrom IN ($Defs::CLR_TYPE_SWC, $Defs::CLR_TYPE_MANUAL)
 			AND C.intRealmID = ?
@@ -236,7 +231,7 @@ sub listOfflineClearances {
     $cnt++;
 
     my %row = ();
-    for my $i (qw(MemberName DOB SourceClubName DestinationClubName updatestatus overallstatus dtApplied createdFrom intClearanceID clrYear intClearanceStatus_RAW ))  {
+    for my $i (qw(MemberName DOB SourceEntityName DestinationEntityName updatestatus overallstatus dtApplied createdFrom intClearanceID clrYear intClearanceStatus_RAW ))  {
       $row{$i} = $dref->{$i};
     }
     $row{'id'} = $dref->{'intClearanceID'}.$cnt;
@@ -289,11 +284,11 @@ sub listOfflineClearances {
     },
     {
       name =>   $lang->txt('From Club'),
-      field =>  'SourceClubName',
+      field =>  'SourceEntityName',
     },
     {
       name =>   $lang->txt('To Club'),
-      field =>  'DestinationClubName',
+      field =>  'DestinationEntityName',
     },
     {
       name =>   $lang->txt("Overall status"),
@@ -321,12 +316,12 @@ sub listOfflineClearances {
       type => 'regex',
     },
     {
-      field => 'SourceClubName',
+      field => 'SourceEntityName',
       elementID => 'id_fromclub',
       type => 'regex',
     },
     {
-      field => 'DestinationClubName',
+      field => 'DestinationEntityName',
       elementID => 'id_toclub',
       type => 'regex',
     },
@@ -429,13 +424,13 @@ sub listClearances	{
 
 	
 	my $st = qq[
-			SELECT C.*, DATE_FORMAT(C.dtApplied,"%d/%m/%Y") AS dtApplied, C.dtApplied as dtApplied_RAW, CP.intClearanceStatus as PathStatus, CP.intClearancePathID, CONCAT(M.strLocalSurname, ", ", M.strLocalFirstname) as MemberName, SourceClub.strName as SourceClubName, DestinationClub.strName as DestinationClubName,  DATE_FORMAT(M.dtDOB,"%d/%m/%Y") AS DOB, M.dtDOB AS DOB_RAW, CP.intTypeID, CP.intID, 
+			SELECT C.*, DATE_FORMAT(C.dtApplied,"%d/%m/%Y") AS dtApplied, C.dtApplied as dtApplied_RAW, CP.intClearanceStatus as PathStatus, CP.intClearancePathID, CONCAT(M.strLocalSurname, ", ", M.strLocalFirstname) as MemberName, SourceEntity.strName as SourceEntityName, DestinationEntity.strName as DestinationEntityName,  DATE_FORMAT(M.dtDOB,"%d/%m/%Y") AS DOB, M.dtDOB AS DOB_RAW, CP.intTypeID, CP.intID, 
 				IF(C.intCurrentPathID = CP.intClearancePathID AND C.intClearanceStatus  = $Defs::CLR_STATUS_PENDING,1,0) AS ThisLevel
 			FROM tblClearance as C 
 				INNER JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID) 
 				INNER JOIN tblPerson as M ON (M.intPersonID = C.intPersonID) 
-				LEFT JOIN tblClub as SourceClub ON (SourceClub.intClubID = C.intSourceClubID)
-				LEFT JOIN tblClub as DestinationClub ON (DestinationClub.intClubID = C.intDestinationClubID)
+				LEFT JOIN tblClub as SourceEntity ON (SourceEntity.intClubID = C.intSourceEntityID)
+				LEFT JOIN tblClub as DestinationEntity ON (DestinationEntity.intClubID = C.intDestinationEntityID)
 			WHERE C.intRealmID = $Data->{'Realm'}
 				$pathWhere
 	];
@@ -496,12 +491,12 @@ sub listClearances	{
 
 		$dref->{overallstatus} = $lang->txt($Defs::clearance_status{$dref->{intClearanceStatus}}) || 'P';
 		$dref->{priority} = $lang->txt($Defs::clearance_priority{$dref->{intClearancePriority}});  
-		$dref->{SourceClubName} ||= $dref->{strSourceClubName} || '';
-		$dref->{DestinationClubName} ||= $dref->{strDestinationClubName} || '';
+		$dref->{SourceEntityName} ||= $dref->{strSourceEntityName} || '';
+		$dref->{DestinationEntityName} ||= $dref->{strDestinationEntityName} || '';
 		$dref->{createdFrom} = $Defs::ClearanceTypes{$dref->{intCreatedFrom}};
 		
 		my %row = ();
-		for my $i (qw(MemberName DOB DOB_RAW SourceClubName DestinationClubName updatestatus overallstatus dtApplied dtApplied_RAW createdFrom intClearanceID intClearanceYear intClearanceStatus_RAW intClearanceStatus_RAW_filter))	{
+		for my $i (qw(MemberName DOB DOB_RAW SourceEntityName DestinationEntityName updatestatus overallstatus dtApplied dtApplied_RAW createdFrom intClearanceID intClearanceYear intClearanceStatus_RAW intClearanceStatus_RAW_filter))	{
 			$row{$i} = $dref->{$i};
 		}
 		$row{'id'} = $dref->{'intClearanceID'}.$cnt;
@@ -568,11 +563,11 @@ sub listClearances	{
     },
     {
       name =>   $lang->txt('From Club'),
-      field =>  'SourceClubName',
+      field =>  'SourceEntityName',
     },
     {
       name =>   $lang->txt('To Club'),
-      field =>  'DestinationClubName',
+      field =>  'DestinationEntityName',
     },
     {
       name =>   $lang->txt("This level's status"),
@@ -616,12 +611,12 @@ sub listClearances	{
       type => 'regex',
     },
     {
-      field => 'SourceClubName',
+      field => 'SourceEntityName',
       elementID => 'id_fromclub',
       type => 'regex',
 		},
     {
-      field => 'DestinationClubName',
+      field => 'DestinationEntityName',
       elementID => 'id_toclub',
       type => 'regex',
 		},
