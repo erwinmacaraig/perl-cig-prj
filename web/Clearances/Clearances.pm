@@ -1835,7 +1835,7 @@ warn("SOURCE$sourceEntityID DES:$destinationEntityID");
             tblTempEntityStructure
 		WHERE 
             intChildID IN ($sourceEntityID, $destinationEntityID)
-            AND intParentLevel > 3
+            AND intParentLevel > $Defs::LEVEL_CLUB
         ORDER BY intParentLevel ASC
 	];
             #AND intChildLevel = 3
