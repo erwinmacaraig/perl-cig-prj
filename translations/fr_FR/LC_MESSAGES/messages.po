@@ -1702,3 +1702,57 @@ msgstr "Décédé?"
 
 msgid "AUTO_INTROTEXT"
 msgstr "Modifier les données dans les cases ci-dessous tel que requis. Lorsqu"
+
+
+msgid "No outstanding tasks"
+msgstr ""
+
+msgid "The following are the outstanding tasks to be authorised"
+msgstr ""
+
+msgid "Registration Authorisation"
+msgstr ""
+
+"Registration constants 
+
+msgid "Player"
+msgstr ""
+
+msgid "Coach"
+msgstr ""
+
+msgid "Referee"
+msgstr ""
+
+msgid "Amateur"
+msgstr ""
+
+msgid "Professional"
+msgstr ""
+
+msgid "Football"
+msgstr ""
+
+msgid "Beach Soccer"
+msgstr ""
+
+msgid "Futsal"
+msgstr ""
+
+msgid "New Registration"
+msgstr ""
+
+msgid "Renewal"
+msgstr ""
+
+msgid "Amendment"
+msgstr ""
+
+msgid "Transfer"
+msgstr ""
+
+msgid "Senior"
+msgstr ""
+
+msgid "Youth"
+msgstr ""

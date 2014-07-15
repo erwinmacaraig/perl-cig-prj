@@ -1639,5 +1639,55 @@ msgstr "Last Updated"
 msgid "Contact Person 2"
 msgstr "Contact Person 2"
 
-msgid "School Suburb "
-msgstr "School Suburb "
+msgid "No outstanding tasks"
+msgstr "No outstanding tasks"
+
+msgid "The following are the outstanding tasks to be authorised"
+msgstr "The following are the outstanding tasks to be authorised"
+
+msgid "Registration Authorisation"
+msgstr "Registration Authorisation"
+
+"Registration constants 
+
+msgid "Player"
+msgstr "Player"
+
+msgid "Coach"
+msgstr "Coach"
+
+msgid "Referee"
+msgstr "Referee"
+
+msgid "Amateur"
+msgstr "Amateur"
+
+msgid "Professional"
+msgstr "Professional"
+
+msgid "Football"
+msgstr "Football"
+
+msgid "Beach Soccer"
+msgstr "Beach Soccer"
+
+msgid "Futsal"
+msgstr "Futsal"
+
+msgid "New Registration"
+msgstr "New Registration"
+
+msgid "Renewal"
+msgstr "Renewal"
+
+msgid "Amendment"
+msgstr "Amendment"
+
+msgid "Transfer"
+msgstr "Transfer"
+
+msgid "Senior"
+msgstr "Senior"
+
+msgid "Youth"
+msgstr "Youth"
