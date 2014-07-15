@@ -323,7 +323,23 @@ sub getEntityMenuData {
             url => $baseurl."a=AL_",
         };
     }
-
+    my $txt_RequestCLR = $SystemConfig->{'txtRequestCLR'} || 'Request a Clearance';
+if($SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequestClearance'}
+    ) {
+        if(!$Data->{'ReadOnlyLogin'}) {
+            $menuoptions{'newclearance'} = {
+                name => $lang->txt($txt_RequestCLR),
+                url => $baseurl."a=CL_createnew",
+            };
+        }
+        if (
+            $Data->{'ReadOnlyLogin'} or $SystemConfig->{'Overide_ROL_RequestClearance'}) {
+            $menuoptions{'newclearance'} = {
+                name => $lang->txt($txt_RequestCLR),
+                url => $baseurl."a=CL_createnew",
+            };
+        }
+    }
     my @menu_structure = (
         [ $lang->txt('Dashboard'), 'home','home'],
         [ $lang->txt('States'), 'menu','states'],
@@ -335,6 +351,7 @@ sub getEntityMenuData {
         [ $lang->txt('Approvals'), 'menu','approvals'],
         [ $lang->txt('Transfers'), 'menu', [
         'clearances',    
+        'newclearance',    
         'clearancesAll',
         ]],
         [ $lang->txt('Registrations'), 'menu',[
