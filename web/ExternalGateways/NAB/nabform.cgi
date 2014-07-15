@@ -65,7 +65,7 @@ sub NABProcess  {
     $m->add('1234A', $chkvalue);
     $chkvalue = $m->hexdigest();
        
-    my $url = qq[http://elwood/FIFASPOnline/web/nabprocess_dummy.cgi?a=S&amp;client=$client&amp;ext=$external&amp;ci=$logID&amp;chkv=$chkvalue&amp;formID=$formID&amp;session=$session&amp;restext=$respText&amp;rescode=$respCode&amp;txnid=111&amp;authid=123];
+    my $url = qq[http://elwood/FIFASPOnline/web/gatewayprocess_dummy.cgi?a=S&amp;client=$client&amp;ext=$external&amp;ci=$logID&amp;chkv=$chkvalue&amp;formID=$formID&amp;session=$session&amp;restext=$respText&amp;rescode=$respCode&amp;txnid=111&amp;authid=123];
 #    my $url = qq[http://elwood/FIFASPOnline/web/payments_process.cgi?a=S&amp;client=$client&amp;ext=$external&amp;ci=$logID&amp;chkv=$chkv&amp;formID=$formID&amp;session=$session&amp;responsetext=Approved&amp;responsecode=00&amp;txnid=111&amp;authid=123];
 
     my $agent = LWP::UserAgent->new(env_proxy => 1,keep_alive => 1, timeout => 30); 

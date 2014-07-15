@@ -26,7 +26,6 @@ sub handleDuplicates {
 
 	my $body='';
 	$action||='DUPL_L';
-#	my $entityID= $Data->{'clientValues'}{'clubID'}; #getAssocID($Data->{'clientValues'}) || 0;
     my $entityID= getID($Data->{'clientValues'}, $Data->{'clientValues'}{'current_level'}) || 0;
 	if($action eq 'DUPL_U')	{
 		$body=updateDuplicateProblems($Data, $entityID) || '';	
