@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS tblEntityTypes ;
 CREATE table tblEntityTypes (
     intEntityTypeID INT NOT NULL AUTO_INCREMENT,
     intEntityID INT DEFAULT 0,
@@ -10,5 +11,5 @@ CREATE table tblEntityTypes (
 
 PRIMARY KEY (intEntityTypeID),
 KEY index_ID(intEntityID, strSport, strPersonLevel, intGender)
-);
+)DEFAULT CHARSET=utf8;
  

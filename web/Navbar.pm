@@ -217,7 +217,16 @@ sub getEntityMenuData {
             name => $lang->txt('Approvals'),
             url => $baseurl."a=WF_",
         };
-    
+
+        $menuoptions{'entityregistrationallowed'} = {
+            name => $lang->txt('Reg. Allowed'),
+            url => $baseurl."a=ERA_",
+        };
+
+        $menuoptions{'registration'} = {
+            name => $lang->txt('Register'),
+            url => $baseurl."a=REG_",
+        };    
     $menuoptions{'usermanagement'} = {
         name => $lang->txt('User Management'),
         url  => $baseurl."a=AM_",
@@ -349,6 +358,8 @@ if($SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequestCleara
         [ $lang->txt('Venues'), 'menu','venues'],
         [ $lang->txt('People'), 'menu','persons'],
         [ $lang->txt('Approvals'), 'menu','approvals'],
+        [ $lang->txt('Reg. Allowed'), 'menu','entityregistrationallowed'],
+        [ $lang->txt('Registration'), 'menu','registration'],
         [ $lang->txt('Transfers'), 'menu', [
         'clearances',    
         'newclearance',    

@@ -60,6 +60,8 @@ use CheckOnLogin;
 use DashboardConfig;
 
 use WorkFlow;
+use EntityRegistrationAllowedEdit;
+use Register;
 
 use Log;
 use Data::Dumper;
@@ -248,7 +250,12 @@ warn("REALM IS ". $Data{'Realm'});
     elsif ( $action =~ /^WF_/ ) {
         ( $resultHTML, $pageHeading ) = handleWorkflow($action, \%Data);
     }
-
+    elsif ( $action =~ /^ERA_/ ) {
+        ( $resultHTML, $pageHeading ) = handleEntityRegistrationAllowedEdit($action, \%Data);
+    }
+    elsif ( $action =~ /^REG_/ ) {
+        ( $resultHTML, $pageHeading ) = handleRegister($action, \%Data);
+    }
     # BUILD PAGE
     if ( !$report ) {
         $client = setClient( \%clientValues );
