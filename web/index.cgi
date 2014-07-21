@@ -155,6 +155,7 @@ sub loginform	{
 						<p class="instruct">We see you already have <span class="sp-passport">SP Passport</span>. Sign in below to access your <span class="sp-membership">SP Membership</span> database.</p>
 					</span>
 					<span class="spp_loggedout"><span class="button special-button"><a href="user/signup.cgi">Register</a></span></span>
+					<span><p style="padding-top:70px; font-size:16px; margin:8px 0; letter-spacing: -0.5px;"><a href="forgotten_password.cgi">I forgot my password.</a></p></span>
 				</div>
 			</div>
 		</div>
