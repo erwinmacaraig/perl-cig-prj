@@ -2,6 +2,8 @@ DROP TABLE IF EXISTS tblWFRule;
 CREATE TABLE `tblWFRule` (
   `intWFRuleID` int(11) NOT NULL AUTO_INCREMENT,
   `intRealmID` int(11) NOT NULL DEFAULT '0',
+    strEntityType VARCHAR(30) DEFAULT '',
+    intEntityLevel INT DEFAULT 0,
   `intSubRealmID` int(11) NOT NULL DEFAULT '0',
   `strPersonType` varchar(20) NOT NULL DEFAULT '' COMMENT 'PLAYER, COACH, REFEREE',
   `strPersonLevel` varchar(20) NOT NULL DEFAULT '' COMMENT 'AMATEUR,PROFESSIONAL',

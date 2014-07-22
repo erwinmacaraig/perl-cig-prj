@@ -62,6 +62,7 @@ sub listTasks {
             dt.strDocumentName,
 			p.strLocalFirstname, 
             p.strLocalSurname, 
+            e.strLocalName as EntityLocalName,
             p.intPersonID, 
             t.strTaskStatus, 
             uar.userID as UserID, 
@@ -69,6 +70,7 @@ sub listTasks {
             uar.entityID as UserEntityID, 
             uarRejected.entityID as UserRejectedEntityID
 		FROM tblWFTask AS t
+        LEFT JOIN tblEntity as e ON (e.intEntityID = t.intEntityID)
 		LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (t.intPersonRegistrationID = pr.intPersonRegistrationID)
 		LEFT JOIN tblPerson AS p ON (t.intPersonID = p.intPersonID)
 		LEFT JOIN tblUserAuthRole AS uar ON (
@@ -113,6 +115,7 @@ sub listTasks {
 			AgeLevel => $dref->{strAgeLevel},
 			RegistrationNature => $dref->{strRegistrationNature},
 			DocumentName => $dref->{strDocumentName},
+			LocalEntityName=> $dref->{EntityLocalName},
 			LocalFirstname => $dref->{strLocalFirstname},
 			LocalSurname => $dref->{strLocalSurname},
 			PersonID => $dref->{intPersonID},			
@@ -139,7 +142,7 @@ sub listTasks {
 	$body = runTemplate(
 			$Data,
 			\%TemplateData,
-			'dashboards/persontasks.templ',
+			'dashboards/worktasks.templ',
 	);
 	
 
@@ -181,9 +184,15 @@ sub getEntityParentID   {
 sub addTasks {
      my(
         $Data,
-        $personRegistrationID,
+        $entityID,
+        $personID,
+        $personRegistrationID
     ) = @_;
  
+    $entityID ||= 0;
+    $personID ||= 0;
+    $personRegistrationID ||= 0;
+
 	my $q = '';
 	my $db=$Data->{'db'};
 	
@@ -199,10 +208,12 @@ sub addTasks {
 			strTaskStatus, 
 			intProblemResolutionEntityID, 
 			intProblemResolutionRoleID,
+            intEntityID,
 			intPersonID, 
 			intPersonRegistrationID 
 		)
         VALUES (
+            ?,
             ?,
             ?,
             ?,
@@ -222,7 +233,7 @@ sub addTasks {
     my $st = '';
     if ($personRegistrationID)   {
         ## NEed another for a Entity Approval
-        my $st = qq[
+        $st = qq[
 		SELECT 
 			r.intWFRuleID, 
 			r.intRealmID,
@@ -238,18 +249,53 @@ sub addTasks {
 			pr.intPersonRegistrationID,
             pr.intEntityID as RegoEntity
 		FROM tblPersonRegistration_$Data->{'Realm'} AS pr
-		INNER JOIN tblWFRule AS r
-			ON pr.intRealmID = r.intRealmID
+		INNER JOIN tblWFRule AS r ON (
+			pr.intRealmID = r.intRealmID
 			AND pr.intSubRealmID = r.intSubRealmID
 			AND pr.strPersonLevel = r.strPersonLevel
 			AND pr.strAgeLevel = r.strAgeLevel
 			AND pr.strSport = r.strSport
 			AND pr.strRegistrationNature = r.strRegistrationNature
-		WHERE pr.intPersonRegistrationID = ?
+        )
+		WHERE 
+            pr.intPersonRegistrationID = ?
+            AND r.intEntityLevel = 0
+            AND r.strPersonType <> ''
 		];
 	    $q = $db->prepare($st);
   	    $q->execute($personRegistrationID);
     }
+    if ($entityID and ! $personID and ! $personRegistrationID)   {
+        ## NEed another for a Entity Approval
+        $st = qq[
+		SELECT 
+			r.intWFRuleID, 
+			r.intRealmID,
+			r.intSubRealmID,
+			r.intApprovalEntityLevel,
+			r.intApprovalRoleID, 
+			r.strTaskType, 
+			r.intDocumentTypeID, 
+			r.strTaskStatus, 
+			r.intProblemResolutionEntityLevel, 
+			r.intProblemResolutionRoleID,
+            0 as intPersonID,
+            0 as intPersonRegistrationID,
+            e.intEntityID as RegoEntity
+		FROM tblEntity as e
+		INNER JOIN tblWFRule AS r ON (
+			e.intRealmID = r.intRealmID
+			AND e.intSubRealmID = r.intSubRealmID
+            AND r.strPersonType = ''
+			AND e.intEntityLevel = e.intEntityLevel
+            AND e.strEntityType = r.strEntityType
+        )
+		WHERE e.intEntityID= ?
+		];
+	    $q = $db->prepare($st);
+  	    $q->execute($entityID);
+    }
+
 
     while (my $dref= $q->fetchrow_hashref())    {
         my $approvalEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intApprovalEntityLevel'}) || 0;
@@ -266,6 +312,7 @@ sub addTasks {
             $dref->{'strTaskStatus'},
             $problemEntityID,
             $dref->{'intProblemResolutionRoleID'},
+            $entityID,
             $dref->{'intPersonID'},
             $dref->{'intPersonRegistrationID'}
         );
@@ -298,7 +345,7 @@ sub addTasks {
 		return $q->errstr . '<br>' . $st;
 	}
 
-	my $rc = checkForOutstandingTasks($Data,$personRegistrationID);
+	my $rc = checkForOutstandingTasks($Data,$entityID, $personID, $personRegistrationID);
 
 	return($rc); 
 }
@@ -335,7 +382,10 @@ sub approveTask {
 	}
 	
     $st = qq[
-        SELECT intPersonRegistrationID
+        SELECT 
+            intPersonID,
+            intPersonRegistrationID,
+            intEntityID
         FROM tblWFTask
         WHERE intWFTaskID = ?
     ];
@@ -344,9 +394,11 @@ sub approveTask {
     $q->execute($WFTaskID);
             
     my $dref= $q->fetchrow_hashref();
+    my $personID = $dref->{intPersonID};
     my $personRegistrationID = $dref->{intPersonRegistrationID};
+    my $entityID= $dref->{intEntityID};
     
-   	my $rc = checkForOutstandingTasks($Data,$personRegistrationID);
+   	my $rc = checkForOutstandingTasks($Data,$entityID, $personID, $personRegistrationID);
     
     return($rc);
     
@@ -355,7 +407,9 @@ sub approveTask {
 sub checkForOutstandingTasks {
     my(
         $Data,
-        $PersonRegistrationID,
+        $entityID,
+        $personID,
+        $personRegistrationID,
     ) = @_;
 
 	my $st = '';
@@ -370,18 +424,23 @@ sub checkForOutstandingTasks {
 		FROM tblWFTask pt
 		INNER JOIN tblWFTaskPreReq ptpr ON pt.intWFTaskID = ptpr.intWFTaskID
 		INNER JOIN tblWFTask ct on ptpr.intPreReqWFRuleID = ct.intWFRuleID 
-		WHERE pt.intPersonRegistrationID = ? 
-			AND pt.strTaskStatus = ?
-			AND ct.intPersonRegistrationID = ?
+        WHERE
+			pt.strTaskStatus = ?
+		    AND (pt.intPersonRegistrationID = ? AND pt.intEntityID = ? AND pt.intPersonID = ?)
+			AND (ct.intPersonRegistrationID = ? AND ct.intEntityID = ? AND ct.intPersonID = ?)
 			AND ct.strTaskStatus IN (?,?)
 		ORDER by pt.intWFTaskID;
 	];
 	
 	$q = $db->prepare($st);
   	$q->execute(
-  		$PersonRegistrationID,
   		'PENDING',
-  		$PersonRegistrationID,
+  		$personRegistrationID,
+        $entityID,
+        $personID,
+  		$personRegistrationID,
+        $entityID,
+        $personID,
   		'ACTIVE',
   		'COMPLETE',
   		);
@@ -454,17 +513,37 @@ sub checkForOutstandingTasks {
             FROM 
                 tblWFTask
             WHERE 
-                intPersonRegistrationID = ?
+                intPersonID = ?
+                AND intPersonRegistrationID = ?
+                AND intEntityID= ?
 			    AND strTaskStatus IN ('PENDING','ACTIVE')
         ];
         
         $q = $db->prepare($st);
         $q->execute(
-       		$PersonRegistrationID
+            $personID,
+       		$personRegistrationID,
+            $entityID
 	  	);
   
         
-        if (!$q->fetchrow_array()) {
+        if ($entityID and !$q->fetchrow_array() and (!$personID and !$personRegistrationID)) {
+            $st = qq[
+                    UPDATE tblEntity
+                    SET
+                        strStatus = 'ACTIVE',
+                        dtFrom = Now()
+                    WHERE
+                        intEntityID= ?
+                ];
+
+                $q = $db->prepare($st);
+                $q->execute(
+                    $entityID
+                    );
+                $rc = 1;
+        }
+        if ($personRegistrationID and !$q->fetchrow_array()) {
         	#Now check to see if there is a payment outstanding
         	$st = qq[
 			        SELECT intPaymentRequired
@@ -473,7 +552,7 @@ sub checkForOutstandingTasks {
 			];
 			        
 			$q = $db->prepare($st);
-			$q->execute($PersonRegistrationID);
+			$q->execute($personRegistrationID);
 			            
 			my $dref= $q->fetchrow_hashref();
 			my $intPaymentRequired = $dref->{intPaymentRequired};
@@ -491,7 +570,7 @@ sub checkForOutstandingTasks {
 	    
 		        $q = $db->prepare($st);
 		        $q->execute(
-		       		$PersonRegistrationID
+		       		$personRegistrationID
 		  			);         
 	        	$rc = 1;	# All registration tasks have been completed        		
         	}
