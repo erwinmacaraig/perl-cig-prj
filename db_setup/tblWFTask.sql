@@ -17,6 +17,7 @@ CREATE TABLE `tblWFTask` (
   `dtApprovalDate` datetime DEFAULT NULL COMMENT 'What date was this task approved',
   `intRejectedUserID` int(11) DEFAULT NULL,
   `dtRejectedDate` datetime DEFAULT NULL,
+  `intEntityID` int(11) NOT NULL DEFAULT '0' COMMENT 'The entity who is registering',
   `intPersonID` int(11) NOT NULL DEFAULT '0' COMMENT 'The person who is registering',
   `intPersonRegistrationID` int(11) NOT NULL DEFAULT '0' COMMENT 'Foreign key to the registration that triggered this task',
   `tTimeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

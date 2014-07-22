@@ -797,6 +797,10 @@ sub getClubMenuData {
                     url => $baseurl."a=PR_",
                 };
             }   
+        $menuoptions{'approvals'} = {
+            name => $lang->txt('Approvals'),
+            url => $baseurl."a=WF_",
+        };
             if (
                 $Data->{'SystemConfig'}{'AllowOnlineRego'}
                     or $Data-> {'Permissions'}{'OtherOptions'}{'AllowOnlineRego'}
@@ -853,6 +857,7 @@ sub getClubMenuData {
         ]],
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu','venues'],
         [ $lang->txt('Registrations'), 'menu',[
+        'approvals',
         'registrationforms',
         'transactions',
         'locator',
