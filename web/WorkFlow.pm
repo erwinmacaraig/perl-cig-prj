@@ -231,8 +231,9 @@ sub addTasks {
 	my $qINS = $db->prepare($stINS);
             
     my $st = '';
+    ## Build up SELECT based on what sort of record we are approving
     if ($personRegistrationID)   {
-        ## NEed another for a Entity Approval
+        ## APPROVAL FOR PERSON REGO
         $st = qq[
 		SELECT 
 			r.intWFRuleID, 
@@ -256,6 +257,7 @@ sub addTasks {
 			AND pr.strAgeLevel = r.strAgeLevel
 			AND pr.strSport = r.strSport
 			AND pr.strRegistrationNature = r.strRegistrationNature
+            AND pr.strPersonType = r.strPersonType
         )
 		WHERE 
             pr.intPersonRegistrationID = ?
@@ -266,7 +268,7 @@ sub addTasks {
   	    $q->execute($personRegistrationID);
     }
     if ($entityID and ! $personID and ! $personRegistrationID)   {
-        ## NEed another for a Entity Approval
+        ## APPROVAL FOR ENTITY
         $st = qq[
 		SELECT 
 			r.intWFRuleID, 
