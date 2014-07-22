@@ -29,6 +29,7 @@ CREATE TABLE tblPersonRegistration_XX (
     intNationalPeriodID INT NOT NULL DEFAULT 0,
     intAgeGroupID  INT NOT NULL DEFAULT 0,
     tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    intPaymentRequired TINYINT DEFAULT 0
 
   PRIMARY KEY  (intPersonRegistrationID),
   KEY index_intPersonID (intPersonID),
