@@ -203,7 +203,10 @@ sub addTasks {
     ];
 	my $qINS = $db->prepare($stINS);
             
-    my $st = qq[
+    my $st = '';
+    if ($personRegistrationID)   {
+        ## NEed another for a Entity Approval
+        my $st = qq[
 		SELECT 
 			r.intWFRuleID, 
 			r.intRealmID,
@@ -217,7 +220,7 @@ sub addTasks {
 			r.intProblemResolutionRoleID,
 			pr.intPersonID, 
 			pr.intPersonRegistrationID,
-            pr.intEntityID as PersonRegoEntity
+            pr.intEntityID as RegoEntity
 		FROM tblPersonRegistration_$Data->{'Realm'} AS pr
 		INNER JOIN tblWFRule AS r
 			ON pr.intRealmID = r.intRealmID
@@ -228,12 +231,13 @@ sub addTasks {
 			AND pr.strRegistrationNature = r.strRegistrationNature
 		WHERE pr.intPersonRegistrationID = ?
 		];
-		
-	$q = $db->prepare($st);
-  	$q->execute($personRegistrationID);
+	    $q = $db->prepare($st);
+  	    $q->execute($personRegistrationID);
+    }
+
     while (my $dref= $q->fetchrow_hashref())    {
-        my $approvalEntityID = getEntityParentID($Data, $dref->{PersonRegoEntity}, $dref->{'intApprovalEntityLevel'}) || 0;
-        my $problemEntityID = getEntityParentID($Data, $dref->{PersonRegoEntity}, $dref->{'intProblemResolutionEntityLevel'});
+        my $approvalEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intApprovalEntityLevel'}) || 0;
+        my $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intProblemResolutionEntityLevel'});
         next if (! $approvalEntityID and ! $problemEntityID);
   	    $qINS->execute(
             $dref->{'intWFRuleID'},
