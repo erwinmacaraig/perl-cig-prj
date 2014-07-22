@@ -214,7 +214,7 @@ sub getEntityMenuData {
 
 
         $menuoptions{'approvals'} = {
-            name => $lang->txt('Approvals'),
+            name => $lang->txt('Work Tasks'),
             url => $baseurl."a=WF_",
         };
 
@@ -357,7 +357,7 @@ if($SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequestCleara
         [ $lang->txt('Clubs'), 'menu','clubs'],
         [ $lang->txt('Venues'), 'menu','venues'],
         [ $lang->txt('People'), 'menu','persons'],
-        [ $lang->txt('Approvals'), 'menu','approvals'],
+        [ $lang->txt('Work Tasks'), 'menu','approvals'],
         [ $lang->txt('Reg. Allowed'), 'menu','entityregistrationallowed'],
         [ $lang->txt('Registration'), 'menu','registration'],
         [ $lang->txt('Transfers'), 'menu', [
@@ -798,7 +798,7 @@ sub getClubMenuData {
                 };
             }   
         $menuoptions{'approvals'} = {
-            name => $lang->txt('Approvals'),
+            name => $lang->txt('Work Tasks'),
             url => $baseurl."a=WF_",
         };
             if (
@@ -856,8 +856,8 @@ sub getClubMenuData {
         'pendingregistration',
         ]],
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu','venues'],
+        [ $lang->txt('Work Tasks'), 'menu','approvals'],
         [ $lang->txt('Registrations'), 'menu',[
-        'approvals',
         'registrationforms',
         'transactions',
         'locator',

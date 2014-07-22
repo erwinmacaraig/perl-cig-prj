@@ -49,17 +49,33 @@ sub listTasks {
 	my $db=$Data->{'db'};
 	
 	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
-warn("CURRENT: $entityID");
 	
     $st = qq[
-		SELECT t.intWFTaskID, t.strTaskStatus, t.strTaskType, pr.strPersonLevel, pr.strAgeLevel, pr.strSport, 
-			pr.strRegistrationNature, dt.strDocumentName,
-			p.strLocalFirstname, p.strLocalSurname, p.intPersonID, t.strTaskStatus, uar.userID as UserID, uarRejected.userID as RejectedUserID, uar.entityID as UserEntityID, uarRejected.entityID as UserRejectedEntityID
+		SELECT 
+            t.intWFTaskID, 
+            t.strTaskStatus, 
+            t.strTaskType, 
+            pr.strPersonLevel, 
+            pr.strAgeLevel, 
+            pr.strSport, 
+			pr.strRegistrationNature, 
+            dt.strDocumentName,
+			p.strLocalFirstname, 
+            p.strLocalSurname, 
+            p.intPersonID, 
+            t.strTaskStatus, 
+            uar.userID as UserID, 
+            uarRejected.userID as RejectedUserID, 
+            uar.entityID as UserEntityID, 
+            uarRejected.entityID as UserRejectedEntityID
 		FROM tblWFTask AS t
-		LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON t.intPersonRegistrationID = pr.intPersonRegistrationID
-		LEFT JOIN tblPerson AS p on t.intPersonID = p.intPersonID
-		LEFT JOIN tblUserAuthRole AS uar ON t.intApprovalEntityID = uar.entityID AND t.intApprovalRoleID = uar.roleId
-		LEFT OUTER JOIN tblDocumentType AS dt ON t.intDocumentTypeID = dt.intDocumentTypeID
+		LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (t.intPersonRegistrationID = pr.intPersonRegistrationID)
+		LEFT JOIN tblPerson AS p ON (t.intPersonID = p.intPersonID)
+		LEFT JOIN tblUserAuthRole AS uar ON (
+            t.intApprovalEntityID = uar.entityID 
+            AND t.intApprovalRoleID = uar.roleId
+        )
+		LEFT OUTER JOIN tblDocumentType AS dt ON (t.intDocumentTypeID = dt.intDocumentTypeID)
 		LEFT JOIN tblUserAuthRole AS uarRejected ON (
             t.intProblemResolutionEntityID = uarRejected.entityID 
 			AND t.intProblemResolutionRoleID = uarRejected.roleId
@@ -433,10 +449,13 @@ sub checkForOutstandingTasks {
 	else {	
 		# Nothing to update. Do a check to see if all tasks have been completed
 		$st = qq[
-            SELECT count(*) as NumRows
-            FROM tblWFTask
-            WHERE intPersonRegistrationID = ?
-			AND strTaskStatus IN ('PENDING','ACTIVE')
+            SELECT 
+                COUNT(*) as NumRows
+            FROM 
+                tblWFTask
+            WHERE 
+                intPersonRegistrationID = ?
+			    AND strTaskStatus IN ('PENDING','ACTIVE')
         ];
         
         $q = $db->prepare($st);
@@ -462,10 +481,12 @@ sub checkForOutstandingTasks {
         	if (!$intPaymentRequired) {
         		#Nothing outstanding, so mark this registration as complete
 	            $st = qq[
-	            	UPDATE tblPersonRegistration_$Data->{'Realm'} SET
-	            	strStatus = 'ACTIVE',
-	            	dtFrom = Now()
-	    	        WHERE intPersonRegistrationID = ?
+	            	UPDATE tblPersonRegistration_$Data->{'Realm'} 
+                    SET
+	            	    strStatus = 'ACTIVE',
+	            	    dtFrom = Now()
+	    	        WHERE 
+                        intPersonRegistrationID = ?
 	        	];
 	    
 		        $q = $db->prepare($st);
@@ -495,12 +516,14 @@ sub rejectTask {
 	
 	#Update this task to REJECTED
 	$st = qq[
-	  	UPDATE tblWFTask SET 
+	  	UPDATE tblWFTask 
+        SET 
 	  		strTaskStatus = 'REJECTED',
 	  		dtRejectedDate = Now(),
 	  		intRejectedUserID = ?
-	  	WHERE intWFTaskID = ?; 
-		];
+	  	WHERE 
+            intWFTaskID = ?; 
+    ];
 		
   	$q = $db->prepare($st);
   	$q->execute(
