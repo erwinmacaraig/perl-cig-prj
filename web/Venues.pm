@@ -13,6 +13,7 @@ use CGI qw(unescape param);
 use FormHelpers;
 use GridDisplay;
 use Log;
+use WorkFlow;
 require RecordTypeFilter;
 
 sub handleVenues    {
@@ -656,6 +657,7 @@ sub postVenueAdd {
       my $query = $db->prepare($st);
       $query->execute($entityID, $id);
       $query->finish();
+        my $rc = addTasks($Data,$entityID, 0,0);
     }
 
     {
