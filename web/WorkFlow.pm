@@ -99,7 +99,7 @@ sub listTasks {
 			WFTaskID => $dref->{intWFTaskID},
 			TaskType => $dref->{strTaskType},
 			AgeLevel => $dref->{strAgeLevel},
-			RegistrationNature => $dref->{intRegistrationNature},
+			RegistrationNature => $dref->{strRegistrationNature},
 			DocumentName => $dref->{strDocumentName},
 			LocalFirstname => $dref->{strLocalFirstname},
 			LocalSurname => $dref->{strLocalSurname},

@@ -22,6 +22,6 @@ CREATE TABLE `tblWFTask` (
   `tTimeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`intWFTaskID`),
   KEY `index_intEntityID` (`intApprovalRoleID`),
-    KEY index_WFRule (intWFRule),
+    KEY index_WFRule (intWFRuleID),
     KEY index_intRealmID (intRealmID, intSubRealmID)
 ) DEFAULT CHARSET=utf8 COMMENT='A list of tasks associated with a Role at an Entity. For a single registration there could be multiple tasks. tblWFTask rows are inserted on a one to one ration with rows from tblWFRule';
