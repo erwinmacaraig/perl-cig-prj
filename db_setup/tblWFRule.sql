@@ -18,5 +18,6 @@ CREATE TABLE `tblWFRule` (
   `intProblemResolutionEntityID` int(11) NOT NULL DEFAULT '0',
   `tTimeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`intWFRuleID`),
-  KEY `Entity` (`intWFRuleID`)
+  KEY `Entity` (`intWFRuleID`),
+    KEY index_intRealmID (intRealmID, intSubRealmID)
 ) DEFAULT CHARSET=utf8 COMMENT='Defines the flow of approvals for a registration. One set of rules per Realm. Within Realm there is one row for each combination of PersonType, Level, Sport, Nature, AgeLevel';

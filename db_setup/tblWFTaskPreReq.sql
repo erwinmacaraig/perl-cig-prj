@@ -6,5 +6,6 @@ CREATE TABLE `tblWFTaskPreReq` (
   `intPreReqWFRuleID` int(11) NOT NULL DEFAULT '0',
   `tTimeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`intWFTaskPreReqID`),
+    KEY index_WFRule (intWFRuleID),
   KEY `index_intEntityID` (`intWFTaskID`)
 ) DEFAULT CHARSET=utf8;
