@@ -184,14 +184,17 @@ sub getEntityParentID   {
 sub addTasks {
      my(
         $Data,
+        $ruleFor,
         $entityID,
         $personID,
-        $personRegistrationID
+        $personRegistrationID,
+        $documentID
     ) = @_;
  
     $entityID ||= 0;
     $personID ||= 0;
     $personRegistrationID ||= 0;
+    $documentID ||= 0;
 
 	my $q = '';
 	my $db=$Data->{'db'};
@@ -210,9 +213,11 @@ sub addTasks {
 			intProblemResolutionRoleID,
             intEntityID,
 			intPersonID, 
-			intPersonRegistrationID 
+			intPersonRegistrationID,
+            intDocumentID
 		)
         VALUES (
+            ?,
             ?,
             ?,
             ?,
@@ -232,7 +237,7 @@ sub addTasks {
             
     my $st = '';
     ## Build up SELECT based on what sort of record we are approving
-    if ($personRegistrationID)   {
+    if ($ruleFor eq 'REGO' and $personRegistrationID)   {
         ## APPROVAL FOR PERSON REGO
         $st = qq[
 		SELECT 
@@ -248,7 +253,8 @@ sub addTasks {
 			r.intProblemResolutionRoleID,
 			pr.intPersonID, 
 			pr.intPersonRegistrationID,
-            pr.intEntityID as RegoEntity
+            pr.intEntityID as RegoEntity,
+            0 as DocumentID
 		FROM tblPersonRegistration_$Data->{'Realm'} AS pr
 		INNER JOIN tblWFRule AS r ON (
 			pr.intRealmID = r.intRealmID
@@ -262,12 +268,12 @@ sub addTasks {
 		WHERE 
             pr.intPersonRegistrationID = ?
             AND r.intEntityLevel = 0
-            AND r.strPersonType <> ''
+            AND r.strWFRuleFor = 'REGO'
 		];
 	    $q = $db->prepare($st);
-  	    $q->execute($personRegistrationID);
+  	    $q->execute($personRegistrationID, $ruleFor);
     }
-    if ($entityID and ! $personID and ! $personRegistrationID)   {
+    if ($ruleFor eq 'ENTITY' and $entityID)  {
         ## APPROVAL FOR ENTITY
         $st = qq[
 		SELECT 
@@ -283,7 +289,8 @@ sub addTasks {
 			r.intProblemResolutionRoleID,
             0 as intPersonID,
             0 as intPersonRegistrationID,
-            e.intEntityID as RegoEntity
+            e.intEntityID as RegoEntity,
+            0 as DocumentID
 		FROM tblEntity as e
 		INNER JOIN tblWFRule AS r ON (
 			e.intRealmID = r.intRealmID
@@ -293,10 +300,41 @@ sub addTasks {
             AND e.strEntityType = r.strEntityType
         )
 		WHERE e.intEntityID= ?
+            AND r.strWFRuleFor = 'ENTITY'
 		];
 	    $q = $db->prepare($st);
   	    $q->execute($entityID);
     }
+    if ($ruleFor eq 'DOCUMENT' and $documentID)    {
+        ## APPROVAL FOR DOCUMENT
+        $st = qq[
+		SELECT 
+			r.intWFRuleID, 
+			r.intRealmID,
+			r.intSubRealmID,
+			r.intApprovalEntityLevel,
+			r.intApprovalRoleID, 
+			r.strTaskType, 
+			r.intDocumentTypeID, 
+			r.strTaskStatus, 
+			r.intProblemResolutionEntityLevel, 
+			r.intProblemResolutionRoleID,
+            0 as intPersonID,
+            0 as intPersonRegistrationID,
+            e.intEntityID as RegoEntity,
+            d.intDocumentID as DocumentID
+		FROM tblDocuments as d 
+		INNER JOIN tblWFRule AS r ON (
+            d.intDocumentTypeID = r.intDocumentTypeID
+            AND d.intEntityLevel = r.intEntityLevel
+        )
+		WHERE d.intDocumentID = ?
+            AND r.strWFRuleFor = 'DOCUMENT'
+		];
+	    $q = $db->prepare($st);
+  	    $q->execute($documentID);
+    }
+
 
 
     while (my $dref= $q->fetchrow_hashref())    {
@@ -316,7 +354,8 @@ sub addTasks {
             $dref->{'intProblemResolutionRoleID'},
             $entityID,
             $dref->{'intPersonID'},
-            $dref->{'intPersonRegistrationID'}
+            $dref->{'intPersonRegistrationID'},
+            $dref->{'DocumentID'}
         );
 
     }

@@ -109,7 +109,7 @@ sub addRegistration {
 	}
   	my $personRegistrationID = $q->{mysql_insertid};
   	
-  	my $rc = addTasks($Data,0,0,$personRegistrationID);
+  	my $rc = addTasks($Data,'REGO', 0,0,$personRegistrationID, 0);
   	
  	return ($personRegistrationID, $rc) ;
 
