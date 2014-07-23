@@ -272,9 +272,11 @@ sub addTasks {
             pr.intPersonRegistrationID = ?
             AND r.intEntityLevel = 0
             AND r.strWFRuleFor = 'REGO'
+            AND r.intRealmID = ?
+            AND r.intSubRealmID IN (0, ?)
 		];
 	    $q = $db->prepare($st);
-  	    $q->execute($personRegistrationID);
+  	    $q->execute($personRegistrationID, $Data->{'Realm'}, $Data->{'RealmSubType'});
     }
     if ($ruleFor eq 'ENTITY' and $entityID)  {
         ## APPROVAL FOR ENTITY
@@ -305,9 +307,11 @@ sub addTasks {
         )
 		WHERE e.intEntityID= ?
             AND r.strWFRuleFor = 'ENTITY'
+            AND r.intRealmID = ?
+            AND r.intSubRealmID IN (0, ?)
 		];
 	    $q = $db->prepare($st);
-  	    $q->execute($entityID);
+  	    $q->execute($entityID, $Data->{'Realm'}, $Data->{'RealmSubType'});
     }
     if ($ruleFor eq 'DOCUMENT' and $documentID)    {
         ## APPROVAL FOR DOCUMENT
@@ -335,9 +339,11 @@ sub addTasks {
         )
 		WHERE d.intDocumentID = ?
             AND r.strWFRuleFor = 'DOCUMENT'
+            AND r.intRealmID = ?
+            AND r.intSubRealmID IN (0, ?)
 		];
 	    $q = $db->prepare($st);
-  	    $q->execute($documentID);
+  	    $q->execute($documentID, $Data->{'Realm'}, $Data->{'RealmSubType'});
     }
 
 
@@ -432,7 +438,9 @@ sub approveTask {
         SELECT 
             intPersonID,
             intPersonRegistrationID,
-            intEntityID
+            intEntityID,
+            intDocumentID,
+            strWFRuleFor
         FROM tblWFTask
         WHERE intWFTaskID = ?
     ];
@@ -441,11 +449,13 @@ sub approveTask {
     $q->execute($WFTaskID);
             
     my $dref= $q->fetchrow_hashref();
-    my $personID = $dref->{intPersonID};
-    my $personRegistrationID = $dref->{intPersonRegistrationID};
-    my $entityID= $dref->{intEntityID};
+    my $personID = $dref->{intPersonID} || 0;
+    my $personRegistrationID = $dref->{intPersonRegistrationID} || 0;
+    my $entityID= $dref->{intEntityID} || 0;
+    my $documentID= $dref->{intDocumentID} || 0;
+    my $ruleFor = $dref->{strWFRuleFor} || '';
     
-   	my $rc = checkForOutstandingTasks($Data,$entityID, $personID, $personRegistrationID);
+   	my $rc = checkForOutstandingTasks($Data,$ruleFor, $entityID, $personID, $personRegistrationID, $documentID);
     
     return($rc);
     
@@ -454,9 +464,11 @@ sub approveTask {
 sub checkForOutstandingTasks {
     my(
         $Data,
+        $ruleFor,
         $entityID,
         $personID,
         $personRegistrationID,
+        $documentID
     ) = @_;
 
 	my $st = '';
@@ -473,9 +485,11 @@ sub checkForOutstandingTasks {
 		INNER JOIN tblWFTask ct on ptpr.intPreReqWFRuleID = ct.intWFRuleID 
         WHERE
 			pt.strTaskStatus = ?
-		    AND (pt.intPersonRegistrationID = ? AND pt.intEntityID = ? AND pt.intPersonID = ?)
-			AND (ct.intPersonRegistrationID = ? AND ct.intEntityID = ? AND ct.intPersonID = ?)
+		    AND (pt.intPersonRegistrationID = ? AND pt.intEntityID = ? AND pt.intPersonID = ? and pt.intDocumentID = ?)
+			AND (ct.intPersonRegistrationID = ? AND ct.intEntityID = ? AND ct.intPersonID = ? and ct.intDocumentID = ?)
 			AND ct.strTaskStatus IN (?,?)
+            AND pt.strWFRuleFor = ?
+            AND ct.strWFRuleFor = ?
 		ORDER by pt.intWFTaskID;
 	];
 	
@@ -485,11 +499,15 @@ sub checkForOutstandingTasks {
   		$personRegistrationID,
         $entityID,
         $personID,
+        $documentID,
   		$personRegistrationID,
         $entityID,
         $personID,
+        $documentID,
   		'ACTIVE',
   		'COMPLETE',
+        $ruleFor,
+        $ruleFor,
   		);
   		
 	if ($q->errstr) {
@@ -563,6 +581,8 @@ sub checkForOutstandingTasks {
                 intPersonID = ?
                 AND intPersonRegistrationID = ?
                 AND intEntityID= ?
+                AND intDocumentID = ?
+                AND strWFRUleFor = ?
 			    AND strTaskStatus IN ('PENDING','ACTIVE')
         ];
         
@@ -570,11 +590,13 @@ sub checkForOutstandingTasks {
         $q->execute(
             $personID,
        		$personRegistrationID,
-            $entityID
+            $entityID,
+            $documentID,
+            $ruleFor
 	  	);
   
         
-        if ($entityID and !$q->fetchrow_array() and (!$personID and !$personRegistrationID)) {
+        if ($ruleFor eq 'ENTITY' and $entityID and !$q->fetchrow_array())   {
             $st = qq[
                     UPDATE tblEntity
                     SET
@@ -590,7 +612,24 @@ sub checkForOutstandingTasks {
                     );
                 $rc = 1;
         }
-        if ($personRegistrationID and !$q->fetchrow_array()) {
+        if ($ruleFor eq 'DOCUMENT' and $documentID and !$q->fetchrow_array())   {
+            $st = qq[
+                    UPDATE tblDocuments
+                    SET
+                        strApprovalStatus = 'ACTIVE',
+                        dtFrom = Now()
+                    WHERE
+                        intDocumentID= ?
+                ];
+
+                $q = $db->prepare($st);
+                $q->execute(
+                    $documentID
+                );
+                $rc = 1;
+        }
+ 
+        if ($ruleFor eq 'REGO' and $personRegistrationID and !$q->fetchrow_array()) {
         	#Now check to see if there is a payment outstanding
         	$st = qq[
 			        SELECT intPaymentRequired
