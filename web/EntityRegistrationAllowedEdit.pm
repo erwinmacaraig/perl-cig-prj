@@ -66,10 +66,10 @@ sub rule_details   {
 
     my $field = loadRuleDetails($Data->{'db'}, $Data, $entityID) || ();
 my %genderoptions = ();
-    for my $k ( keys %Defs::PersonGenderInfo ) {
+    for my $k ( keys %Defs::genderInfo ) {
         next if !$k;
-        next if ( $Data->{'SystemConfig'}{'NoUnspecifiedGender'} and $k eq $Defs::GENDER_NONE );
-        $genderoptions{$k} = $Defs::PersonGenderInfo{$k} || '';
+        next if ($k eq $Defs::GENDER_NONE );
+        $genderoptions{$k} = $Defs::genderInfo{$k} || '';
     }
     
     my %FieldDefinitions = (

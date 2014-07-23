@@ -185,6 +185,7 @@ sub addTasks {
      my(
         $Data,
         $ruleFor,
+        $originLevel,
         $entityID,
         $personID,
         $personRegistrationID,
@@ -193,6 +194,7 @@ sub addTasks {
  
     $entityID ||= 0;
     $personID ||= 0;
+    $originLevel ||= 0;
     $personRegistrationID ||= 0;
     $documentID ||= 0;
 
@@ -270,13 +272,13 @@ sub addTasks {
         )
 		WHERE 
             pr.intPersonRegistrationID = ?
-            AND r.intEntityLevel = 0
             AND r.strWFRuleFor = 'REGO'
             AND r.intRealmID = ?
             AND r.intSubRealmID IN (0, ?)
+            AND r.intOriginLevel = ?
 		];
 	    $q = $db->prepare($st);
-  	    $q->execute($personRegistrationID, $Data->{'Realm'}, $Data->{'RealmSubType'});
+  	    $q->execute($personRegistrationID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel);
     }
     if ($ruleFor eq 'ENTITY' and $entityID)  {
         ## APPROVAL FOR ENTITY
@@ -309,9 +311,10 @@ sub addTasks {
             AND r.strWFRuleFor = 'ENTITY'
             AND r.intRealmID = ?
             AND r.intSubRealmID IN (0, ?)
+            AND r.intOriginLevel = ?
 		];
 	    $q = $db->prepare($st);
-  	    $q->execute($entityID, $Data->{'Realm'}, $Data->{'RealmSubType'});
+  	    $q->execute($entityID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel);
     }
     if ($ruleFor eq 'DOCUMENT' and $documentID)    {
         ## APPROVAL FOR DOCUMENT
@@ -341,9 +344,10 @@ sub addTasks {
             AND r.strWFRuleFor = 'DOCUMENT'
             AND r.intRealmID = ?
             AND r.intSubRealmID IN (0, ?)
+            AND r.intOriginLevel = ?
 		];
 	    $q = $db->prepare($st);
-  	    $q->execute($documentID, $Data->{'Realm'}, $Data->{'RealmSubType'});
+  	    $q->execute($documentID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel);
     }
 
 
