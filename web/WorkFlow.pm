@@ -65,23 +65,15 @@ sub listTasks {
             e.strLocalName as EntityLocalName,
             p.intPersonID, 
             t.strTaskStatus, 
-            uar.userID as UserID, 
-            uarRejected.userID as RejectedUserID, 
             uar.entityID as UserEntityID, 
             uarRejected.entityID as UserRejectedEntityID
 		FROM tblWFTask AS t
         LEFT JOIN tblEntity as e ON (e.intEntityID = t.intEntityID)
 		LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (t.intPersonRegistrationID = pr.intPersonRegistrationID)
 		LEFT JOIN tblPerson AS p ON (t.intPersonID = p.intPersonID)
-		LEFT JOIN tblUserAuthRole AS uar ON (
-            t.intApprovalEntityID = uar.entityID 
-            AND t.intApprovalRoleID = uar.roleId
-        )
+		LEFT JOIN tblUserAuthRole AS uar ON ( t.intApprovalEntityID = uar.entityID )
 		LEFT OUTER JOIN tblDocumentType AS dt ON (t.intDocumentTypeID = dt.intDocumentTypeID)
-		LEFT JOIN tblUserAuthRole AS uarRejected ON (
-            t.intProblemResolutionEntityID = uarRejected.entityID 
-			AND t.intProblemResolutionRoleID = uarRejected.roleId
-        )
+		LEFT JOIN tblUserAuthRole AS uarRejected ON ( t.intProblemResolutionEntityID = uarRejected.entityID )
 		WHERE 
 			t.strTaskStatus IN ('ACTIVE', 'REJECTED')
 			AND (
@@ -89,6 +81,10 @@ sub listTasks {
                 OR intProblemResolutionEntityID=?
             )
     ];
+            #uar.userID as UserID, 
+            #uarRejected.userID as RejectedUserID, 
+            #AND t.intApprovalRoleID = uar.roleId
+			#AND t.intProblemResolutionRoleID = uarRejected.roleId
             #AND
             #(
             #    uar.userID = ? 
@@ -207,21 +203,17 @@ sub addTasks {
 			intRealmID,
 			intSubRealmID, 
 			intApprovalEntityID,
-			intApprovalRoleID, 
 			strTaskType, 
             strWFRuleFor,
 			intDocumentTypeID, 
 			strTaskStatus, 
 			intProblemResolutionEntityID, 
-			intProblemResolutionRoleID,
             intEntityID,
 			intPersonID, 
 			intPersonRegistrationID,
             intDocumentID
 		)
         VALUES (
-            ?,
-            ?,
             ?,
             ?,
             ?,
@@ -249,18 +241,17 @@ sub addTasks {
 			r.intRealmID,
 			r.intSubRealmID,
 			r.intApprovalEntityLevel,
-			r.intApprovalRoleID, 
 			r.strTaskType, 
             r.strWFRuleFor,
 			r.intDocumentTypeID, 
 			r.strTaskStatus, 
 			r.intProblemResolutionEntityLevel, 
-			r.intProblemResolutionRoleID,
 			pr.intPersonID, 
 			pr.intPersonRegistrationID,
             pr.intEntityID as RegoEntity,
             0 as DocumentID
 		FROM tblPersonRegistration_$Data->{'Realm'} AS pr
+            LEFT JOIN tblEntity as e ON (e.intEntityID = pr.intEntityID)
 		INNER JOIN tblWFRule AS r ON (
 			pr.intRealmID = r.intRealmID
 			AND pr.intSubRealmID = r.intSubRealmID
@@ -276,6 +267,7 @@ sub addTasks {
             AND r.intRealmID = ?
             AND r.intSubRealmID IN (0, ?)
             AND r.intOriginLevel = ?
+            AND r.strEntityType IN ('', e.strEntityType)
 		];
 	    $q = $db->prepare($st);
   	    $q->execute($personRegistrationID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel);
@@ -288,13 +280,11 @@ sub addTasks {
 			r.intRealmID,
 			r.intSubRealmID,
 			r.intApprovalEntityLevel,
-			r.intApprovalRoleID, 
 			r.strTaskType, 
             r.strWFRuleFor,
 			r.intDocumentTypeID, 
 			r.strTaskStatus, 
 			r.intProblemResolutionEntityLevel, 
-			r.intProblemResolutionRoleID,
             0 as intPersonID,
             0 as intPersonRegistrationID,
             e.intEntityID as RegoEntity,
@@ -324,13 +314,11 @@ sub addTasks {
 			r.intRealmID,
 			r.intSubRealmID,
 			r.intApprovalEntityLevel,
-			r.intApprovalRoleID, 
 			r.strTaskType, 
             r.strWFRuleFor,
 			r.intDocumentTypeID, 
 			r.strTaskStatus, 
 			r.intProblemResolutionEntityLevel, 
-			r.intProblemResolutionRoleID,
             0 as intPersonID,
             0 as intPersonRegistrationID,
             e.intEntityID as RegoEntity,
@@ -361,13 +349,11 @@ sub addTasks {
             $dref->{'intRealmID'},
             $dref->{'intSubRealmID'},
             $approvalEntityID,
-            $dref->{'intApprovalRoleID'},
             $dref->{'strTaskType'},
             $dref->{'strWFRuleFor'},
             $dref->{'intDocumentTypeID'},
             $dref->{'strTaskStatus'},
             $problemEntityID,
-            $dref->{'intProblemResolutionRoleID'},
             $entityID,
             $dref->{'intPersonID'},
             $dref->{'intPersonRegistrationID'},
@@ -424,15 +410,15 @@ sub approveTask {
 	  	UPDATE tblWFTask SET 
 	  		strTaskStatus = 'COMPLETE',
 	  		dtApprovalDate = Now(),
-	  		intApprovalUserID = ?
 	  	WHERE intWFTaskID = ?; 
 		];
 		
+	  		#intApprovalUserID = ?
   	$q = $db->prepare($st);
   	$q->execute(
-	  	$Data->{'clientValues'}{'userID'},
   		$WFTaskID,
   		);
+	  	#$Data->{'clientValues'}{'userID'},
   		
 	if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
@@ -562,9 +548,9 @@ sub checkForOutstandingTasks {
 		  	UPDATE tblWFTask SET 
 		  		strTaskStatus = 'ACTIVE',
 		  		dtActivateDate = Now(),
-		  		intActiveUserID = 1
 		  	WHERE intWFTaskID IN ($list_WFTaskID); 
 			];
+		  		#intActiveUserID = 1
 			
 	  	$q = $db->prepare($st);
 	  	$q->execute();
@@ -689,14 +675,14 @@ sub rejectTask {
         SET 
 	  		strTaskStatus = 'REJECTED',
 	  		dtRejectedDate = Now(),
-	  		intRejectedUserID = ?
 	  	WHERE 
             intWFTaskID = ?; 
     ];
 		
+	  		#intRejectedUserID = ?
+	  	#$Data->{'clientValues'}{'userID'},
   	$q = $db->prepare($st);
   	$q->execute(
-	  	$Data->{'clientValues'}{'userID'},
   		$WFTaskID,
   		);
   		
