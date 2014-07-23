@@ -58,13 +58,6 @@ use DuplicatePrevention;
 sub handlePerson {
     my ( $action, $Data, $personID ) = @_;
 
-print "Content-type: text/html\n\n";
-use Data::Dumper;
-print "<pre>";
-print Dumper(\$Data); 
-print "</pre>";
-
-
     my $resultHTML = '';
     my $personName = my $title = '';
 

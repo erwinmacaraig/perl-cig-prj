@@ -64,7 +64,7 @@ sub rule_details   {
     my $client = setClient($Data->{'clientValues'}) || '';
 	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
-    my $field = loadRuleDetails($Data->{'db'}, $entityID) || ();
+    my $field = loadRuleDetails($Data->{'db'}, $Data, $entityID) || ();
     
     my %FieldDefinitions = (
     fields=>  {
@@ -186,7 +186,7 @@ sub rule_details   {
 }
 
 sub loadRuleDetails {
-  my($db, intEntityRegistrationAllowedID) = @_;
+  my($db, $Data, $intEntityRegistrationAllowedID) = @_;
                        
   my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});                       
                                                                                                         
@@ -203,8 +203,8 @@ sub loadRuleDetails {
   ];
   my $query = $db->prepare($statement);
   $query -> execute(
-  	intEntityRegistrationAllowedID,
-  	intEntityID,
+  	$intEntityRegistrationAllowedID,
+  	$entityID,
   	 );
   my $field=$query->fetchrow_hashref();
   $query->finish;

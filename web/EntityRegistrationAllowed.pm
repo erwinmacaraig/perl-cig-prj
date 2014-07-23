@@ -80,7 +80,7 @@ sub getRegistrationRules {
 			EntityID => $dref->{intEntityID},
 			PersonLevel => $dref->{strPersonLevel},			
 			RegistrationType => $dref->{strRegistrationType},
-			RegistrationNature => $dref->{intRegistrationNature},
+			RegistrationNature => $dref->{strRegistrationNature},
 			Sport => $dref->{strSport},
 			AgeLevel => $dref->{strAgeLevel},	
 			Status => $dref->{intStatus},				 	);

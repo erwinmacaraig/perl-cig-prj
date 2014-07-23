@@ -57,6 +57,7 @@ CREATE TABLE tblEntity (
     strEntityPaymentInfo TEXT,
   PRIMARY KEY (`intEntityID`),
   KEY `index_intRealmID` (`intRealmID`),
+  KEY `index_strFIFAID` (`strFIFAID`),
   KEY `index_intEntityLevel` (`intEntityLevel`)
 ) DEFAULT CHARSET=utf8;
 

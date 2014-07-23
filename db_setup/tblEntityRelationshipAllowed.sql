@@ -10,5 +10,7 @@ CREATE TABLE `tblEntityRegistrationAllowed` (
   `strRegistrationNature` varchar(20) NOT NULL,
   `strAgeLevel` varchar(20) NOT NULL,
   `tTimestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`intEntityRegistrationAllowedID`)
+  PRIMARY KEY (`intEntityRegistrationAllowedID`),
+    KEY `index_intRealmID` (`intRealmID`),
+    KEY `index_intSubRealmID` (`intSubRealmID`)
 ) DEFAULT CHARSET=utf8 COMMENT='This table shows which permuation and combination of players/coaches are available at each Entity';
