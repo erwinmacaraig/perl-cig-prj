@@ -26,6 +26,6 @@ sub main	{
 	$Data{'Realm'} = 1;
     addTasks(\%Data, 'REGO', 0,0,1, 0); ## Person Rego
     addTasks(\%Data, 'ENTITY', 749,0,0, 0); ##Venue
-    addTasks(\%Data, 'DOCUMENT', 0,0,0, 1); ##Document
+#    addTasks(\%Data, 'DOCUMENT', 0,0,0, 1); ##Document
 
 }

@@ -7,6 +7,7 @@ CREATE TABLE `tblWFTask` (
   `intApprovalEntityID` int(11) NOT NULL DEFAULT '0' COMMENT 'Which entity has to approve this task',
   `intApprovalRoleID` int(11) NOT NULL DEFAULT '0' COMMENT 'What Role within the Entity has to approve this item',
   `strTaskType` varchar(20) NOT NULL COMMENT 'From tblWFRule',
+    strWFRuleFor VARCHAR(30) DEFAULT '' COMMENT 'PERSON, REGO, ENTITY, DOCUMENT',
   `intDocumentTypeID` int(11) NOT NULL DEFAULT '0' COMMENT 'From tblWFRule',
   `strTaskStatus` varchar(20) NOT NULL DEFAULT 'ACTIVE' COMMENT 'From tblWFRule',
   `intProblemResolutionEntityID` int(11) DEFAULT NULL COMMENT 'From tblWFRule',
@@ -21,7 +22,7 @@ CREATE TABLE `tblWFTask` (
   `intEntityID` int(11) NOT NULL DEFAULT '0' COMMENT 'The entity who is registering',
   `intPersonID` int(11) NOT NULL DEFAULT '0' COMMENT 'The person who is registering',
   `intPersonRegistrationID` int(11) NOT NULL DEFAULT '0' COMMENT 'Foreign key to the registration that triggered this task',
-  `intDocumentID` int(11) NOT NULL DEFAULT '0' COMMENT 'The document to check',
+  `intDocumentID` int(11) NOT NULL DEFAULT '0' COMMENT 'The document to check - for a particular document',
 
   `tTimeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`intWFTaskID`),

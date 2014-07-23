@@ -207,6 +207,7 @@ sub addTasks {
 			intApprovalEntityID,
 			intApprovalRoleID, 
 			strTaskType, 
+            strWFRuleFor,
 			intDocumentTypeID, 
 			strTaskStatus, 
 			intProblemResolutionEntityID, 
@@ -217,6 +218,7 @@ sub addTasks {
             intDocumentID
 		)
         VALUES (
+            ?,
             ?,
             ?,
             ?,
@@ -247,6 +249,7 @@ sub addTasks {
 			r.intApprovalEntityLevel,
 			r.intApprovalRoleID, 
 			r.strTaskType, 
+            r.strWFRuleFor,
 			r.intDocumentTypeID, 
 			r.strTaskStatus, 
 			r.intProblemResolutionEntityLevel, 
@@ -271,7 +274,7 @@ sub addTasks {
             AND r.strWFRuleFor = 'REGO'
 		];
 	    $q = $db->prepare($st);
-  	    $q->execute($personRegistrationID, $ruleFor);
+  	    $q->execute($personRegistrationID);
     }
     if ($ruleFor eq 'ENTITY' and $entityID)  {
         ## APPROVAL FOR ENTITY
@@ -283,6 +286,7 @@ sub addTasks {
 			r.intApprovalEntityLevel,
 			r.intApprovalRoleID, 
 			r.strTaskType, 
+            r.strWFRuleFor,
 			r.intDocumentTypeID, 
 			r.strTaskStatus, 
 			r.intProblemResolutionEntityLevel, 
@@ -315,6 +319,7 @@ sub addTasks {
 			r.intApprovalEntityLevel,
 			r.intApprovalRoleID, 
 			r.strTaskType, 
+            r.strWFRuleFor,
 			r.intDocumentTypeID, 
 			r.strTaskStatus, 
 			r.intProblemResolutionEntityLevel, 
@@ -348,6 +353,7 @@ sub addTasks {
             $approvalEntityID,
             $dref->{'intApprovalRoleID'},
             $dref->{'strTaskType'},
+            $dref->{'strWFRuleFor'},
             $dref->{'intDocumentTypeID'},
             $dref->{'strTaskStatus'},
             $problemEntityID,
