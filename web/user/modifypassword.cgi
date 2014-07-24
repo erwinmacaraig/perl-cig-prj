@@ -1,5 +1,4 @@
-#!/usr/bin/perl -w 
-
+#!/usr/bin/perl -w
 use DBI;
 use CGI qw(:cgi escape unescape);
 
@@ -20,12 +19,21 @@ $Data{lang} = $lang;
 my $target = 'modifypassword.cgi';
 $Data{'target'} = $target;
 $Data{'cache'}  = new MCache();
+$Data{uId} = '';
 my $body = '';
+
+#check first for existing parameter 
+my $url_key = param('url_key') || '';
+my $uId = isURL_Key_Valid($url_key);
+if(defined ($uId)){
+     $Data{uId} = $uId;
+}
+
 my $template = 'user/modify_user_password.templ';  
 
 $body = runTemplate(
     \%Data,
-    {'Errors' => 'errors'},
+    {},
     $template,
 ); 
 

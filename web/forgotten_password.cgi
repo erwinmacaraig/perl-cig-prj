@@ -4,13 +4,14 @@
 #
 
 use strict;
-use lib ".", "..";
+use lib ".", "..", 'user';
 use CGI qw(param unescape escape cookie);
 use Defs;
 use Lang;
 use TTTemplate; 
 use Utils;
-
+use UserObj;
+use PageMain;
 use DBI;
 
 my $lang= Lang->get_handle() || die "Can't get a language handle!";
@@ -18,31 +19,47 @@ my $lang= Lang->get_handle() || die "Can't get a language handle!";
 
 my $title=$lang->txt('APPNAME') || 'SportingPulse Membership'; 
 
-my %Data = (lang => $lang,);	
+my %Data = (); #empty hash 
+my $lang = Lang->get_handle() || die "Can't get a language handle!";
+$Data{lang} = $lang;	 
+$Data{'cache'}  = new MCache(); 
 my $error = '';
 my $action = param('a') || '';
+
 
 if($action eq 'RESET_PASSWD'){ 
 	my $email = param('email'); 
 	my $dbh = connectDB(); 
-	my $query = "SELECT email FROM tblUser WHERE email = ?";
+	my $query = "SELECT userId, email FROM tblUser WHERE email = ?";
 	my $st = $dbh->prepare($query);
 	$st->execute($email);
 	my @row = $st->fetchrow_array; 
 	if(!@row){
-	 $error = "Sorry. Email address does not exist in our system."
+	 $error = "Sorry. Email address does not exist in our system.";
 	}
 	else { 
-		print "Location: user/modifypassword.cgi\n\n";
+		#1. Generate unique random string
+		my $userObj = new UserObj();
+			
+		#2. Insert the string in tblUserHash strPasswordChangeKey 
+		my $uId = shift @row;
+		$query = "UPDATE tblUserHash SET strPasswordChangeKey = ? WHERE userID = ?";
+		my $stringRandom = $userObj->_generateConfirmKey();
+		$st = $dbh->prepare($query);
+		$st->execute($stringRandom,$uId);
+		$st->finish();
+		print "Location: emailform.cgi?url_key=$stringRandom\n\n";
 	}		
 }
-print "Content-type: text/html\n\n";
-my $forgot_passwd_form = runTemplate(
-   \%Data,
-      {'Errors' => $error,},
+my $body = runTemplate(
+    \%Data,
+    {'Error' => $error},
     'user/forgot_password_form.templ',
-  );    
-print $forgot_passwd_form; 
+);
+
+pageForm($title, $body, {}, '', \%Data);
+  
+  
   
   
   
