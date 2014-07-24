@@ -3,16 +3,18 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = @EXPORT_OK = qw(
 	handleWorkflow
-  	addTasks
+  	addWorkFlowTasks
   	approveTask
   	checkForOutstandingTasks
 );
 
 use strict;
+use lib '.', '..'; #"comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 use Utils;
 use Reg_common;
 use TTTemplate;
 use Log;
+use Person;
 
 sub handleWorkflow {
     my ( 
@@ -58,37 +60,36 @@ sub listTasks {
             pr.strPersonLevel, 
             pr.strAgeLevel, 
             pr.strSport, 
-			pr.strRegistrationNature, 
+			t.strRegistrationNature, 
             dt.strDocumentName,
 			p.strLocalFirstname, 
             p.strLocalSurname, 
+            p.intGender as PersonGender,
             e.strLocalName as EntityLocalName,
             p.intPersonID, 
             t.strTaskStatus, 
-            uar.userID as UserID, 
-            uarRejected.userID as RejectedUserID, 
+            t.strWFRuleFor,
             uar.entityID as UserEntityID, 
             uarRejected.entityID as UserRejectedEntityID
 		FROM tblWFTask AS t
         LEFT JOIN tblEntity as e ON (e.intEntityID = t.intEntityID)
 		LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (t.intPersonRegistrationID = pr.intPersonRegistrationID)
 		LEFT JOIN tblPerson AS p ON (t.intPersonID = p.intPersonID)
-		LEFT JOIN tblUserAuthRole AS uar ON (
-            t.intApprovalEntityID = uar.entityID 
-            AND t.intApprovalRoleID = uar.roleId
-        )
+		LEFT JOIN tblUserAuthRole AS uar ON ( t.intApprovalEntityID = uar.entityID )
 		LEFT OUTER JOIN tblDocumentType AS dt ON (t.intDocumentTypeID = dt.intDocumentTypeID)
-		LEFT JOIN tblUserAuthRole AS uarRejected ON (
-            t.intProblemResolutionEntityID = uarRejected.entityID 
-			AND t.intProblemResolutionRoleID = uarRejected.roleId
-        )
+		LEFT JOIN tblUserAuthRole AS uarRejected ON ( t.intProblemResolutionEntityID = uarRejected.entityID )
 		WHERE 
-			t.strTaskStatus IN ('ACTIVE', 'REJECTED')
+            t.intRealmID = $Data->{'Realm'}
 			AND (
-                intApprovalEntityID = ?
-                OR intProblemResolutionEntityID=?
+                (intApprovalEntityID = ? AND t.strTaskStatus = 'ACTIVE')
+                OR
+                (intProblemResolutionEntityID= ? AND t.strTaskStatus = 'REJECTED')
             )
     ];
+            #uar.userID as UserID, 
+            #uarRejected.userID as RejectedUserID, 
+            #AND t.intApprovalRoleID = uar.roleId
+			#AND t.intProblemResolutionRoleID = uarRejected.roleId
             #AND
             #(
             #    uar.userID = ? 
@@ -109,12 +110,17 @@ sub listTasks {
 	  
 	while(my $dref= $q->fetchrow_hashref()) {
 		$rowCount ++;
+        my $name = '';
+        $name = $dref->{'EntityLocalName'} if ($dref->{strWFRuleFor} eq 'ENTITY');
+        $name = Person::formatPersonName($Data, $dref->{'strLocalFirstname'}, $dref->{'strLocalSurname'}, $dref->{'PersonGender'}) if ($dref->{strWFRuleFor} eq 'REGO' or $dref->{strWFRuleFor} eq 'PERSON');
 		my %single_row = (
 			WFTaskID => $dref->{intWFTaskID},
 			TaskType => $dref->{strTaskType},
 			AgeLevel => $dref->{strAgeLevel},
+			RuleFor=> $dref->{strWFRuleFor},
 			RegistrationNature => $dref->{strRegistrationNature},
 			DocumentName => $dref->{strDocumentName},
+            Name=>$name,
 			LocalEntityName=> $dref->{EntityLocalName},
 			LocalFirstname => $dref->{strLocalFirstname},
 			LocalSurname => $dref->{strLocalSurname},
@@ -181,17 +187,23 @@ sub getEntityParentID   {
         
     return $q->fetchrow_array() || 0;
 }
-sub addTasks {
+sub addWorkFlowTasks {
      my(
         $Data,
+        $ruleFor,
+        $regNature,
+        $originLevel,
         $entityID,
         $personID,
-        $personRegistrationID
+        $personRegistrationID,
+        $documentID
     ) = @_;
  
     $entityID ||= 0;
     $personID ||= 0;
+    $originLevel ||= 0;
     $personRegistrationID ||= 0;
+    $documentID ||= 0;
 
 	my $q = '';
 	my $db=$Data->{'db'};
@@ -202,17 +214,19 @@ sub addTasks {
 			intRealmID,
 			intSubRealmID, 
 			intApprovalEntityID,
-			intApprovalRoleID, 
 			strTaskType, 
+            strWFRuleFor,
+            strRegistrationNature,
 			intDocumentTypeID, 
 			strTaskStatus, 
 			intProblemResolutionEntityID, 
-			intProblemResolutionRoleID,
             intEntityID,
 			intPersonID, 
-			intPersonRegistrationID 
+			intPersonRegistrationID,
+            intDocumentID
 		)
         VALUES (
+            ?,
             ?,
             ?,
             ?,
@@ -232,7 +246,7 @@ sub addTasks {
             
     my $st = '';
     ## Build up SELECT based on what sort of record we are approving
-    if ($personRegistrationID)   {
+    if ($ruleFor eq 'REGO' and $personRegistrationID)   {
         ## APPROVAL FOR PERSON REGO
         $st = qq[
 		SELECT 
@@ -240,34 +254,38 @@ sub addTasks {
 			r.intRealmID,
 			r.intSubRealmID,
 			r.intApprovalEntityLevel,
-			r.intApprovalRoleID, 
 			r.strTaskType, 
+            r.strWFRuleFor,
 			r.intDocumentTypeID, 
 			r.strTaskStatus, 
 			r.intProblemResolutionEntityLevel, 
-			r.intProblemResolutionRoleID,
 			pr.intPersonID, 
 			pr.intPersonRegistrationID,
-            pr.intEntityID as RegoEntity
+            pr.intEntityID as RegoEntity,
+            0 as DocumentID
 		FROM tblPersonRegistration_$Data->{'Realm'} AS pr
+            LEFT JOIN tblEntity as e ON (e.intEntityID = pr.intEntityID)
 		INNER JOIN tblWFRule AS r ON (
 			pr.intRealmID = r.intRealmID
 			AND pr.intSubRealmID = r.intSubRealmID
 			AND pr.strPersonLevel = r.strPersonLevel
 			AND pr.strAgeLevel = r.strAgeLevel
 			AND pr.strSport = r.strSport
-			AND pr.strRegistrationNature = r.strRegistrationNature
             AND pr.strPersonType = r.strPersonType
         )
 		WHERE 
             pr.intPersonRegistrationID = ?
-            AND r.intEntityLevel = 0
-            AND r.strPersonType <> ''
+            AND r.strWFRuleFor = 'REGO'
+            AND r.intRealmID = ?
+            AND r.intSubRealmID IN (0, ?)
+            AND r.intOriginLevel = ?
+            AND r.strEntityType IN ('', e.strEntityType)
+			AND r.strRegistrationNature = ?
 		];
 	    $q = $db->prepare($st);
-  	    $q->execute($personRegistrationID);
+  	    $q->execute($personRegistrationID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
     }
-    if ($entityID and ! $personID and ! $personRegistrationID)   {
+    if ($ruleFor eq 'ENTITY' and $entityID)  {
         ## APPROVAL FOR ENTITY
         $st = qq[
 		SELECT 
@@ -275,15 +293,15 @@ sub addTasks {
 			r.intRealmID,
 			r.intSubRealmID,
 			r.intApprovalEntityLevel,
-			r.intApprovalRoleID, 
 			r.strTaskType, 
+            r.strWFRuleFor,
 			r.intDocumentTypeID, 
 			r.strTaskStatus, 
 			r.intProblemResolutionEntityLevel, 
-			r.intProblemResolutionRoleID,
             0 as intPersonID,
             0 as intPersonRegistrationID,
-            e.intEntityID as RegoEntity
+            e.intEntityID as RegoEntity,
+            0 as DocumentID
 		FROM tblEntity as e
 		INNER JOIN tblWFRule AS r ON (
 			e.intRealmID = r.intRealmID
@@ -293,10 +311,48 @@ sub addTasks {
             AND e.strEntityType = r.strEntityType
         )
 		WHERE e.intEntityID= ?
+            AND r.strWFRuleFor = 'ENTITY'
+            AND r.intRealmID = ?
+            AND r.intSubRealmID IN (0, ?)
+            AND r.intOriginLevel = ?
+			AND r.strRegistrationNature = ?
 		];
 	    $q = $db->prepare($st);
-  	    $q->execute($entityID);
+  	    $q->execute($entityID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
     }
+    if ($ruleFor eq 'DOCUMENT' and $documentID)    {
+        ## APPROVAL FOR DOCUMENT
+        $st = qq[
+		SELECT 
+			r.intWFRuleID, 
+			r.intRealmID,
+			r.intSubRealmID,
+			r.intApprovalEntityLevel,
+			r.strTaskType, 
+            r.strWFRuleFor,
+			r.intDocumentTypeID, 
+			r.strTaskStatus, 
+			r.intProblemResolutionEntityLevel, 
+            0 as intPersonID,
+            0 as intPersonRegistrationID,
+            e.intEntityID as RegoEntity,
+            d.intDocumentID as DocumentID
+		FROM tblDocuments as d 
+		INNER JOIN tblWFRule AS r ON (
+            d.intDocumentTypeID = r.intDocumentTypeID
+            AND d.intEntityLevel = r.intEntityLevel
+        )
+		WHERE d.intDocumentID = ?
+            AND r.strWFRuleFor = 'DOCUMENT'
+            AND r.intRealmID = ?
+            AND r.intSubRealmID IN (0, ?)
+            AND r.intOriginLevel = ?
+			AND r.strRegistrationNature = ?
+		];
+	    $q = $db->prepare($st);
+  	    $q->execute($documentID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
+    }
+
 
 
     while (my $dref= $q->fetchrow_hashref())    {
@@ -308,15 +364,16 @@ sub addTasks {
             $dref->{'intRealmID'},
             $dref->{'intSubRealmID'},
             $approvalEntityID,
-            $dref->{'intApprovalRoleID'},
             $dref->{'strTaskType'},
+            $ruleFor,
+            $regNature,
             $dref->{'intDocumentTypeID'},
             $dref->{'strTaskStatus'},
             $problemEntityID,
-            $dref->{'intProblemResolutionRoleID'},
             $entityID,
             $dref->{'intPersonID'},
-            $dref->{'intPersonRegistrationID'}
+            $dref->{'intPersonRegistrationID'},
+            $dref->{'DocumentID'}
         );
 
     }
@@ -368,16 +425,16 @@ sub approveTask {
 	$st = qq[
 	  	UPDATE tblWFTask SET 
 	  		strTaskStatus = 'COMPLETE',
-	  		dtApprovalDate = Now(),
-	  		intApprovalUserID = ?
+	  		dtApprovalDate = NOW()
 	  	WHERE intWFTaskID = ?; 
 		];
 		
+	  		#intApprovalUserID = ?
   	$q = $db->prepare($st);
   	$q->execute(
-	  	$Data->{'clientValues'}{'userID'},
   		$WFTaskID,
   		);
+	  	#$Data->{'clientValues'}{'userID'},
   		
 	if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
@@ -387,7 +444,9 @@ sub approveTask {
         SELECT 
             intPersonID,
             intPersonRegistrationID,
-            intEntityID
+            intEntityID,
+            intDocumentID,
+            strWFRuleFor
         FROM tblWFTask
         WHERE intWFTaskID = ?
     ];
@@ -396,11 +455,13 @@ sub approveTask {
     $q->execute($WFTaskID);
             
     my $dref= $q->fetchrow_hashref();
-    my $personID = $dref->{intPersonID};
-    my $personRegistrationID = $dref->{intPersonRegistrationID};
-    my $entityID= $dref->{intEntityID};
+    my $personID = $dref->{intPersonID} || 0;
+    my $personRegistrationID = $dref->{intPersonRegistrationID} || 0;
+    my $entityID= $dref->{intEntityID} || 0;
+    my $documentID= $dref->{intDocumentID} || 0;
+    my $ruleFor = $dref->{strWFRuleFor} || '';
     
-   	my $rc = checkForOutstandingTasks($Data,$entityID, $personID, $personRegistrationID);
+   	my $rc = checkForOutstandingTasks($Data,$ruleFor, $entityID, $personID, $personRegistrationID, $documentID);
     
     return($rc);
     
@@ -409,9 +470,11 @@ sub approveTask {
 sub checkForOutstandingTasks {
     my(
         $Data,
+        $ruleFor,
         $entityID,
         $personID,
         $personRegistrationID,
+        $documentID
     ) = @_;
 
 	my $st = '';
@@ -428,9 +491,11 @@ sub checkForOutstandingTasks {
 		INNER JOIN tblWFTask ct on ptpr.intPreReqWFRuleID = ct.intWFRuleID 
         WHERE
 			pt.strTaskStatus = ?
-		    AND (pt.intPersonRegistrationID = ? AND pt.intEntityID = ? AND pt.intPersonID = ?)
-			AND (ct.intPersonRegistrationID = ? AND ct.intEntityID = ? AND ct.intPersonID = ?)
+		    AND (pt.intPersonRegistrationID = ? AND pt.intEntityID = ? AND pt.intPersonID = ? and pt.intDocumentID = ?)
+			AND (ct.intPersonRegistrationID = ? AND ct.intEntityID = ? AND ct.intPersonID = ? and ct.intDocumentID = ?)
 			AND ct.strTaskStatus IN (?,?)
+            AND pt.strWFRuleFor = ?
+            AND ct.strWFRuleFor = ?
 		ORDER by pt.intWFTaskID;
 	];
 	
@@ -440,11 +505,15 @@ sub checkForOutstandingTasks {
   		$personRegistrationID,
         $entityID,
         $personID,
+        $documentID,
   		$personRegistrationID,
         $entityID,
         $personID,
+        $documentID,
   		'ACTIVE',
   		'COMPLETE',
+        $ruleFor,
+        $ruleFor,
   		);
   		
 	if ($q->errstr) {
@@ -494,10 +563,10 @@ sub checkForOutstandingTasks {
 		$st = qq[
 		  	UPDATE tblWFTask SET 
 		  		strTaskStatus = 'ACTIVE',
-		  		dtActivateDate = Now(),
-		  		intActiveUserID = 1
+		  		dtActivateDate = NOW()
 		  	WHERE intWFTaskID IN ($list_WFTaskID); 
 			];
+		  		#intActiveUserID = 1
 			
 	  	$q = $db->prepare($st);
 	  	$q->execute();
@@ -518,6 +587,8 @@ sub checkForOutstandingTasks {
                 intPersonID = ?
                 AND intPersonRegistrationID = ?
                 AND intEntityID= ?
+                AND intDocumentID = ?
+                AND strWFRUleFor = ?
 			    AND strTaskStatus IN ('PENDING','ACTIVE')
         ];
         
@@ -525,16 +596,18 @@ sub checkForOutstandingTasks {
         $q->execute(
             $personID,
        		$personRegistrationID,
-            $entityID
+            $entityID,
+            $documentID,
+            $ruleFor
 	  	);
   
         
-        if ($entityID and !$q->fetchrow_array() and (!$personID and !$personRegistrationID)) {
+        if ($ruleFor eq 'ENTITY' and $entityID and !$q->fetchrow_array())   {
             $st = qq[
                     UPDATE tblEntity
                     SET
                         strStatus = 'ACTIVE',
-                        dtFrom = Now()
+                        dtFrom = NOW()
                     WHERE
                         intEntityID= ?
                 ];
@@ -545,7 +618,24 @@ sub checkForOutstandingTasks {
                     );
                 $rc = 1;
         }
-        if ($personRegistrationID and !$q->fetchrow_array()) {
+        if ($ruleFor eq 'DOCUMENT' and $documentID and !$q->fetchrow_array())   {
+            $st = qq[
+                    UPDATE tblDocuments
+                    SET
+                        strApprovalStatus = 'ACTIVE',
+                        dtFrom = NOW()
+                    WHERE
+                        intDocumentID= ?
+                ];
+
+                $q = $db->prepare($st);
+                $q->execute(
+                    $documentID
+                );
+                $rc = 1;
+        }
+ 
+        if ($ruleFor eq 'REGO' and $personRegistrationID and !$q->fetchrow_array()) {
         	#Now check to see if there is a payment outstanding
         	$st = qq[
 			        SELECT intPaymentRequired
@@ -565,7 +655,7 @@ sub checkForOutstandingTasks {
 	            	UPDATE tblPersonRegistration_$Data->{'Realm'} 
                     SET
 	            	    strStatus = 'ACTIVE',
-	            	    dtFrom = Now()
+	            	    dtFrom = NOW()
 	    	        WHERE 
                         intPersonRegistrationID = ?
 	        	];
@@ -600,15 +690,15 @@ sub rejectTask {
 	  	UPDATE tblWFTask 
         SET 
 	  		strTaskStatus = 'REJECTED',
-	  		dtRejectedDate = Now(),
-	  		intRejectedUserID = ?
+	  		dtRejectedDate = NOW()
 	  	WHERE 
             intWFTaskID = ?; 
     ];
 		
+	  		#intRejectedUserID = ?
+	  	#$Data->{'clientValues'}{'userID'},
   	$q = $db->prepare($st);
   	$q->execute(
-	  	$Data->{'clientValues'}{'userID'},
   		$WFTaskID,
   		);
   		

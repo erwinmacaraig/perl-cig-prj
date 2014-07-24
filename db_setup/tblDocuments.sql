@@ -4,7 +4,7 @@ CREATE TABLE tblDocuments (
     intDocumentTypeID INT DEFAULT 0,
     intEntityLevel tinyint default 0, /*Person, Entity */
     intEntityID INT DEFAULT 0, /* ID of the Person, Entity*/
-    intApprovalStatus TINYINT DEFAULT 0, /* 0 =pending , -1=No, 1 = Yes */
+    strApprovalStatus TINYINT DEFAULT 0, /* PENDING , APPROVED, REJECTED */
     strDeniedNotes  TEXT default '',
     dtAdded datetime,
     tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

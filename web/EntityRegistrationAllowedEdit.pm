@@ -53,9 +53,9 @@ sub rule_details   {
 	if ($action eq 'ERA_ADD') {
 		$option = 'add';
 	}
-	else {
-		$option = 'delete';
-	};
+#	else {
+#		$option = 'delete';
+#	};
 
     # $option='edit' if $action eq 'VENUE_DTE' and allowedAction($Data, 'venue_e');
     # $option='add' if $action eq 'VENUE_DTA' and allowedAction($Data, 'venue_a');
@@ -65,27 +65,41 @@ sub rule_details   {
 	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
     my $field = loadRuleDetails($Data->{'db'}, $Data, $entityID) || ();
+my %genderoptions = ();
+    for my $k ( keys %Defs::genderInfo ) {
+        next if !$k;
+        next if ($k eq $Defs::GENDER_NONE );
+        $genderoptions{$k} = $Defs::genderInfo{$k} || '';
+    }
     
     my %FieldDefinitions = (
     fields=>  {
       strPersonType => {
-        label => 'Person Type',
+        label => 'Person Type (DROP BOX OF PLAYER/COACH/REFEREE) etc',
         value => $field->{strPersonType},
         type  => 'text',
         size  => '40',
         maxsize => '150',
         sectionname => 'details',
       },
-      strLocalName => {
-        strSport => 'Sport',
+      strSport=> {
+        label=> 'Sport (DROP BOX OF SPORT)',
         value => $field->{strSport},
         type  => 'text',
         size  => '40',
         maxsize => '150',
         sectionname => 'details',
       },
+        intGender => {
+                label       => 'Gender',
+                value       => $field->{intGender},
+                type        => 'lookup',
+                options     => \%genderoptions,
+                sectionname => 'details',
+                firstoption => [ '', " " ],
+        },
       strPersonLevel => {
-        label => 'Person Level',
+        label => 'Person Level (DROP BOX OF PRO/AMATEUR)',
         value => $field->{strPersonLevel},
         type  => 'text',
         size  => '30',
@@ -93,7 +107,7 @@ sub rule_details   {
         sectionname => 'details',
       },      
       strRegistrationNature => {
-        label => 'Registration Nature',
+        label => 'Registration Nature (DROP BOX OF NEW/REREG/AMEND/TRANSFER)',
         value => $field->{strRegistrationNature},
         type  => 'text',
         size  => '40',
@@ -101,7 +115,7 @@ sub rule_details   {
         sectionname => 'details',
       },
       strAgeLevel => {
-        label => 'Age Level',
+        label => 'Age Level (DROP BOX OF JUNIOR/SENIOR)',
         value => $field->{strAgeLevel},
         type  => 'text',
         size  => '30',
@@ -112,6 +126,7 @@ sub rule_details   {
     order => [qw(
 		strPersonType
 		strSport
+        intGender
 		strPersonLevel
 		strRegistrationNature
 		strAgeLevel
@@ -196,6 +211,7 @@ sub loadRuleDetails {
 		strSport,
 		strPersonLevel,
 		strRegistrationNature,
+        intGender,
 		strAgeLevel
     FROM tblEntityRegistrationAllowed
     WHERE intEntityRegistrationAllowedID = ?
@@ -228,6 +244,7 @@ sub listRules  {
         intEntityRegistrationAllowedID,
         strPersonType,
         strSport,
+        intGender,
         strPersonLevel,
         strRegistrationNature,
         strAgeLevel
@@ -248,6 +265,7 @@ sub listRules  {
         id => $dref->{'intEntityRegistrationAllowedID'} || 0,
         strPersonType => $dref->{'strPersonType'} || '',
         strSport => $dref->{'strSport'} || '',
+        Gender => $Defs::PersonGenderInfo{$dref->{'intGender'}} || '',
         strPersonLevel => $dref->{'strPersonLevel'} || '',
         strRegistrationNature => $dref->{'strRegistrationNature'} || '',
         strAgeLevel => $dref->{'strAgeLevel'} || '',
@@ -289,6 +307,10 @@ sub listRules  {
         {
             name  => $Data->{'lang'}->txt('AgeLevel'),
             field => 'strAgeLevel',
+        },
+        {
+            name  => $Data->{'lang'}->txt('Gender'),
+            field => 'Gender',
         },
     );
     

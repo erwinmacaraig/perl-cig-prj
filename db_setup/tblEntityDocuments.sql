@@ -5,6 +5,6 @@ CREATE TABLE tblEntityDocuments(
     intEntityType int default 0, /* Club, School */
     intRequired TINYINT DEFAULT 0, /* 1 = Yes */
 
-  PRIMARY KEY (intDocumentID, intEntityLevel, intEntityType)
+  PRIMARY KEY (intDocumentTypeID, intEntityLevel, intEntityType)
 ) DEFAULT CHARSET=utf8;
 

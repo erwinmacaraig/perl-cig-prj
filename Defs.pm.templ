@@ -76,6 +76,28 @@ $fs_customreports_dir="$fs_base/customreports";
 
 $mail_log_file="/var/log/sp-mail/mail.log";
 
+
+#### NEW:
+###
+$ORIGIN_SELF = 1;
+$ORIGIN_CLUB = 3;
+$ORIGIN_ZONE= 10;
+$ORIGIN_REGION = 20;
+$ORIGIN_STATE = 30;
+$ORIGIN_NATIONAL = 100;
+
+$SPORT_FOOTBALL = 'FOOTBALL';
+$SPORT_FUTSAL = 'FUTSAL';
+$SPORT_BEACH= 'BEACH';
+
+%sportInfo = (
+        $SPORT_FOOTBALL=> "Football",
+        $SPORT_FUTSAL=> "Futsal",
+        $SPORT_BEACH=> "Beach",
+);
+
+########
+
 $cookie_domain="elwood"; ##CONFIG
 $COOKIE_MEMBER="reg_m";
 $COOKIE_LOGIN="_SP_M";
