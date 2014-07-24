@@ -149,7 +149,7 @@ sub setPassword {
       ?,
       ?
     )
-    ON DUPLICATE KEY UPDATE passwordHash = ?
+    ON DUPLICATE KEY UPDATE passwordHash = ?, strPasswordChangeKey = '' 
   ];
   
   my $q = $self->{'db'}->prepare($st);
