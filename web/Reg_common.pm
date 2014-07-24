@@ -7,7 +7,7 @@ package Reg_common;
 require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = @EXPORT_OK = qw(
-kickThemOff allowedTo setClient getClient stripSpaces moneyFormat entryExists getDataAccess textMessage getAssocID getDBConfig create_selectbox getLevelName txtField getID setClientValue getClientValue allowedAction getRealm currency createButtonForm getRegoPassword getEntityValues getEntityID getEntityStructure isHeavierPerm get_page_url
+kickThemOff allowedTo setClient getClient stripSpaces moneyFormat entryExists getDataAccess textMessage getAssocID getDBConfig create_selectbox getLevelName txtField getID setClientValue getClientValue allowedAction getRealm currency createButtonForm getRegoPassword getEntityValues getEntityID getEntityStructure isHeavierPerm get_page_url getLastEntityID
 );
 
 use strict;

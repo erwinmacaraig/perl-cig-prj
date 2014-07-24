@@ -294,11 +294,11 @@ print STDERR "SDSDSDSD|$paymentType";
     my $authLevel = $Data->{'clientValues'}{'authLevel'}||=$Defs::INVALID_ID;
     my $entityID = getID($Data->{'clientValues'}, $authLevel) || 0;
 
-	my $intClubID = $Data->{'clientValues'}{'clubID'} || 0; 
+    my $entityID = getLastEntityID($Data->{'clientValues'});
 #BAFF
-    $intClubID = 0 if ($intClubID == $Defs::INVALID_ID);
+    $entityID= 0 if ($entityID== $Defs::INVALID_ID);
 	my $intPersonID= $Data->{'clientValues'}{'personID'}; 
-	my ($transHTML, $transcount, $transCurrency_ref, $transAmount_ref)=getTransList($Data, $db, $intClubID, $intPersonID, $whereClause, $clientValues_ref, 0, $displayonly);
+	my ($transHTML, $transcount, $transCurrency_ref, $transAmount_ref)=getTransList($Data, $db, $entityID, $intPersonID, $whereClause, $clientValues_ref, 0, $displayonly);
 
 
 #Make DB Changes
@@ -574,6 +574,7 @@ sub getTransList {
 		  t.intTransactionID
 		$orderBy
   ];
+warn($statement);
     $statement =~ s/AND  AND/AND/g;
     my $query = $db->prepare($statement);
     $query->execute or print STDERR $statement;
@@ -763,9 +764,9 @@ sub listTransactions_where {
     $whereClause .= qq[ AND t.intID=$safeTableID and t.intTableType=$Defs::LEVEL_CLUB]   if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB;
     $whereClause .= qq[ AND t1.intTLogID= $safePaymentID ] if $paymentID;
 
-    my $clubID = $Data->{'clientValues'}{'clubID'} || 0;
+    my $entityID = getLastEntityID($Data->{'clientValues'}) || 0; #
 
-    $whereClause .= qq[ AND intTXNEntityID IN (0, $clubID)] if $clubID;
+    $whereClause .= qq[ AND intTXNEntityID IN (0, $entityID)] if $entityID;
     $whereClause .= qq[ AND P.intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) ] if $txnStatus != $Defs::TXN_PAID;
 
     return $whereClause;
@@ -773,6 +774,7 @@ sub listTransactions_where {
 
 sub listTransactions {
     my ($Data, $db, $entityID, $personID, $tempClientValues_ref, $action, $resultMessage) = @_;
+warn("ENTITY: $entityID | $personID");
     my ($body, $paidLink, $unpaidLink, $cancelledLink, $query) = ('', '', '', '', '');
     my $txnStatus = $Data->{'ViewTXNStatus'} || $Defs::TXN_UNPAID;
     my ($link, $mode, $TableID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('', $Data, $tempClientValues_ref);
@@ -785,6 +787,7 @@ sub listTransactions {
 
     my $whereClause = '';
     $whereClause .= qq[ AND t.intID=$personID and t.intTableType=$Defs::LEVEL_PERSON] if ($personID and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON);
+warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
     $whereClause .= qq[ AND t.intID=$entityID and t.intTableType=$Defs::LEVEL_CLUB] if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB;
     $whereClause .= qq[ AND t1.intTLogID= $safePaymentID ] if $paymentID;
 
@@ -1663,7 +1666,7 @@ sub listTransLog	{
   if (
 		$Data->{'clientValues'}{'clubID'} 
 		and $Data->{'clientValues'}{'clubID'} != $Defs::INVALID_ID)  {
-    $clubWHERE = qq[ AND TL.intClubPaymentID IN (0, $Data->{'clientValues'}{'clubID'}) ];
+    $clubWHERE = qq[ AND TL.intEntityPaymentID IN (0, $Data->{'clientValues'}{'clubID'}) ];
   }
 	my $statement =qq[
 		SELECT 
