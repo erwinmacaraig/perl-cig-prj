@@ -10,6 +10,7 @@ require Exporter;
   check_valid_date
   postPersonUpdate
   loadPersonDetails
+  formatPersonName
 );
 
 use strict;
@@ -203,6 +204,12 @@ sub updatePersonNotes {
     $query->execute( @value_list, @value_list );
 }
 
+sub formatPersonName {
+
+    my ($Data, $firstname, $surname, $gender) = @_;
+    
+    return "$firstname $surname";
+}
 sub PersonTransfer {
 
     my ($Data) = @_;

@@ -6,7 +6,7 @@
 
 use strict;
 
-use lib "..","../web","../web/comp", "../web/user";
+use lib "..","../web","../web/comp", "../web/user", '../web/RegoForm', "../web/dashboard", "../web/RegoFormBuilder",'../web/PaymentSplit', "../web/Clearances";
 
 use Defs;
 use Utils;
@@ -24,8 +24,8 @@ sub main	{
 	my $db = connectDB();
 	$Data{'db'} = $db;
 	$Data{'Realm'} = 1;
-    addTasks(\%Data, 'REGO', $Defs::ORIGIN_SELF, 0,0,1, 0); ## Person Rego
-    addTasks(\%Data, 'ENTITY', $Defs::ORIGIN_SELF, 749,0,0, 0); ##Venue
-#    addTasks(\%Data, 'DOCUMENT', $Defs::ORIGIN_SELF, 0,0,0, 1); ##Document
+    addWorkFlowTasks(\%Data, 'REGO', 'NEW', $Defs::ORIGIN_SELF, 0,0,1, 0); ## Person Rego
+    addWorkFlowTasks(\%Data, 'ENTITY', 'NEW', $Defs::ORIGIN_SELF, 749,0,0, 0); ##Venue
+#    addWorkFlowTasks(\%Data, 'DOCUMENT', $Defs::ORIGIN_SELF, 0,0,0, 1); ##Document
 
 }

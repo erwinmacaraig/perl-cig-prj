@@ -4,16 +4,17 @@ CREATE TABLE tblWFRule (
   intRealmID int(11) NOT NULL DEFAULT '0',
   intSubRealmID int(11) NOT NULL DEFAULT '0',
 
-  intOriginLevel INT DEFAULT '', /* ORIGIN LEVEL (See Defs) of the record */
+  intOriginLevel INT DEFAULT 0, /* ORIGIN LEVEL (See Defs) of the record */
   strWFRuleFor VARCHAR(30) DEFAULT '' COMMENT 'PERSON, REGO, ENTITY, DOCUMENT',
 
   strEntityType VARCHAR(30) DEFAULT '', /* School/Club -- Can even have School rules for a REGO*/
   intEntityLevel INT DEFAULT 0, /*Venue/Club*/
 
+  strRegistrationNature varchar(20) NOT NULL DEFAULT '0' COMMENT 'NEW,RENEWAL,AMENDMENT,TRANSFER,',
+
   strPersonType varchar(20) NOT NULL DEFAULT '' COMMENT 'PLAYER, COACH, REFEREE',
   strPersonLevel varchar(20) NOT NULL DEFAULT '' COMMENT 'AMATEUR,PROFESSIONAL',
   strSport varchar(20) NOT NULL DEFAULT '' COMMENT 'FOOTBALL,FUTSAL,BEACHSOCCER',
-  strRegistrationNature varchar(20) NOT NULL DEFAULT '0' COMMENT 'NEW,RENEWAL,AMENDMENT,TRANSFER,',
   strAgeLevel varchar(20) NOT NULL DEFAULT '' COMMENT 'SENIOR,JUNIOR',
 
   intPaymentRequired int(11) NOT NULL DEFAULT '0' COMMENT 'Is a payment required for this type of registration',

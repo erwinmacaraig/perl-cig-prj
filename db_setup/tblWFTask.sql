@@ -7,9 +7,9 @@ CREATE TABLE tblWFTask (
   intApprovalEntityID int(11) NOT NULL DEFAULT '0' COMMENT 'Which entity has to approve this task',
 /*  intApprovalRoleID int(11) NOT NULL DEFAULT '0' COMMENT 'What Role within the Entity has to approve this item',*/
   strTaskType varchar(20) NOT NULL COMMENT 'From tblWFRule',
-    strWFRuleFor VARCHAR(30) DEFAULT '' COMMENT 'PERSON, REGO, ENTITY, DOCUMENT',
-  intDocumentTypeID int(11) NOT NULL DEFAULT '0' COMMENT 'From tblWFRule',
+  strWFRuleFor VARCHAR(30) DEFAULT '' COMMENT 'PERSON, REGO, ENTITY, DOCUMENT',
   strTaskStatus varchar(20) NOT NULL DEFAULT 'ACTIVE' COMMENT 'From tblWFRule',
+    strRegistrationNature varchar(20) NOT NULL DEFAULT '0' COMMENT 'NEW,RENEWAL,AMENDMENT,TRANSFER,',
   intProblemResolutionEntityID int(11) DEFAULT NULL COMMENT 'From tblWFRule',
   /*intProblemResolutionRoleID int(11) DEFAULT NULL COMMENT 'From tblWFRule',*/
   /*intActivateUserID int(11) DEFAULT NULL COMMENT 'This person approved another task which caused this task to become active and appear on a list for another person to approve',*/
@@ -19,6 +19,7 @@ CREATE TABLE tblWFTask (
   /*intRejectedUserID int(11) DEFAULT NULL,*/
   dtRejectedDate datetime DEFAULT NULL,
 
+  intDocumentTypeID int(11) NOT NULL DEFAULT '0' COMMENT 'From tblWFRule',
   intEntityID int(11) NOT NULL DEFAULT '0' COMMENT 'The entity who is registering',
   intPersonID int(11) NOT NULL DEFAULT '0' COMMENT 'The person who is registering',
   intPersonRegistrationID int(11) NOT NULL DEFAULT '0' COMMENT 'Foreign key to the registration that triggered this task',
@@ -26,7 +27,8 @@ CREATE TABLE tblWFTask (
 
   tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (intWFTaskID),
-  KEY index_intEntityID (intApprovalRoleID),
+  KEY index_intEntityID (intApprovalEntityID),
+  KEY index_intProbEntityID (intProblemResolutionEntityID),
     KEY index_WFRule (intWFRuleID),
     KEY index_intRealmID (intRealmID, intSubRealmID),
     KEY index_RuleFor (strWFRuleFor)
