@@ -370,6 +370,7 @@ if($SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequestCleara
         'bankfileexport',
         'paymentsplitrun',
         'registrationforms', #nationalrego. enable regoforms at entity level.
+        'entityregistrationallowed',
         ]],
         [ $lang->txt('Reports'), 'menu',[
         'reports',
@@ -801,6 +802,12 @@ sub getClubMenuData {
             name => $lang->txt('Work Tasks'),
             url => $baseurl."a=WF_",
         };
+        $menuoptions{'entityregistrationallowed'} = {
+            name => $lang->txt('Reg. Allowed'),
+            url => $baseurl."a=ERA_",
+        };
+
+
             if (
                 $Data->{'SystemConfig'}{'AllowOnlineRego'}
                     or $Data-> {'Permissions'}{'OtherOptions'}{'AllowOnlineRego'}
@@ -861,6 +868,7 @@ sub getClubMenuData {
         'registrationforms',
         'transactions',
         'locator',
+        'entityregistrationallowed',
         ]],
         [ $lang->txt('Reports'), 'menu',[
         'reports',

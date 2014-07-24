@@ -14,6 +14,7 @@ use DBI;
 use WorkFlow;
 use UserObj;
 use CGI qw(unescape);
+use RegistrationAllowed;
 
 main();
 
@@ -22,10 +23,44 @@ sub main	{
 
 	my %Data = ();
 	my $db = connectDB();
+    my $entityID=19;
+    my $personRegistrationID = 1;
+    my $venueID=749;
 	$Data{'db'} = $db;
 	$Data{'Realm'} = 1;
-    addWorkFlowTasks(\%Data, 'REGO', 'NEW', $Defs::ORIGIN_SELF, 0,0,1, 0); ## Person Rego
-    addWorkFlowTasks(\%Data, 'ENTITY', 'NEW', $Defs::ORIGIN_SELF, 749,0,0, 0); ##Venue
+	$Data{'RealmSubType'} = 0;
+    my %RegFields = ();
+    $RegFields{'personType'} = 'PLAYER';
+    $RegFields{'personLevel'} = 'AMATEUR';
+    $RegFields{'sport'} = 'FOOTBALL';
+    $RegFields{'ageLevel'} = 'SENIOR';
+    $RegFields{'gender'} = 1;
+    if (isRegoAllowedToEntity(\%Data, $entityID, 'NEW', \%RegFields))  {
+            print "OK TO CONTINUE FOR ENTITY\n";
+        if (isRegoAllowedToSystem(\%Data, $Defs::ORIGIN_SELF, 'NEW', \%RegFields))    {
+            print "OK TO CONTINUE - PLAYER\n";
+            addWorkFlowTasks(\%Data, 'REGO', 'NEW', $Defs::ORIGIN_SELF, 0,0,$personRegistrationID, 0); ## Person Rego
+        }
+        else    {
+            print "NOT OK TO CONTINUE - PLAYER\n";
+        }
+    }
+    else    {
+        print "NOT OK TO CONTINUE FOR ENTITY- PLAYER\n";
+    }
+    $RegFields{'personType'} = 'COACH';
+    $RegFields{'personLevel'} = 'AMATEUR';
+    $RegFields{'sport'} = 'FUTSAL';
+    $RegFields{'ageLevel'} = 'SENIOR';
+    if (isRegoAllowedToSystem(\%Data, $Defs::ORIGIN_SELF, 'NEW', \%RegFields))    {
+        print "OK TO CONTINUE - COACH\n";
+    }
+    else    {
+        print "NOT OK TO CONTINUE - COACH\n";
+    }
+    
+
+    addWorkFlowTasks(\%Data, 'ENTITY', 'NEW', $Defs::ORIGIN_SELF, $venueID,0,0, 0); ##Venue
 #    addWorkFlowTasks(\%Data, 'DOCUMENT', $Defs::ORIGIN_SELF, 0,0,0, 1); ##Document
 
 }

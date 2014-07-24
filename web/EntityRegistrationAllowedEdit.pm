@@ -75,7 +75,7 @@ my %genderoptions = ();
     my %FieldDefinitions = (
     fields=>  {
       strPersonType => {
-        label => 'Person Type',
+        label => 'Person Type (DROP BOX OF PLAYER/COACH/REFEREE) etc',
         value => $field->{strPersonType},
         type  => 'text',
         size  => '40',
@@ -83,7 +83,7 @@ my %genderoptions = ();
         sectionname => 'details',
       },
       strSport=> {
-        label=> 'Sport',
+        label=> 'Sport (DROP BOX OF SPORT)',
         value => $field->{strSport},
         type  => 'text',
         size  => '40',
@@ -99,7 +99,7 @@ my %genderoptions = ();
                 firstoption => [ '', " " ],
         },
       strPersonLevel => {
-        label => 'Person Level',
+        label => 'Person Level (DROP BOX OF PRO/AMATEUR)',
         value => $field->{strPersonLevel},
         type  => 'text',
         size  => '30',
@@ -107,7 +107,7 @@ my %genderoptions = ();
         sectionname => 'details',
       },      
       strRegistrationNature => {
-        label => 'Registration Nature',
+        label => 'Registration Nature (DROP BOX OF NEW/REREG/AMEND/TRANSFER)',
         value => $field->{strRegistrationNature},
         type  => 'text',
         size  => '40',
@@ -115,7 +115,7 @@ my %genderoptions = ();
         sectionname => 'details',
       },
       strAgeLevel => {
-        label => 'Age Level',
+        label => 'Age Level (DROP BOX OF JUNIOR/SENIOR)',
         value => $field->{strAgeLevel},
         type  => 'text',
         size  => '30',
