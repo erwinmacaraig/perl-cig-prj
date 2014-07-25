@@ -14,9 +14,9 @@ CREATE TABLE tblWFTask (
   /*intProblemResolutionRoleID int(11) DEFAULT NULL COMMENT 'From tblWFRule',*/
   /*intActivateUserID int(11) DEFAULT NULL COMMENT 'This person approved another task which caused this task to become active and appear on a list for another person to approve',*/
   dtActivateDate datetime DEFAULT NULL COMMENT 'What date did this task first appear on a person''s list',
-  /*intApprovalUserID int(11) DEFAULT NULL COMMENT 'Who approved this task',*/
+  intApprovalUserID int(11) DEFAULT NULL COMMENT 'Who approved this task',
   dtApprovalDate datetime DEFAULT NULL COMMENT 'What date was this task approved',
-  /*intRejectedUserID int(11) DEFAULT NULL,*/
+  intRejectedUserID int(11) DEFAULT NULL,
   dtRejectedDate datetime DEFAULT NULL,
 
   intDocumentTypeID int(11) NOT NULL DEFAULT '0' COMMENT 'From tblWFRule',

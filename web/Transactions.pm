@@ -37,6 +37,7 @@ sub handleTransactions	{
 	my $heading='';
 
   if ($action =~ /_TXN_LIST/) {
+        $entityID = getLastEntityID($Data->{'clientValues'});
 		($resultHTML,$heading) = TransLog::handleTransLogs('list', $Data, $entityID, $intTableID);
   }
   elsif ($action =~ /_TXN_EDIT/) {
@@ -92,11 +93,11 @@ sub displayTransaction	{
 
 	my $action = 'P_TXN_EDIT';
 	$action = 'T_TXN_EDIT' if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB;
-  my $resultHTML = '';
+    my $resultHTML = '';
 	my $toplist='';
 
-	my $entityID= $Data->{'clientValues'}{'clubID'} || 0;
-  $entityID=0 if ($entityID== $Defs::INVALID_ID);
+	my $entityID= getLastEntityID($Data->{'clientValues'}) || 0; 
+    $entityID=0 if ($entityID== $Defs::INVALID_ID);
 	my %DataVals=();
 	my $statement=qq[
 		SELECT 
@@ -337,7 +338,8 @@ sub showTransactionChildren	{
 	];
 
 	my $qry = $Data->{'db'}->prepare($st);
-	$qry->execute($id, $Data->{'clientValues'}{'clubID'});
+    my $entityID = getLastEntityID($Data->{'clientValues'}) || 0;
+	$qry->execute($id, $entityID);
 	my $count=0;
 	my $body = qq[
 		<div class="pageHeading">Part Payment records</div>
@@ -377,14 +379,14 @@ sub checkTXNPricing	{
 	my($id,$params, $Data,$db, $personID)=@_;
         $personID||=0;
 
-	my $clubID = $Data->{'clientValues'}{'clubID'} || 0;
+    my $entityID = getLastEntityID($Data->{'clientValues'}) || 0;
 	my $statement = qq[
         SELECT PP.curAmount, P.curDefaultAmount, T.intQty
 	FROM tblTransactions as T
 	        LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
-			LEFT JOIN tblProductPricing as PP ON (PP.intProductID = P.intProductID AND PP.intRealmID = $Data->{'Realm'} AND ((PP.intID = T.intTXNEntityID AND intLevel = $Defs::LEVEL_CLUB)
+			LEFT JOIN tblProductPricing as PP ON (PP.intProductID = P.intProductID AND PP.intRealmID = $Data->{'Realm'} AND ((PP.intID = T.intTXNEntityID AND intLevel >= $Defs::LEVEL_CLUB)
 ];          
-    $statement .= qq[ OR (PP.intID = $clubID AND intLevel=$Defs::LEVEL_CLUB)] if ($clubID and $clubID != $Defs::INVALID_ID);
+    $statement .= qq[ OR (PP.intID = $entityID AND intLevel>=$Defs::LEVEL_CLUB)] if ($entityID and $entityID != $Defs::INVALID_ID);
     $statement .= qq[))
 	WHERE T.intTransactionID = $id
     ];
