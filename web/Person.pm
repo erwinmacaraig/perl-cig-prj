@@ -125,7 +125,8 @@ sub handlePerson {
         ( $resultHTML, $title ) = Transactions::handleTransactions( $action, $Data, $personID );
     }
     elsif ( $action =~ /P_TXNLog/ ) {
-        ( $resultHTML, $title ) = TransLog::handleTransLogs( $action, $Data, $personID );
+        my $entityID = getLastEntityID($Data->{'clientValues'});
+        ( $resultHTML, $title ) = TransLog::handleTransLogs( $action, $Data, $entityID, $personID );
     }
     elsif ( $action =~ /P_PAY_/ ) {
         ( $resultHTML, $title ) = handlePayments( $action, $Data, 0 );

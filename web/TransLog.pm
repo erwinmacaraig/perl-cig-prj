@@ -243,9 +243,7 @@ print STDERR "SDSDSDSD $paymentTypeSubmitted";
 	my ($body, $header) = ('', '');
 
 	my ($currencyID, $intAmount, $dtLog, $paymentType, $strBSB, $strAccountName, $strAccountNum, $strResponseCode, $strResponseText, $strComments, $strBank, $strReceiptRef) = ($Data->{params}{currencyID}, $Data->{params}{intAmount}, $Data->{params}{dtLog}, $Data->{params}{paymentType}, $Data->{params}{strBSB}, $Data->{params}{strAccountName}, $Data->{params}{strAccountNum}, $Data->{params}{strResponseCode}, $Data->{params}{strResponseCode}, $Data->{params}{strComments}, $Data->{params}{strBank}, $Data->{params}{strReceiptRef});
-print STDERR "SDSDSDSD|$paymentType";
     $paymentType ||= $paymentTypeSubmitted;
-print STDERR "SDSDSDSD|$paymentType";
 
 	#$dtLog=convertDateToYYYYMMDD($dtLog);
 	$dtLog=fixDate($dtLog);
@@ -262,24 +260,24 @@ print STDERR "SDSDSDSD|$paymentType";
         }
 		
 	if ($paymentTypeSubmitted)	{
-		if (! $Data->{'clientValues'}{'clubID'} or $Data->{'clientValues'}{'clubID'} == $Defs::INVALID_ID)	{
-			my $whereClause = 'intTransactionID in ('.join(",", @transactionIDs).')';	
-			my $st = qq[
-				SELECT
-					DISTINCT intProductID
-				FROM
-					tblTransactions
-				WHERE intRealmID = $Data->{'Realm'}
-				AND  $whereClause
-			];
-			my $query = $db->prepare($st);
-  			$query->execute;
-			while (my $productID=$query->fetchrow_array())	{
-				if (Products::checkProductClubSplit($Data, $productID)>0)	{
-					return ("One of these products has a club split that's attempting to send funds to a club, but the club is unknown. To sell a product with a club split applied, log in (or drill down) to club level and select the member from within the club.", "Transactions");
-				}
-			}
-		}
+	#	if (! $Data->{'clientValues'}{'clubID'} or $Data->{'clientValues'}{'clubID'} == $Defs::INVALID_ID)	{
+	#		my $whereClause = 'intTransactionID in ('.join(",", @transactionIDs).')';	
+	#		my $st = qq[
+	#			SELECT
+	#				DISTINCT intProductID
+	#			FROM
+	#				tblTransactions
+	#			WHERE intRealmID = $Data->{'Realm'}
+	#			AND  $whereClause
+	#		];
+	#		my $query = $db->prepare($st);
+  	#		$query->execute;
+	#		while (my $productID=$query->fetchrow_array())	{
+	#			if (Products::checkProductClubSplit($Data, $productID)>0)	{
+	#				return ("One of these products has a club split that's attempting to send funds to a club, but the club is unknown. To sell a product with a club split applied, log in (or drill down) to club level and select the member from within the club.", "Transactions");
+	#			}
+	#		}
+	#	}
 		
 
 			
@@ -294,11 +292,11 @@ print STDERR "SDSDSDSD|$paymentType";
     my $authLevel = $Data->{'clientValues'}{'authLevel'}||=$Defs::INVALID_ID;
     my $entityID = getID($Data->{'clientValues'}, $authLevel) || 0;
 
-	my $intClubID = $Data->{'clientValues'}{'clubID'} || 0; 
+    my $entityID = getLastEntityID($Data->{'clientValues'});
 #BAFF
-    $intClubID = 0 if ($intClubID == $Defs::INVALID_ID);
+    $entityID= 0 if ($entityID== $Defs::INVALID_ID);
 	my $intPersonID= $Data->{'clientValues'}{'personID'}; 
-	my ($transHTML, $transcount, $transCurrency_ref, $transAmount_ref)=getTransList($Data, $db, $intClubID, $intPersonID, $whereClause, $clientValues_ref, 0, $displayonly);
+	my ($transHTML, $transcount, $transCurrency_ref, $transAmount_ref)=getTransList($Data, $db, $entityID, $intPersonID, $whereClause, $clientValues_ref, 0, $displayonly);
 
 
 #Make DB Changes
@@ -522,9 +520,9 @@ sub getTransList {
 
     my $realmID = $Data->{'Realm'};
 	my $orderBy = $Data->{'SystemConfig'}{'TransListOrderBy'} || '';
-    my $clubWHERE = '';
+    my $entityWHERE = '';
     if ($entityID)   {
-        $clubWHERE = qq[ 
+        $entityWHERE = qq[ 
             AND (
                 tl.intLogID IS NULL 
                 OR tl.intEntityPaymentID IN (0, $entityID)
@@ -763,9 +761,9 @@ sub listTransactions_where {
     $whereClause .= qq[ AND t.intID=$safeTableID and t.intTableType=$Defs::LEVEL_CLUB]   if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB;
     $whereClause .= qq[ AND t1.intTLogID= $safePaymentID ] if $paymentID;
 
-    my $clubID = $Data->{'clientValues'}{'clubID'} || 0;
+    my $entityID = getLastEntityID($Data->{'clientValues'}) || 0; #
 
-    $whereClause .= qq[ AND intTXNEntityID IN (0, $clubID)] if $clubID;
+    $whereClause .= qq[ AND intTXNEntityID IN (0, $entityID)] if $entityID;
     $whereClause .= qq[ AND P.intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) ] if $txnStatus != $Defs::TXN_PAID;
 
     return $whereClause;
@@ -773,6 +771,7 @@ sub listTransactions_where {
 
 sub listTransactions {
     my ($Data, $db, $entityID, $personID, $tempClientValues_ref, $action, $resultMessage) = @_;
+warn("ENTITY: $entityID | $personID");
     my ($body, $paidLink, $unpaidLink, $cancelledLink, $query) = ('', '', '', '', '');
     my $txnStatus = $Data->{'ViewTXNStatus'} || $Defs::TXN_UNPAID;
     my ($link, $mode, $TableID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('', $Data, $tempClientValues_ref);
@@ -785,6 +784,7 @@ sub listTransactions {
 
     my $whereClause = '';
     $whereClause .= qq[ AND t.intID=$personID and t.intTableType=$Defs::LEVEL_PERSON] if ($personID and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON);
+warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
     $whereClause .= qq[ AND t.intID=$entityID and t.intTableType=$Defs::LEVEL_CLUB] if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB;
     $whereClause .= qq[ AND t1.intTLogID= $safePaymentID ] if $paymentID;
 
@@ -1659,11 +1659,10 @@ sub listTransLog	{
 		    $WHERE .= qq[ AND T.intTXNEntityID = $entityID];
 			$WHERE .= qq[ AND T.intTableType=$Defs::LEVEL_CLUB] 
 		}
-  my $clubWHERE = '';
+  my $entityWHERE = '';
   if (
-		$Data->{'clientValues'}{'clubID'} 
-		and $Data->{'clientValues'}{'clubID'} != $Defs::INVALID_ID)  {
-    $clubWHERE = qq[ AND TL.intClubPaymentID IN (0, $Data->{'clientValues'}{'clubID'}) ];
+		$entityID and $entityID != $Defs::INVALID_ID)  {
+    $entityWHERE = qq[ AND TL.intEntityPaymentID IN (0, $entityID) ];
   }
 	my $statement =qq[
 		SELECT 

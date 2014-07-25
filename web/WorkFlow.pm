@@ -425,16 +425,16 @@ sub approveTask {
 	$st = qq[
 	  	UPDATE tblWFTask SET 
 	  		strTaskStatus = 'COMPLETE',
+	  		intApprovalUserID = ?,
 	  		dtApprovalDate = NOW()
 	  	WHERE intWFTaskID = ?; 
 		];
 		
-	  		#intApprovalUserID = ?
   	$q = $db->prepare($st);
   	$q->execute(
+	  	$Data->{'clientValues'}{'userID'},
   		$WFTaskID,
   		);
-	  	#$Data->{'clientValues'}{'userID'},
   		
 	if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
@@ -690,15 +690,15 @@ sub rejectTask {
 	  	UPDATE tblWFTask 
         SET 
 	  		strTaskStatus = 'REJECTED',
+	  		intRejectedUserID = ?,
 	  		dtRejectedDate = NOW()
 	  	WHERE 
             intWFTaskID = ?; 
     ];
 		
-	  		#intRejectedUserID = ?
-	  	#$Data->{'clientValues'}{'userID'},
   	$q = $db->prepare($st);
   	$q->execute(
+	  	$Data->{'clientValues'}{'userID'},
   		$WFTaskID,
   		);
   		

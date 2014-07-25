@@ -190,7 +190,8 @@ sub checkoutConfirm	{
     
     my $compulsory = 0;
 	my $RegoFormObj = undef;
-	my $passedClubID = $Data->{'clientValues'}{'clubID'};
+	#my $passedEntityID = $Data->{'clientValues'}{'clubID'};
+	#$passedEntityID = $Data->{'clientValues'}{'zoneID'} if ($Data->{'clientValues'}{'zoneID'} and $Data->{'clientValues'}{'zoneID'} != $Defs::INVALID_ID);
 
 	if($Data->{'RegoFormID'})	{
 		$RegoFormObj = RegoForm::RegoFormFactory::getRegoFormObj(
@@ -201,7 +202,7 @@ sub checkoutConfirm	{
         $compulsory = $RegoFormObj->getValue('intPaymentCompulsory') || 0;
 	}
     my $formID = $Data->{'RegoFormID'} || 0;
-	$Data->{'clientValues'}{'clubID'}= $passedClubID if $passedClubID;
+	#$Data->{'clientValues'}{'clubID'}= $passedEntityID if $passedEntityID;
 	my $client=setClient($Data->{'clientValues'}) || '';
 	my $db = $Data->{'db'};
 	my $body;
