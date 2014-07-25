@@ -11,7 +11,7 @@ require Exporter;
 use lib "..";
 use strict;
 use Mail::Sendmail;
-use Utils;
+#use Utils;
 use DeQuote;
 
 
@@ -83,15 +83,18 @@ Content-Transfer-Encoding: 8bit
 	if($mail{To} ne "") {
 		if (sendmail(%mail)) {
 			print MAILLOG (scalar localtime()).":$maillog_text :$mail{To}: FROM $from Sent OK\n";
-	close MAILLOG;
+			print scalar localtime().":$maillog_text :$mail{To}: FROM $from Sent OK\n";
+	#close MAILLOG;
 			return 1;
 		}
 		else {
-			print MAILLOG (scalar localtime()).":$maillog_text:$mail{To}:Error sending mail: $Mail::Sendmail::error\n";
-	close MAILLOG;
+			print MAILLOG (scalar localtime()).":$maillog_text:$mail{To}:Error sending mail: $Mail::Sendmail::error\n"; 
+			print scalar localtime().":$maillog_text:$mail{To}:Error sending mail: $Mail::Sendmail::error\n";
+	#close MAILLOG;
 			return 0;
 		}
 	}
 }
 
-1
+1;
+

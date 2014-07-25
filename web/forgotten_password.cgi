@@ -6,6 +6,7 @@
 use strict;
 use lib ".", "..", 'user';
 use CGI qw(param unescape escape cookie);
+use CGI qw(:standard -debug);
 use Defs;
 use Lang;
 use TTTemplate; 
@@ -20,7 +21,6 @@ my $lang= Lang->get_handle() || die "Can't get a language handle!";
 my $title=$lang->txt('APPNAME') || 'SportingPulse Membership'; 
 
 my %Data = (); #empty hash 
-my $lang = Lang->get_handle() || die "Can't get a language handle!";
 $Data{lang} = $lang;	 
 $Data{'cache'}  = new MCache(); 
 my $error = '';
@@ -30,25 +30,13 @@ my $action = param('a') || '';
 if($action eq 'RESET_PASSWD'){ 
 	my $email = param('email'); 
 	my $dbh = connectDB(); 
-	my $query = "SELECT userId, email FROM tblUser WHERE email = ?";
-	my $st = $dbh->prepare($query);
-	$st->execute($email);
-	my @row = $st->fetchrow_array; 
-	if(!@row){
-	 $error = "Sorry. Email address does not exist in our system.";
+	my $userObj = new UserObj('db',$dbh);
+	if( !defined($userObj->load('email',$email)) ){ 
+	    $error = "Sorry. Email address does not exist in our system.";
 	}
-	else { 
-		#1. Generate unique random string
-		my $userObj = new UserObj();
-			
-		#2. Insert the string in tblUserHash strPasswordChangeKey 
-		my $uId = shift @row;
-		$query = "UPDATE tblUserHash SET strPasswordChangeKey = ? WHERE userID = ?";
-		my $stringRandom = $userObj->_generateConfirmKey();
-		$st = $dbh->prepare($query);
-		$st->execute($stringRandom,$uId);
-		$st->finish();
-		print "Location: emailform.cgi?url_key=$stringRandom\n\n";
+	else { 		
+	    my $stringRandom = $userObj->getPasswdChangeKey();
+	    print "Location: emailform.cgi?url_key=$stringRandom\n\n";
 	}		
 }
 my $body = runTemplate(
@@ -57,12 +45,10 @@ my $body = runTemplate(
     'user/forgot_password_form.templ',
 );
 
-pageForm($title, $body, {}, '', \%Data);
-  
-  
-  
-  
-  
-  
-  
-     
+pageForm(
+	$title,
+	$body,
+	{},
+	'',
+	\%Data,
+);

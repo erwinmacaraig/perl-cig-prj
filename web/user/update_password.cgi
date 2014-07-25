@@ -18,10 +18,14 @@ use DBI;
 my $lang = Lang->get_handle() || die "Can't get a language handle!";
 $Data{lang} = $lang;
 
+
+
 #get posted values
 my $newpasswd = param('new_passwd') || '';
 my $confirm_passwd = param('confirm_passwd') || '';
 my $uId = param('uId') || '';
+my $url_key = param('url_key') || '';
+
 my $error = undef;
 
 #validate password again 
@@ -31,23 +35,25 @@ if($newpasswd ne $confirm_passwd){
 if(length($newpasswd) < 6){
 	$error .= 'Password should be atleast 6 characters long.<br />';
 }
+
+#validate if user id corresponds to clients url key
+my $dbh = connectDB(); 
+if(!verifyUserHasKey()){
+	$error .= 'URL key is not valid for this user. <br />';
+}
+
 #update password
 if(!defined($error)){ 
-     my $dbh = connectDB(); 
      my %cfg = (id => $uId, db => $dbh);
      my $myUserObj = new UserObj(%cfg);	
-     $myUserObj->setPassword($newpasswd);
-     
+     $myUserObj->setPassword($newpasswd);     
 }
-$Data{'Errors'} = $error;
-
-
 
 my $template = 'user/update_password_msg.templ';  
 
 my $body = runTemplate(
     \%Data,
-    {},
+    {Errors => $error,},
     $template,
 ); 
 
@@ -60,3 +66,13 @@ pageForm(
 	'',
 	\%Data,
 );
+
+sub verifyUserHasKey{
+	my $query = "SELECT userId FROM tblUserHash WHERE strPasswordChangeKey = ?";	
+	my $sth = $dbh->prepare($query);
+	$sth->execute($url_key);
+	my($uId_frm_db) = $sth->fetchrow_array();
+	$sth->finish();
+	return 1 if($uId_frm_db == $uId); 
+	return 0;	
+}

@@ -211,8 +211,19 @@ sub Email  {
 sub Status {
   my $self = shift;
   return $self->{'DBData'}{'status'} || $Defs::USER_STATUS_INVALID
+} 
+#### Setting a new password change key ##### 
+sub getPasswdChangeKey {
+    my $self = shift; 
+    my $id = $self->ID() || 0;
+    return undef if(!$id); 
+    
+    my $query = "UPDATE tblUserHash SET strPasswordChangeKey = ? WHERE userID = ?";
+    my $sth = $self->{'db'}->prepare($query);
+    my $url_key = $self->_generateConfirmKey();
+    $sth->execute($url_key,$id);
+    return $url_key || '';    
 }
-
 
  # ---- Internal functions
 sub _load_Details {
@@ -273,4 +284,7 @@ sub _generateConfirmKey {
   $confirmkey=substr($confirmkey,0,30);
   return $confirmkey;
 }
+
+
+
 1;

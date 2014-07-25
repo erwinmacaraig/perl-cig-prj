@@ -9,7 +9,7 @@ require Exporter;
 
 @EXPORT = @EXPORT_OK = qw(
 commify connectDB disconnectDB debug db_error query_error authstring getDBSysDate HTML_link untaint_param untaint_number DB_Insert safe_param getQueryPreparedAndBound getSimpleSQL getSelectSQL getDeleteSQL getUpdateSQL htmlDumper pair_to_hash print_stack_trace now_str encode decode hash_list_to_hash
-hash_to_kv_list generate_random_parameter isURL_Key_Valid);
+hash_to_kv_list);
 
 use strict;
 use lib "..", "../..";
@@ -404,33 +404,5 @@ sub hash_to_kv_list {
 
     return \@result;
 }
-
-####### Generates Ramdom String ########
-sub generate_random_parameter {
-	my $length_of_string = shift; 
-	my @chars = ('a'..'z','A'..'Z','0'..'9','^','[',')','_',':'); 
-	my $random_string;
-	print "The chars array: @chars .\n";
-	foreach (1..$length_of_string){
-		$random_string .= $chars[rand @chars]; 
-	} 
-	return $random_string;
-} 
-
-sub isURL_Key_Valid{ 
-	my $url_key = shift;
-	my $query = "SELECT userId FROM tblUserHash WHERE strPasswordChangeKey != '' AND strPasswordChangeKey = ?";
-	my $dbh = connectDB();
-	my $sth = $dbh->prepare($query);
-	$sth->execute($url_key); 
-	my ($uId) = $sth->fetchrow_array();
-	$sth->finish();
-	return $uId;		
-}
-
-
-
-
-
 1;
 # vim: set et sw=4 ts=4:

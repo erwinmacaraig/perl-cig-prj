@@ -19,21 +19,24 @@ $Data{lang} = $lang;
 my $target = 'modifypassword.cgi';
 $Data{'target'} = $target;
 $Data{'cache'}  = new MCache();
-$Data{uId} = '';
+
+my $UserTempDataUid = '';
 my $body = '';
 
 #check first for existing parameter 
 my $url_key = param('url_key') || '';
 my $uId = isURL_Key_Valid($url_key);
 if(defined ($uId)){
-     $Data{uId} = $uId;
+     $UserTempDataUid = $uId;
 }
 
 my $template = 'user/modify_user_password.templ';  
 
 $body = runTemplate(
     \%Data,
-    {},
+   {UserTempDataUid => $UserTempDataUid,
+    URL_Key => $url_key,
+   },
     $template,
 ); 
 
@@ -46,3 +49,13 @@ pageForm(
 	'',
 	\%Data,
 );
+sub isURL_Key_Valid{ 
+	my $url_key = shift;
+	my $query = "SELECT userId FROM tblUserHash WHERE strPasswordChangeKey != '' AND strPasswordChangeKey = ?";
+	my $dbh = connectDB();
+	my $sth = $dbh->prepare($query);
+	$sth->execute($url_key); 
+	my ($uId) = $sth->fetchrow_array();
+	$sth->finish();
+	return $uId;		
+}
