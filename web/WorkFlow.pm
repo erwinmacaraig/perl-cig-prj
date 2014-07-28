@@ -183,7 +183,7 @@ sub getEntityParentID   {
             AND intPrimary=1
             
     ];
-	my $q = $Data->{'db'}->prepare($st);
+	$q = $Data->{'db'}->prepare($st);
   	$q->execute($fromEntityID, $getEntityLevel);
         
     return $q->fetchrow_array() || 0;
