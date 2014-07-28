@@ -647,7 +647,7 @@ sub checkForOutstandingTasks {
 			$q->execute($personRegistrationID);
 			            
 			my $dref= $q->fetchrow_hashref();
-			my $intPaymentRequired = $dref->{intPaymentRequired};
+			my $intPaymentRequired = 0; #$dref->{intPaymentRequired};
 			  	
         	if (!$intPaymentRequired) {
         		#Nothing outstanding, so mark this registration as complete

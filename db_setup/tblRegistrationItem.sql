@@ -23,6 +23,7 @@ CREATE TABLE tblRegistrationItem (
 
     intUseExistingThisEntity TINYINT DEFAULT 0, /* An existing use of this ID is possible within this entity */
     intUseExistingAnyEntity TINYINT DEFAULT 0,/* An existing use of this ID is Ok against ANY entity */
+    intPaymentRequired TINYINT DEFAULT 0 COMMENT '0=Optional, 1 =Required', /* Sets intPaymentRequired in tblPersonRego */
     intRequired TINYINT DEFAULT 0 COMMENT '0=Optional, 1 =Required',
 
     tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

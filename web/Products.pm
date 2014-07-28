@@ -2249,19 +2249,42 @@ sub product_apply_transaction {
     
     return if !$transLogID;
     my $st = qq[
-			SELECT intProductID,intID 
-			FROM tblTransactions 
-			WHERE intTransLogID = ?
-				AND intTableType = 1
+			SELECT 
+                T.intProductID,
+                T.intID,
+                P.intCanResetPaymentRequired,
+                T.intPersonRegistrationID,
+                T.intStatus
+			FROM tblTransactions as T
+                INNER JOIN tblProducts as P ON (P.intProductID=T.intProductID)
+			WHERE T.intTransLogID = ?
+				AND T.intTableType = 1
 		];
     my $q = $db->prepare($st);
     $q->execute($transLogID);
-    while( my ($productID,$personID) = $q->fetchrow_array())	{
+    
+    my $stUPD= qq[
+        UPDATE tblPersonRegistration_$Data->{'Realm'} 
+        SET 
+            intPaymentRequired = 1
+        WHERE 
+            intPersonID = ?
+            AND intPersonRegistrationID = ?
+        LIMIT 1
+    ];
+    my $qUPD = $db->prepare($stUPD);
+   
+    while( my ($productID,$personID, $resetPaymentReq, $personRegoID, $txnStatus) = $q->fetchrow_array())	{
         if ($productID && $personID) {
             apply_product_rules($Data,$productID,$personID,$transLogID);
+            if ($txnStatus==1 and $resetPaymentReq and $personRegoID) {
+                $qUPD->execute($personID, $personRegoID);
+            }
         }
     }
     $q->finish();
+
+    $st = 
     
     return;
 }
