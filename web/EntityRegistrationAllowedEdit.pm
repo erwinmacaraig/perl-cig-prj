@@ -65,63 +65,87 @@ sub rule_details   {
 	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
     my $field = loadRuleDetails($Data->{'db'}, $Data, $entityID) || ();
-my %genderoptions = ();
+    my %genderoptions = ();
     for my $k ( keys %Defs::genderInfo ) {
         next if !$k;
         next if ($k eq $Defs::GENDER_NONE );
         $genderoptions{$k} = $Defs::genderInfo{$k} || '';
     }
-    
-    my %FieldDefinitions = (
-    fields=>  {
-      strPersonType => {
-        label => 'Person Type (DROP BOX OF PLAYER/COACH/REFEREE) etc',
-        value => $field->{strPersonType},
-        type  => 'text',
-        size  => '40',
-        maxsize => '150',
-        sectionname => 'details',
-      },
-      strSport=> {
-        label=> 'Sport (DROP BOX OF SPORT)',
-        value => $field->{strSport},
-        type  => 'text',
-        size  => '40',
-        maxsize => '150',
-        sectionname => 'details',
-      },
-        intGender => {
-                label       => 'Gender',
-                value       => $field->{intGender},
-                type        => 'lookup',
-                options     => \%genderoptions,
-                sectionname => 'details',
-                firstoption => [ '', " " ],
-        },
-      strPersonLevel => {
-        label => 'Person Level (DROP BOX OF PRO/AMATEUR)',
-        value => $field->{strPersonLevel},
-        type  => 'text',
-        size  => '30',
-        maxsize => '50',
-        sectionname => 'details',
-      },      
-      strRegistrationNature => {
-        label => 'Registration Nature (DROP BOX OF NEW/REREG/AMEND/TRANSFER)',
-        value => $field->{strRegistrationNature},
-        type  => 'text',
-        size  => '40',
-        maxsize => '150',
-        sectionname => 'details',
-      },
-      strAgeLevel => {
-        label => 'Age Level (DROP BOX OF JUNIOR/SENIOR)',
-        value => $field->{strAgeLevel},
-        type  => 'text',
-        size  => '30',
-        maxsize => '50',
-        sectionname => 'details',
-      },
+     #### Drop Down Values For  Person Type ###
+     my %persontypeoptions = (); 
+     for my $k ( keys %Defs::personType ){
+        $persontypeoptions{$k} = $Defs::personType{$k} || '';
+    }
+    ### Drop Down Values For Sport ###
+    my %sporttypeoptions = (); 
+    for my $k ( keys %Defs::sportType ){
+        $sporttypeoptions{$k} = $Defs::sportType{$k} || ''; 
+    }
+   ### Drop Down Values For Person Level ### 
+   my %personleveloptions = ();
+   for my $k ( keys %Defs::personLevel ){
+	$personleveloptions{$k} = $Defs::personLevel{$k} || '';
+   }
+   ### Drop Down Values For Registration Nature ###
+   my %registrationnatureoptions = ();
+   for my $k ( keys %Defs::registrationNature ){
+	$registrationnatureoptions{$k} = $Defs::registrationNature{$k} || '';
+   }
+   ### Drop Down Values for Age Type ### 
+   my %agetypeoptions = (); 
+   for my $k ( keys %Defs::AgeType ){ 
+	$agetypeoptions{$k} = $Defs::AgeType{$k} || '';
+    }
+   my %FieldDefinitions = (
+       fields=>  {
+         strPersonType => {
+           label => 'Person Type',
+           value => $field->{strPersonType},
+           type  => 'lookup',
+           options     => \%persontypeoptions,
+           sectionname => 'details',
+           firstoption => [ '', " " ],
+         },
+         strSport=> {
+           label=> 'Sport',
+           value => $field->{strSport},
+           type  => 'lookup',
+           options     => \%sporttypeoptions,
+   	sectionname => 'details',
+           firstoption => [ '', " " ],
+         },
+           intGender => {
+                   label       => 'Gender',
+                   value       => $field->{intGender},
+                   type        => 'lookup',
+                   options     => \%genderoptions,
+                   sectionname => 'details',
+                   firstoption => [ '', " " ],
+           },
+         strPersonLevel => {
+           label => 'Person Level',
+           value => $field->{strPersonLevel},
+           type  => 'lookup',
+   	options     => \%personleveloptions,
+   	sectionname => 'details',
+           firstoption => [ '', " " ],
+         },      
+         strRegistrationNature => {
+           label => 'Registration Nature',
+           value => $field->{strRegistrationNature},
+           type  => 'lookup',
+   	options     => \%registrationnatureoptions,
+   	sectionname => 'details',
+           firstoption => [ '', " " ],
+         },
+         strAgeLevel => {
+           label => 'Age Level',
+           value => $field->{strAgeLevel},
+           type  => 'lookup',
+          	options     => \%agetypeoptions,
+          	sectionname => 'details',
+           firstoption => [ '', " " ],
+         },
     },
     order => [qw(
 		strPersonType
@@ -311,6 +335,11 @@ sub listRules  {
         {
             name  => $Data->{'lang'}->txt('Gender'),
             field => 'Gender',
+        },
+        {
+             name =>   $Data->{'lang'}->txt(' '),
+             field =>  'SelectLink',
+             type => 'HTML',
         },
     );
     
