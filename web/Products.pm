@@ -6,8 +6,8 @@ package Products;
 
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(getProducts handle_products get_product get_product_list product_apply_transaction getProductDependencies getFormProductAttributes updateProductTXNPricing checkProductClubSplit );
-@EXPORT_OK = qw(getProducts handle_products get_product get_product_list product_apply_transaction getProductDependencies getFormProductAttributes updateProductTXNPricing checkProductClubSplit );
+@EXPORT = qw(getProducts handle_products get_product get_product_list product_apply_transaction getProductDependencies getFormProductAttributes updateProductTXNPricing checkProductClubSplit getItemCost getCorrectPrice);
+@EXPORT_OK = qw(getProducts handle_products get_product get_product_list product_apply_transaction getProductDependencies getFormProductAttributes updateProductTXNPricing checkProductClubSplit getItemCost getCorrectPrice);
 
 use strict;
 use lib  '.', '..';#, "..", ".";
@@ -28,6 +28,68 @@ require InstanceOf;
 require Seasons;
 require PaymentApplication;
 require AgeGroups;
+
+
+sub getCorrectPrice {
+    my($dref, $multipersonType) = @_;
+    $multipersonType=~s/\s//g;
+    my $amount= 0 ;
+    $multipersonType ||= '';
+    $dref->{'curAmount'} ||= 0;
+    $dref->{'intPricingType'} ||= 0;
+    $dref->{'curAmount_'.$multipersonType} ||= 0;
+    $dref->{'curAmount_'.$multipersonType} = 0 if $dref->{'curAmount_'.$multipersonType} eq '0.00';
+    $dref->{'curAmount'} = 0 if $dref->{'curAmount'} eq '0.00';
+    $dref->{'curDefaultAmount'} = 0 if $dref->{'curDefaultAmount'} eq '0.00';
+    if($dref->{'intPricingType'} == 1 and $multipersonType)  {
+      $amount = $dref->{'curAmount_'.$multipersonType} || 0;
+    }
+    else  {
+      $amount = $dref->{'curAmount'} || $dref->{'curDefaultAmount'} || 0;
+    }
+    return $amount;
+}
+
+sub getItemCost {
+
+    my ($Data, $entityID, $entityLevel, $multipersonType, $productID) = @_;
+
+     my $st=qq[
+        SELECT
+            P.intProductID,
+            P.curDefaultAmount,
+            PP.curAmount,
+            PP.intPricingType,
+            PP.curAmount_Adult1,
+            PP.curAmount_Adult2,
+            PP.curAmount_Adult3,
+            PP.curAmount_AdultPlus,
+            PP.curAmount_Child1,
+            PP.curAmount_Child2,
+            PP.curAmount_Child3,
+            PP.curAmount_ChildPlus
+        FROM tblProducts as P
+            LEFT JOIN tblProductPricing as PP ON (
+                PP.intProductID = P.intProductID
+                AND PP.intRealmID = ?
+                AND (
+                    (PP.intID = ? AND intLevel = ?)
+                    OR
+                    (intLevel = $Defs::LEVEL_NATIONAL)
+                )
+            )
+        WHERE
+            P.intRealmID = ?
+            AND P.intProductID = ?
+        ORDER BY PP.intLevel ASC
+        LIMIT 1
+    ];
+    my $query = $Data->{'db'}->prepare($st);
+    $query->execute($Data->{'Realm'}, $entityID, $entityLevel, $Data->{'Realm'}, $productID);
+    my $dref=$query->fetchrow_hashref();
+    my $amount= getCorrectPrice($dref, $multipersonType);
+    return $amount;
+}
 
 sub checkProductClubSplit   {
 

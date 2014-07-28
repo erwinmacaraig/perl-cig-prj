@@ -15,6 +15,8 @@ use WorkFlow;
 use UserObj;
 use CGI qw(unescape);
 use RegistrationAllowed;
+use RegistrationItem;
+use Data::Dumper;
 
 main();
 
@@ -40,6 +42,11 @@ sub main	{
         if (isRegoAllowedToSystem(\%Data, $Defs::ORIGIN_SELF, 'NEW', \%RegFields))    {
             print "OK TO CONTINUE - PLAYER\n";
             addWorkFlowTasks(\%Data, 'REGO', 'NEW', $Defs::ORIGIN_SELF, 0,0,$personRegistrationID, 0); ## Person Rego
+            my $products = getRegistrationItems(\%Data, 'REGO', 'PRODUCT', $Defs::ORIGIN_SELF, 'NEW', $entityID, $Defs::LEVEL_CLUB, 0, \%RegFields);
+            my $docs = getRegistrationItems(\%Data, 'REGO', 'DOCUMENT', $Defs::ORIGIN_SELF, 'NEW', $entityID, $Defs::LEVEL_CLUB, 0, \%RegFields);
+    print STDERR Dumper($products);
+    print STDERR "\n\nDOCS" . Dumper($docs);
+            
         }
         else    {
             print "NOT OK TO CONTINUE - PLAYER\n";

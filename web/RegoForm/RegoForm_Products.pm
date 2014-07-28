@@ -6,8 +6,8 @@ package RegoForm_Products;
 require Exporter;
 @ISA =  qw(Exporter);
 
-@EXPORT = qw(getRegoProducts getCorrectPrice checkAllowedProductCount checkMandatoryProducts insertRegoTransaction);
-@EXPORT_OK = qw(getRegoProducts getCorrectPrice checkAllowedProductCount checkMandatoryProducts insertRegoTransaction);
+@EXPORT = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction);
+@EXPORT_OK = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction);
 
 use strict;
 use lib "..","../..";
@@ -378,27 +378,6 @@ sub getAllRegoProducts {
 
     return $regoProducts;
 }
-
-sub getCorrectPrice {
-    my($dref, $multipersonType) = @_;
-    $multipersonType=~s/\s//g;
-    my $amount= 0 ;
-    $multipersonType ||= '';
-    $dref->{'curAmount'} ||= 0;
-    $dref->{'intPricingType'} ||= 0;
-    $dref->{'curAmount_'.$multipersonType} ||= 0;
-    $dref->{'curAmount_'.$multipersonType} = 0 if $dref->{'curAmount_'.$multipersonType} eq '0.00';
-    $dref->{'curAmount'} = 0 if $dref->{'curAmount'} eq '0.00';
-    $dref->{'curDefaultAmount'} = 0 if $dref->{'curDefaultAmount'} eq '0.00';
-    if($dref->{'intPricingType'} == 1 and $multipersonType)  {
-      $amount = $dref->{'curAmount_'.$multipersonType} || 0;
-    }
-    else  {
-      $amount = $dref->{'curAmount'} || $dref->{'curDefaultAmount'} || 0;
-    }
-    return $amount;
-}
-
 
 sub checkAllowedProductCount {
     my ($Data, $ID, $tableType, $formID, $params, $assocID, $realmID) = @_;
