@@ -539,14 +539,16 @@ sub createTransLog	{
     $fields{amount} = $amount || 0;
     
     my $authLevel = $Data->{'clientValues'}{'authLevel'}||=$Defs::INVALID_ID;
-    my $entityID = getID($Data->{'clientValues'}, $authLevel);
+    if (! $entityID)    {
+        $entityID = getID($Data->{'clientValues'}, $authLevel);
+    }
 	$entityID= 0 if $entityID== $Defs::INVALID_ID;
 
  	my $paymentConfigID= $paymentSettings->{'intPaymentConfigID'} || 0;
     deQuote($db, \%fields);
 	my $paymentType = $paymentSettings->{'paymentType'};
 	my $intRegoFormID = $Data->{'RegoFormID'} || 0;
-	my $authLevel = $Data->{'clientValues'}{'authLevel'} || 0;
+	$authLevel = $Data->{'clientValues'}{'authLevel'} || 0;
     my $cgi = new CGI;
 	if ($intRegoFormID and (! $entityID or $entityID == -1))	{
 		my $stRegoForm =qq[

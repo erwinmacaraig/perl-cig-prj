@@ -290,7 +290,7 @@ print STDERR "SDSDSDSD $paymentTypeSubmitted";
 	my $displayonly = 1;
 
     my $authLevel = $Data->{'clientValues'}{'authLevel'}||=$Defs::INVALID_ID;
-    my $entityID = getID($Data->{'clientValues'}, $authLevel) || 0;
+    #my $entityID = getID($Data->{'clientValues'}, $authLevel) || 0;
 
     my $entityID = getLastEntityID($Data->{'clientValues'});
 #BAFF

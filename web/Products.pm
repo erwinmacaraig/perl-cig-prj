@@ -376,7 +376,6 @@ sub list_products	{
   ];
 
 	my $allowadds = 1;
-	my $addlink = qq[<a href="$target?client=$client&amp;a=PR_E">Add a New Product</a>];
 	my $addlink = qq[<span class = "button-small generic-button"><a href="$target?client=$client&amp;a=PR_E">Add</a></span></a>];
 
 	$addlink = '' if !$allowadds;
@@ -1426,9 +1425,6 @@ sub update_products	{
     my $current_level = $Data->{'clientValues'}{'currentLevel'};
     my $original_level = $current_level;
     
-	my $entityID=$Data->{'clientValues'}{'clubID'} || $Defs::INVALID_ID;
-	$entityID = 0 if $entityID == $Defs::INVALID_ID;
-
     my $entityTypeID = $Data->{'currentLevel'};
     my $entityID = getID($Data->{'clientValues'}, $entityTypeID);
 
