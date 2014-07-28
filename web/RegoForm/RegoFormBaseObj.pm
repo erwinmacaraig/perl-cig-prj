@@ -1,7 +1,3 @@
-#
-# $Header: svn://svn/SWM/trunk/web/RegoForm/RegoFormBaseObj.pm 11586 2014-05-16 04:19:10Z sliu $
-#
-
 package RegoForm::RegoFormBaseObj;
 
 use strict;
@@ -62,23 +58,10 @@ sub new {
     $self->_loadFormDetails();
     $self->loadOrgDetails();
 
-    if (!$self->AssocID() or $self->AssocID() == -1) {
-        return undef;
-    }
-
     return $self if $earlyExit;
-    if ($self->isNodeForm() or $self->isLinkedForm()) {
-        ($self->isNodeForm())
-            ? $self->_loadFormTextNodeForm()
-            : $self->_loadFormTextLinkedForm();
-        $self->_loadFieldsNodeLinkedForm();
-        $self->_loadFieldRulesNodeLinkedForm();
-    }
-    else {
-        $self->_loadFormTextAssocClubForm();
-        $self->_loadFieldsAssocClubForm();
-        $self->_loadFieldRulesAssocClubForm();
-    }
+    $self->_loadFormText();
+    $self->_loadFields();
+    $self->_loadFieldRules();
 
     return $self;
 }
@@ -91,106 +74,6 @@ sub _loadFormDetails {
     $q->execute($self->ID());
     $self->{'DBData'} = $q->fetchrow_hashref();
     $q->finish();
-
-    #set nfEntityTypeID, nfEntityID for non-node forms, in particular for linked forms.
-    #but do before any mucking around of fields below (this if).
-    if (!$self->isNodeForm()) {
-        my $cID = $self->{'DBData'}{'intClubID'}  || 0;
-        $cID = 0 if $cID < 0;
-        my $aID = $self->{'DBData'}{'intAssocID'} || 0;
-        my $nfEntityTypeID = $cID ? $Defs::LEVEL_CLUB : $Defs::LEVEL_ASSOC;
-        my $nfEntityID     = $cID ? $cID : $aID;
-        $self->{'Data'}{'nfEntityTypeID'} = $nfEntityTypeID;
-        $self->{'Data'}{'nfEntityID'}     = $nfEntityID;
-    }
-
-    #nationalrego> a form created by a node, will have assocID and clubID set to -1. the values should have come through in the url (and been set into the Data hash).
-    if ($self->{'DBData'}{'intAssocID'} <= 0) {
-        $self->{'DBData'}{'intAssocID'} = $self->{'Data'}{'spAssocID'} if exists $self->{'Data'}{'spAssocID'} and $self->{'Data'}{'spAssocID'} > 0;
-
-        if ($self->{'DBData'}{'intClubID'} <= 0) {
-            $self->{'DBData'}{'intClubID'} = $self->{'Data'}{'spClubID'} if exists $self->{'Data'}{'spClubID'} and $self->{'Data'}{'spClubID'} > 0;
-        }
-
-    }
-
-    if($self->{'DBData'}{'intAssocID'}) {
-        $self->{'RunDetails'}{'AssocID'} = $self->{'DBData'}{'intAssocID'} || 0;
-        $self->{'Data'}{'clientValues'}{'assocID'} = $self->{'DBData'}{'intAssocID'};
-    }
-    if($self->{'DBData'}{'intClubID'})  {
-        $self->{'RunDetails'}{'ClubID'} = $self->{'DBData'}{'intClubID'} || 0;
-    }
-
-    $self->_setFieldsToNodeValues() if $self->isLinkedForm();
-
-    if ($self->isNodeForm() or $self->isLinkedForm) {
-        my $nrsConfig = getNrsConfig($self->{'Data'});
-        $self->_setFieldsToOverrideValues($nrsConfig) if $nrsConfig->{'optCount'};
-    }
-
-}
-
-sub _setFieldsToNodeValues {
-    my $self = shift;
-
-    my $regoFormObj = RegoFormObj->load(db=>$self->{'db'}, ID=>$self->ParentBodyFormID());
-
-    my $nrsOverrideFields = getNrsOverrideFields();
-    my $dbData = 'DBData';
-
-    $self->{$dbData}{$nrsOverrideFields->{'paymentCompulsory'}} = $regoFormObj->getValue($nrsOverrideFields->{'paymentCompulsory'}) || 0;
-    $self->{$dbData}{$nrsOverrideFields->{'player'}}            = $regoFormObj->getValue($nrsOverrideFields->{'player'})            || '';
-    $self->{$dbData}{$nrsOverrideFields->{'coach'}}             = $regoFormObj->getValue($nrsOverrideFields->{'coach'})             || '';
-    $self->{$dbData}{$nrsOverrideFields->{'official'}}          = $regoFormObj->getValue($nrsOverrideFields->{'official'})          || '';
-    $self->{$dbData}{$nrsOverrideFields->{'matchOfficial'}}     = $regoFormObj->getValue($nrsOverrideFields->{'matchOfficial'})     || '';
-    $self->{$dbData}{$nrsOverrideFields->{'misc'}}              = $regoFormObj->getValue($nrsOverrideFields->{'misc'})              || '';
-    $self->{$dbData}{$nrsOverrideFields->{'volunteer'}}         = $regoFormObj->getValue($nrsOverrideFields->{'volunteer'})         || '';
-    $self->{$dbData}{$nrsOverrideFields->{'multipleAdult'}}     = $regoFormObj->getValue($nrsOverrideFields->{'multipleAdult'})     || 0;
-    $self->{$dbData}{$nrsOverrideFields->{'multipleChild'}}     = $regoFormObj->getValue($nrsOverrideFields->{'multipleChild'})     || 0;
-    $self->{$dbData}{$nrsOverrideFields->{'newRegos'}}          = $regoFormObj->getValue($nrsOverrideFields->{'newRegos'})          || 0;
-
-}
-
-sub _setFieldsToOverrideValues {
-    my $self = shift;
-
-    my ($nrsConfig) = @_;
-
-    #will only get here for a node or linked form.
-    my $formID = ($self->isNodeForm()) ? $self->ID() : $self->ParentBodyFormID();
-
-    my %where = (intRegoFormID=>$formID, intEntityTypeID=>$self->EntityTypeID(), intEntityID=>$self->EntityID());
-    my $regoFormAddedObj = RegoFormAddedObj->loadWhere(dbh=>$self->{'db'}, where=>\%where);
-
-    if ($regoFormAddedObj->isDefined()) {
-
-        my $nrsOverrideFields = getNrsOverrideFields();
-
-        my $dbData = 'DBData';
-
-        if ($nrsConfig->{'pcEnabled'}) { #pc = payment compulsory
-            $self->{$dbData}{$nrsOverrideFields->{'paymentCompulsory'}} = $regoFormAddedObj->getValue($nrsOverrideFields->{'paymentCompulsory'}) || 0;
-        }
-
-        if ($nrsConfig->{'raEnabled'}) { #ra = register as
-            $self->{$dbData}{$nrsOverrideFields->{'player'}}        = $regoFormAddedObj->getValue($nrsOverrideFields->{'player'})        || '';
-            $self->{$dbData}{$nrsOverrideFields->{'coach'}}         = $regoFormAddedObj->getValue($nrsOverrideFields->{'coach'})         || '';
-            $self->{$dbData}{$nrsOverrideFields->{'official'}}      = $regoFormAddedObj->getValue($nrsOverrideFields->{'official'})      || '';
-            $self->{$dbData}{$nrsOverrideFields->{'matchOfficial'}} = $regoFormAddedObj->getValue($nrsOverrideFields->{'matchOfficial'}) || '';
-            $self->{$dbData}{$nrsOverrideFields->{'misc'}}          = $regoFormAddedObj->getValue($nrsOverrideFields->{'misc'})          || '';
-            $self->{$dbData}{$nrsOverrideFields->{'volunteer'}}     = $regoFormAddedObj->getValue($nrsOverrideFields->{'volunteer'})     || '';
-        }
-
-        if ($nrsConfig->{'mrEnabled'}) { #mr = multiple registrations
-            $self->{$dbData}{$nrsOverrideFields->{'multipleAdult'}} = $regoFormAddedObj->getValue($nrsOverrideFields->{'multipleAdult'}) || 0;
-            $self->{$dbData}{$nrsOverrideFields->{'multipleChild'}} = $regoFormAddedObj->getValue($nrsOverrideFields->{'multipleChild'}) || 0;
-        }
-
-        if ($nrsConfig->{'roEnabled'}) { #ro = registration options
-            $self->{$dbData}{$nrsOverrideFields->{'newRegos'}}      = $regoFormAddedObj->getValue($nrsOverrideFields->{'newRegos'})      || 0;
-        }
-    }
 }
 
 sub ID {
@@ -211,7 +94,10 @@ sub Name    {
 
 sub Title {
     my $self = shift;
-    return $self->{'DBData'}{'strTitle'} || $self->{'RunDetails'}{'ClubDetails'}{'strName'} || $self->{'RunDetails'}{'AssocDetails'}{'strName'} || '';
+    return $self->{'DBData'}{'strTitle'} 
+        || $self->{'RunDetails'}{'EntityDetails'}{'strName'} 
+        || $self->{'RunDetails'}{'NationalDetails'}{'strName'} 
+        || '';
 }
 
 sub formAvailable {
@@ -339,11 +225,9 @@ sub _setupRun   {
     }
 
 	if(
-		$self->{'RunParams'}{'clubID'}
-		or $self->{'RunParams'}{'teamID'}
+		$self->{'RunParams'}{'eID'}
 	)	{
-		$self->{'RunDetails'}{'ClubID'} =  $self->{'RunParams'}{'clubID'} || 0;
-		$self->{'RunDetails'}{'TeamID'} =  $self->{'RunParams'}{'teamID'} || 0;
+		$self->{'RunDetails'}{'EntityID'} =  $self->{'RunParams'}{'eID'} || 0;
 		$self->loadOrgDetails(); #Reload org details
 	}
 
@@ -990,15 +874,10 @@ sub SessionSummary  {
 sub loadLogo {
   my $self = shift;
 
-    my $type = $self->ClubID()
-        ? $Defs::LEVEL_CLUB
-        : $Defs::LEVEL_ASSOC;
-    my $id = $self->ClubID() || $self->AssocID();
-
     $self->{'FormLogo'} = showLogo(
         $self->{'Data'},
-        $type,
-        $id,
+        $Defs::LEVEL_ENTITY,
+        $self->EntityID,
         '',
         0,
         100,
@@ -1028,46 +907,16 @@ sub error_message   {
 
 sub loadOrgDetails  {
   my $self = shift;
-    if($self->{'RunDetails'}{'AssocID'})    {
+    if($self->{'RunDetails'}{'EntityID'})    {
         my $st = qq[
-            SELECT 
-                intAssocID,
-                intRealmID,
-                intAssocTypeID,
-                strName,
-                intAllowPayment,
-                intPaymentConfigID,
-                strPaymentReceiptBodyTEXT,
-                strPaymentReceiptBodyHTML,
-                intDefaultRegoProductID,
-                intDefaultTeamRegoProductID,
-                intAllowRegoForm,
-                intHideRegoFormNew,
-                intNoPMSEmail,
-                strTimeZone,
-                strState,          #used in TeamFunctions for passport args
-                strCountry         #used in TeamFunctions for passport args
-            FROM tblAssoc
-            WHERE intAssocID = ?
-                AND intRecStatus <> $Defs::RECSTATUS_DELETED
+            SELECT *
+            FROM tblEntity
+            WHERE intEntityID = ?
+                AND strStatus = 'APPROVED'
         ];
         my $q = $self->{'db'}->prepare($st);
-        $q->execute($self->{'RunDetails'}{'AssocID'});
-        $self->{'RunDetails'}{'AssocDetails'} = $q->fetchrow_hashref();
-        $q->finish();
-    }
-    if($self->{'RunDetails'}{'ClubID'} and $self->{'RunDetails'}{'ClubID'} > 0)   {
-        my $st = qq[SELECT intClubID, strName FROM tblClub WHERE intClubID = ?  AND intRecStatus <> $Defs::RECSTATUS_DELETED];
-        my $q = $self->{'db'}->prepare($st);
-        $q->execute($self->{'RunDetails'}{'ClubID'});
-        $self->{'RunDetails'}{'ClubDetails'} = $q->fetchrow_hashref();
-        $q->finish();
-    }
-    if($self->{'RunDetails'}{'TeamID'}) {
-        my $st = qq[SELECT intTeamID, strName FROM tblTeam WHERE intTeamID = ?  AND intRecStatus <> $Defs::RECSTATUS_DELETED];
-        my $q = $self->{'db'}->prepare($st);
-        $q->execute($self->{'RunDetails'}{'TeamID'});
-        $self->{'RunDetails'}{'TeamDetails'} = $q->fetchrow_hashref();
+        $q->execute($self->{'RunDetails'}{'EntityID'});
+        $self->{'RunDetails'}{'EntityDetails'} = $q->fetchrow_hashref();
         $q->finish();
     }
 }

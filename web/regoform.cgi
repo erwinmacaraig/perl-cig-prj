@@ -37,7 +37,6 @@ sub main	{
 	my $current_session = $cgi->cookie($Defs::COOKIE_REGFORMSESSION);
 	my $sessionKey      = safe_param('session','word');
     #nationalrego
-    my $assocID         = safe_param('aID','number') || 0;
     my $clubID          = safe_param('cID','number') || safe_param('clubID','number')  || 0;
     my $memberID        = safe_param('ID','number')  || 0;
     my $pwdVal          = safe_param('pKey', 'word') || '';
@@ -59,9 +58,6 @@ sub main	{
 	if ($cgi->param('ID') and $cgi->param('eID'))	{
         $cgi->param(-name => 'rfp', -value => 'vt');
 	}
-	my $teamcode = safe_param('teamcode','number') || safe_param('d_teamcode','number') || '';
-    my $compID   = safe_param('compID','number')   || '';
-
     # check if bulkID is valid
     my $bulkID = safe_param( 'bID', 'nubmer' ) || 0;
     my $st_BulkRenewals = qq[SELECT dtSent FROM tblBulkRenewals WHERE intBulkRenewalID=? AND intEntityID IN ( $assocID, $clubID)];
@@ -96,7 +92,6 @@ sub main	{
 	);
 
     #nationalrego
-    $Data{'spAssocID'} = $assocID || 0;
     $Data{'spClubID'}  = $clubID  || 0;
     $Data{'nfEntityTypeID'} = $nfEntityTypeID;
     $Data{'nfEntityID'}     = $nfEntityID;
@@ -104,12 +99,9 @@ sub main	{
 	my %carryfields = (
 		nh       => $noheader || 0,
 		formID   => $formID   || 0,
-		teamcode => $teamcode || '',
-        compID   => $compID   || '',
 	);
 
     #nationalrego
-    $carryfields{'aID'}            = $assocID if $assocID;
     $carryfields{'cID'}            = $clubID  if $clubID;
     $carryfields{'nfEntityTypeID'} = $nfEntityTypeID;
     $carryfields{'nfEntityID'}     = $nfEntityID;
@@ -132,10 +124,8 @@ sub main	{
 
 	$Data{'Realm'} = $tempformObj->RealmID();
     $Data{'RealmSubType'} = $tempformObj->SubRealmID();
-    $Data{'clientValues'}{'assocID'} = $tempformObj->AssocID();
     $Data{'clientValues'}{'clubID'} = $tempformObj->ClubID();
     $Data{'spAssocID'} = $tempformObj->AssocID() if($tempformObj->AssocID()>0);
-    $assocID = $Data{'clientValues'}{'assocID'};
     $Data{'SystemConfig'}=getSystemConfig(\%Data);
     $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     $Data{'lang'} = $lang;
@@ -171,13 +161,10 @@ sub main	{
 		my $formtitle = $formObj->Title();
 		my $summary = $formObj->SessionSummary();
 		my $logo = $formObj->Logo();
-        my $assoclogo = '';
-		$assoclogo = showLogo(\%Data, $Defs::LEVEL_ASSOC, $assocID, '', '', '');
-		$assoclogo = '' if ($assoclogo eq $logo);
         my $style = $logo ? 'min-height:120px;line-height:100px;' : '';
 		my $navigation = $formObj->Navigation();
 		$body = qq[
-            <div class="pageHeading">$logo<span class="form-title-wrap"><h1 class="form-title">$formtitle</h1></span><span class="assoc-logo">$assoclogo</span></div>
+            <div class="pageHeading">$logo<span class="form-title-wrap"><h1 class="form-title">$formtitle</h1></span></div>
             <div id="form-container">
                 <div class="progress">$navigation</div>
                 <div class="form-body">
@@ -188,7 +175,6 @@ sub main	{
 		];
 	  $Data{'Realm'} = $formObj->RealmID();
 	  $Data{'RealmSubType'} = $formObj->SubRealmID();
-	  $Data{'clientValues'}{'assocID'} = $formObj->AssocID();
 	}
 	else	{
 		$body = qq[

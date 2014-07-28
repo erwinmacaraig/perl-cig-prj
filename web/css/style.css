@@ -760,10 +760,6 @@ dl.astable {
     color: black;
 }
 
-.loadmysport img	{
-	vertical-align:middle;
-}
-
 div.warningbox	{
 	width:98%;
 	border:1px solid #ff0000;
@@ -4500,3 +4496,6 @@ form#signup-form .button {
 }
 
 
+.regoptions a.optselected   {
+    color:#ff0000;
+}

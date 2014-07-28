@@ -1,0 +1,67 @@
+<form>
+<input type = "hidden" id = "selected_sport">
+<input type = "hidden" id = "selected_type">
+<input type = "hidden" id = "selected_level">
+<input type = "hidden" id = "selected_age">
+<input type = "hidden" id = "selected_nature">
+<input type = "hidden" id = "selected_entityID" value = "[% entityID %]">
+<input type = "hidden" id = "originLevel" value = "[% originLevel %]">
+<input type = "hidden" id = "rID" value = "[% realmID %]">
+<input type = "hidden" id = "srID" value = "[% realmSubTypeID %]">
+<input type = "hidden" id = "client" value = "[% client %]">
+
+<div id  = "regopt_sportoptions" class = "regoptions"> </div>
+<div id  = "regopt_persontype" class = "regoptions"> </div>
+<div id  = "regopt_level" class = "regoptions"> </div>
+<div id  = "regopt_age" class = "regoptions"> </div>
+<div id  = "regopt_nature" class = "regoptions"> </div>
+
+</form>
+<script>
+    function update_options(optionType, outputDiv)   {
+
+        var qstring = '';
+        qstring = qstring + '&sp=' + jQuery('#selected_sport').val();
+        qstring = qstring + '&pt=' + jQuery('#selected_type').val();
+        qstring = qstring + '&pl=' + jQuery('#selected_level').val();
+        qstring = qstring + '&ag=' + jQuery('#selected_age').val();
+        qstring = qstring + '&nat=' + jQuery('#selected_nature').val();
+        qstring = qstring + '&ol=' + jQuery('#originLevel').val();
+        qstring = qstring + '&r=' + jQuery('#rID').val();
+        qstring = qstring + '&sr=' + jQuery('#srID').val();
+
+        jQuery.getJSON('ajax/aj_person_registerwhat.cgi?otype=' + optionType + qstring, function(data)    {
+            if(data.results) {
+              var items = [];
+            
+              jQuery.each( data.options, function( key, val ) {
+                items.push( '<span class = "button generic-button"><a href = "#" data-val = "' + val.value + '" data-optiontype = "' + optionType + '">' + val.name + '</a></span>' );
+              });
+              jQuery('#' + outputDiv).html(items.join(''));
+            }
+        });
+    }
+
+    jQuery('.regoptions').on('click','a',function(e) {
+        var v = jQuery(this).attr('data-val');
+        var optionType = jQuery(this).attr('data-optionType');
+        jQuery('#selected_' + optionType).val(v);
+        var parent = jQuery(this).closest('.regoptions');
+        jQuery(parent).find('a').removeClass('optselected');
+        jQuery(this).addClass('optselected');
+        var nextlayer = {
+            'sport' : { 'key' : 'type', 'val' : 'regopt_persontype' },
+            'type' : { 'key' : 'level', 'val' : 'regopt_level' },
+            'level' : { 'key' : 'age', 'val' : 'regopt_age' },
+            'age' : { 'key' : 'nature', 'val' : 'regopt_nature' }
+        };
+        jQuery(parent).nextAll('.regoptions').html('');
+        update_options(nextlayer[optionType]['key'],nextlayer[optionType]['val']);
+        e.preventDefault();
+        return false; 
+    });
+
+    update_options('sport', 'regopt_sportoptions');
+</script>
+
+

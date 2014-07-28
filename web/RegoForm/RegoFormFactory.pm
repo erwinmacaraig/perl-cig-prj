@@ -1,7 +1,3 @@
-#
-# $Header: svn://svn/SWM/trunk/web/RegoForm/RegoFormFactory.pm 10978 2014-03-14 02:28:01Z mstarcevic $
-#
-
 package RegoForm::RegoFormFactory;
 
 require Exporter;
