@@ -1,5 +1,4 @@
 #!/usr/bin/perl -w
-
 use DBI;
 use CGI qw(:cgi escape unescape);
 
@@ -38,7 +37,7 @@ if(length($newpasswd) < 6){
 
 #validate if user id corresponds to clients url key
 my $dbh = connectDB(); 
-if(!verifyUserHasKey()){
+if(!verifyUserHasKey($dbh,$url_key)){
 	$error .= 'URL key is not valid for this user. <br />';
 }
 
@@ -68,9 +67,10 @@ pageForm(
 );
 
 sub verifyUserHasKey{
+	my($db,$key) = @_;
 	my $query = "SELECT userId FROM tblUserHash WHERE strPasswordChangeKey = ?";	
-	my $sth = $dbh->prepare($query);
-	$sth->execute($url_key);
+	my $sth = $db->prepare($query);
+	$sth->execute($key);
 	my($uId_frm_db) = $sth->fetchrow_array();
 	$sth->finish();
 	return 1 if($uId_frm_db == $uId); 
