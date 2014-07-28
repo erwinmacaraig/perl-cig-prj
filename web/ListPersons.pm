@@ -139,6 +139,7 @@ sub listPersons {
         SELECT DISTINCT 
             P.intPersonID,
             P.strStatus,
+            PR.strStatus as PRStatus,
             P.intSystemStatus
             $select_str
             $sel_str 

@@ -1846,6 +1846,7 @@ warn("SOURCE$sourceEntityID DES:$destinationEntityID");
 		WHERE 
             intChildID IN ($sourceEntityID, $destinationEntityID)
             AND intParentLevel > $Defs::LEVEL_CLUB
+            AND intPrimary=1
         ORDER BY intParentLevel ASC
 	];
             #AND intChildLevel = 3

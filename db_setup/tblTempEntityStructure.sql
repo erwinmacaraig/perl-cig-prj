@@ -7,6 +7,7 @@ CREATE TABLE tblTempEntityStructure(
     intChildLevel INT NOT NULL DEFAULT 0,
     intDirect TINYINT NOT NULL DEFAULT 0,
     intDataAccess TINYINT NOT NULL DEFAULT 10,
+    intPrimary           TINYINT NOT NULL DEFAULT 1,
     tTimeStamp                    TIMESTAMP,
 
     PRIMARY KEY(intParentID, intChildID),

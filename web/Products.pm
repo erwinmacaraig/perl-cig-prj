@@ -272,7 +272,6 @@ sub list_products	{
 			    P.strGroup, 
 			    P.strName
 	];
-warn($st);
   my $query = $Data->{'db'}->prepare($st);
   $query->execute();
 	my $body = '';

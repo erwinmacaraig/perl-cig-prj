@@ -43,9 +43,11 @@ sub createTempEntityStructure  {
         intChildID,
         intChildLevel,
         intDirect,
-        intDataAccess
+        intDataAccess,
+        intPrimary
     )
     VALUES (
+        ?,
         ?,
         ?,
         ?,
@@ -100,7 +102,8 @@ sub createTempEntityStructure  {
       my $st_el = qq[
         SELECT
           intParentEntityID,
-          intChildEntityID
+          intChildEntityID,
+          intPrimary
         FROM
           tblEntityLinks
         WHERE
@@ -108,7 +111,7 @@ sub createTempEntityStructure  {
       ];
       my $q_el = $db->prepare($st_el);
       $q_el->execute();
-      while (my($parent, $child) = $q_el->fetchrow_array()) {
+      while (my($parent, $child, $primary) = $q_el->fetchrow_array()) {
         if(
             $parent 
             and $child 
@@ -125,6 +128,7 @@ sub createTempEntityStructure  {
               $entities{$child}{'level'},
               1,
               $entities{$child}{'dataaccess'},
+              $primary
           );
         }
       }
@@ -178,6 +182,7 @@ sub insertRelationships {
               $entities->{$child->{'id'}}{'level'},
               0,
               $child->{'dataaccess'},
+              $child->{'primary'},
           );
           if($myDataAccess < $child->{'dataaccess'})  {
             $child->{'dataaccess'} = $myDataAccess;

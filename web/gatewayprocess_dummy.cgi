@@ -71,7 +71,6 @@ sub main	{
 
 	my ($Order, $Transactions) = gatewayTransactions(\%Data, $logID);
 	 $Order->{'Status'} = $Order->{'TLStatus'} >=1 ? 1 : 0;
-warn("AAASTATUS" . $Order->{'Status'});
   $Data{'SystemConfig'}{'PaymentConfigID'} = $Data{'SystemConfig'}{'PaymentConfigUsedID'} ||  $Data{'SystemConfig'}{'PaymentConfigID'};
 
   my %clientValues = getClient($client);

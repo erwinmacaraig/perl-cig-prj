@@ -180,6 +180,7 @@ sub getEntityParentID   {
 		WHERE
             intChildID = ?
             AND intParentLevel = ?
+            AND intPrimary=1
             
     ];
 	my $q = $Data->{'db'}->prepare($st);
@@ -637,19 +638,19 @@ sub checkForOutstandingTasks {
  
         if ($ruleFor eq 'REGO' and $personRegistrationID and !$q->fetchrow_array()) {
         	#Now check to see if there is a payment outstanding
-        	$st = qq[
-			        SELECT intPaymentRequired
-			        FROM tblPersonRegistration_$Data->{'Realm'} 
-			        WHERE intPersonRegistrationID = ?
-			];
-			        
-			$q = $db->prepare($st);
-			$q->execute($personRegistrationID);
-			            
-			my $dref= $q->fetchrow_hashref();
-			my $intPaymentRequired = 0; #$dref->{intPaymentRequired};
+        	#$st = qq[
+			#        SELECT intPaymentRequired
+			#        FROM tblPersonRegistration_$Data->{'Realm'} 
+			#        WHERE intPersonRegistrationID = ?
+			#];
+			#        
+			#$q = $db->prepare($st);
+			#$q->execute($personRegistrationID);
+			#            
+			#my $dref= $q->fetchrow_hashref();
+			#my $intPaymentRequired = 0; #$dref->{intPaymentRequired};
 			  	
-        	if (!$intPaymentRequired) {
+        	#if (!$intPaymentRequired) {
         		#Nothing outstanding, so mark this registration as complete
 	            $st = qq[
 	            	UPDATE tblPersonRegistration_$Data->{'Realm'} 
@@ -665,7 +666,7 @@ sub checkForOutstandingTasks {
 		       		$personRegistrationID
 		  			);         
 	        	$rc = 1;	# All registration tasks have been completed        		
-        	}
+        	#}
         }
 	}      
 
