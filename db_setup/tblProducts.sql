@@ -42,6 +42,7 @@ CREATE TABLE `tblProducts` (
   `intMatchCreditsPerQty` int(11) DEFAULT '0',
   `intMatchCreditType` int(11) DEFAULT '0',
   `intPhoto` tinyint(4) DEFAULT '0',
+    intCanResetPaymentRequired TINYINT DEFAULT 0,
   PRIMARY KEY (`intProductID`),
   KEY `index_intEntityID` (`intEntityID`),
   KEY `index_intRealmID` (`intRealmID`),

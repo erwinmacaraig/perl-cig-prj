@@ -13,6 +13,7 @@ CREATE TABLE tblTransactions (
     intRealmSubTypeID int(11) default '0',
     intID int(11) default '0',
     intTableType tinyint(4) default '0',
+    intPersonRegistrationID INT DEFAULT 0,
     intTXNEntityID INT default 0,
     intProductID int(11) default NULL,
     intTransLogID int(11) default '0',
