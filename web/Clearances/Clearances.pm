@@ -5,8 +5,8 @@
 package Clearances;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw(checkAutoConfirms handleClearances clearanceHistory sendCLREmail finaliseClearance);
-@EXPORT_OK = qw(checkAutoConfirms handleClearances clearanceHistory sendCLREmail finaliseClearance);
+@EXPORT = qw(checkAutoConfirms handleClearances clearanceHistory sendCLREmail finaliseClearance insertSelfTransfer);
+@EXPORT_OK = qw(checkAutoConfirms handleClearances clearanceHistory sendCLREmail finaliseClearance insertSelfTransfer);
 use lib '.', '..', '../..', "../comp", '../RegoForm', "../dashboard", "../RegoFormBuilder",'../PaymentSplit', "../user";
 
 use strict;
@@ -25,6 +25,76 @@ use GridDisplay;
 use Data::Dumper;
 use ContactsObj;
 use DefCodes;
+use PersonRegistration;
+
+sub insertSelfTransfer  {
+
+    my ($Data, $personID, $fromEntity, $toEntity, $clr_ref) = @_;
+	my $intClearanceYear =$Data->{'SystemConfig'}{'clrClearanceYear'} || 0;
+
+    my $st=qq[
+        INSERT INTO tblClearance (
+            intPersonID, 
+            intDestinationEntityID, 
+            intSourceEntityID, 
+            intRealmID, 
+            dtApplied, 
+            intClearanceStatus, 
+            intRecStatus, 
+            intClearanceYear,
+            intReasonForClearanceID,
+            strPersonType,
+            strPersonSubType,
+            strPersonLevel,
+            strPersonEntityRole,
+            strSport,
+            intOriginLevel,
+            strAgeLevel
+        )
+        VALUES (
+            ?, 
+            ?,
+            ?,
+            ?,
+            SYSDATE(), 
+            ?,
+            ?,
+            ?,
+            ?, 
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?
+        )
+    ];
+    my $qry= $Data->{'db'}->prepare($st);
+    $qry->execute(
+            $personID, 
+            $toEntity, 
+            $fromEntity, 
+            $Data->{'Realm'}, 
+            $Defs::CLR_STATUS_PENDING, 
+            $Defs::RECSTATUS_ACTIVE,  
+            $intClearanceYear,
+            $Data->{'SystemConfig'}{'clrReasonSelfInitiatedID'} || 0,
+            $clr_ref->{'personType'} || '',
+            $clr_ref->{'personSubType'} || '',
+            $clr_ref->{'personLevel'} || '',
+            $clr_ref->{'personEntityRole'} || '',
+            $clr_ref->{'sport'} || '',
+            $Defs::ORIGIN_SELF,
+            $clr_ref->{'ageLevel'} || ''
+    ) or query_error($st);
+	my $clrID= $qry->{mysql_insertid} || 0;
+
+   my %params = ();
+   $params{'sourceEntityID'} = $fromEntity;
+   $params{'destinationEntityID'} = $toEntity;
+   my ($clrAddStatus, undef) = postClearanceAdd($clrID,\%params,'ADD',$Data,$Data->{'db'});
+}
 
 sub handleClearances	{
     ### PURPOSE: main function to handle clearances.
@@ -1215,6 +1285,13 @@ sub finaliseClearance	{
             C.intSourceEntityID, 
             M.intGender, 
             DATE_FORMAT(M.dtDOB, "%Y%m%d") as DOBAgeGroup
+            C.strPersonType,
+            C.strPersonSubType,
+            C.strPersonLevel,
+            C.strSport,
+            C.intOriginLevel,
+            C.strAgeLevel,
+            C.strPersonEntityRole
 		FROM tblClearance as C
 			INNER JOIN tblPerson as M ON (M.intPersonID = C.intPersonID)
 		WHERE intClearanceID = $cID
@@ -1222,7 +1299,7 @@ sub finaliseClearance	{
 	my $query = $db->prepare($st) or query_error($st);
 	$query->execute or query_error($st);
 
-	my ($intPersonID, $intClubID, $intSourceEntityID, $Gender, $DOBAgeGroup) = $query->fetchrow_array();
+	my ($intPersonID, $intClubID, $intSourceEntityID, $Gender, $DOBAgeGroup, $personType, $personSubType, $personLevel, $sport, $originLevel, $ageLevel, $entityRole) = $query->fetchrow_array();
 	$intPersonID ||= 0;
 	$intClubID ||= 0;
 	$intSourceEntityID ||= 0;
@@ -1236,12 +1313,20 @@ sub finaliseClearance	{
 
 	my $intMA_Status = $Defs::RECSTATUS_ACTIVE;
 
-	$st = qq[
-		INSERT INTO tblPersonRegistration_1
-		(intPersonID, intEntityID, strStatus)
-		VALUES ($intPersonID, $intClubID, "ACTIVE")
-	];
-	$db->do($st);
+    my %reg =();
+    $reg{'personID'} = $intPersonID;
+    $reg{'entityID'} = $intClubID;
+    $reg{'personType'} = $personType;
+    $reg{'personSubType'} = $personSubType;
+    $reg{'personEntityRole'} = $entityRole;
+    $reg{'personLevel'} = $personLevel;
+    $reg{'sport'} = $sport;
+    $reg{'originLevel'} = $originLevel; 
+    $reg{'ageLevel'} = $ageLevel; 
+    $reg{'ageGroupID'} = $ageGroupID;
+    $reg{'paymentRequired'} = 0; ###
+    
+    addRegistration($Data, \%reg);
 
 #		$st = qq[
 #			UPDATE tblPerson
