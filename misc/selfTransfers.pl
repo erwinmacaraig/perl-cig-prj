@@ -32,6 +32,7 @@ sub main	{
 	$Data{'db'} = $db;
 	$Data{'Realm'} = 1;
 	$Data{'RealmSubType'} = 0;
+    $Data{'SystemConfig'}{'clrClearanceYear'} = 2014;
     $Data{'SystemConfig'}{'clrReasonSelfInitiatedID'} = 558004;
 
     my %RegFields = ();

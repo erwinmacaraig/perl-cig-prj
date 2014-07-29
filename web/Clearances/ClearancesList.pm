@@ -437,6 +437,7 @@ sub listClearances	{
   $st .= qq[
                         AND intClearanceYear = $clryear
 	] if $clryear;
+warn($st);
 
 	if ($showAll)	{
 		$st .= qq[ GROUP BY C.intClearanceID ORDER BY MemberName, dtApplied, C.intClearanceID ];

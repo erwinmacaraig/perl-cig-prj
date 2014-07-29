@@ -26,6 +26,7 @@ use Data::Dumper;
 use ContactsObj;
 use DefCodes;
 use PersonRegistration;
+use RuleMatrix;
 
 sub insertSelfTransfer  {
 
@@ -1284,7 +1285,7 @@ sub finaliseClearance	{
             C.intDestinationEntityID, 
             C.intSourceEntityID, 
             M.intGender, 
-            DATE_FORMAT(M.dtDOB, "%Y%m%d") as DOBAgeGroup
+            DATE_FORMAT(M.dtDOB, "%Y%m%d") as DOBAgeGroup,
             C.strPersonType,
             C.strPersonSubType,
             C.strPersonLevel,
@@ -1324,9 +1325,13 @@ sub finaliseClearance	{
     $reg{'originLevel'} = $originLevel; 
     $reg{'ageLevel'} = $ageLevel; 
     $reg{'ageGroupID'} = $ageGroupID;
-    $reg{'paymentRequired'} = 0; ###
+    $reg{'current'} = 1;
+
+    my $matrix_ref = getRuleMatrix($Data, $Data->{'SubRealm'}, $Defs::ORIGIN_SELF, 'REGO');
+    $reg{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
     
-    addRegistration($Data, \%reg);
+    PersonRegistration::addRegistration($Data, \%reg);
+    
 
 #		$st = qq[
 #			UPDATE tblPerson
@@ -1337,10 +1342,10 @@ sub finaliseClearance	{
 	
 
 #	$st = qq[
-#		UPDATE tblPerson
-#		SET intStatus = $Defs::RECSTATUS_ACTIVE
+#	UPDATE tblPerson
+#        SET strStatus = $Defs::RECSTATUS_ACTIVE
 #		WHERE intPersonID = $intPersonID
-#			AND intStatus = $Defs::RECSTATUS_DELETED
+#		AND intStatus = $Defs::RECSTATUS_DELETED
 #		LIMIT 1
 #	];
 #	$db->do($st);
