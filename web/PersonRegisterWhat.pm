@@ -21,6 +21,7 @@ sub displayPersonRegisterWhat   {
         $dob,
         $gender,
         $originLevel,
+        $continueURL,
     ) = @_;
 
     my %templateData = (
@@ -32,6 +33,7 @@ sub displayPersonRegisterWhat   {
         client => $Data->{'client'} || '',
         realmID => $Data->{'Realm'} || 0,
         realmSubTypeID => $Data->{'RealmSubType'} || 0,
+        continueURL => $continueURL || '',
     );
 
     my $body = runTemplate(
@@ -118,6 +120,21 @@ sub optionsPersonRegisterWhat {
             AND strWFRuleFor = 'REGO'
             $where
     ];
+    if($entityID)   {
+        $st = qq[
+            SELECT DISTINCT $lookingForField
+            FROM tblEntityRegistrationAllowed
+            WHERE
+                intEntityID = ?
+                intRealmID = ?
+                AND intSubRealmID IN (0,?)
+                AND strTaskType = 'APPROVAL'
+                AND intOriginLevel  = ?
+                AND strWFRuleFor = 'REGO'
+                $where
+        ];
+        unshift @values, $entityID;
+    }
 
     my $q = $Data->{'db'}->prepare($st);
     my @retdata = ();
