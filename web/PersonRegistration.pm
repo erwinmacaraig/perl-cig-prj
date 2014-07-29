@@ -426,7 +426,6 @@ sub submitPersonRegistration    {
     if ($count) {
         my $pr_ref = $regs->[0];
         $pr_ref->{'strStatus'} = 'PENDING';
-print STDERR Dumper($pr_ref);
 
         updatePersonRegistration($Data, $personID, $personRegistrationID, $pr_ref);
 
