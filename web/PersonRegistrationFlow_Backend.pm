@@ -8,8 +8,10 @@ require Exporter;
 use strict;
 use lib "../..","..";
 use PersonRegistration;
+use RegistrationItem;
 use PersonRegisterWhat;
 use Reg_common;
+use CGI qw(:cgi);
 
 sub handleRegistrationFlowBackend   {
     my (
@@ -21,8 +23,16 @@ sub handleRegistrationFlowBackend   {
     my $title = '';
     my $client = $Data->{'client'};
     my $clientValues = $Data->{'clientValues'};
+    my $rego_ref = {};
     if ( $action eq 'PREGF_TU' ) {
         #add rego record with types etc.
+        $rego_ref = {
+            personType => param('pt') || '',
+            personLevel => param('pl') || '',
+            sport => param('sp') || '',
+            ageLevel => param('ag') || '',
+            registrationNature => param('nat') || '',
+        };
         $action = 'PREGF_P';
     }
     if ( $action eq 'PREGF_PU' ) {
@@ -52,6 +62,19 @@ sub handleRegistrationFlowBackend   {
     }
     elsif ( $action eq 'PREGF_P' ) {
         my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_PU&amp;";
+        my $products = getRegistrationItems(
+            $Data,
+            'REGO',
+            'PRODUCT',
+            getLastEntityLevel($clientValues) || 0,
+            $rego_ref->{'registrationNature'},
+            getLastEntityID($clientValues) || 0,
+            0,
+            0,
+            $rego_ref,
+        );
+use Data::Dumper;
+print STDERR Dumper($products);
         $body = qq[
             display product information
 
@@ -60,6 +83,19 @@ sub handleRegistrationFlowBackend   {
     }
     elsif ( $action eq 'PREGF_D' ) {
         my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_DU&amp;";
+        my $documents = getRegistrationItems(
+            $Data,
+            'REGO',
+            'DOCUMENT',
+            getLastEntityLevel($clientValues) || 0,
+            $rego_ref->{'registrationNature'},
+            getLastEntityID($clientValues) || 0,
+            0,
+            0,
+            $rego_ref,
+        );
+use Data::Dumper;
+print STDERR Dumper($products);
         $body = qq[
             display document upload information
 
