@@ -1057,8 +1057,6 @@ sub getPersonMenuData {
     my $DataAccess_ref = $Data->{'DataAccess'};
     my $accreditation_title = exists $Data->{'SystemConfig'}{'ACCRED_Custom_Name'} ? $Data->{'SystemConfig'}{'ACCRED_Custom_Name'}.'s' : "Accreditations";
 
-warn("RRRR: $Data->{'Realm'}");
-
     my ($intOfficial) = $personObj->getValue('intOfficial');
     my $clubs = $Data->{'SystemConfig'}{'NoClubs'} ? 0 : 1;
     my $clr= $Data->{'SystemConfig'}{'AllowClearances'} || 0;
@@ -1084,7 +1082,6 @@ warn("RRRR: $Data->{'Realm'}");
         }
 
      my $txns_link_name = $lang->txt('Transactions');
-warn("ALLOWTXNS" . $SystemConfig->{'AllowTXNs'});
      if($SystemConfig->{'AllowTXNs'}) {
         $menuoptions{'transactions'} = {
             url => $baseurl."a=P_TXNLog_list",
