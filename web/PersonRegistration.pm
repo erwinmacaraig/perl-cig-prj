@@ -26,7 +26,7 @@ sub deletePersonRegistered  {
         LIMIT 1
     ];
   	my $q= $Data->{'db'}->prepare($st);
-    my $q->execute($personID, $personRegistrationID) or query_error($st);
+    $q->execute($personID, $personRegistrationID) or query_error($st);
 }
 
 sub isPersonRegistered {
@@ -223,7 +223,7 @@ sub updatePersonRegistration    {
 	if ($q->errstr) {
 		return (0, 0);
 	}
-  	my $personRegistrationID = $q->{mysql_insertid};
+  	$personRegistrationID ||= $q->{mysql_insertid};
   	
   	my $rc = addWorkFlowTasks(
         $Data,

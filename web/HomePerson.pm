@@ -5,6 +5,7 @@ require Exporter;
 @EXPORT_OK =qw(showPersonHome);
 
 use strict;
+use lib "..","../..";
 use Reg_common;
 use Utils;
 use InstanceOf;
@@ -13,7 +14,7 @@ use Photo;
 use TTTemplate;
 use Notifications;
 use FormHelpers;
-use Seasons;
+#use Seasons;
 use PersonRegistration;
 use UploadFiles;
 use Log;
