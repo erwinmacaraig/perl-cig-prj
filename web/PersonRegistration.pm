@@ -365,8 +365,8 @@ sub addRegistration {
             ?,
             ?,
             ?,
-            ?,
-            ?,
+            NOW(),
+            NOW(),
             ?,
             ?,
             ?,
@@ -392,8 +392,6 @@ sub addRegistration {
   		$Reg_ref->{'dateTo'},  		
   		$Data->{'Realm'},
   		$Data->{'SubRealm'} || 0,
-        NOW(),
-        NOW(),
   		$Reg_ref->{'nationalPeriodID'} || 0,
   		$Reg_ref->{'ageGroupID'} || 0,
   		$Reg_ref->{'ageLevel'} || '',
@@ -412,6 +410,7 @@ sub addRegistration {
         $Reg_ref->{'registrationNature'}, 
         $Reg_ref->{'originLevel'} || 0, 
         $Reg_ref->{'entityID'} || 0,
+        $Reg_ref->{'personID'},
         $personRegistrationID, 0
     );
   	
