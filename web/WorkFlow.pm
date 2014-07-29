@@ -129,6 +129,8 @@ sub listTasks {
 		);
 		push @TaskList, \%single_row;
 	}
+
+    ## Calc Dupl Res and Pending Clr here
 	
 	my $msg = ''; 
 	if ($rowCount == 0) {
