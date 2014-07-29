@@ -7,7 +7,7 @@ package Reg_common;
 require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = @EXPORT_OK = qw(
-kickThemOff allowedTo setClient getClient stripSpaces moneyFormat entryExists getDataAccess textMessage getAssocID getDBConfig create_selectbox getLevelName txtField getID setClientValue getClientValue allowedAction getRealm currency createButtonForm getRegoPassword getEntityValues getEntityID getEntityStructure isHeavierPerm get_page_url getLastEntityID
+kickThemOff allowedTo setClient getClient stripSpaces moneyFormat entryExists getDataAccess textMessage getAssocID getDBConfig create_selectbox getLevelName txtField getID setClientValue getClientValue allowedAction getRealm currency createButtonForm getRegoPassword getEntityValues getEntityID getEntityStructure isHeavierPerm get_page_url getLastEntityID getLastEntityLevel
 );
 
 use strict;
@@ -673,10 +673,9 @@ qq[ <input type="text" name="$name" value="$value" maxlength="$maxlength" size="
 }
 
 sub getLastEntityID {
-    my ( $clientValues, $level ) = @_;
+    my ( $clientValues) = @_;
 
     return 0 if !$clientValues;
-    my $cl = $level || $clientValues->{currentLevel} || 0;
     for my $k (qw(
         clubID
         zoneID
@@ -693,6 +692,23 @@ sub getLastEntityID {
     }
     return 0;
 }
+
+sub getLastEntityLevel {
+    # Returns the level of the last entity
+    my ( $clientValues) = @_;
+
+    return 0 if !$clientValues;
+    return $Defs::LEVEL_CLUB if ($clientValues->{clubID} and $clientValues->{'clubId'} != $Defs::INVALID_ID);
+    return $Defs::LEVEL_ZONE if ($clientValues->{zoneID} and $clientValues->{'zoneId'} != $Defs::INVALID_ID);
+    return $Defs::LEVEL_REGION if ($clientValues->{regionID} and $clientValues->{'regionId'} != $Defs::INVALID_ID);
+    return $Defs::LEVEL_STATE if ($clientValues->{stateID} and $clientValues->{'stateId'} != $Defs::INVALID_ID);
+    return $Defs::LEVEL_NATIONAL if ($clientValues->{natID} and $clientValues->{'natId'} != $Defs::INVALID_ID);
+    return $Defs::LEVEL_INTZONE if ($clientValues->{intzonID} and $clientValues->{'intzonId'} != $Defs::INVALID_ID);
+    return $Defs::LEVEL_INTREGION if ($clientValues->{intregID} and $clientValues->{'intregId'} != $Defs::INVALID_ID);
+
+    return 0;
+}
+
 
 sub getID {
 
