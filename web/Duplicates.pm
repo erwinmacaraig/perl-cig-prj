@@ -19,6 +19,7 @@ use DeQuote;
 use Seasons;
 use MovePhoto;
 use Notifications;
+use PersonRegistration;
 
 sub handleDuplicates {
 
@@ -565,9 +566,12 @@ next if $dref->{$k} eq "'0000-00-00'";
         warn("HANDLE PERSON REGO HERE");
 		$Data->{'db'}->do(qq[UPDATE tblPerson as M LEFT JOIN tblPersonRegistration_$realmID as MA ON (MA.intPersonID = M.intPersonID and MA.intEntityID<> $entityID ) SET M.intSystemStatus=$Defs::RECSTATUS_DELETED WHERE M.intPersonID=$id_of_duplicate and MA.intPersonID IS NULL]);
 		$Data->{'db'}->do(qq[UPDATE tblPerson as M LEFT JOIN tblPersonRegistration_$realmID as MA ON (MA.intPersonID = M.intPersonID and MA.intEntityID<> $entityID) SET M.intSystemStatus=$Defs::RECSTATUS_ACTIVE WHERE M.intPersonID=$id_of_duplicate and MA.intPersonID IS NOT NULL]);
+        $Data->{'db'}->do(qq[DELETE FROM tblWFTask WHERE intPersonID = $id_of_duplicate and strWFRuleFor IN ('PERSON', 'REGO')]);
 	}
 	elsif($option =~ /^change/)	{ 
-		$Data->{'db'}->do(qq[UPDATE tblTransactions SET intID = $existingid WHERE intID = $id_of_duplicate and intTableType=$Defs::LEVEL_PERSON]);
+        mergePersonRegistrations($Data, $id_of_duplicate, $existingid);
+		$Data->{'db'}->do(qq[UPDATE tblTransactions SET intID = $existingid WHERE intID = $id_of_duplicate and intTableType=$Defs::LEVEL_PERSON AND intPersonRegistrationID=0]);
+		$Data->{'db'}->do(qq[UPDATE tblDocuments SET intEntityID = $existingid WHERE intEntityID = $id_of_duplicate and intEntityLvel=$Defs::LEVEL_PERSON]);
 		$Data->{'db'}->do(qq[UPDATE tblClearance SET intPersonID = $existingid WHERE intPersonID=$id_of_duplicate]);
 		$Data->{'db'}->do(qq[UPDATE IGNORE tblAuth SET intID = $existingid WHERE intLevel=1 AND intID=$id_of_duplicate]);
 
