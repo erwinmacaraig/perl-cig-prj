@@ -14,7 +14,7 @@ use Utils;
 use Reg_common;
 use TTTemplate;
 use Log;
-use Person;
+use PersonUtils;
 
 sub handleWorkflow {
     my ( 
@@ -112,7 +112,7 @@ sub listTasks {
 		$rowCount ++;
         my $name = '';
         $name = $dref->{'EntityLocalName'} if ($dref->{strWFRuleFor} eq 'ENTITY');
-        $name = Person::formatPersonName($Data, $dref->{'strLocalFirstname'}, $dref->{'strLocalSurname'}, $dref->{'PersonGender'}) if ($dref->{strWFRuleFor} eq 'REGO' or $dref->{strWFRuleFor} eq 'PERSON');
+        $name = formatPersonName($Data, $dref->{'strLocalFirstname'}, $dref->{'strLocalSurname'}, $dref->{'PersonGender'}) if ($dref->{strWFRuleFor} eq 'REGO' or $dref->{strWFRuleFor} eq 'PERSON');
 		my %single_row = (
 			WFTaskID => $dref->{intWFTaskID},
 			TaskType => $dref->{strTaskType},

@@ -150,7 +150,6 @@ sub optionsPersonRegisterWhat {
             };
         }
     }
-#Still need to filter by entity
     return (\@retdata, '');
 }
 
