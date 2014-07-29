@@ -5,6 +5,7 @@ require Exporter;
 @EXPORT_OK =qw(showPersonHome);
 
 use strict;
+use lib "..","../..";
 use Reg_common;
 use Utils;
 use InstanceOf;
@@ -13,7 +14,7 @@ use Photo;
 use TTTemplate;
 use Notifications;
 use FormHelpers;
-use Seasons;
+#use Seasons;
 use PersonRegistration;
 use UploadFiles;
 use Log;
@@ -56,6 +57,7 @@ sub showPersonHome	{
 		}
 
 	}
+    my $addregistrationURL = "$Data->{'target'}?client=$client&amp;a=PREGF_T";
 	my $accreditations = ($Data->{'SystemConfig'}{'NationalAccreditation'}) ? AccreditationDisplay::ActiveNationalAccredSummary($Data, $personID) : '';#ActiveAccredSummary($Data, $personID, $Data->{'clientValues'}{'assocID'});
 
   my $docs = getUploadedFiles(
@@ -74,6 +76,7 @@ sub showPersonHome	{
 		Photo => $photo,
 		MarkDuplicateURL => $markduplicateURL || '',
 		AddDocumentURL => $adddocumentURL || '',
+		AddRegistrationURL => $addregistrationURL || '',
 		CardPrintingURL => $cardprintingURL || '',
 		UmpireLabel => $Data->{'SystemConfig'}{'UmpireLabel'} || 'Match Official',
 		Documents => $docs,
@@ -101,7 +104,12 @@ sub showPersonHome	{
 
 	);
 	
-	getRegistrationData($Data, $personID, \%TemplateData);
+    my %RegFilters=();
+    $RegFilters{'current'} = 1;
+    $RegFilters{'entityID'} = getLastEntityID($Data->{'clientValues'});
+    my ($RegCount, $Reg_ref) = getRegistrationData($Data, $personID, \%RegFilters);
+    $TemplateData{'RegistrationInfo'} = $Reg_ref;
+
 
 	my $statuspanel= runTemplate(
 		$Data,

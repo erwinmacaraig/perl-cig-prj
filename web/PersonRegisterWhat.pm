@@ -21,6 +21,7 @@ sub displayPersonRegisterWhat   {
         $dob,
         $gender,
         $originLevel,
+        $continueURL,
     ) = @_;
 
     my %templateData = (
@@ -32,6 +33,7 @@ sub displayPersonRegisterWhat   {
         client => $Data->{'client'} || '',
         realmID => $Data->{'Realm'} || 0,
         realmSubTypeID => $Data->{'RealmSubType'} || 0,
+        continueURL => $continueURL || '',
     );
 
     my $body = runTemplate(
@@ -68,6 +70,13 @@ sub optionsPersonRegisterWhat {
         level => 'strPersonLevel',
         age => 'strAgeLevel',
         sport => 'strSport',
+    );
+    my %lfLabelTable = (
+        type => \%Defs::personType,
+        nature => \%Defs::registrationNature,
+        level => \%Defs::personLevel,
+        age => \%Defs::ageLevel,
+        sport => \%Defs::sportType,
     );
     
     my $lookingForField = $lfTable{$lookingFor} || '';
@@ -111,19 +120,36 @@ sub optionsPersonRegisterWhat {
             AND strWFRuleFor = 'REGO'
             $where
     ];
+    if($entityID)   {
+        $st = qq[
+            SELECT DISTINCT $lookingForField
+            FROM tblEntityRegistrationAllowed
+            WHERE
+                intEntityID = ?
+                intRealmID = ?
+                AND intSubRealmID IN (0,?)
+                AND strTaskType = 'APPROVAL'
+                AND intOriginLevel  = ?
+                AND strWFRuleFor = 'REGO'
+                $where
+        ];
+        unshift @values, $entityID;
+    }
 
     my $q = $Data->{'db'}->prepare($st);
     my @retdata = ();
     $q->execute(@values);
+    my $lookup = ();
     while(my $val = $q->fetchrow_array())   {
         if($val)    {
+            my $label = $lfLabelTable{$lookingFor}{$val};
+            $label = $Data->{'lang'}->txt($lfLabelTable{$lookingFor}{$val});
             push @retdata, {
-                name => $val,
+                name => $label,
                 value => $val,
             };
         }
     }
-#Still need to filter by entity
     return (\@retdata, '');
 }
 

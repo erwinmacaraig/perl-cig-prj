@@ -2261,7 +2261,8 @@ sub product_apply_transaction {
     my $stUPD= qq[
         UPDATE tblPersonRegistration_$Data->{'Realm'} 
         SET 
-            intPaymentRequired = 0
+            intPaymentRequired = 0,
+            intIsPaid=1
         WHERE 
             intPersonID = ?
             AND intPersonRegistrationID = ?
