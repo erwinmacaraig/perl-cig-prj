@@ -7,12 +7,13 @@ require Exporter;
     deletePersonRegistered
     isPersonRegistered
     mergePersonRegistrations
+    submitPersonRegistration
 );
 
 use strict;
 use WorkFlow;
 #use Log;
-#use Data::Dumper;
+use Data::Dumper;
 
 sub deletePersonRegistered  {
 	my ($Data, $personID, $personRegistrationID) = @_;
@@ -166,28 +167,28 @@ sub updatePersonRegistration    {
 
 	my $st = qq[
    		UPDATE tblPersonRegistration_$Data->{'Realm'} 
-            SET
-            intEntityID = $Reg_ref->{'intEntityID'},
-            strPersonType = $Reg_ref->{'strPersonType'},
-            strPersonSubType = $Reg_ref->{'strPersonSubType'},
-            strPersonLevel = $Reg_ref->{'strPersonLevel'},
-            strPersonEntityRole = $Reg_ref->{'strPersonEntityRole'},
-            strStatus = $Reg_ref->{'strStatus'},
-            strSport = $Reg_ref->{'strSport'},
-            intCurrent = $Reg_ref->{'intCurrent'},
-            intOriginLevel = $Reg_ref->{'intOriginLevel'},
-            intOriginID = $Reg_ref->{'intOriginID'},
-            dtFrom = $Reg_ref->{'dtFrom'},
-            dtTo = $Reg_ref->{'dtTo'},
-            intRealmID = $Data->{'Realm'},
-            intSubRealmID = $Reg_ref->{'intSubRealmID'},
-            dtAdded = $Reg_ref->{'dtAdded'},
-            dtLastUpdated = $Reg_ref->{'dtLastUpdated'},
-            intNationalPeriodID = $Reg_ref->{'intNationalPeriodID'},
-            intAgeGroupID = $Reg_ref->{'intAgeGroupID'},
-            strAgeLevel = $Reg_ref->{'strAgeLevel'},
-            strRegistrationNature = $Reg_ref->{'strRegistrationNature'},
-            intPaymentRequired = $Reg_ref->{'intPaymentRequired'}
+        SET
+            intEntityID = ?,
+            strPersonType = ?,
+            strPersonSubType = ?,
+            strPersonLevel = ?,
+            strPersonEntityRole = ?,
+            strStatus = ?,
+            strSport = ?,
+            intCurrent = ?,
+            intOriginLevel = ?,
+            intOriginID = ?,
+            dtFrom = ?,
+            dtTo = ?,
+            intRealmID = ?,
+            intSubRealmID = ?,
+            dtAdded = ?,
+            dtLastUpdated = ?,
+            intNationalPeriodID = ?,
+            intAgeGroupID = ?,
+            strAgeLevel = ?,
+            strRegistrationNature = ?,
+            intPaymentRequired = ?
         WHERE
             intPersonID = ?
             AND intPersonRegistrationID = ?
@@ -196,47 +197,35 @@ sub updatePersonRegistration    {
 
   	my $q = $Data->{'db'}->prepare($st);
   	$q->execute(
-  		$Reg_ref->{'personID'},
-  		$Reg_ref->{'entityID'},
-  		$Reg_ref->{'personType'} || '',  		
-  		$Reg_ref->{'personSubType'} || '',  		
-  		$Reg_ref->{'personLevel'} || '',  		
-  		$Reg_ref->{'personEntityRole'} || '',  		
-  		'PENDING',
-  		$Reg_ref->{'sport'},  		
-  		$Reg_ref->{'current'} || 0,  		
-  		$Reg_ref->{'originLevel'} || 0,  		
-  		$Reg_ref->{'originID'} || 0,  		
-  		$Reg_ref->{'dateFrom'},  		
-  		$Reg_ref->{'dateTo'},  		
-  		$Data->{'Realm'},
-  		$Data->{'SubRealm'} || 0,
-        NOW(),
-        NOW(),
-  		$Reg_ref->{'nationalPeriodID'} || 0,
-  		$Reg_ref->{'ageGroupID'} || 0,
-  		$Reg_ref->{'ageLevel'} || '',
-  		$Reg_ref->{'registrationNature'} || '',
-  		$Reg_ref->{'paymentRequired'} || 0
+        $Reg_ref->{'intEntityID'},
+        $Reg_ref->{'strPersonType'},
+        $Reg_ref->{'strPersonSubType'},
+        $Reg_ref->{'strPersonLevel'},
+        $Reg_ref->{'strPersonEntityRole'},
+        $Reg_ref->{'strStatus'},
+        $Reg_ref->{'strSport'},
+        $Reg_ref->{'intCurrent'},
+        $Reg_ref->{'intOriginLevel'},
+        $Reg_ref->{'intOriginID'},
+        $Reg_ref->{'dtFrom'},
+        $Reg_ref->{'dtTo'},
+        $Data->{'Realm'},
+        $Data->{'RealmSubType'},
+        $Reg_ref->{'dtAdded'},
+        $Reg_ref->{'dtLastUpdated'},
+        $Reg_ref->{'intNationalPeriodID'},
+        $Reg_ref->{'intAgeGroupID'},
+        $Reg_ref->{'strAgeLevel'},
+        $Reg_ref->{'strRegistrationNature'},
+        $Reg_ref->{'intPaymentRequired'},
+        $personID,
+        $personRegistrationID
   	);
 	
 	if ($q->errstr) {
-		return (0, 0);
+		return 0;
 	}
-  	$personRegistrationID ||= $q->{mysql_insertid};
-  	
-  	my $rc = addWorkFlowTasks(
-        $Data,
-        'REGO', 
-        $Reg_ref->{'registrationNature'}, 
-        $Reg_ref->{'originLevel'} || 0, 
-        $Reg_ref->{'entityID'} || 0,
-        $personRegistrationID, 0
-    );
-  	
- 	return ($personRegistrationID, $rc) ;
-
-
+    return 1;
 }
 
 sub getRegistrationData	{
@@ -246,6 +235,10 @@ sub getRegistrationData	{
         $personID,
     );
     my $where = '';
+    if($regFilters_ref->{'personRegistrationID'})  {
+        push @values, $regFilters_ref->{'personRegistrationID'};
+        $where .= " AND pr.intPersonRegistrationID= ? ";
+    }
     if($regFilters_ref->{'personType'})  {
         push @values, $regFilters_ref->{'personType'};
         $where .= " AND pr.strPersonType = ? ";
@@ -323,6 +316,7 @@ sub getRegistrationData	{
 sub addRegistration {
     my($Data, $Reg_ref) = @_;
 
+    my $status = $Reg_ref->{'status'} || 'PENDING';
 	my $st = qq[
    		INSERT INTO tblPersonRegistration_$Data->{'Realm'} (
             intPersonID,
@@ -383,7 +377,7 @@ sub addRegistration {
   		$Reg_ref->{'personSubType'} || '',  		
   		$Reg_ref->{'personLevel'} || '',  		
   		$Reg_ref->{'personEntityRole'} || '',  		
-  		'PENDING',
+  		$Reg_ref->{'status'} || '',  		
   		$Reg_ref->{'sport'},  		
   		$Reg_ref->{'current'} || 0,  		
   		$Reg_ref->{'originLevel'} || 0,  		
@@ -391,7 +385,7 @@ sub addRegistration {
   		$Reg_ref->{'dateFrom'},  		
   		$Reg_ref->{'dateTo'},  		
   		$Data->{'Realm'},
-  		$Data->{'SubRealm'} || 0,
+  		$Data->{'RealmSubType'} || 0,
   		$Reg_ref->{'nationalPeriodID'} || 0,
   		$Reg_ref->{'ageGroupID'} || 0,
   		$Reg_ref->{'ageLevel'} || '',
@@ -404,18 +398,51 @@ sub addRegistration {
 	}
   	my $personRegistrationID = $q->{mysql_insertid};
   	
-  	my $rc = addWorkFlowTasks(
-        $Data,
-        'REGO', 
-        $Reg_ref->{'registrationNature'}, 
-        $Reg_ref->{'originLevel'} || 0, 
-        $Reg_ref->{'entityID'} || 0,
-        $Reg_ref->{'personID'},
-        $personRegistrationID, 0
-    );
+    my $rc=0;
+    if ($status eq 'PENDING')   {
+  	    $rc = addWorkFlowTasks(
+            $Data,
+            'REGO', 
+            $Reg_ref->{'registrationNature'}, 
+            $Reg_ref->{'originLevel'} || 0, 
+            $Reg_ref->{'entityID'} || 0,
+            $Reg_ref->{'personID'},
+            $personRegistrationID, 
+            0
+        );
+    }
   	
  	return ($personRegistrationID, $rc) ;
-
 }
+
+sub submitPersonRegistration    {
+
+    my ($Data, $personID, $personRegistrationID) = @_;
+
+    my %Reg=();
+    $Reg{'personRegistrationID'} = $personRegistrationID;
+    my ($count, $regs) = getRegistrationData($Data, $personID, \%Reg);
+
+    if ($count) {
+        my $pr_ref = $regs->[0];
+        $pr_ref->{'strStatus'} = 'PENDING';
+print STDERR Dumper($pr_ref);
+
+        updatePersonRegistration($Data, $personID, $personRegistrationID, $pr_ref);
+
+  	    my $rc = addWorkFlowTasks(
+            $Data,
+            'REGO', 
+            $pr_ref->{'strRegistrationNature'} || '', 
+            $pr_ref->{'intOriginLevel'} || 0, 
+            $pr_ref->{'intEntityID'} || 0,
+            $personID,
+            $personRegistrationID, 
+            0
+        );
+    }
+}
+
+
 
 1;
