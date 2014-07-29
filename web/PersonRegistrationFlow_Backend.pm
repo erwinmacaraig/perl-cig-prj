@@ -95,7 +95,7 @@ print STDERR Dumper($products);
             $rego_ref,
         );
 use Data::Dumper;
-print STDERR Dumper($products);
+print STDERR Dumper($documents);
         $body = qq[
             display document upload information
 
