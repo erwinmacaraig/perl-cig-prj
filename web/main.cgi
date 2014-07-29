@@ -61,7 +61,7 @@ use DashboardConfig;
 
 use WorkFlow;
 use EntityRegistrationAllowedEdit;
-use PersonRegisterWhat;
+use PersonRegistrationFlow_Backend;
 
 use Log;
 use Data::Dumper;
@@ -253,9 +253,8 @@ warn("REALM IS ". $Data{'Realm'});
     elsif ( $action =~ /^ERA_/ ) {
         ( $resultHTML, $pageHeading ) = handleEntityRegistrationAllowedEdit($action, \%Data);
     }
-    elsif ( $action =~ /^REG_/ ) {
-my $t = displayPersonRegisterWhat(\%Data,0,0,0,0,100);
-$resultHTML = $t;
+    elsif ( $action =~ /^PREGF_/ ) {
+        ( $resultHTML, $pageHeading ) = handleRegistrationFlowBackend($action, \%Data);
     }
     # BUILD PAGE
     if ( !$report ) {

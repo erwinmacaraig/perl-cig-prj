@@ -34,7 +34,7 @@ my $st = qq[
 
 my $q = $db->prepare($st);
 my $realm = 1;
-my $origin = 100;
+my $origin = 3;
 foreach my $sport (keys %Defs::sportType)   {
     foreach my $nature (keys %Defs::registrationNature)   {
         foreach my $personType (keys %Defs::personType)   {

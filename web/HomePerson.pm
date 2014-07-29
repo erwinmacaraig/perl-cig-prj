@@ -57,6 +57,7 @@ sub showPersonHome	{
 		}
 
 	}
+    my $addregistrationURL = "$Data->{'target'}?client=$client&amp;a=PREGF_T";
 	my $accreditations = ($Data->{'SystemConfig'}{'NationalAccreditation'}) ? AccreditationDisplay::ActiveNationalAccredSummary($Data, $personID) : '';#ActiveAccredSummary($Data, $personID, $Data->{'clientValues'}{'assocID'});
 
   my $docs = getUploadedFiles(
@@ -75,6 +76,7 @@ sub showPersonHome	{
 		Photo => $photo,
 		MarkDuplicateURL => $markduplicateURL || '',
 		AddDocumentURL => $adddocumentURL || '',
+		AddRegistrationURL => $addregistrationURL || '',
 		CardPrintingURL => $cardprintingURL || '',
 		UmpireLabel => $Data->{'SystemConfig'}{'UmpireLabel'} || 'Match Official',
 		Documents => $docs,
