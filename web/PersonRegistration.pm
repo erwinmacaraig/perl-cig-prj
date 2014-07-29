@@ -10,9 +10,9 @@ require Exporter;
 );
 
 use strict;
-#use Log;
 use WorkFlow;
-use Data::Dumper;
+#use Log;
+#use Data::Dumper;
 
 sub deletePersonRegistered  {
 	my ($Data, $personID, $personRegistrationID) = @_;
@@ -33,6 +33,7 @@ sub isPersonRegistered {
 
 	my ( $Data, $personID, $regFilters_ref)=@_;
 
+## Are there any "current" registration records for the member in the system
     $regFilters_ref->{'current'} = 1;
     my ($count, $p1_refs) = getRegistrationData($Data, $personID, $regFilters_ref);
 
@@ -43,13 +44,9 @@ sub isPersonRegistered {
 sub mergePersonRegistrations    {
 
     my ($Data, $pFromId, $pToId) = @_;
-warn("FROM: $pFromId");
-warn("TO: $pToId");
 
     my ($pFromCount, $pFrom_refs) = getRegistrationData($Data, $pFromId, undef);
     my ($pToCount, $pTo_refs) = getRegistrationData($Data, $pToId, undef);
-warn("FROMCNT: $pFromCount");
-warn("TOCNT: $pToCount");
 
     my $stMove = qq[
         UPDATE tblPersonRegistration_$Data->{'Realm'}
@@ -123,14 +120,12 @@ warn("TOCNT: $pToCount");
 
             if ($keyTo eq $keyFrom) {
                 ##Match found
-warn("FOUND!!!!!!!!!!");
                 $personRegoIDTo= $To_ref->{'intPersonRegistrationID'};
                 $found_To_ref = $To_ref;
                 last;
             }
         }
         if ($personRegoIDFrom and ! $personRegoIDTo )   {
-            warn("MVOE");
   	        $qMove->execute($pToId, $pFromId, $personRegoIDFrom);
             $qTasks->execute($pToId, $personRegoIDFrom, $pFromId, $personRegoIDFrom);
             $qTasks->execute($pToId, 0, $pFromId, 0);
@@ -161,9 +156,6 @@ warn("FOUND!!!!!!!!!!");
                 $qDELTasks->execute($pToId, $personRegoIDTo);
                 $qTasks->execute($pToId, $$personRegoIDTo, $pFromId, $personRegoIDFrom);
             }
-
-            warn ("WHAT ABOUT TASKS (KEEP PENDING IF PENDING USED AND TRANSACTIONS !!!!!!!");
-            warn ("WHAT ABOUT DOCS etc!!!!!!!");
         }
     }
 }
