@@ -16,7 +16,10 @@ use CGI qw(unescape param);
 use FormHelpers;
 use GridDisplay;
 use Log;
+use RegistrationAllowed;
+#imported RegistrationAllowed
 require RecordTypeFilter;
+
 
 # This program edits the rules that determine what types of registration each entity will accept
 # It maintains tblEntityRegistrationAllowed
@@ -49,28 +52,36 @@ sub rule_details   {
 
 	# Check for change of QS    return '' if ($venueID and !venueAllowed($Data, $venueID));
 
+	my $db = $Data->{db};
 	my $option = '';
 	if ($action eq 'ERA_ADD') {
 		$option = 'add';
 	}
-#	else {
-#		$option = 'delete';
-#	};
+	elsif($action eq 'ERA_DELETE'){ 
+		$option = 'delete';
+	}
+	
+    #	else {
+    #		$option = 'delete';
+    #	};
 
     # $option='edit' if $action eq 'VENUE_DTE' and allowedAction($Data, 'venue_e');
     # $option='add' if $action eq 'VENUE_DTA' and allowedAction($Data, 'venue_a');
     # $intEntityRegistrationAllowedID = 0 if $option eq 'add';
 
     my $client = setClient($Data->{'clientValues'}) || '';
-	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+    my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
-    my $field = loadRuleDetails($Data->{'db'}, $Data, $entityID) || ();
+    my $field = loadRuleDetails($Data->{'db'}, $Data, $intEntityRegistrationAllowedID) || ();
+    #changed the last parameter from $entityID to $intEntityRegistrationAllowedID
+    
     my %genderoptions = ();
     for my $k ( keys %Defs::genderInfo ) {
         next if !$k;
         next if ($k eq $Defs::GENDER_NONE );
         $genderoptions{$k} = $Defs::genderInfo{$k} || '';
     }
+   
      #### Drop Down Values For  Person Type ###
      my %persontypeoptions = (); 
      for my $k ( keys %Defs::personType ){
@@ -96,130 +107,155 @@ sub rule_details   {
    for my $k ( keys %Defs::AgeType ){ 
 	$agetypeoptions{$k} = $Defs::AgeType{$k} || '';
     }
-   my %FieldDefinitions = (
-       fields=>  {
-         strPersonType => {
-           label => 'Person Type',
-           value => $field->{strPersonType},
-           type  => 'lookup',
-           options     => \%persontypeoptions,
-           sectionname => 'details',
-           firstoption => [ '', " " ],
-         },
-         strSport=> {
-           label=> 'Sport',
-           value => $field->{strSport},
-           type  => 'lookup',
-           options     => \%sporttypeoptions,
-   	sectionname => 'details',
-           firstoption => [ '', " " ],
-         },
-           intGender => {
-                   label       => 'Gender',
-                   value       => $field->{intGender},
-                   type        => 'lookup',
-                   options     => \%genderoptions,
-                   sectionname => 'details',
-                   firstoption => [ '', " " ],
-           },
-         strPersonLevel => {
-           label => 'Person Level',
-           value => $field->{strPersonLevel},
-           type  => 'lookup',
-   	options     => \%personleveloptions,
-   	sectionname => 'details',
-           firstoption => [ '', " " ],
-         },      
-         strRegistrationNature => {
-           label => 'Registration Nature',
-           value => $field->{strRegistrationNature},
-           type  => 'lookup',
-   	options     => \%registrationnatureoptions,
-   	sectionname => 'details',
-           firstoption => [ '', " " ],
-         },
-         strAgeLevel => {
-           label => 'Age Level',
-           value => $field->{strAgeLevel},
-           type  => 'lookup',
-          	options     => \%agetypeoptions,
-          	sectionname => 'details',
-           firstoption => [ '', " " ],
-         },
-    },
-    order => [qw(
-		strPersonType
-		strSport
-        intGender
-		strPersonLevel
-		strRegistrationNature
-		strAgeLevel
-    )],
-    sections => [ 
-        [ 'details', "Registration Details" ], 
-    ],
-    options => {
-      labelsuffix => ':',
-      hideblank => 1,
-      target => $Data->{'target'},
-      formname => 'n_form',
-      submitlabel => $Data->{'lang'}->txt('Update'),
-      introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
-      NoHTML => 1, 
-      addSQL => qq[
-          INSERT INTO tblEntityRegistrationAllowed (
-              intEntityID, 
-              --FIELDS-- 
-          )
-          VALUES (
-              $entityID, 
-              --VAL-- 
-          )
-      ],
-      auditFunction=> \&auditLog,
-      auditAddParams => [
-        $Data,
-        'Add',
-        'Rule'
-      ],
-
-      afteraddFunction => \&postRuleAdd,
-      afteraddParams => [$option,$Data,$Data->{'db'}],
-
-      LocaleMakeText => $Data->{'lang'},
-    },
-    carryfields =>  {
-      client => $client,
-      a=> $action,
-    },
-  );
+    ### Move variable declarations here ###
+    my %FieldDefinitions;
     my $resultHTML='';
-    ($resultHTML, undef )=handleHTMLForm(\%FieldDefinitions, undef, $option, '',$Data->{'db'});
-    my $title=qq[Registration Accepted];
-
-    my $chgoptions='';
+    my $title;
+    if($option eq 'add'){
+         %FieldDefinitions = (
+           fields=>  {
+             strPersonType => {
+               label => 'Person Type',
+               value => $field->{strPersonType},
+               type  => 'lookup',
+               options     => \%persontypeoptions,
+               sectionname => 'details',
+               firstoption => [ '', " " ],
+             },
+             strSport=> {
+               label=> 'Sport',
+               value => $field->{strSport},
+               type  => 'lookup',
+               options     => \%sporttypeoptions,
+       	sectionname => 'details',
+               firstoption => [ '', " " ],
+             },
+               intGender => {
+                       label       => 'Gender',
+                       value       => $field->{intGender},
+                       type        => 'lookup',
+                       options     => \%genderoptions,
+                       sectionname => 'details',
+                       firstoption => [ '', " " ],
+               },
+             strPersonLevel => {
+               label => 'Person Level',
+               value => $field->{strPersonLevel},
+               type  => 'lookup',
+       	       options     => \%personleveloptions,
+               sectionname => 'details',
+               firstoption => [ '', " " ],
+             },      
+             strRegistrationNature => {
+               label => 'Registration Nature',
+               value => $field->{strRegistrationNature},
+               type  => 'lookup',
+       	       options     => \%registrationnatureoptions,
+       	       sectionname => 'details',
+               firstoption => [ '', " " ],
+             },
+             strAgeLevel => {
+               label => 'Age Level',
+               value => $field->{strAgeLevel},
+               type  => 'lookup',
+              	options     => \%agetypeoptions,
+              	sectionname => 'details',
+               firstoption => [ '', " " ],
+             },
+        },
+        order => [qw(
+    		strPersonType
+    		strSport
+                intGender
+    		strPersonLevel
+    		strRegistrationNature
+    		strAgeLevel
+        )],
+        sections => [ 
+            [ 'details', "Registration Details" ], 
+        ],
+        options => {
+          labelsuffix => ':',
+          hideblank => 1,
+          target => $Data->{'target'},
+          formname => 'n_form',
+          submitlabel => $Data->{'lang'}->txt('Update'),
+          introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
+          NoHTML => 1, 
+          beforeaddFunction => \&isRegoAllowedToSystem,
+          addSQL => qq[
+              INSERT INTO tblEntityRegistrationAllowed (
+                  intEntityID, 
+                  --FIELDS-- 
+              )
+              VALUES (
+                  $entityID, 
+                  --VAL-- 
+              )
+          ],
+          auditFunction=> \&auditLog,
+          auditAddParams => [
+            $Data,
+            'Add',
+            'Rule'
+          ],
+    
+          afteraddFunction => \&postRuleAdd,
+          afteraddParams => [$option,$Data,$Data->{'db'}],
+    
+          LocaleMakeText => $Data->{'lang'},
+        },
+        carryfields =>  {
+          client => $client,
+          a=> $action,
+        },
+  );
+    $resultHTML='';
+   ($resultHTML, undef )=handleHTMLForm(\%FieldDefinitions, undef, $option, '',$Data->{'db'});
+    $title=qq[Registration Accepted];
+    }
+    ##### DELETING A RULE ####
+    elsif($option eq 'delete'){ 
+                                                                                                             
+       my $statement=qq[ DELETE FROM tblEntityRegistrationAllowed WHERE intEntityRegistrationAllowedID = ? ];
+       my $query = $db->prepare($statement);
+       $query -> execute($intEntityRegistrationAllowedID);
+       $query->finish();
+       $title = 'Registration Rule Deleted';
+     
+   } #### END ELSEIF  (FOR DELETING A RULE) ###
+    
+    
+    #my $chgoptions='';
     
     # if($option eq 'display')  {
         # Edit Venue.
     #    $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DTE&amp;venueID=$venueID">Edit Venue</a></span> ] if allowedAction($Data, 'venue_e');
     #}
-    if ($option eq 'delete') {
-        # Delete Venue.
-        my $ruleObj = new EntityObj('db'=>$Data->{db},ID=>$intEntityRegistrationAllowedID);
+    #if ($option eq 'delete') {
+    # Delete Venue.
+    #    my $ruleObj = new EntityObj('db'=>$Data->{db},ID=>$intEntityRegistrationAllowedID);
         
-        $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=ERA_DELETE&amp;venueID=$intEntityRegistrationAllowedID" onclick="return confirm('Are you sure you want to delete this venue');">Delete Rule</a> ] if $ruleObj->canDelete();
-    }
+    #    $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=ERA_DELETE&amp;venueID=$intEntityRegistrationAllowedID" onclick="return confirm('Are you sure you want to delete this venue');">Delete Rule</a> ] if $ruleObj->canDelete();
+    #}
     
-    $chgoptions=qq[<div class="changeoptions">$chgoptions</div>] if $chgoptions;
+    #$chgoptions=qq[<div class="changeoptions">$chgoptions</div>] if $chgoptions;
     
-    $title=$chgoptions.$title;
+    #$title=$chgoptions.$title;
     
     if ($option eq 'add') {
 	    $title="Add New Registration Type"     	
-    };
-
+    }
     my $text = qq[<p style = "clear:both;"><a href="$Data->{'target'}?client=$client&amp;a=ERA_LIST">Click here</a> to return to list of current registration types accepted</p>];
-    $resultHTML = $text.$resultHTML.$text;
+     
+    if($option eq 'delete'){
+       my $delMsg = '<div class="OKmsg"> Registration rule deleted. </div><br>';
+       $resultHTML = $text.$resultHTML.$delMsg.$text;
+    }
+    else {
+       $resultHTML = $text.$resultHTML.$text;
+    }
+   
 
     return ($resultHTML,$title);
 }
@@ -235,7 +271,7 @@ sub loadRuleDetails {
 		strSport,
 		strPersonLevel,
 		strRegistrationNature,
-        intGender,
+                intGender,
 		strAgeLevel
     FROM tblEntityRegistrationAllowed
     WHERE intEntityRegistrationAllowedID = ?
@@ -249,7 +285,12 @@ sub loadRuleDetails {
   my $field=$query->fetchrow_hashref();
   $query->finish;
                                                                                                         
-  foreach my $key (keys %{$field})  { if(!defined $field->{$key}) {$field->{$key}='';} }
+  foreach my $key (keys %{$field}){ 
+       if(!defined $field->{$key}){ 
+           $field->{$key}='';          
+       } 
+        
+ }
   return $field;
 }
 
@@ -260,7 +301,6 @@ sub listRules  {
    	my $st = '';
 	my $q = '';
 	my $db = $Data->{'db'};
-
 	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
     $st =qq[
@@ -279,22 +319,21 @@ sub listRules  {
     
 	$q = $db->prepare($st) or query_error($st);
 	$q->execute($entityID);
-    my $results = 0;
-    my @rowdata = ();
+        my $results = 0;
+        my @rowdata = ();
     
     while (my $dref = $q->fetchrow_hashref) {
-      $results = 1;
-     
+      $results = 1;     
       push @rowdata, {
         id => $dref->{'intEntityRegistrationAllowedID'} || 0,
         strPersonType => $dref->{'strPersonType'} || '',
         strSport => $dref->{'strSport'} || '',
-        Gender => $Defs::PersonGenderInfo{$dref->{'intGender'}} || '',
+        Gender => $Defs::genderInfo{$dref->{'intGender'}} || '',
         strPersonLevel => $dref->{'strPersonLevel'} || '',
         strRegistrationNature => $dref->{'strRegistrationNature'} || '',
         strAgeLevel => $dref->{'strAgeLevel'} || '',
-        SelectLink => "$Data->{'target'}?client=$Data->{client}&amp;a=ERA_DELETE&amp;RID=$dref->{'intEntityRegistrationAllowedID'}",
-        
+        SelectLink => "$Data->{'target'}?client=$Data->{client}&amp;a=ERA_ADD&amp;RID=$dref->{'intEntityRegistrationAllowedID'}",
+        DeleteLink => qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$Data->{client}&amp;a=ERA_DELETE&amp;RID=$dref->{'intEntityRegistrationAllowedID'}" onclick="return confirm('Are you sure you want to delete this rule');">Delete Rule</a></span> ],
       };
     }
     $q->finish;
@@ -337,9 +376,9 @@ sub listRules  {
             field => 'Gender',
         },
         {
-             name =>   $Data->{'lang'}->txt(' '),
-             field =>  'SelectLink',
-             type => 'HTML',
+            name =>   $Data->{'lang'}->txt(' '),
+     	    field =>  'DeleteLink',
+	    type => 'HTML',         
         },
     );
     
@@ -378,6 +417,18 @@ sub postRuleAdd {
         <a href="$Data->{'target'}?client=$client&amp;a=ERA_List">Add another Registration Type</a>
 
       ]);
+    }
+    
+  }
+  else {
+  	 {
+	      my $client = setClient($Data->{'clientValues'}) || '';
+	
+	      return (0,qq[
+	        <div class="OKmsg"> Registration rule deleted. </div><br>
+	        <a href="$Data->{'target'}?client=$client&amp;a=ERA_List">Add another Registration Type</a>
+	
+	      ]);
     }
   }
 }
