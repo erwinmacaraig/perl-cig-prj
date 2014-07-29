@@ -69,6 +69,13 @@ sub optionsPersonRegisterWhat {
         age => 'strAgeLevel',
         sport => 'strSport',
     );
+    my %lfLabelTable = (
+        type => \%Defs::personType,
+        nature => \%Defs::registrationNature,
+        level => \%Defs::personLevel,
+        age => \%Defs::ageLevel,
+        sport => \%Defs::sportType,
+    );
     
     my $lookingForField = $lfTable{$lookingFor} || '';
     return (undef,'Invalid item to look for') if !$lookingForField;
@@ -115,10 +122,13 @@ sub optionsPersonRegisterWhat {
     my $q = $Data->{'db'}->prepare($st);
     my @retdata = ();
     $q->execute(@values);
+    my $lookup = ();
     while(my $val = $q->fetchrow_array())   {
         if($val)    {
+            my $label = $lfLabelTable{$lookingFor}{$val};
+            $label = $Data->{'lang'}->txt($lfLabelTable{$lookingFor}{$val});
             push @retdata, {
-                name => $val,
+                name => $label,
                 value => $val,
             };
         }

@@ -37,6 +37,9 @@
 <div id = "regopt_wrapper">
     <div id  = "regopt_options_title" class = "regoptions_title">[% Lang.txt('Choose the sport') %] </div>
     <div id  = "regopt_options" class = "regoptions"></div>
+    <div id  = "regopt_options_continue" style = "display:none;">
+        <span class = "proceed-button button"><a href = "[% ContinueURL %]">[% Lang.txt('Continue') %]</a></span>
+    </div>
 </div>
 <div class = "option_titles" style="display:none;">
     <span id = "regopt_title_sport">[% Lang.txt("Choose the sport") %]</span>
@@ -44,6 +47,7 @@
     <span id = "regopt_title_level">[% Lang.txt("Choose the level") %]</span>
     <span id = "regopt_title_age">[% Lang.txt("Choose the age group") %]</span>
     <span id = "regopt_title_nature">[% Lang.txt("Choose the nature of the registration") %]</span>
+    <span id = "regopt_title_nooptions">[% Lang.txt("This type of registration is not available") %]</span>
 </div>
 
 </form>
@@ -63,17 +67,33 @@
         qstring = qstring + '&r=' + jQuery('#rID').val();
         qstring = qstring + '&sr=' + jQuery('#srID').val();
 
-        jQuery.getJSON('ajax/aj_person_registerwhat.cgi?otype=' + optionType + qstring, function(data)    {
-            if(data.results) {
+        if(optionType == 'complete')    {
+          jQuery('#regopt_options').html('');
+          jQuery('#regopt_options_title').html('');
+          var url = jQuery('#regopt_options_continue a').attr('href');
+          url = url + qstring;
+          jQuery('#regopt_options_continue a').attr('href',url);
+          jQuery('#regopt_options_continue').show();
+        }
+        else    {
+            jQuery.getJSON('ajax/aj_person_registerwhat.cgi?otype=' + optionType + qstring, function(data)    {
               var items = [];
-            
-              jQuery.each( data.options, function( key, val ) {
-                items.push( '<a href = "#" data-val = "' + val.value + '" data-optiontype = "' + optionType + '" data-optionname = "' + val.name + '">' + val.name + '</a>' );
-              });
-              jQuery('#regopt_options').html(items.join(''));
-              jQuery('#regopt_options_title').html(jQuery('#regopt_title_' + optionType).html());
-            }
-        });
+              if(data.results == 1) {
+                chooseOption(data.options[0].value,optionType, data.options[0].name); 
+              }
+              else if(data.results > 1) {
+                  jQuery.each( data.options, function( key, val ) {
+                    items.push( '<a href = "#" data-val = "' + val.value + '" data-optiontype = "' + optionType + '" data-optionname = "' + val.name + '">' + val.name + '</a>' );
+                  });
+                  jQuery('#regopt_options').html(items.join(''));
+                  jQuery('#regopt_options_title').html(jQuery('#regopt_title_' + optionType).html());
+              }
+              else  {
+                  jQuery('#regopt_options').html(jQuery('#regopt_title_nooptions').html());
+                  jQuery('#regopt_options_title').html('');
+              }
+            });
+        }
     }
 
     function chooseOption(val, optionType, name)  {
@@ -83,7 +103,8 @@
             'sport' : 'type',
             'type' : 'level',
             'level' : 'age',
-            'age' : 'nature'
+            'age' : 'nature',
+            'nature' : 'complete'
         };
         update_options(nextlayer[optionType]);
     }
@@ -105,6 +126,7 @@
         jQuery('#selected_age').val('');
         jQuery('#selected_nature').val('');
         jQuery('.co_value').html('');
+        jQuery('#regopt_options_continue').hide();
         regopt_start();
         e.preventDefault();
         return false; 
