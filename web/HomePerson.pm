@@ -101,7 +101,12 @@ sub showPersonHome	{
 
 	);
 	
-	getRegistrationData($Data, $personID, \%TemplateData);
+    my %RegFilters=();
+    $RegFilters{'current'} = 1;
+    $RegFilters{'entityID'} = getLastEntityID($Data->{'clientValues'});
+    my ($RegCount, $Reg_ref) = getRegistrationData($Data, $personID, \%RegFilters);
+    $TemplateData{'RegistrationInfo'} = $Reg_ref;
+
 
 	my $statuspanel= runTemplate(
 		$Data,
