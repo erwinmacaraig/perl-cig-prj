@@ -16,13 +16,12 @@ sub new {
 
   my $this = shift;
   my $class = ref($this) || $this;
-  my ($db, $realm, $realmSubTypeID, $assocID, $overide_interval) = @_;
+  my ($db, $realm, $realmSubTypeID, $overide_interval) = @_;
   my %fields=();
   $fields{db}=$db || '';
   $fields{availablenums}=();
   $fields{'realm'}=$realm || '';
   $fields{'realmSubTypeID'}=$realmSubTypeID || 0;
-  $fields{'assocID'}=$assocID || 0;
 
   my $realmSubType_SQL = '';
   if ($realmSubTypeID and $realmSubTypeID > 0) {

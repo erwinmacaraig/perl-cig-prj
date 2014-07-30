@@ -24,6 +24,7 @@ use DefCodes;
 use TransLog;
 use Transactions;
 use WorkFlow;
+use RuleMatrix;
 
 sub handleClub  {
   my ($action, $Data, $clubID, $typeID)=@_;
@@ -71,7 +72,15 @@ sub club_details  {
 
   my $field_case_rules = get_field_case_rules({dbh=>$Data->{'db'}, client=>$client, type=>'Club'});
 
-    my $authID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
+  my $authID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
+
+     my $paymentRequired = 0;
+    if ($option eq 'add')   {
+        my %Reg=();
+        $Reg{'registrationNature'}='NEW';
+        my $matrix_ref = getRuleMatrix($Data, $Data->{'clientValues'}{'authLevel'}, $field->{'strEntityType'}, 'ENTITY', \%Reg);
+        $paymentRequired = $matrix_ref->{'intPaymentRequired'} || 0;
+    }
 
   my %FieldDefinitions=(
     fields=>  {

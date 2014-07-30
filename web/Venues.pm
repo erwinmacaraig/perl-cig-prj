@@ -15,6 +15,7 @@ use GridDisplay;
 use Log;
 use WorkFlow;
 require RecordTypeFilter;
+use RuleMatrix;
 
 sub handleVenues    {
     my ($action, $Data)=@_;
@@ -51,6 +52,13 @@ warn("NAME:" . $field->{strLocalName});
     my $client=setClient($Data->{'clientValues'}) || '';
     
     my $authID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
+    my $paymentRequired = 0;
+    if ($option eq 'add')   {
+        my %Reg=();
+        $Reg{'registrationNature'}='NEW';
+        my $matrix_ref = getRuleMatrix($Data, $Data->{'clientValues'}{'authLevel'}, '', 'ENTITY', \%Reg);
+        $paymentRequired = $matrix_ref->{'intPaymentRequired'} || 0;
+    }
     my %FieldDefinitions = (
     fields=>  {
       strFIFAID => {
@@ -355,6 +363,7 @@ warn("NAME:" . $field->{strLocalName});
               intEntityLevel, 
               strStatus,
               intCreatedByEntityID,
+              intPaymentRequired,
               --FIELDS-- 
           )
           VALUES (
@@ -362,6 +371,7 @@ warn("NAME:" . $field->{strLocalName});
               $Defs::LEVEL_VENUE, 
               'PENDING',
               $authID,
+              $paymentRequired,
               --VAL-- 
           )
       ],

@@ -14,6 +14,8 @@ use strict;
 use WorkFlow;
 #use Log;
 use RuleMatrix;
+use NationalReportingPeriod;
+use GenAgeGroup;
 use Data::Dumper;
 
 sub deletePersonRegistered  {
@@ -176,14 +178,9 @@ sub updatePersonRegistration    {
             strStatus = ?,
             strSport = ?,
             intCurrent = ?,
-            intOriginLevel = ?,
-            intOriginID = ?,
             dtFrom = ?,
             dtTo = ?,
-            dtAdded = ?,
             dtLastUpdated = ?,
-            intNationalPeriodID = ?,
-            intAgeGroupID = ?,
             strAgeLevel = ?,
             strRegistrationNature = ?,
             intPaymentRequired = ?
@@ -202,14 +199,9 @@ sub updatePersonRegistration    {
         $Reg_ref->{'status'} || $Reg_ref->{'strStatus'},
         $Reg_ref->{'sport'} || $Reg_ref->{'strSport'},
         $Reg_ref->{'current'} || $Reg_ref->{'intCurrent'},
-        $Reg_ref->{'originLevel'} || $Reg_ref->{'intOriginLevel'},
-        $Reg_ref->{'originID'} || $Reg_ref->{'intOriginID'},
         $Reg_ref->{'dateFrom'} || $Reg_ref->{'dtFrom'},
         $Reg_ref->{'dateTo'} || $Reg_ref->{'dtTo'},
-        $Reg_ref->{'entityID'} || $Reg_ref->{'dtAdded'},
         $Reg_ref->{'dateLastUpdated'} || $Reg_ref->{'dtLastUpdated'},
-        $Reg_ref->{'nationalPeriodID'} || $Reg_ref->{'intNationalPeriodID'},
-        $Reg_ref->{'ageGroupID'} || $Reg_ref->{'intAgeGroupID'},
         $Reg_ref->{'ageLevel'} || $Reg_ref->{'strAgeLevel'},
         $Reg_ref->{'registrationNature'} || $Reg_ref->{'strRegistrationNature'},
         $Reg_ref->{'paymentRequired'} || $Reg_ref->{'intPaymentRequired'},
@@ -313,9 +305,28 @@ sub addRegistration {
 
     my $status = $Reg_ref->{'status'} || 'PENDING';
 
-    if (exists $Reg_ref->{'paymentRequired'} && ! $Reg_ref->{'paymentRequired'})    {
+    if (! exists $Reg_ref->{'paymentRequired'})    {
         my $matrix_ref = getRuleMatrix($Data, $Reg_ref->{'originLevel'}, $Reg_ref->{'entityType'} || '', 'REGO', $Reg_ref);
         $Reg_ref->{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
+    }
+    my $nationalPeriodID = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'});
+    my $genAgeGroup ||=new GenAgeGroup ($Data->{'db'},$Data->{'Realm'}, $Data->{'RealmSubType'});
+    my $ageGroupID = 0;
+
+    if ($Reg_ref->{'personID'})  {
+        my $st= qq[
+            SELECT 
+                DATE_FORMAT(dtDOB, "%Y%m%d") as DOBAgeGroup, 
+                intGender
+            FROM 
+                tblPerson
+            WHERE 
+                intPerson= ?
+        ];
+        my $qry=$Data->{'db'}->prepare($st);
+        $qry->execute($Reg_ref->{'personID'});
+        my ($DOBAgeGroup, $Gender)=$qry->fetchrow_array();
+        $ageGroupID=$genAgeGroup->getAgeGroup($Gender, $DOBAgeGroup) || 0;
     }
 
 	my $st = qq[
@@ -387,8 +398,8 @@ sub addRegistration {
   		$Reg_ref->{'dateTo'},  		
   		$Data->{'Realm'},
   		$Data->{'RealmSubType'} || 0,
-  		$Reg_ref->{'nationalPeriodID'} || 0,
-  		$Reg_ref->{'ageGroupID'} || 0,
+  		$nationalPeriodID || 0,
+  		$ageGroupID || 0,
   		$Reg_ref->{'ageLevel'} || '',
   		$Reg_ref->{'registrationNature'} || '',
   		$Reg_ref->{'paymentRequired'} || 0

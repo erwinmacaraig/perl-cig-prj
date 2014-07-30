@@ -2246,6 +2246,7 @@ sub product_apply_transaction {
     my $st = qq[
 			SELECT 
                 T.intProductID,
+                T.intTableType,
                 T.intID,
                 P.intCanResetPaymentRequired,
                 T.intPersonRegistrationID,
@@ -2269,13 +2270,26 @@ sub product_apply_transaction {
         LIMIT 1
     ];
     my $qUPD = $db->prepare($stUPD);
+
+   my $stUPDEntity= qq[
+        UPDATE tblEntity
+        SET 
+            intPaymentRequired = 0,
+            intIsPaid=1
+        WHERE 
+            intEntityID = ?
+    ];
+    my $qUPDEntity = $db->prepare($stUPDEntity);
    
-    while( my ($productID,$personID, $resetPaymentReq, $personRegoID, $txnStatus) = $q->fetchrow_array())	{
-        if ($productID && $personID) {
-            apply_product_rules($Data,$productID,$personID,$transLogID);
-            if ($txnStatus==1 and $resetPaymentReq and $personRegoID) {
-                $qUPD->execute($personID, $personRegoID);
-            }
+
+    while( my ($productID,$tableType, $ID, $resetPaymentReq, $personRegoID, $txnStatus) = $q->fetchrow_array())	{
+        apply_product_rules($Data,$productID,$ID,$transLogID);
+        next if (! $ID or ! $productID or $txnStatus != 1 or ! $resetPaymentReq);
+        if ($tableType = $Defs::LEVEL_PERSON and $personRegoID) {
+            $qUPD->execute($ID, $personRegoID);
+        }
+        if ($tableType >= $Defs::LEVEL_CLUB) {
+            $qUPDEntity->execute($ID);
         }
     }
     $q->finish();

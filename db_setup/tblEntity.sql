@@ -55,6 +55,8 @@ CREATE TABLE tblEntity (
     strPaymentNotificationAddress VARCHAR(250),
     strEntityPaymentBusinessNumber VARCHAR(100) DEFAULT '',
     strEntityPaymentInfo TEXT,
+    intPaymentRequired TINYINT DEFAULT 0,
+    intIsPaid TINYINT DEFAULT 0,
   PRIMARY KEY (`intEntityID`),
   KEY `index_intRealmID` (`intRealmID`),
   KEY `index_strFIFAID` (`strFIFAID`),
