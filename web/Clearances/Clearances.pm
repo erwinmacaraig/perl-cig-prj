@@ -1326,8 +1326,9 @@ sub finaliseClearance	{
     $reg{'ageLevel'} = $ageLevel; 
     $reg{'ageGroupID'} = $ageGroupID;
     $reg{'current'} = 1;
+    $reg{'registrationNature'} = 'TRANSFER';
 
-    my $matrix_ref = getRuleMatrix($Data, $Data->{'SubRealm'}, $Defs::ORIGIN_SELF, 'REGO');
+    my $matrix_ref = getRuleMatrix($Data, $Data->{'RealmSubType'}, $Defs::ORIGIN_SELF, 'REGO', \%reg);
     $reg{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
     
     PersonRegistration::addRegistration($Data, \%reg);

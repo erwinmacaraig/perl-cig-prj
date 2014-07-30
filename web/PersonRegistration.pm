@@ -13,6 +13,7 @@ require Exporter;
 use strict;
 use WorkFlow;
 #use Log;
+use RuleMatrix;
 use Data::Dumper;
 
 sub deletePersonRegistered  {
@@ -311,6 +312,14 @@ sub addRegistration {
     my($Data, $Reg_ref) = @_;
 
     my $status = $Reg_ref->{'status'} || 'PENDING';
+
+    $Reg_ref->{'paymentRequired'} ||= 0;
+
+    if (! $Reg_ref->{'paymentRequired'})    {
+        my $matrix_ref = getRuleMatrix($Data, $Data->{'RealmSubType'}, $Reg_ref->{'originLevel'}, 'REGO', $Reg_ref);
+        $Reg_ref->{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
+    }
+
 	my $st = qq[
    		INSERT INTO tblPersonRegistration_$Data->{'Realm'} (
             intPersonID,

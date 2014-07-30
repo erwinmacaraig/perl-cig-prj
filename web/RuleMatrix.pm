@@ -32,7 +32,8 @@ sub getRuleMatrix   {
         $where .= " AND strSport = ? ";
     }
     if($reg_ref->{'registrationNature'})  {
-        $where .= " AND strRegistrationNature = 'TRANSFER' ";
+        push @values, $reg_ref->{'registrationNature'};
+        $where .= " AND strRegistrationNature = ? ";
     }
     if($reg_ref->{'personType'})  {
         push @values, $reg_ref->{'personType'};
