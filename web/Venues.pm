@@ -13,7 +13,8 @@ use CGI qw(unescape param);
 use FormHelpers;
 use GridDisplay;
 use Log;
-use WorkFlow;
+use EntityStructure;
+
 require RecordTypeFilter;
 
 sub handleVenues    {
@@ -657,9 +658,11 @@ sub postVenueAdd {
       my $query = $db->prepare($st);
       $query->execute($entityID, $id);
       $query->finish();
-        my $rc = addTasks($Data,$entityID, 0,0);
     }
-
+      ### A call TO createTempEntityStructure FROM EntityStructure   ###
+      $Data->{'db'}=$db;
+      createTempEntityStructure($Data); 
+      ### End call to createTempEntityStructure FROM EntityStructure###
     {
       my $cl=setClient($Data->{'clientValues'}) || '';
       my %cv=getClient($cl);
@@ -674,8 +677,10 @@ sub postVenueAdd {
 
       ]);
     }
-  }
-}
+    
+  } ## end if add
+  
+} ## end sub
 
 
 sub venueAllowed    {
