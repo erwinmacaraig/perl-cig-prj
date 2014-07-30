@@ -586,7 +586,7 @@ sub getTransList {
     push (@Columns, {Name => 'Start_RAW', Field => 'dtStart_RAW', hide=>1});
     push (@Columns, {Name => 'End', Field => 'dtEnd', width => 20});
     push (@Columns, {Name => 'End_RAW', Field => 'dtEnd_RAW', hide=>1});
-    push (@Columns, {Name => 'Status', Field => 'StatusText', width => 20});
+    push (@Columns, {Name => 'Status', Field => 'StatusTextLang', width => 20});
     push (@Columns, {Name => 'Status_raw', Field => 'intStatus', hide => 1});
     push (@Columns, {Name => '&nbsp;', Field => 'stuff', type => 'HTML', hide => $displayonly});
     push (@Columns, {Name => 'Pay', Field => 'manual_payment', type => 'HTML', width => 10, hide => $hidePayment});
@@ -618,18 +618,22 @@ sub getTransList {
         my $row_data = {};
         $row_data->{id} = $i;
         foreach my $header (@Columns) {
-            if ($header->{Field} eq 'StatusText') {
+            if ($header->{Field} eq 'StatusTextLang') {
         my $status = $row->{intStatus};
         $row->{StatusText} = 'Unpaid' if ($status == 0);
         $row->{StatusText} = 'Paid' if ($status == 1);
         $row->{StatusText} = 'Cancelled' if ($status == 2);
+
+        $row->{StatusTextLang} = $Data->{'lang'}->txt('Unpaid') if ($status == 0);
+        $row->{StatusTextLang} = $Data->{'lang'}->txt('Paid') if ($status == 1);
+        $row->{StatusTextLang} = $Data->{'lang'}->txt('Cancelled') if ($status == 2);
       }
       $row_data->{$header->{Field}} = $row->{$header->{Field}};
     }
     $row_data->{SelectLink} = qq[main.cgi?client=$client&a=P_TXN_EDIT&personID=$row->{intID}&id=$row->{intTransLogID}&tID=$row->{intTransactionID}];
     if ($row->{StatusText} eq 'Paid') {
-      $row_data->{stuff} = qq[<a href="main.cgi?a=P_TXNLog_payVIEW&client=$client&tlID=$row->{intTransLogID}">View Payment Record</a>];
-      $row_data->{strReceipt} = qq[<a href="printreceipt.cgi?client=$client&ids=$row->{intTransLogID}"  target="receipt">View Receipt</a>];
+      $row_data->{stuff} = qq[<a href="main.cgi?a=P_TXNLog_payVIEW&client=$client&tlID=$row->{intTransLogID}">].$Data->{'lang'}->txt('View Payment Record').qq[</a>];
+      $row_data->{strReceipt} = qq[<a href="printreceipt.cgi?client=$client&ids=$row->{intTransLogID}"  target="receipt">].$Data->{'lang'}->txt('View Receipt').qq[</a>];
       $row_data->{manual_payment} = '';
     }
     elsif ($row->{StatusText} eq 'Unpaid') {
@@ -640,7 +644,7 @@ sub getTransList {
       $allowUD = 0 if $Data->{'SystemConfig'}{'DontAllowUnpaidDelete'}; 
 
       $row_data->{stuff} = ($allowUD) 
-          ? qq[<a href="main.cgi?a=P_TXN_DEL&client=$client&tID=$row->{intTransactionID}">Delete Transaction</a>]
+          ? qq[<a href="main.cgi?a=P_TXN_DEL&client=$client&tID=$row->{intTransactionID}">].$Data->{'lang'}->txt('Delete Transaction').qq[</a>]
           : '';
       $row_data->{manual_payment} = qq[<input type="checkbox" name="act_$row->{intTransactionID}" value="" class = "paytxn_chk">];
     }
@@ -671,10 +675,10 @@ sub getTransList {
 			<div class = "showrecoptions">
 				Filter by:
 				<select name="dd_intStatus" id="dd_intStatus">
-					<option value="3">All</option>
-					<option value="1">Paid</option>
-					<option value="0">Unpaid</option>
-					<option value="2">Cancelled</option>
+					<option value="3">].$Data->{'lang'}->txt('All') .qq[</option>
+					<option value="1">].$Data->{'lang'}->txt('Paid') .qq[</option>
+					<option value="0">].$Data->{'lang'}->txt('Unpaid') .qq[</option>
+					<option value="2">].$Data->{'lang'}->txt('Cancelled') .qq[</option>
 				</select>
 			</div>
 	];
@@ -688,7 +692,7 @@ sub getTransList {
   my $cl=setClient($Data->{'clientValues'}) || '';
         my $payment_records_link=qq[<br><br><a href="$Data->{'target'}?client=$cl&amp;a=P_TXNLog_payLIST">].$Data->{'lang'}->txt('List All Payment Records')."</a>" ;
   $payment_records_link = '' if ($hide_list_payments_link);
-  $grid = $grid ? qq[$grid $payment_records_link]  : qq[<p class="error">No records were found with this filter</p>$payment_records_link]; 
+  $grid = $grid ? qq[$grid $payment_records_link]  : qq[<p class="error">].$Data->{'lang'}->txt('No records were found with this filter').qq[</p>$payment_records_link]; 
 
 
   return ($grid, $i, \@transCurrency, \@transAmount);

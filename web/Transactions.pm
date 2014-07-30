@@ -84,6 +84,7 @@ sub displayTransaction	{
 
   my($Data, $TableID, $id, $edit) = @_;
 
+    my $lang = $Data->{'lang'};
 	my $db=$Data->{'db'} || undef;
     my $client=setClient($Data->{'clientValues'}) || '';
 	my $target=$Data->{'target'} || '';
@@ -161,47 +162,47 @@ sub displayTransaction	{
 		TXN => {
 			fields => {
 				intStatus=> {
-			        	label => "Paid ?",
+			        	label => $lang->txt("Paid ?"),
 		                	value => $dref->{'intStatus'},
                 			type  => 'lookup',
                 			options=> {$Defs::TXN_PAID => $Defs::TransactionStatus{$Defs::TXN_PAID}, $Defs::TXN_CANCELLED=> $Defs::TransactionStatus{$Defs::TXN_CANCELLED}},
 					readonly=>$readonly,
             			},
 				intDelivered=> {
-			        	label => "Delivered ?",
+			        	label => $lang->txt("Delivered ?"),
 		                	value => $dref->{'intDelivered'},
                 			type  => 'checkbox',
                 			displaylookup => {0=>'Undelivered', 1=>'Delivered'},
             			},
 				dtPaid=> {
-					label => 'Date Paid',
+					label => $lang->txt('Date Paid'),
 					type => 'text',
 					readonly=>1,
 					size => 30,
 					value => $dref->{'dtPaid'},
 				},
 				PartPayment=> {
-					label => $dref->{'intParentTXNID'} ? 'Part Payment for' : '',
+					label => $dref->{'intParentTXNID'} ? $lang->txt('Part Payment for') : '',
 					type => 'text',
 					readonly=>1,
 					size => 30,
 					value => Payments::TXNtoInvoiceNum($dref->{intParentTXNID}) . qq[ - $dref->{'ParentProductName'}],
 				},
 				intQty=> {
-					label => 'Quantity',
+					label => $lang->txt('Quantity'),
 					type => 'text',
 					size => 8,
 					value => $dref->{'intQty'} || 1,
 				},
 				curAmount=> {
-					label => 'Amount Due',
+					label => $lang->txt('Amount Due'),
 					type => 'text',
 					size => 8,
 					value => $dref->{'curAmount'},
 					readonly=>$amount_readonly,
 				},
 				AmountAlreadyPaid=> {
-					label => $dref->{'AmountAlreadyPaid'} ? 'Amount Already Paid via Part Payments' : '',
+					label => $dref->{'AmountAlreadyPaid'} ? $lang->txt('Amount Already Paid via Part Payments') : '',
 					type => 'text',
 					size => 8,
 					value => $dref->{'AmountAlreadyPaid'},
@@ -210,32 +211,32 @@ sub displayTransaction	{
 
         ## TC
         dtStart => {
-          label => $Data->{'SystemConfig'}{'AllowTxnStartDateEdit'} ? 'Start Date' : '',
+          label => $Data->{'SystemConfig'}{'AllowTxnStartDateEdit'} ? $lang->txt('Start Date') : '',
           type => 'date',
           value => $dref->{'dtStart'},
 					noadd => 1,
         },
        dtEnd => {
-          label => $Data->{'SystemConfig'}{'AllowTxnEndDateEdit'} ? 'End Date' : '',
+          label => $Data->{'SystemConfig'}{'AllowTxnEndDateEdit'} ? $lang->txt('End Date') : '',
           type => 'date',
           value => $dref->{'dtEnd'},
 					noadd => 1,
         },
         ## TC
 				strNotes=> {
-					label => 'Notes',
+					label => $lang->txt('Notes'),
 					type => 'textarea',
 					value => $dref->{'strNotes'},
 					rows => 5,
 		                	cols=> 45,
 				},
 				intProductID => {
-          				label => 'Product',
+          				label => $lang->txt('Product'),
           				type => 'lookup',
           				compulsory => 1,
 		          		value => $dref->{'intProductID'},
           				options =>  $prods_vals,
-		          		firstoption => ['','Select Product'],
+		          		firstoption => ['',$lang->txt('Select Product')],
 					readonly=>$prod_readonly,
         			},
 		},
@@ -273,14 +274,14 @@ sub displayTransaction	{
 				stopAfterAction => 1,
 				updateOKtext => qq[
 					<div class="OKmsg">Record updated successfully</div> <br>
-					<a href="$Data->{'target'}?client=$client&amp;a=M_TXN_LIST">Return to Transaction</a>
+					<a href="$Data->{'target'}?client=$client&amp;a=M_TXN_LIST">].$lang->txt('Return to Transaction').qq[</a>
 				],
 				addOKtext => qq[
 					<div class="OKmsg">Record updated successfully</div> <br>
-					<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_LIST">Return to Transaction</a>
+					<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_LIST">].$lang->txt('Return to Transaction').qq[</a>
 				],
 			},
-			sections => [ ['main','Details'], ],
+			sections => [ ['main',$lang->txt('Details')], ],
 			carryfields =>  {
 				client => $client,
 				a=> $action,
@@ -291,16 +292,16 @@ sub displayTransaction	{
 	($resultHTML, undef )=handleHTMLForm($FieldDefs{'TXN'}, undef, $option, '',$db);
 	my $url = getPartPayURL($Data, $id) if ($dref->{'NumChildren'});
 	if ($url)	{
-		$resultHTML.= qq[<a href=$url target="invoice_pay">Click to View Part Payment form</a><br><br>];
+		$resultHTML.= qq[<a href=$url target="invoice_pay">].$lang->txt('Click to View Part Payment form').qq[</a><br><br>];
 	}
 	$resultHTML .= showTransactionChildren($Data, $id) if ($dref->{'NumChildren'});
 
 	if($option eq 'display')	{
-		$resultHTML .=allowedAction($Data, 'txn_e') ?qq[ <a href="$target?a=$action&amp;tID=$dref->{'intTransactionID'}&amp;client=$client">Edit Details</a> ] : '';
+		$resultHTML .=allowedAction($Data, 'txn_e') ?qq[ <a href="$target?a=$action&amp;tID=$dref->{'intTransactionID'}&amp;client=$client">].$lang->txt('Edit Details').qq[</a> ] : '';
 	}
 
 		$resultHTML=qq[
-			<div>No Transaction were found.</div>
+			<div>].$lang->txt('No Transaction were found.').qq[</div>
 		] if !ref $dref;
 
 		$resultHTML=qq[
@@ -309,7 +310,7 @@ sub displayTransaction	{
 					$resultHTML
 				</div>
 		];
-		my $heading = $Data->{'SystemConfig'}{'txns_link_name'}  || qq[Transactions];
+		my $heading = $Data->{'SystemConfig'}{'txns_link_name'}  || $lang->txt('Transactions');
 		return ($resultHTML,$heading);
 }
 
