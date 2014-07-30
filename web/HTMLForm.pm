@@ -1233,11 +1233,11 @@ qq[To modify this information change the information in the boxes below and when
         and $fields_ref->{'options'}{'LocaleMakeText'} )
     {
 
-        $txt = $fields_ref->{'options'}{'LocaleMakeText'}->maketext(
+        $txt = $fields_ref->{'options'}{'LocaleMakeText'}->txt(
             $key,
             (
                 map {
-                    $fields_ref->{'options'}{'LocaleMakeText'}->maketext($_)
+                    $fields_ref->{'options'}{'LocaleMakeText'}->txt($_)
                       || $_
                 } @_
             )
