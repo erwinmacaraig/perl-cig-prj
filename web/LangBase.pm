@@ -12,7 +12,9 @@ sub txt (@) {
   $temp[0] =~ s/^\n+//m;
   $temp[0] =~ s/\n+$//m;
 
-  return $self->maketext(@temp); 
+  my $s = $self->maketext(@temp); 
+  return $s;
+  #return qq[<span style="color:red !important;">$s</span>];
 } 
 
 # I decree that this project's first language is English.
