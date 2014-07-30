@@ -71,6 +71,8 @@ sub club_details  {
 
   my $field_case_rules = get_field_case_rules({dbh=>$Data->{'db'}, client=>$client, type=>'Club'});
 
+    my $authID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
+
   my %FieldDefinitions=(
     fields=>  {
       strFIFAID => {
@@ -250,10 +252,11 @@ sub club_details  {
       ],
       addSQL => qq[
         INSERT INTO tblEntity
-          (intRealmID, intEntityLevel, strStatus, --FIELDS-- )
+          (intRealmID, intEntityLevel, strStatus, intCreatedByEntityID, --FIELDS-- )
           VALUES (
             $Data->{'Realm'},
             $Defs::LEVEL_CLUB,
+            $authID,
             'PENDING', --VAL-- )
         ],
       auditFunction=> \&auditLog,

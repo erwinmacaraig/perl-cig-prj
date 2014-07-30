@@ -50,6 +50,7 @@ warn("NAME:" . $field->{strLocalName});
     my $intRealmID = $Data->{'Realm'} >= 0 ? $Data->{'Realm'} : 0;
     my $client=setClient($Data->{'clientValues'}) || '';
     
+    my $authID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
     my %FieldDefinitions = (
     fields=>  {
       strFIFAID => {
@@ -353,12 +354,14 @@ warn("NAME:" . $field->{strLocalName});
               intRealmID, 
               intEntityLevel, 
               strStatus,
+              intCreatedByEntityID,
               --FIELDS-- 
           )
           VALUES (
               $intRealmID, 
               $Defs::LEVEL_VENUE, 
               'PENDING',
+              $authID,
               --VAL-- 
           )
       ],
