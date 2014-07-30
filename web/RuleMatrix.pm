@@ -15,7 +15,6 @@ use Log;
 sub getRuleMatrix   {
     my (
         $Data,
-        $subRealmID,
         $originLevel,
         $entityType,
         $ruleFor,
@@ -24,7 +23,7 @@ sub getRuleMatrix   {
 
     my @values = (
         $Data->{'Realm'},
-        $subRealmID,
+        $Data->{'RealmSubType'},
     );
     my $where = '';
     if($reg_ref->{'sport'})  {

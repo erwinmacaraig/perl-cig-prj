@@ -1328,7 +1328,7 @@ sub finaliseClearance	{
     $reg{'current'} = 1;
     $reg{'registrationNature'} = 'TRANSFER';
 
-    my $matrix_ref = getRuleMatrix($Data, $Data->{'RealmSubType'}, $Defs::ORIGIN_SELF, 'REGO', \%reg);
+    my $matrix_ref = getRuleMatrix($Data, $Defs::ORIGIN_SELF, $reg{'entityType'} || '','REGO', \%reg);
     $reg{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
     
     PersonRegistration::addRegistration($Data, \%reg);
