@@ -313,9 +313,7 @@ sub addRegistration {
 
     my $status = $Reg_ref->{'status'} || 'PENDING';
 
-    $Reg_ref->{'paymentRequired'} ||= 0;
-
-    if (! $Reg_ref->{'paymentRequired'})    {
+    if (exists $Reg_ref->{'paymentRequired'} && ! $Reg_ref->{'paymentRequired'})    {
         my $matrix_ref = getRuleMatrix($Data, $Reg_ref->{'originLevel'}, $Reg_ref->{'entityType'} || '', 'REGO', $Reg_ref);
         $Reg_ref->{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
     }
