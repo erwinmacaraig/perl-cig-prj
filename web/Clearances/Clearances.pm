@@ -1326,8 +1326,9 @@ sub finaliseClearance	{
     $reg{'ageLevel'} = $ageLevel; 
     $reg{'ageGroupID'} = $ageGroupID;
     $reg{'current'} = 1;
+    $reg{'registrationNature'} = 'TRANSFER';
 
-    my $matrix_ref = getRuleMatrix($Data, $Data->{'SubRealm'}, $Defs::ORIGIN_SELF, 'REGO');
+    my $matrix_ref = getRuleMatrix($Data, $Defs::ORIGIN_SELF, $reg{'entityType'} || '','REGO', \%reg);
     $reg{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
     
     PersonRegistration::addRegistration($Data, \%reg);
@@ -1417,9 +1418,7 @@ sub createClearance	{
 			<p>] . $lang->txt('Fill in the members National Number, or enter Surname and DOB') . qq[<br></p>
 			<table>
 			<tr><td><span class="label">] . $lang->txt('Search on a National Number') . qq[:</span></td><td><span class="formw"><input type="text" name="member_natnum" value=""></span></td></tr>
-			<tr><td colspan="2"><b>] . $lang->txt("and/or") . qq[</b></td></tr>
 			<tr><td><span class="label">] . $lang->txt('Search on Surname') . qq[:</span></td><td><span class="formw"><input type="text" name="member_surname" value=""></span></td></tr>
-			<tr><td colspan="2"><b>and/or</b></td></tr>
 			<tr><td><span class="label">] . $lang->txt('Search on Date of Birth (dd/mm/yyyy)') . qq[:</span></td><td><span class="formw"><input type="text" name="member_dob" value=""></span></td></tr>
 			</table>
 			<input type="submit" name="submit" value="] . $lang->txt('Select Person') . qq[">	
@@ -1520,7 +1519,7 @@ sub createClearance	{
 				$body .= qq[<td><b>] . $lang->txt('TRANSFERRED') . qq[</b></td>];
 			}
 			else	{
-				$body .= qq[<td><a href="$Data->{'target'}?$href&amp;personID=$dref->{intPersonID}">select</a></td>];
+				$body .= qq[<td><a href="$Data->{'target'}?$href&amp;personID=$dref->{intPersonID}">].$lang->txt('select').qq[</a></td>];
 			}
 			$body .= qq[
 					<td>$dref->{strLocalSurname}</td>

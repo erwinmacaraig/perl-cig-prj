@@ -183,8 +183,9 @@ sub validateStep1 {
 	my ($Data, $db, $clientValues_ref) = @_;
 
 	my ($success, $body) = (0,'');
+    my $lang = $Data->{'lang'};
 
-	$body='<p>To process an unpaid transaction select it by checking the box in the Pay column.</p>';
+	$body='<p>' . $lang->txt('To process an unpaid transaction select it by checking the box in the Pay column') . qq[</p>];
 
 	#Check that there are actually some transactions
 	foreach my $k (keys %{$Data->{params}}) {
@@ -200,7 +201,7 @@ sub validateStep1 {
 
 	if ($amount !~/^[\-\d\.]+$/) {
 		$body.="<br>" if $body;
-		$body.= "'$amount' is not a valid Amount";
+		$body.= "'$amount' " . $lang->txt('is not a valid Amount');
 		$success=0;
 	}
 
@@ -211,7 +212,7 @@ sub validateStep1 {
         use Date::Calc qw(check_date);
         if (!check_date($y,$m,$d)) {
 		$body.="<br>" if $body;
-		$body.= "'$dtLog' is not valid for Date Paid";
+		$body.= "'$dtLog' " . $lang->txt('is not valid for Date Paid');
 		$success = 0;
 	}
 
@@ -239,7 +240,7 @@ sub step2 {
 #Handles the 'Payment Confirmation' Screen, tblTransactions records get intTempLogID set and new tblTransLog record gets added with intStatus=pending
 	my ($Data, $db, $paymentTypeSubmitted, $clientValues_ref) = @_;
 
-print STDERR "SDSDSDSD $paymentTypeSubmitted";
+    my $lang = $Data->{'lang'};
 	my ($body, $header) = ('', '');
 
 	my ($currencyID, $intAmount, $dtLog, $paymentType, $strBSB, $strAccountName, $strAccountNum, $strResponseCode, $strResponseText, $strComments, $strBank, $strReceiptRef) = ($Data->{params}{currencyID}, $Data->{params}{intAmount}, $Data->{params}{dtLog}, $Data->{params}{paymentType}, $Data->{params}{strBSB}, $Data->{params}{strAccountName}, $Data->{params}{strAccountNum}, $Data->{params}{strResponseCode}, $Data->{params}{strResponseCode}, $Data->{params}{strComments}, $Data->{params}{strBank}, $Data->{params}{strReceiptRef});
@@ -282,7 +283,7 @@ print STDERR "SDSDSDSD $paymentTypeSubmitted";
 
 			
 		my $bb = Payments::checkoutConfirm($Data, $paymentType, \@transactionIDs,1);
-		return ($bb, "Payments Checkout");
+		return ($bb, $lang->txt("Payments Checkout"));
 	}
 
 	my $whereClause = 'AND t.intTransactionID in ('.join(",", @transactionIDs).')';	
@@ -322,7 +323,7 @@ print STDERR "SDSDSDSD $paymentTypeSubmitted";
 	foreach my $cID (@$transCurrency_ref) {
 		if (!($multiCurrency) and $prevCurrencyID and ($prevCurrencyID != $cID)) {
 			$warnings.='<br>' if $warnings;
-			$warnings.='This Payment includes transactions of multiple currencies (this makes it impossible to compare the payment amount to the total of the transactions).';
+			$warnings.=$lang->txt('This Payment includes transactions of multiple currencies (this makes it impossible to compare the payment amount to the total of the transactions).');
 			$multiCurrency=1;
 		}
 		$transAmount+=$transAmount_ref->[$currencyUpto];
@@ -331,7 +332,7 @@ print STDERR "SDSDSDSD $paymentTypeSubmitted";
 	}
 	if ($transAmount != $Data->{params}{intAmount} and !$multiCurrency) {
 		$warnings.='<br>' if $warnings;
-		$warnings.="The total of the transactions ($transAmount) amount does not equal the amount of the payment ($Data->{params}{intAmount}).";
+		$warnings.=$lang->txt("The total of the transactions") ." ($transAmount) " . $lang->txt("amount does not equal the amount of the payment") . " ($Data->{params}{intAmount}).";
 	}
 
 
@@ -351,14 +352,13 @@ print STDERR "SDSDSDSD $paymentTypeSubmitted";
 			#	<td class="value">$currencyName</td>
 			#</tr>
 
-	$header = 'Confirm Payment';
-	$body.= qq[
-		Review the payment details below, then click Confirm Payment or Cancel Payment
+	$header = $lang->txt('Confirm Payment');
+	$body.= $lang->txt("Review the payment details below, then click Confirm Payment or Cancel Payment") . qq[
 		<table cellpadding="2" cellspacing="0" border="0">
 			
 			<tbody id="secmain2" >	
 			<tr>
-				<td class="label"><label for="l_intAmount">Amount</label>:</td>
+				<td class="label"><label for="l_intAmount">].$lang->txt('Amount.').qq[</label>:</td>
 				<td class="value">
 				$Data->{params}{intAmount}
 </td>
@@ -366,17 +366,17 @@ print STDERR "SDSDSDSD $paymentTypeSubmitted";
 
 		
 			<tr>
-				<td class="label"><label for="l_dtLog">Date Paid</label>:</td>
+				<td class="label"><label for="l_dtLog">].$lang->txt('Date Paid').qq[</label>:</td>
 				<td class="value">$Data->{params}{dtLog}</td>
 			</tr>
 	#	
 		
 			<tr>
-				<td class="label"><label for="l_intPaymentType">Payment Type</label>:</td>
+				<td class="label"><label for="l_intPaymentType">].$lang->txt('Payment Type').qq[</label>:</td>
 				<td class="value">$Defs::manualPaymentTypes{$Data->{params}{paymentType}}</td>
 			</tr>
 		
-			<tr>
+			<!--<tr>
 				<td class="label"><label for="l_strBank">Bank</label>:</td>
 				<td class="value">$Data->{params}{strBank}</td>
 			</tr>
@@ -411,7 +411,7 @@ print STDERR "SDSDSDSD $paymentTypeSubmitted";
 			<tr>
 				<td class="label"><label for="l_strReceiptRef">Receipt Reference</label>:</td>
 				<td class="value">$Data->{params}{strReceiptRef}</td>
-			</tr>			
+			</tr>			-->
 
 			<!--<tr>
 				<td class="label"><label for="l_intPartialPayment">Partial Payment</label>:</td>
@@ -419,7 +419,7 @@ print STDERR "SDSDSDSD $paymentTypeSubmitted";
 			</tr>	-->
 			<tr>
 
-				<td class="label"><label for="l_strComments">Comments</label>:</td>
+				<td class="label"><label for="l_strComments">].$lang->txt('Comments').qq[</label>:</td>
 				<td class="value">$Data->{params}{strComments}</td>
 			</tr>
 		    </tbody>	
@@ -432,7 +432,7 @@ print STDERR "SDSDSDSD $paymentTypeSubmitted";
 
 	$body.=qq[
 		<div style="clear:both;"></div>
-		  <br><div class="pageHeading">Potential Problems</div>
+		  <br><div class="pageHeading">].$lang->txt('Potential Problems').qq[</div>
 		     <p class="error">$warnings</p>
 		 ] if $warnings;
 
@@ -444,14 +444,14 @@ print STDERR "SDSDSDSD $paymentTypeSubmitted";
 				<input type="hidden" name="a" value="P_TXNLogstep3">
 				<input type="hidden" name="client" value="$client">
 				<input type="hidden" name="mode" value="$mode"><input type="hidden" name="personID" value="$personID"><input type="hidden" name="client" value="$client"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="transLogID" value="$transLogID">
-				<input type="submit" name="subbut" value=" Confirm Payment " class="HF_submit button proceed-button">
+				<input type="submit" name="subbut" value=" ]. $lang->txt('Confirm Payment') . qq[ " class="HF_submit button proceed-button">
 			</form>
 			<div style="clear:both;"></div>
 			<form action="$Data->{'target'}" method="POST">
 				<input type="hidden" name="a" value="P_TXNLoglist">
 				<input type="hidden" name="client" value="$client">
 				<input type="hidden" name="mode" value="$mode"><input type="hidden" name="personID" value="$personID"><input type="hidden" name="client" value="$client"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="dt_start_paid" value="$dtStart_paid"><input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
-				<input type="submit" name="subbut" value=" Cancel Payment " class="HF_submit button cancel-button">
+				<input type="submit" name="subbut" value=" ]. $lang->txt('Cancel Payment') . qq[ " class="HF_submit button cancel-button">
 			</form>
 		 ]; 
 
@@ -462,8 +462,9 @@ sub step3 {
 
 	my ($Data, $db, $clientValues_ref) = @_;
 
+    my $lang = $Data->{'lang'};
 	my $transLogID=$Data->{'params'}{'transLogID'};
-	return ('Invalid Transaction','') if !$transLogID;
+	return ($lang->txt('Invalid Transaction'),'') if !$transLogID;
 
 	deQuote($db, \$transLogID);
 
@@ -503,10 +504,10 @@ EOS
   auditLog($transLogID, $Data, 'Confirmed Payment', 'Transactions');
 
 	return (qq[
-		<div class="OKmsg">Your payment has been Confirmed</div>
+		<div class="OKmsg">].$lang->txt('Your payment has been Confirmed') .qq[</div>
 		<br>
-		<br><a href="$receiptLink" target="receipt">Print Receipt</a><br>
-	<br><a href="$Data->{'target'}?client=$cl&amp;a=P_TXN_LIST">Return to Transactions</a><br>
+		<br><a href="$receiptLink" target="receipt">]. $lang->txt('Print Receipt') .qq[</a><br>
+	<br><a href="$Data->{'target'}?client=$cl&amp;a=P_TXN_LIST">]. $lang->txt('Return to Transactions') .qq[</a><br>
 
 	], '');		
 }
@@ -586,7 +587,7 @@ sub getTransList {
     push (@Columns, {Name => 'Start_RAW', Field => 'dtStart_RAW', hide=>1});
     push (@Columns, {Name => 'End', Field => 'dtEnd', width => 20});
     push (@Columns, {Name => 'End_RAW', Field => 'dtEnd_RAW', hide=>1});
-    push (@Columns, {Name => 'Status', Field => 'StatusText', width => 20});
+    push (@Columns, {Name => 'Status', Field => 'StatusTextLang', width => 20});
     push (@Columns, {Name => 'Status_raw', Field => 'intStatus', hide => 1});
     push (@Columns, {Name => '&nbsp;', Field => 'stuff', type => 'HTML', hide => $displayonly});
     push (@Columns, {Name => 'Pay', Field => 'manual_payment', type => 'HTML', width => 10, hide => $hidePayment});
@@ -618,18 +619,22 @@ sub getTransList {
         my $row_data = {};
         $row_data->{id} = $i;
         foreach my $header (@Columns) {
-            if ($header->{Field} eq 'StatusText') {
+            if ($header->{Field} eq 'StatusTextLang') {
         my $status = $row->{intStatus};
         $row->{StatusText} = 'Unpaid' if ($status == 0);
         $row->{StatusText} = 'Paid' if ($status == 1);
         $row->{StatusText} = 'Cancelled' if ($status == 2);
+
+        $row->{StatusTextLang} = $Data->{'lang'}->txt('Unpaid') if ($status == 0);
+        $row->{StatusTextLang} = $Data->{'lang'}->txt('Paid') if ($status == 1);
+        $row->{StatusTextLang} = $Data->{'lang'}->txt('Cancelled') if ($status == 2);
       }
       $row_data->{$header->{Field}} = $row->{$header->{Field}};
     }
     $row_data->{SelectLink} = qq[main.cgi?client=$client&a=P_TXN_EDIT&personID=$row->{intID}&id=$row->{intTransLogID}&tID=$row->{intTransactionID}];
     if ($row->{StatusText} eq 'Paid') {
-      $row_data->{stuff} = qq[<a href="main.cgi?a=P_TXNLog_payVIEW&client=$client&tlID=$row->{intTransLogID}">View Payment Record</a>];
-      $row_data->{strReceipt} = qq[<a href="printreceipt.cgi?client=$client&ids=$row->{intTransLogID}"  target="receipt">View Receipt</a>];
+      $row_data->{stuff} = qq[<a href="main.cgi?a=P_TXNLog_payVIEW&client=$client&tlID=$row->{intTransLogID}">].$Data->{'lang'}->txt('View Payment Record').qq[</a>];
+      $row_data->{strReceipt} = qq[<a href="printreceipt.cgi?client=$client&ids=$row->{intTransLogID}"  target="receipt">].$Data->{'lang'}->txt('View Receipt').qq[</a>];
       $row_data->{manual_payment} = '';
     }
     elsif ($row->{StatusText} eq 'Unpaid') {
@@ -640,7 +645,7 @@ sub getTransList {
       $allowUD = 0 if $Data->{'SystemConfig'}{'DontAllowUnpaidDelete'}; 
 
       $row_data->{stuff} = ($allowUD) 
-          ? qq[<a href="main.cgi?a=P_TXN_DEL&client=$client&tID=$row->{intTransactionID}">Delete Transaction</a>]
+          ? qq[<a href="main.cgi?a=P_TXN_DEL&client=$client&tID=$row->{intTransactionID}">].$Data->{'lang'}->txt('Delete Transaction').qq[</a>]
           : '';
       $row_data->{manual_payment} = qq[<input type="checkbox" name="act_$row->{intTransactionID}" value="" class = "paytxn_chk">];
     }
@@ -671,10 +676,10 @@ sub getTransList {
 			<div class = "showrecoptions">
 				Filter by:
 				<select name="dd_intStatus" id="dd_intStatus">
-					<option value="3">All</option>
-					<option value="1">Paid</option>
-					<option value="0">Unpaid</option>
-					<option value="2">Cancelled</option>
+					<option value="3">].$Data->{'lang'}->txt('All') .qq[</option>
+					<option value="1">].$Data->{'lang'}->txt('Paid') .qq[</option>
+					<option value="0">].$Data->{'lang'}->txt('Unpaid') .qq[</option>
+					<option value="2">].$Data->{'lang'}->txt('Cancelled') .qq[</option>
 				</select>
 			</div>
 	];
@@ -688,7 +693,7 @@ sub getTransList {
   my $cl=setClient($Data->{'clientValues'}) || '';
         my $payment_records_link=qq[<br><br><a href="$Data->{'target'}?client=$cl&amp;a=P_TXNLog_payLIST">].$Data->{'lang'}->txt('List All Payment Records')."</a>" ;
   $payment_records_link = '' if ($hide_list_payments_link);
-  $grid = $grid ? qq[$grid $payment_records_link]  : qq[<p class="error">No records were found with this filter</p>$payment_records_link]; 
+  $grid = $grid ? qq[$grid $payment_records_link]  : qq[<p class="error">].$Data->{'lang'}->txt('No records were found with this filter').qq[</p>$payment_records_link]; 
 
 
   return ($grid, $i, \@transCurrency, \@transAmount);
@@ -773,6 +778,7 @@ sub listTransactions {
     my ($Data, $db, $entityID, $personID, $tempClientValues_ref, $action, $resultMessage) = @_;
 warn("ENTITY: $entityID | $personID");
     my ($body, $paidLink, $unpaidLink, $cancelledLink, $query) = ('', '', '', '', '');
+    my $lang = $Data->{'lang'};
     my $txnStatus = $Data->{'ViewTXNStatus'} || $Defs::TXN_UNPAID;
     my ($link, $mode, $TableID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('', $Data, $tempClientValues_ref);
     my ($safeTableID, $safePaymentID) = ($TableID, $paymentID);
@@ -856,7 +862,7 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
             my $pType = $gateway->{'paymentType'};
             my $name = $gateway->{'gatewayName'};
             $CC_body .= qq[
-				    <input type="submit" name="cc_submit[$gatewayCount]" value="Pay via $name" class = "button proceed-button"><br><br>
+				    <input type="submit" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
                     <input type="hidden" value="$pType" name="pt_submit[$gatewayCount]">
             ];
         }
@@ -902,7 +908,7 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
 			  $CC_body
 		  ];
 		 my $orstring = '';
-		 $orstring = qq[&nbsp; <b>OR</b> &nbsp;] if $CC_body and $allowMP;
+		 $orstring = qq[&nbsp; <b>].$lang->txt('OR').qq[</b> &nbsp;] if $CC_body and $allowMP;
 		 if($paymentType==0){ $paymentType='';}
         $body .= qq[
             <div id="payment_manual" style= "display:none;">
@@ -924,24 +930,24 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
         ];
 
         $body .= qq[
-			  <div class="sectionheader">Manual Payment</div>
+			  <div class="sectionheader">].$lang->txt('Manual Payment').qq[</div>
 				  $resultMessage
 					<table cellpadding="2" cellspacing="0" border="0">
 					<tbody id="secmain2" >	
 					<tr>
-						<td class="label"><label for="l_intAmount">Amount (ddd.cc)</label>:</td>
+						<td class="label"><label for="l_intAmount">].$lang->txt('Amount (ddd.cc)').qq[</label>:</td>
 						<td class="value">
 						<input type="text" name="intAmount" value="$Data->{params}{intAmount}" id="l_intAmount" size="10"  /> </td>
 					</tr>
 					<tr>
-						<td class="label"><label for="l_dtLog">Date Paid</label>:</td>
+						<td class="label"><label for="l_dtLog">].$lang->txt('Date Paid').qq[</label>:</td>
 						<td class="value"><input type="text" name="dtLog" value="$currentDate" id="l_dtLog" size="10" maxlength="10" /> <span class="HTdateformat">dd/mm/yyyy</span> </td>
 					</tr>
 					<tr>
-						<td class="label"><label for="l_intPaymentType">Payment Type</label>:</td>
+						<td class="label"><label for="l_intPaymentType">].$lang->txt('Payment Type').qq[</label>:</td>
 						<td class="value">].drop_down('paymentType',\%Defs::manualPaymentTypes, undef, $paymentType, 1, 0,'','').qq[</td>
 					</tr>
-					<tr>
+					<!--<tr>
 						<td class="label"><label for="l_strBank">Bank</label>:</td>
 						<td class="value"><input type="text" name="strBank" value="$Data->{params}{strBank}" id="l_strBank"   /></td>
 					</tr>
@@ -968,14 +974,14 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
 					<tr>
 						<td class="label"><label for="l_strReceiptRef">Receipt Reference</label>:</td>
 						<td class="value"><input type="text" name="strReceiptRef" value="$Data->{params}{strReceiptRef}" id="l_strReceiptRef"   /> </td>
-					</tr>	
+					</tr>	-->
 					<!-- <tr>
 						<td class="label"><label for="l_intPartialPayment">Partial Payment</label>:</td>
 						<td class="value"><input type="checkbox" name="intPartialPayment" value="1" id="l_intPartialPayment" ].($Data->{params}{intPartialPayment} ? 'checked' : '').qq[  /> </td>
 					</tr>	-->
 					<tr>
 
-						<td class="label"><label for="l_strComments">Comments</label>:</td>
+						<td class="label"><label for="l_strComments">].$lang->txt('Comments').qq[</label>:</td>
 						<td class="value"><textarea name="strComments" id="l_strComments"  rows = "5"   cols = "45"  >$Data->{params}{strComments}</textarea> </td>
 					</tr>
 				    </tbody>	
@@ -1294,6 +1300,7 @@ sub viewTransLog	{
 
 	my ($Data, $intTransLogID)= @_;
 
+    my $lang = $Data->{'lang'};
 	$intTransLogID ||= 0;
 	my $db = $Data->{'db'};
 	my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
@@ -1399,6 +1406,7 @@ sub viewTransLog	{
                                 formname => 'txnlog_form',
                                 introtext => 'auto',
                                 buttonloc => 'bottom',
+                                LocaleMakeText => $Data->{'lang'},
                                 stopAfterAction => 1,
                         },
                         sections => [ ['main',''], ],
@@ -1409,13 +1417,13 @@ sub viewTransLog	{
 
 	#my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
   my $previousAttemptsBody = qq[
-    <div class="sectionheader">Previous Payment attempts</div>
+    <div class="sectionheader">].$lang->txt('Previous Payment attempts') . qq[</div>
     <table class="listTable">
     <tr>
-      <th>Payment Type</th>
-      <th>Date/Time</th>
-      <th>Gateway Text</th>
-      <th>Amount</th>
+      <th>].$lang->txt('Payment Type') . qq[</th>
+      <th>].$lang->txt('Date/Time') . qq[</th>
+      <th>].$lang->txt('Gateway Text') . qq[</th>
+      <th>].$lang->txt('Amount') . qq[</th>
     </tr>
   ];
   my $previousCount=0;
@@ -1451,15 +1459,15 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 
 	my $body = qq[
     $previousAttemptsBody
-		<div class="sectionheader">Items making up this Payment</div>
+		<div class="sectionheader">].$lang->txt('Items making up this Payment').qq[</div>
 		<table class="listTable">
 		<tr>
-			<th>Invoice Number</th>
-			<th>Item</th>
-			<th>Payment For</th>
-			<th>Quantity</th>
-			<th>Total Amount</th>
-			<th>Status</th>
+			<th>].$lang->txt('Invoice Number').qq[</th>
+			<th>].$lang->txt('Item').qq[</th>
+			<th>].$lang->txt('Payment For').qq[</th>
+			<th>].$lang->txt('Quantity').qq[</th>
+			<th>].$lang->txt('Total Amount').qq[</th>
+			<th>].$lang->txt('Status').qq[</th>
 		</tr>
 	];
 	my $client=setClient($Data->{'clientValues'});
@@ -1488,11 +1496,11 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 
 	$body .= qq[</table>];
 	
-	$body = $count ? qq[<div class="sectionheader">Payment Summary</div>] . $resultHTML.$body: $resultHTML;
+	$body = $count ? qq[<div class="sectionheader">].$lang->txt('Payment Summary').qq[</div>] . $resultHTML.$body: $resultHTML;
 	
 	my $chgoptions='';
     
-	$chgoptions.= qq[<a href="$Data->{target}?a=P_TXNLog_DEL&amp;client=$client&amp;tlID=$TLref->{intLogID}" onclick="return confirm('This will remove this payment and set all linked transactions to unpaid. Continue?')"><img src="images/delete.png" border="0" alt="Delete Payment Record" title="Delete Payment Record"></a>] if (
+	$chgoptions.= qq[<a href="$Data->{target}?a=P_TXNLog_DEL&amp;client=$client&amp;tlID=$TLref->{intLogID}" onclick="return confirm(].$lang->txt('This will remove this payment and set all linked transactions to unpaid. Continue?').qq["><img src="images/delete.png" border="0" alt="Delete Payment Record" title="Delete Payment Record"></a>] if (
 		$Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC 
 		and $thisassoc 
 		and (
@@ -1507,7 +1515,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
   $chgoptions = '' if $Data->{'ReadOnlyLogin'};
   $chgoptions=qq[<div class="changeoptions">$chgoptions</div>] if $chgoptions;
 
-	return ($body, $chgoptions."Payment Record");
+	return ($body, $chgoptions.$lang->txt("Payment Record"));
 
 }
 

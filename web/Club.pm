@@ -23,7 +23,12 @@ use FieldCaseRule;
 use DefCodes;
 use TransLog;
 use Transactions;
+<<<<<<< HEAD
 use EntityStructure;
+=======
+use WorkFlow;
+
+>>>>>>> 8b1948ec8c4527da121ff617246ff36cfd12e353
 sub handleClub  {
   my ($action, $Data, $clubID, $typeID)=@_;
 
@@ -69,6 +74,8 @@ sub club_details  {
   my $club_chars = getClubCharacteristicsBlock($Data, $clubID) || '';
 
   my $field_case_rules = get_field_case_rules({dbh=>$Data->{'db'}, client=>$client, type=>'Club'});
+
+    my $authID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
 
   my %FieldDefinitions=(
     fields=>  {
@@ -247,8 +254,12 @@ sub club_details  {
       ],
       addSQL => qq[
         INSERT INTO tblEntity
-          ( --FIELDS-- )
-          VALUES ( --VAL-- )
+          (intRealmID, intEntityLevel, strStatus, intCreatedByEntityID, --FIELDS-- )
+          VALUES (
+            $Data->{'Realm'},
+            $Defs::LEVEL_CLUB,
+            $authID,
+            'PENDING', --VAL-- )
         ],
       auditFunction=> \&auditLog,
       auditAddParams => [
@@ -374,6 +385,8 @@ sub postClubAdd {
       my $query = $db->prepare($st);
       $query->execute($entityID, $id);
       $query->finish();
+        
+      addWorkFlowTasks($Data, 'ENTITY', 'NEW', $Data->{'clientValues'}{'authLevel'}, $id,0,0, 0);
     }
 
     my %clubchars = ();

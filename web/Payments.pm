@@ -181,6 +181,7 @@ sub checkoutConfirm	{
 	my($Data, $paymentType, $trans, $external)=@_;
 	$external ||= 0; ## Pop CC in NEW window ?
 
+    my $lang = $Data->{'lang'};
 	$Data->{'SystemConfig'}=getSystemConfig($Data);
 	$Data->{'LocalConfig'}=getLocalConfig($Data);
     my $authLevel = $Data->{'clientValues'}{'authLevel'}||=$Defs::INVALID_ID;
@@ -270,7 +271,7 @@ sub checkoutConfirm	{
         my $formTarget = $external ? qq[ target="other" onClick="window.open('$paymentURL','other','location=no,directories=no,menubar=no,statusbar=no,toolbar=no,scrollbars=yes,height=820,width=870,resizable=yes');return false;" ] : '';
         $externalGateway= qq[
           	<div class="accepted">
-							<p>We Accept:</p>
+							<p>]. $lang->txt('We Accept').qq[</p>
 							<span class="visa-logo"><img src="images/visa_logo.png" border="0"></span>
 							<span class="mcard-logo"><img src="images/mcard_logo.png" border="0"></span>
 						</div>	
@@ -328,14 +329,14 @@ sub checkoutConfirm	{
 			$product_confirmation=qq[
 				<table class="permsTable">
 					<tr>
-						<th>Invoice Number</th>
-						<th>Item</th>
-						<th>Name</th>
-						<th style="width:50px;">Price</th>
+						<th>].$lang->txt('Invoice Number').qq[</th>
+						<th>].$lang->txt('Item').qq[</th>
+						<th>].$lang->txt('Name').qq[</th>
+						<th style="width:50px;">].$lang->txt('Price').qq[</th>
 					</tr>
 					$product_confirmation
 					<tr>
-						<th>Total</th>
+						<th>].$lang->txt('Total').qq[</th>
 						<th>&nbsp;</th>
 						<th>&nbsp;</th>
 						<td style="text-align:right;font-weight:bold;">$dollarSymbol$camount</td>
@@ -361,7 +362,7 @@ sub checkoutConfirm	{
 				];
 				if (($onlinePayment) and $externalGateway)	{
                     #if (getVerifiedBankAccount($Data, $paymentType))   { 
-						$body.=qq[<div class="payment_note"><p>Please confirm the details above, then click the <b>Pay Now</b> button to make an online payment.</p>] if ! $paymenttext;
+						$body.=qq[<div class="payment_note"><p>]. $lang->txt('Please confirm the details above, then click the <b>Pay Now</b> button to make an online payment').qq[</p>] if ! $paymenttext;
 						$body .=qq[ $externalGateway</div><p id ="final_msg"></p>];
 						
                     #}

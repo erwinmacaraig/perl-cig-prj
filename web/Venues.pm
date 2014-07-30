@@ -51,6 +51,7 @@ warn("NAME:" . $field->{strLocalName});
     my $intRealmID = $Data->{'Realm'} >= 0 ? $Data->{'Realm'} : 0;
     my $client=setClient($Data->{'clientValues'}) || '';
     
+    my $authID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
     my %FieldDefinitions = (
     fields=>  {
       strFIFAID => {
@@ -353,11 +354,15 @@ warn("NAME:" . $field->{strLocalName});
           INSERT INTO tblEntity (
               intRealmID, 
               intEntityLevel, 
+              strStatus,
+              intCreatedByEntityID,
               --FIELDS-- 
           )
           VALUES (
               $intRealmID, 
-              -47, 
+              $Defs::LEVEL_VENUE, 
+              'PENDING',
+              $authID,
               --VAL-- 
           )
       ],
@@ -658,6 +663,13 @@ sub postVenueAdd {
       my $query = $db->prepare($st);
       $query->execute($entityID, $id);
       $query->finish();
+<<<<<<< HEAD
+=======
+        my $rc = addTasks($Data,$entityID, 0,0);
+
+
+      addWorkFlowTasks($Data, 'ENTITY', 'NEW', $Data->{'clientValues'}{'authLevel'}, $id,0,0, 0);
+>>>>>>> 8b1948ec8c4527da121ff617246ff36cfd12e353
     }
       ### A call TO createTempEntityStructure FROM EntityStructure   ###
       $Data->{'db'}=$db;
