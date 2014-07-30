@@ -352,11 +352,13 @@ warn("NAME:" . $field->{strLocalName});
           INSERT INTO tblEntity (
               intRealmID, 
               intEntityLevel, 
+              strStatus,
               --FIELDS-- 
           )
           VALUES (
               $intRealmID, 
-              -47, 
+              $Defs::LEVEL_VENUE, 
+              'PENDING',
               --VAL-- 
           )
       ],
@@ -658,6 +660,9 @@ sub postVenueAdd {
       $query->execute($entityID, $id);
       $query->finish();
         my $rc = addTasks($Data,$entityID, 0,0);
+
+
+      addWorkFlowTasks($Data, 'ENTITY', 'NEW', $Data->{'clientValues'}{'authLevel'}, $id,0,0, 0);
     }
 
     {

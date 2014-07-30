@@ -23,6 +23,7 @@ use FieldCaseRule;
 use DefCodes;
 use TransLog;
 use Transactions;
+use WorkFlow;
 
 sub handleClub  {
   my ($action, $Data, $clubID, $typeID)=@_;
@@ -249,8 +250,11 @@ sub club_details  {
       ],
       addSQL => qq[
         INSERT INTO tblEntity
-          ( --FIELDS-- )
-          VALUES ( --VAL-- )
+          (intRealmID, intEntityLevel, strStatus, --FIELDS-- )
+          VALUES (
+            $Data->{'Realm'},
+            $Defs::LEVEL_CLUB,
+            'PENDING', --VAL-- )
         ],
       auditFunction=> \&auditLog,
       auditAddParams => [
@@ -376,6 +380,8 @@ sub postClubAdd {
       my $query = $db->prepare($st);
       $query->execute($entityID, $id);
       $query->finish();
+        
+      addWorkFlowTasks($Data, 'ENTITY', 'NEW', $Data->{'clientValues'}{'authLevel'}, $id,0,0, 0);
     }
 
     my %clubchars = ();
