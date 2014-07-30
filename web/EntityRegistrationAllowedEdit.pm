@@ -217,9 +217,9 @@ sub rule_details   {
     ##### DELETING A RULE ####
     elsif($option eq 'delete'){ 
                                                                                                              
-       my $statement=qq[ DELETE FROM tblEntityRegistrationAllowed WHERE intEntityRegistrationAllowedID = ? ];
+       my $statement=qq[ DELETE FROM tblEntityRegistrationAllowed WHERE intEntityRegistrationAllowedID = ? AND intEntityID = ? ];
        my $query = $db->prepare($statement);
-       $query -> execute($intEntityRegistrationAllowedID);
+       $query -> execute($intEntityRegistrationAllowedID,$entityID);
        $query->finish();
        $title = 'Registration Rule Deleted';
      
@@ -332,7 +332,6 @@ sub listRules  {
         strPersonLevel => $dref->{'strPersonLevel'} || '',
         strRegistrationNature => $dref->{'strRegistrationNature'} || '',
         strAgeLevel => $dref->{'strAgeLevel'} || '',
-        SelectLink => "$Data->{'target'}?client=$Data->{client}&amp;a=ERA_ADD&amp;RID=$dref->{'intEntityRegistrationAllowedID'}",
         DeleteLink => qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$Data->{client}&amp;a=ERA_DELETE&amp;RID=$dref->{'intEntityRegistrationAllowedID'}" onclick="return confirm('Are you sure you want to delete this rule');">Delete Rule</a></span> ],
       };
     }
@@ -347,10 +346,6 @@ sub listRules  {
     my $rectype_options = '';
 
     my @headers = (
-        {
-            type  => 'Selector',
-            field => 'SelectLink',
-        },
         {
             name  => $Data->{'lang'}->txt('PersonType'),
             field => 'strPersonType',
