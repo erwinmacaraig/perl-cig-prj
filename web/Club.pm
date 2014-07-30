@@ -23,9 +23,13 @@ use FieldCaseRule;
 use DefCodes;
 use TransLog;
 use Transactions;
+<<<<<<< HEAD
+use EntityStructure;
+=======
 use WorkFlow;
 use RuleMatrix;
 
+>>>>>>> 8b1948ec8c4527da121ff617246ff36cfd12e353
 sub handleClub  {
   my ($action, $Data, $clubID, $typeID)=@_;
 
@@ -122,8 +126,6 @@ sub club_details  {
         size  => '30',
         maxsize => '50',
       },
-
-
       strContact => {
         label => 'Contact Person',
         value => $field->{strContact},
@@ -411,6 +413,10 @@ sub postClubAdd {
         \%clubchars,
       );
     }
+    ### A call TO createTempEntityStructure FROM EntityStructure   ###
+    $Data->{'db'}=$db;
+    createTempEntityStructure($Data); 
+    ### End call to createTempEntityStructure FROM EntityStructure###
     {
       my $cl=setClient($Data->{'clientValues'}) || '';
       my %cv=getClient($cl);
@@ -425,8 +431,10 @@ sub postClubAdd {
 
       ]);
     }
-  }
-}
+    
+  } ### end if  add
+  
+} ## end sub
 
 sub postClubUpdate {
   my($id,$params,$action,$Data,$db, $clubID)=@_;

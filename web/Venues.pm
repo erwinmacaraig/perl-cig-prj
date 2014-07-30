@@ -13,7 +13,8 @@ use CGI qw(unescape param);
 use FormHelpers;
 use GridDisplay;
 use Log;
-use WorkFlow;
+use EntityStructure;
+
 require RecordTypeFilter;
 use RuleMatrix;
 
@@ -672,12 +673,18 @@ sub postVenueAdd {
       my $query = $db->prepare($st);
       $query->execute($entityID, $id);
       $query->finish();
+<<<<<<< HEAD
+=======
         my $rc = addTasks($Data,$entityID, 0,0);
 
 
       addWorkFlowTasks($Data, 'ENTITY', 'NEW', $Data->{'clientValues'}{'authLevel'}, $id,0,0, 0);
+>>>>>>> 8b1948ec8c4527da121ff617246ff36cfd12e353
     }
-
+      ### A call TO createTempEntityStructure FROM EntityStructure   ###
+      $Data->{'db'}=$db;
+      createTempEntityStructure($Data); 
+      ### End call to createTempEntityStructure FROM EntityStructure###
     {
       my $cl=setClient($Data->{'clientValues'}) || '';
       my %cv=getClient($cl);
@@ -692,8 +699,10 @@ sub postVenueAdd {
 
       ]);
     }
-  }
-}
+    
+  } ## end if add
+  
+} ## end sub
 
 
 sub venueAllowed    {
