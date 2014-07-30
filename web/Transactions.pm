@@ -93,7 +93,7 @@ sub displayTransaction	{
 #($Data->{'Realm'},$Data->{'RealmSubType'})=getRealm($Data);
 
 	my $action = 'P_TXN_EDIT';
-	$action = 'T_TXN_EDIT' if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB;
+	$action = 'C_TXN_EDIT' if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB;
     my $resultHTML = '';
 	my $toplist='';
 
