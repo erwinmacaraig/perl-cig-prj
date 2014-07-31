@@ -216,6 +216,7 @@ sub addWorkFlowTasks {
 			intWFRuleID,
 			intRealmID,
 			intSubRealmID, 
+            intCreatedByUserID,
 			intApprovalEntityID,
 			strTaskType, 
             strWFRuleFor,
@@ -229,6 +230,7 @@ sub addWorkFlowTasks {
             intDocumentID
 		)
         VALUES (
+            ?,
             ?,
             ?,
             ?,
@@ -366,6 +368,7 @@ sub addWorkFlowTasks {
             $dref->{'intWFRuleID'},
             $dref->{'intRealmID'},
             $dref->{'intSubRealmID'},
+            $Data->{'clientValues'}{'userID'} || 0,
             $approvalEntityID,
             $dref->{'strTaskType'},
             $ruleFor,
