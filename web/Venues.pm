@@ -60,36 +60,6 @@ warn("NAME:" . $field->{strLocalName});
         my $matrix_ref = getRuleMatrix($Data, $Data->{'clientValues'}{'authLevel'}, '', 'ENTITY', \%Reg);
         $paymentRequired = $matrix_ref->{'intPaymentRequired'} || 0;
     }
-     ### Drop Down Values For Entity Status ### 
-        my %entitystatusoptions = ();
-        for my $k ( keys %Defs::entiyStatus ){
-            $entitystatusoptions{$k} = $Defs::entiyStatus{$k} || '';
-        }   
-        ### End drop down values ###   
-        
-        ### Anonymous Hash Ref === ### 
-        my $entitystatushashref;
-        if($Data->{'clientValues'}{'authLevel'} >= 100){ 
-      	     $entitystatushashref = {
-        		  label => 'Status',
-        		  value => $field->{strStatus},
-        		  type => 'lookup',  
-        		  options => \%entitystatusoptions,
-        		  sectionname => 'details',
-        		  firstoption => [ '', " " ],
-    	     };
-        }
-        else {
-    	    $entitystatushashref = {
-    		  label => 'Status',
-    		  value => $field->{strStatus},
-    		  type => 'lookup',  
-    		  options => \%entitystatusoptions,
-    		  sectionname => 'details',
-    		  readonly => 1,
-    		  firstoption => [ '', " " ],
-    	     };
-    }
     my %FieldDefinitions = (
     fields=>  {
       strFIFAID => {
@@ -137,7 +107,15 @@ warn("NAME:" . $field->{strLocalName});
         sectionname => 'details',
       },
       
-      strStatus => $entitystatushashref,
+      strStatus => {
+          label => 'Status',
+    	  value => $field->{strStatus},
+    	  type => 'lookup',  
+    	  options => \%Defs::entiyStatus,
+    	  sectionname => 'details',
+    	  readonly => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
+    	  firstoption => [ '', " " ],
+      },
       
       strAddress => {
         label => 'Address',
@@ -395,7 +373,6 @@ warn("NAME:" . $field->{strLocalName});
           INSERT INTO tblEntity (
               intRealmID, 
               intEntityLevel, 
-              strStatus,
               intCreatedByEntityID,
               intPaymentRequired,
               --FIELDS-- 
@@ -403,7 +380,6 @@ warn("NAME:" . $field->{strLocalName});
           VALUES (
               $intRealmID, 
               $Defs::LEVEL_VENUE, 
-              'PENDING',
               $authID,
               $paymentRequired,
               --VAL-- 

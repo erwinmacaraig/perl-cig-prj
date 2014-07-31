@@ -82,7 +82,7 @@ sub club_details  {
         my $matrix_ref = getRuleMatrix($Data, $Data->{'clientValues'}{'authLevel'}, $field->{'strEntityType'}, 'ENTITY', \%Reg);
         $paymentRequired = $matrix_ref->{'intPaymentRequired'} || 0;
     }
-
+  
   my %FieldDefinitions=(
     fields=>  {
       strFIFAID => {
@@ -123,6 +123,17 @@ sub club_details  {
         size  => '30',
         maxsize => '50',
       },
+      
+      strStatus => {
+          label => 'Status',
+          value => $field->{strStatus},
+          type => 'lookup',  
+          options => \%Defs::entiyStatus,
+          sectionname => 'details',
+          readonly => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
+          firstoption => [ '', " " ],
+      },
+      
       strContact => {
         label => 'Contact Person',
         value => $field->{strContact},
@@ -238,7 +249,7 @@ sub club_details  {
       },
     },
     order => [qw(
-        strFIFAID strLocalName strLocalShortName strLatinName strLatinShortName dtFrom dtTo strISOCountry strRegion strPostalCode strTown strAddress strWebURL strEmail strPhone strFax strContactTitle strContactEmail strContactPhone strContact clubcharacteristics
+        strFIFAID strLocalName strLocalShortName strLatinName strStatus strLatinShortName dtFrom dtTo strISOCountry strRegion strPostalCode strTown strAddress strWebURL strEmail strPhone strFax strContactTitle strContactEmail strContactPhone strContact clubcharacteristics
     )],
     fieldtransform => {
       textcase => {
