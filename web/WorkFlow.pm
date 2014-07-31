@@ -287,7 +287,6 @@ sub addWorkFlowTasks {
 		];
 	    $q = $db->prepare($st);
   	    $q->execute($personRegistrationID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
-print $st;
     }
     if ($ruleFor eq 'ENTITY' and $entityID)  {
         ## APPROVAL FOR ENTITY
