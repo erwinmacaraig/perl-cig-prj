@@ -86,6 +86,11 @@ sub listTasks {
                 (intProblemResolutionEntityID= ? AND t.strTaskStatus = 'REJECTED')
             )
     ];
+
+        #my $userID = $Data->{'clientValues'}{'userID'}
+        ## if ($userID)
+        ## $st .= qqp AND t.intCreatedByUserID <> $userID ];
+
             #uar.userID as UserID, 
             #uarRejected.userID as RejectedUserID, 
             #AND t.intApprovalRoleID = uar.roleId
