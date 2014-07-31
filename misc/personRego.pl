@@ -25,11 +25,58 @@ sub main	{
 
 	my %Data = ();
 	my $db = connectDB();
-    my $personID= 10346430;
+    my $personID= 10759090;
+    my $gender=1;
+    my $entityID = 19;
+    my $originID = 14;
+    my $originLevel = 20;
     my $pRegID = 1;
 	$Data{'db'} = $db;
 	$Data{'Realm'} = 1;
 	$Data{'RealmSubType'} = 0;
 
-    submitPersonRegistration(\%Data, $personID, $pRegID);
+    my $st = qq[
+        DELETE FROM tblPersonRegistration_$Data{'Realm'}
+        WHERE intPersonID = ?
+    ];
+    my $q= $db->prepare($st);
+    $q->execute($personID);
+
+    my %RegFields = ();
+    $RegFields{'personID'} = $personID;
+    $RegFields{'gender'} = $gender;
+    $RegFields{'personType'} = 'PLAYER';
+    $RegFields{'current'} = 1;
+    $RegFields{'personSubType'} = 'SubTypePlayer';
+    $RegFields{'personEntityRole'} = 'entityRole';
+    $RegFields{'personLevel'} = 'AMATEUR';
+    $RegFields{'sport'} = 'FOOTBALL';
+    $RegFields{'ageLevel'} = 'SENIOR';
+    $RegFields{'registrationNature'} = 'NEW';
+    $RegFields{'entityID'} = $entityID;
+    $RegFields{'originID'} = $originID;
+    $RegFields{'originLevel'} = $originLevel;
+
+    if (isRegoAllowedToEntity(\%Data, $entityID, 'NEW', \%RegFields))  {
+        print "OK.. lets go\n";
+        addRegistration(\%Data, \%RegFields);
+        print "DONE\n";
+        my %Filters=();
+        print "\n\n\n~~~~~PLAYER~~~~\n";
+        $Filters{'personType'} = 'PLAYER';
+        my $regos_ref = getRegistrationData(\%Data, $personID, \%Filters);
+        print Dumper($regos_ref);
+        print "\n\n\n~~~~~COACH~~~~\n";
+        $Filters{'personType'} = 'COACH';
+        my $regos_ref = getRegistrationData(\%Data, $personID, \%Filters);
+        print Dumper($regos_ref);
+    }
+    print "\n\n\n\n\n";
+
+    ##Now lets do an update
+    print "~~UPDATE~~";
+
+
+    print "\n\n\nDONE\n";
+
 }

@@ -91,7 +91,7 @@ sub club_details  {
         type  => 'text',
         size  => '40',
         maxsize => '150',
-        readonly =>!($Data->{'clientValues'}{authLevel} > $Defs::LEVEL_NATIONAL),
+        readonly =>($Data->{'clientValues'}{authLevel} < $Defs::LEVEL_NATIONAL),
       },
       strLocalName => {
         label => 'Name',

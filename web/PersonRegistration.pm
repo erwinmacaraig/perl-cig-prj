@@ -311,7 +311,7 @@ sub addRegistration {
         my $matrix_ref = getRuleMatrix($Data, $Reg_ref->{'originLevel'}, $Reg_ref->{'entityType'} || '', 'REGO', $Reg_ref);
         $Reg_ref->{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
     }
-    my $nationalPeriodID = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'});
+    my $nationalPeriodID = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $Reg_ref->{'sport'});
     my $genAgeGroup ||=new GenAgeGroup ($Data->{'db'},$Data->{'Realm'}, $Data->{'RealmSubType'});
     my $ageGroupID = 0;
 
@@ -323,7 +323,7 @@ sub addRegistration {
             FROM 
                 tblPerson
             WHERE 
-                intPerson= ?
+                intPersonID= ?
         ];
         my $qry=$Data->{'db'}->prepare($st);
         $qry->execute($Reg_ref->{'personID'});
@@ -391,7 +391,7 @@ sub addRegistration {
   		$Reg_ref->{'personSubType'} || '',  		
   		$Reg_ref->{'personLevel'} || '',  		
   		$Reg_ref->{'personEntityRole'} || '',  		
-  		$Reg_ref->{'status'} || '',  		
+  		$status || '',  		
   		$Reg_ref->{'sport'},  		
   		$Reg_ref->{'current'} || 0,  		
   		$Reg_ref->{'originLevel'} || 0,  		
