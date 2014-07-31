@@ -8,6 +8,7 @@ require Exporter;
     isPersonRegistered
     mergePersonRegistrations
     submitPersonRegistration
+    updatePersonRegistration
 );
 
 use strict;

@@ -217,7 +217,7 @@ sub addWorkFlowTasks {
 	my $db=$Data->{'db'};
 	
 	my $stINS = qq[
-		INSERT INTO tblWFTask (
+		INSERT IGNORE INTO tblWFTask (
 			intWFRuleID,
 			intRealmID,
 			intSubRealmID, 
@@ -393,7 +393,7 @@ sub addWorkFlowTasks {
 		return $q->errstr . '<br>' . $st
 	}			
 	$st = qq[
-		INSERT INTO tblWFTaskPreReq (
+		INSERT IGNORE INTO tblWFTaskPreReq (
 			intWFTaskID, 
 			intWFRuleID, 
 			intPreReqWFRuleID

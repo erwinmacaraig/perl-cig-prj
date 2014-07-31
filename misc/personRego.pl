@@ -56,25 +56,34 @@ sub main	{
     $RegFields{'entityID'} = $entityID;
     $RegFields{'originID'} = $originID;
     $RegFields{'originLevel'} = $originLevel;
+    my $pRId = 0;
+    my %Filters=();
 
     if (isRegoAllowedToEntity(\%Data, $entityID, 'NEW', \%RegFields))  {
         print "OK.. lets go\n";
-        addRegistration(\%Data, \%RegFields);
+        ($pRId, undef) = addRegistration(\%Data, \%RegFields);
         print "DONE\n";
-        my %Filters=();
         print "\n\n\n~~~~~PLAYER~~~~\n";
         $Filters{'personType'} = 'PLAYER';
-        my $regos_ref = getRegistrationData(\%Data, $personID, \%Filters);
+        my (undef, $regos_ref) = getRegistrationData(\%Data, $personID, \%Filters);
         print Dumper($regos_ref);
         print "\n\n\n~~~~~COACH~~~~\n";
         $Filters{'personType'} = 'COACH';
-        my $regos_ref = getRegistrationData(\%Data, $personID, \%Filters);
+        my (undef, $regos_ref) = getRegistrationData(\%Data, $personID, \%Filters);
         print Dumper($regos_ref);
     }
     print "\n\n\n\n\n";
 
     ##Now lets do an update
     print "~~UPDATE~~";
+        $Filters{'personType'} = 'PLAYER';
+        $Filters{'personRegistrationID'} = $pRId;
+        my (undef, $regos_ref) = getRegistrationData(\%Data, $personID, \%Filters);
+        my $reg_ref = $regos_ref->[0];
+        $reg_ref->{'dtFrom'} = '2014-01-07';
+        updatePersonRegistration(\%Data, $personID, $pRId, $reg_ref);
+        my (undef, $get_ref) = getRegistrationData(\%Data, $personID, \%Filters);
+        print Dumper($get_ref);
 
 
     print "\n\n\nDONE\n";
