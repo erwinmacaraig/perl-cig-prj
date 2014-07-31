@@ -28,8 +28,8 @@ sub main	{
     my $personID= 10759090;
     my $gender=1;
     my $entityID = 19;
-    my $originID = 14;
-    my $originLevel = 20;
+    my $originID = 19;
+    my $originLevel = 3;
     my $pRegID = 1;
 	$Data{'db'} = $db;
 	$Data{'Realm'} = 1;
