@@ -81,32 +81,7 @@ sub rule_details   {
         next if ($k eq $Defs::GENDER_NONE );
         $genderoptions{$k} = $Defs::genderInfo{$k} || '';
     }
-   
-     #### Drop Down Values For  Person Type ###
-     my %persontypeoptions = (); 
-     for my $k ( keys %Defs::personType ){
-        $persontypeoptions{$k} = $Defs::personType{$k} || '';
-    }
-    ### Drop Down Values For Sport ###
-    my %sporttypeoptions = (); 
-    for my $k ( keys %Defs::sportType ){
-        $sporttypeoptions{$k} = $Defs::sportType{$k} || ''; 
-    }
-   ### Drop Down Values For Person Level ### 
-   my %personleveloptions = ();
-   for my $k ( keys %Defs::personLevel ){
-	$personleveloptions{$k} = $Defs::personLevel{$k} || '';
-   }
-   ### Drop Down Values For Registration Nature ###
-   my %registrationnatureoptions = ();
-   for my $k ( keys %Defs::registrationNature ){
-	$registrationnatureoptions{$k} = $Defs::registrationNature{$k} || '';
-   }
-   ### Drop Down Values for Age Type ### 
-   my %agetypeoptions = (); 
-   for my $k ( keys %Defs::AgeType ){ 
-	$agetypeoptions{$k} = $Defs::AgeType{$k} || '';
-    }
+        
     ### Move variable declarations here ###
     my %FieldDefinitions;
     my $resultHTML='';
@@ -118,7 +93,7 @@ sub rule_details   {
                label => 'Person Type',
                value => $field->{strPersonType},
                type  => 'lookup',
-               options     => \%persontypeoptions,
+               options     => \%Defs::personType,
                sectionname => 'details',
                firstoption => [ '', " " ],
              },
@@ -126,7 +101,7 @@ sub rule_details   {
                label=> 'Sport',
                value => $field->{strSport},
                type  => 'lookup',
-               options     => \%sporttypeoptions,
+               options     => \%Defs::sportType,
        	sectionname => 'details',
                firstoption => [ '', " " ],
              },
@@ -137,12 +112,12 @@ sub rule_details   {
                        options     => \%genderoptions,
                        sectionname => 'details',
                        firstoption => [ '', " " ],
-               },
+             },
              strPersonLevel => {
                label => 'Person Level',
                value => $field->{strPersonLevel},
                type  => 'lookup',
-       	       options     => \%personleveloptions,
+       	       options     => \%Defs::personLevel,
                sectionname => 'details',
                firstoption => [ '', " " ],
              },      
@@ -150,7 +125,7 @@ sub rule_details   {
                label => 'Registration Nature',
                value => $field->{strRegistrationNature},
                type  => 'lookup',
-       	       options     => \%registrationnatureoptions,
+       	       options     => \%Defs::registrationNature,
        	       sectionname => 'details',
                firstoption => [ '', " " ],
              },
@@ -158,7 +133,7 @@ sub rule_details   {
                label => 'Age Level',
                value => $field->{strAgeLevel},
                type  => 'lookup',
-              	options     => \%agetypeoptions,
+              	options     => \%Defs::AgeType,
               	sectionname => 'details',
                firstoption => [ '', " " ],
              },
