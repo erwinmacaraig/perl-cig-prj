@@ -183,6 +183,7 @@ sub updatePersonRegistration    {
             dtLastUpdated = ?,
             strAgeLevel = ?,
             strRegistrationNature = ?,
+            intIsPaid = ?,
             intPaymentRequired = ?
         WHERE
             intPersonID = ?
@@ -204,6 +205,7 @@ sub updatePersonRegistration    {
         $Reg_ref->{'dateLastUpdated'} || $Reg_ref->{'dtLastUpdated'},
         $Reg_ref->{'ageLevel'} || $Reg_ref->{'strAgeLevel'},
         $Reg_ref->{'registrationNature'} || $Reg_ref->{'strRegistrationNature'},
+        $Reg_ref->{'isPaid'} || $Reg_ref->{'intIsPaid'},
         $Reg_ref->{'paymentRequired'} || $Reg_ref->{'intPaymentRequired'},
         $personID,
         $personRegistrationID

@@ -23,13 +23,10 @@ use FieldCaseRule;
 use DefCodes;
 use TransLog;
 use Transactions;
-<<<<<<< HEAD
 use EntityStructure;
-=======
 use WorkFlow;
 use RuleMatrix;
 
->>>>>>> 8b1948ec8c4527da121ff617246ff36cfd12e353
 sub handleClub  {
   my ($action, $Data, $clubID, $typeID)=@_;
 
