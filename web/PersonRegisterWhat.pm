@@ -106,7 +106,7 @@ sub optionsPersonRegisterWhat {
     }
     if($ageLevel)  {
         push @values, $ageLevel;
-        $where .= " AND strAgeLevel = ? ";
+        $where .= " AND strAgeLevel IN ('ALL_AGES', ?) ";
     }
 
     my $st = qq[

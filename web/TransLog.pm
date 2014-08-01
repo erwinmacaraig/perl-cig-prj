@@ -759,20 +759,20 @@ sub generateTXNListLink {
 	return ($link, $mode, $tableID, $paymentID, $client, $dtStart_paid, $dtEnd_paid);
 }
 
-sub listTransactions_where {
-    my ($whereClause, $txnStatus, $safeTableID, $safePaymentID, $paymentID, $Data, $db) = @_;
-
-    $whereClause .= qq[ AND t.intID=$safeTableID and t.intTableType=$Defs::LEVEL_PERSON] if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON;
-    $whereClause .= qq[ AND t.intID=$safeTableID and t.intTableType=$Defs::LEVEL_CLUB]   if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB;
-    $whereClause .= qq[ AND t1.intTLogID= $safePaymentID ] if $paymentID;
-
-    my $entityID = getLastEntityID($Data->{'clientValues'}) || 0; #
-
-    $whereClause .= qq[ AND intTXNEntityID IN (0, $entityID)] if $entityID;
-    $whereClause .= qq[ AND P.intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) ] if $txnStatus != $Defs::TXN_PAID;
-
-    return $whereClause;
-}
+#sub listTransactions_where {
+#    my ($whereClause, $txnStatus, $safeTableID, $safePaymentID, $paymentID, $Data, $db) = @_;
+#
+#    $whereClause .= qq[ AND t.intID=$safeTableID and t.intTableType=$Defs::LEVEL_PERSON] if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON;
+#    $whereClause .= qq[ AND t.intID=$safeTableID and t.intTableType=$Defs::LEVEL_CLUB]   if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB;
+#    $whereClause .= qq[ AND t1.intTLogID= $safePaymentID ] if $paymentID;
+#
+#    my $entityID = getLastEntityID($Data->{'clientValues'}) || 0; #
+#
+#    $whereClause .= qq[ AND intTXNEntityID IN (0, $entityID)] if $entityID;
+#    $whereClause .= qq[ AND P.intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) ] if $txnStatus != $Defs::TXN_PAID;
+#
+#    return $whereClause;
+#}
 
 sub listTransactions {
     my ($Data, $db, $entityID, $personID, $tempClientValues_ref, $action, $resultMessage) = @_;
