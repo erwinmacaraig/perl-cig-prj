@@ -76,10 +76,10 @@ sub rule_details   {
     #changed the last parameter from $entityID to $intEntityRegistrationAllowedID
     
     my %genderoptions = ();
-    for my $k ( keys %Defs::genderInfo ) {
+    for my $k ( keys %Defs::PersonGenderInfo ) {
         next if !$k;
         next if ($k eq $Defs::GENDER_NONE );
-        $genderoptions{$k} = $Defs::genderInfo{$k} || '';
+        $genderoptions{$k} = $Defs::PersonGenderInfo{$k} || '';
     }
         
     ### Move variable declarations here ###
@@ -95,6 +95,7 @@ sub rule_details   {
                type  => 'lookup',
                options     => \%Defs::personType,
                sectionname => 'details',
+                compulsory=>1,
                firstoption => [ '', " " ],
              },
              strSport=> {
@@ -104,6 +105,7 @@ sub rule_details   {
                options     => \%Defs::sportType,
        	sectionname => 'details',
                firstoption => [ '', " " ],
+                compulsory=>1,
              },
                intGender => {
                        label       => 'Gender',
@@ -112,6 +114,7 @@ sub rule_details   {
                        options     => \%genderoptions,
                        sectionname => 'details',
                        firstoption => [ '', " " ],
+                compulsory=>1,
              },
              strPersonLevel => {
                label => 'Person Level',
@@ -120,6 +123,7 @@ sub rule_details   {
        	       options     => \%Defs::personLevel,
                sectionname => 'details',
                firstoption => [ '', " " ],
+                compulsory=>1,
              },      
              strRegistrationNature => {
                label => 'Registration Nature',
@@ -136,6 +140,7 @@ sub rule_details   {
               	options     => \%Defs::AgeType,
               	sectionname => 'details',
                firstoption => [ '', " " ],
+                compulsory=>1,
              },
         },
         order => [qw(
@@ -143,7 +148,6 @@ sub rule_details   {
     		strSport
                 intGender
     		strPersonLevel
-    		strRegistrationNature
     		strAgeLevel
         )],
         sections => [ 
@@ -158,12 +162,17 @@ sub rule_details   {
           introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
           NoHTML => 1, 
           beforeaddFunction => \&isRegoAllowedToSystem,
+          beforeaddParams => [$Data, 0, $field->{strRegistrationNature}, $field],
           addSQL => qq[
               INSERT IGNORE INTO tblEntityRegistrationAllowed (
+                  intRealmID,
+                  intSubRealmID,
                   intEntityID, 
                   --FIELDS-- 
               )
               VALUES (
+                  $Data->{'Realm'},
+                  $Data->{'RealmSubType'},
                   $entityID, 
                   --VAL-- 
               )
@@ -305,7 +314,6 @@ sub listRules  {
         strSport => $dref->{'strSport'} || '',
         Gender => $Defs::genderInfo{$dref->{'intGender'}} || '',
         strPersonLevel => $dref->{'strPersonLevel'} || '',
-        strRegistrationNature => $dref->{'strRegistrationNature'} || '',
         strAgeLevel => $dref->{'strAgeLevel'} || '',
         DeleteLink => qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$Data->{client}&amp;a=ERA_DELETE&amp;RID=$dref->{'intEntityRegistrationAllowedID'}" onclick="return confirm('Are you sure you want to delete this rule');">] . $Data->{'lang'}->txt("Delete Rule") . q [ </a></span> ],
       };
@@ -332,10 +340,6 @@ sub listRules  {
         {
             name  => $Data->{'lang'}->txt('PersonLevel'),
             field => 'strPersonLevel',
-        },
-        {
-            name  => $Data->{'lang'}->txt('RegistrationNature'),
-            field => 'strRegistrationNature',
         },
         {
             name  => $Data->{'lang'}->txt('AgeLevel'),

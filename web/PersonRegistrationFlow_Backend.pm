@@ -46,7 +46,6 @@ warn("RID $regoID");
         $action = 'PREGF_C';
     }
 
-
     if ( $action eq 'PREGF_T' ) {
         my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_TU&amp;";
         my $dob = '';

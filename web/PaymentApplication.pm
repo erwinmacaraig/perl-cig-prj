@@ -302,7 +302,7 @@ sub application_details	{
       afteraddFunction => \&postApplicationAdd,
       afteraddParams => [$option,$Data,$Data->{'db'}],
       beforeaddFunction => \&preApplicationAdd,
-      beforeaddParams => [$option,$Data,$Data->{'db'}, $entityID, $entityTypeID],
+      beeforeaddParams => [$option,$Data,$Data->{'db'}, $entityID, $entityTypeID],
       afterupdateFunction => \&postApplicationUpdate,
       afterupdateParams => [$option,$Data,$Data->{'db'}, $entityID, $entityTypeID],
 

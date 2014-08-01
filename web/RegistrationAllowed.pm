@@ -11,12 +11,12 @@ use Utils;
 use Log;
 
 sub isRegoAllowedToSystem {
-    my($Data, $originLevel, $regNature, $Rego_ref) = @_; 
+    my($Rego_ref, $Data, $originLevel, $regNature) = @_; 
 
     $originLevel ||= 0; 
     $regNature ||= '';
 
-    return 0 if (! $originLevel or ! $regNature);
+    #return 0 if (! $originLevel or ! $regNature);
 	
     my $st = qq[
 		SELECT 
@@ -28,30 +28,36 @@ sub isRegoAllowedToSystem {
             AND intSubRealmID IN (0, ?)
             AND strTaskType = 'APPROVAL'
             AND strWFRuleFor = 'REGO'
-            AND intOriginLevel = ?
-			AND strRegistrationNature = ?
 			AND strPersonType = ?
 			AND strPersonLevel = ?
 			AND strSport = ?
 			AND strAgeLevel = ?		
     ];
-	
+    my @bind=();
+    push @bind, $Data->{'Realm'};
+    push @bind, $Data->{'RealmSubType'};
+    push @bind, $Rego_ref->{'d_strPersonType'} || $Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '';
+    push @bind, $Rego_ref->{'d_strPersonLevel'} || $Rego_ref->{'strPersonLevel'} || $Rego_ref->{'personLevel'} || '';
+    push @bind, $Rego_ref->{'d_strSport'} || $Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '';
+    push @bind, $Rego_ref->{'d_strAgeLevel'} || $Rego_ref->{'strAgeLevel'} || $Rego_ref->{'ageLevel'} || '';
 
+    if ($originLevel)   {
+        $st .= qq[AND intOriginLevel = ? ];
+        push @bind, $originLevel;
+    }
+    if ($regNature)   {
+		$st .= qq[AND strRegistrationNature = ? ];
+        push @bind, $regNature;
+    }
+	
 	my $q = $Data->{'db'}->prepare($st) or query_error($st);
-	$q->execute(
-        $Data->{'Realm'},
-        $Data->{'RealmSubType'},
-        $originLevel,
-		$regNature,
-		$Rego_ref->{'personType'} || '',
-		$Rego_ref->{'personLevel'} || '',
-		$Rego_ref->{'sport'} || '',
-		$Rego_ref->{'ageLevel'} || '',
-	) or query_error($st);
+    
+	$q->execute(@bind) or query_error($st);
 	
     my $count = $q->fetchrow_array() || 0;
-    return 1 if $count;
-    return 0 if ! $count;
+warn("COUNT: $count");
+    return (1, '') if $count;
+    return (0, $Data->{'lang'}->txt('The system does not allow this combination')) if ! $count;
 
 }
 

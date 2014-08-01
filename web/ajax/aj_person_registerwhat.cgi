@@ -30,7 +30,6 @@ sub main	{
     my $realmIN = param('r') || 0;
     my $subRealmIN = param('sr') || 0;
 
-
     my %Data=();
     my $target='aj_person_registerwhat.cgi';
     $Data{'target'}=$target;

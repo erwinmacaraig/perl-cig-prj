@@ -82,12 +82,14 @@ sub optionsPersonRegisterWhat {
     my $lookingForField = $lfTable{$lookingFor} || '';
     return (undef,'Invalid item to look for') if !$lookingForField;
 
-    my @values = (
-        $realmID,
-        $subRealmID,
-        $originLevel,
-    );
+    my @values = ();
+        push @values, $originLevel;
+        push @values, $realmID;
+        push @values, $subRealmID;
     my $where = '';
+    #if ($lookingForField eq 'strRegistrationNature')    {
+        #push @values, $originLevel;
+    #}
     if($sport)  {
         push @values, $sport;
         $where .= " AND strSport = ? ";
@@ -111,33 +113,48 @@ sub optionsPersonRegisterWhat {
 
     my $st = qq[
         SELECT DISTINCT $lookingForField
+    ];
+    if (! $entityID and $lookingForField ne 'strRegistrationNature')    {
+        $st = qq[
+            SELECT COUNT(intWFRuleID) as CountNum
+        ];
+    }
+    $st .= qq[
         FROM tblWFRule
         WHERE
-            intRealmID = ?
+            intOriginLevel  = ?
+            AND intRealmID = ?
             AND intSubRealmID IN (0,?)
             AND strTaskType = 'APPROVAL'
-            AND intOriginLevel  = ?
             AND strWFRuleFor = 'REGO'
             $where
     ];
-    if($entityID)   {
+    my @retdata = ();
+    if ($lookingForField ne 'strRegistrationNature')   {
+        my $qCheck = $Data->{'db'}->prepare($st);
+        $qCheck->execute(@values);
+        my $ok = $qCheck->fetchrow_array() || 0;
+       # warn ("OK IS $ok");
+        if (! $ok)  {
+            return (\@retdata, '');
+        }
+    }
+
+    if($entityID and $lookingForField ne 'strRegistrationNature')   {
+        shift @values;
         $st = qq[
             SELECT DISTINCT $lookingForField
             FROM tblEntityRegistrationAllowed
             WHERE
                 intEntityID = ?
-                intRealmID = ?
+                AND intRealmID = ?
                 AND intSubRealmID IN (0,?)
-                AND strTaskType = 'APPROVAL'
-                AND intOriginLevel  = ?
-                AND strWFRuleFor = 'REGO'
                 $where
         ];
         unshift @values, $entityID;
     }
 
     my $q = $Data->{'db'}->prepare($st);
-    my @retdata = ();
     $q->execute(@values);
     my $lookup = ();
     while(my $val = $q->fetchrow_array())   {
