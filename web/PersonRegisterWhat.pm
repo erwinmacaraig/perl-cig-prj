@@ -130,7 +130,7 @@ sub optionsPersonRegisterWhat {
             $where
     ];
     my @retdata = ();
-    if ($lookingForField ne 'strRegistrationNature')   {
+    if (! $entityID and $lookingForField ne 'strRegistrationNature')   {
         my $qCheck = $Data->{'db'}->prepare($st);
         $qCheck->execute(@values);
         my $ok = $qCheck->fetchrow_array() || 0;
