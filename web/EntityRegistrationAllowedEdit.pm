@@ -159,7 +159,7 @@ sub rule_details   {
           NoHTML => 1, 
           beforeaddFunction => \&isRegoAllowedToSystem,
           addSQL => qq[
-              INSERT INTO tblEntityRegistrationAllowed (
+              INSERT IGNORE INTO tblEntityRegistrationAllowed (
                   intEntityID, 
                   --FIELDS-- 
               )
@@ -196,7 +196,7 @@ sub rule_details   {
        my $query = $db->prepare($statement);
        $query -> execute($intEntityRegistrationAllowedID,$entityID);
        $query->finish();
-       $title = 'Registration Rule Deleted';
+       $title = $Data->{lang}->txt("Registration Rule Deleted");
      
    } #### END ELSEIF  (FOR DELETING A RULE) ###
     
@@ -219,12 +219,12 @@ sub rule_details   {
     #$title=$chgoptions.$title;
     
     if ($option eq 'add') {
-	    $title="Add New Registration Type"     	
+	    $title=$Data->{lang}->txt("Add New Registration Type");     	
     }
-    my $text = qq[<p style = "clear:both;"><a href="$Data->{'target'}?client=$client&amp;a=ERA_LIST">Click here</a> to return to list of current registration types accepted</p>];
+    my $text = qq[<p style = "clear:both;"><a href="$Data->{'target'}?client=$client&amp;a=ERA_LIST"> ] . $Data->{lang}->txt("Click here") . q[</a> ] . $Data->{lang}->txt("to return to list of current registration types accepted") . q[</p>];
      
     if($option eq 'delete'){
-       my $delMsg = '<div class="OKmsg"> Registration rule deleted. </div><br>';
+       my $delMsg = q[ <div class="OKmsg"> ] . $Data->{lang}->txt("Registration rule deleted"). q[ </div><br> ];
        $resultHTML = $text.$resultHTML.$delMsg.$text;
     }
     else {
@@ -307,14 +307,14 @@ sub listRules  {
         strPersonLevel => $dref->{'strPersonLevel'} || '',
         strRegistrationNature => $dref->{'strRegistrationNature'} || '',
         strAgeLevel => $dref->{'strAgeLevel'} || '',
-        DeleteLink => qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$Data->{client}&amp;a=ERA_DELETE&amp;RID=$dref->{'intEntityRegistrationAllowedID'}" onclick="return confirm('Are you sure you want to delete this rule');">Delete Rule</a></span> ],
+        DeleteLink => qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$Data->{client}&amp;a=ERA_DELETE&amp;RID=$dref->{'intEntityRegistrationAllowedID'}" onclick="return confirm('Are you sure you want to delete this rule');">] . $Data->{'lang'}->txt("Delete Rule") . q [ </a></span> ],
       };
     }
     $q->finish;
 
 	#PP add to language file
-    my $addlink = qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$Data->{client}&amp;a=ERA_ADD">Add new Rule</a></span>];
-    my $title = qq[Registrations accepted by my organisation];
+    my $addlink = qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$Data->{client}&amp;a=ERA_ADD">] . $Data->{'lang'}->txt("Add new Rule") . q[ </a></span> ];
+    my $title = $Data->{lang}->txt("Registrations accepted by my organisation");
  
     my $modoptions = qq[<div class="changeoptions">$addlink</div>];
     $title=$modoptions.$title;
@@ -382,9 +382,9 @@ sub postRuleAdd {
     {
       my $client = setClient($Data->{'clientValues'}) || '';
 
-      return (0,qq[
-        <div class="OKmsg"> Registration type added successfully</div><br>
-        <a href="$Data->{'target'}?client=$client&amp;a=ERA_List">Add another Registration Type</a>
+      return (0,q[
+        <div class="OKmsg"> ] . $Data->{lang}->txt("Registration type added successfully") . qq[ </div><br>
+        <a href="$Data->{'target'}?client=$client&amp;a=ERA_List"> ] . $Data->{lang}->txt("Add another Registration Type") . q[ </a>
 
       ]);
     }
@@ -395,8 +395,8 @@ sub postRuleAdd {
 	      my $client = setClient($Data->{'clientValues'}) || '';
 	
 	      return (0,qq[
-	        <div class="OKmsg"> Registration rule deleted. </div><br>
-	        <a href="$Data->{'target'}?client=$client&amp;a=ERA_List">Add another Registration Type</a>
+	        <div class="OKmsg"> $Data->{lang}->txt("Registration rule deleted.") </div><br>
+	        <a href="$Data->{'target'}?client=$client&amp;a=ERA_List">$Data->{lang}->txt("Add another Registration Type")</a>
 	
 	      ]);
     }

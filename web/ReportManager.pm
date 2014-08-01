@@ -223,7 +223,7 @@ sub displayReportList	{
 	my $tablist = '';
 	for my $g(@grouplist)	{
 		$tablist .= qq[
-			<input type = 'button' value="$g->[1]" onclick="showreporttab('$g->[0]'); return false;" class="reporttab-button" id="reporttab-button-$g->[0]">
+			<input type = 'button' value="$g->[1])" onclick="showreporttab('$g->[0]'); return false;" class="reporttab-button" id="reporttab-button-$g->[0]">
 		];
 	}
 	my $paramcode = qq[
@@ -411,7 +411,7 @@ sub getSavedReportData  {
 	{
 		my $st = qq[
 			SELECT 
-				intReportID 
+			intReportID 
 			FROM tblSavedReports
 			WHERE intSavedReportID = ?
 		];
