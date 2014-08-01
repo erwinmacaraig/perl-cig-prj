@@ -29,7 +29,12 @@
                         <a href="main.cgi?client=[% client %]&a=CL_list">View</a>
                     </span>
                 </td>
-            
+            [% ELSIF task.TaskType == 'DUPLICATES' %]
+			    <td colspan="2"><div class="member-data">
+                    <span class = "button-small generic-button">
+                        <a href="main.cgi?client=[% client %]&a=DUPL_L">View</a>
+                    </span>
+                </td>
             [% ELSE %]
 			    <td><div class="member-data">
                     <span class = "button-small generic-button">

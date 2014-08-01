@@ -5,8 +5,8 @@
 package Duplicates;
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(handleDuplicates isCheckDupl getDuplFields );
-@EXPORT_OK = qw(handleDuplicates isCheckDupl getDuplFields );
+@EXPORT = qw(handleDuplicates isCheckDupl getDuplFields getDupTaskCount);
+@EXPORT_OK = qw(handleDuplicates isCheckDupl getDuplFields getDupTaskCount);
 
 use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 
@@ -20,6 +20,24 @@ use Seasons;
 use MovePhoto;
 use Notifications;
 use PersonRegistration;
+
+sub getDupTaskCount {
+
+    my ($Data, $entityID) = @_;
+
+    my $st = qq[
+        SELECT COUNT(tblPerson.intPersonID) as CountNum
+        FROM 
+            tblPerson
+            INNER JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (tblPerson.intPersonID= PR.intPersonID)
+        WHERE PR.intEntityID = $entityID
+            AND tblPerson.intSystemStatus=$Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
+            AND tblPerson.intRealmID=$Data->{'Realm'}
+    ];
+    my $qry= $Data->{'db'}->prepare($st);
+    $qry->execute or query_error($st);
+    return $qry->fetchrow_array() || 0;
+}
 
 sub handleDuplicates {
 

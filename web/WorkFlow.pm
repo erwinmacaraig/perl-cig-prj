@@ -16,6 +16,7 @@ use TTTemplate;
 use Log;
 use PersonUtils;
 use Clearances;
+use Duplicates;
 
 sub handleWorkflow {
     my ( 
@@ -138,14 +139,22 @@ sub listTasks {
 
     ## Calc Dupl Res and Pending Clr here
     my $clrCount = getClrTaskCount($Data, $entityID);
+    my $dupCount = Duplicates::getDupTaskCount($Data, $entityID);
     if ($clrCount)   {
-        my %clr_row=(
+        my %row=(
             TaskType => 'TRANSFERS',
             Name => $Data->{'lang'}->txt('You have Transfers to view'),
         );
-		push @TaskList, \%clr_row;
+		push @TaskList, \%row;
     }
-	
+    if ($dupCount)   {
+        my %row=(
+            TaskType => 'DUPLICATES',
+            Name => $Data->{'lang'}->txt('You have Duplicates to resolve'),
+        );
+		push @TaskList, \%row;
+    }
+		
 	my $msg = ''; 
 	if ($rowCount == 0) {
 		$msg = $Data->{'lang'}->txt('No outstanding tasks');
