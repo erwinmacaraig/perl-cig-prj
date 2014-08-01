@@ -136,6 +136,15 @@ sub listTasks {
 	}
 
     ## Calc Dupl Res and Pending Clr here
+#    my $clrCount = getClrCount();
+    if (1==1)   {
+
+        my %clr_row=(
+            TaskType => 'TRANSFERS',
+            Name => $Data->{'lang'}->txt('You have Transfers to view'),
+        );
+		push @TaskList, \%clr_row;
+    }
 	
 	my $msg = ''; 
 	if ($rowCount == 0) {
