@@ -9,12 +9,13 @@ require Exporter;
 );
 
 use strict;
-use lib '.', '..'; #"comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
+use lib '.', '..', 'Clearances'; #"comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 use Utils;
 use Reg_common;
 use TTTemplate;
 use Log;
 use PersonUtils;
+use Clearances;
 
 sub handleWorkflow {
     my ( 
@@ -136,9 +137,8 @@ sub listTasks {
 	}
 
     ## Calc Dupl Res and Pending Clr here
-#    my $clrCount = getClrCount();
-    if (1==1)   {
-
+    my $clrCount = getClrTaskCount($Data, $entityID);
+    if ($clrCount)   {
         my %clr_row=(
             TaskType => 'TRANSFERS',
             Name => $Data->{'lang'}->txt('You have Transfers to view'),

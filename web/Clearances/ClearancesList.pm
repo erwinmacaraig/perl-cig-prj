@@ -172,14 +172,14 @@ sub listOfflineClearances {
 			'year' => $lang->txt('Year'),
 	);
 
-  my $intAllowClubClrAccess = 0;
-  my $assocObj = getInstanceOf($Data, 'assoc', $Data->{'clientValues'}{'assocID'});
-	if($assocObj)	{
-		( $intAllowClubClrAccess) = $assocObj->getValue([ 'intAllowClubClrAccess', ]);
-	}
+  my $intAllowClubClrAccess = 1;
+#  my $assocObj = getInstanceOf($Data, 'assoc', $Data->{'clientValues'}{'assocID'});
+#	if($assocObj)	{
+#		( $intAllowClubClrAccess) = $assocObj->getValue([ 'intAllowClubClrAccess', ]);
+#	}
 
-  $intAllowClubClrAccess ||= 0;
-  $intAllowClubClrAccess = 1 if ($Data->{'clientValues'}{'authLevel'}>=$Defs::LEVEL_ASSOC);
+#  $intAllowClubClrAccess ||= 0;
+#  $intAllowClubClrAccess = 1 if ($Data->{'clientValues'}{'authLevel'}>=$Defs::LEVEL_ASSOC);
 
   my $intTypeID = $Data->{'clientValues'}{'currentLevel'};
 
@@ -399,14 +399,14 @@ sub listClearances	{
       'Name' => $lang->txt('Name'),
     );
 
-  my ( $intAllowClubClrAccess) = 0;
-  my $assocObj = getInstanceOf($Data, 'assoc', $Data->{'clientValues'}{'assocID'});
-	if($assocObj)	{
-		( $intAllowClubClrAccess) = $assocObj->getValue([ 'intAllowClubClrAccess', ]);
-	}
+  my ( $intAllowClubClrAccess) = 1;
+#  my $assocObj = getInstanceOf($Data, 'assoc', $Data->{'clientValues'}{'assocID'});
+#	if($assocObj)	{
+#		( $intAllowClubClrAccess) = $assocObj->getValue([ 'intAllowClubClrAccess', ]);
+#	}
 
-	$intAllowClubClrAccess ||= 0;
-	$intAllowClubClrAccess = 1 if ($Data->{'clientValues'}{'authLevel'}>=$Defs::LEVEL_ASSOC);
+#	$intAllowClubClrAccess ||= 0;
+#	$intAllowClubClrAccess = 1 if ($Data->{'clientValues'}{'authLevel'}>=$Defs::LEVEL_ASSOC);
 
 	my $intTypeID = $Data->{'clientValues'}{'currentLevel'};
 

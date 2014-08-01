@@ -5,8 +5,8 @@
 package Clearances;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw(checkAutoConfirms handleClearances clearanceHistory sendCLREmail finaliseClearance insertSelfTransfer);
-@EXPORT_OK = qw(checkAutoConfirms handleClearances clearanceHistory sendCLREmail finaliseClearance insertSelfTransfer);
+@EXPORT = qw(checkAutoConfirms handleClearances clearanceHistory sendCLREmail finaliseClearance insertSelfTransfer getClrTaskCount);
+@EXPORT_OK = qw(checkAutoConfirms handleClearances clearanceHistory sendCLREmail finaliseClearance insertSelfTransfer getClrTaskCount);
 use lib '.', '..', '../..', "../comp", '../RegoForm', "../dashboard", "../RegoFormBuilder",'../PaymentSplit', "../user";
 
 use strict;
@@ -28,6 +28,27 @@ use DefCodes;
 use PersonRegistration;
 use RuleMatrix;
 
+sub getClrTaskCount {
+
+    my ($Data, $entityID) = @_;
+
+    my $st = qq[
+        SELECT 
+            COUNT(C.intClearanceID) as CountNum
+        FROM 
+            tblClearance as C
+            INNER JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID)
+        WHERE 
+                C.intRealmID = $Data->{'Realm'}
+                AND CP.intID = $entityID
+                AND CP.intTypeID = $Data->{'clientValues'}{'currentLevel'}
+                AND C.intCurrentPathID = CP.intClearancePathID 
+                AND C.intClearanceStatus  = $Defs::CLR_STATUS_PENDING
+    ];
+    my $qry= $Data->{'db'}->prepare($st);
+    $qry->execute or query_error($st);
+    return $qry->fetchrow_array() || 0;
+}
 sub insertSelfTransfer  {
 
     my ($Data, $personID, $fromEntity, $toEntity, $clr_ref) = @_;
