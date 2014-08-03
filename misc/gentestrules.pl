@@ -6,6 +6,7 @@ use Utils;
 
 my $db = connectDB();
 
+my @origin = (20);
 
 my $st = qq[
     INSERT INTO tblWFRule (
@@ -34,23 +35,24 @@ my $st = qq[
 
 my $q = $db->prepare($st);
 my $realm = 1;
-my $origin = 3;
-foreach my $sport (keys %Defs::sportType)   {
-    foreach my $nature (keys %Defs::registrationNature)   {
-        foreach my $personType (keys %Defs::personType)   {
-            foreach my $personLevel (keys %Defs::personLevel)   {
-                foreach my $ageLevel (keys %Defs::ageLevel)   {
-                    $q->execute(
-                        $realm,
-                        $origin,
-                        'REGO',
-                        $nature,
-                        $personType,
-                        $personLevel,
-                        $sport,
-                        $ageLevel,
-                        'APPROVAL',
-                    );
+foreach my $origin (@origin)    {
+    foreach my $sport (keys %Defs::sportType)   {
+        foreach my $nature (keys %Defs::registrationNature)   {
+            foreach my $personType (keys %Defs::personType)   {
+                foreach my $personLevel (keys %Defs::personLevel)   {
+                    foreach my $ageLevel (keys %Defs::ageLevel)   {
+                        $q->execute(
+                            $realm,
+                            $origin,
+                            'REGO',
+                            $nature,
+                            $personType,
+                            $personLevel,
+                            $sport,
+                            $ageLevel,
+                            'APPROVAL',
+                        );
+                    }
                 }
             }
         }

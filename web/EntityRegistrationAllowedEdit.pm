@@ -137,7 +137,7 @@ sub rule_details   {
                label => 'Age Level',
                value => $field->{strAgeLevel},
                type  => 'lookup',
-              	options     => \%Defs::AgeType,
+              	options     => \%Defs::ageLevel,
               	sectionname => 'details',
                firstoption => [ '', " " ],
                 compulsory=>1,
