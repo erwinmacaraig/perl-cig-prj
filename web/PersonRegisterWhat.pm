@@ -114,6 +114,9 @@ sub optionsPersonRegisterWhat {
     my $st = qq[
         SELECT DISTINCT $lookingForField
     ];
+
+    ## IF entityID then get strEntityType
+
     if (! $entityID and $lookingForField ne 'strRegistrationNature')    {
         $st = qq[
             SELECT COUNT(intWFRuleID) as CountNum
