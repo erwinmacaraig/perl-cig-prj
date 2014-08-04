@@ -34,6 +34,8 @@ sub handleRegistrationFlowBackend   {
     my $personID = getID($clientValues, $Defs::LEVEL_PERSON) || 0;
     my $entityID = getLastEntityID($clientValues) || 0;
     my $entityLevel = getLastEntityLevel($clientValues) || 0;
+    my $originLevel = $Data->{'clientValues'}{'authLevel'} || 0;
+
     my %Flow = ();
     $Flow{'PREGF_TU'} = 'PREGF_P'; #Typees
     $Flow{'PREGF_PU'} = 'PREGF_D'; #Products
@@ -54,7 +56,7 @@ sub handleRegistrationFlowBackend   {
     }
     if ( $action eq 'PREGF_TU' ) {
         #add rego record with types etc.
-        ($regoID, $rego_ref) = add_rego_record($Data, $personID, $entityID, $entityLevel);
+        ($regoID, $rego_ref) = add_rego_record($Data, $personID, $entityID, $originLevel);
         $Hidden{'rID'} = $regoID;
         $action = $Flow{$action};
         $personID = $personID || $rego_ref->{'personID'} || $rego_ref->{'intPersonID'} || 0;
@@ -79,7 +81,7 @@ sub handleRegistrationFlowBackend   {
             $entityID,
             $dob,
             $gender,        
-            $entityLevel,
+            $originLevel,
             $url,
         );
     }
@@ -89,7 +91,7 @@ sub handleRegistrationFlowBackend   {
             $Data,
             'REGO',
             'PRODUCT',
-            $entityLevel,
+            $originLevel,
             $rego_ref->{'strRegistrationNature'} || $rego_ref->{'registrationNature'},
             $entityID,
             0,
@@ -132,7 +134,7 @@ warn("PRODID: $product");
             $Data,
             'REGO',
             'DOCUMENT',
-            $entityLevel,
+            $originLevel,
             $rego_ref->{'strRegistrationNature'} || $rego_ref->{'registrationNature'},
             $entityID,
             0,
@@ -251,7 +253,7 @@ sub save_rego_products {
 
 
 sub add_rego_record{
-    my ($Data, $personID, $entityID, $entityLevel) =@_;
+    my ($Data, $personID, $entityID, $originLevel) =@_;
 
     my $clientValues = $Data->{'clientValues'};
     my $rego_ref = {
@@ -261,7 +263,7 @@ sub add_rego_record{
         sport => param('sp') || '',
         ageLevel => param('ag') || '',
         registrationNature => param('nat') || '',
-        originLevel => $entityLevel,
+        originLevel => $originLevel,
         originID => $entityID,
         entityID => $entityID,
         personID => $personID,
