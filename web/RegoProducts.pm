@@ -93,8 +93,8 @@ sub getRegoProducts {
 
     my $AllowedCountText = '';
     my $AllowedCount = $Data->{'SystemConfig'}{'OnlineRego_productCount'} || 0;
-    my $products = ($AllowedCount == 1) ? 'item' : 'items';
-    $AllowedCountText = qq[You are only allowed to purchase $AllowedCount $products at a time] if $AllowedCount;
+    my $productscount = ($AllowedCount == 1) ? 'item' : 'items';
+    $AllowedCountText = qq[You are only allowed to purchase $AllowedCount $productscount at a time] if $AllowedCount;
     my %PageData = (
         HideItemHeader => $Data->{'SystemConfig'}{'hideRegoFormItemsHeader'} || 0,
         HideQty => $Data->{'SystemConfig'}{'regoForm_HIDE_qty'} || !$anyAllowQty || 0,

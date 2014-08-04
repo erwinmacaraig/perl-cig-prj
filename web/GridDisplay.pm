@@ -477,6 +477,7 @@ jQuery(".show-select$basicgrid").click(function () {
 </script>
 ] if($basicgrid);
 
+    $reportlink ||= '';
 	$body = qq~
 		$reportlink
 		<div class = "grid-widget$basicgrid">

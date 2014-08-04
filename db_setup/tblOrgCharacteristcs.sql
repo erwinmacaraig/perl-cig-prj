@@ -3,6 +3,7 @@ CREATE TABLE tblOrgCharacteristics (
 	intCharacteristicID INT NOT NULL AUTO_INCREMENT,
 	intRealmID INT NOT NULL DEFAULT 0,
 	intSubRealmID INT NOT NULL DEFAULT 0,
+	intEntityLevel INT NOT NULL DEFAULT 0,
 	strName VARCHAR(200),
 	strAbbrev VARCHAR(20),
 	intLocator TINYINT DEFAULT 0,

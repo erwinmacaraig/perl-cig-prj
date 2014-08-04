@@ -75,13 +75,13 @@ sub club_details  {
 
   my $authID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
 
-     my $paymentRequired = 0;
-    if ($option eq 'add')   {
-        my %Reg=();
-        $Reg{'registrationNature'}='NEW';
-        my $matrix_ref = getRuleMatrix($Data, $Data->{'clientValues'}{'authLevel'}, $field->{'strEntityType'}, 'ENTITY', \%Reg);
-        $paymentRequired = $matrix_ref->{'intPaymentRequired'} || 0;
-    }
+  my $paymentRequired = 0;
+  if ($option eq 'add')   {
+      my %Reg=();
+      $Reg{'registrationNature'}='NEW';
+      my $matrix_ref = getRuleMatrix($Data, $Data->{'clientValues'}{'authLevel'}, $field->{'strEntityType'}, 'ENTITY', \%Reg);
+      $paymentRequired = $matrix_ref->{'intPaymentRequired'} || 0;
+  }
   
   my %FieldDefinitions=(
     fields=>  {
@@ -99,7 +99,6 @@ sub club_details  {
         type  => 'text',
         size  => '40',
         maxsize => '150',
-        readonly =>1,
       },
       strLocalShortName => {
         label => 'Short Name',
@@ -114,7 +113,6 @@ sub club_details  {
         type  => 'text',
         size  => '40',
         maxsize => '150',
-        readonly =>1,
       },
       strLatinShortName => {
         label => 'Short Name (Latin)',
@@ -123,15 +121,13 @@ sub club_details  {
         size  => '30',
         maxsize => '50',
       },
-      
       strStatus => {
           label => 'Status',
-          value => $field->{strStatus},
+          value => $field->{strStatus} || 'ACTIVE',
           type => 'lookup',  
           options => \%Defs::entiyStatus,
           sectionname => 'details',
           readonly => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
-          firstoption => [ '', " " ],
       },
       
       strContact => {
@@ -249,7 +245,28 @@ sub club_details  {
       },
     },
     order => [qw(
-        strFIFAID strLocalName strLocalShortName strLatinName strStatus strLatinShortName dtFrom dtTo strISOCountry strRegion strPostalCode strTown strAddress strWebURL strEmail strPhone strFax strContactTitle strContactEmail strContactPhone strContact clubcharacteristics
+        strFIFAID
+        strLocalName
+        strLocalShortName
+        strLatinName
+        strLatinShortName
+        strStatus
+        dtFrom
+        dtTo
+        strISOCountry
+        strRegion
+        strPostalCode
+        strTown
+        strAddress
+        strWebURL
+        strEmail
+        strPhone
+        strFax
+        strContactTitle
+        strContactEmail
+        strContactPhone
+        strContact
+        clubcharacteristics
     )],
     fieldtransform => {
       textcase => {
@@ -313,7 +330,7 @@ sub club_details  {
   my $resultHTML='';
   ($resultHTML, undef )=handleHTMLForm(\%FieldDefinitions, $clubperms, $option, '',$Data->{'db'});
   my $title=$field->{'strLocalName'} || '';
-   my $scMenu = (allowedAction($Data, 'c_e'))
+  my $scMenu = (allowedAction($Data, 'c_e'))
     ? getServicesContactsMenu($Data, $Defs::LEVEL_CLUB, $clubID, $Defs::SC_MENU_SHORT, $Defs::SC_MENU_CURRENT_OPTION_DETAILS)
     : '';
   my $logodisplay = '';
@@ -433,7 +450,7 @@ sub postClubAdd {
       my $clm=setClient(\%cv);
       return (0,qq[
         <div class="OKmsg"> $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Added Successfully</div><br>
-        <a href="$Data->{'target'}?client=$clm&amp;a=C_DT">Display Details for $params->{'d_strName'}</a><br><br>
+        <a href="$Data->{'target'}?client=$clm&amp;a=C_DT">Display Details for $params->{'d_strLocalName'}</a><br><br>
         <b>or</b><br><br>
         <a href="$Data->{'target'}?client=$cl&amp;a=C_DTA&amp;l=$Defs::LEVEL_CLUB">Add another $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}</a>
 
@@ -523,6 +540,8 @@ sub listClubs   {
       strContact => $dref->{'strContact'} || '',
       strPhone => $dref->{'strPhone'} || '',
       strEmail => $dref->{'strEmail'} || '',
+      strStatus => $dref->{'strStatus'} || '',
+      strStatusText => $Data->{'lang'}->txt($Defs::entityStatus{$dref->{'strStatus'}} || ''),
     };
   }
   $query->finish;
@@ -554,6 +573,12 @@ sub listClubs   {
       name =>   $Data->{'lang'}->txt('Email'),
       field =>  'strEmail',
     },
+    {
+        name   => $Data->{'lang'}->txt('Status'),
+        field  => 'strStatusText',
+        width  => 30,
+    },
+
   );
   my $filterfields = [
     {
@@ -561,13 +586,12 @@ sub listClubs   {
       elementID => 'id_textfilterfield',
       type => 'regex',
     },
-    #{
-      #field => 'intRecStatus',
-      #elementID => 'dd_actstatus',
-      #allvalue => '2',
-    #}
+    {
+      field => 'strStatus',
+      elementID => 'dd_actstatus',
+      allvalue => 'ALL',
+    }
   ];
-  
   my $grid  = showGrid(
     Data => $Data,
     columns => \@headers,
@@ -576,7 +600,13 @@ sub listClubs   {
     gridid => 'grid',
     width => '99%',
   );
-  my $rectype_options = show_recordtypes($Data, $Defs::LEVEL_CLUB,0, undef, 'Name');
+  my $rectype_options=show_recordtypes(
+        $Data,
+        $Data->{'lang'}->txt('Name'),
+        '',
+        \%Defs::entityStatus,
+        { 'ALL' => $Data->{'lang'}->txt('All'), },
+  ) || '';
 
   $resultHTML = qq[ 
       <div style="width:99%;">$rectype_options</div>
@@ -586,6 +616,16 @@ sub listClubs   {
 
   my $title=$Data->{'SystemConfig'}{"PageTitle_List_".$Defs::LEVEL_CLUB} 
     || "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB.'_P'} in $currentname"; ###needs translation ->  WHAT in WHAT? 
+
+  my $addlink='';
+  {
+      $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>];
+
+  }
+
+  my $modoptions=qq[<div class="changeoptions">$addlink</div>];
+  $title=$modoptions.$title;
+  
   return ($resultHTML,$title);
 }
 

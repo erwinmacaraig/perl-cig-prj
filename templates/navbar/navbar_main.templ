@@ -11,7 +11,7 @@
 			</div>
 			<ol class="nav_session_levels">
 				[% FOR level = NavTree %]
-					<li class="session_item"><a href = "[% level.url %]"><span class="nav-bar-name">[% Lang.txt(level.name) %]</span>&nbsp;<span class="level-name">[% Lang.txt(level.levelname) %]</span></a></li>
+					<li class="session_item"><a href = "[% level.url %]"><span class="nav-bar-name">[% level.name %]</span>&nbsp;<span class="level-name">[% Lang.txt(level.levelname) %]</span></a></li>
 				[% END %]
 			</ol>
 			<script type="text/javascript">
