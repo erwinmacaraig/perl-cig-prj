@@ -457,9 +457,9 @@ sub submitPersonRegistration    {
   	    my $rc = addWorkFlowTasks(
             $Data,
             'REGO', 
-            $pr_ref->{'strRegistrationNature'} || '', 
-            $pr_ref->{'intOriginLevel'} || 0, 
-            $pr_ref->{'intEntityID'} || 0,
+            $pr_ref->{'registrationNature'} || $pr_ref->{'strRegistrationNature'} || '', 
+            $pr_ref->{'originLevel'} || $pr_ref->{'intOriginLevel'} || 0, 
+            $pr_ref->{'entityID'} || $pr_ref->{'intEntityID'} || 0,
             $personID,
             $personRegistrationID, 
             0
