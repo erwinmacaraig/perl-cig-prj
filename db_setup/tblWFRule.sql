@@ -17,21 +17,21 @@ CREATE TABLE tblWFRule (
   strSport varchar(20) NOT NULL DEFAULT '' COMMENT 'FOOTBALL,FUTSAL,BEACHSOCCER',
   strAgeLevel varchar(20) NOT NULL DEFAULT '' COMMENT 'SENIOR,JUNIOR',
 
-  intPaymentRequired int(11) NOT NULL DEFAULT '0' COMMENT 'Is a payment required for this type of registration',
   intApprovalEntityLevel int(11) NOT NULL DEFAULT '0' COMMENT 'Which Entity level has to approve this rule',
   intProblemResolutionEntityLevel int(11) NOT NULL DEFAULT '0' COMMENT 'Which Entity Level to solve issues',
-  intDocumentTypeID int(11) NOT NULL DEFAULT '0',
 
   strTaskType varchar(20) NOT NULL DEFAULT 'APPROVAL' COMMENT 'APPROVAL,DOCUMENT',
   strTaskStatus varchar(20) NOT NULL DEFAULT 'PENDING' COMMENT 'PENDING,ACTIVE',
+  intDocumentTypeID int(11) NOT NULL DEFAULT '0',
    
-  intNationalPeriodID INT DEFAULT 0,
 
   /*intApprovalRoleID int(11) NOT NULL DEFAULT '0' COMMENT 'Which Role, within and Entity must approve this rule',*/
 /*  intProblemResolutionRoleID int(11) NOT NULL DEFAULT '0',*/
 /*intSeasonID INT DEFAULT 0,*/
 /*intRoleID INT DEFAULT 0,*/
 /*intVersionID INT DEFAULT 0,*/
+  /*intPaymentRequired int(11) NOT NULL DEFAULT '0' COMMENT 'Is a payment required for this type of registration',*/
+  /*intNationalPeriodID INT DEFAULT 0,*/
 
   tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (intWFRuleID),

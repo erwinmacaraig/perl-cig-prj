@@ -188,7 +188,7 @@ sub _getConfiguration {
                 {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
-                    dropdownoptions => \%Defs::AgeType,
+                    dropdownoptions => \%Defs::ageLevel,
                     dbfield         => 'tblClub.intAgeTypeID',
                     allowgrouping   => 1,
                 }

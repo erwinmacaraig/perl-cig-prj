@@ -37,7 +37,6 @@ sub main	{
     $RegFields{'sport'} = 'FOOTBALL';
     $RegFields{'ageLevel'} = 'SENIOR';
     $RegFields{'gender'} = 1;
-    if (isRegoAllowedToEntity(\%Data, $entityID, 'NEW', \%RegFields))  {
             print "OK TO CONTINUE FOR ENTITY\n";
         if (isRegoAllowedToSystem(\%Data, $Defs::ORIGIN_SELF, 'NEW', \%RegFields))    {
             print "OK TO CONTINUE - PLAYER\n";
@@ -51,10 +50,6 @@ sub main	{
         else    {
             print "NOT OK TO CONTINUE - PLAYER\n";
         }
-    }
-    else    {
-        print "NOT OK TO CONTINUE FOR ENTITY- PLAYER\n";
-    }
     $RegFields{'personType'} = 'COACH';
     $RegFields{'personLevel'} = 'AMATEUR';
     $RegFields{'sport'} = 'FUTSAL';

@@ -59,6 +59,7 @@ warn("RID $regoID");
             getLastEntityLevel($clientValues),
             $url,
         );
+#getLastEntityLevel($clientValues) -- OriginLevel
     }
     elsif ( $action eq 'PREGF_P' ) {
         my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_PU&amp;rID=$regoID";
@@ -66,7 +67,7 @@ warn("RID $regoID");
             $Data,
             'REGO',
             'PRODUCT',
-            getLastEntityLevel($clientValues) || 0,
+            getLastEntityLevel($clientValues),
             $rego_ref->{'registrationNature'},
             getLastEntityID($clientValues) || 0,
             0,
@@ -89,7 +90,7 @@ print STDERR Dumper($products);
             $Data,
             'REGO',
             'DOCUMENT',
-            getLastEntityLevel($clientValues) || 0,
+            getLastEntityLevel($clientValues),
             $rego_ref->{'registrationNature'},
             getLastEntityID($clientValues) || 0,
             0,

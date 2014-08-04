@@ -59,7 +59,6 @@ sub main	{
     my $pRId = 0;
     my %Filters=();
 
-    if (isRegoAllowedToEntity(\%Data, $entityID, 'NEW', \%RegFields))  {
         print "OK.. lets go\n";
         ($pRId, undef) = addRegistration(\%Data, \%RegFields);
         print "DONE\n";
@@ -71,7 +70,6 @@ sub main	{
         $Filters{'personType'} = 'COACH';
         my (undef, $regos_ref) = getRegistrationData(\%Data, $personID, \%Filters);
         print Dumper($regos_ref);
-    }
     print "\n\n\n\n\n";
 
     ##Now lets do an update
