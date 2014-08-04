@@ -125,11 +125,10 @@ sub club_details  {
           label => 'Status',
           value => $field->{strStatus} || 'ACTIVE',
           type => 'lookup',  
-          options => \%Defs::entiyStatus,
+          options => \%Defs::entityStatus,
           sectionname => 'details',
           readonly => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
       },
-      
       strContact => {
         label => 'Contact Person',
         value => $field->{strContact},
