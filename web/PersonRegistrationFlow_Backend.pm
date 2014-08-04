@@ -25,20 +25,29 @@ sub handleRegistrationFlowBackend   {
     my $client = $Data->{'client'};
     my $clientValues = $Data->{'clientValues'};
     my $rego_ref = {};
+    my $cgi=new CGI;
+    my %params=$cgi->Vars();
+    
+        
     my $regoID = param('rID') || 0;
-
     if($regoID) {
-        my $valid = validateRegoID($Data, $regoID);
+        my $valid =0;
+        ($valid, $rego_ref) = validateRegoID($Data, $regoID);
         $regoID = 0 if !$valid;
     }
     if ( $action eq 'PREGF_TU' ) {
         #add rego record with types etc.
-        $regoID = add_rego_record($Data);
+        ($regoID, $rego_ref) = add_rego_record($Data);
 warn("RID $regoID");
+use Data::Dumper;
+print STDERR Dumper($rego_ref);
         $action = 'PREGF_P';
     }
     if ( $action eq 'PREGF_PU' ) {
         #Update product records
+warn("ABOUT TO SAVE");
+$params{'prod_1'} = 1;
+        save_rego_products($Data, $regoID, $rego_ref->{'personID'} || $rego_ref->{'intPersonID'}, getLastEntityID($clientValues) || 0, getLastEntityLevel($clientValues), \%params);
         $action = 'PREGF_D';
     }
     if ( $action eq 'PREGF_DU' ) {
@@ -74,11 +83,19 @@ warn("RID $regoID");
             0,
             $rego_ref,
         );
-use Data::Dumper;
-print STDERR Dumper($products);
-        $body .= getRegoProducts($Data, $products);
+        my @prodIDs = ();
+        my $productIDs = '';
+        foreach my $product (@{$products})  {
+            $productIDs .= " " if ($productIDs);
+            $productIDs .= $product->{'ID'};
+            push @prodIDs, $product->{'ID'};
+        }
+        if (@prodIDs)   {
+            $body .= getRegoProducts($Data, \@prodIDs);
+        }
         $body .= qq[
             display product information
+            HANDLE NO PRODUCTS
 
             <a href = "$url">Continue</a>
         ];
@@ -136,10 +153,18 @@ sub validateRegoID {
         getID($Data->{'clientValues'}),
         \%Reg
     );
-    return $count || 0;
+    return ($count, $regs) || (0, undef);
 
 }
 
+sub save_rego_products {
+    my ($Data, $regoID, $personID, $entityID, $entityLevel, $params) = @_;
+
+    my $session='';
+    insertRegoTransaction($Data, $regoID, $personID, $params, $entityID, $entityLevel, 1, $session);
+}
+
+    
 
 sub add_rego_record{
     my ($Data) =@_;
@@ -160,5 +185,8 @@ sub add_rego_record{
     };
 
     my ($regID,$rc) = addRegistration($Data,$rego_ref);
-    return $regID || 0;
+    if ($regID)     {
+        return ($regID, $rego_ref);
+    }
+    return (0, undef);
 }

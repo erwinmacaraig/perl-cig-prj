@@ -2,8 +2,8 @@ package RegoProducts;
 require Exporter;
 @ISA =  qw(Exporter);
 
-@EXPORT = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts );
-@EXPORT_OK = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts );
+@EXPORT = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction);
+@EXPORT_OK = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction);
 
 use strict;
 use lib "..","../..";
@@ -114,7 +114,7 @@ sub getRegoProducts {
 sub getAllRegoProducts {
     my ($Data, $productIds) = @_;
 
-    my $productID_str = join(',',$productIds);
+    my $productID_str = join(',',@{$productIds});
     return [] if !$productID_str;
 
     my $sql = qq[
@@ -146,21 +146,18 @@ sub getAllRegoProducts {
         FROM tblProducts as P
             LEFT JOIN tblProductPricing as PP ON (
                 PP.intProductID = P.intProductID
-                AND PP.intRealmID = ?
+                AND PP.intRealmID = P.intRealmID
             )
         WHERE
             P.intRealmID = ?
             AND P.intProductID IN ($productID_str)
         ORDER BY P.strGroup, P.strName, intLevel
     ];
+warn($sql);
             #AND (P.intMinSellLevel <= ? or P.intMinSellLevel=0)
 
     my $q = $Data->{'db'}->prepare($sql);
-    my @queryParams = (
-        $Data->{'Realm'},
-        $Data->{'Realm'},
-    );
-    $q->execute( @queryParams );
+    $q->execute($Data->{'Realm'});
 
     my $regoProducts = $q->fetchall_hashref('intProductID');
 
@@ -454,4 +451,199 @@ sub productAllowedThroughFilter {
 
     return 1;
 }
+
+sub insertRegoTransaction {
+    my($Data, $regoID, $intID, $params, $entityID, $entityLevel, $level, $session)=@_;
+    my $db=$Data->{'db'};
+    $entityID ||= getLastEntityID($Data->{'clientValues'});
+    $entityLevel ||= getLastEntityLevel($Data->{'clientValues'});
+    $session ||= undef;
+    my $multipersonType = $session ? ($session->getNextRegoType())[0] || '' : '';
+    $intID ||= 0;
+
+use Data::Dumper;
+print STDERR Dumper($params);
+    #Get products selected
+    my @productsselected=();
+    my @already_in_cart_items=();
+    for my $k (%{$params})  {
+      if($k=~/prod_/) {
+        if($params->{$k}==1)  {
+          my $prod=$k;
+          $prod=~s/[^\d]//g;
+          push @productsselected, $prod;
+        }
+      }
+      if($k=~/txn_/)  {
+        if($params->{$k}>=1)  {
+          my $txn=$k;
+          $txn=~s/[^\d]//g;
+          push @already_in_cart_items, $txn;
+        }
+      }
+    }
+    my $realmID=$Data->{'Realm'} || 0;
+    my $realmSubTypeID=$Data->{'RealmSubType'} || 0;
+    my $st_add= qq[
+        INSERT INTO tblTransactions (
+          intStatus, 
+          curAmount, 
+          curPerItem, 
+          intProductID, 
+          intQty, 
+          dtTransaction, 
+          intID, 
+          intTableType, 
+          intRealmID, 
+          intRealmSubTypeID, 
+          intTXNEntityID,
+          intPersonRegistrationID
+        )
+        VALUES (?, ?, ?, ?, ?, SYSDATE(), ?, ?, ?, ?, ?, ?)
+  ];
+  my $q_add= $db->prepare($st_add);
+  my @txns_added=();
+  my $total_amount = 0;
+    if (scalar(@productsselected) or scalar(@already_in_cart_items)) {
+        if (scalar(@productsselected)) {
+            foreach my $product (@productsselected)    {
+                my $amount= getItemCost($Data, $entityID, $entityLevel, $multipersonType, $product);
+                $total_amount += $amount;
+            }
+        }
+        if (scalar(@already_in_cart_items)){
+            my @query_params;
+            my $clubWHERE;
+            if ( $entityID and $entityID != $Defs::INVALID_ID ) {
+                $clubWHERE
+                    = qq[ OR (PP.intID = ?)];
+                @query_params = ($realmID, $entityID , @already_in_cart_items);
+            }
+            else {
+                @query_params = ($realmID, @already_in_cart_items);
+            }
+            my $already_list = join(',', map { '?' } @already_in_cart_items );
+            my $st = qq[
+                SELECT 
+                    T.intTransactionID, 
+                    T.intQty as CurrentQty,
+                    T.intProductID,
+                    T.curAmount as CurrentAmount,
+                P.curDefaultAmount,
+                P.intMinChangeLevel,
+                P.intCreatedLevel,
+                PP.curAmount,
+                P.intCreatedID,
+                PP.intPricingType,
+                PP.curAmount_Adult1,
+                PP.curAmount_Adult2,
+                PP.curAmount_Adult3,
+                PP.curAmount_AdultPlus,
+                PP.curAmount_Child1,
+                PP.curAmount_Child2,
+                PP.curAmount_Child3,
+                PP.curAmount_ChildPlus
+        FROM 
+                    tblTransactions as T
+                    INNER JOIN tblProducts as P ON (T.intProductID=P.intProductID)
+                    LEFT JOIN tblProductPricing as PP ON (
+                        PP.intProductID = P.intProductID
+                        AND PP.intRealmID = ?
+                        AND ((PP.intID = ? AND intLevel = $Defs::LEVEL_NATIONAL)
+                        $clubWHERE
+                        )
+                    )
+        WHERE 
+                    intTransactionID IN ($already_list)
+                ORDER BY PP.intLevel
+      ];
+      my $query = $Data->{'db'}->prepare($st);
+      $query->execute(@query_params);
+            my $st_upd = qq[
+                UPDATE tblTransactions
+                SET intQty = ?, curAmount=?, curPerItem=?
+                WHERE intTransactionID=?
+                    AND intStatus=0
+                    AND intProductID=?
+                LIMIT 1
+            ];
+      my $qry_update = $Data->{'db'}->prepare($st_upd);
+            my %product_seen;
+      while(my $dref=$query->fetchrow_hashref())  {
+                next if $product_seen{$dref->{'intProductID'}};
+          my $amount= getCorrectPrice($dref, $multipersonType);
+          my $qty = $params->{'txnQTY_'.$dref->{'intTransactionID'}} || $params->{'prodQTY_'.$dref->{'intTransactionID'}} ||  0;
+        
+#Fix QTY (Prevent bad chars)
+    $qty = fix_qty($qty); 
+    my $totalamount= $amount * $qty;
+                if ($amount != $dref->{'CurrentAmount'} or $qty != $dref->{CurrentQty}) {
+              $qry_update->execute($qty, $totalamount, $amount, $dref->{intTransactionID}, $dref->{intProductID});
+                }
+        $total_amount += $dref->{curAmount};
+                $product_seen{$dref->{intProductID}}=1;
+      }
+    }
+  }
+
+    if (scalar(@productsselected)) {
+        my %product_seen;
+        foreach my $product (@productsselected)    {
+            next if $product_seen{$product}++;
+            my $amount= getItemCost($Data, $entityID, $entityLevel, $multipersonType, $product);
+            my $status = ($total_amount eq '0.00' or $total_amount == 0) ? 1: 0;
+            $status = 0 if $Data->{'SystemConfig'}{'RegoForm_DontPayZero'};
+            my $qty = $params->{'txnQTY_'.$product} || $params->{'prodQTY_'.$product} || 1;
+            $qty = fix_qty($qty);
+            my $totalamount= $amount * $qty;
+            $q_add->execute(
+                $status,
+                $totalamount,
+                $amount,
+                $product,
+                $qty,
+                $intID,
+                $level,
+                $realmID,
+                $realmSubTypeID,
+                $entityID,
+                $regoID
+            );
+    
+            
+      my $tx_ID=$q_add->{mysql_insertid} || 0;
+      if ($status and ($total_amount == 0 or $total_amount eq '0.00'))  {
+        my $regoFormID = $Data->{'RegoFormID'} || 0;
+        my $st = qq[
+          INSERT INTO tblTransLog
+          (dtLog, intAmount, intRealmID, intStatus, intPaymentType, intRegoFormID)
+          VALUES (NOW(), 0, ?, 1, 0, ?)
+        ];
+        my $qry=$Data->{'db'}->prepare($st);
+        $qry->execute( $Data->{'Realm'}, $regoFormID );
+        my $transLogID = $qry->{'mysql_insertid'};
+
+        $st = qq[
+          INSERT INTO tblTXNLogs
+          (intTXNID, intTLogID)
+          VALUES (?, ?)
+        ];
+        $qry=$Data->{'db'}->prepare($st);
+        $qry->execute( $tx_ID, $transLogID );
+        $st = qq[
+          UPDATE tblTransactions
+            SET intTransLogID = ?, intStatus = $Defs::TXN_PAID, dtPaid=NOW()
+          WHERE intTransactionID = ?
+        ];
+        $qry=$Data->{'db'}->prepare($st);
+        $qry->execute( $transLogID, $tx_ID );
+                Products::product_apply_transaction($Data,$transLogID);
+      }
+      push @txns_added, $tx_ID if $tx_ID;
+    }
+  }
+  push @txns_added, @already_in_cart_items;
+  return \@txns_added || [];
+}
+
 1;

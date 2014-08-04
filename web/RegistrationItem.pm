@@ -48,7 +48,6 @@ sub getRegistrationItems    {
             AND strItemType = ?
     ];
 	
-
 	my $q = $Data->{'db'}->prepare($st) or query_error($st);
 	$q->execute(
         $Data->{'Realm'},
