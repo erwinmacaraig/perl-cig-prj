@@ -354,7 +354,6 @@ if($SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequestCleara
         [ $lang->txt('Venues'), 'menu','venues'],
         [ $lang->txt('People'), 'menu','persons'],
         [ $lang->txt('Work Tasks'), 'menu','approvals'],
-        [ $lang->txt('Reg. Allowed'), 'menu','entityregistrationallowed'],
         [ $lang->txt('Transfers'), 'menu', [
         'clearances',    
         'newclearance',    
