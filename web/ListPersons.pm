@@ -288,8 +288,13 @@ sub listPersons {
     $title = $modoptions.$title;
     #$title = 'Pending ' . $title if ($is_pending_registration);
 
-warn("BRUCE SET BELOW TO OMIT SEASONS -- via LAST FUNCTION PARAM=1");
-    my $rectype_options = show_recordtypes($Data, $Defs::LEVEL_PERSON, 1, $memfieldlabels, 'Family Name',1, 0,1);
+    my $rectype_options=show_recordtypes(
+        $Data,
+        $Data->{'lang'}->txt('Family Name'),
+        '',
+        \%Defs::entityStatus,
+        { 'ALL' => $Data->{'lang'}->txt('All'), },
+    ) || '';
 
     $resultHTML =qq[
         $list_instruction
