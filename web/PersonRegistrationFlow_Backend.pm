@@ -108,7 +108,6 @@ sub handleRegistrationFlowBackend   {
             $ProductRules{$product->{'ID'}} = $product;
 warn("PRODID: $product");
         }
-        if (@prodIDs)   {
             $body .= qq[
                 <form action="$Data->{target}" method="POST">
                 <input type="hidden" name="a" value="PREGF_PU">
@@ -116,13 +115,12 @@ warn("PRODID: $product");
             foreach my $hidden (keys %Hidden)   {
                 $body .= qq[<input type="hidden" name="$hidden" value="].$Hidden{$hidden}.qq[">];
             }
+        if (@prodIDs)   {
             $body .= getRegoProducts($Data, \@prodIDs, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
+        }
             $body .= qq[
                 <input type="submit" name="submit" value="]. $lang->txt("Continue").qq[" class = "button proceed-button"><br><br>
                 </form>
-            ];
-        }
-        $body .= qq[
             display product information
             HANDLE NO PRODUCTS
         ];
