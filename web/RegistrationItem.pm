@@ -55,17 +55,19 @@ sub getRegistrationItems    {
         $ruleFor,
         $originLevel,
 		$regNature,
-        $Rego_ref->{'entityType'} || '',
-        $Rego_ref->{'entityLevel'} || 0,
-		$Rego_ref->{'personType'} || '',
-		$Rego_ref->{'personLevel'} || '',
-		$Rego_ref->{'sport'} || '',
-		$Rego_ref->{'ageLevel'} || '',
+        $Rego_ref->{'strEntityType'} || $Rego_ref->{'entityType'} || '',
+        $Rego_ref->{'strEntityLevel'} || $Rego_ref->{'entityLevel'} || 0,
+		$Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '',
+		$Rego_ref->{'strPersonLevel'} || $Rego_ref->{'personLevel'} || '',
+		$Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '',
+		$Rego_ref->{'strAgeLevel'} || $Rego_ref->{'ageLevel'} || '',
         $itemType
 	) or query_error($st);
 	
     my @Items=();
+warn($st);
     while (my $dref = $q->fetchrow_hashref())   {
+warn("ITEM");
         my %Item=();
         $Item{'ID'} = $dref->{'intID'};
         $Item{'UseExistingThisEntity'} = $dref->{'intUseExistingThisEntity'} || 0;

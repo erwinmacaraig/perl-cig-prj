@@ -19,8 +19,12 @@ sub getRegoProducts {
     my (
         $Data,
         $products,
+        $entityID,
+        $regoID,
+        $personID,
         $memdetails,
         $multipersonType,
+        $regItemRules_ref
     ) = @_;
 
     my $currencySymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
@@ -28,7 +32,7 @@ sub getRegoProducts {
     $multipersonType ||= ''; 
     my $cl  = setClient($Data->{'clientValues'});
 
-    my $regoProducts = getAllRegoProducts($Data, $products);
+    my $regoProducts = getAllRegoProducts($Data, $entityID, $regoID, $personID, $products);
 
     my $productAttributes = Products::getFormProductAttributes($Data, 0) || {};
 
@@ -52,6 +56,7 @@ sub getRegoProducts {
     } keys %$regoProducts;
 
     foreach my $key (@sorted) {
+        ## Filter here based on intUseExistingThisEntity, intUseExistingAnyEntity
         my $dref = $regoProducts->{$key};
         $dref->{strProductNotes}=~s/\n/<br>/g;
         next if $product_seen{$dref->{'intProductID'}};
@@ -61,7 +66,7 @@ sub getRegoProducts {
         my $amount = currency(getCorrectPrice($dref, $multipersonType)) || 0;
         my $paid = 0;
         my $unpaid = 0;
-        #next if ($paid_product{$dref->{'intProductID'}} and !$dref->{intAllowMultiPurchase});
+       #next if ($paid_product{$dref->{'intProductID'}} and !$dref->{intAllowMultiPurchase});
         my $photolink = '';
          
         if($dref->{'intPhoto'}){
@@ -80,7 +85,7 @@ sub getRegoProducts {
             TransactionID => $dref->{'intTransactionID'} || 0,
             Status => $dref->{'intStatus'},
             ProductNotes => decode_entities($dref->{'strProductNotes'}) || '',
-            Mandatory => $dref->{'intIsMandatory'} || 0,
+            Mandatory => $regItemRules_ref->{$dref->{'intProductID'}}{'Required'} || $dref->{'intIsMandatory'} || 0,
             Name => $dref->{'strName'} || '',
             Photo =>$photolink,
         );
@@ -112,13 +117,16 @@ sub getRegoProducts {
 }
 
 sub getAllRegoProducts {
-    my ($Data, $productIds) = @_;
+    my ($Data, $entityID, $regoID, $personID, $productIds) = @_;
 
     my $productID_str = join(',',@{$productIds});
     return [] if !$productID_str;
 
     my $sql = qq[
         SELECT DISTINCT 
+            T.intStatus,
+            T.intTransactionID,
+            T.curAmount as AmountCharged,
             P.intProductID,
             P.strName,
             P.curDefaultAmount,
@@ -144,6 +152,14 @@ sub getAllRegoProducts {
             dtDateAvailableFrom,
             dtDateAvailableTo
         FROM tblProducts as P
+            LEFT JOIN tblTransactions as T ON (
+                T.intID =?
+                AND T.intTableType = $Defs::LEVEL_PERSON
+                AND T.intProductID = P.intProductID
+                AND T.intPersonRegistrationID IN (0, ?)
+                AND T.intTXNEntityID IN (0, ?)
+                AND T.intStatus = 0     
+            )
             LEFT JOIN tblProductPricing as PP ON (
                 PP.intProductID = P.intProductID
                 AND PP.intRealmID = P.intRealmID
@@ -153,11 +169,10 @@ sub getAllRegoProducts {
             AND P.intProductID IN ($productID_str)
         ORDER BY P.strGroup, P.strName, intLevel
     ];
-warn($sql);
             #AND (P.intMinSellLevel <= ? or P.intMinSellLevel=0)
 
     my $q = $Data->{'db'}->prepare($sql);
-    $q->execute($Data->{'Realm'});
+    $q->execute($personID, $regoID, $entityID, $Data->{'Realm'});
 
     my $regoProducts = $q->fetchall_hashref('intProductID');
 
@@ -387,7 +402,6 @@ sub productAllowedThroughFilter {
     }
 
     if ($memdetails) {
-
         if ( $memdetails->{'Gender'} and $dref->{'intProductGender'} ) {
             return 0 if $dref->{'intProductGender'} != $memdetails->{'Gender'};
         }
@@ -549,7 +563,7 @@ print STDERR Dumper($params);
                     LEFT JOIN tblProductPricing as PP ON (
                         PP.intProductID = P.intProductID
                         AND PP.intRealmID = ?
-                        AND ((PP.intID = ? AND intLevel = $Defs::LEVEL_NATIONAL)
+                        AND ((intLevel = $Defs::LEVEL_NATIONAL)
                         $clubWHERE
                         )
                     )
