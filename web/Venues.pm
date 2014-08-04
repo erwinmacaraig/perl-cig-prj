@@ -16,7 +16,7 @@ use Log;
 use EntityStructure;
 use WorkFlow;
 
-require RecordTypeFilter;
+use RecordTypeFilter;
 use RuleMatrix;
 
 sub handleVenues    {
@@ -607,7 +607,7 @@ sub listVenues  {
 
     my $modoptions=qq[<div class="changeoptions">$addlink</div>];
     $title=$modoptions.$title;
-    my $rectype_options=RecordTypeFilter::show_recordtypes(
+    my $rectype_options=show_recordtypes(
         $Data, 
         $Data->{'lang'}->txt('Name'),
         '',
@@ -627,8 +627,6 @@ sub listVenues  {
         {
             name   => $Data->{'lang'}->txt('Status'),
             field  => 'strStatusText',
-            editor => 'checkbox',
-            type   => 'tick',
             width  => 30,
         },
     );

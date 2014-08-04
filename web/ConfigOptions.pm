@@ -452,109 +452,12 @@ sub getFieldsList	{
         intNatCustomBool3
         intNatCustomBool4
         intNatCustomBool5
-        strCustomStr1
-        strCustomStr2
-        strCustomStr3
-        strCustomStr4
-        strCustomStr5
-        strCustomStr6
-        strCustomStr7
-        strCustomStr8
-        strCustomStr9
-        strCustomStr10
-        strCustomStr11
-        strCustomStr12
-        strCustomStr13
-        strCustomStr14
-        strCustomStr15
-        strCustomStr16
-        strCustomStr17
-        strCustomStr18
-        strCustomStr19
-        strCustomStr20
-        strCustomStr21
-        strCustomStr22
-        strCustomStr23
-        strCustomStr24
-        strCustomStr25
-        dblCustomDbl1
-        dblCustomDbl2
-        dblCustomDbl3
-        dblCustomDbl4
-        dblCustomDbl5
-        dblCustomDbl6
-        dblCustomDbl7
-        dblCustomDbl8
-        dblCustomDbl9
-        dblCustomDbl10
-        dblCustomDbl11
-        dblCustomDbl12
-        dblCustomDbl13
-        dblCustomDbl14
-        dblCustomDbl15
-        dblCustomDbl16
-        dblCustomDbl17
-        dblCustomDbl18
-        dblCustomDbl19
-        dblCustomDbl20
-        dtCustomDt1
-        dtCustomDt2
-        dtCustomDt3
-        dtCustomDt4
-        dtCustomDt5
-        dtCustomDt6
-        dtCustomDt7
-        dtCustomDt8
-        dtCustomDt9
-        dtCustomDt10
-        dtCustomDt11
-        dtCustomDt12
-        dtCustomDt13
-        dtCustomDt14
-        dtCustomDt15
-        intCustomLU1
-        intCustomLU2
-        intCustomLU3
-        intCustomLU4
-        intCustomLU5
-        intCustomLU6
-        intCustomLU7
-        intCustomLU8
-        intCustomLU9
-        intCustomLU10
-        intCustomLU11
-        intCustomLU12
-        intCustomLU13
-        intCustomLU14
-        intCustomLU15
-        intCustomLU16
-        intCustomLU17
-        intCustomLU18
-        intCustomLU19
-        intCustomLU20
-        intCustomLU21
-        intCustomLU22
-        intCustomLU23
-        intCustomLU24
-        intCustomLU25
-        intCustomBool1
-        intCustomBool2
-        intCustomBool3
-        intCustomBool4
-        intCustomBool5
-        intCustomBool6
-        intCustomBool7
         intFavStateTeamID
         intFavNationalTeamID
         intFavNationalTeamMember
         intAttendSportCount
         intWatchSportHowOftenID
         strNotes
-        strMemberCustomNotes1
-        strMemberCustomNotes2
-        strMemberCustomNotes3
-        strMemberCustomNotes4
-        strMemberCustomNotes5
         dtFirstRegistered
         dtLastRegistered
         dtLastUpdate
@@ -563,85 +466,34 @@ sub getFieldsList	{
         intHowFoundOutID
         intConsentSignatureSighted
         intDefaulter
-        PlayerNumberTeam.strJumperNum
-        PlayerNumberClub.strJumperNum
         intPhotoUseApproval
         ));
     push @memberFields, ('intSchoolID', 'intGradeID') if $data->{'SystemConfig'}{'Schools'};
     return \@memberFields if $fieldtype eq 'Member';
 
     my @clubFields = (qw(
-        strName
-        intRecStatus
-        strAbbrev
-        strAddress1
-        strAddress2
-        strSuburb
+        strFIFAID
+        strLocalName
+        strLocalShortName
+        strLatinName
+        strLatinShortName
+        strStatus
+        strISOCountry
+
+        strRegion
         strPostalCode
-        strState
-        strCountry
-        strLGA
-        strDevelRegion
-        strClubZone
+        strTown
+        strAddress
+        strWebURL
+        strEmail
         strPhone
         strFax
-        strEmail
-        strIncNo
-        strBusinessNo
-        strColours
-        intClubTypeID
-        intAgeTypeID
-        intClubCategoryID
-        strNotes
+        strContactTitle
+        strContactEmail
+        strContactPhone
+        strContact
+
         intClubClassification
-        Username
-        strClubCustomCheckBox1
-        strClubCustomCheckBox2
-        strClubCustomStr1
-        strClubCustomStr2
-        strClubCustomStr3
-        strClubCustomStr4
-        strClubCustomStr5
-        strClubCustomStr6
-        strClubCustomStr7
-        strClubCustomStr8
-        strClubCustomStr9
-        strClubCustomStr10
-        strClubCustomStr11
-        strClubCustomStr12
-        strClubCustomStr13
-        strClubCustomStr14
-        strClubCustomStr15
-        dblClubCustomDbl1
-        dblClubCustomDbl2
-        dblClubCustomDbl3
-        dblClubCustomDbl4
-        dblClubCustomDbl5
-        dblClubCustomDbl6
-        dblClubCustomDbl7
-        dblClubCustomDbl8
-        dblClubCustomDbl9
-        dblClubCustomDbl10
-        dtClubCustomDt1
-        dtClubCustomDt2
-        dtClubCustomDt3
-        dtClubCustomDt4
-        dtClubCustomDt5
-        intClubCustomLU1
-        intClubCustomLU2
-        intClubCustomLU3
-        intClubCustomLU4
-        intClubCustomLU5
-        intClubCustomLU6
-        intClubCustomLU7
-        intClubCustomLU8
-        intClubCustomLU9
-        intClubCustomLU10
-        intClubCustomBool1
-        intClubCustomBool2
-        intClubCustomBool3
-        intClubCustomBool4
-        intClubCustomBool5
         ));
 
     return \@clubFields if $fieldtype eq 'Club';
@@ -653,6 +505,7 @@ sub getFieldsList	{
         #strMemberNo => 1,
         dtCreatedOnline => 1,
         ClubName => 1,
+        strFIFAID => 1,
     );
 
     my @hiddenfields	= (qw(

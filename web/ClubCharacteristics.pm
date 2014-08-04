@@ -91,6 +91,7 @@ sub getAvailableCharacteristics	{
 		WHERE intRealmID = ?
 			AND intSubRealmID IN (0,?)
 			AND intRecStatus >= 0
+			AND intEntityLevel = $Defs::LEVEL_CLUB
 			$locatorstring
 		ORDER BY intOrder, intSubRealmID ASC
 	];

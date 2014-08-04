@@ -1,7 +1,3 @@
-#
-# $Header: svn://svn/SWM/trunk/web/FieldLabels.pm 11586 2014-05-16 04:19:10Z sliu $
-#
-
 package FieldLabels;
 require Exporter;
 @ISA = qw(Exporter);
@@ -103,30 +99,26 @@ sub getFieldLabels	{
 
 	if($level== $Defs::LEVEL_CLUB)	{
 		%labels = (
-			strName => 'Name',
-			Username => 'Username',
-			intRecStatus => 'Active',
-			strAbbrev => 'Abbreviation',
-			strAddress1 => 'Postal Address Line 1',
-			strAddress2 => 'Postal Address Line 2',
-			strSuburb => 'Suburb',
-			strState => 'State',
-			strCountry => 'Country',
-			strPostalCode => 'Postal Code',
-			strLGA => 'Local Government Area',
-			strDevelRegion => $Data->{'SystemConfig'}{'DevelRegions'} ? 'Development Region' : '',
-			strClubZone => $Data->{'SystemConfig'}{'ClubZones'} ? 'Zone' : '',
-			strPhone => "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Phone",
-			strFax => "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Fax",
-			strEmail => "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Email",
-			strIncNo => 'Incorporation Number',
-			strBusinessNo => 'Business Number (ABN)',
-      strColours => 'Colours',
-			intClubTypeID => 'Club Type',
-			intClubCategoryID => 'Club Category',
-			intAgeTypeID => 'Age Type',
-			strNotes => 'Notes',
-            intClubClassification => 'Accreditation Level',
+            strFIFAID => 'FIFA ID',
+            strLocalName => 'Name',
+            strLocalShortName => 'Short Name',
+            strLatinName => 'Name (Latin)',
+            strLatinShortName => 'Short Name (Latin)',
+            strStatus => 'Status',
+            strISOCountry => 'Country (ISO)',
+
+            strRegion => 'Region',
+            strPostalCode => 'Postal Code',
+            strTown => 'Town',
+            strAddress => 'Address',
+            strWebURL => 'Website',
+            strEmail => 'Email',
+            strPhone => 'Phone',
+            strFax => 'Fax',
+            strContactTitle => 'Contact Person Title',
+            strContactEmail => 'Contact Person Email',
+            strContactPhone => 'Contact Person Phone',
+            strContact => 'Contact Person',
 		);
 	}
 	for my $k (keys %labels)	{
