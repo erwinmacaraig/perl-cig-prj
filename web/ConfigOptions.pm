@@ -14,7 +14,15 @@ use Data::Dumper;
 #
 
 sub GetPermissions {
-    my ($Data, $EntityTypeID, $EntityID, $RealmID, $SubRealmID, $authLevel, $returnraw) = @_;
+    my (
+        $Data, 
+        $EntityTypeID, 
+        $EntityID, 
+        $RealmID, 
+        $SubRealmID, 
+        $authLevel, 
+        $returnraw
+    ) = @_;
 
     my $db = $Data->{'db'};
 
@@ -44,46 +52,26 @@ sub GetPermissions {
 
     my @structureIDs = ();
     my $levelID = $EntityID;
-    my $assocID = $Data->{'clientValues'}{'assocID'} || 0;
-    $assocID = 0 if $Data->{'clientValues'}{'assocID'} < 0;
-    {
-        #Get IDs from tblTempNodeStructure
-        if($EntityTypeID == $Defs::LEVEL_NATIONAL)	{
-            $fieldname = 'int100_ID';
-        }
-        elsif($EntityTypeID == $Defs::LEVEL_STATE)	{
-            $fieldname = 'int30_ID';
-        }
-        elsif($EntityTypeID == $Defs::LEVEL_REGION)	{
-            $fieldname = 'int20_ID';
-        }
-        elsif($EntityTypeID == $Defs::LEVEL_ZONE)	{
-            $fieldname = 'int10_ID';
-        }
-    }
 
-    if($fieldname and $levelID)	{
+    if($levelID)	{
         my $st = qq[
             SELECT
-                int100_ID,
-                int30_ID,
-                int20_ID,
-                int10_ID,
-                intAssocID
+                intParentLevel,
+                intParentID
             FROM
-                tblTempNodeStructure AS T
+                tblTempEntityStructure AS T
             WHERE
-                T.intRealmID = ? AND $fieldname = ?
+                T.intRealmID = ? 
+                AND intChildID = ?
             LIMIT 1
         ];
         my $q = $db->prepare($st);
-        $q->execute($RealmID, $levelID);
-        my ($dref) = $q->fetchrow_hashref();
+        $q->execute($RealmID, $EntityID);
+        while(my $dref = $q->fetchrow_hashref())  {
+            push @structureIDs, [$dref->{'intParentLevel'}, $dref->{'intParentID'}];
+        }
         $q->finish;
-        push @structureIDs, [$Defs::LEVEL_NATIONAL, $dref->{'int100_ID'}] if $dref->{'int100_ID'};
-        push @structureIDs, [$Defs::LEVEL_STATE, $dref->{'int30_ID'}] if $dref->{'int30_ID'};
-        push @structureIDs, [$Defs::LEVEL_REGION, $dref->{'int20_ID'}] if $dref->{'int20_ID'};
-        push @structureIDs, [$Defs::LEVEL_ZONE, $dref->{'int10_ID'}] if $dref->{'int10_ID'};
+        push @structureIDs, [$EntityTypeID, $EntityID];
     }
 
     my $structure_where = '';
@@ -192,33 +180,32 @@ sub GetPermissions {
     #OK we now have the field permissions sorted,
     #Let's load the other types of permissions
 
-    if($assocID)	{
-        my $sql = qq[
-            SELECT   
-                intEntityID,
-                intLevelID,
-                strType,
-                strPerm,
-                strValue,
-                intSubTypeID
-            FROM tblConfig
-            WHERE 
-                (intEntityID = ? OR intEntityID= 0)
-                AND intLevelID = ?
-                AND intRealmID = ?
-                AND strType <> ''
-            ORDER BY 
-                intTypeID ASC, 
-                intEntityID DESC, 
-                intSubTypeID ASC
-        ];
-        my $data = query_data($sql, $assocID, $Defs::LEVEL_ASSOC, $RealmID);
-        for my $dref (@$data) {
-            next if($dref->{'intSubTypeID'} and $dref->{'intSubTypeID'} != $SubRealmID);
-
-            $permissions{$dref->{'strType'}}{$dref->{'strPerm'}}=[$dref->{'strValue'},$dref->{'intLevelID'}, $dref->{'intEntityID'}];
-        }
-    }
+    #if($assocID)	{
+        #my $sql = qq[
+            #SELECT   
+                #intEntityID,
+                #intLevelID,
+                #strType,
+                #strPerm,
+                #strValue,
+                #intSubTypeID
+            #FROM tblConfig
+            #WHERE 
+                #(intEntityID = ? OR intEntityID= 0)
+                #AND intLevelID = ?
+                #AND intRealmID = ?
+                #AND strType <> ''
+            #ORDER BY 
+                #intTypeID ASC, 
+                #intEntityID DESC, 
+                #intSubTypeID ASC
+        #];
+        #my $data = query_data($sql, $assocID, $Defs::LEVEL_ASSOC, $RealmID);
+        #for my $dref (@$data) {
+            #next if($dref->{'intSubTypeID'} and $dref->{'intSubTypeID'} != $SubRealmID);
+            #$permissions{$dref->{'strType'}}{$dref->{'strPerm'}}=[$dref->{'strValue'},$dref->{'intLevelID'}, $dref->{'intEntityID'}];
+        #}
+    #}
     return \%permissions;
 }
 
@@ -318,34 +305,28 @@ sub getFieldsList	{
     my ($data, $fieldtype) = @_;
 
     my @memberFields =(qw(
+
         strNationalNum
-        strMemberNo
-        intRecStatus
+        strPersonNo
+        strStatus
         strSalutation
-        strFirstname
-        strMiddlename
-        strSurname
-        strMaidenName
-        strMotherCountry
-        strFatherCountry
+        strLocalFirstname
         strPreferredName
+        strMiddlename
+        strLocalSurname
+        strMaidenName
         dtDOB
         strPlaceofBirth
         strCountryOfBirth
+        strMotherCountry
+        strFatherCountry
         intGender
-        intDeceased
-        strEyeColour
-        strHairColour
-        intEthnicityID
-        strHeight
-        strWeight
         strAddress1
         strAddress2
         strSuburb
-        strCityOfResidence
         strState
-        strCountry
         strPostalCode
+        strCountry
         strPhoneHome
         strPhoneWork
         strPhoneMobile
@@ -353,60 +334,45 @@ sub getFieldsList	{
         strFax
         strEmail
         strEmail2
+        SPcontact
+        intDeceased
+        intDeRegister
+        strPreferredLang
+        strPassportIssueCountry
+        strPassportNationality
+        strPassportNo
+        dtPassportExpiry
+        dtPoliceCheck
+        dtPoliceCheckExp
+        strPoliceCheckRef
         strEmergContName
         strEmergContNo
         strEmergContNo2
         strEmergContRel
-        intPlayer
-        intCoach
-        intUmpire
-        intOfficial
-        intMisc
-        intVolunteer
-        intPlayerPending
-        strPreferredLang
-        strPassportNationality
-        strPassportNo
-        strPassportIssueCountry
-        dtPassportExpiry
-        strBirthCertNo
-        strHealthCareNo
-        intIdentTypeID
-        strIdentNum
-        dtPoliceCheck
-        dtPoliceCheckExp
-        strPoliceCheckRef
-        intP1Gender
         strP1Salutation
         strP1FName
         strP1SName
+        intP1Gender
         strP1Phone
         strP1Phone2
         strP1PhoneMobile
         strP1Email
         strP1Email2
-        intP1AssistAreaID
-        intP2Gender
         strP2Salutation
         strP2FName
         strP2SName
+        intP2Gender
         strP2Phone
         strP2Phone2
         strP2PhoneMobile
         strP2Email
         strP2Email2
-        intP2AssistAreaID
-        intFinancialActive
-        intMemberPackageID
-        curMemberFinBal
-        intLifeMember
-        intMedicalConditions
-        intAllergies
-        intAllowMedicalTreatment
-        strMedicalNotes
-        intOccupationID
-        strLoyaltyNumber
-        intMailingList
+        strEyeColour
+        strHairColour
+        strHeight
+        strWeight
+        strNotes
+
         strNatCustomStr1
         strNatCustomStr2
         strNatCustomStr3
@@ -452,24 +418,9 @@ sub getFieldsList	{
         intNatCustomBool3
         intNatCustomBool4
         intNatCustomBool5
-        intFavStateTeamID
-        intFavNationalTeamID
-        intFavNationalTeamMember
-        intAttendSportCount
-        intWatchSportHowOftenID
-        strNotes
-        dtFirstRegistered
-        dtLastRegistered
-        dtLastUpdate
-        dtRegisteredUntil
-        dtCreatedOnline
-        intHowFoundOutID
-        intConsentSignatureSighted
-        intDefaulter
-        intPhotoUseApproval
+
         ));
-    push @memberFields, ('intSchoolID', 'intGradeID') if $data->{'SystemConfig'}{'Schools'};
-    return \@memberFields if $fieldtype eq 'Member';
+    return \@memberFields if $fieldtype eq 'Person';
 
     my @clubFields = (qw(
         strFIFAID

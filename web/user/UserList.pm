@@ -46,90 +46,14 @@ sub getAuthOrgListsData {
         }
     }
 
-    my $member_str = join( ',', keys %{ $orgs{$Defs::LEVEL_MEMBER} } );
-    my $club_str   = join( ',', keys %{ $orgs{$Defs::LEVEL_CLUB} } );
+use Data::Dumper;
+print STDERR Dumper(\%nodes);
 
     my $node_str = join( ',', keys %nodes );
     my %org_data = ();
     my %realms   = ();
 
     my %LevelNames = ();
-    if ($member_str) {
-        my $st = qq[
-            SELECT    
-                intMemberID,
-                intRealmID,
-                concat_ws(' ', strFirstname, strSurname) as strName
-            FROM
-                tblMember
-            WHERE intMemberID IN ($member_str)
-            ORDER BY strName
-        ];
-        my $q = $db->prepare($st);
-        $q->execute();
-        while ( my ( $id, $realm, $name ) = $q->fetchrow_array() ) {
-            $realms{$realm} = 1;
-            if ( !$LevelNames{$realm}{$Defs::LEVEL_MEMBER} ) {
-                $LevelNames{$realm} = getNames( $db, $realm );
-            }
-            my $levelname = $LevelNames{$realm}{$Defs::LEVEL_MEMBER} || 'Association';
-            my $logoURL = showLogo( $Data, $Defs::LEVEL_MEMBER, $id, '', 0, 100, 0, );
-
-            my $url = "$Defs::base_url/authenticate.cgi?i=$id&amp;t=$Defs::LEVEL_ASSOC";
-
-            push @{ $org_data{$Defs::LEVEL_MEMBER} },
-              {
-                Name     => $name || next,
-                EntityID => $id   || next,
-                EntityTypeID => $Defs::LEVEL_MEMBER,
-                Logo         => $logoURL,
-                Realm        => $realm,
-                LevelName    => $levelname,
-                URL          => $url,
-              };
-        }
-    }
-    if ($club_str) {
-        my $st = qq[
-            SELECT    
-                E.intEntityID,
-                E.strLocalName,
-                R.strRealmName
-            FROM
-                tblEntity AS E
-                INNER JOIN tblRealms AS R ON E.intRealmID = R.intRealmID
-                LEFT JOIN tblUploadedFiles AS UF ON (
-                    UF.intEntityTypeID = $Defs::LEVEL_CLUB
-                    AND UF.intEntityID = E.intEntityID
-                    AND UF.intFileType = $Defs::UPLOADFILETYPE_LOGO
-                )
-            WHERE E.intEntityID IN ($club_str)
-                AND E.intEntityLevel = $Defs::LEVEL_CLUB
-            ORDER BY E.strLocalName
-        ];
-        my $q = $db->prepare($st);
-        $q->execute();
-        while ( my ( $id, $name, $realm ) = $q->fetchrow_array() ) {
-            $realms{$realm} = 1;
-            my $logoURL = showLogo( $Data, $Defs::LEVEL_CLUB, $id, '', 0, 100, 0, );
-
-            if ( !$LevelNames{$realm}{$Defs::LEVEL_CLUB} ) {
-                $LevelNames{$realm} = getNames( $db, $realm );
-            }
-            my $levelname = $LevelNames{$realm}{$Defs::LEVEL_CLUB} || 'Club';
-            my $url = "$Defs::base_url/authenticate.cgi?i=$id&amp;t=$Defs::LEVEL_CLUB";
-            push @{ $org_data{$Defs::LEVEL_CLUB} },
-              {
-                Name     => $name || next,
-                EntityID => $id   || next,
-                EntityTypeID => $Defs::LEVEL_CLUB,
-                Logo         => $logoURL,
-                Realm        => $realm,
-                LevelName    => $levelname,
-                URL          => $url,
-              };
-        }
-    }
     if ($node_str) {
         my $st = qq[
             SELECT    

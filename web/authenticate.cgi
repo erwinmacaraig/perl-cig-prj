@@ -52,7 +52,6 @@ sub main {
     my $level     = 0;
     my $logins    = 0;
     my $lastlogin = 0;
-    my $assocID   = 0;
     my $days      = 0;
 
     my $type     = '';
@@ -78,6 +77,7 @@ sub main {
         $q->finish();
         $success = 1 if $idcode;
 
+warn("SICCA $success");
         if ($success) {
             my $statement = qq[
 				UPDATE tblUserAuth
@@ -91,15 +91,15 @@ sub main {
             $q->finish;
         }
         else {
-            my ( $valid, $assocID_login ) = validateGlobalAuth( \%Data, $userID, $typeID_IN, $ID_IN);
+            my $valid = validateGlobalAuth( \%Data, $userID, $typeID_IN, $ID_IN);
             if ($valid) {
                 $level   = $typeID_IN;
                 $idcode  = $ID_IN;
-                $assocID = $assocID_login || 0;
                 $success = 1;
             }
         }
     }
+warn("SICC $success");
     if ( !$success ) {
         disconnectDB($db);
 
@@ -142,17 +142,13 @@ sub main {
     my $client = '';
     if ( $level == $Defs::LEVEL_PERSON ) {
         $clientValues{personID} = $idcode;
-        $clientValues{assocID}  = $assocID;
         kickThemOff( 'Invalid Login Parameters', $redirectURL );
     }
     if ( $level == $Defs::LEVEL_CLUB ) {
         $clientValues{clubID}      = $idcode;
-        $clientValues{clubAssocID} = $assocID;
-        $clientValues{assocID}     = $assocID;
         $clientValues{displayClub} = "true";
     }
 
-    $clientValues{assocID}  = $idcode if $level == $Defs::LEVEL_ASSOC;
     $clientValues{zoneID}   = $idcode if $level == $Defs::LEVEL_ZONE;
     $clientValues{regionID} = $idcode if $level == $Defs::LEVEL_REGION;
     $clientValues{stateID}  = $idcode if $level == $Defs::LEVEL_STATE;

@@ -91,11 +91,6 @@ sub show_fieldconfig {
         $client,
     ) = @_;
 
-    # This is a horrible hack, SOOOO so sorry...
-    if ($Data->{'Realm'} == 13) {
-        delete $readonlyfields{'dtRegisteredUntil'};
-    }
-
     my $FieldLabels = undef;
     my $CustomFieldNames=getCustomFieldNames($Data) || '';
     my $realmID=$Data->{'Realm'} || 0;
@@ -125,17 +120,13 @@ sub show_fieldconfig {
     $txts{'childdef'}=$l->txt($permissionNames{'ChildDefine'});
 
     my $unescclient=unescape($client);
-    my $memberFields = getFieldsList($Data, 'Member');
+    my $memberFields = getFieldsList($Data, 'Person');
     my $clubFields = getFieldsList($Data, 'Club');
-    my $teamFields = getFieldsList($Data, 'Team');
     my $subBody = '';
     my @fieldtypelist = ();
     push @fieldtypelist, ['Member', $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} || 'Member'];
     if($currentLevel > $Defs::LEVEL_CLUB and !$Data->{'SystemConfig'}{'NoClubs'})    {
         push @fieldtypelist, ['Club', $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} || 'Club'];
-    }
-    if($currentLevel > $Defs::LEVEL_TEAM and !$Data->{'SystemConfig'}{'NoTeams'})    {
-        push @fieldtypelist, ['Team', $Data->{'LevelNames'}{$Defs::LEVEL_TEAM} || 'Team'];
     }
 
     for my $fieldtyperow (@fieldtypelist)    {
@@ -156,10 +147,6 @@ sub show_fieldconfig {
         elsif($fieldtype eq 'Club')    {
             $field_list = $clubFields;
             $FieldLabels=getFieldLabels($Data, $Defs::LEVEL_CLUB);
-        }
-        elsif($fieldtype eq 'Team')    {
-            $field_list = $teamFields;
-            $FieldLabels=getFieldLabels($Data, $Defs::LEVEL_TEAM);
         }
         my $i;
         for my $f (@$field_list) {
@@ -388,26 +375,19 @@ sub update_fieldconfig {
     if($currentLevel > $Defs::LEVEL_CLUB and !$Data->{'SystemConfig'}{'NoClubs'})    {
         push @fieldtypelist, ['Club', $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} || 'Club'];
     }
-    if($currentLevel > $Defs::LEVEL_TEAM and !$Data->{'SystemConfig'}{'NoTeams'})    {
-        push @fieldtypelist, ['Team', $Data->{'LevelNames'}{$Defs::LEVEL_TEAM} || 'Team'];
-    }
 
     my $q=$Data->{'db'}->prepare($st);
     for my $fieldtyperow (@fieldtypelist)    {
         my $fieldtype = $fieldtyperow->[0];
 
         my @field_list = ();
-        my $memberFields = getFieldsList($Data, 'Member');
+        my $memberFields = getFieldsList($Data, 'Person');
         my $clubFields = getFieldsList($Data, 'Club');
-        my $teamFields = getFieldsList($Data, 'Team');
         if($fieldtype eq 'Member')    {
             @field_list = @{$memberFields};
         }
         elsif($fieldtype eq 'Club')    {
             @field_list = @{$clubFields};
-        }
-        elsif($fieldtype eq 'Team')    {
-            @field_list = @{$teamFields};
         }
         $q_del->execute(
             $realmID,
@@ -489,7 +469,6 @@ sub optionrow    {
         $Defs::LEVEL_STATE,
         $Defs::LEVEL_REGION,
         $Defs::LEVEL_ZONE,
-        $Defs::LEVEL_ASSOC,
         $Defs::LEVEL_CLUB,
     );
 
@@ -501,12 +480,12 @@ sub optionrow    {
     for my $level (@levels_to_check)    {
         if(
             $above
-                or $level eq $entityTypeID
+            or $level eq $entityTypeID
         )    {
             my $type = $fieldtype;
             if(    
                 $fieldtype eq '' 
-                    and $level ne $entityTypeID    
+                and $level ne $entityTypeID    
             )    {
                 $type = 'Child';
             }
@@ -579,9 +558,8 @@ sub FieldConfigPermissionOptions    {
         $Data->{'clientValues'}{'authLevel'} || 0,
         1,
     );
-    my $memberFields = getFieldsList($Data, 'Member');
+    my $memberFields = getFieldsList($Data, 'Person');
     my $clubFields = getFieldsList($Data, 'Club');
-    my $teamFields = getFieldsList($Data, 'Team');
     my $field_list = undef;
     if($fieldgroup eq 'Member')    {
         # previous code don't have this field in list, it might should
@@ -591,9 +569,6 @@ sub FieldConfigPermissionOptions    {
     }
     elsif($fieldgroup eq 'Club')    {
         $field_list = $clubFields;
-    }
-    elsif($fieldgroup eq 'Team')    {
-        $field_list = $teamFields;
     }
     my %fielddata = ();
     for my $f (@$field_list) {

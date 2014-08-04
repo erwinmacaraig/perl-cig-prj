@@ -292,7 +292,7 @@ sub listPersons {
         $Data,
         $Data->{'lang'}->txt('Family Name'),
         '',
-        \%Defs::entityStatus,
+        \%Defs::personStatus,
         { 'ALL' => $Data->{'lang'}->txt('All'), },
     ) || '';
 
