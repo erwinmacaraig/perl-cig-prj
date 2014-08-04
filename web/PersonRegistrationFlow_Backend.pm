@@ -163,41 +163,45 @@ warn("PRODID: $product");
             $regoID,
         );
         my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
+        my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
         $body = qq[
             Registration is complete
             <a href = "$url">Continue</a><br>
+            <a href = "$pay_url">View Transactions</a><br>
         ];
-        my (undef, $paymentTypes) = getPaymentSettings($Data, 0, 0, $Data->{'clientValues'});
-        my $CC_body = qq[<div id = "payment_cc" style= "ddisplay:none;"><br>];
-        my $gatewayCount = 0;
-        foreach my $gateway (@{$paymentTypes})  {
-            $gatewayCount++;
-            my $id = $gateway->{'intPaymentConfigID'};
-            my $pType = $gateway->{'paymentType'};
-            my $name = $gateway->{'gatewayName'};
+        if (1==2)   {
+            my (undef, $paymentTypes) = getPaymentSettings($Data, 0, 0, $Data->{'clientValues'});
+            my $CC_body = qq[<div id = "payment_cc" style= "ddisplay:none;"><br>];
+            my $gatewayCount = 0;
+            foreach my $gateway (@{$paymentTypes})  {
+                $gatewayCount++;
+                my $id = $gateway->{'intPaymentConfigID'};
+                my $pType = $gateway->{'paymentType'};
+                my $name = $gateway->{'gatewayName'};
+                $CC_body .= qq[
+                        <input type="submit" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
+                        <input type="hidden" value="$pType" name="pt_submit[$gatewayCount]">
+                ];
+            }
             $CC_body .= qq[
-                    <input type="submit" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
-                    <input type="hidden" value="$pType" name="pt_submit[$gatewayCount]">
+                        <input type="hidden" value="$gatewayCount" name="gatewayCount">
+                        <div style= "clear:both;"></div>
+                    </div>
+            ];
+            $CC_body = '' if ! $gatewayCount;
+            $body .= qq[
+                <form action="$Data->{target}" method="POST">
+                <input type="hidden" name="a" value="PREGF_CHECKOUT">
+            ];
+            foreach my $hidden (keys %Hidden)   {
+                $body .= qq[<input type="hidden" name="$hidden" value="].$Hidden{$hidden}.qq[">];
+            }
+            $body .= qq[
+                $CC_body
+                </form>
             ];
         }
-        $CC_body .= qq[
-                    <input type="hidden" value="$gatewayCount" name="gatewayCount">
-                    <div style= "clear:both;"></div>
-                </div>
-        ];
-        $CC_body = '' if ! $gatewayCount;
-        $body .= qq[
-            <form action="$Data->{target}" method="POST">
-            <input type="hidden" name="a" value="PREGF_CHECKOUT">
-        ];
-        foreach my $hidden (keys %Hidden)   {
-            $body .= qq[<input type="hidden" name="$hidden" value="].$Hidden{$hidden}.qq[">];
-        }
-        $body .= qq[
-            $CC_body
-            </form>
-        ];
-        
+            
     }    
     elsif ($action eq 'PREGF_CHECKOUT') {
         my $gCount = param('gatewayCount') || 0;
