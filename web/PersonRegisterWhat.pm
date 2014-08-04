@@ -116,6 +116,22 @@ sub optionsPersonRegisterWhat {
     ];
 
     ## IF entityID then get strEntityType
+    my $entityType = '';
+    if ($entityID)  {
+        my $stEntity = qq[
+            SELECT
+                strEntityType
+            FROM
+                tblEntity
+            WHERE 
+                intRealmID = ?
+                AND intEntityID = ?
+            LIMIT 1
+        ];
+        my $qEntity= $Data->{'db'}->prepare($stEntity);
+        $qEntity->execute($Data->{'Realm'}, $entityID);
+        $entityType = $qEntity->fetchrow_array() || '';
+    }
 
     if (! $entityID and $lookingForField ne 'strRegistrationNature')    {
         $st = qq[
@@ -131,7 +147,9 @@ sub optionsPersonRegisterWhat {
             AND strTaskType = 'APPROVAL'
             AND strWFRuleFor = 'REGO'
             $where
+            AND strEntityType IN ('', ?)
     ];
+    push @values, $entityType;
     my @retdata = ();
     if (! $entityID and $lookingForField ne 'strRegistrationNature')   {
         my $qCheck = $Data->{'db'}->prepare($st);
@@ -144,7 +162,8 @@ sub optionsPersonRegisterWhat {
     }
 
     if($entityID and $lookingForField ne 'strRegistrationNature')   {
-        shift @values;
+        shift @values; #Get rid of originLevel
+        pop @values; #Get rid of EntityType
         $st = qq[
             SELECT DISTINCT $lookingForField
             FROM tblEntityRegistrationAllowed
@@ -156,6 +175,7 @@ sub optionsPersonRegisterWhat {
         ];
         unshift @values, $entityID;
     }
+warn($st);
 
     my $q = $Data->{'db'}->prepare($st);
     $q->execute(@values);

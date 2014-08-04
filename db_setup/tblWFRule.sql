@@ -22,6 +22,7 @@ CREATE TABLE tblWFRule (
 
   strTaskType varchar(20) NOT NULL DEFAULT 'APPROVAL' COMMENT 'APPROVAL,DOCUMENT',
   strTaskStatus varchar(20) NOT NULL DEFAULT 'PENDING' COMMENT 'PENDING,ACTIVE',
+  intDocumentTypeID int(11) NOT NULL DEFAULT '0',
    
 
   /*intApprovalRoleID int(11) NOT NULL DEFAULT '0' COMMENT 'Which Role, within and Entity must approve this rule',*/
@@ -31,7 +32,6 @@ CREATE TABLE tblWFRule (
 /*intVersionID INT DEFAULT 0,*/
   /*intPaymentRequired int(11) NOT NULL DEFAULT '0' COMMENT 'Is a payment required for this type of registration',*/
   /*intNationalPeriodID INT DEFAULT 0,*/
-  /*intDocumentTypeID int(11) NOT NULL DEFAULT '0',*/
 
   tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (intWFRuleID),
