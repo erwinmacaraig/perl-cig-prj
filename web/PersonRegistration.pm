@@ -273,6 +273,10 @@ sub getRegistrationData	{
     my $st= qq[
         SELECT 
             pr.*, 
+            p.dtDOB,
+            DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
+            p.intGender,
+            p.intGender as Gender,
             DATE_FORMAT(pr.dtFrom, "%Y%m%d") as dtFrom_,
             DATE_FORMAT(pr.dtTo, "%Y%m%d") as dtTo_,
             DATE_FORMAT(pr.dtAdded, "%Y%m%d%H%i") as dtAdded_,
@@ -283,11 +287,14 @@ sub getRegistrationData	{
             INNER JOIN tblEntity e ON (
                 pr.intEntityID = e.intEntityID 
             )
+            INNER JOIN tblPerson as p ON (
+                p.intPersonID = pr.intPersonID
+            )
         WHERE     
-            intPersonID = ?
+            p.intPersonID = ?
             $where
         ORDER BY
-          dtAdded DESC
+          pr.dtAdded DESC
     ];	
     my $db=$Data->{'db'};
     my $query = $db->prepare($st) or query_error($st);
@@ -450,9 +457,9 @@ sub submitPersonRegistration    {
   	    my $rc = addWorkFlowTasks(
             $Data,
             'REGO', 
-            $pr_ref->{'strRegistrationNature'} || '', 
-            $pr_ref->{'intOriginLevel'} || 0, 
-            $pr_ref->{'intEntityID'} || 0,
+            $pr_ref->{'registrationNature'} || $pr_ref->{'strRegistrationNature'} || '', 
+            $pr_ref->{'originLevel'} || $pr_ref->{'intOriginLevel'} || 0, 
+            $pr_ref->{'entityID'} || $pr_ref->{'intEntityID'} || 0,
             $personID,
             $personRegistrationID, 
             0

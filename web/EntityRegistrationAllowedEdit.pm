@@ -162,7 +162,7 @@ sub rule_details   {
           introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
           NoHTML => 1, 
           beforeaddFunction => \&isRegoAllowedToSystem,
-          beforeaddParams => [$Data, 0, $field->{strRegistrationNature}, $field],
+          beforeaddParams => [$Data, $Data->{'clientValues'}{'authLevel'}, $field->{strRegistrationNature}, $field],
           addSQL => qq[
               INSERT IGNORE INTO tblEntityRegistrationAllowed (
                   intRealmID,
