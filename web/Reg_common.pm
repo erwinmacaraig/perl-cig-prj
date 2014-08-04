@@ -775,24 +775,7 @@ sub allowedAction {
         return 0 if $action =~ /_d$/;
     }
     my $level   = $Data->{'clientValues'}{'authLevel'}  || $Defs::LEVEL_NONE;
-    my $assocID = getAssocID( $Data->{'clientValues'} ) || $Defs::LEVEL_NONE;
     if ( !$Data->{'Permissions'} ) {
-        if ($assocID) {
-            $Data->{'Permissions'} = GetPermissions(
-                $Data,
-                $Data->{'clientValues'}{'currentLevel'},
-                getID(
-                    $Data->{'clientValues'},
-                    $Data->{'clientValues'}{'currentLevel'}
-                ),
-                $Data->{'Realm'},
-                $Data->{'RealmSubType'},
-                $Data->{'clientValues'}{'authLevel'},
-                0,
-            );
-        }
-        else {
-        }
     }
     my $currentID = getID( $Data->{'clientValues'} ) || 0;
     my $currentlevel = $Data->{'clientValues'}{'currentLevel'} || $Defs::LEVEL_NONE;
@@ -803,7 +786,8 @@ sub allowedAction {
     }
 
     return 1 if $parentaccess == $Defs::DATA_ACCESS_FULL;
-    return 0;
+    return 1;
+    #return 0;
 }
 
 sub getRealm {

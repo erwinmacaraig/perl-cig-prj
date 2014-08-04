@@ -14,6 +14,7 @@ use FormHelpers;
 use GridDisplay;
 use Log;
 use EntityStructure;
+use WorkFlow;
 
 require RecordTypeFilter;
 use RuleMatrix;
@@ -40,14 +41,12 @@ sub handleVenues    {
 sub venue_details   {
     my ($action, $Data, $venueID)=@_;
 
-warn("ID:" . $venueID);
     return '' if ($venueID and !venueAllowed($Data, $venueID));
     my $option='display';
     $option='edit' if $action eq 'VENUE_DTE' and allowedAction($Data, 'venue_e');
     $option='add' if $action eq 'VENUE_DTA' and allowedAction($Data, 'venue_a');
     $venueID=0 if $option eq 'add';
     my $field=loadVenueDetails($Data->{'db'}, $venueID) || ();
-warn("NAME:" . $field->{strLocalName});
     
     my $intRealmID = $Data->{'Realm'} >= 0 ? $Data->{'Realm'} : 0;
     my $client=setClient($Data->{'clientValues'}) || '';
@@ -77,8 +76,8 @@ warn("NAME:" . $field->{strLocalName});
         type  => 'text',
         size  => '40',
         maxsize => '150',
-        readonly =>1,
         sectionname => 'details',
+        compulsory => 1,
       },
       strLocalShortName => {
         label => 'Short Name',
@@ -86,8 +85,8 @@ warn("NAME:" . $field->{strLocalName});
         type  => 'text',
         size  => '30',
         maxsize => '50',
-        readonly =>1,
         sectionname => 'details',
+        compulsory => 1,
       },      
       strLatinName => {
         label => 'Name (Latin)',
@@ -96,7 +95,6 @@ warn("NAME:" . $field->{strLocalName});
         size  => '40',
         maxsize => '150',
         sectionname => 'details',
-        readonly =>1,
       },
       strLatinShortName => {
         label => 'Short Name (Latin)',
@@ -109,12 +107,11 @@ warn("NAME:" . $field->{strLocalName});
       
       strStatus => {
           label => 'Status',
-    	  value => $field->{strStatus},
+    	  value => $field->{strStatus} || 'ACTIVE',
     	  type => 'lookup',  
-    	  options => \%Defs::entiyStatus,
+    	  options => \%Defs::entityStatus,
     	  sectionname => 'details',
     	  readonly => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
-    	  firstoption => [ '', " " ],
       },
       
       strAddress => {
@@ -322,8 +319,8 @@ warn("NAME:" . $field->{strLocalName});
         strLocalName
         strLocalShortName
         strLatinName
-        strStatus
         strLatinShortName
+        strStatus
         dtFrom
         dtTo
         strISOCountry
@@ -418,7 +415,7 @@ warn("NAME:" . $field->{strLocalName});
     
     if($option eq 'display')  {
         # Edit Venue.
-        $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DTE&amp;venueID=$venueID">Edit Venue</a></span> ] if allowedAction($Data, 'venue_e');
+        $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DTE&amp;venueID=$venueID">].$Data->{'lang'}->txt('Edit Venue').qq[</a></span> ] if allowedAction($Data, 'venue_e');
     }
     elsif ($option eq 'edit') {
         # Delete Venue.
@@ -587,13 +584,15 @@ sub listVenues  {
     my @rowdata = ();
     while (my $dref = $query->fetchrow_hashref) {
       $results=1;
-      $tempClientValues{currentLevel} = $dref->{CNintEntityLevel};
-      setClientValue(\%tempClientValues, $dref->{CNintEntityLevel}, $dref->{CNintEntityID});
-      my $tempClient = setClient(\%tempClientValues);
+      #$tempClientValues{currentLevel} = $dref->{CNintEntityLevel};
+      #setClientValue(\%tempClientValues, $dref->{CNintEntityLevel}, $dref->{CNintEntityID});
+      #my $tempClient = setClient(\%tempClientValues);
       push @rowdata, {
         id => $dref->{'CNintEntityID'} || 0,
         strLocalName => $dref->{'strLocalName'} || '',
-        SelectLink => "$Data->{'target'}?client=$tempClient&amp;a=VENUE_DTE&amp;venueID=$dref->{'CNintEntityID'}",
+        strStatus => $dref->{'strStatus'} || '',
+        strStatusText => $Data->{'lang'}->txt($Defs::entityStatus{$dref->{'strStatus'}} || ''),
+        SelectLink => "$Data->{'target'}?client=$client&amp;a=VENUE_DTE&amp;venueID=$dref->{'CNintEntityID'}",
       };
     }
     $query->finish;
@@ -602,13 +601,19 @@ sub listVenues  {
     my $title=qq[Venues];
     {
         my $tempClient = setClient(\%tempClientValues);
-        $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$tempClient&amp;a=VENUE_DTA">Add</a></span>];
+        $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>];
 
     }
 
     my $modoptions=qq[<div class="changeoptions">$addlink</div>];
     $title=$modoptions.$title;
-    my $rectype_options=RecordTypeFilter::show_recordtypes($Data, $Defs::LEVEL_ASSOC,undef, undef, 'Name') || '';
+    my $rectype_options=RecordTypeFilter::show_recordtypes(
+        $Data, 
+        $Data->{'lang'}->txt('Name'),
+        '',
+        \%Defs::entityStatus,
+        { 'ALL' => $Data->{'lang'}->txt('All'), },
+    ) || '';
 
     my @headers = (
         {
@@ -621,7 +626,7 @@ sub listVenues  {
         },
         {
             name   => $Data->{'lang'}->txt('Status'),
-            field  => 'intStatus',
+            field  => 'strStatusText',
             editor => 'checkbox',
             type   => 'tick',
             width  => 30,
@@ -635,9 +640,9 @@ sub listVenues  {
             type      => 'regex',
         },
         {
-            field     => 'intStatus',
+            field     => 'strStatus',
             elementID => 'dd_actstatus',
-            allvalue  => '2',
+            allvalue  => 'ALL',
         },
     ];
 
@@ -692,12 +697,10 @@ sub postVenueAdd {
     {
       my $cl=setClient($Data->{'clientValues'}) || '';
       my %cv=getClient($cl);
-      $cv{'venueID'}=$id;
-      $cv{'currentLevel'} = $Defs::LEVEL_VENUE;
       my $clm=setClient(\%cv);
       return (0,qq[
         <div class="OKmsg"> $Data->{'LevelNames'}{$Defs::LEVEL_VENUE} Added Successfully</div><br>
-        <a href="$Data->{'target'}?client=$clm&amp;venueID=$id&amp;a=VENUE_DT">Display Details for $params->{'d_strLocalName'}</a><br><br>
+        <a href="$Data->{'target'}?client=$cl&amp;venueID=$id&amp;a=VENUE_DT">Display Details for $params->{'d_strLocalName'}</a><br><br>
         <b>or</b><br><br>
         <a href="$Data->{'target'}?client=$cl&amp;a=VENUE_DTA&amp;l=$Defs::LEVEL_VENUE">Add another $Data->{'LevelNames'}{$Defs::LEVEL_VENUE}</a>
 
