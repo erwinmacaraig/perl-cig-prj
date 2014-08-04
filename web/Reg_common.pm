@@ -197,7 +197,7 @@ sub allowedTo {
     ( $level, $intID, $readOnly, $roleID ) = $q->fetchrow_array();
     $q->finish();
     if ( !$level and !$intID ) {
-        my ( $valid, undef ) = validateGlobalAuth(
+        my $valid = validateGlobalAuth(
             $Data, $userID,
             $clientValues_ref->{authLevel},
             getID( $clientValues_ref, $clientValues_ref->{authLevel} ),

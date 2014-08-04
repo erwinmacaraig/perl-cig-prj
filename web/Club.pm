@@ -26,6 +26,7 @@ use Transactions;
 use EntityStructure;
 use WorkFlow;
 use RuleMatrix;
+use InstanceOf;
 
 sub handleClub  {
   my ($action, $Data, $clubID, $typeID)=@_;
@@ -528,7 +529,6 @@ sub listClubs   {
   my $results=0;
   while (my $dref = $query->fetchrow_hashref) {
     $results=1;
-    $currentname||=$dref->{PNName};
     $tempClientValues{currentLevel} = $dref->{CNintEntityLevel};
     setClientValue(\%tempClientValues, $dref->{CNintEntityLevel}, $dref->{CNintEntityID});
     my $tempClient = setClient(\%tempClientValues);
@@ -613,6 +613,10 @@ sub listClubs   {
     $grid
   ];
 
+  my $obj = getInstanceOf($Data, 'entity', $entityID);
+  if($obj)   {
+      $currentname = $obj->getValue('strLocalName') || '';
+  }
   my $title=$Data->{'SystemConfig'}{"PageTitle_List_".$Defs::LEVEL_CLUB} 
     || "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB.'_P'} in $currentname"; ###needs translation ->  WHAT in WHAT? 
 

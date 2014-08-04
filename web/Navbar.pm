@@ -186,12 +186,12 @@ sub getEntityMenuData {
             url => $baseurl."a=E_L&amp;l=$Defs::LEVEL_ZONE",
         };
     }
-    if(exists $children->{$Defs::LEVEL_CLUB})    {
+    #if(exists $children->{$Defs::LEVEL_CLUB})    {
         $menuoptions{'clubs'} = {
             name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_CLUB.'_P'}),
             url => $baseurl."a=C_L&amp;l=$Defs::LEVEL_CLUB",
         };
-    }
+    #}
     #if(exists $children->{$Defs::LEVEL_VENUE})    {
         $menuoptions{'venues'} = {
             name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}),
@@ -223,10 +223,6 @@ sub getEntityMenuData {
             url => $baseurl."a=ERA_",
         };
 
-        $menuoptions{'registration'} = {
-            name => $lang->txt('Register'),
-            url => $baseurl."a=REG_",
-        };    
     $menuoptions{'usermanagement'} = {
         name => $lang->txt('User Management'),
         url  => $baseurl."a=AM_",
@@ -359,7 +355,6 @@ if($SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequestCleara
         [ $lang->txt('People'), 'menu','persons'],
         [ $lang->txt('Work Tasks'), 'menu','approvals'],
         [ $lang->txt('Reg. Allowed'), 'menu','entityregistrationallowed'],
-        [ $lang->txt('Registration'), 'menu','registration'],
         [ $lang->txt('Transfers'), 'menu', [
         'clearances',    
         'newclearance',    

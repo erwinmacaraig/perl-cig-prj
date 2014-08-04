@@ -41,32 +41,10 @@ sub validateGlobalAuth {
 		$q->execute($userID);
 		($admin) = $q->fetchrow_array();
 		$q->finish();
-		return (0,0) if !$admin;
 		$cache->set('swm',"GLOBALADMIN_$userID",1,'',60*8) if $cache;
+		return 1 if $admin;
 	}
-
-	if($entityTypeID > $Defs::LEVEL_ASSOC)	{
-		return(1,0);
-	}
-	elsif($entityTypeID == $Defs::LEVEL_ASSOC)	{
-		return(1,$entityID);
-	}
-	elsif(
-		$entityTypeID == $Defs::LEVEL_CLUB
-	)	{
-		my $assocID = 0;
-		if($entityTypeID == $Defs::LEVEL_CLUB)	{
-			#my $obj = getInstanceOf($Data,'club',$entityID);
-			#$assocID = $obj->assocID();
-			my $st = qq[SELECT intAssocID FROM tblAssoc_Clubs WHERE intClubID = ?];
-			my $q = $Data->{'db'}->prepare($st);
-			$q->execute($entityID);
-			($assocID) = $q->fetchrow_array();
-			$q->finish();
-		}
-		return(1,$assocID || 0);
-	}
-	return (1,0);
+    return 0;
 }
 
 
