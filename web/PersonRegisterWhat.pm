@@ -82,6 +82,7 @@ sub optionsPersonRegisterWhat {
     my $lookingForField = $lfTable{$lookingFor} || '';
     return (undef,'Invalid item to look for') if !$lookingForField;
 
+warn("OL".$originLevel);
     my @values = ();
         push @values, $originLevel;
         push @values, $realmID;
@@ -117,10 +118,12 @@ sub optionsPersonRegisterWhat {
 
     ## IF entityID then get strEntityType
     my $entityType = '';
+    my $entityLevel=0;
     if ($entityID)  {
         my $stEntity = qq[
             SELECT
-                strEntityType
+                strEntityType,
+                intEntityLevel
             FROM
                 tblEntity
             WHERE 
@@ -128,28 +131,32 @@ sub optionsPersonRegisterWhat {
                 AND intEntityID = ?
             LIMIT 1
         ];
+warn($st);
+warn("V".$Data->{'Realm'}."E". $entityID);
         my $qEntity= $Data->{'db'}->prepare($stEntity);
         $qEntity->execute($Data->{'Realm'}, $entityID);
-        $entityType = $qEntity->fetchrow_array() || '';
+        ($entityType, $entityLevel) = $qEntity->fetchrow_array() || '';
     }
 
     if (! $entityID and $lookingForField ne 'strRegistrationNature')    {
         $st = qq[
-            SELECT COUNT(intWFRuleID) as CountNum
+            SELECT COUNT(intMatrixID) as CountNum
         ];
     }
     $st .= qq[
-        FROM tblWFRule
+        FROM tblMatrix
         WHERE
             intOriginLevel  = ?
             AND intRealmID = ?
             AND intSubRealmID IN (0,?)
-            AND strTaskType = 'APPROVAL'
-            AND strWFRuleFor = 'REGO'
             $where
             AND strEntityType IN ('', ?)
     ];
     push @values, $entityType;
+    if ($entityLevel)  {
+        $st .= qq[ AND intEntityLevel = ?];
+        push @values, $entityLevel;
+    }
     my @retdata = ();
     if (! $entityID and $lookingForField ne 'strRegistrationNature')   {
         my $qCheck = $Data->{'db'}->prepare($st);
@@ -163,6 +170,7 @@ sub optionsPersonRegisterWhat {
 
     if($entityID and $lookingForField ne 'strRegistrationNature')   {
         shift @values; #Get rid of originLevel
+        pop @values if ($entityLevel); #Get rid of EntityLevel
         pop @values; #Get rid of EntityType
         $st = qq[
             SELECT DISTINCT $lookingForField
@@ -175,11 +183,11 @@ sub optionsPersonRegisterWhat {
         ];
         unshift @values, $entityID;
     }
-warn($st);
 
     my $q = $Data->{'db'}->prepare($st);
     $q->execute(@values);
     my $lookup = ();
+warn($st);
     while(my $val = $q->fetchrow_array())   {
         if($val)    {
             my $label = $lfLabelTable{$lookingFor}{$val};

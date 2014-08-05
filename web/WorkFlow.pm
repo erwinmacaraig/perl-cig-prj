@@ -292,7 +292,7 @@ sub addWorkFlowTasks {
             pr.intEntityID as RegoEntity,
             0 as DocumentID
 		FROM tblPersonRegistration_$Data->{'Realm'} AS pr
-            LEFT JOIN tblEntity as e ON (e.intEntityID = pr.intEntityID)
+        INNER JOIN tblEntity as e ON (e.intEntityID = pr.intEntityID)
 		INNER JOIN tblWFRule AS r ON (
 			pr.intRealmID = r.intRealmID
 			AND pr.intSubRealmID = r.intSubRealmID
@@ -300,6 +300,7 @@ sub addWorkFlowTasks {
 			AND pr.strAgeLevel = r.strAgeLevel
 			AND pr.strSport = r.strSport
             AND pr.strPersonType = r.strPersonType
+            AND pr.intEntityLevel = e.intEntityLevel
         )
 		WHERE 
             pr.intPersonRegistrationID = ?

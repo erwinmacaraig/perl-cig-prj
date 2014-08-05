@@ -1313,7 +1313,8 @@ sub finaliseClearance	{
             C.strSport,
             C.intOriginLevel,
             C.strAgeLevel,
-            C.strPersonEntityRole
+            C.strPersonEntityRole,
+            E.intEntityLevel as DestinationEntityLevel
 		FROM tblClearance as C
 			INNER JOIN tblPerson as M ON (M.intPersonID = C.intPersonID)
 		WHERE intClearanceID = $cID
@@ -1321,7 +1322,7 @@ sub finaliseClearance	{
 	my $query = $db->prepare($st) or query_error($st);
 	$query->execute or query_error($st);
 
-	my ($intPersonID, $intClubID, $intSourceEntityID, $Gender, $DOBAgeGroup, $personType, $personSubType, $personLevel, $sport, $originLevel, $ageLevel, $entityRole) = $query->fetchrow_array();
+	my ($intPersonID, $intClubID, $intSourceEntityID, $Gender, $DOBAgeGroup, $personType, $personSubType, $personLevel, $sport, $originLevel, $ageLevel, $entityRole, $destinationEntityLevel) = $query->fetchrow_array();
 	$intPersonID ||= 0;
 	$intClubID ||= 0;
 	$intSourceEntityID ||= 0;
@@ -1347,9 +1348,10 @@ sub finaliseClearance	{
     $reg{'ageLevel'} = $ageLevel; 
     $reg{'ageGroupID'} = $ageGroupID;
     $reg{'current'} = 1;
+    $reg{'entityLevel'} = $destinationEntityLevel;
     $reg{'registrationNature'} = 'TRANSFER';
 
-    my $matrix_ref = getRuleMatrix($Data, $Defs::ORIGIN_SELF, $reg{'entityType'} || '','REGO', \%reg);
+    my $matrix_ref = getRuleMatrix($Data, $Defs::ORIGIN_SELF, $destinationEntityLevel, $Defs::LEVEL_PERSON, $reg{'entityType'} || '','REGO', \%reg);
     $reg{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
     
     PersonRegistration::addRegistration($Data, \%reg);

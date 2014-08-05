@@ -80,7 +80,7 @@ sub club_details  {
   if ($option eq 'add')   {
       my %Reg=();
       $Reg{'registrationNature'}='NEW';
-      my $matrix_ref = getRuleMatrix($Data, $Data->{'clientValues'}{'authLevel'}, $field->{'strEntityType'}, 'ENTITY', \%Reg);
+      my $matrix_ref = getRuleMatrix($Data, $Data->{'clientValues'}{'authLevel'}, getLastEntityLevel($Data->{'clientValues'}), $Defs::LEVEL_CLUB, $field->{'strEntityType'}, 'ENTITY', \%Reg);
       $paymentRequired = $matrix_ref->{'intPaymentRequired'} || 0;
   }
   

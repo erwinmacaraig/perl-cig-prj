@@ -56,7 +56,7 @@ sub venue_details   {
     if ($option eq 'add')   {
         my %Reg=();
         $Reg{'registrationNature'}='NEW';
-        my $matrix_ref = getRuleMatrix($Data, $Data->{'clientValues'}{'authLevel'}, '', 'ENTITY', \%Reg);
+        my $matrix_ref = getRuleMatrix($Data, $Data->{'clientValues'}{'authLevel'}, getLastEntityLevel($Data->{'clientValues'}), $Defs::LEVEL_VENUE, '', 'ENTITY', \%Reg);
         $paymentRequired = $matrix_ref->{'intPaymentRequired'} || 0;
     }
     my %FieldDefinitions = (

@@ -2,10 +2,11 @@ CREATE TABLE `tblMatrix` (
     intMatrixID int NOT NULL AUTO_INCREMENT,
     intRealmID  INT DEFAULT 0,
     intSubRealmID  INT DEFAULT 0,
-    intEntityLevel TINYINT DEFAULT 0, /* club/venue/person */
+    intOfEntityLevel TINYINT DEFAULT 0, /* Level of entity being registered.. ie: OF type club/venue/person */
+    intEntityLevel TINYINT DEFAULT 0, /* Entity Level Registerign TO */
     strWFRuleFor VARCHAR(30) DEFAULT '',
-    strEntityType VARCHAR(30) DEFAULT '', /* School/club /Player/COACH*/
-    strPersonType VARCHAR(30) DEFAULT '', /* School/club /Player/COACH*/
+    strEntityType VARCHAR(30) DEFAULT '', /* School/club */
+    strPersonType VARCHAR(30) DEFAULT '', /*/Player/COACH*/
     strRegistrationNature VARCHAR(30) DEFAULT '',
     strPersonLevel varchar(10) DEFAULT '', /* pro, amateur */  
     strSport    VARCHAR(20) DEFAULT '',

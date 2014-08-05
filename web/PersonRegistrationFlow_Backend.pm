@@ -56,7 +56,7 @@ sub handleRegistrationFlowBackend   {
     }
     if ( $action eq 'PREGF_TU' ) {
         #add rego record with types etc.
-        ($regoID, $rego_ref) = add_rego_record($Data, $personID, $entityID, $originLevel);
+        ($regoID, $rego_ref) = add_rego_record($Data, $personID, $entityID, $entityLevel, $originLevel);
         $Hidden{'rID'} = $regoID;
         $action = $Flow{$action};
         $personID = $personID || $rego_ref->{'personID'} || $rego_ref->{'intPersonID'} || 0;
@@ -255,7 +255,7 @@ sub save_rego_products {
 
 
 sub add_rego_record{
-    my ($Data, $personID, $entityID, $originLevel) =@_;
+    my ($Data, $personID, $entityID, $entityLevel, $originLevel) =@_;
 
     my $clientValues = $Data->{'clientValues'};
     my $rego_ref = {
@@ -268,6 +268,7 @@ sub add_rego_record{
         originLevel => $originLevel,
         originID => $entityID,
         entityID => $entityID,
+        entityLevel => $entityLevel,
         personID => $personID,
         current => 1,
     };
