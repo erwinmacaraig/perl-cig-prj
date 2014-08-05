@@ -122,15 +122,19 @@ sub club_details  {
         size  => '30',
         maxsize => '50',
       },
+      strEntityType => {
+          label => 'Subtype',
+          value => $field->{strEntityType} || 'Club',
+          type => 'lookup',  
+          options => \%Defs::clubLevelSubtype,
+          sectionname => 'details',
+      },     
       strStatus => {
           label => 'Status',
           value => $field->{strStatus} || 'ACTIVE',
           type => 'lookup',  
           options => \%Defs::entityStatus,
-<<<<<<< HEAD
           sectionname => 'details',
-=======
->>>>>>> c9616cc0b7ba5a435b62cd75eb37c2e937fb4cd7
           readonly => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
       },
       strContact => {
@@ -147,7 +151,6 @@ sub club_details  {
         size  => '30',
         maxsize => '50',
       },
-
       strContactEmail => {
         label => 'Contact Person Email',
         value => $field->{strContactEmail},
@@ -253,6 +256,7 @@ sub club_details  {
         strLocalShortName
         strLatinName
         strLatinShortName
+        strEntityType
         strStatus
         dtFrom
         dtTo
