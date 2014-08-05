@@ -15,7 +15,6 @@ CREATE TABLE tblPersonRegistration_XX (
     intOriginID INT DEFAULT 0, 
     intCreatedByUserID INT DEFAULT 0,
     strRegistrationNature VARCHAR(30) default '', /*NEW, REREG, AMEND etc*/
-    intRegistrationNature int default 0, /*First, Subsequent -- We haev a count ? */
     strAgeLevel VARCHAR(100) default '',
 
     dtFrom date,
