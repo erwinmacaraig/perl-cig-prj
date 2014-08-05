@@ -77,7 +77,6 @@ sub createTempEntityStructure  {
       tblEntity
     WHERE
       intRealmID = ?
-      AND intEntityLevel >= $Defs::LEVEL_CLUB
       AND strStatus <> 'DELETED'
   ];
   my $q_e = $db->prepare($st_e);

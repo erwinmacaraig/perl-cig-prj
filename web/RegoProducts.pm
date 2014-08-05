@@ -159,6 +159,7 @@ sub getAllRegoProducts {
                 AND T.intPersonRegistrationID IN (0, ?)
                 AND T.intTXNEntityID IN (0, ?)
                 AND T.intStatus = 0     
+                AND T.intStatus=999
             )
             LEFT JOIN tblProductPricing as PP ON (
                 PP.intProductID = P.intProductID
@@ -169,6 +170,8 @@ sub getAllRegoProducts {
             AND P.intProductID IN ($productID_str)
         ORDER BY P.strGroup, P.strName, intLevel
     ];
+
+    ## T.intStatus=999 to turn off existing for moment.
             #AND (P.intMinSellLevel <= ? or P.intMinSellLevel=0)
 
     my $q = $Data->{'db'}->prepare($sql);
