@@ -9,6 +9,7 @@ require Exporter;
     mergePersonRegistrations
     submitPersonRegistration
     updatePersonRegistration
+    checkRenewalOK
 );
 
 use strict;
@@ -18,6 +19,27 @@ use RuleMatrix;
 use NationalReportingPeriod;
 use GenAgeGroup;
 use Data::Dumper;
+
+sub checkRenewalOK  {
+
+    my ($Data, $personID, $rego_ref) = @_;
+    my %Reg = (
+        sport=> $rego_ref->{'sport'} || '',
+        personType=> $rego_ref->{'personType'} || '',
+        personEntityRole=> $rego_ref->{'personEntityRole'} || '',
+        personLevel=> $rego_ref->{'personLevel'} || '',
+        ageLevel=> $rego_ref->{'ageLevel'} || '',
+        status=> 'ACTIVE',
+    );
+    my ($count, $regs) = getRegistrationData(
+        $Data,
+        $personID,
+        \%Reg
+    );
+
+    return $count;
+}
+
 
 sub deletePersonRegistered  {
 	my ($Data, $personID, $personRegistrationID) = @_;

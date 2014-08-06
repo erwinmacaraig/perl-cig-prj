@@ -57,9 +57,15 @@ sub handleRegistrationFlowBackend   {
     }
     if ( $action eq 'PREGF_TU' ) {
         #add rego record with types etc.
-        ($regoID, $rego_ref) = add_rego_record($Data, $personID, $entityID, $entityLevel, $originLevel);
+        my $msg='';
+        ($regoID, $rego_ref, $msg) = add_rego_record($Data, $personID, $entityID, $entityLevel, $originLevel);
         if (!$regoID)   {
-            $body = $lang->txt("You cannot register this combination, limit exceeded");
+            if ($msg eq 'LIMIT_EXCEEDED')   {
+                $body = $lang->txt("You cannot register this combination, limit exceeded");
+            }
+            if ($msg eq 'RENEWAL_FAILED')   {
+                $body = $lang->txt("Renewal failed, cannot find existing registration");
+            }
             my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_T";
             $body .= qq[<a href="$url">].$lang->txt("Click here to select new combination").qq[</a>];
         }
@@ -293,10 +299,14 @@ sub add_rego_record{
     };
 
     my $ok = checkRegoTypeLimits($Data, $personID, 0, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
-    return (0, undef) if (!$ok);
+    return (0, undef, 'LIMIT_EXCEEDED') if (!$ok);
+    if ($rego_ref->{'registrationNature'} eq 'RENEWAL') {
+        my $ok = checkRenewalOK($Data, $personID, $rego_ref);
+        return (0, undef, 'RENEWAL_FAILED') if (!$ok);
+    }
     my ($regID,$rc) = addRegistration($Data,$rego_ref);
     if ($regID)     {
-        return ($regID, $rego_ref);
+        return ($regID, $rego_ref, '');
     }
-    return (0, undef);
+    return (0, undef, '');
 }
