@@ -105,6 +105,8 @@ sub displayDuplicateProblems	{
 			$extraFrom
 		WHERE PR.intEntityID = $entityID
 			AND tblPerson.intSystemStatus=$Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
+            AND tblPerson.strStatus <> 'INPROGRESS'
+            AND PR.strStatus <> 'INPROGRESS'
 			AND tblPerson.intRealmID=$realm
 			$extraWhere
 		GROUP BY tblPerson.intPersonID
@@ -144,6 +146,8 @@ sub displayDuplicateProblems	{
 			WHERE tblPerson.intRealmID=$realm
 				AND tblPerson.intSystemStatus <> $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
 				AND tblPerson.intSystemStatus<>$Defs::PERSONSTATUS_DELETED
+                AND tblPerson.strStatus <> 'INPROGRESS'
+                AND PR.strStatus <> 'INPROGRESS'
 				AND ( $where)
 			ORDER BY strLocalSurname, strLocalFirstname, dtDOB
 		];

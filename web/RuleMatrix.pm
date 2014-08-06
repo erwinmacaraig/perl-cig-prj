@@ -16,6 +16,8 @@ sub getRuleMatrix   {
     my (
         $Data,
         $originLevel,
+        $entityLevel,
+        $entityOfLevel,
         $entityType,
         $ruleFor,
         $reg_ref
@@ -24,6 +26,7 @@ sub getRuleMatrix   {
     my @values = (
         $Data->{'Realm'},
         $Data->{'RealmSubType'},
+        $entityOfLevel || 0,
     );
     my $where = '';
     if($reg_ref->{'sport'})  {
@@ -50,6 +53,10 @@ sub getRuleMatrix   {
         push @values, $originLevel;
         $where .= " AND intOriginLevel= ? ";
     }
+    if($entityLevel)  {
+        push @values, $entityLevel;
+        $where .= " AND intEntityLevel = ?"
+    }
     if($entityType)  {
         push @values, $entityType;
         $where .= " AND strEntityType IN ('', ?) ";
@@ -67,6 +74,7 @@ sub getRuleMatrix   {
         WHERE
             intRealmID = ?
             AND intSubRealmID IN (0,?)
+            AND intOfEntityLevel = ?
             $where
         LIMIT 1
     ];

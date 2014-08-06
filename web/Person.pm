@@ -1091,8 +1091,8 @@ sub person_details {
             WHERE tblPerson.intPersonID=$personID
             ],
             addSQL => qq[
-            INSERT INTO tblPerson (intRealmID, --FIELDS--)
-            VALUES ($Data->{'Realm'},  --VAL--)
+            INSERT INTO tblPerson (intRealmID, strStatus, --FIELDS--)
+            VALUES ($Data->{'Realm'},  'INPROGRESS', --VAL--)
             ],
             NoHTML               => 1,
             afterupdateFunction  => \&postPersonUpdate,

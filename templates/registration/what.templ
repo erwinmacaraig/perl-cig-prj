@@ -9,6 +9,7 @@
 <div id = "chosenOptions_wrapper">
     <input type = "hidden" id = "selected_sport">
     <input type = "hidden" id = "selected_type">
+    <input type = "hidden" id = "selected_role">
     <input type = "hidden" id = "selected_level">
     <input type = "hidden" id = "selected_age">
     <input type = "hidden" id = "selected_nature">
@@ -19,6 +20,10 @@
     <div class = "co_row">
         <div class = "co_label">[% Lang.txt('Person Type') %]:</div>
         <div class = "co_value" id = "selected_type_name"></div>
+    </div>
+    <div class = "co_row">
+        <div class = "co_label">[% Lang.txt('Person Role') %]:</div>
+        <div class = "co_value" id = "selected_role_name"></div>
     </div>
     <div class = "co_row">
         <div class = "co_label">[% Lang.txt('Level') %]:</div>
@@ -44,6 +49,7 @@
 <div class = "option_titles" style="display:none;">
     <span id = "regopt_title_sport">[% Lang.txt("Choose the sport") %]</span>
     <span id = "regopt_title_type">[% Lang.txt("Choose the type") %]</span>
+    <span id = "regopt_title_role">[% Lang.txt("Choose the role") %]</span>
     <span id = "regopt_title_level">[% Lang.txt("Choose the level") %]</span>
     <span id = "regopt_title_age">[% Lang.txt("Choose the age group") %]</span>
     <span id = "regopt_title_nature">[% Lang.txt("Choose the nature of the registration") %]</span>
@@ -60,6 +66,7 @@
         var qstring = '';
         qstring = qstring + '&sp=' + jQuery('#selected_sport').val();
         qstring = qstring + '&pt=' + jQuery('#selected_type').val();
+        qstring = qstring + '&per=' + jQuery('#selected_role').val();
         qstring = qstring + '&pl=' + jQuery('#selected_level').val();
         qstring = qstring + '&ag=' + jQuery('#selected_age').val();
         qstring = qstring + '&nat=' + jQuery('#selected_nature').val();
@@ -102,7 +109,8 @@
         jQuery('#selected_' + optionType + "_name").html(name);
         var nextlayer = {
             'sport' : 'type',
-            'type' : 'level',
+            'type' : 'role',
+            'role' : 'level',
             'level' : 'age',
             'age' : 'nature',
             'nature' : 'complete'
@@ -123,6 +131,7 @@
         
         jQuery('#selected_sport').val('');
         jQuery('#selected_type').val('');
+        jQuery('#selected_role').val('');
         jQuery('#selected_level').val('');
         jQuery('#selected_age').val('');
         jQuery('#selected_nature').val('');

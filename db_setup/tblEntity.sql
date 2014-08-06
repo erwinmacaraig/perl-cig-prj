@@ -6,7 +6,7 @@ CREATE TABLE tblEntity (
     intSubRealmID INT DEFAULT 0,
     intDataAccess   TINYINT NOT NULL DEFAULT 10,
     strEntityType VARCHAR(30) DEFAULT '', /* School, Club */
-    strStatus VARCHAR(20) default '', /*Approved, pending, inactive, suspended */
+    strStatus VARCHAR(20) default '', /*ACTIVE, INACTIVE, PENDING, SUSPENDED, DESOLVED */
     intRealmApproved tinyint default 0,
     intCreatedByEntityID INT default 0,
     strFIFAID varchar(30) default '',

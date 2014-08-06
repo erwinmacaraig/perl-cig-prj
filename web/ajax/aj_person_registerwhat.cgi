@@ -19,6 +19,7 @@ sub main	{
     my $originLevel= param('ol') || 0;
     my $registrationNature = param('nat') || '';
     my $personType = param('pt') || '';
+    my $personEntityRole= param('per') || '';
     my $personLevel = param('pl') || '';
     my $sport = param('sp') || '';
     my $ageLevel = param('ag') || '';
@@ -52,6 +53,7 @@ sub main	{
             $originLevel,
             $registrationNature,
             $personType,
+            $personEntityRole,
             $personLevel,
             $sport,
             $ageLevel,

@@ -195,6 +195,7 @@ sub getEntityParentID   {
 	my $q = $Data->{'db'}->prepare($st);
   	$q->execute($fromEntityID);
     my $entityLevel = $q->fetchrow_array() || 0;
+warn("FOR $fromEntityID $entityLevel GET $getEntityLevel");
     return $fromEntityID if ($getEntityLevel == $entityLevel);
 
     $st = qq[
@@ -208,6 +209,7 @@ sub getEntityParentID   {
             AND intPrimary=1
             
     ];
+
 	$q = $Data->{'db'}->prepare($st);
   	$q->execute($fromEntityID, $getEntityLevel);
         
@@ -292,7 +294,7 @@ sub addWorkFlowTasks {
             pr.intEntityID as RegoEntity,
             0 as DocumentID
 		FROM tblPersonRegistration_$Data->{'Realm'} AS pr
-            LEFT JOIN tblEntity as e ON (e.intEntityID = pr.intEntityID)
+        INNER JOIN tblEntity as e ON (e.intEntityID = pr.intEntityID)
 		INNER JOIN tblWFRule AS r ON (
 			pr.intRealmID = r.intRealmID
 			AND pr.intSubRealmID = r.intSubRealmID
@@ -300,6 +302,7 @@ sub addWorkFlowTasks {
 			AND pr.strAgeLevel = r.strAgeLevel
 			AND pr.strSport = r.strSport
             AND pr.strPersonType = r.strPersonType
+            AND r.intEntityLevel = e.intEntityLevel
         )
 		WHERE 
             pr.intPersonRegistrationID = ?
@@ -309,7 +312,9 @@ sub addWorkFlowTasks {
             AND r.intOriginLevel = ?
             AND r.strEntityType IN ('', e.strEntityType)
 			AND r.strRegistrationNature = ?
+            AND r.strPersonEntityRole IN ('', pr.strPersonEntityRole)
 		];
+warn($st);
 	    $q = $db->prepare($st);
   	    $q->execute($personRegistrationID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
     }
@@ -384,8 +389,10 @@ sub addWorkFlowTasks {
 
 
     while (my $dref= $q->fetchrow_hashref())    {
+warn("RULE FOUND");
         my $approvalEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intApprovalEntityLevel'}) || 0;
         my $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intProblemResolutionEntityLevel'});
+warn("DDDD" . $approvalEntityID . "|" . $problemEntityID);
         next if (! $approvalEntityID and ! $problemEntityID);
   	    $qINS->execute(
             $dref->{'intWFRuleID'},
@@ -433,7 +440,7 @@ sub addWorkFlowTasks {
 		return $q->errstr . '<br>' . $st;
 	}
 
-	my $rc = checkForOutstandingTasks($Data,$entityID, $personID, $personRegistrationID);
+	my $rc = checkForOutstandingTasks($Data,$ruleFor, $entityID, $personID, $personRegistrationID, $documentID);
 
 	return($rc); 
 }
@@ -527,7 +534,7 @@ sub checkForOutstandingTasks {
             AND ct.strWFRuleFor = ?
 		ORDER by pt.intWFTaskID;
 	];
-	
+warn("CHECKING FOR OUTSANDING FOR PERSON $personID PR $personRegistrationID");	
 	$q = $db->prepare($st);
   	$q->execute(
   		'PENDING',
@@ -548,6 +555,7 @@ sub checkForOutstandingTasks {
 	if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
 	}
+warn("$ruleFor STILL CHECKING");
 
 	my $prev_WFTaskID = 0;
    	my $updateThisTask = '';
@@ -559,6 +567,7 @@ sub checkForOutstandingTasks {
    	#Should be a cleverer way to do this, but check all the Pending Tasks and see if all of their
    	# pre-reqs have been completed. If so, update their status from Pending to Active.
 	while(my $dref= $q->fetchrow_hashref()) {
+warn("INCHECKING");
 		$count ++;
 	
    		if ($dref->{intWFTaskID} != $prev_WFTaskID) {
@@ -585,6 +594,7 @@ sub checkForOutstandingTasks {
 		}
    	}
 	
+warn("CHECKING $update_count");
 	my $rc = 0;
 	 
 	if ($update_count > 0) {
@@ -689,6 +699,7 @@ sub checkForOutstandingTasks {
                         intPersonRegistrationID = ?
 	        	];
 	    
+warn("UPDATING");
 		        $q = $db->prepare($st);
 		        $q->execute(
 		       		$personRegistrationID

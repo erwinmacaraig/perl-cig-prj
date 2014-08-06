@@ -4,7 +4,7 @@ CREATE TABLE tblPersonRegistration_XX (
     intPersonID int(11) default 0,
     intEntityID int(11) default 0,
     strPersonType varchar(20) default '', /* player, coach, referee */
-    strPersonSubType varchar(50) default '', /*?? or ID */
+    strPersonSubType varchar(20) default '', /* NOT USED FOR NOW */
     strPersonLevel varchar(30) DEFAULT '', /* pro, amateur */
     strPersonEntityRole varchar(50) DEFAULT '', /* Referee, Head Coach, Delegate, Other */
     
@@ -29,7 +29,7 @@ CREATE TABLE tblPersonRegistration_XX (
     intNationalPeriodID INT NOT NULL DEFAULT 0,
     intAgeGroupID  INT NOT NULL DEFAULT 0,
     tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    intPaymentRequired TINYINT DEFAULT 0
+    intPaymentRequired TINYINT DEFAULT 0,
 
   PRIMARY KEY  (intPersonRegistrationID),
   KEY index_intPersonID (intPersonID),

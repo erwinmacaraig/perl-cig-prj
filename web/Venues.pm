@@ -56,7 +56,7 @@ sub venue_details   {
     if ($option eq 'add')   {
         my %Reg=();
         $Reg{'registrationNature'}='NEW';
-        my $matrix_ref = getRuleMatrix($Data, $Data->{'clientValues'}{'authLevel'}, '', 'ENTITY', \%Reg);
+        my $matrix_ref = getRuleMatrix($Data, $Data->{'clientValues'}{'authLevel'}, getLastEntityLevel($Data->{'clientValues'}), $Defs::LEVEL_VENUE, '', 'ENTITY', \%Reg);
         $paymentRequired = $matrix_ref->{'intPaymentRequired'} || 0;
     }
     my %FieldDefinitions = (
@@ -372,6 +372,8 @@ sub venue_details   {
               intEntityLevel, 
               intCreatedByEntityID,
               intPaymentRequired,
+              strStatus,
+              intDataAccess,
               --FIELDS-- 
           )
           VALUES (
@@ -379,6 +381,8 @@ sub venue_details   {
               $Defs::LEVEL_VENUE, 
               $authID,
               $paymentRequired,
+              'PENDING',
+              $Defs::DATA_ACCESS_FULL,
               --VAL-- 
           )
       ],
@@ -732,6 +736,7 @@ sub venueAllowed    {
     my $query = $Data->{'db'}->prepare($st);
     $query->execute($venueID);
     my ($parentID) = $query->fetchrow_array();
+warn("PPPPP".$parentID);
     $query->finish();
     return 0 if !$parentID;
     my $authID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
@@ -747,6 +752,7 @@ sub venueAllowed    {
             AND intDataAccess = $Defs::DATA_ACCESS_FULL
         LIMIT 1
     ];
+warn($st);
     $query = $Data->{'db'}->prepare($st);
     $query->execute($authID, $parentID);
     my ($found) = $query->fetchrow_array();

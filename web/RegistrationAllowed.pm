@@ -10,7 +10,7 @@ use Utils;
 use Log;
 
 sub isRegoAllowedToSystem {
-    my($Rego_ref, $Data, $originLevel, $regNature) = @_; 
+    my($Rego_ref, $Data, $originLevel, $regNature, $entityLevel) = @_; 
 
     $originLevel ||= 0; 
     $regNature ||= '';
@@ -19,18 +19,17 @@ sub isRegoAllowedToSystem {
 	
     my $st = qq[
 		SELECT 
-            COUNT(intWFRuleID) as CountRecords
+            COUNT(intMatrixID) as CountRecords
         FROM
-            tblWFRule
+            tblMatrix
         WHERE
             intRealmID = ?
             AND intSubRealmID IN (0, ?)
-            AND strTaskType = 'APPROVAL'
-            AND strWFRuleFor = 'REGO'
 			AND strPersonType = ?
 			AND strPersonLevel = ?
 			AND strSport = ?
 			AND strAgeLevel = ?		
+			AND intEntityLevel = ?		
     ];
     my @bind=();
     push @bind, $Data->{'Realm'};
@@ -39,6 +38,7 @@ sub isRegoAllowedToSystem {
     push @bind, $Rego_ref->{'d_strPersonLevel'} || $Rego_ref->{'strPersonLevel'} || $Rego_ref->{'personLevel'} || '';
     push @bind, $Rego_ref->{'d_strSport'} || $Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '';
     push @bind, $Rego_ref->{'d_strAgeLevel'} || $Rego_ref->{'strAgeLevel'} || $Rego_ref->{'ageLevel'} || '';
+        push @bind, $entityLevel;
 
     if ($originLevel)   {
         $st .= qq[AND intOriginLevel = ? ];
@@ -54,7 +54,6 @@ sub isRegoAllowedToSystem {
 	$q->execute(@bind) or query_error($st);
 	
     my $count = $q->fetchrow_array() || 0;
-warn("COUNT: $count");
     return (1, '') if $count;
     return (0, $Data->{'lang'}->txt('The system does not allow this combination')) if ! $count;
 
