@@ -13,7 +13,7 @@ require Exporter;
 );
 
 use strict;
-use lib "../..","..";
+use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 use PersonRegistration;
 use RegistrationItem;
 use PersonRegisterWhat;

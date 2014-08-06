@@ -1,6 +1,7 @@
 <form>
 <input type = "hidden" id = "selected_entityID" value = "[% entityID %]">
 <input type = "hidden" id = "originLevel" value = "[% originLevel %]">
+<input type = "hidden" id = "pID" value = "[% personID %]">
 <input type = "hidden" id = "rID" value = "[% realmID %]">
 <input type = "hidden" id = "srID" value = "[% realmSubTypeID %]">
 <input type = "hidden" id = "client" value = "[% client %]">
@@ -74,6 +75,7 @@
         qstring = qstring + '&r=' + jQuery('#rID').val();
         qstring = qstring + '&sr=' + jQuery('#srID').val();
         qstring = qstring + '&eID=' + jQuery('#selected_entityID').val();
+        qstring = qstring + '&pID=' + jQuery('#pID').val();
 
         if(optionType == 'complete')    {
           jQuery('#regopt_options').html('');

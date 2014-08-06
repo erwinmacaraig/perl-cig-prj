@@ -6,7 +6,7 @@ require Exporter;
 );
 
 use strict;
-use lib "../..","..";
+use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 use PersonRegistration;
 use RegistrationItem;
 use PersonRegisterWhat;
@@ -16,6 +16,7 @@ use CGI qw(:cgi unescape);
 use Payments;
 use RegoTypeLimits;
 use PersonRegistrationFlow_Common;
+use Person;
 
 use Data::Dumper;
 
@@ -31,7 +32,7 @@ sub handleRegistrationFlowBackend   {
     my $cgi=new CGI;
     my %params=$cgi->Vars();
     my $lang = $Data->{'lang'};
-    my $personID = getID($clientValues, $Defs::LEVEL_PERSON) || 0;
+    my $personID = param('pID') || getID($clientValues, $Defs::LEVEL_PERSON) || 0;
     my $entityID = getLastEntityID($clientValues) || 0;
     my $entityLevel = getLastEntityLevel($clientValues) || 0;
     my $originLevel = $Data->{'clientValues'}{'authLevel'} || 0;
@@ -46,6 +47,12 @@ sub handleRegistrationFlowBackend   {
     $Hidden{'rID'} = $regoID;
     $Hidden{'client'} = unescape($cl);
     $Hidden{'txnIds'} = $params{'txnIds'} || '';
+
+    my $pref= undef;
+    if ($personID)  {
+        $pref = loadPersonDetails($Data->{'db'}, $personID);
+    }
+warn("FBEND:$personID");
 
     if($regoID) {
         my $valid =0;
@@ -88,15 +95,14 @@ sub handleRegistrationFlowBackend   {
 
 ## FLOW SCREENS
     if ( $action eq 'PREGF_T' ) {
+warn("HERE $personID | $entityID");
         my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_TU&amp;";
-        my $dob = '';
-        my $gender = '';
         $body = displayPersonRegisterWhat(
             $Data,
             $personID,
             $entityID,
-            $dob,
-            $gender,        
+            $pref->{'dtDOB_RAW'} || '',
+            $pref->{'intGender'} || 0,
             $originLevel,
             $url,
         );
