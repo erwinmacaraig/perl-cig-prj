@@ -112,6 +112,7 @@ sub venue_details   {
     	  options => \%Defs::entityStatus,
     	  sectionname => 'details',
     	  readonly => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
+          noadd=>1,
       },
       
       strAddress => {
