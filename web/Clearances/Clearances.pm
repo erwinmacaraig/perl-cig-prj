@@ -1504,6 +1504,7 @@ sub createClearance	{
 				AND C.intEntityID <> $entityID 
 				AND PR.strStatus <> 'TRANSFERRED'
                 AND M.strStatus <> 'INPROGRESS'
+                AND PR.strStatus <> 'INPROGRESS'
                 AND M.intSystemStatus = $Defs::PERSONSTATUS_ACTIVE
 				$strWhere
 			GROUP BY M.intPersonID, C.intEntityID
