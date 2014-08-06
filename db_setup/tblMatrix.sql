@@ -14,7 +14,6 @@ CREATE TABLE `tblMatrix` (
     intOriginLevel INT DEFAULT 0, /* Self, club, Reg, MA */
     strAgeLevel VARCHAR(20) NOT NULL DEFAULT 'ALL', /* ALL,ADULT,MINOR */
     intPaymentRequired TINYINT DEFAULT 0,
-    intProblemResolutionLevel INT NOT NULL DEFAULT 3,
     dtAdded date,
 
     tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

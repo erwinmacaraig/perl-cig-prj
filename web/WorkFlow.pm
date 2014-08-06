@@ -699,11 +699,24 @@ warn("CHECKING $update_count");
                         intPersonRegistrationID = ?
 	        	];
 	    
-warn("UPDATING");
 		        $q = $db->prepare($st);
 		        $q->execute(
 		       		$personRegistrationID
 		  			);         
+	        	$rc = 1;	# All registration tasks have been completed        		
+        }
+        if ($personID)  {
+                $st = qq[
+	            	UPDATE tblPerson
+                    SET
+	            	    strStatus = 'ACTIVE'
+	    	        WHERE 
+                        intPersonID= ?
+                        AND strStatus='PENDING'
+	        	];
+	    
+		        $q = $db->prepare($st);
+		        $q->execute( $personID); 
 	        	$rc = 1;	# All registration tasks have been completed        		
         	#}
         }

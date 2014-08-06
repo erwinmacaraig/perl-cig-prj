@@ -27,7 +27,6 @@ sub getRegistrationItems    {
     my $st = qq[
 		SELECT 
             intID,
-            intPaymentRequired,
             intRequired,
             intUseExistingThisEntity,
             intUseExistingAnyEntity
@@ -75,7 +74,6 @@ warn("ITEM");
         $Item{'UseExistingThisEntity'} = $dref->{'intUseExistingThisEntity'} || 0;
         $Item{'UseExistingAnyEntity'} = $dref->{'intUseExistingAnyEntity'} || 0;
         $Item{'Required'} = $dref->{'intRequired'} || 0;
-        $Item{'PaymentRequired'} = $dref->{'intPaymentRequired'} || 0;
         if ($itemType eq 'PRODUCT') {
             $Item{'ProductPrice'} = getItemCost($Data, $entityID, $entityLevel, $multiPersonType, $dref->{'intID'}) || 0;
         }
