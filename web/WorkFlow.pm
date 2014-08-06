@@ -195,7 +195,6 @@ sub getEntityParentID   {
 	my $q = $Data->{'db'}->prepare($st);
   	$q->execute($fromEntityID);
     my $entityLevel = $q->fetchrow_array() || 0;
-warn("FOR $fromEntityID $entityLevel GET $getEntityLevel");
     return $fromEntityID if ($getEntityLevel == $entityLevel);
 
     $st = qq[
@@ -206,14 +205,16 @@ warn("FOR $fromEntityID $entityLevel GET $getEntityLevel");
 		WHERE
             intChildID = ?
             AND intParentLevel = ?
-            AND intPrimary=1
-            
+        ORDER BY intPrimary DESC
+        LIMIT 1            
     ];
+            #AND intPrimary=1
 
 	$q = $Data->{'db'}->prepare($st);
   	$q->execute($fromEntityID, $getEntityLevel);
         
-    return $q->fetchrow_array() || 0;
+    return  $q->fetchrow_array() || 0;
+    
 }
 sub addWorkFlowTasks {
      my(
@@ -350,6 +351,7 @@ warn($st);
             AND r.intOriginLevel = ?
 			AND r.strRegistrationNature = ?
 		];
+warn($st);
 	    $q = $db->prepare($st);
   	    $q->execute($entityID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
     }
