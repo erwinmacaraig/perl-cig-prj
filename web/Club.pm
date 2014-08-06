@@ -125,14 +125,11 @@ sub club_details  {
         size  => '30',
         maxsize => '50',
       },
-                
       strEntityType => {
            label => "Subtype",
            value => $field->{strEntityType},
            type => 'lookup',
            options => \%Defs::clubLevelSubtype,
-           readonly => $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB ? 0 : 1,
- 
      },
       strStatus => {
           label => 'Status',
