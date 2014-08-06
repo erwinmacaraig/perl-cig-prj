@@ -37,7 +37,9 @@ my $Fields = {
 		strPager
 		strFax
 		strEmail
-		strEmail2
+		strEmail2 
+                strStatus
+                strEntityType
 		intOccupationID
 		intEthnicityID
 		intMailingList
