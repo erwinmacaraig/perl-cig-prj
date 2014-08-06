@@ -7,6 +7,7 @@ CREATE TABLE `tblMatrix` (
     strWFRuleFor VARCHAR(30) DEFAULT '',
     strEntityType VARCHAR(30) DEFAULT '', /* School/club */
     strPersonType VARCHAR(30) DEFAULT '', /*/Player/COACH*/
+    strPersonEntityRole varchar(50) DEFAULT '',
     strRegistrationNature VARCHAR(30) DEFAULT '',
     strPersonLevel varchar(10) DEFAULT '', /* pro, amateur */  
     strSport    VARCHAR(20) DEFAULT '',

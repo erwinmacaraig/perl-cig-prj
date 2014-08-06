@@ -4,7 +4,7 @@ CREATE TABLE tblPersonRegistration_XX (
     intPersonID int(11) default 0,
     intEntityID int(11) default 0,
     strPersonType varchar(20) default '', /* player, coach, referee */
-    strPersonSubType varchar(50) default '', /*?? or ID */
+    strPersonSubType varchar(20) default '', /* NOT USED FOR NOW */
     strPersonLevel varchar(30) DEFAULT '', /* pro, amateur */
     strPersonEntityRole varchar(50) DEFAULT '', /* Referee, Head Coach, Delegate, Other */
     

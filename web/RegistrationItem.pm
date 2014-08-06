@@ -43,6 +43,7 @@ sub getRegistrationItems    {
             AND intEntityLevel = ?
 			AND strPersonType = ?
 			AND strPersonLevel = ?
+            AND strPersonEntityRole IN ('', ?)
 			AND strSport = ?
 			AND strAgeLevel = ?		
             AND strItemType = ?
@@ -59,6 +60,7 @@ sub getRegistrationItems    {
         $Rego_ref->{'strEntityLevel'} || $Rego_ref->{'entityLevel'} || 0,
 		$Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '',
 		$Rego_ref->{'strPersonLevel'} || $Rego_ref->{'personLevel'} || '',
+		$Rego_ref->{'strPersonEntityRole'} || $Rego_ref->{'personEntityRole'} || '',
 		$Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '',
 		$Rego_ref->{'strAgeLevel'} || $Rego_ref->{'ageLevel'} || '',
         $itemType

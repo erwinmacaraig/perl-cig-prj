@@ -81,7 +81,7 @@ sub insertSelfTransfer  {
             SYSDATE(), 
             ?,
             ?,
-            ?,
+            ?, 
             ?, 
             ?,
             ?,
@@ -1340,7 +1340,6 @@ sub finaliseClearance	{
     $reg{'personID'} = $intPersonID;
     $reg{'entityID'} = $intClubID;
     $reg{'personType'} = $personType;
-    $reg{'personSubType'} = $personSubType;
     $reg{'personEntityRole'} = $entityRole;
     $reg{'personLevel'} = $personLevel;
     $reg{'sport'} = $sport;
@@ -1504,6 +1503,7 @@ sub createClearance	{
                 M.intRealmID = $Data->{'Realm'}
 				AND C.intEntityID <> $entityID 
 				AND PR.strStatus <> 'TRANSFERRED'
+                AND M.strStatus <> 'INPROGRESS'
                 AND M.intSystemStatus = $Defs::PERSONSTATUS_ACTIVE
 				$strWhere
 			GROUP BY M.intPersonID, C.intEntityID

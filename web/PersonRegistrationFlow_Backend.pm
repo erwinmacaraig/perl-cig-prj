@@ -261,6 +261,7 @@ sub add_rego_record{
     my $rego_ref = {
         status => 'INPROGRESS',
         personType => param('pt') || '',
+        personEntityRole=> param('per') || '',
         personLevel => param('pl') || '',
         sport => param('sp') || '',
         ageLevel => param('ag') || '',
