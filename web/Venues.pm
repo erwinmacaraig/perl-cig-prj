@@ -373,6 +373,7 @@ sub venue_details   {
               intCreatedByEntityID,
               intPaymentRequired,
               strStatus,
+              intDataAccess,
               --FIELDS-- 
           )
           VALUES (
@@ -381,6 +382,7 @@ sub venue_details   {
               $authID,
               $paymentRequired,
               'PENDING',
+              $Defs::DATA_ACCESS_FULL,
               --VAL-- 
           )
       ],
@@ -734,6 +736,7 @@ sub venueAllowed    {
     my $query = $Data->{'db'}->prepare($st);
     $query->execute($venueID);
     my ($parentID) = $query->fetchrow_array();
+warn("PPPPP".$parentID);
     $query->finish();
     return 0 if !$parentID;
     my $authID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
@@ -749,6 +752,7 @@ sub venueAllowed    {
             AND intDataAccess = $Defs::DATA_ACCESS_FULL
         LIMIT 1
     ];
+warn($st);
     $query = $Data->{'db'}->prepare($st);
     $query->execute($authID, $parentID);
     my ($found) = $query->fetchrow_array();

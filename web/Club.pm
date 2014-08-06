@@ -303,6 +303,7 @@ sub club_details  {
             intEntityLevel,
             intCreatedByEntityID,
             strStatus,
+            intDataAccess,
             --FIELDS--
          )
           VALUES (
@@ -310,6 +311,7 @@ sub club_details  {
             $Defs::LEVEL_CLUB,
             $authID,
             'PENDING',
+            $Defs::DATA_ACCESS_FULL,
              --VAL-- )
         ],
       auditFunction=> \&auditLog,
