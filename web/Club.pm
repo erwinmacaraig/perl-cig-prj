@@ -436,7 +436,7 @@ sub postClubAdd {
       $query->execute($entityID, $id);
       $query->finish();
         
-      #addWorkFlowTasks($Data, 'ENTITY', 'NEW', $Data->{'clientValues'}{'authLevel'}, $id,0,0, 0);
+      addWorkFlowTasks($Data, 'ENTITY', 'NEW', $Data->{'clientValues'}{'authLevel'}, $id,0,0, 0);
     }
 
     my %clubchars = ();
