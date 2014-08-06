@@ -7,6 +7,11 @@ CREATE TABLE tblDocuments (
     strApprovalStatus TINYINT DEFAULT 0, /* PENDING , APPROVED, REJECTED */
     strDeniedNotes  TEXT default '',
     dtAdded datetime,
+    strPath VARCHAR(50) NOT NULL,
+    strFilename VARCHAR(50) NOT NULL,
+    strOrigFilename VARCHAR(250) NOT NULL,
+    strExtension CHAR(4),
+    intBytes INT DEFAULT 1,
     tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   PRIMARY KEY (intDocumentID),
