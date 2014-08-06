@@ -11,6 +11,7 @@ use Utils;
 use Reg_common;
 use TTTemplate;
 use Log;
+use EntityTypeRoles;
 
 
 sub displayPersonRegisterWhat   {
@@ -54,6 +55,7 @@ sub optionsPersonRegisterWhat {
         $originLevel,
         $registrationNature,
         $personType,
+        $personEntityRole,
         $personLevel,
         $sport,
         $ageLevel,
@@ -70,9 +72,12 @@ sub optionsPersonRegisterWhat {
         level => 'strPersonLevel',
         age => 'strAgeLevel',
         sport => 'strSport',
+        role => 'strPersonEntityRole',
     );
+    my $role_ref = getEntityTypeRoles($Data, $sport, $personType);
     my %lfLabelTable = (
         type => \%Defs::personType,
+        role=> $role_ref,
         nature => \%Defs::registrationNature,
         level => \%Defs::personLevel,
         age => \%Defs::ageLevel,
@@ -82,33 +87,48 @@ sub optionsPersonRegisterWhat {
     my $lookingForField = $lfTable{$lookingFor} || '';
     return (undef,'Invalid item to look for') if !$lookingForField;
 
-    my @values = ();
-        push @values, $originLevel;
-        push @values, $realmID;
-        push @values, $subRealmID;
-    my $where = '';
-    #if ($lookingForField eq 'strRegistrationNature')    {
-        #push @values, $originLevel;
-    #}
+    my @ERAvalues = ();
+    my @MATRIXvalues = ();
+    my $MATRIXwhere = '';
+    my $ERAwhere = '';
+    push @MATRIXvalues, $originLevel;
+    push @MATRIXvalues, $realmID;
+    push @MATRIXvalues, $subRealmID;
+    push @ERAvalues, $entityID;
+    push @ERAvalues, $realmID;
+    push @ERAvalues, $subRealmID;
+
     if($sport)  {
-        push @values, $sport;
-        $where .= " AND strSport = ? ";
+        push @MATRIXvalues, $sport;
+        push @ERAvalues, $sport;
+        $MATRIXwhere .= " AND strSport = ? ";
+        $ERAwhere .= " AND strSport = ? ";
     }
     if($registrationNature)  {
-        push @values, $registrationNature;
-        $where .= " AND strRegistrationNature = ? ";
+        push @MATRIXvalues, $registrationNature;
+        $MATRIXwhere .= " AND strRegistrationNature = ? ";
     }
     if($personType)  {
-        push @values, $personType;
-        $where .= " AND strPersonType = ? ";
+        push @MATRIXvalues, $personType;
+        push @ERAvalues, $personType;
+        $MATRIXwhere .= " AND strPersonType = ? ";
+        $ERAwhere .= " AND strPersonType = ? ";
+    }
+    if($personEntityRole)  {
+        push @MATRIXvalues, $personEntityRole;
+        $MATRIXwhere .= " AND strPersonEntityRole IN ('', ?) ";
     }
     if($personLevel)  {
-        push @values, $personLevel;
-        $where .= " AND strPersonLevel = ? ";
+        push @MATRIXvalues, $personLevel;
+        push @ERAvalues, $personLevel;
+        $MATRIXwhere .= " AND strPersonLevel = ? ";
+        $ERAwhere .= " AND strPersonLevel = ? ";
     }
     if($ageLevel)  {
-        push @values, $ageLevel;
-        $where .= " AND strAgeLevel IN ('ALL_AGES', ?) ";
+        push @MATRIXvalues, $ageLevel;
+        push @ERAvalues, $ageLevel;
+        $MATRIXwhere .= " AND strAgeLevel IN ('ALL_AGES', ?) ";
+        $ERAwhere .= " AND strAgeLevel IN ('ALL_AGES', ?) ";
     }
 
     my $st = qq[
@@ -116,11 +136,14 @@ sub optionsPersonRegisterWhat {
     ];
 
     ## IF entityID then get strEntityType
+    my @retdata = ();
     my $entityType = '';
+    my $entityLevel=0;
     if ($entityID)  {
         my $stEntity = qq[
             SELECT
-                strEntityType
+                strEntityType,
+                intEntityLevel
             FROM
                 tblEntity
             WHERE 
@@ -130,40 +153,58 @@ sub optionsPersonRegisterWhat {
         ];
         my $qEntity= $Data->{'db'}->prepare($stEntity);
         $qEntity->execute($Data->{'Realm'}, $entityID);
-        $entityType = $qEntity->fetchrow_array() || '';
+        ($entityType, $entityLevel) = $qEntity->fetchrow_array() || '';
     }
 
+    if ($lookingForField eq 'strPersonEntityRole')  {
+warn("SHOULD THIS MOVE TO FUTHER DOWN ?");
+        foreach my $key (keys %{$role_ref})   {
+            push @retdata, {
+                name => $role_ref->{$key},
+                value => $key,
+            };
+        }
+        if (! @retdata) {
+            push @retdata, {
+                name => '-',
+                value => '-',
+            };
+        }
+        return (\@retdata, '');
+    }
     if (! $entityID and $lookingForField ne 'strRegistrationNature')    {
         $st = qq[
-            SELECT COUNT(intWFRuleID) as CountNum
+            SELECT COUNT(intMatrixID) as CountNum
         ];
     }
     $st .= qq[
-        FROM tblWFRule
+        FROM tblMatrix
         WHERE
             intOriginLevel  = ?
             AND intRealmID = ?
             AND intSubRealmID IN (0,?)
-            AND strTaskType = 'APPROVAL'
-            AND strWFRuleFor = 'REGO'
-            $where
+            $MATRIXwhere
             AND strEntityType IN ('', ?)
     ];
-    push @values, $entityType;
-    my @retdata = ();
+    push @MATRIXvalues, $entityType;
+warn($st);
+    if ($entityLevel)  {
+        $st .= qq[ AND intEntityLevel = ?];
+        push @MATRIXvalues, $entityLevel;
+    }
     if (! $entityID and $lookingForField ne 'strRegistrationNature')   {
         my $qCheck = $Data->{'db'}->prepare($st);
-        $qCheck->execute(@values);
+        $qCheck->execute(@MATRIXvalues);
         my $ok = $qCheck->fetchrow_array() || 0;
        # warn ("OK IS $ok");
         if (! $ok)  {
+warn("NOT OK");
             return (\@retdata, '');
         }
     }
 
+    my @values = ();
     if($entityID and $lookingForField ne 'strRegistrationNature')   {
-        shift @values; #Get rid of originLevel
-        pop @values; #Get rid of EntityType
         $st = qq[
             SELECT DISTINCT $lookingForField
             FROM tblEntityRegistrationAllowed
@@ -171,11 +212,14 @@ sub optionsPersonRegisterWhat {
                 intEntityID = ?
                 AND intRealmID = ?
                 AND intSubRealmID IN (0,?)
-                $where
+                $ERAwhere
         ];
-        unshift @values, $entityID;
+        @values = @ERAvalues;
     }
-warn($st);
+    else    {
+        @values = @MATRIXvalues;
+    }
+    
 
     my $q = $Data->{'db'}->prepare($st);
     $q->execute(@values);

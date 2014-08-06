@@ -9,7 +9,7 @@ CREATE TABLE tblPerson (
     strFIFAID varchar(30) default '',
     intDataOrigin INT DEFAULT 0,
 
-    strStatus varchar(20) DEFAULT '', /* pending/registered/de-registered/transferred/deceased */
+    strStatus varchar(20) DEFAULT '', /* ACTIVE/INACTIVE/PENDING/TRANSFERRED/DECEASED/SUSPENDED*/
     intSystemStatus TINYINT DEFAULT 0, /* for things like duplicate etc */
     intPhoto TINYINT DEFAULT 0, 
 

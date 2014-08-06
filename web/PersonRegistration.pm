@@ -169,6 +169,13 @@ sub updatePersonRegistration    {
 
     my ($Data, $personID, $personRegistrationID, $Reg_ref) = @_;
 
+    if ($Reg_ref->{'personEntityRole'} eq '-')  {
+        $Reg_ref->{'personEntityRole'}= '';
+    }
+    if ($Reg_ref->{'strPersonEntityRole'} eq '-')  {
+        $Reg_ref->{'strPersonEntityRole'}= '';
+    }
+        
 	my $st = qq[
    		UPDATE tblPersonRegistration_$Data->{'Realm'} 
         SET
@@ -225,6 +232,13 @@ sub getRegistrationData	{
         $personID,
     );
     my $where = '';
+
+    if ($regFilters_ref>{'personEntityRole'} eq '-')  {
+        $regFilters_ref->{'personEntityRole'}= '';
+    }
+    if ($regFilters_ref->{'strPersonEntityRole'} eq '-')  {
+        $regFilters_ref->{'strPersonEntityRole'}= '';
+    }
     if($regFilters_ref->{'personRegistrationID'})  {
         push @values, $regFilters_ref->{'personRegistrationID'};
         $where .= " AND pr.intPersonRegistrationID= ? ";
@@ -313,10 +327,13 @@ sub getRegistrationData	{
 sub addRegistration {
     my($Data, $Reg_ref) = @_;
 
+    if ($Reg_ref->{'personEntityRole'} eq '-')  {
+        $Reg_ref->{'personEntityRole'}= '';
+    }
     my $status = $Reg_ref->{'status'} || 'PENDING';
 
     if (! exists $Reg_ref->{'paymentRequired'})    {
-        my $matrix_ref = getRuleMatrix($Data, $Reg_ref->{'originLevel'}, $Reg_ref->{'entityType'} || '', 'REGO', $Reg_ref);
+        my $matrix_ref = getRuleMatrix($Data, $Reg_ref->{'originLevel'}, $Reg_ref->{'entityLevel'}, $Defs::LEVEL_PERSON, $Reg_ref->{'entityType'} || '', 'REGO', $Reg_ref);
         $Reg_ref->{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
     }
     my $nationalPeriodID = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $Reg_ref->{'sport'});
@@ -435,6 +452,7 @@ sub addRegistration {
             $personRegistrationID, 
             0
         );
+        personInProgressToPending($Data, $Reg_ref->{'personID'});
     }
   	
  	return ($personRegistrationID, $rc) ;
@@ -464,9 +482,26 @@ sub submitPersonRegistration    {
             $personRegistrationID, 
             0
         );
+        personInProgressToPending($Data, $personID);
     }
 }
 
+sub personInProgressToPending {
 
+    my ($Data, $personID) = @_;
+
+    return if (! $personID);
+    my $st = qq[
+        UPDATE tblPerson
+        SET strStatus='PENDING'
+        WHERE 
+            intPersonID=?
+            AND intRealmID=?
+            AND strStatus='INPROGRESS'
+        LIMIT 1
+    ];
+    my $qry=$Data->{'db'}->prepare($st);
+    $qry->execute($personID, $Data->{'Realm'});
+}
 
 1;
