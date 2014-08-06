@@ -83,7 +83,10 @@ sub club_details  {
       my $matrix_ref = getRuleMatrix($Data, $Data->{'clientValues'}{'authLevel'}, getLastEntityLevel($Data->{'clientValues'}), $Defs::LEVEL_CLUB, $field->{'strEntityType'}, 'ENTITY', \%Reg);
       $paymentRequired = $matrix_ref->{'intPaymentRequired'} || 0;
   }
-  
+  my %keyparams = (); 
+  foreach my $i (keys $Data->{clientValues}){
+   $keyparams{$i} = $Data->{clientValues}{$i};
+  }
   my %FieldDefinitions=(
     fields=>  {
       strFIFAID => {
@@ -122,14 +125,22 @@ sub club_details  {
         size  => '30',
         maxsize => '50',
       },
+                
+      strEntityType => {
+           label => "Subtype",
+           value => $field->{strEntityType},
+           type => 'lookup',
+           options => \%Defs::clubLevelSubtype,
+           readonly => $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB ? 0 : 1,
+ 
+     },
       strStatus => {
           label => 'Status',
-          value => $field->{strStatus} || 'ACTIVE',
+          value => $field->{strStatus},
           type => 'lookup',  
           options => \%Defs::entityStatus,
           readonly => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
-      },
-      
+     },
       strContact => {
         label => 'Contact Person',
         value => $field->{strContact},
@@ -144,7 +155,6 @@ sub club_details  {
         size  => '30',
         maxsize => '50',
       },
-
       strContactEmail => {
         label => 'Contact Person Email',
         value => $field->{strContactEmail},
@@ -250,6 +260,7 @@ sub club_details  {
         strLocalShortName
         strLatinName
         strLatinShortName
+        strEntityType
         strStatus
         dtFrom
         dtTo
@@ -270,7 +281,7 @@ sub club_details  {
     )],
     fieldtransform => {
       textcase => {
-        strName => $field_case_rules->{'strName'} || '',
+      strName => $field_case_rules->{'strName'} || '',
       }
     },
     options => {
@@ -287,13 +298,17 @@ sub club_details  {
         WHERE intEntityID=$clubID
       ],
       addSQL => qq[
-        INSERT INTO tblEntity
-          (intRealmID, intEntityLevel, strStatus, intCreatedByEntityID, --FIELDS-- )
+        INSERT INTO tblEntity (
+            intRealmID,
+            intEntityLevel,
+            intCreatedByEntityID,
+            --FIELDS--
+         )
           VALUES (
             $Data->{'Realm'},
             $Defs::LEVEL_CLUB,
             $authID,
-            'PENDING', --VAL-- )
+             --VAL-- )
         ],
       auditFunction=> \&auditLog,
       auditAddParams => [
@@ -326,9 +341,8 @@ sub club_details  {
     'Club',
   );
   $clubperms->{'clubcharacteristics'} = 1;
-
-  my $resultHTML='';
-  ($resultHTML, undef )=handleHTMLForm(\%FieldDefinitions, $clubperms, $option, '',$Data->{'db'});
+my $resultHTML='' ;
+($resultHTML, undef )=handleHTMLForm(\%FieldDefinitions, $clubperms, $option, '',$Data->{'db'});
   my $title=$field->{'strLocalName'} || '';
   my $scMenu = (allowedAction($Data, 'c_e'))
     ? getServicesContactsMenu($Data, $Defs::LEVEL_CLUB, $clubID, $Defs::SC_MENU_SHORT, $Defs::SC_MENU_CURRENT_OPTION_DETAILS)
@@ -352,7 +366,6 @@ sub club_details  {
   }
   $resultHTML = $scMenu.$logodisplay.$resultHTML;
   $title="Add New $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}" if $option eq 'add';
-
   return ($resultHTML,$title);
 }
 
@@ -631,5 +644,4 @@ sub listClubs   {
   
   return ($resultHTML,$title);
 }
-
 1;
