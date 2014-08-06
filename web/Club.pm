@@ -302,7 +302,6 @@ sub club_details  {
             intRealmID,
             intEntityLevel,
             intCreatedByEntityID,
-            strStatus,
             intDataAccess,
             --FIELDS--
          )
@@ -310,7 +309,6 @@ sub club_details  {
             $Data->{'Realm'},
             $Defs::LEVEL_CLUB,
             $authID,
-            'PENDING',
             $Defs::DATA_ACCESS_FULL,
              --VAL-- )
         ],
@@ -648,4 +646,22 @@ sub listClubs   {
   
   return ($resultHTML,$title);
 }
+#addSQL => qq[
+#        INSERT INTO tblEntity (
+#            intRealmID,
+#            intEntityLevel,
+#            intCreatedByEntityID,
+#            strStatus,
+#            intDataAccess,
+#            --FIELDS--
+#         )
+#          VALUES (
+#            $Data->{'Realm'},
+#            $Defs::LEVEL_CLUB,
+#            $authID,
+#            'PENDING',
+ #           $Defs::DATA_ACCESS_FULL,
+#             --VAL-- )
+#        ],
+
 1;
