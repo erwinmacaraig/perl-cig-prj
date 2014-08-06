@@ -372,6 +372,7 @@ sub venue_details   {
               intEntityLevel, 
               intCreatedByEntityID,
               intPaymentRequired,
+              strStatus,
               --FIELDS-- 
           )
           VALUES (
@@ -379,6 +380,7 @@ sub venue_details   {
               $Defs::LEVEL_VENUE, 
               $authID,
               $paymentRequired,
+              'PENDING',
               --VAL-- 
           )
       ],

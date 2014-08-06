@@ -302,12 +302,14 @@ sub club_details  {
             intRealmID,
             intEntityLevel,
             intCreatedByEntityID,
+            strStatus,
             --FIELDS--
          )
           VALUES (
             $Data->{'Realm'},
             $Defs::LEVEL_CLUB,
             $authID,
+            'PENDING',
              --VAL-- )
         ],
       auditFunction=> \&auditLog,
