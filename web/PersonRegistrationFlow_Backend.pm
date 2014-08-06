@@ -14,6 +14,7 @@ use RegoProducts;
 use Reg_common;
 use CGI qw(:cgi unescape);
 use Payments;
+use RegoTypeLimits;
 use Data::Dumper;
 
 sub handleRegistrationFlowBackend   {
@@ -57,9 +58,16 @@ sub handleRegistrationFlowBackend   {
     if ( $action eq 'PREGF_TU' ) {
         #add rego record with types etc.
         ($regoID, $rego_ref) = add_rego_record($Data, $personID, $entityID, $entityLevel, $originLevel);
-        $Hidden{'rID'} = $regoID;
-        $action = $Flow{$action};
-        $personID = $personID || $rego_ref->{'personID'} || $rego_ref->{'intPersonID'} || 0;
+        if (!$regoID)   {
+            $body = $lang->txt("You cannot register this combination, limit exceeded");
+            my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_T";
+            $body .= qq[<a href="$url">].$lang->txt("Click here to select new combination").qq[</a>];
+        }
+        else    {
+            $Hidden{'rID'} = $regoID;
+            $action = $Flow{$action};
+            $personID = $personID || $rego_ref->{'personID'} || $rego_ref->{'intPersonID'} || 0;
+        }
     }
     if ( $action eq 'PREGF_PU' ) {
         #Update product records
@@ -157,49 +165,59 @@ warn("PRODID: $product");
             ];
     }    
     elsif ( $action eq 'PREGF_C' ) {
-        submitPersonRegistration(
-            $Data, 
-            $personID,
-            $regoID,
-        );
-        my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
-        my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
-        $body = qq[
-            Registration is complete
-            <a href = "$url">Continue</a><br>
-            <a href = "$pay_url">View Transactions</a><br>
-        ];
-        if (1==2)   {
-            my (undef, $paymentTypes) = getPaymentSettings($Data, 0, 0, $Data->{'clientValues'});
-            my $CC_body = qq[<div id = "payment_cc" style= "ddisplay:none;"><br>];
-            my $gatewayCount = 0;
-            foreach my $gateway (@{$paymentTypes})  {
-                $gatewayCount++;
-                my $id = $gateway->{'intPaymentConfigID'};
-                my $pType = $gateway->{'paymentType'};
-                my $name = $gateway->{'gatewayName'};
+        my $ok = checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
+warn("OK".$ok);
+        if (!$ok)   {
+            $body = $lang->txt("You cannot register this combination, limit exceeded");
+            my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_T";
+            $body .= qq[<a href="$url">].$lang->txt("Click here to select new combination").qq[</a>];
+        }
+        if ($ok)   {
+warn("~~~~~~~~~~~~~~~~~~~~ABOUT TO SUBMIT");
+            submitPersonRegistration(
+                $Data, 
+                $personID,
+                $regoID,
+            );
+            my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
+            my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
+            $body = qq[
+                Registration is complete
+                <a href = "$url">Continue</a><br>
+                <a href = "$pay_url">View Transactions</a><br>
+            ];
+            if (1==2)   {
+                my (undef, $paymentTypes) = getPaymentSettings($Data, 0, 0, $Data->{'clientValues'});
+                my $CC_body = qq[<div id = "payment_cc" style= "ddisplay:none;"><br>];
+                my $gatewayCount = 0;
+                foreach my $gateway (@{$paymentTypes})  {
+                    $gatewayCount++;
+                    my $id = $gateway->{'intPaymentConfigID'};
+                    my $pType = $gateway->{'paymentType'};
+                    my $name = $gateway->{'gatewayName'};
+                    $CC_body .= qq[
+                            <input type="submit" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
+                            <input type="hidden" value="$pType" name="pt_submit[$gatewayCount]">
+                    ];
+                }
                 $CC_body .= qq[
-                        <input type="submit" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
-                        <input type="hidden" value="$pType" name="pt_submit[$gatewayCount]">
+                            <input type="hidden" value="$gatewayCount" name="gatewayCount">
+                            <div style= "clear:both;"></div>
+                        </div>
+                ];
+                $CC_body = '' if ! $gatewayCount;
+                $body .= qq[
+                    <form action="$Data->{target}" method="POST">
+                    <input type="hidden" name="a" value="PREGF_CHECKOUT">
+                ];
+                foreach my $hidden (keys %Hidden)   {
+                    $body .= qq[<input type="hidden" name="$hidden" value="].$Hidden{$hidden}.qq[">];
+                }
+                $body .= qq[
+                    $CC_body
+                    </form>
                 ];
             }
-            $CC_body .= qq[
-                        <input type="hidden" value="$gatewayCount" name="gatewayCount">
-                        <div style= "clear:both;"></div>
-                    </div>
-            ];
-            $CC_body = '' if ! $gatewayCount;
-            $body .= qq[
-                <form action="$Data->{target}" method="POST">
-                <input type="hidden" name="a" value="PREGF_CHECKOUT">
-            ];
-            foreach my $hidden (keys %Hidden)   {
-                $body .= qq[<input type="hidden" name="$hidden" value="].$Hidden{$hidden}.qq[">];
-            }
-            $body .= qq[
-                $CC_body
-                </form>
-            ];
         }
             
     }    
@@ -274,6 +292,8 @@ sub add_rego_record{
         current => 1,
     };
 
+    my $ok = checkRegoTypeLimits($Data, $personID, 0, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
+    return (0, undef) if (!$ok);
     my ($regID,$rc) = addRegistration($Data,$rego_ref);
     if ($regID)     {
         return ($regID, $rego_ref);

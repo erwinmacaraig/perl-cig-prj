@@ -233,7 +233,7 @@ sub getRegistrationData	{
     );
     my $where = '';
 
-    if ($regFilters_ref>{'personEntityRole'} eq '-')  {
+    if ($regFilters_ref->{'personEntityRole'} eq '-')  {
         $regFilters_ref->{'personEntityRole'}= '';
     }
     if ($regFilters_ref->{'strPersonEntityRole'} eq '-')  {
