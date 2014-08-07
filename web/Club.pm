@@ -436,7 +436,10 @@ sub postClubAdd {
       $query->execute($entityID, $id);
       $query->finish();
         
-      #addWorkFlowTasks($Data, 'ENTITY', 'NEW', $Data->{'clientValues'}{'authLevel'}, $id,0,0, 0);
+    ### A call TO createTempEntityStructure FROM EntityStructure   ###
+    createTempEntityStructure($Data); 
+    ### End call to createTempEntityStructure FROM EntityStructure###
+      addWorkFlowTasks($Data, 'ENTITY', 'NEW', $Data->{'clientValues'}{'authLevel'}, $id,0,0, 0);
     }
 
     my %clubchars = ();
@@ -454,10 +457,6 @@ sub postClubAdd {
         \%clubchars,
       );
     }
-    ### A call TO createTempEntityStructure FROM EntityStructure   ###
-    $Data->{'db'}=$db;
-    createTempEntityStructure($Data); 
-    ### End call to createTempEntityStructure FROM EntityStructure###
     {
       my $cl=setClient($Data->{'clientValues'}) || '';
       my %cv=getClient($cl);

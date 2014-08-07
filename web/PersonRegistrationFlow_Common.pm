@@ -142,7 +142,7 @@ sub displayRegoFlowProducts {
             $body .= qq[<input type="hidden" name="$hidden" value="].$hidden_ref->{$hidden}.qq[">];
         }
         if (@prodIDs)   {
-            $body .= getRegoProducts($Data, \@prodIDs, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
+            $body .= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
         }
         $body .= qq[
                 <input type="submit" name="submit" value="]. $lang->txt("Continue").qq[" class = "button proceed-button"><br><br>

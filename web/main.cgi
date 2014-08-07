@@ -196,7 +196,7 @@ warn("REALM IS ". $Data{'Realm'});
         ( $resultHTML, $pageHeading ) = handleAgeGroups( $action, \%Data );
     }
     elsif ( $action =~ /^VENUE_/ ) {
-        ( $resultHTML, $pageHeading ) = handleVenues( $action, \%Data );
+        ( $resultHTML, $pageHeading ) = handleVenues( $action, \%Data);
     }
     elsif ( $action =~ /^AGREE_/ ) {
         ( $resultHTML, $pageHeading ) =
