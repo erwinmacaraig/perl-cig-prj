@@ -1,8 +1,8 @@
 package Entity;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT=qw(handleEntity);
-@EXPORT_OK=qw(handleEntity);
+@EXPORT=qw(handleEntity loadEntityDetails);
+@EXPORT_OK=qw(handleEntity loadEntityDetails);
 
 use strict;
 use Reg_common;

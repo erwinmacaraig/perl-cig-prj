@@ -2,7 +2,8 @@
 
 use strict;
 use warnings;
-use lib "..",".","../..";
+#use lib "..",".","../..";
+use lib '.', '..', '../..',"../comp", '../RegoForm', "../dashboard", "../RegoFormBuilder",'../PaymentSplit', "../user", "../Clearances";
 use CGI qw(param);
 use Defs;
 use Reg_common;
@@ -31,6 +32,8 @@ sub main	{
     my $realmIN = param('r') || 0;
     my $subRealmIN = param('sr') || 0;
 
+warn("AJAXPId$personID");
+warn("AJAXeId$entityID");
     my %Data=();
     my $target='aj_person_registerwhat.cgi';
     $Data{'target'}=$target;
