@@ -71,7 +71,7 @@ sub showPersonHome	{
 	my %TemplateData = (
 		Name => $name,
 		ReadOnlyLogin => $Data->{'ReadOnlyLogin'},
-		EditDetailsLink => "$Data->{'target'}?client=$client&amp;a=P_DTE",
+		EditDetailsLink => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? "$Data->{'target'}?client=$client&amp;a=P_DTE" : undef,
 		Notifications => $notifications,
 		Photo => $photo,
 		MarkDuplicateURL => $markduplicateURL || '',
