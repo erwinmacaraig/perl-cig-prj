@@ -131,7 +131,7 @@ sub club_details  {
            value => $field->{strEntityType},
            type => 'lookup',
            options => \%Defs::clubLevelSubtype,
-           readonly => $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB ? 0 : 1,
+           readonly => $Data->{'clientValues'}{'currentLevel'} > $Defs::LEVEL_CLUB ? 0 : 1,
  
      },
       strStatus => {
