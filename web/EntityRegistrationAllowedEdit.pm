@@ -105,7 +105,6 @@ sub rule_details   {
                options     => \%Defs::sportType,
        	sectionname => 'details',
                firstoption => [ '', " " ],
-                compulsory=>1,
              },
                intGender => {
                        label       => 'Gender',
@@ -123,7 +122,6 @@ sub rule_details   {
        	       options     => \%Defs::personLevel,
                sectionname => 'details',
                firstoption => [ '', " " ],
-                compulsory=>1,
              },      
              strRegistrationNature => {
                label => 'Registration Nature',
@@ -140,7 +138,6 @@ sub rule_details   {
               	options     => \%Defs::ageLevel,
               	sectionname => 'details',
                firstoption => [ '', " " ],
-                compulsory=>1,
              },
         },
         order => [qw(
