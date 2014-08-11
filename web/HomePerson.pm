@@ -18,6 +18,7 @@ use FormHelpers;
 use PersonRegistration;
 use UploadFiles;
 use Log;
+use Person;
 use Data::Dumper;
 
 require AccreditationDisplay;
@@ -107,7 +108,7 @@ sub showPersonHome	{
     my %RegFilters=();
     $RegFilters{'current'} = 1;
     $RegFilters{'entityID'} = getLastEntityID($Data->{'clientValues'});
-    my ($RegCount, $Reg_ref) = getRegistrationData($Data, $personID, \%RegFilters);
+    my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
     $TemplateData{'RegistrationInfo'} = $Reg_ref;
 
 
@@ -208,7 +209,7 @@ sub showLink {
         return $url if ($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL);     
         my %Reg=();
         $Reg{'entityID'} = getLastEntityID($Data->{'clientValues'});
-        my $field = loadPersonDetails($Data->{'db'},$personID); 
+        my $field = Person::loadPersonDetails($Data->{'db'},$personID); 
         if(($field->{'strStatus'} eq $Defs::PERSON_STATUS_ACTIVE || $field->{'strStatus'} eq $Defs::PERSON_STATUS_PENDING) && isPersonRegistered($Data,$personID,\%Reg)){
             return  $url; 
         } 

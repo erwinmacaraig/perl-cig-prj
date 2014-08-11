@@ -29,7 +29,14 @@ sub displayRegoFlowComplete {
     my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref) = @_;
     my $lang=$Data->{'lang'};
 
-    my $ok = checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
+    my $ok = 0;
+print STDERR Dumper($rego_ref);
+    if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL') {
+        $ok=1;
+    }
+    else    {
+        $ok = checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
+    }
     my $body = '';
     if (!$ok)   {
         $body = $lang->txt("You cannot register this combination, limit exceeded");
@@ -244,8 +251,10 @@ sub add_rego_record{
         current => 1,
     };
 
-    my $ok = checkRegoTypeLimits($Data, $personID, 0, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
-    return (0, undef, 'LIMIT_EXCEEDED') if (!$ok);
+    if ($rego_ref->{'registrationNature'} ne 'RENEWAL') {
+        my $ok = checkRegoTypeLimits($Data, $personID, 0, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
+        return (0, undef, 'LIMIT_EXCEEDED') if (!$ok);
+    }
     if ($rego_ref->{'registrationNature'} eq 'RENEWAL') {
         my $ok = checkRenewalRegoOK($Data, $personID, $rego_ref);
         return (0, undef, 'RENEWAL_FAILED') if (!$ok);

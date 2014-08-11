@@ -21,6 +21,7 @@ use RuleMatrix;
 use NationalReportingPeriod;
 use GenAgeGroup;
 use Data::Dumper;
+use Person;
 
 sub rolloverExistingPersonRegistrations {
 
@@ -55,7 +56,7 @@ sub rolloverExistingPersonRegistrations {
         my $thisRego = $rego;
 warn("IN HERE FOR $rego->{'intPersonRegistrationID'}");
         $thisRego->{'intCurrent'} = 0;
-        $thisRego->{'strStatus'} = $Defs::PERSONREGO_STATUS_ROLLEDOVER;
+        $thisRego->{'strStatus'} = $Defs::PERSONREGO_STATUS_ROLLED_OVER;
         updatePersonRegistration($Data, $personID, $rego->{'intPersonRegistrationID'}, $thisRego);
     }
 }
@@ -90,6 +91,11 @@ sub checkNewRegoOK  {
 sub checkRenewalRegoOK  {
 
     my ($Data, $personID, $rego_ref) = @_;
+    
+    my $pref= undef;
+    $pref = loadPersonDetails($Data->{'db'}, $personID) if ($personID);
+    return 0 if (defined $pref and ($pref->{'strStatus'} eq $Defs::PERSON_STATUS_SUSPENDED));
+
     my %Reg = (
         sport=> $rego_ref->{'sport'} || '',
         personType=> $rego_ref->{'personType'} || '',
@@ -136,6 +142,7 @@ sub checkRenewalRegoOK  {
         \%Reg
     );
 
+    
     return 1 if ($countActive or $countInactive or $countRolledOver); ## Must have an ACTIVE or PASSIVE record
     return 0;
 
