@@ -36,8 +36,8 @@ sub checkRegoTypeLimits    {
             $sport = $regs->[0]{'strSport'};
             $personType= $regs->[0]{'strPersonType'};
             $entityRole= $regs->[0]{'strPersonEntityRole'};
-             $personLevel= $regs->[0]{'strPersonLevel'};
-             $ageLevel= $regs->[0]{'strAgeLevel'};
+            $personLevel= $regs->[0]{'strPersonLevel'};
+            $ageLevel= $regs->[0]{'strAgeLevel'};
         }
     }
     my $st = qq[
@@ -48,23 +48,32 @@ sub checkRegoTypeLimits    {
         WHERE 
             intRealmID = ?
             AND intSubRealmID IN (0, ?)
-            AND strSport = ?
             AND strPersonType = ?
-            AND strPersonEntityRole IN ('', ?)
-            AND strPersonLevel IN ('', ?)
-            AND strAgeLevel IN ('', ?)
     ];
+    my @limitValues = (
+        $Data->{'Realm'}, 
+        $Data->{'RealmSubType'},
+        $personType,
+    );
+    if (defined $sport) {
+        push @limitValues, $sport;
+        $st .= qq[ AND strSport IN ('', ?)];
+    }
+    if (defined $entityRole) {
+        push @limitValues, $entityRole;
+        $st .= qq[ AND strPersonEntityRole IN ('', ?)];
+    }
+    if (defined $personLevel) {
+        push @limitValues, $personLevel;
+        $st .= qq[ AND strPersonLevel IN ('', ?)];
+    }
+    if (defined $ageLevel) {
+        push @limitValues, $ageLevel;
+        $st .= qq[ AND strAgeLevel IN ('', ?)];
+    }
 
     my $query = $Data->{'db'}->prepare($st);
-    $query -> execute(
-        $Data->{'Realm'},
-        $Data->{'RealmSubType'},
-        $sport || '',
-        $personType,
-        $entityRole || '',
-        $personLevel || '',
-        $ageLevel || ''
-    );
+    $query -> execute(@limitValues);
 
     my $stPR = qq[
         SELECT
@@ -75,13 +84,11 @@ sub checkRegoTypeLimits    {
             intPersonID = ?
             AND intPersonRegistrationID <> ?
             AND strStatus IN ('ACTIVE', 'PENDING', 'SUSPENDED')
-            AND strSport = ?
             AND strPersonType = ?
     ];
     my @values =();
     push @values, $personID;
     push @values, $personRegistrationID;
-    push @values, $sport;
     push @values, $personType;
 
     while (my $dref = $query->fetchrow_hashref())   {
@@ -89,15 +96,20 @@ sub checkRegoTypeLimits    {
         my $stPRrow= $stPR;
         my @rowValues=();
         @rowValues=@values;
-        if ($dref->{'strPersonEntityRole'} and $dref->{'strPersonEntityRole'} ne '')    {
+        if ($dref->{'strSport'} and $dref->{'strSport'} ne '')    {
+            $stPRrow.= qq[ AND strSport = ? ];
+            push @rowValues, $dref->{'strSport'};
+        }
+        
+        if (defined $dref->{'strPersonEntityRole'} and $dref->{'strPersonEntityRole'} ne '')    {
             $stPRrow .= qq[ AND strPersonEntityRole = ?];
             push @rowValues, $dref->{'strPersonEntityRole'};
         }
-        if ($dref->{'strPersonLevel'} and $dref->{'strPersonLevel'} ne '')    {
+        if (defined $dref->{'strPersonLevel'} and $dref->{'strPersonLevel'} ne '')    {
             $stPRrow .= qq[ AND strPersonLevel = ?];
             push @rowValues, $dref->{'strPersonLevel'};
         }
-        if ($dref->{'strAgeLevel'} and $dref->{'strAgeLevel'} ne '')    {
+        if (defined $dref->{'strAgeLevel'} and $dref->{'strAgeLevel'} ne '')    {
             $stPRrow .= qq[ AND strAgeLevel = ?];
             push @rowValues, $dref->{'strAgeLevel'};
         }
@@ -105,6 +117,9 @@ sub checkRegoTypeLimits    {
         $qryPR -> execute(@rowValues);
         my $prCount = $qryPR->fetchrow_array() || 0;
         $prCount++; #For current row
+warn("SQL:$stPRrow");
+print STDERR Dumper(\@rowValues);
+warn("COUNT IS $prCount");
         if ($prCount > $dref->{'intLimit'}) {
             return 0;
         }

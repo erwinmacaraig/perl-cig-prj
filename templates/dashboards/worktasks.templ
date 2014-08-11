@@ -38,6 +38,11 @@
             [% ELSE %]
 			    <td><div class="member-data">
                     <span class = "button-small generic-button">
+                        <a href="[% task.viewURL %]">View</a>
+                    </span>
+                </div></td>
+			    <td><div class="member-data">
+                    <span class = "button-small generic-button">
                         <a href="main.cgi?client=[% client %]&a=WF_Approve&TID=[% task.WFTaskID %]">Approve</a>
                     </span>
                 </div></td>
