@@ -59,11 +59,11 @@ sub checkRegoTypeLimits    {
     $query -> execute(
         $Data->{'Realm'},
         $Data->{'RealmSubType'},
-        $sport,
+        $sport || '',
         $personType,
-        $entityRole,
-        $personLevel,
-        $ageLevel
+        $entityRole || '',
+        $personLevel || '',
+        $ageLevel || ''
     );
 
     my $stPR = qq[

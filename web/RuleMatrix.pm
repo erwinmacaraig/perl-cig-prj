@@ -29,7 +29,7 @@ sub getRuleMatrix   {
         $entityOfLevel || 0,
     );
     my $where = '';
-    if($reg_ref->{'sport'})  {
+    if(exists $reg_ref->{'sport'})  {
         push @values, $reg_ref->{'sport'};
         $where .= " AND strSport = ? ";
     }
@@ -41,11 +41,11 @@ sub getRuleMatrix   {
         push @values, $reg_ref->{'personType'};
         $where .= " AND strPersonType = ? ";
     }
-    if($reg_ref->{'personLevel'})  {
+    if(exists $reg_ref->{'personLevel'})  {
         push @values, $reg_ref->{'personLevel'};
         $where .= " AND strPersonLevel = ? ";
     }
-    if($reg_ref->{'ageLevel'})  {
+    if(exists $reg_ref->{'ageLevel'})  {
         push @values, $reg_ref->{'ageLevel'};
         $where .= " AND strAgeLevel = ? ";
     }

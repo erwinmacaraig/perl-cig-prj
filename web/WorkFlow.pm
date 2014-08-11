@@ -462,7 +462,7 @@ sub approveTask {
 	#Update this task to COMPLETE
 	$st = qq[
 	  	UPDATE tblWFTask SET 
-	  		strTaskStatus = 'COMPLETE',
+	  		strTaskStatus = ?,
 	  		intApprovalUserID = ?,
 	  		dtApprovalDate = NOW()
 	  	WHERE intWFTaskID = ?; 
@@ -470,6 +470,7 @@ sub approveTask {
 		
   	$q = $db->prepare($st);
   	$q->execute(
+        $Defs::WF_TASK_STATUS_COMPLETE,
 	  	$Data->{'clientValues'}{'userID'},
   		$WFTaskID,
   		);
@@ -539,7 +540,7 @@ sub checkForOutstandingTasks {
 warn("CHECKING FOR OUTSANDING FOR PERSON $personID PR $personRegistrationID");	
 	$q = $db->prepare($st);
   	$q->execute(
-  		'PENDING',
+  		$Defs::WF_TASK_STATUS_PENDING,
   		$personRegistrationID,
         $entityID,
         $personID,
@@ -548,8 +549,8 @@ warn("CHECKING FOR OUTSANDING FOR PERSON $personID PR $personRegistrationID");
         $entityID,
         $personID,
         $documentID,
-  		'ACTIVE',
-  		'COMPLETE',
+        $Defs::WF_TASK_STATUS_ACTIVE,
+        $Defs::WF_TASK_STATUS_COMPLETE,
         $ruleFor,
         $ruleFor,
   		);
@@ -630,7 +631,7 @@ warn("CHECKING $update_count");
                 AND intEntityID= ?
                 AND intDocumentID = ?
                 AND strWFRUleFor = ?
-			    AND strTaskStatus IN ('PENDING','ACTIVE')
+			    AND strTaskStatus IN (?,?)
         ];
         
         $q = $db->prepare($st);
@@ -639,7 +640,9 @@ warn("CHECKING $update_count");
        		$personRegistrationID,
             $entityID,
             $documentID,
-            $ruleFor
+            $ruleFor,
+            $Defs::WF_TASK_STATUS_PENDING,
+            $Defs::WF_TASK_STATUS_ACTIVE
 	  	);
   
         

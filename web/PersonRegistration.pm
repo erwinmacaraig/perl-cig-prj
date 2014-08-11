@@ -224,16 +224,16 @@ sub updatePersonRegistration    {
   	my $q = $Data->{'db'}->prepare($st);
   	$q->execute(
         $Reg_ref->{'personType'} || $Reg_ref->{'strPersonType'},
-        $Reg_ref->{'personSubType'} || $Reg_ref->{'strPersonSubType'},
-        $Reg_ref->{'personLevel'} || $Reg_ref->{'strPersonLevel'},
-        $Reg_ref->{'personEntityRole'} || $Reg_ref->{'strPersonEntityRole'},
+        $Reg_ref->{'personSubType'} || $Reg_ref->{'strPersonSubType'} || '',
+        $Reg_ref->{'personLevel'} || $Reg_ref->{'strPersonLevel'} || '',
+        $Reg_ref->{'personEntityRole'} || $Reg_ref->{'strPersonEntityRole'} || '',
         $Reg_ref->{'status'} || $Reg_ref->{'strStatus'},
-        $Reg_ref->{'sport'} || $Reg_ref->{'strSport'},
+        $Reg_ref->{'sport'} || $Reg_ref->{'strSport'} || '',
         $Reg_ref->{'current'} || $Reg_ref->{'intCurrent'},
         $Reg_ref->{'dateFrom'} || $Reg_ref->{'dtFrom'},
         $Reg_ref->{'dateTo'} || $Reg_ref->{'dtTo'},
         $Reg_ref->{'dateLastUpdated'} || $Reg_ref->{'dtLastUpdated'},
-        $Reg_ref->{'ageLevel'} || $Reg_ref->{'strAgeLevel'},
+        $Reg_ref->{'ageLevel'} || $Reg_ref->{'strAgeLevel'} || '',
         $Reg_ref->{'registrationNature'} || $Reg_ref->{'strRegistrationNature'},
         $Reg_ref->{'isPaid'} || $Reg_ref->{'intIsPaid'},
         $Reg_ref->{'paymentRequired'} || $Reg_ref->{'intPaymentRequired'},
@@ -269,15 +269,19 @@ sub getRegistrationData	{
         push @values, $regFilters_ref->{'personType'};
         $where .= " AND pr.strPersonType = ? ";
     }
-    if($regFilters_ref->{'personSubType'})  {
+    if(exists $regFilters_ref->{'personSubType'})  {
         push @values, $regFilters_ref->{'personSubType'};
         $where .= " AND pr.strPersonSubType = ? ";
     }
-    if($regFilters_ref->{'personLevel'})  {
+    if(exists $regFilters_ref->{'ageLevel'})  {
+        push @values, $regFilters_ref->{'ageLevel'};
+        $where .= " AND pr.strAgeLevel= ? ";
+    }
+    if(exists $regFilters_ref->{'personLevel'})  {
         push @values, $regFilters_ref->{'personLevel'};
         $where .= " AND pr.strPersonLevel= ? ";
     }
-    if($regFilters_ref->{'personEntityRole'})  {
+    if(exists $regFilters_ref->{'personEntityRole'})  {
         push @values, $regFilters_ref->{'personEntityRole'};
         $where .= " AND pr.strPersonEntityRole= ? ";
     }
@@ -285,7 +289,7 @@ sub getRegistrationData	{
         push @values, $regFilters_ref->{'status'};
         $where .= " AND pr.strStatus= ? ";
     }
-    if($regFilters_ref->{'sport'})  {
+    if(exists $regFilters_ref->{'sport'})  {
         push @values, $regFilters_ref->{'sport'};
         $where .= " AND pr.strSport= ? ";
     }
@@ -441,7 +445,7 @@ sub addRegistration {
   		$Reg_ref->{'personLevel'} || '',  		
   		$Reg_ref->{'personEntityRole'} || '',  		
   		$status || '',  		
-  		$Reg_ref->{'sport'},  		
+  		$Reg_ref->{'sport'} || '',  		
   		$Reg_ref->{'current'} || 0,  		
   		$Reg_ref->{'originLevel'} || 0,  		
   		$Reg_ref->{'originID'} || 0,  		
