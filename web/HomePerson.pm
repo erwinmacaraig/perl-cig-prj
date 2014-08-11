@@ -204,9 +204,12 @@ sub showLink {
         my ($personID,$client,$Data) = @_;
            
         #check person level 
-        return undef if ($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL);     
+        my $url = "$Data->{'target'}?client=$client&amp;a=P_DTE";
+        return $url if ($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL);     
+        my %Reg=();
+        $Reg{'entityID'} = getLastEntityID($Data->{'clientValues'});
         my $field = loadPersonDetails($Data->{'db'},$personID); 
-        if(($field->{'strStatus'} eq $Defs::PERSON_STATUS_ACTIVE || $field->{'strStatus'} eq $Defs::PERSON_STATUS_PENDING)&& isPersonRegistered($Data,$personID,{})){
+        if(($field->{'strStatus'} eq $Defs::PERSON_STATUS_ACTIVE || $field->{'strStatus'} eq $Defs::PERSON_STATUS_PENDING) && isPersonRegistered($Data,$personID,\%Reg)){
             return  "$Data->{'target'}?client=$client&amp;a=P_DTE"; 
         } 
         return undef;
