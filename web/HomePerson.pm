@@ -202,20 +202,13 @@ sub deregistration_check___duplicated {
 
 sub showLink {
         my ($personID,$client,$Data) = @_;
-        my $db = $Data->{db};
-     
+           
         #check person level 
         return undef if ($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL);     
-             
-        #check Person status  
-        my $query =qq[SELECT tblPerson.intPersonID FROM tblPerson INNER JOIN tblPersonRegistration_$Data->{'Realm'} ON tblPerson.intPersonID = tblPersonRegistration_$Data->{'Realm'}.intPersonID WHERE tblPerson.intPersonID = ? AND (tblPerson.strStatus = ? OR tblPerson.strStatus = ?)];
-       my $sth = $db->prepare($query); 
-       $sth->execute($personID,$Defs::PERSON_STATUS_ACTIVE,$Defs::PERSON_STATUS_PENDING);
-       $sth->execute();
-     
-       my $pid = $sth->fetchrow_array(); 
-       return undef if (!defined $pid); 
-       #Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? return "$Data->{'target'}?client=$client&amp;a=P_DTE" : return undef; 
-       return  "$Data->{'target'}?client=$client&amp;a=P_DTE";
+        my $field = loadPersonDetails($Data->{'db'},$personID); 
+        if(($field->{'strStatus'} eq $Defs::PERSON_STATUS_ACTIVE || $field->{'strStatus'} eq $Defs::PERSON_STATUS_PENDING)&& isPersonRegistered($Data,$personID,{})){
+            return  "$Data->{'target'}?client=$client&amp;a=P_DTE"; 
+        } 
+        return undef;
 }
 1;
