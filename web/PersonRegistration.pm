@@ -164,10 +164,17 @@ sub isPersonRegistered {
 
 ## Are there any "current" registration records for the member in the system
     $regFilters_ref->{'current'} = 1;
-    my ($count, $p1_refs) = getRegistrationData($Data, $personID, $regFilters_ref);
+    my ($count, $refs) = getRegistrationData($Data, $personID, $regFilters_ref);
 
-    return 1 if $count;
-    return 0;
+    my $ok = 0;
+    foreach my $reg (@{$refs})  {
+        $ok = 1 if (
+            $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE
+            or $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PASSIVE
+        );
+        last if $ok;
+    }
+    return $ok;
 }
 
 sub mergePersonRegistrations    {
