@@ -17,6 +17,7 @@ use Log;
 use PersonUtils;
 use Clearances;
 use Duplicates;
+use PersonRegistration;
 
 sub handleWorkflow {
     my ( 
@@ -709,6 +710,7 @@ warn("CHECKING $update_count");
 		       		$personRegistrationID
 		  			);         
 	        	$rc = 1;	# All registration tasks have been completed        		
+                PersonRegistration::rolloverExistingPersonRegistrations($Data, $personID, $personRegistrationID);
         }
         if ($personID)  {
                 $st = qq[

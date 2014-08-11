@@ -247,8 +247,12 @@ sub add_rego_record{
     my $ok = checkRegoTypeLimits($Data, $personID, 0, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
     return (0, undef, 'LIMIT_EXCEEDED') if (!$ok);
     if ($rego_ref->{'registrationNature'} eq 'RENEWAL') {
-        my $ok = checkRenewalOK($Data, $personID, $rego_ref);
+        my $ok = checkRenewalRegoOK($Data, $personID, $rego_ref);
         return (0, undef, 'RENEWAL_FAILED') if (!$ok);
+    }
+    if ($rego_ref->{'registrationNature'} eq 'NEW') {
+        my $ok = checkNewRegoOK($Data, $personID, $rego_ref);
+        return (0, undef, 'NEW_FAILED') if (!$ok);
     }
     my ($regID,$rc) = addRegistration($Data,$rego_ref);
     if ($regID)     {

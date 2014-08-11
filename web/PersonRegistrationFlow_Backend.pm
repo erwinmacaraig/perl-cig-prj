@@ -70,6 +70,9 @@ warn("FBEND:$personID");
             if ($msg eq 'LIMIT_EXCEEDED')   {
                 $body = $lang->txt("You cannot register this combination, limit exceeded");
             }
+            if ($msg eq 'NEW_FAILED')   {
+                $body = $lang->txt("New failed, existing registration found");
+            }
             if ($msg eq 'RENEWAL_FAILED')   {
                 $body = $lang->txt("Renewal failed, cannot find existing registration");
             }

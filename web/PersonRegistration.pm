@@ -9,7 +9,9 @@ require Exporter;
     mergePersonRegistrations
     submitPersonRegistration
     updatePersonRegistration
-    checkRenewalOK
+    checkRenewalRegoOK
+    checkNewRegoOK
+    rolloverExistingPersonRegistrations
 );
 
 use strict;
@@ -20,7 +22,47 @@ use NationalReportingPeriod;
 use GenAgeGroup;
 use Data::Dumper;
 
-sub checkRenewalOK  {
+sub rolloverExistingPersonRegistrations {
+
+    my ($Data, $personID, $personRegistrationID) = @_;
+
+    my %Reg = (
+        personRegistrationID=> $personRegistrationID || 0,
+    );
+    my ($count, $reg_ref) = getRegistrationData(
+        $Data,
+        $personID,
+        \%Reg
+    );
+    
+    return if (! $count);
+    my %ExistingReg = (
+        sport=> $reg_ref->[0]{'strSport'} || '',
+        personType=> $reg_ref->[0]{'strPersonType'} || '',
+        personEntityRole=> $reg_ref->[0]{'strPersonEntityRole'} || '',
+        personLevel=> $reg_ref->[0]{'strPersonLevel'} || '',
+        ageLevel=> $reg_ref->[0]{'strAgeLevel'} || '',
+        entityID=> $reg_ref->[0]{'intEntityID'} || 0,
+        status=> $Defs::PERSONREGO_STATUS_ACTIVE,
+    );
+    my ($countRecords, $regs_ref) = getRegistrationData(
+        $Data,
+        $personID,
+        \%ExistingReg
+    );
+    foreach my $rego (@{$regs_ref})  {
+        next if ($rego->{'intPersonRegistrationID'} == $personRegistrationID);
+        my $thisRego = $rego;
+warn("IN HERE FOR $rego->{'intPersonRegistrationID'}");
+        $thisRego->{'intCurrent'} = 0;
+        $thisRego->{'strStatus'} = $Defs::PERSONREGO_STATUS_ROLLEDOVER;
+        updatePersonRegistration($Data, $personID, $rego->{'intPersonRegistrationID'}, $thisRego);
+    }
+}
+
+ 
+     
+sub checkNewRegoOK  {
 
     my ($Data, $personID, $rego_ref) = @_;
     my %Reg = (
@@ -29,15 +71,75 @@ sub checkRenewalOK  {
         personEntityRole=> $rego_ref->{'personEntityRole'} || '',
         personLevel=> $rego_ref->{'personLevel'} || '',
         ageLevel=> $rego_ref->{'ageLevel'} || '',
-        status=> 'ACTIVE',
+        entityID=> $rego_ref->{'entityID'} || 0,
     );
     my ($count, $regs) = getRegistrationData(
         $Data,
         $personID,
         \%Reg
     );
+    my $ok = 1;
+    foreach my $reg (@{$regs})  {
+        $ok = 0 if ($reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_DELETED);
+        warn("ROW " . $reg->{'intPersonRegistrationID'});
+    }
 
-    return $count;
+    return $ok;
+}
+
+sub checkRenewalRegoOK  {
+
+    my ($Data, $personID, $rego_ref) = @_;
+    my %Reg = (
+        sport=> $rego_ref->{'sport'} || '',
+        personType=> $rego_ref->{'personType'} || '',
+        personEntityRole=> $rego_ref->{'personEntityRole'} || '',
+        personLevel=> $rego_ref->{'personLevel'} || '',
+        ageLevel=> $rego_ref->{'ageLevel'} || '',
+        status=> $Defs::PERSONREGO_STATUS_ACTIVE,
+        entityID=> $rego_ref->{'entityID'} || 0,
+    );
+    my ($countActive, undef) = getRegistrationData(
+        $Data,
+        $personID,
+        \%Reg
+    );
+
+    %Reg = (
+        sport=> $rego_ref->{'sport'} || '',
+        personType=> $rego_ref->{'personType'} || '',
+        personEntityRole=> $rego_ref->{'personEntityRole'} || '',
+        personLevel=> $rego_ref->{'personLevel'} || '',
+        ageLevel=> $rego_ref->{'ageLevel'} || '',
+        status=> $Defs::PERSONREGO_STATUS_ROLLEDOVER,
+        entityID=> $rego_ref->{'entityID'} || 0,
+    );
+    my ($countRolledOver, undef) = getRegistrationData(
+        $Data,
+        $personID,
+        \%Reg
+    );
+
+
+    %Reg = (
+        sport=> $rego_ref->{'sport'} || '',
+        personType=> $rego_ref->{'personType'} || '',
+        personEntityRole=> $rego_ref->{'personEntityRole'} || '',
+        personLevel=> $rego_ref->{'personLevel'} || '',
+        ageLevel=> $rego_ref->{'ageLevel'} || '',
+        status=> $Defs::PERSONREGO_STATUS_PASSIVE,
+        entityID=> $rego_ref->{'entityID'} || 0,
+    );
+    my ($countInactive, undef) = getRegistrationData(
+        $Data,
+        $personID,
+        \%Reg
+    );
+
+    return 1 if ($countActive or $countInactive or $countRolledOver); ## Must have an ACTIVE or PASSIVE record
+    return 0;
+
+
 }
 
 
@@ -309,6 +411,10 @@ sub getRegistrationData	{
         push @values, $regFilters_ref->{'paymentRequired'};
         $where .= " AND pr.intPaymentRequired = ? ";
     }
+    if(exists $regFilters_ref->{'entityID'})  {
+        push @values, $regFilters_ref->{'entityID'};
+        $where .= " AND pr.intEntityID= ? ";
+    }
 
     my $st= qq[
         SELECT 
@@ -338,6 +444,7 @@ sub getRegistrationData	{
     ];	
     my $db=$Data->{'db'};
     my $query = $db->prepare($st) or query_error($st);
+
     $query->execute(@values) or query_error($st);
     my $count=0;
 
