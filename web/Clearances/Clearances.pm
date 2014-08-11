@@ -1380,13 +1380,20 @@ sub finaliseClearance	{
 	$db->do($st);
 
 	$st = qq[
-		UPDATE tblPersonRegistration_1
-        SET strStatus="TRANSFERRED"
+		UPDATE tblPersonRegistration_$Data->{'Realm'}
+        SET strPreTransferredStatus = strStatus, strStatus="TRANSFERRED"
 		WHERE intEntityID= $intSourceEntityID
-            AND intCurrent=1
+            AND intCurrent=0
+            AND strPersonType=?
+            AND strSport = ?
+            AND strAgeLevel = ?
+            AMD strPersonLevel = ?
+            AMD strPersonEntityRole IN ('', ?)
 			AND intPersonID = $intPersonID
+            AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
 	];
-	$db->do($st);
+	my $query = $db->prepare($st) or query_error($st);
+	$query->execute($personType, $sport, $ageLevel, $personLevel, $entityRole) or query_error($st);
 
 	sendCLREmail($Data, $cID, 'FINALISED');
 
@@ -1505,7 +1512,7 @@ sub createClearance	{
 				AND PR.strStatus <> 'TRANSFERRED'
                 AND M.strStatus <> 'INPROGRESS'
                 AND PR.strStatus <> 'INPROGRESS'
-                AND M.intSystemStatus = $Defs::PERSONSTATUS_ACTIVE
+                AND M.intSystemStatus = 'ACTIVE'
 				$strWhere
 			GROUP BY M.intPersonID, C.intEntityID
 			ORDER BY MAX(CLR.dtFinalised) DESC, M.strLocalSurname, M.strLocalFirstname, M.dtDOB
