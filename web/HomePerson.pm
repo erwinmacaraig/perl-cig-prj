@@ -210,7 +210,7 @@ sub showLink {
         $Reg{'entityID'} = getLastEntityID($Data->{'clientValues'});
         my $field = loadPersonDetails($Data->{'db'},$personID); 
         if(($field->{'strStatus'} eq $Defs::PERSON_STATUS_ACTIVE || $field->{'strStatus'} eq $Defs::PERSON_STATUS_PENDING) && isPersonRegistered($Data,$personID,\%Reg)){
-            return  "$Data->{'target'}?client=$client&amp;a=P_DTE"; 
+            return  $url; 
         } 
         return undef;
 }
