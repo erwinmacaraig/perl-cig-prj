@@ -200,6 +200,7 @@ warn("AERROR WITH MATRIX");
             FROM tblMatrix
             WHERE
                 intOriginLevel  = ?
+                AND intLocked=0
                 AND intRealmID = ?
                 AND intSubRealmID IN (0,?)
                 $MATRIXwhere
@@ -266,6 +267,7 @@ sub checkMatrixOK   {
         FROM tblMatrix
         WHERE
             intOriginLevel  = ?
+            AND intLocked=0
             AND intRealmID = ?
             AND intSubRealmID IN (0,?)
             $where

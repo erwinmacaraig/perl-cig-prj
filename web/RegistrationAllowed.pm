@@ -24,6 +24,7 @@ sub isRegoAllowedToSystem {
             tblMatrix
         WHERE
             intRealmID = ?
+            AND intLocked=0
             AND intSubRealmID IN (0, ?)
 			AND strPersonType = ?
 			AND strPersonLevel = ?
