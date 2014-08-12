@@ -146,30 +146,17 @@ sub displayRegoFlowProducts {
         $ProductRules{$product->{'ID'}} = $product;
      }
     my $product_body='';
-     my $body .= qq[
-        <form action="$Data->{target}" method="POST">
-            <input type="hidden" name="a" value="PREGF_PU">
-     ];
-        foreach my $hidden (keys %{$hidden_ref})   {
-            $body .= qq[<input type="hidden" name="$hidden" value="].$hidden_ref->{$hidden}.qq[">];
-        }
-        if (@prodIDs)   {
-            $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
-        }
-        $body .= qq[
-                <input type="submit" name="submit" value="]. $lang->txt("Continue").qq[" class = "button proceed-button"><br><br>
-            </form>
-            display product information
-            HANDLE NO PRODUCTS
-        ];
+    if (@prodIDs)   {
+        $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
+     }
      my %PageData = (
         nextaction=>"PREGF_PU",
         target => $Data->{'target'},
         product_body => $product_body,
-        hidden_ref => $hidden_ref,
+        hidden_ref=> $hidden_ref,
+        Lang => $Data->{'lang'}
     );
-    my $pagedata = '';
-    $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ');
+    my $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ') || '';
 
     return $pagedata;
 }
