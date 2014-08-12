@@ -95,18 +95,20 @@ sub displayRegoFlowDocuments    {
         $originLevel,
         $rego_ref->{'strRegistrationNature'} || $rego_ref->{'registrationNature'},
         $entityID,
-        0,
+        $Defs::LEVEL_PERSON,
         0,
         $rego_ref,
      );
      my $body = qq[
         display document upload information
-            <a href = "$url">Continue</a>
      ];
      $body .= qq[
         <form action="$Data->{target}" method="POST">
             <input type="hidden" name="a" value="PREGF_DU">
      ];
+     foreach my $doc (@{$documents})   {
+        $body .= qq[ <p>Document ID needed ]. $doc->{'ID'}. qq[</p>];
+     }
      foreach my $hidden (keys %{$hidden_ref})   {
         $body .= qq[<input type="hidden" name="$hidden" value="].$hidden_ref->{$hidden}.qq[">];
      }
@@ -131,7 +133,7 @@ sub displayRegoFlowProducts {
         $originLevel,
         $rego_ref->{'strRegistrationNature'} || $rego_ref->{'registrationNature'},
         $entityID,
-        0,
+        $Defs::LEVEL_PERSON,
         0,
         $rego_ref,
     );

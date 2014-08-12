@@ -39,7 +39,7 @@ sub getRegistrationItems    {
             AND intOriginLevel = ?
 			AND strRegistrationNature = ?
             AND strEntityType IN ('', ?)
-            AND intEntityLevel = ?
+            AND intEntityLevel IN (0, ?)
 			AND strPersonType = ?
 			AND strPersonLevel = ?
             AND strPersonEntityRole IN ('', ?)
@@ -47,7 +47,9 @@ sub getRegistrationItems    {
 			AND strAgeLevel = ?		
             AND strItemType = ?
     ];
-	
+use Data::Dumper;
+print STDERR Dumper($Rego_ref);
+	warn("ruleFor:$ruleFor origin $originLevel $regNature $itemType");
 	my $q = $Data->{'db'}->prepare($st) or query_error($st);
 	$q->execute(
         $Data->{'Realm'},
@@ -56,7 +58,7 @@ sub getRegistrationItems    {
         $originLevel,
 		$regNature,
         $Rego_ref->{'strEntityType'} || $Rego_ref->{'entityType'} || '',
-        $Rego_ref->{'strEntityLevel'} || $Rego_ref->{'entityLevel'} || 0,
+        $entityLevel,
 		$Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '',
 		$Rego_ref->{'strPersonLevel'} || $Rego_ref->{'personLevel'} || '',
 		$Rego_ref->{'strPersonEntityRole'} || $Rego_ref->{'personEntityRole'} || '',
