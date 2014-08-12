@@ -22,6 +22,7 @@ use Reg_common;
 use CGI qw(:cgi unescape);
 use Payments;
 use RegoTypeLimits;
+use TTTemplate;
 use Data::Dumper;
 
 sub displayRegoFlowComplete {
@@ -144,6 +145,7 @@ sub displayRegoFlowProducts {
         push @prodIDs, $product->{'ID'};
         $ProductRules{$product->{'ID'}} = $product;
      }
+    my $product_body='';
      my $body .= qq[
         <form action="$Data->{target}" method="POST">
             <input type="hidden" name="a" value="PREGF_PU">
@@ -152,7 +154,7 @@ sub displayRegoFlowProducts {
             $body .= qq[<input type="hidden" name="$hidden" value="].$hidden_ref->{$hidden}.qq[">];
         }
         if (@prodIDs)   {
-            $body .= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
+            $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
         }
         $body .= qq[
                 <input type="submit" name="submit" value="]. $lang->txt("Continue").qq[" class = "button proceed-button"><br><br>
@@ -160,7 +162,16 @@ sub displayRegoFlowProducts {
             display product information
             HANDLE NO PRODUCTS
         ];
-    return $body;
+     my %PageData = (
+        nextaction=>"PREGF_PU",
+        target => $Data->{'target'},
+        product_body => $product_body,
+        hidden_ref => $hidden_ref,
+    );
+    my $pagedata = '';
+    $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ');
+
+    return $pagedata;
 }
  
 
