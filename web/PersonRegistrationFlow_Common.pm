@@ -84,7 +84,7 @@ sub displayRegoFlowCheckout {
 
 sub displayRegoFlowDocuments    {
 
-    my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref) = @_;
+    my ($Data, $regoID, $client, $entityRegisteringForLevel, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref) = @_;
     my $lang=$Data->{'lang'};
 
      my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_DU&amp;rID=$regoID";
@@ -95,7 +95,7 @@ sub displayRegoFlowDocuments    {
         $originLevel,
         $rego_ref->{'strRegistrationNature'} || $rego_ref->{'registrationNature'},
         $entityID,
-        $Defs::LEVEL_PERSON,
+        $entityRegisteringForLevel,
         0,
         $rego_ref,
      );
@@ -106,6 +106,7 @@ sub displayRegoFlowDocuments    {
         <form action="$Data->{target}" method="POST">
             <input type="hidden" name="a" value="PREGF_DU">
      ];
+print STDERR Dumper($documents);
      foreach my $doc (@{$documents})   {
         $body .= qq[ <p>Document ID needed ]. $doc->{'ID'}. qq[</p>];
      }
@@ -122,7 +123,7 @@ sub displayRegoFlowDocuments    {
 
 sub displayRegoFlowProducts {
 
-    my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref) = @_;
+    my ($Data, $regoID, $client, $entityRegisteringForLevel, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref) = @_;
     my $lang=$Data->{'lang'};
 
     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_PU&amp;rID=$regoID";
@@ -133,7 +134,7 @@ sub displayRegoFlowProducts {
         $originLevel,
         $rego_ref->{'strRegistrationNature'} || $rego_ref->{'registrationNature'},
         $entityID,
-        $Defs::LEVEL_PERSON,
+        $entityRegisteringForLevel,
         0,
         $rego_ref,
     );

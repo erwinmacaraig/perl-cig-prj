@@ -111,10 +111,10 @@ warn("HERE $personID | $entityID");
         );
     }
     elsif ( $action eq 'PREGF_P' ) {
-        $body .= displayRegoFlowProducts($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, \%Hidden);
+        $body .= displayRegoFlowProducts($Data, $regoID, $client, $entityLevel, $originLevel, $rego_ref, $entityID, $personID, \%Hidden);
    }
     elsif ( $action eq 'PREGF_D' ) {
-        $body .= displayRegoFlowDocuments($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, \%Hidden);
+        $body .= displayRegoFlowDocuments($Data, $regoID, $client, $entityLevel, $originLevel, $rego_ref, $entityID, $personID, \%Hidden);
     }    
     elsif ( $action eq 'PREGF_C' ) {
         $body .= displayRegoFlowComplete($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, \%Hidden);
