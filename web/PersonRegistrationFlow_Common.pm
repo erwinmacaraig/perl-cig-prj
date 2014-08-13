@@ -119,7 +119,6 @@ sub displayRegoFlowDocuments    {
         <form action="$Data->{target}" method="POST">
             <input type="hidden" name="a" value="PREGF_DU">
      ];
-print STDERR Dumper($documents);
      foreach my $doc (@{$documents})   {
         $body .= qq[ <p>Document ID needed ]. $doc->{'ID'}. qq[</p>];
      }
@@ -263,7 +262,7 @@ sub add_rego_record{
         personID => $personID,
     };
 
-    my ($personStatus, $prStatus) = checkIsSuspended($Data, $personID, $entityID);
+    my ($personStatus, $prStatus) = checkIsSuspended($Data, $personID, $entityID, $rego_ref->{'personType'});
     return (0, undef, 'SUSPENDED') if ($personStatus eq 'SUSPENDED' or $prStatus eq 'SUSPENDED');
         
     if ($rego_ref->{'registrationNature'} ne 'RENEWAL') {

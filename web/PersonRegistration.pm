@@ -82,10 +82,13 @@ sub checkIsSuspended    {
         WHERE
             P.intRealmID = ?
             AND P.intPersonID = ?
+        LIMIT 1
     ];
+warn($st);
   	my $q= $Data->{'db'}->prepare($st);
     $q->execute($entityID, $personType, $Data->{'Realm'}, $personID) or query_error($st);
     my ($personStatus, $prStatus) = $q->fetchrow_array();
+warn("STATUS:$personStatus $prStatus for $entityID $personType");
     $personStatus ||= '';
     $prStatus ||= '';
     return ($personStatus, $prStatus);

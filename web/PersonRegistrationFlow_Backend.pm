@@ -90,7 +90,7 @@ warn("FBEND:$personID");
                 Lang => $lang,
                 client => $client,
             );
-            $body = runTemplate($Data, \%PageData, 'registration/error.templ') || '';
+            return runTemplate($Data, \%PageData, 'registration/error.templ') || '';
         }
         else    {
             $Hidden{'rID'} = $regoID;
