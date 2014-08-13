@@ -8,6 +8,7 @@ CREATE TABLE tblRegoTypeLimits(
     strPersonEntityRole varchar(30) default '',
     strPersonLevel varchar(30) default '',
     strAgeLevel varchar(30) default '',
+    strLimitType VARCHAR(20) default '',
     intLimit int default 0,
     tTimestamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
