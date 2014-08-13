@@ -23,6 +23,7 @@ use CGI qw(:cgi unescape);
 use Payments;
 use RegoTypeLimits;
 use TTTemplate;
+use Transactions;
 use Data::Dumper;
 
 sub displayRegoFlowComplete {
@@ -153,6 +154,10 @@ sub displayRegoFlowProducts {
     my @prodIDs = ();
     my %ProductRules=();
     foreach my $product (@{$products})  {
+
+        next if($product->{'UseExistingThisEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'THIS_ENTITY'));
+        next if($product->{'UseExistingAnyEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'ANY_ENTITY'));
+
         push @prodIDs, $product->{'ID'};
         $ProductRules{$product->{'ID'}} = $product;
      }

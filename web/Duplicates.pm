@@ -610,7 +610,6 @@ next if $dref->{$k} eq "'0000-00-00'";
             $Task{'entityID'} = getID($Data->{'clientValues'});
             $Task{'approvalLevel'} = $Defs::LEVEL_NATIONAL;
             addIndividualTask($Data, 0, $Defs::WF_TASK_TYPE_CHECKDUPL, 'PERSON', \%Task);
-            warn("CREATE TASK !!!!!!!!!!");
         }
         
 		$Data->{'db'}->do(qq[UPDATE tblTransactions SET intID = $existingid WHERE intID = $id_of_duplicate and intTableType=$Defs::LEVEL_PERSON AND intPersonRegistrationID=0]);

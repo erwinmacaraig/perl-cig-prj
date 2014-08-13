@@ -6,8 +6,8 @@ package Transactions;
 
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(handleTransactions );
-@EXPORT_OK = qw(handleTransactions );
+@EXPORT = qw(handleTransactions checkExistingProduct);
+@EXPORT_OK = qw(handleTransactions checkExistingProduct);
 
 use strict;
 use CGI qw(param unescape escape);
@@ -63,6 +63,41 @@ sub handleTransactions	{
 	#$heading ||= 'Transactions';
   return ($resultHTML,$heading);
 
+}
+
+sub checkExistingProduct    {
+
+    my ($Data, $productID, $tableType, $ID, $entityID, $checkType) = @_;
+
+
+    my $st = qq[
+        SELECT
+            COUNT(intTransactionID) as CountTXNs
+        FROM
+            tblTransactions
+        WHERE
+            intID = ?
+            AND intRealmID = ?
+            AND intTableType = ?
+            AND intStatus=1
+            AND intProductID=?
+    ];
+    my @values=(
+        $ID,
+        $Data->{'Realm'},
+        $tableType,
+        $productID
+    );
+
+    if ($checkType eq 'THIS_ENTITY') {
+        $st .= qq[ AND intTXNEntityID = ?];
+        push @values, $entityID;
+    }
+
+    my $q= $Data->{'db'}->prepare($st);
+    $q->execute(@values) or query_error($st);
+    my ($count) = $q->fetchrow_array();
+    return $count || 0;
 }
 
 sub deleteTransaction	{

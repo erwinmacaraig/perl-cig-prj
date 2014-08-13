@@ -212,9 +212,14 @@ sub listTasks {
         my $tempClient= setClient(\%tempClientValues);
         my $viewURL = "$Data->{'target'}?client=$tempClient&amp;a=$home";
         
+        my $taskDescription = $Data->{'lang'}->txt('Please review this record');
+        if ($dref->{'strTaskType'} eq $Defs::WF_TASK_TYPE_CHECKDUPL)    {
+            $taskDescription =$Data->{'lang'}->txt('This person has been duplicate resolved and appears to have an incorrect Registration count');
+        }    
 
 		my %single_row = (
 			WFTaskID => $dref->{intWFTaskID},
+            TaskDescription => $taskDescription,
 			TaskType => $dref->{strTaskType},
 			AgeLevel => $dref->{strAgeLevel},
 			RuleFor=> $dref->{strWFRuleFor},
@@ -237,14 +242,14 @@ sub listTasks {
     if ($clrCount)   {
         my %row=(
             TaskType => 'TRANSFERS',
-            Name => $Data->{'lang'}->txt('You have Transfers to view'),
+            TaskDescription=> $Data->{'lang'}->txt('You have Transfers to view'),
         );
 		push @TaskList, \%row;
     }
     if ($dupCount)   {
         my %row=(
             TaskType => 'DUPLICATES',
-            Name => $Data->{'lang'}->txt('You have Duplicates to resolve'),
+            TaskDescription=> $Data->{'lang'}->txt('You have Duplicates to resolve'),
         );
 		push @TaskList, \%row;
     }
