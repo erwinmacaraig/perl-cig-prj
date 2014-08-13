@@ -70,7 +70,7 @@ print STDERR Dumper(\%nodes);
                     AND UF.intFileType = $Defs::UPLOADFILETYPE_LOGO
                 )
             WHERE E.intEntityID IN ($node_str)
-                AND E.intEntityLevel > $Defs::LEVEL_CLUB
+                AND E.intEntityLevel >= $Defs::LEVEL_CLUB
             ORDER BY E.strLocalName
         ];
         my $q = $db->prepare($st);
