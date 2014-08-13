@@ -142,54 +142,56 @@ sub checkRenewalRegoOK  {
     $pref = loadPersonDetails($Data->{'db'}, $personID) if ($personID);
     return 0 if (defined $pref and ($pref->{'strStatus'} eq $Defs::PERSON_STATUS_SUSPENDED));
 
+    my @statusIN = ($Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);
     my %Reg = (
         sport=> $rego_ref->{'sport'} || '',
         personType=> $rego_ref->{'personType'} || '',
         personEntityRole=> $rego_ref->{'personEntityRole'} || '',
         personLevel=> $rego_ref->{'personLevel'} || '',
         ageLevel=> $rego_ref->{'ageLevel'} || '',
-        status=> $Defs::PERSONREGO_STATUS_ACTIVE,
+        statusIN => \@statusIN,
         entityID=> $rego_ref->{'entityID'} || 0,
     );
-    my ($countActive, undef) = getRegistrationData(
+    my ($count, undef) = getRegistrationData(
         $Data,
         $personID,
         \%Reg
     );
 
-    %Reg = (
-        sport=> $rego_ref->{'sport'} || '',
-        personType=> $rego_ref->{'personType'} || '',
-        personEntityRole=> $rego_ref->{'personEntityRole'} || '',
-        personLevel=> $rego_ref->{'personLevel'} || '',
-        ageLevel=> $rego_ref->{'ageLevel'} || '',
-        status=> $Defs::PERSONREGO_STATUS_ROLLEDOVER,
-        entityID=> $rego_ref->{'entityID'} || 0,
-    );
-    my ($countRolledOver, undef) = getRegistrationData(
-        $Data,
-        $personID,
-        \%Reg
-    );
+    #%Reg = (
+    #    sport=> $rego_ref->{'sport'} || '',
+    #    personType=> $rego_ref->{'personType'} || '',
+    #    personEntityRole=> $rego_ref->{'personEntityRole'} || '',
+    #    personLevel=> $rego_ref->{'personLevel'} || '',
+    #    ageLevel=> $rego_ref->{'ageLevel'} || '',
+    #    status=> $Defs::PERSONREGO_STATUS_ROLLED_OVER,
+    #    entityID=> $rego_ref->{'entityID'} || 0,
+    #);
+    #my ($countRolledOver, undef) = getRegistrationData(
+    #    $Data,
+    #    $personID,
+    #    \%Reg
+    #);
 
 
-    %Reg = (
-        sport=> $rego_ref->{'sport'} || '',
-        personType=> $rego_ref->{'personType'} || '',
-        personEntityRole=> $rego_ref->{'personEntityRole'} || '',
-        personLevel=> $rego_ref->{'personLevel'} || '',
-        ageLevel=> $rego_ref->{'ageLevel'} || '',
-        status=> $Defs::PERSONREGO_STATUS_PASSIVE,
-        entityID=> $rego_ref->{'entityID'} || 0,
-    );
-    my ($countInactive, undef) = getRegistrationData(
-        $Data,
-        $personID,
-        \%Reg
-    );
+    #%Reg = (
+    #    sport=> $rego_ref->{'sport'} || '',
+    #    personType=> $rego_ref->{'personType'} || '',
+    #    personEntityRole=> $rego_ref->{'personEntityRole'} || '',
+    #    personLevel=> $rego_ref->{'personLevel'} || '',
+    #    ageLevel=> $rego_ref->{'ageLevel'} || '',
+    #    status=> $Defs::PERSONREGO_STATUS_PASSIVE,
+    #    entityID=> $rego_ref->{'entityID'} || 0,
+    #);
+    #my ($countInactive, undef) = getRegistrationData(
+    #    $Data,
+    #    $personID,
+    #    \%Reg
+    #);
 
     
-    return 1 if ($countActive or $countInactive or $countRolledOver); ## Must have an ACTIVE or PASSIVE record
+    #return 1 if ($countActive or $countInactive or $countRolledOver); ## Must have an ACTIVE or PASSIVE record
+    return 1 if ($count);
     return 0;
 
 
