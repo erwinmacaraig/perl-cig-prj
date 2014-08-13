@@ -13,6 +13,8 @@ CREATE TABLE `tblMatrix` (
     strSport    VARCHAR(20) DEFAULT '',
     intOriginLevel INT DEFAULT 0, /* Self, club, Reg, MA */
     strAgeLevel VARCHAR(20) NOT NULL DEFAULT 'ALL', /* ALL,ADULT,MINOR */
+    dtFrom date,
+    dtTo date,
     intPaymentRequired TINYINT DEFAULT 0,
     intLocked TINYINT DEFAULT 0,
     dtAdded date,
