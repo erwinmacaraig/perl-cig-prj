@@ -1,0 +1,26 @@
+<div id="swm-login-wrap">
+            <div class="spm-left">
+            </div>
+            <div class="spm-right">
+                <div class="membership-login-wrap passport-sign-box">
+                    <p class="pageHeading">[% Lang.txt('Register/Sign') %]</span></p>
+                    <span class="spp_loggedout"><p class="instruct">[% Lang.txt("Don't have an account ?") %]</p>
+                    <p class="instruct">[% Lang.txt("No problems, just click Register to create one and gain access to your") %]
+                     <span class="sp-membership">[% Lang.txt("SP Membership") %]</span> [% Lang.txt("database") %].
+</span>
+                    </p>
+<p>
+<form method = "POST" action = "user/login.cgi">
+                       UN <input type = "text" name = "email"><br>
+                       PW <input type = "password" name = "pw"><br>
+                        <span class="button generic-button"><input type = "submit" value = "[% Lang.txt('Sign in') %]"> </span>
+</p>
+</form>
+                    <span class="spp_loggedin">
+                        <p class="instruct">We see you already have an account. Sign in below to access your <span class="sp-membership">SP Membership</span> database.</p>
+                    </span>
+                    <span class="spp_loggedout"><span class="button special-button"><a href="user/signup.cgi">[% Lang.txt('Register') %]</a></span></span>
+                    <span><p style="padding-top:70px; font-size:16px; margin:8px 0; letter-spacing: -0.5px;"><a href="forgotten_password.cgi">I forgot my password.</a></p></span>
+                </div>
+            </div>
+        </div>
