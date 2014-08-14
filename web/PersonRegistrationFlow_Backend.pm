@@ -91,8 +91,16 @@ warn("FBEND:$personID");
         $action = $Flow{$action};
     }
     if ( $action eq 'PREGF_DU' ) {
-        #Update document records
-        $action = $Flow{$action};
+        #### JUST tryint to put the upload function here###
+        
+        my $filename_of_uploaded = param('file') || ''; 
+        if($filename_of_uploaded ne ''){
+        
+        }
+        else {
+             #Update document records
+             $action = $Flow{$action}; 
+        }
     }
 
 
