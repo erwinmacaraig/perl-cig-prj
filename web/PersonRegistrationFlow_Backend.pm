@@ -18,6 +18,7 @@ use RegoTypeLimits;
 use PersonRegistrationFlow_Common;
 use Person;
 use TTTemplate;
+use UploadFiles;
 
 use Data::Dumper;
 
@@ -106,9 +107,18 @@ warn("FBEND:$personID");
     if ( $action eq 'PREGF_DU' ) {
         #### JUST tryint to put the upload function here###
         
-        my $filename_of_uploaded = param('file') || ''; 
-        if($filename_of_uploaded ne ''){
-        
+        my $uploaded_filename = param('file') || ''; 
+        if($uploaded_filename ne ''){  
+            #my $EntityTypeID = $Data->{'clientValues'}{'currentLevel'}; 
+            #my $EntityID = $Data->{'clientValues'}{'_intID'};
+            my $filefield = 'file';  
+            my $permission = ''; 
+            my @files = (
+                        [$uploaded_filename, $filefield, $permission,],
+            ); 
+            processUploadFile($Data,\@files,$entityLevel,$entityID,$Defs::UPLOADFILETYPE_DOC,);
+            # _processUploadFile_single($Data,$uploaded_filename,'file',$EntityTypeID,$EntityID,$Defs::UPLOADFILETYPE_DOC,1,undef);                 
+           
         }
         else {
              #Update document records

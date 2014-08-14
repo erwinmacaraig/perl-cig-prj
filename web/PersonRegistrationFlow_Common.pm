@@ -116,16 +116,11 @@ sub displayRegoFlowDocuments    {
      my $body = qq[
         display document upload information
      ];
-<<<<<<< HEAD
+
       
      #####################3
      print STDERR Dumper($documents);
-=======
-     $body .= qq[
-        <form action="$Data->{target}" method="POST">
-            <input type="hidden" name="a" value="PREGF_DU">
-     ];
->>>>>>> 226e5f2be5764d6be570d75206550b1bd3a272cc
+
      foreach my $doc (@{$documents})   {
         $body .= qq[ <p>Document ID needed ]. $doc->{'ID'}. qq[</p>]; 
         ### plaed one dropzone form for each document ##########
