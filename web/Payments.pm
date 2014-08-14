@@ -287,7 +287,7 @@ sub checkoutConfirm	{
 	if (($onlinePayment) and $amount eq '0.00')	{
 	    my $responsetext = 'Zero paid';
         my $txn = 'Zero-' . time(); 
-		processTransLog($Data->{'db'}, $txn, 'OK', $responsetext, $intLogID, $paymentSettings, undef, undef, '', '', '', '', '');
+		processTransLog($Data->{'db'}, $txn, 'OK', $responsetext, $intLogID, $paymentSettings, undef, undef, '', '', '', '', '', '','',1);
 		UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $intLogID);
 #        EmailPaymentConfirmation($Data, $paymentSettings, $intLogID, $client, $RegoFormObj);
 #        Products::product_apply_transaction($Data,$intLogID);
@@ -717,7 +717,7 @@ sub displayPaymentResult        {
 
 sub processTransLogFailure    {
 
-    my ($db, $intLogID, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5) = @_;
+    my ($db, $intLogID, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text) = @_;
     $intLogID ||= 0;
 
     my %fields=();
@@ -726,17 +726,19 @@ sub processTransLogFailure    {
     $fields{otherRef3} = $otherRef3 || '';
     $fields{otherRef4} = $otherRef4 || '';
     $fields{otherRef5} = $otherRef5 || '';
+    $fields{GATEWAY_AUTH_ID} = $authID || '';
+    $fields{GATEWAY_RESPONSE_TEXT} = $text || '';
     deQuote($db, \%fields);
 
     my $st= qq[
         UPDATE tblTransLog
-        SET strResponseCode = "-1", strResponseText = "FAILED", intStatus = $Defs::TXNLOG_FAILED, strOtherRef1 = $fields{otherRef1}, strOtherRef2 = $fields{otherRef2}, strOtherRef3 = $fields{otherRef3}, strOtherRef4 = $fields{otherRef4}, strOtherRef5 = $fields{otherRef5}
+        SET strResponseCode = "-1", strResponseText = "FAILED", intStatus = $Defs::TXNLOG_FAILED, strOtherRef1 = ?, strOtherRef2 = ?, strOtherRef3 = ?, strOtherRef4 = ?, strOtherRef5 = ?, strAuthID=?, strText=?
         WHERE intLogID = $intLogID
 		    AND intStatus = $Defs::TXNLOG_PENDING
             AND strResponseCode IS NULL
     ];
     my $query = $db->prepare($st) or query_error($st);
-    $query->execute or query_error($st);
+    $query->execute($fields{otherRef1}, $fields{otherRef2}, $fields{otherRef3}, $fields{otherRef4}, $fields{otherRef5}, $fields{GATEWAY_AUTH_ID}, $fields{GATEWAY_RESPONSE_TEXT}) or query_error($st);
 }
 
 sub calcTXNInvoiceNum       {
@@ -1279,7 +1281,7 @@ sub logRetry	{
 
 sub processTransLog    {
 
-    my ($db, $txn, $responsecode, $responsetext, $intLogID, $paymentSettings, $passedChkValue, $settlement_date, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $exportOK) = @_;
+    my ($db, $txn, $responsecode, $responsetext, $intLogID, $paymentSettings, $passedChkValue, $settlement_date, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text, $exportOK) = @_;
 
 	$exportOK ||= 0;
     my %fields=();
@@ -1316,9 +1318,9 @@ sub processTransLog    {
     $m->add($paymentSettings->{'gatewaySalt'}, $chkvalue);
     $chkvalue = $m->hexdigest();
 
-    deQuote($db, \%fields);
+#    deQuote($db, \%fields);
 	if (! $responsecode)	{
-		processTransLogFailure($db, $intLogID, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5);
+		processTransLogFailure($db, $intLogID, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text);
 	}
 	else	{
 		if ($existingResponseCode and $existingLogID)	{
@@ -1326,12 +1328,25 @@ sub processTransLog    {
 		}
     	$statement = qq[
             UPDATE tblTransLog
-        	SET dtLog=SYSDATE(), strTXN = $fields{txn}, strResponseCode = $fields{responsecode}, strResponseText = $fields{responsetext}, intStatus = $intStatus, dtSettlement=$fields{settlement_date}, strOtherRef1 = $fields{otherRef1}, strOtherRef2 = $fields{otherRef2}, strOtherRef3 = $fields{otherRef3}, strOtherRef4 = $fields{otherRef4}, strOtherRef5 = $fields{otherRef5} , intExportOK = $exportOK
+        	SET dtLog=SYSDATE(), strTXN = ?, strResponseCode = ?, strResponseText = ?, intStatus = $intStatus, dtSettlement=?, strOtherRef1 = ?, strOtherRef2 = ?, strOtherRef3 = ?, strOtherRef4 = ?, strOtherRef5 = ? , intExportOK = $exportOK, strAuthID=?, strText=?
         	WHERE intLogID = $intLogID
 			    AND intStatus<> 1
     	];
     	$query = $db->prepare($statement) or query_error($statement);
-    	$query->execute or query_error($statement);
+    	$query->execute(
+            $fields{txn},
+            $fields{responsecode},
+            $fields{responsetext},
+            $fields{settlement_date},
+            $fields{otherRef1},
+            $fields{otherRef2},
+            $fields{otherRef3},
+            $fields{otherRef4},
+            $fields{otherRef5},
+            $authID,
+            $text
+        )
+         or query_error($statement);
 	}
 
 	$intLogID=0 if ($chkvalue ne $passedChkValue);
