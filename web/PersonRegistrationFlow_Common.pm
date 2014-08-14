@@ -22,6 +22,8 @@ use Reg_common;
 use CGI qw(:cgi unescape);
 use Payments;
 use RegoTypeLimits;
+use TTTemplate;
+use Transactions;
 use Data::Dumper;
 
 sub displayRegoFlowComplete {
@@ -30,7 +32,6 @@ sub displayRegoFlowComplete {
     my $lang=$Data->{'lang'};
 
     my $ok = 0;
-print STDERR Dumper($rego_ref);
     if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL') {
         $ok=1;
     }
@@ -39,9 +40,16 @@ print STDERR Dumper($rego_ref);
     }
     my $body = '';
     if (!$ok)   {
-        $body = $lang->txt("You cannot register this combination, limit exceeded");
+        my $error = $lang->txt("You cannot register this combination, limit exceeded");
         my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_T";
-        $body .= qq[<a href="$url">].$lang->txt("Click here to select new combination").qq[</a>];
+        my %PageData = (
+            return_url => $url,
+            error => $error,
+            target => $Data->{'target'},
+            Lang => $lang,
+            client => $client,
+        );
+        $body = runTemplate($Data, \%PageData, 'registration/error.templ') || '';
     }
     if ($ok)   {
         submitPersonRegistration(
@@ -51,14 +59,20 @@ print STDERR Dumper($rego_ref);
          );
          my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
          my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
-         $body = qq[
-            Registration is complete
-            <a href = "$url">Continue</a><br>
-            <a href = "$pay_url">View Transactions</a><br>
-         ];
+        my $gateways = '';
          if (1==2)   {
-            $body .= generateRegoFlow_Gateways($Data, "PREGF_CHECKOUT", $hidden_ref);
+            $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
          }
+        my %PageData = (
+            person_home_url => $url,
+            gateways => $gateways,
+            txns_url => $pay_url,
+            target => $Data->{'target'},
+            hidden_ref=> $hidden_ref,
+            Lang => $Data->{'lang'},
+            client=>$client,
+        );
+        $body = runTemplate($Data, \%PageData, 'registration/complete.templ') || '';
     }
     return $body;
 }
@@ -102,9 +116,16 @@ sub displayRegoFlowDocuments    {
      my $body = qq[
         display document upload information
      ];
+<<<<<<< HEAD
       
      #####################3
      print STDERR Dumper($documents);
+=======
+     $body .= qq[
+        <form action="$Data->{target}" method="POST">
+            <input type="hidden" name="a" value="PREGF_DU">
+     ];
+>>>>>>> 226e5f2be5764d6be570d75206550b1bd3a272cc
      foreach my $doc (@{$documents})   {
         $body .= qq[ <p>Document ID needed ]. $doc->{'ID'}. qq[</p>]; 
         ### plaed one dropzone form for each document ##########
@@ -161,36 +182,39 @@ sub displayRegoFlowProducts {
     my @prodIDs = ();
     my %ProductRules=();
     foreach my $product (@{$products})  {
+
+        next if($product->{'UseExistingThisEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'THIS_ENTITY'));
+        next if($product->{'UseExistingAnyEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'ANY_ENTITY'));
+
         push @prodIDs, $product->{'ID'};
         $ProductRules{$product->{'ID'}} = $product;
      }
-     my $body .= qq[
-        <form action="$Data->{target}" method="POST">
-            <input type="hidden" name="a" value="PREGF_PU">
-     ];
-        foreach my $hidden (keys %{$hidden_ref})   {
-            $body .= qq[<input type="hidden" name="$hidden" value="].$hidden_ref->{$hidden}.qq[">];
-        }
-        if (@prodIDs)   {
-            $body .= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
-        }
-        $body .= qq[
-                <input type="submit" name="submit" value="]. $lang->txt("Continue").qq[" class = "button proceed-button"><br><br>
-            </form>
-            display product information
-            HANDLE NO PRODUCTS
-        ];
-    return $body;
+    my $product_body='';
+    if (@prodIDs)   {
+        $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
+     }
+
+     my %PageData = (
+        nextaction=>"PREGF_PU",
+        target => $Data->{'target'},
+        product_body => $product_body,
+        hidden_ref=> $hidden_ref,
+        Lang => $Data->{'lang'},
+        client=>$client,
+    );
+    my $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ') || '';
+
+    return $pagedata;
 }
  
 
 sub generateRegoFlow_Gateways   {
 
-    my ($Data, $nextAction, $hidden_ref) = @_;
+    my ($Data, $client, $nextAction, $hidden_ref) = @_;
 
     my $lang = $Data->{'lang'};
     my (undef, $paymentTypes) = getPaymentSettings($Data, 0, 0, $Data->{'clientValues'});
-    my $CC_body = qq[
+    my $gateway_body = qq[
         <div id = "payment_cc" style= "ddisplay:none;"><br>
     ];
     my $gatewayCount = 0;
@@ -199,29 +223,27 @@ sub generateRegoFlow_Gateways   {
         my $id = $gateway->{'intPaymentConfigID'};
         my $pType = $gateway->{'paymentType'};
         my $name = $gateway->{'gatewayName'};
-        $CC_body .= qq[
+        $gateway_body .= qq[
             <input type="submit" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
             <input type="hidden" value="$pType" name="pt_submit[$gatewayCount]">
         ];
     }
-    $CC_body .= qq[
+    $gateway_body .= qq[
         <input type="hidden" value="$gatewayCount" name="gatewayCount">
         <div style= "clear:both;"></div>
         </div>
     ];
-    $CC_body = '' if ! $gatewayCount;
-    my $body = qq[
-        <form action="$Data->{target}" method="POST">
-        <input type="hidden" name="a" value="$nextAction">
-    ];
-    foreach my $hidden (keys %{$hidden_ref})   {
-        $body .= qq[<input type="hidden" name="$hidden" value="].$hidden_ref->{$hidden}.qq[">];
-    }
-    $body .= qq[
-        $CC_body
-        </form>
-    ];
-    return $body;
+    $gateway_body = '' if ! $gatewayCount;
+
+    my %PageData = (
+        nextaction=>$nextAction,
+        target => $Data->{'target'},
+        gateway_body => $gateway_body,
+        hidden_ref=> $hidden_ref,
+        Lang => $Data->{'lang'},
+        client=>$client,
+    );
+    return runTemplate($Data, \%PageData, 'registration/show_gateways.templ') || '';
 }
 
 sub validateRegoID {
@@ -271,9 +293,11 @@ sub add_rego_record{
         entityID => $entityID,
         entityLevel => $entityLevel,
         personID => $personID,
-        current => 1,
     };
 
+    my ($personStatus, $prStatus) = checkIsSuspended($Data, $personID, $entityID, $rego_ref->{'personType'});
+    return (0, undef, 'SUSPENDED') if ($personStatus eq 'SUSPENDED' or $prStatus eq 'SUSPENDED');
+        
     if ($rego_ref->{'registrationNature'} ne 'RENEWAL') {
         my $ok = checkRegoTypeLimits($Data, $personID, 0, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
         return (0, undef, 'LIMIT_EXCEEDED') if (!$ok);

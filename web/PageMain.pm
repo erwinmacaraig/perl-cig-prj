@@ -368,11 +368,9 @@ warn(" IN PF");
     my $output = new CGI;
     my $header = '';
     if($Data->{'WriteCookies'})    {
-warn("### IN WRITE COOKIES#");
         my $cookies_string = '';
         my @cookie_array = ();
         for my $i (@{$Data->{'WriteCookies'}})    {
-warn("EXPIRES $i->[2]");
             push @cookie_array, $output->cookie(
                 -name=>$i->[0],
                 -value=>$i->[1],
@@ -387,6 +385,8 @@ warn("EXPIRES $i->[2]");
 
         if($Data->{'RedirectTo'})   {
             $header = $output->redirect (-uri => $Data->{'RedirectTo'},-cookie=>[$cookies_string], -P3P => $p3p);
+my $o = new CGI; #Don't know why this and next line are need - but it works
+my $h3eader = $o->header();
         }
         else    {
             $header = $output->header(-cookie=>[$cookies_string], -P3P => $p3p, -charset=>'UTF-8');

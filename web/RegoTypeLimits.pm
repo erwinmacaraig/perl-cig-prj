@@ -6,6 +6,7 @@ require Exporter;
     checkRegoTypeLimits
 );
 
+use lib ".", "..";
 use strict;
 use Reg_common;
 use Utils;
@@ -22,12 +23,13 @@ sub checkRegoTypeLimits    {
     ## Sport, PersonType mandatory.  But other fields can be blank in tblRegoTypeLimits
     $personID ||= 0;
     $personRegistrationID ||= 0;
+    my $entityID=0;
     
     if ($personRegistrationID)  {
         my %Reg = (
             personRegistrationID => $personRegistrationID,
         );
-        my ($count, $regs) = getRegistrationData(
+        my ($count, $regs) = PersonRegistration::getRegistrationData(
             $Data,
             $personID,
             \%Reg
@@ -38,6 +40,7 @@ sub checkRegoTypeLimits    {
             $entityRole= $regs->[0]{'strPersonEntityRole'};
             $personLevel= $regs->[0]{'strPersonLevel'};
             $ageLevel= $regs->[0]{'strAgeLevel'};
+            $entityID= $regs->[0]{'intEntityID'};
         }
     }
     my $st = qq[
@@ -75,9 +78,22 @@ sub checkRegoTypeLimits    {
     my $query = $Data->{'db'}->prepare($st);
     $query -> execute(@limitValues);
 
+    ## Build up an SQL for Count of Unique Person/Entity per sport/personType
+    my $stPE = qq[
+        SELECT
+            COUNT(intPersonRegistrationID) as CountPE,
+            intEntityID
+        FROM
+            tblPersonRegistration_$Data->{'Realm'}
+        WHERE
+            intPersonID = ?
+            AND intPersonRegistrationID <> ?
+            AND strStatus IN ('ACTIVE', 'PENDING', 'SUSPENDED')
+            AND strPersonType = ?
+    ];
     my $stPR = qq[
         SELECT
-            COUNT(intPersonRegistrationID) as CountPR
+            COUNT(intPersonRegistrationID) as CountPR,
         FROM
             tblPersonRegistration_$Data->{'Realm'}
         WHERE
@@ -94,11 +110,15 @@ sub checkRegoTypeLimits    {
     while (my $dref = $query->fetchrow_hashref())   {
         next if ! $dref->{'intLimit'};
         my $stPRrow= $stPR;
+        my $stPErow= $stPE;
         my @rowValues=();
-        @rowValues=@values;
+        my @PErowValues=();
+        @PErowValues=@values;
         if ($dref->{'strSport'} and $dref->{'strSport'} ne '')    {
             $stPRrow.= qq[ AND strSport = ? ];
             push @rowValues, $dref->{'strSport'};
+            $stPErow.= qq[ AND strSport = ? ];
+            push @PErowValues, $dref->{'strSport'};
         }
         
         if (defined $dref->{'strPersonEntityRole'} and $dref->{'strPersonEntityRole'} ne '')    {
@@ -113,15 +133,36 @@ sub checkRegoTypeLimits    {
             $stPRrow .= qq[ AND strAgeLevel = ?];
             push @rowValues, $dref->{'strAgeLevel'};
         }
-        my $qryPR = $Data->{'db'}->prepare($stPRrow);
-        $qryPR -> execute(@rowValues);
-        my $prCount = $qryPR->fetchrow_array() || 0;
-        $prCount++; #For current row
-warn("SQL:$stPRrow");
-print STDERR Dumper(\@rowValues);
-warn("COUNT IS $prCount");
-        if ($prCount > $dref->{'intLimit'}) {
-            return 0;
+        $stPErow .= qq[GROUP BY intEntityID, strPersonType, strSport];
+
+        if ($dref->{'strLimitType'} eq 'PERSONENTITY_UNIQUE')  {
+warn("PE CHECK");
+            ## Only runs on PersonType & Sport
+            my $peCount = 0;
+            my $qryPE = $Data->{'db'}->prepare($stPErow);
+            $qryPE -> execute(@PErowValues);
+            my $thisEntitySeen = 0;
+            while (my $pe_ref = $qryPE->fetchrow_hashref()) {
+                if ($pe_ref->{'intEntityID'} and $pe_ref->{'intEntityID'} == $entityID)  {
+                    $thisEntitySeen = 1;
+                }
+                $peCount++;
+            }
+            $peCount++ if (!$thisEntitySeen);
+            if ($peCount > $dref->{'intLimit'}) {
+                return 0;
+            }
+        warn("PE OK");
+        }
+        else    {
+            ### Normal, across system count
+            my $qryPR = $Data->{'db'}->prepare($stPRrow);
+            $qryPR -> execute(@rowValues);
+            my $prCount = $qryPR->fetchrow_array() || 0;
+            $prCount++; #For current row
+            if ($prCount > $dref->{'intLimit'}) {
+                return 0;
+            }
         }
     }
     return 1;

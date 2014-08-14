@@ -15,7 +15,6 @@ use WorkFlow;
 use UserObj;
 use CGI qw(unescape);
 use RegistrationAllowed;
-use PersonRegistration;
 use RegoTypeLimits;
 use Data::Dumper;
 

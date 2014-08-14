@@ -1648,8 +1648,6 @@ msgstr "The following are the outstanding tasks to be authorised"
 msgid "Registration Authorisation"
 msgstr "Registration Authorisation"
 
-"Registration constants 
-
 msgid "Player"
 msgstr "Player"
 

@@ -17,6 +17,7 @@ use Payments;
 use RegoTypeLimits;
 use PersonRegistrationFlow_Common;
 use Person;
+use TTTemplate;
 
 use Data::Dumper;
 
@@ -67,17 +68,29 @@ warn("FBEND:$personID");
         my $msg='';
         ($regoID, $rego_ref, $msg) = add_rego_record($Data, $personID, $entityID, $entityLevel, $originLevel);
         if (!$regoID)   {
+            my $error = '';
+            if ($msg eq 'SUSPENDED')   {
+                $error = $lang->txt("You cannot register at this time, Person is currently SUSPENDED");
+            }
             if ($msg eq 'LIMIT_EXCEEDED')   {
-                $body = $lang->txt("You cannot register this combination, limit exceeded");
+                $error = $lang->txt("You cannot register this combination, limit exceeded");
             }
             if ($msg eq 'NEW_FAILED')   {
-                $body = $lang->txt("New failed, existing registration found");
+                $error = $lang->txt("New failed, existing registration found.  In order to continue, a Transfer from the existing Entity must be organised.");
             }
             if ($msg eq 'RENEWAL_FAILED')   {
-                $body = $lang->txt("Renewal failed, cannot find existing registration");
+                $error = $lang->txt("Renewal failed, cannot find existing registration");
             }
             my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_T";
-            $body .= qq[<a href="$url">].$lang->txt("Click here to select new combination").qq[</a>];
+            ## Make this a template for errors
+            my %PageData = (
+                return_url => $url,
+                error => $error,
+                target => $Data->{'target'},
+                Lang => $lang,
+                client => $client,
+            );
+            return runTemplate($Data, \%PageData, 'registration/error.templ') || '';
         }
         else    {
             $Hidden{'rID'} = $regoID;
@@ -106,7 +119,6 @@ warn("FBEND:$personID");
 
 ## FLOW SCREENS
     if ( $action eq 'PREGF_T' ) {
-warn("HERE $personID | $entityID");
         my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_TU&amp;";
         $body = displayPersonRegisterWhat(
             $Data,

@@ -108,6 +108,8 @@ sub showPersonHome	{
     my %RegFilters=();
     $RegFilters{'current'} = 1;
     $RegFilters{'entityID'} = getLastEntityID($Data->{'clientValues'});
+    my @statusIN = ($Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);
+    $RegFilters{'statusIN'} = \@statusIN;
     my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
     $TemplateData{'RegistrationInfo'} = $Reg_ref;
 
@@ -210,7 +212,7 @@ sub showLink {
         my %Reg=();
         $Reg{'entityID'} = getLastEntityID($Data->{'clientValues'});
         my $field = Person::loadPersonDetails($Data->{'db'},$personID); 
-        if(($field->{'strStatus'} eq $Defs::PERSON_STATUS_ACTIVE || $field->{'strStatus'} eq $Defs::PERSON_STATUS_PENDING) && isPersonRegistered($Data,$personID,\%Reg)){
+        if(($field->{'strStatus'} eq $Defs::PERSON_STATUS_ACTIVE || $field->{'strStatus'} eq $Defs::PERSON_STATUS_PENDING) && PersonRegistration::isPersonRegistered($Data,$personID,\%Reg)){
             return  $url; 
         } 
         return undef;

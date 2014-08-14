@@ -21,6 +21,8 @@ CREATE TABLE tblTransLog (
     dtSettlement date,
     intEntityPaymentID INT default 0,
     intPaymentConfigID INT default 0,
+    strAuthID varchar(50) default '',
+    strText varchar(150) default '',
     strOtherRef1 varchar(100) default '',
     strOtherRef2 varchar(100) default '',
     strOtherRef3 varchar(100) default '',
