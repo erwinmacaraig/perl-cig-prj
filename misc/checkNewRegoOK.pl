@@ -15,7 +15,7 @@ use WorkFlow;
 use UserObj;
 use CGI qw(unescape);
 use RegistrationAllowed;
-use RegoTypeLimits;
+use PersonRegistration;
 use Data::Dumper;
 
 main();
@@ -30,16 +30,15 @@ sub main	{
 	$Data{'db'} = $db;
 	$Data{'Realm'} = 1;
 	$Data{'RealmSubType'} = 0;
-
-   my $ok = checkRegoTypeLimits(\%Data, $personID, $pRID, 'FOOTBALL', 'PLAYER', '', 'AMATEUR', 'JUNIOR');
+    my %Rego=();
+    $Rego{'personType'} = 'PLAYER';
+    $Rego{'sport'} = 'FUTSAL';
+    $Rego{'personLevel'} = 'AMATEUR';
+    $Rego{'ageLevel'} = 'SENIOR';
+    $Rego{'personEntityRole'} = '';
+    $Rego{'entityID'} = 35;
+    
+   my $ok = checkNewRegoOK(\%Data, $personID, \%Rego);
 warn("try1-FAILED") if (!$ok);
 warn("try1-OK to insert") if ($ok);
-
-   my $ok = checkRegoTypeLimits(\%Data, $personID, $pRID, 'FOOTBALL', 'PLAYER', '', 'AMATEUR', 'SENIOR');
-warn("try2-FAILED") if (!$ok);
-warn("try2-OK to insert") if ($ok);
-
-   my $ok = checkRegoTypeLimits(\%Data, $personID, $pRID, 'FOOTBALL', 'TECHOFFICIAL', 'DOCTOR', 'AMATEUR', 'SENIOR');
-warn("try3-FAILED") if (!$ok);
-warn("try3-OK to insert") if ($ok);
 }

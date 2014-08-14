@@ -23,7 +23,7 @@ sub getFieldLabels	{
 
 		%labels = (
 			strNationalNum => $natnumname,
-			strStatus => "Active",
+			strStatus => "Status",
 			strSalutation => 'Title',
 			strLocalFirstname => 'First name',
 			strLocalMiddlename => 'Middle name',

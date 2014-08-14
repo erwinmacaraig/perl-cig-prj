@@ -9,6 +9,7 @@ CREATE TABLE tblPersonRegistration_XX (
     strPersonEntityRole varchar(50) DEFAULT '', /* Referee, Head Coach, Delegate, Other */
     
     strStatus varchar(20) default '', /*Pending, Active,Passive, Transferred */
+    strPreTransferredStatus varchar(20) default '', /*Pending, Active,Passive, Transferred */
     strSport varchar(20) default '',
     intCurrent tinyint default 0,
     intOriginLevel TINYINT DEFAULT 0, /* Self, club, Reg, MA */

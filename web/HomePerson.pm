@@ -18,6 +18,7 @@ use FormHelpers;
 use PersonRegistration;
 use UploadFiles;
 use Log;
+use Person;
 use Data::Dumper;
 
 require AccreditationDisplay;
@@ -71,7 +72,7 @@ sub showPersonHome	{
 	my %TemplateData = (
 		Name => $name,
 		ReadOnlyLogin => $Data->{'ReadOnlyLogin'},
-		EditDetailsLink => "$Data->{'target'}?client=$client&amp;a=P_DTE",
+		EditDetailsLink => showLink($personID,$client,$Data),
 		Notifications => $notifications,
 		Photo => $photo,
 		MarkDuplicateURL => $markduplicateURL || '',
@@ -107,7 +108,9 @@ sub showPersonHome	{
     my %RegFilters=();
     $RegFilters{'current'} = 1;
     $RegFilters{'entityID'} = getLastEntityID($Data->{'clientValues'});
-    my ($RegCount, $Reg_ref) = getRegistrationData($Data, $personID, \%RegFilters);
+    my @statusIN = ($Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);
+    $RegFilters{'statusIN'} = \@statusIN;
+    my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
     $TemplateData{'RegistrationInfo'} = $Reg_ref;
 
 
@@ -200,4 +203,18 @@ sub deregistration_check___duplicated {
         }
 }
 
+sub showLink {
+        my ($personID,$client,$Data) = @_;
+           
+        #check person level 
+        my $url = "$Data->{'target'}?client=$client&amp;a=P_DTE";
+        return $url if ($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL);     
+        my %Reg=();
+        $Reg{'entityID'} = getLastEntityID($Data->{'clientValues'});
+        my $field = Person::loadPersonDetails($Data->{'db'},$personID); 
+        if(($field->{'strStatus'} eq $Defs::PERSON_STATUS_ACTIVE || $field->{'strStatus'} eq $Defs::PERSON_STATUS_PENDING) && PersonRegistration::isPersonRegistered($Data,$personID,\%Reg)){
+            return  $url; 
+        } 
+        return undef;
+}
 1;

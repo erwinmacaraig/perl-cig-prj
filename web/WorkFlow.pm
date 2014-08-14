@@ -6,6 +6,7 @@ require Exporter;
   	addWorkFlowTasks
   	approveTask
   	checkForOutstandingTasks
+    addIndividualTask
 );
 
 use strict;
@@ -17,6 +18,74 @@ use Log;
 use PersonUtils;
 use Clearances;
 use Duplicates;
+use PersonRegistration;
+use CGI qw(param unescape escape);
+
+sub addIndividualTask   {
+
+    my ($Data, $ruleID, $taskType, $ruleFor, $task_ref) = @_;
+
+     my $stINS = qq[
+        INSERT IGNORE INTO tblWFTask (
+            intWFRuleID,
+            intRealmID,
+            intSubRealmID,
+            intCreatedByUserID,
+            intApprovalEntityID,
+            strTaskType,
+            strWFRuleFor,
+            strRegistrationNature,
+            intDocumentTypeID,
+            strTaskStatus,
+            intProblemResolutionEntityID,
+            intEntityID,
+            intPersonID,
+            intPersonRegistrationID,
+            intDocumentID
+        )
+        VALUES (
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?
+        )
+    ];
+    my $approvalEntityID = getEntityParentID($Data, $task_ref->{'entityID'}, $task_ref->{'approvalLevel'} || $Defs::LEVEL_NATIONAL) || 0;
+    my $problemEntityID = $task_ref->{'problemEntityID'} || $task_ref->{'entityID'} || 0;
+    my $q= $Data->{'db'}->prepare($stINS);
+    $q->execute(
+        $ruleID || 0,
+        $Data->{'Realm'},
+        $Data->{'RealmSubType'},
+        $Data->{'clientValues'}{'userID'},
+        $approvalEntityID,
+        $taskType,
+        $ruleFor,
+        $task_ref->{'registrationNature'} || '',
+        $task_ref->{'documentTypeID'} || 0,
+        $task_ref->{'taskStatus'} || 'ACTIVE',
+        $problemEntityID,
+        $task_ref->{'entityID'} || 0,
+        $task_ref->{'personID'} || 0,
+        $task_ref->{'personRegistrationID'} || 0,
+        $task_ref->{'documentID'} || 0,
+    );
+}
+        
+        
+    
+
 
 sub handleWorkflow {
     my ( 
@@ -72,7 +141,9 @@ sub listTasks {
             t.strTaskStatus, 
             t.strWFRuleFor,
             uar.entityID as UserEntityID, 
-            uarRejected.entityID as UserRejectedEntityID
+            uarRejected.entityID as UserRejectedEntityID,
+            e.intEntityID,
+            e.intEntityLevel
 		FROM tblWFTask AS t
         LEFT JOIN tblEntity as e ON (e.intEntityID = t.intEntityID)
 		LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (t.intPersonRegistrationID = pr.intPersonRegistrationID)
@@ -115,13 +186,40 @@ sub listTasks {
 	my @TaskList = ();
 	my $rowCount = 0;
 	  
+    my $client = unescape($Data->{client});
 	while(my $dref= $q->fetchrow_hashref()) {
+        my %tempClientValues = getClient($client);
 		$rowCount ++;
         my $name = '';
         $name = $dref->{'EntityLocalName'} if ($dref->{strWFRuleFor} eq 'ENTITY');
         $name = formatPersonName($Data, $dref->{'strLocalFirstname'}, $dref->{'strLocalSurname'}, $dref->{'PersonGender'}) if ($dref->{strWFRuleFor} eq 'REGO' or $dref->{strWFRuleFor} eq 'PERSON');
+        my $home = '';
+        if ($dref->{'intEntityID'}) {
+            $tempClientValues{currentLevel} = $dref->{'intEntityLevel'};
+            my $level = 'clubID';
+            $level = 'regionID' if ($dref->{'intEntityLevel'} == $Defs::LEVEL_REGION);
+            $level = 'zoneID' if ($dref->{'intEntityLevel'} == $Defs::LEVEL_ZONE);
+            $level = 'stateID' if ($dref->{'intEntityLevel'} == $Defs::LEVEL_STATE);
+            $level = 'natID' if ($dref->{'intEntityLevel'} == $Defs::LEVEL_NATIONAL);
+            $home = 'E_HOME';
+            $tempClientValues{$level} = $dref->{intEntityID};
+        }
+        if ($dref->{'intPersonID'}) {
+            $tempClientValues{currentLevel} = $Defs::LEVEL_PERSON;
+            $tempClientValues{personID} = $dref->{intPersonID};
+            $home = 'P_HOME';
+        }
+        my $tempClient= setClient(\%tempClientValues);
+        my $viewURL = "$Data->{'target'}?client=$tempClient&amp;a=$home";
+        
+        my $taskDescription = $Data->{'lang'}->txt('Please review this record');
+        if ($dref->{'strTaskType'} eq $Defs::WF_TASK_TYPE_CHECKDUPL)    {
+            $taskDescription =$Data->{'lang'}->txt('This person has been duplicate resolved and appears to have an incorrect Registration count');
+        }    
+
 		my %single_row = (
 			WFTaskID => $dref->{intWFTaskID},
+            TaskDescription => $taskDescription,
 			TaskType => $dref->{strTaskType},
 			AgeLevel => $dref->{strAgeLevel},
 			RuleFor=> $dref->{strWFRuleFor},
@@ -133,6 +231,7 @@ sub listTasks {
 			LocalSurname => $dref->{strLocalSurname},
 			PersonID => $dref->{intPersonID},			
 			TaskStatus => $dref->{strTaskStatus},
+            viewURL => $viewURL,
 		);
 		push @TaskList, \%single_row;
 	}
@@ -143,14 +242,14 @@ sub listTasks {
     if ($clrCount)   {
         my %row=(
             TaskType => 'TRANSFERS',
-            Name => $Data->{'lang'}->txt('You have Transfers to view'),
+            TaskDescription=> $Data->{'lang'}->txt('You have Transfers to view'),
         );
 		push @TaskList, \%row;
     }
     if ($dupCount)   {
         my %row=(
             TaskType => 'DUPLICATES',
-            Name => $Data->{'lang'}->txt('You have Duplicates to resolve'),
+            TaskDescription=> $Data->{'lang'}->txt('You have Duplicates to resolve'),
         );
 		push @TaskList, \%row;
     }
@@ -195,7 +294,6 @@ sub getEntityParentID   {
 	my $q = $Data->{'db'}->prepare($st);
   	$q->execute($fromEntityID);
     my $entityLevel = $q->fetchrow_array() || 0;
-warn("FOR $fromEntityID $entityLevel GET $getEntityLevel");
     return $fromEntityID if ($getEntityLevel == $entityLevel);
 
     $st = qq[
@@ -206,14 +304,16 @@ warn("FOR $fromEntityID $entityLevel GET $getEntityLevel");
 		WHERE
             intChildID = ?
             AND intParentLevel = ?
-            AND intPrimary=1
-            
+        ORDER BY intPrimary DESC
+        LIMIT 1            
     ];
+            #AND intPrimary=1
 
 	$q = $Data->{'db'}->prepare($st);
   	$q->execute($fromEntityID, $getEntityLevel);
         
-    return $q->fetchrow_array() || 0;
+    return  $q->fetchrow_array() || 0;
+    
 }
 sub addWorkFlowTasks {
      my(
@@ -350,6 +450,7 @@ warn($st);
             AND r.intOriginLevel = ?
 			AND r.strRegistrationNature = ?
 		];
+warn($st);
 	    $q = $db->prepare($st);
   	    $q->execute($entityID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
     }
@@ -440,7 +541,7 @@ warn("DDDD" . $approvalEntityID . "|" . $problemEntityID);
 		return $q->errstr . '<br>' . $st;
 	}
 
-	my $rc = checkForOutstandingTasks($Data,$ruleFor, $entityID, $personID, $personRegistrationID, $documentID);
+	my $rc = checkForOutstandingTasks($Data,$ruleFor, '', $entityID, $personID, $personRegistrationID, $documentID);
 
 	return($rc); 
 }
@@ -460,7 +561,7 @@ sub approveTask {
 	#Update this task to COMPLETE
 	$st = qq[
 	  	UPDATE tblWFTask SET 
-	  		strTaskStatus = 'COMPLETE',
+	  		strTaskStatus = ?,
 	  		intApprovalUserID = ?,
 	  		dtApprovalDate = NOW()
 	  	WHERE intWFTaskID = ?; 
@@ -468,6 +569,7 @@ sub approveTask {
 		
   	$q = $db->prepare($st);
   	$q->execute(
+        $Defs::WF_TASK_STATUS_COMPLETE,
 	  	$Data->{'clientValues'}{'userID'},
   		$WFTaskID,
   		);
@@ -482,6 +584,7 @@ sub approveTask {
             intPersonRegistrationID,
             intEntityID,
             intDocumentID,
+            strTaskType,
             strWFRuleFor
         FROM tblWFTask
         WHERE intWFTaskID = ?
@@ -496,8 +599,9 @@ sub approveTask {
     my $entityID= $dref->{intEntityID} || 0;
     my $documentID= $dref->{intDocumentID} || 0;
     my $ruleFor = $dref->{strWFRuleFor} || '';
+    my $taskType= $dref->{strTaskType} || '';
     
-   	my $rc = checkForOutstandingTasks($Data,$ruleFor, $entityID, $personID, $personRegistrationID, $documentID);
+   	my $rc = checkForOutstandingTasks($Data,$ruleFor, $taskType, $entityID, $personID, $personRegistrationID, $documentID);
     
     return($rc);
     
@@ -507,6 +611,7 @@ sub checkForOutstandingTasks {
     my(
         $Data,
         $ruleFor,
+        $taskType,
         $entityID,
         $personID,
         $personRegistrationID,
@@ -516,6 +621,7 @@ sub checkForOutstandingTasks {
 	my $st = '';
 	my $q = '';
 	my $db=$Data->{'db'};
+    $taskType ||= '';
 		
 	#As a result of an update, check to see if there are any Tasks that now have all their pre-reqs completed
 	# or if all tasks have been completed
@@ -537,7 +643,7 @@ sub checkForOutstandingTasks {
 warn("CHECKING FOR OUTSANDING FOR PERSON $personID PR $personRegistrationID");	
 	$q = $db->prepare($st);
   	$q->execute(
-  		'PENDING',
+  		$Defs::WF_TASK_STATUS_PENDING,
   		$personRegistrationID,
         $entityID,
         $personID,
@@ -546,8 +652,8 @@ warn("CHECKING FOR OUTSANDING FOR PERSON $personID PR $personRegistrationID");
         $entityID,
         $personID,
         $documentID,
-  		'ACTIVE',
-  		'COMPLETE',
+        $Defs::WF_TASK_STATUS_ACTIVE,
+        $Defs::WF_TASK_STATUS_COMPLETE,
         $ruleFor,
         $ruleFor,
   		);
@@ -628,7 +734,7 @@ warn("CHECKING $update_count");
                 AND intEntityID= ?
                 AND intDocumentID = ?
                 AND strWFRUleFor = ?
-			    AND strTaskStatus IN ('PENDING','ACTIVE')
+			    AND strTaskStatus IN (?,?)
         ];
         
         $q = $db->prepare($st);
@@ -637,7 +743,9 @@ warn("CHECKING $update_count");
        		$personRegistrationID,
             $entityID,
             $documentID,
-            $ruleFor
+            $ruleFor,
+            $Defs::WF_TASK_STATUS_PENDING,
+            $Defs::WF_TASK_STATUS_ACTIVE
 	  	);
   
         
@@ -704,8 +812,9 @@ warn("CHECKING $update_count");
 		       		$personRegistrationID
 		  			);         
 	        	$rc = 1;	# All registration tasks have been completed        		
+                PersonRegistration::rolloverExistingPersonRegistrations($Data, $personID, $personRegistrationID);
         }
-        if ($personID)  {
+        if ($personID and $taskType ne $Defs::WF_TASK_TYPE_CHECKDUPL)  {
                 $st = qq[
 	            	UPDATE tblPerson
                     SET

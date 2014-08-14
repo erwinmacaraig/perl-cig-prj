@@ -38,8 +38,6 @@ sub handleAuthMaintenance {
 	$title .= ' - ' . $typename;
 
 	if ($action =~/^AM_d/) {
-
-
 		$resultHTML .= auth_delete(
 			$Data,
 			$entityTypeID, 
@@ -81,14 +79,24 @@ sub auth_list {
 	my $db = $Data->{'db'};
 	my $st = qq[
 		SELECT
-			intPassportID,
-			intReadOnly,
-			DATE_FORMAT(dtLastLogin,'%Y-%m-%d (%d %M %Y)') as dtLastLogin_FMT
+			u.userId,
+			ua.readOnly,
+			DATE_FORMAT(lastLogin,'%Y-%m-%d (%H:%i %p)') as dtLastLogin_FMT,
+            u.status,
+            u.email,
+            u.firstName,
+            u.familyName,
+            ua.readOnly
 		FROM
-			tblPassportAuth
+			tblUser as u
+                INNER JOIN tblUserAuth as ua ON (ua.userId=u.userId)
 		WHERE 
-			intEntityTypeID = ?
-			AND intEntityID = ?
+			entityTypeID = ?
+			AND entityID = ?
+        ORDER BY 
+            familyName, 
+            firstName
+
 	];
 	my $q = $db->prepare($st);
 	$q->execute(
@@ -96,53 +104,36 @@ sub auth_list {
 		$entityID, 
 	);
 
-  my @authlist = ();
+    my @authlist = ();
 	my %authdetails = ();
-  while(my($DB_intPassportID, $readonly, $lastlogin)=$q->fetchrow_array()) {
-		$authdetails{$DB_intPassportID} = [$readonly, $lastlogin];
-    push @authlist, $DB_intPassportID;
-  }
-  my $PassportData = undef;
-  if(@authlist) {
-    my $passport = new Passport(
-      db => $db,
-    );
-    $PassportData = $passport->bulkdetails(\@authlist);
-  }
 	my $addaction = 'AM_a';
 	my $addaction2 = '';
 	my $delaction = 'AM_d';
 	my $delaction2 = '';
 	if($entityTypeID == $Defs::LEVEL_VENUE)	{
-	$addaction = 'VENUE_USER';
+	    $addaction = 'VENUE_USER';
 		$addaction2 = 'AM_a';
 		$delaction = 'VENUE_USER';
 		$delaction2 = 'AM_d&venueID='.$entityID;
 	}
-	my @outputdata = ();
-  if($PassportData) {
-    for my $member (
-      sort {
-        $a->{'FamilyName'} cmp $b->{'FamilyName'}
-        or $a->{'FirstName'} cmp $b->{'FirstName'}
-      }
-      @{$PassportData}
-    ) {
-      my $name = join (' ',($member->{'FirstName'} || ''), ($member->{'FamilyName'} || ''));
-      next if !$member->{'Email'};
-      next if !$member->{'Status'} == 2;
-			push @outputdata, {
-				id => $member->{'PassportID'} || next,
-				PassportID => $member->{'PassportID'} || next,
-				Name => $name,
-				Email => $member->{'Email'},
-				ReadOnly => $authdetails{$member->{'PassportID'}}[0] || 0,
-				AccessLevel => $authdetails{$member->{'PassportID'}}[0] ? 'Restricted Access' : 'Full',
-				LastLogin => $authdetails{$member->{'PassportID'}}[1] || '',
-				DeleteLink => qq[<a href = "$Data->{'target'}?a=$delaction&amp;a2=$delaction2&amp;id=$member->{'PassportID'}&amp;client=$client&amp;id=$member->{'PassportID'}" onclick = "return confirm('Are you sure you want to remove $name?');">Delete</a>],
-			};
+    my @outputdata = ();
+
+    while(my $dref=$q->fetchrow_hashref()) {
+        my $name = join (' ',($dref->{'firstName'} || ''), ($dref->{'familyName'} || ''));
+        next if !$dref->{'email'};
+        next if !$dref->{'status'} == 2;
+        my $deleteLink = qq[<a href = "$Data->{'target'}?a=$delaction&amp;a2=$delaction2&amp;id=$dref->{'userId'}&amp;client=$client" onclick = "return confirm('Are you sure you want to remove $name?');">Delete</a>];
+        $deleteLink = '-' if($dref->{'userId'} ==$Data->{'clientValues'}{'userID'} and $entityTypeID==$Data->{'clientValues'}{'authLevel'});
+		push @outputdata, {
+		    id => $dref->{'userId'} || next,
+			Name => $name,
+			Email => $dref->{'email'},
+			ReadOnly => $dref->{'readOnly'},
+			AccessLevel => $dref->{'readOnly'}? 'Restricted Access' : 'Full',
+			LastLogin => $dref->{'dtLastLogin_FMT'} || '',
+			DeleteLink => $deleteLink,
+        };
     }
-  }
 	my @headers = (
     {
       name =>   $Data->{'lang'}->txt('Name'),
@@ -207,11 +198,11 @@ sub auth_delete {
 	return '' if !$id;
 	
 	my $st = qq[
-		DELETE FROM tblPassportAuth
+		DELETE FROM tblUserAuth
 		WHERE 
-			intEntityTypeID = ?
-			AND intEntityID = ?
-			AND intPassportID = ?
+			entityTypeID = ?
+			AND entityID = ?
+			AND userId= ?
 	];
 	my $q = $db->prepare($st);
 	$q->execute(
@@ -222,6 +213,22 @@ sub auth_delete {
 	$q->finish();
 auditLog($id, $Data, 'Delete', 'User Management');
 	return qq[<div class = "OKmsg">User access removed</div>];
+}
+sub loadUserDetails {
+    my ($Data, $email) = @_;
+
+    my $st = qq[
+        SELECT
+            *
+        FROM
+            tblUser
+        WHERE
+            email=?
+    ];
+	my $q = $Data->{'db'}->prepare($st);
+	$q->execute($email);
+    my $dref = $q->fetchrow_hashref();
+    return $dref;
 }
 
 sub auth_add {
@@ -239,47 +246,37 @@ sub auth_add {
 	return '' if !$newemail;
 	return '' if !$entityTypeID;
 	return '' if !$entityID;
-	my $assocID = $Data->{'clientValues'}{'assocID'} || 0;
-	$assocID = 0 if $assocID < 0;
 	
-	my $passport = new Passport(
-		db => $db,
-	);
-	my($DB_intMemberID, $status) = $passport->isMember($newemail);
-	$DB_intMemberID = 0 if $status != 2;
+    my $user_ref = loadUserDetails($Data, $newemail);
+    my $DB_intMemberID = $user_ref->{'userId'} || 0;
+	$DB_intMemberID = 0 if $user_ref->{'status'} != 2;
 
 	if($DB_intMemberID) {
 
 		my $st = qq[
-			INSERT INTO tblPassportAuth	(
-				intEntityTypeID,
-				intEntityID,
-				intPassportID,
-				intAssocID,
-				dtCreated,
-				intReadOnly
+			INSERT INTO tblUserAuth (
+                userId,
+                entityTypeId,
+                entityId,
+                readOnly
 			)
 			VALUES (
 				?,
 				?,
 				?,
-				?,
-				NOW(),
 				?
 			)
 		];
 		my $q = $db->prepare($st);
 		$q->execute(
+			$DB_intMemberID,
 			$entityTypeID, 
 			$entityID, 
-			$DB_intMemberID,
-			$assocID,
 			$readonly,
 		);
 		$q->finish();
 
 auditLog($DB_intMemberID, $Data, 'Add', 'User Management');
-		$passport->addModule('SPMEMBERSHIPADMIN', $newemail);
 	}
 	else	{
 		return qq[<div class = "warningmsg">I'm sorry I cannot find that user</div>];

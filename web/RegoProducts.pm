@@ -19,6 +19,7 @@ sub getRegoProducts {
     my (
         $Data,
         $products,
+        $incExisting,
         $entityID,
         $regoID,
         $personID,
@@ -28,11 +29,12 @@ sub getRegoProducts {
     ) = @_;
 
     my $currencySymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
+    $incExisting ||= 0; ## Set to 1 to include existing in-cart items that aren't paid for the member
 
     $multipersonType ||= ''; 
     my $cl  = setClient($Data->{'clientValues'});
 
-    my $regoProducts = getAllRegoProducts($Data, $entityID, $regoID, $personID, $products);
+    my $regoProducts = getAllRegoProducts($Data, $entityID, $regoID, $personID, $incExisting, $products);
 
     my $productAttributes = Products::getFormProductAttributes($Data, 0) || {};
 
@@ -117,11 +119,12 @@ sub getRegoProducts {
 }
 
 sub getAllRegoProducts {
-    my ($Data, $entityID, $regoID, $personID, $productIds) = @_;
+    my ($Data, $entityID, $regoID, $personID, $incExisting, $productIds) = @_;
 
     my $productID_str = join(',',@{$productIds});
     return [] if !$productID_str;
 
+    my $ExistingStatus = $incExisting ? 0 : 9999; ## Obviously none will have 9999
     my $sql = qq[
         SELECT DISTINCT 
             T.intStatus,
@@ -159,7 +162,7 @@ sub getAllRegoProducts {
                 AND T.intPersonRegistrationID IN (0, ?)
                 AND T.intTXNEntityID IN (0, ?)
                 AND T.intStatus = 0     
-                AND T.intStatus=999
+                AND T.intStatus=$ExistingStatus
             )
             LEFT JOIN tblProductPricing as PP ON (
                 PP.intProductID = P.intProductID

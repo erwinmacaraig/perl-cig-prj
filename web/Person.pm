@@ -442,6 +442,8 @@ sub person_details {
 	my @reverseYNOrder = ('',1,0);
 
     my $mrt_config = '';
+       #readonly      => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
+               
 
     my %FieldDefinitions = (
         fields => {
@@ -472,13 +474,12 @@ sub person_details {
             strStatus => {
                 label         => $FieldLabels->{'strStatus'},
                 value         => $field->{strStatus},
-                type          => 'checkbox',
+                type          => 'lookup',
                 sectionname   => 'details',
-                default       => 1,
-                displaylookup => { 1 => 'Yes', 0 => 'No' },
+                options       => \%Defs::personStatus, 
+                readonly      => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
                 noadd         => 1,
             },
-
             strTitle => {
                 label       => $FieldLabels->{'strTitle'},
                 value       => $field->{strTitle},
@@ -1044,7 +1045,7 @@ sub person_details {
 
         },
         order => [
-        qw(strNationalNum strPersonNo strStatus strSalutation strLocalFirstname strPreferredName strMiddlename strLocalSurname strMaidenName dtDOB strPlaceofBirth strCountryOfBirth strMotherCountry strFatherCountry intGender strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased intDeRegister strPreferredLang strPassportIssueCountry strPassportNationality strPassportNo dtPassportExpiry dtPoliceCheck dtPoliceCheckExp strPoliceCheckRef strEmergContName strEmergContNo strEmergContNo2 strEmergContRel strP1Salutation strP1FName strP1SName intP1Gender strP1Phone strP1Phone2 strP1PhoneMobile strP1Email strP1Email2 strP2Salutation strP2FName strP2SName intP2Gender strP2Phone strP2Phone2 strP2PhoneMobile strP2Email strP2Email2 strEyeColour strHairColour strHeight strWeight 
+        qw(strNationalNum strPersonNo strSalutation strStatus strLocalFirstname strPreferredName strMiddlename strLocalSurname strMaidenName dtDOB strPlaceofBirth strCountryOfBirth strMotherCountry strFatherCountry intGender strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased intDeRegister strPreferredLang strPassportIssueCountry strPassportNationality strPassportNo dtPassportExpiry dtPoliceCheck dtPoliceCheckExp strPoliceCheckRef strEmergContName strEmergContNo strEmergContNo2 strEmergContRel strP1Salutation strP1FName strP1SName intP1Gender strP1Phone strP1Phone2 strP1PhoneMobile strP1Email strP1Email2 strP2Salutation strP2FName strP2SName intP2Gender strP2Phone strP2Phone2 strP2PhoneMobile strP2Email strP2Email2 strEyeColour strHairColour strHeight strWeight 
         ),
 
         map("strNatCustomStr$_", (1..15)),

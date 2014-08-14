@@ -1,6 +1,7 @@
 <form>
 <input type = "hidden" id = "selected_entityID" value = "[% entityID %]">
 <input type = "hidden" id = "originLevel" value = "[% originLevel %]">
+<input type = "hidden" id = "pID" value = "[% personID %]">
 <input type = "hidden" id = "rID" value = "[% realmID %]">
 <input type = "hidden" id = "srID" value = "[% realmSubTypeID %]">
 <input type = "hidden" id = "client" value = "[% client %]">
@@ -14,12 +15,12 @@
     <input type = "hidden" id = "selected_age">
     <input type = "hidden" id = "selected_nature">
     <div class = "co_row">
-        <div class = "co_label">[% Lang.txt('Sport') %]:</div>
-        <div class = "co_value" id = "selected_sport_name"></div>
-    </div>
-    <div class = "co_row">
         <div class = "co_label">[% Lang.txt('Person Type') %]:</div>
         <div class = "co_value" id = "selected_type_name"></div>
+    </div>
+    <div class = "co_row">
+        <div class = "co_label">[% Lang.txt('Sport') %]:</div>
+        <div class = "co_value" id = "selected_sport_name"></div>
     </div>
     <div class = "co_row">
         <div class = "co_label">[% Lang.txt('Person Role') %]:</div>
@@ -40,7 +41,7 @@
 </div>
 
 <div id = "regopt_wrapper">
-    <div id  = "regopt_options_title" class = "regoptions_title">[% Lang.txt('Choose the sport') %] </div>
+    <div id  = "regopt_options_title" class = "regoptions_title">[% Lang.txt('Choose the type') %] </div>
     <div id  = "regopt_options" class = "regoptions"></div>
     <div id  = "regopt_options_continue" style = "display:none;">
         <span class = "proceed-button button"><a href = "[% continueURL %]">[% Lang.txt('Continue') %]</a></span>
@@ -59,7 +60,7 @@
 </form>
 <script>
     function regopt_start()   {
-        update_options('sport');
+        update_options('type');
     }
     function update_options(optionType)   {
 
@@ -74,6 +75,7 @@
         qstring = qstring + '&r=' + jQuery('#rID').val();
         qstring = qstring + '&sr=' + jQuery('#srID').val();
         qstring = qstring + '&eID=' + jQuery('#selected_entityID').val();
+        qstring = qstring + '&pID=' + jQuery('#pID').val();
 
         if(optionType == 'complete')    {
           jQuery('#regopt_options').html('');
@@ -108,8 +110,8 @@
         jQuery('#selected_' + optionType).val(val);
         jQuery('#selected_' + optionType + "_name").html(name);
         var nextlayer = {
-            'sport' : 'type',
-            'type' : 'role',
+            'type' : 'sport',
+            'sport' : 'role',
             'role' : 'level',
             'level' : 'age',
             'age' : 'nature',

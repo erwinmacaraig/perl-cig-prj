@@ -125,14 +125,12 @@ sub club_details  {
         size  => '30',
         maxsize => '50',
       },
-                
       strEntityType => {
-           label => "Subtype",
-           value => $field->{strEntityType},
-           type => 'lookup',
-           options => \%Defs::clubLevelSubtype,
-           readonly => $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB ? 0 : 1,
- 
+        label => "Subtype",
+        value => $field->{strEntityType},
+        type => 'lookup',
+        options => \%Defs::clubLevelSubtype,
+        firstoption => [ '', 'Select Type' ],
      },
       strStatus => {
           label => 'Status',
@@ -140,6 +138,7 @@ sub club_details  {
           type => 'lookup',  
           options => \%Defs::entityStatus,
           readonly => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
+          noadd         => 1,
      },
       strContact => {
         label => 'Contact Person',
@@ -303,6 +302,7 @@ sub club_details  {
             intEntityLevel,
             intCreatedByEntityID,
             intDataAccess,
+            strStatus,
             --FIELDS--
          )
           VALUES (
@@ -310,6 +310,7 @@ sub club_details  {
             $Defs::LEVEL_CLUB,
             $authID,
             $Defs::DATA_ACCESS_FULL,
+            "PENDING",
              --VAL-- )
         ],
       auditFunction=> \&auditLog,
@@ -435,6 +436,9 @@ sub postClubAdd {
       $query->execute($entityID, $id);
       $query->finish();
         
+    ### A call TO createTempEntityStructure FROM EntityStructure   ###
+    createTempEntityStructure($Data); 
+    ### End call to createTempEntityStructure FROM EntityStructure###
       addWorkFlowTasks($Data, 'ENTITY', 'NEW', $Data->{'clientValues'}{'authLevel'}, $id,0,0, 0);
     }
 
@@ -453,10 +457,6 @@ sub postClubAdd {
         \%clubchars,
       );
     }
-    ### A call TO createTempEntityStructure FROM EntityStructure   ###
-    $Data->{'db'}=$db;
-    createTempEntityStructure($Data); 
-    ### End call to createTempEntityStructure FROM EntityStructure###
     {
       my $cl=setClient($Data->{'clientValues'}) || '';
       my %cv=getClient($cl);
@@ -646,22 +646,4 @@ sub listClubs   {
   
   return ($resultHTML,$title);
 }
-#addSQL => qq[
-#        INSERT INTO tblEntity (
-#            intRealmID,
-#            intEntityLevel,
-#            intCreatedByEntityID,
-#            strStatus,
-#            intDataAccess,
-#            --FIELDS--
-#         )
-#          VALUES (
-#            $Data->{'Realm'},
-#            $Defs::LEVEL_CLUB,
-#            $authID,
-#            'PENDING',
- #           $Defs::DATA_ACCESS_FULL,
-#             --VAL-- )
-#        ],
-
 1;

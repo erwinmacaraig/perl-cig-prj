@@ -9,7 +9,8 @@ CREATE TABLE tblRegistrationItem (
     strRuleFor VARCHAR(30) DEFAULT '' COMMENT 'REGO, ENTITY',
 
     strEntityType VARCHAR(30) DEFAULT '', /* School/Club -- Can even have School rules for a REGO*/
-    intEntityLevel INT DEFAULT 0, /*Venue/Club*/
+    intEntityLevel INT DEFAULT 0, /*Persin/Venue/Club*/
+
 
     strRegistrationNature varchar(20) NOT NULL DEFAULT '0' COMMENT 'NEW,RENEWAL,AMENDMENT,TRANSFER,',
 

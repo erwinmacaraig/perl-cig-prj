@@ -20,6 +20,8 @@ use Seasons;
 use MovePhoto;
 use Notifications;
 use PersonRegistration;
+use RegoTypeLimits;
+use WorkFlow;
 
 sub getDupTaskCount {
 
@@ -493,6 +495,7 @@ warn("PRCOESS MEMBER CHANGE");
 	my $memberNo = '';
 	my %USE_DATA=();
 	$USE_DATA{'DataOrigin'} = 0;
+    my $suspended = 0;
 	if ($option =~ /^change/)	{
 		my $st = qq[
 			SELECT 
@@ -531,10 +534,12 @@ warn("PRCOESS MEMBER CHANGE");
 		$q=$Data->{'db'}->prepare($st);
 		$q->execute();
 		while (my $dref= $q->fetchrow_hashref())	{
+            $suspended = 1 if ($dref->{'strStatus'} eq $Defs::PERSON_STATUS_SUSPENDED);
 			$USE_DATA{'strStatus'} = $dref->{'strStatus'} if ! $USE_DATA{'strStatus'};
 		}
 		
 	}
+    $USE_DATA{'strStatus'} = $Defs::PERSON_STATUS_SUSPENDED if ($suspended);
 
 	if($option eq 'change_usenew')	{
 		#Get the Data rom the new record
@@ -564,7 +569,12 @@ next if $dref->{$k} eq "'0000-00-00'";
 			next if $dref->{$k} eq 'NULL';
 			$dref->{$k} ="''" if $dref->{$k} eq 'NULL';
 			$update_str.=',' if $update_str;
-			$update_str.= " $k = $dref->{$k} ";
+            if ($k eq 'strStatus' and $suspended)   {
+			    $update_str.= " strStatus = 'SUSPENDED' ";
+            }
+            else    {
+			    $update_str.= " $k = $dref->{$k} ";
+            }
 		}
 		
 		#OK now set the Existing record with the new data from
@@ -592,6 +602,16 @@ next if $dref->{$k} eq "'0000-00-00'";
 	}
 	elsif($option =~ /^change/)	{ 
         mergePersonRegistrations($Data, $id_of_duplicate, $existingid);
+        my $ok = checkRegoTypeLimits($Data, $id_of_duplicate, 0, undef, 'PLAYER', undef, undef, undef);
+        warn("CHECK FOR INCORRECT COUNT OF REGOs HERE");
+        if (!$ok)   {
+            my %Task = ();
+            $Task{'personID'} = $existingid;
+            $Task{'entityID'} = getID($Data->{'clientValues'});
+            $Task{'approvalLevel'} = $Defs::LEVEL_NATIONAL;
+            addIndividualTask($Data, 0, $Defs::WF_TASK_TYPE_CHECKDUPL, 'PERSON', \%Task);
+        }
+        
 		$Data->{'db'}->do(qq[UPDATE tblTransactions SET intID = $existingid WHERE intID = $id_of_duplicate and intTableType=$Defs::LEVEL_PERSON AND intPersonRegistrationID=0]);
 		$Data->{'db'}->do(qq[UPDATE tblDocuments SET intEntityID = $existingid WHERE intEntityID = $id_of_duplicate and intEntityLvel=$Defs::LEVEL_PERSON]);
 		$Data->{'db'}->do(qq[UPDATE tblClearance SET intPersonID = $existingid WHERE intPersonID=$id_of_duplicate]);

@@ -22,7 +22,7 @@ use RuleMatrix;
 sub handleVenues    {
     my ($action, $Data)=@_;
 
-    my $venueID = param('venueID') || param("id") || 0;
+    my $venueID= param('venueID') || 0;
     my $resultHTML='';
     my $title='';
     if ($action =~/^VENUE_DT/) {
@@ -43,12 +43,12 @@ sub venue_details   {
 
     return '' if ($venueID and !venueAllowed($Data, $venueID));
     my $option='display';
-    $option='edit' if $action eq 'VENUE_DTE' and allowedAction($Data, 'venue_e');
-    $option='add' if $action eq 'VENUE_DTA' and allowedAction($Data, 'venue_a');
+    $option='edit' if $action eq 'VENUE_DTE';# and allowedAction($Data, 'venue_e');
+    $option='add' if $action eq 'VENUE_DTA';# and allowedAction($Data, 'venue_a');
     $venueID=0 if $option eq 'add';
     my $field=loadVenueDetails($Data->{'db'}, $venueID) || ();
     
-    my $intRealmID = $Data->{'Realm'} >= 0 ? $Data->{'Realm'} : 0;
+    my $intRealmID = $Data->{'Realm'} ? $Data->{'Realm'} : 0;
     my $client=setClient($Data->{'clientValues'}) || '';
     
     my $authID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
@@ -112,6 +112,7 @@ sub venue_details   {
     	  options => \%Defs::entityStatus,
     	  sectionname => 'details',
     	  readonly => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
+          noadd=>1,
       },
       
       strAddress => {
@@ -409,6 +410,7 @@ sub venue_details   {
     carryfields =>  {
       client => $client,
       a=> $action,
+      venueID=> $venueID,
     },
   );
     my $resultHTML='';
@@ -689,12 +691,12 @@ sub postVenueAdd {
       my $query = $db->prepare($st);
       $query->execute($entityID, $id);
       $query->finish();
+      $Data->{'db'}=$db;
+      createTempEntityStructure($Data); 
         #my $rc = addTasks($Data,$entityID, 0,0);
       addWorkFlowTasks($Data, 'ENTITY', 'NEW', $Data->{'clientValues'}{'authLevel'}, $id,0,0, 0);
     }
       ### A call TO createTempEntityStructure FROM EntityStructure   ###
-      $Data->{'db'}=$db;
-      createTempEntityStructure($Data); 
       ### End call to createTempEntityStructure FROM EntityStructure###
     {
       my $cl=setClient($Data->{'clientValues'}) || '';
@@ -720,7 +722,6 @@ sub venueAllowed    {
 
     #Get parent entity and check that the user has access to that
 
-    return 0 if !$Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_VENUE;
     my $st = qq[
         SELECT
             intParentEntityID
@@ -735,8 +736,7 @@ sub venueAllowed    {
     ];
     my $query = $Data->{'db'}->prepare($st);
     $query->execute($venueID);
-    my ($parentID) = $query->fetchrow_array();
-warn("PPPPP".$parentID);
+    my $parentID = $query->fetchrow_array() || 0;
     $query->finish();
     return 0 if !$parentID;
     my $authID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
@@ -752,7 +752,6 @@ warn("PPPPP".$parentID);
             AND intDataAccess = $Defs::DATA_ACCESS_FULL
         LIMIT 1
     ];
-warn($st);
     $query = $Data->{'db'}->prepare($st);
     $query->execute($authID, $parentID);
     my ($found) = $query->fetchrow_array();

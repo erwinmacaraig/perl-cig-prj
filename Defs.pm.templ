@@ -42,6 +42,10 @@ $DB_DSN_REPORTING = "DBI:mysql:fifasponline"; ##CONFIG
 
 $DevelMode = 1;
 
+$REGO_FORM_SALT = "1234";
+$bank_export_dir="/u/web/swm/trunk/web/banksplits/";
+$bank_export_dir_web="banksplits/";
+$RegoServerKey='df09s8h5w498y5209^&%*&T*#';
 $version='4.0';
 $base_url = 'http://elwood/FIFASPOnline/web'; ##CONFIG
 $duplicate_url = 'http://elwood/FIFASPOnline/web'; ##CONFIG
@@ -70,28 +74,7 @@ $fs_customreports_dir="$fs_base/customreports";
 
 $mail_log_file="/var/log/sp-mail/mail.log";
 
-
-#### NEW:
-###
-$ORIGIN_SELF = 1;
-$ORIGIN_CLUB = 3;
-$ORIGIN_ZONE= 10;
-$ORIGIN_REGION = 20;
-$ORIGIN_STATE = 30;
-$ORIGIN_NATIONAL = 100;
-
-$SPORT_FOOTBALL = 'FOOTBALL';
-$SPORT_FUTSAL = 'FUTSAL';
-$SPORT_BEACH= 'BEACH';
-
-%sportInfo = (
-        $SPORT_FOOTBALL=> "Football",
-        $SPORT_FUTSAL=> "Futsal",
-        $SPORT_BEACH=> "Beach",
-);
-
-########
-
+## Below here mvoed
 $cookie_domain="elwood"; ##CONFIG
 $COOKIE_MEMBER="reg_m";
 $COOKIE_LOGIN="_SP_M";
@@ -110,6 +93,155 @@ $COOKIE_TXN_ACTSTATUS = 'SWOMTXNREC';
 $COOKIE_PRODSTATUS = 'SWOMPRODREC';
 $COOKIE_FGRID = 'SWOMFGRID';
 $COOKIE_REGFORMSESSION = 'SWOMRFSID';
+$SECRET_SALT="62tfdxcgf68dvxcgvxc9gvg9d9esgsdeg9rgdcxvgcxivgd9f7efiiu";
+
+$PAYPAL_URL_MASSPAY = 'https://api-3t.sandbox.paypal.com/nvp';
+$SCHOOL_SEARCH_LIMIT=50;
+$SCHOOL_COOKIE='regspsch';
+# Payment split fields
+$PS_MAX_SPLITS = 5;
+$PS_REMAINDER_SPLIT = $PS_MAX_SPLITS + 1;
+## SEASONS
+$COOKIE_SEASONFILTER = 'SWOMSNFILTER';
+$COOKIE_AGEGROUPFILTER = 'SWOMAGEGRPFILTER';
+$expiryseconds = 60 * 400;
+################################################################################################
+
+$WF_TASK_TYPE_APPROVAL = 'APPROVAL';
+$WF_TASK_TYPE_DOCUMENT= 'DOCUMENT';
+$WF_TASK_TYPE_CHECKDUPL= 'CHECKDUPL'; ## There was an issue with Dupl Res, CHECK
+
+%wfTaskType = (
+    $WF_TASK_TYPE_APPROVAL => 'Approve',
+    $WF_TASK_TYPE_DOCUMENT => 'Check Document',
+    $WF_TASK_TYPE_CHECKDUPL => 'Duplicate Resolution Issue',
+);
+
+$WF_TASK_STATUS_PENDING= 'PENDING';
+$WF_TASK_STATUS_ACTIVE= 'ACTIVE';
+
+%wfTaskStatus= (
+    $WF_TASK_STATUS_PENDING=> 'Pending',
+    $WF_TASK_STATUS_ACTIVE=> 'Active',
+);
+
+%sportType = (
+	'FOOTBALL'=>'Football',	
+	'BEACHSOCCER'=>'Beach Soccer',	
+	'FUTSAL'=>'Futsal',	
+);	
+
+$SPORT_TYPE_FOOTBALL = 'FOOTBALL';
+$SPORT_TYPE_BEACHSOCCER = 'BEACHSOCCER';
+$SPORT_TYPE_FUTSAL = 'FUTSAL';
+
+#Registration constants
+%personType = (
+		'PLAYER'=>'Player',	
+		'COACH'=>'Coach',	
+		'REFEREE'=>'Referee',	
+        'TECHOFFICIAL'=>'Technical Official',
+);
+
+$PERSON_TYPE_PLAYER = 'PLAYER';
+$PERSON_TYPE_COACH = 'COACH';
+$PERSON_TYPE_REFEREE = 'REFEREE';
+$PERSON_TYPE_TECHOFFICIAL= 'TECHOFFICIAL';
+	
+%personLevel = (
+	'AMATEUR'=>'Amateur',	
+	'PROFESSIONAL'=>'Professional',	
+);	
+
+$PERSON_LEVEL_AMATEUR = 'AMATEUR';
+$PERSON_LEVEL_PROFESSIONAL = 'PROFESSIONAL';
+
+%entityStatus = (
+        'PENDING' => 'Pending',
+        'ACTIVE' => 'Active',
+        'INACTIVE' => 'Inactive',
+        'DE-REGISTERED' => 'De-registered',
+        'SUSPENDED' => 'Suspended'
+);
+
+$ENTITY_STATUS_PENDING = 'PENDING';
+$ENTITY_STATUS_ACTIVE = 'ACTIVE';
+$ENTITY_STATUS_INACTIVE = 'INACTIVE';
+$ENTITY_STATUS_DE_REGISTERED = 'DE-REGISTERED';
+$ENTITY_STATUS_SUSPENDED = 'SUSPENDED';
+
+%registrationNature = (
+	'NEW'=>'New Registration',	
+	'RENEWAL'=>'Renewal',	
+	'AMENDMENT'=>'Amendment',
+	'TRANSFER'=>'Transfer'
+);
+
+$REGISTRATION_NATURE_NEW = 'NEW';
+$REGISTRATION_NATURE_RENEWAL = 'RENEWAL';
+$REGISTRATION_NATURE_AMENDMENT = 'AMENDMENT';
+$REGISTRATION_NATURE_TRANSFER = 'TRANSFER';
+
+$PERSON_STATUS_PENDING = 'PENDING';
+$PERSON_STATUS_ACTIVE = 'ACTIVE';
+$PERSON_STATUS_INACTIVE = 'INACTIVE';
+$PERSON_STATUS_DECEASED = 'DECEASED';
+$PERSON_STATUS_TRANSFERRED = 'TRANSFERRED';
+$PERSON_STATUS_INPROGRESS = 'INPROGRESS';
+$PERSON_STATUS_SUSPENDED= 'SUSPENDED';
+$PERSON_STATUS_DELETED= 'DELETED';
+
+%personStatus = (
+        $PERSON_STATUS_PENDING => 'Pending',
+        $PERSON_STATUS_ACTIVE => 'Active',
+        $PERSON_STATUS_INACTIVE => 'Inactive',
+        $PERSON_STATUS_DECEASED => 'Deceased',
+        $PERSON_STATUS_TRANSFERRED => 'Transferred',
+        $PERSON_STATUS_INPROGRESS => 'In Progress',
+        $PERSON_STATUS_SUSPENDED=> 'Suspended',
+        $PERSON_STATUS_DELETED=> 'Deleted',
+);
+
+$PERSONREGO_STATUS_PENDING = 'PENDING';
+$PERSONREGO_STATUS_ACTIVE = 'ACTIVE';
+$PERSONREGO_STATUS_ROLLED_OVER= 'ROLLED_OVER';
+$PERSONREGO_STATUS_PASSIVE= 'PASSIVE';
+$PERSONREGO_STATUS_TRANSFERRED = 'TRANSFERRED';
+$PERSONREGO_STATUS_INPROGRESS = 'INPROGRESS';
+$PERSONREGO_STATUS_SUSPENDED= 'SUSPENDED';
+$PERSONREGO_STATUS_DELETED= 'DELETED';
+
+%personRegoStatus = (
+        $PERSONREGO_STATUS_PENDING => 'Pending',
+        $PERSONREGO_STATUS_ACTIVE => 'Active',
+        $PERSONREGO_STATUS_ROLLED_OVER=> 'InActive (Rolled over)',
+        $PERSONREGO_STATUS_PASSIVE=> 'Passive',
+        $PERSONREGO_STATUS_TRANSFERRED => 'Transferred',
+        $PERSONREGO_STATUS_INPROGRESS => 'In Progress',
+        $PERSONREGO_STATUS_SUSPENDED=> 'Suspended',
+        $PERSONREGO_STATUS_DELETED=> 'Deleted',
+);
+
+#End of Registration constants
+$CLUBLEVEL_SUBTYPE_CLUB = 'Club'; 
+$CLUBLEVEL_SUBTYPE_SCHOOL = 'School';
+$CLUBLEVEL_SUBTYPE_ACADEMY = 'Academy';
+
+%clubLevelSubtype = (
+    $CLUBLEVEL_SUBTYPE_CLUB => 'Club', 
+    $CLUBLEVEL_SUBTYPE_SCHOOL => 'School',
+    $CLUBLEVEL_SUBTYPE_ACADEMY => 'Academy',
+     
+);
+
+
+
+$ORIGIN_SELF = 1;
+$ORIGIN_CLUB = 3;
+$ORIGIN_ZONE= 10;
+$ORIGIN_REGION = 20;
+$ORIGIN_STATE = 30;
+$ORIGIN_NATIONAL = 100;
 
 $USER_STATUS_INVALID = 0,
 $USER_STATUS_NOTCONFIRMED = 1,
@@ -119,12 +251,6 @@ $USER_STATUS_SUSPENDED = 5,
 $USER_STATUS_EMAILSUSPENDED = 6,
 
 
-## SEASONS
-$COOKIE_SEASONFILTER = 'SWOMSNFILTER';
-$COOKIE_AGEGROUPFILTER = 'SWOMAGEGRPFILTER';
-
-$SECRET_SALT="62tfdxcgf68dvxcgvxc9gvg9d9esgsdeg9rgdcxvgcxivgd9f7efiiu";
-$expiryseconds = 60 * 400;
 
  # ACCESS LEVEL CODES
   $LEVEL_NONE = -1;
@@ -409,87 +535,6 @@ $PAYMENT_BARTER = 20;
         $PAYMENT_BARTER => 'Other / Barter',
 );
 
-
-#Schools
-$SCHOOL_SEARCH_LIMIT=50;
-$SCHOOL_COOKIE='regspsch';
-
-
-#EDU
-$EDU_IMAGE_COUNT = 2;
-@EDU_IMAGE_DIMENSIONS = qw(300x300 300x300);
-@EDU_IMAGE_LABELS = qw(Logo Signature);
-
-
-$DA_IMAGE_COUNT = 2;
-@DA_IMAGE_DIMENSIONS = qw(300x300 300x300);
-@DA_IMAGE_LABELS = qw(Logo Signature);
-
-
-$CS_FAILED=-1;
-$CS_NOT_COMPLETED=0;
-$CS_COMPLETED=1;
-%mmtCompletedStatus = (
-        $CS_FAILED =>        'Not yet competent',
-        $CS_NOT_COMPLETED => 'Pending',
-        $CS_COMPLETED =>     'Competent',
-);
-
-%mmCompletedStatus = (
-        $CS_FAILED =>        'Not yet competent',
-        $CS_NOT_COMPLETED => 'Pending',
-        $CS_COMPLETED =>     'Competent',
-);
-
-
-$MM_A_REJECTED=-1;
-$MM_A_PENDING=0;
-$MM_A_ACCEPTED=1;
-%mmApprovalStatus = (
-        $MM_A_REJECTED=>   'Rejected',
-        $MM_A_PENDING=>    'Pending',
-        $MM_A_ACCEPTED=>         'Approved',
-);
-
-
-$MM_R_FAILED=-1;
-$MM_R_NA=0;
-$MM_R_PASSED=1;
-%mmResult = (
-        $MM_R_FAILED=>    'Failed',
-        $MM_R_NA=>        'Not Available',
-        $MM_R_PASSED=>   'Passed',
-);
-
-
-$TABLE_TYPE_MEMBERMODULE = 1;
-
-
-
-%tableTypeName = (
-    $TABLE_TYPE_MEMBERMODULE => 'tblMemberModule',
-);
-
-
-$MODULE_STATUS_CANCELLED=-1;
-$MODULE_STATUS_ACTIVE=1;
-%moduleStatus = (
-        $MODULE_STATUS_CANCELLED=>   'Cancelled',
-        $MODULE_STATUS_ACTIVE=>      'Active',
-);
-
-$TEMPLATE_CODE_PREFIX='T';
-$COURSE_CODE_PREFIX='C';
-$MODULE_CODE_PREFIX='M';
-
-$STAFF_MODULE_TEMPLATE_STATUS_UNQUALIFIED=0;
-$STAFF_MODULE_TEMPLATE_STATUS_QUALIFIED=1;
-%staff_module_template_status = (
-        $STAFF_MODULE_TEMPLATE_STATUS_UNQUALIFIED => 'Unqualified',
-        $STAFF_MODULE_TEMPLATE_STATUS_QUALIFIED => 'Qualified',
-);
-
-
 #Clearances
 $DIRECTION_FROM_SOURCE=1;
 $DIRECTION_TO_DESTINATION=2;
@@ -497,20 +542,9 @@ $CLUB_LEVEL_CLEARANCE=1;
 $ASSOC_LEVEL_CLEARANCE=2;
 $NODE_LEVEL_CLEARANCE=3;
 
-#Event Def Codes
-$EVENTDEFCODES_HOTELS =1;
-$EVENTDEFCODES_HOTELTRANSPORT =2;
-$EVENTDEFCODES_AIRLINE=3;
-$EVENTDEFCODES_INTERDOMESTIC=4;
-$EVENTDEFCODES_AIRPORT=5;
-
-$EVENTUNIFORM_DEFCODES_1 = 1;
-$EVENTUNIFORM_DEFCODES_2 = 2;
-$EVENTUNIFORM_DEFCODES_3 = 3;
-$EVENTUNIFORM_DEFCODES_4 = 4;
-
 %LevelNames = (
   $LEVEL_NONE => 'None',
+  $LEVEL_PERSON=> 'Person',
   $LEVEL_MEMBER => 'Member',
   $LEVEL_TEAM =>'Team',
   $LEVEL_CLUB => 'Club',
@@ -529,10 +563,12 @@ $EVENTUNIFORM_DEFCODES_4 = 4;
   $LEVEL_PROGRAM => 'Program',
 );
 
-%AgeType = (
-  JUNIOR => 'Junior',
-  SENIOR => 'Senior',
-  ALL_AGES => 'All Ages',
+$AGE_LEVEL_SENIOR = 'SENIOR';
+$AGE_LEVEL_JUNIOR = 'JUNIOR';
+$AGE_LEVEL_ALL = 'ALL';
+%ageLevel = (
+	$AGE_LEVEL_SENIOR=>'Senior',	
+	$AGE_LEVEL_JUNIOR=>'Junior',	
 );
 
 %ClubType = (
@@ -547,93 +583,6 @@ $EVENTUNIFORM_DEFCODES_4 = 4;
   3 => 'Both',
 );
 
-$REGO_FORM_SALT = "1234";
-
-$bank_export_dir="/u/web/swm/trunk/web/banksplits/";
-$bank_export_dir_web="banksplits/";
-
-#EDU
-$LEVEL_EDU_ADMIN  = -150;
-  $LEVEL_EDU_DA     = -151;
-  $LEVEL_EDU_MODULE = -152;
-$EDU_IMAGE_COUNT = 2;
-@EDU_IMAGE_DIMENSIONS = qw(300x300 300x300);
-@DA_IMAGE_LABELS = qw(Logo Signature);
-
-
-$DA_IMAGE_COUNT = 2;
-@DA_IMAGE_DIMENSIONS = qw(300x300 300x300);
-@DA_IMAGE_LABELS = qw(Logo Signature);
-
-
-$CS_FAILED=-1;
-$CS_NOT_COMPLETED=0;
-$CS_COMPLETED=1;
-%mmtCompletedStatus = (
-        $CS_FAILED =>        'Not yet competent',
-        $CS_NOT_COMPLETED => 'Pending',
-        $CS_COMPLETED =>     'Competent',
-);
-
-%mmCompletedStatus = (
-        $CS_FAILED =>        'Not yet competent',
-        $CS_NOT_COMPLETED => 'Pending',
-        $CS_COMPLETED =>     'Competent',
-);
-
-
-$MM_A_REJECTED=-1;
-$MM_A_PENDING=0;
-$MM_A_ACCEPTED=1;
-%mmApprovalStatus = (
-        $MM_A_REJECTED=>   'Rejected',
-        $MM_A_PENDING=>    'Pending',
-        $MM_A_ACCEPTED=>         'Approved',
-);
-
-
-$MM_R_FAILED=-1;
-$MM_R_NA=0;
-$MM_R_PASSED=1;
-%mmResult = (
-        $MM_R_FAILED=>    'Failed',
-        $MM_R_NA=>        'Not Available',
-        $MM_R_PASSED=>   'Passed',
-);
-
-
-$TABLE_TYPE_MEMBERMODULE = 1;
-
-
-
-%tableTypeName = (
-    $TABLE_TYPE_MEMBERMODULE => 'tblMemberModule',
-);
-
-$MODULE_STATUS_CANCELLED=-1;
-$MODULE_STATUS_ACTIVE=1;
-%moduleStatus = (
-        $MODULE_STATUS_CANCELLED=>   'Cancelled',
-        $MODULE_STATUS_ACTIVE=>      'Active',
-);
-
-$TEMPLATE_CODE_PREFIX='T';
-$COURSE_CODE_PREFIX='C';
-$MODULE_CODE_PREFIX='M';
-
-$STAFF_MODULE_TEMPLATE_STATUS_UNQUALIFIED=0;
-$STAFF_MODULE_TEMPLATE_STATUS_QUALIFIED=1;
-%staff_module_template_status = (
-        $STAFF_MODULE_TEMPLATE_STATUS_UNQUALIFIED => 'Unqualified',
-        $STAFF_MODULE_TEMPLATE_STATUS_QUALIFIED => 'Qualified',
-);
-
-
-
-#MySport Stuff
-$COOKIE_MYSPORT="spulse_lg";
-$RegoServerKey='df09s8h5w498y5209^&%*&T*#';
-$MySportCheckURL='http://localhost';
 
 ## CLEARANCES:
 $DIRECTION_FROM_SOURCE=1;
@@ -678,69 +627,8 @@ $CLR_AUTO_DENY= 2;
         $CLR_AUTO_DENY=>'Deny All',
 );
 
-%clearancePermitType=    (
-  2 =>  { ##Footy Web
-        ''=>'-None-',
-        $CLRPERMIT_MATCHDAY =>'1. Match Day',
-        $CLRPERMIT_LOCALINTX=>'2. Local Interchange',
-        $CLRPERMIT_TRANSFER=>'3. Temporary Transfer',
-  },
-  3 =>  { ##ARLD
-        ''=>'-None-',
-  },
-  5 =>  { ##
-        ''=>'-None-',
-        $CLRPERMIT_MATCHDAY =>'1. Match Day',
-        $CLRPERMIT_LOCALINTX=>'2. Local Interchange',
-        $CLRPERMIT_TRANSFER=>'3. Temporary Transfer',
-  },
-  6 =>  { ##Footy Web
-        ''=>'-None-',
-        $CLRPERMIT_MATCHDAY =>'1. Match Day',
-        $CLRPERMIT_LOCALINTX=>'2. Local Interchange',
-        $CLRPERMIT_TRANSFER=>'3. Temporary Transfer',
-  },
-  13 => { ##Footy Web
-        ''=>'-None-',
-        $CLRPERMIT_MATCHDAY =>'1. Match Day',
-        $CLRPERMIT_LOCALINTX=>'2. Local Interchange',
-        $CLRPERMIT_TRANSFER=>'3. Temporary Transfer',
-  },
-  27 => { ##Footy Web
-        ''=>'-None-',
-        $CLRPERMIT_MATCHDAY =>'1. Match Day',
-        $CLRPERMIT_LOCALINTX=>'2. Local Interchange',
-        $CLRPERMIT_TRANSFER=>'3. Temporary Transfer',
-  },
-);
-
 %ClearanceRuleTypes=    (
   2 =>  { ## RealmID
-        $CLR_TYPE_CLR=>'Transfers/Clearances Only',
-        $CLR_TYPE_PERMIT_LOCALINTX=>'2. Local Interchange',
-        $CLR_TYPE_PERMIT_TRANSFER=>'3. Temporary Transfer',
-  },
-  3 =>  { ##Footy Web
-        $CLR_TYPE_CLR=>'Transfers/Clearances Only',
-        $CLR_TYPE_PERMIT_LOCALINTX=>'Portability',
-        $CLR_TYPE_PERMIT_TRANSFER=>'Temporary Clearance',
-  },
-  5 =>  { ## RealmID
-        $CLR_TYPE_CLR=>'Transfers/Clearances Only',
-        $CLR_TYPE_PERMIT_LOCALINTX=>'2. Local Interchange',
-        $CLR_TYPE_PERMIT_TRANSFER=>'3. Temporary Transfer',
-  },
-  6 =>  { ## RealmID
-        $CLR_TYPE_CLR=>'Transfers/Clearances Only',
-        $CLR_TYPE_PERMIT_LOCALINTX=>'2. Local Interchange',
-        $CLR_TYPE_PERMIT_TRANSFER=>'3. Temporary Transfer',
-  },
-  13 => { ## RealmID
-        $CLR_TYPE_CLR=>'Transfers/Clearances Only',
-        $CLR_TYPE_PERMIT_LOCALINTX=>'2. Local Interchange',
-        $CLR_TYPE_PERMIT_TRANSFER=>'3. Temporary Transfer',
-  },
-  27 => { ## RealmID
         $CLR_TYPE_CLR=>'Transfers/Clearances Only',
         $CLR_TYPE_PERMIT_LOCALINTX=>'2. Local Interchange',
         $CLR_TYPE_PERMIT_TRANSFER=>'3. Temporary Transfer',
@@ -798,31 +686,6 @@ $PS_REMAINDER_SPLIT = $PS_MAX_SPLITS + 1;
         2=>'Club House',
         3=>'Tribunal Venue',
 );
-### Process Log
-$PROCESSLOG_COMP_LDR = 1;
-$PROCESSLOG_COMP_PLAYER_STATS = 2;
-$PROCESSLOG_SWW_UPLOAD = 99;
-$PROCESSLOG_MEDIARPT_EMAIL = 3;
-
-%processLogTypes = (
-                   $PROCESSLOG_COMP_LDR=>'Competition Ladder Update',
-                   $PROCESSLOG_COMP_PLAYER_STATS=>'Competition Player Stats Update',
-                   $PROCESSLOG_SWW_UPLOAD=>'Competition Upload to SportingPulse',
-                   $PROCESSLOG_MEDIARPT_EMAIL=>'Emailing Media Report',
-                   );
-
-### Process Log Statuses
-$PROCESSLOG_WAITING = 1;
-$PROCESSLOG_RUNNING = 2;
-$PROCESSLOG_COMPLETED = 3;
-$PROCESSLOG_FAILED = 4;
-
-%processLogStatuses = (
-                       $PROCESSLOG_WAITING => 'Waiting',
-                       $PROCESSLOG_RUNNING => 'Running',
-                       $PROCESSLOG_COMPLETED => 'Completed',
-                       $PROCESSLOG_FAILED => 'Failed',
-                   );
 
 # Communicator message types
 $MESSAGE_TYPE_EMAIL = 1; 
@@ -833,7 +696,6 @@ $PRODUCT_MEMBER_TYPES = 2;
 
 $PRODUCT_PROGRAM_NEW = 5;
 $PRODUCT_PROGRAM_RETURNING = 6;
-
 
 ### Media Reporting Member Name Formats
 $MEMBER_NAME_FULL = 1;
@@ -854,7 +716,6 @@ $PRODUCTS_MINLEVEL_NATIONAL= 1;
   $LEVEL_NATIONAL => 'National level',
 );
 
-$PAYPAL_URL_MASSPAY = 'https://api-3t.sandbox.paypal.com/nvp';
 
 $GATEWAY_CC=1;
 $GATEWAY_PAYPAL=2;
@@ -863,20 +724,13 @@ $COMP_ROUND_HOMEAWAY = 0;
 $COMP_ROUND_FINALS = 2;
 $MESSAGE_TYPE_SMS = 2;
 
-# Payment split fields
-$PS_MAX_SPLITS = 5;
-$PS_REMAINDER_SPLIT = $PS_MAX_SPLITS + 1;
 
 %PS_FeesType = (
   1 => 'SportingPulse Fees',
   2 => 'Bank Fees',
 );
 
-
-
 $PROD_TYPE_MINFEE = 2;
-
-$micropay_export_dir="/u/web/swm/trunk/micropay/";
 $ML_TYPE_GATEWAYFEES=1;
 $ML_TYPE_SPMAX=2;
 $ML_TYPE_LPF=3;
@@ -945,101 +799,8 @@ $CLUB_LEVEL = 3;
   3=>'Accepted',
 );
 
-$PROCESSLOG_COURTSIDE_STADIUM_SCORING = '';
-$GOVBODY_AUTH_TYPE = '';
-
-$PROCESSLOG_FINALSELIGIBILITY = '';
-
 $PRICING_TYPE_SINGLE = 0;
 $PRICING_TYPE_MULTI  = 1;
 $PRICING_TYPE_RANGED = 2;
-
-#Registration constants
-%personType = (
-		'PLAYER'=>'Player',	
-		'COACH'=>'Coach',	
-		'REFEREE'=>'Referee',	
-);
-
-$PERSON_TYPE_PLAYER = 'AMATEUR';
-$PERSON_TYPE_COACH = 'COACH';
-$PERSON_TYPE_REFEREE = 'REFEREE';
-	
-%personLevel = (
-	'AMATEUR'=>'Amateur',	
-	'PROFESSIONAL'=>'Professional',	
-);	
-
-$PERSON_LEVEL_AMATEUR = 'AMATEUR';
-$PERSON_LEVEL_PROFESSIONAL = 'PROFESSIONAL';
-
-%sportType = (
-	'FOOTBALL'=>'Football',	
-	'BEACHSOCCER'=>'Beach Soccer',	
-	'FUTSAL'=>'Futsal',	
-);	
-
-$SPORT_TYPE_FOOTBALL = 'FOOTBALL';
-$SPORT_TYPE_BEACHSOCCER = 'BEACHSOCCER';
-$SPORT_TYPE_FUTSAL = 'FUTSAL';
-
-%entityStatus = (
-        'PENDING' => 'Pending',
-        'ACTIVE' => 'Active',
-        'INACTIVE' => 'Inactive',
-        'DE-REGISTERED' => 'De-registered',
-        'SUSPENDED' => 'Suspended'
-);
-
-$ENTITY_STATUS_PENDING = 'PENDING';
-$ENTITY_STATUS_ACTIVE = 'ACTIVE';
-$ENTITY_STATUS_INACTIVE = 'INACTIVE';
-$ENTITY_STATUS_DE_REGISTERED = 'DE-REGISTERED';
-$ENTITY_STATUS_SUSPENDED = 'SUSPENDED';
-
-%registrationNature = (
-	'NEW'=>'New Registration',	
-	'RENEWAL'=>'Renewal',	
-	'AMENDMENT'=>'Amendment',
-	'TRANSFER'=>'Transfer'
-);
-
-$REGISTRATION_NATURE_NEW = 'NEW';
-$REGISTRATION_NATURE_RENEWAL = 'RENEWAL';
-$REGISTRATION_NATURE_AMENDMENT = 'AMENDMENT';
-$REGISTRATION_NATURE_TRANSFER = 'TRANSFER';
-
-%ageLevel = (
-	'SENIOR'=>'Senior',	
-	'JUNIOR'=>'Junior',	
-);
-
-$AGE_LEVEL_SENIOR = 'SENIOR';
-$AGE_LEVEL_JUNIOR = 'JUNIOR';
-
-%personStatus = (
-        $PERSON_STATUS_PENDING => 'Pending',
-        $PERSON_STATUS_ACTIVE => 'Active',
-        $PERSON_STATUS_INACTIVE => 'Inactive',
-        $PERSON_STATUS_DE_REGISTERED => 'De-registered',
-);
-
-$PERSON_STATUS_PENDING = 'PENDING';
-$PERSON_STATUS_ACTIVE = 'ACTIVE';
-$PERSON_STATUS_INACTIVE = 'INACTIVE';
-$PERSON_STATUS_DE_REGISTERED = 'DE-REGISTERED';
-$PERSON_STATUS_SUSPENDED = 'SUSPENDED';
-
-#End of Registration constants
-$CLUBLEVEL_SUBTYPE_CLUB = 'Club'; 
-$CLUBLEVEL_SUBTYPE_SCHOOL = 'School';
-$CLUBLEVEL_SUBTYPE_ACADEMY = 'Academy';
-
-%clubLevelSubtype = (
-    $CLUBLEVEL_SUBTYPE_CLUB => 'Club', 
-    $CLUBLEVEL_SUBTYPE_SCHOOL => 'School',
-    $CLUBLEVEL_SUBTYPE_ACADEMY => 'Academy',
-     
-);
 
 1;

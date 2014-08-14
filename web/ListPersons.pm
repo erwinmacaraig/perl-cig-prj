@@ -144,17 +144,19 @@ sub listPersons {
             $select_str
             $sel_str 
         FROM tblPerson  AS P
-            INNER JOIN tblPersonRegistration_$realm_id AS PR
-                ON P.intPersonID = PR.intPersonID
-
+            INNER JOIN tblPersonRegistration_$realm_id AS PR ON ( 
+                P.intPersonID = PR.intPersonID
+                AND PR.strStatus NOT IN ('ROLLED_OVER')
+            )
         LEFT JOIN tblPersonNotes ON tblPersonNotes.intPersonID = P.intPersonID
         WHERE P.strStatus <> 'DELETED'
             AND P.intRealmID = $Data->{'Realm'}
             AND PR.intEntityID = ?
-        ORDER BY $default_sort strLocalSurname, strLocalFirstname
+        ORDER BY intPersonRegistrationID DESC, $default_sort strLocalSurname, strLocalFirstname
     ];
 
-    my $query = exec_sql($statement, $entityID);
+    my $query= $Data->{'db'}->prepare($statement);
+    $query->execute($entityID) or query_error($statement);
     my $found = 0;
     my @rowdata = ();
     my $newaction='P_HOME';
@@ -162,8 +164,22 @@ sub listPersons {
 
     my %tempClientValues = getClient($client);
     $tempClientValues{currentLevel} = $Defs::LEVEL_PERSON;
+    my %PersonSeen=();
     while (my $dref = $query->fetchrow_hashref()) {
-        next if (defined $dref->{strStatus} and $dref->{strStatus} eq 'DELETED');
+        next if (
+            (
+                $dref->{'PRStatus'} eq $Defs::PERSONREGO_STATUS_DELETED
+                or $dref->{'strStatus'} eq $Defs::PERSON_STATUS_DELETED
+                or $dref->{'PRStatus'} eq $Defs::PERSONREGO_STATUS_TRANSFERRED 
+                or $dref->{'PRStatus'} eq $Defs::PERSONREGO_STATUS_INPROGRESS
+                or $dref->{'PRStatus'} eq $Defs::PERSONREGO_STATUS_SUSPENDED
+                or $dref->{'strStatus'} eq $Defs::PERSON_STATUS_SUSPENDED
+            )
+            and $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL
+        );
+        next if exists $PersonSeen{$dref->{'intPersonID'}};
+        $PersonSeen{$dref->{'intPersonID'}} = 1;
+        $dref->{'strStatus'} = $dref->{'PRStatus'}; ## Lets use PR status
         next if (defined $dref->{intSystemStatus} and $dref->{intSystemStatus} == $Defs::PERSONSTATUS_DELETED);
         $tempClientValues{personID} = $dref->{intPersonID};
         my $tempClient = setClient(\%tempClientValues);

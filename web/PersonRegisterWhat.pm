@@ -6,13 +6,18 @@ require Exporter;
     optionsPersonRegisterWhat
 );
 
+use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 use strict;
 use Utils;
 use Reg_common;
 use TTTemplate;
 use Log;
 use EntityTypeRoles;
+use Person;
+use Entity;
+use CGI qw(param);
 
+use Data::Dumper;
 
 sub displayPersonRegisterWhat   {
     my(
@@ -24,7 +29,7 @@ sub displayPersonRegisterWhat   {
         $originLevel,
         $continueURL,
     ) = @_;
-
+warn("AIN DISPLAY");
     my %templateData = (
         originLevel => $originLevel || 0,
         personID => $personID || 0,
@@ -66,6 +71,11 @@ sub optionsPersonRegisterWhat {
         $lookingFor,
     ) = @_;
 
+warn("AAAAA1");
+    my $pref= undef;
+    $pref = loadPersonDetails($Data->{'db'}, $personID) if ($personID);
+
+    my $role_ref = getEntityTypeRoles($Data, $sport, $personType);
     my %lfTable = (
         type => 'strPersonType',
         nature => 'strRegistrationNature',
@@ -74,7 +84,6 @@ sub optionsPersonRegisterWhat {
         sport => 'strSport',
         role => 'strPersonEntityRole',
     );
-    my $role_ref = getEntityTypeRoles($Data, $sport, $personType);
     my %lfLabelTable = (
         type => \%Defs::personType,
         role=> $role_ref,
@@ -86,145 +95,127 @@ sub optionsPersonRegisterWhat {
     
     my $lookingForField = $lfTable{$lookingFor} || '';
     return (undef,'Invalid item to look for') if !$lookingForField;
+    my $step=1;
+    $step=2 if ($lookingFor eq 'sport');
+    $step=3 if ($lookingFor eq 'role');
+    $step=4 if ($lookingFor eq 'level');
+    $step=5 if ($lookingFor eq 'age');
+    $step=6 if ($lookingFor eq 'nature');
 
-    my @ERAvalues = ();
-    my @MATRIXvalues = ();
-    my $MATRIXwhere = '';
-    my $ERAwhere = '';
-    push @MATRIXvalues, $originLevel;
-    push @MATRIXvalues, $realmID;
-    push @MATRIXvalues, $subRealmID;
-    push @ERAvalues, $entityID;
-    push @ERAvalues, $realmID;
-    push @ERAvalues, $subRealmID;
+    my @retdata = ();
+    my @values = ();
+    my $st = '';
+    my ($MATRIXwhere, $ERAwhere) = ('','');
+    my @MATRIXvalues = (
+        $originLevel,
+        $realmID,
+        $subRealmID
+    );
+    my @ERAvalues = (
+        $entityID,
+        $realmID,
+        $subRealmID
+    );
 
-    if($sport)  {
+    ### LETS BUILD UP THE SQL WHERE STATEMENTS TO HELP NARROW SELECTION
+warn("STEP $step FOR $sport");
+    if($step > 2) {# and defined $sport)  {
         push @MATRIXvalues, $sport;
         push @ERAvalues, $sport;
         $MATRIXwhere .= " AND strSport = ? ";
         $ERAwhere .= " AND strSport = ? ";
     }
-    if($registrationNature)  {
+    if($step > 6 and defined $registrationNature)  {
         push @MATRIXvalues, $registrationNature;
         $MATRIXwhere .= " AND strRegistrationNature = ? ";
     }
-    if($personType)  {
+    if($step > 1 and defined $personType)  {
         push @MATRIXvalues, $personType;
         push @ERAvalues, $personType;
         $MATRIXwhere .= " AND strPersonType = ? ";
         $ERAwhere .= " AND strPersonType = ? ";
     }
-    if($personEntityRole)  {
+    if($step > 3 and defined $personEntityRole)  {
         push @MATRIXvalues, $personEntityRole;
         $MATRIXwhere .= " AND strPersonEntityRole IN ('', ?) ";
     }
-    if($personLevel)  {
+    if($step > 4 and defined $personLevel)  {
         push @MATRIXvalues, $personLevel;
         push @ERAvalues, $personLevel;
         $MATRIXwhere .= " AND strPersonLevel = ? ";
         $ERAwhere .= " AND strPersonLevel = ? ";
     }
-    if($ageLevel)  {
+    if($step > 5 and defined $ageLevel)  {
         push @MATRIXvalues, $ageLevel;
         push @ERAvalues, $ageLevel;
         $MATRIXwhere .= " AND strAgeLevel IN ('ALL_AGES', ?) ";
         $ERAwhere .= " AND strAgeLevel IN ('ALL_AGES', ?) ";
     }
-
-    my $st = qq[
-        SELECT DISTINCT $lookingForField
-    ];
-
-    ## IF entityID then get strEntityType
-    my @retdata = ();
-    my $entityType = '';
-    my $entityLevel=0;
-    if ($entityID)  {
-        my $stEntity = qq[
-            SELECT
-                strEntityType,
-                intEntityLevel
-            FROM
-                tblEntity
-            WHERE 
-                intRealmID = ?
-                AND intEntityID = ?
-            LIMIT 1
-        ];
-        my $qEntity= $Data->{'db'}->prepare($stEntity);
-        $qEntity->execute($Data->{'Realm'}, $entityID);
-        ($entityType, $entityLevel) = $qEntity->fetchrow_array() || '';
+    if(defined $pref->{'intGender'})  {
+        push @ERAvalues, $pref->{'intGender'} || 0;
+        $ERAwhere .= " AND intGender IN (0, ?) ";
     }
 
-    if ($lookingForField eq 'strPersonEntityRole')  {
-warn("SHOULD THIS MOVE TO FUTHER DOWN ?");
-        foreach my $key (keys %{$role_ref})   {
-            push @retdata, {
-                name => $role_ref->{$key},
-                value => $key,
-            };
+
+    if ($entityID)  {
+        my $eref= loadEntityDetails($Data->{'db'}, $entityID);
+        my $entityType = $eref->{'strEntityType'} || '';
+        my $entityLevel = $eref->{'intEntityLevel'} || 0;
+        if ($entityLevel)  {
+            push @MATRIXvalues, $entityLevel;
+            $MATRIXwhere .= qq[ AND intEntityLevel = ?];
         }
-        if (! @retdata) {
-            push @retdata, {
-                name => '-',
-                value => '-',
-            };
+        if ($entityType)    {
+            push @MATRIXvalues, $entityType;
+            $MATRIXwhere .= qq[ AND strEntityType IN ('', ?)];
         }
+    }
+
+    if (! checkMatrixOK($Data, $MATRIXwhere, \@MATRIXvalues))   {
+warn("AERROR WITH MATRIX");
         return (\@retdata, '');
     }
-    if (! $entityID and $lookingForField ne 'strRegistrationNature')    {
+    
+    ### ALL OK, LETS RETURN NEXT SET OF SELECTIONS
+    if ($lookingForField eq 'strPersonEntityRole')  {
+        my $roledata_ref = returnEntityRoles($role_ref);
+        return ($roledata_ref, '');
+    }
+    elsif ($entityID and $lookingForField ne 'strRegistrationNature')   {
         $st = qq[
-            SELECT COUNT(intMatrixID) as CountNum
-        ];
-    }
-    $st .= qq[
-        FROM tblMatrix
-        WHERE
-            intOriginLevel  = ?
-            AND intRealmID = ?
-            AND intSubRealmID IN (0,?)
-            $MATRIXwhere
-            AND strEntityType IN ('', ?)
-    ];
-    push @MATRIXvalues, $entityType;
-warn($st);
-    if ($entityLevel)  {
-        $st .= qq[ AND intEntityLevel = ?];
-        push @MATRIXvalues, $entityLevel;
-    }
-    if (! $entityID and $lookingForField ne 'strRegistrationNature')   {
-        my $qCheck = $Data->{'db'}->prepare($st);
-        $qCheck->execute(@MATRIXvalues);
-        my $ok = $qCheck->fetchrow_array() || 0;
-       # warn ("OK IS $ok");
-        if (! $ok)  {
-warn("NOT OK");
-            return (\@retdata, '');
-        }
-    }
-
-    my @values = ();
-    if($entityID and $lookingForField ne 'strRegistrationNature')   {
-        $st = qq[
-            SELECT DISTINCT $lookingForField
+            SELECT DISTINCT $lookingForField, COUNT(intEntityRegistrationAllowedID) as CountNum
             FROM tblEntityRegistrationAllowed
             WHERE
                 intEntityID = ?
                 AND intRealmID = ?
                 AND intSubRealmID IN (0,?)
                 $ERAwhere
+            GROUP BY $lookingForField
         ];
         @values = @ERAvalues;
     }
     else    {
+        $st = qq[
+            SELECT DISTINCT $lookingForField, COUNT(intMatrixID) as CountNum
+            FROM tblMatrix
+            WHERE
+                intOriginLevel  = ?
+                AND intLocked=0
+                AND intRealmID = ?
+                AND intSubRealmID IN (0,?)
+                $MATRIXwhere
+            GROUP BY $lookingForField
+        ];
         @values = @MATRIXvalues;
     }
+warn($st);
     
 
     my $q = $Data->{'db'}->prepare($st);
     $q->execute(@values);
     my $lookup = ();
-    while(my $val = $q->fetchrow_array())   {
+    while(my ($val, $countNum) = $q->fetchrow_array())   {
+warn("VAL$countNum".$val);
         if($val)    {
             my $label = $lfLabelTable{$lookingFor}{$val};
             $label = $Data->{'lang'}->txt($lfLabelTable{$lookingFor}{$val});
@@ -233,8 +224,58 @@ warn("NOT OK");
                 value => $val,
             };
         }
+        else    {
+            push @retdata, {
+                name => '-',
+                value => '',
+            };
+       }
     }
+
     return (\@retdata, '');
 }
 
+
+
+#### FUNCTIONS #####
+
+sub returnEntityRoles   {
+
+    my ($role_ref) = @_;
+    my @retdata=();
+    foreach my $key (keys %{$role_ref})   {
+        push @retdata, {
+            name => $role_ref->{$key},
+            value => $key,
+        };
+     }
+     if (! @retdata) {
+        push @retdata, {
+            name => '-',
+            value => '',
+        };
+     }
+     return \@retdata;
+}
+
+sub checkMatrixOK   {
+
+    my ($Data, $where, $values_ref) = @_;
+
+    my $st = qq[
+        SELECT COUNT(intMatrixID) as CountNum
+        FROM tblMatrix
+        WHERE
+            intOriginLevel  = ?
+            AND intLocked=0
+            AND intRealmID = ?
+            AND intSubRealmID IN (0,?)
+            $where
+    ];
+warn($st);
+print STDERR Dumper($values_ref);
+    my $q = $Data->{'db'}->prepare($st);
+    $q->execute(@{$values_ref});
+    return $q->fetchrow_array() || 0;
+}
 1;

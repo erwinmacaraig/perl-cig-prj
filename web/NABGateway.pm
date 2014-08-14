@@ -158,15 +158,15 @@ sub NABUpdate {
   $assocID ||= 0;
   my $txn = $returnVals->{'GATEWAY_TXN_ID'} || '';
   my $settlement_date=$returnVals->{'GATEWAY_SETTLEMENT_DATE'} || '0000-00-00';
-  my $otherRef1 = 'AUTHID:'.$returnVals->{'GATEWAY_AUTH_ID'} || '';
-  my $otherRef2 = '';
+  my $otherRef1 = $returnVals->{'Other1'} || '';
+  my $otherRef2 = $returnVals->{'Other2'} || '';
   my $otherRef3 = '';
   my $otherRef4 = '';
   my $responseText = $returnVals->{'ResponseText'} || '';
 
 	my $exportOK = 0;
 	$exportOK=1 if ($returnVals->{'ResponseCode'} eq 'OK');
-  	processTransLog($Data->{'db'}, $txn, $returnVals->{'ResponseCode'}, $responseText, $logID, $paymentSettings, undef, $settlement_date, $otherRef1, $otherRef2, $otherRef3, $otherRef4, '', $exportOK);
+  	processTransLog($Data->{'db'}, $txn, $returnVals->{'ResponseCode'}, $responseText, $logID, $paymentSettings, undef, $settlement_date, $otherRef1, $otherRef2, $otherRef3, $otherRef4, '', $returnVals->{'GATEWAY_AUTH_ID'}, $returnVals->{'GATEWAY_RESPONSE_TEXT'}, $exportOK);
   	my $template_ref = getPaymentTemplate($Data, $assocID);
   	my $templateBody = $template_ref->{'strFailureTemplate'} || 'payment_failure.templ';
     my $itemData;
@@ -174,7 +174,7 @@ sub NABUpdate {
     	UpdateCart($Data, $paymentSettings, $client, undef, undef, $logID);
     	#EmailPaymentConfirmation($Data, $paymentSettings, $logID, $client);
 	    # finalize_registration eather returnes 0 (no compulsory, no temp all good!) 
-	    $itemData = finalize_registration($Data,$logID);
+	    #$itemData = finalize_registration($Data,$logID);
     	product_apply_transaction($Data,$logID);
     	EmailPaymentConfirmation($Data, $paymentSettings, $logID, $client);
     	$templateBody = $template_ref->{'strSuccessTemplate'} || 'payment_success.templ';
