@@ -123,23 +123,11 @@ sub loginform	{
 	return qq[
 		<div id="swm-login-wrap">
 			<div class="spm-left">
-				<div class="pp-signin">
-					<p class="intro">].$lang->txt("We are making it easier to access your SP products with a single email and password, your").qq[ <span class="sp-passport">].$lang->txt("SP Passport").qq[</span>.</p>
-					<p>].$lang->txt("This gives you:").qq[</p>
-					<ul>
-						<li><span>].$lang->txt("A single login for all SP products, especially handy if you juggle multiple username / passwords in").qq[ <span class="sp-membership">].$lang->txt("SP Membership").qq[</span></span></li>
-						<li><span>].$lang->txt("Better auditing of database updates").qq[</span></li>
-						<li><span>].$lang->txt("Better communications from SP on product updates").qq[</span></li>
-						<li><span>].$lang->txt("Access SP Membership at any time with a single click from the global navigation").qq[</span></li>
-					</ul>
-      		<p><a href="https://sportingpulse.zendesk.com/entries/22501701-sp-passport-passport-update-december-5th" target="_blank">Click here for more information</a></p>
-      	</div>
 			</div>
-			<div class="or-sep-vert"><img src="images/rule-vert.png"></div>
 			<div class="spm-right">
 				<div class="membership-login-wrap passport-sign-box">
-					<p class="pageHeading"><span class="spp_loggedout">Register/</span>].$lang->txt("Sign in with").qq[ <span class="sp-passport">].$lang->txt("SP Passport").qq[</span></p>				
-					<span class="spp_loggedout"><p class="instruct">].$lang->txt("Don't have a").qq[ <span class="sp-passport">].$lang->txt("SP Passport").qq[</span>?</p>
+					<p class="pageHeading">].$lang->txt("Register/Sign").qq[</span></p>				
+					<span class="spp_loggedout"><p class="instruct">].$lang->txt("Don't have an account ?").qq[</p>
 					<p class="instruct">].$lang->txt("No problems, just click Register to create one and gain access to your").qq[
 					 <span class="sp-membership">].$lang->txt("SP Membership").qq[</span> ].$lang->txt("database").qq[.
 </span>
@@ -152,7 +140,7 @@ sub loginform	{
 </p>
 </form>
 					<span class="spp_loggedin">
-						<p class="instruct">We see you already have <span class="sp-passport">SP Passport</span>. Sign in below to access your <span class="sp-membership">SP Membership</span> database.</p>
+						<p class="instruct">We see you already have an account. Sign in below to access your <span class="sp-membership">SP Membership</span> database.</p>
 					</span>
 					<span class="spp_loggedout"><span class="button special-button"><a href="user/signup.cgi">Register</a></span></span>
 					<span><p style="padding-top:70px; font-size:16px; margin:8px 0; letter-spacing: -0.5px;"><a href="forgotten_password.cgi">I forgot my password.</a></p></span>
