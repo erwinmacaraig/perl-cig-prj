@@ -307,11 +307,11 @@ sub listRules  {
       $results = 1;     
       push @rowdata, {
         id => $dref->{'intEntityRegistrationAllowedID'} || 0,
-        strPersonType => $dref->{'strPersonType'} || '',
-        strSport => $dref->{'strSport'} || '',
+        PersonType => $Defs::personType{$dref->{'strPersonType'}} || '',
+        Sport => $Defs::sportType{$dref->{'strSport'}} || '',
         Gender => $Defs::genderInfo{$dref->{'intGender'}} || '',
-        strPersonLevel => $dref->{'strPersonLevel'} || '',
-        strAgeLevel => $dref->{'strAgeLevel'} || '',
+        PersonLevel => $Defs::personLevel{$dref->{'strPersonLevel'}} || '',
+        AgeLevel => $Defs::ageLevel{$dref->{'strAgeLevel'}} || '',
         DeleteLink => qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$Data->{client}&amp;a=ERA_DELETE&amp;RID=$dref->{'intEntityRegistrationAllowedID'}" onclick="return confirm('Are you sure you want to delete this rule');">] . $Data->{'lang'}->txt("Delete Rule") . q [ </a></span> ],
       };
     }
@@ -328,19 +328,19 @@ sub listRules  {
     my @headers = (
         {
             name  => $Data->{'lang'}->txt('PersonType'),
-            field => 'strPersonType',
+            field => 'PersonType',
         },
         {
             name  => $Data->{'lang'}->txt('Sport'),
-            field => 'strSport',
+            field => 'Sport',
         },
         {
             name  => $Data->{'lang'}->txt('PersonLevel'),
-            field => 'strPersonLevel',
+            field => 'PersonLevel',
         },
         {
             name  => $Data->{'lang'}->txt('AgeLevel'),
-            field => 'strAgeLevel',
+            field => 'AgeLevel',
         },
         {
             name  => $Data->{'lang'}->txt('Gender'),

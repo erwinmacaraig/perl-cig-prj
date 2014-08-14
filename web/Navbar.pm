@@ -803,9 +803,10 @@ sub getClubMenuData {
 
 
             if (
+                1==2 and (
                 $Data->{'SystemConfig'}{'AllowOnlineRego'}
                     or $Data-> {'Permissions'}{'OtherOptions'}{'AllowOnlineRego'}
-                    and !$Data->{'ReadOnlyLogin'}
+                    and !$Data->{'ReadOnlyLogin'})
             ) {
                 $menuoptions{'registrationforms'} = {
                     name => $lang->txt('Registration Forms'),
