@@ -189,6 +189,7 @@ sub _processUploadFile_single	{
 	my $error = '';
   if($isimage )  { #Image
     my $filename= "$Defs::fs_upload_dir/files/"."$path$fileID.jpg";
+warn("FN".$filename);
     my %field=();
     {
       my $dimensions=$options->{'dimensions'} || '800x600';

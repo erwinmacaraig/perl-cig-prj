@@ -4,7 +4,7 @@ CREATE TABLE tblDocuments (
     intDocumentTypeID INT DEFAULT 0,
     intEntityLevel tinyint default 0, /*Person, Entity */
     intEntityID INT DEFAULT 0, /* ID of the Person, Entity*/
-    strApprovalStatus TINYINT DEFAULT 0, /* PENDING , APPROVED, REJECTED */
+    strApprovalStatus varchar(30) default '', /* PENDING , APPROVED, REJECTED */
     strDeniedNotes  TEXT default '',
     dtAdded datetime,
     strPath VARCHAR(50) NOT NULL,
