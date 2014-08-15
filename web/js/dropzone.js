@@ -299,11 +299,11 @@ require.register("dropzone/lib/dropzone.js", function (exports, module) {
       maxThumbnailFilesize: 10,
       thumbnailWidth: 100,
       thumbnailHeight: 100,
-      maxFiles: null,
+      maxFiles: 1,
       params: {},
       clickable: true,
       ignoreHiddenFiles: true,
-      acceptedFiles: null,
+      acceptedFiles: ".jpeg, .jpg, .png, .gif, .pdf, .JPEG, .JPG, .PNG, .GIF, .PDF",
       acceptedMimeTypes: null,
       autoProcessQueue: true,
       autoQueue: true,
@@ -733,6 +733,9 @@ require.register("dropzone/lib/dropzone.js", function (exports, module) {
         eventName = _ref1[_i];
         this.on(eventName, this.options[eventName]);
       }
+      this.on("maxfilesexceeded",function(file){
+           this.removeFile(this.files[1]);
+      });
       this.on("uploadprogress", (function(_this) {
         return function() {
           return _this.updateTotalUploadProgress();

@@ -113,48 +113,28 @@ sub displayRegoFlowDocuments    {
         0,
         $rego_ref,
      );
-     my $body = qq[
-        display document upload information
-     ];
-
+     my $body;
+     
       
      #####################3
      print STDERR Dumper($documents);
 
-     foreach my $doc (@{$documents})   {
-        $body .= qq[ <p>Document ID needed ]. $doc->{'ID'}. qq[</p>]; 
-        ### plaed one dropzone form for each document ##########
-        $body .= qq[
-        <br /><form action="main.cgi" class="dropzone">
-                 <input type="hidden" name="a" value="PREGF_DU">];
 
-     foreach my $hidden (keys %{$hidden_ref})   {
-        $body .= qq[<input type="hidden" name="$hidden" value="].$hidden_ref->{$hidden}.qq[">];
-     }
-
-
-       $body .= q[ </form> ];     
-   
-
-     }
     
-############## FOR THE CONTINUE BUTTON  #########
- $body .= qq[
-        
-           <form action="$Data->{target}" method="POST">
-            <input type="hidden" name="a" value="PREGF_DU">
-     ]; 
+  my %PageData = (
+        nextaction => "PREGF_DU",
+        target => $Data->{'target'},
+        documents => $documents, 
+        hidden_ref => $hidden_ref,
+        Lang => $Data->{'lang'},
+        client => $client,
+  );  
+ my $pagedata = runTemplate($Data, \%PageData, 'registration/document_flow_backend.templ') || '';
 
-     foreach my $hidden (keys %{$hidden_ref})   {
-        $body .= qq[<input type="hidden" name="$hidden" value="].$hidden_ref->{$hidden}.qq[">];
-     }
- 
- $body .= qq[
-               <input type="submit" name="submit" value="]. $lang->txt("Continue").qq[" class = "button proceed-button"><br><br>
-                    </form>
-     ]; 
+    return $pagedata;
+
 #########################
-    return $body;
+   # return $body;
 }
 
 sub displayRegoFlowProducts {

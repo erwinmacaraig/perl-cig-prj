@@ -116,7 +116,7 @@ warn("FBEND:$personID");
             my @files = (
                         [$uploaded_filename, $filefield, $permission,],
             ); 
-            processUploadFile($Data,\@files,$entityLevel,$entityID,$Defs::UPLOADFILETYPE_DOC,);
+            processUploadFile($Data,\@files,$Defs::LEVEL_PERSON,$personID,$Defs::UPLOADFILETYPE_DOC,);
             # _processUploadFile_single($Data,$uploaded_filename,'file',$EntityTypeID,$EntityID,$Defs::UPLOADFILETYPE_DOC,1,undef);                 
            
         }
