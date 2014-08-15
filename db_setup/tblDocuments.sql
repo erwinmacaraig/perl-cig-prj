@@ -16,6 +16,6 @@ CREATE TABLE tblDocuments (
 
   PRIMARY KEY (intDocumentID),
   KEY index_DocumentType(intDocumentID),
-  KEY index_Entity(intEntityLevel , intEntityID),
+  KEY index_Entity(intEntityLevel , intEntityID)
 ) DEFAULT CHARSET=utf8;
 
