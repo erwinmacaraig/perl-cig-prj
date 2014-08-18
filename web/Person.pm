@@ -60,6 +60,7 @@ sub handlePerson {
 
     my $resultHTML = '';
     my $personName = my $title = '';
+    my $lang = $Data->{'lang'};
 
     my $clrd_out = 0;
     if ( $Data->{'SystemConfig'}{'Clearances_FilterClearedOut'} ) {
@@ -152,10 +153,38 @@ sub handlePerson {
     elsif ( $action =~ /^P_NACCRED/ ) {
         ( $resultHTML, $title ) = handleAccreditationDisplay( $action, $Data, $personID );
     }
+    elsif ( $action =~ /P_REGOS/ ) {
+        $resultHTML = personRegstrationsHistory( $Data, $personID ) || '';
+        $title = $lang->txt('Registration History');
+    }
+    elsif ( $action =~ /P_REGO/ ) {
+        $resultHTML = personRegistration( $Data, $personID ) || '';
+        $title = $lang->txt('Registration History');
+    }
+    elsif ( $action =~ /P_DOCS/ ) {
+        $resultHTML = qq[LIST DOCUMENTS TO GO HERE]; #listDocuments($Data, $personID ) || '';
+        $title = $lang->txt('Registration History');
+    }
     else {
         print STDERR "Unknown action $action\n";
     }
     return ( $resultHTML, $title );
+}
+
+sub personRegstration   {
+
+    my ($Data, $personID) = @_;
+
+    return "NEED PAGE FOR A REGISTRATION RECORD";
+}
+sub personRegstrationsHistory   {
+
+    my ($Data, $personID) = @_;
+
+    #getRegistrationData
+    #load into grid
+    #put in template
+    return "NEED PAGE FOR REGISTRATION HISTORY";
 }
 
 sub updatePersonNotes {
