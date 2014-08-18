@@ -36,6 +36,8 @@ sub getFieldLabels	{
 			strMotherCountry=> 'Country of Birth (Mother)',
 			strFatherCountry=> 'Country of Birth (Father)',
 			dtDOB => 'Date of Birth',
+			dtDeath=> 'Date of Death',
+			dtSuspendedUntil=> 'Date Suspended Until',
 			strPlaceofBirth => 'Place (Town) of Birth',
             strCountryOfBirth => 'Country of Birth',
 			intGender => 'Gender',

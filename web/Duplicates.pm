@@ -173,6 +173,7 @@ sub displayDuplicateProblems	{
 			my $origtimeStamp=$orig->{'tTimeStamp'};
 			my $dupltimeStamp=$ProbRecords{$key}{'tTimeStamp'};
 
+
 			$ProbRecords{$key}{'MATCH_FOUND'} = 1;
 			$orig->{$num_field}||='';
 			$ProbRecords{$key}{$num_field}||='';
@@ -563,6 +564,7 @@ next if $dref->{$k} eq "'0000-00-00'";
 			next if $k eq 'intPersonID';
 			next if $k eq 'strNationalNum';
 			next if $k eq 'intPhoto' and ! $dref->{'intPhoto'};
+			next if $k eq 'dtSuspendedUntil' and (! $dref->{'dtSuspendedUntil'} or $dref->{'dtSuspendedUntil'} eq '0000-00-00');
 			next if $k eq 'strPersonNo' and ! $dref->{'strPersonNo'};
 			next if $k eq 'intDataOrigin' and ! $dref->{'intDataOrigin'};
 			

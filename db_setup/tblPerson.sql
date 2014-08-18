@@ -32,6 +32,7 @@ CREATE TABLE tblPerson (
     strPlaceOfBirth varchar(100) default '',
 
     dtDeath date DEFAULT '0000-00-00',
+    dtSuspendedUntil DATE DEFAULT '0000-00-00',
 
     strFirstClubName varchar(100) default '',
 
