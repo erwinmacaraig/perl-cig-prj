@@ -115,6 +115,7 @@ sub displayDuplicateProblems	{
 		ORDER BY strLocalSurname
 	];
 	my $wherestr='';
+warn($statement);
 
 	my $query = $db->prepare($statement) or query_error($statement);
 	$query->execute or query_error($statement);
@@ -497,10 +498,14 @@ warn("PRCOESS MEMBER CHANGE");
 	my %USE_DATA=();
 	$USE_DATA{'DataOrigin'} = 0;
     my $suspended = 0;
+    my $dtSuspendedUntil= '';
+    my $DSU= '';
 	if ($option =~ /^change/)	{
 		my $st = qq[
 			SELECT 
 				strNationalNum,
+                dtSuspendedUntil,
+                DATE_FORMAT(dtSuspendedUntil, "%Y%m%d") as DSU,
                 strPersonNo,
                 intDataOrigin
 			FROM 
@@ -520,6 +525,14 @@ warn("PRCOESS MEMBER CHANGE");
                 $dref->{'intDataOrigin'} > $USE_DATA{'DataOrigin'} 
                 and $USE_DATA{'DataOrigin'} !=  $Defs::CREATED_BY_REGOFORM
             );
+            if (! $dtSuspendedUntil and $dref->{'DSU'} and $dref->{'DSU'} > '00000000')  {
+                $dtSuspendedUntil = $dref->{'dtSuspendedUntil'};
+                $DSU= $dref->{'DSU'};
+            }
+            elsif ($DSU and $dref->{'DSU'}  and $dref->{'DSU'} > '00000000' and $dref->{'DSU'} > $DSU)  {
+                $dtSuspendedUntil = $dref->{'dtSuspendedUntil'};
+                $DSU= $dref->{'DSU'};
+            }
 		}
 		$USE_DATA{'MemberNo'} = $memberNo || '';
 
@@ -564,9 +577,9 @@ next if $dref->{$k} eq "'0000-00-00'";
 			next if $k eq 'intPersonID';
 			next if $k eq 'strNationalNum';
 			next if $k eq 'intPhoto' and ! $dref->{'intPhoto'};
-			next if $k eq 'dtSuspendedUntil' and (! $dref->{'dtSuspendedUntil'} or $dref->{'dtSuspendedUntil'} eq '0000-00-00');
 			next if $k eq 'strPersonNo' and ! $dref->{'strPersonNo'};
 			next if $k eq 'intDataOrigin' and ! $dref->{'intDataOrigin'};
+            $dref->{'dtSuspendedUntil'} = qq['$dtSuspendedUntil'] if $dref->{'dtSuspendedUntil'} ;
 			
 			next if $dref->{$k} eq 'NULL';
 			$dref->{$k} ="''" if $dref->{$k} eq 'NULL';
@@ -615,7 +628,7 @@ next if $dref->{$k} eq "'0000-00-00'";
         }
         
 		$Data->{'db'}->do(qq[UPDATE tblTransactions SET intID = $existingid WHERE intID = $id_of_duplicate and intTableType=$Defs::LEVEL_PERSON AND intPersonRegistrationID=0]);
-		$Data->{'db'}->do(qq[UPDATE tblDocuments SET intEntityID = $existingid WHERE intEntityID = $id_of_duplicate and intEntityLvel=$Defs::LEVEL_PERSON]);
+		$Data->{'db'}->do(qq[UPDATE tblDocuments SET intEntityID = $existingid WHERE intEntityID = $id_of_duplicate and intEntityLevel=$Defs::LEVEL_PERSON]);
 		$Data->{'db'}->do(qq[UPDATE tblClearance SET intPersonID = $existingid WHERE intPersonID=$id_of_duplicate]);
 		$Data->{'db'}->do(qq[UPDATE IGNORE tblAuth SET intID = $existingid WHERE intLevel=1 AND intID=$id_of_duplicate]);
 

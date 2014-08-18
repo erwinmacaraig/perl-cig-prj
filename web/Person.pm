@@ -587,6 +587,7 @@ sub person_details {
                 format      => 'dd/mm/yyyy',
                 sectionname => 'details',
                 validate    => 'DATE',
+                compulsory => 1,
                 first_page  => 1,
             },
             strPlaceofBirth => {
@@ -626,6 +627,7 @@ sub person_details {
                 value       => $field->{intGender},
                 type        => 'lookup',
                 options     => \%genderoptions,
+                compulsory => 1,
                 sectionname => 'details',
                 firstoption => [ '', " " ],
                 first_page  => 1,
@@ -1380,6 +1382,16 @@ sub loadPersonDetails {
     return $field;
 }
 
+sub NewRegoButton   {
+
+    my ($Data, $clm) = @_;
+
+    my $lang = $Data->{'lang'};
+    return qq[
+        <a href="$Data->{'target'}?client=$clm&amp;a=PREGF_T">]. $lang->txt('Add Registration') . qq[</a>
+    ];
+}
+
 sub postPersonUpdate {
     my ( $id, $params, $action, $Data, $db, $personID, $fields ) = @_;
 
@@ -1420,29 +1432,30 @@ sub postPersonUpdate {
         }
         getAutoPersonNum( $Data, undef, $id, $Data->{'clientValues'}{'assocID'} );
         #Seasons::insertPersonSeasonRecord( $Data, $id, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, 0, $ageGroupID, \%types ) if ($id);
+        my $cl = setClient( $Data->{'clientValues'} ) || '';
+        my %cv = getClient($cl);
+        $cv{'personID'}     = $id;
+        $cv{'currentLevel'} = $Defs::LEVEL_PERSON;
+        my $clm = setClient( \%cv );
         if ( $params->{'isDuplicate'} ) {
             my $st = qq[
                 UPDATE tblPerson SET intSystemStatus=$Defs::PERSONSTATUS_POSSIBLE_DUPLICATE 
                 WHERE intPersonID=$id
             ];
             $db->do($st);
-            return ( 0, DuplicateExplanation($Data) );
+            my $body = DuplicateExplanation($Data);
+            $body .= NewRegoButton($Data, $clm);
+            return (0, $body);
         }
         else {
-            my $cl = setClient( $Data->{'clientValues'} ) || '';
-            my %cv = getClient($cl);
-            $cv{'personID'}     = $id;
-            $cv{'currentLevel'} = $Defs::LEVEL_PERSON;
-            my $clm = setClient( \%cv );
-
-            return (
-                0, qq[
+            my $body = qq[
                 <div class="OKmsg"> $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} Added Successfully</div><br>
                 <a href="$Data->{'target'}?client=$clm&amp;a=P_HOME">Display Details for $params->{'d_strLocalFirstname'} $params->{'d_strLocalSurname'}</a><br><br>
                 <b>or</b><br><br>
                 <a href="$Data->{'target'}?client=$cl&amp;a=P_A&amp;l=$Defs::LEVEL_PERSON">Add another $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}</a>
-                ]
-            );
+            ];
+            $body .= qq[<br>]. NewRegoButton($Data, $clm);
+            return (0, $body);
 
             #</RE>
         }
