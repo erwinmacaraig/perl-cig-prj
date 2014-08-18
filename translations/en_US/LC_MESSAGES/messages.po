@@ -1114,7 +1114,7 @@ msgstr "Starting Date for Registrations"
 
 msgid "COPYRIGHT"
 msgstr ""
-"&copy;&nbsp; Copyright FOX SPORTS PULSE Pty Ltd & SportingPulse "
+"&copy;&nbsp; Copyright SportingPulse "
 "International Pty Ltd &nbsp;2014.&nbsp; All rights reserved."
 
 msgid "Parent/Guardian 1 Firstname"

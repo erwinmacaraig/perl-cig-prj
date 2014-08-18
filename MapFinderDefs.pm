@@ -61,7 +61,7 @@ $CONFIG_TYPE_PROGRAM    = 2;
             AlternateSearchResults => '',
             DefaultHeader          => 'sp_membership_web_lrg.png',
             DefaultCopyright =>
-'&copy;&nbsp; Copyright FOX SPORTS PULSE Pty Ltd & SportingPulse International Pty Ltd &nbsp;2014.&nbsp; All rights reserved.',
+'&copy;&nbsp; Copyright SportingPulse International Pty Ltd &nbsp;2014.&nbsp; All rights reserved.',
             AdvancedSearch              => 'advanced_search.templ',
             ClubCharacteristicsTemplate => '',
             ExtraStyle                  => '',
