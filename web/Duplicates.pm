@@ -35,6 +35,8 @@ sub getDupTaskCount {
         WHERE PR.intEntityID = $entityID
             AND tblPerson.intSystemStatus=$Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
             AND tblPerson.intRealmID=$Data->{'Realm'}
+            AND tblPerson.strStatus <> 'INPROGRESS'
+            AND PR.strStatus <> 'INPROGRESS'
     ];
     my $qry= $Data->{'db'}->prepare($st);
     $qry->execute or query_error($st);
