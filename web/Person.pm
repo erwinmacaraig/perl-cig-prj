@@ -146,9 +146,6 @@ sub handlePerson {
         $resultHTML = $clubs;
         $title      = "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} History";
     }
-    elsif ( $action =~ /P_SEASONS/ ) {
-        ( $resultHTML, $title ) = showSeasonSummary( $Data, $personID );
-    }
     elsif ( $action =~ /P_CLR/ ) {
         $resultHTML = clearanceHistory( $Data, $personID ) || '';
         my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
@@ -1879,29 +1876,5 @@ sub _fix_date {
     if ( $yyyy < 100 ) { $yyyy += 2000; }
     return "$yyyy-$mm-$dd";
 }
-
-
-sub showSeasonSummary {
-
-    my ( $Data, $personID ) = @_;
-
-    my $body = '';
-    my ( $memseason_vals, $memseasons ) = listPersonSeasons( $Data, $personID );
-    my $season_Name = $Data->{'SystemConfig'}{'txtSeason'} || 'Season';
-    if ($memseasons) {
-        my %Title = ();
-        $Title{1} = "$Data->{'LevelNames'}{$Defs::LEVEL_ASSOC} Summary";
-        $Title{2} = "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Summary";
-        $Title{3} = "Full $season_Name Summary";
-        my $count = 1;
-        for my $section ( @{$memseason_vals} ) {
-            my $title = $Title{$count};
-            $count++;
-            $body .= qq[<div class="sectionheader">$title</div>$section];
-        }
-    }
-    return ( $body, 'Season Summary' );
-}
-
 
 1;

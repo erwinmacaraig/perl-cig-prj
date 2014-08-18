@@ -212,7 +212,7 @@ sub showLink {
         my %Reg=();
         $Reg{'entityID'} = getLastEntityID($Data->{'clientValues'});
         my $field = Person::loadPersonDetails($Data->{'db'},$personID); 
-        if(($field->{'strStatus'} eq $Defs::PERSON_STATUS_ACTIVE || $field->{'strStatus'} eq $Defs::PERSON_STATUS_PENDING) && PersonRegistration::isPersonRegistered($Data,$personID,\%Reg)){
+        if(($field->{'strStatus'} eq $Defs::PERSON_STATUS_ACTIVE || $field->{'strStatus'} eq $Defs::PERSON_STATUS_PENDING || $field->{'strStatus'} eq $Defs::PERSON_STATUS_DUPLICATE) && PersonRegistration::isPersonRegistered($Data,$personID,\%Reg)){
             return  $url; 
         } 
         return undef;
