@@ -26,29 +26,31 @@ sub getRegistrationItems    {
 	
     my $st = qq[
 		SELECT 
-            intID,
-            intRequired,
-            intUseExistingThisEntity,
-            intUseExistingAnyEntity
+            RI.intID,
+            RI.intRequired,
+            RI.intUseExistingThisEntity,
+            RI.intUseExistingAnyEntity,
+            D.strDocumentName,
+            P.strName as strProductName
         FROM
-            tblRegistrationItem
+            tblRegistrationItem as RI
+            LEFT JOIN tblDocumentType as D ON (intDocumentTypeID = RI.intID and strItemType='DOCUMENT')
+            LEFT JOIN tblProducts as P ON (P.intProductID= RI.intID and strItemType='PRODUCT')
         WHERE
-            intRealmID = ?
-            AND intSubRealmID IN (0, ?)
-            AND strRuleFor = ?
-            AND intOriginLevel = ?
-			AND strRegistrationNature = ?
-            AND strEntityType IN ('', ?)
-            AND intEntityLevel IN (0, ?)
-			AND strPersonType = ?
-			AND strPersonLevel = ?
-            AND strPersonEntityRole IN ('', ?)
-			AND strSport = ?
-			AND strAgeLevel = ?		
-            AND strItemType = ?
+            RI.intRealmID = ?
+            AND RI.intSubRealmID IN (0, ?)
+            AND RI.strRuleFor = ?
+            AND RI.intOriginLevel = ?
+			AND RI.strRegistrationNature = ?
+            AND RI.strEntityType IN ('', ?)
+            AND RI.intEntityLevel IN (0, ?)
+			AND RI.strPersonType = ?
+			AND RI.strPersonLevel = ?
+            AND RI.strPersonEntityRole IN ('', ?)
+			AND RI.strSport = ?
+			AND RI.strAgeLevel = ?		
+            AND RI.strItemType = ?
     ];
-use Data::Dumper;
-print STDERR Dumper($Rego_ref);
 	warn("ruleFor:$ruleFor origin $originLevel $regNature $itemType");
 	my $q = $Data->{'db'}->prepare($st) or query_error($st);
 	$q->execute(
@@ -76,7 +78,12 @@ warn("ITEM");
         $Item{'UseExistingThisEntity'} = $dref->{'intUseExistingThisEntity'} || 0;
         $Item{'UseExistingAnyEntity'} = $dref->{'intUseExistingAnyEntity'} || 0;
         $Item{'Required'} = $dref->{'intRequired'} || 0;
+        if ($itemType eq 'DOCUMENT') {
+            $Item{'Name'} = $dref->{'strDocumentName'};
+        }
+    
         if ($itemType eq 'PRODUCT') {
+            $Item{'Name'} = $dref->{'strProductName'};
             $Item{'ProductPrice'} = getItemCost($Data, $entityID, $entityLevel, $multiPersonType, $dref->{'intID'}) || 0;
         }
         push @Items, \%Item;

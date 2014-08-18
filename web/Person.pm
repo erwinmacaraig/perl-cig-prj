@@ -561,6 +561,24 @@ sub person_details {
                 maxsize     => '50',
                 sectionname => 'details',
             },
+            dtDeath=> {
+                label       => $FieldLabels->{'dtDeath'},
+                value       => $field->{dtDeath},
+                type        => 'date',
+                datetype    => 'dropdown',
+                format      => 'dd/mm/yyyy',
+                sectionname => 'details',
+                validate    => 'DATE',
+            },
+            dtSuspendedUntil=> {
+                label       => $FieldLabels->{'dtSuspendedUntil'},
+                value       => $field->{dtSuspendedUntil},
+                type        => 'date',
+                datetype    => 'dropdown',
+                format      => 'dd/mm/yyyy',
+                sectionname => 'other',
+                validate    => 'DATE',
+            },
             dtDOB => {
                 label       => $FieldLabels->{'dtDOB'},
                 value       => $field->{dtDOB},
@@ -570,8 +588,6 @@ sub person_details {
                 sectionname => 'details',
                 validate    => 'DATE',
                 first_page  => 1,
-
-                #onChange   => 1,
             },
             strPlaceofBirth => {
                 label       => $FieldLabels->{'strPlaceofBirth'},
@@ -1045,7 +1061,7 @@ sub person_details {
 
         },
         order => [
-        qw(strNationalNum strPersonNo strSalutation strStatus strLocalFirstname strPreferredName strMiddlename strLocalSurname strMaidenName dtDOB strPlaceofBirth strCountryOfBirth strMotherCountry strFatherCountry intGender strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased intDeRegister strPreferredLang strPassportIssueCountry strPassportNationality strPassportNo dtPassportExpiry dtPoliceCheck dtPoliceCheckExp strPoliceCheckRef strEmergContName strEmergContNo strEmergContNo2 strEmergContRel strP1Salutation strP1FName strP1SName intP1Gender strP1Phone strP1Phone2 strP1PhoneMobile strP1Email strP1Email2 strP2Salutation strP2FName strP2SName intP2Gender strP2Phone strP2Phone2 strP2PhoneMobile strP2Email strP2Email2 strEyeColour strHairColour strHeight strWeight 
+        qw(strNationalNum strPersonNo strSalutation strStatus strLocalFirstname strPreferredName strMiddlename strLocalSurname strMaidenName dtDOB dtDeath strPlaceofBirth strCountryOfBirth strMotherCountry strFatherCountry intGender strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased intDeRegister strPreferredLang strPassportIssueCountry strPassportNationality strPassportNo dtPassportExpiry dtPoliceCheck dtPoliceCheckExp strPoliceCheckRef strEmergContName strEmergContNo strEmergContNo2 strEmergContRel strP1Salutation strP1FName strP1SName intP1Gender strP1Phone strP1Phone2 strP1PhoneMobile strP1Email strP1Email2 strP2Salutation strP2FName strP2SName intP2Gender strP2Phone strP2Phone2 strP2PhoneMobile strP2Email strP2Email2 strEyeColour strHairColour strHeight strWeight dtSuspendedUntil
         ),
 
         map("strNatCustomStr$_", (1..15)),

@@ -1,0 +1,1 @@
+ALTER TABLE tblPerson ADD COLUMN dtSuspendedUntil DATE DEFAULT '0000-00-00';
