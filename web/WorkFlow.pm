@@ -607,6 +607,7 @@ sub approveTask {
   		$WFTaskID,
   		);
   		
+    setDocumentStatus($Data, $WFTaskID, 'APRROVED');
 	if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
 	}
@@ -617,6 +618,7 @@ sub approveTask {
             intPersonRegistrationID,
             intEntityID,
             intDocumentID,
+            intDocumentTypeID,
             strTaskType,
             strWFRuleFor
         FROM tblWFTask
@@ -802,8 +804,7 @@ warn("CHECKING $update_count");
             $st = qq[
                     UPDATE tblDocuments
                     SET
-                        strApprovalStatus = 'ACTIVE',
-                        dtFrom = NOW()
+                        strApprovalStatus = 'APPROVED'
                     WHERE
                         intDocumentID= ?
                 ];
@@ -869,6 +870,72 @@ return ($rc) # 1 = Registration is complete, 0 = There are still outstanding Tas
        	
 }
 
+sub setDocumentStatus  {
+
+    my ($Data, $taskID, $status) = @_;
+    my $st = qq[
+        SELECT
+            intPersonID,
+            intPersonRegistrationID,
+            intEntityID,
+            intDocumentID,
+            intDocumentTypeID,
+        FROM tblWFTask
+        WHERE intWFTaskID = ?
+    ];
+
+    my $q = $Data->{'db'}->prepare($st);
+    $q->execute($taskID);
+
+    my $dref= $q->fetchrow_hashref();
+    my $personID = $dref->{intPersonID} || 0;
+    my $entityID = $dref->{intEntityID} || 0;
+    my $personRegistrationID = $dref->{intPersonRegistrationID} || 0;
+    my $documentID= $dref->{intDocumentID} || 0;
+    my $documentTypeID= $dref->{intDocumentTypeID} || 0;
+    my $ruleFor = $dref->{strWFRuleFor} || '';
+    my $taskType= $dref->{strTaskType} || '';
+
+    return if (! $entityID and !$personID);
+
+    $st = qq[
+        UPDATE tblDocuments
+        SET strApprovalStatus = ?
+        WHERE
+            intEntityLevelID=?
+            AND intEntityID = ?
+    ];
+    my @values=();
+    if ($personID)  {
+        $st .= qq[ AND intEntityID = ?];
+        push @values, $personID;
+        $st .= qq[ AND intEntityLevel = ?];
+        push @values, $Defs::LEVEL_PERSON;
+    }
+    else    {
+        $st .= qq[ AND intEntityID = ?];
+        push @values, $entityID;
+        $st .= qq[ AND intEntityLevel <> ?];
+        push @values, $Defs::LEVEL_PERSON;
+    }
+    
+    if ($personRegistrationID)    {
+        $st .= qq[ AND intPersonRegistrationID= ?];
+        push @values, $personRegistrationID;
+    }
+    
+    if ($documentTypeID)    {
+        $st .= qq[ AND intDocumentTypeID = ?];
+        push @values, $documentTypeID;
+    }
+    if ($documentID)    {
+        $st .= qq[ AND intDocumentID = ?];
+        push @values, $documentID;
+    }
+  	$q = $Data->{'db'}->prepare($st);
+  	$q->execute(@values);
+}
+    
 sub rejectTask {
     my(
         $Data,
@@ -897,6 +964,7 @@ sub rejectTask {
 	  	$Data->{'clientValues'}{'userID'},
   		$WFTaskID,
   		);
+    setDocumentStatus($Data, $WFTaskID, 'REJECTED');
   		
 	if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
