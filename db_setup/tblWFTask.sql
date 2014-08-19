@@ -20,6 +20,8 @@ CREATE TABLE tblWFTask (
   intRejectedUserID int(11) DEFAULT NULL,
   dtRejectedDate datetime DEFAULT NULL,
 
+    strTaskNotes varchar(250) default '',
+
   intDocumentTypeID int(11) NOT NULL DEFAULT '0' COMMENT 'From tblWFRule',
   intEntityID int(11) NOT NULL DEFAULT '0' COMMENT 'The entity who is registering',
   intPersonID int(11) NOT NULL DEFAULT '0' COMMENT 'The person who is registering',
