@@ -346,6 +346,7 @@ sub setupPersonListFields    {
         intAgeGroupID
         strStatus 
         dtDOB 
+        intGender
         strSuburb 
         strPhoneMobile 
         strEmail
