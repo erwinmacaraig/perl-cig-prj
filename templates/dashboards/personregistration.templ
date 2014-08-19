@@ -1,5 +1,5 @@
 <div class="member-status-wrap">
-	<div class="sectionheader">Current Registrations</div>
+	<div class="sectionheader">[% Lang.txt('Current Registrations to this level') %]</div>
 		<div class="members-seasonstatus-content">
 			[% FOREACH entity IN RegistrationInfo %]
                 <!--[% IF entity.strLocalName %]
@@ -72,7 +72,4 @@
 			[% END %]
 		</div>
 	</div>
-[% IF !ReadOnlyLogin %]
-    <span class = "button-small generic-button"><a href = "[% AddRegistrationURL %]">[% Lang.txt('Add Registration') %]</a></span>
-[% END %]
 </div>

@@ -1,5 +1,8 @@
 <div class="member-home-page">
 <div class = "changeoptions">
+[% IF AddRegistrationURL and !ReadOnlyLogin %]
+    <span class = "button-small generic-button"><a href = "[% AddRegistrationURL %]">[% Lang.txt('Add Registration') %]</a></span>
+[% END %]
 [% IF MarkDuplicateURL  and !ReadOnlyLogin %]
 <span class = "button-small generic-button"><a href = "[% MarkDuplicateURL %]">[% Lang.txt("Mark as Duplicate") %]</a></span>
 [% END %]
