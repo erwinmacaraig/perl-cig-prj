@@ -508,7 +508,8 @@ sub getRegistrationData	{
             DATE_FORMAT(pr.dtTo, "%Y%m%d") as dtTo_,
             DATE_FORMAT(pr.dtAdded, "%Y%m%d%H%i") as dtAdded_,
             DATE_FORMAT(pr.dtLastUpdated, "%Y%m%d%H%i") as dtLastUpdated_,
-            e.strLocalName 
+            e.strLocalName,
+            e.strLatinName
         FROM
             tblPersonRegistration_$Data->{'Realm'} AS pr
             INNER JOIN tblEntity e ON (

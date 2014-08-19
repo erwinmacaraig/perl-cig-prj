@@ -79,9 +79,7 @@ sub showPersonHome	{
 		AddDocumentURL => $adddocumentURL || '',
 		AddRegistrationURL => $addregistrationURL || '',
 		CardPrintingURL => $cardprintingURL || '',
-		UmpireLabel => $Data->{'SystemConfig'}{'UmpireLabel'} || 'Match Official',
 		Documents => $docs,
-		Accreditations => $accreditations,
 		GroupData => $groupdata,
 		Details => {
 			Active => $Data->{'lang'}->txt(($personObj->getValue('intRecStatus') || '') ? 'Yes' : 'No'),

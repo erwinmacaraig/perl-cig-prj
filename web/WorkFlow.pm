@@ -376,6 +376,39 @@ sub addWorkFlowTasks {
             
     my $st = '';
     ## Build up SELECT based on what sort of record we are approving
+    if ($ruleFor eq 'PERSON' and $personID)   {
+        ## APPROVAL FOR PERSON REGO
+        $st = qq[
+		SELECT 
+			r.intWFRuleID, 
+			r.intRealmID,
+			r.intSubRealmID,
+			r.intApprovalEntityLevel,
+			r.strTaskType, 
+            r.strWFRuleFor,
+			r.intDocumentTypeID, 
+			r.strTaskStatus, 
+			r.intProblemResolutionEntityLevel, 
+			p.intPersonID, 
+			0 as intPersonRegistrationID,
+            0 as RegoEntity,
+            0 as DocumentID
+		FROM tblPerson as p
+		INNER JOIN tblWFRule AS r ON (
+			p.intRealmID = r.intRealmID
+        )
+		WHERE 
+            p.intPersonID= ?
+            AND r.strWFRuleFor = 'PERSON'
+            AND r.intRealmID = ?
+            AND r.intSubRealmID IN (0, ?)
+            AND r.intOriginLevel = ?
+			AND r.strRegistrationNature = ?
+		];
+	    $q = $db->prepare($st);
+  	    $q->execute($personID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
+    }
+ 
     if ($ruleFor eq 'REGO' and $personRegistrationID)   {
         ## APPROVAL FOR PERSON REGO
         $st = qq[
@@ -802,6 +835,7 @@ warn("CHECKING $update_count");
 	            	UPDATE tblPersonRegistration_$Data->{'Realm'} 
                     SET
 	            	    strStatus = 'ACTIVE',
+                        intCurrent=1,
 	            	    dtFrom = NOW()
 	    	        WHERE 
                         intPersonRegistrationID = ?
