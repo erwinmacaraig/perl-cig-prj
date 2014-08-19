@@ -268,6 +268,7 @@ sub add_rego_record{
         entityID => $entityID,
         entityLevel => $entityLevel,
         personID => $personID,
+        current => 1,
     };
 
     my ($personStatus, $prStatus) = checkIsSuspended($Data, $personID, $entityID, $rego_ref->{'personType'});

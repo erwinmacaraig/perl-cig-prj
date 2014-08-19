@@ -113,6 +113,8 @@ sub listPersons {
             $dbfield_str = "DATE_FORMAT($qualdbfield,'$datetime_format')" if $dbfield =~/^tTime/;
             $dbfield_str ||= $qualdbfield;
             $dbfield_str .= " AS $field" if($f=~/\./ or $dbfield_str =~ /FORMAT/);
+            $dbfield_str = "PR." . $dbfield_str if $dbfield eq 'intAgeGroupID';
+            $dbfield_str = "PR." . $dbfield_str if $dbfield eq 'intPersonRegistrationID';
             push @select_fields, $dbfield_str;
         }
 
@@ -140,19 +142,24 @@ sub listPersons {
             P.intPersonID,
             P.strStatus,
             PR.strStatus as PRStatus,
+            PRActive.strStatus as PRActiveStatus,
             P.intSystemStatus
             $select_str
             $sel_str 
         FROM tblPerson  AS P
+            LEFT JOIN tblPersonRegistration_$realm_id AS PRActive ON ( 
+                P.intPersonID = PRActive.intPersonID
+                AND PRActive.strStatus IN ('ACTIVE')
+            )
             INNER JOIN tblPersonRegistration_$realm_id AS PR ON ( 
                 P.intPersonID = PR.intPersonID
-                AND PR.strStatus NOT IN ('ROLLED_OVER')
+                AND PR.strStatus NOT IN ('ACTIVE', 'ROLLED_OVER')
             )
         LEFT JOIN tblPersonNotes ON tblPersonNotes.intPersonID = P.intPersonID
         WHERE P.strStatus <> 'DELETED'
             AND P.intRealmID = $Data->{'Realm'}
             AND PR.intEntityID = ?
-        ORDER BY intPersonRegistrationID DESC, $default_sort strLocalSurname, strLocalFirstname
+        ORDER BY PR.intPersonRegistrationID DESC, $default_sort strLocalSurname, strLocalFirstname
     ];
 
     my $query= $Data->{'db'}->prepare($statement);
@@ -179,7 +186,9 @@ sub listPersons {
         );
         next if exists $PersonSeen{$dref->{'intPersonID'}};
         $PersonSeen{$dref->{'intPersonID'}} = 1;
-        $dref->{'strStatus'} = $dref->{'PRStatus'}; ## Lets use PR status
+        $dref->{'PRStatus'} = $dref->{'PRActiveStatus'} if ($dref->{'PRActiveStatus'});
+        $dref->{'strStatus'} = $Defs::personRegoStatus{$dref->{'PRStatus'}}; ## Lets use PR status
+        
         next if (defined $dref->{intSystemStatus} and $dref->{intSystemStatus} == $Defs::PERSONSTATUS_DELETED);
         $tempClientValues{personID} = $dref->{intPersonID};
         my $tempClient = setClient(\%tempClientValues);
