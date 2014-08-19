@@ -69,7 +69,9 @@ sub showPersonHome	{
     $Data->{'client'},
   );
 
+print STDERR Dumper($personObj);
 	my %TemplateData = (
+        Lang => $Data->{'lang'},
 		Name => $name,
 		ReadOnlyLogin => $Data->{'ReadOnlyLogin'},
 		EditDetailsLink => showLink($personID,$client,$Data),
@@ -79,12 +81,12 @@ sub showPersonHome	{
 		AddDocumentURL => $adddocumentURL || '',
 		AddRegistrationURL => $addregistrationURL || '',
 		CardPrintingURL => $cardprintingURL || '',
-		UmpireLabel => $Data->{'SystemConfig'}{'UmpireLabel'} || 'Match Official',
 		Documents => $docs,
-		Accreditations => $accreditations,
 		GroupData => $groupdata,
 		Details => {
 			Active => $Data->{'lang'}->txt(($personObj->getValue('intRecStatus') || '') ? 'Yes' : 'No'),
+			LatinFirstname=> $personObj->getValue('strLatinFirstname') || '',	
+			LatinSurname=> $personObj->getValue('strLatinSurname') || '',	
 			Address1 => $personObj->getValue('strAddress1') || '',	
 			Address2 => $personObj->getValue('strAddress2') || '',	
 			Suburb => $personObj->getValue('strSuburb') || '',	
@@ -95,7 +97,7 @@ sub showPersonHome	{
 			PhoneWork => $personObj->getValue('strPhoneWork') || '',	
 			PhoneMobile => $personObj->getValue('strPhoneMobile') || '',	
 			Email => $personObj->getValue('strEmail') || '',	
-			Gender => $Defs::genderInfo{$personObj->getValue('intGender') || 0} || '',
+			Gender => $Data->{'lang'}->txt($Defs::genderInfo{$personObj->getValue('intGender') || 0}) || '',
 			DOB => $personObj->getValue('dtDOB') || '',
 			NationalNum => $personObj->getValue('strNationalNum') || '',
 			SquadNum => $personObj->getValue('dblCustomDbl10') || '',

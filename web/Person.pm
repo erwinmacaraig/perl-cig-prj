@@ -54,6 +54,7 @@ use Data::Dumper;
 
 use PrimaryClub;
 use DuplicatePrevention;
+use RecordTypeFilter;
 
 sub handlePerson {
     my ( $action, $Data, $personID ) = @_;
@@ -154,17 +155,22 @@ sub handlePerson {
         ( $resultHTML, $title ) = handleAccreditationDisplay( $action, $Data, $personID );
     }
     elsif ( $action =~ /P_REGOS/ ) {
-        $resultHTML = personRegstrationsHistory( $Data, $personID ) || '';
+        ($resultHTML , $title)= personRegstrationsHistory( $Data, $personID ) ;
         $title = $lang->txt('Registration History');
     }
-    elsif ( $action =~ /P_REGO/ ) {
+    elsif ( $action eq 'P_REGO' ) {
         $resultHTML = personRegistration( $Data, $personID ) || '';
         $title = $lang->txt('Registration History');
     }
     elsif ( $action =~ /P_DOCS/ ) {
+<<<<<<< HEAD
         $resultHTML = qq[LIST DOCUMENTS TO GO HERE];
         $resultHTML =  listDocuments($Data, $personID);
         $title = $lang->txt('Registration History');
+=======
+        $resultHTML = qq[LIST DOCUMENTS TO GO HERE]; #listDocuments($Data, $personID ) || '';
+        $title = $lang->txt('Registration Documents');
+>>>>>>> a52fbae8d740774a5daa4b5806df4b289fde4af2
     }
     else {
         print STDERR "Unknown action $action\n";
@@ -175,17 +181,133 @@ sub handlePerson {
 sub personRegstration   {
 
     my ($Data, $personID) = @_;
-
     return "NEED PAGE FOR A REGISTRATION RECORD";
 }
 sub personRegstrationsHistory   {
 
+
     my ($Data, $personID) = @_;
 
-    #getRegistrationData
-    #load into grid
-    #put in template
-    return "NEED PAGE FOR REGISTRATION HISTORY";
+    my $lang = $Data->{'lang'};
+
+    my %RegFilters=();
+    my @statusNOTIN = ($Defs::PERSONREGO_STATUS_DELETED, $Defs::PERSONREGO_STATUS_INPROGRESS);
+    $RegFilters{'statusNOTIN'} = \@statusNOTIN;
+    my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
+    my @rowdata = ();
+    my $results = 0;
+    my $client           = setClient( $Data->{'clientValues'} ) || '';
+    foreach my $rego (@{$Reg_ref})  {
+      $results=1;
+        my $name = $rego->{'strLocalName'};
+        $name .= " ($rego->{'strLatinName'})" if $rego->{'strLatinName'};
+      push @rowdata, {
+        id => $rego->{'intPersonRegistrationID'} || 0,
+        EntityLocalName=> $name,
+        EntityLatinName=> $rego->{'strLatinName'} || '',
+        dtAdded=> $rego->{'dtAdded_formatted'} || '',
+        PersonType=> $rego->{'PersonType'} || '',
+        PersonLevel=> $rego->{'PersonLevel'} || '',
+        AgeLevel=> $rego->{'AgeLevel'} || '',
+        RegistrationNature=> $rego->{'RegistrationNature'} || '',
+        Status=> $rego->{'Status'} || '',
+        PersonEntityRole=> $rego->{'strPersonEntityRole'} || '',
+        Sport=> $rego->{'Sport'} || '',
+        SelectLink => "$Data->{'target'}?client=$client&amp;a=PR_VIEW&amp;prID=$rego->{'intPersonRegistrationID'}",
+      };
+    }
+
+    my $addlink='';
+    my $title=$lang->txt('Registration History');
+    my %tempClientValues = getClient($client);
+    {
+        my $tempClient = setClient(\%tempClientValues);
+        $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>];
+
+    }
+
+    my $modoptions=qq[<div class="changeoptions">$addlink</div>];
+    $title=$modoptions.$title;
+    my $rectype_options=show_recordtypes(
+        $Data,
+        '',
+        '',
+        \%Defs::personRegoStatus,
+        { 'ALL' => $Data->{'lang'}->txt('All'), },
+    ) || '';
+    $rectype_options='';
+
+    my @headers = (
+        {
+            type  => 'Selector',
+            field => 'SelectLink',
+        },
+        {
+            name  => $Data->{'lang'}->txt('Registration Type'),
+            field => 'RegistrationNature',
+        },
+        {
+            name  => $Data->{'lang'}->txt('Registered To'),
+            field => 'EntityLocalName',
+        },
+        {
+            name   => $Data->{'lang'}->txt('Type'),
+            field  => 'PersonType',
+            width  => 30,
+        },
+        {
+            name   => $Data->{'lang'}->txt('Sport'),
+            field  => 'Sport',
+            width  => 30,
+        },
+        {
+            name  => $Data->{'lang'}->txt('Level'),
+            field => 'PersonLevel',
+        },
+        {
+            name  => $Data->{'lang'}->txt('Age Level'),
+            field => 'AgeLevel',
+        },
+        {
+            name  => $Data->{'lang'}->txt('Status'),
+            field => 'Status',
+        },
+        {
+            name  => $Data->{'lang'}->txt('Date Registered'),
+            field => 'dtAdded',
+        },
+    );
+
+    my $filterfields = [
+        {
+            field     => 'strLocalName',
+            elementID => 'id_textfilterfield',
+            type      => 'regex',
+        },
+        {
+            field     => 'strStatus',
+            elementID => 'dd_actstatus',
+            allvalue  => 'ALL',
+        },
+    ];
+
+    my $grid  = showGrid(
+        Data    => $Data,
+        columns => \@headers,
+        rowdata => \@rowdata,
+        gridid  => 'grid',
+        width   => '99%',
+        filters => $filterfields,
+    );
+
+    my $resultHTML = qq[
+        <div class="grid-filter-wrap">
+            <div style="width:99%;">$rectype_options</div>
+            $grid
+        </div>
+    ];
+
+    return ($resultHTML,$title);
 }
 
 sub updatePersonNotes {
@@ -1084,7 +1206,7 @@ sub person_details {
 
         },
         order => [
-        qw(strNationalNum strPersonNo strSalutation strStatus strLocalFirstname strPreferredName strMiddlename strLocalSurname strMaidenName dtDOB dtDeath strPlaceofBirth strCountryOfBirth strMotherCountry strFatherCountry intGender strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased intDeRegister strPreferredLang strPassportIssueCountry strPassportNationality strPassportNo dtPassportExpiry dtPoliceCheck dtPoliceCheckExp strPoliceCheckRef strEmergContName strEmergContNo strEmergContNo2 strEmergContRel strP1Salutation strP1FName strP1SName intP1Gender strP1Phone strP1Phone2 strP1PhoneMobile strP1Email strP1Email2 strP2Salutation strP2FName strP2SName intP2Gender strP2Phone strP2Phone2 strP2PhoneMobile strP2Email strP2Email2 strEyeColour strHairColour strHeight strWeight dtSuspendedUntil
+        qw(strNationalNum strPersonNo strSalutation strStatus strLocalFirstname strPreferredName strMiddlename strLocalSurname strLatinFirstname strLatinSurname strMaidenName dtDOB dtDeath strPlaceofBirth strCountryOfBirth strMotherCountry strFatherCountry intGender strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased intDeRegister strPreferredLang strPassportIssueCountry strPassportNationality strPassportNo dtPassportExpiry dtPoliceCheck dtPoliceCheckExp strPoliceCheckRef strEmergContName strEmergContNo strEmergContNo2 strEmergContRel strP1Salutation strP1FName strP1SName intP1Gender strP1Phone strP1Phone2 strP1PhoneMobile strP1Email strP1Email2 strP2Salutation strP2FName strP2SName intP2Gender strP2Phone strP2Phone2 strP2PhoneMobile strP2Email strP2Email2 strEyeColour strHairColour strHeight strWeight dtSuspendedUntil
         ),
 
         map("strNatCustomStr$_", (1..15)),
@@ -1292,7 +1414,6 @@ $person_photo
     $option = 'display' if $processed;
     my $chgoptions = '';
     my $title = ( !$field->{strLocalFirstname} and !$field->{strLocalSurname} ) ? "Add New $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}" : "$field->{strLocalFirstname} $field->{strLocalSurname}";
-warn("$option AAAAAAAAAAAAAAAAAAAA");
 
     if ( $option eq 'display' ) {
 
@@ -1409,7 +1530,9 @@ sub postPersonUpdate {
     return ( 0, undef ) if !$db;
 
     my $assocID = $Data->{'clientValues'}{'assocID'} || 0;
-    $Data->{'cache'}->delete( 'swm', "PersonObj-$id-$assocID" ) if $Data->{'cache'};
+    my $entityID = getLastEntityID($Data->{'clientValues'});
+    $Data->{'cache'}->delete( 'swm', "PersonObj-$id-$entityID" ) if $Data->{'cache'};
+    $Data->{'cache'}->delete( 'swm', "PersonObj-$id" ) if $Data->{'cache'};
 
     my %types        = ();
     my $assocSeasons = Seasons::getDefaultAssocSeasons($Data);

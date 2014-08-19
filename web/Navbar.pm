@@ -1059,7 +1059,7 @@ sub getPersonMenuData {
     my $baseurl = "$target?client=$client&amp;";
     my %menuoptions = (
         home => {
-            name => $lang->txt('Dashboard'),
+            name => $lang->txt('Person Dashboard'),
             url => $baseurl."a=P_HOME",
         },
     );
@@ -1098,7 +1098,7 @@ sub getPersonMenuData {
 
     $Data->{'SystemConfig'}{'TYPE_NAME_3'} = '' if not exists $Data->{'SystemConfig'}{'TYPE_NAME_3'};
     my @menu_structure = (
-        [ $lang->txt('Dashboard'), 'home','home'],
+        [ $lang->txt('Person Dashboard'), 'home','home'],
         [ $lang->txt($SystemConfig->{'txns_link_name'} || 'Transactions'), 'menu','transactions'],
         [ $lang->txt($txt_Clrs), 'menu','clr'],
         [ $lang->txt('Registration History'), 'menu','regos'],

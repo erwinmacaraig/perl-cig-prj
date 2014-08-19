@@ -113,6 +113,8 @@ sub listPersons {
             $dbfield_str = "DATE_FORMAT($qualdbfield,'$datetime_format')" if $dbfield =~/^tTime/;
             $dbfield_str ||= $qualdbfield;
             $dbfield_str .= " AS $field" if($f=~/\./ or $dbfield_str =~ /FORMAT/);
+            $dbfield_str = "PR." . $dbfield_str if $dbfield eq 'intAgeGroupID';
+            $dbfield_str = "PR." . $dbfield_str if $dbfield eq 'intPersonRegistrationID';
             push @select_fields, $dbfield_str;
         }
 
@@ -140,23 +142,29 @@ sub listPersons {
             P.intPersonID,
             P.strStatus,
             PR.strStatus as PRStatus,
+            PRActive.strStatus as PRActiveStatus,
             P.intSystemStatus
             $select_str
             $sel_str 
         FROM tblPerson  AS P
+            LEFT JOIN tblPersonRegistration_$realm_id AS PRActive ON ( 
+                P.intPersonID = PRActive.intPersonID
+                AND PRActive.intEntityID = ?
+                AND PRActive.strStatus IN ('ACTIVE')
+            )
             INNER JOIN tblPersonRegistration_$realm_id AS PR ON ( 
                 P.intPersonID = PR.intPersonID
-                AND PR.strStatus NOT IN ('ROLLED_OVER')
+                AND PR.strStatus NOT IN ('ACTIVE', 'ROLLED_OVER')
             )
         LEFT JOIN tblPersonNotes ON tblPersonNotes.intPersonID = P.intPersonID
         WHERE P.strStatus <> 'DELETED'
             AND P.intRealmID = $Data->{'Realm'}
             AND PR.intEntityID = ?
-        ORDER BY intPersonRegistrationID DESC, $default_sort strLocalSurname, strLocalFirstname
+        ORDER BY PR.intPersonRegistrationID DESC, $default_sort strLocalSurname, strLocalFirstname
     ];
 
     my $query= $Data->{'db'}->prepare($statement);
-    $query->execute($entityID) or query_error($statement);
+    $query->execute($entityID, $entityID) or query_error($statement);
     my $found = 0;
     my @rowdata = ();
     my $newaction='P_HOME';
@@ -179,7 +187,10 @@ sub listPersons {
         );
         next if exists $PersonSeen{$dref->{'intPersonID'}};
         $PersonSeen{$dref->{'intPersonID'}} = 1;
-        $dref->{'strStatus'} = $dref->{'PRStatus'}; ## Lets use PR status
+        $dref->{'PRStatus'} = $dref->{'PRActiveStatus'} if ($dref->{'PRActiveStatus'});
+        $dref->{'PRStatus'} = $lang->txt('SUSPENDED') if ($dref->{'strStatus'} eq 'SUSPENDED');
+        $dref->{'strStatus'} = $lang->txt($Defs::personRegoStatus{$dref->{'PRStatus'}}); ## Lets use PR status
+        
         next if (defined $dref->{intSystemStatus} and $dref->{intSystemStatus} == $Defs::PERSONSTATUS_DELETED);
         $tempClientValues{personID} = $dref->{intPersonID};
         my $tempClient = setClient(\%tempClientValues);
@@ -192,7 +203,6 @@ sub listPersons {
         $dref->{'intGender'} ||= 0;
         $dref->{'strLocalFirstname'} ||= '';
         $dref->{'strLocalSurname'} ||= '-';
-        $dref->{'strLocalSurname'} .= '    (P)' if $dref->{'intPermit'};
         $dref->{'TxnTotalCount'} ||= 0;
         $dref->{'TxnTotalCount'} = ''. qq[<a href="$Data->{'target'}?client=$tempClient&amp;a=P_TXN_LIST">$dref->{TxnTotalCount}</a>];
         for my $k (keys %{$lookupfields})    {
@@ -219,7 +229,7 @@ sub listPersons {
                 }
             }
             $dref->{'strStatus_Filter'}='1';
-            $dref->{'strStatus'}='DUPLICATE';
+            $dref->{'strStatus'}=$lang->txt('DUPLICATE');
         }
 
         if(allowedAction($Data, 'm_d') and $Data->{'SystemConfig'}{'AllowPersonDelete'})    {
@@ -332,9 +342,12 @@ sub setupPersonListFields    {
     my @listfields=qw( 
         strLocalSurname 
         strLocalFirstname 
+        strLatinSurname 
+        strLatinFirstname 
         intAgeGroupID
         strStatus 
         dtDOB 
+        intGender
         strSuburb 
         strPhoneMobile 
         strEmail
@@ -477,11 +490,12 @@ sub getPersonListFieldOtherInfo {
 
 sub personList_lookupVals {
     my($Data)=@_;
-    my %ynVals=( 1 => 'Y', 0 => 'N');
+    my $lang = $Data->{'lang'};
+    my %ynVals=( 1 => $lang->txt('Y'), 0 => $lang->txt('N'));
     my %lookupfields=(
         intGender => {
-            $Defs::GENDER_MALE => 'M',
-            $Defs::GENDER_FEMALE=> 'F',
+            $Defs::GENDER_MALE => $lang->txt($Defs::genderInfo{$Defs::GENDER_MALE}),
+            $Defs::GENDER_FEMALE => $lang->txt($Defs::genderInfo{$Defs::GENDER_FEMALE}),
             $Defs::GENDER_NONE=> '',
         },
     );

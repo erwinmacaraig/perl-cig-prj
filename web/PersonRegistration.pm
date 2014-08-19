@@ -507,8 +507,10 @@ sub getRegistrationData	{
             DATE_FORMAT(pr.dtFrom, "%Y%m%d") as dtFrom_,
             DATE_FORMAT(pr.dtTo, "%Y%m%d") as dtTo_,
             DATE_FORMAT(pr.dtAdded, "%Y%m%d%H%i") as dtAdded_,
+            DATE_FORMAT(pr.dtAdded, "%Y-%m-%d %H:%i") as dtAdded_formatted,
             DATE_FORMAT(pr.dtLastUpdated, "%Y%m%d%H%i") as dtLastUpdated_,
-            e.strLocalName 
+            e.strLocalName,
+            e.strLatinName
         FROM
             tblPersonRegistration_$Data->{'Realm'} AS pr
             INNER JOIN tblEntity e ON (
@@ -534,6 +536,12 @@ warn($st);
       
     while(my $dref= $query->fetchrow_hashref()) {
         $count++;
+        $dref->{'Sport'} = $Defs::sportType{$dref->{'strSport'}} || '';
+        $dref->{'PersonType'} = $Defs::personType{$dref->{'strPersonType'}} || '';
+        $dref->{'PersonLevel'} = $Defs::personLevel{$dref->{'strPersonLevel'}} || '';
+        $dref->{'AgeLevel'} = $Defs::ageLevel{$dref->{'strAgeLevel'}} || '';
+        $dref->{'Status'} = $Defs::personRegoStatus{$dref->{'strStatus'}} || '';
+        $dref->{'RegistrationNature'} = $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '';
         push @Registrations, $dref;
     }
     return ($count, \@Registrations);
