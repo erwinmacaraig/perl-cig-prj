@@ -162,7 +162,8 @@ sub handlePerson {
         $title = $lang->txt('Registration History');
     }
     elsif ( $action =~ /P_DOCS/ ) {
-        $resultHTML = qq[LIST DOCUMENTS TO GO HERE]; #listDocuments($Data, $personID ) || '';
+        $resultHTML = qq[LIST DOCUMENTS TO GO HERE];
+        $resultHTML =  listDocuments($Data, $personID);
         $title = $lang->txt('Registration History');
     }
     else {
@@ -1767,4 +1768,68 @@ sub _fix_date {
     return "$yyyy-$mm-$dd";
 }
 
+sub listDocuments{
+    my ($Data, $personID) = @_;
+    my $resultHTML = ''; 
+    my $lang = $Data->{'lang'}; 
+    my $db = $Data->{'db'};  
+    my $client = $Data->{'client'};
+
+    my %headerLabels = (
+       'document' => $lang->txt('Document'), 
+       'status' => $lang->txt('Status'), 
+       'dteupload' => $lang->txt('Date Uploaded'), 
+       
+    );
+    my @rowdata = (); 
+    my $query = qq[
+         SELECT tblUploadedFiles.intFileID,tblDocumentType.strDocumentName,tblUploadedFiles.dtUploaded as DateUploaded, tblDocuments.strApprovalStatus FROM tblDocuments INNER JOIN tblUploadedFiles ON tblDocuments.intUploadFileID = tblUploadedFiles.intFileID INNER JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intPersonID = ?]; 
+#? AND tblUploadedFiles.intEntityTypeID = ?
+    my $sth = $db->prepare($query); 
+    $sth->execute($personID); 
+   
+    while(my $dref = $sth->fetchrow_hashref()){
+       # my $fileLink = "$Defs::base_url/getfile.cgi?client=$client&amp;f=$dref->{'intFileID'}";  
+       my $fileLink = '';
+       push @rowdata, {  
+	        ID => $dref->{'intFileID'} || 0,
+	        SelectLink => $fileLink,
+	        strDocumentName => $dref->{'strDocumentName'},
+		strApprovalStatus => $dref->{'strApprovalStatus'},
+		DateUploaded => $dref->{'DateUploaded'},
+       };
+    }
+
+    my @headers = (
+        { 
+            type => 'Selector',
+            field => 'SelectLink',
+        }, 
+        {
+            name => $lang->txt('Type'),
+            field => 'strDocumentName',
+        }, 
+        {
+            name => $lang->txt('Status'),
+            field => 'strApprovalStatus',
+        },
+        {
+            name => $lang->txt('Date Uploaded'),
+            field => 'DateUploaded',
+        },
+    );    
+    #### GRID  #### 
+    my $grid = showGrid(
+        Data => $Data,
+        columns => \@headers,
+        rowdata => \@rowdata,
+        gridid => 'grid',
+        width => '99%',
+    ); 
+    my $list_instruction = ''; 
+    $resultHTML = qq[ $list_instruction $grid ]; 
+    
+   #return $resultHTML; 
+
+} ## end sub listDocuments
 1;

@@ -18,6 +18,7 @@ use FileUpload;
 use CGI qw(:cgi param unescape escape);
 use Reg_common;
 
+use Scalar::Util qw(looks_like_number);
 
 my $File_MaxSize = 4*1024*1024; #4Mb;
 
@@ -72,8 +73,10 @@ sub processUploadFile	{
     $EntityTypeID,
     $EntityID,
     $fileType,
+    $documentTypeID,
   ) = @_;
-
+        #assignDefaultValue
+        $documentTypeID ||= 0;
 	my $ret = '';
 
 	for my $files (@{$files_to_process})	{
@@ -86,6 +89,7 @@ sub processUploadFile	{
 			$fileType,
 			$files->[2],
 			$files->[3] || undef,
+                        $documentTypeID,
 		);
 		if($err)	{
 			$ret .= "'$files->[0]' : $err<br>";
@@ -105,9 +109,11 @@ sub _processUploadFile_single	{
 		$fileType,
 		$permissions,
 		$options,
+                $DocumentTypeId,
 	) = @_;
 
-	$options ||= {};
+	$options ||= {}; 
+        
   my $origfilename=param($file_field) || '';
 	$origfilename =~s/.*\///g;
 	$origfilename =~s/.*\\//g;
@@ -134,7 +140,7 @@ sub _processUploadFile_single	{
 	];
 	my $q_u = $Data->{'db'}->prepare($st_u);
 
-	my $st_a = qq[
+		my $st_a = qq[
 		INSERT INTO tblUploadedFiles
 		(
 			intFileType,
@@ -162,9 +168,9 @@ sub _processUploadFile_single	{
 	];
 	my $q_a = $Data->{'db'}->prepare($st_a);
 	$q_a->execute(
-		$fileType,
-		$EntityTypeID,
-		$EntityID,
+		$fileType, 
+                $EntityTypeID,
+                $EntityID,
 		$Data->{'clientValues'}{'authLevel'},
 		$Data->{'clientValues'}{'_intID'},
 		$title,
@@ -173,8 +179,39 @@ sub _processUploadFile_single	{
 	);
 	my $fileID = $q_a->{mysql_insertid} || 0;
 	$q_a->finish();
-	return ('Invalid ID',0) if !$fileID;
+	return ('Invalid ID',0) if !$fileID; 
+        #### START OF INSERTING DATA IN tblDocuments ##
+        if($DocumentTypeId){
 
+           my $doc_st = qq[
+                INSERT INTO tblDocuments ( 
+                   intUploadFileID,
+                   intDocumentTypeID,
+                   intEntityLevel,
+                   intEntityID, 
+                   intPersonID
+                )
+                VALUES (
+                   ?,
+                   ?,
+                   ?,
+                   ?,
+                   ?
+                 ) 
+        ];  
+        my $doc_q = $Data->{'db'}->prepare($doc_st); 
+        $doc_q->execute(
+              $fileID,
+              $DocumentTypeId,
+              $EntityTypeID,
+              $Data->{'clientValues'}{'_intID'},
+              $EntityID, 
+        );        
+       $doc_q->finish();
+      } 
+      ##### END OF INSERTING DATA IN tblDocuments ####
+
+      
 	my $path='';
 	{
 		my $l=6 - length($fileID);
@@ -306,6 +343,12 @@ sub deleteFile	{
 		$q_d->execute(
 			$fileID,
 		);
+
+                ### DELETE FROM tblDocuments ###
+                $st_d = qq[ DELETE FROM tblDocuments WHERE intUploadFileID = ?]; 
+                $q_d = $Data->{'db'}->prepare($st_d);
+                $q_d->execute( $fileID, );
+                ## END DELETE FROM tblDocuments ### 
 		$q_d->finish();
 		return 1;
 	}

@@ -108,6 +108,7 @@ warn("FBEND:$personID");
         #### JUST tryint to put the upload function here###
         
         my $uploaded_filename = param('file') || ''; 
+	my $docTypeID = param('doctypeID') || 0; 
         if($uploaded_filename ne ''){  
             #my $EntityTypeID = $Data->{'clientValues'}{'currentLevel'}; 
             #my $EntityID = $Data->{'clientValues'}{'_intID'};
@@ -116,7 +117,7 @@ warn("FBEND:$personID");
             my @files = (
                         [$uploaded_filename, $filefield, $permission,],
             ); 
-            processUploadFile($Data,\@files,$Defs::LEVEL_PERSON,$personID,$Defs::UPLOADFILETYPE_DOC,);
+            processUploadFile($Data,\@files,$Defs::LEVEL_PERSON,$personID,$Defs::UPLOADFILETYPE_DOC,$docTypeID,);
             # _processUploadFile_single($Data,$uploaded_filename,'file',$EntityTypeID,$EntityID,$Defs::UPLOADFILETYPE_DOC,1,undef);                 
            
         }
