@@ -152,12 +152,12 @@ sub listPersons {
             )
             INNER JOIN tblPersonRegistration_$realm_id AS PR ON ( 
                 P.intPersonID = PR.intPersonID
-                AND PR.strStatus NOT IN ('ACTIVE', 'ROLLED_OVER')
+                AND PR.strStatus NOT IN ('ROLLED_OVER')
+                AND PR.intEntityID = ?
             )
         LEFT JOIN tblPersonNotes ON tblPersonNotes.intPersonID = P.intPersonID
         WHERE P.strStatus <> 'DELETED'
             AND P.intRealmID = $Data->{'Realm'}
-            AND PR.intEntityID = ?
         ORDER BY PR.intPersonRegistrationID DESC, $default_sort strLocalSurname, strLocalFirstname
     ];
 
