@@ -1063,37 +1063,37 @@ sub getPersonMenuData {
             url => $baseurl."a=P_HOME",
         },
     );
-        if(!$SystemConfig->{'NoAuditLog'}) {
-            $menuoptions{'auditlog'} = {
-                name => $lang->txt('Audit Log'),
-                url => $baseurl."a=AL_",
-            };
-        }
-        if ($SystemConfig->{'NationalAccreditation'} or $SystemConfig->{'AssocConfig'}{'NationalAccreditation'}) {
-            $menuoptions{'accreditation'} = {
-                name => $lang->txt($accreditation_title),
-                url => $baseurl."a=P_NACCRED_LIST",
-            };
-        }
+       if(!$SystemConfig->{'NoAuditLog'}) {
+           $menuoptions{'auditlog'} = {
+               name => $lang->txt('Audit Log'),
+               url => $baseurl."a=AL_",
+           };
+       }
+       if ($SystemConfig->{'NationalAccreditation'} or $SystemConfig->{'AssocConfig'}{'NationalAccreditation'}) {
+           $menuoptions{'accreditation'} = {
+               name => $lang->txt($accreditation_title),
+               url => $baseurl."a=P_NACCRED_LIST",
+           };
+       }
 
-     my $txns_link_name = $lang->txt('Transactions');
-     if($SystemConfig->{'AllowTXNs'}) {
-        $menuoptions{'transactions'} = {
-            url => $baseurl."a=P_TXNLog_list",
-        };
-     }
-        if($clubs) {
-            $menuoptions{'clubs'} = {
-                name => $lang->txt('Clubs'),
-                url => $baseurl."a=P_CLUBS",
-            };
-        }
-        if($clr) {
-            $menuoptions{'clr'} = {
+    my $txns_link_name = $lang->txt('Transactions');
+    if($SystemConfig->{'AllowTXNs'}) {
+       $menuoptions{'transactions'} = {
+           url => $baseurl."a=P_TXNLog_list",
+       };
+    }
+    $menuoptions{'regos'} = {
+       url => $baseurl."a=P_REGOS",
+    };
+    $menuoptions{'docs'} = {
+       url => $baseurl."a=P_DOCS",
+    };
+    if($clr) {
+        $menuoptions{'clr'} = {
                 name => $lang->txt($txt_Clrs),
                 url => $baseurl."a=P_CLR",
-            };
-        }
+        };
+    }
 
 
     $Data->{'SystemConfig'}{'TYPE_NAME_3'} = '' if not exists $Data->{'SystemConfig'}{'TYPE_NAME_3'};
@@ -1101,10 +1101,8 @@ sub getPersonMenuData {
         [ $lang->txt('Dashboard'), 'home','home'],
         [ $lang->txt($SystemConfig->{'txns_link_name'} || 'Transactions'), 'menu','transactions'],
         [ $lang->txt($txt_Clrs), 'menu','clr'],
-        [ $lang->txt('Person History'), 'menu',[
-        'clubs',
-        'seasons',
-        ]],
+        [ $lang->txt('Registration History'), 'menu','regos'],
+        [ $lang->txt('Documents'), 'menu','docs'],
         [ $lang->txt('System'), 'system',[
         'auditlog',
         ]],

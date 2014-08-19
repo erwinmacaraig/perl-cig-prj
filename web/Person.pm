@@ -60,6 +60,7 @@ sub handlePerson {
 
     my $resultHTML = '';
     my $personName = my $title = '';
+    my $lang = $Data->{'lang'};
 
     my $clrd_out = 0;
     if ( $Data->{'SystemConfig'}{'Clearances_FilterClearedOut'} ) {
@@ -140,15 +141,6 @@ sub handlePerson {
     elsif ( $action =~ /^P_TRANSFER/ ) {
         ( $resultHTML, $title ) = PersonTransfer($Data);
     }
-    elsif ( $action =~ /P_CLUBS/ ) {
-        my ( $clubStatus, $clubs, undef) = showClubTeams( $Data, $personID );
-        $clubs      = qq[<div class="warningmsg">No $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} History found</div>] if !$clubs;
-        $resultHTML = $clubs;
-        $title      = "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} History";
-    }
-    elsif ( $action =~ /P_SEASONS/ ) {
-        ( $resultHTML, $title ) = showSeasonSummary( $Data, $personID );
-    }
     elsif ( $action =~ /P_CLR/ ) {
         $resultHTML = clearanceHistory( $Data, $personID ) || '';
         my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
@@ -161,10 +153,38 @@ sub handlePerson {
     elsif ( $action =~ /^P_NACCRED/ ) {
         ( $resultHTML, $title ) = handleAccreditationDisplay( $action, $Data, $personID );
     }
+    elsif ( $action =~ /P_REGOS/ ) {
+        $resultHTML = personRegstrationsHistory( $Data, $personID ) || '';
+        $title = $lang->txt('Registration History');
+    }
+    elsif ( $action =~ /P_REGO/ ) {
+        $resultHTML = personRegistration( $Data, $personID ) || '';
+        $title = $lang->txt('Registration History');
+    }
+    elsif ( $action =~ /P_DOCS/ ) {
+        $resultHTML = qq[LIST DOCUMENTS TO GO HERE]; #listDocuments($Data, $personID ) || '';
+        $title = $lang->txt('Registration History');
+    }
     else {
         print STDERR "Unknown action $action\n";
     }
     return ( $resultHTML, $title );
+}
+
+sub personRegstration   {
+
+    my ($Data, $personID) = @_;
+
+    return "NEED PAGE FOR A REGISTRATION RECORD";
+}
+sub personRegstrationsHistory   {
+
+    my ($Data, $personID) = @_;
+
+    #getRegistrationData
+    #load into grid
+    #put in template
+    return "NEED PAGE FOR REGISTRATION HISTORY";
 }
 
 sub updatePersonNotes {
@@ -587,6 +607,7 @@ sub person_details {
                 format      => 'dd/mm/yyyy',
                 sectionname => 'details',
                 validate    => 'DATE',
+                compulsory => 1,
                 first_page  => 1,
             },
             strPlaceofBirth => {
@@ -626,6 +647,7 @@ sub person_details {
                 value       => $field->{intGender},
                 type        => 'lookup',
                 options     => \%genderoptions,
+                compulsory => 1,
                 sectionname => 'details',
                 firstoption => [ '', " " ],
                 first_page  => 1,
@@ -1269,6 +1291,8 @@ $person_photo
     $option = 'display' if $processed;
     my $chgoptions = '';
     my $title = ( !$field->{strLocalFirstname} and !$field->{strLocalSurname} ) ? "Add New $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}" : "$field->{strLocalFirstname} $field->{strLocalSurname}";
+warn("$option AAAAAAAAAAAAAAAAAAAA");
+
     if ( $option eq 'display' ) {
 
         $chgoptions .= qq[<a href="$Data->{'target'}?client=$client&amp;a=P_DEL"  onclick="return confirm('Are you sure you want to Delete this $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}');"><img src="images/delete_icon.gif" border="0" alt="Delete $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}" title="Delete $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}"></a>]
@@ -1282,24 +1306,15 @@ $person_photo
 
         my @taboptions = ();
         my @tabdata    = ();
-        my ( $clubStatus, $clubs, undef) = showClubTeams( $Data, $personID );
-        $clubs ||= '';
-        push @taboptions, [ 'memclubs_dat', $Data->{'LevelNames'}{ $Defs::LEVEL_CLUB . "_P" } ] if $clubs;
-        push @tabdata, qq[<div id="memclubs_dat">$clubs</div>] if $clubs;
 
-        if ( $clubStatus == $Defs::RECSTATUS_INACTIVE and $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB ) {
-            $chgoptions = '';
-            $title .= " - <b><i>Restricted Access</i></b> ";
-        }
+        #if ( $clubStatus == $Defs::RECSTATUS_INACTIVE and $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB ) {
+        #    $chgoptions = '';
+        #    $title .= " - <b><i>Restricted Access</i></b> ";
+        #}
 
         $title = $chgoptions . $title;
         $title .= " - ON PERMIT " if $Data->{'PersonOnPermit'};
 
-        my $otherassocs = checkOtherAssocs( $Data, $personID ) || '';
-        if ($otherassocs) {
-            push @tabdata, qq[<div id="otherassocs_dat">$otherassocs</div>];
-            push @taboptions, [ 'otherassocs_dat', 'Associations' ];
-        }
         my $clearancehistory = clearanceHistory( $Data, $personID ) || '';
         if ($clearancehistory) {
             push @tabdata, qq[<div id="clearancehistory_dat">$clearancehistory</div>];
@@ -1310,11 +1325,6 @@ $person_photo
         my $tabstr    = '';
         my $tabheader = '';
 
-        #for my $i (0 .. $#taboptions)	{
-        #	#$tabstr .= qq{<h3><a href = "#">$taboptions[$i][1]</a></h3>};
-        #	$tabheader.= qq{<li><a href = "#$taboptions[$i][0]">$taboptions[$i][1]</a></li>};
-        #	$tabstr .= $tabdata[$i] ? $tabdata[$i] : '<div></div>';
-        #}
         $tabheader = qq[<ul>$tabheader</ul>] if $tabheader;
 	if ($tabstr) {
             $Data->{'AddToPage'}->add( 'js_bottom', 'inline', "jQuery('#persontabs').tabs();" );
@@ -1380,6 +1390,16 @@ sub loadPersonDetails {
     return $field;
 }
 
+sub NewRegoButton   {
+
+    my ($Data, $clm) = @_;
+
+    my $lang = $Data->{'lang'};
+    return qq[
+        <a href="$Data->{'target'}?client=$clm&amp;a=PREGF_T">]. $lang->txt('Add Registration') . qq[</a>
+    ];
+}
+
 sub postPersonUpdate {
     my ( $id, $params, $action, $Data, $db, $personID, $fields ) = @_;
 
@@ -1420,29 +1440,30 @@ sub postPersonUpdate {
         }
         getAutoPersonNum( $Data, undef, $id, $Data->{'clientValues'}{'assocID'} );
         #Seasons::insertPersonSeasonRecord( $Data, $id, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, 0, $ageGroupID, \%types ) if ($id);
+        my $cl = setClient( $Data->{'clientValues'} ) || '';
+        my %cv = getClient($cl);
+        $cv{'personID'}     = $id;
+        $cv{'currentLevel'} = $Defs::LEVEL_PERSON;
+        my $clm = setClient( \%cv );
         if ( $params->{'isDuplicate'} ) {
             my $st = qq[
                 UPDATE tblPerson SET intSystemStatus=$Defs::PERSONSTATUS_POSSIBLE_DUPLICATE 
                 WHERE intPersonID=$id
             ];
             $db->do($st);
-            return ( 0, DuplicateExplanation($Data) );
+            my $body = DuplicateExplanation($Data);
+            $body .= NewRegoButton($Data, $clm);
+            return (0, $body);
         }
         else {
-            my $cl = setClient( $Data->{'clientValues'} ) || '';
-            my %cv = getClient($cl);
-            $cv{'personID'}     = $id;
-            $cv{'currentLevel'} = $Defs::LEVEL_PERSON;
-            my $clm = setClient( \%cv );
-
-            return (
-                0, qq[
+            my $body = qq[
                 <div class="OKmsg"> $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} Added Successfully</div><br>
                 <a href="$Data->{'target'}?client=$clm&amp;a=P_HOME">Display Details for $params->{'d_strLocalFirstname'} $params->{'d_strLocalSurname'}</a><br><br>
                 <b>or</b><br><br>
                 <a href="$Data->{'target'}?client=$cl&amp;a=P_A&amp;l=$Defs::LEVEL_PERSON">Add another $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}</a>
-                ]
-            );
+            ];
+            $body .= qq[<br>]. NewRegoButton($Data, $clm);
+            return (0, $body);
 
             #</RE>
         }
@@ -1652,127 +1673,6 @@ sub getAutoPersonNum {
     return undef;
 }
 
-sub showClubTeams {
-    my ( $Data, $personID ) = @_;
-
-    my $aID = $Data->{'clientValues'}{'assocID'} || 0;    #Current Association
-                                                          #Check and Display what other assocs this person may be in
-    my $st = qq[
-		SELECT DISTINCT 
-            tblClub.intClubID, 
-            tblClub.strName, 
-            MC.intGradeID, 
-            MC.strContractYear, 
-            MC.strContractNo, 
-            MC.intPrimaryClub, 
-            G.strGradeName, 
-            MC.intStatus, 
-            MC.intPermit, 
-            tblClub.strStatus
-		FROM tblClub 
-			INNER JOIN tblPerson_Clubs AS MC ON (tblClub.intClubID=MC.intClubID)
-			INNER JOIN tblAssoc_Clubs AS AC ON (tblClub.intClubID=AC.intClubID)
-			LEFT JOIN tblClubGrades AS G ON (G.intGradeID=MC.intGradeID)
-		WHERE MC.intPersonID=$personID
-			AND AC.intAssocID = $aID
-			AND AC.strStatus <> $Defs::RECSTATUS_DELETED
-			AND MC.intStatus <> $Defs::RECSTATUS_DELETED
-		ORDER BY strName, intStatus DESC, intPermit ASC
-	];
-    my $query = $Data->{'db'}->prepare($st);
-    $query->execute;
-
-    my $body       = '';
-    my $clubs      = '';
-    my $clubStatus = '';
-    my $cnt        = 0;
-    my %hasClub    = ();
-    while ( my $dref = $query->fetchrow_hashref() ) {
-        ## GET THE NAME OF THE GRADE FOR THE PERSON IF ALLOW CLUB GRADES IS ENABLED IN SYS CONFIG
-        my $gradeName = '&nbsp;';
-        next if exists $hasClub{ $dref->{intClubID} };
-        $hasClub{ $dref->{intClubID} } = 1;
-        if ( $Data->{'SystemConfig'}{'AllowClubGrades'} ) {
-            $gradeName = qq[($dref->{'strGradeDesc'})] if $dref->{'strGradeDesc'};
-        }
-        my $status = ( $dref->{intStatus} == $Defs::RECSTATUS_INACTIVE ) ? qq[<i>(Inactive)</i>] : '&nbsp;';
-        my $permit = ( $dref->{intPermit} == 1 ) ? qq[<i>On Permit</i>] : '&nbsp;';
-
-        my $primaryClub = ( $dref->{'intPrimaryClub'} )   ? qq{[Primary Club]} : '&nbsp;';
-        my $class       = $cnt % 2 == 0                   ? 'rowshade'         : '';
-        my $deleted     = ( $dref->{strStatus} == -1 ) ? qq[ (Deleted)]     : '';
-        $clubs .= qq[
-			<tr>
-				<td class="$class">$dref->{'strName'}$deleted</td>
-				<td class="$class">$gradeName</td>
-				<td class="$class">$primaryClub</td>
-				<td class="$class">$status&nbsp;$permit</td>
-			</tr>
-		];
-        if ( $Data->{'clientValues'}{'clubID'} and $Data->{'clientValues'}{'clubID'} != $Defs::INVALID_ID and $Data->{'clientValues'}{'clubID'} == $dref->{intClubID} ) {
-            $clubStatus = $dref->{intStatus};
-        }
-        $cnt++;
-    }
-    my $editclubsbutton = '';
-    my $client          = setClient( $Data->{'clientValues'} ) || '';
-    if ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC and !$Data->{'SystemConfig'}{'NoClubs'} and allowedAction( $Data, 'mc_e' ) ) {
-        $editclubsbutton = qq[
-			<form action="$Data->{'target'}" method="POST" >
-				<input type="hidden" name="a" value="P_CLB_">
-				<input type="hidden" name="client" value="$client">
-				<input type="submit" class="button proceed-button" value="Edit $Data->{'LevelNames'}{$Defs::LEVEL_CLUB."_P"}">
-			</form>
-		];
-    }
-    $editclubsbutton = '' if $Data->{'SystemConfig'}{'LockClub'};
-    if ( !$Data->{'SystemConfig'}{'NoClubs'} ) {
-        $clubs ||= '';
-        $clubs = qq[
-			<table class="listTable" style="width:100%;">$clubs</table>
-				<br>
-				$editclubsbutton
-		];
-    }
-
-    return ( $clubStatus, $clubs, '');
-}
-
-sub checkOtherAssocs {
-    my ( $Data, $personID ) = @_;
-
-    my $aID = $Data->{'clientValues'}{'assocID'} || 0;    #Current Association
-                                                          #Check and Display what other assocs this person may be in
-
-    my $st = qq[
-		SELECT strName, MA.strStatus
-		FROM tblAssoc INNER JOIN tblPerson_Associations AS MA ON (tblAssoc.intAssocID=MA.intAssocID)
-		WHERE intPersonID = ?
-			AND tblAssoc.intAssocID <> ?
-			AND MA.strStatus <> $Defs::RECSTATUS_DELETED
-		ORDER BY strName
-	];
-    my $query = $Data->{'db'}->prepare($st);
-    $query->execute(
-                     $personID,
-                     $aID,
-    );
-    my $body = '';
-    while ( my $dref = $query->fetchrow_hashref() ) {
-        my $act = $dref->{'strStatus'} == $Defs::RECSTATUS_ACTIVE ? 'Active' : 'Inactive';
-
-        $body .= qq[$dref->{'strName'} <i>($act)</i><br>\n];
-    }
-    if ($body) {
-        $body = qq[
-			<div class="sectionheader">Other $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC.'_P'}</div>
-				$body
-		];
-    }
-
-    return $body;
-}
-
 sub delete_person {
     my ( $Data, $personID ) = @_;
 
@@ -1866,29 +1766,5 @@ sub _fix_date {
     if ( $yyyy < 100 ) { $yyyy += 2000; }
     return "$yyyy-$mm-$dd";
 }
-
-
-sub showSeasonSummary {
-
-    my ( $Data, $personID ) = @_;
-
-    my $body = '';
-    my ( $memseason_vals, $memseasons ) = listPersonSeasons( $Data, $personID );
-    my $season_Name = $Data->{'SystemConfig'}{'txtSeason'} || 'Season';
-    if ($memseasons) {
-        my %Title = ();
-        $Title{1} = "$Data->{'LevelNames'}{$Defs::LEVEL_ASSOC} Summary";
-        $Title{2} = "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Summary";
-        $Title{3} = "Full $season_Name Summary";
-        my $count = 1;
-        for my $section ( @{$memseason_vals} ) {
-            my $title = $Title{$count};
-            $count++;
-            $body .= qq[<div class="sectionheader">$title</div>$section];
-        }
-    }
-    return ( $body, 'Season Summary' );
-}
-
 
 1;
