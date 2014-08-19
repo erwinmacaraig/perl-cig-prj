@@ -31,7 +31,6 @@ sub listPersons {
     my $resultHTML    = '';
     my $client        = unescape($Data->{client});
     my $from_str      = '';
-    my $sel_str       = '';
     my $type          = $Data->{'clientValues'}{'currentLevel'};
     my $levelName     = $Data->{'LevelNames'}{$type} || '';
     my $action_IN     = $action || '';
@@ -145,7 +144,6 @@ sub listPersons {
             PRActive.strStatus as PRActiveStatus,
             P.intSystemStatus
             $select_str
-            $sel_str 
         FROM tblPerson  AS P
             LEFT JOIN tblPersonRegistration_$realm_id AS PRActive ON ( 
                 P.intPersonID = PRActive.intPersonID
