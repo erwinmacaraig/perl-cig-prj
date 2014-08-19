@@ -31,7 +31,6 @@ sub listPersons {
     my $resultHTML    = '';
     my $client        = unescape($Data->{client});
     my $from_str      = '';
-    my $sel_str       = '';
     my $type          = $Data->{'clientValues'}{'currentLevel'};
     my $levelName     = $Data->{'LevelNames'}{$type} || '';
     my $action_IN     = $action || '';
@@ -145,7 +144,6 @@ sub listPersons {
             PRActive.strStatus as PRActiveStatus,
             P.intSystemStatus
             $select_str
-            $sel_str 
         FROM tblPerson  AS P
             LEFT JOIN tblPersonRegistration_$realm_id AS PRActive ON ( 
                 P.intPersonID = PRActive.intPersonID
@@ -154,12 +152,12 @@ sub listPersons {
             )
             INNER JOIN tblPersonRegistration_$realm_id AS PR ON ( 
                 P.intPersonID = PR.intPersonID
-                AND PR.strStatus NOT IN ('ACTIVE', 'ROLLED_OVER')
+                AND PR.strStatus NOT IN ('ROLLED_OVER')
+                AND PR.intEntityID = ?
             )
         LEFT JOIN tblPersonNotes ON tblPersonNotes.intPersonID = P.intPersonID
         WHERE P.strStatus <> 'DELETED'
             AND P.intRealmID = $Data->{'Realm'}
-            AND PR.intEntityID = ?
         ORDER BY PR.intPersonRegistrationID DESC, $default_sort strLocalSurname, strLocalFirstname
     ];
 
