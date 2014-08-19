@@ -149,6 +149,7 @@ sub listPersons {
         FROM tblPerson  AS P
             LEFT JOIN tblPersonRegistration_$realm_id AS PRActive ON ( 
                 P.intPersonID = PRActive.intPersonID
+                AND PRActive.intEntityID = ?
                 AND PRActive.strStatus IN ('ACTIVE')
             )
             INNER JOIN tblPersonRegistration_$realm_id AS PR ON ( 
@@ -163,7 +164,7 @@ sub listPersons {
     ];
 
     my $query= $Data->{'db'}->prepare($statement);
-    $query->execute($entityID) or query_error($statement);
+    $query->execute($entityID, $entityID) or query_error($statement);
     my $found = 0;
     my @rowdata = ();
     my $newaction='P_HOME';
@@ -187,6 +188,7 @@ sub listPersons {
         next if exists $PersonSeen{$dref->{'intPersonID'}};
         $PersonSeen{$dref->{'intPersonID'}} = 1;
         $dref->{'PRStatus'} = $dref->{'PRActiveStatus'} if ($dref->{'PRActiveStatus'});
+        $dref->{'PRStatus'} = 'SUSPENDED' if ($dref->{'strStatus'} eq 'SUSPENDED');
         $dref->{'strStatus'} = $Defs::personRegoStatus{$dref->{'PRStatus'}}; ## Lets use PR status
         
         next if (defined $dref->{intSystemStatus} and $dref->{intSystemStatus} == $Defs::PERSONSTATUS_DELETED);
@@ -228,7 +230,7 @@ sub listPersons {
                 }
             }
             $dref->{'strStatus_Filter'}='1';
-            $dref->{'strStatus'}='DUPLICATE';
+            $dref->{'strStatus'}=$lang->txt('DUPLICATE');
         }
 
         if(allowedAction($Data, 'm_d') and $Data->{'SystemConfig'}{'AllowPersonDelete'})    {
