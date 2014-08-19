@@ -3697,6 +3697,15 @@ ul.new_tabs li a.active, .new_tabs_wrap  a.active {
 	font-size: 20px;
 }
 
+.member-home-page .details-rowred {
+	float: left;
+	width: 100%;
+	border-bottom: 1px solid #DEDEDE;
+	padding-bottom: 4px;
+	margin-bottom: 6px;
+	font-size: 13px;
+    color: red;
+}
 .member-home-page .details-row {
 	float: left;
 	width: 100%;

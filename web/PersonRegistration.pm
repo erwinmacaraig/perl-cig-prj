@@ -535,6 +535,12 @@ warn($st);
       
     while(my $dref= $query->fetchrow_hashref()) {
         $count++;
+        $dref->{'Sport'} = $Defs::sportType{$dref->{'strSport'}} || '';
+        $dref->{'PersonType'} = $Defs::personType{$dref->{'strPersonType'}} || '';
+        $dref->{'PersonLevel'} = $Defs::personLevel{$dref->{'strPersonLevel'}} || '';
+        $dref->{'AgeLevel'} = $Defs::ageLevel{$dref->{'strAgeLevel'}} || '';
+        $dref->{'Status'} = $Defs::personRegoStatus{$dref->{'strStatus'}} || '';
+        $dref->{'RegistrationNature'} = $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '';
         push @Registrations, $dref;
     }
     return ($count, \@Registrations);

@@ -2,25 +2,77 @@
 	<div class="sectionheader">Current Registrations</div>
 		<div class="members-seasonstatus-content">
 			[% FOREACH entity IN RegistrationInfo %]
-				<div class="member-data"> [% entity.strLocalName %] </div>
-            [% IF entity.strLatinName %]
-				<div class="member-data"> [% entity.strLatinName %] </div>
-            [% END %]
-				<div class="member-data"> [% entity.strSport %] </div>
-				<div class="member-data"> [% entity.strPersonType %] </div>
-				<div class="member-data"> [% entity.strPersonLevel %] </div>
-				<div class="member-data"> [% entity.strAgeLevel %] </div>
-            [% IF entity.dtFrom and entity.dtFrom != '0000-00-00' %]
-				<div class="member-data">From: [% entity.dtFrom %] </div>
-            [% END %]
-            [% IF entity.dtTo and entity.dtTo != '0000-00-00' %]
-				<div class="member-data">To: [% entity.dtTo %] </div>
-            [% END %]
-                <br>
+                <!--[% IF entity.strLocalName %]
+                    <span class="details-row">
+                        <span class="details-left">[% Lang.txt('Registrered To') %]:</span>
+                        <span class="details-right">[% entity.strLocalName %]</span>
+                    </span>
+                [% END %]
+                [% IF entity.strLatinName %]
+                    <span class="details-row">
+                        <span class="details-left">[% Lang.txt('Registrered To (Latin characters)') %]:</span>
+                        <span class="details-right">[% entity.strLatinName %]</span>
+                    </span>
+                [% END %]
+                -->
+                [% IF entity.intPaymentRequired %]
+                    <span class="details-rowred">
+                        [% Lang.txt('Payment Still Required') %]
+                    </span>
+                [% END %]
+                [% IF entity.RegistrationNature %]
+                    <span class="details-row">
+                        <span class="details-left">[% Lang.txt('Registration Type') %]:</span>
+                        <span class="details-right">[% entity.RegistrationNature %]</span>
+                    </span>
+                [% END %]
+                [% IF entity.Status %]
+                    <span class="details-row">
+                        <span class="details-left">[% Lang.txt('Status') %]:</span>
+                        <span class="details-right">[% entity.Status %]</span>
+                    </span>
+                [% END %]
+                [% IF entity.Sport %]
+                    <span class="details-row">
+                        <span class="details-left">[% Lang.txt('Sport') %]:</span>
+                        <span class="details-right">[% entity.Sport %]</span>
+                    </span>
+                [% END %]
+                [% IF entity.PersonType %]
+                    <span class="details-row">
+                        <span class="details-left">[% Lang.txt('Type') %]:</span>
+                        <span class="details-right">[% entity.PersonType %]</span>
+                    </span>
+                [% END %]
+                [% IF entity.PersonLevel %]
+                    <span class="details-row">
+                        <span class="details-left">[% Lang.txt('Level') %]:</span>
+                        <span class="details-right">[% entity.PersonLevel %]</span>
+                    </span>
+                [% END %]
+                [% IF entity.AgeLevel %]
+                    <span class="details-row">
+                        <span class="details-left">[% Lang.txt('Age Level') %]:</span>
+                        <span class="details-right">[% entity.AgeLevel %]</span>
+                    </span>
+                [% END %]
+                [% IF entity.dtFrom and entity.dtFrom != '0000-00-00' %]
+                    <span class="details-row">
+                        <span class="details-left">[% Lang.txt('Valid From') %]:</span>
+                        <span class="details-right">[% entity.dtFrom %]</span>
+                    </span>
+                [% END %]
+                [% IF entity.dtTo and entity.dtTo != '0000-00-00' %]
+                    <span class="details-row">
+                        <span class="details-left">[% Lang.txt('Valid To') %]:</span>
+                        <span class="details-right">[% entity.dtTo %]</span>
+                    </span>
+                [% END %]
+                    <span class="details-row"> <br></span>
 			[% END %]
 		</div>
 	</div>
 [% IF !ReadOnlyLogin %]
-    <a href = "[% AddRegistrationURL %]">[% Lang.txt('Add Registration') %]</a>
+    <span class = "button-small generic-button"><a href = "[% AddRegistrationURL %]">[% Lang.txt('Add Registration') %]</a></span>
 [% END %]
 </div>

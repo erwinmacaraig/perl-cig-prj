@@ -70,6 +70,7 @@ sub showPersonHome	{
   );
 
 	my %TemplateData = (
+        Lang => $Data->{'lang'},
 		Name => $name,
 		ReadOnlyLogin => $Data->{'ReadOnlyLogin'},
 		EditDetailsLink => showLink($personID,$client,$Data),
