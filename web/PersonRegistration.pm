@@ -507,6 +507,7 @@ sub getRegistrationData	{
             DATE_FORMAT(pr.dtFrom, "%Y%m%d") as dtFrom_,
             DATE_FORMAT(pr.dtTo, "%Y%m%d") as dtTo_,
             DATE_FORMAT(pr.dtAdded, "%Y%m%d%H%i") as dtAdded_,
+            DATE_FORMAT(pr.dtAdded, "%Y-%m-%d %H:%i") as dtAdded_formatted,
             DATE_FORMAT(pr.dtLastUpdated, "%Y%m%d%H%i") as dtLastUpdated_,
             e.strLocalName,
             e.strLatinName

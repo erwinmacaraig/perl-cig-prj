@@ -54,6 +54,7 @@ use Data::Dumper;
 
 use PrimaryClub;
 use DuplicatePrevention;
+use RecordTypeFilter;
 
 sub handlePerson {
     my ( $action, $Data, $personID ) = @_;
@@ -154,37 +155,154 @@ sub handlePerson {
         ( $resultHTML, $title ) = handleAccreditationDisplay( $action, $Data, $personID );
     }
     elsif ( $action =~ /P_REGOS/ ) {
-        $resultHTML = personRegstrationsHistory( $Data, $personID ) || '';
+        ($resultHTML , $title)= personRegstrationsHistory( $Data, $personID ) ;
         $title = $lang->txt('Registration History');
     }
-    elsif ( $action =~ /P_REGO/ ) {
+    elsif ( $action eq 'P_REGO' ) {
         $resultHTML = personRegistration( $Data, $personID ) || '';
         $title = $lang->txt('Registration History');
     }
     elsif ( $action =~ /P_DOCS/ ) {
         $resultHTML = qq[LIST DOCUMENTS TO GO HERE]; #listDocuments($Data, $personID ) || '';
-        $title = $lang->txt('Registration History');
+        $title = $lang->txt('Registration Documents');
     }
     else {
         print STDERR "Unknown action $action\n";
     }
+warn("AAA.$resultHTML");
     return ( $resultHTML, $title );
 }
 
 sub personRegstration   {
 
     my ($Data, $personID) = @_;
-
     return "NEED PAGE FOR A REGISTRATION RECORD";
 }
 sub personRegstrationsHistory   {
 
+
     my ($Data, $personID) = @_;
 
-    #getRegistrationData
-    #load into grid
-    #put in template
-    return "NEED PAGE FOR REGISTRATION HISTORY";
+    my $lang = $Data->{'lang'};
+
+    my %RegFilters=();
+    my @statusNOTIN = ($Defs::PERSONREGO_STATUS_DELETED, $Defs::PERSONREGO_STATUS_INPROGRESS);
+    $RegFilters{'statusNOTIN'} = \@statusNOTIN;
+    my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
+    my @rowdata = ();
+    my $results = 0;
+    my $client           = setClient( $Data->{'clientValues'} ) || '';
+    foreach my $rego (@{$Reg_ref})  {
+      $results=1;
+        my $name = $rego->{'strLocalName'};
+        $name .= " ($rego->{'strLatinName'})" if $rego->{'strLatinName'};
+      push @rowdata, {
+        id => $rego->{'intPersonRegistrationID'} || 0,
+        EntityLocalName=> $name,
+        EntityLatinName=> $rego->{'strLatinName'} || '',
+        dtAdded=> $rego->{'dtAdded_formatted'} || '',
+        PersonType=> $rego->{'PersonType'} || '',
+        PersonLevel=> $rego->{'PersonLevel'} || '',
+        AgeLevel=> $rego->{'AgeLevel'} || '',
+        RegistrationNature=> $rego->{'RegistrationNature'} || '',
+        Status=> $rego->{'Status'} || '',
+        PersonEntityRole=> $rego->{'strPersonEntityRole'} || '',
+        Sport=> $rego->{'Sport'} || '',
+        SelectLink => "$Data->{'target'}?client=$client&amp;a=PR_VIEW&amp;prID=$rego->{'intPersonRegistrationID'}",
+      };
+    }
+
+    my $addlink='';
+    my $title=$lang->txt('Registration History');
+    my %tempClientValues = getClient($client);
+    {
+        my $tempClient = setClient(\%tempClientValues);
+        $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>];
+
+    }
+
+    my $modoptions=qq[<div class="changeoptions">$addlink</div>];
+    $title=$modoptions.$title;
+    my $rectype_options=show_recordtypes(
+        $Data,
+        '',
+        '',
+        \%Defs::personRegoStatus,
+        { 'ALL' => $Data->{'lang'}->txt('All'), },
+    ) || '';
+    $rectype_options='';
+
+    my @headers = (
+        {
+            type  => 'Selector',
+            field => 'SelectLink',
+        },
+        {
+            name  => $Data->{'lang'}->txt('Registration Type'),
+            field => 'RegistrationNature',
+        },
+        {
+            name  => $Data->{'lang'}->txt('Registered To'),
+            field => 'EntityLocalName',
+        },
+        {
+            name   => $Data->{'lang'}->txt('Type'),
+            field  => 'PersonType',
+            width  => 30,
+        },
+        {
+            name   => $Data->{'lang'}->txt('Sport'),
+            field  => 'Sport',
+            width  => 30,
+        },
+        {
+            name  => $Data->{'lang'}->txt('Level'),
+            field => 'PersonLevel',
+        },
+        {
+            name  => $Data->{'lang'}->txt('Age Level'),
+            field => 'AgeLevel',
+        },
+        {
+            name  => $Data->{'lang'}->txt('Status'),
+            field => 'Status',
+        },
+        {
+            name  => $Data->{'lang'}->txt('Date Registered'),
+            field => 'dtAdded',
+        },
+    );
+
+    my $filterfields = [
+        {
+            field     => 'strLocalName',
+            elementID => 'id_textfilterfield',
+            type      => 'regex',
+        },
+        {
+            field     => 'strStatus',
+            elementID => 'dd_actstatus',
+            allvalue  => 'ALL',
+        },
+    ];
+
+    my $grid  = showGrid(
+        Data    => $Data,
+        columns => \@headers,
+        rowdata => \@rowdata,
+        gridid  => 'grid',
+        width   => '99%',
+        filters => $filterfields,
+    );
+
+    my $resultHTML = qq[
+        <div class="grid-filter-wrap">
+            <div style="width:99%;">$rectype_options</div>
+            $grid
+        </div>
+    ];
+
+    return ($resultHTML,$title);
 }
 
 sub updatePersonNotes {
