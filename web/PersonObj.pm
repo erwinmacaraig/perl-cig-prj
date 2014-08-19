@@ -8,6 +8,7 @@ our @ISA =qw(BaseObject);
 sub load {
   my $self = shift;
 
+warn("PERSON OBJ!!!!!!!!!!!!!");
 	my $st=qq[
   SELECT
     tblPerson.*,

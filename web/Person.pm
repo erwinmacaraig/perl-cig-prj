@@ -169,7 +169,6 @@ sub handlePerson {
     else {
         print STDERR "Unknown action $action\n";
     }
-warn("AAA.$resultHTML");
     return ( $resultHTML, $title );
 }
 
@@ -1201,7 +1200,7 @@ sub person_details {
 
         },
         order => [
-        qw(strNationalNum strPersonNo strSalutation strStatus strLocalFirstname strPreferredName strMiddlename strLocalSurname strMaidenName dtDOB dtDeath strPlaceofBirth strCountryOfBirth strMotherCountry strFatherCountry intGender strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased intDeRegister strPreferredLang strPassportIssueCountry strPassportNationality strPassportNo dtPassportExpiry dtPoliceCheck dtPoliceCheckExp strPoliceCheckRef strEmergContName strEmergContNo strEmergContNo2 strEmergContRel strP1Salutation strP1FName strP1SName intP1Gender strP1Phone strP1Phone2 strP1PhoneMobile strP1Email strP1Email2 strP2Salutation strP2FName strP2SName intP2Gender strP2Phone strP2Phone2 strP2PhoneMobile strP2Email strP2Email2 strEyeColour strHairColour strHeight strWeight dtSuspendedUntil
+        qw(strNationalNum strPersonNo strSalutation strStatus strLocalFirstname strPreferredName strMiddlename strLocalSurname strLatinFirstname strLatinSurname strMaidenName dtDOB dtDeath strPlaceofBirth strCountryOfBirth strMotherCountry strFatherCountry intGender strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased intDeRegister strPreferredLang strPassportIssueCountry strPassportNationality strPassportNo dtPassportExpiry dtPoliceCheck dtPoliceCheckExp strPoliceCheckRef strEmergContName strEmergContNo strEmergContNo2 strEmergContRel strP1Salutation strP1FName strP1SName intP1Gender strP1Phone strP1Phone2 strP1PhoneMobile strP1Email strP1Email2 strP2Salutation strP2FName strP2SName intP2Gender strP2Phone strP2Phone2 strP2PhoneMobile strP2Email strP2Email2 strEyeColour strHairColour strHeight strWeight dtSuspendedUntil
         ),
 
         map("strNatCustomStr$_", (1..15)),
@@ -1409,7 +1408,6 @@ $person_photo
     $option = 'display' if $processed;
     my $chgoptions = '';
     my $title = ( !$field->{strLocalFirstname} and !$field->{strLocalSurname} ) ? "Add New $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}" : "$field->{strLocalFirstname} $field->{strLocalSurname}";
-warn("$option AAAAAAAAAAAAAAAAAAAA");
 
     if ( $option eq 'display' ) {
 
@@ -1526,7 +1524,9 @@ sub postPersonUpdate {
     return ( 0, undef ) if !$db;
 
     my $assocID = $Data->{'clientValues'}{'assocID'} || 0;
-    $Data->{'cache'}->delete( 'swm', "PersonObj-$id-$assocID" ) if $Data->{'cache'};
+    my $entityID = getLastEntityID($Data->{'clientValues'});
+    $Data->{'cache'}->delete( 'swm', "PersonObj-$id-$entityID" ) if $Data->{'cache'};
+    $Data->{'cache'}->delete( 'swm', "PersonObj-$id" ) if $Data->{'cache'};
 
     my %types        = ();
     my $assocSeasons = Seasons::getDefaultAssocSeasons($Data);

@@ -29,9 +29,8 @@ sub getFieldLabels	{
 			strLocalMiddlename => 'Middle name',
 			strPreferredName => 'Preferred name',
 			strLocalSurname => 'Family name',
-			strLatinSurname => 'Family name (Latin)',
-
-
+			strLatinSurname => 'Family name (Latin characters)',
+			strLatinFirstname=> 'Firstname (Latin characters)',
 			strMaidenName => 'Maiden name',
 			strMotherCountry=> 'Country of Birth (Mother)',
 			strFatherCountry=> 'Country of Birth (Father)',

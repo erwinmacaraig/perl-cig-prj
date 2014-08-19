@@ -37,15 +37,21 @@
 <div class="member-detail">
 	<div class = "sectionheader">[% Lang.txt('Member Detail Summary') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin  %]<a href = "[% EditDetailsLink %]"         class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
 	<div class="member-details">
-		[% IF Details.SquadNum %]
+		[% IF Details.LatinFirstname %]
 		<span class="details-row">
-		  <span class="details-left">Squad Number:</span>
-			<span class="details-right">[% Details.SquadNum %]</span>
+			<span class="details-left">[% Lang.txt("First name (Latin Characters)") %]:</span>
+			<span class="details-right">[% Details.LatinFirstname %]</span>
+		</span>
+		[% END %]
+		[% IF Details.LatinSurname %]
+		<span class="details-row">
+			<span class="details-left">[% Lang.txt("Family name (Latin Characters)") %]:</span>
+			<span class="details-right">[% Details.LatinSurname %]</span>
 		</span>
 		[% END %]
 		[% IF Details.Gender %]
 		<span class="details-row">
-			<span class="details-left">Gender:</span>
+			<span class="details-left">[% Lang.txt('Gender') %]:</span>
 			<span class="details-right">[% Details.Gender %]</span>
 		</span>
 		[% END %]

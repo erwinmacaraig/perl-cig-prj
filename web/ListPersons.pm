@@ -188,8 +188,8 @@ sub listPersons {
         next if exists $PersonSeen{$dref->{'intPersonID'}};
         $PersonSeen{$dref->{'intPersonID'}} = 1;
         $dref->{'PRStatus'} = $dref->{'PRActiveStatus'} if ($dref->{'PRActiveStatus'});
-        $dref->{'PRStatus'} = 'SUSPENDED' if ($dref->{'strStatus'} eq 'SUSPENDED');
-        $dref->{'strStatus'} = $Defs::personRegoStatus{$dref->{'PRStatus'}}; ## Lets use PR status
+        $dref->{'PRStatus'} = $lang->txt('SUSPENDED') if ($dref->{'strStatus'} eq 'SUSPENDED');
+        $dref->{'strStatus'} = $lang->txt($Defs::personRegoStatus{$dref->{'PRStatus'}}); ## Lets use PR status
         
         next if (defined $dref->{intSystemStatus} and $dref->{intSystemStatus} == $Defs::PERSONSTATUS_DELETED);
         $tempClientValues{personID} = $dref->{intPersonID};
@@ -203,7 +203,6 @@ sub listPersons {
         $dref->{'intGender'} ||= 0;
         $dref->{'strLocalFirstname'} ||= '';
         $dref->{'strLocalSurname'} ||= '-';
-        $dref->{'strLocalSurname'} .= '    (P)' if $dref->{'intPermit'};
         $dref->{'TxnTotalCount'} ||= 0;
         $dref->{'TxnTotalCount'} = ''. qq[<a href="$Data->{'target'}?client=$tempClient&amp;a=P_TXN_LIST">$dref->{TxnTotalCount}</a>];
         for my $k (keys %{$lookupfields})    {
@@ -343,6 +342,8 @@ sub setupPersonListFields    {
     my @listfields=qw( 
         strLocalSurname 
         strLocalFirstname 
+        strLatinSurname 
+        strLatinFirstname 
         intAgeGroupID
         strStatus 
         dtDOB 
@@ -489,11 +490,12 @@ sub getPersonListFieldOtherInfo {
 
 sub personList_lookupVals {
     my($Data)=@_;
-    my %ynVals=( 1 => 'Y', 0 => 'N');
+    my $lang = $Data->{'lang'};
+    my %ynVals=( 1 => $lang->txt('Y'), 0 => $lang->txt('N'));
     my %lookupfields=(
         intGender => {
-            $Defs::GENDER_MALE => 'M',
-            $Defs::GENDER_FEMALE=> 'F',
+            $Defs::GENDER_MALE => $lang->txt($Defs::genderInfo{$Defs::GENDER_MALE}),
+            $Defs::GENDER_FEMALE => $lang->txt($Defs::genderInfo{$Defs::GENDER_FEMALE}),
             $Defs::GENDER_NONE=> '',
         },
     );
