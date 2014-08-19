@@ -163,14 +163,8 @@ sub handlePerson {
         $title = $lang->txt('Registration History');
     }
     elsif ( $action =~ /P_DOCS/ ) {
-<<<<<<< HEAD
-        $resultHTML = qq[LIST DOCUMENTS TO GO HERE];
         $resultHTML =  listDocuments($Data, $personID);
-        $title = $lang->txt('Registration History');
-=======
-        $resultHTML = qq[LIST DOCUMENTS TO GO HERE]; #listDocuments($Data, $personID ) || '';
         $title = $lang->txt('Registration Documents');
->>>>>>> a52fbae8d740774a5daa4b5806df4b289fde4af2
     }
     else {
         print STDERR "Unknown action $action\n";
@@ -309,6 +303,79 @@ sub personRegstrationsHistory   {
 
     return ($resultHTML,$title);
 }
+sub listDocuments {
+    my ($Data, $personID) = @_;
+    my $resultHTML = ''; 
+    my $lang = $Data->{'lang'}; 
+    my $db = $Data->{'db'};  
+    my $client = $Data->{'client'};
+
+   
+    my @rowdata = (); 
+    my $query = qq[
+         SELECT tblUploadedFiles.intFileID,tblDocumentType.strDocumentName,tblUploadedFiles.dtUploaded as DateUploaded, tblDocuments.strApprovalStatus FROM tblDocuments INNER JOIN tblUploadedFiles ON tblDocuments.intUploadFileID = tblUploadedFiles.intFileID INNER JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intPersonID = ?]; 
+#? AND tblUploadedFiles.intEntityTypeID = ?
+    my $sth = $db->prepare($query); 
+    $sth->execute($personID); 
+   
+    while(my $dref = $sth->fetchrow_hashref()){
+       # my $fileLink = "$Defs::base_url/getfile.cgi?client=$client&amp;f=$dref->{'intFileID'}";  
+       my $fileLink = '';
+       push @rowdata, {  
+	        id => $dref->{'intFileID'} || 0,
+	        SelectLink => $fileLink,
+	        strDocumentName => $dref->{'strDocumentName'},
+		strApprovalStatus => $dref->{'strApprovalStatus'},
+		DateUploaded => $dref->{'DateUploaded'},
+       };
+    }
+
+    my @headers = (
+        { 
+            type => 'Selector',
+            field => 'SelectLink',
+        }, 
+        {
+            name => $lang->txt('Type'),
+            field => 'strDocumentName',
+        }, 
+        {
+            name => $lang->txt('Status'),
+            field => 'strApprovalStatus',
+        },
+        {
+            name => $lang->txt('Date Uploaded'),
+            field => 'DateUploaded',
+        },
+    ); 
+    my $filterfields = [
+        {
+            field     => 'strApprovalStatus',
+            elementID => 'dd_actstatus',
+            allvalue  => 'ALL',
+        },
+    ];
+  
+    #### GRID  #### 
+    my $grid = showGrid(
+        Data => $Data,
+        columns => \@headers,
+        rowdata => \@rowdata,
+        gridid => 'grid',
+        width => '99%',
+        
+   ); 
+     
+        $resultHTML = qq[
+        <div class="grid-filter-wrap">
+            <div style="width:99%;">&nbsp;</div>
+            $grid
+        </div>
+    ];
+
+    return ($resultHTML);
+
+} ## end sub listDocuments
 
 sub updatePersonNotes {
 
@@ -1891,68 +1958,4 @@ sub _fix_date {
     return "$yyyy-$mm-$dd";
 }
 
-sub listDocuments{
-    my ($Data, $personID) = @_;
-    my $resultHTML = ''; 
-    my $lang = $Data->{'lang'}; 
-    my $db = $Data->{'db'};  
-    my $client = $Data->{'client'};
-
-    my %headerLabels = (
-       'document' => $lang->txt('Document'), 
-       'status' => $lang->txt('Status'), 
-       'dteupload' => $lang->txt('Date Uploaded'), 
-       
-    );
-    my @rowdata = (); 
-    my $query = qq[
-         SELECT tblUploadedFiles.intFileID,tblDocumentType.strDocumentName,tblUploadedFiles.dtUploaded as DateUploaded, tblDocuments.strApprovalStatus FROM tblDocuments INNER JOIN tblUploadedFiles ON tblDocuments.intUploadFileID = tblUploadedFiles.intFileID INNER JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intPersonID = ?]; 
-#? AND tblUploadedFiles.intEntityTypeID = ?
-    my $sth = $db->prepare($query); 
-    $sth->execute($personID); 
-   
-    while(my $dref = $sth->fetchrow_hashref()){
-       # my $fileLink = "$Defs::base_url/getfile.cgi?client=$client&amp;f=$dref->{'intFileID'}";  
-       my $fileLink = '';
-       push @rowdata, {  
-	        ID => $dref->{'intFileID'} || 0,
-	        SelectLink => $fileLink,
-	        strDocumentName => $dref->{'strDocumentName'},
-		strApprovalStatus => $dref->{'strApprovalStatus'},
-		DateUploaded => $dref->{'DateUploaded'},
-       };
-    }
-
-    my @headers = (
-        { 
-            type => 'Selector',
-            field => 'SelectLink',
-        }, 
-        {
-            name => $lang->txt('Type'),
-            field => 'strDocumentName',
-        }, 
-        {
-            name => $lang->txt('Status'),
-            field => 'strApprovalStatus',
-        },
-        {
-            name => $lang->txt('Date Uploaded'),
-            field => 'DateUploaded',
-        },
-    );    
-    #### GRID  #### 
-    my $grid = showGrid(
-        Data => $Data,
-        columns => \@headers,
-        rowdata => \@rowdata,
-        gridid => 'grid',
-        width => '99%',
-    ); 
-    my $list_instruction = ''; 
-    $resultHTML = qq[ $list_instruction $grid ]; 
-    
-   #return $resultHTML; 
-
-} ## end sub listDocuments
 1;
