@@ -319,14 +319,15 @@ sub listDocuments {
     $sth->execute($personID); 
    
     while(my $dref = $sth->fetchrow_hashref()){
-       # my $fileLink = "$Defs::base_url/getfile.cgi?client=$client&amp;f=$dref->{'intFileID'}";  
-       my $fileLink = '';
+       my $viewLink = qq[ <span class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}" target="_blank">]. $lang->txt('Get File') . q[</a></span>];  
+       my $fileLink = "#";
        push @rowdata, {  
 	        id => $dref->{'intFileID'} || 0,
 	        SelectLink => $fileLink,
 	        strDocumentName => $dref->{'strDocumentName'},
 		strApprovalStatus => $dref->{'strApprovalStatus'},
-		DateUploaded => $dref->{'DateUploaded'},
+                DateUploaded => $dref->{'DateUploaded'}, 
+                ViewDoc => $viewLink,  
        };
     }
 
@@ -346,7 +347,12 @@ sub listDocuments {
         {
             name => $lang->txt('Date Uploaded'),
             field => 'DateUploaded',
-        },
+        }, 
+        {
+            name => $lang->txt('View'),
+            field => 'ViewDoc',
+            type => 'HTML', 
+        }
     ); 
     my $filterfields = [
         {
