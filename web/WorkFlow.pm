@@ -234,7 +234,7 @@ sub listTasks {
         $showApprove= 1 if ($dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID);
 
         my $showResolve=0;
-        $showResolve= 1 if ($dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);
+        $showResolve= 1 if ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_REJECTED and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);
 
 		my %single_row = (
 			WFTaskID => $dref->{intWFTaskID},
