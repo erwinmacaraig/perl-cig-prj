@@ -100,9 +100,16 @@ sub handleWorkflow {
         approveTask($Data);
         ( $body, $title ) = listTasks( $Data );	
     }
+    elsif ( $action eq 'WF_notesS' ) {
+        ( $body, $title ) = updateTaskNotes( $Data );	
+    }
+    elsif ( $action eq 'WF_Resolve' ) {
+        resolveTask($Data);
+        ( $body, $title ) = addTaskNotes( $Data );	
+    }
     elsif ( $action eq 'WF_Reject' ) {
         rejectTask($Data);
-        ( $body, $title ) = listTasks( $Data );	
+        ( $body, $title ) = addTaskNotes( $Data );	
     }
 	else {
         ( $body, $title ) = listTasks( $Data );		
@@ -143,7 +150,10 @@ sub listTasks {
             uar.entityID as UserEntityID, 
             uarRejected.entityID as UserRejectedEntityID,
             e.intEntityID,
-            e.intEntityLevel
+            e.intEntityLevel,
+            t.intApprovalEntityID,
+            t.intProblemResolutionEntityID,
+            t.strTaskNotes as TaskNotes
 		FROM tblWFTask AS t
         LEFT JOIN tblEntity as e ON (e.intEntityID = t.intEntityID)
 		LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (t.intPersonRegistrationID = pr.intPersonRegistrationID)
@@ -217,10 +227,20 @@ sub listTasks {
             $taskDescription =$Data->{'lang'}->txt('This person has been duplicate resolved and appears to have an incorrect Registration count');
         }    
 
+        my $showReject=0;
+        $showReject = 1 if ($dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} != $entityID);
+
+        my $showApprove=0;
+        $showApprove= 1 if ($dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID);
+
+        my $showResolve=0;
+        $showResolve= 1 if ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_REJECTED and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);
+
 		my %single_row = (
 			WFTaskID => $dref->{intWFTaskID},
             TaskDescription => $taskDescription,
 			TaskType => $dref->{strTaskType},
+			TaskNotes=> $dref->{TaskNotes},
 			AgeLevel => $dref->{strAgeLevel},
 			RuleFor=> $dref->{strWFRuleFor},
 			RegistrationNature => $dref->{strRegistrationNature},
@@ -232,6 +252,9 @@ sub listTasks {
 			PersonID => $dref->{intPersonID},			
 			TaskStatus => $dref->{strTaskStatus},
             viewURL => $viewURL,
+            showReject => $showReject,
+            showApprove => $showApprove,
+            showResolve => $showResolve,
 		);
 		push @TaskList, \%single_row;
 	}
@@ -597,7 +620,8 @@ sub approveTask {
 	  		strTaskStatus = ?,
 	  		intApprovalUserID = ?,
 	  		dtApprovalDate = NOW()
-	  	WHERE intWFTaskID = ?; 
+	  	WHERE intWFTaskID = ? 
+            AND intRealmID=?
 		];
 		
   	$q = $db->prepare($st);
@@ -605,7 +629,8 @@ sub approveTask {
         $Defs::WF_TASK_STATUS_COMPLETE,
 	  	$Data->{'clientValues'}{'userID'},
   		$WFTaskID,
-  		);
+        $Data->{'Realm'}
+  	);
   		
     setDocumentStatus($Data, $WFTaskID, 'APRROVED');
 	if ($q->errstr) {
@@ -879,7 +904,7 @@ sub setDocumentStatus  {
             intPersonRegistrationID,
             intEntityID,
             intDocumentID,
-            intDocumentTypeID,
+            intDocumentTypeID
         FROM tblWFTask
         WHERE intWFTaskID = ?
     ];
@@ -897,20 +922,19 @@ sub setDocumentStatus  {
     my $taskType= $dref->{strTaskType} || '';
 
     return if (! $entityID and !$personID);
+    return if (! $documentID and !$documentTypeID);
 
     $st = qq[
         UPDATE tblDocuments
         SET strApprovalStatus = ?
         WHERE
-            intEntityLevelID=?
-            AND intEntityID = ?
+            1=1
     ];
     my @values=();
+    push @values, $status;
     if ($personID)  {
-        $st .= qq[ AND intEntityID = ?];
+        $st .= qq[ AND intPersonID = ?];
         push @values, $personID;
-        $st .= qq[ AND intEntityLevel = ?];
-        push @values, $Defs::LEVEL_PERSON;
     }
     else    {
         $st .= qq[ AND intEntityID = ?];
@@ -935,7 +959,125 @@ sub setDocumentStatus  {
   	$q = $Data->{'db'}->prepare($st);
   	$q->execute(@values);
 }
+
+sub updateTaskNotes {
+
+    my( $Data) = @_;
+
+    my $WFTaskID = safe_param('TID','number') || '';
+    my $notes= safe_param('notes','words') || '';
+    my $lang = $Data->{'lang'};
+    my $title = $lang->txt('Work task notes Updated');
+
+    my $st = qq[
+        UPDATE tblWFTask
+        SET 
+            strTaskNotes = ?
+        WHERE 
+            intWFTaskID = ?
+            AND intRealmID=?
+        LIMIT 1
+    ];
     
+  	my $q = $Data->{'db'}->prepare($st);
+  	$q->execute($notes, $WFTaskID, $Data->{'Realm'});
+
+   my %TemplateData = (
+			TaskID=> $WFTaskID,
+            Lang => $Data->{'lang'},
+			TaskNotes=> $notes,
+			client => $Data->{client},
+            target=>$Data->{'target'},
+            action => 'WF_list',
+	);
+
+	my $body = runTemplate(
+			$Data,
+			\%TemplateData,
+			'dashboards/worktask_notes_updated.templ',
+	);
+    
+    return ($body, $title);
+
+}
+    
+sub addTaskNotes    {
+
+    my( $Data) = @_;
+
+    my $WFTaskID = safe_param('TID','number') || '';
+
+    my $lang = $Data->{'lang'};
+    my $title = $lang->txt('Work task Notes');
+    my $st = qq[
+        SELECT
+            strTaskNotes
+        FROM
+            tblWFTask
+        WHERE 
+            intWFTaskID = ?
+    ];
+  	my $q = $Data->{'db'}->prepare($st);
+  	$q->execute($WFTaskID);
+    my $notes = $q->fetchrow_array() || '';
+
+    my %TemplateData = (
+			TaskID=> $WFTaskID,
+            Lang => $Data->{'lang'},
+			TaskNotes=> $notes,
+			client => $Data->{client},
+            target=>$Data->{'target'},
+            action => 'WF_notesS',
+	);
+
+	my $body = runTemplate(
+			$Data,
+			\%TemplateData,
+			'dashboards/worktask_notes.templ',
+	);
+    
+    return ($body, $title);
+}
+sub resolveTask {
+    my(
+        $Data,
+    ) = @_;
+	
+	my $st = '';
+	my $q = '';
+	my $db=$Data->{'db'};
+
+	#Get values from the QS
+    my $WFTaskID = safe_param('TID','number') || '';
+	
+	#Update this task to REJECTED
+	$st = qq[
+	  	UPDATE tblWFTask 
+        SET 
+	  		strTaskStatus = 'ACTIVE'
+	  	WHERE 
+            intWFTaskID = ? 
+            AND intProblemResolutionEntityID = ?
+            AND intRealmID = ?
+    ];
+		
+warn("DDDD");
+  	$q = $db->prepare($st);
+  	$q->execute(
+  		$WFTaskID,
+        getLastEntityID($Data->{'clientValues'}),
+        $Data->{'Realm'}
+  	);
+    setDocumentStatus($Data, $WFTaskID, 'PENDING');
+  		
+	if ($q->errstr) {
+		return $q->errstr . '<br>' . $st
+	}
+	
+    return(0);
+    
+}
+
 sub rejectTask {
     my(
         $Data,
@@ -956,14 +1098,16 @@ sub rejectTask {
 	  		intRejectedUserID = ?,
 	  		dtRejectedDate = NOW()
 	  	WHERE 
-            intWFTaskID = ?; 
+            intWFTaskID = ? 
+            AND intRealmID= ?
     ];
 		
   	$q = $db->prepare($st);
   	$q->execute(
 	  	$Data->{'clientValues'}{'userID'},
   		$WFTaskID,
-  		);
+        $Data->{'Realm'}
+  	);
     setDocumentStatus($Data, $WFTaskID, 'REJECTED');
   		
 	if ($q->errstr) {

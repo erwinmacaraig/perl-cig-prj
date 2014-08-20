@@ -1,21 +1,15 @@
 DROP TABLE IF EXISTS tblDocuments;
-CREATE TABLE tblDocuments (
-    intDocumentID int NOT NULL AUTO_INCREMENT,
-    intDocumentTypeID INT DEFAULT 0,
-    intEntityLevel tinyint default 0, /*Person, Entity */
-    intEntityID INT DEFAULT 0, /* ID of the Person, Entity*/
-    strApprovalStatus varchar(30) default '', /* PENDING , APPROVED, REJECTED */
-    strDeniedNotes  TEXT default '',
-    dtAdded datetime,
-    strPath VARCHAR(50) NOT NULL,
-    strFilename VARCHAR(50) NOT NULL,
-    strOrigFilename VARCHAR(250) NOT NULL,
-    strExtension CHAR(4),
-    intBytes INT DEFAULT 1,
-    tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-  PRIMARY KEY (intDocumentID),
-  KEY index_DocumentType(intDocumentID),
-  KEY index_Entity(intEntityLevel , intEntityID)
-) DEFAULT CHARSET=utf8;
-
+CREATE TABLE IF NOT EXISTS tblDocuments (
+  intDocumentID INT(11) NOT NULL AUTO_INCREMENT,
+  intDocumentTypeID INT(11) NULL,
+  intEntityLevel TINYINT(4) NULL,
+  intEntityID INT(11) NOT NULL DEFAULT 0,
+  intPersonID INT(11) NOT NULL DEFAULT 0,
+  intPersonRegistrationID INT(11) NOT NULL DEFAULT 0,
+  intClearanceID INT(11) NOT NULL,
+  strDeniedNotes TEXT NULL,
+  strApprovalStatus VARCHAR(30) NOT NULL DEFAULT 'PENDING',
+  intUploadFileID INT(11) NOT NULL,
+  PRIMARY KEY (intDocumentID)
+)ENGINE = InnoDB;
