@@ -450,6 +450,7 @@ sub addWorkFlowTasks {
             pr.intEntityID as RegoEntity,
             0 as DocumentID
 		FROM tblPersonRegistration_$Data->{'Realm'} AS pr
+        INNER JOIN tblPerson as p ON (p.intPersonID = pr.intPersonID)
         INNER JOIN tblEntity as e ON (e.intEntityID = pr.intEntityID)
 		INNER JOIN tblWFRule AS r ON (
 			pr.intRealmID = r.intRealmID
@@ -459,6 +460,8 @@ sub addWorkFlowTasks {
 			AND pr.strSport = r.strSport
             AND pr.strPersonType = r.strPersonType
             AND r.intEntityLevel = e.intEntityLevel
+            AND (r.strISOCountry_IN = '' OR r.strISOCountry_IN LIKE CONCAT('%|',p.strISOCountry,'|%'))
+            AND (r.strISOCountry_NOTIN = '' OR r.strISOCountry_NOTIN NOT LIKE CONCAT('%|',p.strISOCountry,'|%'))
         )
 		WHERE 
             pr.intPersonRegistrationID = ?
@@ -632,7 +635,7 @@ sub approveTask {
         $Data->{'Realm'}
   	);
   		
-    setDocumentStatus($Data, $WFTaskID, 'APRROVED');
+    setDocumentStatus($Data, $WFTaskID, 'APPROVED');
 	if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
 	}
@@ -911,6 +914,7 @@ sub setDocumentStatus  {
 
     my $q = $Data->{'db'}->prepare($st);
     $q->execute($taskID);
+warn("IN SET DOCO FOR $taskID");
 
     my $dref= $q->fetchrow_hashref();
     my $personID = $dref->{intPersonID} || 0;
@@ -923,6 +927,7 @@ sub setDocumentStatus  {
 
     return if (! $entityID and !$personID);
     return if (! $documentID and !$documentTypeID);
+warn("-----STILL IN SET DOCO FOR $taskID, P $personID, $documentTypeID");
 
     $st = qq[
         UPDATE tblDocuments
@@ -956,6 +961,9 @@ sub setDocumentStatus  {
         $st .= qq[ AND intDocumentID = ?];
         push @values, $documentID;
     }
+warn($st);
+use Data::Dumper;
+print STDERR Dumper(\@values);
   	$q = $Data->{'db'}->prepare($st);
   	$q->execute(@values);
 }
