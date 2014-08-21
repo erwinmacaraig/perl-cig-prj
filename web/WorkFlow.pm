@@ -865,7 +865,8 @@ warn("CHECKING $update_count");
                     SET
 	            	    strStatus = 'ACTIVE',
                         intCurrent=1,
-	            	    dtFrom = NOW()
+	            	    dtFrom = NOW(),
+                        dtLastUpdated=NOW()
 	    	        WHERE 
                         intPersonRegistrationID = ?
 	        	];

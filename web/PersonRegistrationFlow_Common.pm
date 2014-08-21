@@ -27,6 +27,7 @@ use Payments;
 use RegoTypeLimits;
 use TTTemplate;
 use Transactions;
+use Products;
 use Data::Dumper;
 
 sub displayRegoFlowCompleteBulk {
@@ -174,10 +175,11 @@ sub displayRegoFlowProducts {
     my @prodIDs = ();
     my %ProductRules=();
     foreach my $product (@{$products})  {
+        #next if($product->{'UseExistingThisEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'THIS_ENTITY'));
+        #next if($product->{'UseExistingAnyEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'ANY_ENTITY'));
 
-        next if($product->{'UseExistingThisEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'THIS_ENTITY'));
-#        $product->{'HaveForThisEntity'} =1;
-        next if($product->{'UseExistingAnyEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'ANY_ENTITY'));
+        $product->{'HaveForAnyEntity'} =1 if($product->{'UseExistingAnyEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'ANY_ENTITY'));
+        $product->{'HaveForThisEntity'} =1 if($product->{'UseExistingThisEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'THIS_ENTITY'));
 
         push @prodIDs, $product->{'ID'};
         $ProductRules{$product->{'ID'}} = $product;
@@ -219,7 +221,6 @@ sub displayRegoFlowProductsBulk {
     my @prodIDs = ();
     my %ProductRules=();
     foreach my $product (@{$products})  {
-
         push @prodIDs, $product->{'ID'};
         $ProductRules{$product->{'ID'}} = $product;
      }
@@ -231,7 +232,9 @@ sub displayRegoFlowProductsBulk {
      my %PageData = (
         nextaction=>"PREGFB_PU",
         target => $Data->{'target'},
-        product_body => "HANDLE EXISTING " .$product_body,
+        product_body => $product_body,
+        allowManualPay=> 1,
+        manualPaymentTypes => \%Defs::manualPaymentTypes,
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
         client=>$client,
@@ -300,18 +303,29 @@ sub validateRegoID {
 }
 
 sub save_rego_products {
-    my ($Data, $regoID, $personID, $entityID, $entityLevel, $params) = @_;
+    my ($Data, $regoID, $personID, $entityID, $entityLevel, $rego_ref, $params) = @_;
 
     my $session='';
 
-    my $txns_added = insertRegoTransaction($Data, $regoID, $personID, $params, $entityID, $entityLevel, 1, $session);
+    my $products = getRegistrationItems(
+        $Data,
+        'REGO',
+        'PRODUCT',
+        $rego_ref->{'intOriginLevel'} || $rego_ref->{'originLevel'},
+        $rego_ref->{'strRegistrationNature'} || $rego_ref->{'registrationNature'},
+        $entityID,
+        $entityLevel,
+        0,
+        $rego_ref,
+    );
+    my ($txns_added, $amount) = insertRegoTransaction($Data, $regoID, $personID, $params, $entityID, $entityLevel, 1, $session, $products);
     my $txnIds = join(':',@{$txns_added});
     return $txnIds;
 }
 
 
 sub add_rego_record{
-    my ($Data, $personID, $entityID, $entityLevel, $originLevel, $personType, $personEntityRole, $personLevel, $sport, $ageLevel, $registrationNature) =@_;
+    my ($Data, $personID, $entityID, $entityLevel, $originLevel, $personType, $personEntityRole, $personLevel, $sport, $ageLevel, $registrationNature, $ruleFor) =@_;
 
     my $clientValues = $Data->{'clientValues'};
     my $rego_ref = {
@@ -328,8 +342,8 @@ sub add_rego_record{
         entityLevel => $entityLevel,
         personID => $personID,
         current => 1,
+        ruleFor=>$ruleFor
     };
-print STDERR Dumper($rego_ref);
     my ($personStatus, $prStatus) = checkIsSuspended($Data, $personID, $entityID, $rego_ref->{'personType'});
     return (0, undef, 'SUSPENDED') if ($personStatus eq 'SUSPENDED' or $prStatus eq 'SUSPENDED');
         
@@ -354,12 +368,25 @@ print STDERR Dumper($rego_ref);
  
 sub bulkRegoSubmit {
 
-    my ($Data, $bulk_ref, $rolloverIDs) = @_;
+    my ($Data, $bulk_ref, $rolloverIDs, $productIDs, $markPaid, $paymentType) = @_;
 
     my $body = 'Submitting';
     my @IDs= split /\|/, $rolloverIDs;
+
+    my $products = getRegistrationItems(
+        $Data,
+        'REGO',
+        'PRODUCT',
+        $bulk_ref->{'originLevel'},
+        $bulk_ref->{'registrationNature'},
+        $bulk_ref->{'entityID'},
+        $bulk_ref->{'entityLevel'},
+        0,
+        $bulk_ref,
+    );
+ 
+
     for my $pID (@IDs)   {
-        $body .= qq[INSERT PRODUCTS & NEEED TO CHECK LIMITS !!!!!<p>P:$pID>/p>];
         my ($regoID, $rego_ref, $msg) = add_rego_record(
             $Data, 
             $pID, 
@@ -371,17 +398,42 @@ sub bulkRegoSubmit {
             $bulk_ref->{'personLevel'}, 
             $bulk_ref->{'sport'}, 
             $bulk_ref->{'ageLevel'}, 
-            $bulk_ref->{'registrationNature'}
+            $bulk_ref->{'registrationNature'},
+            "BULKREGO"
         );
         submitPersonRegistration(
             $Data,
             $pID,
             $regoID,
             $bulk_ref
-         );
+        );
+        my @products = split /\:/, $productIDs;
+        my %Products=();
+        foreach my $product (@products) {
+            $Products{'prod_'.$product} =1;
+        }
+        my ($txns_added, $amount) = insertRegoTransaction(
+            $Data, 
+            $regoID, 
+            $pID, 
+            \%Products, 
+            $bulk_ref->{'entityID'}, 
+            $bulk_ref->{'entityLevel'}, 
+            $Defs::LEVEL_PERSON, 
+            '',
+            $products
+        );
+        if ($paymentType and $markPaid)  {
+            my %Settings=();
+            $Settings{'paymentType'} = $paymentType;
+            my $logID = createTransLog($Data, \%Settings, $bulk_ref->{'entityID'},$txns_added, $amount); 
+            UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $logID);
+            product_apply_transaction($Data,$logID);
+        }
     }
     
     return $body;
 }
+
 1;
 

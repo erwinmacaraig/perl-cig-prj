@@ -51,7 +51,9 @@ sub getRegistrationItems    {
 			AND RI.strAgeLevel = ?		
             AND RI.strItemType = ?
     ];
-	warn("ruleFor:$ruleFor origin $originLevel $regNature $itemType");
+	warn("ruleFor:$ruleFor origin $originLevel $regNature $itemType ");
+use Data::Dumper;
+print STDERR Dumper($Rego_ref);
 	my $q = $Data->{'db'}->prepare($st) or query_error($st);
 	$q->execute(
         $Data->{'Realm'},

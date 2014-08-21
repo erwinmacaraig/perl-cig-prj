@@ -108,7 +108,7 @@ warn("FBEND:$personID");
     }
     if ( $action eq 'PREGF_PU' ) {
         #Update product records
-        $Hidden{'txnIds'} = save_rego_products($Data, $regoID, $personID, $entityID, $entityLevel, \%params);
+        $Hidden{'txnIds'} = save_rego_products($Data, $regoID, $personID, $entityID, $entityLevel, $rego_ref, \%params);
         $action = $Flow{$action};
     }
     if ( $action eq 'PREGF_DU' ) {

@@ -33,7 +33,6 @@ sub handleRegistrationFlowBulk {
     my $client = $Data->{'client'};
     my $clientValues = $Data->{'clientValues'};
     my $cl = setClient($clientValues);
-    my $rego_ref = {};
     my $cgi=new CGI;
     my %params=$cgi->Vars();
     my $lang = $Data->{'lang'};
@@ -85,7 +84,10 @@ sub handleRegistrationFlowBulk {
 
     if ( $action eq 'PREGFB_SPU' ) {
         my $rolloverIDs= param('rolloverIDs') || '';
-        $body .= bulkRegoSubmit($Data, $bulk_ref, $rolloverIDs);
+        my $prodIds = param('prodIds');
+        my $markPaid = param('markPaid');
+        my $paymentType= param('paymentType');
+        $body .= bulkRegoSubmit($Data, $bulk_ref, $rolloverIDs, $prodIds, $markPaid, $paymentType);
 #        return $Data->{'lang'}->txt("No $Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'} selected") if (! scalar @MembersToRollover);
         $body .= qq[ROLLOVER FOR $rolloverIDs];
         warn("ROLLOVER$rolloverIDs");
@@ -94,6 +96,24 @@ sub handleRegistrationFlowBulk {
     if ( $action eq 'PREGFB_PU' ) {
         #Update product records
         #$Hidden{'txnIds'} = save_rego_products($Data, $regoID, $personID, $entityID, $entityLevel, \%params);
+        my @productsselected=();
+        for my $k (%params)  {
+            if($k=~/prod_/) {
+                if($params{$k}==1)  {
+                    my $prod=$k;
+                    $prod=~s/[^\d]//g;
+                    push @productsselected, $prod;
+                }
+            }
+            if ($k eq 'markPaid' && $params{$k} == 1)   {
+                $Hidden{'markPaid'} = 1;
+            }
+            if ($k eq 'paymentType' && $params{$k})   {
+                $Hidden{'paymentType'} = $params{$k};
+            }
+        }
+        my $prodIds= join(':',@productsselected);
+        $Hidden{'prodIds'} = $prodIds;
         ## PUT PRODUCTS IN HIDDEN
         $action = $Flow{$action};
     }
@@ -113,16 +133,14 @@ sub handleRegistrationFlowBulk {
         );
     }
     elsif ( $action eq 'PREGFB_SP' ) {
-#        my ($listPersons_body, undef) = listPersons($Data, $entityID, '');
         my ($listPersons_body, undef) = bulkPersonRollover($Data, 'PREGFB_SPU', $bulk_ref, \%Hidden);
-        $body .= qq[NEED TO FILTER FOR THOSE WHO ALREADY MATCH BUT IF RENEWAL, SHOW NEW etc<br>IF NEW, WANT ZERO ALREADY ETC];
         $body .= $listPersons_body;
    }
     elsif ( $action eq 'PREGFB_P' ) {
-        $body .= displayRegoFlowProductsBulk($Data, 0, $client, $entityLevel, $originLevel, $rego_ref, $entityID, $personID, \%Hidden);
+        $body .= displayRegoFlowProductsBulk($Data, 0, $client, $entityLevel, $originLevel, $bulk_ref, $entityID, $personID, \%Hidden);
    }
     elsif ( $action eq 'PREGFB_C' ) {
-        $body .= displayRegoFlowCompleteBulk($Data, 0, $client, $originLevel, $rego_ref, $entityID, $personID, \%Hidden);
+        $body .= displayRegoFlowCompleteBulk($Data, 0, $client, $originLevel, $bulk_ref, $entityID, $personID, \%Hidden);
     }    
     else {
     }

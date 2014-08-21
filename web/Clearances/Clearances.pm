@@ -1349,6 +1349,7 @@ sub finaliseClearance	{
     $reg{'current'} = 1;
     $reg{'entityLevel'} = $destinationEntityLevel;
     $reg{'registrationNature'} = 'TRANSFER';
+    $reg{'clearanceID'} = $cID;
 
     my $matrix_ref = getRuleMatrix($Data, $Defs::ORIGIN_SELF, $destinationEntityLevel, $Defs::LEVEL_PERSON, $reg{'entityType'} || '','REGO', \%reg);
     $reg{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;

@@ -206,7 +206,8 @@ sub deletePersonRegistered  {
 
     my $st = qq[
         UPDATE tblPersonRegistration_$Data->{'Realm'}
-        SET strStatus = 'DELETED'
+        SET strStatus = 'DELETED',
+            dtLastUpdated=NOW()
         WHERE
             intPersonID = ?
             AND intPersonRegistrationID = ?
@@ -556,7 +557,9 @@ sub addRegistration {
     my $status = $Reg_ref->{'status'} || 'PENDING';
 
     if (! exists $Reg_ref->{'paymentRequired'})    {
-        my $matrix_ref = getRuleMatrix($Data, $Reg_ref->{'originLevel'}, $Reg_ref->{'entityLevel'}, $Defs::LEVEL_PERSON, $Reg_ref->{'entityType'} || '', 'REGO', $Reg_ref);
+        my $ruleFor = 'REGO';
+        $ruleFor = $Reg_ref->{'ruleFor'} if ($Reg_ref->{'ruleFor'});
+        my $matrix_ref = getRuleMatrix($Data, $Reg_ref->{'originLevel'}, $Reg_ref->{'entityLevel'}, $Defs::LEVEL_PERSON, $Reg_ref->{'entityType'} || '', $ruleFor, $Reg_ref);
         $Reg_ref->{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
         $Reg_ref->{'dateFrom'} = $matrix_ref->{'dtFrom'} if (! $Reg_ref->{'dtFrom'});
         $Reg_ref->{'dateTo'} = $matrix_ref->{'dtTo'} if (! $Reg_ref->{'dtTo'});
@@ -606,7 +609,8 @@ sub addRegistration {
             intAgeGroupID,
             strAgeLevel,
             strRegistrationNature,
-            intPaymentRequired
+            intPaymentRequired,
+            intClearanceID
 		)
 		VALUES
 		(
@@ -628,6 +632,7 @@ sub addRegistration {
             ?,
             NOW(),
             NOW(),
+            ?,
             ?,
             ?,
             ?,
@@ -659,6 +664,7 @@ sub addRegistration {
   		$Reg_ref->{'ageLevel'} || '',
   		$Reg_ref->{'registrationNature'} || '',
   		$Reg_ref->{'paymentRequired'} || 0
+  		$Reg_ref->{'clearanceID'} || 0
   	);
 	
 	if ($q->errstr) {
