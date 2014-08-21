@@ -948,10 +948,6 @@ warn("-----STILL IN SET DOCO FOR $taskID, P $personID, $documentTypeID");
         push @values, $Defs::LEVEL_PERSON;
     }
     
-    if ($personRegistrationID)    {
-        $st .= qq[ AND intPersonRegistrationID= ?];
-        push @values, $personRegistrationID;
-    }
     
     if ($documentTypeID)    {
         $st .= qq[ AND intDocumentTypeID = ?];
@@ -961,9 +957,16 @@ warn("-----STILL IN SET DOCO FOR $taskID, P $personID, $documentTypeID");
         $st .= qq[ AND intDocumentID = ?];
         push @values, $documentID;
     }
-warn($st);
-use Data::Dumper;
-print STDERR Dumper(\@values);
+    if ($personRegistrationID)    {
+        $st .= qq[ AND intPersonRegistrationID IN (0,?) ];
+        push @values, $personRegistrationID;
+        $st .= qq[ 
+            ORDER BY intPersonRegistrationID DESC
+        ];
+    }
+    $st .= qq[
+        LIMIT 1
+    ];
   	$q = $Data->{'db'}->prepare($st);
   	$q->execute(@values);
 }

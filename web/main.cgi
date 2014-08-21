@@ -62,6 +62,7 @@ use DashboardConfig;
 use WorkFlow;
 use EntityRegistrationAllowedEdit;
 use PersonRegistrationFlow_Backend;
+use PersonRegistrationFlow_Bulk;
 
 use Log;
 use Data::Dumper;
@@ -255,6 +256,9 @@ warn("REALM IS ". $Data{'Realm'});
     }
     elsif ( $action =~ /^PREGF_/ ) {
         ( $resultHTML, $pageHeading ) = handleRegistrationFlowBackend($action, \%Data);
+    }
+    elsif ( $action =~ /^PREGFB_/ ) {
+        ( $resultHTML, $pageHeading ) = handleRegistrationFlowBulk($action, \%Data);
     }
     # BUILD PAGE
     if ( !$report ) {

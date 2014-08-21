@@ -6,10 +6,12 @@ require Exporter;
     displayRegoFlowCheckout
     displayRegoFlowDocuments
     displayRegoFlowProducts
+    displayRegoFlowProductsBulk
     generateRegoFlow_Gateways
     validateRegoID
     save_rego_products
     add_rego_record
+    bulk_rego_submit
 );
 
 use strict;
@@ -56,6 +58,7 @@ sub displayRegoFlowComplete {
             $Data, 
             $personID,
             $regoID,
+            $rego_ref
          );
          my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
          my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
@@ -68,6 +71,7 @@ sub displayRegoFlowComplete {
             gateways => $gateways,
             txns_url => $pay_url,
             target => $Data->{'target'},
+            RegoStatus => $rego_ref->{'strStatus'},
             hidden_ref=> $hidden_ref,
             Lang => $Data->{'lang'},
             client=>$client,
@@ -159,6 +163,7 @@ sub displayRegoFlowProducts {
     foreach my $product (@{$products})  {
 
         next if($product->{'UseExistingThisEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'THIS_ENTITY'));
+#        $product->{'HaveForThisEntity'} =1;
         next if($product->{'UseExistingAnyEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'ANY_ENTITY'));
 
         push @prodIDs, $product->{'ID'};
@@ -173,6 +178,47 @@ sub displayRegoFlowProducts {
         nextaction=>"PREGF_PU",
         target => $Data->{'target'},
         product_body => $product_body,
+        hidden_ref=> $hidden_ref,
+        Lang => $Data->{'lang'},
+        client=>$client,
+    );
+    my $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ') || '';
+
+    return $pagedata;
+}
+sub displayRegoFlowProductsBulk {
+
+    my ($Data, $regoID, $client, $entityRegisteringForLevel, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref) = @_;
+    my $lang=$Data->{'lang'};
+
+    my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_PU&amp;rID=$regoID";
+    my $products = getRegistrationItems(
+        $Data,
+        'REGO',
+        'PRODUCT',
+        $originLevel,
+        $rego_ref->{'strRegistrationNature'} || $rego_ref->{'registrationNature'},
+        $entityID,
+        $entityRegisteringForLevel,
+        0,
+        $rego_ref,
+    );
+    my @prodIDs = ();
+    my %ProductRules=();
+    foreach my $product (@{$products})  {
+
+        push @prodIDs, $product->{'ID'};
+        $ProductRules{$product->{'ID'}} = $product;
+     }
+    my $product_body='';
+    if (@prodIDs)   {
+        $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
+     }
+
+     my %PageData = (
+        nextaction=>"PREGFB_PU",
+        target => $Data->{'target'},
+        product_body => "HANDLE EXISTING " .$product_body,
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
         client=>$client,
@@ -250,6 +296,126 @@ sub save_rego_products {
     return $txnIds;
 }
 
+
+sub add_rego_record{
+    my ($Data, $personID, $entityID, $entityLevel, $originLevel) =@_;
+
+    my $clientValues = $Data->{'clientValues'};
+    my $rego_ref = {
+        status => 'INPROGRESS',
+        personType => param('pt') || '',
+        personEntityRole=> param('per') || '',
+        personLevel => param('pl') || '',
+        sport => param('sp') || '',
+        ageLevel => param('ag') || '',
+        registrationNature => param('nat') || '',
+        originLevel => $originLevel,
+        originID => $entityID,
+        entityID => $entityID,
+        entityLevel => $entityLevel,
+        personID => $personID,
+        current => 1,
+    };
+
+    my ($personStatus, $prStatus) = checkIsSuspended($Data, $personID, $entityID, $rego_ref->{'personType'});
+    return (0, undef, 'SUSPENDED') if ($personStatus eq 'SUSPENDED' or $prStatus eq 'SUSPENDED');
+        
+    if ($rego_ref->{'registrationNature'} ne 'RENEWAL') {
+        my $ok = checkRegoTypeLimits($Data, $personID, 0, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
+        return (0, undef, 'LIMIT_EXCEEDED') if (!$ok);
+    }
+    if ($rego_ref->{'registrationNature'} eq 'RENEWAL') {
+        my $ok = checkRenewalRegoOK($Data, $personID, $rego_ref);
+        return (0, undef, 'RENEWAL_FAILED') if (!$ok);
+    }
+    if ($rego_ref->{'registrationNature'} eq 'NEW') {
+        my $ok = checkNewRegoOK($Data, $personID, $rego_ref);
+        return (0, undef, 'NEW_FAILED') if (!$ok);
+    }
+    my ($regID,$rc) = addRegistration($Data,$rego_ref);
+    if ($regID)     {
+        return ($regID, $rego_ref, '');
+    }
+    return (0, undef, '');
+}
+ 
+
+sub generateRegoFlow_Gateways   {
+
+    my ($Data, $client, $nextAction, $hidden_ref) = @_;
+
+    my $lang = $Data->{'lang'};
+    my (undef, $paymentTypes) = getPaymentSettings($Data, 0, 0, $Data->{'clientValues'});
+    my $gateway_body = qq[
+        <div id = "payment_cc" style= "ddisplay:none;"><br>
+    ];
+    my $gatewayCount = 0;
+    foreach my $gateway (@{$paymentTypes})  {
+        $gatewayCount++;
+        my $id = $gateway->{'intPaymentConfigID'};
+        my $pType = $gateway->{'paymentType'};
+        my $name = $gateway->{'gatewayName'};
+        $gateway_body .= qq[
+            <input type="submit" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
+            <input type="hidden" value="$pType" name="pt_submit[$gatewayCount]">
+        ];
+    }
+    $gateway_body .= qq[
+        <input type="hidden" value="$gatewayCount" name="gatewayCount">
+        <div style= "clear:both;"></div>
+        </div>
+    ];
+    $gateway_body = '' if ! $gatewayCount;
+
+    my %PageData = (
+        nextaction=>$nextAction,
+        target => $Data->{'target'},
+        gateway_body => $gateway_body,
+        hidden_ref=> $hidden_ref,
+        Lang => $Data->{'lang'},
+        client=>$client,
+    );
+    return runTemplate($Data, \%PageData, 'registration/show_gateways.templ') || '';
+}
+
+sub validateRegoID {
+    my ($Data, $personID, $regoID, $entityID) = @_;
+
+    my %Reg = (
+        personRegistrationID => $regoID,
+        entityID => $entityID || 0,
+    );
+    my ($count, $regs) = getRegistrationData(
+        $Data, 
+        $personID,
+        \%Reg
+    );
+    if ($count) {
+        return ($count, $regs->[0]);
+    }
+    return (0, undef);
+
+}
+
+sub save_rego_products {
+    my ($Data, $regoID, $personID, $entityID, $entityLevel, $params) = @_;
+
+    my $session='';
+
+    my $txns_added = insertRegoTransaction($Data, $regoID, $personID, $params, $entityID, $entityLevel, 1, $session);
+    my $txnIds = join(':',@{$txns_added});
+    return $txnIds;
+}
+
+sub bulk_rego_submit {
+#($regoID, $rego_ref, $msg) = add_rego_record($Data, $personID, $entityID, $entityLevel, $originLevel);
+        ### FOR EACH person,
+#            checkRegoTypeLimits
+ #           add_rego
+                ## FOR EACH PRODUCT add_products
+             #submitPersonRegistration
+        ##
+}
 
 sub add_rego_record{
     my ($Data, $personID, $entityID, $entityLevel, $originLevel) =@_;

@@ -28,8 +28,10 @@ sub displayPersonRegisterWhat   {
         $gender,
         $originLevel,
         $continueURL,
+        $bulk,
     ) = @_;
 warn("AIN DISPLAY");
+    $bulk ||= 0;
     my %templateData = (
         originLevel => $originLevel || 0,
         personID => $personID || 0,
@@ -42,10 +44,12 @@ warn("AIN DISPLAY");
         continueURL => $continueURL || '',
     );
 
+    my $template = "registration/what.templ";
+    $template = "registration/whatbulk.templ" if ($bulk);
     my $body = runTemplate(
         $Data, 
         \%templateData, 
-        "registration/what.templ"
+        $template
     );
     return $body || '';
 }
@@ -69,7 +73,9 @@ sub optionsPersonRegisterWhat {
         $dob,
         $gender,
         $lookingFor,
+        $bulk
     ) = @_;
+    $bulk ||= 0;
 
 warn("AAAAA1");
     my $pref= undef;
@@ -171,7 +177,7 @@ warn("STEP $step FOR $sport");
         }
     }
 
-    if (! checkMatrixOK($Data, $MATRIXwhere, \@MATRIXvalues))   {
+    if (! checkMatrixOK($Data, $MATRIXwhere, \@MATRIXvalues, $bulk))   {
 warn("AERROR WITH MATRIX");
         return (\@retdata, '');
     }
@@ -260,7 +266,7 @@ sub returnEntityRoles   {
 
 sub checkMatrixOK   {
 
-    my ($Data, $where, $values_ref) = @_;
+    my ($Data, $where, $values_ref, $bulk) = @_;
 
     my $st = qq[
         SELECT COUNT(intMatrixID) as CountNum
@@ -272,6 +278,9 @@ sub checkMatrixOK   {
             AND intSubRealmID IN (0,?)
             $where
     ];
+    if ($bulk)  {
+        $st .= qq[ AND strWFRuleFor ='BULKREGO'];
+    }
 warn($st);
 print STDERR Dumper($values_ref);
     my $q = $Data->{'db'}->prepare($st);

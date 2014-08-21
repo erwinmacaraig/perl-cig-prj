@@ -686,7 +686,7 @@ sub addRegistration {
 
 sub submitPersonRegistration    {
 
-    my ($Data, $personID, $personRegistrationID) = @_;
+    my ($Data, $personID, $personRegistrationID, $rego_ref) = @_;
 
     my %Reg=();
     $Reg{'personRegistrationID'} = $personRegistrationID;
@@ -709,6 +709,11 @@ sub submitPersonRegistration    {
             0
         );
         personInProgressToPending($Data, $personID);
+        ($count, $regs) = getRegistrationData($Data, $personID, \%Reg);
+        if ($count) {
+            my $pr_ref = $regs->[0];
+            $rego_ref->{'strStatus'} = $pr_ref->{'strStatus'};
+        }
     }
 }
 

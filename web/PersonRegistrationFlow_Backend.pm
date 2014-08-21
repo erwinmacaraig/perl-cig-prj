@@ -51,7 +51,7 @@ sub handleRegistrationFlowBackend   {
     $Hidden{'txnIds'} = $params{'txnIds'} || '';
 
     my $pref= undef;
-    if ($personID)  {
+    if ($personID && $personID>0)  {
         $pref = loadPersonDetails($Data->{'db'}, $personID);
     }
 warn("FBEND:$personID");
