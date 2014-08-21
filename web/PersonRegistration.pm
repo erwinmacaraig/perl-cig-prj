@@ -55,7 +55,6 @@ sub rolloverExistingPersonRegistrations {
     foreach my $rego (@{$regs_ref})  {
         next if ($rego->{'intPersonRegistrationID'} == $personRegistrationID);
         my $thisRego = $rego;
-warn("IN HERE FOR $rego->{'intPersonRegistrationID'}");
         $thisRego->{'intCurrent'} = 0;
         $thisRego->{'strStatus'} = $Defs::PERSONREGO_STATUS_ROLLED_OVER;
         updatePersonRegistration($Data, $personID, $rego->{'intPersonRegistrationID'}, $thisRego);
@@ -84,11 +83,9 @@ sub checkIsSuspended    {
             AND P.intPersonID = ?
         LIMIT 1
     ];
-warn($st);
   	my $q= $Data->{'db'}->prepare($st);
     $q->execute($entityID, $personType, $Data->{'Realm'}, $personID) or query_error($st);
     my ($personStatus, $prStatus) = $q->fetchrow_array();
-warn("STATUS:$personStatus $prStatus for $entityID $personType");
     $personStatus ||= '';
     $prStatus ||= '';
     return ($personStatus, $prStatus);
@@ -526,7 +523,6 @@ sub getRegistrationData	{
         ORDER BY
           pr.dtAdded DESC
     ];	
-warn($st);
     my $db=$Data->{'db'};
     my $query = $db->prepare($st) or query_error($st);
 
@@ -565,7 +561,7 @@ sub addRegistration {
         $Reg_ref->{'dateTo'} = $matrix_ref->{'dtTo'} if (! $Reg_ref->{'dtTo'});
         $Reg_ref->{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
     }
-    my $nationalPeriodID = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $Reg_ref->{'sport'});
+    my $nationalPeriodID = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $Reg_ref->{'sport'}, $Reg_ref->{'registrationNature'});
     my $genAgeGroup ||=new GenAgeGroup ($Data->{'db'},$Data->{'Realm'}, $Data->{'RealmSubType'});
     my $ageGroupID = 0;
 
@@ -663,7 +659,7 @@ sub addRegistration {
   		$ageGroupID || 0,
   		$Reg_ref->{'ageLevel'} || '',
   		$Reg_ref->{'registrationNature'} || '',
-  		$Reg_ref->{'paymentRequired'} || 0
+  		$Reg_ref->{'paymentRequired'} || 0,
   		$Reg_ref->{'clearanceID'} || 0
   	);
 	

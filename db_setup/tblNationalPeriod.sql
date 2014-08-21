@@ -7,6 +7,9 @@ CREATE TABLE tblNationalPeriod (
   intSubRealmID INT,
   dtFrom DATE,
   dtTo DATE,
+  intCurrentNew TINYINT DEFAULT 0, 
+  intCurrentRenewal TINYINT DEFAULT 0,
+
   PRIMARY KEY (intNationalPeriodID),
   KEY index_intRealm(intRealmID, intSubRealmID, strSport)
 );
