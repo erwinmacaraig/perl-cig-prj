@@ -36,7 +36,7 @@ sub handleRegistrationFlowBulk {
     my $cgi=new CGI;
     my %params=$cgi->Vars();
     my $lang = $Data->{'lang'};
-    my $personID = param('pID') || getID($clientValues, $Defs::LEVEL_PERSON) || 0;
+    my $personID = 0; #param('pID') || getID($clientValues, $Defs::LEVEL_PERSON) || 0;
     my $entityID = getLastEntityID($clientValues) || 0;
     my $entityLevel = getLastEntityLevel($clientValues) || 0;
     my $originLevel = $Data->{'clientValues'}{'authLevel'} || 0;
