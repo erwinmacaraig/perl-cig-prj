@@ -3,6 +3,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = @EXPORT_OK = qw(
     displayRegoFlowComplete
+    displayRegoFlowCompleteBulk
     displayRegoFlowCheckout
     displayRegoFlowDocuments
     displayRegoFlowProducts
@@ -11,7 +12,7 @@ require Exporter;
     validateRegoID
     save_rego_products
     add_rego_record
-    bulk_rego_submit
+    bulkRegoSubmit
 );
 
 use strict;
@@ -28,6 +29,18 @@ use TTTemplate;
 use Transactions;
 use Data::Dumper;
 
+sub displayRegoFlowCompleteBulk {
+
+    my ($Data, $client) = @_;
+    my %PageData = (
+        target => $Data->{'target'},
+        Lang => $Data->{'lang'},
+        client=>$client,
+    );
+    my $body = runTemplate($Data, \%PageData, 'registration/completebulk.templ') || '';
+    return $body;
+}
+    
 sub displayRegoFlowComplete {
 
     my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref) = @_;
@@ -298,17 +311,17 @@ sub save_rego_products {
 
 
 sub add_rego_record{
-    my ($Data, $personID, $entityID, $entityLevel, $originLevel) =@_;
+    my ($Data, $personID, $entityID, $entityLevel, $originLevel, $personType, $personEntityRole, $personLevel, $sport, $ageLevel, $registrationNature) =@_;
 
     my $clientValues = $Data->{'clientValues'};
     my $rego_ref = {
         status => 'INPROGRESS',
-        personType => param('pt') || '',
-        personEntityRole=> param('per') || '',
-        personLevel => param('pl') || '',
-        sport => param('sp') || '',
-        ageLevel => param('ag') || '',
-        registrationNature => param('nat') || '',
+        personType => $personType || '',
+        personEntityRole=> $personEntityRole || '',
+        personLevel => $personLevel || '',
+        sport => $sport || '',
+        ageLevel => $ageLevel || '',
+        registrationNature => $registrationNature || '',
         originLevel => $originLevel,
         originID => $entityID,
         entityID => $entityID,
@@ -316,7 +329,7 @@ sub add_rego_record{
         personID => $personID,
         current => 1,
     };
-
+print STDERR Dumper($rego_ref);
     my ($personStatus, $prStatus) = checkIsSuspended($Data, $personID, $entityID, $rego_ref->{'personType'});
     return (0, undef, 'SUSPENDED') if ($personStatus eq 'SUSPENDED' or $prStatus eq 'SUSPENDED');
         
@@ -339,122 +352,36 @@ sub add_rego_record{
     return (0, undef, '');
 }
  
+sub bulkRegoSubmit {
 
-sub generateRegoFlow_Gateways   {
+    my ($Data, $bulk_ref, $rolloverIDs) = @_;
 
-    my ($Data, $client, $nextAction, $hidden_ref) = @_;
-
-    my $lang = $Data->{'lang'};
-    my (undef, $paymentTypes) = getPaymentSettings($Data, 0, 0, $Data->{'clientValues'});
-    my $gateway_body = qq[
-        <div id = "payment_cc" style= "ddisplay:none;"><br>
-    ];
-    my $gatewayCount = 0;
-    foreach my $gateway (@{$paymentTypes})  {
-        $gatewayCount++;
-        my $id = $gateway->{'intPaymentConfigID'};
-        my $pType = $gateway->{'paymentType'};
-        my $name = $gateway->{'gatewayName'};
-        $gateway_body .= qq[
-            <input type="submit" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
-            <input type="hidden" value="$pType" name="pt_submit[$gatewayCount]">
-        ];
+    my $body = 'Submitting';
+    my @IDs= split /\|/, $rolloverIDs;
+    for my $pID (@IDs)   {
+        $body .= qq[INSERT PRODUCTS & NEEED TO CHECK LIMITS !!!!!<p>P:$pID>/p>];
+        my ($regoID, $rego_ref, $msg) = add_rego_record(
+            $Data, 
+            $pID, 
+            $bulk_ref->{'entityID'}, 
+            $bulk_ref->{'entityLevel'}, 
+            $bulk_ref->{'originLevel'}, 
+            $bulk_ref->{'personType'}, 
+            $bulk_ref->{'personEntityRole'}, 
+            $bulk_ref->{'personLevel'}, 
+            $bulk_ref->{'sport'}, 
+            $bulk_ref->{'ageLevel'}, 
+            $bulk_ref->{'registrationNature'}
+        );
+        submitPersonRegistration(
+            $Data,
+            $pID,
+            $regoID,
+            $bulk_ref
+         );
     }
-    $gateway_body .= qq[
-        <input type="hidden" value="$gatewayCount" name="gatewayCount">
-        <div style= "clear:both;"></div>
-        </div>
-    ];
-    $gateway_body = '' if ! $gatewayCount;
-
-    my %PageData = (
-        nextaction=>$nextAction,
-        target => $Data->{'target'},
-        gateway_body => $gateway_body,
-        hidden_ref=> $hidden_ref,
-        Lang => $Data->{'lang'},
-        client=>$client,
-    );
-    return runTemplate($Data, \%PageData, 'registration/show_gateways.templ') || '';
+    
+    return $body;
 }
+1;
 
-sub validateRegoID {
-    my ($Data, $personID, $regoID, $entityID) = @_;
-
-    my %Reg = (
-        personRegistrationID => $regoID,
-        entityID => $entityID || 0,
-    );
-    my ($count, $regs) = getRegistrationData(
-        $Data, 
-        $personID,
-        \%Reg
-    );
-    if ($count) {
-        return ($count, $regs->[0]);
-    }
-    return (0, undef);
-
-}
-
-sub save_rego_products {
-    my ($Data, $regoID, $personID, $entityID, $entityLevel, $params) = @_;
-
-    my $session='';
-
-    my $txns_added = insertRegoTransaction($Data, $regoID, $personID, $params, $entityID, $entityLevel, 1, $session);
-    my $txnIds = join(':',@{$txns_added});
-    return $txnIds;
-}
-
-sub bulk_rego_submit {
-#($regoID, $rego_ref, $msg) = add_rego_record($Data, $personID, $entityID, $entityLevel, $originLevel);
-        ### FOR EACH person,
-#            checkRegoTypeLimits
- #           add_rego
-                ## FOR EACH PRODUCT add_products
-             #submitPersonRegistration
-        ##
-}
-
-sub add_rego_record{
-    my ($Data, $personID, $entityID, $entityLevel, $originLevel) =@_;
-
-    my $clientValues = $Data->{'clientValues'};
-    my $rego_ref = {
-        status => 'INPROGRESS',
-        personType => param('pt') || '',
-        personEntityRole=> param('per') || '',
-        personLevel => param('pl') || '',
-        sport => param('sp') || '',
-        ageLevel => param('ag') || '',
-        registrationNature => param('nat') || '',
-        originLevel => $originLevel,
-        originID => $entityID,
-        entityID => $entityID,
-        entityLevel => $entityLevel,
-        personID => $personID,
-        current => 1,
-    };
-
-    my ($personStatus, $prStatus) = checkIsSuspended($Data, $personID, $entityID, $rego_ref->{'personType'});
-    return (0, undef, 'SUSPENDED') if ($personStatus eq 'SUSPENDED' or $prStatus eq 'SUSPENDED');
-        
-    if ($rego_ref->{'registrationNature'} ne 'RENEWAL') {
-        my $ok = checkRegoTypeLimits($Data, $personID, 0, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
-        return (0, undef, 'LIMIT_EXCEEDED') if (!$ok);
-    }
-    if ($rego_ref->{'registrationNature'} eq 'RENEWAL') {
-        my $ok = checkRenewalRegoOK($Data, $personID, $rego_ref);
-        return (0, undef, 'RENEWAL_FAILED') if (!$ok);
-    }
-    if ($rego_ref->{'registrationNature'} eq 'NEW') {
-        my $ok = checkNewRegoOK($Data, $personID, $rego_ref);
-        return (0, undef, 'NEW_FAILED') if (!$ok);
-    }
-    my ($regID,$rc) = addRegistration($Data,$rego_ref);
-    if ($regID)     {
-        return ($regID, $rego_ref, '');
-    }
-    return (0, undef, '');
-}

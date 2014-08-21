@@ -67,7 +67,14 @@ warn("FBEND:$personID");
     if ( $action eq 'PREGF_TU' ) {
         #add rego record with types etc.
         my $msg='';
-        ($regoID, $rego_ref, $msg) = add_rego_record($Data, $personID, $entityID, $entityLevel, $originLevel);
+        my $personType = param('pt') || '';
+        my $personEntityRole= param('per') || '';
+        my $personLevel = param('pl') || '';
+        my $sport = param('sp') || '';
+        my $ageLevel = param('ag') || '';
+        my $registrationNature = param('nat') || ''; 
+
+        ($regoID, $rego_ref, $msg) = add_rego_record($Data, $personID, $entityID, $entityLevel, $originLevel, $personType, $personEntityRole, $personLevel, $sport, $ageLevel, $registrationNature);
         if (!$regoID)   {
             my $error = '';
             if ($msg eq 'SUSPENDED')   {

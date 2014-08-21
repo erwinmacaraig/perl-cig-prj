@@ -20,6 +20,7 @@ use Person;
 use TTTemplate;
 use UploadFiles;
 use ListPersons;
+use BulkPersons;
 
 use Data::Dumper;
 
@@ -83,7 +84,11 @@ sub handleRegistrationFlowBulk {
     }
 
     if ( $action eq 'PREGFB_SPU' ) {
-        ## CALL A bulk_rego_submit()
+        my $rolloverIDs= param('rolloverIDs') || '';
+        $body .= bulkRegoSubmit($Data, $bulk_ref, $rolloverIDs);
+#        return $Data->{'lang'}->txt("No $Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'} selected") if (! scalar @MembersToRollover);
+        $body .= qq[ROLLOVER FOR $rolloverIDs];
+        warn("ROLLOVER$rolloverIDs");
         $action = $Flow{$action};
     }
     if ( $action eq 'PREGFB_PU' ) {
@@ -108,7 +113,8 @@ sub handleRegistrationFlowBulk {
         );
     }
     elsif ( $action eq 'PREGFB_SP' ) {
-        my ($listPersons_body, undef) = listPersons($Data, $entityID, '');
+#        my ($listPersons_body, undef) = listPersons($Data, $entityID, '');
+        my ($listPersons_body, undef) = bulkPersonRollover($Data, 'PREGFB_SPU', $bulk_ref, \%Hidden);
         $body .= qq[NEED TO FILTER FOR THOSE WHO ALREADY MATCH BUT IF RENEWAL, SHOW NEW etc<br>IF NEW, WANT ZERO ALREADY ETC];
         $body .= $listPersons_body;
    }
@@ -116,7 +122,7 @@ sub handleRegistrationFlowBulk {
         $body .= displayRegoFlowProductsBulk($Data, 0, $client, $entityLevel, $originLevel, $rego_ref, $entityID, $personID, \%Hidden);
    }
     elsif ( $action eq 'PREGFB_C' ) {
-        $body .= displayRegoFlowComplete($Data, 0, $client, $originLevel, $rego_ref, $entityID, $personID, \%Hidden);
+        $body .= displayRegoFlowCompleteBulk($Data, 0, $client, $originLevel, $rego_ref, $entityID, $personID, \%Hidden);
     }    
     else {
     }
