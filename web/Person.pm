@@ -163,9 +163,8 @@ sub handlePerson {
         $title = $lang->txt('Registration History');
     }
     elsif ( $action =~ /P_DOCS/ ) {
-        $resultHTML =  listDocuments($Data, $personID);
-        $title = $lang->txt('Registration Documents');
-    }
+        ($resultHTML,$title) =  listDocuments($Data, $personID);
+           }
     else {
         print STDERR "Unknown action $action\n";
     }
@@ -370,16 +369,46 @@ sub listDocuments {
         gridid => 'grid',
         width => '99%',
         
-   ); 
-     
-        $resultHTML = qq[
-        <div class="grid-filter-wrap">
-            <div style="width:99%;">&nbsp;</div>
-            $grid
-        </div>
-    ];
+   );  
+  
+   
+  my $addlink='';
+  {
+      $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=DOC_L">].$Data->{'lang'}->txt('Add').qq[</a></span>];
 
-    return ($resultHTML);
+  }
+    $query = qq[
+         SELECT strDocumentName, intDocumentTypeID FROM tblDocumentType WHERE strDocumentFor = ? AND intRealmID IN (0,?)
+    ]; 
+    $sth = $db->prepare($query);
+    $sth->execute($Defs::DOC_FOR_PERSON,$Data->{'Realm'});
+    my $doclisttype = qq[  <form action="$Data->{'target'}">
+                              <input type="hidden" name="client" value="$client" />
+                              <input type="hidden" name="a" value="DOC_L" />
+                              <label>Add File For</label>  
+                              <select name="doclisttype" id="doclisttype">
+                       ];
+    while(my $dref = $sth->fetchrow_hashref()){
+        $doclisttype .= qq[<option value="$dref->{'intDocumentTypeID'}">$dref->{'strDocumentName'}</option>];
+    } 
+   $doclisttype .= q[     </select> 
+                          <input type="submit" class="button-small generic-button" value="Go" />
+                    </form>
+                    ];
+#  my $modoptions=qq[<div class="changeoptions">$addlink</div>];
+ my $modoptions=qq[<div class="changeoptions"></div>];
+
+ my $title = $lang->txt('Registration Documents') ;
+ 
+       # $modoptions   
+        $resultHTML = qq[ $modoptions                       
+                   <div style="width:955555%;"> 
+                      <div class="showrecoptions"> $doclisttype </div>     
+                  </div>
+            $grid
+           ];
+
+    return ($resultHTML,$title);
 
 } ## end sub listDocuments
 

@@ -73,10 +73,11 @@ sub processUploadFile	{
     $EntityTypeID,
     $EntityID,
     $fileType,
-    $documentTypeID,
-  ) = @_;
-        #assignDefaultValue
-        $documentTypeID ||= 0;
+    $other_person_info,
+  ) = @_; 
+    
+        
+       
 	my $ret = '';
 
 	for my $files (@{$files_to_process})	{
@@ -89,7 +90,7 @@ sub processUploadFile	{
 			$fileType,
 			$files->[2],
 			$files->[3] || undef,
-                        $documentTypeID,
+                        $other_person_info,
 		);
 		if($err)	{
 			$ret .= "'$files->[0]' : $err<br>";
@@ -109,11 +110,16 @@ sub _processUploadFile_single	{
 		$fileType,
 		$permissions,
 		$options,
-                $DocumentTypeId,
+                $other_person_info,
 	) = @_;
 
 	$options ||= {}; 
-        
+        my $DocumentTypeId = 0;
+        my $regoID = 0;
+        if(defined $other_person_info){
+          $DocumentTypeId = $other_person_info->{'docTypeID'}; 
+          $regoID = $other_person_info->{'regoID'};         
+        }   
   my $origfilename=param($file_field) || '';
 	$origfilename =~s/.*\///g;
 	$origfilename =~s/.*\\//g;
@@ -189,9 +195,11 @@ sub _processUploadFile_single	{
                    intDocumentTypeID,
                    intEntityLevel,
                    intEntityID, 
+                   intPersonRegistrationID,
                    intPersonID
                 )
                 VALUES (
+                   ?,
                    ?,
                    ?,
                    ?,
@@ -205,6 +213,7 @@ sub _processUploadFile_single	{
               $DocumentTypeId,
               $EntityTypeID,
               $Data->{'clientValues'}{'_intID'},
+              $regoID,
               $EntityID, 
         );        
        $doc_q->finish();

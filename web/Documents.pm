@@ -22,7 +22,7 @@ use UploadFiles;
 use FormHelpers;
 
 sub handle_documents {
-	my($action, $Data, $memberID)=@_;
+	my($action, $Data, $memberID, $intDocumentTypeID)=@_;
   my $resultHTML='';
 	
   my $assocID= $Data->{'clientValues'}{'assocID'} || -1;
@@ -31,7 +31,7 @@ sub handle_documents {
   my $client=setClient($Data->{'clientValues'}) || '';
 
   my $type = '';
-
+       $intDocumentTypeID ||= 0; 
 	$action ||= 'DOC_L';
 
   if ($action eq 'DOC_u') {
@@ -82,7 +82,7 @@ sub list_docs {
 		my $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$doc->{'ID'}";
     $options.=qq[
       <tr $c>
-        <td><a href="$doc->{'URL'}" target="_doc">$displayTitle</a></td>
+        <td><a href="$doc->{'URL'}" target="_doc">$displayTitle MemberID = $memberID</a></td>
         <td>$doc->{'Size'}Mb</td>
         <td>$doc->{'Ext'}</td>
         <td>$doc->{'DateAdded'}</td>
@@ -101,35 +101,29 @@ sub list_docs {
 			</table>
 		];
 	}
-	$body .= new_doc_form($Data, $client);
-	return $body;
+	$body .= new_doc_form($Data, $client,$documentTypeID);
+	
+       return $body;
 }
 
 sub new_doc_form {
 	my(
 		$Data, 
-		$client
+		$client,
+                $documentTypeID
 	)=@_;
 
 	my $l = $Data->{'lang'};
 	my $target=$Data->{'target'} || '';
-
-	my $numoptions = 6;
-
-	my $options = '';
-	for my $i (1 .. $numoptions)	{
-    #1 = Available to Everyone
-    #2 = Available to only the person adding it
-    #3 = Available to all bodies at add level and above to which the entity is lnked
-
-		my $currentLevelName = $Data->{'LevelNames'}{$Data->{'clientValues'}{'authLevel'}} || 'organisation';
-		my %permoptions = (
-			1 => $Data->{'lang'}->txt('All organisations to which this member is linked'),
-			2 => $Data->{'lang'}->txt("Only to this $currentLevelName"),
-			3 => $Data->{'lang'}->txt("Organisations ( $currentLevelName and above) to which this member is linked"),
-		);
-		my $perms = drop_down("docperms_$i",\%permoptions,undef,0,1,0);
-		$options .= qq[
+        
+	my $currentLevelName = $Data->{'LevelNames'}{$Data->{'clientValues'}{'authLevel'}} || 'organisation';
+	my %permoptions = (
+	    1 => $Data->{'lang'}->txt('All organisations to which this member is linked'),
+	    2 => $Data->{'lang'}->txt("Only to this $currentLevelName"),
+	    3 => $Data->{'lang'}->txt("Organisations ( $currentLevelName and above) to which this member is linked"),
+	);
+		my $perms = drop_down("docperms",\%permoptions,undef,0,1,0);
+	 my $options .= qq[
 			<tr style = "border-bottom:1px solid #777;">
 				<td>&nbsp;</td>
 			</tr>
@@ -138,18 +132,27 @@ sub new_doc_form {
 			</tr>
 			<tr>
 				<td class="label">Document Name: </td>
-				<td><input type="text" name = "docname_$i" value = "" size="40"></td>
+				<td><input type="text" name="docname" value = "" size="40"></td>
 			</tr>
 			<tr>
 				<td class="label">&nbsp;</td>
-				<td><input type="file" name = "doc_$i"></td>
+				<td><input type="file" name="doc"></td>
 			</tr>
 			<tr>
 				<td class="label">Viewable by :</td>
 				<td> $perms</td>
 			</tr>
 		];
-	}
+
+
+
+
+
+
+    #1 = Available to Everyone
+    #2 = Available to only the person adding it
+    #3 = Available to all bodies at add level and above to which the entity is lnked
+
 	my $title = $l->txt('New Document');
 	my $body = qq[
 	<div class="sectionheader">$title</div>
@@ -164,7 +167,7 @@ sub new_doc_form {
 			<input type="submit" name="submitb" value="Upload" onclick="document.getElementById('docselect').style.display='none';document.getElementById('pleasewait').style.display='block'"  style="width:160px;">
 			<input type="hidden" name="client" value="].unescape($client).qq[">
 			<input type="hidden" name="a" value="DOC_u">
-			<input type="hidden" name="numdocs" value="$numoptions">
+			
 		</form>
 		</div>
 	];
@@ -181,13 +184,11 @@ sub process_doc_upload	{
 
 	my @files_to_process = ();
 
-	my $numdocs = param('numdocs') || 0;
-	for my $i ( 1 .. $numdocs) {
-		my $name = param('docname_'. $i) || '';
-		my $filefield = 'doc_' . $i;
-		my $permission = param('docperms_'. $i) || '';
+		my $name = param('docname') || '';
+		my $filefield = 'doc' ;
+		my $permission = param('docperms') || '';
 		push @files_to_process, [$name, $filefield, $permission];
-	}
+	
 	my $retvalue = processUploadFile(
 		$Data, 
 		\@files_to_process,
