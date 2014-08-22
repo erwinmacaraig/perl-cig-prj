@@ -51,7 +51,7 @@ sub handleRegistrationFlowBackend   {
     $Hidden{'txnIds'} = $params{'txnIds'} || '';
 
     my $pref= undef;
-    if ($personID)  {
+    if ($personID && $personID>0)  {
         $pref = loadPersonDetails($Data->{'db'}, $personID);
     }
 warn("FBEND:$personID");
@@ -67,7 +67,14 @@ warn("FBEND:$personID");
     if ( $action eq 'PREGF_TU' ) {
         #add rego record with types etc.
         my $msg='';
-        ($regoID, $rego_ref, $msg) = add_rego_record($Data, $personID, $entityID, $entityLevel, $originLevel);
+        my $personType = param('pt') || '';
+        my $personEntityRole= param('per') || '';
+        my $personLevel = param('pl') || '';
+        my $sport = param('sp') || '';
+        my $ageLevel = param('ag') || '';
+        my $registrationNature = param('nat') || ''; 
+
+        ($regoID, $rego_ref, $msg) = add_rego_record($Data, $personID, $entityID, $entityLevel, $originLevel, $personType, $personEntityRole, $personLevel, $sport, $ageLevel, $registrationNature);
         if (!$regoID)   {
             my $error = '';
             if ($msg eq 'SUSPENDED')   {
@@ -101,7 +108,7 @@ warn("FBEND:$personID");
     }
     if ( $action eq 'PREGF_PU' ) {
         #Update product records
-        $Hidden{'txnIds'} = save_rego_products($Data, $regoID, $personID, $entityID, $entityLevel, \%params);
+        $Hidden{'txnIds'} = save_rego_products($Data, $regoID, $personID, $entityID, $entityLevel, $rego_ref, \%params);
         $action = $Flow{$action};
     }
     if ( $action eq 'PREGF_DU' ) {

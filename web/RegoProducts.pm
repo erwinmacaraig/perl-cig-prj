@@ -13,6 +13,7 @@ use AssocTime;
 use TTTemplate;
 use HTML::Entities;
 use Utils;
+use Transactions;
 use Date::Calc qw(Today Delta_YMD);
 
 sub getRegoProducts {
@@ -77,6 +78,7 @@ sub getRegoProducts {
             $photolink =qq[<img width ='20' height ='20' src ="getProductPhoto.cgi?pa=$pa&pID=$dref->{'intProductID'}&client=$cl">];
         }
 
+        $amount = 0 if ($regItemRules_ref->{$dref->{'intProductID'}}{'HaveForThisEntity'} or $regItemRules_ref->{$dref->{'intProductID'}}{'HaveForAnyEntity'});
         my %itemdata = (
             Amount => $amount || 0,
             ProductID => $dref->{'intProductID'},
@@ -473,7 +475,7 @@ sub productAllowedThroughFilter {
 }
 
 sub insertRegoTransaction {
-    my($Data, $regoID, $intID, $params, $entityID, $entityLevel, $level, $session)=@_;
+    my($Data, $regoID, $intID, $params, $entityID, $entityLevel, $level, $session, $rego_products)=@_;
     my $db=$Data->{'db'};
     $entityID ||= getLastEntityID($Data->{'clientValues'});
     $entityLevel ||= getLastEntityLevel($Data->{'clientValues'});
@@ -481,8 +483,16 @@ sub insertRegoTransaction {
     my $multipersonType = $session ? ($session->getNextRegoType())[0] || '' : '';
     $intID ||= 0;
 
-use Data::Dumper;
-print STDERR Dumper($params);
+    my $stTxnsClean = qq[
+        DELETE FROM tblTransactions 
+        WHERE 
+            intPersonRegistrationID = ? 
+            AND intPersonRegistrationID > 0 
+            AND intID = ? 
+            AND intStatus=0 
+            AND intProductID=? 
+    ];
+    my $q_txnclean= $db->prepare($stTxnsClean);
     #Get products selected
     my @productsselected=();
     my @already_in_cart_items=();
@@ -524,10 +534,27 @@ print STDERR Dumper($params);
   my $q_add= $db->prepare($st_add);
   my @txns_added=();
   my $total_amount = 0;
+    my %ExistingProducts=();
     if (scalar(@productsselected) or scalar(@already_in_cart_items)) {
         if (scalar(@productsselected)) {
             foreach my $product (@productsselected)    {
+                ## Lets get rid of duplicate products
+                $q_txnclean->execute($regoID, $intID, $product);
+                
                 my $amount= getItemCost($Data, $entityID, $entityLevel, $multipersonType, $product);
+#                $amount = 0 if (); BAFF
+                foreach my $existproduct (@{$rego_products})  {
+                    next if ($existproduct->{'ID'} != $product);
+                    next if ($level != $Defs::LEVEL_PERSON);
+                    if ($existproduct->{'UseExistingThisEntity'} && checkExistingProduct($Data, $existproduct->{'ID'}, $Defs::LEVEL_PERSON, $intID, $entityID, 'THIS_ENTITY')) {
+                        $amount=0;
+                        $ExistingProducts{$product} = 1;
+                    }
+                    if ($existproduct->{'UseExistingAnyEntity'} && checkExistingProduct($Data, $existproduct->{'ID'}, $Defs::LEVEL_PERSON, $intID, $entityID, 'ANY_ENTITY')) {
+                        $amount=0;
+                        $ExistingProducts{$product} = 1;
+                    }
+                }
                 $total_amount += $amount;
             }
         }
@@ -611,6 +638,9 @@ print STDERR Dumper($params);
         foreach my $product (@productsselected)    {
             next if $product_seen{$product}++;
             my $amount= getItemCost($Data, $entityID, $entityLevel, $multipersonType, $product);
+            
+            $amount = 0 if (exists $ExistingProducts{$product} and $ExistingProducts{$product}==1);
+            #$amount = 0 if (); BAFF
             my $status = ($total_amount eq '0.00' or $total_amount == 0) ? 1: 0;
             $status = 0 if $Data->{'SystemConfig'}{'RegoForm_DontPayZero'};
             my $qty = $params->{'txnQTY_'.$product} || $params->{'prodQTY_'.$product} || 1;
@@ -663,7 +693,8 @@ print STDERR Dumper($params);
     }
   }
   push @txns_added, @already_in_cart_items;
-  return \@txns_added || [];
+#  @txns_added ||= [];
+  return (\@txns_added, $total_amount);
 }
 
 1;

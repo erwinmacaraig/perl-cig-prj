@@ -28,8 +28,9 @@ sub displayPersonRegisterWhat   {
         $gender,
         $originLevel,
         $continueURL,
+        $bulk,
     ) = @_;
-warn("AIN DISPLAY");
+    $bulk ||= 0;
     my %templateData = (
         originLevel => $originLevel || 0,
         personID => $personID || 0,
@@ -42,10 +43,12 @@ warn("AIN DISPLAY");
         continueURL => $continueURL || '',
     );
 
+    my $template = "registration/what.templ";
+    $template = "registration/whatbulk.templ" if ($bulk);
     my $body = runTemplate(
         $Data, 
         \%templateData, 
-        "registration/what.templ"
+        $template
     );
     return $body || '';
 }
@@ -69,9 +72,10 @@ sub optionsPersonRegisterWhat {
         $dob,
         $gender,
         $lookingFor,
+        $bulk
     ) = @_;
+    $bulk ||= 0;
 
-warn("AAAAA1");
     my $pref= undef;
     $pref = loadPersonDetails($Data->{'db'}, $personID) if ($personID);
 
@@ -103,6 +107,14 @@ warn("AAAAA1");
     $step=6 if ($lookingFor eq 'nature');
 
     my @retdata = ();
+    if ($bulk and $step==6)  {
+        my $label = $Data->{'lang'}->txt($lfLabelTable{$lookingFor}{'RENEWAL'});
+        push @retdata, {
+            name => $label,
+            value => 'RENEWAL',
+        };
+        return (\@retdata, '');
+    }
     my @values = ();
     my $st = '';
     my ($MATRIXwhere, $ERAwhere) = ('','');
@@ -171,8 +183,7 @@ warn("STEP $step FOR $sport");
         }
     }
 
-    if (! checkMatrixOK($Data, $MATRIXwhere, \@MATRIXvalues))   {
-warn("AERROR WITH MATRIX");
+    if (! checkMatrixOK($Data, $MATRIXwhere, \@MATRIXvalues, $bulk))   {
         return (\@retdata, '');
     }
     
@@ -208,14 +219,12 @@ warn("AERROR WITH MATRIX");
         ];
         @values = @MATRIXvalues;
     }
-warn($st);
     
 
     my $q = $Data->{'db'}->prepare($st);
     $q->execute(@values);
     my $lookup = ();
     while(my ($val, $countNum) = $q->fetchrow_array())   {
-warn("VAL$countNum".$val);
         if($val)    {
             my $label = $lfLabelTable{$lookingFor}{$val};
             $label = $Data->{'lang'}->txt($lfLabelTable{$lookingFor}{$val});
@@ -260,7 +269,7 @@ sub returnEntityRoles   {
 
 sub checkMatrixOK   {
 
-    my ($Data, $where, $values_ref) = @_;
+    my ($Data, $where, $values_ref, $bulk) = @_;
 
     my $st = qq[
         SELECT COUNT(intMatrixID) as CountNum
@@ -272,6 +281,9 @@ sub checkMatrixOK   {
             AND intSubRealmID IN (0,?)
             $where
     ];
+    if ($bulk)  {
+        $st .= qq[ AND strWFRuleFor ='BULKREGO'];
+    }
 warn($st);
 print STDERR Dumper($values_ref);
     my $q = $Data->{'db'}->prepare($st);

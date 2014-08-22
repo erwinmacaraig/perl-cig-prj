@@ -55,7 +55,6 @@ sub rolloverExistingPersonRegistrations {
     foreach my $rego (@{$regs_ref})  {
         next if ($rego->{'intPersonRegistrationID'} == $personRegistrationID);
         my $thisRego = $rego;
-warn("IN HERE FOR $rego->{'intPersonRegistrationID'}");
         $thisRego->{'intCurrent'} = 0;
         $thisRego->{'strStatus'} = $Defs::PERSONREGO_STATUS_ROLLED_OVER;
         updatePersonRegistration($Data, $personID, $rego->{'intPersonRegistrationID'}, $thisRego);
@@ -84,11 +83,9 @@ sub checkIsSuspended    {
             AND P.intPersonID = ?
         LIMIT 1
     ];
-warn($st);
   	my $q= $Data->{'db'}->prepare($st);
     $q->execute($entityID, $personType, $Data->{'Realm'}, $personID) or query_error($st);
     my ($personStatus, $prStatus) = $q->fetchrow_array();
-warn("STATUS:$personStatus $prStatus for $entityID $personType");
     $personStatus ||= '';
     $prStatus ||= '';
     return ($personStatus, $prStatus);
@@ -206,7 +203,8 @@ sub deletePersonRegistered  {
 
     my $st = qq[
         UPDATE tblPersonRegistration_$Data->{'Realm'}
-        SET strStatus = 'DELETED'
+        SET strStatus = 'DELETED',
+            dtLastUpdated=NOW()
         WHERE
             intPersonID = ?
             AND intPersonRegistrationID = ?
@@ -525,7 +523,6 @@ sub getRegistrationData	{
         ORDER BY
           pr.dtAdded DESC
     ];	
-warn($st);
     my $db=$Data->{'db'};
     my $query = $db->prepare($st) or query_error($st);
 
@@ -556,13 +553,15 @@ sub addRegistration {
     my $status = $Reg_ref->{'status'} || 'PENDING';
 
     if (! exists $Reg_ref->{'paymentRequired'})    {
-        my $matrix_ref = getRuleMatrix($Data, $Reg_ref->{'originLevel'}, $Reg_ref->{'entityLevel'}, $Defs::LEVEL_PERSON, $Reg_ref->{'entityType'} || '', 'REGO', $Reg_ref);
+        my $ruleFor = 'REGO';
+        $ruleFor = $Reg_ref->{'ruleFor'} if ($Reg_ref->{'ruleFor'});
+        my $matrix_ref = getRuleMatrix($Data, $Reg_ref->{'originLevel'}, $Reg_ref->{'entityLevel'}, $Defs::LEVEL_PERSON, $Reg_ref->{'entityType'} || '', $ruleFor, $Reg_ref);
         $Reg_ref->{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
         $Reg_ref->{'dateFrom'} = $matrix_ref->{'dtFrom'} if (! $Reg_ref->{'dtFrom'});
         $Reg_ref->{'dateTo'} = $matrix_ref->{'dtTo'} if (! $Reg_ref->{'dtTo'});
         $Reg_ref->{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
     }
-    my $nationalPeriodID = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $Reg_ref->{'sport'});
+    my $nationalPeriodID = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $Reg_ref->{'sport'}, $Reg_ref->{'registrationNature'});
     my $genAgeGroup ||=new GenAgeGroup ($Data->{'db'},$Data->{'Realm'}, $Data->{'RealmSubType'});
     my $ageGroupID = 0;
 
@@ -606,7 +605,8 @@ sub addRegistration {
             intAgeGroupID,
             strAgeLevel,
             strRegistrationNature,
-            intPaymentRequired
+            intPaymentRequired,
+            intClearanceID
 		)
 		VALUES
 		(
@@ -628,6 +628,7 @@ sub addRegistration {
             ?,
             NOW(),
             NOW(),
+            ?,
             ?,
             ?,
             ?,
@@ -658,7 +659,8 @@ sub addRegistration {
   		$ageGroupID || 0,
   		$Reg_ref->{'ageLevel'} || '',
   		$Reg_ref->{'registrationNature'} || '',
-  		$Reg_ref->{'paymentRequired'} || 0
+  		$Reg_ref->{'paymentRequired'} || 0,
+  		$Reg_ref->{'clearanceID'} || 0
   	);
 	
 	if ($q->errstr) {
@@ -686,7 +688,7 @@ sub addRegistration {
 
 sub submitPersonRegistration    {
 
-    my ($Data, $personID, $personRegistrationID) = @_;
+    my ($Data, $personID, $personRegistrationID, $rego_ref) = @_;
 
     my %Reg=();
     $Reg{'personRegistrationID'} = $personRegistrationID;
@@ -709,6 +711,11 @@ sub submitPersonRegistration    {
             0
         );
         personInProgressToPending($Data, $personID);
+        ($count, $regs) = getRegistrationData($Data, $personID, \%Reg);
+        if ($count) {
+            my $pr_ref = $regs->[0];
+            $rego_ref->{'strStatus'} = $pr_ref->{'strStatus'};
+        }
     }
 }
 

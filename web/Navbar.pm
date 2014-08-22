@@ -845,6 +845,10 @@ sub getClubMenuData {
             url => $baseurl."a=C_TXNLog_list",
         };
      }
+        $menuoptions{'bulk'} = {
+            name => $lang->txt('Bulk Renewals'),
+            url => $baseurl."a=PREGFB_T",
+        };
  
     my @menu_structure = (
         [ $lang->txt('Dashboard'), 'home','home'],
@@ -862,6 +866,7 @@ sub getClubMenuData {
         [ $lang->txt('Registrations'), 'menu',[
         'registrationforms',
         'transactions',
+        'bulk',
         'locator',
         'entityregistrationallowed',
         ]],

@@ -7,7 +7,7 @@ require Exporter;
 use strict;
 
 sub getNationalReportingPeriod {
-    my ($db, $realmID, $subRealmID, $sport) = @_;
+    my ($db, $realmID, $subRealmID, $sport, $registrationNature) = @_;
     $subRealmID ||= 0;
     my $st = qq[
         SELECT
@@ -19,6 +19,19 @@ sub getNationalReportingPeriod {
             AND (intSubRealmID = ? or intSubRealmID = 0)
             AND strSport IN ('', ?)
             AND (dtFrom < now() AND dtTo > now())
+    ];
+    if ($registrationNature and $registrationNature eq 'NEW')   {
+        $st .= qq[ 
+            AND intCurrentNew = 1 
+        ];
+    }
+    if ($registrationNature and $registrationNature eq 'RENEWAL')   {
+        $st .= qq[ 
+            AND 
+                intCurrentRenewal= 1 
+        ];
+    }
+    $st .= qq[
         ORDER BY 
             intSubRealmID DESC,
             strSport DESC   

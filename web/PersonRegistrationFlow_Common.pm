@@ -3,13 +3,16 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = @EXPORT_OK = qw(
     displayRegoFlowComplete
+    displayRegoFlowCompleteBulk
     displayRegoFlowCheckout
     displayRegoFlowDocuments
     displayRegoFlowProducts
+    displayRegoFlowProductsBulk
     generateRegoFlow_Gateways
     validateRegoID
     save_rego_products
     add_rego_record
+    bulkRegoSubmit
 );
 
 use strict;
@@ -24,8 +27,21 @@ use Payments;
 use RegoTypeLimits;
 use TTTemplate;
 use Transactions;
+use Products;
 use Data::Dumper;
 
+sub displayRegoFlowCompleteBulk {
+
+    my ($Data, $client) = @_;
+    my %PageData = (
+        target => $Data->{'target'},
+        Lang => $Data->{'lang'},
+        client=>$client,
+    );
+    my $body = runTemplate($Data, \%PageData, 'registration/completebulk.templ') || '';
+    return $body;
+}
+    
 sub displayRegoFlowComplete {
 
     my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref) = @_;
@@ -56,6 +72,7 @@ sub displayRegoFlowComplete {
             $Data, 
             $personID,
             $regoID,
+            $rego_ref
          );
          my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
          my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
@@ -68,6 +85,7 @@ sub displayRegoFlowComplete {
             gateways => $gateways,
             txns_url => $pay_url,
             target => $Data->{'target'},
+            RegoStatus => $rego_ref->{'strStatus'},
             hidden_ref=> $hidden_ref,
             Lang => $Data->{'lang'},
             client=>$client,
@@ -157,9 +175,11 @@ sub displayRegoFlowProducts {
     my @prodIDs = ();
     my %ProductRules=();
     foreach my $product (@{$products})  {
+        #next if($product->{'UseExistingThisEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'THIS_ENTITY'));
+        #next if($product->{'UseExistingAnyEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'ANY_ENTITY'));
 
-        next if($product->{'UseExistingThisEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'THIS_ENTITY'));
-        next if($product->{'UseExistingAnyEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'ANY_ENTITY'));
+        $product->{'HaveForAnyEntity'} =1 if($product->{'UseExistingAnyEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'ANY_ENTITY'));
+        $product->{'HaveForThisEntity'} =1 if($product->{'UseExistingThisEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'THIS_ENTITY'));
 
         push @prodIDs, $product->{'ID'};
         $ProductRules{$product->{'ID'}} = $product;
@@ -173,6 +193,48 @@ sub displayRegoFlowProducts {
         nextaction=>"PREGF_PU",
         target => $Data->{'target'},
         product_body => $product_body,
+        hidden_ref=> $hidden_ref,
+        Lang => $Data->{'lang'},
+        client=>$client,
+    );
+    my $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ') || '';
+
+    return $pagedata;
+}
+sub displayRegoFlowProductsBulk {
+
+    my ($Data, $regoID, $client, $entityRegisteringForLevel, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref) = @_;
+    my $lang=$Data->{'lang'};
+
+    my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_PU&amp;rID=$regoID";
+    my $products = getRegistrationItems(
+        $Data,
+        'REGO',
+        'PRODUCT',
+        $originLevel,
+        $rego_ref->{'strRegistrationNature'} || $rego_ref->{'registrationNature'},
+        $entityID,
+        $entityRegisteringForLevel,
+        0,
+        $rego_ref,
+    );
+    my @prodIDs = ();
+    my %ProductRules=();
+    foreach my $product (@{$products})  {
+        push @prodIDs, $product->{'ID'};
+        $ProductRules{$product->{'ID'}} = $product;
+     }
+    my $product_body='';
+    if (@prodIDs)   {
+        $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
+     }
+
+     my %PageData = (
+        nextaction=>"PREGFB_PU",
+        target => $Data->{'target'},
+        product_body => $product_body,
+        allowManualPay=> 1,
+        manualPaymentTypes => \%Defs::manualPaymentTypes,
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
         client=>$client,
@@ -241,36 +303,47 @@ sub validateRegoID {
 }
 
 sub save_rego_products {
-    my ($Data, $regoID, $personID, $entityID, $entityLevel, $params) = @_;
+    my ($Data, $regoID, $personID, $entityID, $entityLevel, $rego_ref, $params) = @_;
 
     my $session='';
 
-    my $txns_added = insertRegoTransaction($Data, $regoID, $personID, $params, $entityID, $entityLevel, 1, $session);
+    my $products = getRegistrationItems(
+        $Data,
+        'REGO',
+        'PRODUCT',
+        $rego_ref->{'intOriginLevel'} || $rego_ref->{'originLevel'},
+        $rego_ref->{'strRegistrationNature'} || $rego_ref->{'registrationNature'},
+        $entityID,
+        $entityLevel,
+        0,
+        $rego_ref,
+    );
+    my ($txns_added, $amount) = insertRegoTransaction($Data, $regoID, $personID, $params, $entityID, $entityLevel, 1, $session, $products);
     my $txnIds = join(':',@{$txns_added});
     return $txnIds;
 }
 
 
 sub add_rego_record{
-    my ($Data, $personID, $entityID, $entityLevel, $originLevel) =@_;
+    my ($Data, $personID, $entityID, $entityLevel, $originLevel, $personType, $personEntityRole, $personLevel, $sport, $ageLevel, $registrationNature, $ruleFor) =@_;
 
     my $clientValues = $Data->{'clientValues'};
     my $rego_ref = {
         status => 'INPROGRESS',
-        personType => param('pt') || '',
-        personEntityRole=> param('per') || '',
-        personLevel => param('pl') || '',
-        sport => param('sp') || '',
-        ageLevel => param('ag') || '',
-        registrationNature => param('nat') || '',
+        personType => $personType || '',
+        personEntityRole=> $personEntityRole || '',
+        personLevel => $personLevel || '',
+        sport => $sport || '',
+        ageLevel => $ageLevel || '',
+        registrationNature => $registrationNature || '',
         originLevel => $originLevel,
         originID => $entityID,
         entityID => $entityID,
         entityLevel => $entityLevel,
         personID => $personID,
         current => 1,
+        ruleFor=>$ruleFor
     };
-
     my ($personStatus, $prStatus) = checkIsSuspended($Data, $personID, $entityID, $rego_ref->{'personType'});
     return (0, undef, 'SUSPENDED') if ($personStatus eq 'SUSPENDED' or $prStatus eq 'SUSPENDED');
         
@@ -292,3 +365,75 @@ sub add_rego_record{
     }
     return (0, undef, '');
 }
+ 
+sub bulkRegoSubmit {
+
+    my ($Data, $bulk_ref, $rolloverIDs, $productIDs, $markPaid, $paymentType) = @_;
+
+    my $body = 'Submitting';
+    my @IDs= split /\|/, $rolloverIDs;
+
+    my $products = getRegistrationItems(
+        $Data,
+        'REGO',
+        'PRODUCT',
+        $bulk_ref->{'originLevel'},
+        $bulk_ref->{'registrationNature'},
+        $bulk_ref->{'entityID'},
+        $bulk_ref->{'entityLevel'},
+        0,
+        $bulk_ref,
+    );
+ 
+
+    for my $pID (@IDs)   {
+        my ($regoID, $rego_ref, $msg) = add_rego_record(
+            $Data, 
+            $pID, 
+            $bulk_ref->{'entityID'}, 
+            $bulk_ref->{'entityLevel'}, 
+            $bulk_ref->{'originLevel'}, 
+            $bulk_ref->{'personType'}, 
+            $bulk_ref->{'personEntityRole'}, 
+            $bulk_ref->{'personLevel'}, 
+            $bulk_ref->{'sport'}, 
+            $bulk_ref->{'ageLevel'}, 
+            $bulk_ref->{'registrationNature'},
+            "BULKREGO"
+        );
+        submitPersonRegistration(
+            $Data,
+            $pID,
+            $regoID,
+            $bulk_ref
+        );
+        my @products = split /\:/, $productIDs;
+        my %Products=();
+        foreach my $product (@products) {
+            $Products{'prod_'.$product} =1;
+        }
+        my ($txns_added, $amount) = insertRegoTransaction(
+            $Data, 
+            $regoID, 
+            $pID, 
+            \%Products, 
+            $bulk_ref->{'entityID'}, 
+            $bulk_ref->{'entityLevel'}, 
+            $Defs::LEVEL_PERSON, 
+            '',
+            $products
+        );
+        if ($paymentType and $markPaid)  {
+            my %Settings=();
+            $Settings{'paymentType'} = $paymentType;
+            my $logID = createTransLog($Data, \%Settings, $bulk_ref->{'entityID'},$txns_added, $amount); 
+            UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $logID);
+            product_apply_transaction($Data,$logID);
+        }
+    }
+    
+    return $body;
+}
+
+1;
+

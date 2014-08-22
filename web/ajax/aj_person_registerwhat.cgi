@@ -31,6 +31,7 @@ sub main	{
     my $lookingFor = param('otype') || '';
     my $realmIN = param('r') || 0;
     my $subRealmIN = param('sr') || 0;
+    my $bulk= param('bulk') || 0;
 
 warn("AJAXPId$personID");
 warn("AJAXeId$entityID");
@@ -65,6 +66,7 @@ warn("AJAXeId$entityID");
             $dob,
             $gender,
             $lookingFor,
+            $bulk
         );
 	}
 
