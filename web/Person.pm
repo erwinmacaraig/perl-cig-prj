@@ -402,9 +402,9 @@ sub listDocuments {
  
        # $modoptions   
         $resultHTML = qq[ $modoptions                       
-                   <div style="width:955555%;"> 
+                   
                       <div class="showrecoptions"> $doclisttype </div>     
-                  </div>
+                  
             $grid
            ];
 
