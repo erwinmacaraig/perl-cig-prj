@@ -37,6 +37,7 @@ sub getNationalReportingPeriod {
             strSport DESC   
         LIMIT 1
     ];
+warn($st);
     my $q = $db->prepare($st);
     $q->execute($realmID, $subRealmID, $sport);
     my $nationalPeriodID = $q->fetchrow_array();

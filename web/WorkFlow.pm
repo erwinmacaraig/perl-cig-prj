@@ -7,6 +7,7 @@ require Exporter;
   	approveTask
   	checkForOutstandingTasks
     addIndividualTask
+    cleanTasks
 );
 
 use strict;
@@ -20,6 +21,40 @@ use Clearances;
 use Duplicates;
 use PersonRegistration;
 use CGI qw(param unescape escape);
+
+sub cleanTasks  {
+
+    my ($Data, $personID, $entityID, $personRegistrationID, $ruleFor) = @_;
+    return if (!$personID and !$entityID and !$personRegistrationID);
+
+    my $st = qq[
+        DELETE tblWFTaskPreReq.* 
+        FROM 
+            tblWFTaskPreReq 
+            INNER JOIN tblWFTask USING (intWFTaskID) 
+        WHERE 
+            intPersonID = ?
+            AND intEntityID = ?
+            AND intPersonRegistrationID=?
+            AND strWFRuleFor = ?
+    ];
+
+    my $q= $Data->{'db'}->prepare($st);
+    $q->execute($personID, $entityID, $personRegistrationID, $ruleFor);
+    
+    $st = qq[
+        DELETE 
+        FROM 
+            tblWFTask
+        WHERE 
+            intPersonID = ?
+            AND intEntityID = ?
+            AND intPersonRegistrationID=?
+            AND strWFRuleFor = ?
+    ];
+    $q= $Data->{'db'}->prepare($st);
+    $q->execute($personID, $entityID, $personRegistrationID, $ruleFor);
+}
 
 sub addIndividualTask   {
 
@@ -473,7 +508,6 @@ sub addWorkFlowTasks {
 			AND r.strRegistrationNature = ?
             AND r.strPersonEntityRole IN ('', pr.strPersonEntityRole)
 		];
-warn($st);
 	    $q = $db->prepare($st);
   	    $q->execute($personRegistrationID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
     }
@@ -509,7 +543,6 @@ warn($st);
             AND r.intOriginLevel = ?
 			AND r.strRegistrationNature = ?
 		];
-warn($st);
 	    $q = $db->prepare($st);
   	    $q->execute($entityID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
     }
@@ -811,8 +844,9 @@ warn("CHECKING $update_count");
             $Defs::WF_TASK_STATUS_ACTIVE
 	  	);
   
+        my $rowCount = $q->fetchrow_array() || 0;
         
-        if ($ruleFor eq 'ENTITY' and $entityID and !$q->fetchrow_array())   {
+        if ($ruleFor eq 'ENTITY' and $entityID and ! $rowCount) {
             $st = qq[
                     UPDATE tblEntity
                     SET
@@ -828,7 +862,7 @@ warn("CHECKING $update_count");
                     );
                 $rc = 1;
         }
-        if ($ruleFor eq 'DOCUMENT' and $documentID and !$q->fetchrow_array())   {
+        if ($ruleFor eq 'DOCUMENT' and $documentID and !$rowCount)   {
             $st = qq[
                     UPDATE tblDocuments
                     SET
@@ -844,22 +878,10 @@ warn("CHECKING $update_count");
                 $rc = 1;
         }
  
-        if ($ruleFor eq 'REGO' and $personRegistrationID and !$q->fetchrow_array()) {
-        	#Now check to see if there is a payment outstanding
-        	#$st = qq[
-			#        SELECT intPaymentRequired
-			#        FROM tblPersonRegistration_$Data->{'Realm'} 
-			#        WHERE intPersonRegistrationID = ?
-			#];
-			#        
-			#$q = $db->prepare($st);
-			#$q->execute($personRegistrationID);
-			#            
-			#my $dref= $q->fetchrow_hashref();
-			#my $intPaymentRequired = 0; #$dref->{intPaymentRequired};
-			  	
-        	#if (!$intPaymentRequired) {
-        		#Nothing outstanding, so mark this registration as complete
+warn("------ $ruleFor $personRegistrationID $rowCount");
+        if ($ruleFor eq 'REGO' and $personRegistrationID and !$rowCount) {
+warn("---- NOW HERE");
+        
 	            $st = qq[
 	            	UPDATE tblPersonRegistration_$Data->{'Realm'} 
                     SET
@@ -1073,7 +1095,6 @@ sub resolveTask {
             AND intRealmID = ?
     ];
 		
-warn("DDDD");
   	$q = $db->prepare($st);
   	$q->execute(
   		$WFTaskID,

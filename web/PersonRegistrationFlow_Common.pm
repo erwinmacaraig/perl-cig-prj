@@ -28,6 +28,7 @@ use RegoTypeLimits;
 use TTTemplate;
 use Transactions;
 use Products;
+use WorkFlow;
 use Data::Dumper;
 
 sub displayRegoFlowCompleteBulk {
@@ -411,6 +412,14 @@ sub bulkRegoSubmit {
             $bulk_ref->{'registrationNature'},
             "BULKREGO"
         );
+        next if (! $regoID);
+        #cleanTasks(
+        #    $Data,
+        #    $pID,
+        #    $bulk_ref->{'entityID'},
+        #    $regoID,
+        #    'REGO'
+        #);
         submitPersonRegistration(
             $Data,
             $pID,

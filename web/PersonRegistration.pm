@@ -28,6 +28,7 @@ sub rolloverExistingPersonRegistrations {
 
     my ($Data, $personID, $personRegistrationID) = @_;
 
+warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^IN ROLLOVER");
     my %Reg = (
         personRegistrationID=> $personRegistrationID || 0,
     );
@@ -114,22 +115,28 @@ sub checkNewRegoOK  {
     }
 
     return $ok if (! $ok);
+    ## I assume the above is handled via checkLimits?
+#Not OK.. Transfer needed
 
     ## Now check within this ENTITY
-    %Reg=();
-    %Reg = (
+    my %Reg = (
         sport=> $rego_ref->{'sport'} || '',
         personType=> $rego_ref->{'personType'} || '',
         entityID => $rego_ref->{'entityID'},
+        personEntityRole=> $rego_ref->{'personEntityRole'} || '',
+        personLevel=> $rego_ref->{'personLevel'} || '',
+        ageLevel=> $rego_ref->{'ageLevel'} || '',
     );
     my ($count, $regs) = getRegistrationData(
         $Data,
         $personID,
         \%Reg
     );
+    my $ok=1;
+warn("NEW CHECK $count");
     foreach my $reg (@{$regs})  {
-        next if $reg->{'intEntityID'} != $rego_ref->{'intEntityID'};
-        $ok = 0 if ($reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE or $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PASSIVE or $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_TRANSFERRED);
+        next if $reg->{'intEntityID'} != $rego_ref->{'entityID'};
+        $ok = 0 if ($reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PENDING or $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE or $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PASSIVE or $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_TRANSFERRED);
     }
     return $ok;
 }
@@ -141,8 +148,9 @@ sub checkRenewalRegoOK  {
     my $pref= undef;
     $pref = loadPersonDetails($Data->{'db'}, $personID) if ($personID);
     return 0 if (defined $pref and ($pref->{'strStatus'} eq $Defs::PERSON_STATUS_SUSPENDED));
+    my $nationalPeriodID = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $rego_ref->{'sport'}, 'RENEWAL');
 
-    my @statusIN = ($Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);
+    my @statusIN = ($Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);#, $Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_INPROGRESS);
     my %Reg = (
         sport=> $rego_ref->{'sport'} || '',
         personType=> $rego_ref->{'personType'} || '',
@@ -153,6 +161,25 @@ sub checkRenewalRegoOK  {
         entityID=> $rego_ref->{'entityID'} || 0,
     );
     my ($count, undef) = getRegistrationData(
+        $Data,
+        $personID,
+        \%Reg
+    );
+warn("IN RENEWAL CHECK$count");
+    my @statusIN = ($Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_INPROGRESS);
+
+    %Reg=();
+    %Reg = (
+        sport=> $rego_ref->{'sport'} || '',
+        personType=> $rego_ref->{'personType'} || '',
+        personEntityRole=> $rego_ref->{'personEntityRole'} || '',
+        personLevel=> $rego_ref->{'personLevel'} || '',
+        ageLevel=> $rego_ref->{'ageLevel'} || '',
+        statusIN => \@statusIN,
+        entityID=> $rego_ref->{'entityID'} || 0,
+        nationalPeriod=>$nationalPeriodID,
+    );
+    my ($countAlready, undef) = getRegistrationData(
         $Data,
         $personID,
         \%Reg
@@ -191,7 +218,7 @@ sub checkRenewalRegoOK  {
 
     
     #return 1 if ($countActive or $countInactive or $countRolledOver); ## Must have an ACTIVE or PASSIVE record
-    return 1 if ($count);
+    return 1 if ($count and ! $countAlready);
     return 0;
 
 
@@ -680,6 +707,13 @@ sub addRegistration {
   	
     my $rc=0;
     if ($status eq 'PENDING')   {
+        cleanTasks(
+            $Data,
+            $Reg_ref->{'personID'},
+            $Reg_ref->{'entityID'},
+            $personRegistrationID,
+            'REGO'
+        );
   	    $rc = addWorkFlowTasks(
             $Data,
             'REGO', 
@@ -709,6 +743,13 @@ sub submitPersonRegistration    {
         $pr_ref->{'strStatus'} = 'PENDING';
 
         updatePersonRegistration($Data, $personID, $personRegistrationID, $pr_ref);
+        cleanTasks(
+            $Data,
+            $personID,
+            $pr_ref->{'entityID'} || $pr_ref->{'intEntityID'} || 0,
+            $personRegistrationID,
+            'REGO'
+        );
 
   	    my $rc = addWorkFlowTasks(
             $Data,

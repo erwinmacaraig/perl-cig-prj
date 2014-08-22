@@ -21,6 +21,7 @@ use TTTemplate;
 use UploadFiles;
 use ListPersons;
 use BulkPersons;
+use NationalReportingPeriod;
 
 use Data::Dumper;
 
@@ -146,6 +147,7 @@ sub handleRegistrationFlowBulk {
         );
     }
     elsif ( $action eq 'PREGFB_SP' ) {
+        $bulk_ref->{'nationalPeriodID'} = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $bulk_ref->{'sport'}, $bulk_ref->{'registrationNature'});
         my ($listPersons_body, undef) = bulkPersonRollover($Data, 'PREGFB_SPU', $bulk_ref, \%Hidden);
         $body .= $listPersons_body;
    }
