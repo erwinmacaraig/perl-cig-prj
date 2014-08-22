@@ -308,18 +308,24 @@ sub listDocuments {
     my $lang = $Data->{'lang'}; 
     my $db = $Data->{'db'};  
     my $client = $Data->{'client'};
-
-   
+    my %RegFilters=();
+    my @statusNOTIN = ($Defs::PERSONREGO_STATUS_DELETED, $Defs::PERSONREGO_STATUS_INPROGRESS);
+    $RegFilters{'statusNOTIN'} = \@statusNOTIN;
+    my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
+ 
+    #does not matter how many, intPersonRegistrationID is the same all throughout 
+    my $pRIDRef = ${$Reg_ref}[0];
+    my $personRegistrationID = $pRIDRef->{'intPersonRegistrationID'};
     my @rowdata = (); 
     my $query = qq[
-         SELECT tblUploadedFiles.intFileID,tblDocumentType.strDocumentName,tblUploadedFiles.dtUploaded as DateUploaded, tblDocuments.strApprovalStatus FROM tblDocuments INNER JOIN tblUploadedFiles ON tblDocuments.intUploadFileID = tblUploadedFiles.intFileID INNER JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intPersonID = ?]; 
+         SELECT tblUploadedFiles.intFileID,tblDocumentType.strDocumentName,tblUploadedFiles.dtUploaded as DateUploaded, tblDocuments.strApprovalStatus FROM tblDocuments INNER JOIN tblUploadedFiles ON tblDocuments.intUploadFileID = tblUploadedFiles.intFileID INNER JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intPersonID = ? AND tblUploadedFiles.intEntityTypeID = ?]; 
 #? AND tblUploadedFiles.intEntityTypeID = ?
     my $sth = $db->prepare($query); 
-    $sth->execute($personID); 
-   
-    while(my $dref = $sth->fetchrow_hashref()){
+    $sth->execute($personID, $Defs::LEVEL_PERSON); 
+       while(my $dref = $sth->fetchrow_hashref()){
        my $viewLink = qq[ <span class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}" target="_blank">]. $lang->txt('Get File') . q[</a></span>];  
-       my $fileLink = "#";
+       my $fileLink = "#$personRegistrationID";
+      
        push @rowdata, {  
 	        id => $dref->{'intFileID'} || 0,
 	        SelectLink => $fileLink,
@@ -377,7 +383,7 @@ sub listDocuments {
       $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=DOC_L">].$Data->{'lang'}->txt('Add').qq[</a></span>];
 
   }
-    $query = qq[
+   my $query = qq[
          SELECT strDocumentName, intDocumentTypeID FROM tblDocumentType WHERE strDocumentFor = ? AND intRealmID IN (0,?)
     ]; 
     $sth = $db->prepare($query);
@@ -387,18 +393,20 @@ sub listDocuments {
                               <input type="hidden" name="a" value="DOC_L" />
                               <label>Add File For</label>  
                               <select name="doclisttype" id="doclisttype">
+                              <option value="0">Misc</option>  
                        ];
     while(my $dref = $sth->fetchrow_hashref()){
         $doclisttype .= qq[<option value="$dref->{'intDocumentTypeID'}">$dref->{'strDocumentName'}</option>];
     } 
-   $doclisttype .= q[     </select> 
-                          <input type="submit" class="button-small generic-button" value="Go" />
-                    </form>
+   $doclisttype .= qq[     </select> 
+                           <input type="hidden" value="$personRegistrationID" name="RegistrationID" />
+                           <input type="submit" class="button-small generic-button" value="Go" />
+                           </form>
                     ];
 #  my $modoptions=qq[<div class="changeoptions">$addlink</div>];
  my $modoptions=qq[<div class="changeoptions"></div>];
 
- my $title = $lang->txt('Registration Documents') ;
+ my $title = $lang->txt('Registration Documents');
  
        # $modoptions   
         $resultHTML = qq[ $modoptions                       

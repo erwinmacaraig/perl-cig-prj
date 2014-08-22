@@ -22,7 +22,7 @@ use UploadFiles;
 use FormHelpers;
 
 sub handle_documents {
-	my($action, $Data, $memberID, $intDocumentTypeID)=@_;
+	my($action, $Data, $memberID, $DocumentTypeID,$RegistrationID)=@_;
   my $resultHTML='';
 	
   my $assocID= $Data->{'clientValues'}{'assocID'} || -1;
@@ -31,8 +31,9 @@ sub handle_documents {
   my $client=setClient($Data->{'clientValues'}) || '';
 
   my $type = '';
-       $intDocumentTypeID ||= 0; 
-	$action ||= 'DOC_L';
+       $DocumentTypeID ||= 0; 
+       $RegistrationID ||= 0;
+       $action ||= 'DOC_L';
 
   if ($action eq 'DOC_u') {
 		my $retvalue = process_doc_upload( 
@@ -48,7 +49,7 @@ sub handle_documents {
     $resultHTML .= delete_doc($Data, $fileID);
 		$type = 'Delete Document';
   }
-	$resultHTML .= list_docs($Data,$memberID,$client,$intDocumentTypeID);
+	$resultHTML .= list_docs($Data,$memberID,$client,$DocumentTypeID,$RegistrationID);
 
   if ($type) {
     auditLog($memberID, $Data, $type, 'Document');
@@ -59,9 +60,11 @@ sub handle_documents {
 
 
 sub list_docs {
-	my($Data, $memberID, $client,$documentTypeID)=@_;
+	my($Data, $memberID, $client, $DocumentTypeID, $RegistrationID )=@_;
 	my $target=$Data->{'target'} || '';
 	my $l = $Data->{'lang'};
+        $DocumentTypeID ||= 0; 
+        $RegistrationID ||= 0;
 
 	my $docs = getUploadedFiles(
 		$Data,
@@ -101,7 +104,7 @@ sub list_docs {
 			</table>
 		];
 	}
-	$body .= new_doc_form($Data, $client,$documentTypeID);
+	$body .= new_doc_form($Data, $client,$DocumentTypeID,$RegistrationID); 
 	
        return $body;
 }
@@ -110,65 +113,41 @@ sub new_doc_form {
 	my(
 		$Data, 
 		$client,
-                $documentTypeID
+                $DocumentTypeID,
+		$RegistrationID,
 	)=@_;
 
 	my $l = $Data->{'lang'};
 	my $target=$Data->{'target'} || '';
         
-	my $currentLevelName = $Data->{'LevelNames'}{$Data->{'clientValues'}{'authLevel'}} || 'organisation';
-	my %permoptions = (
-	    1 => $Data->{'lang'}->txt('All organisations to which this member is linked'),
-	    2 => $Data->{'lang'}->txt("Only to this $currentLevelName"),
-	    3 => $Data->{'lang'}->txt("Organisations ( $currentLevelName and above) to which this member is linked"),
-	);
-		my $perms = drop_down("docperms",\%permoptions,undef,0,1,0);
-	 my $options .= qq[
-			<tr style = "border-bottom:1px solid #777;">
-				<td>&nbsp;</td>
-			</tr>
-			<tr>
-				<td>&nbsp;</td>
-			</tr>
-			<tr>
-				<td class="label">Document Name: </td>
-				<td><input type="text" name="docname" value = "" size="40"></td>
-			</tr>
-			<tr>
-				<td class="label">&nbsp;</td>
-				<td><input type="file" name="doc"></td>
-			</tr>
-			<tr>
-				<td class="label">Viewable by :</td>
-				<td> $perms</td>
-			</tr>
-		];
-
-
-
-
-
-
-    #1 = Available to Everyone
-    #2 = Available to only the person adding it
-    #3 = Available to all bodies at add level and above to which the entity is lnked
-
-	my $title = $l->txt('New Document');
+	#my $currentLevelName = $Data->{'LevelNames'}{$Data->{'clientValues'}{'authLevel'}} || 'organisation';
+	#my %permoptions = (
+	#    1 => $Data->{'lang'}->txt('All organisations to which this member is linked'),
+	#    2 => $Data->{'lang'}->txt("Only to this $currentLevelName"),
+	#    3 => $Data->{'lang'}->txt("Organisations ( $currentLevelName and above) to which this member is linked"),
+	#);
+	#	my $perms = drop_down("docperms",\%permoptions,undef,0,1,0);
+		my $title = $l->txt('New Document');
 	my $body = qq[
+        <br />
 	<div class="sectionheader">$title</div>
-		<div id="docselect">
-		<p>To add a document click the browse button and find the document you wish to upload from your computer.  When you have selected the file click the "Upload" button.</p>
-		</p>
-		<form action="$target" method="POST" enctype="multipart/form-data">
-			<table>
-			$options
-			</table>
-			<br><br>
-			<input type="submit" name="submitb" value="Upload" onclick="document.getElementById('docselect').style.display='none';document.getElementById('pleasewait').style.display='block'"  style="width:160px;">
-			<input type="hidden" name="client" value="].unescape($client).qq[">
-			<input type="hidden" name="a" value="DOC_u">
+	<br />
+         	<div id="docselect">
+		<form action="$target" method="POST" enctype="multipart/form-data" class="dropzone">			
+
+		<input type="hidden" name="client" value="].unescape($client).qq[">];
+	if($DocumentTypeID){
+		$body .= qq[
+                <input type="hidden" name="DocumentTypeID" value="$DocumentTypeID" />
+                <input type="hidden" name="RegistrationID" value="$RegistrationID" />];
+        }
+
+
+	$body .=	qq[<input type="hidden" name="a" value="DOC_u">
 			
-		</form>
+		</form> 
+                <br />  
+                <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=P_HOME">] . $Data->{'lang'}->txt('Continue').q[</a></span>
 		</div>
 	];
 	return $body;
@@ -184,17 +163,25 @@ sub process_doc_upload	{
 
 	my @files_to_process = ();
 
-		my $name = param('docname') || '';
-		my $filefield = 'doc' ;
-		my $permission = param('docperms') || '';
+		my $name = param('file') || '';
+		my $filefield = 'file' ;
+		my $permission = param('docperms') || 1;
+                              
+                my $docTypeID = param('DocumentTypeID') || 0; 
+                my $regoID = param('RegistrationID') || 0; 
+                my $other_person_info = {
+                	docTypeID => $docTypeID,
+                        regoID    => $regoID,    
+               };
 		push @files_to_process, [$name, $filefield, $permission];
-	
+                	
 	my $retvalue = processUploadFile(
 		$Data, 
 		\@files_to_process,
-    $Defs::LEVEL_MEMBER,
-    $memberID,
-    $Defs::UPLOADFILETYPE_DOC,
+                $Defs::LEVEL_MEMBER,
+                $memberID,
+                $Defs::UPLOADFILETYPE_DOC,
+                $other_person_info,
 	);
 	return $retvalue;
 }
