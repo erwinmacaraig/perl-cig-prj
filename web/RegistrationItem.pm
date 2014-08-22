@@ -51,9 +51,6 @@ sub getRegistrationItems    {
 			AND RI.strAgeLevel = ?		
             AND RI.strItemType = ?
     ];
-	warn("ruleFor:$ruleFor origin $originLevel $regNature $itemType ");
-use Data::Dumper;
-print STDERR Dumper($Rego_ref);
 	my $q = $Data->{'db'}->prepare($st) or query_error($st);
 	$q->execute(
         $Data->{'Realm'},
@@ -72,9 +69,7 @@ print STDERR Dumper($Rego_ref);
 	) or query_error($st);
 	
     my @Items=();
-warn($st);
     while (my $dref = $q->fetchrow_hashref())   {
-warn("ITEM");
         my %Item=();
         $Item{'ID'} = $dref->{'intID'};
         $Item{'UseExistingThisEntity'} = $dref->{'intUseExistingThisEntity'} || 0;

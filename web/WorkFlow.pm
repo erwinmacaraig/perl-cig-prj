@@ -582,10 +582,8 @@ sub addWorkFlowTasks {
 
 
     while (my $dref= $q->fetchrow_hashref())    {
-warn("RULE FOUND");
         my $approvalEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intApprovalEntityLevel'}) || 0;
         my $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intProblemResolutionEntityLevel'});
-warn("DDDD" . $approvalEntityID . "|" . $problemEntityID);
         next if (! $approvalEntityID and ! $problemEntityID);
   	    $qINS->execute(
             $dref->{'intWFRuleID'},
@@ -736,7 +734,6 @@ sub checkForOutstandingTasks {
             AND ct.strWFRuleFor = ?
 		ORDER by pt.intWFTaskID;
 	];
-warn("CHECKING FOR OUTSANDING FOR PERSON $personID PR $personRegistrationID");	
 	$q = $db->prepare($st);
   	$q->execute(
   		$Defs::WF_TASK_STATUS_PENDING,
@@ -757,7 +754,6 @@ warn("CHECKING FOR OUTSANDING FOR PERSON $personID PR $personRegistrationID");
 	if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
 	}
-warn("$ruleFor STILL CHECKING");
 
 	my $prev_WFTaskID = 0;
    	my $updateThisTask = '';
@@ -769,7 +765,6 @@ warn("$ruleFor STILL CHECKING");
    	#Should be a cleverer way to do this, but check all the Pending Tasks and see if all of their
    	# pre-reqs have been completed. If so, update their status from Pending to Active.
 	while(my $dref= $q->fetchrow_hashref()) {
-warn("INCHECKING");
 		$count ++;
 	
    		if ($dref->{intWFTaskID} != $prev_WFTaskID) {
@@ -796,7 +791,6 @@ warn("INCHECKING");
 		}
    	}
 	
-warn("CHECKING $update_count");
 	my $rc = 0;
 	 
 	if ($update_count > 0) {
@@ -878,9 +872,7 @@ warn("CHECKING $update_count");
                 $rc = 1;
         }
  
-warn("------ $ruleFor $personRegistrationID $rowCount");
         if ($ruleFor eq 'REGO' and $personRegistrationID and !$rowCount) {
-warn("---- NOW HERE");
         
 	            $st = qq[
 	            	UPDATE tblPersonRegistration_$Data->{'Realm'} 
@@ -937,7 +929,6 @@ sub setDocumentStatus  {
 
     my $q = $Data->{'db'}->prepare($st);
     $q->execute($taskID);
-warn("IN SET DOCO FOR $taskID");
 
     my $dref= $q->fetchrow_hashref();
     my $personID = $dref->{intPersonID} || 0;
@@ -950,7 +941,6 @@ warn("IN SET DOCO FOR $taskID");
 
     return if (! $entityID and !$personID);
     return if (! $documentID and !$documentTypeID);
-warn("-----STILL IN SET DOCO FOR $taskID, P $personID, $documentTypeID");
 
     $st = qq[
         UPDATE tblDocuments

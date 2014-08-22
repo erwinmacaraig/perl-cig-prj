@@ -88,9 +88,10 @@ sub handleRegistrationFlowBulk {
     if ( $action eq 'PREGFB_SPU' ) {
         my $rolloverIDs= param('rolloverIDs') || '';
         my $prodIds = param('prodIds');
+        my $prodQty= param('prodQty');
         my $markPaid = param('markPaid');
         my $paymentType= param('paymentType');
-        $body .= bulkRegoSubmit($Data, $bulk_ref, $rolloverIDs, $prodIds, $markPaid, $paymentType);
+        $body .= bulkRegoSubmit($Data, $bulk_ref, $rolloverIDs, $prodIds, $prodQty, $markPaid, $paymentType);
 #        return $Data->{'lang'}->txt("No $Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'} selected") if (! scalar @MembersToRollover);
         $body .= qq[ROLLOVER FOR $rolloverIDs];
         warn("ROLLOVER$rolloverIDs");

@@ -81,7 +81,7 @@ sub displayRegoFlowComplete {
         my @productQty= split /:/, $hidden_ref->{'prodQty'};
         foreach my $prodQty (@productQty){ 
             my ($prodID, $qty) = split /-/, $prodQty;
-            $hidden_ref->{"prodQTY_$prodID"} =$prodQty;
+            $hidden_ref->{"prodQTY_$prodID"} =$qty;
         }
         $hidden_ref->{'txnIds'} = save_rego_products($Data, $regoID, $personID, $entityID, $rego_ref->{'entityLevel'}, $rego_ref, $hidden_ref); #\%params);
 
@@ -379,7 +379,7 @@ sub add_rego_record{
  
 sub bulkRegoSubmit {
 
-    my ($Data, $bulk_ref, $rolloverIDs, $productIDs, $markPaid, $paymentType) = @_;
+    my ($Data, $bulk_ref, $rolloverIDs, $productIDs, $productQtys, $markPaid, $paymentType) = @_;
 
     my $body = 'Submitting';
     my @IDs= split /\|/, $rolloverIDs;
@@ -431,10 +431,10 @@ sub bulkRegoSubmit {
         foreach my $product (@products) {
             $Products{'prod_'.$product} =1;
         }
-        my @productQty= split /:/, $Products{'prodQty'};
+        my @productQty= split /:/, $productQtys;
         foreach my $prodQty (@productQty){
             my ($prodID, $qty) = split /-/, $prodQty;
-            $Products{"prodQTY_$prodID"} =$prodQty;
+            $Products{"prodQTY_$prodID"} =$qty;
         }
         my ($txns_added, $amount) = insertRegoTransaction(
             $Data, 

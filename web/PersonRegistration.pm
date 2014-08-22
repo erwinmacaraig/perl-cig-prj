@@ -28,7 +28,6 @@ sub rolloverExistingPersonRegistrations {
 
     my ($Data, $personID, $personRegistrationID) = @_;
 
-warn("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^IN ROLLOVER");
     my %Reg = (
         personRegistrationID=> $personRegistrationID || 0,
     );
@@ -119,7 +118,8 @@ sub checkNewRegoOK  {
 #Not OK.. Transfer needed
 
     ## Now check within this ENTITY
-    my %Reg = (
+    %Reg=();
+    %Reg = (
         sport=> $rego_ref->{'sport'} || '',
         personType=> $rego_ref->{'personType'} || '',
         entityID => $rego_ref->{'entityID'},
@@ -127,13 +127,14 @@ sub checkNewRegoOK  {
         personLevel=> $rego_ref->{'personLevel'} || '',
         ageLevel=> $rego_ref->{'ageLevel'} || '',
     );
-    my ($count, $regs) = getRegistrationData(
+    $count=0;
+    $regs='';
+    ($count, $regs) = getRegistrationData(
         $Data,
         $personID,
         \%Reg
     );
-    my $ok=1;
-warn("NEW CHECK $count");
+    $ok=1;
     foreach my $reg (@{$regs})  {
         next if $reg->{'intEntityID'} != $rego_ref->{'entityID'};
         $ok = 0 if ($reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PENDING or $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE or $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PASSIVE or $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_TRANSFERRED);
@@ -165,8 +166,8 @@ sub checkRenewalRegoOK  {
         $personID,
         \%Reg
     );
-warn("IN RENEWAL CHECK$count");
-    my @statusIN = ($Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_INPROGRESS);
+    @statusIN = ();
+    @statusIN = ($Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_INPROGRESS);
 
     %Reg=();
     %Reg = (
@@ -383,10 +384,10 @@ sub updatePersonRegistration    {
 
     my ($Data, $personID, $personRegistrationID, $Reg_ref) = @_;
 
-    if ($Reg_ref->{'personEntityRole'} eq '-')  {
+    if ($Reg_ref->{'personEntityRole'} && $Reg_ref->{'personEntityRole'} eq '-')  {
         $Reg_ref->{'personEntityRole'}= '';
     }
-    if ($Reg_ref->{'strPersonEntityRole'} eq '-')  {
+    if ($Reg_ref->{'strPersonEntityRole'} && $Reg_ref->{'strPersonEntityRole'} eq '-')  {
         $Reg_ref->{'strPersonEntityRole'}= '';
     }
         
@@ -447,10 +448,10 @@ sub getRegistrationData	{
     );
     my $where = '';
 
-    if ($regFilters_ref->{'personEntityRole'} eq '-')  {
+    if ($regFilters_ref->{'personEntityRole'} && $regFilters_ref->{'personEntityRole'} eq '-')  {
         $regFilters_ref->{'personEntityRole'}= '';
     }
-    if ($regFilters_ref->{'strPersonEntityRole'} eq '-')  {
+    if ($regFilters_ref->{'strPersonEntityRole'} && $regFilters_ref->{'strPersonEntityRole'} eq '-')  {
         $regFilters_ref->{'strPersonEntityRole'}= '';
     }
     if($regFilters_ref->{'personRegistrationID'})  {
