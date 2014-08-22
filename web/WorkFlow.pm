@@ -883,7 +883,9 @@ sub checkForOutstandingTasks {
                         dtLastUpdated=NOW()
 	    	        WHERE 
                         intPersonRegistrationID = ?
+                        AND strStatus IN ('PENDING', 'INPROGRESS')
 	        	];
+                        #AND strStatus NOT IN ('SUSPENDED', 'TRANSFERRED', 'DELETED')
 	    
 		        $q = $db->prepare($st);
 		        $q->execute(
@@ -1091,11 +1093,28 @@ sub resolveTask {
         getLastEntityID($Data->{'clientValues'}),
         $Data->{'Realm'}
   	);
-    setDocumentStatus($Data, $WFTaskID, 'PENDING');
-  		
 	if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
 	}
+    setDocumentStatus($Data, $WFTaskID, 'PENDING');
+
+    $st = qq[
+        UPDATE tblPersonRegistration_$Data->{'Realm'} as PR
+            INNER JOIN tblWFTask as T ON (
+                PR.intPersonRegistrationID = T.intPersonRegistrationID
+                AND PR.intPersonID = T.intPersonID
+            )
+        SET strStatus='PENDING'
+        WHERE 
+            intWFTaskID = ?
+            AND PR.strStatus IN ('REJECTED')
+            AND T.strWFRule = 'REGO'
+        LIMIT 1
+    ];
+  	$q = $db->prepare($st);
+  	$q->execute(
+  		$WFTaskID,
+    );
 	
     return(0);
     
@@ -1136,6 +1155,24 @@ sub rejectTask {
 	if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
 	}
+
+    $st = qq[
+        UPDATE tblPersonRegistration_$Data->{'Realm'} as PR
+            INNER JOIN tblWFTask as T ON (
+                PR.intPersonRegistrationID = T.intPersonRegistrationID
+                AND PR.intPersonID = T.intPersonID
+            )
+        SET strStatus='REJECTED'
+        WHERE 
+            intWFTaskID = ?
+            AND PR.strStatus IN ('PENDING')
+            AND T.strWFRule = 'REGO'
+        LIMIT 1
+    ];
+  	$q = $db->prepare($st);
+  	$q->execute(
+  		$WFTaskID,
+    );
 	
     return(0);
     
