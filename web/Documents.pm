@@ -48,7 +48,7 @@ sub handle_documents {
     $resultHTML .= delete_doc($Data, $fileID);
 		$type = 'Delete Document';
   }
-	$resultHTML .= list_docs($Data,$memberID,$client);
+	$resultHTML .= list_docs($Data,$memberID,$client,$intDocumentTypeID);
 
   if ($type) {
     auditLog($memberID, $Data, $type, 'Document');
@@ -59,7 +59,7 @@ sub handle_documents {
 
 
 sub list_docs {
-	my($Data, $memberID, $client)=@_;
+	my($Data, $memberID, $client,$documentTypeID)=@_;
 	my $target=$Data->{'target'} || '';
 	my $l = $Data->{'lang'};
 
