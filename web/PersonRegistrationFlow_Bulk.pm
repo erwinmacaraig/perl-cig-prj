@@ -49,6 +49,8 @@ sub handleRegistrationFlowBulk {
     my %Hidden=();
     $Hidden{'client'} = unescape($cl);
     $Hidden{'txnIds'} = $params{'txnIds'} || '';
+    $Hidden{'prodIds'} = $params{'prodIds'} || '';
+    $Hidden{'prodQty'} = $params{'prodQty'} || '';
 
     my $pref= undef;
    #if ($personID && $personID> 0)  {
@@ -97,6 +99,7 @@ sub handleRegistrationFlowBulk {
         #Update product records
         #$Hidden{'txnIds'} = save_rego_products($Data, $regoID, $personID, $entityID, $entityLevel, \%params);
         my @productsselected=();
+        my @productsqty=();
         for my $k (%params)  {
             if($k=~/prod_/) {
                 if($params{$k}==1)  {
@@ -105,6 +108,14 @@ sub handleRegistrationFlowBulk {
                     push @productsselected, $prod;
                 }
             }
+            if($k=~/prodQTY_/) {
+                if($params{$k})  {
+                    my $prod=$k;
+                    $prod=~s/[^\d]//g;
+                    push @productsqty, "$prod-$params{$k}";
+                }
+            }
+            
             if ($k eq 'markPaid' && $params{$k} == 1)   {
                 $Hidden{'markPaid'} = 1;
             }
@@ -114,6 +125,8 @@ sub handleRegistrationFlowBulk {
         }
         my $prodIds= join(':',@productsselected);
         $Hidden{'prodIds'} = $prodIds;
+        my $prodQty= join(':',@productsqty);
+        $Hidden{'prodQty'} = $prodQty;
         ## PUT PRODUCTS IN HIDDEN
         $action = $Flow{$action};
     }

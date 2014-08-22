@@ -74,7 +74,7 @@ sub checkExistingProduct    {
     my $prWhere='';
     if ($tableType == $Defs::LEVEL_PERSON)  {
         $prJoin = qq[
-           LEFT JOIN tblPersonRegistrations_$Data->{Realm} as pr ON (
+           LEFT JOIN tblPersonRegistration_$Data->{Realm} as pr ON (
                 pr.intPersonID = t.intID
             )
         ];
@@ -204,7 +204,14 @@ sub displayTransaction	{
     my $pr_count = 0;
     my %PR_vals=();
     if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON and $TableID)  {
-        my @statusNOTIN = ($Defs::PERSONREGO_STATUS_INPROGRESS);
+        my @statusNOTIN = ();
+        if ($id)    {
+        @statusNOTIN = ($Defs::PERSONREGO_STATUS_INPROGRESS);
+        }
+        else    {
+            ## ADD SO LESS VALUES
+            @statusNOTIN = ($Defs::PERSONREGO_STATUS_INPROGRESS, $Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_DELETED);
+        }
         my %Reg = (
             statusNOTIN => \@statusNOTIN,
         );
@@ -216,16 +223,24 @@ sub displayTransaction	{
         );
         if ($pr_count) {
             foreach my $reg (@{$regs})   {
-                my $sport = $reg->{'strSport'};
-                my $personType= $reg->{'strPersonType'};
-                my $entityRole= $reg->{'strPersonEntityRole'};
-                my $personLevel= $reg->{'strPersonLevel'};
-                my $ageLevel= $reg->{'strAgeLevel'};
+                my $sport = $Defs::sportType{$reg->{'strSport'}} || '';
+                my $personType= $Defs::personType{$reg->{'strPersonType'}} || '';
+                my $entityRole= $reg->{'strEntityRoleName'};
+                my $personLevel= $Defs::personLevel{$reg->{'strPersonLevel'}} || '';
+                my $ageLevel= $Defs::ageLevel{$reg->{'strAgeLevel'}} || '';
                 my $entityLocalName= $reg->{'strLocalName'};
                 my $nationalPeriodName= $reg->{'strNationalPeriodName'};
                 my $entityLatinName= $reg->{'strLatinName'};
-                my $status= $reg->{'Status'};
-                my $text = $entityLocalName . "($entityLatinName) | $sport $personType $personLevel $ageLevel $nationalPeriodName $status";
+                my $status= $Defs::personRegoStatus{$reg->{'strStatus'}} || '';
+                my $text = $entityLocalName;
+                $text .=  " ($entityLatinName)" if ($entityLatinName);
+                $text .= " -$personType" if ($personType);
+                $text .= " -$entityRole" if ($entityRole);
+                $text .= " -$sport" if ($sport);
+                $text .= " -$personLevel" if ($personLevel);
+                $text .= " -$ageLevel" if ($ageLevel);
+                $text .= " -$nationalPeriodName " if ($nationalPeriodName);
+                $text .= " -$status" if ($status);
                 $PR_vals{$reg->{'intPersonRegistrationID'}} = $text;
             }
         }

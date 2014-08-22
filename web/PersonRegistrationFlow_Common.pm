@@ -74,6 +74,16 @@ sub displayRegoFlowComplete {
             $regoID,
             $rego_ref
          );
+         
+        my @products= split /:/, $hidden_ref->{'prodIds'};
+        foreach my $prod (@products){ $hidden_ref->{"prod_$prod"} =1;}
+        my @productQty= split /:/, $hidden_ref->{'prodQty'};
+        foreach my $prodQty (@productQty){ 
+            my ($prodID, $qty) = split /-/, $prodQty;
+            $hidden_ref->{"prodQTY_$prodID"} =$prodQty;
+        }
+        $hidden_ref->{'txnIds'} = save_rego_products($Data, $regoID, $personID, $entityID, $rego_ref->{'entityLevel'}, $rego_ref, $hidden_ref); #\%params);
+
          my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
          my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
         my $gateways = '';
@@ -161,7 +171,7 @@ sub displayRegoFlowProducts {
     my $lang=$Data->{'lang'};
 
     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_PU&amp;rID=$regoID";
-    my $products = getRegistrationItems(
+    my $CheckProducts = getRegistrationItems(
         $Data,
         'REGO',
         'PRODUCT',
@@ -174,7 +184,7 @@ sub displayRegoFlowProducts {
     );
     my @prodIDs = ();
     my %ProductRules=();
-    foreach my $product (@{$products})  {
+    foreach my $product (@{$CheckProducts})  {
         #next if($product->{'UseExistingThisEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'THIS_ENTITY'));
         #next if($product->{'UseExistingAnyEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'ANY_ENTITY'));
 
@@ -207,7 +217,7 @@ sub displayRegoFlowProductsBulk {
     my $lang=$Data->{'lang'};
 
     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_PU&amp;rID=$regoID";
-    my $products = getRegistrationItems(
+    my $CheckProducts = getRegistrationItems(
         $Data,
         'REGO',
         'PRODUCT',
@@ -220,7 +230,7 @@ sub displayRegoFlowProductsBulk {
     );
     my @prodIDs = ();
     my %ProductRules=();
-    foreach my $product (@{$products})  {
+    foreach my $product (@{$CheckProducts})  {
         push @prodIDs, $product->{'ID'};
         $ProductRules{$product->{'ID'}} = $product;
      }
@@ -307,7 +317,7 @@ sub save_rego_products {
 
     my $session='';
 
-    my $products = getRegistrationItems(
+    my $CheckProducts = getRegistrationItems(
         $Data,
         'REGO',
         'PRODUCT',
@@ -318,7 +328,7 @@ sub save_rego_products {
         0,
         $rego_ref,
     );
-    my ($txns_added, $amount) = insertRegoTransaction($Data, $regoID, $personID, $params, $entityID, $entityLevel, 1, $session, $products);
+    my ($txns_added, $amount) = insertRegoTransaction($Data, $regoID, $personID, $params, $entityID, $entityLevel, 1, $session, $CheckProducts);
     my $txnIds = join(':',@{$txns_added});
     return $txnIds;
 }
@@ -373,7 +383,7 @@ sub bulkRegoSubmit {
     my $body = 'Submitting';
     my @IDs= split /\|/, $rolloverIDs;
 
-    my $products = getRegistrationItems(
+    my $CheckProducts = getRegistrationItems(
         $Data,
         'REGO',
         'PRODUCT',
@@ -412,6 +422,11 @@ sub bulkRegoSubmit {
         foreach my $product (@products) {
             $Products{'prod_'.$product} =1;
         }
+        my @productQty= split /:/, $Products{'prodQty'};
+        foreach my $prodQty (@productQty){
+            my ($prodID, $qty) = split /-/, $prodQty;
+            $Products{"prodQTY_$prodID"} =$prodQty;
+        }
         my ($txns_added, $amount) = insertRegoTransaction(
             $Data, 
             $regoID, 
@@ -421,7 +436,7 @@ sub bulkRegoSubmit {
             $bulk_ref->{'entityLevel'}, 
             $Defs::LEVEL_PERSON, 
             '',
-            $products
+            $CheckProducts
         );
         if ($paymentType and $markPaid)  {
             my %Settings=();

@@ -49,12 +49,13 @@ sub handleRegistrationFlowBackend   {
     $Hidden{'rID'} = $regoID;
     $Hidden{'client'} = unescape($cl);
     $Hidden{'txnIds'} = $params{'txnIds'} || '';
+    $Hidden{'prodIds'} = $params{'prodIds'} || '';
+    $Hidden{'prodQty'} = $params{'prodQty'} || '';
 
     my $pref= undef;
     if ($personID && $personID>0)  {
         $pref = loadPersonDetails($Data->{'db'}, $personID);
     }
-warn("FBEND:$personID");
 
     if($regoID) {
         my $valid =0;
@@ -108,7 +109,29 @@ warn("FBEND:$personID");
     }
     if ( $action eq 'PREGF_PU' ) {
         #Update product records
-        $Hidden{'txnIds'} = save_rego_products($Data, $regoID, $personID, $entityID, $entityLevel, $rego_ref, \%params);
+        my @productsselected=();
+        my @productsqty=();
+        for my $k (%params)  {
+            if($k=~/prod_/) {
+                if($params{$k}==1)  {
+                    my $prod=$k;
+                    $prod=~s/[^\d]//g;
+                    push @productsselected, $prod;
+                }
+            }
+            if($k=~/prodQTY_/) {
+                if($params{$k})  {
+                    my $prod=$k;
+                    $prod=~s/[^\d]//g;
+                    push @productsqty, "$prod-$params{$k}";
+                }
+            }
+        }
+        my $prodQty= join(':',@productsqty);
+        $Hidden{'prodQty'} = $prodQty;
+        my $prodIds= join(':',@productsselected);
+        $Hidden{'prodIds'} = $prodIds;
+#        $Hidden{'txnIds'} = save_rego_products($Data, $regoID, $personID, $entityID, $entityLevel, $rego_ref, \%params);
         $action = $Flow{$action};
     }
     if ( $action eq 'PREGF_DU' ) {

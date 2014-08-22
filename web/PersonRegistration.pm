@@ -508,12 +508,18 @@ sub getRegistrationData	{
             DATE_FORMAT(pr.dtAdded, "%Y%m%d%H%i") as dtAdded_,
             DATE_FORMAT(pr.dtAdded, "%Y-%m-%d %H:%i") as dtAdded_formatted,
             DATE_FORMAT(pr.dtLastUpdated, "%Y%m%d%H%i") as dtLastUpdated_,
+            er.strEntityRoleName,
             e.strLocalName,
             e.strLatinName
         FROM
             tblPersonRegistration_$Data->{'Realm'} AS pr
             LEFT JOIN tblNationalPeriod as np ON (
                 np.intNationalPeriodID = pr.intNationalPeriodID
+            )
+            LEFT JOIN tblEntityTypeRoles as er ON (
+                er.strEntityRoleKey = pr.strPersonEntityRole
+                and er.strSport = pr.strSport
+                and er.strPersonType = pr.strPersonType
             )
             INNER JOIN tblEntity e ON (
                 pr.intEntityID = e.intEntityID 
