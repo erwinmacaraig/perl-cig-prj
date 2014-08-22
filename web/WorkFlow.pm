@@ -7,6 +7,7 @@ require Exporter;
   	approveTask
   	checkForOutstandingTasks
     addIndividualTask
+    cleanTasks
 );
 
 use strict;
@@ -20,6 +21,40 @@ use Clearances;
 use Duplicates;
 use PersonRegistration;
 use CGI qw(param unescape escape);
+
+sub cleanTasks  {
+
+    my ($Data, $personID, $entityID, $personRegistrationID, $ruleFor) = @_;
+    return if (!$personID and !$entityID and !$personRegistrationID);
+
+    my $st = qq[
+        DELETE tblWFTaskPreReq.* 
+        FROM 
+            tblWFTaskPreReq 
+            INNER JOIN tblWFTask USING (intWFTaskID) 
+        WHERE 
+            intPersonID = ?
+            AND intEntityID = ?
+            AND intPersonRegistrationID=?
+            AND strWFRuleFor = ?
+    ];
+
+    my $q= $Data->{'db'}->prepare($st);
+    $q->execute($personID, $entityID, $personRegistrationID, $ruleFor);
+    
+    $st = qq[
+        DELETE 
+        FROM 
+            tblWFTask
+        WHERE 
+            intPersonID = ?
+            AND intEntityID = ?
+            AND intPersonRegistrationID=?
+            AND strWFRuleFor = ?
+    ];
+    $q= $Data->{'db'}->prepare($st);
+    $q->execute($personID, $entityID, $personRegistrationID, $ruleFor);
+}
 
 sub addIndividualTask   {
 
@@ -473,7 +508,6 @@ sub addWorkFlowTasks {
 			AND r.strRegistrationNature = ?
             AND r.strPersonEntityRole IN ('', pr.strPersonEntityRole)
 		];
-warn($st);
 	    $q = $db->prepare($st);
   	    $q->execute($personRegistrationID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
     }
@@ -509,7 +543,6 @@ warn($st);
             AND r.intOriginLevel = ?
 			AND r.strRegistrationNature = ?
 		];
-warn($st);
 	    $q = $db->prepare($st);
   	    $q->execute($entityID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
     }
@@ -549,10 +582,8 @@ warn($st);
 
 
     while (my $dref= $q->fetchrow_hashref())    {
-warn("RULE FOUND");
         my $approvalEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intApprovalEntityLevel'}) || 0;
         my $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intProblemResolutionEntityLevel'});
-warn("DDDD" . $approvalEntityID . "|" . $problemEntityID);
         next if (! $approvalEntityID and ! $problemEntityID);
   	    $qINS->execute(
             $dref->{'intWFRuleID'},
@@ -703,7 +734,6 @@ sub checkForOutstandingTasks {
             AND ct.strWFRuleFor = ?
 		ORDER by pt.intWFTaskID;
 	];
-warn("CHECKING FOR OUTSANDING FOR PERSON $personID PR $personRegistrationID");	
 	$q = $db->prepare($st);
   	$q->execute(
   		$Defs::WF_TASK_STATUS_PENDING,
@@ -724,7 +754,6 @@ warn("CHECKING FOR OUTSANDING FOR PERSON $personID PR $personRegistrationID");
 	if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
 	}
-warn("$ruleFor STILL CHECKING");
 
 	my $prev_WFTaskID = 0;
    	my $updateThisTask = '';
@@ -736,7 +765,6 @@ warn("$ruleFor STILL CHECKING");
    	#Should be a cleverer way to do this, but check all the Pending Tasks and see if all of their
    	# pre-reqs have been completed. If so, update their status from Pending to Active.
 	while(my $dref= $q->fetchrow_hashref()) {
-warn("INCHECKING");
 		$count ++;
 	
    		if ($dref->{intWFTaskID} != $prev_WFTaskID) {
@@ -763,7 +791,6 @@ warn("INCHECKING");
 		}
    	}
 	
-warn("CHECKING $update_count");
 	my $rc = 0;
 	 
 	if ($update_count > 0) {
@@ -811,8 +838,9 @@ warn("CHECKING $update_count");
             $Defs::WF_TASK_STATUS_ACTIVE
 	  	);
   
+        my $rowCount = $q->fetchrow_array() || 0;
         
-        if ($ruleFor eq 'ENTITY' and $entityID and !$q->fetchrow_array())   {
+        if ($ruleFor eq 'ENTITY' and $entityID and ! $rowCount) {
             $st = qq[
                     UPDATE tblEntity
                     SET
@@ -828,7 +856,7 @@ warn("CHECKING $update_count");
                     );
                 $rc = 1;
         }
-        if ($ruleFor eq 'DOCUMENT' and $documentID and !$q->fetchrow_array())   {
+        if ($ruleFor eq 'DOCUMENT' and $documentID and !$rowCount)   {
             $st = qq[
                     UPDATE tblDocuments
                     SET
@@ -844,22 +872,8 @@ warn("CHECKING $update_count");
                 $rc = 1;
         }
  
-        if ($ruleFor eq 'REGO' and $personRegistrationID and !$q->fetchrow_array()) {
-        	#Now check to see if there is a payment outstanding
-        	#$st = qq[
-			#        SELECT intPaymentRequired
-			#        FROM tblPersonRegistration_$Data->{'Realm'} 
-			#        WHERE intPersonRegistrationID = ?
-			#];
-			#        
-			#$q = $db->prepare($st);
-			#$q->execute($personRegistrationID);
-			#            
-			#my $dref= $q->fetchrow_hashref();
-			#my $intPaymentRequired = 0; #$dref->{intPaymentRequired};
-			  	
-        	#if (!$intPaymentRequired) {
-        		#Nothing outstanding, so mark this registration as complete
+        if ($ruleFor eq 'REGO' and $personRegistrationID and !$rowCount) {
+        
 	            $st = qq[
 	            	UPDATE tblPersonRegistration_$Data->{'Realm'} 
                     SET
@@ -869,7 +883,9 @@ warn("CHECKING $update_count");
                         dtLastUpdated=NOW()
 	    	        WHERE 
                         intPersonRegistrationID = ?
+                        AND strStatus IN ('PENDING', 'INPROGRESS')
 	        	];
+                        #AND strStatus NOT IN ('SUSPENDED', 'TRANSFERRED', 'DELETED')
 	    
 		        $q = $db->prepare($st);
 		        $q->execute(
@@ -915,7 +931,6 @@ sub setDocumentStatus  {
 
     my $q = $Data->{'db'}->prepare($st);
     $q->execute($taskID);
-warn("IN SET DOCO FOR $taskID");
 
     my $dref= $q->fetchrow_hashref();
     my $personID = $dref->{intPersonID} || 0;
@@ -928,7 +943,6 @@ warn("IN SET DOCO FOR $taskID");
 
     return if (! $entityID and !$personID);
     return if (! $documentID and !$documentTypeID);
-warn("-----STILL IN SET DOCO FOR $taskID, P $personID, $documentTypeID");
 
     $st = qq[
         UPDATE tblDocuments
@@ -1073,18 +1087,34 @@ sub resolveTask {
             AND intRealmID = ?
     ];
 		
-warn("DDDD");
   	$q = $db->prepare($st);
   	$q->execute(
   		$WFTaskID,
         getLastEntityID($Data->{'clientValues'}),
         $Data->{'Realm'}
   	);
-    setDocumentStatus($Data, $WFTaskID, 'PENDING');
-  		
 	if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
 	}
+    setDocumentStatus($Data, $WFTaskID, 'PENDING');
+
+    $st = qq[
+        UPDATE tblPersonRegistration_$Data->{'Realm'} as PR
+            INNER JOIN tblWFTask as T ON (
+                PR.intPersonRegistrationID = T.intPersonRegistrationID
+                AND PR.intPersonID = T.intPersonID
+            )
+        SET strStatus='PENDING'
+        WHERE 
+            intWFTaskID = ?
+            AND PR.strStatus IN ('REJECTED')
+            AND T.strWFRule = 'REGO'
+        LIMIT 1
+    ];
+  	$q = $db->prepare($st);
+  	$q->execute(
+  		$WFTaskID,
+    );
 	
     return(0);
     
@@ -1125,6 +1155,24 @@ sub rejectTask {
 	if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
 	}
+
+    $st = qq[
+        UPDATE tblPersonRegistration_$Data->{'Realm'} as PR
+            INNER JOIN tblWFTask as T ON (
+                PR.intPersonRegistrationID = T.intPersonRegistrationID
+                AND PR.intPersonID = T.intPersonID
+            )
+        SET strStatus='REJECTED'
+        WHERE 
+            intWFTaskID = ?
+            AND PR.strStatus IN ('PENDING')
+            AND T.strWFRule = 'REGO'
+        LIMIT 1
+    ];
+  	$q = $db->prepare($st);
+  	$q->execute(
+  		$WFTaskID,
+    );
 	
     return(0);
     

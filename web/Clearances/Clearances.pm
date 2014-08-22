@@ -1393,7 +1393,7 @@ sub finaliseClearance	{
 			AND intPersonID = $intPersonID
             AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
 	];
-	my $query = $db->prepare($st) or query_error($st);
+	$query = $db->prepare($st) or query_error($st);
 	$query->execute($personType, $sport, $ageLevel, $personLevel, $entityRole) or query_error($st);
 
 	sendCLREmail($Data, $cID, 'FINALISED');

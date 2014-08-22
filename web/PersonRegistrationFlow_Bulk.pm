@@ -21,6 +21,7 @@ use TTTemplate;
 use UploadFiles;
 use ListPersons;
 use BulkPersons;
+use NationalReportingPeriod;
 
 use Data::Dumper;
 
@@ -49,6 +50,8 @@ sub handleRegistrationFlowBulk {
     my %Hidden=();
     $Hidden{'client'} = unescape($cl);
     $Hidden{'txnIds'} = $params{'txnIds'} || '';
+    $Hidden{'prodIds'} = $params{'prodIds'} || '';
+    $Hidden{'prodQty'} = $params{'prodQty'} || '';
 
     my $pref= undef;
    #if ($personID && $personID> 0)  {
@@ -85,9 +88,10 @@ sub handleRegistrationFlowBulk {
     if ( $action eq 'PREGFB_SPU' ) {
         my $rolloverIDs= param('rolloverIDs') || '';
         my $prodIds = param('prodIds');
+        my $prodQty= param('prodQty');
         my $markPaid = param('markPaid');
         my $paymentType= param('paymentType');
-        $body .= bulkRegoSubmit($Data, $bulk_ref, $rolloverIDs, $prodIds, $markPaid, $paymentType);
+        $body .= bulkRegoSubmit($Data, $bulk_ref, $rolloverIDs, $prodIds, $prodQty, $markPaid, $paymentType);
 #        return $Data->{'lang'}->txt("No $Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'} selected") if (! scalar @MembersToRollover);
         $body .= qq[ROLLOVER FOR $rolloverIDs];
         warn("ROLLOVER$rolloverIDs");
@@ -97,6 +101,7 @@ sub handleRegistrationFlowBulk {
         #Update product records
         #$Hidden{'txnIds'} = save_rego_products($Data, $regoID, $personID, $entityID, $entityLevel, \%params);
         my @productsselected=();
+        my @productsqty=();
         for my $k (%params)  {
             if($k=~/prod_/) {
                 if($params{$k}==1)  {
@@ -105,6 +110,14 @@ sub handleRegistrationFlowBulk {
                     push @productsselected, $prod;
                 }
             }
+            if($k=~/prodQTY_/) {
+                if($params{$k})  {
+                    my $prod=$k;
+                    $prod=~s/[^\d]//g;
+                    push @productsqty, "$prod-$params{$k}";
+                }
+            }
+            
             if ($k eq 'markPaid' && $params{$k} == 1)   {
                 $Hidden{'markPaid'} = 1;
             }
@@ -114,6 +127,8 @@ sub handleRegistrationFlowBulk {
         }
         my $prodIds= join(':',@productsselected);
         $Hidden{'prodIds'} = $prodIds;
+        my $prodQty= join(':',@productsqty);
+        $Hidden{'prodQty'} = $prodQty;
         ## PUT PRODUCTS IN HIDDEN
         $action = $Flow{$action};
     }
@@ -133,6 +148,7 @@ sub handleRegistrationFlowBulk {
         );
     }
     elsif ( $action eq 'PREGFB_SP' ) {
+        $bulk_ref->{'nationalPeriodID'} = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $bulk_ref->{'sport'}, $bulk_ref->{'registrationNature'});
         my ($listPersons_body, undef) = bulkPersonRollover($Data, 'PREGFB_SPU', $bulk_ref, \%Hidden);
         $body .= $listPersons_body;
    }

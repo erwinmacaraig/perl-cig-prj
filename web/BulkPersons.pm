@@ -37,9 +37,6 @@ sub bulkPersonRollover {
     my $realmID = $Data->{'Realm'};
 
 
-    warn("GET intNationalPeriodID");
-
-
     my $st = qq[
         SELECT DISTINCT
             P.intPersonID,

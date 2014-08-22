@@ -23,6 +23,7 @@ use AuditLog;
 use InvoicePay;
 require Payments;
 require TransLog;
+require PersonRegistration;
 
 # GET INFORMATION RELATING TO THIS MEMBERS TYPE (IE. COACH, PLAYER ETC)
 
@@ -69,18 +70,31 @@ sub checkExistingProduct    {
 
     my ($Data, $productID, $tableType, $ID, $entityID, $checkType) = @_;
 
+    my $prJoin='';
+    my $prWhere='';
+    if ($tableType == $Defs::LEVEL_PERSON)  {
+        $prJoin = qq[
+           LEFT JOIN tblPersonRegistration_$Data->{Realm} as pr ON (
+                pr.intPersonID = t.intID
+            )
+        ];
+        $prWhere = qq[ AND (t.intPersonRegistrationID =0 or pr.strStatus NOT IN ('INPROGRESS'))];
+    }
+        
 
     my $st = qq[
         SELECT
-            COUNT(intTransactionID) as CountTXNs
+            COUNT(t.intTransactionID) as CountTXNs
         FROM
-            tblTransactions
+            tblTransactions as t
+            $prJoin
         WHERE
             intID = ?
-            AND intRealmID = ?
-            AND intTableType = ?
-            AND intStatus=1
-            AND intProductID=?
+            $prWhere
+            AND t.intRealmID = ?
+            AND t.intTableType = ?
+            AND t.intStatus=1
+            AND t.intProductID=?
     ];
     my @values=(
         $ID,
@@ -90,7 +104,7 @@ sub checkExistingProduct    {
     );
 
     if ($checkType eq 'THIS_ENTITY') {
-        $st .= qq[ AND intTXNEntityID = ?];
+        $st .= qq[ AND t.intTXNEntityID = ?];
         push @values, $entityID;
     }
 
@@ -187,6 +201,52 @@ sub displayTransaction	{
   my ($prods_vals,$prods_order)=getDBdrop_down_Ref($Data->{'db'},$st_prods,'');
   my ($paytypes_vals,$paytypes_order)=getDBdrop_down_Ref($Data->{'db'},$st_paymenttypes,'');
 
+    my $pr_count = 0;
+    my %PR_vals=();
+    if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON and $TableID)  {
+        my @statusNOTIN = ();
+        if ($id)    {
+        @statusNOTIN = ($Defs::PERSONREGO_STATUS_INPROGRESS);
+        }
+        else    {
+            ## ADD SO LESS VALUES
+            @statusNOTIN = ($Defs::PERSONREGO_STATUS_INPROGRESS, $Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_DELETED);
+        }
+        my %Reg = (
+            statusNOTIN => \@statusNOTIN,
+        );
+        my $regs='';
+        ($pr_count, $regs) = PersonRegistration::getRegistrationData(
+            $Data,
+            $TableID,
+            \%Reg
+        );
+        if ($pr_count) {
+            foreach my $reg (@{$regs})   {
+                my $sport = $Defs::sportType{$reg->{'strSport'}} || '';
+                my $personType= $Defs::personType{$reg->{'strPersonType'}} || '';
+                my $entityRole= $reg->{'strEntityRoleName'};
+                my $personLevel= $Defs::personLevel{$reg->{'strPersonLevel'}} || '';
+                my $ageLevel= $Defs::ageLevel{$reg->{'strAgeLevel'}} || '';
+                my $entityLocalName= $reg->{'strLocalName'};
+                my $nationalPeriodName= $reg->{'strNationalPeriodName'};
+                my $entityLatinName= $reg->{'strLatinName'};
+                my $status= $Defs::personRegoStatus{$reg->{'strStatus'}} || '';
+                my $text = $entityLocalName;
+                $text .=  " ($entityLatinName)" if ($entityLatinName);
+                $text .= " -$personType" if ($personType);
+                $text .= " -$entityRole" if ($entityRole);
+                $text .= " -$sport" if ($sport);
+                $text .= " -$personLevel" if ($personLevel);
+                $text .= " -$ageLevel" if ($ageLevel);
+                $text .= " -$nationalPeriodName " if ($nationalPeriodName);
+                $text .= " -$status" if ($status);
+                $PR_vals{$reg->{'intPersonRegistrationID'}} = $text;
+            }
+        }
+    }
+
+    my $showPR = $pr_count ? 1 : 0;
 
 	my $readonly = ($dref->{intStatus} == $Defs::TXN_UNPAID) ? 1 : 0;
 	#my $amount_readonly = $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC ? 0: 1;
@@ -265,6 +325,15 @@ sub displayTransaction	{
 					rows => 5,
 		                	cols=> 45,
 				},
+				intPersonRegistrationID=> {
+          				label => $showPR ? $lang->txt('Registration') : '',
+          				type => 'lookup',
+          				compulsory => $showPR ? 1 : '',
+		          		value => $dref->{'intPersonRegistrationID'},
+          				options =>  \%PR_vals,
+		          		firstoption => ['',$lang->txt('Select Registration')],
+					readonly=>$prod_readonly,
+        			},
 				intProductID => {
           				label => $lang->txt('Product'),
           				type => 'lookup',
@@ -275,7 +344,7 @@ sub displayTransaction	{
 					readonly=>$prod_readonly,
         			},
 		},
-		order => [qw(intProductID curAmount AmountAlreadyPaid dtPaid intQty intStatus intDelivered strNotes dtStart dtEnd PartPayment)],
+		order => [qw(intProductID intPersonRegistrationID curAmount AmountAlreadyPaid dtPaid intQty intStatus intDelivered strNotes dtStart dtEnd PartPayment)],
 			options => {
 				labelsuffix => ':',
 				hideblank => 1,
