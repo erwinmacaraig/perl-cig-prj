@@ -498,6 +498,7 @@ sub getRegistrationData	{
     my $st= qq[
         SELECT 
             pr.*, 
+            np.strNationalPeriodName,
             p.dtDOB,
             DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
             p.intGender,
@@ -511,6 +512,9 @@ sub getRegistrationData	{
             e.strLatinName
         FROM
             tblPersonRegistration_$Data->{'Realm'} AS pr
+            LEFT JOIN tblNationalPeriod as np ON (
+                np.intNationalPeriodID = pr.intNationalPeriodID
+            )
             INNER JOIN tblEntity e ON (
                 pr.intEntityID = e.intEntityID 
             )

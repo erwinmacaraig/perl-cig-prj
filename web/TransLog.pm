@@ -564,8 +564,12 @@ sub getTransList {
       tblTransactions as t
       INNER JOIN tblProducts as P ON (P.intProductID = t.intProductID)
       LEFT JOIN tblTransLog as tl ON (t.intTransLogID = tl.intLogID)
+        LEFT JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (
+            PR.intPersonRegistrationID = t.intPersonRegistrationID
+        )
     WHERE
       t.intRealmID = $Data->{Realm}
+        AND (t.intPersonRegistrationID =0 or PR.strStatus NOT IN ('INPROGRESS'))
 			AND P.intProductType<>2
 	    $prodSellLevel
       $whereClause
