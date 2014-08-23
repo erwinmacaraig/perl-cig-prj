@@ -83,10 +83,10 @@ print STDERR Dumper(\%inputs);
     if($inputs{'password'} ne $inputs{'password2'})   {
         push @errors, $Data->{'lang'}->txt('Password and Password 2 do not match');
     }
-    #require Mail::RFC822::Address;
-    #if(!Mail::RFC822::Address::valid($inputs{'email'}))   {
-    #    push @errors, $Data->{'lang'}->txt('Email address is not valid');
-    #}
+    require Mail::RFC822::Address;
+    if(!Mail::RFC822::Address::valid($inputs{'email'}))   {
+        push @errors, $Data->{'lang'}->txt('Email address is not valid');
+    }
     if(scalar(@errors)) { return \@errors }
     my $user = new UserObj(db => $Data->{'db'});
     $user->load(email => $inputs{'email'});
