@@ -19,38 +19,17 @@ msgstr ""
 msgid "Club Id"
 msgstr "Club Id"
 
-msgid "Select Sporting Event"
-msgstr "Select Sporting Event"
-
 msgid "Problems"
 msgstr "Problems"
 
-msgid "Teams"
-msgstr "Teams"
-
-msgid "Category Name"
-msgstr "Category Name"
-
-msgid "View Types"
-msgstr "View Types"
-
 msgid "in"
 msgstr "in"
-
-msgid "Season Participating?"
-msgstr "Season Participating?"
 
 msgid "Fields Updated"
 msgstr "Fields Updated"
 
 msgid "Weight"
 msgstr "Weight"
-
-msgid "Allow Clubs to"
-msgstr "Allow Clubs to"
-
-msgid "Coach in Association?"
-msgstr "Coach in Association?"
 
 msgid "Add"
 msgstr "Add"
@@ -67,26 +46,14 @@ msgstr "Birth Certificate Number"
 msgid "Search Results"
 msgstr "Search Results"
 
-msgid "Services"
-msgstr "Services"
-
-msgid "Member Types: Referee Accred"
-msgstr "Member Types: Referee Accred"
-
 msgid "Regions"
 msgstr "Regions"
-
-msgid "Member Types: Rider Position"
-msgstr "Member Types: Rider Position"
 
 msgid "Parent/Guardian 1 Assistance Area"
 msgstr "Parent/Guardian 1 Assistance Area"
 
 msgid "Update Event"
 msgstr "Update Event"
-
-msgid "Member Types: Misc Position"
-msgstr "Member Types: Misc Position"
 
 msgid "Update Club"
 msgstr "Update Club"
@@ -100,35 +67,17 @@ msgstr "No entries match your Search criteria. Please try again"
 msgid "ADV_REPORT_INTRO"
 msgstr ""
 
-msgid "Member Types: FAO"
-msgstr "Member Types: FAO"
-
 msgid "Welcome Message Updated"
 msgstr "Welcome Message Updated"
 
-msgid "Their Password"
-msgstr "Their Password"
-
 msgid "City of Residence"
 msgstr "City of Residence"
-
-msgid "Allow Card Printing when at this status"
-msgstr "Allow Card Printing when at this status"
-
-msgid "Ask for Sporting Event Selection?"
-msgstr "Ask for Sporting Event Selection?"
 
 msgid "Parent/Guardian 2 Email 2"
 msgstr "Parent/Guardian 2 Email 2"
 
 msgid "Player Age Group"
 msgstr "Player Age Group"
-
-msgid "How many national games do you attend per season?"
-msgstr "How many national games do you attend per season?"
-
-msgid "Misc?"
-msgstr "Misc?"
 
 msgid "Choose an option from the list below"
 msgstr "Choose an option from the list below"
@@ -145,26 +94,14 @@ msgstr "Email 2"
 msgid "Entity ID"
 msgstr "Entity ID"
 
-msgid "Max number of Venues to appear on accred."
-msgstr "Max number of Venues to appear on accred."
-
 msgid "Any Allergies"
 msgstr "Any Allergies"
-
-msgid "Jumper Numbers"
-msgstr "Jumper Numbers"
 
 msgid "Start Date"
 msgstr "Start Date"
 
-msgid "Apply for a Day Pass"
-msgstr "Apply for a Day Pass"
-
 msgid "Title of Contact 3"
 msgstr "Title of Contact 3"
-
-msgid "Fitness Tests"
-msgstr "Fitness Tests"
 
 msgid "cannot have spaces"
 msgstr "cannot have spaces"
@@ -190,20 +127,8 @@ msgstr ""
 msgid "Sep"
 msgstr "Sep"
 
-msgid "Season Match Official?"
-msgstr "Season Match Official?"
-
 msgid "You have [_1] duplicate to resolve."
 msgstr "You have [quant,_1,duplicate,duplicates] to resolve."
-
-msgid "Volunteer?"
-msgstr "Volunteer?"
-
-msgid "Official?"
-msgstr "Official?"
-
-msgid "Member Types: Volunteer Position"
-msgstr "Member Types: Volunteer Position"
 
 msgid "Maiden name"
 msgstr "Maiden name"
@@ -219,9 +144,6 @@ msgstr "Association"
 
 msgid "An invalid Action Code has been passed to me."
 msgstr "An invalid Action Code has been passed to me."
-
-msgid "Player in<br>Association?"
-msgstr "Player in<br>Association?"
 
 msgid "Deceased?"
 msgstr "Deceased?"
@@ -244,21 +166,11 @@ msgstr "This is the list of the last 20 changes peformed."
 msgid "Editable"
 msgstr "Editable"
 
-msgid "How often do you watch matches on TV?"
-msgstr "How often do you watch matches on TV?"
-
 msgid "Consent Forms"
 msgstr "Consent Forms"
 
 msgid "Login"
 msgstr "Login"
-
-msgid "MARK_CONSENT_FORM_RECEIVED"
-msgstr ""
-"Mark form as received by entering the Form reference number and press th"
-
-msgid "Member Types: Coach"
-msgstr "Member Types: Coach"
 
 msgid "Contact Person 3"
 msgstr "Contact Person 3"
@@ -292,9 +204,6 @@ msgstr ""
 msgid "Edit Welcome Message"
 msgstr "Edit Welcome Message"
 
-msgid "Accreditation Category"
-msgstr "Accreditation Category"
-
 msgid "is not between [_1] and [_2]"
 msgstr "is not between [_1] and [_2]"
 
@@ -305,35 +214,17 @@ msgid "AUTO_INTROTEXT"
 msgstr ""
 "To modify this information change the information in the boxes below and whe"
 
-msgid "Association Season Member Package"
-msgstr "Association Season Member Package"
-
 msgid "Select your report type below."
 msgstr "Select your report type below."
 
 msgid "Abbreviation"
 msgstr "Abbreviation"
 
-msgid "Their Member Types"
-msgstr "Their Member Types"
-
-msgid "Update Permissions"
-msgstr "Update Permissions"
-
-msgid "Select a Status to Assign"
-msgstr "Select a Status to Assign"
-
 msgid "Postal Code"
 msgstr "Postal Code"
 
 msgid "Secondary Sort By"
 msgstr "Secondary Sort By"
-
-msgid "Veteran?"
-msgstr "Veteran?"
-
-msgid "Alternate Uniform Top Colour"
-msgstr "Alternate Uniform Top Colour"
 
 msgid "Record updated successfully"
 msgstr "Record updated successfully"
@@ -349,12 +240,6 @@ msgstr "Hair Colour"
 
 msgid "None"
 msgstr "None"
-
-msgid "Pager"
-msgstr "Pager"
-
-msgid "Match Official Active?"
-msgstr "Match Official Active?"
 
 msgid "Response Code"
 msgstr "Response Code"
@@ -374,9 +259,6 @@ msgstr "Contact Person"
 msgid "Phone (Mobile)"
 msgstr "Phone (Mobile)"
 
-msgid "Accreditation Result"
-msgstr "Accreditation Result"
-
 msgid "Contact Phone 3"
 msgstr "Contact Phone 3"
 
@@ -389,38 +271,11 @@ msgstr "Team Name"
 msgid "Details"
 msgstr "Details"
 
-msgid "Season Member Package"
-msgstr "Season Member Package"
-
-msgid "Sporting Events"
-msgstr "Sporting Events"
-
 msgid "International Zone"
 msgstr "International Zone"
 
 msgid "Season"
 msgstr "Season"
-
-msgid "Permissions"
-msgstr "Permissions"
-
-msgid "Member Types: Referee"
-msgstr "Member Types: Referee"
-
-msgid "Member Types: Misc"
-msgstr "Member Types: Misc"
-
-msgid "DATA_EXPORT_EMAIL_SENT"
-msgstr "<p>Your data has been sent successfully.</p"
-
-msgid "Members"
-msgstr "Members"
-
-msgid "Uniform Colours"
-msgstr "Uniform Colours"
-
-msgid "Uniform Top Colour"
-msgstr "Uniform Top Colour"
 
 msgid "No Limit"
 msgstr "No Limit"
@@ -444,9 +299,6 @@ msgstr "Search Again"
 msgid "or"
 msgstr "or"
 
-msgid "MUST_PRINT_CONSENT_FORM"
-msgstr "<p"
-
 msgid "Member Reports"
 msgstr "Member Reports"
 
@@ -462,24 +314,8 @@ msgstr "View"
 msgid "Member Types: Official"
 msgstr "Member Types: Official"
 
-msgid "Organisation"
-msgstr "Organisation"
-
-msgid "Club Season Member Package"
-msgstr "Club Season Member Package"
-
 msgid "All Records"
 msgstr "All Records"
-
-msgid "Member Types: Match Official"
-msgstr "Member Types: Match Official"
-
-msgid "DATA_EXPORT_EMAIL_TEXT"
-msgstr ""
-"The data you requested for export ([_1]) is included in the attached file"
-
-msgid "match Official in<br>Club?"
-msgstr "Match Official in<br>Club?"
 
 msgid "Country"
 msgstr "Country"
@@ -489,15 +325,6 @@ msgstr "None Available"
 
 msgid "is not a valid email address"
 msgstr "is not a valid email address"
-
-msgid "Alternate Uniform Bottom Colour"
-msgstr "Alternate Uniform Bottom Colour"
-
-msgid "Loyalty Number"
-msgstr "Loyalty Number"
-
-msgid "Senior?"
-msgstr "Senior?"
 
 msgid "Other Code"
 msgstr "Other Code"
@@ -520,33 +347,15 @@ msgstr "Date of Birth"
 msgid "Emergency Contact Number 2"
 msgstr "Emergency Contact Number 2"
 
-msgid "Starting Date for Arrivals"
-msgstr "Starting Date for Arrivals"
-
-msgid "Venue 3"
-msgstr "Venue 3"
-
 msgid "CHOOSE_AND_REPORT"
 msgstr ""
 "Choose which fields you want on your report and any filters you wish to apply"
-
-msgid "Competitions"
-msgstr "Competitions"
 
 msgid "Amount"
 msgstr "Amount"
 
 msgid "Parent/Guardian 1 Email"
 msgstr "Parent/Guardian 1 Email"
-
-msgid "Edit Event"
-msgstr "Edit Event"
-
-msgid "Event Name"
-msgstr "Event Name"
-
-msgid "Associations"
-msgstr "Associations"
 
 msgid "National Team"
 msgstr "National Team"
@@ -563,12 +372,6 @@ msgstr "National Bodies"
 msgid "Re-Accreditation"
 msgstr "Re-Accreditation"
 
-msgid "Season Coach Financial?"
-msgstr "Season Coach Financial?"
-
-msgid "Password"
-msgstr "Password"
-
 msgid "Contact Email"
 msgstr "Contact Email"
 
@@ -581,18 +384,8 @@ msgstr "Member"
 msgid "Nov"
 msgstr "Nov"
 
-msgid "Member Types: Rider Accred"
-msgstr "Member Types: Rider Accred"
-
-msgid "PLEASE_COMPLETE_BIO"
-msgstr ""
-"Please complete the Biographical Information below.  When you have finishe"
-
 msgid "Options"
 msgstr "Options"
-
-msgid "Exclude from Club Championships"
-msgstr "Exclude from Club Championships"
 
 msgid "Position"
 msgstr "Position"
@@ -602,9 +395,6 @@ msgstr "Date First Registered"
 
 msgid "No Payment Records can be found in the database."
 msgstr "No Payment Records can be found in the database."
-
-msgid "Uniform Bottom Colour"
-msgstr "Uniform Bottom Colour"
 
 msgid "Mar"
 msgstr "Mar"
@@ -645,9 +435,6 @@ msgstr "Family name"
 msgid "Identification Type"
 msgstr "Identification Type"
 
-msgid "Estimated Un-Registered Players"
-msgstr "Estimated Un-Registered Players"
-
 msgid "Emergency Contact Name"
 msgstr "Emergency Contact Name"
 
@@ -657,29 +444,14 @@ msgstr "Police Check Number"
 msgid "NO_BODY"
 msgstr "Oops, this shouldn't be happening. Please contact"
 
-msgid "Assign Approval Statuses"
-msgstr "Assign Approval Statuses"
-
-msgid "Season Player Financial?"
-msgstr "Season Player Financial?"
-
 msgid "Not Available"
 msgstr "Not Available"
-
-msgid "Coach Active?"
-msgstr "Coach Active?"
 
 msgid "Allow Parent Body"
 msgstr "Allow Parent Body"
 
-msgid "Update Team"
-msgstr "Update Team"
-
 msgid "Preferred name"
 msgstr "Preferred name"
-
-msgid "Member Types: Match Official Position"
-msgstr "Member Types: Match Official Position"
 
 msgid "Male"
 msgstr "Male"
@@ -687,9 +459,6 @@ msgstr "Male"
 msgid "MARK_AS_DUPLICATE_WARNING"
 msgstr ""
 "NOTE: Only mark the extra [_1], not the [_1] you believe may be the origina"
-
-msgid "Defaulter"
-msgstr "Defaulter"
 
 msgid "is not less than or equal to [_1]"
 msgstr "is not less than or equal to [_1]"
@@ -706,9 +475,6 @@ msgid ""
 msgstr ""
 "These configuration options allow you to modify the data and behaviour of "
 "the system."
-
-msgid "Sub Category Abbrev."
-msgstr "Sub Category Abbrev."
 
 msgid "Parent/Guardian 2 Phone 2"
 msgstr "Parent/Guardian 2 Phone 2"
@@ -727,9 +493,6 @@ msgstr ""
 msgid "Emergency Contact Number"
 msgstr "Emergency Contact Number"
 
-msgid "Automatically Approve Selections"
-msgstr "Automatically Approve Selections"
-
 msgid "Welcome"
 msgstr "Welcome"
 
@@ -745,9 +508,6 @@ msgstr "Active"
 msgid "Identifications"
 msgstr "Identifications"
 
-msgid "Estimated Participants"
-msgstr "Estimated Participants"
-
 msgid "Status"
 msgstr "Status"
 
@@ -760,17 +520,8 @@ msgstr "<p"
 msgid "Choose a Sport"
 msgstr "Choose a Sport"
 
-msgid "Max number of Zones to appear on accred."
-msgstr "Max number of Zones to appear on accred."
-
 msgid "Audit Log"
 msgstr "Audit Log"
-
-msgid "Uniform Number"
-msgstr "Uniform Number"
-
-msgid "Courses"
-msgstr "Courses"
 
 msgid "Club"
 msgstr "Club"
@@ -811,10 +562,6 @@ msgstr "Added By"
 msgid "Bulk Change"
 msgstr "Bulk Change"
 
-msgid "ACCREDITATION_DETAILS_TOP"
-msgstr ""
-"Choose the relevant options below and press the <b>'[_1]'</b> button whe"
-
 msgid "First name"
 msgstr "First name"
 
@@ -832,9 +579,6 @@ msgstr "Passport Number"
 
 msgid "Type"
 msgstr "Type"
-
-msgid "Season Match Official Financial?"
-msgstr "Season Match Official Financial?"
 
 msgid "There are no available Tags to assign"
 msgstr "There are no available Tags to assign"
@@ -869,9 +613,6 @@ msgstr "Invalid Date"
 msgid "Address Line 2"
 msgstr "Address Line 2"
 
-msgid "Member Types: Riders"
-msgstr "Member Types: Riders"
-
 msgid "Parent/Guardian 1 Gender"
 msgstr "Parent/Guardian 1 Gender"
 
@@ -883,9 +624,6 @@ msgstr "Season Coach?"
 
 msgid "Ask for Job Title"
 msgstr "Ask for Job Title"
-
-msgid "May"
-msgstr "May"
 
 msgid "Secretary"
 msgstr "Secretary"
@@ -901,12 +639,6 @@ msgstr "<p"
 
 msgid "First Name"
 msgstr "First Name"
-
-msgid "Coach Registration No."
-msgstr "Coach Registration No."
-
-msgid "Coach?"
-msgstr "Coach?"
 
 msgid "Sportzware Membership Login Page"
 msgstr "Sportzware Membership Login Page"
@@ -932,29 +664,14 @@ msgstr "Open the report for viewing on the screen"
 msgid "Manage Lookup Information"
 msgstr "Manage Lookup Information"
 
-msgid "REQUIRED_PASS_STATUS"
-msgstr ""
-"Check the boxes if the status is required for pass printing.  When you hav"
-
 msgid "Parent/Guardian 2 Assistance Area"
 msgstr "Parent/Guardian 2 Assistance Area"
-
-msgid "BULK_PRINT_BUTTON_INFO"
-msgstr ""
-"Press the <b>'[_1]'</b> button to generate a list of passes to be printed"
-
-msgid "This member has been associated with the following tags."
-msgstr "This member has been associated with the following tags."
 
 msgid "Member Financial Balance"
 msgstr "Member Financial Balance"
 
 msgid "Payment Type"
 msgstr "Payment Type"
-
-msgid "DATA_EXPORT_DESCRIPTION"
-msgstr ""
-"The data exported includes the member name, accreditation type, entry and exi"
 
 msgid "Passport Country of Issue"
 msgstr "Passport Country of Issue"
@@ -968,29 +685,11 @@ msgstr "Contact Phone 2"
 msgid "Gender"
 msgstr "Gender"
 
-msgid "Team Passwords"
-msgstr "Team Passwords"
-
-msgid "No Tags Found"
-msgstr "No Tags Found"
-
 msgid "Address Line 1"
 msgstr "Address Line 1"
 
-msgid "Update Association"
-msgstr "Update Association"
-
 msgid "is not more than [_1]"
 msgstr "is not more than [_1]"
-
-msgid "School Grade"
-msgstr "School Grade"
-
-msgid "Password Management"
-msgstr "Password Management"
-
-msgid "Data Export"
-msgstr "Data Export"
 
 msgid "Edit"
 msgstr "Edit"
@@ -1007,29 +706,11 @@ msgstr "Parent/Guardian 2 Mobile"
 msgid "Run Report"
 msgstr "Run Report"
 
-msgid "Season Player?"
-msgstr "Season Player?"
-
 msgid "Date Added"
 msgstr "Date Added"
 
-msgid "Last Recorded Game"
-msgstr "Last Recorded Game"
-
-msgid "Athletics Associations"
-msgstr "Athletic Associations"
-
-msgid "Player Active?"
-msgstr "Player Active?"
-
-msgid "Player in<br>Club?"
-msgstr "Player in<br>Club?"
-
 msgid "ROLLOVER_INSTRUCTIONS"
 msgstr "<p"
-
-msgid "Last Date for Departures"
-msgstr "Last Date for Departures"
 
 msgid "[_1] updated successfully"
 msgstr "[_1] updated successfully"
@@ -1039,9 +720,6 @@ msgstr "Zones"
 
 msgid "Parent/Guardian 2 Salutation"
 msgstr "Parent/Guardian 2 Salutation"
-
-msgid "Venue 2"
-msgstr "Venue 2"
 
 msgid "Age Groups"
 msgstr "Age Groups"
@@ -1055,44 +733,14 @@ msgstr "Phone"
 msgid "Member Number"
 msgstr "Member Number"
 
-msgid "Approval Name Text"
-msgstr "Approval Name Text"
-
-msgid "End Date"
-msgstr "End Date"
-
-msgid "Member Types: Match Official Accred"
-msgstr "Member Types: Match Official Accred"
-
-msgid "Jan"
-msgstr "Jan"
-
 msgid "Update"
 msgstr "Update"
 
 msgid "State"
 msgstr "State"
 
-msgid "Allow Medical Treatment"
-msgstr "Allow Medical Treatment"
-
-msgid "Member Package"
-msgstr "Member Package"
-
-msgid "Financial?"
-msgstr "Financial?"
-
-msgid "Membership Package"
-msgstr "Membership Package"
-
-msgid "Member Types"
-msgstr "Member Types"
-
 msgid "Health Care Number"
 msgstr "Health Care Number"
-
-msgid "School"
-msgstr "School"
 
 msgid "International"
 msgstr "International"
@@ -1102,15 +750,6 @@ msgstr "Custom Fields"
 
 msgid "Clubs"
 msgstr "Clubs"
-
-msgid "Career Games"
-msgstr "Career Games"
-
-msgid "Username/Code"
-msgstr "Username/Code"
-
-msgid "Starting Date for Registrations"
-msgstr "Starting Date for Registrations"
 
 msgid "COPYRIGHT"
 msgstr ""
@@ -1129,42 +768,14 @@ msgstr "Status Reports"
 msgid "Occupation"
 msgstr "Occupation"
 
-msgid "Member Types: Volunteer"
-msgstr "Member Types: Volunteer"
-
-msgid "Their Details"
-msgstr "Their Details"
-
-msgid "Life Member?"
-msgstr "Life Member?"
-
-msgid "System developed and powered by [_1]"
-msgstr "System developed and powered by [_1]"
-
-msgid "EVENTCOPY_info"
-msgstr ""
-"This option allows the copying of some of the event setup information fro"
-
 msgid "Salutation"
 msgstr "Salutation"
-
-msgid "How did you find out about us?"
-msgstr "How did you find out about us?"
 
 msgid "Age Group"
 msgstr "Age Group"
 
-msgid "Active in Association"
-msgstr "Active in Association"
-
 msgid "Add new record"
 msgstr "Add new record"
-
-msgid "Mixed"
-msgstr "Mixed"
-
-msgid "Member Types: Misc Accred"
-msgstr "Member Types: Misc Accred"
 
 msgid "Contact Email 3"
 msgstr "Contact Email 3"
@@ -1181,12 +792,6 @@ msgstr "Offline Number"
 msgid "Welcome Message"
 msgstr "Welcome Message"
 
-msgid "Jun"
-msgstr "Jun"
-
-msgid "Member Types: Volunteer Accred"
-msgstr "Member Types: Volunteer Accred"
-
 msgid "Search"
 msgstr "Search"
 
@@ -1196,42 +801,11 @@ msgstr "Reports"
 msgid "Configuration"
 msgstr "Configuration"
 
-msgid "Event Approval Statuses"
-msgstr "Event Approval Statuses"
-
-msgid "Alternate Uniform Number Colour"
-msgstr "Alternate Uniform Number Colour"
-
-msgid "Select from the options on the left to manage your event."
-msgstr "Select from the options on the left to manage your event"
-
-msgid "Association Summary"
-msgstr "Association Summary"
-
-msgid "PERMISSIONS_intro"
-msgstr ""
-"Choose the options below to set the permissions various users have to perfor"
-
 msgid "Maximum no. of rows to display"
 msgstr "Maximum no. of rows to display"
 
-msgid "Signature Sighted"
-msgstr "Signature Sighted"
-
-msgid "Member Passwords"
-msgstr "Member Passwords"
-
 msgid "States"
 msgstr "States"
-
-msgid "Allow Teams to"
-msgstr "Allow Teams to"
-
-msgid "Member Types: FAO Position"
-msgstr "Member Types: FAO Position"
-
-msgid "Communicator"
-msgstr "Communicator"
 
 msgid "Hidden"
 msgstr "Hidden"
@@ -1254,29 +828,14 @@ msgstr "Unique Records Only"
 msgid "is not a valid date"
 msgstr "is not a valid date"
 
-msgid "CHOOSE_EXPORT_FORMAT"
-msgstr "Choose the export format you wish to us"
-
 msgid "Passport Nationality"
 msgstr "Passport Nationality"
 
 msgid "Filter Only"
 msgstr "Filter Only"
 
-msgid "Date Registered Until"
-msgstr "Date Registered Until"
-
 msgid "Contact Email 2"
 msgstr "Contact Email 2"
-
-msgid "Dec"
-msgstr "Dec"
-
-msgid "View Type"
-msgstr "View Type"
-
-msgid "Alternate Uniform Number"
-msgstr "Alternate Uniform Number"
 
 msgid "APPNAME"
 msgstr "SportingPulse Membership"
@@ -1290,9 +849,6 @@ msgstr "Add Season Record"
 msgid "HTMLFORM_INTROTEXT"
 msgstr "auto"
 
-msgid "Application Date"
-msgstr "Application Date"
-
 msgid "Phone (Home)"
 msgstr "Phone (Home)"
 
@@ -1302,56 +858,20 @@ msgstr "No Clubs of this status can be found in the database."
 msgid "Female"
 msgstr "Female"
 
-msgid "Member Financial?"
-msgstr "Member Financial?"
-
-msgid "Team"
-msgstr "Team"
-
-msgid "Uniform Number Colour"
-msgstr "Uniform Number Colour"
-
 msgid "Read Only"
 msgstr "Read Only"
 
 msgid "Record added successfully"
 msgstr "Record added successfully"
 
-msgid "Username"
-msgstr "Username"
-
-msgid "Mailing List?"
-msgstr "Mailing List?"
-
 msgid "Update Information"
 msgstr "Update Information"
-
-msgid "Approval Types"
-msgstr "Approval Types"
-
-msgid "Medical"
-msgstr "Medical"
-
-msgid "Member Types: Coach Position"
-msgstr "Member Types: Coach Position"
 
 msgid "I cannot find any records of changes"
 msgstr "I cannot find any records of changes"
 
-msgid "Member Types: Official Accred"
-msgstr "Member Types: Official Accred"
-
-msgid "Player?"
-msgstr "Player?"
-
 msgid "Date"
 msgstr "Date"
-
-msgid "Save Tags"
-msgstr "Save Tags"
-
-msgid "Aug"
-msgstr "Aug"
 
 msgid "Compulsory Field"
 msgstr "Compulsory Field"
@@ -1362,14 +882,8 @@ msgstr "The following fields are compulsory and need to be filled in"
 msgid "This will assign the status to all matching records"
 msgstr "This will assign the status to all matching records"
 
-msgid "Jul"
-msgstr "Jul"
-
 msgid "Email"
 msgstr "Email"
-
-msgid "ACCREDITATION_CATEGORY_SELECTION_TEXT"
-msgstr "<p"
 
 msgid "Level"
 msgstr "Level"
@@ -1383,27 +897,17 @@ msgstr "Title of Contact 2"
 msgid "Descending"
 msgstr "Descending"
 
-msgid "From here you can login to your Sportzware Membership online system."
-msgstr "From here you can login to your Sportzware Membership online system."
-
 msgid "Tags Updated"
 msgstr "Tags Updated"
 
 msgid "Configure Event Details"
 msgstr "Configure Event Details"
 
-msgid "DATA_EXPORT_FORMAT_DESCRIPTION"
-msgstr ""
-"You can export the data in two formats. Sportzware format is for importin"
-
 msgid "Sort By"
 msgstr "Sort By"
 
 msgid "Club Name"
 msgstr "Club Name"
-
-msgid "Member Types: Player"
-msgstr "Member Types: Player"
 
 msgid "Display details for [_1]"
 msgstr "Display details for [_1]"
@@ -1416,52 +920,21 @@ msgstr ""
 msgid "Parent/Guardian 2 Firstname"
 msgstr "Parent/Guardian 2 Firstname"
 
-msgid "Closing Date for Registrations"
-msgstr "Closing Date for Registrations"
-
 msgid "EXPORT_WARNING"
 msgstr ""
 "This option has a specified set of fields that it exports, however filters ar"
 
-msgid "SEARCH_FOR_CONSENT_FORM"
-msgstr ""
-"Search for a person by entering their surname and/or first name and then pres"
-
-msgid "Accreditation Provider"
-msgstr "Accreditation Provider"
-
-msgid "Match Official Registration No."
-msgstr "Match Official Registration No."
-
-msgid "Selections"
-msgstr "Selections"
-
-msgid "Member Types: Coach Accred"
-msgstr "Member Types: Coach Accred"
-
 msgid "Logout"
 msgstr "Logout"
 
-msgid "Estimated Registered Players"
-msgstr "Estimated Registered Players"
-
-msgid "Colours"
-msgstr "Colours"
-
 msgid "Sports"
 msgstr "Sports"
-
-msgid "Coach in<br>Club?"
-msgstr "Coach in<br>Club?"
 
 msgid "Sport Code"
 msgstr "Sport Code"
 
 msgid "Ask for Photo?"
 msgstr "Ask for Photo?"
-
-msgid "Association Name"
-msgstr "Association Name"
 
 msgid "Parent/Guardian 1 Salutation"
 msgstr "Parent/Guardian 1 Salutation"
@@ -1475,26 +948,14 @@ msgstr "Member Summary Reports"
 msgid "Help"
 msgstr "Help"
 
-msgid "Competition"
-msgstr "Competition"
-
 msgid "Incorporation Number"
 msgstr "Incorporation Number"
-
-msgid "Event Management"
-msgstr "Event Management"
 
 msgid "Compulsory"
 msgstr "Compulsory"
 
 msgid "Fax"
 msgstr "Fax"
-
-msgid "State Team Supported"
-msgstr "State Team Supported"
-
-msgid "Instructor Registration No"
-msgstr "Instructor Registration No"
 
 msgid "Add Season Club Record"
 msgstr "Add Season Club Record"
@@ -1522,9 +983,6 @@ msgstr "Sport"
 
 msgid "is not a valid number"
 msgstr "is not a valid number"
-
-msgid "Member Types: FAO Accred"
-msgstr "Member Types: FAO Accred"
 
 msgid "Name (or part of)"
 msgstr "Name (or part of)"
