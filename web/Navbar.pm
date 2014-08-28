@@ -408,8 +408,8 @@ sub getAssocMenuData {
     my $txt_SeasonsNames= $SystemConfig->{'txtSeasons'} || 'Seasons';
     my $txt_AgeGroupsNames= $SystemConfig->{'txtAgeGroups'} || 'Age Groups';
     my $txt_Clr = $SystemConfig->{'txtCLR'} || 'Clearance';
-    my $txt_Clr_ListOnline = $SystemConfig->{'txtCLRListOnline'} || "List Online $txt_Clr"."s";
-    my $txt_Clr_ListOffline = "List Offline $txt_Clr"."s";
+    my $txt_Clr_ListOnline = $SystemConfig->{'txtCLRListOnline'} || "List Online Clearances";
+    my $txt_Clr_ListOffline = "List Offline Clearances";
 
     my $swol_url = $Defs::SWOL_URL;
     $swol_url = $Defs::SWOL_URL_v6 if ($Data->{'SystemConfig'}{'AssocConfig'}{'olrv6'});
@@ -670,7 +670,7 @@ sub getClubMenuData {
     my $txt_SeasonsNames= $SystemConfig->{'txtSeasons'} || 'Seasons';
     my $txt_AgeGroupsNames= $SystemConfig->{'txtAgeGroups'} || 'Age Groups';
     my $txt_Clr = $SystemConfig->{'txtCLR'} || 'Clearance';
-    my $txt_Clr_ListOnline = $SystemConfig->{'txtCLRListOnline'} || "List Online $txt_Clr"."s";
+    my $txt_Clr_ListOnline = $SystemConfig->{'txtCLRListOnline'} || "List Online Clearances";
     my $DataAccess_ref = $Data->{'DataAccess'};
 
     my $paymentSplitSettings = getPaymentSplitSettings($Data);

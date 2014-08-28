@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: EN\n"
+"Language: SV\n"
 "X-Generator: Poedit 1.5.7\n"
 "X-Poedit-KeywordsList: txt\n"
 "X-Poedit-Basepath: .\n"
@@ -17,97 +17,97 @@ msgstr ""
 "X-Poedit-SearchPath-1: /home/warren/src/spil/FIFASPOnline/templates\n"
 
 msgid "Club Id"
-msgstr "Club Id"
+msgstr ""
 
 msgid "Problems"
-msgstr "Problems"
+msgstr ""
 
 msgid "in"
-msgstr "in"
+msgstr ""
 
 msgid "Fields Updated"
-msgstr "Fields Updated"
+msgstr ""
 
 msgid "Weight"
-msgstr "Weight"
+msgstr ""
 
 msgid "Add"
-msgstr "Add"
+msgstr ""
 
 msgid "The list is limited to the first [_1] entries."
-msgstr "The list is limited to the first [_1] entries."
+msgstr ""
 
 msgid "CHOOSE_HOW_REPORTS"
-msgstr "Choose how you want to receive the data from this report."
+msgstr ""
 
 msgid "Birth Certificate Number"
-msgstr "Birth Certificate Number"
+msgstr ""
 
 msgid "Search Results"
-msgstr "Search Results"
+msgstr ""
 
 msgid "Regions"
-msgstr "Regions"
+msgstr ""
 
 msgid "Update Club"
-msgstr "Update Club"
+msgstr ""
 
 msgid "Middle name"
-msgstr "Middle name"
+msgstr ""
 
 msgid "No entries match your Search criteria. Please try again"
-msgstr "No entries match your Search criteria. Please try again"
+msgstr ""
 
 msgid "ADV_REPORT_INTRO"
 msgstr ""
 
 msgid "Welcome Message Updated"
-msgstr "Welcome Message Updated"
+msgstr ""
 
 msgid "City of Residence"
-msgstr "City of Residence"
+msgstr ""
 
 msgid "Parent/Guardian 2 Email 2"
-msgstr "Parent/Guardian 2 Email 2"
+msgstr ""
 
 msgid "Player Age Group"
-msgstr "Player Age Group"
+msgstr ""
 
 msgid "Choose an option from the list below"
-msgstr "Choose an option from the list below"
+msgstr ""
 
 msgid "Phone (Work)"
-msgstr "Phone (Work)"
+msgstr ""
 
 msgid "Parent/Guardian 1 Phone 2"
-msgstr "Parent/Guardian 1 Phone 2"
+msgstr ""
 
 msgid "Email 2"
-msgstr "Email 2"
+msgstr ""
 
 msgid "Entity ID"
-msgstr "Entity ID"
+msgstr ""
 
 msgid "Any Allergies"
-msgstr "Any Allergies"
+msgstr ""
 
 msgid "Start Date"
-msgstr "Start Date"
+msgstr ""
 
 msgid "Title of Contact 3"
-msgstr "Title of Contact 3"
+msgstr ""
 
 msgid "cannot have spaces"
-msgstr "cannot have spaces"
+msgstr ""
 
 msgid "Manager"
-msgstr "Manager"
+msgstr ""
 
 msgid "School Name"
-msgstr "School Name"
+msgstr ""
 
 msgid "Emergency Contact Relationship"
-msgstr "Emergency Contact Relationship"
+msgstr ""
 
 msgid "REPORT_INTRO_DESC_TEXT"
 msgstr ""
@@ -119,70 +119,70 @@ msgstr ""
 "li></ol>"
 
 msgid "Sep"
-msgstr "Sep"
+msgstr ""
 
 msgid "You have [_1] duplicate to resolve."
-msgstr "You have [quant,_1,duplicate,duplicates] to resolve."
+msgstr ""
 
 msgid "Maiden name"
-msgstr "Maiden name"
+msgstr ""
 
 msgid "Database Error in Addition"
-msgstr "Database Error in Addition"
+msgstr ""
 
 msgid "Deregistered"
-msgstr "Deregistered"
+msgstr ""
 
 msgid "An invalid Action Code has been passed to me."
-msgstr "An invalid Action Code has been passed to me."
+msgstr ""
 
 msgid "Deceased?"
-msgstr "Deceased?"
+msgstr ""
 
 msgid "Identification Number"
-msgstr "Identification Number"
+msgstr ""
 
 msgid "Yes"
-msgstr "Yes"
+msgstr ""
 
 msgid "Parent/Guardian 2 Surname"
-msgstr "Parent/Guardian 2 Surname"
+msgstr ""
 
 msgid "Parent/Guardian 2 Email"
-msgstr "Parent/Guardian 2 Email"
+msgstr ""
 
 msgid "This is the list of the last 20 changes peformed."
-msgstr "This is the list of the last 20 changes peformed."
+msgstr ""
 
 msgid "Editable"
-msgstr "Editable"
+msgstr ""
 
 msgid "Consent Forms"
-msgstr "Consent Forms"
+msgstr ""
 
 msgid "Login"
-msgstr "Login"
+msgstr ""
 
 msgid "Contact Person 3"
-msgstr "Contact Person 3"
+msgstr ""
 
 msgid "Sub Category"
-msgstr "Sub Category"
+msgstr ""
 
 msgid "must be [_1] characters long"
-msgstr "must be [_1] characters long"
+msgstr ""
 
 msgid "Zone"
-msgstr "Zone"
+msgstr ""
 
 msgid "Problem Updating Fields"
-msgstr "Problem Updating Fields"
+msgstr ""
 
 msgid "Parent/Guardian 1 Phone"
-msgstr "Parent/Guardian 1 Phone"
+msgstr ""
 
 msgid "Contact Details"
-msgstr "Contact Details"
+msgstr ""
 
 msgid "FIELDS_intro"
 msgstr ""
@@ -190,86 +190,86 @@ msgstr ""
 "Member fields."
 
 msgid "Edit Welcome Message"
-msgstr "Edit Welcome Message"
+msgstr ""
 
 msgid "is not between [_1] and [_2]"
-msgstr "is not between [_1] and [_2]"
+msgstr ""
 
 msgid "Nickname"
-msgstr "Nickname"
+msgstr ""
 
 msgid "AUTO_INTROTEXT"
 msgstr ""
 "To modify this information change the information in the boxes below and whe"
 
 msgid "Select your report type below."
-msgstr "Select your report type below."
+msgstr ""
 
 msgid "Abbreviation"
-msgstr "Abbreviation"
+msgstr ""
 
 msgid "Postal Code"
-msgstr "Postal Code"
+msgstr ""
 
 msgid "Secondary Sort By"
-msgstr "Secondary Sort By"
+msgstr ""
 
 msgid "Record updated successfully"
-msgstr "Record updated successfully"
+msgstr ""
 
 msgid "Menu"
-msgstr "Menu"
+msgstr ""
 
 msgid "Cards Printed"
-msgstr "Cards Printed"
+msgstr ""
 
 msgid "Hair Colour"
-msgstr "Hair Colour"
+msgstr ""
 
 msgid "None"
-msgstr "None"
+msgstr ""
 
 msgid "Response Code"
-msgstr "Response Code"
+msgstr ""
 
 msgid "Ethnicity"
-msgstr "Ethnicity"
+msgstr ""
 
 msgid "Height"
-msgstr "Height"
+msgstr ""
 
 msgid "Sport Name"
-msgstr "Sport Name"
+msgstr ""
 
 msgid "Contact Person"
-msgstr "Contact Person"
+msgstr ""
 
 msgid "Phone (Mobile)"
-msgstr "Phone (Mobile)"
+msgstr ""
 
 msgid "Contact Phone 3"
-msgstr "Contact Phone 3"
+msgstr ""
 
 msgid "Name"
-msgstr "Name"
+msgstr ""
 
 msgid "Details"
-msgstr "Details"
+msgstr ""
 
 msgid "International Zone"
-msgstr "International Zone"
+msgstr ""
 
 msgid "Season"
-msgstr "Season"
+msgstr ""
 
 msgid "No Limit"
-msgstr "No Limit"
+msgstr ""
 
 msgid "Any Medical Conditions?"
-msgstr "Any Medical Conditions?"
+msgstr ""
 
 msgid "Parent/Guardian 2 Phone"
-msgstr "Parent/Guardian 2 Phone"
+msgstr ""
 
 msgid ""
 "Please enter your username and password below and then press the Sign in "
@@ -279,174 +279,174 @@ msgstr ""
 "button."
 
 msgid "Search Again"
-msgstr "Search Again"
+msgstr ""
 
 msgid "or"
-msgstr "or"
+msgstr ""
 
 msgid "Member Reports"
-msgstr "Member Reports"
+msgstr ""
 
 msgid "You have entered an Invalid Date of birth"
-msgstr "You have entered an Invalid Date of birth"
+msgstr ""
 
 msgid "Parent/Guardian 2 Gender"
-msgstr "Parent/Guardian 2 Gender"
+msgstr ""
 
 msgid "View"
-msgstr "View"
+msgstr ""
 
 msgid "Member Types: Official"
-msgstr "Member Types: Official"
+msgstr ""
 
 msgid "All Records"
-msgstr "All Records"
+msgstr ""
 
 msgid "Country"
-msgstr "Country"
+msgstr ""
 
 msgid "None Available"
-msgstr "None Available"
+msgstr ""
 
 msgid "is not a valid email address"
-msgstr "is not a valid email address"
+msgstr ""
 
 msgid "Other Code"
-msgstr "Other Code"
+msgstr ""
 
 msgid "Family Name"
-msgstr "Family Name"
+msgstr ""
 
 msgid "Both"
-msgstr "Both"
+msgstr ""
 
 msgid "Click here to resolve it."
-msgstr "Click here to resolve [quant2,_1,it,them]."
+msgstr ""
 
 msgid "Mobile"
-msgstr "Mobile"
+msgstr ""
 
 msgid "Date of Birth"
-msgstr "Date of Birth"
+msgstr ""
 
 msgid "Emergency Contact Number 2"
-msgstr "Emergency Contact Number 2"
+msgstr ""
 
 msgid "CHOOSE_AND_REPORT"
 msgstr ""
 "Choose which fields you want on your report and any filters you wish to apply"
 
 msgid "Amount"
-msgstr "Amount"
+msgstr ""
 
 msgid "Parent/Guardian 1 Email"
-msgstr "Parent/Guardian 1 Email"
+msgstr ""
 
 msgid "ENTER_USER_PASSWORD"
-msgstr "Please enter your username and password below and then press the '[_1]"
+msgstr ""
 
 msgid "Oct"
-msgstr "Oct"
+msgstr ""
 
 msgid "National Bodies"
-msgstr "National Bodies"
+msgstr ""
 
 msgid "Contact Email"
-msgstr "Contact Email"
+msgstr ""
 
 msgid "Contact"
-msgstr "Contact"
+msgstr ""
 
 msgid "Member"
-msgstr "Member"
+msgstr ""
 
 msgid "Nov"
-msgstr "Nov"
+msgstr ""
 
 msgid "Options"
-msgstr "Options"
+msgstr ""
 
 msgid "Position"
-msgstr "Position"
+msgstr ""
 
 msgid "Date First Registered"
-msgstr "Date First Registered"
+msgstr ""
 
 msgid "No Payment Records can be found in the database."
-msgstr "No Payment Records can be found in the database."
+msgstr ""
 
 msgid "Mar"
-msgstr "Mar"
+msgstr ""
 
 msgid "Place (Town) of Birth"
-msgstr "Place (Town) of Birth"
+msgstr ""
 
 msgid "Non Specified"
-msgstr "Non Specified"
+msgstr ""
 
 msgid "Statistics"
-msgstr "Statistics"
+msgstr ""
 
 msgid "Personal Details"
-msgstr "Personal Details"
+msgstr ""
 
 msgid "Email Address of the Organiser"
-msgstr "Email Address of the Organiser"
+msgstr ""
 
 msgid "cannot contain HTML"
-msgstr "cannot contain HTML"
+msgstr ""
 
 msgid "ROWS_FOUND"
-msgstr "[_1] rows found"
+msgstr ""
 
 msgid "Delete"
-msgstr "Delete"
+msgstr ""
 
 msgid "Feb"
-msgstr "Feb"
+msgstr ""
 
 msgid "Business Number"
-msgstr "Business Number"
+msgstr ""
 
 msgid "Family name"
-msgstr "Family name"
+msgstr ""
 
 msgid "Identification Type"
-msgstr "Identification Type"
+msgstr ""
 
 msgid "Emergency Contact Name"
-msgstr "Emergency Contact Name"
+msgstr ""
 
 msgid "Police Check Number"
-msgstr "Police Check Number"
+msgstr ""
 
 msgid "NO_BODY"
-msgstr "Oops, this shouldn't be happening. Please contact"
+msgstr ""
 
 msgid "Not Available"
-msgstr "Not Available"
+msgstr ""
 
 msgid "Allow Parent Body"
-msgstr "Allow Parent Body"
+msgstr ""
 
 msgid "Preferred name"
-msgstr "Preferred name"
+msgstr ""
 
 msgid "Male"
-msgstr "Male"
+msgstr ""
 
 msgid "MARK_AS_DUPLICATE_WARNING"
 msgstr ""
 "NOTE: Only mark the extra [_1], not the [_1] you believe may be the original"
 
 msgid "is not less than or equal to [_1]"
-msgstr "is not less than or equal to [_1]"
+msgstr ""
 
 msgid "Match Official?"
-msgstr "Match Official?"
+msgstr ""
 
 msgid "Seasons"
-msgstr "Seasons"
+msgstr ""
 
 msgid ""
 "These configuration options allow you to modify the data and behaviour of "
@@ -456,10 +456,10 @@ msgstr ""
 "the system."
 
 msgid "Parent/Guardian 2 Phone 2"
-msgstr "Parent/Guardian 2 Phone 2"
+msgstr ""
 
 msgid "Update Welcome Message"
-msgstr "Update Welcome Message"
+msgstr ""
 
 msgid "WELCOME"
 msgstr ""
@@ -470,253 +470,253 @@ msgstr ""
 "and press the <b>[_1]</b> button.</p>"
 
 msgid "Emergency Contact Number"
-msgstr "Emergency Contact Number"
+msgstr ""
 
 msgid "Welcome"
-msgstr "Welcome"
+msgstr ""
 
 msgid "Click to Open/Close Group"
-msgstr "Click to Open/Close Group"
+msgstr ""
 
 msgid "Active"
-msgstr "Active"
+msgstr ""
 
 msgid "Identifications"
-msgstr "Identifications"
+msgstr ""
 
 msgid "Status"
-msgstr "Status"
+msgstr ""
 
 msgid "International Zones"
-msgstr "International Zones"
+msgstr ""
 
 msgid "UPLOAD_PHOTO_FORM_TEXT"
-msgstr "<p"
+msgstr ""
 
 msgid "Choose a Sport"
-msgstr "Choose a Sport"
+msgstr ""
 
 msgid "Audit Log"
-msgstr "Audit Log"
+msgstr ""
 
 msgid "Club"
-msgstr "Club"
+msgstr ""
 
 msgid "Products"
-msgstr "Products"
+msgstr ""
 
 msgid "Police Check"
-msgstr "Police Check"
+msgstr ""
 
 msgid "Parent/Guardian 1 Mobile"
-msgstr "Parent/Guardian 1 Mobile"
+msgstr ""
 
 msgid "Member Tags"
-msgstr "Member Tags"
+msgstr ""
 
 msgid "Home Venue Post Code"
-msgstr "Home Venue Post Code"
+msgstr ""
 
 msgid "Date Suspended Until"
-msgstr "Date Suspended Until"
+msgstr ""
 
 msgid "Modify Member List"
-msgstr "Modify Member List"
+msgstr ""
 
 msgid "Member Sport Detail Reports"
-msgstr "Member Sport Detail Reports"
+msgstr ""
 
 msgid "MODIFY_PHOTO_FORM_HEADER"
-msgstr "<p"
+msgstr ""
 
 msgid "Date Last Registered"
-msgstr "Date Last Registered"
+msgstr ""
 
 msgid "Added By"
-msgstr "Added By"
+msgstr ""
 
 msgid "Bulk Change"
-msgstr "Bulk Change"
+msgstr ""
 
 msgid "First name"
-msgstr "First name"
+msgstr ""
 
 msgid "Additional Contacts"
-msgstr "Additional Contacts"
+msgstr ""
 
 msgid "Summary Data"
-msgstr "Summary Data"
+msgstr ""
 
 msgid "Junior?"
-msgstr "Junior?"
+msgstr ""
 
 msgid "Passport Number"
-msgstr "Passport Number"
+msgstr ""
 
 msgid "Type"
-msgstr "Type"
+msgstr ""
 
 msgid "There are no available Tags to assign"
-msgstr "There are no available Tags to assign"
+msgstr ""
 
 msgid "Registration Number"
-msgstr "Registration Number"
+msgstr ""
 
 msgid "International Region"
-msgstr "International Region"
+msgstr ""
 
 msgid "Apr"
-msgstr "Apr"
+msgstr ""
 
 msgid "Search using the options below"
-msgstr "Search using the options below"
+msgstr ""
 
 msgid "International Regions"
-msgstr "International Regions"
+msgstr ""
 
 msgid "Medical Notes"
-msgstr "Medical Notes"
+msgstr ""
 
 msgid "Ref. No."
-msgstr "Ref. No."
+msgstr ""
 
 msgid "Reset"
-msgstr "Reset"
+msgstr ""
 
 msgid "Invalid Date"
-msgstr "Invalid Date"
+msgstr ""
 
 msgid "Address Line 2"
-msgstr "Address Line 2"
+msgstr ""
 
 msgid "Parent/Guardian 1 Gender"
-msgstr "Parent/Guardian 1 Gender"
+msgstr ""
 
 msgid "Bank Account Details"
-msgstr "Bank Account Details"
+msgstr ""
 
 msgid "Ask for Job Title"
-msgstr "Ask for Job Title"
+msgstr ""
 
 msgid "Secretary"
-msgstr "Secretary"
+msgstr ""
 
 msgid "Active?"
-msgstr "Active?"
+msgstr ""
 
 msgid "There was a problem changing the welcome message"
-msgstr "There was a problem changing the welcome message"
+msgstr ""
 
 msgid "REPORT_INTRO_TEXT"
-msgstr "<p"
+msgstr ""
 
 msgid "First Name"
-msgstr "First Name"
+msgstr ""
 
 msgid "Sportzware Membership Login Page"
-msgstr "Sportzware Membership Login Page"
+msgstr ""
 
 msgid "National Number"
-msgstr "National Number"
+msgstr ""
 
 msgid "OR"
-msgstr "OR"
+msgstr ""
 
 msgid "Ascending"
-msgstr "Ascending"
+msgstr ""
 
 msgid "Search found the following results"
-msgstr "Search found the following results"
+msgstr ""
 
 msgid "Other Fields"
-msgstr "Other Fields"
+msgstr ""
 
 msgid "DISPLAY_REPORT"
-msgstr "Open the report for viewing on the screen"
+msgstr ""
 
 msgid "Manage Lookup Information"
-msgstr "Manage Lookup Information"
+msgstr ""
 
 msgid "Payment Type"
-msgstr "Payment Type"
+msgstr ""
 
 msgid "Passport Country of Issue"
-msgstr "Passport Country of Issue"
+msgstr ""
 
 msgid "Police Check Expiry Date"
-msgstr "Police Check Expiry Date"
+msgstr ""
 
 msgid "Contact Phone 2"
-msgstr "Contact Phone 2"
+msgstr ""
 
 msgid "Gender"
-msgstr "Gender"
+msgstr ""
 
 msgid "Address Line 1"
-msgstr "Address Line 1"
+msgstr ""
 
 msgid "is not more than [_1]"
-msgstr "is not more than [_1]"
+msgstr ""
 
 msgid "Edit"
-msgstr "Edit"
+msgstr ""
 
 msgid "Name (or part of name)"
-msgstr "Name (or part of name)"
+msgstr ""
 
 msgid "Parent/Guardian 1 Email 2"
-msgstr "Parent/Guardian 1 Email 2"
+msgstr ""
 
 msgid "Parent/Guardian 2 Mobile"
-msgstr "Parent/Guardian 2 Mobile"
+msgstr ""
 
 msgid "Run Report"
-msgstr "Run Report"
+msgstr ""
 
 msgid "Date Added"
-msgstr "Date Added"
+msgstr ""
 
 msgid "ROLLOVER_INSTRUCTIONS"
-msgstr "<p"
+msgstr ""
 
 msgid "[_1] updated successfully"
-msgstr "[_1] updated successfully"
+msgstr ""
 
 msgid "Zones"
-msgstr "Zones"
+msgstr ""
 
 msgid "Parent/Guardian 2 Salutation"
-msgstr "Parent/Guardian 2 Salutation"
+msgstr ""
 
 msgid "Age Groups"
-msgstr "Age Groups"
+msgstr ""
 
 msgid "Phone 3"
-msgstr "Phone 3"
+msgstr ""
 
 msgid "Phone"
-msgstr "Phone"
+msgstr ""
 
 msgid "Member Number"
-msgstr "Member Number"
+msgstr ""
 
 msgid "Update"
-msgstr "Update"
+msgstr ""
 
 msgid "State"
-msgstr "State"
+msgstr ""
 
 msgid "Health Care Number"
-msgstr "Health Care Number"
+msgstr ""
 
 msgid "International"
-msgstr "International"
+msgstr ""
 
 msgid "Custom Fields"
-msgstr "Custom Fields"
+msgstr ""
 
 msgid "Clubs"
-msgstr "Clubs"
+msgstr ""
 
 msgid "COPYRIGHT"
 msgstr ""
@@ -724,154 +724,154 @@ msgstr ""
 "All rights reserved."
 
 msgid "Parent/Guardian 1 Firstname"
-msgstr "Parent/Guardian 1 Firstname"
+msgstr ""
 
 msgid "View Receipt"
-msgstr "View Receipt"
+msgstr ""
 
 msgid "Status Reports"
-msgstr "Status Reports"
+msgstr ""
 
 msgid "Occupation"
-msgstr "Occupation"
+msgstr ""
 
 msgid "Salutation"
-msgstr "Salutation"
+msgstr ""
 
 msgid "Age Group"
-msgstr "Age Group"
+msgstr ""
 
 msgid "Add new record"
-msgstr "Add new record"
+msgstr ""
 
 msgid "Contact Email 3"
-msgstr "Contact Email 3"
+msgstr ""
 
 msgid "is not more than or equal to [_1]"
-msgstr "is not more than or equal to [_1]"
+msgstr ""
 
 msgid "Duplicate Resolution"
-msgstr "Duplicate Resolution"
+msgstr ""
 
 msgid "Offline Number"
-msgstr "Offline Number"
+msgstr ""
 
 msgid "Welcome Message"
-msgstr "Welcome Message"
+msgstr ""
 
 msgid "Search"
-msgstr "Search"
+msgstr ""
 
 msgid "Reports"
-msgstr "Reports"
+msgstr ""
 
 msgid "Configuration"
-msgstr "Configuration"
+msgstr ""
 
 msgid "Maximum no. of rows to display"
-msgstr "Maximum no. of rows to display"
+msgstr ""
 
 msgid "States"
-msgstr "States"
+msgstr ""
 
 msgid "Hidden"
-msgstr "Hidden"
+msgstr ""
 
 msgid "Action"
-msgstr "Action"
+msgstr ""
 
 msgid "President"
-msgstr "President"
+msgstr ""
 
 msgid "Inactive"
-msgstr "Inactive"
+msgstr ""
 
 msgid "Notes"
-msgstr "Notes"
+msgstr ""
 
 msgid "Unique Records Only"
-msgstr "Unique Records Only"
+msgstr ""
 
 msgid "is not a valid date"
-msgstr "is not a valid date"
+msgstr ""
 
 msgid "Passport Nationality"
-msgstr "Passport Nationality"
+msgstr ""
 
 msgid "Filter Only"
-msgstr "Filter Only"
+msgstr ""
 
 msgid "Contact Email 2"
-msgstr "Contact Email 2"
+msgstr ""
 
 msgid "APPNAME"
-msgstr "SportingPulse Membership"
+msgstr ""
 
 msgid "Database Error in Update"
-msgstr "Database Error in Update"
+msgstr ""
 
 msgid "HTMLFORM_INTROTEXT"
-msgstr "auto"
+msgstr ""
 
 msgid "Phone (Home)"
-msgstr "Phone (Home)"
+msgstr ""
 
 msgid "No Clubs of this status can be found in the database."
-msgstr "No Clubs of this status can be found in the database."
+msgstr ""
 
 msgid "Female"
-msgstr "Female"
+msgstr ""
 
 msgid "Read Only"
-msgstr "Read Only"
+msgstr ""
 
 msgid "Record added successfully"
-msgstr "Record added successfully"
+msgstr ""
 
 msgid "Update Information"
-msgstr "Update Information"
+msgstr ""
 
 msgid "I cannot find any records of changes"
-msgstr "I cannot find any records of changes"
+msgstr ""
 
 msgid "Date"
-msgstr "Date"
+msgstr ""
 
 msgid "Compulsory Field"
-msgstr "Compulsory Field"
+msgstr ""
 
 msgid "The following fields are compulsory and need to be filled in"
-msgstr "The following fields are compulsory and need to be filled in"
+msgstr ""
 
 msgid "This will assign the status to all matching records"
-msgstr "This will assign the status to all matching records"
+msgstr ""
 
 msgid "Email"
-msgstr "Email"
+msgstr ""
 
 msgid "Level"
-msgstr "Level"
+msgstr ""
 
 msgid "Police Check Date"
-msgstr "Police Check Date"
+msgstr ""
 
 msgid "Title of Contact 2"
-msgstr "Title of Contact 2"
+msgstr ""
 
 msgid "Descending"
-msgstr "Descending"
+msgstr ""
 
 msgid "Tags Updated"
-msgstr "Tags Updated"
+msgstr ""
 
 msgid "Sort By"
-msgstr "Sort By"
+msgstr ""
 
 msgid "Club Name"
-msgstr "Club Name"
+msgstr ""
 
 msgid "Display details for [_1]"
-msgstr "Display details for [_1]"
+msgstr ""
 
 msgid "TO_UPD_DASHBOARD"
 msgstr ""
@@ -879,56 +879,56 @@ msgstr ""
 "<b>Update</b> to save.</p>"
 
 msgid "Parent/Guardian 2 Firstname"
-msgstr "Parent/Guardian 2 Firstname"
+msgstr ""
 
 msgid "EXPORT_WARNING"
 msgstr ""
 "This option has a specified set of fields that it exports, however filters ar"
 
 msgid "Logout"
-msgstr "Logout"
+msgstr ""
 
 msgid "Parent/Guardian 1 Salutation"
-msgstr "Parent/Guardian 1 Salutation"
+msgstr ""
 
 msgid "Help"
-msgstr "Help"
+msgstr ""
 
 msgid "Incorporation Number"
-msgstr "Incorporation Number"
+msgstr ""
 
 msgid "Compulsory"
-msgstr "Compulsory"
+msgstr ""
 
 msgid "Fax"
-msgstr "Fax"
+msgstr ""
 
 msgid "Other Details"
-msgstr "Other Details"
+msgstr ""
 
 msgid "Region"
-msgstr "Region"
+msgstr ""
 
 msgid "Suburb"
-msgstr "Suburb"
+msgstr ""
 
 msgid "Phone 2"
-msgstr "Phone 2"
+msgstr ""
 
 msgid "Permissions Updated"
-msgstr "Permissions Updated"
+msgstr ""
 
 msgid "Passport Expiry Date"
-msgstr "Passport Expiry Date"
+msgstr ""
 
 msgid "Sport"
-msgstr "Sport"
+msgstr ""
 
 msgid "is not a valid number"
-msgstr "is not a valid number"
+msgstr ""
 
 msgid "Name (or part of)"
-msgstr "Name (or part of)"
+msgstr ""
 
 msgid "DATA_EXPORT_EMAIL_PROMPT"
 msgstr ""
@@ -936,137 +936,137 @@ msgstr ""
 "email"
 
 msgid "Show"
-msgstr "Show"
+msgstr ""
 
 msgid "Date Created Online"
-msgstr "Date Created Online"
+msgstr ""
 
 msgid "Bulk Printing"
-msgstr "Bulk Printing"
+msgstr ""
 
 msgid "Title of Contact"
-msgstr "Title of Contact"
+msgstr ""
 
 msgid "Fill in the appropriate filter boxes below to search."
-msgstr "Fill in the appropriate filter boxes below to search."
+msgstr ""
 
 msgid "Database Home"
-msgstr "Database Home"
+msgstr ""
 
 msgid "Problem Updating Permissions"
-msgstr "Problem Updating Permissions"
+msgstr ""
 
 msgid "List of Payment Records"
-msgstr "List of Payment Records"
+msgstr ""
 
 msgid "Parent/Guardian 1 Surname"
-msgstr "Parent/Guardian 1 Surname"
+msgstr ""
 
 msgid "Save Options"
-msgstr "Save Options"
+msgstr ""
 
 msgid "Venue 1"
-msgstr "Venue 1"
+msgstr ""
 
 msgid "Eye Colour"
-msgstr "Eye Colour"
+msgstr ""
 
 msgid "MARK_AS_DUPLICATE_INSTRUCTIONS"
-msgstr "<p"
+msgstr ""
 
 msgid "Product Blog"
-msgstr "Product Blog"
+msgstr ""
 
 msgid "Month"
-msgstr "Month"
+msgstr ""
 
 msgid "EMAIL_REPORT"
 msgstr ""
 "Email the report in a format suitable to be imported into another product"
 
 msgid "Current Level"
-msgstr "Current Level"
+msgstr ""
 
 msgid "Approvals"
-msgstr "Approvals"
+msgstr ""
 
 msgid "Limit"
-msgstr "Limit"
+msgstr ""
 
 msgid "Sort Order"
-msgstr "Sort Order"
+msgstr ""
 
 msgid "Field options"
-msgstr "Field Options"
+msgstr ""
 
 msgid "Parent/Guardian"
-msgstr "Parent/Guardian"
+msgstr ""
 
 msgid "Search Entity"
-msgstr "Search Entity"
+msgstr ""
 
 msgid "National Body"
-msgstr "National Body"
+msgstr ""
 
 msgid "Website"
-msgstr "Website"
+msgstr ""
 
 msgid "is not less than [_1]"
-msgstr "is not less than [_1]"
+msgstr ""
 
 msgid "Last Updated"
-msgstr "Last Updated"
+msgstr ""
 
 msgid "Contact Person 2"
-msgstr "Contact Person 2"
+msgstr ""
 
 msgid "No outstanding tasks"
-msgstr "No outstanding tasks"
+msgstr ""
 
 msgid "Registration Authorisation"
-msgstr "Registration Authorisation"
+msgstr ""
 
 msgid "Player"
-msgstr "Player"
+msgstr ""
 
 msgid "Coach"
-msgstr "Coach"
+msgstr ""
 
 msgid "Referee"
-msgstr "Referee"
+msgstr ""
 
 msgid "Amateur"
-msgstr "Amateur"
+msgstr ""
 
 msgid "Professional"
-msgstr "Professional"
+msgstr ""
 
 msgid "Football"
-msgstr "Football"
+msgstr ""
 
 msgid "Beach Soccer"
-msgstr "Beach Soccer"
+msgstr ""
 
 msgid "Futsal"
-msgstr "Futsal"
+msgstr ""
 
 msgid "New Registration"
-msgstr "New Registration"
+msgstr ""
 
 msgid "Renewal"
-msgstr "Renewal"
+msgstr ""
 
 msgid "Amendment"
-msgstr "Amendment"
+msgstr ""
 
 msgid "Transfer"
-msgstr "Transfer"
+msgstr ""
 
 msgid "Senior"
-msgstr "Senior"
+msgstr ""
 
 msgid "Youth"
-msgstr "Youth"
+msgstr ""
 
 msgid " "
 msgstr ""
@@ -1080,7 +1080,7 @@ msgid ""
 msgstr ""
 
 msgid "$txt_Clr Settings"
-msgstr "Clearance Settings"
+msgstr ""
 
 msgid "$txt_Clr is $Defs::clearance_status{$dref->{intClearanceStatus}}"
 msgstr ""
@@ -1089,7 +1089,7 @@ msgid "-- Not Available --"
 msgstr ""
 
 msgid "Your login session has expired"
-msgstr "Your login session has expired"
+msgstr ""
 
 msgid "A member with the same name and date of birth already exists!"
 msgstr ""
@@ -1098,16 +1098,16 @@ msgid "AWAITING YOUR APPROVAL"
 msgstr ""
 
 msgid "Access"
-msgstr "Access"
+msgstr ""
 
 msgid "Accounts"
-msgstr "Accounts"
+msgstr ""
 
 msgid "Active ?"
 msgstr ""
 
 msgid "Add $txt_Clr Settings"
-msgstr "Add Clearance Settings"
+msgstr ""
 
 msgid "Add $txt_Name $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Record"
 msgstr ""
@@ -1116,7 +1116,7 @@ msgid "Add $txt_Name Record"
 msgstr ""
 
 msgid "Add Document"
-msgstr "Add Document"
+msgstr ""
 
 msgid "Add Manual Transfer"
 msgstr ""

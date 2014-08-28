@@ -11,7 +11,7 @@ use Defs;
 require CustomFields;
 
 sub getFieldLabels	{
-	my($Data, $level)=@_;
+	my($Data, $level, $raw)=@_;
 
 	my %labels=();
 	return \%labels if(!$Data or !$level);
@@ -92,7 +92,6 @@ sub getFieldLabels	{
 			dtPoliceCheck => $Data->{'SystemConfig'}{'dtPoliceCheck_Text'} ? $Data->{'SystemConfig'}{'dtPoliceCheck_Text'} : 'Police Check Date',
 			dtPoliceCheckExp => $Data->{'SystemConfig'}{'dtPoliceCheckExp_Text'} ? $Data->{'SystemConfig'}{'dtPoliceCheckExp_Text'} : 'Police Check Expiry Date',
 			strPoliceCheckRef => 'Police Check Number',
-            intMemberToHideID => "Upload to Website Results",
 			strPreferredLang => 'Preferred Language',
        
 		);
@@ -126,6 +125,9 @@ sub getFieldLabels	{
 		$labels{$k}= ($Data->{'SystemConfig'}{'FieldLabel_'.$k} || '') if exists $Data->{'SystemConfig'}{'FieldLabel_'.$k};
 	}
 
+    if($raw)    {
+        return \%labels;
+    }
     my $lang = $Data->{lang};
 
     foreach my $key (keys %labels) {
