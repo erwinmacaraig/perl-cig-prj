@@ -1,0 +1,6 @@
+./processFile.pl --filename "TEST/TEST.csv" --config "TEST/test.config"
+
+./processFile.pl --filename "FINLAND/FINLAND.csv" --config "FINLAND/finland.config"
+
+./processFile.pl --filename "SINGAPORE/SINGAPORE.csv" --config "SINGAPORE/singapore.config"
+
