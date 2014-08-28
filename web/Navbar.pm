@@ -218,8 +218,17 @@ sub getEntityMenuData {
             url => $baseurl."a=WF_",
         };
 
+    
+        $menuoptions{'pending'} = {
+            name => $lang->txt('Pending Registrations'),
+            url => $baseurl."a=PENDPR_",
+        };
+        $menuoptions{'bulk'} = {
+            name => $lang->txt('Bulk Renewals'),
+            url => $baseurl."a=PREGFB_T",
+        };
         $menuoptions{'entityregistrationallowed'} = {
-            name => $lang->txt('Reg. Allowed'),
+            name => $lang->txt('Registrations Allowed'),
             url => $baseurl."a=ERA_",
         };
 
@@ -264,12 +273,6 @@ sub getEntityMenuData {
             };
         }
 
-        if ($SystemConfig->{'AllowPendingRegistration'}) {
-            $menuoptions{'pendingregistration'} = {
-                name => $lang->txt('Pending Registration'),
-                url => $baseurl."a=P_PRS_L",
-            };
-        }
 
         #nationalrego. enable regoforms at entity level.
         if  ($SystemConfig->{'AllowOnlineRego_entity'}) {
@@ -365,6 +368,8 @@ if($SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequestCleara
         'paymentsplitrun',
         'registrationforms', #nationalrego. enable regoforms at entity level.
         'entityregistrationallowed',
+        'bulk',
+        'pending',
         ]],
         [ $lang->txt('Reports'), 'menu',[
         'reports',
@@ -542,12 +547,6 @@ sub getAssocMenuData {
                 };
             }
 
-            if ($SystemConfig->{'AllowPendingRegistration'}) {
-                $menuoptions{'pendingregistration'} = {
-                    name => $lang->txt('Pending Registration'),
-                    url => $baseurl."a=P_PRS_L",
-                };
-            }
 
             if($SystemConfig->{'AllowTXNs'}) {
                 $menuoptions{'products'} = {
@@ -617,7 +616,6 @@ sub getAssocMenuData {
         'personrollover',
         'transferperson',
         'cardprinting',
-        'pendingregistration',
         ]],
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_CLUB.'_P'}), 'menu', [
         'clubs',
@@ -699,13 +697,6 @@ sub getClubMenuData {
         },
     );
     my $txt_RequestCLR = $SystemConfig->{'txtRequestCLR'} || 'Request a Clearance';
-
-    if ($SystemConfig->{'AllowPendingRegistration'}) {
-        $menuoptions{'pendingregistration'} = {
-            name => $lang->txt('Pending Registration'),
-            url => $baseurl."a=P_PRS_L",
-        };
-    }
 
     if($SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequestClearance'} 
     ) {
@@ -797,7 +788,7 @@ sub getClubMenuData {
             url => $baseurl."a=WF_",
         };
         $menuoptions{'entityregistrationallowed'} = {
-            name => $lang->txt('Reg. Allowed'),
+            name => $lang->txt('Registrations Allowed'),
             url => $baseurl."a=ERA_",
         };
 
@@ -845,6 +836,10 @@ sub getClubMenuData {
             url => $baseurl."a=C_TXNLog_list",
         };
      }
+        $menuoptions{'pending'} = {
+            name => $lang->txt('Pending Registrations'),
+            url => $baseurl."a=PENDPR_",
+        };
         $menuoptions{'bulk'} = {
             name => $lang->txt('Bulk Renewals'),
             url => $baseurl."a=PREGFB_T",
@@ -859,7 +854,6 @@ sub getClubMenuData {
         'personrollover',
         'transferperson',
         'duplicates',
-        'pendingregistration',
         ]],
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu','venues'],
         [ $lang->txt('Work Tasks'), 'menu','approvals'],
@@ -867,6 +861,7 @@ sub getClubMenuData {
         'registrationforms',
         'transactions',
         'bulk',
+        'pending',
         'locator',
         'entityregistrationallowed',
         ]],
