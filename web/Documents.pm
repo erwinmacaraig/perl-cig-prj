@@ -33,24 +33,29 @@ sub handle_documents {
   my $type = '';
        $DocumentTypeID ||= 0; 
        $RegistrationID ||= 0;
+       
        $action ||= 'DOC_L';
 
+   $resultHTML =  new_doc_form($Data, $client,$DocumentTypeID,$RegistrationID); 
   if ($action eq 'DOC_u') {
 		my $retvalue = process_doc_upload( 
 			$Data,
 			$memberID, 
 			$client,
 		);
-		$resultHTML .= qq[<div class="warningmsg">$retvalue</div>] if $retvalue;
-		$type = 'Add Document';
+		$resultHTML = qq[<div class="warningmsg">$retvalue</div>] if $retvalue;
+		$type = 'Add Document'; 
+                
 	}
   elsif ($action eq 'DOC_d') {
 		my $fileID = param('dID') || 0;	
-    $resultHTML .= delete_doc($Data, $fileID);
+    $resultHTML = delete_doc($Data, $fileID,$client);
 		$type = 'Delete Document';
-  }
-	$resultHTML .= list_docs($Data,$memberID,$client,$DocumentTypeID,$RegistrationID);
-
+  }   
+  
+  
+	#$resultHTML .= list_docs($Data,$memberID,$client,$DocumentTypeID,$RegistrationID);
+       
   if ($type) {
     auditLog($memberID, $Data, $type, 'Document');
   }
@@ -74,8 +79,8 @@ sub list_docs {
 		$client,
 	);
 
-	my $title = $l->txt('Documents');
-	my $body = qq[<div class="pageHeading">$title</div>];
+	my $title = $l->txt('Files');
+	my $body = qq[<br /><div class="pageHeading">$title</div>];
 	my $options = '';
 	my $count = 0;
 	for my $doc (@{$docs})	{
@@ -104,7 +109,7 @@ sub list_docs {
 			</table>
 		];
 	}
-	$body .= new_doc_form($Data, $client,$DocumentTypeID,$RegistrationID); 
+	#$body .= new_doc_form($Data, $client,$DocumentTypeID,$RegistrationID); 
 	
        return $body;
 }
@@ -119,7 +124,7 @@ sub new_doc_form {
 
 	my $l = $Data->{'lang'};
 	my $target=$Data->{'target'} || '';
-        
+    my $fileToReplace = param('f') || 0;    
 	#my $currentLevelName = $Data->{'LevelNames'}{$Data->{'clientValues'}{'authLevel'}} || 'organisation';
 	#my %permoptions = (
 	#    1 => $Data->{'lang'}->txt('All organisations to which this member is linked'),
@@ -142,12 +147,16 @@ sub new_doc_form {
                 <input type="hidden" name="RegistrationID" value="$RegistrationID" />];
         }
 
-
+    if($fileToReplace){ 
+    	$body .= qq[
+    	       <input type="hidden" name="fileId" value="$fileToReplace" />
+    	];
+    }
 	$body .=	qq[<input type="hidden" name="a" value="DOC_u">
 			
 		</form> 
                 <br />  
-                <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=P_HOME">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+                <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=P_DOCS">] . $Data->{'lang'}->txt('Continue').q[</a></span>
 		</div>
 	];
 	return $body;
@@ -169,9 +178,11 @@ sub process_doc_upload	{
                               
                 my $docTypeID = param('DocumentTypeID') || 0; 
                 my $regoID = param('RegistrationID') || 0; 
+                my $fileID = param('fileId') || 0;
                 my $other_person_info = {
                 	docTypeID => $docTypeID,
-                        regoID    => $regoID,    
+                    regoID    => $regoID,    
+                    replaceFileID => $fileID,    
                };
 		push @files_to_process, [$name, $filefield, $permission];
                 	
@@ -187,14 +198,18 @@ sub process_doc_upload	{
 }
 
 sub delete_doc {
-	my($Data, $fileID)=@_;
+	my($Data, $fileID, $client)=@_;
 
 	my $response = deleteFile(
 		$Data,
     $fileID,
   );
 
-	return '';
+	return qq[
+          <div class="OKmsg">Successfully deleted file.</div> 
+          <br />  
+          <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=P_DOCS">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+       ];
 }
 
 1;

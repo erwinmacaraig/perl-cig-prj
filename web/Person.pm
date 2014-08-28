@@ -55,7 +55,7 @@ use Data::Dumper;
 use PrimaryClub;
 use DuplicatePrevention;
 use RecordTypeFilter;
-
+use Documents;
 sub handlePerson {
     my ( $action, $Data, $personID ) = @_;
 
@@ -164,6 +164,8 @@ sub handlePerson {
     }
     elsif ( $action =~ /P_DOCS/ ) {
         ($resultHTML,$title) =  listDocuments($Data, $personID);
+         my $client = setClient( $Data->{'clientValues'} ) || '';
+         $resultHTML .= Documents::list_docs($Data, $personID, $client);
            }
     else {
         print STDERR "Unknown action $action\n";
@@ -319,11 +321,15 @@ sub listDocuments {
     my @rowdata = (); 
     my $query = qq[
          SELECT tblUploadedFiles.intFileID,tblDocumentType.strDocumentName,tblUploadedFiles.dtUploaded as DateUploaded, tblDocuments.strApprovalStatus FROM tblDocuments INNER JOIN tblUploadedFiles ON tblDocuments.intUploadFileID = tblUploadedFiles.intFileID INNER JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intPersonID = ? AND tblUploadedFiles.intEntityTypeID = ?]; 
-#? AND tblUploadedFiles.intEntityTypeID = ?
+
     my $sth = $db->prepare($query); 
     $sth->execute($personID, $Defs::LEVEL_PERSON); 
        while(my $dref = $sth->fetchrow_hashref()){
-       my $viewLink = qq[ <span class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}" target="_blank">]. $lang->txt('Get File') . q[</a></span>];  
+       my $viewLink = qq[ <span class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}" target="_blank">]. $lang->txt('Get File') . q[</a></span>];    
+       
+      my $replaceLink =   qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a></span>];    
+       
+
        my $fileLink = "#$personRegistrationID";
       
        push @rowdata, {  
@@ -332,7 +338,9 @@ sub listDocuments {
 	        strDocumentName => $dref->{'strDocumentName'},
 		strApprovalStatus => $dref->{'strApprovalStatus'},
                 DateUploaded => $dref->{'DateUploaded'}, 
-                ViewDoc => $viewLink,  
+                ViewDoc => $viewLink, 
+                ReplaceFile => $replaceLink,
+              
        };
     }
 
@@ -357,7 +365,12 @@ sub listDocuments {
             name => $lang->txt('View'),
             field => 'ViewDoc',
             type => 'HTML', 
-        }
+        },
+        {
+        	name => $lang->txt('Replace'),
+        	field => 'ReplaceFile', 
+        	type => 'HTML',
+        },
     ); 
     my $filterfields = [
         {

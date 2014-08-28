@@ -27,6 +27,7 @@ use EntityStructure;
 use WorkFlow;
 use RuleMatrix;
 use InstanceOf;
+use EntityDocuments;
 
 sub handleClub  {
   my ($action, $Data, $clubID, $typeID)=@_;
@@ -47,6 +48,9 @@ sub handleClub  {
   }
   elsif ($action=~/^C_HOME/) {
       ($resultHTML,$title)=showClubHome($Data,$clubID);
+  }
+  elsif($action =~ /^C_DOCS/){
+  	($resultHTML, $title) = handle_entity_documents($action, $Data, $clubID, $typeID, $Defs::DOC_FOR_CLUBS);  	
   }
   elsif ( $action =~ /^C_TXN_/ ) {
         ( $resultHTML, $title ) = Transactions::handleTransactions( $action, $Data, $clubID, 0);

@@ -90,7 +90,7 @@ sub processUploadFile	{
 			$fileType,
 			$files->[2],
 			$files->[3] || undef,
-                        $other_person_info,
+            $other_person_info,
 		);
 		if($err)	{
 			$ret .= "'$files->[0]' : $err<br>";
@@ -110,15 +110,17 @@ sub _processUploadFile_single	{
 		$fileType,
 		$permissions,
 		$options,
-                $other_person_info,
+        $other_person_info,
 	) = @_;
 
 	$options ||= {}; 
         my $DocumentTypeId = 0;
-        my $regoID = 0;
+        my $regoID = 0; 
+        my $oldFileId = 0;
         if(defined $other_person_info){
-          $DocumentTypeId = $other_person_info->{'docTypeID'}; 
-          $regoID = $other_person_info->{'regoID'};         
+          $DocumentTypeId = $other_person_info->{'docTypeID'} || 0; 
+          $regoID = $other_person_info->{'regoID'} || 0;
+          $oldFileId = $other_person_info->{'replaceFileID'} || 0;                   
         }   
   my $origfilename=param($file_field) || '';
 	$origfilename =~s/.*\///g;
@@ -175,8 +177,8 @@ sub _processUploadFile_single	{
 	my $q_a = $Data->{'db'}->prepare($st_a);
 	$q_a->execute(
 		$fileType, 
-                $EntityTypeID,
-                $EntityID,
+        $EntityTypeID,
+        $EntityID,
 		$Data->{'clientValues'}{'authLevel'},
 		$Data->{'clientValues'}{'_intID'},
 		$title,
@@ -186,10 +188,12 @@ sub _processUploadFile_single	{
 	my $fileID = $q_a->{mysql_insertid} || 0;
 	$q_a->finish();
 	return ('Invalid ID',0) if !$fileID; 
+	my $doc_st;
+	my $doc_q;
         #### START OF INSERTING DATA IN tblDocuments ##
-        if($DocumentTypeId){
+        if($DocumentTypeId && !$oldFileId){
 
-           my $doc_st = qq[
+           $doc_st = qq[
                 INSERT INTO tblDocuments ( 
                    intUploadFileID,
                    intDocumentTypeID,
@@ -206,8 +210,8 @@ sub _processUploadFile_single	{
                    ?,
                    ?
                  ) 
-        ];  
-        my $doc_q = $Data->{'db'}->prepare($doc_st); 
+        ]; 
+        $doc_q = $Data->{'db'}->prepare($doc_st); 
         $doc_q->execute(
               $fileID,
               $DocumentTypeId,
@@ -215,9 +219,22 @@ sub _processUploadFile_single	{
               $Data->{'clientValues'}{'_intID'},
               $regoID,
               $EntityID, 
-        );        
+        );  
+        }
+        else {
+        	 $doc_st = qq[
+        		UPDATE tblDocuments SET intUploadFileID = ? WHERE intUploadFileID = ? AND intPersonID = ?
+        	]; 
+        	$doc_q = $Data->{'db'}->prepare($doc_st); 
+        	$doc_q->execute(
+              $fileID,
+              $oldFileId,
+              $EntityID, 
+        );
+        }
+                
        $doc_q->finish();
-      } 
+       
       ##### END OF INSERTING DATA IN tblDocuments ####
 
       
