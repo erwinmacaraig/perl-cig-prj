@@ -7,6 +7,6 @@ CREATE TABLE IF NOT EXISTS `tblEntityIdentifier` (
   `strIdentifier` VARCHAR(100) NOT NULL,
   `dtValidFrom` DATE NULL,
   `dtValidUntil` DATE NULL,
-  `txtDescription` VARCHAR(250) NULL,
+  `strDescription` VARCHAR(250) NULL,
   PRIMARY KEY (`intIdentifierId`)
 ) DEFAULT CHARSET=utf8;
