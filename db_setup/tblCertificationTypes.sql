@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS `tblCertificationTypes`;
+CREATE TABLE IF NOT EXISTS `tblCertificationTypes` (
+  `intCetificationTypeID` INT NOT NULL AUTO_INCREMENT,
+  `intRealmID` INT NOT NULL,
+  `strCertificationName` VARCHAR(50) NOT NULL,
+  `tTimeStamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `intStatus` TINYINT NOT NULL DEFAULT 1,
+  PRIMARY KEY (`intCetificationTypeID`)
+) DEFAULT CHARSET=utf8;

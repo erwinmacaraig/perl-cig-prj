@@ -79,7 +79,7 @@ sub verifyCallbackToken {
             $result{'Result'} = 'FAILURE';
 
             $result{'FailureReason'} = CALLBACK_TOKEN_EXPIRED;
-            push @{$errors}, $l->txt('<div class="alert alert-warning">Your login session has expired</div>');
+            push @{$errors}, '<div class="alert alert-warning">'.$l->txt('Your login session has expired')."</div>";
         }
         else {
             my $md5_verify = md5_base64( CALLBACK_HASH_SECRET . $timestamp );
