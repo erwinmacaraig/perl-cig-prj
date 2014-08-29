@@ -63,6 +63,7 @@ use WorkFlow;
 use EntityRegistrationAllowedEdit;
 use PersonRegistrationFlow_Backend;
 use PersonRegistrationFlow_Bulk;
+use PendingRegistrations;
 
 use Log;
 use Data::Dumper;
@@ -261,6 +262,11 @@ warn("REALM IS ". $Data{'Realm'});
     }
     elsif ( $action =~ /^PREGFB_/ ) {
         ( $resultHTML, $pageHeading ) = handleRegistrationFlowBulk($action, \%Data);
+    }
+    elsif ( $action =~ /^PENDPR_/ ) {
+        my $prID = safe_param( 'prID', 'number' );
+        my $entityID = getID($Data{'clientValues'},$Data{'clientValues'}{'currentLevel'});
+        ( $resultHTML, $pageHeading ) = handlePendingRegistrations($action, \%Data, $entityID, $prID);
     }
     # BUILD PAGE
     if ( !$report ) {

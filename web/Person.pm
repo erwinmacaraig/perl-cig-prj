@@ -55,6 +55,7 @@ use Data::Dumper;
 use PrimaryClub;
 use DuplicatePrevention;
 use RecordTypeFilter;
+use PersonRegistrationDetail;
 
 sub handlePerson {
     my ( $action, $Data, $personID ) = @_;
@@ -155,11 +156,13 @@ sub handlePerson {
         ( $resultHTML, $title ) = handleAccreditationDisplay( $action, $Data, $personID );
     }
     elsif ( $action =~ /P_REGOS/ ) {
-        ($resultHTML , $title)= personRegstrationsHistory( $Data, $personID ) ;
+        ($resultHTML , $title)= personRegistrationsHistory( $Data, $personID ) ;
         $title = $lang->txt('Registration History');
     }
     elsif ( $action eq 'P_REGO' ) {
-        $resultHTML = personRegistration( $Data, $personID ) || '';
+        my $entityID = getLastEntityID($Data->{'clientValues'});
+        my $prID = safe_param( 'prID', 'number' );    
+        $resultHTML = personRegistrationDetail( $Data, $entityID, $prID) || '';
         $title = $lang->txt('Registration History');
     }
     elsif ( $action =~ /P_DOCS/ ) {
@@ -171,12 +174,7 @@ sub handlePerson {
     return ( $resultHTML, $title );
 }
 
-sub personRegstration   {
-
-    my ($Data, $personID) = @_;
-    return "NEED PAGE FOR A REGISTRATION RECORD";
-}
-sub personRegstrationsHistory   {
+sub personRegistrationsHistory   {
 
 
     my ($Data, $personID) = @_;
@@ -206,7 +204,7 @@ sub personRegstrationsHistory   {
         Status=> $rego->{'Status'} || '',
         PersonEntityRole=> $rego->{'strPersonEntityRole'} || '',
         Sport=> $rego->{'Sport'} || '',
-        SelectLink => "$Data->{'target'}?client=$client&amp;a=PR_VIEW&amp;prID=$rego->{'intPersonRegistrationID'}",
+        SelectLink => "$Data->{'target'}?client=$client&amp;a=P_REGO&amp;prID=$rego->{'intPersonRegistrationID'}",
       };
     }
 
