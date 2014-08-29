@@ -27,6 +27,7 @@ use ContactsObj;
 use DefCodes;
 use PersonRegistration;
 use RuleMatrix;
+use Entity;
 
 sub getClrTaskCount {
 
@@ -121,15 +122,27 @@ sub insertSelfTransfer  {
 sub handleClearances	{
     ### PURPOSE: main function to handle clearances.
 
-	my($action,$Data)=@_;
+	my($action,$Data, $entityID)=@_;
     my $lang = $Data->{'lang'};
 	my $q=new CGI;
     my %params=$q->Vars();
-
+    
+    
 	my $clearanceID = $params{'cID'} || 0;
 	my $clearancePathID = $params{'cpID'} || 0;
 	my $txt_RequestCLR = $lang->txt('Request a Transfer');
-
+    
+    #checks if Club is active
+    my $db = $Data->{'db'};   
+    my $entityChecks = Entity::loadEntityDetails($db, $entityID); 
+    if($entityChecks->{'strStatus'} ne 'ACTIVE'){ 
+    		my $resultHTML =qq[
+    		<div class="warningmsg">]. $lang->txt('Entity Not Allowed To View Transfer Details') .q[</div>
+    		];
+    		my $title = $lang->txt('Error');
+            return ($resultHTML,$title);
+    }
+    ###### end check
 	return (createClearance($action, $Data), $txt_RequestCLR) if $action eq 'CL_createnew';
 	return (clearancePathDetails($Data, $clearanceID, $clearancePathID), $lang->txt('Transfer Status Selection')) if $action eq 'CL_details';
 	return (listClearances($Data), $txt_RequestCLR) if $action eq 'CL_list';

@@ -173,7 +173,7 @@ warn("REALM IS ". $Data{'Realm'});
           handleReports( $action, \%Data );
     }
     elsif ( $action =~ /^CL_/ ) {
-        ( $resultHTML, $pageHeading ) = handleClearances( $action, \%Data );
+        ( $resultHTML, $pageHeading ) = handleClearances( $action, \%Data, $ID );
     }
     elsif ( $action =~ /^CLRSET_/ ) {
         ( $resultHTML, $pageHeading ) =
