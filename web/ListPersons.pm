@@ -37,6 +37,7 @@ sub listPersons {
     my $target        = $Data->{'target'} || '';;
     my $realm_id      = $Data->{'Realm'};
     my $title = '';
+    my $lang = $Data->{'lang'};
     #checks begins here
     #check if the entity viewing the list > LEVEL_NATIONAL
     my $unlockInactiveLevel = $Data->{'SystemConfig'}{'unlockListPeople_level'} || $Defs::LEVEL_NATIONAL;
@@ -44,9 +45,9 @@ sub listPersons {
     if($entityChecks->{'intEntityLevel'} < $unlockInactiveLevel){    	
     	if($entityChecks->{'strStatus'} ne 'ACTIVE'){ 
     		$resultHTML =qq[
-    		<div class="warningmsg">Enity Not Allowed To View List</div>
+    		<div class="warningmsg">]. $lang->txt('Entity Not Allowed To View List') .q[</div>
     		];
-    		$title = "Error";
+    		$title = $lang->txt('Error');
             return ($resultHTML,$title);
     	}
     }
@@ -55,7 +56,7 @@ sub listPersons {
     my ($AgeGroups, undef) = AgeGroups::getAgeGroups($Data);
 
 
-    my $lang = $Data->{'lang'};
+   
     my %textLabels = (
         'addPerson' => $lang->txt("Add"),
         'transferPerson' => $lang->txt('Transfer Person'),
