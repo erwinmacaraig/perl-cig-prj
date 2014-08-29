@@ -106,10 +106,12 @@ sub list_entity_docs{
 		
 		
 		$body .= qq[
-		$doclisttype EntityID: $entityID
+		$doclisttype
+		<p>
 			<table class="listTable">
 				$options
-			</table>
+			</table> 
+	    </p>
 		];
 	}
 	#$body .= new_doc_form($Data, $client,$DocumentTypeID,$RegistrationID); 
@@ -128,7 +130,8 @@ sub new_doc_form {
 	my $l = $Data->{'lang'};
 	my $target=$Data->{'target'} || '';
     my $fileToReplace = param('f') || 0;    
-	my $title = $l->txt('New Document'). "Current LEvel:  $Data->{'clientValues'}{'currentLevel'}";
+	my $title = $l->txt('New Document'); 
+	#. "Current LEvel:  $Data->{'clientValues'}{'currentLevel'}"
 	my $body = qq[
         <br />
 	<div class="sectionheader">$title</div>
@@ -197,11 +200,12 @@ sub delete_doc {
 		$Data,
     $fileID,
   );
-
+   # REFER TO Defs file ACCESS LEVEL CODES section for implementing dynamic link
+   # appropriate for the button for now leaving the link URL 
 	return qq[
           <div class="OKmsg">Successfully deleted file.</div> 
           <br />  
-          <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=P_DOCS">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+          <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS">] . $Data->{'lang'}->txt('Continue').q[</a></span>
        ];
 }
 
