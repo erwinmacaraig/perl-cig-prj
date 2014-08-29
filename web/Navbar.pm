@@ -273,7 +273,14 @@ sub getEntityMenuData {
             };
         }
 
-
+        if ($SystemConfig->{'AllowPendingRegistration'}) {
+            $menuoptions{'pendingregistration'} = {
+                name => $lang->txt('Pending Registration'),
+                url => $baseurl."a=P_PRS_L",
+            };
+        }
+       
+        
         #nationalrego. enable regoforms at entity level.
         if  ($SystemConfig->{'AllowOnlineRego_entity'}) {
             $menuoptions{'registrationforms'} = {
@@ -844,6 +851,10 @@ sub getClubMenuData {
             name => $lang->txt('Bulk Renewals'),
             url => $baseurl."a=PREGFB_T",
         };
+      
+        $menuoptions{'clubdocs'} = {
+        url => $baseurl."a=C_DOCS",
+    };
  
     my @menu_structure = (
         [ $lang->txt('Dashboard'), 'home','home'],
@@ -854,7 +865,9 @@ sub getClubMenuData {
         'personrollover',
         'transferperson',
         'duplicates',
-        ]],
+        'pendingregistration',
+         ]],
+
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu','venues'],
         [ $lang->txt('Work Tasks'), 'menu','approvals'],
         [ $lang->txt('Registrations'), 'menu',[
@@ -868,6 +881,7 @@ sub getClubMenuData {
         [ $lang->txt('Reports'), 'menu',[
         'reports',
         ]],
+        [ $lang->txt('Documents'), 'menu','clubdocs'],
         [ $lang->txt('Search'), 'search',[
         'advancedsearch',
         'nataccredsearch',

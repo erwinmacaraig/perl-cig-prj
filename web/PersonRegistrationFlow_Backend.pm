@@ -139,7 +139,7 @@ sub handleRegistrationFlowBackend   {
 	my $docTypeID = param('doctypeID') || 0; 
         if($uploaded_filename ne ''){  
             my $filefield = 'file';  
-            my $permission = ''; 
+            my $permission = 1; 
             my @files = (
                         [$uploaded_filename, $filefield, $permission,],
             );  

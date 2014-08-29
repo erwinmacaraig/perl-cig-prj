@@ -156,7 +156,7 @@ sub listPersons {
                 AND PR.intEntityID = ?
             )
         LEFT JOIN tblPersonNotes ON tblPersonNotes.intPersonID = P.intPersonID
-        WHERE P.strStatus <> 'DELETED'
+        WHERE P.strStatus <> 'DELETED' AND PR.strStatus <> 'INPROGRESS'
             AND P.intRealmID = $Data->{'Realm'}
         ORDER BY PR.intPersonRegistrationID DESC, $default_sort strLocalSurname, strLocalFirstname
     ];
@@ -247,21 +247,20 @@ sub listPersons {
     my $list_instruction = $Data->{'SystemConfig'}{"ListInstruction_$Defs::LEVEL_PERSON"} ? 
     qq[<div class="listinstruction">$Data->{'SystemConfig'}{"ListInstruction_$Defs::LEVEL_PERSON"}</div>] : '';
     $list_instruction=eval("qq[$list_instruction]") if $list_instruction;
+  
+my $filterfields = [
+    {
+      field => 'strLocalSurname',
+      elementID => 'id_textfilterfield',
+      type => 'regex',
+    },
+    {
+      field => 'PRStatus',
+      elementID => 'dd_actstatus',
+      allvalue => 'ALL',
+    }
+  ];
 
-    my $filterfields = [
-        {
-            field => 'strLocalSurname',
-            elementID => 'id_textfilterfield',
-            type => 'regex',
-        }
-    ];
-
-        push @{$filterfields},
-        {
-            field => 'intAgeGroupID',
-            elementID => 'dd_ageGroupfilter',
-            allvalue => '-99',
-        };
     my $msg_area_id   = '';
     my $msg_area_html = '';
 
@@ -273,7 +272,7 @@ sub listPersons {
         gridid        => 'grid',
         width         => '99%',
         height        => '700',
-        #filters       => $filterfields,
+        filters       => $filterfields,
         client        => $client,
         #saveurl       => 'ajax/aj_persongrid_update.cgi',
         ajax_keyfield => 'intPersonID',

@@ -146,13 +146,16 @@ sub main {
     }
     elsif ( $action =~ /^P_/ ) {
 warn("REALM IS ". $Data{'Realm'});
-        ( $resultHTML, $pageHeading ) = handlePerson( $action, \%Data, $ID );
+        ( $resultHTML, $pageHeading ) = handlePerson( $action, \%Data, $ID );  
+       
     }
     elsif ( $action =~ /^DOC_/ ) {  
          #needed to pass a parameter to accommodate single File Document Upload
-         my $intDocumentTypeID = param('doclisttype') || ''; 
+         my $DocumentTypeID = param('doclisttype') || '';  
+         my $RegistrationID = param('RegistrationID') || '';         
         ( $resultHTML, $pageHeading ) =
-          handle_documents( $action, \%Data, $ID, $intDocumentTypeID );
+          handle_documents( $action, \%Data, $ID, $DocumentTypeID,$RegistrationID );
+          
     }
     elsif ( $action =~ /^LOGO_/ ) {
         ( $resultHTML, $pageHeading ) =
