@@ -36,7 +36,22 @@ sub listPersons {
     my $action_IN     = $action || '';
     my $target        = $Data->{'target'} || '';;
     my $realm_id      = $Data->{'Realm'};
-
+    my $title = '';
+    #checks begins here
+    #check if the entity viewing the list > LEVEL_NATIONAL
+    my $unlockInactiveLevel = $Data->{'SystemConfig'}{'unlockListPeople_level'} || $Defs::LEVEL_NATIONAL;
+    my $entityChecks = Entity::loadEntityDetails($db, $entityID); 
+    if($entityChecks->{'intEntityLevel'} < $unlockInactiveLevel){    	
+    	if($entityChecks->{'strStatus'} ne 'ACTIVE'){ 
+    		$resultHTML =qq[
+    		<div class="warningmsg">Enity Not Allowed To View List</div>
+    		];
+    		$title = "Error";
+            return ($resultHTML,$title);
+    	}
+    }
+    ### End checks here    
+    
     my ($AgeGroups, undef) = AgeGroups::getAgeGroups($Data);
 
 
@@ -307,7 +322,7 @@ my $filterfields = [
         $modoptions = qq[<div class="changeoptions">$modoptions</div>] if $modoptions;
     }
 
-    my $title=$textLabels{'personsInLevel'};
+    $title=$textLabels{'personsInLevel'};
     $title = $modoptions.$title;
     #$title = 'Pending ' . $title if ($is_pending_registration);
 
