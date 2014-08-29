@@ -273,7 +273,6 @@ sub getEntityMenuData {
             };
         }
 
-<<<<<<< HEAD
         if ($SystemConfig->{'AllowPendingRegistration'}) {
             $menuoptions{'pendingregistration'} = {
                 name => $lang->txt('Pending Registration'),
@@ -282,9 +281,6 @@ sub getEntityMenuData {
         }
        
         
-=======
-
->>>>>>> e38c9b0306ad7f920ac8879c77cd3a8ca19ba068
         #nationalrego. enable regoforms at entity level.
         if  ($SystemConfig->{'AllowOnlineRego_entity'}) {
             $menuoptions{'registrationforms'} = {
@@ -869,12 +865,9 @@ sub getClubMenuData {
         'personrollover',
         'transferperson',
         'duplicates',
-<<<<<<< HEAD
         'pendingregistration',
          ]],
-=======
-        ]],
->>>>>>> e38c9b0306ad7f920ac8879c77cd3a8ca19ba068
+
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu','venues'],
         [ $lang->txt('Work Tasks'), 'menu','approvals'],
         [ $lang->txt('Registrations'), 'menu',[
