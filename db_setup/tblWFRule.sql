@@ -16,7 +16,7 @@ CREATE TABLE tblWFRule (
   strPersonLevel varchar(20) NOT NULL DEFAULT '' COMMENT 'AMATEUR,PROFESSIONAL',
     strPersonEntityRole varchar(50) DEFAULT '', /* head coach, doctor etc */
   strSport varchar(20) NOT NULL DEFAULT '' COMMENT 'FOOTBALL,FUTSAL,BEACHSOCCER',
-  strAgeLevel varchar(20) NOT NULL DEFAULT '' COMMENT 'SENIOR,JUNIOR',
+  strAgeLevel varchar(20) NOT NULL DEFAULT '' COMMENT 'ADULT,MINOR',
 
   intApprovalEntityLevel int(11) NOT NULL DEFAULT '0' COMMENT 'Which Entity level has to approve this rule',
   intProblemResolutionEntityLevel int(11) NOT NULL DEFAULT '0' COMMENT 'Which Entity Level to solve issues',
