@@ -729,7 +729,7 @@ sub checkForOutstandingTasks {
 			pt.strTaskStatus = ?
 		    AND (pt.intPersonRegistrationID = ? AND pt.intEntityID = ? AND pt.intPersonID = ? and pt.intDocumentID = ?)
 			AND (ct.intPersonRegistrationID = ? AND ct.intEntityID = ? AND ct.intPersonID = ? and ct.intDocumentID = ?)
-			AND ct.strTaskStatus IN (?,?)
+			AND ct.strTaskStatus IN (?,?,?)
             AND pt.strWFRuleFor = ?
             AND ct.strWFRuleFor = ?
 		ORDER by pt.intWFTaskID;
@@ -747,6 +747,7 @@ sub checkForOutstandingTasks {
         $documentID,
         $Defs::WF_TASK_STATUS_ACTIVE,
         $Defs::WF_TASK_STATUS_COMPLETE,
+        $Defs::WF_TASK_STATUS_REJECTED,
         $ruleFor,
         $ruleFor,
   		);
