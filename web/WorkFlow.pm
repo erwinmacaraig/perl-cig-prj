@@ -1168,7 +1168,7 @@ sub rejectTask {
         WHERE 
             intWFTaskID = ?
             AND PR.strStatus IN ('PENDING')
-            AND T.strWFRule = 'REGO'
+            AND T.strWFRuleFor = 'REGO'
     ];
   	$q = $db->prepare($st);
   	$q->execute(
