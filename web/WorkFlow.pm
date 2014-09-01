@@ -1110,8 +1110,7 @@ sub resolveTask {
         WHERE 
             intWFTaskID = ?
             AND PR.strStatus IN ('REJECTED')
-            AND T.strWFRule = 'REGO'
-        LIMIT 1
+            AND T.strWFRuleFor = 'REGO'
     ];
   	$q = $db->prepare($st);
   	$q->execute(
