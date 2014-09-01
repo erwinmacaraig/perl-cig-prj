@@ -1186,8 +1186,7 @@ sub copyTransaction	{
       dtStart,
       dtEnd,
       curPerItem,
-      intTXNClubID,
-      intTXNTeamID,
+      intTXNEntityID,
       intRenewed
 		)
 		SELECT
@@ -1212,8 +1211,7 @@ sub copyTransaction	{
       dtStart,
       dtEnd,
       curPerItem,
-      intTXNClubID,
-      intTXNTeamID,
+      intTXNEntityID,
       intRenewed
 		FROM
 			tblTransactions
