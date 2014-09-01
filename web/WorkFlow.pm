@@ -873,6 +873,8 @@ sub checkForOutstandingTasks {
         }
  
         if ($ruleFor eq 'REGO' and $personRegistrationID and !$rowCount) {
+
+                ## Handle intPaymentRequired ?  What abotu $0 products
         
 	            $st = qq[
 	            	UPDATE tblPersonRegistration_$Data->{'Realm'} 
