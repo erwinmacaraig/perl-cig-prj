@@ -18,7 +18,7 @@ CREATE TABLE tblRegistrationItem (
     strPersonLevel varchar(20) NOT NULL DEFAULT '' COMMENT 'AMATEUR,PROFESSIONAL',
     strPersonEntityRole varchar(50) DEFAULT '', /* head coach, doctor etc */
     strSport varchar(20) NOT NULL DEFAULT '' COMMENT 'FOOTBALL,FUTSAL,BEACHSOCCER',
-    strAgeLevel varchar(20) NOT NULL DEFAULT '' COMMENT 'SENIOR,JUNIOR',
+    strAgeLevel varchar(20) NOT NULL DEFAULT '' COMMENT 'ADULT,MINOR',
 
     strItemType varchar(20) default '' COMMENT 'DOCUMENT (TYPE), PRODUCT',
     intID INT DEFAULT 0 COMMENT 'ID of strItemType',

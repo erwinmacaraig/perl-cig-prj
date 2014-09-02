@@ -728,12 +728,15 @@ sub checkForOutstandingTasks {
         WHERE
 			pt.strTaskStatus = ?
 		    AND (pt.intPersonRegistrationID = ? AND pt.intEntityID = ? AND pt.intPersonID = ? and pt.intDocumentID = ?)
-			AND (ct.intPersonRegistrationID = ? AND ct.intEntityID = ? AND ct.intPersonID = ? and ct.intDocumentID = ?)
-			AND ct.strTaskStatus IN (?,?)
+			AND (ct.intPersonRegistrationID = pt.intPersonRegistrationID AND ct.intEntityID = pt.intEntityID AND ct.intPersonID = pt.intPersonID and ct.intDocumentID = pt.intDocumentID)
             AND pt.strWFRuleFor = ?
-            AND ct.strWFRuleFor = ?
+            AND ct.strWFRuleFor = pt.strWFRuleFor
 		ORDER by pt.intWFTaskID;
 	];
+			#AND ct.strTaskStatus IN (?,?,?)
+        #$Defs::WF_TASK_STATUS_ACTIVE,
+        #$Defs::WF_TASK_STATUS_COMPLETE,
+        #$Defs::WF_TASK_STATUS_REJECTED,
 	$q = $db->prepare($st);
   	$q->execute(
   		$Defs::WF_TASK_STATUS_PENDING,
@@ -741,13 +744,6 @@ sub checkForOutstandingTasks {
         $entityID,
         $personID,
         $documentID,
-  		$personRegistrationID,
-        $entityID,
-        $personID,
-        $documentID,
-        $Defs::WF_TASK_STATUS_ACTIVE,
-        $Defs::WF_TASK_STATUS_COMPLETE,
-        $ruleFor,
         $ruleFor,
   		);
   		
@@ -780,6 +776,12 @@ sub checkForOutstandingTasks {
    		}
    		
    		if ($dref->{strTaskStatus} eq 'ACTIVE') {
+   			$updateThisTask = "nope";
+   		}
+   		if ($dref->{strTaskStatus} eq 'PENDING') {
+   			$updateThisTask = "nope";
+   		}
+   		if ($dref->{strTaskStatus} eq 'REJECTED') {
    			$updateThisTask = "nope";
    		}
     }
@@ -873,6 +875,8 @@ sub checkForOutstandingTasks {
         }
  
         if ($ruleFor eq 'REGO' and $personRegistrationID and !$rowCount) {
+
+                ## Handle intPaymentRequired ?  What abotu $0 products
         
 	            $st = qq[
 	            	UPDATE tblPersonRegistration_$Data->{'Realm'} 
@@ -1108,8 +1112,7 @@ sub resolveTask {
         WHERE 
             intWFTaskID = ?
             AND PR.strStatus IN ('REJECTED')
-            AND T.strWFRule = 'REGO'
-        LIMIT 1
+            AND T.strWFRuleFor = 'REGO'
     ];
   	$q = $db->prepare($st);
   	$q->execute(
@@ -1166,8 +1169,7 @@ sub rejectTask {
         WHERE 
             intWFTaskID = ?
             AND PR.strStatus IN ('PENDING')
-            AND T.strWFRule = 'REGO'
-        LIMIT 1
+            AND T.strWFRuleFor = 'REGO'
     ];
   	$q = $db->prepare($st);
   	$q->execute(
