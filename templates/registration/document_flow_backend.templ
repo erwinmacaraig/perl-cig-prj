@@ -1,6 +1,6 @@
 display document upload information 
 [% FOREACH doc IN documents %] 
-<p>Document ID needed [% doc.Name %] </p> 
+<p> [% doc.Name %] </p> 
 
 <form action="[% target %]" method="POST" class="dropzone">
 <input type="hidden" name="doctypeID" value="[% doc.ID %]" />

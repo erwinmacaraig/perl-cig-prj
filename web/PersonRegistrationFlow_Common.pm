@@ -142,9 +142,24 @@ sub displayRegoFlowDocuments    {
         0,
         $rego_ref,
      );
-     my $body;
+    
+    ### FOR FILTERING 
+    my @docos = (); 
+	my %approved_docs = (); 
+    my $db = $Data->{'db'}; 
+	my $query = qq[SELECT intDocumentTypeID FROM tblDocuments WHERE strApprovalStatus = ? AND intPersonID = ?  GROUP BY intDocumentTypeID]; 
+	my $sth = $db->prepare($query); 
+	$sth->execute('APPROVED',$personID);
+		
+	while(my @approved_doc_arr = $sth->fetchrow_array()){
+		$approved_docs{ $approved_doc_arr[0] } = 'APPROVED';
+	}	
+	foreach my $dc (@{$documents}){ 
+    	next if(exists $approved_docs{$dc->{'ID'}} && $dc->{'UseExistingAnyEntity'});
+    	push @docos,$dc; 
+    }
      
-      
+     #END OF FILTERING 
      ######################
      print STDERR Dumper($documents);
 
@@ -153,7 +168,7 @@ sub displayRegoFlowDocuments    {
   my %PageData = (
         nextaction => "PREGF_DU",
         target => $Data->{'target'},
-        documents => $documents, 
+        documents => \@docos,
         hidden_ref => $hidden_ref,
         Lang => $Data->{'lang'},
         client => $client,
