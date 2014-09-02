@@ -1,4 +1,4 @@
-display document upload information 
+<!-- display document upload information --> 
 
 [% IF approveddocs.size %]
 <h3>Approved Documents</h3>
@@ -8,7 +8,7 @@ display document upload information
 [% END %]
 </ul>
 [% END %]
-
+<h3>Required Documents</h3>
 [% FOREACH doc IN documents %] 
 <p> [% doc.Name %] </p> 
 <form action="[% target %]" method="POST" class="dropzone">
