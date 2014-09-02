@@ -146,6 +146,7 @@ sub displayRegoFlowDocuments    {
     ### FOR FILTERING 
     my @docos = (); 
 	my %approved_docs = (); 
+	my @listing = ();
     my $db = $Data->{'db'}; 
 	my $query = qq[SELECT intDocumentTypeID FROM tblDocuments WHERE strApprovalStatus = ? AND intPersonID = ?  GROUP BY intDocumentTypeID]; 
 	my $sth = $db->prepare($query); 
@@ -155,8 +156,14 @@ sub displayRegoFlowDocuments    {
 		$approved_docs{ $approved_doc_arr[0] } = 'APPROVED';
 	}	
 	foreach my $dc (@{$documents}){ 
-    	next if(exists $approved_docs{$dc->{'ID'}} && $dc->{'UseExistingAnyEntity'});
-    	push @docos,$dc; 
+    	#next if(exists $approved_docs{$dc->{'ID'}} && $dc->{'UseExistingAnyEntity'});
+    	#push @docos,$dc;
+    	if(exists $approved_docs{$dc->{'ID'}} && $dc->{'UseExistingAnyEntity'}){
+    		push @listing,$dc;
+    	}
+    	else {
+    		push @docos,$dc;	
+    	}
     }
      
      #END OF FILTERING 
@@ -169,6 +176,7 @@ sub displayRegoFlowDocuments    {
         nextaction => "PREGF_DU",
         target => $Data->{'target'},
         documents => \@docos,
+        approveddocs => \@listing, 
         hidden_ref => $hidden_ref,
         Lang => $Data->{'lang'},
         client => $client,
