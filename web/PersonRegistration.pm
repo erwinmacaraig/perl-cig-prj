@@ -13,6 +13,7 @@ require Exporter;
     checkNewRegoOK
     rolloverExistingPersonRegistrations
     checkIsSuspended
+    getRegistrationDetail
 );
 
 use strict;
@@ -787,6 +788,69 @@ sub personInProgressToPending {
     ];
     my $qry=$Data->{'db'}->prepare($st);
     $qry->execute($personID, $Data->{'Realm'});
+}
+
+sub getRegistrationDetail {
+	my ($Data, $personRegistrationID) = @_;
+	
+    my @params = (
+        $personRegistrationID,
+    );
+
+    my $st= qq[
+        SELECT 
+            pr.*, 
+            np.strNationalPeriodName,
+            p.dtDOB,
+            DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
+            p.intGender,
+            p.intGender as Gender,
+            DATE_FORMAT(pr.dtFrom, "%Y%m%d") as dtFrom_,
+            DATE_FORMAT(pr.dtTo, "%Y%m%d") as dtTo_,
+            DATE_FORMAT(pr.dtAdded, "%Y%m%d%H%i") as dtAdded_,
+            DATE_FORMAT(pr.dtAdded, "%Y-%m-%d %H:%i") as dtAdded_formatted,
+            DATE_FORMAT(pr.dtLastUpdated, "%Y%m%d%H%i") as dtLastUpdated_,
+            er.strEntityRoleName,
+            e.strLocalName,
+            e.strLatinName
+        FROM
+            tblPersonRegistration_$Data->{'Realm'} AS pr
+            LEFT JOIN tblNationalPeriod as np ON (
+                np.intNationalPeriodID = pr.intNationalPeriodID
+            )
+            LEFT JOIN tblEntityTypeRoles as er ON (
+                er.strEntityRoleKey = pr.strPersonEntityRole
+                and er.strSport = pr.strSport
+                and er.strPersonType = pr.strPersonType
+            )
+            INNER JOIN tblEntity e ON (
+                pr.intEntityID = e.intEntityID 
+            )
+            INNER JOIN tblPerson as p ON (
+                p.intPersonID = pr.intPersonID
+            )
+        WHERE     
+            pr.intPersonRegistrationID = ?
+        ORDER BY
+          pr.dtAdded DESC
+    ];	
+    my $db = $Data->{'db'};
+    my $query = $db->prepare($st) or query_error($st);
+
+    $query->execute(@params) or query_error($st);
+
+    my @RegistrationDetail = ();
+      
+    while(my $dref= $query->fetchrow_hashref()) {
+        $dref->{'Sport'} = $Defs::sportType{$dref->{'strSport'}} || '';
+        $dref->{'PersonType'} = $Defs::personType{$dref->{'strPersonType'}} || '';
+        $dref->{'PersonLevel'} = $Defs::personLevel{$dref->{'strPersonLevel'}} || '';
+        $dref->{'AgeLevel'} = $Defs::ageLevel{$dref->{'strAgeLevel'}} || '';
+        $dref->{'Status'} = $Defs::personRegoStatus{$dref->{'strStatus'}} || '';
+        $dref->{'RegistrationNature'} = $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '';
+        push @RegistrationDetail, $dref;
+    }
+    return (\@RegistrationDetail);
 }
 
 1;
