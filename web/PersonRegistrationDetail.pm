@@ -26,9 +26,7 @@ sub personRegistrationDetail   {
     my $RegistrationDetail = PersonRegistration::getRegistrationDetail($Data, $personRegistrationID);
     $RegistrationDetail = pop $RegistrationDetail;
 
-    #TODO: to be enabled once the query is modified to allow different entities to view the list of PR
-    #my $option = $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 'edit' : 'display';
-    my $option = 'edit';
+    my $option = $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 'edit' : 'display';
     my $intRelamID = $Data->{'Relam'} ? $Data->{'Realm'} : 0;
     my %statusoptions = ();
 
@@ -44,9 +42,7 @@ sub personRegistrationDetail   {
                 value => uc($RegistrationDetail->{'Status'}),
                 type => 'lookup',
                 options => \%statusoptions,
-                #TODO: to be enabled once the query is modified to allow different entities to view the list of PR
-                #readonly => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
-                readonly => 0,
+                readonly => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
             },
             strAgeLevel => {
                 label => 'Age Level',
