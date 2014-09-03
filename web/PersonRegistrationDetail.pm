@@ -18,6 +18,7 @@ use Reg_common;
 use HTMLForm;
 use FormHelpers;
 use GridDisplay;
+use RecordTypeFilter;
 
 sub personRegistrationDetail   {
 
@@ -170,6 +171,7 @@ sub personRegistrationWorkTasks {
             DATE_FORMAT(pr.dtLastUpdated, "%Y%m%d%H%i") as dtLastUpdated_,
             er.strEntityRoleName,
             WFT.strTaskType as WFTTaskType,
+            WFT.intWFTaskID as WFTTaskID,
             ApprovalEntity.strLocalName as ApprovalLocalName,
             ApprovalEntity.strLatinName as ApprovalEntityName,
             RejectedEntity.strLocalName as RejectedLocalName,
@@ -230,8 +232,9 @@ sub personRegistrationWorkTasks {
             $taskTo= $entitylocalname;
             $taskTo.= qq[ ($dref->{'RejectedEntityName'})] if ($dref->{'RejectedEntityName'});
         }
+
         push @rowdata, {
-            id => $dref->{'intPersonRegistrationID'} || 0,
+            id => $dref->{'WFTTaskID'} || 0,
             dtAdded=> $dref->{'dtAdded_formatted'} || '',
             PersonLevel=> $Defs::personLevel{$dref->{'strPersonLevel'}} || '',
             PersonEntityRole=> $dref->{'strEntityRoleName'} || '',
@@ -254,42 +257,26 @@ sub personRegistrationWorkTasks {
           };
     }
 
-
     my $rectype_options = '';
-
     my @headers = (
         {
-            name  => $Data->{'lang'}->txt('Registration Type'),
-            field => 'RegistrationNature',
-            width  => 60,
+            name   => $Data->{'lang'}->txt('Registration Type'),
+            field  => 'RegistrationNature',
+            width  => 30,
         },
         {
-            name  => $Data->{'lang'}->txt('Person'),
-            field => 'LocalLatinName',
+            name   => $Data->{'lang'}->txt('Name'),
+            field  => 'LocalLatinName',
+            width  => 30,
         },
         {
             name   => $Data->{'lang'}->txt('Type'),
-            field  => 'PersonType',
-            width  => 30,
-        },
-        {
-            name   => $Data->{'lang'}->txt('Role'),
-            field  => 'PersonEntityRole',
-            width  => 30,
-        },
-        {
-            name   => $Data->{'lang'}->txt('Sport'),
             field  => 'Sport',
             width  => 40,
         },
         {
-            name  => $Data->{'lang'}->txt('Level'),
-            field => 'PersonLevel',
-            width  => 40,
-        },
-        {
-            name  => $Data->{'lang'}->txt('Age Level'),
-            field => 'AgeLevel',
+            name   => $Data->{'lang'}->txt('Age Level'),
+            field  => 'AgeLevel',
             width  => 40,
         },
         {
@@ -298,20 +285,30 @@ sub personRegistrationWorkTasks {
             width  => 40,
         },
         {
+            name  => $Data->{'lang'}->txt('Assigned To'),
+            field => 'TaskTo',
+            width  => 40,
+        },
+        {
+            name  => $Data->{'lang'}->txt('Problem Resolution'),
+            field => '',
+            width  => 40,
+        },
+        {
             name  => $Data->{'lang'}->txt('Current Task'),
             field => 'TaskType',
             width  => 50,
         },
-        {
-            name  => $Data->{'lang'}->txt('Task Assigned To'),
-            field => 'TaskTo',
-            width  => 70,
-        },
-        {
-            name  => $Data->{'lang'}->txt('Date Registration Added'),
-            field => 'dtAdded',
-            width  => 50,
-        },
+        #{
+        #    name  => $Data->{'lang'}->txt('Task Assigned To'),
+        #    field => 'TaskTo',
+        #    width  => 70,
+        #},
+        #{
+        #    name  => $Data->{'lang'}->txt('Date Registration Added'),
+        #    field => 'dtAdded',
+        #    width  => 50,
+        #},
     );
 
     my $filterfields = [
