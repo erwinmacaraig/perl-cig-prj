@@ -21,11 +21,13 @@ use GridDisplay;
 
 sub personRegistrationDetail   {
 
-    my ($Data, $entityID, $personRegistrationID) = @_;
+    my ($action, $Data, $entityID, $personRegistrationID) = @_;
 
     my $RegistrationDetail = PersonRegistration::getRegistrationDetail($Data, $personRegistrationID);
     $RegistrationDetail = pop $RegistrationDetail;
-
+    
+    my $client=setClient($Data->{'clientValues'}) || '';
+    
     #TODO: to be enabled once the query is modified to allow different entities to view the list of PR
     #my $option = $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 'edit' : 'display';
     my $option = 'edit';
@@ -102,7 +104,8 @@ sub personRegistrationDetail   {
             submitlabel => $Data->{'lang'}->txt('Update'),
             introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
             NoHTML => 1,
-            updateSQL => qq[],
+            updateSQL => qq[UPDATE tblPersonRegistration_$Data->{'Realm'} SET --VAL--
+            WHERE intPersonRegistrationID=$personRegistrationID],
             addSQL => qq[],
 
             afteraddFunction => ,
@@ -111,9 +114,15 @@ sub personRegistrationDetail   {
             afterupdateParams => [$option, $Data, $Data->{'db'}],
             LocaleMakeText => $Data->{'lang'},
         },
-        carryfields => {},
+        carryfields =>  {
+            client => $client,
+            a => $action,
+            prID => $personRegistrationID,
+        },
+        
     );
 
+    #$personRegistrationID
     my $resultHTML = '';
     ($resultHTML, undef) = handleHTMLForm(\%FieldDefinitions, undef, $option, '', $Data->{'db'});
 
@@ -131,6 +140,14 @@ sub personRegistrationDetail   {
     ## Used for both Registration History from Person level and Pending Registrations from an Entity.
 }
 
+  sub postVenueUpdate {
+    my($id,$params,$action,$Data,$db, $entityID)=@_;
+    return undef if !$db;
+    $entityID ||= $id || 0;
+  
+    $Data->{'cache'}->delete('swm',"VenueObj-$entityID") if $Data->{'cache'};
+  
+  }
 sub personRegistrationWorkTasks {
 
     my ($Data, $personRegistrationID) = @_;
