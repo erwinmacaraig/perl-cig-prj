@@ -37,7 +37,7 @@ sub handlePendingRegistrations  {
     my $lang = $Data->{'lang'};
 
     if ( $action eq 'PENDPR_D' ) {
-        $resultHTML = personRegistrationDetail( $Data, $entityID, $personRegistrationID) || '';
+        $resultHTML = personRegistrationDetail($action, $Data, $entityID, $personRegistrationID) || '';
         $title = $lang->txt('Registration Detail');
     }
     elsif ( $action eq 'PENDPR_')   {
@@ -56,6 +56,7 @@ sub listPendingRegistrations    {
 
 
     my ($Data, $entityID) = @_;
+    
 
     my $lang = $Data->{'lang'};
     my $client = setClient( $Data->{'clientValues'} ) || '';

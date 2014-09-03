@@ -13,9 +13,12 @@
 <div class = "pageHeading dash-heading">[% Name %]
 	[% IF Details.NationalNum %]<span class = "nationalnumber"> - #[% Details.NationalNum %]</span>[% END %]
 </div>
+ <!--
 <div class="member-edit-info" id="logo-status">
   [% Photo %]
+    
 	<div class="member-docs">
+	
 		<div class = "sectionheader">[% Lang.txt('Documents') %]</div>
 			[% IF Documents.size() > 0 %]
   			<ul>
@@ -31,8 +34,11 @@
 					<a href = "[% AddDocumentURL %]">[% Lang.txt("Add Document") %]</a>
 				</span>
 			[% END %]
+			
 		</div>	
+		
 </div>
+-->
 <div class="member-col-2">
 <div class="member-detail">
 	<div class = "sectionheader">[% Lang.txt('Member Detail Summary') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin  %]<a href = "[% EditDetailsLink %]"         class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
