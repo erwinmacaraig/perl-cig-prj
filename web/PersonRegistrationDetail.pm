@@ -172,6 +172,7 @@ sub personRegistrationWorkTasks {
             er.strEntityRoleName,
             WFT.strTaskType as WFTTaskType,
             WFT.intWFTaskID as WFTTaskID,
+            WFT.strTaskStatus as WFTTaskStatus,
             ApprovalEntity.strLocalName as ApprovalLocalName,
             ApprovalEntity.strLatinName as ApprovalEntityName,
             RejectedEntity.strLocalName as RejectedLocalName,
@@ -192,7 +193,7 @@ sub personRegistrationWorkTasks {
             INNER JOIN tblWFTask as WFT ON (
                 WFT.intPersonRegistrationID = pr.intPersonRegistrationID
                 AND WFT.intPersonID = pr.intPersonID
-                AND WFT.strTaskStatus IN ('ACTIVE')
+                #AND WFT.strTaskStatus IN ('ACTIVE')
             )
             LEFT JOIN tblEntity as ApprovalEntity ON (
                 ApprovalEntity.intEntityID = WFT.intApprovalEntityID
@@ -216,7 +217,6 @@ sub personRegistrationWorkTasks {
         $personRegistrationID
     );
     while (my $dref = $query->fetchrow_hashref) {
-
         $results++;
         my $localname = formatPersonName($Data, $dref->{'strLocalFirstname'}, $dref->{'strLocalSurname'}, $dref->{'intGender'});
         my $name = formatPersonName($Data, $dref->{'strLatinFirstname'}, $dref->{'strLatinSurname'}, $dref->{'intGender'});
@@ -241,7 +241,7 @@ sub personRegistrationWorkTasks {
             PersonType=> $Defs::personType{$dref->{'strPersonType'}} || '',
             AgeLevel=> $Defs::ageLevel{$dref->{'strAgeLevel'}} || '',
             RegistrationNature=> $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '',
-            Status=> $Defs::wfTaskStatus{$dref->{'strStatus'}} || '',
+            Status=> $Defs::wfTaskStatus{$dref->{'WFTTaskStatus'}} || '',
             PersonEntityRole=> $dref->{'strPersonEntityRole'} || '',
             Sport=> $Defs::sportType{$dref->{'strSport'}} || '',
             LocalName=>$localname,
