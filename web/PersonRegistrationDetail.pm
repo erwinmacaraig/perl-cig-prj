@@ -105,7 +105,7 @@ sub personRegistrationDetail   {
             introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
             NoHTML => 1,
             updateSQL => qq[UPDATE tblPersonRegistration_$Data->{'Realm'} SET --VAL--
-            WHERE intPersonRegistrationID=$personRegistrationID],
+            WHERE intPersonRegistrationID=$personRegistrationID LIMIT 1],
             addSQL => qq[],
 
             afteraddFunction => ,
