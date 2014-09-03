@@ -34,9 +34,7 @@ sub personRegistrationDetail   {
 
     for my $key (keys %Defs::personRegoStatus) {
         next if !$key;
-        if ($key eq $Defs::PERSON_STATUS_PENDING or $key eq $Defs::PERSON_STATUS_ACTIVE) {
-            $statusoptions{$key} = $Defs::personRegoStatus{$key} || '';
-        }
+        $statusoptions{$key} = $Defs::personRegoStatus{$key} || '';
     }
 
     my %FieldDefinitions = (
@@ -52,7 +50,7 @@ sub personRegistrationDetail   {
             },
             strAgeLevel => {
                 label => 'Age Level',
-                value => $RegistrationDetail->{'strAgeLevel'},
+                value => %Defs::ageLevel->{$RegistrationDetail->{'AgeLevel'}},
                 type => 'text',
                 readonly => 1,
             },
@@ -69,7 +67,7 @@ sub personRegistrationDetail   {
                 readonly => 1,
             },
             strRegistrationNature => {
-                label => 'Registraion Type',
+                label => 'Registration Type',
                 value => $RegistrationDetail->{'RegistrationNature'},
                 type => 'text',
                 readonly => 1,
@@ -246,10 +244,6 @@ sub personRegistrationWorkTasks {
     my $rectype_options = '';
 
     my @headers = (
-        {
-            type  => 'Selector',
-            field => 'SelectLink',
-        },
         {
             name  => $Data->{'lang'}->txt('Registration Type'),
             field => 'RegistrationNature',
