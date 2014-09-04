@@ -7,17 +7,347 @@ require Exporter;
 
 use strict;
 use WorkFlow;
+use Defs;
+
 #use Log;
+use TTTemplate;
 use Data::Dumper;
+use PersonUtils;
+use PersonRegistration;
+use Reg_common;
+use HTMLForm;
+use FormHelpers;
+use GridDisplay;
+use RecordTypeFilter;
 
 sub personRegistrationDetail   {
 
-    my ($Data, $entityID, $personRegistrationID) = @_;
+    my ($action, $Data, $entityID, $personRegistrationID) = @_;
+
+    my $RegistrationDetail = PersonRegistration::getRegistrationDetail($Data, $personRegistrationID);
+    $RegistrationDetail = pop $RegistrationDetail;
+
+    my $option = $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 'edit' : 'display';
+    
+    my $client=setClient($Data->{'clientValues'}) || '';
+    
+    my $intRelamID = $Data->{'Relam'} ? $Data->{'Realm'} : 0;
+    my %statusoptions = ();
+
+    for my $key (keys %Defs::personRegoStatus) {
+        next if !$key;
+        $statusoptions{$key} = $Defs::personRegoStatus{$key} || '';
+    }
+
+    print STDERR Dumper $RegistrationDetail;
+    my %FieldDefinitions = (
+        fields => {
+            strStatus => {
+                label => 'Status',
+                value => uc($RegistrationDetail->{'Status'}),
+                type => 'lookup',
+                options => \%statusoptions,
+                readonly => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
+            },
+            strAgeLevel => {
+                label => 'Age Level',
+                value => %Defs::ageLevel->{$RegistrationDetail->{'AgeLevel'}},
+                type => 'text',
+                readonly => 1,
+            },
+            strSport => {
+                label => 'Sport',
+                value => $RegistrationDetail->{'Sport'},
+                type => 'text',
+                readonly => 1,
+            },
+            strGender => {
+                label => 'Gender',
+                value => %Defs::genderInfo->{$RegistrationDetail->{'intGender'}},
+                type => 'text',
+                readonly => 1,
+            },
+            strRegistrationNature => {
+                label => 'Registration Type',
+                value => $RegistrationDetail->{'RegistrationNature'},
+                type => 'text',
+                readonly => 1,
+            },
+            strPersonType => {
+                label => 'Type',
+                value => $RegistrationDetail->{'PersonType'},
+                type => 'text',
+                readonly => 1,
+            },
+            strPersonLevel => {
+                label => 'Level',
+                value => $RegistrationDetail->{'PersonLevel'},
+                type => 'text',
+                readonly => 1,
+            },
+            strPersonLevel => {
+                label => 'Date Registration Added',
+                value => $RegistrationDetail->{'dtAdded_formatted'},
+                type => 'text',
+                readonly => 1,
+            },
+        },
+        order => [qw(
+            strStatus
+            strAgeLevel
+            strSport
+            strGender
+            strRegistrationNature
+            strPersonType
+            strPersonLevel
+        )],
+        options => {
+            labelsuffix => ':',
+            hideblank => 1,
+            target => $Data->{'target'},
+            formname => 'n_form',
+            submitlabel => $Data->{'lang'}->txt('Update'),
+            introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
+            NoHTML => 1,
+            updateSQL => qq[UPDATE tblPersonRegistration_$Data->{'Realm'} SET --VAL--
+            WHERE intPersonRegistrationID=$personRegistrationID],
+            addSQL => qq[],
+
+            afteraddFunction => ,
+            afteraddParams => [$option, $Data, $Data->{'db'}],
+            afterupdateFunction => ,
+            afterupdateParams => [$option, $Data, $Data->{'db'}],
+            LocaleMakeText => $Data->{'lang'},
+        },
+        carryfields =>  {
+            client => $client,
+            a => $action,
+            prID => $personRegistrationID,
+        },
+        
+    );
+
+    #$personRegistrationID
+    my $resultHTML = '';
+    ($resultHTML, undef) = handleHTMLForm(\%FieldDefinitions, undef, $option, '', $Data->{'db'});
+
+    my $workTasks = personRegistrationWorkTasks($Data, $personRegistrationID);
+
+    return $resultHTML . $workTasks;
+
+    #print STDERR Dumper $RegistrationDetail;
+
     ## Needs to use PersonRegistration::getRegistrationDetail
     ## Needs to get list (SQL fine) of tasks and the Entity who is tasked with each row.... see SQL in PendingRegistrations.pm for SQL example
     ## Needs to be in a template/
     ## For top half, use HTMLForm so Status can be changed if $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL or $Data->{'SystemConfig'}{'ChangePRStatus_Level'} >= $Data->{'clientValues'}{'authLevel'} -- so basically we can set a tblSystemConfig value to what level can change per Realm.  "ChangePRStatus_Level" would be the name of the key-value pair in tblSystemConfig
-    return "NEED PAGE FOR A REGISTRATION RECORD - This will show at top the full detail of the Registration, then a table at bottom showing the list of tasks";
+    #return "NEED PAGE FOR A REGISTRATION RECORD - This will show at top the full detail of the Registration, then a table at bottom showing the list of tasks";
     ## Used for both Registration History from Person level and Pending Registrations from an Entity.
 }
+
+  sub postVenueUpdate {
+    my($id,$params,$action,$Data,$db, $entityID)=@_;
+    return undef if !$db;
+    $entityID ||= $id || 0;
+  
+    $Data->{'cache'}->delete('swm',"VenueObj-$entityID") if $Data->{'cache'};
+  
+  }
+sub personRegistrationWorkTasks {
+
+    my ($Data, $personRegistrationID) = @_;
+
+    my $lang = $Data->{'lang'};
+    my $client = setClient($Data->{'clientValues'}) || '';
+
+    my %RegFilters = ();
+    my $st = qq[
+        SELECT
+            pr.*,
+            p.strLocalFirstname,
+            p.strLocalSurname,
+            p.strLatinFirstname,
+            p.strLatinSurname,
+            np.strNationalPeriodName,
+            p.dtDOB,
+            DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
+            p.intGender,
+            p.intGender as Gender,
+            DATE_FORMAT(pr.dtAdded, "%Y%m%d%H%i") as dtAdded_,
+            DATE_FORMAT(pr.dtAdded, "%Y-%m-%d %H:%i") as dtAdded_formatted,
+            DATE_FORMAT(pr.dtLastUpdated, "%Y%m%d%H%i") as dtLastUpdated_,
+            er.strEntityRoleName,
+            WFT.strTaskType as WFTTaskType,
+            WFT.intWFTaskID as WFTTaskID,
+            WFT.strTaskStatus as WFTTaskStatus,
+            ApprovalEntity.strLocalName as ApprovalLocalName,
+            ApprovalEntity.strLatinName as ApprovalEntityName,
+            RejectedEntity.strLocalName as RejectedLocalName,
+            RejectedEntity.strLatinName as RejectedEntityName
+        FROM
+            tblPersonRegistration_$Data->{'Realm'} AS pr
+            LEFT JOIN tblNationalPeriod as np ON (
+                np.intNationalPeriodID = pr.intNationalPeriodID
+            )
+            LEFT JOIN tblEntityTypeRoles as er ON (
+                er.strEntityRoleKey = pr.strPersonEntityRole
+                and er.strSport = pr.strSport
+                and er.strPersonType = pr.strPersonType
+            )
+            INNER JOIN tblPerson as p ON (
+                p.intPersonID = pr.intPersonID
+            )
+            INNER JOIN tblWFTask as WFT ON (
+                WFT.intPersonRegistrationID = pr.intPersonRegistrationID
+                AND WFT.intPersonID = pr.intPersonID
+                #AND WFT.strTaskStatus IN ('ACTIVE')
+            )
+            LEFT JOIN tblEntity as ApprovalEntity ON (
+                ApprovalEntity.intEntityID = WFT.intApprovalEntityID
+            )
+            LEFT JOIN tblEntity as RejectedEntity ON (
+                RejectedEntity.intEntityID = WFT.intProblemResolutionEntityID
+            )
+        WHERE
+            p.intRealmID = ?
+            AND pr.intPersonRegistrationID = ?
+            AND pr.strStatus IN ('PENDING', 'REJECTED')
+        ORDER BY
+          pr.dtAdded DESC
+    ];
+
+    my $results=0;
+    my @rowdata = ();
+    my $query = $Data->{'db'}->prepare($st);
+    $query->execute(
+        $Data->{'Realm'},
+        $personRegistrationID
+    );
+    while (my $dref = $query->fetchrow_hashref) {
+        $results++;
+        my $localname = formatPersonName($Data, $dref->{'strLocalFirstname'}, $dref->{'strLocalSurname'}, $dref->{'intGender'});
+        my $name = formatPersonName($Data, $dref->{'strLatinFirstname'}, $dref->{'strLatinSurname'}, $dref->{'intGender'});
+        my $local_latin_name = $localname;
+        $local_latin_name .= qq[ ($name)] if ($name and $name ne ' ');
+
+        my $entitylocalname = $dref->{'ApprovalLocalName'};
+        my $taskTo= $entitylocalname;
+        $taskTo.= qq[ ($dref->{'ApprovalEntityName'})] if ($dref->{'ApprovalEntityName'});
+        
+        if ($dref->{'strStatus'} eq $Defs::WF_TASK_STATUS_REJECTED) {
+            $entitylocalname = $dref->{'RejectedLocalName'};
+            $taskTo= $entitylocalname;
+            $taskTo.= qq[ ($dref->{'RejectedEntityName'})] if ($dref->{'RejectedEntityName'});
+        }
+
+        push @rowdata, {
+            id => $dref->{'WFTTaskID'} || 0,
+            dtAdded=> $dref->{'dtAdded_formatted'} || '',
+            PersonLevel=> $Defs::personLevel{$dref->{'strPersonLevel'}} || '',
+            PersonEntityRole=> $dref->{'strEntityRoleName'} || '',
+            PersonType=> $Defs::personType{$dref->{'strPersonType'}} || '',
+            AgeLevel=> $Defs::ageLevel{$dref->{'strAgeLevel'}} || '',
+            RegistrationNature=> $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '',
+            Status=> $Defs::wfTaskStatus{$dref->{'WFTTaskStatus'}} || '',
+            PersonEntityRole=> $dref->{'strPersonEntityRole'} || '',
+            Sport=> $Defs::sportType{$dref->{'strSport'}} || '',
+            LocalName=>$localname,
+            LatinName=>$name,
+            LocalLatinName=>$local_latin_name,
+            CurrentTask=>$dref->{'WFTTaskType'},
+            CurrentTaskApproval=>$dref->{'intApprovalEntityID'},
+            CurrentTaskProblem=>$dref->{'intProblemResolutionEntityID'},
+            NationalPeriodName => $dref->{'strNationalPeriodName'} || '',
+            TaskType => $Defs::wfTaskType{$dref->{'WFTTaskType'}} || '',
+            TaskTo=>$taskTo,
+            SelectLink => "$Data->{'target'}?client=$client&amp;a=PENDPR_D&amp;prID=$dref->{'intPersonRegistrationID'}",
+          };
+    }
+
+    my $rectype_options = '';
+    my @headers = (
+        {
+            name   => $Data->{'lang'}->txt('Registration Type'),
+            field  => 'RegistrationNature',
+            width  => 30,
+        },
+        {
+            name   => $Data->{'lang'}->txt('Name'),
+            field  => 'LocalLatinName',
+            width  => 30,
+        },
+        {
+            name   => $Data->{'lang'}->txt('Type'),
+            field  => 'Sport',
+            width  => 40,
+        },
+        {
+            name   => $Data->{'lang'}->txt('Age Level'),
+            field  => 'AgeLevel',
+            width  => 40,
+        },
+        {
+            name  => $Data->{'lang'}->txt('Status'),
+            field => 'Status',
+            width  => 40,
+        },
+        {
+            name  => $Data->{'lang'}->txt('Assigned To'),
+            field => 'TaskTo',
+            width  => 40,
+        },
+        {
+            name  => $Data->{'lang'}->txt('Problem Resolution'),
+            field => '',
+            width  => 40,
+        },
+        {
+            name  => $Data->{'lang'}->txt('Current Task'),
+            field => 'TaskType',
+            width  => 50,
+        },
+        #{
+        #    name  => $Data->{'lang'}->txt('Task Assigned To'),
+        #    field => 'TaskTo',
+        #    width  => 70,
+        #},
+        #{
+        #    name  => $Data->{'lang'}->txt('Date Registration Added'),
+        #    field => 'dtAdded',
+        #    width  => 50,
+        #},
+    );
+
+    my $filterfields = [
+        {
+            field     => 'strLocalName',
+            elementID => 'id_textfilterfield',
+            type      => 'regex',
+        },
+        {
+            field     => 'strStatus',
+            elementID => 'dd_actstatus',
+            allvalue  => 'ALL',
+        },
+    ];
+
+    my $grid  = showGrid(
+        Data    => $Data,
+        columns => \@headers,
+        rowdata => \@rowdata,
+        gridid  => 'grid',
+        width   => '99%',
+        filters => $filterfields,
+    );
+
+    my $resultHTML = qq[
+        <div class="grid-filter-wrap">
+            <div style="width:99%;">$rectype_options</div>
+            $grid
+        </div>
+    ];
+
+    return $resultHTML;
+}
+
 1;

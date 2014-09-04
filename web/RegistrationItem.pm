@@ -24,7 +24,7 @@ sub getRegistrationItems    {
 
     return 0 if (! $itemType);
 	
-    my $st = qq[
+  my $st = qq[
 		SELECT 
             RI.intID,
             RI.intRequired,
@@ -51,8 +51,9 @@ sub getRegistrationItems    {
 			AND RI.strAgeLevel = ?		
             AND RI.strItemType = ?
     ];
-	my $q = $Data->{'db'}->prepare($st) or query_error($st);
-	$q->execute(
+    my $q = $Data->{'db'}->prepare($st) or query_error($st);
+    
+    $q->execute(
         $Data->{'Realm'},
         $Data->{'RealmSubType'},
         $ruleFor,
@@ -67,7 +68,6 @@ sub getRegistrationItems    {
 		$Rego_ref->{'strAgeLevel'} || $Rego_ref->{'ageLevel'} || '',
         $itemType
 	) or query_error($st);
-	
     my @Items=();
     while (my $dref = $q->fetchrow_hashref())   {
         my %Item=();
@@ -80,8 +80,9 @@ sub getRegistrationItems    {
         }
     
         if ($itemType eq 'PRODUCT') {
-            $Item{'Name'} = $dref->{'strProductName'};
+            $Item{'Name'} = $dref->{'strProductName'} . $st;
             $Item{'ProductPrice'} = getItemCost($Data, $entityID, $entityLevel, $multiPersonType, $dref->{'intID'}) || 0;
+            
         }
         push @Items, \%Item;
     }

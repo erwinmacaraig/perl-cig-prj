@@ -1,7 +1,16 @@
-display document upload information 
-[% FOREACH doc IN documents %] 
-<p>Document ID needed [% doc.Name %] </p> 
+<!-- display document upload information --> 
 
+[% IF approveddocs.size %]
+<h3>Approved Documents</h3>
+<ul>
+[% FOREACH apprdocs IN approveddocs %] 
+<li>[% apprdocs.Name %]</li>
+[% END %]
+</ul>
+[% END %]
+<h3>Required Documents</h3>
+[% FOREACH doc IN documents %] 
+<p> [% doc.Name %] </p> 
 <form action="[% target %]" method="POST" class="dropzone">
 <input type="hidden" name="doctypeID" value="[% doc.ID %]" />
 <input type="hidden" name="a" value="[% nextaction %]" />
