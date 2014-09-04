@@ -18,6 +18,7 @@ use Reg_common;
 use HTMLForm;
 use FormHelpers;
 use GridDisplay;
+use RecordTypeFilter;
 
 sub personRegistrationDetail   {
 
@@ -25,12 +26,11 @@ sub personRegistrationDetail   {
 
     my $RegistrationDetail = PersonRegistration::getRegistrationDetail($Data, $personRegistrationID);
     $RegistrationDetail = pop $RegistrationDetail;
+
+    my $option = $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 'edit' : 'display';
     
     my $client=setClient($Data->{'clientValues'}) || '';
     
-    #TODO: to be enabled once the query is modified to allow different entities to view the list of PR
-    #my $option = $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 'edit' : 'display';
-    my $option = 'edit';
     my $intRelamID = $Data->{'Relam'} ? $Data->{'Realm'} : 0;
     my %statusoptions = ();
 
@@ -39,6 +39,7 @@ sub personRegistrationDetail   {
         $statusoptions{$key} = $Defs::personRegoStatus{$key} || '';
     }
 
+    print STDERR Dumper $RegistrationDetail;
     my %FieldDefinitions = (
         fields => {
             strStatus => {
@@ -46,9 +47,7 @@ sub personRegistrationDetail   {
                 value => uc($RegistrationDetail->{'Status'}),
                 type => 'lookup',
                 options => \%statusoptions,
-                #TODO: to be enabled once the query is modified to allow different entities to view the list of PR
-                #readonly => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
-                readonly => 0,
+                readonly => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
             },
             strAgeLevel => {
                 label => 'Age Level',
@@ -83,6 +82,12 @@ sub personRegistrationDetail   {
             strPersonLevel => {
                 label => 'Level',
                 value => $RegistrationDetail->{'PersonLevel'},
+                type => 'text',
+                readonly => 1,
+            },
+            strPersonLevel => {
+                label => 'Date Registration Added',
+                value => $RegistrationDetail->{'dtAdded_formatted'},
                 type => 'text',
                 readonly => 1,
             },
@@ -173,6 +178,8 @@ sub personRegistrationWorkTasks {
             DATE_FORMAT(pr.dtLastUpdated, "%Y%m%d%H%i") as dtLastUpdated_,
             er.strEntityRoleName,
             WFT.strTaskType as WFTTaskType,
+            WFT.intWFTaskID as WFTTaskID,
+            WFT.strTaskStatus as WFTTaskStatus,
             ApprovalEntity.strLocalName as ApprovalLocalName,
             ApprovalEntity.strLatinName as ApprovalEntityName,
             RejectedEntity.strLocalName as RejectedLocalName,
@@ -193,7 +200,7 @@ sub personRegistrationWorkTasks {
             INNER JOIN tblWFTask as WFT ON (
                 WFT.intPersonRegistrationID = pr.intPersonRegistrationID
                 AND WFT.intPersonID = pr.intPersonID
-                AND WFT.strTaskStatus IN ('ACTIVE')
+                #AND WFT.strTaskStatus IN ('ACTIVE')
             )
             LEFT JOIN tblEntity as ApprovalEntity ON (
                 ApprovalEntity.intEntityID = WFT.intApprovalEntityID
@@ -217,7 +224,6 @@ sub personRegistrationWorkTasks {
         $personRegistrationID
     );
     while (my $dref = $query->fetchrow_hashref) {
-
         $results++;
         my $localname = formatPersonName($Data, $dref->{'strLocalFirstname'}, $dref->{'strLocalSurname'}, $dref->{'intGender'});
         my $name = formatPersonName($Data, $dref->{'strLatinFirstname'}, $dref->{'strLatinSurname'}, $dref->{'intGender'});
@@ -233,15 +239,16 @@ sub personRegistrationWorkTasks {
             $taskTo= $entitylocalname;
             $taskTo.= qq[ ($dref->{'RejectedEntityName'})] if ($dref->{'RejectedEntityName'});
         }
+
         push @rowdata, {
-            id => $dref->{'intPersonRegistrationID'} || 0,
+            id => $dref->{'WFTTaskID'} || 0,
             dtAdded=> $dref->{'dtAdded_formatted'} || '',
             PersonLevel=> $Defs::personLevel{$dref->{'strPersonLevel'}} || '',
             PersonEntityRole=> $dref->{'strEntityRoleName'} || '',
             PersonType=> $Defs::personType{$dref->{'strPersonType'}} || '',
             AgeLevel=> $Defs::ageLevel{$dref->{'strAgeLevel'}} || '',
             RegistrationNature=> $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '',
-            Status=> $Defs::wfTaskStatus{$dref->{'strStatus'}} || '',
+            Status=> $Defs::wfTaskStatus{$dref->{'WFTTaskStatus'}} || '',
             PersonEntityRole=> $dref->{'strPersonEntityRole'} || '',
             Sport=> $Defs::sportType{$dref->{'strSport'}} || '',
             LocalName=>$localname,
@@ -257,42 +264,26 @@ sub personRegistrationWorkTasks {
           };
     }
 
-
     my $rectype_options = '';
-
     my @headers = (
         {
-            name  => $Data->{'lang'}->txt('Registration Type'),
-            field => 'RegistrationNature',
-            width  => 60,
+            name   => $Data->{'lang'}->txt('Registration Type'),
+            field  => 'RegistrationNature',
+            width  => 30,
         },
         {
-            name  => $Data->{'lang'}->txt('Person'),
-            field => 'LocalLatinName',
+            name   => $Data->{'lang'}->txt('Name'),
+            field  => 'LocalLatinName',
+            width  => 30,
         },
         {
             name   => $Data->{'lang'}->txt('Type'),
-            field  => 'PersonType',
-            width  => 30,
-        },
-        {
-            name   => $Data->{'lang'}->txt('Role'),
-            field  => 'PersonEntityRole',
-            width  => 30,
-        },
-        {
-            name   => $Data->{'lang'}->txt('Sport'),
             field  => 'Sport',
             width  => 40,
         },
         {
-            name  => $Data->{'lang'}->txt('Level'),
-            field => 'PersonLevel',
-            width  => 40,
-        },
-        {
-            name  => $Data->{'lang'}->txt('Age Level'),
-            field => 'AgeLevel',
+            name   => $Data->{'lang'}->txt('Age Level'),
+            field  => 'AgeLevel',
             width  => 40,
         },
         {
@@ -301,20 +292,30 @@ sub personRegistrationWorkTasks {
             width  => 40,
         },
         {
+            name  => $Data->{'lang'}->txt('Assigned To'),
+            field => 'TaskTo',
+            width  => 40,
+        },
+        {
+            name  => $Data->{'lang'}->txt('Problem Resolution'),
+            field => '',
+            width  => 40,
+        },
+        {
             name  => $Data->{'lang'}->txt('Current Task'),
             field => 'TaskType',
             width  => 50,
         },
-        {
-            name  => $Data->{'lang'}->txt('Task Assigned To'),
-            field => 'TaskTo',
-            width  => 70,
-        },
-        {
-            name  => $Data->{'lang'}->txt('Date Registration Added'),
-            field => 'dtAdded',
-            width  => 50,
-        },
+        #{
+        #    name  => $Data->{'lang'}->txt('Task Assigned To'),
+        #    field => 'TaskTo',
+        #    width  => 70,
+        #},
+        #{
+        #    name  => $Data->{'lang'}->txt('Date Registration Added'),
+        #    field => 'dtAdded',
+        #    width  => 50,
+        #},
     );
 
     my $filterfields = [

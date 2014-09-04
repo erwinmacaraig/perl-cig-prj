@@ -163,7 +163,7 @@ sub handlePerson {
     elsif ( $action eq 'P_REGO' ) {
         my $entityID = getLastEntityID($Data->{'clientValues'});
         my $prID = safe_param( 'prID', 'number' );    
-        $resultHTML = personRegistrationDetail( $Data, $entityID, $prID) || '';
+        $resultHTML = personRegistrationDetail($action, $Data, $entityID, $prID) || '';
         $title = $lang->txt('Registration History');
     }
     elsif ( $action =~ /P_DOCS/ ) {
