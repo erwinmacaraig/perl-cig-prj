@@ -39,6 +39,7 @@ sub personRegistrationDetail   {
         $statusoptions{$key} = $Defs::personRegoStatus{$key} || '';
     }
 
+    print STDERR Dumper $RegistrationDetail;
     my %FieldDefinitions = (
         fields => {
             strStatus => {
@@ -81,6 +82,12 @@ sub personRegistrationDetail   {
             strPersonLevel => {
                 label => 'Level',
                 value => $RegistrationDetail->{'PersonLevel'},
+                type => 'text',
+                readonly => 1,
+            },
+            strPersonLevel => {
+                label => 'Date Registration Added',
+                value => $RegistrationDetail->{'dtAdded_formatted'},
                 type => 'text',
                 readonly => 1,
             },
