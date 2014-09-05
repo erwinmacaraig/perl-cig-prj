@@ -70,13 +70,24 @@ sub handleClub  {
 sub club_details  {
   my ($action, $Data, $clubID)=@_;
 
-  my $option='display';
-  $option='edit' if $action eq 'C_DTE' and allowedAction($Data, 'c_e');
-  $option='add' if $action eq 'C_DTA' and allowedAction($Data, 'c_a');
-  $clubID=0 if $option eq 'add';
+  
+  
+  
+  
+ 
   my $field=loadClubDetails($Data->{'db'}, $clubID,$Data->{'clientValues'}{'assocID'}) || ();
   my $client=setClient($Data->{'clientValues'}) || '';
-
+  
+    my $allowedit =( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
+    $Data->{'ReadOnlyLogin'} ? $allowedit = 0 : undef;
+    
+    
+    my $option='display';       
+   
+   $option='edit' if $action eq 'C_DTE' and allowedAction($Data, 'c_e') && $allowedit;
+   $option='add' if $action eq 'C_DTA' and allowedAction($Data, 'c_a')  && $allowedit;
+   $clubID=0 if $option eq 'add';
+  
   my $club_chars = getClubCharacteristicsBlock($Data, $clubID) || '';
 
   my $field_case_rules = get_field_case_rules({dbh=>$Data->{'db'}, client=>$client, type=>'Club'});
@@ -644,7 +655,7 @@ sub listClubs   {
 
   my $addlink='';
   {
-      $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>];
+      $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if(!$Data->{'ReadOnlyLogin'});
 
   }
 

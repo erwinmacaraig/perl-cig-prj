@@ -17,6 +17,7 @@ CREATE TABLE tblPerson (
     strLocalFirstname varchar(50) DEFAULT '',
     strLocalMiddlename varchar(50) DEFAULT '',
     strLocalSurname varchar(150) DEFAULT '',
+    strISONationality varchar(50) DEFAULT '',
     strLocalSurname2 varchar(150) DEFAULT '',
 
     strLatinTitle varchar(30) DEFAULT '',

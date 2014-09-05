@@ -654,10 +654,11 @@ sub person_details {
     my ( $action, $Data, $personID, $prefillData, $returndata ) = @_;
     $returndata ||= 0; 
     
+  
     my $option = 'display';
     
     	$option = 'edit' if $action eq 'P_DTE' and allowedAction( $Data, 'm_e' );
-    	$option = 'add'  if $action eq 'P_A' and allowedAction( $Data, 'm_a' ) ;
+    	$option = 'add'  if $action eq 'P_A' and allowedAction( $Data, 'm_a' );
     	$option = 'add' if ( $Data->{'RegoForm'} and !$personID );
     
     

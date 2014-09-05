@@ -70,10 +70,14 @@ sub showPersonHome	{
   );
 
 print STDERR Dumper($personObj);
+
+    my $readonly = !( ($personObj->getValue('strStatus') eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
+    $Data->{'ReadOnlyLogin'} ? $readonly = 1 : undef;
+
 	my %TemplateData = (
         Lang => $Data->{'lang'},
 		Name => $name,
-		ReadOnlyLogin => $Data->{'ReadOnlyLogin'},
+		ReadOnlyLogin => $readonly,
 		EditDetailsLink => showLink($personID,$client,$Data),
 		Notifications => $notifications,
 		Photo => $photo,
