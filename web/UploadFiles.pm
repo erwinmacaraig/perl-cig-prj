@@ -200,7 +200,8 @@ sub _processUploadFile_single	{
                    intEntityLevel,
                    intEntityID, 
                    intPersonRegistrationID,
-                   intPersonID
+                   intPersonID,
+                   dtAdded
                 )
                 VALUES (
                    ?,
@@ -208,7 +209,8 @@ sub _processUploadFile_single	{
                    ?,
                    ?,
                    ?,
-                   ?
+                   ?,
+                   NOW()
                  ) 
         ]; 
         $doc_q = $Data->{'db'}->prepare($doc_st); 
@@ -223,11 +225,11 @@ sub _processUploadFile_single	{
         }
         else {
         	 $doc_st = qq[
-        		UPDATE tblDocuments SET intUploadFileID = ? WHERE intUploadFileID = ? AND intPersonID = ?
+        		UPDATE tblDocuments SET intUploadFileID = ?, dtLastUpdated = NOW() WHERE intUploadFileID = ? AND intPersonID = ?
         	]; 
         	$doc_q = $Data->{'db'}->prepare($doc_st); 
         	$doc_q->execute(
-              $fileID,
+              $fileID,              
               $oldFileId,
               $EntityID, 
         );
