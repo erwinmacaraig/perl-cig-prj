@@ -119,6 +119,11 @@ sub getFieldLabels	{
             strContactEmail => 'Contact Person Email',
             strContactPhone => 'Contact Person Phone',
             strContact => 'Contact Person',
+            intIdentifierTypeID => 'Identifier Type',
+            strIdentifier => 'Identifier',
+            dtValidFrom => 'Valid From',
+            dtValidUntil =>'Valid Until',
+            strDescription => 'Description'
 		);
 	}
 	for my $k (keys %labels)	{

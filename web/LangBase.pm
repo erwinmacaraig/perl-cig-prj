@@ -57,9 +57,14 @@ sub getSearchingFrom {
 
 #sub lexicon { eval( '%' . substr(ref(shift),0,8) . '::Lexicon') || () }
 
+
+    sub DESTROY {
+        my $self = shift;
+        
+        $self->SUPER::DESTROY;
+    }
+
 1;  # End of module.
-
-
 package LangBase::en_us;
 use base qw(Locale::Maketext::Gettext);
 return 1;
