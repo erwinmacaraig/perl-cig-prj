@@ -739,9 +739,9 @@ sub submitPersonRegistration    {
     my %Reg=();
     $Reg{'personRegistrationID'} = $personRegistrationID;
     my ($count, $regs) = getRegistrationData($Data, $personID, \%Reg);
-
-    if ($count) {
-        my $pr_ref = $regs->[0];
+	
+    my $pr_ref = $regs->[0];
+    if ($count && $pr_ref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_INPROGRESS) {
         $pr_ref->{'strStatus'} = 'PENDING';
 
         updatePersonRegistration($Data, $personID, $personRegistrationID, $pr_ref);
@@ -753,7 +753,7 @@ sub submitPersonRegistration    {
             'REGO'
         );
 
-  	    my $rc = addWorkFlowTasks(
+            my $rc = addWorkFlowTasks(
             $Data,
             'REGO', 
             $pr_ref->{'registrationNature'} || $pr_ref->{'strRegistrationNature'} || '', 
