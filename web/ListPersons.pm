@@ -298,7 +298,7 @@ my $filterfields = [
 
     my $allowClubAdd = 1;
 
-    if(allowedAction($Data, 'm_a'))    {
+    if(allowedAction($Data, 'm_a') && !$Data->{'ReadOnlyLogin'})    {
         $options{'addperson'} = [
         "$target?client=$client&amp;a=P_A&amp;l=$Defs::LEVEL_PERSON",
         $textLabels{'addPerson'}

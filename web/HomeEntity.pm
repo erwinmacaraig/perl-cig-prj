@@ -47,12 +47,17 @@ sub showEntityHome	{
     $entityID,
 	);
 
+    
+       
+    my $readonly = !( ($entityObj->getValue('strStatus') eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
+    $Data->{'ReadOnlyLogin'} ? $readonly = 1 : undef;
+	
 	my $name = $entityObj->name();
 	my %TemplateData = (
 		Welcome => $welcome,
 		Logo => $logo,
 		Name => $name,
-		ReadOnlyLogin => $Data->{'ReadOnlyLogin'},
+		ReadOnlyLogin => $readonly,
 		EditDetailsLink => "$Data->{'target'}?client=$client&amp;a=E_DTE",
 		EditDashboardLink => "$Data->{'target'}?client=$client&amp;a=DASHCFG_",
 		Dashboard => $dashboard,

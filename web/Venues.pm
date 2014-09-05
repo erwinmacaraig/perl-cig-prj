@@ -43,10 +43,18 @@ sub venue_details   {
 
     return '' if ($venueID and !venueAllowed($Data, $venueID));
     my $option='display';
-    $option='edit' if $action eq 'VENUE_DTE';# and allowedAction($Data, 'venue_e');
-    $option='add' if $action eq 'VENUE_DTA';# and allowedAction($Data, 'venue_a');
-    $venueID=0 if $option eq 'add';
     my $field=loadVenueDetails($Data->{'db'}, $venueID) || ();
+    
+    my $allowedit =( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
+    $Data->{'ReadOnlyLogin'} ? $allowedit = 0 : undef;
+   
+    $option='edit' if $action eq 'VENUE_DTE' && $allowedit;
+    $option='add' if $action eq 'VENUE_DTA' && $allowedit;
+    
+    #$option='edit' if $action eq 'VENUE_DTE' && !$Data->{'ReadOnlyLogin'};# and allowedAction($Data, 'venue_e');
+    #$option='add' if $action eq 'VENUE_DTA' && !$Data->{'ReadOnlyLogin'}; # and allowedAction($Data, 'venue_a');
+    $venueID=0 if $option eq 'add';
+    
     
     my $intRealmID = $Data->{'Realm'} ? $Data->{'Realm'} : 0;
     my $client=setClient($Data->{'clientValues'}) || '';
@@ -427,7 +435,7 @@ sub venue_details   {
         # Delete Venue.
         my $venueObj = new EntityObj('db'=>$Data->{db},ID=>$venueID,realmID=>$intRealmID);
         
-        $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DEL&amp;venueID=$venueID" onclick="return confirm('Are you sure you want to delete this venue');">Delete Venue</a> ] if $venueObj->canDelete();
+        $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DEL&amp;venueID=$venueID" onclick="return confirm('Are you sure you want to delete this venue');">Delete Venue</a> ] if ($venueObj->canDelete() && !$Data->{'ReadOnlyLogin'});
     }
     
     $chgoptions=qq[<div class="changeoptions">$chgoptions</div>] if $chgoptions;
@@ -607,7 +615,7 @@ sub listVenues  {
     my $title=qq[Venues];
     {
         my $tempClient = setClient(\%tempClientValues);
-        $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>];
+        $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if !$Data->{'ReadOnlyLogin'};
 
     }
 

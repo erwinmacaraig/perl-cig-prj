@@ -51,11 +51,18 @@ sub showClubHome  {
     $Defs::LEVEL_CLUB,
     $clubID,
   );
-
+  
+  #my @ctrlMatrix = ([1,1],[0,0]);
+  #my $controlEdit = $ctrlMatrix[( ($clubObj->getValue('strStatus') eq 'ACTIVE') ? 1 : 0 )][$Data->{'ReadOnlyLogin'}];
+  #($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL) ? $controlEdit = 0 : undef;
+  
+   my $readonly = !( ($clubObj->getValue('strStatus') eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
+   $Data->{'ReadOnlyLogin'} ? $readonly = 1 : undef;
+  
   my $name = $clubObj->name();
   my %TemplateData = (
     Welcome => $welcome,
-    ReadOnlyLogin => $Data->{'ReadOnlyLogin'},
+    ReadOnlyLogin => $readonly,
     Logo => $logo,
     Name => $name,
     ContactsMenu => $scMenu,
