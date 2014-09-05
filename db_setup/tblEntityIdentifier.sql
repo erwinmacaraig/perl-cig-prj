@@ -1,12 +1,16 @@
 DROP TABLE IF EXISTS `tblEntityIdentifier`;
-CREATE TABLE IF NOT EXISTS `tblEntityIdentifier` (
-  `intIdentifierId` INT NOT NULL AUTO_INCREMENT,
-  `intEntityID` INT NOT NULL,
-  `intRealmID` INT NOT NULL,
-  `intIdentifierTypeID` INT NOT NULL,
-  `strIdentifier` VARCHAR(100) NOT NULL,
-  `dtValidFrom` DATE NULL,
-  `dtValidUntil` DATE NULL,
-  `strDescription` VARCHAR(250) NULL,
+CREATE TABLE `tblEntityIdentifier` (
+  `intIdentifierId` int(11) NOT NULL AUTO_INCREMENT,
+  `intEntityID` int(11) NOT NULL,
+  `intRealmID` int(11) NOT NULL,
+  `intIdentifierTypeID` int(11) NOT NULL,
+  `strIdentifier` varchar(100) NOT NULL,
+  `dtValidFrom` date DEFAULT NULL,
+  `dtValidUntil` date DEFAULT NULL,
+  `strDescription` varchar(250) DEFAULT NULL,
+  `dtAdded` datetime DEFAULT NULL,
+  `dtLastUpdated` datetime DEFAULT NULL,
+  `tTimestamp` varchar(45) DEFAULT 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+  `intStatus` int(11) DEFAULT '1',
   PRIMARY KEY (`intIdentifierId`)
 ) DEFAULT CHARSET=utf8;
