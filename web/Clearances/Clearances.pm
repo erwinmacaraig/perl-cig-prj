@@ -319,7 +319,7 @@ sub clearanceHistory	{
 	return '' if ! $intPersonID;
 
 	my $db = $Data->{'db'};
-    my $st = qq[
+   my $st = qq[
                 SELECT 
                     C.*, 
                     SourceEntity.strLocalName as SourceEntityName, 
@@ -327,13 +327,13 @@ sub clearanceHistory	{
                     DATE_FORMAT(dtApplied,'%d/%m/%Y') AS dtApplied, now() AS Today
                 FROM tblClearance as C
 			        LEFT JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID)
-                    LEFT JOIN tblEntity as SourceEntity ON (SourceEntity.intEntityID= C.intSourceClubID)
-                    LEFT JOIN tblEntity as DestinationEntity ON (DestinationEntity.intEntityID = C.intDestinationClubID)
-                WHERE C.intMemberID = $intPersonID
+                    LEFT JOIN tblEntity as SourceEntity ON (SourceEntity.intEntityID= C.intSourceEntityID)
+                    LEFT JOIN tblEntity as DestinationEntity ON (DestinationEntity.intEntityID = C.intDestinationEntityID)
+                WHERE C.intPersonID = $intPersonID
 			AND C.intRecStatus <> -1
 		GROUP BY C.intClearanceID
 		ORDER BY C.dtApplied DESC
-        ];	
+        ];
     	my $query = $db->prepare($st) or query_error($st);
     	$query->execute or query_error($st);
 	
