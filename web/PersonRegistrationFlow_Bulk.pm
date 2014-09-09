@@ -86,12 +86,19 @@ sub handleRegistrationFlowBulk {
     }
 
     if ( $action eq 'PREGFB_SPU' ) {
+        $bulk_ref->{'nationalPeriodID'} = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $bulk_ref->{'sport'}, $bulk_ref->{'registrationNature'});
+        my $count = bulkPersonRollover($Data, 'PREGFB_SPU', $bulk_ref, \%Hidden, 1);
+
         my $rolloverIDs= param('rolloverIDs') || '';
         my $prodIds = param('prodIds');
         my $prodQty= param('prodQty');
         my $markPaid = param('markPaid');
         my $paymentType= param('paymentType');
-        $body .= bulkRegoSubmit($Data, $bulk_ref, $rolloverIDs, $prodIds, $prodQty, $markPaid, $paymentType);
+
+        #FC-145 (having duplicate entries upon page refresh.. need to check number of records upon submit)
+        if($count > 0) {
+            $body .= bulkRegoSubmit($Data, $bulk_ref, $rolloverIDs, $prodIds, $prodQty, $markPaid, $paymentType);
+        }
 #        return $Data->{'lang'}->txt("No $Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'} selected") if (! scalar @MembersToRollover);
         $body .= qq[ROLLOVER FOR $rolloverIDs];
         warn("ROLLOVER$rolloverIDs");
@@ -149,7 +156,7 @@ sub handleRegistrationFlowBulk {
     }
     elsif ( $action eq 'PREGFB_SP' ) {
         $bulk_ref->{'nationalPeriodID'} = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $bulk_ref->{'sport'}, $bulk_ref->{'registrationNature'});
-        my ($listPersons_body, undef) = bulkPersonRollover($Data, 'PREGFB_SPU', $bulk_ref, \%Hidden);
+        my ($listPersons_body, undef) = bulkPersonRollover($Data, 'PREGFB_SPU', $bulk_ref, \%Hidden, 0);
         $body .= $listPersons_body;
    }
     elsif ( $action eq 'PREGFB_P' ) {
