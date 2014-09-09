@@ -28,14 +28,42 @@ use FormHelpers;
 use AuditLog;
 use Log;
 use TTTemplate;
+use Data::Dumper;
 
 sub bulkPersonRollover {
-    my($Data, $nextAction, $bulk_ref, $hidden_ref) = @_;
+    my($Data, $nextAction, $bulk_ref, $hidden_ref, $countOnly) = @_;
 
     my $body = '';
     my $client = setClient($Data->{'clientValues'});
     my $realmID = $Data->{'Realm'};
 
+
+    #my $st = qq[
+    #    SELECT DISTINCT
+    #        P.intPersonID,
+    #        P.strLocalSurname,
+    #        P.strLocalFirstname,
+    #        DATE_FORMAT(P.dtDOB,"%d/%m/%Y") AS dtDOB,
+    #        P.dtDOB AS dtDOB_RAW,
+    #        P.strNationalNum
+    #    FROM 
+    #        tblPerson as P
+    #        INNER JOIN tblPersonRegistration_$realmID as PR ON (
+    #            PR.intPersonID = P.intPersonID
+    #            AND PR.strPersonType = ?
+    #            AND PR.strPersonLevel= ?
+    #            AND PR.strPersonEntityRole= ?
+    #            AND PR.strAgeLevel= ?
+    #            AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
+    #            AND PR.strRegistrationNature = ?
+    #            AND PR.intEntityID = ?
+    #            AND PR.intNationalPeriodID <> ?
+    #        )
+    #    WHERE 
+    #        P.strStatus NOT IN ('DELETED', 'SUSPENDED')
+    #        AND P.intRealmID = ?
+    #    ORDER BY strLocalSurname, strLocalFirstname
+    #];
 
     my $st = qq[
         SELECT DISTINCT
@@ -54,7 +82,6 @@ sub bulkPersonRollover {
                 AND PR.strPersonEntityRole= ?
                 AND PR.strAgeLevel= ?
                 AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
-                AND PR.strRegistrationNature = ?
                 AND PR.intEntityID = ?
                 AND PR.intNationalPeriodID <> ?
             )
@@ -63,12 +90,13 @@ sub bulkPersonRollover {
             AND P.intRealmID = ?
         ORDER BY strLocalSurname, strLocalFirstname
     ];
+
     my @values=(
         $bulk_ref->{'personType'} || '',
         $bulk_ref->{'personLevel'} || '',
         $bulk_ref->{'personEntityRole'} || '',
         $bulk_ref->{'ageLevel'} || '',
-        $bulk_ref->{'registrationNature'} || '',
+        #$bulk_ref->{'registrationNature'} || '',
         $bulk_ref->{'entityID'} || '',
         $bulk_ref->{'nationalPeriodID'} || '',
         $realmID
@@ -76,8 +104,11 @@ sub bulkPersonRollover {
     
     my $q = $Data->{'db'}->prepare($st);
     $q->execute(@values);
+    my $count = 0;
     my @rowdata    = ();
+
     while (my $dref = $q->fetchrow_hashref()) {
+        $count++;
         my %row = ();
         for my $i (qw(intPersonID strLocalSurname strLocalFirstname dtDOB dtDOB_RAW strNationalNum))    {
             $row{$i} = $dref->{$i};
@@ -85,6 +116,10 @@ sub bulkPersonRollover {
         $row{'id'} = $dref->{'intPersonID'};
         push @rowdata, \%row;
     }
+
+    #Depends on the call
+    #if countOnly == 1, simply return the number of records
+    return $count if($countOnly);
 
     my $memfieldlabels=FieldLabels::getFieldLabels($Data,$Defs::LEVEL_PERSON);
     my @headers = (
