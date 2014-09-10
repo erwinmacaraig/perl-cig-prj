@@ -1288,6 +1288,7 @@ sub person_details {
                 options     => $isocountries,
                 sectionname => 'details',
                 firstoption => [ '', 'Select Country' ],
+                compulsory => 1,
             },
             strISONationality => {
                 label       => $FieldLabels->{'strISONationality'},
@@ -1296,6 +1297,7 @@ sub person_details {
                 options     => $isocountries,
                 sectionname => 'details',
                 firstoption => [ '', 'Select Country' ],
+                compulsory => 1,
             },
             dtLastUpdate => {
                 label       => 'Last Updated',
