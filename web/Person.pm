@@ -1011,7 +1011,7 @@ sub person_details {
                 type        => 'text',
                 size        => '20',
                 maxsize     => '50',
-                sectionname => 'identification',
+                sectionname => 'details',
             },
             strPassportIssueCountry => {
                 label       => $FieldLabels->{'strPassportIssueCountry'},
@@ -1344,7 +1344,7 @@ sub person_details {
 
         },
         order => [
-        qw(strNationalNum strPersonNo strSalutation strStatus strLocalFirstname strLocalSurname strPreferredName strLatinFirstname strLatinSurname strISONationality strISOCountry dtDOB dtDeath strPlaceofBirth strCountryOfBirth intGender strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased strPreferredLang strPassportIssueCountry strPassportNationality strPassportNo dtPassportExpiry strEmergContName strEmergContNo strEmergContNo2 strP1FName strP1SName strP1Phone strP1PhoneMobile strP1Email strP2FName strP2SName strP2Phone strP2PhoneMobile strP2Email dtSuspendedUntil),
+        qw(strNationalNum strPersonNo strStatus strLocalFirstname strLocalSurname strPreferredName strLatinFirstname strLatinSurname strISONationality strISOCountry dtDOB intGender dtDeath strPlaceofBirth strCountryOfBirth strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased strPreferredLang strEmergContName strEmergContNo strEmergContNo2 strP1FName strP1SName strP1Phone strP1PhoneMobile strP1Email strP2FName strP2SName strP2Phone strP2PhoneMobile strP2Email dtSuspendedUntil),
 
         map("strNatCustomStr$_", (1..15)),
         map("dblNatCustomDbl$_", (1..10)),
@@ -1366,7 +1366,7 @@ sub person_details {
         [ 'regoform',       q{} ],
         [ 'details',        'Personal Details' ],
         [ 'contact',        'Contact Details' ],
-        [ 'identification', 'Identification' ],
+        #[ 'identification', 'Identification' ],
         [ 'profile',        'Profile' ],
         [ 'contracts',      'Contracts' ],
         [ 'citizenship',    'Citizenship' ],
