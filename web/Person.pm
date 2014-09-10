@@ -1538,10 +1538,10 @@ my $person_photo = qq[
         <div class="person-edit-info">
 <div class="photo">$photolink</div>
         <span class="button-small mobile-button"><a href="?client='.$client.'&amp;a=P_PH_d">Add/Edit Photo</a></span>
-        <h4>Documents</h4>
-        <span class="button-small generic-button"><a href="?client='.$client.'&amp;a=DOC_L">Add Document</a></span>
       </div>
 ];
+        #<h4>Documents</h4>
+        #<span class="button-small generic-button"><a href="?client='.$client.'&amp;a=DOC_L">Add Document</a></span>
 $person_photo = '' if($option eq 'add');
 $tabs = '' if($option eq 'add');
 	$resultHTML =qq[
