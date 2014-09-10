@@ -1346,8 +1346,7 @@ sub person_details {
 
         },
         order => [
-        qw(strNationalNum strPersonNo strSalutation strStatus strLocalFirstname strPreferredName strMiddlename strLocalSurname strLatinFirstname strLatinSurname strMaidenName strISONationality strISOCountry dtDOB dtDeath strPlaceofBirth strCountryOfBirth strMotherCountry strFatherCountry intGender strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased intDeRegister strPreferredLang strPassportIssueCountry strPassportNationality strPassportNo dtPassportExpiry dtPoliceCheck dtPoliceCheckExp strPoliceCheckRef strEmergContName strEmergContNo strEmergContNo2 strEmergContRel strP1Salutation strP1FName strP1SName intP1Gender strP1Phone strP1Phone2 strP1PhoneMobile strP1Email strP1Email2 strP2Salutation strP2FName strP2SName intP2Gender strP2Phone strP2Phone2 strP2PhoneMobile strP2Email strP2Email2 strEyeColour strHairColour strHeight strWeight dtSuspendedUntil
-        ),
+        qw(strNationalNum strPersonNo strSalutation strStatus strLocalFirstname strLocalSurname strPreferredName strLatinFirstname strLatinSurname strISONationality strISOCountry dtDOB dtDeath strPlaceofBirth strCountryOfBirth intGender strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased strPreferredLang strPassportIssueCountry strPassportNationality strPassportNo dtPassportExpiry strEmergContName strEmergContNo strEmergContNo2 strP1FName strP1SName strP1Phone strP1PhoneMobile strP1Email strP2FName strP2SName strP2Phone strP2PhoneMobile strP2Email dtSuspendedUntil),
 
         map("strNatCustomStr$_", (1..15)),
         map("dblNatCustomDbl$_", (1..10)),
