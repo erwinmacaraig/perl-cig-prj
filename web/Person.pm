@@ -862,7 +862,7 @@ sub person_details {
                 type        => 'text',
                 size        => '30',
                 maxsize     => '45',
-                sectionname => 'details',
+                sectionname => 'other',
             },
             strISOCountryOfBirth => {
                 label       => $FieldLabels->{'strISOCountryOfBirth'},
@@ -930,14 +930,6 @@ sub person_details {
                 size        => '50',
                 maxsize     => '100',
                 sectionname => 'contact',
-            },
-            strISOCountry => {
-                label       => $FieldLabels->{'strISOCountry'},
-                value       => $field->{strISOCountry}, 
-                type        => 'lookup',
-                options     => \%countriesonly,
-                sectionname => 'contact',
-                firstoption => [ '', 'Select Country' ],
             },
             strPostalCode => {
                 label       => $FieldLabels->{'strPostalCode'},
@@ -1011,7 +1003,7 @@ sub person_details {
                 type        => 'text',
                 size        => '20',
                 maxsize     => '50',
-                sectionname => 'details',
+                sectionname => 'other',
             },
             strPassportIssueCountry => {
                 label       => $FieldLabels->{'strPassportIssueCountry'},
@@ -1286,7 +1278,7 @@ sub person_details {
                 value       => $field->{strISOCountry},
                 type        => 'lookup',
                 options     => $isocountries,
-                sectionname => 'details',
+                sectionname => 'contact',
                 firstoption => [ '', 'Select Country' ],
                 compulsory => 1,
             },
@@ -1346,7 +1338,7 @@ sub person_details {
 
         },
         order => [
-        qw(strNationalNum strPersonNo strStatus strLocalFirstname strLocalSurname strPreferredName strLatinFirstname strLatinSurname strISONationality strISOCountry dtDOB intGender strPlaceofBirth strCountryOfBirth strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased strPreferredLang strEmergContName strEmergContNo strEmergContNo2 strP1FName strP1SName strP1Phone strP1PhoneMobile strP1Email strP2FName strP2SName strP2Phone strP2PhoneMobile strP2Email dtSuspendedUntil),
+        qw(strNationalNum strPersonNo strStatus strLocalFirstname strLocalSurname strISONationality strISOCountry dtDOB intGender strLatinFirstname strLatinSurname strPreferredName strPlaceofBirth strCountryOfBirth strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased strPreferredLang strEmergContName strEmergContNo strEmergContNo2 strP1FName strP1SName strP1Phone strP1PhoneMobile strP1Email strP2FName strP2SName strP2Phone strP2PhoneMobile strP2Email dtSuspendedUntil),
 
         map("strNatCustomStr$_", (1..15)),
         map("dblNatCustomDbl$_", (1..10)),
