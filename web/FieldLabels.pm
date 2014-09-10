@@ -93,6 +93,8 @@ sub getFieldLabels	{
 			dtPoliceCheckExp => $Data->{'SystemConfig'}{'dtPoliceCheckExp_Text'} ? $Data->{'SystemConfig'}{'dtPoliceCheckExp_Text'} : 'Police Check Expiry Date',
 			strPoliceCheckRef => 'Police Check Number',
 			strPreferredLang => 'Preferred Language',
+			strISONationality => 'Nationality',
+			strISOCountry => 'Country (ISO)',
        
 		);
 	}
