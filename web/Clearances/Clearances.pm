@@ -137,7 +137,7 @@ sub handleClearances	{
     my $entityChecks = Entity::loadEntityDetails($db, $entityID); 
     if( $entityChecks->{'strStatus'} ne 'ACTIVE' && $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL){ 
     		my $resultHTML =qq[
-    		<div class="warningmsg">]. $lang->txt($entityChecks->{'strStatus'} . $entityID .'Entity Not Allowed To View Transfer Details') .q[</div>
+    		<div class="warningmsg">]. $lang->txt('Entity Not Allowed To View Transfer Details') .q[</div>
     		];
     		my $title = $lang->txt('Error');
             return ($resultHTML,$title);
@@ -1794,7 +1794,7 @@ sub clearanceForm	{
 					<div class="OKmsg">] . $lang->txt('Record updated successfully') . qq[</div> <br>
 					<a href="$Data->{'target'}?client=$client&amp;a=CL_list">] . $lang->txt('Return to Transfer') . qq[</a>],
 				addOKtext => qq[
-					<div class="OKmsg">] . $lang->txt('Record updated successfully') . qq[</div> <br>
+					<div class="OKmsg">] . $lang->txt('Record added successfully') . qq[</div> <br>
 					<a href="$Data->{'target'}?client=$client&amp;a=CL_list">] . $lang->txt('Return to Transfer') . qq[</a>],
 			},
 			sections => [ ['main',$lang->txt('Details')], ],
@@ -1998,6 +1998,7 @@ sub postClearanceAdd	{
 	#   </form>
 	#];
 	sendCLREmail($Data, $id, 'ADDED');
+	$resultHTML = transferDocsForm($Data,$id);
 	return (0, $resultHTML);
 	
 }
@@ -2209,7 +2210,7 @@ sub clearanceAddManual	{
                 },
 			
 			},
-			order => [qw(dtApplied MemberName DOB strState strSourceEntityName strDestinationEntityName intReasonForClearanceID strReasonForClearance )],
+			order => [qw(dtApplied MemberName DOB strState strSourceEntityName strDestinationEntityName intReasonForClearanceID strReasonForClearance intClearAction)],
 			options => {
 				labelsuffix => ':',
 				hideblank => 1,
@@ -2520,4 +2521,33 @@ sub postManualClrAction	{
 
 }
 
+
+sub transferDocsForm {
+	my ($Data,  $intClearanceID) = @_;  
+	my $client = setClient($Data->{'clientValues'}) || ''; 
+	
+	my $transferdocsfrm = qq[
+	    <div>
+	    <h3> Add Transfer Documents </h3>
+	     <form action="upload.php" class="dropzone" id="transferdocs">
+	     <input type="hidden" name="ClearanceID" value="$intClearanceID" />
+	     <input type="hidden" name="Filetype" value="$Defs::UPLOADFILETYPE_DOC" />
+	     <input type="hidden" name="EntityTypeID" value="" />
+	     <input type="hidden" name="EntityID" value="" />
+	     <input type="hidden" name="AddedByTypeID" value="" /> 
+	     <input type="hidden" name="AddedBy" value="" />
+	      
+	     </form>
+	     <script>
+              Dropzone.options.transferdocs = { 
+                  maxFilesize: 2, // MB 
+	              maxFiles: 10
+              };
+         </script>
+         <br /> 
+         <a href="$Data->{'target'}?client=$client&amp;a=CL_list">]. $Data->{'lang'}->txt('Return to Transfer') .qq[</a> 
+	    </div>
+	]; 
+	return $transferdocsfrm;
+}
 1;
