@@ -1454,7 +1454,7 @@ sub createClearance	{
 		$body .=qq[Club not found];
 		return $body;
 	}
-
+    ### This is the form
 	if	(! $personID and ! $params{'member_surname'} and ! $params{'member_dob'} and ! $params{'member_natnum'} and ! $params{'member_loggedsurname'} and ! $params{'member_systemsurname'} and ! $params{'member_systemdob'})	{
 		$body .= qq[
 			<form action="$Data->{'target'}" method="POST">
@@ -1469,6 +1469,8 @@ sub createClearance	{
 			</form>
 		];
 	}
+	#### end of Form 
+	
 	elsif	(! $personID and ($params{'member_surname'} or $params{'member_dob'} or $params{'member_natnum'} or $params{'member_loggedsurname'} or ($params{'member_systemsurname'} and $params{'member_systemdob'})))	{
 		my $strWhere = '';
 		my %tParams = %params;
@@ -1530,10 +1532,10 @@ sub createClearance	{
 				$strWhere
 			GROUP BY M.intPersonID, C.intEntityID
 			ORDER BY MAX(CLR.dtFinalised) DESC, M.strLocalSurname, M.strLocalFirstname, M.dtDOB
-		];
+		]; 
 		
 		my $userID=getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'}) || 0;
-
+       
 		my $query = $db->prepare($st) or query_error($st);
 	    $query->execute or query_error($st);
 
@@ -1580,15 +1582,18 @@ sub createClearance	{
 		$body .= qq[</table>];
 	}
 	else	{
-		my ($title, $cbody) = clearanceForm($Data, \%params,0,0,'add');
-		$body .= $title . $cbody;
+		my ($title, $cbody) = clearanceForm($Data, \%params,0,0,'add'); 
+		# need to get last insert ID
+		
+		$body .= $title .  $cbody;
 	}
 	return $body;
 }
 
 sub clearanceForm	{
 
-### PURPOSE: This function is called once the createClearance() function is ready to pass control to ask the destination club (who requested the clearance) the final clearance questions and then to write to DB.
+### PURPOSE: This function is called once the createClearance() function is ready to pass control to ask the destination club (who requested the clearance)
+### the final clearance questions and then to write to DB.
 
 ### It has a postClearanceAdd() (afteraddfunction), which will create the clearance path.
 
@@ -1769,7 +1774,7 @@ sub clearanceForm	{
 			sections => [ ['main',$lang->txt('Details')], ],
 			carryfields =>  {
 				client => $client,
-				a=> 'CL_createnew',
+				a=> "CL_createnew",
 				clrID => $id,
 				sourceEntityID => $sourceEntityID,
 				destinationEntityID => $destinationEntityID,
@@ -1953,13 +1958,22 @@ sub postClearanceAdd	{
 
     		if ($intClearanceStatus == $Defs::CLR_STATUS_APPROVED)  {
         		finaliseClearance($Data, $id);
-			$resultHTML = memberLink($Data, $id);
+			    $resultHTML = memberLink($Data, $id);
+			
     		}
 		
 		}
 	
+	#$resultHTML .= qq[<!-- clearanceID = $id -->];
+	
+	#$resultHTML = qq[
+	#   <form name="emacform" method="post"> 
+	#   Enter anything <input type="text" value="$id" /><br />
+	#   </form>
+	#];
 	sendCLREmail($Data, $id, 'ADDED');
 	return (0, $resultHTML);
+	
 }
 
 sub getMeetingPoint	{
