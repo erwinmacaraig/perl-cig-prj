@@ -1777,7 +1777,7 @@ sub clearanceForm	{
 				beforeaddFunction => \&preClearanceAdd,
                 beforeaddParams => [$Data,$client, $personID, getID($Data->{'clientValues'})],
 				afteraddFunction => \&postClearanceAdd,
-				afteraddParams=> [$option,$Data,$Data->{'db'}],
+				afteraddParams=> [$option,$Data,$Data->{'db'},$personID],
 				auditFunction=> \&auditLog,
         auditAddParams => [
           $Data,
@@ -1900,7 +1900,7 @@ sub postClearanceAdd	{
 
 ### PURPOSE: This function build's up the starting points between the two clubs then calls getMeetingPoint() to do the grunt work in finding the top node
 
-	my($id,$params,$action,$Data,$db)=@_;
+	my($id,$params,$action,$Data,$db,$personID)=@_;
   	return undef if !$db or ! $id;
 	my $resultHTML = '';
 
@@ -1998,7 +1998,7 @@ sub postClearanceAdd	{
 	#   </form>
 	#];
 	sendCLREmail($Data, $id, 'ADDED');
-	$resultHTML = transferDocsForm($Data,$id);
+	$resultHTML = transferDocsForm($Data,$id,$personID);
 	return (0, $resultHTML);
 	
 }
@@ -2523,19 +2523,19 @@ sub postManualClrAction	{
 
 
 sub transferDocsForm {
-	my ($Data,  $intClearanceID) = @_;  
+	my ($Data, $intClearanceID, $personID) = @_;  
 	my $client = setClient($Data->{'clientValues'}) || ''; 
 	
 	my $transferdocsfrm = qq[
 	    <div>
 	    <h3> Add Transfer Documents </h3>
-	     <form action="upload.php" class="dropzone" id="transferdocs">
+	     <form action="UploadTransferDocs.cgi" class="dropzone" id="transferdocs">
 	     <input type="hidden" name="ClearanceID" value="$intClearanceID" />
 	     <input type="hidden" name="Filetype" value="$Defs::UPLOADFILETYPE_DOC" />
-	     <input type="hidden" name="EntityTypeID" value="" />
-	     <input type="hidden" name="EntityID" value="" />
-	     <input type="hidden" name="AddedByTypeID" value="" /> 
-	     <input type="hidden" name="AddedBy" value="" />
+	     <input type="hidden" name="EntityTypeID" value="$Defs::LEVEL_PERSON" />
+	     <input type="hidden" name="EntityID" value="$personID" />
+	     <input type="hidden" name="AddedByTypeID" value="$Data->{'clientValues'}{'authLevel'}" /> 
+	     <input type="hidden" name="AddedBy" value="$Data->{'clientValues'}{'_intID'}" />
 	      
 	     </form>
 	     <script>
