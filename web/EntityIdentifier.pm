@@ -327,13 +327,13 @@ sub list{
     }
     my $modoptions=qq[<div class="changeoptions">$addlink</div>];
     $title=$modoptions.$title;
-    my $rectype_options=show_recordtypes(
-        $Data, 
-        $Data->{'lang'}->txt('Name'),
-        '',
-        \%Defs::entityStatus,
-        { 'ALL' => $Data->{'lang'}->txt('All'), },
-    ) || '';
+    my $rectype_options=''; #show_recordtypes(
+#        $Data, 
+#        $Data->{'lang'}->txt('Name'),
+#        '',
+#        \%Defs::entityStatus,
+#        { 'ALL' => $Data->{'lang'}->txt('All'), },
+#    ) || '';
     
     my @headers = (
         {
