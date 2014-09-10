@@ -120,7 +120,6 @@ sub main {
          safe_param( 'l', 'number' )
       || $clientValues{'currentLevel'}
       || $Defs::LEVEL_NONE;
-    my $ID = getID( \%clientValues );
     $Data{'Permissions'} = GetPermissions(
         \%Data,
         $clientValues{'authLevel'},
@@ -137,48 +136,47 @@ sub main {
     }
 
     if ( $action =~ /^E_/ ) {
-        ( $resultHTML, $pageHeading ) =
-          handleEntity( $action, \%Data, $ID, $typeID );
+        my $ID = getID( \%clientValues );
+        ( $resultHTML, $pageHeading ) = handleEntity( $action, \%Data, $ID, $typeID );
     }
     elsif ( $action =~ /^C_/ ) {
-        ( $resultHTML, $pageHeading ) =
-          handleClub( $action, \%Data, $ID, $typeID );
+        my $clubID= getID($Data{'clientValues'},$Defs::LEVEL_CLUB); 
+        my $entityID = getLastEntityID($Data{'clientValues'});
+        ( $resultHTML, $pageHeading ) = handleClub( $action, \%Data, $entityID, $clubID, $typeID );
     }
     elsif ( $action =~ /^P_/ ) {
-warn("REALM IS ". $Data{'Realm'});
-        ( $resultHTML, $pageHeading ) = handlePerson( $action, \%Data, $ID );  
-       
+        my $personID= getID($Data{'clientValues'},$Defs::LEVEL_PERSON);
+        ( $resultHTML, $pageHeading ) = handlePerson( $action, \%Data, $personID);  
     }
     elsif ( $action =~ /^DOC_/ ) {  
          #needed to pass a parameter to accommodate single File Document Upload
          my $DocumentTypeID = param('doclisttype') || '';  
          my $RegistrationID = param('RegistrationID') || '';         
+        my $ID = getID( \%clientValues );
         ( $resultHTML, $pageHeading ) =
           handle_documents( $action, \%Data, $ID, $DocumentTypeID,$RegistrationID );
           
     }
     elsif ( $action =~ /^LOGO_/ ) {
-        ( $resultHTML, $pageHeading ) =
-          handle_logos( $action, \%Data, $typeID, $ID, $client );
+        my $ID = getID( \%clientValues );
+        ( $resultHTML, $pageHeading ) = handle_logos( $action, \%Data, $typeID, $ID, $client );
     }
     elsif ( $action =~ /^TB_/ ) {
-        ( $resultHTML, $pageHeading ) = handlePerson( $action, \%Data, $ID );
+        my $personID= getID($Data{'clientValues'},$Defs::LEVEL_PERSON);
+        ( $resultHTML, $pageHeading ) = handlePerson( $action, \%Data, $personID );
     }
     elsif ( $action =~ /^SEARCH_/ ) {
-        ( $resultHTML, $pageHeading ) =
-          handleSearch( $action, \%Data, $client );
+        ( $resultHTML, $pageHeading ) = handleSearch( $action, \%Data, $client );
     }
     elsif ( $action =~ /^REP_/ ) {
-        ( $resultHTML, $report, $pageHeading ) =
-          handleReports( $action, \%Data );
+        ( $resultHTML, $report, $pageHeading ) = handleReports( $action, \%Data );
     }
     elsif ( $action =~ /^CL_/ ) {
         my $entityID = getLastEntityID($Data{'clientValues'});
         ( $resultHTML, $pageHeading ) = handleClearances( $action, \%Data, $entityID );
     }
     elsif ( $action =~ /^CLRSET_/ ) {
-        ( $resultHTML, $pageHeading ) =
-          handleClearanceSettings( $action, \%Data );
+        ( $resultHTML, $pageHeading ) = handleClearanceSettings( $action, \%Data );
     }
     elsif ( $action =~ /^DUPL_/ ) {
         ( $resultHTML, $pageHeading ) = handleDuplicates( $action, \%Data );
@@ -187,8 +185,8 @@ warn("REALM IS ". $Data{'Realm'});
         ( $resultHTML, $pageHeading ) = displayAuditLog( \%Data );
     }
     elsif ( $action =~ /^AM/ ) {
-        ( $resultHTML, $pageHeading ) =
-          handleAuthMaintenance( $action, \%Data, $typeID, $ID );
+        my $ID = getID( \%clientValues );
+        ( $resultHTML, $pageHeading ) = handleAuthMaintenance( $action, \%Data, $typeID, $ID );
     }
     elsif ( $action =~ /^CHG/ ) {
         ( $resultHTML, $pageHeading ) = displayChanges( \%Data );
@@ -206,36 +204,22 @@ warn("REALM IS ". $Data{'Realm'});
     elsif ( $action =~ /^VENUE_/ ) {
         ( $resultHTML, $pageHeading ) = handleVenues( $action, \%Data);
     }
-    elsif ( $action =~ /^AGREE_/ ) {
-        ( $resultHTML, $pageHeading ) =
-          handleAgreements( $action, \%Data, $typeID, $ID );
-    }
     elsif ( $action =~ /^CON_/ ) {
-        ( $resultHTML, $pageHeading ) =
-          handleContacts( $action, \%Data, $typeID, $ID );
+        my $ID = getID( \%clientValues );
+        ( $resultHTML, $pageHeading ) = handleContacts( $action, \%Data, $typeID, $ID );
     }
     elsif ( $action =~ /^BANKSPLIT/ ) {
         ( $resultHTML, $pageHeading ) = handleBankSplit( $action, \%Data );
     }
     elsif ( $action =~ /^PSR/ ) {
-        ( $resultHTML, $pageHeading ) =
-          handlePaymentSplitRun( $action, \%Data );
-    }
-    elsif ( $action =~ /^BA_/ ) {
-        ( $resultHTML, $pageHeading ) =
-          handleBankAccount( $action, \%Data, $ID, $typeID );
-    }
-    elsif ( $action =~ /^PY_/ ) {
-        ( $resultHTML, $pageHeading ) =
-          handlePaymentApplication( $action, \%Data, $ID, $typeID );
+        ( $resultHTML, $pageHeading ) = handlePaymentSplitRun( $action, \%Data );
     }
     elsif ( $action =~ /^MEMCARD_/ ) {
-        ( $resultHTML, $pageHeading ) =
-          handleMemberCard( $action, \%Data, $client, $ID, $typeID );
+        my $ID = getID( \%clientValues );
+        ( $resultHTML, $pageHeading ) = handleMemberCard( $action, \%Data, $client, $ID, $typeID );
     }
     elsif ( $action =~ /^RFR_/ ) {
-        ( $resultHTML, $pageHeading ) =
-          handleFormReplication( $action, \%Data );
+        ( $resultHTML, $pageHeading ) = handleFormReplication( $action, \%Data );
     }
     elsif ( $action =~ /^FC_C_/ ) {
         ( $resultHTML, $pageHeading ) = handleFieldConfig( $action, \%Data );
@@ -244,16 +228,15 @@ warn("REALM IS ". $Data{'Realm'});
         ( $resultHTML, $pageHeading ) = handleEntitySettings( $action, \%Data );
     }
     elsif ( $action =~ /^DASHCFG_/ ) {
-        ( $resultHTML, $pageHeading ) =
-          handle_DashboardConfig( $action, \%Data, $ID, $typeID, $client );
+        my $ID = getID( \%clientValues );
+        ( $resultHTML, $pageHeading ) = handle_DashboardConfig( $action, \%Data, $ID, $typeID, $client );
     }
     elsif ( $action =~ /^NOTS/ ) {
-        ( $resultHTML, $pageHeading ) =
-          handleNotifications( $action, \%Data, $client, $typeID, $ID );
+        my $ID = getID( \%clientValues );
+        ( $resultHTML, $pageHeading ) = handleNotifications( $action, \%Data, $client, $typeID, $ID );
     }
     elsif ( $action =~ /^PR_/ ) {
-        ( $resultHTML, $pageHeading ) =
-          handle_products(\%Data, $action);
+        ( $resultHTML, $pageHeading ) = handle_products(\%Data, $action);
     }
     elsif ( $action =~ /^WF_/ ) {
         ( $resultHTML, $pageHeading ) = handleWorkflow($action, \%Data);
