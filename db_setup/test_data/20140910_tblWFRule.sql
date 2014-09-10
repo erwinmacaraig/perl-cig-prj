@@ -1,0 +1,2 @@
+-- ENTITY - ADDING CLUB or VENUE as ENTITY (national level approval)
+INSERT INTO tblWFRule(intRealmID, intSubRealmID, intOriginLevel, strWFRuleFor, strEntityType, intEntityLevel, strRegistrationNature, strPersonType, strPersonLevel, strSport, strAgeLevel, intApprovalEntityLevel, intProblemResolutionEntityLevel, strTaskType, strTaskStatus, tTimeStamp, intDocumentTypeID, strPersonEntityRole, strISOCountry_IN, strISOCountry_NOTIN) VALUES(1, 0, 100, 'ENTITY', '', 3, '', '', '', '', '', 100, 100, 'APPROVAL', 'ACTIVE', now(), 0, '', '', '');
