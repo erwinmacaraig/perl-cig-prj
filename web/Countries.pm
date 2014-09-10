@@ -328,7 +328,9 @@ sub getCountriesArray	{
 sub getISOCountriesHash	{
     my %cnames=();
 	for my $key (keys %countries)	{ 
-		$cnames{$countries{$key}[1]}=$countries{$key}[0]; 
+		if($countries{$key}[1] ne "N/A" ){
+			$cnames{$countries{$key}[1]}=$countries{$key}[0]; 
+		}
 	}
 	return \%cnames;
 }
