@@ -1330,6 +1330,7 @@ sub finaliseClearance	{
             E.intEntityLevel as DestinationEntityLevel
 		FROM tblClearance as C
 			INNER JOIN tblPerson as M ON (M.intPersonID = C.intPersonID)
+            INNER JOIN tblEntity as E ON (E.intEntityID = C.intDestinationEntityID)
 		WHERE intClearanceID = $cID
 	];
 	my $query = $db->prepare($st) or query_error($st);
@@ -1401,8 +1402,8 @@ sub finaliseClearance	{
             AND strPersonType=?
             AND strSport = ?
             AND strAgeLevel = ?
-            AMD strPersonLevel = ?
-            AMD strPersonEntityRole IN ('', ?)
+            AND strPersonLevel = ?
+            AND strPersonEntityRole IN ('', ?)
 			AND intPersonID = $intPersonID
             AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
 	];
@@ -1526,13 +1527,15 @@ sub createClearance	{
                 M.intRealmID = $Data->{'Realm'}
 				AND C.intEntityID <> $entityID 
 				AND PR.strStatus <> 'TRANSFERRED'
-                AND M.strStatus <> 'INPROGRESS'
+                AND M.strStatus NOT IN ('INPROGRESS', 'TRANSFERRED', 'DECEASED', 'DELETED')
                 AND PR.strStatus <> 'INPROGRESS'
-                AND M.intSystemStatus = 'ACTIVE'
+                AND M.intSystemStatus <> $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
+           
 				$strWhere
 			GROUP BY M.intPersonID, C.intEntityID
 			ORDER BY MAX(CLR.dtFinalised) DESC, M.strLocalSurname, M.strLocalFirstname, M.dtDOB
-		]; 
+		];
+print STDERR $st;
 		
 		my $userID=getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'}) || 0;
        
@@ -1575,7 +1578,7 @@ sub createClearance	{
 					<td>$dref->{CLR_DATE} ($dref->{Club_STATUS})</td>
 					<td>$dref->{LastRegistered}</td>
 					<td>$dref->{DOB}</td>
-					<td>$dref->{strNationalNum}</td>
+					<td>$dref->{intPersonID} $dref->{strNationalNum}</td>
 				</tr>
 			];
 		}
@@ -1646,9 +1649,11 @@ sub clearanceForm	{
 	];
 	my $intClearanceYear =$Data->{'SystemConfig'}{'clrClearanceYear'} || 0;
 
+    
+    my $originLevel = $Data->{'clientValues'}{'authLevel'};
     my $clradd=qq[
-        INSERT INTO tblClearance (intPersonID, intDestinationEntityID, intSourceEntityID, intRealmID, --FIELDS--, dtApplied, intClearanceStatus, intRecStatus, intClearanceYear )
-            VALUES ($personID, $destinationEntityID, $sourceEntityID, $realm, --VAL--,  SYSDATE(), $Defs::CLR_STATUS_PENDING, $Defs::RECSTATUS_ACTIVE,  $intClearanceYear)
+        INSERT INTO tblClearance (intPersonID, intDestinationEntityID, intSourceEntityID, intRealmID, --FIELDS--, dtApplied, intClearanceStatus, intRecStatus, intClearanceYear, strPersonType, intOriginLevel )
+            VALUES ($personID, $destinationEntityID, $sourceEntityID, $realm, --VAL--,  SYSDATE(), $Defs::CLR_STATUS_PENDING, $Defs::RECSTATUS_ACTIVE,  $intClearanceYear, 'PLAYER', $originLevel)
     ];
 
     my ($DefCodes, $DefCodesOrder) = getDefCodes(
@@ -1736,8 +1741,29 @@ sub clearanceForm	{
                     firstoption => ['','Select Priority'],
 					readonly => $intClearancePriority,
                 },
+                strPersonLevel=> {
+                    label => $lang->txt('Person level'),
+                    value => $dref->{'strPersonLevel'},
+                    type  => 'lookup',
+                    options => \%Defs::personLevel,
+                    firstoption => ['','Select Level'],
+                },
+                strAgeLevel=> {
+                    label => $lang->txt('Age level'),
+                    value => $dref->{'strAgeLevel'},
+                    type  => 'lookup',
+                    options => \%Defs::ageLevel,
+                    firstoption => ['','Select Age'],
+                },
+                strSport=> {
+                    label => $lang->txt('Sport'),
+                    value => $dref->{'strSport'},
+                    type  => 'lookup',
+                    options => \%Defs::sportType,
+                    firstoption => ['','Select Sport'],
+                },
 			},
-			order => [qw(MemberName NatNum DOB strState SourceEntity intReasonForClearanceID strReasonForClearance )],
+			order => [qw(MemberName NatNum DOB strState SourceEntity intReasonForClearanceID strReasonForClearance strPersonLevel strAgeLevel strSport)],
 			options => {
 				labelsuffix => ':',
 				hideblank => 1,
@@ -1994,10 +2020,10 @@ warn("SOURCE$sourceEntityID DES:$destinationEntityID");
 		WHERE 
             intChildID IN ($sourceEntityID, $destinationEntityID)
             AND intParentLevel > $Defs::LEVEL_CLUB
-            AND intPrimary=1
         ORDER BY intParentLevel ASC
 	];
             #AND intChildLevel = 3
+print STDERR $st;
     my $query = $db->prepare($st) or query_error($st);
     $query->execute or query_error($st);
 

@@ -42,7 +42,8 @@ sub listPersons {
     #check if the entity viewing the list > LEVEL_NATIONAL
     my $unlockInactiveLevel = $Data->{'SystemConfig'}{'unlockListPeople_level'} || $Defs::LEVEL_NATIONAL;
     my $entityChecks = Entity::loadEntityDetails($db, $entityID); 
-    if($entityChecks->{'intEntityLevel'} < $unlockInactiveLevel){    	
+    #if($entityChecks->{'intEntityLevel'} < $unlockInactiveLevel){    	
+    if($Data->{'clientValues'}{'authLevel'} < $unlockInactiveLevel){    	
     	if($entityChecks->{'strStatus'} ne 'ACTIVE'){ 
     		$resultHTML =qq[
     		<div class="warningmsg">]. $lang->txt('Entity Not Allowed To View List') .q[</div>
