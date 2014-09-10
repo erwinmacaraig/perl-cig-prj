@@ -683,7 +683,7 @@ sub person_details {
         $countriesonly{$c} = $c;
     }
     my $countries = getCountriesHash($Data);
-
+    my $isocountries = getISOCountriesHash();
     my ($DefCodes, $DefCodesOrder) = getDefCodes(
         dbh        => $Data->{'db'}, 
         realmID    => $Data->{'Realm'},
@@ -785,8 +785,6 @@ sub person_details {
                 sectionname => 'details',
                 first_page  => 1,
             },
-
-
             strLatinFirstname => {
                 label       => $FieldLabels->{'strLatinFirstname'},
                 value       => $field->{strLatinFirstname},
@@ -813,8 +811,6 @@ sub person_details {
                 sectionname => 'details',
                 first_page  => 1,
             },
-
-
             strMaidenName => {
                 label       => $FieldLabels->{'strMaidenName'},
                 value       => $field->{strMaidenName},
@@ -1285,7 +1281,22 @@ sub person_details {
                 sectionname => 'details',
                 format_txt  => 'kg',
             },
-
+            strISOCountry => {
+                label       => $FieldLabels->{'strISOCountry'},
+                value       => $field->{strISOCountry},
+                type        => 'lookup',
+                options     => $isocountries,
+                sectionname => 'details',
+                firstoption => [ '', 'Select Country' ],
+            },
+            strISONationality => {
+                label       => $FieldLabels->{'strISONationality'},
+                value       => $field->{strISONationality},
+                type        => 'lookup',
+                options     => $isocountries,
+                sectionname => 'details',
+                firstoption => [ '', 'Select Country' ],
+            },
             dtLastUpdate => {
                 label       => 'Last Updated',
                 value       => $field->{tTimeStamp},
@@ -1333,7 +1344,7 @@ sub person_details {
 
         },
         order => [
-        qw(strNationalNum strPersonNo strSalutation strStatus strLocalFirstname strPreferredName strMiddlename strLocalSurname strLatinFirstname strLatinSurname strMaidenName dtDOB dtDeath strPlaceofBirth strCountryOfBirth strMotherCountry strFatherCountry intGender strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased intDeRegister strPreferredLang strPassportIssueCountry strPassportNationality strPassportNo dtPassportExpiry dtPoliceCheck dtPoliceCheckExp strPoliceCheckRef strEmergContName strEmergContNo strEmergContNo2 strEmergContRel strP1Salutation strP1FName strP1SName intP1Gender strP1Phone strP1Phone2 strP1PhoneMobile strP1Email strP1Email2 strP2Salutation strP2FName strP2SName intP2Gender strP2Phone strP2Phone2 strP2PhoneMobile strP2Email strP2Email2 strEyeColour strHairColour strHeight strWeight dtSuspendedUntil
+        qw(strNationalNum strPersonNo strSalutation strStatus strLocalFirstname strPreferredName strMiddlename strLocalSurname strLatinFirstname strLatinSurname strMaidenName strISONationality strISOCountry dtDOB dtDeath strPlaceofBirth strCountryOfBirth strMotherCountry strFatherCountry intGender strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased intDeRegister strPreferredLang strPassportIssueCountry strPassportNationality strPassportNo dtPassportExpiry dtPoliceCheck dtPoliceCheckExp strPoliceCheckRef strEmergContName strEmergContNo strEmergContNo2 strEmergContRel strP1Salutation strP1FName strP1SName intP1Gender strP1Phone strP1Phone2 strP1PhoneMobile strP1Email strP1Email2 strP2Salutation strP2FName strP2SName intP2Gender strP2Phone strP2Phone2 strP2PhoneMobile strP2Email strP2Email2 strEyeColour strHairColour strHeight strWeight dtSuspendedUntil
         ),
 
         map("strNatCustomStr$_", (1..15)),
@@ -1415,7 +1426,6 @@ sub person_details {
         },
     );
 
-
     ######################################################
     # generate custom fileds definitions
     ######################################################
@@ -1481,6 +1491,7 @@ sub person_details {
     # map("intNatCustomBool$_", (1..5)),
     for my $i (1..5) {
         my $fieldname = "intNatCustomBool$i";
+        
         $FieldDefinitions{'fields'}{$fieldname} = {
             label => $CustomFieldNames->{$fieldname}[0] || '',
             value => $field->{$fieldname},
@@ -1490,10 +1501,8 @@ sub person_details {
             readonly      => ( $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL and $Data->{'SystemConfig'}{"NationalOnly_$fieldname"} ? 1 : 0 ),
         };
     }
-
     my $resultHTML = '';
     my $fieldperms = $Data->{'Permissions'};
-
     my $memperm = ProcessPermissions($fieldperms, \%FieldDefinitions, 'Person',);
 
     if($Data->{'SystemConfig'}{'AllowDeRegister'}) {
@@ -1510,6 +1519,7 @@ sub person_details {
     my $processed = 0;
     my $header ='';
     my $tabs = '';
+    my $fd = \%FieldDefinitions;
     ( $resultHTML, $processed, $header, $tabs ) = handleHTMLForm( \%FieldDefinitions, $memperm, $option, '', $Data->{'db'}, \%configchanges );
 
     if ($option ne 'display') {

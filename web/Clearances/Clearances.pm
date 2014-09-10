@@ -137,7 +137,7 @@ sub handleClearances	{
     my $entityChecks = Entity::loadEntityDetails($db, $entityID); 
     if( $entityChecks->{'strStatus'} ne 'ACTIVE' && $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL){ 
     		my $resultHTML =qq[
-    		<div class="warningmsg">]. $lang->txt('Entity Not Allowed To View Transfer Details') .q[</div>
+    		<div class="warningmsg">]. $lang->txt($entityChecks->{'strStatus'} . $entityID .'Entity Not Allowed To View Transfer Details') .q[</div>
     		];
     		my $title = $lang->txt('Error');
             return ($resultHTML,$title);
@@ -2195,7 +2195,7 @@ sub clearanceAddManual	{
                 },
 			
 			},
-			order => [qw(dtApplied MemberName DOB strState strSourceEntityName strDestinationEntityName intReasonForClearanceID strReasonForClearance intClearAction)],
+			order => [qw(dtApplied MemberName DOB strState strSourceEntityName strDestinationEntityName intReasonForClearanceID strReasonForClearance )],
 			options => {
 				labelsuffix => ':',
 				hideblank => 1,

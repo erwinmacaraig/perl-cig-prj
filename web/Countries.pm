@@ -6,8 +6,8 @@ package Countries;
 use Data::Dumper;
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(getCountriesHash getCountriesArray getOceaniaCountriesHash getOceaniaCountriesArray);
-@EXPORT_OK = qw(getCountriesHash getCountriesArray getCountriesNameToData getOceaniaCountriesHash getOceaniaCountriesArray);
+@EXPORT = qw(getISOCountriesHash getCountriesHash getCountriesArray getOceaniaCountriesHash getOceaniaCountriesArray);
+@EXPORT_OK = qw(getISOCountriesHash getCountriesHash getCountriesArray getCountriesNameToData getOceaniaCountriesHash getOceaniaCountriesArray);
 
     my $noCountryDisclosedID = 300;
 	my %countries	=	(
@@ -323,6 +323,14 @@ sub getCountriesArray	{
 		push @countries, $countries{$key}[0] unless(!$force_select_country and $key == $noCountryDisclosedID );
 	}
 	return @countries;
+}
+
+sub getISOCountriesHash	{
+    my %cnames=();
+	for my $key (keys %countries)	{ 
+		$cnames{$countries{$key}[1]}=$countries{$key}[0]; 
+	}
+	return \%cnames;
 }
 
 sub getOceaniaCountriesHash {
