@@ -533,7 +533,7 @@ sub addWorkFlowTasks {
 			e.intRealmID = r.intRealmID
 			AND e.intSubRealmID = r.intSubRealmID
             AND r.strPersonType = ''
-			AND e.intEntityLevel = e.intEntityLevel
+			AND r.intEntityLevel = e.intEntityLevel
             AND e.strEntityType = r.strEntityType
         )
 		WHERE e.intEntityID= ?

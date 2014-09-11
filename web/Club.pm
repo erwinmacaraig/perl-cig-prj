@@ -29,6 +29,7 @@ use RuleMatrix;
 use InstanceOf;
 use EntityDocuments;
 use EntityIdentifier;
+use Data::Dumper;
 
 sub handleClub  {
   my ($action, $Data, $parentID, $clubID, $typeID)=@_;
@@ -80,14 +81,16 @@ print STDERR "SSSS$action $clubID\n";
   my $field=loadClubDetails($Data->{'db'}, $clubID,$Data->{'clientValues'}{'assocID'}) || ();
   my $client=setClient($Data->{'clientValues'}) || '';
   
-    my $allowedit =( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
+  #my $allowedit =( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
+  my $allowedit =($field->{strStatus} eq 'ACTIVE' ? 1 : 0);
+  my $allowadd = $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ZONE ? 1 : 0;
+
     $Data->{'ReadOnlyLogin'} ? $allowedit = 0 : undef;
-    
     
     my $option='display';       
    
    $option='edit' if $action eq 'C_DTE' and allowedAction($Data, 'c_e') && $allowedit;
-   $option='add' if $action eq 'C_DTA' and allowedAction($Data, 'c_a')  && $allowedit;
+   $option='add' if $action eq 'C_DTA' and allowedAction($Data, 'c_a')  && $allowadd;
    $clubID=0 if $option eq 'add';
   
   my $club_chars = getClubCharacteristicsBlock($Data, $clubID) || '';

@@ -20,7 +20,8 @@ sub handleEntity  {
   my $resultHTML='';
   my $entityName=
   my $title='';
-  return ('','') if $entityLevel < $Defs::LEVEL_ZONE;
+  #return ('','') if $entityLevel < $Defs::LEVEL_ZONE;
+  return ('','') if $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_ZONE;
 
   if ($action =~/^E_DT/) {
     #Entity Details

@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS tblPerson;
 CREATE TABLE tblPerson (
     intPersonID int(11) NOT NULL AUTO_INCREMENT,
     intRealmID int(11) NOT NULL DEFAULT 0,
-    strExtKey varchar(20) NOT NULL DEFAULT '''',
+    strExtKey varchar(20) NOT NULL DEFAULT '',
     strPersonNo varchar(15) NOT NULL DEFAULT '',
     strNationalNum varchar(30) DEFAULT '',
     strFIFAID varchar(30) default '',
