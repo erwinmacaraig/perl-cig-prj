@@ -90,7 +90,7 @@ sub list_docs {
 		my $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$doc->{'ID'}";
     $options.=qq[
       <tr $c>
-        <td><a href="$doc->{'URL'}" target="_doc">$displayTitle MemberID = $memberID</a></td>
+        <td><a href="$doc->{'URL'}" target="_doc">$displayTitle</a></td>
         <td>$doc->{'Size'}Mb</td>
         <td>$doc->{'Ext'}</td>
         <td>$doc->{'DateAdded'}</td>

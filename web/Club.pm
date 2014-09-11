@@ -407,7 +407,6 @@ sub loadClubDetails {
      intRealmID,
      strEntityType,
      strStatus,
-     intRealmApproved,
      intCreatedByEntityID,
      strFIFAID,
      strLocalName,
