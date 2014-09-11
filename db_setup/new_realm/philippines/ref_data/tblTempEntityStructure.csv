@@ -1,0 +1,4 @@
+"intRealmID","intParentID","intParentLevel","intChildID","intChildLevel","intDirect","intDataAccess","intPrimary"
+"1","PH","100","SD1","20","1","5","1"
+"1","PH","100","SC1","3","0","5","0"
+"1","SD1","20","SC1","3","1","10","1"
