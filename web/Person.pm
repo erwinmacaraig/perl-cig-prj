@@ -864,11 +864,11 @@ sub person_details {
                 maxsize     => '45',
                 sectionname => 'other',
             },
-            strISOCountryOfBirth => {
+             strISOCountryOfBirth => {
                 label       => $FieldLabels->{'strISOCountryOfBirth'},
                 value       => $field->{strISOCountryOfBirth},
                 type        => 'lookup',
-                options     => \%countriesonly,
+                options     => $isocountries,
                 sectionname => 'other',
                 firstoption => [ '', 'Select Country' ],
             },
@@ -1273,14 +1273,13 @@ sub person_details {
                 sectionname => 'details',
                 format_txt  => 'kg',
             },
-            strISOCountry => {
+           strISOCountry => {
                 label       => $FieldLabels->{'strISOCountry'},
                 value       => $field->{strISOCountry},
                 type        => 'lookup',
                 options     => $isocountries,
                 sectionname => 'contact',
                 firstoption => [ '', 'Select Country' ],
-                compulsory => 1,
             },
             strISONationality => {
                 label       => $FieldLabels->{'strISONationality'},
@@ -1338,7 +1337,7 @@ sub person_details {
 
         },
         order => [
-        qw(strNationalNum strPersonNo strStatus strLocalFirstname strLocalSurname strISONationality strISOCountry dtDOB intGender strLatinFirstname strLatinSurname strPreferredName strPlaceofBirth strCountryOfBirth strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased strPreferredLang strEmergContName strEmergContNo strEmergContNo2 strP1FName strP1SName strP1Phone strP1PhoneMobile strP1Email strP2FName strP2SName strP2Phone strP2PhoneMobile strP2Email dtSuspendedUntil),
+        qw(strNationalNum strPersonNo strStatus strLocalFirstname strLocalSurname strISONationality strISOCountry dtDOB intGender strLatinFirstname strLatinSurname strPreferredName strPlaceofBirth strISOCountryOfBirth strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased strPreferredLang strEmergContName strEmergContNo strEmergContNo2 strP1FName strP1SName strP1Phone strP1PhoneMobile strP1Email strP2FName strP2SName strP2Phone strP2PhoneMobile strP2Email dtSuspendedUntil),
 
         map("strNatCustomStr$_", (1..15)),
         map("dblNatCustomDbl$_", (1..10)),

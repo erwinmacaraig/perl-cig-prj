@@ -95,6 +95,7 @@ sub getFieldLabels	{
 			strPreferredLang => 'Preferred Language',
 			strISONationality => 'Nationality',
 			strISOCountry => 'Country (ISO)',
+			strISOCountryOfBirth => 'Country of Birth (ISO)',
        
 		);
 	}
