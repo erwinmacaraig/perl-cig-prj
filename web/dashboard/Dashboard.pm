@@ -120,8 +120,9 @@ sub getDefaultItems	{
 		#['graph', 'txns_historical'],
 		['graph', 'txnval_historical'],
 	);
-	if($entityTypeID == $Defs::LEVEL_ASSOC)	{
-	}
+
+    #if($entityTypeID == $Defs::LEVEL_ASSOC)	{
+    #}
 	
 	return \@defaultitems;
 }
