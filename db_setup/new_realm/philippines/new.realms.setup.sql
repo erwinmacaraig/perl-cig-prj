@@ -36,7 +36,7 @@ WHERE 	intRealmID = @intRealmID
 	AND strLocalShortName = @strLocalShortName;
 
 /** Load Child Entity Files **/
-LOAD DATA INFILE '/home/fcascante/src/FIFASPOnline/db_setup/new_realm/philippines/ref_data/tblEntity.csv'
+LOAD DATA INFILE '/home/bruce/Development/FIFASPOnline/db_setup/new_realm/philippines/ref_data/tblEntity.csv'
 INTO TABLE tblEntity
 FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
@@ -59,7 +59,7 @@ IGNORE 1 ROWS
 SET intRealmID = @intRealmID;
 
 /** Load Hierarchy Files **/
-LOAD DATA INFILE '/home/fcascante/src/FIFASPOnline/db_setup/new_realm/philippines/ref_data/tblTempEntityStructure.csv'
+LOAD DATA INFILE '/home/bruce/Development/FIFASPOnline/db_setup/new_realm/philippines/ref_data/tblTempEntityStructure.csv'
 INTO TABLE tblTempEntityStructure
 FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
@@ -88,7 +88,7 @@ SET intRealmID = @intRealmID,
 ;
 
 /** Load User Acces Files **/
-LOAD DATA INFILE '/home/fcascante/src/FIFASPOnline/db_setup/new_realm/philippines/ref_data/tblUserAuth.csv'
+LOAD DATA INFILE '/home/bruce/Development/FIFASPOnline/db_setup/new_realm/philippines/ref_data/tblUserAuth.csv'
 INTO TABLE tblUserAuth
 FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
