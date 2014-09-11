@@ -137,7 +137,7 @@ sub handleClearances	{
     my $entityChecks = Entity::loadEntityDetails($db, $entityID); 
     if( $entityChecks->{'strStatus'} ne 'ACTIVE' && $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL){ 
     		my $resultHTML =qq[
-    		<div class="warningmsg">]. $lang->txt($entityChecks->{'strStatus'} . $entityID .'Entity Not Allowed To View Transfer Details') .q[</div>
+    		<div class="warningmsg">]. $lang->txt('Entity Not Allowed To View Transfer Details') .q[</div>
     		];
     		my $title = $lang->txt('Error');
             return ($resultHTML,$title);
@@ -1455,7 +1455,7 @@ sub createClearance	{
 		$body .=qq[Club not found];
 		return $body;
 	}
-
+    ### This is the form
 	if	(! $personID and ! $params{'member_surname'} and ! $params{'member_dob'} and ! $params{'member_natnum'} and ! $params{'member_loggedsurname'} and ! $params{'member_systemsurname'} and ! $params{'member_systemdob'})	{
 		$body .= qq[
 			<form action="$Data->{'target'}" method="POST">
@@ -1470,6 +1470,8 @@ sub createClearance	{
 			</form>
 		];
 	}
+	#### end of Form 
+	
 	elsif	(! $personID and ($params{'member_surname'} or $params{'member_dob'} or $params{'member_natnum'} or $params{'member_loggedsurname'} or ($params{'member_systemsurname'} and $params{'member_systemdob'})))	{
 		my $strWhere = '';
 		my %tParams = %params;
@@ -1536,7 +1538,7 @@ sub createClearance	{
 print STDERR $st;
 		
 		my $userID=getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'}) || 0;
-
+       
 		my $query = $db->prepare($st) or query_error($st);
 	    $query->execute or query_error($st);
 
@@ -1583,15 +1585,18 @@ print STDERR $st;
 		$body .= qq[</table>];
 	}
 	else	{
-		my ($title, $cbody) = clearanceForm($Data, \%params,0,0,'add');
-		$body .= $title . $cbody;
+		my ($title, $cbody) = clearanceForm($Data, \%params,0,0,'add'); 
+		# need to get last insert ID
+		
+		$body .= $title .  $cbody;
 	}
 	return $body;
 }
 
 sub clearanceForm	{
 
-### PURPOSE: This function is called once the createClearance() function is ready to pass control to ask the destination club (who requested the clearance) the final clearance questions and then to write to DB.
+### PURPOSE: This function is called once the createClearance() function is ready to pass control to ask the destination club (who requested the clearance)
+### the final clearance questions and then to write to DB.
 
 ### It has a postClearanceAdd() (afteraddfunction), which will create the clearance path.
 
@@ -1772,7 +1777,7 @@ sub clearanceForm	{
 				beforeaddFunction => \&preClearanceAdd,
                 beforeaddParams => [$Data,$client, $personID, getID($Data->{'clientValues'})],
 				afteraddFunction => \&postClearanceAdd,
-				afteraddParams=> [$option,$Data,$Data->{'db'}],
+				afteraddParams=> [$option,$Data,$Data->{'db'},$personID],
 				auditFunction=> \&auditLog,
         auditAddParams => [
           $Data,
@@ -1789,13 +1794,13 @@ sub clearanceForm	{
 					<div class="OKmsg">] . $lang->txt('Record updated successfully') . qq[</div> <br>
 					<a href="$Data->{'target'}?client=$client&amp;a=CL_list">] . $lang->txt('Return to Transfer') . qq[</a>],
 				addOKtext => qq[
-					<div class="OKmsg">] . $lang->txt('Record updated successfully') . qq[</div> <br>
+					<div class="OKmsg">] . $lang->txt('Record added successfully') . qq[</div> <br>
 					<a href="$Data->{'target'}?client=$client&amp;a=CL_list">] . $lang->txt('Return to Transfer') . qq[</a>],
 			},
 			sections => [ ['main',$lang->txt('Details')], ],
 			carryfields =>  {
 				client => $client,
-				a=> 'CL_createnew',
+				a=> "CL_createnew",
 				clrID => $id,
 				sourceEntityID => $sourceEntityID,
 				destinationEntityID => $destinationEntityID,
@@ -1895,7 +1900,7 @@ sub postClearanceAdd	{
 
 ### PURPOSE: This function build's up the starting points between the two clubs then calls getMeetingPoint() to do the grunt work in finding the top node
 
-	my($id,$params,$action,$Data,$db)=@_;
+	my($id,$params,$action,$Data,$db,$personID)=@_;
   	return undef if !$db or ! $id;
 	my $resultHTML = '';
 
@@ -1979,13 +1984,23 @@ sub postClearanceAdd	{
 
     		if ($intClearanceStatus == $Defs::CLR_STATUS_APPROVED)  {
         		finaliseClearance($Data, $id);
-			$resultHTML = memberLink($Data, $id);
+			    $resultHTML = memberLink($Data, $id);
+			
     		}
 		
 		}
 	
+	#$resultHTML .= qq[<!-- clearanceID = $id -->];
+	
+	#$resultHTML = qq[
+	#   <form name="emacform" method="post"> 
+	#   Enter anything <input type="text" value="$id" /><br />
+	#   </form>
+	#];
 	sendCLREmail($Data, $id, 'ADDED');
+	$resultHTML = transferDocsForm($Data,$id,$personID);
 	return (0, $resultHTML);
+	
 }
 
 sub getMeetingPoint	{
@@ -2195,7 +2210,7 @@ sub clearanceAddManual	{
                 },
 			
 			},
-			order => [qw(dtApplied MemberName DOB strState strSourceEntityName strDestinationEntityName intReasonForClearanceID strReasonForClearance )],
+			order => [qw(dtApplied MemberName DOB strState strSourceEntityName strDestinationEntityName intReasonForClearanceID strReasonForClearance intClearAction)],
 			options => {
 				labelsuffix => ':',
 				hideblank => 1,
@@ -2506,4 +2521,33 @@ sub postManualClrAction	{
 
 }
 
+
+sub transferDocsForm {
+	my ($Data, $intClearanceID, $personID) = @_;  
+	my $client = setClient($Data->{'clientValues'}) || ''; 
+	
+	my $transferdocsfrm = qq[
+	    <div>
+	    <h3> Add Transfer Documents </h3>
+	     <form action="UploadTransferDocs.cgi" class="dropzone" id="transferdocs">
+	     <input type="hidden" name="ClearanceID" value="$intClearanceID" />
+	     <input type="hidden" name="Filetype" value="$Defs::UPLOADFILETYPE_DOC" />
+	     <input type="hidden" name="EntityTypeID" value="$Defs::LEVEL_PERSON" />
+	     <input type="hidden" name="EntityID" value="$personID" />
+	     <input type="hidden" name="AddedByTypeID" value="$Data->{'clientValues'}{'authLevel'}" /> 
+	     <input type="hidden" name="AddedBy" value="$Data->{'clientValues'}{'_intID'}" />
+	      
+	     </form>
+	     <script>
+              Dropzone.options.transferdocs = { 
+                  maxFilesize: 2, // MB 
+	              maxFiles: 10
+              };
+         </script>
+         <br /> 
+         <a href="$Data->{'target'}?client=$client&amp;a=CL_list">]. $Data->{'lang'}->txt('Return to Transfer') .qq[</a> 
+	    </div>
+	]; 
+	return $transferdocsfrm;
+}
 1;
