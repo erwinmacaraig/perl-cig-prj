@@ -530,6 +530,7 @@ sub getRegistrationData	{
             np.strNationalPeriodName,
             p.dtDOB,
             DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
+            TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             p.intGender,
             p.intGender as Gender,
             DATE_FORMAT(pr.dtFrom, "%Y%m%d") as dtFrom_,

@@ -515,7 +515,6 @@ sub loadVenueDetails {
       intRealmID,
       strEntityType,
       strStatus,
-      intRealmApproved,
       intCreatedByEntityID,
       strFIFAID,
       strLocalName,
