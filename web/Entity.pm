@@ -268,7 +268,6 @@ sub loadEntityDetails {
      intRealmID,
      strEntityType,
      strStatus,
-     intRealmApproved,
      intCreatedByEntityID,
      strFIFAID,
      strLocalName,
