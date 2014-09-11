@@ -46,7 +46,7 @@ sub venue_details   {
     my $field=loadVenueDetails($Data->{'db'}, $venueID) || ();
     
     #my $allowedit =( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
-    my $allowedit =( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ZONE ? 1 : 0 ) );
+    my $allowedit =( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB ? 1 : 0 ) );
     $Data->{'ReadOnlyLogin'} ? $allowedit = 0 : undef;
    
     $option='edit' if $action eq 'VENUE_DTE' && $allowedit;
