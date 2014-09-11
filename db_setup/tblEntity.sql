@@ -17,6 +17,7 @@ CREATE TABLE tblEntity (
     strLatinName    varchar(100) default '',
     strLatinShortName varchar(100) default '',
     strLatinFacilityName varchar(150) DEFAULT '',
+    strISOLocalLanguage VARCHAR(20) DEFAULT '',
 
     dtFrom date,
     dtTo date,

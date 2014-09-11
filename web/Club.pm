@@ -31,12 +31,14 @@ use EntityDocuments;
 use EntityIdentifier;
 
 sub handleClub  {
-  my ($action, $Data, $clubID, $typeID)=@_;
+  my ($action, $Data, $parentID, $clubID, $typeID)=@_;
 
   my $resultHTML='';
   my $clubName=
   my $title='';
   $typeID=$Defs::LEVEL_CLUB if $typeID==$Defs::LEVEL_NONE;
+    print STDERR "AAAA" . $Data->{'clientValues'}{'clubID'};
+print STDERR "CCCCCC:$clubID $parentID";
   if ($action =~/^C_DT/) {
     #Club Details
       ($resultHTML,$title)=club_details($action, $Data, $clubID);
@@ -45,7 +47,7 @@ sub handleClub  {
     #Club Configuration
   }
   elsif ($action =~/^C_L/) {
-        ($resultHTML,$title)=listClubs($Data, $clubID);
+        ($resultHTML,$title)=listClubs($Data, $parentID);
   }
   elsif ($action=~/^C_HOME/) {
       ($resultHTML,$title)=showClubHome($Data,$clubID);
@@ -71,7 +73,7 @@ sub club_details  {
   my ($action, $Data, $clubID)=@_;
 
   
-  
+print STDERR "SSSS$action $clubID\n";  
   
   
  

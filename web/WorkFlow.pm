@@ -1031,6 +1031,61 @@ sub updateTaskNotes {
 
 }
     
+sub setPersonRegoStatus  {
+
+    my ($Data, $taskID, $status) = @_;
+    my $prevStatus = ($status eq $Defs::WF_TASK_STATUS_PENDING) ? $Defs::WF_TASK_STATUS_REJECTED : $Defs::WF_TASK_STATUS_PENDING;
+
+    my $st;
+    my $q;
+
+    $st = qq[
+        UPDATE tblPersonRegistration_$Data->{'Realm'} as PR
+            INNER JOIN tblWFTask as T ON (
+                PR.intPersonRegistrationID = T.intPersonRegistrationID
+                AND PR.intPersonID = T.intPersonID
+            )
+        SET strStatus='$status'
+        WHERE 
+            intWFTaskID = ?
+            AND PR.strStatus IN ('$prevStatus')
+            AND T.strWFRuleFor = 'REGO'
+    ];
+  	$q = $Data->{'db'}->prepare($st);
+  	$q->execute(
+  		$taskID,
+    );
+}
+
+sub setEntityStatus  {
+
+    my ($Data, $taskID, $status) = @_;
+    my $prevStatus = ($status eq $Defs::WF_TASK_STATUS_PENDING) ? $Defs::WF_TASK_STATUS_REJECTED : $Defs::WF_TASK_STATUS_PENDING;
+
+    my $st;
+    my $q;
+
+    $st = qq[
+        UPDATE tblEntity as EN
+            INNER JOIN tblWFTask as T ON (
+                EN.intEntityID = T.intEntityID
+            )
+        SET strStatus='$status'
+        WHERE 
+            intWFTaskID = ?
+            AND EN.strStatus IN ('$prevStatus')
+            AND T.strWFRuleFor = 'ENTITY'
+            AND EN.intRealmID = ?
+    ];
+  	$q = $Data->{'db'}->prepare($st);
+  	$q->execute(
+  		$taskID,
+        $Data->{'Realm'},
+    );
+}
+
+
+
 sub addTaskNotes    {
 
     my( $Data) = @_;
@@ -1079,7 +1134,21 @@ sub resolveTask {
 
 	#Get values from the QS
     my $WFTaskID = safe_param('TID','number') || '';
+
+    #FC-144 get current task based on taskid param
+    my $task = getTask($Data, $WFTaskID);
 	
+    return if (!$task or ($task eq undef));
+
+    if($task->{strWFRuleFor} eq 'ENTITY') {
+        setEntityStatus($Data, $WFTaskID, $Defs::WF_TASK_STATUS_REJECTED);
+    }
+
+    if($task->{strWFRuleFor} eq 'REGO') {
+        setPersonRegoStatus($Data, $WFTaskID, $Defs::WF_TASK_STATUS_REJECTED);
+    }
+
+
 	#Update this task to REJECTED
 	$st = qq[
 	  	UPDATE tblWFTask 
@@ -1090,7 +1159,15 @@ sub resolveTask {
             AND intProblemResolutionEntityID = ?
             AND intRealmID = ?
     ];
-		
+
+    if($task->{strWFRuleFor} eq 'ENTITY') {
+        setEntityStatus($Data, $WFTaskID, $Defs::WF_TASK_STATUS_PENDING);
+    }
+
+    if($task->{strWFRuleFor} eq 'REGO') {
+        setPersonRegoStatus($Data, $WFTaskID, $Defs::WF_TASK_STATUS_PENDING);
+    }
+
   	$q = $db->prepare($st);
   	$q->execute(
   		$WFTaskID,
@@ -1102,23 +1179,6 @@ sub resolveTask {
 	}
     setDocumentStatus($Data, $WFTaskID, 'PENDING');
 
-    $st = qq[
-        UPDATE tblPersonRegistration_$Data->{'Realm'} as PR
-            INNER JOIN tblWFTask as T ON (
-                PR.intPersonRegistrationID = T.intPersonRegistrationID
-                AND PR.intPersonID = T.intPersonID
-            )
-        SET strStatus='PENDING'
-        WHERE 
-            intWFTaskID = ?
-            AND PR.strStatus IN ('REJECTED')
-            AND T.strWFRuleFor = 'REGO'
-    ];
-  	$q = $db->prepare($st);
-  	$q->execute(
-  		$WFTaskID,
-    );
-	
     return(0);
     
 }
@@ -1134,9 +1194,22 @@ sub rejectTask {
 
 	#Get values from the QS
     my $WFTaskID = safe_param('TID','number') || '';
+
+    #FC-144 get current task based on taskid param
+    my $task = getTask($Data, $WFTaskID);
 	
+    return if (!$task or ($task eq undef));
+
+    if($task->{strWFRuleFor} eq 'ENTITY') {
+        setEntityStatus($Data, $WFTaskID, $Defs::WF_TASK_STATUS_REJECTED);
+    }
+
+    if($task->{strWFRuleFor} eq 'REGO') {
+        setPersonRegoStatus($Data, $WFTaskID, $Defs::WF_TASK_STATUS_REJECTED);
+    }
+
 	#Update this task to REJECTED
-	$st = qq[
+    $st = qq[
 	  	UPDATE tblWFTask 
         SET 
 	  		strTaskStatus = 'REJECTED',
@@ -1146,37 +1219,51 @@ sub rejectTask {
             intWFTaskID = ? 
             AND intRealmID= ?
     ];
-		
-  	$q = $db->prepare($st);
+
+    $q = $db->prepare($st);
   	$q->execute(
 	  	$Data->{'clientValues'}{'userID'},
   		$WFTaskID,
         $Data->{'Realm'}
   	);
+
     setDocumentStatus($Data, $WFTaskID, 'REJECTED');
-  		
-	if ($q->errstr) {
+
+    if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
 	}
 
-    $st = qq[
-        UPDATE tblPersonRegistration_$Data->{'Realm'} as PR
-            INNER JOIN tblWFTask as T ON (
-                PR.intPersonRegistrationID = T.intPersonRegistrationID
-                AND PR.intPersonID = T.intPersonID
-            )
-        SET strStatus='REJECTED'
-        WHERE 
-            intWFTaskID = ?
-            AND PR.strStatus IN ('PENDING')
-            AND T.strWFRuleFor = 'REGO'
-    ];
-  	$q = $db->prepare($st);
-  	$q->execute(
-  		$WFTaskID,
-    );
-	
     return(0);
     
+}
+
+sub getTask {
+    my ($Data, $WFTaskID) = @_;
+
+    my $st = '';
+    my $q = '';
+	$st = qq[
+	  	SELECT
+            intWFTaskID,
+            intWFRuleID,
+            intRealmID,
+            intApprovalEntityID,
+            strWFRuleFor,
+            strTaskStatus
+        FROM
+            tblWFTask 
+	  	WHERE 
+            intWFTaskID = ? 
+            AND intRealmID = ?
+    ];
+
+    $q = $Data->{'db'}->prepare($st);
+    $q->execute(
+        $WFTaskID,
+        $Data->{'Realm'},
+    );
+
+    my $result = $q->fetchrow_hashref();
+    return $result || undef;
 }
 1;

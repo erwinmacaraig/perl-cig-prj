@@ -862,7 +862,7 @@ sub person_details {
                 type        => 'text',
                 size        => '30',
                 maxsize     => '45',
-                sectionname => 'details',
+                sectionname => 'other',
             },
             strISOCountryOfBirth => {
                 label       => $FieldLabels->{'strISOCountryOfBirth'},
@@ -930,14 +930,6 @@ sub person_details {
                 size        => '50',
                 maxsize     => '100',
                 sectionname => 'contact',
-            },
-            strISOCountry => {
-                label       => $FieldLabels->{'strISOCountry'},
-                value       => $field->{strISOCountry}, 
-                type        => 'lookup',
-                options     => \%countriesonly,
-                sectionname => 'contact',
-                firstoption => [ '', 'Select Country' ],
             },
             strPostalCode => {
                 label       => $FieldLabels->{'strPostalCode'},
@@ -1011,7 +1003,7 @@ sub person_details {
                 type        => 'text',
                 size        => '20',
                 maxsize     => '50',
-                sectionname => 'identification',
+                sectionname => 'other',
             },
             strPassportIssueCountry => {
                 label       => $FieldLabels->{'strPassportIssueCountry'},
@@ -1286,8 +1278,9 @@ sub person_details {
                 value       => $field->{strISOCountry},
                 type        => 'lookup',
                 options     => $isocountries,
-                sectionname => 'details',
+                sectionname => 'contact',
                 firstoption => [ '', 'Select Country' ],
+                compulsory => 1,
             },
             strISONationality => {
                 label       => $FieldLabels->{'strISONationality'},
@@ -1296,6 +1289,7 @@ sub person_details {
                 options     => $isocountries,
                 sectionname => 'details',
                 firstoption => [ '', 'Select Country' ],
+                compulsory => 1,
             },
             dtLastUpdate => {
                 label       => 'Last Updated',
@@ -1344,8 +1338,7 @@ sub person_details {
 
         },
         order => [
-        qw(strNationalNum strPersonNo strSalutation strStatus strLocalFirstname strPreferredName strMiddlename strLocalSurname strLatinFirstname strLatinSurname strMaidenName strISONationality strISOCountry dtDOB dtDeath strPlaceofBirth strCountryOfBirth strMotherCountry strFatherCountry intGender strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased intDeRegister strPreferredLang strPassportIssueCountry strPassportNationality strPassportNo dtPassportExpiry dtPoliceCheck dtPoliceCheckExp strPoliceCheckRef strEmergContName strEmergContNo strEmergContNo2 strEmergContRel strP1Salutation strP1FName strP1SName intP1Gender strP1Phone strP1Phone2 strP1PhoneMobile strP1Email strP1Email2 strP2Salutation strP2FName strP2SName intP2Gender strP2Phone strP2Phone2 strP2PhoneMobile strP2Email strP2Email2 strEyeColour strHairColour strHeight strWeight dtSuspendedUntil
-        ),
+        qw(strNationalNum strPersonNo strStatus strLocalFirstname strLocalSurname strISONationality strISOCountry dtDOB intGender strLatinFirstname strLatinSurname strPreferredName strPlaceofBirth strCountryOfBirth strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased strPreferredLang strEmergContName strEmergContNo strEmergContNo2 strP1FName strP1SName strP1Phone strP1PhoneMobile strP1Email strP2FName strP2SName strP2Phone strP2PhoneMobile strP2Email dtSuspendedUntil),
 
         map("strNatCustomStr$_", (1..15)),
         map("dblNatCustomDbl$_", (1..10)),
@@ -1367,7 +1360,7 @@ sub person_details {
         [ 'regoform',       q{} ],
         [ 'details',        'Personal Details' ],
         [ 'contact',        'Contact Details' ],
-        [ 'identification', 'Identification' ],
+        #[ 'identification', 'Identification' ],
         [ 'profile',        'Profile' ],
         [ 'contracts',      'Contracts' ],
         [ 'citizenship',    'Citizenship' ],
@@ -1537,10 +1530,10 @@ my $person_photo = qq[
         <div class="person-edit-info">
 <div class="photo">$photolink</div>
         <span class="button-small mobile-button"><a href="?client='.$client.'&amp;a=P_PH_d">Add/Edit Photo</a></span>
-        <h4>Documents</h4>
-        <span class="button-small generic-button"><a href="?client='.$client.'&amp;a=DOC_L">Add Document</a></span>
       </div>
 ];
+        #<h4>Documents</h4>
+        #<span class="button-small generic-button"><a href="?client='.$client.'&amp;a=DOC_L">Add Document</a></span>
 $person_photo = '' if($option eq 'add');
 $tabs = '' if($option eq 'add');
 	$resultHTML =qq[
