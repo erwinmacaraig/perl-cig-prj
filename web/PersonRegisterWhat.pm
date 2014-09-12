@@ -15,6 +15,7 @@ use Log;
 use EntityTypeRoles;
 use Person;
 use Entity;
+use RegoAgeRestrictions;
 use CGI qw(param);
 
 use Data::Dumper;
@@ -206,6 +207,23 @@ warn("STEP $step FOR $sport");
         @values = @ERAvalues;
     }
     else    {
+
+        $Data->{'Realm'} = $Data->{'Realm'} || $realmID,
+        my $inAgeRange = checkRegoAgeRestrictions(
+            $Data,
+            $personID,
+            0,
+            $sport,
+            $personType,
+            $personEntityRole,
+            $personLevel,
+            $ageLevel,
+        );
+
+        if(!$inAgeRange) {
+            return (undef, 'Age not in valid range.');
+        }
+
         $st = qq[
             SELECT DISTINCT $lookingForField, COUNT(intMatrixID) as CountNum
             FROM tblMatrix
