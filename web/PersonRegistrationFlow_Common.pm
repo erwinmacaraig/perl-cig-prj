@@ -142,6 +142,18 @@ sub displayRegoFlowDocuments    {
         0,
         $rego_ref,
      );
+     
+      my $personLeveldocs = getRegistrationItems(
+        $Data,
+        'PERSON',
+        'DOCUMENT',
+        $originLevel,
+        $rego_ref->{'strRegistrationNature'} || $rego_ref->{'registrationNature'},
+        $entityID,
+        $entityRegisteringForLevel,
+        0,
+        undef,
+     );
     
     ### FOR FILTERING 
     my @docos = (); 
@@ -177,6 +189,7 @@ sub displayRegoFlowDocuments    {
         target => $Data->{'target'},
         documents => \@docos,
         approveddocs => \@listing, 
+        personleveldocs => $personLeveldocs,
         hidden_ref => $hidden_ref,
         Lang => $Data->{'lang'},
         client => $client,

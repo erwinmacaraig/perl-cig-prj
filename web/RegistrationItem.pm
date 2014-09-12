@@ -24,7 +24,7 @@ sub getRegistrationItems    {
 
     return 0 if (! $itemType);
 	
-  my $st = qq[
+    my $st = qq[
 		SELECT 
             RI.intID,
             RI.intRequired,
@@ -52,6 +52,7 @@ sub getRegistrationItems    {
             AND RI.strItemType = ?
     ];
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
+print STDERR $st;
     
     $q->execute(
         $Data->{'Realm'},
