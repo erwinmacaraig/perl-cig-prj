@@ -24,7 +24,7 @@ sub getRegistrationItems    {
 
     return 0 if (! $itemType);
 	
-  my $st = qq[
+    my $st = qq[
 		SELECT 
             RI.intID,
             RI.intRequired,

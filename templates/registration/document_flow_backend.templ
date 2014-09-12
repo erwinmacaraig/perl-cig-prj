@@ -20,22 +20,27 @@
 [% END %]
 </form>
 [% END %] 
-<br />
-<div class="sectionheader">Other Supporting Documents</div> 
-<form action="[% target %]" method="POST" class="dropzone" id="miscedocs">
-<input type="hidden" name="a" value="DOC_u" />
-[% FOREACH h IN hidden_ref %]
-     [% IF h.key == 'client'  %]
-          <input type="hidden" name="[% h.key %]" value="[% h.value %]" />
-     [% END %]
+
+<br /><br />
+[% IF personleveldocs.size %]
+    <div class="sectionheader">Other Documents</div> 
+
+	[% FOREACH doc IN personleveldocs %] 
+		<p> [% doc.Name %] </p> 
+		<form action="[% target %]" method="POST" class="dropzone">
+		<input type="hidden" name="doctypeID" value="[% doc.ID %]" />
+		<input type="hidden" name="a" value="[% nextaction %]" />
+		[% FOREACH h IN hidden_ref %]
+			[% NEXT IF h.key == 'rID' %]
+			<input type="hidden" name="[% h.key %]" value="[% h.value %]" />
+		[% END %]
+		</form>
+	[% END %] 
+
 [% END %]
-</form>
-<script type="text/javascript">
-Dropzone.options.miscedocs = { 
-    maxFilesize: 2, 
-	maxFiles: 10
-}
-</script>
+
+
+
 
 <form action="[% target %]" method="POST">
 <input type="hidden" name="a" value="[% nextaction %]">
