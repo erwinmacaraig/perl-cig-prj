@@ -31,11 +31,13 @@ sub checkRegoAgeRestrictions {
         my %Reg = (
             personRegistrationID => $personRegistrationID,
         );
+
         my ($count, $regs) = PersonRegistration::getRegistrationData(
             $Data,
             $personID,
             \%Reg
         );
+
         if ($count == 1) {
             $sport = $regs->[0]{'strSport'};
             $personType = $regs->[0]{'strPersonType'};
@@ -44,15 +46,13 @@ sub checkRegoAgeRestrictions {
             $ageLevel = $regs->[0]{'strAgeLevel'};
             $entityID = $regs->[0]{'intEntityID'};
             $dtDOB = $regs->[0]{'dtDOB'};
-            $personAge = $regs->[0]{'personAge'};
+            $personAge = $regs->[0]{'currentAge'};
         }
     } else {
         $personDetails = loadPersonDetails($Data->{'db'}, $personID);
         $personAge = $personDetails->{'currentAge'} or undef;
     }
 
-    #print Dumper $personDetails;
-    #print Dumper $personAge;
     return 0 if(!defined($personAge));
 
     my $st = qq[
@@ -73,9 +73,6 @@ sub checkRegoAgeRestrictions {
         $personAge,
     );
 
-
-    #print Dumper $Data;
-    #print Dumper @limitValues;
     if (defined $sport) {
         push @limitValues, $sport;
         $st .= qq[ AND strSport IN ('', ?)];
@@ -97,6 +94,8 @@ sub checkRegoAgeRestrictions {
     $query->execute(@limitValues);
 
     my $dref = $query->fetchrow_hashref();
-    print Dumper $dref;
+
+    return if(!$dref or !defined($dref));
+    return 1;
 }
 1;
