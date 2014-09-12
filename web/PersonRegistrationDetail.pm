@@ -51,7 +51,7 @@ sub personRegistrationDetail   {
             },
             strAgeLevel => {
                 label => 'Age Level',
-                value => %Defs::ageLevel->{$RegistrationDetail->{'AgeLevel'}},
+                value => $Defs::ageLevel->{$RegistrationDetail->{'AgeLevel'}},
                 type => 'text',
                 readonly => 1,
             },
@@ -63,7 +63,7 @@ sub personRegistrationDetail   {
             },
             strGender => {
                 label => 'Gender',
-                value => %Defs::genderInfo->{$RegistrationDetail->{'intGender'}},
+                value => $Defs::genderInfo->{$RegistrationDetail->{'intGender'}},
                 type => 'text',
                 readonly => 1,
             },
