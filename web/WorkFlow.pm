@@ -495,8 +495,8 @@ sub addWorkFlowTasks {
 			AND pr.strSport = r.strSport
             AND pr.strPersonType = r.strPersonType
             AND r.intEntityLevel = e.intEntityLevel
-            AND (r.strISOCountry_IN = '' OR r.strISOCountry_IN LIKE CONCAT('%|',p.strISOCountry,'|%'))
-            AND (r.strISOCountry_NOTIN = '' OR r.strISOCountry_NOTIN NOT LIKE CONCAT('%|',p.strISOCountry,'|%'))
+            AND (r.strISOCountry_IN = '' OR r.strISOCountry_IN LIKE CONCAT('%|',p.strISONationality ,'|%'))
+            AND (r.strISOCountry_NOTIN = '' OR r.strISOCountry_NOTIN NOT LIKE CONCAT('%|',p.strISONationality ,'|%'))
         )
 		WHERE 
             pr.intPersonRegistrationID = ?
