@@ -118,7 +118,7 @@ sub new_doc_form {
 	my(
 		$Data, 
 		$client,
-                $DocumentTypeID,
+        $DocumentTypeID,
 		$RegistrationID,
 	)=@_;
 
