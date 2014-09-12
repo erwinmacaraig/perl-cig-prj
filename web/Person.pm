@@ -1604,6 +1604,7 @@ sub loadPersonDetails {
 		DATE_FORMAT(dtPassportExpiry,'%d/%m/%Y') AS dtPassportExpiry, 
 		DATE_FORMAT(dtDOB,'%d/%m/%Y') AS dtDOB, 
 		dtDOB AS dtDOB_RAW, 
+		TIMESTAMPDIFF(YEAR, dtDOB, CURDATE()) as currentAge, 
 		DATE_FORMAT(dtPoliceCheck,'%d/%m/%Y') AS dtPoliceCheck, 
 		DATE_FORMAT(dtPoliceCheckExp,'%d/%m/%Y') AS dtPoliceCheckExp, 
 		DATE_FORMAT(dtNatCustomDt1,'%d/%m/%Y') AS dtNatCustomDt1, 

@@ -1,0 +1,1 @@
+mysql --local-infile -u root fifasponline -p < new.realms.setup.sql

@@ -328,7 +328,9 @@ sub getClient {
     $clientValues{personID}     ||= $Defs::INVALID_ID;
     $clientValues{currentLevel} ||= -1;
     $clientValues{authLevel}    ||= -1;
-    $clientValues{userID}   ||= 0;
+    $clientValues{userID}       ||= 0;
+    #HACK: need to identify how venueID is getting set initially
+    $clientValues{venueID}      ||= $clientValues{clubID} ||= $Defs::INVALID_ID;
 
     if ( $clientValues{currentLevel} > $Defs::LEVEL_PERSON ) {
         $clientValues{personID} = $Defs::INVALID_ID;
@@ -338,6 +340,9 @@ sub getClient {
     }
     if ( $clientValues{currentLevel} > $Defs::LEVEL_CLUB ) {
         $clientValues{clubID} = $Defs::INVALID_ID;
+    }
+    if ( $clientValues{currentLevel} > $Defs::LEVEL_VENUE ) {
+        $clientValues{venueID} = $Defs::INVALID_ID;
     }
     if ( $clientValues{currentLevel} >= $Defs::LEVEL_REGION ) {
         $clientValues{zoneID} = $Defs::INVALID_ID;
