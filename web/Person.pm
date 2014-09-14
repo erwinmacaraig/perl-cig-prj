@@ -1337,7 +1337,7 @@ sub person_details {
 
         },
         order => [
-        qw(strNationalNum strPersonNo strStatus strLocalFirstname strLocalSurname strISONationality strISOCountry dtDOB intGender strLatinFirstname strLatinSurname strPreferredName strPlaceofBirth strISOCountryOfBirth strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased strPreferredLang strEmergContName strEmergContNo strEmergContNo2 strP1FName strP1SName strP1Phone strP1PhoneMobile strP1Email strP2FName strP2SName strP2Phone strP2PhoneMobile strP2Email dtSuspendedUntil),
+        qw(strNationalNum strPersonNo strStatus strLocalFirstname strLocalSurname strISONationality strISOCountry dtDOB intGender strLatinFirstname strLatinSurname strPreferredName strPlaceofBirth strISOCountryOfBirth strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneMobile strEmail SPcontact intDeceased strPreferredLang strEmergContName strEmergContNo strEmergContNo2 strP1FName strP1SName strP1Phone strP1Email dtSuspendedUntil),
 
         map("strNatCustomStr$_", (1..15)),
         map("dblNatCustomDbl$_", (1..10)),
