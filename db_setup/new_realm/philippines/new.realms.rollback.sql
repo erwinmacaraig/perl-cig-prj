@@ -16,3 +16,9 @@ SET @c = CONCAT("DROP TABLE IF EXISTS tblPersonRegistration_",@intRealmID);
 PREPARE stmt from @c;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
+
+SET @c = CONCAT("DROP TABLE IF EXISTS tblSnapShotMemberCounts_",@intRealmID);
+
+PREPARE stmt from @c;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;

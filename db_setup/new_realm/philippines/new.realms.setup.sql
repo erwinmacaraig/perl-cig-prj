@@ -153,3 +153,28 @@ SET @c = CONCAT("CREATE TABLE tblPersonRegistration_",@intRealmID,"(
 PREPARE stmt from @c;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
+
+SET @c = CONCAT("CREATE TABLE tblSnapShotMemberCounts_",@intRealmID,"(
+  `intEntityTypeID` int(11) NOT NULL,
+  `intEntityID` int(11) NOT NULL,
+  `intYear` int(11) NOT NULL,
+  `intMonth` tinyint(4) NOT NULL,
+  `intSeasonID` int(11) NOT NULL DEFAULT '0',
+  `intGender` tinyint(4) NOT NULL DEFAULT '0',
+  `intAgeGroupID` int(11) NOT NULL DEFAULT '0',
+  `intMembers` int(11) NOT NULL DEFAULT '0',
+  `intNewMembers` int(11) NOT NULL DEFAULT '0',
+  `intRegoFormMembers` int(11) NOT NULL DEFAULT '0',
+  `intPermitMembers` int(11) NOT NULL DEFAULT '0',
+  `intPlayer` int(11) NOT NULL DEFAULT '0',
+  `intCoach` int(11) NOT NULL DEFAULT '0',
+  `intUmpire` int(11) NOT NULL DEFAULT '0',
+  `intOther1` int(11) NOT NULL DEFAULT '0',
+  `intOther2` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`intYear`,`intMonth`,`intEntityTypeID`,`intEntityID`,`intGender`,`intAgeGroupID`),
+  KEY `index_Entity` (`intEntityTypeID`,`intEntityID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;");
+
+PREPARE stmt from @c;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
