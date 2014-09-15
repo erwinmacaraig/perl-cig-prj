@@ -860,9 +860,17 @@ sub person_details {
                 compulsory => 1,
                 first_page  => 1,
             },
-            strPlaceofBirth => {
-                label       => $FieldLabels->{'strPlaceofBirth'},
-                value       => $field->{strPlaceofBirth},
+            strRegionOfBirth => {
+                label       => $FieldLabels->{'strRegionOfBirth'},
+                value       => $field->{strRegionOfBirth},
+                type        => 'text',
+                size        => '30',
+                maxsize     => '45',
+                sectionname => 'other',
+            },
+            strPlaceOfBirth => {
+                label       => $FieldLabels->{'strPlaceOfBirth'},
+                value       => $field->{strPlaceOfBirth},
                 type        => 'text',
                 size        => '30',
                 maxsize     => '45',
@@ -1341,7 +1349,7 @@ sub person_details {
 
         },
         order => [
-        qw(strNationalNum strPersonNo strStatus strLocalFirstname strLocalSurname strISONationality strISOCountry dtDOB intGender strLatinFirstname strLatinSurname strPreferredName strPlaceofBirth strISOCountryOfBirth strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneWork strPhoneMobile strPager strFax strEmail strEmail2 SPcontact intDeceased strPreferredLang strEmergContName strEmergContNo strEmergContNo2 strP1FName strP1SName strP1Phone strP1PhoneMobile strP1Email strP2FName strP2SName strP2Phone strP2PhoneMobile strP2Email dtSuspendedUntil),
+        qw(strNationalNum strPersonNo strStatus strLocalFirstname strLocalSurname strISONationality strISOCountry dtDOB intGender strLatinFirstname strLatinSurname strPreferredName strRegionOfBirth strPlaceOfBirth strISOCountryOfBirth strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneMobile strEmail SPcontact intDeceased strPreferredLang strEmergContName strEmergContNo strEmergContNo2 strP1FName strP1SName strP1Phone strP1Email dtSuspendedUntil),
 
         map("strNatCustomStr$_", (1..15)),
         map("dblNatCustomDbl$_", (1..10)),

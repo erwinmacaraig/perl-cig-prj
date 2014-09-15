@@ -1,0 +1,4 @@
+"intEntityLevel","intRealmID","strStatus","strLocalName","strLocalShortName","strISOCountry","strPostalCode","strTown","strAddress","strPhone","intDataAccess"
+"20","1","ACTIVE","North-East","NE","SG","0001","Ang Mo Kio","Hougang New Town","1111111","5"
+"20","1","ACTIVE","Central","CEN","SG","0002","Alexandra","Alexandra Road","2222222","5"
+"3","1","ACTIVE","Club 0001","C0001","SG","0001","Ang Mo Kio","Hougang New Town","1000001","10"

@@ -99,7 +99,9 @@
                   jQuery('#regopt_options_title').html(jQuery('#regopt_title_' + optionType).html());
               }
               else  {
-                  jQuery('#regopt_options').html(jQuery('#regopt_title_nooptions').html());
+                  var error;
+                  error = (data.error) ? data.error : '';
+                  jQuery('#regopt_options').html(jQuery('#regopt_title_nooptions').html() + ": " + "<br/>" + error);
                   jQuery('#regopt_options_title').html('');
               }
             });

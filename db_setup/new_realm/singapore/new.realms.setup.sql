@@ -1,17 +1,29 @@
 /** Set new Realm **/
-SET @strRealmName="Philippines", 
-	@strLocalShortName="PH";
+SET @strRealmName="Singapore", 
+	@strLocalShortName="SIN",
+    @intEntityLevel="100",
+    @strStatus="ACTIVE",
+    @intDataAccess="10";
 
-/** Create new Realm **/
-INSERT INTO `tblRealms` (`strRealmName`) 
-VALUES (@strRealmName);
+/** Create new Realm (added checking of duplicate) **/
+INSERT INTO `tblRealms` (
+    `strRealmName`,
+    `strRealmAdType`
+) 
+    SELECT * FROM (
+        SELECT @strRealmName, ''
+    ) AS tmptblRealms
+    WHERE NOT EXISTS (
+        SELECT * FROM `tblRealms`
+        WHERE strRealmName = @strRealmName
+    );
 
 /** Get the new Realm ID **/
 SELECT @intRealmID:=intRealmID
 FROM tblRealms
 WHERE strRealmName = @strRealmName;
 
-/** Create new Entity **/
+/** Create new National Level Entity (added duplicate checks using intEntityLevel, strLocalName and intRealmID) **/
 INSERT INTO `tblEntity` (
 	`intEntityLevel`, 
 	`intRealmID`, 
@@ -20,98 +32,22 @@ INSERT INTO `tblEntity` (
 	`strLocalShortName`, 
 	`intDataAccess`
 )
-VALUES (
-	'100', 
-	@intRealmID, 
-	'ACTIVE', 
-	@strRealmName, 
-	@strLocalShortName, 
-	'10'
-);
-
-/** Get the new Entity ID **/
-SELECT @intEntityID:=intEntityID
-FROM tblEntity
-WHERE 	intRealmID = @intRealmID
-	AND strLocalShortName = @strLocalShortName;
-
-/** Load Child Entity Files **/
-/** LOAD DATA LOCAL INFILE '/home/bruce/Development/FIFASPOnline/db_setup/new_realm/philippines/ref_data/tblEntity.csv' **/
-LOAD DATA LOCAL INFILE '/home/fcascante/src/FIFASPOnline/db_setup/new_realm/philippines/ref_data/tblEntity.csv'
-
-INTO TABLE tblEntity
-FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 ROWS
-(
-	intEntityLevel,
-	intRealmID,
-	strStatus,
-	strLocalName,
-	strLocalShortName,
-	strISOCountry,
-	strPostalCode,
-	strTown,
-	strAddress,
-	strPhone,
-	intDataAccess
-)
-
-/** SET data manipulation here**/
-SET intRealmID = @intRealmID;
-
-/** Load Hierarchy Files **/
-/** LOAD DATA LOCAL INFILE '/home/bruce/Development/FIFASPOnline/db_setup/new_realm/philippines/ref_data/tblTempEntityStructure.csv' **/
-LOAD DATA LOCAL INFILE '/home/fcascante/src/FIFASPOnline/db_setup/new_realm/philippines/ref_data/tblTempEntityStructure.csv'
-
-INTO TABLE tblTempEntityStructure
-FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 ROWS
-(
-	intRealmID,
-	@intParentID,
-	intParentLevel,
-	@intChildID,
-	intChildLevel,
-	intDirect,
-	intDataAccess,
-	intPrimary
-)
-/** SET data manipulation here**/
-
-SET intRealmID = @intRealmID,
-	intParentID = (SELECT @intEntityID:=intEntityID
-	FROM tblEntity
-	WHERE 	intRealmID = @intRealmID
-		AND strLocalShortName = @intParentID),
-	intChildID = (SELECT @intEntityID:=intEntityID
-	FROM tblEntity
-	WHERE 	intRealmID = @intRealmID
-		AND strLocalShortName = @intChildID)
-;
-
-/** Load User Acces Files **/
-/** LOAD DATA LOCAL INFILE '/home/bruce/Development/FIFASPOnline/db_setup/new_realm/philippines/ref_data/tblUserAuth.csv' **/
-
-LOAD DATA LOCAL INFILE '/home/fcascante/src/FIFASPOnline/db_setup/new_realm/philippines/ref_data/tblUserAuth.csv'
-
-INTO TABLE tblUserAuth
-FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 ROWS
-(
-	userId,
-	entityTypeId,
-	@entityId
-)
-/** SET data manipulation here**/
-
-SET entityId = (SELECT @intEntityID:=intEntityID
-	FROM tblEntity
-	WHERE 	intRealmID = @intRealmID
-		AND strLocalShortName = @entityId)
-;
+    SELECT * FROM (
+        SELECT
+            @intEntityLevel,
+            @intRealmID,
+            @strStatus,
+            @strRealmName,
+            @strLocalShortName,
+            @intDataAccess
+    ) AS tmptblEntity 
+    WHERE NOT EXISTS (
+        SELECT * from `tblEntity`
+        WHERE
+            intEntityLevel = @intEntityLevel
+            AND strLocalName = @strRealmName
+            AND intRealmID = @intRealmID
+    );
 
 SET @c = CONCAT("CREATE TABLE tblPersonRegistration_",@intRealmID,"(
   `intPersonRegistrationID` int(11) NOT NULL AUTO_INCREMENT,

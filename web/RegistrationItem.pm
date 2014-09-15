@@ -44,11 +44,11 @@ sub getRegistrationItems    {
 			AND RI.strRegistrationNature = ?
             AND RI.strEntityType IN ('', ?)
             AND RI.intEntityLevel IN (0, ?)
-			AND RI.strPersonType = ?
-			AND RI.strPersonLevel = ?
+			AND RI.strPersonType IN ('', ?)
+			AND RI.strPersonLevel IN ('', ?)
             AND RI.strPersonEntityRole IN ('', ?)
-			AND RI.strSport = ?
-			AND RI.strAgeLevel = ?		
+			AND RI.strSport IN ('', ?)
+			AND RI.strAgeLevel IN ('', ?)
             AND RI.strItemType = ?
     ];
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
