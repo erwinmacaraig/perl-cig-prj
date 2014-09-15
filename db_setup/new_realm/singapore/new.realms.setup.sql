@@ -1,6 +1,9 @@
 /** Set new Realm **/
 SET @strRealmName="Singapore", 
-	@strLocalShortName="SIN";
+	@strLocalShortName="SIN",
+    @intEntityLevel="100",
+    @strStatus="ACTIVE",
+    @intDataAccess="10";
 
 /** Create new Realm (added checking of duplicate) **/
 INSERT INTO `tblRealms` (
@@ -31,17 +34,17 @@ INSERT INTO `tblEntity` (
 )
     SELECT * FROM (
         SELECT
-            '100',
+            @intEntityLevel,
             @intRealmID,
-            'ACTIVE',
+            @strStatus,
             @strRealmName,
             @strLocalShortName,
-            '10'
+            @intDataAccess
     ) AS tmptblEntity 
     WHERE NOT EXISTS (
         SELECT * from `tblEntity`
         WHERE
-            intEntityLevel = '100'
+            intEntityLevel = @intEntityLevel
             AND strLocalName = @strRealmName
             AND intRealmID = @intRealmID
     );
