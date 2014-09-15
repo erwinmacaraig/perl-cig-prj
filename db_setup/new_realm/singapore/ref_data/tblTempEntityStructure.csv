@@ -1,4 +1,4 @@
 "intRealmID","intParentID","intParentLevel","intChildID","intChildLevel","intDirect","intDataAccess","intPrimary"
-"1","SG","100","NE","20","1","5","1"
-"1","SG","100","C0001","3","0","5","0"
-"1","NE","20","C0001","3","1","10","1"
+"1","Singapore","100","North-East","20","1","5","1"
+"1","Singapore","100","Club 0001","3","0","5","0"
+"1","North-East","20","Club 0001","3","1","10","1"

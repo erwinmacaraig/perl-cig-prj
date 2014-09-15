@@ -1,6 +1,7 @@
 /** Realm Settings **/
 SET @strRealmName="Singapore", 
     @strStatus="ACTIVE",
+    @strLocalName="Singapore",
     @intEntityLevel="100";
 
 /** Retrieve target realm id **/
@@ -36,9 +37,9 @@ SET intRealmID = @intRealmID,
 	intParentID = (SELECT @intEntityID:=intEntityID
 	FROM tblEntity
 	WHERE 	intRealmID = @intRealmID
-		AND strLocalShortName = @intParentID),
+		AND strLocalName = @intParentID),
 	intChildID = (SELECT @intEntityID:=intEntityID
 	FROM tblEntity
 	WHERE 	intRealmID = @intRealmID
-		AND strLocalShortName = @intChildID)
+		AND strLocalName = @intChildID)
 ;
