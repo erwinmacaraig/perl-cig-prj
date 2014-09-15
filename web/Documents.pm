@@ -20,6 +20,7 @@ use Reg_common;
 use AuditLog;
 use UploadFiles;
 use FormHelpers;
+use GridDisplay;
 
 sub handle_documents {
 	my($action, $Data, $memberID, $DocumentTypeID,$RegistrationID)=@_;
@@ -49,7 +50,8 @@ sub handle_documents {
 	}
   elsif ($action eq 'DOC_d') {
 		my $fileID = param('dID') || 0;	
-    $resultHTML = delete_doc($Data, $fileID,$client);
+		my $retpage = param('retpage') || "$Data->{'target'}?client=$client";
+        $resultHTML = delete_doc($Data, $fileID,$client, $retpage);
 		$type = 'Delete Document';
   }   
   
@@ -65,51 +67,120 @@ sub handle_documents {
 
 
 sub list_docs {
-	my($Data, $memberID, $client, $DocumentTypeID, $RegistrationID )=@_;
+	my($Data, $memberID, $client, $DocumentTypeID, $RegistrationID,$retpage)=@_;
 	my $target=$Data->{'target'} || '';
 	my $l = $Data->{'lang'};
-        $DocumentTypeID ||= 0; 
-        $RegistrationID ||= 0;
-
+    $DocumentTypeID ||= 0; 
+    $RegistrationID ||= 0;
+    $retpage ||= "P_DOCS";
+	my $body = '';
+	my $title = '';	
 	my $docs = getUploadedFiles(
 		$Data,
 		$Defs::LEVEL_MEMBER,	
 		$memberID,
 		$Defs::UPLOADFILETYPE_DOC,
 		$client,
+		$retpage
 	);
+	##############################3
+	 my $allfilesgrid = '';
+	if(defined $docs->[0]->{'id'}){
+		$body = qq[<br /><div class="pageHeading">$title</div>];
+		my @headers2 = (
+		{ 
+            type => 'Selector',
+            field => 'SelectLink',
+        }, 
+		{
+			name => $Data->{'lang'}->txt('Title'),
+			field => 'Title',
+		},
+       {
+            name => $Data->{'lang'}->txt('Size'),
+            field => 'Size',
+        }, 
+        {
+            name => $Data->{'lang'}->txt('Extension Name'),
+            field => 'Ext',
+        },
+        {
+            name => $Data->{'lang'}->txt('Date Uploaded'),
+            field => 'DateAdded',
+        }, 
+        {
+            name => $Data->{'lang'}->txt('View'),
+            field => 'View',
+            type => 'HTML',
+        },
+         {
+            name => $Data->{'lang'}->txt('Delete'),
+            field => 'Delete',
+            type => 'HTML',
+        },
+    ); 
+   $allfilesgrid = showGrid(
+        Data => $Data,
+        columns => \@headers2,
+        rowdata => $docs,
+        gridid => 'allfilesgridid',
+        width => '99%',
+        
+   ); 
+   $body .= qq[
+       
+		<div class="sectionheader"> All Files </div> 
+		$allfilesgrid
+	];
+    
+}
 
-	my $title = $l->txt('Files');
-	my $body = qq[<br /><div class="pageHeading">$title</div>];
-	my $options = '';
-	my $count = 0;
-	for my $doc (@{$docs})	{
-    $count++;
-    my $c = $count%2==0 ? 'class="rowshade"' : '';
-		my $displayTitle = $doc->{'Title'} || 'Untitled Document';
-		my $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$doc->{'ID'}";
-    $options.=qq[
-      <tr $c>
-        <td><a href="$doc->{'URL'}" target="_doc">$displayTitle</a></td>
-        <td>$doc->{'Size'}Mb</td>
-        <td>$doc->{'Ext'}</td>
-        <td>$doc->{'DateAdded'}</td>
-        <td>(<a href="$deleteURL" onclick="return confirm('Are you sure you want to delete this document?');">Delete</a>)</td>
-      </tr>
-    ];
-	}
 
-	if(!$body)	{
-		$body .= $Data->{'lang'}->txt('There are no documents');
-	}
-	else	{
-		$body .= qq[
-			<table class="listTable">
-				$options
-			</table>
-		];
-	}
-	#$body .= new_doc_form($Data, $client,$DocumentTypeID,$RegistrationID); 
+
+
+   ########################################
+	
+	
+
+	
+	
+	#my $options = '';
+	#my $count = 0;
+	#for my $doc (@{$docs})	{
+    #$count++;
+    #my $c = $count%2==0 ? 'class="rowshade"' : '';
+	##	my $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$doc->{'ID'}";
+    #$options.=qq[
+    #  <tr $c>
+    #   <td><a href="$doc->{'URL'}" target="_doc">$displayTitle</a></td>
+    #    <td>$doc->{'Size'}Mb</td>
+    #    <td>$doc->{'Ext'}</td>
+    #    <td>$doc->{'DateAdded'}</td>
+    #    <td>(<a href="$deleteURL" onclick="return confirm('Are you sure you want to delete this document?');">Delete</a>)</td>
+    #  </tr>
+    #];
+	#}
+
+
+
+
+
+
+
+
+
+
+	#if(!$body)	{
+	#	$body .= $Data->{'lang'}->txt('There are no documents');
+	#}
+	#else	{
+	#	$body .= qq[
+	#		<table class="listTable">
+	#			$options
+	#		</table>
+	#	];
+	#}
+	
 	
        return $body;
 }
@@ -169,7 +240,7 @@ sub process_doc_upload	{
 		$memberID, 
 		$client
 	)=@_;
-
+    
 	my @files_to_process = ();
 
 		my $name = param('file') || '';
@@ -179,7 +250,7 @@ sub process_doc_upload	{
                 my $docTypeID = param('DocumentTypeID') || 0; 
                 my $regoID = param('RegistrationID') || 0; 
                 my $fileID = param('fileId') || 0;
-                my $other_person_info = {
+                my $other_info = {
                 	docTypeID => $docTypeID,
                     regoID    => $regoID,    
                     replaceFileID => $fileID,    
@@ -192,23 +263,23 @@ sub process_doc_upload	{
                 $Defs::LEVEL_MEMBER,
                 $memberID,
                 $Defs::UPLOADFILETYPE_DOC,
-                $other_person_info,
+                $other_info,
 	);
 	return $retvalue;
 }
 
 sub delete_doc {
-	my($Data, $fileID, $client)=@_;
+	my($Data, $fileID, $client, $retpage)=@_;
 
 	my $response = deleteFile(
-		$Data,
+	$Data,
     $fileID,
   );
 
 	return qq[
           <div class="OKmsg">Successfully deleted file.</div> 
           <br />  
-          <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=P_DOCS">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+          <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=$retpage">] . $Data->{'lang'}->txt('Continue').q[</a></span>
        ];
 }
 

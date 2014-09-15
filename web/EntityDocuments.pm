@@ -16,6 +16,7 @@ use Reg_common;
 use AuditLog;
 use UploadFiles;
 use FormHelpers; 
+use GridDisplay;
 
 sub handle_entity_documents{ 
 	my($action, $Data, $entityID, $typeID, $doc_for)=@_; 
@@ -30,7 +31,7 @@ sub handle_entity_documents{
 		  $resultHTML =  new_doc_form($Data, $client, $DocumentTypeID); 
 	}
 	elsif($action eq 'C_DOCS_u'){
-		my $retvalue = process_doc_upload( 
+	   	my $retvalue = process_doc_upload( 
 			$Data,
 			$entityID, 
 			$client,
@@ -38,6 +39,8 @@ sub handle_entity_documents{
 		$resultHTML = qq[<div class="warningmsg">$retvalue</div>] if $retvalue;
 		my $type = 'Add Document'; 
 	}
+	#replace documents here
+	
 	return $resultHTML;
 }
 
@@ -46,16 +49,81 @@ sub list_entity_docs{
 	my $target=$Data->{'target'} || '';
 	my $lang = $Data->{'lang'};
 	my $db = $Data->{'db'};
+    my @rowdata = (); 
+    my $query = qq[
+        SELECT tblUploadedFiles.intFileID,
+        tblDocumentType.strDocumentName,
+        tblUploadedFiles.dtUploaded as DateUploaded, 
+        tblDocuments.strApprovalStatus FROM tblDocuments 
+        INNER JOIN tblUploadedFiles ON tblDocuments.intUploadFileID = tblUploadedFiles.intFileID 
+        INNER JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
+        WHERE tblDocuments.intEntityID = ? AND intPersonID = 0 AND intClearanceID = 0
+    ]; 
+    my $sth = $db->prepare($query); 
+    $sth->execute($entityID); 
+    while(my $dref = $sth->fetchrow_hashref()){
+    my $viewLink = qq[ <span class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}" target="_blank">]. $lang->txt('Get File') . q[</a></span>];    
+    my $replaceLink =   qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a></span>];    
+     push @rowdata, {  
+	        id => $dref->{'intFileID'} || 0,
+	        SelectLink => ' ',
+	        strDocumentName => $dref->{'strDocumentName'},
+		    strApprovalStatus => $dref->{'strApprovalStatus'},
+            DateUploaded => $dref->{'DateUploaded'}, 
+            ViewDoc => $viewLink, 
+            ReplaceFile => $replaceLink,              
+       };
+    }
+    my @headers = (
+        { 
+            type => 'Selector',
+            field => 'SelectLink',
+        }, 
+        {
+            name => $lang->txt('Type'),
+            field => 'strDocumentName',
+        }, 
+        {
+            name => $lang->txt('Status'),
+            field => 'strApprovalStatus',
+        },
+        {
+            name => $lang->txt('Date Uploaded'),
+            field => 'DateUploaded',
+        }, 
+        {
+            name => $lang->txt('View'),
+            field => 'ViewDoc',
+            type => 'HTML', 
+        },
+        {
+        	name => $lang->txt('Replace'),
+        	field => 'ReplaceFile', 
+        	type => 'HTML',
+        },
+    ); 
+    my $filterfields = [
+        {
+            field     => 'strApprovalStatus',
+            elementID => 'dd_actstatus',
+            allvalue  => 'ALL',
+        },
+    ];
+  
+    #### GRID  #### 
+    my $grid = showGrid(
+        Data => $Data,
+        columns => \@headers,
+        rowdata => \@rowdata,
+        gridid => 'grid',
+        width => '99%',
         
-	my $docs = getUploadedFiles(
-		$Data,
-		$typeID,	
-		$entityID,
-		$Defs::UPLOADFILETYPE_DOC,
-		$client,
-	); 
+   ); 
+    
+    
+  
 	
-	my $title = $lang->txt('Files');
+	my $title = $lang->txt('Documents');
 	my $body = qq[<br /><div class="pageHeading">$title</div>];
 	my $options = '';
 	my $count = 0;
@@ -75,46 +143,80 @@ sub list_entity_docs{
     while(my $dref = $sth->fetchrow_hashref()){
         $doclisttype .= qq[<option value="$dref->{'intDocumentTypeID'}">$dref->{'strDocumentName'}</option>];
     } 
-   $doclisttype .= qq[     </select> 
-                          
+   $doclisttype .= qq[     </select>                           
                            <input type="submit" class="button-small generic-button" value="Go" />
                            </form>
                     ];
 	
-	# <input type="hidden" value="$personRegistrationID" name="RegistrationID" />
-	for my $doc (@{$docs})	{
-    $count++;
-    my $c = $count%2==0 ? 'class="rowshade"' : '';
-		my $displayTitle = $doc->{'Title'} || 'Untitled Document';
-		my $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$doc->{'ID'}";
-    $options.=qq[
-      <tr $c>
-        <td><a href="$doc->{'URL'}" target="_doc">$displayTitle MemberID = $entityID</a></td>
-        <td>$doc->{'Size'}Mb</td>
-        <td>$doc->{'Ext'}</td>
-        <td>$doc->{'DateAdded'}</td>
-        <td>(<a href="$deleteURL" onclick="return confirm('Are you sure you want to delete this document?');">Delete</a>)</td>
-      </tr>
-    ];
-	}
-
-	if(!$body)	{
-		$body .= $Data->{'lang'}->txt('There are no documents');
-	}
-	else	{
+	my $modoptions=qq[<div class="changeoptions"></div>];
+	
+	
+	$body .= qq[ 
+		$modoptions
+		<div class="showrecoptions"> $doclisttype </div> 
+		$grid
 		
-		
-		
-		$body .= qq[
-		$doclisttype
-		<p>
-			<table class="listTable">
-				$options
-			</table> 
-	    </p>
 		];
-	}
-	#$body .= new_doc_form($Data, $client,$DocumentTypeID,$RegistrationID); 
+	
+	#device a lookup table for different entities - leave it as static (C_DOCS) for now
+	
+	my $docs = getUploadedFiles(
+		$Data,
+		$typeID,	
+		$entityID,
+		$Defs::UPLOADFILETYPE_DOC,
+		$client,
+		'C_DOCS',
+	); 
+    my $allfilesgrid = '';
+	if(defined $docs->[0]->{'id'}){
+		my @headers2 = (
+		{ 
+            type => 'Selector',
+            field => 'SelectLink',
+        }, 
+		{
+			name => $lang->txt('Title'),
+			field => 'Title',
+		},
+       {
+            name => $lang->txt('Size'),
+            field => 'Size',
+        }, 
+        {
+            name => $lang->txt('Extension Name'),
+            field => 'Ext',
+        },
+        {
+            name => $lang->txt('Date Uploaded'),
+            field => 'DateAdded',
+        }, 
+        {
+            name => $lang->txt('View'),
+            field => 'View',
+            type => 'HTML',
+        },
+         {
+            name => $lang->txt('Delete'),
+            field => 'Delete',
+            type => 'HTML',
+        },
+    ); 
+   $allfilesgrid = showGrid(
+        Data => $Data,
+        columns => \@headers2,
+        rowdata => $docs,
+        gridid => 'allfilesgridid',
+        width => '99%',
+        
+   ); 
+   
+   $body .= qq[
+        <br /><br />
+		<div class="sectionheader"> All Files </div> 
+		$allfilesgrid
+	];
+} 
 	
        return $body;
 } #end sub
@@ -148,9 +250,11 @@ sub new_doc_form {
     if($fileToReplace){ 
     	$body .= qq[
     	       <input type="hidden" name="fileId" value="$fileToReplace" />
-    	];
+    	]; 
     }
-	$body .=	qq[<input type="hidden" name="a" value="C_DOCS_u">
+	$body .=	qq[
+	<input type="hidden" name="entitydocs" value=" " />
+	<input type="hidden" name="a" value="C_DOCS_u">
 			
 		</form> 
                 <br />  

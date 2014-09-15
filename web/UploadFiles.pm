@@ -18,7 +18,7 @@ use FileUpload;
 use CGI qw(:cgi param unescape escape);
 use Reg_common;
 
-use Scalar::Util qw(looks_like_number);
+
 
 my $File_MaxSize = 4*1024*1024; #4Mb;
 
@@ -27,8 +27,9 @@ sub getUploadedFiles	{
     $Data,
     $entityTypeID,
     $entityID,
-		$fileType,
-		$client,
+	$fileType,
+	$client,
+	$page,
   ) = @_;
 
 	my $st = qq[
@@ -50,10 +51,16 @@ sub getUploadedFiles	{
 	my @rows = ();
 	while(my $dref = $q->fetchrow_hashref())	{
 		my $url = "$Defs::base_url/getfile.cgi?client=$client&amp;f=$dref->{'intFileID'}";
+		my $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
+		my $deleteURLButton = qq[ <span class="button-small generic-button"><a href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a></span>];
+		my $urlViewButton = qq[ <span class="button-small generic-button"><a href="$url">]. $Data->{'lang'}->txt('View'). q[</a></span>];
 		push @rows, {
-			ID => $dref->{'intFileID'} || 0,
+			id => $dref->{'intFileID'} || 0,
+			SelectLink => ' ',
 			Title => $dref->{'strTitle'} || '',
 			URL => $url,
+			Delete => $deleteURLButton, 
+			View => $urlViewButton,
 			Ext => $dref->{'strExtension'} || '',
 			Size => sprintf("%0.2f",($dref->{'intBytes'} /1024/1024)),
 			DateAdded => $dref->{'DateAdded_FMT'},
@@ -73,7 +80,7 @@ sub processUploadFile	{
     $EntityTypeID,
     $EntityID,
     $fileType,
-    $other_person_info,
+    $other_info,
   ) = @_; 
     
         
@@ -90,7 +97,7 @@ sub processUploadFile	{
 			$fileType,
 			$files->[2],
 			$files->[3] || undef,
-            $other_person_info,
+            $other_info,
 		);
 		if($err)	{
 			$ret .= "'$files->[0]' : $err<br>";
@@ -110,18 +117,19 @@ sub _processUploadFile_single	{
 		$fileType,
 		$permissions,
 		$options,
-        $other_person_info,
+        $other_info,
 	) = @_;
 
 	$options ||= {}; 
         my $DocumentTypeId = 0;
         my $regoID = 0; 
         my $oldFileId = 0;
-        if(defined $other_person_info){
-          $DocumentTypeId = $other_person_info->{'docTypeID'} || 0; 
-          $regoID = $other_person_info->{'regoID'} || 0;
-          $oldFileId = $other_person_info->{'replaceFileID'} || 0;                   
+        if(defined $other_info){
+          $DocumentTypeId = $other_info->{'docTypeID'} || 0; 
+          $regoID = $other_info->{'regoID'} || 0;
+          $oldFileId = $other_info->{'replaceFileID'} || 0;                   
         }   
+        
   my $origfilename=param($file_field) || '';
 	$origfilename =~s/.*\///g;
 	$origfilename =~s/.*\\//g;
@@ -131,7 +139,7 @@ sub _processUploadFile_single	{
     my @parts=split /\./,$origfilename;
     $extension=$parts[$#parts];
   }
-  my @imageextensions =(qw(jpg gif jpeg bmp png ));
+  my @imageextensions =(qw(jpg gif jpeg bmp png));
 	my $isimage = 0;
   for my $i (@imageextensions)  {
     $isimage = 1 if $i eq lc $extension;
@@ -190,9 +198,17 @@ sub _processUploadFile_single	{
 	return ('Invalid ID',0) if !$fileID; 
 	my $doc_st;
 	my $doc_q;
-        #### START OF INSERTING DATA IN tblDocuments ##
+	my $entitydocs = param('entitydocs') || 0; 
+	# need to distinguish Person FROM other entity
+	my $intPersonID = $EntityID;
+	my $intEntityID = 0;
+	if($entitydocs){ 
+		$intPersonID = 0;	
+		$intEntityID = $EntityID;	
+	}
+	    #### START OF INSERTING DATA IN tblDocuments ##
         if($DocumentTypeId && !$oldFileId){
-
+           
            $doc_st = qq[
                 INSERT INTO tblDocuments ( 
                    intUploadFileID,
@@ -218,10 +234,11 @@ sub _processUploadFile_single	{
               $fileID,
               $DocumentTypeId,
               $EntityTypeID,
-              $Data->{'clientValues'}{'_intID'},
+              $intEntityID,
               $regoID,
-              $EntityID, 
+              $intPersonID, 
         );  
+        #$EntityID = memberID (this should be the case)
         }
         else {
         	 $doc_st = qq[
@@ -231,7 +248,7 @@ sub _processUploadFile_single	{
         	$doc_q->execute(
               $fileID,              
               $oldFileId,
-              $EntityID, 
+              $intPersonID, 
         );
         }
                 

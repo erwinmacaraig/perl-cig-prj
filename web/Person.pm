@@ -169,7 +169,7 @@ sub handlePerson {
     elsif ( $action =~ /P_DOCS/ ) {
         ($resultHTML,$title) =  listDocuments($Data, $personID);
          my $client = setClient( $Data->{'clientValues'} ) || '';
-         $resultHTML .= Documents::list_docs($Data, $personID, $client);
+         $resultHTML .= Documents::list_docs($Data, $personID, $client );
            }
     else {
         print STDERR "Unknown action $action\n";
@@ -335,11 +335,10 @@ sub listDocuments {
 	        id => $dref->{'intFileID'} || 0,
 	        SelectLink => $fileLink,
 	        strDocumentName => $dref->{'strDocumentName'},
-		strApprovalStatus => $dref->{'strApprovalStatus'},
-                DateUploaded => $dref->{'DateUploaded'}, 
-                ViewDoc => $viewLink, 
-                ReplaceFile => $replaceLink,
-              
+		    strApprovalStatus => $dref->{'strApprovalStatus'},
+            DateUploaded => $dref->{'DateUploaded'}, 
+            ViewDoc => $viewLink, 
+            ReplaceFile => $replaceLink,              
        };
     }
 
@@ -400,13 +399,13 @@ sub listDocuments {
     ]; 
     $sth = $db->prepare($query);
     $sth->execute($Defs::DOC_FOR_PERSON,$Data->{'Realm'});
-    my $doclisttype = qq[  <form action="$Data->{'target'}">
+    my $doclisttype = qq[  <form action="$Data->{'target'}" id="personDocAdd">
                               <input type="hidden" name="client" value="$client" />
                               <input type="hidden" name="a" value="DOC_L" />
                               <label>Add File For</label>  
                               <select name="doclisttype" id="doclisttype">
                               <option value="0">Misc</option>  
-                       ];
+                       ]; 
     while(my $dref = $sth->fetchrow_hashref()){
         $doclisttype .= qq[<option value="$dref->{'intDocumentTypeID'}">$dref->{'strDocumentName'}</option>];
     } 
@@ -421,12 +420,17 @@ sub listDocuments {
  my $title = $lang->txt('Registration Documents');
  
        # $modoptions   
-        $resultHTML = qq[ $modoptions                       
-                   
-                      <div class="showrecoptions"> $doclisttype </div>     
-                  
-            $grid
+        $resultHTML = qq[ $modoptions   
+                      <div class="showrecoptions"> $doclisttype </div>              
+                       $grid
            ];
+
+
+###################
+
+###################
+
+
 
     return ($resultHTML,$title);
 
