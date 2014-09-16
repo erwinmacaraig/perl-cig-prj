@@ -180,7 +180,7 @@ sub list_entity_docs{
 			field => 'Title',
 		},
        {
-            name => $lang->txt('Size'),
+            name => $lang->txt('Size (MB)'),
             field => 'Size',
         }, 
         {

@@ -30,7 +30,8 @@ use InstanceOf;
 use EntityDocuments;
 use EntityIdentifier;
 use Data::Dumper;
-
+use RegistrationItem;
+use TTTemplate;
 sub handleClub  {
   my ($action, $Data, $parentID, $clubID, $typeID)=@_;
 
@@ -485,14 +486,49 @@ sub postClubAdd {
       $cv{'clubID'}=$id;
       $cv{'currentLevel'} = $Defs::LEVEL_CLUB;
       my $clm=setClient(\%cv);
+       ############################################################
+      my $originLevel = $Data->{'clientValues'}{'authLevel'} || 0;
+      my $clientValues = $Data->{'clientValues'};
+      my $entityRegisteringForLevel = getLastEntityLevel($clientValues) || 0;
+      my $entityID = getLastEntityID($clientValues);     
+     
+      my $required_club_docs = getRegistrationItems(
+        $Data,
+        'ENTITY',
+        'DOCUMENT',
+        $originLevel,
+        'NEW',
+        $entityID,
+        $entityRegisteringForLevel,
+        0,
+        undef,
+     );
+     
+     #what is origin level,is the level for this entity or the level of the person logged in???
+     
+    my %PageData = (
+        target => $Data->{'target'},
+        documents => $required_club_docs,
+        Lang => $Data->{'lang'},
+        client => $clm,
+  );  
+  my $clubdocs;
+  $clubdocs = runTemplate($Data, \%PageData, 'club/required_docs.templ') || '';  
+      
+      
+      
+      
       return (0,qq[
-        <div class="OKmsg"> $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Added Successfully</div><br>
-        <a href="$Data->{'target'}?client=$clm&amp;a=C_DT">Display Details for $params->{'d_strLocalName'}</a><br><br>
+     <div class="sectionheader"> $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Added Successfully</div><br>
+      <div>
+       $clubdocs
+	  </div>
+	  <a href="$Data->{'target'}?client=$clm&amp;a=C_DT">Display Details for $params->{'d_strLocalName'}</a><br><br>
         <b>or</b><br><br>
-        <a href="$Data->{'target'}?client=$cl&amp;a=C_DTA&amp;l=$Defs::LEVEL_CLUB">Add another $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}</a>
-
+	   <a href="$Data->{'target'}?client=$cl&amp;a=C_DTA&amp;l=$Defs::LEVEL_CLUB">Add another $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}</a>
       ]);
     }
+  ###############################################################################  
     
   } ### end if  add
   

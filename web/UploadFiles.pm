@@ -43,6 +43,7 @@ sub getUploadedFiles	{
 			AND intFileType = ?
 	];
 	my $q = $Data->{'db'}->prepare($st);
+	#print $st;
 	$q->execute(
 		$entityTypeID,
 		$entityID,
