@@ -47,6 +47,7 @@ CREATE TABLE tblEntity (
     intLightCapacity int(11) DEFAULT '0',
     strGroundNature varchar(100) DEFAULT '', /* Grass, Turf -- comma seperated ? */
     strDiscipline varchar(100) default '', /* list of sports -- comma seperated ? */
+    strGender VARCHAR(10) NULL AFTER `strDiscipline`,
     strMapRef varchar(20) DEFAULT '',
     intMapNumber int(11) DEFAULT '0',
     dblLat double DEFAULT '0',
