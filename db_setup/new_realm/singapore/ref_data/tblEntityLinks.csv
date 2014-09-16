@@ -1,0 +1,3 @@
+"intParentEntityID","intChildEntityID","intPrimary","tTimeStamp"
+"Singapore","North-East","1",now()
+"North-East","Club 0001","1",now()
