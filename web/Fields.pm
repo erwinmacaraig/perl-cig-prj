@@ -12,7 +12,7 @@ use strict;
 
 my $Fields = {
 	Member => qw(
-		strNationalNum
+        strNationalNum
 		strMemberNo
 		intActive
 		strSalutation
