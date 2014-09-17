@@ -125,7 +125,7 @@ sub optionsPersonRegisterWhat {
     }
     my @values = ();
     my $st = '';
-    my ($MATRIXwhere, $ERAwhere) = ('','');
+    my ($MATRIXwhere, $ERAwhere, $ENTITYAllowedwhere) = ('','','');
     my @MATRIXvalues = (
         $originLevel,
         $realmID,
@@ -136,14 +136,21 @@ sub optionsPersonRegisterWhat {
         $realmID,
         $subRealmID
     );
+    my @ENTITYAllowedValues = (
+        $entityID,
+        $realmID,
+        $subRealmID
+    );
 
     ### LETS BUILD UP THE SQL WHERE STATEMENTS TO HELP NARROW SELECTION
 
     if($step > 2) {# and defined $sport)  {
         push @MATRIXvalues, $sport;
         push @ERAvalues, $sport;
+        push @ENTITYAllowedValues, $sport;
         $MATRIXwhere .= " AND strSport = ? ";
         $ERAwhere .= " AND strSport = ? ";
+        $ENTITYAllowedwhere .= " AND (strDiscipline in ('ALL', '', ?) OR strDiscipline IS NULL) ";
     }
     if($step > 6 and defined $registrationNature)  {
         push @MATRIXvalues, $registrationNature;
@@ -174,9 +181,14 @@ sub optionsPersonRegisterWhat {
     if(defined $pref->{'intGender'})  {
         push @ERAvalues, $pref->{'intGender'} || 0;
         $ERAwhere .= " AND intGender IN (0, ?) ";
-    }
 
-    my $personGender = ($pref->{'intGender'} == 0) ? "ALL" : ($pref->{'intGender'} == 1) ? "MALE" : "FEMALE";
+        #use Defs here
+        my $personGender = ($pref->{'intGender'} == 0) ? "ALL" : ($pref->{'intGender'} == 1) ? "MALE" : "FEMALE";
+        push @ENTITYAllowedValues, $personGender;
+        $ENTITYAllowedwhere .= " AND (strGender in ('ALL', '', ?) or strGender IS NULL) ";
+            
+
+    }
 
     if ($entityID)  {
         my $eref= loadEntityDetails($Data->{'db'}, $entityID);
@@ -213,20 +225,53 @@ sub optionsPersonRegisterWhat {
         #return ($personTypeOptions, "");
     }
     elsif ($entityID and $lookingForField ne 'strRegistrationNature')   {
-
         #FC-181 - now check for allowed Sport and Gender
         #FC-181 - remove query to tblEntityRegistrationAllowed for now
-        $st = qq[
-            SELECT DISTINCT $lookingForField, COUNT(intEntityRegistrationAllowedID) as CountNum
-            FROM tblEntityRegistrationAllowed
-            WHERE
-                intEntityID = ?
-                AND intRealmID = ?
-                AND intSubRealmID IN (0,?)
-                $ERAwhere
-            GROUP BY $lookingForField
-        ];
-        @values = @ERAvalues;
+        if($step == 2) {
+            #identify the list if sports from tblEntity
+            #include Gender check here (checkEntityAllowed will initially look for valid gender)
+            my $entityAllowed = checkEntityAllowed($Data, $ENTITYAllowedwhere, \@ENTITYAllowedValues);
+            return (undef, "Please check player's gender.") if(!$entityAllowed);
+
+            #based on strDiscipline value in tblEntity, identify the list to return
+            #if strDiscipline == ALL, return selected distinct strSport from tblMatrix
+            #otherwise check from tblMatrix if strDiscipline is allowed before returning any options
+
+            if($entityAllowed->{'strDiscipline'} ne 'ALL') {
+                #include in WHERE the specific sport from tblEntity to narrow down search
+                $MATRIXwhere .= " AND $lookingForField = '$entityAllowed->{'strDiscipline'}'";
+            }
+
+            $st = qq[
+                SELECT DISTINCT $lookingForField, COUNT(intMatrixID) as CountNum
+                FROM tblMatrix
+                WHERE
+                    intOriginLevel  = ?
+                    AND intLocked=0
+                    AND intRealmID = ?
+                    AND intSubRealmID IN (0,?)
+                    $MATRIXwhere
+                GROUP BY $lookingForField
+            ];
+
+            @values = @MATRIXvalues;
+        }
+        else {
+            #TODO
+            #handle for other steps (person role, level, age group)
+        }
+
+        #$st = qq[
+        #    SELECT DISTINCT $lookingForField, COUNT(intEntityRegistrationAllowedID) as CountNum
+        #    FROM tblEntityRegistrationAllowed
+        #    WHERE
+        #        intEntityID = ?
+        #        AND intRealmID = ?
+        #        AND intSubRealmID IN (0,?)
+        #        $ERAwhere
+        #    GROUP BY $lookingForField
+        #];
+        #@values = @ERAvalues;
     }
     else    {
 
@@ -288,6 +333,9 @@ sub optionsPersonRegisterWhat {
 
 #### FUNCTIONS #####
 
+sub getOptionsFromMatrix {
+    #query to retrieve options from tblMatrix will be moved here for reusability
+}
 sub returnEntityRoles   {
 
     my ($role_ref) = @_;
@@ -305,9 +353,6 @@ sub returnEntityRoles   {
         };
      }
      return \@retdata;
-}
-
-sub returnPersonType {
 }
 
 sub checkMatrixOK   {
@@ -334,6 +379,32 @@ sub checkMatrixOK   {
     return $q->fetchrow_array() || 0;
 }
 
+sub checkEntityAllowed {
+    my ($Data, $where, $values_ref) = @_;
+
+    my $st = qq[
+        SELECT
+            strDiscipline,
+            strGender
+        FROM tblEntity
+        WHERE
+            intEntityID = ?
+            AND intRealmID = ?
+            AND intSubRealmID in (0, ?)
+            $where
+        LIMIT 1
+    ];
+    
+    my $q = $Data->{'db'}->prepare($st);
+    $q->execute(@{$values_ref});
+    my $dref = $q->fetchrow_hashref();
+
+    return 0 if !$dref;
+
+    return $dref;
+    #print STDERR Dumper $dref;
+}
+
 #FC-181 - tblMatrix will rule out (tblEntityRegistrationAllowed will not be used for now)
 sub getPersonTypeFromMatrix {
     my($Data, $realmID, $subRealmID, $where, $values_ref) = @_;
@@ -352,10 +423,8 @@ sub getPersonTypeFromMatrix {
     $query->execute(@{$values_ref});
     
     my $personTypeList = \%Defs::personType;
-    print STDERR Dumper $personTypeList->{'COACH'};
     my @retdata=();
     while (my $dref = $query->fetchrow_hashref())   {
-        print STDERR Dumper $dref->{'strPersonType'};
         push @retdata, {
             name => $personTypeList->{$dref->{'strPersonType'}},
             value => $dref->{'strPersonType'},
@@ -366,7 +435,9 @@ sub getPersonTypeFromMatrix {
     #return 0 if(!@retdata);
 
     return @retdata;
-    #print STDERR Dumper \%values;
+}
+
+sub getAllowedSports {
 }
 
 1;
