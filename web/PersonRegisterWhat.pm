@@ -77,6 +77,7 @@ sub optionsPersonRegisterWhat {
     ) = @_;
     $bulk ||= 0;
 
+
     my $pref= undef;
     $pref = loadPersonDetails($Data->{'db'}, $personID) if ($personID);
 
@@ -89,6 +90,12 @@ sub optionsPersonRegisterWhat {
         sport => 'strSport',
         role => 'strPersonEntityRole',
     );
+
+    #my %genderList = (
+    #    0 => 'ALL',
+    #    1 => %Defs->{$Defs::GENDER_MALE},
+    #    2 => $Defs->{$Defs::GENDER_FEMALE},
+    #);
     my %lfLabelTable = (
         type => \%Defs::personType,
         role=> $role_ref,
@@ -131,7 +138,7 @@ sub optionsPersonRegisterWhat {
     );
 
     ### LETS BUILD UP THE SQL WHERE STATEMENTS TO HELP NARROW SELECTION
-warn("STEP $step FOR $sport");
+
     if($step > 2) {# and defined $sport)  {
         push @MATRIXvalues, $sport;
         push @ERAvalues, $sport;
@@ -169,6 +176,7 @@ warn("STEP $step FOR $sport");
         $ERAwhere .= " AND intGender IN (0, ?) ";
     }
 
+    my $personGender = ($pref->{'intGender'} == 0) ? "ALL" : ($pref->{'intGender'} == 1) ? "MALE" : "FEMALE";
 
     if ($entityID)  {
         my $eref= loadEntityDetails($Data->{'db'}, $entityID);
@@ -193,7 +201,21 @@ warn("STEP $step FOR $sport");
         my $roledata_ref = returnEntityRoles($role_ref);
         return ($roledata_ref, '');
     }
+    elsif ($lookingForField eq 'strPersonType') {
+        my @personTypeOptions = getPersonTypeFromMatrix($Data, 1, $subRealmID, $MATRIXwhere, \@MATRIXvalues);
+
+        if(!@personTypeOptions) {
+            return (undef, 'List of Person Type not found for the current realm.');
+        } else {
+            return (\@personTypeOptions, '');
+        }
+
+        #return ($personTypeOptions, "");
+    }
     elsif ($entityID and $lookingForField ne 'strRegistrationNature')   {
+
+        #FC-181 - now check for allowed Sport and Gender
+        #FC-181 - remove query to tblEntityRegistrationAllowed for now
         $st = qq[
             SELECT DISTINCT $lookingForField, COUNT(intEntityRegistrationAllowedID) as CountNum
             FROM tblEntityRegistrationAllowed
@@ -285,6 +307,9 @@ sub returnEntityRoles   {
      return \@retdata;
 }
 
+sub returnPersonType {
+}
+
 sub checkMatrixOK   {
 
     my ($Data, $where, $values_ref, $bulk) = @_;
@@ -302,10 +327,46 @@ sub checkMatrixOK   {
     if ($bulk)  {
         $st .= qq[ AND strWFRuleFor ='BULKREGO'];
     }
-warn($st);
-print STDERR Dumper($values_ref);
+#warn($st);
+#print STDERR Dumper($values_ref);
     my $q = $Data->{'db'}->prepare($st);
     $q->execute(@{$values_ref});
     return $q->fetchrow_array() || 0;
 }
+
+#FC-181 - tblMatrix will rule out (tblEntityRegistrationAllowed will not be used for now)
+sub getPersonTypeFromMatrix {
+    my($Data, $realmID, $subRealmID, $where, $values_ref) = @_;
+                       
+    my $st=qq[
+        SELECT DISTINCT strPersonType
+        FROM tblMatrix
+        WHERE
+            intOriginLevel = ?
+            AND intLocked = 0
+            AND intRealmID IN (0, ?)
+            AND intSubRealmID IN (0, ?)
+            $where
+    ];
+    my $query = $Data->{'db'}->prepare($st);
+    $query->execute(@{$values_ref});
+    
+    my $personTypeList = \%Defs::personType;
+    print STDERR Dumper $personTypeList->{'COACH'};
+    my @retdata=();
+    while (my $dref = $query->fetchrow_hashref())   {
+        print STDERR Dumper $dref->{'strPersonType'};
+        push @retdata, {
+            name => $personTypeList->{$dref->{'strPersonType'}},
+            value => $dref->{'strPersonType'},
+        }
+        #$values{$dref->{'strPersonType'}} = $personTypeList->{$dref->{'strPersonType'}};
+    }
+
+    #return 0 if(!@retdata);
+
+    return @retdata;
+    #print STDERR Dumper \%values;
+}
+
 1;
