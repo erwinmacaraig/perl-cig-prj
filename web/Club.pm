@@ -32,6 +32,7 @@ use EntityIdentifier;
 use Data::Dumper;
 use RegistrationItem;
 use TTTemplate;
+use DBI;
 sub handleClub  {
   my ($action, $Data, $parentID, $clubID, $typeID)=@_;
 
@@ -111,6 +112,18 @@ print STDERR "SSSS$action $clubID\n";
   foreach my $i (keys $Data->{clientValues}){
    $keyparams{$i} = $Data->{clientValues}{$i};
   }
+  
+  
+  my %legalTypeOptions = ();
+  my $query = "SELECT intLegalType, strLegalType FROM tblLegalType WHERE intRealmID IN (0,?)"; 
+   my $sth = $Data->{'db'}->prepare($query);
+  $sth->execute($Data->{'Realm'}); 
+  while(my $href = $sth->fetchrow_hashref()){
+  	$legalTypeOptions{$href->{'intLegalType'}} = $href->{'strLegalType'};
+  }
+  $sth->finish();
+  
+  
   my %FieldDefinitions=(
     fields=>  {
       strFIFAID => {
@@ -149,6 +162,14 @@ print STDERR "SSSS$action $clubID\n";
         size  => '30',
         maxsize => '50',
       },
+      strLegalType => {
+        label => "Legal Entity Type",
+        value => $field->{strLegalTypeID},
+        type => 'lookup',
+        options => \%legalTypeOptions,
+        firstoption => [ '', 'Select Type' ],
+        readonly =>($Data->{'clientValues'}{authLevel} < $Defs::LEVEL_NATIONAL),
+     },
       strEntityType => {
         label => "Subtype",
         value => $field->{strEntityType},
@@ -165,21 +186,21 @@ print STDERR "SSSS$action $clubID\n";
           noadd         => 1,
      },
       strContact => {
-        label => 'Contact Person',
+        label => '',
         value => $field->{strContact},
         type  => 'text',
         size  => '30',
         maxsize => '50',
       },
       strContactTitle => {
-        label => 'Contact Person Title',
+        label => '',
         value => $field->{strContactTitle},
         type  => 'text',
         size  => '30',
         maxsize => '50',
       },
       strContactEmail => {
-        label => 'Contact Person Email',
+        label => '',
         value => $field->{strContactEmail},
         type  => 'text',
         size  => '30',
@@ -187,7 +208,7 @@ print STDERR "SSSS$action $clubID\n";
         validate => 'EMAIL',
       },
       strContactPhone => {
-        label => 'Contact Person Phone',
+        label => '',
         value => $field->{strContactPhone},
         type  => 'text',
         size  => '30',
@@ -222,6 +243,13 @@ print STDERR "SSSS$action $clubID\n";
         size  => '30',
         maxsize => '50',
       },
+      strISOLocalLanguage => {
+      	label => 'Local Name Language',
+        value => $field->{strISOLocalLanguage},
+        type  => 'text',
+        size  => '30',
+        maxsize => '50',
+      },
       strPostalCode => {
         label => 'Postal Code',
         value => $field->{strPostalCode},
@@ -250,6 +278,20 @@ print STDERR "SSSS$action $clubID\n";
         size  => '35',
         maxsize => '250',
         validate => 'EMAIL',
+      },
+      strMANotes => {
+      	label => 'MA Comment',
+      	value => $field->{strMANotes},
+        type => 'textarea',
+        rows => '10',
+        cols => '40',
+        readonly =>($Data->{'clientValues'}{authLevel} < $Defs::LEVEL_NATIONAL),
+      },
+      strAssocNature => { 
+      	label => 'Association Nature',
+      	value => $field->{strAssocNature},
+        type => 'text',
+        size => 40,
       },
       strWebURL => {
         label => 'Web',
@@ -285,9 +327,12 @@ print STDERR "SSSS$action $clubID\n";
         strLatinShortName
         strEntityType
         strStatus
+        strAssocNature
+        strLegalType
         dtFrom
         dtTo
         strISOCountry
+        strISOLocalLanguage
         strRegion
         strPostalCode
         strTown
@@ -296,10 +341,8 @@ print STDERR "SSSS$action $clubID\n";
         strEmail
         strPhone
         strFax
-        strContactTitle
-        strContactEmail
-        strContactPhone
-        strContact
+        strContactEmail        
+        strMANotes         
         clubcharacteristics
     )],
     fieldtransform => {
@@ -411,6 +454,7 @@ sub loadClubDetails {
      intCreatedByEntityID,
      strFIFAID,
      strLocalName,
+     strLegalTypeID,
      strLocalShortName,
      strLocalFacilityName,
      strLatinName,
@@ -419,6 +463,7 @@ sub loadClubDetails {
      dtFrom,
      dtTo,
      strISOCountry,
+     strISOLocalLanguage,
      strRegion,
      strPostalCode,
      strTown,
@@ -427,6 +472,8 @@ sub loadClubDetails {
      strEmail,
      strPhone,
      strFax,
+     strAssocNature,
+     strMANotes,
      strContactTitle,
      strContactEmail,
      strContactPhone,
