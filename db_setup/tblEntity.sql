@@ -59,6 +59,8 @@ CREATE TABLE tblEntity (
     strEntityPaymentInfo TEXT,
     intPaymentRequired TINYINT DEFAULT 0,
     intIsPaid TINYINT DEFAULT 0,
+    strShortNotes varchar(255) DEFAULT NULL COMMENT 'can only be added/edited/viewed by MA level',
+    strLegalID VARCHAR(45) NULL COMMENT 'a field to type in the ID that corresponds to the LegalType' AFTER `strShortNotes`,
   PRIMARY KEY (`intEntityID`),
   KEY `index_intRealmID` (`intRealmID`),
   KEY `index_strFIFAID` (`strFIFAID`),
