@@ -1,0 +1,36 @@
+{
+	"rules" : {
+		"strGender" : {
+			"rule" : "multiplyEntry",
+			"value" : "ALL",
+			"field" : "strGender",
+			"collection" : ["MALE","FEMALE"]
+		},
+		"strSport" : {
+			"rule" : "multiplyEntry",
+			"value" : "ALL",
+			"field" : "strSport",
+			"collection" : ["FOOTBALL","FUTSAL","BEACHSOCCER"]
+		},
+		"strPersonLevel" : {
+			"rule" : "multiplyEntry",
+			"value" : "ALL",
+			"field" : "strPersonLevel",
+			"collection" : ["AMATEUR","PROFESSIONAL"]
+		},
+		"strAgeLevel" : {
+			"rule" : "multiplyEntry",
+			"value" : "ALL",
+			"field" : "strAgeLevel",
+			"collection" : ["MINOR","ADULT"]
+		}
+	},
+	"mapping" : {
+		"EntityCode" : "strImportEntityCode",
+		"PersonType" : "strPersonType",
+		"Sport" : "strSport",
+		"Gender" : "strGender",
+		"Level" : "strPersonLevel",
+		"AgeLevel" : "strAgeLevel"
+	}
+}

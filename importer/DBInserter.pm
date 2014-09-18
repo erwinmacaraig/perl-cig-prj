@@ -1,7 +1,7 @@
 package DBInserter;
 require Exporter;
-@EXPORT = qw(insertBatch connectDB);
-@EXPORT_OK = qw(insertBatch connectDB);
+@EXPORT = qw(insertBatch connectDB getEntity);
+@EXPORT_OK = qw(insertBatch connectDB getEntity);
 @ISA =  qw(Exporter);
 use lib '.','..';
 use Data::Dumper;
@@ -33,11 +33,26 @@ sub insertBatch {
 	}
 }
 
+sub getEntity{
+	my ($db,$key, $value) = @_;
+	my $statement=qq[
+	    SELECT 
+          intEntityID
+	      FROM tblEntity
+	      WHERE $key = ?
+	  ];
+	  my $query = $db->prepare($statement);
+	  $query->execute($value);
+	  my $field=$query->fetchrow_hashref();
+	  $query->finish;
+	  
+	  return $field->{"intEntityID"};
+}
 sub connectDB{
 
     print $Config::DB_USER;
     print "\n\n";
-    my $dbh = DBI->connect('DBI:mysql:test', 'root','') or die $DBI::errstr;
+    my $dbh = DBI->connect('DBI:mysql:fifasponline', 'root','') or die $DBI::errstr;
     $dbh->do("SET NAMES 'utf8'");
     return $dbh;
 }

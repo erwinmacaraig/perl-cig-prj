@@ -31,34 +31,73 @@ sub readCSVFile{
     
     if($format eq 'tsv'){
         $csv_config->{sep_char} = qq|\t|;
-        $table =~ s/.tsv//g;
     }
     elsif($format eq 'csv'){
     	$csv_config->{sep_char} = qq|,|;
-        $table =~ s/.csv//g;
     }
-    
+    my @tag = split(/\./,$table);
+	my $object =  $tag[0];
     my $csv = Text::CSV->new($csv_config) or die "Text::CSV error: " . Text::CSV->error_diag;
     my @headers = $csv->getline($fh) or die "no header";
-    $csv->column_names(@headers);
+    my $config = getConfig($object);
+	;
+    my @keys = MapKeys(@headers,$config->{"mapping"});
+    $csv->column_names(@keys);
     while (my $hashref = $csv->getline_hr($fh)) {
       push @records, $hashref;
-      ApplyRules($table,$hashref);
     }
+    my $records = ApplyPreRules($config->{"rules"},\@records);
+    my $inserts = ApplyRemoveLinks($config->{"rules"},$records);
+    insertBatch($db,$object,$inserts);
+    my $links = ApplyPostRules($object,$config->{"rules"},\@records); 
+    insertBatch($db,"tblEntityLinks",$links);
     close $fh;
 }
 
 # Run only rules if there is any specified in the TableRules.
-sub ApplyRules{
-    my ($table,$hashref) = @_;
-    my @mrecords;
-    my ($rules) = getRules($table);
-    foreach my $key ( keys $rules ){
+sub ApplyPreRules{
+    my ($rules,$records) = @_;
+    my @irecords = ();
+    my @links = ();
+    foreach my $key ( keys %{$rules} ){
         my $rule = $rules->{$key};
         if($rule->{"rule"} eq "multiplyEntry"){
-           multiplyEntry(\@mrecords,$hashref,$rule);
+           $records = multiplyEntry($records,$rule);
         }
     }
-    insertBatch($db,$table,\@mrecords);
-   # print Dumper(@mrecords);
+    return $records;
+}
+
+sub ApplyRemoveLinks{
+	my ($rules,$records) = @_;
+    my @irecords = ();
+    my @links = ();
+    foreach my $key ( keys %{$rules} ){
+        my $rule = $rules->{$key};
+        if($rule->{"rule"} eq "insertLink"){
+           $records = removeLinkField($records,$rule);
+        }
+    }
+    return $records;
+}
+# Run only rules if there is any specified in the TableRules.
+sub ApplyPostRules{
+    my ($table,$rules,$records) = @_;
+    my $links = [];
+    foreach my $key ( keys %{$rules} ){
+        my $rule = $rules->{$key};
+        if($rule->{"rule"} eq "insertLink"){
+           $links = insertLink($links,$records,$rule);
+        }
+    }
+    return $links;
+   
+}
+sub MapKeys{
+	my ($headers,$mapping) = @_;
+	my @keys = ();
+	foreach my $i (@{$headers}){
+		push @keys,$mapping->{$i};
+	}
+	return @keys;
 }
