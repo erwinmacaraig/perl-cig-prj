@@ -214,7 +214,7 @@ sub optionsPersonRegisterWhat {
         return ($roledata_ref, '');
     }
     elsif ($lookingForField eq 'strPersonType') {
-        my @personTypeOptions = getPersonTypeFromMatrix($Data, 1, $subRealmID, $MATRIXwhere, \@MATRIXvalues);
+        my @personTypeOptions = getPersonTypeFromMatrix($Data, $realmID, $subRealmID, $MATRIXwhere, \@MATRIXvalues);
 
         if(!@personTypeOptions) {
             return (undef, 'List of Person Type not found for the current realm.');
@@ -227,7 +227,7 @@ sub optionsPersonRegisterWhat {
     elsif ($entityID and $lookingForField ne 'strRegistrationNature')   {
         #FC-181 - now check for allowed Sport and Gender
         #FC-181 - remove query to tblEntityRegistrationAllowed for now
-        if($step == 2) {
+        if($lookingForField eq 'strSport') {
             #identify the list if sports from tblEntity
             #include Gender check here (checkEntityAllowed will initially look for valid gender)
             my $entityAllowed = checkEntityAllowed($Data, $ENTITYAllowedwhere, \@ENTITYAllowedValues);
@@ -256,9 +256,82 @@ sub optionsPersonRegisterWhat {
 
             @values = @MATRIXvalues;
         }
-        else {
+        elsif ($lookingForField eq 'strPersonLevel') {
             #TODO
             #handle for other steps (person role, level, age group)
+
+            $st = qq[
+                SELECT DISTINCT $lookingForField, COUNT(intMatrixID) as CountNum
+                FROM tblMatrix
+                WHERE
+                    intOriginLevel  = ?
+                    AND intLocked=0
+                    AND intRealmID = ?
+                    AND intSubRealmID IN (0,?)
+                    $MATRIXwhere
+                GROUP BY $lookingForField
+            ];
+
+            @values = @MATRIXvalues;
+        }
+        elsif ($lookingForField eq 'strAgeLevel') {
+            #get age level from tblMatrix to narrow down selection in checkRegoAgeRestrictions
+            my @ageLevelFromMatrix = getAgeLevelFromMatrix($Data, 1, $subRealmID, $MATRIXwhere, \@MATRIXvalues);
+
+            if(!@ageLevelFromMatrix) {
+                return (undef, 'No age level defined.') 
+            }
+            else {
+                $Data->{'Realm'} = $Data->{'Realm'} || $realmID,
+                my $ageLevelOptions = checkRegoAgeRestrictions(
+                    $Data,
+                    $personID,
+                    0,
+                    $sport,
+                    $personType,
+                    $personEntityRole,
+                    $personLevel,
+                    @ageLevelFromMatrix,
+                );
+
+                if(!$ageLevelOptions) {
+                    return (undef, 'Age Level/Person\'s age not defined.');
+                }
+                else {
+                    return ($ageLevelOptions, '');
+                }
+            }
+            #$Data->{'Realm'} = $Data->{'Realm'} || $realmID,
+            #my @ageLevelOptions = checkRegoAgeRestrictions(
+            #    $Data,
+            #    $personID,
+            #    0,
+            #    $sport,
+            #    $personType,
+            #    $personEntityRole,
+            #    $personLevel,
+            #    $ageLevel,
+            #);
+
+            #print STDERR Dumper @ageLevelOptions;
+            #if(!$inAgeRange) {
+            #    return (undef, 'Age not in valid range.');
+            #}
+
+
+            #$st = qq[
+            #    SELECT DISTINCT $lookingForField, COUNT(intMatrixID) as CountNum
+            #    FROM tblMatrix
+            #    WHERE
+            #        intOriginLevel  = ?
+            #        AND intLocked=0
+            #        AND intRealmID = ?
+            #        AND intSubRealmID IN (0,?)
+            #        $MATRIXwhere
+            #    GROUP BY $lookingForField
+            #];
+
+            #@values = @MATRIXvalues;
         }
 
         #$st = qq[
@@ -274,22 +347,6 @@ sub optionsPersonRegisterWhat {
         #@values = @ERAvalues;
     }
     else    {
-
-        $Data->{'Realm'} = $Data->{'Realm'} || $realmID,
-        my $inAgeRange = checkRegoAgeRestrictions(
-            $Data,
-            $personID,
-            0,
-            $sport,
-            $personType,
-            $personEntityRole,
-            $personLevel,
-            $ageLevel,
-        );
-
-        if(!$inAgeRange) {
-            return (undef, 'Age not in valid range.');
-        }
 
         $st = qq[
             SELECT DISTINCT $lookingForField, COUNT(intMatrixID) as CountNum
@@ -437,7 +494,30 @@ sub getPersonTypeFromMatrix {
     return @retdata;
 }
 
-sub getAllowedSports {
+sub getAgeLevelFromMatrix {
+    my($Data, $realmID, $subRealmID, $where, $values_ref) = @_;
+                       
+    my $st=qq[
+        SELECT DISTINCT strAgeLevel
+        FROM tblMatrix
+        WHERE
+            intOriginLevel = ?
+            AND intLocked = 0
+            AND intRealmID IN (0, ?)
+            AND intSubRealmID IN (0, ?)
+            $where
+    ];
+    my $query = $Data->{'db'}->prepare($st);
+    $query->execute(@{$values_ref});
+    
+    my @retdata=();
+    while (my $dref = $query->fetchrow_hashref())   {
+        push @retdata, $dref->{'strAgeLevel'};
+        #$values{$dref->{'strPersonType'}} = $personTypeList->{$dref->{'strPersonType'}};
+    }
+
+    return 0 if(!@retdata);
+    return @retdata;
 }
 
 1;
