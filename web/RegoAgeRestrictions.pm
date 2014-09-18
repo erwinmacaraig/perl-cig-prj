@@ -16,9 +16,10 @@ use Log;
 use PersonRegistration;
 use Person;
 use Data::Dumper;
+use List::MoreUtils qw(uniq);
 
 sub checkRegoAgeRestrictions {
-    my ($Data, $personID, $personRegistrationID, $sport, $personType, $entityRole, $personLevel, $ageLevel) = @_;
+    my ($Data, $personID, $personRegistrationID, $sport, $personType, $entityRole, $personLevel, @ageLevel) = @_;
 
     $personID ||= 0;
     $personRegistrationID ||= 0;
@@ -39,11 +40,12 @@ sub checkRegoAgeRestrictions {
         );
 
         if ($count == 1) {
+            @ageLevel = ();
+            push @ageLevel, $regs->[0]{'strAgeLevel'};
             $sport = $regs->[0]{'strSport'};
             $personType = $regs->[0]{'strPersonType'};
             $entityRole = $regs->[0]{'strPersonEntityRole'};
             $personLevel = $regs->[0]{'strPersonLevel'};
-            $ageLevel = $regs->[0]{'strAgeLevel'};
             $entityID = $regs->[0]{'intEntityID'};
             $dtDOB = $regs->[0]{'dtDOB'};
             $personAge = $regs->[0]{'currentAge'};
@@ -85,17 +87,49 @@ sub checkRegoAgeRestrictions {
         push @limitValues, $personLevel;
         $st .= qq[ AND strPersonLevel IN ('', ?)];
     }
-    if (defined $ageLevel) {
-        push @limitValues, $ageLevel;
-        $st .= qq[ AND strAgeLevel IN ('', ?)];
+
+    if (defined @ageLevel) {
+        #push @limitValues, $ageLevel;
+        my $strMergeAgeString = "'" . join("','", @ageLevel) . "'";
+        $st .= qq[ AND strAgeLevel IN ('', $strMergeAgeString)];
     }
+
+    $st .= qq [ ORDER BY strAgeLevel ASC ];
 
     my $query = $Data->{'db'}->prepare($st);
     $query->execute(@limitValues);
 
-    my $dref = $query->fetchrow_hashref();
+    my @retrievedValues = ();
+    while (my $dref = $query->fetchrow_hashref()) {
+        push @retrievedValues, $dref->{'strAgeLevel'};
+        if($dref->{'strAgeLevel'} eq '') {
+            #strAgeLevel is optional; return @ageLevel if that's the case
+            @retrievedValues = ();
+            @retrievedValues = @ageLevel;
+            last;
+        }
+    }
 
-    return if(!$dref or !defined($dref));
-    return 1;
+    my @uniqueAgeLevelOptions = uniq @retrievedValues;
+
+    return 0 if !@uniqueAgeLevelOptions;
+
+    my @retdata = ();
+    foreach(@uniqueAgeLevelOptions) {
+        if($_ eq '') {
+            push @retdata, {
+                name => '-',
+                value => '',
+            };
+        }
+        else {
+            push @retdata, {
+                name => $Defs::ageLevel{$_},
+                value => $_,
+            };
+        }
+    }
+
+    return \@retdata;
 }
 1;
