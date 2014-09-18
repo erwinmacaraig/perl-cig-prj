@@ -8,6 +8,7 @@ require Exporter;
   	checkForOutstandingTasks
     addIndividualTask
     cleanTasks
+    viewTask
 );
 
 use strict;
@@ -146,6 +147,9 @@ sub handleWorkflow {
         rejectTask($Data);
         ( $body, $title ) = addTaskNotes( $Data );	
     }
+    elsif ( $action eq 'WF_View' ) {
+        ( $body, $title ) = viewTask( $Data );		
+    }
 	else {
         ( $body, $title ) = listTasks( $Data );		
 	};
@@ -227,7 +231,7 @@ sub listTasks {
 		$entityID,
 		$entityID,
 	) or query_error($st);
-	
+
 	my @TaskList = ();
 	my $rowCount = 0;
 	  
@@ -1265,5 +1269,26 @@ sub getTask {
 
     my $result = $q->fetchrow_hashref();
     return $result || undef;
+}
+
+sub viewTask {
+    my ($Data) = @_;
+    #TODO
+    #retrieve all necessary details here
+    #   - person detail
+    #   - or entity detail
+    #   - and documents
+    # using $WFTaskID, link tblWFTask to tblEntity to personRegistration (if intPersonRegistrationID != 0) and tblPerson (use intPersonID)
+    # using entityID, add a check so that the entity should only have access to task specifically assigned to it
+    # check strTask status
+    #   - if rejected, intProblemResolutionID = entityID
+    #   - if active, intApprovalEntityID = entityID
+    #   - check strStatus
+    #       - if COMPLETED (final approval as per comment in JIRA), display a summary page
+
+    my $WFTaskID = safe_param('TID','number') || '';
+	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+
+    return (undef, undef);
 }
 1;
