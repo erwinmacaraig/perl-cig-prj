@@ -112,10 +112,10 @@ print STDERR Dumper($personObj);
 	);
 	
     my %RegFilters=();
-    $RegFilters{'current'} = 1;
-    my @statusIN = ($Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE, $Defs::PERSONREGO_STATUS_TRANSFERRED, $Defs::PERSONREGO_STATUS_SUSPENDED);
-    $RegFilters{'entityID'} = getLastEntityID($Data->{'clientValues'});
-    $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? push @statusIN, $Defs::PERSONREGO_STATUS_DELETED : undef;
+    #$RegFilters{'current'} = 1;
+    my @statusIN = ($Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE); #, $Defs::PERSONREGO_STATUS_TRANSFERRED, $Defs::PERSONREGO_STATUS_SUSPENDED);
+    #$RegFilters{'entityID'} = getLastEntityID($Data->{'clientValues'});
+    #$Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? push @statusIN, $Defs::PERSONREGO_STATUS_DELETED : undef;
     
     $RegFilters{'statusIN'} = \@statusIN;
     my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
