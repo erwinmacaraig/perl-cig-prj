@@ -21,6 +21,8 @@ use PersonUtils;
 use Clearances;
 use Duplicates;
 use PersonRegistration;
+use Data::Dumper;
+use Switch;
 use CGI qw(param unescape escape);
 
 sub cleanTasks  {
@@ -1278,7 +1280,7 @@ sub viewTask {
     #   - person detail
     #   - or entity detail
     #   - and documents
-    # using $WFTaskID, link tblWFTask to tblEntity to personRegistration (if intPersonRegistrationID != 0) and tblPerson (use intPersonID)
+    # DONE: using $WFTaskID, link tblWFTask to tblEntity to personRegistration (if intPersonRegistrationID != 0) and tblPerson (use intPersonID)
     # using entityID, add a check so that the entity should only have access to task specifically assigned to it
     # check strTask status
     #   - if rejected, intProblemResolutionID = entityID
@@ -1287,8 +1289,112 @@ sub viewTask {
     #       - if COMPLETED (final approval as per comment in JIRA), display a summary page
 
     my $WFTaskID = safe_param('TID','number') || '';
-	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+    my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+    my $st;
 
-    return (undef, undef);
+    $st = qq[
+        SELECT 
+            t.intWFTaskID, 
+            t.strTaskStatus, 
+            t.strTaskType, 
+            pr.intPersonRegistrationID, 
+            pr.strPersonLevel, 
+            pr.strAgeLevel, 
+            pr.strSport, 
+            t.strRegistrationNature, 
+            dt.strDocumentName,
+            p.strLocalFirstname, 
+            p.strLocalSurname, 
+            p.intGender as PersonGender,
+            e.strLocalName as EntityLocalName,
+            p.intPersonID, 
+            t.strTaskStatus, 
+            t.strWFRuleFor,
+            uar.entityID as UserEntityID, 
+            uarRejected.entityID as UserRejectedEntityID,
+            e.intEntityID,
+            e.intEntityLevel,
+            t.intApprovalEntityID,
+            t.intProblemResolutionEntityID,
+            t.strTaskNotes as TaskNotes
+        FROM tblWFTask AS t
+        LEFT JOIN tblEntity as e ON (e.intEntityID = t.intEntityID)
+        LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (t.intPersonRegistrationID = pr.intPersonRegistrationID)
+        LEFT JOIN tblPerson AS p ON (t.intPersonID = p.intPersonID)
+        LEFT JOIN tblUserAuthRole AS uar ON ( t.intApprovalEntityID = uar.entityID )
+        LEFT OUTER JOIN tblDocumentType AS dt ON (t.intDocumentTypeID = dt.intDocumentTypeID)
+        LEFT JOIN tblUserAuthRole AS uarRejected ON ( t.intProblemResolutionEntityID = uarRejected.entityID )
+        WHERE 
+            t.intRealmID = $Data->{'Realm'}
+            AND t.intWFTaskID = ?
+            AND (
+                (intApprovalEntityID = ? AND t.strTaskStatus = 'ACTIVE')
+                OR
+                (intProblemResolutionEntityID = ? AND t.strTaskStatus = 'REJECTED')
+            )
+        LIMIT 1
+    ];
+
+    my $db = $Data->{'db'};
+    my $q = $db->prepare($st) or query_error($st);
+    $q->execute(
+        $WFTaskID,
+        $entityID,
+        $entityID,
+    ) or query_error($st);
+
+    my @TaskList = ();
+    my $rowCount = 0;
+	  
+    my $dref = $q->fetchrow_hashref();
+    print STDERR Dumper $dref;
+
+    if(!$dref) {
+        return (undef, "ERROR: no data retrieved/no access.");
+    }
+
+    warn "WORKFLOW_entityID " . $entityID;
+    warn "WORKFLOW_strRuleFor " . $dref->{strWFRuleFor};
+
+    my %TemplateData = ();
+    my $templateFile;
+    my $title;
+
+    switch($dref->{strWFRuleFor}) {
+        case 'REGO' {
+            $title = 'Person Registration Details';
+            $templateFile = 'workflow/view/personregistration.templ';
+        }
+        case 'ENTITY' {
+            switch ($dref->{intEntityLevel}) {
+                case 3 {
+                    $title = 'Club Registration Details';
+                    $templateFile = 'workflow/view/club.templ';
+                }
+                case -47 {
+                    $title = 'Venue Registration Details';
+                    $templateFile = 'workflow/view/venue.templ';
+                }
+                else {
+                
+                }
+            }
+        }
+        case 'PERSON' {
+            $title = 'Person Details';
+            $templateFile = 'workflow/view/person.templ';
+        }
+        else {
+        
+        }
+    }
+
+    my $body = runTemplate(
+        $Data,
+        \%TemplateData,
+        $templateFile
+    );
+
+    return ($body, $title);
 }
 1;
