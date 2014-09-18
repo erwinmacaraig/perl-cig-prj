@@ -115,13 +115,23 @@ print STDERR "SSSS$action $clubID\n";
   
   
   my %legalTypeOptions = ();
-  my $query = "SELECT intLegalType, strLegalType FROM tblLegalType WHERE intRealmID IN (0,?)"; 
+  
+  my $query = "SELECT strLegalType, intLegalTypeID FROM tblLegalType WHERE intRealmID IN (0,?)"; 
    my $sth = $Data->{'db'}->prepare($query);
   $sth->execute($Data->{'Realm'}); 
   while(my $href = $sth->fetchrow_hashref()){
-  	$legalTypeOptions{$href->{'intLegalType'}} = $href->{'strLegalType'};
+  	$legalTypeOptions{$href->{'intLegalTypeID'}} = $href->{'strLegalType'};
   }
   $sth->finish();
+  
+  my $kk = $field->{intLegalTypeID};
+  my $vv = $legalTypeOptions{$field->{intLegalTypeID}} || 'Select Type';  
+    if(!%legalTypeOptions ||  !$field->{intLegalTypeID}){
+     	   $kk = '';
+  		   $vv = 'Select Type';	
+    }
+    #[ $field->{intLegalTypeID}, $legalTypeOptions{$field->{intLegalTypeID}} ]
+
   
   
   my %FieldDefinitions=(
@@ -162,14 +172,20 @@ print STDERR "SSSS$action $clubID\n";
         size  => '30',
         maxsize => '50',
       },
-      strLegalType => {
+      intLegalTypeID => {
         label => "Legal Entity Type",
-        value => $field->{strLegalTypeID},
         type => 'lookup',
         options => \%legalTypeOptions,
-        firstoption => [ '', 'Select Type' ],
+        firstoption => [$kk, $vv],       
         readonly =>($Data->{'clientValues'}{authLevel} < $Defs::LEVEL_NATIONAL),
      },
+     strLegalID => {
+        label => "Legal Type Number",
+        value => $field->{strLegalID},
+        type  => 'text',
+        size  => '30',
+        maxsize => '50',       
+      },
       strEntityType => {
         label => "Subtype",
         value => $field->{strEntityType},
@@ -328,7 +344,8 @@ print STDERR "SSSS$action $clubID\n";
         strEntityType
         strStatus
         strAssocNature
-        strLegalType
+        intLegalTypeID
+        strLegalID
         dtFrom
         dtTo
         strISOCountry
@@ -436,6 +453,8 @@ my $resultHTML='' ;
   }
   $resultHTML = $scMenu.$logodisplay.$resultHTML;
   $title="Add New $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}" if $option eq 'add';
+  
+  
   return ($resultHTML,$title);
 }
 
@@ -454,7 +473,7 @@ sub loadClubDetails {
      intCreatedByEntityID,
      strFIFAID,
      strLocalName,
-     strLegalTypeID,
+     intLegalTypeID,
      strLocalShortName,
      strLocalFacilityName,
      strLatinName,
@@ -478,7 +497,8 @@ sub loadClubDetails {
      strContactEmail,
      strContactPhone,
      dtAdded,
-     tTimeStamp
+     tTimeStamp,
+     strLegalID
     FROM tblEntity
     WHERE intEntityID = ?
   ];

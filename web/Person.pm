@@ -722,7 +722,7 @@ sub person_details {
     my %FieldDefinitions = (
         fields => {
             strFIFAID => {
-                label       => $FieldLabels->{'strFIFAID'},
+                label       => $Data->{'SystemConfig'}{'person_strFIFAID'} ? $FieldLabels->{'strFIFAID'} : '',
                 value       => $field->{strFIFAID},
                 type        => 'text',
                 size        => '14',
@@ -737,16 +737,9 @@ sub person_details {
                 readonly    => 1,
                 sectionname => 'details',
             },
-            strPersonNo => {
-                label       => $FieldLabels->{'strPersonNo'},
-                value       => $field->{strPersonNo},
-                type        => 'text',
-                size        => '15',
-                maxsize     => '15',
-                sectionname => 'details',
-            },
+            
             strStatus => {
-                label         => $FieldLabels->{'strStatus'},
+                label         => $Data->{'SystemConfig'}{'person_strStatus'}? $FieldLabels->{'strStatus'} : '',
                 value         => $field->{strStatus},
                 type          => 'lookup',
                 sectionname   => 'details',
@@ -764,7 +757,7 @@ sub person_details {
             },
 
             strLocalFirstname => {
-                label       => $FieldLabels->{'strLocalFirstname'},
+                label       => $Data->{'SystemConfig'}{'person_strLocalFirstname'}?$FieldLabels->{'strLocalFirstname'} : '',
                 value       => $field->{strLocalFirstname},
                 type        => 'text',
                 size        => '40',
@@ -772,14 +765,7 @@ sub person_details {
                 sectionname => 'details',
                 first_page  => 1,
             },
-            strLocalMiddlename => {
-                label       => $FieldLabels->{'strLocalMiddlename'},
-                value       => $field->{strLocalMiddlename},
-                type        => 'text',
-                size        => '40',
-                maxsize     => '50',
-                sectionname => 'details',
-            },
+            
             strLocalSurname => {
                 label       => $Data->{'SystemConfig'}{'strLocalSurname_Text'} ? $Data->{'SystemConfig'}{'strLocalSurname_Text'} : $FieldLabels->{'strLocalSurname'},
                 value       => $field->{strLocalSurname},
@@ -797,15 +783,7 @@ sub person_details {
                 maxsize     => '50',
                 sectionname => 'details',
                 first_page  => 1,
-            },
-            strLatinMiddlename => {
-                label       => $FieldLabels->{'strLatinMiddlename'},
-                value       => $field->{strLatinMiddlename},
-                type        => 'text',
-                size        => '40',
-                maxsize     => '50',
-                sectionname => 'details',
-            },
+            },            
             strLatinSurname => {
                 label       => $Data->{'SystemConfig'}{'strLocalSurname_Text'} ? $Data->{'SystemConfig'}{'strLocalSurname_Text'} : $FieldLabels->{'strLatinSurname'},
                 value       => $field->{strLatinSurname},
@@ -831,15 +809,7 @@ sub person_details {
                 maxsize     => '50',
                 sectionname => 'details',
             },
-            dtDeath=> {
-                label       => $FieldLabels->{'dtDeath'},
-                value       => $field->{dtDeath},
-                type        => 'date',
-                datetype    => 'dropdown',
-                format      => 'dd/mm/yyyy',
-                sectionname => 'details',
-                validate    => 'DATE',
-            },
+            
             dtSuspendedUntil=> {
                 label       => $FieldLabels->{'dtSuspendedUntil'},
                 value       => $field->{dtSuspendedUntil},
@@ -884,22 +854,7 @@ sub person_details {
                 sectionname => 'other',
                 firstoption => [ '', 'Select Country' ],
             },
-            strISOMotherCountry => {
-                label       => $FieldLabels->{'strISOMotherCountry'},
-                value       => $field->{strMotherISOCountry},
-                type        => 'lookup',
-                options     => \%countriesonly,
-                sectionname => 'details',
-                firstoption => [ '', 'Select Country' ],
-            },
-            strISOFatherCountry => {
-                label       => $FieldLabels->{'strISOFatherCountry'},
-                value       => $field->{strISOFatherCountry},
-                type        => 'lookup',
-                options     => \%countriesonly,
-                sectionname => 'details',
-                firstoption => [ '', 'Select Country' ],
-            },
+            
             intGender => {
                 label       => $FieldLabels->{'intGender'},
                 value       => $field->{intGender},
@@ -910,7 +865,6 @@ sub person_details {
                 firstoption => [ '', " " ],
                 first_page  => 1,
             },
-
             strAddress1 => {
                 label       => $FieldLabels->{'strAddress1'},
                 value       => $field->{strAddress1},
@@ -959,14 +913,7 @@ sub person_details {
                 maxsize     => '30',
                 sectionname => 'contact',
             },
-            strPhoneWork => {
-                label       => $FieldLabels->{'strPhoneWork'},
-                value       => $field->{strPhoneWork},
-                type        => 'text',
-                size        => '20',
-                maxsize     => '30',
-                sectionname => 'contact',
-            },
+            
             strPhoneMobile => {
                 label       => $FieldLabels->{'strPhoneMobile'},
                 value       => $field->{strPhoneMobile},
@@ -975,22 +922,8 @@ sub person_details {
                 maxsize     => '30',
                 sectionname => 'contact',
             },
-            strPager => {
-                label       => $FieldLabels->{'strPager'},
-                value       => $field->{strPager},
-                type        => 'text',
-                size        => '20',
-                maxsize     => '30',
-                sectionname => 'contact',
-            },
-            strFax => {
-                label       => $FieldLabels->{'strFax'},
-                value       => $field->{strFax},
-                type        => 'text',
-                size        => '20',
-                maxsize     => '30',
-                sectionname => 'contact',
-            },
+           
+           
             strEmail => {
                 label       => $FieldLabels->{'strEmail'},
                 value       => $field->{strEmail},
@@ -1016,63 +949,7 @@ sub person_details {
                 size        => '20',
                 maxsize     => '50',
                 sectionname => 'other',
-            },
-            strPassportIssueCountry => {
-                label       => $FieldLabels->{'strPassportIssueCountry'},
-                value       => uc( $field->{strPassportIssueCountry} ),
-                type        => 'lookup',
-                options     => \%countriesonly,
-                sectionname => 'identification',
-                firstoption => [ '', " " ],
-            },
-            strPassportNationality => {
-                label       => $FieldLabels->{'strPassportNationality'},
-                value       => uc( $field->{strPassportNationality} ),
-                type        => 'lookup',
-                options     => \%countriesonly,
-                sectionname => 'identification',
-                firstoption => [ '', " " ],
-            },
-            strPassportNo => {
-                label       => $FieldLabels->{'strPassportNo'},
-                value       => $field->{strPassportNo},
-                type        => 'text',
-                size        => '20',
-                maxsize     => '50',
-                sectionname => 'identification',
-            },
-            dtPassportExpiry => {
-                label       => $FieldLabels->{'dtPassportExpiry'},
-                value       => $field->{dtPassportExpiry},
-                type        => 'date',
-                format      => 'dd/mm/yyyy',
-                sectionname => 'identification',
-                validate    => 'DATE',
-            },
-            dtPoliceCheck => {
-                label => $Data->{'SystemConfig'}{'dtPoliceCheck_Text'} ? $Data->{'SystemConfig'}{'dtPoliceCheck_Text'} : $FieldLabels->{'dtPoliceCheck'},
-                value => $field->{dtPoliceCheck},
-                type  => 'date',
-                format      => 'dd/mm/yyyy',
-                sectionname => 'identification',
-                validate    => 'DATE',
-            },
-            dtPoliceCheckExp => {
-                label => $Data->{'SystemConfig'}{'dtPoliceCheckExp_Text'} ? $Data->{'SystemConfig'}{'dtPoliceCheckExp_Text'} : $FieldLabels->{'dtPoliceCheckExp'},
-                value => $field->{dtPoliceCheckExp},
-                type  => 'date',
-                format      => 'dd/mm/yyyy',
-                sectionname => 'identification',
-                validate    => 'DATE',
-            },
-            strPoliceCheckRef => {
-                label       => $FieldLabels->{'strPoliceCheckRef'},
-                value       => $field->{strPoliceCheckRef},
-                type        => 'text',
-                size        => '20',
-                maxsize     => '30',
-                sectionname => 'identification',
-            },
+            },         
             strEmergContName => {
                 label       => $FieldLabels->{'strEmergContName'},
                 value       => $field->{strEmergContName},
@@ -1097,40 +974,8 @@ sub person_details {
                 maxsize     => '100',
                 sectionname => 'contact',
             },
-            strP1Salutation => {
-                label       => $FieldLabels->{'strP1Salutation'},
-                value       => $field->{strP1Salutation},
-                type        => 'text',
-                size        => '20',
-                maxsize     => '30',
-                sectionname => 'parent',
-            },
-            strP2Salutation => {
-                label       => $FieldLabels->{'strP2Salutation'},
-                value       => $field->{strP2Salutation},
-                type        => 'text',
-                size        => '20',
-                maxsize     => '30',
-                sectionname => 'parent',
-            },
-            intP1Gender => {
-                label       => $FieldLabels->{'intP1Gender'},
-                value       => $field->{intP1Gender},
-                type        => 'lookup',
-                options     => \%genderoptions,
-                sectionname => 'details',
-                firstoption => [ '', " " ],
-                sectionname => 'parent',
-            },
-            intP2Gender => {
-                label       => $FieldLabels->{'intP2Gender'},
-                value       => $field->{intP2Gender},
-                type        => 'lookup',
-                options     => \%genderoptions,
-                sectionname => 'details',
-                firstoption => [ '', " " ],
-                sectionname => 'parent',
-            },
+            
+            
             strP1FName => {
                 label       => $FieldLabels->{'strP1FName'},
                 value       => $field->{strP1FName},
@@ -1147,22 +992,7 @@ sub person_details {
                 maxsize     => '50',
                 sectionname => 'parent',
             },
-            strP2FName => {
-                label       => $FieldLabels->{'strP2FName'},
-                value       => $field->{strP2FName},
-                type        => 'text',
-                size        => '30',
-                maxsize     => '50',
-                sectionname => 'parent',
-            },
-            strP2SName => {
-                label       => $FieldLabels->{'strP2SName'},
-                value       => $field->{strP2SName},
-                type        => 'text',
-                size        => '30',
-                maxsize     => '50',
-                sectionname => 'parent',
-            },
+            
             strP1Phone => {
                 label       => $FieldLabels->{'strP1Phone'},
                 value       => $field->{strP1Phone},
@@ -1171,46 +1001,8 @@ sub person_details {
                 maxsize     => '30',
                 sectionname => 'parent',
             },
-            strP2Phone => {
-                label       => $FieldLabels->{'strP2Phone'},
-                value       => $field->{strP2Phone},
-                type        => 'text',
-                size        => '20',
-                maxsize     => '30',
-                sectionname => 'parent',
-            },
-            strP1Phone2 => {
-                label       => $FieldLabels->{'strP1Phone2'},
-                value       => $field->{strP1Phone2},
-                type        => 'text',
-                size        => '20',
-                maxsize     => '30',
-                sectionname => 'parent',
-            },
-            strP2Phone2 => {
-                label       => $FieldLabels->{'strP2Phone2'},
-                value       => $field->{strP2Phone2},
-                type        => 'text',
-                size        => '20',
-                maxsize     => '30',
-                sectionname => 'parent',
-            },
-            strP1PhoneMobile => {
-                label       => $FieldLabels->{'strP1PhoneMobile'},
-                value       => $field->{strP1PhoneMobile},
-                type        => 'text',
-                size        => '20',
-                maxsize     => '30',
-                sectionname => 'parent',
-            },
-            strP2PhoneMobile => {
-                label       => $FieldLabels->{'strP2PhoneMobile'},
-                value       => $field->{strP2PhoneMobile},
-                type        => 'text',
-                size        => '20',
-                maxsize     => '30',
-                sectionname => 'parent',
-            },
+           
+            
             strP1Email => {
                 label       => $FieldLabels->{'strP1Email'},
                 value       => $field->{strP1Email},
@@ -1220,71 +1012,9 @@ sub person_details {
                 sectionname => 'parent',
                 validate    => 'EMAIL',
             },
-            strP2Email => {
-                label       => $FieldLabels->{'strP2Email'},
-                value       => $field->{strP2Email},
-                type        => 'text',
-                size        => '50',
-                maxsize     => '200',
-                sectionname => 'parent',
-                validate    => 'EMAIL',
-            },
-            strP1Email2 => {
-                label       => $FieldLabels->{'strP1Email2'},
-                value       => $field->{strP1Email2},
-                type        => 'text',
-                size        => '50',
-                maxsize     => '200',
-                sectionname => 'parent',
-                validate    => 'EMAIL',
-            },
-            strP2Email2 => {
-                label       => $FieldLabels->{'strP2Email2'},
-                value       => $field->{strP2Email2},
-                type        => 'text',
-                size        => '50',
-                maxsize     => '200',
-                sectionname => 'parent',
-                validate    => 'EMAIL',
-            },
-            strEyeColour => {
-                label       => $FieldLabels->{'strEyeColour'},
-                value       => $field->{strEyeColour},
-                type        => 'lookup',
-                options     => $DefCodes->{-11},
-                order       => $DefCodesOrder->{-11},
-                sectionname => 'other',
-                firstoption => [ '', " " ],
-                sectionname => 'details',
-            },
-            strHairColour => {
-                label       => $FieldLabels->{'strHairColour'},
-                value       => $field->{strHairColour},
-                type        => 'lookup',
-                options     => $DefCodes->{-10},
-                order       => $DefCodesOrder->{-10},
-                sectionname => 'other',
-                firstoption => [ '', " " ],
-                sectionname => 'details',
-            },
-            strHeight => {
-                label       => $FieldLabels->{'strHeight'},
-                value       => $field->{strHeight},
-                type        => 'text',
-                size        => '5',
-                maxsize     => '20',
-                sectionname => 'details',
-                format_txt  => 'cm',
-            },
-            strWeight => {
-                label       => $FieldLabels->{'strWeight'},
-                value       => $field->{strWeight},
-                type        => 'text',
-                size        => '5',
-                maxsize     => '20',
-                sectionname => 'details',
-                format_txt  => 'kg',
-            },
+            
+           
+            
            strISOCountry => {
                 label       => $FieldLabels->{'strISOCountry'},
                 value       => $field->{strISOCountry},

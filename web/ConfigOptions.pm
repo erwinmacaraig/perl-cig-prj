@@ -451,7 +451,8 @@ sub getFieldsList	{
         strContact
         strAssocNature
         strMANotes
-        strLegalType
+        intLegalTypeID
+        strLegalID
         intClubClassification
         ));
 
