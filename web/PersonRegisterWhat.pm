@@ -276,7 +276,7 @@ sub optionsPersonRegisterWhat {
         }
         elsif ($lookingForField eq 'strAgeLevel') {
             #get age level from tblMatrix to narrow down selection in checkRegoAgeRestrictions
-            my @ageLevelFromMatrix = getAgeLevelFromMatrix($Data, 1, $subRealmID, $MATRIXwhere, \@MATRIXvalues);
+            my @ageLevelFromMatrix = getAgeLevelFromMatrix($Data, $MATRIXwhere, \@MATRIXvalues);
 
             if(!@ageLevelFromMatrix) {
                 return (undef, 'No age level defined.') 
@@ -495,7 +495,7 @@ sub getPersonTypeFromMatrix {
 }
 
 sub getAgeLevelFromMatrix {
-    my($Data, $realmID, $subRealmID, $where, $values_ref) = @_;
+    my($Data, $where, $values_ref) = @_;
                        
     my $st=qq[
         SELECT DISTINCT strAgeLevel
