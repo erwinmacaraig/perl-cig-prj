@@ -1,0 +1,2 @@
+ALTER TABLE `tblLegalType` 
+CHANGE COLUMN `intLegalType` `intLegalTypeID` INT(11) NOT NULL AUTO_INCREMENT ;

@@ -65,6 +65,8 @@ sub GetPermissions {
                 AND intChildID = ?
             LIMIT 1
         ];
+        
+        
         my $q = $db->prepare($st);
         $q->execute($RealmID, $EntityID);
         while(my $dref = $q->fetchrow_hashref())  {
@@ -84,7 +86,8 @@ sub GetPermissions {
         $structure_where .= qq{ OR ( intEntityTypeID = $r->[0] AND intEntityID = ?) };
         push @vals, $r->[1];
     }
-
+    
+    
     my $authRoleID = $Data->{'AuthRoleID'} || 0;
     my $st = qq[
         SELECT 
@@ -105,6 +108,8 @@ sub GetPermissions {
         ORDER BY intRoleID DESC
     ];
     my $q = $db->prepare($st);
+   
+    
     $q->execute(@vals);
     my %PermissionsRaw = ();
     my %fields_by_type = ();
@@ -430,6 +435,7 @@ sub getFieldsList	{
         strLatinShortName
         strStatus
         strISOCountry
+        strISOLocalLanguage
 
         strRegion
         strPostalCode
@@ -443,7 +449,9 @@ sub getFieldsList	{
         strContactEmail
         strContactPhone
         strContact
-
+        strAssocNature
+        strMANotes
+        strLegalType
         intClubClassification
         ));
 

@@ -127,8 +127,13 @@ sub getFieldLabels	{
             strIdentifier => 'Identifier',
             dtValidFrom => 'Valid From',
             dtValidUntil =>'Valid Until',
-            strDescription => 'Description'
-		);
+            strDescription => 'Description',
+            strAssocNature => 'Association Nature',
+            strMANotes => 'MA Comment',
+            strLegalType => 'Legal Entity Type', 
+            strISOLocalLanguage => 'Local Name Language'
+            	
+	);
 	}
 	for my $k (keys %labels)	{
 		$labels{$k}= ($Data->{'SystemConfig'}{'FieldLabel_'.$k} || '') if exists $Data->{'SystemConfig'}{'FieldLabel_'.$k};
