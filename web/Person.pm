@@ -687,7 +687,8 @@ sub person_details {
         $countriesonly{$c} = $c;
     }
     my $countries = getCountriesHash($Data);
-    my $isocountries = getISOCountriesHash();
+     my $isocountries = getISOCountriesHash();
+   
     my ($DefCodes, $DefCodesOrder) = getDefCodes(
         dbh        => $Data->{'db'}, 
         realmID    => $Data->{'Realm'},
@@ -755,7 +756,6 @@ sub person_details {
                 maxsize     => '30',
                 sectionname => 'details',
             },
-
             strLocalFirstname => {
                 label       => $Data->{'SystemConfig'}{'person_strLocalFirstname'}?$FieldLabels->{'strLocalFirstname'} : '',
                 value       => $field->{strLocalFirstname},
@@ -764,8 +764,7 @@ sub person_details {
                 maxsize     => '50',
                 sectionname => 'details',
                 first_page  => 1,
-            },
-            
+            },            
             strLocalSurname => {
                 label       => $Data->{'SystemConfig'}{'strLocalSurname_Text'} ? $Data->{'SystemConfig'}{'strLocalSurname_Text'} : $FieldLabels->{'strLocalSurname'},
                 value       => $field->{strLocalSurname},
@@ -1011,10 +1010,7 @@ sub person_details {
                 maxsize     => '200',
                 sectionname => 'parent',
                 validate    => 'EMAIL',
-            },
-            
-           
-            
+           },            
            strISOCountry => {
                 label       => $FieldLabels->{'strISOCountry'},
                 value       => $field->{strISOCountry},

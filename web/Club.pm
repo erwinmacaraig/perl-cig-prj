@@ -33,6 +33,7 @@ use Data::Dumper;
 use RegistrationItem;
 use TTTemplate;
 use DBI;
+use Countries;
 sub handleClub  {
   my ($action, $Data, $parentID, $clubID, $typeID)=@_;
 
@@ -124,14 +125,14 @@ print STDERR "SSSS$action $clubID\n";
   }
   $sth->finish();
   
-  my $kk = $field->{intLegalTypeID};
-  my $vv = $legalTypeOptions{$field->{intLegalTypeID}} || 'Select Type';  
-    if(!%legalTypeOptions ||  !$field->{intLegalTypeID}){
-     	   $kk = '';
-  		   $vv = 'Select Type';	
-    }
-    #[ $field->{intLegalTypeID}, $legalTypeOptions{$field->{intLegalTypeID}} ]
-
+  #my $kk = $field->{intLegalTypeID};
+  #my $vv = $legalTypeOptions{$field->{intLegalTypeID}} || 'Select Type';  
+  #  if(!%legalTypeOptions ||  !$field->{intLegalTypeID}){
+  #   	   $kk = '';
+  #		   $vv = 'Select Type';	
+  #  }
+  #[ $field->{intLegalTypeID}, $legalTypeOptions{$field->{intLegalTypeID}} ]
+   my $isocountries = getISOCountriesHash();
   
   
   my %FieldDefinitions=(
@@ -174,9 +175,10 @@ print STDERR "SSSS$action $clubID\n";
       },
       intLegalTypeID => {
         label => "Legal Entity Type",
+        value => $field->{intLegalTypeID},
         type => 'lookup',
         options => \%legalTypeOptions,
-        firstoption => [$kk, $vv],       
+        firstoption => [ '', 'Select Type' ],       
         readonly =>($Data->{'clientValues'}{authLevel} < $Defs::LEVEL_NATIONAL),
      },
      strLegalID => {
@@ -253,11 +255,11 @@ print STDERR "SSSS$action $clubID\n";
         maxsize => '50',
       },
       strISOCountry => {
-        label => 'Country (ISO)',
-        value => $field->{strISOCountry},
-        type  => 'text',
-        size  => '30',
-        maxsize => '50',
+          label       => 'ISO Country',
+          value       => $field->{strISOCountry},
+          type        => 'lookup',
+          options     => $isocountries,
+          firstoption => [ '', 'Select Country' ],
       },
       strISOLocalLanguage => {
       	label => 'Local Name Language',
@@ -274,21 +276,21 @@ print STDERR "SSSS$action $clubID\n";
         maxsize => '15',
       },
       strPhone => {
-        label => 'Phone',
+        label => '',
         value => $field->{strPhone},
         type  => 'text',
         size  => '20',
         maxsize => '20',
       },
       strFax => {
-        label => 'Fax',
+        label => '',
         value => $field->{strFax},
         type  => 'text',
         size  => '20',
         maxsize => '20',
       },
       strEmail => {
-        label => 'Email',
+        label => '',
         value => $field->{strEmail},
         type  => 'text',
         size  => '35',
