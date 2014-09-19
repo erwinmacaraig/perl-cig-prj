@@ -1298,13 +1298,26 @@ sub viewTask {
             t.strTaskStatus, 
             t.strTaskType, 
             pr.intPersonRegistrationID, 
+            pr.strStatus as personRegistrationStatus,
             pr.strPersonLevel, 
             pr.strAgeLevel, 
             pr.strSport, 
+            pr.strPersonType,
             t.strRegistrationNature, 
             dt.strDocumentName,
             p.strLocalFirstname, 
+            p.strStatus as PersonStatus,
+            p.strLocalMiddleName,
+            p.strLocalSurname,
+            p.dtDOB,
+            p.strAddress1,
+            p.strAddress2,
+            p.strSuburb,
+            p.strState,
+            p.strPostalCode,
             p.strLocalSurname, 
+            p.dtSuspendedUntil, 
+            p.strISONationality, 
             p.intGender as PersonGender,
             e.strLocalName as EntityLocalName,
             p.intPersonID, 
@@ -1347,7 +1360,7 @@ sub viewTask {
     my $rowCount = 0;
 	  
     my $dref = $q->fetchrow_hashref();
-    print STDERR Dumper $dref;
+    #print STDERR Dumper $dref;
 
     if(!$dref) {
         return (undef, "ERROR: no data retrieved/no access.");
@@ -1356,36 +1369,25 @@ sub viewTask {
     warn "WORKFLOW_entityID " . $entityID;
     warn "WORKFLOW_strRuleFor " . $dref->{strWFRuleFor};
 
-    my %TemplateData = ();
+    my %TemplateData;
     my $templateFile;
     my $title;
 
     switch($dref->{strWFRuleFor}) {
         case 'REGO' {
-            $title = 'Person Registration Details';
+            warn "WORKFLOW_NEW REGO";
+            %TemplateData = populateRegoViewData($Data, $dref);
             $templateFile = 'workflow/view/personregistration.templ';
+            $title = "Person Registration Details";
+            print STDERR Dumper %TemplateData;
         }
         case 'ENTITY' {
-            switch ($dref->{intEntityLevel}) {
-                case 3 {
-                    $title = 'Club Registration Details';
-                    $templateFile = 'workflow/view/club.templ';
-                }
-                case -47 {
-                    $title = 'Venue Registration Details';
-                    $templateFile = 'workflow/view/venue.templ';
-                }
-                else {
-                
-                }
-            }
+            %TemplateData = populateEntityViewData($Data, $dref);
         }
         case 'PERSON' {
-            $title = 'Person Details';
-            $templateFile = 'workflow/view/person.templ';
+            %TemplateData = populatePersonViewData($Data, $dref);
         }
         else {
-        
         }
     }
 
@@ -1396,5 +1398,52 @@ sub viewTask {
     );
 
     return ($body, $title);
+    #return (undef, undef);
 }
+
+sub populateRegoViewData {
+    my ($Data, $dref) = @_;
+
+    my $title = 'Person Registration Details';
+    my $templateFile = 'workflow/view/personregistration.templ';
+
+    #print STDERR Dumper $Data->{'lang'};
+    print STDERR Dumper $dref;
+	my %TemplateData = (
+        PersonDetails => {
+            Status => $Data->{'lang'}->txt($Defs::personStatus{$dref->{'PersonStatus'} || 0}) || '',
+            Gender => $Data->{'lang'}->txt($Defs::genderInfo{$dref->{'PersonGender'} || 0}) || '',
+            DOB => $dref->{'dtDOB'} || '',
+            LocalName => "$dref->{'strLocalFirstname'} $dref->{'strLocalMiddleName'} $dref->{'strLocalSurname'}" || '',
+            LatinName => "$dref->{'strLatinFirstname'} $dref->{'strLatinMiddleName'} $dref->{'strLatinSurname'}" || '',
+            Address => "$dref->{'strAddress1'} $dref->{'strAddress2'} $dref->{'strAddress2'} $dref->{'strSuburb'} $dref->{'strState'} $dref->{'strPostalCode'}" || '',
+            Nationality => $dref->{'strISONationality'} || '', #TODO identify extract string
+            DateSuspendedUntil => '',
+            LastUpdate => '',
+        },
+        PersonRegoDetails => {
+            ID => $dref->{'intPersonRegistrationID'},
+            Status => $Data->{'lang'}->txt($Defs::personRegoStatus{$dref->{'personRegistrationStatus'} || 0}) || '',
+            RegoType => $Data->{'lang'}->txt($Defs::registrationNature{$dref->{'strRegistrationNature'} || 0}) || '',
+            PersonType => $Data->{'lang'}->txt($Defs::personType{$dref->{'strPersonType'} || 0}) || '', 
+            Sport => $Defs::sportType{$dref->{'strSport'}} || '',
+            Level => $Defs::personLevel{$dref->{'strPersonLevel'}} || '',
+            AgeLevel => $Defs::ageLevel{$dref->{'strAgeLevel'}} | '',
+        },
+	);
+	
+    return (%TemplateData);
+
+}
+
+sub populateEntityViewData {
+}
+
+sub populatePersonViewData {
+}
+
+sub populateDocumentViewData {
+
+}
+
 1;
