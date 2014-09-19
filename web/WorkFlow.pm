@@ -1329,7 +1329,20 @@ sub viewTask {
             e.intEntityLevel,
             t.intApprovalEntityID,
             t.intProblemResolutionEntityID,
-            t.strTaskNotes as TaskNotes
+            t.strTaskNotes as TaskNotes,
+            e.strEntityType,
+            e.strStatus as entityStatus,
+            e.strLocalName as entityLocalName,
+            e.strLocalShortName as strLocalShortName,
+            e.strRegion as entityRegion,
+            e.strPostalCode as entityPostalCode,
+            e.strTown as entityTown,
+            e.strAddress as entityAddress,
+            e.strWebUrl as entityWebUrl,
+            e.strEmail as entityEmail,
+            e.strPhone as entityPhone,
+            e.strFax as entityFax,
+            e.tTimeStamp as entityCreatedUpdated
         FROM tblWFTask AS t
         LEFT JOIN tblEntity as e ON (e.intEntityID = t.intEntityID)
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (t.intPersonRegistrationID = pr.intPersonRegistrationID)
@@ -1370,46 +1383,49 @@ sub viewTask {
     warn "WORKFLOW_strRuleFor " . $dref->{strWFRuleFor};
 
     my %TemplateData;
-    my $templateFile;
-    my $title;
+    my %fields;
 
     switch($dref->{strWFRuleFor}) {
         case 'REGO' {
-            warn "WORKFLOW_NEW REGO";
-            %TemplateData = populateRegoViewData($Data, $dref);
-            $templateFile = 'workflow/view/personregistration.templ';
-            $title = "Person Registration Details";
-            print STDERR Dumper %TemplateData;
+            my ($TemplateData, $fields) = populateRegoViewData($Data, $dref);
+            %TemplateData = %{$TemplateData};
+            %fields = %{$fields};
         }
         case 'ENTITY' {
-            %TemplateData = populateEntityViewData($Data, $dref);
+            my ($TemplateData, $fields) = populateEntityViewData($Data, $dref);
+            %TemplateData = %{$TemplateData};
+            %fields = %{$fields};
         }
         case 'PERSON' {
-            %TemplateData = populatePersonViewData($Data, $dref);
+            my ($TemplateData, $fields) = populatePersonViewData($Data, $dref);
+            %TemplateData = %{$TemplateData};
+            %fields = %{$fields};
         }
         else {
         }
     }
 
+
     my $body = runTemplate(
         $Data,
         \%TemplateData,
-        $templateFile
+        $fields{'templateFile'},
     );
 
-    return ($body, $title);
+    return ($body, $fields{'title'});
     #return (undef, undef);
 }
 
 sub populateRegoViewData {
     my ($Data, $dref) = @_;
 
-    my $title = 'Person Registration Details';
-    my $templateFile = 'workflow/view/personregistration.templ';
+    my %TemplateData;
+    my %fields = (
+        title => 'Person Registration Details',
+        templateFile => 'workflow/view/personregistration.templ',
+    );
 
-    #print STDERR Dumper $Data->{'lang'};
-    print STDERR Dumper $dref;
-	my %TemplateData = (
+	%TemplateData = (
         PersonDetails => {
             Status => $Data->{'lang'}->txt($Defs::personStatus{$dref->{'PersonStatus'} || 0}) || '',
             Gender => $Data->{'lang'}->txt($Defs::genderInfo{$dref->{'PersonGender'} || 0}) || '',
@@ -1432,11 +1448,51 @@ sub populateRegoViewData {
         },
 	);
 	
-    return (%TemplateData);
-
+    return (\%TemplateData, \%fields);
 }
 
 sub populateEntityViewData {
+    my ($Data, $dref) = @_;
+
+    my %TemplateData;
+    my %fields;
+
+	%TemplateData = (
+        EntityDetails => {
+            Status => $Data->{'lang'}->txt($Defs::entityStatus{$dref->{'entityStatus'} || 0}) || '',
+            LocalShortName => $dref->{'entityLocalShortName'} || '',
+            LocalName => $dref->{'entityLocalName'} || '',
+            Region => $dref->{'entityRegion'} || '',
+            Address => $dref->{'entityAddress'} || '',
+            Town => $dref->{'entityTown'} || '',
+            WebUrl => $dref->{'entityWebUrl'} || '',
+            Email => $dref->{'entityEmail'} || '',
+            Phone => $dref->{'entityPhone'} || '',
+            Fax => $dref->{'entityFax'} || '',
+        },
+	);
+	
+    switch ($dref->{intEntityLevel}) {
+        case "$Defs::LEVEL_CLUB"  {
+            %fields = (
+                title => 'Club Registration Details',
+                templateFile => 'workflow/view/club.templ',
+            );
+            #TODO: add details specific to CLUB
+        }
+        case "$Defs::LEVEL_VENUE" {
+            %fields = (
+                title => 'Venue Registration Details',
+                templateFile => 'workflow/view/venue.templ',
+            );
+            #TODO: add details specific to VENUE
+        }
+        else {
+        
+        }
+    }
+
+    return (\%TemplateData, \%fields);
 }
 
 sub populatePersonViewData {
