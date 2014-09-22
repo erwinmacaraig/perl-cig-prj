@@ -30,7 +30,7 @@ sub handle_entity_documents{
 	if($action eq 'C_DOCS_frm'){
 		  $resultHTML =  new_doc_form($Data, $client, $DocumentTypeID); 
 	}
-	elsif($action eq 'C_DOCS_u'){
+	elsif($action eq 'C_DOCS_u' || $action eq 'VENUE_DOCS_u'){
 	   	my $retvalue = process_doc_upload( 
 			$Data,
 			$entityID, 
