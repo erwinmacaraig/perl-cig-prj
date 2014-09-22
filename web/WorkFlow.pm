@@ -1343,14 +1343,26 @@ sub viewTask {
             e.strEmail as entityEmail,
             e.strPhone as entityPhone,
             e.strFax as entityFax,
-            e.tTimeStamp as entityCreatedUpdated
+            e.tTimeStamp as entityCreatedUpdated,
+            dPersonRego.intDocumentID as documentID,
+            dPersonRego.strApprovalStatus as documentApprovalStatus,
+            dPersonRego.strDeniedNotes as documentDeniedNotes,
+            dt.strDocumentName as documentName,
+            uf.strOrigFilename as documentOrigFilename,
+            uf.strPath as documentPath,
+            uf.strFilename as documentFilename,
+            uf.strExtension as documentExtension,
+            dPersonRego.intPersonRegistrationID as documentPersonRegistrationID,
+            dPersonRego.intPersonID as documentPersonID
         FROM tblWFTask AS t
         LEFT JOIN tblEntity as e ON (e.intEntityID = t.intEntityID)
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (t.intPersonRegistrationID = pr.intPersonRegistrationID)
         LEFT JOIN tblPerson AS p ON (t.intPersonID = p.intPersonID)
         LEFT JOIN tblUserAuthRole AS uar ON ( t.intApprovalEntityID = uar.entityID )
-        LEFT OUTER JOIN tblDocumentType AS dt ON (t.intDocumentTypeID = dt.intDocumentTypeID)
         LEFT JOIN tblUserAuthRole AS uarRejected ON ( t.intProblemResolutionEntityID = uarRejected.entityID )
+        LEFT JOIN tblDocuments as dPersonRego ON (t.intPersonID = dPersonRego.intPersonID AND t.intPersonRegistrationID = dPersonRego.intPersonRegistrationID)
+        LEFT JOIN tblUploadedFiles as uf ON (dPersonRego.intUploadFileID = uf.intFileID)
+        LEFT JOIN tblDocumentType as dt ON (dPersonRego.intDocumentTypeID = dt.intDocumentTypeID)
         WHERE 
             t.intRealmID = $Data->{'Realm'}
             AND t.intWFTaskID = ?
@@ -1384,6 +1396,8 @@ sub viewTask {
     warn "WORKFLOW_strRuleFor " . $dref->{strWFRuleFor};
 
     my %TemplateData;
+    my %DocumentData;
+    my %PaymentData;
     my %fields;
 
     switch($dref->{strWFRuleFor}) {
@@ -1424,8 +1438,32 @@ sub viewTask {
         'showResolve' => $showResolve,
     );
 
-    $TemplateData{'TaskAction'} = \%TaskAction;
+    my ($DocumentData, $fields) = populateDocumentViewData($Data, $dref);
+    %DocumentData = %{$DocumentData};
 
+    #my ($PaymentData, $fields) = populatePaymentViewData($Data, $dref);
+    #%PaymentData = %{$PaymentData};
+    %PaymentData = ();
+
+    my $documentBlock = runTemplate(
+        $Data,
+        \%DocumentData,
+        'workflow/view/generic/document.templ'
+    );
+
+    my $paymentBlock = runTemplate(
+        $Data,
+        \%PaymentData,
+        'workflow/view/generic/payment.templ'
+    );
+
+
+
+    $TemplateData{'TaskAction'} = \%TaskAction;
+    $TemplateData{'DocumentBlock'} = $documentBlock;
+    $TemplateData{'PaymentBlock'} = $paymentBlock;
+
+    print STDERR Dumper %TemplateData;
     my $body = runTemplate(
         $Data,
         \%TemplateData,
@@ -1543,7 +1581,30 @@ sub populatePersonViewData {
 }
 
 sub populateDocumentViewData {
+    my ($Data, $dref) = @_;
 
+    #still to implement tblWFRuleDocuments
+    my %DocumentData;
+    my %fields = (
+        title => '',
+        templateFile => 'workflow/view/generic/document.templ',
+    );
+
+    %DocumentData = (
+        DocumentDetails => {
+            DocumentID => $dref->{'documentID'} || '',
+            Status => $Data->{'lang'}->txt($dref->{'documentApprovalStatus'} || 0) || '',
+            DocumentName => $Data->{'lang'}->txt($dref->{'documentName'} || 0) || '',
+            DeniedNotes => $dref->{'documentDeniedNotes'} || '',
+            DocumentOrigFileName => $dref->{'documentOrigFilename'} || '',
+            DocumentPath => $Defs::fs_upload_dir . '/files/' . $dref->{'documentPath'} . $dref->{'documentFilename'} . '.' . $dref->{'documentExtension'} || '',
+            PersonID => $dref->{'documentPersonID'} || 0,
+            PersonRegistrationID => $dref->{'documentPersonRegistrationID'} || 0,
+        },
+	);
+
+    print STDERR Dumper %DocumentData;
+    return (\%DocumentData, \%fields);
 }
 
 1;
