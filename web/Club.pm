@@ -160,14 +160,14 @@ print STDERR "SSSS$action $clubID\n";
         maxsize => '50',
       },      
       strLatinName => {
-        label => 'Name (Latin)',
+        label => 'International Name',
         value => $field->{strLatinName},
         type  => 'text',
         size  => '40',
         maxsize => '150',
       },
       strLatinShortName => {
-        label => 'Short Name (Latin)',
+        label => 'International Short Name',
         value => $field->{strLatinShortName},
         type  => 'text',
         size  => '30',
@@ -189,7 +189,7 @@ print STDERR "SSSS$action $clubID\n";
         maxsize => '50',       
       },
       strEntityType => {
-        label => "Subtype",
+        label => "Entity Type",
         value => $field->{strEntityType},
         type => 'lookup',
         options => \%Defs::clubLevelSubtype,
