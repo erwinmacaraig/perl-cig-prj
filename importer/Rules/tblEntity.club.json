@@ -1,0 +1,44 @@
+{
+	"rules" : {
+		"strStateLocalName" : {
+			"rule" : "insertLink",
+			"field" : "strStateLocalName",
+			"reference" : "strLocalName"
+		},
+		"strRegionLocalName" : {
+			"rule" : "insertLink",
+			"field" : "strRegionLocalName",
+			"reference" : "strLocalName"
+		},
+		"strZoneLocalName" : {
+			"rule" : "insertLink",
+			"field" : "strZoneLocalName",
+			"reference" : "strImportEntityCode"
+		}
+	},
+	"mapping" : {
+		"EntityCode" : "strImportEntityCode",
+		"StateName" : "strStateLocalName",
+		"RegionName" : "strRegionLocalName",
+		"ZoneName" : "strZoneLocalName",
+		"SubType" : "strEntityType",
+		"Status" : "strStatus",
+		"LocalName" : "strLocalName",
+		"LocalShortName" : "strLocalShortName",
+		"LocalLanguageCode" : "strISOLocalLanguage",
+		"LatinName" : "strLatinName",
+		"LatinShortName" : "strLatinShortName",
+		"FoundationDate" : "dtFrom",
+		"DissolutionDate" : "dtTo",
+		"Country" : "strISOCountry",
+		"Region" : "strRegion",
+		"PostalCode" : "strPostalCode",
+		"State" : "strTown",
+		"Address1" : "strAddress",
+		"Address2" : "strAddress2",
+		"WebURL" : "strWebURL",
+		"Email" : "strEmail",
+		"Phone" : "strPhone",
+		"Fax" : "strFax"
+	}
+}

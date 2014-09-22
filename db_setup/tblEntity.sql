@@ -62,7 +62,10 @@ CREATE TABLE tblEntity (
     strShortNotes varchar(255) DEFAULT NULL COMMENT 'can only be added/edited/viewed by MA level',
     `intLegalTypeID` int(11) DEFAULT NULL COMMENT 'Type of Legal ID provided as listed in the tblLegalType Table',
     `strLegalID` varchar(45) DEFAULT NULL COMMENT 'a field to type in the ID that corresponds to the LegalType',
+    `strImportEntityCode` VARCHAR(45) NULL COMMENT 'Reference to the imported records inputted by client' AFTER `strShortNotes`,
+    `strAddress2` VARCHAR(200) NULL COMMENT 'Secondary address detail' AFTER `strAddress`,
   PRIMARY KEY (`intEntityID`),
+  UNIQUE KEY `strImportEntityCode_UNIQUE` (`strImportEntityCode`),
   KEY `index_intRealmID` (`intRealmID`),
   KEY `index_strFIFAID` (`strFIFAID`),
   KEY `index_intEntityLevel` (`intEntityLevel`)

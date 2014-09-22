@@ -1,0 +1,5 @@
+"EntityCode","StateName","RegionName","ZoneName","Status","SubType","LocalName","LocalShortName","LocalLanguageCode","LatinName","LatinShortName","FoundationDate","DissolutionDate","Country","WebURL","Fax","Phone","Address1","Address2","PostalCode","Region","State","Email"
+"C1","C2","C3","C4","ACTIVE","CLUB","Courts Young Lions","CYL","","","Courts Young Lions","1932-01-01","","SGP","www.younglions.com.sg","","","","","","","",""
+"C2","C1","C3","C4","ACTIVE","CLUB","Young Lions","YL","","","Young Lions","1965-01-01","","SGP","","","","","","","","",""
+"C3","C1","C2","C4","ACTIVE","CLUB","Home United FC","HUFC","","","","1992-06-01","","SGP","","","","","","","","",""
+"C4","C1","C2","C3","ACTIVE","CLUB","Home United FC 1","HUFC 1","","","","1992-06-01","","SGP","","","","","","","","",""

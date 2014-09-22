@@ -8,6 +8,7 @@ require Exporter;
   	checkForOutstandingTasks
     addIndividualTask
     cleanTasks
+    viewTask
 );
 
 use strict;
@@ -20,6 +21,8 @@ use PersonUtils;
 use Clearances;
 use Duplicates;
 use PersonRegistration;
+use Data::Dumper;
+use Switch;
 use CGI qw(param unescape escape);
 
 sub cleanTasks  {
@@ -146,6 +149,9 @@ sub handleWorkflow {
         rejectTask($Data);
         ( $body, $title ) = addTaskNotes( $Data );	
     }
+    elsif ( $action eq 'WF_View' ) {
+        ( $body, $title ) = viewTask( $Data );		
+    }
 	else {
         ( $body, $title ) = listTasks( $Data );		
 	};
@@ -227,7 +233,7 @@ sub listTasks {
 		$entityID,
 		$entityID,
 	) or query_error($st);
-	
+
 	my @TaskList = ();
 	my $rowCount = 0;
 	  
@@ -1266,4 +1272,278 @@ sub getTask {
     my $result = $q->fetchrow_hashref();
     return $result || undef;
 }
+
+sub viewTask {
+    my ($Data) = @_;
+    #TODO
+    #retrieve all necessary details here
+    #   - person detail
+    #   - or entity detail
+    #   - and documents
+    # DONE: using $WFTaskID, link tblWFTask to tblEntity to personRegistration (if intPersonRegistrationID != 0) and tblPerson (use intPersonID)
+    # using entityID, add a check so that the entity should only have access to task specifically assigned to it
+    # check strTask status
+    #   - if rejected, intProblemResolutionID = entityID
+    #   - if active, intApprovalEntityID = entityID
+    #   - check strStatus
+    #       - if COMPLETED (final approval as per comment in JIRA), display a summary page
+
+    my $WFTaskID = safe_param('TID','number') || '';
+    my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+
+    my $st;
+
+    $st = qq[
+        SELECT 
+            t.intWFTaskID, 
+            t.strTaskStatus, 
+            t.strTaskType, 
+            pr.intPersonRegistrationID, 
+            pr.strStatus as personRegistrationStatus,
+            pr.strPersonLevel, 
+            pr.strAgeLevel, 
+            pr.strSport, 
+            pr.strPersonType,
+            t.strRegistrationNature, 
+            dt.strDocumentName,
+            p.strLocalFirstname, 
+            p.strStatus as PersonStatus,
+            p.strLocalMiddleName,
+            p.strLocalSurname,
+            p.dtDOB,
+            p.strAddress1,
+            p.strAddress2,
+            p.strSuburb,
+            p.strState,
+            p.strPostalCode,
+            p.strLocalSurname, 
+            p.dtSuspendedUntil, 
+            p.strISONationality, 
+            p.intGender as PersonGender,
+            e.strLocalName as EntityLocalName,
+            p.intPersonID, 
+            t.strTaskStatus, 
+            t.strWFRuleFor,
+            uar.entityID as UserEntityID, 
+            uarRejected.entityID as UserRejectedEntityID,
+            e.intEntityID,
+            e.intEntityLevel,
+            t.intApprovalEntityID,
+            t.intProblemResolutionEntityID,
+            t.strTaskNotes as TaskNotes,
+            e.strEntityType,
+            e.strStatus as entityStatus,
+            e.strLocalName as entityLocalName,
+            e.strLocalShortName as strLocalShortName,
+            e.strRegion as entityRegion,
+            e.strPostalCode as entityPostalCode,
+            e.strTown as entityTown,
+            e.strAddress as entityAddress,
+            e.strWebUrl as entityWebUrl,
+            e.strEmail as entityEmail,
+            e.strPhone as entityPhone,
+            e.strFax as entityFax,
+            e.tTimeStamp as entityCreatedUpdated
+        FROM tblWFTask AS t
+        LEFT JOIN tblEntity as e ON (e.intEntityID = t.intEntityID)
+        LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (t.intPersonRegistrationID = pr.intPersonRegistrationID)
+        LEFT JOIN tblPerson AS p ON (t.intPersonID = p.intPersonID)
+        LEFT JOIN tblUserAuthRole AS uar ON ( t.intApprovalEntityID = uar.entityID )
+        LEFT OUTER JOIN tblDocumentType AS dt ON (t.intDocumentTypeID = dt.intDocumentTypeID)
+        LEFT JOIN tblUserAuthRole AS uarRejected ON ( t.intProblemResolutionEntityID = uarRejected.entityID )
+        WHERE 
+            t.intRealmID = $Data->{'Realm'}
+            AND t.intWFTaskID = ?
+            AND (
+                (intApprovalEntityID = ? AND t.strTaskStatus = 'ACTIVE')
+                OR
+                (intProblemResolutionEntityID = ? AND t.strTaskStatus = 'REJECTED')
+            )
+        LIMIT 1
+    ];
+
+    my $db = $Data->{'db'};
+    my $q = $db->prepare($st) or query_error($st);
+    $q->execute(
+        $WFTaskID,
+        $entityID,
+        $entityID,
+    ) or query_error($st);
+
+    my @TaskList = ();
+    my $rowCount = 0;
+	  
+    my $dref = $q->fetchrow_hashref();
+    #print STDERR Dumper $dref;
+
+    if(!$dref) {
+        return (undef, "ERROR: no data retrieved/no access.");
+    }
+
+    warn "WORKFLOW_entityID " . $entityID;
+    warn "WORKFLOW_strRuleFor " . $dref->{strWFRuleFor};
+
+    my %TemplateData;
+    my %fields;
+
+    switch($dref->{strWFRuleFor}) {
+        case 'REGO' {
+            my ($TemplateData, $fields) = populateRegoViewData($Data, $dref);
+            %TemplateData = %{$TemplateData};
+            %fields = %{$fields};
+        }
+        case 'ENTITY' {
+            my ($TemplateData, $fields) = populateEntityViewData($Data, $dref);
+            %TemplateData = %{$TemplateData};
+            %fields = %{$fields};
+        }
+        case 'PERSON' {
+            my ($TemplateData, $fields) = populatePersonViewData($Data, $dref);
+            %TemplateData = %{$TemplateData};
+            %fields = %{$fields};
+        }
+        else {
+            my ($TemplateData, $fields) = (undef, undef);
+        }
+    }
+
+    my $showReject = 0;
+    $showReject = 1 if ($dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} != $entityID);
+
+    my $showApprove = 0;
+    $showApprove = 1 if ($dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID);
+
+    my $showResolve = 0;
+    $showResolve = 1 if ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_REJECTED and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);
+
+    my %TaskAction = (
+        'WFTaskID' => $dref->{intWFTaskID} || 0,
+        'client' => $Data->{client} || 0,
+        'showApprove' => $showApprove,
+        'showReject' => $showReject,
+        'showResolve' => $showResolve,
+    );
+
+    $TemplateData{'TaskAction'} = \%TaskAction;
+
+    my $body = runTemplate(
+        $Data,
+        \%TemplateData,
+        $fields{'templateFile'},
+    );
+
+    return ($body, $fields{'title'});
+    #return (undef, undef);
+}
+
+sub populateRegoViewData {
+    my ($Data, $dref) = @_;
+
+    my %TemplateData;
+    my %fields = (
+        title => 'Person Registration Details',
+        templateFile => 'workflow/view/personregistration.templ',
+    );
+
+	%TemplateData = (
+        PersonDetails => {
+            Status => $Data->{'lang'}->txt($Defs::personStatus{$dref->{'PersonStatus'} || 0}) || '',
+            Gender => $Data->{'lang'}->txt($Defs::genderInfo{$dref->{'PersonGender'} || 0}) || '',
+            DOB => $dref->{'dtDOB'} || '',
+            LocalName => "$dref->{'strLocalFirstname'} $dref->{'strLocalMiddleName'} $dref->{'strLocalSurname'}" || '',
+            LatinName => "$dref->{'strLatinFirstname'} $dref->{'strLatinMiddleName'} $dref->{'strLatinSurname'}" || '',
+            Address => "$dref->{'strAddress1'} $dref->{'strAddress2'} $dref->{'strAddress2'} $dref->{'strSuburb'} $dref->{'strState'} $dref->{'strPostalCode'}" || '',
+            Nationality => $dref->{'strISONationality'} || '', #TODO identify extract string
+            DateSuspendedUntil => '',
+            LastUpdate => '',
+        },
+        PersonRegoDetails => {
+            ID => $dref->{'intPersonRegistrationID'},
+            Status => $Data->{'lang'}->txt($Defs::personRegoStatus{$dref->{'personRegistrationStatus'} || 0}) || '',
+            RegoType => $Data->{'lang'}->txt($Defs::registrationNature{$dref->{'strRegistrationNature'} || 0}) || '',
+            PersonType => $Data->{'lang'}->txt($Defs::personType{$dref->{'strPersonType'} || 0}) || '', 
+            Sport => $Defs::sportType{$dref->{'strSport'}} || '',
+            Level => $Defs::personLevel{$dref->{'strPersonLevel'}} || '',
+            AgeLevel => $Defs::ageLevel{$dref->{'strAgeLevel'}} | '',
+        },
+	);
+	
+    return (\%TemplateData, \%fields);
+}
+
+sub populateEntityViewData {
+    my ($Data, $dref) = @_;
+
+    my %TemplateData;
+    my %fields;
+
+	%TemplateData = (
+        EntityDetails => {
+            Status => $Data->{'lang'}->txt($Defs::entityStatus{$dref->{'entityStatus'} || 0}) || '',
+            LocalShortName => $dref->{'entityLocalShortName'} || '',
+            LocalName => $dref->{'entityLocalName'} || '',
+            Region => $dref->{'entityRegion'} || '',
+            Address => $dref->{'entityAddress'} || '',
+            Town => $dref->{'entityTown'} || '',
+            WebUrl => $dref->{'entityWebUrl'} || '',
+            Email => $dref->{'entityEmail'} || '',
+            Phone => $dref->{'entityPhone'} || '',
+            Fax => $dref->{'entityFax'} || '',
+        },
+	);
+	
+    switch ($dref->{intEntityLevel}) {
+        case "$Defs::LEVEL_CLUB"  {
+            %fields = (
+                title => 'Club Registration Details',
+                templateFile => 'workflow/view/club.templ',
+            );
+            #TODO: add details specific to CLUB
+        }
+        case "$Defs::LEVEL_VENUE" {
+            %fields = (
+                title => 'Venue Registration Details',
+                templateFile => 'workflow/view/venue.templ',
+            );
+            #TODO: add details specific to VENUE
+        }
+        else {
+        
+        }
+    }
+
+    return (\%TemplateData, \%fields);
+}
+
+sub populatePersonViewData {
+    my ($Data, $dref) = @_;
+
+    my %TemplateData;
+    my %fields = (
+        title => 'Person Details',
+        templateFile => 'workflow/view/person.templ',
+    );
+
+	%TemplateData = (
+        PersonDetails => {
+            Status => $Data->{'lang'}->txt($Defs::personStatus{$dref->{'PersonStatus'} || 0}) || '',
+            Gender => $Data->{'lang'}->txt($Defs::genderInfo{$dref->{'PersonGender'} || 0}) || '',
+            DOB => $dref->{'dtDOB'} || '',
+            LocalName => "$dref->{'strLocalFirstname'} $dref->{'strLocalMiddleName'} $dref->{'strLocalSurname'}" || '',
+            LatinName => "$dref->{'strLatinFirstname'} $dref->{'strLatinMiddleName'} $dref->{'strLatinSurname'}" || '',
+            Address => "$dref->{'strAddress1'} $dref->{'strAddress2'} $dref->{'strAddress2'} $dref->{'strSuburb'} $dref->{'strState'} $dref->{'strPostalCode'}" || '',
+            Nationality => $dref->{'strISONationality'} || '', #TODO identify extract string
+            DateSuspendedUntil => '',
+            LastUpdate => '',
+        },
+	);
+	
+    return (\%TemplateData, \%fields);
+
+}
+
+sub populateDocumentViewData {
+
+}
+
 1;

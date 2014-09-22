@@ -1,0 +1,34 @@
+{
+	"rules" : {
+	},
+	"mapping" : {
+		"PersonCode" : "strImportPersonCode",
+		"Status" : "strStatus",
+		"LocalFirstName" : "strLocalFirstname",
+		"LocalLastName" : "strLocalSurname",
+		"LocalLanguageCode" : "strISOLocalLanguage",
+		"PreferredName" : "strPreferredName",
+		"LatinFirstName" : "strLatinFirstname",
+		"LatinLastName" : "strLatinSurname",
+		"DateOfBirth" : "dtDOB",
+		"Gender" : "strGender",
+		"Nationality" : "strISONationality",
+		"CountryOfBirth" : "strISOCountryOfBirth",
+		"RegionOfBirth" : "strRegionOfBirth",
+		"PlaceOfBirth" : "strPlaceOfBirth",
+		"Fax" : "strFax",
+		"Phone" : "strPhoneHome",
+		"Address1" : "strAddress1",
+		"Address2" : "strAddress2",
+		"PostalCode" : "strPostalCode",
+		"Suburb" : "strSuburb",
+		"State" : "strState",
+		"Email" : "strEmail",
+		"DemographicField1" : "strDemographicField1",
+		"DemographicField2" : "strDemographicField2",
+		"DemographicField3" : "strDemographicField3",
+		"DemographicField4" : "strDemographicField4",
+		"DemographicField5" : "strDemographicField5",
+		"DemographicField6" : "strDemographicField6"
+	}
+}

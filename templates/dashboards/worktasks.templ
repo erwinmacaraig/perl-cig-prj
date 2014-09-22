@@ -40,33 +40,39 @@
             [% ELSE %]
 			    <td><div class="member-data">
                     <span class = "button-small generic-button">
-                        <a href="[% task.viewURL %]">View</a>
+                        <a href="main.cgi?client=[% client %]&a=WF_View&TID=[% task.WFTaskID %]">[% Lang.txt('View') %]</a>
                     </span>
                 </div></td>
             [% IF task.showApprove %]
+                <!--
 			    <td><div class="member-data">
                     <span class = "button-small generic-button">
                         <a href="main.cgi?client=[% client %]&a=WF_Approve&TID=[% task.WFTaskID %]">[% Lang.txt('Approve') %]</a>
                     </span>
                 </div></td>
+                -->
             [% ELSE %]
                 <td>&nbsp;</td>
             [% END %]
             [% IF task.showReject %]
+                <!--
                 <td><div class="member-data">
                     <span class = "button-small generic-button">
                         <a href="main.cgi?client=[% client %]&a=WF_Reject&TID=[% task.WFTaskID %]">[% Lang.txt('Reject') %]</a>
                     </span>
                 </div></td>	
+                -->
             [% ELSE %]
                 <td>&nbsp;</td>
             [% END %]
             [% IF task.showResolve %]
+                <!--
                 <td><div class="member-data">
                     <span class = "button-small generic-button">
                         <a href="main.cgi?client=[% client %]&a=WF_Resolve&TID=[% task.WFTaskID %]">[% Lang.txt('Resolve') %]</a>
                     </span>
                 </div></td>	
+                -->
             [% ELSE %]
                 <td>&nbsp;</td>
             [% END %]

@@ -1835,6 +1835,20 @@ body.membership-login .spp_loggedin {
 	height: 20px;
 }
 
+.button-medium a {
+	font-family: 'DINRegular',sans-serif;
+	font-size: 12px;
+	text-decoration: none;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+	text-transform:uppercase;
+	cursor: pointer;
+	padding: 10px;
+	letter-spacing: -0.2px;
+	height: 20px;
+}
+
 .proceed-button a, input.proceed-button, button.proceed-button {
   color: #FFFFFF;
   background-image: #8ecb75;
@@ -4538,4 +4552,8 @@ form#signup-form .button {
     float:left;
     width:200px;
 
+}
+div#content div.member-home-page div.task-actions {
+    padding: 30px;
+    text-align: center;
 }

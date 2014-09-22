@@ -1,0 +1,118 @@
+<div class="member-home-page">
+    <div class="">
+        <div class="rego-detail">
+            <div class = "sectionheader">[% Lang.txt('Registration Details') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin  %]<a href = "[% EditDetailsLink %]"         class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
+            <div class="member-details">
+
+            [% IF EntityDetails.Status %]
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Status") %]:</span>
+                    <span class="details-left">[% EntityDetails.Status %]</span>
+                </span>
+            [% END %]
+
+            [% IF EntityDetails.LocalShortName %]
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Short Name") %]:</span>
+                    <span class="details-left">[% EntityDetails.LocalShortName %]</span>
+                </span>
+            [% END %]
+
+            [% IF EntityDetails.LocalName %]
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Local Name") %]:</span>
+                    <span class="details-left">[% EntityDetails.LocalName %]</span>
+                </span>
+            [% END %]
+
+            [% IF EntityDetails.Region %]
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Region") %]:</span>
+                    <span class="details-left">[% EntityDetails.Region %]</span>
+                </span>
+            [% END %]
+
+            [% IF EntityDetails.Address %]
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Address") %]:</span>
+                    <span class="details-left">[% EntityDetails.Address %]</span>
+                </span>
+            [% END %]
+
+            [% IF EntityDetails.Town %]
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Town") %]:</span>
+                    <span class="details-left">[% EntityDetails.Town %]</span>
+                </span>
+            [% END %]
+
+            [% IF EntityDetails.WebUrl %]
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("WebUrl") %]:</span>
+                    <span class="details-left">[% EntityDetails.WebUrl %]</span>
+                </span>
+            [% END %]
+
+            [% IF EntityDetails.Email %]
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Email") %]:</span>
+                    <span class="details-left">[% EntityDetails.Email %]</span>
+                </span>
+            [% END %]
+
+            [% IF EntityDetails.Phone %]
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Phone") %]:</span>
+                    <span class="details-left">[% EntityDetails.Phone %]</span>
+                </span>
+            [% END %]
+
+            [% IF EntityDetails.Fax %]
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Fax") %]:</span>
+                    <span class="details-left">[% EntityDetails.Fax %]</span>
+                </span>
+            [% END %]
+
+            </div>
+        </div>
+    </div>
+
+    <div class="">
+        <div class="payment-detail">
+            <div class = "sectionheader">[% Lang.txt('Payment Details') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin  %]<a href = "[% EditDetailsLink %]"         class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
+            <div class="member-details">
+            </div>
+        </div>
+    </div>
+
+    <div class="">
+        <div class="document-detail">
+            <div class = "sectionheader">
+            [% Lang.txt('Documents') %]&nbsp;&nbsp;
+            [% IF EditDetailsLink and !ReadOnlyLogin  %]
+                <a href = "[% EditDetailsLink %]" class="edit-link">[% Lang.txt('Edit') %]</a>
+            [% END %]
+            </div>
+            <div class="member-details">
+            </div>
+        </div>
+    </div>
+
+    <div class="task-actions">
+
+        [% IF TaskAction.showApprove %]
+        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Approve') %]</a></span>
+        [% END %]
+
+        [% IF TaskAction.showReject %]
+        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Reject&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Reject') %]</a></span>
+        [% END %]
+
+        [% IF TaskAction.showResolve %]
+        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Resolve&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Resolve') %]</a></span>
+        [% END %]
+
+    </div>
+
+</div>
