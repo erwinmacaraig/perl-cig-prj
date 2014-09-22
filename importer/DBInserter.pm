@@ -1,19 +1,21 @@
+
 package DBInserter;
 require Exporter;
 @EXPORT = qw(insertBatch connectDB getEntity);
 @EXPORT_OK = qw(insertBatch connectDB getEntity);
 @ISA =  qw(Exporter);
-use lib '.','..';
 use Data::Dumper;
 use DBI;
 use strict;
-use Config;
+use ImporterConfig;
+
 
 sub insertRow {
 	my ($db,$table,$record) = @_;
     my $keystr = (join ",\n        ", (keys $record));
 	my $valstr = join ', ', (split(/ /, "? " x (scalar(values $record))));
 	my @values = values $record;
+	my %success = ();
 	my $query = qq[
 	    INSERT INTO $table (
 		        $keystr
@@ -23,7 +25,8 @@ sub insertRow {
 		    )
 	];
 	my $sth = $db->prepare($query) or die "Can't prepare insert: ".$db->errstr()."\n";
-	$sth->execute(@values) or die "Can't execute insert: ".$db->errstr()."\n";
+	my $result = $sth->execute(@values) or die "Can't execute insert: ".$db->errstr()."\n";
+	print "INSERT SUCCESS :: TABLE:: '",$table,"' RECORDS:: '",join(', ', @values),"'\n";
 }
 
 sub insertBatch {
@@ -50,9 +53,8 @@ sub getEntity{
 }
 sub connectDB{
 
-    print $Config::DB_USER;
-    print "\n\n";
-    my $dbh = DBI->connect('DBI:mysql:fifasponline', 'root','') or die $DBI::errstr;
+    my $dbh = DBI->connect($ImporterConfig::DB_CONFIG{"DB_DSN"}, $ImporterConfig::DB_CONFIG{"DB_USER"},$ImporterConfig::DB_CONFIG{"DB_PASSWD"}) or die $DBI::errstr;
     $dbh->do("SET NAMES 'utf8'");
     return $dbh;
 }
+1;

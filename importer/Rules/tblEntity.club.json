@@ -2,15 +2,18 @@
 	"rules" : {
 		"strStateLocalName" : {
 			"rule" : "insertLink",
-			"field" : "strStateLocalName"
+			"field" : "strStateLocalName",
+			"reference" : "strLocalName"
 		},
 		"strRegionLocalName" : {
 			"rule" : "insertLink",
-			"field" : "strRegionLocalName"
+			"field" : "strRegionLocalName",
+			"reference" : "strLocalName"
 		},
 		"strZoneLocalName" : {
 			"rule" : "insertLink",
-			"field" : "strZoneLocalName"
+			"field" : "strZoneLocalName",
+			"reference" : "strImportEntityCode"
 		}
 	},
 	"mapping" : {

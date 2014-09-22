@@ -10,6 +10,7 @@ use Data::Dumper;
 use JSON;
 use DBInserter;
 
+
 my $db = connectDB();
 my %config = ();
 
@@ -74,8 +75,8 @@ sub insertLink{
 	my ($links,$records,$rule) = @_;
     foreach my $record ( @{$records} ){
         my %link = (
-            "intParentEntityID" => getEntity($db,"strLocalName",$record->{$rule->{"field"}}),
-            "intChildEntityID" => getEntity($db,"strLocalName",$record->{"strLocalName"}),
+            "intParentEntityID" => getEntity($db,"strImportEntityCode",$record->{$rule->{"field"}}),
+            "intChildEntityID" => getEntity($db,"strImportEntityCode",$record->{"strImportEntityCode"}),
         );
         push ($links,\%link)
     }
