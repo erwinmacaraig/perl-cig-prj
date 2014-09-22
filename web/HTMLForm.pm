@@ -26,6 +26,7 @@ sub genHTMLForm {
         $override_config )
       = @_;
     my $returnstr   = '';
+warn("NT $notabs");
     my $sectionlist = $fields_ref->{'sections'};
     $sectionlist = [ [ 'main', '' ] ] if !$sectionlist;
     $action ||= 'display';
@@ -343,6 +344,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
         if ( $sections{ $s->[0] } ) {
             next if $s->[2] and not display_section( $s->[2], $fields_ref );
             $usedsections{ $s->[0] } = 1;
+warn("NT4 $notabs");
             if ($notabs) {
                 $returnstr .= $sections{ $s->[0] };
             }
@@ -350,9 +352,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 #my $style=$s ? 'style="display:none;" ' : '';
                 my $sh = q{};
                 if ( $s->[1] ) {
-                    $sh = <<"EOS";
-<tr><th colspan="2" class="sectionheader">$sectionheader</th></tr>
-EOS
+                    $sh = qq[ <tr><th colspan="2" class="sectionheader">$sectionheader</th></tr>];
                 }
                 $tabs .= qq[<li><a id="a_sec$s->[0]" class="tab_links" href="#sec$s->[0]">$sectionheader</a></li>];
 
