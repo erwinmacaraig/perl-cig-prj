@@ -78,26 +78,9 @@
         </div>
     </div>
 
-    <div class="">
-        <div class="payment-detail">
-            <div class = "sectionheader">[% Lang.txt('Payment Details') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin  %]<a href = "[% EditDetailsLink %]"         class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
-            <div class="member-details">
-            </div>
-        </div>
-    </div>
+    [% PaymentBlock %]
 
-    <div class="">
-        <div class="document-detail">
-            <div class = "sectionheader">
-            [% Lang.txt('Documents') %]&nbsp;&nbsp;
-            [% IF EditDetailsLink and !ReadOnlyLogin  %]
-                <a href = "[% EditDetailsLink %]" class="edit-link">[% Lang.txt('Edit') %]</a>
-            [% END %]
-            </div>
-            <div class="member-details">
-            </div>
-        </div>
-    </div>
+    [% DocumentBlock %]
 
     <div class="task-actions">
 

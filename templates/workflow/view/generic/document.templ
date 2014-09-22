@@ -1,0 +1,53 @@
+    
+    <br/>
+    <div class="">
+        <div class="document-detail">
+            <div class = "sectionheader">
+
+            [% IF DocumentDetails.PersonID != 0 AND DocumentDetails.PersonRegistrationID != 0 %]
+                [% Lang.txt('Registration Documents') %]&nbsp;&nbsp;
+            [% END %]
+
+            [% IF DocumentDetails.PersonID != 0 AND DocumentDetails.PersonRegistrationID == 0 %]
+                [% Lang.txt('Person Documents') %]&nbsp;&nbsp;
+            [% END %]
+
+            </div>
+            <div class="member-details">
+                <table style="width: 100%">
+                    <tr>
+                        <th>Document ID</th>
+                        <th>Status</th>
+                        <th>Document Type</th>
+                        <th>Notes</th>
+                        <th>Action/s</th>
+                    </tr>
+                    <!-- loop here; -->
+                    <tr>
+                        <td><div class="member-data"> [% DocumentDetails.DocumentID %] </div></td>
+                        <td><div class="member-data"> [% DocumentDetails.Status %] </div></td>
+                        <td><div class="member-data"> [% DocumentDetails.DocumentName %] </div></td>
+                        <td>
+                            <div class="member-data">
+                            [% IF DocumentDetails.DeniedNotes %]
+                                [% DocumentDetails.DeniedNotes %]
+                            [% ELSE %]
+                                N/A
+                            [% END %]
+                            </div>
+                            </td>
+                        <td>
+                            <div class="member-data">
+                                <span class = "button-small generic-button">
+                                    <a href="">[% Lang.txt('View') %]</a>
+                                </span>
+                                <span class = "button-small generic-button">
+                                    <a href="">[% Lang.txt('Verify') %]</a>
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
