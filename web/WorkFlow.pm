@@ -1402,6 +1402,7 @@ sub viewTask {
             %fields = %{$fields};
         }
         else {
+            my ($TemplateData, $fields) = (undef, undef);
         }
     }
 
@@ -1496,6 +1497,30 @@ sub populateEntityViewData {
 }
 
 sub populatePersonViewData {
+    my ($Data, $dref) = @_;
+
+    my %TemplateData;
+    my %fields = (
+        title => 'Person Details',
+        templateFile => 'workflow/view/person.templ',
+    );
+
+	%TemplateData = (
+        PersonDetails => {
+            Status => $Data->{'lang'}->txt($Defs::personStatus{$dref->{'PersonStatus'} || 0}) || '',
+            Gender => $Data->{'lang'}->txt($Defs::genderInfo{$dref->{'PersonGender'} || 0}) || '',
+            DOB => $dref->{'dtDOB'} || '',
+            LocalName => "$dref->{'strLocalFirstname'} $dref->{'strLocalMiddleName'} $dref->{'strLocalSurname'}" || '',
+            LatinName => "$dref->{'strLatinFirstname'} $dref->{'strLatinMiddleName'} $dref->{'strLatinSurname'}" || '',
+            Address => "$dref->{'strAddress1'} $dref->{'strAddress2'} $dref->{'strAddress2'} $dref->{'strSuburb'} $dref->{'strState'} $dref->{'strPostalCode'}" || '',
+            Nationality => $dref->{'strISONationality'} || '', #TODO identify extract string
+            DateSuspendedUntil => '',
+            LastUpdate => '',
+        },
+	);
+	
+    return (\%TemplateData, \%fields);
+
 }
 
 sub populateDocumentViewData {
