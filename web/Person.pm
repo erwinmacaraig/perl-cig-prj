@@ -719,7 +719,7 @@ sub person_details {
     my $mrt_config = '';
        #readonly      => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
                
-
+    
     my %FieldDefinitions = (
         fields => {
             strFIFAID => {
@@ -920,9 +920,7 @@ sub person_details {
                 size        => '20',
                 maxsize     => '30',
                 sectionname => 'contact',
-            },
-           
-           
+            },      
             strEmail => {
                 label       => $FieldLabels->{'strEmail'},
                 value       => $field->{strEmail},
@@ -1021,12 +1019,13 @@ sub person_details {
             },
             strISONationality => {
                 label       => $FieldLabels->{'strISONationality'},
-                value       => $field->{strISONationality},
+                value       => $field->{strISONationality}  || $Data->{'SystemConfig'}{'personNationalityDefault'},
                 type        => 'lookup',
                 options     => $isocountries,
                 sectionname => 'details',
                 firstoption => [ '', 'Select Country' ],
                 compulsory => 1,
+               
             },
             dtLastUpdate => {
                 label       => 'Last Updated',
@@ -1047,7 +1046,7 @@ sub person_details {
                 SkipProcessing    => 1,
             },
             PhotoUpload => {
-                label => 'Photo',
+                label => ($Data->{'SystemConfig'}{'person_intPhoto'} && $Data->{'SystemConfig'}{'person_demographic'})? 'Photo' : '',
                 type  => 'htmlblock',
                 value => q[
                 <div id="photoupload_result">] . $photolink . q[</div>

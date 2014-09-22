@@ -12,6 +12,9 @@ use AuditLog;
 use Logo;
 use GridDisplay;
 use HomeEntity;
+use Countries;
+use RegistrationItem;
+use TTTemplate;
 
 
 sub handleEntity  {
@@ -48,6 +51,24 @@ sub entity_details  {
   $option='edit' if $action eq 'E_DTE' and $Data->{'clientValues'}{'authLevel'} >= $entityLevel;
   
   my $client=setClient($Data->{'clientValues'}) || '';
+   #################Limited List of Country Per MA ############################
+    my $isocountries = getISOCountriesHash();
+    my %countriesonly = ();
+    my %Mcountriesonly = ();
+  
+    my @limitCountriesArr = ();
+    if($Data->{'RegoForm'} && $Data->{'SystemConfig'}{'AllowedRegoCountries'}){
+    	@limitCountriesArr = split(/\|/, $Data->{'SystemConfig'}{'AllowedRegoCountries'} );    	
+    }
+  
+    while(my($k,$c) = each(%{$isocountries})){
+    	$countriesonly{$k} = $c;
+    	if(@limitCountriesArr){
+    		next if(grep(/^$k/, @limitCountriesArr));
+    	}
+    	$Mcountriesonly{$c} = $c;
+    }    
+    #################################################################
   my %FieldDefinitions=(
     fields=>  {
       strFIFAID => {
@@ -142,12 +163,12 @@ sub entity_details  {
         size  => '30',
         maxsize => '50',
       },
-      strISOCountry => {
-        label => 'Country (ISO)',
-        value => $field->{strISOCountry},
-        type  => 'text',
-        size  => '30',
-        maxsize => '50',
+     strISOCountry => {
+          label       => 'ISO Country',
+          value       =>  $field->{strISOCountry} || $Data->{'SystemConfig'}{'DefaultCountry'} || '',
+          type        => 'lookup',
+          options     => \%Mcountriesonly,
+          firstoption => [ '', 'Select Country' ],
       },
       strPostalCode => {
         label => 'Postal Code',

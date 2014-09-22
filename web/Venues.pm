@@ -18,9 +18,14 @@ use WorkFlow;
 
 use RecordTypeFilter;
 use RuleMatrix;
+use Countries;
+
+use RegistrationItem;
+use TTTemplate;
+use EntityDocuments;
 
 sub handleVenues    {
-    my ($action, $Data)=@_;
+    my ($action, $Data, $parentID, $typeID)=@_;
 
     my $venueID= param('venueID') || 0;
     my $resultHTML='';
@@ -34,7 +39,11 @@ sub handleVenues    {
         ($tempResultHTML,$title)=listVenues($Data);
         $resultHTML .= $tempResultHTML;
     }
-        
+    ##### FOR UPLOADING DOCUMENT FOR ADDING VENUES #######
+    elsif($action =~ /^VENUE_DOCS/){
+    	($resultHTML, $title) = handle_entity_documents($action, $Data, $venueID, $typeID, $Defs::DOC_FOR_VENUES);  
+    }    
+    #####################################################    
     return ($resultHTML,$title);
 }
 
@@ -68,6 +77,24 @@ sub venue_details   {
         my $matrix_ref = getRuleMatrix($Data, $Data->{'clientValues'}{'authLevel'}, getLastEntityLevel($Data->{'clientValues'}), $Defs::LEVEL_VENUE, '', 'ENTITY', \%Reg);
         $paymentRequired = $matrix_ref->{'intPaymentRequired'} || 0;
     }
+     #################Limited List of Country Per MA ############################
+    my $isocountries = getISOCountriesHash();
+    my %countriesonly = ();
+    my %Mcountriesonly = ();
+  
+    my @limitCountriesArr = ();
+    if($Data->{'RegoForm'} && $Data->{'SystemConfig'}{'AllowedRegoCountries'}){
+    	@limitCountriesArr = split(/\|/, $Data->{'SystemConfig'}{'AllowedRegoCountries'} );    	
+    }
+  
+    while(my($k,$c) = each(%{$isocountries})){
+    	$countriesonly{$k} = $c;
+    	if(@limitCountriesArr){
+    		next if(grep(/^$k/, @limitCountriesArr));
+    	}
+    	$Mcountriesonly{$c} = $c;
+    }    
+    #################################################################
     my %FieldDefinitions = (
     fields=>  {
       strFIFAID => {
@@ -147,13 +174,13 @@ sub venue_details   {
         size  => '30',
         maxsize => '50',
         sectionname => 'details',
-      },
+      },      
       strISOCountry => {
         label => 'Country (ISO)',
-        value => $field->{strISOCountry},
-        type  => 'text',
-        size  => '30',
-        maxsize => '50',
+        value =>  $field->{strISOCountry} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
+        type  => 'lookup',
+        options     => \%Mcountriesonly,
+        firstoption => [ '', 'Select Country' ],
         sectionname => 'details',
       },
       strPostalCode => {
@@ -708,11 +735,51 @@ sub postVenueAdd {
       ### End call to createTempEntityStructure FROM EntityStructure###
     {
       my $cl=setClient($Data->{'clientValues'}) || '';
-      my %cv=getClient($cl);
+      my %cv=getClient($cl);      
+      $cv{'venueID'}=$id;
+      $cv{'currentLevel'} = $Defs::LEVEL_VENUE;
       my $clm=setClient(\%cv);
+      ######################## For Adding Venue Documents ################################
+      my $originLevel = $Data->{'clientValues'}{'authLevel'} || 0;
+      my $clientValues = $Data->{'clientValues'};
+      my $entityRegisteringForLevel = getLastEntityLevel($clientValues) || 0;
+      my $entityID = getID($Data->{'clientValues'});    
+      my $entityIDD = getLastEntityID($clientValues);     
+      
+     
+      my $required_venue_docs = getRegistrationItems(
+        $Data,
+        'ENTITY',
+        'DOCUMENT',
+        $originLevel,
+        'NEW',
+        $id,
+        $entityRegisteringForLevel,
+        0,
+        undef,
+     );
+      #what is origin level,is the level for this entity or the level of the person logged in???
+     
+    my %PageData = (
+        target => $Data->{'target'},
+        documents => $required_venue_docs,
+        Lang => $Data->{'lang'},
+        nextaction => 'VENUE_DOCS_u',
+        client => $clm,
+        venue => $id,
+   );  
+ 
+   my $venuedocs;
+   $venuedocs = runTemplate($Data, \%PageData, 'entity/required_docs.templ') || '';  
+      
+      ####################################################################################
+      
       return (0,qq[
-        <div class="OKmsg"> $Data->{'LevelNames'}{$Defs::LEVEL_VENUE} Added Successfully</div><br>
-        <a href="$Data->{'target'}?client=$cl&amp;venueID=$id&amp;a=VENUE_DT">Display Details for $params->{'d_strLocalName'}</a><br><br>
+        <div class="OKmsg"> $Data->{'LevelNames'}{$Defs::LEVEL_VENUE} Added Successfully Venue ID = $id AND entityID = $entityID AND entityIDD = $entityIDD</div><br>
+        <div>
+        $venuedocs
+        </div>
+        <a href="$Data->{'target'}?client=$clm&amp;venueID=$id&amp;a=VENUE_DT">Display Details for $params->{'d_strLocalName'}</a><br><br>
         <b>or</b><br><br>
         <a href="$Data->{'target'}?client=$cl&amp;a=VENUE_DTA&amp;l=$Defs::LEVEL_VENUE">Add another $Data->{'LevelNames'}{$Defs::LEVEL_VENUE}</a>
 

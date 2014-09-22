@@ -132,8 +132,9 @@ print STDERR "SSSS$action $clubID\n";
   #		   $vv = 'Select Type';	
   #  }
   #[ $field->{intLegalTypeID}, $legalTypeOptions{$field->{intLegalTypeID}} ]
-   my $isocountries = getISOCountriesHash();
-  ######Limited List of Country Per MA ############################
+   
+  #################Limited List of Country Per MA ############################
+    my $isocountries = getISOCountriesHash();
     my %countriesonly = ();
     my %Mcountriesonly = ();
   
@@ -143,13 +144,12 @@ print STDERR "SSSS$action $clubID\n";
     }
   
     while(my($k,$c) = each(%{$isocountries})){
-    	$countriesonly{$c} = $c;
+    	$countriesonly{$k} = $c;
     	if(@limitCountriesArr){
-    		next if(grep(/^$c/, @limitCountriesArr));
+    		next if(grep(/^$k/, @limitCountriesArr));
     	}
     	$Mcountriesonly{$c} = $c;
-    }
-    
+    }    
     #################################################################
   
   my %FieldDefinitions=(
@@ -273,7 +273,7 @@ print STDERR "SSSS$action $clubID\n";
       },
       strISOCountry => {
           label       => 'ISO Country',
-          value       =>  $field->{strISOCountry} || $Data->{'SystemConfig'}{'DefaultCountry'} || '',
+          value       => $field->{strISOCountry} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
           type        => 'lookup',
           options     => \%Mcountriesonly,
           firstoption => [ '', 'Select Country' ],
