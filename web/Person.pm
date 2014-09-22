@@ -757,7 +757,7 @@ sub person_details {
                 sectionname => 'details',
             },
             strLocalFirstname => {
-                label       => $Data->{'SystemConfig'}{'person_strLocalFirstname'}?$FieldLabels->{'strLocalFirstname'} : '',
+                label       => $FieldLabels->{'strLocalFirstname'},
                 value       => $field->{strLocalFirstname},
                 type        => 'text',
                 size        => '40',
@@ -1250,7 +1250,7 @@ sub person_details {
     my $header ='';
     my $tabs = '';
     my $fd = \%FieldDefinitions;
-    ( $resultHTML, $processed, $header, $tabs ) = handleHTMLForm( \%FieldDefinitions, $memperm, $option, '', $Data->{'db'}, \%configchanges );
+    ( $resultHTML, $processed, $header, $tabs ) = handleHTMLForm( \%FieldDefinitions, $memperm, $option, 0, $Data->{'db'}, \%configchanges );
 
     if ($option ne 'display') {
         $resultHTML .= '';

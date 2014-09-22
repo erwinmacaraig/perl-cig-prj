@@ -448,7 +448,7 @@ print STDERR "SSSS$action $clubID\n";
   );
   $clubperms->{'clubcharacteristics'} = 1;
 my $resultHTML='' ;
-($resultHTML, undef )=handleHTMLForm(\%FieldDefinitions, $clubperms, $option, '',$Data->{'db'});
+($resultHTML, undef )=handleHTMLForm(\%FieldDefinitions, $clubperms, $option, 0,$Data->{'db'});
   my $title=$field->{'strLocalName'} || '';
   my $scMenu = (allowedAction($Data, 'c_e'))
     ? getServicesContactsMenu($Data, $Defs::LEVEL_CLUB, $clubID, $Defs::SC_MENU_SHORT, $Defs::SC_MENU_CURRENT_OPTION_DETAILS)
