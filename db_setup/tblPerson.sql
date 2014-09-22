@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS tblPerson;
  
 CREATE TABLE tblPerson (
     intPersonID int(11) NOT NULL AUTO_INCREMENT,
+    strImportPersonCode VARCHAR(45) NULL AFTER `intPersonID`,
     intRealmID int(11) NOT NULL DEFAULT 0,
     strExtKey varchar(20) NOT NULL DEFAULT '',
     strPersonNo varchar(15) NOT NULL DEFAULT '',
@@ -27,6 +28,7 @@ CREATE TABLE tblPerson (
     strLatinSurname2 varchar(150) DEFAULT '',
 
     intGender tinyint(4) DEFAULT 0,
+    strGender varchar(50) DEFAULT '',
     dtDOB date DEFAULT '0000-00-00',
     strISOCountryOfBirth varchar(100) default '',
     strRegionOfBirth varchar(100) default '',
@@ -141,8 +143,14 @@ CREATE TABLE tblPerson (
     intNatCustomBool3 tinyint(4) DEFAULT 0,
     intNatCustomBool4 tinyint(4) DEFAULT 0,
     intNatCustomBool5 tinyint(4) DEFAULT 0,
-      
+    strDemographicField1 VARCHAR(45) NULL COMMENT 'TBC' AFTER `dtSuspendedUntil`,
+    strDemographicField2 VARCHAR(45) NULL COMMENT 'TBC' AFTER `strDemographicField1`,
+    strDemographicField3 VARCHAR(45) NULL COMMENT 'TBC' AFTER `strDemographicField2`,
+    strDemographicField4 VARCHAR(45) NULL COMMENT 'TBC' AFTER `strDemographicField3`,
+    strDemographicField5 VARCHAR(45) NULL COMMENT 'TBC' AFTER `strDemographicField4`,
+    strDemographicField6 VARCHAR(45) NULL COMMENT 'TBC' AFTER `strDemographicField5`,
   PRIMARY KEY (intPersonID),
+  UNIQUE INDEX `strImportPersonCode_UNIQUE` (`strImportPersonCode` ASC),
   KEY index_strPersonNo (strPersonNo),
   KEY index_strStatus (strStatus),
   KEY index_strExtKey (strExtKey),
