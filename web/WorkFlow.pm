@@ -1290,6 +1290,7 @@ sub viewTask {
 
     my $WFTaskID = safe_param('TID','number') || '';
     my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+
     my $st;
 
     $st = qq[
@@ -1406,6 +1407,24 @@ sub viewTask {
         }
     }
 
+    my $showReject = 0;
+    $showReject = 1 if ($dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} != $entityID);
+
+    my $showApprove = 0;
+    $showApprove = 1 if ($dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID);
+
+    my $showResolve = 0;
+    $showResolve = 1 if ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_REJECTED and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);
+
+    my %TaskAction = (
+        'WFTaskID' => $dref->{intWFTaskID} || 0,
+        'client' => $Data->{client} || 0,
+        'showApprove' => $showApprove,
+        'showReject' => $showReject,
+        'showResolve' => $showResolve,
+    );
+
+    $TemplateData{'TaskAction'} = \%TaskAction;
 
     my $body = runTemplate(
         $Data,

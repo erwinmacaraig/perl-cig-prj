@@ -100,8 +100,19 @@
     </div>
 
     <div class="task-actions">
-        <span class = "button-medium generic-button"><a href = "">[% Lang.txt('Approve') %]</a></span>
-        <span class = "button-medium generic-button"><a href = "">[% Lang.txt('Reject') %]</a></span>
+
+        [% IF TaskAction.showApprove %]
+        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Approve') %]</a></span>
+        [% END %]
+
+        [% IF TaskAction.showReject %]
+        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Reject&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Reject') %]</a></span>
+        [% END %]
+
+        [% IF TaskAction.showResolve %]
+        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Resolve&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Resolve') %]</a></span>
+        [% END %]
+
     </div>
 
 </div>

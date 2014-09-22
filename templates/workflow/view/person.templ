@@ -1,16 +1,4 @@
 <div class="member-home-page">
-    <div class = "changeoptions">
-    [% IF AddRegistrationURL and !ReadOnlyLogin %]
-        <span class = "button-small generic-button"><a href = "[% AddRegistrationURL %]">[% Lang.txt('Add Registration') %]</a></span>
-    [% END %]
-    [% IF MarkDuplicateURL  and !ReadOnlyLogin %]
-        <span class = "button-small generic-button"><a href = "[% MarkDuplicateURL %]">[% Lang.txt("Mark as Duplicate") %]</a></span>
-    [% END %]
-    [% IF CardPrintingURL  and !ReadOnlyLogin %]
-        <span class = "button-small generic-button"><a href = "[% CardPrintingURL %]">[% Lang.txt("Member Cards") %]</a></span>
-    [% END %]
-    </div>
-
     <div class="">
         <div class="member-detail">
             <div class = "sectionheader">[% Lang.txt('Registration Details') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin  %]<a href = "[% EditDetailsLink %]"         class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
@@ -107,8 +95,19 @@
     </div>
 
     <div class="task-actions">
-        <span class = "button-medium generic-button"><a href = "">[% Lang.txt('Approve') %]</a></span>
-        <span class = "button-medium generic-button"><a href = "">[% Lang.txt('Reject') %]</a></span>
+
+        [% IF TaskAction.showApprove %]
+        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Approve') %]</a></span>
+        [% END %]
+
+        [% IF TaskAction.showReject %]
+        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Reject&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Reject') %]</a></span>
+        [% END %]
+
+        [% IF TaskAction.showResolve %]
+        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Resolve&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Resolve') %]</a></span>
+        [% END %]
+
     </div>
 
 </div>
