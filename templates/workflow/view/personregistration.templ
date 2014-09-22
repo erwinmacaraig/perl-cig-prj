@@ -1,0 +1,157 @@
+<div class="member-home-page">
+    <div class = "changeoptions">
+    [% IF AddRegistrationURL and !ReadOnlyLogin %]
+        <span class = "button-small generic-button"><a href = "[% AddRegistrationURL %]">[% Lang.txt('Add Registration') %]</a></span>
+    [% END %]
+    [% IF MarkDuplicateURL  and !ReadOnlyLogin %]
+        <span class = "button-small generic-button"><a href = "[% MarkDuplicateURL %]">[% Lang.txt("Mark as Duplicate") %]</a></span>
+    [% END %]
+    [% IF CardPrintingURL  and !ReadOnlyLogin %]
+        <span class = "button-small generic-button"><a href = "[% CardPrintingURL %]">[% Lang.txt("Member Cards") %]</a></span>
+    [% END %]
+    </div>
+
+    <div class="">
+        <div class="member-detail">
+            <div class = "sectionheader">[% Lang.txt('Member Detail Summary') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin  %]<a href = "[% EditDetailsLink %]"         class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
+            <div class="member-details">
+
+            [% IF PersonDetails.LatinName %]
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Name (Latin Characters)") %]:</span>
+                    <span class="details-left">[% PersonDetails.LatinFirstname %]</span>
+                </span>
+            [% END %]
+
+            [% IF PersonDetails.LocalName %]
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Local Name") %]:</span>
+                    <span class="details-left">[% PersonDetails.LocalName %]</span>
+                </span>
+            [% END %]
+
+            [% IF PersonDetails.Gender %]
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt('Gender') %]:</span>
+                    <span class="details-left">[% PersonDetails.Gender %]</span>
+                </span>
+            [% END %]
+
+            [% IF PersonDetails.DOB %]
+                <span class="details-row">
+                  <span class="details-left">Date of Birth:</span>
+                  <span class="details-left">[% PersonDetails.DOB %]</span>
+                </span>
+            [% END %]
+
+            [% IF PersonDetails.Nationality %]
+                <span class="details-row">
+                  <span class="details-left">Nationality:</span>
+                  <span class="details-left">[% PersonDetails.Nationality %]</span>
+                </span>
+            [% END %]
+
+            [% IF PersonDetails.Address %]
+                <span class="details-row">
+                  <span class="details-left">Address:</span>
+                  <span class="details-left">[% PersonDetails.Address %]</span>
+                </span>
+            [% END %]
+
+            [% IF PersonDetails.DateSuspendedUntil != '' %]
+                <span class="details-row">
+                  <span class="details-left">Suspended Until:</span>
+                  <span class="details-left">[% PersonDetails.DateSuspendedUntil %]</span>
+                </span>
+            [% END %]
+
+            [% IF PersonDetails.LastUpdate %]
+                <span class="details-row">
+                  <span class="details-left">Last Update:</span>
+                  <span class="details-left">[% PersonDetails.LastUpdate %]</span>
+                </span>
+            [% END %]
+
+
+
+            [% IF PersonDetails.Status %]
+                <span class="details-row">
+                  <span class="details-left">Status:</span>
+                  <span class="details-left">[% PersonDetails.Status %]</span>
+                </span>
+            [% END %]
+
+            </div>
+        </div>
+    </div>
+
+    <div class="">
+        <div class="rego-detail">
+            <div class = "sectionheader">[% Lang.txt('Registration Details') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin  %]<a href = "[% EditDetailsLink %]"         class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
+            <div class="member-details">
+
+            [% IF PersonRegoDetails.RegoType %]
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Registration Type") %]:</span>
+                    <span class="details-left">[% PersonRegoDetails.RegoType %]</span>
+                </span>
+            [% END %]
+
+            [% IF PersonRegoDetails.Status %]
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Status") %]:</span>
+                    <span class="details-left">[% PersonRegoDetails.Status %]</span>
+                </span>
+            [% END %]
+
+            [% IF PersonRegoDetails.Sport %]
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Sport") %]:</span>
+                    <span class="details-left">[% PersonRegoDetails.Sport %]</span>
+                </span>
+            [% END %]
+
+            [% IF PersonRegoDetails.Level %]
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Level") %]:</span>
+                    <span class="details-left">[% PersonRegoDetails.Level %]</span>
+                </span>
+            [% END %]
+
+            [% IF PersonRegoDetails.AgeLevel %]
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Age Level") %]:</span>
+                    <span class="details-left">[% PersonRegoDetails.AgeLevel %]</span>
+                </span>
+            [% END %]
+            </div>
+        </div>
+    </div>
+
+    <div class="">
+        <div class="payment-detail">
+            <div class = "sectionheader">[% Lang.txt('Payment Details') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin  %]<a href = "[% EditDetailsLink %]"         class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
+            <div class="member-details">
+            </div>
+        </div>
+    </div>
+
+    <div class="">
+        <div class="document-detail">
+            <div class = "sectionheader">
+            [% Lang.txt('Registration Documents') %]&nbsp;&nbsp;
+            [% IF EditDetailsLink and !ReadOnlyLogin  %]
+                <a href = "[% EditDetailsLink %]" class="edit-link">[% Lang.txt('Edit') %]</a>
+            [% END %]
+            </div>
+            <div class="member-details">
+            </div>
+        </div>
+    </div>
+
+    <div class="task-actions">
+        <span class = "button-medium generic-button"><a href = "">[% Lang.txt('Approve') %]</a></span>
+        <span class = "button-medium generic-button"><a href = "">[% Lang.txt('Reject') %]</a></span>
+    </div>
+
+</div>

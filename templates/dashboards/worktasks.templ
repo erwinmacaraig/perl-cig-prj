@@ -40,7 +40,7 @@
             [% ELSE %]
 			    <td><div class="member-data">
                     <span class = "button-small generic-button">
-                        <a href="[% task.viewURL %]">View</a>
+                        <a href="main.cgi?client=[% client %]&a=WF_View&TID=[% task.WFTaskID %]">[% Lang.txt('View') %]</a>
                     </span>
                 </div></td>
             [% IF task.showApprove %]
