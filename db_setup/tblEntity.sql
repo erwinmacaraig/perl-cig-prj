@@ -65,6 +65,7 @@ CREATE TABLE tblEntity (
     `strImportEntityCode` VARCHAR(45) NULL COMMENT 'Reference to the imported records inputted by client' AFTER `strShortNotes`,
     `strAddress2` VARCHAR(200) NULL COMMENT 'Secondary address detail' AFTER `strAddress`,
   PRIMARY KEY (`intEntityID`),
+  UNIQUE KEY `strImportEntityCode_UNIQUE` (`strImportEntityCode`),
   KEY `index_intRealmID` (`intRealmID`),
   KEY `index_strFIFAID` (`strFIFAID`),
   KEY `index_intEntityLevel` (`intEntityLevel`)
