@@ -10,6 +10,7 @@ CREATE TABLE `tblEntityRegistrationAllowed` (
   `strPersonLevel` varchar(20) NOT NULL,
   `strRegistrationNature` varchar(20) NOT NULL,
   `strAgeLevel` varchar(20) NOT NULL,
+  `intImportID` INT NULL COMMENT 'Tracking ID on which batch this record is included during import',
   `tTimestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`intEntityRegistrationAllowedID`),
     KEY `index_intRealmID` (`intRealmID`),
