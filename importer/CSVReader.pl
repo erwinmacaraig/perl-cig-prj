@@ -70,6 +70,10 @@ sub ApplyPreRules{
         if($rule->{"rule"} eq "multiplyEntry"){
            $records = multiplyEntry($records,$rule);
         }
+        if($rule->{"rule"} eq "swapEntry"){
+        	print Dumper($rule);
+           $records = swapEntry($records,$rule);
+        }
     }
     return $records;
 }

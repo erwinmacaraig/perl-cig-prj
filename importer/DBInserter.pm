@@ -1,8 +1,8 @@
 
 package DBInserter;
 require Exporter;
-@EXPORT = qw(insertBatch connectDB getEntity insertRow);
-@EXPORT_OK = qw(insertBatch connectDB getEntity insertRow);
+@EXPORT = qw(insertBatch connectDB getRecord insertRow);
+@EXPORT_OK = qw(insertBatch connectDB getRecord insertRow);
 @ISA =  qw(Exporter);
 use Data::Dumper;
 use DBI;
@@ -41,13 +41,13 @@ sub insertBatch {
 	}
 }
 
-sub getEntity{
-	my ($db,$key, $value) = @_;
+sub getRecord{
+	my ($db,$table,$field,$filter,$value) = @_;
 	my $statement=qq[
 	    SELECT 
-          intEntityID
-	      FROM tblEntity
-	      WHERE $key = ?
+          $field
+	      FROM $table
+	      WHERE $filter = ?
 	  ];
 	  my $query = $db->prepare($statement);
 	  $query->execute($value);
@@ -56,6 +56,7 @@ sub getEntity{
 	  
 	  return $field->{"intEntityID"};
 }
+
 sub connectDB{
 
     my $dbh = DBI->connect($ImporterConfig::DB_CONFIG{"DB_DSN"}, $ImporterConfig::DB_CONFIG{"DB_USER"},$ImporterConfig::DB_CONFIG{"DB_PASSWD"}) or die $DBI::errstr;

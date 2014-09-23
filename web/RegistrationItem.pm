@@ -19,8 +19,7 @@ sub getRegistrationItems    {
     $regNature ||= '';
     $ruleFor ||= '';
     $entityLevel ||= 0; # used for Products
-    $multiPersonType ||= ''; ## For products, are multi regos used
-    
+    $multiPersonType ||= ''; ## For products, are multi regos used    
 
     return 0 if (! $itemType);
 	

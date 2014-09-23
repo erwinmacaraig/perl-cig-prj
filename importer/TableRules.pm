@@ -2,8 +2,8 @@
 package TableRules;
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(multiplyEntry insertLink removeLinkField getConfig);
-@EXPORT_OK = qw(multiplyEntry insertLink removeLinkField getConfig);
+@EXPORT = qw(multiplyEntry insertLink removeLinkField getConfig swapEntry);
+@EXPORT_OK = qw(multiplyEntry insertLink removeLinkField getConfig swapEntry);
 
 # This is where you should include the migration rule for your table
 use Data::Dumper;
@@ -75,12 +75,23 @@ sub insertLink{
 	my ($links,$records,$rule) = @_;
     foreach my $record ( @{$records} ){
         my %link = (
-            "intParentEntityID" => getEntity($db,"strImportEntityCode",$record->{$rule->{"field"}}),
-            "intChildEntityID" => getEntity($db,"strImportEntityCode",$record->{"strImportEntityCode"}),
+            "intParentEntityID" => getRecord($db,"tblEntity","intEntityID","strImportEntityCode",$record->{$rule->{"field"}}),
+            "intChildEntityID" => getRecord($db,"tblEntity","intEntityID","strImportEntityCode",$record->{"strImportEntityCode"}),
         );
         push ($links,\%link)
     }
     return $links;
+}
+sub swapEntry{
+	my ($records,$rule) = @_;
+	my @newRecords = ();
+    foreach my $record ( @{$records} ){
+    	my $copy = {%$record};
+	    $copy->{$rule->{"destination"}} = getRecord($db,$rule->{"table"},$rule->{"destination"},$rule->{"source"},$record->{$rule->{"source"}});
+	    delete $copy->{$rule->{"source"}};
+	    push (@newRecords, $copy);
+    }
+    return \@newRecords;
 }
 
 1;
