@@ -1,8 +1,8 @@
 
 package DBInserter;
 require Exporter;
-@EXPORT = qw(insertBatch connectDB getEntity);
-@EXPORT_OK = qw(insertBatch connectDB getEntity);
+@EXPORT = qw(insertBatch connectDB getEntity insertRow);
+@EXPORT_OK = qw(insertBatch connectDB getEntity insertRow);
 @ISA =  qw(Exporter);
 use Data::Dumper;
 use DBI;
@@ -11,28 +11,33 @@ use ImporterConfig;
 
 
 sub insertRow {
-	my ($db,$table,$record) = @_;
+	my ($db,$table,$record,$importId) = @_;
     my $keystr = (join ",\n        ", (keys $record));
 	my $valstr = join ', ', (split(/ /, "? " x (scalar(values $record))));
+	if(defined $importId){
+    	$keystr = (join ",\n        ","intImportID", $keystr);
+    	$valstr = (join ",","$importId", $valstr);
+    }
 	my @values = values $record;
 	my %success = ();
 	my $query = qq[
 	    INSERT INTO $table (
-		        $keystr
-		    )
-		    VALUES (
-		        $valstr
-		    )
+		    $keystr
+		)
+		VALUES (
+		    $valstr
+		)
 	];
 	my $sth = $db->prepare($query) or die "Can't prepare insert: ".$db->errstr()."\n";
 	my $result = $sth->execute(@values) or die "Can't execute insert: ".$db->errstr()."\n";
-	print "INSERT SUCCESS :: TABLE:: '",$table,"' RECORDS:: '",join(', ', @values),"'\n";
+	print "INSERT SUCCESS :: TABLE:: '",$table,"' ID:: ",$sth->{mysql_insertid},"' RECORDS:: '",join(', ', @values),"'\n";
+	return $sth->{mysql_insertid};
 }
 
 sub insertBatch {
-	my ($db,$table,$records) = @_;
+	my ($db,$table,$records,$importId) = @_;
 	foreach my $i (@{$records}){
-		insertRow($db,$table,$i);
+		insertRow($db,$table,$i,$importId);
 	}
 }
 

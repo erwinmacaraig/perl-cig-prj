@@ -149,6 +149,7 @@ CREATE TABLE tblPerson (
     strDemographicField4 VARCHAR(45) NULL COMMENT 'TBC' AFTER `strDemographicField3`,
     strDemographicField5 VARCHAR(45) NULL COMMENT 'TBC' AFTER `strDemographicField4`,
     strDemographicField6 VARCHAR(45) NULL COMMENT 'TBC' AFTER `strDemographicField5`,
+    `intImportID` INT NULL COMMENT 'Tracking ID on which batch this record is included during import',
   PRIMARY KEY (intPersonID),
   UNIQUE INDEX `strImportPersonCode_UNIQUE` (`strImportPersonCode` ASC),
   KEY index_strPersonNo (strPersonNo),
