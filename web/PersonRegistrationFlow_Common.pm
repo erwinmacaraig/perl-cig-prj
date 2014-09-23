@@ -197,9 +197,6 @@ sub displayRegoFlowDocuments    {
  my $pagedata = runTemplate($Data, \%PageData, 'registration/document_flow_backend.templ') || '';
 
     return $pagedata;
-
-#########################
-   # return $body;
 }
 
 sub displayRegoFlowProducts {
@@ -372,7 +369,7 @@ sub save_rego_products {
 
 
 sub add_rego_record{
-    my ($Data, $personID, $entityID, $entityLevel, $originLevel, $personType, $personEntityRole, $personLevel, $sport, $ageLevel, $registrationNature, $ruleFor) =@_;
+    my ($Data, $personID, $entityID, $entityLevel, $originLevel, $personType, $personEntityRole, $personLevel, $sport, $ageLevel, $registrationNature, $ruleFor, $nationality) =@_;
 
     my $clientValues = $Data->{'clientValues'};
     my $rego_ref = {
@@ -389,7 +386,7 @@ sub add_rego_record{
         entityLevel => $entityLevel,
         personID => $personID,
         current => 1,
-        ruleFor=>$ruleFor
+        ruleFor=>$ruleFor,
     };
     my ($personStatus, $prStatus) = checkIsSuspended($Data, $personID, $entityID, $rego_ref->{'personType'});
     return (0, undef, 'SUSPENDED') if ($personStatus eq 'SUSPENDED' or $prStatus eq 'SUSPENDED');

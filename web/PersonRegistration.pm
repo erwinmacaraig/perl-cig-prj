@@ -533,6 +533,7 @@ sub getRegistrationData	{
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             p.intGender,
             p.intGender as Gender,
+            p.strISONationality,
             DATE_FORMAT(pr.dtFrom, "%Y%m%d") as dtFrom_,
             DATE_FORMAT(pr.dtTo, "%Y%m%d") as dtTo_,
             DATE_FORMAT(pr.dtAdded, "%Y%m%d%H%i") as dtAdded_,
