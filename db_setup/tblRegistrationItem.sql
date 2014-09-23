@@ -27,7 +27,8 @@ CREATE TABLE tblRegistrationItem (
     intUseExistingAnyEntity TINYINT DEFAULT 0,/* An existing use of this ID is Ok against ANY entity */
     intPaymentRequired TINYINT DEFAULT 0 COMMENT '0=Optional, 1 =Required', /* Sets intPaymentRequired in tblPersonRego */
     intRequired TINYINT DEFAULT 0 COMMENT '0=Optional, 1 =Required',
-
+    strISOCountry_IN varchar(200) DEFAULT NULL,
+    strISOCountry_NOTIN varchar(200) DEFAULT NULL,
     tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
 
