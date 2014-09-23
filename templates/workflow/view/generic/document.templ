@@ -19,34 +19,34 @@
                         <th>Document ID</th>
                         <th>Status</th>
                         <th>Document Type</th>
-                        <th>Notes</th>
                         <th>Action/s</th>
                     </tr>
                     <!-- loop here; -->
+                    [% FOREACH document IN RelatedDocuments %]
                     <tr>
-                        <td><div class="member-data"> [% DocumentDetails.DocumentID %] </div></td>
-                        <td><div class="member-data"> [% DocumentDetails.Status %] </div></td>
-                        <td><div class="member-data"> [% DocumentDetails.DocumentName %] </div></td>
+                        <td><div class="member-data"> [% document.DocumentID %] </div></td>
+                        <td><div class="member-data"> [% document.Status %] </div></td>
+                        <td><div class="member-data"> [% document.DocumentType %] </div></td>
                         <td>
                             <div class="member-data">
-                            [% IF DocumentDetails.DeniedNotes %]
-                                [% DocumentDetails.DeniedNotes %]
-                            [% ELSE %]
-                                N/A
-                            [% END %]
-                            </div>
-                            </td>
-                        <td>
-                            <div class="member-data">
+                                <!--
                                 <span class = "button-small generic-button">
                                     <a href="">[% Lang.txt('View') %]</a>
                                 </span>
-                                <span class = "button-small generic-button">
-                                    <a href="">[% Lang.txt('Verify') %]</a>
-                                </span>
+                                -->
+                                [% IF document.Status == 'PENDING' %]
+                                <form action="[% DocumentAction.target %]" method="POST">
+                                    <input type="hidden" name="client" value="[% DocumentAction.client %]">
+                                    <input type="hidden" name="TID" value="[% DocumentAction.WFTaskID %]">
+                                    <input type="hidden" name="a" value="[% DocumentAction.action %]">
+                                    <input type="hidden" name="did" value="[% document.DocumentID %]">
+                                    <input class="button-small generic-button" type="submit" name="verify" value="verify">
+                                </form>
+                                [% END %]
                             </div>
                         </td>
                     </tr>
+                    [% END %]
                 </table>
             </div>
         </div>

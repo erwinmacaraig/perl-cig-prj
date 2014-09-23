@@ -10,17 +10,22 @@ use DBInserter;
 
 my $directory = '';  
 my $format = '';
+my $notes = '';
 my $db = connectDB();
 
-GetOptions ('directory=s' => \$directory, 'format=s' => \$format);
+GetOptions ('directory=s' => \$directory, 'format=s' => \$format, 'notes=s' => \$notes);
 
 foreach my $fp (glob("$directory/*.".$format)) {
-  readCSVFile($fp);
+    my %importRecord = (
+    	"strNotes" => $notes,
+    );
+    my ($importId) = insertRow($db,"tblImportTrack",\%importRecord);
+    readCSVFile($fp,$importId);
 }
 
 
 sub readCSVFile{
-    my ($file) = @_;
+    my ($file,$importId) = @_;
     my @records;
     my @directory = split /\//, $file;
     my $dirlength  = scalar @directory;
@@ -48,9 +53,10 @@ sub readCSVFile{
     }
     my $records = ApplyPreRules($config->{"rules"},\@records);
     my $inserts = ApplyRemoveLinks($config->{"rules"},$records);
-    insertBatch($db,$object,$inserts);
+   
+    insertBatch($db,$object,$inserts,$importId);
     my $links = ApplyPostRules($object,$config->{"rules"},\@records); 
-    insertBatch($db,"tblEntityLinks",$links);
+    insertBatch($db,"tblEntityLinks",$links,$importId);
     close $fh;
 }
 
@@ -63,6 +69,10 @@ sub ApplyPreRules{
         my $rule = $rules->{$key};
         if($rule->{"rule"} eq "multiplyEntry"){
            $records = multiplyEntry($records,$rule);
+        }
+        if($rule->{"rule"} eq "swapEntry"){
+        	print Dumper($rule);
+           $records = swapEntry($records,$rule);
         }
     }
     return $records;

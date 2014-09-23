@@ -64,6 +64,7 @@ CREATE TABLE tblEntity (
     `strLegalID` varchar(45) DEFAULT NULL COMMENT 'a field to type in the ID that corresponds to the LegalType',
     `strImportEntityCode` VARCHAR(45) NULL COMMENT 'Reference to the imported records inputted by client' AFTER `strShortNotes`,
     `strAddress2` VARCHAR(200) NULL COMMENT 'Secondary address detail' AFTER `strAddress`,
+    `intImportID` INT NULL COMMENT 'Tracking ID on which batch this record is included during import',
   PRIMARY KEY (`intEntityID`),
   UNIQUE KEY `strImportEntityCode_UNIQUE` (`strImportEntityCode`),
   KEY `index_intRealmID` (`intRealmID`),

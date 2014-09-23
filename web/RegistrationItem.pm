@@ -19,8 +19,7 @@ sub getRegistrationItems    {
     $regNature ||= '';
     $ruleFor ||= '';
     $entityLevel ||= 0; # used for Products
-    $multiPersonType ||= ''; ## For products, are multi regos used
-    
+    $multiPersonType ||= ''; ## For products, are multi regos used    
 
     return 0 if (! $itemType);
 	
@@ -41,15 +40,17 @@ sub getRegistrationItems    {
             AND RI.intSubRealmID IN (0, ?)
             AND RI.strRuleFor = ?
             AND RI.intOriginLevel = ?
-			AND RI.strRegistrationNature = ?
+	    AND RI.strRegistrationNature = ?
             AND RI.strEntityType IN ('', ?)
             AND RI.intEntityLevel IN (0, ?)
-			AND RI.strPersonType IN ('', ?)
-			AND RI.strPersonLevel IN ('', ?)
+	    AND RI.strPersonType IN ('', ?)
+	    AND RI.strPersonLevel IN ('', ?)
             AND RI.strPersonEntityRole IN ('', ?)
-			AND RI.strSport IN ('', ?)
-			AND RI.strAgeLevel IN ('', ?)
-            AND RI.strItemType = ?
+	    AND RI.strSport IN ('', ?)
+	    AND RI.strAgeLevel IN ('', ?)
+        AND RI.strItemType = ? 
+        AND (RI.strISOCountry_IN = '' OR RI.strISOCountry_IN LIKE CONCAT('%|',?,'|%'))
+        AND (RI.strISOCountry_NOTIN = '' OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))
     ];
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
     
@@ -58,16 +59,20 @@ sub getRegistrationItems    {
         $Data->{'RealmSubType'},
         $ruleFor,
         $originLevel,
-		$regNature,
+	    $regNature,
         $Rego_ref->{'strEntityType'} || $Rego_ref->{'entityType'} || '',
         $entityLevel,
-		$Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '',
-		$Rego_ref->{'strPersonLevel'} || $Rego_ref->{'personLevel'} || '',
-		$Rego_ref->{'strPersonEntityRole'} || $Rego_ref->{'personEntityRole'} || '',
-		$Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '',
-		$Rego_ref->{'strAgeLevel'} || $Rego_ref->{'ageLevel'} || '',
-        $itemType
+	    $Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '',
+	    $Rego_ref->{'strPersonLevel'} || $Rego_ref->{'personLevel'} || '',
+	    $Rego_ref->{'strPersonEntityRole'} || $Rego_ref->{'personEntityRole'} || '',
+	    $Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '',
+	    $Rego_ref->{'strAgeLevel'} || $Rego_ref->{'ageLevel'} || '',
+        $itemType,  
+        $Rego_ref->{'Nationality'} || '',
+        $Rego_ref->{'Nationality'} || ''   
 	) or query_error($st);
+    
+    
     my @Items=();
     while (my $dref = $q->fetchrow_hashref())   {
         my %Item=();

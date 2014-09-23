@@ -23,6 +23,12 @@
 			"value" : "ALL",
 			"field" : "strAgeLevel",
 			"collection" : ["MINOR","ADULT"]
+		},
+		"strImportEntityCode" : {
+			"rule" : "swapEntry",
+			"source" : "strImportEntityCode",
+			"destination" : "intEntityID",
+			"table" : "tblEntity"
 		}
 	},
 	"mapping" : {

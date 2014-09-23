@@ -52,9 +52,10 @@ sub handleRegistrationFlowBackend   {
     $Hidden{'prodIds'} = $params{'prodIds'} || '';
     $Hidden{'prodQty'} = $params{'prodQty'} || '';
 
+	
     my $pref= undef;
     if ($personID && $personID>0)  {
-        $pref = loadPersonDetails($Data->{'db'}, $personID);
+        $pref = loadPersonDetails($Data->{'db'}, $personID);       
     }
 
     if($regoID) {
@@ -66,6 +67,7 @@ sub handleRegistrationFlowBackend   {
     }
 
     if ( $action eq 'PREGF_TU' ) {
+    	
         #add rego record with types etc.
         my $msg='';
         my $personType = param('pt') || '';
@@ -76,6 +78,9 @@ sub handleRegistrationFlowBackend   {
         my $registrationNature = param('nat') || ''; 
 
         ($regoID, $rego_ref, $msg) = add_rego_record($Data, $personID, $entityID, $entityLevel, $originLevel, $personType, $personEntityRole, $personLevel, $sport, $ageLevel, $registrationNature);
+       ###########################################
+        $rego_ref->{'Nationality'} = $pref->{'strISONationality'} || '';
+        ##########################################
         if (!$regoID)   {
             my $error = '';
             if ($msg eq 'SUSPENDED')   {
@@ -90,6 +95,8 @@ sub handleRegistrationFlowBackend   {
             if ($msg eq 'RENEWAL_FAILED')   {
                 $error = $lang->txt("Renewal failed, cannot find existing registration");
             }
+          
+            
             my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_T";
             ## Make this a template for errors
             my %PageData = (
