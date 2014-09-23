@@ -177,14 +177,14 @@ print STDERR "SSSS$action $clubID\n";
         maxsize => '50',
       },      
       strLatinName => {
-        label => 'Name (Latin)',
+        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'Name (Latin)' : '',
         value => $field->{strLatinName},
         type  => 'text',
         size  => '40',
         maxsize => '150',
       },
       strLatinShortName => {
-        label => 'Short Name (Latin)',
+        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'Short Name (Latin)' : '',
         value => $field->{strLatinShortName},
         type  => 'text',
         size  => '30',

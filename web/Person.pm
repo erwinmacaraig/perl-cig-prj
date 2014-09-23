@@ -757,7 +757,7 @@ sub person_details {
                 sectionname => 'details',
             },
             strLocalFirstname => {
-                label       => $Data->{'SystemConfig'}{'person_strLocalFirstname'}?$FieldLabels->{'strLocalFirstname'} : '',
+                label       => $Data->{'SystemConfig'}{'person_strLocalFirstname'} ? $FieldLabels->{'strLocalFirstname'} : '',
                 value       => $field->{strLocalFirstname},
                 type        => 'text',
                 size        => '40',
@@ -775,7 +775,7 @@ sub person_details {
                 first_page  => 1,
             },
             strLatinFirstname => {
-                label       => $FieldLabels->{'strLatinFirstname'},
+                label       => $Data->{'SystemConfig'}{'person_strLatinNames'} ? $FieldLabels->{'strLatinFirstname'} : '' ,
                 value       => $field->{strLatinFirstname},
                 type        => 'text',
                 size        => '40',
@@ -784,7 +784,7 @@ sub person_details {
                 first_page  => 1,
             },            
             strLatinSurname => {
-                label       => $Data->{'SystemConfig'}{'strLocalSurname_Text'} ? $Data->{'SystemConfig'}{'strLocalSurname_Text'} : $FieldLabels->{'strLatinSurname'},
+                label       => $Data->{'SystemConfig'}{'person_strLatinNames'} ?  $FieldLabels->{'strLatinSurname'} : '',
                 value       => $field->{strLatinSurname},
                 type        => 'text',
                 size        => '40',
