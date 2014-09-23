@@ -1741,14 +1741,19 @@ sub populateDocumentViewData {
         WHERE 
             wt.intWFTaskID = ?
             AND wt.intRealmID = ?
-            AND ((wt.intProblemResolutionEntityID = ? AND rd.intAllowProblemResolutionLevel = 1) OR (rd.intAllowProblemResolutionLevel = 0))
+            AND
+            (
+                (wt.intProblemResolutionEntityID = ? AND rd.intAllowProblemResolutionLevel = 1)
+                OR
+                (wt.intApprovalEntityID = ? AND rd.intAllowProblemResolutionLevel = 0)
+            )
     ];
 
-    print STDERR Dumper $entityID;
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
 	$q->execute(
         $dref->{'intWFTaskID'},
         $Data->{'Realm'},
+        $entityID,
         $entityID,
 	) or query_error($st);
 
