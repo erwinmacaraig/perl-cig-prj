@@ -1271,7 +1271,7 @@ my $person_photo = qq[
         #<h4>Documents</h4>
         #<span class="button-small generic-button"><a href="?client='.$client.'&amp;a=DOC_L">Add Document</a></span>
 $person_photo = '' if($option eq 'add');
-$tabs = '' if($option eq 'add');
+#$tabs = '' if($option eq 'add'); #WR: may need to go back in
 	$resultHTML =qq[
  $tabs 
 $person_photo
