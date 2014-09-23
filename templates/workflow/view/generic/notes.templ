@@ -1,8 +1,26 @@
 
+    <br/>
+    <br/>
     <div class="">
         <div class="payment-detail">
             <div class = "sectionheader">[% Lang.txt('Task Notes') %]&nbsp;&nbsp;</div>
             <div class="member-details">
+                <table style="width: 100%">
+                    <tr>
+                        <th>Rejection Notes</th>
+                        <th>Date/Time Rejected</th>
+                        <th>Resolution Notes</th>
+                        <th>Date/Time Resolved</th>
+                    </tr>
+                    <!-- loop here; -->
+                    [% FOREACH note IN TaskNotes %]
+                    <tr>
+                        <td><div class="member-data"> [% note.RejectionNotes %] </div></td>
+                        <td><div class="member-data"> [% note.TimestampRejected %] </div></td>
+                        <td><div class="member-data"> [% note.ResolveNotes %] </div></td>
+                        <td><div class="member-data"> [% note.TimestampResolved %] </div></td>
+                    [% END %]
+                </table>
             </div>
         </div>
     </div>
