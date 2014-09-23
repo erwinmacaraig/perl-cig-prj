@@ -1005,18 +1005,86 @@ sub updateTaskNotes {
     my $lang = $Data->{'lang'};
     my $title = $lang->txt('Work task notes Updated');
 
-    my $st = qq[
-        UPDATE tblWFTask
-        SET 
-            strTaskNotes = ?
-        WHERE 
-            intWFTaskID = ?
-            AND intRealmID=?
-        LIMIT 1
-    ];
-    
-  	my $q = $Data->{'db'}->prepare($st);
-  	$q->execute($notes, $WFTaskID, $Data->{'Realm'});
+    my $task = getTask($Data, $WFTaskID);
+    #identify type of action (rejection or resolution based on intApprovalEntityID and intProblemResolutionID)
+    my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+    #my $type = ($entityID == $task->{'intApprovalEntityID'}) ? 'REJECT' : ($entityID == $task->{'intProblemResolutionEntityID'}) ? 'RESOLVE' : '';
+    my $WFCurrentNoteID = $task->{'intTaskNoteID'} || 0;
+    my $st;
+
+    if($entityID == $task->{'intApprovalEntityID'}) {   #reject
+        $st = qq[
+            INSERT INTO tblWFTaskNotes (
+                intTaskNoteID,
+                intWFTaskID,
+                strRejectionNotes,
+                intCurrent,
+                tTimeStampRejected
+            )
+            VALUES (
+                ?,
+                ?,
+                ?,
+                1,
+                now()
+            )
+            ON DUPLICATE KEY UPDATE
+                intWFTaskID = VALUES(intWFTaskID),
+                strRejectionNotes = VALUES(strRejectionNotes),
+                tTimeStampRejected = VALUES(tTimeStampRejected)
+        ];
+
+        my $q = $Data->{'db'}->prepare($st);
+        $q->execute(
+            $WFCurrentNoteID,
+            $WFTaskID,
+            $notes
+        );
+    } elsif ($entityID == $task->{'intProblemResolutionEntityID'}) { #reject
+        warn "RESOLTION $entityID";
+        #set intCurrent to 0; this will result to empty value
+        #for intCurrent in sub viewTask query thus returning
+        #0 to insert new set of work flow task note
+        #$st = qq[
+        #    INSERT INTO tblWFTaskNotes (
+        #        intTaskNoteID,
+        #        intWFTaskID,
+        #        strResolveNotes,
+        #        intCurrent,
+        #        tTimeStampResolved
+        #    )
+        #    VALUES (
+        #        ?,
+        #        ?,
+        #        ?,
+        #        0,
+        #        now()
+        #    )
+        #    ON DUPLICATE KEY UPDATE
+        #        intWFTaskID = VALUES(intWFTaskID),
+        #        intCurrent = VALUES(intCurrent),
+        #        strResolveNotes = VALUES(strResolveNotes),
+        #        tTimeStampResolved = VALUES(tTimeStampResolved)
+        #];
+
+        $st = qq[
+            UPDATE tblWFTaskNotes
+            SET
+                strResolveNotes = ?,
+                intCurrent = 0,
+                tTimeStampResolved = NOW()
+            WHERE
+                intTaskNoteID = ?
+                AND intWFTaskID = ?
+        ];
+
+        my $q = $Data->{'db'}->prepare($st);
+        $q->execute(
+            $notes,
+            $WFCurrentNoteID,
+            $WFTaskID
+        );
+    }
 
    my %TemplateData = (
 			TaskID=> $WFTaskID,
@@ -1097,29 +1165,31 @@ sub addTaskNotes    {
     my( $Data) = @_;
 
     my $WFTaskID = safe_param('TID','number') || '';
+    my $WFCurrentNoteID = safe_param('NID','number') || '';
 
     my $lang = $Data->{'lang'};
     my $title = $lang->txt('Work task Notes');
-    my $st = qq[
-        SELECT
-            strTaskNotes
-        FROM
-            tblWFTask
-        WHERE 
-            intWFTaskID = ?
-    ];
-  	my $q = $Data->{'db'}->prepare($st);
-  	$q->execute($WFTaskID);
-    my $notes = $q->fetchrow_array() || '';
+    #my $st = qq[
+    #    SELECT
+    #        strTaskNotes
+    #    FROM
+    #        tblWFTask
+    #    WHERE 
+    #        intWFTaskID = ?
+    #];
+  	#my $q = $Data->{'db'}->prepare($st);
+  	#$q->execute($WFTaskID);
+    #my $notes = $q->fetchrow_array() || '';
 
     my %TemplateData = (
-			TaskID=> $WFTaskID,
-            Lang => $Data->{'lang'},
-			TaskNotes=> $notes,
-			client => $Data->{client},
-            target=>$Data->{'target'},
-            action => 'WF_notesS',
-	);
+        TaskID=> $WFTaskID,
+        CurrentNoteID=> $WFCurrentNoteID,
+        Lang => $Data->{'lang'},
+        TaskNotes=> '',
+        client => $Data->{client},
+        target=>$Data->{'target'},
+        action => 'WF_notesS',
+    );
 
 	my $body = runTemplate(
 			$Data,
@@ -1250,17 +1320,20 @@ sub getTask {
     my $q = '';
 	$st = qq[
 	  	SELECT
-            intWFTaskID,
-            intWFRuleID,
-            intRealmID,
-            intApprovalEntityID,
-            strWFRuleFor,
-            strTaskStatus
+            t.intWFTaskID,
+            t.intWFRuleID,
+            t.intRealmID,
+            t.intApprovalEntityID,
+            t.intProblemResolutionEntityID,
+            t.strWFRuleFor,
+            t.strTaskStatus,
+            nt.intTaskNoteID
         FROM
-            tblWFTask 
+            tblWFTask t
+        LEFT JOIN tblWFTaskNotes nt ON (t.intWFTaskID = nt.intWFTaskID AND nt.intCurrent = 1)
 	  	WHERE 
-            intWFTaskID = ? 
-            AND intRealmID = ?
+            t.intWFTaskID = ? 
+            AND t.intRealmID = ?
     ];
 
     $q = $Data->{'db'}->prepare($st);
@@ -1270,6 +1343,7 @@ sub getTask {
     );
 
     my $result = $q->fetchrow_hashref();
+    print STDERR Dumper $result;
     return $result || undef;
 }
 
@@ -1353,7 +1427,8 @@ sub viewTask {
             uf.strFilename as documentFilename,
             uf.strExtension as documentExtension,
             dPersonRego.intPersonRegistrationID as documentPersonRegistrationID,
-            dPersonRego.intPersonID as documentPersonID
+            dPersonRego.intPersonID as documentPersonID,
+            tn.intTaskNoteID as currentNoteID
         FROM tblWFTask AS t
         LEFT JOIN tblEntity as e ON (e.intEntityID = t.intEntityID)
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (t.intPersonRegistrationID = pr.intPersonRegistrationID)
@@ -1363,6 +1438,7 @@ sub viewTask {
         LEFT JOIN tblDocuments as dPersonRego ON (t.intPersonID = dPersonRego.intPersonID AND t.intPersonRegistrationID = dPersonRego.intPersonRegistrationID)
         LEFT JOIN tblUploadedFiles as uf ON (dPersonRego.intUploadFileID = uf.intFileID)
         LEFT JOIN tblDocumentType as dt ON (dPersonRego.intDocumentTypeID = dt.intDocumentTypeID)
+        LEFT JOIN tblWFTaskNotes as tn ON (tn.intWFTaskID = t.intWFTaskID AND tn.intCurrent = 1)
         WHERE 
             t.intRealmID = $Data->{'Realm'}
             AND t.intWFTaskID = ?
@@ -1398,6 +1474,7 @@ sub viewTask {
     my %TemplateData;
     my %DocumentData;
     my %PaymentData;
+    my %NotesData;
     my %fields;
 
     switch($dref->{strWFRuleFor}) {
@@ -1436,6 +1513,7 @@ sub viewTask {
         'showApprove' => $showApprove,
         'showReject' => $showReject,
         'showResolve' => $showResolve,
+        'currentNoteID' => $dref->{'currentNoteID'} || 0,   #primary set to 0 will insert new row to table
     );
 
     my ($DocumentData, $fields) = populateDocumentViewData($Data, $dref);
@@ -1444,6 +1522,10 @@ sub viewTask {
     #my ($PaymentData, $fields) = populatePaymentViewData($Data, $dref);
     #%PaymentData = %{$PaymentData};
     %PaymentData = ();
+
+    my ($NotesData) = populateTaskNotesViewData($Data, $dref);
+    %NotesData = %{$NotesData};
+    print STDERR Dumper %NotesData;
 
     my $documentBlock = runTemplate(
         $Data,
@@ -1457,13 +1539,19 @@ sub viewTask {
         'workflow/view/generic/payment.templ'
     );
 
+    my $notesBlock = runTemplate(
+        $Data,
+        \%NotesData,
+        'workflow/view/generic/notes.templ'
+    );
 
 
     $TemplateData{'TaskAction'} = \%TaskAction;
     $TemplateData{'DocumentBlock'} = $documentBlock;
     $TemplateData{'PaymentBlock'} = $paymentBlock;
+    $TemplateData{'NotesBlock'} = $notesBlock;
 
-    print STDERR Dumper %TemplateData;
+    #print STDERR Dumper %TemplateData;
     my $body = runTemplate(
         $Data,
         \%TemplateData,
@@ -1605,6 +1693,52 @@ sub populateDocumentViewData {
 
     print STDERR Dumper %DocumentData;
     return (\%DocumentData, \%fields);
+}
+
+sub populateTaskNotesViewData {
+    my ($Data, $dref) = @_;
+
+    my %TemplateData = ();
+
+    my $st = qq[
+        SELECT
+            tn.intTaskNoteID,
+            tn.intWFTaskID,
+            tn.strRejectionNotes,
+            tn.strResolveNotes,
+            tn.intCurrent,
+            tn.tTimeStampRejected,
+            tn.tTimeStampResolved
+        FROM tblWFTaskNotes AS tn
+        WHERE 
+            tn.intWFTaskID = ?
+    ];
+
+    my $q = $Data->{'db'}->prepare($st) or query_error($st);
+	$q->execute(
+        $dref->{'intWFTaskID'}
+	) or query_error($st);
+
+	my @TaskNotes = ();
+	my $rowCount = 0;
+	  
+    while(my $tdref = $q->fetchrow_hashref()) {
+        my %rowNotes = (
+            TaskNoteID => $tdref->{intTaskNoteID},
+            RejectionNotes => $tdref->{strRejectionNotes},
+            ResolveNotes => $tdref->{strResolveNotes},
+            TimestampRejected => $tdref->{tTimeStampRejected},
+            TimestampResolved => $tdref->{tTimeStampResolved},
+        );
+        push @TaskNotes, \%rowNotes;
+    }
+
+    my %TemplateData = (
+        TaskNotes => \@TaskNotes,
+    );
+
+    return (\%TemplateData);
+
 }
 
 1;
