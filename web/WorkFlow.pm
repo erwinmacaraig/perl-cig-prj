@@ -9,6 +9,11 @@ require Exporter;
     addIndividualTask
     cleanTasks
     viewTask
+    populateRegoViewData
+    populatePersonViewData
+    populateDocumentViewData
+    populateTaskNotesViewData
+    populateEntityViewData
 );
 
 use strict;
@@ -151,6 +156,10 @@ sub handleWorkflow {
     }
     elsif ( $action eq 'WF_View' ) {
         ( $body, $title ) = viewTask( $Data );		
+    }
+    elsif ( $action eq 'WF_Verify' ) {
+        verifyDocument($Data);
+        ( $body, $title ) = viewTask( $Data );
     }
 	else {
         ( $body, $title ) = listTasks( $Data );		
@@ -1158,7 +1167,27 @@ sub setEntityStatus  {
     );
 }
 
+sub verifyDocument {
+    my ($Data) = @_;
 
+    my $WFTaskID = safe_param('TID','number') || '';
+    my $documentID = safe_param('did','number') || '';
+
+    my $st = qq[
+        UPDATE tblDocuments
+        SET
+            strApprovalStatus = 'VERIFIED'
+        WHERE
+        intDocumentID = ?
+    ];
+
+    my $q = $Data->{'db'}->prepare($st);
+    $q->execute(
+        $documentID
+    );
+
+    warn "VERIFY DOCUMENT $documentID";
+}
 
 sub addTaskNotes    {
 
@@ -1671,27 +1700,97 @@ sub populatePersonViewData {
 sub populateDocumentViewData {
     my ($Data, $dref) = @_;
 
-    #still to implement tblWFRuleDocuments
+    #need to retrieve list of documents here
+    #since a specific work flow rule can have
+    #multiple entries in tblWFRuleDocuments (1:n cardinality of task to document rules)
+    
+    my $joinCondition = '';
+
+    switch($dref->{strWFRuleFor}) {
+        case 'REGO' {
+            $joinCondition .= qq[ (d.intDocumentTypeID = rd.intDocumentTypeID AND d.intPersonRegistrationID = wt.intPersonRegistrationID AND d.intPersonID = wt.intPersonID) ];
+        }
+        case 'ENTITY' {
+            $joinCondition .= qq[ (d.intDocumentTypeID = rd.intDocumentTypeID AND d.intEntityID = wt.intEntityID AND d.intPersonID = 0 AND d.intPersonRegistrationID = 0) ];
+        }
+        case 'PERSON' {
+            $joinCondition .= qq[ (d.intDocumentTypeID = rd.intDocumentTypeID AND d.intPersonID = wt.intPersonID AND d.intPersonRegistrationID = 0) ];
+        }
+        else {
+        }
+    }
+
+    my %TemplateData = ();
+
+	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+
+    my $st = qq[
+        SELECT
+            rd.intWFRuleDocumentID,
+            rd.intWFRuleID,
+            rd.intDocumentTypeID,
+            wt.intApprovalEntityID,
+            wt.intProblemResolutionEntityID,
+            dt.strDocumentName,
+            d.strApprovalStatus,
+            d.intDocumentID
+        FROM tblWFRuleDocuments AS rd
+        INNER JOIN tblWFTask AS wt ON (wt.intWFRuleID = rd.intWFRuleID)
+        INNER JOIN tblDocuments AS d ON $joinCondition
+        INNER JOIN tblDocumentType dt ON (dt.intDocumentTypeID = d.intDocumentTypeID )
+        WHERE 
+            wt.intWFTaskID = ?
+            AND wt.intRealmID = ?
+            AND
+            (
+                (wt.intProblemResolutionEntityID = ? AND rd.intAllowProblemResolutionLevel = 1)
+                OR
+                (wt.intApprovalEntityID = ? AND rd.intAllowProblemResolutionLevel = 0)
+            )
+    ];
+
+    my $q = $Data->{'db'}->prepare($st) or query_error($st);
+	$q->execute(
+        $dref->{'intWFTaskID'},
+        $Data->{'Realm'},
+        $entityID,
+        $entityID,
+	) or query_error($st);
+
+	my @RelatedDocuments = ();
+	my $rowCount = 0;
+	  
+    my %DocumentAction = (
+        'target' => 'main.cgi',
+        'WFTaskID' => $dref->{intWFTaskID} || 0,
+        'client' => $Data->{client} || 0,
+        'action' => 'WF_Verify',
+    );
+
+    while(my $tdref = $q->fetchrow_hashref()) {
+        my %documents = (
+            DocumentID => $tdref->{'intDocumentID'},
+            Status => $tdref->{'strApprovalStatus'},
+            DocumentType => $tdref->{'strDocumentName'},
+        );
+        push @RelatedDocuments, \%documents;
+    }
+    #print STDERR Dumper @RelatedDocuments;
+
+    %TemplateData = (
+        DocumentAction => \%DocumentAction,
+        RelatedDocuments => \@RelatedDocuments,
+    );
+
+    return (\%TemplateData);
+
+
     my %DocumentData;
     my %fields = (
         title => '',
         templateFile => 'workflow/view/generic/document.templ',
     );
 
-    %DocumentData = (
-        DocumentDetails => {
-            DocumentID => $dref->{'documentID'} || '',
-            Status => $Data->{'lang'}->txt($dref->{'documentApprovalStatus'} || 0) || '',
-            DocumentName => $Data->{'lang'}->txt($dref->{'documentName'} || 0) || '',
-            DeniedNotes => $dref->{'documentDeniedNotes'} || '',
-            DocumentOrigFileName => $dref->{'documentOrigFilename'} || '',
-            DocumentPath => $Defs::fs_upload_dir . '/files/' . $dref->{'documentPath'} . $dref->{'documentFilename'} . '.' . $dref->{'documentExtension'} || '',
-            PersonID => $dref->{'documentPersonID'} || 0,
-            PersonRegistrationID => $dref->{'documentPersonRegistrationID'} || 0,
-        },
-	);
-
-    print STDERR Dumper %DocumentData;
     return (\%DocumentData, \%fields);
 }
 
@@ -1733,7 +1832,7 @@ sub populateTaskNotesViewData {
         push @TaskNotes, \%rowNotes;
     }
 
-    my %TemplateData = (
+    %TemplateData = (
         TaskNotes => \@TaskNotes,
     );
 
