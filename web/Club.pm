@@ -201,7 +201,7 @@ print STDERR "SSSS$action $clubID\n";
       	 label => "Sport",
       	 value => $field->{strDiscipline}, 
          type  => 'lookup',
-         options => \%Defs::sportType,
+         options => \%Defs::entitySportType,
          firstoption => [ '', 'Select Type' ],   
       },  
       intLegalTypeID => {
