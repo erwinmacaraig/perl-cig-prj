@@ -40,7 +40,9 @@
                                     <input type="hidden" name="TID" value="[% DocumentAction.WFTaskID %]">
                                     <input type="hidden" name="a" value="[% DocumentAction.action %]">
                                     <input type="hidden" name="did" value="[% document.DocumentID %]">
+                                    [% IF document.DisplayVerify == 1 %]
                                     <input class="button-small generic-button" type="submit" name="verify" value="verify">
+                                    [% END %]
                                 </form>
                                 [% END %]
                             </div>
