@@ -14,6 +14,7 @@ require Exporter;
     populateDocumentViewData
     populateTaskNotesViewData
     populateEntityViewData
+    resetRelatedTasks
 );
 
 use strict;
@@ -1284,6 +1285,8 @@ sub resolveTask {
 	}
     setDocumentStatus($Data, $WFTaskID, 'PENDING');
 
+    resetRelatedTasks($Data, $WFTaskID, 'ACTIVE');
+
     return(0);
     
 }
@@ -1334,6 +1337,7 @@ sub rejectTask {
 
     setDocumentStatus($Data, $WFTaskID, 'REJECTED');
 
+    resetRelatedTasks($Data, $WFTaskID, 'PENDING');
     if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
 	}
@@ -1729,6 +1733,7 @@ sub populateDocumentViewData {
             rd.intWFRuleDocumentID,
             rd.intWFRuleID,
             rd.intDocumentTypeID,
+            rd.intAllowProblemResolutionLevel,
             wt.intApprovalEntityID,
             wt.intProblemResolutionEntityID,
             dt.strDocumentName,
@@ -1741,20 +1746,14 @@ sub populateDocumentViewData {
         WHERE 
             wt.intWFTaskID = ?
             AND wt.intRealmID = ?
-            AND
-            (
-                (wt.intProblemResolutionEntityID = ? AND rd.intAllowProblemResolutionLevel = 1)
-                OR
-                (wt.intApprovalEntityID = ? AND rd.intAllowProblemResolutionLevel = 0)
-            )
     ];
 
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
 	$q->execute(
         $dref->{'intWFTaskID'},
         $Data->{'Realm'},
-        $entityID,
-        $entityID,
+        #$entityID,
+        #$entityID,
 	) or query_error($st);
 
 	my @RelatedDocuments = ();
@@ -1768,14 +1767,23 @@ sub populateDocumentViewData {
     );
 
     while(my $tdref = $q->fetchrow_hashref()) {
+        my $displayVerify;
+
+        if($tdref->{'intAllowProblemResolutionLevel'} eq 1) {
+            $displayVerify = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
+        }
+        elsif ($tdref->{'intApprovalEntityID'} == $entityID) {
+            $displayVerify = 1;
+        }
+
         my %documents = (
             DocumentID => $tdref->{'intDocumentID'},
             Status => $tdref->{'strApprovalStatus'},
             DocumentType => $tdref->{'strDocumentName'},
+            DisplayVerify => $displayVerify || '',
         );
         push @RelatedDocuments, \%documents;
     }
-    #print STDERR Dumper @RelatedDocuments;
 
     %TemplateData = (
         DocumentAction => \%DocumentAction,
@@ -1783,7 +1791,6 @@ sub populateDocumentViewData {
     );
 
     return (\%TemplateData);
-
 
     my %DocumentData;
     my %fields = (
@@ -1838,6 +1845,40 @@ sub populateTaskNotesViewData {
 
     return (\%TemplateData);
 
+}
+
+sub resetRelatedTasks {
+    my ($Data, $WFTaskID, $status) = @_;
+
+    my $st = qq[
+        UPDATE
+            tblWFTask AS WF
+        INNER JOIN
+            tblWFTask as PT ON (
+                (PT.intPersonID = WF.intPersonID AND PT.intPersonRegistrationID = WF.intPersonRegistrationID AND PT.intWFTaskID != WF.intWFTaskID AND PT.strWFRuleFor = WF.strWFRuleFor AND WF.strWFRuleFor = 'REGO')
+                OR
+                (PT.intEntityID = WF.intEntityID AND PT.intPersonRegistrationID = 0 AND PT.intPersonID = 0 AND PT.intWFTaskID != WF.intWFTaskID AND PT.strWFRuleFor = WF.strWFRuleFor AND WF.strWFRuleFor = 'ENTITY')
+                OR
+                (PT.intPersonID = WF.intPersonID AND PT.intPersonRegistrationID = 0 AND PT.intWFTaskID != WF.intWFTaskID AND PT.strWFRuleFor = WF.strWFRuleFor AND WF.strWFRuleFor = 'PERSON')
+                OR
+                (PT.intDocumentID = WF.intDocumentID AND PT.intWFTaskID != WF.intWFTaskID AND PT.strWFRuleFor = WF.strWFRuleFor AND WF.strWFRuleFor = 'DOCUMENT')
+            )
+        INNER JOIN tblWFRule as R ON (R.intWFRuleID = WF.intWFRuleID)
+        INNER JOIN tblWFRule as TR ON (PT.intWFRuleID = TR.intWFRuleID)
+        SET
+            PT.strTaskStatus = ?
+        WHERE
+            WF.intWFTaskID = ?
+            AND WF.intRealmID = ?
+            AND TR.intApprovalEntityLevel < R.intApprovalEntityLevel
+    ];
+
+    my $q = $Data->{'db'}->prepare($st) or query_error($st);
+    $q->execute(
+        $status,
+        $WFTaskID,
+        $Data->{'Realm'},
+    ) or query_error($st);
 }
 
 1;

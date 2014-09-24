@@ -1,0 +1,16 @@
+[% IF documents.size %]
+<h3>Required Club Documents</h3> 
+    <ul>
+	[% FOREACH doc IN documents %]
+		<li><h4>[% doc.Name %]</h4></li>
+		<form action="[% target %]" class="dropzone" method="post" enctype="multipart/form-data">
+		     <input type="hidden" name="DocumentTypeID" value="[% doc.ID %]" />
+		     <input type="hidden" name="a" value="[% nextaction %]">
+		     <input type="hidden" name="entitydocs" value=" " />
+		     <input type="hidden" name="client" value="[% client %]" />
+		     <input type="hidden" name="venueID" value="[% venue %]" />
+		</form>
+		<br /><br />		
+	[% END %] 
+    </ul>
+[% END %]

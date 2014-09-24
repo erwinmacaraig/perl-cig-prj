@@ -24,7 +24,7 @@ sub getRegistrationItems    {
     return 0 if (! $itemType);
 	
     my $st = qq[
-		SELECT 
+   SELECT 
             RI.intID,
             RI.intRequired,
             RI.intUseExistingThisEntity,
@@ -45,13 +45,14 @@ sub getRegistrationItems    {
             AND RI.intEntityLevel IN (0, ?)
 	    AND RI.strPersonType IN ('', ?)
 	    AND RI.strPersonLevel IN ('', ?)
-            AND RI.strPersonEntityRole IN ('', ?)
+        AND RI.strPersonEntityRole IN ('', ?)
 	    AND RI.strSport IN ('', ?)
 	    AND RI.strAgeLevel IN ('', ?)
         AND RI.strItemType = ? 
-        AND (RI.strISOCountry_IN = '' OR RI.strISOCountry_IN LIKE CONCAT('%|',?,'|%'))
-        AND (RI.strISOCountry_NOTIN = '' OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))
-    ];
+        AND (RI.strISOCountry_IN IS NULL OR RI.strISOCountry_IN LIKE CONCAT('%|',?,'|%'))
+        AND (RI.strISOCountry_NOTIN IS NULL OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))        
+      ]; 
+        
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
     
     $q->execute(
@@ -67,9 +68,10 @@ sub getRegistrationItems    {
 	    $Rego_ref->{'strPersonEntityRole'} || $Rego_ref->{'personEntityRole'} || '',
 	    $Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '',
 	    $Rego_ref->{'strAgeLevel'} || $Rego_ref->{'ageLevel'} || '',
-        $itemType,  
+        $itemType, 
         $Rego_ref->{'Nationality'} || '',
-        $Rego_ref->{'Nationality'} || ''   
+        $Rego_ref->{'Nationality'} || '',
+        
 	) or query_error($st);
     
     
