@@ -15,7 +15,7 @@ use HTML::Entities;
 use Utils;
 use Transactions;
 use Date::Calc qw(Today Delta_YMD);
-
+use Data::Dumper;
 sub getRegoProducts {
     my (
         $Data,
@@ -145,6 +145,8 @@ sub getAllRegoProducts {
             P.intInactive,
             P.intAllowQtys,
             P.intProductGender,
+            P.strNationality_IN,
+            P.strNationality_NOTIN,
             PP.intPricingType,
             PP.curAmount_Adult1,
             PP.curAmount_Adult2,
@@ -158,7 +160,7 @@ sub getAllRegoProducts {
             dtDateAvailableTo
         FROM tblProducts as P
             LEFT JOIN tblTransactions as T ON (
-                T.intID =?
+                T.intID = ?
                 AND T.intTableType = $Defs::LEVEL_PERSON
                 AND T.intProductID = P.intProductID
                 AND T.intPersonRegistrationID IN (0, ?)
@@ -175,7 +177,7 @@ sub getAllRegoProducts {
             AND P.intProductID IN ($productID_str)
         ORDER BY P.strGroup, P.strName, intLevel
     ];
-
+    #print $sql;
     ## T.intStatus=999 to turn off existing for moment.
             #AND (P.intMinSellLevel <= ? or P.intMinSellLevel=0)
 
@@ -413,6 +415,18 @@ sub productAllowedThroughFilter {
         if ( $memdetails->{'Gender'} and $dref->{'intProductGender'} ) {
             return 0 if $dref->{'intProductGender'} != $memdetails->{'Gender'};
         }
+        
+        #print STDERR 'dref value is ' . $dref->{'strNationality_IN'};
+        my @NOTIN_Countries = split(/\|/, $dref->{'strNationality_NOTIN'});
+        my @IN_Countries = split(/\|/, $dref->{'strNationality_IN'}); 
+        
+        if( (grep(/^$memdetails->{'Nationality'}/,@NOTIN_Countries))){
+        	print STDERR 'At this point(1) the value of Nationality is: ' . $memdetails->{'Nationality'};
+        	return 0;
+        } 
+        if(!(grep(/^$memdetails->{'Nationality'}/,@IN_Countries))){
+        	return 0;
+        }
 
         if ( $productAttributes->{ $dref->{'intProductID'} } ) {
 
@@ -450,7 +464,7 @@ sub productAllowedThroughFilter {
 	                if( $productAttributes->{$dref->{'intProductID'}}{$Defs::PRODUCT_AGE_MIN}
 	                    and $productAttributes->{$dref->{'intProductID'}}{$Defs::PRODUCT_AGE_MIN}[0] ne 'NULL' ) {
 	                    return 0 if ( $age_year < $productAttributes->{$dref->{'intProductID'}}{$Defs::PRODUCT_AGE_MIN}[0] );
-	                }
+	                }	                
                 }
 		    }
 

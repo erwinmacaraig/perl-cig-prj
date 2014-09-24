@@ -190,6 +190,20 @@ print STDERR "SSSS$action $clubID\n";
         size  => '30',
         maxsize => '50',
       },
+      strGender => {
+          label => "Gender",
+          value => $field->{strGender}, 
+          type  => 'lookup',
+          options => \%Defs::genderEntityInfo,
+          firstoption => [ '', 'Select Type' ],            
+      },   
+      strDiscipline => {
+      	 label => "Sport",
+      	 value => $field->{strDiscipline}, 
+         type  => 'lookup',
+         options => \%Defs::sportType,
+         firstoption => [ '', 'Select Type' ],   
+      },  
       intLegalTypeID => {
         label => "Legal Entity Type",
         value => $field->{intLegalTypeID},
@@ -360,6 +374,8 @@ print STDERR "SSSS$action $clubID\n";
         strLocalShortName
         strLatinName
         strLatinShortName
+        strGender
+        strDiscipline
         strEntityType
         strStatus
         strAssocNature
@@ -494,6 +510,8 @@ sub loadClubDetails {
      strLocalName,
      intLegalTypeID,
      strLocalShortName,
+     strGender,
+     strDiscipline,
      strLocalFacilityName,
      strLatinName,
      strLatinShortName,

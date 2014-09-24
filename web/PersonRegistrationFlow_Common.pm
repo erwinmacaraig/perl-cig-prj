@@ -230,6 +230,8 @@ sub displayRegoFlowProducts {
      }
     my $product_body='';
     if (@prodIDs)   {
+    	#print STDERR Dumper(%$rego_ref);
+    	#print STDERR 'Nationality is ' . $rego_ref->{'Nationality'};
         $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
      }
 

@@ -80,7 +80,7 @@ sub handleRegistrationFlowBackend   {
         ($regoID, $rego_ref, $msg) = add_rego_record($Data, $personID, $entityID, $entityLevel, $originLevel, $personType, $personEntityRole, $personLevel, $sport, $ageLevel, $registrationNature);
        ###########################################
         $rego_ref->{'Nationality'} = $pref->{'strISONationality'} || '';
-        ##########################################
+       ##########################################
         if (!$regoID)   {
             my $error = '';
             if ($msg eq 'SUSPENDED')   {
@@ -176,7 +176,7 @@ sub handleRegistrationFlowBackend   {
             $url,
         );
     }
-    elsif ( $action eq 'PREGF_P' ) {
+    elsif ( $action eq 'PREGF_P' ) {    	
         $body .= displayRegoFlowProducts($Data, $regoID, $client, $entityLevel, $originLevel, $rego_ref, $entityID, $personID, \%Hidden);
    }
     elsif ( $action eq 'PREGF_D' ) {
