@@ -1729,6 +1729,7 @@ sub populateDocumentViewData {
             rd.intWFRuleDocumentID,
             rd.intWFRuleID,
             rd.intDocumentTypeID,
+            rd.intAllowProblemResolutionLevel,
             wt.intApprovalEntityID,
             wt.intProblemResolutionEntityID,
             dt.strDocumentName,
@@ -1741,20 +1742,14 @@ sub populateDocumentViewData {
         WHERE 
             wt.intWFTaskID = ?
             AND wt.intRealmID = ?
-            AND
-            (
-                (wt.intProblemResolutionEntityID = ? AND rd.intAllowProblemResolutionLevel = 1)
-                OR
-                (wt.intApprovalEntityID = ? AND rd.intAllowProblemResolutionLevel = 0)
-            )
     ];
 
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
 	$q->execute(
         $dref->{'intWFTaskID'},
         $Data->{'Realm'},
-        $entityID,
-        $entityID,
+        #$entityID,
+        #$entityID,
 	) or query_error($st);
 
 	my @RelatedDocuments = ();
@@ -1768,14 +1763,23 @@ sub populateDocumentViewData {
     );
 
     while(my $tdref = $q->fetchrow_hashref()) {
+        my $displayVerify;
+
+        if($tdref->{'intAllowProblemResolutionLevel'} eq 1) {
+            $displayVerify = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
+        }
+        elsif ($tdref->{'intApprovalEntityID'} == $entityID) {
+            $displayVerify = 1;
+        }
+
         my %documents = (
             DocumentID => $tdref->{'intDocumentID'},
             Status => $tdref->{'strApprovalStatus'},
             DocumentType => $tdref->{'strDocumentName'},
+            DisplayVerify => $displayVerify || '',
         );
         push @RelatedDocuments, \%documents;
     }
-    #print STDERR Dumper @RelatedDocuments;
 
     %TemplateData = (
         DocumentAction => \%DocumentAction,
@@ -1783,7 +1787,6 @@ sub populateDocumentViewData {
     );
 
     return (\%TemplateData);
-
 
     my %DocumentData;
     my %fields = (
