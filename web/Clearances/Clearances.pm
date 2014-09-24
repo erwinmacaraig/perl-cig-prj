@@ -1631,17 +1631,14 @@ sub finaliseClearance {
 		UPDATE tblPersonRegistration_$Data->{'Realm'}
         SET strPreTransferredStatus = strStatus, strStatus="TRANSFERRED"
 		WHERE intEntityID= $intSourceEntityID
-            AND intCurrent=0
             AND strPersonType=?
             AND strSport = ?
-            AND strAgeLevel = ?
             AND strPersonLevel = ?
-            AND strPersonEntityRole IN ('', ?)
 			AND intPersonID = $intPersonID
             AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
 	];
 	$query = $db->prepare($st) or query_error($st);
-	$query->execute( $personType, $sport, $ageLevel, $personLevel, $entityRole )
+	$query->execute( $personType, $sport, $personLevel)
 	  or query_error($st);
 
 	sendCLREmail( $Data, $cID, 'FINALISED' );

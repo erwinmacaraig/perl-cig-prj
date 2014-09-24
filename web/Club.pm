@@ -177,22 +177,14 @@ print STDERR "SSSS$action $clubID\n";
         maxsize => '50',
       },      
       strLatinName => {
-<<<<<<< HEAD
-        label => 'International Name',
-=======
-        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'Name (Latin)' : '',
->>>>>>> 631c1273ca405a7b91f3ad33b15dcf5071c711c5
+        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'International Name' : '',
         value => $field->{strLatinName},
         type  => 'text',
         size  => '40',
         maxsize => '150',
       },
       strLatinShortName => {
-<<<<<<< HEAD
-        label => 'International Short Name',
-=======
-        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'Short Name (Latin)' : '',
->>>>>>> 631c1273ca405a7b91f3ad33b15dcf5071c711c5
+        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'International Short Name' : '',
         value => $field->{strLatinShortName},
         type  => 'text',
         size  => '30',

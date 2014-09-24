@@ -757,11 +757,7 @@ sub person_details {
                 sectionname => 'details',
             },
             strLocalFirstname => {
-<<<<<<< HEAD
                 label       => $FieldLabels->{'strLocalFirstname'},
-=======
-                label       => $Data->{'SystemConfig'}{'person_strLocalFirstname'} ? $FieldLabels->{'strLocalFirstname'} : '',
->>>>>>> 631c1273ca405a7b91f3ad33b15dcf5071c711c5
                 value       => $field->{strLocalFirstname},
                 type        => 'text',
                 size        => '40',
