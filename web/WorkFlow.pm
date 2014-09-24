@@ -1863,7 +1863,6 @@ sub resetRelatedTasks {
                 OR
                 (PT.intDocumentID = WF.intDocumentID AND PT.intWFTaskID != WF.intWFTaskID AND PT.strWFRuleFor = WF.strWFRuleFor AND WF.strWFRuleFor = 'DOCUMENT')
             )
-        INNER JOIN tblWFRule as RR ON (RR.intWFRuleID = PT.intWFRuleID)
         INNER JOIN tblWFRule as R ON (R.intWFRuleID = WF.intWFRuleID)
         INNER JOIN tblWFRule as TR ON (PT.intWFRuleID = TR.intWFRuleID)
         SET
