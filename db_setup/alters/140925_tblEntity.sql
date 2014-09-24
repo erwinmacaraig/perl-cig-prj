@@ -11,8 +11,4 @@ CHANGE COLUMN `dtFrom` `dtFrom` DATE NULL DEFAULT NULL COMMENT 'The date when th
 CHANGE COLUMN `dtTo` `dtTo` DATE NULL DEFAULT NULL COMMENT 'The date when the Organization was dissolved or superseded by another Organization.' ,
 CHANGE COLUMN `intSubRealmID` `intSubRealmID` INT(11) NOT NULL DEFAULT '0' AFTER `intRealmID`,
 CHANGE COLUMN `strStatus` `strStatus` VARCHAR(20) NULL DEFAULT '' COMMENT 'The status of this entity. ACTIVE, INACTIVE, PENDING, SUSPENDED, DESOLVED' ,
-ADD COLUMN `strAcceptSelfRego` VARCHAR(15) NULL COMMENT 'Allow an Entity to determine if they accept self registration FC-231' AFTER `intImportID`,
-ADD COLUMN `intRealmApproved` TINYINT NULL DEFAULT 0 AFTER `strAcceptSelfRego`,
-ADD COLUMN `strPaymentNotificationAddress` VARCHAR(250) NULL AFTER `intRealmApproved`,
-ADD COLUMN `strEntityPaymentBusinessNumber` VARCHAR(100) NULL AFTER `strPaymentNotificationAddress`,
-ADD COLUMN `strEntityPaymentInfo` TEXT NULL AFTER `strEntityPaymentBusinessNumber`;
+ADD COLUMN `strAcceptSelfRego` VARCHAR(15) NULL COMMENT 'Allow an Entity to determine if they accept self registration FC-231' AFTER `intImportID`;
