@@ -1,0 +1,1 @@
+call addcol("tblTransLog","intPaymentByLevel","int(11)",NULL);
