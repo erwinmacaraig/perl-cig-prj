@@ -1,0 +1,2 @@
+ALTER TABLE tblProducts ADD COLUMN `strNationality_IN` VARCHAR(200) NULL COMMENT 'Product visibility per IOS Nationality';
+ALTER TABLE tblProducts ADD COLUMN `strNationality_NOTIN` VARCHAR(200) NULL COMMENT 'Product Invisibility';
