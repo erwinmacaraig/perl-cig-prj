@@ -202,7 +202,12 @@ sub main {
         ( $resultHTML, $pageHeading ) = handleAgeGroups( $action, \%Data );
     }
     elsif ( $action =~ /^VENUE_/ ) {
-        ( $resultHTML, $pageHeading ) = handleVenues( $action, \%Data);
+    	#####  Leaving this if venueID can be setup in Reg_common.pm    	
+    	#my $venueID= getID($Data{'clientValues'},$Defs::LEVEL_VENUE); 
+        my $entityID = getLastEntityID($Data{'clientValues'});
+       ( $resultHTML, $pageHeading ) = handleVenues( $action, \%Data, $entityID, $typeID );
+    	####
+       # ( $resultHTML, $pageHeading ) = handleVenues( $action, \%Data);
     }
     elsif ( $action =~ /^CON_/ ) {
         my $ID = getID( \%clientValues );
