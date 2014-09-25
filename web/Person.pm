@@ -58,6 +58,8 @@ use RecordTypeFilter;
 use PersonRegistrationDetail;
 
 use Documents;
+use WorkFlow;
+
 sub handlePerson {
     my ( $action, $Data, $personID ) = @_;
 
@@ -1447,6 +1449,18 @@ sub postPersonUpdate {
             return (0, $body);
         }
         else {
+            my $rc = addWorkFlowTasks(
+                $Data,
+                'PERSON', 
+                'NEW',
+                $Data->{'clientValues'}{'authLevel'} || 0, 
+                getID($Data->{'clientValues'}) || 0,
+                $id,
+                0,
+                0,
+                0
+            );
+
             my $body = qq[
                 <div class="OKmsg"> $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} Added Successfully</div><br>
                 <a href="$Data->{'target'}?client=$clm&amp;a=P_HOME">Display Details for $params->{'d_strLocalFirstname'} $params->{'d_strLocalSurname'}</a><br><br>
