@@ -42,6 +42,8 @@ CREATE TABLE `tblProducts` (
   `intMatchCreditsPerQty` int(11) DEFAULT '0',
   `intMatchCreditType` int(11) DEFAULT '0',
   `intPhoto` tinyint(4) DEFAULT '0',
+  `strNationality_IN` VARCHAR(200) NULL COMMENT 'Product visibility per IOS Nationality',
+  `strNationality_NOTIN` VARCHAR(200) NULL COMMENT 'Product Invisibility',
     intCanResetPaymentRequired TINYINT DEFAULT 0,
   PRIMARY KEY (`intProductID`),
   KEY `index_intEntityID` (`intEntityID`),

@@ -177,14 +177,14 @@ print STDERR "SSSS$action $clubID\n";
         maxsize => '50',
       },      
       strLatinName => {
-        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'Name (Latin)' : '',
+        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'International Name' : '',
         value => $field->{strLatinName},
         type  => 'text',
         size  => '40',
         maxsize => '150',
       },
       strLatinShortName => {
-        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'Short Name (Latin)' : '',
+        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'International Short Name' : '',
         value => $field->{strLatinShortName},
         type  => 'text',
         size  => '30',
@@ -220,7 +220,7 @@ print STDERR "SSSS$action $clubID\n";
         maxsize => '50',       
       },
       strEntityType => {
-        label => "Subtype",
+        label => "Entity Type",
         value => $field->{strEntityType},
         type => 'lookup',
         options => \%Defs::clubLevelSubtype,
@@ -464,7 +464,7 @@ print STDERR "SSSS$action $clubID\n";
   );
   $clubperms->{'clubcharacteristics'} = 1;
 my $resultHTML='' ;
-($resultHTML, undef )=handleHTMLForm(\%FieldDefinitions, $clubperms, $option, '',$Data->{'db'});
+($resultHTML, undef )=handleHTMLForm(\%FieldDefinitions, $clubperms, $option, 0,$Data->{'db'});
   my $title=$field->{'strLocalName'} || '';
   my $scMenu = (allowedAction($Data, 'c_e'))
     ? getServicesContactsMenu($Data, $Defs::LEVEL_CLUB, $clubID, $Defs::SC_MENU_SHORT, $Defs::SC_MENU_CURRENT_OPTION_DETAILS)

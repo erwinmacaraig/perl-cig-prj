@@ -374,7 +374,6 @@ if($SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequestCleara
         'bankfileexport',
         'paymentsplitrun',
         'registrationforms', #nationalrego. enable regoforms at entity level.
-        'entityregistrationallowed',
         'bulk',
         'pending',
         ]],
@@ -880,7 +879,6 @@ sub getClubMenuData {
         'bulk',
         'pending',
         'locator',
-        'entityregistrationallowed',
         ]],
         [ $lang->txt('Reports'), 'menu',[
         'reports',
