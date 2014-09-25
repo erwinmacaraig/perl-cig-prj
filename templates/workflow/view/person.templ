@@ -90,7 +90,7 @@
     <div class="task-actions">
 
         [% IF TaskAction.showApprove %]
-        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Approve') %]</a></span>
+        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Summary&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Approve') %]</a></span>
         [% END %]
 
         [% IF TaskAction.showReject %]
