@@ -9,6 +9,7 @@ require Exporter;
     addIndividualTask
     cleanTasks
     viewTask
+    viewSummaryForApproval
     populateRegoViewData
     populatePersonViewData
     populateDocumentViewData
@@ -1879,6 +1880,10 @@ sub resetRelatedTasks {
         $WFTaskID,
         $Data->{'Realm'},
     ) or query_error($st);
+}
+
+sub viewSummaryForApproval {
+    my ($Data, $WFTaskID) = @_;
 }
 
 1;
