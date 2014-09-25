@@ -1563,19 +1563,19 @@ sub viewTask {
     my $documentBlock = runTemplate(
         $Data,
         \%DocumentData,
-        'workflow/view/generic/document.templ'
+        'workflow/generic/document.templ'
     );
 
     my $paymentBlock = runTemplate(
         $Data,
         \%PaymentData,
-        'workflow/view/generic/payment.templ'
+        'workflow/generic/payment.templ'
     );
 
     my $notesBlock = runTemplate(
         $Data,
         \%NotesData,
-        'workflow/view/generic/notes.templ'
+        'workflow/generic/notes.templ'
     );
 
 
