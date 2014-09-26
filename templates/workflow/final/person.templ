@@ -1,7 +1,7 @@
 <div class="member-home-page">
     <div class="">
         <div class="member-detail">
-            <div class = "sectionheader">[% Lang.txt('Member Detail Summary') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin  %]<a href = "[% EditDetailsLink %]"         class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
+            <div class = "sectionheader">[% Lang.txt('Registration Details') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin  %]<a href = "[% EditDetailsLink %]"         class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
             <div class="member-details">
 
             [% IF PersonDetails.LatinName %]
@@ -74,44 +74,9 @@
     </div>
 
     <div class="">
-        <div class="rego-detail">
-            <div class = "sectionheader">[% Lang.txt('Registration Details') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin  %]<a href = "[% EditDetailsLink %]"         class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
+        <div class="payment-detail">
+            <div class = "sectionheader">[% Lang.txt('Payment Details') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin  %]<a href = "[% EditDetailsLink %]"         class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
             <div class="member-details">
-
-            [% IF PersonRegoDetails.RegoType %]
-                <span class="details-row">
-                    <span class="details-left">[% Lang.txt("Registration Type") %]:</span>
-                    <span class="details-left">[% PersonRegoDetails.RegoType %]</span>
-                </span>
-            [% END %]
-
-            [% IF PersonRegoDetails.Status %]
-                <span class="details-row">
-                    <span class="details-left">[% Lang.txt("Status") %]:</span>
-                    <span class="details-left">[% PersonRegoDetails.Status %]</span>
-                </span>
-            [% END %]
-
-            [% IF PersonRegoDetails.Sport %]
-                <span class="details-row">
-                    <span class="details-left">[% Lang.txt("Sport") %]:</span>
-                    <span class="details-left">[% PersonRegoDetails.Sport %]</span>
-                </span>
-            [% END %]
-
-            [% IF PersonRegoDetails.Level %]
-                <span class="details-row">
-                    <span class="details-left">[% Lang.txt("Level") %]:</span>
-                    <span class="details-left">[% PersonRegoDetails.Level %]</span>
-                </span>
-            [% END %]
-
-            [% IF PersonRegoDetails.AgeLevel %]
-                <span class="details-row">
-                    <span class="details-left">[% Lang.txt("Age Level") %]:</span>
-                    <span class="details-left">[% PersonRegoDetails.AgeLevel %]</span>
-                </span>
-            [% END %]
             </div>
         </div>
     </div>
@@ -125,7 +90,7 @@
     <div class="task-actions">
 
         [% IF TaskAction.showApprove %]
-        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Summary&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Approve') %]</a></span>
+        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Approve') %]</a></span>
         [% END %]
 
         [% IF TaskAction.showReject %]

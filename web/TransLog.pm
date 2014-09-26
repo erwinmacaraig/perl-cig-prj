@@ -25,6 +25,7 @@ use GridDisplay;
 
 require Products;
 use Payments;
+use Data::Dumper;
 #require List;
 
 my $entityName       = 'Transaction';
@@ -33,8 +34,8 @@ my $entityNameURL    = 'P_TXNLog';
 
 sub handleTransLogs {
   my($action, $Data, $entityID, $personID) = @_;
-	my $q=new CGI;
-	$Data->{'params'} = $q->Vars();
+  my $q=new CGI;
+  $Data->{'params'} = $q->Vars();
   my $clientValues_ref = $Data->{'clientValues'};
   my ($body, $header, $db, $step1Success, $resultMessage)=('','', $Data->{'db'}, 0, '');
 
@@ -297,13 +298,15 @@ sub step2 {
 #BAFF
     $entityID= 0 if ($entityID== $Defs::INVALID_ID);
 	my $intPersonID= $Data->{'clientValues'}{'personID'}; 
+	my $currentLevel = $Data->{'clientValues'}{'authLevel'};
+	
 	my ($transHTML, $transcount, $transCurrency_ref, $transAmount_ref)=getTransList($Data, $db, $entityID, $intPersonID, $whereClause, $clientValues_ref, 0, $displayonly);
 
 
 #Make DB Changes
 	my $statement = qq[
-			INSERT INTO tblTransLog (intEntityPaymentID, dtLog, intAmount, strResponseCode, strResponseText, strComments, intPaymentType, strBSB, strBank, strAccountName, strAccountNum, intRealmID, intCurrencyID, strReceiptRef, intStatus) VALUES
-	($entityID, $dtLog, $intAmount, $strResponseCode, $strResponseText, $strComments, $paymentType, $strBSB, $strBank, $strAccountName, $strAccountNum, $Data->{Realm}, $currencyID, $strReceiptRef, $Defs::TXNLOG_PENDING) 
+			INSERT INTO tblTransLog (intEntityPaymentID, dtLog, intAmount, strResponseCode, strResponseText, strComments, intPaymentType, strBSB, strBank, strAccountName, strAccountNum, intRealmID, intCurrencyID, strReceiptRef, intStatus, intPaymentByLevel) VALUES
+	($entityID, $dtLog, $intAmount, $strResponseCode, $strResponseText, $strComments, $paymentType, $strBSB, $strBank, $strAccountName, $strAccountNum, $Data->{Realm}, $currencyID, $strReceiptRef, $Defs::TXNLOG_PENDING, $currentLevel) 
 	];
 	my $query = $db->prepare($statement);
   	$query->execute;

@@ -9,12 +9,15 @@ require Exporter;
     addIndividualTask
     cleanTasks
     viewTask
+    viewSummaryForApproval
     populateRegoViewData
     populatePersonViewData
     populateDocumentViewData
     populateTaskNotesViewData
     populateEntityViewData
     resetRelatedTasks
+    viewSummaryPreApproval
+    viewFinalPage
 );
 
 use strict;
@@ -142,7 +145,7 @@ sub handleWorkflow {
 	
 	if ( $action eq 'WF_Approve' ) {
         approveTask($Data);
-        ( $body, $title ) = listTasks( $Data );	
+        ( $body, $title ) = viewFinalPage( $Data );	
     }
     elsif ( $action eq 'WF_notesS' ) {
         ( $body, $title ) = updateTaskNotes( $Data );	
@@ -161,6 +164,9 @@ sub handleWorkflow {
     elsif ( $action eq 'WF_Verify' ) {
         verifyDocument($Data);
         ( $body, $title ) = viewTask( $Data );
+    }
+    elsif ( $action eq 'WF_Summary' ) {
+        ( $body, $title ) = viewSummaryPreApproval( $Data );
     }
 	else {
         ( $body, $title ) = listTasks( $Data );		
@@ -1351,6 +1357,7 @@ sub getTask {
 
     my $st = '';
     my $q = '';
+    #TODO: join to other tables: person, personrego, etc
 	$st = qq[
 	  	SELECT
             t.intWFTaskID,
@@ -1360,10 +1367,12 @@ sub getTask {
             t.intProblemResolutionEntityID,
             t.strWFRuleFor,
             t.strTaskStatus,
+            e.intEntityLevel,
             nt.intTaskNoteID
         FROM
             tblWFTask t
         LEFT JOIN tblWFTaskNotes nt ON (t.intWFTaskID = nt.intWFTaskID AND nt.intCurrent = 1)
+        LEFT JOIN tblEntity e ON (t.intEntityID = e.intEntityID)
 	  	WHERE 
             t.intWFTaskID = ? 
             AND t.intRealmID = ?
@@ -1563,19 +1572,19 @@ sub viewTask {
     my $documentBlock = runTemplate(
         $Data,
         \%DocumentData,
-        'workflow/view/generic/document.templ'
+        'workflow/generic/document.templ'
     );
 
     my $paymentBlock = runTemplate(
         $Data,
         \%PaymentData,
-        'workflow/view/generic/payment.templ'
+        'workflow/generic/payment.templ'
     );
 
     my $notesBlock = runTemplate(
         $Data,
         \%NotesData,
-        'workflow/view/generic/notes.templ'
+        'workflow/generic/notes.templ'
     );
 
 
@@ -1879,6 +1888,89 @@ sub resetRelatedTasks {
         $WFTaskID,
         $Data->{'Realm'},
     ) or query_error($st);
+}
+
+sub viewSummaryPreApproval {
+    my ($Data) = @_;
+
+    my $WFTaskID = safe_param('TID','number') || '';
+    my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+
+    my $task = getTask($Data, $WFTaskID);
+
+    return (" ", "Access forbidden.") if($entityID != $task->{'intApprovalEntityID'});
+
+    my %TemplateData;
+    my $templateFile;
+
+    my %TaskAction = (
+        'WFTaskID' => $task->{intWFTaskID} || 0,
+        'client' => $Data->{client} || 0,
+    );
+
+    $TemplateData{'TaskAction'} = \%TaskAction;
+
+    switch($task->{'strWFRuleFor'}) {
+        case 'REGO' {
+            $templateFile = 'workflow/summary/personregistration.templ';
+        }
+        case 'ENTITY' {
+            switch ($task->{'intEntityLevel'}) {
+                case "$Defs::LEVEL_CLUB"  {
+                    #TODO: add details specific to CLUB
+                    $templateFile = 'workflow/summary/club.templ';
+                }
+                case "$Defs::LEVEL_VENUE" {
+                    #TODO: add details specific to VENUE
+                    $templateFile = 'workflow/summary/venue.templ';
+                }
+                else {
+                
+                }
+            }
+        }
+        case 'PERSON' {
+            $templateFile = 'workflow/summary/person.templ';
+        }
+        else {
+            my ($TemplateData, $fields) = (undef, undef);
+        }
+    }
+
+	my $body = runTemplate(
+			$Data,
+			\%TemplateData,
+            $templateFile
+	);
+    
+    return ($body, "Summary");
+
+}
+
+sub viewFinalPage {
+    my ($Data) = @_;
+
+    #display page for now; details to be passed aren't finalised yet
+    #use generic template for now
+
+    my $WFTaskID = safe_param('TID','number') || '';
+
+    my %TemplateData;
+
+    my %TaskAction = (
+        'WFTaskID' => $WFTaskID || 0,
+        'client' => $Data->{client} || 0,
+    );
+
+    $TemplateData{'TaskAction'} = \%TaskAction;
+
+	my $body = runTemplate(
+        $Data,
+        \%TemplateData,
+        'workflow/final/page.templ'
+	);
+    
+    return ($body, "Approval status:");
 }
 
 1;
