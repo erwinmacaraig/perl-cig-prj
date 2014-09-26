@@ -18,6 +18,7 @@ require Exporter;
     resetRelatedTasks
     viewSummaryPreApproval
     viewFinalPage
+    pauseTask
 );
 
 use strict;
@@ -168,6 +169,10 @@ sub handleWorkflow {
     elsif ( $action eq 'WF_Summary' ) {
         ( $body, $title ) = viewSummaryPreApproval( $Data );
     }
+    elsif ( $action eq 'WF_Pause' ) {
+        pauseTask($Data);
+        ( $body, $title ) = addTaskNotes( $Data );
+    }
 	else {
         ( $body, $title ) = listTasks( $Data );		
 	};
@@ -210,7 +215,8 @@ sub listTasks {
             e.intEntityLevel,
             t.intApprovalEntityID,
             t.intProblemResolutionEntityID,
-            t.strTaskNotes as TaskNotes
+            t.strTaskNotes as TaskNotes,
+            t.intOnHold as OnHold
 		FROM tblWFTask AS t
         LEFT JOIN tblEntity as e ON (e.intEntityID = t.intEntityID)
 		LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (t.intPersonRegistrationID = pr.intPersonRegistrationID)
@@ -224,6 +230,8 @@ sub listTasks {
                 (intApprovalEntityID = ? AND t.strTaskStatus = 'ACTIVE')
                 OR
                 (intProblemResolutionEntityID= ? AND t.strTaskStatus = 'REJECTED')
+                OR
+                (intOnHold = 1)
             )
     ];
 
@@ -293,6 +301,9 @@ sub listTasks {
         my $showResolve=0;
         $showResolve= 1 if ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_REJECTED and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);
 
+        my $showView = 0;
+        $showView = 1 if(($showApprove and $dref->{'OnHold'} == 1) or ($showResolve and $dref->{'OnHold'} == 1) or $dref->{'OnHold'} == 0);
+
 		my %single_row = (
 			WFTaskID => $dref->{intWFTaskID},
             TaskDescription => $taskDescription,
@@ -312,6 +323,8 @@ sub listTasks {
             showReject => $showReject,
             showApprove => $showApprove,
             showResolve => $showResolve,
+            showView => $showView,
+            OnHold => $dref->{OnHold}
 		);
 		push @TaskList, \%single_row;
 	}
@@ -1028,88 +1041,82 @@ sub updateTaskNotes {
     my $WFCurrentNoteID = $task->{'intTaskNoteID'} || 0;
     my $st;
 
-    if($entityID == $task->{'intApprovalEntityID'}) {   #reject
-        $st = qq[
-            INSERT INTO tblWFTaskNotes (
-                intTaskNoteID,
-                intWFTaskID,
-                strRejectionNotes,
-                intCurrent,
-                tTimeStampRejected
-            )
-            VALUES (
-                ?,
-                ?,
-                ?,
-                1,
-                now()
-            )
-            ON DUPLICATE KEY UPDATE
-                intWFTaskID = VALUES(intWFTaskID),
-                strRejectionNotes = VALUES(strRejectionNotes),
-                tTimeStampRejected = VALUES(tTimeStampRejected)
-        ];
+    $st = qq[
+        INSERT INTO tblWFTaskNotes (
+            intTaskNoteID,
+            intParentNoteID,
+            intWFTaskID,
+            strNotes,
+            intCurrent,
+            strType,
+            tTimeStamp
+        )
+        VALUES (
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            now()
+        )
 
+    ];
+
+    if($entityID == $task->{'intApprovalEntityID'}) {   #reject
         my $q = $Data->{'db'}->prepare($st);
         $q->execute(
-            $WFCurrentNoteID,
             $WFTaskID,
-            $notes
+            0,
+            $WFTaskID,
+            $notes,
+            1,
+            'REJECT'
         );
     } elsif ($entityID == $task->{'intProblemResolutionEntityID'}) { #reject
         warn "RESOLTION $entityID";
-        #set intCurrent to 0; this will result to empty value
-        #for intCurrent in sub viewTask query thus returning
-        #0 to insert new set of work flow task note
-        #$st = qq[
-        #    INSERT INTO tblWFTaskNotes (
-        #        intTaskNoteID,
-        #        intWFTaskID,
-        #        strResolveNotes,
-        #        intCurrent,
-        #        tTimeStampResolved
-        #    )
-        #    VALUES (
-        #        ?,
-        #        ?,
-        #        ?,
-        #        0,
-        #        now()
-        #    )
-        #    ON DUPLICATE KEY UPDATE
-        #        intWFTaskID = VALUES(intWFTaskID),
-        #        intCurrent = VALUES(intCurrent),
-        #        strResolveNotes = VALUES(strResolveNotes),
-        #        tTimeStampResolved = VALUES(tTimeStampResolved)
-        #];
+        warn "PARENTID $WFCurrentNoteID";
 
-        $st = qq[
-            UPDATE tblWFTaskNotes
-            SET
-                strResolveNotes = ?,
-                intCurrent = 0,
-                tTimeStampResolved = NOW()
-            WHERE
-                intTaskNoteID = ?
-                AND intWFTaskID = ?
-        ];
+        #check if there's a current rejection note
+        #if exists, update it with intCurrent = 0 then insert new record,
+        #otherwise do nothing (to prevent duplicate entries and un-mapped notes)
+        if($WFCurrentNoteID and $task->{'intCurrent'} == 1) {
+            my $q = $Data->{'db'}->prepare($st);
+            $q->execute(
+                0,
+                $WFCurrentNoteID,
+                $WFTaskID,
+                $notes,
+                0,
+                'RESOLVE'
+            );
 
-        my $q = $Data->{'db'}->prepare($st);
-        $q->execute(
-            $notes,
-            $WFCurrentNoteID,
-            $WFTaskID
-        );
+            my $streset = qq[
+                UPDATE
+                    tblWFTaskNotes
+                SET
+                    intCurrent = 0
+                WHERE
+                    intTaskNoteID = ?
+            ];
+
+            $q = $Data->{'db'}->prepare($streset);
+            $q->execute(
+                $WFCurrentNoteID
+            ) or query_error($streset);
+
+        }
     }
 
-   my %TemplateData = (
-			TaskID=> $WFTaskID,
-            Lang => $Data->{'lang'},
-			TaskNotes=> $notes,
-			client => $Data->{client},
-            target=>$Data->{'target'},
-            action => 'WF_list',
-	);
+
+    my %TemplateData = (
+        TaskID=> $WFTaskID,
+        Lang => $Data->{'lang'},
+        TaskNotes=> $notes,
+        client => $Data->{client},
+        target=>$Data->{'target'},
+        action => 'WF_list',
+    );
 
 	my $body = runTemplate(
 			$Data,
@@ -1368,7 +1375,8 @@ sub getTask {
             t.strWFRuleFor,
             t.strTaskStatus,
             e.intEntityLevel,
-            nt.intTaskNoteID
+            nt.intTaskNoteID,
+            nt.intCurrent
         FROM
             tblWFTask t
         LEFT JOIN tblWFTaskNotes nt ON (t.intWFTaskID = nt.intWFTaskID AND nt.intCurrent = 1)
@@ -1817,16 +1825,21 @@ sub populateTaskNotesViewData {
 
     my $st = qq[
         SELECT
-            tn.intTaskNoteID,
-            tn.intWFTaskID,
-            tn.strRejectionNotes,
-            tn.strResolveNotes,
-            tn.intCurrent,
-            tn.tTimeStampRejected,
-            tn.tTimeStampResolved
-        FROM tblWFTaskNotes AS tn
-        WHERE 
-            tn.intWFTaskID = ?
+            PN.intWFTaskID,
+            PN.intTaskNoteID as parentNoteID,
+            PN.strNotes as parentNote,
+            PN.strType as parentNoteType,
+            PN.tTimeStamp as parentTimeStamp,
+            CN.intTaskNoteID as childNoteID,
+            CN.strNotes as childNote,
+            CN.strType as childNoteType,
+            CN.tTimeStamp as childTimeStamp
+        FROM
+            tblWFTaskNotes AS PN
+            LEFT JOIN tblWFTaskNotes AS CN ON (PN.intTaskNoteID = CN.intParentNoteID)
+        WHERE
+            PN.intWFTaskID = ?
+            AND PN.intParentNoteID = 0
     ];
 
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
@@ -1839,15 +1852,17 @@ sub populateTaskNotesViewData {
 	  
     while(my $tdref = $q->fetchrow_hashref()) {
         my %rowNotes = (
-            TaskNoteID => $tdref->{intTaskNoteID},
-            RejectionNotes => $tdref->{strRejectionNotes},
-            ResolveNotes => $tdref->{strResolveNotes},
-            TimestampRejected => $tdref->{tTimeStampRejected},
-            TimestampResolved => $tdref->{tTimeStampResolved},
+            ParentNote => $tdref->{'parentNote'},
+            ParentNoteType => $tdref->{'parentNoteType'},
+            ParentTimeStamp => $tdref->{'parentTimeStamp'},
+            ChildNote => $tdref->{'childNote'},
+            ChildNoteType => $tdref->{'childNoteType'},
+            ChildTimeStamp => $tdref->{'childTimeStamp'},
         );
         push @TaskNotes, \%rowNotes;
     }
 
+    print STDERR Dumper @TaskNotes;
     %TemplateData = (
         TaskNotes => \@TaskNotes,
     );
@@ -1971,6 +1986,37 @@ sub viewFinalPage {
 	);
     
     return ($body, "Approval status:");
+}
+
+sub pauseTask {
+    my ($Data) = @_;
+
+    my $WFTaskID = safe_param('TID','number') || '';
+    my $task = getTask($Data, $WFTaskID);
+    my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+
+    #check if the task is assigned to
+    #the current logged-in level
+    #by this, only the current assignee can put the task on-hold
+    if(($task->{'strTaskStatus'} eq 'ACTIVE' and $task->{'intApprovalEntityID'} == $entityID) or ($task->{'strTaskStatus'} eq 'REJECTED' and $task->{'intProblemResolutionEntityID'} == $entityID)) {
+        my $st = qq[
+            UPDATE
+                tblWFTask
+            SET
+                intOnHold = 1
+            WHERE
+                intWFTaskID = ?
+        ];
+
+        my $q = $Data->{'db'}->prepare($st);
+        $q->execute(
+            $WFTaskID
+        ) or query_error($st);
+
+        return 1;
+    }
+
+    return 0;
 }
 
 1;
