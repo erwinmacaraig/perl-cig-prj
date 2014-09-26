@@ -15,10 +15,10 @@
                     <!-- loop here; -->
                     [% FOREACH note IN TaskNotes %]
                     <tr>
-                        <td><div class="member-data"> [% note.RejectionNotes %] </div></td>
-                        <td><div class="member-data"> [% note.TimestampRejected %] </div></td>
-                        <td><div class="member-data"> [% note.ResolveNotes %] </div></td>
-                        <td><div class="member-data"> [% note.TimestampResolved %] </div></td>
+                        <td><div class="member-data"> [% note.ParentNote %] </div></td>
+                        <td><div class="member-data"> [% note.ParentTimeStamp %] </div></td>
+                        <td><div class="member-data"> [% note.ChildNote %] </div></td>
+                        <td><div class="member-data"> [% note.ChildTimeStamp %] </div></td>
                     [% END %]
                 </table>
             </div>
