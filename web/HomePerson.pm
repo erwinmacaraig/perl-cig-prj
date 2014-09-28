@@ -71,7 +71,7 @@ sub showPersonHome	{
 
 print STDERR Dumper($personObj);
 
-    my $readonly = !( ($personObj->getValue('strStatus') eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
+    my $readonly = !( ($personObj->getValue('strStatus') eq 'REGISTERED' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
     $Data->{'ReadOnlyLogin'} ? $readonly = 1 : undef;
 
 	my %TemplateData = (
@@ -220,7 +220,7 @@ sub showLink {
         my %Reg=();
         $Reg{'entityID'} = getLastEntityID($Data->{'clientValues'});
         my $field = Person::loadPersonDetails($Data->{'db'},$personID); 
-        if(($field->{'strStatus'} eq $Defs::PERSON_STATUS_ACTIVE || $field->{'strStatus'} eq $Defs::PERSON_STATUS_PENDING || $field->{'strStatus'} eq $Defs::PERSON_STATUS_DUPLICATE) && PersonRegistration::isPersonRegistered($Data,$personID,\%Reg)){
+        if(($field->{'strStatus'} eq $Defs::PERSON_STATUS_REGISTERED || $field->{'strStatus'} eq $Defs::PERSON_STATUS_PENDING || $field->{'strStatus'} eq $Defs::PERSON_STATUS_DUPLICATE) && PersonRegistration::isPersonRegistered($Data,$personID,\%Reg)){
             return  $url; 
         } 
         return undef;

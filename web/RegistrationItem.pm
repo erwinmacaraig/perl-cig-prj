@@ -49,10 +49,11 @@ sub getRegistrationItems    {
 	    AND RI.strSport IN ('', ?)
 	    AND RI.strAgeLevel IN ('', ?)
         AND RI.strItemType = ? 
-        AND (RI.strISOCountry_IN IS NULL OR RI.strISOCountry_IN LIKE CONCAT('%|',?,'|%'))
-        AND (RI.strISOCountry_NOTIN IS NULL OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))        
+        AND (NOT RI.strISOCountry_IN OR RI.strISOCountry_IN IS NULL OR RI.strISOCountry_IN LIKE CONCAT('%|',?,'|%'))
+        AND (NOT RI.strISOCountry_NOTIN OR RI.strISOCountry_NOTIN IS NULL OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))        
       ]; 
         
+print STDERR $st;
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
     
     $q->execute(

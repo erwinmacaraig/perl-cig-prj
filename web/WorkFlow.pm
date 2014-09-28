@@ -924,7 +924,7 @@ sub checkForOutstandingTasks {
                 $st = qq[
 	            	UPDATE tblPerson
                     SET
-	            	    strStatus = 'ACTIVE'
+	            	    strStatus = 'REGISTERED'
 	    	        WHERE 
                         intPersonID= ?
                         AND strStatus='PENDING'

@@ -40,9 +40,9 @@ sub handleRegistrationFlowBackend   {
     my $originLevel = $Data->{'clientValues'}{'authLevel'} || 0;
 
     my %Flow = ();
-    $Flow{'PREGF_TU'} = 'PREGF_P'; #Typees
-    $Flow{'PREGF_PU'} = 'PREGF_D'; #Products
-    $Flow{'PREGF_DU'} = 'PREGF_C'; #Documents
+    $Flow{'PREGF_TU'} = 'PREGF_D'; #Typees
+    $Flow{'PREGF_DU'} = 'PREGF_P'; #Products
+    $Flow{'PREGF_PU'} = 'PREGF_C'; #Documents
     
     my %Hidden=();
     my $regoID = param('rID') || 0;

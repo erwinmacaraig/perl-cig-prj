@@ -93,7 +93,7 @@ sub checkRegoTypeLimits    {
     ];
     my $stPR = qq[
         SELECT
-            COUNT(intPersonRegistrationID) as CountPR,
+            COUNT(intPersonRegistrationID) as CountPR
         FROM
             tblPersonRegistration_$Data->{'Realm'}
         WHERE
@@ -114,6 +114,7 @@ sub checkRegoTypeLimits    {
         my @rowValues=();
         my @PErowValues=();
         @PErowValues=@values;
+        @rowValues = @values;
         if ($dref->{'strSport'} and $dref->{'strSport'} ne '')    {
             $stPRrow.= qq[ AND strSport = ? ];
             push @rowValues, $dref->{'strSport'};
@@ -136,7 +137,6 @@ sub checkRegoTypeLimits    {
         $stPErow .= qq[GROUP BY intEntityID, strPersonType, strSport];
 
         if ($dref->{'strLimitType'} eq 'PERSONENTITY_UNIQUE')  {
-warn("PE CHECK");
             ## Only runs on PersonType & Sport
             my $peCount = 0;
             my $qryPE = $Data->{'db'}->prepare($stPErow);
@@ -152,7 +152,6 @@ warn("PE CHECK");
             if ($peCount > $dref->{'intLimit'}) {
                 return 0;
             }
-        warn("PE OK");
         }
         else    {
             ### Normal, across system count
