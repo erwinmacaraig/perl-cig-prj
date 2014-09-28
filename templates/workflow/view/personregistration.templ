@@ -136,6 +136,10 @@
         <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Resolve&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Resolve') %]</a></span>
         [% END %]
 
+        [% IF TaskAction.showToggle %]
+        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Toggle&TID=[% TaskAction.WFTaskID %]">[% IF TaskAction.onHold == 1 %][% Lang.txt('Resume') %][% ELSE %][% Lang.txt('Put on-hold') %][% END %]</a></span>
+        [% END %]
+
     </div>
 
 </div>

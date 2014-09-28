@@ -7,6 +7,7 @@
             <div class="member-details">
                 <table style="width: 100%">
                     <tr>
+                        <th>Type</th>
                         <th>Rejection Notes</th>
                         <th>Date/Time Rejected</th>
                         <th>Resolution Notes</th>
@@ -15,10 +16,11 @@
                     <!-- loop here; -->
                     [% FOREACH note IN TaskNotes %]
                     <tr>
-                        <td><div class="member-data"> [% note.RejectionNotes %] </div></td>
-                        <td><div class="member-data"> [% note.TimestampRejected %] </div></td>
-                        <td><div class="member-data"> [% note.ResolveNotes %] </div></td>
-                        <td><div class="member-data"> [% note.TimestampResolved %] </div></td>
+                        <td><div class="member-data"> [% note.ParentNoteType %] </div></td>
+                        <td><div class="member-data"> [% note.ParentNote %] </div></td>
+                        <td><div class="member-data"> [% note.ParentTimeStamp %] </div></td>
+                        <td><div class="member-data"> [% note.ChildNote %] </div></td>
+                        <td><div class="member-data"> [% note.ChildTimeStamp %] </div></td>
                     [% END %]
                 </table>
             </div>
