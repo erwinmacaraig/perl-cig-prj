@@ -8,6 +8,7 @@
                         <span class="details-right">[% entity.strLocalName %]</span>
                     </span>
                 [% END %]
+                
                 [% IF entity.strLatinName %]
                     <span class="details-row">
                         <span class="details-left">[% Lang.txt('Registrered To (Latin characters)') %]:</span>
@@ -66,6 +67,13 @@
                     <span class="details-row">
                         <span class="details-left">[% Lang.txt('Valid To') %]:</span>
                         <span class="details-right">[% entity.dtTo %]</span>
+                    </span>
+                [% END %]
+
+                [% IF entity.renew_link %]
+                    <span class="details-row">
+                        <span class="details-left">&nbsp;</span>
+                        <span class="details-right"><a href="[% entity.renew_link %]">[% Lang.txt('Renew Registration') %]</a></span>
                     </span>
                 [% END %]
                     <span class="details-row"> <br></span>

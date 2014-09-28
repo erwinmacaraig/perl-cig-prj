@@ -93,7 +93,7 @@ sub handleRegistrationFlowBackend   {
                 $error = $lang->txt("New failed, existing registration found.  In order to continue, a Transfer from the existing Entity must be organised.");
             }
             if ($msg eq 'RENEWAL_FAILED')   {
-                $error = $lang->txt("Renewal failed, cannot find existing registration");
+                $error = $lang->txt("Renewal failed, cannot find existing registration. Might have already been renewed");
             }
           
             

@@ -19,6 +19,7 @@ use PersonRegistration;
 use UploadFiles;
 use Log;
 use Person;
+use NationalReportingPeriod;
 use Data::Dumper;
 
 require AccreditationDisplay;
@@ -69,8 +70,6 @@ sub showPersonHome	{
     $Data->{'client'},
   );
 
-print STDERR Dumper($personObj);
-
     my $readonly = !( ($personObj->getValue('strStatus') eq 'REGISTERED' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
     $Data->{'ReadOnlyLogin'} ? $readonly = 1 : undef;
 
@@ -119,6 +118,20 @@ print STDERR Dumper($personObj);
     
     $RegFilters{'statusIN'} = \@statusIN;
     my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
+
+    my $client = $Data->{'client'};
+    
+    foreach my $rego (@{$Reg_ref})  {
+        my $renew = '';
+        $rego->{'renew_link'} = '';
+        next if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}));
+        next if ($rego->{'strStatus'} != $Defs::PERSONREGO_STATUS_ACTIVE or $rego->{'strStatus'} != $Defs::PERSONREGO_STATUS_PASSIVE);
+        my $ageLevel = 'ADULT'; ## HERE NEEDS TO CALCULATE IF MINOR/ADULT
+        my $nationalPeriodID = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $rego->{'strSport'}, 'RENEWAL');
+        next if ($rego->{'intNationalPeriodID'} == $nationalPeriodID);
+        $renew = $Data->{'target'} . "?client=$client&amp;a=PREGF_TU&amp;pt=$rego->{'strPersonType'}&amp;per=$rego->{'strPersonEntityRole'}&amp;pl=$rego->{'strPersonLevel'}&amp;sp=$rego->{'strSport'}&amp;ag=$ageLevel&amp;nat=RENEWAL";
+        $rego->{'renew_link'} = $renew;
+    }
     $TemplateData{'RegistrationInfo'} = $Reg_ref;
 
 
