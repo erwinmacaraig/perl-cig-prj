@@ -18,7 +18,7 @@ require Exporter;
     resetRelatedTasks
     viewSummaryPreApproval
     viewFinalPage
-    pauseTask
+    toggleTask
 );
 
 use strict;
@@ -153,11 +153,11 @@ sub handleWorkflow {
     }
     elsif ( $action eq 'WF_Resolve' ) {
         resolveTask($Data);
-        ( $body, $title ) = addTaskNotes( $Data );	
+        ( $body, $title ) = addTaskNotes( $Data, "RESOLVE" );	
     }
     elsif ( $action eq 'WF_Reject' ) {
         rejectTask($Data);
-        ( $body, $title ) = addTaskNotes( $Data );	
+        ( $body, $title ) = addTaskNotes( $Data, "REJECT" );	
     }
     elsif ( $action eq 'WF_View' ) {
         ( $body, $title ) = viewTask( $Data );		
@@ -169,9 +169,14 @@ sub handleWorkflow {
     elsif ( $action eq 'WF_Summary' ) {
         ( $body, $title ) = viewSummaryPreApproval( $Data );
     }
-    elsif ( $action eq 'WF_Pause' ) {
-        pauseTask($Data);
-        ( $body, $title ) = addTaskNotes( $Data );
+    elsif ( $action eq 'WF_Toggle' ) {
+        my $res = toggleTask($Data);
+        if($res) {
+            ( $body, $title ) = addTaskNotes( $Data, "TOGGLE" );
+        }
+        else {
+            ( $body, $title ) = ("", "No access");
+        }
     }
 	else {
         ( $body, $title ) = listTasks( $Data );		
@@ -1031,6 +1036,7 @@ sub updateTaskNotes {
 
     my $WFTaskID = safe_param('TID','number') || '';
     my $notes= safe_param('notes','words') || '';
+    my $type = safe_param('type','words') || '';
     my $lang = $Data->{'lang'};
     my $title = $lang->txt('Work task notes Updated');
 
@@ -1038,7 +1044,8 @@ sub updateTaskNotes {
     #identify type of action (rejection or resolution based on intApprovalEntityID and intProblemResolutionID)
     my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
     #my $type = ($entityID == $task->{'intApprovalEntityID'}) ? 'REJECT' : ($entityID == $task->{'intProblemResolutionEntityID'}) ? 'RESOLVE' : '';
-    my $WFCurrentNoteID = $task->{'intTaskNoteID'} || 0;
+    my $WFRejectCurrentNoteID = $task->{'rejectTaskNoteID'} || 0;
+    my $WFToggleCurrentNoteID = $task->{'toggleTaskNoteID'} || 0;
     my $st;
 
     $st = qq[
@@ -1063,28 +1070,29 @@ sub updateTaskNotes {
 
     ];
 
-    if($entityID == $task->{'intApprovalEntityID'}) {   #reject
+    if(($entityID == $task->{'intApprovalEntityID'}) and ($type eq "REJECT")) {   #reject
         my $q = $Data->{'db'}->prepare($st);
         $q->execute(
-            $WFTaskID,
+            $WFRejectCurrentNoteID,
             0,
             $WFTaskID,
             $notes,
             1,
             'REJECT'
         );
-    } elsif ($entityID == $task->{'intProblemResolutionEntityID'}) { #reject
+    }
+    elsif (($entityID == $task->{'intProblemResolutionEntityID'}) and ($type eq "RESOLVE")) { #resolve
         warn "RESOLTION $entityID";
-        warn "PARENTID $WFCurrentNoteID";
+        warn "PARENTID $WFRejectCurrentNoteID";
 
         #check if there's a current rejection note
         #if exists, update it with intCurrent = 0 then insert new record,
         #otherwise do nothing (to prevent duplicate entries and un-mapped notes)
-        if($WFCurrentNoteID and $task->{'intCurrent'} == 1) {
+        if($WFRejectCurrentNoteID and $task->{'rejectCurrent'} == 1) {
             my $q = $Data->{'db'}->prepare($st);
             $q->execute(
                 0,
-                $WFCurrentNoteID,
+                $WFRejectCurrentNoteID,
                 $WFTaskID,
                 $notes,
                 0,
@@ -1102,9 +1110,27 @@ sub updateTaskNotes {
 
             $q = $Data->{'db'}->prepare($streset);
             $q->execute(
-                $WFCurrentNoteID
+                $WFRejectCurrentNoteID
             ) or query_error($streset);
 
+        }
+    }
+    elsif ($type = "TOGGLE") {
+        #check intOnHold 
+        warn "NEWFLOW HOLD STATUS $task->{'intOnHold'}";
+        if($task->{'intOnHold'} == 1) {
+            my $q = $Data->{'db'}->prepare($st);
+            $q->execute(
+                $WFToggleCurrentNoteID,
+                0,
+                $WFTaskID,
+                $notes,
+                1,
+                'ON-HOLD'
+            );
+        }
+        else {
+        
         }
     }
 
@@ -1205,7 +1231,7 @@ sub verifyDocument {
 
 sub addTaskNotes    {
 
-    my( $Data) = @_;
+    my( $Data, $noteType) = @_;
 
     my $WFTaskID = safe_param('TID','number') || '';
     my $WFCurrentNoteID = safe_param('NID','number') || '';
@@ -1232,6 +1258,7 @@ sub addTaskNotes    {
         client => $Data->{client},
         target=>$Data->{'target'},
         action => 'WF_notesS',
+        type => $noteType,
     );
 
 	my $body = runTemplate(
@@ -1374,12 +1401,16 @@ sub getTask {
             t.intProblemResolutionEntityID,
             t.strWFRuleFor,
             t.strTaskStatus,
+            t.intOnHold,
             e.intEntityLevel,
-            nt.intTaskNoteID,
-            nt.intCurrent
+            rnt.intTaskNoteID as rejectTaskNoteID,
+            rnt.intCurrent as rejectCurrent,
+            tnt.intTaskNoteID as toggleTaskNoteID,
+            tnt.intCurrent as toggleCurrent
         FROM
             tblWFTask t
-        LEFT JOIN tblWFTaskNotes nt ON (t.intWFTaskID = nt.intWFTaskID AND nt.intCurrent = 1)
+        LEFT JOIN tblWFTaskNotes rnt ON (t.intWFTaskID = rnt.intWFTaskID AND rnt.strType = "REJECT" AND rnt.intCurrent = 1)
+        LEFT JOIN tblWFTaskNotes tnt ON (t.intWFTaskID = tnt.intWFTaskID AND tnt.strType = "ON-HOLD" AND tnt.intCurrent = 1)
         LEFT JOIN tblEntity e ON (t.intEntityID = e.intEntityID)
 	  	WHERE 
             t.intWFTaskID = ? 
@@ -1422,6 +1453,7 @@ sub viewTask {
             t.intWFTaskID, 
             t.strTaskStatus, 
             t.strTaskType, 
+            t.intOnHold, 
             pr.intPersonRegistrationID, 
             pr.strStatus as personRegistrationStatus,
             pr.strPersonLevel, 
@@ -1548,14 +1580,21 @@ sub viewTask {
         }
     }
 
+    my $showToggle = 0;
+    #make sure only the current assignee can put on hold or resume the task
+    $showToggle = 1
+        if (($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_REJECTED and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID)
+            or ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_ACTIVE and $dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID));
+
     my $showReject = 0;
-    $showReject = 1 if ($dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} != $entityID);
+    $showReject = 1 if ($dref->{'intOnHold'} == 0 and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} != $entityID);
 
     my $showApprove = 0;
-    $showApprove = 1 if ($dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID);
+    $showApprove = 1 if ($dref->{'intOnHold'} == 0 and $dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID);
 
     my $showResolve = 0;
-    $showResolve = 1 if ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_REJECTED and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);
+    $showResolve = 1 if ($dref->{'intOnHold'} == 0 and $dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_REJECTED and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);
+
 
     my %TaskAction = (
         'WFTaskID' => $dref->{intWFTaskID} || 0,
@@ -1563,7 +1602,9 @@ sub viewTask {
         'showApprove' => $showApprove,
         'showReject' => $showReject,
         'showResolve' => $showResolve,
+        'showToggle' => $showToggle,
         'currentNoteID' => $dref->{'currentNoteID'} || 0,   #primary set to 0 will insert new row to table
+        'onHold' => $dref->{'intOnHold'},
     );
 
     my ($DocumentData, $fields) = populateDocumentViewData($Data, $dref);
@@ -1988,7 +2029,7 @@ sub viewFinalPage {
     return ($body, "Approval status:");
 }
 
-sub pauseTask {
+sub toggleTask {
     my ($Data) = @_;
 
     my $WFTaskID = safe_param('TID','number') || '';
@@ -2003,7 +2044,7 @@ sub pauseTask {
             UPDATE
                 tblWFTask
             SET
-                intOnHold = 1
+                intOnHold = IF(intOnHold = 1, 0, 1)
             WHERE
                 intWFTaskID = ?
         ];
