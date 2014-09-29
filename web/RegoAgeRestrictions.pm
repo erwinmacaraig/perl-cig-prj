@@ -53,6 +53,7 @@ sub checkRegoAgeRestrictions {
         }
     } else {
         $personDetails = loadPersonDetails($Data->{'db'}, $personID);
+        print STDERR Dumper $personDetails;
         $personAge = $personDetails->{'currentAge'} or undef;
     }
 
@@ -116,19 +117,9 @@ sub checkRegoAgeRestrictions {
     return 0 if !@uniqueAgeLevelOptions;
 
     my $systemConfig = getSystemConfig($Data);
-    my @RealmAdultAge = split(/\-/, $systemConfig->{'AdultAge'});
+    $Data->{'SystemConfig'} = $systemConfig;
 
-    my $adultAgeFrom = $RealmAdultAge[0];
-    my $adultAgeTo = (!defined($RealmAdultAge[1])) ? $adultAgeFrom : $RealmAdultAge[1];
-
-    my $personAgeLevel = undef;
-
-    if(($personAge >= $adultAgeFrom) and ($personAge <= $adultAgeTo)) {
-        $personAgeLevel = $Defs::AGE_LEVEL_ADULT;
-    }
-    elsif($personAge < $adultAgeFrom) {
-        $personAgeLevel = $Defs::AGE_LEVEL_MINOR;
-    }
+    my $personAgeLevel = Person::calculateAgeLevel($Data, $personAge);
 
     my @retdata = ();
     foreach(@uniqueAgeLevelOptions) {
