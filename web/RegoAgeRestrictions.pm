@@ -16,6 +16,7 @@ use Log;
 use PersonRegistration;
 use Person;
 use Data::Dumper;
+use SystemConfig;
 use List::MoreUtils qw(uniq);
 
 sub checkRegoAgeRestrictions {
@@ -114,6 +115,21 @@ sub checkRegoAgeRestrictions {
 
     return 0 if !@uniqueAgeLevelOptions;
 
+    my $systemConfig = getSystemConfig($Data);
+    my @RealmAdultAge = split(/\-/, $systemConfig->{'AdultAge'});
+
+    my $adultAgeFrom = $RealmAdultAge[0];
+    my $adultAgeTo = (!defined($RealmAdultAge[1])) ? $adultAgeFrom : $RealmAdultAge[1];
+
+    my $personAgeLevel = undef;
+
+    if(($personAge >= $adultAgeFrom) and ($personAge <= $adultAgeTo)) {
+        $personAgeLevel = $Defs::AGE_LEVEL_ADULT;
+    }
+    elsif($personAge < $adultAgeFrom) {
+        $personAgeLevel = $Defs::AGE_LEVEL_MINOR;
+    }
+
     my @retdata = ();
     foreach(@uniqueAgeLevelOptions) {
         if($_ eq '') {
@@ -122,7 +138,7 @@ sub checkRegoAgeRestrictions {
                 value => '',
             };
         }
-        else {
+        elsif($personAgeLevel eq $_) {
             push @retdata, {
                 name => $Defs::ageLevel{$_},
                 value => $_,
