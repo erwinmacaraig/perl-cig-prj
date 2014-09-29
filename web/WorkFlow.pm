@@ -153,11 +153,11 @@ sub handleWorkflow {
     }
     elsif ( $action eq 'WF_Resolve' ) {
         resolveTask($Data);
-        ( $body, $title ) = addTaskNotes( $Data, "RESOLVE" );	
+        ( $body, $title ) = addTaskNotes( $Data, $Defs::WF_TASK_ACTION_RESOLVE );	
     }
     elsif ( $action eq 'WF_Reject' ) {
         rejectTask($Data);
-        ( $body, $title ) = addTaskNotes( $Data, "REJECT" );	
+        ( $body, $title ) = addTaskNotes( $Data, $Defs::WF_TASK_ACTION_REJECT );	
     }
     elsif ( $action eq 'WF_View' ) {
         ( $body, $title ) = viewTask( $Data );		
@@ -1070,7 +1070,7 @@ sub updateTaskNotes {
 
     ];
 
-    if(($entityID == $task->{'intApprovalEntityID'}) and ($type eq "REJECT")) {   #reject
+    if(($entityID == $task->{'intApprovalEntityID'}) and ($type eq $Defs::WF_TASK_ACTION_REJECT)) {   #reject
         my $q = $Data->{'db'}->prepare($st);
         $q->execute(
             $WFRejectCurrentNoteID,
@@ -1078,10 +1078,10 @@ sub updateTaskNotes {
             $WFTaskID,
             $notes,
             1,
-            'REJECT'
+            $Defs::WF_TASK_ACTION_REJECT
         );
     }
-    elsif (($entityID == $task->{'intProblemResolutionEntityID'}) and ($type eq "RESOLVE")) { #resolve
+    elsif (($entityID == $task->{'intProblemResolutionEntityID'}) and ($type eq $Defs::WF_TASK_ACTION_RESOLVE)) { #resolve
         warn "RESOLTION $entityID";
         warn "PARENTID $WFRejectCurrentNoteID";
 
@@ -1096,7 +1096,7 @@ sub updateTaskNotes {
                 $WFTaskID,
                 $notes,
                 0,
-                'RESOLVE'
+                $Defs::WF_TASK_ACTION_RESOLVE
             );
 
             my $streset = qq[
@@ -1119,6 +1119,9 @@ sub updateTaskNotes {
         #check intOnHold 
         warn "NEWFLOW HOLD STATUS $task->{'intOnHold'}";
         if($task->{'intOnHold'} == 1) {
+            #put on-hold
+            #WFToggleCurrentNoteID as bind param
+            #to prevent duplicate entry
             my $q = $Data->{'db'}->prepare($st);
             $q->execute(
                 $WFToggleCurrentNoteID,
@@ -1126,11 +1129,36 @@ sub updateTaskNotes {
                 $WFTaskID,
                 $notes,
                 1,
-                'ON-HOLD'
+                $Defs::WF_TASK_ACTION_HOLD
             );
         }
         else {
-        
+            if($WFToggleCurrentNoteID and $task->{'toggleCurrent'} == 1) {
+                my $q = $Data->{'db'}->prepare($st);
+                $q->execute(
+                    0,
+                    $WFToggleCurrentNoteID,
+                    $WFTaskID,
+                    $notes,
+                    0,
+                    $Defs::WF_TASK_ACTION_RESUME
+                );
+
+                my $streset = qq[
+                    UPDATE
+                        tblWFTaskNotes
+                    SET
+                        intCurrent = 0
+                    WHERE
+                        intTaskNoteID = ?
+                ];
+
+                $q = $Data->{'db'}->prepare($streset);
+                $q->execute(
+                    $WFToggleCurrentNoteID
+                ) or query_error($streset);
+
+            }
         }
     }
 
@@ -1410,7 +1438,7 @@ sub getTask {
         FROM
             tblWFTask t
         LEFT JOIN tblWFTaskNotes rnt ON (t.intWFTaskID = rnt.intWFTaskID AND rnt.strType = "REJECT" AND rnt.intCurrent = 1)
-        LEFT JOIN tblWFTaskNotes tnt ON (t.intWFTaskID = tnt.intWFTaskID AND tnt.strType = "ON-HOLD" AND tnt.intCurrent = 1)
+        LEFT JOIN tblWFTaskNotes tnt ON (t.intWFTaskID = tnt.intWFTaskID AND tnt.strType = "HOLD" AND tnt.intCurrent = 1)
         LEFT JOIN tblEntity e ON (t.intEntityID = e.intEntityID)
 	  	WHERE 
             t.intWFTaskID = ? 
@@ -2034,25 +2062,29 @@ sub toggleTask {
 
     my $WFTaskID = safe_param('TID','number') || '';
     my $task = getTask($Data, $WFTaskID);
+    my $currentToggle = safe_param('t', 'number') || 0;
     my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
     #check if the task is assigned to
     #the current logged-in level
     #by this, only the current assignee can put the task on-hold
     if(($task->{'strTaskStatus'} eq 'ACTIVE' and $task->{'intApprovalEntityID'} == $entityID) or ($task->{'strTaskStatus'} eq 'REJECTED' and $task->{'intProblemResolutionEntityID'} == $entityID)) {
-        my $st = qq[
-            UPDATE
-                tblWFTask
-            SET
-                intOnHold = IF(intOnHold = 1, 0, 1)
-            WHERE
-                intWFTaskID = ?
-        ];
 
-        my $q = $Data->{'db'}->prepare($st);
-        $q->execute(
-            $WFTaskID
-        ) or query_error($st);
+        if($currentToggle == $task->{'intOnHold'}) {
+            my $st = qq[
+                UPDATE
+                    tblWFTask
+                SET
+                    intOnHold = IF(intOnHold = 1, 0, 1)
+                WHERE
+                    intWFTaskID = ?
+            ];
+
+            my $q = $Data->{'db'}->prepare($st);
+            $q->execute(
+                $WFTaskID
+            ) or query_error($st);
+        }
 
         return 1;
     }
