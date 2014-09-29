@@ -25,7 +25,7 @@ use GridDisplay;
 use ProductPhoto;
 
 require InstanceOf;
-require Seasons;
+require NationalReportingPeriod;
 require PaymentApplication;
 require AgeGroups;
 
@@ -510,7 +510,7 @@ my $warning_note = $Data->{'SystemConfig'}{'ProductEditNote'} || '';
     my $inactive= $dref->{intInactive} ? 'checked' : '';
 #    $Defs::page_title = $name ? "SWM - Update Product - $name" : 'SWM - Add Product';
     if ($fulledit)	{
-	my ($Seasons, undef) =Seasons::getSeasons($Data);	
+	my $NationalPeriods =NationalReportingPeriods::getPeriods($Data);	
 	
         $body .= qq[
                     <tr>
@@ -518,8 +518,8 @@ my $warning_note = $Data->{'SystemConfig'}{'ProductEditNote'} || '';
                     <td class="data"><input type="text" name="name" value="$name" size="40" maxlength="50">$compulsory</td>
                     </tr>
                     <tr>
-                    <td class="label"><label for="intProductSeasonID">Product Reporting Season: </label></td>
-					<td class="data">].drop_down('intProductSeasonID',$Seasons,undef,$dref->{'intProductSeasonID'},1,0).qq[&nbsp;&nbsp;<span class="formfieldinfo">(Used in Reporting as a filter for Products purchased)</span></td>
+                    <td class="label"><label for="intProductNationalPeriodID">Product Reporting Season: </label></td>
+					<td class="data">].drop_down('intProductNationalPeriodID',$NationalPeriods,undef,$dref->{'intProductNationalPeriodID'},1,0).qq[&nbsp;&nbsp;<span class="formfieldinfo">(Used in Reporting as a filter for Products purchased)</span></td>
                     </tr>
 
 	];
@@ -1431,6 +1431,8 @@ sub update_products	{
 	my $name=param('name') || '';
 	return ('<div class="warningmsg">Unable to Add Product. You must have a name for the Product</div>',0) if ! $name;
 	my $notes=param('strProductNotes') || '';
+	my $productType=param('strProductType') || '';
+	my $productCode=param('strProductCode') || '';
 	my $group=param('strGroup') || '';
 	my $gsttext=param('strGSTText') || '';
 	my $multiPurchase=param('intAllowMultiPurchase') || 0;
@@ -1474,7 +1476,7 @@ sub update_products	{
 	}
 
 
-	my $intProductSeasonID= param('intProductSeasonID') || 0;
+	my $intProductNationalPeriodID= param('intProductNationalPeriodID') || 0;
     
 	my $mandatoryProductID = param('intMandatoryProductID') || 0;
   my $memberPackageID  = param('intProductMemberPackageID') || 0; 
@@ -1611,10 +1613,11 @@ EOS
 					intSeasonOther1Financial = ?,
 					intSeasonOther2Financial = ?,
 					intSeasonMemberPackageID = ?,
-					intProductSeasonID = ?,
+					intProductNationalPeriodID = ?,
 					dtDateAvailableFrom = ?,
 					dtDateAvailableTo = ?,
-
+                    strProductType = ?,
+                    strProductCode = ?
 				WHERE intRealmID= ?
 					AND intEntityID= ?
 					AND intProductID = ?
@@ -1646,9 +1649,11 @@ EOS
 				$setSeasonOther1Financial,
 				$setSeasonOther2Financial,
 				$setSeasonMemberPackageID,
-				$intProductSeasonID,
+				$intProductNationalPeriodID,
 				$prod_avail_from_date,
 				$prod_avail_to_date,
+                $productType,
+                $productCode,
 				$realmID,
 				$entityID,
 				$id,
@@ -1724,11 +1729,15 @@ EOS
 				intSeasonOther1Financial,
 				intSeasonOther2Financial,
 				intSeasonMemberPackageID,
-				intProductSeasonID,
+				intProductNationalPeriodID,
 				dtDateAvailableFrom,
-				dtDateAvailableTo
+				dtDateAvailableTo,
+            strProductType,
+            strProductCode
 			)
 			VALUES (
+				?,
+				?,
 				?,
 				?,
 				?,
@@ -1795,9 +1804,11 @@ EOS
 			$setSeasonOther1Financial,
 			$setSeasonOther2Financial,
 			$setSeasonMemberPackageID,
-			$intProductSeasonID,
+			$intProductNationalPeriodID,
 			$prod_avail_from_date,
 			$prod_avail_to_date,
+            $productType,
+            $productCode,
 		) || return ($dbErrMsg,0);
 		$id = $query->{mysql_insertid} || 0;
 		_insert_product_dependencies($Data,$id);
@@ -2140,6 +2151,8 @@ my $entityTypeID = $Data->{'currentLevel'};
 			SELECT 	
 				P.intProductID, 	
 				P.strName, 	
+				P.strProductType, 	
+				P.strProductCode, 	
 				P.intEntityID, 	
 				P.curDefaultAmount, 	
 				P.intMinChangeLevel, 	
@@ -2167,7 +2180,7 @@ my $entityTypeID = $Data->{'currentLevel'};
 				P.intSeasonOther1Financial,
 				P.intSeasonOther2Financial,
 				P.intSeasonMemberPackageID,
-				P.intProductSeasonID,
+				P.intProductNationalPeriodID,
 				P.dtDateAvailableFrom,
 				P.dtDateAvailableTo,
 				DATE(dtDateAvailableFrom) AS DateAvailableFrom,
@@ -2760,6 +2773,8 @@ sub copy_product {
 
     my $products_st = qq[
         INSERT INTO tblProducts (
+            strProductType,
+            strProductCode,
             intEntityID,
             intMinSellLevel,
             intRealmID,
@@ -2789,12 +2804,14 @@ sub copy_product {
             intSeasonOther1Financial,
             intSeasonOther2Financial,
             intSeasonMemberPackageID,
-            intProductSeasonID,
+            intProductNationalPeriodID,
             dtDateAvailableFrom,
             dtDateAvailableTo,
             intPaymentSplitID
         )
         SELECT
+            strProductType,
+            strProductCode,
             intEntityID,
             intMinSellLevel,
             intRealmID,
@@ -2824,7 +2841,7 @@ sub copy_product {
             intSeasonOther1Financial,
             intSeasonOther2Financial,
             intSeasonMemberPackageID,
-            intProductSeasonID,
+            intProductNationalPeriodID,
             dtDateAvailableFrom,
             dtDateAvailableTo,
             intPaymentSplitID
