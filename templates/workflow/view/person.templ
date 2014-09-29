@@ -87,24 +87,6 @@
 
     [% NotesBlock %]
 
-    <div class="task-actions">
-
-        [% IF TaskAction.showApprove %]
-        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Summary&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Approve') %]</a></span>
-        [% END %]
-
-        [% IF TaskAction.showReject %]
-        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Reject&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Reject') %]</a></span>
-        [% END %]
-
-        [% IF TaskAction.showResolve %]
-        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Resolve&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Resolve') %]</a></span>
-        [% END %]
-
-        [% IF TaskAction.showToggle %]
-        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Toggle&TID=[% TaskAction.WFTaskID %]&t=[% TaskAction.onHold %]">[% IF TaskAction.onHold == 1 %][% Lang.txt('Resume') %][% ELSE %][% Lang.txt('Put on-hold') %][% END %]</a></span>
-        [% END %]
-
-    </div>
+    [% ActionsBlock %]
 
 </div>
