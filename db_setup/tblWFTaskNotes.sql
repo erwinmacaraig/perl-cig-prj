@@ -9,4 +9,4 @@ CREATE TABLE `tblWFTaskNotes` (
   `intCurrent` int(11) NOT NULL DEFAULT '1',
   `tTimeStamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`intTaskNoteID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

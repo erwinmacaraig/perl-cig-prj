@@ -8,4 +8,4 @@ CREATE TABLE `tblWFRuleDocuments` (
     `tTimeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`intWFRuleDocumentID`),
     KEY `KEY` (`intWFRuleID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
