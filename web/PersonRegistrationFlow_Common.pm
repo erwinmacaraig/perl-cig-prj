@@ -143,6 +143,8 @@ sub displayRegoFlowDocuments    {
         $rego_ref,
      );
      
+        my %PersonRef = ();
+        $PersonRef{'strPersonType'} = $rego_ref->{'strPersonType'} || '';
       my $personLeveldocs = getRegistrationItems(
         $Data,
         'PERSON',
@@ -152,7 +154,7 @@ sub displayRegoFlowDocuments    {
         $entityID,
         $entityRegisteringForLevel,
         0,
-        undef,
+        \%PersonRef,
      );
     
     ### FOR FILTERING 
