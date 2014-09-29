@@ -2,7 +2,7 @@
 	<div class="sectionheader">[% Lang.txt('Current Registrations') %]</div>
 		<div class="members-seasonstatus-content">
 			[% FOREACH entity IN RegistrationInfo %]
-                <!--[% IF entity.strLocalName %]
+                [% IF entity.strLocalName %]
                     <span class="details-row">
                         <span class="details-left">[% Lang.txt('Registrered To') %]:</span>
                         <span class="details-right">[% entity.strLocalName %]</span>
@@ -11,11 +11,10 @@
                 
                 [% IF entity.strLatinName %]
                     <span class="details-row">
-                        <span class="details-left">[% Lang.txt('Registrered To (Latin characters)') %]:</span>
+                        <span class="details-left">[% Lang.txt('Registrered To (International Name)') %]:</span>
                         <span class="details-right">[% entity.strLatinName %]</span>
                     </span>
                 [% END %]
-                -->
                 [% IF entity.intPaymentRequired %]
                     <span class="details-rowred">
                         [% Lang.txt('Payment Still Required') %]
