@@ -15,7 +15,7 @@
 			<th>Status</th>
 		</tr>
 		[% FOREACH task IN TaskList %]
-			<tr>
+			<tr [% IF task.OnHold == 1 %]style="color: #CFD1D0"[% END %]>
 			<td><div class="member-data"> [% task.WFTaskID %] </div></td>
 			<td><div class="member-data"> [% task.RuleFor %] </div></td>
 			<td><div class="member-data"> [% task.TaskType %] </div></td>
@@ -24,7 +24,15 @@
 			<td><div class="member-data"> [% task.RegistrationNature %] </div></td>			
 			<td><div class="member-data"> [% task.DocumentName %] </div></td>			
 			<td><div class="member-data"> [% task.Name %] </div></td>			
-			<td><div class="member-data"> [% task.TaskStatus %] </div></td>	
+			<td>
+                <div class="member-data">
+                [% IF task.OnHold == 1 %]
+                    <span>ON-HOLD</span>
+                [% ELSE %]
+                    [% task.TaskStatus %]
+                [% END %]
+                </div>
+            </td>	
             [% IF task.TaskType == 'TRANSFERS' %]
 			    <td colspan="2"><div class="member-data">
                     <span class = "button-small generic-button">
@@ -38,11 +46,15 @@
                     </span>
                 </td>
             [% ELSE %]
+            [% IF task.showView %]
 			    <td><div class="member-data">
                     <span class = "button-small generic-button">
                         <a href="main.cgi?client=[% client %]&a=WF_View&TID=[% task.WFTaskID %]">[% Lang.txt('View') %]</a>
                     </span>
                 </div></td>
+            [% ELSE %]
+                <td>&nbsp;</td>
+            [% END %]
             [% IF task.showApprove %]
                 <!--
 			    <td><div class="member-data">
