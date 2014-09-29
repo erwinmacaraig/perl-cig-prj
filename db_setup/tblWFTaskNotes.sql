@@ -1,12 +1,12 @@
 DROP TABLE IF EXISTS tblWFTaskNotes;
 
 CREATE TABLE `tblWFTaskNotes` (
-    `intTaskNoteID` int(11) NOT NULL AUTO_INCREMENT,
-    `intWFTaskID` int(11) NOT NULL,
-    `strRejectionNotes` varchar(250) NOT NULL,
-    `strResolveNotes` varchar(250) NOT NULL,
-    `intCurrent` int(11) NOT NULL DEFAULT '1',
-    `tTimeStampRejected` timestamp NULL DEFAULT NULL,
-    `tTimeStampResolved` timestamp NULL DEFAULT NULL,
-    PRIMARY KEY (`intTaskNoteID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1
+  `intTaskNoteID` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `intParentNoteID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Used to track which rejection/toggle note a resolution note will be mapped.',
+  `intWFTaskID` int(11) NOT NULL,
+  `strNotes` varchar(250) NOT NULL,
+  `strType` varchar(20) DEFAULT NULL COMMENT 'REJECT, RESOLVE, HOLD',
+  `intCurrent` int(11) NOT NULL DEFAULT '1',
+  `tTimeStamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`intTaskNoteID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
