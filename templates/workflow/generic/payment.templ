@@ -3,6 +3,18 @@
         <div class="payment-detail">
             <div class = "sectionheader">[% Lang.txt('Payment Details') %]&nbsp;&nbsp;</div>
             <div class="member-details">
+                    <table style="width: 100%">
+                    <tr>
+                        <th>Product</th>
+                        <th>Amount</th>
+                    </tr>
+                    <!-- loop here; -->
+                    [% FOREACH row IN TXNs %]
+                    <tr>
+                        <td><div class="member-data"> [% row.ProductName %] </div></td>
+                        <td><div class="member-data"> [% row.Amount %] </div></td>
+                    [% END %]
+                </table>
             </div>
         </div>
     </div>

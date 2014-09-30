@@ -1591,8 +1591,8 @@ sub viewTask {
 
     my %TemplateData;
     my %DocumentData;
-    my %PaymentData;
     my %NotesData;
+    my %PaymentsData;
     my %ActionsData;
     my %fields;
 
@@ -1647,9 +1647,8 @@ sub viewTask {
     my ($DocumentData, $fields) = populateDocumentViewData($Data, $dref);
     %DocumentData = %{$DocumentData};
 
-    #my ($PaymentData, $fields) = populatePaymentViewData($Data, $dref);
-    #%PaymentData = %{$PaymentData};
-    %PaymentData = ();
+    my ($PaymentsData) = populateRegoPaymentsViewData($Data, $dref);
+    %PaymentsData = %{$PaymentsData};
 
     my ($NotesData) = populateTaskNotesViewData($Data, $dref);
     %NotesData = %{$NotesData};
@@ -1663,7 +1662,7 @@ sub viewTask {
 
     my $paymentBlock = runTemplate(
         $Data,
-        \%PaymentData,
+        \%PaymentsData,
         'workflow/generic/payment.templ'
     );
 
@@ -1902,6 +1901,53 @@ sub populateDocumentViewData {
 
     return (\%DocumentData, \%fields);
 }
+
+sub populateRegoPaymentsViewData {
+    my ($Data, $dref) = @_;
+
+    my %TemplateData = ();
+
+    my $st = qq[
+        SELECT
+            T.*,
+            P.*,
+            TL.*
+        FROM 
+            tblTransactions as T 
+            INNER JOIN tblProducts as P ON (P.intProductID=T.intProductID)
+            LEFT JOIN tblTransLog as TL ON (TL.intLogID=T.intTransLogID)
+        WHERE 
+            T.intID = ?
+            AND T.intTableType = ?
+            AND T.intPersonRegistrationID = ?
+    ];
+
+    my $q = $Data->{'db'}->prepare($st) or query_error($st);
+	$q->execute(
+        $dref->{'intPersonID'},
+        $Defs::LEVEL_PERSON,
+        $dref->{'intPersonRegistrationID'},
+	) or query_error($st);
+
+	my @TXNs= ();
+	my $rowCount = 0;
+	  
+    while(my $tdref = $q->fetchrow_hashref()) {
+        my %row= (
+            ProductName=> $tdref->{'strName'},
+            Amount=> $tdref->{'curDefaultAmount'},
+        );
+        push @TXNs, \%row;
+    }
+
+    %TemplateData = (
+        TXNs=> \@TXNs,
+    );
+
+    return (\%TemplateData);
+
+}
+
 
 sub populateTaskNotesViewData {
     my ($Data, $dref) = @_;
