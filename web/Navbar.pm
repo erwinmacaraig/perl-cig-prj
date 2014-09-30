@@ -1099,20 +1099,31 @@ sub getPersonMenuData {
            url => $baseurl."a=P_TXNLog_list",
        };
     }
-    $menuoptions{'regos'} = {
-       url => $baseurl."a=P_REGOS",
-    };
     $menuoptions{'docs'} = {
        url => $baseurl."a=P_DOCS",
     };
-     $menuoptions{'passport'} = {
+    $menuoptions{'passport'} = {
        url => $baseurl."a=P_PASS",
     };
     if($clr) {
         $menuoptions{'clr'} = {
                 name => $lang->txt($txt_Clrs),
                 url => $baseurl."a=P_CLR",
+    if (
+        $Data->{'clientValues'}{'authLevel'}>= $Defs::LEVEL_NATIONAL 
+        or ($SystemConfig->{'PersonMenus_level'} 
+            and $SystemConfig->{'PersonMenus_level'} >= $Data->{'clientValues'}{'authLevel'}
+        )
+    )   {
+        $menuoptions{'regos'} = {
+            url => $baseurl."a=P_REGOS",
         };
+        if($clr)    {
+            $menuoptions{'clr'} = {
+                    name => $lang->txt('Transfer History'),
+                 url => $baseurl."a=P_CLR",
+            };
+        }
     }
 
 

@@ -10,6 +10,7 @@ require Exporter;
   check_valid_date
   postPersonUpdate
   loadPersonDetails
+  calculateAgeLevel
 );
 
 use strict;
@@ -1805,6 +1806,26 @@ sub _fix_date {
     if ( !$dd or !$mm or !$yyyy ) { return ''; }
     if ( $yyyy < 100 ) { $yyyy += 2000; }
     return "$yyyy-$mm-$dd";
+}
+
+sub calculateAgeLevel {
+    my($Data, $currentAge) = @_;
+
+    my @RealmAdultAge = split(/\-/, $Data->{'SystemConfig'}{'AdultAge'});
+
+    my $adultAgeFrom = $RealmAdultAge[0];
+    my $adultAgeTo = (!defined($RealmAdultAge[1])) ? $adultAgeFrom : $RealmAdultAge[1];
+
+    my $personAgeLevel = undef;
+
+    if(($currentAge >= $adultAgeFrom) and ($currentAge <= $adultAgeTo)) {
+        $personAgeLevel = $Defs::AGE_LEVEL_ADULT;
+    }
+    elsif($currentAge < $adultAgeFrom) {
+        $personAgeLevel = $Defs::AGE_LEVEL_MINOR;
+    }
+
+    return $personAgeLevel;
 }
 
 1;

@@ -49,12 +49,13 @@ sub getRegistrationItems    {
 	    AND RI.strSport IN ('', ?)
 	    AND RI.strAgeLevel IN ('', ?)
         AND RI.strItemType = ? 
-        AND (NOT RI.strISOCountry_IN OR RI.strISOCountry_IN IS NULL OR RI.strISOCountry_IN LIKE CONCAT('%|',?,'|%'))
-        AND (NOT RI.strISOCountry_NOTIN OR RI.strISOCountry_NOTIN IS NULL OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))        
+        AND (RI.strISOCountry_IN ='' OR RI.strISOCountry_IN IS NULL OR RI.strISOCountry_IN LIKE CONCAT('%|',?,'|%'))
+        AND (RI.strISOCountry_NOTIN ='' OR RI.strISOCountry_NOTIN IS NULL OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))        
       ]; 
         
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
     
+print STDERR "NNNNNNNNNN" . $Rego_ref->{'Nationality'};
     $q->execute(
         $Data->{'Realm'},
         $Data->{'RealmSubType'},

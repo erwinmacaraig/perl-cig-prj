@@ -420,11 +420,11 @@ sub productAllowedThroughFilter {
         my @NOTIN_Countries = split(/\|/, $dref->{'strNationality_NOTIN'});
         my @IN_Countries = split(/\|/, $dref->{'strNationality_IN'}); 
         
-        if( (grep(/^$memdetails->{'Nationality'}/,@NOTIN_Countries))){
+        if(scalar(@NOTIN_Countries) and  (grep(/^$memdetails->{'Nationality'}/,@NOTIN_Countries))){
         	print STDERR 'At this point(1) the value of Nationality is: ' . $memdetails->{'Nationality'};
         	return 0;
         } 
-        if(!(grep(/^$memdetails->{'Nationality'}/,@IN_Countries))){
+        if(scalar(@IN_Countries) and !(grep(/^$memdetails->{'Nationality'}/,@IN_Countries))){
         	return 0;
         }
 

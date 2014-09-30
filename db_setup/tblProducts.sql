@@ -1,6 +1,8 @@
 DROP TABLE IF EXISTS `tblProducts`;
 CREATE TABLE `tblProducts` (
   `intProductID` int(11) NOT NULL AUTO_INCREMENT,
+   strProductCode varchar(20) default '',
+   strProductType varchar(20) default '', /*LICENCE, INSURANCE, OTHER etc..*/
   `strName` varchar(100) DEFAULT '',
   `curDefaultAmount` decimal(12,2) DEFAULT '0.00',
   `intMinChangeLevel` int(11) DEFAULT '0',
@@ -35,7 +37,7 @@ CREATE TABLE `tblProducts` (
   `intSeasonOther1Financial` tinyint(4) DEFAULT '0',
   `intSeasonOther2Financial` tinyint(4) DEFAULT '0',
   `intSeasonMemberPackageID` int(11) DEFAULT '0',
-  `intProductSeasonID` int(11) DEFAULT '0',
+  `intProductNationalPeriodID` int(11) DEFAULT '0',
   `dtDateAvailableFrom` datetime DEFAULT NULL,
   `dtDateAvailableTo` datetime DEFAULT NULL,
   `strLMSCourseID` varchar(20) DEFAULT '0',

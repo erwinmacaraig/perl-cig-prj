@@ -5156,7 +5156,7 @@ qq[DATE_FORMAT($player_comp_stats_table.dtStatTotal2,"%d/%m/%Y")],
                     optiongroup => 'transactions'
                 }
               ],
-              intProductSeasonID => [
+              intProductNationalPeriodID => [
                 "Product Reporting $txt_SeasonName",
                 {
                     displaytype     => 'lookup',
@@ -5784,7 +5784,7 @@ qq[DATE_FORMAT($player_comp_stats_table.dtStatTotal2,"%d/%m/%Y")],
               ADintHotelID
               ADstrNotes
               intTransactionID
-              intProductSeasonID
+              intProductNationalPeriodID
               intProductID
               strGroup
               intQty

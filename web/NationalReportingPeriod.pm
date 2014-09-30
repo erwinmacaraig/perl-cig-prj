@@ -1,10 +1,44 @@
 package NationalReportingPeriod;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT=qw(getNationalReportingPeriod);
-@EXPORT_OK=qw(getNationalReportingPeriod);
+@EXPORT=qw(getPeriods getNationalReportingPeriod);
+@EXPORT_OK=qw(getPeriods getNationalReportingPeriod);
 
 use strict;
+
+sub getPeriods {
+    my($Data)=@_;
+
+    my $subType = $Data->{'RealmSubType'} || 0;
+
+    my $checkLocked = $Data->{'HideLocked'} ? qq[ AND intLocked <> 1] : '';
+    my $subTypeSeasonOnly = $Data->{'SystemConfig'}->{'OnlyUseSubRealmSeasons'} ? '' : 'OR intRealmSubTypeID= 0';
+    my $st=qq[
+        SELECT
+            intNationalPeriodID,
+            strNationalPeriodName,
+            strSport
+        FROM
+            tblNationalPeriod
+        WHERE
+            intRealmID = $Data->{'Realm'}
+        ORDER BY dtFrom
+    ];
+
+    my $query = $Data->{'db'}->prepare($st);
+    $query->execute();
+
+    my $body='';
+    my %Periods=();
+
+    while (my ($id,$name, $sport)=$query->fetchrow_array()) {
+        $name .= qq[ - $sport] if $sport;
+        $Periods{$id}=$name ||'';
+        
+    }
+
+    return \%Periods;
+}
 
 sub getNationalReportingPeriod {
     my ($db, $realmID, $subRealmID, $sport, $registrationNature) = @_;

@@ -16,6 +16,7 @@ use Log;
 use PersonRegistration;
 use Person;
 use Data::Dumper;
+use SystemConfig;
 use List::MoreUtils qw(uniq);
 
 sub checkRegoAgeRestrictions {
@@ -52,6 +53,7 @@ sub checkRegoAgeRestrictions {
         }
     } else {
         $personDetails = loadPersonDetails($Data->{'db'}, $personID);
+        print STDERR Dumper $personDetails;
         $personAge = $personDetails->{'currentAge'} or undef;
     }
 
@@ -114,6 +116,11 @@ sub checkRegoAgeRestrictions {
 
     return 0 if !@uniqueAgeLevelOptions;
 
+    my $systemConfig = getSystemConfig($Data);
+    $Data->{'SystemConfig'} = $systemConfig;
+
+    my $personAgeLevel = Person::calculateAgeLevel($Data, $personAge);
+
     my @retdata = ();
     foreach(@uniqueAgeLevelOptions) {
         if($_ eq '') {
@@ -122,7 +129,7 @@ sub checkRegoAgeRestrictions {
                 value => '',
             };
         }
-        else {
+        elsif($personAgeLevel eq $_) {
             push @retdata, {
                 name => $Defs::ageLevel{$_},
                 value => $_,

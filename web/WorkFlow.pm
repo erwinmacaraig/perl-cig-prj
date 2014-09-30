@@ -9,16 +9,16 @@ require Exporter;
     addIndividualTask
     cleanTasks
     viewTask
-    viewSummaryForApproval
     populateRegoViewData
     populatePersonViewData
     populateDocumentViewData
     populateTaskNotesViewData
     populateEntityViewData
     resetRelatedTasks
-    viewSummaryPreApproval
-    viewFinalPage
+    viewApprovalPage
+    viewSummaryPage
     toggleTask
+    checkRelatedTasks
 );
 
 use strict;
@@ -146,7 +146,13 @@ sub handleWorkflow {
 	
 	if ( $action eq 'WF_Approve' ) {
         approveTask($Data);
-        ( $body, $title ) = viewFinalPage( $Data );	
+        my $allComplete = checkRelatedTasks($Data);
+        if($allComplete) {
+            ( $body, $title ) = viewSummaryPage( $Data );	
+        }
+        else {
+            ( $body, $title ) = viewApprovalPage( $Data );	
+        }
     }
     elsif ( $action eq 'WF_notesS' ) {
         ( $body, $title ) = updateTaskNotes( $Data );	
@@ -535,8 +541,8 @@ sub addWorkFlowTasks {
 			AND pr.strSport = r.strSport
             AND pr.strPersonType = r.strPersonType
             AND r.intEntityLevel = e.intEntityLevel
-            AND (r.strISOCountry_IN = '' OR r.strISOCountry_IN LIKE CONCAT('%|',p.strISONationality ,'|%'))
-            AND (r.strISOCountry_NOTIN = '' OR r.strISOCountry_NOTIN NOT LIKE CONCAT('%|',p.strISONationality ,'|%'))
+            AND (r.strISOCountry_IN IS NULL or r.strISOCountry_IN = '' OR r.strISOCountry_IN LIKE CONCAT('%|',p.strISONationality ,'|%'))
+            AND (r.strISOCountry_NOTIN IS NULL or r.strISOCountry_NOTIN = '' OR r.strISOCountry_NOTIN NOT LIKE CONCAT('%|',p.strISONationality ,'|%'))
         )
 		WHERE 
             pr.intPersonRegistrationID = ?
@@ -1585,6 +1591,7 @@ sub viewTask {
     my %DocumentData;
     my %PaymentData;
     my %NotesData;
+    my %ActionsData;
     my %fields;
 
     switch($dref->{strWFRuleFor}) {
@@ -1664,11 +1671,18 @@ sub viewTask {
         'workflow/generic/notes.templ'
     );
 
+    $ActionsData{'TaskAction'} = \%TaskAction;
+    my $actionsBlock = runTemplate(
+        $Data,
+        \%ActionsData,
+        'workflow/generic/actions.templ'
+    );
 
     $TemplateData{'TaskAction'} = \%TaskAction;
     $TemplateData{'DocumentBlock'} = $documentBlock;
     $TemplateData{'PaymentBlock'} = $paymentBlock;
     $TemplateData{'NotesBlock'} = $notesBlock;
+    $TemplateData{'ActionsBlock'} = $actionsBlock;
 
     #print STDERR Dumper %TemplateData;
     my $body = runTemplate(
@@ -1974,7 +1988,7 @@ sub resetRelatedTasks {
     ) or query_error($st);
 }
 
-sub viewSummaryPreApproval {
+sub viewSummaryPage {
     my ($Data) = @_;
 
     my $WFTaskID = safe_param('TID','number') || '';
@@ -2031,7 +2045,7 @@ sub viewSummaryPreApproval {
 
 }
 
-sub viewFinalPage {
+sub viewApprovalPage {
     my ($Data) = @_;
 
     #display page for now; details to be passed aren't finalised yet
@@ -2051,7 +2065,7 @@ sub viewFinalPage {
 	my $body = runTemplate(
         $Data,
         \%TemplateData,
-        'workflow/final/page.templ'
+        'workflow/result/page.templ'
 	);
     
     return ($body, "Approval status:");
@@ -2090,6 +2104,49 @@ sub toggleTask {
     }
 
     return 0;
+}
+
+sub checkRelatedTasks {
+    my ($Data) = @_;
+
+    my $WFTaskID = safe_param('TID','number') || '';
+    my $st = qq[
+        SELECT
+            PT.intWFTaskID,
+            PT.strTaskStatus
+        FROM
+            tblWFTask AS WF
+        INNER JOIN
+            tblWFTask as PT ON (
+                (PT.intPersonID = WF.intPersonID AND PT.intPersonRegistrationID = WF.intPersonRegistrationID AND PT.strWFRuleFor = WF.strWFRuleFor AND WF.strWFRuleFor = 'REGO')
+                OR
+                (PT.intEntityID = WF.intEntityID AND PT.intPersonRegistrationID = 0 AND PT.intPersonID = 0 AND PT.strWFRuleFor = WF.strWFRuleFor AND WF.strWFRuleFor = 'ENTITY')
+                OR
+                (PT.intPersonID = WF.intPersonID AND PT.intPersonRegistrationID = 0 AND PT.strWFRuleFor = WF.strWFRuleFor AND WF.strWFRuleFor = 'PERSON')
+                OR
+                (PT.intDocumentID = WF.intDocumentID AND PT.strWFRuleFor = WF.strWFRuleFor AND WF.strWFRuleFor = 'DOCUMENT')
+            )
+        WHERE
+            WF.intWFTaskID = ?
+            AND WF.intRealmID = ?
+    ];
+
+    my $q = $Data->{'db'}->prepare($st);
+    $q->execute(
+        $WFTaskID,
+        $Data->{'Realm'},
+    ) or query_error($st);
+
+    my $allComplete = 1;
+    while(my $dref = $q->fetchrow_hashref()) {
+        #continue if status = COMPLETE
+        next if ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_COMPLETE);
+
+        #flag that there are still tasks to be completed
+        $allComplete = 0;
+    }
+
+    return $allComplete;
 }
 
 1;
