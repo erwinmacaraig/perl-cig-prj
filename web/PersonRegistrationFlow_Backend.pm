@@ -66,6 +66,10 @@ sub handleRegistrationFlowBackend   {
         $personID = $personID || $rego_ref->{'personID'} || $rego_ref->{'intPersonID'} || 0;
     }
 
+    $rego_ref->{'Nationality'} ='';
+    if (defined $pref and $pref->{'strISONationality'}) {
+        $rego_ref->{'Nationality'} = $pref->{'strISONationality'} || '';
+    }
     if ( $action eq 'PREGF_TU' ) {
     	
         #add rego record with types etc.
@@ -79,7 +83,6 @@ sub handleRegistrationFlowBackend   {
 
         ($regoID, $rego_ref, $msg) = add_rego_record($Data, $personID, $entityID, $entityLevel, $originLevel, $personType, $personEntityRole, $personLevel, $sport, $ageLevel, $registrationNature);
        ###########################################
-        $rego_ref->{'Nationality'} = $pref->{'strISONationality'} || '';
        ##########################################
         if (!$regoID)   {
             my $error = '';

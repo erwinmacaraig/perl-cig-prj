@@ -341,7 +341,7 @@ sub listTasks {
 	}
 
     ## Calc Dupl Res and Pending Clr here
-    my $clrCount = getClrTaskCount($Data, $entityID);
+    my $clrCount = 0; #getClrTaskCount($Data, $entityID);
     my $dupCount = Duplicates::getDupTaskCount($Data, $entityID);
     if ($clrCount)   {
         my %row=(

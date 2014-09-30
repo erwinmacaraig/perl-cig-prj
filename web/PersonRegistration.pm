@@ -45,10 +45,10 @@ sub rolloverExistingPersonRegistrations {
         personType=> $reg_ref->[0]{'strPersonType'} || '',
         personEntityRole=> $reg_ref->[0]{'strPersonEntityRole'} || '',
         personLevel=> $reg_ref->[0]{'strPersonLevel'} || '',
-        ageLevel=> $reg_ref->[0]{'strAgeLevel'} || '',
         entityID=> $reg_ref->[0]{'intEntityID'} || 0,
         status=> $Defs::PERSONREGO_STATUS_ACTIVE,
     );
+        #ageLevel=> $reg_ref->[0]{'strAgeLevel'} || '',
     my ($countRecords, $regs_ref) = getRegistrationData(
         $Data,
         $personID,
