@@ -772,7 +772,7 @@ sub listClubs   {
     Data => $Data,
     columns => \@headers,
     rowdata => \@rowdata,
-    filters => $filterfields,
+    OFFfilters => $filterfields,
     gridid => 'grid',
     width => '99%',
   );
@@ -783,6 +783,7 @@ sub listClubs   {
         \%Defs::entityStatus,
         { 'ALL' => $Data->{'lang'}->txt('All'), },
   ) || '';
+  $rectype_options=''; #OFF FOR NOW
 
   $resultHTML = qq[ 
       <div style="width:99%;">$rectype_options</div>

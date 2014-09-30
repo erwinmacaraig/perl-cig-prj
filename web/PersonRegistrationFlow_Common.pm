@@ -29,6 +29,7 @@ use TTTemplate;
 use Transactions;
 use Products;
 use WorkFlow;
+use Person;
 use Data::Dumper;
 
 sub displayRegoFlowCompleteBulk {
@@ -207,6 +208,8 @@ sub displayRegoFlowProducts {
     my $lang=$Data->{'lang'};
 
     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_PU&amp;rID=$regoID";
+    my $pref = loadPersonDetails($Data->{'db'}, $personID);
+    $rego_ref->{'Nationality'} = $pref->{'strISONationality'};
     my $CheckProducts = getRegistrationItems(
         $Data,
         'REGO',
@@ -255,6 +258,8 @@ sub displayRegoFlowProductsBulk {
     my $lang=$Data->{'lang'};
 
     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_PU&amp;rID=$regoID";
+    my $pref = loadPersonDetails($Data->{'db'}, $personID);
+    $rego_ref->{'Nationality'} = $pref->{'strISONationality'};
     my $CheckProducts = getRegistrationItems(
         $Data,
         'REGO',
