@@ -1105,10 +1105,6 @@ sub getPersonMenuData {
     $menuoptions{'passport'} = {
        url => $baseurl."a=P_PASS",
     };
-    if($clr) {
-        $menuoptions{'clr'} = {
-                name => $lang->txt($txt_Clrs),
-                url => $baseurl."a=P_CLR",
     if (
         $Data->{'clientValues'}{'authLevel'}>= $Defs::LEVEL_NATIONAL 
         or ($SystemConfig->{'PersonMenus_level'} 
@@ -1145,5 +1141,4 @@ sub getPersonMenuData {
 
 }
 
-# vim: set et sw=4 ts=4:
 1;
