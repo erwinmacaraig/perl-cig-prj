@@ -45,7 +45,9 @@ sub getNationalReportingPeriod {
     $subRealmID ||= 0;
     my $st = qq[
         SELECT
-            intNationalPeriodID
+            intNationalPeriodID,
+            dtFrom,
+            dtTo
         FROM
             tblNationalPeriod
         WHERE
@@ -73,9 +75,9 @@ sub getNationalReportingPeriod {
     ];
     my $q = $db->prepare($st);
     $q->execute($realmID, $subRealmID, $sport);
-    my $nationalPeriodID = $q->fetchrow_array();
+    my ($nationalPeriodID, $dtFrom, $dtTo) = $q->fetchrow_array();
     $nationalPeriodID ||= 0;
-    return $nationalPeriodID;
+    return ($nationalPeriodID, $dtFrom, $dtTo);
 }
 
 1;

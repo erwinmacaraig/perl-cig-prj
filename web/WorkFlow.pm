@@ -924,16 +924,18 @@ sub checkForOutstandingTasks {
 
                 ## Handle intPaymentRequired ?  What abotu $0 products
         
+                        #LEFT JOIN tblNationalPeriod as NP ON (PR.intNationalPeriodID = NP.intNationalPeriodID)
+	            	    #PR.dtFrom = NP.dtFrom,
+                        #PR.dtTo = NP.dtTo,
 	            $st = qq[
-	            	UPDATE tblPersonRegistration_$Data->{'Realm'} 
+	            	UPDATE tblPersonRegistration_$Data->{'Realm'} as PR
                     SET
-	            	    strStatus = 'ACTIVE',
-                        intCurrent=1,
-	            	    dtFrom = NOW(),
+	            	    PR.strStatus = 'ACTIVE',
+                        PR.intCurrent=1,
                         dtLastUpdated=NOW()
 	    	        WHERE 
-                        intPersonRegistrationID = ?
-                        AND strStatus IN ('PENDING', 'INPROGRESS')
+                        PR.intPersonRegistrationID = ?
+                        AND PR.strStatus IN ('PENDING', 'INPROGRESS')
 	        	];
                         #AND strStatus NOT IN ('SUSPENDED', 'TRANSFERRED', 'DELETED')
 	    
