@@ -24,6 +24,7 @@ use NationalReportingPeriod;
 use GenAgeGroup;
 use Data::Dumper;
 use Person;
+use PersonRegisterWhat;
 
 sub rolloverExistingPersonRegistrations {
 
@@ -152,16 +153,48 @@ sub checkRenewalRegoOK  {
     return 0 if (defined $pref and ($pref->{'strStatus'} eq $Defs::PERSON_STATUS_SUSPENDED));
     my $nationalPeriodID = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $rego_ref->{'sport'}, 'RENEWAL');
 
+    my ($personRegisterWhat, $errorMsg) = optionsPersonRegisterWhat(
+        $Data,
+        $Data->{'Realm'},
+        $Data->{'RealmSubType'},
+        $rego_ref->{'originLevel'},
+        '',
+        $rego_ref->{'personType'} || '',
+        $rego_ref->{'personEntityRole'} || '',
+        $rego_ref->{'personLevel'} || '',
+        $rego_ref->{'sport'} || '',
+        $rego_ref->{'ageLevel'} || '',
+        $rego_ref->{'personID'},
+        $rego_ref->{'entityID'},
+        '',
+        '',
+        'nature',
+        0
+    );
+
+    my $validRego = 0;
+    foreach my $option (@{$personRegisterWhat}) {
+        if($option->{'value'} eq 'RENEWAL') {
+            $validRego = 1;
+            last;
+        }
+    }
+
+    warn "VALID REGO $validRego";
+    return $validRego if (!$validRego);
+
     my @statusIN = ($Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);#, $Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_INPROGRESS);
     my %Reg = (
         sport=> $rego_ref->{'sport'} || '',
         personType=> $rego_ref->{'personType'} || '',
         personEntityRole=> $rego_ref->{'personEntityRole'} || '',
         personLevel=> $rego_ref->{'personLevel'} || '',
-        ageLevel=> $rego_ref->{'ageLevel'} || '',
+        #ageLevel=> $rego_ref->{'ageLevel'} || '',
         statusIN => \@statusIN,
         entityID=> $rego_ref->{'entityID'} || 0,
     );
+
+
     my ($count, undef) = getRegistrationData(
         $Data,
         $personID,
@@ -176,7 +209,7 @@ sub checkRenewalRegoOK  {
         personType=> $rego_ref->{'personType'} || '',
         personEntityRole=> $rego_ref->{'personEntityRole'} || '',
         personLevel=> $rego_ref->{'personLevel'} || '',
-        ageLevel=> $rego_ref->{'ageLevel'} || '',
+        #ageLevel=> $rego_ref->{'ageLevel'} || '',
         statusIN => \@statusIN,
         entityID=> $rego_ref->{'entityID'} || 0,
         nationalPeriod=>$nationalPeriodID,
@@ -219,11 +252,11 @@ sub checkRenewalRegoOK  {
     #);
 
     
+    warn "COUNT $count";
+    warn "COUNTALREADY $countAlready";
     #return 1 if ($countActive or $countInactive or $countRolledOver); ## Must have an ACTIVE or PASSIVE record
     return 1 if ($count and ! $countAlready);
     return 0;
-
-
 }
 
 
@@ -523,6 +556,8 @@ sub getRegistrationData	{
         push @values, $regFilters_ref->{'entityID'};
         $where .= " AND pr.intEntityID= ? ";
     }
+
+    print STDERR Dumper $where;
 
     my $st= qq[
         SELECT 
