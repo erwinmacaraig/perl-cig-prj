@@ -260,6 +260,8 @@ sub main {
         my $entityID = getID($Data{'clientValues'},$Data{'clientValues'}{'currentLevel'});
         ( $resultHTML, $pageHeading ) = handlePendingRegistrations($action, \%Data, $entityID, $prID);
     }
+    
+   
     # BUILD PAGE
     if ( !$report ) {
         $client = setClient( \%clientValues );

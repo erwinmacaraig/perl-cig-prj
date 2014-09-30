@@ -53,7 +53,6 @@ sub getRegistrationItems    {
         AND (NOT RI.strISOCountry_NOTIN OR RI.strISOCountry_NOTIN IS NULL OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))        
       ]; 
         
-print STDERR $st;
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
     
     $q->execute(

@@ -87,10 +87,25 @@ sub displayRegoFlowComplete {
 
          my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
          my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
-        my $gateways = '';
+         my $gateways = '';
          if (1==2)   {
             $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
          }
+         ##################################################################################
+         #check sport
+         if( ($rego_ref->{'Sport'} eq 'Football') && ($rego_ref->{'PersonType'} eq 'Player') ){ 
+         ###
+         # Query db for person DOB
+              my $query = "SELECT YEAR(CURDATE()) - YEAR(dtDOB) as age FROM tblPerson WHERE YEAR(CURDATE()) - YEAR(dtDOB) >= 12 AND dtDOB <> '0000-00-00' AND intPersonID = ?";
+              my $sth = $Data->{'db'}->prepare($query);
+              $sth->execute($personID); 
+              my $ageRef = $sth->fetchrow_hashref(); 
+              # if football player age is greater or equal to 13
+              if(!undef $ageRef){              	
+              	savePlayerPassport($Data, $entityID, $personID, $rego_ref);              	
+              }
+        }
+        #####################################################################################
         my %PageData = (
             person_home_url => $url,
             gateways => $gateways,
@@ -101,6 +116,7 @@ sub displayRegoFlowComplete {
             Lang => $Data->{'lang'},
             client=>$client,
         );
+        
         $body = runTemplate($Data, \%PageData, 'registration/complete.templ') || '';
     }
     return $body;
@@ -493,6 +509,31 @@ sub bulkRegoSubmit {
     
     return $body;
 }
+#################################################################
+sub savePlayerPassport{ 
+	my ($Data, $entityID, $personID, $rego_ref) = @_;
+	my $query = qq[SELECT 
+              	          strLocalName, 
+              	          strRealmName, 
+              	          tblNationalPeriod.dtTo FROM tblEntity 
+              	          INNER JOIN tblRealms ON tblEntity.intRealmID = tblRealms.intRealmID
+              	          LEFT JOIN tblNationalPeriod ON 
+              	          (tblEntity.intRealmID = tblNationalPeriod.intRealmID AND 
+              	          CURDATE() BETWEEN  tblNationalPeriod.dtFrom AND tblNationalPeriod.dtTo) 
+              	          WHERE tblEntity.intRealmID = $Data->{'Realm'} AND tblEntity.intEntityID = $entityID];
+              	          
+              	my $sth = $Data->{'db'}->prepare($query); 
+              	$sth->execute(); 
+              	my $passportOtherinfoHash = $sth->fetchrow_hashref();
+              	
+               $query = qq[INSERT INTO tblPlayerPassport (intPersonID,strOrigin,strPersonLevel,intEntityID,strEntityName,strMAName,dtFrom, dtTo)  VALUES (?, ?, ?, ?, ?, ?, CURDATE(), ?)   ];
+              	
+              	$sth = $Data->{'db'}->prepare($query); 
+              	$sth->execute($personID,'REGO', $rego_ref->{'PersonLevel'},$entityID, $passportOtherinfoHash->{'strLocalName'},$passportOtherinfoHash->{'strRealmName'},$passportOtherinfoHash->{'dtTo'}); 
+              	# insert data in tblPlayerPassport 
+}
+#####################################################################
+
 
 1;
 

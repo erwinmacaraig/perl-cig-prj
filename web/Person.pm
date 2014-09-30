@@ -59,6 +59,8 @@ use PersonRegistrationDetail;
 
 use Documents;
 use WorkFlow;
+use TTTemplate;
+
 
 sub handlePerson {
     my ( $action, $Data, $personID ) = @_;
@@ -173,11 +175,44 @@ sub handlePerson {
          my $client = setClient( $Data->{'clientValues'} ) || '';
          $resultHTML .= Documents::list_docs($Data, $personID, $client );
            }
+    elsif($action =~ /P_PASS/){ 
+    	($resultHTML,$title) = listPlayerPassport($Data, $personID);
+    	
+    }
     else {
         print STDERR "Unknown action $action\n";
     }
     return ( $resultHTML, $title );
 }
+
+sub listPlayerPassport {
+	my ($Data, $personID) = @_; 
+	
+	my $query = qq[ SELECT strPersonLevel, strEntityName, strMAName, dtFrom, dtTo FROM tblPlayerPassport WHERE intPersonID = ? ORDER BY dtFrom,dtTo DESC
+	];
+	my $sth = $Data->{'db'}->prepare($query); 
+	$sth->execute($personID); 
+	my @rowdata = (); 
+	while(my $passportref = $sth->fetchrow_hashref()){ 
+		push @rowdata,{
+			From => $passportref->{'dtFrom'},
+			To => $passportref->{'dtTo'},
+			Club => $passportref->{'strEntityName'}, 
+			Level => $passportref->{'strPersonLevel'}, 
+			MAName => $passportref->{'strMAName'},  
+		};
+	}
+	$sth->finish();
+	my $PageContent = {
+		Lang => $Data->{'lang'},
+		Passport => \@rowdata,
+	};
+	 my $title = '';
+	 my $resultHTML = runTemplate($Data, $PageContent, 'registration/playerpassport.templ') || '';  
+	 $title = 'Player Passport'; 
+	 return ($resultHTML, $title);
+}
+
 
 sub personRegistrationsHistory   {
 

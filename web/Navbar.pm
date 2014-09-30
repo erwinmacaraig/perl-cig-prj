@@ -1105,6 +1105,9 @@ sub getPersonMenuData {
     $menuoptions{'docs'} = {
        url => $baseurl."a=P_DOCS",
     };
+     $menuoptions{'passport'} = {
+       url => $baseurl."a=P_PASS",
+    };
     if($clr) {
         $menuoptions{'clr'} = {
                 name => $lang->txt($txt_Clrs),
@@ -1116,6 +1119,7 @@ sub getPersonMenuData {
     $Data->{'SystemConfig'}{'TYPE_NAME_3'} = '' if not exists $Data->{'SystemConfig'}{'TYPE_NAME_3'};
     my @menu_structure = (
         [ $lang->txt('Person Dashboard'), 'home','home'],
+        [ $lang->txt('Player Passport'), 'menu','passport'],
         [ $lang->txt($SystemConfig->{'txns_link_name'} || 'Transactions'), 'menu','transactions'],
         [ $lang->txt($txt_Clrs), 'menu','clr'],
         [ $lang->txt('Registration History'), 'menu','regos'],

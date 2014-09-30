@@ -1,0 +1,30 @@
+[% IF Passport.size() > 0 %]
+
+[% count = 0 %]
+<table class="listTable">
+	<tr> 
+		<th>Beginning Of Registration</th>
+		<th>End of Registration </th>
+		<th>Club Name</th> 
+		<th>Level</th>
+		<th>Registration Member Association</th>
+	</tr> 
+	[% FOREACH p = Passport %]
+	    [% count = count + 1 
+           c = count mod 2; 
+           IF count == 0    
+         %]
+              <tr class="rowshade">
+          [% ELSE %]
+              <tr>
+          [% END %] 
+          <td>[% p.From %]</td>
+          <td>[% p.To %]</td>
+          <td>[% p.Club %]</td>
+          <td>[% p.Level %]</td> 
+          <td>[% p.MAName %]</td>
+	[% END %]  
+</table>
+[% ELSE %]
+<h4> No Record Found. </h4>
+[% END %]
