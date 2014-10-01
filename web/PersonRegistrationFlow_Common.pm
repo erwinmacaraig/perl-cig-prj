@@ -545,6 +545,7 @@ sub savePlayerPassport{
 		$sth->execute($entityID);
 	} 
 
+    my $pref = loadPersonDetails($Data->{'db'}, $personID);  #Get DOB
     my @statusIN = ($Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);  #Might need changing
     my %Reg = (
         personType => $Defs::PERSON_TYPE_PLAYER,
