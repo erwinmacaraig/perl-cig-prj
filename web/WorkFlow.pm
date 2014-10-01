@@ -1909,9 +1909,12 @@ sub populateRegoPaymentsViewData {
 
     my $st = qq[
         SELECT
-            T.*,
-            P.*,
-            TL.*
+            T.intQty,
+            T.curAmount,
+            P.strName as ProductName,
+            P.strProductType as ProductType,
+            T.intStatus,
+            TL.intPaymentType
         FROM 
             tblTransactions as T 
             INNER JOIN tblProducts as P ON (P.intProductID=T.intProductID)
@@ -1934,14 +1937,19 @@ sub populateRegoPaymentsViewData {
 	  
     while(my $tdref = $q->fetchrow_hashref()) {
         my %row= (
-            ProductName=> $tdref->{'strName'},
-            Amount=> $tdref->{'curDefaultAmount'},
+            ProductName=> $tdref->{'ProductName'},
+            ProductType=> $tdref->{'ProductType'},
+            Amount=> $tdref->{'curAmount'},
+            TXNStatus => $Defs::TransactionStatus{$tdref->{'intStatus'}},
+            PaymentType=> $Defs::paymentTypes{$tdref->{'intPaymentType'}} || '-',
+            Qty=> $tdref->{'intQty'},
         );
         push @TXNs, \%row;
     }
 
     %TemplateData = (
         TXNs=> \@TXNs,
+        CurrencySymbol => $Data->{'SystemConfig'}{'DollarSymbol'} || "\$",
     );
 
     return (\%TemplateData);
