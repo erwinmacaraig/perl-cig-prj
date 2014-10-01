@@ -1828,7 +1828,7 @@ sub populateDocumentViewData {
 
     switch($dref->{strWFRuleFor}) {
         case 'REGO' {
-            $joinCondition .= qq[ (d.intDocumentTypeID = rd.intDocumentTypeID AND d.intPersonRegistrationID IN (0, wt.intPersonRegistrationID) AND d.intPersonID = wt.intPersonID) ];
+            $joinCondition .= qq[ (d.intDocumentTypeID = rd.intDocumentTypeID AND ((d.intPersonRegistrationID IN (0) AND pr.intNewBaseRecord = 1) OR (d.intPersonRegistrationID = wt.intPersonRegistrationID)) AND d.intPersonID = wt.intPersonID) ];
 ### MIGHT NEED TO MAKE d.intPersonRegistrationID IN (0, wt.intPersonRegistrationID) if its a new base record ?
         }
         case 'ENTITY' {
@@ -1855,9 +1855,11 @@ sub populateDocumentViewData {
             wt.intProblemResolutionEntityID,
             dt.strDocumentName,
             d.strApprovalStatus,
-            d.intDocumentID
+            d.intDocumentID,
+            pr.intNewBaseRecord
         FROM tblWFRuleDocuments AS rd
         INNER JOIN tblWFTask AS wt ON (wt.intWFRuleID = rd.intWFRuleID)
+        LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (pr.intPersonRegistrationID = wt.intPersonRegistrationID)
         INNER JOIN tblDocuments AS d ON $joinCondition
         INNER JOIN tblDocumentType dt ON (dt.intDocumentTypeID = d.intDocumentTypeID )
         WHERE 
