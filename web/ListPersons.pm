@@ -289,7 +289,7 @@ my $filterfields = [
         gridid        => 'grid',
         width         => '99%',
         height        => '700',
-        filters       => $filterfields,
+        ffilters       => $filterfields,
         client        => $client,
         #saveurl       => 'ajax/aj_persongrid_update.cgi',
         ajax_keyfield => 'intPersonID',
@@ -335,6 +335,7 @@ my $filterfields = [
         \%Defs::personStatus,
         { 'ALL' => $Data->{'lang'}->txt('All'), },
     ) || '';
+$rectype_options = ''; #OFF FOR NOW
 
     $resultHTML =qq[
         $list_instruction

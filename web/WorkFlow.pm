@@ -1601,8 +1601,8 @@ sub viewTask {
 
     my %TemplateData;
     my %DocumentData;
-    my %PaymentData;
     my %NotesData;
+    my %PaymentsData;
     my %ActionsData;
     my %fields;
 
@@ -1657,9 +1657,16 @@ sub viewTask {
     my ($DocumentData, $fields) = populateDocumentViewData($Data, $dref);
     %DocumentData = %{$DocumentData};
 
-    #my ($PaymentData, $fields) = populatePaymentViewData($Data, $dref);
-    #%PaymentData = %{$PaymentData};
-    %PaymentData = ();
+    my $paymentBlock = '';
+    if ($dref->{strWFRuleFor} eq 'REGO')    {
+        my ($PaymentsData) = populateRegoPaymentsViewData($Data, $dref);
+        %PaymentsData = %{$PaymentsData};
+        $paymentBlock = runTemplate(
+            $Data,
+            \%PaymentsData,
+            'workflow/generic/payment.templ'
+        );
+    }
 
     my ($NotesData) = populateTaskNotesViewData($Data, $dref);
     %NotesData = %{$NotesData};
@@ -1671,11 +1678,6 @@ sub viewTask {
         'workflow/generic/document.templ'
     );
 
-    my $paymentBlock = runTemplate(
-        $Data,
-        \%PaymentData,
-        'workflow/generic/payment.templ'
-    );
 
     my $notesBlock = runTemplate(
         $Data,
@@ -1825,6 +1827,7 @@ sub populateDocumentViewData {
     switch($dref->{strWFRuleFor}) {
         case 'REGO' {
             $joinCondition .= qq[ (d.intDocumentTypeID = rd.intDocumentTypeID AND d.intPersonRegistrationID = wt.intPersonRegistrationID AND d.intPersonID = wt.intPersonID) ];
+### MIGHT NEED TO MAKE d.intPersonRegistrationID IN (0, wt.intPersonRegistrationID) if its a new base record ?
         }
         case 'ENTITY' {
             $joinCondition .= qq[ (d.intDocumentTypeID = rd.intDocumentTypeID AND d.intEntityID = wt.intEntityID AND d.intPersonID = 0 AND d.intPersonRegistrationID = 0) ];
@@ -1912,6 +1915,61 @@ sub populateDocumentViewData {
 
     return (\%DocumentData, \%fields);
 }
+
+sub populateRegoPaymentsViewData {
+    my ($Data, $dref) = @_;
+
+    my %TemplateData = ();
+
+    my $st = qq[
+        SELECT
+            T.intQty,
+            T.curAmount,
+            P.strName as ProductName,
+            P.strProductType as ProductType,
+            T.intStatus,
+            TL.intPaymentType
+        FROM 
+            tblTransactions as T 
+            INNER JOIN tblProducts as P ON (P.intProductID=T.intProductID)
+            LEFT JOIN tblTransLog as TL ON (TL.intLogID=T.intTransLogID)
+        WHERE 
+            T.intID = ?
+            AND T.intTableType = ?
+            AND T.intPersonRegistrationID = ?
+    ];
+
+    my $q = $Data->{'db'}->prepare($st) or query_error($st);
+	$q->execute(
+        $dref->{'intPersonID'},
+        $Defs::LEVEL_PERSON,
+        $dref->{'intPersonRegistrationID'},
+	) or query_error($st);
+
+	my @TXNs= ();
+	my $rowCount = 0;
+	  
+    while(my $tdref = $q->fetchrow_hashref()) {
+        my %row= (
+            ProductName=> $tdref->{'ProductName'},
+            ProductType=> $tdref->{'ProductType'},
+            Amount=> $tdref->{'curAmount'},
+            TXNStatus => $Defs::TransactionStatus{$tdref->{'intStatus'}},
+            PaymentType=> $Defs::paymentTypes{$tdref->{'intPaymentType'}} || '-',
+            Qty=> $tdref->{'intQty'},
+        );
+        push @TXNs, \%row;
+    }
+
+    %TemplateData = (
+        TXNs=> \@TXNs,
+        CurrencySymbol => $Data->{'SystemConfig'}{'DollarSymbol'} || "\$",
+    );
+
+    return (\%TemplateData);
+
+}
+
 
 sub populateTaskNotesViewData {
     my ($Data, $dref) = @_;

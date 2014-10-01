@@ -632,6 +632,7 @@ next if $dref->{$k} eq "'0000-00-00'";
 		$Data->{'db'}->do(qq[UPDATE tblTransactions SET intID = $existingid WHERE intID = $id_of_duplicate and intTableType=$Defs::LEVEL_PERSON AND intPersonRegistrationID=0]);
 		$Data->{'db'}->do(qq[UPDATE tblDocuments SET intPersonID= $existingid WHERE intPersonID= $id_of_duplicate]);
 		$Data->{'db'}->do(qq[UPDATE tblPersonCertifications SET intPersonID= $existingid WHERE intPersonID= $id_of_duplicate]);
+		$Data->{'db'}->do(qq[UPDATE tblPlayerPassport SET intPersonID= $existingid WHERE intPersonID= $id_of_duplicate]);
 		$Data->{'db'}->do(qq[UPDATE tblWFTask SET intPersonID= $existingid WHERE intPersonID= $id_of_duplicate]);
 		$Data->{'db'}->do(qq[UPDATE tblClearance SET intPersonID = $existingid WHERE intPersonID=$id_of_duplicate]);
 		$Data->{'db'}->do(qq[UPDATE IGNORE tblAuth SET intID = $existingid WHERE intLevel=1 AND intID=$id_of_duplicate]);

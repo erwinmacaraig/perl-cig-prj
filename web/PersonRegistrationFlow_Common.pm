@@ -162,21 +162,27 @@ sub displayRegoFlowDocuments    {
         0,
         $rego_ref,
      );
-     
-        my %PersonRef = ();
-        $PersonRef{'strPersonType'} = $rego_ref->{'strPersonType'} || '';
-      my $personLeveldocs = getRegistrationItems(
+
+    my %PersonRef = ();
+    $PersonRef{'strPersonType'} = $rego_ref->{'strPersonType'} || '';
+    my $personRegoNature = 'NEW';
+    my $pref = loadPersonDetails($Data->{'db'}, $personID);
+
+    if ($pref->{'strStatus'} ne $Defs::PERSON_STATUS_INPROGRESS)    {
+        $personRegoNature = 'RENEWAL';
+    }
+    my $personLeveldocs = getRegistrationItems(
         $Data,
         'PERSON',
         'DOCUMENT',
         $originLevel,
-        $rego_ref->{'strRegistrationNature'} || $rego_ref->{'registrationNature'},
+        $personRegoNature,
         $entityID,
         $entityRegisteringForLevel,
         0,
         \%PersonRef,
      );
-    
+     
     ### FOR FILTERING 
     my @docos = (); 
 	my %approved_docs = (); 
