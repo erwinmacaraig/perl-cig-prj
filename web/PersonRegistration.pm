@@ -59,7 +59,7 @@ sub rolloverExistingPersonRegistrations {
         my $thisRego = $rego;
         $thisRego->{'intCurrent'} = 0;
         $thisRego->{'strStatus'} = $Defs::PERSONREGO_STATUS_ROLLED_OVER;
-        updatePersonRegistration($Data, $personID, $rego->{'intPersonRegistrationID'}, $thisRego);
+        updatePersonRegistration($Data, $personID, $rego->{'intPersonRegistrationID'}, $thisRego, 0);
     }
 }
 
@@ -416,7 +416,7 @@ sub mergePersonRegistrations    {
 
 sub updatePersonRegistration    {
 
-    my ($Data, $personID, $personRegistrationID, $Reg_ref) = @_;
+    my ($Data, $personID, $personRegistrationID, $Reg_ref, $personStatus) = @_;
 
     if ($Reg_ref->{'personEntityRole'} && $Reg_ref->{'personEntityRole'} eq '-')  {
         $Reg_ref->{'personEntityRole'}= '';
@@ -425,6 +425,11 @@ sub updatePersonRegistration    {
         $Reg_ref->{'strPersonEntityRole'}= '';
     }
         
+    my $newBaseRecord = 0;
+    if($personStatus eq $Defs::PERSONREGO_STATUS_INPROGRESS) {
+        $newBaseRecord = 1;
+    }
+
 	my $st = qq[
    		UPDATE tblPersonRegistration_$Data->{'Realm'} 
         SET
@@ -441,7 +446,8 @@ sub updatePersonRegistration    {
             strAgeLevel = ?,
             strRegistrationNature = ?,
             intIsPaid = ?,
-            intPaymentRequired = ?
+            intPaymentRequired = ?,
+            intNewBaseRecord = ?
         WHERE
             intPersonID = ?
             AND intPersonRegistrationID = ?
@@ -464,8 +470,9 @@ sub updatePersonRegistration    {
         $Reg_ref->{'registrationNature'} || $Reg_ref->{'strRegistrationNature'},
         $Reg_ref->{'isPaid'} || $Reg_ref->{'intIsPaid'},
         $Reg_ref->{'paymentRequired'} || $Reg_ref->{'intPaymentRequired'},
+        $newBaseRecord,
         $personID,
-        $personRegistrationID
+        $personRegistrationID,
   	);
 	
 	if ($q->errstr) {
@@ -568,6 +575,7 @@ sub getRegistrationData	{
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             p.intGender,
             p.intGender as Gender,
+            p.strStatus as personStatus,
             p.strISONationality,
             DATE_FORMAT(pr.dtFrom, "%Y%m%d") as dtFrom_,
             DATE_FORMAT(pr.dtTo, "%Y%m%d") as dtTo_,
@@ -622,6 +630,8 @@ sub getRegistrationData	{
 
 sub addRegistration {
     my($Data, $Reg_ref) = @_;
+
+    warn "ADD REGISTRATION CALLED";
 
     if ($Reg_ref->{'personEntityRole'} eq '-')  {
         $Reg_ref->{'personEntityRole'}= '';
@@ -775,15 +785,17 @@ sub submitPersonRegistration    {
 
     my ($Data, $personID, $personRegistrationID, $rego_ref) = @_;
 
+    warn "SUBMIT REGISTRATION CALLED";
     my %Reg=();
     $Reg{'personRegistrationID'} = $personRegistrationID;
     my ($count, $regs) = getRegistrationData($Data, $personID, \%Reg);
 	
     my $pr_ref = $regs->[0];
     if ($count && $pr_ref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_INPROGRESS) {
+        my $personStatus = $pr_ref->{'personStatus'};
         $pr_ref->{'strStatus'} = 'PENDING';
 
-        updatePersonRegistration($Data, $personID, $personRegistrationID, $pr_ref);
+        updatePersonRegistration($Data, $personID, $personRegistrationID, $pr_ref, $personStatus);
         cleanTasks(
             $Data,
             $personID,
