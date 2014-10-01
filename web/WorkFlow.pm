@@ -495,7 +495,7 @@ sub addWorkFlowTasks {
 			r.intProblemResolutionEntityLevel, 
 			p.intPersonID, 
 			0 as intPersonRegistrationID,
-            0 as RegoEntity,
+            $entityID as RegoEntity,
             0 as DocumentID
 		FROM tblPerson as p
 		INNER JOIN tblWFRule AS r ON (
@@ -509,6 +509,7 @@ sub addWorkFlowTasks {
             AND r.intOriginLevel = ?
 			AND r.strRegistrationNature = ?
 		];
+        #0 as RegoEntity,
 	    $q = $db->prepare($st);
   	    $q->execute($personID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
     }
