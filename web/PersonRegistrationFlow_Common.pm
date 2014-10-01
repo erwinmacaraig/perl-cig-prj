@@ -31,7 +31,7 @@ use Products;
 use WorkFlow;
 use Person;
 use Data::Dumper;
-
+use POSIX qw(strftime);
 sub displayRegoFlowCompleteBulk {
 
     my ($Data, $client) = @_;
@@ -93,8 +93,11 @@ sub displayRegoFlowComplete {
             $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
          }
          ##################################################################################
-         #check sport
-         if( ($rego_ref->{'Sport'} eq 'Football') && ($rego_ref->{'PersonType'} eq 'Player') ){ 
+         #check sport, check if person is a PLAYER and registration status if ACTIVE
+         
+         my @status = ('ACTIVE','PASSIVE','ROLLED_OVER','TRANSFERRED');
+         
+         if( ($rego_ref->{'Sport'} eq 'Football') && ($rego_ref->{'PersonType'} eq 'Player') && ( grep (/$rego_ref->{'strStatus'}/,@status) ) ){ 
          ###
          # Query db for person DOB
               my $query = "SELECT YEAR(CURDATE()) - YEAR(dtDOB) as age FROM tblPerson WHERE YEAR(CURDATE()) - YEAR(dtDOB) >= 12 AND dtDOB <> '0000-00-00' AND intPersonID = ?";
@@ -103,7 +106,7 @@ sub displayRegoFlowComplete {
               my $ageRef = $sth->fetchrow_hashref(); 
               # if football player age is greater or equal to 13
               if(!undef $ageRef){              	
-              	savePlayerPassport($Data, $entityID, $personID, $rego_ref);              	
+              	savePlayerPassport($Data, $entityID, $personID,$rego_ref->{'PersonLevel'});              	
               }
         }
         #####################################################################################
@@ -518,10 +521,28 @@ sub bulkRegoSubmit {
 }
 #################################################################
 sub savePlayerPassport{ 
-	my ($Data, $entityID, $personID, $rego_ref) = @_;
-	my $query = qq[SELECT 
+	my ($Data, $entityID, $personID, $personLevel) = @_;
+	
+	#check if uninterrupted
+	my $query = qq[SELECT * FROM tblPlayerPassport WHERE intEntityID = ?];
+	my $sth = $Data->{'db'}->prepare($query); 
+	$sth->execute($entityID);
+	my $uninterrupted = $sth->fetchrow_hashref();
+	my $theDate = strftime "%F", localtime;
+			
+	if(defined $uninterrupted->{'dtFrom'}){
+		$theDate = $uninterrupted->{'dtFrom'};		
+		
+		#DELETE RECORD
+		$query = "DELETE FROM tblPlayerPassport WHERE intEntityID = ?";
+		my $sth = $Data->{'db'}->prepare($query); 
+		$sth->execute($entityID);
+	} 
+	
+	# INSERT THE NEW RECORD
+	$query = qq[SELECT 
               	          strLocalName, 
-              	          strRealmName, 
+              	          strRealmName,              	                        	           
               	          tblNationalPeriod.dtTo FROM tblEntity 
               	          INNER JOIN tblRealms ON tblEntity.intRealmID = tblRealms.intRealmID
               	          LEFT JOIN tblNationalPeriod ON 
@@ -529,14 +550,14 @@ sub savePlayerPassport{
               	          CURDATE() BETWEEN  tblNationalPeriod.dtFrom AND tblNationalPeriod.dtTo) 
               	          WHERE tblEntity.intRealmID = $Data->{'Realm'} AND tblEntity.intEntityID = $entityID];
               	          
-              	my $sth = $Data->{'db'}->prepare($query); 
+              	$sth = $Data->{'db'}->prepare($query); 
               	$sth->execute(); 
               	my $passportOtherinfoHash = $sth->fetchrow_hashref();
               	
-               $query = qq[INSERT INTO tblPlayerPassport (intPersonID,strOrigin,strPersonLevel,intEntityID,strEntityName,strMAName,dtFrom, dtTo)  VALUES (?, ?, ?, ?, ?, ?, CURDATE(), ?)   ];
+                $query = qq[INSERT INTO tblPlayerPassport (intPersonID,strOrigin,strPersonLevel,intEntityID,strEntityName,strMAName,dtFrom, dtTo)  VALUES (?, ?, ?, ?, ?, ?, ?, ?)];
               	
               	$sth = $Data->{'db'}->prepare($query); 
-              	$sth->execute($personID,'REGO', $rego_ref->{'PersonLevel'},$entityID, $passportOtherinfoHash->{'strLocalName'},$passportOtherinfoHash->{'strRealmName'},$passportOtherinfoHash->{'dtTo'}); 
+              	$sth->execute($personID,'REGO', $personLevel, $entityID, $passportOtherinfoHash->{'strLocalName'},$passportOtherinfoHash->{'strRealmName'}, $theDate, $passportOtherinfoHash->{'dtTo'}); 
               	# insert data in tblPlayerPassport 
 }
 #####################################################################

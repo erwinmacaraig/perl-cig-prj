@@ -677,8 +677,8 @@ sub addWorkFlowTasks {
 		return $q->errstr . '<br>' . $st;
 	}
 
-	my $rc = checkForOutstandingTasks($Data,$ruleFor, '', $entityID, $personID, $personRegistrationID, $documentID);
-
+	my $rc = checkForOutstandingTasks($Data, $ruleFor, '', $entityID, $personID, $personRegistrationID, $documentID);
+    
 	return($rc); 
 }
 
@@ -945,6 +945,16 @@ sub checkForOutstandingTasks {
 		  			);         
 	        	$rc = 1;	# All registration tasks have been completed        		
                 PersonRegistration::rolloverExistingPersonRegistrations($Data, $personID, $personRegistrationID);
+				# Do the check
+				$st = qq[SELECT strPersonType, strSport, (YEAR(CURDATE()) - YEAR(dtDOB)) as age FROM tblPersonRegistration_$Data->{Realm} INNER JOIN tblPerson
+				         ON tblPersonRegistration_$Data->{'Realm'}.intPersonID = tblPerson.intPersonID WHERE intPersonRegistrationID = ?]; 
+				$q->execute($personRegistrationID);   
+				my $ppref = $q->fetchrow_hashref();				
+                # if check  pass call save
+                if( ($ppref->{'strPersonType'} eq 'PLAYER') && ($ppref->{'strSport'} eq 'FOOTBALL') && ($ppref->{'age'} >= 12) ){
+                	PersonRegistrationFlow_Common::savePlayerPassport($Data, $entityID, $personID, $ppref->{'strPersonLevel'});  
+                }
+           ##############################################################################################################        
         }
         if ($personID and $taskType ne $Defs::WF_TASK_TYPE_CHECKDUPL)  {
                 $st = qq[
