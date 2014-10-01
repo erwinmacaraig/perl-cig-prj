@@ -1817,6 +1817,7 @@ sub populateDocumentViewData {
     switch($dref->{strWFRuleFor}) {
         case 'REGO' {
             $joinCondition .= qq[ (d.intDocumentTypeID = rd.intDocumentTypeID AND d.intPersonRegistrationID = wt.intPersonRegistrationID AND d.intPersonID = wt.intPersonID) ];
+### MIGHT NEED TO MAKE d.intPersonRegistrationID IN (0, wt.intPersonRegistrationID) if its a new base record ?
         }
         case 'ENTITY' {
             $joinCondition .= qq[ (d.intDocumentTypeID = rd.intDocumentTypeID AND d.intEntityID = wt.intEntityID AND d.intPersonID = 0 AND d.intPersonRegistrationID = 0) ];
