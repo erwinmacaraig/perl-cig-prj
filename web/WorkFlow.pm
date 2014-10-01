@@ -949,6 +949,7 @@ sub checkForOutstandingTasks {
 				# Do the check
 				$st = qq[SELECT strPersonType, strSport, (YEAR(CURDATE()) - YEAR(dtDOB)) as age FROM tblPersonRegistration_$Data->{Realm} INNER JOIN tblPerson
 				         ON tblPersonRegistration_$Data->{'Realm'}.intPersonID = tblPerson.intPersonID WHERE intPersonRegistrationID = ?]; 
+                $q = $db->prepare($st);
 				$q->execute($personRegistrationID);   
 				my $ppref = $q->fetchrow_hashref();				
                 # if check  pass call save

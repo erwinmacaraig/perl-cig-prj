@@ -544,6 +544,23 @@ sub savePlayerPassport{
 		my $sth = $Data->{'db'}->prepare($query); 
 		$sth->execute($entityID);
 	} 
+
+    my @statusIN = ($Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);  #Might need changing
+    my %Reg = (
+        sport=> $Defs::SPORT_TYPE_FOOTBALL,
+        statusIN=>\@statusIN,
+    );
+    my ($count, $regs) = getRegistrationData(
+        $Data,
+        $personID,
+        \%Reg
+    );
+
+    ##Loop these
+
+    #If the person was 12 years old in the period include that period
+    #If there multiple UNBROKEN periods for the ONE club/ONE personLevel then make ONE row
+    #If there is a BROKEN dtFrom/dtTo then split the rows up
 	
 	# INSERT THE NEW RECORD
 	$query = qq[SELECT 
