@@ -540,9 +540,9 @@ sub savePlayerPassport{
 		$theDate = $uninterrupted->{'dtFrom'};		
 		
 		#DELETE RECORD
-		$query = "DELETE FROM tblPlayerPassport WHERE intEntityID = ?";
+		$query = "DELETE FROM tblPlayerPassport WHERE intPersonID= ? and strOrigin= 'REGO'";
 		my $sth = $Data->{'db'}->prepare($query); 
-		$sth->execute($entityID);
+		$sth->execute($personID);
 	} 
 
     my $pref = loadPersonDetails($Data->{'db'}, $personID);  #Get DOB
@@ -557,36 +557,51 @@ sub savePlayerPassport{
         $personID,
         \%Reg
     );
+    my $stPP= qq[
+        INSERT INTO tblPlayerPassport (
+            intPersonID,
+            strOrigin,
+            strPersonLevel,
+            intEntityID,
+            strEntityName,
+            strMAName,
+            dtFrom, 
+            dtTo
+        )  
+        VALUES (
+            ?, 
+            ?, 
+            ?, 
+            ?, 
+            ?, 
+            ?, 
+            ?, 
+            ?
+     )];
+     my $qPP = $Data->{'db'}->prepare($stPP); 
 
     ##Loop these
-
-    #If the person was 12 years old in the period include that period
-    #If there multiple UNBROKEN periods for the ONE club/ONE personLevel then make ONE row
-    #If there is a BROKEN dtFrom/dtTo then split the rows up
+    foreach my $reg (@{$regs})  {
+        #If the person was 12 years old in the period include that period
+        #If there multiple UNBROKEN periods for the ONE club/ONE personLevel then make ONE row
+        #If there is a BROKEN dtFrom/dtTo then split the rows up
 	
-	# INSERT THE NEW RECORD
-	$query = qq[SELECT 
-              	          strLocalName, 
-              	          strRealmName,              	                        	           
-              	          tblNationalPeriod.dtTo FROM tblEntity 
-              	          INNER JOIN tblRealms ON tblEntity.intRealmID = tblRealms.intRealmID
-              	          LEFT JOIN tblNationalPeriod ON 
-              	          (tblEntity.intRealmID = tblNationalPeriod.intRealmID AND 
-              	          CURDATE() BETWEEN  tblNationalPeriod.dtFrom AND tblNationalPeriod.dtTo) 
-              	          WHERE tblEntity.intRealmID = $Data->{'Realm'} AND tblEntity.intEntityID = $entityID];
-              	          
-              	$sth = $Data->{'db'}->prepare($query); 
-              	$sth->execute(); 
-              	my $passportOtherinfoHash = $sth->fetchrow_hashref();
-              	
-                $query = qq[INSERT INTO tblPlayerPassport (intPersonID,strOrigin,strPersonLevel,intEntityID,strEntityName,strMAName,dtFrom, dtTo)  VALUES (?, ?, ?, ?, ?, ?, ?, ?)];
-              	
-              	$sth = $Data->{'db'}->prepare($query); 
-              	$sth->execute($personID,'REGO', $personLevel, $entityID, $passportOtherinfoHash->{'strLocalName'},$passportOtherinfoHash->{'strRealmName'}, $theDate, $passportOtherinfoHash->{'dtTo'}); 
-              	# insert data in tblPlayerPassport 
+    ### MAYBE STORE EXISTING WORK IN A HASH and see if its an INSERT or UPDATE to new End Date
+	    # INSERT THE NEW RECORD
+    my $FromDate = ''; #??
+    my $ToDate = ''; #??
+        $qPP->execute(
+            $personID,
+            'REGO', 
+            $reg->{'strPersonLevel'}, 
+            $reg->{'intEntityID'}, 
+            $reg->{'strLocalName'},
+            $reg->{'strRealmName'},
+            $FromDate, 
+            $ToDate
+        ); 
+    }
 }
 #####################################################################
-
-
 1;
 
