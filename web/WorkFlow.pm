@@ -1647,8 +1647,16 @@ sub viewTask {
     my ($DocumentData, $fields) = populateDocumentViewData($Data, $dref);
     %DocumentData = %{$DocumentData};
 
-    my ($PaymentsData) = populateRegoPaymentsViewData($Data, $dref);
-    %PaymentsData = %{$PaymentsData};
+    my $paymentBlock = '';
+    if ($dref->{strWFRuleFor} eq 'REGO')    {
+        my ($PaymentsData) = populateRegoPaymentsViewData($Data, $dref);
+        %PaymentsData = %{$PaymentsData};
+        $paymentBlock = runTemplate(
+            $Data,
+            \%PaymentsData,
+            'workflow/generic/payment.templ'
+        );
+    }
 
     my ($NotesData) = populateTaskNotesViewData($Data, $dref);
     %NotesData = %{$NotesData};
@@ -1660,11 +1668,6 @@ sub viewTask {
         'workflow/generic/document.templ'
     );
 
-    my $paymentBlock = runTemplate(
-        $Data,
-        \%PaymentsData,
-        'workflow/generic/payment.templ'
-    );
 
     my $notesBlock = runTemplate(
         $Data,
