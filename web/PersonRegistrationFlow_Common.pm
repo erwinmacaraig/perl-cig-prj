@@ -168,7 +168,7 @@ sub displayRegoFlowDocuments    {
     if ($pref->{'strStatus'} ne $Defs::PERSON_STATUS_INPROGRESS)    {
         $personRegoNature = 'RENEWAL';
     }
-    my $personLeveldocs = loadPersongetRegistrationItems(
+    my $personLeveldocs = getRegistrationItems(
         $Data,
         'PERSON',
         'DOCUMENT',
