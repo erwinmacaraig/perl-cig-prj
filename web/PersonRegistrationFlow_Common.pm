@@ -547,6 +547,7 @@ sub savePlayerPassport{
 
     my @statusIN = ($Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);  #Might need changing
     my %Reg = (
+        personType => $Defs::PERSON_TYPE_PLAYER,
         sport=> $Defs::SPORT_TYPE_FOOTBALL,
         statusIN=>\@statusIN,
     );
