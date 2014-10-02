@@ -1861,8 +1861,8 @@ sub populateDocumentViewData {
         FROM tblWFRuleDocuments AS rd
         INNER JOIN tblWFTask AS wt ON (wt.intWFRuleID = rd.intWFRuleID)
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (pr.intPersonRegistrationID = wt.intPersonRegistrationID)
-        INNER JOIN tblDocuments AS d ON $joinCondition
-        INNER JOIN tblDocumentType dt ON (dt.intDocumentTypeID = d.intDocumentTypeID )
+        LEFT JOIN tblDocuments AS d ON $joinCondition
+        LEFT JOIN tblDocumentType dt ON (dt.intDocumentTypeID = rd.intDocumentTypeID )
         WHERE 
             wt.intWFTaskID = ?
             AND wt.intRealmID = ?
@@ -1886,9 +1886,13 @@ sub populateDocumentViewData {
         'action' => 'WF_Verify',
     );
 
+    my $count = 0;
     while(my $tdref = $q->fetchrow_hashref()) {
+        $count++;
         my $displayVerify;
+        my $displayAdd;
 
+        #warn "DOCUMENT TYPE ID " . $tdref->{'intDocumentTypeID'};
         if($tdref->{'intAllowProblemResolutionLevel'} eq 1 and $tdref->{'intAllowVerify'} == 1) {
             $displayVerify = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
         }
@@ -1896,13 +1900,22 @@ sub populateDocumentViewData {
             $displayVerify = 1;
         }
 
+        if($tdref->{'intAllowProblemResolutionLevel'} eq 1 and $tdref->{'intAllowVerify'} == 1 and !$tdref->{'intDocumentID'}) {
+            $displayAdd = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
+        }
+        elsif ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowVerify'} == 1 and !$tdref->{'intDocumentID'}) {
+            $displayAdd = 1;
+        }
+
         my %documents = (
             DocumentID => $tdref->{'intDocumentID'},
-            Status => $tdref->{'strApprovalStatus'},
+            Status => $tdref->{'strApprovalStatus'} || "MISSING",
             DocumentType => $tdref->{'strDocumentName'},
             Verifier => $tdref->{'strLocalName'},
             DisplayVerify => $displayVerify || '',
+            DisplayAdd => $displayAdd || '',
         );
+
         push @RelatedDocuments, \%documents;
     }
 
