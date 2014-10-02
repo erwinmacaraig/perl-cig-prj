@@ -32,6 +32,8 @@ use WorkFlow;
 use Person;
 use Data::Dumper;
 use POSIX qw(strftime);
+use Date::Parse;
+
 sub displayRegoFlowCompleteBulk {
 
     my ($Data, $client) = @_;
@@ -541,22 +543,27 @@ sub savePlayerPassport{
 		
 		#DELETE RECORD
 		$query = "DELETE FROM tblPlayerPassport WHERE intPersonID= ? and strOrigin= 'REGO'";
-		my $sth = $Data->{'db'}->prepare($query); 
+		$sth = $Data->{'db'}->prepare($query); 
 		$sth->execute($personID);
 	} 
+	
+	
+	$query = qq[SELECT intPersonRegistrationID, intPersonID, intEntityID, strPersonType, strPersonLevel, 
+dtFrom, dtTo,intNationalPeriodID, strRealmName, strAgeLevel, YEAR(dtTo) as yrDtTo FROM tblPersonRegistration_$Data->{'Realm'} 
+ INNER JOIN tblRealms ON tblPersonRegistration_$Data->{'Realm'}.intRealmID = tblRealms.intRealmID WHERE intPersonID = ? AND strPersonType = 'PLAYER' AND strSport = 'FOOTBALL' AND strStatus IN ('PASSIVE', 'ACTIVE', 'ROLLED_OVER')
+ORDER BY dtFrom];	
+	
+	$sth = $Data->{'db'}->prepare($query); 
+	$sth->execute($personID); 
+	
+	#get all Possible Registration candidate to be placed in tblPlayerPassport 
+	# FROM these records choose the ones in which PersonAge >= 12 
 
     my $pref = loadPersonDetails($Data->{'db'}, $personID);  #Get DOB
-    my @statusIN = ($Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);  #Might need changing
-    my %Reg = (
-        personType => $Defs::PERSON_TYPE_PLAYER,
-        sport=> $Defs::SPORT_TYPE_FOOTBALL,
-        statusIN=>\@statusIN,
-    );
-    my ($count, $regs) = getRegistrationData(
-        $Data,
-        $personID,
-        \%Reg
-    );
+    my $yearBorn = $pref->{'dtDOB_year'};     
+    
+     
+   
     my $stPP= qq[
         INSERT INTO tblPlayerPassport (
             intPersonID,
@@ -579,28 +586,86 @@ sub savePlayerPassport{
             ?
      )];
      my $qPP = $Data->{'db'}->prepare($stPP); 
-
-    ##Loop these
-    foreach my $reg (@{$regs})  {
-        #If the person was 12 years old in the period include that period
-        #If there multiple UNBROKEN periods for the ONE club/ONE personLevel then make ONE row
-        #If there is a BROKEN dtFrom/dtTo then split the rows up
-	
-    ### MAYBE STORE EXISTING WORK IN A HASH and see if its an INSERT or UPDATE to new End Date
-	    # INSERT THE NEW RECORD
-    my $FromDate = ''; #??
-    my $ToDate = ''; #??
-        $qPP->execute(
-            $personID,
-            'REGO', 
-            $reg->{'strPersonLevel'}, 
-            $reg->{'intEntityID'}, 
-            $reg->{'strLocalName'},
-            $reg->{'strRealmName'},
-            $FromDate, 
-            $ToDate
-        ); 
-    }
+     
+     my $eID = 0;
+     my $level = '';
+     my $dtFrom = '';
+     my $dtTo = '';
+     my $rowCount = 0;
+     my $currentunixtimevalue = 0;
+     my $tempunixtimevalue = 0;
+     my %Reg = ();
+     my $count = 0;
+     my $regs; 
+     my $lastPRID = 0;
+     my $lastRealmName = '';
+     my @statusIN = ($Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE); 
+     while(my $dref = $sth->fetchrow_hashref()){
+     	
+     	###
+     	#check age 
+     	next if( ($dref->{'yrDtTo'} - $yearBorn) < 12 );
+     	if($rowCount == 0){
+     		$eID = $dref->{'intEntityID'};
+     		$level = $dref->{'strPersonLevel'}; 
+     		$dtFrom = $dref->{'dtFrom'};
+     		$dtTo = $dref->{'dtTo'}; 
+     		$lastPRID = $dref->{'intPersonRegistrationID'};	
+            $lastRealmName = $dref->{'strRealmName'};
+     		$rowCount++;
+     		next;
+     	}
+     	
+        $rowCount++;
+        if( $eID != $dref->{'intEntityID'} || $level ne $dref->{'strPersonLevel'} ){
+        	#need to get strEntityName, strMAName,  
+        	 #@statusIN = ($Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);  #Might need changing
+             %Reg = (
+                  personType => $Defs::PERSON_TYPE_PLAYER,
+                  sport=> $Defs::SPORT_TYPE_FOOTBALL,
+                  statusIN=>\@statusIN,
+                  personRegistrationID => $dref->{'intPersonRegistrationID'}
+              );
+              
+              ###
+              
+              
+              ($count, $regs) = getRegistrationData(
+                  $Data,
+                  $personID,
+                  \%Reg
+              );
+        	###
+        	print STDERR "Registration Fields: " . Dumper($regs); 
+        	
+        	$qPP->execute($personID,'REGO', $level, $eID, $regs->[0]{'strLocalName'}, $dref->{'strRealmName'}, $dtFrom, $dtTo);
+        	$eID = $dref->{'intEntityID'};
+     		$level = $dref->{'strPersonLevel'}; 
+     		$dtFrom = $dref->{'dtFrom'};
+     		$dtTo = $dref->{'dtTo'}; 
+        }
+        else {
+        	 $currentunixtimevalue = str2time($dref->{'dtTo'});
+    	     $tempunixtimevalue = str2time($dtTo);
+    	     if($currentunixtimevalue > $tempunixtimevalue){
+    	     	$dtTo = $dref->{'dtTo'}; 
+    	     }
+        }
+        $lastPRID = $dref->{'intPersonRegistrationID'};	
+        $lastRealmName = $dref->{'strRealmName'};
+     } #end while
+     
+     $Reg{'personRegistrationID'} = $lastPRID;
+     ($count, $regs) = getRegistrationData(
+         $Data,
+         $personID,
+         \%Reg
+      );
+      print STDERR "The value at the exit point of strRealmName is " . $lastRealmName;
+      print STDERR "The value at the exit point of strRealmName using regs is " . $regs->[0]{'strRealmName'};
+      $qPP->execute($personID,'REGO', $level, $eID, $regs->[0]{'strLocalName'}, $lastRealmName, $dtFrom, $dtTo);
+      # need to get the Date because we need to get the age
+    
 }
 #####################################################################
 1;
