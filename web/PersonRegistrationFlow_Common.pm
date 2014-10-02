@@ -33,6 +33,7 @@ use Person;
 use Data::Dumper;
 use POSIX qw(strftime);
 use Date::Parse;
+use PlayerPassport;
 
 sub displayRegoFlowCompleteBulk {
 
@@ -94,24 +95,8 @@ sub displayRegoFlowComplete {
          if (1==2)   {
             $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
          }
-         ##################################################################################
-         #check sport, check if person is a PLAYER and registration status if ACTIVE
          
-         my @status = ('ACTIVE','PASSIVE','ROLLED_OVER','TRANSFERRED');
-         
-         if( ($rego_ref->{'Sport'} eq 'Football') && ($rego_ref->{'PersonType'} eq 'Player') && ( grep (/$rego_ref->{'strStatus'}/,@status) ) ){ 
-         ###
-         # Query db for person DOB
-              my $query = "SELECT YEAR(CURDATE()) - YEAR(dtDOB) as age FROM tblPerson WHERE YEAR(CURDATE()) - YEAR(dtDOB) >= 12 AND dtDOB <> '0000-00-00' AND intPersonID = ?";
-              my $sth = $Data->{'db'}->prepare($query);
-              $sth->execute($personID); 
-              my $ageRef = $sth->fetchrow_hashref(); 
-              # if football player age is greater or equal to 13
-              if(!undef $ageRef){              	
-              	#savePlayerPassport($Data, $entityID, $personID,$rego_ref->{'PersonLevel'});              	
-              }
-        }
-        #####################################################################################
+          savePlayerPassport($Data, $personID);
         my %PageData = (
             person_home_url => $url,
             gateways => $gateways,
@@ -523,150 +508,10 @@ sub bulkRegoSubmit {
             UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $logID);
             product_apply_transaction($Data,$logID);
         }
+          savePlayerPassport($Data, $pID);
     }
     
     return $body;
 }
-#################################################################
-sub OLDsavePlayerPassport{ 
-	my ($Data, $entityID, $personID, $personLevel) = @_;
-	
-	#check if uninterrupted
-	my $query = qq[SELECT * FROM tblPlayerPassport WHERE intEntityID = ?];
-	my $sth = $Data->{'db'}->prepare($query); 
-	$sth->execute($entityID);
-	my $uninterrupted = $sth->fetchrow_hashref();
-	my $theDate = strftime "%F", localtime;
-			
-	if(defined $uninterrupted->{'dtFrom'}){
-		$theDate = $uninterrupted->{'dtFrom'};		
-		
-		#DELETE RECORD
-		$query = "DELETE FROM tblPlayerPassport WHERE intPersonID= ? and strOrigin= 'REGO'";
-		$sth = $Data->{'db'}->prepare($query); 
-		$sth->execute($personID);
-	} 
-	
-	
-	$query = qq[SELECT intPersonRegistrationID, intPersonID, intEntityID, strPersonType, strPersonLevel, 
-dtFrom, dtTo,intNationalPeriodID, strRealmName, strAgeLevel, YEAR(dtTo) as yrDtTo FROM tblPersonRegistration_$Data->{'Realm'} 
- INNER JOIN tblRealms ON tblPersonRegistration_$Data->{'Realm'}.intRealmID = tblRealms.intRealmID WHERE intPersonID = ? AND strPersonType = 'PLAYER' AND strSport = 'FOOTBALL' AND strStatus IN ('PASSIVE', 'ACTIVE', 'ROLLED_OVER')
-ORDER BY dtFrom];	
-	
-	$sth = $Data->{'db'}->prepare($query); 
-	$sth->execute($personID); 
-	
-	#get all Possible Registration candidate to be placed in tblPlayerPassport 
-	# FROM these records choose the ones in which PersonAge >= 12 
-
-    my $pref = loadPersonDetails($Data->{'db'}, $personID);  #Get DOB
-    my $yearBorn = $pref->{'dtDOB_year'};     
-    
-     
-   
-    my $stPP= qq[
-        INSERT INTO tblPlayerPassport (
-            intPersonID,
-            strOrigin,
-            strPersonLevel,
-            intEntityID,
-            strEntityName,
-            strMAName,
-            dtFrom, 
-            dtTo
-        )  
-        VALUES (
-            ?, 
-            ?, 
-            ?, 
-            ?, 
-            ?, 
-            ?, 
-            ?, 
-            ?
-     )];
-     my $qPP = $Data->{'db'}->prepare($stPP); 
-     
-     my $eID = 0;
-     my $level = '';
-     my $dtFrom = '';
-     my $dtTo = '';
-     my $rowCount = 0;
-     my $currentunixtimevalue = 0;
-     my $tempunixtimevalue = 0;
-     my %Reg = ();
-     my $count = 0;
-     my $regs; 
-     my $lastPRID = 0;
-     my $lastRealmName = '';
-     my @statusIN = ($Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE); 
-     while(my $dref = $sth->fetchrow_hashref()){
-     	
-     	###
-     	#check age 
-     	next if( ($dref->{'yrDtTo'} - $yearBorn) < 12 );
-     	if($rowCount == 0){
-     		$eID = $dref->{'intEntityID'};
-     		$level = $dref->{'strPersonLevel'}; 
-     		$dtFrom = $dref->{'dtFrom'};
-     		$dtTo = $dref->{'dtTo'}; 
-     		$lastPRID = $dref->{'intPersonRegistrationID'};	
-            $lastRealmName = $dref->{'strRealmName'};
-     		$rowCount++;
-     		next;
-     	}
-     	
-        $rowCount++;
-        if( $eID != $dref->{'intEntityID'} || $level ne $dref->{'strPersonLevel'} ){
-        	#need to get strEntityName, strMAName,  
-        	 #@statusIN = ($Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);  #Might need changing
-             %Reg = (
-                  personType => $Defs::PERSON_TYPE_PLAYER,
-                  sport=> $Defs::SPORT_TYPE_FOOTBALL,
-                  statusIN=>\@statusIN,
-                  personRegistrationID => $dref->{'intPersonRegistrationID'}
-              );
-              
-              ###
-              
-              
-              ($count, $regs) = getRegistrationData(
-                  $Data,
-                  $personID,
-                  \%Reg
-              );
-        	###
-        	print STDERR "Registration Fields: " . Dumper($regs); 
-        	
-        	$qPP->execute($personID,'REGO', $level, $eID, $regs->[0]{'strLocalName'}, $dref->{'strRealmName'}, $dtFrom, $dtTo);
-        	$eID = $dref->{'intEntityID'};
-     		$level = $dref->{'strPersonLevel'}; 
-     		$dtFrom = $dref->{'dtFrom'};
-     		$dtTo = $dref->{'dtTo'}; 
-        }
-        else {
-        	 $currentunixtimevalue = str2time($dref->{'dtTo'});
-    	     $tempunixtimevalue = str2time($dtTo);
-    	     if($currentunixtimevalue > $tempunixtimevalue){
-    	     	$dtTo = $dref->{'dtTo'}; 
-    	     }
-        }
-        $lastPRID = $dref->{'intPersonRegistrationID'};	
-        $lastRealmName = $dref->{'strRealmName'};
-     } #end while
-     
-     $Reg{'personRegistrationID'} = $lastPRID;
-     ($count, $regs) = getRegistrationData(
-         $Data,
-         $personID,
-         \%Reg
-      );
-      print STDERR "The value at the exit point of strRealmName is " . $lastRealmName;
-      print STDERR "The value at the exit point of strRealmName using regs is " . $regs->[0]{'strRealmName'};
-      $qPP->execute($personID,'REGO', $level, $eID, $regs->[0]{'strLocalName'}, $lastRealmName, $dtFrom, $dtTo);
-      # need to get the Date because we need to get the age
-    
-}
-#####################################################################
 1;
 

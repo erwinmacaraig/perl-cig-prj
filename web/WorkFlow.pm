@@ -33,6 +33,7 @@ use Duplicates;
 use PersonRegistration;
 use Data::Dumper;
 use Switch;
+use PlayerPassport;
 use CGI qw(param unescape escape);
 
 sub cleanTasks  {
@@ -947,14 +948,13 @@ sub checkForOutstandingTasks {
 	        	$rc = 1;	# All registration tasks have been completed        		
                 PersonRegistration::rolloverExistingPersonRegistrations($Data, $personID, $personRegistrationID);
 				# Do the check
-				$st = qq[SELECT strPersonType, strSport, (YEAR(CURDATE()) - YEAR(dtDOB)) as age FROM tblPersonRegistration_$Data->{Realm} INNER JOIN tblPerson
-				         ON tblPersonRegistration_$Data->{'Realm'}.intPersonID = tblPerson.intPersonID WHERE intPersonRegistrationID = ?]; 
+				$st = qq[SELECT strPersonType, strSport FROM tblPersonRegistration_$Data->{Realm} WHERE intPersonRegistrationID = ?]; 
                 $q = $db->prepare($st);
 				$q->execute($personRegistrationID);   
 				my $ppref = $q->fetchrow_hashref();				
                 # if check  pass call save
-                if( ($ppref->{'strPersonType'} eq 'PLAYER') && ($ppref->{'strSport'} eq 'FOOTBALL') && ($ppref->{'age'} >= 12) ){
-                	#PersonRegistrationFlow_Common::savePlayerPassport($Data, $entityID, $personID, $ppref->{'strPersonLevel'});  
+                if( ($ppref->{'strPersonType'} eq 'PLAYER') && ($ppref->{'strSport'} eq 'FOOTBALL'))    {
+                	savePlayerPassport($Data, $personID);
                 }
            ##############################################################################################################        
         }
