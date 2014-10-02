@@ -28,7 +28,6 @@ sub handlePersonFlow {
     my $entityLevel = getLastEntityLevel($clientValues) || 0;
     my $originLevel = $Data->{'clientValues'}{'authLevel'} || 0;
 
-
     my $flow = new Flow_PersonBackend(
         db => $Data->{'db'},
         Data => $Data,

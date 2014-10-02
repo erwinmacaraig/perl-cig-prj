@@ -507,7 +507,7 @@ sub gather    {
 
                     if ( $d and $m and $y ) {
                         $fieldvalue = "$d/$m/$y";
-                        $fieldvalue = $self->_fix_date($fieldvalue);
+                        $fieldvalue = $params->{$name} = $self->_fix_date($fieldvalue);
                     }
                 }
             }
@@ -540,7 +540,7 @@ sub gather    {
             next if $fv->{'readonly'};
             next if ( $permissions    and !$permissions->{$fieldname} );
             if($fv->{'label'})  {
-                push @problems, [$fv->{'label'} . ' : ' . $self->langlookup('Required')];
+                push @problems, $fv->{'label'} . ' : ' . $self->langlookup('Required');
             }
             next;
         }
@@ -551,7 +551,7 @@ sub gather    {
             my $errs =
               $self->_validate( $fv->{'validate'}, $params->{$name} );
             for my $err ( @{$errs} ) {
-                push @problems, [$fv->{'label'} . ' : ' . $err];
+                push @problems, $fv->{'label'} . ' : ' . $err;
             }
         }
         $fieldvalue =~ s/</&lt;/g if $self->{'Fields'}->{'options'}{'NoHTML'};
@@ -702,6 +702,8 @@ sub _fix_date {
     if ( !$dd or !$mm or !$yyyy ) {
         return ( $self->langlookup( "Invalid Date" ), '' );
     }
+    if    ( $mm < 10 )  { $mm = "0$mm"; }
+    if    ( $dd < 10 )  { $dd = "0$dd"; }
     if    ( $yyyy < 10 )  { $yyyy += 2000; }
     elsif ( $yyyy < 100 ) { $yyyy += 1900; }
     return "$yyyy-$mm-$dd";
@@ -725,7 +727,7 @@ sub check_valid_date {
     my ($date) = @_;
     return 1 if $date eq '0000-00-00';
     return 1 if $date eq '00/00/0000';
-    my ( $d, $m, $y ) = split /\//, $date;
+    my ( $y, $m, $d ) = split /\-/, $date;
     return Date::Calc::check_date( $y, $m, $d );
 }
 

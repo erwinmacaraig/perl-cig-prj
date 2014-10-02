@@ -12,9 +12,11 @@
 
 [% TextTop %]
 <form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">
-    [% Fields %]
+    [% IF Content %][% Content %][% END %]
     [% IF FlowNextAction %]
+[% IF !NoContinueButton %]
 	<input type = "submit" value = " [% Lang.txt('Continue') %] "  class = "button proceed-button">
+[% END %]
 	<input type = "hidden" name ="rfp" value ="[% FlowNextAction %]">
     [% END %]
 	[% HiddenFields %]

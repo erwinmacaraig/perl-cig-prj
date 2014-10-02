@@ -218,7 +218,7 @@ sub display {
       $templateData->{'Navigation'} = $self->Navigation();
   }
   my $output = runTemplate($self->{'Data'}, $templateData, $templateName);
-  if($templateData->{'Errors'}) {
+  if(scalar(@{$templateData->{'Errors'}})) {
     my $filledin = HTML::FillInForm->fill(\$output, $self->{'RunParams'});
     $output = $filledin;
   }

@@ -12,6 +12,9 @@ use PersonObj;
 use ConfigOptions;
 use InstanceOf;
 use Countries;
+use PersonRegisterWhat;
+use Reg_common;
+
 
 sub setProcessOrder {
     my $self = shift;
@@ -198,7 +201,7 @@ sub display_core_details    {
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        Fields => $fieldsContent || '',
+        Content => $fieldsContent || '',
         ScriptContent => $scriptContent || '',
         Title => '',
         TextTop => '',
@@ -216,9 +219,7 @@ sub validate_core_details    {
 
     my $userData = {};
     ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields();
-use Data::Dumper;
-print STDERR Dumper($userData);
-$self->{'RunDetails'}{'Errors'} = ['test error'];
+
     if(scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
         $self->setCurrentProcessIndex('cd');
@@ -230,7 +231,6 @@ $self->{'RunDetails'}{'Errors'} = ['test error'];
     $personObj->setValues($userData);
     $personObj->write();
     if(!$id)    {
-        warn("NEW" .$personObj->ID());
         $self->setID($personObj->ID());
     }
 
@@ -245,7 +245,7 @@ sub display_contact_details    {
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        Fields => $fieldsContent || '',
+        Content => $fieldsContent || '',
         ScriptContent => $scriptContent || '',
         Title => '',
         TextTop => '',
@@ -269,6 +269,65 @@ sub validate_contact_details    {
     if(scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
         $self->setCurrentProcessIndex('cond');
+        return ('',2);
+    }
+
+    my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
+    $personObj->setValues($userData);
+    $personObj->write();
+    return ('',1);
+}
+
+sub display_registration { 
+    my $self = shift;
+
+    my $personID = $self->ID();
+    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
+    my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
+
+    my $client = $self->{'Data'}->{'client'};
+    my $url = $self->{'Target'}."?rtp=".$self->getNextAction()."&".$self->stringifyURLCarryField();
+    my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID);
+    $personObj->load();
+    my ($dob, $gender) = $personObj->getValue(['dtDOB_RAW','intGender']); 
+    my $content = displayPersonRegisterWhat(
+        $self->{'Data'},
+        $personID,
+        $entityID,
+        $dob || '',
+        $gender || 0,
+        $originLevel,
+        $url,
+    );
+    my %PageData = (
+        HiddenFields => $self->stringifyCarryField(),
+        Target => $self->{'Data'}{'target'},
+        Errors => $self->{'RunDetails'}{'Errors'} || [],
+        Content => $content,
+        Title => '',
+        TextTop => '',
+        TextBottom => '',
+        NoContinueButton => 1,
+    );
+    my $pagedata = $self->display(\%PageData);
+
+    return ($pagedata,0);
+
+}
+
+sub process_registration { 
+    my $self = shift;
+
+    my $userData = {};
+    ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields();
+    my $id = $self->ID() || 0;
+    if(!$id)    {
+        push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person';
+    }
+    if(scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+        #There are errors - reset where we are to go back to the form again
+        $self->setCurrentProcessIndex('ru');
         return ('',2);
     }
 
