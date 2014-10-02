@@ -45,6 +45,11 @@
                                     [% END %]
                                 </form>
                                 [% END %]
+                                [% IF document.DisplayAdd == 1 %]
+                                <form action="[% DocumentAction.target %]" method="POST">
+                                    <input class="button-small generic-button" type="submit" name="add" value="add">
+                                </form>
+                                [% END %]
                             </div>
                         </td>
                     </tr>
