@@ -954,7 +954,7 @@ sub checkForOutstandingTasks {
 				my $ppref = $q->fetchrow_hashref();				
                 # if check  pass call save
                 if( ($ppref->{'strPersonType'} eq 'PLAYER') && ($ppref->{'strSport'} eq 'FOOTBALL') && ($ppref->{'age'} >= 12) ){
-                	PersonRegistrationFlow_Common::savePlayerPassport($Data, $entityID, $personID, $ppref->{'strPersonLevel'});  
+                	#PersonRegistrationFlow_Common::savePlayerPassport($Data, $entityID, $personID, $ppref->{'strPersonLevel'});  
                 }
            ##############################################################################################################        
         }

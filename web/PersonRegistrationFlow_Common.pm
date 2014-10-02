@@ -108,7 +108,7 @@ sub displayRegoFlowComplete {
               my $ageRef = $sth->fetchrow_hashref(); 
               # if football player age is greater or equal to 13
               if(!undef $ageRef){              	
-              	savePlayerPassport($Data, $entityID, $personID,$rego_ref->{'PersonLevel'});              	
+              	#savePlayerPassport($Data, $entityID, $personID,$rego_ref->{'PersonLevel'});              	
               }
         }
         #####################################################################################
@@ -528,7 +528,7 @@ sub bulkRegoSubmit {
     return $body;
 }
 #################################################################
-sub savePlayerPassport{ 
+sub OLDsavePlayerPassport{ 
 	my ($Data, $entityID, $personID, $personLevel) = @_;
 	
 	#check if uninterrupted
