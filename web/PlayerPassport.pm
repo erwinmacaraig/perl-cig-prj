@@ -41,7 +41,7 @@ sub savePlayerPassport{
             PR.intPersonID = ? 
             AND PR.strPersonType = 'PLAYER' 
             AND PR.strSport = 'FOOTBALL' 
-            AND PR.strStatus IN ('PASSIVE', 'ACTIVE', 'ROLLED_OVER')
+            AND PR.strStatus IN ('PASSIVE', 'ACTIVE', 'ROLLED_OVER', 'TRANSFERRED')
         ORDER BY PR.dtFrom
     ];	
 	
