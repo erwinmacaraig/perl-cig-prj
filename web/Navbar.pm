@@ -243,7 +243,7 @@ sub getEntityMenuData {
             url => $baseurl."a=FC_C_d",
         };
 
-        if($SystemConfig->{'AllowClearances'} 
+        if(1==2 and $SystemConfig->{'AllowClearances'} 
                 and !$hideClearances
                 and (!$Data->{'ReadOnlyLogin'} 
                     or  $SystemConfig->{'Overide_ROL_RequestClearance'})
@@ -339,7 +339,7 @@ sub getEntityMenuData {
         };
     }
     my $txt_RequestCLR = $SystemConfig->{'txtRequestCLR'} || 'Request a Clearance';
-if($SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequestClearance'}
+if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequestClearance'}
     ) {
         if(!$Data->{'ReadOnlyLogin'}) {
             $menuoptions{'newclearance'} = {
@@ -490,7 +490,7 @@ sub getAssocMenuData {
             or $data_access==$Defs::DATA_ACCESS_READONLY
     ) {
 
-        if($SystemConfig->{'AllowClearances'} 
+        if(1==2 and $SystemConfig->{'AllowClearances'} 
                 and $intAllowClearances
         ) {
             $menuoptions{'clearances'} = {
@@ -498,7 +498,7 @@ sub getAssocMenuData {
                 url => $baseurl."a=CL_list",
             };
         }
-        if($SystemConfig->{'DisplayOffLineClearances'}
+        if(1==2 and $SystemConfig->{'DisplayOffLineClearances'}
                 and $intAllowClearances
         )       {
             $menuoptions{'clearancesoff'} = {
@@ -704,7 +704,7 @@ sub getClubMenuData {
     );
     my $txt_RequestCLR = $SystemConfig->{'txtRequestCLR'} || 'Request a Clearance';
 
-    if($SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequestClearance'} 
+    if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequestClearance'} 
     ) {
         if(!$Data->{'ReadOnlyLogin'}) {
             $menuoptions{'newclearance'} = {
@@ -729,7 +729,7 @@ sub getClubMenuData {
             or $data_access==$Defs::DATA_ACCESS_READONLY
     ) {
 
-        if($SystemConfig->{'AllowClearances'} 
+        if(1==2 and $SystemConfig->{'AllowClearances'} 
                 and (!$Data->{'ReadOnlyLogin'} or
                 $SystemConfig->{'Overide_ROL_RequestClearance'}
             )
