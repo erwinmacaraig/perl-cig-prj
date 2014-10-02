@@ -1,0 +1,23 @@
+[% IF Navigation %]<div class = "progress">[% Navigation %]</div>[% END %]
+[% Title %]
+[% IF Errors.size %]
+<div class = "warningmsg">
+	<ul>
+	[% FOREACH error IN Errors %]
+		<li>[% error %]</li>
+	[% END %]
+	</ul>
+</div>
+[% END %]
+
+[% TextTop %]
+<form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">
+    [% Fields %]
+    [% IF FlowNextAction %]
+	<input type = "submit" value = " [% Lang.txt('Continue') %] "  class = "button proceed-button">
+	<input type = "hidden" name ="rfp" value ="[% FlowNextAction %]">
+    [% END %]
+	[% HiddenFields %]
+
+</form>
+[% TextBottom %]
