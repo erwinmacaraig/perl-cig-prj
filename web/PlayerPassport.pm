@@ -128,7 +128,9 @@ sub savePlayerPassport{
         $lastRealmName = $dref->{'strRealmName'};
      } #end while
      
+        if ($eID )  {
       $qPP->execute($personID,'REGO', $level, $eID, $lastEntityName, $lastRealmName, $dtFrom, $dtTo);
+        }
       # need to get the Date because we need to get the age
     
 }
