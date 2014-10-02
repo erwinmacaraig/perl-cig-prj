@@ -1,7 +1,3 @@
-#
-# $Header: svn://svn/SWM/trunk/web/comp/BaseObject.pm 10638 2014-02-10 01:01:16Z apurcell $
-#
-
 package BaseObject;
 
 use strict;
@@ -57,6 +53,14 @@ sub getValue  {
 		return @a;
 	}
   return $self->{'DBData'}{$field};
+}
+
+sub setValues   {
+  my $self = shift;
+  my($values)=@_;
+  for my $k (keys %{$values})   {
+     $self->{'DBData'}{$k} = $values->{$k};
+  }
 }
 
 sub getAllValues{
@@ -243,7 +247,14 @@ sub write {
         ];
         my $insert_stmt = $self->{'db'}->prepare($insert_sql);
         $insert_stmt->execute(@values);  
+        my $newId = $insert_stmt->{mysql_insertid};
+        if(!$self->{'DBData'}{$key_field})  {
+            if($newId)  {
+                $self->{'DBData'}{$key_field} = $newId;
+                $self->{'ID'} = $newId;
+            }
+        }
     }
-
 }
+
 1;

@@ -16,6 +16,7 @@ sub savePlayerPassport{
 	my ($Data, $personID) = @_;
 	
 	#DELETE RECORD
+## MIGHT NEED TO TAKE THE IMPORTED RECORD INTO ACCOUNT IN WORKING OUT TIME PERIODS
 	my $query = "DELETE FROM tblPlayerPassport WHERE intPersonID= ? and strOrigin= 'REGO'";
 	my $sth = $Data->{'db'}->prepare($query); 
 	$sth->execute($personID);
