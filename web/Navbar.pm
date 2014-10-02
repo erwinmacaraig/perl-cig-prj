@@ -855,10 +855,12 @@ sub getClubMenuData {
         url => $baseurl."a=C_DOCS",
     };
  
+    if (1==2)   {
         $menuoptions{'clubidentifier'} = {
            name => $lang->txt('Bulk Renewals'),
            url => $baseurl."a=C_ID_LIST",
         };
+    }
     my @menu_structure = (
         [ $lang->txt('Dashboard'), 'home','home'],
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}), 'menu', [
