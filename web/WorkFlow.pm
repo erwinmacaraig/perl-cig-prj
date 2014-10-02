@@ -1851,6 +1851,7 @@ sub populateDocumentViewData {
             rd.intWFRuleID,
             rd.intDocumentTypeID,
             rd.intAllowProblemResolutionLevel,
+            rd.intAllowVerify,
             wt.intApprovalEntityID,
             wt.intProblemResolutionEntityID,
             dt.strDocumentName,
@@ -1888,10 +1889,10 @@ sub populateDocumentViewData {
     while(my $tdref = $q->fetchrow_hashref()) {
         my $displayVerify;
 
-        if($tdref->{'intAllowProblemResolutionLevel'} eq 1) {
+        if($tdref->{'intAllowProblemResolutionLevel'} eq 1 and $tdref->{'intAllowVerify'} == 1) {
             $displayVerify = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
         }
-        elsif ($tdref->{'intApprovalEntityID'} == $entityID) {
+        elsif ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowVerify'} == 1) {
             $displayVerify = 1;
         }
 
@@ -1899,6 +1900,7 @@ sub populateDocumentViewData {
             DocumentID => $tdref->{'intDocumentID'},
             Status => $tdref->{'strApprovalStatus'},
             DocumentType => $tdref->{'strDocumentName'},
+            Verifier => $tdref->{'strLocalName'},
             DisplayVerify => $displayVerify || '',
         );
         push @RelatedDocuments, \%documents;
