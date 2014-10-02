@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS tblPersonRequest;
 CREATE TABLE `tblPersonRequest` (
     `intPersonRequestID` INT NOT NULL AUTO_INCREMENT,
     `strRequestType` VARCHAR(20) NOT NULL COMMENT 'ACCESS, TRANSFER',
@@ -18,7 +19,6 @@ CREATE TABLE `tblPersonRequest` (
     PRIMARY KEY (`intPersonRequestID`),
     KEY `index_intPersonID` (`intPersonID` ASC),
     KEY `index_intFromEntityID` (`intRequestFromEntityID` ASC),
-    KEY `index_intToEntityID` (`intRequestToEntityID` ASC))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
-)
+    KEY `index_intToEntityID` (`intRequestToEntityID` ASC)
+) DEFAULT CHARACTER SET = utf8;
+
