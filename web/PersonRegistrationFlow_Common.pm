@@ -32,6 +32,9 @@ use WorkFlow;
 use Person;
 use Data::Dumper;
 use POSIX qw(strftime);
+use Date::Parse;
+use PlayerPassport;
+
 sub displayRegoFlowCompleteBulk {
 
     my ($Data, $client) = @_;
@@ -92,24 +95,8 @@ sub displayRegoFlowComplete {
          if (1==2)   {
             $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
          }
-         ##################################################################################
-         #check sport, check if person is a PLAYER and registration status if ACTIVE
          
-         my @status = ('ACTIVE','PASSIVE','ROLLED_OVER','TRANSFERRED');
-         
-         if( ($rego_ref->{'Sport'} eq 'Football') && ($rego_ref->{'PersonType'} eq 'Player') && ( grep (/$rego_ref->{'strStatus'}/,@status) ) ){ 
-         ###
-         # Query db for person DOB
-              my $query = "SELECT YEAR(CURDATE()) - YEAR(dtDOB) as age FROM tblPerson WHERE YEAR(CURDATE()) - YEAR(dtDOB) >= 12 AND dtDOB <> '0000-00-00' AND intPersonID = ?";
-              my $sth = $Data->{'db'}->prepare($query);
-              $sth->execute($personID); 
-              my $ageRef = $sth->fetchrow_hashref(); 
-              # if football player age is greater or equal to 13
-              if(!undef $ageRef){              	
-              	savePlayerPassport($Data, $entityID, $personID,$rego_ref->{'PersonLevel'});              	
-              }
-        }
-        #####################################################################################
+          savePlayerPassport($Data, $personID);
         my %PageData = (
             person_home_url => $url,
             gateways => $gateways,
@@ -521,87 +508,10 @@ sub bulkRegoSubmit {
             UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $logID);
             product_apply_transaction($Data,$logID);
         }
+          savePlayerPassport($Data, $pID);
     }
     
     return $body;
 }
-#################################################################
-sub savePlayerPassport{ 
-	my ($Data, $entityID, $personID, $personLevel) = @_;
-	
-	#check if uninterrupted
-	my $query = qq[SELECT * FROM tblPlayerPassport WHERE intEntityID = ?];
-	my $sth = $Data->{'db'}->prepare($query); 
-	$sth->execute($entityID);
-	my $uninterrupted = $sth->fetchrow_hashref();
-	my $theDate = strftime "%F", localtime;
-			
-	if(defined $uninterrupted->{'dtFrom'}){
-		$theDate = $uninterrupted->{'dtFrom'};		
-		
-		#DELETE RECORD
-		$query = "DELETE FROM tblPlayerPassport WHERE intPersonID= ? and strOrigin= 'REGO'";
-		my $sth = $Data->{'db'}->prepare($query); 
-		$sth->execute($personID);
-	} 
-
-    my $pref = loadPersonDetails($Data->{'db'}, $personID);  #Get DOB
-    my @statusIN = ($Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);  #Might need changing
-    my %Reg = (
-        personType => $Defs::PERSON_TYPE_PLAYER,
-        sport=> $Defs::SPORT_TYPE_FOOTBALL,
-        statusIN=>\@statusIN,
-    );
-    my ($count, $regs) = getRegistrationData(
-        $Data,
-        $personID,
-        \%Reg
-    );
-    my $stPP= qq[
-        INSERT INTO tblPlayerPassport (
-            intPersonID,
-            strOrigin,
-            strPersonLevel,
-            intEntityID,
-            strEntityName,
-            strMAName,
-            dtFrom, 
-            dtTo
-        )  
-        VALUES (
-            ?, 
-            ?, 
-            ?, 
-            ?, 
-            ?, 
-            ?, 
-            ?, 
-            ?
-     )];
-     my $qPP = $Data->{'db'}->prepare($stPP); 
-
-    ##Loop these
-    foreach my $reg (@{$regs})  {
-        #If the person was 12 years old in the period include that period
-        #If there multiple UNBROKEN periods for the ONE club/ONE personLevel then make ONE row
-        #If there is a BROKEN dtFrom/dtTo then split the rows up
-	
-    ### MAYBE STORE EXISTING WORK IN A HASH and see if its an INSERT or UPDATE to new End Date
-	    # INSERT THE NEW RECORD
-    my $FromDate = ''; #??
-    my $ToDate = ''; #??
-        $qPP->execute(
-            $personID,
-            'REGO', 
-            $reg->{'strPersonLevel'}, 
-            $reg->{'intEntityID'}, 
-            $reg->{'strLocalName'},
-            $reg->{'strRealmName'},
-            $FromDate, 
-            $ToDate
-        ); 
-    }
-}
-#####################################################################
 1;
 

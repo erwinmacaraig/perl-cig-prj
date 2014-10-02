@@ -1485,7 +1485,7 @@ sub postPersonUpdate {
             return (0, $body);
         }
         else {
-            my $rc = addWorkFlowTasks(
+            my $rc = WorkFlow::addWorkFlowTasks(
                 $Data,
                 'PERSON', 
                 'NEW',
