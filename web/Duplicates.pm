@@ -22,6 +22,7 @@ use Notifications;
 use PersonRegistration;
 use RegoTypeLimits;
 use WorkFlow;
+use PlayerPassport;
 
 sub getDupTaskCount {
 
@@ -633,6 +634,8 @@ next if $dref->{$k} eq "'0000-00-00'";
 		$Data->{'db'}->do(qq[UPDATE tblDocuments SET intPersonID= $existingid WHERE intPersonID= $id_of_duplicate]);
 		$Data->{'db'}->do(qq[UPDATE tblPersonCertifications SET intPersonID= $existingid WHERE intPersonID= $id_of_duplicate]);
 		$Data->{'db'}->do(qq[UPDATE tblPlayerPassport SET intPersonID= $existingid WHERE intPersonID= $id_of_duplicate]);
+        savePlayerPassport($Data, $existingid);
+		$Data->{'db'}->do(qq[UPDATE tblPersonRequest SET intPersonID= $existingid WHERE intPersonID= $id_of_duplicate]);
 		$Data->{'db'}->do(qq[UPDATE tblWFTask SET intPersonID= $existingid WHERE intPersonID= $id_of_duplicate]);
 		$Data->{'db'}->do(qq[UPDATE tblClearance SET intPersonID = $existingid WHERE intPersonID=$id_of_duplicate]);
 		$Data->{'db'}->do(qq[UPDATE IGNORE tblAuth SET intID = $existingid WHERE intLevel=1 AND intID=$id_of_duplicate]);

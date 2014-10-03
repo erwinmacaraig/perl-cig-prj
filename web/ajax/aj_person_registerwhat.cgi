@@ -32,6 +32,7 @@ sub main	{
     my $realmIN = param('r') || 0;
     my $subRealmIN = param('sr') || 0;
     my $bulk= param('bulk') || 0;
+    my $defaultType = param('dtype') || '';
 
 warn("AJAXPId$personID");
 warn("AJAXeId$entityID");
@@ -57,6 +58,7 @@ warn("AJAXeId$entityID");
             $originLevel,
             $registrationNature,
             $personType,
+            $defaultType,
             $personEntityRole,
             $personLevel,
             $sport,

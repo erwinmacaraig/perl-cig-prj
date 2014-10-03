@@ -255,6 +255,10 @@ sub main {
     elsif ( $action =~ /^PREGFB_/ ) {
         ( $resultHTML, $pageHeading ) = handleRegistrationFlowBulk($action, \%Data);
     }
+    elsif ( $action =~ /^PF_/ ) {
+use PersonFlow;
+        ( $resultHTML, $pageHeading ) = handlePersonFlow($action, \%Data);
+    }
     elsif ( $action =~ /^PENDPR_/ ) {
         my $prID = safe_param( 'prID', 'number' );
         my $entityID = getID($Data{'clientValues'},$Data{'clientValues'}{'currentLevel'});
