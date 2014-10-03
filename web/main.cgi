@@ -65,6 +65,8 @@ use PersonRegistrationFlow_Backend;
 use PersonRegistrationFlow_Bulk;
 use PendingRegistrations;
 
+use PersonRequest;
+
 use Log;
 use Data::Dumper;
 
@@ -263,6 +265,9 @@ use PersonFlow;
         my $prID = safe_param( 'prID', 'number' );
         my $entityID = getID($Data{'clientValues'},$Data{'clientValues'}{'currentLevel'});
         ( $resultHTML, $pageHeading ) = handlePendingRegistrations($action, \%Data, $entityID, $prID);
+    }
+    elsif ( $action =~ /^PRA_/) {
+        ($resultHTML, $pageHeading) = handlePersonRequest($action, \%Data);
     }
     
    
