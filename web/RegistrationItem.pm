@@ -22,7 +22,6 @@ sub getRegistrationItems    {
     $multiPersonType ||= ''; ## For products, are multi regos used    
 
     return 0 if (! $itemType);
-	
     my $st = qq[
    SELECT 
             RI.intID,
@@ -54,26 +53,24 @@ sub getRegistrationItems    {
       ]; 
         
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
-    
-print STDERR "NNNNNNNNNN" . $Rego_ref->{'Nationality'};
     $q->execute(
-        $Data->{'Realm'},
-        $Data->{'RealmSubType'},
-        $ruleFor,
-        $originLevel,
-	    $regNature,
-        $Rego_ref->{'strEntityType'} || $Rego_ref->{'entityType'} || '',
-        $entityLevel,
-	    $Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '',
-	    $Rego_ref->{'strPersonLevel'} || $Rego_ref->{'personLevel'} || '',
-	    $Rego_ref->{'strPersonEntityRole'} || $Rego_ref->{'personEntityRole'} || '',
-	    $Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '',
-	    $Rego_ref->{'strAgeLevel'} || $Rego_ref->{'ageLevel'} || '',
-        $itemType, 
-        $Rego_ref->{'Nationality'} || '',
-        $Rego_ref->{'Nationality'} || '',
-        
-	) or query_error($st);
+	         $Data->{'Realm'}, 
+	        $Data->{'RealmSubType'}, 
+	        $ruleFor,
+	        $originLevel,
+		    $regNature,
+	        $Rego_ref->{'strEntityType'} || $Rego_ref->{'entityType'} || '',
+	        $entityLevel,
+		    $Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '',
+		    $Rego_ref->{'strPersonLevel'} || $Rego_ref->{'personLevel'} || '',
+		    $Rego_ref->{'strPersonEntityRole'} || $Rego_ref->{'personEntityRole'} || '',
+		    $Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '',
+		    $Rego_ref->{'strAgeLevel'} || $Rego_ref->{'ageLevel'} || '',
+	        $itemType, 
+	        $Rego_ref->{'Nationality'} || '',
+	        $Rego_ref->{'Nationality'} || '',
+	        
+		) or query_error($st);
     
     
     my @Items=();
