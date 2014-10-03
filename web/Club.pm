@@ -407,8 +407,6 @@ print STDERR "SSSS$action $clubID\n";
         strAssocNature
         intLegalTypeID
         strLegalID
-        dtFrom
-        dtTo
         strISOCountry
         strISOLocalLanguage
         strRegion
@@ -545,8 +543,6 @@ sub loadClubDetails {
      strLatinName,
      strLatinShortName,
      strLatinFacilityName,
-     dtFrom,
-     dtTo,
      strISOCountry,
      strISOLocalLanguage,
      strRegion,
