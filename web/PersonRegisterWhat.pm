@@ -258,6 +258,7 @@ print STDERR "AAAAAAAAAAAAAAAAAAAAAAA $defaultType\n";
                     $MATRIXwhere
                 GROUP BY $lookingForField
             ];
+print STDERR $st;
 
             @values = @MATRIXvalues;
         }
@@ -362,6 +363,7 @@ print STDERR "AAAAAAAAAAAAAAAAAAAAAAA $defaultType\n";
                 AND intRealmID = ?
                 AND intSubRealmID IN (0,?)
                 $MATRIXwhere
+                AND strRegistrationNature <> 'TRANSFER'
             GROUP BY $lookingForField
         ];
         @values = @MATRIXvalues;
