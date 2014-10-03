@@ -32,6 +32,8 @@ sub displayPersonRegisterWhat   {
         $bulk,
     ) = @_;
     $bulk ||= 0;
+    my $defaultType = param('dtype') || '';
+
     my %templateData = (
         originLevel => $originLevel || 0,
         personID => $personID || 0,
@@ -42,6 +44,7 @@ sub displayPersonRegisterWhat   {
         realmID => $Data->{'Realm'} || 0,
         realmSubTypeID => $Data->{'RealmSubType'} || 0,
         continueURL => $continueURL || '',
+        dtype=> $defaultType
     );
 
     my $template = "registration/what.templ";
@@ -64,6 +67,7 @@ sub optionsPersonRegisterWhat {
         $originLevel,
         $registrationNature,
         $personType,
+        $defaultType,
         $personEntityRole,
         $personLevel,
         $sport,
@@ -78,6 +82,7 @@ sub optionsPersonRegisterWhat {
     $bulk ||= 0;
 
 
+print STDERR "AAAAAAAAAAAAAAAAAAAAAAA $defaultType\n";
     my $pref= undef;
     $pref = loadPersonDetails($Data->{'db'}, $personID) if ($personID);
 
@@ -214,7 +219,7 @@ sub optionsPersonRegisterWhat {
         return ($roledata_ref, '');
     }
     elsif ($lookingForField eq 'strPersonType') {
-        my @personTypeOptions = getPersonTypeFromMatrix($Data, $realmID, $subRealmID, $MATRIXwhere, \@MATRIXvalues);
+        my @personTypeOptions = getPersonTypeFromMatrix($Data, $realmID, $subRealmID, $MATRIXwhere, \@MATRIXvalues, $defaultType);
 
         if(!@personTypeOptions) {
             return (undef, 'List of Person Type not found for the current realm.');
@@ -464,8 +469,14 @@ sub checkEntityAllowed {
 
 #FC-181 - tblMatrix will rule out (tblEntityRegistrationAllowed will not be used for now)
 sub getPersonTypeFromMatrix {
-    my($Data, $realmID, $subRealmID, $where, $values_ref) = @_;
-                       
+    my($Data, $realmID, $subRealmID, $where, $values_ref, $defaultType) = @_;
+
+    $defaultType ||= '';
+    my $defaultTypeWHERE = '';
+    if ($defaultType)   {
+        $defaultTypeWHERE = qq[ AND strPersonType = ? ];
+        push @{$values_ref}, $defaultType;
+    }
     my $st=qq[
         SELECT DISTINCT strPersonType
         FROM tblMatrix
@@ -475,6 +486,7 @@ sub getPersonTypeFromMatrix {
             AND intRealmID IN (0, ?)
             AND intSubRealmID IN (0, ?)
             $where
+            $defaultTypeWHERE
     ];
     my $query = $Data->{'db'}->prepare($st);
     $query->execute(@{$values_ref});
