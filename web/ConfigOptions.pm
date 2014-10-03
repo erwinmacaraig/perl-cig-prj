@@ -456,6 +456,9 @@ sub getFieldsList	{
         strGender
         strDiscipline
         intClubClassification
+        strMAID
+        dtFrom
+        dtTo
         ));
 
     return \@clubFields if $fieldtype eq 'Club';

@@ -156,11 +156,11 @@ print STDERR "SSSS$action $clubID\n";
     fields=>  {
       strFIFAID => {
         label => 'FIFA ID',
-        value => $field->{strFIFAID},
+        value => $field->{strFIFAID} || ' ',
         type  => 'text',
         size  => '40',
         maxsize => '150',
-        readonly =>($Data->{'clientValues'}{authLevel} < $Defs::LEVEL_NATIONAL),
+        
       },
       strLocalName => {
         label => 'Name',
@@ -189,6 +189,29 @@ print STDERR "SSSS$action $clubID\n";
         type  => 'text',
         size  => '30',
         maxsize => '50',
+      },
+      strMAID => {
+      	label => 'MA ID',
+      	value => $field->{strMAID},
+      	type => 'text',
+      	size => '30',
+      	maxsize => '100',
+      },
+      dtFrom => {
+        label       => 'Foundation Date',
+        value       => $field->{dtFrom},
+        type        => 'date',
+        datetype    => 'dropdown',
+        format      => 'dd/mm/yyyy',
+        validate    => 'DATE',            
+      }, 
+      dtTo => {
+        label       => 'Dissolution Date',
+        value       => $field->{dtTo},
+        type        => 'date',
+        datetype    => 'dropdown',
+        format      => 'dd/mm/yyyy',
+        validate    => 'DATE',            
       },
       strGender => {
           label => "Gender",
@@ -369,11 +392,14 @@ print STDERR "SSSS$action $clubID\n";
       },
     },
     order => [qw(
-        strFIFAID
+        strFIFAID        
         strLocalName
         strLocalShortName
         strLatinName
         strLatinShortName
+        strMAID
+        dtFrom
+        dtTo
         strGender
         strDiscipline
         strEntityType
@@ -507,6 +533,9 @@ sub loadClubDetails {
      strStatus,
      intCreatedByEntityID,
      strFIFAID,
+     strMAID,
+     dtFrom,
+     dtTo,
      strLocalName,
      intLegalTypeID,
      strLocalShortName,

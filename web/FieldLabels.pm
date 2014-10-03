@@ -132,7 +132,10 @@ sub getFieldLabels	{
             strMANotes => 'MA Comment',
             intLegalTypeID => 'Legal Entity Type', 
             strISOLocalLanguage => 'Local Name Language',
-            strLegalID => "Legal Type Number"
+            strLegalID => "Legal Type Number",
+            strMAID => 'MA ID',
+            dtFrom => 'Foundation Date',
+            dtTo => 'Dissolution Date',
             	
 	);
 	}
