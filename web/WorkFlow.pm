@@ -1852,6 +1852,7 @@ sub populateDocumentViewData {
             rd.intDocumentTypeID,
             rd.intAllowProblemResolutionLevel,
             rd.intAllowVerify,
+            tuf.intFileID,
             wt.intApprovalEntityID,
             wt.intProblemResolutionEntityID,
             dt.strDocumentName,
@@ -1863,6 +1864,7 @@ sub populateDocumentViewData {
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (pr.intPersonRegistrationID = wt.intPersonRegistrationID)
         LEFT JOIN tblDocuments AS d ON $joinCondition
         LEFT JOIN tblDocumentType dt ON (dt.intDocumentTypeID = rd.intDocumentTypeID )
+        LEFT JOIN tblUploadedFiles tuf ON (tuf.intFileID = d.intUploadFileID)
         WHERE 
             wt.intWFTaskID = ?
             AND wt.intRealmID = ?
@@ -1891,6 +1893,8 @@ sub populateDocumentViewData {
         $count++;
         my $displayVerify;
         my $displayAdd;
+        my $displayView;
+        my $viewLink = '';
 
         #warn "DOCUMENT TYPE ID " . $tdref->{'intDocumentTypeID'};
         if($tdref->{'intAllowProblemResolutionLevel'} eq 1 and $tdref->{'intAllowVerify'} == 1) {
@@ -1907,6 +1911,11 @@ sub populateDocumentViewData {
             $displayAdd = 1;
         }
 
+        if($tdref->{'intDocumentID'}) {
+            $displayView = 1;
+            $viewLink = qq[ <span style="position: relative" class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$tdref->{'intFileID'}" target="_blank">]. $Data->{'lang'}->txt('View') . q[</a></span>];
+        }
+
         my %documents = (
             DocumentID => $tdref->{'intDocumentID'},
             Status => $tdref->{'strApprovalStatus'} || "MISSING",
@@ -1914,6 +1923,9 @@ sub populateDocumentViewData {
             Verifier => $tdref->{'strLocalName'},
             DisplayVerify => $displayVerify || '',
             DisplayAdd => $displayAdd || '',
+            DisplayView => $displayView || '',
+            viewLink => $viewLink,
+            addLink => ''
         );
 
         push @RelatedDocuments, \%documents;
