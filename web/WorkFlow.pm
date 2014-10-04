@@ -34,6 +34,7 @@ use PersonRegistration;
 use Data::Dumper;
 use Switch;
 use PlayerPassport;
+use Documents;
 use CGI qw(param unescape escape);
 
 sub cleanTasks  {
@@ -184,6 +185,9 @@ sub handleWorkflow {
         else {
             ( $body, $title ) = ("", "No access");
         }
+    }
+    elsif ($action eq 'WF_amd') {
+        ($body, $title) = addMissingDocument($Data);
     }
 	else {
         ( $body, $title ) = listTasks( $Data );		
@@ -1858,9 +1862,39 @@ sub populateDocumentViewData {
             dt.strDocumentName,
             d.strApprovalStatus,
             d.intDocumentID,
-            pr.intNewBaseRecord
+            pr.intNewBaseRecord,
+            addPersonItem.intItemID as addPersonItemID,
+            regoItem.intItemID as regoItemID,
+            entityItem.intItemID as entityItemID
         FROM tblWFRuleDocuments AS rd
         INNER JOIN tblWFTask AS wt ON (wt.intWFRuleID = rd.intWFRuleID)
+        INNER JOIN tblWFRule as wr ON (wr.intWFRuleID = wt.intWFRuleID)
+        LEFT JOIN tblRegistrationItem as addPersonItem
+            ON (
+                addPersonItem.strItemType = 'DOCUMENT'
+                AND addPersonItem.intOriginLevel = wr.intOriginLevel
+                AND addPersonItem.strRuleFor = 'PERSON'
+                AND addPersonItem.intID = rd.intDocumentTypeID
+                )
+        LEFT JOIN tblRegistrationItem as regoItem
+            ON (
+                regoItem.strItemType = 'DOCUMENT'
+                AND regoItem.intOriginLevel = wr.intOriginLevel
+                AND regoItem.strRuleFor = 'REGO'
+                AND regoItem.intID = rd.intDocumentTypeID
+                AND regoItem.strRegistrationNature = '$dref->{'strRegistrationNature'}'
+                AND regoItem.strPersonType = '$dref->{'strPersonType'}'
+                AND regoItem.strPersonLevel = '$dref->{'strPersonLevel'}'
+                AND regoItem.strSport = '$dref->{'strSport'}'
+                AND regoItem.strAgeLevel = '$dref->{'strAgeLevel'}'
+                )
+        LEFT JOIN tblRegistrationItem as entityItem
+            ON (
+                entityItem.strItemType = 'DOCUMENT'
+                AND entityItem.intOriginLevel = wr.intOriginLevel
+                AND entityItem.strRuleFor = 'ENTITY'
+                AND entityItem.intID = rd.intDocumentTypeID
+                )
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (pr.intPersonRegistrationID = wt.intPersonRegistrationID)
         LEFT JOIN tblDocuments AS d ON $joinCondition
         LEFT JOIN tblDocumentType dt ON (dt.intDocumentTypeID = rd.intDocumentTypeID )
@@ -1895,7 +1929,14 @@ sub populateDocumentViewData {
         my $displayAdd;
         my $displayView;
         my $viewLink = '';
+        my $addLink = '';
 
+        my $registrationID = $tdref->{'regoItemID'} ? $dref->{'intPersonRegistrationID'} : 0;
+        my $targetID = $tdref->{'addPersonItemID'} ? $dref->{'intPersonID'} : 0;
+        #document for ENTITY
+        $targetID = (!$targetID and !$registrationID) ? $dref->{'intEntityID'} : $targetID;
+
+        print STDERR Dumper $tdref;
         #warn "DOCUMENT TYPE ID " . $tdref->{'intDocumentTypeID'};
         if($tdref->{'intAllowProblemResolutionLevel'} eq 1 and $tdref->{'intAllowVerify'} == 1) {
             $displayVerify = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
@@ -1909,6 +1950,7 @@ sub populateDocumentViewData {
         }
         elsif ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowVerify'} == 1 and !$tdref->{'intDocumentID'}) {
             $displayAdd = 1;
+            $addLink = qq[ <span style="position: relative" class="button-small generic-button"><a href="$Defs::base_url/main.cgi?a=WF_amd&amp;RegistrationID=" target="_blank">]. $Data->{'lang'}->txt('Add') . q[</a></span>];
         }
 
         if($tdref->{'intDocumentID'}) {
@@ -1925,7 +1967,7 @@ sub populateDocumentViewData {
             DisplayAdd => $displayAdd || '',
             DisplayView => $displayView || '',
             viewLink => $viewLink,
-            addLink => ''
+            addLink => $addLink
         );
 
         push @RelatedDocuments, \%documents;
@@ -2248,6 +2290,11 @@ sub checkRelatedTasks {
     }
 
     return $allComplete;
+}
+
+sub addMissingDocument {
+    my ($Data) = @_;
+
 }
 
 1;
