@@ -154,7 +154,8 @@ sub main {
          #needed to pass a parameter to accommodate single File Document Upload
          my $DocumentTypeID = param('doclisttype') || '';  
          my $RegistrationID = param('RegistrationID') || '';         
-        my $ID = getID( \%clientValues );
+         my $memberID = param('memberID') || 0;
+        my $ID = $memberID || getID( \%clientValues);
         ( $resultHTML, $pageHeading ) =
           handle_documents( $action, \%Data, $ID, $DocumentTypeID,$RegistrationID );
           
