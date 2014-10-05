@@ -32,6 +32,7 @@ sub main	{
     my $realmIN = param('r') || 0;
     my $subRealmIN = param('sr') || 0;
     my $bulk= param('bulk') || 0;
+    my $defaultType = param('dtype') || '';
 
     my %Data=();
     my $target='aj_person_registerwhat.cgi';
@@ -55,6 +56,7 @@ sub main	{
             $originLevel,
             $registrationNature,
             $personType,
+            $defaultType,
             $personEntityRole,
             $personLevel,
             $sport,

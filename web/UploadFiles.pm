@@ -51,7 +51,7 @@ sub getUploadedFiles	{
 	);
 	my @rows = ();
 	while(my $dref = $q->fetchrow_hashref())	{
-		my $url = "$Defs::base_url/getfile.cgi?client=$client&amp;f=$dref->{'intFileID'}";
+		my $url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}";
 		my $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
 		my $deleteURLButton = qq[ <span class="button-small generic-button"><a href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a></span>];
 		my $urlViewButton = qq[ <span class="button-small generic-button"><a href="$url">]. $Data->{'lang'}->txt('View'). q[</a></span>];

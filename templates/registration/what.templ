@@ -5,7 +5,6 @@
 <input type = "hidden" id = "rID" value = "[% realmID %]">
 <input type = "hidden" id = "srID" value = "[% realmSubTypeID %]">
 <input type = "hidden" id = "client" value = "[% client %]">
-
 <a href = "" id = "regopt-reset-btn">[% Lang.txt('Reset') %]</a>
 <div id = "chosenOptions_wrapper">
     <input type = "hidden" id = "selected_sport">
@@ -60,11 +59,11 @@
 </form>
 <script>
     function regopt_start()   {
-        update_options('type');
+        update_options('type', '[% dtype %]');
     }
-    function update_options(optionType)   {
-
+    function update_options(optionType, dtype)   {
         var qstring = '';
+        qstring = qstring + '&dtype=' + dtype;
         qstring = qstring + '&sp=' + jQuery('#selected_sport').val();
         qstring = qstring + '&pt=' + jQuery('#selected_type').val();
         qstring = qstring + '&per=' + jQuery('#selected_role').val();

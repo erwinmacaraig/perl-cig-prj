@@ -65,6 +65,8 @@ use PersonRegistrationFlow_Backend;
 use PersonRegistrationFlow_Bulk;
 use PendingRegistrations;
 
+use PersonRequest;
+
 use Log;
 use Data::Dumper;
 
@@ -152,7 +154,8 @@ sub main {
          #needed to pass a parameter to accommodate single File Document Upload
          my $DocumentTypeID = param('doclisttype') || '';  
          my $RegistrationID = param('RegistrationID') || '';         
-        my $ID = getID( \%clientValues );
+         my $memberID = param('memberID') || 0;
+        my $ID = $memberID || getID( \%clientValues);
         ( $resultHTML, $pageHeading ) =
           handle_documents( $action, \%Data, $ID, $DocumentTypeID,$RegistrationID );
           
@@ -263,6 +266,9 @@ use PersonFlow;
         my $prID = safe_param( 'prID', 'number' );
         my $entityID = getID($Data{'clientValues'},$Data{'clientValues'}{'currentLevel'});
         ( $resultHTML, $pageHeading ) = handlePendingRegistrations($action, \%Data, $entityID, $prID);
+    }
+    elsif ( $action =~ /^PRA_/) {
+        ($resultHTML, $pageHeading) = handlePersonRequest($action, \%Data);
     }
     
    
