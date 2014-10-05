@@ -432,7 +432,7 @@ sub listDocuments {
       $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=DOC_L">].$Data->{'lang'}->txt('Add').qq[</a></span>];
 
   }
-   my $query = qq[
+   $query = qq[
          SELECT strDocumentName, intDocumentTypeID FROM tblDocumentType WHERE strDocumentFor = ? AND intRealmID IN (0,?)
     ]; 
     $sth = $db->prepare($query);

@@ -35,6 +35,7 @@ sub showPersonHome	{
         	%configchanges = eval( $Data->{'SystemConfig'}{'PersonFormReLayout'} );
     	}
 
+warn("personID $personID");
 	my ($fields_grouped, $groupdata) = getMemFields($Data, $personID, $FieldDefinitions, $memperms, $personObj, \%configchanges);
 	my ($photo,undef)=handle_photo('P_PH_s',$Data,$personID);
 	my $name = $personObj->name();
@@ -119,8 +120,6 @@ sub showPersonHome	{
     $RegFilters{'statusIN'} = \@statusIN;
     my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
 
-    my $client = $Data->{'client'};
-    
     foreach my $rego (@{$Reg_ref})  {
         my $renew = '';
         $rego->{'renew_link'} = '';

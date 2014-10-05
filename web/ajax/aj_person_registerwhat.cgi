@@ -33,8 +33,6 @@ sub main	{
     my $subRealmIN = param('sr') || 0;
     my $bulk= param('bulk') || 0;
 
-warn("AJAXPId$personID");
-warn("AJAXeId$entityID");
     my %Data=();
     my $target='aj_person_registerwhat.cgi';
     $Data{'target'}=$target;
@@ -83,7 +81,6 @@ warn("AJAXeId$entityID");
     );
   }
   my $json = to_json(\%jsondata);
-warn($json);
   print "Content-type: application/x-javascript\n\n$json";
 }
 

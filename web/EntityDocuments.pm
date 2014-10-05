@@ -128,10 +128,10 @@ sub list_entity_docs{
 	my $options = '';
 	my $count = 0;
 	
-	my $query = qq[
+	$query = qq[
          SELECT strDocumentName, intDocumentTypeID FROM tblDocumentType WHERE strDocumentFor = ? AND intRealmID IN (0,?)
     ]; 
-    my $sth = $db->prepare($query);
+    $sth = $db->prepare($query);
     $sth->execute($doc_for,$Data->{'Realm'});
     my $doclisttype = qq[  <form action="$Data->{'target'}">
                               <input type="hidden" name="client" value="$client" />
