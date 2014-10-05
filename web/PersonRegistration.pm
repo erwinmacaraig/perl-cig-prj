@@ -153,6 +153,7 @@ sub checkRenewalRegoOK  {
     return 0 if (defined $pref and ($pref->{'strStatus'} eq $Defs::PERSON_STATUS_SUSPENDED));
     my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $rego_ref->{'sport'}, 'RENEWAL');
 
+    $rego_ref->{'ruleFor'} = 'REGO';
     my ($personRegisterWhat, $errorMsg) = optionsPersonRegisterWhat(
         $Data,
         $Data->{'Realm'},
@@ -160,6 +161,7 @@ sub checkRenewalRegoOK  {
         $rego_ref->{'originLevel'},
         '',
         $rego_ref->{'personType'} || '',
+        '',
         $rego_ref->{'personEntityRole'} || '',
         $rego_ref->{'personLevel'} || '',
         $rego_ref->{'sport'} || '',
