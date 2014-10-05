@@ -203,7 +203,7 @@ sub checkRenewalRegoOK  {
         \%Reg
     );
     my @statusNOTIN = ();
-    @statusNOTIN = (INPROGRESS);
+    @statusNOTIN = ($Defs::PERSONREGO_STATUS_INPROGRESS);
 
     %Reg=();
     %Reg = (
