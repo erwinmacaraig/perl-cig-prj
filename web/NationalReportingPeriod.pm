@@ -54,8 +54,8 @@ sub getNationalReportingPeriod {
             intRealmID = ?
             AND (intSubRealmID = ? or intSubRealmID = 0)
             AND strSport IN ('', ?)
-            AND (dtFrom < now() AND dtTo > now())
     ];
+            #AND (dtFrom < now() AND dtTo > now())
     if ($registrationNature and $registrationNature eq 'NEW')   {
         $st .= qq[ 
             AND intCurrentNew = 1 
