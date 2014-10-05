@@ -1932,8 +1932,9 @@ sub populateDocumentViewData {
         my $addLink = '';
 
         my $registrationID = $tdref->{'regoItemID'} ? $dref->{'intPersonRegistrationID'} : 0;
-        my $targetID = $tdref->{'addPersonItemID'} ? $dref->{'intPersonID'} : 0;
+        my $targetID = $dref->{'intPersonID'};
         #document for ENTITY
+        my $level = (!$targetID and !$registrationID) ? $Defs::LEVEL_CLUB : $Defs::LEVEL_PERSON;
         $targetID = (!$targetID and !$registrationID) ? $dref->{'intEntityID'} : $targetID;
 
         print STDERR Dumper $tdref;
@@ -1950,7 +1951,7 @@ sub populateDocumentViewData {
         }
         elsif ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowVerify'} == 1 and !$tdref->{'intDocumentID'}) {
             $displayAdd = 1;
-            $addLink = qq[ <span style="position: relative" class="button-small generic-button"><a href="$Defs::base_url/main.cgi?a=WF_amd&amp;RegistrationID=" target="_blank">]. $Data->{'lang'}->txt('Add') . q[</a></span>];
+            $addLink = qq[ <span style="position: relative" class="button-small generic-button"><a href="$Defs::base_url/main.cgi?client=$Data->{'client'}&amp;a=WF_amd&amp;RegistrationID=$registrationID&amp;trgtid=$targetID&amp;doclisttype=$tdref->{'intDocumentTypeID'}&amp;level=$level" target="_blank">]. $Data->{'lang'}->txt('Add') . q[</a></span>];
         }
 
         if($tdref->{'intDocumentID'}) {
@@ -2295,6 +2296,13 @@ sub checkRelatedTasks {
 sub addMissingDocument {
     my ($Data) = @_;
 
+    my $registrationID = safe_param('RegistrationID', 'number') || '';
+    my $memberID = safe_param('trgtid', 'number') || '';
+    my $documentTypeID = safe_param('doclisttype', 'number') || '';
+
+    my ($body, $title) = handle_documents(undef, $Data, $memberID, $documentTypeID, $registrationID);
+
+    return ($body, $title);
 }
 
 1;
