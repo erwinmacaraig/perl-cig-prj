@@ -202,8 +202,8 @@ sub checkRenewalRegoOK  {
         $personID,
         \%Reg
     );
-    @statusIN = ();
-    @statusIN = ($Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_INPROGRESS);
+    my @statusNOTIN = ();
+    @statusNOTIN = ($Defs::PERSONREGO_STATUS_INPROGRESS);
 
     %Reg=();
     %Reg = (
@@ -212,7 +212,7 @@ sub checkRenewalRegoOK  {
         personEntityRole=> $rego_ref->{'personEntityRole'} || '',
         personLevel=> $rego_ref->{'personLevel'} || '',
         #ageLevel=> $rego_ref->{'ageLevel'} || '',
-        statusIN => \@statusIN,
+        statusNOTIN => \@statusNOTIN,
         entityID=> $rego_ref->{'entityID'} || 0,
         nationalPeriod=>$nationalPeriodID,
     );
@@ -222,38 +222,6 @@ sub checkRenewalRegoOK  {
         \%Reg
     );
 
-    #%Reg = (
-    #    sport=> $rego_ref->{'sport'} || '',
-    #    personType=> $rego_ref->{'personType'} || '',
-    #    personEntityRole=> $rego_ref->{'personEntityRole'} || '',
-    #    personLevel=> $rego_ref->{'personLevel'} || '',
-    #    ageLevel=> $rego_ref->{'ageLevel'} || '',
-    #    status=> $Defs::PERSONREGO_STATUS_ROLLED_OVER,
-    #    entityID=> $rego_ref->{'entityID'} || 0,
-    #);
-    #my ($countRolledOver, undef) = getRegistrationData(
-    #    $Data,
-    #    $personID,
-    #    \%Reg
-    #);
-
-
-    #%Reg = (
-    #    sport=> $rego_ref->{'sport'} || '',
-    #    personType=> $rego_ref->{'personType'} || '',
-    #    personEntityRole=> $rego_ref->{'personEntityRole'} || '',
-    #    personLevel=> $rego_ref->{'personLevel'} || '',
-    #    ageLevel=> $rego_ref->{'ageLevel'} || '',
-    #    status=> $Defs::PERSONREGO_STATUS_PASSIVE,
-    #    entityID=> $rego_ref->{'entityID'} || 0,
-    #);
-    #my ($countInactive, undef) = getRegistrationData(
-    #    $Data,
-    #    $personID,
-    #    \%Reg
-    #);
-
-    
     warn "COUNT $count";
     warn "COUNTALREADY $countAlready";
     #return 1 if ($countActive or $countInactive or $countRolledOver); ## Must have an ACTIVE or PASSIVE record
