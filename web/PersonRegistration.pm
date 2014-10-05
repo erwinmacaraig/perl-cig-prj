@@ -211,7 +211,6 @@ sub checkRenewalRegoOK  {
         personType=> $rego_ref->{'personType'} || '',
         personEntityRole=> $rego_ref->{'personEntityRole'} || '',
         personLevel=> $rego_ref->{'personLevel'} || '',
-        #ageLevel=> $rego_ref->{'ageLevel'} || '',
         statusNOTIN => \@statusNOTIN,
         entityID=> $rego_ref->{'entityID'} || 0,
         nationalPeriod=>$nationalPeriodID,
@@ -222,8 +221,8 @@ sub checkRenewalRegoOK  {
         \%Reg
     );
 
-    warn "COUNT $count";
-    warn "COUNTALREADY $countAlready";
+    print STDERR "renew COUNT $count";
+    print STDERR "COUNTALREADY $countAlready";
     #return 1 if ($countActive or $countInactive or $countRolledOver); ## Must have an ACTIVE or PASSIVE record
     return 1 if ($count and ! $countAlready);
     return 0;
