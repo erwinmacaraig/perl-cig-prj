@@ -126,13 +126,13 @@ warn("personID $personID");
         next if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}));
         next if ($rego->{'strStatus'} !~ /$Defs::PERSONREGO_STATUS_ACTIVE|$Defs::PERSONREGO_STATUS_PASSIVE/);
         #my $ageLevel = $rego->{'strAgeLevel'}; #'ADULT'; ## HERE NEEDS TO CALCULATE IF MINOR/ADULT
-        my $ageLevel = '';
+        my $newAgeLevel = '';
         if ($rego->{'strAgeLevel'}) { 
-            $ageLevel = Person::calculateAgeLevel($Data, $rego->{'currentAge'});
+            $newAgeLevel = Person::calculateAgeLevel($Data, $rego->{'currentAge'});
         }
         my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $rego->{'strSport'}, 'RENEWAL');
         next if ($rego->{'intNationalPeriodID'} == $nationalPeriodID);
-        $renew = $Data->{'target'} . "?client=$client&amp;a=PREGF_TU&amp;pt=$rego->{'strPersonType'}&amp;per=$rego->{'strPersonEntityRole'}&amp;pl=$rego->{'strPersonLevel'}&amp;sp=$rego->{'strSport'}&amp;ag=$ageLevel&amp;nat=RENEWAL";
+$renew = $Data->{'target'} . "?client=$client&amp;a=PREGF_TU&amp;pt=$rego->{'strPersonType'}&amp;per=$rego->{'strPersonEntityRole'}&amp;pl=$rego->{'strPersonLevel'}&amp;sp=$rego->{'strSport'}&amp;ag=$newAgeLevel&amp;nat=RENEWAL";
         $rego->{'renew_link'} = $renew;
     }
     $TemplateData{'RegistrationInfo'} = $Reg_ref;
