@@ -37,7 +37,7 @@ sub handle_documents {
        
        $action ||= 'DOC_L';
 
-   $resultHTML =  new_doc_form($Data, $client,$DocumentTypeID,$RegistrationID); 
+   $resultHTML =  new_doc_form($Data, $client,$DocumentTypeID,$RegistrationID, $memberID); 
   if ($action eq 'DOC_u') {
 		my $retvalue = process_doc_upload( 
 			$Data,
@@ -191,6 +191,7 @@ sub new_doc_form {
 		$client,
         $DocumentTypeID,
 		$RegistrationID,
+        $memberID
 	)=@_;
 
 	my $l = $Data->{'lang'};
@@ -216,6 +217,11 @@ sub new_doc_form {
 		$body .= qq[
                 <input type="hidden" name="DocumentTypeID" value="$DocumentTypeID" />
                 <input type="hidden" name="RegistrationID" value="$RegistrationID" />];
+        }
+
+	if($memberID){
+		$body .= qq[
+                <input type="hidden" name="memberID" value="$memberID" />];
         }
 
     if($fileToReplace){ 

@@ -33,8 +33,8 @@ sub new {
     $self->{'Target'}         = $params{'Target'}        || '';
     $self->{'cgi'}            = $params{'cgi'}           || new CGI;
     $self->{'DefaultTemplate'}   = $params{'DefaultTemplate'} || 'flow/default.templ';
-    $self->{'RunDetails'}     = ();
-    $self->{'RunParams'}      = ();
+    $self->{'RunDetails'}     = {};
+    $self->{'RunParams'}      = {};
     $self->{'CookiesToWrite'} = ();
     $self->{'FieldSets'} = {};
     $self->{'ID'} = 0;
@@ -78,7 +78,7 @@ sub _setupRun   {
     for my $param (keys %{$cgi->Vars()}) {
         $self->{'RunParams'}{$param} = join(',', $cgi->param($param));
     }
-    
+    $self->_reloadCarryFields();
     if($self->{'RunParams'}{'e'})   {
         $self->{'ID'} = $self->{'RunParams'}{'e'};
     }
@@ -136,6 +136,16 @@ sub incrementCurrentProcessIndex    {
 
     if($self->{'CurrentIndex'} < $#{$self->{'ProcessOrder'}})   {
         $self->{'CurrentIndex'}++;
+        return 1;
+    }
+    return 0;
+}
+
+sub decrementCurrentProcessIndex    {
+  my $self = shift;
+
+    if($self->{'CurrentIndex'} > 0)   {
+        $self->{'CurrentIndex'}--;
         return 1;
     }
     return 0;
@@ -269,6 +279,7 @@ sub setCarryFields {
   my $self = shift;
     my($fields) = @_;
     $self->{'CarryFields'} = $fields;
+    $self->_refreshCarryFieldIndex();
 }
 
 sub deleteCarryField {
@@ -283,10 +294,12 @@ sub addCarryField {
     return 0 if !$fieldname;
     if($value)  {
         $self->{'CarryFields'}{$fieldname} = $value;
+        $self->{'RunParams'}{$fieldname} = $value;
     }
     else    {
         delete $self->{'CarryFields'}{$fieldname};
     }
+    $self->_refreshCarryFieldIndex();
     return 1;
 }
 
@@ -315,6 +328,30 @@ sub stringifyURLCarryField {
     return $string;
 }
 
+sub _refreshCarryFieldIndex {
+  my $self = shift;
+    my $string = '';
+    my @keys= ();
+    for my $k (keys %{$self->{'CarryFields'}})  {
+        if($k and $k ne '__cf')    {
+            push @keys, $k;
+        }
+    }
+    $self->{'CarryFields'}{'__cf'} = join('|',@keys);
+}
+
+
+sub _reloadCarryFields {
+  my $self = shift;
+  if($self->{'RunParams'} and $self->{'RunParams'}{'__cf'}) {
+    my $fieldlist = $self->{'RunParams'}{'__cf'} || '';
+    for my $k (split /\|/,$fieldlist)   {
+        $self->{'CarryFields'}{$k} = $self->{'RunParams'}{$k};
+    }
+  }
+  $self->_refreshCarryFieldIndex();
+}
+
 sub getCarryFields {
   my $self = shift;
     my ($fieldname) = @_;
@@ -322,6 +359,7 @@ sub getCarryFields {
         return $self->{'CarryFields'}{$fieldname};
     }
     my %tempcarry = %{$self->{'CarryFields'}};
+    delete($tempcarry{'__cf'});
     return  \%tempcarry;
 }
 
@@ -331,10 +369,6 @@ sub setupValues { }
 
 sub setProcessOrder {
     my $self = shift;
-    #columns,
-      # action key
-      #function to call
-    # label for navigation
     $self->{'ProcessOrder'} = [
         {
             'action' => 'd',

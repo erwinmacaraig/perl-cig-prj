@@ -34,8 +34,6 @@ sub main	{
     my $bulk= param('bulk') || 0;
     my $defaultType = param('dtype') || '';
 
-warn("AJAXPId$personID");
-warn("AJAXeId$entityID");
     my %Data=();
     my $target='aj_person_registerwhat.cgi';
     $Data{'target'}=$target;
@@ -85,7 +83,6 @@ warn("AJAXeId$entityID");
     );
   }
   my $json = to_json(\%jsondata);
-warn($json);
   print "Content-type: application/x-javascript\n\n$json";
 }
 

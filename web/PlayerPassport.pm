@@ -15,6 +15,7 @@ use Date::Parse;
 sub savePlayerPassport{ 
 	my ($Data, $personID) = @_;
 	
+    return if (! $personID);
 	#DELETE RECORD
 ## MIGHT NEED TO TAKE THE IMPORTED RECORD INTO ACCOUNT IN WORKING OUT TIME PERIODS
 	my $query = "DELETE FROM tblPlayerPassport WHERE intPersonID= ? and strOrigin= 'REGO'";

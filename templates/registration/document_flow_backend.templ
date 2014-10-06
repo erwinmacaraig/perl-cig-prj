@@ -40,8 +40,7 @@
 [% END %]
 
 
-
-
+[% IF !NoFormFields %]
 <form action="[% target %]" method="POST">
 <input type="hidden" name="a" value="[% nextaction %]">
 [% FOREACH h IN  hidden_ref %]
@@ -49,3 +48,4 @@
 [% END %]
 <input type="submit" name="submit" value="[% Lang.txt('Continue') %]" class = "button proceed-button"><br><br>
             </form>
+[% END %]

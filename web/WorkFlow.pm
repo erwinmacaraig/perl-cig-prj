@@ -34,6 +34,7 @@ use PersonRegistration;
 use Data::Dumper;
 use Switch;
 use PlayerPassport;
+use Documents;
 use CGI qw(param unescape escape);
 
 sub cleanTasks  {
@@ -185,6 +186,9 @@ sub handleWorkflow {
             ( $body, $title ) = ("", "No access");
         }
     }
+    elsif ($action eq 'WF_amd') {
+        ($body, $title) = addMissingDocument($Data);
+    }
 	else {
         ( $body, $title ) = listTasks( $Data );		
 	};
@@ -241,9 +245,9 @@ sub listTasks {
 			AND (
                 (intApprovalEntityID = ? AND t.strTaskStatus = 'ACTIVE')
                 OR
-                (intProblemResolutionEntityID= ? AND t.strTaskStatus = 'REJECTED')
+                (intProblemResolutionEntityID = ? AND t.strTaskStatus = 'REJECTED')
                 OR
-                (intOnHold = 1)
+                (intOnHold = 1 AND (intApprovalEntityID = ? OR intProblemResolutionEntityID = ?))
             )
     ];
 
@@ -266,6 +270,8 @@ sub listTasks {
 	$db=$Data->{'db'};
 	$q = $db->prepare($st) or query_error($st);
 	$q->execute(
+		$entityID,
+		$entityID,
 		$entityID,
 		$entityID,
 	) or query_error($st);
@@ -926,7 +932,22 @@ sub checkForOutstandingTasks {
                 );
                 $rc = 1;
         }
- 
+         if ($personID and $taskType ne $Defs::WF_TASK_TYPE_CHECKDUPL)  {
+                $st = qq[
+	            	UPDATE tblPerson
+                    SET
+	            	    strStatus = 'REGISTERED'
+	    	        WHERE 
+                        intPersonID= ?
+                        AND strStatus='PENDING'
+	        	];
+	    
+		        $q = $db->prepare($st);
+		        $q->execute( $personID); 
+	        	$rc = 1;	# All registration tasks have been completed        		
+        	#}
+        }
+
         if ($ruleFor eq 'REGO' and $personRegistrationID and !$rowCount) {
 
                 ## Handle intPaymentRequired ?  What abotu $0 products
@@ -954,31 +975,16 @@ sub checkForOutstandingTasks {
                 PersonRegistration::rolloverExistingPersonRegistrations($Data, $personID, $personRegistrationID);
 				# Do the check
 				$st = qq[SELECT strPersonType, strSport FROM tblPersonRegistration_$Data->{Realm} WHERE intPersonRegistrationID = ?]; 
-                $q = $db->prepare($st);
-				$q->execute($personRegistrationID);   
-				my $ppref = $q->fetchrow_hashref();				
+                my $qPR = $db->prepare($st);
+				$qPR->execute($personRegistrationID);   
+				my $ppref = $qPR->fetchrow_hashref();				
                 # if check  pass call save
                 if( ($ppref->{'strPersonType'} eq 'PLAYER') && ($ppref->{'strSport'} eq 'FOOTBALL'))    {
                 	savePlayerPassport($Data, $personID);
                 }
            ##############################################################################################################        
         }
-        if ($personID and $taskType ne $Defs::WF_TASK_TYPE_CHECKDUPL)  {
-                $st = qq[
-	            	UPDATE tblPerson
-                    SET
-	            	    strStatus = 'REGISTERED'
-	    	        WHERE 
-                        intPersonID= ?
-                        AND strStatus='PENDING'
-	        	];
-	    
-		        $q = $db->prepare($st);
-		        $q->execute( $personID); 
-	        	$rc = 1;	# All registration tasks have been completed        		
-        	#}
-        }
-	}      
+       	}      
 
 return ($rc) # 1 = Registration is complete, 0 = There are still outstanding Tasks to be completed
        	
@@ -1866,17 +1872,49 @@ sub populateDocumentViewData {
             rd.intDocumentTypeID,
             rd.intAllowProblemResolutionLevel,
             rd.intAllowVerify,
+            tuf.intFileID,
             wt.intApprovalEntityID,
             wt.intProblemResolutionEntityID,
             dt.strDocumentName,
             d.strApprovalStatus,
             d.intDocumentID,
-            pr.intNewBaseRecord
+            pr.intNewBaseRecord,
+            addPersonItem.intItemID as addPersonItemID,
+            regoItem.intItemID as regoItemID,
+            entityItem.intItemID as entityItemID
         FROM tblWFRuleDocuments AS rd
         INNER JOIN tblWFTask AS wt ON (wt.intWFRuleID = rd.intWFRuleID)
+        INNER JOIN tblWFRule as wr ON (wr.intWFRuleID = wt.intWFRuleID)
+        LEFT JOIN tblRegistrationItem as addPersonItem
+            ON (
+                addPersonItem.strItemType = 'DOCUMENT'
+                AND addPersonItem.intOriginLevel = wr.intOriginLevel
+                AND addPersonItem.strRuleFor = 'PERSON'
+                AND addPersonItem.intID = rd.intDocumentTypeID
+                )
+        LEFT JOIN tblRegistrationItem as regoItem
+            ON (
+                regoItem.strItemType = 'DOCUMENT'
+                AND regoItem.intOriginLevel = wr.intOriginLevel
+                AND regoItem.strRuleFor = 'REGO'
+                AND regoItem.intID = rd.intDocumentTypeID
+                AND regoItem.strRegistrationNature = '$dref->{'strRegistrationNature'}'
+                AND regoItem.strPersonType = '$dref->{'strPersonType'}'
+                AND regoItem.strPersonLevel = '$dref->{'strPersonLevel'}'
+                AND regoItem.strSport = '$dref->{'strSport'}'
+                AND regoItem.strAgeLevel = '$dref->{'strAgeLevel'}'
+                )
+        LEFT JOIN tblRegistrationItem as entityItem
+            ON (
+                entityItem.strItemType = 'DOCUMENT'
+                AND entityItem.intOriginLevel = wr.intOriginLevel
+                AND entityItem.strRuleFor = 'ENTITY'
+                AND entityItem.intID = rd.intDocumentTypeID
+                )
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (pr.intPersonRegistrationID = wt.intPersonRegistrationID)
         LEFT JOIN tblDocuments AS d ON $joinCondition
         LEFT JOIN tblDocumentType dt ON (dt.intDocumentTypeID = rd.intDocumentTypeID )
+        LEFT JOIN tblUploadedFiles tuf ON (tuf.intFileID = d.intUploadFileID)
         WHERE 
             wt.intWFTaskID = ?
             AND wt.intRealmID = ?
@@ -1905,7 +1943,17 @@ sub populateDocumentViewData {
         $count++;
         my $displayVerify;
         my $displayAdd;
+        my $displayView;
+        my $viewLink = '';
+        my $addLink = '';
 
+        my $registrationID = $tdref->{'regoItemID'} ? $dref->{'intPersonRegistrationID'} : 0;
+        my $targetID = $dref->{'intPersonID'};
+        #document for ENTITY
+        my $level = (!$targetID and !$registrationID) ? $Defs::LEVEL_CLUB : $Defs::LEVEL_PERSON;
+        $targetID = (!$targetID and !$registrationID) ? $dref->{'intEntityID'} : $targetID;
+
+        print STDERR Dumper $tdref;
         #warn "DOCUMENT TYPE ID " . $tdref->{'intDocumentTypeID'};
         if($tdref->{'intAllowProblemResolutionLevel'} eq 1 and $tdref->{'intAllowVerify'} == 1) {
             $displayVerify = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
@@ -1919,6 +1967,12 @@ sub populateDocumentViewData {
         }
         elsif ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowVerify'} == 1 and !$tdref->{'intDocumentID'}) {
             $displayAdd = 1;
+            $addLink = qq[ <span style="position: relative" class="button-small generic-button"><a href="$Defs::base_url/main.cgi?client=$Data->{'client'}&amp;a=WF_amd&amp;RegistrationID=$registrationID&amp;trgtid=$targetID&amp;doclisttype=$tdref->{'intDocumentTypeID'}&amp;level=$level" target="_blank">]. $Data->{'lang'}->txt('Add') . q[</a></span>];
+        }
+
+        if($tdref->{'intDocumentID'}) {
+            $displayView = 1;
+            $viewLink = qq[ <span style="position: relative" class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$tdref->{'intFileID'}" target="_blank">]. $Data->{'lang'}->txt('View') . q[</a></span>];
         }
 
         my %documents = (
@@ -1928,6 +1982,9 @@ sub populateDocumentViewData {
             Verifier => $tdref->{'strLocalName'},
             DisplayVerify => $displayVerify || '',
             DisplayAdd => $displayAdd || '',
+            DisplayView => $displayView || '',
+            viewLink => $viewLink,
+            addLink => $addLink
         );
 
         push @RelatedDocuments, \%documents;
@@ -2250,6 +2307,18 @@ sub checkRelatedTasks {
     }
 
     return $allComplete;
+}
+
+sub addMissingDocument {
+    my ($Data) = @_;
+
+    my $registrationID = safe_param('RegistrationID', 'number') || '';
+    my $memberID = safe_param('trgtid', 'number') || '';
+    my $documentTypeID = safe_param('doclisttype', 'number') || '';
+
+    my ($body, $title) = handle_documents(undef, $Data, $memberID, $documentTypeID, $registrationID);
+
+    return ($body, $title);
 }
 
 1;

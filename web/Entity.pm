@@ -321,8 +321,6 @@ sub loadEntityDetails {
   $query->execute($id);
   my $field=$query->fetchrow_hashref();
   $query->finish;
-                                                                                                        
-print STDERR $statement;
   foreach my $key (keys %{$field})  { if(!defined $field->{$key}) {$field->{$key}='';} }
   return $field;
 }

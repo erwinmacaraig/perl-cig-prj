@@ -134,7 +134,7 @@ sub displayRegoFlowCheckout {
 
 sub displayRegoFlowDocuments    {
 
-    my ($Data, $regoID, $client, $entityRegisteringForLevel, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref) = @_;
+    my ($Data, $regoID, $client, $entityRegisteringForLevel, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref, $noFormFields) = @_;
     my $lang=$Data->{'lang'};
 
      my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_DU&amp;rID=$regoID";
@@ -208,6 +208,7 @@ sub displayRegoFlowDocuments    {
         hidden_ref => $hidden_ref,
         Lang => $Data->{'lang'},
         client => $client,
+        NoFormFields =>$noFormFields,
   );  
  my $pagedata = runTemplate($Data, \%PageData, 'registration/document_flow_backend.templ') || '';
 
@@ -216,7 +217,7 @@ sub displayRegoFlowDocuments    {
 
 sub displayRegoFlowProducts {
 
-    my ($Data, $regoID, $client, $entityRegisteringForLevel, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref) = @_;
+    my ($Data, $regoID, $client, $entityRegisteringForLevel, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref, $noFormFields) = @_;
     my $lang=$Data->{'lang'};
 
     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_PU&amp;rID=$regoID";
@@ -259,6 +260,7 @@ sub displayRegoFlowProducts {
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
         client=>$client,
+        NoFormFields =>$noFormFields,
     );
     my $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ') || '';
 

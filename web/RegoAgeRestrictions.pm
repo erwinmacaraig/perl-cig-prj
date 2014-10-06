@@ -53,7 +53,7 @@ sub checkRegoAgeRestrictions {
         }
     } else {
         $personDetails = loadPersonDetails($Data->{'db'}, $personID);
-        print STDERR Dumper $personDetails;
+        #print STDERR Dumper $personDetails;
         $personAge = $personDetails->{'currentAge'} or undef;
     }
 
@@ -90,7 +90,7 @@ sub checkRegoAgeRestrictions {
         $st .= qq[ AND strPersonLevel IN ('', ?)];
     }
 
-    if (defined @ageLevel) {
+    if (scalar(@ageLevel)) {
         #push @limitValues, $ageLevel;
         my $strMergeAgeString = "'" . join("','", @ageLevel) . "'";
         $st .= qq[ AND strAgeLevel IN ('', $strMergeAgeString)];

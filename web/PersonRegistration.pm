@@ -153,6 +153,7 @@ sub checkRenewalRegoOK  {
     return 0 if (defined $pref and ($pref->{'strStatus'} eq $Defs::PERSON_STATUS_SUSPENDED));
     my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $rego_ref->{'sport'}, 'RENEWAL');
 
+    $rego_ref->{'ruleFor'} = 'REGO';
     my ($personRegisterWhat, $errorMsg) = optionsPersonRegisterWhat(
         $Data,
         $Data->{'Realm'},
@@ -160,6 +161,7 @@ sub checkRenewalRegoOK  {
         $rego_ref->{'originLevel'},
         '',
         $rego_ref->{'personType'} || '',
+        '',
         $rego_ref->{'personEntityRole'} || '',
         $rego_ref->{'personLevel'} || '',
         $rego_ref->{'sport'} || '',
@@ -189,7 +191,6 @@ sub checkRenewalRegoOK  {
         personType=> $rego_ref->{'personType'} || '',
         personEntityRole=> $rego_ref->{'personEntityRole'} || '',
         personLevel=> $rego_ref->{'personLevel'} || '',
-        #ageLevel=> $rego_ref->{'ageLevel'} || '',
         statusIN => \@statusIN,
         entityID=> $rego_ref->{'entityID'} || 0,
     );
@@ -200,8 +201,8 @@ sub checkRenewalRegoOK  {
         $personID,
         \%Reg
     );
-    @statusIN = ();
-    @statusIN = ($Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_INPROGRESS);
+    my @statusNOTIN = ();
+    @statusNOTIN = ($Defs::PERSONREGO_STATUS_INPROGRESS);
 
     %Reg=();
     %Reg = (
@@ -209,10 +210,9 @@ sub checkRenewalRegoOK  {
         personType=> $rego_ref->{'personType'} || '',
         personEntityRole=> $rego_ref->{'personEntityRole'} || '',
         personLevel=> $rego_ref->{'personLevel'} || '',
-        #ageLevel=> $rego_ref->{'ageLevel'} || '',
-        statusIN => \@statusIN,
+        statusNOTIN => \@statusNOTIN,
         entityID=> $rego_ref->{'entityID'} || 0,
-        nationalPeriod=>$nationalPeriodID,
+        nationalPeriodID=>$nationalPeriodID,
     );
     my ($countAlready, undef) = getRegistrationData(
         $Data,
@@ -220,42 +220,11 @@ sub checkRenewalRegoOK  {
         \%Reg
     );
 
-    #%Reg = (
-    #    sport=> $rego_ref->{'sport'} || '',
-    #    personType=> $rego_ref->{'personType'} || '',
-    #    personEntityRole=> $rego_ref->{'personEntityRole'} || '',
-    #    personLevel=> $rego_ref->{'personLevel'} || '',
-    #    ageLevel=> $rego_ref->{'ageLevel'} || '',
-    #    status=> $Defs::PERSONREGO_STATUS_ROLLED_OVER,
-    #    entityID=> $rego_ref->{'entityID'} || 0,
-    #);
-    #my ($countRolledOver, undef) = getRegistrationData(
-    #    $Data,
-    #    $personID,
-    #    \%Reg
-    #);
-
-
-    #%Reg = (
-    #    sport=> $rego_ref->{'sport'} || '',
-    #    personType=> $rego_ref->{'personType'} || '',
-    #    personEntityRole=> $rego_ref->{'personEntityRole'} || '',
-    #    personLevel=> $rego_ref->{'personLevel'} || '',
-    #    ageLevel=> $rego_ref->{'ageLevel'} || '',
-    #    status=> $Defs::PERSONREGO_STATUS_PASSIVE,
-    #    entityID=> $rego_ref->{'entityID'} || 0,
-    #);
-    #my ($countInactive, undef) = getRegistrationData(
-    #    $Data,
-    #    $personID,
-    #    \%Reg
-    #);
-
-    
-    warn "COUNT $count";
-    warn "COUNTALREADY $countAlready";
+    print STDERR "renew COUNT $count";
+    print STDERR "COUNTALREADY $countAlready";
     #return 1 if ($countActive or $countInactive or $countRolledOver); ## Must have an ACTIVE or PASSIVE record
     return 1 if ($count and ! $countAlready);
+print STDERR "ALL OK";
     return 0;
 }
 
@@ -546,7 +515,8 @@ sub getRegistrationData	{
         my $statusNOTIN = "";
         foreach my $status (@{$regFilters_ref->{'statusNOTIN'}})   {
             $statusNOTIN .= "," if ($statusNOTIN);
-            $statusNOTIN .= "'".$status."'";
+            #$statusNOTIN .= "'".$status."'";
+            $statusNOTIN .= qq["$status"];
         }
         $where .= " AND pr.strStatus NOT IN ($statusNOTIN)";
     }
@@ -554,7 +524,8 @@ sub getRegistrationData	{
         my $statusIN = "";
         foreach my $status (@{$regFilters_ref->{'statusIN'}})   {
             $statusIN .= "," if ($statusIN);
-            $statusIN .= "'".$status."'";
+            #$statusIN .= "'".$status."'";
+            $statusIN .= qq["$status"];
         }
         $where .= " AND pr.strStatus IN ($statusIN)";
     }

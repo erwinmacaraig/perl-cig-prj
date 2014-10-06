@@ -861,6 +861,22 @@ sub getClubMenuData {
            url => $baseurl."a=C_ID_LIST",
         };
     }
+
+    if ($SystemConfig->{'allowPersonRequest'}) {
+        $menuoptions{'requesttransfer'} = {
+           name => $lang->txt('Request a Transfer'),
+           url => $baseurl."a=PRA_T",
+        };
+    }
+
+    if ($SystemConfig->{'allowPersonRequest'}) {
+        $menuoptions{'requestaccess'} = {
+           name => $lang->txt('Request for Person Details'),
+           url => $baseurl."a=PRA_R",
+        };
+    }
+
+
     my @menu_structure = (
         [ $lang->txt('Dashboard'), 'home','home'],
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}), 'menu', [
@@ -871,6 +887,8 @@ sub getClubMenuData {
         'transferperson',
         'duplicates',
         'pendingregistration',
+        'requesttransfer',
+        'requestaccess',
          ]],
 
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu','venues'],

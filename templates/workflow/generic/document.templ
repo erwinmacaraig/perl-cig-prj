@@ -34,8 +34,12 @@
                                     <a href="">[% Lang.txt('View') %]</a>
                                 </span>
                                 -->
+                                [% IF document.DisplayView == 1 %]
+                                [% document.viewLink %]
+                                [% END %]
+
                                 [% IF document.Status == 'PENDING' %]
-                                <form action="[% DocumentAction.target %]" method="POST">
+                                <form style="float: left; position:relative" action="[% DocumentAction.target %]" method="POST">
                                     <input type="hidden" name="client" value="[% DocumentAction.client %]">
                                     <input type="hidden" name="TID" value="[% DocumentAction.WFTaskID %]">
                                     <input type="hidden" name="a" value="[% DocumentAction.action %]">
@@ -45,10 +49,9 @@
                                     [% END %]
                                 </form>
                                 [% END %]
+
                                 [% IF document.DisplayAdd == 1 %]
-                                <form action="[% DocumentAction.target %]" method="POST">
-                                    <input class="button-small generic-button" type="submit" name="add" value="add">
-                                </form>
+                                [% document.addLink %]
                                 [% END %]
                             </div>
                         </td>
