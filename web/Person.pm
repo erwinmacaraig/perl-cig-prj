@@ -1499,10 +1499,10 @@ sub postPersonUpdate {
 
             my $body = qq[
                 <div class="OKmsg"> $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} Added Successfully</div><br>
-                <a href="$Data->{'target'}?client=$clm&amp;a=P_HOME">Display Details for $params->{'d_strLocalFirstname'} $params->{'d_strLocalSurname'}</a><br><br>
-                <b>or</b><br><br>
-                <a href="$Data->{'target'}?client=$cl&amp;a=P_A&amp;l=$Defs::LEVEL_PERSON">Add another $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}</a>
             ];
+                #<a href="$Data->{'target'}?client=$clm&amp;a=P_HOME">Display Details for $params->{'d_strLocalFirstname'} $params->{'d_strLocalSurname'}</a><br><br>
+                #<b>or</b><br><br>
+                #<a href="$Data->{'target'}?client=$cl&amp;a=P_A&amp;l=$Defs::LEVEL_PERSON">Add another $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}</a>
             $body .= qq[<br>]. NewRegoButton($Data, $clm);
             return (0, $body);
 
