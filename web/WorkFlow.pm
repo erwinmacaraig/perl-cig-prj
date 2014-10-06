@@ -925,7 +925,22 @@ sub checkForOutstandingTasks {
                 );
                 $rc = 1;
         }
- 
+         if ($personID and $taskType ne $Defs::WF_TASK_TYPE_CHECKDUPL)  {
+                $st = qq[
+	            	UPDATE tblPerson
+                    SET
+	            	    strStatus = 'REGISTERED'
+	    	        WHERE 
+                        intPersonID= ?
+                        AND strStatus='PENDING'
+	        	];
+	    
+		        $q = $db->prepare($st);
+		        $q->execute( $personID); 
+	        	$rc = 1;	# All registration tasks have been completed        		
+        	#}
+        }
+
         if ($ruleFor eq 'REGO' and $personRegistrationID and !$rowCount) {
 
                 ## Handle intPaymentRequired ?  What abotu $0 products
@@ -953,35 +968,16 @@ sub checkForOutstandingTasks {
                 PersonRegistration::rolloverExistingPersonRegistrations($Data, $personID, $personRegistrationID);
 				# Do the check
 				$st = qq[SELECT strPersonType, strSport FROM tblPersonRegistration_$Data->{Realm} WHERE intPersonRegistrationID = ?]; 
-                $q = $db->prepare($st);
-				$q->execute($personRegistrationID);   
-				my $ppref = $q->fetchrow_hashref();				
+                my $qPR = $db->prepare($st);
+				$qPR->execute($personRegistrationID);   
+				my $ppref = $qPR->fetchrow_hashref();				
                 # if check  pass call save
-                print STDERR "PLAYER PASSPORT HERE FOR $personRegistrationID\n";
-                use Data::Dumper;
-            print STDERR Dumper($ppref);
                 if( ($ppref->{'strPersonType'} eq 'PLAYER') && ($ppref->{'strSport'} eq 'FOOTBALL'))    {
-                print STDERR "STILL IN PLAYER PASSPORT HERE\n";
                 	savePlayerPassport($Data, $personID);
                 }
            ##############################################################################################################        
         }
-        if ($personID and $taskType ne $Defs::WF_TASK_TYPE_CHECKDUPL)  {
-                $st = qq[
-	            	UPDATE tblPerson
-                    SET
-	            	    strStatus = 'REGISTERED'
-	    	        WHERE 
-                        intPersonID= ?
-                        AND strStatus='PENDING'
-	        	];
-	    
-		        $q = $db->prepare($st);
-		        $q->execute( $personID); 
-	        	$rc = 1;	# All registration tasks have been completed        		
-        	#}
-        }
-	}      
+       	}      
 
 return ($rc) # 1 = Registration is complete, 0 = There are still outstanding Tasks to be completed
        	
