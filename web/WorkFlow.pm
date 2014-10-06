@@ -957,7 +957,11 @@ sub checkForOutstandingTasks {
 				$q->execute($personRegistrationID);   
 				my $ppref = $q->fetchrow_hashref();				
                 # if check  pass call save
+                print STDERR "PLAYER PASSPORT HERE FOR $personRegistrationID\n";
+                use Data::Dumper;
+            print STDERR Dumper($ppref);
                 if( ($ppref->{'strPersonType'} eq 'PLAYER') && ($ppref->{'strSport'} eq 'FOOTBALL'))    {
+                print STDERR "STILL IN PLAYER PASSPORT HERE\n";
                 	savePlayerPassport($Data, $personID);
                 }
            ##############################################################################################################        
