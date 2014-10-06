@@ -213,7 +213,7 @@ sub checkRenewalRegoOK  {
         personLevel=> $rego_ref->{'personLevel'} || '',
         statusNOTIN => \@statusNOTIN,
         entityID=> $rego_ref->{'entityID'} || 0,
-        nationalPeriod=>$nationalPeriodID,
+        nationalPeriodID=>$nationalPeriodID,
     );
     my ($countAlready, undef) = getRegistrationData(
         $Data,
