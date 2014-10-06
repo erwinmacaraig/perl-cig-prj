@@ -274,6 +274,9 @@ sub deletePersonRegistered  {
     ];
   	my $q= $Data->{'db'}->prepare($st);
     $q->execute($personID, $personRegistrationID) or query_error($st);
+    ####
+    auditLog($personRegistrationID, $Data, 'Delete Person Registraton', 'Person Registration');
+    ####
 }
 
 sub isPersonRegistered {
@@ -381,7 +384,13 @@ sub mergePersonRegistrations    {
         }
         if ($personRegoIDFrom and ! $personRegoIDTo )   {
   	        $qMove->execute($pToId, $pFromId, $personRegoIDFrom);
+  	        ####
+            auditLog($personRegoIDFrom, $Data, 'Move Person Registration', 'Person Registration');
+            ####
             $qTasks->execute($pToId, $personRegoIDFrom, $pFromId, $personRegoIDFrom);
+            ####
+            auditLog($personRegoIDFrom, $Data, 'Update WFTask', 'Person Registration');
+            ####
             $qTasks->execute($pToId, 0, $pFromId, 0);
         }
         my $tasks = 'USE_TO';
@@ -401,13 +410,25 @@ sub mergePersonRegistrations    {
             my $new_intPaymentRequired= $From_ref->{'intPaymentRequired'} ? 1 : $found_To_ref->{'intPaymentRequired'};
 
   	        $qMerge->execute($pToId, $newStatus, $new_dtFrom, $new_dtTo, $new_intCurrent, $new_intIsPaid, $new_intPaymentRequired, $new_dtAdded, $new_dtLastUpdated, $pToId, $personRegoIDTo);
-
-            $qTXNs->execute($personRegoIDTo, $personRegoIDFrom);
+            ####
+            auditLog($personRegoIDTo, $Data, 'Merge Person Registration', 'Person Registration');
+            ####
+            $qTXNs->execute($personRegoIDTo, $personRegoIDFrom); 
+            ####
+            auditLog($personRegoIDTo, $Data, 'Transaction', 'Person Registration');
+            ####
+            
             if ($tasks eq 'USE_TO') {
                 $qDELTasks->execute($pFromId, $personRegoIDFrom);
+                 ####
+           		 auditLog( $personRegoIDFrom, $Data, 'DELETE WFTask', 'Person Registration');
+           		 ####
             }
             if ($tasks eq 'USE_FROM')   {
-                $qDELTasks->execute($pToId, $personRegoIDTo);
+                $qDELTasks->execute($pToId, $personRegoIDTo); 
+                 ####
+           		 auditLog( $personRegoIDTo, $Data, 'DELETE WFTask', 'Person Registration');
+           		 ####
                 $qTasks->execute($pToId, $$personRegoIDTo, $pFromId, $personRegoIDFrom);
             }
         }
@@ -474,7 +495,9 @@ sub updatePersonRegistration    {
         $personID,
         $personRegistrationID,
   	);
-	
+	####
+    auditLog($personRegistrationID, $Data, 'Update Person Registration', 'Person Registration');
+    ####
 	if ($q->errstr) {
 		return 0;
 	}
@@ -755,7 +778,9 @@ sub addRegistration {
 		return (0, 0);
 	}
   	my $personRegistrationID = $q->{mysql_insertid};
-  	
+  	####
+  	auditLog($personRegistrationID, $Data, 'Add Person Registration', 'Person');
+  	###	
     my $rc=0;
     if ($status eq 'PENDING')   {
         cleanTasks(
@@ -838,7 +863,10 @@ sub personInProgressToPending {
         LIMIT 1
     ];
     my $qry=$Data->{'db'}->prepare($st);
-    $qry->execute($personID, $Data->{'Realm'});
+    $qry->execute($personID, $Data->{'Realm'}); 
+    ####
+    auditLog($personID, $Data, 'UPDATE Person Registration To Pending','Person Registration');
+    ###
 }
 
 sub getRegistrationDetail {

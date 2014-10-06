@@ -132,6 +132,9 @@ sub savePlayerPassport{
         if ($eID )  {
       $qPP->execute($personID,'REGO', $level, $eID, $lastEntityName, $lastRealmName, $dtFrom, $dtTo);
         }
+        ###
+		auditLog($personID, $Data, 'Add Player Passport', 'Player Passport');
+		###
       # need to get the Date because we need to get the age
     
 }

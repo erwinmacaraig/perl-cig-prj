@@ -713,7 +713,9 @@ sub approveTask {
   		$WFTaskID,
         $Data->{'Realm'}
   	);
-  		
+  	####
+  	auditLog($WFTaskID, $Data, 'Updated WFTask', 'WFTask');
+  	###	
     setDocumentStatus($Data, $WFTaskID, 'APPROVED');
 	if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
@@ -859,6 +861,9 @@ sub checkForOutstandingTasks {
 		if ($q->errstr) {
 			return $q->errstr . '<br>' . $st
 		}
+		####
+  	    auditLog('', $Data, 'Updated WFTask', 'WFTask');
+      	###	
 		    
 	} 
 	else {	
@@ -1099,7 +1104,10 @@ sub updateTaskNotes {
             $notes,
             1,
             $Defs::WF_TASK_ACTION_REJECT
-        );
+        ); 
+       ##### 
+       auditLog($q->{mysql_insertid},$Data,'New TaskNote','WFTaskNotes');
+       ####
     }
     elsif (($entityID == $task->{'intProblemResolutionEntityID'}) and ($type eq $Defs::WF_TASK_ACTION_RESOLVE)) { #resolve
         warn "RESOLTION $entityID";
@@ -1132,6 +1140,7 @@ sub updateTaskNotes {
             $q->execute(
                 $WFRejectCurrentNoteID
             ) or query_error($streset);
+          
 
         }
     }
@@ -1374,7 +1383,10 @@ sub resolveTask {
     setDocumentStatus($Data, $WFTaskID, 'PENDING');
 
     resetRelatedTasks($Data, $WFTaskID, 'ACTIVE');
-
+    ####
+  	auditLog($WFTaskID, $Data, 'Updated WFTask', 'WFTask');
+  	###	
+    
     return(0);
     
 }
@@ -1429,7 +1441,9 @@ sub rejectTask {
     if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
 	}
-
+    ####
+  	auditLog($WFTaskID, $Data, 'Updated WFTask', 'WFTask');
+  	###	
     return(0);
     
 }
