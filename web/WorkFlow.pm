@@ -245,9 +245,9 @@ sub listTasks {
 			AND (
                 (intApprovalEntityID = ? AND t.strTaskStatus = 'ACTIVE')
                 OR
-                (intProblemResolutionEntityID= ? AND t.strTaskStatus = 'REJECTED')
+                (intProblemResolutionEntityID = ? AND t.strTaskStatus = 'REJECTED')
                 OR
-                (intOnHold = 1)
+                (intOnHold = 1 AND (intApprovalEntityID = ? OR intProblemResolutionEntityID = ?))
             )
     ];
 
@@ -270,6 +270,8 @@ sub listTasks {
 	$db=$Data->{'db'};
 	$q = $db->prepare($st) or query_error($st);
 	$q->execute(
+		$entityID,
+		$entityID,
 		$entityID,
 		$entityID,
 	) or query_error($st);
