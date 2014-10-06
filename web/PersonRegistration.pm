@@ -492,7 +492,8 @@ sub getRegistrationData	{
         my $statusNOTIN = "";
         foreach my $status (@{$regFilters_ref->{'statusNOTIN'}})   {
             $statusNOTIN .= "," if ($statusNOTIN);
-            $statusNOTIN .= "'".$status."'";
+            #$statusNOTIN .= "'".$status."'";
+            $statusNOTIN .= qq["$status"];
         }
         $where .= " AND pr.strStatus NOT IN ($statusNOTIN)";
     }
@@ -500,7 +501,8 @@ sub getRegistrationData	{
         my $statusIN = "";
         foreach my $status (@{$regFilters_ref->{'statusIN'}})   {
             $statusIN .= "," if ($statusIN);
-            $statusIN .= "'".$status."'";
+            #$statusIN .= "'".$status."'";
+            $statusIN .= qq["$status"];
         }
         $where .= " AND pr.strStatus IN ($statusIN)";
     }
