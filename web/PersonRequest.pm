@@ -382,12 +382,14 @@ sub listRequests {
     #while(my $tdref = $q->fetchrow_hashref()) {
     for my $request (@{$personRequests}) {
         $found = 1;
+        print STDERR Dumper $request;
         push @rowdata, {
             id => $request->{'intPersonRequestID'} || 0,
             personID => $request->{'intPersonID'} || 0,
             requestFrom => $request->{'requestFrom'} || '',
             requestTo => $request->{'requestTo'} || '',
             requestType => $Defs::personRequest{$request->{'strRequestType'}},
+            requestResponse => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || "N/A",
             SelectLink => "$Data->{'target'}?client=$client&amp;a=PRA_V&rid=$request->{'intPersonRequestID'}"
         }
     }
@@ -414,6 +416,14 @@ sub listRequests {
         {
             name => $Data->{'lang'}->txt('Type'),
             field => 'requestType',
+        }, 
+        {
+            name => $Data->{'lang'}->txt('Type'),
+            field => 'requestType',
+        }, 
+        {
+            name => $Data->{'lang'}->txt('Response Status'),
+            field => 'requestResponse',
         }, 
     ); 
 
