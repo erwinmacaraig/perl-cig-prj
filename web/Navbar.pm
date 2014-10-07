@@ -876,6 +876,15 @@ sub getClubMenuData {
         };
     }
 
+    if ($SystemConfig->{'allowPersonRequest'}) {
+        $menuoptions{'listrequests'} = {
+           name => $lang->txt('List Requests'),
+           url => $baseurl."a=PRA_L",
+        };
+    }
+
+
+
 
     my @menu_structure = (
         [ $lang->txt('Dashboard'), 'home','home'],
@@ -889,6 +898,7 @@ sub getClubMenuData {
         'pendingregistration',
         'requesttransfer',
         'requestaccess',
+        'listrequests',
          ]],
 
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu','venues'],
