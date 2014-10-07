@@ -103,6 +103,7 @@
             [% END %]
 
             [% IF RequestAction.initiateRequestProcess == 1 %]
+            <!--
             <form action="[% RequestAction.target %]" method="POST" style="float: left">
                 <input type="hidden" name="client" value="[% RequestAction.client %]">
                 <input type="hidden" name="a" value="[% RequestAction.action %]">
@@ -120,6 +121,10 @@
 
                 <input class="button-small generic-button" type="submit" name="submit" value="Initiate [% RequestAction.request_type %]">
             </form>
+            -->
+            <span class="button-small generic-button">
+            <a href="main.cgi?client=[% RequestAction.client %]&a=[% RequestAction.action %]&dtype=undefined&sp=[% sport %]&pt=[% personType %]&per=&pl=[% personLevel %]&ag=[% personAgeLevel %]&nat=[% RequestAction.request_type %]&ol=[% requestOriginLevel %]&r=1&sr=0&eID=[% requestEntityID %]&pID=[% personID %]">Initiate [% RequestAction.request_type %]</a>
+            </span>
             [% END %]
         </div>
     </div>
