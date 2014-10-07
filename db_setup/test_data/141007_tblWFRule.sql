@@ -1,0 +1,1 @@
+UPDATE tblWFRule set intApprovalEntityLevel = 100, intProblemResolutionEntityLevel = 3 WHERE strRegistrationNature = 'TRANSFER' AND intOriginLevel = 3 AND strPersonType = 'PLAYER' AND strSport = 'FOOTBALL';
