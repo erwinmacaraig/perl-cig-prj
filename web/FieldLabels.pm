@@ -40,7 +40,7 @@ sub getFieldLabels	{
 			strRegionOfBirth => 'Region of Birth',
 			strPlaceOfBirth => 'Place (Town) of Birth',
             strCountryOfBirth => 'Country of Birth',
-			intGender => 'Gender',
+			strGender => 'Gender',
 			strAddress1 => 'Address Line 1',
 			strAddress2 => 'Address Line 2',
 			strSuburb => 'Suburb',
@@ -140,6 +140,8 @@ sub getFieldLabels	{
             strMAID => 'MA ID',
             dtFrom => 'Foundation Date',
             dtTo => 'Dissolution Date',
+            strGender => 'Gender',
+            strDiscipline => 'Sport',
             	
 	);
 	}

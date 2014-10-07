@@ -436,7 +436,7 @@ sub getFieldsList	{
         strStatus
         strISOCountry
         strISOLocalLanguage
-
+		strGender
         strRegion
         strPostalCode
         strTown
