@@ -97,6 +97,10 @@ sub getFieldLabels	{
 			strISONationality => 'Nationality',
 			strISOCountry => 'Country (ISO)',
 			strISOCountryOfBirth => 'Country of Birth (ISO)',
+            intMinorMoveOtherThanFootball => 'Move to Country for reasons other than football',
+            intMinorDistance => 'Live 50km from National border. Maximum distance between the players domicile and the Clubs HQ shall be 100km',
+            intMinorEU => 'The transfer takes place within the territory of the European Union and player is aged between 16 and 18',
+            intMinorNone => 'None of the Above',
        
 		);
 	}

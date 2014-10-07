@@ -5,14 +5,21 @@
 package AssocTime;
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(timeatAssoc);
-@EXPORT_OK = qw(timeatAssoc);
+@EXPORT = qw(timeatAssoc dateatAssoc);
+@EXPORT_OK = qw(timeatAssoc dateatAssoc);
 
 use strict;
 use DateTime;
 
-sub timeatAssoc	{
+sub dateatAssoc	{
 	my($timezone, $datestring)	=@_;
+
+    return timeatAssoc($timezone, $datestring, 1);
+}
+
+sub timeatAssoc	{
+	my($timezone, $datestring, $dateonly)	=@_;
+    $dateonly ||= 0;
 	my @values;
 	my($y,$m,$d,$h,$min,$s)=(0,0,0,0,0,0);
 	if($datestring)	{
@@ -47,5 +54,8 @@ sub timeatAssoc	{
 		}
 	}
 	my $stringdate=sprintf("%02d-%02d-%02d %02d:%02d:%02d", ($values[5]+1900),($values[4]+1), $values[3],$values[2],$values[1],$values[0]);
+    if($dateonly)   {
+        $stringdate=sprintf("%02d-%02d-%02d", ($values[5]+1900),($values[4]+1), $values[3]);
+    }
 	return wantarray ? @values : $stringdate;
 }

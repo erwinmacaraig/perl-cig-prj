@@ -9,6 +9,7 @@ use TTTemplate;
 use CGI;
 use FieldLabels;
 use PersonObj;
+use PersonUtils;
 use ConfigOptions;
 use InstanceOf;
 use Countries;
@@ -34,6 +35,18 @@ sub setProcessOrder {
             'action' => 'cdu',
             'function' => 'validate_core_details',
             'fieldset'  => 'core',
+        },
+        {
+            'action' => 'minor',
+            'function' => 'display_minor_fields',
+            'label'  => 'Minor',
+            'fieldset'  => 'minor',
+            'NoNav'     => 1,
+        },
+        {
+            'action' => 'minoru',
+            'function' => 'validate_minor_fields',
+            'fieldset'  => 'minor',
         },
         {
             'action' => 'cond',
@@ -98,6 +111,7 @@ sub setupValues    {
         next if ( $self->{'SystemConfig'}{'NoUnspecifiedGender'} and $k eq $Defs::GENDER_NONE );
         $genderoptions{$k} = $Defs::PersonGenderInfo{$k} || '';
     }
+    my $values = {};
 
     $self->{'FieldSets'} = {
         core => {
@@ -250,6 +264,45 @@ sub setupValues    {
                     strSuburb    => $field_case_rules->{'strSuburb'}    || '',
                 }
             },
+        },
+        minor => {
+            'fields' => {
+                intMinorMoveOtherThanFootball => {
+                    label => $FieldLabels->{'intMinorMoveOtherThanFootball'} || '',
+                    value => $values->{'intMinorMoveOtherThanFootball'} || 0,
+                    type  => 'checkbox',
+                    displaylookup => { 1 => 'Yes', 0 => 'No' },
+                },
+                intMinorDistance => {
+                    label => $FieldLabels->{'intMinorDistance'} || '',
+                    value => $values->{'intMinorDistance'} || 0,
+                    type  => 'checkbox',
+                    displaylookup => { 1 => 'Yes', 0 => 'No' },
+                },
+                intMinorEU => {
+                    label => $FieldLabels->{'intMinorEU'} || '',
+                    value => $values->{'intMinorEU'} || 0,
+                    type  => 'checkbox',
+                    displaylookup => { 1 => 'Yes', 0 => 'No' },
+                },
+                intMinorNone => {
+                    label => $FieldLabels->{'intMinorNone'} || '',
+                    value => $values->{'intMinorNone'} || 0,
+                    type  => 'checkbox',
+                    displaylookup => { 1 => 'Yes', 0 => 'No' },
+                },
+            },
+            'order' => [qw(
+                intMinorMoveOtherThanFootball
+                intMinorDistance
+                intMinorEU
+                intMinorNone
+            )],
+            fieldtransform => {
+                textcase => {
+                    strSuburb    => $field_case_rules->{'strSuburb'}    || '',
+                }
+            },
         }
     };
 
@@ -295,6 +348,7 @@ sub validate_core_details    {
 
     my $id = $self->ID() || 0;
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
+    $personObj->load();
     $userData->{'strStatus'} = 'INPROGRESS';
     $userData->{'intRealmID'} = $self->{'Data'}{'Realm'};
     $personObj->setValues($userData);
@@ -319,6 +373,71 @@ sub validate_core_details    {
 
     return ('',1);
 }
+
+sub display_minor_fields { 
+    my $self = shift;
+
+    my $id = $self->ID() || 0;
+    if(!$id)    {
+        push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person';
+    }
+    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+        #There are errors - reset where we are to go back to the form again
+        $self->decrementCurrentProcessIndex();
+        return ('',2);
+    }
+    my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
+    $personObj->load();
+    my $dob = $personObj->getValue('dtDOB_RAW');
+    my $isMinor = personIsMinor($self->{'Data'}, $dob);
+    if(!$isMinor)   {
+        $self->incrementCurrentProcessIndex();
+        $self->incrementCurrentProcessIndex();
+        return ('',2);
+    }
+
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+    my %PageData = (
+        HiddenFields => $self->stringifyCarryField(),
+        Target => $self->{'Data'}{'target'},
+        Errors => $self->{'RunDetails'}{'Errors'} || [],
+        Content => $fieldsContent || '',
+        ScriptContent => $scriptContent || '',
+        Title => '',
+        TextTop => '',
+        TextBottom => '',
+    );
+    my $pagedata = $self->display(\%PageData);
+
+    return ($pagedata,0);
+
+}
+
+sub validate_minor_fields { 
+    my $self = shift;
+
+    my $userData = {};
+    ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields();
+    my $id = $self->ID() || 0;
+    if(!$id)    {
+        push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person';
+    }
+    if($userData->{'intMinorNone'})   {
+        push @{$self->{'RunDetails'}{'Errors'}}, 'This person is not eligible for registration';
+    }
+    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+        #There are errors - reset where we are to go back to the form again
+        $self->decrementCurrentProcessIndex();
+        return ('',2);
+    }
+
+    my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
+    $personObj->load();
+    $personObj->setValues($userData);
+    $personObj->write();
+    return ('',1);
+}
+
 
 sub display_contact_details    { 
     my $self = shift;
@@ -356,6 +475,7 @@ sub validate_contact_details    {
     }
 
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
+    $personObj->load();
     $personObj->setValues($userData);
     $personObj->write();
     return ('',1);
