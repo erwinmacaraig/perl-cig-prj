@@ -27,6 +27,7 @@ sub handlePersonFlow {
     my $entityID = getLastEntityID($clientValues) || 0;
     my $entityLevel = getLastEntityLevel($clientValues) || 0;
     my $originLevel = $Data->{'clientValues'}{'authLevel'} || 0;
+    my $defaultType = $params{'dtype'} || '';
 
     my $flow = new Flow_PersonBackend(
         db => $Data->{'db'},
@@ -35,6 +36,7 @@ sub handlePersonFlow {
         CarryFields => {
             client => $client,
             a => $action,
+            dtype => $defaultType,
         },
         SystemConfig => $Data->{'SystemConfig'},
         ClientValues => $clientValues,
