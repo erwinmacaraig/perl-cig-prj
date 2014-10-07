@@ -51,7 +51,7 @@ sub getRegistrationItems    {
         AND (RI.strISOCountry_IN ='' OR RI.strISOCountry_IN IS NULL OR RI.strISOCountry_IN LIKE CONCAT('%|',?,'|%'))
         AND (RI.strISOCountry_NOTIN ='' OR RI.strISOCountry_NOTIN IS NULL OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))        
       ]; 
-        
+    print STDERR "getRegistrationItems Sport Query: " .  $Rego_ref->{'strSport'};    
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
     $q->execute(
 	         $Data->{'Realm'}, 

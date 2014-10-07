@@ -36,7 +36,7 @@ use Switch;
 use PlayerPassport;
 use Documents;
 use CGI qw(param unescape escape);
-
+use AuditLog;
 sub cleanTasks  {
 
     my ($Data, $personID, $entityID, $personRegistrationID, $ruleFor) = @_;

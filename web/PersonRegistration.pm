@@ -25,7 +25,7 @@ use GenAgeGroup;
 use Data::Dumper;
 use Person;
 use PersonRegisterWhat;
-
+use AuditLog;
 sub rolloverExistingPersonRegistrations {
 
     my ($Data, $personID, $personRegistrationID) = @_;
