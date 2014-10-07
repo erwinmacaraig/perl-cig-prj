@@ -418,10 +418,6 @@ sub listRequests {
             field => 'requestType',
         }, 
         {
-            name => $Data->{'lang'}->txt('Type'),
-            field => 'requestType',
-        }, 
-        {
             name => $Data->{'lang'}->txt('Response Status'),
             field => 'requestResponse',
         }, 
