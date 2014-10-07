@@ -35,6 +35,7 @@ sub handleRegistrationFlowBackend   {
     my %params=$cgi->Vars();
     my $lang = $Data->{'lang'};
     my $personID = param('pID') || getID($clientValues, $Defs::LEVEL_PERSON) || 0;
+    #my $personID = getID($clientValues, $Defs::LEVEL_PERSON) || param('pID') || 0;
     my $entityID = getLastEntityID($clientValues) || 0;
     my $entityLevel = getLastEntityLevel($clientValues) || 0;
     my $originLevel = $Data->{'clientValues'}{'authLevel'} || 0;
@@ -52,6 +53,8 @@ sub handleRegistrationFlowBackend   {
     $Hidden{'prodIds'} = $params{'prodIds'} || '';
     $Hidden{'prodQty'} = $params{'prodQty'} || '';
 
+    #TODO : check how to populate Data client Values (if current level is LEVEL_PERSON?)
+    $Hidden{'pID'} = $personID;
 	
     my $pref= undef;
     if ($personID && $personID>0)  {
