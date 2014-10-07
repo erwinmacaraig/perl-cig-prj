@@ -20,6 +20,12 @@
                         [% Lang.txt('Payment Still Required') %]
                     </span>
                 [% END %]
+                [% IF entity.strNationalPeriodName %]
+                    <span class="details-row">
+                        <span class="details-left">[% Lang.txt('Registration Period') %]:</span>
+                        <span class="details-right">[% entity.strNationalPeriodName %]</span>
+                    </span>
+                [% END %]
                 [% IF entity.RegistrationNature %]
                     <span class="details-row">
                         <span class="details-left">[% Lang.txt('Registration Type') %]:</span>

@@ -932,7 +932,7 @@ sub checkForOutstandingTasks {
                 );
                 $rc = 1;
         }
-         if ($personID and $taskType ne $Defs::WF_TASK_TYPE_CHECKDUPL)  {
+         if (!$rowCount and $personID and $taskType ne $Defs::WF_TASK_TYPE_CHECKDUPL)  {
                 $st = qq[
 	            	UPDATE tblPerson
                     SET
