@@ -101,6 +101,26 @@
                 <input class="button-small generic-button" type="submit" name="response" value="Deny">
             </form>
             [% END %]
+
+            [% IF RequestAction.initiateRequestProcess == 1 %]
+            <form action="[% RequestAction.target %]" method="POST" style="float: left">
+                <input type="hidden" name="client" value="[% RequestAction.client %]">
+                <input type="hidden" name="a" value="[% RequestAction.action %]">
+                <input type="hidden" name="sp" value="[% sport %]">
+                <input type="hidden" name="pt" value="[% personType %]">
+                <input type="hidden" name="per" value="[%  %]">
+                <input type="hidden" name="pl" value="[% personLevel %]">
+                <input type="hidden" name="ag" value="[% personAgeLevel %]">
+                <input type="hidden" name="nat" value="[% RequestAction.request_type %]">
+                <input type="hidden" name="ol" value="[% requestOriginLevel %]">
+                <input type="hidden" name="r" value="[%  %]">
+                <input type="hidden" name="sr" value="[%  %]">
+                <input type="hidden" name="eID" value="[% requestEntityID %]">
+                <input type="hidden" name="pID" value="[% personID %]">
+
+                <input class="button-small generic-button" type="submit" name="submit" value="Initiate [% RequestAction.request_type %]">
+            </form>
+            [% END %]
         </div>
     </div>
 </div>
