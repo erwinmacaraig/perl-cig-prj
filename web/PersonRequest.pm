@@ -16,6 +16,8 @@ use Reg_common;
 use Utils;
 use AuditLog;
 use PersonRegistration;
+use Person;
+
 use CGI qw(unescape param);
 use Log;
 use Data::Dumper;
@@ -88,6 +90,7 @@ sub listPersonRecord {
 	my %params = $p->Vars();
 
     my $client = setClient( $Data->{'clientValues'} ) || '';
+	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
 
     my $MID = safe_param('mid','number') || '';
     my $firstname = safe_param('firstname','word') || '';
@@ -126,7 +129,7 @@ sub listPersonRecord {
         FROM
             tblPerson P
         INNER JOIN tblPersonRegistration_$Data->{'Realm'} PR
-            ON (PR.intPersonID = P.intPersonID and PR.intRealmID = P.intRealmID and PR.strStatus in ('ACTIVE', 'PASSIVE','PENDING') and PR.strPersonType = 'PLAYER')
+            ON (PR.intEntityID != ? AND PR.intPersonID = P.intPersonID and PR.intRealmID = P.intRealmID and PR.strStatus in ('ACTIVE', 'PASSIVE','PENDING') and PR.strPersonType = 'PLAYER')
         LEFT JOIN tblEntity E 
             ON (E.intEntityID = PR.intEntityID and E.intRealmID = PR.intRealmID)
         WHERE
@@ -141,6 +144,7 @@ sub listPersonRecord {
     my $db = $Data->{'db'};
     my $q = $db->prepare($st) or query_error($st);
     $q->execute(
+        $entityID,
         $Data->{'Realm'},
         $MID,
         $firstname,
@@ -450,7 +454,9 @@ sub viewRequest {
 
     my $requestID = safe_param('rid', 'number') || 0;
 	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
+    my $requestType = undef;
     my $title = "View Request";
+    my $action = undef;
 
     my %regFilter = (
         'entityID' => $entityID,
@@ -461,18 +467,23 @@ sub viewRequest {
     $request = $request->[0];
     return ("Request not found.", $title) if !$request;
 
-    print STDERR Dumper $request;
     my $templateFile = undef;
     switch($request->{'strRequestType'}) {
-        case 'TRANSFER' {
+        case "$Defs::PERSON_REQUEST_TRANSFER" {
             $templateFile = "personrequest/transfer/view.templ";
+            $requestType = $Defs::PERSON_REQUEST_TRANSFER;
         }
-        case 'ACCESS' {
+        case "$Defs::PERSON_REQUEST_ACCESS" {
             $templateFile = "personrequest/access/view.templ";
+            $requestType = $Defs::PERSON_REQUEST_ACCESS;
         }
         else {
         }
     }
+
+    my $personDetails = loadPersonDetails($Data->{'db'}, $request->{'intPersonID'});
+    my $personCurrAgeLevel = calculateAgeLevel($Data, $personDetails->{'currentAge'});
+    my $originLevel = $Data->{'clientValues'}{'authLevel'};
 
     my %TemplateData = (
         'requestID' => $request->{'intPersonRequestID'} || 0,
@@ -488,20 +499,38 @@ sub viewRequest {
         'personGender' => $Defs::PersonGenderInfo{$request->{'intGender'} || 0} || '',
         'DOB' => $request->{'dtDOB'} || '',
         'personStatus' => $request->{'personStatus'} || '',
+        'sport' => $request->{'strSport'} || '',
         'personType' => $request->{'strPersonType'} || '',
         'personLevel' => $request->{'strPersonLevel'} || '',
         'requestNotes' => $request->{'strRequestNotes'} || '',
         'responseNotes' => $request->{'strResponseNotes'} || '',
+
+        'personID' => $request->{'intPersonID'},
+        'personAgeLevel' => $personCurrAgeLevel,
+        'requestOriginLevel' => $originLevel,
+        'requestEntityID' => $entityID,
     );
 
+
     my $showAction = 0;
-    $showAction = 1 if ($entityID == $request->{'intRequestToEntityID'});
+    if ($entityID == $request->{'intRequestToEntityID'}) {
+        $showAction = 1;
+        $action = "PRA_S";
+    }
+
+    my $initiateRequestProcess = 0;
+    if($entityID == $request->{'intRequestFromEntityID'} and $request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_RESPONSE_ACCEPTED) {
+        $initiateRequestProcess = 1;
+        $action = "PREGF_TU";
+    }
 
     my %RequestAction = (
         'client' => $Data->{client} || 0,
         'rid' => $requestID,
-        'action' => 'PRA_S',
+        'action' => $action,
         'showAction' => $showAction,
+        'initiateRequestProcess' => $initiateRequestProcess,
+        'request_type' => $requestType
     );
 
     $TemplateData{'RequestAction'} = \%RequestAction;
