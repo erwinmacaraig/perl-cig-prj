@@ -81,8 +81,6 @@ sub optionsPersonRegisterWhat {
     ) = @_;
     $bulk ||= 0;
 
-
-print STDERR "AAAAAAAAAAAAAAAAAAAAAAA $defaultType\n";
     my $pref= undef;
     $pref = loadPersonDetails($Data->{'db'}, $personID) if ($personID);
 
@@ -258,7 +256,6 @@ print STDERR "AAAAAAAAAAAAAAAAAAAAAAA $defaultType\n";
                     $MATRIXwhere
                 GROUP BY $lookingForField
             ];
-print STDERR $st;
 
             @values = @MATRIXvalues;
         }

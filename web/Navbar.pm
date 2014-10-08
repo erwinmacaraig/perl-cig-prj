@@ -204,6 +204,22 @@ sub getEntityMenuData {
             url => $baseurl."a=P_L&amp;l=$Defs::LEVEL_PERSON",
         };
     #}
+    $menuoptions{'persons_addplayer'} = {
+        name => $lang->txt('Add Player'),
+        url => $baseurl."a=PF_&amp;dtype=PLAYER",
+    };
+    $menuoptions{'persons_addcoach'} = {
+        name => $lang->txt('Add Coach'),
+        url => $baseurl."a=PF_&amp;dtype=COACH",
+    };
+    $menuoptions{'persons_addtechofficial'} = {
+        name => $lang->txt('Add Tech Official'),
+        url => $baseurl."a=PF_&amp;dtype=TECHOFFICIAL",
+    };
+    $menuoptions{'persons_addofficial'} = {
+        name => $lang->txt('Add Official'),
+        url => $baseurl."a=PF_&amp;dtype=OFFICIAL",
+    };
 
     if($paymentSplitSettings->{'psBanks'}) {
         $menuoptions{'bankdetails'} = {
@@ -362,7 +378,13 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
         [ $lang->txt('Zones'), 'menu','zones'],
         [ $lang->txt('Clubs'), 'menu','clubs'],
         [ $lang->txt('Venues'), 'menu','venues'],
-        [ $lang->txt('People'), 'menu','persons'],
+        [ $lang->txt('People'), 'menu',[
+            'persons',
+            'persons_addplayer',
+            'persons_addcoach',
+            'persons_addofficial',
+            'persons_addtechofficial',
+        ]],
         [ $lang->txt('Work Tasks'), 'menu','approvals'],
         [ $lang->txt('Transfers'), 'menu', [
         'clearances',    
@@ -884,6 +906,23 @@ sub getClubMenuData {
         };
     }
 
+    $menuoptions{'persons_addplayer'} = {
+        name => $lang->txt('Add Player'),
+        url => $baseurl."a=PF_&amp;dtype=PLAYER",
+    };
+    $menuoptions{'persons_addcoach'} = {
+        name => $lang->txt('Add Coach'),
+        url => $baseurl."a=PF_&amp;dtype=COACH",
+    };
+    $menuoptions{'persons_addtechofficial'} = {
+        name => $lang->txt('Add Tech Official'),
+        url => $baseurl."a=PF_&amp;dtype=TECHOFFICIAL",
+    };
+    $menuoptions{'persons_addofficial'} = {
+        name => $lang->txt('Add Official'),
+        url => $baseurl."a=PF_&amp;dtype=OFFICIAL",
+    };
+
 
 
 
@@ -900,6 +939,10 @@ sub getClubMenuData {
         'requesttransfer',
         'requestaccess',
         'listrequests',
+            'persons_addplayer',
+            'persons_addcoach',
+            'persons_addofficial',
+            'persons_addtechofficial',
          ]],
 
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu','venues'],

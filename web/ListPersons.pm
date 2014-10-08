@@ -301,7 +301,7 @@ my $filterfields = [
 
     if(allowedAction($Data, 'm_a') && !$Data->{'ReadOnlyLogin'})    {
         $options{'addperson'} = [
-        "$target?client=$client&amp;a=P_A&amp;l=$Defs::LEVEL_PERSON",
+        "$target?client=$client&amp;a=PF_&amp;l=$Defs::LEVEL_PERSON",
         $textLabels{'addPerson'}
         ];
         delete $options{'addperson'} if $Data->{'SystemConfig'}{'LockPerson'} or !$allowClubAdd;
