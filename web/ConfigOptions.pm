@@ -453,7 +453,6 @@ sub getFieldsList	{
         strMANotes
         intLegalTypeID
         strLegalID
-        strGender
         strDiscipline
         intClubClassification
         strMAID

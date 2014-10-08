@@ -40,7 +40,6 @@ sub getFieldLabels	{
 			strRegionOfBirth => 'Region of Birth',
 			strPlaceOfBirth => 'Place (Town) of Birth',
             strCountryOfBirth => 'Country of Birth',
-			strGender => 'Gender',
 			strAddress1 => 'Address Line 1',
 			strAddress2 => 'Address Line 2',
 			strSuburb => 'Suburb',
