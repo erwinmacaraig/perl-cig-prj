@@ -876,7 +876,8 @@ sub getClubMenuData {
         };
     }
 
-    if ($SystemConfig->{'allowPersonRequest'}) {
+    #hide for now; list is already included in Work Tasks
+    if (0) {
         $menuoptions{'listrequests'} = {
            name => $lang->txt('List Requests'),
            url => $baseurl."a=PRA_L",
