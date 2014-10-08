@@ -32,6 +32,11 @@
                 </span>
 
                 <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Person Registration Status") %]:</span>
+                    <span class="details-left">[% personRegistrationStatus %]</span>
+                </span>
+
+                <span class="details-row">
                     <span class="details-left">[% Lang.txt("First Name") %]:</span>
                     <span class="details-left">[% personFirstname %]</span>
                 </span>
@@ -103,7 +108,6 @@
             [% END %]
 
             [% IF RequestAction.initiateRequestProcess == 1 %]
-            <!--
             <form action="[% RequestAction.target %]" method="POST" style="float: left">
                 <input type="hidden" name="client" value="[% RequestAction.client %]">
                 <input type="hidden" name="a" value="[% RequestAction.action %]">
@@ -118,13 +122,15 @@
                 <input type="hidden" name="sr" value="[%  %]">
                 <input type="hidden" name="eID" value="[% requestEntityID %]">
                 <input type="hidden" name="pID" value="[% personID %]">
+                <input type="hidden" name="reqID" value="[% requestID %]">
 
                 <input class="button-small generic-button" type="submit" name="submit" value="Initiate [% RequestAction.request_type %]">
             </form>
-            -->
+            <!--
             <span class="button-small generic-button">
             <a href="main.cgi?client=[% RequestAction.client %]&a=[% RequestAction.action %]&dtype=undefined&sp=[% sport %]&pt=[% personType %]&per=&pl=[% personLevel %]&ag=[% personAgeLevel %]&nat=[% RequestAction.request_type %]&ol=[% requestOriginLevel %]&r=1&sr=0&eID=[% requestEntityID %]&pID=[% personID %]">Initiate [% RequestAction.request_type %]</a>
             </span>
+            -->
             [% END %]
         </div>
     </div>
