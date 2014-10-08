@@ -625,8 +625,6 @@ sub getRegistrationData	{
 sub addRegistration {
     my($Data, $Reg_ref) = @_;
 
-    warn "ADD REGISTRATION CALLED";
-
     if ($Reg_ref->{'personEntityRole'} eq '-')  {
         $Reg_ref->{'personEntityRole'}= '';
     }
@@ -688,7 +686,8 @@ sub addRegistration {
             strAgeLevel,
             strRegistrationNature,
             intPaymentRequired,
-            intClearanceID
+            intClearanceID,
+            intPersonRequestID
 		)
 		VALUES
 		(
@@ -710,6 +709,7 @@ sub addRegistration {
             ?,
             NOW(),
             NOW(),
+            ?,
             ?,
             ?,
             ?,
@@ -742,7 +742,8 @@ sub addRegistration {
   		$Reg_ref->{'ageLevel'} || '',
   		$Reg_ref->{'registrationNature'} || '',
   		$Reg_ref->{'paymentRequired'} || 0,
-  		$Reg_ref->{'clearanceID'} || 0
+  		$Reg_ref->{'clearanceID'} || 0,
+  		$Reg_ref->{'personRequestID'} || 0,
   	);
 	
 	if ($q->errstr) {
