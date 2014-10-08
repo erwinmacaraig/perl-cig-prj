@@ -740,32 +740,39 @@ sub approveTask {
             AND intRealmID=?
 		];
 		
-  	$q = $db->prepare($st);
-  	$q->execute(
-        $Defs::WF_TASK_STATUS_COMPLETE,
-	  	$Data->{'clientValues'}{'userID'},
-  		$WFTaskID,
-        $Data->{'Realm'}
-  	);
-  	####
-  	auditLog($WFTaskID, $Data, 'Updated WFTask', 'WFTask');
-  	###	
-    setDocumentStatus($Data, $WFTaskID, 'APPROVED');
-	if ($q->errstr) {
-		return $q->errstr . '<br>' . $st
-	}
+        $q = $db->prepare($st);
+        $q->execute(
+            $Defs::WF_TASK_STATUS_COMPLETE,
+            $Data->{'clientValues'}{'userID'},
+            $WFTaskID,
+            $Data->{'Realm'}
+        );
+  	    ####
+  	    auditLog($WFTaskID, $Data, 'Updated WFTask', 'WFTask');
+  	    ###	
+        setDocumentStatus($Data, $WFTaskID, 'APPROVED');
+	    if ($q->errstr) {
+	    	return $q->errstr . '<br>' . $st
+	    }
 	
     $st = qq[
         SELECT 
-            intPersonID,
-            intPersonRegistrationID,
-            intEntityID,
-            intDocumentID,
-            intDocumentTypeID,
-            strTaskType,
-            strWFRuleFor
-        FROM tblWFTask
-        WHERE intWFTaskID = ?
+            wft.intPersonID,
+            wft.intPersonRegistrationID,
+            wft.intEntityID,
+            wft.intDocumentID,
+            wft.intDocumentTypeID,
+            wft.strTaskType,
+            wft.strWFRuleFor,
+            wft.strRegistrationNature,
+            pr.intPersonRegistrationID,
+            pr.intEntityID as personRegoEntityID,
+            pr.intPersonRequestID
+        FROM
+            tblWFTask wft
+        LEFT JOIN
+            tblPersonRegistration_$Data->{'Realm'} as pr ON (pr.intPersonRegistrationID = wft.intPersonRegistrationID)
+        WHERE wft.intWFTaskID = ?
     ];
         
     $q = $db->prepare($st);
@@ -778,7 +785,22 @@ sub approveTask {
     my $documentID= $dref->{intDocumentID} || 0;
     my $ruleFor = $dref->{strWFRuleFor} || '';
     my $taskType= $dref->{strTaskType} || '';
+    my $registrationNature = $dref->{'strRegistrationNature'} || '';
+    my $personRequestID = $dref->{'intPersonRequestID'} || '';
+    my $personRegoEntityID = $dref->{'personRegoEntityID'} || '';
     
+    if($registrationNature eq $Defs::REGISTRATION_NATURE_TRANSFER) {
+        #check for pending tasks?
+
+        my $allComplete = checkRelatedTasks($Data);
+        if($Data->{'clientValues'}{'currentLevel'} eq $Defs::LEVEL_NATIONAL) {
+            PersonRequest::finaliseTransfer($Data, $personRequestID);
+        }
+        elsif ($allComplete) {
+            PersonRequest::finaliseTransfer($Data, $personRequestID);
+        }
+    }
+
    	my $rc = checkForOutstandingTasks($Data,$ruleFor, $taskType, $entityID, $personID, $personRegistrationID, $documentID);
     
     return($rc);
