@@ -23,7 +23,7 @@ my $Fields = {
 		strPreferredName
 		dtDOB
 		strPlaceofBirth
-		intGender
+		strGender
 		strAddress1
 		strAddress2
 		strSuburb
