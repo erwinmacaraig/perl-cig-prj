@@ -315,9 +315,9 @@ print STDERR "SSSS$action $clubID\n";
           options     => \%Mcountriesonly,
           firstoption => [ '', 'Select Country' ],
       },
-      strISOLocalLanguage => {
+      intLocalLanguage => {
       	label => 'Local Name Language',
-        value => $field->{strISOLocalLanguage},
+        value => $field->{intLocalLanguage},
         type  => 'text',
         size  => '30',
         maxsize => '50',
@@ -408,7 +408,7 @@ print STDERR "SSSS$action $clubID\n";
         intLegalTypeID
         strLegalID
         strISOCountry
-        strISOLocalLanguage
+        intLocalLanguage
         strRegion
         strPostalCode
         strTown
@@ -544,7 +544,7 @@ sub loadClubDetails {
      strLatinShortName,
      strLatinFacilityName,
      strISOCountry,
-     strISOLocalLanguage,
+     intLocalLanguage,
      strRegion,
      strPostalCode,
      strTown,

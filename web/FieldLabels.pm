@@ -101,6 +101,7 @@ sub getFieldLabels	{
             intMinorDistance => 'Live 50km from National border. Maximum distance between the players domicile and the Clubs HQ shall be 100km',
             intMinorEU => 'The transfer takes place within the territory of the European Union and player is aged between 16 and 18',
             intMinorNone => 'None of the Above',
+            intLocalLanguage => 'Local Name Language',
        
 		);
 	}
@@ -135,7 +136,7 @@ sub getFieldLabels	{
             strAssocNature => 'Association Nature',
             strMANotes => 'MA Comment',
             intLegalTypeID => 'Legal Entity Type', 
-            strISOLocalLanguage => 'Local Name Language',
+            intLocalLanguage => 'Local Name Language',
             strLegalID => "Legal Type Number",
             strMAID => 'MA ID',
             dtFrom => 'Foundation Date',

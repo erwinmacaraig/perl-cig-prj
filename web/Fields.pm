@@ -21,6 +21,7 @@ my $Fields = {
 		strSurname
 		strMaidenName
 		strPreferredName
+        intLocalLanguage
 		dtDOB
 		strPlaceofBirth
 		intGender

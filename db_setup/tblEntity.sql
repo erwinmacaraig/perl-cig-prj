@@ -11,7 +11,7 @@ CREATE TABLE `tblEntity` (
   `strMAID` varchar(30) DEFAULT NULL,
   `strLocalName` varchar(100) DEFAULT '' COMMENT 'The name of a organization in local language (the language specified by LocalNameLanguage attribute).',
   `strLocalShortName` varchar(100) DEFAULT '' COMMENT 'The short name of a organization in local language (the language specified by LocalNameLanguage attribute).',
-  `strISOLocalLanguage` varchar(20) DEFAULT NULL COMMENT 'The language the localized names(LocalName and LocalShortName) are written in.',
+  `intLocalLanguage` INT NOT NUL DEFAULT 0 COMMENT 'The language the localized names(LocalName and LocalShortName) are written in.',
   `strLocalFacilityName` varchar(150) DEFAULT '',
   `strLatinName` varchar(100) DEFAULT '' COMMENT 'The full name of the organization in Latin script/alphabet. For a club this is for example Ballsportverein Borussia Dortmund e.V.',
   `strLatinShortName` varchar(100) DEFAULT '' COMMENT 'The short name (or abbreviation) of the organization in Latin script/alphabet. As an example this could be FIFA or BVB.',

@@ -315,10 +315,13 @@ sub getFieldsList	{
         strPersonNo
         strStatus
         strSalutation
-        strLocalFirstname
         strPreferredName
         strMiddlename
+        intLocalLanguage
+        strLocalFirstname
         strLocalSurname
+        strLatinFirstname
+        strLatinSurname
         strMaidenName
         dtDOB
         strPlaceofBirth
@@ -435,7 +438,7 @@ sub getFieldsList	{
         strLatinShortName
         strStatus
         strISOCountry
-        strISOLocalLanguage
+        intLocalLanguage
 		strGender
         strRegion
         strPostalCode
