@@ -212,13 +212,25 @@ sub getEntityMenuData {
         name => $lang->txt('Add Coach'),
         url => $baseurl."a=PF_&amp;dtype=COACH",
     };
-    $menuoptions{'persons_addtechofficial'} = {
-        name => $lang->txt('Add Tech Official'),
-        url => $baseurl."a=PF_&amp;dtype=TECHOFFICIAL",
-    };
+    if($currentLevel == $Defs::LEVEL_NATIONAL) {
+        $menuoptions{'persons_addmaofficial'} = {
+             name => $lang->txt('Add MA Official'),
+            url => $baseurl."a=PF_&amp;dtype=MAOFFICIAL",
+        };
+    }
+    if($currentLevel == $Defs::LEVEL_CLUB) {
+        $menuoptions{'persons_addteamofficial'} = {
+            name => $lang->txt('Add Team Official'),
+            url => $baseurl."a=PF_&amp;dtype=TEAMOFFICIAL",
+        };
+        $menuoptions{'persons_addclubofficial'} = {
+            name => $lang->txt('Add Club Official'),
+            url => $baseurl."a=PF_&amp;dtype=CLUBOFFICIAL",
+        };
+    }
     $menuoptions{'persons_addofficial'} = {
-        name => $lang->txt('Add Official'),
-        url => $baseurl."a=PF_&amp;dtype=OFFICIAL",
+        name => $lang->txt('Add Referee'),
+        url => $baseurl."a=PF_&amp;dtype=REFEREE",
     };
 
     if($paymentSplitSettings->{'psBanks'}) {
@@ -383,7 +395,9 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
             'persons_addplayer',
             'persons_addcoach',
             'persons_addofficial',
-            'persons_addtechofficial',
+            'persons_addteamofficial',
+            'persons_addclubofficial',
+            'persons_addmaofficial',
         ]],
         [ $lang->txt('Work Tasks'), 'menu','approvals'],
         [ $lang->txt('Transfers'), 'menu', [
@@ -914,14 +928,28 @@ sub getClubMenuData {
         name => $lang->txt('Add Coach'),
         url => $baseurl."a=PF_&amp;dtype=COACH",
     };
-    $menuoptions{'persons_addtechofficial'} = {
-        name => $lang->txt('Add Tech Official'),
-        url => $baseurl."a=PF_&amp;dtype=TECHOFFICIAL",
-    };
+    if($currentLevel == $Defs::LEVEL_NATIONAL) {
+        $menuoptions{'persons_addmaofficial'} = {
+             name => $lang->txt('Add MA Official'),
+            url => $baseurl."a=PF_&amp;dtype=MAOFFICIAL",
+        };
+    }
+    if($currentLevel == $Defs::LEVEL_CLUB) {
+        $menuoptions{'persons_addteamofficial'} = {
+            name => $lang->txt('Add Team Official'),
+            url => $baseurl."a=PF_&amp;dtype=TEAMOFFICIAL",
+        };
+        $menuoptions{'persons_addclubofficial'} = {
+            name => $lang->txt('Add Club Official'),
+            url => $baseurl."a=PF_&amp;dtype=CLUBOFFICIAL",
+        };
+    }
     $menuoptions{'persons_addofficial'} = {
-        name => $lang->txt('Add Official'),
-        url => $baseurl."a=PF_&amp;dtype=OFFICIAL",
+        name => $lang->txt('Add Referee'),
+        url => $baseurl."a=PF_&amp;dtype=REFEREE",
     };
+
+
 
 
 
@@ -942,7 +970,9 @@ sub getClubMenuData {
             'persons_addplayer',
             'persons_addcoach',
             'persons_addofficial',
-            'persons_addtechofficial',
+            'persons_addteamofficial',
+            'persons_addclubofficial',
+            'persons_addmaofficial',
          ]],
 
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu','venues'],
