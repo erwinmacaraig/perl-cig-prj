@@ -376,6 +376,7 @@ sub listTasks {
     if(scalar @{$personRequests}) {
 
         for my $request (@{$personRequests}) {
+            #next if ($request->{''} eq 'ACCEPTED' and $request->{'strRequestStatus'} eq 'PENDING')
             $rowCount++;
             my $name = formatPersonName($Data, $request->{'strLocalFirstname'}, $request->{'strLocalSurname'}, $request->{'intGender'});
             my $viewURL = "$Data->{'target'}?client=$client&amp;a=PRA_V&rid=$request->{'intPersonRequestID'}";
@@ -795,9 +796,11 @@ sub approveTask {
         my $allComplete = checkRelatedTasks($Data);
         if($Data->{'clientValues'}{'currentLevel'} eq $Defs::LEVEL_NATIONAL) {
             PersonRequest::finaliseTransfer($Data, $personRequestID);
+            PersonRequest::setRequestStatus($Data, $personRequestID, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
         }
         elsif ($allComplete) {
             PersonRequest::finaliseTransfer($Data, $personRequestID);
+            PersonRequest::setRequestStatus($Data, $personRequestID, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
         }
     }
 
@@ -1494,6 +1497,7 @@ sub rejectTask {
     setDocumentStatus($Data, $WFTaskID, 'REJECTED');
 
     resetRelatedTasks($Data, $WFTaskID, 'PENDING');
+
     if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
 	}
