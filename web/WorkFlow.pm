@@ -35,6 +35,7 @@ use Data::Dumper;
 use Switch;
 use PlayerPassport;
 use Documents;
+use PersonRequest;
 use CGI qw(param unescape escape);
 use AuditLog;
 sub cleanTasks  {
@@ -364,7 +365,34 @@ sub listTasks {
         );
 		push @TaskList, \%row;
     }
-		
+
+
+    my %reqFilters = (
+        'entityID' => $entityID
+    );
+
+    my $personRequests = getRequests($Data, \%reqFilters);
+
+    if(scalar @{$personRequests}) {
+
+        for my $request (@{$personRequests}) {
+            $rowCount++;
+            my $name = formatPersonName($Data, $request->{'strLocalFirstname'}, $request->{'strLocalSurname'}, $request->{'intGender'});
+            my $viewURL = "$Data->{'target'}?client=$client&amp;a=PRA_V&rid=$request->{'intPersonRequestID'}";
+
+            my %personRequest = (
+                TaskType => $request->{'strRequestType'},
+                TaskDescription => $Data->{'lang'}->txt('Person Request'),
+                Name => $name,
+                TaskStatus => $request->{'strRequestResponse'} ? $request->{'strRequestResponse'} : 'PENDING',
+                viewURL => $viewURL,
+                showView => 1,
+            );
+            push @TaskList, \%personRequest;
+        }
+    }
+
+
 	my $msg = ''; 
 	if ($rowCount == 0) {
 		$msg = $Data->{'lang'}->txt('No outstanding tasks');
