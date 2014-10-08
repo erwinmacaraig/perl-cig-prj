@@ -19,6 +19,7 @@ use FieldCaseRule;
 use WorkFlow;
 use PersonRegistrationFlow_Common;
 use AuditLog;
+use PersonLanguages;
 
 
 sub setProcessOrder {
@@ -113,6 +114,43 @@ sub setupValues    {
     }
     my $values = {};
 
+    my $languages = getPersonLanguages( $self->{'Data'}, 1, 0);
+    my %languageOptions = ();
+    my $nonLatin = 0;
+    my @nonLatinLanguages =();
+    for my $l ( @{$languages} ) {
+        $languageOptions{$l->{'intLanguageID'}} = $l->{'language'} || next;
+        if($l->{'intNonLatin'}) {
+            $nonLatin = 1 ;
+            push @nonLatinLanguages, $l->{'intLanguageID'};
+        }
+    }
+    my $nonlatinscript = '';
+    if($nonLatin)   {
+        my $vals = join(',',@nonLatinLanguages);
+        $nonlatinscript =   qq[
+           <script>
+                jQuery(document).ready(function()  {
+                    jQuery('#l_row_strLatinFirstname').hide();
+                    jQuery('#l_row_strLatinSurname').hide();
+                    jQuery('#l_intLocalLanguage').change(function()   {
+                        var lang = parseInt(jQuery('#l_intLocalLanguage').val());
+                        nonlatinvals = [$vals];
+                        if(nonlatinvals.indexOf(lang) !== -1 )  {
+                            jQuery('#l_row_strLatinFirstname').show();
+                            jQuery('#l_row_strLatinSurname').show();
+                        }
+                        else    {
+                            jQuery('#l_row_strLatinFirstname').hide();
+                            jQuery('#l_row_strLatinSurname').hide();
+                        }
+                    });
+                });
+            </script> 
+
+        ];
+    }
+
     $self->{'FieldSets'} = {
         core => {
             'fields' => {
@@ -129,17 +167,34 @@ sub setupValues    {
                     maxsize     => '50',
                     compulsory => 1,
                 },
+                intGender => {
+                    label       => $FieldLabels->{'intGender'},
+                    type        => 'lookup',
+                    options     => \%genderoptions,
+                    compulsory => 1,
+                    firstoption => [ '', " " ],
+                },
+                intLocalLanguage => {
+                    label       => $FieldLabels->{'intLocalLanguage'},
+                    type        => 'lookup',
+                    options     => \%languageOptions,
+                    firstoption => [ '', 'Select Language' ],
+                    compulsory => 1,
+                    posttext => $nonlatinscript,
+                },
                 strLatinFirstname => {
-                    label       => $self->{'SystemConfig'}{'person_strLatinNames'} ? $FieldLabels->{'strLatinFirstname'} : '' ,
+                    label       => $self->{'SystemConfig'}{'person_strLatinNames'} || $FieldLabels->{'strLatinFirstname'},
                     type        => 'text',
                     size        => '40',
                     maxsize     => '50',
+                    active      => $nonLatin,
                 },
                 strLatinSurname => {
-                    label       => $self->{'SystemConfig'}{'person_strLatinNames'} ?  $FieldLabels->{'strLatinSurname'} : '',
+                    label       => $self->{'SystemConfig'}{'person_strLatinNames'} || $FieldLabels->{'strLatinSurname'},
                     type        => 'text',
                     size        => '40',
                     maxsize     => '50',
+                    active      => $nonLatin,
                 },
                 strMaidenName => {
                     label       => $FieldLabels->{'strMaidenName'},
@@ -161,7 +216,6 @@ sub setupValues    {
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
                     compulsory => 1,
-
                 },
                 strISOCountryOfBirth => {
                     label       => $FieldLabels->{'strISOCountryOfBirth'},
@@ -194,6 +248,7 @@ sub setupValues    {
             'order' => [qw(
                 strLocalFirstname
                 strLocalSurname
+                intLocalLanguage
                 strLatinFirstname
                 strLatinSurname
                 dtDOB
@@ -206,9 +261,9 @@ sub setupValues    {
             )],
             fieldtransform => {
                 textcase => {
-                    strLocalFirstname => $field_case_rules->{'strLocalFirstname'} || '',
-                    strLocalSurname   => $field_case_rules->{'strLocalSurname'}   || '',
-                    strSuburb    => $field_case_rules->{'strSuburb'}    || '',
+                    #strLocalFirstname => $field_case_rules->{'strLocalFirstname'} || '',
+                    #strLocalSurname   => $field_case_rules->{'strLocalSurname'}   || '',
+                    #strSuburb    => $field_case_rules->{'strSuburb'}    || '',
                 }
             },
         },

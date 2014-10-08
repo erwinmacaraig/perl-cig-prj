@@ -204,6 +204,34 @@ sub getEntityMenuData {
             url => $baseurl."a=P_L&amp;l=$Defs::LEVEL_PERSON",
         };
     #}
+    $menuoptions{'persons_addplayer'} = {
+        name => $lang->txt('Add Player'),
+        url => $baseurl."a=PF_&amp;dtype=PLAYER",
+    };
+    $menuoptions{'persons_addcoach'} = {
+        name => $lang->txt('Add Coach'),
+        url => $baseurl."a=PF_&amp;dtype=COACH",
+    };
+    if($currentLevel == $Defs::LEVEL_NATIONAL) {
+        $menuoptions{'persons_addmaofficial'} = {
+             name => $lang->txt('Add MA Official'),
+            url => $baseurl."a=PF_&amp;dtype=MAOFFICIAL",
+        };
+    }
+    if($currentLevel == $Defs::LEVEL_CLUB) {
+        $menuoptions{'persons_addteamofficial'} = {
+            name => $lang->txt('Add Team Official'),
+            url => $baseurl."a=PF_&amp;dtype=TEAMOFFICIAL",
+        };
+        $menuoptions{'persons_addclubofficial'} = {
+            name => $lang->txt('Add Club Official'),
+            url => $baseurl."a=PF_&amp;dtype=CLUBOFFICIAL",
+        };
+    }
+    $menuoptions{'persons_addofficial'} = {
+        name => $lang->txt('Add Referee'),
+        url => $baseurl."a=PF_&amp;dtype=REFEREE",
+    };
 
     if($paymentSplitSettings->{'psBanks'}) {
         $menuoptions{'bankdetails'} = {
@@ -362,7 +390,15 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
         [ $lang->txt('Zones'), 'menu','zones'],
         [ $lang->txt('Clubs'), 'menu','clubs'],
         [ $lang->txt('Venues'), 'menu','venues'],
-        [ $lang->txt('People'), 'menu','persons'],
+        [ $lang->txt('People'), 'menu',[
+            'persons',
+            'persons_addplayer',
+            'persons_addcoach',
+            'persons_addofficial',
+            'persons_addteamofficial',
+            'persons_addclubofficial',
+            'persons_addmaofficial',
+        ]],
         [ $lang->txt('Work Tasks'), 'menu','approvals'],
         [ $lang->txt('Transfers'), 'menu', [
         'clearances',    
@@ -876,12 +912,44 @@ sub getClubMenuData {
         };
     }
 
-    if ($SystemConfig->{'allowPersonRequest'}) {
+    #hide for now; list is already included in Work Tasks
+    if (0) {
         $menuoptions{'listrequests'} = {
            name => $lang->txt('List Requests'),
            url => $baseurl."a=PRA_L",
         };
     }
+
+    $menuoptions{'persons_addplayer'} = {
+        name => $lang->txt('Add Player'),
+        url => $baseurl."a=PF_&amp;dtype=PLAYER",
+    };
+    $menuoptions{'persons_addcoach'} = {
+        name => $lang->txt('Add Coach'),
+        url => $baseurl."a=PF_&amp;dtype=COACH",
+    };
+    if($currentLevel == $Defs::LEVEL_NATIONAL) {
+        $menuoptions{'persons_addmaofficial'} = {
+             name => $lang->txt('Add MA Official'),
+            url => $baseurl."a=PF_&amp;dtype=MAOFFICIAL",
+        };
+    }
+    if($currentLevel == $Defs::LEVEL_CLUB) {
+        $menuoptions{'persons_addteamofficial'} = {
+            name => $lang->txt('Add Team Official'),
+            url => $baseurl."a=PF_&amp;dtype=TEAMOFFICIAL",
+        };
+        $menuoptions{'persons_addclubofficial'} = {
+            name => $lang->txt('Add Club Official'),
+            url => $baseurl."a=PF_&amp;dtype=CLUBOFFICIAL",
+        };
+    }
+    $menuoptions{'persons_addofficial'} = {
+        name => $lang->txt('Add Referee'),
+        url => $baseurl."a=PF_&amp;dtype=REFEREE",
+    };
+
+
 
 
 
@@ -899,6 +967,12 @@ sub getClubMenuData {
         'requesttransfer',
         'requestaccess',
         'listrequests',
+            'persons_addplayer',
+            'persons_addcoach',
+            'persons_addofficial',
+            'persons_addteamofficial',
+            'persons_addclubofficial',
+            'persons_addmaofficial',
          ]],
 
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu','venues'],
@@ -1158,7 +1232,7 @@ sub getPersonMenuData {
         [ $lang->txt('Person Dashboard'), 'home','home'],
         [ $lang->txt('Player Passport'), 'menu','passport'],
         [ $lang->txt($SystemConfig->{'txns_link_name'} || 'Transactions'), 'menu','transactions'],
-        [ $lang->txt($txt_Clrs), 'menu','clr'],
+        [ $lang->txt('Transfer History'), 'menu','clr'],
         [ $lang->txt('Registration History'), 'menu','regos'],
         [ $lang->txt('Documents'), 'menu','docs'],
         [ $lang->txt('System'), 'system',[

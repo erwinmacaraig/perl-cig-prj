@@ -20,7 +20,7 @@ CREATE TABLE tblPerson (
     `strLocalSurname` VARCHAR(150) NULL DEFAULT '' COMMENT 'The lastname of a person in local language (the language specified by LocalNameLanguage attribute).' ,
     strISONationality varchar(50) DEFAULT '',
     strLocalSurname2 varchar(150) DEFAULT '',
-    strISOLocalLanguage VARCHAR(20) DEFAULT '',
+    intLocalLanguage INT NOT NULL DEFAULT 0,
     strLatinTitle varchar(30) DEFAULT '',
     strLatinFirstname varchar(50) DEFAULT '',
     strLatinMiddlename varchar(50) DEFAULT '',

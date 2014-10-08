@@ -35,6 +35,7 @@ use Data::Dumper;
 use Switch;
 use PlayerPassport;
 use Documents;
+use PersonRequest;
 use CGI qw(param unescape escape);
 use AuditLog;
 sub cleanTasks  {
@@ -364,7 +365,34 @@ sub listTasks {
         );
 		push @TaskList, \%row;
     }
-		
+
+
+    my %reqFilters = (
+        'entityID' => $entityID
+    );
+
+    my $personRequests = getRequests($Data, \%reqFilters);
+
+    if(scalar @{$personRequests}) {
+
+        for my $request (@{$personRequests}) {
+            $rowCount++;
+            my $name = formatPersonName($Data, $request->{'strLocalFirstname'}, $request->{'strLocalSurname'}, $request->{'intGender'});
+            my $viewURL = "$Data->{'target'}?client=$client&amp;a=PRA_V&rid=$request->{'intPersonRequestID'}";
+
+            my %personRequest = (
+                TaskType => $request->{'strRequestType'},
+                TaskDescription => $Data->{'lang'}->txt('Person Request'),
+                Name => $name,
+                TaskStatus => $request->{'strRequestResponse'} ? $request->{'strRequestResponse'} : 'PENDING',
+                viewURL => $viewURL,
+                showView => 1,
+            );
+            push @TaskList, \%personRequest;
+        }
+    }
+
+
 	my $msg = ''; 
 	if ($rowCount == 0) {
 		$msg = $Data->{'lang'}->txt('No outstanding tasks');
@@ -932,7 +960,7 @@ sub checkForOutstandingTasks {
                 );
                 $rc = 1;
         }
-         if ($personID and $taskType ne $Defs::WF_TASK_TYPE_CHECKDUPL)  {
+         if (!$rowCount and $personID and $taskType ne $Defs::WF_TASK_TYPE_CHECKDUPL)  {
                 $st = qq[
 	            	UPDATE tblPerson
                     SET
@@ -1962,8 +1990,11 @@ sub populateDocumentViewData {
             $displayVerify = 1;
         }
 
-        if($tdref->{'intAllowProblemResolutionLevel'} eq 1 and $tdref->{'intAllowVerify'} == 1 and !$tdref->{'intDocumentID'}) {
+        if($tdref->{'intAllowProblemResolutionLevel'} == 1 and $tdref->{'intAllowVerify'} == 1 and !$tdref->{'intDocumentID'}) {
             $displayAdd = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
+            if($displayAdd) {
+                $addLink = qq[ <span style="position: relative" class="button-small generic-button"><a href="$Defs::base_url/main.cgi?client=$Data->{'client'}&amp;a=WF_amd&amp;RegistrationID=$registrationID&amp;trgtid=$targetID&amp;doclisttype=$tdref->{'intDocumentTypeID'}&amp;level=$level" target="_blank">]. $Data->{'lang'}->txt('Add') . q[</a></span>];
+            }
         }
         elsif ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowVerify'} == 1 and !$tdref->{'intDocumentID'}) {
             $displayAdd = 1;

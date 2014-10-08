@@ -6,6 +6,7 @@ require Exporter;
     handlePersonRequest
     listPersonRecord
     getRequests
+    listRequests
 );
 
 use lib ".", "..";
@@ -68,7 +69,7 @@ sub handlePersonRequest {
             ($body, $title) = submitRequestPage($Data);
         }
         case 'PRA_L' {
-            ($body, $title) = listRequests($Data);
+            ($body, $title) = listRequests($Data,0);
         }
         case 'PRA_V' {
             ($body, $title) = viewRequest($Data);
@@ -129,7 +130,13 @@ sub listPersonRecord {
         FROM
             tblPerson P
         INNER JOIN tblPersonRegistration_$Data->{'Realm'} PR
-            ON (PR.intEntityID != ? AND PR.intPersonID = P.intPersonID and PR.intRealmID = P.intRealmID and PR.strStatus in ('ACTIVE', 'PASSIVE','PENDING') and PR.strPersonType = 'PLAYER')
+            ON (
+                PR.intEntityID != ?
+                AND PR.intPersonID = P.intPersonID
+                AND PR.intRealmID = P.intRealmID
+                AND PR.strStatus IN ('ACTIVE', 'PASSIVE','PENDING')
+                AND PR.strPersonType = 'PLAYER'
+                )
         LEFT JOIN tblEntity E 
             ON (E.intEntityID = PR.intEntityID and E.intRealmID = PR.intRealmID)
         WHERE
@@ -159,7 +166,7 @@ sub listPersonRecord {
         $found = 1;
         print STDERR Dumper $tdref;
 
-        my $actionLink = qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=PRA_initRequest&amp;pid=$tdref->{'intPersonID'}&amp;prid=$tdref->{'intPersonRegistrationID'}&amp;request_type=$request_type">]. $Data->{'lang'}->txt('Transfer') . q[</a></span>];    
+        my $actionLink = qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=PRA_initRequest&amp;pid=$tdref->{'intPersonID'}&amp;prid=$tdref->{'intPersonRegistrationID'}&amp;request_type=$request_type">]. $Data->{'lang'}->txt($request_type) . q[</a></span>];    
         push @rowdata, {
             id => $tdref->{'intPersonRegistrationID'} || 0,
             currentClub => $tdref->{'currentClub'} || '',
@@ -295,7 +302,7 @@ sub submitRequestPage {
         personRegistrationID => $personRegistrationID || 0,
     );
 
-    my ($count, $reg_ref) = getRegistrationData(
+    my ($count, $reg_ref) = PersonRegistration::getRegistrationData(
         $Data,
         $personID,
         \%Reg
@@ -366,27 +373,33 @@ sub submitRequestPage {
 }
 
 sub listRequests {
-    my ($Data) = @_;
+    my ($Data,$personID) = @_;
+    $personID ||= 0;
 
 	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
     my $client = setClient( $Data->{'clientValues'} ) || '';
     my $title = "Requests";
 
-    my %reqFilters =  (
-        'entityID' => $entityID
-    );
+    my %reqFilters =  ();
+    if ($personID)  {
+        $reqFilters{'personID'} = $personID;
+    }
+    else    {
+        $reqFilters{'(entityID'} = $entityID
+    }
 
     my $personRequests = getRequests($Data, \%reqFilters);
 
-
-    warn "REQUEST FROM $entityID";
     my $found = 0;
     my @rowdata = ();
 
     #while(my $tdref = $q->fetchrow_hashref()) {
     for my $request (@{$personRequests}) {
         $found = 1;
-        print STDERR Dumper $request;
+        my $selectLink = '';
+        if (! $personID)    {
+            $selectLink = "$Data->{'target'}?client=$client&amp;a=PRA_V&rid=$request->{'intPersonRequestID'}";
+        }
         push @rowdata, {
             id => $request->{'intPersonRequestID'} || 0,
             personID => $request->{'intPersonID'} || 0,
@@ -394,7 +407,7 @@ sub listRequests {
             requestTo => $request->{'requestTo'} || '',
             requestType => $Defs::personRequest{$request->{'strRequestType'}},
             requestResponse => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || "N/A",
-            SelectLink => "$Data->{'target'}?client=$client&amp;a=PRA_V&rid=$request->{'intPersonRequestID'}"
+            SelectLink => $selectLink,
         }
     }
 
@@ -481,8 +494,8 @@ sub viewRequest {
         }
     }
 
-    my $personDetails = loadPersonDetails($Data->{'db'}, $request->{'intPersonID'});
-    my $personCurrAgeLevel = calculateAgeLevel($Data, $personDetails->{'currentAge'});
+    my $personDetails = PersonRegistration::loadPersonDetails($Data->{'db'}, $request->{'intPersonID'});
+    my $personCurrAgeLevel = PersonRegistration::calculateAgeLevel($Data, $personDetails->{'currentAge'});
     my $originLevel = $Data->{'clientValues'}{'authLevel'};
 
     my %TemplateData = (
@@ -626,6 +639,11 @@ sub getRequests {
         push @values, $filter->{'entityID'};
         push @values, $Defs::PERSON_REQUEST_RESPONSE_ACCEPTED;
         push @values, $Defs::PERSON_REQUEST_RESPONSE_DENIED;
+    }
+
+    if($filter->{'personID'}) {
+        $where .= " AND pq.intPersonID = ?";
+        push @values, $filter->{'personID'};
     }
 
     if($filter->{'requestID'}) {

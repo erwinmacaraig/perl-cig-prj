@@ -47,11 +47,19 @@
                 </td>
             [% ELSE %]
             [% IF task.showView %]
-			    <td><div class="member-data">
-                    <span class = "button-small generic-button">
-                        <a href="main.cgi?client=[% client %]&a=WF_View&TID=[% task.WFTaskID %]">[% Lang.txt('View') %]</a>
-                    </span>
-                </div></td>
+                [% IF task.TaskType == 'TRANSFER' || task.TaskType == 'ACCESS' %]
+                    <td><div class="member-data">
+                        <span class = "button-small generic-button">
+                            <a href="[% task.viewURL %]">[% Lang.txt('View') %]</a>
+                        </span>
+                    </div></td>
+                [% ELSE %]
+                    <td><div class="member-data">
+                        <span class = "button-small generic-button">
+                            <a href="main.cgi?client=[% client %]&a=WF_View&TID=[% task.WFTaskID %]">[% Lang.txt('View') %]</a>
+                        </span>
+                    </div></td>
+                [% END %]
             [% ELSE %]
                 <td>&nbsp;</td>
             [% END %]
