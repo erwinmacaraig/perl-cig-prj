@@ -130,7 +130,13 @@ sub listPersonRecord {
         FROM
             tblPerson P
         INNER JOIN tblPersonRegistration_$Data->{'Realm'} PR
-            ON (PR.intEntityID != ? AND PR.intPersonID = P.intPersonID and PR.intRealmID = P.intRealmID and PR.strStatus in ('ACTIVE', 'PASSIVE','PENDING') and PR.strPersonType = 'PLAYER')
+            ON (
+                PR.intEntityID != ?
+                AND PR.intPersonID = P.intPersonID
+                AND PR.intRealmID = P.intRealmID
+                AND PR.strStatus IN ('ACTIVE', 'PASSIVE','PENDING')
+                AND PR.strPersonType = 'PLAYER'
+                )
         LEFT JOIN tblEntity E 
             ON (E.intEntityID = PR.intEntityID and E.intRealmID = PR.intRealmID)
         WHERE
@@ -160,7 +166,7 @@ sub listPersonRecord {
         $found = 1;
         print STDERR Dumper $tdref;
 
-        my $actionLink = qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=PRA_initRequest&amp;pid=$tdref->{'intPersonID'}&amp;prid=$tdref->{'intPersonRegistrationID'}&amp;request_type=$request_type">]. $Data->{'lang'}->txt('Transfer') . q[</a></span>];    
+        my $actionLink = qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=PRA_initRequest&amp;pid=$tdref->{'intPersonID'}&amp;prid=$tdref->{'intPersonRegistrationID'}&amp;request_type=$request_type">]. $Data->{'lang'}->txt($request_type) . q[</a></span>];    
         push @rowdata, {
             id => $tdref->{'intPersonRegistrationID'} || 0,
             currentClub => $tdref->{'currentClub'} || '',
@@ -296,7 +302,7 @@ sub submitRequestPage {
         personRegistrationID => $personRegistrationID || 0,
     );
 
-    my ($count, $reg_ref) = getRegistrationData(
+    my ($count, $reg_ref) = PersonRegistration::getRegistrationData(
         $Data,
         $personID,
         \%Reg
@@ -488,8 +494,8 @@ sub viewRequest {
         }
     }
 
-    my $personDetails = loadPersonDetails($Data->{'db'}, $request->{'intPersonID'});
-    my $personCurrAgeLevel = calculateAgeLevel($Data, $personDetails->{'currentAge'});
+    my $personDetails = PersonRegistration::loadPersonDetails($Data->{'db'}, $request->{'intPersonID'});
+    my $personCurrAgeLevel = PersonRegistration::calculateAgeLevel($Data, $personDetails->{'currentAge'});
     my $originLevel = $Data->{'clientValues'}{'authLevel'};
 
     my %TemplateData = (
