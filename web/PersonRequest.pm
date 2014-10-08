@@ -8,6 +8,7 @@ require Exporter;
     getRequests
     listRequests
     finaliseTransfer
+    setRequestStatus
 );
 
 use lib ".", "..";
@@ -127,7 +128,10 @@ sub listPersonRecord {
             PR.strStatus as personRegistrationStatus,
             PR.strPersonType,
             PR.strSport,
-            PR.strPersonLevel
+            PR.strPersonLevel,
+            ePR.intPersonRegistrationID as currEntityPendingRegistrationID,
+            ePR.intPersonRequestID as currEntityPendingRequestID,
+            eRQ.intPersonRequestID as existPendingRequestID
         FROM
             tblPerson P
         INNER JOIN tblPersonRegistration_$Data->{'Realm'} PR
@@ -138,6 +142,19 @@ sub listPersonRecord {
                 AND PR.strStatus IN ('ACTIVE', 'PASSIVE','PENDING')
                 AND PR.strPersonType = 'PLAYER'
                 )
+        LEFT JOIN tblPersonRequest as eRQ
+            ON  (
+                eRQ.intPersonRequestID = PR.intPersonRequestID
+                )
+        LEFT JOIN tblPersonRegistration_$Data->{'Realm'} ePR
+            ON (
+                ePR.intEntityID = ?
+                AND ePR.intPersonID = P.intPersonID
+                AND ePR.intRealmID = P.intRealmID
+                AND ePR.strStatus IN ('PENDING')
+                AND ePR.strSport = PR.strSport
+                AND ePR.strPersonType = PR.strPersonType
+            )
         LEFT JOIN tblEntity E 
             ON (E.intEntityID = PR.intEntityID and E.intRealmID = PR.intRealmID)
         WHERE
@@ -153,6 +170,7 @@ sub listPersonRecord {
     my $q = $db->prepare($st) or query_error($st);
     $q->execute(
         $entityID,
+        $entityID,
         $Data->{'Realm'},
         $MID,
         $firstname,
@@ -164,10 +182,22 @@ sub listPersonRecord {
     my @rowdata = ();
 
     while(my $tdref = $q->fetchrow_hashref()) {
-        $found = 1;
         print STDERR Dumper $tdref;
 
-        my $actionLink = qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=PRA_initRequest&amp;pid=$tdref->{'intPersonID'}&amp;prid=$tdref->{'intPersonRegistrationID'}&amp;request_type=$request_type">]. $Data->{'lang'}->txt($request_type) . q[</a></span>];    
+        #other club hits an still in-progress or pending request
+        next if ($entityID != $tdref->{'intEntityID'} and $tdref->{'existPendingRequestID'} and ($tdref->{'personRegistrationStatus'} eq 'PENDING' or $tdref->{'personRegistrationStatus'} eq 'INPROGRESS'));
+
+        $found = 1;
+
+        my $actionLink = undef;
+        if($tdref->{'currEntityPendingRequestID'} and $tdref->{'currEntityPendingRegistrationID'}) {
+            #current logged-in entity hits the same pending request
+            $actionLink = qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=PRA_V&amp;rid=$tdref->{'currEntityPendingRequestID'}">]. $Data->{'lang'}->txt("View pending") . q[</a></span>];    
+        }
+        else {
+            $actionLink = qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=PRA_initRequest&amp;pid=$tdref->{'intPersonID'}&amp;prid=$tdref->{'intPersonRegistrationID'}&amp;request_type=$request_type">]. $Data->{'lang'}->txt($request_type) . q[</a></span>];
+        }
+
         push @rowdata, {
             id => $tdref->{'intPersonRegistrationID'} || 0,
             currentClub => $tdref->{'currentClub'} || '',
@@ -330,10 +360,12 @@ sub submitRequestPage {
                 intRequestToEntityID,
                 intRequestToMAOverride,
                 strRequestNotes,
+                strRequestStatus,
                 dtDateRequest
             )
             VALUES
             (
+                ?,
                 ?,
                 ?,
                 ?,
@@ -365,6 +397,7 @@ sub submitRequestPage {
         $regDetails->{'intEntityID'},
         $MAOverride,
         $notes,
+        $Defs::PERSON_REQUEST_STATUS_INPROGRESS,
     );
 
     my $requestID = $db->{mysql_insertid};
@@ -575,13 +608,16 @@ sub setRequestResponse {
     my $response = safe_param('response', 'word') || '';
     my $notes = safe_param('notes', 'words') || '';
 	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
+    my $requestStatus = '';
 
     switch($response){
         case 'Deny' {
             $response = $Defs::PERSON_REQUEST_RESPONSE_DENIED;
+            $requestStatus = $Defs::PERSON_REQUEST_STATUS_DENIED;
         }
         case 'Accept' {
             $response = $Defs::PERSON_REQUEST_RESPONSE_ACCEPTED;
+            $requestStatus = $Defs::PERSON_REQUEST_STATUS_PENDING;
         }
         else {
             $response = undef;
@@ -600,7 +636,8 @@ sub setRequestResponse {
         SET
             strRequestResponse = ?,
             intResponseBy = ?,
-            strResponseNotes = ?
+            strResponseNotes = ?,
+            strRequestStatus = ?
         WHERE
             intPersonRequestID = ?
     ];
@@ -611,6 +648,7 @@ sub setRequestResponse {
         $response,
         $entityID,
         $notes,
+        $requestStatus,
         $requestID
     ) or query_error($st);
 
@@ -640,7 +678,7 @@ sub getRequests {
     my ($Data, $filter) = @_;
 
     my $where = '';
-    my $personRegoJoin = '';
+    my $personRegoJoin = " LEFT JOIN tblPersonRegistration_$Data->{'Realm'} pr ON (pr.intPersonRequestID = pq.intPersonRequestID AND pr.intEntityID = intRequestFromEntityID) ";
     my @values = (
         $Data->{'Realm'}
     );
@@ -651,8 +689,6 @@ sub getRequests {
         push @values, $filter->{'entityID'};
         push @values, $Defs::PERSON_REQUEST_RESPONSE_ACCEPTED;
         push @values, $Defs::PERSON_REQUEST_RESPONSE_DENIED;
-
-        $personRegoJoin .= " LEFT JOIN tblPersonRegistration_$Data->{'Realm'} pr ON (pr.intPersonRequestID = pq.intPersonRequestID AND pr.intEntityID = intRequestFromEntityID) ";
     }
 
     if($filter->{'personID'}) {
@@ -669,18 +705,12 @@ sub getRequests {
         push @values, $Defs::PERSON_REQUEST_RESPONSE_ACCEPTED;
         push @values, $Defs::PERSON_REQUEST_RESPONSE_DENIED;
 
-        $personRegoJoin .= " LEFT JOIN tblPersonRegistration_$Data->{'Realm'} pr ON (pr.intPersonRequestID = pq.intPersonRequestID AND pr.intEntityID = intRequestFromEntityID) ";
     }
     elsif ($filter->{'requestID'}) {
         $where .= " AND pq.intPersonRequestID = ? ";
         push @values, $filter->{'requestID'};
-
-        $personRegoJoin .= " LEFT JOIN tblPersonRegistration_$Data->{'Realm'} pr ON (pr.intPersonRequestID = pq.intPersonRequestID AND pr.intEntityID = intRequestFromEntityID) ";
     }
 
-
-    print STDERR Dumper $filter;
-    print STDERR Dumper @values;
     my $st = qq[
         SELECT
             pq.intPersonRequestID,
@@ -699,6 +729,7 @@ sub getRequests {
             pq.strRequestResponse,
             pq.strResponseNotes,
             pq.intResponseBy,
+            pq.strRequestStatus,
             p.strLocalFirstname,
             p.strLocalSurname,
             p.strStatus as personStatus,
@@ -778,8 +809,31 @@ sub finaliseTransfer {
        $personRequest->{'strPersonLevel'},
        $personRequest->{'intPersonID'}
     ) or query_error($st);
+}
 
+sub setRequestStatus {
+    my ($Data, $requestID, $requestStatus) = @_;
 
+    $requestID ||= 0;
+    $requestStatus ||= '';
+
+    warn "PERSON REQ STATUS $requestID";
+    warn "PERSON REQ STATUS $requestStatus";
+    my $st = qq[
+        UPDATE
+            tblPersonRequest
+        SET
+            strRequestStatus = ?
+        WHERE
+            intPersonRequestID = ?
+    ];
+
+    my $db = $Data->{'db'};
+    my $q = $db->prepare($st);
+    $q->execute(
+        $requestStatus,
+        $requestID
+    ) or query_error($st);
 }
 
 1;
