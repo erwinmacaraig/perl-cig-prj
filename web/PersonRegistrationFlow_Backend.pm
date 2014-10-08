@@ -83,8 +83,9 @@ sub handleRegistrationFlowBackend   {
         my $sport = param('sp') || '';
         my $ageLevel = param('ag') || '';
         my $registrationNature = param('nat') || ''; 
+        my $personRequestID = param('reqID') || 0; 
 
-        ($regoID, $rego_ref, $msg) = add_rego_record($Data, $personID, $entityID, $entityLevel, $originLevel, $personType, $personEntityRole, $personLevel, $sport, $ageLevel, $registrationNature);
+        ($regoID, $rego_ref, $msg) = add_rego_record($Data, $personID, $entityID, $entityLevel, $originLevel, $personType, $personEntityRole, $personLevel, $sport, $ageLevel, $registrationNature, undef, undef, $personRequestID);
        ###########################################
        ##########################################
         if (!$regoID)   {
