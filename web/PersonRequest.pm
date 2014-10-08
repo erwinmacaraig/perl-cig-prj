@@ -500,7 +500,7 @@ sub viewRequest {
     my $originLevel = $Data->{'clientValues'}{'authLevel'};
 
     my %TemplateData = (
-        'requestID' => $request->{'intPersonRequestID'} || 0,
+        'requestID' => $request->{'intPersonRequestID'} || undef,
         'requestType' => $Defs::personRequest{$request->{'strRequestType'}} || '',
         'requestFrom' => $request->{'requestFrom'} || '',
         'requestTo' => $request->{'requestTo'} || '',
@@ -523,6 +523,9 @@ sub viewRequest {
         'personAgeLevel' => $personCurrAgeLevel,
         'requestOriginLevel' => $originLevel,
         'requestEntityID' => $entityID,
+
+        'personRegistrationID' => $request->{'intPersonRegistrationID'} || 0,
+        'personRegistrationStatus' => $request->{'personRegoStatus'} || 'N/A'
     );
 
 
@@ -534,7 +537,14 @@ sub viewRequest {
 
     my $initiateRequestProcess = 0;
     if($entityID == $request->{'intRequestFromEntityID'} and $request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_RESPONSE_ACCEPTED) {
-        $initiateRequestProcess = 1;
+        #check PENDING for now
+        if($request->{'intPersonRegistrationID'} and $request->{'personRegoStatus'} eq $Defs::PERSONREGO_STATUS_PENDING) {
+            $initiateRequestProcess = 0;
+        }
+        else {
+            $initiateRequestProcess = 1;
+        }
+
         $action = "PREGF_TU";
     }
 
@@ -630,6 +640,7 @@ sub getRequests {
     my ($Data, $filter) = @_;
 
     my $where = '';
+    my $personRegoJoin = '';
     my @values = (
         $Data->{'Realm'}
     );
@@ -640,6 +651,8 @@ sub getRequests {
         push @values, $filter->{'entityID'};
         push @values, $Defs::PERSON_REQUEST_RESPONSE_ACCEPTED;
         push @values, $Defs::PERSON_REQUEST_RESPONSE_DENIED;
+
+        $personRegoJoin .= " LEFT JOIN tblPersonRegistration_$Data->{'Realm'} pr ON (pr.intPersonRequestID = pq.intPersonRequestID AND pr.intEntityID = intRequestFromEntityID) ";
     }
 
     if($filter->{'personID'}) {
@@ -655,11 +668,16 @@ sub getRequests {
         push @values, $filter->{'requestID'};
         push @values, $Defs::PERSON_REQUEST_RESPONSE_ACCEPTED;
         push @values, $Defs::PERSON_REQUEST_RESPONSE_DENIED;
+
+        $personRegoJoin .= " LEFT JOIN tblPersonRegistration_$Data->{'Realm'} pr ON (pr.intPersonRequestID = pq.intPersonRequestID AND pr.intEntityID = intRequestFromEntityID) ";
     }
     elsif ($filter->{'requestID'}) {
         $where .= " AND pq.intPersonRequestID = ? ";
         push @values, $filter->{'requestID'};
+
+        $personRegoJoin .= " LEFT JOIN tblPersonRegistration_$Data->{'Realm'} pr ON (pr.intPersonRequestID = pq.intPersonRequestID AND pr.intEntityID = intRequestFromEntityID) ";
     }
+
 
     print STDERR Dumper $filter;
     print STDERR Dumper @values;
@@ -689,7 +707,9 @@ sub getRequests {
             p.intGender,
             ef.strLocalName as requestFrom,
             et.strLocalName as requestTo,
-            erb.strLocalName as responseBy
+            erb.strLocalName as responseBy,
+            pr.intPersonRegistrationID,
+            pr.strStatus as personRegoStatus
         FROM
             tblPersonRequest pq
         INNER JOIN
@@ -700,10 +720,15 @@ sub getRequests {
             tblEntity et ON (et.intEntityID = pq.intRequestToEntityID)
         LEFT JOIN
             tblEntity erb ON (erb.intEntityID = pq.intResponseBy)
+        $personRegoJoin
+
         WHERE
             pq.intRealmID = ?
             $where
     ];
+
+
+    print STDERR Dumper $st;
 
     my $db = $Data->{'db'};
     my $q = $db->prepare($st);
