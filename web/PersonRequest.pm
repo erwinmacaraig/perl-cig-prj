@@ -6,6 +6,7 @@ require Exporter;
     handlePersonRequest
     listPersonRecord
     getRequests
+    listRequests
 );
 
 use lib ".", "..";
@@ -68,7 +69,7 @@ sub handlePersonRequest {
             ($body, $title) = submitRequestPage($Data);
         }
         case 'PRA_L' {
-            ($body, $title) = listRequests($Data);
+            ($body, $title) = listRequests($Data,0);
         }
         case 'PRA_V' {
             ($body, $title) = viewRequest($Data);
@@ -366,27 +367,33 @@ sub submitRequestPage {
 }
 
 sub listRequests {
-    my ($Data) = @_;
+    my ($Data,$personID) = @_;
+    $personID ||= 0;
 
 	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
     my $client = setClient( $Data->{'clientValues'} ) || '';
     my $title = "Requests";
 
-    my %reqFilters =  (
-        'entityID' => $entityID
-    );
+    my %reqFilters =  ();
+    if ($personID)  {
+        $reqFilters{'personID'} = $personID;
+    }
+    else    {
+        $reqFilters{'(entityID'} = $entityID
+    }
 
     my $personRequests = getRequests($Data, \%reqFilters);
 
-
-    warn "REQUEST FROM $entityID";
     my $found = 0;
     my @rowdata = ();
 
     #while(my $tdref = $q->fetchrow_hashref()) {
     for my $request (@{$personRequests}) {
         $found = 1;
-        print STDERR Dumper $request;
+        my $selectLink = '';
+        if (! $personID)    {
+            $selectLink = "$Data->{'target'}?client=$client&amp;a=PRA_V&rid=$request->{'intPersonRequestID'}";
+        }
         push @rowdata, {
             id => $request->{'intPersonRequestID'} || 0,
             personID => $request->{'intPersonID'} || 0,
@@ -394,7 +401,7 @@ sub listRequests {
             requestTo => $request->{'requestTo'} || '',
             requestType => $Defs::personRequest{$request->{'strRequestType'}},
             requestResponse => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || "N/A",
-            SelectLink => "$Data->{'target'}?client=$client&amp;a=PRA_V&rid=$request->{'intPersonRequestID'}"
+            SelectLink => $selectLink,
         }
     }
 
@@ -626,6 +633,11 @@ sub getRequests {
         push @values, $filter->{'entityID'};
         push @values, $Defs::PERSON_REQUEST_RESPONSE_ACCEPTED;
         push @values, $Defs::PERSON_REQUEST_RESPONSE_DENIED;
+    }
+
+    if($filter->{'personID'}) {
+        $where .= " AND pq.intPersonID = ?";
+        push @values, $filter->{'personID'};
     }
 
     if($filter->{'requestID'}) {

@@ -1158,7 +1158,7 @@ sub getPersonMenuData {
         [ $lang->txt('Person Dashboard'), 'home','home'],
         [ $lang->txt('Player Passport'), 'menu','passport'],
         [ $lang->txt($SystemConfig->{'txns_link_name'} || 'Transactions'), 'menu','transactions'],
-        [ $lang->txt($txt_Clrs), 'menu','clr'],
+        [ $lang->txt('Transfer History'), 'menu','clr'],
         [ $lang->txt('Registration History'), 'menu','regos'],
         [ $lang->txt('Documents'), 'menu','docs'],
         [ $lang->txt('System'), 'system',[
