@@ -151,7 +151,7 @@ sub handlePerson {
         ( $resultHTML, $title ) = PersonTransfer($Data);
     }
     elsif ( $action =~ /P_CLR/ ) {
-        ($resultHTML, $title) = listRequests( $Data, $personID ) || '';
+        ($resultHTML, $title) = listRequests( $Data, $personID );
     }
     elsif ( $action =~ /^P_HOME/ ) {
         my ( $FieldDefinitions, $memperms ) = person_details( '', $Data, $personID, {}, 1 );
