@@ -4558,3 +4558,12 @@ div#content div.member-home-page div.task-actions {
     text-align: center;
 }
 
+#flowSummary    {
+    width: 200px;
+    float:right;
+    padding:10px;
+    margin:5px;
+    border:1px solid #000;
+    background-color:#fff;
+
+}

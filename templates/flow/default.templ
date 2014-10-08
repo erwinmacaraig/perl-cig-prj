@@ -9,6 +9,10 @@
 	</ul>
 </div>
 [% END %]
+[% IF FlowSummary %]
+[% FStemplate = FlowSummaryTemplate or 'flow/flow_summary.templ' %]
+[% INCLUDE $FStemplate %]
+[% END %]
 
 [% TextTop %]
 <form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">

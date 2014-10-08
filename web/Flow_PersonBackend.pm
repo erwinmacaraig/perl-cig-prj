@@ -458,6 +458,8 @@ sub display_minor_fields {
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $fieldsContent || '',
         ScriptContent => $scriptContent || '',
+        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
+        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
         Title => '',
         TextTop => '',
         TextBottom => '',
@@ -498,12 +500,17 @@ sub display_contact_details    {
     my $self = shift;
 
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+    my $id = $self->ID() || 0;
+    my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
+    $personObj->load();
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $fieldsContent || '',
         ScriptContent => $scriptContent || '',
+        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
+        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
         Title => '',
         TextTop => '',
         TextBottom => '',
@@ -563,6 +570,8 @@ sub display_registration {
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $content,
+        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
+        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
         Title => '',
         TextTop => '',
         TextBottom => '',
@@ -660,9 +669,9 @@ sub display_products {
         $regoID = 0 if !$valid;
     }
 
+    my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID);
+    $personObj->load();
     if($regoID) {
-        my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID);
-        $personObj->load();
         my $nationality = $personObj->getValue('strISONationality') || ''; 
         $rego_ref->{'Nationality'} = $nationality;
 
@@ -692,6 +701,8 @@ sub display_products {
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $content,
+        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
+        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
         Title => '',
         TextTop => '',
         TextBottom => '',
@@ -754,9 +765,9 @@ sub display_documents {
         $regoID = 0 if !$valid;
     }
 
+    my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID);
+    $personObj->load();
     if($regoID) {
-        my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID);
-        $personObj->load();
         my $nationality = $personObj->getValue('strISONationality') || ''; 
         $rego_ref->{'Nationality'} = $nationality;
 
@@ -785,6 +796,8 @@ sub display_documents {
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
+        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
+        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
         Content => '',
         Title => '',
         TextTop => $content,
@@ -877,6 +890,19 @@ sub display_complete {
 
     return ($pagedata,0);
 
+}
+
+sub buildSummaryData    {
+    my ($Data, $personObj) = @_;
+
+    return {} if !$personObj;
+    return {} if !$personObj->ID();
+    my %summary = (
+        'name' => $personObj->name(),
+        'dob' => $personObj->getValue('dtDOB'),
+        'gender' => $Defs::PersonGenderInfo{$personObj->getValue('intGender')},
+    );
+    return \%summary; 
 }
 
 

@@ -11,15 +11,8 @@ sub load {
 	my $st=qq[
     SELECT
         tblPerson.*,
-        DATE_FORMAT(dtPassportExpiry,'%d/%m/%Y') AS dtPassportExpiry,
-        DATE_FORMAT(dtDOB,'%d/%m/%Y') AS dtDOB,
-        tblPerson.dtDOB AS dtDOB_RAW,
+        DATE_FORMAT(dtDOB,'%d/%m/%Y') AS dtDOB_Format,
         DATE_FORMAT(tblPerson.tTimeStamp,'%d/%m/%Y') AS tTimeStamp,
-        DATE_FORMAT(dtNatCustomDt1,'%d/%m/%Y') AS dtNatCustomDt1,
-        DATE_FORMAT(dtNatCustomDt2,'%d/%m/%Y') AS dtNatCustomDt2,
-        DATE_FORMAT(dtNatCustomDt3,'%d/%m/%Y') AS dtNatCustomDt3,
-        DATE_FORMAT(dtNatCustomDt4,'%d/%m/%Y') AS dtNatCustomDt4,
-        DATE_FORMAT(dtNatCustomDt5,'%d/%m/%Y') AS dtNatCustomDt5,
         MN.strNotes
     FROM
         tblPerson
@@ -98,7 +91,7 @@ sub already_exists {
 sub _get_sql_details{
 
     my $field_details = {
-        'fields_to_ignore' => ['tTimestamp'],
+        'fields_to_ignore' => ['tTimestamp','strNotes','dtDOB_Format'],
         'table_name' => 'tblPerson',
         'key_field' => 'intPersonId',
     };
