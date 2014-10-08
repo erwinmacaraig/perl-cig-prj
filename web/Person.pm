@@ -61,6 +61,7 @@ use PersonRegistrationDetail;
 use Documents;
 use WorkFlow;
 use TTTemplate;
+use PersonRequest;
 
 
 sub handlePerson {
@@ -150,9 +151,7 @@ sub handlePerson {
         ( $resultHTML, $title ) = PersonTransfer($Data);
     }
     elsif ( $action =~ /P_CLR/ ) {
-        $resultHTML = clearanceHistory( $Data, $personID ) || '';
-        my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
-        $title = $txt_Clr . " History";
+        ($resultHTML, $title) = listRequests( $Data, $personID );
     }
     elsif ( $action =~ /^P_HOME/ ) {
         my ( $FieldDefinitions, $memperms ) = person_details( '', $Data, $personID, {}, 1 );
