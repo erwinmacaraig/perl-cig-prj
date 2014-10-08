@@ -7,6 +7,7 @@ require Exporter;
     listPersonRecord
     getRequests
     listRequests
+    finaliseTransfer
 );
 
 use lib ".", "..";
@@ -646,7 +647,7 @@ sub getRequests {
         push @values, $filter->{'personID'};
     }
 
-    if($filter->{'requestID'}) {
+    if($filter->{'requestID'} and $filter->{'entityID'}) {
         $where .= " AND (((pq.intRequestToEntityID = ? AND pq.strRequestResponse is NULL AND pq.intPersonRequestID = ?)) OR (pq.intRequestFromEntityID = ? AND pq.intPersonRequestID = ? AND pq.strRequestResponse in (?, ?))) ";
         push @values, $filter->{'entityID'};
         push @values, $filter->{'requestID'};
@@ -654,6 +655,10 @@ sub getRequests {
         push @values, $filter->{'requestID'};
         push @values, $Defs::PERSON_REQUEST_RESPONSE_ACCEPTED;
         push @values, $Defs::PERSON_REQUEST_RESPONSE_DENIED;
+    }
+    elsif ($filter->{'requestID'}) {
+        $where .= " AND pq.intPersonRequestID = ? ";
+        push @values, $filter->{'requestID'};
     }
 
     print STDERR Dumper $filter;
@@ -711,6 +716,45 @@ sub getRequests {
     }
 
     return (\@personRequests);
+}
+
+sub finaliseTransfer {
+    my ($Data, $requestID) = @_;
+
+    my %reqFilters = (
+        'requestID' => $requestID
+    );
+
+    my $personRequest = getRequests($Data, \%reqFilters);
+    $personRequest = $personRequest->[0];
+
+    my $st = qq[
+        UPDATE
+            tblPersonRegistration_$Data->{'Realm'}
+        SET
+            strPreTransferredStatus = strStatus,
+            strStatus = ?
+        WHERE
+            intEntityID = ?
+            AND strPersonType = ?
+            AND strSport = ?
+            AND strPersonLevel = ?
+            AND intPersonID = ?
+            AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
+	];
+
+    my $db = $Data->{'db'};
+    my $query = $db->prepare($st) or query_error($st);
+    $query->execute(
+       $Defs::PERSONREGO_STATUS_TRANSFERRED,
+       $personRequest->{'intRequestToEntityID'},
+       $personRequest->{'strPersonType'},
+       $personRequest->{'strSport'},
+       $personRequest->{'strPersonLevel'},
+       $personRequest->{'intPersonID'}
+    ) or query_error($st);
+
+
 }
 
 1;
