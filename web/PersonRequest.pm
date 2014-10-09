@@ -115,6 +115,36 @@ sub listPersonRecord {
     # ACTIVE    | 1
     # PASSIVE   | 2
     # PENDING   | 3
+
+    
+    my $requestType = getRequestType();
+    warn "REQUEST TYPE $requestType";
+    
+    my $requestAccessCond = undef;
+    my $joinCondition = '';
+    my $orderBy = '';
+    my $limit = '';
+
+    if($requestType eq $Defs::PERSON_REQUEST_ACCESS) {
+        $joinCondition = qq [
+            AND (
+                (strPersonType = 'PLAYER' and strSport = 'FOOTBALL')
+                OR
+                (strPersonType != 'PLAYER' or strSport != 'FOOTBALL')
+                )
+        ];
+        $orderBy = qq[
+            ORDER BY
+                CASE WHEN PR.strPersonType = 'PLAYER' AND PR.strSport = 'FOOTBALL' THEN PR.intPersonRegistrationID END desc,
+                CASE WHEN PR.strPersonType != 'PLAYER' AND PR.strSport != 'FOOTBALL' THEN PR.dtAdded END asc
+        ];
+        $limit = qq[ LIMIT 1 ];
+    }
+    elsif($requestType eq $Defs::PERSON_REQUEST_TRANSFER) {
+        $joinCondition = qq [ AND PR.strPersonType = 'PLAYER' ];
+        $limit = qq[ LIMIT 1 ];
+    }
+
     my $st = qq[
         SELECT
             E.intEntityID,
@@ -140,7 +170,7 @@ sub listPersonRecord {
                 AND PR.intPersonID = P.intPersonID
                 AND PR.intRealmID = P.intRealmID
                 AND PR.strStatus IN ('ACTIVE', 'PASSIVE','PENDING')
-                AND PR.strPersonType = 'PLAYER'
+                $joinCondition
                 )
         LEFT JOIN tblPersonRequest as eRQ
             ON  (
@@ -164,6 +194,8 @@ sub listPersonRecord {
             AND
                 (P.strLocalFirstname LIKE CONCAT('%',?,'%') OR P.strLocalSurname LIKE CONCAT('%',?,'%'))
             AND P.dtDOB = ?
+        $orderBy
+        $limit
     ];
 
     my $db = $Data->{'db'};
@@ -182,7 +214,7 @@ sub listPersonRecord {
     my @rowdata = ();
 
     while(my $tdref = $q->fetchrow_hashref()) {
-        print STDERR Dumper $tdref;
+        #print STDERR Dumper $tdref;
 
         #other club hits an still in-progress or pending request
         next if ($entityID != $tdref->{'intEntityID'} and $tdref->{'existPendingRequestID'} and ($tdref->{'personRegistrationStatus'} eq 'PENDING' or $tdref->{'personRegistrationStatus'} eq 'INPROGRESS'));
