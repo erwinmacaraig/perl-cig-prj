@@ -376,7 +376,7 @@ sub listTasks {
     if(scalar @{$personRequests}) {
 
         for my $request (@{$personRequests}) {
-            #next if ($request->{''} eq 'ACCEPTED' and $request->{'strRequestStatus'} eq 'PENDING')
+            next if ($request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_COMPLETED);
             $rowCount++;
             my $name = formatPersonName($Data, $request->{'strLocalFirstname'}, $request->{'strLocalSurname'}, $request->{'intGender'});
             my $viewURL = "$Data->{'target'}?client=$client&amp;a=PRA_V&rid=$request->{'intPersonRequestID'}";
