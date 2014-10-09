@@ -7,9 +7,6 @@ require Exporter;
 
 use strict;
 
-require DefCodes;
-
-
 sub getCustomFieldNames	{
 	my($Data, $subtypeID)=@_;
 	my $db=$Data->{'db'};

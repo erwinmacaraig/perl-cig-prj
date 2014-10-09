@@ -484,19 +484,12 @@ sub display_minor_fields {
     my $self = shift;
 
     my $id = $self->ID() || 0;
-    if(!$id)    {
-        push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person';
-    }
-    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
-        #There are errors - reset where we are to go back to the form again
-        $self->decrementCurrentProcessIndex();
-        return ('',2);
-    }
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
     $personObj->load();
     my $dob = $personObj->getValue('dtDOB');
     my $isMinor = personIsMinor($self->{'Data'}, $dob);
-    if(!$isMinor)   {
+    my $defaultType = $self->{'RunParams'}{'dtype'} || '';
+    if(!$isMinor or $defaultType ne 'PLAYER')   {
         $self->incrementCurrentProcessIndex();
         $self->incrementCurrentProcessIndex();
         return ('',2);
