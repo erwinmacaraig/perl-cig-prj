@@ -39,8 +39,8 @@ my $Fields = {
 		strFax
 		strEmail
 		strEmail2 
-                strStatus
-                strEntityType
+        strStatus
+        strEntityType
 		intOccupationID
 		intEthnicityID
 		intMailingList
@@ -67,36 +67,6 @@ my $Fields = {
 		strHairColour
 		strHeight
 		strWeight
-		strCustomStr1
-		strCustomStr2
-		strCustomStr3
-		strCustomStr4
-		strCustomStr5
-		strCustomStr6
-		strCustomStr7
-		strCustomStr8
-		strCustomStr9
-		strCustomStr10
-		strCustomStr11
-		strCustomStr12
-		strCustomStr13
-		strCustomStr14
-		strCustomStr15
-		dblCustomDbl1
-		dblCustomDbl2
-		dblCustomDbl3
-		dblCustomDbl4
-		dblCustomDbl5
-		dblCustomDbl6
-		dblCustomDbl7
-		dblCustomDbl8
-		dblCustomDbl9
-		dblCustomDbl10
-		dtCustomDt1
-		dtCustomDt2
-		dtCustomDt3
-		dtCustomDt4
-		dtCustomDt5
 		intPlayer
 		intCoach
 		intUmpire

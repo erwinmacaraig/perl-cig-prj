@@ -345,6 +345,7 @@ sub getFieldsList	{
         SPcontact
         intDeceased
         intDeRegister
+        intEthnicityID
         strPreferredLang
         strPassportIssueCountry
         strPassportNationality
@@ -375,10 +376,6 @@ sub getFieldsList	{
         strP2PhoneMobile
         strP2Email
         strP2Email2
-        strEyeColour
-        strHairColour
-        strHeight
-        strWeight
         strNotes
 
         strNatCustomStr1
@@ -479,23 +476,6 @@ sub getFieldsList	{
         strSchoolName
         strSchoolSuburb
     ));
-}
-
-sub getTeamClubID	{
-    my( $db, $teamID,) = @_;
-    return 0 if !$db;
-    return 0 if !$teamID;
-    my $st = qq[
-        SELECT intClubID
-        FROM tblTeam
-        WHERE intTeamID = ?
-    ];
-    my $q = $db->prepare($st);
-    $q->execute($teamID);
-    my ($clubID) = $q->fetchrow_array();
-    $q->finish();
-    return $clubID || 0;
-
 }
 
 1;

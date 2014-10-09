@@ -20,6 +20,8 @@ use WorkFlow;
 use PersonRegistrationFlow_Common;
 use AuditLog;
 use PersonLanguages;
+use CustomFields;
+use DefCodes;
 
 
 sub setProcessOrder {
@@ -52,13 +54,24 @@ sub setProcessOrder {
         {
             'action' => 'cond',
             'function' => 'display_contact_details',
-            'label'  => 'Details',
+            'label'  => 'Contact Details',
             'fieldset'  => 'contactdetails',
         },
         {
             'action' => 'condu',
             'function' => 'validate_contact_details',
             'fieldset'  => 'contactdetails',
+        },
+        {
+            'action' => 'od',
+            'function' => 'display_other_details',
+            'label'  => 'Other Details',
+            'fieldset'  => 'otherdetails',
+        },
+        {
+            'action' => 'odu',
+            'function' => 'validate_other_details',
+            'fieldset'  => 'otherdetails',
         },
         {
             'action' => 'r',
@@ -150,7 +163,14 @@ sub setupValues    {
 
         ];
     }
+    my ($DefCodes, $DefCodesOrder) = getDefCodes(
+        dbh        => $self->{'Data'}{'db'},
+        realmID    => $self->{'Data'}{'Realm'},
+        subRealmID => $self->{'Data'}{'RealmSubType'},
+    );
 
+    my @intNatCustomLU_DefsCodes = (undef, -53, -54, -55, -64, -65, -66, -67, -68,-69,-70);
+    my $CustomFieldNames = getCustomFieldNames( $self->{'Data'}, $self->{'Data'}{'RealmSubType'}) || {};
     $self->{'FieldSets'} = {
         core => {
             'fields' => {
@@ -263,7 +283,6 @@ sub setupValues    {
                 textcase => {
                     #strLocalFirstname => $field_case_rules->{'strLocalFirstname'} || '',
                     #strLocalSurname   => $field_case_rules->{'strLocalSurname'}   || '',
-                    #strSuburb    => $field_case_rules->{'strSuburb'}    || '',
                 }
             },
         },
@@ -314,11 +333,34 @@ sub setupValues    {
                 strPostalCode
                 strPhoneHome
             )],
-            fieldtransform => {
-                textcase => {
-                    strSuburb    => $field_case_rules->{'strSuburb'}    || '',
-                }
+            #fieldtransform => {
+                #textcase => {
+                    #strSuburb    => $field_case_rules->{'strSuburb'}    || '',
+                #}
+            #},
+        },
+        otherdetails => {
+            'fields' => {
+                strPreferredLang => {
+                    label       => $FieldLabels->{'strPreferredLang'},
+                    type        => 'lookup',
+                    options     => \%languageOptions,
+                    firstoption => [ '', 'Select Language' ],
+                },
+                intEthnicityID => {
+                    label       => $FieldLabels->{'intEthnicityID'},
+                    value       => $values->{intEthnicityID},
+                    type        => 'lookup',
+                    options     => $DefCodes->{-8},
+                    order       => $DefCodesOrder->{-8},
+                    firstoption => [ '', " " ],
+                },
+
             },
+            'order' => [qw(
+                strPreferredLang
+                intEthnicityID
+            )],
         },
         minor => {
             'fields' => {
@@ -353,13 +395,22 @@ sub setupValues    {
                 intMinorEU
                 intMinorNone
             )],
-            fieldtransform => {
-                textcase => {
-                    strSuburb    => $field_case_rules->{'strSuburb'}    || '',
-                }
-            },
         }
     };
+    for my $i (1..10) {
+        my $fieldname = "intNatCustomLU$i";
+        my $name = $CustomFieldNames->{$fieldname}[0] || '';
+        next if !$name;
+        $self->{'FieldSets'}{'otherdetails'}{'fields'}{$fieldname} = {
+            label => $name,
+            value => $values->{$fieldname},
+            type  => 'lookup',
+            options     => $DefCodes->{$intNatCustomLU_DefsCodes[$i]},
+            order       => $DefCodesOrder->{$intNatCustomLU_DefsCodes[$i]},
+            firstoption => [ '', " " ],
+        };
+        push @{$self->{'FieldSets'}{'otherdetails'}{'order'}} , $fieldname;
+    }
 
 }
 
@@ -443,7 +494,7 @@ sub display_minor_fields {
     }
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
     $personObj->load();
-    my $dob = $personObj->getValue('dtDOB_RAW');
+    my $dob = $personObj->getValue('dtDOB');
     my $isMinor = personIsMinor($self->{'Data'}, $dob);
     if(!$isMinor)   {
         $self->incrementCurrentProcessIndex();
@@ -543,6 +594,53 @@ sub validate_contact_details    {
     return ('',1);
 }
 
+sub display_other_details    { 
+    my $self = shift;
+
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+    my $id = $self->ID() || 0;
+    my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
+    $personObj->load();
+    my %PageData = (
+        HiddenFields => $self->stringifyCarryField(),
+        Target => $self->{'Data'}{'target'},
+        Errors => $self->{'RunDetails'}{'Errors'} || [],
+        Content => $fieldsContent || '',
+        ScriptContent => $scriptContent || '',
+        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
+        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        Title => '',
+        TextTop => '',
+        TextBottom => '',
+    );
+    my $pagedata = $self->display(\%PageData);
+
+    return ($pagedata,0);
+
+}
+
+sub validate_other_details    { 
+    my $self = shift;
+
+    my $userData = {};
+    ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields();
+    my $id = $self->ID() || 0;
+    if(!$id)    {
+        push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person';
+    }
+    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+        #There are errors - reset where we are to go back to the form again
+        $self->decrementCurrentProcessIndex();
+        return ('',2);
+    }
+
+    my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
+    $personObj->load();
+    $personObj->setValues($userData);
+    $personObj->write();
+    return ('',1);
+}
+
 sub display_registration { 
     my $self = shift;
 
@@ -555,7 +653,7 @@ sub display_registration {
     my $url = $self->{'Target'}."?rfp=".$self->getNextAction()."&".$self->stringifyURLCarryField();
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID);
     $personObj->load();
-    my ($dob, $gender) = $personObj->getValue(['dtDOB_RAW','intGender']); 
+    my ($dob, $gender) = $personObj->getValue(['dtDOB','intGender']); 
     my $content = displayPersonRegisterWhat(
         $self->{'Data'},
         $personID,

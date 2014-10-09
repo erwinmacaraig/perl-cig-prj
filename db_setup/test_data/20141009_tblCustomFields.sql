@@ -1,0 +1,1 @@
+INSERT INTO `tblCustomFields` VALUES (1,'intNatCustomLU1','Religion',0,'2014-10-08 23:30:04',1,1,0),(2,'intNatCustomLU2','Education',0,'2014-10-08 23:30:16',1,1,0),(3,'intNatCustomLU3','Occupation',0,'2014-10-08 23:30:34',1,1,0),(4,'intNatCustomLU4','Blood Type',0,'2014-10-09 02:35:44',1,1,0);
