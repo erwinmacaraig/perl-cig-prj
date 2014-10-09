@@ -1,0 +1,137 @@
+<div class="member-home-page">
+    <div class="">
+        <div class="member-detail">
+            <div class = "sectionheader">[% Lang.txt('Request Details') %]</div>
+            <div class="member-details">
+
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Request Type") %]:</span>
+                    <span class="details-left">[% requestType %]</span>
+                </span>
+
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Request From") %]:</span>
+                    <span class="details-left">[% requestFrom %]</span>
+                </span>
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Request To") %]:</span>
+                    <span class="details-left">[% requestTo %]</span>
+                </span>
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Date") %]:</span>
+                    <span class="details-left">[% dateRequest %]</span>
+                </span>
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Request Response") %]:</span>
+                    <span class="details-left">[% requestResponse %]</span>
+                </span>
+
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Response By") %]:</span>
+                    <span class="details-left">[% responseBy %]</span>
+                </span>
+
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Person Registration Status") %]:</span>
+                    <span class="details-left">[% personRegistrationStatus %]</span>
+                </span>
+
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("First Name") %]:</span>
+                    <span class="details-left">[% personFirstname %]</span>
+                </span>
+
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Last Name") %]:</span>
+                    <span class="details-left">[% personSurname %]</span>
+                </span>
+
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Nationality") %]:</span>
+                    <span class="details-left">[% ISONationality %]</span>
+                </span>
+
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Gender") %]:</span>
+                    <span class="details-left">[% personGender %]</span>
+                </span>
+
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Date of Birth") %]:</span>
+                    <span class="details-left">[% DOB %]</span>
+                </span>
+
+
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Person Status") %]:</span>
+                    <span class="details-left">[% personStatus %]</span>
+                </span>
+
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Type") %]:</span>
+                    <span class="details-left">[% personType %]</span>
+                </span>
+
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Level") %]:</span>
+                    <span class="details-left">[% personLevel %]</span>
+                </span>
+
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Request Notes") %]:</span>
+                    <span class="details-left">[% requestNotes %]</span>
+                </span>
+
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Response Notes") %]:</span>
+                    <span class="details-left">[% responseNotes %]</span>
+                </span>
+
+            </div>
+        </div>
+        <div style="float: left; height: 50px; width: 100%">
+            [% IF RequestAction.showAction == 1 %]
+            <form action="[% RequestAction.target %]" method="POST" style="float: left">
+                <input type="hidden" name="client" value="[% RequestAction.client %]">
+                <input type="hidden" name="request_type" value="[% RequestAction.request_type %]">
+                <input type="hidden" name="a" value="[% RequestAction.action %]">
+                <input type="hidden" name="rid" value="[% RequestAction.rid %]">
+                <input class="button-small generic-button" type="submit" name="response" value="Accept">
+            </form>
+            <form action="[% RequestAction.target %]" method="POST" style="float: left">
+                <input type="hidden" name="client" value="[% RequestAction.client %]">
+                <input type="hidden" name="request_type" value="[% RequestAction.request_type %]">
+                <input type="hidden" name="a" value="[% RequestAction.action %]">
+                <input type="hidden" name="rid" value="[% RequestAction.rid %]">
+                <input class="button-small generic-button" type="submit" name="response" value="Deny">
+            </form>
+            [% END %]
+
+            [% IF RequestAction.initiateRequestProcess == 1 %]
+            <form action="[% RequestAction.target %]" method="POST" style="float: left">
+                <input type="hidden" name="client" value="[% RequestAction.client %]">
+                <input type="hidden" name="a" value="[% RequestAction.action %]">
+                <input type="hidden" name="sp" value="[% sport %]">
+                <input type="hidden" name="pt" value="[% personType %]">
+                <input type="hidden" name="per" value="[%  %]">
+                <input type="hidden" name="pl" value="[% personLevel %]">
+                <input type="hidden" name="ag" value="[% personAgeLevel %]">
+                <input type="hidden" name="nat" value="[% RequestAction.request_type %]">
+                <input type="hidden" name="ol" value="[% requestOriginLevel %]">
+                <input type="hidden" name="r" value="[%  %]">
+                <input type="hidden" name="sr" value="[%  %]">
+                <input type="hidden" name="eID" value="[% requestEntityID %]">
+                <input type="hidden" name="pID" value="[% personID %]">
+                <input type="hidden" name="reqID" value="[% requestID %]">
+
+                <input class="button-small generic-button" type="submit" name="submit" value="Initiate [% requestType %]">
+            </form>
+            <!--
+            <span class="button-small generic-button">
+            <a href="main.cgi?client=[% RequestAction.client %]&a=[% RequestAction.action %]&dtype=undefined&sp=[% sport %]&pt=[% personType %]&per=&pl=[% personLevel %]&ag=[% personAgeLevel %]&nat=[% RequestAction.request_type %]&ol=[% requestOriginLevel %]&r=1&sr=0&eID=[% requestEntityID %]&pID=[% personID %]">Initiate [% RequestAction.request_type %]</a>
+            </span>
+            -->
+            [% END %]
+        </div>
+    </div>
+</div>
