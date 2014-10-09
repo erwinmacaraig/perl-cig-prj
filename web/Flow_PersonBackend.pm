@@ -496,7 +496,8 @@ sub display_minor_fields {
     $personObj->load();
     my $dob = $personObj->getValue('dtDOB');
     my $isMinor = personIsMinor($self->{'Data'}, $dob);
-    if(!$isMinor)   {
+    my $defaultType = $self->{'RunParams'}{'dtype'} || '';
+    if(!$isMinor or $defaultType ne 'PLAYER')   {
         $self->incrementCurrentProcessIndex();
         $self->incrementCurrentProcessIndex();
         return ('',2);
