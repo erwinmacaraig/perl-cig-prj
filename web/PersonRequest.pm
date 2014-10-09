@@ -525,6 +525,7 @@ sub viewRequest {
             $requestType = $Defs::PERSON_REQUEST_ACCESS;
         }
         else {
+
         }
     }
 
@@ -569,6 +570,8 @@ sub viewRequest {
     }
 
     my $initiateRequestProcess = 0;
+    my $tempClient = undef;
+
     if($entityID == $request->{'intRequestFromEntityID'} and $request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_RESPONSE_ACCEPTED) {
         #check PENDING for now
         if($request->{'intPersonRegistrationID'} and $request->{'personRegoStatus'} eq $Defs::PERSONREGO_STATUS_PENDING) {
@@ -578,11 +581,24 @@ sub viewRequest {
             $initiateRequestProcess = 1;
         }
 
-        $action = "PREGF_TU";
+        switch($requestType) {
+            case "$Defs::PERSON_REQUEST_TRANSFER" {
+                $action = "PREGF_TU";
+            }
+            case "$Defs::PERSON_REQUEST_ACCESS" {
+                my %tempClientValues = %{ $Data->{'clientValues'} };
+                $tempClientValues{'personID'} = $request->{'intPersonID'};
+                $tempClientValues{'currentLevel'} = $Defs::LEVEL_PERSON;
+                $tempClient = setClient( \%tempClientValues );
+                print STDERR Dumper %tempClientValues;
+                #$action = "PREGF_T";
+                $action = "P_HOME";
+            }
+        }
     }
 
     my %RequestAction = (
-        'client' => $Data->{client} || 0,
+        'client' => $tempClient || $Data->{client} || 0,
         'rid' => $requestID,
         'action' => $action,
         'showAction' => $showAction,
@@ -759,7 +775,6 @@ sub getRequests {
     ];
 
 
-    print STDERR Dumper $st;
 
     my $db = $Data->{'db'};
     my $q = $db->prepare($st);
@@ -771,6 +786,7 @@ sub getRequests {
         push @personRequests, $dref;
     }
 
+    #print STDERR Dumper @personRequests;
     return (\@personRequests);
 }
 
