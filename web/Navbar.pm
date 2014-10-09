@@ -21,6 +21,7 @@ use ServicesContacts;
 use TTTemplate;
 use Log;
 use Data::Dumper;
+use PersonRegisterWhat;
 
 sub navBar {
     my(
@@ -204,34 +205,42 @@ sub getEntityMenuData {
             url => $baseurl."a=P_L&amp;l=$Defs::LEVEL_PERSON",
         };
     #}
-    $menuoptions{'persons_addplayer'} = {
-        name => $lang->txt('Add Player'),
-        url => $baseurl."a=PF_&amp;dtype=PLAYER",
-    };
-    $menuoptions{'persons_addcoach'} = {
-        name => $lang->txt('Add Coach'),
-        url => $baseurl."a=PF_&amp;dtype=COACH",
-    };
-    if($currentLevel == $Defs::LEVEL_NATIONAL) {
+    if($SystemConfig->{'menu_newperson_PLAYER_'.$Data->{'clientValues'}{'authLevel'}}) {
+        $menuoptions{'persons_addplayer'} = {
+            name => $lang->txt('Add Player'),
+            url => $baseurl."a=PF_&amp;dtype=PLAYER",
+        };
+    }
+    if($SystemConfig->{'menu_newperson_COACH_'.$Data->{'clientValues'}{'authLevel'}}) {
+        $menuoptions{'persons_addcoach'} = {
+            name => $lang->txt('Add Coach'),
+            url => $baseurl."a=PF_&amp;dtype=COACH",
+        };
+    }
+    if($currentLevel == $Defs::LEVEL_NATIONAL and $SystemConfig->{'menu_newperson_MAOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}}) {
         $menuoptions{'persons_addmaofficial'} = {
              name => $lang->txt('Add MA Official'),
             url => $baseurl."a=PF_&amp;dtype=MAOFFICIAL",
         };
     }
-    if($currentLevel == $Defs::LEVEL_CLUB) {
+    if($currentLevel == $Defs::LEVEL_CLUB and $SystemConfig->{'menu_newperson_TEAMOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}}) {
         $menuoptions{'persons_addteamofficial'} = {
             name => $lang->txt('Add Team Official'),
             url => $baseurl."a=PF_&amp;dtype=TEAMOFFICIAL",
         };
+    }
+    if($currentLevel == $Defs::LEVEL_CLUB and $SystemConfig->{'menu_newperson_CLUBOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}}) {
         $menuoptions{'persons_addclubofficial'} = {
             name => $lang->txt('Add Club Official'),
             url => $baseurl."a=PF_&amp;dtype=CLUBOFFICIAL",
         };
     }
-    $menuoptions{'persons_addofficial'} = {
-        name => $lang->txt('Add Referee'),
-        url => $baseurl."a=PF_&amp;dtype=REFEREE",
-    };
+    if($SystemConfig->{'menu_newperson_REFEREE_'.$Data->{'clientValues'}{'authLevel'}}) {
+        $menuoptions{'persons_addofficial'} = {
+            name => $lang->txt('Add Referee'),
+            url => $baseurl."a=PF_&amp;dtype=REFEREE",
+            };
+    }
 
     if($paymentSplitSettings->{'psBanks'}) {
         $menuoptions{'bankdetails'} = {
@@ -920,34 +929,42 @@ sub getClubMenuData {
         };
     }
 
-    $menuoptions{'persons_addplayer'} = {
-        name => $lang->txt('Add Player'),
-        url => $baseurl."a=PF_&amp;dtype=PLAYER",
-    };
-    $menuoptions{'persons_addcoach'} = {
-        name => $lang->txt('Add Coach'),
-        url => $baseurl."a=PF_&amp;dtype=COACH",
-    };
-    if($currentLevel == $Defs::LEVEL_NATIONAL) {
+    if($SystemConfig->{'menu_newperson_PLAYER_'.$Data->{'clientValues'}{'authLevel'}}) {
+        $menuoptions{'persons_addplayer'} = {
+            name => $lang->txt('Add Player'),
+            url => $baseurl."a=PF_&amp;dtype=PLAYER",
+        };
+    }
+    if($SystemConfig->{'menu_newperson_COACH_'.$Data->{'clientValues'}{'authLevel'}}) {
+        $menuoptions{'persons_addcoach'} = {
+            name => $lang->txt('Add Coach'),
+            url => $baseurl."a=PF_&amp;dtype=COACH",
+        };
+    }
+    if($currentLevel == $Defs::LEVEL_NATIONAL and $SystemConfig->{'menu_newperson_MAOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}}) {
         $menuoptions{'persons_addmaofficial'} = {
              name => $lang->txt('Add MA Official'),
             url => $baseurl."a=PF_&amp;dtype=MAOFFICIAL",
         };
     }
-    if($currentLevel == $Defs::LEVEL_CLUB) {
+    if($currentLevel == $Defs::LEVEL_CLUB and $SystemConfig->{'menu_newperson_TEAMOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}}) {
         $menuoptions{'persons_addteamofficial'} = {
             name => $lang->txt('Add Team Official'),
             url => $baseurl."a=PF_&amp;dtype=TEAMOFFICIAL",
         };
+    }
+    if($currentLevel == $Defs::LEVEL_CLUB and $SystemConfig->{'menu_newperson_CLUBOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}}) {
         $menuoptions{'persons_addclubofficial'} = {
             name => $lang->txt('Add Club Official'),
             url => $baseurl."a=PF_&amp;dtype=CLUBOFFICIAL",
         };
     }
-    $menuoptions{'persons_addofficial'} = {
-        name => $lang->txt('Add Referee'),
-        url => $baseurl."a=PF_&amp;dtype=REFEREE",
-    };
+    if($SystemConfig->{'menu_newperson_REFEREE_'.$Data->{'clientValues'}{'authLevel'}}) {
+        $menuoptions{'persons_addofficial'} = {
+            name => $lang->txt('Add Referee'),
+            url => $baseurl."a=PF_&amp;dtype=REFEREE",
+            };
+    }
 
 
 
