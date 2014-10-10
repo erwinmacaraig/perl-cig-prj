@@ -279,29 +279,44 @@ sub optionsPersonRegisterWhat {
         }
         elsif ($lookingForField eq 'strAgeLevel') {
             #get age level from tblMatrix to narrow down selection in checkRegoAgeRestrictions
-            my @ageLevelFromMatrix = getAgeLevelFromMatrix($Data, $MATRIXwhere, \@MATRIXvalues);
+            my $ageLevelFromMatrix = getAgeLevelFromMatrix($Data, $MATRIXwhere, \@MATRIXvalues);
 
-            if(!@ageLevelFromMatrix) {
+            if(!$ageLevelFromMatrix) {
                 return (undef, 'No age level defined.') 
             }
             else {
-                $Data->{'Realm'} = $Data->{'Realm'} || $realmID,
-                my $ageLevelOptions = checkRegoAgeRestrictions(
-                    $Data,
-                    $personID,
-                    0,
-                    $sport,
-                    $personType,
-                    $personEntityRole,
-                    $personLevel,
-                    @ageLevelFromMatrix,
-                );
+                #print STDERR Dumper @ageLevelFromMatrix;
+                
+                my @tempAgeLevel = @{$ageLevelFromMatrix};
 
-                if(!$ageLevelOptions) {
-                    return (undef, 'Age Level/Person\'s age not defined.');
+                if(scalar(@tempAgeLevel) == 1 and $tempAgeLevel[0] eq '' and $personType ne $Defs::PERSON_TYPE_PLAYER) {
+                    my @retdata;
+                    push @retdata, {
+                        name => '-',
+                        value => '',
+                    };
+
+                    return (\@retdata, '');
                 }
                 else {
-                    return ($ageLevelOptions, '');
+                    $Data->{'Realm'} = $Data->{'Realm'} || $realmID,
+                    my $ageLevelOptions = checkRegoAgeRestrictions(
+                        $Data,
+                        $personID,
+                        0,
+                        $sport,
+                        $personType,
+                        $personEntityRole,
+                        $personLevel,
+                        @{$ageLevelFromMatrix},
+                    );
+
+                    if(!$ageLevelOptions) {
+                        return (undef, 'Age Level/Person\'s age not defined.');
+                    }
+                    else {
+                        return ($ageLevelOptions, '');
+                    }
                 }
             }
             #$Data->{'Realm'} = $Data->{'Realm'} || $realmID,
@@ -522,13 +537,15 @@ sub getAgeLevelFromMatrix {
     $query->execute(@{$values_ref});
     
     my @retdata=();
+    my $count = 0;
     while (my $dref = $query->fetchrow_hashref())   {
+        $count++;
         push @retdata, $dref->{'strAgeLevel'};
         #$values{$dref->{'strPersonType'}} = $personTypeList->{$dref->{'strPersonType'}};
     }
 
-    return 0 if(!@retdata);
-    return @retdata;
+    return 0 if(!$count);
+    return \@retdata;
 }
 
 1;
