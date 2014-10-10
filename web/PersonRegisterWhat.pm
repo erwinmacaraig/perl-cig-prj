@@ -240,7 +240,7 @@ sub optionsPersonRegisterWhat {
             #if strDiscipline == ALL, return selected distinct strSport from tblMatrix
             #otherwise check from tblMatrix if strDiscipline is allowed before returning any options
 
-            if($entityAllowed->{'strDiscipline'} ne 'ALL') {
+            if((defined $Defs::entitySportType{$entityAllowed->{'strDiscipline'}}) and $entityAllowed->{'strDiscipline'} ne 'ALL') {
                 #include in WHERE the specific sport from tblEntity to narrow down search
                 $MATRIXwhere .= " AND $lookingForField = '$entityAllowed->{'strDiscipline'}'";
             }
