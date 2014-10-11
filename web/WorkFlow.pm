@@ -1924,8 +1924,10 @@ sub populateDocumentViewData {
             rd.intWFRuleDocumentID,
             rd.intWFRuleID,
             rd.intDocumentTypeID,
-            rd.intAllowProblemResolutionLevel,
-            rd.intAllowVerify,
+            rd.intAllowApprovalEntityAdd,
+            rd.intAllowApprovalEntityVerify,
+            rd.intAllowProblemResolutionEntityAdd,
+            rd.intAllowProblemResolutionEntityVerify,
             tuf.intFileID,
             wt.intApprovalEntityID,
             wt.intProblemResolutionEntityID,
@@ -2009,23 +2011,39 @@ sub populateDocumentViewData {
 
         print STDERR Dumper $tdref;
         #warn "DOCUMENT TYPE ID " . $tdref->{'intDocumentTypeID'};
-        if($tdref->{'intAllowProblemResolutionLevel'} eq 1 and $tdref->{'intAllowVerify'} == 1) {
-            $displayVerify = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
-        }
-        elsif ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowVerify'} == 1) {
-            $displayVerify = 1;
-        }
+        #if($tdref->{'intAllowProblemResolutionLevel'} eq 1 and $tdref->{'intAllowVerify'} == 1) {
+        #    $displayVerify = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
+        #}
+        #elsif ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowVerify'} == 1) {
+        #    $displayVerify = 1;
+        #}
 
-        if($tdref->{'intAllowProblemResolutionLevel'} == 1 and $tdref->{'intAllowVerify'} == 1 and !$tdref->{'intDocumentID'}) {
+        if($tdref->{'intAllowProblemResolutionEntityAdd'} == 1 and !$tdref->{'intDocumentID'}) {
             $displayAdd = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
             if($displayAdd) {
                 $addLink = qq[ <span style="position: relative" class="button-small generic-button"><a href="$Defs::base_url/main.cgi?client=$Data->{'client'}&amp;a=WF_amd&amp;RegistrationID=$registrationID&amp;trgtid=$targetID&amp;doclisttype=$tdref->{'intDocumentTypeID'}&amp;level=$level" target="_blank">]. $Data->{'lang'}->txt('Add') . q[</a></span>];
             }
         }
-        elsif ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowVerify'} == 1 and !$tdref->{'intDocumentID'}) {
+
+        if ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityAdd'} == 1 and !$tdref->{'intDocumentID'}) {
             $displayAdd = 1;
             $addLink = qq[ <span style="position: relative" class="button-small generic-button"><a href="$Defs::base_url/main.cgi?client=$Data->{'client'}&amp;a=WF_amd&amp;RegistrationID=$registrationID&amp;trgtid=$targetID&amp;doclisttype=$tdref->{'intDocumentTypeID'}&amp;level=$level" target="_blank">]. $Data->{'lang'}->txt('Add') . q[</a></span>];
         }
+
+
+
+
+
+        if($tdref->{'intAllowProblemResolutionEntityVerify'} == 1 and !$tdref->{'intDocumentID'}) {
+            $displayVerify = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
+        }
+
+        if ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityVerify'} == 1 and $tdref->{'intDocumentID'}) {
+            $displayVerify = 1;
+        }
+
+
+
 
         if($tdref->{'intDocumentID'}) {
             $displayView = 1;
