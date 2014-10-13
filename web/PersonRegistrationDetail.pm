@@ -91,6 +91,12 @@ sub personRegistrationDetail   {
                 type => 'text',
                 readonly => 1,
             },
+            strShortNotes => {
+                label => 'Notes',
+                value => $RegistrationDetail->{'strShortNotes'},
+                type => 'text',
+                readonly => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
+            },
         },
         order => [qw(
             strStatus
@@ -100,6 +106,7 @@ sub personRegistrationDetail   {
             strRegistrationNature
             strPersonType
             strPersonLevel
+            strShortNotes
         )],
         options => {
             labelsuffix => ':',
