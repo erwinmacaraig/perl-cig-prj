@@ -288,9 +288,42 @@ sub optionsPersonRegisterWhat {
                 #print STDERR Dumper @ageLevelFromMatrix;
                 
                 my @tempAgeLevel = @{$ageLevelFromMatrix};
+                if ($bulk)  {
+                    $st = qq[
+                        SELECT DISTINCT $lookingForField, COUNT(intMatrixID) as CountNum
+                        FROM tblMatrix
+                        WHERE
+                            intOriginLevel  = ?
+                            AND intLocked=0
+                            AND strWFRuleFor='BULKREGO'
+                            AND intRealmID = ?
+                            AND intSubRealmID IN (0,?)
+                            $MATRIXwhere
+                        GROUP BY $lookingForField
+                    ];
+                    @values = @MATRIXvalues;
+                    my $q = $Data->{'db'}->prepare($st);
+                    $q->execute(@values);
+                    while(my ($val, $countNum) = $q->fetchrow_array())   {
+                        if($val)    {
+                            my $label = $lfLabelTable{$lookingFor}{$val};
+                            $label = $Data->{'lang'}->txt($lfLabelTable{$lookingFor}{$val});
+                            push @retdata, {
+                                name => $label,
+                                value => $val,
+                            };
+                        }
+                        else    {
+                            push @retdata, {
+                                name => '-',
+                                value => '',
+                            };
+                       }
+                    }
+                    return (\@retdata, '');
+                }
 
-    ## If BULK ignore
-                if($bulk or (scalar(@tempAgeLevel) == 1 and $tempAgeLevel[0] eq '' and $personType ne $Defs::PERSON_TYPE_PLAYER)) {
+                if(scalar(@tempAgeLevel) == 1 and $tempAgeLevel[0] eq '' and $personType ne $Defs::PERSON_TYPE_PLAYER) {
                     my @retdata;
                     push @retdata, {
                         name => '-',
