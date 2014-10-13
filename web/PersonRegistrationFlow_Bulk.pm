@@ -63,7 +63,6 @@ sub handleRegistrationFlowBulk {
             personEntityRole=> param('per') || '',
             personLevel => param('pl') || '',
             sport => param('sp') || '',
-            ageLevel => param('ag') || '',
             registrationNature => param('nat') || '',
             originLevel => $originLevel,
             originID => $entityID,
@@ -71,13 +70,15 @@ sub handleRegistrationFlowBulk {
             entityLevel => $entityLevel,
             current => 1,
         };
+            #ageLevel => param('ag') || '',
         $Hidden{'pt'} = param('pt');
         $Hidden{'per'} = param('per');
         $Hidden{'pl'} = param('pl');
         $Hidden{'sp'} = param('sp');
-        $Hidden{'ag'} = param('ag');
+        #$Hidden{'ag'} = param('ag');
         $Hidden{'nat'} = param('nat');
         $body.= "NOW SELECT PEOPLE OF $bulk_ref->{'personType'} | $bulk_ref->{'sport'} | $bulk_ref->{'personLevel'}"; 
+print STDERR $action;
     if ( $action eq 'PREGFB_TU' ) {
         #add rego record with types etc.
         my $msg='';
@@ -87,6 +88,7 @@ sub handleRegistrationFlowBulk {
 
     if ( $action eq 'PREGFB_SPU' ) {
         ($bulk_ref->{'nationalPeriodID'}, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $bulk_ref->{'sport'}, $bulk_ref->{'registrationNature'});
+        print STDERR "222NATIONAL PERIOD : $bulk_ref->{'nationalPeriodID'}";
         my $count = bulkPersonRollover($Data, 'PREGFB_SPU', $bulk_ref, \%Hidden, 1);
 
         my $rolloverIDs= param('rolloverIDs') || '';
@@ -139,7 +141,7 @@ sub handleRegistrationFlowBulk {
         ## PUT PRODUCTS IN HIDDEN
         $action = $Flow{$action};
     }
-
+print STDERR $action;
 ## FLOW SCREENS
     if ( $action eq 'PREGFB_T' ) {
         my $url = $Data->{'target'}."?client=$client&amp;a=PREGFB_TU&amp;";
@@ -156,6 +158,7 @@ sub handleRegistrationFlowBulk {
     }
     elsif ( $action eq 'PREGFB_SP' ) {
         ($bulk_ref->{'nationalPeriodID'}, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $bulk_ref->{'sport'}, $bulk_ref->{'registrationNature'});
+        print STDERR "NATIONAL PERIOD : $bulk_ref->{'nationalPeriodID'}";
         my ($listPersons_body, undef) = bulkPersonRollover($Data, 'PREGFB_SPU', $bulk_ref, \%Hidden, 0);
         $body .= $listPersons_body;
    }

@@ -34,6 +34,7 @@ use Data::Dumper;
 use POSIX qw(strftime);
 use Date::Parse;
 use PlayerPassport;
+use RegoAgeRestrictions;
 
 sub displayRegoFlowCompleteBulk {
 
@@ -452,9 +453,26 @@ sub bulkRegoSubmit {
         0,
         $bulk_ref,
     );
- 
-
+    my @Ages = ('ADULT',
+            'MINOR'
+    );
     for my $pID (@IDs)   {
+        my $pref = loadPersonDetails($Data->{'db'}, $pID) if ($pID);
+        my $ageLevelOptions = checkRegoAgeRestrictions(
+            $Data,
+            $pID,
+            0,
+            $bulk_ref->{'sport'},
+            $bulk_ref->{'personType'},
+            $bulk_ref->{'personEntityRole'},
+            $bulk_ref->{'personLevel'},
+            @Ages
+        );
+        
+        $bulk_ref->{'ageLevel'}='';
+        if (defined $ageLevelOptions)   {
+            $bulk_ref->{'ageLevel'}=$ageLevelOptions->[0]{'value'};#'ADULT';
+        }
         my ($regoID, $rego_ref, $msg) = add_rego_record(
             $Data, 
             $pID, 

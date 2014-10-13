@@ -289,7 +289,8 @@ sub optionsPersonRegisterWhat {
                 
                 my @tempAgeLevel = @{$ageLevelFromMatrix};
 
-                if(scalar(@tempAgeLevel) == 1 and $tempAgeLevel[0] eq '' and $personType ne $Defs::PERSON_TYPE_PLAYER) {
+    ## If BULK ignore
+                if($bulk or (scalar(@tempAgeLevel) == 1 and $tempAgeLevel[0] eq '' and $personType ne $Defs::PERSON_TYPE_PLAYER)) {
                     my @retdata;
                     push @retdata, {
                         name => '-',
@@ -310,7 +311,6 @@ sub optionsPersonRegisterWhat {
                         $personLevel,
                         @{$ageLevelFromMatrix},
                     );
-
                     if(!$ageLevelOptions) {
                         return (undef, 'Age Level/Person\'s age not defined.');
                     }
@@ -351,18 +351,6 @@ sub optionsPersonRegisterWhat {
 
             #@values = @MATRIXvalues;
         }
-
-        #$st = qq[
-        #    SELECT DISTINCT $lookingForField, COUNT(intEntityRegistrationAllowedID) as CountNum
-        #    FROM tblEntityRegistrationAllowed
-        #    WHERE
-        #        intEntityID = ?
-        #        AND intRealmID = ?
-        #        AND intSubRealmID IN (0,?)
-        #        $ERAwhere
-        #    GROUP BY $lookingForField
-        #];
-        #@values = @ERAvalues;
     }
     else    {
 
