@@ -139,6 +139,7 @@ sub getFieldLabels	{
             dtTo => 'Dissolution Date',
             strGender => 'Gender',
             strDiscipline => 'Sport',
+            strEntityType => 'Entity Type',
             	
 	);
 	}

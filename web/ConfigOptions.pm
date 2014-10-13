@@ -454,6 +454,7 @@ sub getFieldsList	{
         intLegalTypeID
         strLegalID
         strDiscipline
+        strEntityType
         intClubClassification
         strMAID
         dtFrom
