@@ -38,6 +38,10 @@
                                 [% document.viewLink %]
                                 [% END %]
 
+                                [% IF document.DisplayReplace == 1 %]
+                                [% document.replaceLink %]
+                                [% END %]
+
                                 [% IF document.Status == 'PENDING' %]
                                 <form style="float: left; position:relative" action="[% DocumentAction.target %]" method="POST">
                                     <input type="hidden" name="client" value="[% DocumentAction.client %]">
