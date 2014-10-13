@@ -596,7 +596,7 @@ sub viewRequest {
 
 
     my $showAction = 0;
-    if ($entityID == $request->{'intRequestToEntityID'}) {
+    if (($entityID == $request->{'intRequestToEntityID'} and $request->{'intRequestToMAOverride'} == 0) or ($entityID == $request->{'intRequestToMAOverride'} and $request->{'intRequestToMAOverride'} == 1)) {
         $showAction = 1;
         $action = "PRA_S";
     }
@@ -732,7 +732,16 @@ sub getRequests {
     );
 
     if($filter->{'entityID'}) {
-        $where .= " AND ((pq.intRequestToEntityID = ? AND pq.strRequestResponse is NULL) OR (pq.intRequestFromEntityID = ? AND pq.strRequestResponse in (?, ?))) ";
+        $where .= "
+            AND (
+                    (pq.intParentMAEntityID = ? AND pq.intRequestToMAOverride = 1 AND pq.strRequestResponse is NULL)
+                    OR
+                    (pq.intRequestToEntityID = ? AND pq.strRequestResponse is NULL AND pq.intRequestToMAOverride = 0)
+                    OR
+                    (pq.intRequestFromEntityID = ? AND pq.strRequestResponse in (?, ?))
+                )
+            ";
+        push @values, $filter->{'entityID'};
         push @values, $filter->{'entityID'};
         push @values, $filter->{'entityID'};
         push @values, $Defs::PERSON_REQUEST_RESPONSE_ACCEPTED;
@@ -745,7 +754,16 @@ sub getRequests {
     }
 
     if($filter->{'requestID'} and $filter->{'entityID'}) {
-        $where .= " AND (((pq.intRequestToEntityID = ? AND pq.strRequestResponse is NULL AND pq.intPersonRequestID = ?)) OR (pq.intRequestFromEntityID = ? AND pq.intPersonRequestID = ? AND pq.strRequestResponse in (?, ?))) ";
+        $where .= "
+            AND (
+                    (pq.intParentMAEntityID = ? AND pq.intRequestToMAOverride = 1 AND pq.strRequestResponse is NULL)
+                    OR
+                    (pq.intRequestToEntityID = ? AND pq.strRequestResponse is NULL AND pq.intPersonRequestID = ? AND pq.intRequestToMAOverride = 0)
+                    OR
+                    (pq.intRequestFromEntityID = ? AND pq.intPersonRequestID = ? AND pq.strRequestResponse in (?, ?))
+                )
+            ";
+        push @values, $filter->{'entityID'};
         push @values, $filter->{'entityID'};
         push @values, $filter->{'requestID'};
         push @values, $filter->{'entityID'};
