@@ -2000,8 +2000,10 @@ sub populateDocumentViewData {
         my $displayVerify;
         my $displayAdd;
         my $displayView;
+        my $displayReplace;
         my $viewLink = '';
         my $addLink = '';
+        my $replaceLink = '';
 
         my $registrationID = $tdref->{'regoItemID'} ? $dref->{'intPersonRegistrationID'} : 0;
         my $targetID = $dref->{'intPersonID'};
@@ -2018,16 +2020,26 @@ sub populateDocumentViewData {
         #    $displayVerify = 1;
         #}
 
-        if($tdref->{'intAllowProblemResolutionEntityAdd'} == 1 and !$tdref->{'intDocumentID'}) {
-            $displayAdd = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
-            if($displayAdd) {
-                $addLink = qq[ <span style="position: relative" class="button-small generic-button"><a href="$Defs::base_url/main.cgi?client=$Data->{'client'}&amp;a=WF_amd&amp;RegistrationID=$registrationID&amp;trgtid=$targetID&amp;doclisttype=$tdref->{'intDocumentTypeID'}&amp;level=$level" target="_blank">]. $Data->{'lang'}->txt('Add') . q[</a></span>];
+        #$replaceLink = qq[ <span style="position: relative" class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$tdref->{'intFileID'}" target="_blank">]. $Data->{'lang'}->txt('Replace') . q[</a></span>];
+        $replaceLink = qq[ <span style="position: relative" class="button-small generic-button"><a href="$Defs::base_url/main.cgi?client=$Data->{'client'}&amp;a=WF_amd&amp;RegistrationID=$registrationID&amp;trgtid=$targetID&amp;doclisttype=$tdref->{'intDocumentTypeID'}&amp;level=$level&amp;f=$tdref->{'intFileID'}" target="_blank">]. $Data->{'lang'}->txt('Replace') . q[</a></span>];
+        $addLink = qq[ <span style="position: relative" class="button-small generic-button"><a href="$Defs::base_url/main.cgi?client=$Data->{'client'}&amp;a=WF_amd&amp;RegistrationID=$registrationID&amp;trgtid=$targetID&amp;doclisttype=$tdref->{'intDocumentTypeID'}&amp;level=$level" target="_blank">]. $Data->{'lang'}->txt('Add') . q[</a></span>];
+
+        if($tdref->{'intAllowProblemResolutionEntityAdd'} == 1) {
+            if(!$tdref->{'intDocumentID'}){
+                $displayAdd = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
+            }
+            else {
+                $displayReplace = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
             }
         }
 
-        if ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityAdd'} == 1 and !$tdref->{'intDocumentID'}) {
-            $displayAdd = 1;
-            $addLink = qq[ <span style="position: relative" class="button-small generic-button"><a href="$Defs::base_url/main.cgi?client=$Data->{'client'}&amp;a=WF_amd&amp;RegistrationID=$registrationID&amp;trgtid=$targetID&amp;doclisttype=$tdref->{'intDocumentTypeID'}&amp;level=$level" target="_blank">]. $Data->{'lang'}->txt('Add') . q[</a></span>];
+        if ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityAdd'} == 1) {
+            if(!$tdref->{'intDocumentID'}){
+                $displayAdd = 1;
+            }
+            else {
+                $displayReplace = 1;
+            }
         }
 
 
@@ -2058,8 +2070,10 @@ sub populateDocumentViewData {
             DisplayVerify => $displayVerify || '',
             DisplayAdd => $displayAdd || '',
             DisplayView => $displayView || '',
+            DisplayReplace => $displayReplace || '',
             viewLink => $viewLink,
-            addLink => $addLink
+            addLink => $addLink,
+            replaceLink => $replaceLink
         );
 
         push @RelatedDocuments, \%documents;
