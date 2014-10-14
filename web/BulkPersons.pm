@@ -87,6 +87,7 @@ sub bulkPersonRollover {
             )
         WHERE 
             P.strStatus NOT IN ('DELETED', 'SUSPENDED')
+            AND P.strStatus IN ('REGISTERED')
             AND P.intRealmID = ?
         ORDER BY strLocalSurname, strLocalFirstname
     ];
