@@ -80,7 +80,7 @@ sub handleRegistrationFlowBulk {
         $Hidden{'sp'} = param('sp');
         $Hidden{'ag'} = param('ag');
         $Hidden{'nat'} = param('nat');
-        $body.= "NOW SELECT PEOPLE OF $bulk_ref->{'personType'} | $bulk_ref->{'sport'} | $bulk_ref->{'personLevel'}"; 
+        $body.= "$bulk_ref->{'personType'} | $bulk_ref->{'sport'} | $bulk_ref->{'personLevel'}"; 
 print STDERR $action;
     if ( $action eq 'PREGFB_TU' ) {
         #add rego record with types etc.
