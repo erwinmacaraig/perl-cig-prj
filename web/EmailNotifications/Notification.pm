@@ -1,29 +1,27 @@
-package Notification;
+package EmailNotifications::Notification;
 
 use strict;
+use lib '.', '..';
+use Email;
+use parent 'EmailNotifications::Template';
+use Data::Dumper;
 
 sub new {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my (%args) = @_;
 
-    my $self = {
-        _realmID            => $args{realmID},
-        _entityID           => $args{entityID},
-        _notificationType   => $args{entityID},
-        _lang               => $args{lang} || undef,
-        _htmlTemplatePath   => $args{htmlTemplatePath} || undef,
-        _textTemplatePath   => $args{textTemplatePath} || undef,
-        _subject            => $args{subject} || undef,
-    };
-
-    $self = bless ($self, $class);
-
-    return $self;
+    return $class->SUPER::new(@_); 
 }
 
 sub initialise {
+    my ($self) = shift;
 
+    $self->SUPER::retrieve();
+    return $self;
 }
 
 sub send {
 
 }
+
+1;
