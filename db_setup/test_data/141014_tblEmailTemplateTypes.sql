@@ -1,0 +1,16 @@
+INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_WFTASK_ADDED', 'wftask_added', 1, NOW());
+INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_WFTASK_APPROVED', 'wftask_approved', 1, NOW());
+INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_WFTASK_REJECTED', 'wftask_rejected', 1, NOW());
+INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_WFTASK_RESOLVED', 'wftask_resolved', 1, NOW());
+INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_WFTASK_HELD', 'wftask_held', 1, NOW());
+INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_WFTASK_RESUMED', 'wftask_resumed', 1, NOW());
+INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTACCESS_ACCEPTED', 'requestaccess_accepted', 1, NOW());
+INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTACCESS_DENIED', 'requestaccess_denied', 1, NOW());
+INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTACCESS_OVERRIDDEN', 'requestaccess_overridden', 1, NOW());
+INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTACCESS_REJECTED', 'requestaccess_rejected', 1, NOW());
+INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTACCESS_COMPLETED', 'requesttransfer_completed', 1, NOW());
+INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTTRANSFER_ACCEPTED', 'requesttransfer_accepted', 1, NOW());
+INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTTRANSFER_DENIED', 'requesttransfer_denied', 1, NOW());
+INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTTRANSFER_OVERRIDDEN', 'requesttransfer_overridden', 1, NOW());
+INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTTRANSFER_REJECTED', 'requesttransfer_rejected', 1, NOW());
+INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTTRANSFER_COMPLETED', 'requesttransfer_completed', 1, NOW());
