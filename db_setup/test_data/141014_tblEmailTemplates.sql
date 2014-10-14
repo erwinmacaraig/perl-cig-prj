@@ -1,0 +1,1 @@
+INSERT INTO tblEmailTemplates(intEmailTemplateTypeID, strHTMLTemplatePath, strTextTemplatePath, strSubjectPrefix, intLanguageID, intActive, tTimeStamp) VALUES(1, 'emails/notification/__REALMNAME__/workflow/html/', '', 'WORK TASK ADDED: ', 1, 1, NOW());
