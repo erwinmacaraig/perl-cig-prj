@@ -643,10 +643,10 @@ sub postClubAdd {
   );  
   my $clubdocs;
   $clubdocs = runTemplate($Data, \%PageData, 'club/required_docs.templ') || '';  
-      
-      
-      
-      
+
+	### Change strStatus to DE-REGISTERED When Dissolution date is less than current date ###
+	resetStatus($cv{'clubID'},$db);  
+            
       return (0,qq[
      <div class="sectionheader"> $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Added Successfully</div><br>
       <div>
@@ -685,8 +685,19 @@ sub postClubUpdate {
   }
 
   $Data->{'cache'}->delete('swm',"ClubObj-$clubID") if $Data->{'cache'};
+	### Change strStatus to DE-REGISTERED When Dissolution date is less than current date ###
+	resetStatus($clubID,$db);
+} 
 
-}
+sub resetStatus {
+	my($id,$db)=@_;
+		my $st=qq[
+    	UPDATE tblEntity SET strStatus = \"DE-REGISTERED\" WHERE intEntityID = ? and date(dtTo) <= date(NOW())
+  	];
+ 		my $query = $db->prepare($st);
+		$query->execute($id);
+		$query->finish;
+} 
 
 sub listClubs   {
   my($Data, $entityID) = @_;
