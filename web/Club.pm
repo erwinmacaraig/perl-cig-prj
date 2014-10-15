@@ -211,7 +211,8 @@ print STDERR "SSSS$action $clubID\n";
         type        => 'date',
         datetype    => 'dropdown',
         format      => 'dd/mm/yyyy',
-        validate    => 'DATE',            
+        validate    => 'DATE',
+        readonly    => $Data->{'clientValues'}{authLevel} < $Defs::LEVEL_NATIONAL ? 1 : 0,            
       },
       strGender => {
           label => "Gender",
@@ -689,18 +690,18 @@ sub postClubUpdate {
   }
 
   $Data->{'cache'}->delete('swm',"ClubObj-$clubID") if $Data->{'cache'};
-	### Change strStatus to DE-REGISTERED When Dissolution date is less than current date ###
-	resetStatus($clubID,$db);
+  ### Change strStatus to DE-REGISTERED When Dissolution date is less than current date ###
+  resetStatus($clubID,$db);
 } 
 
 sub resetStatus {
-	my($id,$db)=@_;
-		my $st=qq[
-    	UPDATE tblEntity SET strStatus = \"DE-REGISTERED\" WHERE intEntityID = ? and date(dtTo) <= date(NOW())
-  	];
- 		my $query = $db->prepare($st);
-		$query->execute($id);
-		$query->finish;
+  my($id,$db)=@_;
+  my $st=qq[
+    UPDATE tblEntity SET strStatus = \"DE-REGISTERED\" WHERE intEntityID = ? and date(dtTo) <= date(NOW())
+  ];
+  my $query = $db->prepare($st);
+  $query->execute($id);
+  $query->finish;
 } 
 
 sub listClubs   {

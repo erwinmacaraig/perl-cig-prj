@@ -45,12 +45,15 @@ sub handleTransLogs {
         if ($Data->{'params'}{"cc_submit[$i]"}) {
             $cc_submit = $Data->{'params'}{"pt_submit[$i]"};
         }
-        print STDERR "THE VALUE IS " . $cc_submit;
+        print STDERR "==========THE VALUE IS " . $cc_submit . "=============";
     }
-
+#########################################
   if ($action=~/step2/) {	
 	  if ($cc_submit)	{
-		  ($step1Success, $resultMessage) = (1,'');
+		  ($step1Success, $resultMessage) = (1,'');		
+		  print STDERR "****** so I am going here  AND RESULT MESSAGE = *****" . $resultMessage;   
+		  
+		  
 	  }
 	  else	{
 		  ($step1Success, $resultMessage) = validateStep1($Data,$db,$clientValues_ref);
@@ -62,6 +65,7 @@ sub handleTransLogs {
 	    $action = 'list'; 
 	  }
   }
+##########################################
   if ($action=~/step3/) {	
 	  ($resultMessage) = step3($Data, $db, $clientValues_ref);
 	  $header = qq[Payment Confirmed];
@@ -240,12 +244,19 @@ sub step2 {
 
 #Handles the 'Payment Confirmation' Screen, tblTransactions records get intTempLogID set and new tblTransLog record gets added with intStatus=pending
 	my ($Data, $db, $paymentTypeSubmitted, $clientValues_ref) = @_;
-
+    
     my $lang = $Data->{'lang'};
 	my ($body, $header) = ('', '');
 
 	my ($currencyID, $intAmount, $dtLog, $paymentType, $strBSB, $strAccountName, $strAccountNum, $strResponseCode, $strResponseText, $strComments, $strBank, $strReceiptRef) = ($Data->{params}{currencyID}, $Data->{params}{intAmount}, $Data->{params}{dtLog}, $Data->{params}{paymentType}, $Data->{params}{strBSB}, $Data->{params}{strAccountName}, $Data->{params}{strAccountNum}, $Data->{params}{strResponseCode}, $Data->{params}{strResponseCode}, $Data->{params}{strComments}, $Data->{params}{strBank}, $Data->{params}{strReceiptRef});
     $paymentType ||= $paymentTypeSubmitted;
+    print STDERR "currencyID = " . $currencyID;
+    print STDERR "intAmount = " . $intAmount;
+    print STDERR "strBSB = " . $strBSB;
+    print STDERR "strResponseCode = " . $strResponseCode;
+    
+
+
 
 	#$dtLog=convertDateToYYYYMMDD($dtLog);
 	$dtLog=fixDate($dtLog);
@@ -561,7 +572,9 @@ sub getTransList {
       t.dtEnd as dtEnd_RAW, 
       DATE_FORMAT( t.dtEnd, '%d/%m/%Y') AS dtEnd, 
       IF(strGroup <> '', 
-      CONCAT(strGroup,'-',P.strName), P.strName) as strName, 
+      CONCAT(strGroup,'-',P.strName), P.strName) as strName,
+      P.strGSTText,
+      P.dblTaxRate, 
       t.strNotes
     FROM 
       tblTransactions as t
@@ -589,7 +602,11 @@ sub getTransList {
     push (@Columns, {Name => 'Invoice Number', Field => 'intTransactionID', width => 20});
     push (@Columns, {Name => 'Item Name', Field => 'strName'});
     push (@Columns, {Name => 'Quantity', Field => 'intQty', width => 15});
-    push (@Columns, {Name => 'Amount', Field => 'curAmount', width =>20});
+    push (@Columns, {Name => 'Current Amount', Field => 'curAmount', width =>20});
+    ########    
+    push (@Columns, {Name => 'Tax Total', Field => 'TaxTotal', width => 15});
+    push (@Columns, {Name => 'Amount', Field => 'NetAmount', width => 20});    
+    #######
     push (@Columns, {Name => 'Start', Field => 'dtStart', width => 20});
     push (@Columns, {Name => 'Start_RAW', Field => 'dtStart_RAW', hide=>1});
     push (@Columns, {Name => 'End', Field => 'dtEnd', width => 20});
@@ -627,16 +644,18 @@ sub getTransList {
         $row_data->{id} = $i;
         foreach my $header (@Columns) {
             if ($header->{Field} eq 'StatusTextLang') {
-        my $status = $row->{intStatus};
-        $row->{StatusText} = 'Unpaid' if ($status == 0);
-        $row->{StatusText} = 'Paid' if ($status == 1);
-        $row->{StatusText} = 'Cancelled' if ($status == 2);
+               my $status = $row->{intStatus};
+               $row->{StatusText} = 'Unpaid' if ($status == 0);
+               $row->{StatusText} = 'Paid' if ($status == 1);
+               $row->{StatusText} = 'Cancelled' if ($status == 2);
 
-        $row->{StatusTextLang} = $Data->{'lang'}->txt('Unpaid') if ($status == 0);
-        $row->{StatusTextLang} = $Data->{'lang'}->txt('Paid') if ($status == 1);
-        $row->{StatusTextLang} = $Data->{'lang'}->txt('Cancelled') if ($status == 2);
-      }
-      $row_data->{$header->{Field}} = $row->{$header->{Field}};
+               $row->{StatusTextLang} = $Data->{'lang'}->txt('Unpaid') if ($status == 0);
+               $row->{StatusTextLang} = $Data->{'lang'}->txt('Paid') if ($status == 1);
+               $row->{StatusTextLang} = $Data->{'lang'}->txt('Cancelled') if ($status == 2);
+             }
+        $row_data->{$header->{Field}} = $row->{$header->{Field}}; 
+              
+
     }
     $row_data->{SelectLink} = qq[main.cgi?client=$client&a=P_TXN_EDIT&personID=$row->{intID}&id=$row->{intTransLogID}&tID=$row->{intTransactionID}];
     if ($row->{StatusText} eq 'Paid') {
@@ -659,7 +678,16 @@ sub getTransList {
     else {
       $row_data->{stuff} = '';
       $row_data->{manual_payment} = '';
-    }
+    } 
+   # $row_data->{TotalAmount} = $row->{intQty} * $row->{curAmount};
+   # $row_data->{curAmount} =$row_data->{TotalAmount};    
+    if($row->{'dblTaxRate'}){
+        my $temppricerate = 1 + $row->{'dblTaxRate'}; 
+        $row_data->{'NetAmount'} = sprintf( "%.2f",($row->{curAmount} / $temppricerate));
+        $row_data->{'TaxTotal'} =sprintf("%.2f",($row->{'dblTaxRate'} * $row_data->{'NetAmount'}));  
+    }     
+
+
     push @rowdata, $row_data if $row_data;
     $i++;
   }
@@ -1327,7 +1355,7 @@ sub viewTransLog	{
 	my $TLref = $qry->fetchrow_hashref();
 
 	my $st_trans = qq[
-		SELECT M.strLocalSurname, M.strLocalFirstName, E.*, P.strName, P.strGroup, E.strLocalName as EntityName
+		SELECT M.strLocalSurname, M.strLocalFirstName, E.*, P.strName, P.strGroup, E.strLocalName as EntityName, T.intQty, T.curAmount, T.intTableType, T.intStatus
 		FROM tblTransactions as T
 			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
 			LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
@@ -1335,6 +1363,13 @@ sub viewTransLog	{
 		WHERE intTransLogID = $intTransLogID
 		AND T.intRealmID = $Data->{'Realm'}
 	];
+	
+	
+	# create a filehandle 
+	open(ERRORFILE, '>> /home/emacaraig/src/FIFASPOnline/web/myadmin/test.txt');
+	print ERRORFILE "For dispaying table " . $st_trans . "\n"; 
+	
+	print STDERR  "For dispaying table " . $st_trans;
 	my $qry_trans = $db->prepare($st_trans);
   	$qry_trans->execute;
 		
@@ -1484,7 +1519,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 	while (my $dref = $qry_trans->fetchrow_hashref())	{
 		$count++;
         my $paymentFor = '';
-        $paymentFor = qq[$dref->{strLocalSurname}, $dref->{strFirstName}] if ($dref->{intTableType} == $Defs::LEVEL_PERSON);
+        $paymentFor = qq[$dref->{strLocalSurname}, $dref->{strLocalFirstName}] if ($dref->{intTableType} == $Defs::LEVEL_PERSON);
         $paymentFor = qq[$dref->{EntityName}] if ($dref->{intTableType} == $Defs::LEVEL_CLUB);
 		my $productname = $dref->{strName};
 		$productname = qq[$dref->{strGroup}-].$productname if ($dref->{strGroup});
@@ -1549,7 +1584,7 @@ sub viewPayLaterTransLog    {
 	my $TLref = $qry->fetchrow_hashref();
 
 	my $st_trans = qq[
-		SELECT M.strLocalSurname, M.strLocalFirstName, E.*, P.strName, P.strGroup
+		SELECT M.strLocalSurname, M.strLocalFirstName, E.*, P.strName, P.strGroup, T.intQty, T.curAmount, T.intTableType, T.intStatus
 		FROM tblTransactions as T
             LEFT JOIN tblTXNLogs as TXNLog ON (TXNLog.intTXNID = T.intTransactionID)
 			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
@@ -1715,8 +1750,8 @@ sub listTransLog	{
 			id => $dref->{'intLogID'},
 			intLogID => $dref->{'intLogID'},
 			paymentType => $dref->{'paymentType'},
-			intAmount => $dref->{'intAmount'},
-			status => $dref->{'status'},
+                	intAmount => $dref->{'intAmount'}, 		
+                        status => $dref->{'status'},
 			strResponseCode => $dref->{'strResponseCode'},
 			dtLog => $dref->{'dtLog'},
 			dtLog_RAW => $dref->{'dtLog_RAW'},
@@ -1727,7 +1762,7 @@ sub listTransLog	{
 	}
   $total = sprintf("%.2f", $total);
 	$query->finish;
-
+#
   my @headers = (
     {
       type => 'Selector',
