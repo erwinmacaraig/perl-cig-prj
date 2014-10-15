@@ -8,7 +8,7 @@ INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, st
 INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTACCESS_DENIED', 'requestaccess_denied', 1, NOW());
 INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTACCESS_OVERRIDDEN', 'requestaccess_overridden', 1, NOW());
 INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTACCESS_REJECTED', 'requestaccess_rejected', 1, NOW());
-INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTACCESS_COMPLETED', 'requesttransfer_completed', 1, NOW());
+INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTACCESS_COMPLETED', 'requestaccess_completed', 1, NOW());
 INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTTRANSFER_ACCEPTED', 'requesttransfer_accepted', 1, NOW());
 INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTTRANSFER_DENIED', 'requesttransfer_denied', 1, NOW());
 INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTTRANSFER_OVERRIDDEN', 'requesttransfer_overridden', 1, NOW());
