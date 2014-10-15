@@ -73,7 +73,7 @@ sub retrieve {
             LEFT JOIN tblContacts frtc ON (frtc.intRealmID = ett.intRealmID AND frtc.intClubID = fromEntity.intEntityID AND (frtc.intContactRoleID = tcrs.intRoleID OR frtc.intContactRoleID = tcrp.intRoleID) AND frtc.strContactEmail != '')
         WHERE
             ett.intRealmID = ?
-            AND ett.intSubRealmID = ?
+            AND ett.intSubRealmID IN (0, ?)
             AND ett.strTemplateType = ?
             AND ett.intActive = 1
         LIMIT 1
