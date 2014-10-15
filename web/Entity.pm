@@ -206,9 +206,9 @@ sub entity_details  {
         size  => '35',
         maxsize => '250',
       },
-      strNotes => {
+      strShortNotes => {
         label => 'Notes',
-        value => $field->{strNotes},
+        value => $field->{strShortNotes},
         type => 'textarea',
         rows => '10',
         cols => '40',
@@ -218,7 +218,7 @@ sub entity_details  {
       },
     },
     order => [qw(
-        strFIFAID strLocalName strLocalShortName strLatinName strLatinShortName dtFrom dtTo strISOCountry strRegion strPostalCode strTown strAddress strWebURL strEmail strPhone strFax strContactTitle strContactEmail strContactPhone strContact
+        strFIFAID strLocalName strLocalShortName strLatinName strLatinShortName dtFrom dtTo strISOCountry strRegion strPostalCode strTown strAddress strWebURL strEmail strPhone strFax strContactTitle strContactEmail strContactPhone strContact strShortNotes
     )],
     options => {
       labelsuffix => ':',
@@ -313,6 +313,7 @@ sub loadEntityDetails {
      strContactEmail,
      strContactPhone,
      dtAdded,
+     strShortNotes,
      tTimeStamp
     FROM tblEntity
     WHERE intEntityID = ?
