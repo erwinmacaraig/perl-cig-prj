@@ -140,9 +140,7 @@ sub getFieldLabels	{
             strGender => 'Gender',
             strDiscipline => 'Sport',
             strEntityType => 'Entity Type',
-            strShortNotes => 'Short Notes',
-            	
-	);
+            );
 	}
 	for my $k (keys %labels)	{
 		$labels{$k}= ($Data->{'SystemConfig'}{'FieldLabel_'.$k} || '') if exists $Data->{'SystemConfig'}{'FieldLabel_'.$k};

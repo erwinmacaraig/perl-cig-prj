@@ -445,7 +445,6 @@ sub getFieldsList	{
         strEmail
         strPhone
         strFax 
-        strShortNotes
         strContactTitle
         strContactEmail
         strContactPhone

@@ -429,7 +429,6 @@ print STDERR "SSSS$action $clubID\n";
         strPhone
         strFax
         strContactEmail 
-        strShortNotes       
         strMANotes
         clubcharacteristics
     )],
