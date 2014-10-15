@@ -170,6 +170,18 @@ sub displayRegoFlowDocuments    {
         0,
         \%PersonRef,
      );
+
+     my $transferdocs  = getRegistrationItems(
+        $Data,
+        'TRANSFER',
+        'DOCUMENT',
+        $originLevel,
+        $personRegoNature,
+        $entityID,
+        $entityRegisteringForLevel,
+        0,
+        \%PersonRef,
+     );
      
     ### FOR FILTERING 
     my @docos = (); 
@@ -206,6 +218,7 @@ sub displayRegoFlowDocuments    {
         documents => \@docos,
         approveddocs => \@listing, 
         personleveldocs => $personLeveldocs,
+        transferdocs=> $transferdocs,
         hidden_ref => $hidden_ref,
         Lang => $Data->{'lang'},
         client => $client,
