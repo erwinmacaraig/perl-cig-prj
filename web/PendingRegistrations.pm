@@ -256,15 +256,72 @@ sub listPendingRegistrations    {
         gridid  => 'grid',
         width   => '99%',
         filters => $filterfields,
+    ); 
+
+    my @fielddata = ();
+    $st = qq[SELECT intEntityLevel, intEntityID, strLocalName, strStatus FROM tblEntity INNER JOIN tblEntityLinks ON tblEntity.intEntityID =
+             tblEntityLinks.intChildEntityID WHERE intParentEntityID = ? AND intRealmID = ? AND strStatus = 'PENDING' ORDER BY intEntityLevel, strLocalName ASC 
+              ];
+    $query = $Data->{db}->prepare($st);
+    $query->execute( $entityID, $Data->{Realm} );
+    while (my $dref = $query->fetchrow_hashref) {
+        
+        push @fielddata, {
+            id => $dref->{intEntityID},
+            strLocalName => $dref->{strLocalName},
+            EntityLevel => $Defs::LevelNames{$dref->{intEntityLevel}},
+            strStatus => $dref->{strStatus}, 
+       };
+    }
+
+    my @entityheadersgrid = (
+        {
+            type  => 'Selector',
+            field => 'SelectLink',
+        },
+        {
+            name  => $Data->{'lang'}->txt('Name'),
+            field => 'strLocalName',
+            width  => 60,
+        },
+        {
+            name  => $Data->{'lang'}->txt('Level'),
+            field => 'EntityLevel',
+        },
+        {
+            name   => $Data->{'lang'}->txt('Status'),
+            field  => 'strStatus',
+            width  => 30,
+        },
+       
+
+
     );
 
-    my $resultHTML = qq[
-        <div class="grid-filter-wrap">
-            <div style="width:99%;">$rectype_options</div>
-            $grid
-        </div>
-    ];
+    my $grid2  = showGrid(
+        Data    => $Data,
+        columns => \@entityheadersgrid,
+        rowdata => \@fielddata,
+        gridid  => 'entitygrid',
+        width   => '99%',
+        
+    );
 
+    # class="grid-filter-wrap"
+    my $resultHTML = qq[
+        <div>
+            <div style="width:99%;">$rectype_options</div>
+             $grid  
+           
+        </div>
+        
+         <div class="pageHeading">Pending Entity Registrations</div>
+         <div>
+             $grid2          
+        </div> 
+        
+  
+     ];
     return ($resultHTML,$title);
 }
 1;
