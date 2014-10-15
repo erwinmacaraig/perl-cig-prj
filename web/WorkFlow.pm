@@ -1758,7 +1758,7 @@ sub viewTask {
     my $rowCount = 0;
 	  
     my $dref = $q->fetchrow_hashref();
-    print STDERR Dumper $st;
+    #print STDERR Dumper $st;
 
     if(!$dref) {
         return (undef, "ERROR: no data retrieved/no access.");
