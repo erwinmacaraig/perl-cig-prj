@@ -1,81 +1,42 @@
 package EmailNotifications::Template;
+require Exporter;
 
 use strict;
-use lib '.', '..';
+use lib '.', '..', '../..';
+use Defs;
 use TTTemplate;
 use Data::Dumper;
 
 sub new {
     my $class = shift;
-    my (%args) = @_;
+    my ($args) = @_;
 
     my $self = {
-        _realmID            => $args{realmID},
-        _subRealmID         => $args{subRealmID},
-        _fromEntityID       => $args{fromEntityID} || undef,
-        _toEntityID         => $args{toEntityID} || undef,
-        _notificationType   => $args{notificationType},
-        _dbh                => $args{dbh},
-        _subject            => $args{subject} || undef,
-        _lang               => $args{lang} || undef,
-        _htmlTemplatePath   => $args{htmlTemplatePath} || undef,
-        _textTemplatePath   => $args{textTemplatePath} || undef,
+        _notificationObj    => $args,
+        _config             => undef,
+        _content            => undef,
+        _templateData       => undef,
     };
 
     $self = bless ($self, $class);
 
+    #print STDERR Dumper $self->{_notificationObj}->getRealmID();
     return $self;
-
 }
 
-sub getRealmID {
-    my ($self) = shift;
-    return $self->{_realmID};
+sub getConfig {
+    my $self = shift;
+    return $self->{_config};
 }
 
-sub getSubRealmID {
-    my ($self) = shift;
-    return $self->{_subRealmID};
-}
+sub getContent {
+    my $self = shift;
+    return $self->{_content};
+} 
 
-sub getFromEntityID {
-    my ($self) = shift;
-    return $self->{_fromEntityID};
-}
-
-sub getToEntityID {
-    my ($self) = shift;
-    return $self->{_toEntityID};
-}
-
-sub getNotificationType {
-    my ($self) = shift;
-    return $self->{_notificationType};
-}
-
-sub getDbh {
-    my ($self) = shift;
-    return $self->{_dbh};
-}
-
-sub getSubject {
-    my ($self) = shift;
-    return $self->{_subject};
-}
-
-sub getLang {
-    my ($self) = shift;
-    return $self->{_lang};
-}
-
-sub getHtmlTemplatePath {
-    my ($self) = shift;
-    return $self->{_htmlTemplatePath};
-}
-
-sub getTextTemplatePath {
-    my ($self) = shift;
-    return $self->{_textTemplatePath};
+sub getTemplateData {
+    my $self = shift;
+    return $self->{_templateData};
 }
 
 sub retrieve {
@@ -94,8 +55,10 @@ sub retrieve {
             tl.strLocale,
             toEntity.strEmail as toEntityEmail,
             toEntity.strContactEmail as toEntityContactEmail,
+            toEntity.strLocalName as toEntityName,
             fromEntity.strEmail as fromEntityEmail,
             fromEntity.strContactEmail as fromEntityContactEmail,
+            fromEntity.strLocalName as fromEntityName,
             totc.strContactEmail as toClubContactEmail,
             frtc.strContactEmail as fromClubContactEmail
         FROM tblEmailTemplateTypes ett
@@ -104,99 +67,99 @@ sub retrieve {
             INNER JOIN tblLanguages tl ON (tl.intLanguageID = et.intLanguageID AND tl.intRealmID = ett.intRealmID)
             INNER JOIN tblEntity toEntity ON (toEntity.intRealmID = ett.intRealmID AND toEntity.intEntityID = ?)
             INNER JOIN tblEntity fromEntity ON (fromEntity.intRealmID = ett.intRealmID AND fromEntity.intEntityID = ?)
-            LEFT JOIN tblContacts totc ON (totc.intRealmID = ett.intRealmID AND totc.intClubID = toEntity.intEntityID)
-            LEFT JOIN tblContacts frtc ON (frtc.intRealmID = ett.intRealmID AND frtc.intClubID = fromEntity.intEntityID)
+            LEFT JOIN tblContactRoles tcrs ON (tcrs.intRealmID = ett.intRealmID AND tcrs.strRoleName = 'Secretary')
+            LEFT JOIN tblContactRoles tcrp ON (tcrp.intRealmID = ett.intRealmID AND tcrp.strRoleName = 'President')
+            LEFT JOIN tblContacts totc ON (totc.intRealmID = ett.intRealmID AND totc.intClubID = toEntity.intEntityID AND (totc.intContactRoleID = tcrs.intRoleID OR totc.intContactRoleID = tcrp.intRoleID) AND totc.strContactEmail != '')
+            LEFT JOIN tblContacts frtc ON (frtc.intRealmID = ett.intRealmID AND frtc.intClubID = fromEntity.intEntityID AND (frtc.intContactRoleID = tcrs.intRoleID OR frtc.intContactRoleID = tcrp.intRoleID) AND frtc.strContactEmail != '')
         WHERE
             ett.intRealmID = ?
             AND ett.intSubRealmID = ?
             AND ett.strTemplateType = ?
             AND ett.intActive = 1
+        LIMIT 1
 
     ];
 
     #ADD LOCALE CHECK ON tblLanguages or SystemConfig->DefaultLocale or Cookie_Locale
-    my $q = $self->getDbh()->prepare($st);
+    my $q = $self->{_notificationObj}->getDbh()->prepare($st);
     $q->execute(
-        $self->getToEntityID(),
-        $self->getFromEntityID(),
-        $self->getRealmID(),
-        $self->getSubRealmID(),
-        $self->getNotificationType()
+        $self->{_notificationObj}->getToEntityID(),
+        $self->{_notificationObj}->getFromEntityID(),
+        $self->{_notificationObj}->getRealmID(),
+        $self->{_notificationObj}->getSubRealmID(),
+        $self->{_notificationObj}->getNotificationType()
     ) or query_error($st);
 
-    print STDERR Dumper $q->fetchrow_hashref();
+    my $config = $q->fetchrow_hashref();
+    $self->setConfig($config);
 
-    #TODO: populate recipient details
-    #TODO: populate sender details
-    #TODO: identify correct template by using ett.strFilenamePrefix and replaced __REALMNAME__ by r.strRealmName
-    #emails/notification/__REALMNAME__/workflow/html
     return $self;
 }
 
 sub build {
+    my $self = shift;
 
-    #call after retrieveTemplate
-    return 1;
+    my $config = $self->getConfig();
+
+    if(defined $config) {
+        my $content = undef;
+        my $realmName = $config->{'strRealmName'} || 'generic';
+        my $replace = "__REALMNAME__";
+        my $templatePath = (defined $config->{'strHTMLTemplatePath'} and $config->{'strHTMLTemplatePath'}) ? $config->{'strHTMLTemplatePath'} : $config->{'strTextTemplatePath'};
+        $templatePath =~ s/\Q$replace/\E$realmName/g;
+        my $templateFile = $templatePath . '/' . $config->{'strFileNamePrefix'} . '.templ';
+
+        my %Data = (
+            lang => $self->{_notificationObj}->getLang(),
+            Realm => $self->{_notificationObj}->getRealmID(),
+        );
+
+        my %TemplateData = (
+            To => {
+                email => $config->{'toEntityContactEmail'} ? $config->{'toEntityContactEmail'} : $config->{'toEntityEmail'} ? $config->{'toEntityEmail'} : $config->{'toClubContactEmail'},
+                name => $config->{'toEntityName'},
+            },
+            From => {
+                email => $self->{_notificationObj}->getDefsEmail() ? $self->{_notificationObj}->getDefsEmail() : $config->{'fromEntityContactEmail'} ? $config->{'fromEntityContactEmail'} : $config->{'fromClubContactEmail'},
+                name => $self->{_notificationObj}->getDefsName() ? $self->{_notificationObj}->getDefsName() : $config->{'fromEntityName'},
+            },
+            CC => {
+                email => undef,
+                name => undef,
+            },
+            OtherData => {
+            },
+        );
+	
+        $content = runTemplate(
+            \%Data,
+            \%TemplateData,
+            $templateFile
+        );
+        
+        $self->setContent($content);
+        $self->setTemplateData(\%TemplateData);
+    }
+
+    return $self;
 }
 
-sub setRealmID {
+sub setConfig {
     my $self = shift;
-    my ($realmID) = @_;
-    $self->{_realmID} = $realmID if defined $realmID;
+    my ($configHash) = @_;
+    $self->{_config} = $configHash if defined $configHash;
 }
 
-sub setSubRealmID {
+sub setContent {
     my $self = shift;
-    my ($subRealmID) = @_;
-    $self->{_subRealmID} = $subRealmID if defined $subRealmID;
+    my ($content) = @_;
+    $self->{_content} = $content if defined $content;
 }
 
-sub setFromEntityID {
+sub setTemplateData {
     my $self = shift;
-    my ($fromEntityID) = @_;
-    $self->{_fromEntityID} = $fromEntityID if defined $fromEntityID;
-}
-
-sub setToEntityID {
-    my $self = shift;
-    my ($toEntityID) = @_;
-    $self->{_toEntityID} = $toEntityID if defined $toEntityID;
-}
-
-sub setNotificationType {
-    my $self = shift;
-    my ($notificationType) = @_;
-    $self->{_notificationType} = $notificationType if defined $notificationType;
-}
-
-sub setDbh {
-    my $self = shift;
-    my ($dbh) = @_;
-    $self->{_dbh} = $dbh if defined $dbh;
-}
-
-sub setSubject {
-    my $self = shift;
-    my ($subject) = @_;
-    $self->{_subject} = $subject if defined $subject;
-}
-
-sub setLang {
-    my $self = shift;
-    my ($lang) = @_;
-    $self->{_lang} = $lang if defined $lang;
-}
-
-sub setHtmlTemplatePath {
-    my $self = shift;
-    my ($htmlTemplatePath) = @_;
-    $self->{_htmlTemplatePath} = $htmlTemplatePath if defined $htmlTemplatePath;
-}
-
-sub setTextTemplatePath {
-    my $self = shift;
-    my ($textTemplatePath) = @_;
-    $self->{_textTemplatePath} = $textTemplatePath if defined $textTemplatePath;
+    my ($templateData) = @_;
+    $self->{_templateData} = $templateData if defined $templateData;
 }
 
 1;
