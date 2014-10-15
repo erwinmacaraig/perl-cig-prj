@@ -358,7 +358,7 @@ sub checkoutConfirm	{
 			if ($amount >= 0)	{
 				$body .= qq[ 
 					$product_confirmation 
-					$paymenttext<br>
+					$paymenttext<br> 
 				];
 				if (($onlinePayment) and $externalGateway)	{
                     #if (getVerifiedBankAccount($Data, $paymentType))   { 

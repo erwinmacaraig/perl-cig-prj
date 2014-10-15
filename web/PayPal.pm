@@ -22,6 +22,8 @@ use CGI qw(param unescape escape);
 use RegoForm_MemberFunctions qw(rego_addRealMember);
 use RegoForm::RegoFormFactory;
 
+
+use Data::Dumper;
 sub payPalProcess	{
 
  ## CALL SetExpressCheckoutAPI
@@ -108,6 +110,7 @@ warn("LLLLine: $line");
 
 
         ## Redirect to paypal
+        print STDERR "===== RETURN VALUES FROM PAYPAL === " . Dumper(%returnvals) . "==============";
         my $token = $returnvals{'TOKEN'};
         $token =~ s/\%2d/-/g;
 	    $APIurl= $paymentSettings->{'gateway_url2'}; #$Defs::paypal_LIVE_URL_REDIRECT
@@ -212,6 +215,9 @@ print STDERR "LOGID: $logID PP2: $key | $val\n";
 		$returnvals{'ResponseText'} = '500 Server closed' if ($val =~ /500 Server/ or $key =~ /500 Server/ and ! $returnvals{'ResponseText'});
 	}
 
+    print STDERR "=== After Performing DoExpressCheckoutPayment == " . Dumper(%returnvals);
+
+
 	#if ($returnvals{'ResponseText'} eq '500 Server closed')	{
 	if ($returnvals{'ACK'} !~ /Success/)	{
 			print STDERR "RETRYING paypal FOR $logID\n";
@@ -222,7 +228,7 @@ print STDERR "LOGID: $logID PP2: $key | $val\n";
             SIGNATURE => $APIsignature,
             VERSION => $gatewayVersion,
             METHOD => 'TransactionSearch',
-	INVNUM=>$paymentSettings->{'gatewayPrefix'}.'-'.$logID,
+	        INVNUM=>$paymentSettings->{'gatewayPrefix'}.'-'.$logID,
             STARTDATE => '2014-1-1T10:00:00Z',
             ENDDATE => '2019-1-1T11:00:00Z',
         );
@@ -240,7 +246,7 @@ print STDERR "LOGID: $logID PP2: $key | $val\n";
 	my $settlement_date = unescape($returnvals{'ORDERTIME'});
 	$settlement_date =~ s/T|Z/ /g;
 
-print STDERR "RT:$returnvals{'ACK'}|\n";
+    print STDERR "RT:$returnvals{'ACK'}|\n";
 	$returnvals{'ResponseCode'} = ($returnvals{'ACK'} =~ /^Success/) ? 'OK' : 'ERROR';
 	my $txn = qq[PayPal TransactionID: $returnvals{'TRANSACTIONID'} - PayPal CorrelationID: $returnvals{'CORRELATIONID'}];
 

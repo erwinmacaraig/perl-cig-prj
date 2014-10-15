@@ -151,6 +151,16 @@ print STDERR "SSSS$action $clubID\n";
     	$Mcountriesonly{$c} = $c;
     }    
     #################################################################
+    
+    my $dissDateReadOnly = 0;
+    
+    if ($Data->{'SystemConfig'}{'Entity_EditDissolutionDateMinLevel'} && $Data->{'SystemConfig'}{'Entity_EditDissolutionDateMinLevel'} < $Data->{'clientValues'}{'authLevel'}){
+      $dissDateReadOnly = 1; ### Allow us to set custom Level that can edit. ###
+    }
+    elsif ($Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL){
+      $dissDateReadOnly = 1;
+    }
+
   
   my %FieldDefinitions=(
     fields=>  {
@@ -211,7 +221,8 @@ print STDERR "SSSS$action $clubID\n";
         type        => 'date',
         datetype    => 'dropdown',
         format      => 'dd/mm/yyyy',
-        validate    => 'DATE',            
+        validate    => 'DATE',
+        readonly    => $dissDateReadOnly,            
       },
       strGender => {
           label => "Gender",
@@ -372,9 +383,9 @@ print STDERR "SSSS$action $clubID\n";
         size  => '35',
         maxsize => '250',
       },
-      strNotes => {
+      strShortNotes => {
         label => 'Notes',
-        value => $field->{strNotes},
+        value => $field->{strShortNotes},
         type => 'textarea',
         rows => '10',
         cols => '40',
@@ -417,8 +428,8 @@ print STDERR "SSSS$action $clubID\n";
         strEmail
         strPhone
         strFax
-        strContactEmail        
-        strMANotes         
+        strContactEmail 
+        strMANotes
         clubcharacteristics
     )],
     fieldtransform => {
@@ -558,7 +569,8 @@ sub loadClubDetails {
      strContactTitle,
      strContactEmail,
      strContactPhone,
-     dtAdded,
+     dtAdded, 
+     strShortNotes,
      tTimeStamp,
      strLegalID
     FROM tblEntity
@@ -660,6 +672,10 @@ sub postClubAdd {
   ###############################################################################  
     
   } ### end if  add
+  if($id)    {  
+    $Data->{'cache'}->delete('swm','EntityObj-'.$id) if $Data->{'cache'};
+  }
+
   
 } ## end sub
 
@@ -685,18 +701,18 @@ sub postClubUpdate {
   }
 
   $Data->{'cache'}->delete('swm',"ClubObj-$clubID") if $Data->{'cache'};
-	### Change strStatus to DE-REGISTERED When Dissolution date is less than current date ###
-	resetStatus($clubID,$db);
+  ### Change strStatus to DE-REGISTERED When Dissolution date is less than current date ###
+  resetStatus($clubID,$db);
 } 
 
 sub resetStatus {
-	my($id,$db)=@_;
-		my $st=qq[
-    	UPDATE tblEntity SET strStatus = \"DE-REGISTERED\" WHERE intEntityID = ? and date(dtTo) <= date(NOW())
-  	];
- 		my $query = $db->prepare($st);
-		$query->execute($id);
-		$query->finish;
+  my($id,$db)=@_;
+  my $st=qq[
+    UPDATE tblEntity SET strStatus = \"DE-REGISTERED\" WHERE intEntityID = ? and date(dtTo) <= date(NOW())
+  ];
+  my $query = $db->prepare($st);
+  $query->execute($id);
+  $query->finish;
 } 
 
 sub listClubs   {
