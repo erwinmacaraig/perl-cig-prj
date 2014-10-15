@@ -39,6 +39,7 @@ use PersonRequest;
 use CGI qw(param unescape escape);
 use AuditLog;
 use NationalNumber;
+use EmailNotifications::WorkFlow;
 
 sub cleanTasks  {
 
@@ -148,9 +149,11 @@ sub handleWorkflow {
  
 	my $body = '';
 	my $title = '';
+
+    my $emailNotification = new EmailNotifications::WorkFlow();
 	
 	if ( $action eq 'WF_Approve' ) {
-        approveTask($Data);
+        approveTask($Data, $emailNotification);
         my $allComplete = checkRelatedTasks($Data);
         if($allComplete) {
             ( $body, $title ) = viewSummaryPage( $Data );	
@@ -163,11 +166,11 @@ sub handleWorkflow {
         ( $body, $title ) = updateTaskNotes( $Data );	
     }
     elsif ( $action eq 'WF_Resolve' ) {
-        resolveTask($Data);
+        resolveTask($Data, $emailNotification);
         ( $body, $title ) = addTaskNotes( $Data, $Defs::WF_TASK_ACTION_RESOLVE );	
     }
     elsif ( $action eq 'WF_Reject' ) {
-        rejectTask($Data);
+        rejectTask($Data, $emailNotification);
         ( $body, $title ) = addTaskNotes( $Data, $Defs::WF_TASK_ACTION_REJECT );	
     }
     elsif ( $action eq 'WF_View' ) {
@@ -181,7 +184,7 @@ sub handleWorkflow {
         ( $body, $title ) = viewSummaryPreApproval( $Data );
     }
     elsif ( $action eq 'WF_Toggle' ) {
-        my $res = toggleTask($Data);
+        my $res = toggleTask($Data, $emailNotification);
         if($res) {
             ( $body, $title ) = addTaskNotes( $Data, "TOGGLE" );
         }
@@ -665,6 +668,7 @@ sub addWorkFlowTasks {
     }
 
 
+    my $emailNotification = new EmailNotifications::WorkFlow();
 
     while (my $dref= $q->fetchrow_hashref())    {
         my $approvalEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intApprovalEntityLevel'}) || 0;
@@ -687,6 +691,20 @@ sub addWorkFlowTasks {
             $dref->{'intPersonRegistrationID'},
             $dref->{'DocumentID'}
         );
+
+        $emailNotification->setRealmID($Data->{'Realm'});
+        $emailNotification->setSubRealmID(0);
+        $emailNotification->setToEntityID($approvalEntityID);
+        $emailNotification->setFromEntityID($problemEntityID);
+        $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
+        $emailNotification->setDefsName($Defs::admin_email_name);
+        $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_ADDED);
+        $emailNotification->setSubject("Work Task ID ");
+        $emailNotification->setLang($Data->{'lang'});
+        $emailNotification->setDbh($Data->{'db'});
+
+        my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+        $emailNotification->send($emailTemplate);
 
     }
 	
@@ -724,6 +742,7 @@ sub addWorkFlowTasks {
 sub approveTask {
     my(
         $Data,
+        $emailNotification
     ) = @_;
 	
 	my $st = '';
@@ -733,6 +752,8 @@ sub approveTask {
 	#Get values from the QS
     my $WFTaskID = safe_param('TID','number') || '';
 	
+    my $task = getTask($Data, $WFTaskID);
+
 	#Update this task to COMPLETE
 	$st = qq[
 	  	UPDATE tblWFTask SET 
@@ -757,6 +778,22 @@ sub approveTask {
 	    if ($q->errstr) {
 	    	return $q->errstr . '<br>' . $st
 	    }
+
+        if($emailNotification) { 
+            $emailNotification->setRealmID($Data->{'Realm'});
+            $emailNotification->setSubRealmID(0);
+            $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
+            $emailNotification->setFromEntityID($task->{'intApprovalEntityID'});
+            $emailNotification->setDefsEmail($Defs::admin_email);
+            $emailNotification->setDefsName($Defs::admin_email_name);
+            $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_APPROVED);
+            $emailNotification->setSubject("Work Task ID " . $WFTaskID);
+            $emailNotification->setLang($Data->{'lang'});
+            $emailNotification->setDbh($Data->{'db'});
+
+            my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+            $emailNotification->send($emailTemplate);
+        }
 	
     $st = qq[
         SELECT 
@@ -1404,6 +1441,7 @@ sub addTaskNotes    {
 sub resolveTask {
     my(
         $Data,
+        $emailNotification
     ) = @_;
 	
 	my $st = '';
@@ -1462,6 +1500,22 @@ sub resolveTask {
   	auditLog($WFTaskID, $Data, 'Updated WFTask', 'WFTask');
   	###	
     
+    if($emailNotification) { 
+        $emailNotification->setRealmID($Data->{'Realm'});
+        $emailNotification->setSubRealmID(0);
+        $emailNotification->setToEntityID($task->{'intApprovalEntityID'});
+        $emailNotification->setFromEntityID($task->{'intProblemResolutionEntityID'});
+        $emailNotification->setDefsEmail($Defs::admin_email);
+        $emailNotification->setDefsName($Defs::admin_email_name);
+        $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_RESOLVED);
+        $emailNotification->setSubject("Work Task ID " . $WFTaskID);
+        $emailNotification->setLang($Data->{'lang'});
+        $emailNotification->setDbh($Data->{'db'});
+
+        my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+        $emailNotification->send($emailTemplate);
+    }
+
     return(0);
     
 }
@@ -1469,6 +1523,7 @@ sub resolveTask {
 sub rejectTask {
     my(
         $Data,
+        $emailNotification
     ) = @_;
 	
 	my $st = '';
@@ -1520,6 +1575,23 @@ sub rejectTask {
     ####
   	auditLog($WFTaskID, $Data, 'Updated WFTask', 'WFTask');
   	###	
+
+    if($emailNotification) { 
+        $emailNotification->setRealmID($Data->{'Realm'});
+        $emailNotification->setSubRealmID(0);
+        $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
+        $emailNotification->setFromEntityID($task->{'intApprovalEntityID'});
+        $emailNotification->setDefsEmail($Defs::admin_email);
+        $emailNotification->setDefsName($Defs::admin_email_name);
+        $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_REJECTED);
+        $emailNotification->setSubject("Work Task ID " . $WFTaskID);
+        $emailNotification->setLang($Data->{'lang'});
+        $emailNotification->setDbh($Data->{'db'});
+
+        my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+        $emailNotification->send($emailTemplate);
+    }
+
     return(0);
     
 }
@@ -2337,7 +2409,7 @@ sub viewApprovalPage {
 }
 
 sub toggleTask {
-    my ($Data) = @_;
+    my ($Data, $emailNotification) = @_;
 
     my $WFTaskID = safe_param('TID','number') || '';
     my $task = getTask($Data, $WFTaskID);
@@ -2363,6 +2435,35 @@ sub toggleTask {
             $q->execute(
                 $WFTaskID
             ) or query_error($st);
+        }
+
+        my $toEntityID = undef;
+        my $fromEntityID = undef;
+
+        if($task->{'strTaskStatus'} eq 'ACTIVE' and $task->{'intApprovalEntityID'} == $entityID) {
+            $toEntityID = $task->{'intProblemResolutionEntityID'};
+            $fromEntityID = $task->{'intApprovalEntityID'};
+        }
+        elsif($task->{'strTaskStatus'} eq 'REJECTED' and $task->{'intProblemResolutionEntityID'} == $entityID) {
+            $toEntityID = $task->{'intApprovalEntityID'};       
+            $fromEntityID = $task->{'intProblemResolutionEntityID'};
+        }
+
+        if($emailNotification and $toEntityID and $fromEntityID) {
+            my $nType = $task->{'intOnHold'} == 0 ? $Defs::NOTIFICATION_WFTASK_HELD : $Defs::NOTIFICATION_WFTASK_RESUMED;
+            $emailNotification->setRealmID($Data->{'Realm'});
+            $emailNotification->setSubRealmID(0);
+            $emailNotification->setToEntityID($toEntityID);
+            $emailNotification->setFromEntityID($fromEntityID);
+            $emailNotification->setDefsEmail($Defs::admin_email);
+            $emailNotification->setDefsName($Defs::admin_email_name);
+            $emailNotification->setNotificationType($nType);
+            $emailNotification->setSubject("Work Task ID " . $WFTaskID);
+            $emailNotification->setLang($Data->{'lang'});
+            $emailNotification->setDbh($Data->{'db'});
+
+            my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+            $emailNotification->send($emailTemplate);
         }
 
         return 1;
