@@ -1466,7 +1466,7 @@ sub postPersonUpdate {
         if ($id) {
 
         }
-        getAutoPersonNum( $Data, undef, $id, $Data->{'clientValues'}{'assocID'} );
+        #getAutoPersonNum( $Data, undef, $id, $Data->{'clientValues'}{'assocID'} );
         #Seasons::insertPersonSeasonRecord( $Data, $id, $assocSeasons->{'newRegoSeasonID'}, $Data->{'clientValues'}{'assocID'}, 0, $ageGroupID, \%types ) if ($id);
         my $cl = setClient( $Data->{'clientValues'} ) || '';
         my %cv = getClient($cl);
@@ -1698,8 +1698,11 @@ sub getAutoPersonNum {
         }
         else { $CreateCodes = 1; }
         if ($CreateCodes) {
-            $genCode ||= new GenCode( $Data->{'db'}, $Data->{'Realm'} );
-            my $num = $genCode->getNumber( '', '', $num_field ) || '';
+            $genCode ||= new GenCode( $Data->{'db'}, 'PERSON', $Data->{'Realm'}, $Data->{'RealmSubType'} );
+            my $num = $genCode->getNumber({
+
+
+            });
             if ($num) {
                 my $st = qq[
 						UPDATE tblPerson SET $num_field = ?

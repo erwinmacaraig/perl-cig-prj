@@ -1,7 +1,3 @@
-#
-# $Header: svn://svn/SWM/trunk/web/GenCode.pm 8251 2013-04-08 09:00:53Z rlee $
-#
-
 package GenCode;
 
 use Exporter;
@@ -11,30 +7,71 @@ use lib "../web";
 use strict;
 use Utils;
 
-#This code generates new unique membership numbers based on conditions contained in tblGenerate
-# NB This code requires that only one instance is running at one time or concurrency issues may occur.
+#This code generates new unique numbers based on conditions contained in tblGenerate
+# 
+# Fields in tblGenerate
+
+#intGenerateID: 2   - Unique ID
+   #intRealmID: 1   - RealmID that this rule is for
+#intSubRealmID: 0   - SubRealmID that this rule is for
+  #intEntityID: 1   - EntityID that this rule is for
+   #strGenType: PERSON   - What type of thing is the number for options, PERSON, ENTITY,FACILITY
+    #intLength: 5        - Length of the Sequence number 
+    #intMaxNum: 99999    - Maximum value of the sequence number
+#intCurrentNum: 10006    - Current value of the sequence number
+   #tTimeStamp: 2014-10-15 08:54:18
+    #strFormat: %P%SEQUENCE%GENDER%-%YEAR
+#  The format field of the number defines what the number looks like.  It consists of numerous different parts, all separated by a % character. Each part can be named with a string. %SEQUENCE is a special value that includes the automatically generatd sequence number.
+
+    #strValues: GENDER=$params->{"gender"} == 2 ? "F" : "M"#YEAR=substr($params->{"dob"},2,2)
+
+# The values field defines how to generate the parts defined in the format section.
+# The Values field contains definitions of the format NAME followed by an = and then followed by a Perl expression.  The different values are delimited with a # character.  The Perl expression must return a value.
+# The perl expression has access to a variable $params which is a reference to the has the user has passed in to the function.
+# Any name in the strFormat field not in the strValues field will be added in to the number as a text string.  
+
 
 sub new {
 
   my $this = shift;
   my $class = ref($this) || $this;
-  my ($db, $realm)=@_;
+  my (
+    $db, 
+    $type,
+    $realmID, 
+    $subRealmID, 
+    $entityID,
+  )=@_;
   my %fields=();
-	$fields{db}=$db || '';
-	$fields{availablenums}=();
-	$fields{'realm'}=$realm || '';
+	$fields{'db'}=$db || '';
+	$fields{'realmID'} = $realmID || 0;
+	$fields{'subRealmID'} = $subRealmID || 0;
+	$fields{'entityID'} = $entityID || 0;
+	$fields{'type'} = $type || 0;
 	
 	#Setup Values
 	my $statement=qq[
-					SELECT intMemberLength, strMemberPrefix, strMemberSuffix, intMaxNum, intCurrentNum, intGenType, intAlphaCheck, intMinNum
-					FROM tblGenerate
-						WHERE intRealmID=$realm
-					LIMIT 1
+        SELECT *
+        FROM tblGenerate
+        WHERE 
+            strGenType = ?
+            AND intRealmID = ?
+            AND intSubRealmID IN (0,?)
+            AND intEntityID IN (0,?)
+        ORDER BY
+            intEntityID DESC,
+            intSubRealmID DESC
+        LIMIT 1
 	];
 	my $query=$db->prepare($statement) or query_error($statement);
-	$query->execute or query_error($statement);
-	$fields{Data}= $query->fetchrow_hashref();
-	if(!$fields{Data})	{ $fields{Data}{intGenType}=0;	}
+	$query->execute(
+        $fields{'type'},
+        $fields{'realmID'},
+        $fields{'subRealmID'},
+        $fields{'entityID'},
+    );
+	$fields{'Data'}= $query->fetchrow_hashref();
+	if(!$fields{'Data'})	{ $fields{'Data'}{'strGenType'} = 0;	}
 	$query->finish();
 
 	my $self={%fields};
@@ -49,102 +86,69 @@ sub getNumber	{
 	#return a new member number
 
 	my $self = shift;
-	my($prefixEval,$suffixEval, $field)=@_;
+	my($params)=@_;
 
-	if(!$prefixEval)	{
-		if($self->{Data}{strMemberPrefix})	{ $prefixEval=eval($self->{Data}{strMemberPrefix}); }
-		else	{ $prefixEval=''; }
-	}
-	if(!$suffixEval)	{
-		if($self->{Data}{strMemberSuffix})	{ $suffixEval=eval($self->{Data}{strMemberSuffix}); }
-		else	{ $suffixEval=''; }
-	}
-	if(!defined $self->{availablenums} or !@{$self->{availablenums}})	{	$self->genCodeNo($prefixEval,$suffixEval, $field);	}
-	my $newnum=shift @{$self->{availablenums}} || 0;
-	$self->{LastNum}=$newnum;
-	return $newnum;
+  my @numberParts = ();
+  return '' if !$self->Active();
+  my $format =  $self->{'Data'}{'strFormat'} || '';
+  return '' if !$format;
+  my @formatarray = split/%/,$format;
+  my $valueStr =  $self->{'Data'}{'strValues'} || '';
+  my @valueArray = split /\#/,$valueStr;
+  my %valueHash = ();
+  for my $i (@valueArray)   {
+    my($k,$v) = split /=/,$i,2;
+    if($k and $v)   {
+        $valueHash{$k} = $v;
+    }
+  }
+
+  my $sequenceNumber = '';
+  if($format =~/\%SEQUENCE/) {
+    $sequenceNumber = $self->getSequenceNumber($params);
+  }
+
+  for my $part (@formatarray)   {
+    if(exists($valueHash{$part}) and $valueHash{$part})   {
+      push @numberParts, $self->evalPart($valueHash{$part}, $params) || '';
+    }
+    elsif($part eq 'SEQUENCE')  {
+      push @numberParts, $sequenceNumber || '';
+    }
+    #elsif($part eq 'ALPHACHECK')  {
+      #push @numberParts, $self->genCheckLetter($sequenceNumber) || '';
+    #}
+    else    {
+      push @numberParts, $part;
+    }
+  }
+
+  my $number = join('',@numberParts);
+  return $number;
 }
 
-sub genCodeNo	{
-	#db : Database Handle
-	#maxnum : Maximum Number to randomise to
-
+sub getSequenceNumber {
 	my $self = shift;
-	my($prefixEval,$suffixEval, $field)=@_;
+	my($params)=@_;
 
-	$self->{Data}{intAlphaCheck}||=0;
-	$self->{Data}{intMinNum}||=0;
-	$field||='strNationalNum';
-	if($self->{Data}{intGenType}==1)	{
-		#Random Numbers
-		my $numtogen=2;
-		if(!$self->{Data}{intMemberLength})	{ return -1;	}
-		my $gen_length=$self->{Data}{intMemberLength}-length($prefixEval)-length($suffixEval);
-		if($self->{Data}{intAlphaCheck}>0)	{$gen_length--;}
-		if($gen_length <=0)	{ return -1;	}
-		my $gen_num=(10**$gen_length)-1;
-		if($self->{Data}{intMaxNum}< $gen_num)	{$gen_num=$self->{Data}{intMaxNum};}
-		srand();
-		my $statement=qq[
-			SELECT DISTINCT $field
-			FROM tblMember
-			WHERE $field IN (?)
-				AND intRealmID= $self->{'realm'}
-			LIMIT $numtogen
-		];
-		my $query=$self->{db}->prepare($statement) or query_error($statement);
-		for my $tries (0 .. 6)	{
-			my %possible=();
-			for my $i (0 .. $numtogen)	{
-				if($gen_num <= $i)	{last;}
-				my $randNumber=int(rand($gen_num-$self->{Data}{intMinNum}));
-				$randNumber+=$self->{Data}{intMinNum};
-				if($randNumber==0)	{next;}
-				$randNumber=sprintf("%0*d",$gen_length, $randNumber);
-				my $try_code=$prefixEval.$randNumber.$suffixEval;
-				if($self->{Data}{intAlphaCheck})       {
-					my $checkLetter=genCheckLetter($try_code);
-					if($self->{Data}{intAlphaCheck}==1)	{ $try_code=$try_code.$checkLetter; }
-					elsif($self->{Data}{intAlphaCheck}==2)	{ $try_code=$checkLetter.$try_code; }
-				}
-				$possible{$try_code}=1;
-			}
-			my $possiblelist=join(',',keys %possible);
-			$query->execute($possiblelist);
-			while(my ($existingkey)=$query->fetchrow())	{ 
-				delete($possible{$existingkey});
-			}
-			push @{$self->{availablenums}}, keys %possible;
-			if(@{$self->{availablenums}})	{last;}
-		}
-	}
-	elsif($self->{Data}{intGenType}==2)	{
-		#Sequential Numbers
-		my $statement_UPD=qq[
-			UPDATE tblGenerate
-			SET intCurrentNum=LAST_INSERT_ID(intCurrentNum+1)
-			WHERE intRealmID= $self->{'realm'}
-			LIMIT 1
-		];
-		$self->{'db'}->do($statement_UPD);
-		my $st_getnum=qq[SELECT LAST_INSERT_ID()];
-		my $query=$self->{db}->prepare($st_getnum) or query_error($st_getnum);
-		$query->execute or query_error($st_getnum);
-		($self->{LastNum})=$query->fetchrow() ;
-		$self->{LastNum}||= $self->{Data}{intMinNum} || 0;
-		my $newnum=$self->{LastNum};
-		if($newnum < $self->{Data}{intMinNum}) 	{$newnum=$self->{Data}{intMinNum};}
-		#$newnum++;
-		my $gen_length=$self->{Data}{intMemberLength}-length($prefixEval)-length($suffixEval);
-		if($self->{Data}{intAlphaCheck}>0)	{$gen_length--;}
-		$newnum=sprintf("%0*d",$gen_length, $newnum);
-		if($self->{Data}{intAlphaCheck})       {
-			my $checkLetter=genCheckLetter($newnum);
-			if($self->{Data}{intAlphaCheck}==1)	{ $newnum=$newnum.$checkLetter; }
-			elsif($self->{Data}{intAlphaCheck}==2)	{ $newnum=$checkLetter.$newnum; }
-		}
-		push @{$self->{availablenums}}, $newnum;
-	}
+  my $db = $self->{'db'} or return '';
+
+  #Sequential Numbers
+  my $statement_UPD=qq[
+    UPDATE tblGenerate
+    SET intCurrentNum=LAST_INSERT_ID(intCurrentNum+1)
+    WHERE intGenerateID = ?
+    LIMIT 1
+  ];
+  my $q = $db->prepare($statement_UPD);
+  $q->execute($self->{'Data'}{'intGenerateID'});
+  $self->{LastNum} = $q->{mysql_insertid} || 0;
+  $q->finish();
+
+  my $newnum=$self->{'LastNum'};
+  my $gen_length = $self->{'Data'}{'intLength'};
+  $newnum = sprintf("%0*d",$gen_length, $newnum);
+  return $newnum;
 }
 
 sub genCheckLetter	{
@@ -161,9 +165,22 @@ sub genCheckLetter	{
 	return $alpha_array[$index];
 }
 
+sub evalPart {
+	my $self=shift;
+  my (
+    $evalString,
+    $params,
+  ) = @_;
+  return '' if !$evalString;
+  my $output = '';
+  my $eval = '$output = ('.$evalString.');';
+  eval($eval);
+  return $output || '';
+}
+
 sub Active	{
 	my $self=shift;
-	if($self->{Data}{intGenType})	{ return 1;	}
+	if($self->{Data}{strGenType})	{ return 1;	}
 	else	{ 	return 0;	}
 }
 
