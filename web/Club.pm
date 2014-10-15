@@ -660,6 +660,10 @@ sub postClubAdd {
   ###############################################################################  
     
   } ### end if  add
+  if($id)    {  
+    $Data->{'cache'}->delete('swm','EntityObj-'.$id) if $Data->{'cache'};
+  }
+
   
 } ## end sub
 

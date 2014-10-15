@@ -38,6 +38,8 @@ use Documents;
 use PersonRequest;
 use CGI qw(param unescape escape);
 use AuditLog;
+use NationalNumber;
+
 sub cleanTasks  {
 
     my ($Data, $personID, $entityID, $personRegistrationID, $ruleFor) = @_;
@@ -969,6 +971,12 @@ sub checkForOutstandingTasks {
                     $entityID
                     );
                 $rc = 1;
+                $Data->{'cache'}->delete('swm','EntityObj-'.$entityID) if $Data->{'cache'};
+                assignNationalNumber(
+                    $Data,
+                    'ENTITY',
+                    $entityID, 
+                );
         }
         if ($ruleFor eq 'DOCUMENT' and $documentID and !$rowCount)   {
             $st = qq[
@@ -998,6 +1006,14 @@ sub checkForOutstandingTasks {
 		        $q = $db->prepare($st);
 		        $q->execute( $personID); 
 	        	$rc = 1;	# All registration tasks have been completed        		
+                $Data->{'cache'}->delete('swm','PersonObj-'.$personID) if $Data->{'cache'};
+                assignNationalNumber(
+                    $Data,
+                    'PERSON',
+                    $personID, 
+                    $personRegistrationID,
+                );
+
         	#}
         }
 
