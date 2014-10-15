@@ -151,6 +151,16 @@ print STDERR "SSSS$action $clubID\n";
     	$Mcountriesonly{$c} = $c;
     }    
     #################################################################
+    
+    my $dissDateReadOnly = 0;
+    
+    if ($Data->{'SystemConfig'}{'Entity_EditDissolutionDateMinLevel'} && $Data->{'SystemConfig'}{'Entity_EditDissolutionDateMinLevel'} < $Data->{'clientValues'}{'authLevel'}){
+      $dissDateReadOnly = 1; ### Allow us to set custom Level that can edit. ###
+    }
+    elsif ($Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL){
+      $dissDateReadOnly = 1;
+    }
+
   
   my %FieldDefinitions=(
     fields=>  {
@@ -212,7 +222,7 @@ print STDERR "SSSS$action $clubID\n";
         datetype    => 'dropdown',
         format      => 'dd/mm/yyyy',
         validate    => 'DATE',
-        readonly    => $Data->{'clientValues'}{authLevel} < $Defs::LEVEL_NATIONAL ? 1 : 0,            
+        readonly    => $dissDateReadOnly,            
       },
       strGender => {
           label => "Gender",
@@ -663,6 +673,10 @@ sub postClubAdd {
   ###############################################################################  
     
   } ### end if  add
+  if($id)    {  
+    $Data->{'cache'}->delete('swm','EntityObj-'.$id) if $Data->{'cache'};
+  }
+
   
 } ## end sub
 

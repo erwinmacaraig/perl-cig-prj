@@ -40,7 +40,7 @@ sub getInstanceOf	{
 				$obj->clearDB();
 				$cache->set(
 					'swm',
-					"ClubObj-$id",
+					"EntityObj-$id",
 					$obj, 
 					'',
 					60*60*5, # 5hours
