@@ -57,7 +57,7 @@ print STDERR "CCCCCC:$clubID $parentID";
       ($resultHTML,$title)=showClubHome($Data,$clubID);
   }
   elsif($action =~ /^C_DOCS/){
-  	($resultHTML, $title) = handle_entity_documents($action, $Data, $clubID, $typeID, $Defs::DOC_FOR_CLUBS);  	
+  	($resultHTML, $title) = handle_entity_documents($action, $Data, $clubID, $typeID, $Defs::DOC_FOR_CLUBS);
   }
   elsif ( $action =~ /^C_TXN_/ ) {
         ( $resultHTML, $title ) = Transactions::handleTransactions( $action, $Data, $clubID, 0);
@@ -68,7 +68,7 @@ print STDERR "CCCCCC:$clubID $parentID";
   elsif ( $action =~ /^C_ID_/ ) {
         ( $resultHTML, $title ) = handleEntityIdentifiers($action, $Data, $clubID);
   }
-    
+
   return ($resultHTML,$title);
 }
 
@@ -76,26 +76,26 @@ print STDERR "CCCCCC:$clubID $parentID";
 sub club_details  {
   my ($action, $Data, $clubID)=@_;
 
-  
-print STDERR "SSSS$action $clubID\n";  
-  
-  
- 
+
+print STDERR "SSSS$action $clubID\n";
+
+
+
   my $field=loadClubDetails($Data->{'db'}, $clubID,$Data->{'clientValues'}{'assocID'}) || ();
   my $client=setClient($Data->{'clientValues'}) || '';
-  
+
   #my $allowedit =( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
   my $allowedit =($field->{strStatus} eq 'ACTIVE' ? 1 : 0);
   my $allowadd = $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ZONE ? 1 : 0;
 
     $Data->{'ReadOnlyLogin'} ? $allowedit = 0 : undef;
-    
-    my $option='display';       
-   
+
+    my $option='display';
+
    $option='edit' if $action eq 'C_DTE' and allowedAction($Data, 'c_e') && $allowedit;
    $option='add' if $action eq 'C_DTA' and allowedAction($Data, 'c_a')  && $allowadd;
    $clubID=0 if $option eq 'add';
-  
+
   my $club_chars = getClubCharacteristicsBlock($Data, $clubID) || '';
 
   my $field_case_rules = get_field_case_rules({dbh=>$Data->{'db'}, client=>$client, type=>'Club'});
@@ -109,51 +109,51 @@ print STDERR "SSSS$action $clubID\n";
       my $matrix_ref = getRuleMatrix($Data, $Data->{'clientValues'}{'authLevel'}, getLastEntityLevel($Data->{'clientValues'}), $Defs::LEVEL_CLUB, $field->{'strEntityType'}, 'ENTITY', \%Reg);
       $paymentRequired = $matrix_ref->{'intPaymentRequired'} || 0;
   }
-  my %keyparams = (); 
+  my %keyparams = ();
   foreach my $i (keys $Data->{clientValues}){
    $keyparams{$i} = $Data->{clientValues}{$i};
   }
-  
-  
+
+
   my %legalTypeOptions = ();
-  
-  my $query = "SELECT strLegalType, intLegalTypeID FROM tblLegalType WHERE intRealmID IN (0,?)"; 
+
+  my $query = "SELECT strLegalType, intLegalTypeID FROM tblLegalType WHERE intRealmID IN (0,?)";
    my $sth = $Data->{'db'}->prepare($query);
-  $sth->execute($Data->{'Realm'}); 
+  $sth->execute($Data->{'Realm'});
   while(my $href = $sth->fetchrow_hashref()){
   	$legalTypeOptions{$href->{'intLegalTypeID'}} = $href->{'strLegalType'};
   }
   $sth->finish();
-  
+
   #my $kk = $field->{intLegalTypeID};
-  #my $vv = $legalTypeOptions{$field->{intLegalTypeID}} || 'Select Type';  
+  #my $vv = $legalTypeOptions{$field->{intLegalTypeID}} || 'Select Type';
   #  if(!%legalTypeOptions ||  !$field->{intLegalTypeID}){
   #   	   $kk = '';
-  #		   $vv = 'Select Type';	
+  #		   $vv = 'Select Type';
   #  }
   #[ $field->{intLegalTypeID}, $legalTypeOptions{$field->{intLegalTypeID}} ]
-   
+
   #################Limited List of Country Per MA ############################
     my $isocountries = getISOCountriesHash();
     my %countriesonly = ();
     my %Mcountriesonly = ();
-  
+
     my @limitCountriesArr = ();
     if($Data->{'RegoForm'} && $Data->{'SystemConfig'}{'AllowedRegoCountries'}){
-    	@limitCountriesArr = split(/\|/, $Data->{'SystemConfig'}{'AllowedRegoCountries'} );    	
+    	@limitCountriesArr = split(/\|/, $Data->{'SystemConfig'}{'AllowedRegoCountries'} );
     }
-  
+
     while(my($k,$c) = each(%{$isocountries})){
     	$countriesonly{$k} = $c;
     	if(@limitCountriesArr){
     		next if(grep(/^$k/, @limitCountriesArr));
     	}
     	$Mcountriesonly{$c} = $c;
-    }    
+    }
     #################################################################
-    
+
     my $dissDateReadOnly = 0;
-    
+
     if ($Data->{'SystemConfig'}{'Entity_EditDissolutionDateMinLevel'} && $Data->{'SystemConfig'}{'Entity_EditDissolutionDateMinLevel'} < $Data->{'clientValues'}{'authLevel'}){
       $dissDateReadOnly = 1; ### Allow us to set custom Level that can edit. ###
     }
@@ -161,7 +161,7 @@ print STDERR "SSSS$action $clubID\n";
       $dissDateReadOnly = 1;
     }
 
-  
+
   my %FieldDefinitions=(
     fields=>  {
       strFIFAID => {
@@ -170,7 +170,7 @@ print STDERR "SSSS$action $clubID\n";
         type  => 'text',
         size  => '40',
         maxsize => '150',
-        
+
       },
       strLocalName => {
         label => 'Name',
@@ -178,6 +178,7 @@ print STDERR "SSSS$action $clubID\n";
         type  => 'text',
         size  => '40',
         maxsize => '150',
+        compulsory => 1,
       },
       strLocalShortName => {
         label => 'Short Name',
@@ -185,7 +186,7 @@ print STDERR "SSSS$action $clubID\n";
         type  => 'text',
         size  => '30',
         maxsize => '50',
-      },      
+      },
       strLatinName => {
         label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'International Name' : '',
         value => $field->{strLatinName},
@@ -206,6 +207,7 @@ print STDERR "SSSS$action $clubID\n";
       	type => 'text',
       	size => '30',
       	maxsize => '100',
+        compulsory => 1,
       },
       dtFrom => {
         label       => 'Foundation Date',
@@ -213,8 +215,9 @@ print STDERR "SSSS$action $clubID\n";
         type        => 'date',
         datetype    => 'dropdown',
         format      => 'dd/mm/yyyy',
-        validate    => 'DATE',            
-      }, 
+        validate    => 'DATE',
+        compulsory => 1,
+      },
       dtTo => {
         label       => 'Dissolution Date',
         value       => $field->{dtTo},
@@ -222,36 +225,38 @@ print STDERR "SSSS$action $clubID\n";
         datetype    => 'dropdown',
         format      => 'dd/mm/yyyy',
         validate    => 'DATE',
-        readonly    => $dissDateReadOnly,            
+        readonly    => $dissDateReadOnly,
       },
       strGender => {
           label => "Gender",
-          value => $field->{strGender}, 
+          value => $field->{strGender},
           type  => 'lookup',
           options => \%Defs::genderEntityInfo,
-          firstoption => [ '', 'Select Type' ],            
-      },   
+          firstoption => [ '', 'Select Type' ],
+      },
       strDiscipline => {
       	 label => "Sport",
-      	 value => $field->{strDiscipline}, 
+      	 value => $field->{strDiscipline},
          type  => 'lookup',
          options => \%Defs::entitySportType,
-         firstoption => [ '', 'Select Type' ],   
-      },  
+         firstoption => [ '', 'Select Type' ],
+      },
       intLegalTypeID => {
         label => "Legal Entity Type",
         value => $field->{intLegalTypeID},
         type => 'lookup',
         options => \%legalTypeOptions,
-        firstoption => [ '', 'Select Type' ],       
+        firstoption => [ '', 'Select Type' ],
         readonly =>($Data->{'clientValues'}{authLevel} < $Defs::LEVEL_NATIONAL),
+        compulsory => 1,
      },
      strLegalID => {
         label => "Legal Type Number",
         value => $field->{strLegalID},
         type  => 'text',
         size  => '30',
-        maxsize => '50',       
+        maxsize => '50',
+        compulsory => 1,
       },
       strEntityType => {
         label => "Entity Type",
@@ -259,11 +264,12 @@ print STDERR "SSSS$action $clubID\n";
         type => 'lookup',
         options => \%Defs::clubLevelSubtype,
         firstoption => [ '', 'Select Type' ],
+        compulsory => 1,
      },
       strStatus => {
           label => 'Status',
           value => $field->{strStatus},
-          type => 'lookup',  
+          type => 'lookup',
           options => \%Defs::entityStatus,
           readonly => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
           noadd         => 1,
@@ -304,6 +310,7 @@ print STDERR "SSSS$action $clubID\n";
         type  => 'text',
         size  => '40',
         maxsize => '50',
+        compulsory => 1,
       },
       strTown => {
         label => 'Town',
@@ -311,6 +318,7 @@ print STDERR "SSSS$action $clubID\n";
         type  => 'text',
         size  => '30',
         maxsize => '50',
+        compulsory => 1,
       },
       strRegion => {
         label => 'Region',
@@ -325,6 +333,7 @@ print STDERR "SSSS$action $clubID\n";
           type        => 'lookup',
           options     => \%Mcountriesonly,
           firstoption => [ '', 'Select Country' ],
+        compulsory => 1,
       },
       intLocalLanguage => {
       	label => 'Local Name Language',
@@ -370,11 +379,12 @@ print STDERR "SSSS$action $clubID\n";
         cols => '40',
         readonly =>($Data->{'clientValues'}{authLevel} < $Defs::LEVEL_NATIONAL),
       },
-      strAssocNature => { 
+      strAssocNature => {
       	label => 'Association Nature',
       	value => $field->{strAssocNature},
         type => 'text',
         size => 40,
+        compulsory => 1,
       },
       strWebURL => {
         label => 'Web',
@@ -403,7 +413,7 @@ print STDERR "SSSS$action $clubID\n";
       },
     },
     order => [qw(
-        strFIFAID        
+        strFIFAID
         strLocalName
         strLocalShortName
         strLatinName
@@ -428,7 +438,7 @@ print STDERR "SSSS$action $clubID\n";
         strEmail
         strPhone
         strFax
-        strContactEmail 
+        strContactEmail
         strMANotes
         clubcharacteristics
     )],
@@ -444,7 +454,7 @@ print STDERR "SSSS$action $clubID\n";
       formname => 'n_form',
       submitlabel => $Data->{'lang'}->txt('Update'),
       introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
-      NoHTML => 1, 
+      NoHTML => 1,
       updateSQL => qq[
         UPDATE tblEntity
           SET --VAL--
@@ -523,8 +533,8 @@ my $resultHTML='' ;
   }
   $resultHTML = $scMenu.$logodisplay.$resultHTML;
   $title="Add New $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}" if $option eq 'add';
-  
-  
+
+
   return ($resultHTML,$title);
 }
 
@@ -532,9 +542,9 @@ my $resultHTML='' ;
 
 sub loadClubDetails {
   my($db, $id) = @_;
-                                                                                                        
+
   my $statement=qq[
-    SELECT 
+    SELECT
      intEntityID,
      intEntityLevel,
      intRealmID,
@@ -569,7 +579,7 @@ sub loadClubDetails {
      strContactTitle,
      strContactEmail,
      strContactPhone,
-     dtAdded, 
+     dtAdded,
      strShortNotes,
      tTimeStamp,
      strLegalID
@@ -580,7 +590,7 @@ sub loadClubDetails {
   $query->execute($id);
   my $field=$query->fetchrow_hashref();
   $query->finish;
-                                                                                                        
+
   foreach my $key (keys %{$field})  { if(!defined $field->{$key}) {$field->{$key}='';} }
   return $field;
 }
@@ -599,9 +609,9 @@ sub postClubAdd {
       my $query = $db->prepare($st);
       $query->execute($entityID, $id);
       $query->finish();
-        
+
     ### A call TO createTempEntityStructure FROM EntityStructure   ###
-    createTempEntityStructure($Data); 
+    createTempEntityStructure($Data);
     ### End call to createTempEntityStructure FROM EntityStructure###
       addWorkFlowTasks($Data, 'ENTITY', 'NEW', $Data->{'clientValues'}{'authLevel'}, $id,0,0, 0);
     }
@@ -631,8 +641,8 @@ sub postClubAdd {
       my $originLevel = $Data->{'clientValues'}{'authLevel'} || 0;
       my $clientValues = $Data->{'clientValues'};
       my $entityRegisteringForLevel = getLastEntityLevel($clientValues) || 0;
-      my $entityID = getLastEntityID($clientValues);     
-     
+      my $entityID = getLastEntityID($clientValues);
+
       my $required_club_docs = getRegistrationItems(
         $Data,
         'ENTITY',
@@ -644,21 +654,21 @@ sub postClubAdd {
         0,
         undef,
      );
-     
+
      #what is origin level,is the level for this entity or the level of the person logged in???
-     
+
     my %PageData = (
         target => $Data->{'target'},
         documents => $required_club_docs,
         Lang => $Data->{'lang'},
         client => $clm,
-  );  
+  );
   my $clubdocs;
-  $clubdocs = runTemplate($Data, \%PageData, 'club/required_docs.templ') || '';  
+  $clubdocs = runTemplate($Data, \%PageData, 'club/required_docs.templ') || '';
 
 	### Change strStatus to DE-REGISTERED When Dissolution date is less than current date ###
-	resetStatus($cv{'clubID'},$db);  
-            
+	resetStatus($cv{'clubID'},$db);
+
       return (0,qq[
      <div class="sectionheader"> $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Added Successfully</div><br>
       <div>
@@ -669,14 +679,14 @@ sub postClubAdd {
 	   <a href="$Data->{'target'}?client=$cl&amp;a=C_DTA&amp;l=$Defs::LEVEL_CLUB">Add another $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}</a>
       ]);
     }
-  ###############################################################################  
-    
+  ###############################################################################
+
   } ### end if  add
-  if($id)    {  
+  if($id)    {
     $Data->{'cache'}->delete('swm','EntityObj-'.$id) if $Data->{'cache'};
   }
 
-  
+
 } ## end sub
 
 sub postClubUpdate {
@@ -703,7 +713,7 @@ sub postClubUpdate {
   $Data->{'cache'}->delete('swm',"ClubObj-$clubID") if $Data->{'cache'};
   ### Change strStatus to DE-REGISTERED When Dissolution date is less than current date ###
   resetStatus($clubID,$db);
-} 
+}
 
 sub resetStatus {
   my($id,$db)=@_;
@@ -713,7 +723,7 @@ sub resetStatus {
   my $query = $db->prepare($st);
   $query->execute($id);
   $query->finish;
-} 
+}
 
 sub listClubs   {
   my($Data, $entityID) = @_;
@@ -734,18 +744,18 @@ sub listClubs   {
   my $currentname='';
   my @rowdata = ();
   my $statement =qq[
-    SELECT 
-      PN.intEntityID AS PNintEntityID, 
-      CN.strLocalName, 
-      CN.strContact, 
-      CN.strPhone, 
-      CN.strEmail, 
-      CN.intEntityID AS CNintEntityID, 
-      CN.intEntityLevel AS CNintEntityLevel, 
-      PN.strLocalName AS PNName, 
+    SELECT
+      PN.intEntityID AS PNintEntityID,
+      CN.strLocalName,
+      CN.strContact,
+      CN.strPhone,
+      CN.strEmail,
+      CN.intEntityID AS CNintEntityID,
+      CN.intEntityLevel AS CNintEntityLevel,
+      PN.strLocalName AS PNName,
       CN.strStatus
-    FROM tblEntity AS PN 
-      LEFT JOIN tblEntityLinks ON PN.intEntityID=tblEntityLinks.intParentEntityID 
+    FROM tblEntity AS PN
+      LEFT JOIN tblEntityLinks ON PN.intEntityID=tblEntityLinks.intParentEntityID
       JOIN tblEntity as CN ON CN.intEntityID=tblEntityLinks.intChildEntityID
     WHERE PN.intEntityID = ?
       AND CN.strStatus <> 'DELETED'
@@ -774,8 +784,8 @@ sub listClubs   {
   }
   $query->finish;
 
-  my $list_instruction= $Data->{'SystemConfig'}{"ListInstruction_Club"} 
-        ? qq[<div class="listinstruction">$Data->{'SystemConfig'}{"ListInstruction_Club"}</div>] 
+  my $list_instruction= $Data->{'SystemConfig'}{"ListInstruction_Club"}
+        ? qq[<div class="listinstruction">$Data->{'SystemConfig'}{"ListInstruction_Club"}</div>]
         : '';
   $list_instruction=eval($list_instruction) if $list_instruction;
 
@@ -795,7 +805,7 @@ sub listClubs   {
     {
       name =>   $Data->{'lang'}->txt('Phone'),
       field =>  'strPhone',
-      width => 50,   
+      width => 50,
     },
     {
       name =>   $Data->{'lang'}->txt('Email'),
@@ -837,7 +847,7 @@ sub listClubs   {
   ) || '';
   $rectype_options=''; #OFF FOR NOW
 
-  $resultHTML = qq[ 
+  $resultHTML = qq[
       <div style="width:99%;">$rectype_options</div>
     $list_instruction
     $grid
@@ -847,8 +857,8 @@ sub listClubs   {
   if($obj)   {
       $currentname = $obj->getValue('strLocalName') || '';
   }
-  my $title=$Data->{'SystemConfig'}{"PageTitle_List_".$Defs::LEVEL_CLUB} 
-    || "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB.'_P'} in $currentname"; ###needs translation ->  WHAT in WHAT? 
+  my $title=$Data->{'SystemConfig'}{"PageTitle_List_".$Defs::LEVEL_CLUB}
+    || "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB.'_P'} in $currentname"; ###needs translation ->  WHAT in WHAT?
 
   my $addlink='';
   {
@@ -858,7 +868,7 @@ sub listClubs   {
 
   my $modoptions=qq[<div class="changeoptions">$addlink</div>];
   $title=$modoptions.$title;
-  
+
   return ($resultHTML,$title);
 }
 1;
