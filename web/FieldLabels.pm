@@ -140,6 +140,7 @@ sub getFieldLabels	{
             strGender => 'Gender',
             strDiscipline => 'Sport',
             strEntityType => 'Entity Type',
+            strShortNotes => 'Short Notes',
             	
 	);
 	}

@@ -373,9 +373,9 @@ print STDERR "SSSS$action $clubID\n";
         size  => '35',
         maxsize => '250',
       },
-      strNotes => {
+      strShortNotes => {
         label => 'Notes',
-        value => $field->{strNotes},
+        value => $field->{strShortNotes},
         type => 'textarea',
         rows => '10',
         cols => '40',
@@ -418,8 +418,9 @@ print STDERR "SSSS$action $clubID\n";
         strEmail
         strPhone
         strFax
-        strContactEmail        
-        strMANotes         
+        strContactEmail 
+        strShortNotes       
+        strMANotes
         clubcharacteristics
     )],
     fieldtransform => {
@@ -559,7 +560,8 @@ sub loadClubDetails {
      strContactTitle,
      strContactEmail,
      strContactPhone,
-     dtAdded,
+     dtAdded, 
+     strShortNotes,
      tTimeStamp,
      strLegalID
     FROM tblEntity
