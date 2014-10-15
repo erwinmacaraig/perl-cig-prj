@@ -1661,6 +1661,7 @@ sub viewTask {
     $st = qq[
         SELECT 
             t.intWFTaskID, 
+            t.intWFRuleID,
             t.strTaskStatus, 
             t.strTaskType, 
             t.intOnHold, 
@@ -1720,8 +1721,11 @@ sub viewTask {
             uf.strExtension as documentExtension,
             dPersonRego.intPersonRegistrationID as documentPersonRegistrationID,
             dPersonRego.intPersonID as documentPersonID,
-            tn.intTaskNoteID as currentNoteID
+            tn.intTaskNoteID as currentNoteID,
+	    rl.intApprovalEntityLevel as ApprovalEntityLevel,
+            rl.intWFRuleID as RuleID
         FROM tblWFTask AS t
+        LEFT JOIN tblWFRule as rl ON (t.intWFRuleID = rl.intWFRuleID)
         LEFT JOIN tblEntity as e ON (e.intEntityID = t.intEntityID)
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (t.intPersonRegistrationID = pr.intPersonRegistrationID)
         LEFT JOIN tblPerson AS p ON (t.intPersonID = p.intPersonID)
@@ -1754,7 +1758,7 @@ sub viewTask {
     my $rowCount = 0;
 	  
     my $dref = $q->fetchrow_hashref();
-    #print STDERR Dumper $dref;
+    print STDERR Dumper $st;
 
     if(!$dref) {
         return (undef, "ERROR: no data retrieved/no access.");
@@ -1808,6 +1812,7 @@ sub viewTask {
 
 
     my %TaskAction = (
+        'ApprovalEntityLevel' => $dref->{'ApprovalEntityLevel'},
         'WFTaskID' => $dref->{intWFTaskID} || 0,
         'client' => $Data->{client} || 0,
         'showApprove' => $showApprove,
