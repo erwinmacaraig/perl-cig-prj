@@ -37,20 +37,20 @@ sub listClearanceSettings	{
 
 	my %textLabels = (
 		'addClearanceSettings' => $lang->txt("Add $txt_Clr Settings"),
-		'autoApproval' => $lang->txt('Auto Approval'), 
+		'autoApproval' => $lang->txt('Auto Approval'),
 		'clearance' => $lang->txt($txt_Clr),
-		'defaultFee' => $lang->txt('Default Fee'), 
+		'defaultFee' => $lang->txt('Default Fee'),
 		'dobEnd' => $lang->txt('DOB End'),
-		'dobStart' => $lang->txt('DOB Start'), 
+		'dobStart' => $lang->txt('DOB Start'),
 		'listOfClearanceSettings' => $lang->txt("List of $txt_Clr Settings"),
 		'noClearanceSettingsFound' => $lang->txt("No $txt_Clr Settings can be found using this filter."),
-		'ruleAppliesTo' => $lang->txt('Rule Applies To'), 
-		'clearanceType' => $lang->txt("Rule for $txt_Clr Type"), 
+		'ruleAppliesTo' => $lang->txt('Rule Applies To'),
+		'clearanceType' => $lang->txt("Rule for $txt_Clr Type"),
 	);
 
 	my $clearanceStatus = $Data->{'ViewClrStatus'} || $Defs::CLR_STATUS_PENDING || 0;
 	my $st = qq[
-		SELECT CS.*, DATE_FORMAT(dtDOBStart,'%d/%m/%Y') AS dtDOBStart, DATE_FORMAT(dtDOBEnd,'%d/%m/%Y') AS dtDOBEnd 
+		SELECT CS.*, DATE_FORMAT(dtDOBStart,'%d/%m/%Y') AS dtDOBStart, DATE_FORMAT(dtDOBEnd,'%d/%m/%Y') AS dtDOBEnd
 		FROM tblClearanceSettings as CS
 		WHERE intID = ?
 			AND intTypeID = ?
@@ -63,7 +63,7 @@ sub listClearanceSettings	{
 		$intTypeID,
 	);
 
-	my $resultHTML = ''; 
+	my $resultHTML = '';
 
 	my $client=setClient($Data->{'clientValues'});
 
@@ -88,7 +88,7 @@ sub listClearanceSettings	{
 		};
   }
   $query->finish;
-	my $addLink= qq[<div class="changeoptions"><span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=CLRSET_ADD">] . $lang->txt('Add') . qq[</a></span></div>];
+	my $addLink= qq[<div class="changeoptions"><span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=CLRSET_ADD">] . $lang->txt('Add') . qq[</a></span></div>] if (!$Data->{'ReadOnlyLogin'});
 
   my @headers = (
     {
@@ -130,7 +130,7 @@ sub listClearanceSettings	{
     width => '99%',
   );
 
-	$resultHTML = qq[ 
+	$resultHTML = qq[
 		$grid
 	];
 
@@ -155,14 +155,14 @@ sub listOfflineClearances {
 			'clearanceRefNo' => $lang->txt('Clearance Ref. No.'),
 			'createdBy' => $lang->txt('Created by'),
 			'denied' => $lang->txt('Denied'),
-			'dob' => $lang->txt('Date of Birth'), 
+			'dob' => $lang->txt('Date of Birth'),
 			'fromClub' => $lang->txt('From Club'),
 			'listClearances' => $lang->txt('List Offline/Manual Clearances'),
 			'member' => $lang->txt('Member'),
 			'memberName' => $lang->txt('Member Name'),
 			'noClearanceFound' => $lang->txt('No Clearances can be found with this filter.'),
 			'only100Shown'  => $lang->txt('NOTE: Only 100 Offline/Manual Clearances are shown.  You may need to apply more filters to view a specific record'),
-			'overallStatus' => $lang->txt('Overall Status'), 
+			'overallStatus' => $lang->txt('Overall Status'),
 			'pending' => $lang->txt('Pending'),
 			'records' => $lang->txt('records'),
 			'showing' => $lang->txt('Showing'),
@@ -195,14 +195,14 @@ sub listOfflineClearances {
 
 	my $st = qq[
 		SELECT DISTINCT C.*, DATE_FORMAT(C.dtApplied,"%d/%m/%Y") AS dtApplied, CONCAT(M.strLocalSurname, ", ", M.strLocalFirstname) as MemberName, IF(SourceEntity.intClubID, SourceEntity.strName, strSourceEntityName) as SourceEntityName, IF (DestinationEntity.intClubID, DestinationEntity.strName, strDestinationEntityName) as DestinationEntityName, DATE_FORMAT(M.dtDOB,"%d/%m/%Y") AS DOB, YEAR(dtApplied) AS clrYear
-		FROM tblClearance as C 
-			INNER JOIN tblPerson as M ON (M.intPersonID = C.intPersonID) 
+		FROM tblClearance as C
+			INNER JOIN tblPerson as M ON (M.intPersonID = C.intPersonID)
 			LEFT JOIN tblClub as SourceEntity ON (SourceEntity.intClubID = C.intSourceEntityID)
 			LEFT JOIN tblClub as DestinationEntity ON (DestinationEntity.intClubID = C.intDestinationEntityID)
-                WHERE 
+                WHERE
 			C.intCreatedFrom IN ($Defs::CLR_TYPE_SWC, $Defs::CLR_TYPE_MANUAL)
 			AND C.intRealmID = ?
-	ORDER BY C.intClearanceID 
+	ORDER BY C.intClearanceID
 	];
 
 	my $query = $db->prepare($st) or query_error($st);
@@ -349,7 +349,7 @@ sub listOfflineClearances {
 
 
 
-	$resultHTML .= qq[ 
+	$resultHTML .= qq[
 		<div>$line</div>
 		$grid
 	];
@@ -371,7 +371,7 @@ sub listClearances	{
 
     my $lang = $Data->{'lang'};
     my %textLabels = (
-			'ClearanceID' => $lang->txt('Clearance Ref'), 
+			'ClearanceID' => $lang->txt('Clearance Ref'),
 			'all' => $lang->txt('All'),
 			'applicationDate' => $lang->txt('Application Date'),
 			'approved' => $lang->txt('Approved'),
@@ -380,7 +380,7 @@ sub listClearances	{
 			'cancelled' => $lang->txt('Cancelled'),
 			'dateDue' => $lang->txt('Date Due'),
 			'denied' => $lang->txt('Denied'),
-			'dob' => $lang->txt('Date of Birth'), 
+			'dob' => $lang->txt('Date of Birth'),
 			'filter' => $lang->txt('Filter'),
 			'listClearances' => $lang->txt("List Offline/Manual $txt_Clr".'s'),
 			'listClrRequests' => $lang->txt("List $txt_Clr Requests"),
@@ -422,13 +422,13 @@ sub listClearances	{
 			AND CP.intID = $intID
 	];
 
-	
+
 	my $st = qq[
-			SELECT C.*, DATE_FORMAT(C.dtApplied,"%d/%m/%Y") AS dtApplied, C.dtApplied as dtApplied_RAW, CP.intClearanceStatus as PathStatus, CP.intClearancePathID, CONCAT(M.strLocalSurname, ", ", M.strLocalFirstname) as MemberName, SourceEntity.strName as SourceEntityName, DestinationEntity.strName as DestinationEntityName,  DATE_FORMAT(M.dtDOB,"%d/%m/%Y") AS DOB, M.dtDOB AS DOB_RAW, CP.intTypeID, CP.intID, 
+			SELECT C.*, DATE_FORMAT(C.dtApplied,"%d/%m/%Y") AS dtApplied, C.dtApplied as dtApplied_RAW, CP.intClearanceStatus as PathStatus, CP.intClearancePathID, CONCAT(M.strLocalSurname, ", ", M.strLocalFirstname) as MemberName, SourceEntity.strName as SourceEntityName, DestinationEntity.strName as DestinationEntityName,  DATE_FORMAT(M.dtDOB,"%d/%m/%Y") AS DOB, M.dtDOB AS DOB_RAW, CP.intTypeID, CP.intID,
 				IF(C.intCurrentPathID = CP.intClearancePathID AND C.intClearanceStatus  = $Defs::CLR_STATUS_PENDING,1,0) AS ThisLevel
-			FROM tblClearance as C 
-				INNER JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID) 
-				INNER JOIN tblPerson as M ON (M.intPersonID = C.intPersonID) 
+			FROM tblClearance as C
+				INNER JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID)
+				INNER JOIN tblPerson as M ON (M.intPersonID = C.intPersonID)
 				LEFT JOIN tblClub as SourceEntity ON (SourceEntity.intClubID = C.intSourceEntityID)
 				LEFT JOIN tblClub as DestinationEntity ON (DestinationEntity.intClubID = C.intDestinationEntityID)
 			WHERE C.intRealmID = $Data->{'Realm'}
@@ -448,7 +448,7 @@ warn($st);
 	my $query = $db->prepare($st) or query_error($st);
 	$query->execute or query_error($st);
 
-	my $resultHTML = ''; 
+	my $resultHTML = '';
 
 	my $client=setClient($Data->{'clientValues'});
 
@@ -460,20 +460,20 @@ warn($st);
 		$dref->{'intClearanceStatus_RAW'} = $dref->{'intClearanceStatus'};
 		$dref->{'intClearanceStatus_RAW'} = 100 if $dref->{'ThisLevel'};
 		$dref->{'intClearanceStatus_RAW_filter'} = $dref->{'intClearanceStatus_RAW'};
-		
+
 		if($clearanceStatus==0) {
 		$dref->{'intClearanceStatus_RAW_filter'} = 0 if($dref->{'intClearanceStatus_RAW_filter'} == 100);
 		}
-		$dref->{updatestatus} = $dref->{intCurrentPathID} == $dref->{intClearancePathID} 
-            ? ($dref->{PathStatus} 
-                ? $lang->txt($Defs::clearance_status{$dref->{PathStatus}}) 
-                : qq[<a href="$Data->{'target'}?client=$client&amp;a=CL_details&amp;cID=$dref->{intClearanceID}&amp;cpID=$dref->{intClearancePathID}"><b>--$textLabels{'awaitingYourApproval'}--</b></a>]) 
+		$dref->{updatestatus} = $dref->{intCurrentPathID} == $dref->{intClearancePathID}
+            ? ($dref->{PathStatus}
+                ? $lang->txt($Defs::clearance_status{$dref->{PathStatus}})
+                : qq[<a href="$Data->{'target'}?client=$client&amp;a=CL_details&amp;cID=$dref->{intClearanceID}&amp;cpID=$dref->{intClearancePathID}"><b>--$textLabels{'awaitingYourApproval'}--</b></a>])
             : '';
-		$dref->{updatestatus} = $dref->{intCurrentPathID} > $dref->{intClearancePathID} 
-            ? $lang->txt($Defs::clearance_status{$dref->{PathStatus}}) 
+		$dref->{updatestatus} = $dref->{intCurrentPathID} > $dref->{intClearancePathID}
+            ? $lang->txt($Defs::clearance_status{$dref->{PathStatus}})
             : '' if ($dref->{updatestatus} eq '');
-		$dref->{updatestatus} = $dref->{intCurrentPathID} < $dref->{intClearancePathID} 
-            ? $textLabels{'notYet'} 
+		$dref->{updatestatus} = $dref->{intCurrentPathID} < $dref->{intClearancePathID}
+            ? $textLabels{'notYet'}
             : '' if ($dref->{updatestatus} eq '');
 		$dref->{updatestatus} =  $lang->txt("$txt_Clr is $Defs::clearance_status{$dref->{intClearanceStatus}}") if $dref->{intClearanceStatus} > 1;
         $dref->{updatestatus} = '-' if ($dref->{intID} != $intID or $dref->{intTypeID} != $intTypeID);
@@ -491,11 +491,11 @@ warn($st);
 		### HANDLE REOPENS ??
 
 		$dref->{overallstatus} = $lang->txt($Defs::clearance_status{$dref->{intClearanceStatus}}) || 'P';
-		$dref->{priority} = $lang->txt($Defs::clearance_priority{$dref->{intClearancePriority}});  
+		$dref->{priority} = $lang->txt($Defs::clearance_priority{$dref->{intClearancePriority}});
 		$dref->{SourceEntityName} ||= $dref->{strSourceEntityName} || '';
 		$dref->{DestinationEntityName} ||= $dref->{strDestinationEntityName} || '';
 		$dref->{createdFrom} = $Defs::ClearanceTypes{$dref->{intCreatedFrom}};
-		
+
 		my %row = ();
 		for my $i (qw(MemberName DOB DOB_RAW SourceEntityName DestinationEntityName updatestatus overallstatus dtApplied dtApplied_RAW createdFrom intClearanceID intClearanceYear intClearanceStatus_RAW intClearanceStatus_RAW_filter))	{
 			$row{$i} = $dref->{$i};
@@ -544,7 +544,7 @@ warn($st);
 
         my $listOffline = ($Data->{'SystemConfig'}{'clrListOffline'} and ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB or $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_ASSOC)) ? qq[<span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=CL_offlist">$textLabels{'listClearances'}</a></span>] : '';
         my $listRequests= ($Data->{'SystemConfig'}{'clrInternationalSpecial'} and $Data->{'clientValues'}{'currentLevel'} == $Data->{'SystemConfig'}{'clrInternationalSearchNodeLevel'}) ? qq[<span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=CL_LHB">$textLabels{'listClrRequests'}</a></span>] : '';
-	
+
 		my $applicationDateHeader = $textLabels{'applicationDate'};
 		$applicationDateHeader .= qq[<br>($textLabels{'dateDue'})] if ($Data->{'SystemConfig'}{'Clearance_DateDue'} and $hasDateDue);
 
@@ -649,7 +649,7 @@ warn($st);
 	$resultHTML = qq[
 		<div class="changeoptions">
 			$listOffline
-			$listRequests 
+			$listRequests
 		</div>
 		<div class="grid-filter-wrap">
 			<div style="width:100%;">$line</div>
