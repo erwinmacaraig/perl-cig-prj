@@ -73,6 +73,7 @@ sub handleRegistrationFlowBackend   {
     if (defined $pref and $pref->{'strISONationality'}) {
         $rego_ref->{'Nationality'} = $pref->{'strISONationality'} || '';
     }
+print STDERR "AAAAAAAA $action\n";
     if ( $action eq 'PREGF_TU' ) {
     	
         #add rego record with types etc.
@@ -145,7 +146,8 @@ sub handleRegistrationFlowBackend   {
         $Hidden{'prodQty'} = $prodQty;
         my $prodIds= join(':',@productsselected);
         $Hidden{'prodIds'} = $prodIds;
-#        $Hidden{'txnIds'} = save_rego_products($Data, $regoID, $personID, $entityID, $entityLevel, $rego_ref, \%params);
+print STDERR "---------------------------HERE FOR $personID $regoID\n";
+        $Hidden{'txnIds'} = save_rego_products($Data, $regoID, $personID, $entityID, $entityLevel, $rego_ref, \%params);
         $action = $Flow{$action};
     }
     if ( $action eq 'PREGF_DU' ) {
