@@ -88,7 +88,7 @@ sub listClearanceSettings	{
 		};
   }
   $query->finish;
-	my $addLink= qq[<div class="changeoptions"><span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=CLRSET_ADD">] . $lang->txt('Add') . qq[</a></span></div>] if (!$Data->{'ReadOnlyLogin'});
+	my $addLink = qq[<div class="changeoptions"><span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=CLRSET_ADD">] . $lang->txt('Add') . qq[</a></span></div>] if (!$Data->{'ReadOnlyLogin'});
 
   my @headers = (
     {
