@@ -74,16 +74,16 @@ sub handlePerson {
     my $clrd_out = 0;
     if ( $Data->{'SystemConfig'}{'Clearances_FilterClearedOut'} ) {
         my $club = $Data->{'clientValues'}{'clubID'};
-        my $st   = qq[ 
-			SELECT 
-				intPersonID, 
+        my $st   = qq[
+			SELECT
+				intPersonID,
 				MCC.intClubID,
-				strName as ClubName 
-			FROM 
-				tblPerson_ClubsClearedOut as MCC 
-					INNER JOIN tblClub as C ON (C.intClubID = MCC.intClubID) 
-			WHERE 
-				intPersonID=$personID 
+				strName as ClubName
+			FROM
+				tblPerson_ClubsClearedOut as MCC
+					INNER JOIN tblClub as C ON (C.intClubID = MCC.intClubID)
+			WHERE
+				intPersonID=$personID
 				AND intAssocID = $Data->{'clientValues'}{'assocID'}
 		];
         my $query = $Data->{'db'}->prepare($st);
@@ -166,7 +166,7 @@ sub handlePerson {
     }
     elsif ( $action eq 'P_REGO' ) {
         my $entityID = getLastEntityID($Data->{'clientValues'});
-        my $prID = safe_param( 'prID', 'number' );    
+        my $prID = safe_param( 'prID', 'number' );
         $resultHTML = personRegistrationDetail($action, $Data, $entityID, $prID) || '';
         $title = $lang->txt('Registration History');
     }
@@ -175,9 +175,9 @@ sub handlePerson {
          my $client = setClient( $Data->{'clientValues'} ) || '';
          $resultHTML .= Documents::list_docs($Data, $personID, $client );
            }
-    elsif($action =~ /P_PASS/){ 
+    elsif($action =~ /P_PASS/){
     	($resultHTML,$title) = listPlayerPassport($Data, $personID);
-    	
+
     }
     else {
         print STDERR "Unknown action $action\n";
@@ -186,20 +186,20 @@ sub handlePerson {
 }
 
 sub listPlayerPassport {
-	my ($Data, $personID) = @_; 
-	
+	my ($Data, $personID) = @_;
+
 	my $query = qq[ SELECT strPersonLevel, strEntityName, strMAName, dtFrom, dtTo FROM tblPlayerPassport WHERE intPersonID = ? ORDER BY dtFrom,dtTo DESC
 	];
-	my $sth = $Data->{'db'}->prepare($query); 
-	$sth->execute($personID); 
-	my @rowdata = (); 
-	while(my $passportref = $sth->fetchrow_hashref()){ 
+	my $sth = $Data->{'db'}->prepare($query);
+	$sth->execute($personID);
+	my @rowdata = ();
+	while(my $passportref = $sth->fetchrow_hashref()){
 		push @rowdata,{
 			From => $passportref->{'dtFrom'},
 			To => $passportref->{'dtTo'},
-			Club => $passportref->{'strEntityName'}, 
-			Level => $passportref->{'strPersonLevel'}, 
-			MAName => $passportref->{'strMAName'},  
+			Club => $passportref->{'strEntityName'},
+			Level => $passportref->{'strPersonLevel'},
+			MAName => $passportref->{'strMAName'},
 		};
 	}
 	$sth->finish();
@@ -208,8 +208,8 @@ sub listPlayerPassport {
 		Passport => \@rowdata,
 	};
 	 my $title = '';
-	 my $resultHTML = runTemplate($Data, $PageContent, 'registration/playerpassport.templ') || '';  
-	 $title = 'Player Passport'; 
+	 my $resultHTML = runTemplate($Data, $PageContent, 'registration/playerpassport.templ') || '';
+	 $title = 'Player Passport';
 	 return ($resultHTML, $title);
 }
 
@@ -253,7 +253,7 @@ sub personRegistrationsHistory   {
     my %tempClientValues = getClient($client);
     {
         my $tempClient = setClient(\%tempClientValues);
-        $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>];
+        $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if (!$Data->{'ReadOnlyLogin'});
 
     }
 
@@ -342,52 +342,52 @@ sub personRegistrationsHistory   {
 }
 sub listDocuments {
     my ($Data, $personID) = @_;
-    my $resultHTML = ''; 
-    my $lang = $Data->{'lang'}; 
-    my $db = $Data->{'db'};  
+    my $resultHTML = '';
+    my $lang = $Data->{'lang'};
+    my $db = $Data->{'db'};
     my $client = $Data->{'client'};
     my %RegFilters=();
     my @statusNOTIN = ($Defs::PERSONREGO_STATUS_DELETED, $Defs::PERSONREGO_STATUS_INPROGRESS);
     $RegFilters{'statusNOTIN'} = \@statusNOTIN;
     my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
- 
-    #does not matter how many, intPersonRegistrationID is the same all throughout 
+
+    #does not matter how many, intPersonRegistrationID is the same all throughout
     my $pRIDRef = ${$Reg_ref}[0];
     my $personRegistrationID = $pRIDRef->{'intPersonRegistrationID'};
-    my @rowdata = (); 
+    my @rowdata = ();
     my $query = qq[
-         SELECT tblUploadedFiles.intFileID,tblDocumentType.strDocumentName,tblUploadedFiles.dtUploaded as DateUploaded, tblDocuments.strApprovalStatus FROM tblDocuments INNER JOIN tblUploadedFiles ON tblDocuments.intUploadFileID = tblUploadedFiles.intFileID INNER JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intPersonID = ? AND tblUploadedFiles.intEntityTypeID = ?]; 
+         SELECT tblUploadedFiles.intFileID,tblDocumentType.strDocumentName,tblUploadedFiles.dtUploaded as DateUploaded, tblDocuments.strApprovalStatus FROM tblDocuments INNER JOIN tblUploadedFiles ON tblDocuments.intUploadFileID = tblUploadedFiles.intFileID INNER JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intPersonID = ? AND tblUploadedFiles.intEntityTypeID = ?];
 
-    my $sth = $db->prepare($query); 
-    $sth->execute($personID, $Defs::LEVEL_PERSON); 
+    my $sth = $db->prepare($query);
+    $sth->execute($personID, $Defs::LEVEL_PERSON);
        while(my $dref = $sth->fetchrow_hashref()){
-       my $viewLink = qq[ <span class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}" target="_blank">]. $lang->txt('Get File') . q[</a></span>];    
-       
-      my $replaceLink =   qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a></span>];    
-       
+       my $viewLink = qq[ <span class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}" target="_blank">]. $lang->txt('Get File') . q[</a></span>];
+
+      my $replaceLink =   qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a></span>];
+
 
        my $fileLink = "#$personRegistrationID";
-      
-       push @rowdata, {  
+
+       push @rowdata, {
 	        id => $dref->{'intFileID'} || 0,
 	        SelectLink => $fileLink,
 	        strDocumentName => $dref->{'strDocumentName'},
 		    strApprovalStatus => $dref->{'strApprovalStatus'},
-            DateUploaded => $dref->{'DateUploaded'}, 
-            ViewDoc => $viewLink, 
-            ReplaceFile => $replaceLink,              
+            DateUploaded => $dref->{'DateUploaded'},
+            ViewDoc => $viewLink,
+            ReplaceFile => $replaceLink,
        };
     }
 
     my @headers = (
-        { 
+        {
             type => 'Selector',
             field => 'SelectLink',
-        }, 
+        },
         {
             name => $lang->txt('Type'),
             field => 'strDocumentName',
-        }, 
+        },
         {
             name => $lang->txt('Status'),
             field => 'strApprovalStatus',
@@ -395,18 +395,18 @@ sub listDocuments {
         {
             name => $lang->txt('Date Uploaded'),
             field => 'DateUploaded',
-        }, 
+        },
         {
             name => $lang->txt('View'),
             field => 'ViewDoc',
-            type => 'HTML', 
+            type => 'HTML',
         },
         {
         	name => $lang->txt('Replace'),
-        	field => 'ReplaceFile', 
+        	field => 'ReplaceFile',
         	type => 'HTML',
         },
-    ); 
+    );
     my $filterfields = [
         {
             field     => 'strApprovalStatus',
@@ -414,39 +414,38 @@ sub listDocuments {
             allvalue  => 'ALL',
         },
     ];
-  
-    #### GRID  #### 
+
+    #### GRID  ####
     my $grid = showGrid(
         Data => $Data,
         columns => \@headers,
         rowdata => \@rowdata,
         gridid => 'grid',
         width => '99%',
-        
-   );  
-  
-   
+
+   );
+
+
   my $addlink='';
   {
-      $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=DOC_L">].$Data->{'lang'}->txt('Add').qq[</a></span>];
-
+      $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=DOC_L">].$Data->{'lang'}->txt('Add').qq[</a></span>] if (!$Data->{'ReadOnlyLogin'});
   }
    $query = qq[
          SELECT strDocumentName, intDocumentTypeID FROM tblDocumentType WHERE strDocumentFor = ? AND intRealmID IN (0,?)
-    ]; 
+    ];
     $sth = $db->prepare($query);
     $sth->execute($Defs::DOC_FOR_PERSON,$Data->{'Realm'});
     my $doclisttype = qq[  <form action="$Data->{'target'}" id="personDocAdd">
                               <input type="hidden" name="client" value="$client" />
                               <input type="hidden" name="a" value="DOC_L" />
-                              <label>Add File For</label>  
+                              <label>Add File For</label>
                               <select name="doclisttype" id="doclisttype">
-                              <option value="0">Misc</option>  
-                       ]; 
+                              <option value="0">Misc</option>
+                       ];
     while(my $dref = $sth->fetchrow_hashref()){
         $doclisttype .= qq[<option value="$dref->{'intDocumentTypeID'}">$dref->{'strDocumentName'}</option>];
-    } 
-   $doclisttype .= qq[     </select> 
+    }
+   $doclisttype .= qq[     </select>
                            <input type="hidden" value="$personRegistrationID" name="RegistrationID" />
                            <input type="submit" class="button-small generic-button" value="Go" />
                            </form>
@@ -455,10 +454,10 @@ sub listDocuments {
  my $modoptions=qq[<div class="changeoptions"></div>];
 
  my $title = $lang->txt('Registration Documents');
- 
-       # $modoptions   
-        $resultHTML = qq[ $modoptions   
-                      <div class="showrecoptions"> $doclisttype </div>              
+
+       # $modoptions
+        $resultHTML = qq[ $modoptions
+                      <div class="showrecoptions"> $doclisttype </div>
                        $grid
            ];
 
@@ -501,7 +500,7 @@ sub updatePersonNotes {
     my $st = qq[
         INSERT INTO tblPersonNotes
             (intPersonID $insert_cols)
-        VALUES 
+        VALUES
             ($personID $insert_vals)
         ON DUPLICATE KEY UPDATE tTimeStamp=NOW() $update_vals
     ];
@@ -531,14 +530,14 @@ sub PersonTransfer {
     my $confirmed = $params{'transfer_confirm'} || 0;
     my $assocTypeIDWHERE = exists $Data->{'SystemConfig'}{'PersonTransfer_AssocType'} ? qq[ AND A.intAssocTypeID = $Data->{'SystemConfig'}{'PersonTransfer_AssocType'} ] : '';
     my $st = qq[
-		SELECT 
-            M.intPersonID, 
-            A.strName, 
-            A.intAssocID, 
-            MA.strStatus, 
-            CONCAT(M.strLocalFirstname, ' ', M.strLocalSurname) as PersonName, 
-            DATE_FORMAT(dtDOB,'%d/%m/%Y') AS dtDOB, 
-            DATE_FORMAT(dtDOB, "%Y%m%d") as DOBAgeGroup, 
+		SELECT
+            M.intPersonID,
+            A.strName,
+            A.intAssocID,
+            MA.strStatus,
+            CONCAT(M.strLocalFirstname, ' ', M.strLocalSurname) as PersonName,
+            DATE_FORMAT(dtDOB,'%d/%m/%Y') AS dtDOB,
+            DATE_FORMAT(dtDOB, "%Y%m%d") as DOBAgeGroup,
             M.intGender
 		FROM tblPerson as M
 			INNER JOIN tblPerson_Associations as MA ON (MA.intPersonID = M.intPersonID)
@@ -591,7 +590,7 @@ sub PersonTransfer {
                                 <p>Please select a person to be transferred and click the <b>select</b> link.</p>
                         <p>
                         	<table>
-                               	<tr><td>&nbsp;</td>		
+                               	<tr><td>&nbsp;</td>
 								<td><span class="label">$Data->{'SystemConfig'}{'NationalNumName'}:</td>
                                	<td><span class="label">Person's Name:</td>
                                	<td><span class="label">Person's Date Of Birth:</td>
@@ -693,20 +692,20 @@ sub PersonTransfer {
 
 sub person_details {
     my ( $action, $Data, $personID, $prefillData, $returndata ) = @_;
-    $returndata ||= 0; 
-    
-  
+    $returndata ||= 0;
+
+
     my $option = 'display';
-    
+
     	$option = 'edit' if $action eq 'P_DTE' and allowedAction( $Data, 'm_e' );
     	$option = 'add'  if $action eq 'P_A' and allowedAction( $Data, 'm_a' );
     	$option = 'add' if ( $Data->{'RegoForm'} and !$personID );
-    
-    
+
+
     $personID = 0 if $option eq 'add';
     my $hideWebCamTab = $Data->{SystemConfig}{hide_webcam_tab} ? qq[&hwct=1] : '';
     my $field = loadPersonDetails( $Data->{'db'}, $personID ) || ();
-    
+
 
     if ( $prefillData and ref $prefillData ) {
         if ($personID) {
@@ -725,9 +724,9 @@ sub person_details {
     }
     my $countries = getCountriesHash($Data);
      my $isocountries = getISOCountriesHash();
-   
+
     my ($DefCodes, $DefCodesOrder) = getDefCodes(
-        dbh        => $Data->{'db'}, 
+        dbh        => $Data->{'db'},
         realmID    => $Data->{'Realm'},
         subRealmID => $Data->{'RealmSubType'} || $field->{'intAssocTypeID'},
         assocID    => $Data->{'clientValues'}{'assocID'},
@@ -755,8 +754,8 @@ sub person_details {
 
     my $mrt_config = '';
        #readonly      => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
-               
-    
+
+
     my %FieldDefinitions = (
         fields => {
             strFIFAID => {
@@ -775,13 +774,13 @@ sub person_details {
                 readonly    => 1,
                 sectionname => 'details',
             },
-            
+
             strStatus => {
                 label         => $Data->{'SystemConfig'}{'person_strStatus'}? $FieldLabels->{'strStatus'} : '',
                 value         => $field->{strStatus},
                 type          => 'lookup',
                 sectionname   => 'details',
-                options       => \%Defs::personStatus, 
+                options       => \%Defs::personStatus,
                 readonly      => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
                 noadd         => 1,
             },
@@ -801,7 +800,7 @@ sub person_details {
                 maxsize     => '50',
                 sectionname => 'details',
                 first_page  => 1,
-            },            
+            },
             strLocalSurname => {
                 label       => $Data->{'SystemConfig'}{'strLocalSurname_Text'} ? $Data->{'SystemConfig'}{'strLocalSurname_Text'} : $FieldLabels->{'strLocalSurname'},
                 value       => $field->{strLocalSurname},
@@ -819,7 +818,7 @@ sub person_details {
                 maxsize     => '50',
                 sectionname => 'details',
                 first_page  => 1,
-            },            
+            },
             strLatinSurname => {
                 label       => $Data->{'SystemConfig'}{'person_strLatinNames'} ?  $FieldLabels->{'strLatinSurname'} : '',
                 value       => $field->{strLatinSurname},
@@ -845,7 +844,7 @@ sub person_details {
                 maxsize     => '50',
                 sectionname => 'details',
             },
-            
+
             dtSuspendedUntil=> {
                 label       => $FieldLabels->{'dtSuspendedUntil'},
                 value       => $field->{dtSuspendedUntil},
@@ -890,7 +889,7 @@ sub person_details {
                 sectionname => 'other',
                 firstoption => [ '', 'Select Country' ],
             },
-            
+
             intGender => {
                 label       => $FieldLabels->{'intGender'},
                 value       => $field->{intGender},
@@ -949,7 +948,7 @@ sub person_details {
                 maxsize     => '30',
                 sectionname => 'contact',
             },
-            
+
             strPhoneMobile => {
                 label       => $FieldLabels->{'strPhoneMobile'},
                 value       => $field->{strPhoneMobile},
@@ -957,7 +956,7 @@ sub person_details {
                 size        => '20',
                 maxsize     => '30',
                 sectionname => 'contact',
-            },      
+            },
             strEmail => {
                 label       => $FieldLabels->{'strEmail'},
                 value       => $field->{strEmail},
@@ -983,7 +982,7 @@ sub person_details {
                 size        => '20',
                 maxsize     => '50',
                 sectionname => 'other',
-            },         
+            },
             strEmergContName => {
                 label       => $FieldLabels->{'strEmergContName'},
                 value       => $field->{strEmergContName},
@@ -1008,8 +1007,8 @@ sub person_details {
                 maxsize     => '100',
                 sectionname => 'contact',
             },
-            
-            
+
+
             strP1FName => {
                 label       => $FieldLabels->{'strP1FName'},
                 value       => $field->{strP1FName},
@@ -1026,7 +1025,7 @@ sub person_details {
                 maxsize     => '50',
                 sectionname => 'parent',
             },
-            
+
             strP1Phone => {
                 label       => $FieldLabels->{'strP1Phone'},
                 value       => $field->{strP1Phone},
@@ -1035,8 +1034,8 @@ sub person_details {
                 maxsize     => '30',
                 sectionname => 'parent',
             },
-           
-            
+
+
             strP1Email => {
                 label       => $FieldLabels->{'strP1Email'},
                 value       => $field->{strP1Email},
@@ -1045,7 +1044,7 @@ sub person_details {
                 maxsize     => '200',
                 sectionname => 'parent',
                 validate    => 'EMAIL',
-           },            
+           },
            strISOCountry => {
                 label       => $FieldLabels->{'strISOCountry'},
                 value       => $field->{strISOCountry},
@@ -1062,7 +1061,7 @@ sub person_details {
                 sectionname => 'details',
                 firstoption => [ '', 'Select Country' ],
                 compulsory => 1,
-               
+
             },
             dtLastUpdate => {
                 label       => 'Last Updated',
@@ -1119,7 +1118,7 @@ sub person_details {
         map("intNatCustomLU$_", (1..10)),
         map("intNatCustomBool$_", (1..5)),
         qw(
-        strNotes SPdetails dtLastUpdate 
+        strNotes SPdetails dtLastUpdate
         )
         ],
         fieldtransform => {
@@ -1257,7 +1256,7 @@ sub person_details {
     # map("intNatCustomBool$_", (1..5)),
     for my $i (1..5) {
         my $fieldname = "intNatCustomBool$i";
-        
+
         $FieldDefinitions{'fields'}{$fieldname} = {
             label => $CustomFieldNames->{$fieldname}[0] || '',
             value => $field->{$fieldname},
@@ -1310,7 +1309,7 @@ my $person_photo = qq[
 $person_photo = '' if($option eq 'add');
 #$tabs = '' if($option eq 'add'); #WR: may need to go back in
 	$resultHTML =qq[
- $tabs 
+ $tabs
 $person_photo
       <div class="person-edit-form">$resultHTML</div><style type="text/css">.pageHeading{font-size:48px;font-family:"DINMedium",sans-serif;letter-spacing:-2px;margin:40px 0;}.ad_heading{margin: 36px 0 0 0;}</style>] if!$processed;
     $resultHTML = qq[<p>$Data->{'PersonClrdOut'}</p> $resultHTML] if $Data->{'PersonClrdOut'};
@@ -1373,26 +1372,26 @@ sub loadPersonDetails {
     return {} if !$id;
 
     my $statement = qq[
-	SELECT 
-		tblPerson.*, 
-		DATE_FORMAT(dtPassportExpiry,'%d/%m/%Y') AS dtPassportExpiry, 
-		DATE_FORMAT(dtDOB,'%d/%m/%Y') AS dtDOB, 
-		dtDOB AS dtDOB_RAW, 
-		TIMESTAMPDIFF(YEAR, dtDOB, CURDATE()) as currentAge, 
-		DATE_FORMAT(dtPoliceCheck,'%d/%m/%Y') AS dtPoliceCheck, 
-		DATE_FORMAT(dtPoliceCheckExp,'%d/%m/%Y') AS dtPoliceCheckExp, 
-		DATE_FORMAT(dtNatCustomDt1,'%d/%m/%Y') AS dtNatCustomDt1, 
-		DATE_FORMAT(dtNatCustomDt2,'%d/%m/%Y') AS dtNatCustomDt2, 
-		DATE_FORMAT(dtNatCustomDt3,'%d/%m/%Y') AS dtNatCustomDt3, 
-		DATE_FORMAT(dtNatCustomDt4,'%d/%m/%Y') AS dtNatCustomDt4, 
-		DATE_FORMAT(dtNatCustomDt5,'%d/%m/%Y') AS dtNatCustomDt5, 
+	SELECT
+		tblPerson.*,
+		DATE_FORMAT(dtPassportExpiry,'%d/%m/%Y') AS dtPassportExpiry,
+		DATE_FORMAT(dtDOB,'%d/%m/%Y') AS dtDOB,
+		dtDOB AS dtDOB_RAW,
+		TIMESTAMPDIFF(YEAR, dtDOB, CURDATE()) as currentAge,
+		DATE_FORMAT(dtPoliceCheck,'%d/%m/%Y') AS dtPoliceCheck,
+		DATE_FORMAT(dtPoliceCheckExp,'%d/%m/%Y') AS dtPoliceCheckExp,
+		DATE_FORMAT(dtNatCustomDt1,'%d/%m/%Y') AS dtNatCustomDt1,
+		DATE_FORMAT(dtNatCustomDt2,'%d/%m/%Y') AS dtNatCustomDt2,
+		DATE_FORMAT(dtNatCustomDt3,'%d/%m/%Y') AS dtNatCustomDt3,
+		DATE_FORMAT(dtNatCustomDt4,'%d/%m/%Y') AS dtNatCustomDt4,
+		DATE_FORMAT(dtNatCustomDt5,'%d/%m/%Y') AS dtNatCustomDt5,
 		MN.strNotes
-		FROM 
-			tblPerson 
+		FROM
+			tblPerson
 			LEFT JOIN tblPersonNotes as MN ON (
 				MN.intPersonID = tblPerson.intPersonID
 			)
-    	WHERE 
+    	WHERE
 		    tblPerson.intPersonID = ?
 	];
 
@@ -1475,7 +1474,7 @@ sub postPersonUpdate {
         my $clm = setClient( \%cv );
         if ( $params->{'isDuplicate'} ) {
             my $st = qq[
-                UPDATE tblPerson SET intSystemStatus=$Defs::PERSONSTATUS_POSSIBLE_DUPLICATE 
+                UPDATE tblPerson SET intSystemStatus=$Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
                 WHERE intPersonID=$id
             ];
             $db->do($st);
@@ -1486,9 +1485,9 @@ sub postPersonUpdate {
         else {
             my $rc = WorkFlow::addWorkFlowTasks(
                 $Data,
-                'PERSON', 
+                'PERSON',
                 'NEW',
-                $Data->{'clientValues'}{'authLevel'} || 0, 
+                $Data->{'clientValues'}{'authLevel'} || 0,
                 getID($Data->{'clientValues'}) || 0,
                 $id,
                 0,
@@ -1557,7 +1556,7 @@ sub prePersonAdd {
             surname   => $params->{'d_strLocalSurname'},
             dob       => $params->{'d_dtDOB'},
         );
-        
+
         my $resultHTML = '';
 
         #At some stage PrimaryClub and DuplicatePrevention may/should become intertwined.
@@ -1566,13 +1565,13 @@ sub prePersonAdd {
         if ($Data->{'SystemConfig'}{'checkPrimaryClub'}) {
             my $format = 1; #This should be set to 2 when the TransferLink part is working...mick
 
-            $resultHTML = checkPrimaryClub($Data, \%newPerson, $format); 
+            $resultHTML = checkPrimaryClub($Data, \%newPerson, $format);
         }
 
         if (!$resultHTML) {
             if ($Data->{'SystemConfig'}{'DuplicatePrevention'}) {
                 my $prefix = (exists $params->{'formID'} and $params->{'formID'}) ? 'yn' : 'd_int';
- 
+
                 my @personTypes = ($prefix.'Player', $prefix.'Coach', $prefix.'MatchOfficial', $prefix.'Official', $prefix.' Misc', $prefix.' Volunteer');
 
                 my @registeringAs = ();

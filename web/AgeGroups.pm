@@ -35,7 +35,7 @@ sub handleAgeGroups	{
 		($tempResultHTML,$title)=listAgeGroups($Data);
 		$resultHTML .= $tempResultHTML;
 	}
-	
+
 	return ($resultHTML,$title);
 }
 
@@ -50,7 +50,7 @@ sub ageGroup_details	{
 	my $intAssocID = $Data->{'clientValues'}{'assocID'} >= 0 ? $Data->{'clientValues'}{'assocID'} : 0;
 	my $txt_Name= $Data->{'SystemConfig'}{'txtAgeGroup'} || 'Age Group';
 	my $txt_Names= $Data->{'SystemConfig'}{'txtAgeGroups'} || 'Age Groups';
-	
+
 	my %genderoptions=();
 	for my $k (keys %Defs::genderInfo)        {
 		next if !$k and $Data->{'SystemConfig'}{'NoUnspecifiedGender'};
@@ -58,12 +58,12 @@ sub ageGroup_details	{
 	}
 
     my ($DefCodes, $DefCodesOrder) = DefCodes::getDefCodes(
-        dbh        => $Data->{'db'}, 
+        dbh        => $Data->{'db'},
         realmID    => $Data->{'Realm'},
         subRealmID => $Data->{'RealmSubType'},
         assocID    => $intAssocID,
     );
-       
+
   my $client=setClient($Data->{'clientValues'}) || '';
 	my %FieldDefinitions=(
 		fields=>	{
@@ -100,7 +100,7 @@ sub ageGroup_details	{
 				type  => 'lookup',
 				options => \%genderoptions,
 				sectionname => 'details',
-				firstoption => [''," "], 
+				firstoption => [''," "],
 				compulsory => 1,
 			},
 			intCategoryID => {
@@ -110,7 +110,7 @@ sub ageGroup_details	{
 				options => $DefCodes->{-1005},
 				order => $DefCodesOrder->{-1005},
 				sectionname => 'details',
-				firstoption => [''," "], 
+				firstoption => [''," "],
 			},
 			intRecStatus=> {
 				label => "$txt_Name Active",
@@ -124,7 +124,7 @@ sub ageGroup_details	{
 		order => [qw(strAgeGroupDesc dtDOBStart dtDOBEnd intAgeGroupGender intCategoryID intRecStatus)],
 		sections => [
 			['details',"$txt_Name Details"],
-		],	
+		],
 		options => {
 			labelsuffix => ':',
 			hideblank => 1,
@@ -195,7 +195,7 @@ sub loadAgeGroupDetails {
   my $statement=qq[
     		SELECT *
     		FROM tblAgeGroups
-    		WHERE intAgeGroupID = $id 
+    		WHERE intAgeGroupID = $id
 			AND intRealmID = $realmID
 			AND (intAssocID = $assocID OR intAssocID = 0)
 			AND (intRealmSubTypeID IN (0,$realmSubType))
@@ -205,8 +205,8 @@ sub loadAgeGroupDetails {
 	my $field=$query->fetchrow_hashref();
 	$query->finish;
 
-	foreach my $key (keys %{$field})  { 
-		if(!defined $field->{$key}) {$field->{$key}='';} 
+	foreach my $key (keys %{$field})  {
+		if(!defined $field->{$key}) {$field->{$key}='';}
 	}
 	return $field;
 }
@@ -217,7 +217,7 @@ sub getAgeGroups	{
 	$blankagegroups ||= 0;
 	$allagegroups ||= 0;
   my $assocID=$Data->{'clientValues'}{'assocID'} || $Defs::INVALID_ID;
-  
+
 	my $st=qq[
 		SELECT intAgeGroupID, strAgeGroupDesc , intAgeGroupGender
 		FROM tblAgeGroups
@@ -225,7 +225,7 @@ sub getAgeGroups	{
 			AND (intRealmSubTypeID IN (0, $Data->{'RealmSubType'}))
 			AND intRecStatus=1
 		ORDER BY dtDOBStart, strAgeGroupDesc
-	]; 
+	];
 
 	my $query = $Data->{'db'}->prepare($st);
 	$query->execute();
@@ -291,15 +291,15 @@ sub listAgeGroups {
 	my @rowdata = ();
   while (my $dref= $query->fetchrow_hashref()) {
     my $tempClient = setClient(\%tempClientValues);
-    $dref->{AgeGroupGender} = $dref->{intAgeGroupGender} 
-			? $Defs::genderInfo{$dref->{intAgeGroupGender}} 
+    $dref->{AgeGroupGender} = $dref->{intAgeGroupGender}
+			? $Defs::genderInfo{$dref->{intAgeGroupGender}}
 			: '';
-    $dref->{AddedBy} = $dref->{intAssocID} 
-			? $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC} 
+    $dref->{AddedBy} = $dref->{intAssocID}
+			? $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC}
 			: $Data->{'LevelNames'}{$Defs::LEVEL_NATIONAL};
 		my $link = '';
 		if ($dref->{intAssocID} > 0 or $Data->{clientValues}{authLevel} == $Defs::LEVEL_NATIONAL)	{
-			$link = "$Data->{'target'}?client=$tempClient&amp;a=AGEGRP_DTE&amp;ageGroupID=$dref->{intAgeGroupID}" 
+			$link = "$Data->{'target'}?client=$tempClient&amp;a=AGEGRP_DTE&amp;ageGroupID=$dref->{intAgeGroupID}"
 		}
 
     push @rowdata, {
@@ -319,7 +319,7 @@ sub listAgeGroups {
   {
     my $tempClient = setClient(\%tempClientValues);
     $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$tempClient&amp;a=AGEGRP_DTA">Add</a></span>];
-    $addlink = '' if ($Data->{'SystemConfig'}{'AgeGroups_NationalOnly'} and $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL);
+    $addlink = '' if ($Data->{'SystemConfig'}{'AgeGroups_NationalOnly'} and $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL and $Data->{'ReadOnlyLogin'});
   }
 
   my $modoptions=qq[<div class="changeoptions">$addlink</div>];
