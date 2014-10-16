@@ -224,6 +224,7 @@ sub listTasks {
             pr.strSport,
 	    t.strRegistrationNature,
             dt.strDocumentName,
+            p.intSystemStatus,
 	    p.strLocalFirstname, 
             p.strLocalSurname, 
             p.intGender as PersonGender,
@@ -239,21 +240,23 @@ sub listTasks {
             t.intProblemResolutionEntityID,
             t.strTaskNotes as TaskNotes,
             t.intOnHold as OnHold
-		FROM tblWFTask AS t
-        LEFT JOIN tblEntity as e ON (e.intEntityID = t.intEntityID)
+	    FROM tblWFTask AS t
+                LEFT JOIN tblEntity as e ON (e.intEntityID = t.intEntityID)
 		LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (t.intPersonRegistrationID = pr.intPersonRegistrationID)
 		LEFT JOIN tblPerson AS p ON (t.intPersonID = p.intPersonID)
 		LEFT JOIN tblUserAuthRole AS uar ON ( t.intApprovalEntityID = uar.entityID )
 		LEFT OUTER JOIN tblDocumentType AS dt ON (t.intDocumentTypeID = dt.intDocumentTypeID)
 		LEFT JOIN tblUserAuthRole AS uarRejected ON ( t.intProblemResolutionEntityID = uarRejected.entityID )
 		WHERE
-            t.intRealmID = $Data->{'Realm'}
-			AND (
-                (intApprovalEntityID = ? AND t.strTaskStatus = 'ACTIVE')
-                OR
-                (intProblemResolutionEntityID = ? AND t.strTaskStatus = 'REJECTED')
-                OR
-                (intOnHold = 1 AND (intApprovalEntityID = ? OR intProblemResolutionEntityID = ?))
+                  p.intSystemStatus != $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
+                    AND 
+                  t.intRealmID = $Data->{'Realm'}
+		    AND (
+                      (intApprovalEntityID = ? AND t.strTaskStatus = 'ACTIVE')
+                        OR
+                      (intProblemResolutionEntityID = ? AND t.strTaskStatus = 'REJECTED')
+                        OR
+                      (intOnHold = 1 AND (intApprovalEntityID = ? OR intProblemResolutionEntityID = ?))
             )
     ];
 #print STDERR Dumper 'VALUE IS:' .$st;
@@ -287,7 +290,7 @@ sub listTasks {
 
     my $client = unescape($Data->{client});
 	while(my $dref= $q->fetchrow_hashref()) {
-
+        if ($dref->{intSystemStatus} != $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE) {
         my %tempClientValues = getClient($client);
 		$rowCount ++;
         my $name = '';
@@ -331,14 +334,14 @@ sub listTasks {
 
 	 my %single_row = (
 			WFTaskID => $dref->{intWFTaskID},
-            TaskDescription => $taskDescription,
+                        TaskDescription => $taskDescription,
 			TaskType => $dref->{strTaskType},
 			TaskNotes=> $dref->{TaskNotes},
 			AgeLevel => $dref->{strAgeLevel},
 			RuleFor=> $dref->{strWFRuleFor},
 			RegistrationNature => $dref->{strRegistrationNature},
 			DocumentName => $dref->{strDocumentName},
-            Name=>$name,
+                        Name=>$name,
 			LocalEntityName=> $dref->{EntityLocalName},
 			LocalFirstname => $dref->{strLocalFirstname},
 			LocalSurname => $dref->{strLocalSurname},
@@ -353,6 +356,7 @@ sub listTasks {
 		);
    
 		push @TaskList, \%single_row;
+          }
 	}
 
     ## Calc Dupl Res and Pending Clr here
