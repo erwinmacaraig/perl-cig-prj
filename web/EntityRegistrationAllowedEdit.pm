@@ -30,7 +30,7 @@ sub handleEntityRegistrationAllowedEdit    {
     my $resultHTML='';
     my $title='';
     my $intEntityRegistrationAllowedID = safe_param('RID','number') || '0';
-    
+
     if ($action =~/^ERA_ADD/) {
         ($resultHTML,$title) = rule_details($action, $Data,$intEntityRegistrationAllowedID);
     }
@@ -43,7 +43,7 @@ sub handleEntityRegistrationAllowedEdit    {
         ($tempResultHTML,$title) = listRules($Data);
         $resultHTML .= $tempResultHTML;
     };
-        
+
     return ($resultHTML,$title);
 }
 
@@ -57,10 +57,10 @@ sub rule_details   {
 	if ($action eq 'ERA_ADD') {
 		$option = 'add';
 	}
-	elsif($action eq 'ERA_DELETE'){ 
+	elsif($action eq 'ERA_DELETE'){
 		$option = 'delete';
 	}
-	
+
     #	else {
     #		$option = 'delete';
     #	};
@@ -74,14 +74,17 @@ sub rule_details   {
 
     my $field = loadRuleDetails($Data->{'db'}, $Data, $intEntityRegistrationAllowedID) || ();
     #changed the last parameter from $entityID to $intEntityRegistrationAllowedID
-    
+
+    my $allowedit =( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB ? 1 : 0 ) );
+    $Data->{'ReadOnlyLogin'} ? $allowedit = 0 : undef;
+
     my %genderoptions = ();
     for my $k ( keys %Defs::PersonGenderInfo ) {
         next if !$k;
         next if ($k eq $Defs::GENDER_NONE );
         $genderoptions{$k} = $Defs::PersonGenderInfo{$k} || '';
     }
-        
+
     ### Move variable declarations here ###
     my %FieldDefinitions;
     my $resultHTML='';
@@ -122,7 +125,7 @@ sub rule_details   {
        	       options     => \%Defs::personLevel,
                sectionname => 'details',
                firstoption => [ '', " " ],
-             },      
+             },
              strRegistrationNature => {
                label => 'Registration Nature',
                value => $field->{strRegistrationNature},
@@ -147,8 +150,8 @@ sub rule_details   {
     		strPersonLevel
     		strAgeLevel
         )],
-        sections => [ 
-            [ 'details', "Registration Details" ], 
+        sections => [
+            [ 'details', "Registration Details" ],
         ],
         options => {
           labelsuffix => ':',
@@ -157,21 +160,21 @@ sub rule_details   {
           formname => 'n_form',
           submitlabel => $Data->{'lang'}->txt('Update'),
           introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
-          NoHTML => 1, 
+          NoHTML => 1,
           beforeaddFunction => \&isRegoAllowedToSystem,
           beforeaddParams => [$Data, $Data->{'clientValues'}{'authLevel'}, $field->{strRegistrationNature}, $Data->{'clientValues'}{'currentLevel'}],
           addSQL => qq[
               INSERT IGNORE INTO tblEntityRegistrationAllowed (
                   intRealmID,
                   intSubRealmID,
-                  intEntityID, 
-                  --FIELDS-- 
+                  intEntityID,
+                  --FIELDS--
               )
               VALUES (
                   $Data->{'Realm'},
                   $Data->{'RealmSubType'},
-                  $entityID, 
-                  --VAL-- 
+                  $entityID,
+                  --VAL--
               )
           ],
           auditFunction=> \&auditLog,
@@ -180,10 +183,10 @@ sub rule_details   {
             'Add',
             'Rule'
           ],
-    
+
           afteraddFunction => \&postRuleAdd,
           afteraddParams => [$option,$Data,$Data->{'db'}],
-    
+
           LocaleMakeText => $Data->{'lang'},
         },
         carryfields =>  {
@@ -196,19 +199,19 @@ sub rule_details   {
     $title=qq[Registration Accepted];
     }
     ##### DELETING A RULE ####
-    elsif($option eq 'delete'){ 
-                                                                                                             
+    elsif($option eq 'delete'){
+
        my $statement=qq[ DELETE FROM tblEntityRegistrationAllowed WHERE intEntityRegistrationAllowedID = ? AND intEntityID = ? ];
        my $query = $db->prepare($statement);
        $query -> execute($intEntityRegistrationAllowedID,$entityID);
        $query->finish();
        $title = $Data->{lang}->txt("Registration Rule Deleted");
-     
+
    } #### END ELSEIF  (FOR DELETING A RULE) ###
-    
-    
+
+
     #my $chgoptions='';
-    
+
     # if($option eq 'display')  {
         # Edit Venue.
     #    $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DTE&amp;venueID=$venueID">Edit Venue</a></span> ] if allowedAction($Data, 'venue_e');
@@ -216,19 +219,19 @@ sub rule_details   {
     #if ($option eq 'delete') {
     # Delete Venue.
     #    my $ruleObj = new EntityObj('db'=>$Data->{db},ID=>$intEntityRegistrationAllowedID);
-        
+
     #    $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=ERA_DELETE&amp;venueID=$intEntityRegistrationAllowedID" onclick="return confirm('Are you sure you want to delete this venue');">Delete Rule</a> ] if $ruleObj->canDelete();
     #}
-    
+
     #$chgoptions=qq[<div class="changeoptions">$chgoptions</div>] if $chgoptions;
-    
+
     #$title=$chgoptions.$title;
-    
+
     if ($option eq 'add') {
-	    $title=$Data->{lang}->txt("Add New Registration Type");     	
+	    $title=$Data->{lang}->txt("Add New Registration Type");
     }
     my $text = qq[<p style = "clear:both;"><a href="$Data->{'target'}?client=$client&amp;a=ERA_LIST"> ] . $Data->{lang}->txt("Click here") . q[</a> ] . $Data->{lang}->txt("to return to list of current registration types accepted") . q[</p>];
-     
+
     if($option eq 'delete'){
        my $delMsg = q[ <div class="OKmsg"> ] . $Data->{lang}->txt("Registration rule deleted"). q[ </div><br> ];
        $resultHTML = $text.$resultHTML.$delMsg.$text;
@@ -236,18 +239,18 @@ sub rule_details   {
     else {
        $resultHTML = $text.$resultHTML.$text;
     }
-   
+
 
     return ($resultHTML,$title);
 }
 
 sub loadRuleDetails {
   my($db, $Data, $intEntityRegistrationAllowedID) = @_;
-                       
-  my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});                       
-                                                                                                        
+
+  my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+
   my $statement=qq[
-    SELECT 
+    SELECT
 		strPersonType,
 		strSport,
 		strPersonLevel,
@@ -265,12 +268,12 @@ sub loadRuleDetails {
   	 );
   my $field=$query->fetchrow_hashref();
   $query->finish;
-                                                                                                        
-  foreach my $key (keys %{$field}){ 
-       if(!defined $field->{$key}){ 
-           $field->{$key}='';          
-       } 
-        
+
+  foreach my $key (keys %{$field}){
+       if(!defined $field->{$key}){
+           $field->{$key}='';
+       }
+
  }
   return $field;
 }
@@ -285,7 +288,7 @@ sub listRules  {
 	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
     $st =qq[
-      SELECT 
+      SELECT
         intEntityRegistrationAllowedID,
         strPersonType,
         strSport,
@@ -293,18 +296,18 @@ sub listRules  {
         strPersonLevel,
         strRegistrationNature,
         strAgeLevel
-      FROM tblEntityRegistrationAllowed 
+      FROM tblEntityRegistrationAllowed
       WHERE intEntityID = ?
       ORDER BY strPersonType, strSport, strPersonLevel, strRegistrationNature, strAgeLevel
     ];
-    
+
 	$q = $db->prepare($st) or query_error($st);
 	$q->execute($entityID);
         my $results = 0;
         my @rowdata = ();
-    
+
     while (my $dref = $q->fetchrow_hashref) {
-      $results = 1;     
+      $results = 1;
       push @rowdata, {
         id => $dref->{'intEntityRegistrationAllowedID'} || 0,
         PersonType => $Defs::personType{$dref->{'strPersonType'}} || '',
@@ -318,9 +321,9 @@ sub listRules  {
     $q->finish;
 
 	#PP add to language file
-    my $addlink = qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$Data->{client}&amp;a=ERA_ADD">] . $Data->{'lang'}->txt("Add new Rule") . q[ </a></span> ];
+    my $addlink = qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$Data->{client}&amp;a=ERA_ADD">] . $Data->{'lang'}->txt("Add new Rule") . q[ </a></span> ] if(!$Data->{'ReadOnlyLogin'});
     my $title = $Data->{lang}->txt("Registrations accepted by my organisation");
- 
+
     my $modoptions = qq[<div class="changeoptions">$addlink</div>];
     $title=$modoptions.$title;
     my $rectype_options = '';
@@ -349,10 +352,10 @@ sub listRules  {
         {
             name =>   $Data->{'lang'}->txt(' '),
      	    field =>  'DeleteLink',
-	    type => 'HTML',         
+	    type => 'HTML',
         },
     );
-    
+
 
     my $grid  = showGrid(
         Data    => $Data,
@@ -375,9 +378,9 @@ sub listRules  {
 sub postRuleAdd {
   my($id,$params,$action,$Data,$db)=@_;
   return undef if !$db;
-  
+
   #PP Check to see if this is valid, ie if it already exists, return an error message
-  
+
   if($action eq 'add')  {
 
     {
@@ -389,16 +392,16 @@ sub postRuleAdd {
 
       ]);
     }
-    
+
   }
   else {
   	 {
 	      my $client = setClient($Data->{'clientValues'}) || '';
-	
+
 	      return (0,qq[
 	        <div class="OKmsg"> $Data->{lang}->txt("Registration rule deleted.") </div><br>
 	        <a href="$Data->{'target'}?client=$client&amp;a=ERA_List">$Data->{lang}->txt("Add another Registration Type")</a>
-	
+
 	      ]);
     }
   }

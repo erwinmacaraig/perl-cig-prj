@@ -81,7 +81,6 @@ sub handleRegistrationFlowBulk {
         $Hidden{'ag'} = param('ag');
         $Hidden{'nat'} = param('nat');
         $body.= "$bulk_ref->{'personType'} | $bulk_ref->{'sport'} | $bulk_ref->{'personLevel'}"; 
-print STDERR $action;
     if ( $action eq 'PREGFB_TU' ) {
         #add rego record with types etc.
         my $msg='';
@@ -135,22 +134,20 @@ print STDERR $action;
         my $count = bulkPersonRollover($Data, 'PREGFB_SPU', $bulk_ref, \%Hidden, 1);
 
         my $rolloverIDs= param('rolloverIDs') || '';
-        my $prodIds = param('prodIds');
-        my $prodQty= param('prodQty');
+#        my $prodIds = param('prodIds');
+#        my $prodQty= param('prodQty');
         my $markPaid = param('markPaid');
         my $paymentType= param('paymentType');
 
         #FC-145 (having duplicate entries upon page refresh.. need to check number of records upon submit)
         if($count > 0) {
-            $body .= bulkRegoSubmit($Data, $bulk_ref, $rolloverIDs, $prodIds, $prodQty, $markPaid, $paymentType);
+            my $txnIds = bulkRegoSubmit($Data, $bulk_ref, $rolloverIDs, $prodIds, $prodQty, $markPaid, $paymentType);
+            $Hidden{'txnIds'} = $txnIds;
         }
 #        return $Data->{'lang'}->txt("No $Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'} selected") if (! scalar @MembersToRollover);
         $body .= qq[ROLLOVER FOR $rolloverIDs];
-        warn("ROLLOVER$rolloverIDs");
-        $action = $Flow{$action};
     }
  
-print STDERR $action;
 ## FLOW SCREENS
     if ( $action eq 'PREGFB_T' ) {
         my $url = $Data->{'target'}."?client=$client&amp;a=PREGFB_TU&amp;";
@@ -167,7 +164,6 @@ print STDERR $action;
     }
     elsif ( $action eq 'PREGFB_SP' ) {
         ($bulk_ref->{'nationalPeriodID'}, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $bulk_ref->{'sport'}, $bulk_ref->{'registrationNature'});
-        print STDERR "NATIONAL PERIOD : $bulk_ref->{'nationalPeriodID'}";
         my ($listPersons_body, undef) = bulkPersonRollover($Data, 'PREGFB_SPU', $bulk_ref, \%Hidden, 0);
         $body .= $listPersons_body;
    }
@@ -175,7 +171,7 @@ print STDERR $action;
         $body .= displayRegoFlowProductsBulk($Data, 0, $client, $entityLevel, $originLevel, $bulk_ref, $entityID, $personID, \%Hidden);
    }
     elsif ( $action eq 'PREGFB_C' ) {
-        $body .= displayRegoFlowCompleteBulk($Data, 0, $client, $originLevel, $bulk_ref, $entityID, $personID, \%Hidden);
+        $body .= displayRegoFlowCompleteBulk($Data, $client, \%Hidden);
     }    
     else {
     }
