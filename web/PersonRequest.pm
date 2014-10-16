@@ -20,6 +20,7 @@ use Utils;
 use AuditLog;
 use PersonRegistration;
 use Person;
+use EmailNotifications::PersonRequest;
 
 use CGI qw(unescape param);
 use Log;
@@ -95,9 +96,9 @@ sub listPersonRecord {
     my $client = setClient( $Data->{'clientValues'} ) || '';
 	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
 
-    my $MID = safe_param('mid','number') || '';
-    my $firstname = safe_param('firstname','word') || '';
-    my $lastname = safe_param('lastname','word') || '';
+    my $MID = safe_param('mid','word') || '';
+    my $firstname = safe_param('firstname','words') || '';
+    my $lastname = safe_param('lastname','words') || '';
     #TODO: might need to validate dob or use jquery datepicker
     my $dob = $params{'dob'} || '';
     my $request_type = $params{'request_type'} || '';
