@@ -225,7 +225,6 @@ sub listTasks {
 	    t.strRegistrationNature,
             dt.strDocumentName,
 	    p.strLocalFirstname, 
-            p.intSystemStatus,
             p.strLocalSurname, 
             p.intGender as PersonGender,
             e.strLocalName as EntityLocalName,
@@ -285,12 +284,9 @@ sub listTasks {
 
 	my @TaskList = ();
 	my $rowCount = 0;
-	my %single_row = ();
 
     my $client = unescape($Data->{client});
 	while(my $dref= $q->fetchrow_hashref()) {
-   
-    if ($dref->{intSystemStatus} != $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE) {
 
         my %tempClientValues = getClient($client);
 		$rowCount ++;
@@ -333,7 +329,7 @@ sub listTasks {
         my $showView = 0;
         $showView = 1 if(($showApprove and $dref->{'OnHold'} == 1) or ($showResolve and $dref->{'OnHold'} == 1) or $dref->{'OnHold'} == 0);
 
-		my %single_row = (
+	 my %single_row = (
 			WFTaskID => $dref->{intWFTaskID},
             TaskDescription => $taskDescription,
 			TaskType => $dref->{strTaskType},
@@ -356,8 +352,6 @@ sub listTasks {
             OnHold => $dref->{OnHold}
 		);
    
-    }
-
 		push @TaskList, \%single_row;
 	}
 
