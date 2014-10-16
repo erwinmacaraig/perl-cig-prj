@@ -1,10 +1,15 @@
 <form action="main.cgi" method="POST">
-    <p>Fill in the members National Number, or enter Surname and DOB<br></p>
     <table>
-    <tbody><tr><td><span class="label">Member Association ID:</span></td><td><span class="formw"><input type="text" name="mid" value=""></span></td></tr>
+    [% IF transferTypeOption != '' %]
+    <tbody><tr><td><span class="label">Transfer type:</span></td><td><span class="formw">[% transferTypeOption %]</span></td></tr>
+    [% END %]
+    <tbody><tr><td><span class="label">Person Lookup:</span></td><td><span class="formw"><input type="text" name="search_keyword" value=""></span></td></tr>
+    <tbody><tr><td><span class="label"></span></td><td><span class="label">Enter Name or Member ID</span></td></tr>
+    <!--
     <tr><td><span class="label">First Name:</span></td><td><span class="formw"><input type="text" name="firstname" value=""></span></td></tr>
     <tr><td><span class="label">Last Name:</span></td><td><span class="formw"><input type="text" name="lastname" value=""></span></td></tr>
     <tr><td><span class="label">Date of Birth (yyyy-mm-dd):</span></td><td><span class="formw"><input type="text" name="dob" value=""></span></td></tr>
+    -->
     </tbody></table>
     <input type="submit" name="submit" value="Search">   
     <input type="hidden" value="[% action %]" name="a"> <input type="hidden" value="[% client %]" name="client">
