@@ -224,8 +224,9 @@ sub listTasks {
             pr.strSport,
 			t.strRegistrationNature,
             dt.strDocumentName,
-			p.strLocalFirstname,
-            p.strLocalSurname,
+			p.strLocalFirstname, 
+      p.intSystemStatus,
+            p.strLocalSurname, 
             p.intGender as PersonGender,
             e.strLocalName as EntityLocalName,
             p.intPersonID,
@@ -256,7 +257,7 @@ sub listTasks {
                 (intOnHold = 1 AND (intApprovalEntityID = ? OR intProblemResolutionEntityID = ?))
             )
     ];
-
+print STDERR Dumper 'VALUE IS:' .$st;
         #my $userID = $Data->{'clientValues'}{'userID'}
         ## if ($userID)
         ## $st .= qqp AND t.intCreatedByUserID <> $userID ];
@@ -284,9 +285,13 @@ sub listTasks {
 
 	my @TaskList = ();
 	my $rowCount = 0;
+	my %single_row = ();
 
     my $client = unescape($Data->{client});
 	while(my $dref= $q->fetchrow_hashref()) {
+   
+    if ($dref->{intSystemStatus} != $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE) {
+
         my %tempClientValues = getClient($client);
 		$rowCount ++;
         my $name = '';
@@ -350,6 +355,9 @@ sub listTasks {
             showView => $showView,
             OnHold => $dref->{OnHold}
 		);
+   
+    }
+
 		push @TaskList, \%single_row;
 	}
 
