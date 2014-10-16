@@ -29,6 +29,7 @@ use Data::Dumper;
 use RecordTypeFilter;
 use PersonRegistrationDetail;
 
+use Switch;
 sub handlePendingRegistrations  {
     my ($action, $Data, $entityID, $personRegistrationID) = @_;
 
@@ -42,7 +43,7 @@ sub handlePendingRegistrations  {
     }
     elsif ( $action eq 'PENDPR_')   {
         ($resultHTML , $title)= listPendingRegistrations( $Data, $entityID) ;
-        $title = $lang->txt('Pending Registrations');
+        
     }
     else {
         print STDERR "Unknown action $action\n";
@@ -247,27 +248,32 @@ sub listPendingRegistrations    {
             elementID => 'dd_actstatus',
             allvalue  => 'ALL',
         },
-    ];
-
-    my $grid  = showGrid(
-        Data    => $Data,
-        columns => \@headers,
-        rowdata => \@rowdata,
-        gridid  => 'grid',
-        width   => '99%',
-        filters => $filterfields,
-    ); 
-
+    ];   
+    my $client=setClient($Data->{'clientValues'});
+    my %tempClientValues = getClient($client);
     my @fielddata = ();
+    my $tempaction;
+    my $client=setClient($Data->{'clientValues'}) || '';
     $st = qq[SELECT intEntityLevel, intEntityID, strLocalName, strStatus FROM tblEntity INNER JOIN tblEntityLinks ON tblEntity.intEntityID =
              tblEntityLinks.intChildEntityID WHERE intParentEntityID = ? AND intRealmID = ? AND strStatus = 'PENDING' ORDER BY intEntityLevel, strLocalName ASC 
               ];
     $query = $Data->{db}->prepare($st);
     $query->execute( $entityID, $Data->{Realm} );
     while (my $dref = $query->fetchrow_hashref) {
-        
+        $tempClientValues{currentLevel} = $dref->{intEntityLevel};
+        setClientValue(\%tempClientValues, $dref->{intEntityLevel}, $dref->{intEntityID});
+        my $tempClient = setClient(\%tempClientValues);
+        switch($dref->{intEntityLevel}){
+        	case -47 {
+        		$tempaction = "$Data->{'target'}?client=$client&amp;a=VENUE_DTE&amp;venueID=".$dref->{intEntityID};
+        	}
+        	case 3 {
+        		$tempaction = "$Data->{'target'}?client=$tempClient&amp;a=C_DTE";
+        	}
+        }
         push @fielddata, {
             id => $dref->{intEntityID},
+            SelectLink => "$tempaction",
             strLocalName => $dref->{strLocalName},
             EntityLevel => $Defs::LevelNames{$dref->{intEntityLevel}},
             strStatus => $dref->{strStatus}, 
@@ -294,34 +300,48 @@ sub listPendingRegistrations    {
             width  => 30,
         },
        
-
-
     );
+   
 
-    my $grid2  = showGrid(
+   $title = '';
+    # class="grid-filter-wrap"
+    my $resultHTML = '';
+    if(@rowdata){
+    	$title = $lang->txt('Pending Registrations');
+    	 my $grid  = showGrid(
+        Data    => $Data,
+        columns => \@headers,
+        rowdata => \@rowdata,
+        gridid  => 'grid',
+        width   => '99%',
+        filters => $filterfields,
+    ); 
+    	$resultHTML .=  qq[<div>
+            <div style="width:99%;">$rectype_options</div>
+             $grid             
+        </div>
+        ];
+    }
+    if(@fielddata){
+    	 my $grid2  = showGrid(
         Data    => $Data,
         columns => \@entityheadersgrid,
-        rowdata => \@fielddata,
-        gridid  => 'entitygrid',
+        rowdata => \@fielddata,   
+        gridid  => 'grid2',     
         width   => '99%',
         
     );
-
-    # class="grid-filter-wrap"
-    my $resultHTML = qq[
-        <div>
-            <div style="width:99%;">$rectype_options</div>
-             $grid  
-           
-        </div>
-        
+     $resultHTML .= qq[
          <div class="pageHeading">Pending Entity Registrations</div>
          <div>
              $grid2          
         </div> 
-        
+    ];
+   
+    }
   
-     ];
+
+           
     return ($resultHTML,$title);
 }
 1;
