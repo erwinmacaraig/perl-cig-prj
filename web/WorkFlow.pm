@@ -215,17 +215,17 @@ sub listTasks {
 	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
     $st = qq[
-		SELECT
+            SELECT
             t.intWFTaskID,
             t.strTaskStatus,
             t.strTaskType,
             pr.strPersonLevel,
             pr.strAgeLevel,
             pr.strSport,
-			t.strRegistrationNature,
+	    t.strRegistrationNature,
             dt.strDocumentName,
-			p.strLocalFirstname, 
-      p.intSystemStatus,
+	    p.strLocalFirstname, 
+            p.intSystemStatus,
             p.strLocalSurname, 
             p.intGender as PersonGender,
             e.strLocalName as EntityLocalName,
@@ -257,7 +257,7 @@ sub listTasks {
                 (intOnHold = 1 AND (intApprovalEntityID = ? OR intProblemResolutionEntityID = ?))
             )
     ];
-print STDERR Dumper 'VALUE IS:' .$st;
+#print STDERR Dumper 'VALUE IS:' .$st;
         #my $userID = $Data->{'clientValues'}{'userID'}
         ## if ($userID)
         ## $st .= qqp AND t.intCreatedByUserID <> $userID ];
