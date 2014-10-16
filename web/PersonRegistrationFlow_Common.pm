@@ -321,7 +321,7 @@ sub displayRegoFlowProductsBulk {
         nextaction=>"PREGFB_PU",
         target => $Data->{'target'},
         product_body => $product_body,
-        allowManualPay=> 1,
+        allowManualPay=> 0,
         manualPaymentTypes => \%Defs::manualPaymentTypes,
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
