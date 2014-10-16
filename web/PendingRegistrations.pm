@@ -341,6 +341,9 @@ sub listPendingRegistrations    {
     ];
    
     }
+    else {
+    	$resultHTML = 'No Pending Registrations';
+    }
   
 
            
