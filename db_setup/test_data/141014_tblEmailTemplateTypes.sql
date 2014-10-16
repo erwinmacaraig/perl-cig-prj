@@ -1,3 +1,5 @@
+TRUNCATE TABLE tblEmailTemplateTypes;
+
 INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_WFTASK_ADDED', 'wftask_added', 1, NOW());
 INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_WFTASK_APPROVED', 'wftask_approved', 1, NOW());
 INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_WFTASK_REJECTED', 'wftask_rejected', 1, NOW());
@@ -14,3 +16,5 @@ INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, st
 INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTTRANSFER_OVERRIDDEN', 'requesttransfer_overridden', 1, NOW());
 INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTTRANSFER_REJECTED', 'requesttransfer_rejected', 1, NOW());
 INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTTRANSFER_COMPLETED', 'requesttransfer_completed', 1, NOW());
+INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTACCESS_SENT', 'requestaccess_sent', 1, NOW());
+INSERT INTO tblEmailTemplateTypes(intRealmID, intSubRealmID, strTemplateType, strFileNamePrefix, intActive, tTimeStamp) VALUES(1, 0, 'NOTIFICATION_REQUESTTRANSFER_SENT', 'requesttransfer_sent', 1, NOW());
