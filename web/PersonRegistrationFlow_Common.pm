@@ -38,12 +38,18 @@ use RegoAgeRestrictions;
 
 sub displayRegoFlowCompleteBulk {
 
-    my ($Data, $client) = @_;
+    my ($Data, $client, $hidden_ref) = @_;
+    my $gateways = '';
+    if ($Data->{'SystemConfig'}{'AllowTXNs_CCs'} && $hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0)   {
+        $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
+    }
     my %PageData = (
         target => $Data->{'target'},
         Lang => $Data->{'lang'},
         client=>$client,
+        gateways => $gateways,
     );
+
     my $body = runTemplate($Data, \%PageData, 'registration/completebulk.templ') || '';
     return $body;
 }
@@ -118,11 +124,11 @@ sub displayRegoFlowCheckout {
 
     my ($Data, $hidden_ref) = @_;
 
-    my $gCount = param('gatewayCount') || 0;
+    my $gCount = param('gatewayCount') || $hidden_ref->{'gatewayCount'} || 0;
     my $cc_submit = '';
     foreach my $i (1 .. $gCount)    {
-        if (param("cc_submit[$i]")) {
-            $cc_submit = param("pt_submit[$i]");
+        if (param("cc_submit[$i]") or $hidden_ref->{"cc_submit[$i]"}) {
+            $cc_submit = param("pt_submit[$i]") || $hidden_ref->{"pt_submit[$i]"};
         }
     }
     my @transactions= split /:/, $hidden_ref->{'txnIds'};
@@ -318,7 +324,7 @@ sub displayRegoFlowProductsBulk {
         nextaction=>"PREGFB_PU",
         target => $Data->{'target'},
         product_body => $product_body,
-        allowManualPay=> 1,
+        allowManualPay=> 0,
         manualPaymentTypes => \%Defs::manualPaymentTypes,
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
@@ -340,10 +346,12 @@ sub generateRegoFlow_Gateways   {
         <div id = "payment_cc" style= "ddisplay:none;"><br>
     ];
     my $gatewayCount = 0;
+    my $paymentType = 0;
     foreach my $gateway (@{$paymentTypes})  {
         $gatewayCount++;
         my $id = $gateway->{'intPaymentConfigID'};
         my $pType = $gateway->{'paymentType'};
+        $paymentType = $pType;
         my $name = $gateway->{'gatewayName'};
         $gateway_body .= qq[
             <input type="submit" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
@@ -365,6 +373,12 @@ sub generateRegoFlow_Gateways   {
         Lang => $Data->{'lang'},
         client=>$client,
     );
+    if ($gatewayCount == 1) {
+        $hidden_ref->{"pt_submit[1]"} = $paymentType; 
+        $hidden_ref->{"gatewayCount"} = 1;
+        $hidden_ref->{"cc_submit[1]"} = 1;
+        return displayRegoFlowCheckout($Data, $hidden_ref);
+    }
     return runTemplate($Data, \%PageData, 'registration/show_gateways.templ') || '';
 }
 
@@ -455,10 +469,13 @@ sub add_rego_record{
 sub bulkRegoSubmit {
 
     my ($Data, $bulk_ref, $rolloverIDs, $productIDs, $productQtys, $markPaid, $paymentType) = @_;
+print STDERR "IN BULK REGO $rolloverIDs | $productIDs | $productQtys\n\n\n\n";
 
     my $body = 'Submitting';
     my @IDs= split /\|/, $rolloverIDs;
 
+    my $totalAmount=0;
+    my @total_txns_added=();
     my $CheckProducts = getRegistrationItems(
         $Data,
         'REGO',
@@ -539,17 +556,21 @@ sub bulkRegoSubmit {
             '',
             $CheckProducts
         );
-        if ($paymentType and $markPaid)  {
-            my %Settings=();
-            $Settings{'paymentType'} = $paymentType;
-            my $logID = createTransLog($Data, \%Settings, $bulk_ref->{'entityID'},$txns_added, $amount); 
-            UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $logID);
-            product_apply_transaction($Data,$logID);
-        }
+        $totalAmount = $totalAmount + $amount;
+        push @total_txns_added, @{$txns_added};
+        #if ($paymentType and $markPaid)  {
+        #    my %Settings=();
+        #    $Settings{'paymentType'} = $paymentType;
+        #    my $logID = createTransLog($Data, \%Settings, $bulk_ref->{'entityID'},$txns_added, $amount); 
+        #    UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $logID);
+        #    product_apply_transaction($Data,$logID);
+        #}
           savePlayerPassport($Data, $pID);
     }
+    my $txnIds = join(':',@total_txns_added);
     
-    return $body;
+ 
+    return ($totalAmount, $txnIds);
 }
 1;
 

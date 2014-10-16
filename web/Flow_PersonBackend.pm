@@ -830,6 +830,27 @@ sub process_products {
     my $prodIds= join(':',@productsselected);
     $self->addCarryField('prodIds', $prodIds);
 
+    my $personID = $self->ID();
+    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
+    my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
+    my $regoID = $self->{'RunParams'}{'rID'} || 0;
+    my $client = $self->{'Data'}->{'client'};
+    my $rego_ref = {};
+    if($regoID) {
+        my $valid =0;
+        ($valid, $rego_ref) = validateRegoID(
+            $self->{'Data'}, 
+            $personID, 
+            $regoID, 
+            $entityID
+        );
+        $regoID = 0 if !$valid;
+    }
+
+    my $txnIds = save_rego_products($self->{'Data'}, $regoID, $personID, $entityID, $entityLevel, $rego_ref, $self->{'RunParams'});
+    $self->addCarryField('txnIds',$txnIds);
+
     return ('',1);
 }
 
@@ -958,6 +979,7 @@ sub display_complete {
             $rego_ref, 
             $entityID, 
             $personID, 
+            $self->{'CarryFields'}
         );
     }
     else    {
