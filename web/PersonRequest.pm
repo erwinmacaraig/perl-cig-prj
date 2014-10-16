@@ -436,6 +436,26 @@ sub submitRequestPage {
     my $requestID = $db->{mysql_insertid};
     warn "REQUEST ID $requestID";
 
+    my $notificationType = undef;
+
+    warn "NOTIF TYPE $requestType";
+    warn "NOTIF TYPE $notificationType";
+    my $emailNotification = new EmailNotifications::PersonRequest();
+    $emailNotification->setRealmID($Data->{'Realm'});
+    $emailNotification->setSubRealmID(0);
+    $emailNotification->setToEntityID($regDetails->{'intEntityID'});
+    $emailNotification->setFromEntityID($entityID);
+    $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
+    $emailNotification->setDefsName($Defs::admin_email_name);
+    $emailNotification->setNotificationType($requestType, "SENT");
+    $emailNotification->setSubject("Request ID - " . $requestID);
+    $emailNotification->setLang($Data->{'lang'});
+    $emailNotification->setDbh($Data->{'db'});
+
+    my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+    $emailNotification->send($emailTemplate);
+
+
     return("Request has been sent.", " ");
 }
 
@@ -659,6 +679,14 @@ sub setRequestResponse {
 	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
     my $requestStatus = '';
 
+    my %regFilter = (
+        'entityID' => $entityID,
+        'requestID' => $requestID
+    );
+    my $request = getRequests($Data, \%regFilter);
+    $request = $request->[0];
+
+
     switch($response){
         case 'Deny' {
             $response = $Defs::PERSON_REQUEST_RESPONSE_DENIED;
@@ -672,6 +700,21 @@ sub setRequestResponse {
             $response = undef;
         }
     }
+
+    my $emailNotification = new EmailNotifications::PersonRequest();
+    $emailNotification->setRealmID($Data->{'Realm'});
+    $emailNotification->setSubRealmID(0);
+    $emailNotification->setToEntityID($request->{'intRequestFromEntityID'});
+    $emailNotification->setFromEntityID($request->{'intRequestToEntityID'});
+    $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
+    $emailNotification->setDefsName($Defs::admin_email_name);
+    $emailNotification->setNotificationType($request->{'strRequestType'}, $response);
+    $emailNotification->setSubject("Request ID - " . $requestID);
+    $emailNotification->setLang($Data->{'lang'});
+    $emailNotification->setDbh($Data->{'db'});
+
+    my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+    $emailNotification->send($emailTemplate);
 
     warn "RESPONSE $response";
     warn "REQUEST ID $requestID";
