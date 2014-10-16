@@ -75,8 +75,7 @@ sub rule_details   {
     my $field = loadRuleDetails($Data->{'db'}, $Data, $intEntityRegistrationAllowedID) || ();
     #changed the last parameter from $entityID to $intEntityRegistrationAllowedID
 
-    my $allowedit =( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB ? 1 : 0 ) );
-    $Data->{'ReadOnlyLogin'} ? $allowedit = 0 : undef;
+
 
     my %genderoptions = ();
     for my $k ( keys %Defs::PersonGenderInfo ) {
@@ -286,6 +285,8 @@ sub listRules  {
 	my $q = '';
 	my $db = $Data->{'db'};
 	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+
+    $Data->{'ReadOnlyLogin'} ? ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB ? 1 : 0 ) : undef;
 
     $st =qq[
       SELECT
