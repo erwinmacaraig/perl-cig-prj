@@ -268,7 +268,9 @@ sub listPendingRegistrations    {
         		$tempaction = "$Data->{'target'}?client=$client&amp;a=VENUE_DTE&amp;venueID=".$dref->{intEntityID};
         	}
         	case 3 {
-        		$tempaction = "$Data->{'target'}?client=$tempClient&amp;a=C_DTE";
+        		#$tempaction = "$Data->{'target'}?client=$tempClient&amp;a=C_DTE"; -> enable to set your entity level to 3 which is Club level
+        		$tempaction = "$Data->{'target'}?client=$client&amp;a=C_DTE"; # used this one for having the original entity level
+        		 
         	}
         }
         push @fielddata, {
