@@ -39,7 +39,10 @@ use RegoAgeRestrictions;
 sub displayRegoFlowCompleteBulk {
 
     my ($Data, $client, $hidden_ref) = @_;
-    my $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
+    my $gateways = '';
+    if ($Data->{'SystemConfig'}{'AllowTXNs_CCs'} && $hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0)   {
+        $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
+    }
     my %PageData = (
         target => $Data->{'target'},
         Lang => $Data->{'lang'},
@@ -567,7 +570,7 @@ print STDERR "IN BULK REGO $rolloverIDs | $productIDs | $productQtys\n\n\n\n";
     my $txnIds = join(':',@total_txns_added);
     
  
-    return $txnIds;
+    return ($totalAmount, $txnIds);
 }
 1;
 
