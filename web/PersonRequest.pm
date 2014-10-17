@@ -54,6 +54,28 @@ sub handlePersonRequest {
             $TemplateData{'action'} = 'PRA_search';
             $TemplateData{'request_type'} = 'transfer';
             $TemplateData{'transferTypeOption'} = $transferTypeOption;
+            $TemplateData{'script'} = qq[
+                <script>
+                    jQuery(document).ready(function(){
+                        jQuery(":radio[name=transfer_type]").click(function(){
+                            jQuery("div#international").slideToggle("fast");
+                            jQuery("div#domestic").slideToggle("fast");
+
+                            //if(jQuery(this).val() == "DOMESTIC"){
+                            //    jQuery("div#domestic").show();
+                            //    jQuery("div#international").hide();
+                            //} else {
+                            //    jQuery("div#domestic").show();
+                            //    jQuery("div#international").hide();                           
+                            //}
+                        });
+                    });
+                </script>
+            ];
+
+            $TemplateData{'noITC'} = qq[ <span class="button generic-button"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PRA_NC">]. $Data->{'lang'}->txt("No") . q[</a></span>];
+            $TemplateData{'withITC'} = qq[ <span class="button generic-button"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PF_&amp;dtype=PLAYER&amp;itc=1">]. $Data->{'lang'}->txt("Yes") . q[</a></span>];
+
             $body = runTemplate(
                 $Data,
                 \%TemplateData,
