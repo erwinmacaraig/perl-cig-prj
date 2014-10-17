@@ -1693,6 +1693,7 @@ sub viewTask {
             p.dtSuspendedUntil,
             p.strISONationality,
             p.intGender as PersonGender,
+            p.intInternationalTransfer as InternationalTransfer,
             e.strLocalName as EntityLocalName,
             p.intPersonID,
             t.strTaskStatus,
@@ -2031,6 +2032,7 @@ sub populateDocumentViewData {
             wt.intApprovalEntityID,
             wt.intProblemResolutionEntityID,
             dt.strDocumentName,
+            dt.strDocumentFor,
             d.strApprovalStatus,
             d.intDocumentID,
             pr.intNewBaseRecord,
@@ -2095,6 +2097,7 @@ sub populateDocumentViewData {
 
     my $count = 0;
     while(my $tdref = $q->fetchrow_hashref()) {
+        next if((!$dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC') or ($dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC' and $dref->{'PersonStatus'} ne $Defs::PERSON_STATUS_PENDING));
         $count++;
         my $displayVerify;
         my $displayAdd;
@@ -2110,7 +2113,6 @@ sub populateDocumentViewData {
         my $level = (!$targetID and !$registrationID) ? $Defs::LEVEL_CLUB : $Defs::LEVEL_PERSON;
         $targetID = (!$targetID and !$registrationID) ? $dref->{'intEntityID'} : $targetID;
 
-        print STDERR Dumper $tdref;
         #warn "DOCUMENT TYPE ID " . $tdref->{'intDocumentTypeID'};
         #if($tdref->{'intAllowProblemResolutionLevel'} eq 1 and $tdref->{'intAllowVerify'} == 1) {
         #    $displayVerify = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
