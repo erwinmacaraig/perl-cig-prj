@@ -29,6 +29,7 @@ sub getRegistrationItems    {
             RI.intUseExistingThisEntity,
             RI.intUseExistingAnyEntity,
             D.strDocumentName,
+            D.strDocumentFor,
             P.strName as strProductName
         FROM
             tblRegistrationItem as RI
@@ -80,6 +81,7 @@ sub getRegistrationItems    {
         $Item{'UseExistingThisEntity'} = $dref->{'intUseExistingThisEntity'} || 0;
         $Item{'UseExistingAnyEntity'} = $dref->{'intUseExistingAnyEntity'} || 0;
         $Item{'Required'} = $dref->{'intRequired'} || 0;
+        $Item{'DocumentFor'} = $dref->{'strDocumentFor'} || 0;
         if ($itemType eq 'DOCUMENT') {
             $Item{'Name'} = $dref->{'strDocumentName'};
         }
