@@ -211,8 +211,8 @@ sub displayRegoFlowDocuments    {
     	if(exists $approved_docs{$dc->{'ID'}} && $dc->{'UseExistingAnyEntity'}){
     		push @listing,$dc;
     	}
-    	else {
-    		push @docos,$dc;	
+    	elsif(($dc->{'DocumentFor'} eq 'TRANSFERITC' and $rego_ref->{'InternationalTransfer'}) or $dc->{'DocumentFor'} ne 'TRANSFERITC') {
+            push @docos,$dc;	
     	}
     }
      
