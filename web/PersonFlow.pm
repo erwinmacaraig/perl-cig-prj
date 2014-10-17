@@ -10,6 +10,7 @@ use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSp
 use Reg_common;
 use CGI qw(:cgi unescape);
 use Flow_PersonBackend;
+use Data::Dumper;
 
 sub handlePersonFlow {
     my ($action, $Data) = @_;
@@ -28,6 +29,7 @@ sub handlePersonFlow {
     my $entityLevel = getLastEntityLevel($clientValues) || 0;
     my $originLevel = $Data->{'clientValues'}{'authLevel'} || 0;
     my $defaultType = $params{'dtype'} || '';
+    my $internationalTransfer = $params{'itc'} || '';
 
     my $flow = new Flow_PersonBackend(
         db => $Data->{'db'},
@@ -37,6 +39,7 @@ sub handlePersonFlow {
             client => $client,
             a => $action,
             dtype => $defaultType,
+            itc => $internationalTransfer
         },
         SystemConfig => $Data->{'SystemConfig'},
         ClientValues => $clientValues,
