@@ -45,7 +45,12 @@ sub checkRegoTypeLimits    {
     }
     my $st = qq[
         SELECT 
-            *
+            *,
+            IF(strSport = '', 0, 1) +
+            IF(strPersonType = '', 0, 1) +
+            IF(strPersonEntityRole = '', 0, 1) +
+            IF(strPersonLevel = '', 0, 1) +
+            IF(strAgeLevel = '', 0, 1) as fieldSpecifiedExistCount
         FROM
             tblRegoTypeLimits
         WHERE 
@@ -79,6 +84,7 @@ sub checkRegoTypeLimits    {
         $st .= qq[ AND strAgeLevel IN ('', ?)];
     }
 
+    $st .= qq[ ORDER BY fieldSpecifiedExistCount DESC ];
     my $query = $Data->{'db'}->prepare($st);
     $query -> execute(@limitValues);
 
