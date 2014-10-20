@@ -75,9 +75,6 @@ sub rule_details   {
     my $field = loadRuleDetails($Data->{'db'}, $Data, $intEntityRegistrationAllowedID) || ();
     #changed the last parameter from $entityID to $intEntityRegistrationAllowedID
 
-    my $allowedit =( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB ? 1 : 0 ) );
-    $Data->{'ReadOnlyLogin'} ? $allowedit = 0 : undef;
-
     my %genderoptions = ();
     for my $k ( keys %Defs::PersonGenderInfo ) {
         next if !$k;

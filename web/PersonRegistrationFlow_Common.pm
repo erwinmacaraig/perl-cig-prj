@@ -39,7 +39,10 @@ use RegoAgeRestrictions;
 sub displayRegoFlowCompleteBulk {
 
     my ($Data, $client, $hidden_ref) = @_;
-    my $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
+    my $gateways = '';
+    if ($Data->{'SystemConfig'}{'AllowTXNs_CCs'} && $hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0)   {
+        $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
+    }
     my %PageData = (
         target => $Data->{'target'},
         Lang => $Data->{'lang'},
@@ -208,8 +211,8 @@ sub displayRegoFlowDocuments    {
     	if(exists $approved_docs{$dc->{'ID'}} && $dc->{'UseExistingAnyEntity'}){
     		push @listing,$dc;
     	}
-    	else {
-    		push @docos,$dc;	
+    	elsif(($dc->{'DocumentFor'} eq 'TRANSFERITC' and $rego_ref->{'InternationalTransfer'}) or $dc->{'DocumentFor'} ne 'TRANSFERITC') {
+            push @docos,$dc;	
     	}
     }
      
@@ -321,7 +324,7 @@ sub displayRegoFlowProductsBulk {
         nextaction=>"PREGFB_PU",
         target => $Data->{'target'},
         product_body => $product_body,
-        allowManualPay=> 1,
+        allowManualPay=> 0,
         manualPaymentTypes => \%Defs::manualPaymentTypes,
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
@@ -567,7 +570,7 @@ print STDERR "IN BULK REGO $rolloverIDs | $productIDs | $productQtys\n\n\n\n";
     my $txnIds = join(':',@total_txns_added);
     
  
-    return $txnIds;
+    return ($totalAmount, $txnIds);
 }
 1;
 

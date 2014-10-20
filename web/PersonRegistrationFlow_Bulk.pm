@@ -141,8 +141,9 @@ sub handleRegistrationFlowBulk {
 
         #FC-145 (having duplicate entries upon page refresh.. need to check number of records upon submit)
         if($count > 0) {
-            my $txnIds = bulkRegoSubmit($Data, $bulk_ref, $rolloverIDs, $prodIds, $prodQty, $markPaid, $paymentType);
+            my ($totalAmount, $txnIds) = bulkRegoSubmit($Data, $bulk_ref, $rolloverIDs, $prodIds, $prodQty, $markPaid, $paymentType);
             $Hidden{'txnIds'} = $txnIds;
+            $Hidden{'totalAmount'} = $totalAmount || 0;
         }
 #        return $Data->{'lang'}->txt("No $Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'} selected") if (! scalar @MembersToRollover);
         $body .= qq[ROLLOVER FOR $rolloverIDs];

@@ -22,6 +22,7 @@ use AuditLog;
 use PersonLanguages;
 use CustomFields;
 use DefCodes;
+use Data::Dumper;
 
 
 sub setProcessOrder {
@@ -457,6 +458,7 @@ sub validate_core_details    {
     $personObj->load();
     $userData->{'strStatus'} = 'INPROGRESS';
     $userData->{'intRealmID'} = $self->{'Data'}{'Realm'};
+    $userData->{'intInternationalTransfer'} = 1 if $self->getCarryFields('itc');
     $personObj->setValues($userData);
     $personObj->write();
     if($personObj->ID())    {
@@ -881,7 +883,9 @@ sub display_documents {
     $personObj->load();
     if($regoID) {
         my $nationality = $personObj->getValue('strISONationality') || ''; 
+        my $itc = $personObj->getValue('intInternationalTransfer') || '';
         $rego_ref->{'Nationality'} = $nationality;
+        $rego_ref->{'InternationalTransfer'} = $itc;
 
         $content = displayRegoFlowDocuments(
             $self->{'Data'}, 

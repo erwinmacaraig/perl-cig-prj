@@ -33,7 +33,7 @@ sub handleSeasons   {
     my $title      = '';
     if($action eq 'SN_L_U') {
         $resultHTML = setDefaultAssocSeasonConfig($Data);
-    } 
+    }
     if ($action =~/^SN_DT/) {
         #Season Details
        ($resultHTML,$title)=season_details($action, $Data, $seasonID);
@@ -57,7 +57,7 @@ sub checkMSRecordExistance  {
     my $st = qq[
         SELECT
             COUNT(*) as MSCount
-        FROM 
+        FROM
             $MStablename
         WHERE
             intMSRecStatus=1
@@ -87,7 +87,7 @@ sub checkForMemberSeasonRecord  {
     # ## Check List.pm line
     return '' if (! $Data->{'memberListIntoComp'});
     $Data->{'memberListIntoComp'}=0;  ## Reset it back.  USE THIS LINE AS WELL.
-    
+
     my $st = qq[
         SELECT intNewSeasonID
         FROM tblAssoc_Comp
@@ -110,7 +110,7 @@ sub checkForMemberSeasonRecord  {
 
     my %types = ();
 
-    if (!$types{'intPlayerStatus'} and !$types{'intCoachStatus'} and !$types{'intUmpireStatus'} and !$types{'intOfficialStatus'} 
+    if (!$types{'intPlayerStatus'} and !$types{'intCoachStatus'} and !$types{'intUmpireStatus'} and !$types{'intOfficialStatus'}
     and !$types{'intMiscStatus'} and !$types{'intVolunteerStatus'} and !$types{'intOther1Status'} and !$types{'intOther2Status'}) {
         $types{'intPlayerStatus'}    = 1 if ($assocSeasons->{'defaultMemberType'} == $Defs::MEMBER_TYPE_PLAYER);
         $types{'intCoachStatus'}     = 1 if ($assocSeasons->{'defaultMemberType'} == $Defs::MEMBER_TYPE_COACH);
@@ -172,12 +172,12 @@ sub syncAllowSeasons    {
 
     $intAssocID || return;
     $SWC_AppVer || return;
-    
+
     if ($SWC_AppVer =~ /^7/)    {
         $db->do(qq[UPDATE tblAssoc SET intAllowSeasons=1 WHERE intAssocID=$intAssocID]);
     }
 }
-        
+
 sub memberSeason_details    {
     my($Data, $memberSeasonID, $action) = @_;
 
@@ -203,25 +203,25 @@ sub memberSeason_details    {
     $strWhere .= qq[ AND MS.intSeasonID = ] . param("d_intSeasonID") if param("d_intSeasonID");
     $strWhere .= param("d_intClubID") ?  qq[ AND MS.intClubID = ] . param("d_intClubID") : qq[ AND MS.intClubID=0];
 
-    $strWhere = qq[ AND MS.intMemberSeasonID = $memberSeasonID] if ($memberSeasonID); 
+    $strWhere = qq[ AND MS.intMemberSeasonID = $memberSeasonID] if ($memberSeasonID);
     if (! param("d_intSeasonID") and ! $memberSeasonID) {
         $strWhere = qq[ AND MS.intMemberSeasonID = 0];
     }
 
     my $statement=qq[
-        SELECT 
-            MS.*, 
-            S.strSeasonName, 
-            C.strName as ClubName, 
-            DATE_FORMAT(MS.dtInPlayer,    "%d-%M-%Y") as DateInPlayer, 
-            DATE_FORMAT(MS.dtInCoach,     "%d-%M-%Y") as DateInCoach, 
-            DATE_FORMAT(MS.dtInUmpire,    "%d-%M-%Y") as DateInUmpire, 
-            DATE_FORMAT(MS.dtInOfficial,  "%d-%M-%Y") as DateInOfficial, 
-            DATE_FORMAT(MS.dtInMisc,      "%d-%M-%Y") as DateInMisc, 
-            DATE_FORMAT(MS.dtInVolunteer, "%d-%M-%Y") as DateInVolunteer, 
-            DATE_FORMAT(MS.dtInOther1,    "%d-%M-%Y") as DateInOther1, 
+        SELECT
+            MS.*,
+            S.strSeasonName,
+            C.strName as ClubName,
+            DATE_FORMAT(MS.dtInPlayer,    "%d-%M-%Y") as DateInPlayer,
+            DATE_FORMAT(MS.dtInCoach,     "%d-%M-%Y") as DateInCoach,
+            DATE_FORMAT(MS.dtInUmpire,    "%d-%M-%Y") as DateInUmpire,
+            DATE_FORMAT(MS.dtInOfficial,  "%d-%M-%Y") as DateInOfficial,
+            DATE_FORMAT(MS.dtInMisc,      "%d-%M-%Y") as DateInMisc,
+            DATE_FORMAT(MS.dtInVolunteer, "%d-%M-%Y") as DateInVolunteer,
+            DATE_FORMAT(MS.dtInOther1,    "%d-%M-%Y") as DateInOther1,
             DATE_FORMAT(MS.dtInOther2,    "%d-%M-%Y") as DateInOther2
-        FROM 
+        FROM
             $tablename as MS
             INNER JOIN tblSeasons as S ON (S.intSeasonID = MS.intSeasonID)
             LEFT JOIN tblClub as C ON (C.intClubID = MS.intClubID)
@@ -246,7 +246,7 @@ sub memberSeason_details    {
         my $genAgeGroup ||=new GenAgeGroup ($Data->{'db'},$Data->{'Realm'}, $Data->{'RealmSubType'}, $Data->{'clientValues'}{'assocID'});
         my $st = qq[
             SELECT intGender, DATE_FORMAT(dtDOB, "%Y%m%d") as DOBAgeGroup
-            FROM tblMember 
+            FROM tblMember
             WHERE intMemberID = $Data->{'clientValues'}{'memberID'}
         ];
     my $query = $db->prepare($st);
@@ -257,54 +257,54 @@ sub memberSeason_details    {
     }
     my $msupdate = qq[
         UPDATE $tablename
-        SET 
-            --VAL--, 
-            dtInPlayer    = IF(intPlayerStatus    = 1 and (dtInPlayer    IS NULL or dtInPlayer    = '0000-00-00'), CURDATE(), dtInPlayer), 
-            dtInCoach     = IF(intCoachStatus     = 1 and (dtInCoach     IS NULL or dtInCoach     = '0000-00-00'), CURDATE(), dtInCoach), 
-            dtInUmpire    = IF(intUmpireStatus    = 1 and (dtInUmpire    IS NULL or dtInUmpire    = '0000-00-00'), CURDATE(), dtInUmpire), 
-            dtInOfficial  = IF(intOfficialStatus  = 1 and (dtInOfficial  IS NULL or dtInOfficial  = '0000-00-00'), CURDATE(), dtInOfficial), 
-            dtInMisc      = IF(intMiscStatus      = 1 and (dtInMisc      IS NULL or dtInMisc      = '0000-00-00'), CURDATE(), dtInMisc), 
-            dtInVolunteer = IF(intVolunteerStatus = 1 and (dtInVolunteer IS NULL or dtInVolunteer = '0000-00-00'), CURDATE(), dtInVolunteer), 
-            dtInOther1    = IF(intOther1Status    = 1 and (dtInOther1    IS NULL or dtInOther1    = '0000-00-00'), CURDATE(), dtInOther1), 
-            dtInOther2    = IF(intOther2Status    = 1 and (dtInOther2    IS NULL or dtInOther2    = '0000-00-00'), CURDATE(), dtInOther2) 
-        WHERE 
+        SET
+            --VAL--,
+            dtInPlayer    = IF(intPlayerStatus    = 1 and (dtInPlayer    IS NULL or dtInPlayer    = '0000-00-00'), CURDATE(), dtInPlayer),
+            dtInCoach     = IF(intCoachStatus     = 1 and (dtInCoach     IS NULL or dtInCoach     = '0000-00-00'), CURDATE(), dtInCoach),
+            dtInUmpire    = IF(intUmpireStatus    = 1 and (dtInUmpire    IS NULL or dtInUmpire    = '0000-00-00'), CURDATE(), dtInUmpire),
+            dtInOfficial  = IF(intOfficialStatus  = 1 and (dtInOfficial  IS NULL or dtInOfficial  = '0000-00-00'), CURDATE(), dtInOfficial),
+            dtInMisc      = IF(intMiscStatus      = 1 and (dtInMisc      IS NULL or dtInMisc      = '0000-00-00'), CURDATE(), dtInMisc),
+            dtInVolunteer = IF(intVolunteerStatus = 1 and (dtInVolunteer IS NULL or dtInVolunteer = '0000-00-00'), CURDATE(), dtInVolunteer),
+            dtInOther1    = IF(intOther1Status    = 1 and (dtInOther1    IS NULL or dtInOther1    = '0000-00-00'), CURDATE(), dtInOther1),
+            dtInOther2    = IF(intOther2Status    = 1 and (dtInOther2    IS NULL or dtInOther2    = '0000-00-00'), CURDATE(), dtInOther2)
+        WHERE
             intMemberSeasonID = $memberSeasonID
             AND intAssocID    = $Data->{'clientValues'}{'assocID'}
             AND intMemberID   = $Data->{'clientValues'}{'memberID'}
     ];
     my $msadd = qq[
         INSERT IGNORE INTO $tablename (
-            intAssocID, 
-            intMemberID, 
-            dtInPlayer, 
-            dtInCoach, 
-            dtInUmpire, 
-            dtInOfficial, 
-            dtInMisc, 
-            dtInVolunteer, 
-            dtInOther1, 
-            dtInOther2, 
+            intAssocID,
+            intMemberID,
+            dtInPlayer,
+            dtInCoach,
+            dtInUmpire,
+            dtInOfficial,
+            dtInMisc,
+            dtInVolunteer,
+            dtInOther1,
+            dtInOther2,
             --FIELDS--
         )
         VALUES (
-            $Data->{'clientValues'}{'assocID'}, 
-            $Data->{'clientValues'}{'memberID'}, 
-            IF(intPlayerStatus    = 1, CURDATE(), NULL), 
-            IF(intCoachStatus     = 1, CURDATE(), NULL), 
-            IF(intUmpireStatus    = 1, CURDATE(), NULL), 
-            IF(intOfficialStatus  = 1, CURDATE(), NULL), 
-            IF(intMiscStatus      = 1, CURDATE(), NULL), 
-            IF(intVolunteerStatus = 1, CURDATE(), NULL), 
-            IF(intOther1Status    = 1, CURDATE(), NULL), 
-            IF(intOther2Status    = 1, CURDATE(), NULL), 
+            $Data->{'clientValues'}{'assocID'},
+            $Data->{'clientValues'}{'memberID'},
+            IF(intPlayerStatus    = 1, CURDATE(), NULL),
+            IF(intCoachStatus     = 1, CURDATE(), NULL),
+            IF(intUmpireStatus    = 1, CURDATE(), NULL),
+            IF(intOfficialStatus  = 1, CURDATE(), NULL),
+            IF(intMiscStatus      = 1, CURDATE(), NULL),
+            IF(intVolunteerStatus = 1, CURDATE(), NULL),
+            IF(intOther1Status    = 1, CURDATE(), NULL),
+            IF(intOther2Status    = 1, CURDATE(), NULL),
             --VAL--
         )
     ];
-      my $st_seasons=qq[ 
-          SELECT intSeasonID, strSeasonName 
-          FROM tblSeasons 
-          WHERE intRealmID = $Data->{'Realm'} 
-              AND (intAssocID=$Data->{'clientValues'}{'assocID'} OR intAssocID =0) 
+      my $st_seasons=qq[
+          SELECT intSeasonID, strSeasonName
+          FROM tblSeasons
+          WHERE intRealmID = $Data->{'Realm'}
+              AND (intAssocID=$Data->{'clientValues'}{'assocID'} OR intAssocID =0)
               AND (intRealmSubTypeID = $subType OR intRealmSubTypeID= 0)
               AND intArchiveSeason <> 1
               AND intLocked <> 1
@@ -312,13 +312,13 @@ sub memberSeason_details    {
       ];
       #AND (intRealmSubTypeID = $Data->{'RealmSubType'} OR intRealmSubTypeID= 0)
     my ($seasons_vals,$seasons_order)=getDBdrop_down_Ref($Data->{'db'},$st_seasons,'');
-      
+
       my $defaultClubID = $Data->{'clientValues'}{'clubID'} || 0;
       $defaultClubID= 0 if ($defaultClubID == $Defs::INVALID_ID);
       my $clubWHERE = ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB and $defaultClubID) ? qq[ WHERE C.intClubID = $defaultClubID] : '';
-      my $st_clubs=qq[ 
+      my $st_clubs=qq[
           SELECT C.intClubID, strName
-          FROM tblClub as C 
+          FROM tblClub as C
               INNER JOIN tblAssoc_Clubs as AC ON (AC.intClubID = C.intClubID
                   AND AC.intAssocID = $Data->{'clientValues'}{'assocID'})
               INNER JOIN tblMember_Clubs as MC ON (MC.intClubID = C.intClubID
@@ -330,27 +330,27 @@ sub memberSeason_details    {
     my ($clubs_vals,$clubs_order)=getDBdrop_down_Ref($Data->{'db'},$st_clubs,'');
 
       my $AgeGroups=AgeGroups::getAgeGroups($Data);
-      my $st_ageGroups=qq[ 
+      my $st_ageGroups=qq[
           SELECT intAgeGroupID, IF(intRecStatus<1, CONCAT(strAgeGroupDesc, ' (Inactive)'),  strAgeGroupDesc) as strAgeGroupDesc
           FROM tblAgeGroups
-          WHERE intRealmID = $Data->{'Realm'} 
-              AND (intAssocID=$Data->{'clientValues'}{'assocID'} OR intAssocID =0) 
+          WHERE intRealmID = $Data->{'Realm'}
+              AND (intAssocID=$Data->{'clientValues'}{'assocID'} OR intAssocID =0)
               AND (intRealmSubTypeID = $subType OR intRealmSubTypeID = 0)
               AND intRecStatus<>-1
           ORDER BY strAgeGroupDesc
       ];
     my ($ageGroups_vals,$ageGroups_order) = getDBdrop_down_Ref($Data->{'db'},$st_ageGroups,'');
 
-    my $levelName = ($action =~ /CADD$/ or $dref->{intClubID}) 
-        ? $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} 
+    my $levelName = ($action =~ /CADD$/ or $dref->{intClubID})
+        ? $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}
         : $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC};
 
     my $MemberPackages=getMemberPackages($Data) || '';
 
-    
+
     if (! $memberSeasonID and $action =~ /ADD/ and $Data->{'SystemConfig'}{'checkLastSeasonTypesFilter'})   {
-        my $clubWHERE = ($Data->{'clientValues'}{'clubID'} and $Data->{'clientValues'}{'clubID'} != $Defs::INVALID_ID) 
-            ? qq[ AND intClubID = $Data->{'clientValues'}{'clubID'}] 
+        my $clubWHERE = ($Data->{'clientValues'}{'clubID'} and $Data->{'clientValues'}{'clubID'} != $Defs::INVALID_ID)
+            ? qq[ AND intClubID = $Data->{'clientValues'}{'clubID'}]
             : qq[ AND intClubID=0];
 
         my $st = qq[
@@ -363,7 +363,7 @@ sub memberSeason_details    {
                 intVolunteerStatus
             FROM
                 $tablename
-            WHERE  
+            WHERE
                 intMemberID = $Data->{'clientValues'}{'memberID'}
                 AND intAssocID = $Data->{'clientValues'}{'assocID'}
                 $clubWHERE
@@ -390,7 +390,7 @@ sub memberSeason_details    {
               label => "$txt_Name Name",
               value => $dref->{strSeasonName},
               type  => 'text',
-              readonly => 1, 
+              readonly => 1,
               sectionname => 'main',
           },
           intMSRecStatus=> {
@@ -413,7 +413,7 @@ sub memberSeason_details    {
               label => $dref->{intClubID} ? "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Name" : '',
               value => $dref->{ClubName},
               type  => 'text',
-              readonly =>1, 
+              readonly =>1,
               sectionname => 'main',
           },
           intClubID => {
@@ -625,36 +625,36 @@ sub memberSeason_details    {
       },
       order => [
           qw(
-              SeasonName 
-              intSeasonID 
-              intMSRecStatus 
-              ClubName 
-              intClubID 
-              intSeasonMemberPackageID 
-              intPlayerAgeGroupID 
-              intPlayerStatus 
-              intPlayerFinancialStatus 
-              DateInPlayer 
-              intCoachStatus 
-              intCoachFinancialStatus 
-              DateInCoach 
-              intUmpireStatus 
-              intUmpireFinancialStatus 
-              DateInUmpire 
-              intOfficialStatus 
-              intOfficialFinancialStatus 
-              DateInOfficial 
-              intMiscStatus 
-              intMiscFinancialStatus 
+              SeasonName
+              intSeasonID
+              intMSRecStatus
+              ClubName
+              intClubID
+              intSeasonMemberPackageID
+              intPlayerAgeGroupID
+              intPlayerStatus
+              intPlayerFinancialStatus
+              DateInPlayer
+              intCoachStatus
+              intCoachFinancialStatus
+              DateInCoach
+              intUmpireStatus
+              intUmpireFinancialStatus
+              DateInUmpire
+              intOfficialStatus
+              intOfficialFinancialStatus
+              DateInOfficial
+              intMiscStatus
+              intMiscFinancialStatus
               DateInMisc
-              intVolunteerStatus 
-              intVolunteerFinancialStatus 
+              intVolunteerStatus
+              intVolunteerFinancialStatus
               DateInVolunteer
-              intOther1Status 
-              intOther1FinancialStatus 
-              DateInOther1 
-              intOther2Status 
-              intOther2FinancialStatus 
+              intOther1Status
+              intOther1FinancialStatus
+              DateInOther1
+              intOther2Status
+              intOther2FinancialStatus
               DateInOther2
           )
       ],
@@ -722,7 +722,7 @@ sub memberSeason_details    {
     $editDetailsLink = '' if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB and $Data->{'SystemConfig'}{'Club_MemberEditOnly'});
     $editDetailsLink = '' if $Data->{'SystemConfig'}{'LockSeasonsFullEditLock'};
 
-    # if LockSeasonsCRL is set all levels above club can edit season record. 
+    # if LockSeasonsCRL is set all levels above club can edit season record.
     $editDetailsLink = '' if ($Data->{'SystemConfig'}{'LockSeasonsCRL'} and $Data->{'clientValues'}{'authLevel'} <$Defs::LEVEL_ASSOC);
     $resultHTML .= $editDetailsLink;
     $resultHTML=qq[<div>Cannot find Member $txt_Name record.</div>] if !ref $dref;
@@ -756,7 +756,7 @@ sub postMemberSeasonUpdate    {
             AND MS.intAssocID = $Data->{'clientValues'}{'assocID'}
             AND MS.intMemberSeasonID = $id
     ];
-    
+
   my $query = $db->prepare($st);
   $query->execute();
     my ($seasonID, $DOBAgeGroup, $Gender, $intClubID) =$query->fetchrow_array();
@@ -820,7 +820,7 @@ sub season_details  {
     my $intAssocID = $Data->{'clientValues'}{'assocID'} >= 0 ? $Data->{'clientValues'}{'assocID'} : 0;
     my $txt_Name= $lang->txt($Data->{'SystemConfig'}{'txtSeason'}) || $lang->txt('Season');
     my $txt_Names= $lang->txt($Data->{'SystemConfig'}{'txtSeasons'}) || $lang->txt('Seasons');
-    
+
   my $client=setClient($Data->{'clientValues'}) || '';
 
     my $lockedlabel = "$txt_Name Locked";
@@ -867,7 +867,7 @@ sub season_details  {
         order => [qw(strSeasonName intSeasonOrder intArchiveSeason intLocked)],
         sections => [
             ['details',"$txt_Name Details"],
-        ],  
+        ],
         options => {
             labelsuffix => ':',
             hideblank => 1,
@@ -884,7 +884,7 @@ sub season_details  {
             addSQL => qq[
                 INSERT INTO tblSeasons
                     (intRealmID, intRealmSubTypeID, intAssocID, dtAdded,  --FIELDS-- )
-                VALUES 
+                VALUES
                     ($Data->{'Realm'}, $Data->{'RealmSubType'}, $intAssocID, SYSDATE(), --VAL-- )
             ],
             auditFunction=> \&auditLog,
@@ -937,7 +937,7 @@ sub loadSeasonDetails {
     my $statement=qq[
         SELECT *
         FROM tblSeasons
-        WHERE intSeasonID = $id 
+        WHERE intSeasonID = $id
             AND intRealmID = $realmID
             AND (intAssocID = $assocID OR intAssocID = 0)
             AND (intRealmSubTypeID = $realmSubType OR intRealmSubTypeID= 0)
@@ -948,7 +948,7 @@ sub loadSeasonDetails {
 
     my $field=$query->fetchrow_hashref();
     $query->finish;
-                                                                                                          
+
     foreach my $key (keys %{$field})  { if(!defined $field->{$key}) {$field->{$key}='';} }
     return $field;
 }
@@ -956,18 +956,18 @@ sub loadSeasonDetails {
 sub insertMemberSeasonRecord    {
 
     # The following columns are handled via $types hash:
-    # intPlayerAgeGroupID, 
-    # intPlayerStatus, 
-    # intPlayerFinancialStatus, 
-    # intCoachStatus, 
-    # intCoachFinancialStatus, 
-    # intUmpireStatus, 
-    # intUmpireFinancialStatus, 
-    # intOfficialStatus, 
-    # intOfficialFinancialStatus, 
-    # intMiscStatus, 
+    # intPlayerAgeGroupID,
+    # intPlayerStatus,
+    # intPlayerFinancialStatus,
+    # intCoachStatus,
+    # intCoachFinancialStatus,
+    # intUmpireStatus,
+    # intUmpireFinancialStatus,
+    # intOfficialStatus,
+    # intOfficialFinancialStatus,
+    # intMiscStatus,
     # intMiscFinancialStatus,
-    # intVolunteerStatus, 
+    # intVolunteerStatus,
     # intVolunteerFinancialStatus,
 
 
@@ -1001,17 +1001,17 @@ sub insertMemberSeasonRecord    {
                 intVolunteerStatus
             FROM
                 $tablename
-            WHERE  
+            WHERE
                 intMemberID = $intMemberID
                 AND intAssocID = $intAssocID
                 $clubWHERE
                 AND intSeasonID IN ($Data->{'SystemConfig'}{'checkLastSeasonTypes'})
                 AND intMSRecStatus = 1
-            ORDER BY 
+            ORDER BY
                 intSeasonID DESC
             LIMIT 1
-        ]; 
-        my $query = $Data->{'db'}->prepare($st); 
+        ];
+        my $query = $Data->{'db'}->prepare($st);
         $query->execute();
         my $lastref=$query->fetchrow_hashref();
         $types->{intPlayerStatus}    = 2 if ($lastref->{intPlayerStatus}    and !$types->{intPlayerStatus});
@@ -1087,7 +1087,7 @@ sub insertMemberSeasonRecord    {
         }
         if ($type eq 'intMSRecStatus')  {
             $recStatus = qq[, intMSRecStatus = $types->{$type}];
-        }   
+        }
         if ($type !~ /Financial|intMSRecStatus|userselected/)   {
             my $value = $types->{$type};
             $types->{$type}= 1 if ($value =~/1/ and $type =~ /Status/);
@@ -1127,7 +1127,7 @@ sub insertMemberSeasonRecord    {
                 last;
             }
         }
-    } 
+    }
 
     if (!$pending) {
         if($Data->{'SystemConfig'}{'AllowPendingRegistration'} and $rereg == 2) {
@@ -1137,24 +1137,24 @@ sub insertMemberSeasonRecord    {
 
     my $st = qq[
         INSERT INTO $tablename (
-            intMSRecStatus, 
-            intMemberID, 
-            intAssocID, 
-            intClubID, 
+            intMSRecStatus,
+            intMemberID,
+            intAssocID,
+            intClubID,
             intSeasonID,
             intNatReportingGroupID
             $insert_cols
         )
         VALUES (
-            $status, 
-            $intMemberID, 
-            $intAssocID, 
-            $intClubID, 
+            $status,
+            $intMemberID,
+            $intAssocID,
+            $intClubID,
             $intSeasonID,
             $nationalSeasonID
             $insert_vals
         )
-        ON DUPLICATE KEY 
+        ON DUPLICATE KEY
             UPDATE $timeStamp $update_status $update_financials $update_dates $update_pending $recStatus
     ];
 
@@ -1165,9 +1165,9 @@ sub insertMemberSeasonRecord    {
 
     if (exists $Data->{'fromsync'}) {
         $st = qq[
-            SELECT 
+            SELECT
                 intMemberSeasonID
-            FROM 
+            FROM
                 $tablename
             WHERE
                 intMemberID=$intMemberID
@@ -1182,31 +1182,31 @@ sub insertMemberSeasonRecord    {
     if ($types->{'intMSRecStatus'} and $types->{'intMSRecStatus'} == -1 and $intClubID == 0)    {
         ## The Assoc record was being marked as deleted, so do all club records aswell
         $st = qq[
-            UPDATE 
+            UPDATE
                 $tablename
-            SET 
+            SET
                 intMSRecStatus=-1
-            WHERE 
+            WHERE
                 intMemberID=$intMemberID
                 AND intAssocID=$intAssocID
                 AND intSeasonID=$intSeasonID
-                AND intClubID>0 
+                AND intClubID>0
         ];
     my $query = $Data->{'db'}->prepare($st);
     $query->execute();
     }
     ### Now lets go update the interest flags
     $st = qq[
-        SELECT 
-            MAX(intPlayerStatus)    as PlayerStatus, 
-            MAX(intCoachStatus)     as CoachStatus, 
+        SELECT
+            MAX(intPlayerStatus)    as PlayerStatus,
+            MAX(intCoachStatus)     as CoachStatus,
             MAX(intUmpireStatus)    as UmpireStatus,
             MAX(intOfficialStatus)  as OfficialStatus,
             MAX(intMiscStatus)      as MiscStatus,
             MAX(intVolunteerStatus) as VolunteerStatus
-        FROM 
+        FROM
             $tablename
-        WHERE 
+        WHERE
             intMemberID = $intMemberID
             AND intMSRecStatus=1
     ];
@@ -1224,14 +1224,14 @@ sub insertMemberSeasonRecord    {
 
     $st = qq[
         UPDATE tblMember
-        SET 
-            intPlayer    = $PlayerStatus, 
-            intCoach     = $CoachStatus, 
+        SET
+            intPlayer    = $PlayerStatus,
+            intCoach     = $CoachStatus,
             intUmpire    = $UmpireStatus,
             intOfficial  = $OfficialStatus,
             intMisc      = $MiscStatus,
             intVolunteer = $VolunteerStatus
-        WHERE 
+        WHERE
             intMemberID = $intMemberID
     ];
 
@@ -1240,27 +1240,27 @@ sub insertMemberSeasonRecord    {
     if ($Data->{'SystemConfig'}{'Seasons_StatusClubToAssoc'} or $Data->{'SystemConfig'}{'Seasons_FinancialsClubToAssoc'}) {
         $update_status = '';
         $st = qq[
-            SELECT 
-                COUNT(intMemberID)               as Count, 
-                MAX(intPlayerStatus)             as PlayerStatus, 
-                MAX(intCoachStatus)              as CoachStatus, 
-                MAX(intUmpireStatus)             as UmpireStatus, 
-                MAX(intOfficialStatus)           as OfficialStatus, 
-                MAX(intMiscStatus)               as MiscStatus, 
-                MAX(intVolunteerStatus)          as VolunteerStatus, 
-                MAX(intOther1Status)             as Other1Status, 
-                MAX(intOther2Status)             as Other2Status, 
-                MAX(intPlayerFinancialStatus)    as PlayerFinancialStatus, 
-                MAX(intCoachFinancialStatus)     as CoachFinancialStatus, 
-                MAX(intUmpireFinancialStatus)    as UmpireFinancialStatus, 
-                MAX(intOfficialFinancialStatus)  as OfficialFinancialStatus, 
-                MAX(intMiscFinancialStatus)      as MiscFinancialStatus, 
-                MAX(intVolunteerFinancialStatus) as VolunteerFinancialStatus, 
-                MAX(intOther1FinancialStatus)    as Other1FinancialStatus, 
+            SELECT
+                COUNT(intMemberID)               as Count,
+                MAX(intPlayerStatus)             as PlayerStatus,
+                MAX(intCoachStatus)              as CoachStatus,
+                MAX(intUmpireStatus)             as UmpireStatus,
+                MAX(intOfficialStatus)           as OfficialStatus,
+                MAX(intMiscStatus)               as MiscStatus,
+                MAX(intVolunteerStatus)          as VolunteerStatus,
+                MAX(intOther1Status)             as Other1Status,
+                MAX(intOther2Status)             as Other2Status,
+                MAX(intPlayerFinancialStatus)    as PlayerFinancialStatus,
+                MAX(intCoachFinancialStatus)     as CoachFinancialStatus,
+                MAX(intUmpireFinancialStatus)    as UmpireFinancialStatus,
+                MAX(intOfficialFinancialStatus)  as OfficialFinancialStatus,
+                MAX(intMiscFinancialStatus)      as MiscFinancialStatus,
+                MAX(intVolunteerFinancialStatus) as VolunteerFinancialStatus,
+                MAX(intOther1FinancialStatus)    as Other1FinancialStatus,
                 MAX(intOther2FinancialStatus)    as Other2FinancialStatus
-            FROM 
+            FROM
                 $tablename
-            WHERE 
+            WHERE
                 intMemberID=$intMemberID
                 AND intAssocID=$intAssocID
                 AND intClubID>0
@@ -1269,7 +1269,7 @@ sub insertMemberSeasonRecord    {
         ];
         $query = $Data->{'db'}->prepare($st);
         $query->execute();
-        my ($count, $PlayerStatus, $CoachStatus, $UmpireStatus, $OfficialStatus, $MiscStatus, $VolunteerStatus, 
+        my ($count, $PlayerStatus, $CoachStatus, $UmpireStatus, $OfficialStatus, $MiscStatus, $VolunteerStatus,
             $Other1Status, $Other2Status, $PFStatus, $CFStatus, $UFStatus, $OFStatus, $MFStatus, $VFStatus, $O1FStatus, $O2FStatus) = $query->fetchrow_array();
 
         $PlayerStatus    ||= 0;
@@ -1310,12 +1310,12 @@ sub insertMemberSeasonRecord    {
         }
 
         $st = qq[
-            UPDATE 
+            UPDATE
                 $tablename
-            SET 
-                tTimeStamp=$timeStamp 
+            SET
+                tTimeStamp=$timeStamp
                 $update_status
-            WHERE 
+            WHERE
                 intMemberID=$intMemberID
                 AND intAssocID=$intAssocID
                 AND intClubID=0
@@ -1326,13 +1326,13 @@ sub insertMemberSeasonRecord    {
 
     if ($Data->{'RegoFormID'} and $Data->{'RegoFormID'} > 0)    {
           $st = qq[
-              UPDATE 
+              UPDATE
                   $tablename
-              SET 
-                  intUsedRegoForm=1, 
-                  dtLastUsedRegoForm = NOW(), 
+              SET
+                  intUsedRegoForm=1,
+                  dtLastUsedRegoForm = NOW(),
                   intUsedRegoFormID=$Data->{'RegoFormID'}
-              WHERE 
+              WHERE
                   intMemberID = $intMemberID
                   AND intAssocID = $intAssocID
                   AND intClubID IN (0, $intClubID)
@@ -1383,7 +1383,7 @@ sub getPendingTypes {
 sub memberSeasonDuplicateResolution {
 
     my ($Data, $assocID, $fromID, $toID) = @_;
-    
+
     my $realmID = $Data->{'Realm'} || 0;
     my $tablename = "tblMember_Seasons_$realmID";
     $Data->{'db'}->do(qq[UPDATE IGNORE $tablename SET intMemberID = $toID WHERE intMemberID=$fromID AND intAssocID = $assocID]);
@@ -1397,19 +1397,19 @@ sub memberSeasonDuplicateResolution {
     ## Now lets handle the remaining duplicate records
 
     my $st = qq[
-        SELECT 
-            intClubID, intSeasonID, intPlayerAgeGroupID, 
-            intPlayerStatus,          intPlayerFinancialStatus, 
-            intCoachStatus,           intCoachFinancialStatus, 
-            intUmpireStatus,          intUmpireFinancialStatus, 
-            intOfficialStatus,        intOfficialFinancialStatus, 
-            intMiscStatus,            intMiscFinancialStatus, 
-            intVolunteerStatus,       intVolunteerFinancialStatus, 
-            intOther1Status,          intOther2Status, 
+        SELECT
+            intClubID, intSeasonID, intPlayerAgeGroupID,
+            intPlayerStatus,          intPlayerFinancialStatus,
+            intCoachStatus,           intCoachFinancialStatus,
+            intUmpireStatus,          intUmpireFinancialStatus,
+            intOfficialStatus,        intOfficialFinancialStatus,
+            intMiscStatus,            intMiscFinancialStatus,
+            intVolunteerStatus,       intVolunteerFinancialStatus,
+            intOther1Status,          intOther2Status,
             intOther1FinancialStatus, intOther2FinancialStatus
-        FROM 
+        FROM
             $tablename
-        WHERE 
+        WHERE
             intMemberID = $fromID
             AND intAssocID=$assocID
     ];
@@ -1419,14 +1419,14 @@ sub memberSeasonDuplicateResolution {
     $query->execute or query_error($st);
 
     my @MemberSeasons = qw(
-        intPlayerAgeGroupID 
-        intPlayerStatus          intPlayerFinancialStatus 
-        intCoachStatus           intCoachFinancialStatus 
-        intUmpireStatus          intUmpireFinancialStatus 
-        intOfficialStatus        intOfficialFinancialStatus 
-        intMiscStatus            intMiscFinancialStatus 
-        intVolunteerStatus       intVolunteerFinancialStatus 
-        intOther1Status          intOther2Status 
+        intPlayerAgeGroupID
+        intPlayerStatus          intPlayerFinancialStatus
+        intCoachStatus           intCoachFinancialStatus
+        intUmpireStatus          intUmpireFinancialStatus
+        intOfficialStatus        intOfficialFinancialStatus
+        intMiscStatus            intMiscFinancialStatus
+        intVolunteerStatus       intVolunteerFinancialStatus
+        intOther1Status          intOther2Status
         intOther1FinancialStatus intOther2FinancialStatus
     );
 
@@ -1440,29 +1440,29 @@ sub memberSeasonDuplicateResolution {
         }
         if ($update_vals)       {
             $Data->{'db'}->do(qq[
-                UPDATE IGNORE $tablename 
-                SET 
-                    $update_vals 
-                WHERE 
-                    intAssocID = $assocID 
-                    AND intMemberID = $toID 
-                    AND intClubID = $dref->{intClubID} 
+                UPDATE IGNORE $tablename
+                SET
+                    $update_vals
+                WHERE
+                    intAssocID = $assocID
+                    AND intMemberID = $toID
+                    AND intClubID = $dref->{intClubID}
                     AND intSeasonID = $dref->{intSeasonID}
             ]);
         }
     }
 
     $st = qq[
-        SELECT 
-            MAX(intPlayerStatus)    as PlayerStatus, 
-            MAX(intCoachStatus)     as CoachStatus, 
-            MAX(intUmpireStatus)    as UmpireStatus, 
-            MAX(intOfficialStatus)  as OfficialStatus, 
-            MAX(intMiscStatus)      as MiscStatus, 
+        SELECT
+            MAX(intPlayerStatus)    as PlayerStatus,
+            MAX(intCoachStatus)     as CoachStatus,
+            MAX(intUmpireStatus)    as UmpireStatus,
+            MAX(intOfficialStatus)  as OfficialStatus,
+            MAX(intMiscStatus)      as MiscStatus,
             MAX(intVolunteerStatus) as VolunteerStatus
-        FROM 
+        FROM
             $tablename
-        WHERE 
+        WHERE
             intMemberID = $toID
     ];
 
@@ -1480,14 +1480,14 @@ sub memberSeasonDuplicateResolution {
 
     $st = qq[
         UPDATE tblMember
-        SET 
-            intPlayer    = $PlayerStatus, 
-            intCoach     = $CoachStatus, 
-            intUmpire    = $UmpireStatus, 
-            intOfficial  = $OfficialStatus, 
-            intMisc      = $MiscStatus, 
+        SET
+            intPlayer    = $PlayerStatus,
+            intCoach     = $CoachStatus,
+            intUmpire    = $UmpireStatus,
+            intOfficial  = $OfficialStatus,
+            intMisc      = $MiscStatus,
             intVolunteer = $VolunteerStatus
-        WHERE 
+        WHERE
             intMemberID = $toID
     ];
     $Data->{'db'}->do($st);
@@ -1522,7 +1522,7 @@ sub viewDefaultAssocSeasons {
         $newRegoSeasonID ||= $Data->{'SystemConfig'}{'Seasons_defaultNewRegoSeason'} || $maxSeasonID;
         $Data->{'db'}->do(qq[UPDATE tblAssoc SET intCurrentSeasonID = $currentSeasonID, intNewRegoSeasonID = $newRegoSeasonID WHERE intAssocID = $assocID]);
     }
-    
+
     my $txt_Name= $Data->{'SystemConfig'}{'txtSeason'} || 'Season';
     my $txt_Names= $Data->{'SystemConfig'}{'txtSeasons'} || 'Seasons';
 
@@ -1554,7 +1554,7 @@ sub viewDefaultAssocSeasons {
 
             <p><b>NEW REGISTRATION $txt_Name</b> for the $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC}. </p>
         ].drop_down('newregoSeasonID',$Seasons,undef,$newRegoSeasonID,1,0);
-        
+
     }
 
     return $subBody;
@@ -1565,21 +1565,21 @@ sub getSeasons  {
     $allseason ||= 0;
     $blankseason ||= 0;
     my $assocID=$Data->{'clientValues'}{'assocID'} || $Defs::INVALID_ID;
-  
+
     my $subType = $Data->{'RealmSubType'} || 0;
 
     my $checkLocked = $Data->{'HideLocked'} ? qq[ AND intLocked <> 1] : '';
     my $subTypeSeasonOnly = $Data->{'SystemConfig'}->{'OnlyUseSubRealmSeasons'} ? '' : 'OR intRealmSubTypeID= 0';
     my $st=qq[
-        SELECT 
-            intSeasonID, strSeasonName, intArchiveSeason 
-        FROM 
-            tblSeasons 
-        WHERE 
+        SELECT
+            intSeasonID, strSeasonName, intArchiveSeason
+        FROM
+            tblSeasons
+        WHERE
             intRealmID = $Data->{'Realm'}
             $checkLocked
         ORDER BY intSeasonOrder
-    ]; 
+    ];
 
     my $query = $Data->{'db'}->prepare($st);
     $query->execute();
@@ -1698,23 +1698,23 @@ sub seasonRollover  {
     for my $mID (@{$members_ref})   {
         next if ! $mID;
         my $st = qq[
-            SELECT 
-                DATE_FORMAT(M.dtDOB, "%Y%m%d"), M.intGender, MS.intPlayerStatus, MS.intCoachStatus, MS.intUmpireStatus, 
+            SELECT
+                DATE_FORMAT(M.dtDOB, "%Y%m%d"), M.intGender, MS.intPlayerStatus, MS.intCoachStatus, MS.intUmpireStatus,
                  MS.intOfficialStatus, MS.intMiscStatus, MS.intVolunteerStatus, MS.intOther1Status, MS.intOther2Status
-            FROM 
+            FROM
                 tblMember as M
-            LEFT JOIN 
+            LEFT JOIN
                 $MStablename as MS ON (
-                    MS.intMemberID = M.intMemberID 
+                    MS.intMemberID = M.intMemberID
                     AND MS.intSeasonID = $fromSeasonID
                     AND MS.intClubID = 0
                     AND MS.intAssocID = $assocID
                     AND MS.intMSRecStatus = 1
                 )
            WHERE M.intMemberID = $mID
-        ]; 
+        ];
 
-        my $qry= $Data->{'db'}->prepare($st); 
+        my $qry= $Data->{'db'}->prepare($st);
         $qry->execute or query_error($st);
 
         my ($DOBAgeGroup, $Gender, $PlayerStatus, $CoachStatus, $UmpireStatus, $OfficialStatus, $MiscStatus, $VolunteerStatus, $Other1Status, $Other2Status) = $qry->fetchrow_array();
@@ -1740,11 +1740,11 @@ sub seasonRollover  {
             my $season_WHERE = ($params{'Seasons_rolloverFrom'} > 0) ? qq[ AND MS.intSeasonID = $params{'Seasons_rolloverFrom'} ] : '';
             my $team_JOIN = $teamID ? qq[ INNER JOIN tblTeam as T ON (T.intTeamID = $teamID and MC.intClubID = T.intClubID)] : '';
             my $st = qq[
-                SELECT DISTINCT 
-                    MC.intClubID, MS.intPlayerStatus, MS.intCoachStatus, MS.intUmpireStatus, MS.intOfficialStatus, 
+                SELECT DISTINCT
+                    MC.intClubID, MS.intPlayerStatus, MS.intCoachStatus, MS.intUmpireStatus, MS.intOfficialStatus,
                     MS.intMiscStatus, MS.intVolunteerStatus, MS.intOther1Status, MS.intOther2Status
                 FROM tblMember_Clubs as MC
-                    LEFT JOIN $MStablename as MS ON (MS.intMemberID = MC.intMemberID 
+                    LEFT JOIN $MStablename as MS ON (MS.intMemberID = MC.intMemberID
                         AND MS.intClubID = MC.intClubID
                         AND MS.intAssocID = $assocID
                         AND MS.intMSRecStatus = 1)
@@ -1753,8 +1753,8 @@ sub seasonRollover  {
                     AND MC.intStatus <> $Defs::RECSTATUS_DELETED
                     $club_WHERE
                     $season_WHERE
-                ]; 
-                my $qry= $Data->{'db'}->prepare($st); 
+                ];
+                my $qry= $Data->{'db'}->prepare($st);
                 $qry->execute or query_error($st);
                 while (my $dref = $qry->fetchrow_hashref()) {
                 my %types=();
@@ -1776,16 +1776,16 @@ sub seasonRollover  {
                 WHERE intMemberID = $mID
                     AND intAssocID = $assocID
             ];
-            my $qry= $Data->{'db'}->prepare($st); 
+            my $qry= $Data->{'db'}->prepare($st);
             $qry->execute or query_error($st);
         }
         if ($Data->{'SystemConfig'}{'Seasons_rolloverDateRegistered'})  {
             my $st = qq[
-                UPDATE 
+                UPDATE
                     tblMember_Associations
-                SET         
+                SET
                     dtLastRegistered=NOW()
-                WHERE 
+                WHERE
                     intMemberID = $mID
                     AND intAssocID = $assocID
                 LIMIT 1
@@ -1837,19 +1837,19 @@ sub seasonToClubRollover    {
     for my $mID (@{$members_ref}) {
         next if ! $mID;
         my $st = qq[
-            SELECT 
-                DATE_FORMAT(M.dtDOB, "%Y%m%d"), M.intGender, MS.intPlayerStatus, MS.intCoachStatus, MS.intUmpireStatus, 
+            SELECT
+                DATE_FORMAT(M.dtDOB, "%Y%m%d"), M.intGender, MS.intPlayerStatus, MS.intCoachStatus, MS.intUmpireStatus,
                 MS.intOfficialStatus, MS.intMiscStatus, MS.intVolunteerStatus, MS.intOther1Status, MS.intOther2Status
             FROM tblMember as M
-            LEFT JOIN $MStablename as MS ON (MS.intMemberID = M.intMemberID 
+            LEFT JOIN $MStablename as MS ON (MS.intMemberID = M.intMemberID
                 AND MS.intSeasonID = $fromSeasonID
                 AND MS.intClubID = 0
                 AND MS.intAssocID = $assocID
                 AND MS.intMSRecStatus = 1
             )
             WHERE M.intMemberID = $mID
-        ]; 
-        my $qry= $Data->{'db'}->prepare($st); 
+        ];
+        my $qry= $Data->{'db'}->prepare($st);
         $qry->execute or query_error($st);
         my ($DOBAgeGroup, $Gender, $PlayerStatus, $CoachStatus, $UmpireStatus, $OfficialStatus, $MiscStatus, $VolunteerStatus, $Other1Status, $Other2Status) = $qry->fetchrow_array();
         my %types=();
@@ -1871,9 +1871,9 @@ sub seasonToClubRollover    {
         }
 
         my $upd_st = qq[
-            UPDATE 
+            UPDATE
                 tblMember_Associations
-            SET 
+            SET
                 intRecStatus=1
             WHERE
                 intMemberID= $mID
@@ -1884,14 +1884,14 @@ sub seasonToClubRollover    {
         my $ins_st = qq[
             INSERT IGNORE INTO tblMember_Associations
                 (intMemberID, intAssocID, intRecStatus)
-            VALUES 
+            VALUES
                 ($mID, $assocToID, 1)
         ];
         $Data->{'db'}->do($ins_st);
         $ins_st = qq[
             INSERT INTO tblMember_Types
                 (intMemberID, intTypeID, intSubTypeID, intActive, intAssocID, intRecStatus)
-            VALUES 
+            VALUES
                 ($mID,$Defs::MEMBER_TYPE_PLAYER,0,1,$assocToID, 1)
         ];
         $Data->{'db'}->do($ins_st);
@@ -1899,7 +1899,7 @@ sub seasonToClubRollover    {
         $ins_st = qq[
             INSERT INTO tblMember_Clubs
                 (intMemberID, intClubID, intStatus)
-            VALUES 
+            VALUES
                 ($mID, $clubToID, 1)
         ];
         $Data->{'db'}->do($ins_st);
@@ -1965,11 +1965,11 @@ sub listSeasons {
     my $subTypeSeasonOnly = $Data->{'SystemConfig'}->{'OnlyUseSubRealmSeasons'} ? '' : 'OR intRealmSubTypeID= 0';
 
     my $statement=qq[
-        SELECT 
-            intSeasonID, 
-            strSeasonName, 
-            DATE_FORMAT(dtAdded, '%d/%m/%Y') AS dtAdded, 
-            dtAdded AS dtAdded_RAW, 
+        SELECT
+            intSeasonID,
+            strSeasonName,
+            DATE_FORMAT(dtAdded, '%d/%m/%Y') AS dtAdded,
+            dtAdded AS dtAdded_RAW,
             intAssocID,
             intArchiveSeason
         FROM tblSeasons
@@ -1989,8 +1989,8 @@ sub listSeasons {
     my $client = $Data->{'client'};
     my @rowdata = ();
     while (my $dref= $query->fetchrow_hashref()) {
-        $dref->{AddedBy} = $dref->{intAssocID} 
-            ? $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC} 
+        $dref->{AddedBy} = $dref->{intAssocID}
+            ? $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC}
             : $Data->{'LevelNames'}{$Defs::LEVEL_NATIONAL};
         push @rowdata, {
             id => $dref->{'intSeasonID'} || 0,
@@ -2007,7 +2007,8 @@ sub listSeasons {
     my $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=SN_DTA">Add</a></span>];
 
     if (($Data->{'SystemConfig'}{'Seasons_NationalOnly'} and $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL)
-    or ($Data->{'SystemConfig'}{'Seasons_CantAddSeasons'} and $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL)) {
+    or ($Data->{'SystemConfig'}{'Seasons_CantAddSeasons'} and $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL)
+    or ($Data->{'ReadOnlyLogin'})) {
         $addlink = '';
     }
 

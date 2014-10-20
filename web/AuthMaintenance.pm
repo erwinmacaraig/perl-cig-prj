@@ -20,9 +20,9 @@ use GridDisplay;
 
 sub handleAuthMaintenance {
 	my (
-		$action, 
-		$Data, 
-		$entityTypeID, 
+		$action,
+		$Data,
+		$entityTypeID,
 		$entityID
 	) = @_;
 	my $client = setClient($Data->{'clientValues'});
@@ -40,16 +40,16 @@ sub handleAuthMaintenance {
 	if ($action =~/^AM_d/) {
 		$resultHTML .= auth_delete(
 			$Data,
-			$entityTypeID, 
-			$entityID, 
+			$entityTypeID,
+			$entityID,
 			$client,
 		);
 	}
 	elsif ($action =~/^AM_a/) {
 		$resultHTML .= auth_add (
 			$Data,
-			$entityTypeID, 
-			$entityID, 
+			$entityTypeID,
+			$entityID,
 			$client,
 		);
 	  $resultHTML.=$ret;
@@ -57,13 +57,13 @@ sub handleAuthMaintenance {
 	}
 	$resultHTML .= auth_list (
 		$Data,
-		$entityTypeID, 
-		$entityID, 
+		$entityTypeID,
+		$entityID,
 		$client,
 	);
-	
+
   return (
-		$resultHTML, 
+		$resultHTML,
 		$title
 	);
 }
@@ -71,8 +71,8 @@ sub handleAuthMaintenance {
 sub auth_list {
 	my (
 		$Data,
-		$entityTypeID, 
-		$entityID, 
+		$entityTypeID,
+		$entityID,
 		$client,
 	) = @_;
 
@@ -90,18 +90,18 @@ sub auth_list {
 		FROM
 			tblUser as u
                 INNER JOIN tblUserAuth as ua ON (ua.userId=u.userId)
-		WHERE 
+		WHERE
 			entityTypeID = ?
 			AND entityID = ?
-        ORDER BY 
-            familyName, 
+        ORDER BY
+            familyName,
             firstName
 
 	];
 	my $q = $db->prepare($st);
 	$q->execute(
-		$entityTypeID, 
-		$entityID, 
+		$entityTypeID,
+		$entityID,
 	);
 
     my @authlist = ();
@@ -123,7 +123,7 @@ sub auth_list {
         next if !$dref->{'email'};
         next if !$dref->{'status'} == 2;
         my $deleteLink = qq[<a href = "$Data->{'target'}?a=$delaction&amp;a2=$delaction2&amp;id=$dref->{'userId'}&amp;client=$client" onclick = "return confirm('Are you sure you want to remove $name?');">Delete</a>];
-        $deleteLink = '-' if($dref->{'userId'} ==$Data->{'clientValues'}{'userID'} and $entityTypeID==$Data->{'clientValues'}{'authLevel'});
+        $deleteLink = '-' if($dref->{'userId'} ==$Data->{'clientValues'}{'userID'} and $entityTypeID==$Data->{'clientValues'}{'authLevel'} and ($Data->{'ReadOnlyLogin'}));
 		push @outputdata, {
 		    id => $dref->{'userId'} || next,
 			Name => $name,
@@ -167,7 +167,7 @@ sub auth_list {
   );
 
 	my $body = runTemplate(
-		$Data, 
+		$Data,
 		{
 			AuthList => \@outputdata,
 			Grid => $grid,
@@ -187,8 +187,8 @@ sub auth_list {
 sub auth_delete {
 	my (
 		$Data,
-		$entityTypeID, 
-		$entityID, 
+		$entityTypeID,
+		$entityID,
 		$client,
 	) = @_;
 
@@ -196,18 +196,18 @@ sub auth_delete {
 
 	my $id = param('id') || '';
 	return '' if !$id;
-	
+
 	my $st = qq[
 		DELETE FROM tblUserAuth
-		WHERE 
+		WHERE
 			entityTypeID = ?
 			AND entityID = ?
 			AND userId= ?
 	];
 	my $q = $db->prepare($st);
 	$q->execute(
-		$entityTypeID, 
-		$entityID, 
+		$entityTypeID,
+		$entityID,
 		$id,
 	);
 	$q->finish();
@@ -234,8 +234,8 @@ sub loadUserDetails {
 sub auth_add {
 	my (
 		$Data,
-		$entityTypeID, 
-		$entityID, 
+		$entityTypeID,
+		$entityID,
 		$client,
 	) = @_;
 
@@ -246,7 +246,7 @@ sub auth_add {
 	return '' if !$newemail;
 	return '' if !$entityTypeID;
 	return '' if !$entityID;
-	
+
     my $user_ref = loadUserDetails($Data, $newemail);
     my $DB_intMemberID = $user_ref->{'userId'} || 0;
 	$DB_intMemberID = 0 if $user_ref->{'status'} != 2;
@@ -270,8 +270,8 @@ sub auth_add {
 		my $q = $db->prepare($st);
 		$q->execute(
 			$DB_intMemberID,
-			$entityTypeID, 
-			$entityID, 
+			$entityTypeID,
+			$entityID,
 			$readonly,
 		);
 		$q->finish();

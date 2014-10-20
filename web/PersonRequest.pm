@@ -43,9 +43,39 @@ sub handlePersonRequest {
 
     switch($action) {
         case 'PRA_T' {
+            my $transferTypeOption = undef;
+            my $defaultTypeChecked = undef;
+            foreach my $transferType (sort keys %Defs::personTransferType) {
+                $defaultTypeChecked = 'checked="checked"' if($transferType eq $Defs::TRANSFER_TYPE_DOMESTIC);
+                $transferTypeOption .= "<input type='radio' name='transfer_type' $defaultTypeChecked value='$transferType'>$Defs::personTransferType{$transferType}</input>";
+                $defaultTypeChecked = '';
+            }
             $title = "Request a Transfer";
             $TemplateData{'action'} = 'PRA_search';
             $TemplateData{'request_type'} = 'transfer';
+            $TemplateData{'transferTypeOption'} = $transferTypeOption;
+            $TemplateData{'script'} = qq[
+                <script>
+                    jQuery(document).ready(function(){
+                        jQuery(":radio[name=transfer_type]").click(function(){
+                            jQuery("div#international").slideToggle("fast");
+                            jQuery("div#domestic").slideToggle("fast");
+
+                            //if(jQuery(this).val() == "DOMESTIC"){
+                            //    jQuery("div#domestic").show();
+                            //    jQuery("div#international").hide();
+                            //} else {
+                            //    jQuery("div#domestic").show();
+                            //    jQuery("div#international").hide();                           
+                            //}
+                        });
+                    });
+                </script>
+            ];
+
+            $TemplateData{'noITC'} = qq[ <span class="button generic-button"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PRA_NC">]. $Data->{'lang'}->txt("No") . q[</a></span>];
+            $TemplateData{'withITC'} = qq[ <span class="button generic-button"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PF_&amp;dtype=PLAYER&amp;itc=1">]. $Data->{'lang'}->txt("Yes") . q[</a></span>];
+
             $body = runTemplate(
                 $Data,
                 \%TemplateData,
@@ -80,6 +110,9 @@ sub handlePersonRequest {
         case 'PRA_S' {
             ($body, $title) = setRequestResponse($Data);
         }
+        case 'PRA_NC' {
+            ($body, $title) = displayNoITC($Data);
+        }
         else {
         }
     }
@@ -96,15 +129,19 @@ sub listPersonRecord {
     my $client = setClient( $Data->{'clientValues'} ) || '';
 	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
 
-    my $MID = safe_param('mid','word') || '';
+    my $searchKeyword = safe_param('search_keyword','words') || '';
+    $searchKeyword =~ s/\h+/ /g;
+    $searchKeyword =~ s/^\s+|\s+$//;
     my $firstname = safe_param('firstname','words') || '';
     my $lastname = safe_param('lastname','words') || '';
     #TODO: might need to validate dob or use jquery datepicker
     my $dob = $params{'dob'} || '';
     my $request_type = $params{'request_type'} || '';
+    my $transferType = safe_param('transfer_type', 'word') || '';
+    warn "TRANSFER TYPE $transferType";
 
     my $title = $Data->{'lang'}->txt('Search Result');
-    warn "PERSONREQUEST $MID";
+    warn "PERSONREQUEST $searchKeyword";
     warn "PERSONFNAME $firstname";
     warn "PERSONLNAME $lastname";
     warn "PERSONDOB $dob";
@@ -190,14 +227,13 @@ sub listPersonRecord {
             ON (E.intEntityID = PR.intEntityID and E.intRealmID = PR.intRealmID)
         WHERE
             P.intRealmID = ?
-            AND P.strNationalNum = ?
             AND P.strStatus IN ('REGISTERED', 'PASSIVE','PENDING')
             AND
-                (P.strLocalFirstname LIKE CONCAT('%',?,'%') OR P.strLocalSurname LIKE CONCAT('%',?,'%'))
-            AND P.dtDOB = ?
+                (P.strNationalNum = ? OR CONCAT_WS(' ', P.strLocalFirstname, P.strLocalSurname) LIKE CONCAT('%',?,'%') OR CONCAT_WS(' ', P.strLocalSurname, P.strLocalFirstname) LIKE CONCAT('%',?,'%'))
         $orderBy
         $limit
     ];
+    #(P.strNationalNum = ? OR P.strLocalFirstname LIKE CONCAT('%',?,'%') OR P.strLocalSurname LIKE CONCAT('%',?,'%'))
 
     my $db = $Data->{'db'};
     my $q = $db->prepare($st) or query_error($st);
@@ -205,10 +241,9 @@ sub listPersonRecord {
         $entityID,
         $entityID,
         $Data->{'Realm'},
-        $MID,
-        $firstname,
-        $lastname,
-        $dob,
+        $searchKeyword,
+        $searchKeyword,
+        $searchKeyword
     ) or query_error($st);
 
     my $found = 0;
@@ -228,7 +263,7 @@ sub listPersonRecord {
             $actionLink = qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=PRA_V&amp;rid=$tdref->{'currEntityPendingRequestID'}">]. $Data->{'lang'}->txt("View pending") . q[</a></span>];    
         }
         else {
-            $actionLink = qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=PRA_initRequest&amp;pid=$tdref->{'intPersonID'}&amp;prid=$tdref->{'intPersonRegistrationID'}&amp;request_type=$request_type">]. $Data->{'lang'}->txt($request_type) . q[</a></span>];
+            $actionLink = qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=PRA_initRequest&amp;pid=$tdref->{'intPersonID'}&amp;prid=$tdref->{'intPersonRegistrationID'}&amp;request_type=$request_type&amp;transfer_type=$transferType">]. $Data->{'lang'}->txt($request_type) . q[</a></span>];
         }
 
         push @rowdata, {
@@ -320,30 +355,51 @@ sub listPersonRecord {
 sub initRequestPage {
     my ($Data) = @_;
 
-    my $title = "Confirm Request";
+    my $title = undef;
+    my $body = undef;
     my $personID = safe_param('pid', 'number') || 0;
     my $personRegistrationID = safe_param('prid', 'number') || 0;
     my $requestType = safe_param('request_type', 'word') || '';
-
-    my %RequestAction = (
-        'request_type' => $requestType,
-        'client' => $Data->{client} || 0,
-        'backAction' => 'PRA_T',
-        'sendAction' => 'PRA_submit',
-        'target' =>$Data->{'target'},
-    );
-
+    my $transferType = safe_param('transfer_type', 'word') || '';
     my %TemplateData;
-    $TemplateData{'RequestAction'} = \%RequestAction;
-    $TemplateData{'personID'} = $personID;
-    $TemplateData{'personRegistrationID'} = $personRegistrationID;
 
-    my $body = runTemplate(
-        $Data,
-        \%TemplateData,
-        'personrequest/generic/submit_request.templ',
-    );
+    warn "INIT REQ TRANSFER TYPE $transferType";
+    if($transferType eq $Defs::TRANSFER_TYPE_INTERNATIONAL) {
+        $title = $Data->{'lang'}->txt("Do you have Player's International Transfer Certificate?");
 
+        $TemplateData{'noITC'} = qq[ <span class="button generic-button"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PRA_NC">]. $Data->{'lang'}->txt("No") . q[</a></span>];
+        $TemplateData{'withITC'} = qq[ <span class="button generic-button"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PF_&amp;dtype=PLAYER&amp;itc=1">]. $Data->{'lang'}->txt("Yes") . q[</a></span>];
+
+        $body = runTemplate(
+            $Data,
+            \%TemplateData,
+            'personrequest/transfer/itc_question.templ',
+        );
+
+        my %TemplateData;
+
+    }
+    else {
+        $title = $Data->{'lang'}->txt("Confirm Request");
+        my %RequestAction = (
+            'request_type' => $requestType,
+            'client' => $Data->{client} || 0,
+            'backAction' => 'PRA_T',
+            'sendAction' => 'PRA_submit',
+            'target' =>$Data->{'target'},
+        );
+
+        $TemplateData{'RequestAction'} = \%RequestAction;
+        $TemplateData{'personID'} = $personID;
+        $TemplateData{'personRegistrationID'} = $personRegistrationID;
+
+        $body = runTemplate(
+            $Data,
+            \%TemplateData,
+            'personrequest/generic/submit_request.templ',
+        );
+
+    }
     return ($body, $title);
 }
 
@@ -944,6 +1000,16 @@ sub setRequestStatus {
         $requestStatus,
         $requestID
     ) or query_error($st);
+}
+
+sub displayNoITC {
+    my ($Data) = @_;
+
+    my $title = $Data->{'lang'}->txt("Next step");
+    my $body = $Data->{'lang'}->txt("Please request Player's ITC via TMS or directly to the other MA.");
+    #return text for now
+    return ($body, $title);
+
 }
 
 1;

@@ -22,7 +22,7 @@ use Data::Dumper;
 use Authorize;
 use FieldLabels;
 
-sub handleEntityIdentifiers{ 
+sub handleEntityIdentifiers{
     my($action, $Data)=@_;
 
     my $resultHTML='';
@@ -36,7 +36,7 @@ sub handleEntityIdentifiers{
         ($tempResultHTML,$title)=list($Data);
         $resultHTML .= $tempResultHTML;
     }
-        
+
     return ($resultHTML,$title);
 }
 
@@ -44,7 +44,7 @@ sub provision{
     my ($action, $Data)=@_;
     my $id= param('intIdentifierId') || 0;
     my $FieldLabels   = FieldLabels::getFieldLabels( $Data, $Defs::LEVEL_CLUB );
-    
+
     my $entityID = getID($Data->{'clientValues'});
     return '' if ($id and !entityAllowed($Data, $entityID,$Defs::LEVEL_CLUB));
     my $option='display';
@@ -52,8 +52,8 @@ sub provision{
     $option='add' if $action eq 'C_ID_DTA';
     $option='del' if $action eq 'C_ID_DTD';
     $id=0 if $option eq 'add';
-    
-    
+
+
     my $client = unescape($Data->{client});
     if($option eq 'del'){
       my $st=qq[
@@ -68,25 +68,25 @@ sub provision{
        print $cgi->header(-location => qq[$Data->{'target'}?client=$client&amp;a=C_ID_LIST]);
     }
     my %tempClientValues = getClient($client);
-    
+
     my $intRealmID = $Data->{'Realm'} ? $Data->{'Realm'} : 0;
     my $field=loadDetails($Data->{'db'}, $id) || ();
-    
+
     my $st=qq[
-        SELECT 
+        SELECT
             DISTINCT
             intIdentifierTypeID as Value,
             strIdentifierName as Name
         FROM
             tblIdentifierTypes
-        WHERE 
+        WHERE
             intActive = 1 AND
             intRealmID = $intRealmID
         ORDER BY
             strIdentifierName
     ];
     my ($contacts_vals,$contacts_order)=getDBdrop_down_Ref($Data->{'db'},$st,'');
-    
+
     my %FieldDefinitions = (
       fields=>  {
        intIdentifierTypeID => {
@@ -138,10 +138,10 @@ sub provision{
         dtValidFrom
         dtValidUntil
         strDescription
-        
+
       )],
-      sections => [ 
-        [ 'details', "Identifier Details" ], 
+      sections => [
+        [ 'details', "Identifier Details" ],
     ],
     options => {
       labelsuffix => ':',
@@ -150,7 +150,7 @@ sub provision{
       formname => 'n_form',
       submitlabel => $Data->{'lang'}->txt('Update'),
       introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
-      NoHTML => 1, 
+      NoHTML => 1,
       updateSQL => qq[
           UPDATE tblEntityIdentifier
             SET --VAL--
@@ -158,14 +158,14 @@ sub provision{
       ],
       addSQL => qq[
           INSERT INTO tblEntityIdentifier (
-              intEntityID, 
-              intRealmID, 
-              --FIELDS-- 
+              intEntityID,
+              intRealmID,
+              --FIELDS--
           )
           VALUES (
               $entityID,
               $intRealmID,
-              --VAL-- 
+              --VAL--
           )
       ],
       auditFunction=> \&auditLog,
@@ -208,7 +208,7 @@ sub provision{
     }
     $chgoptions=qq[<div class="changeoptions">$chgoptions</div>] if $chgoptions;
     $title=$chgoptions.$title;
-    
+
     $title="Add New Identifier" if $option eq 'add';
      my $text = qq[<p style = "clear:both;"><a href="$Data->{'target'}?client=$client&amp;a=C_ID_LIST">Click here</a> to return to list of Identifer</p>];
     $resultHTML = $text.$resultHTML.$text;
@@ -242,9 +242,9 @@ sub postUpdate {
 
 sub loadDetails {
   my($db, $id) = @_;
-                                                                                                        
+
   my $statement=qq[
-    SELECT 
+    SELECT
         EI.intIdentifierId,
         EI.intEntityID,
         EI.intRealmID,
@@ -254,7 +254,7 @@ sub loadDetails {
         DATE_FORMAT(EI.dtValidFrom,"%d/%m/%Y") as dtValidFrom,
         DATE_FORMAT(EI.dtValidUntil,"%d/%m/%Y") as dtValidUntil,
         EI.strDescription
-      FROM tblEntityIdentifier AS EI 
+      FROM tblEntityIdentifier AS EI
         INNER JOIN tblIdentifierTypes as IT ON EI.intIdentifierTypeID=IT.intIdentifierTypeID
       WHERE IT.intActive = 1
         AND EI.intIdentifierId = ?
@@ -263,7 +263,7 @@ sub loadDetails {
   $query->execute($id);
   my $field=$query->fetchrow_hashref();
   $query->finish;
-                                                                                                        
+
   foreach my $key (keys %{$field})  { if(!defined $field->{$key}) {$field->{$key}='';} }
   return $field;
 }
@@ -279,7 +279,7 @@ sub list{
     my $entityID = getID($Data->{'clientValues'});
 
     my $statement =qq[
-      SELECT 
+      SELECT
         EI.intIdentifierId,
         EI.intEntityID,
         EI.intRealmID,
@@ -289,17 +289,17 @@ sub list{
         DATE_FORMAT(EI.dtValidFrom,"%d/%m/%Y") as dtValidFrom,
         DATE_FORMAT(EI.dtValidUntil,"%d/%m/%Y") as dtValidUntil,
         EI.strDescription
-      FROM tblEntityIdentifier AS EI 
+      FROM tblEntityIdentifier AS EI
         INNER JOIN tblIdentifierTypes as IT ON EI.intIdentifierTypeID=IT.intIdentifierTypeID
       WHERE IT.intActive = 1
         AND EI.intStatus = 0
         AND EI.intEntityID = ?
       ORDER BY EI.intIdentifierId
     ];
-    
+
     my $query = $Data->{'db'}->prepare($statement);
     $query->execute($entityID);
-    
+
     my $results=0;
     my @rowdata = ();
     while (my $dref = $query->fetchrow_hashref) {
@@ -322,19 +322,19 @@ sub list{
     my $title=qq[Identifiers];
     {
         my $tempClient = setClient(\%tempClientValues);
-        $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_ID_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>];
+        $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_ID_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if (!$Data->{'ReadOnlyLogin'});
 
     }
     my $modoptions=qq[<div class="changeoptions">$addlink</div>];
     $title=$modoptions.$title;
     my $rectype_options=''; #show_recordtypes(
-#        $Data, 
+#        $Data,
 #        $Data->{'lang'}->txt('Name'),
 #        '',
 #        \%Defs::entityStatus,
 #        { 'ALL' => $Data->{'lang'}->txt('All'), },
 #    ) || '';
-    
+
     my @headers = (
         {
             type  => 'Selector',
@@ -361,7 +361,7 @@ sub list{
             field  => 'strDescription'
         },
     );
-    
+
     my $filterfields = [
         {
             field     => 'strIdentifier',
@@ -374,7 +374,7 @@ sub list{
             allvalue  => 'ALL',
         },
     ];
-    
+
     my $grid  = showGrid(
         Data    => $Data,
         columns => \@headers,
