@@ -20,7 +20,7 @@
 					width:400px;
 					margin-left:auto;
 					margin-right:auto;
-				}
+i				}
 				body	{
 				}
 				table.paymentlist td{
@@ -29,34 +29,35 @@
 
 			</style>
     </head>
-		<body>
+		<!-- <body onload="window.print();close();" > --> 
+     <body>
 			<div class="receiptbox">
+     
+            <div style="text-align:center; padding-top: 50px;">
+				<h2>[% OtherInfo.0.strRealmName %] </h2>
+				<h3>[% OtherInfo.0.Club %]</h3>
+			</div>
 
-[% FOREACH r = Receipts %]
-	<div style="text-align:center;">
-		<h2>[% r.Info.strAssocName %]</h2>
-		<h3>[% r.Info.strClubName %]</h3>
-	</div>
 
-	<table class="paymentlist">
+       <table class="paymentlist">
 		<tr>
-			<td><b>Payment For:</b></td>
-			<td>[% r.Info.Name %]</td>
+			<td>[% index %]<b>Payment For:</b></td>
+			<td>[% Receipts.1.Info.Name %]</td>
 		</tr>
 		<tr>
 			<td><b>Payment Date:</b></td>
-			<td>[% r.Info.dtLog_FMT %]</td>
+			<td>[% Receipts.1.Info.dtLog_FMT %]</td>
 		</tr>
 		<tr>
 			<td><b>Payment Type:</b></td>
-			<td>[% r.Info.PaymentType %]</td>
+			<td>[% Receipts.1.Info.PaymentType %]</td>
 		</tr>
 		<tr>
 			<td><b>Receipt No.:</b></td>
-			<td>[% r.Info.intLogID %]</td>
+			<td>[% Receipts.1.Info.intLogID %]</td>
 		</tr>
 	</table>
-		<br><br>
+	<br><br>
 	<table class="itemlist">
 		<tr style = " border-bottom:1px solid #aaa;">
 			<td style="width:80px;">Item</td>
@@ -64,7 +65,7 @@
 			<td>Description</td>
 			<td style="width:70px;">Cost</td>
 		</tr>
-	[% FOREACH i = r.Items %]
+	[% FOREACH i IN Receipts.0.Items %]
 		<tr>
 			<td>[% i.InvoiceNo %]</td>
 			<td>[% i.intQty %]</td>
@@ -74,10 +75,10 @@
 	[% END %]
 		<tr style = " border-top:1px solid #aaa;">
 			<td colspan="3"><b>Payment Total:</b></td>
-			<td><b>\$[% r.Info.intAmount %]</b></td>
+			<td><b>\$[% Receipts.1.Info.intAmount %]</b></td>
 		</tr>
 	</table>
-[% END %]
+
 			</div>
     </body>
   </html>
