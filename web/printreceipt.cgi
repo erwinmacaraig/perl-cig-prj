@@ -20,11 +20,10 @@ use ConfigOptions;
 use Lang;
 use TTTemplate;
 use Payments;
-
+use Data::Dumper;
 main();
 
 sub main	{
-
 	# GET INFO FROM URL
 	my $action = param('a') || '';
 	my $client = param('client') || '';
@@ -38,6 +37,8 @@ sub main	{
 	# AUTHENTICATE
 	my $db=allowedTo(\%Data);
   ($Data{'Realm'}, $Data{'RealmSubType'})=getRealm(\%Data);
+  
+ 
 	$Data{'SystemConfig'}=getSystemConfig(\%Data);
     my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
   $Data{'lang'}=$lang;
@@ -96,16 +97,19 @@ sub main	{
 				M.strLocalFirstName, 
 				E.*, 
 				P.strName, 
-				P.strGroup
+				P.strGroup,
+                T.intQty,
+                T.curAmount
 			FROM tblTransactions as T
 				LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_MEMBER)
 				LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
-				LEFT JOIN tblEntity as E on (E.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
-			WHERE intTransLogID IN (?)
+				LEFT JOIN tblEntity as E on (E.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB) 
+			 WHERE intTransLogID IN (?) 
+                        
 			AND T.intRealmID = ?
-		];
-		my $qry_trans = $db->prepare($st_trans);
-    $qry_trans->execute(
+		]; 
+               	my $qry_trans = $db->prepare($st_trans);
+                $qry_trans->execute(
 			$txlogIDs,
 			$Data{'Realm'},
 		);
@@ -117,16 +121,24 @@ sub main	{
 		$qry_trans->finish();
 
 		my %ContentData = ();
-		for my $k (keys %receiptData)	{
+                for my $k (sort keys %receiptData)	{
 			push @{$ContentData{'Receipts'}}, $receiptData{$k};
 		}
+                #$receiptData{'BodyLoad'} = qq[ onload="window.print();close();" ];
+                #print STDERR "\n======= \n** ContentData: " . Dumper(%ContentData) . "\n==========**********\n";
+		 my $filename = $Data{'SystemConfig'}{'receiptFilename'} || 'standardreceipt';
 
-		my $filename = $Data{'SystemConfig'}{'receiptFilename'} || 'standardreceipt';
-		#$receiptData{'BodyLoad'} = qq[ onload="window.print();close();" ];
-		$resultHTML = runTemplate(
+                my $q = qq[SELECT strRealmName, (SELECT strLocalName FROM tblEntity WHERE intEntityID = ?) as Region, strLocalName as Club FROM tblEntity INNER JOIN tblRealms ON tblEntity.intRealmID = tblRealms.intRealmID WHERE intEntityID = ?]; 
+                my $handle = $db->prepare($q); 
+                $handle->execute($Data{clientValues}{regionID}, $Data{clientValues}{clubID}); 
+                my $handle_ref = $handle->fetchrow_hashref();
+                push @{$ContentData{'OtherInfo'}}, $handle_ref;
+	        # print FH "\n ****** ======= \n**\n ContentData: " . Dumper(%ContentData) . "\n==========\n";
+	
+                $resultHTML = runTemplate(
 			\%Data, 
 			\%ContentData,
-			"txn_receipt/$filename.templ"
+                        "txn_receipt/$filename.templ"
 		);
 
 	}

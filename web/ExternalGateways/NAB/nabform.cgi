@@ -68,7 +68,6 @@ sub NABProcess  {
     $chkvalue = $m->hexdigest();
        
     my $url = $Defs::gatewayReturnDemo . qq[/gatewayprocess.cgi?a=S&amp;client=$client&amp;ext=$external&amp;ci=$logID&amp;chkv=$chkvalue&amp;formID=$formID&amp;session=$session&amp;restext=$respText&amp;rescode=$respCode&amp;txnid=111&amp;authid=123];
-#    my $url = qq[http://elwood/FIFASPOnline/web/payments_process.cgi?a=S&amp;client=$client&amp;ext=$external&amp;ci=$logID&amp;chkv=$chkv&amp;formID=$formID&amp;session=$session&amp;responsetext=Approved&amp;responsecode=00&amp;txnid=111&amp;authid=123];
 
     my $agent = LWP::UserAgent->new(env_proxy => 1,keep_alive => 1, timeout => 30); 
     my $header = HTTP::Request->new(GET => $url); 
@@ -108,7 +107,7 @@ sub NABPaymentForm  {
 
 sub displayNABCCPage    {
     my ($Data, $logID, $NAB_ref) = @_;
-    my $base_url = 'http://elwood/FIFASPOnline/web';
+    my $base_url = 'http://emacaraig.spildevel/FIFASPOnline/web';
 
   my $expiryMonth = qq[
 		<span class="expirym">
@@ -168,7 +167,7 @@ sub displayNABCCPage    {
 					  <div class="card-field"><div class="label">Amount</div><div class="input">\$$NAB_ref->{'amount'}</div></div>
 				</div>
 						<div style="color:red"><b>PLEASE DO NOT DOUBLE CLICK THE PROCESS PAYMENT BUTTON.</b><br>Double clicking can result in the payment being processed twice</div>
-					  <br><br><input type="submit" name="SUBMIT" value="Process Payment" style="height:30px;width:180px;margin-left:145px;margin-top:20px;" id="btnsubmit">
+					  <br><br><input type="submit" name="SUBMIT" value="Process Payment" style="height:30px;width:180px;margin-left:145px;margin-top:20px;" id="btnsubmit" onclick="javascript:this.disabled='true';">
 		<img src="images/nab-logo-registrations.png" style="float:right;padding-right:145px;"> 
      		<input type="hidden" name="EPS_CURRENCY" value="$NAB_ref->{'currency'}">
      		<input type="hidden" name="EPS_TIMESTAMP" value="$NAB_ref->{'EPS_TIMESTAMP'}">
