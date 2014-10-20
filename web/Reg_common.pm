@@ -7,7 +7,7 @@ package Reg_common;
 require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = @EXPORT_OK = qw(
-kickThemOff allowedTo setClient getClient stripSpaces moneyFormat entryExists getDataAccess textMessage getAssocID getDBConfig create_selectbox getLevelName txtField getID setClientValue getClientValue allowedAction getRealm currency createButtonForm getRegoPassword getEntityValues getEntityID getEntityStructure isHeavierPerm get_page_url getLastEntityID getLastEntityLevel
+kickThemOff allowedTo setClient getClient stripSpaces moneyFormat entryExists getDataAccess textMessage getAssocID getDBConfig create_selectbox getLevelName txtField getID setClientValue getClientValue allowedAction getRealm currency createButtonForm getRegoPassword getEntityValues getEntityID getEntityStructure isHeavierPerm get_page_url getLastEntityID getLastEntityLevel getClientFieldKey
 );
 
 use strict;
@@ -867,22 +867,45 @@ sub getEntityID {
     my $level = $clientValues->{'currentLevel'};
     my $entityID = 0;
 
-    if($level == 100){#National
+    if($level == $Defs::LEVEL_NATIONAL){#National
         $entityID = $clientValues->{'natID'};    
     } 
-    elsif ($level == 30){#State
+    elsif ($level == $Defs::LEVEL_STATE){#State
         $entityID = $clientValues->{'stateID'};       
     }
-    elsif($level == 20){#Region
+    elsif($level == $Defs::LEVEL_REGION){#Region
         $entityID = $clientValues->{'regionID'};
     }
-    elsif($level == 10){#Zone
+    elsif($level == $Defs::LEVEL_ZONE){#Zone
         $entityID = $clientValues->{'zoneID'};
     }
-    elsif ($level == 3){#club
+    elsif ($level == $Defs::LEVEL_CLUB){#club
         $entityID = $clientValues->{'clubID'};
     }
     return $entityID;
+}
+
+sub getClientFieldKey {
+    my ($level) = @_;
+    if($level == $Defs::LEVEL_NATIONAL){#National
+        return 'natID';    
+    } 
+    elsif ($level == $Defs::LEVEL_STATE){#State
+        return 'stateID';       
+    }
+    elsif($level == $Defs::LEVEL_REGION){#Region
+        return 'regionID';
+    }
+    elsif($level == $Defs::LEVEL_ZONE){#Zone
+        return 'zoneID';
+    }
+    elsif ($level == $Defs::LEVEL_CLUB){#club
+        return 'clubID';
+    }
+    elsif ($level == $Defs::LEVEL_PERSON){#person
+        return 'personID';
+    }
+    return '';
 }
 
 sub getEntityStructure {

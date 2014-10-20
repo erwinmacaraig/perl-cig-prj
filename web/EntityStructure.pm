@@ -97,6 +97,7 @@ sub createTempEntityStructure  {
 
     my $entity_list = join(',',keys %entities);
     my %entityLinks = ();
+    my %entityLinksCtoP = ();
     if($entity_list)  {
       my $st_el = qq[
         SELECT
@@ -118,6 +119,9 @@ sub createTempEntityStructure  {
             and exists($entities{$child})
         )    {
           push @{$entityLinks{$parent}}, $child; 
+          if(!exists $entityLinksCtoP{$child} or $primary)  {
+              $entityLinksCtoP{$child} = $parent;
+          }
           #Insert the direct relationships
           $ins_qry->execute(
               $realmID,
@@ -143,6 +147,8 @@ sub createTempEntityStructure  {
           $realmID,
       );
     }
+
+    createTreeStructure($db, $realmID, \%entities, \%entityLinks, \%entityLinksCtoP);
   }
 }
 
@@ -192,3 +198,84 @@ sub insertRelationships {
     return \@children;
 }
 
+sub createTreeStructure {
+    my (
+        $db, 
+        $realmID, 
+        $entities, 
+        $entityLinks,
+        $entityLinksCtoP,
+    ) = @_;
+    
+    my %pathToNational = ();
+
+
+    foreach my $eId (keys %{$entityLinksCtoP})    {
+        next if !$entities->{$eId};
+        my @path = ();
+        my $count = 5;
+        my $workingId = $eId;
+        my $found = 0;
+        for my $i ( 1 .. 5) {
+            my $level = $entities->{$workingId}{'level'};
+            push @path, [$workingId, $level];
+            if($level == 100)   {
+                $found = 1;
+                last;
+            }
+            else    {
+                $workingId = $entityLinksCtoP->{$workingId};
+            }
+        }
+        if($found)  {
+            $pathToNational{$eId} = \@path;
+        }
+    }
+    my $ins_st = qq[
+        INSERT INTO tblTempTreeStructure (
+            intRealmID, 
+            int100_ID,
+            int30_ID,
+            int20_ID,
+            int10_ID,
+            int3_ID
+        )
+        VALUES (
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?
+        )
+    ];
+    my $ins_qry= $db->prepare($ins_st);
+
+    my $del_st = qq[
+      DELETE FROM 
+        tblTempTreeStructure
+      WHERE 
+        intRealmID = ?
+    ];
+
+    my $del_qry= $db->prepare($del_st);
+    $del_qry->execute($realmID);
+    foreach my $eId (keys %pathToNational)  {
+        my %row = ();
+        for my $r (@{$pathToNational{$eId}})    {
+            $row{'t'.$r->[1]} = $r->[0];
+        }
+        
+        $ins_qry->execute(
+          $realmID,
+          $row{'t100'} || 0,
+          $row{'t30'} || 0,
+          $row{'t20'} || 0,
+          $row{'t10'} || 0,
+          $row{'t3'} || 0,
+        );
+
+    }
+
+
+}
