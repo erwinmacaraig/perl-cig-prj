@@ -247,8 +247,7 @@ print STDERR "SSSS$action $clubID\n";
         type => 'lookup',
         options => \%legalTypeOptions,
         firstoption => [ '', 'Select Type' ],
-        readonly =>($Data->{'clientValues'}{authLevel} < $Defs::LEVEL_NATIONAL),
-        compulsory => 1,
+        readonly =>($Data->{'clientValues'}{authLevel} < $Defs::LEVEL_NATIONAL),       
      },
      strLegalID => {
         label => "Legal Type Number",
