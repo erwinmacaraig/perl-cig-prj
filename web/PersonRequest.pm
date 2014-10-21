@@ -85,7 +85,7 @@ sub handlePersonRequest {
         case 'PRA_R' {
             $title = "Request Access to Person Details";
             $TemplateData{'request_type'} = 'access';
-            $TemplateData{'action'} = 'PRA_search';
+            $TemplateData{'action'} = 'PRA_getrecord';
             $body = runTemplate(
                 $Data,
                 \%TemplateData,
@@ -93,6 +93,9 @@ sub handlePersonRequest {
             );
         }
         case 'PRA_search' {
+            ($body, $title) = listPeople($Data);
+        }
+        case 'PRA_getrecord' {
             ($body, $title) = listPersonRecord($Data);
         }
         case 'PRA_initRequest' {
@@ -120,6 +123,121 @@ sub handlePersonRequest {
 	return ($body, $title);
 }
 
+sub listPeople {
+    my ($Data) = @_;
+
+	my $p = new CGI;
+	my %params = $p->Vars();
+    my $title = $Data->{'lang'}->txt('Search Result');
+
+    my $client = setClient( $Data->{'clientValues'} ) || '';
+	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
+
+    my $searchKeyword = safe_param('search_keyword','words') || '';
+    $searchKeyword =~ s/\h+/ /g;
+    $searchKeyword =~ s/^\s+|\s+$//;
+    my $firstname = safe_param('firstname','words') || '';
+    my $lastname = safe_param('lastname','words') || '';
+    #TODO: might need to validate dob or use jquery datepicker
+    my $dob = $params{'dob'} || '';
+    my $request_type = $params{'request_type'} || '';
+    my $transferType = safe_param('transfer_type', 'word') || '';
+
+    my $title = $Data->{'lang'}->txt('Search Result');
+
+    my $st = qq[
+        SELECT
+            P.strLocalFirstname,
+            P.strLocalSurname,
+            P.strNationalNum,
+            E.strLocalName,
+            PR.intPersonRegistrationID
+        FROM
+            tblPerson P
+        INNER JOIN tblPersonRegistration_$Data->{'Realm'} PR ON (PR.intPersonID = P.intPersonID AND PR.intEntityID <> ?)
+        INNER JOIN tblEntity E ON (E.intEntityID = PR.intEntityID)
+        WHERE
+            P.intRealmID = ?
+            AND P.strStatus IN ('REGISTERED', 'PASSIVE','PENDING')
+            AND
+                (P.strNationalNum = ? OR CONCAT_WS(' ', P.strLocalFirstname, P.strLocalSurname) LIKE CONCAT('%',?,'%') OR CONCAT_WS(' ', P.strLocalSurname, P.strLocalFirstname) LIKE CONCAT('%',?,'%'))
+        GROUP BY P.strNationalNum
+    ];
+
+    my $db = $Data->{'db'};
+    my $q = $db->prepare($st) or query_error($st);
+    $q->execute(
+        $entityID,
+        $Data->{'Realm'},
+        $searchKeyword,
+        $searchKeyword,
+        $searchKeyword
+    ) or query_error($st);
+
+    my $found = 0;
+    my @rowdata = ();
+    my $actionLink = undef;
+    while(my $tdref = $q->fetchrow_hashref()) {
+        $found++;
+        $actionLink = qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=PRA_getrecord&request_type=$request_type&amp;search_keyword=$tdref->{'strNationalNum'}&amp;transfer_type=$transferType">]. $Data->{'lang'}->txt("Select") . q[</a></span>];    
+        push @rowdata, {
+            id => $tdref->{'intPersonRegistrationID'} || 0,
+            currentClub => $tdref->{'strLocalName'} || '',
+            localFirstname => $tdref->{'strLocalFirstname'} || '',
+            localSurname => $tdref->{'strLocalSurname'} || '',
+            MAID => $tdref->{'strNationalNum'} || '',
+            actionLink => $actionLink,
+        }
+    }
+
+    return ("No record found.", $title) if !$found;
+
+    my @headers = (
+        {
+            name => $Data->{'lang'}->txt('MAID'),
+            field => 'MAID',
+        },
+        #{
+        #    name => $Data->{'lang'}->txt('Registered To'),
+        #    field => 'currentClub',
+        #}, 
+        {
+            name => $Data->{'lang'}->txt('First Name'),
+            field => 'localFirstname',
+        },
+        {
+            name => $Data->{'lang'}->txt('Last Name'),
+            field => 'localSurname',
+        },
+        {
+            name => $Data->{'lang'}->txt('Action'),
+            field => 'actionLink',
+            type => 'HTML', 
+        },
+
+    ); 
+
+    my $rectype_options = '';
+    my $grid = showGrid(
+        Data => $Data,
+        columns => \@headers,
+        rowdata => \@rowdata,
+        gridid => 'grid',
+        width => '99%',
+    ); 
+
+    my $resultHTML = qq[
+        <div class="grid-filter-wrap">
+            <div style="width:99%;">$rectype_options</div>
+            $grid
+        </div>
+    ];
+
+    my @groupResult = ();
+
+    return ($resultHTML, $title);
+}
+
 sub listPersonRecord {
     my ($Data) = @_;
 
@@ -138,13 +256,8 @@ sub listPersonRecord {
     my $dob = $params{'dob'} || '';
     my $request_type = $params{'request_type'} || '';
     my $transferType = safe_param('transfer_type', 'word') || '';
-    warn "TRANSFER TYPE $transferType";
 
     my $title = $Data->{'lang'}->txt('Search Result');
-    warn "PERSONREQUEST $searchKeyword";
-    warn "PERSONFNAME $firstname";
-    warn "PERSONLNAME $lastname";
-    warn "PERSONDOB $dob";
     my %result;
 
     #TODO: might use priority column in the query, then limit the result to 1 grouped by club
@@ -156,12 +269,12 @@ sub listPersonRecord {
 
     
     my $requestType = getRequestType();
-    warn "REQUEST TYPE $requestType";
     
     my $requestAccessCond = undef;
     my $joinCondition = '';
     my $orderBy = '';
     my $limit = '';
+    my $groupBy = '';
 
     if($requestType eq $Defs::PERSON_REQUEST_ACCESS) {
         $joinCondition = qq [
@@ -180,7 +293,8 @@ sub listPersonRecord {
     }
     elsif($requestType eq $Defs::PERSON_REQUEST_TRANSFER) {
         $joinCondition = qq [ AND PR.strPersonType = 'PLAYER' ];
-        $limit = qq[ LIMIT 1 ];
+        $groupBy = qq [ GROUP BY PR.strSport, PR.intEntityID ];
+        #$limit = qq[ LIMIT 1 ];
     }
 
     my $st = qq[
@@ -230,6 +344,7 @@ sub listPersonRecord {
             AND P.strStatus IN ('REGISTERED', 'PASSIVE','PENDING')
             AND
                 (P.strNationalNum = ? OR CONCAT_WS(' ', P.strLocalFirstname, P.strLocalSurname) LIKE CONCAT('%',?,'%') OR CONCAT_WS(' ', P.strLocalSurname, P.strLocalFirstname) LIKE CONCAT('%',?,'%'))
+        $groupBy
         $orderBy
         $limit
     ];
@@ -248,15 +363,14 @@ sub listPersonRecord {
 
     my $found = 0;
     my @rowdata = ();
+    my %groupResult;
+    my @tData = ();
 
     while(my $tdref = $q->fetchrow_hashref()) {
-        #print STDERR Dumper $tdref;
-
         #other club hits an still in-progress or pending request
         next if ($entityID != $tdref->{'intEntityID'} and $tdref->{'existPendingRequestID'} and ($tdref->{'personRegistrationStatus'} eq 'PENDING' or $tdref->{'personRegistrationStatus'} eq 'INPROGRESS'));
 
-        $found = 1;
-
+        $found++;
         my $actionLink = undef;
         if($tdref->{'currEntityPendingRequestID'} and $tdref->{'currEntityPendingRegistrationID'}) {
             #current logged-in entity hits the same pending request
@@ -279,75 +393,117 @@ sub listPersonRecord {
             DOB => $tdref->{'dtDOB'} || '',
             actionLink => $actionLink,
             SelectLink => ''
+        };
+
+        push @tData, {
+            id => $tdref->{'intPersonRegistrationID'} || 0,
+            personID => $tdref->{'intPersonID'} || 0,
+            currentClub => $tdref->{'currentClub'} || '',
+            personStatus => $tdref->{'personStatus'} || '',
+            personRegoStatus => $tdref->{'personRegistrationStatus'} || '',
+            sport => $tdref->{'strSport'} || '',
+            sportLabel => $Defs::sportType{$tdref->{'strSport'}} || '',
+            localFirstname => $tdref->{'strLocalFirstname'} || '',
+            localSurname => $tdref->{'strLocalSurname'} || '',
+            personType => $tdref->{'strPersonType'} || '',
+            personLevel => $tdref->{'strPersonLevel'} || '',
+            DOB => $tdref->{'dtDOB'} || '',
+        };
+
+        if(exists $groupResult{$tdref->{'currentClub'}}){
+            push @{$groupResult{$tdref->{'currentClub'}}}, @tData;
         }
+        else{
+            $groupResult{$tdref->{'currentClub'}} = [@tData];
+            #push @{$groupResult{$tdref->{'intEntityID'}}}, @rowdata;
+        }
+
+        @tData = ();
     }
 
     return ("$found record found.", $title) if !$found;
 
-    my @headers = (
-        { 
-            type => 'Selector',
-            field => 'SelectLink',
-        }, 
-        {
-            name => $Data->{'lang'}->txt('Registered To'),
-            field => 'currentClub',
-        }, 
-        {
-            name => $Data->{'lang'}->txt('First Name'),
-            field => 'localFirstname',
-        },
-        {
-            name => $Data->{'lang'}->txt('Last Name'),
-            field => 'localSurname',
-        },
-        {
-            name => $Data->{'lang'}->txt('Date of birth'),
-            field => 'DOB',
-        },
-        {
-            name => $Data->{'lang'}->txt('Person Status'),
-            field => 'personStatus',
-        },
-        {
-            name => $Data->{'lang'}->txt('Sport'),
-            field => 'sport',
-        }, 
-        {
-            name => $Data->{'lang'}->txt('Type'),
-            field => 'personType',
-        }, 
-        {
-            name => $Data->{'lang'}->txt('Person Level'),
-            field => 'personLevel',
-        }, 
-        {
-            name => $Data->{'lang'}->txt('Registration Status'),
-            field => 'personRegoStatus',
-        },
-        {
-            name => $Data->{'lang'}->txt('Action'),
-            field => 'actionLink',
-            type => 'HTML', 
-        },
+    my $resultHTML = undef;
+    if($requestType eq $Defs::PERSON_REQUEST_ACCESS) {
+        my @headers = (
+            { 
+                type => 'Selector',
+                field => 'SelectLink',
+            }, 
+            {
+                name => $Data->{'lang'}->txt('Registered To'),
+                field => 'currentClub',
+            }, 
+            {
+                name => $Data->{'lang'}->txt('First Name'),
+                field => 'localFirstname',
+            },
+            {
+                name => $Data->{'lang'}->txt('Last Name'),
+                field => 'localSurname',
+            },
+            {
+                name => $Data->{'lang'}->txt('Date of birth'),
+                field => 'DOB',
+            },
+            {
+                name => $Data->{'lang'}->txt('Person Status'),
+                field => 'personStatus',
+            },
+            {
+                name => $Data->{'lang'}->txt('Sport'),
+                field => 'sport',
+            }, 
+            #{
+            #    name => $Data->{'lang'}->txt('Type'),
+            #    field => 'personType',
+            #}, 
+            #{
+            #    name => $Data->{'lang'}->txt('Person Level'),
+            #    field => 'personLevel',
+            #}, 
+            #{
+            #    name => $Data->{'lang'}->txt('Registration Status'),
+            #    field => 'personRegoStatus',
+            #},
+            {
+                name => $Data->{'lang'}->txt('Action'),
+                field => 'actionLink',
+                type => 'HTML', 
+            },
 
-    ); 
+        ); 
 
-    my $rectype_options = '';
-    my $grid = showGrid(
-        Data => $Data,
-        columns => \@headers,
-        rowdata => \@rowdata,
-        gridid => 'grid',
-        width => '99%',
-    ); 
+        my $rectype_options = '';
+        my $grid = showGrid(
+            Data => $Data,
+            columns => \@headers,
+            rowdata => \@rowdata,
+            gridid => 'grid',
+            width => '99%',
+        ); 
 
-    my $resultHTML = qq[
-        <div class="grid-filter-wrap">
-            <div style="width:99%;">$rectype_options</div>
-            $grid
-        </div>
-    ];
+        $resultHTML = qq[
+            <div class="grid-filter-wrap">
+                <div style="width:99%;">$rectype_options</div>
+                $grid
+            </div>
+        ];
+    }
+    elsif($requestType eq $Defs::PERSON_REQUEST_TRANSFER) {
+        $resultHTML = ' ';
+        my %TemplateData;
+        $TemplateData{'groupResult'} = \%groupResult;
+        $TemplateData{'action'} = "PRA_initRequest";
+        $TemplateData{'request_type'} = $request_type;
+        $TemplateData{'transfer_type'} = $transferType;
+        $TemplateData{'client'} = $Data->{'client'};
+        $resultHTML = runTemplate(
+            $Data,
+            \%TemplateData,
+            'personrequest/transfer/selection.templ',
+        );
+    }
 
     return ($resultHTML, $title);
 }
@@ -361,9 +517,30 @@ sub initRequestPage {
     my $personRegistrationID = safe_param('prid', 'number') || 0;
     my $requestType = safe_param('request_type', 'word') || '';
     my $transferType = safe_param('transfer_type', 'word') || '';
+    #my $multiParam = 
+
+	my $p = new CGI;
+	my %params = $p->Vars();
+
+    my %requestParams;
+    for my $selectedRego ($p->param()) {
+        if(my ($personID, $personRegoID) = $selectedRego =~ /^regoselected\[([0-9]+)\]\[([0-9]+)\]\z/) {
+            if(exists $requestParams{$personID}){
+                push @{$requestParams{$personID}}, $personRegoID;
+            }
+            else{
+                push @{$requestParams{$personID}}, $personRegoID;
+            }
+        }
+    }
+
+    if(scalar(%requestParams) == 0){
+        #specific for PERSON REQUEST ACCESS
+        push @{$requestParams{$personID}}, $personRegistrationID;
+    }
+
     my %TemplateData;
 
-    warn "INIT REQ TRANSFER TYPE $transferType";
     if($transferType eq $Defs::TRANSFER_TYPE_INTERNATIONAL) {
         $title = $Data->{'lang'}->txt("Do you have Player's International Transfer Certificate?");
 
@@ -390,8 +567,9 @@ sub initRequestPage {
         );
 
         $TemplateData{'RequestAction'} = \%RequestAction;
-        $TemplateData{'personID'} = $personID;
-        $TemplateData{'personRegistrationID'} = $personRegistrationID;
+        $TemplateData{'personRegoParamDetails'} = \%requestParams;
+        #$TemplateData{'personID'} = $personID;
+        #$TemplateData{'personRegistrationID'} = $personRegistrationID;
 
         $body = runTemplate(
             $Data,
@@ -406,113 +584,152 @@ sub initRequestPage {
 sub submitRequestPage {
     my ($Data) = @_;
 
-    my $personID = safe_param('pid', 'number') || 0;
-    my $personRegistrationID = safe_param('prid', 'number') || 0;
     my $notes = safe_param('request_notes', 'words') || '';
 	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
 
-    #TODO: check below
-    #if inter-RA, override to MA
-    #otherwise RA approves
-    my $MAOverride = 0;
+    my @rowdata = ();
+	my $p = new CGI;
+	my %params = $p->Vars();
 
-    my $requestType = getRequestType();
+    for my $selectedRego ($p->param()) {
+        if(my ($personID, $personRegoID) = $selectedRego =~ /^regoselected\[([0-9]+)\]\[([0-9]+)\]\z/) {
 
-    my %Reg = (
-        personRegistrationID => $personRegistrationID || 0,
-    );
+            #TODO: check below
+            #if inter-RA, override to MA
+            #otherwise RA approves
+            my $MAOverride = 0;
 
-    my ($count, $reg_ref) = PersonRegistration::getRegistrationData(
-        $Data,
-        $personID,
-        \%Reg
-    );
+            my $requestType = getRequestType();
 
-    return ("Record does not exist.", "Send Request") if(!$count);
+            my %Reg = (
+                personRegistrationID => $personRegoID || 0,
+            );
 
-    print STDERR Dumper $reg_ref;
-    print STDERR Dumper $count;
- 
-    warn "REQUEST TYPE $requestType";
-    my $st = qq[
-        INSERT INTO
-            tblPersonRequest
-            (
-                strRequestType,
-                intPersonID,
-                strSport,
-                strPersonType,
-                strPersonLevel,
-                strPersonEntityRole,
-                intRealmID,
-                intRequestFromEntityID,
-                intRequestToEntityID,
-                intRequestToMAOverride,
-                strRequestNotes,
-                strRequestStatus,
-                dtDateRequest
-            )
-            VALUES
-            (
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                NOW()
-            )
+            my ($count, $reg_ref) = PersonRegistration::getRegistrationData(
+                $Data,
+                $personID,
+                \%Reg
+            );
+
+            #return ("Record does not exist.", "Send Request") if(!$count);
+
+            my $st = qq[
+                INSERT INTO
+                    tblPersonRequest
+                    (
+                        strRequestType,
+                        intPersonID,
+                        strSport,
+                        strPersonType,
+                        strPersonLevel,
+                        strPersonEntityRole,
+                        intRealmID,
+                        intRequestFromEntityID,
+                        intRequestToEntityID,
+                        intRequestToMAOverride,
+                        strRequestNotes,
+                        strRequestStatus,
+                        dtDateRequest
+                    )
+                    VALUES
+                    (
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        NOW()
+                    )
+            ];
+
+            my $regDetails = ${$reg_ref}[0];
+
+            my $db = $Data->{'db'};
+            my $q = $db->prepare($st);
+            $q->execute(
+                $requestType,
+                $personID,
+                $regDetails->{'strSport'},
+                $regDetails->{'strPersonType'},
+                $regDetails->{'strPersonLevel'},
+                $regDetails->{'strPersonEntityRole'},
+                $Data->{'Realm'},
+                $entityID,
+                $regDetails->{'intEntityID'},
+                $MAOverride,
+                $notes,
+                $Defs::PERSON_REQUEST_STATUS_INPROGRESS,
+            );
+
+            my $requestID = $db->{mysql_insertid};
+
+            my $notificationType = undef;
+
+            my $emailNotification = new EmailNotifications::PersonRequest();
+            $emailNotification->setRealmID($Data->{'Realm'});
+            $emailNotification->setSubRealmID(0);
+            $emailNotification->setToEntityID($regDetails->{'intEntityID'});
+            $emailNotification->setFromEntityID($entityID);
+            $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
+            $emailNotification->setDefsName($Defs::admin_email_name);
+            $emailNotification->setNotificationType($requestType, "SENT");
+            $emailNotification->setSubject("Request ID - " . $requestID);
+            $emailNotification->setLang($Data->{'lang'});
+            $emailNotification->setDbh($Data->{'db'});
+
+            my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+            $emailNotification->send($emailTemplate);
+
+            push @rowdata, {
+                id => $regDetails->{'intPersonRegistrationID'} || 0,
+                currentClub => $regDetails->{'strLocalName'} || '',
+                localFirstname => $regDetails->{'strLocalFirstname'} || '',
+                localSurname => $regDetails->{'strLocalSurname'} || '',
+                MAID => $regDetails->{'strNationalNum'} || '',
+                Sport => $regDetails->{'Sport'} || '',
+            };
+        }
+    }
+
+    my @headers = (
+        {
+            name => $Data->{'lang'}->txt('MA ID'),
+            field => 'MAID',
+        },
+        {
+            name => $Data->{'lang'}->txt('Request To'),
+            field => 'currentClub',
+        }, 
+        {
+            name => $Data->{'lang'}->txt('Sport'),
+            field => 'Sport',
+        }, 
+    ); 
+
+    my $rectype_options = '';
+    my $grid = showGrid(
+        Data => $Data,
+        columns => \@headers,
+        rowdata => \@rowdata,
+        gridid => 'grid',
+        width => '99%',
+    ); 
+
+    my $resultHTML = qq[
+        <div class="grid-filter-wrap">
+            <div style="width:99%;">$rectype_options</div>
+            $grid
+        </div>
     ];
 
-    my $regDetails = ${$reg_ref}[0];
-
-    my $db = $Data->{'db'};
-    my $q = $db->prepare($st);
-    $q->execute(
-        $requestType,
-        $personID,
-        $regDetails->{'strSport'},
-        $regDetails->{'strPersonType'},
-        $regDetails->{'strPersonLevel'},
-        $regDetails->{'strPersonEntityRole'},
-        $Data->{'Realm'},
-        $entityID,
-        $regDetails->{'intEntityID'},
-        $MAOverride,
-        $notes,
-        $Defs::PERSON_REQUEST_STATUS_INPROGRESS,
-    );
-
-    my $requestID = $db->{mysql_insertid};
-    warn "REQUEST ID $requestID";
-
-    my $notificationType = undef;
-
-    warn "NOTIF TYPE $requestType";
-    warn "NOTIF TYPE $notificationType";
-    my $emailNotification = new EmailNotifications::PersonRequest();
-    $emailNotification->setRealmID($Data->{'Realm'});
-    $emailNotification->setSubRealmID(0);
-    $emailNotification->setToEntityID($regDetails->{'intEntityID'});
-    $emailNotification->setFromEntityID($entityID);
-    $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
-    $emailNotification->setDefsName($Defs::admin_email_name);
-    $emailNotification->setNotificationType($requestType, "SENT");
-    $emailNotification->setSubject("Request ID - " . $requestID);
-    $emailNotification->setLang($Data->{'lang'});
-    $emailNotification->setDbh($Data->{'db'});
-
-    my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
-    $emailNotification->send($emailTemplate);
-
-
-    return("Request has been sent.", " ");
+    return ($resultHTML, 'Request Summary');
 }
 
 sub listRequests {
@@ -582,8 +799,6 @@ sub listRequests {
             field => 'requestResponse',
         }, 
     ); 
-
-    warn "REQUEST COUNT $found";
 
     my $rectype_options = '';
     my $grid = showGrid(
@@ -699,7 +914,6 @@ sub viewRequest {
                 $tempClientValues{'personID'} = $request->{'intPersonID'};
                 $tempClientValues{'currentLevel'} = $Defs::LEVEL_PERSON;
                 $tempClient = setClient( \%tempClientValues );
-                print STDERR Dumper %tempClientValues;
                 #$action = "PREGF_T";
                 $action = "P_HOME";
             }
@@ -772,11 +986,7 @@ sub setRequestResponse {
     my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
     $emailNotification->send($emailTemplate);
 
-    warn "RESPONSE $response";
-    warn "REQUEST ID $requestID";
     #TODO: check if current entity has the right to update the request
-    my $body = " ";
-    my $title = " ";
 
     my $st = qq[
         UPDATE
@@ -799,6 +1009,16 @@ sub setRequestResponse {
         $requestStatus,
         $requestID
     ) or query_error($st);
+
+    my $body = '';
+    if(scalar(%{$request}) == 0) {
+        $body = $Data->{'lang'}->txt("Response has been submitted already.");
+    }
+    else {
+        $body = $Data->{'lang'}->txt("You have " . $Defs::personRequestResponse{$response}) . " " . $request->{'requestFrom'} . "'s " . $Defs::personRequest{$request->{'strRequestType'}} . " request.";
+    }
+
+    my $title = $Data->{'lang'}->txt("Request Response");
 
     return ($body, $title);
 }
@@ -936,7 +1156,6 @@ sub getRequests {
         push @personRequests, $dref;
     }
 
-    #print STDERR Dumper @personRequests;
     return (\@personRequests);
 }
 
@@ -960,10 +1179,10 @@ sub finaliseTransfer {
             intEntityID = ?
             AND strPersonType = ?
             AND strSport = ?
-            AND strPersonLevel = ?
             AND intPersonID = ?
             AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
 	];
+            #AND strPersonLevel = ?
 
     my $db = $Data->{'db'};
     my $query = $db->prepare($st) or query_error($st);
@@ -972,9 +1191,9 @@ sub finaliseTransfer {
        $personRequest->{'intRequestToEntityID'},
        $personRequest->{'strPersonType'},
        $personRequest->{'strSport'},
-       $personRequest->{'strPersonLevel'},
        $personRequest->{'intPersonID'}
     ) or query_error($st);
+        #$personRequest->{'strPersonLevel'},
 }
 
 sub setRequestStatus {
@@ -983,8 +1202,6 @@ sub setRequestStatus {
     $requestID ||= 0;
     $requestStatus ||= '';
 
-    warn "PERSON REQ STATUS $requestID";
-    warn "PERSON REQ STATUS $requestStatus";
     my $st = qq[
         UPDATE
             tblPersonRequest
