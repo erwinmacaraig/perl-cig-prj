@@ -133,15 +133,15 @@ qq[<span class="compulsory"><img src="images/compulsory.gif" alt="$txt_compulsor
 
             if ( $type eq 'textblock' ) {
                 $sections{$sname} .=
-                  qq[ <tr><td colspan="2">$fieldname</td></tr> ];
+                  qq[ <tr id = "l_row_$fieldname"><td colspan="2">$fieldname</td></tr> ];
                 next FIELD;
             }
             if ( $type eq 'textvalue' ) {
-                $sections{$sname} .= qq[ <tr><td colspan="2">$val</td></tr> ];
+                $sections{$sname} .= qq[ <tr id = "l_row_$fieldname"><td colspan="2">$val</td></tr> ];
                 next FIELD;
             }
             if ( $type eq 'header' ) {
-                $sections{$sname} .= qq[ <tr><th colspan="2">$label</th></tr> ];
+                $sections{$sname} .= qq[ <tr id = "l_row_$fieldname"><th colspan="2">$label</th></tr> ];
                 next FIELD;
             }
             if ( $type eq 'htmlrow' ) {
@@ -151,7 +151,7 @@ qq[<span class="compulsory"><img src="images/compulsory.gif" alt="$txt_compulsor
             if ( $type eq 'htmlblock' ) {
                 if ( $f->{'nolabelsuffix'} ) {
                     $sections{$sname} .=
-                      qq[<tr><td>&nbsp;</td><td colspan="2">$val</td></tr>];
+                      qq[<tr id = "l_row_$fieldname"><td>&nbsp;</td><td colspan="2">$val</td></tr>];
                     next FIELD;
                 }
                 $field_html = $val;
@@ -319,7 +319,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
           )
         {
             $sections{$sname} .= qq[
-            <tr class="$row_class"><td class="label HTvertform-l" colspan="2">$label</td></tr>
+            <tr class="$row_class" id = "l_row_$fieldname"><td class="label HTvertform-l" colspan="2">$label</td></tr>
             <tr><td class="value HTvertform-v" colspan="3">$pretext$field_html$posttext</td> </tr>
             ];
         }
@@ -328,7 +328,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
             my $rowcount =
               ( $sectioncount{$sname} % 2 ) ? 'HTr_odd' : 'HTr_even';
             $sections{$sname} .= qq[
-            <tr class="$rowcount $row_class">
+            <tr class="$rowcount $row_class" id = "l_row_$fieldname">
             <td class="label">$label</td>
             <td class="value">$pretext$field_html$posttext</td>
             </tr>
@@ -344,7 +344,6 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
         if ( $sections{ $s->[0] } ) {
             next if $s->[2] and not display_section( $s->[2], $fields_ref );
             $usedsections{ $s->[0] } = 1;
-warn("NT4 $notabs");
             if ($notabs) {
                 $returnstr .= $sections{ $s->[0] };
             }
