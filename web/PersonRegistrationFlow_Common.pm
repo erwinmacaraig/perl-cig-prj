@@ -60,7 +60,7 @@ sub displayRegoFlowComplete {
     my $lang=$Data->{'lang'};
 
     my $ok = 0;
-    if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL') {
+    if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER') {
         $ok=1;
     }
     else    {
@@ -447,7 +447,8 @@ sub add_rego_record{
     my ($personStatus, $prStatus) = checkIsSuspended($Data, $personID, $entityID, $rego_ref->{'personType'});
     return (0, undef, 'SUSPENDED') if ($personStatus eq 'SUSPENDED' or $prStatus eq 'SUSPENDED');
         
-    if ($rego_ref->{'registrationNature'} ne 'RENEWAL') {
+    warn "REGISTRATION NATURE $rego_ref->{'registrationNature'}";
+    if ($rego_ref->{'registrationNature'} ne 'RENEWAL' and $rego_ref->{'registrationNature'} ne 'TRANSFER') {
         my $ok = checkRegoTypeLimits($Data, $personID, 0, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
         return (0, undef, 'LIMIT_EXCEEDED') if (!$ok);
     }
