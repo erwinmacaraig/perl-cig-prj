@@ -27,7 +27,7 @@ use Data::Dumper;
             SET
                 strStatus = ?
             WHERE
-                dtTo <= DATE(NOW())
+                dtTo < DATE(NOW())
         ];
 
         $q = $db->prepare($st);
