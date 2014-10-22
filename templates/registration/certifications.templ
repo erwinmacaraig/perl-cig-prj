@@ -1,0 +1,21 @@
+[% IF certifications.size() > 0 %]
+<h3>Existing Certifications</h3>
+<table class="listTable">
+	<tr> 
+		<th>Certification</th>
+		<th>From</th>
+		<th>Until</th> 
+		<th>Description/Reference Number</th>
+	</tr> 
+	[% FOREACH c = certifications %]
+        <tr>
+          <td>[% c.strCertificationName %]</td>
+          <td>[% c.dtValidFrom %]</td>
+          <td>[% c.dtValidUntil  %]</td>
+          <td>[% c.strDescription %]</td> 
+        </tr>
+    [% END %]
+</table>
+[% ELSE %]
+<h4> No Record Found. </h4>
+[% END %]

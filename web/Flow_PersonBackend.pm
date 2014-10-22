@@ -22,6 +22,7 @@ use AuditLog;
 use PersonLanguages;
 use CustomFields;
 use DefCodes;
+use PersonCertifications;
 use Data::Dumper;
 
 
@@ -84,6 +85,17 @@ sub setProcessOrder {
             'function' => 'process_registration',
         },
         {
+            'action' => 'cert',
+            'function' => 'display_certifications',
+            'label'  => 'Certifications',
+            'fieldset'  => 'certifications',
+        },
+        {
+            'action' => 'pcert',
+            'function' => 'process_certifications',
+            'fieldset'  => 'certifications',
+        },
+        {
             'action' => 'p',
             'function' => 'display_products',
             'label'  => 'Products',
@@ -111,6 +123,8 @@ sub setProcessOrder {
 
 sub setupValues    {
     my $self = shift;
+    my ($values) = @_;
+    $values ||= {};
 
     my $FieldLabels   = FieldLabels::getFieldLabels( $self->{'Data'}, $Defs::LEVEL_PERSON );
     my $isocountries  = getISOCountriesHash();
@@ -126,7 +140,6 @@ sub setupValues    {
         next if ( $self->{'SystemConfig'}{'NoUnspecifiedGender'} and $k eq $Defs::GENDER_NONE );
         $genderoptions{$k} = $Defs::PersonGenderInfo{$k} || '';
     }
-    my $values = {};
 
     my $languages = getPersonLanguages( $self->{'Data'}, 1, 0);
     my %languageOptions = ();
@@ -177,12 +190,14 @@ sub setupValues    {
             'fields' => {
                 strLocalFirstname => {
                     label       => $FieldLabels->{'strLocalFirstname'},
+                    value       => $values->{'strLocalFirstname'},
                     type        => 'text',
                     size        => '40',
                     maxsize     => '50',
                 },
                 strLocalSurname => {
                     label       => $self->{'SystemConfig'}{'strLocalSurname_Text'} ? $self->{'SystemConfig'}{'strLocalSurname_Text'} : $FieldLabels->{'strLocalSurname'},
+                    value       => $values->{'strLocalSurname'},
                     type        => 'text',
                     size        => '40',
                     maxsize     => '50',
@@ -190,6 +205,7 @@ sub setupValues    {
                 },
                 intGender => {
                     label       => $FieldLabels->{'intGender'},
+                    value       => $values->{'intGender'},
                     type        => 'lookup',
                     options     => \%genderoptions,
                     compulsory => 1,
@@ -197,6 +213,7 @@ sub setupValues    {
                 },
                 intLocalLanguage => {
                     label       => $FieldLabels->{'intLocalLanguage'},
+                    value       => $values->{'intLocalLanguage'},
                     type        => 'lookup',
                     options     => \%languageOptions,
                     firstoption => [ '', 'Select Language' ],
@@ -205,6 +222,7 @@ sub setupValues    {
                 },
                 strLatinFirstname => {
                     label       => $self->{'SystemConfig'}{'person_strLatinNames'} || $FieldLabels->{'strLatinFirstname'},
+                    value       => $values->{'strLatinFirstname'},
                     type        => 'text',
                     size        => '40',
                     maxsize     => '50',
@@ -212,6 +230,7 @@ sub setupValues    {
                 },
                 strLatinSurname => {
                     label       => $self->{'SystemConfig'}{'person_strLatinNames'} || $FieldLabels->{'strLatinSurname'},
+                    value       => $values->{'strLatinSurname'},
                     type        => 'text',
                     size        => '40',
                     maxsize     => '50',
@@ -219,12 +238,14 @@ sub setupValues    {
                 },
                 strMaidenName => {
                     label       => $FieldLabels->{'strMaidenName'},
+                    value       => $values->{'strMaidenName'},
                     type        => 'text',
                     size        => '40',
                     maxsize     => '50',
                 },
                 dtDOB => {
                     label       => $FieldLabels->{'dtDOB'},
+                    value       => $values->{'dtDOB'},
                     type        => 'date',
                     datetype    => 'dropdown',
                     format      => 'dd/mm/yyyy',
@@ -233,6 +254,7 @@ sub setupValues    {
                 },
                 strISONationality => {
                     label       => $FieldLabels->{'strISONationality'},
+                    value       => $values->{'strISONationality'},
                     type        => 'lookup',
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
@@ -240,6 +262,7 @@ sub setupValues    {
                 },
                 strISOCountryOfBirth => {
                     label       => $FieldLabels->{'strISOCountryOfBirth'},
+                    value       => $values->{'strISOCountryOfBirth'},
                     type        => 'lookup',
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
@@ -247,12 +270,14 @@ sub setupValues    {
                 },
                 strRegionOfBirth => {
                     label       => $FieldLabels->{'strRegionOfBirth'},
+                    value       => $values->{'strRegionOfBirth'},
                     type        => 'text',
                     size        => '30',
                     maxsize     => '45',
                 },
                 strPlaceOfBirth => {
                     label       => $FieldLabels->{'strPlaceOfBirth'},
+                    value       => $values->{'strPlaceOfBirth'},
                     type        => 'text',
                     size        => '30',
                     maxsize     => '45',
@@ -260,6 +285,7 @@ sub setupValues    {
                 },
                 intGender => {
                     label       => $FieldLabels->{'intGender'},
+                    value       => $values->{'intGender'},
                     type        => 'lookup',
                     options     => \%genderoptions,
                     compulsory => 1,
@@ -291,36 +317,42 @@ sub setupValues    {
             'fields' => {
                 strAddress1 => {
                     label       => $FieldLabels->{'strAddress1'},
+                    value       => $values->{'strAddress1'},
                     type        => 'text',
                     size        => '50',
                     maxsize     => '100',
                 },
                 strAddress2 => {
                     label       => $FieldLabels->{'strAddress2'},
+                    value       => $values->{'strAddress2'},
                     type        => 'text',
                     size        => '50',
                     maxsize     => '100',
                 },
                 strSuburb => {
                     label       => $FieldLabels->{'strSuburb'},
+                    value       => $values->{'strSuburb'},
                     type        => 'text',
                     size        => '30',
                     maxsize     => '100',
                 },
                 strState => {
                     label       => $FieldLabels->{'strState'},
+                    value       => $values->{'strState'},
                     type        => 'text',
                     size        => '50',
                     maxsize     => '100',
                 },
                 strPostalCode => {
                     label       => $FieldLabels->{'strPostalCode'},
+                    value       => $values->{'strPostalCode'},
                     type        => 'text',
                     size        => '15',
                     maxsize     => '15',
                 },
                 strPhoneHome => {
                     label       => $FieldLabels->{'strPhoneHome'},
+                    value       => $values->{'strPhoneHome'},
                     type        => 'text',
                     size        => '20',
                     maxsize     => '30',
@@ -344,6 +376,7 @@ sub setupValues    {
             'fields' => {
                 strPreferredLang => {
                     label       => $FieldLabels->{'strPreferredLang'},
+                    value       => $values->{'strPreferredLang'},
                     type        => 'lookup',
                     options     => \%languageOptions,
                     firstoption => [ '', 'Select Language' ],
@@ -361,6 +394,44 @@ sub setupValues    {
             'order' => [qw(
                 strPreferredLang
                 intEthnicityID
+            )],
+        },
+        certifications => {
+            'fields' => {
+                intCertificationTypeID => {
+                    label       => $FieldLabels->{'intCertificationTypeID'},
+                    value       => $values->{'intCertificationTypeID'},
+                    type        => 'lookup',
+                    options     => $values->{'certificationTypes'} || {},
+                    firstoption => [ '', " " ],
+                },
+                dtValidFrom => {
+                    label       => $FieldLabels->{'dtValidFrom'},
+                    value       => $values->{'dtValidFrom'},
+                    type        => 'date',
+                    format      => 'yyyy-mm-dd',
+                    validate    => 'DATE',
+                },                
+                dtValidUntil => {
+                    label       => $FieldLabels->{'dtValidUntil'},
+                    value       => $values->{'dtValidUntil'},
+                    type        => 'date',
+                    format      => 'yyyy-mm-dd',
+                    validate    => 'DATE',
+                },
+                strDescription => {
+                    label       => $FieldLabels->{'strDescription'},
+                    value       => $values->{'strDescription'},
+                    type        => 'text',
+                    size        => '30',
+                    maxsize     => '100',
+                },
+            },
+            'order' => [qw(
+                intCertificationTypeID
+                dtValidFrom
+                dtValidUntil
+                strDescription
             )],
         },
         minor => {
@@ -496,6 +567,10 @@ sub display_minor_fields {
         $self->incrementCurrentProcessIndex();
         return ('',2);
     }
+    if($personObj->ID())    {
+        my $objectValues = $self->loadObjectValues();
+        $self->setupValues($objectValues);
+    }
 
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
     my %PageData = (
@@ -545,10 +620,14 @@ sub validate_minor_fields {
 sub display_contact_details    { 
     my $self = shift;
 
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
     my $id = $self->ID() || 0;
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
     $personObj->load();
+    if($personObj->ID())    {
+        my $objectValues = $self->loadObjectValues($personObj);
+        $self->setupValues($objectValues);
+    }
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -592,10 +671,14 @@ sub validate_contact_details    {
 sub display_other_details    { 
     my $self = shift;
 
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
     my $id = $self->ID() || 0;
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
     $personObj->load();
+    if($personObj->ID())    {
+        my $objectValues = $self->loadObjectValues($personObj);
+        $self->setupValues($objectValues);
+    }
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -728,6 +811,7 @@ sub process_registration {
     }
     else    {
         $self->addCarryField('rID',$regoID);
+        $self->addCarryField('pType',$personType);
     }
 
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
@@ -736,6 +820,104 @@ sub process_registration {
         return ('',2);
     }
 
+    return ('',1);
+}
+
+sub display_certifications { 
+    my $self = shift;
+
+    my $id = $self->ID() || 0;
+    my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
+    $personObj->load();
+    my $personType = $self->{'RunParams'}{'pType'} || '';
+    if(!($personType eq 'COACH' or $personType eq 'REFEREE'))   {
+        #only continue if these types
+        $self->incrementCurrentProcessIndex();
+        $self->incrementCurrentProcessIndex();
+        return ('',2);
+    }
+
+    if($personObj->ID())    {
+        my $objectValues = $self->loadObjectValues($personObj);
+        my $certificationTypes  = getPersonCertificationTypes(
+            $self->{'Data'},
+            $personType,
+        );
+        my %ctypes = ();
+        for my $type (@{$certificationTypes})   {
+            $ctypes{$type->{'intCertificationTypeID'}} = $type->{'strCertificationName'} || next;
+        }
+        $objectValues->{'certificationTypes'} = \%ctypes;
+        $self->setupValues($objectValues);
+    }
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+
+    my $certifications = getPersonCertifications(
+        $self->{'Data'},
+        $personObj->ID(),
+        $personType,
+        0
+    );
+    my $content = runTemplate(
+        $self->{'Data'},
+        {
+            certifications => $certifications,
+        },
+        'registration/certifications.templ'
+    );
+    my %PageData = (
+        HiddenFields => $self->stringifyCarryField(),
+        Target => $self->{'Data'}{'target'},
+        Errors => $self->{'RunDetails'}{'Errors'} || [],
+        Content => $fieldsContent || '',
+        ScriptContent => $scriptContent || '',
+        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
+        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        Title => '',
+        TextTop => $content,
+        TextBottom => '',
+    );
+    my $pagedata = $self->display(\%PageData);
+
+    return ($pagedata,0);
+
+}
+
+sub process_certifications { 
+    my $self = shift;
+
+    my $userData = {};
+    ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields();
+    my $id = $self->ID() || 0;
+    if(!$id)    {
+        push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person';
+    }
+
+    if(!scalar(@{$self->{'RunDetails'}{'Errors'}}))    {
+        my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
+        $personObj->load();
+
+        if($userData->{'intCertificationTypeID'})   {
+           my $ret = addPersonCertification(
+                $self->{'Data'},
+                $personObj->ID(),
+                $userData->{'intCertificationTypeID'},
+                $userData->{'dtValidFrom'} || '',
+                $userData->{'dtValidUntil'} || '',
+                $userData->{'strDescription'} || '',
+                'ACTIVE',
+            ); 
+
+            if(!$ret)    {
+                push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Certification Data';
+            }
+        }
+    }
+    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+        #There are errors - reset where we are to go back to the form again
+        $self->decrementCurrentProcessIndex();
+        return ('',2);
+    }
     return ('',1);
 }
 
@@ -1020,6 +1202,47 @@ sub buildSummaryData    {
         'gender' => $Defs::PersonGenderInfo{$personObj->getValue('intGender')},
     );
     return \%summary; 
+}
+
+sub loadObjectValues    {
+    my $self = shift;
+    my ($object) = @_;
+
+    my %values = ();
+    if($object) {
+        for my $field (qw(
+            strLocalFirstname
+            strLocalSurname
+            intLocalLanguage
+            strLatinFirstname
+            strLatinSurname
+            dtDOB
+            intGender
+            strMaidenName
+            strISONationality
+            strISOCountryOfBirth
+            strRegionOfBirth
+            strPlaceOfBirth
+
+            strAddress1
+            strAddress2
+            strSuburb
+            strState
+            strPostalCode
+            strPhoneHome
+
+            strPreferredLang
+            intEthnicityID
+
+            intMinorMoveOtherThanFootball
+            intMinorDistance
+            intMinorEU
+            intMinorNone
+        )) {
+            $values{$field} = $object->getValue($field);
+        }
+    }
+    return \%values;
 }
 
 

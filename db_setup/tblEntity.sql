@@ -63,6 +63,7 @@ CREATE TABLE `tblEntity` (
   `strPaymentNotificationAddress` varchar(250) DEFAULT NULL,
   `strEntityPaymentBusinessNumber` varchar(100) DEFAULT NULL,
   `strEntityPaymentInfo` text,
+  `intNotifications` INT NOT NULL DEFAULT 1 COMMENT 'Flag to check whether to send notifications or not.',
   PRIMARY KEY (`intEntityID`),
   UNIQUE KEY `strImportEntityCode_UNIQUE` (`strImportEntityCode`),
   KEY `index_intRealmID` (`intRealmID`),

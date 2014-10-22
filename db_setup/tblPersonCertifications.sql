@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS `tblPersonCertifications` (
   `intPersonID` INT NOT NULL,
   `intRealmID` INT NOT NULL,
   `intCertificationTypeID` INT NULL,
-  `strCertification` VARCHAR(100) NOT NULL,
   `dtValidFrom` DATE NULL,
   `dtValidUntil` DATE NULL,
   `strDescription` VARCHAR(250) NULL,
