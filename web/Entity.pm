@@ -259,12 +259,18 @@ sub entity_details  {
         rows => '10',
         cols => '40',
       },
+      intNotifications => {
+        label => "Notifications",
+        value => $field->{intNotifications},
+        type => 'lookup',
+        options => \%Defs::notificationToggle,
+      },
       SP1  => {
         type =>'_SPACE_',
       },
     },
     order => [qw(
-        strFIFAID strLocalName strLocalShortName intLocalLanguage strLatinName strLatinShortName dtFrom dtTo strISOCountry strRegion strPostalCode strTown strAddress strWebURL strEmail strPhone strFax strContactTitle strContactEmail strContactPhone strContact strShortNotes
+        strFIFAID strLocalName strLocalShortName intLocalLanguage strLatinName strLatinShortName dtFrom dtTo strISOCountry strRegion strPostalCode strTown strAddress strWebURL strEmail strPhone strFax strContactTitle strContactEmail strContactPhone strContact strShortNotes intNotifications
     )],
     options => {
       labelsuffix => ':',
@@ -361,7 +367,8 @@ sub loadEntityDetails {
      strContactPhone,
      dtAdded,
      strShortNotes,
-     tTimeStamp
+     tTimeStamp,
+     intNotifications
     FROM tblEntity
     WHERE intEntityID = ?
   ];
