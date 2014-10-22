@@ -685,7 +685,7 @@ sub submitRequestPage {
             $emailNotification->setDbh($Data->{'db'});
 
             my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
-            $emailNotification->send($emailTemplate);
+            $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
 
             push @rowdata, {
                 id => $regDetails->{'intPersonRegistrationID'} || 0,
@@ -984,7 +984,7 @@ sub setRequestResponse {
     $emailNotification->setDbh($Data->{'db'});
 
     my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
-    $emailNotification->send($emailTemplate);
+    $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
 
     #TODO: check if current entity has the right to update the request
 
