@@ -34,6 +34,9 @@ use RegistrationItem;
 use TTTemplate;
 use DBI;
 use Countries;
+use PersonLanguages;
+
+
 sub handleClub  {
   my ($action, $Data, $parentID, $clubID, $typeID)=@_;
 
@@ -161,6 +164,42 @@ print STDERR "SSSS$action $clubID\n";
       $dissDateReadOnly = 1;
     }
 
+    my $languages = getPersonLanguages( $Data, 1, 0);
+    my %languageOptions = ();
+    my $nonLatin = 0;
+    my @nonLatinLanguages =();
+    for my $l ( @{$languages} ) {
+        $languageOptions{$l->{'intLanguageID'}} = $l->{'language'} || next;
+        if($l->{'intNonLatin'}) {
+            $nonLatin = 1 ;
+            push @nonLatinLanguages, $l->{'intLanguageID'};
+        }
+    }
+    my $nonlatinscript = '';
+    if($nonLatin)   {
+        my $vals = join(',',@nonLatinLanguages);
+        $nonlatinscript =   qq[
+           <script>
+                jQuery(document).ready(function()  {
+                    jQuery('#l_row_strLatinName').hide();
+                    jQuery('#l_row_strLatinShortName').hide();
+                    jQuery('#l_intLocalLanguage').change(function()   {
+                        var lang = parseInt(jQuery('#l_intLocalLanguage').val());
+                        nonlatinvals = [$vals];
+                        if(nonlatinvals.indexOf(lang) !== -1 )  {
+                            jQuery('#l_row_strLatinName').show();
+                            jQuery('#l_row_strLatinShortName').show();
+                        }
+                        else    {
+                            jQuery('#l_row_strLatinName').hide();
+                            jQuery('#l_row_strLatinShortName').hide();
+                        }
+                    });
+                });
+            </script> 
+
+        ];
+    }
 
   my %FieldDefinitions=(
     fields=>  {
@@ -335,11 +374,13 @@ print STDERR "SSSS$action $clubID\n";
         compulsory => 1,
       },
       intLocalLanguage => {
-      	label => 'Local Name Language',
-        value => $field->{intLocalLanguage},
-        type  => 'text',
-        size  => '30',
-        maxsize => '50',
+          label       => 'Language the name is written in',
+          type        => 'lookup',
+          value       => $field->{intLocalLanguage},
+          options     => \%languageOptions,
+          firstoption => [ '', 'Select Language' ],
+          compulsory => 1,
+          posttext => $nonlatinscript,
       },
       strPostalCode => {
         label => 'Postal Code',

@@ -45,22 +45,31 @@ sub checkRegoTypeLimits    {
     }
     my $st = qq[
         SELECT 
-            *
+            *,
+            IF(strSport = '', 0, 1) +
+            IF(strPersonType = '', 0, 1) +
+            IF(strPersonEntityRole = '', 0, 1) +
+            IF(strPersonLevel = '', 0, 1) +
+            IF(strAgeLevel = '', 0, 1) as fieldSpecifiedExistCount
         FROM
             tblRegoTypeLimits
         WHERE 
             intRealmID = ?
             AND intSubRealmID IN (0, ?)
-            AND strPersonType = ?
     ];
+            #AND strPersonType = ?
     my @limitValues = (
         $Data->{'Realm'}, 
         $Data->{'RealmSubType'},
-        $personType,
+        #$personType,
     );
     if (defined $sport) {
         push @limitValues, $sport;
         $st .= qq[ AND strSport IN ('', ?)];
+    }
+    if (defined $personType) {
+        push @limitValues, $personType;
+        $st .= qq[ AND strPersonType IN ('', ?)];   
     }
     if (defined $entityRole) {
         push @limitValues, $entityRole;
@@ -75,6 +84,7 @@ sub checkRegoTypeLimits    {
         $st .= qq[ AND strAgeLevel IN ('', ?)];
     }
 
+    $st .= qq[ ORDER BY fieldSpecifiedExistCount DESC ];
     my $query = $Data->{'db'}->prepare($st);
     $query -> execute(@limitValues);
 
@@ -89,8 +99,8 @@ sub checkRegoTypeLimits    {
             intPersonID = ?
             AND intPersonRegistrationID <> ?
             AND strStatus IN ('ACTIVE', 'PENDING', 'SUSPENDED')
-            AND strPersonType = ?
     ];
+            #AND strPersonType = ?
     my $stPR = qq[
         SELECT
             COUNT(intPersonRegistrationID) as CountPR
@@ -100,12 +110,12 @@ sub checkRegoTypeLimits    {
             intPersonID = ?
             AND intPersonRegistrationID <> ?
             AND strStatus IN ('ACTIVE', 'PENDING', 'SUSPENDED')
-            AND strPersonType = ?
     ];
+            #AND strPersonType = ?
     my @values =();
     push @values, $personID;
     push @values, $personRegistrationID;
-    push @values, $personType;
+    #push @values, $personType;
 
     while (my $dref = $query->fetchrow_hashref())   {
         next if ! $dref->{'intLimit'};
@@ -121,7 +131,13 @@ sub checkRegoTypeLimits    {
             $stPErow.= qq[ AND strSport = ? ];
             push @PErowValues, $dref->{'strSport'};
         }
-        
+
+        if ($dref->{'strPersonType'} and $dref->{'strPersonType'} ne '')    {
+            $stPRrow.= qq[ AND strPersonType = ? ];
+            push @rowValues, $dref->{'strPersonType'};
+            #$stPErow.= qq[ AND strSport = ? ];
+            #push @PErowValues, $dref->{'strSport'};
+        }
         if (defined $dref->{'strPersonEntityRole'} and $dref->{'strPersonEntityRole'} ne '')    {
             $stPRrow .= qq[ AND strPersonEntityRole = ?];
             push @rowValues, $dref->{'strPersonEntityRole'};
@@ -134,7 +150,8 @@ sub checkRegoTypeLimits    {
             $stPRrow .= qq[ AND strAgeLevel = ?];
             push @rowValues, $dref->{'strAgeLevel'};
         }
-        $stPErow .= qq[GROUP BY intEntityID, strPersonType, strSport];
+        #$stPErow .= qq[GROUP BY intEntityID, strPersonType, strSport];
+        $stPErow .= qq[GROUP BY intEntityID, strSport];
 
         if ($dref->{'strLimitType'} eq 'PERSONENTITY_UNIQUE')  {
             ## Only runs on PersonType & Sport

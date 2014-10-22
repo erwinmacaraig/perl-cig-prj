@@ -15,7 +15,7 @@ use HomeEntity;
 use Countries;
 use RegistrationItem;
 use TTTemplate;
-
+use PersonLanguages;
 
 sub handleEntity  {
   my ($action, $Data, $entityID, $entityLevel)=@_;
@@ -69,6 +69,43 @@ sub entity_details  {
     	$Mcountriesonly{$c} = $c;
     }    
     #################################################################
+    my $languages = getPersonLanguages( $Data, 1, 0);
+    my %languageOptions = ();
+    my $nonLatin = 0;
+    my @nonLatinLanguages =();
+    for my $l ( @{$languages} ) {
+        $languageOptions{$l->{'intLanguageID'}} = $l->{'language'} || next;
+        if($l->{'intNonLatin'}) {
+            $nonLatin = 1 ;
+            push @nonLatinLanguages, $l->{'intLanguageID'};
+        }
+    }
+    my $nonlatinscript = '';
+    if($nonLatin)   {
+        my $vals = join(',',@nonLatinLanguages);
+        $nonlatinscript =   qq[
+           <script>
+                jQuery(document).ready(function()  {
+                    jQuery('#l_row_strLatinName').hide();
+                    jQuery('#l_row_strLatinShortName').hide();
+                    jQuery('#l_intLocalLanguage').change(function()   {
+                        var lang = parseInt(jQuery('#l_intLocalLanguage').val());
+                        nonlatinvals = [$vals];
+                        if(nonlatinvals.indexOf(lang) !== -1 )  {
+                            jQuery('#l_row_strLatinName').show();
+                            jQuery('#l_row_strLatinShortName').show();
+                        }
+                        else    {
+                            jQuery('#l_row_strLatinName').hide();
+                            jQuery('#l_row_strLatinShortName').hide();
+                        }
+                    });
+                });
+            </script> 
+
+        ];
+    }
+
   my %FieldDefinitions=(
     fields=>  {
       strFIFAID => {
@@ -94,6 +131,15 @@ sub entity_details  {
         size  => '30',
         maxsize => '50',
       },      
+      intLocalLanguage => {
+          label       => 'Language the name is written in',
+          type        => 'lookup',
+          value       => $field->{intLocalLanguage},
+          options     => \%languageOptions,
+          firstoption => [ '', 'Select Language' ],
+          compulsory => 1,
+          posttext => $nonlatinscript,
+      },
       strLatinName => {
         label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'Name (Latin)' : '',
         value => $field->{strLatinName},
@@ -218,7 +264,7 @@ sub entity_details  {
       },
     },
     order => [qw(
-        strFIFAID strLocalName strLocalShortName strLatinName strLatinShortName dtFrom dtTo strISOCountry strRegion strPostalCode strTown strAddress strWebURL strEmail strPhone strFax strContactTitle strContactEmail strContactPhone strContact strShortNotes
+        strFIFAID strLocalName strLocalShortName intLocalLanguage strLatinName strLatinShortName dtFrom dtTo strISOCountry strRegion strPostalCode strTown strAddress strWebURL strEmail strPhone strFax strContactTitle strContactEmail strContactPhone strContact strShortNotes
     )],
     options => {
       labelsuffix => ':',
@@ -301,6 +347,7 @@ sub loadEntityDetails {
      dtFrom,
      dtTo,
      strISOCountry,
+     intLocalLanguage,
      strRegion,
      strPostalCode,
      strTown,

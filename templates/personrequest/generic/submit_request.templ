@@ -3,7 +3,14 @@
     <input type="hidden" name="client" value="[% RequestAction.client %]">
     <input type="hidden" name="request_type" value="[% RequestAction.request_type %]">
     <input type="hidden" name="a" value="[% RequestAction.sendAction %]">
-    <input type="hidden" name="pid" value="[% personID %]">
-    <input type="hidden" name="prid" value="[% personRegistrationID %]">
-    <input type="submit" name="submit" value="submit">
+
+    [% FOREACH regoParam IN personRegoParamDetails %]
+        [% FOREACH regoParamValue IN regoParam.value %]
+            <input type="hidden" name="regoselected[[% regoParam.key %]][[% regoParamValue %]]"/>
+        [% END %]
+    [% END %]
+
+    <input type="submit" name="submit" class="button-small generic-button" value="submit">
 </form>
+
+

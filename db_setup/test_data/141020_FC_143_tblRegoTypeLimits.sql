@@ -1,0 +1,2 @@
+INSERT INTO tblRegoTypeLimits(intRealmID, intSubRealmID, strSport, strPersonType, strPersonLevel, intLimit, tTimeStamp, strLimitType) values(1, 0, 'FOOTBALL', 'PLAYER', 'PROFESSIONAL', 2, NOW(), 'PERSONENTITY_UNIQUE');
+INSERT INTO tblRegoTypeLimits(intRealmID, intSubRealmID, strSport, strPersonType, strPersonLevel, intLimit, tTimeStamp, strLimitType) values(1, 0, 'FOOTBALL', 'PLAYER', 'AMATEUR', 2, NOW(), 'PERSONENTITY_UNIQUE');
