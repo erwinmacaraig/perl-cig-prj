@@ -145,6 +145,7 @@ sub getFieldLabels	{
             strGender => 'Gender',
             strDiscipline => 'Sport',
             strEntityType => 'Entity Type',
+            intNotifications => 'Notification Toggle',
             );
 	}
 	for my $k (keys %labels)	{
