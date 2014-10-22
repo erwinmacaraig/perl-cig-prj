@@ -99,6 +99,11 @@ sub getFieldLabels	{
             intMinorNone => 'None of the Above',
             intLocalLanguage => 'Local Name Language',
        
+            intCertificationTypeID => "Certification",
+            dtValidFrom => 'Valid From',
+            dtValidUntil => 'Valid Until',
+            strDescription => 'Description/Reference',
+
 		);
 	}
 

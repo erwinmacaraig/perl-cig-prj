@@ -255,7 +255,7 @@ sub gatherFields {
   my $self = shift;
   my($fieldSet) = @_;
   $fieldSet ||= $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'fieldset'};
-  return '' if !$fieldSet;
+  return ({},[]) if !$fieldSet;
   my $obj = new Flow_DisplayFields(
     Data => $self->{'Data'},
     Lang => $self->{'Lang'},

@@ -568,6 +568,9 @@ sub gather    {
         $outputdata{$fieldname} = $fieldvalue;
     }
 
+use Data::Dumper;
+print STDERR Dumper(\@problems);
+warn("=======");
     return (\%outputdata, \@problems);
 }
 
@@ -939,7 +942,7 @@ sub _date_selection_picker {
     my $readonly ='';
     
     my @datepicker_options = (
-        qq[dateFormat: 'dd/mm/yy'],
+        qq[dateFormat: 'yy-mm-dd'],
         qq[showButtonPanel: true],
     );
     
@@ -971,7 +974,7 @@ sub _date_selection_picker {
         if ( $min =~ /(\d{4})-(\d{1,2})-(\d{1,2})/ ){
             $min = "$3/$2/$1";
         }
-        push @datepicker_options, qq[minDate: '$min'] unless ($min eq '00/00/0000');
+        push @datepicker_options, qq[minDate: '$min'] unless ($min eq '0000-00-00');
     }
     
     if ($f->{'datepicker_options'}->{'max_date'}){
@@ -980,7 +983,7 @@ sub _date_selection_picker {
         if ( $max =~ /(\d{4})-(\d{1,2})-(\d{1,2})/ ){
             $max = "$3/$2/$1";
         }
-        push @datepicker_options, qq[maxDate: '$max'] unless ($max eq '00/00/0000');
+        push @datepicker_options, qq[maxDate: '$max'] unless ($max eq '0000-00-00');
     }
     
     # Prevent user input, as this might be outside our date range
