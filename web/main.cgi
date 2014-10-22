@@ -266,7 +266,8 @@ use PersonFlow;
         my $prID = safe_param( 'prID', 'number' );
         my $entityID = getID($Data{'clientValues'},$Data{'clientValues'}{'currentLevel'});
         ( $resultHTML, $pageHeading ) = handlePendingRegistrations($action, \%Data, $entityID, $prID);
-    }
+       # $pageHeading = $pageHeading . "entityID = " . $entityID;    
+}
     elsif ( $action =~ /^PRA_/) {
         ($resultHTML, $pageHeading) = handlePersonRequest($action, \%Data);
     }

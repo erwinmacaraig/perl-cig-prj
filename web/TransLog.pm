@@ -1339,9 +1339,20 @@ sub viewTransLog	{
 	$intTransLogID ||= 0;
 	my $db = $Data->{'db'};
 	my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
+	open(ERRORFILE, '>> /home/emacaraig/src/FIFASPOnline/web/myadmin/test.txt');
 
-	my $st = qq[
-		SELECT tblTransLog.*, IF(T.intTableType = $Defs::LEVEL_CLUB, Entity.strLocalName, CONCAT(strLocalFirstname,' ',strLocalSurname)) as Name, DATE_FORMAT(dtSettlement,'%d/%m/%Y') as dtSettlement
+	#my $st = qq[
+	#	SELECT tblTransLog.*, IF(T.intTableType = $Defs::LEVEL_CLUB, Entity.strLocalName, CONCAT(strLocalFirstname,' ',strLocalSurname)) as Name, DATE_FORMAT(dtSettlement,'%d/%m/%Y') as dtSettlement
+	#	FROM tblTransLog INNER JOIN tblTXNLogs as TXNLog ON (TXNLog.intTLogID = tblTransLog.intLogID)
+	#		INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLog.intTXNID)
+	#		LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
+	#		LEFT JOIN tblEntity as Entity on (Entity.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
+	#	WHERE intLogID = $intTransLogID
+	#	AND T.intRealmID = $Data->{'Realm'}
+	#];
+
+        my $st = qq[
+		SELECT tblTransLog.*,(SELECT strLocalName FROM tblEntity WHERE intEntityID = tblTransLog.intEntityPaymentID) as Name, DATE_FORMAT(dtSettlement,'%d/%m/%Y') as dtSettlement
 		FROM tblTransLog INNER JOIN tblTXNLogs as TXNLog ON (TXNLog.intTLogID = tblTransLog.intLogID)
 			INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLog.intTXNID)
 			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
@@ -1349,7 +1360,9 @@ sub viewTransLog	{
 		WHERE intLogID = $intTransLogID
 		AND T.intRealmID = $Data->{'Realm'}
 	];
+        
 
+        print ERRORFILE "TransLog::viewTransLog\n $st";
 	my $qry = $db->prepare($st);
   	$qry->execute;
 	my $TLref = $qry->fetchrow_hashref();
@@ -1366,10 +1379,8 @@ sub viewTransLog	{
 	
 	
 	# create a filehandle 
-	open(ERRORFILE, '>> /home/emacaraig/src/FIFASPOnline/web/myadmin/test.txt');
-	print ERRORFILE "For dispaying table " . $st_trans . "\n"; 
+	print ERRORFILE "TransLog::viewTransLog == For dispaying table \n" . $st_trans . "\n"; 
 	
-	print STDERR  "For dispaying table " . $st_trans;
 	my $qry_trans = $db->prepare($st_trans);
   	$qry_trans->execute;
 		
