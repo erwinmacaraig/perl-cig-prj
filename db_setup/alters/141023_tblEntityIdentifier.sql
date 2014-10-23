@@ -1,2 +1,2 @@
 ALTER TABLE `tblEntityIdentifier` 
-ADD COLUMN `strContryIssued` varchar NOT NULL DEFAULT '' AFTER `strIdentifier`;
+ADD COLUMN `strContryIssued` varchar(100) NOT NULL DEFAULT '' AFTER `strIdentifier`;
