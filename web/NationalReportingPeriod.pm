@@ -77,7 +77,8 @@ sub getNationalReportingPeriod {
     $st .= qq[
         ORDER BY 
             intSubRealmID DESC,
-            strSport DESC   
+            strSport DESC,
+            strPersonType DESC   
         LIMIT 1
     ];
     my $q = $db->prepare($st);
