@@ -1,0 +1,2 @@
+INSERT INTO tblRegistrationItem (intRealmID, intSubRealmID, intOriginLevel, strRuleFor, intEntityLevel, strRegistrationNature, strItemType, intID, intRequired) VALUES ('1', '0', '20', 'ENTITY', '3', 'NEW', 'DOCUMENT', '6', '1'); 
+INSERT INTO tblRegistrationItem (intRealmID, intSubRealmID, intOriginLevel, strRuleFor, intEntityLevel, strRegistrationNature, strItemType, intID, intRequired) VALUES ('1', '0', '3', 'ENTITY', '3', 'NEW', 'DOCUMENT', '7', '1');
