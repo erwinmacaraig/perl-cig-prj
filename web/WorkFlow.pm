@@ -248,8 +248,6 @@ sub listTasks {
 		LEFT OUTER JOIN tblDocumentType AS dt ON (t.intDocumentTypeID = dt.intDocumentTypeID)
 		LEFT JOIN tblUserAuthRole AS uarRejected ON ( t.intProblemResolutionEntityID = uarRejected.entityID )
 		WHERE
-                  p.intSystemStatus != $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
-                    AND 
                   t.intRealmID = $Data->{'Realm'}
 		    AND (
                       (intApprovalEntityID = ? AND t.strTaskStatus = 'ACTIVE')
@@ -259,6 +257,10 @@ sub listTasks {
                       (intOnHold = 1 AND (intApprovalEntityID = ? OR intProblemResolutionEntityID = ?))
             )
     ];
+    #p.intSystemStatus != $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
+    #AND
+
+
 #print STDERR Dumper 'VALUE IS:' .$st;
         #my $userID = $Data->{'clientValues'}{'userID'}
         ## if ($userID)
@@ -290,7 +292,9 @@ sub listTasks {
 
     my $client = unescape($Data->{client});
 	while(my $dref= $q->fetchrow_hashref()) {
-        if ($dref->{intSystemStatus} != $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE) {
+        #moved checking of POSSIBLE_DUPLICATE here (if included in query, tasks for ENTITY are not capture)
+        next if ($dref->{intSystemStatus} == $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE);
+
         my %tempClientValues = getClient($client);
 		$rowCount ++;
         my $name = '';
@@ -356,7 +360,6 @@ sub listTasks {
 		);
    
 		push @TaskList, \%single_row;
-          }
 	}
 
     ## Calc Dupl Res and Pending Clr here
