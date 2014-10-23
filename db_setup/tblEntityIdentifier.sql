@@ -5,7 +5,7 @@ CREATE TABLE `tblEntityIdentifier` (
   `intRealmID` int(11) NOT NULL,
   `intIdentifierTypeID` int(11) NOT NULL,
   `strIdentifier` varchar(100) NOT NULL,
-  `strContryIssued` varchar9100) NOT NULL DEFAULT '',
+  `strContryIssued` varchar(100) NOT NULL DEFAULT '',
   `dtValidFrom` date DEFAULT NULL,
   `dtValidUntil` date DEFAULT NULL,
   `strDescription` varchar(250) DEFAULT NULL,
