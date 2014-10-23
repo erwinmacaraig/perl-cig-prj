@@ -130,7 +130,7 @@ warn("personID $personID");
         if ($rego->{'strAgeLevel'}) { 
             $newAgeLevel = Person::calculateAgeLevel($Data, $rego->{'currentAge'});
         }
-        my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $rego->{'strSport'}, 'RENEWAL');
+        my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $rego->{'strSport'}, $rego->{'personType'}, 'RENEWAL');
         next if ($rego->{'intNationalPeriodID'} == $nationalPeriodID);
 $renew = $Data->{'target'} . "?client=$client&amp;a=PREGF_TU&amp;pt=$rego->{'strPersonType'}&amp;per=$rego->{'strPersonEntityRole'}&amp;pl=$rego->{'strPersonLevel'}&amp;sp=$rego->{'strSport'}&amp;ag=$newAgeLevel&amp;nat=RENEWAL";
         $rego->{'renew_link'} = $renew;
