@@ -710,7 +710,7 @@ sub addWorkFlowTasks {
         $emailNotification->setDbh($Data->{'db'});
 
         my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
-        $emailNotification->send($emailTemplate);
+        $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
 
     }
 
@@ -798,7 +798,7 @@ sub approveTask {
             $emailNotification->setDbh($Data->{'db'});
 
             my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
-            $emailNotification->send($emailTemplate);
+            $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
         }
 
     $st = qq[
@@ -1519,7 +1519,7 @@ sub resolveTask {
         $emailNotification->setDbh($Data->{'db'});
 
         my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
-        $emailNotification->send($emailTemplate);
+        $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
     }
 
     return(0);
@@ -1595,7 +1595,7 @@ sub rejectTask {
         $emailNotification->setDbh($Data->{'db'});
 
         my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
-        $emailNotification->send($emailTemplate);
+        $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
     }
 
     return(0);
@@ -2476,7 +2476,7 @@ sub toggleTask {
             $emailNotification->setDbh($Data->{'db'});
 
             my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
-            $emailNotification->send($emailTemplate);
+            $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
         }
 
         return 1;

@@ -85,6 +85,7 @@ print STDERR "SSSS$action $clubID\n";
 
 
   my $field=loadClubDetails($Data->{'db'}, $clubID,$Data->{'clientValues'}{'assocID'}) || ();
+  print STDERR Dumper $field;
   my $client=setClient($Data->{'clientValues'}) || '';
 
   #my $allowedit =( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
@@ -440,6 +441,12 @@ print STDERR "SSSS$action $clubID\n";
         rows => '10',
         cols => '40',
       },
+      intNotifications => {
+        label => "Notifications",
+        value => $field->{intNotifications},
+        type => 'lookup',
+        options => \%Defs::notificationToggle,
+      },
       SP1  => {
         type =>'_SPACE_',
       },
@@ -481,6 +488,7 @@ print STDERR "SSSS$action $clubID\n";
         strContactEmail
         strMANotes
         clubcharacteristics
+        intNotifications
     )],
     fieldtransform => {
       textcase => {
@@ -622,7 +630,8 @@ sub loadClubDetails {
      dtAdded,
      strShortNotes,
      tTimeStamp,
-     strLegalID
+     strLegalID,
+     intNotifications
     FROM tblEntity
     WHERE intEntityID = ?
   ];

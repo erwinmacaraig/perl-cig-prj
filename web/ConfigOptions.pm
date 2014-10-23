@@ -459,6 +459,7 @@ sub getFieldsList	{
         strMAID
         dtFrom
         dtTo
+        intNotifications
         ));
 
     return \@clubFields if $fieldtype eq 'Club';

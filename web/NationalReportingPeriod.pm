@@ -17,6 +17,7 @@ sub getPeriods {
         SELECT
             intNationalPeriodID,
             strNationalPeriodName,
+            strPersonType,
             strSport
         FROM
             tblNationalPeriod
@@ -31,8 +32,10 @@ sub getPeriods {
     my $body='';
     my %Periods=();
 
-    while (my ($id,$name, $sport)=$query->fetchrow_array()) {
+    while (my ($id,$name, $type, $sport)=$query->fetchrow_array()) {
+        my $personType = $Defs::personType->{$type} || '';
         $name .= qq[ - $sport] if $sport;
+        $name .= qq[ - $personType] if $personType;
         $Periods{$id}=$name ||'';
         
     }
@@ -41,7 +44,10 @@ sub getPeriods {
 }
 
 sub getNationalReportingPeriod {
-    my ($db, $realmID, $subRealmID, $sport, $registrationNature) = @_;
+    my ($db, $realmID, $subRealmID, $sport, $personType, $registrationNature) = @_;
+    $sport ||= '';
+    $personType ||= '';
+
     $subRealmID ||= 0;
     my $st = qq[
         SELECT
@@ -54,6 +60,7 @@ sub getNationalReportingPeriod {
             intRealmID = ?
             AND (intSubRealmID = ? or intSubRealmID = 0)
             AND strSport IN ('', ?)
+            AND strPersonType IN ('', ?)
     ];
             #AND (dtFrom < now() AND dtTo > now())
     if ($registrationNature and $registrationNature eq 'NEW')   {
@@ -70,11 +77,12 @@ sub getNationalReportingPeriod {
     $st .= qq[
         ORDER BY 
             intSubRealmID DESC,
-            strSport DESC   
+            strSport DESC,
+            strPersonType DESC   
         LIMIT 1
     ];
     my $q = $db->prepare($st);
-    $q->execute($realmID, $subRealmID, $sport);
+    $q->execute($realmID, $subRealmID, $sport, $personType);
     my ($nationalPeriodID, $dtFrom, $dtTo) = $q->fetchrow_array();
     $nationalPeriodID ||= 0;
     return ($nationalPeriodID, $dtFrom, $dtTo);

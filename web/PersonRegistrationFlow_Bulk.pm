@@ -130,7 +130,7 @@ sub handleRegistrationFlowBulk {
 
         ## Below code was ####  if ( $action eq 'PREGFB_SPU' ) {
 
-        ($bulk_ref->{'nationalPeriodID'}, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $bulk_ref->{'sport'}, $bulk_ref->{'registrationNature'});
+        ($bulk_ref->{'nationalPeriodID'}, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $bulk_ref->{'sport'}, $bulk_ref->{'personType'}, $bulk_ref->{'registrationNature'});
         my $count = bulkPersonRollover($Data, 'PREGFB_SPU', $bulk_ref, \%Hidden, 1);
 
         my $rolloverIDs= param('rolloverIDs') || '';
@@ -164,7 +164,7 @@ sub handleRegistrationFlowBulk {
         );
     }
     elsif ( $action eq 'PREGFB_SP' ) {
-        ($bulk_ref->{'nationalPeriodID'}, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $bulk_ref->{'sport'}, $bulk_ref->{'registrationNature'});
+        ($bulk_ref->{'nationalPeriodID'}, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $bulk_ref->{'sport'}, $bulk_ref->{'personType'}, $bulk_ref->{'registrationNature'});
         my ($listPersons_body, undef) = bulkPersonRollover($Data, 'PREGFB_SPU', $bulk_ref, \%Hidden, 0);
         $body .= $listPersons_body;
    }

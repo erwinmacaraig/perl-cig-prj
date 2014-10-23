@@ -84,6 +84,8 @@ sub optionsPersonRegisterWhat {
     my $pref= undef;
     $pref = loadPersonDetails($Data->{'db'}, $personID) if ($personID);
 
+    my $bulkWHERE='';
+    $bulkWHERE = qq[ AND strWFRuleFor='BULKREGO'] if ($bulk);
     my $role_ref = getEntityTypeRoles($Data, $sport, $personType);
     my %lfTable = (
         type => 'strPersonType',
@@ -217,7 +219,7 @@ sub optionsPersonRegisterWhat {
         return ($roledata_ref, '');
     }
     elsif ($lookingForField eq 'strPersonType') {
-        my @personTypeOptions = getPersonTypeFromMatrix($Data, $realmID, $subRealmID, $MATRIXwhere, \@MATRIXvalues, $defaultType);
+        my @personTypeOptions = getPersonTypeFromMatrix($Data, $realmID, $subRealmID, $MATRIXwhere, \@MATRIXvalues, $defaultType, $bulk);
 
         if(!@personTypeOptions) {
             return (undef, 'List of Person Type not found for the current realm.');
@@ -227,6 +229,7 @@ sub optionsPersonRegisterWhat {
 
         #return ($personTypeOptions, "");
     }
+
     elsif ($entityID and $lookingForField ne 'strRegistrationNature')   {
         #FC-181 - now check for allowed Sport and Gender
         #FC-181 - remove query to tblEntityRegistrationAllowed for now
@@ -253,6 +256,7 @@ sub optionsPersonRegisterWhat {
                     AND intLocked=0
                     AND intRealmID = ?
                     AND intSubRealmID IN (0,?)
+                    $bulkWHERE
                     $MATRIXwhere
                 GROUP BY $lookingForField
             ];
@@ -271,6 +275,7 @@ sub optionsPersonRegisterWhat {
                     AND intLocked=0
                     AND intRealmID = ?
                     AND intSubRealmID IN (0,?)
+                    $bulkWHERE
                     $MATRIXwhere
                 GROUP BY $lookingForField
             ];
@@ -279,7 +284,7 @@ sub optionsPersonRegisterWhat {
         }
         elsif ($lookingForField eq 'strAgeLevel') {
             #get age level from tblMatrix to narrow down selection in checkRegoAgeRestrictions
-            my $ageLevelFromMatrix = getAgeLevelFromMatrix($Data, $MATRIXwhere, \@MATRIXvalues);
+            my $ageLevelFromMatrix = getAgeLevelFromMatrix($Data, $MATRIXwhere, \@MATRIXvalues, $bulk);
 
             if(!$ageLevelFromMatrix) {
                 return (undef, 'No age level defined.') 
@@ -295,7 +300,7 @@ sub optionsPersonRegisterWhat {
                         WHERE
                             intOriginLevel  = ?
                             AND intLocked=0
-                            AND strWFRuleFor='BULKREGO'
+                            $bulkWHERE
                             AND intRealmID = ?
                             AND intSubRealmID IN (0,?)
                             $MATRIXwhere
@@ -504,7 +509,7 @@ sub checkEntityAllowed {
 
 #FC-181 - tblMatrix will rule out (tblEntityRegistrationAllowed will not be used for now)
 sub getPersonTypeFromMatrix {
-    my($Data, $realmID, $subRealmID, $where, $values_ref, $defaultType) = @_;
+    my($Data, $realmID, $subRealmID, $where, $values_ref, $defaultType, $bulk) = @_;
 
     $defaultType ||= '';
     my $defaultTypeWHERE = '';
@@ -512,6 +517,8 @@ sub getPersonTypeFromMatrix {
         $defaultTypeWHERE = qq[ AND strPersonType = ? ];
         push @{$values_ref}, $defaultType;
     }
+    my $bulkWHERE='';
+    $bulkWHERE = qq[ AND strWFRuleFor='BULKREGO'] if ($bulk);
     my $st=qq[
         SELECT DISTINCT strPersonType
         FROM tblMatrix
@@ -520,6 +527,7 @@ sub getPersonTypeFromMatrix {
             AND intLocked = 0
             AND intRealmID IN (0, ?)
             AND intSubRealmID IN (0, ?)
+            $bulkWHERE
             $where
             $defaultTypeWHERE
     ];
@@ -542,8 +550,10 @@ sub getPersonTypeFromMatrix {
 }
 
 sub getAgeLevelFromMatrix {
-    my($Data, $where, $values_ref) = @_;
+    my($Data, $where, $values_ref, $bulk) = @_;
                        
+    my $bulkWHERE='';
+    $bulkWHERE = qq[ AND strWFRuleFor='BULKREGO'] if ($bulk);
     my $st=qq[
         SELECT DISTINCT strAgeLevel
         FROM tblMatrix
@@ -552,6 +562,7 @@ sub getAgeLevelFromMatrix {
             AND intLocked = 0
             AND intRealmID IN (0, ?)
             AND intSubRealmID IN (0, ?)
+            $bulkWHERE
             $where
     ];
     my $query = $Data->{'db'}->prepare($st);

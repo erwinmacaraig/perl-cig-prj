@@ -286,7 +286,7 @@ sub listPersonRecord {
         ];
         $orderBy = qq[
             ORDER BY
-                CASE WHEN PR.strPersonType = 'PLAYER' AND PR.strSport = 'FOOTBALL' THEN PR.intPersonRegistrationID END desc,
+                CASE WHEN PR.strPersonType = 'PLAYER' AND PR.strSport = 'FOOTBALL' THEN personLevelWeight END desc,
                 CASE WHEN PR.strPersonType != 'PLAYER' AND PR.strSport != 'FOOTBALL' THEN PR.dtAdded END asc
         ];
         $limit = qq[ LIMIT 1 ];
@@ -294,6 +294,11 @@ sub listPersonRecord {
     elsif($requestType eq $Defs::PERSON_REQUEST_TRANSFER) {
         $joinCondition = qq [ AND PR.strPersonType = 'PLAYER' ];
         $groupBy = qq [ GROUP BY PR.strSport, PR.intEntityID ];
+        $orderBy = qq[
+            ORDER BY
+                CASE WHEN PR.strPersonType = 'PLAYER' AND PR.strSport = 'FOOTBALL' THEN personLevelWeight END desc,
+                CASE WHEN PR.strPersonType != 'PLAYER' AND PR.strSport != 'FOOTBALL' THEN PR.dtAdded END asc
+        ];
         #$limit = qq[ LIMIT 1 ];
     }
 
@@ -311,6 +316,7 @@ sub listPersonRecord {
             PR.strPersonType,
             PR.strSport,
             PR.strPersonLevel,
+            IF(PR.strPersonLevel = 'PROFESSIONAL', 3, IF(PR.strPersonLevel = 'AMATEUR', 2, 1)) as personLevelWeight,
             ePR.intPersonRegistrationID as currEntityPendingRegistrationID,
             ePR.intPersonRequestID as currEntityPendingRequestID,
             eRQ.intPersonRequestID as existPendingRequestID
@@ -685,7 +691,7 @@ sub submitRequestPage {
             $emailNotification->setDbh($Data->{'db'});
 
             my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
-            $emailNotification->send($emailTemplate);
+            $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
 
             push @rowdata, {
                 id => $regDetails->{'intPersonRegistrationID'} || 0,
@@ -984,7 +990,7 @@ sub setRequestResponse {
     $emailNotification->setDbh($Data->{'db'});
 
     my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
-    $emailNotification->send($emailTemplate);
+    $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
 
     #TODO: check if current entity has the right to update the request
 

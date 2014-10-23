@@ -26,7 +26,14 @@ sub new {
 
 sub getConfig {
     my $self = shift;
-    return $self->{_config};
+    my ($field) = @_;
+
+    if($field) {
+        return $self->{_config}{$field};
+    }
+    else {
+        return $self->{_config};
+    }
 }
 
 sub getContent {
@@ -56,9 +63,11 @@ sub retrieve {
             toEntity.strEmail as toEntityEmail,
             toEntity.strContactEmail as toEntityContactEmail,
             toEntity.strLocalName as toEntityName,
+            toEntity.intNotifications as toEntityNotification,
             fromEntity.strEmail as fromEntityEmail,
             fromEntity.strContactEmail as fromEntityContactEmail,
             fromEntity.strLocalName as fromEntityName,
+            fromEntity.intNotifications as fromEntityNotification,
             totc.strContactEmail as toClubContactEmail,
             frtc.strContactEmail as fromClubContactEmail
         FROM tblEmailTemplateTypes ett
