@@ -35,6 +35,7 @@ use Data::Dumper;
 use Switch;
 use PlayerPassport;
 use Documents;
+use EntityDocuments;
 use PersonRequest;
 use CGI qw(param unescape escape);
 use AuditLog;
@@ -2538,7 +2539,14 @@ sub addMissingDocument {
     my $memberID = safe_param('trgtid', 'number') || '';
     my $documentTypeID = safe_param('doclisttype', 'number') || '';
 
-    my ($body, $title) = handle_documents(undef, $Data, $memberID, $documentTypeID, $registrationID);
+    my $body = undef;
+    my $title = undef;
+    if($registrationID) {
+        ($body, $title) = Documents::handle_documents(undef, $Data, $memberID, $documentTypeID, $registrationID);
+    }
+    else {
+        ($body, $title) = EntityDocuments::handle_entity_documents("C_DOCS_frm", $Data, $memberID, $documentTypeID, undef);
+    }
 
     return ($body, $title);
 }
