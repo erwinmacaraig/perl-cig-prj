@@ -66,6 +66,7 @@ sub listPendingRegistrations    {
     my $st = qq[
         SELECT
             pr.*,
+            IF(pr.strStatus != 'ACTIVE', pr.strStatus, IF(pr.strStatus = 'ACTIVE' AND pr.intPaymentRequired = 1, 'ACTIVE_PENDING_PAYMENT', pr.strStatus)) AS displayStatus,
             p.strLocalFirstname,
             p.strLocalSurname,
             p.strLatinFirstname,
@@ -97,7 +98,7 @@ sub listPendingRegistrations    {
             INNER JOIN tblPerson as p ON (
                 p.intPersonID = pr.intPersonID
             )
-            INNER JOIN tblWFTask as WFT ON (
+            LEFT JOIN tblWFTask as WFT ON (
                 WFT.intPersonRegistrationID = pr.intPersonRegistrationID
                 AND WFT.intPersonID = pr.intPersonID
                 AND WFT.strTaskStatus IN ('ACTIVE')
@@ -111,7 +112,7 @@ sub listPendingRegistrations    {
         WHERE
             p.intRealmID = ?
             AND pr.intEntityID = ?
-            AND pr.strStatus IN ('PENDING', 'REJECTED')
+            AND (pr.strStatus IN ('PENDING', 'REJECTED') OR (pr.strStatus IN ('ACTIVE') AND pr.intPaymentRequired = 1))
         GROUP BY 
             pr.intPersonRegistrationID
         ORDER BY
@@ -148,7 +149,8 @@ sub listPendingRegistrations    {
             PersonType=> $Defs::personType{$dref->{'strPersonType'}} || '',
             AgeLevel=> $Defs::ageLevel{$dref->{'strAgeLevel'}} || '',
             RegistrationNature=> $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '',
-            Status=> $Defs::wfTaskStatus{$dref->{'strStatus'}} || '',
+            #Status=> $Defs::wfTaskStatus{$dref->{'strStatus'}} || '',
+            Status=> $Defs::personRegoStatus{$dref->{'displayStatus'}} || '',
             PersonEntityRole=> $dref->{'strPersonEntityRole'} || '',
             Sport=> $Defs::sportType{$dref->{'strSport'}} || '',
             LocalName=>$localname,
@@ -308,22 +310,22 @@ sub listPendingRegistrations    {
    $title = '';
     # class="grid-filter-wrap"
     my $resultHTML = '';
-    if(@rowdata){
-    	$title = $lang->txt('Pending Registrations');
-    	 my $grid  = showGrid(
-        Data    => $Data,
-        columns => \@headers,
-        rowdata => \@rowdata,
-        gridid  => 'grid',
-        width   => '99%',
-        filters => $filterfields,
-    ); 
-    	$resultHTML .=  qq[<div>
+    #if(@rowdata){
+        $title = $lang->txt('Pending Registrations');
+        my $grid = showGrid(
+            Data    => $Data,
+            columns => \@headers,
+            rowdata => \@rowdata,
+            gridid  => 'grid',
+            width   => '99%',
+            filters => $filterfields,
+        ); 
+        $resultHTML .=  qq[<div>
             <div style="width:99%;">$rectype_options</div>
-             $grid             
-        </div>
+            $grid             
+            </div>
         ];
-    }
+        #}
     if(@fielddata){
     	 my $grid2  = showGrid(
         Data    => $Data,
