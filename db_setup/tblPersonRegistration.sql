@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS tblPersonRegistration_XX;
 CREATE TABLE tblPersonRegistration_XX (
     intPersonRegistrationID int(11) NOT NULL auto_increment,
     intPersonID int(11) default 0,
+    strImportPersonCode varchar(45) NULL,
     intEntityID int(11) default 0,
     strPersonType varchar(20) default '' COMMENT 'The match official role type, e.g. Player, Coach, Referee',
     strPersonSubType varchar(20) default '', /* NOT USED FOR NOW */
@@ -35,6 +36,7 @@ CREATE TABLE tblPersonRegistration_XX (
     strShortNotes VARCHAR(250) NULL DEFAULT NULL COMMENT 'can only be added/edited/viewed by MA level',
 
   PRIMARY KEY  (intPersonRegistrationID),
+  UNIQUE INDEX `strImportPersonCode_UNIQUE` (`strImportPersonCode` ASC),
   KEY index_intPersonID (intPersonID),
   KEY index_intEntityID (intEntityID),
   KEY index_strPersonType (strPersonType),
