@@ -62,6 +62,7 @@ use Documents;
 use WorkFlow;
 use TTTemplate;
 use PersonRequest;
+use BulkPersons;
 
 
 sub handlePerson {
