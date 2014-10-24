@@ -23,6 +23,6 @@
 		"PostalCode" : "strPostalCode",
 		"Suburb" : "strSuburb",
 		"State" : "strState",
-		"Email" : "strEmail",
+		"Email" : "strEmail"
 	}
 }
