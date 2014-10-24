@@ -852,6 +852,7 @@ sub getRegistrationDetail {
     my $st= qq[
         SELECT 
             pr.*, 
+            IF(pr.strStatus != 'ACTIVE', pr.strStatus, IF(pr.strStatus = 'ACTIVE' AND pr.intPaymentRequired = 1, 'ACTIVE_PENDING_PAYMENT', pr.strStatus)) AS displayStatus,
             np.strNationalPeriodName,
             p.dtDOB,
             DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
@@ -898,7 +899,8 @@ sub getRegistrationDetail {
         $dref->{'PersonType'} = $Defs::personType{$dref->{'strPersonType'}} || '';
         $dref->{'PersonLevel'} = $Defs::personLevel{$dref->{'strPersonLevel'}} || '';
         $dref->{'AgeLevel'} = $Defs::ageLevel{$dref->{'strAgeLevel'}} || '';
-        $dref->{'Status'} = $Defs::personRegoStatus{$dref->{'strStatus'}} || '';
+        $dref->{'strStatus'} = $dref->{'strStatus'} || '';
+        $dref->{'displayStatus'} = $dref->{'displayStatus'} || '';
         $dref->{'RegistrationNature'} = $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '';
         push @RegistrationDetail, $dref;
     }
