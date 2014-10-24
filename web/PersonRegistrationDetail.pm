@@ -35,16 +35,17 @@ sub personRegistrationDetail   {
     my %statusoptions = ();
 
     for my $key (keys %Defs::personRegoStatus) {
-        next if !$key;
-        $statusoptions{$key} = $Defs::personRegoStatus{$key} || '';
+        next if(!$key or $key eq $Defs::PERSONREGO_STATUS_ACTIVE_PENDING_PAYMENT);
+
+        $statusoptions{$key} = ($key eq 'ACTIVE' and $RegistrationDetail->{'intPaymentRequired'} and $RegistrationDetail->{'strStatus'} eq 'ACTIVE') ? $Defs::personRegoStatus{$Defs::PERSONREGO_STATUS_ACTIVE_PENDING_PAYMENT} : $Defs::personRegoStatus{$key};
     }
 
-    print STDERR Dumper $RegistrationDetail;
     my %FieldDefinitions = (
         fields => {
             strStatus => {
                 label => 'Status',
-                value => uc($RegistrationDetail->{'Status'}),
+                #value => uc($RegistrationDetail->{'Status'}),
+                value => $RegistrationDetail->{'strStatus'},
                 type => 'lookup',
                 options => \%statusoptions,
                 readonly => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
