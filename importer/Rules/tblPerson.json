@@ -24,11 +24,5 @@
 		"Suburb" : "strSuburb",
 		"State" : "strState",
 		"Email" : "strEmail",
-		"DemographicField1" : "strDemographicField1",
-		"DemographicField2" : "strDemographicField2",
-		"DemographicField3" : "strDemographicField3",
-		"DemographicField4" : "strDemographicField4",
-		"DemographicField5" : "strDemographicField5",
-		"DemographicField6" : "strDemographicField6"
 	}
 }
