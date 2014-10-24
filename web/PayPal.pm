@@ -215,8 +215,7 @@ print STDERR "LOGID: $logID PP2: $key | $val\n";
 		$returnvals{'ResponseText'} = '500 Server closed' if ($val =~ /500 Server/ or $key =~ /500 Server/ and ! $returnvals{'ResponseText'});
 	}
 
-    print STDERR "=== After Performing DoExpressCheckoutPayment == " . Dumper(%returnvals);
-
+   
 
 	#if ($returnvals{'ResponseText'} eq '500 Server closed')	{
 	if ($returnvals{'ACK'} !~ /Success/)	{

@@ -32,7 +32,7 @@ use Data::Dumper;
 
 sub bulkPersonRollover {
     my($Data, $nextAction, $bulk_ref, $hidden_ref, $countOnly) = @_;
-
+    open(FH,">$Defs::myerrorfile");
     my $body = '';
     my $client = setClient($Data->{'clientValues'});
     my $realmID = $Data->{'Realm'};
@@ -92,6 +92,8 @@ sub bulkPersonRollover {
         ORDER BY strLocalSurname, strLocalFirstname
     ];
 
+    print FH "QUERY: " . $st . "\n\n"; 
+
     my @values=(
         $bulk_ref->{'personType'} || '',
         $bulk_ref->{'personLevel'} || '',
@@ -102,6 +104,9 @@ sub bulkPersonRollover {
         $bulk_ref->{'nationalPeriodID'} || '',
         $realmID
     );
+
+    print FH "Dumper: " .  Dumper(@values) . "\n\n";
+
     
     my $q = $Data->{'db'}->prepare($st);
     $q->execute(@values);

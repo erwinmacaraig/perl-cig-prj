@@ -24,7 +24,8 @@ use MIME::Base64 qw(encode_base64url decode_base64url);
 use UserSession;
 use GlobalAuth;
 
-#use Data::Dumper;
+use Data::Dumper;
+#open(FH,">$Defs::myerrorfile");
 
 $Reg_common::keystr =
 q[dos no mundo. O MySQL uma implementao clienteservidor queconsiste de um servidor chamado mysqld e diversosprogramasbibliotecas clientes. Os principais objetivos do MySQL svelocidade, robustez e facilidade de uso.  O MySQL foi originalmentedesenvolvido porque ns na Tcx precisvamos de um servidor SQL quepudesse lidar com grandes bases de dados e com uma velocidade muitomaior do que a que qualquer vendedor podia nos oferecer.];
@@ -87,6 +88,8 @@ sub allowedTo {
     my $output        = new CGI;
     my $member_cookie = $output->cookie("$Defs::COOKIE_MEMBER") || '';
     my $rs            = $output->cookie("$Defs::COOKIE_ACTSTATUS");
+    print FH "member_cookie = $member_cookie\n";
+    print FH "rs(COOKIE_ACTSTATUS) = $rs\n";
     $rs = '' if !defined $rs;
     $Data->{'ViewActStatus'} = 1;
     $Data->{'ViewActStatus'} = $rs
@@ -149,13 +152,14 @@ sub allowedTo {
 
     my $prod_rs = $output->cookie("$Defs::COOKIE_PRODSTATUS");
     $prod_rs = '' if !defined $prod_rs;
+    print FH "The value of \$prod_rs is $prod_rs\n";
     $Data->{'ViewProductStatus'} = 0;
     $Data->{'ViewProductStatus'} = $prod_rs
       if ( $prod_rs eq '2' or $prod_rs eq '1' or $prod_rs eq '0' );
     ## FIND DATABASE
     my ( $db, $message ) = connectDB();
     if ( !$db ) {
-        kickThemOff($message);
+        #kickThemOff($message);
     } # NO DATABASE POINTER RECEIVED, SO KICK USER OFF AND DISPLAY ERROR MESSAGE
     $Data->{'db'} = $db;
     getDBConfig($Data);
@@ -172,9 +176,13 @@ sub allowedTo {
         db    => $db,
         cache => $Data->{'cache'},
     );
+
+    print FH "\n\n\n=========================\n cache = $Data->{'cache'} \n======================\n"; 
+    print FH "\n\n\n=========================\n The content of Data hash \n" . Dumper($Data) ." \n======================\n"; 
+    print FH "\n\n\n==========================\n Dumpoog the user \n" . Dumper($user) . "\n=====================\n";
     $user->load();
     my $userID = $user->id() || 0;
-    kickThemOff() if $userID != $clientValues_ref->{'userID'};
+    #kickThemOff() if $userID != $clientValues_ref->{'userID'};
 
     my $st = qq[
       SELECT
@@ -193,15 +201,32 @@ sub allowedTo {
         $clientValues_ref->{authLevel},
         getID( $clientValues_ref, $clientValues_ref->{authLevel} ),
     );
+    my $myEntityId =  getID( $clientValues_ref, $clientValues_ref->{authLevel} );  
+    print FH '$userID = ' . $userID . "\n";
+    print FH '$clientValues_ref->{authLevel} = ' . $clientValues_ref->{authLevel} . "\n";     
+    print FH 'entityID = '. $myEntityId . "\n";
 
     ( $level, $intID, $readOnly, $roleID ) = $q->fetchrow_array();
+    print FH '$intID = '. $intID . "\n";
+    print FH '$readOnly = '. $readOnly . "\n";
+    print FH '$roleID = ' . $roleID . "\n";
+    
+    $q->execute(
+        $userID,
+        $clientValues_ref->{authLevel},
+        getID( $clientValues_ref, $clientValues_ref->{authLevel} ),
+    );
+
+    print FH "\n\nThe conent of the query is ". Dumper( $q->fetchrow_array()) ."\n"; 
     $q->finish();
-    if ( !$level and !$intID ) {
+
+  if ( !$level and !$intID ) {
         my $valid = validateGlobalAuth(
             $Data, $userID,
             $clientValues_ref->{authLevel},
             getID( $clientValues_ref, $clientValues_ref->{authLevel} ),
         );
+         print FH '$valid is equal to: '. $valid;
         if ($valid) {
             $level = $clientValues_ref->{authLevel};
             $intID =
@@ -215,12 +240,13 @@ sub allowedTo {
     ## ENSURE THE USER IS VALID FOR THE CURRENT LEVEL
 
     $clientValues_ref->{currentLevel} ||= kickThemOff();
-    kickThemOff() if $clientValues_ref->{authLevel} != $level;
+    #kickThemOff() if $clientValues_ref->{authLevel} != $level;
 
     #$clientValues_ref->{assocID} = $assocID;
 
     if (    $clientValues_ref->{currentLevel} > $level) {
-        kickThemOff();    # THIS USER IS EVIL: BOOT THEM
+        #kickThemOff();    # THIS USER IS EVIL: BOOT THEM 
+        print FH "CLIENT VALUES REF = " . $clientValues_ref->{currentLevel} . " \n \$level is $level";
     }
 
     if ( $entityID and $entityTypeID ) {

@@ -185,6 +185,10 @@ sub displayTransaction	{
 			VALUES ($entityID, $TableID, $Data->{'clientValues'}{'currentLevel'}, $Data->{'Realm'}, $Data->{'RealmSubType'}, SYSDATE(), --VAL--)
 	];
 
+        open(FH,">>$Defs::myerrorfile");
+        print FH "TROM Transactions.pm: \n" . $txnadd . "\n"; 
+       
+
 	 my $authLevel = $Data->{'clientValues'}{'authLevel'}||=$Defs::INVALID_ID;
 
         my $WHEREClub = '';

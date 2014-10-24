@@ -10,10 +10,11 @@ use strict;
 use Utils;
 use Log;
 use Products;
+use Data::Dumper;
 
 sub getRegistrationItems    {
     my($Data, $ruleFor, $itemType, $originLevel, $regNature, $entityID, $entityLevel, $multiPersonType, $Rego_ref) = @_; 
-
+    open(FH, ">$Defs::myerrorfile");
     $itemType ||= '';
     $originLevel ||= 0; 
     $regNature ||= '';
@@ -52,10 +53,10 @@ sub getRegistrationItems    {
         AND (RI.strISOCountry_IN ='' OR RI.strISOCountry_IN IS NULL OR RI.strISOCountry_IN LIKE CONCAT('%|',?,'|%'))
         AND (RI.strISOCountry_NOTIN ='' OR RI.strISOCountry_NOTIN IS NULL OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))        
       ]; 
-    print STDERR "getRegistrationItems Sport Query: " .  $Rego_ref->{'strSport'};    
+    #print FH "getRegistrationItems Sport Query: \n" . $st ."\n" ;    
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
     $q->execute(
-	         $Data->{'Realm'}, 
+	        $Data->{'Realm'}, 
 	        $Data->{'RealmSubType'}, 
 	        $ruleFor,
 	        $originLevel,
@@ -73,7 +74,26 @@ sub getRegistrationItems    {
 	        
 		) or query_error($st);
     
-    
+    #####
+    my @values = (); 
+    push @values, $Data->{'Realm'};  
+    push @values,$Data->{'RealmSubType'}; 
+    push @values,$ruleFor;
+    push @values,$originLevel;
+    push @values,$regNature;
+    push @values,$Rego_ref->{'strEntityType'} || $Rego_ref->{'entityType'} || '';
+    push @values,$entityLevel;
+    push @values,$Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '';
+    push @values,$Rego_ref->{'strPersonLevel'} || $Rego_ref->{'personLevel'} || '';
+    push @values,$Rego_ref->{'strPersonEntityRole'} || $Rego_ref->{'personEntityRole'} || '';
+    push @values,$Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '';
+    push @values,$Rego_ref->{'strAgeLevel'} || $Rego_ref->{'ageLevel'} || '';
+    push @values,$itemType;
+    push @values,$Rego_ref->{'Nationality'} || '';
+    push @values,$Rego_ref->{'Nationality'} || '';
+    #print FH Dumper(@values);
+    ####  
+
     my @Items=();
     while (my $dref = $q->fetchrow_hashref())   {
         my %Item=();

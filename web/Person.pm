@@ -62,6 +62,7 @@ use Documents;
 use WorkFlow;
 use TTTemplate;
 use PersonRequest;
+use BulkPersons;
 
 
 sub handlePerson {
@@ -177,7 +178,9 @@ sub handlePerson {
            }
     elsif($action =~ /P_PASS/){
     	($resultHTML,$title) = listPlayerPassport($Data, $personID);
-
+    } 
+    elsif($action =~ /P_CERT/){
+    	($resultHTML, $title) = PersonCertifications::handleCertificates($action,$Data,$personID);  
     }
     else {
         print STDERR "Unknown action $action\n";
