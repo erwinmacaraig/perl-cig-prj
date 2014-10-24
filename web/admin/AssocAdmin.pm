@@ -20,7 +20,7 @@ use Utils;
 use AdminCommon;
 use DeQuote;
 use FormHelpers;
-use NodeStructure;
+use EntityStructure;
 use Products;
 use ClubAdmin;
 use CompAdmin;
@@ -39,14 +39,14 @@ sub handle_assoc	{
   my($db, $action, $target)=@_;
   my $assocID = param('intAssocID') || 0;
   my $realmID = '';
-  
+
   my $body = '';
   my $menu = '';
-  
+
 if ($action ne 'ASSOC_list') {
  	if (!AdminCommon::verify_hash()) {
 		return('Error in Querystring hash');
-	}  
+	}
 }
 
   $realmID = $assocID ? getAssocRealm($db, $assocID) : 0;
@@ -54,33 +54,33 @@ if ($action ne 'ASSOC_list') {
   	my $clr_password=param('clr_password') || '';
 	$body = clearSyncHistory($db, $assocID, $clr_password);
 	$action = 'ASSOC_upl';
-  }	
+  }
 
-    
- 
+
+
   if ($action eq 'ERROR') {
   	# $body has already been setup
   }
   elsif($action eq 'ASSOC_update') {
-		($body,$menu)=update_assoc($db, $action, $assocID, $target); 
+		($body,$menu)=update_assoc($db, $action, $assocID, $target);
   }
   elsif($action eq 'ASSOC_list') {
-		($body,$menu)=list_assoc($db, $action, $assocID, $target); 
+		($body,$menu)=list_assoc($db, $action, $assocID, $target);
   }
   elsif($action eq 'ASSOC_upl') {
-		($body,$menu)=list_uploads($db, $action, $assocID, $target); 
+		($body,$menu)=list_uploads($db, $action, $assocID, $target);
   }
   elsif($action eq 'ASSOC_passport') {
-		($body,$menu)=passportLogins($db,  5, $assocID); 
+		($body,$menu)=passportLogins($db,  5, $assocID);
   }
   elsif($action eq 'ASSOC_loc') {
-		($body,$menu)=list_location($db, $action, $assocID, $target, $realmID); 
+		($body,$menu)=list_location($db, $action, $assocID, $target, $realmID);
   }
   elsif($action eq 'ASSOC_lu') {
-		($body,$menu)=update_loc($db, $assocID, $target); 
+		($body,$menu)=update_loc($db, $assocID, $target);
   }
   elsif($action eq 'ASSOC_new') {
-		($body,$menu)=new_assoc($db, $target); 
+		($body,$menu)=new_assoc($db, $target);
   }
   elsif($action eq 'ASSOC_newlogin') {
     ($body,$menu) = additional_assoc_login_form($db,$assocID,$target,'NEW');
@@ -181,7 +181,7 @@ my $strMPEmail = param("strMPEmail") || '';
 
 
 	my $statement = qq[
-		SELECT SI.*, PS.strSplitName 
+		SELECT SI.*, PS.strSplitName
 		FROM tblPaymentSplit PS
 		LEFT JOIN tblPaymentSplitItem SI ON (SI.intSplitID = PS.intSplitID)
 		WHERE PS.intEntityID=? AND intEntityTypeID=?
@@ -201,7 +201,7 @@ my $strMPEmail = param("strMPEmail") || '';
 	{
 	$showheader = 'Yes';
 	 $body .= qq[
-        
+
   <table style="margin-left:auto;margin-right:auto;"><tr><td class="formbg">
         <h2>Payment Splits</h2><table  cellpadding=10 cellspacing=0 border=1 bordercolor="black">
                 <tr>
@@ -281,7 +281,7 @@ my $strMPEmail = param("strMPEmail") || '';
 
 return $body;
 
-	
+
 
 }
 
@@ -297,7 +297,7 @@ sub clearSyncHistory	{
 	$clr_password ||= '';
 
 	return "WRONG PASSWORD" if ($clr_password ne 'dolphinburger');
-	
+
 
 	my $st = qq[
 		UPDATE tblAssoc
@@ -312,7 +312,7 @@ sub clearSyncHistory	{
 		WHERE intAssocID=$assocID
 	];
 	$db->do($st);
-	
+
 	return "DONE";
 }
 sub assoc_details	{
@@ -333,36 +333,36 @@ sub assoc_details	{
 	my %fields=();
 	if ($edit or $view) {
 		my $statement = qq[
-			SELECT 
+			SELECT
 	tblAssoc.intQRStatsTemplateID,
 	tblAssoc.intHideClubRollover,
 	tblAssoc.intCurrentSeasonID,
 	tblAssoc.intNewRegoSeasonID,
-	tblAssoc.intAssocID, 
-        
-	tblAssoc.strName, 
-        intDataAccess, 
-        strUsername, 
-        strPassword, 
-        strRealmName, 
-        tblAssoc.strCountry, 
+	tblAssoc.intAssocID,
+
+	tblAssoc.strName,
+        intDataAccess,
+        strUsername,
+        strPassword,
+        strRealmName,
+        tblAssoc.strCountry,
 				tblAssoc.strState,
-        intAssocTypeID, 
-        intDefaultRegoProductID, 
-        strFirstSyncCode, 
-        PP.curAmount, 
-        tblRealmSubTypes.strSubTypeName, 
-        intAllowPayment, 
+        intAssocTypeID,
+        intDefaultRegoProductID,
+        strFirstSyncCode,
+        PP.curAmount,
+        tblRealmSubTypes.strSubTypeName,
+        intAllowPayment,
         intAllowRegoForm,
 			  CSCFG.intLiveStatsUserID,
 			  CSCFG.strStadiumScoringKey,
 			  tblAssoc.intPaymentConfigID,
 				IF(PC.intGatewayType=1, 'Credit Card- ', IF(intGatewayType=2, 'PayPal- ', 'NAB- ')) as PaymentConfigType,
- 				IF(RS.intSubTypeID, RS.strSubTypeName, '') as PaymentConfigRealm,			
+ 				IF(RS.intSubTypeID, RS.strSubTypeName, '') as PaymentConfigRealm,
 	IF(PC.intRealmSubTypeID=1, 'Credit Card- ', IF(intGatewayType=2, 'PayPal- ', 'NAB- ')) as PaymentConfigType,
 			  PC.intLevelID,
         intApproveClubPayment,
-        intHideRegoFormNew,     
+        intHideRegoFormNew,
         intAssocFeeAllocationType,
         intAllowAutoDuplRes,
         intHideRollover,
@@ -379,9 +379,9 @@ sub assoc_details	{
         intSWOL_SportID,
 		    strPaymentEmail,
         strExtKey
-			FROM 
+			FROM
         tblAssoc
-	 
+
         LEFT JOIN tblAuth ON (tblAuth.intID=tblAssoc.intAssocID AND tblAuth.intLevel=$Defs::LEVEL_ASSOC)
 				LEFT JOIN tblPaymentApplication as PA ON (PA.intEntityID = tblAssoc.intAssocID AND PA.intEntityTypeID=5)
 				LEFT JOIN tblProductPricing as PP ON (PP.intProductID = intDefaultRegoProductID and PP.intID = tblAssoc.intAssocID and PP.intLevel=5)
@@ -390,9 +390,9 @@ sub assoc_details	{
 				LEFT JOIN tblCourtsideConfig AS CSCFG ON CSCFG.intAssocID = tblAssoc.intAssocID
 				LEFT JOIN tblPaymentConfig as PC ON (tblAssoc.intPaymentConfigID = PC.intPaymentConfigID)
 				LEFT JOIN tblRealmSubTypes as RS ON (RS.intSubTypeID = PC.intRealmSubTypeID)
-		WHERE 
+		WHERE
         tblAssoc.intAssocID = $intAssocID
-			ORDER BY 
+			ORDER BY
         PA.intPaymentType DESC
 			LIMIT 1
 	  ];
@@ -402,7 +402,7 @@ sub assoc_details	{
 
 		$dref= $query->fetchrow_hashref();
 		$query->finish();
-		foreach my $key (keys %{$dref})	{ 
+		foreach my $key (keys %{$dref})	{
 			if(!defined $dref->{$key})	{
 				if ($key =~ /intAllow|intAssocFee/)	{
 					$dref->{$key}=0;
@@ -410,7 +410,7 @@ sub assoc_details	{
 				else	{
 					$dref->{$key}='';
 				}
-			} 
+			}
 		}
 		$fields{'intRealmID'}=$dref->{'strRealmName'} || '';
 		$dref->{'strPaymentConfig'} = $dref->{'PaymentConfigType'} . "- " . $Defs::LevelNames{$dref->{intLevelID}} . " level setup ".$dref->{'PaymentConfigRealm'};
@@ -439,10 +439,10 @@ sub assoc_details	{
 			SELECT intSubTypeID, strSubTypeName
 			FROM tblRealmSubTypes
 			WHERE intRealmID = $realmID
-			ORDER BY strSubTypeName 
+			ORDER BY strSubTypeName
 		";
-		$fields{'intAssocTypeID'}=( $add) 
-				? getDBdrop_down('DB_intAssocTypeID',$db,$st,$dref->{'intAssocTypeID'},'&nbsp;') 
+		$fields{'intAssocTypeID'}=( $add)
+				? getDBdrop_down('DB_intAssocTypeID',$db,$st,$dref->{'intAssocTypeID'},'&nbsp;')
 				: $dref->{'strSubTypeName'};
 	}
 	{ #PAYMENT CONFIG
@@ -461,8 +461,8 @@ sub assoc_details	{
 					(PC.intLevelID=100 AND PC.intEntityID = int100_ID)
 				)
 		";
-		$fields{'intPaymentConfigID'}=($edit) 
-				? getDBdrop_down('DB_intPaymentConfigID',$db,$st,$dref->{'intPaymentConfigID'},'&nbsp;') 
+		$fields{'intPaymentConfigID'}=($edit)
+				? getDBdrop_down('DB_intPaymentConfigID',$db,$st,$dref->{'intPaymentConfigID'},'&nbsp;')
 				: $dref->{'strPaymentConfig'};
 	}
 
@@ -505,7 +505,7 @@ sub assoc_details	{
 	$fields{'intExcludeFromNationalRego'}=genDropDown('DB_intExcludeFromNationalRego',$dref->{intExcludeFromNationalRego},$add,$edit, (0=>'No',1=>'Yes'));
 	$fields{'intSWOL_SportID'}=genDropDown('DB_intSWOL_SportID',$dref->{intSWOL_SportID},$add,$edit,(''=>'', $Defs::SPORT_HOCKEY=>"Hockey", $Defs::SPORT_FOOTBALL=>"AFL", $Defs::SPORT_LACROSSE=>"Lacrosse", $Defs::SPORT_SOCCER=>"Soccer", $Defs::SPORT_NETBALL=>"Netball", $Defs::SPORT_BASKETBALL=>"Basketball", $Defs::SPORT_LEAGUE=>"Rugby League", 9=>"Generic", $Defs::SPORT_TOUCH_FOOTBALL=>"Touch", $Defs::SPORT_WATER_POLO=>"Water Polo", $Defs::SPORT_LAWN_BOWLS=>"Lawn Bowls", $Defs::SPORT_BASEBALL=>'Baseball',$Defs::SPORT_VOLLEYBALL=>'Volleyball', $Defs::SPORT_UNION=>'Rugby Union'));
 	$fields{'strExtKey'}=genTextBox('DB_strExtKey',$dref->{strExtKey},40,$add,$edit);
-	
+
 my $seasonsSQL = qq[SELECT intSeasonID, strSeasonName, DATE_FORMAT(dtAdded, '%d/%m/%Y') AS dtAdded, intAssocID
                 FROM tblSeasons
                 WHERE intRealmID = $realmID
@@ -521,7 +521,7 @@ my $seasonsSQL = qq[SELECT intSeasonID, strSeasonName, DATE_FORMAT(dtAdded, '%d/
 			my $menu='';
 	if($view)	{
 		$menu= qq[
-			<a href="$target?action=ASSOC_edit&amp;intAssocID=$intAssocID"><img src="images/edit.gif" alt="Edit" title="Edit" width="40" height="40" border="0"></a> 
+			<a href="$target?action=ASSOC_edit&amp;intAssocID=$intAssocID"><img src="images/edit.gif" alt="Edit" title="Edit" width="40" height="40" border="0"></a>
 		];
 	}
 
@@ -538,40 +538,40 @@ my $seasonsSQL = qq[SELECT intSeasonID, strSeasonName, DATE_FORMAT(dtAdded, '%d/
     ['strStadiumScoringKey'],
     ['intQRStatsTemplateID'],
 	['intAllowAutoDuplRes'],
-    ['intAllowFullTribunal'], 
-    ['intAllowClearances'], 
-    ['intHideRollover'], 
+    ['intAllowFullTribunal'],
+    ['intAllowClearances'],
+    ['intHideRollover'],
 	['intUploadUmpires'],
 	['intHideClubRollover'],
 
-    ['strUsername'], 
+    ['strUsername'],
 	  ['strPassword'],
 	  ['strFirstSyncCode'],
-    ['intUploadType'], 
- ['strSWWUsername'], 
+    ['intUploadType'],
+ ['strSWWUsername'],
 	  ['strSWWPassword'],
 	  ['intSWWAssocID'],
 	  ['intSWOL_SportID'],
 	  ['strExtKey'],
 
 
-    ['intAllowPayment'], 
-    ['intPaymentConfigID'], 
-    ['strPaymentEmail'], 
-    ['strPaymentConfig'], 
-    ['intDefaultRegoProductID'], 
-    ['curAmount'], 
-    ['intAllowRegoForm'], 
+    ['intAllowPayment'],
+    ['intPaymentConfigID'],
+    ['strPaymentEmail'],
+    ['strPaymentConfig'],
+    ['intDefaultRegoProductID'],
+    ['curAmount'],
+    ['intAllowRegoForm'],
     ['intHideRegoFormNew'],
     ['intExcludeFromNationalRego'],
     ['intApproveClubPayment'],
     ['intAssocFeeAllocationType'],
-    ['intNoPMSEmail'], 
-    ['intCCAssocOnClubPayments'], 
- 
+    ['intNoPMSEmail'],
+    ['intCCAssocOnClubPayments'],
 
 
- 
+
+
  );
 
 #if(check_access('','levelonly')>=90)
@@ -585,7 +585,7 @@ push(@display_fields,['intNewRegoSeasonID']);
 	'intAllowPayment'=>'Rego &amp; Payments',
 	'strUsername'=>'SWW / Login Info',
 	'intCurrentSeasonID'=>'Season Info',
-	'intLiveStatsUserID'=>'Configs'); 
+	'intLiveStatsUserID'=>'Configs');
   my %labels=(
     intAssocID=>'Association ID',
     strUsername=>'Auth User',aPass=>'Auth Pass',
@@ -626,7 +626,7 @@ push(@display_fields,['intNewRegoSeasonID']);
     intSWWAssocID=>'SWW Assoc ID',
     intSWOL_SportID=>'SWOL Sport',
     strExtKey=>'External Key',
-    intCurrentSeasonID=>'CurrentSeasonID',	
+    intCurrentSeasonID=>'CurrentSeasonID',
     intNewRegoSeasonID=>'NewRegoSeasonID',
     #strPaymentConfig=>'Payment Config',
     #intAllowPayment=>'Turn Payments ON (1=yes, 0=no)',
@@ -647,8 +647,8 @@ push(@display_fields,['intNewRegoSeasonID']);
       my $label=$labels{$display_fields[$i][$j]} || '';
       if(!$label) { next; }
       my $span= $span{$display_fields[$i][$j]} || 1;
-	if($intAssocID || (!$intAssocID and $display_fields[$i][$j] ne 'intNewRegoSeasonID' and $display_fields[$i][$j] ne 'intCurrentSeasonID'))	
-	{	
+	if($intAssocID || (!$intAssocID and $display_fields[$i][$j] ne 'intNewRegoSeasonID' and $display_fields[$i][$j] ne 'intCurrentSeasonID'))
+	{
 			if( defined $groups{$display_fields[$i][$j]} and ($groups{$display_fields[$i][$j]} ne '')){$subBody .="</table> <table  align='center' style='width:590px;float:left;margin-right:40px;margin-left:40px;margin-top:20px;'><tr><td colspan=2 align='center'><h2>".$groups{$display_fields[$i][$j]}."</h2></td></tr><tr>";}
 			$subBody.=qq[<tr>
 					<td class="formbg fieldlabel">$label:</td>
@@ -776,12 +776,12 @@ my %TempFields=();
 	if(!$intAssocID)	{
 		$ENV{PATH}='';
 		my $seconds = gettimeofday();
-		my $ms      = int($seconds*1000); 
+		my $ms      = int($seconds*1000);
 		my $timeGenPass = substr($ms,-8);
 		$fields{'DB_strPassword'} = $timeGenPass;
-		
-		# old way for generating password 
-		
+
+		# old way for generating password
+
 		#$fields{'DB_strPassword'}=`$Defs::fs_base/misc/passwdgen -a1q`;
 		$CompulsoryValues{'password'}='Problem Generating Password' if !$fields{'DB_strPassword'};
 	}
@@ -814,7 +814,7 @@ my %TempFields=();
 			$fieldlist.=qq[$newkey];
 		}
 	}
-	
+
 	# Time do update some courtside stuff
 
 	# Livestats ID
@@ -824,7 +824,7 @@ my %TempFields=();
         'value' =>  $livestatsuserID,
         'field' => 'intLiveStatsUserID',
     });
-    
+
     # Stadium Scoring Key
     _update_courtside({
         'db' => $db,
@@ -832,7 +832,7 @@ my %TempFields=();
         'value' =>  $stadiumScoringKey,
         'field' => 'strStadiumScoringKey',
     });
-	
+
 
   my $missing_fields=join("<br>\n",values %CompulsoryValues);
   if($missing_fields) {
@@ -898,7 +898,7 @@ my %TempFields=();
 		#Check to see if the Assoc already exists
 		my $checkstatement=qq[
 			SELECT intAssocID
-			FROM tblAssoc 
+			FROM tblAssoc
 			WHERE strName=$AssocName
 		];
 		my $query = $db->prepare($checkstatement) or query_error($checkstatement);
@@ -911,7 +911,7 @@ my %TempFields=();
 			],'');
 		}
 	}
- 
+
 	my $query = $db->prepare($statement) or query_error($statement);
 	$query->execute() or query_error($statement);
 	if(!$intAssocID)	{$intAssocID=$query->{mysql_insertid};}
@@ -935,19 +935,19 @@ my %TempFields=();
 	DELETE FROM
 	tblProductPricing
 	WHERE intID = $intAssocID
-		AND intLevel=5 
+		AND intLevel=5
 		AND intProductID=$fields{'DB_intDefaultRegoProductID'}
 	];
 	$db->do($st);
 
 	$st = qq[
-		SELECT intProductPricingID 
-		FROM tblProductPricing 
+		SELECT intProductPricingID
+		FROM tblProductPricing
 		WHERE intLevel=5
-			 AND intProductID = $fields{'DB_intDefaultRegoProductID'} 
+			 AND intProductID = $fields{'DB_intDefaultRegoProductID'}
 			 AND intID = $intAssocID
 	];
-	
+
 	$query = $db->prepare($st) or query_error($st);
 	$query->execute() or query_error($st);
 	my $intProductPricingID = $query->fetchrow_array() || 0;
@@ -957,14 +957,14 @@ my %TempFields=();
 		FROM tblAssoc
 		WHERE intAssocID = $intAssocID
 	];
-	
+
 	$query = $db->prepare($st) or query_error($st);
 	$query->execute() or query_error($st);
 	my $intRealmID= $query->fetchrow_array() || 0;
 print STDERR "HERE: $intProductPricingID | $fields{'DB_intDefaultRegoProductID'}| $fields{'DB_curAmount'}\n";
 	if ($intProductPricingID)	{
 		$st = qq[
-			UPDATE tblProductPricing 
+			UPDATE tblProductPricing
 			SET curAmount = $fields{'DB_curAmount'}
 			WHERE intProductPricingID = $intProductPricingID
 		];
@@ -976,12 +976,12 @@ print STDERR "HERE: $intProductPricingID | $fields{'DB_intDefaultRegoProductID'}
 			INSERT INTO tblProductPricing
 			(intID, intLevel, intRealmID, intProductID, curAmount)
 			VALUES ($intAssocID, 5, $intRealmID, $fields{'DB_intDefaultRegoProductID'}, $fields{'DB_curAmount'})
-		];	
+		];
 print STDERR $st;
 		$db->do($st);
         updateProductTXNPricing($db, $intAssocID, $fields{'DB_intDefaultRegoProductID'}, $TempFields{'DB_curAmount'}) if ($TempFields{'DB_curAmount'} > 0);
 	}
-	return assoc_details($db, 'ASSOC_view', $intAssocID, $target); 
+	return assoc_details($db, 'ASSOC_view', $intAssocID, $target);
 }
 
 
@@ -989,7 +989,7 @@ sub genTextBox	{
 	my($name, $value, $length, $add, $edit)=@_;
 	$length||='';
 	$value||='';
-	
+
   my $retVal=($edit or $add) ? qq[<input type="text" name="$name" value="$value" size="$length">] : $value;
 	return $retVal;
 }
@@ -1002,12 +1002,12 @@ sub genDropDown {
  		for (keys %additionalFields)
     		{
         		delete $additionalFields{$_};
-    		}     
+    		}
 		$additionalFields{0} = 'No';
 		$additionalFields{1} = 'Yes';
 	}
 	$selected||='';
-	
+
 	my $retVal= qq[<select name="$name">];
 
 	foreach my $key (sort keys %additionalFields) {
@@ -1039,7 +1039,7 @@ my $query = $db->prepare($st);
 
 sub displaySportSelect	{
 	my($target)=@_;
-	
+
 	my $body=qq[
   <form action="$target" method="post">
 		<div style="text-align:center">
@@ -1067,7 +1067,7 @@ sub list_assoc	{
 
   if ($action eq 'ASSOC_list_IN') {
     $assoc_id_IN = $intAssocID;
-    $action = 'ASSOC_list'; 
+    $action = 'ASSOC_list';
   }
 
   my $strWhere='';
@@ -1082,7 +1082,7 @@ sub list_assoc	{
     $strWhere .= qq/ AND tblAssoc.strFirstSyncCode LIKE '%$assoc_fsc_IN%' /;
   }
   if ($assoc_id_IN) {
-    $strWhere .= qq/ AND tblAssoc.intAssocID = '$assoc_id_IN' /; 
+    $strWhere .= qq/ AND tblAssoc.intAssocID = '$assoc_id_IN' /;
   }
   if ($assoc_swol_IN) {
 	my $assoc_swol_id=0;
@@ -1108,7 +1108,7 @@ print STDERR qq[AL : $Defs::LEVEL_ASSOC | $Defs::base_url \n\n];
 
   my $statement=qq[
 		SELECT distinct tblNode.strName, strSubTypeName, tblAssoc.strName, tblAssoc.intAssocID, strRealmName, tblRealms.intRealmID, intRecStatus, intSWOL
-    FROM 
+    FROM
       tblAssoc
       LEFT JOIN tblAuth ON (tblAuth.intAssocID=tblAssoc.intAssocID AND tblAuth.intLevel=$Defs::LEVEL_ASSOC)
 			LEFT JOIN tblRealms ON (tblAssoc.intRealmID=tblRealms.intRealmID)
@@ -1150,7 +1150,7 @@ print STDERR qq[AL : $Defs::LEVEL_ASSOC | $Defs::base_url \n\n];
 			'',
 			"$Defs::base_url/authenticate.cgi?i=$dref->{intAssocID}&amp;t=$Defs::LEVEL_ASSOC",
 		) ;
-		
+
     $hash_value = AdminCommon::create_hash_qs(0,0,$dref->{intAssocID},0,0);
     $body.=qq[
       <tr>
@@ -1266,9 +1266,9 @@ sub checkusername	{
 	#Check that this password is valid and not already in use
 
 	return (0,'Username cannot begin with a number') if $username=~/^'\d/;
-	my $st=qq[ 
-		SELECT intAuthID 
-		FROM tblAuth 
+	my $st=qq[
+		SELECT intAuthID
+		FROM tblAuth
 		WHERE strUsername=?
 			AND intLevel >= $Defs::LEVEL_ASSOC
 			AND NOT (intLevel=$Defs::LEVEL_ASSOC AND intID=$id)
@@ -1329,7 +1329,7 @@ sub list_location {
 
 	#Get Current
 	my $st=qq[
-		SELECT intNodeID 
+		SELECT intNodeID
 
 		FROM tblAssoc_Node
 		WHERE intAssocID=$intAssocID
@@ -1429,7 +1429,7 @@ else {
 		FROM tblRealms
 		WHERE intRealmID IN ($realmid)
 		ORDER BY strRealmName
-	";	
+	";
 }
 	my %fields=();
 	$fields{'intRealmID'}=getDBdrop_down('DB_intRealmID',$db,$st,'','&nbsp;');
@@ -1502,7 +1502,7 @@ sub additional_assoc_login_form {
   my ($username, $password, $ro) = ('','','');
   if ($action eq "EDIT") {
     $st = qq[
-      SELECT 
+      SELECT
         strUsername,
         strPassword,
         intReadOnly
@@ -1537,7 +1537,7 @@ sub additional_assoc_login_form {
         <td class="formbg fieldlabel">Read Only</td>
         <td class="formbg"><select name="ro"><option value="0">No</option><option value="1" $ro>Yes</option></select></td>
       </tr
-    </table>    
+    </table>
     <input type="hidden" name="action" value="$form_action">
     <input type="hidden" name="intAssocID" value="$assocID">
     <input type="hidden" name="intAuthID" value="$intAuthID">
@@ -1601,7 +1601,7 @@ sub update_assoc_login {
   $msg = "ERROR :: Username is too short (min 6 chracters) !" unless (length($username) > 5);
   return ($msg,'') if ($msg);
   my $st = qq[
-    UPDATE 
+    UPDATE
       tblAuth
     SET
       strUsername = ?,
@@ -1717,8 +1717,8 @@ sub update_timestamps_form {
         </td>
       </tr>
     </table>
-    </form> 
-  ]; 
+    </form>
+  ];
 }
 
 sub update_timestamps {
@@ -1728,11 +1728,11 @@ sub update_timestamps {
   my $venue = param('chk_venue') || 0;
   if ($venue == 1) {
     $st = qq[
-      UPDATE 
+      UPDATE
         tblDefVenue
-      SET 
+      SET
         tTimeStamp = now()
-      WHERE 
+      WHERE
         intAssocID = $assocID
     ];
     $db->do($st);
@@ -2010,7 +2010,7 @@ sub add_club {
   if ($assocID == 0 or $clubName eq '') {
     $body = qq[<p>Assoc ID is not valid</p>] if ($assocID == 0);
     $body .= qq[<p>Club Name is not valid</p>] if ($clubName eq '');
-    my ($form, $menu) = add_club_form($db, $target); 
+    my ($form, $menu) = add_club_form($db, $target);
     $body .= $form;
     return ($body, '');
   }
@@ -2029,7 +2029,7 @@ sub add_club {
   my $clubID = $q->{mysql_insertid} || 0;
   if ($assocID == 0) {
     $body = qq[<p>Club ID is not valid</p>] if ($clubID == 0);
-    my ($form, $menu) = add_club_form($db, $target); 
+    my ($form, $menu) = add_club_form($db, $target);
     $body .= $form;
     return ($body, '');
   }
@@ -2046,7 +2046,7 @@ sub add_club {
   $q = $db->prepare($st);
   $q->execute($assocID, $clubID);
   $body = qq[<p>Club sucessfully added</p>];
-  my ($form, $menu) = add_club_form($db, $target); 
+  my ($form, $menu) = add_club_form($db, $target);
   $body .= $form;
   return ($body, '');
 }
@@ -2054,16 +2054,16 @@ sub add_club {
 sub _update_courtside{
     my $param = shift;
     my ($db, $assocID, $field, $value) = @{$param}{qw/ db assocID field value /};
-    
+
     return 0 if ( !$db || !$assocID || !$field );
-    
+
     $value = undef if (!$value);
-    
+
     my $update_sql = qq[
         INSERT INTO tblCourtsideConfig
             (intAssocID, $field)
             VALUES (?, ?)
-        ON DUPLICATE KEY UPDATE $field = VALUES($field)        
+        ON DUPLICATE KEY UPDATE $field = VALUES($field)
     ];
 
     my $update_stmt = $db->prepare($update_sql);
