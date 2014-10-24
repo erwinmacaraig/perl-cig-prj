@@ -19,7 +19,6 @@ use Data::Dumper;
     my $q;
 
     while(my $realm = $targetRealm->fetchrow_hashref()) {
-        print STDERR Dumper $realm->{'intRealmID'};
 
         $st = qq [
             UPDATE
@@ -27,7 +26,9 @@ use Data::Dumper;
             SET
                 strStatus = ?
             WHERE
-                dtTo < DATE(NOW())
+                dtTo > '1900-01-01'
+                AND dtTo < DATE(NOW())
+                AND strStatus = 'ACTIVE'
         ];
 
         $q = $db->prepare($st);
