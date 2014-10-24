@@ -158,7 +158,9 @@ sub listPersons {
             P.intPersonID,
             P.strStatus,
             PR.strStatus as PRStatus,
+            PR.intPaymentRequired as PRintPaymentRequired,
             PRActive.strStatus as PRActiveStatus,
+            PRActive.intPaymentRequired as PRActiveIntPaymentRequired,
             P.intSystemStatus
             $select_str
         FROM tblPerson  AS P
@@ -203,6 +205,10 @@ sub listPersons {
         next if exists $PersonSeen{$dref->{'intPersonID'}};
         $PersonSeen{$dref->{'intPersonID'}} = 1;
         $dref->{'PRStatus'} = $dref->{'PRActiveStatus'} if ($dref->{'PRActiveStatus'});
+        $dref->{'PRintPaymentRequired'} = $dref->{'PRActiveIntPaymentRequired'} if ($dref->{'PRActiveIntPaymentRequired'});
+
+        $dref->{'PRStatus'} = ($dref->{'PRStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE and $dref->{'PRintPaymentRequired'}) ? $Defs::PERSONREGO_STATUS_ACTIVE_PENDING_PAYMENT : $Defs::PERSONREGO_STATUS_ACTIVE;
+
         $dref->{'PRStatus'} = $lang->txt('SUSPENDED') if ($dref->{'strStatus'} eq 'SUSPENDED');
         $dref->{'strStatus'} = $lang->txt($Defs::personRegoStatus{$dref->{'PRStatus'}}); ## Lets use PR status
         
