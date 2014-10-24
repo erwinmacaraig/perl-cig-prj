@@ -157,8 +157,7 @@ sub main {
          my $memberID = param('memberID') || 0;
         my $ID = $memberID || getID( \%clientValues);
         ( $resultHTML, $pageHeading ) =
-          handle_documents( $action, \%Data, $ID, $DocumentTypeID,$RegistrationID );
-          
+          handle_documents( $action, \%Data, $ID, $DocumentTypeID,$RegistrationID );  
     }
     elsif ( $action =~ /^LOGO_/ ) {
         my $ID = getID( \%clientValues );

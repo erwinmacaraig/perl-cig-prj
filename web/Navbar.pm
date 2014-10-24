@@ -1223,6 +1223,10 @@ sub getPersonMenuData {
     $menuoptions{'docs'} = {
        url => $baseurl."a=P_DOCS",
     };
+    
+    $menuoptions{'certificates'} = {
+       url => $baseurl."a=P_CERT",
+    };
     $menuoptions{'passport'} = {
        url => $baseurl."a=P_PASS",
     };
@@ -1250,6 +1254,7 @@ sub getPersonMenuData {
         [ $lang->txt('Player Passport'), 'menu','passport'],
         [ $lang->txt($SystemConfig->{'txns_link_name'} || 'Transactions'), 'menu','transactions'],
         [ $lang->txt('Transfer History'), 'menu','clr'],
+        [ $lang->txt('Certificates'), 'menu','certificates'],
         [ $lang->txt('Registration History'), 'menu','regos'],
         [ $lang->txt('Documents'), 'menu','docs'],
         [ $lang->txt('System'), 'system',[
