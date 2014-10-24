@@ -25,7 +25,7 @@
 		"Status" : "strStatus",
 		"LocalName" : "strLocalName",
 		"LocalShortName" : "strLocalShortName",
-		"LocalLanguageCode" : "strISOLocalLanguage",
+		"LocalLanguageCode" : "intLocalLanguage",
 		"LatinName" : "strLatinName",
 		"LatinShortName" : "strLatinShortName",
 		"FoundationDate" : "dtFrom",

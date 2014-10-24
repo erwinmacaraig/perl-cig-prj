@@ -6,7 +6,7 @@
 		"Status" : "strStatus",
 		"LocalFirstName" : "strLocalFirstname",
 		"LocalLastName" : "strLocalSurname",
-		"LocalLanguageCode" : "strISOLocalLanguage",
+		"LocalLanguageCode" : "intLocalLanguage",
 		"PreferredName" : "strPreferredName",
 		"LatinFirstName" : "strLatinFirstname",
 		"LatinLastName" : "strLatinSurname",
