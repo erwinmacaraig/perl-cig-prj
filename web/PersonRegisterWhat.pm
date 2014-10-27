@@ -128,6 +128,15 @@ sub optionsPersonRegisterWhat {
         };
         return (\@retdata, '');
     }
+    if (!$bulk and $step==6 and $pref->{'strStatus'} eq 'INPROGRESS')  {
+        my $label = $Data->{'lang'}->txt($lfLabelTable{$lookingFor}{'NEW'});
+        push @retdata, {
+            name => $label,
+            value => 'NEW',
+        };
+        return (\@retdata, '');
+    }
+
     my @values = ();
     my $st = '';
     my ($MATRIXwhere, $ERAwhere, $ENTITYAllowedwhere) = ('','','');
