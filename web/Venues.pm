@@ -23,11 +23,15 @@ use Countries;
 use RegistrationItem;
 use TTTemplate;
 use EntityDocuments;
+use Data::Dumper;
+
+use EntityField;
 
 sub handleVenues    {
     my ($action, $Data, $parentID, $typeID)=@_;
 
     my $venueID= param('venueID') || 0;
+    warn "HANDLER venue id " . $venueID;
     my $resultHTML='';
     my $title='';
     if ($action =~/^VENUE_DT/) {
@@ -43,6 +47,9 @@ sub handleVenues    {
     elsif($action =~ /^VENUE_DOCS/){
     	($resultHTML, $title) = handle_entity_documents($action, $Data, $venueID, $typeID, $Defs::DOC_FOR_VENUES);  
     }    
+    elsif($action =~ /^VENUE_F/) {
+        ($resultHTML, $title) = handle_venue_fields($action, $Data, $venueID);
+    }
     #####################################################    
     return ($resultHTML,$title);
 }
@@ -463,6 +470,7 @@ sub venue_details   {
         # Delete Venue.
         my $venueObj = new EntityObj('db'=>$Data->{db},ID=>$venueID,realmID=>$intRealmID);
         
+        $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$venueID">Edit Fields</a> ] if (!$Data->{'ReadOnlyLogin'});
         $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DEL&amp;venueID=$venueID" onclick="return confirm('Are you sure you want to delete this venue');">Delete Venue</a> ] if ($venueObj->canDelete() && !$Data->{'ReadOnlyLogin'});
     }
     
@@ -833,6 +841,40 @@ sub venueAllowed    {
     $query->finish();
     return $found ? 1 : 0;
 }
-1;
 
+sub handle_venue_fields {
+    my ($action, $Data, $venueID) = @_;
+
+    warn "METHOD CALL $venueID";
+    my $entityID = getID($Data->{'clientValues'});
+    warn "METHOD CALL $entityID";
+    my $venueDetails = loadVenueDetails($Data->{'db'}, $venueID);
+    my $entityField = new EntityField();
+    my $title = $venueDetails->{strLocalName} . ": " . "Fields";;
+
+
+    $entityField->setVenueID($entityID);
+    $entityField->setData($Data);
+
+    my $fields = $entityField->getAll();
+    print STDERR Dumper($fields);
+
+    my %PageData = (
+        target  => $Data->{'target'},
+        Lang    => $Data->{'lang'},
+        action  => 'VENUE_Fupdate',
+        client  => $Data->{'client'},
+        venueID => $venueID,
+        fields  => $fields,
+   );  
+ 
+    my $fieldsPage = runTemplate(
+        $Data,
+        \%PageData,
+        'entity/venue_fields.templ'
+    );  
+
+    return($fieldsPage, $title);
+}
+1;
 
