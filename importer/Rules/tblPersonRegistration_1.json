@@ -1,0 +1,23 @@
+{
+	"rules" : {
+	},
+	"mapping" : {
+		"PersonCode" : "strImportPersonCode",
+		"Status" : "strStatus",
+		"EntityCode" : "intEntityID",
+		"Current" : "intCurrent",
+		"RegistrationNature" : "strRegistrationNature",
+		"PersonType" : "strPersonType",
+		"Role" : "strPersonEntityRole",
+		"Level" : "strPersonLevel",
+		"Sport" : "strSport",
+		"AgeLevel" : "strAgeLevel",
+		"DateFrom" : "dtFrom",
+		"DateTo" : "dtTo",
+		"NationalSeason" : "",
+		"ProductCode" : "",
+		"Amount" : "",
+		"IsPaid" : "intIsPaid",
+		"PaymentReference" : ""
+	}
+}

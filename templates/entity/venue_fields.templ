@@ -1,0 +1,32 @@
+[% USE Dumper %]
+
+<form action="main.cgi" method="POST">
+<table style="width: 100%">
+    <tbody>
+        <tr>
+            <th>Field#</th>
+            <th>Name</th>
+            <th>Discipline</th>
+            <th>Ground Nature</th>
+            <th>Length</th>
+            <th>Width</th>
+            <th>Capacity</th>
+        </tr>
+        [% FOREACH field IN fields %]
+        <tr>
+            <td></td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+            <td>7</td>
+        </tr>
+        [% END %]
+    </tbody>
+</table>
+    <input type="hidden" value="[% action %]" name="a">
+    <input type="hidden" value="[% client %]" name="client">
+    <input type="hidden" value="[% venueID %]" name="venueID">
+    <input type="submit" class="button generic-button" name="submit" value="Submit">   
+</form>

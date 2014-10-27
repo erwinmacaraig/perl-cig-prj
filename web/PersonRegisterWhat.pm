@@ -84,7 +84,7 @@ sub optionsPersonRegisterWhat {
     my $pref= undef;
     $pref = loadPersonDetails($Data->{'db'}, $personID) if ($personID);
 
-    my $bulkWHERE='';
+    my $bulkWHERE= qq[ AND strWFRuleFor='REGO'];
     $bulkWHERE = qq[ AND strWFRuleFor='BULKREGO'] if ($bulk);
     my $role_ref = getEntityTypeRoles($Data, $sport, $personType);
     my %lfTable = (
@@ -128,6 +128,15 @@ sub optionsPersonRegisterWhat {
         };
         return (\@retdata, '');
     }
+    if (!$bulk and $step==6 and $pref->{'strStatus'} eq 'INPROGRESS')  {
+        my $label = $Data->{'lang'}->txt($lfLabelTable{$lookingFor}{'NEW'});
+        push @retdata, {
+            name => $label,
+            value => 'NEW',
+        };
+        return (\@retdata, '');
+    }
+
     my @values = ();
     my $st = '';
     my ($MATRIXwhere, $ERAwhere, $ENTITYAllowedwhere) = ('','','');
