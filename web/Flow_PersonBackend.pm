@@ -29,7 +29,7 @@ use Data::Dumper;
 sub setProcessOrder {
     my $self = shift;
   
-    $self->{'ProcessOrder'} = [
+    $self->{'ProcessOrder'} = [       
         {
             'action' => 'cd',
             'function' => 'display_core_details',
@@ -40,6 +40,18 @@ sub setProcessOrder {
             'action' => 'cdu',
             'function' => 'validate_core_details',
             'fieldset'  => 'core',
+        },
+        {
+        	'action' => 'pi',
+        	'function' => 'display_person_identifier',
+        	'label' => 'Person Identifier',
+        	'fieldset' => 'personidentifierdetails',
+        	
+        },
+         {
+            'action' => 'piu',
+            'function' => 'validate_person_identifier_details',
+            'fieldset'  => 'personidentifierdetails',
         },
         {
             'action' => 'minor',
@@ -313,6 +325,56 @@ sub setupValues    {
                 }
             },
         },
+        personidentifierdetails =>{
+        	'fields' => {
+        		strBirthCert => {
+        			label       => $FieldLabels->{'strBirthCert'},
+                    value       => $values->{'strBirthCert'},
+                    type        => 'text',
+                    size        => '40',
+                    maxsize     => '50',
+        		},
+        		strBirthCertCountry => {
+        			label       => $FieldLabels->{'strBirthCertCountry'},
+                    value       => $values->{'strBirthCertCountry'},
+                    type        => 'lookup',
+                    options     => $isocountries,
+                    firstoption => [ '', 'Select Country' ],
+                    compulsory => 1,
+                  
+        		},
+        		dtBirthCertValidityDateFrom => {
+        			label       => $FieldLabels->{'dtValidFrom'},
+                    value       => $values->{'dtBirthCertValidityDateFrom'},
+                    type        => 'date',
+                    datetype    => 'dropdown',
+                    format      => 'dd/mm/yyyy',
+                    validate    => 'DATE',
+        		},
+        		dtBirthCertValidityDateTo => {
+        			label       => $FieldLabels->{'dtValidUntil'},
+                    value       => $values->{'dtBirthCertValidityDateTo'},
+                    type        => 'date',
+                    datetype    => 'dropdown',
+                    format      => 'dd/mm/yyyy',
+                    validate    => 'DATE',
+        		},
+        		strBirthCertDesc => {
+        			label => $FieldLabels->{'strDescription'},
+      	            value => $values->{'strBirthCertDesc'},
+                    type => 'textarea',
+                    rows => '10',
+                    cols => '40',
+        		}
+        		
+        	},
+        	'order' =>[ 
+        		qw(strBirthCert strBirthCertCountry dtBirthCertValidityDateFrom dtBirthCertValidityDateTo strBirthCertDesc )
+        	],
+        	fieldtransform => {
+        		
+        	},
+        },        
         contactdetails => {
             'fields' => {
                 strAddress1 => {
@@ -486,8 +548,6 @@ sub setupValues    {
 
 }
 
-
-
 sub display_core_details    { 
     my $self = shift;
 
@@ -647,6 +707,55 @@ sub display_contact_details    {
 }
 
 sub validate_contact_details    { 
+    my $self = shift;
+
+    my $userData = {};
+    ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields();
+    my $id = $self->ID() || 0;
+    if(!$id)    {
+        push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person';
+    }
+    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+        #There are errors - reset where we are to go back to the form again
+        $self->decrementCurrentProcessIndex();
+        return ('',2);
+    }
+
+    my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
+    $personObj->load();
+    $personObj->setValues($userData);
+    $personObj->write();
+    return ('',1);
+}
+sub display_person_identifier {
+	my $self = shift; 
+	my $id = $self->ID() || 0;
+    my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
+    $personObj->load();
+    if($personObj->ID())    {
+        my $objectValues = $self->loadObjectValues($personObj);
+        $self->setupValues($objectValues);
+    }
+    
+	my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+    my %PageData = (
+        HiddenFields => $self->stringifyCarryField(),
+        Target => $self->{'Data'}{'target'},
+        Errors => $self->{'RunDetails'}{'Errors'} || [],
+        Content => $fieldsContent || '',
+        ScriptContent => $scriptContent || '',
+        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
+        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        Title => '',
+        TextTop => '',
+        TextBottom => '',
+    );
+    my $pagedata = $self->display(\%PageData);
+
+    return ($pagedata,0);
+	
+}
+sub validate_person_identifier_details    { 
     my $self = shift;
 
     my $userData = {};
@@ -1223,7 +1332,13 @@ sub loadObjectValues    {
             strISOCountryOfBirth
             strRegionOfBirth
             strPlaceOfBirth
-
+            
+            strBirthCert 
+            strBirthCertCountry 
+            dtBirthCertValidityDateFrom 
+            dtBirthCertValidityDateTo 
+            strBirthCertDesc
+            
             strAddress1
             strAddress2
             strSuburb
@@ -1244,5 +1359,4 @@ sub loadObjectValues    {
     }
     return \%values;
 }
-
 
