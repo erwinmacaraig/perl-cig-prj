@@ -55,13 +55,18 @@ CREATE TABLE tblPerson (
     intEthnicityID int(11) DEFAULT 0,
     strPreferredName varchar(100) DEFAULT '',
     strPreferredLang varchar(50) DEFAULT '',
-
     tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
     strCityOfResidence varchar(50) DEFAULT '',
     strPassportNo varchar(50) DEFAULT '',
     strPassportNationality varchar(50) DEFAULT '',
     dtPassportExpiry date DEFAULT '0000-00-00',
+    
+    strPersonIdentifier varchar(20),
+    strPersonCountryIdentifier varchar(6),
+    dtIdentifierValidityDateFrom date,
+    dtIdentifierValidityDateTo date,
+    strPersonIdentifierDesc varchar(250),
+     
     strISOPassportIssueCountry varchar(50) DEFAULT '',
     strEmergContName varchar(100) DEFAULT '',
     strEmergContRel varchar(100) DEFAULT '',
@@ -97,7 +102,6 @@ CREATE TABLE tblPerson (
     intConsentSignatureSighted tinyint(4) DEFAULT 0,
     strISOMotherCountry varchar(100) DEFAULT '',
     strISOFatherCountry varchar(100) DEFAULT '',
-
     strNatCustomStr1 varchar(50) DEFAULT '',
     strNatCustomStr2 varchar(50) DEFAULT '',
     strNatCustomStr3 varchar(50) DEFAULT '',
