@@ -40,19 +40,7 @@ sub setProcessOrder {
             'action' => 'cdu',
             'function' => 'validate_core_details',
             'fieldset'  => 'core',
-        },
-        {
-        	'action' => 'pi',
-        	'function' => 'display_person_identifier',
-        	'label' => 'Person Identifier',
-        	'fieldset' => 'personidentifierdetails',
-        	
-        },
-         {
-            'action' => 'piu',
-            'function' => 'validate_person_identifier_details',
-            'fieldset'  => 'personidentifierdetails',
-        },
+        },        
         {
             'action' => 'minor',
             'function' => 'display_minor_fields',
@@ -222,7 +210,7 @@ sub setupValues    {
                     options     => \%genderoptions,
                     compulsory => 1,
                     firstoption => [ '', " " ],
-                },
+                },                
                 intLocalLanguage => {
                     label       => $FieldLabels->{'intLocalLanguage'},
                     value       => $values->{'intLocalLanguage'},
@@ -325,56 +313,6 @@ sub setupValues    {
                 }
             },
         },
-        personidentifierdetails =>{
-        	'fields' => {
-        		strBirthCert => {
-        			label       => $FieldLabels->{'strBirthCert'},
-                    value       => $values->{'strBirthCert'},
-                    type        => 'text',
-                    size        => '40',
-                    maxsize     => '50',
-        		},
-        		strBirthCertCountry => {
-        			label       => $FieldLabels->{'strBirthCertCountry'},
-                    value       => $values->{'strBirthCertCountry'},
-                    type        => 'lookup',
-                    options     => $isocountries,
-                    firstoption => [ '', 'Select Country' ],
-                    compulsory => 1,
-                  
-        		},
-        		dtBirthCertValidityDateFrom => {
-        			label       => $FieldLabels->{'dtValidFrom'},
-                    value       => $values->{'dtBirthCertValidityDateFrom'},
-                    type        => 'date',
-                    datetype    => 'dropdown',
-                    format      => 'dd/mm/yyyy',
-                    validate    => 'DATE',
-        		},
-        		dtBirthCertValidityDateTo => {
-        			label       => $FieldLabels->{'dtValidUntil'},
-                    value       => $values->{'dtBirthCertValidityDateTo'},
-                    type        => 'date',
-                    datetype    => 'dropdown',
-                    format      => 'dd/mm/yyyy',
-                    validate    => 'DATE',
-        		},
-        		strBirthCertDesc => {
-        			label => $FieldLabels->{'strDescription'},
-      	            value => $values->{'strBirthCertDesc'},
-                    type => 'textarea',
-                    rows => '10',
-                    cols => '40',
-        		}
-        		
-        	},
-        	'order' =>[ 
-        		qw(strBirthCert strBirthCertCountry dtBirthCertValidityDateFrom dtBirthCertValidityDateTo strBirthCertDesc )
-        	],
-        	fieldtransform => {
-        		
-        	},
-        },        
         contactdetails => {
             'fields' => {
                 strAddress1 => {
@@ -451,11 +389,128 @@ sub setupValues    {
                     order       => $DefCodesOrder->{-8},
                     firstoption => [ '', " " ],
                 },
-
+                strBirthCert => {
+        			label       => $FieldLabels->{'strBirthCert'},
+                    value       => $values->{'strBirthCert'},
+                    type        => 'text',
+                    size        => '40',
+                    maxsize     => '50',
+        		},
+        		strBirthCertCountry => {
+        			label       => $FieldLabels->{'strBirthCertCountry'},
+                    value       => $values->{'strBirthCertCountry'},
+                    type        => 'lookup',
+                    options     => $isocountries,
+                    firstoption => [ '', 'Select Country' ],
+                    compulsory => 1,
+                  
+        		},
+        		dtBirthCertValidityDateFrom => {
+        			label       => $FieldLabels->{'dtValidFrom'},
+                    value       => $values->{'dtBirthCertValidityDateFrom'},
+                    type        => 'date',
+                    datetype    => 'dropdown',
+                    format      => 'dd/mm/yyyy',
+                    validate    => 'DATE',
+        		},
+        		dtBirthCertValidityDateTo => {
+        			label       => $FieldLabels->{'dtValidUntil'},
+                    value       => $values->{'dtBirthCertValidityDateTo'},
+                    type        => 'date',
+                    datetype    => 'dropdown',
+                    format      => 'dd/mm/yyyy',
+                    validate    => 'DATE',
+        		},
+        		strBirthCertDesc => {
+        			label => $FieldLabels->{'strDescription'},
+      	            value => $values->{'strBirthCertDesc'},
+                    type => 'textarea',
+                    rows => '10',
+                    cols => '40',
+        		},
+        		strPassportNo => { 
+                	label => $FieldLabels->{'strPassportNo'},
+                	value => $values->{'strPassportNo'},
+                	type => 'text',
+                	size => '40',
+                	maxsize => '50',
+                },
+                strPassportNationality => {
+                	label => $FieldLabels->{'strPassportNationality'},
+                	value => $values->{'strPassportNationality'},
+                	type        => 'lookup',
+                    options     => $isocountries,
+                    firstoption => [ '', 'Select Country' ],
+                    
+                },
+                strPassportIssueCountry => {
+                	label => $FieldLabels->{'strPassportIssueCountry'},
+                	value => $values->{'strPassportIssueCountry'},
+                	type        => 'lookup',
+                    options     => $isocountries,
+                    firstoption => [ '', 'Select Country' ],                	
+                },
+                dtPassportExpiry => {
+                	label => $FieldLabels->{'dtPassportExpiry'},
+                	value => $values->{'dtPassportExpiry'},
+                	type        => 'date',
+                    datetype    => 'dropdown',
+                    format      => 'dd/mm/yyyy',
+                    validate    => 'DATE',
+                },
+                strOtherPersonIdentifier => {
+                	label => $FieldLabels->{'strOtherPersonIdentifier'},
+                	value => $values->{'strOtherPersonIdentifier'},
+                	type => 'text',
+                	size => '40',
+                	maxsize => '50',                	
+                },
+                strOtherPersonIdentifierIssueCountry => {
+                	label => $FieldLabels->{'strOtherPersonIdentifierIssueCountry'},
+                	value => $values->{'strOtherPersonIdentifierIssueCountry'},
+                	type        => 'lookup',
+                    options     => $isocountries,
+                    firstoption => [ '', 'Select Country' ],
+                },
+                dtOtherPersonIdentifierValidDateFrom => {
+                	label => $FieldLabels->{'dtValidFrom'},
+                	value => $values->{'dtOtherPersonIdentifierValidDateFrom'},
+                	type        => 'date',
+                    datetype    => 'dropdown',
+                    format      => 'dd/mm/yyyy',
+                    validate    => 'DATE',
+                },
+                dtOtherPersonIdentifierValidDateTo => {
+                	label => $FieldLabels->{'dtValidUntil'},
+                	value => $values->{'dtOtherPersonIdentifierValidDateTo'},
+                	type        => 'date',
+                    datetype    => 'dropdown',
+                    format      => 'dd/mm/yyyy',
+                    validate    => 'DATE',
+                },
+                strOtherPersonIdentifierDesc => {
+                	label => $FieldLabels->{'strDescription'},
+                	value => $values->{'strOtherPersonIdentifierDesc'},
+                    type => 'textarea',
+                    rows => '10',
+                    cols => '40',                	
+                },
+                
+                
             },
             'order' => [qw(
                 strPreferredLang
-                intEthnicityID
+                intEthnicityID                 
+                strBirthCert strBirthCertCountry dtBirthCertValidityDateFrom dtBirthCertValidityDateTo strBirthCertDesc 
+                strPassportNationality
+                strPassportIssueCountry
+                dtPassportExpiry
+               
+                strOtherPersonIdentifier
+                strOtherPersonIdentifierIssueCountry
+                dtOtherPersonIdentifierValidDateFrom
+                dtOtherPersonIdentifierValidDateTo
+                strOtherPersonIdentifierDesc
             )],
         },
         certifications => {
@@ -1348,6 +1403,17 @@ sub loadObjectValues    {
 
             strPreferredLang
             intEthnicityID
+            
+            strPassportNo
+            strPassportNationality
+            strPassportIssueCountry
+            dtPassportExpiry
+
+            strOtherPersonIdentifier
+            strOtherPersonIdentifierIssueCountry
+            dtOtherPersonIdentifierValidDateFrom
+            dtOtherPersonIdentifierValidDateTo
+            strOtherPersonIdentifierDesc
 
             intMinorMoveOtherThanFootball
             intMinorDistance
