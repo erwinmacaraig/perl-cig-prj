@@ -39,6 +39,11 @@
 		"WebURL" : "strWebURL",
 		"Email" : "strEmail",
 		"Phone" : "strPhone",
-		"Fax" : "strFax"
+		"Fax" : "strFax",
+		"NationalCustomString1" : "strNatCustomStr1",
+		"NationalCustomString2" : "strNatCustomStr2",
+		"NationalCustomString3" : "strNatCustomStr3",
+		"NationalCustomString4" : "strNatCustomStr4",
+		"NationalCustomString5" : "strNatCustomStr5"
 	}
 }
