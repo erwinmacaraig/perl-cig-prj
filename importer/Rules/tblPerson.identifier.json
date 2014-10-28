@@ -1,0 +1,13 @@
+{
+	"rules" : {
+	},
+	"mapping" : {
+		"PersonCode" : "strImportPersonCode",
+		"Identifier" : "strOtherPersonIdentifier",
+		"IdentifierType" : "",
+		"CountryIssued" : "strOtherPersonIdentifierIssueCountry",
+		"DateFrom" : "dtOtherPersonIdentifierValidDateFrom",
+		"DateTo" : "dtOtherPersonIdentifierValidDateTo",
+		"Description" : "strOtherPersonIdentifierDesc"
+	}
+}
