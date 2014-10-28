@@ -26,6 +26,7 @@ use EntityDocuments;
 use Data::Dumper;
 
 use EntityField;
+use FacilityFlow;
 
 sub handleVenues    {
     my ($action, $Data, $parentID, $typeID)=@_;
@@ -34,7 +35,13 @@ sub handleVenues    {
     warn "HANDLER venue id " . $venueID;
     my $resultHTML='';
     my $title='';
-    if ($action =~/^VENUE_DT/) {
+    if ($action =~/^VENUE_DTA/) {
+        #($resultHTML,$title)=venue_details($action, $Data, $venueID);
+        ($resultHTML,$title) = handleFacilityFlow($action, $Data);
+    }
+    elsif($action =~/^VENUE_DTE/){
+        #TODO
+        #still to be implemented
         ($resultHTML,$title)=venue_details($action, $Data, $venueID);
     }
     elsif ($action =~/^VENUE_L/) {
