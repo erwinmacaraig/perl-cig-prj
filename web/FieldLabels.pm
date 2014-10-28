@@ -148,6 +148,53 @@ sub getFieldLabels	{
             intNotifications => 'Notification Toggle',
             );
 	}
+
+	if($level== $Defs::VENUE)	{
+		%labels = (
+            strFIFAID => 'FIFA ID',
+            strLocalName => 'Name',
+            strLocalShortName => 'Short Name',
+            strLocalFacilityName => 'Facility Name',
+            strLatinName => 'Name (International)',
+            strLatinShortName => 'Short Name (International)',
+            strLatinFacilityName => 'Facility Name (International)',
+            strStatus => 'Status',
+            strISOCountry => 'Country',
+
+            strRegion => 'Region',
+            strPostalCode => 'Postal Code',
+            strTown => 'Town',
+            strAddress => 'Address 1',
+            strAddress2 => 'Address 2',
+            strCity => 'City',
+            strWebURL => 'Website',
+            strEmail => 'Email',
+            strPhone => 'Phone',
+            strFax => 'Fax',
+            strContactTitle => 'Contact Person Title',
+            strContactEmail => 'Contact Person Email',
+            strContactPhone => 'Contact Person Phone',
+            strContact => 'Contact Person',
+            intIdentifierTypeID => 'Identifier Type',
+            strIdentifier => 'Identifier',
+            dtValidFrom => 'Valid From',
+            dtValidUntil =>'Valid Until',
+            strDescription => 'Description',
+            strAssocNature => 'Association Nature',
+            strMANotes => 'MA Comment',
+            intLegalTypeID => 'Legal Entity Type', 
+            intLocalLanguage => 'Local Name Language',
+            strLegalID => "Legal Type Number",
+            strMAID => 'MA ID',
+            dtFrom => 'Foundation Date',
+            dtTo => 'Dissolution Date',
+            strGender => 'Gender',
+            strDiscipline => 'Sport',
+            strEntityType => 'Entity Type',
+            intNotifications => 'Notification Toggle',
+            );
+	}
+
 	for my $k (keys %labels)	{
 		$labels{$k}= ($Data->{'SystemConfig'}{'FieldLabel_'.$k} || '') if exists $Data->{'SystemConfig'}{'FieldLabel_'.$k};
 	}
