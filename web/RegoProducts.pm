@@ -662,7 +662,7 @@ print STDERR "SSSSSSSSSSSSSSSSSSSSS";
             my $qty = $params->{'txnQTY_'.$product} || $params->{'prodQTY_'.$product} || 1;
             $qty = fix_qty($qty);
             my $totalamount= $amount * $qty;
-print STDERR "AAAAAAAAAAAAA FOR $product IS $amount $totalamount\n\n\n\n\n\n";
+print STDERR "A$intID $regoID AAAAAAAAAAAA FOR $product IS $amount $totalamount\n\n\n\n\n\n";
             $q_add->execute(
                 $status,
                 $totalamount,
