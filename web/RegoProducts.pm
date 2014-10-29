@@ -560,6 +560,7 @@ sub insertRegoTransaction {
                 foreach my $existproduct (@{$rego_products})  {
                     next if ($existproduct->{'ID'} != $product);
                     next if ($level != $Defs::LEVEL_PERSON);
+                    print STDERR "REGO PRODUCT CHECK HERE " . $existproduct->{'UseExistingThisEntity'} . "|" . $existproduct->{'UseExistingAnyEntity'} . "P:$intID" . "|" . $existproduct->{'ID'};
                     if ($existproduct->{'UseExistingThisEntity'} && checkExistingProduct($Data, $existproduct->{'ID'}, $Defs::LEVEL_PERSON, $intID, $entityID, 'THIS_ENTITY')) {
                         $amount=0;
                         $ExistingProducts{$product} = 1;
