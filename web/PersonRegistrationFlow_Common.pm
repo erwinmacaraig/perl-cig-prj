@@ -99,9 +99,9 @@ sub displayRegoFlowComplete {
          my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
          my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
          my $gateways = '';
-         if (1==2)   {
+#         if (1==2)   {
             $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
-         }
+#         }
          
           savePlayerPassport($Data, $personID);
         my %PageData = (
