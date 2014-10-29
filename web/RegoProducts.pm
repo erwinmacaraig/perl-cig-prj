@@ -566,6 +566,7 @@ sub insertRegoTransaction {
                         $ExistingProducts{$product} = 1;
                     }
                     if ($existproduct->{'UseExistingAnyEntity'} && checkExistingProduct($Data, $existproduct->{'ID'}, $Defs::LEVEL_PERSON, $intID, $entityID, 'ANY_ENTITY')) {
+print STDERR "SSSSSSSSSSSSSSSSSSSSS";
                         $amount=0;
                         $ExistingProducts{$product} = 1;
                     }
@@ -661,6 +662,7 @@ sub insertRegoTransaction {
             my $qty = $params->{'txnQTY_'.$product} || $params->{'prodQTY_'.$product} || 1;
             $qty = fix_qty($qty);
             my $totalamount= $amount * $qty;
+print STDERR "AAAAAAAAAAAAA FOR $product IS $amount $totalamount\n\n\n\n\n\n";
             $q_add->execute(
                 $status,
                 $totalamount,
