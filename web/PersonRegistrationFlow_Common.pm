@@ -94,7 +94,7 @@ sub displayRegoFlowComplete {
             my ($prodID, $qty) = split /-/, $prodQty;
             $hidden_ref->{"prodQTY_$prodID"} =$qty;
         }
-        $hidden_ref->{'txnIds'} = save_rego_products($Data, $regoID, $personID, $entityID, $rego_ref->{'entityLevel'}, $rego_ref, $hidden_ref); #\%params);
+        #$hidden_ref->{'txnIds'} = save_rego_products($Data, $regoID, $personID, $entityID, $rego_ref->{'entityLevel'}, $rego_ref, $hidden_ref); #\%params);
 
          my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
          my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
@@ -553,6 +553,7 @@ print STDERR "IN BULK REGO $rolloverIDs | $productIDs | $productQtys\n\n\n\n";
             my ($prodID, $qty) = split /-/, $prodQty;
             $Products{"prodQTY_$prodID"} =$qty;
         }
+print STDERR "######################################\n";
         my ($txns_added, $amount) = insertRegoTransaction(
             $Data, 
             $regoID, 
