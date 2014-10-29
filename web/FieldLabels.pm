@@ -103,7 +103,20 @@ sub getFieldLabels	{
             dtValidFrom => 'Valid From',
             dtValidUntil => 'Valid Until',
             strDescription => 'Description/Reference',
-
+            
+            strBirthCert => "Birth Certificate",
+            strBirthCertCountry => "Birth Country",
+            dtBirthCertValidityDateFrom => 'Birth Certificate Validity Date From',
+            dtBirthCertValidityDateTo => 'Birth Certificate Validity Date To',
+            strBirthCertDesc => 'Birth Certificate Description',
+            
+            strOtherPersonIdentifier => 'Other Identifier',
+            strOtherPersonIdentifierIssueCountry => 'Other Identifier Issuance Country',
+            dtOtherPersonIdentifierValidDateFrom => 'Other Identifier Validity Date From',
+            dtOtherPersonIdentifierValidDateTo => 'Other Identifier Validity Date To',
+            strOtherPersonIdentifierDesc => 'Other Identifier Description',
+             
+            
 		);
 	}
 
