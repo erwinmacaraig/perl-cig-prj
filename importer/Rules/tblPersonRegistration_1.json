@@ -1,5 +1,11 @@
 {
 	"rules" : {
+		"ProductCode" : {
+			"rule":"createRecord",
+			"table" : "tblTransactions",
+			"refID" : "ProductCode",
+			"fields" : {"intProductID":"ProductCode", "intStatus":"1", "curAmount":"Amount"}
+		}
 	},
 	"mapping" : {
 		"PersonCode" : "strImportPersonCode",
@@ -14,10 +20,10 @@
 		"AgeLevel" : "strAgeLevel",
 		"DateFrom" : "dtFrom",
 		"DateTo" : "dtTo",
-		"NationalSeason" : "",
-		"ProductCode" : "",
-		"Amount" : "",
+		"NationalSeason" : "NationalSeason",
+		"ProductCode" : "ProductCode",
+		"Amount" : "Amount",
 		"IsPaid" : "intIsPaid",
-		"PaymentReference" : ""
+		"PaymentReference" : "PaymentReference"
 	}
 }

@@ -1036,9 +1036,7 @@ sub person_details {
                 size        => '20',
                 maxsize     => '30',
                 sectionname => 'parent',
-            },
-
-
+             },
             strP1Email => {
                 label       => $FieldLabels->{'strP1Email'},
                 value       => $field->{strP1Email},
@@ -1074,6 +1072,65 @@ sub person_details {
                 sectionname => 'other',
                 readonly    => 1,
             },
+            strBirthCert => {
+        		label       => $FieldLabels->{'strBirthCert'},
+                value       => $field->{'strBirthCert'},
+                type        => 'text',
+                size        => '40',
+                maxsize     => '50',  
+                sectionname => 'identification'              
+        	},
+        	strBirthCertCountry => {
+        		label       => $FieldLabels->{'strBirthCertCountry'},
+                value       => $field->{'strBirthCertCountry'},
+                type        => 'lookup',
+                options     => $isocountries,
+                firstoption => [ '', 'Select Country' ],
+                sectionname => 'identification', 
+        	},
+        	dtBirthCertValidityDateFrom => {
+        		label       => $FieldLabels->{'dtValidFrom'},
+                value       => $field->{'dtBirthCertValidityDateFrom'},
+                type        => 'date',
+                datetype    => 'dropdown',
+                format      => 'dd/mm/yyyy',
+                validate    => 'DATE',
+                sectionname => 'identification', 
+        	},
+        	dtBirthCertValidityDateTo => {
+        		label       => $FieldLabels->{'dtValidUntil'},
+                value       => $field->{'dtBirthCertValidityDateTo'},
+                type        => 'date',
+                datetype    => 'dropdown',
+                format      => 'dd/mm/yyyy',
+                validate    => 'DATE',
+                sectionname => 'identification', 
+        	},
+        	strBirthCertDesc => {
+        		label => $FieldLabels->{'strDescription'},
+      	        value => $field->{'strBirthCertDesc'},
+                type => 'textarea',
+                rows => '10',
+                cols => '40',
+                sectionname => 'identification',
+        	},
+        	strPassportNo => { 
+               	label => $FieldLabels->{'strPassportNo'},
+               	value => $field->{'strPassportNo'},
+               	type => 'text',
+               	size => '40',
+               	maxsize => '50',
+            	sectionname => 'identification',
+        	},
+        	 strPassportNationality => {
+              	label => $FieldLabels->{'strPassportNationality'},
+               	value => $field->{'strPassportNationality'},
+               	type        => 'lookup',
+                options     => $isocountries,
+                firstoption => [ '', 'Select Country' ],
+                sectionname => 'identification',
+            },
+        	 
             strNotes => {
                 label             => $FieldLabels->{'strNotes'},
                 value             => $field->{strPersonNotes},
@@ -1084,6 +1141,66 @@ sub person_details {
                 SkipAddProcessing => 1,
                 SkipProcessing    => 1,
             },
+            strPassportIssueCountry => {
+                	label => $FieldLabels->{'strPassportIssueCountry'},
+                	value => $field->{'strPassportIssueCountry'},
+                	type        => 'lookup',
+                    options     => $isocountries,
+                    firstoption => [ '', 'Select Country' ],  
+                    sectionname => 'identification',              	
+                },
+                dtPassportExpiry => {
+                	label => $FieldLabels->{'dtPassportExpiry'},
+                	value => $field->{'dtPassportExpiry'},
+                	type        => 'date',
+                    datetype    => 'dropdown',
+                    format      => 'dd/mm/yyyy',
+                    validate    => 'DATE',
+                    sectionname => 'identification',
+                },
+                strOtherPersonIdentifier => {
+                	label => $FieldLabels->{'strOtherPersonIdentifier'},
+                	value => $field->{'strOtherPersonIdentifier'},
+                	type => 'text',
+                	size => '40',
+                	maxsize => '50',       
+                	sectionname => 'identification',         	
+                },
+                strOtherPersonIdentifierIssueCountry => {
+                	label => $FieldLabels->{'strOtherPersonIdentifierIssueCountry'},
+                	value => $field->{'strOtherPersonIdentifierIssueCountry'},
+                	type        => 'lookup',
+                    options     => $isocountries,
+                    firstoption => [ '', 'Select Country' ],
+                    sectionname => 'identification',
+                },
+                dtOtherPersonIdentifierValidDateFrom => {
+                	label => $FieldLabels->{'dtValidFrom'},
+                	value => $field->{'dtOtherPersonIdentifierValidDateFrom'},
+                	type        => 'date',
+                    datetype    => 'dropdown',
+                    format      => 'dd/mm/yyyy',
+                    validate    => 'DATE',
+                    sectionname => 'identification',
+                },
+                dtOtherPersonIdentifierValidDateTo => {
+                	label => $FieldLabels->{'dtValidUntil'},
+                	value => $field->{'dtOtherPersonIdentifierValidDateTo'},
+                	type        => 'date',
+                    datetype    => 'dropdown',
+                    format      => 'dd/mm/yyyy',
+                    validate    => 'DATE',
+                    sectionname => 'identification',
+                },
+                strOtherPersonIdentifierDesc => {
+                	label => $FieldLabels->{'strDescription'},
+                	value => $field->{'strOtherPersonIdentifierDesc'},
+                    type => 'textarea',
+                    rows => '10',
+                    cols => '40',   
+                    sectionname => 'identification',             	
+                },
+        	
             PhotoUpload => {
                 label => ($Data->{'SystemConfig'}{'person_intPhoto'} && $Data->{'SystemConfig'}{'person_demographic'})? 'Photo' : '',
                 type  => 'htmlblock',
@@ -1113,7 +1230,27 @@ sub person_details {
 
         },
         order => [
-        qw(strNationalNum strPersonNo strStatus strLocalFirstname strLocalSurname strISONationality strISOCountry dtDOB intGender strLatinFirstname strLatinSurname strPreferredName strRegionOfBirth strPlaceOfBirth strISOCountryOfBirth strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneMobile strEmail SPcontact intDeceased strPreferredLang strEmergContName strEmergContNo strEmergContNo2 strP1FName strP1SName strP1Phone strP1Email dtSuspendedUntil),
+        qw(strNationalNum strPersonNo strStatus strLocalFirstname  strLocalSurname strISONationality strISOCountry dtDOB intGender strLatinFirstname strLatinSurname strPreferredName strRegionOfBirth strPlaceOfBirth strISOCountryOfBirth strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneMobile strEmail SPcontact intDeceased strPreferredLang strEmergContName strEmergContNo strEmergContNo2 
+            strBirthCert 
+            strBirthCertCountry 
+            dtBirthCertValidityDateFrom
+            dtBirthCertValidityDateTo
+            strBirthCertDesc
+            strPassportNo
+            strPassportNationality
+            strPassportIssueCountry
+            dtPassportExpiry
+            strOtherPersonIdentifier
+            strOtherPersonIdentifierIssueCountry
+            dtOtherPersonIdentifierValidDateFrom
+            dtOtherPersonIdentifierValidDateTo
+            strOtherPersonIdentifierDesc 
+            strP1FName 
+            strP1SName 
+            strP1Phone 
+            strP1Email 
+            dtSuspendedUntil
+        ),
 
         map("strNatCustomStr$_", (1..15)),
         map("dblNatCustomDbl$_", (1..10)),
@@ -1135,7 +1272,7 @@ sub person_details {
         [ 'regoform',       q{} ],
         [ 'details',        'Personal Details' ],
         [ 'contact',        'Contact Details' ],
-        #[ 'identification', 'Identification' ],
+        [ 'identification', 'Identification' ],
         [ 'profile',        'Profile' ],
         [ 'contracts',      'Contracts' ],
         [ 'citizenship',    'Citizenship' ],
@@ -1270,18 +1407,23 @@ sub person_details {
         };
     }
     my $resultHTML = '';
+    
     my $fieldperms = $Data->{'Permissions'};
+   
     my $memperm = ProcessPermissions($fieldperms, \%FieldDefinitions, 'Person',);
-
+   
+    
+             
     if($Data->{'SystemConfig'}{'AllowDeRegister'}) {
         $memperm->{'intDeRegister'}=1;
     }
-
+    
     my %configchanges = ();
     if ( $Data->{'SystemConfig'}{'PersonFormReLayout'} ) {
         %configchanges = eval( $Data->{'SystemConfig'}{'PersonFormReLayout'} );
     }
-
+    
+    
     return \%FieldDefinitions if $Data->{'RegoForm'};
     return ( \%FieldDefinitions, $memperm ) if $returndata;
     my $processed = 0;
@@ -1411,10 +1553,12 @@ sub loadPersonDetails {
     }
 
     $query->finish;
-
+   
     foreach my $key ( keys %{$field} ) {
         if ( !defined $field->{$key} ) { $field->{$key} = ''; }
+       
     }
+    
     return $field;
 }
 
