@@ -110,6 +110,7 @@ sub checkExistingProduct    {
 
     my $q= $Data->{'db'}->prepare($st);
     $q->execute(@values) or query_error($st);
+print STDERR $st;
     my ($count) = $q->fetchrow_array();
     return $count || 0;
 }
