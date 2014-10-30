@@ -8,6 +8,8 @@ use Text::CSV;
 use TableRules;
 use DBInserter;
 
+use feature qw(say);
+
 my $directory = '';  
 my $format = '';
 my $notes = '';
@@ -31,7 +33,8 @@ sub readCSVFile{
     my $dirlength  = scalar @directory;
     my $table =  $directory[$dirlength - 1];
     
-    open my $fh, '<:utf8', $file or die "Cannot open: $!";
+    #open my $fh, '<:utf8', $file or die "Cannot open: $!";
+    open my $fh, "<:encoding(utf8)", $file or die "Cannot open: $!";
     my $csv_config = {};
     
     if($format eq 'tsv'){
@@ -41,21 +44,24 @@ sub readCSVFile{
     	$csv_config->{sep_char} = qq|,|;
     }
     my @tag = split(/\./,$table);
-	my $object =  $tag[0];
+    my $object =  $tag[0];
     my $csv = Text::CSV->new($csv_config) or die "Text::CSV error: " . Text::CSV->error_diag;
     my @headers = $csv->getline($fh) or die "no header";
     my $config = getConfig($object);
-	;
-    my @keys = MapKeys(@headers,$config->{"mapping"});
+	
+    my @keys = MapKeys(@headers, $config->{"mapping"});
     $csv->column_names(@keys);
+    my $ctr = 0;
+	
     while (my $hashref = $csv->getline_hr($fh)) {
-      push @records, $hashref;
+	    push @records, $hashref;
+	    $ctr++;
     }
+    say 'Total Input Records: #'.$ctr;
     my $records = ApplyPreRules($config->{"rules"},\@records);
     my $inserts = ApplyRemoveLinks($config->{"rules"},$records);
-   
-    insertBatch($db,$object,$inserts,$importId);
-    my $links = ApplyPostRules($object,$config->{"rules"},\@records); 
+    insertBatch($db,$object,$inserts,$importId, $config->{"rules"});
+    my $links = ApplyPostRules($object,$config->{"rules"},\@records);
     insertBatch($db,"tblEntityLinks",$links,$importId);
     close $fh;
 }
@@ -71,7 +77,6 @@ sub ApplyPreRules{
            $records = multiplyEntry($records,$rule);
         }
         if($rule->{"rule"} eq "swapEntry"){
-        	print Dumper($rule);
            $records = swapEntry($records,$rule);
         }
     }
