@@ -329,7 +329,7 @@ sub displayRegoFlowProductsBulk {
         nextaction=>"PREGFB_PU",
         target => $Data->{'target'},
         product_body => $product_body,
-        allowManualPay=> 0,
+        allowManualPay=> 1,
         manualPaymentTypes => \%Defs::manualPaymentTypes,
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
@@ -553,7 +553,6 @@ print STDERR "IN BULK REGO $rolloverIDs | $productIDs | $productQtys\n\n\n\n";
             my ($prodID, $qty) = split /-/, $prodQty;
             $Products{"prodQTY_$prodID"} =$qty;
         }
-print STDERR "######################################\n";
         my ($txns_added, $amount) = insertRegoTransaction(
             $Data, 
             $regoID, 
@@ -567,14 +566,14 @@ print STDERR "######################################\n";
         );
         $totalAmount = $totalAmount + $amount;
         push @total_txns_added, @{$txns_added};
-        #if ($paymentType and $markPaid)  {
-        #    my %Settings=();
-        #    $Settings{'paymentType'} = $paymentType;
-        #    my $logID = createTransLog($Data, \%Settings, $bulk_ref->{'entityID'},$txns_added, $amount); 
-        #    UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $logID);
-        #    product_apply_transaction($Data,$logID);
-        #}
           savePlayerPassport($Data, $pID);
+    }
+    if ($paymentType and $markPaid and scalar @total_txns_added)  {
+        my %Settings=();
+        $Settings{'paymentType'} = $paymentType;
+        my $logID = createTransLog($Data, \%Settings, $bulk_ref->{'entityID'},\@total_txns_added, $totalAmount); 
+        UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $logID);
+        product_apply_transaction($Data,$logID);
     }
     my $txnIds = join(':',@total_txns_added);
     
