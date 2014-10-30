@@ -208,6 +208,7 @@ sub getFieldLabels	{
             strDiscipline => 'Sport',
             strEntityType => 'Entity Type',
             intNotifications => 'Notification Toggle',
+            intEntityFieldCount => 'Number of Fields',
             );
 	}
 
