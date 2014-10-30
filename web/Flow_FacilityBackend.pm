@@ -9,6 +9,8 @@ use TTTemplate;
 use CGI;
 use FieldLabels;
 use EntityObj;
+use EntityFields;
+use EntityFieldObj;
 use EntityStructure;
 use ConfigOptions;
 use InstanceOf;
@@ -48,11 +50,6 @@ sub setProcessOrder {
             'action' => 'condu',
             'function' => 'validate_contact_details',
             'fieldset'  => 'contactdetails',
-        },
-        {
-            'action' => 'p',
-            'function' => 'display_products',
-            'label'  => 'Products',
         },
         {
             'action' => 'role',
@@ -350,6 +347,30 @@ sub setupValues {
                 #}
             #},
         },
+        roledetails  => {
+            'fields' => {
+                intEntityFieldCount    => {
+                    label       => $FieldLabels->{'intEntityFieldCount'},
+                    value       => $values->{'intEntityFieldCount'},
+                    type        => 'text',
+                    size        => '50',
+                    maxsize     => '100',
+                    compulsory  => 1,
+                },
+                strParentEntityName => {
+                    label       => $self->{'ClientValues'}{'authLevel'} == $Defs::LEVEL_CLUB ? 'Club name' : 'Organisation',
+                    value       => "",
+                    type        => 'text',
+                    size        => '50',
+                    maxsize     => '100',
+                    disabled    => 1,
+                },
+            },
+            'order' => [qw(
+                intEntityFieldCount
+                strParentEntityName
+            )],
+        },
     };
 }
 
@@ -405,6 +426,7 @@ sub validate_core_details {
         if(!$id)    { 
             $self->setID($facilityObj->ID()); 
             $self->addCarryField('newvenue',1);
+            $self->addCarryField('newvenueid', $facilityObj->ID());
         }
         #my $client = setClient($self->{'ClientValues'});
         #$self->addCarryField('client',$client);
@@ -478,23 +500,98 @@ sub validate_contact_details {
 }
 
 sub display_role_details {
-    my $pagedata = "drd";
+    my $self = shift;
+
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+    my %PageData = (
+        HiddenFields => $self->stringifyCarryField(),
+        Target => $self->{'Data'}{'target'},
+        Errors => $self->{'RunDetails'}{'Errors'} || [],
+        Content => $fieldsContent || '',
+        ScriptContent => $scriptContent || '',
+        Title => '',
+        TextTop => '',
+        TextBottom => '',
+    );
+
+    my $pagedata = $self->display(\%PageData);
+
     return ($pagedata,0);
 }
 
 sub validate_role_details {
-    my $pagedata = "vrd";
-    return ($pagedata,0);
+    my $self = shift;
+
+    my $facilityFieldData = {};
+    ($facilityFieldData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields();
+
+    if(!$facilityFieldData->{'intEntityFieldCount'}){
+        push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid number of facility fields.';
+    }
+    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+        #There are errors - reset where we are to go back to the form again
+        $self->decrementCurrentProcessIndex();
+        return ('',2);
+    }
+
+    #my $facilityObj = new EntityObj(db => $self->{'db'}, ID => $id);
+    #$facilityObj->load();
+    #$facilityObj->setValues($facilityData);
+
+    #$facilityObj->write();
+
+    $self->addCarryField('facilityFieldCount', $facilityFieldData->{'intEntityFieldCount'});
+
+    return ('',1);
 }
 
 sub display_fields {
-    my $pagedata = "df";
-    return ($pagedata,0);
+    my $self = shift;
+
+
+    my $facilityFieldCount = $self->{'RunParams'}{'facilityFieldCount'} || 0;
+
+    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
+    my $facilityFields = new EntityFields();
+    $facilityFields->setCount($facilityFieldCount);
+    $facilityFields->setEntityID($self->{'RunParams'}{'e'});
+    $facilityFields->setData($self->{'Data'});
+    my $facilityFieldsContent = '';
+    
+    for my $i (1 .. $facilityFieldCount){
+        $facilityFields->setDBData({});
+        $facilityFieldsContent .= $facilityFields->generateSingleRowField();
+    }
+
+    my %PageData = (
+        HiddenFields => $self->stringifyCarryField(),
+        Target => $self->{'Data'}{'target'},
+        Errors => $self->{'RunDetails'}{'Errors'} || [],
+        Content => $facilityFieldsContent || '',
+        ScriptContent => '',
+        Title => '',
+        TextTop => '',
+        TextBottom => '',
+    );
+
+    print STDERR Dumper $facilityFieldsContent;
+    print STDERR Dumper $self->{'RunParams'};
+    my $pagedata = $self->display(\%PageData);
+
 }
 
 sub process_fields {
-    my $pagedata = "pf";
-    return ($pagedata,0);
+    my $self = shift;
+
+    #test validate
+    #push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid value for facility fields.';
+    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+        #There are errors - reset where we are to go back to the form again
+        $self->decrementCurrentProcessIndex();
+        return ('',2);
+    }
+
+    return ('', 1);
 }
 
 sub display_products { 
