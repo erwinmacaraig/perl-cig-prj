@@ -248,12 +248,8 @@ sub displayFields {
     SystemConfig => $self->{'SystemConfig'},
     Fields => $self->{'FieldSets'}{$fieldSet},
   );
-<<<<<<< HEAD
-  return $obj->build({},'add',1);
-=======
 
   return $obj->build($permissions,'add',1);
->>>>>>> 02383e5b0608ea231efa949f6a431710c407413c
 }
 
 sub gatherFields {
