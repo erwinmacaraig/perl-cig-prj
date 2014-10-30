@@ -97,14 +97,14 @@ sub displayRegoFlowComplete {
             my ($prodID, $qty) = split /-/, $prodQty;
             $hidden_ref->{"prodQTY_$prodID"} =$qty;
         }
-        #$hidden_ref->{'txnIds'} = save_rego_products($Data, $regoID, $personID, $entityID, $rego_ref->{'entityLevel'}, $rego_ref, $hidden_ref); #\%params);
+        $hidden_ref->{'txnIds'} = save_rego_products($Data, $regoID, $personID, $entityID, $rego_ref->{'entityLevel'}, $rego_ref, $hidden_ref); #\%params);
 
          my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
          my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
          my $gateways = '';
-#         if (1==2)   {
+         if (1==2)   {
             $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
-#         }
+         }
          
           savePlayerPassport($Data, $personID);
         my %PageData = (
@@ -144,8 +144,7 @@ sub displayRegoFlowCheckout {
 sub displayRegoFlowCertificates{
 	my ($Data, $regoID, $client, $originLevel, $entityLevel, $entityID, $rego_ref, $personID, $hidden_ref) = @_;
 	my $lang=$Data->{'lang'};
-	my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_DU&amp;rID=$regoID";
-	
+		
 	my @certificates = ();
 	#SQL QUERY FOR THE DROPDOWN BOX FOR 
 	my $query = qq[SELECT intCertificationTypeID, strCertificationName FROM tblCertificationTypes WHERE strCertificationtype = ? AND intRealmID = ?];
@@ -156,8 +155,7 @@ sub displayRegoFlowCertificates{
 	    push @certificates, {
 	    	k => $dref->{'intCertificationTypeID'},
 	    	val => $dref->{'strCertificationName'},
-	    };
-	
+	    };	
 	}
 	my @statuses = ();
 	foreach my $k (keys %Defs::person_certification_status){
@@ -165,8 +163,7 @@ sub displayRegoFlowCertificates{
 			k => $k,
 			val => $Defs::person_certification_status{$k},
 		};
-	}
-	
+	}	
 	 my %PageData = (
         nextaction => "PREGF_PCU",
         target => $Data->{'target'},
@@ -174,18 +171,14 @@ sub displayRegoFlowCertificates{
         statuses => \@statuses,
         hidden_ref => $hidden_ref,
         Lang => $Data->{'lang'},
-        client => $client,
-       
+        client => $client,       
   );  
    my $pagedata = runTemplate($Data, \%PageData, 'registration/certificate_flow_backend.templ') || '';
 
-    return $pagedata;
-	
-	
-    
-	
-	
+  return $pagedata;
 }
+
+
 sub displayRegoFlowDocuments    {
 
     my ($Data, $regoID, $client, $entityRegisteringForLevel, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref, $noFormFields) = @_;
@@ -202,7 +195,6 @@ sub displayRegoFlowDocuments    {
         $entityRegisteringForLevel,
         0,
         $rego_ref,
-        undef,
      );
 
     my %PersonRef = ();
@@ -223,7 +215,6 @@ sub displayRegoFlowDocuments    {
         $entityRegisteringForLevel,
         0,
         \%PersonRef,
-        undef,
      );
 
      my $transferdocs  = '';
@@ -239,7 +230,6 @@ sub displayRegoFlowDocuments    {
             $entityRegisteringForLevel,
             0,
             \%PersonRef,
-            undef,
         );
     }
      
@@ -307,7 +297,6 @@ sub displayRegoFlowProducts {
         $entityRegisteringForLevel,
         0,
         $rego_ref,
-        undef,
     );
     my @prodIDs = ();
     my %ProductRules=();
@@ -359,7 +348,6 @@ sub displayRegoFlowProductsBulk {
         $entityRegisteringForLevel,
         0,
         $rego_ref,
-        undef,
     );
     my @prodIDs = ();
     my %ProductRules=();
@@ -376,7 +364,7 @@ sub displayRegoFlowProductsBulk {
         nextaction=>"PREGFB_PU",
         target => $Data->{'target'},
         product_body => $product_body,
-        allowManualPay=> 1,
+        allowManualPay=> 0,
         manualPaymentTypes => \%Defs::manualPaymentTypes,
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
@@ -468,7 +456,6 @@ sub save_rego_products {
         $entityLevel,
         0,
         $rego_ref,
-        undef,
     );
     my ($txns_added, $amount) = insertRegoTransaction($Data, $regoID, $personID, $params, $entityID, $entityLevel, 1, $session, $CheckProducts);
     my $txnIds = join(':',@{$txns_added});
@@ -540,7 +527,6 @@ print STDERR "IN BULK REGO $rolloverIDs | $productIDs | $productQtys\n\n\n\n";
         $bulk_ref->{'entityLevel'},
         0,
         $bulk_ref,
-        undef,
     );
     my @Ages = ('ADULT',
             'MINOR'
@@ -613,14 +599,14 @@ print STDERR "IN BULK REGO $rolloverIDs | $productIDs | $productQtys\n\n\n\n";
         );
         $totalAmount = $totalAmount + $amount;
         push @total_txns_added, @{$txns_added};
+        #if ($paymentType and $markPaid)  {
+        #    my %Settings=();
+        #    $Settings{'paymentType'} = $paymentType;
+        #    my $logID = createTransLog($Data, \%Settings, $bulk_ref->{'entityID'},$txns_added, $amount); 
+        #    UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $logID);
+        #    product_apply_transaction($Data,$logID);
+        #}
           savePlayerPassport($Data, $pID);
-    }
-    if ($paymentType and $markPaid and scalar @total_txns_added)  {
-        my %Settings=();
-        $Settings{'paymentType'} = $paymentType;
-        my $logID = createTransLog($Data, \%Settings, $bulk_ref->{'entityID'},\@total_txns_added, $totalAmount); 
-        UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $logID);
-        product_apply_transaction($Data,$logID);
     }
     my $txnIds = join(':',@total_txns_added);
     
