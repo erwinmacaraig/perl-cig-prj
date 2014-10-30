@@ -29,6 +29,7 @@ use GenCode;
 use AuditLog;
 use DeQuote;
 use Duplicates;
+use DuplicatesUtils;
 #use ProdTransactions;
 #use EditPersonClubs;
 use CGI qw(cookie unescape);
@@ -1739,12 +1740,12 @@ sub prePersonAdd {
 
     $typeofDuplCheck ||= '';
 
-    my $duplcheck = $typeofDuplCheck || Duplicates::isCheckDupl($Data) || '';
+    my $duplcheck = $typeofDuplCheck || DuplicatesUtils::isCheckDupl($Data) || '';
 
     if ($duplcheck) {
 
         #Check for Duplicates
-        my @FieldsToCheck = Duplicates::getDuplFields($Data);
+        my @FieldsToCheck = DuplicatesUtils::getDuplFields($Data);
         return ( 1, '' ) if !@FieldsToCheck;
 
         my $st        = q{};
@@ -1894,7 +1895,7 @@ sub PersonDupl {
 
     $personID ||= 0;
     return '' if !$personID;
-    return '' if !Duplicates::isCheckDupl($Data);
+    return '' if !DuplicatesUtils::isCheckDupl($Data);
 
     if ( $action eq 'P_DUP_S' ) {
         my $st = qq[

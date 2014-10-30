@@ -20,6 +20,7 @@ use UploadFiles;
 use Log;
 use Person;
 use NationalReportingPeriod;
+use DuplicatesUtils;
 use Data::Dumper;
 
 require AccreditationDisplay;
@@ -45,7 +46,7 @@ warn("personID $personID");
 	if(allowedAction($Data, 'm_e'))	{
 		if(!$Data->{'SystemConfig'}{'LockPerson'}){
 			$adddocumentURL = "$Data->{'target'}?client=$client&amp;a=DOC_L";
-			if(Duplicates::isCheckDupl($Data))	{
+			if(DuplicatesUtils::isCheckDupl($Data))	{
 				$markduplicateURL = "$Data->{'target'}?client=$client&amp;a=P_DUP_";
 			}
 		}

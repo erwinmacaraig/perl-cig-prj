@@ -12,7 +12,7 @@ use Reg_common;
 use Defs;
 use Utils;
 use ConfigOptions;
-use Duplicates;
+use DuplicatesUtils;
 use PaymentSplitUtils;
 use MD5;
 use InstanceOf;

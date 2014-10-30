@@ -251,11 +251,10 @@ sub listPendingRegistrations    {
             allvalue  => 'ALL',
         },
     ];   
-    my $client=setClient($Data->{'clientValues'});
+    $client=setClient($Data->{'clientValues'}) || '';
     my %tempClientValues = getClient($client);
     my @fielddata = ();
     my $tempaction;
-    my $client=setClient($Data->{'clientValues'}) || '';
     $st = qq[SELECT intEntityLevel, intEntityID, strLocalName, strStatus FROM tblEntity INNER JOIN tblEntityLinks ON tblEntity.intEntityID =
              tblEntityLinks.intChildEntityID WHERE intParentEntityID = ? AND intRealmID = ? AND strStatus = 'PENDING' ORDER BY intEntityLevel, strLocalName ASC 
               ];

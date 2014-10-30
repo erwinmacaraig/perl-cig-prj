@@ -568,9 +568,6 @@ sub gather    {
         $outputdata{$fieldname} = $fieldvalue;
     }
 
-use Data::Dumper;
-print STDERR Dumper(\@problems);
-warn("=======");
     return (\%outputdata, \@problems);
 }
 
