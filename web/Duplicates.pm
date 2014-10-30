@@ -5,8 +5,8 @@
 package Duplicates;
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(handleDuplicates isCheckDupl getDuplFields getDupTaskCount);
-@EXPORT_OK = qw(handleDuplicates isCheckDupl getDuplFields getDupTaskCount);
+@EXPORT = qw(handleDuplicates getDupTaskCount);
+@EXPORT_OK = qw(handleDuplicates getDupTaskCount);
 
 use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 
@@ -23,6 +23,7 @@ use PersonRegistration;
 use RegoTypeLimits;
 use WorkFlow;
 use PlayerPassport;
+use DuplicatesUtils;
 
 sub getDupTaskCount {
 
@@ -118,7 +119,6 @@ sub displayDuplicateProblems	{
 		ORDER BY strLocalSurname
 	];
 	my $wherestr='';
-warn($statement);
 
 	my $query = $db->prepare($statement) or query_error($statement);
 	$query->execute or query_error($statement);
@@ -705,31 +705,5 @@ sub checkPersonNotes    {
   Person::updatePersonNotes($db, $existingid ,\%Notes);
 }
 
-sub isCheckDupl	{
-	my($Data)=@_;
-    return '' if ($Data->{'ReadOnlyLogin'} and !$Data->{'SystemConfig'}{'ShowDCWhenRO'});
-	my $check_dupl='';
-
-	#Duplicates should also be checked for unless specifically disabled
-	if (exists $Data->{'SystemConfig'}{'DuplCheck'}) {
-        return 'realm' if $Data->{'SystemConfig'}{'DuplCheck'} eq '1'; 
-        return ''      if $Data->{'SystemConfig'}{'DuplCheck'} eq '-1'; #Don't check dup; 
-	}
-	if (exists $Data->{'Permissions'}{'OtherOptions'} and 
-        exists $Data->{'Permissions'}{'OtherOptions'}{'DuplCheck'} and 
-        $Data->{'Permissions'}{'OtherOptions'}{'DuplCheck'}[0] eq '-1')	{
-		    return ''; #Explicitly turned off
-	}
-	return 'assoc';
-}
-
-sub getDuplFields	{
-    my($Data)=@_;
-    my $duplfields=$Data->{'SystemConfig'}{'DuplicateFields'} 
-        || $Data->{'Permissions'}{'OtherOptions'}{'DuplFields'} 
-        || 'strLocalSurname|strLocalFirstname|dtDOB';
-    my @FieldsToCheck=split /\|/,$duplfields;
-    return @FieldsToCheck;
-}
 
 1;

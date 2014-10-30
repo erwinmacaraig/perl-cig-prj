@@ -30,6 +30,7 @@ sub handlePersonFlow {
     my $originLevel = $Data->{'clientValues'}{'authLevel'} || 0;
     my $defaultType = $params{'dtype'} || '';
     my $internationalTransfer = $params{'itc'} || '';
+    my $startingStep = $params{'ss'} || '';
 
     my $flow = new Flow_PersonBackend(
         db => $Data->{'db'},
@@ -39,8 +40,10 @@ sub handlePersonFlow {
             client => $client,
             a => $action,
             dtype => $defaultType,
-            itc => $internationalTransfer
+            itc => $internationalTransfer,
+            ss => $startingStep,
         },
+        ID  => $personID || 0,
         SystemConfig => $Data->{'SystemConfig'},
         ClientValues => $clientValues,
         Target => $Data->{'target'},

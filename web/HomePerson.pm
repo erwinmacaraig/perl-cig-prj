@@ -20,6 +20,7 @@ use UploadFiles;
 use Log;
 use Person;
 use NationalReportingPeriod;
+use DuplicatesUtils;
 use Data::Dumper;
 
 require AccreditationDisplay;
@@ -35,7 +36,6 @@ sub showPersonHome	{
         	%configchanges = eval( $Data->{'SystemConfig'}{'PersonFormReLayout'} );
     	}
 
-warn("personID $personID");
 	my ($fields_grouped, $groupdata) = getMemFields($Data, $personID, $FieldDefinitions, $memperms, $personObj, \%configchanges);
 	my ($photo,undef)=handle_photo('P_PH_s',$Data,$personID);
 	my $name = $personObj->name();
@@ -45,7 +45,7 @@ warn("personID $personID");
 	if(allowedAction($Data, 'm_e'))	{
 		if(!$Data->{'SystemConfig'}{'LockPerson'}){
 			$adddocumentURL = "$Data->{'target'}?client=$client&amp;a=DOC_L";
-			if(Duplicates::isCheckDupl($Data))	{
+			if(DuplicatesUtils::isCheckDupl($Data))	{
 				$markduplicateURL = "$Data->{'target'}?client=$client&amp;a=P_DUP_";
 			}
 		}
@@ -60,7 +60,7 @@ warn("personID $personID");
 		}
 
 	}
-    my $addregistrationURL = "$Data->{'target'}?client=$client&amp;a=PREGF_T";
+    my $addregistrationURL = "$Data->{'target'}?client=$client&amp;a=PF_&rfp=r&amp;_ss=r";
 	my $accreditations = ($Data->{'SystemConfig'}{'NationalAccreditation'}) ? AccreditationDisplay::ActiveNationalAccredSummary($Data, $personID) : '';#ActiveAccredSummary($Data, $personID, $Data->{'clientValues'}{'assocID'});
 
   my $docs = getUploadedFiles(

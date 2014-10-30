@@ -23,6 +23,7 @@ use PersonLanguages;
 use CustomFields;
 use DefCodes;
 use PersonCertifications;
+use DuplicatesUtils;
 use Data::Dumper;
 
 
@@ -632,6 +633,12 @@ sub validate_core_details    {
     my $userData = {};
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Person',);
     ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
+
+    if(!scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+        if(isPossibleDuplicate($self->{'Data'}, $userData))    {
+            push @{$self->{'RunDetails'}{'Errors'}}, 'This person is a possible duplicate';
+        }
+    }
 
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again

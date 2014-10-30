@@ -128,7 +128,6 @@ sub listPeople {
 
 	my $p = new CGI;
 	my %params = $p->Vars();
-    my $title = $Data->{'lang'}->txt('Search Result');
 
     my $client = setClient( $Data->{'clientValues'} ) || '';
 	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
