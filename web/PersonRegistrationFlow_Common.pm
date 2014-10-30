@@ -5,6 +5,7 @@ require Exporter;
     displayRegoFlowComplete
     displayRegoFlowCompleteBulk
     displayRegoFlowCheckout
+    displayRegoFlowCertificates
     displayRegoFlowDocuments
     displayRegoFlowProducts
     displayRegoFlowProductsBulk
@@ -53,6 +54,8 @@ sub displayRegoFlowCompleteBulk {
     my $body = runTemplate($Data, \%PageData, 'registration/completebulk.templ') || '';
     return $body;
 }
+
+
     
 sub displayRegoFlowComplete {
 
@@ -138,7 +141,51 @@ sub displayRegoFlowCheckout {
     $body .= $checkout_body;
     return $body;
 }
+sub displayRegoFlowCertificates{
+	my ($Data, $regoID, $client, $originLevel, $entityLevel, $entityID, $rego_ref, $personID, $hidden_ref) = @_;
+	my $lang=$Data->{'lang'};
+	my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_DU&amp;rID=$regoID";
+	
+	my @certificates = ();
+	#SQL QUERY FOR THE DROPDOWN BOX FOR 
+	my $query = qq[SELECT intCertificationTypeID, strCertificationName FROM tblCertificationTypes WHERE strCertificationtype = ? AND intRealmID = ?];
+	my $sth = $Data->{'db'}->prepare($query);
+	$sth->execute($rego_ref->{'personType'},$Data->{'Realm'});
+	while(my $dref = $sth->fetchrow_hashref()){
+		#$certificates{$dref->{'intCertificationTypeID'}} = $dref->{'strCertificationName'};				
+	    push @certificates, {
+	    	k => $dref->{'intCertificationTypeID'},
+	    	val => $dref->{'strCertificationName'},
+	    };
+	
+	}
+	my @statuses = ();
+	foreach my $k (keys %Defs::person_certification_status){
+		push @statuses, {
+			k => $k,
+			val => $Defs::person_certification_status{$k},
+		};
+	}
+	
+	 my %PageData = (
+        nextaction => "PREGF_PCU",
+        target => $Data->{'target'},
+        certificationtypes => \@certificates,
+        statuses => \@statuses,
+        hidden_ref => $hidden_ref,
+        Lang => $Data->{'lang'},
+        client => $client,
+       
+  );  
+   my $pagedata = runTemplate($Data, \%PageData, 'registration/certificate_flow_backend.templ') || '';
 
+    return $pagedata;
+	
+	
+    
+	
+	
+}
 sub displayRegoFlowDocuments    {
 
     my ($Data, $regoID, $client, $entityRegisteringForLevel, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref, $noFormFields) = @_;

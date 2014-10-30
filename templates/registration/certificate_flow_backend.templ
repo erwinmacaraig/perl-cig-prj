@@ -1,0 +1,74 @@
+
+<div class="pageHeading">Person Certifications</div>
+<form action="[% target %]" method="POST">
+    
+    [% IF certificationtypes.size %]
+    <input type="hidden" name="a" value="[% nextaction %]">   
+    <table cellpadding="2" cellspacing="0" border="0"  class = "HTF_table" >    
+        <tbody id="secmain" class="new_tab">
+            <tr class="HTr_odd" id="l_row_intCertificationTypeID">
+            <td class="label"><label for="l_intCertificationTypeID">Certifcation Type</label>:</td>
+            <td class="value">
+                <select name="intCertificationTypeID">
+                    <option value=""></option>
+                    [% FOREACH type IN certificationtypes %]
+                        <option value="[% type.k %]">[% type.val %]</option>
+                    [% END %]
+                </select>
+            </td>
+            </tr>
+            <tr class="HTr_even form-select" id = "l_row_strStatus">
+            <td class="label"><label for="l_strStatus">Status</label>:</td>
+            <td class="value">
+                <select name="strStatus" id="l_strStatus">
+                    <option value="">Status</option> 
+                    [% FOREACH status IN  statuses %]
+                    	<option value="[% status.k %]">[% status.val %]</option>
+                    [% END %]
+                </select>
+            </td>
+             <tr class="HTr_odd form-select" id = "l_row_dtValidFrom">
+            <td class="label"><label for="l_dtValidFrom">Date Valid From</label>:</td>
+            <td class="value">
+               <script type="text/javascript">
+                   jQuery().ready(function() {
+                       jQuery("#l_dtValidFrom").datepicker({
+                          dateFormat: 'yy-mm-dd',
+                          showButtonPanel: true
+                        });            
+                   });
+               </script>    
+               <input type="text" name="dtValidFrom" value="" id="l_dtValidFrom" size="12" class="datepicker">
+            </td>
+            </tr>
+            <tr class="HTr_even form-select" id = "l_row_dtValidUntil">
+            <td class="label"><label for="l_dtValidUntil">Date Valid Until</label>:</td>
+            <td class="value">
+                <script type="text/javascript">
+                    jQuery().ready(function() {
+                        jQuery("#l_dtValidUntil").datepicker({
+                            dateFormat: 'yy-mm-dd',
+                            showButtonPanel: true
+                        });            
+                    });
+                </script>    
+                <input type="text" name="dtValidUntil" value="" id="l_dtValidUntil" size="12" class="datepicker">
+            </td>
+            </tr>
+            <tr class="HTr_odd id="l_row_strDescription">
+            <td class="label"><label for="l_strDescription">Description</label>:</td>
+            <td class="value"><textarea name="strDescription" id="l_strDescription"  rows="10"   cols="40"></textarea>
+            </td>
+            </tr>
+        </tbody>
+    </table>
+ [% ELSE %]
+ <h3>No Certification Required </h3>
+ <input type="hidden" name="a" value="PREGF_D">
+ [% END %]
+    [% FOREACH h IN hidden_ref %]
+        <input type="hidden" name="[% h.key %]" value="[% h.value %]" />
+    [% END %]        
+    <input type="submit" name="submit" value="[% Lang.txt('Continue') %]" class = "button proceed-button"><br><br>            
+</form>
+

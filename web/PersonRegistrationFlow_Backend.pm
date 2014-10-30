@@ -24,7 +24,7 @@ use Data::Dumper;
 
 sub handleRegistrationFlowBackend   {
     my ($action, $Data) = @_;
-
+    open FH, ">$Defs::myerrorfile";
     my $body = '';
     my $title = '';
     my $client = $Data->{'client'};
@@ -41,9 +41,12 @@ sub handleRegistrationFlowBackend   {
     my $originLevel = $Data->{'clientValues'}{'authLevel'} || 0;
 
     my %Flow = ();
-    $Flow{'PREGF_TU'} = 'PREGF_D'; #Typees
-    $Flow{'PREGF_DU'} = 'PREGF_P'; #Products
-    $Flow{'PREGF_PU'} = 'PREGF_C'; #Documents
+  
+    #$Flow{'PREGF_TU'} = 'PREGF_D'; #Typees 1 
+    $Flow{'PREGF_PCU'} = 'PREGF_D'; #Typees
+    $Flow{'PREGF_TU'} = 'PREGF_CERT';   ### $action = $Flow{$action}
+    $Flow{'PREGF_DU'} = 'PREGF_P'; #Products2
+    $Flow{'PREGF_PU'} = 'PREGF_C'; #Documents3
     
     my %Hidden=();
     my $regoID = param('rID') || 0;
@@ -76,9 +79,10 @@ sub handleRegistrationFlowBackend   {
 print STDERR "AAAAAAAA $action\n";
     if ( $action eq 'PREGF_TU' ) {
     	
+    	
         #add rego record with types etc.
         my $msg='';
-        my $personType = param('pt') || '';
+        my $personType = param('pt') || '';  #####   Check For Coach or Referee 
         my $personEntityRole= param('per') || '';
         my $personLevel = param('pl') || '';
         my $sport = param('sp') || '';
@@ -87,7 +91,8 @@ print STDERR "AAAAAAAA $action\n";
         my $personRequestID = param('reqID') || 0; 
 
         ($regoID, $rego_ref, $msg) = add_rego_record($Data, $personID, $entityID, $entityLevel, $originLevel, $personType, $personEntityRole, $personLevel, $sport, $ageLevel, $registrationNature, undef, undef, $personRequestID);
-       ###########################################
+        print FH "Rego_Ref\n\n" . Dumper($rego_ref) . "\n\n";
+        ###########################################
        ##########################################
         if (!$regoID)   {
             my $error = '';
@@ -118,7 +123,11 @@ print STDERR "AAAAAAAA $action\n";
         }
         else    {
             $Hidden{'rID'} = $regoID;
-            $action = $Flow{$action};
+            #$action = 'PREGF_D';
+            #if($personType eq 'COACH' || $personType eq 'REFEREE' ){
+                $action = $Flow{$action};
+            #}            
+            print FH "Action \n=================================\n $action \n ===================\n";            
             $personID = $personID || $rego_ref->{'personID'} || $rego_ref->{'intPersonID'} || 0;
         }
     }
@@ -152,7 +161,7 @@ print STDERR "---------------------------HERE FOR $personID $regoID\n";
     }
     if ( $action eq 'PREGF_DU' ) {
         my $uploaded_filename = param('file') || ''; 
-	my $docTypeID = param('doctypeID') || 0; 
+	    my $docTypeID = param('doctypeID') || 0; 
         if($uploaded_filename ne ''){  
             my $filefield = 'file';  
             my $permission = 1; 
@@ -170,7 +179,26 @@ print STDERR "---------------------------HERE FOR $personID $regoID\n";
              $action = $Flow{$action}; 
         }
     }
-
+    ############ Store Person Certification   ################
+    if($action eq 'PREGF_PCU'){
+    	# get posted values 
+    	my $query = qq[INSERT INTO tblPersonCertifications (intPersonID, intRealmID, intCertificationTypeID, dtValidFrom, dtValidUntil, strDescription, strStatus) 
+    	VALUES ( ?, ?, ?, ?, ?, ?, ?)];
+    	my $sth = $Data->{'db'}->prepare($query); 
+    	$sth->execute(
+    	               $params{'pID'},
+    	               $Data->{'Realm'},
+    	               $params{'intCertificationTypeID'},
+    	               $params{'dtValidFrom'},
+    	               $params{'dtValidUntil'},
+    	               $params{'strDescription'},
+    	               $params{'strStatus'}
+    	);
+    	
+    	$action = $Flow{$action}; 
+    	print FH "CGI VARS POSTED VALUES \n ================================\n" . Dumper(%params) . "\n==\n";
+    }
+   ###########################################################
 
 ## FLOW SCREENS
     if ( $action eq 'PREGF_T' ) {
@@ -188,6 +216,12 @@ print STDERR "---------------------------HERE FOR $personID $regoID\n";
     elsif ( $action eq 'PREGF_P' ) {    	
         $body .= displayRegoFlowProducts($Data, $regoID, $client, $entityLevel, $originLevel, $rego_ref, $entityID, $personID, \%Hidden);
    }
+   ############# 
+   elsif ($action eq 'PREGF_CERT'){
+       $body .= displayRegoFlowCertificates($Data, $regoID, $client, $originLevel, $entityLevel, $entityID, $rego_ref, $personID, \%Hidden)
+                                                         	
+   }
+   #########3
     elsif ( $action eq 'PREGF_D' ) {
         $body .= displayRegoFlowDocuments($Data, $regoID, $client, $entityLevel, $originLevel, $rego_ref, $entityID, $personID, \%Hidden);
     }    
@@ -198,6 +232,7 @@ print STDERR "---------------------------HERE FOR $personID $regoID\n";
         $body .= displayRegoFlowCheckout($Data, \%Hidden);
     }
     else {
+    	
     }
 
     return ( $body, $title );
