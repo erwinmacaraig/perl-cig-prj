@@ -15,7 +15,7 @@ my $Fields = {
         strNationalNum
 		strMemberNo
 		intActive
-		strSalutation
+		strSalutation 
 		strFirstname
 		strMiddlename
 		strSurname
@@ -89,6 +89,8 @@ my $Fields = {
 		strMemberCustomNotes5
         intMemberToHideID
         intPhotoUseApproval
+        strOtherPersonIdentifierDesc
+        strBirthCert
 	),
 
 }

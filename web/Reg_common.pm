@@ -88,8 +88,8 @@ sub allowedTo {
     my $output        = new CGI;
     my $member_cookie = $output->cookie("$Defs::COOKIE_MEMBER") || '';
     my $rs            = $output->cookie("$Defs::COOKIE_ACTSTATUS");
-    print FH "member_cookie = $member_cookie\n";
-    print FH "rs(COOKIE_ACTSTATUS) = $rs\n";
+    #print FH "member_cookie = $member_cookie\n";
+    #print FH "rs(COOKIE_ACTSTATUS) = $rs\n";
     $rs = '' if !defined $rs;
     $Data->{'ViewActStatus'} = 1;
     $Data->{'ViewActStatus'} = $rs
@@ -152,7 +152,7 @@ sub allowedTo {
 
     my $prod_rs = $output->cookie("$Defs::COOKIE_PRODSTATUS");
     $prod_rs = '' if !defined $prod_rs;
-    print FH "The value of \$prod_rs is $prod_rs\n";
+    #print FH "The value of \$prod_rs is $prod_rs\n";
     $Data->{'ViewProductStatus'} = 0;
     $Data->{'ViewProductStatus'} = $prod_rs
       if ( $prod_rs eq '2' or $prod_rs eq '1' or $prod_rs eq '0' );
@@ -177,9 +177,9 @@ sub allowedTo {
         cache => $Data->{'cache'},
     );
 
-    print FH "\n\n\n=========================\n cache = $Data->{'cache'} \n======================\n"; 
-    print FH "\n\n\n=========================\n The content of Data hash \n" . Dumper($Data) ." \n======================\n"; 
-    print FH "\n\n\n==========================\n Dumpoog the user \n" . Dumper($user) . "\n=====================\n";
+    #print FH "\n\n\n=========================\n cache = $Data->{'cache'} \n======================\n"; 
+    #print FH "\n\n\n=========================\n The content of Data hash \n" . Dumper($Data) ." \n======================\n"; 
+    #print FH "\n\n\n==========================\n Dumpoog the user \n" . Dumper($user) . "\n=====================\n";
     $user->load();
     my $userID = $user->id() || 0;
     #kickThemOff() if $userID != $clientValues_ref->{'userID'};
@@ -202,14 +202,14 @@ sub allowedTo {
         getID( $clientValues_ref, $clientValues_ref->{authLevel} ),
     );
     my $myEntityId =  getID( $clientValues_ref, $clientValues_ref->{authLevel} );  
-    print FH '$userID = ' . $userID . "\n";
-    print FH '$clientValues_ref->{authLevel} = ' . $clientValues_ref->{authLevel} . "\n";     
-    print FH 'entityID = '. $myEntityId . "\n";
+    #print FH '$userID = ' . $userID . "\n";
+    #print FH '$clientValues_ref->{authLevel} = ' . $clientValues_ref->{authLevel} . "\n";     
+    #print FH 'entityID = '. $myEntityId . "\n";
 
     ( $level, $intID, $readOnly, $roleID ) = $q->fetchrow_array();
-    print FH '$intID = '. $intID . "\n";
-    print FH '$readOnly = '. $readOnly . "\n";
-    print FH '$roleID = ' . $roleID . "\n";
+    #print FH '$intID = '. $intID . "\n";
+    #print FH '$readOnly = '. $readOnly . "\n";
+    #print FH '$roleID = ' . $roleID . "\n";
     
     $q->execute(
         $userID,
@@ -217,7 +217,7 @@ sub allowedTo {
         getID( $clientValues_ref, $clientValues_ref->{authLevel} ),
     );
 
-    print FH "\n\nThe conent of the query is ". Dumper( $q->fetchrow_array()) ."\n"; 
+    #print FH "\n\nThe conent of the query is ". Dumper( $q->fetchrow_array()) ."\n"; 
     $q->finish();
 
   if ( !$level and !$intID ) {
@@ -226,7 +226,7 @@ sub allowedTo {
             $clientValues_ref->{authLevel},
             getID( $clientValues_ref, $clientValues_ref->{authLevel} ),
         );
-         print FH '$valid is equal to: '. $valid;
+         #print FH '$valid is equal to: '. $valid;
         if ($valid) {
             $level = $clientValues_ref->{authLevel};
             $intID =
@@ -246,7 +246,7 @@ sub allowedTo {
 
     if (    $clientValues_ref->{currentLevel} > $level) {
         #kickThemOff();    # THIS USER IS EVIL: BOOT THEM 
-        print FH "CLIENT VALUES REF = " . $clientValues_ref->{currentLevel} . " \n \$level is $level";
+        #print FH "CLIENT VALUES REF = " . $clientValues_ref->{currentLevel} . " \n \$level is $level";
     }
 
     if ( $entityID and $entityTypeID ) {
