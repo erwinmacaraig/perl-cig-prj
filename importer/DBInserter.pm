@@ -8,6 +8,8 @@ use Data::Dumper;
 use DBI;
 use strict;
 use ImporterConfig;
+use Try::Tiny;
+use POSIX qw(strftime);
 use feature qw(say);
 
 sub insertRow {
@@ -29,13 +31,21 @@ sub insertRow {
 		    $valstr
 		)
 	];
-	my $sth = $db->prepare($query) or die "Can't prepare insert: ".$db->errstr()."\n";
-	my $result = $sth->execute(@values) or die "Can't execute insert: ".$db->errstr()."\n";
-	print "INSERT SUCCESS :: TABLE:: '",$table,"' ID:: ",$sth->{mysql_insertid},"' RECORDS:: '",join(', ', @values),"'\n";
+	# write log for each insert
+	writeLog("INFO: INSERT INTO $table ($keystr) VALUES(". join(', ', @values).")");
+	try {
+	    my $sth = $db->prepare($query) or die "Can't prepare insert: ".$db->errstr()."\n";
+	    my $result = $sth->execute(@values) or die "Can't execute insert: ".$db->errstr()."\n";
+	    print "INSERT SUCCESS :: TABLE:: '",$table,"' ID:: ",$sth->{mysql_insertid},"' RECORDS:: '",join(', ', @values),"'\n";
 	
-	return $sth->{mysql_insertid};
-	#say "INSERT SUCCESS :: TABLE:: '",$table,"' ID:: ' RECORDS:: '",join(', ', @values),"'\n";
+	    writeLog("INFO: INSERT SUCCESS :: TABLE:: '".$table."' ID:: ".$sth->{mysql_insertid}."' RECORDS:: '". join(', ', @values).")");
+	    return $sth->{mysql_insertid};
 	
+	} catch {
+		writeLog("ERROR: $_");
+		say "INSERT INTO $table ($keystr) VALUES(",join(', ', @values),")'\n";
+		warn "caught error: $_";
+	};
 	1;
 }
 
@@ -93,6 +103,7 @@ sub getNationalPeriodID {
 				WHERE strNationalPeriodName = $rec->{'NationalSeason'}
 		];
 		$periodID = $db->selectrow_array($stmt);
+		writeLog("getNationalPeriodID() - $periodID");
 	}
 	delete $rec->{'NationalSeason'} if exists $rec->{'NationalSeason'};
     return $periodID;
@@ -107,7 +118,7 @@ sub createTransRecord {
 			"strReceiptRef" => $rec->{'PaymentReference'},
 		);
 		my $ret_id = insertRow($db,'tblTransLog',\%translogRecord);
-		
+		writeLog("INFO: createTransRecord() - tblTransLog". \%translogRecord);
 		if( $ret_id ){
 		    my %transactionRecord = (
 			    "intTransLogID" => $ret_id,
@@ -116,6 +127,7 @@ sub createTransRecord {
 			    "intStatus"     => 1,
 		    );
 		    $ret_id = insertRow($db,'tblTransactions',\%transactionRecord);
+			writeLog("INFO: createTransRecord() - tblTransactions". \%transactionRecord);
 		}
 		
 	}
@@ -124,5 +136,15 @@ sub createTransRecord {
     delete $rec->{'Amount'} if exists $rec->{'Amount'};
 	delete $rec->{'ProductCode'} if exists $rec->{'ProductCode'};
 	#return $rec;
+}
+
+sub writeLog{
+    my ($strMsg) = @_;
+	say $strMsg;
+    my $filename = 'importer.log';
+	my $date = strftime "%m/%d/%Y %H:%M:%S", localtime;
+    open(my $fh, '>>', $filename) or die "Could not open file '$filename' $!";
+    print $fh "$date - $strMsg\n";
+    close $fh;
 }
 1;
