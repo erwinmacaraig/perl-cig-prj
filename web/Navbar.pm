@@ -919,6 +919,7 @@ sub getClubMenuData {
         };
     }
 
+print STDERR "DDDAAAA$Data->{'clientValues'}{'authLevel'}\n";
     if ($Data->{'clientValues'}{'authLevel'} > $Defs::LEVEL_CLUB or $clubObj->getValue('strStatus') ne $Defs::ENTITY_STATUS_DE_REGISTERED)    {
         $menuoptions{'bulk'} = {
             name => $lang->txt('Bulk Renewals'),
