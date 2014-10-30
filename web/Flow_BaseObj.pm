@@ -37,7 +37,7 @@ sub new {
     $self->{'RunParams'}      = {};
     $self->{'CookiesToWrite'} = ();
     $self->{'FieldSets'} = {};
-    $self->{'ID'} = 0;
+    $self->{'ID'} = $params{'ID'} || 0;
 
     $self->{'DEBUG'} ||= 0;
 
@@ -99,9 +99,16 @@ sub Navigation {
     my $step_in_future = 0;
     my $noNav = $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'NoNav'} || 0;
     return '' if $noNav;
+    my $startingStep = $self->{'RunParams'}{'_ss'} || '';
+    my $includeStep = 1;
+    $includeStep = 0 if $startingStep;
     for my $i (0 .. $#{$self->{'ProcessOrder'}})    {
         my $current = 0;
         my $name = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'label'} || '');
+        if($startingStep and $self->{'ProcessOrder'}[$i]{'action'} eq $startingStep)   {
+            $includeStep = 1;
+        }
+        next if !$includeStep;
         next if($self->{'ProcessOrder'}[$i]{'NoNav'});
         if($name)   {
             $current = 1 if $i == $self->{'CurrentIndex'};

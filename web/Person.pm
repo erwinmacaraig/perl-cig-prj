@@ -1569,7 +1569,7 @@ sub NewRegoButton   {
 
     my $lang = $Data->{'lang'};
     return qq[
-        <a href="$Data->{'target'}?client=$clm&amp;a=PREGF_T">]. $lang->txt('Add Registration') . qq[</a>
+        <a href="$Data->{'target'}?client=$clm&amp;a=PF_&amp;rfp=r&amp;_ss=r">]. $lang->txt('Add Registration') . qq[</a>
     ];
 }
 
