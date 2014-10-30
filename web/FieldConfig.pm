@@ -29,7 +29,7 @@ sub handleFieldConfig {
     my $resultHTML  = q{};
     my $title       = q{};
     my $ret         = q{};
-    my $fieldtype = param('ft') || 'Member';
+    my $fieldtype = param('ft') || 'Person';
     if(!$entityTypeID or !$entityID)    {
         $entityTypeID = $Data->{'clientValues'}{'currentLevel'};
         $entityID = getID($Data->{'clientValues'}, $entityTypeID);
@@ -124,7 +124,7 @@ sub show_fieldconfig {
     my $clubFields = getFieldsList($Data, 'Club');
     my $subBody = '';
     my @fieldtypelist = ();
-    push @fieldtypelist, ['Member', $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} || 'Member'];
+    push @fieldtypelist, ['Person', $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} || 'Person'];
     if($currentLevel > $Defs::LEVEL_CLUB and !$Data->{'SystemConfig'}{'NoClubs'})    {
         push @fieldtypelist, ['Club', $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} || 'Club'];
     }
@@ -140,7 +140,7 @@ sub show_fieldconfig {
         <table class="permsTable" style="width:100%;">
         ];
         my $field_list = undef;
-        if($fieldtype eq 'Member')    {
+        if($fieldtype eq 'Person')    {
             $field_list = $memberFields;
             $FieldLabels=getFieldLabels($Data, $Defs::LEVEL_PERSON);
         }
@@ -371,7 +371,7 @@ sub update_fieldconfig {
     ];
     my $currentLevel = $Data->{'clientValues'}{'currentLevel'} || 0,
     my @fieldtypelist = ();
-    push @fieldtypelist, ['Member', $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} || 'Member'];
+    push @fieldtypelist, ['Person', $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} || 'Person'];
     if($currentLevel > $Defs::LEVEL_CLUB and !$Data->{'SystemConfig'}{'NoClubs'})    {
         push @fieldtypelist, ['Club', $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} || 'Club'];
     }
@@ -383,7 +383,7 @@ sub update_fieldconfig {
         my @field_list = ();
         my $memberFields = getFieldsList($Data, 'Person');
         my $clubFields = getFieldsList($Data, 'Club');
-        if($fieldtype eq 'Member')    {
+        if($fieldtype eq 'Person')    {
             @field_list = @{$memberFields};
         }
         elsif($fieldtype eq 'Club')    {
@@ -542,7 +542,7 @@ sub optionrow    {
 sub FieldConfigPermissionOptions    {
     my (
         $Data,
-        $fieldgroup, #Member|Club|Team,
+        $fieldgroup, #Person|Club|Team,
         $fieldtype,  # ''|Child|RegoForm
         $entityTypeID,
         $entityID,
@@ -561,7 +561,7 @@ sub FieldConfigPermissionOptions    {
     my $memberFields = getFieldsList($Data, 'Person');
     my $clubFields = getFieldsList($Data, 'Club');
     my $field_list = undef;
-    if($fieldgroup eq 'Member')    {
+    if($fieldgroup eq 'Person')    {
         # previous code don't have this field in list, it might should
         # but for now I just remove it from list to keep it same
         $memberFields = [grep {!/intGradeID/} @$memberFields] if $Data->{'SystemConfig'}{'Schools'};

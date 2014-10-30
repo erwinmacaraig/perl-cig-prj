@@ -139,8 +139,8 @@ sub GetPermissions {
         {$dref->{'intEntityTypeID'} || 'REALM'}
         {$dref->{'strFieldName'}} = $dref->{'strPermission'};
         my $fieldgroup = '';
-        if( $dref->{'strFieldType'} eq 'Member' or $dref->{'strFieldType'} eq 'MemberChild')	{
-            $fieldgroup = 'Member'; 
+        if( $dref->{'strFieldType'} eq 'Person' or $dref->{'strFieldType'} eq 'PersonChild')	{
+            $fieldgroup = 'Person'; 
         }
         elsif( $dref->{'strFieldType'} eq 'Club' or $dref->{'strFieldType'} eq 'ClubChild')	{
             $fieldgroup = 'Club' ;
@@ -163,9 +163,9 @@ sub GetPermissions {
     );
     push @levels_to_check, $Defs::LEVEL_CLUB if $clubID;
 
-    my @fieldgroups = (qw(Member Club));
+    my @fieldgroups = (qw(Person Club));
     if($regoform)	{
-        @fieldgroups = (qw(MemberRegoForm ));
+        @fieldgroups = (qw(PersonRegoForm ));
     }
     for my $fieldgroup (@fieldgroups)	{
         for my $field (keys %{$fields_by_type{$fieldgroup}})	{
@@ -377,6 +377,25 @@ sub getFieldsList	{
         strP2Email
         strP2Email2
         strNotes
+        strISONationality
+        strISOCountryOfBirth
+        strRegionOfBirth
+        strPlaceofBirth
+        strBirthCert
+        strBirthCertCountry
+        dtBirthCertValidityDateFrom
+        dtBirthCertValidityDateTo
+        strBirthCertDesc
+        trOtherPersonIdentifier
+        strOtherPersonIdentifierIssueCountry
+        dtOtherPersonIdentifierValidDateFrom
+        dtOtherPersonIdentifierValidDateTo
+        strOtherPersonIdentifierDesc
+        intMinorMoveOtherThanFootball
+        intMinorDistance
+        intMinorEU
+        intMinorNone
+
 
         strNatCustomStr1
         strNatCustomStr2

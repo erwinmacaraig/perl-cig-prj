@@ -238,8 +238,9 @@ sub display {
 
 sub displayFields {
   my $self = shift;
-  my($fieldSet) = @_;
+  my($permissions, $fieldSet) = @_;
   $fieldSet ||= $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'fieldset'};
+  $permissions ||= {};
   return '' if !$fieldSet;
   my $obj = new Flow_DisplayFields(
     Data => $self->{'Data'},
@@ -248,13 +249,14 @@ sub displayFields {
     Fields => $self->{'FieldSets'}{$fieldSet},
   );
 
-  return $obj->build({},'add',1);
+  return $obj->build($permissions,'add',1);
 }
 
 sub gatherFields {
   my $self = shift;
-  my($fieldSet) = @_;
+  my($permissions, $fieldSet) = @_;
   $fieldSet ||= $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'fieldset'};
+  $permissions ||= {};
   return ({},[]) if !$fieldSet;
   my $obj = new Flow_DisplayFields(
     Data => $self->{'Data'},
@@ -263,7 +265,7 @@ sub gatherFields {
     Fields => $self->{'FieldSets'}{$fieldSet},
   );
 
-  return $obj->gather($self->{'RunParams'},{}, 'add');
+  return $obj->gather($self->{'RunParams'},$permissions, 'add');
 }
 
 

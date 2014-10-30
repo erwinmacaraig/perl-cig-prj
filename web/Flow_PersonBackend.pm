@@ -607,9 +607,8 @@ sub display_core_details    {
     my $self = shift;
 
 
-    my $fieldperms = $self->{'Data'}->{'Permissions'};
-    my $memperm = ProcessPermissions($fieldperms, $self->{'FieldSets'}{'core'}, 'Person',);
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Person',);
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -631,7 +630,8 @@ sub validate_core_details    {
     my $self = shift;
 
     my $userData = {};
-    ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields();
+    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Person',);
+    ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
 
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
@@ -687,7 +687,8 @@ sub display_minor_fields {
         $self->setupValues($objectValues);
     }
 
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'minor'}, 'Person',);
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -710,7 +711,8 @@ sub validate_minor_fields {
     my $self = shift;
 
     my $userData = {};
-    ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields();
+    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'minor'}, 'Person',);
+    ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
     my $id = $self->ID() || 0;
     if(!$id)    {
         push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person';
@@ -742,7 +744,8 @@ sub display_contact_details    {
         my $objectValues = $self->loadObjectValues($personObj);
         $self->setupValues($objectValues);
     }
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'contactdetails'}, 'Person',);
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -765,7 +768,8 @@ sub validate_contact_details    {
     my $self = shift;
 
     my $userData = {};
-    ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields();
+    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'contactdetails'}, 'Person',);
+    ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
     my $id = $self->ID() || 0;
     if(!$id)    {
         push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person';
@@ -842,7 +846,8 @@ sub display_other_details    {
         my $objectValues = $self->loadObjectValues($personObj);
         $self->setupValues($objectValues);
     }
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'otherdetails'}, 'Person',);
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -865,7 +870,8 @@ sub validate_other_details    {
     my $self = shift;
 
     my $userData = {};
-    ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields();
+    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'otherdetails'}, 'Person',);
+    ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
     my $id = $self->ID() || 0;
     if(!$id)    {
         push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person';

@@ -23,7 +23,6 @@ my $Fields = {
 		strPreferredName
         intLocalLanguage
 		dtDOB
-		strPlaceofBirth
 		strGender
 		strAddress1
 		strAddress2
@@ -43,8 +42,6 @@ my $Fields = {
         strEntityType
 		intOccupationID
 		intEthnicityID
-		intMailingList
-		intLifeMember
 		intDeceased
 		strLoyaltyNumber
 		curMemberFinBal
@@ -53,10 +50,6 @@ my $Fields = {
 		strPassportNo
 		strPassportIssueCountry
 		dtPassportExpiry
-		strBirthCertNo
-		strHealthCareNo
-		intIdentTypeID
-		strIdentNum
 		strEmergContName
 		strEmergContRel
 		strP1FName
@@ -74,14 +67,7 @@ my $Fields = {
 		intMisc
 		intVolunteer
         intPlayerPending
-		dtFirstRegistered
-		dtLastRegistered
-		dtRegisteredUntil
 		dtLastUpdate
-		dtSuspendedUntil
-		intFavNationalTeamMember
-		intAttendSportCount
-		intWatchSportHowOftenID
 		strMemberCustomNotes1
 		strMemberCustomNotes2
 		strMemberCustomNotes3
@@ -89,6 +75,26 @@ my $Fields = {
 		strMemberCustomNotes5
         intMemberToHideID
         intPhotoUseApproval
+        strISONationality
+        strISOCountryOfBirth
+        strRegionOfBirth
+		strPlaceofBirth
+        strBirthCert
+        strBirthCertCountry
+        dtBirthCertValidityDateFrom
+        dtBirthCertValidityDateTo
+        strBirthCertDesc
+        trOtherPersonIdentifier
+        strOtherPersonIdentifierIssueCountry
+        dtOtherPersonIdentifierValidDateFrom
+        dtOtherPersonIdentifierValidDateTo
+        strOtherPersonIdentifierDesc
+        intMinorMoveOtherThanFootball
+        intMinorDistance
+        intMinorEU
+        intMinorNone
+
+
 	),
 
 }
