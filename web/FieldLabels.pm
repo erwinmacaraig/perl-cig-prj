@@ -162,7 +162,7 @@ sub getFieldLabels	{
             );
 	}
 
-	if($level== $Defs::VENUE)	{
+	if($level== $Defs::LEVEL_VENUE)	{
 		%labels = (
             strFIFAID => 'FIFA ID',
             strLocalName => 'Name',
@@ -176,18 +176,21 @@ sub getFieldLabels	{
 
             strRegion => 'Region',
             strPostalCode => 'Postal Code',
-            strTown => 'Town',
+            strCity => 'City (Place)',
+            strState => 'State',
             strAddress => 'Address 1',
             strAddress2 => 'Address 2',
             strCity => 'City',
-            strWebURL => 'Website',
-            strEmail => 'Email',
-            strPhone => 'Phone',
-            strFax => 'Fax',
+            strWebURL => 'Web Address',
+            strEmail => 'Email Address',
+            strPhone => 'Phone Number',
+            strFax => 'Fax Number',
             strContactTitle => 'Contact Person Title',
             strContactEmail => 'Contact Person Email',
             strContactPhone => 'Contact Person Phone',
             strContact => 'Contact Person',
+            strContactCity => 'City',
+            strContactISOCountry => 'Country',
             intIdentifierTypeID => 'Identifier Type',
             strIdentifier => 'Identifier',
             dtValidFrom => 'Valid From',

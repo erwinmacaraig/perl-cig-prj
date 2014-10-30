@@ -13,8 +13,8 @@ use Products;
 use Data::Dumper;
 
 sub getRegistrationItems    {
-    my($Data, $ruleFor, $itemType, $originLevel, $regNature, $entityID, $entityLevel, $multiPersonType, $Rego_ref) = @_; 
-    open(FH, ">$Defs::myerrorfile");
+    my($Data, $ruleFor, $itemType, $originLevel, $regNature, $entityID, $entityLevel, $multiPersonType, $Rego_ref, $documentFor) = @_; 
+    #open(FH, ">$Defs::myerrorfile");
     $itemType ||= '';
     $originLevel ||= 0; 
     $regNature ||= '';
@@ -96,6 +96,8 @@ sub getRegistrationItems    {
 
     my @Items=();
     while (my $dref = $q->fetchrow_hashref())   {
+        next if($itemType eq 'DOCUMENT' and $documentFor and ($documentFor ne $dref->{'strDocumentFor'}));
+
         my %Item=();
         $Item{'ID'} = $dref->{'intID'};
         $Item{'UseExistingThisEntity'} = $dref->{'intUseExistingThisEntity'} || 0;

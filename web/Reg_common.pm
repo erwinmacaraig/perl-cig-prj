@@ -88,8 +88,11 @@ sub allowedTo {
     my $output        = new CGI;
     my $member_cookie = $output->cookie("$Defs::COOKIE_MEMBER") || '';
     my $rs            = $output->cookie("$Defs::COOKIE_ACTSTATUS");
+<<<<<<< HEAD
     #print FH "member_cookie = $member_cookie\n";
     #print FH "rs(COOKIE_ACTSTATUS) = $rs\n";
+=======
+>>>>>>> 02383e5b0608ea231efa949f6a431710c407413c
     $rs = '' if !defined $rs;
     $Data->{'ViewActStatus'} = 1;
     $Data->{'ViewActStatus'} = $rs
@@ -152,7 +155,10 @@ sub allowedTo {
 
     my $prod_rs = $output->cookie("$Defs::COOKIE_PRODSTATUS");
     $prod_rs = '' if !defined $prod_rs;
+<<<<<<< HEAD
     #print FH "The value of \$prod_rs is $prod_rs\n";
+=======
+>>>>>>> 02383e5b0608ea231efa949f6a431710c407413c
     $Data->{'ViewProductStatus'} = 0;
     $Data->{'ViewProductStatus'} = $prod_rs
       if ( $prod_rs eq '2' or $prod_rs eq '1' or $prod_rs eq '0' );
@@ -177,9 +183,12 @@ sub allowedTo {
         cache => $Data->{'cache'},
     );
 
+<<<<<<< HEAD
     #print FH "\n\n\n=========================\n cache = $Data->{'cache'} \n======================\n"; 
     #print FH "\n\n\n=========================\n The content of Data hash \n" . Dumper($Data) ." \n======================\n"; 
     #print FH "\n\n\n==========================\n Dumpoog the user \n" . Dumper($user) . "\n=====================\n";
+=======
+>>>>>>> 02383e5b0608ea231efa949f6a431710c407413c
     $user->load();
     my $userID = $user->id() || 0;
     #kickThemOff() if $userID != $clientValues_ref->{'userID'};
@@ -202,6 +211,7 @@ sub allowedTo {
         getID( $clientValues_ref, $clientValues_ref->{authLevel} ),
     );
     my $myEntityId =  getID( $clientValues_ref, $clientValues_ref->{authLevel} );  
+<<<<<<< HEAD
     #print FH '$userID = ' . $userID . "\n";
     #print FH '$clientValues_ref->{authLevel} = ' . $clientValues_ref->{authLevel} . "\n";     
     #print FH 'entityID = '. $myEntityId . "\n";
@@ -210,6 +220,10 @@ sub allowedTo {
     #print FH '$intID = '. $intID . "\n";
     #print FH '$readOnly = '. $readOnly . "\n";
     #print FH '$roleID = ' . $roleID . "\n";
+=======
+
+    ( $level, $intID, $readOnly, $roleID ) = $q->fetchrow_array();
+>>>>>>> 02383e5b0608ea231efa949f6a431710c407413c
     
     $q->execute(
         $userID,
@@ -217,7 +231,10 @@ sub allowedTo {
         getID( $clientValues_ref, $clientValues_ref->{authLevel} ),
     );
 
+<<<<<<< HEAD
     #print FH "\n\nThe conent of the query is ". Dumper( $q->fetchrow_array()) ."\n"; 
+=======
+>>>>>>> 02383e5b0608ea231efa949f6a431710c407413c
     $q->finish();
 
   if ( !$level and !$intID ) {
@@ -226,7 +243,10 @@ sub allowedTo {
             $clientValues_ref->{authLevel},
             getID( $clientValues_ref, $clientValues_ref->{authLevel} ),
         );
+<<<<<<< HEAD
          #print FH '$valid is equal to: '. $valid;
+=======
+>>>>>>> 02383e5b0608ea231efa949f6a431710c407413c
         if ($valid) {
             $level = $clientValues_ref->{authLevel};
             $intID =
@@ -246,7 +266,10 @@ sub allowedTo {
 
     if (    $clientValues_ref->{currentLevel} > $level) {
         #kickThemOff();    # THIS USER IS EVIL: BOOT THEM 
+<<<<<<< HEAD
         #print FH "CLIENT VALUES REF = " . $clientValues_ref->{currentLevel} . " \n \$level is $level";
+=======
+>>>>>>> 02383e5b0608ea231efa949f6a431710c407413c
     }
 
     if ( $entityID and $entityTypeID ) {

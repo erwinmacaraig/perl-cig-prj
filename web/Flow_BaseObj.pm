@@ -9,7 +9,7 @@ use ConfigOptions;
 use TTTemplate;
 use Reg_common;
 use Flow_DisplayFields;
-#use HTML::FillInForm;
+use HTML::FillInForm;
 use Log;
 use Data::Dumper;
 sub new {
@@ -238,8 +238,9 @@ sub display {
 
 sub displayFields {
   my $self = shift;
-  my($fieldSet) = @_;
+  my($permissions, $fieldSet) = @_;
   $fieldSet ||= $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'fieldset'};
+  $permissions ||= {};
   return '' if !$fieldSet;
   my $obj = new Flow_DisplayFields(
     Data => $self->{'Data'},
@@ -247,13 +248,19 @@ sub displayFields {
     SystemConfig => $self->{'SystemConfig'},
     Fields => $self->{'FieldSets'}{$fieldSet},
   );
+<<<<<<< HEAD
   return $obj->build({},'add',1);
+=======
+
+  return $obj->build($permissions,'add',1);
+>>>>>>> 02383e5b0608ea231efa949f6a431710c407413c
 }
 
 sub gatherFields {
   my $self = shift;
-  my($fieldSet) = @_;
+  my($permissions, $fieldSet) = @_;
   $fieldSet ||= $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'fieldset'};
+  $permissions ||= {};
   return ({},[]) if !$fieldSet;
   my $obj = new Flow_DisplayFields(
     Data => $self->{'Data'},
@@ -262,7 +269,7 @@ sub gatherFields {
     Fields => $self->{'FieldSets'}{$fieldSet},
   );
 
-  return $obj->gather($self->{'RunParams'},{}, 'add');
+  return $obj->gather($self->{'RunParams'},$permissions, 'add');
 }
 
 

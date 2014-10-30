@@ -4,7 +4,7 @@ CREATE TABLE tblFieldPermissions (
 	intSubRealmID INT NOT NULL,
 	intEntityTypeID INT NOT NULL DEFAULT 0,
 	intEntityID INT NOT NULL DEFAULT 0,
-	strFieldType VARCHAR(20) DEFAULT '', 
+	strFieldType VARCHAR(50) DEFAULT '', 
 	strFieldName VARCHAR(30) DEFAULT '',
 	strPermission VARCHAR(20) DEFAULT '',
 	intRoleID INT NOT NULL DEFAULT 0,
