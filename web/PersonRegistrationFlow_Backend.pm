@@ -44,7 +44,7 @@ sub handleRegistrationFlowBackend   {
   
     #$Flow{'PREGF_TU'} = 'PREGF_D'; #Typees 1 
     $Flow{'PREGF_PCU'} = 'PREGF_D'; #Typees
-    $Flow{'PREGF_TU'} = 'PREGF_CERT';   ### $action = $Flow{$action}
+    $Flow{'PREGF_TU'} = 'PREGF_CERT'; #Certificates
     $Flow{'PREGF_DU'} = 'PREGF_P'; #Products2
     $Flow{'PREGF_PU'} = 'PREGF_C'; #Documents3
     
@@ -218,8 +218,7 @@ print STDERR "---------------------------HERE FOR $personID $regoID\n";
    }
    ############# 
    elsif ($action eq 'PREGF_CERT'){
-       $body .= displayRegoFlowCertificates($Data, $regoID, $client, $originLevel, $entityLevel, $entityID, $rego_ref, $personID, \%Hidden)
-                                                         	
+       $body .= displayRegoFlowCertificates($Data, $regoID, $client, $originLevel, $entityLevel, $entityID, $rego_ref, $personID, \%Hidden);                                                         	
    }
    #########3
     elsif ( $action eq 'PREGF_D' ) {
