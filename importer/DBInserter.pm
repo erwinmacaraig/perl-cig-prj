@@ -1,8 +1,8 @@
 
 package DBInserter;
 require Exporter;
-@EXPORT = qw(insertBatch connectDB getRecord insertRow createRecord);
-@EXPORT_OK = qw(insertBatch connectDB getRecord insertRow createRecord);
+@EXPORT = qw(insertBatch connectDB getRecord insertRow);
+@EXPORT_OK = qw(insertBatch connectDB getRecord insertRow);
 @ISA =  qw(Exporter);
 use Data::Dumper;
 use DBI;
@@ -11,15 +11,14 @@ use ImporterConfig;
 use feature qw(say);
 
 sub insertRow {
-	my ($db,$table,$record,$importId, $rules) = @_;
-	$rules ||= "";
-	
+	my ($db,$table,$record,$importId) = @_;
 	my $keystr = (join ",\n        ", (keys $record));
 	my $valstr = join ', ', (split(/ /, "? " x (scalar(values $record))));
 	if(defined $importId){
     	$keystr = (join ",\n        ","intImportID", $keystr);
     	$valstr = (join ",","$importId", $valstr);
     }
+	
 	my @values = values $record;
 	my %success = ();
 	my $query = qq[
@@ -34,14 +33,6 @@ sub insertRow {
 	my $result = $sth->execute(@values) or die "Can't execute insert: ".$db->errstr()."\n";
 	print "INSERT SUCCESS :: TABLE:: '",$table,"' ID:: ",$sth->{mysql_insertid},"' RECORDS:: '",join(', ', @values),"'\n";
 	
-	if ($rules) {
-		foreach my $key ( keys %{$rules} ){
-			my $rule = $rules->{$key};
-			say Dumper($rule);
-			createRecord($db, $record, $rule);
-		}
-	}
-	
 	return $sth->{mysql_insertid};
 	#say "INSERT SUCCESS :: TABLE:: '",$table,"' ID:: ' RECORDS:: '",join(', ', @values),"'\n";
 	
@@ -52,7 +43,19 @@ sub insertBatch {
 	my ($db,$table,$records,$importId, $rules) = @_;
 	$rules ||= "None";
 	foreach my $i (@{$records}){
-		insertRow($db,$table,$i,$importId, $rules);
+		
+		#get nationalperiod id if any
+		my $periodID = getNationalPeriodID($db, $i);
+		if( $periodID) {
+		    $i->{'intNationalPeriodID'} = $periodID;
+		}
+		
+		# populate transLog and transaction recs
+		createTransRecord($db, $i);
+		#call_func(\&createTransReccord);
+		
+		# then insert the main file
+		insertRow($db,$table,$i,$importId);
 	}
 }
 
@@ -79,43 +82,47 @@ sub connectDB{
     return $dbh;
 }
 
-# this supports the rule to create record for other tables based from the fields declaration
-sub createRecord {
-    my ($db, $record, $rule) = @_;
-	if($rule->{"rule"} eq "createRecord") {
-		my $tbl    = $rule->{"table"};
-		my $refID  = $rule->{"refID"};
-		my $fields = $rule->{"fields"};
-		my @values = $rule->{"values"};
-		# exit if refID is empty
-		if( !$record->{$refID} ) {
-				return;
-		}
-		my @fldstr = ();
-		my @vstr = ();
-		foreach my $k( keys %{$fields} ){
-			push @fldstr, $k;
-			my $v = $record->{$fields->{$k}};
-			if( defined $v){
-				push @vstr, $v; 
-				#say Dumper($record->{$fields->{$k}});
-			} else {
-				push @vstr, $fields->{$k};
-			}
-		}
-		# prepare field names and its values
-		my $keystr = (join ",\n        ", (@fldstr));
-		my $valstr = join ', ', (split(/ /, "? " x (scalar(@vstr))));
-		# construct mysql query
-		my $query = qq[
-			INSERT INTO $tbl ( $keystr )
-				VALUES ( $valstr )
+sub getNationalPeriodID {
+    my ($db,$rec) = @_;
+	my $periodID = 0;
+    if( exists $rec->{'NationalSeason'} && $rec->{'NationalSeason'}  ){
+		my $stmt=qq[
+	        SELECT 
+				intNationalPeriodID
+				FROM tblNationalPeriod
+				WHERE strNationalPeriodName = $rec->{'NationalSeason'}
 		];
-		#$records = createRecord($records,$rule);
-		my $sth = $db->prepare($query) or die "Can't prepare insert: ".$db->errstr()."\n";
-		my $result = $sth->execute(@vstr) or die "Can't execute insert: ".$db->errstr()."\n";
-		print "INSERT SUCCESS :: TABLE:: '",$tbl,"' ID:: ",$sth->{mysql_insertid},"' RECORDS:: '",join(', ', @vstr),"'\n";
+		$periodID = $db->selectrow_array($stmt);
 	}
+	delete $rec->{'NationalSeason'} if exists $rec->{'NationalSeason'};
+    return $periodID;
 }
 
+sub createTransRecord {
+    my ($db, $rec) = @_;
+	if( exists $rec->{'PaymentReference'} && $rec->{'PaymentReference'}  ){
+		# populate tblTranslog and transactions
+		my %translogRecord = (
+			"strAuthID"     => $rec->{'PaymentReference'},
+			"strReceiptRef" => $rec->{'PaymentReference'},
+		);
+		my $ret_id = insertRow($db,'tblTransLog',\%translogRecord);
+		
+		if( $ret_id ){
+		    my %transactionRecord = (
+			    "intTransLogID" => $ret_id,
+			    "curAmount"     => $rec->{'Amount'}, 
+			    "intProductID"  => $rec->{'ProductCode'},
+			    "intStatus"     => 1,
+		    );
+		    $ret_id = insertRow($db,'tblTransactions',\%transactionRecord);
+		}
+		
+	}
+	# remove fields from the hash table
+    delete $rec->{'PaymentReference'} if exists $rec->{'PaymentReference'};
+    delete $rec->{'Amount'} if exists $rec->{'Amount'};
+	delete $rec->{'ProductCode'} if exists $rec->{'ProductCode'};
+	#return $rec;
+}
 1;
