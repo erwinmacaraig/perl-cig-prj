@@ -858,8 +858,8 @@ sub viewRequest {
         }
     }
 
-    my $personDetails = PersonRegistration::loadPersonDetails($Data->{'db'}, $request->{'intPersonID'});
-    my $personCurrAgeLevel = PersonRegistration::calculateAgeLevel($Data, $personDetails->{'currentAge'});
+    my $personDetails = Person::loadPersonDetails($Data->{'db'}, $request->{'intPersonID'});
+    my $personCurrAgeLevel = Person::calculateAgeLevel($Data, $personDetails->{'currentAge'});
     my $originLevel = $Data->{'clientValues'}{'authLevel'};
 
     my %TemplateData = (
