@@ -1192,7 +1192,7 @@ sub getPersonMenuData {
     my $DataAccess_ref = $Data->{'DataAccess'};
     my $accreditation_title = exists $Data->{'SystemConfig'}{'ACCRED_Custom_Name'} ? $Data->{'SystemConfig'}{'ACCRED_Custom_Name'}.'s' : "Accreditations";
 
-    my ($intOfficial) = $personObj->getValue('intOfficial');
+    my ($intOfficial) = 0;#$personObj->getValue('intOfficial');
     my $clubs = $Data->{'SystemConfig'}{'NoClubs'} ? 0 : 1;
     my $clr= $Data->{'SystemConfig'}{'AllowClearances'} || 0;
 
