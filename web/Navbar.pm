@@ -13,7 +13,7 @@ use Defs;
 use Utils;
 use ConfigOptions;
 use DuplicatesUtils;
-use PaymentSplitUtils;
+#use PaymentSplitUtils;
 use MD5;
 use InstanceOf;
 use PageMain;
@@ -153,7 +153,7 @@ sub getEntityMenuData {
     my $txt_Clr = $lang->txt('Transfer');
     my $txt_Clr_ListOnline = $lang->txt('List Online Transfers');
 
-    my $paymentSplitSettings = getPaymentSplitSettings($Data);
+    my $paymentSplitSettings = ''; #getPaymentSplitSettings($Data);
     my $baseurl = "$target?client=$client&amp;";
     my %menuoptions = (
         advancedsearch => {
@@ -242,12 +242,12 @@ sub getEntityMenuData {
             };
     }
 
-    if($paymentSplitSettings->{'psBanks'}) {
-        $menuoptions{'bankdetails'} = {
-            name => $lang->txt('Payment Configuration'),
-            url => $baseurl."a=BA_",
-        };
-    }
+    #if($paymentSplitSettings->{'psBanks'}) {
+    #    $menuoptions{'bankdetails'} = {
+    #        name => $lang->txt('Payment Configuration'),
+    #        url => $baseurl."a=BA_",
+    #    };
+    #}
 
 
         $menuoptions{'approvals'} = {
@@ -334,13 +334,13 @@ sub getEntityMenuData {
                     url => $baseurl."a=BANKSPLIT_",
                 };
             }
-            if($paymentSplitSettings->{'psRun'} 
-                    and ! $SystemConfig->{'AllowOldBankSplit'}) {
-                $menuoptions{'paymentsplitrun'} = {
-                    name => $lang->txt("Payment Split Run"),
-                    url => $baseurl."a=PSR_opt",
-                };
-            }
+            #if($paymentSplitSettings->{'psRun'} 
+            #        and ! $SystemConfig->{'AllowOldBankSplit'}) {
+            #    $menuoptions{'paymentsplitrun'} = {
+            #        name => $lang->txt("Payment Split Run"),
+            #        url => $baseurl."a=PSR_opt",
+            #    };
+            #}
 
             if ($SystemConfig->{'AllowSeasons'}) {
                 $menuoptions{'seasons'} = {
@@ -490,7 +490,7 @@ sub getAssocMenuData {
         ]);
     $intSWOL = 0 if !$SystemConfig->{'AllowSWOL'};
 
-    my $paymentSplitSettings = getPaymentSplitSettings($Data);
+    my $paymentSplitSettings = ''; #getPaymentSplitSettings($Data);
 
     my $baseurl = "$target?client=$client&amp;";
     my %menuoptions = (
@@ -722,7 +722,7 @@ sub getClubMenuData {
     my $txt_Clr_ListOnline = $SystemConfig->{'txtCLRListOnline'} || "List Online Clearances";
     my $DataAccess_ref = $Data->{'DataAccess'};
 
-    my $paymentSplitSettings = getPaymentSplitSettings($Data);
+    my $paymentSplitSettings ='' ; #getPaymentSplitSettings($Data);
 
     my $baseurl = "$target?client=$client&amp;";
     my %menuoptions = (
@@ -807,12 +807,12 @@ sub getClubMenuData {
             }
 
             if (allowedAction($Data,'c_e')) {
-                if($paymentSplitSettings->{'psBanks'}) {
-                    $menuoptions{'bankdetails'} = {
-                        name => $lang->txt('Payment Configuration'),
-                        url => $baseurl."a=BA_",
-                    };
-                }
+                #if($paymentSplitSettings->{'psBanks'}) {
+                #    $menuoptions{'bankdetails'} = {
+                #        name => $lang->txt('Payment Configuration'),
+                #        url => $baseurl."a=BA_",
+                #    };
+                #}
             }
             if ($SystemConfig->{'AssocClubServices'}) {
                 $menuoptions{'locator'} = {
@@ -1192,7 +1192,7 @@ sub getPersonMenuData {
     my $DataAccess_ref = $Data->{'DataAccess'};
     my $accreditation_title = exists $Data->{'SystemConfig'}{'ACCRED_Custom_Name'} ? $Data->{'SystemConfig'}{'ACCRED_Custom_Name'}.'s' : "Accreditations";
 
-    my ($intOfficial) = $personObj->getValue('intOfficial');
+    my ($intOfficial) = 0;#$personObj->getValue('intOfficial');
     my $clubs = $Data->{'SystemConfig'}{'NoClubs'} ? 0 : 1;
     my $clr= $Data->{'SystemConfig'}{'AllowClearances'} || 0;
 
