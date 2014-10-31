@@ -24,6 +24,7 @@ use CustomFields;
 use DefCodes;
 use PersonCertifications;
 use DuplicatesUtils;
+use PersonUserAccess;
 use Data::Dumper;
 
 
@@ -679,6 +680,9 @@ sub display_minor_fields {
     my $self = shift;
 
     my $id = $self->ID() || 0;
+    if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
+        return ('Invalid User',0);
+    }
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
     $personObj->load();
     my $dob = $personObj->getValue('dtDOB');
@@ -735,6 +739,9 @@ sub validate_minor_fields {
 
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
     $personObj->load();
+    if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
+        return ('Invalid User',0);
+    }
     $personObj->setValues($userData);
     $personObj->write();
     return ('',1);
@@ -745,6 +752,9 @@ sub display_contact_details    {
     my $self = shift;
 
     my $id = $self->ID() || 0;
+    if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
+        return ('Invalid User',0);
+    }
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
     $personObj->load();
     if($personObj->ID())    {
@@ -781,6 +791,9 @@ sub validate_contact_details    {
     if(!$id)    {
         push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person';
     }
+    if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
+        return ('Invalid User',0);
+    }
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
         $self->decrementCurrentProcessIndex();
@@ -796,6 +809,9 @@ sub validate_contact_details    {
 sub display_person_identifier {
 	my $self = shift; 
 	my $id = $self->ID() || 0;
+    if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
+        return ('Invalid User',0);
+    }
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
     $personObj->load();
     if($personObj->ID())    {
@@ -830,6 +846,9 @@ sub validate_person_identifier_details    {
     if(!$id)    {
         push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person';
     }
+    if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
+        return ('Invalid User',0);
+    }
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
         $self->decrementCurrentProcessIndex();
@@ -847,6 +866,9 @@ sub display_other_details    {
     my $self = shift;
 
     my $id = $self->ID() || 0;
+    if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
+        return ('Invalid User',0);
+    }
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
     $personObj->load();
     if($personObj->ID())    {
@@ -883,6 +905,9 @@ sub validate_other_details    {
     if(!$id)    {
         push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person';
     }
+    if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
+        return ('Invalid User',0);
+    }
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
         $self->decrementCurrentProcessIndex();
@@ -900,6 +925,9 @@ sub display_registration {
     my $self = shift;
 
     my $personID = $self->ID();
+    if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
+        return ('Invalid User',0);
+    }
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
@@ -952,6 +980,9 @@ sub process_registration {
     my $lang = $self->{'Lang'};
 
     my $personID = $self->ID() || 0;
+    if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
+        return ('Invalid User',0);
+    }
     my $regoID = 0;
     my $msg = '';
     if($personID)   {
@@ -1004,6 +1035,9 @@ sub display_certifications {
     my $self = shift;
 
     my $id = $self->ID() || 0;
+    if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
+        return ('Invalid User',0);
+    }
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
     $personObj->load();
     my $personType = $self->{'RunParams'}{'pType'} || '';
@@ -1069,6 +1103,9 @@ sub process_certifications {
     if(!$id)    {
         push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person';
     }
+    if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
+        return ('Invalid User',0);
+    }
 
     if(!scalar(@{$self->{'RunDetails'}{'Errors'}}))    {
         my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
@@ -1102,6 +1139,9 @@ sub display_products {
     my $self = shift;
 
     my $personID = $self->ID();
+    if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
+        return ('Invalid User',0);
+    }
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
@@ -1192,6 +1232,9 @@ sub process_products {
     $self->addCarryField('prodIds', $prodIds);
 
     my $personID = $self->ID();
+    if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
+        return ('Invalid User',0);
+    }
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
@@ -1219,6 +1262,9 @@ sub display_documents {
     my $self = shift;
 
     my $personID = $self->ID();
+    if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
+        return ('Invalid User',0);
+    }
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
@@ -1295,6 +1341,9 @@ sub display_complete {
     my $self = shift;
 
     my $personID = $self->ID();
+    if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
+        return ('Invalid User',0);
+    }
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
