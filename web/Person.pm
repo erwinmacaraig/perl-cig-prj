@@ -106,6 +106,8 @@ sub handlePerson {
         ( $resultHTML, $title, $newaction ) = handle_photo( $action, $Data, $personID );
         $action = $newaction if $newaction;
     }
+
+# TEST
     if ( $action =~ /^P_DT/ ) {
         #Person Details
         ( $resultHTML, $title ) = person_details( $action, $Data, $personID );
