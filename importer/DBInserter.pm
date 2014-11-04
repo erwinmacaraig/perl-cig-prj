@@ -87,7 +87,7 @@ sub getRecord{
 
 sub connectDB{
 
-    my $dbh = DBI->connect($ImporterConfig::DB_CONFIG{"DB_DSN"}, $ImporterConfig::DB_CONFIG{"DB_USER"},$ImporterConfig::DB_CONFIG{"DB_PASSWD"}) or die $DBI::errstr;
+    my $dbh = DBI->connect($ImporterConfig::DB_CONFIG{"DB_DSN"}, $ImporterConfig::DB_CONFIG{"DB_USER"},$ImporterConfig::DB_CONFIG{"DB_PASSWD"},{mysql_enable_utf8=>1} ) or die $DBI::errstr;
     $dbh->do("SET NAMES 'utf8'");
     return $dbh;
 }

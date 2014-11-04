@@ -7,6 +7,8 @@ use Getopt::Long;
 use Text::CSV;
 use TableRules;
 use DBInserter;
+use Text::CSV::Encoded;
+
 use feature qw(say);
 
 my $directory = '';  
@@ -33,7 +35,7 @@ sub readCSVFile{
     my $table =  $directory[$dirlength - 1];
     
     #open my $fh, '<:utf8', $file or die "Cannot open: $!";
-    open my $fh, "<:encoding(utf8)", $file or die "Cannot open: $!";
+    open my $fh, "<", $file or die "Cannot open: $!";
     my $csv_config = {};
     
     if($format eq 'tsv'){
@@ -42,10 +44,13 @@ sub readCSVFile{
     elsif($format eq 'csv'){
     	$csv_config->{sep_char} = qq|,|;
     }
+	$csv_config->{'encoding_in'} = "iso-8859-1";
+	$csv_config->{'encoding_out'} = "cp1252";
+	$csv_config->{binary} = 1;
 	
     my @tag = split(/\./,$table);
     my $object =  $tag[0];
-    my $csv = Text::CSV->new($csv_config) or die "Text::CSV error: " . Text::CSV->error_diag;
+    my $csv = Text::CSV::Encoded->new($csv_config) or die "Text::CSV error: " . Text::CSV->error_diag;
 	
     my @headers = $csv->getline($fh) or die "no header";
 	#say Dumper(@headers);
