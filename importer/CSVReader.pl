@@ -7,7 +7,6 @@ use Getopt::Long;
 use Text::CSV;
 use TableRules;
 use DBInserter;
-
 use feature qw(say);
 
 my $directory = '';  
@@ -43,16 +42,19 @@ sub readCSVFile{
     elsif($format eq 'csv'){
     	$csv_config->{sep_char} = qq|,|;
     }
+	
     my @tag = split(/\./,$table);
     my $object =  $tag[0];
     my $csv = Text::CSV->new($csv_config) or die "Text::CSV error: " . Text::CSV->error_diag;
-    my @headers = $csv->getline($fh) or die "no header";
-    my $config = getConfig($object);
 	
+    my @headers = $csv->getline($fh) or die "no header";
+	#say Dumper(@headers);
+	
+    my $config = getConfig($object);
     my @keys = MapKeys(@headers, $config->{"mapping"});
     $csv->column_names(@keys);
     my $ctr = 0;
-	
+
     while (my $hashref = $csv->getline_hr($fh)) {
 	    push @records, $hashref;
 	    $ctr++;
@@ -112,7 +114,8 @@ sub MapKeys{
 	my ($headers,$mapping) = @_;
 	my @keys = ();
 	foreach my $i (@{$headers}){
-		push @keys,$mapping->{$i};
+		# include fieldname if its in mapping rule
+		push @keys,$mapping->{$i} if exists $mapping->{$i};
 	}
 	return @keys;
 }

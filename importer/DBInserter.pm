@@ -43,7 +43,7 @@ sub insertRow {
 	
 	} catch {
 		writeLog("ERROR: $_");
-		say "INSERT INTO $table ($keystr) VALUES(",join(', ', @values),")'\n";
+		#say "INSERT INTO $table ($keystr) VALUES(",join(', ', @values),")'\n";
 		warn "caught error: $_";
 	};
 	1;
@@ -124,7 +124,8 @@ sub createTransRecord {
 			    "intTransLogID" => $ret_id,
 			    "curAmount"     => $rec->{'Amount'}, 
 			    "intProductID"  => $rec->{'ProductCode'},
-			    "intStatus"     => 1,
+				"intStatus"     => 1,
+				"intQty"        => 1,
 		    );
 		    $ret_id = insertRow($db,'tblTransactions',\%transactionRecord);
 			writeLog("INFO: createTransRecord() - tblTransactions". \%transactionRecord);
