@@ -4,6 +4,8 @@ use strict;
 use lib '.', '..';
 use Defs;
 use EntityFieldObj;
+use Switch;
+use Flow_DisplayFields;
 use Data::Dumper;
 
 sub new {
@@ -24,6 +26,7 @@ sub new {
         _data               => $args{data},
         _DBData             => $args{DBData},
         _HTMLFields         => $args{HTMLFields} || '',
+        _errors             => undef,
     };
 
     $self = bless ($self, $class);
@@ -96,6 +99,11 @@ sub getHtmlFields {
     return $self->{_HTMLFields};
 }
 
+sub getErrors {
+    my ($self) = shift;
+    return $self->{_errors};
+}
+
 
 sub getAll {
     my ($self) = shift;
@@ -133,13 +141,20 @@ sub getAll {
         $self->setFieldID($dref->{'intEntityFieldID'});
         $self->setName($dref->{'strName'});
         push @fields, {
-            entityFieldID   => {value => $dref->{'intEntityFieldID'}, html => $self->fieldIDHtml()},
-            fieldName       => {value => $dref->{'strName'}, html => $self->fieldNameHtml()},
-            discipline      => {value => $dref->{'strDiscipline'}, html => $self->disciplineHtml()},
-            capacity        => {value => $dref->{'intCapacity'}, html => $self->capacityHtml},
-            groundNature    => {value => $dref->{'strGroundNature'}, html => $self->groundNatureHtml()},
-            length          => {value => $dref->{'dblLength'}, html => $self->lengthHtml()},
-            width           => {value => $dref->{'dblWidth'}, html => $self->widthHtml()},
+            #entityFieldID   => {value => $dref->{'intEntityFieldID'}, html => $self->fieldIDHtml()},
+            #fieldName       => {value => $dref->{'strName'}, html => $self->fieldNameHtml()},
+            #discipline      => {value => $dref->{'strDiscipline'}, html => $self->disciplineHtml()},
+            #capacity        => {value => $dref->{'intCapacity'}, html => $self->capacityHtml},
+            #groundNature    => {value => $dref->{'strGroundNature'}, html => $self->groundNatureHtml()},
+            #length          => {value => $dref->{'dblLength'}, html => $self->lengthHtml()},
+            #width           => {value => $dref->{'dblWidth'}, html => $self->widthHtml()},
+            intEntityFieldID    => {value => $dref->{'intEntityFieldID'}},
+            strName             => {value => $dref->{'strName'}},
+            strDiscipline       => {value => $dref->{'strDiscipline'}},
+            intCapacity         => {value => $dref->{'intCapacity'}},
+            strGroundNature     => {value => $dref->{'strGroundNature'}},
+            dblLength           => {value => $dref->{'dblLength'}},
+            dblWidth            => {value => $dref->{'dblWidth'}},
         };
     }
 
@@ -148,17 +163,75 @@ sub getAll {
 
 sub generateSingleRowField {
     my $self = shift;
+    my ($prefixID) = @_;
 
     my $htmlFields = '';
     my $count = $self->getCount();
-    my $entityFieldObj = new EntityFieldObj(db => $self->getData()->{'db'}, undef);
+    my $entityFieldObj = new EntityFieldObj(db => $self->getData()->{'db'}, ID => 0);
     $entityFieldObj->setValues($self->getDBData());
 
-    return $htmlFields;
+    my %row = (
+        #intEntityFieldID => $entityFieldObj->getHtml('intEntityFieldID', $prefixID),
+        intFieldOrderNumber => $entityFieldObj->getHtml('intFieldOrderNumber', $prefixID),
+        strName => $entityFieldObj->getHtml('strName', $prefixID),
+        strDiscipline => $entityFieldObj->getHtml('strDiscipline', $prefixID),
+        intCapacity => $entityFieldObj->getHtml('intCapacity', $prefixID),
+        strGroundNature => $entityFieldObj->getHtml('strGroundNature', $prefixID),
+        dblLength => $entityFieldObj->getHtml('dblLength', $prefixID),
+        dblWidth => $entityFieldObj->getHtml('dblWidth', $prefixID),
+    );
+
+    return \%row;
 }
 
 sub validateFormFields {
 
+}
+
+sub retrieveFormFieldData {
+    my $self = shift;
+    my ($params) = @_;
+
+    my $facilityFieldData;
+    my @facilityFieldDataCluster;
+    my @errors;
+    my %fields = (
+        'intFieldOrderNumber' => 'Field Order Number',
+        'strName' => 'Field Name',
+        'strDiscipline' => 'Discipline',
+        'strGroundNature' => 'Ground Nature',
+        'intCapacity' => 'Capacity',
+        'dblLength' => 'Length',
+        'dblWidth' => 'Width',
+    );
+
+    my $obj = new Flow_DisplayFields(
+        Data => $self->getData(),
+        Lang => $self->getData()->{'Lang'},
+        SystemConfig => $self->getData()->{'SystemConfig'},
+        Fields => undef,
+    );
+
+
+    #print STDERR Dumper $params;
+    for my $index (1 .. $self->getCount()) {
+        $facilityFieldData = {};
+        $facilityFieldData->{'intEntityID'} = $self->getEntityID();
+
+        foreach my $field (keys %fields) {
+            my $fieldname = $field . '_' . $index;
+            my $fieldlabel = $fields{$field};
+            #print STDERR Dumper $fieldname . " - " . $params->{$fieldname};
+            #check if empty for now
+            if(!$params->{$fieldname}){
+                push @errors, $fieldlabel . " " . $index . ": " . $obj->langlookup('Field required');
+            }
+            $facilityFieldData->{$field} = $params->{$fieldname};
+        }
+        push @facilityFieldDataCluster, $facilityFieldData;
+    }
+
+    return (\@facilityFieldDataCluster, \@errors);
 }
 
 sub setEntityID {
@@ -232,6 +305,12 @@ sub setHtmlFields {
     my $self = shift;
     my ($htmlField) = @_;
     $self->{_HTMLFields} = $htmlField if defined $htmlField;
+}
+
+sub setErrors {
+    my $self = shift;
+    my ($error) = @_;
+    push @{$self->{_errors}}, $error if defined $error;
 }
 
 1;
