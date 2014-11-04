@@ -22,6 +22,7 @@ use AuditLog;
 use PersonLanguages;
 use CustomFields;
 use DefCodes;
+use RegoProducts;
 use RegistrationItem;
 use Data::Dumper;
 
@@ -71,15 +72,6 @@ sub setProcessOrder {
             'function' => 'process_fields',
         },
         {
-            'action' => 'p',
-            'function' => 'display_products',
-            'label'  => 'Products',
-        },
-        {
-            'action' => 'pu',
-            'function' => 'process_products',
-        },
-        {
             'action' => 'd',
             'function' => 'display_documents',
             'label'  => 'Documents',
@@ -87,6 +79,15 @@ sub setProcessOrder {
         {
             'action' => 'du',
             'function' => 'process_documents',
+        },
+        {
+            'action' => 'p',
+            'function' => 'display_products',
+            'label'  => 'Products',
+        },
+        {
+            'action' => 'pu',
+            'function' => 'process_products',
         },
         {
             'action' => 'c',
@@ -444,8 +445,6 @@ sub validate_core_details {
         my $query = $self->{'db'}->prepare($st);
         $query->execute($entityID, $facilityObj->ID());
 
-        warn "POST VENUE ADD id " . $facilityObj->ID();
-        warn "POST VENUE ADD entity id $entityID";
         $query->finish();
         createTempEntityStructure($self->{'Data'}); 
     }
@@ -479,7 +478,6 @@ sub validate_contact_details {
     my $facilityData = {};
     ($facilityData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields();
     my $id = $self->ID() || 0;
-    warn "CURRENT FACILITY ID $id";
     if(!$id){
         push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid facility.';
     }
@@ -548,7 +546,6 @@ sub validate_role_details {
 sub display_fields {
     my $self = shift;
 
-
     my $facilityFieldCount = $self->{'RunParams'}{'facilityFieldCount'} || 0;
 
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
@@ -556,12 +553,23 @@ sub display_fields {
     $facilityFields->setCount($facilityFieldCount);
     $facilityFields->setEntityID($self->{'RunParams'}{'e'});
     $facilityFields->setData($self->{'Data'});
-    my $facilityFieldsContent = '';
     
+    my @facilityFieldsData = ();
+
     for my $i (1 .. $facilityFieldCount){
         $facilityFields->setDBData({});
-        $facilityFieldsContent .= $facilityFields->generateSingleRowField();
+        push @facilityFieldsData, $facilityFields->generateSingleRowField($i);
     }
+
+    my %FieldsGridData = (
+        FieldElements => \@facilityFieldsData,
+    );
+
+    my $facilityFieldsContent = runTemplate(
+        $self->{'Data'},
+        \%FieldsGridData,
+        'flow/facility_fields_grid.templ',
+    );
 
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
@@ -574,21 +582,46 @@ sub display_fields {
         TextBottom => '',
     );
 
-    print STDERR Dumper $facilityFieldsContent;
-    print STDERR Dumper $self->{'RunParams'};
     my $pagedata = $self->display(\%PageData);
-
 }
 
 sub process_fields {
     my $self = shift;
 
     #test validate
-    #push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid value for facility fields.';
+    my $facilityFieldCount = $self->{'RunParams'}{'facilityFieldCount'} || 0;
+
+    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
+    my $facilityFields = new EntityFields();
+    $facilityFields->setCount($facilityFieldCount);
+    $facilityFields->setEntityID($self->{'RunParams'}{'e'});
+    $facilityFields->setData($self->{'Data'});
+
+    my $facilityFieldDataCluster;
+    ($facilityFieldDataCluster, $self->{'RunDetails'}{'Errors'}) = $facilityFields->retrieveFormFieldData($self->{'RunParams'});
+ 
+    #my @testErrors;
+    #push @testErrors, "test error";
+    #$self->{'RunDetails'}{'Errors'} = \@testErrors;
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
         $self->decrementCurrentProcessIndex();
         return ('',2);
+    }
+
+    my $addedFields = 0;
+
+    #check current tblEntityFields entry count for this specific process to avoid duplicates
+    if($facilityFieldCount != scalar@{$facilityFields->getAll()}){
+        foreach my $fieldObjData (@{$facilityFieldDataCluster}){
+            my $entityFieldObj = new EntityFieldObj(db => $self->{'db'}, ID => 0);
+            $entityFieldObj->load();
+            $entityFieldObj->setValues($fieldObjData);
+            $entityFieldObj->write();
+            $addedFields++;
+        }
+
+        $self->addCarryField('addedFields', $addedFields);
     }
 
     return ('', 1);
@@ -601,69 +634,65 @@ sub display_products {
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
+    my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $client = $self->{'Data'}->{'client'};
+    my $content = '';
 
-    warn "FACILITY ID $facilityID";
-    warn "ENTITY ID $entityID";
-    warn "ENTITY LEVEL $entityLevel";
-    warn "ORIGIN LEVEL $originLevel";
-    warn "CLIENT $client";
-    #my $rego_ref = {};
-    #my $content = '';
-    #if($regoID) {
-    #    my $valid =0;
-    #    ($valid, $rego_ref) = validateRegoID(
-    #        $self->{'Data'}, 
-    #        $personID, 
-    #        $regoID, 
-    #        $entityID
-    #    );
-    #    $regoID = 0 if !$valid;
-    #}
+    my $CheckProducts = getRegistrationItems(
+        $self->{'Data'},
+        'ENTITY',
+        'PRODUCT',
+        $originLevel,
+        'NEW',
+        $entityID,
+        $entityRegisteringForLevel,
+        0,
+        undef,
+        undef,
+    );
 
-    #my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID);
-    #$personObj->load();
-    #if($regoID) {
-    #    my $nationality = $personObj->getValue('strISONationality') || ''; 
-    #    $rego_ref->{'Nationality'} = $nationality;
+    my @prodIDs = ();
+    my %ProductRules=();
+    foreach my $product (@{$CheckProducts})  {
+        #next if($product->{'UseExistingThisEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'THIS_ENTITY'));
+        #next if($product->{'UseExistingAnyEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'ANY_ENTITY'));
 
-    #    $content = displayRegoFlowProducts(
-    #        $self->{'Data'}, 
-    #        $regoID, 
-    #        $client, 
-    #        $entityLevel, 
-    #        $originLevel, 
-    #        $rego_ref, 
-    #        $entityID, 
-    #        $personID, 
-    #        {},
-    #        1,
-    #    );
-    #}
-    #else    {
-    #    push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
-    #}
-    #if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
-    #    #There are errors - reset where we are to go back to the form again
-    #    $self->decrementCurrentProcessIndex();
-    #    return ('',2);
-    #}
-    #my %PageData = (
-    #    HiddenFields => $self->stringifyCarryField(),
-    #    Target => $self->{'Data'}{'target'},
-    #    Errors => $self->{'RunDetails'}{'Errors'} || [],
-    #    Content => $content,
-    #    #FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
-    #    #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
-    #    Title => '',
-    #    TextTop => '',
-    #    TextBottom => '',
-    #);
-    #my $pagedata = $self->display(\%PageData);
+        $product->{'HaveForAnyEntity'} =1 if($product->{'UseExistingAnyEntity'} && checkExistingProduct($self->{'Data'}, $product->{'ID'}, $Defs::LEVEL_VENUE, 0, $entityID, 'ANY_ENTITY'));
+        $product->{'HaveForThisEntity'} =1 if($product->{'UseExistingThisEntity'} && checkExistingProduct($self->{'Data'}, $product->{'ID'}, $Defs::LEVEL_VENUE, 0, $entityID, 'THIS_ENTITY'));
 
-    #exit;
-    return (" ",1);
+        push @prodIDs, $product->{'ID'};
+        $ProductRules{$product->{'ID'}} = $product;
+     }
+    my $product_body='';
+    if (@prodIDs)   {
+        $product_body= getRegoProducts($self->{'Data'}, \@prodIDs, 0, $entityID, 0, 0, 0, 0, \%ProductRules);
+     }
 
+     my %ProductPageData = (
+         #nextaction=>"PREGF_PU",
+        target => $self->{'Data'}->{'target'},
+        product_body => $product_body,
+        hidden_ref => {},
+        Lang => $self->{'Data'}->{'lang'},
+        client => $client,
+        NoFormFields => 1,
+    );
+    $content = runTemplate($self->{'Data'}, \%ProductPageData, 'registration/product_flow_backend.templ') || '';
+
+    my %PageData = (
+        HiddenFields => $self->stringifyCarryField(),
+        Target => $self->{'Data'}{'target'},
+        Errors => $self->{'RunDetails'}{'Errors'} || [],
+        Content => $content,
+        FlowSummary => '',
+        FlowSummaryTemplate => '',
+        Title => '',
+        TextTop => '',
+        TextBottom => '',
+    );
+    my $pagedata = $self->display(\%PageData);
+
+    return ($pagedata,0);
 }
 
 sub process_products { 
@@ -692,25 +721,27 @@ sub process_products {
     my $prodIds= join(':',@productsselected);
     $self->addCarryField('prodIds', $prodIds);
 
-    my $personID = $self->ID();
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
-    my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
     my $rego_ref = {};
-    if($regoID) {
-        my $valid =0;
-        ($valid, $rego_ref) = validateRegoID(
-            $self->{'Data'}, 
-            $personID, 
-            $regoID, 
-            $entityID
-        );
-        $regoID = 0 if !$valid;
-    }
 
-    my $txnIds = save_rego_products($self->{'Data'}, $regoID, $personID, $entityID, $entityLevel, $rego_ref, $self->{'RunParams'});
+    my $txnIds = undef;
+    my $CheckProducts = getRegistrationItems(
+        $self->{'Data'},
+        'ENTITY',
+        'PRODUCT',
+        $originLevel,
+        'NEW',
+        $entityID,
+        $entityLevel,
+        0,
+        $rego_ref,
+    );
+    my ($txns_added, $amount) = insertRegoTransaction($self->{'Data'}, 0, 0, $self->{'RunParams'}, $entityID, $entityLevel, 1, '', $CheckProducts);
+    $txnIds = join(':',@{$txns_added});
+
     $self->addCarryField('txnIds',$txnIds);
 
     return ('',1);
@@ -730,7 +761,6 @@ sub display_documents {
     my $venue_documents = '';
     my $content = '';
 
-    warn "DOCUMENT ORIGIN LEVEL $originLevel";
     if($facilityID) {
         $venue_documents = getRegistrationItems(
             $self->{'Data'},
@@ -761,7 +791,6 @@ sub display_documents {
         );
  
         $content = runTemplate($self->{'Data'}, \%documentData, 'entity/required_docs.templ') || '';  
-        #warn "REGISTERING FOR $entityRegisteringForLevel";
     }
     else    {
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
@@ -798,5 +827,56 @@ sub process_documents {
 }
 
 sub display_complete {
+    my $self = shift;
 
+    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
+    my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
+    my $client = $self->{'Data'}->{'client'};
+
+    my $facilityFields = new EntityFields();
+    $facilityFields->setEntityID($self->{'RunParams'}{'e'});
+    $facilityFields->setData($self->{'Data'});
+
+    my $content = '';
+    if(scalar@{$facilityFields->getAll()}) {
+
+        if($self->{'RunParams'}{'newvenue'})  {
+            my $rc = WorkFlow::addWorkFlowTasks(
+                $self->{'Data'},
+                'ENTITY',
+                'NEW',
+                $self->{'ClientValues'}{'authLevel'} || 0,
+                $facilityFields->getEntityID(),
+                0,
+                0,
+                0,
+            );
+        }
+
+        my $facilityID = $facilityFields->getEntityID();
+        $content = qq [<div class="OKmsg"> $self->{'Data'}->{'LevelNames'}{$Defs::LEVEL_VENUE} Added Successfully Venue ID = $facilityID AND entityID = $entityID </div><br> ];
+    }
+    else {
+        push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Facility ID");
+    }
+
+    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+        #There are errors - reset where we are to go back to the form again
+        $self->decrementCurrentProcessIndex();
+        return ('',2);
+    }
+
+    my %PageData = (
+        HiddenFields => $self->stringifyCarryField(),
+        Target => $self->{'Data'}{'target'},
+        Errors => $self->{'RunDetails'}{'Errors'} || [],
+        Content => '',
+        Title => '',
+        TextTop => $content,
+        TextBottom => '',
+    );
+    my $pagedata = $self->display(\%PageData);
+
+    return ($pagedata,0);
 }
