@@ -370,11 +370,22 @@ sub listPersonRecord {
     my @rowdata = ();
     my %groupResult;
     my @tData = ();
+    my $existsInRequestingClub = 0;
+
+    my %RegFilters=();
 
     while(my $tdref = $q->fetchrow_hashref()) {
+        $existsInRequestingClub = 0;
         #other club hits an still in-progress or pending request
         next if ($entityID != $tdref->{'intEntityID'} and $tdref->{'existPendingRequestID'} and ($tdref->{'personRegistrationStatus'} eq 'PENDING' or $tdref->{'personRegistrationStatus'} eq 'INPROGRESS'));
 
+        my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $tdref->{'intPersonID'}, \%RegFilters);
+        foreach my $reg_rego_ref (@{$Reg_ref}) {
+            next if $existsInRequestingClub;
+            $existsInRequestingClub = 1 if ($reg_rego_ref->{'intEntityID'} == $entityID);
+        }
+
+        next if ($existsInRequestingClub and ($requestType eq $Defs::PERSON_REQUEST_ACCESS));
         $found++;
         my $actionLink = undef;
         if($tdref->{'currEntityPendingRequestID'} and $tdref->{'currEntityPendingRegistrationID'}) {
