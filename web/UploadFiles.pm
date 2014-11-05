@@ -30,18 +30,29 @@ sub getUploadedFiles	{
 	$fileType,
 	$client,
 	$page,
-  ) = @_;
-
+    ) = @_;
+    
+    my %clientValues = getClient($client);
+	my $myCurrentValue = $clientValues{'authLevel'};
+	
 	my $st = qq[
-		SELECT 
-			*,
-			DATE_FORMAT(dtUploaded,"%d/%m/%Y %H:%i") AS DateAdded_FMT
-		FROM tblUploadedFiles AS UF
-		WHERE
-			intEntityTypeID = ?
-			AND intEntityID = ?
-			AND intFileType = ?
+	SELECT *,DATE_FORMAT(dtUploaded,"%d/%m/%Y %H:%i") AS DateAdded_FMT, tblDocuments.intDocumentTypeID,tblDocumentType.strLockAtLevel
+    FROM  tblUploadedFiles AS UF LEFT JOIN tblDocuments ON UF.intFileID = tblDocuments.intUploadFileID 
+    LEFT JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID  WHERE UF.intEntityTypeID = ? AND
+    UF.intEntityID = ? AND UF.intFileType = ?
 	];
+	
+	
+	#my $st = qq[
+	#	SELECT 
+	#		*,
+	#		DATE_FORMAT(dtUploaded,"%d/%m/%Y %H:%i") AS DateAdded_FMT
+	#	FROM tblUploadedFiles AS UF
+	#	WHERE
+	#		intEntityTypeID = ?
+	#		AND intEntityID = ?
+	#		AND intFileType = ?
+	#];
 	my $q = $Data->{'db'}->prepare($st);
 	#print $st;
 	$q->execute(
@@ -49,12 +60,35 @@ sub getUploadedFiles	{
 		$entityID,
 		$fileType,
 	);
+	my $url;
+	my $deleteURL;
+	my $deleteURLButton;
+	my $urlViewButton;
+	print STDERR "My Level at this point is " . $myCurrentValue;
 	my @rows = ();
 	while(my $dref = $q->fetchrow_hashref())	{
-		my $url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}";
-		my $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
-		my $deleteURLButton = qq[ <span class="button-small generic-button"><a href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a></span>];
-		my $urlViewButton = qq[ <span class="button-small generic-button"><a href="$url">]. $Data->{'lang'}->txt('View'). q[</a></span>];
+		#check if strLockLevel is empty which means world access to the file
+    	if($dref->{'strLockAtLevel'} eq ''){
+    		$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}";
+		    $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
+	      	$deleteURLButton = qq[ <span class="button-small generic-button"><a href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a></span>];
+	    	$urlViewButton = qq[ <span class="button-small generic-button"><a href="$url">]. $Data->{'lang'}->txt('View'). q[</a></span>];
+    	}
+    	else {
+    		my @authorizedLevelsArr = split(/\|/,$dref->{'strLockAtLevel'});
+    		
+    	    if(grep(/^$myCurrentValue/,@authorizedLevelsArr)){
+               	$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}";
+		        $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
+	         	$deleteURLButton = qq[ <span class="button-small generic-button"><a href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a></span>];
+	    	    $urlViewButton = qq[ <span class="button-small generic-button"><a href="$url">]. $Data->{'lang'}->txt('View'). q[</a></span>];
+            }
+            else{
+            	$deleteURLButton = qq[ <button class\"HTdisabled\">]. $Data->{'lang'}->txt('Delete'). q[</button>]; 
+            	$urlViewButton = qq[ <button class\"HTdisabled\">].$Data->{'lang'}->txt('View'). q[</button>];          	
+            }
+    	}
+		
 		push @rows, {
 			id => $dref->{'intFileID'} || 0,
 			SelectLink => ' ',
@@ -418,7 +452,7 @@ sub allowFileAccess {
 		return 1; #Not protected
 	}
 	#Permission options
-		#1 = Available to Everyone
+	#1 = Available to Everyone
     #2 = Available to only the person adding it
     #3 = Available to all bodies at add level and above to which the entity is lnked
 	return 1 if $permission == 1;

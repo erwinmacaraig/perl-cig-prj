@@ -21,6 +21,7 @@ use AuditLog;
 use UploadFiles;
 use FormHelpers;
 use GridDisplay;
+use Data::Dumper;
 
 sub handle_documents {
 	my($action, $Data, $memberID, $DocumentTypeID,$RegistrationID)=@_;
@@ -160,16 +161,6 @@ sub list_docs {
     #  </tr>
     #];
 	#}
-
-
-
-
-
-
-
-
-
-
 	#if(!$body)	{
 	#	$body .= $Data->{'lang'}->txt('There are no documents');
 	#}
@@ -248,21 +239,25 @@ sub process_doc_upload	{
 	)=@_;
     
 	my @files_to_process = ();
-
-		my $name = param('file') || '';
-		my $filefield = 'file' ;
-		my $permission = param('docperms') || 1;
+    my %clientValues = getClient($client);
+	my $myCurrentValue = $clientValues{'authLevel'};
+	
+	my $name = param('file') || '';
+	my $filefield = 'file' ;
+	my $permission = param('docperms') || 1;
                               
-                my $docTypeID = param('DocumentTypeID') || 0; 
-                my $regoID = param('RegistrationID') || 0; 
-                my $fileID = param('fileId') || 0;
-                my $other_info = {
-                	docTypeID => $docTypeID,
-                    regoID    => $regoID,    
-                    replaceFileID => $fileID,    
-               };
-		push @files_to_process, [$name, $filefield, $permission];
-                	
+    my $docTypeID = param('DocumentTypeID') || 0; 
+    my $regoID = param('RegistrationID') || 0; 
+    my $fileID = param('fileId') || 0;
+   
+    my $other_info = {
+        docTypeID => $docTypeID,
+        regoID    => $regoID,    
+        replaceFileID => $fileID,    
+    };
+   
+	push @files_to_process, [$name, $filefield, $permission];
+    print FH "\nContents of array files_to_process is " . Dumper($other_info) . "\n\n";             	
 	my $retvalue = processUploadFile(
 		$Data, 
 		\@files_to_process,
