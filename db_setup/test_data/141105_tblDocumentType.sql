@@ -1,0 +1,10 @@
+UPDATE tblDocumentType SET strDocumentName = 'Legal Entity Proof (Official Document of Registration)' WHERE strDocumentName = 'Sample Document';
+INSERT INTO tblDocumentType VALUES(0, 1, 'Form', NOW(), 1, 'CLUB');
+INSERT INTO tblDocumentType VALUES(0, 1, 'Signed Code of Conduct', NOW(), 1, 'CLUB');
+INSERT INTO tblDocumentType VALUES(0, 1, 'Logo', NOW(), 1, 'CLUB');
+INSERT INTO tblDocumentType VALUES(0, 1, 'List of Officials with Signatures', NOW(), 1, 'CLUB');
+INSERT INTO tblDocumentType VALUES(0, 1, 'Bylaws (constitution)', NOW(), 1, 'CLUB');
+INSERT INTO tblDocumentType VALUES(0, 1, 'Minutes / Financial Reports', NOW(), 1, 'CLUB');
+INSERT INTO tblDocumentType VALUES(0, 1, 'Letter of request', NOW(), 1, 'CLUB');
+INSERT INTO tblDocumentType VALUES(0, 1, 'Member Type', NOW(), 1, 'CLUB');
+INSERT INTO tblDocumentType VALUES(0, 1, 'Board Approvals', NOW(), 1, 'CLUB');
