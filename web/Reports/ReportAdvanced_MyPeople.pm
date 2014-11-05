@@ -2,12 +2,14 @@
 # $Header: svn://svn/SWM/trunk/web/Reports/ReportAdvanced_Member.pm 11613 2014-05-20 03:02:24Z cgao $
 #
 
-package Reports::ReportAdvanced_Member;
+package Reports::ReportAdvanced_MyPeople;
 
 use strict;
-use lib ".";
+use lib ".", "../..";
 use ReportAdvanced_Common;
 use Reports::ReportAdvanced;
+use Reg_common;
+
 use Log;
 use Data::Dumper;
 our @ISA = qw(Reports::ReportAdvanced);
@@ -111,7 +113,7 @@ sub _getConfiguration {
                     optiongroup   => 'details'
                 }
             ],
-            strFirstname => [
+            strLocalFirstname => [
                 'First Name',
                 {
                     displaytype => 'text',
@@ -122,7 +124,7 @@ sub _getConfiguration {
                 }
             ],
 
-            strSurname => [
+            strLocalSurname => [
                 'Family Name',
                 {
                     displaytype   => 'text',
@@ -1426,8 +1428,8 @@ sub _getConfiguration {
               MemberID
               strMemberNo
               intRecStatus
-              strFirstname
-              strSurname
+              strLocalFirstname
+              strLocalSurname
               strPreferredName
               dtDOB
               dtYOB
@@ -1671,10 +1673,6 @@ sub SQLBuilder {
 
     my $entityID = getLastEntityID($Data->{'clientValues'});
 
-    my $clubID = ( $Data->{'clientValues'}{'clubID'} and $Data->{'clientValues'}{'clubID'} != $Defs::INVALID_ID ) ? $Data->{'clientValues'}{'clubID'}
-               :                0
-               ;
-
     if ( $where_list and ( $where_levels or $current_where ) ) {
         $where_list = ' AND ' . $where_list;
     }
@@ -1686,12 +1684,6 @@ sub SQLBuilder {
         $products_join = qq[ LEFT JOIN tblProducts as P ON (P.intProductID=TX.intProductID)];
     }
 
-    my $prJOIN = qq[
-        INNER JOIN $PRtablename ON (
-            $PRtablename.intPersonID = tblPerson.intPersonID 
-            AND $PRtablename.intEntityID = $entityID
-        )];
-
     $sql = qq[
         SELECT ###SELECT###
         FROM
@@ -1699,13 +1691,16 @@ sub SQLBuilder {
             $current_from
             $from_list
             $products_join
-            $prJOIN
-            LEFT JOIN tblUploadedFiles ON tblPerson.intPersonID = tblUploadedFiles.intEntityID AND tblUploadedFiles.intEntityTypeID=1
+            INNER JOIN $PRtablename ON (
+                $PRtablename.intPersonID = tblPerson.intPersonID 
+            )
         WHERE
+            PR.intEntityID = $entityID
             $where_levels
             $current_where
             $where_list
     ];
+print STDERR $sql;
 
     return ( $sql, '' );
 }

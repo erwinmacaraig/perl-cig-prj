@@ -113,16 +113,11 @@ sub getLevelQueryStuff	{
 	}
 
 	if ($searchlevel > $Defs::LEVEL_MEMBER and $searchentity == $Defs::LEVEL_MEMBER) { #Assoc Level and above
+        my $PRtablename = "tblPersonRegistration_$Data->{'Realm'}";
 		$from_levels.=' INNER JOIN ' if $from_levels;
 		$where_levels.=' AND ' if $where_levels;
-		my $team_JOIN=  ($clientValues_ref->{teamID} and  $clientValues_ref->{teamID} != $Defs::INVALID_ID ) ? 'INNER' : 'LEFT';
-		if($notmemberteam)	{ $from_levels.=qq[ tblMember INNER JOIN tblMember_Associations ON (tblMember.intMemberID=tblMember_Associations.intMemberID AND tblMember_Associations.intRecStatus<> $Defs::RECSTATUS_DELETED) ] }
-		else	{
-			$from_levels.=qq[ tblMember INNER JOIN tblMember_Associations ON (tblMember.intMemberID=tblMember_Associations.intMemberID AND tblMember_Associations.intRecStatus <> $Defs::RECSTATUS_DELETED) $team_JOIN JOIN tblMember_Teams ON tblMember.intMemberID=tblMember_Teams.intMemberID $team_JOIN JOIN tblTeam ON (tblTeam.intTeamID=tblMember_Teams.intTeamID AND tblTeam.intAssocID=tblMember_Associations.intAssocID AND tblMember_Teams.intStatus <> $Defs::RECSTATUS_DELETED) LEFT JOIN tblComp_Teams ON tblComp_Teams.intTeamID=tblTeam.intTeamID LEFT JOIN tblAssoc_Comp ON (tblAssoc_Comp.intCompID=tblComp_Teams.intCompID AND tblAssoc_Comp.intAssocID=tblMember_Associations.intAssocID AND tblMember_Teams.intCompID=tblAssoc_Comp.intCompID)];
-			$where_levels.=qq[  (tblMember_Teams.intCompID=tblAssoc_Comp.intCompID OR tblMember_Teams.intCompID =0 or tblMember_Teams.intCompID IS NULL OR tblAssoc_Comp.intCompID IS NULL)];
-       	 	$where_levels.=' AND ' if $where_levels;
-        	}
-        	$where_levels.=qq[ tblAssoc.intAssocID=tblMember_Associations.intAssocID AND tblMember.intStatus <> $Defs::RECSTATUS_DELETED];
+		$from_levels.=qq[ tblPerson INNER JOIN $PRtablename as PR ON (tblPerson.intPersonID=PR.intPersonID AND PR.strStatus <> "$Defs::PERSONREGO_STATUS_DELETED") ] ;
+#        $where_levels.=qq[ tblAssoc.intAssocID=tblMember_Associations.intAssocID AND tblMember.intStatus <> $Defs::RECSTATUS_DELETED];
 	}
 
 	$select_levels=','.$select_levels if $select_levels;
@@ -168,22 +163,22 @@ sub getLevelQueryStuff	{
 		$current_where=qq[NL_I.intParentNodeID=0 ];
 	}
 	elsif($current_level== $Defs::LEVEL_CLUB)	{
-		$current_where=qq[tblClub.intClubID = $clientValues_ref->{clubID} AND tblAssoc_Clubs.intAssocID=tblAssoc.intAssocID ];
-		$current_from=qq[ INNER JOIN tblAssoc INNER JOIN tblClub INNER JOIN tblAssoc_Clubs ON (tblAssoc_Clubs.intClubID=tblClub.intClubID)];
+		#$current_where=qq[tblClub.intClubID = $clientValues_ref->{clubID} AND tblAssoc_Clubs.intAssocID=tblAssoc.intAssocID ];
+		#$current_from=qq[ INNER JOIN tblAssoc INNER JOIN tblClub INNER JOIN tblAssoc_Clubs ON (tblAssoc_Clubs.intClubID=tblClub.intClubID)];
 		if($searchentity == $Defs::LEVEL_MEMBER) {
 
-      if ($otheroptions->{'ShowInactiveMembersInClubSearch'}) {
-			  $current_where.=qq[ AND tblMember_Clubs.intMemberID=tblMember.intMemberID AND tblMember_Clubs.intClubID=tblClub.intClubID AND tblMember_Clubs.intStatus<>$Defs::RECSTATUS_DELETED ];
-      }
-      else {
-			  $current_where.=qq[ AND tblMember_Clubs.intMemberID=tblMember.intMemberID AND tblMember_Clubs.intClubID=tblClub.intClubID AND tblMember_Clubs.intStatus=$Defs::RECSTATUS_ACTIVE ];
-      }
-			$current_from.=qq[ INNER JOIN tblMember_Clubs];
+#      if ($otheroptions->{'ShowInactiveMembersInClubSearch'}) {
+#			  $current_where.=qq[ AND tblMember_Clubs.intMemberID=tblMember.intMemberID AND tblMember_Clubs.intClubID=tblClub.intClubID AND tblMember_Clubs.intStatus<>$Defs::RECSTATUS_DELETED ];
+#      }
+#      else {
+#			  $current_where.=qq[ AND tblMember_Clubs.intMemberID=tblMember.intMemberID AND tblMember_Clubs.intClubID=tblClub.intClubID AND tblMember_Clubs.intStatus=$Defs::RECSTATUS_ACTIVE ];
+#      }
+#			$current_from.=qq[ INNER JOIN tblMember_Clubs];
 		}
 	}
 	elsif($current_level== $Defs::LEVEL_MEMBER)	{
-		$current_from=qq[tblMember];
-		$current_where=qq[tblMember.intMemberID= $clientValues_ref->{memberID} ];
+		$current_from=qq[tblPerson];
+		$current_where=qq[tblPerson.intPersonID= $clientValues_ref->{personID} ];
 	}
 	if($clientValues_ref->{assocID} and $clientValues_ref->{assocID} !=$Defs::INVALID_ID  and $from_levels=~/tblMember/) {
 		$where_levels="AND $where_levels" if $where_levels;
