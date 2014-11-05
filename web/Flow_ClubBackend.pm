@@ -55,6 +55,7 @@ sub setProcessOrder {
         {
             'action' => 'role',
             'function' => 'display_role_details',
+            'label'  => 'Organisation Details',
             'fieldset' => 'roledetails',
         },
         {
