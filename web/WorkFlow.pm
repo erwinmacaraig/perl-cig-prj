@@ -632,7 +632,6 @@ sub addWorkFlowTasks {
 			AND e.intSubRealmID = r.intSubRealmID
             AND r.strPersonType = ''
 			AND r.intEntityLevel = e.intEntityLevel
-            AND e.strEntityType = r.strEntityType
         )
 		WHERE e.intEntityID= ?
             AND r.strWFRuleFor = 'ENTITY'
@@ -641,6 +640,7 @@ sub addWorkFlowTasks {
             AND r.intOriginLevel = ?
 			AND r.strRegistrationNature = ?
 		];
+        #AND e.strEntityType = r.strEntityType
 	    $q = $db->prepare($st);
   	    $q->execute($entityID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
     }
