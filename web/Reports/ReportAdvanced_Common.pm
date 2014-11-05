@@ -228,33 +228,25 @@ sub getCommonValues {
 				];
 			}
 
-			my $levelWHERE = qq[AND (P.intAssocID = $aID OR P.intAssocID = 0) ];
+			my $levelWHERE = '';
 			my $currentLevel = $Data->{'clientValues'}{'currentLevel'};
 			my $productName = qq[ P.strName as ProductName,];
-			if ($currentLevel > $Defs::LEVEL_ASSOC)	{
-				$levelWHERE = qq[ AND (P.intAssocID=0 OR ];
+			if ($currentLevel > $Defs::LEVEL_CLUB)	{
 				$levelWHERE .= qq[TNS.int100_ID > 0 ] if ($currentLevel > 100);
 				$levelWHERE .= qq[TNS.int100_ID = $Data->{'clientValues'}{'natID'}] if ($currentLevel == 100);
 				$levelWHERE .= qq[TNS.int30_ID = $Data->{'clientValues'}{'stateID'}] if ($currentLevel == 30);
 				$levelWHERE .= qq[TNS.int20_ID = $Data->{'clientValues'}{'regionID'}] if ($currentLevel == 20);
 				$levelWHERE .= qq[TNS.int10_ID = $Data->{'clientValues'}{'zoneID'}] if ($currentLevel == 10);
 				$levelWHERE .= qq[ )];
-				#$productName = qq[ CONCAT('(', A.strName, ')- ', P.strName) as ProductName,];
-				$productName = qq[IF(A.intAssocID, CONCAT('(', A.strName, ')- ', P.strName), P.strName) as ProductName,];
 			}
 			my $statement=qq[
 				SELECT DISTINCT
 					P.intProductID,
+                    P.strName as ProductName,
 					$productName
 					strGroup, 
 					intInactive
 				FROM tblProducts as P 
-					LEFT JOIN tblTempNodeStructure as TNS ON (
-						TNS.intAssocID=P.intAssocID
-					)
-					LEFT JOIN tblAssoc as A ON (
-						A.intAssocID=P.intAssocID
-					)
 				WHERE P.intRealmID=$Data->{'Realm'}
 					$levelWHERE
 					AND intProductSubRealmID IN (0, $Data->{'RealmSubType'})
