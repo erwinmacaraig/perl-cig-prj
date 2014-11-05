@@ -195,6 +195,17 @@ sub setupValues {
     }
     $sth->finish();
 
+    my %entityTypeOptions = ();
+    for my $eType ( keys %Defs::entityType ) {
+        next if !$eType;
+        next if $eType eq $Defs::EntityType_WORLD_FEDERATION;
+        next if $eType eq $Defs::EntityType_NATIONAL_ASSOCIATION;
+        next if $eType eq $Defs::EntityType_REGIONAL_ASSOCIATION;
+        $entityTypeOptions{$eType} = $Defs::entityType{$eType} || '';
+    }
+
+
+
     $self->{'FieldSets'} = {
         core => {
             'fields' => {
@@ -384,7 +395,7 @@ sub setupValues {
                     label       => $FieldLabels->{'strEntityType'},
                     value       => $values->{strEntityType} || '',
                     type        => 'lookup',
-                    options     => \%Defs::organisationType,
+                    options     => \%entityTypeOptions,
                     firstoption => [ '', 'Select Type of Organisation' ],
                     compulsory => 1,
                 },
