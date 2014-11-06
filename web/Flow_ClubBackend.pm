@@ -204,7 +204,16 @@ sub setupValues {
         $entityTypeOptions{$eType} = $Defs::entityType{$eType} || '';
     }
 
+    my %organisationLevel = (
+        PROFESSIONAL => 'Professional',
+        AMATEUR => 'Amateur',
+        BOTH => 'Both',
+    );
 
+    my %dissolvedOptions = (
+        0 => 'No',
+        1 => 'Yes',
+    );
 
     $self->{'FieldSets'} = {
         core => {
@@ -232,6 +241,12 @@ sub setupValues {
                     format      => 'dd/mm/yyyy',
                     validate    => 'DATE',
                     compulsory => 1,
+                },
+                dissolved => {
+                    label       => $FieldLabels->{'dissolved'},
+                    value       => $values->{'dissolved'},
+                    options     => \%dissolvedOptions,
+                    type        => 'lookup',
                 },
                 dtTo => {
                     label       => $FieldLabels->{'dtTo'},
@@ -296,6 +311,7 @@ sub setupValues {
                 strLocalName
                 strLocalShortName
                 dtFrom
+                dissolved
                 dtTo
                 strCity
                 strRegion
@@ -423,11 +439,11 @@ sub setupValues {
                     firstoption => [ '', 'Select Sport' ],
                     compulsory  => 1,
                 },
-                strLevel        => {
-                    label       => $FieldLabels->{'strLevel'},
-                    value       => $values->{'strLevel'},
+                strOrganisationLevel    => {
+                    label       => $FieldLabels->{'strOrganisationLevel'},
+                    value       => $values->{'strOrganisationLevel'},
                     type        => 'lookup',
-                    options     => \%Defs::personLevel,
+                    options     => \%organisationLevel,
                     firstoption => [ '', 'Select Level' ],
                     compulsory  => 1,
                 },
@@ -445,7 +461,7 @@ sub setupValues {
                 intLegalTypeID
                 strLegalID
                 strDiscipline
-                strLevel
+                strOrganisationLevel
                 strMANotes
             )],
         },
@@ -481,6 +497,7 @@ sub validate_core_details {
     my $clubData = {};
     ($clubData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields();
 
+
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
         $self->decrementCurrentProcessIndex();
@@ -493,11 +510,16 @@ sub validate_core_details {
     my $id = $self->ID() || 0;
     my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id);
     $clubObj->load();
-    $clubData->{'strStatus'} = $Defs::ENTITY_STATUS_PENDING;
+
+    my $clubStatus = ($clubData->{'dissolved'}) ? $Defs::ENTITY_STATUS_DE_REGISTERED : $Defs::ENTITY_STATUS_PENDING;
+    $clubData->{'strStatus'} = $clubStatus;
     $clubData->{'intRealmID'} = $self->{'Data'}{'Realm'};
     $clubData->{'intEntityLevel'} = $Defs::LEVEL_CLUB;
     $clubData->{'intCreatedByEntityID'} = $authID;
     $clubData->{'intDataAccess'} = $Defs::DATA_ACCESS_FULL;
+
+    #delete dissolved value as it doesn't exist in tblEntity
+    delete $clubData->{'dissolved'};
     $clubObj->setValues($clubData);
 
     $clubObj->write();
@@ -602,7 +624,7 @@ sub validate_role_details {
     my $clubData = {};
     ($clubData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields();
     my $id = $self->ID() || 0;
-    delete $clubData->{'strLevel'};
+    #delete $clubData->{'strLevel'};
     if(!$id){
         push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid club.';
     }
@@ -619,90 +641,6 @@ sub validate_role_details {
     $clubObj->write();
 
     return ('',1);
-}
-
-sub display_fields {
-    my $self = shift;
-
-    my $facilityFieldCount = $self->{'RunParams'}{'facilityFieldCount'} || 0;
-
-    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
-    my $facilityFields = new EntityFields();
-    $facilityFields->setCount($facilityFieldCount);
-    $facilityFields->setEntityID($self->{'RunParams'}{'e'});
-    $facilityFields->setData($self->{'Data'});
-    
-    my @facilityFieldsData = ();
-
-    for my $i (1 .. $facilityFieldCount){
-        $facilityFields->setDBData({});
-        push @facilityFieldsData, $facilityFields->generateSingleRowField($i);
-    }
-
-    my %FieldsGridData = (
-        FieldElements => \@facilityFieldsData,
-    );
-
-    my $facilityFieldsContent = runTemplate(
-        $self->{'Data'},
-        \%FieldsGridData,
-        'flow/facility_fields_grid.templ',
-    );
-
-    my %PageData = (
-        HiddenFields => $self->stringifyCarryField(),
-        Target => $self->{'Data'}{'target'},
-        Errors => $self->{'RunDetails'}{'Errors'} || [],
-        Content => $facilityFieldsContent || '',
-        ScriptContent => '',
-        Title => '',
-        TextTop => '',
-        TextBottom => '',
-    );
-
-    my $pagedata = $self->display(\%PageData);
-}
-
-sub process_fields {
-    my $self = shift;
-
-    #test validate
-    my $facilityFieldCount = $self->{'RunParams'}{'facilityFieldCount'} || 0;
-
-    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
-    my $facilityFields = new EntityFields();
-    $facilityFields->setCount($facilityFieldCount);
-    $facilityFields->setEntityID($self->{'RunParams'}{'e'});
-    $facilityFields->setData($self->{'Data'});
-
-    my $facilityFieldDataCluster;
-    ($facilityFieldDataCluster, $self->{'RunDetails'}{'Errors'}) = $facilityFields->retrieveFormFieldData($self->{'RunParams'});
- 
-    #my @testErrors;
-    #push @testErrors, "test error";
-    #$self->{'RunDetails'}{'Errors'} = \@testErrors;
-    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
-        #There are errors - reset where we are to go back to the form again
-        $self->decrementCurrentProcessIndex();
-        return ('',2);
-    }
-
-    my $addedFields = 0;
-
-    #check current tblEntityFields entry count for this specific process to avoid duplicates
-    if($facilityFieldCount != scalar@{$facilityFields->getAll()}){
-        foreach my $fieldObjData (@{$facilityFieldDataCluster}){
-            my $entityFieldObj = new EntityFieldObj(db => $self->{'db'}, ID => 0);
-            $entityFieldObj->load();
-            $entityFieldObj->setValues($fieldObjData);
-            $entityFieldObj->write();
-            $addedFields++;
-        }
-
-        $self->addCarryField('addedFields', $addedFields);
-    }
-
-    return ('', 1);
 }
 
 sub display_products { 
@@ -922,6 +860,8 @@ sub display_complete {
     my $content = '';
     if($clubObj->ID()) {
 
+        my $clubStatus = $clubObj->getValue('strStatus');
+
         if($self->{'RunParams'}{'newclub'})  {
             my $rc = WorkFlow::addWorkFlowTasks(
                 $self->{'Data'},
@@ -933,6 +873,14 @@ sub display_complete {
                 0,
                 0,
             );
+        }
+
+        if($clubStatus eq $Defs::ENTITY_STATUS_DE_REGISTERED) {
+            my $resetStatus = {};
+            $resetStatus->{'strStatus'} = $clubStatus;
+
+            $clubObj->setValues($resetStatus);
+            $clubObj->write();
         }
 
         my $clubID = $clubObj->ID();
