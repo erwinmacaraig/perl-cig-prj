@@ -49,9 +49,9 @@ sub fieldIDHtml {
     my $self = shift;
     my ($field, $prefixID) = @_;
 
-    $self->getValue($field);
+    my $existingValue = $self->getValue($field) || '';
     my $inputFieldName = $self->_inputFieldName($field, $prefixID);
-    my $fieldIDhtml = qq[<input type='hidden' name="$inputFieldName"/>];
+    my $fieldIDhtml = qq[<input type='hidden' name="$inputFieldName" value="$existingValue"/>];
     return $fieldIDhtml;
 }
 
@@ -59,9 +59,9 @@ sub fieldNameHtml {
     my $self = shift;
     my ($field, $prefixID) = @_;
 
-    $self->getValue($field);
+    my $existingValue = $self->getValue($field) || '';
     my $inputFieldName = $self->_inputFieldName($field, $prefixID);
-    my $fieldNamehtml = qq[<input type='text' name='$inputFieldName'/>];
+    my $fieldNamehtml = qq[<input type='text' name='$inputFieldName' value="$existingValue"/>];
     return $fieldNamehtml;
 }
 
@@ -75,7 +75,7 @@ sub disciplineHtml {
 
     my $selected = "";
     foreach my $discipline (keys %Defs::sportType) {
-        $selected = "selected" if ($self->getValue($field) eq $discipline);
+        $selected = ($self->getValue($field) eq $discipline) ? "selected" : '';
         $options .= qq[
             <option $selected value="$discipline">$Defs::sportType{$discipline}</option>
         ];
@@ -89,9 +89,9 @@ sub capacityHtml {
     my $self = shift;
     my ($field, $prefixID) = @_;
 
-    $self->getValue($field);
+    my $existingValue = $self->getValue($field) || '';
     my $inputFieldName = $self->_inputFieldName($field, $prefixID);
-    my $fieldCapacityhtml = qq[<input type='text' name='$inputFieldName'/>];
+    my $fieldCapacityhtml = qq[<input type='text' name='$inputFieldName' value="$existingValue"/>];
     return $fieldCapacityhtml;
 }
 
@@ -99,9 +99,9 @@ sub fieldOrderNumberHtml {
     my $self = shift;
     my ($field, $prefixID) = @_;
 
-    $self->getValue($field);
+    my $existingValue = $self->getValue($field) || '';
     my $inputFieldName = $self->_inputFieldName($field, $prefixID);
-    my $fieldOrderNumberhtml = qq[<input type='text' name='$inputFieldName'/>];
+    my $fieldOrderNumberhtml = qq[<input type='text' name='$inputFieldName' value="$existingValue"/>];
     return $fieldOrderNumberhtml;
 }
 
@@ -115,7 +115,7 @@ sub groundNatureHtml {
 
     my $selected = "";
     foreach my $groundNature (keys %Defs::fieldGroundNatureType) {
-        $selected = "selected" if ($self->getValue($field) eq $groundNature);
+        $selected = ($self->getValue($field) eq $groundNature) ? "selected" : "";
         $options .= qq[
             <option $selected value="$groundNature">$Defs::fieldGroundNatureType{$groundNature}</option>
         ];
@@ -129,9 +129,9 @@ sub lengthHtml {
     my $self = shift;
     my ($field, $prefixID) = @_;
 
-    $self->getValue($field);
+    my $existingValue = $self->getValue($field) || '';
     my $inputFieldName = $self->_inputFieldName($field, $prefixID);
-    my $fieldLengthhtml = qq[<input type='text' name='$inputFieldName'/>];
+    my $fieldLengthhtml = qq[<input type='text' name='$inputFieldName' value="$existingValue"/>];
     return $fieldLengthhtml;
 }
 
@@ -139,9 +139,9 @@ sub widthHtml {
     my $self = shift;
     my ($field, $prefixID) = @_;
 
-    $self->getValue($field);
+    my $existingValue = $self->getValue($field) || '';
     my $inputFieldName = $self->_inputFieldName($field, $prefixID);
-    my $fieldWidthhtml = qq[<input type='text' name='$inputFieldName'/>];
+    my $fieldWidthhtml = qq[<input type='text' name='$inputFieldName' value="$existingValue"/>];
     return $fieldWidthhtml;
 }
 
