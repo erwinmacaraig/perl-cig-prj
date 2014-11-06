@@ -116,7 +116,8 @@ sub getLevelQueryStuff	{
         my $PRtablename = "tblPersonRegistration_$Data->{'Realm'}";
 		$from_levels.=' INNER JOIN ' if $from_levels;
 		$where_levels.=' AND ' if $where_levels;
-		$from_levels.=qq[ tblPerson INNER JOIN $PRtablename as PR ON (tblPerson.intPersonID=PR.intPersonID AND PR.strStatus <> "$Defs::PERSONREGO_STATUS_DELETED") ] ;
+		$from_levels.=qq[ tblPerson INNER JOIN $PRtablename as PR ON (tblPerson.intPersonID=PR.intPersonID AND PR.strStatus NOT IN ("$Defs::PERSONREGO_STATUS_INPROGRESS", "$Defs::PERSONREGO_STATUS_REJECTED", "$Defs::PERSONREGO_STATUS_DELETED")) INNER JOIN tblEntity as E ON (E.intEntityID = PR.intEntityID) ] ;
+        $where_levels.=qq[ tblPerson.strStatus NOT IN ("$Defs::PERSON_STATUS_INPROGRESS", "$Defs::PERSON_STATUS_DELETED") ];
 #        $where_levels.=qq[ tblAssoc.intAssocID=tblMember_Associations.intAssocID AND tblMember.intStatus <> $Defs::RECSTATUS_DELETED];
 	}
 

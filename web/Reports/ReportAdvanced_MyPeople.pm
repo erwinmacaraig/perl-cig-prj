@@ -222,6 +222,42 @@ sub _getConfiguration {
                 }
             ],
 
+            PRstrPersonType=> [
+                'Registration Role',
+                {
+                    dbfield         => 'PR.strPersonType',
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => \%Defs::personType,
+                    optiongroup     => 'regos',
+                    allowgrouping   => 1
+                }
+            ],
+            PRstrPersonType=> [
+                'Registration Role',
+                {
+                    dbfield         => 'PR.strPersonType',
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => \%Defs::personType,
+                    optiongroup     => 'regos',
+                    allowgrouping   => 1
+                }
+            ],
+
+
+           PRstrLocalName=> [
+                'Entity Name',
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    dbfield     => 'E.strLocalName',
+                    optiongroup => 'regos'
+                }
+            ],
+
+
+
            strAddress1 => [
                 'Address 1',
                 {
@@ -1069,31 +1105,6 @@ sub _getConfiguration {
 " AND (AC.intAssocID = tblAssoc.intAssocID OR tblPerson_Clubs.intPersonID IS NULL) AND (($PRtablename.intEntityID=C.intClubID AND $PRtablename.intEntityTypeID= $Defs::LEVEL_CLUB) or tblPerson_Clubs.intPersonID IS NULL)",
                 }
               ],
-              MCStatus => [
-                (
-                    (
-                             !$SystemConfig->{'NoClubs'}
-                          and $currentLevel <= $Defs::LEVEL_ASSOC
-                    )
-                    ? ( 'Active in '
-                          . $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} )
-                    : ''
-                ),
-                {
-                    dbfrom =>
-"LEFT JOIN tblPerson_Clubs MC ON (tblPerson.intPersonID=MC.intPersonID)  LEFT JOIN tblClub as C ON (C.intClubID=MC.intClubID ) LEFT JOIN tblAssoc_Clubs as AC ON (AC.intAssocID=tblAssoc.intAssocID AND AC.intClubID=C.intClubID)",
-                    displaytype     => 'lookup',
-                    fieldtype       => 'dropdown',
-                    dropdownoptions => { 0 => 'No', 1 => 'Yes' },
-                    dropdownorder => [ 0, 1 ],
-                    allowsort     => 1,
-                    dbfield       => "MC.intStatus",
-                    optiongroup   => 'affiliations',
-                    allowgrouping => 1
-                }
-              ],
-
-
               strZoneName => [
                 (
                       $currentLevel > $Defs::LEVEL_ZONE
@@ -1440,6 +1451,10 @@ sub _getConfiguration {
               intGender
               intDeceased
               intEthnicityID
+
+                PRstrPersonType 
+                PRstrLocalName
+
               strAddress1
               strAddress2
               strSuburb
@@ -1528,7 +1543,6 @@ sub _getConfiguration {
               strClubName
               strClubNumber
               intClubCategoryID
-              MCStatus
               strZoneName
               strRegionName
               strStateName
@@ -1597,6 +1611,8 @@ sub _getConfiguration {
           },
           OptionGroups => {
             details         => [ 'Personal Details', { active => 1 } ],
+            regos=> [ 'Registrations',  {} ],
+            contactdetails  => [ 'Contact Details',  {} ],
             contactdetails  => [ 'Contact Details',  {} ],
             security        => [ 'Security',         {} ],
             identifications => [ 'Identifications',  {} ],
@@ -1673,9 +1689,9 @@ sub SQLBuilder {
 
     my $entityID = getLastEntityID($Data->{'clientValues'});
 
-    if ( $where_list and ( $where_levels or $current_where ) ) {
+    #if ( $where_list and ( $where_levels or $current_where ) ) {
         $where_list = ' AND ' . $where_list;
-    }
+    #}
     $where_list =~ s/\sAND\s*$//g;
     $where_list =~ s/AND  AND/AND /;
 
@@ -1695,10 +1711,10 @@ sub SQLBuilder {
                 $PRtablename.intPersonID = tblPerson.intPersonID 
             )
         WHERE
-            PR.intEntityID = $entityID
             $where_levels
             $current_where
             $where_list
+            AND PR.intEntityID = $entityID
     ];
 print STDERR $sql;
 
