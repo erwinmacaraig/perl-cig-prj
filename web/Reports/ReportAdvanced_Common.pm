@@ -71,80 +71,6 @@ sub getCommonValues {
 		$optvalues{'SubRealms'} = \%AssocTypes;
 	}
 
-  if ($options->{'Assocs'}) {
-    my %Assocs = ();
-    my $statement = qq[
-      SELECT intAssocID, strName
-      FROM tblAssoc
-      WHERE intRealmID = ? AND intRecStatus != -1
-    ];
-    my $query = $db->prepare($statement);
-    $query->execute($Data->{'Realm'});
-    while (my $dref = $query->fetchrow_hashref() ) {
-      $Assocs{$dref->{'intAssocID'}} = $dref->{strName};
-    }
-    $optvalues{'Assocs'} = \%Assocs;
-  }
-
-	if ($options->{'RegoForms'}) {
-		my $aID=getAssocID($clientValues_ref) || 0;
-        my $currLevel = $clientValues_ref->{'currentLevel'} || 0;
-        my $clubID = $clientValues_ref->{'clubID'} || 0;
-        
-        my ($entityTypeID, $entityID) = getEntityValues($Data->{'clientValues'});
-        my $nodeIds = '0';
-        my $entityStructure = getEntityStructure($Data, $db, $entityTypeID, $entityID, $Defs::LEVEL_NATIONAL);
-        foreach my $entityArr (@$entityStructure) {
-            next if @$entityArr[0] <= $Defs::LEVEL_ASSOC;
-            $nodeIds .= ',' if $nodeIds;
-            $nodeIds .= @$entityArr[1];
-        }
-		$aID=0 if $aID==-1;
-		my %RegoForms = ();
-		my @RegoFormsOrder = ();
-        #National Forms
-        my $statement = qq[
-        SELECT
-            RF.intRegoFormID,RF.strRegoFormName
-        FROM
-            tblRegoForm RF
-        WHERE
-            (RF.intAssocID IN (0, $aID) OR (RF.intAssocID=-1 AND RF.intCreatedLevel>$Defs::LEVEL_ASSOC AND $currLevel<=RF.intCreatedLevel AND RF.intCreatedID IN (0, $nodeIds)))
-            AND RF.intRealmID = $Data->{'Realm'}
-        ];
-        #forms created by nodes will have a clubID of -1. clubs can only see member-to-club forms created by nodes.
-        if ($clubID) {
-            $statement .= qq[
-                AND (RF.intClubID = $clubID OR (RF.intClubID=-1 AND RF.intCreatedLevel>$Defs::LEVEL_ASSOC AND RF.intRegoType=$Defs::REGOFORM_TYPE_MEMBER_CLUB AND RF.intCreatedID IN (0,$nodeIds)))
-            ];
-        }
-        else {
-            $statement .= " AND RF.intClubID = -1";
-        }
-        #not National Forms
-        my $sql = qq[SELECT intRegoFormID, strRegoformName FROM tblRegoForm WHERE intAssocID IN (0, $aID) AND intRealmID = $Data->{'Realm'} ];
-
-        if ($clubID and $clubID != -1) {
-            $sql .= " AND intClubID = $clubID ";
-        }
-        else {
-            $sql .= " AND intClubID = -1";
-        }
-
-        $statement = qq[$statement UNION $sql];
-		my $query = $db->prepare($statement);
-		$query->execute();
-		while (my $dref = $query->fetchrow_hashref() ) {
-			$RegoForms{$dref->{'intRegoFormID'}}=$dref->{strRegoFormName};
-			push @RegoFormsOrder, $dref->{intRegoFormID};
-		}
-		my %RegoFormData = (
-			Options => \%RegoForms,
-			Order => \@RegoFormsOrder,
-		);
-		$optvalues{'RegoForms'} = \%RegoFormData;
-	}
-
 	if($options->{'Seasons'})	{
 		my $AssocSeasons=Seasons::getDefaultAssocSeasons($Data);
 		my $hideSeasons=0;
@@ -239,6 +165,7 @@ sub getCommonValues {
 				$levelWHERE .= qq[TNS.int10_ID = $Data->{'clientValues'}{'zoneID'}] if ($currentLevel == 10);
 				$levelWHERE .= qq[ )];
 			}
+$levelWHERE = '';
 			my $statement=qq[
 				SELECT DISTINCT
 					P.intProductID,
@@ -269,83 +196,14 @@ sub getCommonValues {
 	}
 
 	if($options->{'Countries'})	{
-  	my @countries=getCountriesArray($Data);
+  	my @countries=getISOCountriesArray($Data);
   	my %countriesonly=();
   	for my $c (@countries)  { $countriesonly{$c}=$c;  }
 		$optvalues{'Countries'} = \%countriesonly;
 	}
 
-	if($options->{'ContactRoles'})	{
-		my %ContactRoles=();
-		my @ContactRolesOrder=();
-		{
-			my $statement = qq[
-				SELECT intRoleID, strRoleName
-				FROM tblContactRoles
-				WHERE intRealmID IN ($Data->{'Realm'},0)
-				ORDER BY intRoleOrder ASC
-			];
-			my $query = $Data->{'db'}->prepare($statement);
-			$query->execute;
-			while (my($id, $strName) = $query->fetchrow_array) {
-				$ContactRoles{$id}=$strName || '';
-				push @ContactRolesOrder, $id;
-			}
-		}
-		$optvalues{'ContactRoles'} = {
-			Order => \@ContactRolesOrder,
-			Values => \%ContactRoles,
-		};
-	}
-
-
 	if($options->{'FieldLabels'})	{
 		$optvalues{'FieldLabels'} = getFieldLabels($Data, $Defs::LEVEL_PERSON);
-	}
-
-	if($options->{'ClubCharacteristics'})	{
-		my %cchar_values = ();
-		my @cchar_order = ();
-		my $cchars = getAvailableCharacteristics($Data);
-
-		for my $c (@{$cchars})	{
-			my $id  = $c->{'intCharacteristicID'} || next;
-			$cchar_values{$id} = $c->{'strName'} || next;
-			push @cchar_order, $id;
-		}
-		$optvalues{'ClubCharacteristics'} = {
-			Order => \@cchar_order,
-			Values => \%cchar_values,
-		};
-	}
-	if($options->{'EntityCategories'})	{
-		my $aID=getAssocID($clientValues_ref) || 0;
-		my %EntityCategories=();
-
-		$aID=0 if $aID==-1;
-		my $subRealmWHERE = '';
-		my $currentLevel = $Data->{'clientValues'}{'currentLevel'};
-		if ($currentLevel > $Defs::LEVEL_ASSOC)	{
-			$subRealmWHERE = '';
-		}
-		my $statement=qq[
-			SELECT 
-				intEntityCategoryID,
-				strCategoryName,
-				intEntityType
-			FROM 
-				tblEntityCategories
-     	WHERE 
-				intRealmID=$Data->{'Realm'}
-        AND (intAssocID = $aID OR intAssocID = 0)
-				$subRealmWHERE
-		];
-		my $query = $db->prepare($statement) or query_error($statement);
-		$query->execute or query_error($statement);
-		while (my $dref = $query->fetchrow_hashref() ) {
-			$EntityCategories{$dref->{'intEntityType'}}{$dref->{'intEntityCategoryID'}}=$dref->{strCategoryName};
-		}
-		$optvalues{'EntityCategories'} = \%EntityCategories;
 	}
 
 	return \%optvalues;

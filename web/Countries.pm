@@ -6,8 +6,8 @@ package Countries;
 use Data::Dumper;
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(getISOCountriesHash getCountriesHash getCountriesArray getOceaniaCountriesHash getOceaniaCountriesArray);
-@EXPORT_OK = qw(getISOCountriesHash getCountriesHash getCountriesArray getCountriesNameToData getOceaniaCountriesHash getOceaniaCountriesArray);
+@EXPORT = qw(getISOCountriesHash getCountriesHash getCountriesArray getISOCountriesArray getOceaniaCountriesHash getOceaniaCountriesArray);
+@EXPORT_OK = qw(getISOCountriesHash getCountriesHash getCountriesArray getISOCountriesArray getCountriesNameToData getOceaniaCountriesHash getOceaniaCountriesArray);
 
     my $noCountryDisclosedID = 300;
 	my %countries	=	(
@@ -310,7 +310,19 @@ sub getCountriesNameToData {
 	return \%cnames;
 }
 
-
+sub getISOCountriesArray	{
+    my ($Data) =@_;
+	my @countries=();
+    my $force_select_country = 0;
+    if(defined $Data and $Data->{'SystemConfig'}{'AllowNoCountrySelection'}) {
+        $force_select_country = 1;
+    }
+	for my $key (sort { $countries{$a}[1] cmp $countries{$b}[1]} keys %countries)	{
+        #if system config is set for AllowNoCountrySelection then we need to display option " Do not wish to enclose"
+		push @countries, $countries{$key}[1] unless(!$force_select_country and $key == $noCountryDisclosedID );
+	}
+	return @countries;
+}
 sub getCountriesArray	{
     my ($Data) =@_;
 	my @countries=();

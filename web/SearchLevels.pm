@@ -112,11 +112,14 @@ sub getLevelQueryStuff	{
 		$where_levels.=qq[ tblAssoc.intAssocID=tblAssoc_Clubs.intAssocID AND tblClub.intRecStatus <> $Defs::RECSTATUS_DELETED];
 	}
 
+$from_levels = '';
+$select_levels= '';
+$where_levels= '';
 	if ($searchlevel > $Defs::LEVEL_MEMBER and $searchentity == $Defs::LEVEL_MEMBER) { #Assoc Level and above
         my $PRtablename = "tblPersonRegistration_$Data->{'Realm'}";
 		$from_levels.=' INNER JOIN ' if $from_levels;
 		$where_levels.=' AND ' if $where_levels;
-		$from_levels.=qq[ tblPerson INNER JOIN $PRtablename as PR ON (tblPerson.intPersonID=PR.intPersonID AND PR.strStatus NOT IN ("$Defs::PERSONREGO_STATUS_INPROGRESS", "$Defs::PERSONREGO_STATUS_REJECTED", "$Defs::PERSONREGO_STATUS_DELETED")) INNER JOIN tblEntity as E ON (E.intEntityID = PR.intEntityID) ] ;
+		$from_levels.=qq[ tblPerson INNER JOIN $PRtablename as PR ON (tblPerson.intPersonID=PR.intPersonID AND PR.strStatus NOT IN ("$Defs::PERSONREGO_STATUS_INPROGRESS", "$Defs::PERSONREGO_STATUS_REJECTED", "$Defs::PERSONREGO_STATUS_DELETED")) INNER JOIN tblEntity as E ON (E.intEntityID = PR.intEntityID) LEFT JOIN tblEntityTypeRoles as ETR ON (ETR.strEntityRoleKey = PR.strPersonEntityRole) ] ;
         $where_levels.=qq[ tblPerson.strStatus NOT IN ("$Defs::PERSON_STATUS_INPROGRESS", "$Defs::PERSON_STATUS_DELETED") ];
 #        $where_levels.=qq[ tblAssoc.intAssocID=tblMember_Associations.intAssocID AND tblMember.intStatus <> $Defs::RECSTATUS_DELETED];
 	}

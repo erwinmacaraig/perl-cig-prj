@@ -2,7 +2,7 @@
 # $Header: svn://svn/SWM/trunk/web/Reports/ReportAdvanced_Member.pm 11613 2014-05-20 03:02:24Z cgao $
 #
 
-package Reports::ReportAdvanced_MyPeople;
+package Reports::ReportAdvanced_BelowPeople;
 
 use strict;
 use lib ".", "../..";
@@ -1886,12 +1886,13 @@ sub SQLBuilder {
             $current_from
             $from_list
             $products_join
+            LEFT JOIN tblTempEntityStructure as TempEnt ON (TempEnt.intChildID=PR.intEntityID)
         WHERE
             $where_list
-            AND PR.intEntityID = $entityID
+            AND TempEnt.intParentID = $entityID
     ];
-            #$where_levels
             #$current_where
+            #$where_levels
 print STDERR $sql;
 
     return ( $sql, '' );
