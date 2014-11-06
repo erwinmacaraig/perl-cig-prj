@@ -1,30 +1,46 @@
-[% USE Dumper %]
+[% IF Errors.size %]
+<div class = "warningmsg">
+	<ul>
+	[% FOREACH error IN Errors %]
+		<li>[% error %]</li>
+	[% END %]
+	</ul>
+</div>
+[% END %]
+[% IF Success.size %]
+<div class="OKmsg"
+    <span>Successfully updated.</span>
+</div>
+[% END %]
 
 <form action="main.cgi" method="POST">
-<table style="width: 100%">
-    <tbody>
+[% USE Dumper %]
+    <table cellpadding="5" style="width: 100%">
         <tr>
-            <th>Field#</th>
-            <th>Name</th>
+            <th></th>
+            <th>Field Order Number</th>
+            <th>Field Name</th>
             <th>Discipline</th>
             <th>Ground Nature</th>
             <th>Length</th>
             <th>Width</th>
             <th>Capacity</th>
         </tr>
-        [% FOREACH field IN fields %]
+
+        [% COUNT = 0 %]
+        [% FOREACH fieldRow IN FieldElements %]
         <tr>
-            <td></td>
-            <td>2</td>
-            <td>3</td>
-            <td>4</td>
-            <td>5</td>
-            <td>6</td>
-            <td>7</td>
+            <td>[% fieldRow.intEntityFieldID %][% COUNT = COUNT + 1 %][% COUNT %]</td>
+            <td>[% fieldRow.intFieldOrderNumber %]</td>
+            <td>[% fieldRow.strName %]</td>
+            <td>[% fieldRow.strDiscipline %]</td>
+            <td>[% fieldRow.strGroundNature %]</td>
+            <td>[% fieldRow.dblLength %]</td>
+            <td>[% fieldRow.dblWidth %]</td>
+            <td>[% fieldRow.intCapacity %]</td>
         </tr>
         [% END %]
-    </tbody>
-</table>
+    </table>
     <input type="hidden" value="[% action %]" name="a">
     <input type="hidden" value="[% client %]" name="client">
     <input type="hidden" value="[% venueID %]" name="venueID">
