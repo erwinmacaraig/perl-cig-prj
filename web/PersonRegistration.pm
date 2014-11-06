@@ -579,7 +579,8 @@ sub getRegistrationData	{
             DATE_FORMAT(pr.dtLastUpdated, "%Y%m%d%H%i") as dtLastUpdated_,
             er.strEntityRoleName,
             e.strLocalName,
-            e.strLatinName
+            e.strLatinName,
+            e.intEntityID
         FROM
             tblPersonRegistration_$Data->{'Realm'} AS pr
             LEFT JOIN tblNationalPeriod as np ON (

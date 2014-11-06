@@ -133,7 +133,10 @@ sub getFieldLabels	{
             strRegion => 'Region',
             strPostalCode => 'Postal Code',
             strTown => 'Town',
-            strAddress => 'Address',
+            strCity => 'City (Place)',
+            strState => 'State',
+            strAddress => 'Address 1',
+            strAddress2 => 'Address 2',
             strWebURL => 'Website',
             strEmail => 'Email',
             strPhone => 'Phone',
@@ -142,6 +145,8 @@ sub getFieldLabels	{
             strContactEmail => 'Contact Person Email',
             strContactPhone => 'Contact Person Phone',
             strContact => 'Contact Person',
+            strContactCity => 'City',
+            strContactISOCountry => 'Country',
             intIdentifierTypeID => 'Identifier Type',
             strIdentifier => 'Identifier',
             dtValidFrom => 'Valid From',
@@ -157,8 +162,11 @@ sub getFieldLabels	{
             dtTo => 'Dissolution Date',
             strGender => 'Gender',
             strDiscipline => 'Sport',
-            strEntityType => 'Entity Type',
+            #strEntityType => 'Entity Type',
+            strEntityType => 'Type of Organisation',
             intNotifications => 'Notification Toggle',
+            strOrganisationLevel => 'Level',
+            dissolved => 'Dissolved',
             );
 	}
 
