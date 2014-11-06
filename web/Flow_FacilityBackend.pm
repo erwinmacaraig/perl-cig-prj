@@ -558,7 +558,7 @@ sub display_fields {
 
     for my $i (1 .. $facilityFieldCount){
         $facilityFields->setDBData({});
-        push @facilityFieldsData, $facilityFields->generateSingleRowField($i);
+        push @facilityFieldsData, $facilityFields->generateSingleRowField($i, undef);
     }
 
     my %FieldsGridData = (
