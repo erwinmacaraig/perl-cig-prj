@@ -54,10 +54,16 @@ sub handleVenues    {
     elsif($action =~ /^VENUE_DOCS/){
     	($resultHTML, $title) = handle_entity_documents($action, $Data, $venueID, $typeID, $Defs::DOC_FOR_VENUES);  
     }    
-    elsif($action =~ /^VENUE_F/) {
-        ($resultHTML, $title) = handle_venue_fields($action, $Data, $venueID);
-    }
     #####################################################    
+    elsif($action =~ /^VENUE_Flist/) {
+        ($resultHTML, $title) = list_venue_fields($action, $Data, $venueID);
+    }
+    elsif($action =~ /^VENUE_Fupdate/){
+        ($resultHTML, $title) = update_venue_fields($action, $Data, $venueID);
+    }
+    elsif($action =~ /^VENUE_Fadd/){
+        ($resultHTML, $title) = add_venue_fields($action, $Data, $venueID);
+    }
     return ($resultHTML,$title);
 }
 
@@ -477,6 +483,7 @@ sub venue_details   {
         # Delete Venue.
         my $venueObj = new EntityObj('db'=>$Data->{db},ID=>$venueID,realmID=>$intRealmID);
         
+        $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_Fadd&amp;venueID=$venueID">Add Fields</a> ] if (!$Data->{'ReadOnlyLogin'});
         $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$venueID">Edit Fields</a> ] if (!$Data->{'ReadOnlyLogin'});
         $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DEL&amp;venueID=$venueID" onclick="return confirm('Are you sure you want to delete this venue');">Delete Venue</a> ] if ($venueObj->canDelete() && !$Data->{'ReadOnlyLogin'});
     }
@@ -849,22 +856,23 @@ sub venueAllowed    {
     return $found ? 1 : 0;
 }
 
-sub handle_venue_fields {
+sub list_venue_fields {
     my ($action, $Data, $venueID) = @_;
 
     warn "METHOD CALL $venueID";
     my $entityID = getID($Data->{'clientValues'});
     warn "METHOD CALL $entityID";
     my $venueDetails = loadVenueDetails($Data->{'db'}, $venueID);
-    my $entityField = new EntityField();
+    my $entityFields = new EntityFields();
     my $title = $venueDetails->{strLocalName} . ": " . "Fields";;
 
+    $entityFields->setEntityID($venueID);
+    $entityFields->setData($Data);
 
-    $entityField->setVenueID($entityID);
-    $entityField->setData($Data);
+    my $fields = $entityFields->getAll();
+    my $count = scalar(@{$fields});
 
-    my $fields = $entityField->getAll();
-    print STDERR Dumper($fields);
+    return ("Invalid Venue ID", "Error") if(!$count);
 
     my %PageData = (
         target  => $Data->{'target'},
@@ -872,8 +880,9 @@ sub handle_venue_fields {
         action  => 'VENUE_Fupdate',
         client  => $Data->{'client'},
         venueID => $venueID,
-        fields  => $fields,
-   );  
+        #fields  => $fields,
+        FieldElements => $fields,
+    );  
  
     my $fieldsPage = runTemplate(
         $Data,
@@ -883,5 +892,84 @@ sub handle_venue_fields {
 
     return($fieldsPage, $title);
 }
+
+sub update_venue_fields {
+    my ($action, $Data, $venueID) = @_;
+
+	my $p = new CGI;
+	my %params = $p->Vars();
+
+    my $entityID = getID($Data->{'clientValues'});
+    my $venueDetails = loadVenueDetails($Data->{'db'}, $venueID);
+    my $entityFields = new EntityFields();
+    my $title = $venueDetails->{strLocalName} . ": " . "Fields";;
+
+    $entityFields->setEntityID($venueID);
+    $entityFields->setData($Data);
+
+    my $fields = $entityFields->getAll();
+    my $count = scalar(@{$fields});
+
+    return ("Invalid Venue ID", "Error") if(!$count);
+
+    $entityFields->setCount($count);
+
+    my $facilityFieldDataCluster;
+    my $errors;
+    my $fieldElements;
+    ($facilityFieldDataCluster, $errors, $fieldElements) = $entityFields->retrieveFormFieldData(\%params);
+ 
+    my %PageData = (
+        target  => $Data->{'target'},
+        Lang    => $Data->{'lang'},
+        action  => 'VENUE_Fupdate',
+        client  => $Data->{'client'},
+        venueID => $venueID,
+        Errors  => $errors,
+        FieldElements  => $fieldElements,
+    );
+ 
+    my $fieldsPage = runTemplate(
+        $Data,
+        \%PageData,
+        'entity/venue_fields.templ'
+    );  
+
+    if(scalar(@{$errors})){
+        return($fieldsPage, $title);
+    }
+
+    my $updatedFields = 0;
+
+    foreach my $fieldObjData (@{$facilityFieldDataCluster}){
+        my $entityFieldObj = new EntityFieldObj(db => $Data->{'db'}, ID => $fieldObjData->{'intEntityFieldID'});
+        $entityFieldObj->setValues($fieldObjData);
+        $entityFieldObj->write();
+        $updatedFields++;
+    }
+
+    #$PageData{'FieldElements'} = $entityFields->getAll();
+    $PageData{'Success'} = $updatedFields;
+    delete $PageData{'Errors'};
+
+    $fieldsPage = runTemplate(
+        $Data,
+        \%PageData,
+        'entity/venue_fields.templ'
+    );
+
+    return($fieldsPage, $title);
+}
+
+sub add_venue_fields {
+    my ($action, $Data, $venueID) = @_;
+
+
+}
+
+sub process_add_venue_fields {
+
+}
+
 1;
 
