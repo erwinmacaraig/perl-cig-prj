@@ -61,7 +61,7 @@ sub handleVenues    {
     elsif($action =~ /^VENUE_Fupdate/){
         ($resultHTML, $title) = update_venue_fields($action, $Data, $venueID);
     }
-    elsif($action =~ /^VENUE_Fadd/){
+    elsif($action =~ /^VENUE_Fadd/ or $action =~ /^VENUE_Fprocadd/){
         ($resultHTML, $title) = add_venue_fields($action, $Data, $venueID);
     }
     return ($resultHTML,$title);
@@ -964,11 +964,87 @@ sub update_venue_fields {
 sub add_venue_fields {
     my ($action, $Data, $venueID) = @_;
 
+	my $p = new CGI;
+	my %params = $p->Vars();
 
-}
+    my $venueDetails = loadVenueDetails($Data->{'db'}, $venueID);
+    my $title = $venueDetails->{strLocalName} . ": " . "Add Fields";;
 
-sub process_add_venue_fields {
+    #TODO: create form to accept number of fields
+    my $facilityFieldCount = 2;
 
+    my $facilityFields = new EntityFields();
+    $facilityFields->setCount($facilityFieldCount);
+    $facilityFields->setEntityID($venueID);
+    $facilityFields->setData($Data);
+    
+    my @facilityFieldsData = ();
+
+    my %FieldsGridData = (
+        target  => $Data->{'target'},
+        Lang    => $Data->{'lang'},
+        action  => 'VENUE_Fprocadd',
+        client  => $Data->{'client'},
+        venueID => $venueID,
+        FieldElements => \@facilityFieldsData,
+    );
+
+    if($action =~ /^VENUE_Fadd/) {
+        for my $i (1 .. $facilityFieldCount){
+            $facilityFields->setDBData({});
+            push @facilityFieldsData, $facilityFields->generateSingleRowField($i, undef);
+        }
+
+        my $facilityFieldsContent = runTemplate(
+            $Data,
+            \%FieldsGridData,
+            'entity/venue_fields.templ',
+        );
+
+        return ($facilityFieldsContent, $title);
+    }
+    elsif($action =~ /^VENUE_Fprocadd/){
+
+        my $facilityFieldDataCluster;
+        my $errors;
+        my $fieldElements;
+        ($facilityFieldDataCluster, $errors, $fieldElements) = $facilityFields->retrieveFormFieldData(\%params);
+        
+        $FieldsGridData{'Errors'} = $errors;
+        $FieldsGridData{'FieldElements'} = $fieldElements;
+
+       my $facilityFieldsContent = runTemplate(
+            $Data,
+            \%FieldsGridData,
+            'entity/venue_fields.templ'
+        );  
+
+        if(scalar(@{$errors})){
+            return($facilityFieldsContent, $title);
+        }
+
+        my $updatedFields = 0;
+
+        foreach my $fieldObjData (@{$facilityFieldDataCluster}){
+            my $entityFieldObj = new EntityFieldObj(db => $Data->{'db'}, ID => 0);
+            $entityFieldObj->setValues($fieldObjData);
+            $entityFieldObj->write();
+            $updatedFields++;
+        }
+
+        $FieldsGridData{'Success'} = $updatedFields;
+        $FieldsGridData{'action'} = "VENUE_Fadd";
+        delete $FieldsGridData{'Errors'};
+
+        $facilityFieldsContent = runTemplate(
+            $Data,
+            \%FieldsGridData,
+            'entity/venue_fields.templ'
+        );
+
+        return($facilityFieldsContent, $title);
+
+    }
 }
 
 1;
