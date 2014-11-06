@@ -165,7 +165,8 @@ sub getFieldLabels	{
             #strEntityType => 'Entity Type',
             strEntityType => 'Type of Organisation',
             intNotifications => 'Notification Toggle',
-            strLevel => 'Level',
+            strOrganisationLevel => 'Level',
+            dissolved => 'Dissolved',
             );
 	}
 
