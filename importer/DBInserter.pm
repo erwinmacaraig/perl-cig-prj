@@ -45,8 +45,9 @@ sub insertRow {
 		writeLog("ERROR: $_");
 		#say "INSERT INTO $table ($keystr) VALUES(",join(', ', @values),")'\n";
 		warn "caught error: $_";
+		return 0;
 	};
-	1;
+	#1;
 }
 
 sub insertBatch {
