@@ -1,0 +1,34 @@
+    [% IF Errors.size %]
+        <div class = "warningmsg">
+            <ul>
+            [% FOREACH error IN Errors %]
+                <li>[% error %]</li>
+            [% END %]
+            </ul>
+        </div>
+    [% END %]
+
+    [% IF transferTypeOption != '' %]
+    <span class="label">Transfer type:</span></td><td><span class="formw">[% transferTypeOption %]</span>
+
+    <br/>
+    <br/>
+    <div id="international" style="display: none;">
+        <span>Do You have the Player's ITC?</span><span>[% withITC %][% noITC %]</span>
+    </div>
+
+    [% END %]
+
+    <br/>
+    <div id="domestic">
+        <form action="main.cgi" method="POST">
+            <table>
+            <tbody><tr><td><span class="label">Enter Number Of Fields:</span></td><td><span class="formw"><input type="text" name="field_count" value="[% field_count %]"></span></td></tr>
+            </tbody></table>
+            <input class="button generic-button" type="submit" name="submit" value="Continue">   
+            <input type="hidden" value="[% action %]" name="a">
+            <input type="hidden" value="[% client %]" name="client">
+            <input type="hidden" value="[% venueID %]" name="venueID">
+        </form>
+    </div>
+    [% script %]

@@ -61,6 +61,9 @@ sub handleVenues    {
     elsif($action =~ /^VENUE_Fupdate/){
         ($resultHTML, $title) = update_venue_fields($action, $Data, $venueID);
     }
+    elsif($action =~ /^VENUE_FPA/){
+        ($resultHTML, $title) = pre_add_venue_fields($action, $Data, $venueID, undef);
+    }
     elsif($action =~ /^VENUE_Fadd/ or $action =~ /^VENUE_Fprocadd/){
         ($resultHTML, $title) = add_venue_fields($action, $Data, $venueID);
     }
@@ -483,7 +486,7 @@ sub venue_details   {
         # Delete Venue.
         my $venueObj = new EntityObj('db'=>$Data->{db},ID=>$venueID,realmID=>$intRealmID);
         
-        $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_Fadd&amp;venueID=$venueID">Add Fields</a> ] if (!$Data->{'ReadOnlyLogin'});
+        $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_FPA&amp;venueID=$venueID">Add Fields</a> ] if (!$Data->{'ReadOnlyLogin'});
         $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$venueID">Edit Fields</a> ] if (!$Data->{'ReadOnlyLogin'});
         $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DEL&amp;venueID=$venueID" onclick="return confirm('Are you sure you want to delete this venue');">Delete Venue</a> ] if ($venueObj->canDelete() && !$Data->{'ReadOnlyLogin'});
     }
@@ -973,13 +976,24 @@ sub add_venue_fields {
 	my $p = new CGI;
 	my %params = $p->Vars();
 
+    my @err;
+    if (!$params{'field_count'}) {
+        push @err, $Data->{'lang'}->txt("Number of Fields: required");
+    }
+
+    if ($params{'field_count'} !~ /^\d+$/) {
+        push @err, $Data->{'lang'}->txt("Number of Fields: invalid input");
+    }
+
+    return pre_add_venue_fields($action, $Data, $venueID, \@err) if scalar(@err);
+
     my $venueDetails = loadVenueDetails($Data->{'db'}, $venueID);
     my $title = $venueDetails->{strLocalName} . ": " . "Add Fields";;
 
     return ("Only Venue/Facility can have fields.", "Error") if($venueDetails->{'intEntityLevel'} != $Defs::LEVEL_VENUE);
 
     #TODO: create form to accept number of fields
-    my $facilityFieldCount = 2;
+    my $facilityFieldCount = $params{'field_count'};
 
     my $facilityFields = new EntityFields();
     $facilityFields->setCount($facilityFieldCount);
@@ -1053,6 +1067,29 @@ sub add_venue_fields {
         return($facilityFieldsContent, $title);
 
     }
+}
+
+sub pre_add_venue_fields {
+    my ($action, $Data, $venueID, $err) = @_;
+
+	my $p = new CGI;
+	my %params = $p->Vars();
+
+    my $title = $Data->{'lang'}->txt("Number of Fields");
+    my %TemplateData;
+    $TemplateData{'action'} = 'VENUE_Fadd';
+    $TemplateData{'client'} = $Data->{'client'};
+    $TemplateData{'venueID'} = $venueID;
+    $TemplateData{'Errors'} = $err if scalar($err);
+    $TemplateData{'field_count'} = $params{'field_count'} if $params{'field_count'};
+
+    my $body = runTemplate(
+        $Data,
+        \%TemplateData,
+        'entity/add_fields_count.templ',
+    );
+
+    return ($body, $title);
 }
 
 1;
