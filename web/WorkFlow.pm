@@ -1646,7 +1646,6 @@ sub getTask {
     );
 
     my $result = $q->fetchrow_hashref();
-    print STDERR Dumper $result;
     return $result || undef;
 }
 
@@ -1683,6 +1682,7 @@ sub viewTask {
             pr.strAgeLevel,
             pr.strSport,
             pr.strPersonType,
+            pr.intPaymentRequired as regoPaymentRequired,
             t.strRegistrationNature,
             dt.strDocumentName,
             p.strLocalFirstname,
@@ -1708,6 +1708,7 @@ sub viewTask {
             uarRejected.entityID as UserRejectedEntityID,
             e.intEntityID,
             e.intEntityLevel,
+            e.intPaymentRequired as entityPaymentRequired,
             t.intApprovalEntityID,
             t.intProblemResolutionEntityID,
             t.strTaskNotes as TaskNotes,
@@ -1817,8 +1818,9 @@ sub viewTask {
     my $showReject = 0;
     $showReject = 1 if ($dref->{'intOnHold'} == 0 and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} != $entityID);
 
+    #print STDERR Dumper $TemplateData{'Notifications'}{'LockApproval'};
     my $showApprove = 0;
-    $showApprove = 1 if ($dref->{'intOnHold'} == 0 and $dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID);
+    $showApprove = 1 if ($dref->{'intOnHold'} == 0 and $dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID and !scalar($TemplateData{'Notifications'}{'LockApproval'}));
 
     my $showResolve = 0;
     $showResolve = 1 if ($dref->{'intOnHold'} == 0 and $dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_REJECTED and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);
@@ -1858,7 +1860,6 @@ sub viewTask {
 
     my ($NotesData) = populateTaskNotesViewData($Data, $dref);
     %NotesData = %{$NotesData};
-    print STDERR Dumper %NotesData;
 
     my $documentBlock = runTemplate(
         $Data,
@@ -1931,6 +1932,9 @@ sub populateRegoViewData {
         },
 	);
 
+    $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.')
+        if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_REGO'} == 1 and $dref->{'regoPaymentRequired'});
+
     return (\%TemplateData, \%fields);
 }
 
@@ -1961,6 +1965,10 @@ sub populateEntityViewData {
                 title => 'Club Registration Details',
                 templateFile => 'workflow/view/club.templ',
             );
+
+            $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.')
+                if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_CLUB'} == 1 and $dref->{'entityPaymentRequired'});
+
             #TODO: add details specific to CLUB
         }
         case "$Defs::LEVEL_VENUE" {
@@ -1968,6 +1976,10 @@ sub populateEntityViewData {
                 title => 'Venue Registration Details',
                 templateFile => 'workflow/view/venue.templ',
             );
+
+            $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.')
+                if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_VENUE'} == 1 and $dref->{'entityPaymentRequired'});
+
             #TODO: add details specific to VENUE
         }
         else {
@@ -2309,7 +2321,6 @@ sub populateTaskNotesViewData {
         push @TaskNotes, \%rowNotes;
     }
 
-    print STDERR Dumper @TaskNotes;
     %TemplateData = (
         TaskNotes => \@TaskNotes,
     );
@@ -2330,7 +2341,6 @@ sub populateVenueFieldsData {
     my $fields = $entityFields->getAll();
     my $count = scalar(@{$fields});
 
-    print STDERR Dumper "COUNT " . $count;
 
     foreach my $field (@{$fields}){
         $field->{'strGroundNature'} = $Defs::fieldGroundNatureType{$field->{'strGroundNature'}};
