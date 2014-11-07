@@ -863,16 +863,19 @@ sub list_venue_fields {
     my $entityID = getID($Data->{'clientValues'});
     warn "METHOD CALL $entityID";
     my $venueDetails = loadVenueDetails($Data->{'db'}, $venueID);
+
+    return ("Only Venue/Facility can have fields.", "Error") if($venueDetails->{'intEntityLevel'} != $Defs::LEVEL_VENUE);
+    
     my $entityFields = new EntityFields();
     my $title = $venueDetails->{strLocalName} . ": " . "Fields";;
 
     $entityFields->setEntityID($venueID);
     $entityFields->setData($Data);
 
-    my $fields = $entityFields->getAll();
+    my $fields = $entityFields->getAll("HTML");
     my $count = scalar(@{$fields});
 
-    return ("Invalid Venue ID", "Error") if(!$count);
+    return ("Facility Field(s) not found.", "Error") if(!$count);
 
     my %PageData = (
         target  => $Data->{'target'},
@@ -901,13 +904,16 @@ sub update_venue_fields {
 
     my $entityID = getID($Data->{'clientValues'});
     my $venueDetails = loadVenueDetails($Data->{'db'}, $venueID);
+
+    return ("Only Venue/Facility can have fields.", "Error") if($venueDetails->{'intEntityLevel'} != $Defs::LEVEL_VENUE);
+
     my $entityFields = new EntityFields();
     my $title = $venueDetails->{strLocalName} . ": " . "Fields";;
 
     $entityFields->setEntityID($venueID);
     $entityFields->setData($Data);
 
-    my $fields = $entityFields->getAll();
+    my $fields = $entityFields->getAll("HTML");
     my $count = scalar(@{$fields});
 
     return ("Invalid Venue ID", "Error") if(!$count);
@@ -969,6 +975,8 @@ sub add_venue_fields {
 
     my $venueDetails = loadVenueDetails($Data->{'db'}, $venueID);
     my $title = $venueDetails->{strLocalName} . ": " . "Add Fields";;
+
+    return ("Only Venue/Facility can have fields.", "Error") if($venueDetails->{'intEntityLevel'} != $Defs::LEVEL_VENUE);
 
     #TODO: create form to accept number of fields
     my $facilityFieldCount = 2;
