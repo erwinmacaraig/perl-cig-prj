@@ -467,6 +467,15 @@ td.value .chzn-container-single .chzn-single div b{
 	margin:20px 20px;;
 }
 
+.notificationmsg	{
+	padding:10px;
+	background-color:#e7e7e7;
+	border:1px solid #b9b9b9;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	margin:40px 0px;;
+}
+
 .warningmsg	.msgtitle{
 	font-weight:bold;
 	color:#cd0a0a;
