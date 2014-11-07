@@ -107,6 +107,9 @@ sub getErrors {
 
 sub getAll {
     my ($self) = shift;
+    my ($type) = @_;
+
+    $type ||= "RAW";
 
     my $db = $self->getData()->{'db'};
 
@@ -143,7 +146,13 @@ sub getAll {
         $self->setName($dref->{'strName'});
 
         $self->setDBData($dref);
-        push @fields, $self->generateSingleRowField($count++, $dref->{'intEntityFieldID'});
+
+        if($type eq 'HTML') {
+            push @fields, $self->generateSingleRowField($count++, $dref->{'intEntityFieldID'});
+        }
+        elsif($type eq 'RAW' or !$type) {
+            push @fields, $dref;
+        }
         #my $fieldData = {};
         #foreach my $entityFieldCol (keys %{$dref}){
         #    #print STDERR Dumper $entityFieldCol . " " . $dref->{$entityFieldCol};
