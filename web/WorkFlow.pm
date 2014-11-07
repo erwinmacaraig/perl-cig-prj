@@ -14,6 +14,7 @@ require Exporter;
     populateDocumentViewData
     populateTaskNotesViewData
     populateEntityViewData
+    populateVenueFieldsData
     resetRelatedTasks
     viewApprovalPage
     viewSummaryPage
@@ -41,6 +42,7 @@ use CGI qw(param unescape escape);
 use AuditLog;
 use NationalNumber;
 use EmailNotifications::WorkFlow;
+use EntityFields;
 
 sub cleanTasks  {
 
@@ -1821,6 +1823,9 @@ sub viewTask {
     my $showResolve = 0;
     $showResolve = 1 if ($dref->{'intOnHold'} == 0 and $dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_REJECTED and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);
 
+    my ($showAddFields, $showEditFields) = (0, 0);
+    $showAddFields = 1  if ($dref->{'intEntityLevel'} == $Defs::LEVEL_VENUE and $dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_REJECTED and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);
+    $showEditFields = 1  if ($dref->{'intEntityLevel'} == $Defs::LEVEL_VENUE and $dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_REJECTED and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);
 
     my %TaskAction = (
         'ApprovalEntityLevel' => $dref->{'ApprovalEntityLevel'},
@@ -1830,8 +1835,11 @@ sub viewTask {
         'showReject' => $showReject,
         'showResolve' => $showResolve,
         'showToggle' => $showToggle,
+        'showAddFields' => $showAddFields,
+        'showEditFields' => $showEditFields,
         'currentNoteID' => $dref->{'currentNoteID'} || 0,   #primary set to 0 will insert new row to table
         'onHold' => $dref->{'intOnHold'},
+        'venueID' => ($dref->{'intEntityLevel'} == $Defs::LEVEL_VENUE) ? $dref->{'intEntityID'} : 0,
     );
 
     my ($DocumentData, $fields) = populateDocumentViewData($Data, $dref);
@@ -1877,6 +1885,8 @@ sub viewTask {
     $TemplateData{'PaymentBlock'} = $paymentBlock;
     $TemplateData{'NotesBlock'} = $notesBlock;
     $TemplateData{'ActionsBlock'} = $actionsBlock;
+    $TemplateData{'VenueFieldsBlock'} = populateVenueFieldsData($Data, $dref) if ($dref->{'intEntityLevel'} == $Defs::LEVEL_VENUE);
+
 
     #print STDERR Dumper %TemplateData;
     my $body = runTemplate(
@@ -2306,6 +2316,45 @@ sub populateTaskNotesViewData {
 
     return (\%TemplateData);
 
+}
+
+
+sub populateVenueFieldsData {
+    my ($Data, $dref) = @_;
+
+    my $entityFields = new EntityFields();
+
+    $entityFields->setEntityID($dref->{'intEntityID'});
+    $entityFields->setData($Data);
+
+    my $fields = $entityFields->getAll();
+    my $count = scalar(@{$fields});
+
+    print STDERR Dumper "COUNT " . $count;
+
+    foreach my $field (@{$fields}){
+        $field->{'strGroundNature'} = $Defs::fieldGroundNatureType{$field->{'strGroundNature'}};
+        $field->{'strDiscipline'} = $Defs::sportType{$field->{'strDiscipline'}};
+    }
+
+    return ("Facility Field(s) not found.", "Error") if(!$count);
+
+    my %PageData = (
+        target  => $Data->{'target'},
+        Lang    => $Data->{'lang'},
+        venueID => $dref->{'intEntityID'},
+        #fields  => $fields,
+        FieldElements => $fields,
+    );  
+ 
+    my $fieldsPage = runTemplate(
+        $Data,
+        \%PageData,
+        'workflow/generic/facility_fields.templ'
+    );  
+
+    return $fieldsPage;
+    #print STDERR Dumper $dref;
 }
 
 sub resetRelatedTasks {
