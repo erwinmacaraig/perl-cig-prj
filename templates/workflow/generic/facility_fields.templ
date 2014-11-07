@@ -1,0 +1,33 @@
+[% Dumper.dump_html($FieldElements) %]
+    <br/>
+    <div class="">
+        <div class = "sectionheader">
+            [% Lang.txt('Fields') %]&nbsp;&nbsp;
+        </div>
+
+        <table cellpadding="5" style="width: 100%">
+            <tr>
+                <th>Field Order Number</th>
+                <th>Field Name</th>
+                <th>Discipline</th>
+                <th>Ground Nature</th>
+                <th>Length</th>
+                <th>Width</th>
+                <th>Capacity</th>
+            </tr>
+
+            [% COUNT = 0 %]
+            [% FOREACH fieldRow IN FieldElements %]
+            <tr>
+                <td>[% fieldRow.intFieldOrderNumber %]</td>
+                <td>[% fieldRow.strName %]</td>
+                <td>[% fieldRow.strDiscipline %]</td>
+                <td>[% fieldRow.strGroundNature %]</td>
+                <td>[% fieldRow.dblLength %]</td>
+                <td>[% fieldRow.dblWidth %]</td>
+                <td>[% fieldRow.intCapacity %]</td>
+            </tr>
+            [% END %]
+        </table>
+    </div>
+
