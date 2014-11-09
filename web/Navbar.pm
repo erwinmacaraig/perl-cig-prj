@@ -368,14 +368,14 @@ sub getEntityMenuData {
                 };
 
     # for Entity menu
-    if(!$Data->{'ReadOnlyLogin'}) {
+    if($SystemConfig->{'menu_newclub_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'addclub'} = {
              name => $lang->txt("Add $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}"),
             url => $baseurl."a=C_DTA",
         };
     }
 
-    if(!$Data->{'ReadOnlyLogin'}) {
+    if($SystemConfig->{'menu_newvenue_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'addvenue'} = {
              name => $lang->txt("Add $Data->{'LevelNames'}{$Defs::LEVEL_VENUE}"),
             url => $baseurl."a=VENUE_DTA",
@@ -987,6 +987,12 @@ sub getClubMenuData {
 
 
 
+    if($SystemConfig->{'menu_newvenue_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+        $menuoptions{'addvenue'} = {
+             name => $lang->txt("Add $Data->{'LevelNames'}{$Defs::LEVEL_VENUE}"),
+            url => $baseurl."a=VENUE_DTA",
+        };
+    }
 
 
 
@@ -1012,7 +1018,10 @@ sub getClubMenuData {
             'bulk',
          ]],
 
-        [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu','venues'],
+        [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu',[
+            'venues',
+            'addvenue'
+        ]],
         [ $lang->txt('Work Tasks'), 'menu',[
             'approvals',
             'pending'
