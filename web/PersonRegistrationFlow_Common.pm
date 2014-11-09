@@ -14,6 +14,7 @@ require Exporter;
     save_rego_products
     add_rego_record
     bulkRegoSubmit
+    checkUploadedRegoDocuments
 );
 
 use strict;
@@ -178,7 +179,40 @@ sub displayRegoFlowCertificates{
   return $pagedata;
 }
 
-
+sub checkUploadedRegoDocuments {
+    my($Data,$personID, $regoID,$entityID,$entityLevel,$originLevel,$rego_ref) = @_;
+    
+    my $query = qq[SELECT count(intItemID) as items FROM tblRegistrationItem WHERE intRealmID = ? AND intOriginLevel = ? AND strRuleFor = ? AND intEntityLevel = ? AND strRegistrationNature = ? AND strPersonType = ? AND strPersonLevel = ? AND strSport = ? AND strAgeLevel = ? AND strItemType = ? AND (strISOCountry_IN ='' OR strISOCountry_IN IS NULL OR strISOCountry_IN LIKE CONCAT('%|',?,'|%')) AND (strISOCountry_NOTIN ='' OR strISOCountry_NOTIN IS NULL OR strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))  ];   
+    my $sth = $Data->{'db'}->prepare($query);
+    $sth->execute(  $Data->{'Realm'},
+    				$originLevel,
+    				'REGO',
+    				$entityLevel,
+    				$rego_ref->{'strRegistrationNature'}, 
+    				$rego_ref->{'strPersonType'},
+    				$rego_ref->{'strPersonLevel'},
+    				$rego_ref->{'strSport'},
+    				$rego_ref->{'strAgeLevel'},
+    				'DOCUMENT',
+    				$rego_ref->{'strISONationality'},
+    				$rego_ref->{'strISONationality'}
+    );
+    
+        
+    my $dref = $sth->fetchrow_hashref();
+    return 1 if($dref->{'items'} == 0);
+    #there are no required documents to be uploaded
+     
+    $query = qq[SELECT count(intDocumentID) as tot FROM tblDocuments WHERE intPersonID = ? AND intPersonRegistrationID = ?];
+    
+    $sth = $Data->{'db'}->prepare($query);
+    $sth->execute($personID, $regoID);
+    $dref = $sth->fetchrow_hashref();
+    
+    $sth->finish();
+    return 1 if($dref->{'tot'} > 0);
+    return 0;
+}
 sub displayRegoFlowDocuments    {
 
     my ($Data, $regoID, $client, $entityRegisteringForLevel, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref, $noFormFields) = @_;
@@ -272,6 +306,7 @@ sub displayRegoFlowDocuments    {
         hidden_ref => $hidden_ref,
         Lang => $Data->{'lang'},
         client => $client,
+        regoID => $regoID,
         NoFormFields =>$noFormFields,
   );  
  my $pagedata = runTemplate($Data, \%PageData, 'registration/document_flow_backend.templ') || '';

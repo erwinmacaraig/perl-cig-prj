@@ -24,7 +24,6 @@ use Data::Dumper;
 
 sub handleRegistrationFlowBackend   {
     my ($action, $Data) = @_;
-    open FH, ">$Defs::myerrorfile";
     my $body = '';
     my $title = '';
     my $client = $Data->{'client'};
@@ -91,8 +90,7 @@ print STDERR "AAAAAAAA $action\n";
         my $personRequestID = param('reqID') || 0; 
 
         ($regoID, $rego_ref, $msg) = add_rego_record($Data, $personID, $entityID, $entityLevel, $originLevel, $personType, $personEntityRole, $personLevel, $sport, $ageLevel, $registrationNature, undef, undef, $personRequestID);
-        print FH "Rego_Ref\n\n" . Dumper($rego_ref) . "\n\n";
-        ###########################################
+    
        ##########################################
         if (!$regoID)   {
             my $error = '';
@@ -127,7 +125,7 @@ print STDERR "AAAAAAAA $action\n";
             #if($personType eq 'COACH' || $personType eq 'REFEREE' ){
                 $action = $Flow{$action};
             #}            
-            print FH "Action \n=================================\n $action \n ===================\n";            
+
             $personID = $personID || $rego_ref->{'personID'} || $rego_ref->{'intPersonID'} || 0;
         }
     }
@@ -155,11 +153,12 @@ print STDERR "AAAAAAAA $action\n";
         $Hidden{'prodQty'} = $prodQty;
         my $prodIds= join(':',@productsselected);
         $Hidden{'prodIds'} = $prodIds;
-print STDERR "---------------------------HERE FOR $personID $regoID\n";
+
         $Hidden{'txnIds'} = save_rego_products($Data, $regoID, $personID, $entityID, $entityLevel, $rego_ref, \%params);
         $action = $Flow{$action};
     }
     if ( $action eq 'PREGF_DU' ) {
+
         my $uploaded_filename = param('file') || ''; 
 	    my $docTypeID = param('doctypeID') || 0; 
         if($uploaded_filename ne ''){  

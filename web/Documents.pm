@@ -257,7 +257,7 @@ sub process_doc_upload	{
     };
    
 	push @files_to_process, [$name, $filefield, $permission];
-    print FH "\nContents of array files_to_process is " . Dumper($other_info) . "\n\n";             	
+
 	my $retvalue = processUploadFile(
 		$Data, 
 		\@files_to_process,

@@ -1332,7 +1332,55 @@ sub display_documents {
 
 sub process_documents { 
     my $self = shift;
+    
+    my $personID = $self->ID();
+    if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
+        return ('Invalid User',0);
+    }
+    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
+    my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
+    my $regoID = $self->{'RunParams'}{'rID'} || 0;
+    my $client = $self->{'Data'}->{'client'};
 
+    my $rego_ref = {};
+    my $content = '';
+    if($regoID) {
+        my $valid =0;
+        ($valid, $rego_ref) = validateRegoID(
+            $self->{'Data'}, 
+            $personID, 
+            $regoID, 
+            $entityID
+        );
+        $regoID = 0 if !$valid;
+    }
+
+    my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID);
+    $personObj->load();
+    
+    #check for uploaded document
+    my $isRequiredDocPresent = checkUploadedRegoDocuments($self->{'Data'},$personID, $regoID,$entityID,$entityLevel,$originLevel,$rego_ref);
+    if(!$isRequiredDocPresent){
+    	push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Required Document Missing");
+    	my %PageData = (
+        HiddenFields => $self->stringifyCarryField(),
+        Target => $self->{'Data'}{'target'},
+        Errors => $self->{'RunDetails'}{'Errors'} || [],
+        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
+        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        Content => '',
+        Title => '',
+        TextTop => $content,
+        TextBottom => '',
+        NoContinueButton => 1,        
+    );
+         
+        my $pagedata = $self->display(\%PageData);
+     
+    	return ($pagedata,0);
+
+    }
     return ('',1);
 }
 
