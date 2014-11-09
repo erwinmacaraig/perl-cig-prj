@@ -361,7 +361,7 @@ sub _getConfiguration {
                     dropdownorder => [ 0, 1 ],
                     dbfield       => 'PR.intPaymentRequired',
                     defaultcomp   => 'equal',
-                    defaultvalue  => '1',
+                    defaultvalue  => '0',
                     active        => 1,
                     optiongroup   => 'regos'
                 }

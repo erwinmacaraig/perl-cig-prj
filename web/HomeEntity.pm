@@ -41,6 +41,10 @@ sub showEntityHome	{
     $Defs::LEVEL_NODE,
     $entityID,
   );
+
+     ### Lets clear Dashboard graphs for now
+    $dashboard = '';
+
 	my ($notifications, $notificationCount) = getNotifications(
 		$Data,
 		$Defs::LEVEL_NODE,

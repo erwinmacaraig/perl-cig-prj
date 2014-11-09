@@ -46,6 +46,10 @@ sub showClubHome  {
     $Defs::LEVEL_CLUB,
     $clubID,
   );
+    ### Lets clear Dashboard graphs for now
+    $dashboard = '';
+
+
   my ($notifications, $notificationCount)  = getNotifications(
     $Data,
     $Defs::LEVEL_CLUB,
