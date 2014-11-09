@@ -1,6 +1,11 @@
 {
 	"rules" : {
+		"intGender" : {
+			"rule" : "StrToIntEntry",
+			"value" : {"MALE":"1", "FEMALE":"2"}
+		}
 	},
+	
 	"mapping" : {
 		"PersonCode" : "strImportPersonCode",
 		"Status" : "strStatus",
@@ -11,7 +16,7 @@
 		"LatinFirstName" : "strLatinFirstname",
 		"LatinLastName" : "strLatinSurname",
 		"DateOfBirth" : "dtDOB",
-		"Gender" : "strGender",
+		"Gender" : "intGender",
 		"Nationality" : "strISONationality",
 		"CountryOfBirth" : "strISOCountryOfBirth",
 		"RegionOfBirth" : "strRegionOfBirth",

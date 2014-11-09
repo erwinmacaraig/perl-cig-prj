@@ -86,6 +86,9 @@ sub ApplyPreRules{
         if($rule->{"rule"} eq "swapEntry"){
            $records = swapEntry($records,$rule);
         }
+		if($rule->{"rule"} eq "StrToIntEntry"){
+			$records = strToIntEntry($records, $key, $rule->{"value"});
+        }
     }
     return $records;
 }

@@ -2,15 +2,15 @@
 package TableRules;
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(multiplyEntry insertLink removeLinkField getConfig swapEntry);
-@EXPORT_OK = qw(multiplyEntry insertLink removeLinkField getConfig swapEntry);
+@EXPORT = qw(multiplyEntry insertLink removeLinkField getConfig swapEntry strToIntEntry);
+@EXPORT_OK = qw(multiplyEntry insertLink removeLinkField getConfig swapEntry strToIntEntry);
 
 # This is where you should include the migration rule for your table
 use Data::Dumper;
 use JSON;
 use DBInserter;
 
-
+use feature qw(say);
 my $db = connectDB();
 my %config = ();
 
@@ -92,6 +92,17 @@ sub swapEntry{
 	    push (@newRecords, $copy);
     }
     return \@newRecords;
+}
+
+sub strToIntEntry{
+    my ($records,$key, $value) = @_;
+    foreach my $record ( @{$records} ){
+        if( $record->{$key} ) {
+            #say Dumper( $value->{ $record->{$key} });
+            $record->{$key} = $value->{ $record->{$key} };
+        }
+    }
+    return $records;
 }
 
 1;

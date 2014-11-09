@@ -21,6 +21,13 @@ sub insertRow {
     	$valstr = (join ",","$importId", $valstr);
     }
 	
+	# add realmid=1
+    if( isRealmExists($db, $table) ) {
+        $keystr = (join ",\n        ","intRealmID", $keystr);
+        $valstr = (join ",","1", $valstr);
+    }
+	
+		
 	my @values = values $record;
 	my %success = ();
 	my $query = qq[
@@ -36,10 +43,9 @@ sub insertRow {
 	try {
 	    my $sth = $db->prepare($query) or die "Can't prepare insert: ".$db->errstr()."\n";
 	    my $result = $sth->execute(@values) or die "Can't execute insert: ".$db->errstr()."\n";
-	    print "INSERT SUCCESS :: TABLE:: '",$table,"' ID:: ",$sth->{mysql_insertid},"' RECORDS:: '",join(', ', @values),"'\n";
-	
+		print "INSERT SUCCESS :: TABLE:: '",$table,"' ID:: ",$sth->{mysql_insertid},"' RECORDS:: '",join(', ', @values),"'\n";
 	    writeLog("INFO: INSERT SUCCESS :: TABLE:: '".$table."' ID:: ".$sth->{mysql_insertid}."' RECORDS:: '". join(', ', @values).")");
-	    return $sth->{mysql_insertid};
+		return $sth->{mysql_insertid};
 	
 	} catch {
 		writeLog("ERROR: $_");
@@ -91,6 +97,15 @@ sub connectDB{
     my $dbh = DBI->connect($ImporterConfig::DB_CONFIG{"DB_DSN"}, $ImporterConfig::DB_CONFIG{"DB_USER"},$ImporterConfig::DB_CONFIG{"DB_PASSWD"},{mysql_enable_utf8=>1} ) or die $DBI::errstr;
     $dbh->do("SET NAMES 'utf8'");
     return $dbh;
+}
+
+sub isRealmExists {
+    my ($db, $table) = @_;
+    my $columns = $db->selectrow_array("show columns from $table like 'intRealmID'");
+    if ($columns) {
+        return 1;
+    }
+    return 0;
 }
 
 sub getNationalPeriodID {
