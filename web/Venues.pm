@@ -665,11 +665,10 @@ sub listVenues  {
 
     my $addlink='';
     my $title=qq[Venues];
-    {
-        my $tempClient = setClient(\%tempClientValues);
-        $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if !$Data->{'ReadOnlyLogin'};
-
-    }
+    #{
+    #    my $tempClient = setClient(\%tempClientValues);
+    #    $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if !$Data->{'ReadOnlyLogin'};
+    #}
 
     my $modoptions=qq[<div class="changeoptions">$addlink</div>];
     $title=$modoptions.$title;

@@ -274,11 +274,11 @@ sub getEntityMenuData {
         url  => $baseurl."a=AM_",
     };
 
-    if( scalar(keys $children)) {
+    if( 1==2 and scalar(keys $children)) {
         $menuoptions{'fieldconfig'} = {
             name => $lang->txt('Field Configuration'),
             url => $baseurl."a=FC_C_d",
-        };
+    };
 
         if(1==2 and $SystemConfig->{'AllowClearances'} 
                 and !$hideClearances
@@ -368,6 +368,19 @@ sub getEntityMenuData {
                 };
 
     # for Entity menu
+    if(!$Data->{'ReadOnlyLogin'}) {
+        $menuoptions{'addclub'} = {
+             name => $lang->txt("Add $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}"),
+            url => $baseurl."a=C_DTA",
+        };
+    }
+
+    if(!$Data->{'ReadOnlyLogin'}) {
+        $menuoptions{'addvenue'} = {
+             name => $lang->txt("Add $Data->{'LevelNames'}{$Defs::LEVEL_VENUE}"),
+            url => $baseurl."a=VENUE_DTA",
+        };
+    }
 
     if(!$SystemConfig->{'NoAuditLog'}) {
         $menuoptions{'auditlog'} = {
@@ -392,13 +405,21 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
             };
         }
     }
+
+    
     my @menu_structure = (
         [ $lang->txt('Dashboard'), 'home','home'],
         [ $lang->txt('States'), 'menu','states'],
         [ $lang->txt('Regions'), 'menu','regions'],
         [ $lang->txt('Zones'), 'menu','zones'],
-        [ $lang->txt('Clubs'), 'menu','clubs'],
-        [ $lang->txt('Venues'), 'menu','venues'],
+        [ $lang->txt('Clubs'), 'menu',[
+            'clubs',
+            'addclub'
+        ]],
+        [ $lang->txt('Venues'), 'menu',[
+            'venues',
+            'addvenue'
+        ]],
         [ $lang->txt('People'), 'menu',[
             'persons',
             'persons_addplayer',
@@ -407,20 +428,16 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
             'persons_addteamofficial',
             'persons_addclubofficial',
             'persons_addmaofficial',
+            'bulk',
         ]],
-        [ $lang->txt('Work Tasks'), 'menu','approvals'],
+        [ $lang->txt('Work Tasks'), 'menu',[
+            'approvals',
+            'pending'
+        ]],
         [ $lang->txt('Transfers'), 'menu', [
         'clearances',    
         'newclearance',    
         'clearancesAll',
-        ]],
-        [ $lang->txt('Registrations'), 'menu',[
-        'bankdetails',
-        'bankfileexport',
-        'paymentsplitrun',
-        'registrationforms', #nationalrego. enable regoforms at entity level.
-        'bulk',
-        'pending',
         ]],
         [ $lang->txt('Reports'), 'menu',[
         'reports',
@@ -992,17 +1009,15 @@ sub getClubMenuData {
             'persons_addteamofficial',
             'persons_addclubofficial',
             'persons_addmaofficial',
+            'bulk',
          ]],
 
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu','venues'],
-        [ $lang->txt('Work Tasks'), 'menu','approvals'],
-        [ $lang->txt('Registration Tasks'), 'menu',[
-        'registrationforms',
-        'transactions',
-        'bulk',
-        'pending',
-        'locator',
+        [ $lang->txt('Work Tasks'), 'menu',[
+            'approvals',
+            'pending'
         ]],
+        [ $lang->txt("$lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Transactions"), 'menu','transactions',],
         [ $lang->txt('Reports'), 'menu',[
         'reports',
         ]],
