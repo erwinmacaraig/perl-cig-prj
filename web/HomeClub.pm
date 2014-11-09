@@ -40,6 +40,9 @@ sub showClubHome  {
     ? getServicesContactsMenu($Data, $Defs::LEVEL_CLUB, $clubID, $Defs::SC_MENU_SHORT,0)
     : '';
   my $contacts = getLocatorContacts($Data,1);
+    ## lets clean up some stuff for now
+    $scMenu = '';
+    $contacts = '';
   my ($dashboard, undef) = showDashboard(
     $Data,
     $client,
@@ -64,13 +67,14 @@ sub showClubHome  {
    $Data->{'ReadOnlyLogin'} ? $readonly = 1 : undef;
   
   my $name = $clubObj->name();
+
+    #ContactsMenu => $scMenu,
+    #Contacts => $contacts,
   my %TemplateData = (
     Welcome => $welcome,
     ReadOnlyLogin => $readonly,
     Logo => $logo,
     Name => $name,
-    ContactsMenu => $scMenu,
-    Contacts => $contacts,
     EditDetailsLink => "$Data->{'target'}?client=$client&amp;a=C_DTE",
     EditContactsLink => "$Data->{'target'}?client=$client&amp;a=CON_LIST",
     EditDashboardLink => "$Data->{'target'}?client=$client&amp;a=DASHCFG_",

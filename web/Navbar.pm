@@ -1026,11 +1026,11 @@ sub getClubMenuData {
             'approvals',
             'pending'
         ]],
-        [ $lang->txt("$lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Transactions"), 'menu','transactions',],
+        [ $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Transactions"), 'menu','transactions',],
         [ $lang->txt('Reports'), 'menu',[
         'reports',
         ]],
-        [ $lang->txt('Documents'), 'menu','clubdocs'],
+        [ $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Documents"), 'menu','clubdocs'],
         [ $lang->txt('Identifiers'), 'menu','clubidentifier'],
         [ $lang->txt('Search'), 'search',[
         'advancedsearch',
