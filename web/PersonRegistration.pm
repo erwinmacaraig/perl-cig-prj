@@ -577,12 +577,17 @@ sub getRegistrationData	{
             DATE_FORMAT(pr.dtAdded, "%Y%m%d%H%i") as dtAdded_,
             DATE_FORMAT(pr.dtAdded, "%Y-%m-%d %H:%i") as dtAdded_formatted,
             DATE_FORMAT(pr.dtLastUpdated, "%Y%m%d%H%i") as dtLastUpdated_,
+            COUNT(DISTINCT T.intTransactionID) as CountTXNs,
             er.strEntityRoleName,
             e.strLocalName,
             e.strLatinName,
             e.intEntityID
         FROM
             tblPersonRegistration_$Data->{'Realm'} AS pr
+            LEFT JOIN tblTransactions as T ON (
+                T.intPersonRegistrationID = pr.intPersonRegistrationID
+                AND T.intStatus = 0
+            )
             LEFT JOIN tblNationalPeriod as np ON (
                 np.intNationalPeriodID = pr.intNationalPeriodID
             )
@@ -600,6 +605,8 @@ sub getRegistrationData	{
         WHERE     
             p.intPersonID = ?
             $where
+        GROUP BY
+            pr.intPersonRegistrationID
         ORDER BY
           pr.dtAdded DESC
     ];	
@@ -793,6 +800,8 @@ sub submitPersonRegistration    {
     if ($count && $pr_ref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_INPROGRESS) {
         my $personStatus = $pr_ref->{'personStatus'};
         $pr_ref->{'strStatus'} = 'PENDING';
+        $pr_ref->{'intPaymentRequired'} = 0 if ($rego_ref->{'CountTXNs'} == 0);
+        $pr_ref->{'paymentRequired'} = 0 if ($rego_ref->{'CountTXNs'} == 0);
 
         updatePersonRegistration($Data, $personID, $personRegistrationID, $pr_ref, $personStatus);
         cleanTasks(
