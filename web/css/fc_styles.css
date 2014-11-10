@@ -109,6 +109,122 @@ ul.icon-left li {
 
 /* Styles Guide  */
 
+header .utilities {
+	background: #004e7e;
+	padding: 10px;
+}
+
+header .utilities ul {
+	margin: 0;
+	padding: 0;
+	float: right;
+}
+
+header .utilities ul li {
+	float: left;
+	list-style-type: none;
+	color: #fff;
+	margin: 0 40px 0 0;
+}
+
+header .utilities ul li:last-child {
+	margin: 0;
+}
+
+header .utilities ul li a {
+	color: #fff;
+	text-decoration: underline;
+}
+
+header .utilities ul li a {
+	color: #fff;
+	text-decoration: underline;
+	font-size: 13px;
+}
+
+header .utilities ul li a:hover {
+	text-decoration: none;
+}
+
+header .logo-area {
+	background: #085a8c;
+	padding: 30px 0;
+}
+
+header .logo-area img {
+	float: left;
+}
+
+header .logo-area h1 {
+	margin: 30px 20px;
+	color: #fff;
+	font-size: 24px;
+	font-family: 'noto_sansbold';
+	font-weight: normal;
+	float: left;
+}
+
+header .logo-area ul {
+	float: right;
+}
+
+header .logo-area ul li {
+	float: left;
+	text-align: center;
+	list-style-type: none;
+	font-size: 12px;
+	color: #fff;
+	margin: 0 40px 0 0;
+}
+
+header .logo-area ul li:last-child {
+	margin: 0;
+}
+
+header .logo-area ul li strong {
+	font-family: 'noto_sansbold';
+	font-weight: normal;
+}
+
+header nav {
+	background: #004e7e;
+	padding: 20px 0;
+	-webkit-box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
+	-moz-box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
+	box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
+}
+
+header nav ul {
+	margin: 0;
+	padding: 0;
+}
+
+header nav ul li {
+	float: left;
+	list-style-type: none;
+}
+
+header nav ul li:first-child a {
+	border: none;
+}
+
+header nav ul li:last-child a {
+	border-right: 1px solid #085a8c;
+}
+
+header nav ul li a {
+	border-left: 1px solid #085a8c;
+	color: #fff;
+	background: #004e7e;
+	padding: 20px;
+}
+
+header nav ul li a:hover {
+	background: #e3e3e3;
+	color: #000;
+	text-decoration: none;
+}
+
 h2.main-heading {
     font-family: 'noto_sansregular';
     font-weight: normal;
@@ -357,9 +473,66 @@ table.table tr td.align-right {
 	padding: 30px 15px 15px;
 }
 
+.offical-status {
+	font-size: 14px;
+	padding: 10px;
+	background: #33a7f2;
+	color: #fff;
+	text-align: center;
+}
+
+.offical-status img {
+	margin: 0 10px 0 0;
+}
+
+.coach-status {
+	font-size: 14px;
+	padding: 10px;
+	background: #1b94e2;
+	color: #fff;
+	text-align: center;
+}
+
+.coach-status img {
+	margin: 0 10px 0 0;
+}
+
+.player-status {
+	font-size: 14px;
+	padding: 10px;
+	background: #0784d4;
+	color: #fff;
+	text-align: center;
+}
+
+.player-status img {
+	margin: 0 10px 0 0;
+}
+
+.not-active-status {
+	font-size: 14px;
+	padding: 10px;
+	background: #cccccc;
+	color: #666;
+	text-align: center;
+}
+
+.not-active-status img {
+	margin: 0 10px 0 0;
+}
+
 .transfer-pending {
+	font-size: 14px;
 	padding: 10px;
 	background: #f0a624;
+	text-align: center;
+	color: #fff;
+}
+
+.transfer-approved {
+	font-size: 14px;
+	padding: 10px;
+	background: #1baf37;
 	text-align: center;
 	color: #fff;
 }
