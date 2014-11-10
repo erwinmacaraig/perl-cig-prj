@@ -79,7 +79,7 @@ sub _getConfiguration {
                 }
             ],
             MemberID => [
-                'Member ID',
+                'Person ID',
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
