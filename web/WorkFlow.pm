@@ -152,17 +152,21 @@ sub handleWorkflow {
 
 	my $body = '';
 	my $title = '';
+    my $error = '';
 
     my $emailNotification = new EmailNotifications::WorkFlow();
 
 	if ( $action eq 'WF_Approve' ) {
-        approveTask($Data, $emailNotification);
-        my $allComplete = checkRelatedTasks($Data);
-        if($allComplete) {
-            ( $body, $title ) = viewSummaryPage( $Data );
-        }
-        else {
-            ( $body, $title ) = viewApprovalPage( $Data );
+        ($body, $title, $error) = approveTask($Data, $emailNotification);
+
+        if(!$error) {
+            my $allComplete = checkRelatedTasks($Data);
+            if($allComplete) {
+                ( $body, $title ) = viewSummaryPage( $Data );
+            }
+            else {
+                ( $body, $title ) = viewApprovalPage( $Data );
+            }
         }
     }
     elsif ( $action eq 'WF_notesS' ) {
@@ -765,6 +769,22 @@ sub approveTask {
     my $WFTaskID = safe_param('TID','number') || '';
 
     my $task = getTask($Data, $WFTaskID);
+    my $sysConfigApprovalLockPaymentRequired = $Data->{'SystemConfig'}{'lockApproval_PaymentRequired_' . $task->{'sysConfigApprovalLockRuleFor'}};
+    my $error = 0;
+    my $response;
+    my $errorStr;
+
+    #NOTE if new approval check needs to be done, just add another condition here (increment error, concat $response)
+    if($sysConfigApprovalLockPaymentRequired and $task->{'paymentRequired'}){
+        $errorStr = $Data->{'lang'}->txt("ERROR: Payment required."); 
+        $response = qq [
+            <span>$errorStr</span><br/>
+        ];
+        $error++;
+    }
+
+    return ($response, "Work Task Approval Result", $error) if $error gt 0;
+
 
 	#Update this task to COMPLETE
 	$st = qq[
@@ -1613,6 +1633,7 @@ sub getTask {
 
     my $st = '';
     my $q = '';
+
     #TODO: join to other tables: person, personrego, etc
 	$st = qq[
 	  	SELECT
@@ -1625,6 +1646,10 @@ sub getTask {
             t.strTaskStatus,
             t.intOnHold,
             e.intEntityLevel,
+            e.intEntityID,
+            IF(t.strWFRuleFor = 'ENTITY', IF(e.intEntityLevel = -47, 'VENUE', IF(e.intEntityLevel = 3, 'CLUB', '')), IF(t.strWFRuleFor = 'REGO', 'REGO', ''))as sysConfigApprovalLockRuleFor,
+            IF(t.strWFRuleFor = 'ENTITY', e.intPaymentRequired, IF(t.strWFRuleFor = 'REGO', pr.intPaymentRequired, 0)) as paymentRequired,
+            pr.intPersonRegistrationID,
             rnt.intTaskNoteID as rejectTaskNoteID,
             rnt.intCurrent as rejectCurrent,
             tnt.intTaskNoteID as toggleTaskNoteID,
@@ -1634,6 +1659,8 @@ sub getTask {
         LEFT JOIN tblWFTaskNotes rnt ON (t.intWFTaskID = rnt.intWFTaskID AND rnt.strType = "REJECT" AND rnt.intCurrent = 1)
         LEFT JOIN tblWFTaskNotes tnt ON (t.intWFTaskID = tnt.intWFTaskID AND tnt.strType = "HOLD" AND tnt.intCurrent = 1)
         LEFT JOIN tblEntity e ON (t.intEntityID = e.intEntityID)
+        LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (pr.intPersonRegistrationID = t.intPersonRegistrationID)
+        LEFT JOIN tblPerson AS p ON (t.intPersonID = p.intPersonID)
 	  	WHERE
             t.intWFTaskID = ?
             AND t.intRealmID = ?
