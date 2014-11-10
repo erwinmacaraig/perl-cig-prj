@@ -314,9 +314,9 @@ sub SQLBuilder  {
     my $txnClub_WHERE = '';
     my $Club_JOIN= '';
     if ($currentLevel == $Defs::LEVEL_CLUB and $self->{'EntityID'})  {
-            $txnClub_WHERE= qq[ AND T.intTXNClubID IN (0, $self->{'EntityID'})];
-            $txnClub_WHERE.= qq[ AND ((TL.intEntityPaymentID IN (0, $self->{'EntityID'}) or TL.intEntityPaymentID IS NULL) AND  (Team.intClubID = $self->{'EntityID'} OR MC.intClubID=$self->{'EntityID'})) ];
-						$Club_JOIN = qq[ LEFT JOIN tblPerson_Clubs as MC ON (M.intPersonID=MC.intMemberID AND MC.intClubID=$self->{'EntityID'} AND MC.intStatus=1) ];
+            $txnClub_WHERE= qq[ AND T.intTXNEntityID IN (0, $self->{'EntityID'})];
+            $txnClub_WHERE.= qq[ AND ((TL.intEntityPaymentID IN (0, $self->{'EntityID'}) or TL.intEntityPaymentID IS NULL) AND  (Entity.intEntityID = $self->{'EntityID'} OR PR.intEntityID=$self->{'EntityID'})) ];
+#						$Club_JOIN = qq[ LEFT JOIN tblPerson_Clubs as MC ON (M.intPersonID=MC.intMemberID AND MC.intClubID=$self->{'EntityID'} AND MC.intStatus=1) ];
 		}
         my $tns_WHERE = '';
 		$tns_WHERE = qq[AND int100_ID=$clientValues->{'natID'}] if ($currentLevel == $Defs::LEVEL_NATIONAL);
@@ -324,6 +324,7 @@ sub SQLBuilder  {
 		$tns_WHERE = qq[AND int20_ID=$clientValues->{'regionID'}] if ($currentLevel == $Defs::LEVEL_REGION);
 		$tns_WHERE = qq[AND int10_ID=$clientValues->{'zoneID'}] if ($currentLevel == $Defs::LEVEL_ZONE);
 
+    my $PRtablename = "tblPersonRegistration_" . $Data->{'Realm'};
     $sql = qq[
       SELECT DISTINCT
 				T.intTransactionID, 
@@ -337,7 +338,7 @@ sub SQLBuilder  {
 				IF(
 					T.intTableType=$Defs::LEVEL_PERSON, 
 					CONCAT(M.strLocalSurname, ", ", M.strLocalFirstname), 
-					Team.strName
+					Entity.strLocalName
 				) as PaymentFor, 
 				TL.intAmount, 
 				TL.strTXN, 
@@ -349,29 +350,29 @@ sub SQLBuilder  {
 				T.strNotes as TXNNotes,  
 				TL.strComments as TLComments,  
 				PaymentEntity.strLocalName AS EntityPaymentID,
-				P.strName,
+				P.strName
 			FROM tblTransactions as T
+                LEFT JOIN $PRtablename as PR ON (PR.intPersonRegistrationID = T.intPersonRegistrationID)
 				LEFT JOIN tblProducts as P ON (P.intProductID=T.intProductID)
 				LEFT JOIN tblTransLog as TL ON (TL.intLogID = T.intTransLogID)
-				LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID AND T.intTableType = $Defs::LEVEL_PERSON AND M.intStatus!=-1)
+				LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID AND T.intTableType = $Defs::LEVEL_PERSON AND M.strStatus NOT IN ("$Defs::PERSON_STATUS_INPROGRESS", "$Defs::PERSON_STATUS_DELETED"))
 				LEFT JOIN tblEntity as Entity ON (Entity.intEntityID = T.intID AND T.intTableType = $Defs::LEVEL_CLUB)
 				LEFT JOIN tblEntity as PaymentEntity ON (PaymentEntity.intEntityID = TL.intEntityPaymentID)
-				$Club_JOIN
-			WHERE T.intRealmID = $Data->{'Realm'}
-				 AND NOT (
-         	T.intProductID IN ($RealmLPF_Ids)
-         	AND T.intStatus = 0 
-         )
+			WHERE 
+                T.intRealmID = $Data->{'Realm'}
+				AND NOT (
+         	        T.intProductID IN ($RealmLPF_Ids)
+         	        AND T.intStatus = 0 
+                )
 				AND (
 					(T.intTableType=$Defs::LEVEL_PERSON AND M.intPersonID IS NOT NULL) OR
-					(T.intTableType=$Defs::LEVEL_CLUB AND Team.intTeamID IS NOT NULL)
+					(T.intTableType=$Defs::LEVEL_CLUB AND Entity.intEntityID IS NOT NULL)
 				    ) 
 				 AND T.intStatus <> -1
 				$tns_WHERE
         $txnClub_WHERE
 				$where_list
  ];
-warn $sql;
     return ($sql,'');
   }
 }
