@@ -2,7 +2,7 @@
 # $Header: svn://svn/SWM/trunk/web/Reports/ReportAdvanced_Transactions.pm 11151 2014-03-27 23:12:43Z dhanslow $
 #
 
-package Reports::ReportAdvanced_Transactions;
+package Reports::ReportAdvanced_MyPeopleTransactions;
 
 use strict;
 use lib ".";
@@ -268,8 +268,6 @@ sub _getConfiguration {
 			intStatus
 			TXNNotes
 			EntityPaymentID
-			strTitle
-			intNewSeasonID
 		)],
 		OptionGroups => {
 			default => ['Details',{}],
@@ -307,26 +305,10 @@ sub SQLBuilder  {
   { #Work out SQL
 
     $where_list=' AND '.$where_list if $where_list and ($where_levels or $current_where);
-		my $RealmLPF_Ids = $SystemConfig->{'LPF_ids'} 
-			? $SystemConfig->{'LPF_ids'} 
-			: 0;
-
-    my $txnClub_WHERE = '';
-    my $Club_JOIN= '';
-    if ($currentLevel == $Defs::LEVEL_CLUB and $self->{'EntityID'})  {
-            $txnClub_WHERE= qq[ AND T.intTXNEntityID IN (0, $self->{'EntityID'})];
-            $txnClub_WHERE.= qq[ AND ((TL.intEntityPaymentID IN (0, $self->{'EntityID'}) or TL.intEntityPaymentID IS NULL) AND  (Entity.intEntityID = $self->{'EntityID'} OR PR.intEntityID=$self->{'EntityID'})) ];
-#						$Club_JOIN = qq[ LEFT JOIN tblPerson_Clubs as MC ON (M.intPersonID=MC.intMemberID AND MC.intClubID=$self->{'EntityID'} AND MC.intStatus=1) ];
-		}
-        my $tns_WHERE = '';
-		$tns_WHERE = qq[AND int100_ID=$clientValues->{'natID'}] if ($currentLevel == $Defs::LEVEL_NATIONAL);
-		$tns_WHERE = qq[AND int30_ID=$clientValues->{'stateID'}] if ($currentLevel == $Defs::LEVEL_STATE);
-		$tns_WHERE = qq[AND int20_ID=$clientValues->{'regionID'}] if ($currentLevel == $Defs::LEVEL_REGION);
-		$tns_WHERE = qq[AND int10_ID=$clientValues->{'zoneID'}] if ($currentLevel == $Defs::LEVEL_ZONE);
 
     my $PRtablename = "tblPersonRegistration_" . $Data->{'Realm'};
     $sql = qq[
-      SELECT DISTINCT
+        SELECT DISTINCT
 				T.intTransactionID, 
 				T.intStatus, 
 				T.curAmount, 
@@ -335,11 +317,7 @@ sub SQLBuilder  {
 				T.dtTransaction, 
 				T.dtPaid, 
 				T.intExportAssocBankFileID, 
-				IF(
-					T.intTableType=$Defs::LEVEL_PERSON, 
-					CONCAT(M.strLocalSurname, ", ", M.strLocalFirstname), 
-					Entity.strLocalName
-				) as PaymentFor, 
+				CONCAT(M.strLocalSurname, ", ", M.strLocalFirstname) as PaymentFor, 
 				TL.intAmount, 
 				TL.strTXN, 
 				TL.strReceiptRef,
@@ -352,27 +330,47 @@ sub SQLBuilder  {
 				PaymentEntity.strLocalName AS EntityPaymentID,
 				P.strName
 			FROM tblTransactions as T
-                LEFT JOIN $PRtablename as PR ON (PR.intPersonRegistrationID = T.intPersonRegistrationID)
+                LEFT JOIN $PRtablename as PR ON (
+                    PR.intPersonRegistrationID = T.intPersonRegistrationID
+                    AND (
+                        T.intStatus=1 
+                        OR (
+                            T.intStatus=0 
+                            AND PR.strStatus NOT IN ("$Defs::PERSONREGO_STATUS_INPROGRESS", "$Defs::PERSONREGO_STATUS_REJECTED")
+                        )
+                    )
+                )
 				LEFT JOIN tblProducts as P ON (P.intProductID=T.intProductID)
 				LEFT JOIN tblTransLog as TL ON (TL.intLogID = T.intTransLogID)
-				LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID AND T.intTableType = $Defs::LEVEL_PERSON AND M.strStatus NOT IN ("$Defs::PERSON_STATUS_INPROGRESS", "$Defs::PERSON_STATUS_DELETED"))
-				LEFT JOIN tblEntity as Entity ON (Entity.intEntityID = T.intID AND T.intTableType = $Defs::LEVEL_CLUB)
+				LEFT JOIN tblPerson as M ON (
+                    M.intPersonID = T.intID 
+                    AND T.intTableType = $Defs::LEVEL_PERSON 
+                    AND (
+                        T.intStatus=1 
+                        OR (
+                            T.intStatus=0 
+                            AND M.strStatus NOT IN ("$Defs::PERSON_STATUS_INPROGRESS", "$Defs::PERSON_STATUS_DELETED")
+                        )
+                    )
+                )
 				LEFT JOIN tblEntity as PaymentEntity ON (PaymentEntity.intEntityID = TL.intEntityPaymentID)
 			WHERE 
                 T.intRealmID = $Data->{'Realm'}
-				AND NOT (
-         	        T.intProductID IN ($RealmLPF_Ids)
-         	        AND T.intStatus = 0 
-                )
-				AND (
-					(T.intTableType=$Defs::LEVEL_PERSON AND M.intPersonID IS NOT NULL) OR
-					(T.intTableType=$Defs::LEVEL_CLUB AND Entity.intEntityID IS NOT NULL)
-				    ) 
-				 AND T.intStatus <> -1
-				$tns_WHERE
-        $txnClub_WHERE
+                AND T.intTableType=$Defs::LEVEL_PERSON
+                AND M.intPersonID IS NOT NULL
+				AND T.intStatus <> -1
+                AND (
+                        (   
+                            TL.intEntityPaymentID IN (0, $self->{'EntityID'}) 
+                            OR TL.intEntityPaymentID IS NULL
+                        ) 
+                        AND  (
+                            T.intTXNEntityID = $self->{'EntityID'} 
+                            OR PR.intEntityID=$self->{'EntityID'}
+                        )
+                ) 
 				$where_list
- ];
+    ];
     return ($sql,'');
   }
 }
