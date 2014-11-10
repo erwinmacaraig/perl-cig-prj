@@ -241,6 +241,12 @@ sub getEntityMenuData {
             url => $baseurl."a=PF_&amp;dtype=REFEREE",
             };
     }
+    if($SystemConfig->{'menu_searchpeople_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+        $menuoptions{'persons_search'} = {
+            name => $lang->txt('Search'),
+            url => $baseurl."a=P_SEARCH&amp;origin=" . $Data->{'clientValues'}{'authLevel'},
+            };
+    }
 
     #if($paymentSplitSettings->{'psBanks'}) {
     #    $menuoptions{'bankdetails'} = {
@@ -429,6 +435,7 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
             'persons_addclubofficial',
             'persons_addmaofficial',
             'bulk',
+            'persons_search',
         ]],
         [ $lang->txt('Work Tasks'), 'menu',[
             'approvals',
@@ -983,6 +990,14 @@ sub getClubMenuData {
                 url => $baseurl."a=PF_&amp;dtype=REFEREE",
                 };
         }
+        if($SystemConfig->{'menu_searchpeople_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+            $menuoptions{'persons_search'} = {
+                name => $lang->txt('Search'),
+                url => $baseurl."a=P_SEARCH&amp;origin=" . $Data->{'clientValues'}{'authLevel'},
+                };
+        }
+
+
    }
 
 
@@ -1016,6 +1031,7 @@ sub getClubMenuData {
             'persons_addclubofficial',
             'persons_addmaofficial',
             'bulk',
+            'persons_search',
          ]],
 
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu',[
