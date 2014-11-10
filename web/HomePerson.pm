@@ -134,6 +134,8 @@ sub showPersonHome	{
         next if ($rego->{'intNationalPeriodID'} == $nationalPeriodID);
 $renew = $Data->{'target'} . "?client=$client&amp;a=PREGF_TU&amp;pt=$rego->{'strPersonType'}&amp;per=$rego->{'strPersonEntityRole'}&amp;pl=$rego->{'strPersonLevel'}&amp;sp=$rego->{'strSport'}&amp;ag=$newAgeLevel&amp;nat=RENEWAL";
         $rego->{'renew_link'} = $renew;
+
+        $rego->{'Status'} = (($rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE) and $rego->{'intPaymentRequired'}) ? $Defs::personRegoStatus{$Defs::PERSONREGO_STATUS_ACTIVE_PENDING_PAYMENT} : $rego->{'Status'};
     }
     $TemplateData{'RegistrationInfo'} = $Reg_ref;
 
