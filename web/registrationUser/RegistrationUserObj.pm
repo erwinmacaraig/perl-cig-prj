@@ -32,10 +32,10 @@ sub load {
   my $self = shift;
   my %params = @_;
   my $id = $self->ID() || 0;
-  my $username = $params{'username'} || '';
-  return undef if(!$id and !$username);
+  my $email = $params{'email'} || '';
+  return undef if(!$id and !$email);
 
-  $self->_load_Details(username => $username);
+  $self->_load_Details(email => $email);
   return undef if !$self->{'DBData'};
 
   return 1;
@@ -56,15 +56,17 @@ sub write {
     #Update User
     
     my $st=qq[
-      UPDATE tblUser
+      UPDATE tblRegistrationUser
       SET
+        email = ?,
         firstName = ?,
         familyName = ?,
         status = ?
-      WHERE userId = ?
+      WHERE registrationUserId = ?
     ];
     my $q = $self->{'db'}->prepare($st);
      $q->execute(
+      $self->{'DBData'}{'email'},
       $self->{'DBData'}{'firstName'},
       $self->{'DBData'}{'familyName'},
       $self->{'DBData'}{'status'},
@@ -74,16 +76,17 @@ sub write {
   else  {
     # Add New User
     
-    #my $confirmkey = newHash(time());
-    #$confirmkey =~ s/[^0-9a-zA-Z]//g;
-    #$confirmkey = substr($confirmkey,0,20);
-    #$self->{'DBData'}{'confirmKey'} = $confirmkey || '';
+    my $confirmkey = newHash(time());
+    $confirmkey =~ s/[^0-9a-zA-Z]//g;
+    $confirmkey = substr($confirmkey,0,20);
+    $self->{'DBData'}{'confirmKey'} = $confirmkey || '';
     my $st=qq[
-      INSERT INTO tblUser (
-        username,
+      INSERT INTO tblRegistrationUser (
+        email,
         firstName,
         familyName,
         status,
+        confirmKey,
         created
       )
       VALUES (
@@ -91,17 +94,19 @@ sub write {
         ?,
         ?,
         $Defs::USER_STATUS_NOTCONFIRMED,
+        ?,
         NOW()
       )
     ];
     my $q = $self->{'db'}->prepare($st);
     $q->execute(
-      $self->{'DBData'}{'username'},
+      $self->{'DBData'}{'email'},
       $self->{'DBData'}{'firstName'},
       $self->{'DBData'}{'familyName'},
+      $self->{'DBData'}{'confirmKey'},
     );
     $self->{'ID'}=$q->{'mysql_insertid'};
-    $self->{'DBData'}{'userId'} = $q->{'mysql_insertid'};
+    $self->{'DBData'}{'registrationUserId'} = $q->{'mysql_insertid'};
 
     if (!$DBI::errstr) {
     }
@@ -136,8 +141,8 @@ sub setPassword {
 
   my $hash  = newHash($id.$newpassword);
   my $st = qq[
-    INSERT INTO tblUserHash (
-      userId,
+    INSERT INTO tblRegistrationUserHash (
+      registrationUserId,
       passwordHash
     )
     VALUES (
@@ -200,7 +205,7 @@ sub FullName {
 
 sub Email  {
   my $self = shift;
-  return $self->{'DBData'}{'username'} || '';
+  return $self->{'DBData'}{'email'} || '';
 }
 
 sub Status {
@@ -213,7 +218,7 @@ sub getPasswdChangeKey {
     my $id = $self->ID() || 0;
     return undef if(!$id); 
     
-    my $query = "UPDATE tblUserHash SET strPasswordChangeKey = ? WHERE userID = ?";
+    my $query = "UPDATE tblRegistrationUserHash SET strPasswordChangeKey = ? WHERE userID = ?";
     my $sth = $self->{'db'}->prepare($query);
     my $url_key = $self->_generateConfirmKey();
     $sth->execute($url_key,$id);
@@ -225,29 +230,29 @@ sub _load_Details {
   my $self = shift;
   my $id = $self->ID() || 0;
   my %params = @_;
-  my $username = $params{'username'} || '';
-  return undef if(!$id and !$username);
+  my $email = $params{'email'} || '';
+  return undef if(!$id and !$email);
 
   my $field = '';
 
   my $value = '';
   if($id)  {
-    $field = 'P.userId';
+    $field = 'P.registrationUserId';
     $value = $id;
   }
-  elsif($username)  {
-    $field = 'P.username';
-    $value = $username;
+  elsif($email)  {
+    $field = 'P.email';
+    $value = $email;
   }
   return undef if !$value;
 
   my $st = qq[ 
-    SELECT P.userId AS PID, 
+    SELECT P.registrationUserId AS PID, 
       P_H.*,
       P.*
-    FROM tblUser AS P
-      LEFT JOIN tblUserHash AS P_H ON (
-        P.userId = P_H.userId  
+    FROM tblRegistrationUser AS P
+      LEFT JOIN tblRegistrationUserHash AS P_H ON (
+        P.registrationUserId = P_H.registrationUserId  
       )
     WHERE 
       $field = ?

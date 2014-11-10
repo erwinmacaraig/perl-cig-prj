@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS tblUser;
 CREATE TABLE tblUser (
     userId INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    email VARCHAR(250) NOT NULL,
+    username VARCHAR(50) NOT NULL,
     status TINYINT DEFAULT 0,
     firstName VARCHAR(100),
     familyName VARCHAR(100),
@@ -11,6 +11,6 @@ CREATE TABLE tblUser (
     ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (userId),
-    UNIQUE KEY index_email(email)
+    UNIQUE KEY index_username(username)
 );
 

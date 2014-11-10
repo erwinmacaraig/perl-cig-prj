@@ -1,5 +1,9 @@
 #!/usr/bin/perl -w
 
+#
+# $Header: svn://svn/SWM/trunk/web/authlist.cgi 10456 2014-01-16 03:51:34Z eobrien $
+#
+
 use DBI;
 use CGI qw(:cgi escape unescape);
 
@@ -31,48 +35,16 @@ sub main {
 
     my($sessionKey, $errors) = login(\%Data, $email, $password);
 
+warn("TEST :$sessionKey:");
     my $body = '';
     if($sessionKey) {
+warn("IN HERE $Defs::COOKIE_LOGIN");
         push @{$Data{'WriteCookies'}}, [
             $Defs::COOKIE_LOGIN,
             $sessionKey,
             '3h',
         ];
-
-        my $user = new UserSession(
-            db    => $db,
-            cache => $Data{'cache'},
-            key   => $sessionKey,
-        );
-
-        my $uID = $user->id() || 0;
-        if ( !$uID ) {
-            $Data{'RedirectTo'} = "$Defs::base_url/";
-        }
-        else    {
-            my $st = qq[
-                SELECT
-                    entityTypeId,
-                    entityId
-                FROM
-                    tblUserAuth
-                WHERE
-                    userId = ?
-                LIMIT 1
-            ];
-            my $q = $db->prepare($st);
-            $q->execute($uID);
-            my ( $type, $id) = $q->fetchrow_array();
-            $q->finish();
-            if(!$type or !$id)  {
-
-                $Data{'RedirectTo'} = "$Defs::base_url/";
-            }
-            else    {
-                $Data{'RedirectTo'} = "$Defs::base_url/authenticate.cgi?i=$id&amp;t=$type";
-            }
-        }
-
+        $Data{'RedirectTo'} = "$Defs::base_url/authlist.cgi";
     }
     else    {
       $body = runTemplate(

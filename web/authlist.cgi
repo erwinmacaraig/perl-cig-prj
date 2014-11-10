@@ -22,6 +22,7 @@ main();
 
 sub main {
 
+return 0;
     my %Data = ();
     my $db   = connectDB();
     $Data{'db'} = $db;
