@@ -198,9 +198,9 @@ sub checkUploadedRegoDocuments {
     				$rego_ref->{'strISONationality'}
     );
     
-        
     my $dref = $sth->fetchrow_hashref();
-    return 1 if($dref->{'items'} == 0);
+    my $total_items = $dref->{'items'};     
+    return 1 if($total_items == 0);
     #there are no required documents to be uploaded
      
     $query = qq[SELECT count(intDocumentID) as tot FROM tblDocuments WHERE intPersonID = ? AND intPersonRegistrationID = ?];
@@ -210,7 +210,7 @@ sub checkUploadedRegoDocuments {
     $dref = $sth->fetchrow_hashref();
     
     $sth->finish();
-    return 1 if($dref->{'tot'} > 0);
+    return 1 if( ($dref->{'tot'} > 0) && $dref->{'tot'} == $total_items);
     return 0;
 }
 sub displayRegoFlowDocuments    {
