@@ -55,6 +55,20 @@ sub getCommonValues {
 		}
 		$optvalues{'DefCodes'} = \%Codes;
 	}
+	if($options->{'LegalTypes'})	{
+		my %LegalTypes=();
+		my $statement=qq[
+			SELECT strLegalType, intLegalTypeID
+			FROM tblLegalType
+			WHERE intRealmID IN (0, ?)
+		];
+		my $query = $db->prepare($statement);
+		$query->execute($Data->{'Realm'});
+		while (my $dref = $query->fetchrow_hashref() ) {
+			$LegalTypes{$dref->{'intLegalTypeID'}}=$dref->{strLegalType};
+		}
+		$optvalues{'LegalTypes'} = \%LegalTypes;
+	}
 
 	if($options->{'SubRealms'})	{
 		my %AssocTypes=();
