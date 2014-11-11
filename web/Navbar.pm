@@ -241,6 +241,12 @@ sub getEntityMenuData {
             url => $baseurl."a=PF_&amp;dtype=REFEREE",
             };
     }
+    if($SystemConfig->{'menu_searchpeople_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+        $menuoptions{'persons_search'} = {
+            name => $lang->txt('Search'),
+            url => $baseurl."a=P_SEARCH&amp;origin=" . $Data->{'clientValues'}{'authLevel'},
+            };
+    }
 
     #if($paymentSplitSettings->{'psBanks'}) {
     #    $menuoptions{'bankdetails'} = {
@@ -269,10 +275,12 @@ sub getEntityMenuData {
             url => $baseurl."a=ERA_",
         };
 
-    $menuoptions{'usermanagement'} = {
-        name => $lang->txt('User Management'),
-        url  => $baseurl."a=AM_",
-    };
+        if($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL)   {
+            $menuoptions{'usermanagement'} = {
+                name => $lang->txt('User Management'),
+                url => $baseurl."a=AM_",
+            };
+        }
 
     if( 1==2 and scalar(keys $children)) {
         $menuoptions{'fieldconfig'} = {
@@ -429,6 +437,7 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
             'persons_addclubofficial',
             'persons_addmaofficial',
             'bulk',
+            'persons_search',
         ]],
         [ $lang->txt('Work Tasks'), 'menu',[
             'approvals',
@@ -812,10 +821,12 @@ sub getClubMenuData {
                 and allowedAction($Data,'c_e')
         ) {
 
-            $menuoptions{'usermanagement'} = {
-                name => $lang->txt('User Management'),
-                url => $baseurl."a=AM_",
-            };
+            if($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL)   {
+                $menuoptions{'usermanagement'} = {
+                    name => $lang->txt('User Management'),
+                    url => $baseurl."a=AM_",
+                };
+            }
             if ( $Data->{'SystemConfig'}{'AllowPersonTransfers'}  and allowedAction($Data, 'c_e')) {
                 $menuoptions{'transferperson'} = {
                     url => $baseurl."a=P_TRANSFER&amp;l=$Defs::LEVEL_PERSON",
@@ -983,6 +994,14 @@ sub getClubMenuData {
                 url => $baseurl."a=PF_&amp;dtype=REFEREE",
                 };
         }
+        if($SystemConfig->{'menu_searchpeople_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+            $menuoptions{'persons_search'} = {
+                name => $lang->txt('Search'),
+                url => $baseurl."a=P_SEARCH&amp;origin=" . $Data->{'clientValues'}{'authLevel'},
+                };
+        }
+
+
    }
 
 
@@ -1016,6 +1035,7 @@ sub getClubMenuData {
             'persons_addclubofficial',
             'persons_addmaofficial',
             'bulk',
+            'persons_search',
          ]],
 
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu',[

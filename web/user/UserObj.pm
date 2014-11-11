@@ -32,10 +32,10 @@ sub load {
   my $self = shift;
   my %params = @_;
   my $id = $self->ID() || 0;
-  my $email = $params{'email'} || '';
-  return undef if(!$id and !$email);
+  my $username = $params{'username'} || '';
+  return undef if(!$id and !$username);
 
-  $self->_load_Details(email => $email);
+  $self->_load_Details(username => $username);
   return undef if !$self->{'DBData'};
 
   return 1;
@@ -58,7 +58,6 @@ sub write {
     my $st=qq[
       UPDATE tblUser
       SET
-        email = ?,
         firstName = ?,
         familyName = ?,
         status = ?
@@ -66,7 +65,6 @@ sub write {
     ];
     my $q = $self->{'db'}->prepare($st);
      $q->execute(
-      $self->{'DBData'}{'email'},
       $self->{'DBData'}{'firstName'},
       $self->{'DBData'}{'familyName'},
       $self->{'DBData'}{'status'},
@@ -76,17 +74,16 @@ sub write {
   else  {
     # Add New User
     
-    my $confirmkey = newHash(time());
-    $confirmkey =~ s/[^0-9a-zA-Z]//g;
-    $confirmkey = substr($confirmkey,0,20);
-    $self->{'DBData'}{'confirmKey'} = $confirmkey || '';
+    #my $confirmkey = newHash(time());
+    #$confirmkey =~ s/[^0-9a-zA-Z]//g;
+    #$confirmkey = substr($confirmkey,0,20);
+    #$self->{'DBData'}{'confirmKey'} = $confirmkey || '';
     my $st=qq[
       INSERT INTO tblUser (
-        email,
+        username,
         firstName,
         familyName,
         status,
-        confirmKey,
         created
       )
       VALUES (
@@ -94,16 +91,14 @@ sub write {
         ?,
         ?,
         $Defs::USER_STATUS_NOTCONFIRMED,
-        ?,
         NOW()
       )
     ];
     my $q = $self->{'db'}->prepare($st);
     $q->execute(
-      $self->{'DBData'}{'email'},
+      $self->{'DBData'}{'username'},
       $self->{'DBData'}{'firstName'},
       $self->{'DBData'}{'familyName'},
-      $self->{'DBData'}{'confirmKey'},
     );
     $self->{'ID'}=$q->{'mysql_insertid'};
     $self->{'DBData'}{'userId'} = $q->{'mysql_insertid'};
@@ -205,7 +200,7 @@ sub FullName {
 
 sub Email  {
   my $self = shift;
-  return $self->{'DBData'}{'email'} || '';
+  return $self->{'DBData'}{'username'} || '';
 }
 
 sub Status {
@@ -230,8 +225,8 @@ sub _load_Details {
   my $self = shift;
   my $id = $self->ID() || 0;
   my %params = @_;
-  my $email = $params{'email'} || '';
-  return undef if(!$id and !$email);
+  my $username = $params{'username'} || '';
+  return undef if(!$id and !$username);
 
   my $field = '';
 
@@ -240,9 +235,9 @@ sub _load_Details {
     $field = 'P.userId';
     $value = $id;
   }
-  elsif($email)  {
-    $field = 'P.email';
-    $value = $email;
+  elsif($username)  {
+    $field = 'P.username';
+    $value = $username;
   }
   return undef if !$value;
 

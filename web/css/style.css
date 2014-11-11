@@ -352,7 +352,7 @@ fieldset.RO_roptions, fieldset.ROReportFormat, fieldset.ROsavedreports	{
 }
 div.row {
   clear: both;
-  padding-top: 5px;
+  /*padding-top: 5px;*/
 }
                                                                                                         
 div.row span.label {

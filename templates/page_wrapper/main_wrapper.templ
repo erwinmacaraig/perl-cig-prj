@@ -12,6 +12,7 @@
     <link rel="stylesheet" type="text/css" href="js/chosen/chosen.css">
 		[% CSSFiles %]
     <link rel="stylesheet" type="text/css" href="css/style.css?2012022201">
+    <link rel="stylesheet" type="text/css" href="css/fc_styles.css">
     <link rel="stylesheet" type="text/css" href="css/spfont.css">
     <link rel="stylesheet" type="text/css" href="css/print.css" media="print"> 
     <link rel="stylesheet" type="text/css" href="css/basicdropzone.css">
@@ -41,41 +42,87 @@
 
   </head>
   <body>
-    <div id ="pagewrapper" class="membership-wrap">
-			[% GlobalNav %]
-    	<div id="content-wrap">
-    			[% IF MemListURL OR TeamListURL OR ClubListURL OR CompListURL %]
-      			<div class="quick-nav">
-        			[% IF MemListURL %]
-          			<div class="jump-item jump-item-1">
-            			<a href="[% MemListURL %]"><img src="images/member.png" /><p>[% MemListName %]</p></a>
-          			</div>
-        			[% END %]
-        			[% IF ClubListURL %]
-          			<div class="jump-item jump-item-3">
-            			<a href="[% ClubListURL  %]"><img src="images/club.png" /><p>[% ClubListName %]</p></a>
-          			</div>
-        			[% END %]
-      			</div>
-    			[% END %]
-    		<div id="pageholder">
-    			<div id="navbar">[% NavBar %]</div>
-    			<div id="contentholder">
-    					<div id="content">[% Ads_Heading %][% Content %]</div> <!-- End Content -->
-    			</div> <!-- End Content Holder -->
-  				[% Ads_BottomLeaderboard %]
-	  		</div> <!-- End Page Holder -->
-				<div id="footer">
-            [% IF !NoSPLogo %]<a href="http://www.sportingpulse.com"><img src="images/SP_powered.png" alt="SportingPulse"></a>[% END %]
-            <div class="footerline">[% Lang.txt('COPYRIGHT') %]</div>
+	<!--
+    <div class="header-section section">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <div id ="pagewrapper" class="membership-wrap">
+              [% GlobalNav %]
+            </div>
           </div>
-    	</div>
-		<script type="text/javascript" src="js/reg.js"></script>
-    <script type="text/javascript" src="js/chosen/chosen.jquery.min.js"></script>
-		[% BottomJSFiles %]
-		[% BottomJSInline %]
-    [% StatsCounter %]
+        </div>
+      </div>
     </div>
+	-->
+
+	<header>
+		[% GlobalNav %]
+	</header>
+
+    <div class="content-section section">
+      <div class="container">
+        <div class="row">
+
+          <div class="col-md-12">
+              [% IF MemListURL OR TeamListURL OR ClubListURL OR CompListURL %]
+              <div class="quick-nav">
+                [% IF MemListURL %]
+                  <div class="jump-item jump-item-1">
+                    <a href="[% MemListURL %]"><img src="images/member.png" /><p>[% MemListName %]</p></a>
+                  </div>
+                [% END %]
+                [% IF ClubListURL %]
+                  <div class="jump-item jump-item-3">
+                    <a href="[% ClubListURL  %]"><img src="images/club.png" /><p>[% ClubListName %]</p></a>
+                  </div>
+                [% END %]
+              </div>
+              [% END %]
+
+            <div id="pageholder">
+              <div id="navbar">
+                [% NavBar %]
+              </div>
+              <div id="contentholder">
+                  <div id="content">
+                  [% Ads_Heading %]
+                  [% Content %]
+                  </div>
+                  <!-- End Content -->
+              </div>
+              <!-- End Content Holder -->
+                [% Ads_BottomLeaderboard %]
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-section section">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <div id="footer">
+              [% IF !NoSPLogo %]
+              <a href="http://www.sportingpulse.com"><img src="images/SP_powered.png" alt="SportingPulse"></a>
+              [% END %]
+              <div class="footerline">
+                [% Lang.txt('COPYRIGHT') %]
+              </div>
+            </div>
+          </div>
+          <script type="text/javascript" src="js/reg.js"></script>
+          <script type="text/javascript" src="js/chosen/chosen.jquery.min.js"></script>
+          [% BottomJSFiles %]
+          [% BottomJSInline %]
+          [% StatsCounter %]
+          </div>
+        </div>
+      </div>
+    </div>
+
 		[% IF Wizard %]
 			[% Wizard %]
 		[% END %]

@@ -79,7 +79,7 @@ sub _getConfiguration {
                 }
             ],
             MemberID => [
-                'Member ID',
+                'Person ID',
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
@@ -1888,11 +1888,10 @@ sub SQLBuilder {
             $products_join
         WHERE
             $where_list
+            $where_levels
+            $current_where
             AND PR.intEntityID = $entityID
     ];
-            #$where_levels
-            #$current_where
-print STDERR $sql;
 
     return ( $sql, '' );
 }

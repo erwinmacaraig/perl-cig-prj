@@ -185,6 +185,10 @@ sub handlePerson {
     elsif($action =~ /P_CERT/){
     	($resultHTML, $title) = PersonCertifications::handleCertificates($action,$Data,$personID);  
     }
+    elsif($action =~ /P_SEARCH/){
+        #place holder atm
+    	($resultHTML, $title) = (undef, undef);
+    }
     else {
         print STDERR "Unknown action $action\n";
     }

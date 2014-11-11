@@ -255,12 +255,28 @@ sub listPendingRegistrations    {
     my %tempClientValues = getClient($client);
     my @fielddata = ();
     my $tempaction;
-    $st = qq[SELECT intEntityLevel, intEntityID, strLocalName, strStatus FROM tblEntity INNER JOIN tblEntityLinks ON tblEntity.intEntityID =
-             tblEntityLinks.intChildEntityID WHERE intParentEntityID = ? AND intRealmID = ? AND strStatus = 'PENDING' ORDER BY intEntityLevel, strLocalName ASC 
-              ];
+    $st = qq[
+        SELECT
+            intEntityLevel,
+            IF(strStatus != 'ACTIVE', strStatus, IF(strStatus = 'ACTIVE' AND intPaymentRequired = 1, 'ACTIVE_PENDING_PAYMENT', strStatus)) AS displayStatus,
+            intEntityID,
+            strLocalName,
+            strStatus
+        FROM
+            tblEntity
+        INNER JOIN
+            tblEntityLinks ON (tblEntity.intEntityID = tblEntityLinks.intChildEntityID)
+        WHERE
+            intParentEntityID = ?
+            AND intRealmID = ?
+            AND (strStatus IN ('PENDING') OR (strStatus IN ('ACTIVE') AND intPaymentRequired = 1))
+        ORDER BY
+            intEntityLevel, strLocalName ASC 
+        ];
     $query = $Data->{db}->prepare($st);
     $query->execute( $entityID, $Data->{Realm} );
     while (my $dref = $query->fetchrow_hashref) {
+        print STDERR Dumper $dref;
         $tempClientValues{currentLevel} = $dref->{intEntityLevel};
         setClientValue(\%tempClientValues, $dref->{intEntityLevel}, $dref->{intEntityID});
         my $tempClient = setClient(\%tempClientValues);
@@ -280,6 +296,7 @@ sub listPendingRegistrations    {
             strLocalName => $dref->{strLocalName},
             EntityLevel => $Defs::LevelNames{$dref->{intEntityLevel}},
             strStatus => $dref->{strStatus}, 
+            displayStatus => $Defs::personRegoStatus{$dref->{displayStatus}},
        };
     }
 
@@ -299,7 +316,8 @@ sub listPendingRegistrations    {
         },
         {
             name   => $Data->{'lang'}->txt('Status'),
-            field  => 'strStatus',
+            #field  => 'strStatus',
+            field  => 'displayStatus',
             width  => 30,
         },
        

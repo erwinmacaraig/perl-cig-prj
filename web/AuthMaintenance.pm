@@ -1,7 +1,3 @@
-#
-# $Header: svn://svn/SWM/trunk/web/AuthMaintenance.pm 8492 2013-05-16 02:20:28Z cgao $
-#
-
 package AuthMaintenance;
 
 require Exporter;
@@ -15,7 +11,7 @@ use Utils;
 use CGI qw(unescape param popup_menu);
 use AuditLog;
 use TTTemplate;
-#use Passport;
+use UserObj;
 use GridDisplay;
 
 sub handleAuthMaintenance {
@@ -30,6 +26,7 @@ sub handleAuthMaintenance {
 	my $title       = 'User Management';
 	my $ret         = q{};
 
+    return '' if $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL;
 	if(!$entityTypeID or !$entityID)	{
 		$entityTypeID = $Data->{'clientValues'}{'currentLevel'};
 		$entityID = getID($Data->{'clientValues'}, $entityTypeID);
@@ -83,7 +80,7 @@ sub auth_list {
 			ua.readOnly,
 			DATE_FORMAT(lastLogin,'%Y-%m-%d (%H:%i %p)') as dtLastLogin_FMT,
             u.status,
-            u.email,
+            u.username,
             u.firstName,
             u.familyName,
             ua.readOnly
@@ -120,14 +117,14 @@ sub auth_list {
 
     while(my $dref=$q->fetchrow_hashref()) {
         my $name = join (' ',($dref->{'firstName'} || ''), ($dref->{'familyName'} || ''));
-        next if !$dref->{'email'};
+        next if !$dref->{'username'};
         next if !$dref->{'status'} == 2;
         my $deleteLink = qq[<a href = "$Data->{'target'}?a=$delaction&amp;a2=$delaction2&amp;id=$dref->{'userId'}&amp;client=$client" onclick = "return confirm('Are you sure you want to remove $name?');">Delete</a>];
         $deleteLink = '-' if($dref->{'userId'} ==$Data->{'clientValues'}{'userID'} and $entityTypeID==$Data->{'clientValues'}{'authLevel'} and ($Data->{'ReadOnlyLogin'}));
 		push @outputdata, {
 		    id => $dref->{'userId'} || next,
 			Name => $name,
-			Email => $dref->{'email'},
+			Username => $dref->{'username'},
 			ReadOnly => $dref->{'readOnly'},
 			AccessLevel => $dref->{'readOnly'}? 'Restricted Access' : 'Full',
 			LastLogin => $dref->{'dtLastLogin_FMT'} || '',
@@ -140,8 +137,8 @@ sub auth_list {
       field =>  'Name',
     },
     {
-      name =>   $Data->{'lang'}->txt('Email'),
-      field =>  'Email',
+      name =>   $Data->{'lang'}->txt('Username'),
+      field =>  'Username',
     },
     {
       name =>   $Data->{'lang'}->txt('Access'),
@@ -211,11 +208,11 @@ sub auth_delete {
 		$id,
 	);
 	$q->finish();
-auditLog($id, $Data, 'Delete', 'User Management');
-	return qq[<div class = "OKmsg">User access removed</div>];
+    auditLog($id, $Data, 'Delete', 'User Management');
+	return qq[<div class = "OKmsg">].$Data->{'lang'}->txt('User access removed') .qq[</div>];
 }
 sub loadUserDetails {
-    my ($Data, $email) = @_;
+    my ($Data, $username) = @_;
 
     my $st = qq[
         SELECT
@@ -223,10 +220,10 @@ sub loadUserDetails {
         FROM
             tblUser
         WHERE
-            email=?
+            username=?
     ];
 	my $q = $Data->{'db'}->prepare($st);
-	$q->execute($email);
+	$q->execute($username);
     my $dref = $q->fetchrow_hashref();
     return $dref;
 }
@@ -240,19 +237,45 @@ sub auth_add {
 	) = @_;
 
 	my $db = $Data->{'db'};
+	my $lang = $Data->{'lang'};
 
-	my $newemail = param('newemail') || '';
+	my $newusername = param('newusername') || '';
+	my $newfname= param('newfname') || '';
+	my $newsname= param('newsname') || '';
+	my $newpassword= param('newpassword') || '';
+	my $newpassword2= param('newpassword2') || '';
 	my $readonly = param('readonly') || 0;
-	return '' if !$newemail;
+    my @missingFields = ();
 	return '' if !$entityTypeID;
 	return '' if !$entityID;
+	push @missingFields, $lang->txt('First name') if !$newfname;
+	push @missingFields, $lang->txt('Family name') if !$newsname;
+	push @missingFields, $lang->txt('Username') if !$newusername;
+	push @missingFields, $lang->txt('Password') if !$newpassword;
+	push @missingFields, $lang->txt('Re-enter Password') if !$newpassword2;
 
-    my $user_ref = loadUserDetails($Data, $newemail);
-    my $DB_intMemberID = $user_ref->{'userId'} || 0;
-	$DB_intMemberID = 0 if $user_ref->{'status'} != 2;
-
-	if($DB_intMemberID) {
-
+    if(scalar(@missingFields))  {
+        my $fields = '<li>'.join('<li>',@missingFields);
+        return qq[<div class = "warningmsg">].$Data->{'lang'}->txt("Missing Fields:") .qq[<ul>$fields</ul></div>];
+    }
+    if($newpassword ne $newpassword2)  {
+        return qq[<div class = "warningmsg">].$Data->{'lang'}->txt('Passwords do not match') .qq[</div>];
+    }
+    my $user = new UserObj(db => $db);
+    my $found = $user->load(username => $newusername);
+    if($found)  {
+        return qq[<div class = "warningmsg">].$Data->{'lang'}->txt('Username already exists') .qq[</div>];
+    }
+    my %userData = (
+        username => $newusername,
+        firstName=> $newfname,
+        familyName=> $newsname,
+        status => $Defs::USER_STATUS_CONFIRMED,
+    );
+    $user->update(\%userData);
+    
+	if($user->ID()) {
+        $user->setPassword($newpassword);
 		my $st = qq[
 			INSERT INTO tblUserAuth (
                 userId,
@@ -269,19 +292,20 @@ sub auth_add {
 		];
 		my $q = $db->prepare($st);
 		$q->execute(
-			$DB_intMemberID,
+			$user->ID(),
 			$entityTypeID,
 			$entityID,
 			$readonly,
 		);
 		$q->finish();
 
-auditLog($DB_intMemberID, $Data, 'Add', 'User Management');
+        auditLog($user->ID(), $Data, 'Add', 'User Management');
 	}
 	else	{
-		return qq[<div class = "warningmsg">I'm sorry I cannot find that user</div>];
+        return qq[<div class = "warningmsg">].$Data->{'lang'}->txt("I'm sorry I can't find that user") .qq[</div>];
 	}
 
-	return qq[<div class = "OKmsg">User access granted</div>];
+	return qq[<div class = "OKmsg">].$Data->{'lang'}->txt('User access granted') .qq[</div>];
 }
+
 1;
