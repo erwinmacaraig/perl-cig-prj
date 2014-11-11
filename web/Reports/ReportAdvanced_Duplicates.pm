@@ -39,121 +39,34 @@ sub _getConfiguration {
     SQLBuilder => \&SQLBuilder,
 
 		Fields => {
-			strAssocName => [
-				$Data->{'LevelNames'}{$Defs::LEVEL_ASSOC}.' Name',
-				{
-					displaytype=>'text',
-					fieldtype=>'text',
-					allowsort=>1,
-					active=>1,
-					dbfield=>'tblAssoc.strName',
-					enabled => $clientValues->{assocID}==-1,
-					allowgrouping=>1,
-				}
-			],
+			strEntityName => [ "Organisation", { displaytype=>'text', fieldtype=>'text', allowsort=>1, active=>1, dbfield=>'tblEntity.strLocalName', allowgrouping=>1, } ],
 
-			intAssocTypeID=> [
-				$Data->{'LevelNames'}{$Defs::LEVEL_ASSOC}.' Type',
-				{
-					displaytype=>'lookup',
-					fieldtype=>'dropdown',
-					dropdownoptions=> $CommonVals->{'SubRealms'},
-					allowsort=>1,
-					enabled => (scalar(keys %{$CommonVals->{'SubRealms'}}) and  $currentLevel > $Defs::LEVEL_ASSOC),
-					allowgrouping=>1,
-				}
-			],
+            intEntityLevel=> [
+                'Organisation Level',
+                {
+                    dbfield         => 'tblEntity.intEntityLevel',
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => \%Defs::DisplayEntityLevelNames,
+                    allowgrouping   => 1
+                }
+            ],
 
-			strZoneName=> [
-				$Data->{'LevelNames'}{$Defs::LEVEL_ZONE}.' Name',
-				{
-					displaytype=>'text',
-					fieldtype=>'text',
-					allowsort=>1,
-					dbfield => "IF(tblZone.intStatusID = $Defs::NODE_SHOW, tblZone.strName, '')",
-					allowgrouping=>1,
-					active=>1,
-					enabled => $currentLevel > $Defs::LEVEL_ZONE,
-				}
-			],
+			strZoneName=> [ $Data->{'LevelNames'}{$Defs::LEVEL_ZONE}.' Name', { displaytype=>'text', fieldtype=>'text', allowsort=>1, dbfield => "IF(tblZone.intStatusID = $Defs::NODE_SHOW, tblZone.strName, '')", allowgrouping=>1, active=>1, enabled => $currentLevel > $Defs::LEVEL_ZONE, } ], 
+			strRegionName=> [ $Data->{'LevelNames'}{$Defs::LEVEL_REGION}.' Name', { displaytype=>'text', fieldtype=>'text', allowsort=>1, dbfield => "IF(tblRegion.intStatusID = $Defs::NODE_SHOW, tblRegion.strName, '')", allowgrouping=>1, active=>1, enabled => $currentLevel > $Defs::LEVEL_REGION, } ],
 
-			strRegionName=> [
-				$Data->{'LevelNames'}{$Defs::LEVEL_REGION}.' Name',
-				{
-					displaytype=>'text',
-					fieldtype=>'text',
-					allowsort=>1,
-					dbfield => "IF(tblRegion.intStatusID = $Defs::NODE_SHOW, tblRegion.strName, '')",
-					allowgrouping=>1,
-					active=>1,
-					enabled => $currentLevel > $Defs::LEVEL_REGION,
-				}
-			],
+			strStateName=> [ $Data->{'LevelNames'}{$Defs::LEVEL_STATE}.' Name', { displaytype=>'text', fieldtype=>'text', allowsort=>1, dbfield => "IF(tblState.intStatusID = $Defs::NODE_SHOW, tblState.strName, '')", allowgrouping=>1, active=>1, enabled => $currentLevel > $Defs::LEVEL_STATE, } ],
 
-			strStateName=> [
-				$Data->{'LevelNames'}{$Defs::LEVEL_STATE}.' Name',
-				{
-					displaytype=>'text',
-					fieldtype=>'text',
-					allowsort=>1,
-					dbfield => "IF(tblState.intStatusID = $Defs::NODE_SHOW, tblState.strName, '')",
-					allowgrouping=>1,
-					active=>1,
-					enabled => $currentLevel > $Defs::LEVEL_STATE,
-				}
-			],
-
-			strNationalName=> [
-				$Data->{'LevelNames'}{$Defs::LEVEL_NATIONAL}.' Name',
-				{
-					displaytype=>'text',
-					fieldtype=>'text',
-					allowsort=>1,
-					dbfield => "IF(tblNational.intStatusID = $Defs::NODE_SHOW, tblNational.strName, '')",
-					allowgrouping=>1,
-					active=>1,
-					enabled => $currentLevel > $Defs::LEVEL_NATIONAL,
-				}
-			],
-
-			strIntZoneName=> [
-				$Data->{'LevelNames'}{$Defs::LEVEL_INTZONE}.' Name',
-				{
-					displaytype=>'text',
-					fieldtype=>'text',
-					allowsort=>1,
-					dbfield => "IF(tblIntZone.intStatusID = $Defs::NODE_SHOW, tblIntZone.strName, '')" ,
-					allowgrouping=>1,
-					active=>1,
-					enabled => $currentLevel > $Defs::LEVEL_INTZONE,
-				}
-			],
-
-			strIntRegionName=> [
-				$Data->{'LevelNames'}{$Defs::LEVEL_INTREGION}.' Name',
-				{
-					displaytype=>'text',
-					fieldtype=>'text',
-					allowsort=>1,
-					dbfield => " IF(tblIntRegion.intStatusID = $Defs::NODE_SHOW, tblIntRegion.strName, '') ",
-					allowgrouping=>1,
-					active=>1,
-					enabled => $currentLevel > $Defs::LEVEL_INTREGION,
-				}
-			],
-			numMembers=> ["Number of Duplicates to be Resolved",{displaytype=>'none', fieldtype=>'text', active=>1, dbfield => 'COUNT(tblMember.intMemberID)', total=>1, allowsort=>1}],
+			numMembers=> ["Number of Duplicates to be Resolved",{displaytype=>'none', fieldtype=>'text', active=>1, dbfield => 'COUNT(tblPerson.intPersonID)', total=>1, allowsort=>1}],
 		},
 
 		Order => [qw(
 			numMembers
-			strAssocName
-			intAssocTypeID
+			strEntityName
+            intEntityLevel
 			strZoneName
 			strRegionName
 			strStateName
-			strNationalName
-			strIntZoneName
-			strIntRegionName
 		)],
 		OptionGroups => {
 			default => ['Details',{}],
@@ -191,25 +104,21 @@ sub SQLBuilder  {
   { #Work out SQL
 
     $where_list=' AND '.$where_list if $where_list and ($where_levels or $current_where);
-		my $groupfields = '';
-		my @grouping = ();
-    push @grouping, 'tblIntRegion.strName' if ($currentLevel > $Defs::LEVEL_INTREGION and $ActiveFields->{'strIntRegionName'});
-    push @grouping, 'tblIntZone.strName' if ($currentLevel > $Defs::LEVEL_INTZONE and $ActiveFields->{'strIntZoneName'});
-    push @grouping, 'tblNational.strName' if ($currentLevel > $Defs::LEVEL_NATIONAL and $ActiveFields->{'strNationalName'});
-    push @grouping, 'tblState.strName' if ($currentLevel > $Defs::LEVEL_REGION and $ActiveFields->{'strStateName'});
-    push @grouping, 'tblRegion.strName' if ($currentLevel > $Defs::LEVEL_ZONE and $ActiveFields->{'strRegionName'});
-    push @grouping, 'tblZone.strName' if ($currentLevel > $Defs::LEVEL_ASSOC and $ActiveFields->{'strZoneName'});
-    push @grouping, 'tblAssoc.strName' if ($currentLevel > $Defs::LEVEL_ASSOC and $ActiveFields->{'strAssocName'});
 
-    my $grp_line=join(',',@grouping) || '';
-    $grp_line="GROUP BY $grp_line" if $grp_line;
+    my $PRtablename = "tblPersonRegistration_" . $Data->{'Realm'};
 
     $sql = qq[
       SELECT ###SELECT###
-      FROM $from_levels $current_from $from_list 
+      FROM 
+            tblPerson 
+            INNER JOIN $PRtablename as PR ON (
+                PR.intPersonID=tblPerson.intPersonID
+             )
+            LEFT JOIN tblTempEntityStructure as TempEnt ON (TempEnt.intChildID=PR.intEntityID)
+            LEFT JOIN tblEntity ON (tblEntity.intEntityID = PR.intEntityID)
       WHERE  $where_levels $current_where $where_list 
-       AND tblMember.intStatus=$Defs::MEMBERSTATUS_POSSIBLE_DUPLICATE
-			$grp_line
+       AND tblPerson.intSystemStatus=$Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
+        GROUP  BY tblEntity.intEntityID
     ];
     return ($sql,'');
   }
