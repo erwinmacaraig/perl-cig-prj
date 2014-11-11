@@ -2118,6 +2118,7 @@ sub populateDocumentViewData {
                 AND regoItem.strPersonLevel = '$dref->{'strPersonLevel'}'
                 AND regoItem.strSport = '$dref->{'strSport'}'
                 AND regoItem.strAgeLevel = '$dref->{'strAgeLevel'}'
+                AND regoItem.strPersonEntityRole = '$dref->{'strPersonEntityRole'}'
                 )
         LEFT JOIN tblRegistrationItem as entityItem
             ON (
@@ -2155,7 +2156,11 @@ sub populateDocumentViewData {
 
     my $count = 0;
     while(my $tdref = $q->fetchrow_hashref()) {
+        #skip if no registration item matches rego details combination (type/role/sport/rego_nature etc)
+        next if !$tdref->{'regoItemID'};
+
         next if((!$dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC') or ($dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC' and $dref->{'PersonStatus'} ne $Defs::PERSON_STATUS_PENDING));
+
         $count++;
         my $displayVerify;
         my $displayAdd;
