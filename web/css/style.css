@@ -1337,7 +1337,7 @@ ul.list li	{
 /* Navbar */
 
 /* ----- Level 1 ----- */
-ul#menu {
+/*ul#menu {
   position: relative;
   font-size: 12px;
   margin-left: 5px;
@@ -1357,7 +1357,7 @@ ul#menu li a {
 	color: #0266a4;
   font-size:14px;
   padding: 7px 10px 8px 10px;
-}
+}*/
 
 /* Doesn't work in IE */
 ul#menu li:last-child a {
@@ -2413,7 +2413,7 @@ body {
 	border-bottom: 1px solid #E4E4E4;
 }
 
-ul#menu {
+/*ul#menu {
 	margin: 0px;
 	padding: 0px;
 }
@@ -2427,7 +2427,7 @@ ul#menu li a {
 
 ul#menu li:last-child a {
 	border-right: 1px solid #E4E4E4;
-}
+}*/
 
 #contentholder {
 	float:left;

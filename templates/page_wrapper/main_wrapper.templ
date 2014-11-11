@@ -42,22 +42,17 @@
 
   </head>
   <body>
-	<!--
-    <div class="header-section section">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-12">
-            <div id ="pagewrapper" class="membership-wrap">
-              [% GlobalNav %]
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-	-->
-
 	<header>
 		[% GlobalNav %]
+    <nav class="clearfix">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                [% NavBar %]
+                </div>
+            </div>
+        </div>
+    </nav>  
 	</header>
 
     <div class="content-section section">
@@ -79,11 +74,7 @@
                 [% END %]
               </div>
               [% END %]
-
             <div id="pageholder">
-              <div id="navbar">
-                [% NavBar %]
-              </div>
               <div id="contentholder">
                   <div id="content">
                   [% Ads_Heading %]
