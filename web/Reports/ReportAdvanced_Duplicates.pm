@@ -52,11 +52,6 @@ sub _getConfiguration {
                 }
             ],
 
-			strZoneName=> [ $Data->{'LevelNames'}{$Defs::LEVEL_ZONE}.' Name', { displaytype=>'text', fieldtype=>'text', allowsort=>1, dbfield => "IF(tblZone.intStatusID = $Defs::NODE_SHOW, tblZone.strName, '')", allowgrouping=>1, active=>1, enabled => $currentLevel > $Defs::LEVEL_ZONE, } ], 
-			strRegionName=> [ $Data->{'LevelNames'}{$Defs::LEVEL_REGION}.' Name', { displaytype=>'text', fieldtype=>'text', allowsort=>1, dbfield => "IF(tblRegion.intStatusID = $Defs::NODE_SHOW, tblRegion.strName, '')", allowgrouping=>1, active=>1, enabled => $currentLevel > $Defs::LEVEL_REGION, } ],
-
-			strStateName=> [ $Data->{'LevelNames'}{$Defs::LEVEL_STATE}.' Name', { displaytype=>'text', fieldtype=>'text', allowsort=>1, dbfield => "IF(tblState.intStatusID = $Defs::NODE_SHOW, tblState.strName, '')", allowgrouping=>1, active=>1, enabled => $currentLevel > $Defs::LEVEL_STATE, } ],
-
 			numMembers=> ["Number of Duplicates to be Resolved",{displaytype=>'none', fieldtype=>'text', active=>1, dbfield => 'COUNT(tblPerson.intPersonID)', total=>1, allowsort=>1}],
 		},
 
@@ -64,9 +59,6 @@ sub _getConfiguration {
 			numMembers
 			strEntityName
             intEntityLevel
-			strZoneName
-			strRegionName
-			strStateName
 		)],
 		OptionGroups => {
 			default => ['Details',{}],
