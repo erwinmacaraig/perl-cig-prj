@@ -359,12 +359,15 @@ sub listDocuments {
     my @statusNOTIN = ($Defs::PERSONREGO_STATUS_DELETED, $Defs::PERSONREGO_STATUS_INPROGRESS);
     $RegFilters{'statusNOTIN'} = \@statusNOTIN;
     my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
+    open FH,">dumpfile.txt";
+    print FH "Registration Data dump\n" . Dumper($Reg_ref) . "\n\n";
+    
     #does not matter how many, intPersonRegistrationID is the same all throughout
     my $pRIDRef = ${$Reg_ref}[0];
     my $personRegistrationID = $pRIDRef->{'intPersonRegistrationID'};
     my @rowdata = ();
     my $query = qq[
-         SELECT tblUploadedFiles.intFileID,tblDocumentType.strDocumentName, tblDocumentType.strLockAtLevel, tblUploadedFiles.dtUploaded as DateUploaded, tblDocuments.strApprovalStatus FROM tblDocuments INNER JOIN tblUploadedFiles ON tblDocuments.intUploadFileID = tblUploadedFiles.intFileID INNER JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intPersonID = ? AND tblUploadedFiles.intEntityTypeID = ?];
+         SELECT tblUploadedFiles.intFileID,tblDocumentType.strDocumentName, tblDocumentType.strLockAtLevel, tblUploadedFiles.dtUploaded as DateUploaded, tblDocuments.strApprovalStatus, tblDocuments.intPersonRegistrationID as regoID, tblDocuments.intDocumentTypeID as doctypeID FROM tblDocuments INNER JOIN tblUploadedFiles ON tblDocuments.intUploadFileID = tblUploadedFiles.intFileID INNER JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intPersonID = ? AND tblUploadedFiles.intEntityTypeID = ?];
 
     my $viewLink;
     my $replaceLink;
@@ -374,13 +377,13 @@ sub listDocuments {
     	#check if strLockLevel is empty which means world access to the file
     	if($dref->{'strLockAtLevel'} eq ''){
     		$viewLink = qq[ <span class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}" target="_blank">]. $lang->txt('Get File') . q[</a></span>];
-    		$replaceLink =   qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a></span>];
+    		$replaceLink =   qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$dref->{'intFileID'}&amp;regoID=$dref->{'regoID'}&amp;dID=$dref->{'doctypeID'}">]. $lang->txt('Replace File'). q[</a></span>];
     	}
     	else {
     		my @authorizedLevelsArr = split(/\|/,$dref->{'strLockAtLevel'});
     		 if(grep(/^$myCurrentValue/,@authorizedLevelsArr)){
     		 	$viewLink = qq[ <span class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}" target="_blank">]. $lang->txt('Get File') . q[</a></span>];
-    		    $replaceLink =   qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a></span>];
+    		    $replaceLink =   qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$dref->{'intFileID'}&amp;regoID=$dref->{'regoID'}&amp;dID=$dref->{'doctypeID'}">]. $lang->txt('Replace File'). q[</a></span>];
     		 }
     		 else {
     		 	$viewLink = qq[ <button class\"HTdisabled\">]. $lang->txt('Get File') . q[</button>];    
@@ -467,9 +470,18 @@ sub listDocuments {
                        ];
     while(my $dref = $sth->fetchrow_hashref()){
         $doclisttype .= qq[<option value="$dref->{'intDocumentTypeID'}">$dref->{'strDocumentName'}</option>];
-    }
+    }  
+
+	my $reglisttype = qq[<select name="RegistrationID">];
+    #query for existing registrations 
+    foreach my $regs (@{$Reg_ref}) {
+		$reglisttype .= qq[<option value="$regs->{'intPersonRegistrationID'}"> $regs->{'strSport'} - $regs->{'strPersonType'} - $regs->{'strPersonLevel'}</option> 
+        ];		
+	}
+	$reglisttype .= q[</select>];
+
    $doclisttype .= qq[     </select>
-                           <input type="hidden" value="$personRegistrationID" name="RegistrationID" />
+                           $reglisttype
                            <input type="submit" class="button-small generic-button" value="Go" />
                            </form>
                     ];
@@ -485,7 +497,7 @@ sub listDocuments {
            ];
 
 
-###################
+################### <input type="hidden" value="$personRegistrationID" name="RegistrationID" />
 
 ###################
 

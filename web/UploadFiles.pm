@@ -36,7 +36,7 @@ sub getUploadedFiles	{
 	my $myCurrentValue = $clientValues{'authLevel'};
 	
 	my $st = qq[
-	SELECT *,DATE_FORMAT(dtUploaded,"%d/%m/%Y %H:%i") AS DateAdded_FMT, tblDocuments.intDocumentTypeID,tblDocumentType.strLockAtLevel
+	SELECT *,DATE_FORMAT(dtUploaded,"%d/%m/%Y %H:%i") AS DateAdded_FMT, tblDocuments.intDocumentTypeID,tblDocuments.intPersonRegistrationID as regoID, tblDocumentType.strLockAtLevel
     FROM  tblUploadedFiles AS UF LEFT JOIN tblDocuments ON UF.intFileID = tblDocuments.intUploadFileID 
     LEFT JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID  WHERE UF.intEntityTypeID = ? AND
     UF.intEntityID = ? AND UF.intFileType = ?
@@ -64,13 +64,14 @@ sub getUploadedFiles	{
 	my $deleteURL;
 	my $deleteURLButton;
 	my $urlViewButton;
-	print STDERR "My Level at this point is " . $myCurrentValue;
+
 	my @rows = ();
 	while(my $dref = $q->fetchrow_hashref())	{
 		#check if strLockLevel is empty which means world access to the file
     	if($dref->{'strLockAtLevel'} eq ''){
     		$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}";
 		    $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
+			$deleteURL .= qq[&amp;dctid=$dref->{'intDocumentTypeID'}&amp;regoID=$dref->{'regoID'}] if($dref->{'intDocumentTypeID'});
 	      	$deleteURLButton = qq[ <span class="button-small generic-button"><a href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a></span>];
 	    	$urlViewButton = qq[ <span class="button-small generic-button"><a href="$url">]. $Data->{'lang'}->txt('View'). q[</a></span>];
     	}
@@ -80,6 +81,7 @@ sub getUploadedFiles	{
     	    if(grep(/^$myCurrentValue/,@authorizedLevelsArr)){
                	$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}";
 		        $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
+				$deleteURL .= qq[&amp;dctid=$dref->{'intDocumentTypeID'}&amp;regoID=$dref->{'regoID'}] if($dref->{'intDocumentTypeID'});
 	         	$deleteURLButton = qq[ <span class="button-small generic-button"><a href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a></span>];
 	    	    $urlViewButton = qq[ <span class="button-small generic-button"><a href="$url">]. $Data->{'lang'}->txt('View'). q[</a></span>];
             }
@@ -277,11 +279,12 @@ sub _processUploadFile_single	{
         }
         else {
         	 $doc_st = qq[
-        		UPDATE tblDocuments SET intUploadFileID = ?, dtLastUpdated = NOW() WHERE intUploadFileID = ? AND intPersonID = ?
+        		UPDATE tblDocuments SET intUploadFileID = ?, dtLastUpdated = NOW(), strApprovalStatus = ? WHERE intUploadFileID = ? AND intPersonID = ?
         	]; 
         	$doc_q = $Data->{'db'}->prepare($doc_st); 
         	$doc_q->execute(
-              $fileID,              
+              $fileID,    
+			  'PENDING',          
               $oldFileId,
               $intPersonID, 
         );
@@ -306,7 +309,7 @@ sub _processUploadFile_single	{
 	my $error = '';
   if($isimage )  { #Image
     my $filename= "$Defs::fs_upload_dir/files/"."$path$fileID.jpg";
-warn("FN".$filename);
+    warn("FN ".$filename);
     my %field=();
     {
       my $dimensions=$options->{'dimensions'} || '800x600';

@@ -25,37 +25,135 @@ use Data::Dumper;
 
 sub handle_documents {
 	my($action, $Data, $memberID, $DocumentTypeID,$RegistrationID)=@_;
-  my $resultHTML='';
-	
-  my $assocID= $Data->{'clientValues'}{'assocID'} || -1;
+	my $resultHTML='';
+	open FH, ">dumpfile.txt";
+    print FH "\nAt this point DocumentTypeID is $DocumentTypeID\n";
+	my $assocID= $Data->{'clientValues'}{'assocID'} || -1;
 	return ('No Member or Association Specified','','') if !$memberID or !$assocID;
 	my $newaction='';
-  my $client=setClient($Data->{'clientValues'}) || '';
+	my $client=setClient($Data->{'clientValues'}) || '';
 
-  my $type = '';
-       $DocumentTypeID ||= 0; 
-       $RegistrationID ||= 0;
+	my $type = '';
+    #$DocumentTypeID ||= 0; 
+	#$RegistrationID ||= 0;
+	$DocumentTypeID = $DocumentTypeID || param('dID') || 0;
+    $RegistrationID = $RegistrationID || param('regoID') || 0;
        
        $action ||= 'DOC_L';
 
    $resultHTML =  new_doc_form($Data, $client,$DocumentTypeID,$RegistrationID, $memberID); 
+	
   if ($action eq 'DOC_u') {
+		$DocumentTypeID = param('DocumentTypeID') || 0;
+        
+
+        print FH "\nAt this second point DocumentTypeID is $DocumentTypeID\n";
 		my $retvalue = process_doc_upload( 
 			$Data,
 			$memberID, 
 			$client,
 		);
-		$resultHTML = qq[<div class="warningmsg">$retvalue</div>] if $retvalue;
+		if($retvalue){
+			$resultHTML = qq[<div class="warningmsg">$retvalue</div>];
+		}
+		else {
+			if($retvalue eq '' && length($retvalue) == 0){
+        	# check if the document to be uploaded is a REGO document 
+            	my $query = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem WHERE strRuleFor = ? AND strItemType = ? AND intID = ? AND intRequired = ?];
+				
+				print FH "\nQuery: $query.\n";
+                print FH "\n intID = $DocumentTypeID\n";
+            	my $sth = $Data->{'db'}->prepare($query); 
+    			$sth->execute('REGO', 'DOCUMENT', $DocumentTypeID, 1);
+				my $isREGODocument = 0;
+				my $dref = $sth->fetchrow_hashref();
+				$isREGODocument = $dref->{'tot'};
+				if($isREGODocument){ 
+										
+					#procedure for replacing a file
+					my $toReplaceRegoDoc = param('fileId') || 0;
+
+					if(!$toReplaceRegoDoc){ # Means adding new file to rego docs
+						#get rule ids
+						$query = qq[SELECT intWFRuleID FROM tblWFTask WHERE intPersonID = ? AND intPersonRegistrationID = ? ];
+						$sth = $Data->{'db'}->prepare($query);
+						$sth->execute($memberID, $RegistrationID);
+					
+						while(my $dref = $sth->fetchrow_hashref()){
+							$query = qq[INSERT INTO tblWFRuleDocuments (intWFRuleID, intDocumentTypeID, intAllowApprovalEntityAdd,intAllowApprovalEntityVerify,intAllowProblemResolutionEntityAdd,intAllowProblemResolutionEntityVerify) VALUES (?,?,?,?,?,?)];
+   							my $sthandle = $Data->{'db'}->prepare($query);
+							$sthandle->execute($dref->{'intWFRuleID'},$DocumentTypeID,0,1,1,0);
+						}
+
+                	 }    
+					 
+    				$query = qq[UPDATE tblWFTask SET strTaskStatus = ? WHERE intPersonID = ? AND intPersonRegistrationID = ?];
+					print FH "\nSecond Query: $query\n";
+					print FH "\nMemberID = $memberID \n intPersonRegistrationID = $RegistrationID\n";
+					$sth = $Data->{'db'}->prepare($query);
+					$sth->execute('ACTIVE', $memberID, $RegistrationID);
+
+					$query = qq[UPDATE tblPersonRegistration_$Data->{'Realm'} SET strStatus = ? WHERE intPersonID = ? AND intPersonRegistrationID = ?]; 
+					$sth = $Data->{'db'}->prepare($query);
+					$sth->execute('PENDING', $memberID, $RegistrationID);
+										
+				}
+			}
+		}
 		$type = 'Add Document'; 
                 
 	}
   elsif ($action eq 'DOC_d') {
 		my $fileID = param('dID') || 0;	
-		my $retpage = param('retpage') || "$Data->{'target'}?client=$client";
-        $resultHTML = delete_doc($Data, $fileID,$client, $retpage);
+        my $retpage = param('retpage') || "$Data->{'target'}?client=$client";
+        my $DocumentTypeID = param('dctid') || 0;
+		my $RegistrationID = param('regoID') || 0;
+
+        my $delOK = delete_doc($Data, $fileID,$client, $retpage);
+		if($delOK){
+
+			if($DocumentTypeID){	
+				my $query = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem WHERE strRuleFor = ? AND strItemType = ? AND intID = ? AND intRequired = ?];
+				my $sth = $Data->{'db'}->prepare($query); 
+    			$sth->execute('REGO', 'DOCUMENT', $DocumentTypeID, 1);
+				my $isREGODocument = 0;
+
+				if($isREGODocument){
+					$query = qq[UPDATE tblWFTask SET strTaskStatus = ? WHERE intPersonID = ? AND intPersonRegistrationID = ?];
+					$sth = $Data->{'db'}->prepare($query);
+					$sth->execute('ACTIVE', $memberID, $RegistrationID);
+
+					$query = qq[UPDATE tblPersonRegistration_$Data->{'Realm'} SET strStatus = ? WHERE intPersonID = ? AND intPersonRegistrationID = ?]; 
+					$sth = $Data->{'db'}->prepare($query);
+					$sth->execute('PENDING', $memberID, $RegistrationID);
+				}
+			}
+
+
+     	$resultHTML =  qq[
+          <div class="OKmsg">Successfully deleted file.</div> 
+          <br />  
+          <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=$retpage">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+       ];
+		}
+		else {
+			$resultHTML = qq[
+			<div class="OKmsg">Error - $delOK </div> 
+          <br />  
+          <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=$retpage">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+			];
+			
+		}
 		$type = 'Delete Document';
   }   
   
+
+
+
+
+
+
+
   
 	#$resultHTML .= list_docs($Data,$memberID,$client,$DocumentTypeID,$RegistrationID);
        
@@ -276,12 +374,8 @@ sub delete_doc {
 	$Data,
     $fileID,
   );
-
-	return qq[
-          <div class="OKmsg">Successfully deleted file.</div> 
-          <br />  
-          <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=$retpage">] . $Data->{'lang'}->txt('Continue').q[</a></span>
-       ];
+  return $response;
+	
 }
 
 1;

@@ -293,6 +293,8 @@ sub listTasks {
 		$entityID,
 		$entityID,
 	) or query_error($st);
+    open FH,">dumpfile.txt";
+    print FH "\n\nFROM WorkFlow entityID = $entityID \n\n";     
 
 	my @TaskList = ();
 	my $rowCount = 0;
@@ -1789,11 +1791,14 @@ sub viewTask {
 
     my $db = $Data->{'db'};
     my $q = $db->prepare($st) or query_error($st);
-    $q->execute(
+	open FH, ">>dumpfile.txt";
+	print FH "WFTaskID = $WFTaskID \n entityID = $entityID\n\n";    
+	$q->execute(
         $WFTaskID,
         $entityID,
         $entityID,
     ) or query_error($st);
+
 
     my @TaskList = ();
     my $rowCount = 0;
@@ -2130,8 +2135,9 @@ sub populateDocumentViewData {
             AND wt.intRealmID = ?
     ];
 
+    
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
-	$q->execute(
+    $q->execute(
         $dref->{'intWFTaskID'},
         $Data->{'Realm'},
         #$entityID,
