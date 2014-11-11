@@ -275,10 +275,12 @@ sub getEntityMenuData {
             url => $baseurl."a=ERA_",
         };
 
-    $menuoptions{'usermanagement'} = {
-        name => $lang->txt('User Management'),
-        url  => $baseurl."a=AM_",
-    };
+        if($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL)   {
+            $menuoptions{'usermanagement'} = {
+                name => $lang->txt('User Management'),
+                url => $baseurl."a=AM_",
+            };
+        }
 
     if( 1==2 and scalar(keys $children)) {
         $menuoptions{'fieldconfig'} = {
@@ -819,10 +821,12 @@ sub getClubMenuData {
                 and allowedAction($Data,'c_e')
         ) {
 
-            $menuoptions{'usermanagement'} = {
-                name => $lang->txt('User Management'),
-                url => $baseurl."a=AM_",
-            };
+            if($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL)   {
+                $menuoptions{'usermanagement'} = {
+                    name => $lang->txt('User Management'),
+                    url => $baseurl."a=AM_",
+                };
+            }
             if ( $Data->{'SystemConfig'}{'AllowPersonTransfers'}  and allowedAction($Data, 'c_e')) {
                 $menuoptions{'transferperson'} = {
                     url => $baseurl."a=P_TRANSFER&amp;l=$Defs::LEVEL_PERSON",
