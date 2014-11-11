@@ -102,6 +102,21 @@
                 </span>
             [% END %]
 
+            [% IF PersonRegoDetails.PersonType %]
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Person Type") %]:</span>
+                    <span class="details-left">[% PersonRegoDetails.PersonType %]</span>
+                </span>
+            [% END %]
+
+            [% IF PersonRegoDetails.PersonEntityTypeRole %]
+                <span class="details-row">
+                    <span class="details-left">[% Lang.txt("Person Role") %]:</span>
+                    <span class="details-left">[% PersonRegoDetails.PersonEntityTypeRole %]</span>
+                </span>
+            [% END %]
+
+
             [% IF PersonRegoDetails.Sport %]
                 <span class="details-row">
                     <span class="details-left">[% Lang.txt("Sport") %]:</span>
@@ -122,6 +137,7 @@
                     <span class="details-left">[% PersonRegoDetails.AgeLevel %]</span>
                 </span>
             [% END %]
+
             </div>
         </div>
     </div>

@@ -1,20 +1,24 @@
 <div id="pushdown-wrapper" style="display:none;"></div>
-
 <div id="globalnav">
-        <div id="globalnav-inner">
-                <div class="gnav-logo">
-                        <div id="gnav-arrow-wrap"><div class="gnav-splogo"></div><div id="gnav-arrow"></div></div>
+    <div id="globalnav-inner">
+        <!--<div class="gnav-logo">
+            <div id="gnav-arrow-wrap">
+                <div class="gnav-splogo">
                 </div>
-<div class="sp-sign-in-out-wrap">
-        <div class="nav-tools">
-                        <div class = "navoptions">
-                                <span class="nav-link"><a href ="#">[% Data.UserName %]</a></span>
-                                <span class="nav-link"><a href ="http://support.sportingpulse.com">Support</a></span>
-                                <span class="nav-link"><a href ="[% BaseURL %]/passport/logout.cgi">Sign out</a></span>
-                        </div>
+                <div id="gnav-arrow">
+                </div>
+            </div>
+        </div>-->
+        <div class="sp-sign-in-out-wrap">
+            <div class="nav-tools">
+                <div class="navoptions">
+                    <span class="nav-link"><a href ="#">[% Data.UserName %]</a></span>
+                    <span class="nav-link"><a href ="http://support.sportingpulse.com">Support</a></span>
+                    <span class="nav-link"><a href ="[% BaseURL %]/passport/logout.cgi">Sign out</a></span>
+                </div>
+            </div>
         </div>
-</div>
-</div>
+    </div>
 </div>
 <script>
 jQuery(document).ready(function()  {
@@ -34,26 +38,26 @@ jQuery(document).ready(function()  {
 </script>
 <style>
 #global-nav-wrap {
-  /*      float: left; disabled due to being obscured */
+  /*    float: left; disabled due to being obscured */
         font-family: 'DINRegular',sans-serif;
         width: 100%;
 /*      height: 32px;*/
-	background: url("https://reg.sportingpulse.com/images/global_nav_sprite.png") repeat-x scroll 0 0 transparent;
+	    background: url("https://reg.sportingpulse.com/images/global_nav_sprite.png") repeat-x scroll 0 0 transparent;
 }
 
 #globalnav {
-	background: url("https://reg.sportingpulse.com/images/global_nav_sprite.png") repeat-x scroll 0 -33px transparent;
-        float: left;
-        height: 32px;
-        width: 100%;
+	    /*background: url("https://reg.sportingpulse.com/images/global_nav_sprite.png") repeat-x scroll 0 -33px transparent;*/
+        /*float: left;*/
+        /*height: 32px;*/
+        /*width: 100%;*/
 }
 #globalnav-inner, .membership-login #globalnav-inner {
-        margin: 0 auto;
+        /*margin: 0 auto;*/
         width: 996px;
 }
 
 .gnav-logo {
-	background: url("https://reg.sportingpulse.com/images/global_nav_sprite.png") no-repeat scroll 0 0 transparent;
+	    /*background: url("https://reg.sportingpulse.com/images/global_nav_sprite.png") no-repeat scroll 0 0 transparent;*/
         cursor: pointer;
         display: block;
         float: left;
@@ -64,7 +68,7 @@ jQuery(document).ready(function()  {
 }
 
 .gnav-splogo {
-	background: url("https://reg.sportingpulse.com/images/global_nav_sprite.png") repeat-x scroll 0 -162px transparent; 
+	    /*background: url("https://reg.sportingpulse.com/images/global_nav_sprite.png") repeat-x scroll 0 -162px transparent; */
         display: inline;
         float: left;
         height: 26px;
@@ -106,7 +110,7 @@ jQuery(document).ready(function()  {
 }
 
 #gnav-arrow {
-	background: url("https://reg.sportingpulse.com/images/global_nav_sprite.png") repeat scroll -23px -353px transparent; 
+	    background: url("https://reg.sportingpulse.com/images/global_nav_sprite.png") repeat scroll -23px -353px transparent; 
         display: inline;
         float: left;
         height: 11px;
