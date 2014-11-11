@@ -43,6 +43,7 @@ use AuditLog;
 use NationalNumber;
 use EmailNotifications::WorkFlow;
 use EntityFields;
+use EntityTypeRoles;
 
 sub cleanTasks  {
 
@@ -1709,6 +1710,7 @@ sub viewTask {
             pr.strAgeLevel,
             pr.strSport,
             pr.strPersonType,
+            pr.strPersonEntityRole,
             pr.intPaymentRequired as regoPaymentRequired,
             t.strRegistrationNature,
             dt.strDocumentName,
@@ -1936,6 +1938,8 @@ sub populateRegoViewData {
         templateFile => 'workflow/view/personregistration.templ',
     );
 
+    my $role_ref = getEntityTypeRoles($Data, $dref->{'strSport'}, $dref->{'strPersonType'});
+
 	%TemplateData = (
         PersonDetails => {
             Status => $Data->{'lang'}->txt($Defs::personStatus{$dref->{'PersonStatus'} || 0}) || '',
@@ -1950,12 +1954,13 @@ sub populateRegoViewData {
         },
         PersonRegoDetails => {
             ID => $dref->{'intPersonRegistrationID'},
-            Status => $Data->{'lang'}->txt($Defs::personRegoStatus{$dref->{'personRegistrationStatus'} || 0}) || '',
-            RegoType => $Data->{'lang'}->txt($Defs::registrationNature{$dref->{'strRegistrationNature'} || 0}) || '',
-            PersonType => $Data->{'lang'}->txt($Defs::personType{$dref->{'strPersonType'} || 0}) || '',
-            Sport => $Defs::sportType{$dref->{'strSport'}} || '',
-            Level => $Defs::personLevel{$dref->{'strPersonLevel'}} || '',
-            AgeLevel => $Defs::ageLevel{$dref->{'strAgeLevel'}} | '',
+            Status => $Data->{'lang'}->txt($Defs::personRegoStatus{$dref->{'personRegistrationStatus'} || 0}) || '-',
+            RegoType => $Data->{'lang'}->txt($Defs::registrationNature{$dref->{'strRegistrationNature'} || 0}) || '-',
+            PersonType => $Data->{'lang'}->txt($Defs::personType{$dref->{'strPersonType'} || 0}) || '-',
+            PersonEntityTypeRole => $Data->{'lang'}->txt($role_ref->{$dref->{'strPersonEntityRole'} || 0}) || '-',
+            Sport => $Defs::sportType{$dref->{'strSport'}} || '-',
+            Level => $Defs::personLevel{$dref->{'strPersonLevel'}} || '-',
+            AgeLevel => $Defs::ageLevel{$dref->{'strAgeLevel'}} | '-',
         },
 	);
 
