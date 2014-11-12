@@ -292,7 +292,6 @@ sub displayRegoFlowDocuments    {
      
      #END OF FILTERING 
      ######################
-     print STDERR Dumper($documents);
 
 
     
@@ -347,8 +346,6 @@ sub displayRegoFlowProducts {
      }
     my $product_body='';
     if (@prodIDs)   {
-    	#print STDERR Dumper(%$rego_ref);
-    	#print STDERR 'Nationality is ' . $rego_ref->{'Nationality'};
         $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
      }
 
@@ -545,7 +542,6 @@ sub add_rego_record{
 sub bulkRegoSubmit {
 
     my ($Data, $bulk_ref, $rolloverIDs, $productIDs, $productQtys, $markPaid, $paymentType) = @_;
-print STDERR "IN BULK REGO $rolloverIDs | $productIDs | $productQtys\n\n\n\n";
 
     my $body = 'Submitting';
     my @IDs= split /\|/, $rolloverIDs;
