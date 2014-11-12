@@ -569,9 +569,12 @@ table.table tr td.align-right {
 }
 
 
-
 #footer {
 	background-color: #085a8c;
 	background-image: none;
 	border-radius:0;
+}
+
+header nav ul#menu ul {
+	top:40px;
 }
