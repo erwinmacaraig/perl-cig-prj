@@ -16,6 +16,13 @@ function dialogform(url, title, width, height,data) {
 	if(data) {d.html(unescape(data));}
 }
 
+function docViewer(id, params) {
+    jQuery('#docViewerOverlay').remove();
+    var url = 'viewer.cgi?' + params + '&f=' + id;
+    var d = jQuery('<div id = "docViewerOverlay"><iframe id="docViewerPage" src = "' + url +'" scrolling="no"></iframe>');
+	jQuery('body').append(d);
+}
+
 // Regs new simple tab code 9/8/2013
 
 $('ul.new_tabs').each(function(){
