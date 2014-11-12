@@ -723,6 +723,9 @@ span.fa{
 .sidebar-box .quick-links li a{
 	color: #555;
 }
+.sidebar-box .panel-header{
+	margin-bottom: 10px;
+}
 /* End Add */
 
 h2.section-header {
