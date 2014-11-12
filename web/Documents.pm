@@ -243,6 +243,7 @@ sub process_doc_upload	{
 	my $myCurrentValue = $clientValues{'authLevel'};
 	
 	my $name = param('file') || '';
+    $name =~s/\....$//;
 	my $filefield = 'file' ;
 	my $permission = param('docperms') || 1;
                               

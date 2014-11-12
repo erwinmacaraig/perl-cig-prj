@@ -4610,7 +4610,7 @@ div#content div.member-home-page div.task-actions {
 
 #docViewerPanel {
     float: right;
-    width: 150px;
+    width: 300px;
 }
 
 #docViewerFileBlock {
@@ -4632,3 +4632,15 @@ div#content div.member-home-page div.task-actions {
     vertical-align: middle;
 }
 
+.docViewerEntityInfo    {
+    background-color:#fff;
+    margin:10px;
+    padding: 10px;
+}
+
+.docViewerButtons   {
+    background-color:#fff;
+    margin:10px;
+    padding: 10px;
+
+}

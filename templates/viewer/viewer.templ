@@ -5,12 +5,21 @@
 <div id = "docViewerContent">
     <div id = "docViewerPanel">
         <div class = "docViewerEntityInfo">
+            [% IF ENTITY %]
 
+
+
+            [% ELSIF person %]
+                <b>[% person.strFirstname %] [% person.strSurname %]<br></b>
+                [% person.dtDOB %]<br>
+                [% person.gender %]<br>
+                [% person.nationality %]<br>
+
+            [% END %]
         </div>
         <div class = "docViewerButtons">
             <input type = "button" value = "Approve">
             <input type = "button" value = "Reject">
-            <input type = "button" value = "Close">
         </div>
     </div>
 

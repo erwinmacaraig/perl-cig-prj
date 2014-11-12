@@ -17,6 +17,8 @@ use ConfigOptions;
 use PageMain;
 use MCache;
 use TTTemplate;
+use InstanceOf;
+use Countries;
 
 main();	
 
@@ -96,6 +98,23 @@ sub main	{
         $dref->{'fileURL'} = 'viewfile.cgi?client='.$client.'&amp;f=' . $dref->{'intFileID'};
     }
 
+    if($dref->{'intPersonID'})  {
+        my $object = getInstanceOf(\%Data,'person',$dref->{'intPersonID'});
+        my $isocountries = getISOCountriesHash();
+        $dref->{'person'} = {
+            strSurname => $object->getValue('strLocalSurname'),
+            strFirstname => $object->getValue('strLocalFirstname'),
+            dtDOB => $object->getValue('dtDOB'),
+            gender => $Defs::PersonGenderInfo{$object->getValue('intGender')},
+            nationality => $isocountries->{$object->getValue('strISONationality')},
+
+
+
+        };
+    }
+    if($dref->{'intEntityID'})  {
+        $dref->{'entity'} = getInstanceOf(\%Data,'entity',$dref->{'intEntityID'});
+    }
     # BUILD PAGE
     my $TemplateData = $dref;
 
