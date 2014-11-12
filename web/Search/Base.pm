@@ -19,6 +19,7 @@ sub new {
         _searchType         => $args{searchType},
         _gridTemplate       => $args{gridTemplate} || 'search/grid/default.templ',
         _cgi                => $args{cgi} || new CGI,
+        _keyword            => $args{keyword},
         _query              => $args{query},
     };
 
@@ -52,17 +53,19 @@ sub getGridTemplate {
     return $self->{_gridTemplate};
 }
 
+sub getKeyword {
+    my ($self) = shift;
+    return $self->{_keyword};
+}
+
 sub displaySearchForm {
     my ($self) = shift;
 
-    my $cgi = $self->{'_cgi'};
-	my %params = $self->{'_cgi'}->Vars();
-
-    print STDERR Dumper $cgi;
 	my %SearchFormData = (
-			client=> $self->getData()->{'client'},
-            action => $self->getSearchType(),
-            search_keyword => $params{'search_keyword'},
+        client=> $self->getData()->{'client'},
+        action => $self->getSearchType(),
+        #search_keyword => $params{'search_keyword'},
+        search_keyword => $self->getKeyword(),
 	);
 
 	my $content = runTemplate(
@@ -73,14 +76,35 @@ sub displaySearchForm {
 
 }
 
-sub search {
+sub displayResultGrid {
     my ($self) = shift;
+    my ($list) = @_;
+
+    my %SearchFormData = (
+        RegoList => $list,
+	);
+
+	my $content = runTemplate(
+        $self->getData(),
+        \%SearchFormData,
+        $self->getGridTemplate(),
+	);
+
+    return $content;
 }
 
-sub processResult {
+sub process {}
 
+sub cleanKeyword {
+    my $self = shift;
+    my ($rawKeyword) = @_;
+
+    $rawKeyword ||= '';
+    $rawKeyword =~ s/\h+/ /g;
+    $rawKeyword =~ s/^\s+|\s+$//;
+
+    return $rawKeyword;
 }
-
 
 sub setRealmID {
     my $self = shift;
@@ -118,6 +142,14 @@ sub setGridTemplate {
     my $self = shift;
     my ($gridTemplate) = @_;
     $self->{_gridTemplate} = $gridTemplate if defined $gridTemplate;
+
+    return $self;
+}
+
+sub setKeyword {
+    my $self = shift;
+    my ($keyword) = @_;
+    $self->{_keyword} = $keyword if defined $keyword;
 
     return $self;
 }
