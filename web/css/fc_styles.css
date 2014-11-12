@@ -758,3 +758,20 @@ i.indicator {
 	float:right;
 	color:#fff;
 }
+
+.tab-pane {
+	padding:15px;
+}
+
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover {
+	
+	background-color: #055688;
+	color:#fff;
+	font-weight: bold;
+}
+
+.nav-tabs > li > a, .nav-tabs > li > a:hover {
+	background-color:#fff;
+	color:#000;
+	font-weight: bold;
+}

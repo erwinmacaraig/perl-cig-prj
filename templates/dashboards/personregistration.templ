@@ -18,89 +18,101 @@
                 </h4>
             </div>
             <div id="panel[% index %]" class="panel-collapse collapse">
-                <div class="panel-body">
-                    [% IF entity.strLatinName %]
-                        <div div="">
-                            <span class="">[% Lang.txt('Registrered To (International Name)') %]:</span>
-                            <span class="">[% entity.strLatinName %]</span>
+                <div class="panel-body">                    
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#doctab[% index %]">Documents</a></li>
+                        <li><a data-toggle="tab" href="#regtab[% index %]">Registration details</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        
+                        <div id="doctab[% index %]" class="tab-pane fade in active">
+                            <p>documents goes here</p>
                         </div>
-                    [% END %]
 
-                    [% IF entity.intPaymentRequired %]
-                        <div class="">
-                            [% Lang.txt('Payment Still Required') %]
-                        </div>
-                    [% END %]
+                        <div id="regtab[% index %]" class="tab-pane fade">
+                            [% IF entity.strLatinName %]
+                                <div div="">
+                                    <span class="">[% Lang.txt('Registrered To (International Name)') %]:</span>
+                                    <span class="detail-value">[% entity.strLatinName %]</span>
+                                </div>
+                            [% END %]
 
-                    [% IF entity.strNationalPeriodName %]
-                        <div class="">
-                            <span class="">[% Lang.txt('Registration Period') %]:</span>
-                            <span class="">[% entity.strNationalPeriodName %]</span>
-                        </div>
-                    [% END %]
+                            [% IF entity.intPaymentRequired %]
+                                <div class="">
+                                    [% Lang.txt('Payment Still Required') %]
+                                </div>
+                            [% END %]
 
-                    [% IF entity.RegistrationNature %]
-                        <div class="">
-                            <span class="">[% Lang.txt('Registration Type') %]:</span>
-                            <span class="">[% entity.RegistrationNature %]</span>
-                        </div>
-                    [% END %]
+                            [% IF entity.strNationalPeriodName %]
+                                <div class="">
+                                    <span class="">[% Lang.txt('Registration Period') %]:</span>
+                                    <span class="detail-value">[% entity.strNationalPeriodName %]</span>
+                                </div>
+                            [% END %]
 
-                    [% IF entity.Status %]
-                        <div class="">
-                            <span class="">[% Lang.txt('Status') %]:</span>
-                            <span class="">[% entity.Status %]</span>
-                        </div>
-                    [% END %]
+                            [% IF entity.RegistrationNature %]
+                                <div class="">
+                                    <span class="">[% Lang.txt('Registration Type') %]:</span>
+                                    <span class="detail-value">[% entity.RegistrationNature %]</span>
+                                </div>
+                            [% END %]
 
-                    [% IF entity.Sport %]
-                        <div class="">
-                            <span class="">[% Lang.txt('Sport') %]:</span>
-                            <span class="">[% entity.Sport %]</span>
-                        </div>
-                    [% END %]
+                            [% IF entity.Status %]
+                                <div class="">
+                                    <span class="">[% Lang.txt('Status') %]:</span>
+                                    <span class="detail-value">[% entity.Status %]</span>
+                                </div>
+                            [% END %]
 
-                    [% IF entity.PersonType %]
-                        <div class="">
-                            <span class="">[% Lang.txt('Type') %]:</span>
-                            <span class="">[% entity.PersonType %]</span>
-                        </div>
-                    [% END %]
+                            [% IF entity.Sport %]
+                                <div class="">
+                                    <span class="">[% Lang.txt('Sport') %]:</span>
+                                    <span class="detail-value">[% entity.Sport %]</span>
+                                </div>
+                            [% END %]
 
-                    [% IF entity.PersonLevel %]
-                        <div class="">
-                            <span class="">[% Lang.txt('Level') %]:</span>
-                            <span class="">[% entity.PersonLevel %]</span>
-                        </div>
-                    [% END %]
+                            [% IF entity.PersonType %]
+                                <div class="">
+                                    <span class="">[% Lang.txt('Type') %]:</span>
+                                    <span class="detail-value">[% entity.PersonType %]</span>
+                                </div>
+                            [% END %]
 
-                    [% IF entity.AgeLevel %]
-                        <div class="">
-                            <span class="">[% Lang.txt('Age Level') %]:</span>
-                            <span class="">[% entity.AgeLevel %]</span>
-                        </div>
-                    [% END %]
+                            [% IF entity.PersonLevel %]
+                                <div class="">
+                                    <span class="">[% Lang.txt('Level') %]:</span>
+                                    <span class="detail-value">[% entity.PersonLevel %]</span>
+                                </div>
+                            [% END %]
 
-                    [% IF entity.dtFrom and entity.dtFrom != '0000-00-00' %]
-                        <div class="">
-                            <span class="">[% Lang.txt('Valid From') %]:</span>
-                            <span class="">[% entity.dtFrom %]</span>
-                        </div>
-                    [% END %]
+                            [% IF entity.AgeLevel %]
+                                <div class="">
+                                    <span class="">[% Lang.txt('Age Level') %]:</span>
+                                    <span class="detail-value">[% entity.AgeLevel %]</span>
+                                </div>
+                            [% END %]
 
-                    [% IF entity.dtTo and entity.dtTo != '0000-00-00' %]
-                        <div class="">
-                            <span class="">[% Lang.txt('Valid To') %]:</span>
-                            <span class="">[% entity.dtTo %]</span>
-                        </div>
-                    [% END %]
+                            [% IF entity.dtFrom and entity.dtFrom != '0000-00-00' %]
+                                <div class="">
+                                    <span class="">[% Lang.txt('Valid From') %]:</span>
+                                    <span class="detail-value">[% entity.dtFrom %]</span>
+                                </div>
+                            [% END %]
 
-                    [% IF entity.renew_link %]
-                        <div class="">
-                            <span class="">&nbsp;</span>
-                            <span class=""><a href="[% entity.renew_link %]">[% Lang.txt('Renew Registration') %]</a></span>
+                            [% IF entity.dtTo and entity.dtTo != '0000-00-00' %]
+                                <div class="">
+                                    <span class="">[% Lang.txt('Valid To') %]:</span>
+                                    <span class="detail-value">[% entity.dtTo %]</span>
+                                </div>
+                            [% END %]
+
+                            [% IF entity.renew_link %]
+                                <div class="pull-right">
+                                    <span class=""><a class="btn-main" href="[% entity.renew_link %]">[% Lang.txt('Renew Registration') %]</a></span>
+                                </div>
+                            [% END %]
                         </div>
-                    [% END %]
+                    </div>
                 </div>
             </div>
         [% END %]
