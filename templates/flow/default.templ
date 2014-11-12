@@ -1,4 +1,4 @@
-[% IF Navigation %]<div class = "progress">[% Navigation %]</div>[% END %]
+[% IF Navigation %]<div class = "col-md-12 steps">[% Navigation %]</div>[% END %]
 [% Title %]
 [% IF Errors.size %]
 <div class = "warningmsg">
@@ -15,15 +15,32 @@
 [% END %]
 
 [% TextTop %]
+<div class="col-md-12">
+	<div class="alert">
+		<div>
+			<span class="fa fa-exclamation"></span>
+			<p>Has this person already been registered? If yes, they need to <u>Transfer to this club</u>. Not sure? Then use the <u>Search</u>.</p>
+		</div>
+	</div>
+</div>
+<div class="col-md-8">
+<h3 class="panel-header">Personal Details</h3>
+<div class="panel-body">
+<fieldset><p><span class="notice-error">*Required fields.</span></p></fieldset>
 <form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">
     [% IF Content %][% Content %][% END %]
     [% IF FlowNextAction %]
 [% IF !NoContinueButton %]
-	<input type = "submit" value = " [% Lang.txt('Continue') %] "  class = "button proceed-button">
+	<!-- <input type = "submit" value = " [% Lang.txt('Continue') %] "  class = "button proceed-button"> -->
+	<fieldset><div class="col-md-10 txtright"><a href="#" title="Continue" class="btn-main">Continue</a></div></fieldset>
 [% END %]
 	<input type = "hidden" name ="rfp" value ="[% FlowNextAction %]">
     [% END %]
 	[% HiddenFields %]
 
 </form>
+</div>
+</div>
+<br/>
+<div class="col-md-8"></div>
 [% TextBottom %]

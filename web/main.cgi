@@ -270,6 +270,10 @@ use PersonFlow;
     elsif ( $action =~ /^PRA_/) {
         ($resultHTML, $pageHeading) = handlePersonRequest($action, \%Data);
     }
+    elsif($action =~ /^INITSRCH_/){
+        use Search::Handler;
+        ($resultHTML, $pageHeading) = Search::Handler::handle($action, \%Data);
+    }
     
    
     # BUILD PAGE
