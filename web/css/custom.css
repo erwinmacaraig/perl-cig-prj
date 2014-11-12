@@ -8,7 +8,8 @@
 
 
 /***** SYMPLICIT FREEMADE STYLES *****/
-header .utilities {
+
+/*header .utilities {
   background: #004e7e;
   padding: 10px;
 }
@@ -85,13 +86,6 @@ header .logo-area ul li strong {
   font-weight: normal;
 }
 
-header nav {
-  background: #085a8c;
-  padding: 20px 0;
-  -webkit-box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
-  -moz-box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
-  box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
-}
 
 header nav ul {
   margin: 0;
@@ -122,7 +116,7 @@ header nav ul li a:hover {
   background: #e3e3e3;
   color: #000;
   text-decoration: none;
-}
+}*/
 
 .form-signin input[type="text"] {
   border: 1px solid #cccccc;
@@ -216,12 +210,4 @@ hr {
   margin-bottom: 20px;
   border: 0;
   border-top: 1px solid #E2E1E2;
-}
-
-
-
-/***** @FONT-FACE *****/
-@font-face {
-  font-family: 'ProximaNovaBold';
-  src: url('../fonts/ProximaNova-Bold.otf') format("opentype");
 }

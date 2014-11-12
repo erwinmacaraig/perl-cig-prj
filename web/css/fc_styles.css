@@ -872,3 +872,19 @@ a.btn-inside-docs-panel:hover {
 .ver-dots.yellow {
 	color: yellow;
 }
+
+/*temporary adjustment to dispay drill down nav*/
+
+header nav {
+	padding-bottom:10px;
+}
+
+header nav ul li a {
+	padding-top:20px;
+	padding-bottom: 27px;
+}
+
+.nav_session_menu_wrap {
+	float:right;
+	margin-top:0;
+}

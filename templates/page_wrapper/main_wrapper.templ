@@ -59,6 +59,21 @@
 		</nav>	
 	</header>
 
+  [% IF MemListURL OR TeamListURL OR ClubListURL OR CompListURL %]
+    <div class="quick-nav">
+      [% IF MemListURL %]
+        <div class="jump-item jump-item-1">
+          <a href="[% MemListURL %]"><img src="images/member.png" /><p>[% MemListName %]</p></a>
+        </div>
+      [% END %]
+      [% IF ClubListURL %]
+        <div class="jump-item jump-item-3">
+          <a href="[% ClubListURL  %]"><img src="images/club.png" /><p>[% ClubListName %]</p></a>
+        </div>
+      [% END %]
+    </div>
+  [% END %]
+
     <div class="content-section section">
       <div class="container">
         <div class="row">
