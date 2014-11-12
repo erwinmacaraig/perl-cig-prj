@@ -50,21 +50,21 @@
 		[% END %]
 	</ol>
 	<script type="text/javascript">
-		var sessno = $('li.session_item').length;
+		var sessno = jQuery('li.session_item').length;
 		if(sessno > 1) {
-			$('.nav_session_placement').addClass('arrow_bg');
-			$('.nav_session_current').click(function() {
-				$('.nav_session_levels').toggleClass('nav_display');
+			jQuery('.nav_session_placement').addClass('arrow_bg');
+			jQuery('.nav_session_current').click(function() {
+				jQuery('.nav_session_levels').toggleClass('nav_display');
 					return false;
 			});
 		}
 		else {
-			$('.nav_session_current').click(function() {
+			jQuery('.nav_session_current').click(function() {
 				return false;
 			});
 		}
-			$('html').click(function() {
-		  $('.nav_session_levels').removeClass('nav_display');
+			jQuery('html').click(function() {
+		  jQuery('.nav_session_levels').removeClass('nav_display');
 	  	});
   	</script>	
 </div>
