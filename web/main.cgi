@@ -271,7 +271,8 @@ use PersonFlow;
         ($resultHTML, $pageHeading) = handlePersonRequest($action, \%Data);
     }
     elsif($action =~ /^INITSRCH_/){
-        ($resultHTML, $pageHeading) = (undef, undef);
+        use Search::Handler;
+        ($resultHTML, $pageHeading) = Search::Handler::handle($action, \%Data);
     }
     
    
