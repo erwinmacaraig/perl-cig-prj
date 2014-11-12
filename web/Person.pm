@@ -486,7 +486,7 @@ sub listDocuments {
 
    $doclisttype .= qq[     </select>
                            $reglisttype
-                           <input type="submit" class="button-small generic-button" value="Go" />
+                           <input type="submit" class="button-small generic-button pull-right" value="Go" />
                            </form>
                     ];
 #  my $modoptions=qq[<div class="changeoptions">$addlink</div>];

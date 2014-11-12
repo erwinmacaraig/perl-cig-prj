@@ -114,6 +114,19 @@
 				</div>
 
 				<br/ >
+
+				<div class="read-only">
+					[% IF GroupData.other && secondcount < 2%]
+					[% secondcount = secondcount + 1 %]
+					[% doneother = 1 %]
+					<h4>[% Lang.txt('Other Details') %]</h4>
+					<div class="read-only-text">
+						[% GroupData.other %]
+					</div>
+					[% END %]
+				</div>
+
+				<br />
 				<!--Accordion start-->
 
 				[% StatusPanel %]
@@ -140,5 +153,20 @@
 
 			</div>
 		</div>
+
+		<div class="col-md-3">
+			<div id = "">
+	
+			<h3 class="panel-header">Member ID: [% #Details.NationalNum %]</h3>
+			<div class="panel-body">
+
+			<p class="reg-text">[% Name %]</p>
+			<p class="reg-text">[% Details.Gender %]</p>
+			<p class="reg-text">[% Details.DOB %]</p>
+			</div>
+			</div>
+
+		</div>
+
 	</div>
 </div>
