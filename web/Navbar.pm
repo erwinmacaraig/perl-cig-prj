@@ -648,6 +648,7 @@ sub getAssocMenuData {
     }
 
     if(
+            1==2 and
         $intAllowSeasons
             and ((!$Data->{'SystemConfig'}{'LockSeasons'}
                     and !$Data->{'SystemConfig'}{'Rollover_HideAll'}
@@ -888,6 +889,7 @@ sub getClubMenuData {
     }
 
     if(
+            1==2 and
             (!$Data->{'SystemConfig'}{'LockSeasons'}
                     and !$Data->{'SystemConfig'}{'LockSeasonsCRL'}
                     and !$Data->{'SystemConfig'}{'Club_PersonEditOnly'}
