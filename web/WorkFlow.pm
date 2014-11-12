@@ -20,6 +20,7 @@ require Exporter;
     viewSummaryPage
     toggleTask
     checkRelatedTasks
+    deleteRegoTransactions
 );
 
 use strict;
@@ -1585,6 +1586,7 @@ sub rejectTask {
     #FC-144 get current task based on taskid param
     my $task = getTask($Data, $WFTaskID);
 
+    print STDERR Dumper $task;
     return if (!$task or ($task eq undef));
 
     if($task->{strWFRuleFor} eq 'ENTITY') {
@@ -1593,6 +1595,7 @@ sub rejectTask {
 
     if($task->{strWFRuleFor} eq 'REGO') {
         setPersonRegoStatus($Data, $WFTaskID, $Defs::WF_TASK_STATUS_REJECTED);
+        my ($result) = deleteRegoTransactions($Data, $task);
     }
 
 	#Update this task to REJECTED
@@ -1616,7 +1619,7 @@ sub rejectTask {
 
     setDocumentStatus($Data, $WFTaskID, 'REJECTED');
 
-    resetRelatedTasks($Data, $WFTaskID, 'PENDING');
+    resetRelatedTasks($Data, $WFTaskID, 'REJECTED');
 
     if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
@@ -1659,6 +1662,7 @@ sub getTask {
             t.intRealmID,
             t.intApprovalEntityID,
             t.intProblemResolutionEntityID,
+            t.intPersonID,
             t.strWFRuleFor,
             t.strTaskStatus,
             t.intOnHold,
@@ -2662,6 +2666,8 @@ sub holdTask {
             $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
         }
 
+        resetRelatedTasks($Data, $WFTaskID, 'PENDING');
+
         return 1;
     }
 
@@ -2728,6 +2734,34 @@ sub addMissingDocument {
     }
 
     return ($body, $title);
+}
+
+sub deleteRegoTransactions {
+    my ($Data, $task) = @_;
+
+    my %TemplateData = ();
+
+    my $st = qq[
+        DELETE
+        FROM
+            tblTransactions
+        WHERE
+            intID = ?
+            AND intTableType = ?
+            AND intPersonRegistrationID = ?
+            AND intRealmID = ?
+            AND intStatus = 0
+    ];
+
+    my $q = $Data->{'db'}->prepare($st) or query_error($st);
+	my $res = $q->execute(
+        $task->{'intPersonID'},
+        $Defs::LEVEL_PERSON,
+        $task->{'intPersonRegistrationID'},
+        $Data->{'Realm'},
+	) or query_error($st);
+
+    return $res;
 }
 
 1;
