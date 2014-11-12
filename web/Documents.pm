@@ -26,8 +26,7 @@ use Data::Dumper;
 sub handle_documents {
 	my($action, $Data, $memberID, $DocumentTypeID,$RegistrationID)=@_;
 	my $resultHTML='';
-	open FH, ">dumpfile.txt";
-    print FH "\nAt this point DocumentTypeID is $DocumentTypeID\n";
+	
 	my $assocID= $Data->{'clientValues'}{'assocID'} || -1;
 	return ('No Member or Association Specified','','') if !$memberID or !$assocID;
 	my $newaction='';
@@ -45,9 +44,7 @@ sub handle_documents {
 	
   if ($action eq 'DOC_u') {
 		$DocumentTypeID = param('DocumentTypeID') || 0;
-        
-
-        print FH "\nAt this second point DocumentTypeID is $DocumentTypeID\n";
+           
 		my $retvalue = process_doc_upload( 
 			$Data,
 			$memberID, 
@@ -60,10 +57,7 @@ sub handle_documents {
 			if($retvalue eq '' && length($retvalue) == 0){
         	# check if the document to be uploaded is a REGO document 
             	my $query = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem WHERE strRuleFor = ? AND strItemType = ? AND intID = ? AND intRequired = ?];
-				
-				print FH "\nQuery: $query.\n";
-                print FH "\n intID = $DocumentTypeID\n";
-            	my $sth = $Data->{'db'}->prepare($query); 
+				my $sth = $Data->{'db'}->prepare($query); 
     			$sth->execute('REGO', 'DOCUMENT', $DocumentTypeID, 1);
 				my $isREGODocument = 0;
 				my $dref = $sth->fetchrow_hashref();
@@ -88,8 +82,6 @@ sub handle_documents {
                 	 }    
 					 
     				$query = qq[UPDATE tblWFTask SET strTaskStatus = ? WHERE intPersonID = ? AND intPersonRegistrationID = ?];
-					print FH "\nSecond Query: $query\n";
-					print FH "\nMemberID = $memberID \n intPersonRegistrationID = $RegistrationID\n";
 					$sth = $Data->{'db'}->prepare($query);
 					$sth->execute('ACTIVE', $memberID, $RegistrationID);
 
