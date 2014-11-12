@@ -654,3 +654,73 @@ table.table tr td.align-right {
 header nav ul#menu ul {
 	top:40px;
 }
+
+/* Added Styles for Table in Task List Dashboard */
+.dashboard-tasklist td{
+	padding: 20px 25px;
+}
+.dashboard-tasklist th{
+	padding: 10px 25px;
+}
+.dashboard-tasklist td select{
+	padding: 5px;
+}
+.dashboard-tasklist td select.filter-tasks{
+	width: 130px;
+	margin-left: 10px;
+}
+.dashboard-tasklist tr{
+	border: 1px solid #cbcbcb;
+}
+.list-action-filter a.inactive{
+	padding: 7px 9px;
+	color: #fff;
+	background: #cbcbcb;
+}
+.list-action-filter a{
+	padding: 7px 9px;
+	float: left;
+	cursor: pointer;
+}
+.task-list:hover{
+	background: #efefef;
+}
+span.fa{
+	margin-right: 10px;
+}
+.box-header{
+	padding: 13px 25px;
+	background: #004e7e;
+	color: #fff;
+	font-size: 14px;
+}
+.sidebar-box{
+	border: 1px solid #cbcbcb;
+	margin-bottom: 20px;
+	padding-bottom: 0px;
+}
+.sidebar-box ul{
+	list-style: none;
+	border-bottom: 1px solid #cbcbcb;
+	padding: 10px 0px;
+}
+.sidebar-box ul:last-child{
+	border-bottom: none;
+	padding-bottom: 0px;
+}
+.sidebar-box ul li{
+	padding-left: 10px;
+}
+.sidebar-box .quick-links li{
+	border-bottom: 1px solid #cbcbcb;
+}
+.sidebar-box .quick-links li{
+	padding: 10px;
+}
+.sidebar-box .quick-links li:last-child{
+	border-bottom: none;
+}
+.sidebar-box .quick-links li a{
+	color: #555;
+}
+/* End Add */
