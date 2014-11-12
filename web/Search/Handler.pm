@@ -7,6 +7,7 @@ use Utils;
 use Data::Dumper;
 use Switch;
 use Search::Person;
+use TTTemplate;
 
 sub handle {
     my ($action, $Data) = @_;
@@ -36,7 +37,26 @@ sub handle {
         ->setSearchType($searchType)
         ->setData($Data);
 
-    
+    my $cgi = $searchObj->{'_cgi'};
+	my %params = $searchObj->{'_cgi'}->Vars();
+	my %SearchData = ();
 
-    return $searchObj->displaySearchForm();
+    if($params{'submit'} eq 'Search') {
+        $searchObj->setKeyword($params{'search_keyword'});
+        $SearchData{'searchForm'} = $searchObj->displaySearchForm();
+
+        my $resultGrid = $searchObj->process();
+        $SearchData{'searchResultGrid'} = $resultGrid;
+    }
+    else {
+        $SearchData{'searchForm'} = $searchObj->displaySearchForm();
+    }
+
+	my $content = runTemplate(
+        $Data,
+        \%SearchData,
+        'search/wrapper.templ',
+	);
+
+    return ($content, "Search");
 }
