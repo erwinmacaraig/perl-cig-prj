@@ -270,6 +270,9 @@ use PersonFlow;
     elsif ( $action =~ /^PRA_/) {
         ($resultHTML, $pageHeading) = handlePersonRequest($action, \%Data);
     }
+    elsif($action =~ /^INITSRCH_/){
+        ($resultHTML, $pageHeading) = (undef, undef);
+    }
     
    
     # BUILD PAGE
