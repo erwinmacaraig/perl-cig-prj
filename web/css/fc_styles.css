@@ -253,7 +253,7 @@ h3.panel-header {
 div.panel-body {
     background: #ededed;
     border: 1px solid #cccccc;
-    padding: 0; /* reset style coming from bootstrap used only in this stylesheet */
+    /*padding: 0;*/ /* reset style coming from bootstrap used only in this stylesheet */
 }
 
 p {
@@ -654,3 +654,40 @@ table.table tr td.align-right {
 header nav ul#menu ul {
 	top:40px;
 }
+<<<<<<< Updated upstream
+=======
+
+h2.section-header {
+	font-family: 'noto_sansregular';
+	font-weight: normal;
+	font-size:26px;
+	color:#000;
+}
+
+.edit-container {
+	text-align: right;
+}
+
+.detail-value {
+	font-weight: bold;
+}
+
+.panel-heading {
+	border-bottom-left-radius:3px;
+	border-bottom-right-radius:3px;
+}
+
+.panel-default>.panel-heading {
+	background-color: #055688!important;
+	border-bottom:1px solid #fff;
+}
+
+.panel-title > a {
+	color:#fff;
+}
+
+i.indicator {
+	float:right;
+	color:#fff;
+}
+>>>>>>> Stashed changes
