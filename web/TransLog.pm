@@ -45,7 +45,7 @@ sub handleTransLogs {
         if ($Data->{'params'}{"cc_submit[$i]"}) {
             $cc_submit = $Data->{'params'}{"pt_submit[$i]"};
         }
-        print STDERR "==========THE VALUE IS " . $cc_submit . "=============";
+        
     }
 #########################################
   if ($action=~/step2/) {	
@@ -949,13 +949,13 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
             <div id="payment_manual" style= "display:none;">
                 $orstring
                 <script type="text/javascript">
-                    jQuery(function() {
-                        jQuery(".paytxn_chk").live('change',function() {
-                            jQuery('#payment_manual').show();
-                            jQuery('#payment_cc').show();
+                    $(function() {
+                        $(".paytxn_chk").live('change',function() {
+                            $('#payment_manual').show();
+                            $('#payment_cc').show();
                         });
-                        jQuery("#btn-manualpay").click(function() {
-                                if(jQuery('#paymentType').val() == '') {
+                        $("#btn-manualpay").click(function() {
+                                if($('#paymentType').val() == '') {
                                     alert("You Must Provide A Payment Type");
                                     return false;
                                 }
@@ -1043,8 +1043,8 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
                   if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB) { 
                       $body .= qq[
                           <script type="text/javascript">
-                              jQuery(".paytxn_chk").live('change',function() {
-                                  jQuery('#payment_cc').show();
+                              $(".paytxn_chk").live('change',function() {
+                                  $('#payment_cc').show();
                               });
                           </script>			  
                       ];
