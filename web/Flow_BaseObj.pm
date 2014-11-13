@@ -117,19 +117,22 @@ sub Navigation {
                 $current || $step_in_future || 0,
             ];
             my $currentclass = '';
-            $currentclass = 'nav-currentstep' if $current;
-            $currentclass = 'nav-futurestep' if $step_in_future;
-            $currentclass ||= 'nav-completedstep';
+            #$currentclass = 'nav-currentstep' if $current;
+            #$currentclass = 'nav-futurestep' if $step_in_future;
+            #$currentclass ||= 'nav-completedstep';            
+						$currentclass = 'current' if $current;
+            $currentclass = 'next' if $step_in_future;
+            $currentclass ||= 'previous';
             $meter = $step if $current;
             #$meter .= qq[ <span class="meter-$current"></span> ];
             #$navstring .= qq[ <li class = "step step-$step $currentclass"><img src="images/tick.png" class="tick-image"><span class="step-num">$step.</span> <span class="br-mobile"><br></span>$name</li> ];
-			$navstring .= qq[ <li class = "step step-$step $currentclass"><span class="step-num"><a href="#">$step. $name</a></li> ];
+			$navstring .= qq[ <li class = "step step-$step"><span class="$currentclass step-num"><a href="#">$step. $name</a></li> ];
             $step_in_future = 2 if $current;
             $step++;
         }
     }
     my $returnHTML = '';
-    $returnHTML .= qq[<ul class = "breadcrumb list-inline form-nav">$navstring</ul><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;
+    $returnHTML .= qq[<ul class = "playermenu list-inline form-nav">$navstring</ul><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;
    
 
     if(wantarray)   {
