@@ -1,0 +1,227 @@
+﻿/*FOR CUSTOMIZE CSS*/
+
+/***** CUSTOM STYLES *****/
+.welcomelogin { margin-bottom: -20px; }
+.welcomelogin span { color: #378080; font-size: 12px; font-weight: bold; font-family: 'noto_sansregular'; }
+.formbg { background: url('../images/img-logo.png'); background-repeat: no-repeat; background-attachment: fixed; background-position: center; }
+
+
+
+/***** SYMPLICIT FREEMADE STYLES *****/
+header .utilities {
+  background: #004e7e;
+  padding: 10px;
+}
+
+header .utilities ul {
+  margin: 0;
+  padding: 0;
+  float: right;
+}
+
+header .utilities ul li {
+  float: left;
+  list-style-type: none;
+  color: #fff;
+  margin: 0 40px 0 0;
+}
+
+header .utilities ul li:last-child {
+  margin: 0;
+}
+
+header .utilities ul li a {
+  color: #fff;
+  text-decoration: underline;
+}
+
+header .utilities ul li a {
+  color: #fff;
+  text-decoration: underline;
+  font-size: 13px;
+}
+
+header .utilities ul li a:hover {
+  text-decoration: none;
+}
+
+header .logo-area {
+  background: #085a8c;
+  padding: 30px 0;
+}
+
+header .logo-area img {
+  float: left;
+}
+
+header .logo-area h1 {
+  margin: 30px 20px;
+  color: #fff;
+  font-size: 24px;
+  font-family: 'noto_sansbold';
+  font-weight: normal;
+  float: left;
+}
+
+header .logo-area ul {
+  float: right;
+}
+
+header .logo-area ul li {
+  float: left;
+  text-align: center;
+  list-style-type: none;
+  font-size: 12px;
+  color: #fff;
+  margin: 0 40px 0 0;
+}
+
+header .logo-area ul li:last-child {
+  margin: 0;
+}
+
+header .logo-area ul li strong {
+  font-family: 'noto_sansbold';
+  font-weight: normal;
+}
+
+header nav {
+  background: #085a8c;
+  padding: 20px 0;
+  -webkit-box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
+  -moz-box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
+  box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
+}
+
+header nav ul {
+  margin: 0;
+  padding: 0;
+}
+
+header nav ul li {
+  float: left;
+  list-style-type: none;
+}
+
+header nav ul li:first-child a {
+  border: none;
+}
+
+header nav ul li:last-child a {
+  border-right: 1px solid #004e7e;
+}
+
+header nav ul li a {
+  border-left: 1px solid #004e7e;
+  color: #fff;
+  background: #085a8c;
+  padding: 20px;
+}
+
+header nav ul li a:hover {
+  background: #e3e3e3;
+  color: #000;
+  text-decoration: none;
+}
+
+.form-signin input[type="text"] {
+  border: 1px solid #cccccc;
+  padding: 5px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+label {
+  font-family: 'noto_sansregular';
+  font-weight: normal;
+  font-size: 14px;
+  color: #000;
+}
+
+a.text-link {
+  font-family: 'noto_sansregular';
+  font-weight: normal;
+  font-size: 14px;
+  color: #000;
+  text-decoration: underline;
+}
+
+a.text-link:hover {
+  text-decoration: none;
+}
+
+
+
+/***** BOOTSTRAP STYLES *****/
+.form-signin {
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+}
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+  margin-bottom: 10px;
+}
+.form-signin .checkbox {
+  font-weight: normal;
+}
+.form-signin .form-control {
+  position: relative;
+  height: auto;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 10px;
+  font-size: 16px;
+}
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+.form-signin input[type="email"] {
+  border: 1px solid #cccccc;
+  padding: 5px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+.form-signin input[type="password"] {
+  border: 1px solid #cccccc;
+  padding: 5px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.footer
+{
+  padding-top:15px;
+  font-weight: normal;
+  font-size: 14px;
+  color: #FFF;
+  font-family: 'noto_sansregular';
+}
+
+.navbar-default {
+  background-color: #085A8C;
+  border-color: #085A8C;
+}
+
+.navbar
+{
+  margin-bottom: 0px;
+  border-radius: 0px;
+  padding-left: 10px;
+}
+
+hr {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border: 0;
+  border-top: 1px solid #E2E1E2;
+}
+
+
+
+/***** @FONT-FACE *****/
+@font-face {
+  font-family: 'ProximaNovaBold';
+  src: url('../fonts/ProximaNova-Bold.otf') format("opentype");
+}
