@@ -4,6 +4,9 @@
 .welcomelogin { margin-bottom: -20px; }
 .welcomelogin span { color: #378080; font-size: 12px; font-weight: bold; font-family: 'noto_sansregular'; }
 .formbg { background: url('../images/img-logo.png'); background-repeat: no-repeat; background-attachment: fixed; background-position: center; }
+.inline li { display: inline-block; }
+.lblPeoplelookup { position:relative;left:20px; }
+.btnPeoplelookupSearch { position:relative;right:-62px; }
 
 
 
@@ -142,6 +145,72 @@ a.text-link {
 
 a.text-link:hover {
   text-decoration: none;
+}
+
+h3.main-heading {
+  font-family: 'noto_sansregular';
+  font-weight: normal;
+  font-size: 30px;
+  color: #000;
+}
+
+h5.panel-header {
+  font-family: 'noto_sansregular';
+  font-weight: normal;
+  font-size: 22px;
+  color: #FFF;
+  padding: 10px 20px;
+  margin: 0;
+  background: #055688;
+  background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzA1NTY4OCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDRlN2UiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+  background: -moz-linear-gradient(top,  #055688 0%, #004e7e 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#055688), color-stop(100%,#004e7e));
+  background: -webkit-linear-gradient(top,  #055688 0%,#004e7e 100%);
+  background: -o-linear-gradient(top,  #055688 0%,#004e7e 100%);
+  background: -ms-linear-gradient(top,  #055688 0%,#004e7e 100%);
+  background: linear-gradient(to bottom,  #055688 0%,#004e7e 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#055688', endColorstr='#004e7e',GradientType=0 );
+}
+
+div.panel-body {
+  background: #ededed;
+  border: 1px solid #cccccc;
+  padding: 10px;
+}
+
+span.notice-error {
+  font-family: 'noto_sansregular';
+  font-weight: normal;
+  font-size: 14px;
+  color: #c4070a;
+}
+
+.toggle a {
+  background: #d8d8d8;
+  border: 1px solid #cccccc;
+  font-size: 16px;
+  padding: 8px 30px;
+  color: #000;
+  float: left;
+}
+
+.toggle a:hover {
+  text-decoration: none;
+}
+
+.toggle a.active {
+  background: #045485;
+  border: 1px solid #045485;
+  font-size: 16px;
+  padding: 8px 30px;
+  color: #fff;
+  float: left;
+}
+
+li.peoplelookup input[type="text"] {
+  border: 1px solid #cccccc;
+  padding: 5px;
+  width: 300px;
 }
 
 
