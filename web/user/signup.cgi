@@ -61,7 +61,7 @@ sub signup  {
     my %fields = (
         firstname => $Data->{'lang'}->txt('First name'),
         familyname => $Data->{'lang'}->txt('Family name'),
-        email => $Data->{'lang'}->txt('Email'),
+        username => $Data->{'lang'}->txt('Username'),
         password => $Data->{'lang'}->txt('Password 1'),
         password2 => $Data->{'lang'}->txt('Password 2'),
     );
@@ -83,19 +83,19 @@ print STDERR Dumper(\%inputs);
     if($inputs{'password'} ne $inputs{'password2'})   {
         push @errors, $Data->{'lang'}->txt('Password and Password 2 do not match');
     }
-    require Mail::RFC822::Address;
-    if(!Mail::RFC822::Address::valid($inputs{'email'}))   {
-        push @errors, $Data->{'lang'}->txt('Email address is not valid');
-    }
+#    require Mail::RFC822::Address;
+#    if(!Mail::RFC822::Address::valid($inputs{'email'}))   {
+#        push @errors, $Data->{'lang'}->txt('Email address is not valid');
+#    }
     if(scalar(@errors)) { return \@errors }
     my $user = new UserObj(db => $Data->{'db'});
-    $user->load(email => $inputs{'email'});
+    $user->load(username => $inputs{'username'});
     if($user->ID()) {
-        push @errors, $Data->{'lang'}->txt('Email address already in use');
+        push @errors, $Data->{'lang'}->txt('Username already in use');
     }
     if(scalar(@errors)) { return \@errors }
     my %userdata = (
-        email => $inputs{'email'},
+        username => $inputs{'username'},
         firstName => $inputs{'firstname'},
         familyName => $inputs{'familyname'},
     ); 
