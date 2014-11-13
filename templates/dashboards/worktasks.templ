@@ -33,8 +33,10 @@
 			        </select>
 				</td>
 				<td class="list-action-filter">
-					<a class="btn-inside-panels">All tasks</a>
-					<a class="btn-inside-panels inactive">New task</a>
+                    <div class="toggle">
+                        <a href="#" class="active">All tasks</a>
+                        <a href="#" class="">New task</a>
+                    </div>
 				</td>
 			</tr>
 		    [% FOREACH task IN TaskList %]

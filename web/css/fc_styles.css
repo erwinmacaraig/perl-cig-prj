@@ -586,7 +586,7 @@ header nav ul#menu ul {
 	top:40px;
 }
 
-/* Added Styles for Table in Task List Dashboard */
+/* Added Styles for Table in Task List Dashboard:: Vincent R; */
 .dashboard-tasklist td{
 	padding: 20px 25px;
 }
@@ -603,13 +603,8 @@ header nav ul#menu ul {
 .dashboard-tasklist tr{
 	border: 1px solid #cbcbcb;
 }
-.list-action-filter a.inactive{
-	padding: 7px 9px;
-	color: #fff;
-	background: #cbcbcb;
-}
-.list-action-filter a{
-	padding: 7px 9px;
+.list-action-filter a, .list-action-filter a.active{
+	padding: 7px 6px;
 	float: left;
 	cursor: pointer;
 }
@@ -790,4 +785,15 @@ i.indicator {
     margin: 0;
     padding: 0;
     width: 100%;
+}
+
+/* Search Styles:: Vincent R */
+.search-panel input{
+	padding: 10px 40px;
+}
+.search-panel input[type="submit"]{
+	margin-left: 20px;
+}
+.search-panel{
+	margin-bottom: 15px;
 }
