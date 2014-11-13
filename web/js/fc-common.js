@@ -25,4 +25,14 @@ $(document).ready(function(){
   	$("body").find("header nav ul li a").css("padding-right","9px");
   }
 
+
+  $('#international').click(function(){
+      $('#international').addClass('active');
+      $('#domestic').removeClass('active');
+  });
+  $('#domestic').click(function(){
+      $('#domestic').addClass('active');
+      $('#international').removeClass('active');
+  });
+
 })

@@ -10,6 +10,7 @@
     [% END %]
 
     <br/>
+    <form action="main.cgi" method="POST">
     <div class="row">
         <div class="col-md-9">
             <h5 class="panel-header">Transfer Details</h5>
@@ -44,7 +45,8 @@
                                         People lookup:
                                     </li>
                                     <li class="peoplelookup">
-                                        <input type="text" />
+                                        <!--<input type="text" />-->
+                                        <input type="text" name="search_keyword" value="">
                                     </li>
                                 </ul>
                             </p>
@@ -57,7 +59,10 @@
                                     Enter name or Member ID 
                                 </li>
                                 <li class="btnPeoplelookupSearch">
-                                    <button class="btn btn-sm btn-primary" type="submit">Search people</button>
+                                    <!--<button class="btn btn-sm btn-primary" type="submit">Search people</button>-->
+                                    <input class="btn btn-sm btn-primary" type="submit" name="submit" value="Search people">   
+                                    <input type="hidden" value="[% action %]" name="a"> <input type="hidden" value="[% client %]" name="client">
+                                    <input type="hidden" value="[% request_type %]" name="request_type">
                                 </li>
                             </ul>
                         </center>
@@ -103,6 +108,7 @@
             </div>
         </div>
     </div>
+</form>
 
 
 
