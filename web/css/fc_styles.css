@@ -653,6 +653,13 @@ span.fa{
 .sidebar-box .panel-header{
 	margin-bottom: 10px;
 }
+.advanced-search-fields{
+	display: none;
+}
+.advanced-search-fields span{
+	width: 50%;
+	float: left;
+}
 /* End Add */
 
 h2.section-header {
