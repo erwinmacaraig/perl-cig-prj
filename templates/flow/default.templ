@@ -13,10 +13,6 @@
 	</ul>
 </div>
 [% END %]
-[% IF FlowSummary %]
-[% FStemplate = FlowSummaryTemplate or 'flow/flow_summary.templ' %]
-[% INCLUDE $FStemplate %]
-[% END %]
 
 [% TextTop %]
 <div class="col-md-12">
@@ -45,6 +41,12 @@
 </form>
 </div>
 </div>
+[% IF FlowSummary %]
+<div class="col-md-4">
+[% FStemplate = FlowSummaryTemplate or 'flow/flow_summary.templ' %]
+[% INCLUDE $FStemplate %]
+</div>
+[% END %]
 <br/>
 <div class="col-md-8"></div>
 [% TextBottom %]

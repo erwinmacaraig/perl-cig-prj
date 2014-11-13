@@ -733,10 +733,9 @@ i.indicator {
 	padding:  10px 20px 10px 25px;
 	background: #0fa54a;
 	color: #000;
-	text-decoration: underline;
 }
 .playermenu li .previous a {
-	color: #000;
+	color: #fff;
 	font-size: 11px;
 }
 .playermenu li .next {
@@ -783,4 +782,12 @@ i.indicator {
 	border-top: solid 21px transparent;
 	border-bottom: solid 20px transparent;
 	z-index: 1;
+}
+.col-md-4 #flowSummary {
+    background-color: none;
+    border: 0px solid #000000;
+    float: right;
+    margin: 0;
+    padding: 0;
+    width: 100%;
 }
