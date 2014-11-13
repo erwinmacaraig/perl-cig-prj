@@ -1,0 +1,61 @@
+[% USE Dumper %]
+<div class="col-md-12 tasklist-content dashboard-tasklist">
+	<table cellpadding="5" style="width: 100%">
+		<thead>
+			<tr class="box-header">
+				<th>Tasklist</th>
+				<th>Date Added</th>
+				<th>Date of Birth</th>
+				<th>Status</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Filter by:
+					<select class="filter-tasks">
+			          <option selected="" value="-- Task --">-- Task --</option>
+			          <option value="Registrations">Registrations</option>
+			          <option value="Transfers">Transfers</option>
+			        </select>
+		        </td>
+				<td>
+					<select>
+			          <option value="-- Date Added --">-- Date Added --</option>
+			          <option value="Latest">Latest</option>
+			          <option value="Oldest">Oldest</option>
+			        </select>
+				</td>
+				<td>
+					<select>
+			          <option value="-- Date of Birth --">-- Date of Birth --</option>
+			          <option value="Latest">Latest</option>
+			          <option value="Oldest">Oldest</option>
+			        </select>
+				</td>
+				<td>
+                    <!-- should be dynamically populated based on search result -->
+					<select id="u53_input">
+			          <option value="-- Type --">-- Type --</option>
+			          <option value="Pending">Player</option>
+			          <option value="In Progress">Coach</option>
+			          <option value="In Progress">Referee</option>
+			          <option value="In Progress">Team Official</option>
+			          <option value="In Progress">Club Official</option>
+			        </select>
+				</td>
+			</tr>
+		    [% FOREACH rego IN RegoList %]
+                <tr class="task-list">
+                    <td><span class="fa fa-user">[% rego.name %]</span></td>
+                    <td>[% rego.added %]</td>
+                    <td>[% rego.dob %]</td>
+                    <td><span class="fa fa-clock-o">[% rego.type %]</span></td>
+                    <td><a href="main.cgi?client=[% client %]&a=WF_View&TID=[% task.WFTaskID %]" class="btn-inside-panels">View</a></td>
+                </tr>
+		    [% END %]
+		</tbody>
+	</table>
+</div>
+
+

@@ -73,7 +73,7 @@ sub getUploadedFiles	{
 		    $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
 			$deleteURL .= qq[&amp;dctid=$dref->{'intDocumentTypeID'}&amp;regoID=$dref->{'regoID'}] if($dref->{'intDocumentTypeID'});
 	      	$deleteURLButton = qq[ <span class="button-small generic-button"><a href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a></span>];
-	    	$urlViewButton = qq[ <span class="button-small generic-button"><a href="$url">]. $Data->{'lang'}->txt('View'). q[</a></span>];
+            $urlViewButton = qq[ <span class="button-small generic-button"><a href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a></span>];
     	}
     	else {
     		my @authorizedLevelsArr = split(/\|/,$dref->{'strLockAtLevel'});
@@ -83,7 +83,7 @@ sub getUploadedFiles	{
 		        $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
 				$deleteURL .= qq[&amp;dctid=$dref->{'intDocumentTypeID'}&amp;regoID=$dref->{'regoID'}] if($dref->{'intDocumentTypeID'});
 	         	$deleteURLButton = qq[ <span class="button-small generic-button"><a href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a></span>];
-	    	    $urlViewButton = qq[ <span class="button-small generic-button"><a href="$url">]. $Data->{'lang'}->txt('View'). q[</a></span>];
+                $urlViewButton = qq[ <span class="button-small generic-button"><a href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a></span>];
             }
             else{
             	$deleteURLButton = qq[ <button class\"HTdisabled\">]. $Data->{'lang'}->txt('Delete'). q[</button>]; 

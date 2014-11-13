@@ -244,7 +244,7 @@ sub getEntityMenuData {
     if($SystemConfig->{'menu_searchpeople_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'persons_search'} = {
             name => $lang->txt('Search'),
-            url => $baseurl."a=P_SEARCH&amp;origin=" . $Data->{'clientValues'}{'authLevel'},
+            url => $baseurl."a=INITSRCH_P&amp;origin=" . $Data->{'clientValues'}{'authLevel'},
             };
     }
 
@@ -648,6 +648,7 @@ sub getAssocMenuData {
     }
 
     if(
+            1==2 and
         $intAllowSeasons
             and ((!$Data->{'SystemConfig'}{'LockSeasons'}
                     and !$Data->{'SystemConfig'}{'Rollover_HideAll'}
@@ -888,6 +889,7 @@ sub getClubMenuData {
     }
 
     if(
+            1==2 and
             (!$Data->{'SystemConfig'}{'LockSeasons'}
                     and !$Data->{'SystemConfig'}{'LockSeasonsCRL'}
                     and !$Data->{'SystemConfig'}{'Club_PersonEditOnly'}
@@ -997,7 +999,7 @@ sub getClubMenuData {
         if($SystemConfig->{'menu_searchpeople_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
             $menuoptions{'persons_search'} = {
                 name => $lang->txt('Search'),
-                url => $baseurl."a=P_SEARCH&amp;origin=" . $Data->{'clientValues'}{'authLevel'},
+                url => $baseurl."a=INITSRCH_P&amp;origin=" . $Data->{'clientValues'}{'authLevel'},
                 };
         }
 

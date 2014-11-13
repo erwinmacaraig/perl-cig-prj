@@ -147,12 +147,14 @@ sub checkNewRegoOK  {
 sub checkRenewalRegoOK  {
 
     my ($Data, $personID, $rego_ref) = @_;
-    
+print STDERR "\nCROK 1\n\n"; 
     my $pref= undef;
     $pref = Person::loadPersonDetails($Data->{'db'}, $personID) if ($personID);
     return 0 if (defined $pref and ($pref->{'strStatus'} eq $Defs::PERSON_STATUS_SUSPENDED));
+print STDERR "\nCROK 2\n\n"; 
     my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $rego_ref->{'sport'}, $rego_ref->{'personType'}, 'RENEWAL');
 
+print STDERR "\nCROK 3\n\n"; 
     $rego_ref->{'ruleFor'} = 'REGO';
     my ($personRegisterWhat, $errorMsg) = PersonRegisterWhat::optionsPersonRegisterWhat(
         $Data,
@@ -181,9 +183,11 @@ sub checkRenewalRegoOK  {
             last;
         }
     }
+print STDERR "\nCROK 4\n\n"; 
 
     warn "VALID REGO $validRego";
     return $validRego if (!$validRego);
+print STDERR "\nCROK 5\n\n"; 
 
     my @statusIN = ($Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);#, $Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_INPROGRESS);
     my %Reg = (
@@ -220,6 +224,7 @@ sub checkRenewalRegoOK  {
         \%Reg
     );
 
+print STDERR "\nCROK 6 NP $nationalPeriodID\n\n"; 
     print STDERR "renew COUNT $count";
     print STDERR "COUNTALREADY $countAlready";
     #return 1 if ($countActive or $countInactive or $countRolledOver); ## Must have an ACTIVE or PASSIVE record
