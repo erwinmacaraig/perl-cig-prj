@@ -295,6 +295,9 @@ label {
 #l_dtDOB_day, #l_dtDOB_mon, #l_dtDOB_year {
 	width: 100px;
 }
+#l_dtPassportExpiry_day, #l_dtPassportExpiry_mon, #l_dtPassportExpiry_year {
+	width: 100px;
+}
 input[type="text"] {
     border: 1px solid #cccccc;
     padding: 5px;
@@ -573,6 +576,7 @@ table.table tr td.align-right {
 	width:100%;
 	margin: 0;
 	background-color: #e3e3e3;
+	padding-bottom: 50px;
 }
 
 
@@ -583,9 +587,13 @@ table.table tr td.align-right {
 }
 
 header nav ul#menu ul {
-	top:40px;
+	top:43px;
 }
 
+header ul#menu ul li a:hover {
+	background-color: #085a8c;
+	color:#fff;
+}
 
 /* Added Styles for Table in Task List Dashboard:: Vincent R; */
 .dashboard-tasklist td, .documents-list td{
@@ -910,3 +918,12 @@ header nav ul li a {
 	width:65%;
 	font-size:16px;
 }
+
+.dash-heading, .pageHeading {
+	font-family: 'noto_sansregular';
+    font-weight: normal;
+    font-size: 36px;
+    color: #000;
+    padding-left:15px;
+}
+

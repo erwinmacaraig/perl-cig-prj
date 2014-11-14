@@ -1,171 +1,164 @@
 <div class="member-home-page">
-
-
-<div class="container">
-	<div class="row">
-		<div class="col-md-9">
-		<!--<h2 class="main-heading">People search</h2>-->
-			<h3 class="panel-header">[% Name %]</h3>
-			<div class="panel-body">
-				<div class="read-only">
-					<h4>Person information</h4>
-					<div class="read-only-text">
-						[% IF Details.LatinFirstname %]
-						<div class="">
-							<span class="">[% Lang.txt("First name (Latin Characters)") %]:</span>
-							<span class="detail-value">[% Details.LatinFirstname %]</span>
-						</div>
-						[% END %]
-
-						[% IF Details.LatinSurname %]
-						<div class="">
-							<span class="">[% Lang.txt("Family name (Latin Characters)") %]:</span>
-							<span class="detail-value">[% Details.LatinSurname %]</span>
-						</div>
-						[% END %]
-
-						[% IF Details.Gender %]
-						<div class="">
-							<span class="">[% Lang.txt('Gender') %]:</span>
-							<span class="detail-value">[% Details.Gender %]</span>
-						</div>
-						[% END %]
-
-						[% IF Details.DOB %]
-					    <div class="">
-					        <span class="">Date of Birth:</span>
-					        <span class="detail-value">[% Details.DOB %]</span>
-					    </div>
-						[% END %]
-
-						[% IF Details.BirthCountry %]
-					    <div class="">
-					      <span class="">Country of Birth:</span>
-					      <span class="detail-value">[% Details.BirthCountry %]</span>
-					    </div>
-
-						[% END %]
-
-						[% IF Details.PassportNat %]
-					    <div class="">
-					      <span class="">Nationality:</span>
-					      <span class="detail-value">[% Details.PassportNat %]</span>
-					    </div>
-						[% END %]
-
-						<div class="edit-container">
-						[% IF EditDetailsLink and !ReadOnlyLogin  %]
-						<a href = "[% EditDetailsLink %]" class="edit-link">
-							[% Lang.txt('Edit') %]
-						</a>
-						[% END %]
-						</div>
-					</div>
-				</div>
-
-				<br/ >
-				
-				<div class="read-only">
-					<h4>Contact details</h4>
-					<div class="read-only-text">
-						[% IF Details.Address1 %]
-						<div class="">
-						  	<span class="">[% Lang.txt('Address 1:') %]</span>
-						  	<span class="detail-value">[% Details.Address1 %]</span>
-						  	<span class="detail-value">[% Details.Suburb %]&nbsp;[% Details.State %]&nbsp;[% Details.PostalCode %]</span>
-					    </div>
-						[% END %]
-
-						[% IF Details.Address2 %]
-						<div class="">
-						<span class="detail-value">[% Details.Address2 %]</span>
-						</div>
-						[% END %]
-
-						[% IF Details.PhoneHome %]
-						<span class="">
-					  	<span class="">Home Phone:</span>
-					    <span class="detail-value">[% Details.PhoneHome %]</span>
-					  	</span>
-						[% END %]
-
-						[% IF Details.PhoneMobile %]
-						<span class="">
-					  	<span class="">Mobile:</span>
-					    <span class="detail-value">[% Details.PhoneMobile %]</span>
-					  	</span>
-						[% END %]
-
-						[% IF Details.Email %]
-						<span class="">
-					  	<span class="">Email:</span>
-					    <span class="detail-value"><a href="mailto:[% Details.Email %]">[% Details.Email %]</a></span>
-					  	</span>
-						[% END %]
-
-						<div class="edit-container">
-						[% IF EditDetailsLink and !ReadOnlyLogin  %]
-						<a href = "[% EditDetailsLink %]" class="edit-link">
-							[% Lang.txt('Edit') %]
-						</a>
-						[% END %]
-						</div>
-					</div>
-				</div>
-
-				<br/ >
-
-				<div class="read-only">
-					[% IF GroupData.other && secondcount < 2%]
-					[% secondcount = secondcount + 1 %]
-					[% doneother = 1 %]
-					<h4>[% Lang.txt('Other Details') %]</h4>
-					<div class="read-only-text">
-						[% GroupData.other %]
+	<div class="col-md-9">
+		<h3 class="panel-header">[% Name %]</h3>
+		<div class="panel-body">
+			<div class="read-only">
+				<h4>Person information</h4>
+				<div class="read-only-text">
+					[% IF Details.LatinFirstname %]
+					<div class="">
+						<span class="">[% Lang.txt("First name (Latin Characters)") %]:</span>
+						<span class="detail-value">[% Details.LatinFirstname %]</span>
 					</div>
 					[% END %]
+
+					[% IF Details.LatinSurname %]
+					<div class="">
+						<span class="">[% Lang.txt("Family name (Latin Characters)") %]:</span>
+						<span class="detail-value">[% Details.LatinSurname %]</span>
+					</div>
+					[% END %]
+
+					[% IF Details.Gender %]
+					<div class="">
+						<span class="">[% Lang.txt('Gender') %]:</span>
+						<span class="detail-value">[% Details.Gender %]</span>
+					</div>
+					[% END %]
+
+					[% IF Details.DOB %]
+				    <div class="">
+				        <span class="">Date of Birth:</span>
+				        <span class="detail-value">[% Details.DOB %]</span>
+				    </div>
+					[% END %]
+
+					[% IF Details.BirthCountry %]
+				    <div class="">
+				      <span class="">Country of Birth:</span>
+				      <span class="detail-value">[% Details.BirthCountry %]</span>
+				    </div>
+
+					[% END %]
+
+					[% IF Details.PassportNat %]
+				    <div class="">
+				      <span class="">Nationality:</span>
+				      <span class="detail-value">[% Details.PassportNat %]</span>
+				    </div>
+					[% END %]
+
+					<div class="edit-container">
+					[% IF EditDetailsLink and !ReadOnlyLogin  %]
+					<a href = "[% EditDetailsLink %]" class="edit-link">
+						[% Lang.txt('Edit') %]
+					</a>
+					[% END %]
+					</div>
 				</div>
-
-				<br />
-				<!--Accordion start-->
-
-				[% StatusPanel %]
-
-				<!--Accordion end-->
-
-				<div class = "changeoptions">
-				[% IF AddRegistrationURL and !ReadOnlyLogin %]
-				    <span>
-				    	<a class="btn-main" href = "[% AddRegistrationURL %]">[% Lang.txt('Add Registration') %]</a>
-				    </span>
-				[% END %]
-
-				[% IF MarkDuplicateURL  and !ReadOnlyLogin %]
-				<span>
-					<a class="btn-main" href = "[% MarkDuplicateURL %]">[% Lang.txt("Mark as Duplicate") %]</a>
-				</span>
-				[% END %]
-
-				<!--[% IF CardPrintingURL  and !ReadOnlyLogin %]
-				<span class = "button-small generic-button"><a href = "[% CardPrintingURL %]">[% Lang.txt("Member Cards") %]</a></span>
-				[% END %]-->
-				</div>
-
 			</div>
+
+			<br/ >
+			
+			<div class="read-only">
+				<h4>Contact details</h4>
+				<div class="read-only-text">
+					[% IF Details.Address1 %]
+					<div class="">
+					  	<span class="">[% Lang.txt('Address 1:') %]</span>
+					  	<span class="detail-value">[% Details.Address1 %]</span>
+					  	<span class="detail-value">[% Details.Suburb %]&nbsp;[% Details.State %]&nbsp;[% Details.PostalCode %]</span>
+				    </div>
+					[% END %]
+
+					[% IF Details.Address2 %]
+					<div class="">
+					<span class="detail-value">[% Details.Address2 %]</span>
+					</div>
+					[% END %]
+
+					[% IF Details.PhoneHome %]
+					<span class="">
+				  	<span class="">Home Phone:</span>
+				    <span class="detail-value">[% Details.PhoneHome %]</span>
+				  	</span>
+					[% END %]
+
+					[% IF Details.PhoneMobile %]
+					<span class="">
+				  	<span class="">Mobile:</span>
+				    <span class="detail-value">[% Details.PhoneMobile %]</span>
+				  	</span>
+					[% END %]
+
+					[% IF Details.Email %]
+					<span class="">
+				  	<span class="">Email:</span>
+				    <span class="detail-value"><a href="mailto:[% Details.Email %]">[% Details.Email %]</a></span>
+				  	</span>
+					[% END %]
+
+					<div class="edit-container">
+					[% IF EditDetailsLink and !ReadOnlyLogin  %]
+					<a href = "[% EditDetailsLink %]" class="edit-link">
+						[% Lang.txt('Edit') %]
+					</a>
+					[% END %]
+					</div>
+				</div>
+			</div>
+
+			<br/ >
+
+			<div class="read-only">
+				[% IF GroupData.other && secondcount < 2%]
+				[% secondcount = secondcount + 1 %]
+				[% doneother = 1 %]
+				<h4>[% Lang.txt('Other Details') %]</h4>
+				<div class="read-only-text">
+					[% GroupData.other %]
+				</div>
+				[% END %]
+			</div>
+
+			<br />
+			<!--Accordion start-->
+
+			[% StatusPanel %]
+
+			<!--Accordion end-->
+
+			<div class = "changeoptions">
+			[% IF AddRegistrationURL and !ReadOnlyLogin %]
+			    <span>
+			    	<a class="btn-main" href = "[% AddRegistrationURL %]">[% Lang.txt('Add Registration') %]</a>
+			    </span>
+			[% END %]
+
+			[% IF MarkDuplicateURL  and !ReadOnlyLogin %]
+			<span>
+				<a class="btn-main" href = "[% MarkDuplicateURL %]">[% Lang.txt("Mark as Duplicate") %]</a>
+			</span>
+			[% END %]
+
+			<!--[% IF CardPrintingURL  and !ReadOnlyLogin %]
+			<span class = "button-small generic-button"><a href = "[% CardPrintingURL %]">[% Lang.txt("Member Cards") %]</a></span>
+			[% END %]-->
+			</div>
+
 		</div>
+	</div>
 
-		<div class="col-md-3">
-			<div id = "">
-	
-			<h3 class="panel-header">Member ID: [% #Details.NationalNum %]</h3>
-			<div class="panel-body">
+	<div class="col-md-3">
+		<div id = "">
 
-			<p class="reg-text">[% Name %]</p>
-			<p class="reg-text">[% Details.Gender %]</p>
-			<p class="reg-text">[% Details.DOB %]</p>
-			</div>
-			</div>
+		<h3 class="panel-header">Member ID: [% #Details.NationalNum %]</h3>
+		<div class="panel-body">
 
+		<p class="reg-text">[% Name %]</p>
+		<p class="reg-text">[% Details.Gender %]</p>
+		<p class="reg-text">[% Details.DOB %]</p>
+		</div>
 		</div>
 
 	</div>
