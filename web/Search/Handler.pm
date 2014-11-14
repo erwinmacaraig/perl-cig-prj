@@ -2,7 +2,8 @@ package Search::Handler;
 require Exporter;
 
 use strict;
-use lib '.', '..';
+use lib "..",".","../..";
+use CGI qw(param);
 use Utils;
 use Data::Dumper;
 use Switch;
@@ -13,11 +14,11 @@ sub handle {
     my ($action, $Data, $render) = @_;
 
     my $searchObj = undef;
-    my $searchType = '';
+    my $searchType = param('type') || '';
+
 
     switch ($action) {
         case 'INITSRCH_P' {
-            $searchType = "INITSRCH_P";
             $searchObj = new Search::Person();
         }
         case 'INITSRCH_C' {
@@ -36,6 +37,7 @@ sub handle {
         ->setRealmID($Data->{'Realm'})
         ->setSubRealmID(0)
         ->setSearchType($searchType)
+        ->setAction($action)
         ->setSphinx()
         ->setData($Data);
 
@@ -43,7 +45,8 @@ sub handle {
 	my %params = $searchObj->{'_cgi'}->Vars();
 	my %SearchData = ();
 
-    if(!$render){
+        print STDERR Dumper "RENDER " . $render;
+    if($render){
         if($params{'submit'} eq 'Search') {
             $searchObj->setKeyword($params{'search_keyword'});
             $SearchData{'searchForm'} = $searchObj->displaySearchForm();
