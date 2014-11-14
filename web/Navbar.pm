@@ -244,7 +244,7 @@ sub getEntityMenuData {
     if($SystemConfig->{'menu_searchpeople_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'persons_search'} = {
             name => $lang->txt('Search'),
-            url => $baseurl."a=INITSRCH_P&amp;origin=" . $Data->{'clientValues'}{'authLevel'},
+            url => $baseurl."a=INITSRCH_P&type=default&amp;origin=" . $Data->{'clientValues'}{'authLevel'},
             };
     }
 
@@ -935,8 +935,9 @@ sub getClubMenuData {
 
     if ($SystemConfig->{'allowPersonRequest'}) {
         $menuoptions{'requesttransfer'} = {
-           name => $lang->txt('Request a Transfer'),
-           url => $baseurl."a=PRA_T",
+            name => $lang->txt('Request a Transfer'),
+            url => $baseurl."a=PRA_T",
+            #url => $baseurl."a=INITSRCH_P&type=transfer&amp;origin=" . $Data->{'clientValues'}{'authLevel'},
         };
     }
 
@@ -999,7 +1000,7 @@ sub getClubMenuData {
         if($SystemConfig->{'menu_searchpeople_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
             $menuoptions{'persons_search'} = {
                 name => $lang->txt('Search'),
-                url => $baseurl."a=INITSRCH_P&amp;origin=" . $Data->{'clientValues'}{'authLevel'},
+                url => $baseurl."a=INITSRCH_P&type=default&amp;origin=" . $Data->{'clientValues'}{'authLevel'},
                 };
         }
 
