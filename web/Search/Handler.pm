@@ -10,7 +10,7 @@ use Search::Person;
 use TTTemplate;
 
 sub handle {
-    my ($action, $Data) = @_;
+    my ($action, $Data, $render) = @_;
 
     my $searchObj = undef;
     my $searchType = '';
@@ -27,6 +27,7 @@ sub handle {
             return;
         }
         else {
+            #return ALL here
             return;
         }
     }
@@ -35,28 +36,34 @@ sub handle {
         ->setRealmID($Data->{'Realm'})
         ->setSubRealmID(0)
         ->setSearchType($searchType)
+        ->setSphinx()
         ->setData($Data);
 
     my $cgi = $searchObj->{'_cgi'};
 	my %params = $searchObj->{'_cgi'}->Vars();
 	my %SearchData = ();
 
-    if($params{'submit'} eq 'Search') {
-        $searchObj->setKeyword($params{'search_keyword'});
-        $SearchData{'searchForm'} = $searchObj->displaySearchForm();
+    if(!$render){
+        if($params{'submit'} eq 'Search') {
+            $searchObj->setKeyword($params{'search_keyword'});
+            $SearchData{'searchForm'} = $searchObj->displaySearchForm();
 
-        my $resultGrid = $searchObj->process();
-        $SearchData{'searchResultGrid'} = $resultGrid;
+            my $resultGrid = $searchObj->process();
+            $SearchData{'searchResultGrid'} = $resultGrid;
+        }
+        else {
+            $SearchData{'searchForm'} = $searchObj->displaySearchForm();
+        }
+
+        my $content = runTemplate(
+            $Data,
+            \%SearchData,
+            'search/wrapper.templ',
+        );
+
+        return ($content, "Search");
     }
     else {
-        $SearchData{'searchForm'} = $searchObj->displaySearchForm();
+    
     }
-
-	my $content = runTemplate(
-        $Data,
-        \%SearchData,
-        'search/wrapper.templ',
-	);
-
-    return ($content, "Search");
 }
