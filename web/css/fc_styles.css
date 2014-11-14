@@ -295,6 +295,9 @@ label {
 #l_dtDOB_day, #l_dtDOB_mon, #l_dtDOB_year {
 	width: 100px;
 }
+#l_dtPassportExpiry_day, #l_dtPassportExpiry_mon, #l_dtPassportExpiry_year {
+	width: 100px;
+}
 input[type="text"] {
     border: 1px solid #cccccc;
     padding: 5px;
