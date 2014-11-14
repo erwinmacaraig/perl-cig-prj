@@ -26,6 +26,7 @@ sub new {
         _query              => $args{query},
         _queryParam         => $args{queryParam},
         _sphinx             => $args{sphinx},
+        _action             => $args{action},
     };
 
     $self = bless ($self, $class);
@@ -78,6 +79,11 @@ sub getSphinx {
     return $self->{_sphinx};
 }
 
+sub getAction {
+    my ($self) = shift;
+    return $self->{_action};
+}
+
 sub execute {
     my ($self) = shift;
 }
@@ -87,7 +93,8 @@ sub displaySearchForm {
 
 	my %SearchFormData = (
         client=> $self->getData()->{'client'},
-        action => $self->getSearchType(),
+        action => $self->getAction(),
+        type => $self->getSearchType(),
         #search_keyword => $params{'search_keyword'},
         search_keyword => $self->getKeyword(),
 	);
@@ -374,6 +381,14 @@ sub setSphinx {
 
         $self->{_sphinx} = $sphinx;
     }
+
+    return $self;
+}
+
+sub setAction {
+    my $self = shift;
+    my ($action) = @_;
+    $self->{_action} = $action if defined $action;
 
     return $self;
 }
