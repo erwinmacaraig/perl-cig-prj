@@ -927,3 +927,6 @@ header nav ul li a {
     padding-left:15px;
 }
 
+.modal-body textarea {
+	width:100%;
+}

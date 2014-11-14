@@ -10,10 +10,10 @@
 
 <div class="member-home-page">
     <div class="col-md-9">
-        <h3 class="panel-header">[% PersonDetails.LocalName %]</h3>
+        <h3 class="panel-header">[% PersonDetails.LocalName %] - [% PersonRegoDetails.PersonType %]</h3>
         <div class="panel-body">
             <ul class="nav nav-tabs">
-                <li class="active"><a data-toggle="tab" href="#memberdocs">Registration Documents</a></li>
+                <li class="active"><a data-toggle="tab" href="#memberdocs">Documents</a></li>
                 <li><a data-toggle="tab" href="#memberdetails">Member Detail Summary</a></li>
                 <li><a data-toggle="tab" href="#regdetails">Registration Details</a></li>
             </ul>
@@ -34,56 +34,56 @@
                     [% IF PersonDetails.LocalName %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Local Name") %]:</span>
-                            <span class="details-left">[% PersonDetails.LocalName %]</span>
+                            <span class="details-left detail-value">[% PersonDetails.LocalName %]</span>
                         </span>
                     [% END %]
 
                     [% IF PersonDetails.Gender %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt('Gender') %]:</span>
-                            <span class="details-left">[% PersonDetails.Gender %]</span>
+                            <span class="details-left detail-value">[% PersonDetails.Gender %]</span>
                         </span>
                     [% END %]
 
                     [% IF PersonDetails.DOB %]
                         <span class="details-row">
                           <span class="details-left">Date of Birth:</span>
-                          <span class="details-left">[% PersonDetails.DOB %]</span>
+                          <span class="details-left detail-value">[% PersonDetails.DOB %]</span>
                         </span>
                     [% END %]
 
                     [% IF PersonDetails.Nationality %]
                         <span class="details-row">
                           <span class="details-left">Nationality:</span>
-                          <span class="details-left">[% PersonDetails.Nationality %]</span>
+                          <span class="details-left detail-value">[% PersonDetails.Nationality %]</span>
                         </span>
                     [% END %]
 
                     [% IF PersonDetails.Address %]
                         <span class="details-row">
                           <span class="details-left">Address:</span>
-                          <span class="details-left">[% PersonDetails.Address %]</span>
+                          <span class="details-left detail-value">[% PersonDetails.Address %]</span>
                         </span>
                     [% END %]
 
                     [% IF PersonDetails.DateSuspendedUntil != '' %]
                         <span class="details-row">
                           <span class="details-left">Suspended Until:</span>
-                          <span class="details-left">[% PersonDetails.DateSuspendedUntil %]</span>
+                          <span class="details-left detail-value">[% PersonDetails.DateSuspendedUntil %]</span>
                         </span>
                     [% END %]
 
                     [% IF PersonDetails.LastUpdate %]
                         <span class="details-row">
                           <span class="details-left">Last Update:</span>
-                          <span class="details-left">[% PersonDetails.LastUpdate %]</span>
+                          <span class="details-left detail-value">[% PersonDetails.LastUpdate %]</span>
                         </span>
                     [% END %]
 
                     [% IF PersonDetails.Status %]
                         <span class="details-row">
                           <span class="details-left">Status:</span>
-                          <span class="details-left">[% PersonDetails.Status %]</span>
+                          <span class="details-left detail-value">[% PersonDetails.Status %]</span>
                         </span>
                     [% END %]
                 </div>
@@ -92,28 +92,28 @@
                     [% IF PersonRegoDetails.RegoType %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Registration Type") %]:</span>
-                            <span class="details-left">[% PersonRegoDetails.RegoType %]</span>
+                            <span class="details-left detail-value">[% PersonRegoDetails.RegoType %]</span>
                         </span>
                     [% END %]
 
                     [% IF PersonRegoDetails.Status %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Status") %]:</span>
-                            <span class="details-left">[% PersonRegoDetails.Status %]</span>
+                            <span class="details-left detail-value">[% PersonRegoDetails.Status %]</span>
                         </span>
                     [% END %]
 
                     [% IF PersonRegoDetails.PersonType %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Person Type") %]:</span>
-                            <span class="details-left">[% PersonRegoDetails.PersonType %]</span>
+                            <span class="details-left detail-value">[% PersonRegoDetails.PersonType %]</span>
                         </span>
                     [% END %]
 
                     [% IF PersonRegoDetails.PersonEntityTypeRole %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Person Role") %]:</span>
-                            <span class="details-left">[% PersonRegoDetails.PersonEntityTypeRole %]</span>
+                            <span class="details-left detail-value">[% PersonRegoDetails.PersonEntityTypeRole %]</span>
                         </span>
                     [% END %]
 
@@ -121,21 +121,21 @@
                     [% IF PersonRegoDetails.Sport %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Sport") %]:</span>
-                            <span class="details-left">[% PersonRegoDetails.Sport %]</span>
+                            <span class="details-left detail-value">[% PersonRegoDetails.Sport %]</span>
                         </span>
                     [% END %]
 
                     [% IF PersonRegoDetails.Level %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Level") %]:</span>
-                            <span class="details-left">[% PersonRegoDetails.Level %]</span>
+                            <span class="details-left detail-value">[% PersonRegoDetails.Level %]</span>
                         </span>
                     [% END %]
 
                     [% IF PersonRegoDetails.AgeLevel %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Age Level") %]:</span>
-                            <span class="details-left">[% PersonRegoDetails.AgeLevel %]</span>
+                            <span class="details-left detail-value">[% PersonRegoDetails.AgeLevel %]</span>
                         </span>
                     [% END %]
                 </div>
@@ -157,6 +157,20 @@
         </div>
 
         [% ActionsBlock %]
+
+    </div>
+    <div class="col-md-3">
+        <div id = "">
+
+        <h3 class="panel-header">Member ID: [% Details.NationalNum %]</h3>
+        <div class="panel-body">
+
+        <p class="reg-text">[% PersonDetails.LocalName %]</p>
+        <p class="reg-text">[% PersonRegoDetails.PersonType %]</p>
+        <p class="reg-text">[% PersonRegoDetails.Sport %]</p>
+        <p class="reg-text">[% PersonRegoDetails.Level %]</p>
+        </div>
+        </div>
 
     </div>
 </div>
