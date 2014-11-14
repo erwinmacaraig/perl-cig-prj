@@ -63,7 +63,7 @@ sub main  {
         $personSearchObj
             ->setRealmID($Data{'Realm'})
             ->setSubRealmID(0)
-            ->setSearchType("PERSON")
+            ->setSearchType("unique")
             ->setData(\%Data)
             ->setKeyword($searchval)
             ->setSphinx($sphinx);
