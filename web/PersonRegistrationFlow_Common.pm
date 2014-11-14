@@ -42,7 +42,7 @@ sub displayRegoFlowCompleteBulk {
 
     my ($Data, $client, $hidden_ref) = @_;
     my $gateways = '';
-    if ($Data->{'SystemConfig'}{'AllowTXNs_CCs'} && $hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0)   {
+    if ($Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'} && $hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0)   {
         $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
     }
     my %PageData = (
