@@ -46,11 +46,11 @@
 			</tr>
 		    [% FOREACH rego IN RegoList %]
                 <tr class="task-list">
-                    <td><span class="fa fa-user"></span>[% rego.name %]</td>
-                    <td>[% rego.added %]</td>
-                    <td>[% rego.dob %]</td>
-                    <td><span class="fa fa-clock-o"></span>[% rego.type %]</td>
-                    <td><a href="main.cgi?client=[% client %]&a=WF_View&TID=[% task.WFTaskID %]" class="btn-inside-panels">View</a></td>
+                    <td><span class="fa fa-user"></span>[% rego.label %]</td>
+                    <td>[%  %]</td>
+                    <td>[% rego.otherdetails.dob %]</td>
+                    <td><span class="fa fa-clock-o"></span>[%  %]</td>
+                    <td><a href="[% rego.link %]" class="btn-inside-panels">View</a></td>
                 </tr>
 		    [% END %]
 		</tbody>
