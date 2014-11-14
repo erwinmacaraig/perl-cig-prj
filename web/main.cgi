@@ -272,7 +272,7 @@ use PersonFlow;
     }
     elsif($action =~ /^INITSRCH_/){
         use Search::Handler;
-        ($resultHTML, $pageHeading) = Search::Handler::handle($action, \%Data);
+        ($resultHTML, $pageHeading) = Search::Handler::handle($action, \%Data, 1);
     }
     
    
