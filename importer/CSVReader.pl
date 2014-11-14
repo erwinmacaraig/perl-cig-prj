@@ -48,10 +48,11 @@ sub readCSVFile{
 	$csv_config->{'encoding_out'} = "cp1252";
 	$csv_config->{binary} = 1;
 	
-    my @tag = split(/\./,$table);
+    my @tag = split(/\.([^.]+)$/,$table,2);
     my $object =  $tag[0];
+    my $tbl =  (split /\./, $object)[0];
     my $csv = Text::CSV::Encoded->new($csv_config) or die "Text::CSV error: " . Text::CSV->error_diag;
-	
+	say $object;
     my @headers = $csv->getline($fh) or die "no header";
 	#say Dumper(@headers);
 	
@@ -67,8 +68,8 @@ sub readCSVFile{
     say 'Total Input Records: #'.$ctr;
     my $records = ApplyPreRules($config->{"rules"},\@records);
     my $inserts = ApplyRemoveLinks($config->{"rules"},$records);
-    insertBatch($db,$object,$inserts,$importId, $config->{"rules"});
-    my $links = ApplyPostRules($object,$config->{"rules"},\@records);
+    insertBatch($db,$tbl,$inserts,$importId, $config->{"rules"});
+    my $links = ApplyPostRules($tbl,$config->{"rules"},\@records);
     insertBatch($db,"tblEntityLinks",$links,$importId);
     close $fh;
 }
@@ -83,11 +84,17 @@ sub ApplyPreRules{
         if($rule->{"rule"} eq "multiplyEntry"){
            $records = multiplyEntry($records,$rule);
         }
-        if($rule->{"rule"} eq "swapEntry"){
+        elsif($rule->{"rule"} eq "swapEntry"){
            $records = swapEntry($records,$rule);
         }
-		if($rule->{"rule"} eq "StrToIntEntry"){
+		elsif($rule->{"rule"} eq "StrToIntEntry"){
 			$records = strToIntEntry($records, $key, $rule->{"value"});
+        }
+        elsif($rule->{"rule"} eq "setUniqField"){
+            $records = setUniqField($records, $key);
+        }
+        elsif($rule->{"rule"} eq "multiDestEntry"){
+            $records = multiDestEntry($records, $rule, $key);
         }
     }
     return $records;
