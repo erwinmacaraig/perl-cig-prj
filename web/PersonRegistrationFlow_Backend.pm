@@ -154,7 +154,7 @@ print STDERR "AAAAAAAA $action\n";
         my $prodIds= join(':',@productsselected);
         $Hidden{'prodIds'} = $prodIds;
 
-        $Hidden{'txnIds'} = save_rego_products($Data, $regoID, $personID, $entityID, $entityLevel, $rego_ref, \%params);
+        ($Hidden{'txnIds'}, undef) = save_rego_products($Data, $regoID, $personID, $entityID, $entityLevel, $rego_ref, \%params);
         $action = $Flow{$action};
     }
     if ( $action eq 'PREGF_DU' ) {
