@@ -7,12 +7,45 @@ our @ISA = qw(Search::Base);
 
 use Defs;
 use Data::Dumper;
+use Switch;
 
 sub process {
     my ($self) = shift;
     my ($raw) = @_;
 
+    $raw ||= 0;
     $self->setGridTemplate('search/grid/people.templ');
+
+    my $searchType = $self->getSearchType() || 'default';
+    #set filters here based on search type
+    #ie transfer, access, unique otherwise default
+
+    print STDERR Dumper "SEARCH TYPE " . $searchType;
+    switch($searchType){
+        case 'unique' {
+            return $self->getUnique($raw);
+            #return $self->getUnique();
+        }
+        case 'transfer' {
+            return;
+        }
+        case 'access' {
+            return;
+        }
+        case 'default' {
+            return $self->getUnique($raw);
+        }
+        else {
+            return $self->getUnique($raw);
+            #return unique for now
+        }
+    }
+}
+
+sub getUnique {
+    my ($self) = shift;
+    my ($raw) = @_;
+
     my ($intermediateNodes, $subNodes) = $self->getIntermediateNodes();
     my $filters = $self->setupFilters($subNodes);
 
@@ -24,6 +57,7 @@ sub process {
     my $results = $self->getSphinx()->Query($self->getKeyword(), 'FIFA_Persons_r'.$filters->{'realm'});
     my @persons = ();
 
+    print STDERR Dumper $results;
     if($results and $results->{'total'})  {
         for my $r (@{$results->{'matches'}})  {
             push @persons, $r->{'doc'};
@@ -106,6 +140,10 @@ sub process {
     else {
         return $self->displayResultGrid(\@memarray);
     }
+}
+
+sub getRegistration {
+
 }
 
 1;
