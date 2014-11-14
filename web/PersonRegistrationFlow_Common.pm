@@ -98,12 +98,12 @@ sub displayRegoFlowComplete {
             my ($prodID, $qty) = split /-/, $prodQty;
             $hidden_ref->{"prodQTY_$prodID"} =$qty;
         }
-        $hidden_ref->{'txnIds'} = save_rego_products($Data, $regoID, $personID, $entityID, $rego_ref->{'entityLevel'}, $rego_ref, $hidden_ref); #\%params);
+        #($hidden_ref->{'txnIds'}, undef) = save_rego_products($Data, $regoID, $personID, $entityID, $rego_ref->{'entityLevel'}, $rego_ref, $hidden_ref); #\%params);
 
          my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
          my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
          my $gateways = '';
-         if (1==2)   {
+         if ($Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
             $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
          }
          
@@ -491,7 +491,7 @@ sub save_rego_products {
     );
     my ($txns_added, $amount) = insertRegoTransaction($Data, $regoID, $personID, $params, $entityID, $entityLevel, 1, $session, $CheckProducts);
     my $txnIds = join(':',@{$txns_added});
-    return $txnIds;
+    return ($txnIds, $amount);
 }
 
 
@@ -630,13 +630,13 @@ sub bulkRegoSubmit {
         );
         $totalAmount = $totalAmount + $amount;
         push @total_txns_added, @{$txns_added};
-        #if ($paymentType and $markPaid)  {
-        #    my %Settings=();
-        #    $Settings{'paymentType'} = $paymentType;
-        #    my $logID = createTransLog($Data, \%Settings, $bulk_ref->{'entityID'},$txns_added, $amount); 
-        #    UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $logID);
-        #    product_apply_transaction($Data,$logID);
-        #}
+        if ($paymentType and $markPaid)  {
+            my %Settings=();
+            $Settings{'paymentType'} = $paymentType;
+            my $logID = createTransLog($Data, \%Settings, $bulk_ref->{'entityID'},$txns_added, $amount); 
+            UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $logID);
+            product_apply_transaction($Data,$logID);
+        }
           savePlayerPassport($Data, $pID);
     }
     my $txnIds = join(':',@total_txns_added);
