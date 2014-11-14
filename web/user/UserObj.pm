@@ -84,13 +84,15 @@ sub write {
         firstName,
         familyName,
         status,
+        confirmed,
         created
       )
       VALUES (
         ?,
         ?,
         ?,
-        $Defs::USER_STATUS_NOTCONFIRMED,
+        $Defs::USER_STATUS_CONFIRMED,
+        NOW(),
         NOW()
       )
     ];
