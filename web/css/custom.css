@@ -185,7 +185,7 @@ span.notice-error {
   color: #c4070a;
 }
 
-.toggle a {
+.toggle-type a {
   background: #d8d8d8;
   border: 1px solid #cccccc;
   font-size: 16px;
@@ -194,11 +194,11 @@ span.notice-error {
   float: left;
 }
 
-.toggle a:hover {
+.toggle-type a:hover {
   text-decoration: none;
 }
 
-.toggle a.active {
+.toggle-type a.active {
   background: #045485;
   border: 1px solid #045485;
   font-size: 16px;
