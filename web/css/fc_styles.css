@@ -589,10 +589,10 @@ header nav ul#menu ul {
 
 /* Added Styles for Table in Task List Dashboard:: Vincent R; */
 .dashboard-tasklist td, .documents-list td{
-	padding: 20px 25px;
+	padding: 20px 20px;
 }
 .dashboard-tasklist th, .documents-list th{
-	padding: 10px 25px;
+	padding: 10px 20px;
 }
 .dashboard-tasklist td select{
 	padding: 5px;
