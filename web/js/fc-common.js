@@ -26,13 +26,26 @@ $(document).ready(function(){
   }
 
 
-  $('#international').click(function(){
-      $('#international').addClass('active');
-      $('#domestic').removeClass('active');
-  });
-  $('#domestic').click(function(){
-      $('#domestic').addClass('active');
-      $('#international').removeClass('active');
-  });
+    $("div#transfer_type_option a").click(function(e){
+        e.preventDefault();
+
+        var selected = jQuery(this).prop("id");
+        $("input[name=transfer_type][value=" + selected.toUpperCase() + "]").prop("checked", true);
+
+        switch(selected){
+            case "international":
+                if(!$(this).hasClass("active")){
+                    $(this).addClass("active");
+                    $("div#transfer_type_option a#domestic").removeClass("active");
+                }
+                break;
+            case "domestic":
+                if(!$(this).hasClass("active")){
+                    $(this).addClass("active");
+                    $("div#transfer_type_option a#international").removeClass("active");
+              }
+              break;
+        }
+    });
 
 })
