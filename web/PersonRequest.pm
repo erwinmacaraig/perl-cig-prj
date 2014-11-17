@@ -21,6 +21,7 @@ use AuditLog;
 use PersonRegistration;
 use Person;
 use EmailNotifications::PersonRequest;
+use Search::Person;
 
 use CGI qw(unescape param);
 use Log;
@@ -51,30 +52,31 @@ sub handlePersonRequest {
                 $defaultTypeChecked = '';
             }
             $title = "Request a Transfer";
+
             $TemplateData{'action'} = 'PRA_search';
             $TemplateData{'request_type'} = 'transfer';
-            $TemplateData{'transferTypeOption'} = $transferTypeOption;
-            $TemplateData{'script'} = qq[
-                <script>
-                    jQuery(document).ready(function(){
-                        jQuery(":radio[name=transfer_type]").click(function(){
-                            jQuery("div#international").slideToggle("fast");
-                            jQuery("div#domestic").slideToggle("fast");
+            $TemplateData{'Lang'} = $Data->{'lang'};
+            $TemplateData{'client'} = $Data->{'client'};
+            $TemplateData{'target'} = $Data->{'target'};
+            #$TemplateData{'transferTypeOption'} = $transferTypeOption;
+            #$TemplateData{'script'} = qq[
+            #    <script>
+            #        jQuery(document).ready(function(){
+            #            jQuery(":radio[name=transfer_type]").click(function(){
+            #                jQuery("div#international").slideToggle("fast");
+            #                jQuery("div#domestic").slideToggle("fast");
 
-                            //if(jQuery(this).val() == "DOMESTIC"){
-                            //    jQuery("div#domestic").show();
-                            //    jQuery("div#international").hide();
-                            //} else {
-                            //    jQuery("div#domestic").show();
-                            //    jQuery("div#international").hide();                           
-                            //}
-                        });
-                    });
-                </script>
-            ];
-
-            $TemplateData{'noITC'} = qq[ <span class="button generic-button"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PRA_NC">]. $Data->{'lang'}->txt("No") . q[</a></span>];
-            $TemplateData{'withITC'} = qq[ <span class="button generic-button"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PF_&amp;dtype=PLAYER&amp;itc=1">]. $Data->{'lang'}->txt("Yes") . q[</a></span>];
+            #                //if(jQuery(this).val() == "DOMESTIC"){
+            #                //    jQuery("div#domestic").show();
+            #                //    jQuery("div#international").hide();
+            #                //} else {
+            #                //    jQuery("div#domestic").show();
+            #                //    jQuery("div#international").hide();                           
+            #                //}
+            #            });
+            #        });
+            #    </script>
+            #];
 
             $body = runTemplate(
                 $Data,
@@ -126,115 +128,44 @@ sub handlePersonRequest {
 sub listPeople {
     my ($Data) = @_;
 
-	my $p = new CGI;
-	my %params = $p->Vars();
-
-    my $client = setClient( $Data->{'clientValues'} ) || '';
-	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
-
     my $searchKeyword = safe_param('search_keyword','words') || '';
-    $searchKeyword =~ s/\h+/ /g;
-    $searchKeyword =~ s/^\s+|\s+$//;
-    my $firstname = safe_param('firstname','words') || '';
-    my $lastname = safe_param('lastname','words') || '';
-    #TODO: might need to validate dob or use jquery datepicker
-    my $dob = $params{'dob'} || '';
-    my $request_type = $params{'request_type'} || '';
-    my $transferType = safe_param('transfer_type', 'word') || '';
+    my $sphinx = Sphinx::Search->new;
+    my %results = ();
+    my $rawResult = 1;
 
-    my $title = $Data->{'lang'}->txt('Search Result');
+    my %TemplateData = (
+        'action' => 'PRA_search',
+        'request_type' => '',
+        'Lang' => $Data->{'lang'},
+        'client' => $Data->{'client'},
+        'target' => $Data->{'target'},
+        'search_keyword' => $searchKeyword,
+    );
 
-    my $st = qq[
-        SELECT
-            P.strLocalFirstname,
-            P.strLocalSurname,
-            P.strNationalNum,
-            E.strLocalName,
-            PR.intPersonRegistrationID
-        FROM
-            tblPerson P
-        INNER JOIN tblPersonRegistration_$Data->{'Realm'} PR ON (PR.intPersonID = P.intPersonID AND PR.intEntityID <> ?)
-        INNER JOIN tblEntity E ON (E.intEntityID = PR.intEntityID)
-        WHERE
-            P.intRealmID = ?
-            AND P.strStatus IN ('REGISTERED', 'PASSIVE','PENDING')
-            AND
-                (P.strNationalNum = ? OR CONCAT_WS(' ', P.strLocalFirstname, P.strLocalSurname) LIKE CONCAT('%',?,'%') OR CONCAT_WS(' ', P.strLocalSurname, P.strLocalFirstname) LIKE CONCAT('%',?,'%'))
-        GROUP BY P.strNationalNum
-    ];
+    $sphinx->SetServer($Defs::Sphinx_Host, $Defs::Sphinx_Port);
+    $sphinx->SetLimits(0,1000);
 
-    my $db = $Data->{'db'};
-    my $q = $db->prepare($st) or query_error($st);
-    $q->execute(
-        $entityID,
-        $Data->{'Realm'},
-        $searchKeyword,
-        $searchKeyword,
-        $searchKeyword
-    ) or query_error($st);
+    my $personSearchObj = new Search::Person();
+    $personSearchObj
+        ->setRealmID($Data->{'Realm'})
+        ->setSubRealmID(0)
+        ->setSearchType("unique")
+        ->setData($Data)
+        ->setKeyword($searchKeyword)
+        ->setSphinx($sphinx)
+        ->setGridTemplate("personrequest/transfer/search_result.templ");
 
-    my $found = 0;
-    my @rowdata = ();
-    my $actionLink = undef;
-    while(my $tdref = $q->fetchrow_hashref()) {
-        $found++;
-        $actionLink = qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=PRA_getrecord&request_type=$request_type&amp;search_keyword=$tdref->{'strNationalNum'}&amp;transfer_type=$transferType">]. $Data->{'lang'}->txt("Select") . q[</a></span>];    
-        push @rowdata, {
-            id => $tdref->{'intPersonRegistrationID'} || 0,
-            currentClub => $tdref->{'strLocalName'} || '',
-            localFirstname => $tdref->{'strLocalFirstname'} || '',
-            localSurname => $tdref->{'strLocalSurname'} || '',
-            MAID => $tdref->{'strNationalNum'} || '',
-            actionLink => $actionLink,
-        }
-    }
+    my $resultGrid = $personSearchObj->process();
 
-    return ("No record found.", $title) if !$found;
+    $TemplateData{'searchResultGrid'} = $resultGrid;
 
-    my @headers = (
-        {
-            name => $Data->{'lang'}->txt('MAID'),
-            field => 'MAID',
-        },
-        #{
-        #    name => $Data->{'lang'}->txt('Registered To'),
-        #    field => 'currentClub',
-        #}, 
-        {
-            name => $Data->{'lang'}->txt('First Name'),
-            field => 'localFirstname',
-        },
-        {
-            name => $Data->{'lang'}->txt('Last Name'),
-            field => 'localSurname',
-        },
-        {
-            name => $Data->{'lang'}->txt('Action'),
-            field => 'actionLink',
-            type => 'HTML', 
-        },
+    my $body = runTemplate(
+        $Data,
+        \%TemplateData,
+        'personrequest/generic/search_form.templ',
+    );
 
-    ); 
-
-    my $rectype_options = '';
-    my $grid = showGrid(
-        Data => $Data,
-        columns => \@headers,
-        rowdata => \@rowdata,
-        gridid => 'grid',
-        width => '99%',
-    ); 
-
-    my $resultHTML = qq[
-        <div class="grid-filter-wrap">
-            <div style="width:99%;">$rectype_options</div>
-            $grid
-        </div>
-    ];
-
-    my @groupResult = ();
-
-    return ($resultHTML, $title);
+    return ($body, "Result");
 }
 
 sub listPersonRecord {

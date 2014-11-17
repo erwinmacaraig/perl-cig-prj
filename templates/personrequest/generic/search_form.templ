@@ -47,7 +47,8 @@
                                         Do you have Player's ITC?
                                     </li>
                                     <li>
-                                        [% withITC %][% noITC %]
+                                        <a class="btn btn-sm btn-primary" href="[% target %]?client=[% client %]&amp;a=PRA_NC">[% Lang.txt('No') %]</a>
+                                        <a class="btn btn-sm btn-primary" href="[% target %]?client=[% client %]&amp;a=PF_&amp;dtype=PLAYER&amp;itc=1">[% Lang.txt('Yes') %]</a>
                                     </li>
                                 </ul>
                             </p>
@@ -63,7 +64,7 @@
                                     </li>
                                     <li class="peoplelookup">
                                         <!--<input type="text" />-->
-                                        <input type="text" name="search_keyword" value="">
+                                        <input type="text" name="search_keyword" value="[% search_keyword %]">
                                     </li>
                                 </ul>
                             </p>
@@ -125,7 +126,7 @@
     </div>
 </form>
 
-
+[% searchResultGrid %]
 
 <!--
     <br /><br />
