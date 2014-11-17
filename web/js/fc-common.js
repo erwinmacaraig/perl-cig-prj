@@ -26,6 +26,7 @@ $(document).ready(function(){
   }
 
 
+    // transfer type selection
     $("div#transfer_type_option a").click(function(e){
         e.preventDefault();
 
