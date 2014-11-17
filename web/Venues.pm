@@ -130,7 +130,7 @@ sub venue_details   {
         sectionname => 'details',
       },
       strLocalName => {
-        label => 'Name',
+        label => 'Venue Name',
         value => $field->{strLocalName},
         type  => 'text',
         size  => '40',
@@ -139,7 +139,7 @@ sub venue_details   {
         compulsory => 1,
       },
       strLocalShortName => {
-        label => 'Short Name',
+        label => 'Venue Short Name',
         value => $field->{strLocalShortName},
         type  => 'text',
         size  => '30',
@@ -148,7 +148,7 @@ sub venue_details   {
         compulsory => 1,
       },      
       strLatinName => {
-        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'Name (Latin)' : '',
+        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'International Venue Name' : '',
         value => $field->{strLatinName},
         type  => 'text',
         size  => '40',
@@ -156,7 +156,7 @@ sub venue_details   {
         sectionname => 'details',
       },
       strLatinShortName => {
-        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'Short Name (Latin)' : '',
+        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'International Venue Short Name' : '',
         value => $field->{strLatinShortName},
         type  => 'text',
         size  => '30',
@@ -175,13 +175,22 @@ sub venue_details   {
       },
       
       strAddress => {
-        label => 'Address',
+        label => 'Address 1',
         value => $field->{strAddress},
         type  => 'text',
         size  => '40',
         maxsize => '50',
         sectionname => 'details',
       },
+      strAddress2 => {
+        label => 'Address 2',
+        value => $field->{strAddress2},
+        type  => 'text',
+        size  => '40',
+        maxsize => '50',
+        sectionname => 'details',
+      },
+ 
       strTown => {
         label => 'Town',
         value => $field->{strTown},
@@ -199,15 +208,23 @@ sub venue_details   {
         sectionname => 'details',
       },      
       strISOCountry => {
-        label => 'Country (ISO)',
+        label => 'Country',
         value =>  $field->{strISOCountry} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
         type  => 'lookup',
         options     => \%Mcountriesonly,
         firstoption => [ '', 'Select Country' ],
         sectionname => 'details',
       },
+      strContactISOCountry => {
+        label => 'Country of Address',
+        value =>  $field->{strContactISOCountry} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
+        type  => 'lookup',
+        options     => \%Mcountriesonly,
+        firstoption => [ '', 'Select Country' ],
+        sectionname => 'details',
+      },
       strPostalCode => {
-        label => 'Postal Code',
+        label => 'Postcode',
         value => $field->{strPostalCode},
         type  => 'text',
         size  => '15',
@@ -215,7 +232,7 @@ sub venue_details   {
         sectionname => 'details',
       },
       strPhone => {
-        label => 'Phone',
+        label => 'Contact Phone',
         value => $field->{strPhone},
         type  => 'text',
         size  => '20',
@@ -223,7 +240,7 @@ sub venue_details   {
         sectionname => 'details',
       },
       strFax => {
-        label => 'Fax',
+        label => 'Facsimile Number',
         value => $field->{strFax},
         type  => 'text',
         size  => '20',
@@ -231,7 +248,7 @@ sub venue_details   {
         sectionname => 'details',
       },
       strEmail => {
-        label => 'Email',
+        label => 'Contact Email',
         value => $field->{strEmail},
         type  => 'text',
         size  => '35',
@@ -240,7 +257,7 @@ sub venue_details   {
         sectionname => 'details',
       },
       strWebURL => {
-        label => 'Web',
+        label => 'Web Address',
         value => $field->{strWebURL},
         type  => 'text',
         size  => '35',
@@ -314,7 +331,7 @@ sub venue_details   {
         sectionname => 'details',
       },
       strGroundNature => {
-        label => 'Ground Nature',
+        label => 'Type of Field',
         value => $field->{strGroundNature},
         type  => 'text',
         size  => '30',
@@ -384,22 +401,16 @@ sub venue_details   {
         dtFrom
         dtTo
         strISOCountry
+        strContactISOCountry
         strRegion
         strPostalCode
         strTown
         strAddress
+        strAddress2
         strWebURL
         strEmail
         strPhone
         strFax
-        intCapacity
-        intCoveredSeats
-        intUncoveredSeats
-        intCoveredStandingPlaces
-        intUncoveredStandingPlaces
-        intLightCapacity
-        strGroundNature
-        strDiscipline
         strMapRef
         intMapNumber
         mapdesc
@@ -582,6 +593,7 @@ sub loadVenueDetails {
       strPostalCode,
       strTown,
       strAddress,
+      strAddress2,
       strWebURL,
       strEmail,
       strPhone,

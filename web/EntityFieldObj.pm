@@ -70,7 +70,7 @@ sub disciplineHtml {
     my ($field, $prefixID) = @_;
 
     my $options = qq[
-        <option value="">Select Sport</option>
+        <option value="">Select Discipline</option>
     ];
 
     my $selected = "";
@@ -110,7 +110,7 @@ sub groundNatureHtml {
     my ($field, $prefixID) = @_;
 
     my $options = qq[
-        <option value="">Select Ground Nature</option>
+        <option value="">Select Type of Field</option>
     ];
 
     my $selected = "";
