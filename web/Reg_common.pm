@@ -396,30 +396,7 @@ sub textMessage {
 
     my ($message) = @_;
 
-    return qq[<p class="note">$message</p>
-
-		<p>
-			<div class="read-only">
-				<h4>ALAND UNITED</h4>
-				<div class="read-only-text">
-					<p><input type="checkbox" /> Football</p>
-					<p><input type="checkbox" /> Futsall</p>
-				</div>
-			</div>		
-		</p>
-
-		<p>
-			<div class="read-only">
-				<h4>Surf Coast</h4>
-				<div class="read-only-text">
-					<p><input type="checkbox" /> Futsall</p>
-				</div>
-			</div>
-		</p>
-		
-		<p><a href="#" title="SEND REQUEST" class="btn-main">SEND REQUEST</a></p>
-
-		];
+    return qq[<p class="note">$message</p>];
 
 }
 
