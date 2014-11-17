@@ -972,3 +972,15 @@ header nav ul li a {
 	overflow:hidden;
 	margin-bottom:10px;
 }
+
+
+table.table thead tr th {
+	background: #d8d8d8;
+	border-bottom:1px solid #ccc;
+	font-size: 16px;
+}
+
+table.table tr th {
+	padding:15px;
+	border-bottom:1px solid #ccc;
+}
