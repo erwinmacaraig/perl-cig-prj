@@ -375,7 +375,7 @@ print STDERR "SSSS$action $clubID\n";
         compulsory => 1,
       },
       strTown => {
-        label => 'City of Organisation',
+        label => 'Town of Organisation',
         value => $field->{strTown},
         type  => 'text',
         size  => '30',

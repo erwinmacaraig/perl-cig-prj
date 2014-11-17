@@ -178,6 +178,7 @@ sub getFieldLabels	{
             strISOCountry => 'Country',
             strRegion => 'Region',
             strState => 'State',
+            strTown => 'Town',
             strAddress => 'Address 1',
             strAddress2 => 'Address 2',
             strCity => 'City',

@@ -634,6 +634,7 @@ sub loadVenueDetails {
       strISOCountry,
       strContactISOCountry,
       strContact,
+     strCity,
      strContactCity,
       strRegion,
       strPostalCode,
