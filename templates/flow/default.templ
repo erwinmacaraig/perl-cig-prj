@@ -5,24 +5,19 @@
 [% END %]
 [% Title %]
 [% IF Errors.size %]
-<div class = "warningmsg">
-	<ul>
-	[% FOREACH error IN Errors %]
-		<li>[% error %]</li>
-	[% END %]
-	</ul>
-</div>
-[% END %]
-
-[% TextTop %]
 <div class="col-md-12">
 	<div class="alert">
 		<div>
 			<span class="fa fa-exclamation"></span>
-			<p>Has this person already been registered? If yes, they need to <u>Transfer to this club</u>. Not sure? Then use the <u>Search</u>.</p>
+			[% FOREACH error IN Errors %]
+			<p>[% error %]</p>
+			[% END %]
 		</div>
 	</div>
 </div>
+[% END %]
+
+[% TextTop %]
 <div class="col-md-8">
 <h3 class="panel-header">Personal Details</h3>
 <div class="panel-body">
