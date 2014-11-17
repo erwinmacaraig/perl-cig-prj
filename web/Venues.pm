@@ -272,6 +272,14 @@ sub venue_details   {
         maxsize => '250',
         sectionname => 'details',
       },
+      strContact=> {
+        label => 'Contact Person',
+        value => $field->{strContact},
+        type  => 'text',
+        size  => '30',
+        maxsize => '50',
+        sectionname => 'details',
+      },      
       strDescription => {
         label => 'Description',
         value => $field->{strDescription},
@@ -435,6 +443,7 @@ sub venue_details   {
         strWebURL
         strEmail
         strPhone
+        strContact
         strFax
         strMapRef
         intMapNumber
@@ -623,9 +632,6 @@ sub loadVenueDetails {
       strEmail,
       strPhone,
       strFax,
-      strContactTitle,
-      strContactEmail,
-      strContactPhone,
       dtAdded,
       tTimeStamp,
       intCapacity,
