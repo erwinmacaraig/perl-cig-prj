@@ -49,7 +49,31 @@ sub handleTransactions	{
   }
   elsif ($action =~ /_TXN_DEL/) {
 		($resultHTML,$heading) = deleteTransaction($Data, $intTableID, $ID);
+	}
+
+  elsif ($action =~ /_TXN_PAY_INV/){
+		($resultHTML,$heading) = queryBlkTXN($action, $Data, $intTableID); 
+		#queryBlkTXNviaInvoice($action, $Data, $intTableID) if  ($action =~ /_step2/ && param('d_strInvoiceNumber')); 
+		
+
+
+		 if($action =~ /_step2/){
+			$heading = 'This is just a test run';	
+			my $value = param('d_strInvoiceNumber') ;
+			$value =~ s/^\s+//;
+			if(length($value) > 0 || $value ne ''){
+				$resultHTML = $value;
+			}
+			else { 
+				$resultHTML = 'Belat';
+			}
+			
+ 		 }
+		
+				
+		
   }
+
   if ($action =~ /_TXN_FAILURE/) {
 	my $intLogID=param("ci") || '';
 		Payments::processTransLogFailure($Data->{'db'}, $intLogID);
@@ -523,7 +547,7 @@ sub checkTXNPricing	{
 
 sub preTXNAddUpdate	{
 
-	my($params, $action, $Data,$db, $client, $personID, $transID)=@_;
+	my($params, $action, $Data, $db, $client, $personID, $transID)=@_;
 
 	$personID ||= 0;
 	$transID ||=0;
@@ -552,8 +576,52 @@ sub preTXNAddUpdate	{
 	];
 	return (0,$error_text) if $intExistingTransactionID;
 	return (1,'');
-		
-	
 }
+
+sub queryBlkTXN {
+	my ($action, $Data, $intTableID) = @_;
+    my $client = setClient($Data->{'clientValues'}) || '';
+	
+	my %FormElements = ( 
+		 fields=>  {				
+			strInvoiceNumber => {
+				label	=> 'Invoice Number',
+				value	=> '',
+				type	=> 'text',
+				size  => '30',
+       			maxsize => '50',
+			}
+		}, #end of fields	
+		order => [qw(
+			strInvoiceNumber
+		)],  #end of order 
+		options => {
+			labelsuffix => ':',
+		    hideblank => 1,
+      		target => $Data->{'target'},
+      		formname => 'n_form',
+      		submitlabel => $Data->{'lang'}->txt('Continue'),
+      		introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
+			 NoHTML => 1,
+		}, #end of options
+		carryfields =>  {
+    		client => $client,
+      		a=> $action."_step2",
+    	},
+	);
+ 
+	#my $formcontent = runTemplate($Data, \%FormElements, 'payment/bulkinvoicelisting.templ'); 
+	my $content;
+	my $title = 'Pay Invoice';
+	($content, undef )=handleHTMLForm(\%FormElements, undef, 'add', '', $Data->{'db'});
+
+	return ($content,$title);
+
+}
+  
+
+
+
+
 
 1;

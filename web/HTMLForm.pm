@@ -1646,7 +1646,7 @@ sub generate_clientside_validation {
             validClass: "form_field_valid",
             invalidHandler: function(e, validator){
                 if(validator.errorList.length){
-                    var tabname = jQuery(validator.errorList[0].element).closest(".$tab_class").attr('id');
+                    var tabname = \$(validator.errorList[0].element).closest(".$tab_class").attr('id');
                     
                     if ( '$tab_style' == 'ui-tabs' ){
                         // Using divs and jquery tabs
@@ -1655,10 +1655,10 @@ sub generate_clientside_validation {
                     }
                     else if ('$tab_style' == 'tables'){
                         // Using html forms tables and black magic
-                        jQuery('.tab_links').removeClass('active');
-                        jQuery('#a_' + tabname ).addClass('active');
-                        jQuery('.$tab_class').hide();
-                        jQuery('#' + tabname ).show(); 
+                        \$('.tab_links').removeClass('active');
+                        \$('#a_' + tabname ).addClass('active');
+                        \$('.$tab_class').hide();
+                        \$('#' + tabname ).show(); 
                         
                     }
                     //alert("Got invalid input on tab " + tabname);
@@ -1669,9 +1669,9 @@ sub generate_clientside_validation {
         return qq[
         <script src = "//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
         <script type="text/javascript">
-        jQuery().ready(function() {
+        \$(document).ready(function() {
                 // validate the comment form when it is submitted
-                jQuery("#$fields_ref->{'options'}{'formname'}$form_suffix").validate($val_rules);
+                \$("#$fields_ref->{'options'}{'formname'}$form_suffix").validate($val_rules);
             });
         </script>
         ];

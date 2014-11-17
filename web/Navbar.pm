@@ -954,6 +954,10 @@ sub getClubMenuData {
             name => $lang->txt('Bulk Renewals'),
             url => $baseurl."a=PREGFB_T",
         };
+		$menuoptions{'bulkpayment'} = { 
+			name => $lang->txt('Pay Invoice'),
+			url => $baseurl."a=TXN_PAY_INV",
+		}; 
         if ($SystemConfig->{'allowPersonRequest'}) {
             $menuoptions{'requestaccess'} = {
             name => $lang->txt('Request for Person Details'),
@@ -989,7 +993,7 @@ sub getClubMenuData {
                 name => $lang->txt('Add Club Official'),
                 url => $baseurl."a=PF_&amp;dtype=CLUBOFFICIAL",
             };
-        }
+        } 
         if($SystemConfig->{'menu_newperson_REFEREE_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
             $menuoptions{'persons_addofficial'} = {
                 name => $lang->txt('Add Referee'),
@@ -1030,14 +1034,15 @@ sub getClubMenuData {
         'requesttransfer',
         'requestaccess',
         'listrequests',
-            'persons_addplayer',
-            'persons_addcoach',
-            'persons_addofficial',
-            'persons_addteamofficial',
-            'persons_addclubofficial',
-            'persons_addmaofficial',
-            'bulk',
-            'persons_search',
+        'persons_addplayer',
+        'persons_addcoach',
+        'persons_addofficial',
+        'persons_addteamofficial',
+        'persons_addclubofficial',
+        'persons_addmaofficial',
+        'bulk',
+		'bulkpayment',
+        'persons_search',
          ]],
 
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu',[

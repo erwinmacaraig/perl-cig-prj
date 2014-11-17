@@ -274,6 +274,11 @@ use PersonFlow;
         use Search::Handler;
         ($resultHTML, $pageHeading) = Search::Handler::handle($action, \%Data);
     }
+	elsif($action =~ /^TXN_PAY_INV/){
+		use PayInvoice;
+		my $clubID = getID($Data{'clientValues'},$Defs::LEVEL_CLUB); 
+		($resultHTML, $pageHeading) = PayInvoice::handlePayInvoice($action, \%Data, $clubID);				
+	}
     
    
     # BUILD PAGE

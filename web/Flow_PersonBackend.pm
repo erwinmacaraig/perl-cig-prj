@@ -159,19 +159,19 @@ sub setupValues    {
         my $vals = join(',',@nonLatinLanguages);
         $nonlatinscript =   qq[
            <script>
-                jQuery(document).ready(function()  {
-                    jQuery('#l_row_strLatinFirstname').hide();
-                    jQuery('#l_row_strLatinSurname').hide();
-                    jQuery('#l_intLocalLanguage').change(function()   {
+                \$(document).ready(function()  {
+                    \$('#l_row_strLatinFirstname').hide();
+                    \$('#l_row_strLatinSurname').hide();
+                    \$('#l_intLocalLanguage').change(function()   {
                         var lang = parseInt(jQuery('#l_intLocalLanguage').val());
                         nonlatinvals = [$vals];
                         if(nonlatinvals.indexOf(lang) !== -1 )  {
-                            jQuery('#l_row_strLatinFirstname').show();
-                            jQuery('#l_row_strLatinSurname').show();
+                            \$('#l_row_strLatinFirstname').show();
+                            \$('#l_row_strLatinSurname').show();
                         }
                         else    {
-                            jQuery('#l_row_strLatinFirstname').hide();
-                            jQuery('#l_row_strLatinSurname').hide();
+                            \$('#l_row_strLatinFirstname').hide();
+                            \$('#l_row_strLatinSurname').hide();
                         }
                     });
                 });
