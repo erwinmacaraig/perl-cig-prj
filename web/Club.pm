@@ -319,7 +319,7 @@ print STDERR "SSSS$action $clubID\n";
           noadd         => 1,
      },
       strContact => {
-        label => '',
+        label => 'Contact Person',
         value => $field->{strContact},
         type  => 'text',
         size  => '30',
@@ -332,22 +332,6 @@ print STDERR "SSSS$action $clubID\n";
         size  => '30',
         maxsize => '50',
       },
-      strContactEmail => {
-        label => '',
-        value => $field->{strContactEmail},
-        type  => 'text',
-        size  => '30',
-        maxsize => '250',
-        validate => 'EMAIL',
-      },
-      strContactPhone => {
-        label => '',
-        value => $field->{strContactPhone},
-        type  => 'text',
-        size  => '30',
-        maxsize => '50',
-      },
-
       strAddress => {
         label => 'Address 1',
         value => $field->{strAddress},
@@ -499,8 +483,8 @@ print STDERR "SSSS$action $clubID\n";
         strWebURL
         strEmail
         strPhone
+        strContact
         strFax
-        strContactEmail
         strMANotes
         clubcharacteristics
         intNotifications
@@ -639,9 +623,6 @@ sub loadClubDetails {
      strFax,
      strAssocNature,
      strMANotes,
-     strContactTitle,
-     strContactEmail,
-     strContactPhone,
      dtAdded,
      strShortNotes,
      tTimeStamp,
