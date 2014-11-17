@@ -930,3 +930,8 @@ header nav ul li a {
 .modal-body textarea {
 	width:100%;
 }
+
+/*** row spacing ***/
+.top-bottom-spacer { 
+	margin: 50px 0px;
+}
