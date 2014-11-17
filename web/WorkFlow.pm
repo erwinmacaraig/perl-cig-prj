@@ -39,7 +39,7 @@ use PlayerPassport;
 use Documents;
 use EntityDocuments;
 use PersonRequest;
-use CGI qw(param unescape escape);
+use CGI qw(param unescape escape redirect);
 use AuditLog;
 use NationalNumber;
 use EmailNotifications::WorkFlow;
@@ -158,6 +158,35 @@ sub handleWorkflow {
 
     my $emailNotification = new EmailNotifications::WorkFlow();
 
+	if ( $action eq 'WF_updateAction' ) {
+        my $query = new CGI;
+        # this will now filter any actions based on type (HOLD, RESOLVE, REJECT) from modal
+        # approve remains the same (WF_Approve)
+        my $WFTaskID = safe_param('TID', 'number') || '';
+        my $notes= safe_param('notes','words') || '';
+        my $type = safe_param('type','words') || '';
+
+        ($body, $title) = updateTaskNotes( $Data );
+        switch($type) {
+            case "$Defs::WF_TASK_ACTION_RESOLVE" {
+                resolveTask($Data, $emailNotification);
+                $query->redirect("$Defs::base_url");
+                print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_");
+            }
+            case "$Defs::WF_TASK_ACTION_REJECT" {
+                rejectTask($Data, $emailNotification);
+
+                #implement a flash message here
+                print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_View&TID=$WFTaskID");
+            }
+            case "$Defs::WF_TASK_ACTION_HOLD" {
+                my $res = holdTask($Data, $emailNotification);
+
+                #implement a flash message here
+                print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_View&TID=$WFTaskID");
+            }
+        }
+    }
 	if ( $action eq 'WF_Approve' ) {
         ($body, $title, $error) = approveTask($Data, $emailNotification);
 
@@ -1222,6 +1251,9 @@ sub updateTaskNotes {
     my $title = $lang->txt('Work task notes Updated');
 
     my $task = getTask($Data, $WFTaskID);
+    my $targetAction = "";
+    my $targetTemplate = "",
+
     #identify type of action (rejection or resolution based on intApprovalEntityID and intProblemResolutionID)
     my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
     #my $type = ($entityID == $task->{'intApprovalEntityID'}) ? 'REJECT' : ($entityID == $task->{'intProblemResolutionEntityID'}) ? 'RESOLVE' : '';
@@ -1265,6 +1297,8 @@ sub updateTaskNotes {
        #####
        auditLog($q->{mysql_insertid},$Data,'New TaskNote','WFTaskNotes');
        ####
+
+       $targetAction = "WF_View";
     }
     elsif (($entityID == $task->{'intProblemResolutionEntityID'}) and ($type eq $Defs::WF_TASK_ACTION_RESOLVE)) { #resolve
 
@@ -1299,8 +1333,10 @@ sub updateTaskNotes {
                 $WFHoldCurrentNoteID
             ) or query_error($streset);
 
-
         }
+
+        $targetAction = "WF_List";
+        $targetTemplate = "dashboards/worktasks.templ";
     }
     elsif ($type eq "TOGGLE") {
         #check intOnHold
@@ -1362,21 +1398,27 @@ sub updateTaskNotes {
                 $Defs::WF_TASK_ACTION_HOLD
             );
         }
+
+       $targetAction = "WF_View";
+       $targetTemplate = "workflow/view/personregistration.templ";
     }
 
     my %TemplateData = (
-        TaskID=> $WFTaskID,
+        TID=> $WFTaskID,
         Lang => $Data->{'lang'},
         TaskNotes=> $notes,
         client => $Data->{client},
         target=>$Data->{'target'},
-        action => 'WF_list',
+        #action => 'WF_list',
+        action => $targetAction,
     );
 
+    $TemplateData{'Notifications'}{'actionResult'} = "ID: $WFTaskID " . $Data->{'lang'}->txt("Work Flow task updated.");
+
 	my $body = runTemplate(
-			$Data,
-			\%TemplateData,
-			'dashboards/worktask_notes_updated.templ',
+        $Data,
+        \%TemplateData,
+        $targetTemplate,
 	);
 
     return ($body, $title);
@@ -1588,7 +1630,6 @@ sub rejectTask {
     #FC-144 get current task based on taskid param
     my $task = getTask($Data, $WFTaskID);
 
-    print STDERR Dumper $task;
     return if (!$task or ($task eq undef));
 
     if($task->{strWFRuleFor} eq 'ENTITY') {
@@ -2627,7 +2668,7 @@ sub holdTask {
     #by this, only the current assignee can put the task on-hold
     if($task->{'strTaskStatus'} eq 'ACTIVE' and $task->{'intApprovalEntityID'} == $entityID) {
 
-        if($currentToggle == $task->{'intOnHold'}) {
+        #if($currentToggle == $task->{'intOnHold'}) {
             my $st = qq[
                 UPDATE
                     tblWFTask
@@ -2641,7 +2682,16 @@ sub holdTask {
             $q->execute(
                 $WFTaskID
             ) or query_error($st);
+        #}
+
+        if($task->{strWFRuleFor} eq 'ENTITY') {
+            setEntityStatus($Data, $WFTaskID, $Defs::WF_TASK_STATUS_HOLD);
         }
+
+        if($task->{strWFRuleFor} eq 'REGO') {
+            setPersonRegoStatus($Data, $WFTaskID, $Defs::WF_TASK_STATUS_HOLD);
+        }
+
 
         my $toEntityID = undef;
         my $fromEntityID = undef;
