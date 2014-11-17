@@ -386,7 +386,7 @@ sub getFieldsList	{
         dtBirthCertValidityDateFrom
         dtBirthCertValidityDateTo
         strBirthCertDesc
-        trOtherPersonIdentifier
+        strOtherPersonIdentifier
         strOtherPersonIdentifierIssueCountry
         dtOtherPersonIdentifierValidDateFrom
         dtOtherPersonIdentifierValidDateTo
