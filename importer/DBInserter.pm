@@ -21,13 +21,23 @@ sub insertRow {
     	$valstr = (join ",","$importId", $valstr);
     }
 	
+	my @tbl_array = ("tblImportTrack", "tblEntityLinks");
+	if( !grep(/^$table$/i, @tbl_array) ){	
+		my $val = join "", (values $record);
+		# skip insert if all data are empty
+		if( !$val ) {
+			say "no value";
+			return 0;
+		}
+		
+	}
+	
 	# add realmid=1
     if( isRealmExists($db, $table) ) {
         $keystr = (join ",\n        ","intRealmID", $keystr);
         $valstr = (join ",","1", $valstr);
     }
 	
-		
 	my @values = values $record;
 	my %success = ();
 	my $query = qq[
@@ -51,9 +61,41 @@ sub insertRow {
 		writeLog("ERROR: $_");
 		#say "INSERT INTO $table ($keystr) VALUES(",join(', ', @values),")'\n";
 		warn "caught error: $_";
-		return 0;
+		return 0; 
 	};
 	#1;
+}
+
+sub updateRow {
+	my ($db,$table,$record) = @_;
+	my $uniq_id = $record->{'uniqField'};
+	my $filter_value = $record->{$uniq_id};
+	delete $record->{'uniqField'};
+	delete $record->{$uniq_id};
+	my $keystr = (join "=?, ", (keys $record));
+	$keystr .= "=?";
+	
+	my @values = values $record;
+
+	my %success = ();
+	my $query = qq[
+	    UPDATE $table 
+		    SET $keystr
+		WHERE $uniq_id = $filter_value
+	];
+
+	writeLog("INFO: UPDATE $table SET $keystr");
+	try {
+	    my $sth = $db->prepare($query) or die "Can't prepare insert: ".$db->errstr()."\n";
+	    my $result = $sth->execute(@values) or die "Can't execute insert: ".$db->errstr()."\n";
+	    writeLog("INFO: UPDATE SUCCESS :: TABLE:: '".$table."' ID:: ".$sth->{mysql_insertid}."' RECORDS:: '". join(', ', @values).")");
+		return $sth->{mysql_insertid};
+	
+	} catch {
+		writeLog("ERROR: $_");
+		warn "caught error: $_";
+		return 0; 
+	};
 }
 
 sub insertBatch {
@@ -72,7 +114,11 @@ sub insertBatch {
 		#call_func(\&createTransReccord);
 		
 		# then insert the main file
-		insertRow($db,$table,$i,$importId);
+		if( exists $i->{'uniqField'} ) {
+			updateRow($db,$table,$i);
+		} else {		
+		    insertRow($db,$table,$i,$importId);
+		}
 	}
 }
 
@@ -157,7 +203,7 @@ sub createTransRecord {
 
 sub writeLog{
     my ($strMsg) = @_;
-	say $strMsg;
+	#say $strMsg;
     my $filename = 'importer.log';
 	my $date = strftime "%m/%d/%Y %H:%M:%S", localtime;
     open(my $fh, '>>', $filename) or die "Could not open file '$filename' $!";

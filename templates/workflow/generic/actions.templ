@@ -1,23 +1,37 @@
     <div class="task-actions">
 
         [% IF TaskAction.showApprove %]
-        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]">[% IF TaskAction.ApprovalEntityLevel == 3 %][% Lang.txt('Accept') %][% ELSE %][% Lang.txt('Approve') %][% END %]</a></span>
+        <a class="btn-main" href = "main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]">
+            [% IF TaskAction.ApprovalEntityLevel == 3 %]
+                [% Lang.txt('Accept') %]
+            [% ELSE %]
+                [% Lang.txt('Approve') %]
+            [% END %]
+        </a>
         [% END %]
 
         [% IF TaskAction.showReject %]
-        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Reject&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Reject') %]</a></span>
+        <a class="btn-main" data-toggle="modal" data-target="#showReject" href = "">
+            [% Lang.txt('Reject') %]
+        </a>
         [% END %]
 
         [% IF TaskAction.showResolve %]
-        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Resolve&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Resolve') %]</a></span>
+        <a class="btn-main" href = "main.cgi?client=[% TaskAction.client %]&a=WF_Resolve&TID=[% TaskAction.WFTaskID %]">
+            [% Lang.txt('Resolve') %]
+        </a>
         [% END %]
 
         [% IF TaskAction.showHold %]
-        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Hold&TID=[% TaskAction.WFTaskID %]&t=[% TaskAction.onHold %]">[% Lang.txt('Put on-hold') %]</a></span>
+        <a class="btn-main" data-toggle="modal" data-target="#showHold" href = "">
+            [% Lang.txt('Put on-hold') %]
+        </a>
         [% END %]
 
         [% IF TaskAction.showAddFields %]
-        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=VENUE_FPA&venueID=[% TaskAction.venueID %]">[% Lang.txt('Add Fields') %]</a></span>
+        <a class="btn-main" href = "main.cgi?client=[% TaskAction.client %]&a=VENUE_FPA&venueID=[% TaskAction.venueID %]">
+            [% Lang.txt('Add Fields') %]
+        </a>
         [% END %]
 
         [% IF TaskAction.showEditFields %]
@@ -27,3 +41,52 @@
     </div>
 
 
+
+<!--trigger modal for each specific action-->
+
+
+<!-- Modal for On Hold -->
+<div class="modal fade" id="showHold" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" style="z-index:9999;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Work task notes (On hold)</h4>
+      </div>
+      
+      <div class="modal-body">
+        <label>Please enter Work task notes</label>
+        <textarea name="notes"></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <a class="btn-main" data-dismiss="modal">Close</a>
+        <a class="btn-main" href="main.cgi?client=[% TaskAction.client %]&a=WF_Hold&TID=[% TaskAction.WFTaskID %]&t=[% TaskAction.onHold %]">Submit</a>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<!-- Modal For Reject -->
+<div class="modal fade" id="showReject" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" style="z-index:9999;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Work task notes (Reject)</h4>
+      </div>
+      
+      <div class="modal-body">
+        <label>Please enter Work task notes</label>
+        <textarea name="notes"></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <a class="btn-main" data-dismiss="modal">Close</a>
+        <a class="btn-main" href="main.cgi?client=[% TaskAction.client %]&a=WF_Reject&TID=[% TaskAction.WFTaskID %]">Submit</a>
+      </div>
+      
+    </div>
+  </div>
+</div>

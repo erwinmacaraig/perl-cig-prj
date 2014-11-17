@@ -26,6 +26,8 @@ use PersonCertifications;
 use DuplicatesUtils;
 use PersonUserAccess;
 use Data::Dumper;
+use Payments;
+use Products;
 
 
 sub setProcessOrder {
@@ -1188,6 +1190,28 @@ sub display_products {
         $self->decrementCurrentProcessIndex();
         return ('',2);
     }
+    my %ManualPayPageData = (
+        HiddenFields => $self->stringifyCarryField(),
+        Target => $self->{'Data'}{'target'},
+        Errors => $self->{'RunDetails'}{'Errors'} || [],
+        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
+        FlowSummaryTemplate => 'registration/person_flow_manual_pay.templ',
+        allowManualPay=> 1,
+        manualPaymentTypes => \%Defs::manualPaymentTypes,
+        Title => '',
+        TextTop => '',
+        TextBottom => '',
+    );
+    my $pay_body = runTemplate(
+            $self->{'Data'},
+            \%ManualPayPageData,
+            'registration/person_flow_manual_pay.templ',
+    );
+    if ($self->{'SystemConfig'}{'AllowTXNs_Manual_roleFlow'}) {
+        $content = $pay_body . $content;
+    }
+
+
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -1252,7 +1276,23 @@ sub process_products {
         $regoID = 0 if !$valid;
     }
 
-    my $txnIds = save_rego_products($self->{'Data'}, $regoID, $personID, $entityID, $entityLevel, $rego_ref, $self->{'RunParams'});
+    my ($txnIds, $amount) = save_rego_products($self->{'Data'}, $regoID, $personID, $entityID, $entityLevel, $rego_ref, $self->{'RunParams'});
+
+####
+    my $paymentType = $self->{'RunParams'}{'paymentType'} || 0;
+    my $markPaid= $self->{'RunParams'}{'markPaid'} || 0;
+    my @txnIds = split ':',$txnIds ;
+    if ($paymentType and $markPaid)  {
+            my %Settings=();
+            $Settings{'paymentType'} = $paymentType;
+            my $logID = createTransLog($self->{'Data'}, \%Settings, $entityID,\@txnIds, $amount);
+            UpdateCart($self->{'Data'}, undef, $self->{'Data'}->{'client'}, undef, undef, $logID);
+            product_apply_transaction($self->{'Data'},$logID);
+        }
+    $self->addCarryField('paymentType',$paymentType);
+    $self->addCarryField('markPaid',$markPaid);
+####
+
     $self->addCarryField('txnIds',$txnIds);
 
     return ('',1);
@@ -1361,7 +1401,7 @@ sub process_documents {
     
     #check for uploaded document
     my $isRequiredDocPresent = checkUploadedRegoDocuments($self->{'Data'},$personID, $regoID,$entityID,$entityLevel,$originLevel,$rego_ref);
-    if(!$isRequiredDocPresent){
+    if(1==2 and !$isRequiredDocPresent){
     	push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Required Document Missing");
     	my %PageData = (
         HiddenFields => $self->stringifyCarryField(),

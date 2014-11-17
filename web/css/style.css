@@ -1,5 +1,5 @@
 html	{
-  font-family: 'DINRegular', sans-serif;
+    /*font-family: 'DINRegular', sans-serif;*/
 	margin:0px;
 }
 
@@ -448,7 +448,7 @@ td.value .chzn-container-single .chzn-single div b{
 }
 
 .sectionheader {
-  font-family: 'DINRegular', sans-serif;
+  /*font-family: 'DINRegular', sans-serif;*/
   color: #0567A4;
   font-size:14px;
 	padding:4px;
@@ -552,7 +552,8 @@ table.lkTable	{
 div.showrecoptions	{
 	float:right;
 	font-size:10px;
-	height:48px;
+	/*height:48px;*/
+	height:auto;
 	vertical-align:bottom;
 	margin-right: 10px;
 }
@@ -2628,7 +2629,7 @@ a.edit-link {
 	font-size: 12px;
   text-decoration:underline;
   color: #0567A4;
-  font-family: 'DINMedium',sans-serif;
+  /*font-family: 'DINMedium',sans-serif;*/
 }
 
 .details-address {
@@ -2643,7 +2644,7 @@ a.edit-link {
 }
 
 a.mail-link {
-	font-family: 'DINMedium',sans-serif;
+	/*font-family: 'DINMedium',sans-serif;*/
 	color: #0567A4;
 	text-decoration: underline;
 }
@@ -2881,7 +2882,7 @@ table.listTable tr:nth-child(odd) {
 
 .slick-pager .slick-pager-status {
 	padding: 3px 6px;
-	font-family: 'DINMedium',sans-serif;
+	/*font-family: 'DINMedium',sans-serif;*/
 }
 
 .changeoptions .button-small {
@@ -2984,7 +2985,7 @@ background-image: -ms-linear-gradient(bottom, #dadada 30%, #e6e6e6 98%, #ffffff 
 background-image: linear-gradient(bottom, #dadada 30%, #e6e6e6 98%, #ffffff 100%);	
 	font-weight: normal;
 	font-size: 14px;
-	font-family: 'DINBold',sans-serif;
+	/*font-family: 'DINBold',sans-serif;*/
 	color: #3B3B3B;
 	border: 1px solid #D9D9D9;
 	padding: 10px 3px 7px 5px;
@@ -2993,7 +2994,7 @@ background-image: linear-gradient(bottom, #dadada 30%, #e6e6e6 98%, #ffffff 100%
 .x-panel-body {
 	border: 1px solid #D9D9D9;
 	border-top: 0px;
-	font-family: 'DINRegular',sans-serif;
+	/*font-family: 'DINRegular',sans-serif;*/
 }
 
 .x-fieldset legend {
@@ -3001,7 +3002,7 @@ background-image: linear-gradient(bottom, #dadada 30%, #e6e6e6 98%, #ffffff 100%
 }
 
 .x-btn button {
-  font-family: 'DINMedium',sans-serif;
+  /*font-family: 'DINMedium',sans-serif;*/
   font-size: 10px;
   text-decoration: none;
   -webkit-border-radius: 3px;
@@ -3739,7 +3740,7 @@ ul.new_tabs li a.active, .new_tabs_wrap  a.active {
 }
 
 .member-home-page .details-left {
-	font-family: 'DINMedium',sans-serif;
+	/*font-family: 'DINMedium',sans-serif;*/
 	float:left;
 	width: 40%;
 }

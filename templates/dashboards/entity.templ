@@ -1,6 +1,6 @@
 <div class="pageHeading dash-heading">Dashboard</div>
 <div class="col-md-9 tasklist-content dashboard-tasklist">
-	<table cellpadding="5">
+	<table cellpadding="5" width="100%">
 		<thead>
 			<tr class="box-header">
 				<th>Tasklist</th>
@@ -33,8 +33,10 @@
 			        </select>
 				</td>
 				<td class="list-action-filter">
-					<a class="btn-inside-panels">All tasks</a>
-					<a class="btn-inside-panels inactive">New task</a>
+					<div class="toggle">
+                        <a href="#" class="active">All tasks</a>
+                        <a href="#" class="">New task</a>
+                    </div>
 				</td>
 			</tr>
 			<tr class="task-list">
@@ -78,7 +80,14 @@
 			<input class="form-control" type="text">
 			<span class="input-group-addon"><i class="fa fa-search"></i></span>
 		</div>
-		<a href="#">Advanced Search</a>
+		<a class="show-advanced-search">Advanced Search</a>
+			<div class="advanced-search-fields">
+				<span><input type="checkbox" value="checkbox">Players</span>
+				<span><input type="checkbox" value="checkbox">Official</span>
+				<span><input type="checkbox" value="checkbox">Coach</span>
+				<span><input type="checkbox" value="checkbox">Pending</span>
+				<span><input type="checkbox" value="checkbox">Referee</span>
+			</div>
 		</div>
 	</div>
 	<div class="sidebar-box">

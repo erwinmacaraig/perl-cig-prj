@@ -168,7 +168,7 @@ sub list_entity_docs{
         $doclisttype .= qq[<option value="$dref->{'intDocumentTypeID'}">$dref->{'strDocumentName'}</option>];
     } 
    $doclisttype .= qq[     </select>                           
-                           <input type="submit" class="button-small generic-button" value="Go" />
+                           <input type="submit" class="button-small generic-button pull-right" value="Go" />
                            </form>
                     ];
 	

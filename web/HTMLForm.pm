@@ -42,7 +42,8 @@ warn("NT $notabs");
     my %sectioncount   = ();
     my $txt_compulsory = langlookup( $fields_ref, 'Compulsory Field' );
     my $compulsory =
-qq[<span class="compulsory"><img src="images/compulsory.gif" alt="$txt_compulsory" title="$txt_compulsory"/></span>];
+#qq[<span class="compulsory"><img src="images/compulsory.gif" alt="$txt_compulsory" title="$txt_compulsory"/></span>];
+qq[];
     my @fieldorder =
       (       defined $override_config
           and exists $override_config->{'order'}
@@ -319,7 +320,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
           )
         {
             $sections{$sname} .= qq[
-            <tr class="$row_class" id = "l_row_$fieldname"><td class="label HTvertform-l" colspan="2">$label</td></tr>
+            <tr class="$row_class" id = "l_row_$fieldname"><td class="label HTvertform-l" colspan="2">$label 1</td></tr>
             <tr><td class="value HTvertform-v" colspan="3">$pretext$field_html$posttext</td> </tr>
             ];
         }
@@ -328,10 +329,10 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
             my $rowcount =
               ( $sectioncount{$sname} % 2 ) ? 'HTr_odd' : 'HTr_even';
             $sections{$sname} .= qq[
-            <tr class="$rowcount $row_class" id = "l_row_$fieldname">
-            <td class="label">$label</td>
-            <td class="value">$pretext$field_html$posttext</td>
-            </tr>
+            <div id="l_row_$fieldname" class="form-group">
+            <label class="col-md-4 control-label txtright">$label</label>
+            <div class="col-md-6 value">$pretext$field_html$posttext</div>
+            </div>
             ];
         }
     }
@@ -351,15 +352,15 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 #my $style=$s ? 'style="display:none;" ' : '';
                 my $sh = q{};
                 if ( $s->[1] ) {
-                    $sh = qq[ <tr><th colspan="2" class="sectionheader">$sectionheader</th></tr>];
+                    $sh = qq[ <p class="sectionheader">$sectionheader</p>];
                 }
                 $tabs .= qq[<li><a id="a_sec$s->[0]" class="tab_links" href="#sec$s->[0]">$sectionheader</a></li>];
 
                 $returnstr .= qq~
-                <tbody id="sec$s->[0]" class="new_tab">
+                <fieldset id="sec$s->[0]" class="new_tab">
                 $sh
                 $sections{$s->[0]}
-                </tbody>
+                </fieldset>
                 ~;
             }
         }
@@ -371,11 +372,10 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
       ? $fields_ref->{'options'}{'pre_button_bottomtext'}
       : '';
     $returnstr = qq[ 
-    <table cellpadding="2" cellspacing="0" border="0" $tableinfo>
     $returnstr
-    <tr><td colspan="2">$pre_button_bottom</td></tr>
-    </table>
-    ];
+    $pre_button_bottom
+    ];    
+
     if ($returnstr) {
         my $buttons = '';
         if (    $fields_ref->{'options'}{'submitlabelnondisable'}
@@ -456,14 +456,22 @@ qq[<input type="hidden" name="$cf" value="$fields_ref->{'carryfields'}{$cf}">];
         $returnstr = qq[
         $validation
         <form action="$fields_ref->{'options'}{'target'}" name="$fields_ref->{'options'}{'formname'}" method="POST" $enctype id = "$fields_ref->{'options'}{'formname'}ID">
+        <fieldset>
+        <div class="col-md-10 txtright">
         $introtext
         $button_top
+        </div>
+        </fieldset>
         $returnstr
+        <fieldset>
+        <div class="col-md-10 txtright">
         $button_bottom
         <input type="hidden" name="HF_oldact" value="$oldaction">
         <input type="hidden" name="HF_subbutact" value="$subbutact">
         $carryfields
         $bottomtext
+        </div>
+        </fieldset>
         </form>
 
         <script type="text/javascript" src="js/ajax.js"></script>

@@ -295,6 +295,9 @@ label {
 #l_dtDOB_day, #l_dtDOB_mon, #l_dtDOB_year {
 	width: 100px;
 }
+#l_dtPassportExpiry_day, #l_dtPassportExpiry_mon, #l_dtPassportExpiry_year {
+	width: 100px;
+}
 input[type="text"] {
     border: 1px solid #cccccc;
     padding: 5px;
@@ -573,6 +576,7 @@ table.table tr td.align-right {
 	width:100%;
 	margin: 0;
 	background-color: #e3e3e3;
+	padding-bottom: 50px;
 }
 
 
@@ -583,15 +587,20 @@ table.table tr td.align-right {
 }
 
 header nav ul#menu ul {
-	top:40px;
+	top:43px;
 }
 
-/* Added Styles for Table in Task List Dashboard */
-.dashboard-tasklist td{
-	padding: 20px 25px;
+header ul#menu ul li a:hover {
+	background-color: #085a8c;
+	color:#fff;
 }
-.dashboard-tasklist th{
-	padding: 10px 25px;
+
+/* Added Styles for Table in Task List Dashboard:: Vincent R; */
+.dashboard-tasklist td, .documents-list td{
+	padding: 20px 20px;
+}
+.dashboard-tasklist th, .documents-list th{
+	padding: 10px 20px;
 }
 .dashboard-tasklist td select{
 	padding: 5px;
@@ -600,16 +609,11 @@ header nav ul#menu ul {
 	width: 130px;
 	margin-left: 10px;
 }
-.dashboard-tasklist tr{
+.dashboard-tasklist tr, .documents-list tr{
 	border: 1px solid #cbcbcb;
 }
-.list-action-filter a.inactive{
-	padding: 7px 9px;
-	color: #fff;
-	background: #cbcbcb;
-}
-.list-action-filter a{
-	padding: 7px 9px;
+.list-action-filter a, .list-action-filter a.active{
+	padding: 7px 6px;
 	float: left;
 	cursor: pointer;
 }
@@ -657,6 +661,13 @@ span.fa{
 .sidebar-box .panel-header{
 	margin-bottom: 10px;
 }
+.advanced-search-fields{
+	display: none;
+}
+.advanced-search-fields span{
+	width: 50%;
+	float: left;
+}
 /* End Add */
 
 h2.section-header {
@@ -699,16 +710,17 @@ i.indicator {
 
 .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover {
 	
-	background-color: #055688;
-	color:#fff;
+	background-color: #fff;
+	color:#000;
 	font-weight: bold;
 }
 
 .nav-tabs > li > a, .nav-tabs > li > a:hover {
-	background-color:#fff;
-	color:#000;
+	background-color:#055688;
+	color:#fff;
 	font-weight: bold;
 }
+
 /** menu **/
 #content .steps {
 	margin: 20px 10px;
@@ -733,10 +745,9 @@ i.indicator {
 	padding:  10px 20px 10px 25px;
 	background: #0fa54a;
 	color: #000;
-	text-decoration: underline;
 }
 .playermenu li .previous a {
-	color: #000;
+	color: #fff;
 	font-size: 11px;
 }
 .playermenu li .next {
@@ -783,4 +794,144 @@ i.indicator {
 	border-top: solid 21px transparent;
 	border-bottom: solid 20px transparent;
 	z-index: 1;
+}
+
+.col-md-4 #flowSummary {
+    background-color: none;
+    border: 0px solid #000000;
+    float: right;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+/* Search Styles:: Vincent R */
+.search-panel input{
+	padding: 10px 40px;
+}
+.search-panel input[type="submit"]{
+	margin-left: 20px;
+}
+.search-panel{
+	margin-bottom: 15px;
+}
+
+.tab-content > .active {
+	background-color:#fff;
+	border-left: solid 1px  #ddd;
+	border-right: solid 1px  #ddd;
+	border-bottom: solid 1px  #ddd;
+	overflow:hidden;
+}
+
+.member-home-page {
+	margin-top:30px;
+}
+
+.document-table-header{
+	padding: 13px 25px;
+	background: #ddd;
+	color: #000;
+	font-size: 14px;
+}
+
+a.btn-inside-docs-panel {
+	font-family: 'noto_sansbold';
+    font-weight: normal;
+    font-size: 14px;
+	color: #fff;
+	padding: 5px 25px;
+	display: inline-block;
+	background: #1870a5;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzE4NzBhNSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwOTViOGQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(top,  #1870a5 0%, #095b8d 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#1870a5), color-stop(100%,#095b8d));
+	background: -webkit-linear-gradient(top,  #1870a5 0%,#095b8d 100%);
+	background: -o-linear-gradient(top,  #1870a5 0%,#095b8d 100%);
+	background: -ms-linear-gradient(top,  #1870a5 0%,#095b8d 100%);
+	background: linear-gradient(to bottom,  #1870a5 0%,#095b8d 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1870a5', endColorstr='#095b8d',GradientType=0 );
+}
+
+a.btn-inside-docs-panel:hover {
+	text-decoration: none;
+	background: #2781b8;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzI3ODFiOCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxNzZlYTQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(top,  #2781b8 0%, #176ea4 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#2781b8), color-stop(100%,#176ea4));
+	background: -webkit-linear-gradient(top,  #2781b8 0%,#176ea4 100%);
+	background: -o-linear-gradient(top,  #2781b8 0%,#176ea4 100%);
+	background: -ms-linear-gradient(top,  #2781b8 0%,#176ea4 100%);
+	background: linear-gradient(to bottom,  #2781b8 0%,#176ea4 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2781b8', endColorstr='#176ea4',GradientType=0 );
+}
+
+.status-col {
+	width:30%;
+	padding-right:10px;
+}
+
+.ver-dots {
+	font-size:1.3em;
+	margin-left:10px;
+}
+
+.ver-dots.green {
+	color: green;
+}
+
+.ver-dots.red {
+	color: red;	
+}
+
+.ver-dots.yellow {
+	color: yellow;
+}
+
+/*temporary adjustment to dispay drill down nav*/
+
+header nav {
+	padding-bottom:10px;
+}
+
+header nav ul li a {
+	padding-top:20px;
+	padding-bottom: 27px;
+}
+
+.nav_session_menu_wrap {
+	float:right;
+	margin-top:0;
+	width:300px;
+}
+
+.nav_session_placement {
+	width:300px;
+	background-position: 272px;
+}
+
+.nav_session_levels {
+	width:300px;
+}
+
+.nav-bar-name {
+	width:65%;
+	font-size:16px;
+}
+
+.dash-heading, .pageHeading {
+	font-family: 'noto_sansregular';
+    font-weight: normal;
+    font-size: 36px;
+    color: #000;
+    padding-left:15px;
+}
+
+.modal-body textarea {
+	width:100%;
+}
+
+/*** row spacing ***/
+.top-bottom-spacer { 
+	margin: 50px 0px;
 }

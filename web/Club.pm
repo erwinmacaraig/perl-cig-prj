@@ -218,7 +218,7 @@ print STDERR "SSSS$action $clubID\n";
 
       },
       strLocalName => {
-        label => 'Name',
+        label => 'Organisation Name',
         value => $field->{strLocalName},
         type  => 'text',
         size  => '40',
@@ -226,28 +226,28 @@ print STDERR "SSSS$action $clubID\n";
         compulsory => 1,
       },
       strLocalShortName => {
-        label => 'Short Name',
+        label => 'Organisation Short Name',
         value => $field->{strLocalShortName},
         type  => 'text',
         size  => '30',
         maxsize => '50',
       },
       strLatinName => {
-        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'International Name' : '',
+        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'International Organisation Name' : '',
         value => $field->{strLatinName},
         type  => 'text',
         size  => '40',
         maxsize => '150',
       },
       strLatinShortName => {
-        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'International Short Name' : '',
+        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'International Organisation Short Name' : '',
         value => $field->{strLatinShortName},
         type  => 'text',
         size  => '30',
         maxsize => '50',
       },
       strMAID => {
-      	label => 'MA ID',
+      	label => 'MA Organisation ID',
       	value => $field->{strMAID},
       	type => 'text',
       	size => '30',
@@ -255,7 +255,7 @@ print STDERR "SSSS$action $clubID\n";
         compulsory => 1,
       },
       dtFrom => {
-        label       => 'Foundation Date',
+        label       => 'Organisation Foundation Date',
         value       => $field->{dtFrom},
         type        => 'date',
         datetype    => 'dropdown',
@@ -264,7 +264,7 @@ print STDERR "SSSS$action $clubID\n";
         compulsory => 1,
       },
       dtTo => {
-        label       => 'Dissolution Date',
+        label       => 'Organisation Dissolution Date',
         value       => $field->{dtTo},
         type        => 'date',
         datetype    => 'dropdown',
@@ -287,7 +287,7 @@ print STDERR "SSSS$action $clubID\n";
          firstoption => [ '', 'Select Type' ],
       },
       intLegalTypeID => {
-        label => "Legal Entity Type",
+        label => "Type of Legal Entity",
         value => $field->{intLegalTypeID},
         type => 'lookup',
         options => \%legalTypeOptions,
@@ -295,7 +295,7 @@ print STDERR "SSSS$action $clubID\n";
         readonly =>($Data->{'clientValues'}{authLevel} < $Defs::LEVEL_NATIONAL),       
      },
      strLegalID => {
-        label => "Legal Type Number",
+        label => "Legal Type Identification Number",
         value => $field->{strLegalID},
         type  => 'text',
         size  => '30',
@@ -349,15 +349,24 @@ print STDERR "SSSS$action $clubID\n";
       },
 
       strAddress => {
-        label => 'Address',
+        label => 'Address 1',
         value => $field->{strAddress},
         type  => 'text',
         size  => '40',
         maxsize => '50',
         compulsory => 1,
       },
+    strAddress2=> {
+        label => 'Address 2',
+        value => $field->{strAddress2},
+        type  => 'text',
+        size  => '40',
+        maxsize => '50',
+        compulsory => 1,
+      },
+
       strTown => {
-        label => 'Town',
+        label => 'City of Organisation',
         value => $field->{strTown},
         type  => 'text',
         size  => '30',
@@ -365,14 +374,14 @@ print STDERR "SSSS$action $clubID\n";
         compulsory => 1,
       },
       strRegion => {
-        label => 'Region',
+        label => 'Region of Organisation',
         value => $field->{strRegion},
         type  => 'text',
         size  => '30',
         maxsize => '50',
       },
       strISOCountry => {
-          label       => 'ISO Country',
+          label       => 'Country of Address',
           value       => $field->{strISOCountry} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
           type        => 'lookup',
           options     => \%Mcountriesonly,
@@ -389,14 +398,14 @@ print STDERR "SSSS$action $clubID\n";
           posttext => $nonlatinscript,
       },
       strPostalCode => {
-        label => 'Postal Code',
+        label => 'Postcode',
         value => $field->{strPostalCode},
         type  => 'text',
         size  => '15',
         maxsize => '15',
       },
       strPhone => {
-        label => '',
+        label => 'Contact Number',
         value => $field->{strPhone},
         type  => 'text',
         size  => '20',
@@ -410,7 +419,7 @@ print STDERR "SSSS$action $clubID\n";
         maxsize => '20',
       },
       strEmail => {
-        label => '',
+        label => 'Contact Email',
         value => $field->{strEmail},
         type  => 'text',
         size  => '35',
@@ -480,12 +489,13 @@ print STDERR "SSSS$action $clubID\n";
         strAssocNature
         intLegalTypeID
         strLegalID
-        strISOCountry
         intLocalLanguage
         strRegion
         strPostalCode
         strTown
         strAddress
+        strAddress2
+        strISOCountry
         strWebURL
         strEmail
         strPhone

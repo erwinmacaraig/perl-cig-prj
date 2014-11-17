@@ -17,4 +17,35 @@ $(document).ready(function(){
   findInitialAccordionPanel();
   $("#accordion").on("hidden.bs.collapse", toggleChevron);
   $("#accordion").on("show.bs.collapse", toggleChevron);
+
+  //temporary workaround for the navs to keep it overlapping on the drilldown menu
+
+  if ($("span.level-name").html() == "Person") {
+  	$("body").find("header nav ul li a").css("padding-left","9px");
+  	$("body").find("header nav ul li a").css("padding-right","9px");
+  }
+
+
+    $("div#transfer_type_option a").click(function(e){
+        e.preventDefault();
+
+        var selected = jQuery(this).prop("id");
+        $("input[name=transfer_type][value=" + selected.toUpperCase() + "]").prop("checked", true);
+
+        switch(selected){
+            case "international":
+                if(!$(this).hasClass("active")){
+                    $(this).addClass("active");
+                    $("div#transfer_type_option a#domestic").removeClass("active");
+                }
+                break;
+            case "domestic":
+                if(!$(this).hasClass("active")){
+                    $(this).addClass("active");
+                    $("div#transfer_type_option a#international").removeClass("active");
+              }
+              break;
+        }
+    });
+
 })

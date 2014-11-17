@@ -486,7 +486,7 @@ sub listDocuments {
 
    $doclisttype .= qq[     </select>
                            $reglisttype
-                           <input type="submit" class="button-small generic-button" value="Go" />
+                           <input type="submit" class="button-small generic-button pull-right" value="Go" />
                            </form>
                     ];
 #  my $modoptions=qq[<div class="changeoptions">$addlink</div>];
@@ -1475,8 +1475,8 @@ $tabs = '
 <div class="new_tabs_wrap">
 <ul class="new_tabs">
   '.$tabs.'
+	<li><a id="a_showall" href="#showall" class="tab_links">Show All</a></li>
 </ul>
-	<span class="showallwrap"><a href="#showall" class="showall">Show All</a></span>
 </div>
 								';
 my $person_photo = qq[
@@ -1492,7 +1492,8 @@ $person_photo = '' if($option eq 'add');
 	$resultHTML =qq[
  $tabs
 $person_photo
-      <div class="person-edit-form">$resultHTML</div><style type="text/css">.pageHeading{font-size:48px;font-family:"DINMedium",sans-serif;letter-spacing:-2px;margin:40px 0;}.ad_heading{margin: 36px 0 0 0;}</style>] if!$processed;
+			<div class="col-md-8"><div class="panel-body">$resultHTML</div></div>
+<style type="text/css">.pageHeading{font-size:48px;font-family:"DINMedium",sans-serif;letter-spacing:-2px;margin:40px 0;}.ad_heading{margin: 36px 0 0 0;}</style>] if!$processed;
     $resultHTML = qq[<p>$Data->{'PersonClrdOut'}</p> $resultHTML] if $Data->{'PersonClrdOut'};
     $option = 'display' if $processed;
     my $chgoptions = '';

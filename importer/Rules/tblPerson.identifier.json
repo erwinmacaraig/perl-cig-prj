@@ -1,10 +1,32 @@
 {
 	"rules" : {
+		"IdentifierType" : {
+			"rule" : "multiDestEntry",
+			"type" : {
+				"Passport" : {
+					"strPassportNo" : "strOtherPersonIdentifier",
+					"strPassportIssueCountry" : "strOtherPersonIdentifierIssueCountry",
+					"dtPassportExpiry" : "dtOtherPersonIdentifierValidDateTo",
+					"dtOtherPersonIdentifierValidDateFrom" : "dtOtherPersonIdentifierValidDateFrom",
+					"strOtherPersonIdentifierDesc" : "strOtherPersonIdentifierDesc"
+				},
+				"BirthCertificate" : {
+					"strBithCert" : "strOtherPersonIdentifier",
+					"strBirthCertCountry" : "strOtherPersonIdentifierIssueCountry",
+					"dtBirthCertValidityDateFrom" : "dtOtherPersonIdentifierValidDateFrom",
+					"dtBirthCertValidityDateTo" : "dtOtherPersonIdentifierValidDateTo",
+					"strBirthCertDesc" : "strOtherPersonIdentifierDesc"
+				}
+			}
+		},
+		"strImportPersonCode" : {
+			"rule" : "setUniqField"
+		}
 	},
 	"mapping" : {
 		"PersonCode" : "strImportPersonCode",
 		"Identifier" : "strOtherPersonIdentifier",
-		"IdentifierType" : "",
+		"IdentifierType" : "IdentifierType",
 		"CountryIssued" : "strOtherPersonIdentifierIssueCountry",
 		"DateFrom" : "dtOtherPersonIdentifierValidDateFrom",
 		"DateTo" : "dtOtherPersonIdentifierValidDateTo",

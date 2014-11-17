@@ -1,30 +1,27 @@
-
-    <br/>
-    <br/>
-    <div class="">
-        <div class="payment-detail">
-            <div class = "sectionheader">[% Lang.txt('Task Notes') %]&nbsp;&nbsp;</div>
-            <div class="member-details">
-                <table style="width: 100%">
-                    <tr>
-                        <th>Type</th>
-                        <th>Rejection Notes</th>
-                        <th>Date/Time Rejected</th>
-                        <th>Resolution Notes</th>
-                        <th>Date/Time Resolved</th>
-                    </tr>
-                    <!-- loop here; -->
-                    [% FOREACH note IN TaskNotes %]
-                    <tr>
-                        <td><div class="member-data"> [% note.ParentNoteType %] </div></td>
-                        <td><div class="member-data"> [% note.ParentNote %] </div></td>
-                        <td><div class="member-data"> [% note.ParentTimeStamp %] </div></td>
-                        <td><div class="member-data"> [% note.ChildNote %] </div></td>
-                        <td><div class="member-data"> [% note.ChildTimeStamp %] </div></td>
-                    [% END %]
-                </table>
-            </div>
+<div class="">
+    <div class="payment-detail">
+        <!--<div class = "sectionheader">[% Lang.txt('Task Notes') %]&nbsp;&nbsp;</div>-->
+        <div class="member-details">
+            <table style="width: 100%">
+                <tr>
+                    <th>Type</th>
+                    <th>Rejection Notes</th>
+                    <th>Date/Time Rejected</th>
+                    <th>Resolution Notes</th>
+                    <th>Date/Time Resolved</th>
+                </tr>
+                <!-- loop here; -->
+                [% FOREACH note IN TaskNotes %]
+                <tr>
+                    <td><div class="member-data"> [% note.ParentNoteType %] </div></td>
+                    <td><div class="member-data"> [% note.ParentNote %] </div></td>
+                    <td><div class="member-data"> [% note.ParentTimeStamp %] </div></td>
+                    <td><div class="member-data"> [% note.ChildNote %] </div></td>
+                    <td><div class="member-data"> [% note.ChildTimeStamp %] </div></td>
+                [% END %]
+            </table>
         </div>
     </div>
+</div>
 
 

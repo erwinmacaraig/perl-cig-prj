@@ -1,13 +1,11 @@
-
-<div>
-    <form action="main.cgi" method="POST">
-        <table>
-        <tbody><tr><td><span class="label">Person Lookup:</span></td><td><span class="formw"><input type="text" name="search_keyword" value="[% search_keyword %]"></span></td></tr>
-        <tbody><tr><td><span class="label"></span></td><td><span class="label">Enter Name or Member ID</span></td></tr>
-        </tbody></table>
-        <input type="submit" name="submit" value="Search">   
-        <input type="hidden" value="[% action %]" name="a"> <input type="hidden" value="[% client %]" name="client">
-        <input type="hidden" value="[% request_type %]" name="searchType">
-    </form>
-
+<div class="search-panel col-md-12">
+	<h3 class="panel-header">Search</h3>
+	<div class="panel-body">
+		<form id="searchForm" action="main.cgi" method="POST">
+			<span class="formw"><input size="105" type="text" placeholder="Enter a person's name or Member ID" name="search_keyword" value="[% search_keyword %]"></span>
+		    <input type="submit" name="submit" value="Search" >   
+		    <input type="hidden" value="[% action %]" name="a"> <input type="hidden" value="[% client %]" name="client">
+		    <input type="hidden" value="[% type %]" name="type">
+	    </form>
+    </div>
 </div>

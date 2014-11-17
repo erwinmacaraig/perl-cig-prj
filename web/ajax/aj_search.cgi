@@ -11,6 +11,7 @@ use Sphinx::Search;
 use JSON;
 use Lang;
 use Data::Dumper;
+use Search::Person;
 
 main();  
 
@@ -18,7 +19,7 @@ sub main  {
   # GET INFO FROM URL
   my $client = param('client') || '';
   my $searchval = param('term') || '';
-                                                                                                        
+
   my %Data=();
   my $target='main.cgi';
   $Data{'target'}=$target;
@@ -46,20 +47,38 @@ sub main  {
 
     my $intermediateNodes = {};
     my $subNodes = [];
-    ($intermediateNodes, $subNodes) = getIntermediateNodes(\%Data);
-    my $filters = setupFilters(\%Data, $subNodes);
+    my $rawResult = 1;
 
     if($currentLevel > $Defs::LEVEL_PERSON)  {
-      $results{'persons'} = search_persons(
-        \%Data,
-        $sphinx,
-        $searchval,
-        $filters,
-        $intermediateNodes,
-        $subNodes,
-      );
+        #$results{'persons'} = search_persons(
+        #  \%Data,
+        #  $sphinx,
+        #  $searchval,
+        #  $filters,
+        #  $intermediateNodes,
+        #  $subNodes,
+        #);
+
+        my $personSearchObj = new Search::Person();
+        $personSearchObj
+            ->setRealmID($Data{'Realm'})
+            ->setSubRealmID(0)
+            ->setSearchType("unique")
+            ->setData(\%Data)
+            ->setKeyword($searchval)
+            ->setSphinx($sphinx);
+
+        #intermediateNodes, subNodes and filters are initialised in Search/Person.pm
+        $results{'persons'} = $personSearchObj->process($rawResult);
+
     }
     if($currentLevel > $Defs::LEVEL_CLUB)  {
+        my $intermediateNodes = {};
+        my $subNodes = [];
+        ($intermediateNodes, $subNodes) = getIntermediateNodes(\%Data);
+        my $filters = setupFilters(\%Data, $subNodes);
+
+
       $results{'entities'} = search_entities(
         \%Data,
         $sphinx,
@@ -394,3 +413,5 @@ sub getIntermediateNodes {
   my @nodes = keys %nodes;
   return (\%intermediateNodes, \@nodes);
 }
+
+

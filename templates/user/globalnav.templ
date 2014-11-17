@@ -36,6 +36,11 @@
 <script>
 jQuery(document).ready(function()  {
 
+	//Show Hide Advanced Search Fields :V:
+	jQuery(".show-advanced-search").on("click", function(){
+		jQuery(this).parent().find((".advanced-search-fields")).slideToggle();
+	});
+
   function clickclear(thisfield, defaulttext) {
     if (thisfield.value == defaulttext) {
     thisfield.value = "";
