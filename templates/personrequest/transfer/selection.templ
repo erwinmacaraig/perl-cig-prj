@@ -1,16 +1,19 @@
 <form action="main.cgi" method="POST">
     <div>
-        [% FOREACH result IN groupResult %]
+        [% FOREACH result IN groupResult %] 
         <div>
-            <span class="sectionheader">[% result.key %]</span>
-            <div>
-                [% FOREACH sportOption IN result.value %]
+		<p>		
+			<div class="read-only">
+				<h4>[% result.key %]</h4>
+				<div class="read-only-text">
+				[% FOREACH sportOption IN result.value %]
                     <input id="option_[% sportOption.id %]" name="regoselected[[% sportOption.personID %]][[% sportOption.id %]]" type="checkbox"/><label for="option_[% sportOption.id %]">[% sportOption.sportLabel %]</label>
                     <br/>
                 [% END %]
-            </div>
+				</div>
+			</div>		
+		</p>
         </div>
-        <br/>
         <br/>
         [% END %]
     </div>
