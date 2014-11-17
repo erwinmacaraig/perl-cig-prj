@@ -324,7 +324,7 @@ sub getFieldsList	{
         strLatinSurname
         strMaidenName
         dtDOB
-        strPlaceofBirth
+        strPlaceOfBirth
         strCountryOfBirth
         strMotherCountry
         strFatherCountry
