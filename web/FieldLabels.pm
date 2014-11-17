@@ -109,11 +109,11 @@ sub getFieldLabels	{
             dtBirthCertValidityDateTo => 'Birth Certificate Validity Date To',
             strBirthCertDesc => 'Birth Certificate Description',
             
-            strOtherPersonIdentifier => 'Other Identifier',
-            strOtherPersonIdentifierIssueCountry => 'Other Identifier Issuance Country',
-            dtOtherPersonIdentifierValidDateFrom => 'Other Identifier Validity Date From',
-            dtOtherPersonIdentifierValidDateTo => 'Other Identifier Validity Date To',
-            strOtherPersonIdentifierDesc => 'Other Identifier Description',
+            strOtherPersonIdentifier => $Data->{'SystemConfig'}{'strOtherPersonIdentifier_Text'} ? $Data->{'SystemConfig'}{'strOtherPersonIdentifier_Text'} : 'Other Identifier',
+            strOtherPersonIdentifierIssueCountry => $Data->{'SystemConfig'}{'strOtherPersonIdentifierIssueCountry_Text'} ? $Data->{'SystemConfig'}{'strOtherPersonIdentifierIssueCountry_Text'} : 'Other Identifier Issuance Country',
+            dtOtherPersonIdentifierValidDateFrom => $Data->{'SystemConfig'}{'dtOtherPersonIdentifierValidDateFrom_Text'} ? $Data->{'SystemConfig'}{'dtOtherPersonIdentifierValidDateFrom_Text'} : 'Other Identifier Validity Date From',
+            dtOtherPersonIdentifierValidDateTo => $Data->{'SystemConfig'}{'dtOtherPersonIdentifierValidDateTo_Text'} ? $Data->{'SystemConfig'}{'dtOtherPersonIdentifierValidDateTo_Text'} : 'Other Identifier Validity Date To',
+            strOtherPersonIdentifierDesc => $Data->{'SystemConfig'}{'strOtherPersonIdentifierDesc_Text'} ? $Data->{'SystemConfig'}{'strOtherPersonIdentifierDesc_Text'} : 'Other Identifier Description',
              
             
 		);
