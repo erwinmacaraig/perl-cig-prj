@@ -191,6 +191,14 @@ sub venue_details   {
         sectionname => 'details',
       },
  
+      strCity=> {
+        label => 'City',
+        value => $field->{strCity},
+        type  => 'text',
+        size  => '30',
+        maxsize => '50',
+        sectionname => 'details',
+      },
       strTown => {
         label => 'Town',
         value => $field->{strTown},
@@ -271,6 +279,22 @@ sub venue_details   {
         rows => '10',
         cols => '40',
         sectionname => 'details',
+      },
+        dtFrom => {
+        label       => 'Foundation Date',
+        value       => $field->{dtFrom},
+        type        => 'date',
+        datetype    => 'dropdown',
+        format      => 'dd/mm/yyyy',
+        validate    => 'DATE',
+      },
+      dtTo => {
+        label       => 'Dissolution Date',
+        value       => $field->{dtTo},
+        type        => 'date',
+        datetype    => 'dropdown',
+        format      => 'dd/mm/yyyy',
+        validate    => 'DATE',
       },
       SP1  => {
         type =>'_SPACE_',
@@ -404,6 +428,7 @@ sub venue_details   {
         strContactISOCountry
         strRegion
         strPostalCode
+        strCity
         strTown
         strAddress
         strAddress2
