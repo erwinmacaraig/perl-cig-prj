@@ -191,6 +191,14 @@ sub venue_details   {
         sectionname => 'details',
       },
  
+      strContactCity=> {
+        label => 'City of Address',
+        value => $field->{strContactCity},
+        type  => 'text',
+        size  => '30',
+        maxsize => '50',
+        sectionname => 'details',
+      },
       strCity=> {
         label => 'City',
         value => $field->{strCity},
@@ -429,17 +437,18 @@ sub venue_details   {
         strLocalShortName
         strLatinName
         strLatinShortName
+        strCity
+        strRegion
+        strISOCountry
         strStatus
         dtFrom
         dtTo
-        strISOCountry
-        strContactISOCountry
-        strRegion
-        strPostalCode
-        strCity
-        strTown
         strAddress
         strAddress2
+        strContactCity
+        strTown
+        strContactISOCountry
+        strPostalCode
         strWebURL
         strEmail
         strPhone
@@ -623,6 +632,9 @@ sub loadVenueDetails {
       dtFrom,
       dtTo,
       strISOCountry,
+      strContactISOCountry,
+      strContact,
+     strContactCity,
       strRegion,
       strPostalCode,
       strTown,

@@ -332,6 +332,7 @@ print STDERR "SSSS$action $clubID\n";
         size  => '30',
         maxsize => '50',
       },
+        
       strAddress => {
         label => 'Address 1',
         value => $field->{strAddress},
@@ -348,7 +349,31 @@ print STDERR "SSSS$action $clubID\n";
         maxsize => '50',
         compulsory => 1,
       },
+      strContactISOCountry => {
+          label       => 'Country of Address',
+          value       => $field->{strContactISOCountry} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
+          type        => 'lookup',
+          options     => \%Mcountriesonly,
+          firstoption => [ '', 'Select Country' ],
+        compulsory => 1,
+      },
+      strContactCity=> {
+        label => 'City',
+        value => $field->{strContactCity},
+        type  => 'text',
+        size  => '40',
+        maxsize => '50',
+        compulsory => 1,
+      },
 
+      strCity=> {
+        label => 'City of Organisation',
+        value => $field->{strCity},
+        type  => 'text',
+        size  => '40',
+        maxsize => '50',
+        compulsory => 1,
+      },
       strTown => {
         label => 'City of Organisation',
         value => $field->{strTown},
@@ -365,7 +390,7 @@ print STDERR "SSSS$action $clubID\n";
         maxsize => '50',
       },
       strISOCountry => {
-          label       => 'Country of Address',
+          label       => 'Country of Organisation',
           value       => $field->{strISOCountry} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
           type        => 'lookup',
           options     => \%Mcountriesonly,
@@ -463,6 +488,10 @@ print STDERR "SSSS$action $clubID\n";
         strLocalShortName
         strLatinName
         strLatinShortName
+        strCity
+        strRegion
+        strTown
+        strISOCountry
         strMAID
         dtFrom
         dtTo
@@ -474,12 +503,11 @@ print STDERR "SSSS$action $clubID\n";
         intLegalTypeID
         strLegalID
         intLocalLanguage
-        strRegion
-        strPostalCode
-        strTown
         strAddress
         strAddress2
-        strISOCountry
+        strContactCity
+        strContactISOCountry
+        strPostalCode
         strWebURL
         strEmail
         strPhone
@@ -612,11 +640,16 @@ sub loadClubDetails {
      strLatinShortName,
      strLatinFacilityName,
      strISOCountry,
+    strContactISOCountry,
+      strContact,
+     strContactCity,
      intLocalLanguage,
      strRegion,
      strPostalCode,
      strTown,
+        strCity,
      strAddress,
+     strAddress2,
      strWebURL,
      strEmail,
      strPhone,
