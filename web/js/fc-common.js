@@ -48,4 +48,8 @@ $(document).ready(function(){
         }
     });
 
+    //here we remove the col-md-10 class used on the generic forms
+    //to flush the button to the right. this is a temporary fix.
+    $("table.products-table").next("fieldset").find("div.txtright").removeClass("col-md-10");
+
 })
