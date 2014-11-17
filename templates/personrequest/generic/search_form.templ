@@ -1,4 +1,5 @@
     [% IF transferTypeOption != '' %]
+    <!--
     <span class="label">Transfer type:</span></td><td><span class="formw">[% transferTypeOption %]</span>
 
     <br/>
@@ -6,6 +7,7 @@
     <div id="international" style="display: none;">
         <span>Do You have the Player/'s ITC?</span><span>[% withITC %][% noITC %]</span>
     </div>
+    -->
 
     [% END %]
 
@@ -37,7 +39,22 @@
                             </p>
                         </center>
                     </div>
-                    <div class="col-md-12">
+                    <div id="itc_selection" class="col-md-12" style="display: none">
+                        <center>
+                            <p>
+                                <ul class="list-unstyled inline">
+                                    <li>
+                                        Do you have Player's ITC?
+                                    </li>
+                                    <li>
+                                        [% withITC %][% noITC %]
+                                    </li>
+                                </ul>
+                            </p>
+                        </center>
+                    </div>
+
+                    <div id="peoplelookup_form" class="col-md-12">
                         <center>
                             <p>
                                 <ul class="list-unstyled inline">
@@ -51,8 +68,6 @@
                                 </ul>
                             </p>
                         </center>
-                    </div>
-                    <div class="col-md-12">
                         <center>
                             <ul class="list-unstyled inline">
                                 <li class="lblPeoplelookup">
@@ -112,17 +127,13 @@
 
 
 
+<!--
     <br /><br />
     <div id="domestic">
         <form action="main.cgi" method="POST">
             <table>
             <tbody><tr><td><span class="label">Person Lookup:</span></td><td><span class="formw"><input type="text" name="search_keyword" value=""></span></td></tr>
             <tbody><tr><td><span class="label"></span></td><td><span class="label">Enter Name or Member ID</span></td></tr>
-            <!--
-            <tr><td><span class="label">First Name:</span></td><td><span class="formw"><input type="text" name="firstname" value=""></span></td></tr>
-            <tr><td><span class="label">Last Name:</span></td><td><span class="formw"><input type="text" name="lastname" value=""></span></td></tr>
-            <tr><td><span class="label">Date of Birth (yyyy-mm-dd):</span></td><td><span class="formw"><input type="text" name="dob" value=""></span></td></tr>
-            -->
             </tbody></table>
             <input type="submit" name="submit" value="Search">   
             <input type="hidden" value="[% action %]" name="a"> <input type="hidden" value="[% client %]" name="client">
@@ -130,3 +141,4 @@
         </form>
     </div>
     [% script %]
+    -->

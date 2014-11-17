@@ -1,7 +1,7 @@
     <div class="task-actions">
 
         [% IF TaskAction.showApprove %]
-        <a class="btn-main" href = "main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]">
+        <a class="btn-main workflow-action" href = "main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]">
             [% IF TaskAction.ApprovalEntityLevel == 3 %]
                 [% Lang.txt('Accept') %]
             [% ELSE %]
@@ -11,19 +11,20 @@
         [% END %]
 
         [% IF TaskAction.showReject %]
-        <a class="btn-main" data-toggle="modal" data-target="#showReject" href = "">
+        <a class="btn-main workflow-action" data-toggle="modal" data-target="#showWorkflowNotes" data-actiontype="REJECT" href = "">
             [% Lang.txt('Reject') %]
         </a>
         [% END %]
 
         [% IF TaskAction.showResolve %]
-        <a class="btn-main" href = "main.cgi?client=[% TaskAction.client %]&a=WF_Resolve&TID=[% TaskAction.WFTaskID %]">
+        <!--<a class="btn-main workflow-action" href = "main.cgi?client=[% TaskAction.client %]&a=WF_Resolve&TID=[% TaskAction.WFTaskID %]">-->
+        <a class="btn-main workflow-action"data-toggle="modal" data-target="#showWorkflowNotes" data-actiontype="RESOLVE"  href = "">
             [% Lang.txt('Resolve') %]
         </a>
         [% END %]
 
         [% IF TaskAction.showHold %]
-        <a class="btn-main" data-toggle="modal" data-target="#showHold" href = "">
+        <a class="btn-main workflow-action" data-toggle="modal" data-target="#showWorkflowNotes" data-actiontype="HOLD" href = "">
             [% Lang.txt('Put on-hold') %]
         </a>
         [% END %]
@@ -46,47 +47,54 @@
 
 
 <!-- Modal for On Hold -->
-<div class="modal fade" id="showHold" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="showWorkflowNotes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" style="z-index:9999;">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title" id="myModalLabel">Work task notes (On hold)</h4>
+        <h4 class="modal-title" id="myModalLabel">Work task notes </h4>
       </div>
       
-      <div class="modal-body">
-        <label>Please enter Work task notes</label>
-        <textarea name="notes"></textarea>
-      </div>
+      <form id="workFlowActionForm" action="main.cgi" method="POST">
+          <div class="modal-body">
+            <label>Please enter Work task notes</label>
+            <textarea name="notes"></textarea>
+            <input type="hidden" name="client" value="[% TaskAction.client %]">
+            <input type="hidden" name="TID" value="[% TaskAction.WFTaskID %]">
+            <input type="hidden" name="type" value="">
+            <input type="hidden" name="a" value="WF_updateAction">
+          </div>
 
-      <div class="modal-footer">
-        <a class="btn-main" data-dismiss="modal">Close</a>
-        <a class="btn-main" href="main.cgi?client=[% TaskAction.client %]&a=WF_Hold&TID=[% TaskAction.WFTaskID %]&t=[% TaskAction.onHold %]">Submit</a>
-      </div>
+          <div class="modal-footer">
+            <a class="btn-main" data-dismiss="modal">Close</a>
+            <input class="btn-main" type="submit" name="submit" value="submit">
+          </div>
+      </form>
       
     </div>
   </div>
 </div>
 
-<!-- Modal For Reject -->
-<div class="modal fade" id="showReject" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog" style="z-index:9999;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title" id="myModalLabel">Work task notes (Reject)</h4>
-      </div>
-      
-      <div class="modal-body">
-        <label>Please enter Work task notes</label>
-        <textarea name="notes"></textarea>
-      </div>
+<script src = "//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+<script type="text/javascript">
+    jQuery().ready(function() {
+        jQuery("a.workflow-action").click(function(e){
+            var actiontype = jQuery(this).data('actiontype');
+            jQuery("#workFlowActionForm input[type=hidden][name=type]").val(actiontype);
+            e.preventDefault();
+        });
 
-      <div class="modal-footer">
-        <a class="btn-main" data-dismiss="modal">Close</a>
-        <a class="btn-main" href="main.cgi?client=[% TaskAction.client %]&a=WF_Reject&TID=[% TaskAction.WFTaskID %]">Submit</a>
-      </div>
-      
-    </div>
-  </div>
-</div>
+        // validate the comment form when it is submitted
+        jQuery("#workFlowActionForm").validate({
+            rules: {
+                notes: {
+                    required: true
+                }
+            },
+            messages: {
+                notes: "Please add notes."
+            }
+        });
+    });
+</script>
+
