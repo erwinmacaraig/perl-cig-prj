@@ -1,11 +1,12 @@
 [% Dumper.dump_html($FieldElements) %]
     <br/>
     <div class="">
-        <div class = "sectionheader">
+        <!--<div class = "sectionheader">
             [% Lang.txt('Fields') %]&nbsp;&nbsp;
-        </div>
+        </div>-->
 
-        <table cellpadding="5" style="width: 100%">
+        <table class="table" cellpadding="5" style="width: 100%">
+            <thead>
             <tr>
                 <th>Field Number</th>
                 <th>Field Name</th>
@@ -15,6 +16,7 @@
                 <th>Width of Field</th>
                 <th>Capacity of Field</th>
             </tr>
+            </thead>
 
             [% COUNT = 0 %]
             [% FOREACH fieldRow IN FieldElements %]

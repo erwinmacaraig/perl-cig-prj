@@ -12,13 +12,15 @@
 
             </div>
             <div class="member-details">
-                <table style="width: 100%">
+                <table class="table" style="width: 100%">
+                    <thead>
                     <tr>
                         <th>Document ID</th>
                         <th>Status</th>
                         <th>Document Type</th>
                         <th>Action/s</th>
                     </tr>
+                    </thead>
                     <!-- loop here; -->
                     [% FOREACH document IN RelatedDocuments %]
                     <tr [% IF document.DisplayVerify != 1 %]style="color: #CFD1D0"[% END %]>
