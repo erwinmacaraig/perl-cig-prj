@@ -38,6 +38,9 @@ $(document).ready(function(){
                 if(!$(this).hasClass("active")){
                     $(this).addClass("active");
                     $("div#transfer_type_option a#domestic").removeClass("active");
+
+                    $("div#itc_selection").slideToggle("fast");
+                    $("div#peoplelookup_form").slideToggle("fast");
                 }
 
                 break;
@@ -45,12 +48,13 @@ $(document).ready(function(){
                 if(!$(this).hasClass("active")){
                     $(this).addClass("active");
                     $("div#transfer_type_option a#international").removeClass("active");
-              }
+
+                    $("div#itc_selection").slideToggle("fast");
+                    $("div#peoplelookup_form").slideToggle("fast");
+                }
               break;
         }
 
-        $("div#itc_selection").slideToggle("fast");
-        $("div#peoplelookup_form").slideToggle("fast");
     });
 
     //here we remove the col-md-10 class used on the generic forms

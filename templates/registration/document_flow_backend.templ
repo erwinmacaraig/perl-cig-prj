@@ -12,7 +12,10 @@
 <div class="sectionheader">Required Documents</div> 
 
 [% FOREACH doc IN documents %] 
-<p> [% doc.Name %] </p> 
+<p> <strong> Title: </strong> [% doc.Name %] </p> 
+[% IF doc.Description != '' %]
+<p> <strong>Description: </strong> [% doc.Description %] </p>
+[% END %]
 <form action="[% target %]" method="POST" class="dropzone" enctype="multipart/form-data">
 <input type="hidden" name="client" value="[% client %]" />
 <input type="hidden" name="rID" value="[% regoID %]" />
