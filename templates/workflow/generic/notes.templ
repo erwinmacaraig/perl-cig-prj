@@ -2,14 +2,16 @@
     <div class="payment-detail">
         <!--<div class = "sectionheader">[% Lang.txt('Task Notes') %]&nbsp;&nbsp;</div>-->
         <div class="member-details">
-            <table style="width: 100%">
-                <tr>
+            <table class="table" style="width: 100%">
+                <thead>
+                    <tr>
                     <th>Type</th>
                     <th>Notes</th>
                     <th>Date/Time Rejected</th>
                     <th>Resolution Notes</th>
                     <th>Date/Time Resolved</th>
                 </tr>
+                </thead>
                 <!-- loop here; -->
                 [% FOREACH note IN TaskNotes %]
                 <tr>
