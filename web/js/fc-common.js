@@ -62,4 +62,23 @@ $(document).ready(function(){
     $("table.products-table").next("fieldset").find("div.txtright").removeClass("col-md-10");
     
     $(".document-upload").insertAfter($("fieldset").first());
+     
+     $(document).on("change", "input.paytxn_chk", function(){
+        if(this.checked){
+          $('#payment_manual').show();
+          $('#payment_cc').show();
+        } else {
+          $('#payment_manual').hide();
+          $('#payment_cc').hide();
+        }
+     })
+
+     $("#btn-manualpay").click(function() {
+            if($('#paymentType').val() == '') {
+                alert("You Must Provide A Payment Type");
+                return false;
+            }
+     });
+
+     
 })

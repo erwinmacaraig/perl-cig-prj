@@ -955,6 +955,7 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
         $body .= qq[
             <div id="payment_manual" style= "display:block;">
                 $orstring
+
                 <script type="text/javascript">
                     \$(function() {
                         \$(".paytxn_chk").on('change',function() {
@@ -969,6 +970,7 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
                         });
                     });
                 </script>			  
+
         ];
 
         $body .= qq[
