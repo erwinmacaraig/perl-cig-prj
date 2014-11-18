@@ -31,6 +31,7 @@ sub getRegistrationItems    {
             RI.intUseExistingAnyEntity,
             D.strDocumentName,
             D.strDocumentFor,
+			D.strDescription,
             P.strName as strProductName
         FROM
             tblRegistrationItem as RI
@@ -53,7 +54,7 @@ sub getRegistrationItems    {
         AND (RI.strISOCountry_IN ='' OR RI.strISOCountry_IN IS NULL OR RI.strISOCountry_IN LIKE CONCAT('%|',?,'|%'))
         AND (RI.strISOCountry_NOTIN ='' OR RI.strISOCountry_NOTIN IS NULL OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))        
       ]; 
-    #print FH "getRegistrationItems Sport Query: \n" . $st ."\n" ;    
+
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
     $q->execute(
 	        $Data->{'Realm'}, 
@@ -103,7 +104,8 @@ sub getRegistrationItems    {
         $Item{'UseExistingThisEntity'} = $dref->{'intUseExistingThisEntity'} || 0;
         $Item{'UseExistingAnyEntity'} = $dref->{'intUseExistingAnyEntity'} || 0;
         $Item{'Required'} = $dref->{'intRequired'} || 0;
-        $Item{'DocumentFor'} = $dref->{'strDocumentFor'} || 0;
+        $Item{'DocumentFor'} = $dref->{'strDocumentFor'} || 0;	
+		$Item{'Description'} = $dref->{'strDescription'} || '';
         if ($itemType eq 'DOCUMENT') {
             $Item{'Name'} = $dref->{'strDocumentName'};
         }
