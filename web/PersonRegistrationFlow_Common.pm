@@ -630,14 +630,22 @@ sub bulkRegoSubmit {
         );
         $totalAmount = $totalAmount + $amount;
         push @total_txns_added, @{$txns_added};
-        if ($paymentType and $markPaid)  {
-            my %Settings=();
-            $Settings{'paymentType'} = $paymentType;
-            my $logID = createTransLog($Data, \%Settings, $bulk_ref->{'entityID'},$txns_added, $amount); 
-            UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $logID);
-            product_apply_transaction($Data,$logID);
-        }
+        ## Below was for each to have their own tblTransLog
+        #if ($paymentType and $markPaid)  {
+        #    my %Settings=();
+        #    $Settings{'paymentType'} = $paymentType;
+        #    my $logID = createTransLog($Data, \%Settings, $bulk_ref->{'entityID'},$txns_added, $amount); 
+        #    UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $logID);
+        #    product_apply_transaction($Data,$logID);
+        #}
           savePlayerPassport($Data, $pID);
+    }
+    if (scalar(@total_txns_added) and $paymentType and $markPaid)  {
+        my %Settings=();
+        $Settings{'paymentType'} = $paymentType;
+        my $logID = createTransLog($Data, \%Settings, $bulk_ref->{'entityID'},\@total_txns_added, $totalAmount);
+        UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $logID);
+        product_apply_transaction($Data,$logID);
     }
     my $txnIds = join(':',@total_txns_added);
     
