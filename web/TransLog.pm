@@ -948,20 +948,6 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
         $body .= qq[
             <div id="payment_manual" style= "display:none;">
                 $orstring
-                <script type="text/javascript">
-                    $(function() {
-                        $(".paytxn_chk").live('change',function() {
-                            $('#payment_manual').show();
-                            $('#payment_cc').show();
-                        });
-                        $("#btn-manualpay").click(function() {
-                                if($('#paymentType').val() == '') {
-                                    alert("You Must Provide A Payment Type");
-                                    return false;
-                                }
-                        });
-                    });
-                </script>			  
         ];
 
         $body .= qq[
