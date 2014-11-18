@@ -566,6 +566,7 @@ sub getTransList {
       t.curAmount, 
       t.intTransLogID, 
       t.intID, 
+	  i.strInvoiceNumber,
       intQty, 
       t.dtStart AS dtStart_RAW, 
       DATE_FORMAT(t.dtStart, '%d/%m/%Y') AS dtStart, 
@@ -579,6 +580,7 @@ sub getTransList {
     FROM 
       tblTransactions as t
       INNER JOIN tblProducts as P ON (P.intProductID = t.intProductID)
+	  INNER JOIN tblInvoice as i ON t.intInvoiceID = i.intInvoiceID
       LEFT JOIN tblTransLog as tl ON (t.intTransLogID = tl.intLogID)
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (
             PR.intPersonRegistrationID = t.intPersonRegistrationID
@@ -599,7 +601,9 @@ sub getTransList {
     my $client = setClient($Data->{clientValues});
     my @Columns = ();
     push (@Columns, {Name => '', Field => 'SelectLink', type => 'Selector', hide => $displayonly});
-    push (@Columns, {Name => 'Invoice Number', Field => 'intTransactionID', width => 20});
+	####
+    push (@Columns, {Name => 'Invoice Number', Field => 'strInvoiceNumber', width => 20});
+	###
     push (@Columns, {Name => 'Item Name', Field => 'strName'});
     push (@Columns, {Name => 'Quantity', Field => 'intQty', width => 15});
     push (@Columns, {Name => 'Current Amount', Field => 'curAmount', width =>20});
@@ -681,11 +685,14 @@ sub getTransList {
     } 
    # $row_data->{TotalAmount} = $row->{intQty} * $row->{curAmount};
    # $row_data->{curAmount} =$row_data->{TotalAmount};    
-    if($row->{'dblTaxRate'}){
+
+
+
+    #if($row->{'dblTaxRate'}){
         my $temppricerate = 1 + $row->{'dblTaxRate'}; 
         $row_data->{'NetAmount'} = sprintf( "%.2f",($row->{curAmount} / $temppricerate));
         $row_data->{'TaxTotal'} =sprintf("%.2f",($row->{'dblTaxRate'} * $row_data->{'NetAmount'}));  
-    }     
+    #}     
 
 
     push @rowdata, $row_data if $row_data;
@@ -889,7 +896,7 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
 	    my $paymentType = $Data->{params}{paymentType} || 0;
         my (undef, $paymentTypes) = getPaymentSettings($Data, $paymentType, 0, $tempClientValues_ref);
     
-        my $CC_body = qq[<div id = "payment_cc" style= "display:none;"><br>];
+        my $CC_body = qq[<div id = "payment_cc" style= "display:block;"><br>];
         my $gatewayCount = 0;
         foreach my $gateway (@{$paymentTypes})  {
             $gatewayCount++;
@@ -946,16 +953,16 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
 		 $orstring = qq[&nbsp; <b>].$lang->txt('OR').qq[</b> &nbsp;] if $CC_body and $allowMP;
 		 if($paymentType==0){ $paymentType='';}
         $body .= qq[
-            <div id="payment_manual" style= "display:none;">
+            <div id="payment_manual" style= "display:block;">
                 $orstring
                 <script type="text/javascript">
-                    $(function() {
-                        $(".paytxn_chk").live('change',function() {
-                            $('#payment_manual').show();
-                            $('#payment_cc').show();
+                    \$(function() {
+                        \$(".paytxn_chk").on('change',function() {
+                            \$('#payment_manual').show();
+                            \$('#payment_cc').show();
                         });
-                        $("#btn-manualpay").click(function() {
-                                if($('#paymentType').val() == '') {
+                        \$("#btn-manualpay").click(function() {
+                                if(\$('#paymentType').val() == '') {
                                     alert("You Must Provide A Payment Type");
                                     return false;
                                 }
@@ -1362,14 +1369,15 @@ sub viewTransLog	{
 	];
         
 
-        print ERRORFILE "TransLog::viewTransLog\n $st";
+        
 	my $qry = $db->prepare($st);
   	$qry->execute;
 	my $TLref = $qry->fetchrow_hashref();
 
 	my $st_trans = qq[
-		SELECT M.strLocalSurname, M.strLocalFirstName, E.*, P.strName, P.strGroup, E.strLocalName as EntityName, T.intQty, T.curAmount, T.intTableType, T.intStatus
+		SELECT M.strLocalSurname, M.strLocalFirstName, E.*, P.strName, P.strGroup, E.strLocalName as EntityName, T.intQty, T.curAmount, T.intTableType, I.strInvoiceNumber, T.intStatus
 		FROM tblTransactions as T
+			INNER JOIN tblInvoice I on I.intInvoiceID = T.intInvoiceID
 			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
 			LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
 			LEFT JOIN tblEntity as E ON (E.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
@@ -1378,8 +1386,7 @@ sub viewTransLog	{
 	];
 	
 	
-	# create a filehandle 
-	print ERRORFILE "TransLog::viewTransLog == For dispaying table \n" . $st_trans . "\n"; 
+	
 	
 	my $qry_trans = $db->prepare($st_trans);
   	$qry_trans->execute;
@@ -1534,12 +1541,13 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
         $paymentFor = qq[$dref->{EntityName}] if ($dref->{intTableType} == $Defs::LEVEL_CLUB);
 		my $productname = $dref->{strName};
 		$productname = qq[$dref->{strGroup}-].$productname if ($dref->{strGroup});
+		# 	Payments::TXNtoInvoiceNum($dref->{intTransactionID})	
 		$body .= qq[
 			<tr>
-				<td>].Payments::TXNtoInvoiceNum($dref->{intTransactionID}).qq[</a></td>
-				<td>$productname</a></td>
-				<td>$paymentFor</a></td>
-				<td>$dref->{intQty}</a></td>
+				<td>$dref->{'strInvoiceNumber'}</td>
+				<td>$productname</td>
+				<td>$paymentFor</td>
+				<td>$dref->{intQty}</td>
 				<td>$dollarSymbol $dref->{curAmount}</td>
 				<td>$Defs::TransactionStatus{$dref->{intStatus}}</td>
 			</tr>
@@ -1761,8 +1769,8 @@ sub listTransLog	{
 			id => $dref->{'intLogID'},
 			intLogID => $dref->{'intLogID'},
 			paymentType => $dref->{'paymentType'},
-                	intAmount => $dref->{'intAmount'}, 		
-                        status => $dref->{'status'},
+           	intAmount => $dref->{'intAmount'}, 		
+            status => $dref->{'status'},
 			strResponseCode => $dref->{'strResponseCode'},
 			dtLog => $dref->{'dtLog'},
 			dtLog_RAW => $dref->{'dtLog_RAW'},
