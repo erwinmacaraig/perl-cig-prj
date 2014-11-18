@@ -1,10 +1,12 @@
 [% IF Notifications.size %]
-    <div class="notificationmsg">
-        <ul>
-        [% FOREACH message IN Notifications %]
-            <li>[% message.value %]</li>
-        [% END %]
-        </ul>
+    <div class="col-md-9">
+        <div class="alert alert-info" role="alert">
+            <ul>
+            [% FOREACH message IN Notifications %]
+                <li>[% message.value %]</li>
+            [% END %]
+            </ul>
+        </div>
     </div>
 [% END %]
 

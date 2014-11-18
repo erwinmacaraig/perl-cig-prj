@@ -27,6 +27,7 @@ use Data::Dumper;
 
 use EntityFields;
 use FacilityFlow;
+use PersonLanguages;
 
 sub handleVenues    {
     my ($action, $Data, $parentID, $typeID)=@_;
@@ -117,6 +118,45 @@ sub venue_details   {
     	}
     	$Mcountriesonly{$c} = $c;
     }    
+
+
+     my $languages = getPersonLanguages( $Data, 1, 0);
+    my %languageOptions = ();
+    my $nonLatin = 0;
+    my @nonLatinLanguages =();
+    for my $l ( @{$languages} ) {
+        $languageOptions{$l->{'intLanguageID'}} = $l->{'language'} || next;
+        if($l->{'intNonLatin'}) {
+            $nonLatin = 1 ;
+            push @nonLatinLanguages, $l->{'intLanguageID'};
+        }
+    }
+    my $nonlatinscript = '';
+    if($nonLatin)   {
+        my $vals = join(',',@nonLatinLanguages);
+        $nonlatinscript =   qq[
+           <script>
+                jQuery(document).ready(function()  {
+                    jQuery('#l_row_strLatinName').hide();
+                    jQuery('#l_row_strLatinShortName').hide();
+                    jQuery('#l_intLocalLanguage').change(function()   {
+                        var lang = parseInt(jQuery('#l_intLocalLanguage').val());
+                        nonlatinvals = [$vals];
+                        if(nonlatinvals.indexOf(lang) !== -1 )  {
+                            jQuery('#l_row_strLatinName').show();
+                            jQuery('#l_row_strLatinShortName').show();
+                        }
+                        else    {
+                            jQuery('#l_row_strLatinName').hide();
+                            jQuery('#l_row_strLatinShortName').hide();
+                        }
+                    });
+                });
+            </script>
+
+        ];
+    }
+        
     #################################################################
     my %FieldDefinitions = (
     fields=>  {
@@ -130,7 +170,7 @@ sub venue_details   {
         sectionname => 'details',
       },
       strLocalName => {
-        label => 'Name',
+        label => 'Venue Name',
         value => $field->{strLocalName},
         type  => 'text',
         size  => '40',
@@ -139,16 +179,25 @@ sub venue_details   {
         compulsory => 1,
       },
       strLocalShortName => {
-        label => 'Short Name',
+        label => 'Venue Short Name',
         value => $field->{strLocalShortName},
         type  => 'text',
         size  => '30',
         maxsize => '50',
         sectionname => 'details',
         compulsory => 1,
+      },
+       intLocalLanguage => {
+          label       => 'Language the name is written in',
+          type        => 'lookup',
+          value       => $field->{intLocalLanguage},
+          options     => \%languageOptions,
+          firstoption => [ '', 'Select Language' ],
+          compulsory => 1,
+          posttext => $nonlatinscript,
       },      
       strLatinName => {
-        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'Name (Latin)' : '',
+        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'International Venue Name' : '',
         value => $field->{strLatinName},
         type  => 'text',
         size  => '40',
@@ -156,7 +205,7 @@ sub venue_details   {
         sectionname => 'details',
       },
       strLatinShortName => {
-        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'Short Name (Latin)' : '',
+        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'International Venue Short Name' : '',
         value => $field->{strLatinShortName},
         type  => 'text',
         size  => '30',
@@ -175,10 +224,43 @@ sub venue_details   {
       },
       
       strAddress => {
-        label => 'Address',
+        label => 'Address 1',
         value => $field->{strAddress},
         type  => 'text',
         size  => '40',
+        maxsize => '50',
+        sectionname => 'details',
+      },
+      strAddress2 => {
+        label => 'Address 2',
+        value => $field->{strAddress2},
+        type  => 'text',
+        size  => '40',
+        maxsize => '50',
+        sectionname => 'details',
+      },
+ 
+      strContactCity=> {
+        label => 'City of Address',
+        value => $field->{strContactCity},
+        type  => 'text',
+        size  => '30',
+        maxsize => '50',
+        sectionname => 'details',
+      },
+      strCity=> {
+        label => 'City',
+        value => $field->{strCity},
+        type  => 'text',
+        size  => '30',
+        maxsize => '50',
+        sectionname => 'details',
+      },
+      strState => {
+        label => 'State',
+        value => $field->{strState},
+        type  => 'text',
+        size  => '30',
         maxsize => '50',
         sectionname => 'details',
       },
@@ -199,15 +281,23 @@ sub venue_details   {
         sectionname => 'details',
       },      
       strISOCountry => {
-        label => 'Country (ISO)',
+        label => 'Country',
         value =>  $field->{strISOCountry} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
         type  => 'lookup',
         options     => \%Mcountriesonly,
         firstoption => [ '', 'Select Country' ],
         sectionname => 'details',
       },
+      strContactISOCountry => {
+        label => 'Country of Address',
+        value =>  $field->{strContactISOCountry} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
+        type  => 'lookup',
+        options     => \%Mcountriesonly,
+        firstoption => [ '', 'Select Country' ],
+        sectionname => 'details',
+      },
       strPostalCode => {
-        label => 'Postal Code',
+        label => 'Postcode',
         value => $field->{strPostalCode},
         type  => 'text',
         size  => '15',
@@ -215,7 +305,7 @@ sub venue_details   {
         sectionname => 'details',
       },
       strPhone => {
-        label => 'Phone',
+        label => 'Contact Phone',
         value => $field->{strPhone},
         type  => 'text',
         size  => '20',
@@ -223,7 +313,7 @@ sub venue_details   {
         sectionname => 'details',
       },
       strFax => {
-        label => 'Fax',
+        label => 'Facsimile Number',
         value => $field->{strFax},
         type  => 'text',
         size  => '20',
@@ -231,7 +321,7 @@ sub venue_details   {
         sectionname => 'details',
       },
       strEmail => {
-        label => 'Email',
+        label => 'Contact Email',
         value => $field->{strEmail},
         type  => 'text',
         size  => '35',
@@ -240,13 +330,21 @@ sub venue_details   {
         sectionname => 'details',
       },
       strWebURL => {
-        label => 'Web',
+        label => 'Web Address',
         value => $field->{strWebURL},
         type  => 'text',
         size  => '35',
         maxsize => '250',
         sectionname => 'details',
       },
+      strContact=> {
+        label => 'Contact Person',
+        value => $field->{strContact},
+        type  => 'text',
+        size  => '30',
+        maxsize => '50',
+        sectionname => 'details',
+      },      
       strDescription => {
         label => 'Description',
         value => $field->{strDescription},
@@ -254,6 +352,22 @@ sub venue_details   {
         rows => '10',
         cols => '40',
         sectionname => 'details',
+      },
+        dtFrom => {
+        label       => 'Foundation Date',
+        value       => $field->{dtFrom},
+        type        => 'date',
+        datetype    => 'dropdown',
+        format      => 'dd/mm/yyyy',
+        validate    => 'DATE',
+      },
+      dtTo => {
+        label       => 'Dissolution Date',
+        value       => $field->{dtTo},
+        type        => 'date',
+        datetype    => 'dropdown',
+        format      => 'dd/mm/yyyy',
+        validate    => 'DATE',
       },
       SP1  => {
         type =>'_SPACE_',
@@ -314,7 +428,7 @@ sub venue_details   {
         sectionname => 'details',
       },
       strGroundNature => {
-        label => 'Ground Nature',
+        label => 'Type of Field',
         value => $field->{strGroundNature},
         type  => 'text',
         size  => '30',
@@ -378,28 +492,26 @@ sub venue_details   {
         strFIFAID
         strLocalName
         strLocalShortName
+        intLocalLanguage
         strLatinName
         strLatinShortName
+        strCity
+        strRegion
+        strISOCountry
         strStatus
         dtFrom
         dtTo
-        strISOCountry
-        strRegion
-        strPostalCode
-        strTown
         strAddress
+        strAddress2
+        strContactCity
+        strState
+        strContactISOCountry
+        strPostalCode
         strWebURL
         strEmail
         strPhone
+        strContact
         strFax
-        intCapacity
-        intCoveredSeats
-        intUncoveredSeats
-        intCoveredStandingPlaces
-        intUncoveredStandingPlaces
-        intLightCapacity
-        strGroundNature
-        strDiscipline
         strMapRef
         intMapNumber
         mapdesc
@@ -575,20 +687,24 @@ sub loadVenueDetails {
       strLatinName,
       strLatinShortName,
       strLatinFacilityName,
+        intLocalLanguage,
       dtFrom,
       dtTo,
       strISOCountry,
+      strContactISOCountry,
+      strContact,
+     strCity,
+     strContactCity,
       strRegion,
       strPostalCode,
       strTown,
+      strState,
       strAddress,
+      strAddress2,
       strWebURL,
       strEmail,
       strPhone,
       strFax,
-      strContactTitle,
-      strContactEmail,
-      strContactPhone,
       dtAdded,
       tTimeStamp,
       intCapacity,

@@ -381,6 +381,13 @@ sub setupValues {
                     size        => '50',
                     maxsize     => '100',
                 },
+                strContact=> {
+                    label       => $FieldLabels->{'strContact'},
+                    value       => $values->{'strContact'},
+                    type        => 'text',
+                    size        => '50',
+                    maxsize     => '100',
+                },
                 strEmail => {
                     label       => $FieldLabels->{'strEmail'},
                     value       => $values->{'strEmail'},
@@ -398,6 +405,7 @@ sub setupValues {
                 strContactISOCountry
                 strPhone
                 strEmail
+                strContact
             )],
             #fieldtransform => {
                 #textcase => {

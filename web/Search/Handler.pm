@@ -45,7 +45,6 @@ sub handle {
 	my %params = $searchObj->{'_cgi'}->Vars();
 	my %SearchData = ();
 
-        print STDERR Dumper "RENDER " . $render;
     if($render){
         if($params{'submit'} eq 'Search') {
             $searchObj->setKeyword($params{'search_keyword'});

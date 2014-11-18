@@ -319,7 +319,7 @@ print STDERR "SSSS$action $clubID\n";
           noadd         => 1,
      },
       strContact => {
-        label => '',
+        label => 'Contact Person',
         value => $field->{strContact},
         type  => 'text',
         size  => '30',
@@ -332,22 +332,7 @@ print STDERR "SSSS$action $clubID\n";
         size  => '30',
         maxsize => '50',
       },
-      strContactEmail => {
-        label => '',
-        value => $field->{strContactEmail},
-        type  => 'text',
-        size  => '30',
-        maxsize => '250',
-        validate => 'EMAIL',
-      },
-      strContactPhone => {
-        label => '',
-        value => $field->{strContactPhone},
-        type  => 'text',
-        size  => '30',
-        maxsize => '50',
-      },
-
+        
       strAddress => {
         label => 'Address 1',
         value => $field->{strAddress},
@@ -364,9 +349,41 @@ print STDERR "SSSS$action $clubID\n";
         maxsize => '50',
         compulsory => 1,
       },
+      strContactISOCountry => {
+          label       => 'Country of Address',
+          value       => $field->{strContactISOCountry} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
+          type        => 'lookup',
+          options     => \%Mcountriesonly,
+          firstoption => [ '', 'Select Country' ],
+        compulsory => 1,
+      },
+      strContactCity=> {
+        label => 'City',
+        value => $field->{strContactCity},
+        type  => 'text',
+        size  => '40',
+        maxsize => '50',
+        compulsory => 1,
+      },
 
-      strTown => {
+      strCity=> {
         label => 'City of Organisation',
+        value => $field->{strCity},
+        type  => 'text',
+        size  => '40',
+        maxsize => '50',
+        compulsory => 1,
+      },
+      strState => {
+        label => 'State of Organisation',
+        value => $field->{strState},
+        type  => 'text',
+        size  => '30',
+        maxsize => '50',
+        compulsory => 1,
+      },
+      strTown => {
+        label => 'Town of Organisation',
         value => $field->{strTown},
         type  => 'text',
         size  => '30',
@@ -381,7 +398,7 @@ print STDERR "SSSS$action $clubID\n";
         maxsize => '50',
       },
       strISOCountry => {
-          label       => 'Country of Address',
+          label       => 'Country of Organisation',
           value       => $field->{strISOCountry} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
           type        => 'lookup',
           options     => \%Mcountriesonly,
@@ -479,6 +496,10 @@ print STDERR "SSSS$action $clubID\n";
         strLocalShortName
         strLatinName
         strLatinShortName
+        strCity
+        strRegion
+        strState
+        strISOCountry
         strMAID
         dtFrom
         dtTo
@@ -490,17 +511,16 @@ print STDERR "SSSS$action $clubID\n";
         intLegalTypeID
         strLegalID
         intLocalLanguage
-        strRegion
-        strPostalCode
-        strTown
         strAddress
         strAddress2
-        strISOCountry
+        strContactCity
+        strContactISOCountry
+        strPostalCode
         strWebURL
         strEmail
         strPhone
+        strContact
         strFax
-        strContactEmail
         strMANotes
         clubcharacteristics
         intNotifications
@@ -628,20 +648,23 @@ sub loadClubDetails {
      strLatinShortName,
      strLatinFacilityName,
      strISOCountry,
+    strContactISOCountry,
+      strContact,
+     strContactCity,
      intLocalLanguage,
      strRegion,
      strPostalCode,
      strTown,
+    strState,
+        strCity,
      strAddress,
+     strAddress2,
      strWebURL,
      strEmail,
      strPhone,
      strFax,
      strAssocNature,
      strMANotes,
-     strContactTitle,
-     strContactEmail,
-     strContactPhone,
      dtAdded,
      strShortNotes,
      tTimeStamp,

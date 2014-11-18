@@ -14,7 +14,7 @@ sub process {
     my ($raw) = @_;
 
     $raw ||= 0;
-    $self->setGridTemplate('search/grid/people.templ');
+    $self->setGridTemplate('search/grid/people.templ') if !$self->getGridTemplate();
 
     my $searchType = $self->getSearchType() || 'default';
     #set filters here based on search type
@@ -140,6 +140,9 @@ sub getUnique {
     else {
         return $self->displayResultGrid(\@memarray);
     }
+}
+
+sub getForTransfer {
 }
 
 sub getRegistration {

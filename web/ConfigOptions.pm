@@ -324,7 +324,7 @@ sub getFieldsList	{
         strLatinSurname
         strMaidenName
         dtDOB
-        strPlaceofBirth
+        strPlaceOfBirth
         strCountryOfBirth
         strMotherCountry
         strFatherCountry
@@ -386,7 +386,7 @@ sub getFieldsList	{
         dtBirthCertValidityDateFrom
         dtBirthCertValidityDateTo
         strBirthCertDesc
-        trOtherPersonIdentifier
+        strOtherPersonIdentifier
         strOtherPersonIdentifierIssueCountry
         dtOtherPersonIdentifierValidDateFrom
         dtOtherPersonIdentifierValidDateTo
@@ -453,13 +453,17 @@ sub getFieldsList	{
         strLatinName
         strLatinShortName
         strStatus
+        strCity
+        strRegion
         strISOCountry
         intLocalLanguage
 		strGender
-        strRegion
-        strPostalCode
-        strTown
         strAddress
+        strAddress2
+        strContactCity
+        strState
+        strPostalCode
+        strContactISOCountry
         strWebURL
         strEmail
         strPhone
