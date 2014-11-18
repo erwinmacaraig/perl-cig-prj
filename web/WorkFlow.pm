@@ -170,7 +170,6 @@ sub handleWorkflow {
         switch($type) {
             case "$Defs::WF_TASK_ACTION_RESOLVE" {
                 resolveTask($Data, $emailNotification);
-                $query->redirect("$Defs::base_url");
                 print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_");
             }
             case "$Defs::WF_TASK_ACTION_REJECT" {
