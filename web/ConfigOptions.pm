@@ -458,10 +458,10 @@ sub getFieldsList	{
         strISOCountry
         intLocalLanguage
 		strGender
-        strTown
         strAddress
         strAddress2
         strContactCity
+        strState
         strPostalCode
         strContactISOCountry
         strWebURL

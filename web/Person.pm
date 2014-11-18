@@ -64,6 +64,7 @@ use WorkFlow;
 use TTTemplate;
 use PersonRequest;
 use BulkPersons;
+use PersonLanguages;
 
 
 sub handlePerson {
@@ -795,6 +796,44 @@ sub person_details {
        #readonly      => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
 
 
+      my $languages = getPersonLanguages( $Data, 1, 0);
+    my %languageOptions = ();
+    my $nonLatin = 0;
+    my @nonLatinLanguages =();
+    for my $l ( @{$languages} ) {
+        $languageOptions{$l->{'intLanguageID'}} = $l->{'language'} || next;
+        if($l->{'intNonLatin'}) {
+            $nonLatin = 1 ;
+            push @nonLatinLanguages, $l->{'intLanguageID'};
+        }
+    }
+    my $nonlatinscript = '';
+    if($nonLatin)   {
+        my $vals = join(',',@nonLatinLanguages);
+        $nonlatinscript =   qq[
+           <script>
+                jQuery(document).ready(function()  {
+                    jQuery('#l_row_strLatinFirstname').hide();
+                    jQuery('#l_row_strLatinSurname').hide();
+                    jQuery('#l_intLocalLanguage').change(function()   {
+                        var lang = parseInt(jQuery('#l_intLocalLanguage').val());
+                        nonlatinvals = [$vals];
+                        if(nonlatinvals.indexOf(lang) !== -1 )  {
+                            jQuery('#l_row_strLatinFirstname').show();
+                            jQuery('#l_row_strLatinSurname').show();
+                        }
+                        else    {
+                            jQuery('#l_row_strLatinFirstname').hide();
+                            jQuery('#l_row_strLatinSurname').hide();
+                        }
+                    });
+                });
+            </script>
+
+        ];
+    }
+
+
     my %FieldDefinitions = (
         fields => {
             strFIFAID => {
@@ -848,6 +887,14 @@ sub person_details {
                 maxsize     => '50',
                 sectionname => 'details',
                 first_page  => 1,
+            },
+            intLocalLanguage=> {
+                label       => $FieldLabels->{'intLocalLanguage'},
+                value       => $field->{intLocalLanguage},
+                type        => 'lookup',
+                options     => \%languageOptions,
+                sectionname => 'other',
+                firstoption => [ '', 'Select Language' ],
             },
             strLatinFirstname => {
                 label       => $Data->{'SystemConfig'}{'person_strLatinNames'} ? $FieldLabels->{'strLatinFirstname'} : '' ,
@@ -1266,7 +1313,7 @@ sub person_details {
 
         },
         order => [
-        qw(strNationalNum strPersonNo strStatus strLocalFirstname  strLocalSurname strISONationality strISOCountry dtDOB intGender strLatinFirstname strLatinSurname strPreferredName strRegionOfBirth strPlaceOfBirth strISOCountryOfBirth strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneMobile strEmail SPcontact intDeceased strPreferredLang strEmergContName strEmergContNo strEmergContNo2 
+        qw(strNationalNum strPersonNo strStatus strLocalFirstname  strLocalSurname strMaidenName intLocalLanguage strISONationality strISOCountry dtDOB intGender strLatinFirstname strLatinSurname strPreferredName strRegionOfBirth strPlaceOfBirth strISOCountryOfBirth strAddress1 strAddress2 strSuburb strState strPostalCode strCountry strPhoneHome strPhoneMobile strEmail SPcontact intDeceased strPreferredLang strEmergContName strEmergContNo strEmergContNo2 
             strBirthCert 
             strBirthCertCountry 
             dtBirthCertValidityDateFrom

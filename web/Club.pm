@@ -374,6 +374,14 @@ print STDERR "SSSS$action $clubID\n";
         maxsize => '50',
         compulsory => 1,
       },
+      strState => {
+        label => 'State of Organisation',
+        value => $field->{strState},
+        type  => 'text',
+        size  => '30',
+        maxsize => '50',
+        compulsory => 1,
+      },
       strTown => {
         label => 'Town of Organisation',
         value => $field->{strTown},
@@ -490,7 +498,7 @@ print STDERR "SSSS$action $clubID\n";
         strLatinShortName
         strCity
         strRegion
-        strTown
+        strState
         strISOCountry
         strMAID
         dtFrom
@@ -647,6 +655,7 @@ sub loadClubDetails {
      strRegion,
      strPostalCode,
      strTown,
+    strState,
         strCity,
      strAddress,
      strAddress2,

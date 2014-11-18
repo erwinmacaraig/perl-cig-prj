@@ -27,6 +27,7 @@ use Data::Dumper;
 
 use EntityFields;
 use FacilityFlow;
+use PersonLanguages;
 
 sub handleVenues    {
     my ($action, $Data, $parentID, $typeID)=@_;
@@ -117,6 +118,45 @@ sub venue_details   {
     	}
     	$Mcountriesonly{$c} = $c;
     }    
+
+
+     my $languages = getPersonLanguages( $Data, 1, 0);
+    my %languageOptions = ();
+    my $nonLatin = 0;
+    my @nonLatinLanguages =();
+    for my $l ( @{$languages} ) {
+        $languageOptions{$l->{'intLanguageID'}} = $l->{'language'} || next;
+        if($l->{'intNonLatin'}) {
+            $nonLatin = 1 ;
+            push @nonLatinLanguages, $l->{'intLanguageID'};
+        }
+    }
+    my $nonlatinscript = '';
+    if($nonLatin)   {
+        my $vals = join(',',@nonLatinLanguages);
+        $nonlatinscript =   qq[
+           <script>
+                jQuery(document).ready(function()  {
+                    jQuery('#l_row_strLatinName').hide();
+                    jQuery('#l_row_strLatinShortName').hide();
+                    jQuery('#l_intLocalLanguage').change(function()   {
+                        var lang = parseInt(jQuery('#l_intLocalLanguage').val());
+                        nonlatinvals = [$vals];
+                        if(nonlatinvals.indexOf(lang) !== -1 )  {
+                            jQuery('#l_row_strLatinName').show();
+                            jQuery('#l_row_strLatinShortName').show();
+                        }
+                        else    {
+                            jQuery('#l_row_strLatinName').hide();
+                            jQuery('#l_row_strLatinShortName').hide();
+                        }
+                    });
+                });
+            </script>
+
+        ];
+    }
+        
     #################################################################
     my %FieldDefinitions = (
     fields=>  {
@@ -146,6 +186,15 @@ sub venue_details   {
         maxsize => '50',
         sectionname => 'details',
         compulsory => 1,
+      },
+       intLocalLanguage => {
+          label       => 'Language the name is written in',
+          type        => 'lookup',
+          value       => $field->{intLocalLanguage},
+          options     => \%languageOptions,
+          firstoption => [ '', 'Select Language' ],
+          compulsory => 1,
+          posttext => $nonlatinscript,
       },      
       strLatinName => {
         label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'International Venue Name' : '',
@@ -202,6 +251,14 @@ sub venue_details   {
       strCity=> {
         label => 'City',
         value => $field->{strCity},
+        type  => 'text',
+        size  => '30',
+        maxsize => '50',
+        sectionname => 'details',
+      },
+      strState => {
+        label => 'State',
+        value => $field->{strState},
         type  => 'text',
         size  => '30',
         maxsize => '50',
@@ -435,6 +492,7 @@ sub venue_details   {
         strFIFAID
         strLocalName
         strLocalShortName
+        intLocalLanguage
         strLatinName
         strLatinShortName
         strCity
@@ -446,7 +504,7 @@ sub venue_details   {
         strAddress
         strAddress2
         strContactCity
-        strTown
+        strState
         strContactISOCountry
         strPostalCode
         strWebURL
@@ -629,6 +687,7 @@ sub loadVenueDetails {
       strLatinName,
       strLatinShortName,
       strLatinFacilityName,
+        intLocalLanguage,
       dtFrom,
       dtTo,
       strISOCountry,
@@ -639,6 +698,7 @@ sub loadVenueDetails {
       strRegion,
       strPostalCode,
       strTown,
+      strState,
       strAddress,
       strAddress2,
       strWebURL,
