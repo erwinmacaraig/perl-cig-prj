@@ -86,7 +86,17 @@
                 </div>
             </div>
             <br />
-            [% searchResultGrid %]
+            [% IF searchResultGrid %]
+                [% IF searchResultGrid.count %]
+                    [% searchResultGrid.data %]
+                [% ELSE %]
+                    <div>
+                        <div class="alert alert-warning" role="alert">
+                            No result found for keyword '[% search_keyword %]'.
+                        </div>
+                    </div>
+                [% END %]
+            [% END %]
         </div>
         <div class="col-md-3">
             <h5 class="panel-header">Transfer Summary</h5>
