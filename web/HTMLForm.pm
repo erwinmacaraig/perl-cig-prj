@@ -329,10 +329,10 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
             my $rowcount =
               ( $sectioncount{$sname} % 2 ) ? 'HTr_odd' : 'HTr_even';
             $sections{$sname} .= qq[
-            <div id="l_row_$fieldname" class="form-group">
-            <label class="col-md-4 control-label txtright">$label</label>
-            <div class="col-md-6 value">$pretext$field_html$posttext</div>
-            </div>
+            <span id="l_row_$fieldname" class="form-group details-row">
+                <span class="details-left">$label</span>
+                <span class="details-left detail-value">$pretext$field_html$posttext</span>
+            </span>
             ];
         }
     }
@@ -357,7 +357,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 $tabs .= qq[<li><a id="a_sec$s->[0]" class="tab_links" href="#sec$s->[0]">$sectionheader</a></li>];
 
                 $returnstr .= qq~
-                <fieldset id="sec$s->[0]" class="new_tab">
+                <fieldset id="sec$s->[0]" class="new_tab member-home-page ">
                 $sh
                 $sections{$s->[0]}
                 </fieldset>
@@ -456,6 +456,8 @@ qq[<input type="hidden" name="$cf" value="$fields_ref->{'carryfields'}{$cf}">];
         $returnstr = qq[
         $validation
         <form action="$fields_ref->{'options'}{'target'}" name="$fields_ref->{'options'}{'formname'}" method="POST" $enctype id = "$fields_ref->{'options'}{'formname'}ID">
+        <h3 class="panel-header" style="margin-top: 20px;">Registration Detail</h3>
+        <div class="panel-body">
         <fieldset>
         <div class="col-md-10 txtright">
         $introtext
@@ -463,6 +465,7 @@ qq[<input type="hidden" name="$cf" value="$fields_ref->{'carryfields'}{$cf}">];
         </div>
         </fieldset>
         $returnstr
+        </div>
         <fieldset>
         <div class="col-md-10 txtright">
         $button_bottom
@@ -472,6 +475,7 @@ qq[<input type="hidden" name="$cf" value="$fields_ref->{'carryfields'}{$cf}">];
         $bottomtext
         </div>
         </fieldset>
+
         </form>
 
         <script type="text/javascript" src="js/ajax.js"></script>

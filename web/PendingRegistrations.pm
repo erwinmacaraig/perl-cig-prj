@@ -39,7 +39,7 @@ sub handlePendingRegistrations  {
 
     if ( $action eq 'PENDPR_D' ) {
         $resultHTML = personRegistrationDetail($action, $Data, $entityID, $personRegistrationID) || '';
-        $title = $lang->txt('Registration Detail');
+        #$title = $lang->txt('Registration Detail');
     }
     elsif ( $action eq 'PENDPR_')   {
         ($resultHTML , $title)= listPendingRegistrations( $Data, $entityID) ;
