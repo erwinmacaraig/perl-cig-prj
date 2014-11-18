@@ -41,6 +41,7 @@ $(document).ready(function(){
 
                     $("div#itc_selection").slideToggle("fast");
                     $("div#peoplelookup_form").slideToggle("fast");
+                    $("div#transfer_search_result").slideToggle("fast");
                 }
 
                 break;
@@ -51,6 +52,7 @@ $(document).ready(function(){
 
                     $("div#itc_selection").slideToggle("fast");
                     $("div#peoplelookup_form").slideToggle("fast");
+                    $("div#transfer_search_result").slideToggle("fast");
                 }
               break;
         }
@@ -79,6 +81,5 @@ $(document).ready(function(){
                 return false;
             }
      });
-
      
 })
