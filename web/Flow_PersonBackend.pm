@@ -1152,6 +1152,7 @@ sub display_products {
 
     my $rego_ref = {};
     my $content = '';
+print STDERR "IN PRODUCTS\n\n\n";
     if($regoID) {
         my $valid =0;
         ($valid, $rego_ref) = validateRegoID(
@@ -1165,6 +1166,7 @@ sub display_products {
 
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID);
     $personObj->load();
+
     if($regoID) {
         my $nationality = $personObj->getValue('strISONationality') || ''; 
         $rego_ref->{'Nationality'} = $nationality;
@@ -1437,6 +1439,7 @@ sub display_complete {
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
+print STDERR "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC IN FLOW_PERSON\n";
 
     my $rego_ref = {};
     my $content = '';

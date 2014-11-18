@@ -931,7 +931,7 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
       $allowMP = 0 if $Data->{'SystemConfig'}{'AssocConfig'}{'DontAllowManualPayments'};
 		  
 		$body=qq[
-			<form action="$Data->{target}" name="n_form" method="POST">
+			<form target="_pay" action="$Data->{target}" name="n_form" method="POST">
             <input type="hidden" name="a" value="P_TXNLogstep2">
             <input type="hidden" name="client" value="$client">
 	

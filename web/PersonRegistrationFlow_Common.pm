@@ -103,7 +103,8 @@ sub displayRegoFlowComplete {
          my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
          my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
          my $gateways = '';
-         if ($Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
+        my $txnCount = getPersonRegoTXN($Data, $personID, $regoID);
+         if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
             $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
          }
          
@@ -122,6 +123,26 @@ sub displayRegoFlowComplete {
         $body = runTemplate($Data, \%PageData, 'registration/complete.templ') || '';
     }
     return $body;
+}
+sub getPersonRegoTXN    {
+
+    my ($Data, $personID, $regoID) = @_;
+
+    my $st = qq[
+        SELECT COUNT(intTransactionID) as CountTXN
+        FROM tblTransactions
+        WHERE intStatus=0
+            AND curAmount>0
+            AND intRealmID =?
+            AND intID = ?
+            AND intPersonRegistrationID = ?
+            AND intPersonRegistrationID > 0
+            AND intTableType = $Defs::LEVEL_PERSON
+    ];
+	my $qry = $Data->{'db'}->prepare($st);
+	$qry->execute($Data->{'Realm'}, $personID, $regoID);
+	my $txnCount = $qry->fetchrow_array() || 0;
+    return $txnCount || 0;
 }
 
 sub displayRegoFlowCheckout {
@@ -449,7 +470,7 @@ sub generateRegoFlow_Gateways   {
         $hidden_ref->{"pt_submit[1]"} = $paymentType; 
         $hidden_ref->{"gatewayCount"} = 1;
         $hidden_ref->{"cc_submit[1]"} = 1;
-        return displayRegoFlowCheckout($Data, $hidden_ref);
+    #    return displayRegoFlowCheckout($Data, $hidden_ref);
     }
     return runTemplate($Data, \%PageData, 'registration/show_gateways.templ') || '';
 }

@@ -200,6 +200,7 @@ print STDERR "AAAAAAAA $action\n";
    ###########################################################
 
 ## FLOW SCREENS
+print STDERR "FFFFFFFFFFFFFFFFFFFFFFFFF $action\n";
     if ( $action eq 'PREGF_T' ) {
         my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_TU&amp;";
         $body = displayPersonRegisterWhat(

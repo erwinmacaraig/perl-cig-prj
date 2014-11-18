@@ -1,4 +1,4 @@
-<form action="[% target %]" method="POST">
+<form target="_pay" action="[% target %]" method="POST">
     <input type="hidden" name="a" value="[% nextaction %]">
     [% gateway_body %]
     [% FOREACH h IN  hidden_ref %]
