@@ -103,13 +103,19 @@
 
 <div class = "home_details">
   <div class = "sectionheader">[% Lang.txt('Details') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin %]<a href = "[% EditDetailsLink %]" class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
-	[% IF Details.Address or Details.Town %]
+	<div class = "details-address">
+		[% IF Details.City %][% Details.City %],&nbsp;[% END %]
+		[% IF Details.Region %][% Details.Region %],&nbsp;[% END %]
+		[% IF Details.Country %][% Details.Country %],&nbsp;[% END %]
+	</div>
+	[% IF Details.Address or Details.ContactCity %]
 	<div class = "details-address">
 		<span class = "label">[% Lang.txt('Address') %]</span><br>
 		[% IF Details.Address %][% Details.Address %]<br>[% END %]
-		[% IF Details.Town %][% Details.Town %]<br>[% END %]
-		[% IF Details.Region %][% Details.Region %],&nbsp;[% END %]
-		[% IF Details.Country %][% Details.Country %],&nbsp;[% END %]
+		[% IF Details.Address2 %][% Details.Address2 %]<br>[% END %]
+		[% IF Details.ContactCity %][% Details.ContactCity %]<br>[% END %]
+		[% IF Details.ContactState %][% Details.ContactState %],&nbsp;[% END %]
+		[% IF Details.ContactCountry %][% Details.ContactCountry %],&nbsp;[% END %]
 		[% IF Details.PostalCode %][% Details.PostalCode %][% END %]
 	</div>
 	[% END %]
