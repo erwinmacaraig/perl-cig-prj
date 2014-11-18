@@ -149,7 +149,7 @@ sub listPeople {
     $personSearchObj
         ->setRealmID($Data->{'Realm'})
         ->setSubRealmID(0)
-        ->setSearchType("unique")
+        ->setSearchType("transfer")
         ->setData($Data)
         ->setKeyword($searchKeyword)
         ->setSphinx($sphinx)
@@ -157,7 +157,13 @@ sub listPeople {
 
     my $resultGrid = $personSearchObj->process();
 
-    $TemplateData{'searchResultGrid'} = $resultGrid;
+    if(!$resultGrid){
+        $TemplateData{'searchResultGrid'}{'count'} = 0;
+    }
+    else {
+        $TemplateData{'searchResultGrid'}{'count'} = 1;
+        $TemplateData{'searchResultGrid'}{'data'} = $resultGrid;
+    }
 
     my $body = runTemplate(
         $Data,
