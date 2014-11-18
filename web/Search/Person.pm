@@ -27,7 +27,7 @@ sub process {
             #return $self->getUnique();
         }
         case 'transfer' {
-            return;
+            return $self->getTransfer($raw);
         }
         case 'access' {
             return;
@@ -57,7 +57,6 @@ sub getUnique {
     my $results = $self->getSphinx()->Query($self->getKeyword(), 'FIFA_Persons_r'.$filters->{'realm'});
     my @persons = ();
 
-    print STDERR Dumper $results;
     if($results and $results->{'total'})  {
         for my $r (@{$results->{'matches'}})  {
             push @persons, $r->{'doc'};
@@ -142,7 +141,95 @@ sub getUnique {
     }
 }
 
-sub getForTransfer {
+sub getTransfer {
+    my ($self) = shift;
+    my ($raw) = @_;
+
+    my ($intermediateNodes, $subNodes) = $self->getIntermediateNodes();
+    my $filters = $self->setupFilters($subNodes);
+
+    my $realmID = $self->getData()->{'Realm'};
+    $self->getSphinx()->ResetFilters();
+    $self->getSphinx()->SetFilter('intrealmid', [$filters->{'realm'}]);
+
+    #exclude persons that are already in the CLUB initiating the transfer
+    $self->getSphinx()->SetFilter('intentityid', [$filters->{'club'}], 1) if $filters->{'club'};
+    my $results = $self->getSphinx()->Query($self->getKeyword(), 'FIFA_Persons_r'.$filters->{'realm'});
+    my @persons = ();
+
+    if($results and $results->{'total'})  {
+        for my $r (@{$results->{'matches'}})  {
+            push @persons, $r->{'doc'};
+        }
+    }
+
+    my @memarray = ();
+    if(@persons)  {
+        my $person_list = join(',',@persons);
+
+        my $entity_list = '';
+        $entity_list = join(',', @{$subNodes});
+        warn "ENTITY LIST " . $entity_list;
+
+        my $clubID = $self->getData()->{'clientValues'}{'clubID'} || 0;
+        $clubID = 0 if $clubID == $Defs::INVALID_ID;
+
+        my $st = qq[
+            SELECT DISTINCT
+                tblPerson.intPersonID,
+                tblPerson.strLocalFirstname,
+                tblPerson.strLocalSurname,
+                tblPerson.strNationalNum,
+                tblPerson.strFIFAID,
+                tblPerson.dtDOB,
+                E.strLocalName AS EntityName,
+                E.intEntityID,
+                E.intEntityLevel
+            FROM
+            tblPerson
+            INNER JOIN tblPersonRegistration_$realmID AS PR ON (
+                tblPerson.intPersonID = PR.intPersonID
+                AND PR.strStatus IN ('ACTIVE', 'PASSIVE','PENDING')
+                AND PR.intEntityID <> $filters->{'club'}
+            )
+            INNER JOIN tblEntity AS E ON (
+                PR.intEntityID = E.intEntityID
+            )
+            WHERE tblPerson.intPersonID IN ($person_list)
+            ORDER BY 
+                strLocalSurname, 
+                strLocalFirstname
+        ];
+        my $q = $self->getData->{'db'}->prepare($st);
+        $q->execute();
+        my %origClientValues = %{$self->getData()->{'clientValues'}};
+
+        my $count = 0;
+        while(my $dref = $q->fetchrow_hashref()) {
+            $count++;
+            my $name = "$dref->{'strLocalFirstname'} $dref->{'strLocalSurname'}" || '';
+            push @memarray, {
+                id => $dref->{'intPersonID'} || next,
+                name => $name,
+                otherdetails => {
+                    dob => $dref->{'dtDOB'},
+                    dtadded => $dref->{'dtadded'},
+                    ma_id => $dref->{'strNationalNum'} || '',
+                }
+            };
+        }
+
+        if($raw){
+            return \@memarray;
+        }
+        else {
+            return $self->displayResultGrid(\@memarray) if $count;
+
+            return $count;
+        }
+
+    }
+
 }
 
 sub getRegistration {
