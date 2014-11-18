@@ -1,3 +1,5 @@
+[% USE Dumper %]
+
     [% IF transferTypeOption != '' %]
     <!--
     <span class="label">Transfer type:</span></td><td><span class="formw">[% transferTypeOption %]</span>
@@ -12,7 +14,6 @@
     [% END %]
 
     <br/>
-    <form action="main.cgi" method="POST">
     <div class="row">
         <div class="col-md-9">
             <h5 class="panel-header">Transfer Details</h5>
@@ -56,32 +57,72 @@
                     </div>
 
                     <div id="peoplelookup_form" class="col-md-12">
-                        <center>
-                            <p>
+                        <form id="personRequestForm" action="main.cgi" method="POST">
+                            <center>
+                                    <ul class="list-unstyled inline">
+                                        <li>
+                                            People lookup:
+                                        </li>
+                                        <li class="peoplelookup">
+                                            <!--<input type="text" />-->
+                                            <input type="text" name="search_keyword" value="[% search_keyword %]">
+                                        </li>
+                                    </ul>
+                            </center>
+                            <center>
                                 <ul class="list-unstyled inline">
-                                    <li>
-                                        People lookup:
+                                    <li class="lblPeoplelookup">
+                                        Enter name or Member ID 
                                     </li>
-                                    <li class="peoplelookup">
-                                        <!--<input type="text" />-->
-                                        <input type="text" name="search_keyword" value="[% search_keyword %]">
+                                    <li class="btnPeoplelookupSearch">
+                                        <!--<button class="btn btn-sm btn-primary" type="submit">Search people</button>-->
+                                        <input class="btn btn-sm btn-primary" type="submit" name="submit" value="Search people">   
+                                        <input type="hidden" value="[% action %]" name="a"> <input type="hidden" value="[% client %]" name="client">
+                                        <input type="hidden" value="[% request_type %]" name="request_type">
                                     </li>
                                 </ul>
-                            </p>
-                        </center>
-                        <center>
-                            <ul class="list-unstyled inline">
-                                <li class="lblPeoplelookup">
-                                    Enter name or Member ID 
-                                </li>
-                                <li class="btnPeoplelookupSearch">
-                                    <!--<button class="btn btn-sm btn-primary" type="submit">Search people</button>-->
-                                    <input class="btn btn-sm btn-primary" type="submit" name="submit" value="Search people">   
-                                    <input type="hidden" value="[% action %]" name="a"> <input type="hidden" value="[% client %]" name="client">
-                                    <input type="hidden" value="[% request_type %]" name="request_type">
-                                </li>
-                            </ul>
-                        </center>
+                            </center>
+                        </form>
+                    </div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div id="init_error" class="col-md-12" style="display: none">
+                        <div class="alert alert-warning" role="alert">
+                            Please select from the Registration(s) below.
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        [% IF groupResult %]
+                            <form id="personInitRequest" name="thisisatest" action="main.cgi" method="POST">
+                                <div>
+                                    [% FOREACH result IN groupResult %] 
+                                    <div>
+                                    <p>		
+                                        <div class="read-only">
+                                            <h4>[% result.key %]</h4>
+                                            <div class="read-only-text">
+                                            [% FOREACH sportOption IN result.value %]
+                                                <input id="option_[% sportOption.id %]" name="regoselected[[% sportOption.personID %]][[% sportOption.id %]]" type="checkbox"/><label for="option_[% sportOption.id %]">[% sportOption.sportLabel %]</label>
+                                                <br/>
+                                            [% END %]
+                                            </div>
+                                        </div>		
+                                    </p>
+                                    </div>
+                                    <br/>
+                                    [% END %]
+                                </div>
+
+                                <input type="hidden" value="[% action_request %]" name="a">
+                                <input type="hidden" value="[% client %]" name="client">
+                                <input type="hidden" value="[% request_type %]" name="request_type">
+                                <input type="hidden" value="[% transfer_type %]" name="transfer_type">
+                                <input type="submit" name="submit" class="btn btn-sm btn-primary" value="Send Request">   
+                            </form>
+                        [% END %]
                     </div>
                 </div>
             </div>
@@ -105,38 +146,81 @@
                     <div class="col-md-12">
                         <p>
                             <label>Member ID:</label><br />
-                            <label>&#8211;</label>
+                            <label>
+                                [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.memberID %][% ELSE %]&#8211;[% END %]
+                            </label>
                         </p>
                         <p>
                             <label>Last Name:</label><br />
-                            <label>&#8211;</label>
+                            <label>
+                                [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.lastName %][% ELSE %]&#8211;[% END %]
+                            </label>
                         </p>
                         <p>
                             <label>First Name:</label><br />
-                            <label>&#8211;</label>
+                            <label>
+                                [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.firstName %][% ELSE %]&#8211;[% END %]
+                            </label>
                         </p>
                         <p>
                             <label>Transfer to club:</label><br />
-                            <label>&#8211;</label>
+                            <label>
+                                [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.transferToClub %][% ELSE %]&#8211;[% END %]
+                            </label>
                         </p>
                         <p>
-                            <label>Current club:</label><br />
-                            <label>&#8211;</label>
+                            <label>Current club(s):</label><br />
+                            <label>
+                                [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.currentClub %][% ELSE %]&#8211;[% END %]
+                            </label>
                         </p>
                         <p>
-                            <label>Current registrations:</label><br />
-                            <label>&#8211;</label>
+                            <label>Current registration(s):</label><br />
+                            <label>
+                                [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.currentRegistrations %][% ELSE %]&#8211;[% END %]
+                            </label>
                         </p>
                         <p>
-                            <label>Current sports:</label><br />
-                            <label>&#8211;</label>
+                            <label>Current sport(s):</label><br />
+                            <label>
+                                [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.currentSports %][% ELSE %]&#8211;[% END %]
+                            </label>
                         </p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</form>
+
+<script src = "//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+<script type="text/javascript">
+    jQuery().ready(function() {
+        // validate the comment form when it is submitted
+        jQuery("form#personRequestForm").validate({
+            rules: {
+                search_keyword: {
+                    required: true
+                }
+            },
+            messages: {
+                search_keyword: "Search keyword is required."
+            }
+        });
+
+        jQuery("form#personInitRequest").submit(function(e){
+            if(jQuery(this).find("input[type=checkbox]:checked").length == 0){
+                e.preventDefault();
+                jQuery("div#init_error").slideDown();
+            }
+        });
+
+        //jQuery("form#personInitRequest").find("input[type=checkbox][name^=regoselected]").click(function(e){
+        //    var selected_option = jQuery(this).prop("id");
+        //    jQuery("form#personInitRequest textarea#comment" + selected_option).slideToggle("fast");
+        //});
+
+    });
+</script>
 
 <!--
     <br /><br />
