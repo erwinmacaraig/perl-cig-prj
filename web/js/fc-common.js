@@ -61,8 +61,9 @@ $(document).ready(function(){
 
     //here we remove the col-md-10 class used on the generic forms
     //to flush the button to the right. this is a temporary fix.
-    $("table.products-table").next("fieldset").find("div.txtright").removeClass("col-md-10");
+    //$("table.products-table").next("fieldset").find("div.txtright").removeClass("col-md-10");
     
+    //this is a temporary fix for the last two steps - documents and complete
     $(".document-upload").insertAfter($("fieldset").first());
      
      $(document).on("change", "input.paytxn_chk", function(){
