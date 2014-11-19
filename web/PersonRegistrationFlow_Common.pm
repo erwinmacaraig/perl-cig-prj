@@ -15,7 +15,7 @@ require Exporter;
     add_rego_record
     bulkRegoSubmit
     checkUploadedRegoDocuments
-    getUnpaidTXNCosts
+    getRegoTXNDetails
 );
 
 use strict;
@@ -38,12 +38,16 @@ use POSIX qw(strftime);
 use Date::Parse;
 use PlayerPassport;
 use RegoAgeRestrictions;
+use DisplayPayResult;
 
 sub displayRegoFlowCompleteBulk {
 
     my ($Data, $client, $hidden_ref) = @_;
+    my ($unpaid_cost, $logIDs) = getRegoTXNDetails($Data, $hidden_ref->{'txnIds'});
+    $hidden_ref->{'totalAmount'} = $unpaid_cost;
     my $gateways = '';
     if ($Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'} && $hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0)   {
+        
         $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
     }
     my %PageData = (
@@ -54,6 +58,12 @@ sub displayRegoFlowCompleteBulk {
     );
 
     my $body = runTemplate($Data, \%PageData, 'registration/completebulk.templ') || '';
+
+    foreach my $id (keys %{$logIDs}) {
+        next if ! $id;
+        $body .= displayPayResult($Data, $id);
+    }
+    
     return $body;
 }
 
@@ -105,7 +115,7 @@ print STDERR Dumper($hidden_ref);
          my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
          my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
          my $gateways = '';
-        my $txnCount = getPersonRegoTXN($Data, $personID, $regoID);
+        my ($txnCount, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
          if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
             $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
          }
@@ -123,28 +133,42 @@ print STDERR Dumper($hidden_ref);
         );
         
         $body = runTemplate($Data, \%PageData, 'registration/complete.templ') || '';
+        foreach my $id (keys %{$logIDs}) {
+            next if ! $id;
+            $body .= displayPayResult($Data, $id);
+        }
     }
     return $body;
 }
-sub getUnpaidTXNCosts {
+sub getRegoTXNDetails  {
 
     my ($Data, $txns) = @_;
 
     $txns =~ s/:/,/g;
 
+    return 0 if ! $txns;
     my $st = qq[
-        SELECT SUM(curAmount)
+        SELECT 
+            intStatus, 
+            intTransLogID, 
+            curAmount
         FROM tblTransactions
-        WHERE intStatus=0
-            AND curAmount>0
-            AND intRealmID =?
+        WHERE
+            intRealmID =?
             AND intTransactionID IN ($txns)
     ];
 	my $qry = $Data->{'db'}->prepare($st);
-print STDERR $st;
 	$qry->execute($Data->{'Realm'}); #, @transactions);
-	my $txnCount = $qry->fetchrow_array() || 0;
-    return $txnCount || 0;
+    my $amount = 0;
+    my %tlogIDs=();
+    while (my $dref= $qry->fetchrow_hashref())  {
+print STDERR "THE LOGID IS $dref->{'intTransLogID'}\n";
+        $tlogIDs{$dref->{'intTransLogID'}} = 1 if ($dref->{'intTransLogID'} and ! exists $tlogIDs{$dref->{'intTransLogID'}});
+        if ($dref->{'intStatus'} == 0)  {
+            $amount = $amount + $dref->{'curAmount'};
+        }
+    }
+    return ($amount, \%tlogIDs);
 }
 
 sub getPersonRegoTXN    {
@@ -152,11 +176,10 @@ sub getPersonRegoTXN    {
     my ($Data, $personID, $regoID) = @_;
 
     my $st = qq[
-        SELECT COUNT(intTransactionID) as CountTXN
+        SELECT intTransLogID, intTransactionID, intStatus
         FROM tblTransactions
-        WHERE intStatus=0
-            AND curAmount>0
-            AND intRealmID =?
+        WHERE
+            intRealmID =?
             AND intID = ?
             AND intPersonRegistrationID = ?
             AND intPersonRegistrationID > 0
@@ -164,8 +187,15 @@ sub getPersonRegoTXN    {
     ];
 	my $qry = $Data->{'db'}->prepare($st);
 	$qry->execute($Data->{'Realm'}, $personID, $regoID);
-	my $txnCount = $qry->fetchrow_array() || 0;
-    return $txnCount || 0;
+    my $count = 0;
+   my %tlogIDs=();
+    while (my $dref= $qry->fetchrow_hashref())  {
+        $tlogIDs{$dref->{'intTransLogID'}} = 1 if ($dref->{'intTransLogID'} and ! exists $tlogIDs{$dref->{'intTransLogID'}});
+        if ($dref->{'intStatus'} == 0)  {
+            $count++;
+        }
+    }
+    return ($count, \%tlogIDs);
 }
 
 sub displayRegoFlowCheckout {
