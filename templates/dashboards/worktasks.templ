@@ -1,3 +1,4 @@
+[% USE Dumper %]
 [% IF Notifications.size %]
     <div class="col-md-9">
         <div class="alert alert-info" role="alert">
@@ -53,15 +54,45 @@
 		    [% FOREACH task IN TaskList %]
                 <tr class="task-list">
                     [% IF task.TaskType == 'TRANSFER' %]
-                        <td><span class="fa fa-user"></span>Transfer: <Club> has requested a transfer for <PLAYER></td>
+                        <td>
+                            <span style="float: left" class="fa fa-user"></span>
+                            <div style="float: left">
+                            Transfer of <br/>
+                            [% task.Name %] from <br/>
+                            [% task.requestFrom %] to [% task.requestTo %]
+                            </div>
+                        </td>
                     [% ELSIF task.TaskType == 'ACCESS' %]
-                        <td><span class="fa fa-user"></span>Access: <Club> has requested access for <PLAYER></td>
+                        <td>
+                            <span style="float: left" class="fa fa-user"></span>
+                            <div style="float: left">
+                            Request Access of <br/>
+                            [% task.Name %] from <br/>
+                            [% task.requestFrom %]
+                            </div>
+                        </td>
+                    [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'REGO' %]
+                        <td>
+                            <span class="fa fa-user" style="float: left"></span>
+                            <div style="float: left">
+                            [% task.RegistrationNatureLabel %]<br/>
+                            [% task.Name %]
+                            </div>
+                        </td>
+                    [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'ENTITY' %]
+                        <td>
+                            <span class="fa fa-user" style="float: left"></span>
+                            <div style="float: left">
+                            [% task.RegistrationNatureLabel %]<br/>
+                            [% task.Name %]
+                            </div>
+                        </td>
 		            [% ELSE %]
                         <td><span class="fa fa-user"></span>Rego [% task.Name %]</td>
 		            [% END %]
-                    <td>12 June 2014</td>
-                    <td><span class="fa fa-clock-o"></span>Pending: Received</td>
-                    <td><a href="main.cgi?client=[% client %]&a=WF_View&TID=[% task.WFTaskID %]" class="btn-inside-panels">View and Approve</a></td>
+                    <td>[% task.taskDate %]</td>
+                    <td><span class="fa fa-clock-o"></span>[% task.TaskStatusLabel %]</td>
+                    <td><a href="main.cgi?client=[% client %]&a=WF_View&TID=[% task.WFTaskID %]" class="btn-inside-panels">View</a></td>
                 </tr>
 		    [% END %]
 
@@ -73,13 +104,16 @@
 	<div class="sidebar-box">
 		<h3 class="panel-header">Task at a Glance</h3>
 		<ul>
-			<li>New Registrations: <b>1</b></li>
-			<li>New Transfers: <b>0</b></li>
+			<li>New Registrations: <b>[% IF TaskCounts.NEW %][% TaskCounts.NEW %][% ELSE %]0[% END %]</b></li>
+			<li>Renewals: <b>[% IF TaskCounts.RENEWAL %][% TaskCounts.RENEWAL %][% ELSE %]0[% END %]</b></li>
+			<li>Transfers: <b>[% IF TaskCounts.TRANSFER %][% TaskCounts.TRANSFER %][% ELSE %]0[% END %]</b></li>
+			<li>Request Access: <b>[% IF TaskCounts.ACCESS %][% TaskCounts.ACCESS %][% ELSE %]0[% END %]</b></li>
 		</ul>
 		<ul>
-			<li>Total Task Pending: <b>2</b></li>
-			<li>Total Task In Progress: <b>3</b></li>
-			<li>Total Task Rejected: <b>0</b></li>
+			<li>Total Task Active: <b>[% IF TaskCounts.ACTIVE %][% TaskCounts.ACTIVE %][% ELSE %]0[% END %]</b></li>
+			<li>Total Task On Hold: <b>[% IF TaskCounts.HOLD %][% TaskCounts.HOLD %][% ELSE %]0[% END %]</b></li>
+			<li>Total Task Pending: <b>[% IF TaskCounts.PENDING %][% TaskCounts.PENDING %][% ELSE %]0[% END %]</b></li>
+			<li>Total Task Rejected: <b>[% IF TaskCounts.REJECTED %][% TaskCounts.REJECTED %][% ELSE %]0[% END %]</b></li>
 		</ul>
 	</div>
     <div class="sidebar-box clearfix">
@@ -102,10 +136,10 @@
 	<div class="sidebar-box">
 		<h3 class="panel-header">Quick Links</h3>
 		<ul class="quick-links">
-			<li><a><span class="fa fa-plus"></span>Start a New Registration</a></li>
-			<li><a><span class="fa fa-random"></span>Start a Transfer</a></li>
-			<li><a><span class="fa fa-newspaper-o"></span>List Pending Registrations</a></li>
-			<li><a><span class="fa fa-paste"></span>Reports</a></li>
+			<li><a href="main.cgi?client=[% client %]&a=PF_"><span class="fa fa-plus"></span>Start a New Registration</a></li>
+			<li><a href="main.cgi?client=[% client %]&a=PRA_T"><span class="fa fa-random"></span>Start a Transfer</a></li>
+			<li><a href="main.cgi?client=[% client %]&a=PENDPR_"><span class="fa fa-newspaper-o"></span>List Pending Registrations</a></li>
+			<li><a href="main.cgi?client=[% client %]&a=REP_SETUP"><span class="fa fa-paste"></span>Reports</a></li>
 		</ul>
 	</div>
 </div>
