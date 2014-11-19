@@ -937,7 +937,8 @@ sub viewRequest {
 
         switch($requestType) {
             case "$Defs::PERSON_REQUEST_TRANSFER" {
-                $action = "PREGF_TU";
+                #$action = "PREGF_TU";
+                $action = "PF_";
             }
             case "$Defs::PERSON_REQUEST_ACCESS" {
                 my %tempClientValues = %{ $Data->{'clientValues'} };
