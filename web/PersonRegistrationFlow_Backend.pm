@@ -23,6 +23,14 @@ use UploadFiles;
 use Data::Dumper;
 
 sub handleRegistrationFlowBackend   {
+    return;
+
+
+
+
+
+
+
     my ($action, $Data) = @_;
     my $body = '';
     my $title = '';
@@ -197,40 +205,39 @@ sub handleRegistrationFlowBackend   {
 
     }
    ###########################################################
-
+print STDERR "**************************************$action\n";
 ## FLOW SCREENS
-    if ( $action eq 'PREGF_T' ) {
-        my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_TU&amp;";
-        $body = displayPersonRegisterWhat(
-            $Data,
-            $personID,
-            $entityID,
-            $pref->{'dtDOB_RAW'} || '',
-            $pref->{'intGender'} || 0,
-            $originLevel,
-            $url,
-        );
-    }
-    elsif ( $action eq 'PREGF_P' ) {    	
-        $body .= displayRegoFlowProducts($Data, $regoID, $client, $entityLevel, $originLevel, $rego_ref, $entityID, $personID, \%Hidden);
-   }
+    #if ( $action eq 'PREGF_T' ) {
+    #    my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_TU&amp;";
+    #    $body = displayPersonRegisterWhat(
+    #        $Data,
+    #        $personID,
+    #        $entityID,
+    #        $pref->{'dtDOB_RAW'} || '',
+    #        $pref->{'intGender'} || 0,
+    #        $originLevel,
+    #        $url,
+   #     );
+   # }
+   # elsif ( $action eq 'PREGF_P' ) {    	
+   #     $body .= displayRegoFlowProducts($Data, $regoID, $client, $entityLevel, $originLevel, $rego_ref, $entityID, $personID, \%Hidden);
+   #}
    ############# 
-   elsif ($action eq 'PREGF_CERT'){
-       $body .= displayRegoFlowCertificates($Data, $regoID, $client, $originLevel, $entityLevel, $entityID, $rego_ref, $personID, \%Hidden);                                                         	
-   }
-   #########3
-    elsif ( $action eq 'PREGF_D' ) {
-        $body .= displayRegoFlowDocuments($Data, $regoID, $client, $entityLevel, $originLevel, $rego_ref, $entityID, $personID, \%Hidden);
-    }    
-    elsif ( $action eq 'PREGF_C' ) {
-        $body .= displayRegoFlowComplete($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, \%Hidden);
-    }    
-    elsif ($action eq 'PREGF_CHECKOUT') {
-        $body .= displayRegoFlowCheckout($Data, \%Hidden);
-    }
-    else {
-    	
-    }
+   #elsif ($action eq 'PREGF_CERT'){
+   #    $body .= displayRegoFlowCertificates($Data, $regoID, $client, $originLevel, $entityLevel, $entityID, $rego_ref, $personID, \%Hidden);                                                         	
+   #}
+   ##########3
+    #elsif ( $action eq 'PREGF_D' ) {
+    #    $body .= displayRegoFlowDocuments($Data, $regoID, $client, $entityLevel, $originLevel, $rego_ref, $entityID, $personID, \%Hidden);
+    #}    
+    #elsif ( $action eq 'PREGF_C' ) {
+    #    $body .= displayRegoFlowComplete($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, \%Hidden);
+    #}    
+    #elsif ($action eq 'PREGF_CHECKOUT') {
+    #    $body .= displayRegoFlowCheckout($Data, \%Hidden);
+    #}
+    #else {
+    #}
 
     return ( $body, $title );
 }
