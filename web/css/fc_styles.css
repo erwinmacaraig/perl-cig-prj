@@ -292,6 +292,10 @@ label {
 .txtright {
 	text-align: right;
 } 
+fieldset .txtleft {
+	text-align: left;
+	font-size: 13px;
+} 
 #l_dtDOB_day, #l_dtDOB_mon, #l_dtDOB_year {
 	width: 100px;
 }
