@@ -329,10 +329,10 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
             my $rowcount =
               ( $sectioncount{$sname} % 2 ) ? 'HTr_odd' : 'HTr_even';
             $sections{$sname} .= qq[
-            <span id="l_row_$fieldname" class="form-group details-row">
-                <span class="details-left">$label</span>
-                <span class="details-left detail-value">$pretext$field_html$posttext</span>
-            </span>
+            <div id="l_row_$fieldname" class="form-group">
+                <label class="col-md-2 control-label">$label</label>
+                <div class="col-md-10">$pretext$field_html$posttext</div>
+            </div>
             ];
         }
     }
@@ -357,10 +357,11 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 $tabs .= qq[<li><a id="a_sec$s->[0]" class="tab_links" href="#sec$s->[0]">$sectionheader</a></li>];
 
                 $returnstr .= qq~
-                <fieldset id="sec$s->[0]" class="new_tab member-home-page ">
+                <div class="col-md-10"><fieldset id="sec$s->[0]" class="new_tab member-home-page">
                 $sh
                 $sections{$s->[0]}
                 </fieldset>
+                </div>
                 ~;
             }
         }
@@ -409,7 +410,7 @@ qq[ <input type="reset" name="resbut" value="$txt" class="HF_reset button cancel
         if ( $introtext eq 'auto' ) {
             my $auto = langlookup( $fields_ref, 'AUTO_INTROTEXT',
                 $fields_ref->{'options'}{'submitlabel'}, $compulsory );
-            $introtext = qq[ <p class="introtext">$auto</p> ];
+            $introtext = qq[ <p class="introtext txtleft">$auto</p> ];
         }
 
         $introtext = '' if $action eq 'display';
