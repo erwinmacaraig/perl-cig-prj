@@ -175,8 +175,8 @@ sub main	{
 		my $body = payPalUpdate(\%Data, $paymentSettings, $client, $clientTransRefID, $INtoken, $Order, $external, $encryptedID);
 		#pageForm( 'Sportzware Membership', $body, $Data{'clientValues'}, q{}, \%Data);
 	}
-    payTryRedirectBack($payTry, $client, $clientTransRefID);
 	disconnectDB($db);
+    payTryRedirectBack($payTry, $client, $clientTransRefID);
 
 }
 
