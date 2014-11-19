@@ -385,6 +385,8 @@ sub listTasks {
 
         $taskCounts{$dref->{'strTaskStatus'}}++;
         $taskCounts{$dref->{'strRegistrationNature'}}++;
+
+        my $viewTaskURL = "$Data->{'target'}?client=$client&amp;a=WF_View&TID=$dref->{'intWFTaskID'}";
 	 my %single_row = (
 			WFTaskID => $dref->{intWFTaskID},
             TaskDescription => $taskDescription,
@@ -409,6 +411,7 @@ sub listTasks {
             showView => $showView,
             OnHold => $dref->{OnHold},
             taskDate => $dref->{taskDate},
+            viewURL => $viewTaskURL,
 		);
    
 		push @TaskList, \%single_row;

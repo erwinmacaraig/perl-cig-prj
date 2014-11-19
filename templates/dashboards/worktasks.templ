@@ -92,7 +92,7 @@
 		            [% END %]
                     <td>[% task.taskDate %]</td>
                     <td><span class="fa fa-clock-o"></span>[% task.TaskStatusLabel %]</td>
-                    <td><a href="main.cgi?client=[% client %]&a=WF_View&TID=[% task.WFTaskID %]" class="btn-inside-panels">View</a></td>
+                    <td><a href="[% task.viewURL %]" class="btn-inside-panels">View</a></td>
                 </tr>
 		    [% END %]
 
