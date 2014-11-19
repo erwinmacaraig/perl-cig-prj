@@ -878,6 +878,8 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
 
 	my $header=qq[$addLink$entityNamePlural];
 
+        my $targetManual = $Data->{'target'};
+        my $targetOnline = 'paytry.cgi';
 
     if ($transCount>0) {
 	    my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
@@ -897,7 +899,7 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
             my $pType = $gateway->{'paymentType'};
             my $name = $gateway->{'gatewayName'};
             $CC_body .= qq[
-				    <input type="submit" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
+				    <input type="submit" onclick="clicked='$targetOnline'" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
                     <input type="hidden" value="$pType" name="pt_submit[$gatewayCount]">
             ];
         }
@@ -930,10 +932,17 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
       $allowMP = 0 if $Data->{'SystemConfig'}{'DontAllowManualPayments'};
       $allowMP = 0 if $Data->{'SystemConfig'}{'AssocConfig'}{'DontAllowManualPayments'};
 		  
-        my $target = 'paytry.cgi';#$Data->{'target'};
-#        $target = $Data->{'target'};
 		$body=qq[
-			<form ttarget="_pay" action="$target" name="n_form" method="POST">
+            <script type="text/javascript">
+                var clicked;
+                function submitForm()
+                {
+                  document.payform.action =clicked;
+                  return true;
+                }
+            </script>
+
+			<form name="payform" method="POST" onsubmit="submitForm();return true;">
             <input type="hidden" name="a" value="P_TXNLogstep2">
             <input type="hidden" name="client" value="$client">
 	
@@ -1010,7 +1019,7 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
 				    </tbody>	
 				</table>
 			
-						<div class="HTbuttons"><input type="submit" name="subbut" value="Submit Manual Payment" class="HF_submit button generic-button" id = "btn-manualpay"></div>
+						<div class="HTbuttons"><input onclick="clicked='$targetManual'" type="submit" name="subbut" value="Submit Manual Payment" class="HF_submit button generic-button" id = "btn-manualpay"></div>
 
 						<input type="hidden" name="personID" value="$TableID"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="dt_start_paid" value="$dtStart_paid"><input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
 					</form> 

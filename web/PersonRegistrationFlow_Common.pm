@@ -495,7 +495,7 @@ sub generateRegoFlow_Gateways   {
     my ($Data, $client, $nextAction, $hidden_ref) = @_;
 
     my $lang = $Data->{'lang'};
-    my (undef, $paymentTypes) = getPaymentSettings($Data, 0, 0, $Data->{'clientValues'});
+    my ($paymentSettings, $paymentTypes) = getPaymentSettings($Data, 0, 0, $Data->{'clientValues'});
     my $gateway_body = qq[
         <div id = "payment_cc" style= "ddisplay:none;"><br>
     ];
@@ -520,9 +520,11 @@ sub generateRegoFlow_Gateways   {
     $gateway_body = '' if ! $gatewayCount;
     my $target = 'paytry.cgi';#$Data->{'target'};
 
+    my $txnList = displayTXNToPay($Data, $hidden_ref->{'txnIds'}, $paymentSettings);
     my %PageData = (
         nextaction=>$nextAction,
         target => $target,
+        txnList =>$txnList,
         gateway_body => $gateway_body,
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
@@ -531,8 +533,6 @@ sub generateRegoFlow_Gateways   {
     if ($gatewayCount == 1) {
         $hidden_ref->{"pt_submit[1]"} = $paymentType; 
         $hidden_ref->{"gatewayCount"} = 1;
-        #$hidden_ref->{"cc_submit[1]"} = 1;
-    #    return displayRegoFlowCheckout($Data, $hidden_ref);
     }
     else    {
         $hidden_ref->{"gatewayCount"} = $gatewayCount;

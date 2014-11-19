@@ -1,0 +1,26 @@
+<table class="confirm-details permsTable" style="width:90%;">
+    <tbody>
+        <tr>        
+            <th>Invoice Number</th>
+            <th>Item</th>
+            <th>Name</th>
+            <th>Amount</th>
+        </tr>
+        [% FOREACH txn = TXNs %]
+            <tr>
+                <td class = "value">[% txn.InvoiceNum %]</td>
+                <td class = "value">[% txn.ProductName %]</td>
+                <td class = "value">[% txn.Name %]</td>
+                <td class = "value">\$[% txn.LineAmount %]</td>
+            </tr>
+        [% END %]
+        <tbody>
+            <tr>
+                <td>Total</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td class="align-right">[% dollarSymbol %][% camount %]</td>
+            </tr>
+        </tbody> 
+    </tbody>
+</table>

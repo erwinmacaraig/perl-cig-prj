@@ -5,8 +5,8 @@
 package Payments;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoInvoiceNum invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog);
-@EXPORT_OK=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoInvoiceNum invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog);
+@EXPORT=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoInvoiceNum invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount);
+@EXPORT_OK=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoInvoiceNum invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount);
 
 use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 
@@ -634,17 +634,20 @@ sub displayPaymentResult        {
         FROM tblTransLog as TL
 		LEFT JOIN tblEntity as E ON (E.intEntityID = TL.intEntityPaymentID)
         WHERE TL.intLogID = $intLogID
+            AND TL.intAmount > 0
     ];
     my $qry = $db->prepare($st) or query_error($st);
     $qry->execute or query_error($st);
     my $transref = $qry->fetchrow_hashref();
+
+    return '' if (! $transref); ## Don't display if no TLog found.... Note Amount must be > 0
+
 	$Data->{'RegoFormID'} = $transref->{'intRegoFormID'} || 0;
 	$Data->{'RealmSubType'} ||= $transref->{'intSubRealmID'} || 0;
 	$Data->{'Realm'} ||= $transref->{'intRealmID'} || 0;
     my $paymentType = $transref->{'intPaymentType'};
 
     my $body = '';
-    my $re_pay_body = '';
 	my $success=0;
     if ($transref->{strResponseCode} eq "1" or $transref->{strResponseCode} eq "OK" or $transref->{strResponseCode} eq "00" or $transref->{strResponseCode} eq "08" or $transref->{strResponseCode} eq 'Success')    {
         my $ttime = time();
@@ -654,7 +657,7 @@ sub displayPaymentResult        {
 		$success=1;
     }
     else    {
-		$msg = qq[ <div align="center" class="warningmsg" style="font-size:14px;">There was an error with your transaction</div> ] if ! $msg;
+		$msg = qq[ <div align="center" class="warningmsg" style="font-size:14px;">There was an error with your transaction</div> ] if (! $msg and $transref->{'intAmount'});
         $body .= qq[ <center>$msg<br></center> ];
 		if ($external)	{
 			$st = qq[
@@ -672,21 +675,10 @@ sub displayPaymentResult        {
 			while (my $dref = $qry->fetchrow_hashref())	{
 				push @txns, $dref->{intTransactionID};
 			}
-			#$re_pay_body= checkoutConfirm($Data, $paymentType, \@txns, 1);
 		}
     }
 	my ($viewTLBody, $header) = TransLog::viewTransLog($Data, $intLogID);
 	$body .= $viewTLBody;
-	$body .= $re_pay_body;
-	if ($success and ($transref->{'intPaymentType'} == $Defs::PAYMENT_ONLINEPAYPAL or $transref->{'intPaymentType'} == $Defs::PAYMENT_ONLINENAB) and $external) {
-        my $RegoFormObj = RegoForm::RegoFormFactory::getRegoFormObj(
-            $Data->{'RegoFormID'},
-            $Data,
-            $Data->{'db'},
-        );
-		my $RegoText=(defined $RegoFormObj) ? $RegoFormObj->getText('strSuccessText',1) : '';
-		$body .= qq[<br><br>] . $RegoText || '';
-	}
 	return $body;
 }
 
@@ -884,7 +876,7 @@ sub getTXNDetails	{
 		    $dref->{P2Email}  = $mref->{strP2Email}  || '';
 		    $dref->{P2Email2} = $mref->{strP2Email2} || '';
     }
-    if ($dref->{intTableType} >= 1) {
+    if ($dref->{intTableType} > 1) {
 	    my $st_entity= qq[
             SELECT strLocalName, strEmail
             FROM tblEntity

@@ -1,8 +1,8 @@
 package DisplayPayResult;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT=qw(displayPayResult);
-@EXPORT_OK=qw(displayPayResult);
+@EXPORT=qw(displayPayResult displayTXNToPay);
+@EXPORT_OK=qw(displayPayResult displayTXNToPay);
 
 use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 
@@ -74,3 +74,58 @@ sub displayPayResult    {
     $templateBody= $result if($result);
     return $templateBody;
 }
+
+###########
+
+sub displayTXNToPay {
+
+    my ($Data, $trans, $paymentSettings) = @_;
+    my @transactions= split /:/, $trans;
+
+    my $external = 0;
+    my $external = 0;
+    my $lang = $Data->{'lang'};
+    my ($count, $dollars, $cents) = getCheckoutAmount($Data, \@transactions);
+    my $amount = "$dollars.$cents";
+    my $invoiceList ='';
+     my $allowPayment = $paymentSettings->{'allowPayment'} || 0;
+    $allowPayment=0 if (! $external and $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_CLUB);
+    my $body = '';
+    my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
+    my $client=setClient($Data->{'clientValues'}) || '';
+
+    #List the products this person is purchasing and their amounts
+    my $assocID=$Data->{'clientValues'}{'assocID'} || 0;
+    my $realmID=$Data->{'Realm'} || 0;
+    my $product_confirmation='';
+    my $txn_list = join (',',@transactions);
+    my @templateTXNs = ();
+    for my $transid (@transactions)	{
+        my $dref = getTXNDetails($Data, $transid,1);
+        next if ! $dref->{intTransactionID};
+        $count++;
+        my $lamount=currency($dref->{'curAmount'} || 0);
+        $invoiceList .= $invoiceList ? qq[,$dref->{'InvoiceNum'}] : $dref->{'InvoiceNum'};
+        my %TXN = ();
+        $TXN{'InvoiceNum'} = $dref->{'InvoiceNum'};
+        $TXN{'ProductName'} = $dref->{'ProductName'};
+        $TXN{'Name'} = $dref->{'Name'};
+        $TXN{'LineAmount'} = $lamount;
+        push @templateTXNs, \%TXN;
+    }
+    my $camount=currency($amount||0);
+    my %PageData = (
+        target => $Data->{'target'},
+        Lang => $Data->{'lang'},
+        client=>$client,
+        TXNs => \@templateTXNs,
+        dollarSymbol => $dollarSymbol,
+        camount => $camount,
+    );
+
+    my $body = runTemplate($Data, \%PageData, 'payment/txn_list.templ') || '';
+
+	return $body;
+
+}
+1;
