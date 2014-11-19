@@ -1152,6 +1152,7 @@ sub getRequests {
             pq.intRequestToMAOverride,
             pq.strRequestNotes,
             pq.dtDateRequest,
+            DATE_FORMAT(pq.dtDateRequest,'%d %b %Y') AS prRequestDateFormatted,
             pq.strRequestResponse,
             pq.strResponseNotes,
             pq.intResponseBy,
