@@ -467,15 +467,13 @@ qq[<input type="hidden" name="$cf" value="$fields_ref->{'carryfields'}{$cf}">];
         </fieldset>
         $returnstr
         </div>
-        <fieldset>
-        <div class="col-md-10 txtright">
+        <div class="txtright">
         $button_bottom
         <input type="hidden" name="HF_oldact" value="$oldaction">
         <input type="hidden" name="HF_subbutact" value="$subbutact">
         $carryfields
         $bottomtext
         </div>
-        </fieldset>
 
         </form>
 

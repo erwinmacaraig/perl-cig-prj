@@ -26,8 +26,7 @@
     [% IF Content %][% Content %][% END %]
     [% IF FlowNextAction %]
 [% IF !NoContinueButton %]
-	<!-- <fieldset><div class="col-md-10 txtright"><a href="#" title="Continue" class="btn-main">Continue</a></div></fieldset> -->
-	<fieldset><div class="col-md-10 txtright"><input type = "submit" value = " [% Lang.txt('Continue') %] "  class = "button proceed-button"></div></fieldset>
+	<div class="txtright"><input type = "submit" value = " [% Lang.txt('Continue') %] "  class = "button proceed-button"></div>
 [% END %]
 	<input type = "hidden" name ="rfp" value ="[% FlowNextAction %]">
     [% END %]
