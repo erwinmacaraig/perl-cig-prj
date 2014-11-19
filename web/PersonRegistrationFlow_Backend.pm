@@ -75,7 +75,6 @@ sub handleRegistrationFlowBackend   {
     if (defined $pref and $pref->{'strISONationality'}) {
         $rego_ref->{'Nationality'} = $pref->{'strISONationality'} || '';
     }
-print STDERR "AAAAAAAA $action\n";
     if ( $action eq 'PREGF_TU' ) {
     	
     	
@@ -200,7 +199,6 @@ print STDERR "AAAAAAAA $action\n";
    ###########################################################
 
 ## FLOW SCREENS
-print STDERR "FFFFFFFFFFFFFFFFFFFFFFFFF $action\n";
     if ( $action eq 'PREGF_T' ) {
         my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_TU&amp;";
         $body = displayPersonRegisterWhat(

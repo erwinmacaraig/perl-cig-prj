@@ -1152,7 +1152,6 @@ sub display_products {
 
     my $rego_ref = {};
     my $content = '';
-print STDERR "IN PRODUCTS\n\n\n";
     if($regoID) {
         my $valid =0;
         ($valid, $rego_ref) = validateRegoID(
@@ -1439,7 +1438,6 @@ sub display_complete {
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
-print STDERR "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC IN FLOW_PERSON\n";
 
     my $rego_ref = {};
     my $content = '';
@@ -1460,7 +1458,11 @@ print STDERR "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC IN FLOW_PERSON\n";
         my $nationality = $personObj->getValue('strISONationality') || ''; 
         $rego_ref->{'Nationality'} = $nationality;
 
-        if($self->{'RunParams'}{'newreg'})  {
+        my $run = $self->{'RunParams'}{'run'} || 0;
+print STDERR "IN display_complete --- COMPLETE $run\n";
+        if($self->{'RunParams'}{'newreg'} and ! $run)  {
+                #$self->{'RunParams'}{'run'} = 1;
+                #$self->addCarryField('run',1);
 print STDERR "RRRRRRRRULES RUNNINGS\n";
             my $rc = WorkFlow::addWorkFlowTasks(
                 $self->{'Data'},

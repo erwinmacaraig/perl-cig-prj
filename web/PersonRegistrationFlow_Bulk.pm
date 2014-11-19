@@ -171,12 +171,10 @@ sub handleRegistrationFlowBulk {
         $body .= displayRegoFlowProductsBulk($Data, 0, $client, $entityLevel, $originLevel, $bulk_ref, $entityID, $personID, \%Hidden);
    }
     elsif ( $action eq 'PREGFB_C' ) {
-        print STDERR "IN BULK HERE !!!!!!!!!\n";
         $Hidden{'nextPayAction'} = $action;
         $Hidden{'upd'} = 1;
         $Hidden{'totalAmount'} ||= $totalAmount;
         $Hidden{'txnIds'} ||= $params{'txnIds'} || '';
-print STDERR Dumper(\%Hidden);
         $body .= displayRegoFlowCompleteBulk($Data, $client, \%Hidden);
     }    
     else {

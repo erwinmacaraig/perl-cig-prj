@@ -23,6 +23,7 @@ use CGI qw(param unescape escape);
 
 use PayPal;
 use Gateway_Common;
+use GatewayProcess;
 
 main();
 
@@ -40,7 +41,6 @@ sub main	{
 	my $session= param('session') || 0;
 	my $compulsory= param('compulsory') || 0;
 	
-print STDERR "AAAAA: $action";
 	my $db=connectDB();
 	my %Data=();
 	$Data{'db'}=$db;
@@ -67,6 +67,7 @@ print STDERR "AAAAA: $action";
   $Data{'lang'}=$lang;
 
   $Data{'LocalConfig'}=getLocalConfig(\%Data);
+    my $payTry = payTryRead(\%Data, $clientTransRefID);
 
 
 	#if (! $assocID or $assocID !~ /^\d.*$/)	{
@@ -144,36 +145,37 @@ print STDERR "AAAAA: $action";
 		my $duplicateLogID = $qry_500->fetchrow_array() || 0;
 		if ($duplicateLogID and $duplicateLogID > 0)	{
 			$error = qq[
-				<p>The SportingPulse Payments system has noticed an error with a previous payment attempt - although it appeared to give an error, it may have successfully been processed.<br>
-				Please contact SportingPulse on 1300 139 970 before proceeding to prevent a possible double payment. We will check and confirm the status of the previous payment.<br>
+				<p>The system has noticed an error with a previous payment attempt - although it appeared to give an error, it may have successfully been processed.<br>
 				Payment Reference Number: $clientTransRefID</p>
 			];
 			$Order->{'Status'} = -1;
 		}
 	}
 
+
+
 	if ($Order->{'Status'} != 0)	{
 		$error = qq[There was an error] if ! $error;
 		my $body  = qq[<div align="center" class="warningmsg" style="font-size:14px;">$error</div>];
-		pageForm( 'Sportzware Membership', $body, $Data{'clientValues'}, q{}, \%Data);
+		#pageForm( 'Sportzware Membership', $body, $Data{'clientValues'}, q{}, \%Data);
 	}
 	elsif ($action eq 'P')	{
 		## CALL SetExpressCheckoutAPI
-print STDERR "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD";
 		my $body = payPalProcess(\%Data, $client, $paymentSettings, $clientTransRefID, $Order, $Transactions, $external);
-		pageForm( 'Sportzware Membership', $body, $Data{'clientValues'}, q{}, \%Data) if $body;
+		#pageForm( 'Sportzware Membership', $body, $Data{'clientValues'}, q{}, \%Data) if $body;
 		
 	}
 	elsif ($action eq 'C')	{
 		my $msg = qq[<div align="center" class="warningmsg" style="font-size:14px;">You cancelled the Transaction</div>];
 		my $body = displayPaymentResult(\%Data, $clientTransRefID, 1, $msg);
 		$body .= qq[<br><p><a href="$Defs::base_url/main.cgi?client=$client&a=P_TXNLog_list&mode=p">Return to Membership System</a></p>] if ! $external;
-		pageForm( 'Sportzware Membership', $body, $Data{'clientValues'}, q{}, \%Data);
+		#pageForm( 'Sportzware Membership', $body, $Data{'clientValues'}, q{}, \%Data);
 	}
 	elsif ($action eq 'S')	{
 		my $body = payPalUpdate(\%Data, $paymentSettings, $client, $clientTransRefID, $INtoken, $Order, $external, $encryptedID);
-		pageForm( 'Sportzware Membership', $body, $Data{'clientValues'}, q{}, \%Data);
+		#pageForm( 'Sportzware Membership', $body, $Data{'clientValues'}, q{}, \%Data);
 	}
+    payTryRedirectBack($payTry, $client, $clientTransRefID);
 	disconnectDB($db);
 
 }

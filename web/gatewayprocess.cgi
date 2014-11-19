@@ -58,22 +58,7 @@ sub main	{
 	disconnectDB($db);
 
     if ($display_action eq '1')    {
-        my $a = $payTry->{'nextPayAction'} || $payTry->{'a'};
-        my $redirect_link = "main.cgi?client=$client&amp;a=$a";
-        foreach my $k (keys %{$payTry}) {
-            next if $k eq 'client'; 
-            next if $k eq 'a';
-            next if $k =~/clubID|teamID|userID|stateID|assocID|intzonID|regionID|zoneID|intregID|authLevel|natID|venueID|authLevel|currentLevel|interID/;
-            next if $k =~/dtype/;
-            next if $k =~/^ss$/;
-            next if $k =~/^cc_submit/;
-            next if $k =~/^pt_submit/;
-            $redirect_link .= "&amp;$k=".$payTry->{$k};
-        } 
-        my $body = "HELLO";
- 	    print "Content-type: text/html\n\n";
-  	    print $body;
-        print qq[<a href="$redirect_link">LINK</a><br>$redirect_link];
+        payTryRedirectBack($payTry, $client, $logID);
     }
 }
 
