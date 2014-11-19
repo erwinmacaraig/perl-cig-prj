@@ -330,8 +330,8 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
               ( $sectioncount{$sname} % 2 ) ? 'HTr_odd' : 'HTr_even';
             $sections{$sname} .= qq[
             <div id="l_row_$fieldname" class="form-group">
-                <label class="col-md-2 control-label">$label</label>
-                <div class="col-md-10">$pretext$field_html$posttext</div>
+                <label class="col-md-4 control-label">$label</label>
+                <div class="col-md-8">$pretext$field_html$posttext</div>
             </div>
             ];
         }
@@ -467,15 +467,13 @@ qq[<input type="hidden" name="$cf" value="$fields_ref->{'carryfields'}{$cf}">];
         </fieldset>
         $returnstr
         </div>
-        <fieldset>
-        <div class="col-md-10 txtright">
+        <div class="txtright">
         $button_bottom
         <input type="hidden" name="HF_oldact" value="$oldaction">
         <input type="hidden" name="HF_subbutact" value="$subbutact">
         $carryfields
         $bottomtext
         </div>
-        </fieldset>
 
         </form>
 
