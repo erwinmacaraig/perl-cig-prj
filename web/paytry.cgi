@@ -72,12 +72,6 @@ sub main	{
 
     my ($logID, $amount, $chkvalue, $session, $paymentSettings) = Payments::checkoutConfirm(\%Data, $paymentType, \@transactions,1,1);
     
-    my $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;chkv=$chkvalue&amp;session=$session&amp;amount=$amount];
-    if ($paymentSettings->{'paymentType'} == $Defs::PAYMENT_ONLINEPAYPAL) {
-        $paymentURL = qq[$Defs::base_url/paypal.cgi?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;session=$session];
-    }
-
-    my $gateway_body= qq[<a href="$paymentURL">Proceed to Payment</a>];
     
 	my $st = qq[
         INSERT INTO tblPayTry (
@@ -105,6 +99,11 @@ sub main	{
     disconnectDB($db);
 
     ## Pass control to gateway
+    my $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;chkv=$chkvalue&amp;session=$session&amp;amount=$amount];
+    if ($paymentSettings->{'paymentType'} == $Defs::PAYMENT_ONLINEPAYPAL) {
+        $paymentURL = qq[$Defs::base_url/paypal.cgi?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;session=$session];
+    }
+    my $gateway_body= qq[<a href="$paymentURL">Proceed to Payment</a>];
 	
     my $body = '';
 print qq[Content-type: text/html\n\n] if ! $body;
