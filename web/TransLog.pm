@@ -931,9 +931,9 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
       $allowMP = 0 if $Data->{'SystemConfig'}{'AssocConfig'}{'DontAllowManualPayments'};
 		  
         my $target = 'paytry.cgi';#$Data->{'target'};
-        $target = $Data->{'target'};
+#        $target = $Data->{'target'};
 		$body=qq[
-			<form target="_pay" action="$target" name="n_form" method="POST">
+			<form ttarget="_pay" action="$target" name="n_form" method="POST">
             <input type="hidden" name="a" value="P_TXNLogstep2">
             <input type="hidden" name="client" value="$client">
 	

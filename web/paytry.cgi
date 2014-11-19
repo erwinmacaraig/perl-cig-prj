@@ -45,13 +45,23 @@ sub main	{
     foreach my $key ( keys %clientValues) {
         $params{$key} = $clientValues{$key};
     }
+
+    my @transactions=();
+    foreach my $k ( keys %params) {
+        if ($k =~ /^act_/)   {
+            $k=~s/.*_//;
+            next  if $k=~/[^\d]/;
+            push @transactions, $k;
+        }
+    }
+        
     $Data{'lang'} = $lang;
 
 use Data::Dumper;
-print STDERR "TXNS FROM PARAMS ARE" . Dumper(\%params);
 
-    my @transactions= split /:/, $params{'txnIds'};
-print STDERR "TXNS IN PAYTRY.cgi ARE " .  $params{'txnIds'} . "\n";
+    if ($params{'txnIds'})  {
+        @transactions= split /:/, $params{'txnIds'};
+    }
     require JSON;
     my $datalog= JSON::to_json( \%params);
     my $gCount = param('gatewayCount') || 0;
@@ -62,7 +72,6 @@ print STDERR "TXNS IN PAYTRY.cgi ARE " .  $params{'txnIds'} . "\n";
         }
     }
 
-print STDERR "PAYMENT TYPE IS $paymentType\n";
     my ($logID, $amount, $chkvalue, $session, $paymentSettings) = Payments::checkoutConfirm(\%Data, $paymentType, \@transactions,1,1);
     
     my $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;chkv=$chkvalue&amp;session=$session&amp;amount=$amount];
