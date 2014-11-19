@@ -5,8 +5,8 @@
 package NABGateway;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT=qw(NABPaymentForm NABUpdate NABResponseCodes finalize_registration);
-@EXPORT_OK=qw(NABPaymentForm NABUpdate NABResponseCodes finalize_registration);
+@EXPORT=qw(NABPaymentForm NABUpdate NABResponseCodes );
+@EXPORT_OK=qw(NABPaymentForm NABUpdate NABResponseCodes );
 
 use lib "RegoForm";
 use strict;
@@ -174,9 +174,6 @@ print STDERR "IN HERE FOR NAB UPDATE\n";
     my $itemData;
   	if ($returnVals->{'ResponseCode'} eq 'OK')  {
     	UpdateCart($Data, $paymentSettings, $client, undef, undef, $logID);
-    	#EmailPaymentConfirmation($Data, $paymentSettings, $logID, $client);
-	    # finalize_registration eather returnes 0 (no compulsory, no temp all good!) 
-	    #$itemData = finalize_registration($Data,$logID);
     	product_apply_transaction($Data,$logID);
     	EmailPaymentConfirmation($Data, $paymentSettings, $logID, $client);
     	$templateBody = $template_ref->{'strSuccessTemplate'} || 'payment_success.templ';
@@ -184,114 +181,6 @@ print STDERR "IN HERE FOR NAB UPDATE\n";
     else    {
         #processTransLogFailure($db, $logID, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text);
     }
-    #my $result = displayPayResult($Data, $logID);
-   	#$templateBody= $result if($result);
-  	#return $templateBody;
-}
-# This function will run after payment is successfully finished, it will check to see if compulsory payment is set for 
-# rego form. if so means we have a temp member in tblTempMember thats needs to be added to real DB and all the post add scripts needs to be run aswell.
-
-sub finalize_registration {
-    my($Data , $logID) = @_;
-    my $db = $Data->{'db'};
-    my $formID = $Data->{'formID'} || 0;
-    my $compulsoryPay = $Data->{'CompulsoryPayment'} || 0;
-    my $session = $Data->{'sessionKey'};
-    my $intRealID;
-    my %item_Data;
-    my $realm = $Data->{'Realm'};
-    if(!$compulsoryPay or $Data->{'SystemConfig'}{'NotUseCompulsoryPay'}){
-        return q{};
-    }
-    if( !$formID ){
-        # no form ID found. is this coming from a rego forms? probably not.
-        return 0;
-    }
-    $Data->{'RegoFormID'} =$formID;
-    if($compulsoryPay) {# only if compulsory payment is set and NotUseCompulsoryPay is not set we have a temp member and need to enter member in real DB
-        warn "Fariba:finalize_registration/NAB:RELAM: $realm , formID:$formID, logID:$logID,session:$session";
-        #only look for temp members in current session and who paid for transaction (inf intTransLogID has been set for them)
-	    my $st = qq[
-		    SELECT
-			    intTempMemberID,strTransactions,intAssocID,intClubID
-		    FROM
-			    tblTempMember
-		    WHERE
-			    strSessionKey =?
-                AND intTransLogID = ? 
-		    ];
-	    my $qry = $db->prepare($st) or query_error($st);
-	    $qry->execute($session,$logID);
-    
-	    my $cgi = new CGI;
-
-	    my $st_update_temp = qq[
-				UPDATE
-				    tblTempMember
-                SET
-                    intRealID = ?,
-				    intStatus = ?
-				 WHERE 
-				    intTransLogID = ?
-                    AND
-				    intTempMemberID =?        
-				];
-	    my $st_update_session = qq[
-				UPDATE
-				    tblRegoFormSession
-				SET 
-				    intMemberID = ?
-				 WHERE 
-				    intTempID =?        
-				];			    
-	    my $action = 'add';
-        my %rego_form_cache;
-	    while (my $dref = $qry->fetchrow_hashref()) {
-		    my $intTempID = $dref->{'intTempMemberID'};
-            my $assocID = $dref->{'intAssocID'};
-            my $clubID = $dref->{'intClubID'};
-            $Data->{'spAssocID'} = $assocID;
-            $Data->{'spClubID'} = $clubID;
-            my $formObj;
-            if ( defined $rego_form_cache{$assocID}{$clubID}){
-                $formObj = $rego_form_cache{$assocID}{$clubID};
-            }
-            else{
-                $formObj = getRegoFormObj(
-                     $formID,
-                     $Data,
-                     $Data->{'db'},    
-                );
-                $rego_form_cache{$assocID}{$clubID} = $formObj;
-            }
-            my $form_entity_type = $formObj->FormEntityType();
-        		
-		    #Add Member
-		    ($intRealID,undef) =  ($form_entity_type eq 'Member') ? rego_addRealMember($Data,$db,$intTempID,$session, $formObj) : (0,0);
-            warn "NAB::CompulsoryPayment: RealID:: $intRealID";
-		    my $st_update = qq[
-					UPDATE tblTransactions
-					SET
-					    intID = ?
-					WHERE 
-					    intTempID = ? 
-					];
-		    # update transaction table 
-		    my $update_qry = $db->prepare($st_update) or query_error($st_update);
-		    $update_qry->execute($intRealID,$intTempID);
-		
-		    # keep  the RealID and intTransLogID  in temp table 
-		    $update_qry = $db->prepare($st_update_temp) or query_error($st_update_temp);
-		
-		    $update_qry->execute($intRealID,1,$logID,$intTempID);
-		
-		    $update_qry = $db->prepare($st_update_session) or query_error($st_update_session);
-		    $update_qry->execute($intRealID,$intTempID);
-		
-    	}   
- 
-    }# end if compulsory
-    return \%item_Data;
 }
 
 sub NABPaymentForm  {

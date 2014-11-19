@@ -57,8 +57,6 @@ sub main	{
         
     $Data{'lang'} = $lang;
 
-use Data::Dumper;
-
     if ($params{'txnIds'})  {
         @transactions= split /:/, $params{'txnIds'};
     }

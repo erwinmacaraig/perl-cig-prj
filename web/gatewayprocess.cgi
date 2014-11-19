@@ -58,9 +58,6 @@ sub main	{
 	disconnectDB($db);
 
     if ($display_action eq '1')    {
-        ## REDIRECTo    
-        #my $a = 'PF_';
-        #$a = 'PREGFB_';#'PF_';
         my $a = $payTry->{'nextPayAction'} || $payTry->{'a'};
         my $redirect_link = "main.cgi?client=$client&amp;a=$a";
         foreach my $k (keys %{$payTry}) {
