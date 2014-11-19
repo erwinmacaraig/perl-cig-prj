@@ -672,7 +672,7 @@ sub displayPaymentResult        {
 			while (my $dref = $qry->fetchrow_hashref())	{
 				push @txns, $dref->{intTransactionID};
 			}
-			$re_pay_body= checkoutConfirm($Data, $paymentType, \@txns, 1);
+			#$re_pay_body= checkoutConfirm($Data, $paymentType, \@txns, 1);
 		}
     }
 	my ($viewTLBody, $header) = TransLog::viewTransLog($Data, $intLogID);

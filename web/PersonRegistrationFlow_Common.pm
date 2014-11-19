@@ -143,7 +143,8 @@ print STDERR "OK IS $ok | $run\n\n";
         $logIDs->{$logID}=1;
         foreach my $id (keys %{$logIDs}) {
             next if ! $id;
-            $body .= displayPayResult($Data, $id);
+       #     $body .= displayPayResult($Data, $id);
+            $body .= displayPaymentResult($Data, $id, 1, '');
         }
     }
     return $body;

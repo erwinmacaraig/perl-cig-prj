@@ -251,9 +251,9 @@ sub main {
     elsif ( $action =~ /^ERA_/ ) {
         ( $resultHTML, $pageHeading ) = handleEntityRegistrationAllowedEdit($action, \%Data);
     }
-    elsif ( $action =~ /^PREGF_/ ) {
-        ( $resultHTML, $pageHeading ) = handleRegistrationFlowBackend($action, \%Data);
-    }
+    #elsif ( $action =~ /^PREGF_/ ) {
+    #    ( $resultHTML, $pageHeading ) = handleRegistrationFlowBackend($action, \%Data);
+    #}
     elsif ( $action =~ /^PREGFB_/ ) {
         ( $resultHTML, $pageHeading ) = handleRegistrationFlowBulk($action, \%Data);
     }
