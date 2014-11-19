@@ -318,29 +318,33 @@ sub checkoutConfirm	{
                 }
 				$product_confirmation.=qq[
 					<tr>
-						<td style="border:1px solid #cccccc;border-left:0px;">$dref->{'InvoiceNum'}</td>
-						<td style="text-align:left;border:1px solid #cccccc;border-right:0px;">$dref->{ProductName}$star</td>
-						<td style="text-align:left;border:1px solid #cccccc;border-right:0px;">$dref->{Name}</td>
-						<td style="text-align:right;border:1px solid #cccccc;border-right:0px;">$dollarSymbol$lamount</td>
+						<td>$dref->{'InvoiceNum'}</td>
+						<td>$dref->{ProductName}$star</td>
+						<td>$dref->{Name}</td>
+						<td class="align-right">$dollarSymbol$lamount</td>
 					</tr>
 				];
 			}
 			my $camount=currency($amount||0);
 			$product_confirmation=qq[
-				<table class="permsTable">
-					<tr>
-						<th>].$lang->txt('Invoice Number').qq[</th>
-						<th>].$lang->txt('Item').qq[</th>
-						<th>].$lang->txt('Name').qq[</th>
-						<th style="width:50px;">].$lang->txt('Price').qq[</th>
-					</tr>
+				<table class="table" cellspacing="0" cellpadding="0" border="0">
+					<thead>
+						<tr>
+							<td>].$lang->txt('Invoice Number').qq[</td>
+							<td>].$lang->txt('Item').qq[</td>
+							<td>].$lang->txt('Name').qq[</td>
+							<td class="align-right">].$lang->txt('Price').qq[</td>
+						</tr>
+					</thead>
 					$product_confirmation
-					<tr>
-						<th>].$lang->txt('Total').qq[</th>
-						<th>&nbsp;</th>
-						<th>&nbsp;</th>
-						<td style="text-align:right;font-weight:bold;">$dollarSymbol$camount</td>
-					</tr>
+					<tbody>
+						<tr>
+							<td>].$lang->txt('Total').qq[</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td class="align-right">$dollarSymbol$camount</td>
+						</tr>
+					</tbody>
 				</table>
                 <div style= 'font-size:10pt'>$processFeeNote</div>
 			] if $product_confirmation;
@@ -822,10 +826,10 @@ sub invoiceNumForm      {
             if ($dref->{intTransactionID})  {
                 $all_nums_body .= qq[
                     <tr>
-                        <td style="text-align:left;border:1px solid #cccccc;border-left:0px;">$id</td>
-                        <td style="text-align:left;border:1px solid #cccccc;border-right:0px;">$dref->{Name}</td>
-                        <td style="text-align:left;border:1px solid #cccccc;border-right:0px;">\$$dref->{curAmount}</td>
-                        <td style="text-align:left;border:1px solid #cccccc;border-right:0px;">$dref->{strName}</td>
+                        <td>$id</td>
+                        <td>$dref->{Name}</td>
+                        <td>\$$dref->{curAmount}</td>
+                        <td>$dref->{strName}</td>
                     </tr>
                 ];
                 $all_nums_list .= qq[|] if $all_nums_list;
