@@ -98,6 +98,8 @@ sub main	{
         ) or query_error($st);
     disconnectDB($db);
 
+    ##
+        ## In here I will build up URL per Gateway
     ## Pass control to gateway
     my $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;chkv=$chkvalue&amp;session=$session&amp;amount=$amount];
     if ($paymentSettings->{'paymentType'} == $Defs::PAYMENT_ONLINEPAYPAL) {
