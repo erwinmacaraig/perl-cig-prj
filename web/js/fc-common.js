@@ -82,5 +82,33 @@ $(document).ready(function(){
                 return false;
             }
      });
-     
+
+
+   //Request transfer
+   //validate the comment form when it is submitted
+    $("form#personRequestForm").validate({
+        rules: {
+            search_keyword: {
+                required: true
+            }
+        },
+        messages: {
+            search_keyword: "Search keyword is required."
+        },
+        
+        errorLabelContainer: "#errorMsg"
+    });
+
+    $("form#personInitRequest").submit(function(e){
+        if($(this).find("input[type=checkbox]:checked").length == 0){
+            e.preventDefault();
+            $("div#init_error").slideDown();
+        }
+    });
+
+    //jQuery("form#personInitRequest").find("input[type=checkbox][name^=regoselected]").click(function(e){
+    //    var selected_option = jQuery(this).prop("id");
+    //    jQuery("form#personInitRequest textarea#comment" + selected_option).slideToggle("fast");
+    //});
+
 })

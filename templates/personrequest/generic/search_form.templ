@@ -45,7 +45,7 @@
                             <p>
                                 <ul class="list-unstyled inline">
                                     <li>
-                                        Do you have Player's ITC?
+                                        Do you have Players ITC?
                                     </li>
                                     <li>
                                         <a class="btn btn-sm btn-primary" href="[% target %]?client=[% client %]&amp;a=PRA_NC">[% Lang.txt('No') %]</a>
@@ -59,6 +59,7 @@
                     <div id="peoplelookup_form" class="col-md-12">
                         <form id="personRequestForm" action="main.cgi" method="POST">
                             <center>
+                            <p id="errorMsg"></p>
                                     <ul class="list-unstyled inline">
                                         <li>
                                             People lookup:
@@ -89,7 +90,10 @@
                 <div class="row">
                     <div id="init_error" class="col-md-12" style="display: none">
                         <div class="alert alert-warning" role="alert">
-                            Please select from the Registration(s) below.
+                            <div>
+                                <span class="fa fa-exclamation"></span>
+                                <p>Please select from the Registration(s) below.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -98,20 +102,33 @@
                         [% IF groupResult %]
                             <form id="personInitRequest" name="thisisatest" action="main.cgi" method="POST">
                                 <div>
+                                    [% IF groupResult.size > 1 %]
+                                    <div class="alert">
+                                        <div>
+                                        <span class="fa fa-exclamation"></span>
+                                        <p>This person has more than one registration. Please select ones apply to this transfer.
+                                        </p>
+                                    </div>
+                                    </div>
+                                    [% END %]
+
                                     [% FOREACH result IN groupResult %] 
-                                    <div>
-                                    <p>		
+                                    	
                                         <div class="read-only">
                                             <h4>[% result.key %]</h4>
                                             <div class="read-only-text">
+
                                             [% FOREACH sportOption IN result.value %]
-                                                <input id="option_[% sportOption.id %]" name="regoselected[[% sportOption.personID %]][[% sportOption.id %]]" type="checkbox"/><label for="option_[% sportOption.id %]">[% sportOption.sportLabel %]</label>
+                                                
+                                                <input id="option_[% sportOption.id %]" name="regoselected[[% sportOption.personID %]][[% sportOption.id %]]" type="checkbox"/>
+                                                <label for="option_[% sportOption.id %]">[% sportOption.sportLabel %]</label>
                                                 <br/>
+
                                             [% END %]
+                                            
                                             </div>
                                         </div>		
-                                    </p>
-                                    </div>
+                                    
                                     <br/>
                                     [% END %]
                                 </div>
@@ -133,7 +150,10 @@
                 [% ELSE %]
                     <div>
                         <div class="alert alert-warning" role="alert">
-                            No result found for keyword '[% search_keyword %]'.
+                            <div>
+                                <span class="fa fa-exclamation"></span>
+                                <p>No result found for keyword '[% search_keyword %]'.</p>
+                            </div>
                         </div>
                     </div>
                 [% END %]
@@ -191,36 +211,6 @@
             </div>
         </div>
     </div>
-
-<script src = "//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
-<script type="text/javascript">
-    jQuery().ready(function() {
-        // validate the comment form when it is submitted
-        jQuery("form#personRequestForm").validate({
-            rules: {
-                search_keyword: {
-                    required: true
-                }
-            },
-            messages: {
-                search_keyword: "Search keyword is required."
-            }
-        });
-
-        jQuery("form#personInitRequest").submit(function(e){
-            if(jQuery(this).find("input[type=checkbox]:checked").length == 0){
-                e.preventDefault();
-                jQuery("div#init_error").slideDown();
-            }
-        });
-
-        //jQuery("form#personInitRequest").find("input[type=checkbox][name^=regoselected]").click(function(e){
-        //    var selected_option = jQuery(this).prop("id");
-        //    jQuery("form#personInitRequest textarea#comment" + selected_option).slideToggle("fast");
-        //});
-
-    });
-</script>
 
 <!--
     <br /><br />
