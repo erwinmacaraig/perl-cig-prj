@@ -174,7 +174,7 @@ sub handleRegistrationFlowBulk {
         print STDERR "IN BULK HERE !!!!!!!!!\n";
         $Hidden{'nextPayAction'} = $action;
         $Hidden{'upd'} = 1;
-        $Hidden{'totalAmount'} ||= $totalAmount || getUnpaidTXNCosts($Data, $Hidden{'txnIds'});
+        $Hidden{'totalAmount'} ||= $totalAmount;
         $Hidden{'txnIds'} ||= $params{'txnIds'} || '';
 print STDERR Dumper(\%Hidden);
         $body .= displayRegoFlowCompleteBulk($Data, $client, \%Hidden);

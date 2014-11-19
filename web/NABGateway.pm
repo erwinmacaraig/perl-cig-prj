@@ -32,6 +32,7 @@ use RegoForm::RegoFormFactory;
 
 use PageMain;
 use Log;
+use DisplayPayResult;
 
 sub NABResponseCodes	{
 
@@ -183,34 +184,9 @@ print STDERR "IN HERE FOR NAB UPDATE\n";
     else    {
         #processTransLogFailure($db, $logID, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text);
     }
-	my $trans_ref = gatewayTransLog($Data, $logID);
-	$trans_ref->{'headerImage'}= $template_ref->{'strHeaderHTML'} || '';
-	$trans_ref->{'CC_SOFT_DESC'} = $paymentSettings->{'gatewayCreditCardNote'} || '';
-    
-    my ($html_head, $page_header, $page_navigator, $paypal, $powered) = getPageCustomization($Data);
-    $trans_ref->{'title'} = '';
-    $trans_ref->{'head'} = $html_head;
-    $trans_ref->{'page_begin'} = qq[ 
-        <div id="global-nav-wrap">
-        $page_navigator
-        </div>
-    ]; 
-    my $body = ''; 
-    $trans_ref->{'page_header'} = $page_header;
-    $trans_ref->{'page_content'} = '';
-    $trans_ref->{'page_footer'} = qq [
-        $paypal
-        $powered
-    ];
-    $trans_ref->{'page_end'} = '';
-
-	my $result = runTemplate(
-            undef,
-            $trans_ref, ,
-            'payment/'.$templateBody
-          );
-   	$templateBody= $result if($result);
-  	return $templateBody;
+    #my $result = displayPayResult($Data, $logID);
+   	#$templateBody= $result if($result);
+  	#return $templateBody;
 }
 # This function will run after payment is successfully finished, it will check to see if compulsory payment is set for 
 # rego form. if so means we have a temp member in tblTempMember thats needs to be added to real DB and all the post add scripts needs to be run aswell.
