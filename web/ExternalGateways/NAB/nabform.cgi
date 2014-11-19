@@ -67,7 +67,8 @@ sub NABProcess  {
     $m->add('1234A', $chkvalue);
     $chkvalue = $m->hexdigest();
        
-    my $url = $Defs::gatewayReturnDemo . qq[/gatewayprocess.cgi?a=S&amp;client=$client&amp;ext=$external&amp;ci=$logID&amp;chkv=$chkvalue&amp;formID=$formID&amp;session=$session&amp;restext=$respText&amp;rescode=$respCode&amp;txnid=111&amp;authid=123];
+    my $url = $Defs::gatewayReturnDemo . qq[/gatewayprocess.cgi?sa=1&amp;da=0&amp;client=$client&amp;ext=$external&amp;ci=$logID&amp;chkv=$chkvalue&amp;formID=$formID&amp;session=$session&amp;restext=$respText&amp;rescode=$respCode&amp;txnid=111&amp;authid=123];
+    my $return_link = $Defs::gatewayReturnDemo . qq[/gatewayprocess.cgi?sa=0&amp;da=1&amp;client=$client&amp;ext=$external&amp;ci=$logID&amp;chkv=$chkvalue&amp;formID=$formID&amp;session=$session&amp;restext=$respText&amp;rescode=$respCode&amp;txnid=111&amp;authid=123];
 
     my $agent = LWP::UserAgent->new(env_proxy => 1,keep_alive => 1, timeout => 30); 
     my $header = HTTP::Request->new(GET => $url); 
@@ -79,7 +80,9 @@ sub NABProcess  {
         <b>RESPCODE</b> $respCode<br>
         <b>RESPTEXT</b> $respText<br>
         <b>AMOUNT</b> \$$amount<br>
-        <br>$url
+        <br>$url<br>
+        <a href="$return_link">RETURN</a><br>
+    $return_link
     ];
 }
 

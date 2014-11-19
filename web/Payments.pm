@@ -178,7 +178,8 @@ sub processFeeDetails {
 }
 
 sub checkoutConfirm	{
-	my($Data, $paymentType, $trans, $external)=@_;
+	my($Data, $paymentType, $trans, $external, $payTryReturn)=@_;
+    $payTryReturn ||= 0;
 	$external ||= 0; ## Pop CC in NEW window ?
 
     my $lang = $Data->{'lang'};
@@ -191,19 +192,8 @@ sub checkoutConfirm	{
     
     my $compulsory = 0;
 	my $RegoFormObj = undef;
-	#my $passedEntityID = $Data->{'clientValues'}{'clubID'};
-	#$passedEntityID = $Data->{'clientValues'}{'zoneID'} if ($Data->{'clientValues'}{'zoneID'} and $Data->{'clientValues'}{'zoneID'} != $Defs::INVALID_ID);
 
-	if($Data->{'RegoFormID'})	{
-		$RegoFormObj = RegoForm::RegoFormFactory::getRegoFormObj(
-			$Data->{'RegoFormID'},
-			$Data,
-			$Data->{'db'},
-		);
-        $compulsory = $RegoFormObj->getValue('intPaymentCompulsory') || 0;
-	}
     my $formID = $Data->{'RegoFormID'} || 0;
-	#$Data->{'clientValues'}{'clubID'}= $passedEntityID if $passedEntityID;
 	my $client=setClient($Data->{'clientValues'}) || '';
 	my $db = $Data->{'db'};
 	my $body;
@@ -230,16 +220,6 @@ sub checkoutConfirm	{
 	# Need to create TransLog record
     my $intLogID = $count ? createTransLog($Data, $paymentSettings, $entityID, $trans, $amount) : 0;
 	my $payLater = '';
-    if ($Data->{'RegoFormID'} and $Data->{'SystemConfig'}{'regoform_showPayLater'} and !$compulsory)   {
-        my $m;
-        my $chkvalue=$intLogID;
-        $m = new MD5;
-        $m->reset();
-        $m->add($Defs::paylater_string, $chkvalue);
-        $chkvalue = $m->hexdigest();
-        $payLater = qq[<a href="paylater.cgi?a=PAY_LATER&amp;ci=$intLogID&amp;formID=$Data->{'RegoFormID'}&amp;pl=$chkvalue">Click here to choose to pay later</a>];
-    }
-
 
     my $values = $amount . $intLogID . $paymentSettings->{'paymentGatewayID'} . $paymentSettings->{'currency'};
     $m->add($paymentSettings->{'gatewaySalt'}, $values);
@@ -251,16 +231,16 @@ sub checkoutConfirm	{
 
     my $session = $Data->{'sessionKey'};
 	my $paymentURL = qq[$Defs::base_url/paypal.cgi?nh=$Data->{'noheader'}&amp;ext=$external&amp;a=P&amp;client=$client&amp;ci=$intLogID&amp;formID=$formID&amp;session=$session;compulsory=$compulsory];
-	my $formTarget = $external ? qq[ target="other" onClick="window.open('$paymentURL','other','location=no,directories=no,menubar=no,statusbar=no,toolbar=no,scrollbars=yes,height=820,width=870,resizable=yes');return false;" ] : '';
+	my $formTarget = $external ;#? qq[ target="other" onClick="window.open('$paymentURL','other','location=no,directories=no,menubar=no,statusbar=no,toolbar=no,scrollbars=yes,height=820,width=870,resizable=yes');return false;" ] : '';
     my $gatewayImage = $paymentSettings->{'gatewayImage'} || '';
 	my $externalGateway= qq[
 	    <div><img src="images/PP-CC.jpg" border="0"></div><br>
 		<br><a $formTarget id ="payment" href="$paymentURL"><img src="$gatewayImage" border="0"  alt="Pay Now"></a>
 	];
 
+    my $chkvalue= $amount . $intLogID . $paymentSettings->{'currency'};
     if ($paymentType == $Defs::PAYMENT_ONLINENAB)    {
         my $m;
-        my $chkvalue= $amount . $intLogID . $paymentSettings->{'currency'};
 #warn("AM:$amount $intLogID " . $paymentSettings->{'currency'} . "#######" . $paymentSettings->{'gatewaySalt'});
         $m = new MD5;
         $m->reset();
@@ -291,8 +271,11 @@ sub checkoutConfirm	{
 		UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $intLogID);
 #        EmailPaymentConfirmation($Data, $paymentSettings, $intLogID, $client, $RegoFormObj);
 #        Products::product_apply_transaction($Data,$intLogID);
+        return (0, 0, '', undef) if $payTryReturn;
 		return '';
 	}
+
+    return ($intLogID, $amount, $chkvalue, $session, $paymentSettings) if $payTryReturn;
 
 	my $invoiceList ='';
 	if ($intLogID)	{
@@ -310,12 +293,6 @@ sub checkoutConfirm	{
 				$count++;
 				my $lamount=currency($dref->{'curAmount'} || 0);
 				$invoiceList .= $invoiceList ? qq[,$dref->{'InvoiceNum'}] : $dref->{'InvoiceNum'};
-                if($dref->{ProductName} =~ /PROCESSING FEE/i){ 
-                    my $factor = processFeeDetails($Data);
-                    my $dollar =qq[1];
-                    $processFeeNote =qq[* Payment processing fee is $factor% inc GST of total transaction.];
-                    $star = qq[*];
-                }
 				$product_confirmation.=qq[
 					<tr>
 						<td style="border:1px solid #cccccc;border-left:0px;">$dref->{'InvoiceNum'}</td>
@@ -361,14 +338,8 @@ sub checkoutConfirm	{
 					$paymenttext<br> 
 				];
 				if (($onlinePayment) and $externalGateway)	{
-                    #if (getVerifiedBankAccount($Data, $paymentType))   { 
 						$body.=qq[<div class="payment_note"><p>]. $lang->txt('Please confirm the details above, then click the <b>Pay Now</b> button to make an online payment').qq[</p>] if ! $paymenttext;
 						$body .=qq[ $externalGateway</div><p id ="final_msg"></p>];
-						
-                    #}
-                    #else    {
-					#    $body.=qq[<p>Purchase cannot be made until this organisation fully configures their payment details</p>];
-                    #}
 				}
 				else	{
 					$body.=qq[<p>Please confirm the details above, then click the <b>Continue to Credit Card Payment</b> button to make an online payment.</p>] if ! $paymenttext;

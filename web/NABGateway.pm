@@ -154,6 +154,7 @@ sub NABUpdate {
 
   my ($Data, $paymentSettings, $client, $returnVals, $logID, $assocID)= @_;
 
+print STDERR "IN HERE FOR NAB UPDATE\n";
   $logID ||= 0;
   $assocID ||= 0;
   my $txn = $returnVals->{'GATEWAY_TXN_ID'} || '';
@@ -179,6 +180,9 @@ sub NABUpdate {
     	EmailPaymentConfirmation($Data, $paymentSettings, $logID, $client);
     	$templateBody = $template_ref->{'strSuccessTemplate'} || 'payment_success.templ';
   	} 
+    else    {
+        #processTransLogFailure($db, $logID, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text);
+    }
 	my $trans_ref = gatewayTransLog($Data, $logID);
 	$trans_ref->{'headerImage'}= $template_ref->{'strHeaderHTML'} || '';
 	$trans_ref->{'CC_SOFT_DESC'} = $paymentSettings->{'gatewayCreditCardNote'} || '';

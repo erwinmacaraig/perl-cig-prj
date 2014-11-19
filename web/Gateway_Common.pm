@@ -33,7 +33,6 @@ sub gatewayTransactions	{
 						LEFT JOIN tblPaymentConfig as PC ON (PC.intPaymentConfigID = TL.intPaymentConfigID)
 						LEFT JOIN tblRegoForm as RF ON (RF.intRegoFormID=TL.intRegoFormID)
         ];
-warn($st);
 
         my $qry= $Data->{'db'}->prepare($st) or query_error($st);
 #print STDERR $st;

@@ -15,6 +15,7 @@ require Exporter;
     add_rego_record
     bulkRegoSubmit
     checkUploadedRegoDocuments
+    getUnpaidTXNCosts
 );
 
 use strict;
@@ -61,6 +62,7 @@ sub displayRegoFlowCompleteBulk {
 sub displayRegoFlowComplete {
 
     my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref) = @_;
+print STDERR Dumper($hidden_ref);
     my $lang=$Data->{'lang'};
 
     my $ok = 0;
@@ -124,6 +126,27 @@ sub displayRegoFlowComplete {
     }
     return $body;
 }
+sub getUnpaidTXNCosts {
+
+    my ($Data, $txns) = @_;
+
+    $txns =~ s/:/,/g;
+
+    my $st = qq[
+        SELECT SUM(curAmount)
+        FROM tblTransactions
+        WHERE intStatus=0
+            AND curAmount>0
+            AND intRealmID =?
+            AND intTransactionID IN ($txns)
+    ];
+	my $qry = $Data->{'db'}->prepare($st);
+print STDERR $st;
+	$qry->execute($Data->{'Realm'}); #, @transactions);
+	my $txnCount = $qry->fetchrow_array() || 0;
+    return $txnCount || 0;
+}
+
 sub getPersonRegoTXN    {
 
     my ($Data, $personID, $regoID) = @_;
@@ -438,6 +461,7 @@ sub generateRegoFlow_Gateways   {
     my $gateway_body = qq[
         <div id = "payment_cc" style= "ddisplay:none;"><br>
     ];
+print STDERR Dumper($hidden_ref);
     my $gatewayCount = 0;
     my $paymentType = 0;
     foreach my $gateway (@{$paymentTypes})  {
@@ -448,19 +472,20 @@ sub generateRegoFlow_Gateways   {
         my $name = $gateway->{'gatewayName'};
         $gateway_body .= qq[
             <input type="submit" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
-            <input type="hidden" value="$pType" name="pt_submit[$gatewayCount]">
         ];
+            #<input type="hidden" value="$pType" name="pt_submit[$gatewayCount]">
+        #<input type="hidden" value="$gatewayCount" name="gatewayCount">
     }
     $gateway_body .= qq[
-        <input type="hidden" value="$gatewayCount" name="gatewayCount">
         <div style= "clear:both;"></div>
         </div>
     ];
     $gateway_body = '' if ! $gatewayCount;
+    my $target = 'paytry.cgi';#$Data->{'target'};
 
     my %PageData = (
         nextaction=>$nextAction,
-        target => $Data->{'target'},
+        target => $target,
         gateway_body => $gateway_body,
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
@@ -469,8 +494,11 @@ sub generateRegoFlow_Gateways   {
     if ($gatewayCount == 1) {
         $hidden_ref->{"pt_submit[1]"} = $paymentType; 
         $hidden_ref->{"gatewayCount"} = 1;
-        $hidden_ref->{"cc_submit[1]"} = 1;
+        #$hidden_ref->{"cc_submit[1]"} = 1;
     #    return displayRegoFlowCheckout($Data, $hidden_ref);
+    }
+    else    {
+        $hidden_ref->{"gatewayCount"} = $gatewayCount;
     }
     return runTemplate($Data, \%PageData, 'registration/show_gateways.templ') || '';
 }

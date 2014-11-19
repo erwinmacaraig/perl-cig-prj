@@ -1434,6 +1434,7 @@ sub display_complete {
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
     }
+print STDERR "ADD IF FROM PAY\n";
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
@@ -1474,6 +1475,9 @@ print STDERR "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC IN FLOW_PERSON\n";
             );
         }
 
+        my $hiddenFields = $self->getCarryFields();
+        $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
+        $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
         $content = displayRegoFlowComplete(
             $self->{'Data'}, 
             $regoID, 
@@ -1482,7 +1486,7 @@ print STDERR "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC IN FLOW_PERSON\n";
             $rego_ref, 
             $entityID, 
             $personID, 
-            $self->{'CarryFields'}
+            $hiddenFields,
         );
     }
     else    {
