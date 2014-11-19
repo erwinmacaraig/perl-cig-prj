@@ -2,15 +2,17 @@
     <div class="payment-detail">
         <!--<div class = "sectionheader">[% Lang.txt('Payment Details') %]&nbsp;&nbsp;</div>-->
         <div class="member-details">
-                <table style="width: 100%">
-                <tr>
-                    <th>[% Lang.txt('Qty') %]</th>
-                    <th>[% Lang.txt('Product') %]</th>
-                    <th>[% Lang.txt('Product Type') %]</th>
-                    <th>[% Lang.txt('Total Cost') %]</th>
-                    <th>[% Lang.txt('Payment Status') %]</th>
-                    <th>[% Lang.txt('Payment Type') %]</th>
-                </tr>
+                <table class="table" style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th>[% Lang.txt('Qty') %]</th>
+                            <th>[% Lang.txt('Product') %]</th>
+                            <th>[% Lang.txt('Product Type') %]</th>
+                            <th>[% Lang.txt('Total Cost') %]</th>
+                            <th>[% Lang.txt('Payment Status') %]</th>
+                            <th>[% Lang.txt('Payment Type') %]</th>
+                        </tr>
+                    </thead>
                 <!-- loop here; -->
                 [% FOREACH row IN TXNs %]
                 <tr>
