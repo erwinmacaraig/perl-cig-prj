@@ -988,3 +988,8 @@ table.table tr th {
 	padding:15px;
 	border-bottom:1px solid #ccc;
 }
+
+.document-upload .document-notes p {
+	padding:0;
+	margin:0;
+}

@@ -1434,7 +1434,6 @@ sub display_complete {
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
     }
-print STDERR "ADD IF FROM PAY\n";
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
@@ -1462,6 +1461,7 @@ print STDERR "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC IN FLOW_PERSON\n";
         $rego_ref->{'Nationality'} = $nationality;
 
         if($self->{'RunParams'}{'newreg'})  {
+print STDERR "RRRRRRRRULES RUNNINGS\n";
             my $rc = WorkFlow::addWorkFlowTasks(
                 $self->{'Data'},
                 'PERSON',
