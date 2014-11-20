@@ -181,6 +181,24 @@ sub setupValues    {
 
         ];
     }
+
+    my $maidennamescript = qq[
+        <script>
+            jQuery(document).ready(function()  {
+                jQuery('#l_row_strMaidenName').hide();
+
+                jQuery("select#l_intGender").change(function(){
+                    if(jQuery(this).val() == 2) {
+                        jQuery("#l_row_strMaidenName").show();
+                    } else {
+                        jQuery("#l_row_strMaidenName").hide();
+                    }
+                });
+            });
+        </script> 
+    ];
+
+
     my ($DefCodes, $DefCodesOrder) = getDefCodes(
         dbh        => $self->{'Data'}{'db'},
         realmID    => $self->{'Data'}{'Realm'},
@@ -198,6 +216,7 @@ sub setupValues    {
                     type        => 'text',
                     size        => '40',
                     maxsize     => '50',
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 strLocalSurname => {
                     label       => $self->{'SystemConfig'}{'strLocalSurname_Text'} ? $self->{'SystemConfig'}{'strLocalSurname_Text'} : $FieldLabels->{'strLocalSurname'},
@@ -206,6 +225,7 @@ sub setupValues    {
                     size        => '40',
                     maxsize     => '50',
                     compulsory => 1,
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 intGender => {
                     label       => $FieldLabels->{'intGender'},
@@ -214,6 +234,7 @@ sub setupValues    {
                     options     => \%genderoptions,
                     compulsory => 1,
                     firstoption => [ '', " " ],
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },                
                 intLocalLanguage => {
                     label       => $FieldLabels->{'intLocalLanguage'},
@@ -223,6 +244,7 @@ sub setupValues    {
                     firstoption => [ '', 'Select Language' ],
                     compulsory => 1,
                     posttext => $nonlatinscript,
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 strLatinFirstname => {
                     label       => $self->{'SystemConfig'}{'person_strLatinNames'} || $FieldLabels->{'strLatinFirstname'},
@@ -231,6 +253,7 @@ sub setupValues    {
                     size        => '40',
                     maxsize     => '50',
                     active      => $nonLatin,
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 strLatinSurname => {
                     label       => $self->{'SystemConfig'}{'person_strLatinNames'} || $FieldLabels->{'strLatinSurname'},
@@ -239,6 +262,7 @@ sub setupValues    {
                     size        => '40',
                     maxsize     => '50',
                     active      => $nonLatin,
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 strMaidenName => {
                     label       => $FieldLabels->{'strMaidenName'},
@@ -246,6 +270,8 @@ sub setupValues    {
                     type        => 'text',
                     size        => '40',
                     maxsize     => '50',
+                    posttext    => $maidennamescript,
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 dtDOB => {
                     label       => $FieldLabels->{'dtDOB'},
@@ -255,6 +281,7 @@ sub setupValues    {
                     format      => 'dd/mm/yyyy',
                     validate    => 'DATE',
                     compulsory => 1,
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 strISONationality => {
                     label       => $FieldLabels->{'strISONationality'},
@@ -263,6 +290,7 @@ sub setupValues    {
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
                     compulsory => 1,
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 strISOCountryOfBirth => {
                     label       => $FieldLabels->{'strISOCountryOfBirth'},
@@ -271,6 +299,7 @@ sub setupValues    {
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
                     compulsory => 1,
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 strRegionOfBirth => {
                     label       => $FieldLabels->{'strRegionOfBirth'},
@@ -278,6 +307,7 @@ sub setupValues    {
                     type        => 'text',
                     size        => '30',
                     maxsize     => '45',
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 strPlaceOfBirth => {
                     label       => $FieldLabels->{'strPlaceOfBirth'},
@@ -286,6 +316,7 @@ sub setupValues    {
                     size        => '30',
                     maxsize     => '45',
                     compulsory => 1,
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 intGender => {
                     label       => $FieldLabels->{'intGender'},
@@ -294,6 +325,7 @@ sub setupValues    {
                     options     => \%genderoptions,
                     compulsory => 1,
                     firstoption => [ '', " " ],
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
             },
             'order' => [qw(
@@ -610,6 +642,16 @@ sub setupValues    {
 sub display_core_details    { 
     my $self = shift;
 
+    my $id = $self->ID() || 0;
+    my $defaultType = $self->{'RunParams'}{'dtype'} || '';
+    if($defaultType eq 'TRANSFER')   {
+        my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
+        $personObj->load();
+        if($personObj->ID())    {
+            my $objectValues = $self->loadObjectValues($personObj);
+            $self->setupValues($objectValues);
+        }
+    }
 
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Person',);
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
