@@ -54,9 +54,9 @@
 		    [% FOREACH task IN TaskList %]
                 <tr class="task-list">
                     [% IF task.TaskType == 'TRANSFER' %]
-                        <td>
+                        <td style="word-wrap: break-word;width: 280px;">
                             <span style="float: left" class="fa fa-user"></span>
-                            <div style="float: left; word-wrap: break-word;width: 280px;">
+                            <div style="float: left;">
                             Transfer of <br/>
                             [% task.Name %] from <br/>
                             [% task.requestFrom %] to [% task.requestTo %]
