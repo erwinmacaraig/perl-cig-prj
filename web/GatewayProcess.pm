@@ -93,13 +93,6 @@ sub gatewayProcess {
 	my $external= $returnVals_ref->{'ext'} || '';
 	my $chkv= $returnVals_ref->{'chkv'} || '';
 
-  my $redirect =0;
-
-  $returnVals_ref->{'ResponseText'} = NABResponseCodes($returnVals_ref->{'GATEWAY_RESPONSE_CODE'});
-  if ($returnVals_ref->{'GATEWAY_RESPONSE_CODE'} =~/^00|08|OK$/)  {
-    $returnVals_ref->{'ResponseCode'} = 'OK';
-  }
-	
 	my $st = qq[
 		INSERT IGNORE INTO tblTransLog_Counts
 		(intTLogID, dtLog, strResponseCode)
@@ -114,6 +107,18 @@ sub gatewayProcess {
   $Data->{'SystemConfig'}{'PaymentConfigID'} = $Data->{'SystemConfig'}{'PaymentConfigUsedID'} ||  $Data->{'SystemConfig'}{'PaymentConfigID'};
 
   my ($paymentSettings, undef) = getPaymentSettings($Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, $external);
+
+
+    print STDERR $paymentSettings->{'gatewayCode'};
+    ### Might need IF test here per gatewayCode
+  $returnVals_ref->{'ResponseText'} = NABResponseCodes($returnVals_ref->{'GATEWAY_RESPONSE_CODE'});
+  $returnVals_ref->{'ResponseCode'} = $returnVals_ref->{'GATEWAY_RESPONSE_CODE'};
+  if ($returnVals_ref->{'GATEWAY_RESPONSE_CODE'} =~/^00|08|OK$/)  {
+    $returnVals_ref->{'ResponseCode'} = 'OK';
+  }
+
+
+
 
   {
     my $chkvalue= param('rescode') . $Order->{'TotalAmount'}. $logID; ## NOTE: Different to one being sent
