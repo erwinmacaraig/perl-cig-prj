@@ -1538,6 +1538,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 		<div class="sectionheader">].$lang->txt('Items making up this Payment').qq[</div>
 		<table class="listTable">
 		<tr>
+			<th>].$lang->txt('Invoice Number').qq[</th>
 			<th>].$lang->txt('Transaction Number').qq[</th>
 			<th>].$lang->txt('Item').qq[</th>
 			<th>].$lang->txt('Payment For').qq[</th>
@@ -1560,17 +1561,11 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 		# 	Payments::TXNtoInvoiceNum($dref->{intTransactionID})	
 		$body .= qq[
 			<tr>
-<<<<<<< HEAD
 				<td>$dref->{'strInvoiceNumber'}</td>
-				<td>$productname</td>
-				<td>$paymentFor</td>
-				<td>$dref->{intQty}</td>
-=======
 				<td>].Payments::TXNtoTXNNumber($dref->{intTransactionID}).qq[</a></td>
 				<td>$productname</a></td>
 				<td>$paymentFor</a></td>
 				<td>$dref->{intQty}</a></td>
->>>>>>> 210db9d45411a43198ee6827b0abcf3e0eddc9af
 				<td>$dollarSymbol $dref->{curAmount}</td>
 				<td>$Defs::TransactionStatus{$dref->{intStatus}}</td>
 			</tr>
