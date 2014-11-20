@@ -1165,6 +1165,7 @@ sub getRequests {
             p.dtDOB,
             p.intGender,
             p.strNationalNum,
+		    TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             ef.strLocalName as requestFrom,
             et.strLocalName as requestTo,
             erb.strLocalName as responseBy,
@@ -1196,6 +1197,8 @@ sub getRequests {
     my @personRequests = ();
       
     while(my $dref = $q->fetchrow_hashref()) {
+        my $personCurrAgeLevel = Person::calculateAgeLevel($Data, $dref->{'currentAge'});
+        $dref->{'personCurrentAgeLevel'} = $personCurrAgeLevel;
         push @personRequests, $dref;
     }
 
