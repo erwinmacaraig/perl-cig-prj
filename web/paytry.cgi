@@ -99,9 +99,13 @@ sub main	{
     disconnectDB($db);
 
     ##
-        ## In here I will build up URL per Gateway
+        ## In here I will build up URL per Gateway -- intPaymentConfigID or have a GATEWAYCODE ?
     ## Pass control to gateway
-    my $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;chkv=$chkvalue&amp;session=$session&amp;amount=$amount];
+    my $paymentURL = '';
+    if ($paymentSettings->{'gatewayCode'} eq 'NABExt1') {
+        print STDERR "YEP";
+    }
+    $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;chkv=$chkvalue&amp;session=$session&amp;amount=$amount];
     if ($paymentSettings->{'paymentType'} == $Defs::PAYMENT_ONLINEPAYPAL) {
         $paymentURL = qq[$Defs::base_url/paypal.cgi?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;session=$session];
     }

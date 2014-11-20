@@ -41,9 +41,25 @@ sub payTryRedirectBack  {
         $redirect_link .= "&amp;$k=".$payTry->{$k};
     }
     my $body = "HELLO";
-    print "Content-type: text/html\n\n";
-    print $body;
-    print qq[<a href="$redirect_link">LINK</a><br>$redirect_link];
+    #print "Content-type: text/html\n\n";
+    #print $body;
+    #print qq[<a href="$redirect_link">LINK</a><br>$redirect_link];
+
+    print "Status: 302 Moved Temporarily\n";
+    print "Location: $redirect_link\n\n";
+    return;
+
+     print qq[Content-type: text/html\n\n];
+        print qq[
+        <HTML>
+        <BODY>
+        <SCRIPT LANGUAGE="JavaScript1.2">
+            parent.location.href="$redirect_link";
+            noScript = 1;
+        </SCRIPT>
+        </BODY>
+        </HTML>
+        ];
 
 }
 
@@ -146,8 +162,8 @@ sub gatewayProcess {
 	}
 	disconnectDB($db);
 
- 	print "Content-type: text/html\n\n";
-  	print $body;
+ 	#print "Content-type: text/html\n\n";
+  	#print $body;
 }
 
 1;

@@ -311,7 +311,9 @@ sub step2 {
 	my $intPersonID= $Data->{'clientValues'}{'personID'}; 
 	my $currentLevel = $Data->{'clientValues'}{'authLevel'};
 	
-	my ($transHTML, $transcount, $transCurrency_ref, $transAmount_ref)=getTransList($Data, $db, $entityID, $intPersonID, $whereClause, $clientValues_ref, 0, $displayonly);
+print STDERR "DISPLAY OLY|".$Data->{params}{'subbut'} ."\n";
+    my $hidePayCheckbox = 1; #$Data->{params}{'subbut'} || 0;
+	my ($transHTML, $transcount, $transCurrency_ref, $transAmount_ref)=getTransList($Data, $db, $entityID, $intPersonID, $whereClause, $clientValues_ref, 0, $displayonly, $hidePayCheckbox);
 
 
 #Make DB Changes
@@ -527,9 +529,10 @@ EOS
 }
 
 sub getTransList {
-	my ($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref, $hide_list_payments_link, $displayonly) = @_;
+	my ($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref, $hide_list_payments_link, $displayonly, $hidePay) = @_;
 	$displayonly ||= 0;
     my $hidePayment=1;
+    $hidePay ||= 0;
     $hidePayment=0 if ($personID and $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB);
     $hidePayment=0 if ($entityID and ! $personID and $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB);
 
@@ -599,7 +602,7 @@ sub getTransList {
     my $client = setClient($Data->{clientValues});
     my @Columns = ();
     push (@Columns, {Name => '', Field => 'SelectLink', type => 'Selector', hide => $displayonly});
-    push (@Columns, {Name => 'Invoice Number', Field => 'intTransactionID', width => 20});
+    push (@Columns, {Name => 'Transaction Number', Field => 'intTransactionID', width => 20});
     push (@Columns, {Name => 'Item Name', Field => 'strName'});
     push (@Columns, {Name => 'Quantity', Field => 'intQty', width => 15});
     push (@Columns, {Name => 'Current Amount', Field => 'curAmount', width =>20});
@@ -614,7 +617,7 @@ sub getTransList {
     push (@Columns, {Name => 'Status', Field => 'StatusTextLang', width => 20});
     push (@Columns, {Name => 'Status_raw', Field => 'intStatus', hide => 1});
     push (@Columns, {Name => '&nbsp;', Field => 'stuff', type => 'HTML', hide => $displayonly});
-    push (@Columns, {Name => 'Pay', Field => 'manual_payment', type => 'HTML', width => 10, hide => $hidePayment});
+    push (@Columns, {Name => 'Pay', Field => 'manual_payment', type => 'HTML', width => 10, hide => ($hidePayment or $hidePay)});
     push (@Columns, {Name => 'Notes', Field => 'strNotes',  width => 50, hide => $displayonly});
     push (@Columns, {Name => 'View Receipt', Field => 'strReceipt', type=>"HTML", width => 50, hide => $displayonly});
 
@@ -833,7 +836,8 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
     $whereClause .= qq[ AND P.intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) ] if $txnStatus != $Defs::TXN_PAID;
 
 
-	($tempBody, $transCount) = getTransList($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref);
+print STDERR "LISTING";
+	($tempBody, $transCount) = getTransList($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref,0,0,0);
 
 	$body .= $tempBody;
 
@@ -1512,7 +1516,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 		<div class="sectionheader">].$lang->txt('Items making up this Payment').qq[</div>
 		<table class="listTable">
 		<tr>
-			<th>].$lang->txt('Invoice Number').qq[</th>
+			<th>].$lang->txt('Transaction Number').qq[</th>
 			<th>].$lang->txt('Item').qq[</th>
 			<th>].$lang->txt('Payment For').qq[</th>
 			<th>].$lang->txt('Quantity').qq[</th>
@@ -1533,7 +1537,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 		$productname = qq[$dref->{strGroup}-].$productname if ($dref->{strGroup});
 		$body .= qq[
 			<tr>
-				<td>].Payments::TXNtoInvoiceNum($dref->{intTransactionID}).qq[</a></td>
+				<td>].Payments::TXNtoTXNNumber($dref->{intTransactionID}).qq[</a></td>
 				<td>$productname</a></td>
 				<td>$paymentFor</a></td>
 				<td>$dref->{intQty}</a></td>
@@ -1652,7 +1656,7 @@ sub viewPayLaterTransLog    {
 		<div class="sectionheader">Items making up this order</div>
 		<table class="listTable">
 		<tr>
-			<th>Invoice Number</th>
+			<th>Transaction Number</th>
 			<th>Item</th>
 			<th>Quantity</th>
 			<th>Total Amount</th>
@@ -1668,7 +1672,7 @@ sub viewPayLaterTransLog    {
 		$productname = qq[$dref->{strGroup}-].$productname if ($dref->{strGroup});
 		$body .= qq[
 			<tr>
-				<td>].Payments::TXNtoInvoiceNum($dref->{intTransactionID}).qq[</a></td>
+				<td>].Payments::TXNtoTXNNumber($dref->{intTransactionID}).qq[</a></td>
 				<td>$productname</a></td>
 				<td>$dref->{intQty}</a></td>
 				<td>$dollarSymbol $dref->{curAmount}</td>
