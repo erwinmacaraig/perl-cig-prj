@@ -122,7 +122,23 @@ sub main	{
     }
     my $gateway_body= qq[<a href="$paymentURL">Proceed to Payment</a>];
     my $cancel_body= qq[<a href="$cancelURL">Cancel Payment</a>];
-	
+    my $proceed_body = qq[
+    <html>
+    <body onload="document.sform.submit()">
+        <h3>Please Wait - Processing</h3>
+        <p>If you are not automatically redirected to the payment page within 30 seconds then you can <a href = "$paymentURL">proceed manually by pressing this link</a>.</p>
+        <form action = "$paymentSettings->{'gateway_url'}" method = "POST" name = "sform" id = "sform">
+            <input type = "hidden" name = "nh" value = "$Data{'noheader'}"
+            <input type = "hidden" name = "a" value = "P">
+            <input type = "hidden" name = "client" value = "].unescape($client).qq[">
+            <input type = "hidden" name = "ci" value = "$logID">
+            <input type = "hidden" name = "chkv" value = "$chkvalue">
+            <input type = "hidden" name = "sessions" value = "$session">
+            <input type = "hidden" name = "amount" value = "$amount">
+        </form>
+    </body>
+    </html>
+    ];
     my $body = '';
 if ($amount eq "0" or $amount eq "0.00" or ! $amount)   {
     print "Status: 302 Moved Temporarily\n";
@@ -130,10 +146,13 @@ if ($amount eq "0" or $amount eq "0.00" or ! $amount)   {
 }
 else    {
     print qq[Content-type: text/html\n\n];
-    print qq[$cancel_body<br>];
-    print qq[$gateway_body];
+    print $proceed_body;
+    #print qq[$cancel_body<br>];
+    #print qq[$gateway_body];
 }
 
 }
 exit;
 
+
+;
