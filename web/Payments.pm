@@ -5,8 +5,8 @@
 package Payments;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoTXNNumber TXNNumberToTXN invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount);
-@EXPORT_OK=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoTXNNumber TXNNumberToTXN invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount);
+@EXPORT=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoTXNNumber TXNNumberToTXN TXNtoInvoiceNum invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount);
+@EXPORT_OK=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoTXNNumber TXNNumberToTXN TXNtoInvoiceNum invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount);
 
 use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 
@@ -750,7 +750,14 @@ sub invoiceNumToTXN	{
 		return -1;
 	}
 }
+sub TXNtoInvoiceNum {
 
+	my ($txnID) = @_;
+
+	my $invoice_num =qq[1] . sprintf("%0*d",7, $txnID);
+	$invoice_num = $invoice_num . calcTXNInvoiceNum($invoice_num);
+	return $invoice_num;
+}
 sub TXNtoTXNNumber	{
 
 	my ($txnID) = @_;

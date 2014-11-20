@@ -51,7 +51,7 @@ sub displayRegoFlowCompleteBulk {
     #	if ($hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0) {
 
     if ($Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'} && $unpaid_cost)  { #hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0)   {
-        
+    print STDERR "SSS";    
 
         $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
     }
@@ -505,7 +505,7 @@ sub generateRegoFlow_Gateways   {
     my $lang = $Data->{'lang'};
     my ($paymentSettings, $paymentTypes) = getPaymentSettings($Data, 0, 0, $Data->{'clientValues'});
     my $gateway_body = qq[
-        <div id = "payment_cc" style= "display:none;"><br>
+        <div id = "payment_cc" sstyle= "display:none;"><br>
     ];
     my $gatewayCount = 0;
     my $paymentType = 0;
