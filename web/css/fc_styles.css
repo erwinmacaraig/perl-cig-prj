@@ -1028,3 +1028,7 @@ table.table tr th {
 	font-family: 'noto_sansregular', arial;
 }
 
+#errorMsg label {
+	font-weight: bold;
+	float:right;
+}
