@@ -42,7 +42,8 @@ sub displayRegoFlowCompleteBulk {
 
     my ($Data, $client, $hidden_ref) = @_;
     my $gateways = '';
-    if ($Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'} && $hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0)   {
+    #if ($Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'} && $hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0)   {
+	if ($hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0) {
         $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
     }
     my %PageData = (
@@ -415,7 +416,7 @@ sub generateRegoFlow_Gateways   {
     my $lang = $Data->{'lang'};
     my (undef, $paymentTypes) = getPaymentSettings($Data, 0, 0, $Data->{'clientValues'});
     my $gateway_body = qq[
-        <div id = "payment_cc" style= "ddisplay:none;"><br>
+        <div id = "payment_cc" style= "display:none;"><br>
     ];
     my $gatewayCount = 0;
     my $paymentType = 0;
@@ -562,6 +563,20 @@ sub bulkRegoSubmit {
     my @Ages = ('ADULT',
             'MINOR'
     );
+
+	my $invoiceNumber;
+	#Generate invoice number 
+	my $stt = qq[INSERT INTO tblInvoice (tTimeStamp) VALUES (NOW())];
+	my $qryy=$Data->{'db'}->prepare($stt); 
+	$qryy->execute();
+	my $invoiceID =  $qryy->{mysql_insertid} || 0;	
+	$invoiceNumber = Payments::TXNtoInvoiceNum($invoiceID); 
+
+	$stt = qq[UPDATE tblInvoice SET strInvoiceNumber = ? WHERE intInvoiceID = ?];		
+	$qryy=$Data->{'db'}->prepare($stt); 
+	$qryy->execute($invoiceNumber,$invoiceID); 
+	$qryy->finish();
+
     for my $pID (@IDs)   {
         my $pref = loadPersonDetails($Data->{'db'}, $pID) if ($pID);
         my $ageLevelOptions = checkRegoAgeRestrictions(
@@ -617,6 +632,8 @@ sub bulkRegoSubmit {
             my ($prodID, $qty) = split /-/, $prodQty;
             $Products{"prodQTY_$prodID"} =$qty;
         }
+		
+
         my ($txns_added, $amount) = insertRegoTransaction(
             $Data, 
             $regoID, 
@@ -626,7 +643,8 @@ sub bulkRegoSubmit {
             $bulk_ref->{'entityLevel'}, 
             $Defs::LEVEL_PERSON, 
             '',
-            $CheckProducts
+            $CheckProducts,
+			$invoiceID
         );
         $totalAmount = $totalAmount + $amount;
         push @total_txns_added, @{$txns_added};

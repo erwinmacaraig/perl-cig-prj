@@ -1401,7 +1401,7 @@ sub process_documents {
     
     #check for uploaded document
     my $isRequiredDocPresent = checkUploadedRegoDocuments($self->{'Data'},$personID, $regoID,$entityID,$entityLevel,$originLevel,$rego_ref);
-    if(1==2 and !$isRequiredDocPresent){
+    if(!$isRequiredDocPresent){
     	push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Required Document Missing");
     	my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
