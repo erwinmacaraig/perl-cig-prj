@@ -1,11 +1,12 @@
 <div class="member-home-page">
-    <div class="">
+    <div class="col-md-10">
         <div class="member-detail">
-            <div class = "sectionheader">[% Lang.txt('Request Details') %]</div>
-            <div class="member-details">
+			<h3 class = "panel-header">[% Lang.txt('Request Details') %]</h3>
+			<div class="panel-body">
+            	<div class="member-details">
 
                 <span class="details-row">
-                    <span class="details-left">[% Lang.txt("Request Type") %]:</span>
+                    <span class="details-left">[% Lang.txt("Request Type") %]: 	1</span>
                     <span class="details-left">[% requestType %]</span>
                 </span>
 
@@ -86,24 +87,24 @@
                     <span class="details-left">[% Lang.txt("Response Notes") %]:</span>
                     <span class="details-left">[% responseNotes %]</span>
                 </span>
-
+				</div>
             </div>
         </div>
         <div style="float: left; height: 50px; width: 100%">
             [% IF RequestAction.showAction == 1 %]
             <form action="[% RequestAction.target %]" method="POST" style="float: left">
-                <input type="hidden" name="client" value="[% RequestAction.client %]">
-                <input type="hidden" name="request_type" value="[% RequestAction.request_type %]">
-                <input type="hidden" name="a" value="[% RequestAction.action %]">
-                <input type="hidden" name="rid" value="[% RequestAction.rid %]">
-                <input class="button-small generic-button" type="submit" name="response" value="Accept">
+                <input type="hidden" name="client" value="[% RequestAction.client %]"> 
+                <input type="hidden" name="request_type" value="[% RequestAction.request_type %]"> 
+                <input type="hidden" name="a" value="[% RequestAction.action %]"> 
+                <input type="hidden" name="rid" value="[% RequestAction.rid %]"> 
+                <input class="button-small generic-button" type="submit" name="response" value="Accept"> 
             </form>
-            <form action="[% RequestAction.target %]" method="POST" style="float: left">
-                <input type="hidden" name="client" value="[% RequestAction.client %]">
-                <input type="hidden" name="request_type" value="[% RequestAction.request_type %]">
-                <input type="hidden" name="a" value="[% RequestAction.action %]">
-                <input type="hidden" name="rid" value="[% RequestAction.rid %]">
-                <input class="button-small generic-button" type="submit" name="response" value="Deny">
+            <form action="[% RequestAction.target %]" method="POST" style="float: left"> 
+                <input type="hidden" name="client" value="[% RequestAction.client %]"> 
+                <input type="hidden" name="request_type" value="[% RequestAction.request_type %]"> 
+                <input type="hidden" name="a" value="[% RequestAction.action %]"> 
+                <input type="hidden" name="rid" value="[% RequestAction.rid %]"> 
+                <input class="button-small generic-button" type="submit" name="response" value="Deny"> 
             </form>
             [% END %]
 
