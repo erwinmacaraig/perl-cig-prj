@@ -80,6 +80,7 @@ sub main	{
     my ($logID, $amount, $chkvalue, $session, $paymentSettings) = Payments::checkoutConfirm(\%Data, $paymentType, \@transactions,1,1);
     
     
+    if (! $logID)   {
 	my $st = qq[
         INSERT INTO tblPayTry (
             intRealmID,
@@ -106,8 +107,7 @@ sub main	{
     my $tryID= $qry->{mysql_insertid};
     disconnectDB($db);
 
-    ##
-        ## In here I will build up URL per Gateway -- intPaymentConfigID or have a GATEWAYCODE ?
+    ## In here I will build up URL per Gateway -- intPaymentConfigID or have a GATEWAYCODE ?
     ## Pass control to gateway
     my $paymentURL = '';
     if ($paymentSettings->{'gatewayCode'} eq 'NABExt1') {
