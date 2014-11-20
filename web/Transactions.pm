@@ -205,13 +205,13 @@ sub displayTransaction	{
 			SET --VAL--
 		WHERE intTransactionID=$id
 	];
+	
 	my $txnadd=qq[
 		INSERT INTO tblTransactions (intTXNEntityID, intID, intTableType, intRealmID, intRealmSubTypeID, dtTransaction, --FIELDS--)
 			VALUES ($entityID, $TableID, $Data->{'clientValues'}{'currentLevel'}, $Data->{'Realm'}, $Data->{'RealmSubType'}, SYSDATE(), --VAL--)
 	];
 
-        open(FH,">>$Defs::myerrorfile");
-        print FH "TROM Transactions.pm: \n" . $txnadd . "\n"; 
+        
        
 
 	 my $authLevel = $Data->{'clientValues'}{'authLevel'}||=$Defs::INVALID_ID;
@@ -531,12 +531,25 @@ sub checkTXNPricing	{
 	$PPamount ||= 0;
         $defaultAmount ||=0;
 
-	 my $amount = $PPamount || $defaultAmount || 0;
+    my $amount = $PPamount || $defaultAmount || 0;
 	my $totalamount = $amount * $qty;
+
+	
+	#Generate invoice number 
+		my $stt = qq[INSERT INTO tblInvoice (tTimeStamp) VALUES (NOW())];
+		my $qryy=$Data->{'db'}->prepare($stt); 
+ 		$qryy->execute();
+		my $invoiceID =  $qryy->{mysql_insertid} || 0;	
+		my $invoiceNumber = Payments::TXNtoInvoiceNum($invoiceID); 
+
+		$stt = qq[UPDATE tblInvoice SET strInvoiceNumber = ? WHERE intInvoiceID = ?];		
+		$qryy=$Data->{'db'}->prepare($stt); 
+		$qryy->execute($invoiceNumber,$invoiceID); 
+
 
 	$statement = qq[
 		UPDATE tblTransactions
-		SET curAmount = $totalamount, curPerItem=$amount
+		SET curAmount = $totalamount, curPerItem=$amount, intInvoiceID=$invoiceID
 		WHERE intTransactionID = $id
 	];
 

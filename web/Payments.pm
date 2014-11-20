@@ -872,8 +872,9 @@ sub getTXNDetails	{
 	my $db = $Data->{'db'};
 	my $statusWHERE = $statusCHECK ? qq[ AND T.intStatus=0] : '';
 	my $st = qq[
-        	SELECT T.intTransactionID, T.intTableType, T.intID, T.curAmount, P.strName as ProductName, P.strGSTText, T.intQty, P.strProductNotes, P.strGroup as ProductGroup
+        	SELECT T.intTransactionID, I.strInvoiceNumber, T.intTableType, T.intID, T.curAmount, P.strName as ProductName, P.strGSTText, T.intQty, P.strProductNotes, P.strGroup as ProductGroup
                 FROM tblTransactions as T
+			INNER JOIN tblInvoice I ON I.intInvoiceID = T.intInvoiceID
 			INNER JOIN tblProducts as P ON (P.intProductID = T.intProductID)
                 WHERE T.intTransactionID = $txnID
                         AND T.intRealmID = $Data->{'Realm'}
@@ -884,7 +885,8 @@ sub getTXNDetails	{
     $qry->execute or query_error($st);
     my $dref = $qry->fetchrow_hashref();
 
-	$dref->{'InvoiceNum'} = TXNtoInvoiceNum($dref->{intTransactionID});
+	#$dref->{'InvoiceNum'} = TXNtoInvoiceNum($dref->{intTransactionID}); 
+	$dref->{'InvoiceNum'} = $dref->{'strInvoiceNumber'};
 	$dref->{ProductName} = qq[$dref->{ProductGroup} - $dref->{ProductName}] if ($dref->{ProductGroup});
 	if ($dref->{intTableType} == 1)       {
         	my $st_mem = qq[

@@ -250,10 +250,7 @@ sub step2 {
 
 	my ($currencyID, $intAmount, $dtLog, $paymentType, $strBSB, $strAccountName, $strAccountNum, $strResponseCode, $strResponseText, $strComments, $strBank, $strReceiptRef) = ($Data->{params}{currencyID}, $Data->{params}{intAmount}, $Data->{params}{dtLog}, $Data->{params}{paymentType}, $Data->{params}{strBSB}, $Data->{params}{strAccountName}, $Data->{params}{strAccountNum}, $Data->{params}{strResponseCode}, $Data->{params}{strResponseCode}, $Data->{params}{strComments}, $Data->{params}{strBank}, $Data->{params}{strReceiptRef});
     $paymentType ||= $paymentTypeSubmitted;
-    print STDERR "currencyID = " . $currencyID;
-    print STDERR "intAmount = " . $intAmount;
-    print STDERR "strBSB = " . $strBSB;
-    print STDERR "strResponseCode = " . $strResponseCode;
+    
     
 
 
