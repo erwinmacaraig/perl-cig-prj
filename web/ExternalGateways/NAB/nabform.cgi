@@ -48,7 +48,7 @@ sub main	{
         $body = NABProcess($client, $external, $amount, $clientTransRefID, $chkv, $formID, $session, $CCV);
     }
     else    {
-        $body = NABPaymentForm(\%Data, $client, $clientTransRefID, \%Order, \%Transactions, $external);
+        $body = PaymentForm(\%Data, $client, $clientTransRefID, \%Order, \%Transactions, $external);
     }
     print $body;
 }
@@ -88,7 +88,7 @@ sub NABProcess  {
     ];
 }
 
-sub NABPaymentForm  {
+sub PaymentForm  {
 
 	my ($Data, $client, $logID, $Order, $Transactions, $external) = @_;
 	my $cgi = new CGI;

@@ -20,7 +20,7 @@ use Products;
 use PageMain;
 use CGI qw(param unescape escape);
 
-use NABGateway;
+use ExternalGateway;
 use Gateway_Common;
 use TTTemplate;
 use Data::Dumper;
@@ -54,7 +54,21 @@ sub main	{
 
     # Do they update
     if ($submit_action eq '1') {
-        gatewayProcess(\%Data, $logID);
+        my %returnVals = ();
+        $returnVals{'action'} = param('sa') || 0;
+        $returnVals{'ext'} = param('ext') || 0;
+        #$returnVals{'ei'} = param('ei') || 0;
+        $returnVals{'chkv'} = param('chkv') || 0;
+
+        $returnVals{'GATEWAY_TXN_ID'}= param('txnid') || '';
+        $returnVals{'GATEWAY_AUTH_ID'}= param('authid') || '';
+        $returnVals{'GATEWAY_SIG'}= param('sig') || '';
+        $returnVals{'GATEWAY_SETTLEMENT_DATE'}= param('settdate') || '';
+        $returnVals{'GATEWAY_RESPONSE_CODE'}= param('rescode') || '';
+        $returnVals{'GATEWAY_RESPONSE_TEXT'}= param('restext') || '';
+        $returnVals{'Other1'} = param('restext') || '';
+        $returnVals{'Other2'} = param('authid') || '';
+        gatewayProcess(\%Data, $logID, $client, \%returnVals);
     }
 
 	disconnectDB($db);

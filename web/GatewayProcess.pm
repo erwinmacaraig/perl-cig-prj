@@ -19,7 +19,7 @@ use Products;
 use PageMain;
 use CGI qw(param unescape escape);
 
-use NABGateway;
+use ExternalGateway;
 use Gateway_Common;
 use TTTemplate;
 use Data::Dumper;
@@ -86,29 +86,18 @@ print STDERR "TRY: $try\n";
 
 sub gatewayProcess {
 
-    my ($Data, $logID, $client) = @_;
+    my ($Data, $logID, $client, $returnVals_ref) = @_;
 
     my $db = $Data->{'db'};
-	my $action = param('sa') || 0;
-	my $external= param('ext') || 0;
-	my $encryptedID= param('ei') || 0;
-	my $chkv= param('chkv') || 0;
+	my $action = $returnVals_ref->{'action'} || '';
+	my $external= $returnVals_ref->{'ext'} || '';
+	my $chkv= $returnVals_ref->{'chkv'} || '';
 
-  my %returnVals = ();
   my $redirect =0;
-  $returnVals{'GATEWAY_TXN_ID'}= param('txnid') || '';
-  $returnVals{'GATEWAY_AUTH_ID'}= param('authid') || '';
-  $returnVals{'GATEWAY_SIG'}= param('sig') || '';
-  $returnVals{'GATEWAY_SETTLEMENT_DATE'}= param('settdate') || '';
-  $returnVals{'GATEWAY_RESPONSE_CODE'}= param('rescode') || '';
-  $returnVals{'GATEWAY_RESPONSE_TEXT'}= param('restext') || '';
-  $returnVals{'Other1'} = param('restext') || '';
-  $returnVals{'Other2'} = param('authid') || '';
-  $returnVals{'ResponseCode'} = 'ERROR';
 
-  $returnVals{'ResponseText'} = NABResponseCodes($returnVals{'GATEWAY_RESPONSE_CODE'});
-  if ($returnVals{'GATEWAY_RESPONSE_CODE'} =~/^00|08|OK$/)  {
-    $returnVals{'ResponseCode'} = 'OK';
+  $returnVals_ref->{'ResponseText'} = NABResponseCodes($returnVals_ref->{'GATEWAY_RESPONSE_CODE'});
+  if ($returnVals_ref->{'GATEWAY_RESPONSE_CODE'} =~/^00|08|OK$/)  {
+    $returnVals_ref->{'ResponseCode'} = 'OK';
   }
 	
 	my $st = qq[
@@ -117,7 +106,7 @@ sub gatewayProcess {
 		VALUES (?, NOW(), ?)
 	];
 	my $qry= $db->prepare($st);
-	$qry->execute($logID, $returnVals{'GATEWAY_RESPONSE_CODE'});
+	$qry->execute($logID, $returnVals_ref->{'GATEWAY_RESPONSE_CODE'});
 
 
 	my ($Order, $Transactions) = gatewayTransactions($Data, $logID);
@@ -157,8 +146,8 @@ sub gatewayProcess {
       $body = $result if($result);
 		}
 	}
-	elsif ($action eq '1')	{ ## WAS 'S'
-		$body = NABUpdate($Data, $paymentSettings, $client, \%returnVals, $logID, $Order->{'AssocID'}); #, $Order, $external, $encryptedID);
+	elsif ($action eq '1' or $action eq 'S')	{ ## WAS 'S'
+		$body = ExternalGatewayUpdate($Data, $paymentSettings, $client, $returnVals_ref, $logID, $Order->{'AssocID'}); #, $Order, $external, $encryptedID);
 	}
 	disconnectDB($db);
 

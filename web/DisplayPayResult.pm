@@ -19,7 +19,7 @@ use Products;
 use PageMain;
 use CGI qw(param unescape escape);
 
-use NABGateway;
+use ExternalGateway;
 use Gateway_Common;
 use TTTemplate;
 use Data::Dumper;
