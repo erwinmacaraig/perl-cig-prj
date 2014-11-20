@@ -1,3 +1,5 @@
+[% USE Dumper %]
+
     [% IF transferTypeOption != '' %]
     <!--
     <span class="label">Transfer type:</span></td><td><span class="formw">[% transferTypeOption %]</span>
@@ -12,7 +14,6 @@
     [% END %]
 
     <br/>
-    <form action="main.cgi" method="POST">
     <div class="row">
         <div class="col-md-9">
             <h5 class="panel-header">Transfer Details</h5>
@@ -44,7 +45,7 @@
                             <p>
                                 <ul class="list-unstyled inline">
                                     <li>
-                                        Do you have Player's ITC?
+                                        Do you have Players ITC?
                                     </li>
                                     <li>
                                         <a class="btn btn-sm btn-primary" href="[% target %]?client=[% client %]&amp;a=PRA_NC">[% Lang.txt('No') %]</a>
@@ -56,32 +57,89 @@
                     </div>
 
                     <div id="peoplelookup_form" class="col-md-12">
-                        <center>
-                            <p>
+                        <form id="personRequestForm" action="main.cgi" method="POST">
+                            <center>
+                            <p id="errorMsg"></p>
+                                    <ul class="list-unstyled inline">
+                                        <li>
+                                            People lookup:
+                                        </li>
+                                        <li class="peoplelookup">
+                                            <!--<input type="text" />-->
+                                            <input type="text" name="search_keyword" value="[% search_keyword %]">
+                                        </li>
+                                    </ul>
+                            </center>
+                            <center>
                                 <ul class="list-unstyled inline">
-                                    <li>
-                                        People lookup:
+                                    <li class="lblPeoplelookup">
+                                        Enter name or Member ID 
                                     </li>
-                                    <li class="peoplelookup">
-                                        <!--<input type="text" />-->
-                                        <input type="text" name="search_keyword" value="[% search_keyword %]">
+                                    <li class="btnPeoplelookupSearch">
+                                        <!--<button class="btn btn-sm btn-primary" type="submit">Search people</button>-->
+                                        <input class="btn btn-sm btn-primary" type="submit" name="submit" value="Search people">   
+                                        <input type="hidden" value="[% action %]" name="a"> <input type="hidden" value="[% client %]" name="client">
+                                        <input type="hidden" value="[% request_type %]" name="request_type">
                                     </li>
                                 </ul>
-                            </p>
-                        </center>
-                        <center>
-                            <ul class="list-unstyled inline">
-                                <li class="lblPeoplelookup">
-                                    Enter name or Member ID 
-                                </li>
-                                <li class="btnPeoplelookupSearch">
-                                    <!--<button class="btn btn-sm btn-primary" type="submit">Search people</button>-->
-                                    <input class="btn btn-sm btn-primary" type="submit" name="submit" value="Search people">   
-                                    <input type="hidden" value="[% action %]" name="a"> <input type="hidden" value="[% client %]" name="client">
-                                    <input type="hidden" value="[% request_type %]" name="request_type">
-                                </li>
-                            </ul>
-                        </center>
+                            </center>
+                        </form>
+                    </div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div id="init_error" class="col-md-12" style="display: none">
+                        <div class="alert alert-warning" role="alert">
+                            <div>
+                                <span class="fa fa-exclamation"></span>
+                                <p>Please select from the Registration(s) below.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        [% IF groupResult %]
+                            <form id="personInitRequest" name="thisisatest" action="main.cgi" method="POST">
+                                <div>
+                                    [% IF groupResult.size > 1 %]
+                                    <div class="alert">
+                                        <div>
+                                        <span class="fa fa-exclamation"></span>
+                                        <p>This person has more than one registration. Please select ones apply to this transfer.
+                                        </p>
+                                    </div>
+                                    </div>
+                                    [% END %]
+
+                                    [% FOREACH result IN groupResult %] 
+                                    	
+                                        <div class="read-only">
+                                            <h4>[% result.key %]</h4>
+                                            <div class="read-only-text">
+
+                                            [% FOREACH sportOption IN result.value %]
+                                                
+                                                <input id="option_[% sportOption.id %]" name="regoselected[[% sportOption.personID %]][[% sportOption.id %]]" type="checkbox"/>
+                                                <label for="option_[% sportOption.id %]">[% sportOption.sportLabel %]</label>
+                                                <br/>
+
+                                            [% END %]
+                                            
+                                            </div>
+                                        </div>		
+                                    
+                                    <br/>
+                                    [% END %]
+                                </div>
+
+                                <input type="hidden" value="[% action_request %]" name="a">
+                                <input type="hidden" value="[% client %]" name="client">
+                                <input type="hidden" value="[% request_type %]" name="request_type">
+                                <input type="hidden" value="[% transfer_type %]" name="transfer_type">
+                                <input type="submit" name="submit" class="btn btn-sm btn-primary" value="Send Request">   
+                            </form>
+                        [% END %]
                     </div>
                 </div>
             </div>
@@ -92,7 +150,10 @@
                 [% ELSE %]
                     <div>
                         <div class="alert alert-warning" role="alert">
-                            No result found for keyword '[% search_keyword %]'.
+                            <div>
+                                <span class="fa fa-exclamation"></span>
+                                <p>No result found for keyword '[% search_keyword %]'.</p>
+                            </div>
                         </div>
                     </div>
                 [% END %]
@@ -105,38 +166,51 @@
                     <div class="col-md-12">
                         <p>
                             <label>Member ID:</label><br />
-                            <label>&#8211;</label>
+                            <label>
+                                [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.memberID %][% ELSE %]&#8211;[% END %]
+                            </label>
                         </p>
                         <p>
                             <label>Last Name:</label><br />
-                            <label>&#8211;</label>
+                            <label>
+                                [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.lastName %][% ELSE %]&#8211;[% END %]
+                            </label>
                         </p>
                         <p>
                             <label>First Name:</label><br />
-                            <label>&#8211;</label>
+                            <label>
+                                [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.firstName %][% ELSE %]&#8211;[% END %]
+                            </label>
                         </p>
                         <p>
                             <label>Transfer to club:</label><br />
-                            <label>&#8211;</label>
+                            <label>
+                                [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.transferToClub %][% ELSE %]&#8211;[% END %]
+                            </label>
                         </p>
                         <p>
-                            <label>Current club:</label><br />
-                            <label>&#8211;</label>
+                            <label>Current club(s):</label><br />
+                            <label>
+                                [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.currentClub %][% ELSE %]&#8211;[% END %]
+                            </label>
                         </p>
                         <p>
-                            <label>Current registrations:</label><br />
-                            <label>&#8211;</label>
+                            <label>Current registration(s):</label><br />
+                            <label>
+                                [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.currentRegistrations %][% ELSE %]&#8211;[% END %]
+                            </label>
                         </p>
                         <p>
-                            <label>Current sports:</label><br />
-                            <label>&#8211;</label>
+                            <label>Current sport(s):</label><br />
+                            <label>
+                                [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.currentSports %][% ELSE %]&#8211;[% END %]
+                            </label>
                         </p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</form>
 
 <!--
     <br /><br />

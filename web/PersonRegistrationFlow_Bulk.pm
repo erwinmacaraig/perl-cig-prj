@@ -55,6 +55,7 @@ sub handleRegistrationFlowBulk {
     $Hidden{'txnIds'} = $params{'txnIds'} || '';
     $Hidden{'prodIds'} = $params{'prodIds'} || '';
     $Hidden{'prodQty'} = $params{'prodQty'} || '';
+    $Hidden{'upd'} = $params{'upd'} || 0;
 
     my $pref= undef;
    #if ($personID && $personID> 0)  {
@@ -88,11 +89,12 @@ sub handleRegistrationFlowBulk {
         $action = $Flow{$action};
     }
 
+    my $rolloverIDs= param('rolloverIDs') || '';
+    $Hidden{'rolloverIDs'} = $rolloverIDs;
     if ( $action eq 'PREGFB_SPU' ) {
-        my $rolloverIDs= param('rolloverIDs') || '';
-        $Hidden{'rolloverIDs'} = $rolloverIDs;
         $action = $Flow{$action};
     }
+    my $totalAmount=0;
     if ( $action eq 'PREGFB_PU' ) {
         #Update product records
         #$Hidden{'txnIds'} = save_rego_products($Data, $regoID, $personID, $entityID, $entityLevel, \%params);
@@ -128,25 +130,22 @@ sub handleRegistrationFlowBulk {
         ## PUT PRODUCTS IN HIDDEN
         $action = $Flow{$action};
 
-        ## Below code was ####  if ( $action eq 'PREGFB_SPU' ) {
-
         ($bulk_ref->{'nationalPeriodID'}, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $bulk_ref->{'sport'}, $bulk_ref->{'personType'}, $bulk_ref->{'registrationNature'});
         my $count = bulkPersonRollover($Data, 'PREGFB_SPU', $bulk_ref, \%Hidden, 1);
 
         my $rolloverIDs= param('rolloverIDs') || '';
-#        my $prodIds = param('prodIds');
-#        my $prodQty= param('prodQty');
         my $markPaid = param('markPaid');
         my $paymentType= param('paymentType');
 
         #FC-145 (having duplicate entries upon page refresh.. need to check number of records upon submit)
         if($count > 0) {
-            my ($totalAmount, $txnIds) = bulkRegoSubmit($Data, $bulk_ref, $rolloverIDs, $prodIds, $prodQty, $markPaid, $paymentType);
+            my ($txnTotalAmount, $txnIds) = bulkRegoSubmit($Data, $bulk_ref, $rolloverIDs, $prodIds, $prodQty, $markPaid, $paymentType);
             $Hidden{'txnIds'} = $txnIds;
-            $Hidden{'totalAmount'} = $totalAmount || 0;
+            $Hidden{'totalAmount'} = $txnTotalAmount || 0;
+            $totalAmount = $txnTotalAmount;
         }
-#        return $Data->{'lang'}->txt("No $Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'} selected") if (! scalar @MembersToRollover);
         $body .= qq[ROLLOVER FOR $rolloverIDs];
+        $Hidden{'rolloverIDs'} = $rolloverIDs;
     }
  
 ## FLOW SCREENS
@@ -172,6 +171,10 @@ sub handleRegistrationFlowBulk {
         $body .= displayRegoFlowProductsBulk($Data, 0, $client, $entityLevel, $originLevel, $bulk_ref, $entityID, $personID, \%Hidden);
    }
     elsif ( $action eq 'PREGFB_C' ) {
+        $Hidden{'nextPayAction'} = $action;
+        $Hidden{'upd'} = 1;
+        $Hidden{'totalAmount'} ||= $totalAmount;
+        $Hidden{'txnIds'} ||= $params{'txnIds'} || '';
         $body .= displayRegoFlowCompleteBulk($Data, $client, \%Hidden);
     }    
     else {

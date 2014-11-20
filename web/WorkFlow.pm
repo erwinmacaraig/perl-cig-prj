@@ -170,7 +170,6 @@ sub handleWorkflow {
         switch($type) {
             case "$Defs::WF_TASK_ACTION_RESOLVE" {
                 resolveTask($Data, $emailNotification);
-                $query->redirect("$Defs::base_url");
                 print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_");
             }
             case "$Defs::WF_TASK_ACTION_REJECT" {
@@ -260,6 +259,7 @@ sub listTasks {
 	my $db=$Data->{'db'};
 
 	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+    my %taskCounts;
 
     $st = qq[
             SELECT
@@ -269,10 +269,11 @@ sub listTasks {
             pr.strPersonLevel,
             pr.strAgeLevel,
             pr.strSport,
-	    t.strRegistrationNature,
+            t.strRegistrationNature,
+            DATE_FORMAT(t.tTimeStamp,'%d %b %Y') AS taskDate,
             dt.strDocumentName,
             p.intSystemStatus,
-	    p.strLocalFirstname, 
+            p.strLocalFirstname, 
             p.strLocalSurname, 
             p.intGender as PersonGender,
             e.strLocalName as EntityLocalName,
@@ -332,8 +333,6 @@ sub listTasks {
 		$entityID,
 		$entityID,
 	) or query_error($st);
-    open FH,">dumpfile.txt";
-    print FH "\n\nFROM WorkFlow entityID = $entityID \n\n";     
 
 	my @TaskList = ();
 	my $rowCount = 0;
@@ -384,27 +383,35 @@ sub listTasks {
         my $showView = 0;
         $showView = 1 if(($showApprove and $dref->{'OnHold'} == 1) or ($showResolve and $dref->{'OnHold'} == 1) or $dref->{'OnHold'} == 0);
 
+        $taskCounts{$dref->{'strTaskStatus'}}++;
+        $taskCounts{$dref->{'strRegistrationNature'}}++;
+
+        my $viewTaskURL = "$Data->{'target'}?client=$client&amp;a=WF_View&TID=$dref->{'intWFTaskID'}";
 	 my %single_row = (
 			WFTaskID => $dref->{intWFTaskID},
-                        TaskDescription => $taskDescription,
+            TaskDescription => $taskDescription,
 			TaskType => $dref->{strTaskType},
 			TaskNotes=> $dref->{TaskNotes},
 			AgeLevel => $dref->{strAgeLevel},
 			RuleFor=> $dref->{strWFRuleFor},
 			RegistrationNature => $dref->{strRegistrationNature},
+			RegistrationNatureLabel => $Defs::registrationNature{$dref->{strRegistrationNature}},
 			DocumentName => $dref->{strDocumentName},
-                        Name=>$name,
+            Name=>$name,
 			LocalEntityName=> $dref->{EntityLocalName},
 			LocalFirstname => $dref->{strLocalFirstname},
 			LocalSurname => $dref->{strLocalSurname},
 			PersonID => $dref->{intPersonID},
 			TaskStatus => $dref->{strTaskStatus},
+			TaskStatusLabel => $Defs::wfTaskStatus{$dref->{strTaskStatus}},
             viewURL => $viewURL,
             showReject => $showReject,
             showApprove => $showApprove,
             showResolve => $showResolve,
             showView => $showView,
-            OnHold => $dref->{OnHold}
+            OnHold => $dref->{OnHold},
+            taskDate => $dref->{taskDate},
+            viewURL => $viewTaskURL,
 		);
    
 		push @TaskList, \%single_row;
@@ -438,23 +445,30 @@ sub listTasks {
     if(scalar @{$personRequests}) {
 
         for my $request (@{$personRequests}) {
+            print STDERR Dumper $request;
             next if ($request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_COMPLETED);
             $rowCount++;
             my $name = formatPersonName($Data, $request->{'strLocalFirstname'}, $request->{'strLocalSurname'}, $request->{'intGender'});
             my $viewURL = "$Data->{'target'}?client=$client&amp;a=PRA_V&rid=$request->{'intPersonRequestID'}";
 
+            my $requestStatus = $request->{'strRequestResponse'} ? $request->{'strRequestResponse'} : 'PENDING';
+            $taskCounts{$requestStatus}++;
+            $taskCounts{$request->{'strRequestType'}}++;
             my %personRequest = (
                 TaskType => $request->{'strRequestType'},
                 TaskDescription => $Data->{'lang'}->txt('Person Request'),
                 Name => $name,
                 TaskStatus => $request->{'strRequestResponse'} ? $request->{'strRequestResponse'} : 'PENDING',
+                TaskStatusLabel => $request->{'strRequestResponse'} ? $Defs::personRequestStatus{$request->{'strRequestResponse'}} : $Defs::personRequestStatus{'PENDING'},
                 viewURL => $viewURL,
                 showView => 1,
+                taskDate => $request->{'prRequestDateFormatted'},
+                requestFrom => $request->{'requestFrom'},
+                requestTo => $request->{'requestTo'},
             );
             push @TaskList, \%personRequest;
         }
     }
-
 
 	my $msg = '';
 	if ($rowCount == 0) {
@@ -466,6 +480,7 @@ sub listTasks {
 
 	my %TemplateData = (
 			TaskList => \@TaskList,
+			TaskCounts => \%taskCounts,
 			TaskMsg => $msg,
 			TaskEntityID => $entityID,
 			client => $Data->{client},
@@ -1914,11 +1929,11 @@ sub viewTask {
 
     my $showReject = 0;
     #$showReject = 1 if ($dref->{'intOnHold'} == 0 and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} != $entityID);
-    $showReject = 1 if ($dref->{'strTaskStatus'} ne $Defs::WF_TASK_STATUS_REJECTED and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} != $entityID);
+    $showReject = 1 if ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_ACTIVE and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} != $entityID);
 
     my $showApprove = 0;
     #$showApprove = 1 if ($dref->{'intOnHold'} == 0 and $dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID and !scalar($TemplateData{'Notifications'}{'LockApproval'}));
-    $showApprove = 1 if ($dref->{'strTaskStatus'} ne $Defs::WF_TASK_STATUS_REJECTED and $dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID and !scalar($TemplateData{'Notifications'}{'LockApproval'}));
+    $showApprove = 1 if (($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_ACTIVE) and $dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID and !scalar($TemplateData{'Notifications'}{'LockApproval'}));
 
     my $showResolve = 0;
     $showResolve = 1 if ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_HOLD and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);

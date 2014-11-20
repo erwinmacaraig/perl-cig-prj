@@ -308,7 +308,9 @@ sub step2 {
 	my $intPersonID= $Data->{'clientValues'}{'personID'}; 
 	my $currentLevel = $Data->{'clientValues'}{'authLevel'};
 	
-	my ($transHTML, $transcount, $transCurrency_ref, $transAmount_ref)=getTransList($Data, $db, $entityID, $intPersonID, $whereClause, $clientValues_ref, 0, $displayonly);
+print STDERR "DISPLAY OLY|".$Data->{params}{'subbut'} ."\n";
+    my $hidePayCheckbox = 1; #$Data->{params}{'subbut'} || 0;
+	my ($transHTML, $transcount, $transCurrency_ref, $transAmount_ref)=getTransList($Data, $db, $entityID, $intPersonID, $whereClause, $clientValues_ref, 0, $displayonly, $hidePayCheckbox);
 
 
 #Make DB Changes
@@ -524,9 +526,10 @@ EOS
 }
 
 sub getTransList {
-	my ($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref, $hide_list_payments_link, $displayonly) = @_;
+	my ($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref, $hide_list_payments_link, $displayonly, $hidePay) = @_;
 	$displayonly ||= 0;
     my $hidePayment=1;
+    $hidePay ||= 0;
     $hidePayment=0 if ($personID and $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB);
     $hidePayment=0 if ($entityID and ! $personID and $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB);
 
@@ -598,9 +601,13 @@ sub getTransList {
     my $client = setClient($Data->{clientValues});
     my @Columns = ();
     push (@Columns, {Name => '', Field => 'SelectLink', type => 'Selector', hide => $displayonly});
+
 	####
-    push (@Columns, {Name => 'Invoice Number', Field => 'strInvoiceNumber', width => 20});
+    #push (@Columns, {Name => 'Invoice Number', Field => 'strInvoiceNumber', width => 20});
 	###
+
+    push (@Columns, {Name => 'Transaction Number', Field => 'intTransactionID', width => 20});
+
     push (@Columns, {Name => 'Item Name', Field => 'strName'});
     push (@Columns, {Name => 'Quantity', Field => 'intQty', width => 15});
     push (@Columns, {Name => 'Current Amount', Field => 'curAmount', width =>20});
@@ -615,7 +622,7 @@ sub getTransList {
     push (@Columns, {Name => 'Status', Field => 'StatusTextLang', width => 20});
     push (@Columns, {Name => 'Status_raw', Field => 'intStatus', hide => 1});
     push (@Columns, {Name => '&nbsp;', Field => 'stuff', type => 'HTML', hide => $displayonly});
-    push (@Columns, {Name => 'Pay', Field => 'manual_payment', type => 'HTML', width => 10, hide => $hidePayment});
+    push (@Columns, {Name => 'Pay', Field => 'manual_payment', type => 'HTML', width => 10, hide => ($hidePayment or $hidePay)});
     push (@Columns, {Name => 'Notes', Field => 'strNotes',  width => 50, hide => $displayonly});
     push (@Columns, {Name => 'View Receipt', Field => 'strReceipt', type=>"HTML", width => 50, hide => $displayonly});
 
@@ -837,7 +844,8 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
     $whereClause .= qq[ AND P.intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) ] if $txnStatus != $Defs::TXN_PAID;
 
 
-	($tempBody, $transCount) = getTransList($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref);
+print STDERR "LISTING";
+	($tempBody, $transCount) = getTransList($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref,0,0,0);
 
 	$body .= $tempBody;
 
@@ -882,6 +890,8 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
 
 	my $header=qq[$addLink$entityNamePlural];
 
+        my $targetManual = $Data->{'target'};
+        my $targetOnline = 'paytry.cgi';
 
     if ($transCount>0) {
 	    my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
@@ -901,7 +911,7 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
             my $pType = $gateway->{'paymentType'};
             my $name = $gateway->{'gatewayName'};
             $CC_body .= qq[
-				    <input type="submit" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
+				    <input type="submit" onclick="clicked='$targetOnline'" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
                     <input type="hidden" value="$pType" name="pt_submit[$gatewayCount]">
             ];
         }
@@ -935,7 +945,16 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
       $allowMP = 0 if $Data->{'SystemConfig'}{'AssocConfig'}{'DontAllowManualPayments'};
 		  
 		$body=qq[
-			<form action="$Data->{target}" name="n_form" method="POST">
+            <script type="text/javascript">
+                var clicked;
+                function submitForm()
+                {
+                  document.payform.action =clicked;
+                  return true;
+                }
+            </script>
+
+			<form name="payform" method="POST" onsubmit="submitForm();return true;">
             <input type="hidden" name="a" value="P_TXNLogstep2">
             <input type="hidden" name="client" value="$client">
 	
@@ -1028,7 +1047,7 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
 				    </tbody>	
 				</table>
 			
-						<div class="HTbuttons"><input type="submit" name="subbut" value="Submit Manual Payment" class="HF_submit button generic-button" id = "btn-manualpay"></div>
+						<div class="HTbuttons"><input onclick="clicked='$targetManual'" type="submit" name="subbut" value="Submit Manual Payment" class="HF_submit button generic-button" id = "btn-manualpay"></div>
 
 						<input type="hidden" name="personID" value="$TableID"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="dt_start_paid" value="$dtStart_paid"><input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
 					</form> 
@@ -1521,7 +1540,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 		<div class="sectionheader">].$lang->txt('Items making up this Payment').qq[</div>
 		<table class="listTable">
 		<tr>
-			<th>].$lang->txt('Invoice Number').qq[</th>
+			<th>].$lang->txt('Transaction Number').qq[</th>
 			<th>].$lang->txt('Item').qq[</th>
 			<th>].$lang->txt('Payment For').qq[</th>
 			<th>].$lang->txt('Quantity').qq[</th>
@@ -1543,10 +1562,17 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 		# 	Payments::TXNtoInvoiceNum($dref->{intTransactionID})	
 		$body .= qq[
 			<tr>
+<<<<<<< HEAD
 				<td>$dref->{'strInvoiceNumber'}</td>
 				<td>$productname</td>
 				<td>$paymentFor</td>
 				<td>$dref->{intQty}</td>
+=======
+				<td>].Payments::TXNtoTXNNumber($dref->{intTransactionID}).qq[</a></td>
+				<td>$productname</a></td>
+				<td>$paymentFor</a></td>
+				<td>$dref->{intQty}</a></td>
+>>>>>>> 210db9d45411a43198ee6827b0abcf3e0eddc9af
 				<td>$dollarSymbol $dref->{curAmount}</td>
 				<td>$Defs::TransactionStatus{$dref->{intStatus}}</td>
 			</tr>
@@ -1662,7 +1688,7 @@ sub viewPayLaterTransLog    {
 		<div class="sectionheader">Items making up this order</div>
 		<table class="listTable">
 		<tr>
-			<th>Invoice Number</th>
+			<th>Transaction Number</th>
 			<th>Item</th>
 			<th>Quantity</th>
 			<th>Total Amount</th>
@@ -1678,7 +1704,7 @@ sub viewPayLaterTransLog    {
 		$productname = qq[$dref->{strGroup}-].$productname if ($dref->{strGroup});
 		$body .= qq[
 			<tr>
-				<td>].Payments::TXNtoInvoiceNum($dref->{intTransactionID}).qq[</a></td>
+				<td>].Payments::TXNtoTXNNumber($dref->{intTransactionID}).qq[</a></td>
 				<td>$productname</a></td>
 				<td>$dref->{intQty}</a></td>
 				<td>$dollarSymbol $dref->{curAmount}</td>

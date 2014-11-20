@@ -48,7 +48,7 @@ sub main	{
         $body = NABProcess($client, $external, $amount, $clientTransRefID, $chkv, $formID, $session, $CCV);
     }
     else    {
-        $body = NABPaymentForm(\%Data, $client, $clientTransRefID, \%Order, \%Transactions, $external);
+        $body = PaymentForm(\%Data, $client, $clientTransRefID, \%Order, \%Transactions, $external);
     }
     print $body;
 }
@@ -67,23 +67,28 @@ sub NABProcess  {
     $m->add('1234A', $chkvalue);
     $chkvalue = $m->hexdigest();
        
-    my $url = $Defs::gatewayReturnDemo . qq[/gatewayprocess.cgi?a=S&amp;client=$client&amp;ext=$external&amp;ci=$logID&amp;chkv=$chkvalue&amp;formID=$formID&amp;session=$session&amp;restext=$respText&amp;rescode=$respCode&amp;txnid=111&amp;authid=123];
+    my $url = $Defs::gatewayReturnDemo . qq[/gatewayprocess.cgi?sa=1&amp;da=0&amp;client=$client&amp;ext=$external&amp;ci=$logID&amp;chkv=$chkvalue&amp;formID=$formID&amp;session=$session&amp;restext=$respText&amp;rescode=$respCode&amp;txnid=111&amp;authid=123];
+    my $return_link = $Defs::gatewayReturnDemo . qq[/gatewayprocess.cgi?sa=1&amp;da=1&amp;client=$client&amp;ext=$external&amp;ci=$logID&amp;chkv=$chkvalue&amp;formID=$formID&amp;session=$session&amp;restext=$respText&amp;rescode=$respCode&amp;txnid=111&amp;authid=123];
 
-    my $agent = LWP::UserAgent->new(env_proxy => 1,keep_alive => 1, timeout => 30); 
-    my $header = HTTP::Request->new(GET => $url); 
-    my $request = HTTP::Request->new('GET', $url, $header); 
-    my $response = $agent->request($request);
+    if (1==2)   {
+        my $agent = LWP::UserAgent->new(env_proxy => 1,keep_alive => 1, timeout => 30); 
+        my $header = HTTP::Request->new(GET => $url); 
+        my $request = HTTP::Request->new('GET', $url, $header); 
+        my $response = $agent->request($request);
+    }
 
     return qq[
         PROCESSED<br>
         <b>RESPCODE</b> $respCode<br>
         <b>RESPTEXT</b> $respText<br>
         <b>AMOUNT</b> \$$amount<br>
-        <br>$url
+        <br>$url<br>
+        <a href="$return_link">RETURN</a><br>
+    $return_link
     ];
 }
 
-sub NABPaymentForm  {
+sub PaymentForm  {
 
 	my ($Data, $client, $logID, $Order, $Transactions, $external) = @_;
 	my $cgi = new CGI;
@@ -167,7 +172,7 @@ sub displayNABCCPage    {
 					  <div class="card-field"><div class="label">Amount</div><div class="input">\$$NAB_ref->{'amount'}</div></div>
 				</div>
 						<div style="color:red"><b>PLEASE DO NOT DOUBLE CLICK THE PROCESS PAYMENT BUTTON.</b><br>Double clicking can result in the payment being processed twice</div>
-					  <br><br><input type="submit" name="SUBMIT" value="Process Payment" style="height:30px;width:180px;margin-left:145px;margin-top:20px;" id="btnsubmit" onclick="javascript:this.disabled='true';">
+					  <br><br><input type="submit" name="SUBMIT" value="Process Payment" style="height:30px;width:180px;margin-left:145px;margin-top:20px;" id="btnsubmit" oonclick="javascript:this.disabled='true';">
 		<img src="images/nab-logo-registrations.png" style="float:right;padding-right:145px;"> 
      		<input type="hidden" name="EPS_CURRENCY" value="$NAB_ref->{'currency'}">
      		<input type="hidden" name="EPS_TIMESTAMP" value="$NAB_ref->{'EPS_TIMESTAMP'}">

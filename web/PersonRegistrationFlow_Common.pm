@@ -15,6 +15,7 @@ require Exporter;
     add_rego_record
     bulkRegoSubmit
     checkUploadedRegoDocuments
+    getRegoTXNDetails
 );
 
 use strict;
@@ -24,7 +25,7 @@ use RegistrationItem;
 use PersonRegisterWhat;
 use RegoProducts;
 use Reg_common;
-use CGI qw(:cgi unescape);
+use CGI qw(:cgi unescape param);
 use Payments;
 use RegoTypeLimits;
 use TTTemplate;
@@ -37,13 +38,21 @@ use POSIX qw(strftime);
 use Date::Parse;
 use PlayerPassport;
 use RegoAgeRestrictions;
+use DisplayPayResult;
 
 sub displayRegoFlowCompleteBulk {
 
     my ($Data, $client, $hidden_ref) = @_;
+    my ($unpaid_cost, $logIDs) = getRegoTXNDetails($Data, $hidden_ref->{'txnIds'});
+    $hidden_ref->{'totalAmount'} = $unpaid_cost;
     my $gateways = '';
+
     #if ($Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'} && $hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0)   {
-	if ($hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0) {
+    #	if ($hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0) {
+
+    if ($Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'} && $unpaid_cost)  { #hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0)   {
+        
+
         $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
     }
     my %PageData = (
@@ -54,6 +63,15 @@ sub displayRegoFlowCompleteBulk {
     );
 
     my $body = runTemplate($Data, \%PageData, 'registration/completebulk.templ') || '';
+
+    my $logID = param('tl') || 0;
+    $logIDs->{$logID}=1;
+    foreach my $id (keys %{$logIDs}) {
+        next if ! $id;
+#        $body .= displayPayResult($Data, $id);
+        $body .= displayPaymentResult($Data, $id, 1, '');
+    }
+    
     return $body;
 }
 
@@ -65,12 +83,15 @@ sub displayRegoFlowComplete {
     my $lang=$Data->{'lang'};
 
     my $ok = 0;
+    my $run = $hidden_ref->{'run'} || param('run') || 0;
+print STDERR "COMPLETE RUN" . $run;
     if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER') {
         $ok=1;
     }
     else    {
-        $ok = checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
+        $ok = $run ? 1 : checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
     }
+print STDERR "OK IS $ok | $run\n\n";
     my $body = '';
     if (!$ok)   {
         my $error = $lang->txt("You cannot register this combination, limit exceeded");
@@ -90,7 +111,7 @@ sub displayRegoFlowComplete {
             $personID,
             $regoID,
             $rego_ref
-         );
+         ) if ! $run;
          
         my @products= split /:/, $hidden_ref->{'prodIds'};
         foreach my $prod (@products){ $hidden_ref->{"prod_$prod"} =1;}
@@ -104,11 +125,13 @@ sub displayRegoFlowComplete {
          my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
          my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
          my $gateways = '';
-         if ($Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
+        my ($txnCount, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
+        savePlayerPassport($Data, $personID) if (! $run);
+        $hidden_ref->{'run'} = 1;
+         if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
             $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
          }
          
-          savePlayerPassport($Data, $personID);
         my %PageData = (
             person_home_url => $url,
             gateways => $gateways,
@@ -121,8 +144,71 @@ sub displayRegoFlowComplete {
         );
         
         $body = runTemplate($Data, \%PageData, 'registration/complete.templ') || '';
+        my $logID = param('tl') || 0;
+        $logIDs->{$logID}=1;
+        foreach my $id (keys %{$logIDs}) {
+            next if ! $id;
+       #     $body .= displayPayResult($Data, $id);
+            $body .= displayPaymentResult($Data, $id, 1, '');
+        }
     }
     return $body;
+}
+sub getRegoTXNDetails  {
+
+    my ($Data, $txns) = @_;
+
+    $txns =~ s/:/,/g;
+
+    return 0 if ! $txns;
+    my $st = qq[
+        SELECT 
+            intStatus, 
+            intTransLogID, 
+            curAmount
+        FROM tblTransactions
+        WHERE
+            intRealmID =?
+            AND intTransactionID IN ($txns)
+    ];
+	my $qry = $Data->{'db'}->prepare($st);
+	$qry->execute($Data->{'Realm'}); #, @transactions);
+    my $amount = 0;
+    my %tlogIDs=();
+    while (my $dref= $qry->fetchrow_hashref())  {
+        $tlogIDs{$dref->{'intTransLogID'}} = 1 if ($dref->{'intTransLogID'} and ! exists $tlogIDs{$dref->{'intTransLogID'}});
+        if ($dref->{'intStatus'} == 0)  {
+            $amount = $amount + $dref->{'curAmount'};
+        }
+    }
+    return ($amount, \%tlogIDs);
+}
+
+sub getPersonRegoTXN    {
+
+    my ($Data, $personID, $regoID) = @_;
+
+    my $st = qq[
+        SELECT intTransLogID, intTransactionID, intStatus
+        FROM tblTransactions
+        WHERE
+            intRealmID =?
+            AND intID = ?
+            AND intPersonRegistrationID = ?
+            AND intPersonRegistrationID > 0
+            AND intTableType = $Defs::LEVEL_PERSON
+    ];
+	my $qry = $Data->{'db'}->prepare($st);
+	$qry->execute($Data->{'Realm'}, $personID, $regoID);
+    my $count = 0;
+   my %tlogIDs=();
+    while (my $dref= $qry->fetchrow_hashref())  {
+        $tlogIDs{$dref->{'intTransLogID'}} = 1 if ($dref->{'intTransLogID'} and ! exists $tlogIDs{$dref->{'intTransLogID'}});
+        if ($dref->{'intStatus'} == 0)  {
+            $count++;
+        }
+    }
+    return ($count, \%tlogIDs);
 }
 
 sub displayRegoFlowCheckout {
@@ -414,7 +500,7 @@ sub generateRegoFlow_Gateways   {
     my ($Data, $client, $nextAction, $hidden_ref) = @_;
 
     my $lang = $Data->{'lang'};
-    my (undef, $paymentTypes) = getPaymentSettings($Data, 0, 0, $Data->{'clientValues'});
+    my ($paymentSettings, $paymentTypes) = getPaymentSettings($Data, 0, 0, $Data->{'clientValues'});
     my $gateway_body = qq[
         <div id = "payment_cc" style= "display:none;"><br>
     ];
@@ -428,19 +514,22 @@ sub generateRegoFlow_Gateways   {
         my $name = $gateway->{'gatewayName'};
         $gateway_body .= qq[
             <input type="submit" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
-            <input type="hidden" value="$pType" name="pt_submit[$gatewayCount]">
         ];
+            #<input type="hidden" value="$pType" name="pt_submit[$gatewayCount]">
+        #<input type="hidden" value="$gatewayCount" name="gatewayCount">
     }
     $gateway_body .= qq[
-        <input type="hidden" value="$gatewayCount" name="gatewayCount">
         <div style= "clear:both;"></div>
         </div>
     ];
     $gateway_body = '' if ! $gatewayCount;
+    my $target = 'paytry.cgi';#$Data->{'target'};
 
+    my $txnList = displayTXNToPay($Data, $hidden_ref->{'txnIds'}, $paymentSettings);
     my %PageData = (
         nextaction=>$nextAction,
-        target => $Data->{'target'},
+        target => $target,
+        txnList =>$txnList,
         gateway_body => $gateway_body,
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
@@ -449,8 +538,9 @@ sub generateRegoFlow_Gateways   {
     if ($gatewayCount == 1) {
         $hidden_ref->{"pt_submit[1]"} = $paymentType; 
         $hidden_ref->{"gatewayCount"} = 1;
-        $hidden_ref->{"cc_submit[1]"} = 1;
-        return displayRegoFlowCheckout($Data, $hidden_ref);
+    }
+    else    {
+        $hidden_ref->{"gatewayCount"} = $gatewayCount;
     }
     return runTemplate($Data, \%PageData, 'registration/show_gateways.templ') || '';
 }
@@ -520,7 +610,7 @@ sub add_rego_record{
     my ($personStatus, $prStatus) = checkIsSuspended($Data, $personID, $entityID, $rego_ref->{'personType'});
     return (0, undef, 'SUSPENDED') if ($personStatus eq 'SUSPENDED' or $prStatus eq 'SUSPENDED');
         
-    warn "REGISTRATION NATURE $rego_ref->{'registrationNature'}";
+    #warn "REGISTRATION NATURE $rego_ref->{'registrationNature'}";
     if ($rego_ref->{'registrationNature'} ne 'RENEWAL' and $rego_ref->{'registrationNature'} ne 'TRANSFER') {
         my $ok = checkRegoTypeLimits($Data, $personID, 0, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
         return (0, undef, 'LIMIT_EXCEEDED') if (!$ok);

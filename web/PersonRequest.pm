@@ -23,7 +23,7 @@ use Person;
 use EmailNotifications::PersonRequest;
 use Search::Person;
 
-use CGI qw(unescape param);
+use CGI qw(unescape param redirect);
 use Log;
 use Data::Dumper;
 use SystemConfig;
@@ -117,6 +117,9 @@ sub handlePersonRequest {
         }
         case 'PRA_NC' {
             ($body, $title) = displayNoITC($Data);
+        }
+        case 'PRA_F' {
+            ($body, $title) = displayCompletedRequest($Data);
         }
         else {
         }
@@ -247,6 +250,7 @@ sub listPersonRecord {
             P.strLocalSurname,
             P.strStatus as personStatus,
             P.dtDOB,
+            P.strNationalNum,
             PR.intPersonRegistrationID,
             PR.strStatus as personRegistrationStatus,
             PR.strPersonType,
@@ -308,6 +312,12 @@ sub listPersonRecord {
     my %groupResult;
     my @tData = ();
     my $existsInRequestingClub = 0;
+    my @personCurrentClubs;
+    my @personCurrentRegistrations;
+    my @personCurrentSports;
+    my $personLname = '';
+    my $personFname = '';
+    my $personMID = '';
 
     my %RegFilters=();
 
@@ -363,10 +373,23 @@ sub listPersonRecord {
             DOB => $tdref->{'dtDOB'} || '',
         };
 
+        $personFname = $tdref->{'strLocalFirstname'} if !$personFname;
+        $personLname = $tdref->{'strLocalSurname'} if !$personLname;
+        $personMID = $tdref->{'strNationalNum'} if !$personMID;
+
+        if(!($Defs::personType{$tdref->{'strPersonType'}} ~~ @personCurrentRegistrations)){
+            push @personCurrentRegistrations, $Defs::personType{$tdref->{'strPersonType'}};
+        }
+
+        if(!($Defs::sportType{$tdref->{'strSport'}} ~~ @personCurrentSports)){
+            push @personCurrentSports, $Defs::sportType{$tdref->{'strSport'}};
+        }
+
         if(exists $groupResult{$tdref->{'currentClub'}}){
             push @{$groupResult{$tdref->{'currentClub'}}}, @tData;
         }
         else{
+            push @personCurrentClubs, $tdref->{'currentClub'};
             $groupResult{$tdref->{'currentClub'}} = [@tData];
             #push @{$groupResult{$tdref->{'intEntityID'}}}, @rowdata;
         }
@@ -446,15 +469,26 @@ sub listPersonRecord {
     elsif($requestType eq $Defs::PERSON_REQUEST_TRANSFER) {
         $resultHTML = ' ';
         my %TemplateData;
+
         $TemplateData{'groupResult'} = \%groupResult;
-        $TemplateData{'action'} = "PRA_initRequest";
+        $TemplateData{'action'} = "PRA_search"; #this uses generic/search_form.templ and action should remain PRA_search
+        #$TemplateData{'action_request'} = "PRA_initRequest";
+        $TemplateData{'action_request'} = "PRA_submit";
         $TemplateData{'request_type'} = $request_type;
         $TemplateData{'transfer_type'} = $transferType;
         $TemplateData{'client'} = $Data->{'client'};
+        $TemplateData{'selectedForTransferDetails'}{'currentClub'} = join(', ', @personCurrentClubs);
+        $TemplateData{'selectedForTransferDetails'}{'transferToClub'} = '';
+        $TemplateData{'selectedForTransferDetails'}{'currentSports'} = join(', ', @personCurrentSports);
+        $TemplateData{'selectedForTransferDetails'}{'currentRegistrations'} = join(', ', @personCurrentRegistrations);
+        $TemplateData{'selectedForTransferDetails'}{'firstName'} = $personFname;
+        $TemplateData{'selectedForTransferDetails'}{'lastName'} = $personLname;
+        $TemplateData{'selectedForTransferDetails'}{'memberID'} = $personMID;
         $resultHTML = runTemplate(
             $Data,
             \%TemplateData,
-            'personrequest/transfer/selection.templ',
+            'personrequest/generic/search_form.templ',
+            #'personrequest/transfer/selection.templ',
         );
     }
 
@@ -543,6 +577,7 @@ sub submitRequestPage {
     my @rowdata = ();
 	my $p = new CGI;
 	my %params = $p->Vars();
+    my @requestIDs;
 
     for my $selectedRego ($p->param()) {
         if(my ($personID, $personRegoID) = $selectedRego =~ /^regoselected\[([0-9]+)\]\[([0-9]+)\]\z/) {
@@ -622,6 +657,7 @@ sub submitRequestPage {
             );
 
             my $requestID = $db->{mysql_insertid};
+            push @requestIDs, $requestID;
 
             my $notificationType = undef;
 
@@ -651,38 +687,79 @@ sub submitRequestPage {
         }
     }
 
-    my @headers = (
-        {
-            name => $Data->{'lang'}->txt('MA ID'),
-            field => 'MAID',
-        },
-        {
-            name => $Data->{'lang'}->txt('Request To'),
-            field => 'currentClub',
-        }, 
-        {
-            name => $Data->{'lang'}->txt('Sport'),
-            field => 'Sport',
-        }, 
-    ); 
+    my $query = new CGI;
+    print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=PRA_F&pr=" . join(',', @requestIDs));
+    #my $resultHTML;
+    #return ($resultHTML, 'Request Summary');
+}
 
-    my $rectype_options = '';
-    my $grid = showGrid(
-        Data => $Data,
-        columns => \@headers,
-        rowdata => \@rowdata,
-        gridid => 'grid',
-        width => '99%',
-    ); 
+sub displayCompletedRequest {
+    my ($Data) = @_;
 
-    my $resultHTML = qq[
-        <div class="grid-filter-wrap">
-            <div style="width:99%;">$rectype_options</div>
-            $grid
-        </div>
-    ];
+    my $body = " ";
+    #todo 
+    my $title = $Data->{'lang'}->txt("Request a Transfer - Submitted to Current Club");
+    my $pr = param('pr');
+    my @prids = split(',', $pr);
 
-    return ($resultHTML, 'Request Summary');
+    my %reqFilters = (
+        'requestIDs' => \@prids
+    );
+
+	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
+    my $personRequests = getRequests($Data, \%reqFilters);
+
+    my $found = 0;
+    my $personID = 0;
+    my $error = 0;
+    my @rowdata;
+    my %personDetails;
+
+    for my $request (@{$personRequests}) {
+        $found = 1;
+        if(!$personID) {
+            $personID = $request->{'intPersonID'};
+        }
+        elsif(($personID and $personID != $request->{'intPersonID'})) {
+            #accessing person requests by adding to request param
+            $error = 1;
+        }
+
+        $error = 1 if($entityID != $request->{'intRequestFromEntityID'});
+
+        push @rowdata, {
+            id => $request->{'intPersonRequestID'} || 0,
+            personID => $request->{'intPersonID'} || 0,
+            sport => $Defs::sportType{$request->{'strSport'}},
+            personType => $Defs::personType{$request->{'strPersonType'}},
+            requestFrom => $request->{'requestFrom'} || '',
+            requestTo => $request->{'requestTo'} || '',
+            requestType => $Defs::personRequest{$request->{'strRequestType'}},
+            requestResponse => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || "N/A",
+            #SelectLink => $selectLink,
+        };
+
+        $personDetails{'memberID'} = $request->{'strNationalNum'};
+        $personDetails{'firstname'} = $request->{'strLocalFirstname'};
+        $personDetails{'surname'} = $request->{'strLocalSurname'};
+        $personDetails{'gender'} = $Defs::PersonGenderInfo{$request->{'intGender'} || 0} || '';
+        $personDetails{'dob'} = $request->{'dtDOB'} || '';
+    }
+
+    return ("An error has been encountered.", " ") if $error; 
+    my %TemplateData;
+
+    $TemplateData{'personDetails'} = \%personDetails;
+    $TemplateData{'personRequests'} = \@rowdata;
+    $TemplateData{'client'} = $Data->{'client'};
+
+    $body = runTemplate(
+        $Data,
+        \%TemplateData,
+        'personrequest/generic/completed.templ',
+    );
+
+    return ($body, $title);
 }
 
 sub listRequests {
@@ -860,7 +937,8 @@ sub viewRequest {
 
         switch($requestType) {
             case "$Defs::PERSON_REQUEST_TRANSFER" {
-                $action = "PREGF_TU";
+                #$action = "PREGF_TU";
+                $action = "PF_";
             }
             case "$Defs::PERSON_REQUEST_ACCESS" {
                 my %tempClientValues = %{ $Data->{'clientValues'} };
@@ -1049,6 +1127,16 @@ sub getRequests {
         $where .= " AND pq.intPersonRequestID = ? ";
         push @values, $filter->{'requestID'};
     }
+    elsif ($filter->{'requestIDs'}) {
+        my @placeholders;
+        foreach my $rid (@{$filter->{'requestIDs'}}) {
+            push @placeholders, "?";
+            push @values, $rid;
+        }
+
+        my $placeholder_in = join(',', @placeholders);
+        $where .= " AND pq.intPersonRequestID IN ($placeholder_in)";
+    }
 
     my $st = qq[
         SELECT
@@ -1065,6 +1153,7 @@ sub getRequests {
             pq.intRequestToMAOverride,
             pq.strRequestNotes,
             pq.dtDateRequest,
+            DATE_FORMAT(pq.dtDateRequest,'%d %b %Y') AS prRequestDateFormatted,
             pq.strRequestResponse,
             pq.strResponseNotes,
             pq.intResponseBy,
@@ -1075,6 +1164,7 @@ sub getRequests {
             p.strISONationality,
             p.dtDOB,
             p.intGender,
+            p.strNationalNum,
             ef.strLocalName as requestFrom,
             et.strLocalName as requestTo,
             erb.strLocalName as responseBy,

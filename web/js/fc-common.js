@@ -41,6 +41,7 @@ $(document).ready(function(){
 
                     $("div#itc_selection").slideToggle("fast");
                     $("div#peoplelookup_form").slideToggle("fast");
+                    $("div#transfer_search_result").slideToggle("fast");
                 }
 
                 break;
@@ -51,6 +52,7 @@ $(document).ready(function(){
 
                     $("div#itc_selection").slideToggle("fast");
                     $("div#peoplelookup_form").slideToggle("fast");
+                    $("div#transfer_search_result").slideToggle("fast");
                 }
               break;
         }
@@ -59,8 +61,9 @@ $(document).ready(function(){
 
     //here we remove the col-md-10 class used on the generic forms
     //to flush the button to the right. this is a temporary fix.
-    $("table.products-table").next("fieldset").find("div.txtright").removeClass("col-md-10");
+    //$("table.products-table").next("fieldset").find("div.txtright").removeClass("col-md-10");
     
+    //this is a temporary fix for the last two steps - documents and complete
     $(".document-upload").insertAfter($("fieldset").first());
      
      $(document).on("change", "input.paytxn_chk", function(){
@@ -80,5 +83,32 @@ $(document).ready(function(){
             }
      });
 
-     
+
+   //Request transfer
+   //validate the comment form when it is submitted
+    $("form#personRequestForm").validate({
+        rules: {
+            search_keyword: {
+                required: true
+            }
+        },
+        messages: {
+            search_keyword: "Search keyword is required."
+        },
+        
+        errorLabelContainer: "#errorMsg"
+    });
+
+    $("form#personInitRequest").submit(function(e){
+        if($(this).find("input[type=checkbox]:checked").length == 0){
+            e.preventDefault();
+            $("div#init_error").slideDown();
+        }
+    });
+
+    //jQuery("form#personInitRequest").find("input[type=checkbox][name^=regoselected]").click(function(e){
+    //    var selected_option = jQuery(this).prop("id");
+    //    jQuery("form#personInitRequest textarea#comment" + selected_option).slideToggle("fast");
+    //});
+
 })

@@ -33,7 +33,6 @@ sub gatewayTransactions	{
 						LEFT JOIN tblPaymentConfig as PC ON (PC.intPaymentConfigID = TL.intPaymentConfigID)
 						LEFT JOIN tblRegoForm as RF ON (RF.intRegoFormID=TL.intRegoFormID)
         ];
-warn($st);
 
         my $qry= $Data->{'db'}->prepare($st) or query_error($st);
 #print STDERR $st;
@@ -58,7 +57,7 @@ warn($st);
 		next if ($dref->{intStatus} >= 1);
                 next if ($dref->{TXNStatus} == 1);
                 $Transactions{$count}{'name'} = $dref->{'ProductName'} || next;
-                $Transactions{$count}{'number'} =  Payments::TXNtoInvoiceNum($dref->{intTransactionID}); #$dref->{'intTransactionID'};
+                $Transactions{$count}{'number'} =  Payments::TXNtoTXNNumber($dref->{intTransactionID}); #$dref->{'intTransactionID'};
                 $Transactions{$count}{'desc'} = $dref->{'ProductGroup'} . qq[ $dref->{strGSTText}];
                 $Transactions{$count}{'amount'} = $dref->{'TxnAmount'};
                 $Transactions{$count}{'amountPerItem'} = $dref->{'curPerItem'};
@@ -132,7 +131,7 @@ sub gatewayTransLog	{
 	my @TXNs=();
 
 	while (my $tref = $qry_trans->fetchrow_hashref())	{
-		$tref->{'InvoiceNum'} = Payments::TXNtoInvoiceNum($tref->{intTransactionID});
+		$tref->{'InvoiceNum'} = Payments::TXNtoTXNNumber($tref->{intTransactionID});
          $tref->{'QtyAmount'} = $tref->{'intQty'};
 		if ($tref->{'intQty'}>1)	{
          $tref->{'QtyAmount'} = qq[$tref->{'intQty'} @ \$$tref->{'curPerItem'}];

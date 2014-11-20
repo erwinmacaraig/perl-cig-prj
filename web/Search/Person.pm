@@ -205,12 +205,15 @@ sub getTransfer {
         my %origClientValues = %{$self->getData()->{'clientValues'}};
 
         my $count = 0;
+        my $target = $self->getData()->{'target'};
+        my $client = $self->getData()->{'client'};
         while(my $dref = $q->fetchrow_hashref()) {
             $count++;
             my $name = "$dref->{'strLocalFirstname'} $dref->{'strLocalSurname'}" || '';
             push @memarray, {
                 id => $dref->{'intPersonID'} || next,
                 name => $name,
+                link => "$target?client=$client&amp;a=PRA_getrecord&request_type=transfer&amp;search_keyword=$dref->{'strNationalNum'}&amp;transfer_type=",
                 otherdetails => {
                     dob => $dref->{'dtDOB'},
                     dtadded => $dref->{'dtadded'},

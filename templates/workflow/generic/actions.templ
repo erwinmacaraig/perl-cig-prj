@@ -1,7 +1,7 @@
     <div class="task-actions">
 
         [% IF TaskAction.showApprove %]
-        <a class="btn-main workflow-action" href = "main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]">
+        <a class="btn-main workflow-action" href="main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]">
             [% IF TaskAction.ApprovalEntityLevel == 3 %]
                 [% Lang.txt('Accept') %]
             [% ELSE %]
@@ -80,8 +80,10 @@
     jQuery().ready(function() {
         jQuery("a.workflow-action").click(function(e){
             var actiontype = jQuery(this).data('actiontype');
-            jQuery("#workFlowActionForm input[type=hidden][name=type]").val(actiontype);
-            e.preventDefault();
+            if(actiontype == "REJECT" or actiontype == "HOLD"){
+                jQuery("#workFlowActionForm input[type=hidden][name=type]").val(actiontype);
+                e.preventDefault();
+            }
         });
 
         // validate the comment form when it is submitted

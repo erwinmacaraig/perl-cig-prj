@@ -310,7 +310,7 @@ sub displayTransaction	{
 					type => 'text',
 					readonly=>1,
 					size => 30,
-					value => Payments::TXNtoInvoiceNum($dref->{intParentTXNID}) . qq[ - $dref->{'ParentProductName'}],
+					value => Payments::TXNtoTXNNumber($dref->{intParentTXNID}) . qq[ - $dref->{'ParentProductName'}],
 				},
 				intQty=> {
 					label => $lang->txt('Quantity'),
@@ -480,7 +480,7 @@ sub showTransactionChildren	{
 		<p>Below is a list of the successful Part Payments for the selected Transaction.</p>
 		<table class="listTable">
 			<tr>
-				<th>Invoice Number</th>
+				<th>Transaction Number</th>
 				<th>Payee</th>
 				<th>Amount</th>
 				<th>Payment Ref ID</th>
@@ -492,7 +492,7 @@ sub showTransactionChildren	{
 		$count++;
 		$body .= qq[
 			<tr>
-				<td>]. Payments::TXNtoInvoiceNum($dref->{'intTransactionID'}) . qq[</td>
+				<td>]. Payments::TXNtoTXNNumber($dref->{'intTransactionID'}) . qq[</td>
 				<td>$dref->{'strPayeeName'}</td>
 				<td>\$$dref->{'curAmount'}</td>
 				<td>$dref->{'intTransLogID'}</td>
