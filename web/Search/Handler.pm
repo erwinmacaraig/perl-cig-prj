@@ -40,6 +40,7 @@ sub handle {
         ->setAction($action)
         ->setSphinx()
         ->setData($Data);
+        #->setGridTemplate("search/grid/people.templ");
 
     my $cgi = $searchObj->{'_cgi'};
 	my %params = $searchObj->{'_cgi'}->Vars();
