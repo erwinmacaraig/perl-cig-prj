@@ -311,7 +311,9 @@ sub step2 {
 	my $intPersonID= $Data->{'clientValues'}{'personID'}; 
 	my $currentLevel = $Data->{'clientValues'}{'authLevel'};
 	
-	my ($transHTML, $transcount, $transCurrency_ref, $transAmount_ref)=getTransList($Data, $db, $entityID, $intPersonID, $whereClause, $clientValues_ref, 0, $displayonly);
+print STDERR "DISPLAY OLY|".$Data->{params}{'subbut'} ."\n";
+    my $hidePayCheckbox = 1; #$Data->{params}{'subbut'} || 0;
+	my ($transHTML, $transcount, $transCurrency_ref, $transAmount_ref)=getTransList($Data, $db, $entityID, $intPersonID, $whereClause, $clientValues_ref, 0, $displayonly, $hidePayCheckbox);
 
 
 #Make DB Changes
@@ -527,9 +529,10 @@ EOS
 }
 
 sub getTransList {
-	my ($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref, $hide_list_payments_link, $displayonly) = @_;
+	my ($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref, $hide_list_payments_link, $displayonly, $hidePay) = @_;
 	$displayonly ||= 0;
     my $hidePayment=1;
+    $hidePay ||= 0;
     $hidePayment=0 if ($personID and $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB);
     $hidePayment=0 if ($entityID and ! $personID and $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB);
 
@@ -614,7 +617,7 @@ sub getTransList {
     push (@Columns, {Name => 'Status', Field => 'StatusTextLang', width => 20});
     push (@Columns, {Name => 'Status_raw', Field => 'intStatus', hide => 1});
     push (@Columns, {Name => '&nbsp;', Field => 'stuff', type => 'HTML', hide => $displayonly});
-    push (@Columns, {Name => 'Pay', Field => 'manual_payment', type => 'HTML', width => 10, hide => $hidePayment});
+    push (@Columns, {Name => 'Pay', Field => 'manual_payment', type => 'HTML', width => 10, hide => ($hidePayment or $hidePay)});
     push (@Columns, {Name => 'Notes', Field => 'strNotes',  width => 50, hide => $displayonly});
     push (@Columns, {Name => 'View Receipt', Field => 'strReceipt', type=>"HTML", width => 50, hide => $displayonly});
 
@@ -833,7 +836,8 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
     $whereClause .= qq[ AND P.intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) ] if $txnStatus != $Defs::TXN_PAID;
 
 
-	($tempBody, $transCount) = getTransList($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref);
+print STDERR "LISTING";
+	($tempBody, $transCount) = getTransList($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref,0,0,0);
 
 	$body .= $tempBody;
 
