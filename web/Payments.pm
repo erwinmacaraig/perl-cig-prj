@@ -5,8 +5,8 @@
 package Payments;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoTXNNumber invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount);
-@EXPORT_OK=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoTXNNumber invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount);
+@EXPORT=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoTXNNumber TXNNumberToTXN invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount);
+@EXPORT_OK=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoTXNNumber TXNNumberToTXN invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount);
 
 use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 
@@ -724,6 +724,19 @@ sub calcTXNInvoiceNum       {
     return (10 - ($rt % 10)) % 10;
 
 }
+sub TXNNumberToTXN	{
+
+	my ($invoice_num) = @_;
+
+	my $txnID = $invoice_num - 100000000; ## 1 more to handle checksum
+	$txnID = substr($txnID, 0, length($txnID)-1);
+	if ($invoice_num == TXNtoTXNNumber($txnID))	{
+		return $txnID;
+	}
+	else	{
+		return -1;
+	}
+}
 sub invoiceNumToTXN	{
 
 	my ($invoice_num) = @_;
@@ -780,7 +793,7 @@ sub invoiceNumForm      {
 		my $intPaymentConfigID = 0;
 		my $firstAssocID=0;
         for my $id (@txns)      {
-            my $txnID = invoiceNumToTXN($id);
+            my $txnID = TXNNumberToTXN($id);
             next if $txnID == -1;
 			my $dref = getTXNDetails($Data, $txnID,1);
 			$firstAssocID= $dref->{'intAssocID'} if ! $firstAssocID;
