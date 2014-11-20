@@ -601,10 +601,9 @@ sub getTransList {
     my $client = setClient($Data->{clientValues});
     my @Columns = ();
     push (@Columns, {Name => '', Field => 'SelectLink', type => 'Selector', hide => $displayonly});
-
-	####
-    #push (@Columns, {Name => 'Invoice Number', Field => 'strInvoiceNumber', width => 20});
-	###
+    ###
+    push (@Columns, {Name => 'Invoice Number', Field => 'strInvoiceNumber', width => 20});
+    ###
 
     push (@Columns, {Name => 'Transaction Number', Field => 'intTransactionID', width => 20});
 
@@ -697,7 +696,7 @@ sub getTransList {
         $row_data->{'NetAmount'} = sprintf( "%.2f",($row->{curAmount} / $temppricerate));
         $row_data->{'TaxTotal'} =sprintf("%.2f",($row->{'dblTaxRate'} * $row_data->{'NetAmount'}));  
     #}     
-
+    $row_data->{'strInvoiceNumber'} = $row->{'strInvoiceNumber'};
 
     push @rowdata, $row_data if $row_data;
     $i++;
