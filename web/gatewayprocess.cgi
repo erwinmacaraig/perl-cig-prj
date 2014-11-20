@@ -32,6 +32,8 @@ main();
 
 sub main	{
 
+    ## Need one of these PER gateway
+
 	my $logID= param('ci') || 0;
 	my $submit_action= param('sa') || '';
 	my $display_action= param('da') || '';

@@ -4,6 +4,7 @@ CREATE TABLE tblPaymentConfig (
     intRealmID INT DEFAULT 0,
     intRealmSubTypeID INT DEFAULT 0,
     intPaymentType TINYINT DEFAULT 0, /*setup for a payment type */
+    strGatewayCode VARCHAR(20) DEFAULT '',
 
     intAllowPaymentBackend TINYINT DEFAULT 0,
     intAllowPaymentRegoForm TINYINT DEFAULT 0,

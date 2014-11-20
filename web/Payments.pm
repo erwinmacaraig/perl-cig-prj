@@ -459,6 +459,7 @@ sub getPaymentSettings	{
 	    my %settings = ();
         my $paymentConfigID = $dref->{intPaymentConfigID} || next;
 	    $settings{'intPaymentConfigID'} = $dref->{intPaymentConfigID} || 0;
+	    $settings{'gatewayCode'} = $dref->{strGatewayCode} || '';
 	    $settings{'gatewayName'} = $dref->{strGatewayName} || '';
         $settings{'feeAllocationType'} = $dref->{'intFeeAllocationType'} || 0;
         $settings{'gatewayStatus'} = $dref->{'intGatewayStatus'} || 0;
