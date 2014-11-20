@@ -56,33 +56,33 @@
                     [% IF task.TaskType == 'TRANSFER' %]
                         <td style="word-wrap: break-word;width: 280px;">
                             <span style="float: left" class="fa fa-user"></span>
-                            <div style="float: left;">
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
                             Transfer of <br/>
                             [% task.Name %] from <br/>
                             [% task.requestFrom %] to [% task.requestTo %]
                             </div>
                         </td>
                     [% ELSIF task.TaskType == 'ACCESS' %]
-                        <td>
+                        <td style="word-wrap: break-word;width: 280px;">
                             <span style="float: left" class="fa fa-user"></span>
-                            <div style="float: left">
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
                             Request Access of <br/>
                             [% task.Name %] from <br/>
                             [% task.requestFrom %]
                             </div>
                         </td>
                     [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'REGO' %]
-                        <td>
+                        <td style="word-wrap: break-word;width: 280px;">
                             <span class="fa fa-user" style="float: left"></span>
-                            <div style="float: left">
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
                             [% task.RegistrationNatureLabel %]<br/>
                             [% task.Name %]
                             </div>
                         </td>
                     [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'ENTITY' %]
-                        <td>
+                        <td style="word-wrap: break-word;width: 280px;">
                             <span class="fa fa-user" style="float: left"></span>
-                            <div style="float: left">
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
                             [% task.RegistrationNatureLabel %]<br/>
                             [% task.Name %]
                             </div>

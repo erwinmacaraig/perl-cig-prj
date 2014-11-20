@@ -271,7 +271,7 @@ sub checkoutConfirm	{
 		UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $intLogID);
 #        EmailPaymentConfirmation($Data, $paymentSettings, $intLogID, $client, $RegoFormObj);
 #        Products::product_apply_transaction($Data,$intLogID);
-        return (0, 0, '', undef) if $payTryReturn;
+        return ($intLogID, 0, '', undef) if $payTryReturn;
 		return '';
 	}
 

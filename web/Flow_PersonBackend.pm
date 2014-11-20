@@ -28,6 +28,7 @@ use PersonUserAccess;
 use Data::Dumper;
 use Payments;
 use Products;
+use PersonRequest;
 
 
 sub setProcessOrder {
@@ -675,6 +676,14 @@ sub display_core_details    {
 sub validate_core_details    { 
     my $self = shift;
 
+    my $defaultType = $self->{'RunParams'}{'dtype'} || '';
+    if($defaultType eq 'TRANSFER')   {
+        #all core details are read-only for Transfer
+        $self->incrementCurrentProcessIndex();
+        $self->incrementCurrentProcessIndex();
+        return ('',2);
+    }
+
     my $userData = {};
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Person',);
     ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
@@ -981,15 +990,58 @@ sub display_registration {
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID);
     $personObj->load();
     my ($dob, $gender) = $personObj->getValue(['dtDOB','intGender']); 
-    my $content = displayPersonRegisterWhat(
-        $self->{'Data'},
-        $personID,
-        $entityID,
-        $dob || '',
-        $gender || 0,
-        $originLevel,
-        $url,
-    );
+
+    my $content = '';
+    my $noContinueButton = 1;
+
+    my $defaultType = $self->{'RunParams'}{'dtype'} || '';
+    if($defaultType eq 'TRANSFER')   {
+        $noContinueButton = 0;
+        my %regFilter = (
+            'entityID' => $entityID,
+            'requestID' => $self->{'RunParams'}{'prid'},
+            #'requestID' => 12213,
+        );
+        my $request = getRequests($self->{'Data'}, \%regFilter);
+        $request = $request->[0];
+
+        if(!$request) {
+            push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person Request';
+            $noContinueButton = 1;
+            $content = "Person Request Details not found.";
+        }
+        else {
+            $request->{'personType'} = $Defs::personType{$request->{'strPersonType'}};
+            $request->{'sport'} = $Defs::sportType{$request->{'strSport'}};
+            $request->{'personLevel'} = $Defs::personLevel{$request->{'strPersonLevel'}};
+
+            $self->addCarryField('nat', 'TRANSFER');
+            $self->addCarryField('pt', $request->{'strPersonType'});
+            $self->addCarryField('pl', $request->{'strPersonLevel'});
+            $self->addCarryField('sp', $request->{'strSport'});
+            $self->addCarryField('ag', $request->{'personCurrentAgeLevel'});
+
+            $content = runTemplate(
+                $self->{'Data'},
+                {
+                    requestSummary => $request,
+                },
+                'personrequest/generic/reg_summary.templ'
+            );
+        }
+    }
+    else {
+         $content = displayPersonRegisterWhat(
+            $self->{'Data'},
+            $personID,
+            $entityID,
+            $dob || '',
+            $gender || 0,
+            $originLevel,
+            $url,
+        );
+    }
+
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -1000,12 +1052,16 @@ sub display_registration {
         Title => '',
         TextTop => '',
         TextBottom => '',
-        NoContinueButton => 1,
+        NoContinueButton => $noContinueButton,
     );
     my $pagedata = $self->display(\%PageData);
 
-    return ($pagedata,0);
+    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}}) and ($defaultType eq 'TRANSFER')) {
+        #display the same step with error notification (for Transfers atm)
+        return ($pagedata,0);
+    }
 
+    return ($pagedata,0);
 }
 
 sub process_registration { 
@@ -1018,6 +1074,7 @@ sub process_registration {
     my $sport = $self->{'RunParams'}{'sp'} || '';
     my $ageLevel = $self->{'RunParams'}{'ag'} || '';
     my $registrationNature = $self->{'RunParams'}{'nat'} || '';
+    my $personRequestID = $self->{'RunParams'}{'prid'} || '';
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
@@ -1042,6 +1099,9 @@ sub process_registration {
             $sport, 
             $ageLevel, 
             $registrationNature,
+            undef,
+            undef,
+            $personRequestID,
        );
     }
     if(!$personID)    {
