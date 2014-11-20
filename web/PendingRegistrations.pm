@@ -337,7 +337,7 @@ sub listPendingRegistrations    {
             width   => '99%',
             filters => $filterfields,
         ); 
-        $resultHTML .=  qq[<div>
+        $resultHTML .=  qq[<div class="grid-filter-wrap">
             <div style="width:99%;">$rectype_options</div>
             $grid             
             </div>
@@ -353,8 +353,9 @@ sub listPendingRegistrations    {
         
     );
      $resultHTML .= qq[
+         <div style="clear:both"></div>
          <div class="pageHeading">Pending Entity Registrations</div>
-         <div>
+         <div class="grid-filter-wrap">
              $grid2          
         </div> 
     ];
