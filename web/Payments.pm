@@ -5,8 +5,8 @@
 package Payments;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoInvoiceNum invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount);
-@EXPORT_OK=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoInvoiceNum invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount);
+@EXPORT=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoTXNNumber invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount);
+@EXPORT_OK=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoTXNNumber invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount);
 
 use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 
@@ -307,7 +307,7 @@ sub checkoutConfirm	{
 				<table class="table" cellspacing="0" cellpadding="0" border="0">
 					<thead>
 						<tr>
-							<td>].$lang->txt('Invoice Number').qq[</td>
+							<td>].$lang->txt('Transaction Number').qq[</td>
 							<td>].$lang->txt('Item').qq[</td>
 							<td>].$lang->txt('Name').qq[</td>
 							<td class="align-right">].$lang->txt('Price').qq[</td>
@@ -728,7 +728,7 @@ sub invoiceNumToTXN	{
 
 	my $txnID = $invoice_num - 100000000; ## 1 more to handle checksum
 	$txnID = substr($txnID, 0, length($txnID)-1);
-	if ($invoice_num == TXNtoInvoiceNum($txnID))	{
+	if ($invoice_num == TXNtoTXNNumber($txnID))	{
 		return $txnID;
 	}
 	else	{
@@ -736,7 +736,7 @@ sub invoiceNumToTXN	{
 	}
 }
 
-sub TXNtoInvoiceNum	{
+sub TXNtoTXNNumber	{
 
 	my ($txnID) = @_;
 
@@ -769,7 +769,7 @@ sub invoiceNumForm      {
             <p class="text" style="margin-left:10px;"><span style="font-size:11px"><b>Below is a list of Transactions that will be paid for if you proceed:</b></span><br>
             <table style="margin-left:10px;" class="permsTable">
                 <tr>
-                    <th>Invoice Number</th>
+                    <th>Transaction Number</th>
                     <th>Payment For</th>
                     <th>Amount Due</th>
                     <th>$Data->{'SystemConfig'}{'invoiceNumFormAssocName'}</th>
@@ -796,7 +796,7 @@ sub invoiceNumForm      {
                     </tr>
                 ];
                 $all_nums_list .= qq[|] if $all_nums_list;
-                $all_nums_list .= TXNtoInvoiceNum($dref->{intTransactionID});
+                $all_nums_list .= TXNtoTXNNumber($dref->{intTransactionID});
 				$count++;
             }
         }
@@ -851,7 +851,7 @@ sub getTXNDetails	{
     $qry->execute or query_error($st);
     my $dref = $qry->fetchrow_hashref();
 
-	$dref->{'InvoiceNum'} = TXNtoInvoiceNum($dref->{intTransactionID});
+	$dref->{'InvoiceNum'} = TXNtoTXNNumber($dref->{intTransactionID});
 	$dref->{ProductName} = qq[$dref->{ProductGroup} - $dref->{ProductName}] if ($dref->{ProductGroup});
 	if ($dref->{intTableType} == 1)       {
         	my $st_mem = qq[

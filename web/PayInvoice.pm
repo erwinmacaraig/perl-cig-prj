@@ -128,7 +128,7 @@ sub queryInvoiceByNumber {
 	#convert invoice number to transaction 
 	# 100000405
 	my $convertedInvoiceNumberToTXNID = invoiceNumToTXN($invoiceNumber);
-	#my $convertedInvoiceNumberToTXNID = TXNtoInvoiceNum($invoiceNumber);
+	#my $convertedInvoiceNumberToTXNID = TXNtoTXNNumber($invoiceNumber);
 	
 	return "<br /><h1> $convertedInvoiceNumberToTXNID </h1>";
 	#my $query = qq[SELECT ];

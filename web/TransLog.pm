@@ -602,7 +602,7 @@ sub getTransList {
     my $client = setClient($Data->{clientValues});
     my @Columns = ();
     push (@Columns, {Name => '', Field => 'SelectLink', type => 'Selector', hide => $displayonly});
-    push (@Columns, {Name => 'Invoice Number', Field => 'intTransactionID', width => 20});
+    push (@Columns, {Name => 'Transaction Number', Field => 'intTransactionID', width => 20});
     push (@Columns, {Name => 'Item Name', Field => 'strName'});
     push (@Columns, {Name => 'Quantity', Field => 'intQty', width => 15});
     push (@Columns, {Name => 'Current Amount', Field => 'curAmount', width =>20});
@@ -1516,7 +1516,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 		<div class="sectionheader">].$lang->txt('Items making up this Payment').qq[</div>
 		<table class="listTable">
 		<tr>
-			<th>].$lang->txt('Invoice Number').qq[</th>
+			<th>].$lang->txt('Transaction Number').qq[</th>
 			<th>].$lang->txt('Item').qq[</th>
 			<th>].$lang->txt('Payment For').qq[</th>
 			<th>].$lang->txt('Quantity').qq[</th>
@@ -1537,7 +1537,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 		$productname = qq[$dref->{strGroup}-].$productname if ($dref->{strGroup});
 		$body .= qq[
 			<tr>
-				<td>].Payments::TXNtoInvoiceNum($dref->{intTransactionID}).qq[</a></td>
+				<td>].Payments::TXNtoTXNNumber($dref->{intTransactionID}).qq[</a></td>
 				<td>$productname</a></td>
 				<td>$paymentFor</a></td>
 				<td>$dref->{intQty}</a></td>
@@ -1656,7 +1656,7 @@ sub viewPayLaterTransLog    {
 		<div class="sectionheader">Items making up this order</div>
 		<table class="listTable">
 		<tr>
-			<th>Invoice Number</th>
+			<th>Transaction Number</th>
 			<th>Item</th>
 			<th>Quantity</th>
 			<th>Total Amount</th>
@@ -1672,7 +1672,7 @@ sub viewPayLaterTransLog    {
 		$productname = qq[$dref->{strGroup}-].$productname if ($dref->{strGroup});
 		$body .= qq[
 			<tr>
-				<td>].Payments::TXNtoInvoiceNum($dref->{intTransactionID}).qq[</a></td>
+				<td>].Payments::TXNtoTXNNumber($dref->{intTransactionID}).qq[</a></td>
 				<td>$productname</a></td>
 				<td>$dref->{intQty}</a></td>
 				<td>$dollarSymbol $dref->{curAmount}</td>
