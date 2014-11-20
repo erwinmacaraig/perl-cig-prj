@@ -1,20 +1,18 @@
 <div>
-<form action="main.cgi" method="POST">
-	<p class="introtext">Please enter the invoice number for transaction payment you want to process.</p> 
-    <table cellpadding="2" cellspacing="0" border="0"  class = "HTF_table" >    
-    	<tbody id="secmain" class="new_tab">
-            <tr class="HTr_odd form-input-text" id = "l_row_strInvoiceNumber">
-            <td class="label"><label for="l_strInvoiceNumber">Invoice Number</label>:</td>
-            <td class="value">
-				<input type="text" name="strInvoiceNumber" value=""  id="l_strInvoiceNumber"  size="30"   maxlength="50" / >
-			</td>
-            </tr>            
-        </tbody>                
-    	<tr><td colspan="2"></td></tr>
-    </table>
-    
-        <div class="HTbuttons"> <input type="submit" name="subbut" value="Continue" class="HF_submit button proceed-button" id="HFsubbut"> </div>        
-        <input type="hidden" name="a" value="[% a %]">
-		<input type="hidden" name="client" value="[% client %]">        
-</form> 
+	<div class="search-panel col-md-12">
+	<form action="main.cgi" method="POST">
+		<h3 class="panel-header">Invoice Number</h3>
+		<div class="panel-body">
+			<p class="introtext">Please enter the invoice number for transaction payment you want to process.</p> 
+			<span class="formw">
+			<input type="text" name="strInvoiceNumber" value="" id="l_strInvoiceNumber" size="30" maxlength="50" size="105" placeholder="Invoice Number" /></span>		
+		</div>
+
+		<div class="HTbuttons"> 
+			<input type="submit" name="subbut" value="Continue" class="HF_submit button proceed-button" id="HFsubbut"> 
+		    <input type="hidden" name="a" value="[% a %]">
+			<input type="hidden" name="client" value="[% client %]"> 
+		</div>
+	</form>             
+	</div>
 <div>
