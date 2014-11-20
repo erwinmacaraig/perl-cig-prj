@@ -80,7 +80,6 @@ sub main	{
     my ($logID, $amount, $chkvalue, $session, $paymentSettings) = Payments::checkoutConfirm(\%Data, $paymentType, \@transactions,1,1);
     
     
-    if (! $logID)   {
 	my $st = qq[
         INSERT INTO tblPayTry (
             intRealmID,
@@ -125,11 +124,12 @@ sub main	{
     my $cancel_body= qq[<a href="$cancelURL">Cancel Payment</a>];
 	
     my $body = '';
-print qq[Content-type: text/html\n\n] if ! $body;
 if ($amount eq "0" or $amount eq "0.00" or ! $amount)   {
-    print qq[$cancel_body];
+    print "Status: 302 Moved Temporarily\n";
+    print "Location: $cancelURL\n\n";
 }
 else    {
+    print qq[Content-type: text/html\n\n];
     print qq[$cancel_body<br>];
     print qq[$gateway_body];
 }
