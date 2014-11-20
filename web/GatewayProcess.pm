@@ -45,8 +45,7 @@ sub payTryRedirectBack  {
     #print $body;
     #print qq[<a href="$redirect_link">LINK</a><br>$redirect_link];
 
-
-    print "Status: 301 Moved Permanently\n";
+    print "Status: 302 Moved Temporarily\n";
     print "Location: $redirect_link\n\n";
     return;
 
