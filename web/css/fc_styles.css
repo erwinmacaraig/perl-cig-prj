@@ -1007,3 +1007,24 @@ table.table tr th {
 	text-align: center;
 	border-radius: 0;
 }
+
+/* JS Generated Table style override:: Vincent R; */
+
+.container .grid-filter-wrap{
+	margin-left: 12px;
+	width: auto;
+}
+.container .grid-filter-wrap .grid-widget{
+	margin: 0 0 12px 0px;
+}
+.container .slick-header-column.ui-state-default{
+	height: 35px;
+}
+.container .grid-widget #grid .slick-header .slick-header-column{
+	background: #004e7e;
+	color: #fff;
+}
+.container .grid-widget #grid .slick-cell, .container .grid-widget #grid .slick-header .slick-column-name{
+	font-family: 'noto_sansregular', arial;
+}
+
