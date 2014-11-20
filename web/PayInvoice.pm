@@ -134,15 +134,10 @@ sub queryInvoiceByNumber {
 	#convert invoice number to transaction 
 	# 100000405
 	my $convertedInvoiceNumberToTXNID = invoiceNumToTXN($invoiceNumber);
-<<<<<<< HEAD
+
 	#my $convertedInvoiceNumberToTXNID = TXNtoInvoiceNum($invoiceNumber);
-=======
 	#my $convertedInvoiceNumberToTXNID = TXNtoTXNNumber($invoiceNumber);
 	
-	return "<br /><h1> $convertedInvoiceNumberToTXNID </h1>";
-	#my $query = qq[SELECT ];
-
->>>>>>> 210db9d45411a43198ee6827b0abcf3e0eddc9af
 
 	my $content = '';
 	my $results = 0;
@@ -326,30 +321,30 @@ sub displayResults {
 	my (undef, $paymentTypes) = getPaymentSettings($Data, 0, 0, $Data->{'clientValues'}); 
 	my $gatewayCount = 0;
 	my $paymentType = 0;
-	my $gateway_body = qq[ <div id = "payment_cc" style= "display:hidden;"><br> ];
+	my $gateway_body = qq[ <div id = "payment_cc" style= "display:none;"><br> ];
 	foreach my $gateway (@{$paymentTypes})  {
     	$gatewayCount++;
      	 my $id = $gateway->{'intPaymentConfigID'};
    		 my $pType = $gateway->{'paymentType'};
     	 $paymentType = $pType;
       	 my $name = $gateway->{'gatewayName'};
-   		 $gateway_body .= qq[
-     	       <input type="submit" name="cc_submit[$gatewayCount]" value="]. $Data->{'lang'}->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
-     	       <input type="hidden" value="$pType" name="pt_submit[$gatewayCount]">
-      	  ];
+  		 $gateway_body .= qq[
+            <input type="submit" name="cc_submit[$gatewayCount]" value="]. $Data->{'lang'}->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
+        ];   		 
     	}
-	$gateway_body .= qq[
-        <input type="hidden" value="$gatewayCount" name="gatewayCount">
-        <div style="clear:both;"></div>
+	 $gateway_body .= qq[
+        <div style= "clear:both;"></div>
         </div>
     ];
 	$gateway_body = '' if ! $gatewayCount;
+	my $target = 'paytry.cgi';#$Data->{'target'};
+
 	## end payment settings
 	my %PageData = (
 		grid => $grid, 
 		gateway_body => $gateway_body,
 		nextAction => 'P_TXNLogstep2', 
-        target => 'main.cgi',
+        target => $target,
         Lang => $Data->{'lang'},
         client => $client,
 	);

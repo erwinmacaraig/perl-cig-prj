@@ -540,8 +540,8 @@ sub checkTXNPricing	{
 		my $qryy=$Data->{'db'}->prepare($stt); 
  		$qryy->execute();
 		my $invoiceID =  $qryy->{mysql_insertid} || 0;	
-		my $invoiceNumber = Payments::TXNtoInvoiceNum($invoiceID); 
-
+		#my $invoiceNumber = Payments::TXNtoInvoiceNum($invoiceID); 
+		my $invoiceNumber = Payments::TXNtoTXNNumber($invoiceID);
 		$stt = qq[UPDATE tblInvoice SET strInvoiceNumber = ? WHERE intInvoiceID = ?];		
 		$qryy=$Data->{'db'}->prepare($stt); 
 		$qryy->execute($invoiceNumber,$invoiceID); 

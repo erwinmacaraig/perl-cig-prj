@@ -51,7 +51,7 @@ sub handleTransLogs {
   if ($action=~/step2/) {	
 	  if ($cc_submit)	{
 		  ($step1Success, $resultMessage) = (1,'');		
-		  print STDERR "****** so I am going here  AND RESULT MESSAGE = *****" . $resultMessage;   
+		   
 		  
 		  
 	  }
@@ -954,7 +954,7 @@ print STDERR "LISTING";
                 }
             </script>
 
-			<form name="payform" id="payform" method="POST" onsubmit="submitForm();return true;">
+			<form name="payform" method="POST" onsubmit="submitForm();return true;">
             <input type="hidden" name="a" value="P_TXNLogstep2">
             <input type="hidden" name="client" value="$client">
 	
@@ -1364,8 +1364,7 @@ sub viewTransLog	{
 	$intTransLogID ||= 0;
 	my $db = $Data->{'db'};
 	my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
-	open(ERRORFILE, '>> /home/emacaraig/src/FIFASPOnline/web/myadmin/test.txt');
-
+	
 	#my $st = qq[
 	#	SELECT tblTransLog.*, IF(T.intTableType = $Defs::LEVEL_CLUB, Entity.strLocalName, CONCAT(strLocalFirstname,' ',strLocalSurname)) as Name, DATE_FORMAT(dtSettlement,'%d/%m/%Y') as dtSettlement
 	#	FROM tblTransLog INNER JOIN tblTXNLogs as TXNLog ON (TXNLog.intTLogID = tblTransLog.intLogID)
