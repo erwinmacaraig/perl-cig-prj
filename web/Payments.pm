@@ -276,6 +276,7 @@ sub checkoutConfirm	{
 	}
 
     return ($intLogID, $amount, $chkvalue, $session, $paymentSettings) if $payTryReturn;
+    return;
 
 	my $invoiceList ='';
 	if ($intLogID)	{

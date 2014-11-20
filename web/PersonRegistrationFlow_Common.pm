@@ -208,6 +208,9 @@ sub getPersonRegoTXN    {
 
 sub displayRegoFlowCheckout {
 
+    return '';
+
+    ### NOT USED 
     my ($Data, $hidden_ref) = @_;
 
     my $gCount = param('gatewayCount') || $hidden_ref->{'gatewayCount'} || 0;

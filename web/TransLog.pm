@@ -946,7 +946,7 @@ print STDERR "LISTING";
                 }
             </script>
 
-			<form name="payform" method="POST" onsubmit="submitForm();return true;">
+			<form name="payform" id="payform" method="POST" onsubmit="submitForm();return true;">
             <input type="hidden" name="a" value="P_TXNLogstep2">
             <input type="hidden" name="client" value="$client">
 	

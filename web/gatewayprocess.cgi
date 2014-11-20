@@ -41,7 +41,7 @@ sub main	{
 	my %Data=();
 	$Data{'db'}=$db;
     ## LOOK UP tblPayTry
-    my $payTry = payTryRead(\%Data, $logID);
+    my $payTry = payTryRead(\%Data, $logID, 0);
 
     my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     $Data{'lang'}=$lang;
@@ -74,7 +74,7 @@ sub main	{
 	disconnectDB($db);
 
     if ($display_action eq '1')    {
-        payTryRedirectBack($payTry, $client, $logID);
+        payTryRedirectBack($payTry, $client, $logID, 1);
     }
 }
 
