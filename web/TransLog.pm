@@ -909,10 +909,15 @@ print STDERR "LISTING";
             my $id = $gateway->{'intPaymentConfigID'};
             my $pType = $gateway->{'paymentType'};
             my $name = $gateway->{'gatewayName'};
-            $CC_body .= qq[
-				    <input type="submit" onclick="clicked='$targetOnline'" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
-                    <input type="hidden" value="$pType" name="pt_submit[$gatewayCount]">
-            ];
+            $targetOnline = 'paytry.cgi' if ($pType == $Defs::PAYMENT_ONLINEPAYPAL);
+            if ($pType == $Defs::PAYMENT_ONLINEPAYPAL)  {
+                $CC_body .= qq[ <input type="submit" onclick="clicked='$targetOnline'" target="_paypp" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay viai").qq[ $name" class = "button proceed-button"><br><br>];
+            }
+            else    {
+                $CC_body .= qq[ <input type="submit" onclick="clicked='$targetOnline'" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>];
+            }
+
+            $CC_body .= qq[ <input type="hidden" value="$pType" name="pt_submit[$gatewayCount]"> ];
         }
         $CC_body .= qq[
                     <input type="hidden" value="$gatewayCount" name="gatewayCount">

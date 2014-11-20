@@ -25,6 +25,7 @@ use TTTemplate;
 use Data::Dumper;
 
 sub payTryRedirectBack  {
+print STDERR "IN REDIRECT BACK!!\n";
 
     my ($payTry, $client, $logID, $autoRun) = @_;
 
@@ -48,6 +49,7 @@ sub payTryRedirectBack  {
     #print qq[<a href="$redirect_link">LINK</a><br>$redirect_link];
     return $redirect_link if ! $autoRun;
 
+print STDERR "SSSS";
     print "Status: 302 Moved Temporarily\n";
     print "Location: $redirect_link\n\n";
     return;

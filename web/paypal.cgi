@@ -29,6 +29,8 @@ main();
 
 sub main	{
 
+
+print STDERR "PPPPAYPAL\n";
 	
 	my $action = param('a') || 0;
 	my $client = param('client') || 0;
@@ -67,7 +69,7 @@ sub main	{
   $Data{'lang'}=$lang;
 
   $Data{'LocalConfig'}=getLocalConfig(\%Data);
-    my $payTry = payTryRead(\%Data, $clientTransRefID);
+    my $payTry = payTryRead(\%Data, $clientTransRefID, 0);
 
 
 	#if (! $assocID or $assocID !~ /^\d.*$/)	{
@@ -176,7 +178,7 @@ sub main	{
 		#pageForm( 'Sportzware Membership', $body, $Data{'clientValues'}, q{}, \%Data);
 	}
 	disconnectDB($db);
-    payTryRedirectBack($payTry, $client, $clientTransRefID);
+    payTryRedirectBack($payTry, $client, $clientTransRefID, 1);
 
 }
 

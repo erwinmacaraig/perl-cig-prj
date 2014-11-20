@@ -127,7 +127,7 @@ sub main	{
     <body onload="document.sform.submit()">
         <h3>Please Wait - Processing</h3>
         <p>If you are not automatically redirected to the payment page within 30 seconds then you can <a href = "$paymentURL">proceed manually by pressing this link</a>.</p>
-        <form action = "$paymentSettings->{'gateway_url'}" method = "POST" name = "sform" id = "sform">
+        <form action = "$paymentURL" method = "POST" name = "sform" id = "sform">
             <input type = "hidden" name = "a" value = "P">
             <input type = "hidden" name = "ci" value = "$logID">
             <input type = "hidden" name = "chkv" value = "$chkvalue">
