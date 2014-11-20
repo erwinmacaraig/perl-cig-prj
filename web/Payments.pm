@@ -276,6 +276,7 @@ sub checkoutConfirm	{
 	}
 
     return ($intLogID, $amount, $chkvalue, $session, $paymentSettings) if $payTryReturn;
+    return;
 
 	my $invoiceList ='';
 	if ($intLogID)	{
@@ -696,7 +697,7 @@ sub processTransLogFailure    {
     $fields{otherRef5} = $otherRef5 || '';
     $fields{GATEWAY_AUTH_ID} = $authID || '';
     $fields{GATEWAY_RESPONSE_TEXT} = $text || '';
-    deQuote($db, \%fields);
+    #deQuote($db, \%fields);
 
     my $st= qq[
         UPDATE tblTransLog
@@ -1254,6 +1255,7 @@ sub logRetry	{
 sub processTransLog    {
 
     my ($db, $txn, $responsecode, $responsetext, $intLogID, $paymentSettings, $passedChkValue, $settlement_date, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text, $exportOK) = @_;
+print STDERR "DHDHDHDHDHD\n";
 
 	$exportOK ||= 0;
     my %fields=();
@@ -1292,6 +1294,7 @@ sub processTransLog    {
 
 #    deQuote($db, \%fields);
 	if (! $responsecode)	{
+print STDERR "IN NOT";
 		processTransLogFailure($db, $intLogID, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text);
 	}
 	else	{
@@ -1304,6 +1307,7 @@ sub processTransLog    {
         	WHERE intLogID = $intLogID
 			    AND intStatus<> 1
     	];
+print STDERR $statement;
     	$query = $db->prepare($statement) or query_error($statement);
     	$query->execute(
             $fields{txn},

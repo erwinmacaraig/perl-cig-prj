@@ -26,8 +26,9 @@ use Data::Dumper;
 
 sub payTryRedirectBack  {
 
-    my ($payTry, $client, $logID) = @_;
+    my ($payTry, $client, $logID, $autoRun) = @_;
 
+    $autoRun ||= 0;
     my $a = $payTry->{'nextPayAction'} || $payTry->{'a'};
     my $redirect_link = "main.cgi?client=$client&amp;a=$a&amp;run=1&tl=$logID";
     foreach my $k (keys %{$payTry}) {
@@ -44,6 +45,7 @@ sub payTryRedirectBack  {
     #print "Content-type: text/html\n\n";
     #print $body;
     #print qq[<a href="$redirect_link">LINK</a><br>$redirect_link];
+    return $redirect_link if ! $autoRun;
 
     print "Status: 302 Moved Temporarily\n";
     print "Location: $redirect_link\n\n";
@@ -65,21 +67,27 @@ sub payTryRedirectBack  {
 
 sub payTryRead  {
 
-    my ($Data, $try) = @_;
+    my ($Data, $logID, $try) = @_;
 
+    my $where = qq[intTransLogID = ?];
+    my $id = $logID;
+    if (! $logID and $try)  {
+        $where = qq[intTryID = ?];
+        $id = $try;;
+    }
+    return undef if (! $logID and ! $try);
     my $st = qq[
         SELECT 
             * 
         FROM
             tblPayTry
         WHERE 
-            intTransLogID = ?
+            $where
     ];
     my $query = $Data->{'db'}->prepare($st);
-    $query->execute($try);
+    $query->execute($id);
     my $href = $query->fetchrow_hashref();
 print STDERR $st;
-print STDERR "TRY: $try\n";
     my $values = JSON::from_json($href->{'strLog'});
     return $values;
 }
@@ -93,13 +101,6 @@ sub gatewayProcess {
 	my $external= $returnVals_ref->{'ext'} || '';
 	my $chkv= $returnVals_ref->{'chkv'} || '';
 
-  my $redirect =0;
-
-  $returnVals_ref->{'ResponseText'} = NABResponseCodes($returnVals_ref->{'GATEWAY_RESPONSE_CODE'});
-  if ($returnVals_ref->{'GATEWAY_RESPONSE_CODE'} =~/^00|08|OK$/)  {
-    $returnVals_ref->{'ResponseCode'} = 'OK';
-  }
-	
 	my $st = qq[
 		INSERT IGNORE INTO tblTransLog_Counts
 		(intTLogID, dtLog, strResponseCode)
@@ -114,6 +115,18 @@ sub gatewayProcess {
   $Data->{'SystemConfig'}{'PaymentConfigID'} = $Data->{'SystemConfig'}{'PaymentConfigUsedID'} ||  $Data->{'SystemConfig'}{'PaymentConfigID'};
 
   my ($paymentSettings, undef) = getPaymentSettings($Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, $external);
+
+
+    print STDERR $paymentSettings->{'gatewayCode'};
+    ### Might need IF test here per gatewayCode
+  $returnVals_ref->{'ResponseText'} = NABResponseCodes($returnVals_ref->{'GATEWAY_RESPONSE_CODE'});
+  $returnVals_ref->{'ResponseCode'} = $returnVals_ref->{'GATEWAY_RESPONSE_CODE'};
+  if ($returnVals_ref->{'GATEWAY_RESPONSE_CODE'} =~/^00|08|OK$/)  {
+    $returnVals_ref->{'ResponseCode'} = 'OK';
+  }
+
+
+
 
   {
     my $chkvalue= param('rescode') . $Order->{'TotalAmount'}. $logID; ## NOTE: Different to one being sent
