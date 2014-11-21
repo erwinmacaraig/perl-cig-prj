@@ -1752,10 +1752,14 @@ sub postPersonUpdate {
         my $dob_p       = $params->{'d_dtDOB'}        || $params->{'dtDOB'}        || '';
         my $email_p     = $params->{'d_strEmail'}     || $params->{'strEmail'}     || '';
 
+        my $isonat_p    = $params->{'d_strISONationality'} || $params->{'strISONationality'} || '';
+
         my $firstname_f = $fields->{'strLocalFirstname'} || '';
         my $lastname_f  = $fields->{'strLocalSurname'}   || '';
         my $dob_f       = $fields->{'dtDOB'}        || '';
         my $email_f     = $fields->{'strEmail'}     || '';
+
+        my $isonat_f    = $fields->{'strISONationality'} || '';
 
         my ( $d, $m, $y ) = split /\//, $dob_f;
         $dob_f = qq[$y-$m-$d];
@@ -1770,6 +1774,50 @@ sub postPersonUpdate {
         if ( $dupl_check == 1 ) {
             my $st = qq[UPDATE tblPerson SET intSystemStatus = 2 WHERE intPersonID = $id LIMIT 1];
             $db->do($st);
+        }
+
+        my @fieldsToTriggerWF = split /\|/, $Data->{'SystemConfig'}{'triggerWorkFlowPersonDataUpdate'};
+        
+        if(scalar(@fieldsToTriggerWF)) {
+            my $triggerWFPersonUpdate = 0;
+            foreach (@fieldsToTriggerWF) {
+                my $field = $_;
+                next if !$field || $triggerWFPersonUpdate;
+
+                my $prevVal = $params->{'d_' . $field};
+                my $currVal = $fields->{$field};
+
+                if($field eq 'dtDOB'){
+                    my ( $d, $m, $y ) = split /\//, $currVal;
+                    $currVal = qq[$y-$m-$d];
+                    my ( $dob_p_y, $dob_p_m, $dob_p_d ) = split /-/, $prevVal if ($prevVal);
+                    $prevVal = sprintf( "%02d-%02d-%02d", $dob_p_y, $dob_p_m, $dob_p_d ) if ($prevVal);
+                }
+                #check input field value and pre-update person details
+                $triggerWFPersonUpdate = 1 if($currVal and $currVal ne $prevVal);
+            }
+
+            if($triggerWFPersonUpdate){
+                #FC-71 - set person status to PENDING and add WF for re-approval
+                my $st = qq[UPDATE tblPerson SET strStatus = "$Defs::PERSON_STATUS_PENDING" WHERE intPersonID = $id LIMIT 1];
+                
+                if($db->do($st)) {
+                    my $originEntityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'authLevel'}) || getID($Data->{'clientValues'}) || 0;
+
+                    my $rc = WorkFlow::addWorkFlowTasks(
+                        $Data,
+                        'PERSON',
+                        'UPDATE',
+                        $Data->{'clientValues'}{'authLevel'} || 0,
+                        $originEntityID,
+                        $id,
+                        0,
+                        0,
+                    );
+                }
+
+            }
+
         }
 
     }
