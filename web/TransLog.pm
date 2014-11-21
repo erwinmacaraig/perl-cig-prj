@@ -1561,7 +1561,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 		$body .= qq[
 			<tr>
 				<td>$dref->{'strInvoiceNumber'}</td>
-				<td>].Payments::TXNtoTXNNumber($dref->{intTransactionID}).qq[</a></td>
+				<td>$dref->{intTransactionID}</a></td>
 				<td>$productname</a></td>
 				<td>$paymentFor</a></td>
 				<td>$dref->{intQty}</a></td>
