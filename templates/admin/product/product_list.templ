@@ -1,0 +1,53 @@
+<div id='cases' style='padding:15px 7px;'>
+    
+					
+    <div id="reports" class="pane_content">
+		
+        	   <form name='listform' id='listform' action='admin_product.cgi' method='post'>
+        <div id='result' style='float:left;width:100%;border:1px solid #7a9512;'>
+           <input type='hidden' name='productid' value='0'/>
+           <div style='float:left;font-size:11pt;'>Product List</div><span style='float:right;width:70px;'>Count: [% results.size %]</span>
+		   
+           <table cellpadding='1' cellspacing='0' class='list' width='100%' id='ticket_list'>
+           <tbody id='tbody_list'>
+		   
+           <tr>
+			<td class='header' style='width:7%;'><!--input type='checkbox' name='tickAll' onclick='tick_untickAll(this);'/-->
+			<a href='?/view_all/-1/&orderby=intProductID&sort=ASC'>PUID</a></td>
+			
+			<td class='header' style='width:20%;'><a href='?/view_all/-1/&orderby=strName&sort=ASC'>Name</a></td>
+			<td class='header' style='width:25%;'><a href='?/view_all/-1/&orderby=strProductNotes&sort=ASC'>Product Description</a></td>
+			
+             <td class='header' style='width:14%;'>Price (Tax included)</td>
+             
+             <td class='header' style='width:10%;'>Season</td>
+             <td class='header' style='width:13%;'>Action</td>
+			 <!--<td class='header'>Assign to</td>-->
+			 </tr>
+			 [% IF results.size %]
+				[% FOREACH key IN results.keys %]
+				<tr id='product-[% results.$key.intProductID %]'>
+				<td class='item'>[% results.$key.intProductID %]</td>
+				<td class='item'>[% results.$key.strName %]</td>
+				<td class='item'>[% results.$key.strProductNotes %]</td>
+				<td class='item'>[% results.$key.curDefaultAmount %]</td>
+				<td class='item'>[% results.$key.strNationalPeriodName %]</td>
+				<td class='item'><button type='button' class='button_small' id='edit' title="Edit Product">Edit</button></td>
+				</tr>
+				[% END %]
+			[% ELSE %]
+				<tr bgcolor="#d0d0d0"><td colspan='10'>No record found.</td></tr>
+			[% END %]
+           </tbody>
+   
+           </table>
+
+		</div>
+	   </form>
+  
+
+    </div>
+</div>
+
+
+<br />
