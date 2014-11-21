@@ -903,9 +903,9 @@ sub viewRequest {
         'personGender' => $Defs::PersonGenderInfo{$request->{'intGender'} || 0} || '',
         'DOB' => $request->{'dtDOB'} || '',
         'personStatus' => $request->{'personStatus'} || '',
-        'sport' => $request->{'strSport'} || '',
-        'personType' => $request->{'strPersonType'} || '',
-        'personLevel' => $request->{'strPersonLevel'} || '',
+        'sport' => $Defs::sportType{$request->{'strSport'}} || '',
+        'personType' => $Defs::personType{$request->{'strPersonType'}} || '',
+        'personLevel' => $Defs::personLevel{$request->{'strPersonLevel'}} || '',
         'requestNotes' => $request->{'strRequestNotes'} || '',
         'responseNotes' => $request->{'strResponseNotes'} || '',
 
@@ -915,7 +915,17 @@ sub viewRequest {
         'requestEntityID' => $entityID,
 
         'personRegistrationID' => $request->{'intPersonRegistrationID'} || 0,
-        'personRegistrationStatus' => $request->{'personRegoStatus'} || 'N/A'
+        'personRegistrationStatus' => $request->{'personRegoStatus'} || 'N/A',
+        'MID' => $request->{'strNationalNum'},
+
+        'contactAddress1' => $request->{'strAddress1'},
+        'contactAddress2' => $request->{'strAddress2'},
+        'contactCity' => $request->{'strSuburb'},
+        'contactState' => $request->{'strState'},
+        'contactPostalCode' => $request->{'strPostalCode'},
+        'contactISOCountry' => $request->{'strISOCountry'},
+        'contactPhoneHome' => $request->{'strPhoneHome'},
+        'contactEmail' => $request->{'strEmail'},
     );
 
 
@@ -1167,6 +1177,14 @@ sub getRequests {
             p.dtDOB,
             p.intGender,
             p.strNationalNum,
+            p.strAddress1,
+            p.strAddress2,
+            p.strSuburb,
+            p.strState,
+            p.strPostalCode,
+            p.strISOCountry,
+            p.strPhoneHome,
+            p.strEmail,
 		    TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             ef.strLocalName as requestFrom,
             et.strLocalName as requestTo,
