@@ -49,6 +49,7 @@ print STDERR "IN REDIRECT BACK!!\n";
     #print qq[<a href="$redirect_link">LINK</a><br>$redirect_link];
     return $redirect_link if ! $autoRun;
 
+print STDERR $redirect_link;
 print STDERR "SSSS";
     print "Status: 302 Moved Temporarily\n";
     print "Location: $redirect_link\n\n";
