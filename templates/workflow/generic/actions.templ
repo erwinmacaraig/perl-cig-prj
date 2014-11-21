@@ -80,7 +80,7 @@
     jQuery().ready(function() {
         jQuery("a.workflow-action").click(function(e){
             var actiontype = jQuery(this).data('actiontype');
-            if(actiontype == "REJECT" or actiontype == "HOLD"){
+            if(actiontype == "REJECT" || actiontype == "HOLD" || actiontype == "RESOLVE"){
                 jQuery("#workFlowActionForm input[type=hidden][name=type]").val(actiontype);
                 e.preventDefault();
             }
