@@ -307,6 +307,7 @@ sub displayRegoFlowDocuments    {
 
     my ($Data, $regoID, $client, $entityRegisteringForLevel, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref, $noFormFields) = @_;
     my $lang=$Data->{'lang'};
+	$hidden_ref->{'pID'} = $personID;
 
      my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_DU&amp;rID=$regoID";
      my $documents = getRegistrationItems(
