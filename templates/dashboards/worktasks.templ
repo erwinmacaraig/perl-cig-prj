@@ -87,6 +87,14 @@
                             [% task.Name %]
                             </div>
                         </td>
+                    [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'PERSON' %]
+                        <td style="word-wrap: break-word;width: 280px;">
+                            <span class="fa fa-user" style="float: left"></span>
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
+                            [% task.RegistrationNatureLabel %]<br/>
+                            [% task.Name %]
+                            </div>
+                        </td>
 		            [% ELSE %]
                         <td><span class="fa fa-user"></span>Rego [% task.Name %]</td>
 		            [% END %]
