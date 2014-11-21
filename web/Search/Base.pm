@@ -27,6 +27,7 @@ sub new {
         _queryParam         => $args{queryParam},
         _sphinx             => $args{sphinx},
         _action             => $args{action},
+        _resultCount        => 0,
     };
 
     $self = bless ($self, $class);
@@ -82,6 +83,11 @@ sub getSphinx {
 sub getAction {
     my ($self) = shift;
     return $self->{_action};
+}
+
+sub getResultCount {
+    my ($self) = shift;
+    return $self->{_resultCount};
 }
 
 sub execute {
@@ -389,6 +395,14 @@ sub setAction {
     my $self = shift;
     my ($action) = @_;
     $self->{_action} = $action if defined $action;
+
+    return $self;
+}
+
+sub setResultCount {
+    my $self = shift;
+    my ($resultCount) = @_;
+    $self->{_resultCount} = $resultCount if defined $resultCount;
 
     return $self;
 }

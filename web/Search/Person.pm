@@ -328,6 +328,8 @@ sub getPersonRegistration {
             };
         }
 
+        $self->setResultCount($count);
+
         if($raw){
             return \@memarray;
         }
