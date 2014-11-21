@@ -14,5 +14,7 @@
 
     [% searchForm %]
 
+    [% IF searchResultGrid.count > 0 %]
     [% searchResultGrid.data %]
+    [% END %]
 </div>
