@@ -1807,7 +1807,7 @@ sub postPersonUpdate {
                     my $rc = WorkFlow::addWorkFlowTasks(
                         $Data,
                         'PERSON',
-                        'UPDATE',
+                        'AMENDMENT',
                         $Data->{'clientValues'}{'authLevel'} || 0,
                         $originEntityID,
                         $id,
