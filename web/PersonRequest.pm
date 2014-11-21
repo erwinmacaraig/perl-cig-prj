@@ -85,6 +85,8 @@ sub handlePersonRequest {
             );
         }
         case 'PRA_R' {
+            return;
+
             $title = "Request Access to Person Details";
             $TemplateData{'request_type'} = 'access';
             $TemplateData{'action'} = 'PRA_getrecord';
