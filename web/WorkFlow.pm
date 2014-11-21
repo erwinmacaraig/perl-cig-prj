@@ -340,7 +340,7 @@ sub listTasks {
     my $client = unescape($Data->{client});
 	while(my $dref= $q->fetchrow_hashref()) {
         #moved checking of POSSIBLE_DUPLICATE here (if included in query, tasks for ENTITY are not capture)
-        next if ($dref->{intSystemStatus} == $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE);
+        next if ($dref->{intSystemStatus} == $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE and $dref->{strWFRuleFor} ne $Defs::WF_RULEFOR_PERSON);
 
         my %tempClientValues = getClient($client);
 		$rowCount ++;
@@ -445,7 +445,6 @@ sub listTasks {
     if(scalar @{$personRequests}) {
 
         for my $request (@{$personRequests}) {
-            print STDERR Dumper $request;
             next if ($request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_COMPLETED);
             $rowCount++;
             my $name = formatPersonName($Data, $request->{'strLocalFirstname'}, $request->{'strLocalSurname'}, $request->{'intGender'});
