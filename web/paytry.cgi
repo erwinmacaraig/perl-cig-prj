@@ -122,6 +122,8 @@ sub main	{
     }
     my $gateway_body= qq[<a href="$paymentURL">Proceed to Payment</a>];
     my $cancel_body= qq[<a href="$cancelURL">Cancel Payment</a>];
+    my $cancelPayPalURL = $Defs::base_url . $paymentSettings->{'gatewayCancelURL'} . qq[&amp;ci=$logID&client=$client]; ##$Defs::paypal_CANCEL_URL;
+
     my $proceed_body = qq[
     <html>
     <body onload="document.sform.submit()">
@@ -149,6 +151,7 @@ else    {
     print $proceed_body;
     #print qq[$cancel_body<br>];
     #print qq[$gateway_body];
+    #print qq[<br>$cancelPayPalURL];
 }
 
 }
