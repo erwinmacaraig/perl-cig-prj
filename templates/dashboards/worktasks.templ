@@ -12,7 +12,7 @@
 [% END %]
 
 <div class="col-md-9 tasklist-content dashboard-tasklist">
-	<table cellpadding="5" width="100%">
+	<table id="example" cellpadding="5" width="100%">
 		<thead>
 			<tr class="box-header">
 				<th>Tasklist</th>
@@ -20,8 +20,6 @@
 				<th>Status</th>
 				<th>Actions</th>
 			</tr>
-		</thead>
-		<tbody>
 			<tr>
 				<td>Filter by:
 					<select class="filter-tasks">
@@ -51,6 +49,8 @@
                     </div>
 				</td>
 			</tr>
+		</thead>
+		<tbody>
 		    [% FOREACH task IN TaskList %]
                 <tr class="task-list">
                     [% IF task.TaskType == 'TRANSFER' %]
@@ -105,6 +105,13 @@
 		    [% END %]
 
 		</tbody>
+        <tfoot>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tfoot>
+
 	</table>
 </div>
 
@@ -151,3 +158,32 @@
 		</ul>
 	</div>
 </div>
+
+
+<script src = "//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+    jQuery().ready(function() {
+            // Setup - add a text input to each footer cell
+                jQuery('#example').dataTable({
+                    "ordering": false,
+                });
+                jQuery('#example tfoot th').each( function () {
+                            var title = jQuery('#example thead th').eq( jQuery(this).index() ).text();
+                                    jQuery(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+                                        } );
+                 
+                     // DataTable
+                         var table = jQuery('#example').DataTable();
+                          
+                              // Apply the search
+                                  table.columns().eq( 0 ).each( function ( colIdx ) {
+                                              jQuery( 'input', table.column( colIdx ).footer() ).on( 'keyup change', function () {
+                                                              table
+                                                                              .column( colIdx )
+                                                                                              .search( this.value )
+                                                                                                              .draw();
+                                                                                                                      } );
+                                                  } );
+    });
+</script>
+
