@@ -33,6 +33,7 @@ sub payPalProcess	{
 
     my $returnPayPalURL = $Defs::base_url . $paymentSettings->{'gatewayReturnURL'} . qq[&amp;ci=$logID&client=$client]; ##$Defs::paypal_RETURN_URL
     my $cancelPayPalURL = $Defs::base_url . $paymentSettings->{'gatewayCancelURL'} . qq[&amp;ci=$logID&client=$client]; ##$Defs::paypal_CANCEL_URL
+print STDERR "CANCEL FOR PAYPAL $cancelPayPalURL\n\n";
 
 	my $m = new MD5;
     $m->reset();

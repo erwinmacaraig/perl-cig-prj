@@ -157,6 +157,7 @@ sub _processUploadFile_single	{
         $other_info,
 	) = @_;
 
+	my $intFileAddedBy = $Data->{'clientValues'}{'_intID'} || getLastEntityID($Data->{'clientValues'});
 	$options ||= {}; 
         my $DocumentTypeId = 0;
         my $regoID = 0; 
@@ -192,7 +193,6 @@ sub _processUploadFile_single	{
 			WHERE intFileID = ?
 	];
 	my $q_u = $Data->{'db'}->prepare($st_u);
-
 		my $st_a = qq[
 		INSERT INTO tblUploadedFiles
 		(
@@ -225,11 +225,12 @@ sub _processUploadFile_single	{
         $EntityTypeID,
         $EntityID,
 		$Data->{'clientValues'}{'authLevel'},
-		$Data->{'clientValues'}{'_intID'},
+		$intFileAddedBy,
 		$title,
 		$origfilename,
 		$permissions,
-	);
+	); 
+#Data->{'clientValues'}{'_intID'}
 	my $fileID = $q_a->{mysql_insertid} || 0;
 	$q_a->finish();
 	return ('Invalid ID',0) if !$fileID; 

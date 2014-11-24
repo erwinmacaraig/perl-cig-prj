@@ -33,6 +33,9 @@ sub handlePersonFlow {
     my $internationalTransfer = $params{'itc'} || '';
     my $startingStep = $params{'ss'} || '';
 
+    #specific to Transfers
+    my $personRequestID = $params{'prid'} || '';
+
     my $flow = new Flow_PersonBackend(
         db => $Data->{'db'},
         Data => $Data,
@@ -43,6 +46,7 @@ sub handlePersonFlow {
             dtype => $defaultType,
             itc => $internationalTransfer,
             ss => $startingStep,
+            prid => $personRequestID,
         },
         ID  => $personID || 0,
         SystemConfig => $Data->{'SystemConfig'},
@@ -50,6 +54,7 @@ sub handlePersonFlow {
         Target => $Data->{'target'},
         cgi => $cgi,
     );
+
     my ($content,  undef) = $flow->run();
 
     return $content;

@@ -99,6 +99,22 @@ $(document).ready(function(){
         errorLabelContainer: "#errorMsg"
     });
 
+    //Pay Invoice Validation
+    $("form#invoiceFormQry").validate({
+        rules: {
+          PersonType: {
+            required: true
+          }
+        },
+
+        messages: {
+            PersonType: "Person type required"
+        },
+
+        errorLabelContainer: "#errorMsg"
+
+    });
+
     $("form#personInitRequest").submit(function(e){
         if($(this).find("input[type=checkbox]:checked").length == 0){
             e.preventDefault();

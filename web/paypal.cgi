@@ -29,21 +29,24 @@ main();
 
 sub main	{
 
+	my $db=connectDB();
+	my %Data=();
+	$Data{'db'}=$db;
+
+	my $clientTransRefID= param('ci') || 0;
+    my $payTry = payTryRead(\%Data, $clientTransRefID, 0);
+    my $client = $payTry->{'client'} || param('client') || 0;
 	
 	my $action = param('a') || 0;
-	my $client = param('client') || 0;
+	#my $client = param('client') || 0;
 	my $INtoken= param('token') || 0;
 	my $external= param('ext') || 0;
-	my $clientTransRefID= param('ci') || 0;
 	my $encryptedID= param('ei') || 0;
 	my $noheader= param('nh') || 0;
 	my $formID= param('formID') || 0;
 	my $session= param('session') || 0;
 	my $compulsory= param('compulsory') || 0;
 	
-	my $db=connectDB();
-	my %Data=();
-	$Data{'db'}=$db;
 
 	$Data{'formID'} = $formID;
 	$Data{'sessionKey'} = $session;
@@ -67,7 +70,7 @@ sub main	{
   $Data{'lang'}=$lang;
 
   $Data{'LocalConfig'}=getLocalConfig(\%Data);
-    my $payTry = payTryRead(\%Data, $clientTransRefID);
+    my $payTry = payTryRead(\%Data, $clientTransRefID, 0);
 
 
 	#if (! $assocID or $assocID !~ /^\d.*$/)	{
@@ -166,16 +169,19 @@ sub main	{
 		
 	}
 	elsif ($action eq 'C')	{
-		my $msg = qq[<div align="center" class="warningmsg" style="font-size:14px;">You cancelled the Transaction</div>];
-		my $body = displayPaymentResult(\%Data, $clientTransRefID, 1, $msg);
-		$body .= qq[<br><p><a href="$Defs::base_url/main.cgi?client=$client&a=P_TXNLog_list&mode=p">Return to Membership System</a></p>] if ! $external;
+        print STDERR "PAYPAL CANCELLLED!!!!!!\n";
+#    payTryRedirectBack($payTry, $client, $clientTransRefID, 1);
+#		my $msg = qq[<div align="center" class="warningmsg" style="font-size:14px;">You cancelled the Transaction</div>];
+#		my $body = displayPaymentResult(\%Data, $clientTransRefID, 1, $msg);
+#		$body .= qq[<br><p><a href="$Defs::base_url/main.cgi?client=$client&a=P_TXNLog_list&mode=p">Return to Membership System</a></p>] if ! $external;
 		#pageForm( 'Sportzware Membership', $body, $Data{'clientValues'}, q{}, \%Data);
+        payTryRedirectBack($payTry, $client, $clientTransRefID, 1);
 	}
 	elsif ($action eq 'S')	{
 		my $body = payPalUpdate(\%Data, $paymentSettings, $client, $clientTransRefID, $INtoken, $Order, $external, $encryptedID);
 		#pageForm( 'Sportzware Membership', $body, $Data{'clientValues'}, q{}, \%Data);
+        payTryRedirectBack($payTry, $client, $clientTransRefID, 1);
 	}
-    payTryRedirectBack($payTry, $client, $clientTransRefID);
 	disconnectDB($db);
 
 }

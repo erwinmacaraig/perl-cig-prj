@@ -46,8 +46,13 @@ sub displayRegoFlowCompleteBulk {
     my ($unpaid_cost, $logIDs) = getRegoTXNDetails($Data, $hidden_ref->{'txnIds'});
     $hidden_ref->{'totalAmount'} = $unpaid_cost;
     my $gateways = '';
+
+    #if ($Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'} && $hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0)   {
+    #	if ($hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0) {
+
     if ($Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'} && $unpaid_cost)  { #hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0)   {
-        
+    print STDERR "SSS";    
+
         $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
     }
     my %PageData = (
@@ -208,6 +213,9 @@ sub getPersonRegoTXN    {
 
 sub displayRegoFlowCheckout {
 
+    return '';
+
+    ### NOT USED 
     my ($Data, $hidden_ref) = @_;
 
     my $gCount = param('gatewayCount') || $hidden_ref->{'gatewayCount'} || 0;
@@ -299,6 +307,7 @@ sub displayRegoFlowDocuments    {
 
     my ($Data, $regoID, $client, $entityRegisteringForLevel, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref, $noFormFields) = @_;
     my $lang=$Data->{'lang'};
+	$hidden_ref->{'pID'} = $personID;
 
      my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_DU&amp;rID=$regoID";
      my $documents = getRegistrationItems(
@@ -495,9 +504,9 @@ sub generateRegoFlow_Gateways   {
     my ($Data, $client, $nextAction, $hidden_ref) = @_;
 
     my $lang = $Data->{'lang'};
-    my (undef, $paymentTypes) = getPaymentSettings($Data, 0, 0, $Data->{'clientValues'});
+    my ($paymentSettings, $paymentTypes) = getPaymentSettings($Data, 0, 0, $Data->{'clientValues'});
     my $gateway_body = qq[
-        <div id = "payment_cc" style= "ddisplay:none;"><br>
+        <div id = "payment_cc" sstyle= "display:none;"><br>
     ];
     my $gatewayCount = 0;
     my $paymentType = 0;
@@ -520,9 +529,11 @@ sub generateRegoFlow_Gateways   {
     $gateway_body = '' if ! $gatewayCount;
     my $target = 'paytry.cgi';#$Data->{'target'};
 
+    my $txnList = displayTXNToPay($Data, $hidden_ref->{'txnIds'}, $paymentSettings);
     my %PageData = (
         nextaction=>$nextAction,
         target => $target,
+        txnList =>$txnList,
         gateway_body => $gateway_body,
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
@@ -531,8 +542,6 @@ sub generateRegoFlow_Gateways   {
     if ($gatewayCount == 1) {
         $hidden_ref->{"pt_submit[1]"} = $paymentType; 
         $hidden_ref->{"gatewayCount"} = 1;
-        #$hidden_ref->{"cc_submit[1]"} = 1;
-    #    return displayRegoFlowCheckout($Data, $hidden_ref);
     }
     else    {
         $hidden_ref->{"gatewayCount"} = $gatewayCount;
@@ -648,6 +657,20 @@ sub bulkRegoSubmit {
     my @Ages = ('ADULT',
             'MINOR'
     );
+
+	my $invoiceNumber;
+	#Generate invoice number 
+	my $stt = qq[INSERT INTO tblInvoice (tTimeStamp) VALUES (NOW())];
+	my $qryy=$Data->{'db'}->prepare($stt); 
+	$qryy->execute();
+	my $invoiceID =  $qryy->{mysql_insertid} || 0;	
+	$invoiceNumber = Payments::TXNtoInvoiceNum($invoiceID); 
+
+	$stt = qq[UPDATE tblInvoice SET strInvoiceNumber = ? WHERE intInvoiceID = ?];		
+	$qryy=$Data->{'db'}->prepare($stt); 
+	$qryy->execute($invoiceNumber,$invoiceID); 
+	$qryy->finish();
+
     for my $pID (@IDs)   {
         my $pref = loadPersonDetails($Data->{'db'}, $pID) if ($pID);
         my $ageLevelOptions = checkRegoAgeRestrictions(
@@ -703,6 +726,8 @@ sub bulkRegoSubmit {
             my ($prodID, $qty) = split /-/, $prodQty;
             $Products{"prodQTY_$prodID"} =$qty;
         }
+		
+
         my ($txns_added, $amount) = insertRegoTransaction(
             $Data, 
             $regoID, 
@@ -712,7 +737,8 @@ sub bulkRegoSubmit {
             $bulk_ref->{'entityLevel'}, 
             $Defs::LEVEL_PERSON, 
             '',
-            $CheckProducts
+            $CheckProducts,
+			$invoiceID
         );
         $totalAmount = $totalAmount + $amount;
         push @total_txns_added, @{$txns_added};
@@ -730,6 +756,8 @@ sub bulkRegoSubmit {
         my %Settings=();
         $Settings{'paymentType'} = $paymentType;
         my $logID = createTransLog($Data, \%Settings, $bulk_ref->{'entityID'},\@total_txns_added, $totalAmount);
+        processTransLog($Data->{'db'}, '', 'OK', 'APPROVED', $logID, \%Settings, undef, undef, '', '', '', '', '', '','',1);
+       print STDERR "MANUAL PAYMENT $logID\n"; 
         UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $logID);
         product_apply_transaction($Data,$logID);
     }

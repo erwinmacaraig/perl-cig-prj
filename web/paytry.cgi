@@ -25,6 +25,7 @@ use SystemConfig;
 use ConfigOptions;
 use Email;
 use Products;
+use GatewayProcess;
 
 main();
 
@@ -53,6 +54,12 @@ sub main	{
             next  if $k=~/[^\d]/;
             push @transactions, $k;
         }
+        if ($k eq 'a' and $params{$k} eq 'P_TXNLogstep2')   {
+            $params{'a'} = "P_TXNLog_list";
+        }
+        if ($k eq 'a' and $params{$k} eq 'C_TXNLogstep2')   {
+            $params{'a'} = "C_TXNLog_list";
+        }
     }
         
     $Data{'lang'} = $lang;
@@ -72,12 +79,6 @@ sub main	{
 
     my ($logID, $amount, $chkvalue, $session, $paymentSettings) = Payments::checkoutConfirm(\%Data, $paymentType, \@transactions,1,1);
     
-    my $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;chkv=$chkvalue&amp;session=$session&amp;amount=$amount];
-    if ($paymentSettings->{'paymentType'} == $Defs::PAYMENT_ONLINEPAYPAL) {
-        $paymentURL = qq[$Defs::base_url/paypal.cgi?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;session=$session];
-    }
-
-    my $gateway_body= qq[<a href="$paymentURL">Proceed to Payment</a>];
     
 	my $st = qq[
         INSERT INTO tblPayTry (
@@ -102,14 +103,59 @@ sub main	{
         $logID,
         $datalog,
         ) or query_error($st);
+    my $tryID= $qry->{mysql_insertid};
     disconnectDB($db);
 
+    ## In here I will build up URL per Gateway -- intPaymentConfigID or have a GATEWAYCODE ?
     ## Pass control to gateway
-	
+    my $paymentURL = '';
+    if ($paymentSettings->{'gatewayCode'} eq 'NABExt1') {
+        print STDERR "YEP";
+    }
+    $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;chkv=$chkvalue&amp;session=$session&amp;amount=$amount];
+
+    my $payTry = payTryRead(\%Data, $logID, $tryID);
+    my $cancelURL = payTryRedirectBack($payTry, $client, $logID, 0);
+
+    if ($paymentSettings->{'paymentType'} == $Defs::PAYMENT_ONLINEPAYPAL) {
+        $paymentURL = qq[$Defs::base_url/paypal.cgi?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;session=$session];
+    }
+    my $gateway_body= qq[<a href="$paymentURL">Proceed to Payment</a>];
+    my $cancel_body= qq[<a href="$cancelURL">Cancel Payment</a>];
+    my $cancelPayPalURL = $Defs::base_url . $paymentSettings->{'gatewayCancelURL'} . qq[&amp;ci=$logID&client=$client]; ##$Defs::paypal_CANCEL_URL;
+
+    my $proceed_body = qq[
+    <html>
+    <body onload="document.sform.submit()">
+        <h3>Please Wait - Processing</h3>
+        <p>If you are not automatically redirected to the payment page within 30 seconds then you can <a href = "$paymentURL">proceed manually by pressing this link</a>.</p>
+        <form action = "$paymentURL" method = "POST" name = "sform" id = "sform">
+            <input type = "hidden" name = "a" value = "P">
+            <input type = "hidden" name = "ci" value = "$logID">
+            <input type = "hidden" name = "chkv" value = "$chkvalue">
+            <input type = "hidden" name = "sessions" value = "$session">
+            <input type = "hidden" name = "amount" value = "$amount">
+        </form>
+    </body>
+    </html>
+    ];
+            #<input type = "hidden" name = "client" value = "].unescape($client).qq[">
+            #<input type = "hidden" name = "nh" value = "$Data{'noheader'}"
     my $body = '';
-print qq[Content-type: text/html\n\n] if ! $body;
-print qq[$gateway_body];
+if ($amount eq "0" or $amount eq "0.00" or ! $amount)   {
+    print "Status: 302 Moved Temporarily\n";
+    print "Location: $cancelURL\n\n";
+}
+else    {
+    print qq[Content-type: text/html\n\n];
+    print $proceed_body;
+    #print qq[$cancel_body<br>];
+    #print qq[$gateway_body];
+    #print qq[<br>$cancelPayPalURL];
+}
 
 }
 exit;
 
+
+;

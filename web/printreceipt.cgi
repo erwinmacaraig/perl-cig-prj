@@ -115,7 +115,7 @@ sub main	{
 		);
 		while(my $field=$qry_trans->fetchrow_hashref())	{
 			foreach my $key (keys %{$field})  { if(!defined $field->{$key}) {$field->{$key}='';} }
-			$field->{'InvoiceNo'} = Payments::TXNtoInvoiceNum($field->{intTransactionID});
+			$field->{'InvoiceNo'} = Payments::TXNtoTXNNumber($field->{intTransactionID});
 			push @{$receiptData{$field->{'intTransLogID'}}{'Items'}}, $field;
 		}
 		$qry_trans->finish();

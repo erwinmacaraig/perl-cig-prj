@@ -40,6 +40,7 @@ sub handle {
         ->setAction($action)
         ->setSphinx()
         ->setData($Data);
+        #->setGridTemplate("search/grid/people.templ");
 
     my $cgi = $searchObj->{'_cgi'};
 	my %params = $searchObj->{'_cgi'}->Vars();
@@ -51,10 +52,12 @@ sub handle {
             $SearchData{'searchForm'} = $searchObj->displaySearchForm();
 
             my $resultGrid = $searchObj->process();
-            $SearchData{'searchResultGrid'} = $resultGrid;
+            $SearchData{'searchResultGrid'}{'data'} = $resultGrid;
+            $SearchData{'searchResultGrid'}{'count'} = $searchObj->getResultCount();
         }
         else {
             $SearchData{'searchForm'} = $searchObj->displaySearchForm();
+            $SearchData{'searchResultGrid'} = '';
         }
 
         my $content = runTemplate(

@@ -28,6 +28,7 @@ use PersonUserAccess;
 use Data::Dumper;
 use Payments;
 use Products;
+use PersonRequest;
 
 
 sub setProcessOrder {
@@ -181,6 +182,24 @@ sub setupValues    {
 
         ];
     }
+
+    my $maidennamescript = qq[
+        <script>
+            jQuery(document).ready(function()  {
+                jQuery('#l_row_strMaidenName').hide();
+
+                jQuery("select#l_intGender").change(function(){
+                    if(jQuery(this).val() == 2) {
+                        jQuery("#l_row_strMaidenName").show();
+                    } else {
+                        jQuery("#l_row_strMaidenName").hide();
+                    }
+                });
+            });
+        </script> 
+    ];
+
+
     my ($DefCodes, $DefCodesOrder) = getDefCodes(
         dbh        => $self->{'Data'}{'db'},
         realmID    => $self->{'Data'}{'Realm'},
@@ -198,6 +217,7 @@ sub setupValues    {
                     type        => 'text',
                     size        => '40',
                     maxsize     => '50',
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 strLocalSurname => {
                     label       => $self->{'SystemConfig'}{'strLocalSurname_Text'} ? $self->{'SystemConfig'}{'strLocalSurname_Text'} : $FieldLabels->{'strLocalSurname'},
@@ -206,6 +226,7 @@ sub setupValues    {
                     size        => '40',
                     maxsize     => '50',
                     compulsory => 1,
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 intGender => {
                     label       => $FieldLabels->{'intGender'},
@@ -214,6 +235,7 @@ sub setupValues    {
                     options     => \%genderoptions,
                     compulsory => 1,
                     firstoption => [ '', " " ],
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },                
                 intLocalLanguage => {
                     label       => $FieldLabels->{'intLocalLanguage'},
@@ -223,6 +245,7 @@ sub setupValues    {
                     firstoption => [ '', 'Select Language' ],
                     compulsory => 1,
                     posttext => $nonlatinscript,
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 strLatinFirstname => {
                     label       => $self->{'SystemConfig'}{'person_strLatinNames'} || $FieldLabels->{'strLatinFirstname'},
@@ -231,6 +254,7 @@ sub setupValues    {
                     size        => '40',
                     maxsize     => '50',
                     active      => $nonLatin,
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 strLatinSurname => {
                     label       => $self->{'SystemConfig'}{'person_strLatinNames'} || $FieldLabels->{'strLatinSurname'},
@@ -239,6 +263,7 @@ sub setupValues    {
                     size        => '40',
                     maxsize     => '50',
                     active      => $nonLatin,
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 strMaidenName => {
                     label       => $FieldLabels->{'strMaidenName'},
@@ -246,6 +271,8 @@ sub setupValues    {
                     type        => 'text',
                     size        => '40',
                     maxsize     => '50',
+                    posttext    => $maidennamescript,
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 dtDOB => {
                     label       => $FieldLabels->{'dtDOB'},
@@ -255,6 +282,7 @@ sub setupValues    {
                     format      => 'dd/mm/yyyy',
                     validate    => 'DATE',
                     compulsory => 1,
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 strISONationality => {
                     label       => $FieldLabels->{'strISONationality'},
@@ -263,6 +291,7 @@ sub setupValues    {
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
                     compulsory => 1,
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 strISOCountryOfBirth => {
                     label       => $FieldLabels->{'strISOCountryOfBirth'},
@@ -271,6 +300,7 @@ sub setupValues    {
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
                     compulsory => 1,
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 strRegionOfBirth => {
                     label       => $FieldLabels->{'strRegionOfBirth'},
@@ -278,6 +308,7 @@ sub setupValues    {
                     type        => 'text',
                     size        => '30',
                     maxsize     => '45',
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 strPlaceOfBirth => {
                     label       => $FieldLabels->{'strPlaceOfBirth'},
@@ -286,6 +317,7 @@ sub setupValues    {
                     size        => '30',
                     maxsize     => '45',
                     compulsory => 1,
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
                 intGender => {
                     label       => $FieldLabels->{'intGender'},
@@ -294,6 +326,7 @@ sub setupValues    {
                     options     => \%genderoptions,
                     compulsory => 1,
                     firstoption => [ '', " " ],
+                    readonly    => $self->{'RunParams'}{'dtype'} eq 'TRANSFER' ? 1 : 0,
                 },
             },
             'order' => [qw(
@@ -610,6 +643,16 @@ sub setupValues    {
 sub display_core_details    { 
     my $self = shift;
 
+    my $id = $self->ID() || 0;
+    my $defaultType = $self->{'RunParams'}{'dtype'} || '';
+    if($defaultType eq 'TRANSFER')   {
+        my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
+        $personObj->load();
+        if($personObj->ID())    {
+            my $objectValues = $self->loadObjectValues($personObj);
+            $self->setupValues($objectValues);
+        }
+    }
 
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Person',);
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
@@ -632,6 +675,14 @@ sub display_core_details    {
 
 sub validate_core_details    { 
     my $self = shift;
+
+    my $defaultType = $self->{'RunParams'}{'dtype'} || '';
+    if($defaultType eq 'TRANSFER')   {
+        #all core details are read-only for Transfer
+        $self->incrementCurrentProcessIndex();
+        $self->incrementCurrentProcessIndex();
+        return ('',2);
+    }
 
     my $userData = {};
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Person',);
@@ -939,15 +990,58 @@ sub display_registration {
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID);
     $personObj->load();
     my ($dob, $gender) = $personObj->getValue(['dtDOB','intGender']); 
-    my $content = displayPersonRegisterWhat(
-        $self->{'Data'},
-        $personID,
-        $entityID,
-        $dob || '',
-        $gender || 0,
-        $originLevel,
-        $url,
-    );
+
+    my $content = '';
+    my $noContinueButton = 1;
+
+    my $defaultType = $self->{'RunParams'}{'dtype'} || '';
+    if($defaultType eq 'TRANSFER')   {
+        $noContinueButton = 0;
+        my %regFilter = (
+            'entityID' => $entityID,
+            'requestID' => $self->{'RunParams'}{'prid'},
+            #'requestID' => 12213,
+        );
+        my $request = getRequests($self->{'Data'}, \%regFilter);
+        $request = $request->[0];
+
+        if(!$request) {
+            push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person Request';
+            $noContinueButton = 1;
+            $content = "Person Request Details not found.";
+        }
+        else {
+            $request->{'personType'} = $Defs::personType{$request->{'strPersonType'}};
+            $request->{'sport'} = $Defs::sportType{$request->{'strSport'}};
+            $request->{'personLevel'} = $Defs::personLevel{$request->{'strPersonLevel'}};
+
+            $self->addCarryField('nat', 'TRANSFER');
+            $self->addCarryField('pt', $request->{'strPersonType'});
+            $self->addCarryField('pl', $request->{'strPersonLevel'});
+            $self->addCarryField('sp', $request->{'strSport'});
+            $self->addCarryField('ag', $request->{'personCurrentAgeLevel'});
+
+            $content = runTemplate(
+                $self->{'Data'},
+                {
+                    requestSummary => $request,
+                },
+                'personrequest/generic/reg_summary.templ'
+            );
+        }
+    }
+    else {
+         $content = displayPersonRegisterWhat(
+            $self->{'Data'},
+            $personID,
+            $entityID,
+            $dob || '',
+            $gender || 0,
+            $originLevel,
+            $url,
+        );
+    }
+
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -958,12 +1052,16 @@ sub display_registration {
         Title => '',
         TextTop => '',
         TextBottom => '',
-        NoContinueButton => 1,
+        NoContinueButton => $noContinueButton,
     );
     my $pagedata = $self->display(\%PageData);
 
-    return ($pagedata,0);
+    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}}) and ($defaultType eq 'TRANSFER')) {
+        #display the same step with error notification (for Transfers atm)
+        return ($pagedata,0);
+    }
 
+    return ($pagedata,0);
 }
 
 sub process_registration { 
@@ -976,6 +1074,7 @@ sub process_registration {
     my $sport = $self->{'RunParams'}{'sp'} || '';
     my $ageLevel = $self->{'RunParams'}{'ag'} || '';
     my $registrationNature = $self->{'RunParams'}{'nat'} || '';
+    my $personRequestID = $self->{'RunParams'}{'prid'} || '';
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
@@ -1000,6 +1099,9 @@ sub process_registration {
             $sport, 
             $ageLevel, 
             $registrationNature,
+            undef,
+            undef,
+            $personRequestID,
        );
     }
     if(!$personID)    {
@@ -1287,6 +1389,7 @@ sub process_products {
             my %Settings=();
             $Settings{'paymentType'} = $paymentType;
             my $logID = createTransLog($self->{'Data'}, \%Settings, $entityID,\@txnIds, $amount);
+            processTransLog($self->{'Data'}->{'db'}, '', 'OK', 'APPROVED', $logID, \%Settings, undef, undef, '', '', '', '', '', '','',1);
             UpdateCart($self->{'Data'}, undef, $self->{'Data'}->{'client'}, undef, undef, $logID);
             product_apply_transaction($self->{'Data'},$logID);
         }
@@ -1402,7 +1505,7 @@ sub process_documents {
     
     #check for uploaded document
     my $isRequiredDocPresent = checkUploadedRegoDocuments($self->{'Data'},$personID, $regoID,$entityID,$entityLevel,$originLevel,$rego_ref);
-    if(1==2 and !$isRequiredDocPresent){
+    if(!$isRequiredDocPresent){
     	push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Required Document Missing");
     	my %PageData = (
         HiddenFields => $self->stringifyCarryField(),

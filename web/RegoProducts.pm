@@ -489,14 +489,15 @@ sub productAllowedThroughFilter {
 }
 
 sub insertRegoTransaction {
-    my($Data, $regoID, $intID, $params, $entityID, $entityLevel, $level, $session, $rego_products)=@_;
+    my($Data, $regoID, $intID, $params, $entityID, $entityLevel, $level, $session, $rego_products, $invoiceID)=@_;
     my $db=$Data->{'db'};
     $entityID ||= getLastEntityID($Data->{'clientValues'});
     $entityLevel ||= getLastEntityLevel($Data->{'clientValues'});
     $session ||= undef;
+	$invoiceID ||= 0;
     my $multipersonType = $session ? ($session->getNextRegoType())[0] || '' : '';
     $intID ||= 0;
-
+	
     my $stTxnsClean = qq[
         DELETE FROM tblTransactions 
         WHERE 
@@ -541,9 +542,10 @@ sub insertRegoTransaction {
           intRealmID, 
           intRealmSubTypeID, 
           intTXNEntityID,
-          intPersonRegistrationID
+          intPersonRegistrationID,
+		  intInvoiceID
         )
-        VALUES (?, ?, ?, ?, ?, SYSDATE(), ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, SYSDATE(), ?, ?, ?, ?, ?, ?, ?)
   ];
   my $q_add= $db->prepare($st_add);
   my @txns_added=();
@@ -628,13 +630,14 @@ sub insertRegoTransaction {
                     AND intProductID=?
                 LIMIT 1
             ];
+
       my $qry_update = $Data->{'db'}->prepare($st_upd);
             my %product_seen;
       while(my $dref=$query->fetchrow_hashref())  {
                 next if $product_seen{$dref->{'intProductID'}};
           my $amount= getCorrectPrice($dref, $multipersonType);
           my $qty = $params->{'txnQTY_'.$dref->{'intTransactionID'}} || $params->{'prodQTY_'.$dref->{'intTransactionID'}} ||  0;
-        
+         		
 #Fix QTY (Prevent bad chars)
     $qty = fix_qty($qty); 
     my $totalamount= $amount * $qty;
@@ -649,6 +652,22 @@ sub insertRegoTransaction {
 
     if (scalar(@productsselected)) {
         my %product_seen;
+		#for single transaction
+		if(!$invoiceID){
+			#Generate invoice number 
+		    my $invoiceNumber;
+			my $stt = qq[INSERT INTO tblInvoice (tTimeStamp) VALUES (NOW())];
+			my $qryy=$Data->{'db'}->prepare($stt); 
+ 			$qryy->execute();
+			$invoiceID =  $qryy->{mysql_insertid} || 0;	
+			$invoiceNumber = Payments::TXNtoInvoiceNum($invoiceID); 
+
+			$stt = qq[UPDATE tblInvoice SET strInvoiceNumber = ? WHERE intInvoiceID = ?];		
+			$qryy=$Data->{'db'}->prepare($stt); 
+			$qryy->execute($invoiceNumber,$invoiceID); 
+		}
+		
+
         foreach my $product (@productsselected)    {
             next if $product_seen{$product}++;
             my $amount= getItemCost($Data, $entityID, $entityLevel, $multipersonType, $product);
@@ -671,11 +690,13 @@ sub insertRegoTransaction {
                 $realmID,
                 $realmSubTypeID,
                 $entityID,
-                $regoID
+                $regoID,
+				$invoiceID
             );
     
             
       my $tx_ID=$q_add->{mysql_insertid} || 0;
+		
       if ($status and ($total_amount == 0 or $total_amount eq '0.00'))  {
         my $regoFormID = $Data->{'RegoFormID'} || 0;
         my $st = qq[
@@ -685,7 +706,11 @@ sub insertRegoTransaction {
         ];
         my $qry=$Data->{'db'}->prepare($st);
         $qry->execute( $Data->{'Realm'}, $regoFormID );
+
+		
         my $transLogID = $qry->{'mysql_insertid'};
+		
+		
 
         $st = qq[
           INSERT INTO tblTXNLogs
@@ -703,6 +728,12 @@ sub insertRegoTransaction {
         $qry->execute( $transLogID, $tx_ID );
                 Products::product_apply_transaction($Data,$transLogID);
       }
+	  
+	  
+
+     
+	
+
       push @txns_added, $tx_ID if $tx_ID;
     }
   }
