@@ -165,6 +165,7 @@ sub queryInvoiceByNumber {
 	my $cl=setClient($Data->{'clientValues'}) || '';
     my %cv=getClient($cl);    
     $cv{'currentLevel'} = $Defs::LEVEL_PERSON;
+	
 	while(my $dref = $sth->fetchrow_hashref()){
 		$results = 1;
 		my $selectPay = qq[<input type="checkbox" name="act_$dref->{'intTransactionID'}" class="paytxn_chk" />];
@@ -179,8 +180,9 @@ sub queryInvoiceByNumber {
 			person => $dref->{'strLocalFirstname'} . ' ' . $dref->{'strLocalSurname'},
 			quantity => $dref->{'intQty'},
 			amount => $dref->{'TotalAmount'},
-			status => $Defs::TransactionStatus{$dref->{'intStatus'}},
+			status => $Defs::TransactionStatus{$dref->{'intStatus'}},			
 		};
+		
 	}
  	
 	my $body = displayResults($Data,\@rowdata,$client);
@@ -247,8 +249,10 @@ sub queryInvoiceByOtherInfo {
 
 	my $results = 0;
 	my @rowdata = ();
+	
 	while(my $dref = $sth->fetchrow_hashref()){
 		$results = 1;
+		
 		my $selectPay = qq[<input type="checkbox" name="act_$dref->{'intTransactionID'}" class="paytxn_chk" />];	
 		$cv{'personID'} = $dref->{'intPersonID'};
         my $clm=setClient(\%cv);	
@@ -261,8 +265,9 @@ sub queryInvoiceByOtherInfo {
 			person => $dref->{'strLocalFirstname'} . ' ' . $dref->{'strLocalSurname'},
 			quantity => $dref->{'intQty'},
 			amount => $dref->{'TotalAmount'},
-			status => $Defs::TransactionStatus{$dref->{'intStatus'}},
+			status => $Defs::TransactionStatus{$dref->{'intStatus'}},			
 		};
+		
 	}
  	my $body = displayResults($Data,\@rowdata,$client);
 	return $body if($results);
@@ -270,7 +275,7 @@ sub queryInvoiceByOtherInfo {
 }
 
 sub displayResults {
-	my($Data,$rowdata,$client) = @_;
+	my($Data,$rowdata,$client,$personIDs_ref) = @_;
 
 	my @headers = (
 	{
@@ -329,7 +334,7 @@ sub displayResults {
     	 $paymentType = $pType;
       	 my $name = $gateway->{'gatewayName'};
   		 $gateway_body .= qq[
-            <input type="submit" name="cc_submit[$gatewayCount]" value="]. $Data->{'lang'}->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
+            <input type="submit" onclick="clicked='paytry.cgi'" name="cc_submit[$gatewayCount]" value="]. $Data->{'lang'}->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
         ];   		 
     	}
 	 $gateway_body .= qq[
@@ -337,7 +342,70 @@ sub displayResults {
         </div>
     ];
 	$gateway_body = '' if ! $gatewayCount;
-	my $target = 'paytry.cgi';#$Data->{'target'};
+
+	my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
+    $Year+=1900;
+    $Month++;
+    my $currentDate="$Day/$Month/$Year";
+	$gateway_body = '' if ! $Data->{'SystemConfig'}{'AllowTXNs_CCs'};
+	for my $i (qw(intAmount strBank strBSB strAccountNum strAccountName strResponseCode strResponseText strReceiptRef strComments intPartialPayment))	{
+		  $Data->{params}{$i}='' if !defined $Data->{params}{$i};
+	}
+
+	my $allowManualPayments = 1;
+    $allowManualPayments = 0 if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB and ! allowedAction($Data, 'm_mp'));
+	$allowManualPayments = 0 if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB and $Data->{'clientValues'}{'currentLevel'}  == $Defs::LEVEL_PERSON and ! allowedAction($Data, 'm_mp'));
+	$allowManualPayments = 0 if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB and $Data->{'clientValues'}{'currentLevel'}  == $Defs::LEVEL_CLUB  and ! allowedAction($Data, 't_tp'));
+    $allowManualPayments = 0 if $Data->{'ReadOnlyLogin'};	
+
+	my $allowMP = 1;
+    $allowMP = 0 if !$allowManualPayments;
+    #$allowMP = 0 if !$personID and $entityID;
+    $allowMP = 0 if $Data->{'SystemConfig'}{'DontAllowManualPayments'};
+    $allowMP = 0 if $Data->{'SystemConfig'}{'AssocConfig'}{'DontAllowManualPayments'}; 
+
+	 my $orstring = '';
+     $orstring = qq[&nbsp; <b>].$Data->{'lang'}->txt('OR').qq[</b> &nbsp;] if $gateway_body and $allowMP;
+     if($paymentType==0){ $paymentType='';}
+   
+	if ($allowMP){
+	$gateway_body .= qq[
+				  <div class="sectionheader">].$Data->{'lang'}->txt('Manual Payment').qq[</div>
+					  <table cellpadding="2" cellspacing="0" border="0">
+						<tbody id="secmain2" >	
+						<tr>
+							<td class="label"><label for="l_intAmount">].$Data->{'lang'}->txt('Amount (ddd.cc)').qq[</label>:</td>
+							<td class="value">
+							<input type="text" name="intAmount" value="$Data->{params}{intAmount}" id="l_intAmount" size="10"  /> </td>
+						</tr>
+						<tr>
+							<td class="label"><label for="l_dtLog">].$Data->{'lang'}->txt('Date Paid').qq[</label>:</td>
+							<td class="value"><input type="text" name="dtLog" value="$currentDate" id="l_dtLog" size="10" maxlength="10" /> <span class="HTdateformat">dd/mm/yyyy</span> </td>
+						</tr>
+						<tr>
+							<td class="label"><label for="l_intPaymentType">].$Data->{'lang'}->txt('Payment Type').qq[</label>:</td>
+							<td class="value">].drop_down('paymentType',\%Defs::manualPaymentTypes, undef, $paymentType, 1, 0,'','').qq[</td>
+					</tr>
+					
+<tr>
+
+						<td class="label"><label for="l_strComments">].$Data->{'lang'}->txt('Comments').qq[</label>:</td>
+						<td class="value"><textarea name="strComments" id="l_strComments"  rows = "5"   cols = "45"  >$Data->{params}{strComments}</textarea> </td>
+					</tr>
+				    </tbody>	
+				</table>
+			
+						<div class="HTbuttons"><input onclick="clicked='main.cgi'" type="submit" name="subbut" value="Submit Manual Payment" class="HF_submit button generic-button" id = "btn-manualpay"></div>
+<input type="hidden" name="paymentID" value=""><input type="hidden" name="dt_start_paid" value=""><input type="hidden" name="dt_end_paid" value="">
+					
+				</div>
+			] 
+
+	}
+
+
+
+my $target = 'paytry.cgi';#$Data->{'target'};
 
 	## end payment settings
 	my %PageData = (

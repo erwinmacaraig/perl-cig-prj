@@ -1,22 +1,13 @@
 <p>Please select the people you wish to register from the list below and click on the update button to commit your change.</p>
-    <form action="[% target %]" method="POST"> 
-	[% grid %]
-    <script>
-    function update_selected()    {
-        var rows = grid_grid.getSelectedRows();
-        var changedIDs = [];
-        for(var i=0, len=rows.length; i < len; i++){
-            changedIDs.push(dataView_grid.getItem(rows[i]).id);
-			
-        }
-		var s = changedIDs.join('|');
-		document.getElementById('transactionIDs').value = s; 
-        
-		
-    }
-    </script>
- 	
-    <input type="hidden" name="transactionIDs" value="" id = "transactionIDs">
+	<script type="text/javascript">
+		var clicked;
+		function submitForm(){
+			document.payform.action = clicked;
+			return true;
+		}
+	</script>
+    <form name="payform" method="POST" onsubmit="submitForm(); return true;"> 
+	[% grid %]   
     <input type="hidden" name="a" value="[% nextAction %]">
     <input type="hidden" name="client" value="[% client %]">
 

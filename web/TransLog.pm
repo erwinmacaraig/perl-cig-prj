@@ -82,7 +82,7 @@ sub handleTransLogs {
 	  ($body, $header) = listTransLog($Data, $entityID, $personID);
   }
 	if ($action =~/payVIEW/)	{
-		($body, $header) = viewTransLog($Data, $Data->{'params'}{'tlID'});
+		($body, $header) = viewTransLog($Data, $Data->{'params'}{'tlID'},$Data->{'params'}{'pID'});
 	}
   if ($action=~/(edit|display|add)/) {
 	  ($body, $header)=entityDetails($action, $Data, $clientValues_ref, $db);
@@ -666,8 +666,8 @@ sub getTransList {
     }
     $row_data->{SelectLink} = qq[main.cgi?client=$client&a=P_TXN_EDIT&personID=$row->{intID}&id=$row->{intTransLogID}&tID=$row->{intTransactionID}];
     if ($row->{StatusText} eq 'Paid') {
-      $row_data->{stuff} = qq[<a href="main.cgi?a=P_TXNLog_payVIEW&client=$client&tlID=$row->{intTransLogID}">].$Data->{'lang'}->txt('View Payment Record').qq[</a>];
-      $row_data->{strReceipt} = qq[<a href="printreceipt.cgi?client=$client&ids=$row->{intTransLogID}"  target="receipt">].$Data->{'lang'}->txt('View Receipt').qq[</a>];
+      $row_data->{stuff} = qq[<a href="main.cgi?a=P_TXNLog_payVIEW&client=$client&tlID=$row->{intTransLogID}&amp;pID=$row->{intID}">].$Data->{'lang'}->txt('View Payment Record').qq[</a>];
+      $row_data->{strReceipt} = qq[<a href="printreceipt.cgi?client=$client&amp;ids=$row->{intTransLogID}&amp;pID=$row->{intID}"  target="receipt">].$Data->{'lang'}->txt('View Receipt').qq[</a>];
       $row_data->{manual_payment} = '';
     }
     elsif ($row->{StatusText} eq 'Unpaid') {
@@ -1005,6 +1005,11 @@ print STDERR "LISTING";
 						<td class="label"><label for="l_intPaymentType">].$lang->txt('Payment Type').qq[</label>:</td>
 						<td class="value">].drop_down('paymentType',\%Defs::manualPaymentTypes, undef, $paymentType, 1, 0,'','').qq[</td>
 					</tr>
+
+
+
+
+
 					<!--<tr>
 						<td class="label"><label for="l_strBank">Bank</label>:</td>
 						<td class="value"><input type="text" name="strBank" value="$Data->{params}{strBank}" id="l_strBank"   /></td>
@@ -1037,6 +1042,11 @@ print STDERR "LISTING";
 						<td class="label"><label for="l_intPartialPayment">Partial Payment</label>:</td>
 						<td class="value"><input type="checkbox" name="intPartialPayment" value="1" id="l_intPartialPayment" ].($Data->{params}{intPartialPayment} ? 'checked' : '').qq[  /> </td>
 					</tr>	-->
+
+
+
+
+
 					<tr>
 
 						<td class="label"><label for="l_strComments">].$lang->txt('Comments').qq[</label>:</td>
@@ -1356,10 +1366,11 @@ my (undef, undef, $id, $Data, $option, $tempClientValues_ref) = @_;
 
 sub viewTransLog	{
 
-	my ($Data, $intTransLogID)= @_;
+	my ($Data, $intTransLogID, $personID)= @_;
 
     my $lang = $Data->{'lang'};
 	$intTransLogID ||= 0;
+	$personID ||= 0;
 	my $db = $Data->{'db'};
 	my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
 	
@@ -1379,7 +1390,7 @@ sub viewTransLog	{
 			INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLog.intTXNID)
 			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
 			LEFT JOIN tblEntity as Entity on (Entity.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
-		WHERE intLogID = $intTransLogID
+		WHERE intLogID = $intTransLogID 
 		AND T.intRealmID = $Data->{'Realm'}
 	];
         
@@ -1396,7 +1407,7 @@ sub viewTransLog	{
 			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
 			LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
 			LEFT JOIN tblEntity as E ON (E.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
-		WHERE intTransLogID = $intTransLogID
+		WHERE intTransLogID = $intTransLogID  
 		AND T.intRealmID = $Data->{'Realm'}
 	];
 	
