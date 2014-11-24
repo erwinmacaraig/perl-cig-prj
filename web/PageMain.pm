@@ -234,8 +234,8 @@ sub pageMain {
         #$TemplateData{'TeamListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=T_L&amp;l=2" if(!$Data->{'SystemConfig'}{'NoTeams'});
     #}
     if($authLevel == $Defs::LEVEL_CLUB)    {
-        $TemplateData{'MemListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=M_L&amp;l=1";
-        $TemplateData{'TeamListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=T_L&amp;l=2" if(!$Data->{'SystemConfig'}{'NoTeams'});
+        #$TemplateData{'MemListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=M_L&amp;l=1";
+        #$TemplateData{'TeamListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=T_L&amp;l=2" if(!$Data->{'SystemConfig'}{'NoTeams'});
     }
 
     my $templateFile = 'page_wrapper/main_wrapper.templ';
