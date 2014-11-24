@@ -1808,6 +1808,7 @@ sub viewTask {
             p.intInternationalTransfer as InternationalTransfer,
             e.strLocalName as EntityLocalName,
             p.intPersonID,
+            p.strNationalNum,
             t.strTaskStatus,
             t.strWFRuleFor,
             uar.entityID as UserEntityID,
@@ -2023,6 +2024,7 @@ sub populateRegoViewData {
 
     my $role_ref = getEntityTypeRoles($Data, $dref->{'strSport'}, $dref->{'strPersonType'});
 
+    print STDERR Dumper $dref;
 	%TemplateData = (
         PersonDetails => {
             Status => $Data->{'lang'}->txt($Defs::personStatus{$dref->{'PersonStatus'} || 0}) || '',
@@ -2034,6 +2036,7 @@ sub populateRegoViewData {
             Nationality => $dref->{'strISONationality'} || '', #TODO identify extract string
             DateSuspendedUntil => '',
             LastUpdate => '',
+            MID => $dref->{'strNationalNum'} || '',
         },
         PersonRegoDetails => {
             ID => $dref->{'intPersonRegistrationID'},
@@ -2044,6 +2047,8 @@ sub populateRegoViewData {
             Sport => $Defs::sportType{$dref->{'strSport'}} || '-',
             Level => $Defs::personLevel{$dref->{'strPersonLevel'}} || '-',
             AgeLevel => $Defs::ageLevel{$dref->{'strAgeLevel'}} | '-',
+            RegisterTo => $dref->{'entityLocalName'} | '-',
+            Status => $Defs::personRegoStatus{$dref->{'personRegistrationStatus'}} | '-',
         },
 	);
 
@@ -2269,8 +2274,8 @@ sub populateDocumentViewData {
         #}
 
         #$replaceLink = qq[ <span style="position: relative" class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$tdref->{'intFileID'}" target="_blank">]. $Data->{'lang'}->txt('Replace') . q[</a></span>];
-        $replaceLink = qq[ <span style="position: relative" class="button-small generic-button"><a href="$Defs::base_url/main.cgi?client=$Data->{'client'}&amp;a=WF_amd&amp;RegistrationID=$registrationID&amp;trgtid=$targetID&amp;doclisttype=$tdref->{'intDocumentTypeID'}&amp;level=$level&amp;f=$tdref->{'intFileID'}" target="_blank">]. $Data->{'lang'}->txt('Replace') . q[</a></span>];
-        $addLink = qq[ <span style="position: relative" class="button-small generic-button"><a href="$Defs::base_url/main.cgi?client=$Data->{'client'}&amp;a=WF_amd&amp;RegistrationID=$registrationID&amp;trgtid=$targetID&amp;doclisttype=$tdref->{'intDocumentTypeID'}&amp;level=$level" target="_blank">]. $Data->{'lang'}->txt('Add') . q[</a></span>] if (!$Data->{'ReadOnlyLogin'});
+        $replaceLink = qq[ <a class="btn-inside-docs-panel" href="$Defs::base_url/main.cgi?client=$Data->{'client'}&amp;a=WF_amd&amp;RegistrationID=$registrationID&amp;trgtid=$targetID&amp;doclisttype=$tdref->{'intDocumentTypeID'}&amp;level=$level&amp;f=$tdref->{'intFileID'}" target="_blank">]. $Data->{'lang'}->txt('Replace') . q[</a>];
+        $addLink = qq[ <a class="btn-inside-docs-panel" href="$Defs::base_url/main.cgi?client=$Data->{'client'}&amp;a=WF_amd&amp;RegistrationID=$registrationID&amp;trgtid=$targetID&amp;doclisttype=$tdref->{'intDocumentTypeID'}&amp;level=$level" target="_blank">]. $Data->{'lang'}->txt('Add') . q[</a>] if (!$Data->{'ReadOnlyLogin'});
 
         if($tdref->{'intAllowProblemResolutionEntityAdd'} == 1) {
             if(!$tdref->{'intDocumentID'}){

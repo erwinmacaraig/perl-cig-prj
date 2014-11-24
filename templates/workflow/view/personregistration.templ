@@ -91,6 +91,14 @@
                 </div>
 
                 <div id="regdetails" class="tab-pane fade">
+                    [% IF PersonRegoDetails.RegisterTo %]
+                        <span class="details-row">
+                            <span class="details-left">[% Lang.txt("Register To") %]:</span>
+                            <span class="details-left detail-value">[% PersonRegoDetails.RegisterTo %]</span>
+                        </span>
+                    [% END %]
+
+
                     [% IF PersonRegoDetails.RegoType %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Registration Type") %]:</span>
@@ -164,7 +172,7 @@
     <div class="col-md-3">
         <div id = "">
 
-        <h3 class="panel-header">Member ID: [% Details.NationalNum %]</h3>
+        <h3 class="panel-header">Member ID: [% PersonDetails.MID %]</h3>
         <div class="panel-body">
 
         <p class="reg-text">[% PersonDetails.LocalName %]</p>
