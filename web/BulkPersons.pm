@@ -83,7 +83,7 @@ sub bulkPersonRollover {
                 AND PR.strStatus IN ("$Defs::PERSONREGO_STATUS_ACTIVE", "$Defs::PERSONREGO_STATUS_PASSIVE")
                 AND PR.intEntityID = ?
                 AND PR.intNationalPeriodID <> ?
-                AND PR.strAgeLevel <> ?
+                AND PR.strAgeLevel = ?
             )
             LEFT JOIN tblPersonRegistration_$realmID as PRto ON (
                 PRto.intPersonID = P.intPersonID
