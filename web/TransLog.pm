@@ -308,7 +308,6 @@ sub step2 {
 	my $intPersonID= $Data->{'clientValues'}{'personID'}; 
 	my $currentLevel = $Data->{'clientValues'}{'authLevel'};
 	
-print STDERR "DISPLAY OLY|".$Data->{params}{'subbut'} ."\n";
     my $hidePayCheckbox = 1; #$Data->{params}{'subbut'} || 0;
 	my ($transHTML, $transcount, $transCurrency_ref, $transAmount_ref)=getTransList($Data, $db, $entityID, $intPersonID, $whereClause, $clientValues_ref, 0, $displayonly, $hidePayCheckbox);
 
@@ -580,7 +579,7 @@ sub getTransList {
     FROM 
       tblTransactions as t
       INNER JOIN tblProducts as P ON (P.intProductID = t.intProductID)
-	  INNER JOIN tblInvoice as i ON t.intInvoiceID = i.intInvoiceID
+	  LEFT JOIN tblInvoice as i ON t.intInvoiceID = i.intInvoiceID
       LEFT JOIN tblTransLog as tl ON (t.intTransLogID = tl.intLogID)
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (
             PR.intPersonRegistrationID = t.intPersonRegistrationID
@@ -1403,7 +1402,7 @@ sub viewTransLog	{
 	my $st_trans = qq[
 		SELECT T.intTransactionID, M.strLocalSurname, M.strLocalFirstName, E.*, P.strName, P.strGroup, E.strLocalName as EntityName, T.intQty, T.curAmount, T.intTableType, I.strInvoiceNumber, T.intStatus
 		FROM tblTransactions as T
-			INNER JOIN tblInvoice I on I.intInvoiceID = T.intInvoiceID
+			LEFT JOIN tblInvoice I on I.intInvoiceID = T.intInvoiceID
 			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
 			LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
 			LEFT JOIN tblEntity as E ON (E.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)

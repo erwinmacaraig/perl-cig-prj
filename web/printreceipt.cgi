@@ -115,7 +115,7 @@ sub main	{
 				LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_MEMBER)
 				LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
 				LEFT JOIN tblEntity as E on (E.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB) 
-				INNER JOIN tblInvoice ON T.intInvoiceID = tblInvoice.intInvoiceID
+				LEFT JOIN tblInvoice ON T.intInvoiceID = tblInvoice.intInvoiceID
 			 WHERE intTransLogID IN (?) AND T.intID = ?                        
 			AND T.intRealmID = ?
 		]; 
