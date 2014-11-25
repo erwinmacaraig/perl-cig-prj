@@ -483,6 +483,7 @@ sub getFieldsList	{
         dtFrom
         dtTo
         intNotifications
+        intFacilityTypeID
         ));
 
     return \@clubFields if $fieldtype eq 'Club';

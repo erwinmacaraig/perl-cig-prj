@@ -162,6 +162,7 @@ sub getFieldLabels	{
             intNotifications => 'Notification Toggle',
             strOrganisationLevel => 'Level',
             dissolved => 'Dissolved',
+            intFacilityTypeID => 'Venue Type',
             );
 	}
 
@@ -208,6 +209,7 @@ sub getFieldLabels	{
             strEntityType => 'Entity Type',
             intNotifications => 'Notification Toggle',
             intEntityFieldCount => 'Number of Fields',
+            intFacilityTypeID => 'Venue Type',
             );
 	}
 
