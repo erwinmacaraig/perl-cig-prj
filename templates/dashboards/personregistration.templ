@@ -8,7 +8,7 @@
                 <h4 class="panel-title">
                     <a href="#panel[% index %]" data-toggle="collapse" data-parent="#accordion">
                     [% IF entity.strLocalName %]
-                        
+                       
                             [% Lang.txt('Registrered To') %]
                             [% entity.strLocalName %]
                        
@@ -37,18 +37,27 @@
                                     </thead>
                                     <tbody>
 
+									[% FOREACH doc IN entity.documents %]									
+
                                         <tr class="task-list">
                                             <td>
-                                                <span class="detail-value">ID Proof:</span>
+                                                <span class="detail-value">[% doc.strDocumentName %]:</span>
                                             </td>
                                             <td class="status-col">
-                                                    <a href="" class="btn-inside-docs-panel">[% Lang.txt('View') %]</a>
+                                                    <a href="[% entity.url %]?client=[% entity.client %]&amp;f=[% doc.intFileID %]" class="btn-inside-docs-panel">[% Lang.txt('View') %]</a>
                                             </td>
                                             <td class="status-col">
-                                                <i class="fa fa-circle ver-dots green"></i>
+											[% IF doc.strApprovalStatus == 'PENDING' %]
+                                                <i class="fa fa-circle ver-dots red"></i>
+                                                <span class="">Pending</span>
+											[% ELSE %]
+												 <i class="fa fa-circle ver-dots green"></i>
                                                 <span class="">Verified</span>
+											[% END %]
+											
                                             </td>
                                         </tr>
+									[% END %]
 
 
 
