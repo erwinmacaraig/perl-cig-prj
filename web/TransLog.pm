@@ -547,9 +547,9 @@ sub getTransList {
 
 	my $prodSellLevel = qq[ 
     AND ( 
-      t.intStatus <> 0 
+      t.intStatus <> 1 
       OR (
-        t.intStatus = 0 
+        t.intStatus = 1 
         AND P.intMinSellLevel <= $Data->{'clientValues'}{'authLevel'} 
         OR P.intMinSellLevel=0
       )
