@@ -2024,7 +2024,6 @@ sub populateRegoViewData {
 
     my $role_ref = getEntityTypeRoles($Data, $dref->{'strSport'}, $dref->{'strPersonType'});
 
-    print STDERR Dumper $dref;
 	%TemplateData = (
         PersonDetails => {
             Status => $Data->{'lang'}->txt($Defs::personStatus{$dref->{'PersonStatus'} || 0}) || '',
@@ -2246,7 +2245,8 @@ sub populateDocumentViewData {
     my $count = 0;
     while(my $tdref = $q->fetchrow_hashref()) {
         #skip if no registration item matches rego details combination (type/role/sport/rego_nature etc)
-        next if !$tdref->{'regoItemID'};
+        next if (!$tdref->{'regoItemID'} and $dref->{'strWFRuleFor'} eq 'REGO');
+        #print STDERR Dumper $tdref;
 
         next if((!$dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC') or ($dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC' and $dref->{'PersonStatus'} ne $Defs::PERSON_STATUS_PENDING));
 
