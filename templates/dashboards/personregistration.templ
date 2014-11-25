@@ -36,15 +36,17 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-
-									[% FOREACH doc IN entity.documents %]									
+								
+									
+									[% FOREACH doc IN entity.documents %]	
+																
 
                                         <tr class="task-list">
                                             <td>
-                                                <span class="detail-value">[% doc.strDocumentName %]:</span>
+                                                <span class="detail-value">[%  doc.strDocumentName %]:</span>
                                             </td>
                                             <td class="status-col">
-                                                    <a href="[% entity.url %]?client=[% entity.client %]&amp;f=[% doc.intFileID %]" class="btn-inside-docs-panel">[% Lang.txt('View') %]</a>
+                                                    <a href="[% url %]?client=[% client %]&amp;f=[% doc.intFileID %]" class="btn-inside-docs-panel">[% Lang.txt('View') %]</a>
                                             </td>
                                             <td class="status-col">
 											[% IF doc.strApprovalStatus == 'PENDING' %]

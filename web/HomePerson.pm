@@ -86,7 +86,9 @@ sub showPersonHome	{
 		AddRegistrationURL => $addregistrationURL || '',
 		CardPrintingURL => $cardprintingURL || '',
 		Documents => $docs,
-		GroupData => $groupdata,
+		GroupData => $groupdata,		
+	    client => $client,
+	    url => "$Defs::base_url/viewer.cgi",
 		Details => {
 			Active => $Data->{'lang'}->txt(($personObj->getValue('intRecStatus') || '') ? 'Yes' : 'No'),
 			LatinFirstname=> $personObj->getValue('strLatinFirstname') || '',	
@@ -119,27 +121,10 @@ sub showPersonHome	{
     
     $RegFilters{'statusIN'} = \@statusIN;
     my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
-	my @reg_docs = ();
-open FH, ">dumpfile.txt";
+	
+	open FH, ">dumpfile.txt";
+	
     foreach my $rego (@{$Reg_ref})  {
-
-my $sql = qq[
-			SELECT strApprovalStatus,strDocumentName, intFileID, pr.intEntityID FROM tblUploadedFiles INNER JOIN tblDocuments 
-			ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID  
-			INNER JOIN tblDocumentType ON tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID   
-			INNER JOIN tblPersonRegistration_$Data->{'Realm'} as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID
-			WHERE pr.intPersonRegistrationID = $rego->{'intPersonRegistrationID'} AND pr.intPersonID = $personID 
-		];
-print FH "Query: \n $sql \n\n\n";
-my $sth = $Data->{'db'}->prepare($sql);
-		$sth->execute();
-		while(my $data_ref = $sth->fetchrow_hashref()){
-			push @reg_docs, $data_ref;
-			
-		}	
-
-
-
         my $renew = '';
         $rego->{'renew_link'} = '';
         next if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}));
@@ -157,16 +142,9 @@ $renew = $Data->{'target'} . "?client=$client&amp;a=PREGF_TU&amp;pt=$rego->{'str
         $rego->{'renew_link'} = $renew;
 
         $rego->{'Status'} = (($rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE) and $rego->{'intPaymentRequired'}) ? $Defs::personRegoStatus{$Defs::PERSONREGO_STATUS_ACTIVE_PENDING_PAYMENT} : $rego->{'Status'};
-		
-		
-		
-
-
     }
 	
-	$Reg_ref->[0]{'documents'} = \@reg_docs;
-	$Reg_ref->[0]{'client'} = $client;
-	$Reg_ref->[0]{'url'} = "$Defs::base_url/viewer.cgi";
+	#$Reg_ref->[0]{'documents'} = \@reg_docs;
 	#push @{$Reg_ref},\%reg_docs;
     $TemplateData{'RegistrationInfo'} = $Reg_ref;
 	

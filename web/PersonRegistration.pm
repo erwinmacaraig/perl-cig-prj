@@ -556,7 +556,7 @@ sub getRegistrationData	{
     my $st= qq[
         SELECT 
             pr.*, 
-            np.strNationalPeriodName,
+			np.strNationalPeriodName,
             p.dtDOB,
             DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
@@ -594,7 +594,8 @@ sub getRegistrationData	{
             )
             INNER JOIN tblPerson as p ON (
                 p.intPersonID = pr.intPersonID
-            )
+            )	
+			
         WHERE     
             p.intPersonID = ?
             $where
@@ -603,14 +604,15 @@ sub getRegistrationData	{
         ORDER BY
           pr.dtAdded DESC
     ];	
+	
     my $db=$Data->{'db'};
     my $query = $db->prepare($st) or query_error($st);
 
     $query->execute(@values) or query_error($st);
     my $count=0;
-
+	#open FH, ">dumpfile.txt";
     my @Registrations = ();
-      
+    my @reg_docs = ();  
     while(my $dref= $query->fetchrow_hashref()) {
         $count++;
         $dref->{'Sport'} = $Defs::sportType{$dref->{'strSport'}} || '';
@@ -619,8 +621,26 @@ sub getRegistrationData	{
         $dref->{'AgeLevel'} = $Defs::ageLevel{$dref->{'strAgeLevel'}} || '';
         $dref->{'Status'} = $Defs::personRegoStatus{$dref->{'strStatus'}} || '';
         $dref->{'RegistrationNature'} = $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '';
+
+		my $sql = qq[
+			SELECT strApprovalStatus,strDocumentName, intFileID, pr.intPersonRegistrationID FROM tblUploadedFiles INNER JOIN tblDocuments 
+			ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID  
+			INNER JOIN tblDocumentType ON tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID   
+			INNER JOIN tblPersonRegistration_$Data->{'Realm'} as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID  
+			WHERE pr.intPersonRegistrationID = $dref->{intPersonRegistrationID} AND pr.intPersonID = $personID 
+		];
+		my $sth = $Data->{'db'}->prepare($sql);
+		$sth->execute();
+		while(my $data_ref = $sth->fetchrow_hashref()){
+			#push @reg_docs, $data_ref;	
+			push @{$dref->{'documents'}},$data_ref;				
+		}			
         push @Registrations, $dref;
+
+		
     }
+
+	
     return ($count, \@Registrations);
 }
 
