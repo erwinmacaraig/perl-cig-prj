@@ -547,9 +547,9 @@ sub getTransList {
 
 	my $prodSellLevel = qq[ 
     AND ( 
-      t.intStatus <> 1 
+      t.intStatus <> 0 
       OR (
-        t.intStatus = 1 
+        t.intStatus = 0 
         AND P.intMinSellLevel <= $Data->{'clientValues'}{'authLevel'} 
         OR P.intMinSellLevel=0
       )
@@ -588,7 +588,9 @@ sub getTransList {
       t.intRealmID = $Data->{Realm}
         AND (t.intPersonRegistrationID =0 or t.intStatus= 1 or PR.strStatus NOT IN ('INPROGRESS'))
 			AND P.intProductType<>2
+        AND (t.intStatus<>1 or (t.intStatus=1 AND intPaymentByLevel <= $Data->{'clientValues'}{'authLevel'}))
       $whereClause
+        $prodSellLevel
 	  GROUP BY 
 		  t.intTransactionID
 		$orderBy
