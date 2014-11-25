@@ -1,15 +1,19 @@
 [% IF Notifications.size %]
-<div class="notificationmsg">
-    <ul>
-    [% FOREACH message IN Notifications %]
-        <li>[% message.value %]</li>
-    [% END %]
-    </ul>
+<div class="col-md-12">
+    <div class="alert alert-warning" role="alert">
+        <div>
+        <span class="fa fa-exclamation"></span>
+        [% FOREACH message IN Notifications %]
+            <p>[% message.value %]</p>
+        [% END %]
+        <br/>
+        </div>
+    </div>
 </div>
 [% END %]
 
 <div class="member-home-page">
-    <div class="col-md-9">
+    <div class="col-md-12">
         <div class="panel-body">
             <ul class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#memberdocs">Documents</a></li>
