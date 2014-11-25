@@ -65,31 +65,14 @@
         <div class="row">
 
           <div class="col-md-12">
-              [% IF MemListURL OR TeamListURL OR ClubListURL OR CompListURL %]
-              <div class="quick-nav">
-                [% IF MemListURL %]
-                  <div class="jump-item jump-item-1">
-                    <a href="[% MemListURL %]"><img src="images/member.png" /><p>[% MemListName %]</p></a>
-                  </div>
-                [% END %]
-                [% IF ClubListURL %]
-                  <div class="jump-item jump-item-3">
-                    <a href="[% ClubListURL  %]"><img src="images/club.png" /><p>[% ClubListName %]</p></a>
-                  </div>
-                [% END %]
-              </div>
-              [% END %]
-
             <div id="pageholder">
               <div id="contentholder">
                   <div id="content">
-                  [% Ads_Heading %]
                   [% Content %]
                   </div>
                   <!-- End Content -->
               </div>
               <!-- End Content Holder -->
-                [% Ads_BottomLeaderboard %]
             </div>
           </div>
           

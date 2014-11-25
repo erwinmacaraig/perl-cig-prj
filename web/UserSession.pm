@@ -21,7 +21,7 @@ sub new {
   return undef if !$self->{'db'};
   bless $self, $class;
   if($self->{'key'})  {
-    $self->load();
+    $self->load($self->{'key'});
   }
   elsif($self->{'UserID'})  {
     $self->create();
