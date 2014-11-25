@@ -586,14 +586,16 @@ sub getTransList {
         )
     WHERE
       t.intRealmID = $Data->{Realm}
-        AND (t.intPersonRegistrationID =0 or PR.strStatus NOT IN ('INPROGRESS'))
+        AND (t.intPersonRegistrationID =0 or t.intStatus= 1 or PR.strStatus NOT IN ('INPROGRESS'))
 			AND P.intProductType<>2
-	    $prodSellLevel
+        AND (t.intStatus<>1 or (t.intStatus=1 AND intPaymentByLevel <= $Data->{'clientValues'}{'authLevel'}))
       $whereClause
+        $prodSellLevel
 	  GROUP BY 
 		  t.intTransactionID
 		$orderBy
   ];
+	    #$prodSellLevel
     $statement =~ s/AND  AND/AND/g;
     my $query = $db->prepare($statement);
     $query->execute or print STDERR $statement;

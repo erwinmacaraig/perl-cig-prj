@@ -483,7 +483,8 @@ sub getPageCustomization{
 
     my $paypal = $Data->{'PAYPAL'} ? qq[<img src="images/PP-CC.jpg" alt="PayPal" border="0"></img>] : '';
 
-    my $powered = qq[<span class="footerline">].$Data->{'lang'}->txt('COPYRIGHT').qq[</span>];
+    #my $powered = qq[<span class="footerline">].$Data->{'lang'}->txt('COPYRIGHT').qq[</span>];
+		my $powered = qq[];
 
     return ($html_head, $page_header, $nav, $paypal, $powered);
 }
