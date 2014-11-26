@@ -1057,3 +1057,13 @@ table.table tr th {
 	font-weight: bold;
 	float:right;
 }
+/*** compulsary ***/
+.panel-body span.compulsory img {
+    left: 0;
+    margin: 0px;
+    position: absolute;
+    top: 0;
+}
+#flowFormID .col-md-6 {
+	position: relative;
+}

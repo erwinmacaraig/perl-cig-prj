@@ -50,9 +50,9 @@ sub build {
     my %sections       = ();
     my %sectioncount   = ();
     my $txt_compulsory = $self->langlookup( 'Compulsory Field' );
-    #my $compulsory =
-#qq[<span class="compulsory"><img src="images/compulsory.gif" alt="$txt_compulsory" title="$txt_compulsory"/></span>];
-    my $compulsory = qq[];
+    my $compulsory =
+qq[<span class="compulsory"><img src="images/compulsory.gif" alt="$txt_compulsory" title="$txt_compulsory"/></span>];
+    #my $compulsory = qq[];
     return '' if !$self->{'Fields'};
     return '' if !$self->{'Fields'}->{'order'};
     my @fieldorder =@{ $self->{'Fields'}->{'order'} };
