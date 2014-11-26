@@ -76,7 +76,6 @@ sub showClubHome  {
     Logo => $logo,
     Name => $name,
     EditDetailsLink => "$Data->{'target'}?client=$client&amp;a=C_DTE",
-    EditContactsLink => "$Data->{'target'}?client=$client&amp;a=CON_LIST",
     EditDashboardLink => "$Data->{'target'}?client=$client&amp;a=DASHCFG_",
     Dashboard => $dashboard,
     Notifications => $notifications,
