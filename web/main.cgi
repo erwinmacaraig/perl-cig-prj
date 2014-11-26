@@ -139,7 +139,8 @@ sub main {
 
     if ( $action =~ /^E_/ ) {
         my $ID = getID( \%clientValues );
-        ( $resultHTML, $pageHeading ) = handleEntity( $action, \%Data, $ID, $typeID );
+        #( $resultHTML, $pageHeading ) = handleEntity( $action, \%Data, $ID, $typeID );
+        ( $resultHTML, $pageHeading ) = handleWorkflow($action, \%Data);
     }
     elsif ( $action =~ /^C_/ ) {
         my $clubID= getID($Data{'clientValues'},$Defs::LEVEL_CLUB); 
