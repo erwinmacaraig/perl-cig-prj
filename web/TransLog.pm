@@ -1881,8 +1881,6 @@ sub checkPersonTransactionStatus {
 
 	my $dref = $sth->fetchrow_hashref();
 	
-	open FH, ">dumpfile.txt";
-	print FH "\n\n$sql\n personID = $personID \n entityID = $entityID\n";
 	return $dref->{'total'};
 
 }
