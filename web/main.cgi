@@ -304,8 +304,9 @@ use PersonFlow;
 
 sub defaultAction {
     my ($level) = @_;
-    return 'C_HOME'  if $level == $Defs::LEVEL_CLUB;
-    return 'E_HOME';
+    #return 'C_HOME'  if $level == $Defs::LEVEL_CLUB;
+    #return 'E_HOME';
+    return 'WF_';
 }
 
 sub logPageData {
