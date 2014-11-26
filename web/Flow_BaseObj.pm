@@ -259,8 +259,8 @@ sub displayFields {
     SystemConfig => $self->{'SystemConfig'},
     Fields => $self->{'FieldSets'}{$fieldSet},
   );
-
-  return $obj->build($permissions,'add',1);
+  my $action = $self->ID() ? 'edit' : 'add';
+  return $obj->build($permissions,$action,1);
 }
 
 sub gatherFields {
@@ -276,7 +276,8 @@ sub gatherFields {
     Fields => $self->{'FieldSets'}{$fieldSet},
   );
 
-  return $obj->gather($self->{'RunParams'},$permissions, 'add');
+  my $action = $self->ID() ? 'edit' : 'add';
+  return $obj->gather($self->{'RunParams'},$permissions, $action);
 }
 
 

@@ -313,7 +313,11 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
             next if $s->[2] and not $self->display_section( $s->[2] );
             $usedsections{ $s->[0] } = 1;
             if ($notabs) {
-                $returnstr .= $sections{ $s->[0] };
+                my $sh = '';
+                if ( $s->[1] ) {
+                    $sh = qq[ <div class = "sectionheader">$sectionheader</div>];
+                }
+                $returnstr .= qq[<div class = "fieldSectionGroup">$sh].$sections{ $s->[0] }.qq[</div>];
             }
             else {
                 #my $style=$s ? 'style="display:none;" ' : '';
@@ -457,11 +461,13 @@ sub gather    {
         $fv->{'old_value'} = $fv->{'value'};
 
         next if $self->{'Fields'}->{'fields'}{$fieldname}{'SkipProcessing'};
+        next if ( $permissions and !$permissions->{$fieldname} );
         if($option eq 'add')    {
             next if $self->{'Fields'}->{'fields'}{$fieldname}{'SkipAddProcessing'};
         }
         if($option eq 'edit')    {
             next if $self->{'Fields'}->{'fields'}{$fieldname}{'SkipEditProcessing'};
+            next if $self->{'Fields'}->{'fields'}{$fieldname}{'noedit'};
         }
         #Update the form display
         if ( exists $params->{$name}
