@@ -4,8 +4,7 @@
 # $Header: svn://svn/SWM/trunk/web/admin/index.cgi 11645 2014-05-22 03:47:31Z apurcell $
 #
 
-use lib "../..","..",".","../RegoForm/","../../..","../PaymentSplit",'../RegoFormBuilder',"../Facilities";
-#use lib "/u/regonew_live","/u/regonew_live/web","/u/regonew_live/web/admin";
+use lib "../..","..",".";
 use DBI;
 use CGI qw(param unescape escape);
 use Defs;
@@ -33,7 +32,6 @@ use StatsAdmin;
 use BankAccount;
 use TempRegos;
 use CopyMemberWizard;
-use PaymentAdmin;
 use Data::Dumper;
 use AdminTests;
 
