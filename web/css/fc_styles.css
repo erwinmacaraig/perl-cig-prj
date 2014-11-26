@@ -787,7 +787,7 @@ i.indicator {
 	height: 0;
 	width: 0;
 	top: -10px;
-	left: 100%;
+	left: 99%;
 	position: absolute;
 	content: ' ';
 	border-left: solid 20px #078b3c;
@@ -1056,4 +1056,14 @@ table.table tr th {
 #errorMsg label {
 	font-weight: bold;
 	float:right;
+}
+/*** compulsary ***/
+.panel-body span.compulsory img {
+    left: 0;
+    margin: 0px;
+    position: absolute;
+    top: 0;
+}
+#flowFormID .col-md-6 {
+	position: relative;
 }

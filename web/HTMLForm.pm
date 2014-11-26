@@ -42,8 +42,7 @@ warn("NT $notabs");
     my %sectioncount   = ();
     my $txt_compulsory = langlookup( $fields_ref, 'Compulsory Field' );
     my $compulsory =
-#qq[<span class="compulsory"><img src="images/compulsory.gif" alt="$txt_compulsory" title="$txt_compulsory"/></span>];
-qq[];
+qq[<span class="compulsory"><img src="images/compulsory.gif" alt="$txt_compulsory" title="$txt_compulsory"/></span>];
     my @fieldorder =
       (       defined $override_config
           and exists $override_config->{'order'}
