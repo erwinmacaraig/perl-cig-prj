@@ -1,15 +1,38 @@
+[% IF FlashMessage.flash.type %]
+<div class="col-md-12">
+    <div class="alert alert-warning" role="alert">
+        <div>
+        [% IF FlashMessage.flash.type == 'success' %]
+            <span class="fa flash_success fa-exclamation"></span>
+            <p>[% FlashMessage.flash.message %]</p>
+        [% ELSIF FlashMessage.flash.type == 'error' %]
+            <span class="fa flash_error fa-exclamation"></span>
+            <p>[% FlashMessage.flash.message %]</p>
+        [% END %]
+        <br/>
+        </div>
+    </div>
+</div>
+[% END %]
+
+
+
 [% IF Notifications.size %]
-<div class="notificationmsg">
-    <ul>
-    [% FOREACH message IN Notifications %]
-        <li>[% message.value %]</li>
-    [% END %]
-    </ul>
+<div class="col-md-12">
+    <div class="alert alert-warning" role="alert">
+        <div>
+        <span class="fa fa-exclamation"></span>
+        [% FOREACH message IN Notifications %]
+            <p>[% message.value %]</p>
+        [% END %]
+        <br/>
+        </div>
+    </div>
 </div>
 [% END %]
 
 <div class="member-home-page">
-    <div class="col-md-9">
+    <div class="col-md-12">
         <div class="panel-body">
             <ul class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#memberdocs">Documents</a></li>

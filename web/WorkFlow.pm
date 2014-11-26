@@ -45,6 +45,7 @@ use NationalNumber;
 use EmailNotifications::WorkFlow;
 use EntityFields;
 use EntityTypeRoles;
+use JSON;
 
 sub cleanTasks  {
 
@@ -165,24 +166,45 @@ sub handleWorkflow {
         my $WFTaskID = safe_param('TID', 'number') || '';
         my $notes= safe_param('notes','words') || '';
         my $type = safe_param('type','words') || '';
+        my %flashMessage;
 
         ($body, $title) = updateTaskNotes( $Data );
         switch($type) {
             case "$Defs::WF_TASK_ACTION_RESOLVE" {
                 resolveTask($Data, $emailNotification);
-                print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_");
+
+                $flashMessage{'flash'}{'type'} = 'success';
+                $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt('Task has been resolved.');
+
+                setFlashMessage($Data, 'WF_U_FM', \%flashMessage);
+                $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_";
+                ($body, $title) = redirectTemplate($Data);
             }
             case "$Defs::WF_TASK_ACTION_REJECT" {
                 rejectTask($Data, $emailNotification);
 
-                #implement a flash message here
-                print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_View&TID=$WFTaskID");
+                $flashMessage{'flash'}{'type'} = 'success';
+                $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt('Task has been rejected.');
+
+                setFlashMessage($Data, 'WF_U_FM', \%flashMessage);
+                $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_View&TID=$WFTaskID";
+                ($body, $title) = redirectTemplate($Data);
             }
             case "$Defs::WF_TASK_ACTION_HOLD" {
                 my $res = holdTask($Data, $emailNotification);
 
-                #implement a flash message here
-                print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_View&TID=$WFTaskID");
+                if($res){
+                    $flashMessage{'flash'}{'type'} = 'success';
+                    $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt('Task has been put on-hold.');
+                }
+                else {
+                    $flashMessage{'flash'}{'type'} = 'success';
+                    $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt('An error has been encountered.');
+                }
+                setFlashMessage($Data, 'WF_U_FM', \%flashMessage);
+                $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_View&TID=$WFTaskID";
+                ($body, $title) = redirectTemplate($Data);
+                #print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_View&TID=$WFTaskID");
             }
         }
     }
@@ -484,6 +506,9 @@ sub listTasks {
 			TaskEntityID => $entityID,
 			client => $Data->{client},
 	);
+
+    my $flashMessage = getFlashMessage($Data, 'WF_U_FM');
+    $TemplateData{'FlashMessage'} = $flashMessage;
 
 	$body = runTemplate(
 			$Data,
@@ -1755,7 +1780,8 @@ sub getTask {
 }
 
 sub viewTask {
-    my ($Data) = @_;
+    my ($Data, $WFTID) = @_;
+
     #TODO
     #retrieve all necessary details here
     #   - person detail
@@ -1769,7 +1795,7 @@ sub viewTask {
     #   - check strStatus
     #       - if COMPLETED (final approval as per comment in JIRA), display a summary page
 
-    my $WFTaskID = safe_param('TID','number') || '';
+    my $WFTaskID = safe_param('TID','number') || $WFTID || '';
     my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
     my $st;
@@ -2002,6 +2028,8 @@ sub viewTask {
     $TemplateData{'ActionsBlock'} = $actionsBlock;
     $TemplateData{'VenueFieldsBlock'} = populateVenueFieldsData($Data, $dref) if ($dref->{'intEntityLevel'} == $Defs::LEVEL_VENUE);
 
+    my $flashMessage = getFlashMessage($Data, 'WF_U_FM');
+    $TemplateData{'FlashMessage'} = $flashMessage;
 
     my $body = runTemplate(
         $Data,
@@ -2131,6 +2159,9 @@ sub populatePersonViewData {
             LastUpdate => '',
         },
 	);
+
+    $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.')
+        if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_PERSON'} == 1 and $dref->{'regoPaymentRequired'});
 
     return (\%TemplateData, \%fields);
 
@@ -2837,6 +2868,47 @@ sub deleteRegoTransactions {
 	) or query_error($st);
 
     return $res;
+}
+
+sub redirectTemplate {
+    my ($Data) = @_;
+
+    my $body = runTemplate(
+        $Data,
+        {},
+        '',
+    );
+
+    return ($body, ' ');
+}
+
+sub getFlashMessage {
+    my ($Data, $cookie_name) = @_;
+
+    my $query = new CGI;
+    my $flashMessage = $query->cookie($cookie_name);
+
+    #since a flash message, it should be displayed once
+    #reset upon first retrieval
+    if($flashMessage){
+        setFlashMessage($Data, $cookie_name, '', '-1d');
+        return decode_json $flashMessage;
+    }
+
+    return '';
+}
+
+sub setFlashMessage {
+    my ($Data, $cookie_name, $message, $exp) = @_;
+
+    $exp = $exp || '1h';
+    $message = ($message) ? encode_json $message : '';
+
+    push @{$Data->{'WriteCookies'}}, [
+        $cookie_name,
+        $message,
+        $exp,
+    ];
 }
 
 1;
