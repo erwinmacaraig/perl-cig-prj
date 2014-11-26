@@ -904,7 +904,7 @@ sub approveTask {
             $emailNotification->setDbh($Data->{'db'});
 
             my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
-            $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
+            #$emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
         }
 
     $st = qq[
@@ -1753,9 +1753,20 @@ sub getTask {
             IF(t.strWFRuleFor = 'ENTITY', IF(e.intEntityLevel = -47, 'VENUE', IF(e.intEntityLevel = 3, 'CLUB', '')), IF(t.strWFRuleFor = 'REGO', 'REGO', ''))as sysConfigApprovalLockRuleFor,
             IF(t.strWFRuleFor = 'ENTITY', e.intPaymentRequired, IF(t.strWFRuleFor = 'REGO', pr.intPaymentRequired, 0)) as paymentRequired,
             pr.intPersonRegistrationID,
+            pr.strPersonType,
+            pr.strAgeLevel,
+            pr.strSport,
+            pr.strPersonLevel,
+            p.strLocalFirstname,
+            p.strLocalSurname,
+            p.strISONationality,
+            p.intGender,
+            DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
+            TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             rnt.intTaskNoteID as rejectTaskNoteID,
             rnt.intCurrent as rejectCurrent,
             tnt.intTaskNoteID as holdTaskNoteID,
+            pre.strLocalName as registerToEntity,
             tnt.intCurrent as holdCurrent
         FROM
             tblWFTask t
@@ -1764,6 +1775,7 @@ sub getTask {
         LEFT JOIN tblEntity e ON (t.intEntityID = e.intEntityID)
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (pr.intPersonRegistrationID = t.intPersonRegistrationID)
         LEFT JOIN tblPerson AS p ON (t.intPersonID = p.intPersonID)
+        LEFT JOIN tblEntity AS pre ON (pre.intEntityID = pr.intEntityID)
 	  	WHERE
             t.intWFTaskID = ?
             AND t.intRealmID = ?
@@ -2621,23 +2633,89 @@ sub viewApprovalPage {
     #use generic template for now
 
     my $WFTaskID = safe_param('TID','number') || '';
+    my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+
+    my $task = getTask($Data, $WFTaskID);
+
+    return (" ", "Access forbidden.") if($entityID != $task->{'intApprovalEntityID'});
 
     my %TemplateData;
+    my $templateFile;
+    my $title = '';
 
     my %TaskAction = (
-        'WFTaskID' => $WFTaskID || 0,
+        'WFTaskID' => $task->{intWFTaskID} || 0,
         'client' => $Data->{client} || 0,
     );
 
     $TemplateData{'TaskAction'} = \%TaskAction;
 
+    print STDERR Dumper $task;
+    switch($task->{'strWFRuleFor'}) {
+        case 'REGO' {
+            $templateFile = 'workflow/result/personregistration.templ';
+            $title = $Data->{'lang'}->txt('New ' . $Defs::personType{$task->{'strPersonType'}} . " Registration - Approval");
+            $TemplateData{'PersonRegistrationDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
+            $TemplateData{'PersonRegistrationDetails'}{'personLevel'} = $Defs::personLevel{$task->{'strPersonLevel'}};
+            $TemplateData{'PersonRegistrationDetails'}{'sport'} = $Defs::sportType{$task->{'strSport'}};
+            $TemplateData{'PersonRegistrationDetails'}{'currentAge'} = $task->{'currentAge'};
+            $TemplateData{'PersonRegistrationDetails'}{'personFirstname'} = $task->{'strLocalFirstname'};
+            $TemplateData{'PersonRegistrationDetails'}{'personSurname'} = $task->{'strLocalSurname'};
+            $TemplateData{'PersonRegistrationDetails'}{'registerTo'} = $task->{'registerToEntity'};
+            $TemplateData{'PersonRegistrationDetails'}{'nationality'} = $task->{'strISONationality'};
+            $TemplateData{'PersonRegistrationDetails'}{'dob'} = $task->{'DOB'};
+            $TemplateData{'PersonRegistrationDetails'}{'gender'} = $Defs::PersonGenderInfo{$task->{'intGender'}};
+        }
+        case 'ENTITY' {
+            switch ($task->{'intEntityLevel'}) {
+                case "$Defs::LEVEL_CLUB"  {
+                    #TODO: add details specific to CLUB
+                    $templateFile = 'workflow/result/club.templ';
+                }
+                case "$Defs::LEVEL_VENUE" {
+                    #TODO: add details specific to VENUE
+                    $templateFile = 'workflow/result/venue.templ';
+                }
+                else {
+
+                }
+            }
+        }
+        case 'PERSON' {
+            $templateFile = 'workflow/result/person.templ';
+        }
+        else {
+            my ($TemplateData, $fields) = (undef, undef);
+        }
+    }
+
 	my $body = runTemplate(
-        $Data,
-        \%TemplateData,
-        'workflow/result/page.templ'
+			$Data,
+			\%TemplateData,
+            $templateFile
 	);
 
-    return ($body, "Approval status:");
+    return ($body, $title);
+
+
+    #my $WFTaskID = safe_param('TID','number') || '';
+
+    #my %TemplateData;
+
+    #my %TaskAction = (
+    #    'WFTaskID' => $WFTaskID || 0,
+    #    'client' => $Data->{client} || 0,
+    #);
+
+    #$TemplateData{'TaskAction'} = \%TaskAction;
+
+	#my $body = runTemplate(
+    #    $Data,
+    #    \%TemplateData,
+    #    'workflow/result/page.templ'
+	#);
+
+    #return ($body, "Approval status:");
 }
 
 sub toggleTask {
