@@ -46,8 +46,6 @@ sub handleClub  {
   my $clubName=
   my $title='';
   $typeID=$Defs::LEVEL_CLUB if $typeID==$Defs::LEVEL_NONE;
-    print STDERR "AAAA" . $Data->{'clientValues'}{'clubID'};
-print STDERR "CCCCCC:$clubID $parentID";
   if ($action =~/^C_DTA/) {
         ($resultHTML,$title) = handleClubFlow($action, $Data);
   }
@@ -85,12 +83,7 @@ sub club_details  {
   my ($action, $Data, $clubID)=@_;
 
 
-print STDERR "SSSS$action $clubID\n";
-
-
-
   my $field=loadClubDetails($Data->{'db'}, $clubID,$Data->{'clientValues'}{'assocID'}) || ();
-  print STDERR Dumper $field;
   my $client=setClient($Data->{'clientValues'}) || '';
 
   #my $allowedit =( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
@@ -105,7 +98,7 @@ print STDERR "SSSS$action $clubID\n";
    $option='add' if $action eq 'C_DTA' and allowedAction($Data, 'c_a')  && $allowadd;
    $clubID=0 if $option eq 'add';
 
-  my $club_chars = getClubCharacteristicsBlock($Data, $clubID) || '';
+  my $club_chars = ''; #getClubCharacteristicsBlock($Data, $clubID) || '';
 
   my $field_case_rules = get_field_case_rules({dbh=>$Data->{'db'}, client=>$client, type=>'Club'});
 
@@ -594,13 +587,11 @@ print STDERR "SSSS$action $clubID\n";
 my $resultHTML='' ;
 ($resultHTML, undef )=handleHTMLForm(\%FieldDefinitions, $clubperms, $option, 0,$Data->{'db'});
   my $title=$field->{'strLocalName'} || '';
-  my $scMenu = (allowedAction($Data, 'c_e'))
-    ? getServicesContactsMenu($Data, $Defs::LEVEL_CLUB, $clubID, $Defs::SC_MENU_SHORT, $Defs::SC_MENU_CURRENT_OPTION_DETAILS)
-    : '';
+  my $scMenu = '';#(allowedAction($Data, 'c_e')) ? getServicesContactsMenu($Data, $Defs::LEVEL_CLUB, $clubID, $Defs::SC_MENU_SHORT, $Defs::SC_MENU_CURRENT_OPTION_DETAILS) : '';
   my $logodisplay = '';
   my $editlink = (allowedAction($Data, 'c_e')) ? 1 : 0;
   if($option eq 'display')  {
-    $resultHTML .= showContacts($Data,0, $editlink);
+#    $resultHTML .= showContacts($Data,0, $editlink);
     my $chgoptions='';
     $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_DTE">Edit $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}</a></span>] if allowedAction($Data, 'c_e');
 

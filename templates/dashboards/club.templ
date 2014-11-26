@@ -24,7 +24,7 @@
             [% IF Details.Email %]<span class = "label">[% Lang.txt('Email') %]</span> <a href = "mailto:[% Details.Email %]" class="mail-link">[% Details.Email %]</a><br>[% END %]
         </div>
     </div>
-    [% IF Contacts.size > 0 %]
+    <!--[% IF Contacts.size > 0 %]
     <div class = "contacts">
     <div class = "sectionheader">[% Lang.txt('Contacts') %] [% IF EditContactsLink and !ReadOnlyLogin  %]&nbsp;<a href = "[% EditContactsLink %]" class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
         [% FOREACH contact IN Contacts %]
@@ -40,7 +40,7 @@
             </div>
         [% END %]
     </div>
-    [% END %]
+    [% END %] -->
     [% IF Notifications.size() > 0 and !ReadOnlyLogin  %]
     <div class = "notifications">
         <div class="notifications-inner">

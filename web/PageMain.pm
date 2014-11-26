@@ -349,9 +349,7 @@ warn(" IN PF");
     $meta->{'title'} = $title;
     $meta->{'head'} = $html_head;
     $meta->{'page_begin'} = qq[
-        <div id="global-nav-wrap">
         $page_navigator
-        </div>
     ];
     $meta->{'page_header'} = $page_header;
     $meta->{'page_content'} = $body;
