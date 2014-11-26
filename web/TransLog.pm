@@ -531,6 +531,7 @@ sub getTransList {
     $hidePay ||= 0;
     $hidePayment=0 if ($personID and $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB);
     $hidePayment=0 if ($entityID and ! $personID and $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB);
+	$hidePayment = 1 if($personID == -1);
 
     my $realmID = $Data->{'Realm'};
 	my $orderBy = $Data->{'SystemConfig'}{'TransListOrderBy'} || '';
@@ -595,6 +596,9 @@ sub getTransList {
 		  t.intTransactionID
 		$orderBy
   ];
+
+	open FH, ">dumpfile.txt";
+	print FH "\nTo query transaction: \n $statement\n";
 	    #$prodSellLevel
     $statement =~ s/AND  AND/AND/g;
     my $query = $db->prepare($statement);
@@ -837,7 +841,10 @@ warn("ENTITY: $entityID | $personID");
     my $whereClause = '';
     $whereClause .= qq[ AND t.intID=$personID and t.intTableType=$Defs::LEVEL_PERSON] if ($personID and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON);
 warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
-    $whereClause .= qq[ AND t.intID=$entityID and t.intTableType=$Defs::LEVEL_CLUB] if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB;
+    $whereClause .= qq[ AND t.intID=$entityID and t.intTableType=$Defs::LEVEL_CLUB] if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB && $personID != -1);
+
+	$whereClause .= qq[ AND t.intTableType=$Defs::LEVEL_PERSON] if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB && $personID == -1);
+
     $whereClause .= qq[ AND t1.intTLogID= $safePaymentID ] if $paymentID;
 
     $whereClause .= qq[ AND intTXNEntityID IN (0, $entityID)] if $entityID;
@@ -894,10 +901,8 @@ print STDERR "LISTING";
         my $targetOnline = 'paytry.cgi';
 
 
-	my $unpaidTransactionsPresent = 0;
-	
-	$unpaidTransactionsPresent = checkPersonTransactionStatus($Data, $db, $entityID, $personID);  
-
+	my $unpaidTransactionsPresent = 0;	
+	$unpaidTransactionsPresent = checkPersonTransactionStatus($Data, $db, $entityID, $personID); 
     if ($transCount>0 &&  $unpaidTransactionsPresent) {
 	    my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
         $Year+=1900;

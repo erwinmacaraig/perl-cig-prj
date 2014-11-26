@@ -81,7 +81,9 @@ $(document).ready(function(){
                 alert("You Must Provide A Payment Type");
                 return false;
             }
-     });
+     }); 
+
+	
 
 
    //Request transfer

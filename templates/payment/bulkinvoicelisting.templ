@@ -3,8 +3,7 @@
 		var clicked;
 		function submitForm(){
 			document.payform.action = clicked;
-			return true;
-		}
+			return true;  
 	</script>
     <form name="payform" method="POST" onsubmit="submitForm(); return true;"> 
 	[% grid %]   
