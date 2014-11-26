@@ -892,7 +892,12 @@ print STDERR "LISTING";
         my $targetManual = $Data->{'target'};
         my $targetOnline = 'paytry.cgi';
 
-    if ($transCount>0) {
+
+	my $unpaidTransactionsPresent = 0;
+	
+	$unpaidTransactionsPresent = checkPersonTransactionStatus($Data, $db, $entityID, $personID);  
+
+    if ($transCount>0 &&  $unpaidTransactionsPresent) {
 	    my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
         $Year+=1900;
         $Month++;
@@ -1864,6 +1869,22 @@ sub listTransLog	{
 	];
 	my $title=$textLabels{'listOfPaymentRecords'};
  	return ($resultHTML,$title);
+}
+
+sub checkPersonTransactionStatus {
+	my ($Data, $db, $entityID, $personID) = @_;
+	#check for unpaid transactions
+	my $sql = qq[SELECT count(intTransactionID) as total FROM tblTransactions WHERE intID = ? AND  dtPaid IS NULL  AND intTXNEntityID = ? AND intTransLogID = 0];
+
+	my $sth = $db->prepare($sql);
+	$sth->execute($personID,$entityID);
+
+	my $dref = $sth->fetchrow_hashref();
+	
+	open FH, ">dumpfile.txt";
+	print FH "\n\n$sql\n personID = $personID \n entityID = $entityID\n";
+	return $dref->{'total'};
+
 }
 
 1;
