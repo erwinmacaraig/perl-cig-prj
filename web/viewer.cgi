@@ -64,7 +64,7 @@ sub main	{
 
     my $st = qq[
       SELECT 
-          *,
+          UF.*,
           DATE_FORMAT(dtUploaded,"%d/%m/%Y %H:%i") AS DateAdded_FMT, 
           tblDocuments.intDocumentTypeID,
           tblDocumentType.strLockAtLevel,
@@ -109,13 +109,15 @@ sub main	{
             nationality => $isocountries->{$object->getValue('strISONationality')},
             status => $object->getValue('strStatus'),
             nationalNum => $object->getValue('strNationalNum'),
-
-
-
         };
     }
     if($dref->{'intEntityID'})  {
-        $dref->{'entity'} = getInstanceOf(\%Data,'entity',$dref->{'intEntityID'});
+        my $object = getInstanceOf(\%Data,'entity',$dref->{'intEntityID'});
+        $dref->{'entity'} = {
+            name => $object->name(),
+            strStatus => $object->getValue('strStatus'),
+            maID => $object->getValue('strMAID'),
+        };    
     }
     # BUILD PAGE
     my $TemplateData = $dref;
