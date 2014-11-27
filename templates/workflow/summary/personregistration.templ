@@ -1,20 +1,61 @@
 [% USE Dumper %]
 <!--<div class="row">-->
     <div class="col-md-3">
-        <h3 class="panel-header">Member Details:</h3>
+        <h3 class="panel-header">Member ID: [% MID %]</h3>
         <div class="panel-body">
             <div class="container-link"><a href="#" title="Upload Profile Image">+ Upload Profile Image</a></div>
-            <p class="reg-text">[% personDetails.memberID %]</p>
-            <p class="reg-text">[% personDetails.firstname %]</p>
-            <p class="reg-text">[% personDetails.surname %]</p>
-            <p class="reg-text">[% personDetails.gender %]</p>
-            <p class="reg-text">[% personDetails.dob %]</p>
+            <p class="reg-text">[% PersonRegistrationDetails.personSurname %]</p>
+            <p class="reg-text">[% PersonRegistrationDetails.personFirstname %]</p>
+            <p class="reg-text">[% PersonRegistrationDetails.gender  %]</p>
+            <p class="reg-text">[% PersonRegistrationDetails.dob %]</p>
+            <p class="reg-text">[% PersonRegistrationDetails.nationality %]</p>
         </div>
-        <div class="transfer-pending"></div>
+        <div class="registration-approved">[% Lang.txt('Complete') %]</div>
     </div>
     <div class="col-md-9">
-        <h3 class="panel-header">[% personDetails.memberID %]</h3>
+        <h3 class="panel-header">
+            [% PersonRegistrationDetails.personFirstname %] [% PersonRegistrationDetails.personSurname %]
+
+            - [% PersonRegistrationDetails.personType %]
+
+            [% IF PersonRegistrationDetails.personRoleName %]
+                - [% PersonRegistrationDetails.personRoleName %]
+            [% END %]
+
+            - [% PersonRegistrationDetails.currentAge %]
+
+            [% IF PersonRegistrationDetails.personLevel %]
+                - [% PersonRegistrationDetails.personLevel %]
+            [% END %]
+
+            - [% PersonRegistrationDetails.sport %]
+        </h3>
         <div class="panel-body">
+            <br/>
+            <div>[% Lang.txt('The following registration has been approved.') %] [% PersonRegistrationDetails.registerTo %] [% Lang.txt('has been notified.') %]</div>
+            <br/>
+			<div class="read-only">
+				<h4>[% Lang.txt('Registration Details') %]</h4>
+				<div class="read-only-text">
+					<div class="">
+					  	<span class="">[% Lang.txt('Register to:') %]</span>
+					  	<span class="detail-value">[% PersonRegistrationDetails.registerTo %]</span>
+				    </div>
+					<div class="">
+					  	<span class="">[% Lang.txt('Register as:') %]</span>
+					  	<span class="detail-value">[% PersonRegistrationDetails.personType %]</span>
+				    </div>
+					<div class="">
+					  	<span class="">[% Lang.txt('Sport:') %]</span>
+					  	<span class="detail-value">[% PersonRegistrationDetails.sport %]</span>
+				    </div>
+					<div class="">
+					  	<span class="">[% Lang.txt('Level:') %]</span>
+					  	<span class="detail-value">[% PersonRegistrationDetails.personLevel %]</span>
+				    </div>
+				</div>
+			</div>
+
             [% FOREACH request IN personRequests %]
             <label>The [% request.requestType %] Request (ID: [% request.id %] --[% request.personType %]/[% request.sport %]--) has been sent to [% request.requestTo %].</label>
             <br/>
@@ -22,10 +63,10 @@
             <div class="row top-bottom-spacer">
             <div class="col-md-4"></div>
             <div class="col-md-8">
-            <p>What would you like to do now?</p>
+            <p>[% Lang.txt('What would you like to do now?') %]</p>
             <p>
-                <a href="main.cgi?client=[% client %]&amp;a=PRA_T" title="" class="btn-main">Transfer another player</a>
-                <a href="main.cgi?client=[% client %]&amp;a=C_HOME" title="" class="btn-main">Go to your dashboard</a>
+                <a href="main.cgi?client=[% TaskAction.client %]&amp;a=WF_" title="" class="btn-main">[% Lang.txt('View next available task') %]</a>
+                <a href="main.cgi?client=[% TaskAction.client %]&amp;a=C_HOME" title="" class="btn-main">[% Lang.txt('Go to your dashboard') %]</a>
             </p>
             </div>
             </div>

@@ -549,7 +549,7 @@ table.table tr td.align-right {
 	margin: 0 10px 0 0;
 }
 
-.transfer-pending {
+.transfer-pending, .registration-pending {
 	font-size: 14px;
 	padding: 10px;
 	background: #f0a624;
@@ -557,7 +557,7 @@ table.table tr td.align-right {
 	color: #fff;
 }
 
-.transfer-approved {
+.transfer-approved, .registration-approved {
 	font-size: 14px;
 	padding: 10px;
 	background: #1baf37;
