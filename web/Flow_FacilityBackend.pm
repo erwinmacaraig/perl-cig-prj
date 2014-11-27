@@ -548,7 +548,13 @@ sub validate_role_details {
     my $self = shift;
 
     my $facilityFieldData = {};
-    ($facilityFieldData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields();
+
+    #make intEntityFieldCount as it's always required during add Facility flow
+    my %fieldCount = (
+        'intEntityFieldCount' => 1
+    );
+
+    ($facilityFieldData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields(\%fieldCount);
 
     if(!$facilityFieldData->{'intEntityFieldCount'}){
         push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid number of facility fields.';
