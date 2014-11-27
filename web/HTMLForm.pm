@@ -456,16 +456,11 @@ qq[<input type="hidden" name="$cf" value="$fields_ref->{'carryfields'}{$cf}">];
         $returnstr = qq[
         $validation
         <form action="$fields_ref->{'options'}{'target'}" name="$fields_ref->{'options'}{'formname'}" method="POST" $enctype id = "$fields_ref->{'options'}{'formname'}ID">
-        <h3 class="panel-header" style="margin-top: 20px;">Registration Detail</h3>
-        <div class="panel-body">
-        <fieldset>
-        <div class="col-md-10 txtright">
-        $introtext
+        <div class="col-md-10">$introtext</div>
+        <div class="txtright">
         $button_top
         </div>
-        </fieldset>
         $returnstr
-        </div>
         <div class="txtright">
         $button_bottom
         <input type="hidden" name="HF_oldact" value="$oldaction">
