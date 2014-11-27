@@ -106,8 +106,8 @@ sub getUnique {
         my $numnotshown = ($results->{'total'} || 0) - 10;
         $numnotshown = 0 if $numnotshown < 0;
         while(my $dref = $q->fetchrow_hashref())  {
-            my $entityID = getLastEntityID($self->Data->{'clientValues'});
-            my $entityLevel = getLastEntityLevel($self->Data->{'clientValues'}) || 0;
+            my $entityID = getLastEntityID($self->getData()->{'clientValues'});
+            my $entityLevel = getLastEntityLevel($self->getData()->{'clientValues'}) || 0;
           my $link = $self->getSearchLink(
             $self->getData(),
             $Defs::LEVEL_PERSON,
@@ -311,8 +311,8 @@ sub getPersonRegistration {
         my $target = $self->getData()->{'target'};
         my $client = $self->getData()->{'client'};
         while(my $dref = $q->fetchrow_hashref()) {
-            my $entityID = getLastEntityID($self->Data->{'clientValues'});
-            my $entityLevel = getLastEntityLevel($self->Data->{'clientValues'}) || 0;
+            my $entityID = getLastEntityID($self->getData()->{'clientValues'});
+            my $entityLevel = getLastEntityLevel($self->getData()->{'clientValues'}) || 0;
             my $link = $self->getSearchLink(
                 $self->getData(),
                 $Defs::LEVEL_PERSON,
