@@ -98,8 +98,8 @@ sub main	{
         $dref->{'fileURL'} = 'viewfile.cgi?client='.$client.'&amp;f=' . $dref->{'intFileID'};
     }
 
-    if($dref->{'intPersonID'})  {
-        my $object = getInstanceOf(\%Data,'person',$dref->{'intPersonID'});
+    if($dref->{'intEntityTypeID'} == 1)  {
+        my $object = getInstanceOf(\%Data,'person',$dref->{'intEntityID'});
         my $isocountries = getISOCountriesHash();
         $dref->{'person'} = {
             strSurname => $object->getValue('strLocalSurname'),
@@ -111,7 +111,7 @@ sub main	{
             nationalNum => $object->getValue('strNationalNum'),
         };
     }
-    if($dref->{'intEntityID'})  {
+    elsif($dref->{'intEntityID'})  {
         my $object = getInstanceOf(\%Data,'entity',$dref->{'intEntityID'});
         $dref->{'entity'} = {
             name => $object->name(),
