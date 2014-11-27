@@ -4,7 +4,7 @@
 
 package FileUpload;
 
-use CGI qw(standard);
+use CGI qw(:standard);
 use strict;
 
 sub new {

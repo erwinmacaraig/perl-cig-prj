@@ -195,7 +195,7 @@ print STDERR "AAAAAAAA $action\n";
     	);
     	
     	$action = $Flow{$action}; 
-    	print FH "CGI VARS POSTED VALUES \n ================================\n" . Dumper(%params) . "\n==\n";
+
     }
    ###########################################################
 

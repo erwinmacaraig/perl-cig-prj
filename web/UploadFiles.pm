@@ -64,7 +64,7 @@ sub getUploadedFiles	{
 	my $deleteURL;
 	my $deleteURLButton;
 	my $urlViewButton;
-	print STDERR "My Level at this point is " . $myCurrentValue;
+
 	my @rows = ();
 	while(my $dref = $q->fetchrow_hashref())	{
 		#check if strLockLevel is empty which means world access to the file
@@ -306,7 +306,7 @@ sub _processUploadFile_single	{
 	my $error = '';
   if($isimage )  { #Image
     my $filename= "$Defs::fs_upload_dir/files/"."$path$fileID.jpg";
-warn("FN".$filename);
+    warn("FN ".$filename);
     my %field=();
     {
       my $dimensions=$options->{'dimensions'} || '800x600';
