@@ -8,6 +8,7 @@ our @ISA = qw(Search::Base);
 use Defs;
 use Data::Dumper;
 use Switch;
+use Reg_common;
 
 sub process {
     my ($self) = shift;
