@@ -2,6 +2,16 @@
 <p>[% Lang.txt('Registration is complete') %]</p>
 <p>Status is [% RegoStatus %]</p>
 <a href="[% person_home_url %]">[% Lang.txt("Continue to Person Home") %]</a>
-<a href="[% txns_url %]">[% Lang.txt("View Transactions") %]</a>
+[% IF txnCount > 0 %]
+<div id="regopt_options_continue" style="float:right;">
+	<span class="proceed-button button">
+		<a href="[% txn_invoice_url %]" target="_blank" onmouseover="this.style.textDecoration = 'none'">[% Lang.txt("Generate Invoice") %]</a>
+	</span>
+ OR
+	<span class="proceed-button button">
+		<a href="[% txns_url %]" onmouseover="this.style.textDecoration = 'none'">[% Lang.txt("Pay Now") %]</a>
+	</span>
+</div>
+[% END %]
 [% gateways %]
 </div>

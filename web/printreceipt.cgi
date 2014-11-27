@@ -119,8 +119,7 @@ sub main	{
 			 WHERE intTransLogID IN (?) AND T.intID = ?                        
 			AND T.intRealmID = ?
 		]; 
-			open FH, ">dumpfile.txt";
-			print FH "\ntxlogIDs = $txlogIDs\npersonID = $personID\n";
+			
            	my $qry_trans = $db->prepare($st_trans);
             $qry_trans->execute(
 			$txlogIDs,

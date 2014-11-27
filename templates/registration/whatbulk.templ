@@ -76,8 +76,8 @@
         qstring = qstring + '&eID=' + jQuery('#selected_entityID').val();
 
         if(optionType == 'complete')    {
-          jQuery('#regopt_options').html('');
-          jQuery('#regopt_options_title').html('');
+          jQuery('#regopt_options').hide();
+          jQuery('#regopt_options_title').hide();
           var url = jQuery('#regopt_options_continue a').attr('href');
           url = url + qstring;
           jQuery('#regopt_options_continue a').attr('href',url);
@@ -128,7 +128,8 @@
     });
 
     jQuery('#regopt-reset-btn').on('click',function(e) {
-        
+        jQuery('#regopt_options').show();
+        jQuery('#regopt_options_title').show();
         jQuery('#selected_sport').val('');
         jQuery('#selected_type').val('');
         jQuery('#selected_role').val('');

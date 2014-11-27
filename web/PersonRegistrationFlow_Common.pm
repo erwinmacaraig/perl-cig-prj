@@ -122,10 +122,13 @@ print STDERR "OK IS $ok | $run\n\n";
         }
         #($hidden_ref->{'txnIds'}, undef) = save_rego_products($Data, $regoID, $personID, $entityID, $rego_ref->{'entityLevel'}, $rego_ref, $hidden_ref); #\%params);
 
-         my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
-         my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
-         my $gateways = '';
-        my ($txnCount, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
+        my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
+        my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
+        my $gateways = '';
+	 	my $txnCount = 0;
+		my $logIDs;
+		my $txn_invoice_url = $Defs::base_url."/printinvoice.cgi?client=$client&amp;rID=$hidden_ref->{'rID'}&amp;pID=$personID";
+        ($txnCount, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
         savePlayerPassport($Data, $personID) if (! $run);
         $hidden_ref->{'run'} = 1;
          if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
@@ -135,7 +138,9 @@ print STDERR "OK IS $ok | $run\n\n";
         my %PageData = (
             person_home_url => $url,
             gateways => $gateways,
+			txnCount => $txnCount,
             txns_url => $pay_url,
+		    txn_invoice_url => $txn_invoice_url,
             target => $Data->{'target'},
             RegoStatus => $rego_ref->{'strStatus'},
             hidden_ref=> $hidden_ref,
@@ -272,7 +277,7 @@ sub displayRegoFlowCertificates{
 sub checkUploadedRegoDocuments {
     my($Data,$personID, $regoID,$entityID,$entityLevel,$originLevel,$rego_ref) = @_;
     
-    my $query = qq[SELECT count(intItemID) as items FROM tblRegistrationItem WHERE intRealmID = ? AND intOriginLevel = ? AND strRuleFor = ? AND intEntityLevel = ? AND strRegistrationNature = ? AND strPersonType = ? AND strPersonLevel = ? AND strSport = ? AND strAgeLevel = ? AND strItemType = ? AND (strISOCountry_IN ='' OR strISOCountry_IN IS NULL OR strISOCountry_IN LIKE CONCAT('%|',?,'|%')) AND (strISOCountry_NOTIN ='' OR strISOCountry_NOTIN IS NULL OR strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))  ];   
+    my $query = qq[SELECT count(intItemID) as items FROM tblRegistrationItem WHERE intRealmID = ? AND intOriginLevel = ? AND strRuleFor = ? AND intEntityLevel = ? AND strRegistrationNature = ? AND strDocumentFor = 'PERSON' AND strPersonType = ? AND strPersonLevel = ? AND strSport = ? AND strAgeLevel = ? AND strItemType = ? AND (strISOCountry_IN ='' OR strISOCountry_IN IS NULL OR strISOCountry_IN LIKE CONCAT('%|',?,'|%')) AND (strISOCountry_NOTIN ='' OR strISOCountry_NOTIN IS NULL OR strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))  ];   
     my $sth = $Data->{'db'}->prepare($query);
     $sth->execute(  $Data->{'Realm'},
     				$originLevel,
@@ -288,6 +293,25 @@ sub checkUploadedRegoDocuments {
     				$rego_ref->{'strISONationality'}
     );
     
+
+	open FH, ">dumpfile.txt";
+	print FH "\nsql\n 
+	SELECT count(intItemID) as items FROM tblRegistrationItem WHERE 
+	intRealmID = 1 AND 
+	intOriginLevel = '$originLevel' AND 
+	strRuleFor = 'REGO' AND 
+	intEntityLevel = $entityLevel AND 
+	strRegistrationNature = '$rego_ref->{'strRegistrationNature'}' AND 
+	strPersonType = '$rego_ref->{'strPersonType'}' AND 
+	strPersonLevel = '$rego_ref->{'strPersonLevel'}' AND 
+	strSport = '$rego_ref->{'strSport'}' AND 
+	strAgeLevel = '$rego_ref->{'strAgeLevel'}' AND 
+	strItemType = 'DOCUMENT' AND 
+	(strISOCountry_IN ='' OR strISOCountry_IN IS NULL OR strISOCountry_IN LIKE CONCAT('%|$rego_ref->{'strISONationality'}|%')) AND 
+	(strISOCountry_NOTIN ='' OR strISOCountry_NOTIN IS NULL OR strISOCountry_NOTIN NOT LIKE CONCAT('%|$rego_ref->{'strISONationality'}|%'))
+
+";
+
     my $dref = $sth->fetchrow_hashref();
     my $total_items = $dref->{'items'};     
     return 1 if($total_items == 0);

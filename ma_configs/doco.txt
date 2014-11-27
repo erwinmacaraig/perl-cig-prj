@@ -75,7 +75,9 @@ INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentN
 
 
 
-
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strItemType, intID, intRequired) SELECT 1, 3, 'PERSON', 3, 'NEW', 'DOCUMENT', intDocumentTypeID , 1 FROM tblDocumentType WHERE intDocumentTypeID IN (32,33,34,35,36,37);
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strItemType, intID, intRequired) SELECT 1, 100, 'PERSON', 3, 'NEW', 'DOCUMENT', intDocumentTypeID , 1 FROM tblDocumentType WHERE intDocumentTypeID IN (32,33,34,35,36,37);
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strItemType, intID, intRequired) SELECT 1, 100, 'PERSON', 100, 'NEW', 'DOCUMENT', intDocumentTypeID , 1 FROM tblDocumentType WHERE intDocumentTypeID IN (32,33,34,35,36,37);
 
 
 
