@@ -1,0 +1,81 @@
+## PLAYER DOCUMENTS
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON', 'Passport Sized Photo', 'Passport Sized Photo');
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON', 'NRIC/Passport', 'Upload a copy of the persons NRIC or, if not held, then a copy of the persons passport must be uploaded');
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON', 'MOM Pass/Student Pass/Dependent Pass/Long Term Visit Pass', 'Any foreign person, who has residency status, must provide this document');
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON', 'Clearance Letter (SAFSA/PSA/HQSCDF) - Regular/Active NS', 'Any active member of the National Services (SAFSA, PSA or HQSCDF) whether on National Service or permanent enlistment must provide a letter of clearance');
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON', 'Code of Conduct (signed)', 'A signed copy of the FSA Code of Conduct must be provided');
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON', 'Parental Consent', 'If the registrant is under the age of 21, a signed parental consent form is to be provided');
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON', "Player's Contract (Professional / Prime League)", 'The Club must provide a copy of the players signed contract, for Professional or Prime League players');
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON', 'Certificate of Medical Fitness', 'All players must provide a current certificate of medical fitness');
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON', 'ITC', 'Any player who is joining the FAS having previously played in a competition in a foreign competition must provide an International transfer certificate');
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON', 'Participation Questionnaire Declaration Form', 'All players over 35 or turning 35 during this competition period must provide a Participant Questionnaire Declaration Form');
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON', 'Notification Letter to School', 'Any student enrolled in an education institution must provide a signed notification letter for their place of enrolment');
+
+
+## COACH DOCUMENTS
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON',"First Aid or CPR Certificate","To be registered as a Coach, a person must hold either a valid First Aid or CPR Certificate");
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON',"FAS/AFC Coach Qualification Certificate","The most recent coaching certificate held by the Coach");
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON',"Coaches Contract", "Required only if the Coach is an S-League Coach"); 
+
+
+## REFEREE DOCUMENTS
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON',"Referee Qualification Certificate", "The most recent coaching certificate held by the Coach");
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON',"Foreign Referee Certificate (official from CONF or MA)", "A refereeing certificate issued in a foreign country or by the Confederation  - only uploaded if applicable");
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON',"Verification letter from Previous MA", "A letter from the Referee’s previous Member Association, validating refereeing experience and qualifications in that Country");
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON',"Fitness Test Requirement (kept by referee dept) For ACTIVATION", "");
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON',"Annual Refresher Course (kept by referee dept)  For ACTIVATION", "");
+
+
+## CLUB/TEAM/MA OFFICIALS
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON',"Professional Qualification", "If you are registering as a Team Doctor or Physiotherapist, you must upload a document that establishes this qualification");
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON',"Notification Letter to School", "Any student enrolled in an education institution must provide a signed notification letter for their place of enrolment");
+
+
+## ORG DOCUMENTS
+
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'CLUB', "Membership Form", "The official FAS membership form, completed and signed by the club");
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'CLUB', "Certificate of Registration (ROS or ACRA)", "Please provide the certificate of incorporation of the organisation (normally ROS or ACRA)");
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'CLUB', "Copy of Bylaws (Constitution)-First Time + Update", "Please provide the constitution or by-laws which provide governance of the organisation");
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'CLUB', "Declaration letter for Affiliation", "Letter of Declaration signed by the President/Chairman and one other authorised signatory");
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'CLUB', "Proforma Form (First Time) + Update", "");
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'CLUB', "Code of Conduct ", "Please upload the official FAS code of conduct for Organisations signed by two office bearers");
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'CLUB', "List of signatories", "A list of signatories for the club counter-signed y at least two of those signatories");
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'CLUB', "Latest Congress/Assembly Minutes", "A copy of the minutes of the most recent meeting of the Congress or Assembly");
+
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'CLUB', "Latest Financial Returns/ACRA & ROS Return", "Professional (S-League and Amateur Prime) clubs must uploaded the latest return filed with ACRA/ROS or their latest audited financial reports");
+
+
+
+
+
+
+
+
+
+
