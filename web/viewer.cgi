@@ -107,6 +107,8 @@ sub main	{
             dtDOB => $object->getValue('dtDOB'),
             gender => $Defs::PersonGenderInfo{$object->getValue('intGender')},
             nationality => $isocountries->{$object->getValue('strISONationality')},
+            status => $object->getValue('strStatus'),
+            nationalNum => $object->getValue('strNationalNum'),
 
 
 
@@ -117,6 +119,7 @@ sub main	{
     }
     # BUILD PAGE
     my $TemplateData = $dref;
+    $TemplateData->{'showButtons'} = $action eq 'review' ? 1 : 0;
 
     $resultHTML = runTemplate(
           \%Data,
