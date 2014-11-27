@@ -1,5 +1,5 @@
 <div id = "docViewerHeader">
-    <div class = "close"><a id = "docViewer-close-btn" href = "">[% Lang.txt('Close') %]</a></div>
+    <div class = "close"><a id = "docViewer-close-btn" href = ""><i class = "fa fa-close fa-2x white"></i></a></div>
     <div class = "docTitle">[% strDocumentName %]: [% strTitle %]</div>
 </div>
 <div id = "docViewerContent">
@@ -10,17 +10,21 @@
 
 
             [% ELSIF person %]
-                <b>[% person.strFirstname %] [% person.strSurname %]<br></b>
-                [% person.dtDOB %]<br>
-                [% person.gender %]<br>
-                [% person.nationality %]<br>
-
+                <h3 class="panel-header">[% Lang.txt('Member ID') %]: [% IF person.strStatus == "REGISTERED" OR person.strStatus != "PENDING" %][% person.nationalNum %][% ELSE %] - [% END %]</h3>
+                <div class="panel-body">
+                    <p class="reg-text">[% person.strFirstname %] [% person.strSurname %]</p>
+                    <p class="reg-text">[% person.gender %]</p>
+                    <p class="reg-text">[% person.dtDOB %]</p>
+                    <p class="reg-text">[% person.nationalitydob %]</p>
+                </div>
             [% END %]
         </div>
+        [% IF showButtons %]
         <div class = "docViewerButtons">
-            <input type = "button" value = "Approve">
-            <input type = "button" value = "Reject">
+            <input type = "button" class = "btn-main" value = "Approve">
+            <input type = "button" class = "btn-main" value = "Reject">
         </div>
+        [% END %]
     </div>
 
     <div id = "docViewerFileBlock">

@@ -120,6 +120,7 @@ sub search_results {
         tblEntity
     WHERE
         intRealmID = ?
+        AND intEntityLevel <> $Defs::LEVEL_VENUE
         $wherestr
     ORDER BY 
         strLocalName, strLatinName

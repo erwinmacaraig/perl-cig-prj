@@ -17,7 +17,7 @@ sub print_adminpageGen {
 	my($body,$page_title,$page_heading, $extra_ref)=@_;
 
 	my $otherevents=$extra_ref->{onload} || '';
-	#print "Content-Type: text/html\n\n";
+	print "Content-Type: text/html\n\n";
 	print qq[
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 	<html>
