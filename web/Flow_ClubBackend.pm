@@ -394,6 +394,7 @@ sub setupValues {
                     type        => 'text',
                     size        => '50',
                     maxsize     => '100',
+                    validate    => 'EMAIL',
                 },
             },
             'order' => [qw(

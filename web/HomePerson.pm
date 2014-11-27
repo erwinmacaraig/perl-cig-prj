@@ -109,6 +109,7 @@ sub showPersonHome	{
 			SquadNum => $personObj->getValue('dblCustomDbl10') || '',
 			BirthCountry => $personObj->getValue('strCountryOfBirth') || '',
 			PassportNat => $personObj->getValue('strPassportNationality') || '',
+			Status => $personObj->getValue('strStatus') || '',
 		},
 
 	);

@@ -330,6 +330,7 @@ sub setupValues {
                     type        => 'text',
                     size        => '50',
                     maxsize     => '100',
+                    validate    => 'EMAIL',
                 },
                 strContact=> {
                     label       => $FieldLabels->{'strContact'},
@@ -351,6 +352,7 @@ sub setupValues {
                     type        => 'text',
                     size        => '50',
                     maxsize     => '100',
+                    validate    => 'URL',
                 },
             },
             'order' => [qw(
