@@ -210,7 +210,8 @@ sub listPersons {
         $dref->{'PRStatus'} = ($dref->{'PRStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE and $dref->{'PRintPaymentRequired'}) ? $Defs::PERSONREGO_STATUS_ACTIVE_PENDING_PAYMENT : $Defs::PERSONREGO_STATUS_ACTIVE;
 
         $dref->{'PRStatus'} = $lang->txt('SUSPENDED') if ($dref->{'strStatus'} eq 'SUSPENDED');
-        $dref->{'strStatus'} = $lang->txt($Defs::personRegoStatus{$dref->{'PRStatus'}}); ## Lets use PR status
+        #$dref->{'strStatus'} = $lang->txt($Defs::personRegoStatus{$dref->{'PRStatus'}}); ## Lets use PR status
+        $dref->{'strStatus'} = $lang->txt($Defs::personStatus{$dref->{'strStatus'}}); ## Lets use PR status
         
         next if (defined $dref->{intSystemStatus} and $dref->{intSystemStatus} == $Defs::PERSONSTATUS_DELETED);
         $tempClientValues{personID} = $dref->{intPersonID};
