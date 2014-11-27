@@ -122,10 +122,13 @@ print STDERR "OK IS $ok | $run\n\n";
         }
         #($hidden_ref->{'txnIds'}, undef) = save_rego_products($Data, $regoID, $personID, $entityID, $rego_ref->{'entityLevel'}, $rego_ref, $hidden_ref); #\%params);
 
-         my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
-         my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
-         my $gateways = '';
-        my ($txnCount, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
+        my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
+        my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
+        my $gateways = '';
+	 	my $txnCount = 0;
+		my $logIDs;
+		my $txn_invoice_url = $Defs::base_url."/printinvoice.cgi?client=$client&amp;rID=$hidden_ref->{'rID'}&amp;pID=$personID";
+        ($txnCount, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
         savePlayerPassport($Data, $personID) if (! $run);
         $hidden_ref->{'run'} = 1;
          if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
@@ -135,7 +138,9 @@ print STDERR "OK IS $ok | $run\n\n";
         my %PageData = (
             person_home_url => $url,
             gateways => $gateways,
+			txnCount => $txnCount,
             txns_url => $pay_url,
+		    txn_invoice_url => $txn_invoice_url,
             target => $Data->{'target'},
             RegoStatus => $rego_ref->{'strStatus'},
             hidden_ref=> $hidden_ref,
