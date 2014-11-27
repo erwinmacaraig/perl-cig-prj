@@ -1107,6 +1107,12 @@ sub generate_clientside_validation {
                       $self->langlookup( "Please enter a valid number",
                         $num1, $num2 );
                 }
+                elsif ( $t eq 'URL' ) {
+                    $valinfo{'rules'}{ $field_prefix . $k }{'url'} = 'true';
+                    $valinfo{'messages'}{ $field_prefix . $k }{'url'} =
+                      $self->langlookup(
+                        "Please enter a valid URL" );
+                }
             }
         }
     }
