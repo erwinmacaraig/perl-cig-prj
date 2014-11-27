@@ -660,7 +660,7 @@ sub bulkRegoSubmit {
 
 	my $invoiceNumber;
 	#Generate invoice number 
-	my $stt = qq[INSERT INTO tblInvoice (tTimeStamp) VALUES (NOW())];
+	my $stt = qq[INSERT INTO tblInvoice (tTimeStamp, intRealmID) VALUES (NOW(), $Data->{'Realm'})];
 	my $qryy=$Data->{'db'}->prepare($stt); 
 	$qryy->execute();
 	my $invoiceID =  $qryy->{mysql_insertid} || 0;	

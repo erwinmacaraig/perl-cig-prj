@@ -656,7 +656,7 @@ sub insertRegoTransaction {
 		if(!$invoiceID){
 			#Generate invoice number 
 		    my $invoiceNumber;
-			my $stt = qq[INSERT INTO tblInvoice (tTimeStamp) VALUES (NOW())];
+			my $stt = qq[INSERT INTO tblInvoice (tTimeStamp, intRealmID) VALUES (NOW(), $Data->{'Realm'})];
 			my $qryy=$Data->{'db'}->prepare($stt); 
  			$qryy->execute();
 			$invoiceID =  $qryy->{mysql_insertid} || 0;	
