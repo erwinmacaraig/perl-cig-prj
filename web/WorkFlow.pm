@@ -1755,8 +1755,10 @@ sub getTask {
             pr.intPersonRegistrationID,
             pr.strPersonType,
             pr.strAgeLevel,
+            pr.strPersonEntityRole,
             pr.strSport,
             pr.strPersonLevel,
+            etr.strEntityRoleName,
             p.strLocalFirstname,
             p.strLocalSurname,
             p.strISONationality,
@@ -1776,6 +1778,7 @@ sub getTask {
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (pr.intPersonRegistrationID = t.intPersonRegistrationID)
         LEFT JOIN tblPerson AS p ON (t.intPersonID = p.intPersonID)
         LEFT JOIN tblEntity AS pre ON (pre.intEntityID = pr.intEntityID)
+        LEFT JOIN tblEntityTypeRoles AS etr ON (etr.strPersonType = pr.strPersonType AND etr.strEntityRoleKey = pr.strPersonEntityRole)
 	  	WHERE
             t.intWFTaskID = ?
             AND t.intRealmID = ?
@@ -2085,9 +2088,9 @@ sub populateRegoViewData {
             PersonEntityTypeRole => $Data->{'lang'}->txt($role_ref->{$dref->{'strPersonEntityRole'} || 0}) || '-',
             Sport => $Defs::sportType{$dref->{'strSport'}} || '-',
             Level => $Defs::personLevel{$dref->{'strPersonLevel'}} || '-',
-            AgeLevel => $Defs::ageLevel{$dref->{'strAgeLevel'}} | '-',
-            RegisterTo => $dref->{'entityLocalName'} | '-',
-            Status => $Defs::personRegoStatus{$dref->{'personRegistrationStatus'}} | '-',
+            AgeLevel => $Defs::ageLevel{$dref->{'strAgeLevel'}} || '-',
+            RegisterTo => $dref->{'entityLocalName'} || '-',
+            Status => $Defs::personRegoStatus{$dref->{'personRegistrationStatus'}} || '-',
         },
 	);
 
@@ -2581,6 +2584,7 @@ sub viewSummaryPage {
 
     my %TemplateData;
     my $templateFile;
+    my $title = '';
 
     my %TaskAction = (
         'WFTaskID' => $task->{intWFTaskID} || 0,
@@ -2588,10 +2592,24 @@ sub viewSummaryPage {
     );
 
     $TemplateData{'TaskAction'} = \%TaskAction;
+    $TemplateData{'Lang'} = $Data->{'lang'};
 
     switch($task->{'strWFRuleFor'}) {
         case 'REGO' {
             $templateFile = 'workflow/summary/personregistration.templ';
+            $title = $Data->{'lang'}->txt('New' . ' ' . $Defs::personType{$task->{'strPersonType'}} . " " . "Registration - Approval");
+            $TemplateData{'PersonRegistrationDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
+            $TemplateData{'PersonRegistrationDetails'}{'personLevel'} = $Defs::personLevel{$task->{'strPersonLevel'}};
+            $TemplateData{'PersonRegistrationDetails'}{'sport'} = $Defs::sportType{$task->{'strSport'}};
+            $TemplateData{'PersonRegistrationDetails'}{'currentAge'} = $task->{'currentAge'};
+            $TemplateData{'PersonRegistrationDetails'}{'personFirstname'} = $task->{'strLocalFirstname'};
+            $TemplateData{'PersonRegistrationDetails'}{'personSurname'} = $task->{'strLocalSurname'};
+            $TemplateData{'PersonRegistrationDetails'}{'registerTo'} = $task->{'registerToEntity'};
+            $TemplateData{'PersonRegistrationDetails'}{'nationality'} = $task->{'strISONationality'};
+            $TemplateData{'PersonRegistrationDetails'}{'dob'} = $task->{'DOB'};
+            $TemplateData{'PersonRegistrationDetails'}{'gender'} = $Defs::PersonGenderInfo{$task->{'intGender'}};
+            $TemplateData{'PersonRegistrationDetails'}{'personRoleName'} = $task->{'strEntityRoleName'};
+
         }
         case 'ENTITY' {
             switch ($task->{'intEntityLevel'}) {
@@ -2622,7 +2640,7 @@ sub viewSummaryPage {
             $templateFile
 	);
 
-    return ($body, "Summary");
+    return ($body, $title);
 
 }
 
@@ -2650,7 +2668,6 @@ sub viewApprovalPage {
 
     $TemplateData{'TaskAction'} = \%TaskAction;
 
-    print STDERR Dumper $task;
     switch($task->{'strWFRuleFor'}) {
         case 'REGO' {
             $templateFile = 'workflow/result/personregistration.templ';
@@ -2665,6 +2682,7 @@ sub viewApprovalPage {
             $TemplateData{'PersonRegistrationDetails'}{'nationality'} = $task->{'strISONationality'};
             $TemplateData{'PersonRegistrationDetails'}{'dob'} = $task->{'DOB'};
             $TemplateData{'PersonRegistrationDetails'}{'gender'} = $Defs::PersonGenderInfo{$task->{'intGender'}};
+            $TemplateData{'PersonRegistrationDetails'}{'personRoleName'} = $task->{'strEntityRoleName'};
         }
         case 'ENTITY' {
             switch ($task->{'intEntityLevel'}) {
