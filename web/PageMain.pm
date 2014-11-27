@@ -322,6 +322,9 @@ sub printBasePage {
             <link rel="stylesheet" type="text/css" href="js/jquery-ui/css/theme/jquery-ui-1.8.22.custom.css">
             <script type="text/javascript" src="$Defs::base_url/js/jquery.ui.touch-punch.min.js"></script>
       <link rel="stylesheet" type="text/css" href="$Defs::base_url/css/style.css">
+      <link rel="stylesheet" type="text/css" href="$Defs::base_url/css/fc_styles.css">
+      <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
+
 $CSSFiles
 $CSSInline
 $TopJSFiles

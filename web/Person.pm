@@ -381,7 +381,7 @@ sub listDocuments {
     while(my $dref = $sth->fetchrow_hashref()){
     	#check if strLockLevel is empty which means world access to the file
     	if($dref->{'strLockAtLevel'} eq ''){
-    		$viewLink = qq[ <span class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}" target="_blank">]. $lang->txt('Get File') . q[</a></span>];
+    		$viewLink = qq[ <span class="button-small generic-button"><a href="#" onclick="docViewer($dref->{'intFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a></span>];
     		$replaceLink =   qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$dref->{'intFileID'}&amp;regoID=$dref->{'regoID'}&amp;dID=$dref->{'doctypeID'}">]. $lang->txt('Replace File'). q[</a></span>];
     	}
     	else {
