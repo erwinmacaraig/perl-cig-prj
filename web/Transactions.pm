@@ -49,7 +49,31 @@ sub handleTransactions	{
   }
   elsif ($action =~ /_TXN_DEL/) {
 		($resultHTML,$heading) = deleteTransaction($Data, $intTableID, $ID);
+	}
+
+  elsif ($action =~ /_TXN_PAY_INV/){
+		($resultHTML,$heading) = queryBlkTXN($action, $Data, $intTableID); 
+		#queryBlkTXNviaInvoice($action, $Data, $intTableID) if  ($action =~ /_step2/ && param('d_strInvoiceNumber')); 
+		
+
+
+		 if($action =~ /_step2/){
+			$heading = 'This is just a test run';	
+			my $value = param('d_strInvoiceNumber') ;
+			$value =~ s/^\s+//;
+			if(length($value) > 0 || $value ne ''){
+				$resultHTML = $value;
+			}
+			else { 
+				$resultHTML = 'Belat';
+			}
+			
+ 		 }
+		
+				
+		
   }
+
   if ($action =~ /_TXN_FAILURE/) {
 	my $intLogID=param("ci") || '';
 		Payments::processTransLogFailure($Data->{'db'}, $intLogID);
@@ -181,13 +205,13 @@ sub displayTransaction	{
 			SET --VAL--
 		WHERE intTransactionID=$id
 	];
+	
 	my $txnadd=qq[
 		INSERT INTO tblTransactions (intTXNEntityID, intID, intTableType, intRealmID, intRealmSubTypeID, dtTransaction, --FIELDS--)
 			VALUES ($entityID, $TableID, $Data->{'clientValues'}{'currentLevel'}, $Data->{'Realm'}, $Data->{'RealmSubType'}, SYSDATE(), --VAL--)
 	];
 
-        open(FH,">>$Defs::myerrorfile");
-        print FH "TROM Transactions.pm: \n" . $txnadd . "\n"; 
+        
        
 
 	 my $authLevel = $Data->{'clientValues'}{'authLevel'}||=$Defs::INVALID_ID;
@@ -286,7 +310,7 @@ sub displayTransaction	{
 					type => 'text',
 					readonly=>1,
 					size => 30,
-					value => Payments::TXNtoInvoiceNum($dref->{intParentTXNID}) . qq[ - $dref->{'ParentProductName'}],
+					value => Payments::TXNtoTXNNumber($dref->{intParentTXNID}) . qq[ - $dref->{'ParentProductName'}],
 				},
 				intQty=> {
 					label => $lang->txt('Quantity'),
@@ -456,7 +480,7 @@ sub showTransactionChildren	{
 		<p>Below is a list of the successful Part Payments for the selected Transaction.</p>
 		<table class="listTable">
 			<tr>
-				<th>Invoice Number</th>
+				<th>Transaction Number</th>
 				<th>Payee</th>
 				<th>Amount</th>
 				<th>Payment Ref ID</th>
@@ -468,7 +492,7 @@ sub showTransactionChildren	{
 		$count++;
 		$body .= qq[
 			<tr>
-				<td>]. Payments::TXNtoInvoiceNum($dref->{'intTransactionID'}) . qq[</td>
+				<td>]. Payments::TXNtoTXNNumber($dref->{'intTransactionID'}) . qq[</td>
 				<td>$dref->{'strPayeeName'}</td>
 				<td>\$$dref->{'curAmount'}</td>
 				<td>$dref->{'intTransLogID'}</td>
@@ -507,12 +531,25 @@ sub checkTXNPricing	{
 	$PPamount ||= 0;
         $defaultAmount ||=0;
 
-	 my $amount = $PPamount || $defaultAmount || 0;
+    my $amount = $PPamount || $defaultAmount || 0;
 	my $totalamount = $amount * $qty;
+
+	
+	#Generate invoice number 
+		my $stt = qq[INSERT INTO tblInvoice (tTimeStamp) VALUES (NOW())];
+		my $qryy=$Data->{'db'}->prepare($stt); 
+ 		$qryy->execute();
+		my $invoiceID =  $qryy->{mysql_insertid} || 0;	
+		#my $invoiceNumber = Payments::TXNtoInvoiceNum($invoiceID); 
+		my $invoiceNumber = Payments::TXNtoTXNNumber($invoiceID);
+		$stt = qq[UPDATE tblInvoice SET strInvoiceNumber = ? WHERE intInvoiceID = ?];		
+		$qryy=$Data->{'db'}->prepare($stt); 
+		$qryy->execute($invoiceNumber,$invoiceID); 
+
 
 	$statement = qq[
 		UPDATE tblTransactions
-		SET curAmount = $totalamount, curPerItem=$amount
+		SET curAmount = $totalamount, curPerItem=$amount, intInvoiceID=$invoiceID
 		WHERE intTransactionID = $id
 	];
 
@@ -523,7 +560,7 @@ sub checkTXNPricing	{
 
 sub preTXNAddUpdate	{
 
-	my($params, $action, $Data,$db, $client, $personID, $transID)=@_;
+	my($params, $action, $Data, $db, $client, $personID, $transID)=@_;
 
 	$personID ||= 0;
 	$transID ||=0;
@@ -552,8 +589,52 @@ sub preTXNAddUpdate	{
 	];
 	return (0,$error_text) if $intExistingTransactionID;
 	return (1,'');
-		
-	
 }
+
+sub queryBlkTXN {
+	my ($action, $Data, $intTableID) = @_;
+    my $client = setClient($Data->{'clientValues'}) || '';
+	
+	my %FormElements = ( 
+		 fields=>  {				
+			strInvoiceNumber => {
+				label	=> 'Invoice Number',
+				value	=> '',
+				type	=> 'text',
+				size  => '30',
+       			maxsize => '50',
+			}
+		}, #end of fields	
+		order => [qw(
+			strInvoiceNumber
+		)],  #end of order 
+		options => {
+			labelsuffix => ':',
+		    hideblank => 1,
+      		target => $Data->{'target'},
+      		formname => 'n_form',
+      		submitlabel => $Data->{'lang'}->txt('Continue'),
+      		introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
+			 NoHTML => 1,
+		}, #end of options
+		carryfields =>  {
+    		client => $client,
+      		a=> $action."_step2",
+    	},
+	);
+ 
+	#my $formcontent = runTemplate($Data, \%FormElements, 'payment/bulkinvoicelisting.templ'); 
+	my $content;
+	my $title = 'Pay Invoice';
+	($content, undef )=handleHTMLForm(\%FormElements, undef, 'add', '', $Data->{'db'});
+
+	return ($content,$title);
+
+}
+  
+
+
+
+
 
 1;

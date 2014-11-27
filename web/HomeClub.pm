@@ -40,12 +40,19 @@ sub showClubHome  {
     ? getServicesContactsMenu($Data, $Defs::LEVEL_CLUB, $clubID, $Defs::SC_MENU_SHORT,0)
     : '';
   my $contacts = getLocatorContacts($Data,1);
+    ## lets clean up some stuff for now
+    $scMenu = '';
+    $contacts = '';
   my ($dashboard, undef) = showDashboard(
     $Data,
     $client,
     $Defs::LEVEL_CLUB,
     $clubID,
   );
+    ### Lets clear Dashboard graphs for now
+    $dashboard = '';
+
+
   my ($notifications, $notificationCount)  = getNotifications(
     $Data,
     $Defs::LEVEL_CLUB,
@@ -60,23 +67,27 @@ sub showClubHome  {
    $Data->{'ReadOnlyLogin'} ? $readonly = 1 : undef;
   
   my $name = $clubObj->name();
+
+    #ContactsMenu => $scMenu,
+    #Contacts => $contacts,
   my %TemplateData = (
     Welcome => $welcome,
     ReadOnlyLogin => $readonly,
     Logo => $logo,
     Name => $name,
-    ContactsMenu => $scMenu,
-    Contacts => $contacts,
     EditDetailsLink => "$Data->{'target'}?client=$client&amp;a=C_DTE",
-    EditContactsLink => "$Data->{'target'}?client=$client&amp;a=CON_LIST",
     EditDashboardLink => "$Data->{'target'}?client=$client&amp;a=DASHCFG_",
     Dashboard => $dashboard,
     Notifications => $notifications,
     Details => {
-      Address => $clubObj->getValue('strAddress') || '',
-      Town => $clubObj->getValue('strTown') || '',
+      City=> $clubObj->getValue('strCity') || '',
       Region => $clubObj->getValue('strRegion') || '',
       Country => $clubObj->getValue('strISOCountry') || '',
+      Address => $clubObj->getValue('strAddress') || '',
+      Address2 => $clubObj->getValue('strAddress2') || '',
+      ContactCity=> $clubObj->getValue('strContactCity') || '',
+      ContactState=> $clubObj->getValue('strState') || '',
+      ContactCountry=> $clubObj->getValue('strContactCountry') || '',
       PostalCode => $clubObj->getValue('strPostalCode') || '',
       Phone => $clubObj->getValue('strPhone') || '',
       Fax => $clubObj->getValue('strFax') || '',

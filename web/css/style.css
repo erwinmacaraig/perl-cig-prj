@@ -1,5 +1,5 @@
 html	{
-  font-family: 'DINRegular', sans-serif;
+    /*font-family: 'DINRegular', sans-serif;*/
 	margin:0px;
 }
 
@@ -352,7 +352,7 @@ fieldset.RO_roptions, fieldset.ROReportFormat, fieldset.ROsavedreports	{
 }
 div.row {
   clear: both;
-  padding-top: 5px;
+  /*padding-top: 5px;*/
 }
                                                                                                         
 div.row span.label {
@@ -448,7 +448,7 @@ td.value .chzn-container-single .chzn-single div b{
 }
 
 .sectionheader {
-  font-family: 'DINRegular', sans-serif;
+  /*font-family: 'DINRegular', sans-serif;*/
   color: #0567A4;
   font-size:14px;
 	padding:4px;
@@ -552,7 +552,8 @@ table.lkTable	{
 div.showrecoptions	{
 	float:right;
 	font-size:10px;
-	height:48px;
+	/*height:48px;*/
+	height:auto;
 	vertical-align:bottom;
 	margin-right: 10px;
 }
@@ -1337,7 +1338,7 @@ ul.list li	{
 /* Navbar */
 
 /* ----- Level 1 ----- */
-ul#menu {
+/*ul#menu {
   position: relative;
   font-size: 12px;
   margin-left: 5px;
@@ -1357,7 +1358,7 @@ ul#menu li a {
 	color: #0266a4;
   font-size:14px;
   padding: 7px 10px 8px 10px;
-}
+}*/
 
 /* Doesn't work in IE */
 ul#menu li:last-child a {
@@ -2413,7 +2414,7 @@ body {
 	border-bottom: 1px solid #E4E4E4;
 }
 
-ul#menu {
+/*ul#menu {
 	margin: 0px;
 	padding: 0px;
 }
@@ -2427,7 +2428,7 @@ ul#menu li a {
 
 ul#menu li:last-child a {
 	border-right: 1px solid #E4E4E4;
-}
+}*/
 
 #contentholder {
 	float:left;
@@ -2628,7 +2629,7 @@ a.edit-link {
 	font-size: 12px;
   text-decoration:underline;
   color: #0567A4;
-  font-family: 'DINMedium',sans-serif;
+  /*font-family: 'DINMedium',sans-serif;*/
 }
 
 .details-address {
@@ -2643,7 +2644,7 @@ a.edit-link {
 }
 
 a.mail-link {
-	font-family: 'DINMedium',sans-serif;
+	/*font-family: 'DINMedium',sans-serif;*/
 	color: #0567A4;
 	text-decoration: underline;
 }
@@ -2881,7 +2882,7 @@ table.listTable tr:nth-child(odd) {
 
 .slick-pager .slick-pager-status {
 	padding: 3px 6px;
-	font-family: 'DINMedium',sans-serif;
+	/*font-family: 'DINMedium',sans-serif;*/
 }
 
 .changeoptions .button-small {
@@ -2984,7 +2985,7 @@ background-image: -ms-linear-gradient(bottom, #dadada 30%, #e6e6e6 98%, #ffffff 
 background-image: linear-gradient(bottom, #dadada 30%, #e6e6e6 98%, #ffffff 100%);	
 	font-weight: normal;
 	font-size: 14px;
-	font-family: 'DINBold',sans-serif;
+	/*font-family: 'DINBold',sans-serif;*/
 	color: #3B3B3B;
 	border: 1px solid #D9D9D9;
 	padding: 10px 3px 7px 5px;
@@ -2993,7 +2994,7 @@ background-image: linear-gradient(bottom, #dadada 30%, #e6e6e6 98%, #ffffff 100%
 .x-panel-body {
 	border: 1px solid #D9D9D9;
 	border-top: 0px;
-	font-family: 'DINRegular',sans-serif;
+	/*font-family: 'DINRegular',sans-serif;*/
 }
 
 .x-fieldset legend {
@@ -3001,7 +3002,7 @@ background-image: linear-gradient(bottom, #dadada 30%, #e6e6e6 98%, #ffffff 100%
 }
 
 .x-btn button {
-  font-family: 'DINMedium',sans-serif;
+  /*font-family: 'DINMedium',sans-serif;*/
   font-size: 10px;
   text-decoration: none;
   -webkit-border-radius: 3px;
@@ -3739,7 +3740,7 @@ ul.new_tabs li a.active, .new_tabs_wrap  a.active {
 }
 
 .member-home-page .details-left {
-	font-family: 'DINMedium',sans-serif;
+	/*font-family: 'DINMedium',sans-serif;*/
 	float:left;
 	width: 40%;
 }
@@ -4574,5 +4575,73 @@ div#content div.member-home-page div.task-actions {
     margin:5px;
     border:1px solid #000;
     background-color:#fff;
+
+}
+/* Document viewer styles */
+
+#docViewerOverlay   {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index:200;
+    width:100%;
+    height:100%;
+    background:transparent;
+}
+#docViewerPage {
+    width:100%;
+    height:100%;
+    background-color: rgba(0,0,0,0.8);
+    overflow:none;
+}
+#docViewerContent {
+    padding: 30px;
+}
+
+#docViewerHeader {
+    background-color:#000;
+    padding:5px 20px;
+    color:#fff;
+    font-size:2em;
+    border-bottom:1px solid #666;
+}
+#docViewerHeader .close {
+    float:right;
+}
+
+#docViewerPanel {
+    float: right;
+    width: 300px;
+}
+
+#docViewerFileBlock {
+    width:66%;
+    height:90%;
+    vertical-align:middle;
+}
+.docViewer-imgBlock{ 
+    text-align:center;
+    vertical-align: middle;
+}
+.docViewer-imgBlock:before {
+    content: ' ';
+    display: inline-block;
+    vertical-align: middle;
+    height: 100%;
+}
+.docViewer-imgBlock img {
+    vertical-align: middle;
+}
+
+.docViewerEntityInfo    {
+    background-color:#fff;
+    margin:10px;
+    padding: 10px;
+}
+
+.docViewerButtons   {
+    background-color:#fff;
+    margin:10px;
+    padding: 10px;
 
 }

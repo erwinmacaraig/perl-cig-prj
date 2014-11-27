@@ -5,6 +5,8 @@
 		<script src = "https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="css/spfont.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" href="css/fc_styles.css">
+    <link rel="stylesheet" href="css/custom.css">
   <!--[if lt IE 8]>
   <style>
 .membership-login .auth-row input.fields {
@@ -19,22 +21,41 @@
   <!--[if lt IE 9]>
     <link rel="stylesheet" type="text/css" href="css/passport_ie_old.css" />
   <![endif]-->
+
+    
   </head>
   <body onload="document.loginform.username.focus();" class="membership-login">
-		[% globalnav %]
-    <div id="spheader">
-			<div id="spheader-int">
-				<img src="images/sp_membership.png" alt="" title="">
-			</div>
-		</div>
+    <header>
+      <div class="logo-area clearfix">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-12">
+              <!--<a href="#" title=""><img src="images/img-logo.png" alt="" /></a><h1>Finland Association</h1>-->
+              <ul>
+                <li>
+                  <strong>Member Association</strong><br/>
+                  Phone: <strong>4567 8658 689</strong><br/>
+                  Email: <strong>ma@ma.com</strong><br/>
+                  Website: <strong>www.ma.com</strong>
+                </li>
+                <li>
+                  <strong>Help Desk</strong><br/>
+                  Phone: <strong>4567 8658 689</strong><br/>
+                  Email: <strong>hd@hd.com</strong><br/>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>       
+    </header>
+    [% pagebody %]
     <div id="pageholder">
-      <div id="content"><span>[% pagebody %]</span></div> <!-- End Content -->
+      <div id="content">
+      </div>
       <div id="footer">
-	<div id="footer-topline"></div>
-		<div id="footer-content">
-				<a href="http://www.sportingpulse.com"><img src="images/SP_powered_rev.png" title="SportingPulse" alt="SportingPulse"></a>
-				<div class="footerline">[% Lang.txt('COPYRIGHT') %]</div>
-		</div>
+        <div id="footer-topline"></div>
+		    <div id="footer-content"></div>
       </div>
     </div> <!-- End Page Holder -->
 </div> <!-- End wrapper -->

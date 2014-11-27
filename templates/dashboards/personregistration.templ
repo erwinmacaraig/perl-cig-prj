@@ -1,88 +1,223 @@
-<div class="member-status-wrap">
-	<div class="sectionheader">[% Lang.txt('Current Registrations') %]</div>
-		<div class="members-seasonstatus-content">
-			[% FOREACH entity IN RegistrationInfo %]
-                [% IF entity.strLocalName %]
-                    <span class="details-row">
-                        <span class="details-left">[% Lang.txt('Registrered To') %]:</span>
-                        <span class="details-right">[% entity.strLocalName %]</span>
-                    </span>
-                [% END %]
-                
-                [% IF entity.strLatinName %]
-                    <span class="details-row">
-                        <span class="details-left">[% Lang.txt('Registrered To (International Name)') %]:</span>
-                        <span class="details-right">[% entity.strLatinName %]</span>
-                    </span>
-                [% END %]
-                [% IF entity.intPaymentRequired %]
-                    <span class="details-rowred">
-                        [% Lang.txt('Payment Still Required') %]
-                    </span>
-                [% END %]
-                [% IF entity.strNationalPeriodName %]
-                    <span class="details-row">
-                        <span class="details-left">[% Lang.txt('Registration Period') %]:</span>
-                        <span class="details-right">[% entity.strNationalPeriodName %]</span>
-                    </span>
-                [% END %]
-                [% IF entity.RegistrationNature %]
-                    <span class="details-row">
-                        <span class="details-left">[% Lang.txt('Registration Type') %]:</span>
-                        <span class="details-right">[% entity.RegistrationNature %]</span>
-                    </span>
-                [% END %]
-                [% IF entity.Status %]
-                    <span class="details-row">
-                        <span class="details-left">[% Lang.txt('Status') %]:</span>
-                        <span class="details-right">[% entity.Status %]</span>
-                    </span>
-                [% END %]
-                [% IF entity.Sport %]
-                    <span class="details-row">
-                        <span class="details-left">[% Lang.txt('Sport') %]:</span>
-                        <span class="details-right">[% entity.Sport %]</span>
-                    </span>
-                [% END %]
-                [% IF entity.PersonType %]
-                    <span class="details-row">
-                        <span class="details-left">[% Lang.txt('Type') %]:</span>
-                        <span class="details-right">[% entity.PersonType %]</span>
-                    </span>
-                [% END %]
-                [% IF entity.PersonLevel %]
-                    <span class="details-row">
-                        <span class="details-left">[% Lang.txt('Level') %]:</span>
-                        <span class="details-right">[% entity.PersonLevel %]</span>
-                    </span>
-                [% END %]
-                [% IF entity.AgeLevel %]
-                    <span class="details-row">
-                        <span class="details-left">[% Lang.txt('Age Level') %]:</span>
-                        <span class="details-right">[% entity.AgeLevel %]</span>
-                    </span>
-                [% END %]
-                [% IF entity.dtFrom and entity.dtFrom != '0000-00-00' %]
-                    <span class="details-row">
-                        <span class="details-left">[% Lang.txt('Valid From') %]:</span>
-                        <span class="details-right">[% entity.dtFrom %]</span>
-                    </span>
-                [% END %]
-                [% IF entity.dtTo and entity.dtTo != '0000-00-00' %]
-                    <span class="details-row">
-                        <span class="details-left">[% Lang.txt('Valid To') %]:</span>
-                        <span class="details-right">[% entity.dtTo %]</span>
-                    </span>
-                [% END %]
+<h2 class="section-header">Registrations</h2>
+[% index = 0 %]
+<div class="panel-group" id="accordion">
+    <div class="panel panel-default">
+        [% FOREACH entity IN RegistrationInfo %]
+            [% index = index + 1 %]
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a href="#panel[% index %]" data-toggle="collapse" data-parent="#accordion">
+                    [% IF entity.strLocalName %]
+                       
+                            [% Lang.txt('Registrered To') %]
+                            [% entity.strLocalName %]
+                       
+                    [% END %]
+                    </a>
+                    <i class="indicator fa fa-chevron-right pull-right"></i>
+                </h4>
+            </div>
+            <div id="panel[% index %]" class="panel-collapse collapse">
+                <div class="panel-body">                    
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#doctab[% index %]">Documents</a></li>
+                        <li><a data-toggle="tab" href="#regtab[% index %]">Registration details</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        
+                        <div id="doctab[% index %]" class="tab-pane fade in active">
+                            <div class="documents-list">
+                                <table class="table" cellpadding="5" style="width:100%;">
+                                    <thead>
+                                        <tr class="document-table-header">
+                                            <th style="width: 70%">Document Type</th>
+                                            <th></th>
+                                            <th style="float:right">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+								
+									
+									[% FOREACH doc IN entity.documents %]	
+																
 
-                [% IF entity.renew_link %]
-                    <span class="details-row">
-                        <span class="details-left">&nbsp;</span>
-                        <span class="details-right"><a href="[% entity.renew_link %]">[% Lang.txt('Renew Registration') %]</a></span>
-                    </span>
-                [% END %]
-                    <span class="details-row"> <br></span>
-			[% END %]
-		</div>
-	</div>
+                                        <tr class="task-list">
+                                            <td>
+                                                <span class="detail-value">[%  doc.strDocumentName %]:</span>
+                                            </td>
+                                            <td class="status-col">
+                                                    <a href="[% url %]?client=[% client %]&amp;f=[% doc.intFileID %]" class="btn-inside-docs-panel">[% Lang.txt('View') %]</a>
+                                            </td>
+                                            <td class="status-col">
+											[% IF doc.strApprovalStatus == 'PENDING' %]
+                                                <i class="fa fa-circle ver-dots red"></i>
+                                                <span class="">Pending</span>
+											[% ELSE %]
+												 <i class="fa fa-circle ver-dots green"></i>
+                                                <span class="">Verified</span>
+											[% END %]
+											
+                                            </td>
+                                        </tr>
+									[% END %]
+
+
+
+
+
+                                        <!--
+                                        <tr class="task-list">
+                                            <td>
+                                                <span class="detail-value">Parental Content:</span>
+                                            </td>
+                                            <td class="status-col">
+                                                <a href="" class="btn-inside-docs-panel">View</a>
+                                                <i class="fa fa-circle ver-dots red"></i>
+                                                <span class="">Rejected</span>
+                                            </td>
+                                        </tr>
+                                        <tr class="task-list">
+                                            <td>
+                                                <span class="detail-value">Contract:</span>
+                                            </td>
+                                            <td class="status-col">
+                                                <a href="" class="btn-inside-docs-panel">View</a>
+                                                <i class="fa fa-circle ver-dots yellow"></i>
+                                                <span class="">Pending</span>
+                                            </td>
+                                        </tr>
+                                        <tr class="task-list">
+                                            <td >
+                                                <span class="detail-value">Signed Code of Conduct:</span>
+                                            </td>
+                                            <td class="status-col">
+                                                <a href="" class="btn-inside-docs-panel">View</a>
+                                                <i class="fa fa-circle ver-dots green"></i>
+                                                <span class="">Verified</span>
+                                            </td>
+                                        </tr>
+                                        <tr class="task-list">
+                                            <td>
+                                                <span class="detail-value">Medical Certificate:</span>
+                                            </td>
+                                            <td class="status-col">
+                                                <a href="" class="btn-inside-docs-panel">View</a>
+                                                <i class="fa fa-circle ver-dots green"></i>
+                                                <span class="">Verified</span>
+                                            </td>
+                                        </tr>
+                                        <tr class="task-list">
+                                            <td>
+                                                <span class="detail-value">NS Clearance:</span>
+                                            </td>
+                                            <td class="status-col">
+                                                <a href="" class="btn-inside-docs-panel">View</a>
+                                                <i class="fa fa-circle ver-dots green"></i>
+                                                <span class="">Verified</span>
+                                            </td>
+                                        </tr>
+                                        <tr class="task-list">
+                                            <td>
+                                                <span class="detail-value">Parental Content:</span>
+                                            </td>
+                                            <td class="status-col">
+                                                <a href="" class="btn-inside-docs-panel">View</a>
+                                                <i class="fa fa-circle ver-dots green"></i>
+                                                <span class="">Verified</span>
+                                            </td>
+                                        </tr>
+                                        -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="regtab[% index %]" class="tab-pane fade">
+                            [% IF entity.strLatinName %]
+                                <span class="details-row">
+                                    <span class="details-left">[% Lang.txt('Registrered To (International Name)') %]:</span>
+                                    <span class="details-left detail-value">[% entity.strLatinName %]</span>
+                                </div>
+                            [% END %]
+
+                            [% IF entity.intPaymentRequired %]
+                                <div class="">
+                                    [% Lang.txt('Payment Still Required') %]
+                                </div>
+                            [% END %]
+
+                            [% IF entity.strNationalPeriodName %]
+                                <span class="details-row">
+                                    <span class="details-left">[% Lang.txt('Registration Period') %]:</span>
+                                    <span class="details-left detail-value">[% entity.strNationalPeriodName %]</span>
+                                </span>
+                            [% END %]
+
+                            [% IF entity.RegistrationNature %]
+                                <span class="details-row">
+                                    <span class="details-left">[% Lang.txt('Registration Type') %]:</span>
+                                    <span class="details-left detail-value">[% entity.RegistrationNature %]</span>
+                                </span>
+                            [% END %]
+
+                            [% IF entity.Status %]
+                                <span class="details-row">
+                                    <span class="details-left">[% Lang.txt('Status') %]:</span>
+                                    <span class="details-left detail-value">[% entity.Status %]</span>
+                                </span>
+                            [% END %]
+
+                            [% IF entity.Sport %]
+                                <span class="details-row">
+                                    <span class="details-left">[% Lang.txt('Sport') %]:</span>
+                                    <span class="details-left detail-value">[% entity.Sport %]</span>
+                                </span>
+                            [% END %]
+
+                            [% IF entity.PersonType %]
+                                <span class="details-row">
+                                    <span class="details-left">[% Lang.txt('Type') %]:</span>
+                                    <span class="details-left detail-value">[% entity.PersonType %]</span>
+                                </span>
+                            [% END %]
+
+                            [% IF entity.PersonLevel %]
+                                <span class="details-row">
+                                    <span class="details-left">[% Lang.txt('Level') %]:</span>
+                                    <span class="details-left detail-value">[% entity.PersonLevel %]</span>
+                                </span>
+                            [% END %]
+
+                            [% IF entity.AgeLevel %]
+                                <span class="details-row">
+                                    <span class="details-left">[% Lang.txt('Age Level') %]:</span>
+                                    <span class="details-left detail-value">[% entity.AgeLevel %]</span>
+                                </span>
+                            [% END %]
+
+                            [% IF entity.dtFrom and entity.dtFrom != '0000-00-00' %]
+                                <span class="details-row">
+                                    <span class="details-left">[% Lang.txt('Valid From') %]:</span>
+                                    <span class="details-left detail-value">[% entity.dtFrom %]</span>
+                                </span>
+                            [% END %]
+
+                            [% IF entity.dtTo and entity.dtTo != '0000-00-00' %]
+                                <span class="details-row">
+                                    <span class="details-left">[% Lang.txt('Valid To') %]:</span>
+                                    <span class="details-left detail-value">[% entity.dtTo %]</span>
+                                </span>
+                            [% END %]
+
+                            [% IF entity.renew_link %]
+                                <div class="pull-right">
+                                    <span class=""><a class="btn-main" href="[% entity.renew_link %]">[% Lang.txt('Renew Registration') %]</a></span>
+                                </div>
+                            [% END %]
+                        </div>
+                    </div>
+                </div>
+            </div>
+        [% END %]
+    </div>
 </div>

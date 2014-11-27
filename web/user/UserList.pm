@@ -46,8 +46,6 @@ sub getAuthOrgListsData {
         }
     }
 
-use Data::Dumper;
-print STDERR Dumper(\%nodes);
 
     my $node_str = join( ',', keys %nodes );
     my %org_data = ();

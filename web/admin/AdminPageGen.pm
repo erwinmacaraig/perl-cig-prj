@@ -17,30 +17,35 @@ sub print_adminpageGen {
 	my($body,$page_title,$page_heading, $extra_ref)=@_;
 
 	my $otherevents=$extra_ref->{onload} || '';
-	print "Content-Type: text/html\n\n";
+	#print "Content-Type: text/html\n\n";
 	print qq[
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 	<html>
 	<head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<link rel="stylesheet" type="text/css" href="../css/style.css">
 	<link rel="stylesheet" type="text/css" href="adminstyle.css">
+	<link rel="stylesheet" type="text/css" href="../css/admin_styles.css">
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 			<script type="text/javascript" src="../js/chosen/chosen.jquery.min.js"></script>
+			<!--<script type="text/javascript" src="../js/jqModal.js"></script>-->
+			<script type="text/javascript" src="../js/product.js"></script>
 			<link rel="stylesheet" type="text/css" href="../js/chosen/chosen.css">
  <!--<script type="text/javascript" src="../js/ext-2.2/adapter/jquery/ext-jquery-adapter.js"></script>
     <script type="text/javascript" src="../js/ext-2.2/ext-all.js"></script>-->
  <script type="text/javascript" src="table2csv.js"></script>
 
-			<script type="text/javascript">
-Ext.onReady(function(){
-
-                        jQuery(".chzn-select").chosen({ disable_search_threshold: 5 });
-    });
+			
+			<!--Ext.onReady(function(){			
+			jQuery(".chzn-select").chosen({ disable_search_threshold: 5 });
+			});-->
 </script>
 	<title>$page_title</title>
 	</head>
 	<body>
+	<iframe id='ajaxframe' name='ajaxframe' style='display:none;height:10px;' src='javascript:false;'></iframe>
+	<span id='loading'>LOADING...</span>
 	$body
 	</body>
 </html>

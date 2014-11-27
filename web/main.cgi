@@ -139,7 +139,8 @@ sub main {
 
     if ( $action =~ /^E_/ ) {
         my $ID = getID( \%clientValues );
-        ( $resultHTML, $pageHeading ) = handleEntity( $action, \%Data, $ID, $typeID );
+        #( $resultHTML, $pageHeading ) = handleEntity( $action, \%Data, $ID, $typeID );
+        ( $resultHTML, $pageHeading ) = handleWorkflow($action, \%Data);
     }
     elsif ( $action =~ /^C_/ ) {
         my $clubID= getID($Data{'clientValues'},$Defs::LEVEL_CLUB); 
@@ -251,9 +252,9 @@ sub main {
     elsif ( $action =~ /^ERA_/ ) {
         ( $resultHTML, $pageHeading ) = handleEntityRegistrationAllowedEdit($action, \%Data);
     }
-    elsif ( $action =~ /^PREGF_/ ) {
-        ( $resultHTML, $pageHeading ) = handleRegistrationFlowBackend($action, \%Data);
-    }
+    #elsif ( $action =~ /^PREGF_/ ) {
+    #    ( $resultHTML, $pageHeading ) = handleRegistrationFlowBackend($action, \%Data);
+    #}
     elsif ( $action =~ /^PREGFB_/ ) {
         ( $resultHTML, $pageHeading ) = handleRegistrationFlowBulk($action, \%Data);
     }
@@ -270,6 +271,15 @@ use PersonFlow;
     elsif ( $action =~ /^PRA_/) {
         ($resultHTML, $pageHeading) = handlePersonRequest($action, \%Data);
     }
+    elsif($action =~ /^INITSRCH_/){
+        use Search::Handler;
+        ($resultHTML, $pageHeading) = Search::Handler::handle($action, \%Data, 1);
+    }
+	elsif($action =~ /^TXN_PAY_INV/){
+		use PayInvoice;
+		my $clubID = getID($Data{'clientValues'},$Defs::LEVEL_CLUB); 
+		($resultHTML, $pageHeading) = PayInvoice::handlePayInvoice($action, \%Data, $clubID);				
+	}
     
    
     # BUILD PAGE
@@ -295,8 +305,9 @@ use PersonFlow;
 
 sub defaultAction {
     my ($level) = @_;
-    return 'C_HOME'  if $level == $Defs::LEVEL_CLUB;
-    return 'E_HOME';
+    #return 'C_HOME'  if $level == $Defs::LEVEL_CLUB;
+    #return 'E_HOME';
+    return 'WF_';
 }
 
 sub logPageData {

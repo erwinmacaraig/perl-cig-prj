@@ -25,14 +25,14 @@ use MCache;
 sub login	{
 	my (
 		$Data,
-		$email,
+		$username,
 		$password,
 	) = @_;
 
 	my $l = $Data->{'lang'};
     my @errors = ();
-	if(!$email)	{
-		push @errors, $l->txt('You must enter an email address');
+	if(!$username)	{
+		push @errors, $l->txt('You must enter an username address');
 	}
 	if(!$password)	{
 		push @errors, $l->txt('You must enter a password');
@@ -51,10 +51,10 @@ sub login	{
 				tblUserHash
 				ON tblUserHash.userId = tblUser.userId
 		WHERE 
-			email = ?
+			username = ?
 	];
 	my $q = $Data->{'db'}->prepare($st);
-	$q->execute($email);
+	$q->execute($username);
 	my($userID, $passwordHash) = $q->fetchrow_array();
 	$q->finish();
 	if($userID)	{
@@ -91,11 +91,11 @@ sub verify_login {
 	$userObj->load();
     my $msg = '';
 	my $status = $userObj->Status();
-	$msg = user_notconfirmed($Data, $userObj) 
-		if $status == $Defs::USER_STATUS_NOTCONFIRMED;
+	#$msg = user_notconfirmed($Data, $userObj) 
+		#if $status == $Defs::USER_STATUS_NOTCONFIRMED;
 	$msg = user_suspended($Data, $userObj) 
 		if $status == $Defs::USER_STATUS_SUSPENDED;
-	$msg = user_emailsuspended($Data, $userObj) 
+	$msg = user_usernamesuspended($Data, $userObj) 
 		if $status == $Defs::USER_STATUS_EMAILSUSPENDED;
 	$msg = user_deleted($Data, $userObj) 
 		if $status == $Defs::USER_STATUS_DELETED;
@@ -121,7 +121,7 @@ sub verify_login {
             return $session->key();
 		}
 		else	{
-			push @{$errors}, $l->txt("Invalid Email/Password");
+			push @{$errors}, $l->txt("Invalid Username & Password");
 		}
 	}
 	else	{
@@ -152,14 +152,14 @@ sub user_suspended{
 	return $body;
 }
 
-sub user_emailsuspended{
+sub user_usernamesuspended{
 	my(
 		$Data,
 		$UserObj,
 
 	) = @_;
 
-	my $body = $Data->{'lang'}->txt('Your user account is currently suspended because your email address is incorrect.');
+	my $body = $Data->{'lang'}->txt('Your user account is currently suspended because your username address is incorrect.');
 	return $body;
 }
 

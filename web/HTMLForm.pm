@@ -319,7 +319,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
           )
         {
             $sections{$sname} .= qq[
-            <tr class="$row_class" id = "l_row_$fieldname"><td class="label HTvertform-l" colspan="2">$label</td></tr>
+            <tr class="$row_class" id = "l_row_$fieldname"><td class="label HTvertform-l" colspan="2">$label 1</td></tr>
             <tr><td class="value HTvertform-v" colspan="3">$pretext$field_html$posttext</td> </tr>
             ];
         }
@@ -328,10 +328,10 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
             my $rowcount =
               ( $sectioncount{$sname} % 2 ) ? 'HTr_odd' : 'HTr_even';
             $sections{$sname} .= qq[
-            <tr class="$rowcount $row_class" id = "l_row_$fieldname">
-            <td class="label">$label</td>
-            <td class="value">$pretext$field_html$posttext</td>
-            </tr>
+            <div id="l_row_$fieldname" class="form-group">
+                <label class="col-md-4 control-label">$label</label>
+                <div class="col-md-8">$pretext$field_html$posttext</div>
+            </div>
             ];
         }
     }
@@ -351,15 +351,16 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 #my $style=$s ? 'style="display:none;" ' : '';
                 my $sh = q{};
                 if ( $s->[1] ) {
-                    $sh = qq[ <tr><th colspan="2" class="sectionheader">$sectionheader</th></tr>];
+                    $sh = qq[ <p class="sectionheader">$sectionheader</p>];
                 }
                 $tabs .= qq[<li><a id="a_sec$s->[0]" class="tab_links" href="#sec$s->[0]">$sectionheader</a></li>];
 
                 $returnstr .= qq~
-                <tbody id="sec$s->[0]" class="new_tab">
+                <div class="col-md-12"><fieldset id="sec$s->[0]" class="new_tab member-home-page">
                 $sh
                 $sections{$s->[0]}
-                </tbody>
+                </fieldset>
+                </div>
                 ~;
             }
         }
@@ -371,11 +372,10 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
       ? $fields_ref->{'options'}{'pre_button_bottomtext'}
       : '';
     $returnstr = qq[ 
-    <table cellpadding="2" cellspacing="0" border="0" $tableinfo>
     $returnstr
-    <tr><td colspan="2">$pre_button_bottom</td></tr>
-    </table>
-    ];
+    $pre_button_bottom
+    ];    
+
     if ($returnstr) {
         my $buttons = '';
         if (    $fields_ref->{'options'}{'submitlabelnondisable'}
@@ -409,7 +409,7 @@ qq[ <input type="reset" name="resbut" value="$txt" class="HF_reset button cancel
         if ( $introtext eq 'auto' ) {
             my $auto = langlookup( $fields_ref, 'AUTO_INTROTEXT',
                 $fields_ref->{'options'}{'submitlabel'}, $compulsory );
-            $introtext = qq[ <p class="introtext">$auto</p> ];
+            $introtext = qq[ <p class="introtext txtleft">$auto</p> ];
         }
 
         $introtext = '' if $action eq 'display';
@@ -456,14 +456,19 @@ qq[<input type="hidden" name="$cf" value="$fields_ref->{'carryfields'}{$cf}">];
         $returnstr = qq[
         $validation
         <form action="$fields_ref->{'options'}{'target'}" name="$fields_ref->{'options'}{'formname'}" method="POST" $enctype id = "$fields_ref->{'options'}{'formname'}ID">
-        $introtext
+        <div class="col-md-12">$introtext</div>
+        <div class="col-md-12 txtright">
         $button_top
+        </div>
         $returnstr
+        <div class="col-md-12 txtright">
         $button_bottom
         <input type="hidden" name="HF_oldact" value="$oldaction">
         <input type="hidden" name="HF_subbutact" value="$subbutact">
         $carryfields
         $bottomtext
+        </div>
+
         </form>
 
         <script type="text/javascript" src="js/ajax.js"></script>
@@ -1646,7 +1651,7 @@ sub generate_clientside_validation {
             validClass: "form_field_valid",
             invalidHandler: function(e, validator){
                 if(validator.errorList.length){
-                    var tabname = jQuery(validator.errorList[0].element).closest(".$tab_class").attr('id');
+                    var tabname = \$(validator.errorList[0].element).closest(".$tab_class").attr('id');
                     
                     if ( '$tab_style' == 'ui-tabs' ){
                         // Using divs and jquery tabs
@@ -1655,10 +1660,10 @@ sub generate_clientside_validation {
                     }
                     else if ('$tab_style' == 'tables'){
                         // Using html forms tables and black magic
-                        jQuery('.tab_links').removeClass('active');
-                        jQuery('#a_' + tabname ).addClass('active');
-                        jQuery('.$tab_class').hide();
-                        jQuery('#' + tabname ).show(); 
+                        \$('.tab_links').removeClass('active');
+                        \$('#a_' + tabname ).addClass('active');
+                        \$('.$tab_class').hide();
+                        \$('#' + tabname ).show(); 
                         
                     }
                     //alert("Got invalid input on tab " + tabname);
@@ -1669,9 +1674,9 @@ sub generate_clientside_validation {
         return qq[
         <script src = "//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
         <script type="text/javascript">
-        jQuery().ready(function() {
+        \$(document).ready(function() {
                 // validate the comment form when it is submitted
-                jQuery("#$fields_ref->{'options'}{'formname'}$form_suffix").validate($val_rules);
+                \$("#$fields_ref->{'options'}{'formname'}$form_suffix").validate($val_rules);
             });
         </script>
         ];

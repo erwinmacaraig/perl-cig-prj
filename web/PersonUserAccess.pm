@@ -11,6 +11,7 @@ use lib ".", "..";
 use strict;
 use Reg_common;
 use Utils;
+use Data::Dumper;
 
 # This job of this module is to work out whether a particular logged in user 
 # has access to a person's details
@@ -41,6 +42,9 @@ sub doesUserHaveAccess  {
             P.intPersonID,
             P.strStatus,
             PR.strPersonLevel,
+            PREQ.intPersonID,
+            PREQ.intRequestFromEntityID,
+            PREQ.intPersonRequestID,
             IF(PR.strPersonLevel = 'PROFESSIONAL', 3, IF(PR.strPersonLevel = 'AMATEUR', 2, 1)) as personLevelWeight
         FROM
             tblPerson P
@@ -49,19 +53,16 @@ sub doesUserHaveAccess  {
                     PR.intPersonID = P.intPersonID
                     AND PR.intRealmID = P.intRealmID
                     AND PR.strStatus IN ('ACTIVE', 'PASSIVE','PENDING')
-                    AND (
-                        (strPersonType = 'PLAYER' and strSport = 'FOOTBALL')
-                        OR
-                        (strPersonType != 'PLAYER' or strSport != 'FOOTBALL')
-                    )
+                )
+            LEFT JOIN tblPersonRequest PREQ
+                ON (
+                    PREQ.intPersonID = P.intPersonID
+                    AND PREQ.strRequestResponse = 'ACCEPTED'
                 )
         WHERE
             P.intRealmID = ?
             AND P.intPersonID = ?
             AND P.strStatus IN ('REGISTERED', 'PASSIVE','PENDING','INPROGRESS')
-        ORDER BY
-            CASE WHEN PR.strPersonType = 'PLAYER' AND PR.strSport = 'FOOTBALL' THEN personLevelWeight END desc,
-            CASE WHEN PR.strPersonType != 'PLAYER' AND PR.strSport != 'FOOTBALL' THEN PR.dtAdded END asc
     ];
 
     my $db = $Data->{'db'};
@@ -80,7 +81,9 @@ sub doesUserHaveAccess  {
             return 1;
         }
         $entities{'WRITE'}{$dref->{'intEntityID'}} = 1 if $count == 1;
+        $entities{'WRITE'}{$dref->{'intRequestFromEntityID'}} = 1 if $count > 1;
         $entities{'READ'}{$dref->{'intEntityID'}} = 1;
+        $entities{'READ'}{$dref->{'intRequestFromEntityID'}} = 1;
         $count++;
     }
 

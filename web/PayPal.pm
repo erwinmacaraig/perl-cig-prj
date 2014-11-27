@@ -33,6 +33,7 @@ sub payPalProcess	{
 
     my $returnPayPalURL = $Defs::base_url . $paymentSettings->{'gatewayReturnURL'} . qq[&amp;ci=$logID&client=$client]; ##$Defs::paypal_RETURN_URL
     my $cancelPayPalURL = $Defs::base_url . $paymentSettings->{'gatewayCancelURL'} . qq[&amp;ci=$logID&client=$client]; ##$Defs::paypal_CANCEL_URL
+print STDERR "CANCEL FOR PAYPAL $cancelPayPalURL\n\n";
 
 	my $m = new MD5;
     $m->reset();
@@ -258,11 +259,9 @@ print STDERR "LOGID: $logID PP2: $key | $val\n";
 	if ($returnvals{'ResponseCode'} eq 'OK')	{	
 		UpdateCart($Data, $paymentSettings, $client, undef, undef, $logID);
 print STDERR "paypal CART DONE ABOUT TO EMAIL FOR $logID\n";
-#		$itemData = finalize_registration($Data,$logID);
         	EmailPaymentConfirmation($Data, $paymentSettings, $logID, $client);
         	product_apply_transaction($Data,$logID);
 		
-		#$itemData = finalize_registration($Data,$logID);
 		
 		
 		if (1==2 and $external and $paymentSettings->{'return_url'})	{
@@ -286,109 +285,6 @@ print STDERR "paypal CART DONE ABOUT TO EMAIL FOR $logID\n";
 
 # This function will run after payment is successfully finished, it will check to see if compulsory payment is set for 
 # rego form. if so means we have a temp member in tblTempMember thats needs to be added to real DB and all the post add scripts needs to be run aswell.
-
-sub finalize_registration {
-    my($Data , $logID) = @_;
-    my $db = $Data->{'db'};
-    my $formID = $Data->{'formID'} || 0;
-    my $session = $Data->{'sessionKey'};
-    my $compulsoryPay = $Data->{'CompulsoryPayment'} || 0;
-    my $intRealID;
-    my $realm = $Data->{'Realm'}; 
-    my %item_Data;
-    if(!$compulsoryPay or $Data->{'SystemConfig'}{'NotUseCompulsoryPay'}){
-        return q{};
-    }
-    if(! $formID ){
-        return 0;
-    }
-    $Data->{'RegoFormID'} =$formID;
-    if($compulsoryPay) {# only if compulsory payment is set and NotUseCompulsoryPay is not set we have a temp member and need to enter member in real DB
-        warn "Fariba:finalize_registration/Paypal REALM: $realm , formID:$formID, logID:$logID,session:$session , Compulsory:: $compulsoryPay";
-
-	    my $st = qq[
-		    SELECT
-	    		intTempMemberID,strTransactions,intAssocID,intClubID
-		    FROM
-		    	tblTempMember
-		    WHERE
-			    strSessionKey =?
-                AND intTransLogID = ?
-		    ];
-	my $qry = $db->prepare($st) or query_error($st);
-	$qry->execute($session, $logID);
-    
-	my $cgi = new CGI;
-
-	my $st_update_temp = qq[
-				UPDATE
-				    tblTempMember
-				SET 
-				    intRealID = ?,
-				    intStatus = ?
-				 WHERE 
-                     intTransLogID = ?
-                    AND
-				    intTempMemberID =?        
-				];
-	my $st_update_session = qq[
-				UPDATE
-				    tblRegoFormSession
-				SET 
-				    intMemberID = ?
-				 WHERE 
-				    intTempID =?        
-				];			    
-	my $action = 'add';
-    my %rego_form_cache;
-	while (my $dref = $qry->fetchrow_hashref()) {
-		my $intTempID = $dref->{'intTempMemberID'};
-	    my $assocID = $dref->{'intAssocID'};
-        my $clubID = $dref->{'intClubID'};
-        $Data->{'spAssocID'} = $assocID;
-        $Data->{'spClubID'} = $clubID;
-        my $formObj;
-        if ( defined $rego_form_cache{$assocID}{$clubID}){
-            $formObj = $rego_form_cache{$assocID}{$clubID};
-        }
-        else{
-            $formObj = getRegoFormObj(
-                    $formID,
-                    $Data,
-                    $Data->{'db'},
-                );
-            $rego_form_cache{$assocID}{$clubID} = $formObj;
-       }
-        my $form_entity_type = $formObj->FormEntityType();
-	
-		#Add Member
-		($intRealID,undef) =  ($form_entity_type eq 'Member') ? rego_addRealMember($Data,$db,$intTempID,$session, $formObj) : (0,0);
-        warn "paypal::CompulsoryPayment: RealID:: $intRealID";
-		my $st_update = qq[
-					UPDATE tblTransactions
-					SET
-					    intID = ?
-					WHERE 
-					    intTempID = ? 
-					];
-		# update transaction table 
-		my $update_qry = $db->prepare($st_update) or query_error($st_update);
-		$update_qry->execute($intRealID,$intTempID);
-		
-		# keepp  the RealID and intTransLogID  in temp table 
-		$update_qry = $db->prepare($st_update_temp) or query_error($st_update_temp);
-		
-		$update_qry->execute($intRealID,1,$logID,$intTempID);
-		
-		$update_qry = $db->prepare($st_update_session) or query_error($st_update_session);
-		$update_qry->execute($intRealID,$intTempID);
-		
-	    }
- 
-    }# end if compulsory
-    return \%item_Data;
-}
-
 
 sub payPalCheckTXN {
 

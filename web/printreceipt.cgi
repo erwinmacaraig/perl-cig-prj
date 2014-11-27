@@ -28,6 +28,7 @@ sub main	{
 	my $action = param('a') || '';
 	my $client = param('client') || '';
 	my $txlogIDs= param('ids') || '';
+	my $personID = param('pID') || '';
 
 	my %clientValues = getClient($client);
 	my %Data=();
@@ -75,19 +76,28 @@ sub main	{
 				INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLog.intTXNID)
 				LEFT JOIN tblPerson as M ON (M.intPersonID= T.intID and T.intTableType=$Defs::LEVEL_MEMBER)
 				LEFT JOIN tblEntity as Entity on (Entity.intEntityID= T.intID and T.intTableType=$Defs::LEVEL_CLUB)
-			WHERE intLogID  IN (?)
+			WHERE intLogID  IN (?) AND T.intID = ? 
 				AND T.intRealmID = ?
 		];
 		my $q= $db->prepare($st);
 		$q->execute(
 			$txlogIDs,
-			$Data{'Realm'},
+			$personID,
+			$Data{'Realm'},		
 		);
-
 		while(my $field=$q->fetchrow_hashref())	{
-			foreach my $key (keys %{$field})  { if(!defined $field->{$key}) {$field->{$key}='';} }
+			foreach my $key (keys %{$field})  { 
+				if(!defined $field->{$key}) {
+					$field->{$key}='';
+				}
+													
+
+			}
+			
 			$field->{'PaymentType'} = $Defs::paymentTypes{$field->{'intPaymentType'}} || '';
-			$receiptData{$field->{'intLogID'}}{'Info'} = $field;
+		    $receiptData{$field->{'intLogID'}}{'Info'} = $field;
+
+			
 		}
 		$q->finish();
 
@@ -99,24 +109,30 @@ sub main	{
 				P.strName, 
 				P.strGroup,
                 T.intQty,
-                T.curAmount
+                T.curAmount,
+				strInvoiceNumber
 			FROM tblTransactions as T
 				LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_MEMBER)
 				LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
 				LEFT JOIN tblEntity as E on (E.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB) 
-			 WHERE intTransLogID IN (?) 
-                        
+				LEFT JOIN tblInvoice ON T.intInvoiceID = tblInvoice.intInvoiceID
+			 WHERE intTransLogID IN (?) AND T.intID = ?                        
 			AND T.intRealmID = ?
 		]; 
-               	my $qry_trans = $db->prepare($st_trans);
-                $qry_trans->execute(
+			open FH, ">dumpfile.txt";
+			print FH "\ntxlogIDs = $txlogIDs\npersonID = $personID\n";
+           	my $qry_trans = $db->prepare($st_trans);
+            $qry_trans->execute(
 			$txlogIDs,
+			$personID,
 			$Data{'Realm'},
 		);
 		while(my $field=$qry_trans->fetchrow_hashref())	{
-			foreach my $key (keys %{$field})  { if(!defined $field->{$key}) {$field->{$key}='';} }
-			$field->{'InvoiceNo'} = Payments::TXNtoInvoiceNum($field->{intTransactionID});
+			foreach my $key (keys %{$field})  { if(!defined $field->{$key}) {$field->{$key}='';}}
+			#$field->{'InvoiceNo'} = Payments::TXNtoTXNNumber($field->{intTransactionID});
+			$field->{'InvoiceNo'} = $field->{'strInvoiceNumber'};
 			push @{$receiptData{$field->{'intTransLogID'}}{'Items'}}, $field;
+		
 		}
 		$qry_trans->finish();
 
@@ -133,7 +149,7 @@ sub main	{
                 $handle->execute($Data{clientValues}{regionID}, $Data{clientValues}{clubID}); 
                 my $handle_ref = $handle->fetchrow_hashref();
                 push @{$ContentData{'OtherInfo'}}, $handle_ref;
-	        # print FH "\n ****** ======= \n**\n ContentData: " . Dumper(%ContentData) . "\n==========\n";
+
 	
                 $resultHTML = runTemplate(
 			\%Data, 

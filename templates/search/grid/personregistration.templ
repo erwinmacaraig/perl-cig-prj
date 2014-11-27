@@ -1,0 +1,60 @@
+[% USE Dumper %]
+<div class="col-md-12 tasklist-content dashboard-tasklist search-panel">
+	<table cellpadding="5" style="width: 100%">
+		<thead>
+			<tr class="box-header">
+				<th>MA ID</th>
+				<th>Name</th>
+				<th>Date of Birth</th>
+				<th>Role</th>
+				<th>&nbsp;</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Filter by:
+					<select class="filter-tasks">
+			          <option selected="" value="-- MA ID --">-- MA ID --</option>
+			          <option value="az">Name A-Z</option>
+			          <option value="za">Name Z-A</option>
+			        </select>
+		        </td>
+				<td>
+					<select class="filter-tasks">
+			          <option selected="" value="-- Task --">-- Name --</option>
+			          <option value="az">Name A-Z</option>
+			          <option value="za">Name Z-A</option>
+			        </select>
+		        </td>
+				<td>
+					<select>
+			          <option value="-- Date of Birth --">-- Date of Birth --</option>
+			          <option value="Latest">Latest</option>
+			          <option value="Oldest">Oldest</option>
+			        </select>
+				</td>
+				<td>
+                    <!-- should be dynamically populated based on search result -->
+					<select>
+			          <option value="-- Type --">-- Role --</option>
+			          <option value="Pending">Player</option>
+			          <option value="In Progress">Coach</option>
+			          <option value="In Progress">Official</option>
+			        </select>
+				</td>
+				<td></td>
+			</tr>
+		    [% FOREACH rego IN RegoList %]
+                <tr class="task-list">
+                    <td><span class="fa fa-user"></span>[% rego.ma_id %]</td>
+                    <td>[% rego.name %]</td>
+                    <td>[% rego.dob %]</td>
+                    <td><span class="fa fa-clock-o"></span>[% rego.role %]</td>
+                    <td><a href="[% rego.link %]" class="btn-inside-panels">View</a></td>
+                </tr>
+		    [% END %]
+		</tbody>
+	</table>
+</div>
+
+

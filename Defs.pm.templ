@@ -54,7 +54,7 @@ $duplicate_url = 'http://emacaraig.spildevel/FIFASPOnline/web'; ##CONFIG
 $sync_logs = 'http://emacaraig.spildevel/FIFASPOnline/sync/logs'; ##CONFIG
 $helpurl='http://support.sportingpulse.com';
 $sitename="SportingPulse";
-$page_title='Sportzware Membership';
+$page_title='FIFA Connect';
 
 $admin_email_name="Admin";
 $admin_email='warren@sportingpulse.com';
@@ -123,12 +123,14 @@ $WF_TASK_STATUS_PENDING= 'PENDING';
 $WF_TASK_STATUS_ACTIVE= 'ACTIVE';
 $WF_TASK_STATUS_COMPLETE= 'COMPLETE';
 $WF_TASK_STATUS_REJECTED= 'REJECTED';
+$WF_TASK_STATUS_HOLD= 'HOLD';
 
 %wfTaskStatus= (
     $WF_TASK_STATUS_PENDING=> 'Pending',
     $WF_TASK_STATUS_ACTIVE=> 'Active',
     $WF_TASK_STATUS_COMPLETE=> 'Complete',
     $WF_TASK_STATUS_REJECTED=> 'Rejected',
+    $WF_TASK_STATUS_HOLD=> 'On hold',
 );
 
 $WF_TASK_ACTION_REJECT = "REJECT";
@@ -595,6 +597,15 @@ $CLUB_LEVEL_CLEARANCE=1;
 $ASSOC_LEVEL_CLEARANCE=2;
 $NODE_LEVEL_CLEARANCE=3;
 
+%DisplayEntityLevelNames = (
+  $LEVEL_NONE => 'None',
+  $LEVEL_CLUB => 'Club',
+  $LEVEL_ZONE => 'Zone',
+  $LEVEL_REGION => 'Region',
+  $LEVEL_STATE => 'State',
+  $LEVEL_NATIONAL => 'National',
+);
+
 %LevelNames = (
   $LEVEL_NONE => 'None',
   $LEVEL_PERSON=> 'Person',
@@ -900,6 +911,16 @@ $PERSON_REQUEST_STATUS_PENDING = "PENDING";
 $PERSON_REQUEST_STATUS_ACTIVE = "ACTIVE";
 $PERSON_REQUEST_STATUS_COMPLETED = "COMPLETED";
 $PERSON_REQUEST_STATUS_DENIED = "DENIED";
+$PERSON_REQUEST_STATUS_ACCEPTED = "ACCEPTED";
+
+%personRequestStatus= (
+    $PERSON_REQUEST_STATUS_INPROGRESS => "In Progress",
+    $PERSON_REQUEST_STATUS_PENDING => "Pending",
+    $PERSON_REQUEST_STATUS_ACTIVE => "Active",
+    $PERSON_REQUEST_STATUS_COMPLETED => "Completed",
+    $PERSON_REQUEST_STATUS_DENIED => "Denied",
+    $PERSON_REQUEST_STATUS_ACCEPTED => "Accepted",
+);
 
 # WF RULE FOR
 

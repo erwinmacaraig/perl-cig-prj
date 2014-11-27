@@ -32,7 +32,7 @@ use Data::Dumper;
 
 sub bulkPersonRollover {
     my($Data, $nextAction, $bulk_ref, $hidden_ref, $countOnly) = @_;
-    open(FH,">$Defs::myerrorfile");
+    
     my $body = '';
     my $client = setClient($Data->{'clientValues'});
     my $realmID = $Data->{'Realm'};
@@ -80,32 +80,40 @@ sub bulkPersonRollover {
                 AND PR.strPersonType = ?
                 AND PR.strPersonLevel= ?
                 AND PR.strPersonEntityRole= ?
-                AND PR.strAgeLevel= ?
-                AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
+                AND PR.strStatus IN ("$Defs::PERSONREGO_STATUS_ACTIVE", "$Defs::PERSONREGO_STATUS_PASSIVE")
                 AND PR.intEntityID = ?
                 AND PR.intNationalPeriodID <> ?
+                AND PR.strAgeLevel = ?
+            )
+            LEFT JOIN tblPersonRegistration_$realmID as PRto ON (
+                PRto.intPersonID = P.intPersonID
+                AND PRto.strPersonType = PR.strPersonType
+                AND PRto.strPersonLevel= PR.strPersonLevel
+                AND PRto.strPersonEntityRole= PR.strPersonEntityRole
+                AND PRto.strStatus IN ("$Defs::PERSONREGO_STATUS_ACTIVE", "$Defs::PERSONREGO_STATUS_PASSIVE", "$Defs::PERSONREGO_STATUS_PENDING")
+                AND PRto.intEntityID = PR.intEntityID
+                AND PRto.intNationalPeriodID = ?
             )
         WHERE 
-            P.strStatus NOT IN ('DELETED', 'SUSPENDED')
-            AND P.strStatus IN ('REGISTERED')
+            P.strStatus NOT IN ("$Defs::PERSON_STATUS_DELETED", "$Defs::PERSON_STATUS_SUSPENDED")
+            AND P.strStatus IN ("$Defs::PERSON_STATUS_REGISTERED")
             AND P.intRealmID = ?
+            AND PRto.intPersonRegistrationID IS NULL
         ORDER BY strLocalSurname, strLocalFirstname
     ];
 
-    print FH "QUERY: " . $st . "\n\n"; 
 
     my @values=(
         $bulk_ref->{'personType'} || '',
         $bulk_ref->{'personLevel'} || '',
         $bulk_ref->{'personEntityRole'} || '',
-        $bulk_ref->{'ageLevel'} || '',
-        #$bulk_ref->{'registrationNature'} || '',
         $bulk_ref->{'entityID'} || '',
+        $bulk_ref->{'nationalPeriodID'} || '',
+        $bulk_ref->{'ageLevel'} || '',
         $bulk_ref->{'nationalPeriodID'} || '',
         $realmID
     );
 
-    print FH "Dumper: " .  Dumper(@values) . "\n\n";
 
     
     my $q = $Data->{'db'}->prepare($st);

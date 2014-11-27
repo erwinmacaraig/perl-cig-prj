@@ -46,8 +46,6 @@ sub handleClub  {
   my $clubName=
   my $title='';
   $typeID=$Defs::LEVEL_CLUB if $typeID==$Defs::LEVEL_NONE;
-    print STDERR "AAAA" . $Data->{'clientValues'}{'clubID'};
-print STDERR "CCCCCC:$clubID $parentID";
   if ($action =~/^C_DTA/) {
         ($resultHTML,$title) = handleClubFlow($action, $Data);
   }
@@ -85,12 +83,7 @@ sub club_details  {
   my ($action, $Data, $clubID)=@_;
 
 
-print STDERR "SSSS$action $clubID\n";
-
-
-
   my $field=loadClubDetails($Data->{'db'}, $clubID,$Data->{'clientValues'}{'assocID'}) || ();
-  print STDERR Dumper $field;
   my $client=setClient($Data->{'clientValues'}) || '';
 
   #my $allowedit =( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
@@ -105,7 +98,7 @@ print STDERR "SSSS$action $clubID\n";
    $option='add' if $action eq 'C_DTA' and allowedAction($Data, 'c_a')  && $allowadd;
    $clubID=0 if $option eq 'add';
 
-  my $club_chars = getClubCharacteristicsBlock($Data, $clubID) || '';
+  my $club_chars = ''; #getClubCharacteristicsBlock($Data, $clubID) || '';
 
   my $field_case_rules = get_field_case_rules({dbh=>$Data->{'db'}, client=>$client, type=>'Club'});
 
@@ -218,7 +211,7 @@ print STDERR "SSSS$action $clubID\n";
 
       },
       strLocalName => {
-        label => 'Name',
+        label => 'Organisation Name',
         value => $field->{strLocalName},
         type  => 'text',
         size  => '40',
@@ -226,28 +219,28 @@ print STDERR "SSSS$action $clubID\n";
         compulsory => 1,
       },
       strLocalShortName => {
-        label => 'Short Name',
+        label => 'Organisation Short Name',
         value => $field->{strLocalShortName},
         type  => 'text',
         size  => '30',
         maxsize => '50',
       },
       strLatinName => {
-        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'International Name' : '',
+        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'International Organisation Name' : '',
         value => $field->{strLatinName},
         type  => 'text',
         size  => '40',
         maxsize => '150',
       },
       strLatinShortName => {
-        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'International Short Name' : '',
+        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'International Organisation Short Name' : '',
         value => $field->{strLatinShortName},
         type  => 'text',
         size  => '30',
         maxsize => '50',
       },
       strMAID => {
-      	label => 'MA ID',
+      	label => 'MA Organisation ID',
       	value => $field->{strMAID},
       	type => 'text',
       	size => '30',
@@ -255,7 +248,7 @@ print STDERR "SSSS$action $clubID\n";
         compulsory => 1,
       },
       dtFrom => {
-        label       => 'Foundation Date',
+        label       => 'Organisation Foundation Date',
         value       => $field->{dtFrom},
         type        => 'date',
         datetype    => 'dropdown',
@@ -264,7 +257,7 @@ print STDERR "SSSS$action $clubID\n";
         compulsory => 1,
       },
       dtTo => {
-        label       => 'Dissolution Date',
+        label       => 'Organisation Dissolution Date',
         value       => $field->{dtTo},
         type        => 'date',
         datetype    => 'dropdown',
@@ -287,7 +280,7 @@ print STDERR "SSSS$action $clubID\n";
          firstoption => [ '', 'Select Type' ],
       },
       intLegalTypeID => {
-        label => "Legal Entity Type",
+        label => "Type of Legal Entity",
         value => $field->{intLegalTypeID},
         type => 'lookup',
         options => \%legalTypeOptions,
@@ -295,7 +288,7 @@ print STDERR "SSSS$action $clubID\n";
         readonly =>($Data->{'clientValues'}{authLevel} < $Defs::LEVEL_NATIONAL),       
      },
      strLegalID => {
-        label => "Legal Type Number",
+        label => "Legal Type Identification Number",
         value => $field->{strLegalID},
         type  => 'text',
         size  => '30',
@@ -319,7 +312,7 @@ print STDERR "SSSS$action $clubID\n";
           noadd         => 1,
      },
       strContact => {
-        label => '',
+        label => 'Contact Person',
         value => $field->{strContact},
         type  => 'text',
         size  => '30',
@@ -332,32 +325,58 @@ print STDERR "SSSS$action $clubID\n";
         size  => '30',
         maxsize => '50',
       },
-      strContactEmail => {
-        label => '',
-        value => $field->{strContactEmail},
-        type  => 'text',
-        size  => '30',
-        maxsize => '250',
-        validate => 'EMAIL',
-      },
-      strContactPhone => {
-        label => '',
-        value => $field->{strContactPhone},
-        type  => 'text',
-        size  => '30',
-        maxsize => '50',
-      },
-
+        
       strAddress => {
-        label => 'Address',
+        label => 'Address 1',
         value => $field->{strAddress},
         type  => 'text',
         size  => '40',
         maxsize => '50',
         compulsory => 1,
       },
+    strAddress2=> {
+        label => 'Address 2',
+        value => $field->{strAddress2},
+        type  => 'text',
+        size  => '40',
+        maxsize => '50',
+        compulsory => 1,
+      },
+      strContactISOCountry => {
+          label       => 'Country of Address',
+          value       => $field->{strContactISOCountry} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
+          type        => 'lookup',
+          options     => \%Mcountriesonly,
+          firstoption => [ '', 'Select Country' ],
+        compulsory => 1,
+      },
+      strContactCity=> {
+        label => 'City',
+        value => $field->{strContactCity},
+        type  => 'text',
+        size  => '40',
+        maxsize => '50',
+        compulsory => 1,
+      },
+
+      strCity=> {
+        label => 'City of Organisation',
+        value => $field->{strCity},
+        type  => 'text',
+        size  => '40',
+        maxsize => '50',
+        compulsory => 1,
+      },
+      strState => {
+        label => 'State of Organisation',
+        value => $field->{strState},
+        type  => 'text',
+        size  => '30',
+        maxsize => '50',
+        compulsory => 1,
+      },
       strTown => {
-        label => 'Town',
+        label => 'Town of Organisation',
         value => $field->{strTown},
         type  => 'text',
         size  => '30',
@@ -365,14 +384,14 @@ print STDERR "SSSS$action $clubID\n";
         compulsory => 1,
       },
       strRegion => {
-        label => 'Region',
+        label => 'Region of Organisation',
         value => $field->{strRegion},
         type  => 'text',
         size  => '30',
         maxsize => '50',
       },
       strISOCountry => {
-          label       => 'ISO Country',
+          label       => 'Country of Organisation',
           value       => $field->{strISOCountry} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
           type        => 'lookup',
           options     => \%Mcountriesonly,
@@ -389,14 +408,14 @@ print STDERR "SSSS$action $clubID\n";
           posttext => $nonlatinscript,
       },
       strPostalCode => {
-        label => 'Postal Code',
+        label => 'Postcode',
         value => $field->{strPostalCode},
         type  => 'text',
         size  => '15',
         maxsize => '15',
       },
       strPhone => {
-        label => '',
+        label => 'Contact Number',
         value => $field->{strPhone},
         type  => 'text',
         size  => '20',
@@ -410,7 +429,7 @@ print STDERR "SSSS$action $clubID\n";
         maxsize => '20',
       },
       strEmail => {
-        label => '',
+        label => 'Contact Email',
         value => $field->{strEmail},
         type  => 'text',
         size  => '35',
@@ -470,6 +489,10 @@ print STDERR "SSSS$action $clubID\n";
         strLocalShortName
         strLatinName
         strLatinShortName
+        strCity
+        strRegion
+        strState
+        strISOCountry
         strMAID
         dtFrom
         dtTo
@@ -480,17 +503,17 @@ print STDERR "SSSS$action $clubID\n";
         strAssocNature
         intLegalTypeID
         strLegalID
-        strISOCountry
         intLocalLanguage
-        strRegion
-        strPostalCode
-        strTown
         strAddress
+        strAddress2
+        strContactCity
+        strContactISOCountry
+        strPostalCode
         strWebURL
         strEmail
         strPhone
+        strContact
         strFax
-        strContactEmail
         strMANotes
         clubcharacteristics
         intNotifications
@@ -564,13 +587,11 @@ print STDERR "SSSS$action $clubID\n";
 my $resultHTML='' ;
 ($resultHTML, undef )=handleHTMLForm(\%FieldDefinitions, $clubperms, $option, 0,$Data->{'db'});
   my $title=$field->{'strLocalName'} || '';
-  my $scMenu = (allowedAction($Data, 'c_e'))
-    ? getServicesContactsMenu($Data, $Defs::LEVEL_CLUB, $clubID, $Defs::SC_MENU_SHORT, $Defs::SC_MENU_CURRENT_OPTION_DETAILS)
-    : '';
+  my $scMenu = '';#(allowedAction($Data, 'c_e')) ? getServicesContactsMenu($Data, $Defs::LEVEL_CLUB, $clubID, $Defs::SC_MENU_SHORT, $Defs::SC_MENU_CURRENT_OPTION_DETAILS) : '';
   my $logodisplay = '';
   my $editlink = (allowedAction($Data, 'c_e')) ? 1 : 0;
   if($option eq 'display')  {
-    $resultHTML .= showContacts($Data,0, $editlink);
+#    $resultHTML .= showContacts($Data,0, $editlink);
     my $chgoptions='';
     $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_DTE">Edit $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}</a></span>] if allowedAction($Data, 'c_e');
 
@@ -618,20 +639,23 @@ sub loadClubDetails {
      strLatinShortName,
      strLatinFacilityName,
      strISOCountry,
+    strContactISOCountry,
+      strContact,
+     strContactCity,
      intLocalLanguage,
      strRegion,
      strPostalCode,
      strTown,
+    strState,
+        strCity,
      strAddress,
+     strAddress2,
      strWebURL,
      strEmail,
      strPhone,
      strFax,
      strAssocNature,
      strMANotes,
-     strContactTitle,
-     strContactEmail,
-     strContactPhone,
      dtAdded,
      strShortNotes,
      tTimeStamp,
@@ -915,10 +939,9 @@ sub listClubs   {
     || "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB.'_P'} in $currentname"; ###needs translation ->  WHAT in WHAT?
 
   my $addlink='';
-  {
-      $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if(!$Data->{'ReadOnlyLogin'});
-
-  }
+  #{
+  #    $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if(!$Data->{'ReadOnlyLogin'});
+  # }
 
   my $modoptions=qq[<div class="changeoptions">$addlink</div>];
   $title=$modoptions.$title;

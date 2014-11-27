@@ -381,6 +381,13 @@ sub setupValues {
                     size        => '50',
                     maxsize     => '100',
                 },
+                strContact=> {
+                    label       => $FieldLabels->{'strContact'},
+                    value       => $values->{'strContact'},
+                    type        => 'text',
+                    size        => '50',
+                    maxsize     => '100',
+                },
                 strEmail => {
                     label       => $FieldLabels->{'strEmail'},
                     value       => $values->{'strEmail'},
@@ -398,6 +405,7 @@ sub setupValues {
                 strContactISOCountry
                 strPhone
                 strEmail
+                strContact
             )],
             #fieldtransform => {
                 #textcase => {
@@ -884,7 +892,7 @@ sub display_complete {
         }
 
         my $clubID = $clubObj->ID();
-        $content = qq [<div class="OKmsg"> $self->{'Data'}->{'LevelNames'}{$Defs::LEVEL_CLUB} Added Successfully Club ID = $clubID AND entityID = $entityID </div><br> ];
+        $content = qq [<div class="col-md-8"><div class="alert"><div><span class="flash_success fa fa-check"></span><p>$self->{'Data'}->{'LevelNames'}{$Defs::LEVEL_CLUB} Added Successfully</p></div></div></div> ];
     }
     else {
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Club ID");

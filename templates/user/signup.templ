@@ -15,9 +15,9 @@
 
  <form id = "signup-form" action = "[% BaseURL %]/user/signup.cgi" method ="POST">
     <div class = "signup_prompt">[% Lang.txt('') %]</div>
-    <div id = "signup-email-div" class = "formfield">
-<label for="email">[% Lang.txt('Email Address') %]</label>
-<input type = "text" name = "email" value = "[% strEmail %]" id = "signup-email" class="fields required" title="email address">
+    <div id = "signup-username-div" class = "formfield">
+<label for="username">[% Lang.txt('Username') %]</label>
+<input type = "text" name = "username" value = "[% username%]" id = "signup-username" class="fields required" title="username address">
 </div>
     <div id = "signup-fname-div" class = "formfield">
 			<label for="firstname">[% Lang.txt('First Name') %]</label>
@@ -35,7 +35,7 @@
 
     <input type = "submit" class = "button proceed-button" value =" [% Lang.txt('Signup') %] ">
     <input type = "hidden" name = "a" value = "SIGNUP">
-	<small class="terms">By clicking <span class="sp-passport">Signup</span> you agree to the <span class="sp-passport">SportingPulse</span> <a href="http://sportingpulse.com/terms" target="_blank">terms & conditions</a></small>
+	
   </form>
 </div>
 
@@ -44,9 +44,9 @@
 	jQuery(document).ready(function(){
 		jQuery("#signup-form").validate({
 			rules: {
-				email : {
+				username : {
 					required: true,
-					email: true
+					username: true
 				},
 				firstname : {
 					required: true,
@@ -78,7 +78,6 @@
 					minlength: "[% Lang.txt('must be at least 6 characters long') %]",
 					equalTo: "[% Lang.txt('Passwords do not match') %]"
 				},
-				email: "[% Lang.txt('Please enter a valid email address') %]",
 			}
 		});
 	});

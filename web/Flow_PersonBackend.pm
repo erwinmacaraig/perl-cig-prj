@@ -26,6 +26,9 @@ use PersonCertifications;
 use DuplicatesUtils;
 use PersonUserAccess;
 use Data::Dumper;
+use Payments;
+use Products;
+use PersonRequest;
 
 
 sub setProcessOrder {
@@ -66,17 +69,17 @@ sub setProcessOrder {
             'function' => 'validate_contact_details',
             'fieldset'  => 'contactdetails',
         },
-        {
-            'action' => 'od',
-            'function' => 'display_other_details',
-            'label'  => 'Other Details',
-            'fieldset'  => 'otherdetails',
-        },
-        {
-            'action' => 'odu',
-            'function' => 'validate_other_details',
-            'fieldset'  => 'otherdetails',
-        },
+        #{
+            #'action' => 'od',
+            #'function' => 'display_other_details',
+            #'label'  => 'Other Details',
+            #'fieldset'  => 'otherdetails',
+        #},
+        #{
+            #'action' => 'odu',
+            #'function' => 'validate_other_details',
+            #'fieldset'  => 'otherdetails',
+        #},
         {
             'action' => 'r',
             'function' => 'display_registration',
@@ -159,19 +162,19 @@ sub setupValues    {
         my $vals = join(',',@nonLatinLanguages);
         $nonlatinscript =   qq[
            <script>
-                jQuery(document).ready(function()  {
-                    jQuery('#l_row_strLatinFirstname').hide();
-                    jQuery('#l_row_strLatinSurname').hide();
-                    jQuery('#l_intLocalLanguage').change(function()   {
+                \$(document).ready(function()  {
+                    \$('#l_row_strLatinFirstname').hide();
+                    \$('#l_row_strLatinSurname').hide();
+                    \$('#l_intLocalLanguage').change(function()   {
                         var lang = parseInt(jQuery('#l_intLocalLanguage').val());
                         nonlatinvals = [$vals];
                         if(nonlatinvals.indexOf(lang) !== -1 )  {
-                            jQuery('#l_row_strLatinFirstname').show();
-                            jQuery('#l_row_strLatinSurname').show();
+                            \$('#l_row_strLatinFirstname').show();
+                            \$('#l_row_strLatinSurname').show();
                         }
                         else    {
-                            jQuery('#l_row_strLatinFirstname').hide();
-                            jQuery('#l_row_strLatinSurname').hide();
+                            \$('#l_row_strLatinFirstname').hide();
+                            \$('#l_row_strLatinSurname').hide();
                         }
                     });
                 });
@@ -179,6 +182,24 @@ sub setupValues    {
 
         ];
     }
+
+    my $maidennamescript = qq[
+        <script>
+            jQuery(document).ready(function()  {
+                jQuery('#l_row_strMaidenName').hide();
+
+                jQuery("select#l_intGender").change(function(){
+                    if(jQuery(this).val() == 2) {
+                        jQuery("#l_row_strMaidenName").show();
+                    } else {
+                        jQuery("#l_row_strMaidenName").hide();
+                    }
+                });
+            });
+        </script> 
+    ];
+
+
     my ($DefCodes, $DefCodesOrder) = getDefCodes(
         dbh        => $self->{'Data'}{'db'},
         realmID    => $self->{'Data'}{'Realm'},
@@ -196,6 +217,8 @@ sub setupValues    {
                     type        => 'text',
                     size        => '40',
                     maxsize     => '50',
+                    sectionname => 'core',
+                    noedit      => 1,
                 },
                 strLocalSurname => {
                     label       => $self->{'SystemConfig'}{'strLocalSurname_Text'} ? $self->{'SystemConfig'}{'strLocalSurname_Text'} : $FieldLabels->{'strLocalSurname'},
@@ -204,6 +227,8 @@ sub setupValues    {
                     size        => '40',
                     maxsize     => '50',
                     compulsory => 1,
+                    sectionname => 'core',
+                    noedit      => 1,
                 },
                 intGender => {
                     label       => $FieldLabels->{'intGender'},
@@ -212,6 +237,8 @@ sub setupValues    {
                     options     => \%genderoptions,
                     compulsory => 1,
                     firstoption => [ '', " " ],
+                    sectionname => 'core',
+                    noedit      => 1,
                 },                
                 intLocalLanguage => {
                     label       => $FieldLabels->{'intLocalLanguage'},
@@ -221,6 +248,8 @@ sub setupValues    {
                     firstoption => [ '', 'Select Language' ],
                     compulsory => 1,
                     posttext => $nonlatinscript,
+                    sectionname => 'core',
+                    noedit      => 1,
                 },
                 strLatinFirstname => {
                     label       => $self->{'SystemConfig'}{'person_strLatinNames'} || $FieldLabels->{'strLatinFirstname'},
@@ -229,6 +258,8 @@ sub setupValues    {
                     size        => '40',
                     maxsize     => '50',
                     active      => $nonLatin,
+                    sectionname => 'core',
+                    noedit      => 1,
                 },
                 strLatinSurname => {
                     label       => $self->{'SystemConfig'}{'person_strLatinNames'} || $FieldLabels->{'strLatinSurname'},
@@ -237,6 +268,8 @@ sub setupValues    {
                     size        => '40',
                     maxsize     => '50',
                     active      => $nonLatin,
+                    sectionname => 'core',
+                    noedit      => 1,
                 },
                 strMaidenName => {
                     label       => $FieldLabels->{'strMaidenName'},
@@ -244,6 +277,9 @@ sub setupValues    {
                     type        => 'text',
                     size        => '40',
                     maxsize     => '50',
+                    posttext    => $maidennamescript,
+                    sectionname => 'core',
+                    noedit      => 1,
                 },
                 dtDOB => {
                     label       => $FieldLabels->{'dtDOB'},
@@ -253,6 +289,8 @@ sub setupValues    {
                     format      => 'dd/mm/yyyy',
                     validate    => 'DATE',
                     compulsory => 1,
+                    sectionname => 'core',
+                    noedit      => 1,
                 },
                 strISONationality => {
                     label       => $FieldLabels->{'strISONationality'},
@@ -261,6 +299,8 @@ sub setupValues    {
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
                     compulsory => 1,
+                    sectionname => 'core',
+                    noedit      => 1,
                 },
                 strISOCountryOfBirth => {
                     label       => $FieldLabels->{'strISOCountryOfBirth'},
@@ -269,6 +309,8 @@ sub setupValues    {
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
                     compulsory => 1,
+                    sectionname => 'core',
+                    noedit      => 1,
                 },
                 strRegionOfBirth => {
                     label       => $FieldLabels->{'strRegionOfBirth'},
@@ -276,6 +318,8 @@ sub setupValues    {
                     type        => 'text',
                     size        => '30',
                     maxsize     => '45',
+                    sectionname => 'core',
+                    noedit      => 1,
                 },
                 strPlaceOfBirth => {
                     label       => $FieldLabels->{'strPlaceOfBirth'},
@@ -284,6 +328,8 @@ sub setupValues    {
                     size        => '30',
                     maxsize     => '45',
                     compulsory => 1,
+                    sectionname => 'core',
+                    noedit      => 1,
                 },
                 intGender => {
                     label       => $FieldLabels->{'intGender'},
@@ -292,8 +338,148 @@ sub setupValues    {
                     options     => \%genderoptions,
                     compulsory => 1,
                     firstoption => [ '', " " ],
+                    sectionname => 'core',
+                    noedit      => 1,
                 },
-            },
+
+                strPreferredLang => {
+                    label       => $FieldLabels->{'strPreferredLang'},
+                    value       => $values->{'strPreferredLang'},
+                    type        => 'lookup',
+                    options     => \%languageOptions,
+                    firstoption => [ '', 'Select Language' ],
+                    sectionname => 'other',
+                },
+                intEthnicityID => {
+                    label       => $FieldLabels->{'intEthnicityID'},
+                    value       => $values->{intEthnicityID},
+                    type        => 'lookup',
+                    options     => $DefCodes->{-8},
+                    order       => $DefCodesOrder->{-8},
+                    firstoption => [ '', " " ],
+                    sectionname => 'other',
+                },
+                strBirthCert => {
+        			label       => $FieldLabels->{'strBirthCert'},
+                    value       => $values->{'strBirthCert'},
+                    type        => 'text',
+                    size        => '40',
+                    maxsize     => '50',
+                    sectionname => 'other',
+        		},
+        		strBirthCertCountry => {
+        			label       => $FieldLabels->{'strBirthCertCountry'},
+                    value       => $values->{'strBirthCertCountry'},
+                    type        => 'lookup',
+                    options     => $isocountries,
+                    firstoption => [ '', 'Select Country' ],
+                    compulsory => 1,
+                    sectionname => 'other',
+                  
+        		},
+        		dtBirthCertValidityDateFrom => {
+        			label       => $FieldLabels->{'dtValidFrom'},
+                    value       => $values->{'dtBirthCertValidityDateFrom'},
+                    type        => 'date',
+                    datetype    => 'dropdown',
+                    format      => 'dd/mm/yyyy',
+                    validate    => 'DATE',
+                    sectionname => 'other',
+        		},
+        		dtBirthCertValidityDateTo => {
+        			label       => $FieldLabels->{'dtValidUntil'},
+                    value       => $values->{'dtBirthCertValidityDateTo'},
+                    type        => 'date',
+                    datetype    => 'dropdown',
+                    format      => 'dd/mm/yyyy',
+                    validate    => 'DATE',
+                    sectionname => 'other',
+        		},
+        		strBirthCertDesc => {
+        			label => $FieldLabels->{'strDescription'},
+      	            value => $values->{'strBirthCertDesc'},
+                    type => 'textarea',
+                    rows => '10',
+                    cols => '40',
+                    sectionname => 'other',
+        		},
+        		strPassportNo => { 
+                	label => $FieldLabels->{'strPassportNo'},
+                	value => $values->{'strPassportNo'},
+                	type => 'text',
+                	size => '40',
+                	maxsize => '50',
+                    sectionname => 'other',
+                },
+                strPassportNationality => {
+                	label => $FieldLabels->{'strPassportNationality'},
+                	value => $values->{'strPassportNationality'},
+                	type        => 'lookup',
+                    options     => $isocountries,
+                    firstoption => [ '', 'Select Country' ],
+                    sectionname => 'other',
+                },
+                strPassportIssueCountry => {
+                	label => $FieldLabels->{'strPassportIssueCountry'},
+                	value => $values->{'strPassportIssueCountry'},
+                	type        => 'lookup',
+                    options     => $isocountries,
+                    firstoption => [ '', 'Select Country' ],                	
+                    sectionname => 'other',
+                },
+                dtPassportExpiry => {
+                	label => $FieldLabels->{'dtPassportExpiry'},
+                	value => $values->{'dtPassportExpiry'},
+                	type        => 'date',
+                    datetype    => 'dropdown',
+                    format      => 'dd/mm/yyyy',
+                    validate    => 'DATE',
+                    sectionname => 'other',
+                },
+                strOtherPersonIdentifier => {
+                	label => $FieldLabels->{'strOtherPersonIdentifier'},
+                	value => $values->{'strOtherPersonIdentifier'},
+                	type => 'text',
+                	size => '40',
+                	maxsize => '50',                	
+                    sectionname => 'other',
+                },
+                strOtherPersonIdentifierIssueCountry => {
+                	label => $FieldLabels->{'strOtherPersonIdentifierIssueCountry'},
+                	value => $values->{'strOtherPersonIdentifierIssueCountry'},
+                	type        => 'lookup',
+                    options     => $isocountries,
+                    firstoption => [ '', 'Select Country' ],
+                    sectionname => 'other',
+                },
+                dtOtherPersonIdentifierValidDateFrom => {
+                	label => $FieldLabels->{'dtValidFrom'},
+                	value => $values->{'dtOtherPersonIdentifierValidDateFrom'},
+                	type        => 'date',
+                    datetype    => 'dropdown',
+                    format      => 'dd/mm/yyyy',
+                    validate    => 'DATE',
+                    sectionname => 'other',
+                },
+                dtOtherPersonIdentifierValidDateTo => {
+                	label => $FieldLabels->{'dtValidUntil'},
+                	value => $values->{'dtOtherPersonIdentifierValidDateTo'},
+                	type        => 'date',
+                    datetype    => 'dropdown',
+                    format      => 'dd/mm/yyyy',
+                    validate    => 'DATE',
+                    sectionname => 'other',
+                },
+                strOtherPersonIdentifierDesc => {
+                	label => $FieldLabels->{'strDescription'},
+                	value => $values->{'strOtherPersonIdentifierDesc'},
+                    type => 'textarea',
+                    rows => '10',
+                    cols => '40',                	
+                    sectionname => 'other',
+                },
+                
+            }                ,
             'order' => [qw(
                 strLocalFirstname
                 strLocalSurname
@@ -307,7 +493,29 @@ sub setupValues    {
                 strISOCountryOfBirth
                 strRegionOfBirth
                 strPlaceOfBirth
+
+                strPreferredLang
+                intEthnicityID                 
+                strBirthCert 
+                strBirthCertCountry 
+                dtBirthCertValidityDateFrom 
+                dtBirthCertValidityDateTo 
+                strBirthCertDesc 
+                strPassportNationality
+                strPassportIssueCountry
+                dtPassportExpiry
+               
+                strOtherPersonIdentifier
+                strOtherPersonIdentifierIssueCountry
+                dtOtherPersonIdentifierValidDateFrom
+                dtOtherPersonIdentifierValidDateTo
+                strOtherPersonIdentifierDesc
+
             )],
+            sections => [
+                [ 'core',        'Personal Details' ],
+                [ 'other',        'Other Details' ],
+            ],
             fieldtransform => {
                 textcase => {
                     #strLocalFirstname => $field_case_rules->{'strLocalFirstname'} || '',
@@ -503,7 +711,11 @@ sub setupValues    {
             'order' => [qw(
                 strPreferredLang
                 intEthnicityID                 
-                strBirthCert strBirthCertCountry dtBirthCertValidityDateFrom dtBirthCertValidityDateTo strBirthCertDesc 
+                strBirthCert 
+                strBirthCertCountry 
+                dtBirthCertValidityDateFrom 
+                dtBirthCertValidityDateTo 
+                strBirthCertDesc 
                 strPassportNationality
                 strPassportIssueCountry
                 dtPassportExpiry
@@ -592,15 +804,16 @@ sub setupValues    {
         my $fieldname = "intNatCustomLU$i";
         my $name = $CustomFieldNames->{$fieldname}[0] || '';
         next if !$name;
-        $self->{'FieldSets'}{'otherdetails'}{'fields'}{$fieldname} = {
+        $self->{'FieldSets'}{'core'}{'fields'}{$fieldname} = {
             label => $name,
             value => $values->{$fieldname},
             type  => 'lookup',
             options     => $DefCodes->{$intNatCustomLU_DefsCodes[$i]},
             order       => $DefCodesOrder->{$intNatCustomLU_DefsCodes[$i]},
+            sectionname => 'other',
             firstoption => [ '', " " ],
         };
-        push @{$self->{'FieldSets'}{'otherdetails'}{'order'}} , $fieldname;
+        push @{$self->{'FieldSets'}{'core'}{'order'}} , $fieldname;
     }
 
 }
@@ -608,6 +821,17 @@ sub setupValues    {
 sub display_core_details    { 
     my $self = shift;
 
+    my $id = $self->ID() || 0;
+    my $defaultType = $self->{'RunParams'}{'dtype'} || '';
+warn("PPPID $id");
+    if($id)   {
+        my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
+        $personObj->load();
+        if($personObj->ID())    {
+            my $objectValues = $self->loadObjectValues($personObj);
+            $self->setupValues($objectValues);
+        }
+    }
 
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Person',);
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
@@ -631,10 +855,20 @@ sub display_core_details    {
 sub validate_core_details    { 
     my $self = shift;
 
+    #my $defaultType = $self->{'RunParams'}{'dtype'} || '';
+    #if($defaultType eq 'TRANSFER')   {
+        #all core details are read-only for Transfer
+        #$self->incrementCurrentProcessIndex();
+        #$self->incrementCurrentProcessIndex();
+        #return ('',2);
+    #}
+
     my $userData = {};
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Person',);
     ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
 
+use Data::Dumper;
+print STDERR Dumper($userData);
     if(!scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         if(isPossibleDuplicate($self->{'Data'}, $userData))    {
             push @{$self->{'RunDetails'}{'Errors'}}, 'This person is a possible duplicate';
@@ -648,15 +882,18 @@ sub validate_core_details    {
     }
 
     my $id = $self->ID() || 0;
+    my $newreg = $id ? 0 : 1;
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
     $personObj->load();
-    $userData->{'strStatus'} = 'INPROGRESS';
-    $userData->{'intRealmID'} = $self->{'Data'}{'Realm'};
-    $userData->{'intInternationalTransfer'} = 1 if $self->getCarryFields('itc');
+    if($newreg)    {
+        $userData->{'strStatus'} = 'INPROGRESS';
+        $userData->{'intRealmID'} = $self->{'Data'}{'Realm'};
+        $userData->{'intInternationalTransfer'} = 1 if $self->getCarryFields('itc');
+    }
     $personObj->setValues($userData);
     $personObj->write();
     if($personObj->ID())    {
-        if(!$id)    { 
+        if($newreg)    { 
             $self->setID($personObj->ID()); 
             $self->addCarryField('newreg',1);
         }
@@ -664,12 +901,14 @@ sub validate_core_details    {
         $self->{'ClientValues'}{'currentLevel'} = $Defs::LEVEL_PERSON;
         my $client = setClient($self->{'ClientValues'});
         $self->addCarryField('client',$client);
-        auditLog(
-            $personObj->ID(),
-            $self->{'Data'},
-            'ADD',
-            'PERSON',
-        );
+        if($newreg) {
+            auditLog(
+                $personObj->ID(),
+                $self->{'Data'},
+                'ADD',
+                'PERSON',
+            );
+        }
 #WR: SHoudl we check for duplicates here
     }
 
@@ -937,15 +1176,58 @@ sub display_registration {
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID);
     $personObj->load();
     my ($dob, $gender) = $personObj->getValue(['dtDOB','intGender']); 
-    my $content = displayPersonRegisterWhat(
-        $self->{'Data'},
-        $personID,
-        $entityID,
-        $dob || '',
-        $gender || 0,
-        $originLevel,
-        $url,
-    );
+
+    my $content = '';
+    my $noContinueButton = 1;
+
+    my $defaultType = $self->{'RunParams'}{'dtype'} || '';
+    if($defaultType eq 'TRANSFER')   {
+        $noContinueButton = 0;
+        my %regFilter = (
+            'entityID' => $entityID,
+            'requestID' => $self->{'RunParams'}{'prid'},
+            #'requestID' => 12213,
+        );
+        my $request = getRequests($self->{'Data'}, \%regFilter);
+        $request = $request->[0];
+
+        if(!$request) {
+            push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person Request';
+            $noContinueButton = 1;
+            $content = "Person Request Details not found.";
+        }
+        else {
+            $request->{'personType'} = $Defs::personType{$request->{'strPersonType'}};
+            $request->{'sport'} = $Defs::sportType{$request->{'strSport'}};
+            $request->{'personLevel'} = $Defs::personLevel{$request->{'strPersonLevel'}};
+
+            $self->addCarryField('nat', 'TRANSFER');
+            $self->addCarryField('pt', $request->{'strPersonType'});
+            $self->addCarryField('pl', $request->{'strPersonLevel'});
+            $self->addCarryField('sp', $request->{'strSport'});
+            $self->addCarryField('ag', $request->{'personCurrentAgeLevel'});
+
+            $content = runTemplate(
+                $self->{'Data'},
+                {
+                    requestSummary => $request,
+                },
+                'personrequest/generic/reg_summary.templ'
+            );
+        }
+    }
+    else {
+         $content = displayPersonRegisterWhat(
+            $self->{'Data'},
+            $personID,
+            $entityID,
+            $dob || '',
+            $gender || 0,
+            $originLevel,
+            $url,
+        );
+    }
+
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -956,12 +1238,16 @@ sub display_registration {
         Title => '',
         TextTop => '',
         TextBottom => '',
-        NoContinueButton => 1,
+        NoContinueButton => $noContinueButton,
     );
     my $pagedata = $self->display(\%PageData);
 
-    return ($pagedata,0);
+    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}}) and ($defaultType eq 'TRANSFER')) {
+        #display the same step with error notification (for Transfers atm)
+        return ($pagedata,0);
+    }
 
+    return ($pagedata,0);
 }
 
 sub process_registration { 
@@ -974,6 +1260,7 @@ sub process_registration {
     my $sport = $self->{'RunParams'}{'sp'} || '';
     my $ageLevel = $self->{'RunParams'}{'ag'} || '';
     my $registrationNature = $self->{'RunParams'}{'nat'} || '';
+    my $personRequestID = $self->{'RunParams'}{'prid'} || '';
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
@@ -998,6 +1285,9 @@ sub process_registration {
             $sport, 
             $ageLevel, 
             $registrationNature,
+            undef,
+            undef,
+            $personRequestID,
        );
     }
     if(!$personID)    {
@@ -1163,6 +1453,7 @@ sub display_products {
 
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID);
     $personObj->load();
+
     if($regoID) {
         my $nationality = $personObj->getValue('strISONationality') || ''; 
         $rego_ref->{'Nationality'} = $nationality;
@@ -1188,6 +1479,28 @@ sub display_products {
         $self->decrementCurrentProcessIndex();
         return ('',2);
     }
+    my %ManualPayPageData = (
+        HiddenFields => $self->stringifyCarryField(),
+        Target => $self->{'Data'}{'target'},
+        Errors => $self->{'RunDetails'}{'Errors'} || [],
+        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
+        FlowSummaryTemplate => 'registration/person_flow_manual_pay.templ',
+        allowManualPay=> 1,
+        manualPaymentTypes => \%Defs::manualPaymentTypes,
+        Title => '',
+        TextTop => '',
+        TextBottom => '',
+    );
+    my $pay_body = runTemplate(
+            $self->{'Data'},
+            \%ManualPayPageData,
+            'registration/person_flow_manual_pay.templ',
+    );
+    if ($self->{'SystemConfig'}{'AllowTXNs_Manual_roleFlow'}) {
+        $content = $pay_body . $content;
+    }
+
+
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -1252,7 +1565,24 @@ sub process_products {
         $regoID = 0 if !$valid;
     }
 
-    my $txnIds = save_rego_products($self->{'Data'}, $regoID, $personID, $entityID, $entityLevel, $rego_ref, $self->{'RunParams'});
+    my ($txnIds, $amount) = save_rego_products($self->{'Data'}, $regoID, $personID, $entityID, $entityLevel, $rego_ref, $self->{'RunParams'});
+
+####
+    my $paymentType = $self->{'RunParams'}{'paymentType'} || 0;
+    my $markPaid= $self->{'RunParams'}{'markPaid'} || 0;
+    my @txnIds = split ':',$txnIds ;
+    if ($paymentType and $markPaid)  {
+            my %Settings=();
+            $Settings{'paymentType'} = $paymentType;
+            my $logID = createTransLog($self->{'Data'}, \%Settings, $entityID,\@txnIds, $amount);
+            processTransLog($self->{'Data'}->{'db'}, '', 'OK', 'APPROVED', $logID, \%Settings, undef, undef, '', '', '', '', '', '','',1);
+            UpdateCart($self->{'Data'}, undef, $self->{'Data'}->{'client'}, undef, undef, $logID);
+            product_apply_transaction($self->{'Data'},$logID);
+        }
+    $self->addCarryField('paymentType',$paymentType);
+    $self->addCarryField('markPaid',$markPaid);
+####
+
     $self->addCarryField('txnIds',$txnIds);
 
     return ('',1);
@@ -1417,7 +1747,12 @@ sub display_complete {
         my $nationality = $personObj->getValue('strISONationality') || ''; 
         $rego_ref->{'Nationality'} = $nationality;
 
-        if($self->{'RunParams'}{'newreg'})  {
+        my $run = $self->{'RunParams'}{'run'} || 0;
+print STDERR "IN display_complete --- COMPLETE $run\n";
+        if($self->{'RunParams'}{'newreg'} and ! $run)  {
+                #$self->{'RunParams'}{'run'} = 1;
+                #$self->addCarryField('run',1);
+print STDERR "RRRRRRRRULES RUNNINGS\n";
             my $rc = WorkFlow::addWorkFlowTasks(
                 $self->{'Data'},
                 'PERSON',
@@ -1431,6 +1766,9 @@ sub display_complete {
             );
         }
 
+        my $hiddenFields = $self->getCarryFields();
+        $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
+        $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
         $content = displayRegoFlowComplete(
             $self->{'Data'}, 
             $regoID, 
@@ -1439,7 +1777,7 @@ sub display_complete {
             $rego_ref, 
             $entityID, 
             $personID, 
-            $self->{'CarryFields'}
+            $hiddenFields,
         );
     }
     else    {

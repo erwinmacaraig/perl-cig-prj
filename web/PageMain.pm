@@ -234,8 +234,8 @@ sub pageMain {
         #$TemplateData{'TeamListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=T_L&amp;l=2" if(!$Data->{'SystemConfig'}{'NoTeams'});
     #}
     if($authLevel == $Defs::LEVEL_CLUB)    {
-        $TemplateData{'MemListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=M_L&amp;l=1";
-        $TemplateData{'TeamListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=T_L&amp;l=2" if(!$Data->{'SystemConfig'}{'NoTeams'});
+        #$TemplateData{'MemListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=M_L&amp;l=1";
+        #$TemplateData{'TeamListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=T_L&amp;l=2" if(!$Data->{'SystemConfig'}{'NoTeams'});
     }
 
     my $templateFile = 'page_wrapper/main_wrapper.templ';
@@ -349,9 +349,7 @@ warn(" IN PF");
     $meta->{'title'} = $title;
     $meta->{'head'} = $html_head;
     $meta->{'page_begin'} = qq[
-        <div id="global-nav-wrap">
         $page_navigator
-        </div>
     ];
     $meta->{'page_header'} = $page_header;
     $meta->{'page_content'} = $body;
@@ -483,7 +481,8 @@ sub getPageCustomization{
 
     my $paypal = $Data->{'PAYPAL'} ? qq[<img src="images/PP-CC.jpg" alt="PayPal" border="0"></img>] : '';
 
-    my $powered = qq[<span class="footerline">].$Data->{'lang'}->txt('COPYRIGHT').qq[</span>];
+    #my $powered = qq[<span class="footerline">].$Data->{'lang'}->txt('COPYRIGHT').qq[</span>];
+		my $powered = qq[];
 
     return ($html_head, $page_header, $nav, $paypal, $powered);
 }

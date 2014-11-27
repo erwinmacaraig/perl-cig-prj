@@ -24,6 +24,7 @@ use CustomFields;
 use DefCodes;
 use RegoProducts;
 use RegistrationItem;
+use FacilityTypes;
 use Data::Dumper;
 
 sub setProcessOrder {
@@ -112,6 +113,12 @@ sub setupValues {
         type=>'Person'
     });
 
+    my %facilityTypeOptions = ();
+    my $facilityTypes = FacilityTypes::getAll($self->{'Data'});
+    for my $ft ( @{$facilityTypes} ) {
+        $facilityTypeOptions{$ft->{'intFacilityTypeID'}} = $ft->{'strName'} || next;
+    }
+
     my %genderoptions = ();
     for my $k ( keys %Defs::PersonGenderInfo ) {
         next if !$k;
@@ -172,6 +179,14 @@ sub setupValues {
     $self->{'FieldSets'} = {
         core => {
             'fields' => {
+                intFacilityTypeID => {
+                    label       => $FieldLabels->{'intFacilityTypeID'},
+                    value       => $values->{'intFacilityTypeID'},
+                    type        => 'lookup',
+                    options     => \%facilityTypeOptions,
+                    firstoption => [ '', 'Select Type' ],
+                    compulsory => 1,
+                },
                 strLocalName => {
                     label       => $FieldLabels->{'strLocalName'},
                     value       => $values->{'strLocalName'},
@@ -238,6 +253,7 @@ sub setupValues {
                 },
             },
             'order' => [qw(
+                intFacilityTypeID
                 strLocalName
                 strLocalShortName
                 strCity
@@ -315,6 +331,13 @@ sub setupValues {
                     size        => '50',
                     maxsize     => '100',
                 },
+                strContact=> {
+                    label       => $FieldLabels->{'strContact'},
+                    value       => $values->{'strContact'},
+                    type        => 'text',
+                    size        => '50',
+                    maxsize     => '100',
+                },
                 strFax => {
                     label       => $FieldLabels->{'strFax'},
                     value       => $values->{'strFax'},
@@ -341,6 +364,7 @@ sub setupValues {
                 strEmail
                 strFax
                 strWebURL
+                strContact
             )],
             #fieldtransform => {
                 #textcase => {
@@ -357,6 +381,7 @@ sub setupValues {
                     size        => '50',
                     maxsize     => '100',
                     compulsory  => 1,
+                    validate    => 'NUMBER',
                 },
                 strParentEntityName => {
                     label       => $self->{'ClientValues'}{'authLevel'} == $Defs::LEVEL_CLUB ? 'Club name' : 'Organisation',
@@ -855,7 +880,7 @@ sub display_complete {
         }
 
         my $facilityID = $facilityFields->getEntityID();
-        $content = qq [<div class="OKmsg"> $self->{'Data'}->{'LevelNames'}{$Defs::LEVEL_VENUE} Added Successfully Venue ID = $facilityID AND entityID = $entityID </div><br> ];
+        $content = qq [<div class="OKmsg"> $self->{'Data'}->{'LevelNames'}{$Defs::LEVEL_VENUE} Added Successfully</div><br>]; # Venue ID = $facilityID AND entityID = $entityID </div><br> ];
     }
     else {
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Facility ID");

@@ -20,6 +20,7 @@ sub main {
 	# GET INFO FROM URL
   my $client = param('client') || '';
   my $fileID = param('f') || 0;
+  my $download = param('d') || 0;
                                                                                                         
   my %Data=();
   $fileID =~ /^(\d+)$/;
@@ -48,6 +49,9 @@ sub main {
   if($ext eq 'jpg') {
 	$contenttype = 'image/jpeg';
   }
+  elsif($ext eq 'pdf') {
+	$contenttype = 'application/pdf';
+  }
   elsif($ext eq 'txt')  {
 	$contenttype = 'text/html';
   }
@@ -59,7 +63,12 @@ sub main {
   print "Content-type: $contenttype\n";
   print "Content-length: $size\n";
   print "Content-transfer-encoding: $size\n";
-  print qq[Content-disposition: attachement; filename = "$origfilename"\n\n];
+  if($download) {
+      print qq[Content-disposition: attachement; filename = "$origfilename"\n\n];
+  }
+  else  {
+      print qq[Content-disposition: inline; filename = "$origfilename"\n\n];
+  }
   print $file;
   
 }

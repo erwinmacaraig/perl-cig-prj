@@ -1,43 +1,150 @@
-<div class = "pageHeading dash-heading">[% Name %]</div>
-<div id="logo-status">
-	[% Logo %]	
-	[% ContactsMenu %]
+<div class="pageHeading dash-heading">Dashboard</div>
+<div class="col-md-9 tasklist-content dashboard-tasklist">
+    <div class="pageHeading dash-heading">[% Name %]</div>
+    <div id="logo-status">
+        [% Logo %]	
+    </div>
+
+    <div class = "home_details">
+        <div class = "sectionheader">[% Lang.txt('Details') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin  %]<a href = "[% EditDetailsLink %]" class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
+        [% IF Details.Address1 or Details.Suburb %]
+        <div class = "details-address">
+            <span class = "label">[% Lang.txt('Address') %]</span><br>
+            [% IF Details.Address %][% Details.Address %]<br>[% END %]
+            [% IF Details.Town%][% Details.Town%]<br>[% END %]
+            [% IF Details.Region%][% Details.Region%],&nbsp;[% END %][% IF Details.Country %][% Details.Country %],&nbsp;[% END %][% IF Details.PostalCode %][% Details.PostalCode %][% END %]
+        </div>
+        [% END %]
+        <div class = "details-phone">
+            [% IF Details.Contact %]<span class = "label">[% Lang.txt('Contact') %]</span> [% Details.Contact%]<br>[% END %]
+            [% IF Details.Phone %]<span class = "label">[% Lang.txt('Phone') %]</span> [% Details.Phone %]<br>[% END %]
+            [% IF Details.Fax %]<span class = "label">[% Lang.txt('Fax') %]</span> [% Details.Fax %]<br>[% END %]
+            [% IF Details.Email %]<span class = "label">[% Lang.txt('Email') %]</span> <a href = "mailto:[% Details.Email %]" class="mail-link">[% Details.Email %]</a><br>[% END %]
+        </div>
+    </div>
+    [% IF Notifications.size() > 0 and !ReadOnlyLogin  %]
+    <div class = "notifications">
+        <div class="notifications-inner">
+            <div class = "sectionheader">[% Lang.txt('Notifications') %]</div>
+        <div class = "sectionsubheader">The following items require your attention:</div>
+            [% FOREACH nitem IN Notifications %]
+          <div class="notification-item">
+            <a href = "#" class="delete-icon"></a>&nbsp;&nbsp;<a href = "[% nitem.url %]" class="notification-link">[% nitem.title %]</a>
+          </div>		
+            [% END %]
+        </div>
+    </div>
+    [% END %]
+    <div class ="welcome">
+        [% Welcome %]
+    </div>
+    <!--
+    <div id="dash-wrap">
+        <div class = "sectionheader">Dashboard&nbsp;&nbsp;[% IF EditDashboardLink and !ReadOnlyLogin  %]<a href = "[% EditDashboardLink %]" class="edit-link">Configure</a>[% END %]</div>
+        [% Dashboard %]
+    </div>
+    -->
+    <!--
+	<table cellpadding="5" width="100%">
+		<thead>
+			<tr class="box-header">
+				<th>Tasklist</th>
+				<th>Started</th>
+				<th>Status</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Filter by:
+					<select class="filter-tasks">
+			          <option selected="" value="-- Task --">-- Task --</option>
+			          <option value="Registrations">Registrations</option>
+			          <option value="Transfers">Transfers</option>
+			        </select>
+		        </td>
+				<td>
+					<select>
+			          <option value="-- Date --">-- Date --</option>
+			          <option value="Latest">Latest</option>
+			          <option value="Oldest">Oldest</option>
+			        </select>
+				</td>
+				<td>
+					<select id="u53_input">
+			          <option value="-- Status --">-- Status --</option>
+			          <option value="Pending">Pending</option>
+			          <option value="In Progress">In Progress</option>
+			        </select>
+				</td>
+				<td class="list-action-filter">
+					<div class="toggle">
+                        <a href="#" class="active">All tasks</a>
+                        <a href="#" class="">New task</a>
+                    </div>
+				</td>
+			</tr>
+			<tr class="task-list">
+				<td><span class="fa fa-user"></span>Registration of PLAYER to CLUB</td>
+				<td>12 June 2014</td>
+				<td><span class="fa fa-clock-o"></span>Pending: Received</td>
+				<td><a class="btn-inside-panels">View and Approve</a></td>
+			</tr>
+			<tr class="task-list">
+				<td><span class="fa fa-user"></span>Registration of PLAYER to CLUB</td>
+				<td>12 June 2014</td>
+				<td><span class="fa fa-clock-o"></span>In Progress</td>
+				<td><a class="btn-inside-panels">View and Approve</a></td>
+			</tr>
+			<tr class="task-list">
+				<td><span class="fa fa-user"></span>Registration of PLAYER to CLUB</td>
+				<td>12 June 2014</td>
+				<td><span class="fa fa-clock-o"></span>In Progress</td>
+				<td><a class="btn-inside-panels">View and Approve</a></td>
+			</tr>
+		</tbody>
+	</table>
+    -->
+</div>
+<div class="col-md-3 dashboard-sidebar">
+	<div class="sidebar-box">
+		<h3 class="panel-header">Task at a Glance</h3>
+		<ul>
+			<li>New Registrations: <b>1</b></li>
+			<li>New Transfers: <b>0</b></li>
+		</ul>
+		<ul>
+			<li>Total Task Pending: <b>2</b></li>
+			<li>Total Task In Progress: <b>3</b></li>
+			<li>Total Task Rejected: <b>0</b></li>
+		</ul>
+	</div>
+		<div class="sidebar-box clearfix">
+		<h3 class="panel-header">Quick Search</h3>
+		<div class="col-md-12">
+		<div class="input-group">
+			<input class="form-control" type="text">
+			<span class="input-group-addon"><i class="fa fa-search"></i></span>
+		</div>
+		<a class="show-advanced-search">Advanced Search</a>
+			<div class="advanced-search-fields">
+				<span><input type="checkbox" value="checkbox">Players</span>
+				<span><input type="checkbox" value="checkbox">Official</span>
+				<span><input type="checkbox" value="checkbox">Coach</span>
+				<span><input type="checkbox" value="checkbox">Pending</span>
+				<span><input type="checkbox" value="checkbox">Referee</span>
+			</div>
+		</div>
+	</div>
+	<div class="sidebar-box">
+		<h3 class="panel-header">Quick Links</h3>
+		<ul class="quick-links">
+			<li><a><span class="fa fa-plus"></span>Start a New Registration</a></li>
+			<li><a><span class="fa fa-random"></span>Start a Transfer</a></li>
+			<li><a><span class="fa fa-newspaper-o"></span>List Pending Registrations</a></li>
+			<li><a><span class="fa fa-paste"></span>Reports</a></li>
+		</ul>
+	</div>
 </div>
 
-<div class = "home_details">
-	<div class = "sectionheader">[% Lang.txt('Details') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin  %]<a href = "[% EditDetailsLink %]" class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
-	[% IF Details.Address1 or Details.Suburb %]
-	<div class = "details-address">
-		<span class = "label">[% Lang.txt('Address') %]</span><br>
-		[% IF Details.Address %][% Details.Address %]<br>[% END %]
-		[% IF Details.Town%][% Details.Town%]<br>[% END %]
-		[% IF Details.Region%][% Details.Region%],&nbsp;[% END %][% IF Details.Country %][% Details.Country %],&nbsp;[% END %][% IF Details.PostalCode %][% Details.PostalCode %][% END %]
-	</div>
-	[% END %]
-	<div class = "details-phone">
-		[% IF Details.Contact %]<span class = "label">[% Lang.txt('Contact') %]</span> [% Details.Contact%]<br>[% END %]
-		[% IF Details.Phone %]<span class = "label">[% Lang.txt('Phone') %]</span> [% Details.Phone %]<br>[% END %]
-		[% IF Details.Fax %]<span class = "label">[% Lang.txt('Fax') %]</span> [% Details.Fax %]<br>[% END %]
-		[% IF Details.Email %]<span class = "label">[% Lang.txt('Email') %]</span> <a href = "mailto:[% Details.Email %]" class="mail-link">[% Details.Email %]</a><br>[% END %]
-	</div>
-</div>
-[% IF Notifications.size() > 0 and !ReadOnlyLogin  %]
-<div class = "notifications">
-	<div class="notifications-inner">
-		<div class = "sectionheader">[% Lang.txt('Notifications') %]</div>
-    <div class = "sectionsubheader">The following items require your attention:</div>
-		[% FOREACH nitem IN Notifications %]
-      <div class="notification-item">
-        <a href = "#" class="delete-icon"></a>&nbsp;&nbsp;<a href = "[% nitem.url %]" class="notification-link">[% nitem.title %]</a>
-      </div>		
-		[% END %]
-	</div>
-</div>
-[% END %]
-<div class ="welcome">
-	[% Welcome %]
-</div>
-<div id="dash-wrap">
-	<div class = "sectionheader">Dashboard&nbsp;&nbsp;[% IF EditDashboardLink and !ReadOnlyLogin  %]<a href = "[% EditDashboardLink %]" class="edit-link">Configure</a>[% END %]</div>
-	[% Dashboard %]
-</div>
+

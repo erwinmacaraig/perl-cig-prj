@@ -1,29 +1,46 @@
-[% IF Navigation %]<div class = "progress">[% Navigation %]</div>[% END %]
-[% Title %]
-[% IF Errors.size %]
-<div class = "warningmsg">
-	<ul>
-	[% FOREACH error IN Errors %]
-		<li>[% error %]</li>
-	[% END %]
-	</ul>
+[% IF Navigation %]
+<div class = "col-md-12"><h2 class="main-heading">New Registration</h2></div>
+<div class = "col-md-12 steps">[% Navigation %]
 </div>
 [% END %]
-[% IF FlowSummary %]
-[% FStemplate = FlowSummaryTemplate or 'flow/flow_summary.templ' %]
-[% INCLUDE $FStemplate %]
+[% Title %]
+[% IF Errors.size %]
+<div class="col-md-12">
+	<div class="alert">
+		<div>
+			<span class="fa fa-exclamation"></span>
+			[% FOREACH error IN Errors %]
+			<p>[% error %]</p>
+			[% END %]
+		</div>
+	</div>
+</div>
 [% END %]
 
 [% TextTop %]
+<div class="col-md-8">
+<h3 class="panel-header">Personal Details</h3>
+<div class="panel-body">
+<fieldset><p><span class="notice-error">*Required fields.</span></p></fieldset>
 <form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">
     [% IF Content %][% Content %][% END %]
     [% IF FlowNextAction %]
 [% IF !NoContinueButton %]
-	<input type = "submit" value = " [% Lang.txt('Continue') %] "  class = "button proceed-button">
+	<div class="txtright"><input type = "submit" value = " [% Lang.txt('Continue') %] "  class = "button proceed-button"></div>
 [% END %]
 	<input type = "hidden" name ="rfp" value ="[% FlowNextAction %]">
     [% END %]
 	[% HiddenFields %]
 
 </form>
+</div>
+</div>
+[% IF FlowSummary %]
+<div class="col-md-4">
+[% FStemplate = FlowSummaryTemplate or 'flow/flow_summary.templ' %]
+[% INCLUDE $FStemplate %]
+</div>
+[% END %]
+<br/>
+<div class="col-md-8"></div>
 [% TextBottom %]

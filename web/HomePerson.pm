@@ -86,7 +86,9 @@ sub showPersonHome	{
 		AddRegistrationURL => $addregistrationURL || '',
 		CardPrintingURL => $cardprintingURL || '',
 		Documents => $docs,
-		GroupData => $groupdata,
+		GroupData => $groupdata,		
+	    client => $client,
+	    url => "$Defs::base_url/viewer.cgi",
 		Details => {
 			Active => $Data->{'lang'}->txt(($personObj->getValue('intRecStatus') || '') ? 'Yes' : 'No'),
 			LatinFirstname=> $personObj->getValue('strLatinFirstname') || '',	
@@ -119,7 +121,9 @@ sub showPersonHome	{
     
     $RegFilters{'statusIN'} = \@statusIN;
     my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
-
+	
+	open FH, ">dumpfile.txt";
+	
     foreach my $rego (@{$Reg_ref})  {
         my $renew = '';
         $rego->{'renew_link'} = '';
@@ -127,6 +131,8 @@ sub showPersonHome	{
         next if ($rego->{'strStatus'} !~ /$Defs::PERSONREGO_STATUS_ACTIVE|$Defs::PERSONREGO_STATUS_PASSIVE/);
         #my $ageLevel = $rego->{'strAgeLevel'}; #'ADULT'; ## HERE NEEDS TO CALCULATE IF MINOR/ADULT
         my $newAgeLevel = '';
+
+		
         if ($rego->{'strAgeLevel'}) { 
             $newAgeLevel = Person::calculateAgeLevel($Data, $rego->{'currentAge'});
         }
@@ -134,8 +140,16 @@ sub showPersonHome	{
         next if ($rego->{'intNationalPeriodID'} == $nationalPeriodID);
 $renew = $Data->{'target'} . "?client=$client&amp;a=PREGF_TU&amp;pt=$rego->{'strPersonType'}&amp;per=$rego->{'strPersonEntityRole'}&amp;pl=$rego->{'strPersonLevel'}&amp;sp=$rego->{'strSport'}&amp;ag=$newAgeLevel&amp;nat=RENEWAL";
         $rego->{'renew_link'} = $renew;
+
+        $rego->{'Status'} = (($rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE) and $rego->{'intPaymentRequired'}) ? $Defs::personRegoStatus{$Defs::PERSONREGO_STATUS_ACTIVE_PENDING_PAYMENT} : $rego->{'Status'};
     }
+	
+	#$Reg_ref->[0]{'documents'} = \@reg_docs;
+	#push @{$Reg_ref},\%reg_docs;
     $TemplateData{'RegistrationInfo'} = $Reg_ref;
+	
+	print FH "Dump of template data \n" . Dumper($TemplateData{'RegistrationInfo'}) . "\n"; 
+
 
 
 	my $statuspanel= runTemplate(

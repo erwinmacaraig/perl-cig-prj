@@ -1,0 +1,11 @@
+<div class="search-panel col-md-12">
+	<h3 class="panel-header">Search</h3>
+	<div class="panel-body">
+		<form id="searchForm" action="main.cgi" method="POST">
+			<span class="formw"><input size="105" type="text" placeholder="Enter a person's name or Member ID" name="search_keyword" value="[% search_keyword %]"></span>
+		    <input type="submit" name="submit" value="Search" >   
+		    <input type="hidden" value="[% action %]" name="a"> <input type="hidden" value="[% client %]" name="client">
+		    <input type="hidden" value="[% type %]" name="type">
+	    </form>
+    </div>
+</div>

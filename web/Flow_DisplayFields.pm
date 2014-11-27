@@ -52,6 +52,7 @@ sub build {
     my $txt_compulsory = $self->langlookup( 'Compulsory Field' );
     my $compulsory =
 qq[<span class="compulsory"><img src="images/compulsory.gif" alt="$txt_compulsory" title="$txt_compulsory"/></span>];
+    #my $compulsory = qq[];
     return '' if !$self->{'Fields'};
     return '' if !$self->{'Fields'}->{'order'};
     my @fieldorder =@{ $self->{'Fields'}->{'order'} };
@@ -232,7 +233,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 $clientside_validation{$fieldname}{'validate'} =
                   $f->{'validate'};
             }
-            $label = qq[<label for="l_$fieldname">$label</label>] if $label;
+            $label = qq[$label] if $label;
         }
         else {
             if ( $type eq 'lookup' ) {
@@ -295,10 +296,10 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
             my $rowcount =
               ( $sectioncount{$sname} % 2 ) ? 'HTr_odd' : 'HTr_even';
             $sections{$sname} .= qq[
-            <tr class="$rowcount $row_class" id = "l_row_$fieldname">
-            <td class="label">$label</td>
-            <td class="value">$pretext$field_html$posttext</td>
-            </tr>
+            <div class="form-group" id = "l_row_$fieldname">
+            <label class="col-md-4 control-label txtright" for="l_$fieldname">$label</label>
+            <div class="col-md-6">$pretext$field_html$posttext</div>
+            </div>
             ];
         }
     }
@@ -312,7 +313,11 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
             next if $s->[2] and not $self->display_section( $s->[2] );
             $usedsections{ $s->[0] } = 1;
             if ($notabs) {
-                $returnstr .= $sections{ $s->[0] };
+                my $sh = '';
+                if ( $s->[1] ) {
+                    $sh = qq[ <div class = "sectionheader">$sectionheader</div>];
+                }
+                $returnstr .= qq[<div class = "fieldSectionGroup">$sh].$sections{ $s->[0] }.qq[</div>];
             }
             else {
                 #my $style=$s ? 'style="display:none;" ' : '';
@@ -333,9 +338,9 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
     }
     my $tableinfo = $self->{'Fields'}->{'options'}{'tableinfo'} || ' class = "HTF_table" ';
     $returnstr = qq[ 
-    <table cellpadding="2" cellspacing="0" border="0" $tableinfo>
+    <fieldset>
     $returnstr
-    </table>
+    </fieldset>
     ];
     if ($returnstr) {
         my $validation =
@@ -456,11 +461,13 @@ sub gather    {
         $fv->{'old_value'} = $fv->{'value'};
 
         next if $self->{'Fields'}->{'fields'}{$fieldname}{'SkipProcessing'};
+        next if ( $permissions and !$permissions->{$fieldname} );
         if($option eq 'add')    {
             next if $self->{'Fields'}->{'fields'}{$fieldname}{'SkipAddProcessing'};
         }
         if($option eq 'edit')    {
             next if $self->{'Fields'}->{'fields'}{$fieldname}{'SkipEditProcessing'};
+            next if $self->{'Fields'}->{'fields'}{$fieldname}{'noedit'};
         }
         #Update the form display
         if ( exists $params->{$name}

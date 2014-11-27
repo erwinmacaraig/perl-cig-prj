@@ -250,28 +250,28 @@ sub retrieveFormFieldData {
             label => 'Field ID',
         },
         'intFieldOrderNumber' => {
-            label => 'Field Order Number',
+            label => 'Field Number',
             validate => 'NUMBER',
         },
         'strName' => {
             label => 'Field Name',
         },
         'strDiscipline' => {
-            label => 'Discipline',
+            label => 'FieldDiscipline',
         },
         'strGroundNature' => {
-            label => 'Ground Nature',
+            label => 'Type of Field',
         },
         'intCapacity' => {
             label => 'Capacity',
             validate => 'NUMBER',
         },
         'dblLength' => {
-            label => 'Length',
+            label => 'Length of Field',
             validate => 'FLOAT',
         },
         'dblWidth' => {
-            label => 'Width',
+            label => 'Width of Field',
             validate => 'FLOAT',
         },
     );

@@ -1,99 +1,149 @@
-[% IF Notifications.size %]
-    <div class="notificationmsg">
-        <ul>
-        [% FOREACH message IN Notifications %]
-            <li>[% message.value %]</li>
+[% IF FlashMessage.flash.type %]
+<div class="col-md-12">
+    <div class="alert alert-warning" role="alert">
+        <div>
+        [% IF FlashMessage.flash.type == 'success' %]
+            <span class="fa flash_success fa-exclamation"></span>
+            <p>[% FlashMessage.flash.message %]</p>
+        [% ELSIF FlashMessage.flash.type == 'error' %]
+            <span class="fa flash_error fa-exclamation"></span>
+            <p>[% FlashMessage.flash.message %]</p>
         [% END %]
-        </ul>
+        <br/>
+        </div>
     </div>
+</div>
+[% END %]
+
+
+
+[% IF Notifications.size %]
+<div class="col-md-12">
+    <div class="alert alert-warning" role="alert">
+        <div>
+        <span class="fa fa-exclamation"></span>
+        [% FOREACH message IN Notifications %]
+            <p>[% message.value %]</p>
+        [% END %]
+        <br/>
+        </div>
+    </div>
+</div>
 [% END %]
 
 <div class="member-home-page">
-    <div class="">
-        <div class="rego-detail">
-            <div class = "sectionheader">[% Lang.txt('Registration Details') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin  %]<a href = "[% EditDetailsLink %]"         class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
-            <div class="member-details">
+    <div class="col-md-12">
+        <div class="panel-body">
+            <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#memberdocs">Documents</a></li>
+                <li><a data-toggle="tab" href="#memberdetails">Personal Information</a></li>
+                <li><a data-toggle="tab" href="#tasknotesdocs">Task Details</a></li>
+            </ul>
 
-            [% IF EntityDetails.Status %]
-                <span class="details-row">
-                    <span class="details-left">[% Lang.txt("Status") %]:</span>
-                    <span class="details-left">[% EntityDetails.Status %]</span>
-                </span>
-            [% END %]
+			<div class="tab-content">
+                
+               <div id="memberdocs" class="tab-pane fade in active">
+                    <h3 class="panel-header">Documents</h3>
+					<div class="panel-body">
+						[% DocumentBlock %]
+					</div>
+                </div>
+                <div id="memberdetails" class="tab-pane fade">
+					<div class="rego-detail">
+						<h3 class="panel-header">[% Lang.txt('Registration Details') %] 1</h3>
+				        <div class="panel-body">
+				            [% IF EditDetailsLink and !ReadOnlyLogin  %]
+				            <a href = "[% EditDetailsLink %]" class="edit-link">
+				                [% Lang.txt('Edit') %]
+				            </a>
+				            [% END %]
 
-            [% IF EntityDetails.LocalShortName %]
-                <span class="details-row">
-                    <span class="details-left">[% Lang.txt("Short Name") %]:</span>
-                    <span class="details-left">[% EntityDetails.LocalShortName %]</span>
-                </span>
-            [% END %]
+				            <div class="member-details">
+				                [% IF EntityDetails.Status %]
+				                <span class="details-row">
+				                    <span class="details-left">[% Lang.txt("Status") %]:</span>
+				                    <span class="details-left detail-value">[% EntityDetails.Status %]</span>
+				                </span>
+				                [% END %]
 
-            [% IF EntityDetails.LocalName %]
-                <span class="details-row">
-                    <span class="details-left">[% Lang.txt("Local Name") %]:</span>
-                    <span class="details-left">[% EntityDetails.LocalName %]</span>
-                </span>
-            [% END %]
+				                [% IF EntityDetails.LocalShortName %]
+				                    <span class="details-row">
+				                        <span class="details-left">[% Lang.txt("Short Name") %]:</span>
+				                        <span class="details-left detail-value">[% EntityDetails.LocalShortName %]</span>
+				                    </span>
+				                [% END %]
 
-            [% IF EntityDetails.Region %]
-                <span class="details-row">
-                    <span class="details-left">[% Lang.txt("Region") %]:</span>
-                    <span class="details-left">[% EntityDetails.Region %]</span>
-                </span>
-            [% END %]
+				                [% IF EntityDetails.LocalName %]
+				                    <span class="details-row">
+				                        <span class="details-left">[% Lang.txt("Local Name") %]:</span>
+				                        <span class="details-left detail-value">[% EntityDetails.LocalName %]</span>
+				                    </span>
+				                [% END %]
 
-            [% IF EntityDetails.Address %]
-                <span class="details-row">
-                    <span class="details-left">[% Lang.txt("Address") %]:</span>
-                    <span class="details-left">[% EntityDetails.Address %]</span>
-                </span>
-            [% END %]
+				                [% IF EntityDetails.Region %]
+				                    <span class="details-row">
+				                        <span class="details-left">[% Lang.txt("Region") %]:</span>
+				                        <span class="details-left detail-value">[% EntityDetails.Region %]</span>
+				                    </span>
+				                [% END %]
 
-            [% IF EntityDetails.Town %]
-                <span class="details-row">
-                    <span class="details-left">[% Lang.txt("Town") %]:</span>
-                    <span class="details-left">[% EntityDetails.Town %]</span>
-                </span>
-            [% END %]
+				                [% IF EntityDetails.Address %]
+				                    <span class="details-row">
+				                        <span class="details-left">[% Lang.txt("Address") %]:</span>
+				                        <span class="details-left detail-value">[% EntityDetails.Address %]</span>
+				                    </span>
+				                [% END %]
 
-            [% IF EntityDetails.WebUrl %]
-                <span class="details-row">
-                    <span class="details-left">[% Lang.txt("WebUrl") %]:</span>
-                    <span class="details-left">[% EntityDetails.WebUrl %]</span>
-                </span>
-            [% END %]
+				                [% IF EntityDetails.Town %]
+				                    <span class="details-row">
+				                        <span class="details-left">[% Lang.txt("Town") %]:</span>
+				                        <span class="details-left detail-value">[% EntityDetails.Town %]</span>
+				                    </span>
+				                [% END %]
 
-            [% IF EntityDetails.Email %]
-                <span class="details-row">
-                    <span class="details-left">[% Lang.txt("Email") %]:</span>
-                    <span class="details-left">[% EntityDetails.Email %]</span>
-                </span>
-            [% END %]
+				                [% IF EntityDetails.WebUrl %]
+				                    <span class="details-row">
+				                        <span class="details-left">[% Lang.txt("WebUrl") %]:</span>
+				                        <span class="details-left detail-value">[% EntityDetails.WebUrl %]</span>
+				                    </span>
+				                [% END %]
 
-            [% IF EntityDetails.Phone %]
-                <span class="details-row">
-                    <span class="details-left">[% Lang.txt("Phone") %]:</span>
-                    <span class="details-left">[% EntityDetails.Phone %]</span>
-                </span>
-            [% END %]
+				                [% IF EntityDetails.Email %]
+				                    <span class="details-row">
+				                        <span class="details-left">[% Lang.txt("Email") %]:</span>
+				                        <span class="details-left detail-value">[% EntityDetails.Email %]</span>
+				                    </span>
+				                [% END %]
 
-            [% IF EntityDetails.Fax %]
-                <span class="details-row">
-                    <span class="details-left">[% Lang.txt("Fax") %]:</span>
-                    <span class="details-left">[% EntityDetails.Fax %]</span>
-                </span>
-            [% END %]
+				                [% IF EntityDetails.Phone %]
+				                    <span class="details-row">
+				                        <span class="details-left">[% Lang.txt("Phone") %]:</span>
+				                        <span class="details-left detail-value">[% EntityDetails.Phone %]</span>
+				                    </span>
+				                [% END %]
 
+				                [% IF EntityDetails.Fax %]
+				                    <span class="details-row">
+				                        <span class="details-left">[% Lang.txt("Fax") %]:</span>
+				                        <span class="details-left detail-value">[% EntityDetails.Fax %]</span>
+				                    </span>
+				                [% END %]
+				            </div>
+				        </div>
+					</div>
+				</div>
+		           	<div id="tasknotesdocs" class="tab-pane fade">
+						<h3 class="panel-header">Task Notes</h3>
+						<div class="panel-body">
+							[% NotesBlock %]
+						</div>
+		            </div>
             </div>
         </div>
+
+        [% PaymentBlock %]
+
+        [% ActionsBlock %]
     </div>
-
-    [% PaymentBlock %]
-
-    [% DocumentBlock %]
-
-    [% NotesBlock %]
-
-    [% ActionsBlock %]
-
 </div>
+

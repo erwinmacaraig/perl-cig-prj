@@ -75,6 +75,7 @@ my $Fields = {
 		strMemberCustomNotes5
                 intMemberToHideID
                 intPhotoUseApproval
+                strOtherPersonIdentifier
                 strOtherPersonIdentifierDesc
                 strISONationality
                 strISOCountryOfBirth

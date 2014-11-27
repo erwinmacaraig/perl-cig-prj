@@ -1,30 +1,31 @@
-
-    <div class="">
-        <div class="payment-detail">
-            <div class = "sectionheader">[% Lang.txt('Payment Details') %]&nbsp;&nbsp;</div>
-            <div class="member-details">
-                    <table style="width: 100%">
-                    <tr>
-                        <th>[% Lang.txt('Qty') %]</th>
-                        <th>[% Lang.txt('Product') %]</th>
-                        <th>[% Lang.txt('Product Type') %]</th>
-                        <th>[% Lang.txt('Total Cost') %]</th>
-                        <th>[% Lang.txt('Payment Status') %]</th>
-                        <th>[% Lang.txt('Payment Type') %]</th>
-                    </tr>
-                    <!-- loop here; -->
-                    [% FOREACH row IN TXNs %]
-                    <tr>
-                        <td><div class="member-data"> [% row.Qty %] </div></td>
-                        <td><div class="member-data"> [% row.ProductName %] </div></td>
-                        <td><div class="member-data"> [% row.ProductType %] </div></td>
-                        <td><div class="member-data"> [% CurrencySymbol %][% row.Amount %] </div></td>
-                        <td><div class="member-data"> [% row.TXNStatus %] </div></td>
-                        <td><div class="member-data"> [% row.PaymentType %] </div></td>
-                    [% END %]
-                </table>
-            </div>
+<div class="">
+    <div class="payment-detail">
+        <!--<div class = "sectionheader">[% Lang.txt('Payment Details') %]&nbsp;&nbsp;</div>-->
+        <div class="member-details">
+                <table class="table" style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th>[% Lang.txt('Qty') %]</th>
+                            <th>[% Lang.txt('Product') %]</th>
+                            <th>[% Lang.txt('Product Type') %]</th>
+                            <th>[% Lang.txt('Total Cost') %]</th>
+                            <th>[% Lang.txt('Payment Status') %]</th>
+                            <th>[% Lang.txt('Payment Type') %]</th>
+                        </tr>
+                    </thead>
+                <!-- loop here; -->
+                [% FOREACH row IN TXNs %]
+                <tr>
+                    <td><div class="member-data"> [% row.Qty %] </div></td>
+                    <td><div class="member-data"> [% row.ProductName %] </div></td>
+                    <td><div class="member-data"> [% row.ProductType %] </div></td>
+                    <td><div class="member-data"> [% CurrencySymbol %][% row.Amount %] </div></td>
+                    <td><div class="member-data"> [% row.TXNStatus %] </div></td>
+                    <td><div class="member-data"> [% row.PaymentType %] </div></td>
+                [% END %]
+            </table>
         </div>
     </div>
+</div>
 
 

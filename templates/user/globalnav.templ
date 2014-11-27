@@ -1,23 +1,47 @@
-<div id="pushdown-wrapper" style="display:none;"></div>
-
-<div id="globalnav">
-        <div id="globalnav-inner">
-                <div class="gnav-logo">
-                        <div id="gnav-arrow-wrap"><div class="gnav-splogo"></div><div id="gnav-arrow"></div></div>
-                </div>
-<div class="sp-sign-in-out-wrap">
-        <div class="nav-tools">
-                        <div class = "navoptions">
-                                <span class="nav-link"><a href ="#">[% Data.UserName %]</a></span>
-                                <span class="nav-link"><a href ="http://support.sportingpulse.com">Support</a></span>
-                                <span class="nav-link"><a href ="[% BaseURL %]/passport/logout.cgi">Sign out</a></span>
-                        </div>
+<!-- <div class="utilities clearfix">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+			<ul>
+				<li>[% Lang.txt('Welcome') %]<a href="#" title="">[% Data.UserName %] <span class="fa fa-caret-down"></span></a></li>
+				<li><a href ="http://support.sportingpulse.com">[% Lang.txt('Support') %]</a></li>
+				<li><a href="user/logout.cgi" title="[% Lang.txt('Logout') %]">[% Lang.txt('Logout') %]</a></li>
+			</ul>
+			</div>
+		</div>
+	</div>
+</div> -->
+<header>
+      <div class="logo-area clearfix">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-12">
+              <!--<a href="#" title=""><img src="images/img-logo.png" alt="" /></a><h1>Finland Association</h1>-->
+              <ul>
+                <li>
+                  <strong>Member Association</strong><br/>
+                  Phone: <strong>4567 8658 689</strong><br/>
+                  Email: <strong>ma@ma.com</strong><br/>
+                  Website: <strong>www.ma.com</strong>
+                </li>
+                <li>
+                  <strong>Help Desk</strong><br/>
+                  Phone: <strong>4567 8658 689</strong><br/>
+                  Email: <strong>hd@hd.com</strong><br/>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
-</div>
-</div>
-</div>
+      </div>       
+    </header>
 <script>
 jQuery(document).ready(function()  {
+
+	//Show Hide Advanced Search Fields :V:
+	jQuery(".show-advanced-search").on("click", function(){
+		jQuery(this).parent().find((".advanced-search-fields")).slideToggle();
+	});
 
   function clickclear(thisfield, defaulttext) {
     if (thisfield.value == defaulttext) {
@@ -33,27 +57,118 @@ jQuery(document).ready(function()  {
 });
 </script>
 <style>
+@font-face {
+    font-family: 'noto_sansbold';
+    src: url('../css/fonts/noto-sans/notosans-bold-webfont.eot');
+    src: url('../css/fonts/noto-sans/notosans-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../css/fonts/noto-sans/notosans-bold-webfont.woff2') format('woff2'),
+         url('../css/fonts/noto-sans/notosans-bold-webfont.woff') format('woff'),
+         url('../css/fonts/noto-sans/notosans-bold-webfont.ttf') format('truetype'),
+         url('../css/fonts/noto-sans/notosans-bold-webfont.svg#noto_sansbold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'noto_sansbold_italic';
+    src: url('../css/fonts/noto-sans/notosans-bolditalic-webfont.eot');
+    src: url('../css/fonts/noto-sans/notosans-bolditalic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../css/fonts/noto-sans/notosans-bolditalic-webfont.woff2') format('woff2'),
+         url('../css/fonts/noto-sans/notosans-bolditalic-webfont.woff') format('woff'),
+         url('../css/fonts/noto-sans/notosans-bolditalic-webfont.ttf') format('truetype'),
+         url('../css/fonts/noto-sans/notosans-bolditalic-webfont.svg#noto_sansbold_italic') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'noto_sansitalic';
+    src: url('../css/fonts/noto-sans/notosans-italic-webfont.eot');
+    src: url('../css/fonts/noto-sans/notosans-italic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../css/fonts/noto-sans/notosans-italic-webfont.woff2') format('woff2'),
+         url('../css/fonts/noto-sans/notosans-italic-webfont.woff') format('woff'),
+         url('../css/fonts/noto-sans/notosans-italic-webfont.ttf') format('truetype'),
+         url('../css/fonts/noto-sans/notosans-italic-webfont.svg#noto_sansitalic') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'noto_sansregular';
+    src: url('../css/fonts/noto-sans/notosans-regular-webfont.eot');
+    src: url('../css/fonts/noto-sans/notosans-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../css/fonts/noto-sans/notosans-regular-webfont.woff2') format('woff2'),
+         url('../css/fonts/noto-sans/notosans-regular-webfont.woff') format('woff'),
+         url('../css/fonts/noto-sans/notosans-regular-webfont.ttf') format('truetype'),
+         url('../css/fonts/noto-sans/notosans-regular-webfont.svg#noto_sansregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
 #global-nav-wrap {
-  /*      float: left; disabled due to being obscured */
+  /*    float: left; disabled due to being obscured */
         font-family: 'DINRegular',sans-serif;
         width: 100%;
 /*      height: 32px;*/
-	background: url("https://reg.sportingpulse.com/images/global_nav_sprite.png") repeat-x scroll 0 0 transparent;
+	    background: url("https://reg.sportingpulse.com/images/global_nav_sprite.png") repeat-x scroll 0 0 transparent;
 }
 
 #globalnav {
-	background: url("https://reg.sportingpulse.com/images/global_nav_sprite.png") repeat-x scroll 0 -33px transparent;
-        float: left;
-        height: 32px;
-        width: 100%;
+	    /*background: url("https://reg.sportingpulse.com/images/global_nav_sprite.png") repeat-x scroll 0 -33px transparent;*/
+        /*float: left;*/
+        /*height: 32px;*/
+        /*width: 100%;*/
 }
 #globalnav-inner, .membership-login #globalnav-inner {
-        margin: 0 auto;
+        /*margin: 0 auto;*/
         width: 996px;
 }
-
+header .logo-area {
+	background: #085a8c;
+	height: 140px;
+  padding: 30px 0px;
+}
+header .logo-area ul {
+float: right;
+}
+header .logo-area ul li {
+float: left;
+text-align: center;
+list-style-type: none;
+font-size: 12px;
+color: #fff;
+margin: 0 10px 0 30px;
+}
+ul, ol {
+margin-top: 0;
+margin-bottom: 10px;
+}
+header .logo-area ul li strong {
+font-family: 'noto_sansbold';
+font-weight: normal;
+}
+.clearfix:before, .clearfix:after, .dl-horizontal dd:before, .dl-horizontal dd:after, .container:before, .container:after, .container-fluid:before, .container-fluid:after, .row:before, .row:after, .form-horizontal .form-group:before, .form-horizontal .form-group:after, .btn-toolbar:before, .btn-toolbar:after, .btn-group-vertical>.btn-group:before, .btn-group-vertical>.btn-group:after, .nav:before, .nav:after, .navbar:before, .navbar:after, .navbar-header:before, .navbar-header:after, .navbar-collapse:before, .navbar-collapse:after, .pager:before, .pager:after, .panel-body:before, .panel-body:after, .modal-footer:before, .modal-footer:after {
+display: table;
+content: " ";
+}
+:before, :after {
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+}
+.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
+position: relative;
+min-height: 1px;
+padding-right: 15px;
+padding-left: 15px;
+}
+* {
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+}
 .gnav-logo {
-	background: url("https://reg.sportingpulse.com/images/global_nav_sprite.png") no-repeat scroll 0 0 transparent;
+	    /*background: url("https://reg.sportingpulse.com/images/global_nav_sprite.png") no-repeat scroll 0 0 transparent;*/
         cursor: pointer;
         display: block;
         float: left;
@@ -64,7 +179,7 @@ jQuery(document).ready(function()  {
 }
 
 .gnav-splogo {
-	background: url("https://reg.sportingpulse.com/images/global_nav_sprite.png") repeat-x scroll 0 -162px transparent; 
+	    /*background: url("https://reg.sportingpulse.com/images/global_nav_sprite.png") repeat-x scroll 0 -162px transparent; */
         display: inline;
         float: left;
         height: 26px;
@@ -106,7 +221,7 @@ jQuery(document).ready(function()  {
 }
 
 #gnav-arrow {
-	background: url("https://reg.sportingpulse.com/images/global_nav_sprite.png") repeat scroll -23px -353px transparent; 
+	    background: url("https://reg.sportingpulse.com/images/global_nav_sprite.png") repeat scroll -23px -353px transparent; 
         display: inline;
         float: left;
         height: 11px;
@@ -124,8 +239,37 @@ jQuery(document).ready(function()  {
 }
 
 /* Media Queries for mobile registrations */
+@media screen and (min-width: 768px){
+	.container {
+	width: 750px;
+	}
+}
+@media screen and (min-width: 992px){
+	.container {
+	width: 970px;
+	}
+  .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12 {
+  float: left;
+  }
+  .col-md-12 {
+  width: 100%;
+  }
+}
+@media screen and (min-width: 1200px){
+	.container {
+	width: 1170px;
+	}
+}
 
+
+.container {
+padding-right: 15px;
+padding-left: 15px;
+margin-right: auto;
+margin-left: auto;
+}
 /* Tablet Landscape Layout */
+
 @media screen and (max-width: 1000px) {
 	#global-nav-wrap {
 		float:none;

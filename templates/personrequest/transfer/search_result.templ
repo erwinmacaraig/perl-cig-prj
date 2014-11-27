@@ -1,0 +1,49 @@
+[% USE Dumper %]
+<div id="transfer_search_result" class="tasklist-content dashboard-tasklist search-panel">
+	<table cellpadding="5" style="width: 100%">
+		<thead>
+			<tr class="box-header">
+				<th>Name</th>
+				<th>Member ID</th>
+				<th>Date of Birth</th>
+				<th>&nbsp;</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Filter by:
+					<select class="filter-tasks">
+			          <option selected="" value="-- Task --">-- Name --</option>
+			          <option value="az">Name A-Z</option>
+			          <option value="za">Name Z-A</option>
+			        </select>
+		        </td>
+				<td>
+					<select>
+			          <option value="-- Member ID --">-- Member ID --</option>
+			          <option value="asc">Ascending</option>
+			          <option value="desc">Descending</option>
+			        </select>
+				</td>
+				<td>
+					<select>
+			          <option value="-- Date of Birth --">-- Date of Birth --</option>
+			          <option value="Latest">Latest</option>
+			          <option value="Oldest">Oldest</option>
+			        </select>
+				</td>
+				<td></td>
+			</tr>
+		    [% FOREACH rego IN RegoList %]
+                <tr class="task-list">
+                    <td><span class="fa fa-user"></span>[% rego.name %]</td>
+                    <td>[% rego.otherdetails.ma_id %]</td>
+                    <td><span class="fa fa-clock-o"></span>[% rego.otherdetails.dob %]</td>
+                    <td><a href="[% rego.link %]" class="btn-inside-panels">View</a></td>
+                </tr>
+		    [% END %]
+		</tbody>
+	</table>
+</div>
+
+

@@ -19,7 +19,7 @@ use Products;
 use PageMain;
 use CGI qw(param unescape escape);
 
-use NABGateway;
+use ExternalGateway;
 use Gateway_Common;
 use TTTemplate;
 use Data::Dumper;
@@ -124,7 +124,7 @@ sub main	{
 		}
 	}
 	elsif ($action eq 'S')	{
-		$body = NABUpdate(\%Data, $paymentSettings, $client, \%returnVals, $logID, $Order->{'AssocID'}); #, $Order, $external, $encryptedID);
+		$body = ExternalGatewayUpdate(\%Data, $paymentSettings, $client, \%returnVals, $logID, $Order->{'AssocID'}); #, $Order, $external, $encryptedID);
 	}
 	disconnectDB($db);
 
@@ -181,7 +181,7 @@ sub main	{
 #	}
 #	elsif ($action eq 'S')	{
 #		warn "Action in nab process is S";
-#		$body = NABUpdate(\%Data, $paymentSettings, $client, \%returnVals, $logID, $Order->{'AssocID'}); #, $Order, $external, $encryptedID);
+#		$body = ExternalGatewayUpdate(\%Data, $paymentSettings, $client, \%returnVals, $logID, $Order->{'AssocID'}); #, $Order, $external, $encryptedID);
 #		
 #	}
 #	disconnectDB($db);

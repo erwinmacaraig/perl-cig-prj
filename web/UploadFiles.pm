@@ -36,7 +36,7 @@ sub getUploadedFiles	{
 	my $myCurrentValue = $clientValues{'authLevel'};
 	
 	my $st = qq[
-	SELECT *,DATE_FORMAT(dtUploaded,"%d/%m/%Y %H:%i") AS DateAdded_FMT, tblDocuments.intDocumentTypeID,tblDocumentType.strLockAtLevel
+	SELECT *,DATE_FORMAT(dtUploaded,"%d/%m/%Y %H:%i") AS DateAdded_FMT, tblDocuments.intDocumentTypeID,tblDocuments.intPersonRegistrationID as regoID, tblDocumentType.strLockAtLevel
     FROM  tblUploadedFiles AS UF LEFT JOIN tblDocuments ON UF.intFileID = tblDocuments.intUploadFileID 
     LEFT JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID  WHERE UF.intEntityTypeID = ? AND
     UF.intEntityID = ? AND UF.intFileType = ?
@@ -71,8 +71,9 @@ sub getUploadedFiles	{
     	if($dref->{'strLockAtLevel'} eq ''){
     		$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}";
 		    $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
+			$deleteURL .= qq[&amp;dctid=$dref->{'intDocumentTypeID'}&amp;regoID=$dref->{'regoID'}] if($dref->{'intDocumentTypeID'});
 	      	$deleteURLButton = qq[ <span class="button-small generic-button"><a href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a></span>];
-	    	$urlViewButton = qq[ <span class="button-small generic-button"><a href="$url">]. $Data->{'lang'}->txt('View'). q[</a></span>];
+            $urlViewButton = qq[ <span class="button-small generic-button"><a href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a></span>];
     	}
     	else {
     		my @authorizedLevelsArr = split(/\|/,$dref->{'strLockAtLevel'});
@@ -80,8 +81,9 @@ sub getUploadedFiles	{
     	    if(grep(/^$myCurrentValue/,@authorizedLevelsArr)){
                	$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}";
 		        $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
+				$deleteURL .= qq[&amp;dctid=$dref->{'intDocumentTypeID'}&amp;regoID=$dref->{'regoID'}] if($dref->{'intDocumentTypeID'});
 	         	$deleteURLButton = qq[ <span class="button-small generic-button"><a href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a></span>];
-	    	    $urlViewButton = qq[ <span class="button-small generic-button"><a href="$url">]. $Data->{'lang'}->txt('View'). q[</a></span>];
+                $urlViewButton = qq[ <span class="button-small generic-button"><a href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a></span>];
             }
             else{
             	$deleteURLButton = qq[ <button class\"HTdisabled\">]. $Data->{'lang'}->txt('Delete'). q[</button>]; 
@@ -155,6 +157,7 @@ sub _processUploadFile_single	{
         $other_info,
 	) = @_;
 
+	my $intFileAddedBy = $Data->{'clientValues'}{'_intID'} || getLastEntityID($Data->{'clientValues'});
 	$options ||= {}; 
         my $DocumentTypeId = 0;
         my $regoID = 0; 
@@ -190,7 +193,6 @@ sub _processUploadFile_single	{
 			WHERE intFileID = ?
 	];
 	my $q_u = $Data->{'db'}->prepare($st_u);
-
 		my $st_a = qq[
 		INSERT INTO tblUploadedFiles
 		(
@@ -223,11 +225,12 @@ sub _processUploadFile_single	{
         $EntityTypeID,
         $EntityID,
 		$Data->{'clientValues'}{'authLevel'},
-		$Data->{'clientValues'}{'_intID'},
+		$intFileAddedBy,
 		$title,
 		$origfilename,
 		$permissions,
-	);
+	); 
+#Data->{'clientValues'}{'_intID'}
 	my $fileID = $q_a->{mysql_insertid} || 0;
 	$q_a->finish();
 	return ('Invalid ID',0) if !$fileID; 
@@ -277,11 +280,12 @@ sub _processUploadFile_single	{
         }
         else {
         	 $doc_st = qq[
-        		UPDATE tblDocuments SET intUploadFileID = ?, dtLastUpdated = NOW() WHERE intUploadFileID = ? AND intPersonID = ?
+        		UPDATE tblDocuments SET intUploadFileID = ?, dtLastUpdated = NOW(), strApprovalStatus = ? WHERE intUploadFileID = ? AND intPersonID = ?
         	]; 
         	$doc_q = $Data->{'db'}->prepare($doc_st); 
         	$doc_q->execute(
-              $fileID,              
+              $fileID,    
+			  'PENDING',          
               $oldFileId,
               $intPersonID, 
         );

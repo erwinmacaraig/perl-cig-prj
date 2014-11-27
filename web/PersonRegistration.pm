@@ -147,7 +147,6 @@ sub checkNewRegoOK  {
 sub checkRenewalRegoOK  {
 
     my ($Data, $personID, $rego_ref) = @_;
-    
     my $pref= undef;
     $pref = Person::loadPersonDetails($Data->{'db'}, $personID) if ($personID);
     return 0 if (defined $pref and ($pref->{'strStatus'} eq $Defs::PERSON_STATUS_SUSPENDED));
@@ -182,7 +181,6 @@ sub checkRenewalRegoOK  {
         }
     }
 
-    warn "VALID REGO $validRego";
     return $validRego if (!$validRego);
 
     my @statusIN = ($Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);#, $Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_INPROGRESS);
@@ -220,11 +218,8 @@ sub checkRenewalRegoOK  {
         \%Reg
     );
 
-    print STDERR "renew COUNT $count";
-    print STDERR "COUNTALREADY $countAlready";
     #return 1 if ($countActive or $countInactive or $countRolledOver); ## Must have an ACTIVE or PASSIVE record
     return 1 if ($count and ! $countAlready);
-print STDERR "ALL OK";
     return 0;
 }
 
@@ -558,12 +553,10 @@ sub getRegistrationData	{
         $where .= " AND pr.intEntityID= ? ";
     }
 
-    print STDERR Dumper $where;
-
     my $st= qq[
         SELECT 
             pr.*, 
-            np.strNationalPeriodName,
+			np.strNationalPeriodName,
             p.dtDOB,
             DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
@@ -577,12 +570,17 @@ sub getRegistrationData	{
             DATE_FORMAT(pr.dtAdded, "%Y%m%d%H%i") as dtAdded_,
             DATE_FORMAT(pr.dtAdded, "%Y-%m-%d %H:%i") as dtAdded_formatted,
             DATE_FORMAT(pr.dtLastUpdated, "%Y%m%d%H%i") as dtLastUpdated_,
+            COUNT(DISTINCT T.intTransactionID) as CountTXNs,
             er.strEntityRoleName,
             e.strLocalName,
             e.strLatinName,
             e.intEntityID
         FROM
             tblPersonRegistration_$Data->{'Realm'} AS pr
+            LEFT JOIN tblTransactions as T ON (
+                T.intPersonRegistrationID = pr.intPersonRegistrationID
+                AND T.intStatus = 0
+            )
             LEFT JOIN tblNationalPeriod as np ON (
                 np.intNationalPeriodID = pr.intNationalPeriodID
             )
@@ -596,21 +594,25 @@ sub getRegistrationData	{
             )
             INNER JOIN tblPerson as p ON (
                 p.intPersonID = pr.intPersonID
-            )
+            )	
+			
         WHERE     
             p.intPersonID = ?
             $where
+        GROUP BY
+            pr.intPersonRegistrationID
         ORDER BY
           pr.dtAdded DESC
     ];	
+	
     my $db=$Data->{'db'};
     my $query = $db->prepare($st) or query_error($st);
 
     $query->execute(@values) or query_error($st);
     my $count=0;
-
+	#open FH, ">dumpfile.txt";
     my @Registrations = ();
-      
+    my @reg_docs = ();  
     while(my $dref= $query->fetchrow_hashref()) {
         $count++;
         $dref->{'Sport'} = $Defs::sportType{$dref->{'strSport'}} || '';
@@ -619,8 +621,26 @@ sub getRegistrationData	{
         $dref->{'AgeLevel'} = $Defs::ageLevel{$dref->{'strAgeLevel'}} || '';
         $dref->{'Status'} = $Defs::personRegoStatus{$dref->{'strStatus'}} || '';
         $dref->{'RegistrationNature'} = $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '';
+
+		my $sql = qq[
+			SELECT strApprovalStatus,strDocumentName, intFileID, pr.intPersonRegistrationID FROM tblUploadedFiles INNER JOIN tblDocuments 
+			ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID  
+			INNER JOIN tblDocumentType ON tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID   
+			INNER JOIN tblPersonRegistration_$Data->{'Realm'} as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID  
+			WHERE pr.intPersonRegistrationID = $dref->{intPersonRegistrationID} AND pr.intPersonID = $personID 
+		];
+		my $sth = $Data->{'db'}->prepare($sql);
+		$sth->execute();
+		while(my $data_ref = $sth->fetchrow_hashref()){
+			#push @reg_docs, $data_ref;	
+			push @{$dref->{'documents'}},$data_ref;				
+		}			
         push @Registrations, $dref;
+
+		
     }
+
+	
     return ($count, \@Registrations);
 }
 
@@ -784,7 +804,6 @@ sub submitPersonRegistration    {
 
     my ($Data, $personID, $personRegistrationID, $rego_ref) = @_;
 
-    warn "SUBMIT REGISTRATION CALLED";
     my %Reg=();
     $Reg{'personRegistrationID'} = $personRegistrationID;
     my ($count, $regs) = getRegistrationData($Data, $personID, \%Reg);
@@ -793,6 +812,8 @@ sub submitPersonRegistration    {
     if ($count && $pr_ref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_INPROGRESS) {
         my $personStatus = $pr_ref->{'personStatus'};
         $pr_ref->{'strStatus'} = 'PENDING';
+        $pr_ref->{'intPaymentRequired'} = 0 if ($rego_ref->{'CountTXNs'} == 0);
+        $pr_ref->{'paymentRequired'} = 0 if ($rego_ref->{'CountTXNs'} == 0);
 
         updatePersonRegistration($Data, $personID, $personRegistrationID, $pr_ref, $personStatus);
         cleanTasks(

@@ -305,13 +305,13 @@ my $filterfields = [
 
     my $allowClubAdd = 1;
 
-    if(allowedAction($Data, 'm_a') && !$Data->{'ReadOnlyLogin'})    {
-        $options{'addperson'} = [
-        "$target?client=$client&amp;a=PF_&amp;l=$Defs::LEVEL_PERSON",
-        $textLabels{'addPerson'}
-        ];
-        delete $options{'addperson'} if $Data->{'SystemConfig'}{'LockPerson'} or !$allowClubAdd;
-    }
+    #if(allowedAction($Data, 'm_a') && !$Data->{'ReadOnlyLogin'})    {
+    #    $options{'addperson'} = [
+    #    "$target?client=$client&amp;a=PF_&amp;l=$Defs::LEVEL_PERSON",
+    #    $textLabels{'addPerson'}
+    #    ];
+    #    delete $options{'addperson'} if $Data->{'SystemConfig'}{'LockPerson'} or !$allowClubAdd;
+    #}
 
 
     if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB and $Data->{'SystemConfig'}{'Club_PersonEditOnly'}) {

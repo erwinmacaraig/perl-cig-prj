@@ -1,113 +1,191 @@
-<div class="task-list-wrap">
-<p>[% TaskMsg %]</p>
-	<div class="tasklist-content">
-		<!-- use tables until UI/UX sorted -->
-		<table cellpadding="5">
-		<tr>
-			<th>TaskID</th>
-			<th>WorkFlow Type</th>
-			<th>Action</th>
-			<th>Task Description</th>
-			<th>Age<br>Level</th>
-			<th>Reg<br>Nature</th>
-			<th>Document<br>Type</th>
-			<th>Name</th>
-			<th>Status</th>
-		</tr>
-		[% FOREACH task IN TaskList %]
-			<tr [% IF task.OnHold == 1 %]style="color: #CFD1D0"[% END %]>
-			<td><div class="member-data"> [% task.WFTaskID %] </div></td>
-			<td><div class="member-data"> [% task.RuleFor %] </div></td>
-			<td><div class="member-data"> [% task.TaskType %] </div></td>
-			<td><div class="member-data"> [% task.TaskDescription %] </div></td>
-			<td><div class="member-data"> [% task.AgeLevel %] </div></td>			
-			<td><div class="member-data"> [% task.RegistrationNature %] </div></td>			
-			<td><div class="member-data"> [% task.DocumentName %] </div></td>			
-			<td><div class="member-data"> [% task.Name %] </div></td>			
-			<td>
-                <div class="member-data">
-                [% IF task.OnHold == 1 %]
-                    <span>ON-HOLD</span>
-                [% ELSE %]
-                    [% task.TaskStatus %]
-                [% END %]
-                </div>
-            </td>	
-            [% IF task.TaskType == 'TRANSFERS' %]
-			    <td colspan="2"><div class="member-data">
-                    <span class = "button-small generic-button">
-                        <a href="main.cgi?client=[% client %]&a=CL_list">View</a>
-                    </span>
-                </td>
-            [% ELSIF task.TaskType == 'DUPLICATES' %]
-			    <td colspan="2"><div class="member-data">
-                    <span class = "button-small generic-button">
-                        <a href="main.cgi?client=[% client %]&a=DUPL_L">View</a>
-                    </span>
-                </td>
-            [% ELSE %]
-            [% IF task.showView %]
-                [% IF task.TaskType == 'TRANSFER' || task.TaskType == 'ACCESS' %]
-                    <td><div class="member-data">
-                        <span class = "button-small generic-button">
-                            <a href="[% task.viewURL %]">[% Lang.txt('View') %]</a>
-                        </span>
-                    </div></td>
-                [% ELSE %]
-                    <td><div class="member-data">
-                        <span class = "button-small generic-button">
-                            <a href="main.cgi?client=[% client %]&a=WF_View&TID=[% task.WFTaskID %]">[% Lang.txt('View') %]</a>
-                        </span>
-                    </div></td>
-                [% END %]
-            [% ELSE %]
-                <td>&nbsp;</td>
+[% USE Dumper %]
+[% IF Notifications.size %]
+    <div class="col-md-9">
+        <div class="alert alert-info" role="alert">
+            <ul>
+            [% FOREACH message IN Notifications %]
+                <li>[% message.value %]</li>
             [% END %]
-            [% IF task.showApprove %]
-                <!--
-			    <td><div class="member-data">
-                    <span class = "button-small generic-button">
-                        <a href="main.cgi?client=[% client %]&a=WF_Approve&TID=[% task.WFTaskID %]">[% Lang.txt('Approve') %]</a>
-                    </span>
-                </div></td>
-                -->
-            [% ELSE %]
-                <td>&nbsp;</td>
-            [% END %]
-            [% IF task.showReject %]
-                <!--
-                <td><div class="member-data">
-                    <span class = "button-small generic-button">
-                        <a href="main.cgi?client=[% client %]&a=WF_Reject&TID=[% task.WFTaskID %]">[% Lang.txt('Reject') %]</a>
-                    </span>
-                </div></td>	
-                -->
-            [% ELSE %]
-                <td>&nbsp;</td>
-            [% END %]
-            [% IF task.showResolve %]
-                <!--
-                <td><div class="member-data">
-                    <span class = "button-small generic-button">
-                        <a href="main.cgi?client=[% client %]&a=WF_Resolve&TID=[% task.WFTaskID %]">[% Lang.txt('Resolve') %]</a>
-                    </span>
-                </div></td>	
-                -->
-            [% ELSE %]
-                <td>&nbsp;</td>
-            [% END %]
+            </ul>
+        </div>
+    </div>
+[% END %]
 
-
-            [% END %]
-			</tr>				
-            [% IF task.TaskNotes %]
-                <tr>
-                <td colspan="12">
-                    [% task.TaskNotes %]
-                </td>
+<div class="col-md-9 tasklist-content dashboard-tasklist">
+	<table id="example" cellpadding="5" width="100%">
+		<thead>
+			<tr class="box-header">
+				<th>Tasklist</th>
+				<th>Started</th>
+				<th>Status</th>
+				<th>Actions</th>
+			</tr>
+			<tr>
+				<td>Filter by:
+					<select class="filter-tasks">
+			          <option selected="" value="-- Task --">-- Task --</option>
+			          <option value="Registrations">Registrations</option>
+			          <option value="Transfers">Transfers</option>
+			        </select>
+		        </td>
+				<td>
+					<select>
+			          <option value="-- Date --">-- Date --</option>
+			          <option value="Latest">Latest</option>
+			          <option value="Oldest">Oldest</option>
+			        </select>
+				</td>
+				<td>
+					<select id="u53_input">
+			          <option value="-- Status --">-- Status --</option>
+			          <option value="Pending">Pending</option>
+			          <option value="In Progress">In Progress</option>
+			        </select>
+				</td>
+				<td class="list-action-filter">
+                    <div class="toggle">
+                        <a href="#" class="active">All tasks</a>
+                        <a href="#" class="">New task</a>
+                    </div>
+				</td>
+			</tr>
+		</thead>
+		<tbody>
+		    [% FOREACH task IN TaskList %]
+                <tr class="task-list">
+                    [% IF task.TaskType == 'TRANSFER' %]
+                        <td style="word-wrap: break-word;width: 280px;">
+                            <span style="float: left" class="fa fa-user"></span>
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
+                            Transfer of <br/>
+                            [% task.Name %] from <br/>
+                            [% task.requestFrom %] to [% task.requestTo %]
+                            </div>
+                        </td>
+                    [% ELSIF task.TaskType == 'ACCESS' %]
+                        <td style="word-wrap: break-word;width: 280px;">
+                            <span style="float: left" class="fa fa-user"></span>
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
+                            Request Access of <br/>
+                            [% task.Name %] from <br/>
+                            [% task.requestFrom %]
+                            </div>
+                        </td>
+                    [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'REGO' %]
+                        <td style="word-wrap: break-word;width: 280px;">
+                            <span class="fa fa-user" style="float: left"></span>
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
+                            [% task.RegistrationNatureLabel %]<br/>
+                            [% task.Name %]
+                            </div>
+                        </td>
+                    [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'ENTITY' %]
+                        <td style="word-wrap: break-word;width: 280px;">
+                            <span class="fa fa-user" style="float: left"></span>
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
+                            [% task.RegistrationNatureLabel %]<br/>
+                            [% task.Name %]
+                            </div>
+                        </td>
+                    [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'PERSON' %]
+                        <td style="word-wrap: break-word;width: 280px;">
+                            <span class="fa fa-user" style="float: left"></span>
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
+                            [% task.RegistrationNatureLabel %]<br/>
+                            [% task.Name %]
+                            </div>
+                        </td>
+		            [% ELSE %]
+                        <td><span class="fa fa-user"></span>Rego [% task.Name %]</td>
+		            [% END %]
+                    <td>[% task.taskDate %]</td>
+                    <td><span class="fa fa-clock-o"></span>[% task.TaskStatusLabel %]</td>
+                    <td><a href="[% task.viewURL %]" class="btn-inside-panels">View</a></td>
                 </tr>
-            [% END %]
-		[% END %]
-		</table>
+		    [% END %]
+
+		</tbody>
+        <tfoot>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tfoot>
+
+	</table>
+</div>
+
+<div class="col-md-3 dashboard-sidebar">
+	<div class="sidebar-box">
+		<h3 class="panel-header">Task at a Glance</h3>
+		<ul>
+			<li>New Registrations: <b>[% IF TaskCounts.NEW %][% TaskCounts.NEW %][% ELSE %]0[% END %]</b></li>
+			<li>Renewals: <b>[% IF TaskCounts.RENEWAL %][% TaskCounts.RENEWAL %][% ELSE %]0[% END %]</b></li>
+			<li>Transfers: <b>[% IF TaskCounts.TRANSFER %][% TaskCounts.TRANSFER %][% ELSE %]0[% END %]</b></li>
+			<li>Request Access: <b>[% IF TaskCounts.ACCESS %][% TaskCounts.ACCESS %][% ELSE %]0[% END %]</b></li>
+		</ul>
+		<ul>
+			<li>Total Task Active: <b>[% IF TaskCounts.ACTIVE %][% TaskCounts.ACTIVE %][% ELSE %]0[% END %]</b></li>
+			<li>Total Task On Hold: <b>[% IF TaskCounts.HOLD %][% TaskCounts.HOLD %][% ELSE %]0[% END %]</b></li>
+			<li>Total Task Pending: <b>[% IF TaskCounts.PENDING %][% TaskCounts.PENDING %][% ELSE %]0[% END %]</b></li>
+			<li>Total Task Rejected: <b>[% IF TaskCounts.REJECTED %][% TaskCounts.REJECTED %][% ELSE %]0[% END %]</b></li>
+		</ul>
+	</div>
+    <div class="sidebar-box clearfix">
+        <h3 class="panel-header">Quick Search</h3>
+        <div class="col-md-12">
+            <div class="input-group">
+                <input class="form-control" type="text">
+                <span class="input-group-addon"><i class="fa fa-search"></i></span>
+            </div>
+            <a class="show-advanced-search">Advanced Search</a>
+            <div class="advanced-search-fields">
+                <span><input type="checkbox" value="checkbox">Players</span>
+                <span><input type="checkbox" value="checkbox">Official</span>
+                <span><input type="checkbox" value="checkbox">Coach</span>
+                <span><input type="checkbox" value="checkbox">Pending</span>
+                <span><input type="checkbox" value="checkbox">Referee</span>
+            </div>
+        </div>
+    </div>
+	<div class="sidebar-box">
+		<h3 class="panel-header">Quick Links</h3>
+		<ul class="quick-links">
+			<li><a href="main.cgi?client=[% client %]&a=PF_"><span class="fa fa-plus"></span>Start a New Registration</a></li>
+			<li><a href="main.cgi?client=[% client %]&a=PRA_T"><span class="fa fa-random"></span>Start a Transfer</a></li>
+			<li><a href="main.cgi?client=[% client %]&a=PENDPR_"><span class="fa fa-newspaper-o"></span>List Pending Registrations</a></li>
+			<li><a href="main.cgi?client=[% client %]&a=REP_SETUP"><span class="fa fa-paste"></span>Reports</a></li>
+		</ul>
 	</div>
 </div>
+
+
+<script src = "//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+/*
+    jQuery().ready(function() {
+            // Setup - add a text input to each footer cell
+                jQuery('#example').dataTable({
+                    "ordering": false,
+                });
+                jQuery('#example tfoot th').each( function () {
+                            var title = jQuery('#example thead th').eq( jQuery(this).index() ).text();
+                                    jQuery(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+                                        } );
+                 
+                     // DataTable
+                         var table = jQuery('#example').DataTable();
+                          
+                              // Apply the search
+                                  table.columns().eq( 0 ).each( function ( colIdx ) {
+                                              jQuery( 'input', table.column( colIdx ).footer() ).on( 'keyup change', function () {
+                                                              table
+                                                                              .column( colIdx )
+                                                                                              .search( this.value )
+                                                                                                              .draw();
+                                                                                                                      } );
+                                                  } );
+    });
+*/
+</script>
+

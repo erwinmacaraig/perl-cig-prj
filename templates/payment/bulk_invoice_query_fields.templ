@@ -1,0 +1,75 @@
+<div class="col-md-12">
+	
+	[% IF invoiceNumber.length > 0 %]
+	 <br /><strong>  No such transaction for invoice number: [% invoiceNumber %] </strong><br /><br /> 
+	[% END %]
+
+	<form action="main.cgi" method="POST" id="invoiceFormQry"> 
+	     <p class="introtext">Please enter the information for transaction you want to process.</p> 
+	    	<p id="errorMsg"></p>
+	    <table cellpadding="2" cellspacing="0" border="0"  class="HTF_table">  
+			<tr>
+				<td>Person Type</td>
+				<td class="form-group">
+					<select name="PersonType"> 
+						<option value="">Select Person Type</option>
+						[% FOREACH opt IN PersonType.options.keys %]
+							<option value="[% opt %]">[% PersonType.options.$opt %]</option>
+						[% END %]					
+					</select>
+				</td>
+			</tr>
+			<tr> 
+				<td>Sport</td> 
+				<td class="form-group">
+					<select name="Sport">
+						<option value="">Select Sport</option>
+							[% FOREACH opt IN Sport.options.keys %]
+								<option value="[% opt %]">[% Sport.options.$opt %]</option>
+							[% END %]	
+					</select>
+				</td>
+			</tr>
+			<tr> 
+				<td>Person Level</td>
+				<td class="form-group">
+					<select name="PersonLevel">
+						<option value="">Select Person Level</option>
+							[% FOREACH opt IN PersonLevel.options.keys %]
+								<option value="[% opt %]">[% PersonLevel.options.$opt %]</option>
+							[% END %]	
+					</select>
+				</td>
+			</tr> 
+			<tr> 
+				<td>Age Level</td>
+				<td class="form-group">
+					<select name="AgeLevel">
+						<option value="">Select Age Level</option>
+							[% FOREACH opt IN AgeLevel.options.keys %]
+								<option value="[% opt %]">[% AgeLevel.options.$opt %]</option>
+							[% END %]	
+					</select>
+				</td>
+			</tr> 
+
+			<tr> 
+				<td>National Period</td>
+				<td class="form-group">
+					<select name="NationalPeriod">
+						<option value="">Select Period</option>
+							[% FOREACH opt IN NationalPeriod.options.keys %]
+								<option value="[% opt %]">[% NationalPeriod.options.$opt %]</option>
+							[% END %]	
+					</select>
+				</td>
+			</tr> 
+		</table>
+
+		[% FOREACH hidden IN carryfields.keys %]
+			<input type="hidden" name="[% hidden %]" value="[% carryfields.$hidden %]" /> 		
+		[% END %]
+		<br />
+		<div class="HTbuttons"><input type="submit" name="subbut" value="Continue" class="HF_submit button proceed-button" id="HFsubbut"></div>
+	</form>
+</div>

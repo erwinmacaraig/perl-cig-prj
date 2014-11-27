@@ -33,7 +33,7 @@ sub _getConfiguration {
   );
 
 	my %config = (
-		Name => "$txt_Clr Report",
+		Name => "Request Report",
 
 		StatsReport => 0,
 		MemberTeam => 0,
@@ -45,85 +45,44 @@ sub _getConfiguration {
     SQLBuilder => \&SQLBuilder,
 
 		Fields => {
+            intPersonRequestID=> ["Request No.",{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1}],
+            strRequestType=> ['Request Type', { displaytype=>'lookup', fieldtype=> 'dropdown', dropdownoptions => \%Defs::personRequest, allowgrouping => 1}],
+            strNationalNum=> [$natnumname,{displaytype=>'text', fieldtype=>'text', allowsort=>1}, active=>1],
+            strLocalFirstname=> ["First name",{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1}],
+            strLocalSurname=> ["Family name",{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1}],
+            strLatinFirstname=> ["International First name",{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1}],
+            strLatinSurname=> ["International Family name",{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1}],
+            dtDOB=> ['Date of Birth',{displaytype=>'date', fieldtype=>'date', dbfield=>'M.dtDOB', dbformat=>' DATE_FORMAT(P.dtDOB,"%d/%m/%Y")'}, active=>1],
+            dtYOB=> ['Year of Birth',{displaytype=>'date', fieldtype=>'text', allowgrouping=>1, allowsort=>1, dbfield=>'YEAR(P.dtDOB)', dbformat=>' YEAR(M.dtDOB)'}],
+            SourceClubName=> ['Source Club',{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'SourceClub.strLocalName', allowgrouping=>1}],
+            DestinationClubName=> ['Destination Club',{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'DestinationClub.strLocalName', allowgrouping=>1}],
 
-        intClearanceID=> ["$txt_Clr Ref No.",{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'M.strLocalFirstname'}],
-        strNationalNum=> [$natnumname,{displaytype=>'text', fieldtype=>'text', allowsort=>1, dbfield=>'M.strNationalNum'}, active=>1],
-        strLocalFirstname=> ["First name",{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'M.strLocalFirstname'}],
-        strLocalSurname=> ["Family name",{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'M.strLocalSurname'}],
-        dtDOB=> ['Date of Birth',{displaytype=>'date', fieldtype=>'date', dbfield=>'M.dtDOB', dbformat=>' DATE_FORMAT(M.dtDOB,"%d/%m/%Y")'}, active=>1],
-        dtYOB=> ['Year of Birth',{displaytype=>'date', fieldtype=>'text', allowgrouping=>1, allowsort=>1, dbfield=>'YEAR(M.dtDOB)', dbformat=>' YEAR(M.dtDOB)'}],
-        SourceClubName=> ['Source Club',{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'SourceClub.strLocalName', allowgrouping=>1}],
-        DestinationClubName=> ['Destination Club',{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'DestinationClub.strLocalName', allowgrouping=>1}],
-        intClearanceYear=> ["$txt_Clr Year",{displaytype=>'text', fieldtype=>'text', active=>1, allowsort=>1, dbfield => 'C.intClearanceYear'}],
-        intReasonForClearanceID => [
-					"Reason for $txt_Clr" ,
-					{
-						displaytype=>'lookup', 
-						active=>0, 
-						fieldtype=>'dropdown', 
-						dropdownoptions => $CommonVals->{'DefCodes'}{-37},
-						allowsort=>1, 
-						allowgrouping=>1,
-						enabled => !$Data->{'SystemConfig'}{'clrHide_intReasonForClearanceID'},
-					}
-				],
-        strReasonForClearance => [
-					"Additional Information" ,
-					{
-						displaytype=>'text', 
-						active=>1, 
-						fieldtype=>'text', 
-						allowsort=>1, 
-						allowgrouping=>1,
-						enabled => !$Data->{'SystemConfig'}{'clrHide_strReasonForClearanceID'},
-					}
-				],
-        intDenialReasonID=> [
-					"Reason for Denial",
-					{
-						fieldtype=>'dropdown', 
-						displaytype=>'lookup', 
-						dropdownoptions => $CommonVals->{'DefCodes'}{-38},
-						allowsort=>1, 
-						allowgrouping=>1,
-						enabled => !$Data->{'SystemConfig'}{'clrHide_intDenialReasonID'},
-					}
-				],
-
-
-
-        intClearanceStatus=> ["Overall $txt_Clr Status" ,{displaytype=>'lookup', active=>1, fieldtype=>'dropdown', dropdownoptions => \%Defs::clearance_status, allowsort=>1, dbfield => 'C.intClearanceStatus', allowgrouping=>1}],
-        PathStatus=> ["This level's Status" ,{displaytype=>'lookup', active=>1, fieldtype=>'dropdown', dropdownoptions => \%Defs::clearance_status, allowsort=>1, dbfield=> 'CP.intClearanceStatus', allowgrouping=>1}],
-        ThisLevel=> ["Waiting At This Level?" ,{displaytype=>'lookup', active=>1, fieldtype=>'dropdown', dropdownoptions => {0=>'No', 1=>'Yes'}, allowsort=>1, dbfield=> 'IF(C.intCurrentPathID = CP.intClearancePathID AND C.intClearanceStatus  = 0,1,0)', allowgrouping=>1}],
-        dtApplied=> ['Application Date',{displaytype=>'date', fieldtype=>'date', dbfield=>'C.dtApplied', dbformat=>' DATE_FORMAT(C.dtApplied,"%d/%m/%Y")'}],
-        dtFinalised=> ['Finalised Date',{displaytype=>'date', fieldtype=>'date', dbfield=>'C.dtFinalised', dbformat=>' DATE_FORMAT(C.dtFinalised,"%d/%m/%Y")'}],
-                intHasAgent=> ["Has Agent ?",{displaytype=>'lookup', fieldtype=>'dropdown', dropdownoptions=>{0=>'No', 1=>'Yes'}, dropdownorder=>[0,1], enabled => $showAgentFields}],
-        strAgentFirstname=> ["Agent First name", {displaytype=>'text', fieldtype=>'text', allowsort=>1, enabled => $showAgentFields}],
-        strAgentSurname=> ["Agent Surname",{displaytype=>'text', fieldtype=>'text', allowsort=>1, enabled => $showAgentFields}],
-        strAgentNationality=> ["Agent Nationality",{displaytype=>'text', fieldtype=>'text', allowsort=>1, enabled => $showAgentFields}],
-        strAgentLicenseNum=> ["Agent License Number",{displaytype=>'text', fieldtype=>'text', allowsort=>1, enabled => $showAgentFields}],
-        strAgencyName=> ["Agency Name" ,{displaytype=>'text', fieldtype=>'text', allowsort=>1, enabled => $showAgentFields}],
-        strAgencyEmail=> ["Agency Email" ,{displaytype=>'text', fieldtype=>'text', allowsort=>1, enabled => $showAgentFields}],
+            strSport=> ['Registration Sport', { displaytype=> 'lookup', fieldtype=> 'dropdown', dropdownoptions => \%Defs::sportType, allowgrouping=> 1 }],
+            strPersonEntityRole=> [ 'Sub Role', { displaytype=>'text', fieldtype=>'text'}],
+            strPersonType=> ['Registration Role', { displaytype=>'lookup', fieldtype=> 'dropdown', dropdownoptions => \%Defs::personType, allowgrouping => 1}],
+            strPersonLevel=> ['Registration Level', { displaytype=> 'lookup', fieldtype=> 'dropdown', dropdownoptions => \%Defs::personLevel, allowgrouping=>1}],
+            dtDateRequest=> ['Date Requested', {active=>1, displaytype=>'date', fieldtype=>'datetime', allowsort=>1, dbformat=>' DATE_FORMAT(PRQ.dtDateRequest,"%d/%m/%Y %H:%i")', }],
+            strRequestStatus => ["Request Status" ,{displaytype=>'lookup', active=>1, fieldtype=>'dropdown', dropdownoptions => \%Defs::personRequestStatus, allowsort=>1, allowgrouping=>1}],
 		},
 
 		Order => [qw(
-			intClearanceID
+			intPersonRequestID
 			strNationalNum
 			strLocalFirstname
 			strLocalSurname
+			strLatinFirstname
+			strLatinSurname
 			dtDOB
 			dtYOB
 			SourceClubName
 			DestinationClubName
-			intClearanceYear
-			PathStatus
-			ThisLevel
-			intReasonForClearanceID
-			strReasonForClearance
-			intDenialReasonID
-			intClearanceStatus
-			dtApplied
-			dtFinalised
+            strRequestType
+            strSport
+            strPersonType
+            strPersonLevel
+            strPersonEntityRole
+            strRequestStatus
+			dtDateRequest
 		)],
     OptionGroups => {
       default => ['Details',{}],
@@ -165,27 +124,27 @@ sub SQLBuilder  {
 
     $sql = qq[
       SELECT 
-				C.*,
-				IF(C.intCurrentPathID = CP.intClearancePathID AND C.intClearanceStatus  = $Defs::CLR_STATUS_PENDING,1,0) AS ThisLevel,	
-				DATE_FORMAT(C.dtApplied, "%d/%m/%Y") AS dtApplied,
-				CP.intClearanceStatus as PathStatus,
-				CP.intClearancePathID,
-				M.strLocalSurname,
-				M.strLocalFirstname,
+				PRQ.*,
+				DATE_FORMAT(PRQ.dtDateRequest, "%d/%m/%Y") AS dtDateRequest,
+				P.strLocalSurname,
+				P.strLocalFirstname,
+				P.strLatinSurname,
+				P.strLatinFirstname,
 				SourceClub.strLocalName as SourceClubName,
 				DestinationClub.strLocalName as DestinationClubName,
-				M.strNationalNum,
-				DATE_FORMAT(M.dtDOB, "%d/%m/%Y") as dtDOB,
-				DATE_FORMAT(M.dtDOB, "%Y") as dtYOB
-				FROM tblClearance as C
-					INNER JOIN tblClearancePath as CP ON (CP.intClearanceID = C.intClearanceID)
-					INNER JOIN tblPerson as M ON (M.intPersonID = C.intPersonID)
-					LEFT JOIN tblEntity as SourceClub ON (SourceClub.intEntityID = C.intSourceClubID)
-					LEFT JOIN tblEntity as DestinationClub ON (DestinationClub.intEntityID = C.intDestinationClubID)
-				WHERE CP.intTypeID = $currentLevel
-					AND CP.intID = $self->{'EntityID'}
-					AND C.intRecStatus <> -1
-					AND C.intCreatedFrom = 0
+				P.strNationalNum,
+				DATE_FORMAT(P.dtDOB, "%d/%m/%Y") as dtDOB,
+				DATE_FORMAT(P.dtDOB, "%Y") as dtYOB
+				FROM tblPersonRequest as PRQ
+					INNER JOIN tblPerson as P ON (P.intPersonID = PRQ.intPersonID)
+					LEFT JOIN tblEntity as SourceClub ON (SourceClub.intEntityID = PRQ.intRequestFromEntityID)
+					LEFT JOIN tblEntity as DestinationClub ON (DestinationClub.intEntityID = PRQ.intRequestToEntityID)
+				WHERE 
+                    PRQ.intRealmID = $Data->{'Realm'}
+					AND (
+                        PRQ.intRequestToEntityID = $self->{'EntityID'} 
+                        OR PRQ.intRequestFromEntityID = $self->{'EntityID'}
+                    )
 					$where_list
     ];
     return ($sql,'');

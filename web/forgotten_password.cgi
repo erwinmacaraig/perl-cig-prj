@@ -31,7 +31,7 @@ if($action eq 'RESET_PASSWD'){
 	my $email = param('email'); 
 	my $dbh = connectDB(); 
 	my $userObj = new UserObj('db',$dbh);
-	if( !defined($userObj->load('email',$email)) ){ 
+	if( !defined($userObj->load('username',$email)) ){ 
 	    $error = "Sorry. Email address does not exist in our system.";
 	}
 	else { 		

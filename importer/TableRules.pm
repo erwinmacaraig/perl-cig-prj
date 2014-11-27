@@ -2,15 +2,15 @@
 package TableRules;
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(multiplyEntry insertLink removeLinkField getConfig swapEntry);
-@EXPORT_OK = qw(multiplyEntry insertLink removeLinkField getConfig swapEntry);
+@EXPORT = qw(multiplyEntry insertLink removeLinkField getConfig swapEntry strToIntEntry setUniqField multiDestEntry);
+@EXPORT_OK = qw(multiplyEntry insertLink removeLinkField getConfig swapEntry strToIntEntry setUniqField multiDestEntry);
 
 # This is where you should include the migration rule for your table
 use Data::Dumper;
 use JSON;
 use DBInserter;
 
-
+use feature qw(say);
 my $db = connectDB();
 my %config = ();
 
@@ -24,7 +24,8 @@ foreach my $fp (glob("Rules/*."."json")) {
 sub readJSONFile{
 	
 	my ($fp,$filename) = @_;
-	my @tag = split(/\./,$filename);
+	#my @tag = split(/\./,$filename);
+	my @tag = split(/\.([^.]+)$/,$filename, 2);
 	my $object =  $tag[0];
 
 	my $json_text = do {
@@ -94,4 +95,56 @@ sub swapEntry{
     return \@newRecords;
 }
 
+sub strToIntEntry{
+    my ($records,$key, $value) = @_;
+    foreach my $record ( @{$records} ){
+        if( $record->{$key} ) {
+            #say Dumper( $value->{ $record->{$key} });
+            $record->{$key} = $value->{ $record->{$key} };
+        }
+    }
+    return $records;
+}
+
+sub multiDestEntry{
+	my ($records,$rule,$key) = @_;
+	my @newrecords = ();
+	my @types = keys %{$rule->{'type'}};
+	foreach my $record ( @{$records}) {
+		my $copy = {%$record};
+		foreach my $type (@types) {
+			if( $record->{$key} && $record->{$key} eq $type ) {
+				my $newfields = $rule->{'type'}->{$type};
+				foreach my $fld (keys %{$newfields}) {
+					# check if new field is not equal from orig field
+					if( $fld ne $newfields->{$fld} ) {
+						# create the new key/value pair
+						$copy->{$fld} = $record->{ $newfields->{$fld} };
+					}
+					# delete the orig key
+					delete $copy->{ $newfields->{$fld} } if exists $copy->{ $newfields->{$fld} };
+				}
+			}
+		}
+		# we must delete the source iden type since its not on the table
+		delete $copy->{$key};
+		# finally, fill out the new records
+		push @newrecords, $copy;
+	}
+	return \@newrecords;
+}
+
+sub setUniqField{
+    my ($records,$fieldname) = @_;
+	my @newrecords = ();
+    foreach my $record ( @{$records} ){
+		my $copy = {%$record};
+		
+        if( $record->{$fieldname} ) {
+            $copy->{"uniqField"} = $fieldname;
+			push @newrecords, $copy;
+        }
+    }
+    return \@newrecords;
+}
 1;
