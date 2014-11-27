@@ -356,7 +356,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 $tabs .= qq[<li><a id="a_sec$s->[0]" class="tab_links" href="#sec$s->[0]">$sectionheader</a></li>];
 
                 $returnstr .= qq~
-                <div class="col-md-10"><fieldset id="sec$s->[0]" class="new_tab member-home-page">
+                <div class="col-md-12"><fieldset id="sec$s->[0]" class="new_tab member-home-page">
                 $sh
                 $sections{$s->[0]}
                 </fieldset>
@@ -456,12 +456,12 @@ qq[<input type="hidden" name="$cf" value="$fields_ref->{'carryfields'}{$cf}">];
         $returnstr = qq[
         $validation
         <form action="$fields_ref->{'options'}{'target'}" name="$fields_ref->{'options'}{'formname'}" method="POST" $enctype id = "$fields_ref->{'options'}{'formname'}ID">
-        <div class="col-md-10">$introtext</div>
-        <div class="txtright">
+        <div class="col-md-12">$introtext</div>
+        <div class="col-md-12 txtright">
         $button_top
         </div>
         $returnstr
-        <div class="txtright">
+        <div class="col-md-12 txtright">
         $button_bottom
         <input type="hidden" name="HF_oldact" value="$oldaction">
         <input type="hidden" name="HF_subbutact" value="$subbutact">
