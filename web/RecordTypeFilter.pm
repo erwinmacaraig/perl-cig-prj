@@ -27,6 +27,7 @@ sub show_recordtypes	{
         $statusname,
         $statusFilterValues,
         $allStatusValue,
+        $defaultValue,
     )=@_;
 
     my $lang = $Data->{'lang'};
@@ -54,7 +55,7 @@ sub show_recordtypes	{
             -size    => 1,
             -style   => "font-size:10px;",
             -values  => \@values,
-            -default => $Data->{'ViewActStatus'},
+            -default => $defaultValue || $Data->{'ViewActStatus'},
             -labels  => \%labels,
         );
 

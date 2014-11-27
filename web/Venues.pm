@@ -794,6 +794,7 @@ sub listVenues  {
         '',
         \%Defs::entityStatus,
         { 'ALL' => $Data->{'lang'}->txt('All'), },
+        'ACTIVE',
     ) || '';
 
     my @headers = (
