@@ -106,15 +106,20 @@ sub getUnique {
         my $numnotshown = ($results->{'total'} || 0) - 10;
         $numnotshown = 0 if $numnotshown < 0;
         while(my $dref = $q->fetchrow_hashref())  {
+            my $entityID = getLastEntityID($self->Data->{'clientValues'});
+            my $entityLevel = getLastEntityLevel($self->Data->{'clientValues'}) || 0;
           my $link = $self->getSearchLink(
             $self->getData(),
             $Defs::LEVEL_PERSON,
             '',
             $dref->{'intPersonID'},
             $intermediateNodes,
-            $dref->{'intEntityID'},
-            $dref->{'intEntityLevel'},
-          );            
+            $entityID,
+            $entityLevel,
+        );
+         #   $dref->{'intEntityID'},
+         #   $dref->{'intEntityLevel'},
+         # );            
           my $name = "$dref->{'strLocalSurname'}, $dref->{'strLocalFirstname'}" || '';
           $name .= " #$dref->{'strNationalNum'}" if $dref->{'strNationalNum'};
           $name .= "  ($dref->{'EntityName'})" if $dref->{'EntityName'};
@@ -306,15 +311,20 @@ sub getPersonRegistration {
         my $target = $self->getData()->{'target'};
         my $client = $self->getData()->{'client'};
         while(my $dref = $q->fetchrow_hashref()) {
+            my $entityID = getLastEntityID($self->Data->{'clientValues'});
+            my $entityLevel = getLastEntityLevel($self->Data->{'clientValues'}) || 0;
             my $link = $self->getSearchLink(
                 $self->getData(),
                 $Defs::LEVEL_PERSON,
                 '',
                 $dref->{'intPersonID'},
                 $intermediateNodes,
-                $dref->{'intEntityID'},
-                $dref->{'intEntityLevel'},
+                $entityID,
+                $entityLevel,
             );
+            #    $dref->{'intEntityID'},
+            #    $dref->{'intEntityLevel'},
+            #);
 
             $count++;
             my $name = "$dref->{'strLocalFirstname'} $dref->{'strLocalSurname'}" || '';
