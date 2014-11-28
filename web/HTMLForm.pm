@@ -222,10 +222,12 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 $val = '' if $val eq '0000-00-00';
                 $val ||= '';
                 my $datetype = $f->{'datetype'} || '';
+                my $maxyear = $f->{'maxyear'} || '';
+                my $minyear = $f->{'minyear'} || '';
                 if ( $datetype eq 'dropdown' ) {
                     $field_html =
                       _date_selection_dropdown( $fieldname, $val, $f,
-                        $disabled, $fields_ref, $onChange );
+                        $disabled, $fields_ref, $onChange, $maxyear, $minyear );
                 }
                 else {
                     $field_html =
@@ -1311,7 +1313,7 @@ sub _time_selection_box {
 }
 
 sub _date_selection_dropdown {
-    my ( $fieldname, $val, $f, $otherinfo, $fields_ref, $onChange ) = @_;
+    my ( $fieldname, $val, $f, $otherinfo, $fields_ref, $onChange, $maxyear, $minyear ) = @_;
     my ( $onBlur, $onMouseOut );
     if ($onChange) {
         ( $onBlur = $onChange ) =~
@@ -1342,8 +1344,9 @@ s/onChange=(['"])(.*)\1/onMouseOut=$1 if (changed_$fieldname==1) { $2 } $1/i;
         11 => langlookup( $fields_ref, 'Nov' ),
         12 => langlookup( $fields_ref, 'Dec' ),
     );
-    my $currentyear = (localtime)[5] + 1900 + 5;
-    my %years = map { $_ => $_ } ( 1900 .. $currentyear );
+    $maxyear ||= (localtime)[5] + 1900 + 5;
+    $minyear ||= 1900;
+    my %years = map { $_ => $_ } ( $minyear .. $maxyear );
     $years{0} = langlookup( $fields_ref, 'Year' );
 
     $val ||= '';
@@ -1359,7 +1362,7 @@ s/onChange=(['"])(.*)\1/onMouseOut=$1 if (changed_$fieldname==1) { $2 } $1/i;
 
     my @order_d = ( 0 .. 31 );
     my @order_m = ( 0 .. 12 );
-    my @order_y = reverse( 1900 .. $currentyear );
+    my @order_y = reverse( $minyear .. $maxyear );
     unshift( @order_y, 0 );
 
     my $otherinfo_d =
