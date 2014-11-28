@@ -277,7 +277,24 @@ sub displayRegoFlowCertificates{
 sub checkUploadedRegoDocuments {
     my($Data,$personID, $regoID,$entityID,$entityLevel,$originLevel,$rego_ref) = @_;
     
-    my $query = qq[SELECT count(intItemID) as items FROM tblRegistrationItem WHERE intRealmID = ? AND intOriginLevel = ? AND strRuleFor = ? AND intEntityLevel = ? AND strRegistrationNature = ? AND strDocumentFor = 'PERSON' AND strPersonType = ? AND strPersonLevel = ? AND strSport = ? AND strAgeLevel = ? AND strItemType = ? AND (strISOCountry_IN ='' OR strISOCountry_IN IS NULL OR strISOCountry_IN LIKE CONCAT('%|',?,'|%')) AND (strISOCountry_NOTIN ='' OR strISOCountry_NOTIN IS NULL OR strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))  ];   
+    my $query = qq[
+        SELECT 
+            count(intItemID) as items 
+        FROM 
+            tblRegistrationItem 
+        WHERE 
+            intRealmID = ? 
+            AND intOriginLevel = ? 
+            AND strRuleFor = ? 
+            AND intEntityLevel = ? 
+            AND strRegistrationNature = ? 
+            AND strDocumentFor = 'PERSON' 
+            AND strPersonType =''
+            AND strPersonLevel IN('', ? )
+            AND strSport IN('', ? )
+            AND strAgeLevel IN('', ? )
+            AND strItemType = ? 
+            AND (strISOCountry_IN ='' OR strISOCountry_IN IS NULL OR strISOCountry_IN LIKE CONCAT('%|',?,'|%')) AND (strISOCountry_NOTIN ='' OR strISOCountry_NOTIN IS NULL OR strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))  ];   
     my $sth = $Data->{'db'}->prepare($query);
     $sth->execute(  $Data->{'Realm'},
     				$originLevel,
