@@ -1693,6 +1693,7 @@ sub process_documents {
     #check for uploaded document
     my $isRequiredDocPresent = checkUploadedRegoDocuments($self->{'Data'},$personID, $regoID,$entityID,$entityLevel,$originLevel,$rego_ref);
     if(!$isRequiredDocPresent){
+		my $labelBackBtn = 'Back to Documents';
     	push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Required Document Missing");
     	my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
@@ -1704,7 +1705,8 @@ sub process_documents {
         Title => '',
         TextTop => $content,
         TextBottom => '',
-        NoContinueButton => 1,        
+        NoContinueButton => 1,       
+		Back => $labelBackBtn, 
     );
          
         my $pagedata = $self->display(\%PageData);
