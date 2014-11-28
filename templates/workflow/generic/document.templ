@@ -37,6 +37,9 @@
                     [% ELSE %]
 
                     [% END %]
+                    [% IF document.DisplayReplace == 1 %]
+                        [% document.replaceLink %]
+                    [% END %]
 
                 </td>
                 <td class="status-col">
