@@ -152,24 +152,15 @@ sub setupValues {
         $nonlatinscript =   qq[
            <script>
                 jQuery(document).ready(function()  {
-                    jQuery('#l_row_strLatinName').find('input').prop('disabled', true);
-                    jQuery('#l_row_strLatinName').hide();
-                    jQuery('#l_row_strLatinShortName').find('input').prop('disabled', true);
-                    jQuery('#l_row_strLatinShortName').hide();
+                    jQuery('#fsg-latinnames').hide();
                     jQuery('#l_intLocalLanguage').change(function()   {
                         var lang = parseInt(jQuery('#l_intLocalLanguage').val());
                         nonlatinvals = [$vals];
                         if(nonlatinvals.indexOf(lang) !== -1 )  {
-                            jQuery('#l_row_strLatinName').find('input').prop('disabled', false);
-                            jQuery('#l_row_strLatinName').show();
-                            jQuery('#l_row_strLatinShortName').find('input').prop('disabled', false);
-                            jQuery('#l_row_strLatinShortName').show();
+                            jQuery('#fsg-latinnames').show();
                         }
                         else    {
-                            jQuery('#l_row_strLatinName').find('input').prop('disabled', true);
-                            jQuery('#l_row_strLatinName').hide();
-                            jQuery('#l_row_strLatinShortName').find('input').prop('disabled', true);
-                            jQuery('#l_row_strLatinShortName').hide();
+                            jQuery('#fsg-latinnames').hide();
                         }
                     });
                 });
@@ -225,6 +216,7 @@ sub setupValues {
                     size        => '40',
                     maxsize     => '50',
                     compulsory  => 1,
+                    sectionname => 'core',
                 },
                 strLocalShortName => {
                     label       => $FieldLabels->{'strLocalShortName'},
@@ -232,6 +224,7 @@ sub setupValues {
                     type        => 'text',
                     size        => '40',
                     maxsize     => '50',
+                    sectionname => 'core',
                 },
                 dtFrom => {
                     label       => $FieldLabels->{'dtFrom'},
@@ -242,12 +235,14 @@ sub setupValues {
                     validate    => 'DATE',
                     maxyear     => (localtime)[5] + 1900,
                     compulsory => 1,
+                    sectionname => 'core2',
                 },
                 dissolved => {
                     label       => $FieldLabels->{'dissolved'},
                     value       => $values->{'dissolved'},
                     options     => \%dissolvedOptions,
                     type        => 'lookup',
+                    sectionname => 'core2',
                 },
                 dtTo => {
                     label       => $FieldLabels->{'dtTo'},
@@ -258,6 +253,7 @@ sub setupValues {
                     validate    => 'DATE',
                     maxyear     => (localtime)[5] + 1900,
                     readonly    => $dissDateReadOnly,
+                    sectionname => 'core2',
                 },
                 strCity         => {
                     label       => $FieldLabels->{'strCity'},
@@ -266,6 +262,7 @@ sub setupValues {
                     size        => '30',
                     maxsize     => '45',
                     compulsory  => 1,
+                    sectionname => 'core2',
                 },
                 strRegion       => {
                     label       => $FieldLabels->{'strRegion'},
@@ -273,6 +270,7 @@ sub setupValues {
                     type        => 'text',
                     size        => '30',
                     maxsize     => '45',
+                    sectionname => 'core2',
                 },
                 strISOCountry   => {
                     label       => $FieldLabels->{'strISOCountry'},
@@ -281,6 +279,7 @@ sub setupValues {
                     options     => \%Mcountriesonly,
                     firstoption => [ '', 'Select Country' ],
                     compulsory => 1,
+                    sectionname => 'core2',
                 },
                 intLocalLanguage => {
                     label       => $FieldLabels->{'intLocalLanguage'},
@@ -290,6 +289,7 @@ sub setupValues {
                     firstoption => [ '', 'Select Language' ],
                     compulsory => 1,
                     posttext => $nonlatinscript,
+                    sectionname => 'core',
                 },
                 strLatinName    => {
                     label       => $self->{'SystemConfig'}{'facility_strLatinNames'} || $FieldLabels->{'strLatinName'},
@@ -299,6 +299,7 @@ sub setupValues {
                     maxsize     => '50',
                     compulsory  => 1,
                     active      => $nonLatin,
+                    sectionname => 'latinnames',
                 },
                 strLatinShortName => {
                     label       => $self->{'SystemConfig'}{'facility_strLatinShortNames'} || $FieldLabels->{'strLatinShortName'},
@@ -307,6 +308,7 @@ sub setupValues {
                     size        => '40',
                     maxsize     => '50',
                     active      => $nonLatin,
+                    sectionname => 'latinnames',
                 },
             },
             'order' => [qw(
@@ -322,6 +324,11 @@ sub setupValues {
                 strRegion
                 strISOCountry
             )],
+            sections => [
+                [ 'core',        '' ],
+                [ 'latinnames',   '','','dynamic-panel'],
+                [ 'core2',        '' ],
+            ],
             fieldtransform => {
                 textcase => {
                     #strLocalFirstname => $field_case_rules->{'strLocalFirstname'} || '',
