@@ -2236,6 +2236,7 @@ sub populateDocumentViewData {
             ON (
                 addPersonItem.strItemType = 'DOCUMENT'
                 AND addPersonItem.intOriginLevel = wr.intOriginLevel
+                AND addPersonItem.intEntityLevel = wr.intEntityLevel
                 AND addPersonItem.strRuleFor = 'PERSON'
                 AND addPersonItem.intID = rd.intDocumentTypeID
                 AND addPersonItem.strAgeLevel IN ('', '$dref->{'strAgeLevel'}')
@@ -2246,6 +2247,7 @@ sub populateDocumentViewData {
                 AND regoItem.intOriginLevel = wr.intOriginLevel
                 AND regoItem.strRuleFor = 'REGO'
                 AND regoItem.intID = rd.intDocumentTypeID
+                AND regoItem.intEntityLevel = wr.intEntityLevel
                 AND regoItem.strRegistrationNature = '$dref->{'strRegistrationNature'}'
                 AND regoItem.strPersonType = '$dref->{'strPersonType'}'
                 AND regoItem.strPersonLevel IN ('', '$dref->{'strPersonLevel'}')
@@ -2259,6 +2261,7 @@ sub populateDocumentViewData {
                 AND entityItem.intOriginLevel = wr.intOriginLevel
                 AND entityItem.strRuleFor = 'ENTITY'
                 AND entityItem.intID = rd.intDocumentTypeID
+                AND entityItem.intEntityLevel = wr.intEntityLevel
                 )
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (pr.intPersonRegistrationID = wt.intPersonRegistrationID)
         LEFT JOIN tblDocuments AS d ON $joinCondition
