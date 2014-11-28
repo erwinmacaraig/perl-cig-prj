@@ -164,18 +164,15 @@ sub setupValues    {
         $nonlatinscript =   qq[
            <script>
                 \$(document).ready(function()  {
-                    \$('#l_row_strLatinFirstname').hide();
-                    \$('#l_row_strLatinSurname').hide();
+                    \$('#fsg-latinnames').hide();
                     \$('#l_intLocalLanguage').change(function()   {
                         var lang = parseInt(jQuery('#l_intLocalLanguage').val());
                         nonlatinvals = [$vals];
                         if(nonlatinvals.indexOf(lang) !== -1 )  {
-                            \$('#l_row_strLatinFirstname').show();
-                            \$('#l_row_strLatinSurname').show();
+                            \$('#fsg-latinnames').show();
                         }
                         else    {
-                            \$('#l_row_strLatinFirstname').hide();
-                            \$('#l_row_strLatinSurname').hide();
+                            \$('#fsg-latinnames').hide();
                         }
                     });
                 });
@@ -259,7 +256,7 @@ sub setupValues    {
                     size        => '40',
                     maxsize     => '50',
                     active      => $nonLatin,
-                    sectionname => 'core',
+                    sectionname => 'latinnames',
                     noedit      => 1,
                 },
                 strLatinSurname => {
@@ -269,7 +266,7 @@ sub setupValues    {
                     size        => '40',
                     maxsize     => '50',
                     active      => $nonLatin,
-                    sectionname => 'core',
+                    sectionname => 'latinnames',
                     noedit      => 1,
                 },
                 strMaidenName => {
@@ -279,7 +276,7 @@ sub setupValues    {
                     size        => '40',
                     maxsize     => '50',
                     posttext    => $maidennamescript,
-                    sectionname => 'core',
+                    sectionname => 'core2',
                     noedit      => 1,
                 },
                 dtDOB => {
@@ -290,7 +287,7 @@ sub setupValues    {
                     format      => 'dd/mm/yyyy',
                     validate    => 'DATE',
                     compulsory => 1,
-                    sectionname => 'core',
+                    sectionname => 'core2',
                     noedit      => 1,
                 },
                 strISONationality => {
@@ -300,7 +297,7 @@ sub setupValues    {
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
                     compulsory => 1,
-                    sectionname => 'core',
+                    sectionname => 'core2',
                     noedit      => 1,
                 },
                 strISOCountryOfBirth => {
@@ -310,7 +307,7 @@ sub setupValues    {
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
                     compulsory => 1,
-                    sectionname => 'core',
+                    sectionname => 'core2',
                     noedit      => 1,
                 },
                 strRegionOfBirth => {
@@ -319,7 +316,7 @@ sub setupValues    {
                     type        => 'text',
                     size        => '30',
                     maxsize     => '45',
-                    sectionname => 'core',
+                    sectionname => 'core2',
                     noedit      => 1,
                 },
                 strPlaceOfBirth => {
@@ -329,7 +326,7 @@ sub setupValues    {
                     size        => '30',
                     maxsize     => '45',
                     compulsory => 1,
-                    sectionname => 'core',
+                    sectionname => 'core2',
                     noedit      => 1,
                 },
                 intGender => {
@@ -339,7 +336,7 @@ sub setupValues    {
                     options     => \%genderoptions,
                     compulsory => 1,
                     firstoption => [ '', " " ],
-                    sectionname => 'core',
+                    sectionname => 'core2',
                     noedit      => 1,
                 },
 
@@ -517,6 +514,8 @@ sub setupValues    {
             )],
             sections => [
                 [ 'core',        'Personal Details' ],
+                [ 'latinnames',   '','','dynamic-panel'],
+                [ 'core2',        '' ],
                 [ 'other',        'Other Details' ],
             ],
             fieldtransform => {

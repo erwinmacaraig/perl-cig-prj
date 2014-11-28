@@ -429,7 +429,8 @@ sub validate_core_details {
     my $self = shift;
 
     my $facilityData = {};
-    ($facilityData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields();
+    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Club',);
+    ($facilityData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
 
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
@@ -503,7 +504,8 @@ sub validate_contact_details {
     my $self = shift;
 
     my $facilityData = {};
-    ($facilityData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields();
+    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Club',);
+    ($facilityData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
     my $id = $self->ID() || 0;
     if(!$id){
         push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid facility.';
