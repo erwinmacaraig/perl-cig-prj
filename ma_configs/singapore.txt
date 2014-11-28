@@ -17,4 +17,8 @@ INSERT INTO tblWFRule SELECT 0,1,0,intOriginLevel, 'REGO','',100, strRegistratio
 INSERT INTO tblWFRule SELECT 0,1,0,intOriginLevel, 'REGO','',3, strRegistrationNature, strPersonType, strPersonLevel, strSport, '', 100,3,'APPROVAL','ACTIVE',NOW(),0,'','','' FROM tblMatrix WHERE strPersonType='PLAYER';
 INSERT INTO tblWFRule SELECT 0,1,0,intOriginLevel, 'REGO','',100, strRegistrationNature, strPersonType, strPersonLevel, strSport, '', 100,100,'APPROVAL','ACTIVE',NOW(),0,'','','' FROM tblMatrix WHERE strPersonType='PLAYER';
 
+INSERT INTO tblWFRule VALUES (0,1,0,3, 'ENTITY','',3,'NEW','','','','',100,100, 'APPROVAL','ACTIVE', NOW(),0,'','','');
+INSERT INTO tblWFRule VALUES (0,1,0,100, 'ENTITY','',3,'NEW','','','','',100,100, 'APPROVAL','ACTIVE', NOW(),0,'','','');
+INSERT INTO tblWFRule VALUES (0,1,0,3, 'ENTITY','',3,'RENEWAL','','','','',100,100, 'APPROVAL','ACTIVE', NOW(),0,'','','');
+INSERT INTO tblWFRule VALUES (0,1,0,100, 'ENTITY','',3,'RENEWAL','','','','',100,100, 'APPROVAL','ACTIVE', NOW(),0,'','','');
 DELETE FROM tblWFRule WHERE intOriginLevel< intEntityLevel;
