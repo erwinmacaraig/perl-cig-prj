@@ -2249,7 +2249,7 @@ sub populateDocumentViewData {
                 AND regoItem.intID = rd.intDocumentTypeID
                 AND regoItem.intEntityLevel = wr.intEntityLevel
                 AND regoItem.strRegistrationNature = '$dref->{'strRegistrationNature'}'
-                AND regoItem.strPersonType = '$dref->{'strPersonType'}'
+                AND regoItem.strPersonType IN ('', '$dref->{'strPersonType'}')
                 AND regoItem.strPersonLevel IN ('', '$dref->{'strPersonLevel'}')
                 AND regoItem.strSport IN ('', '$dref->{'strSport'}')
                 AND regoItem.strAgeLevel IN ('', '$dref->{'strAgeLevel'}')
