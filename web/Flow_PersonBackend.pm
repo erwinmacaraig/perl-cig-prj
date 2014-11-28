@@ -40,6 +40,7 @@ sub setProcessOrder {
             'function' => 'display_core_details',
             'label'  => 'Core Details',
             'fieldset'  => 'core',
+            #'noRevisit' => 1,
         },
         {
             'action' => 'cdu',
@@ -869,8 +870,6 @@ sub validate_core_details    {
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Person',);
     ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
 
-use Data::Dumper;
-print STDERR Dumper($userData);
     if(!scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         if(isPossibleDuplicate($self->{'Data'}, $userData))    {
             push @{$self->{'RunDetails'}{'Errors'}}, 'This person is a possible duplicate';
