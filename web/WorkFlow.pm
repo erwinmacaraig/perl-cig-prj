@@ -409,6 +409,8 @@ sub listTasks {
         $taskCounts{$dref->{'strRegistrationNature'}}++;
 
         my $viewTaskURL = "$Data->{'target'}?client=$client&amp;a=WF_View&TID=$dref->{'intWFTaskID'}";
+        my $taskTypeLabel = '';
+
 	 my %single_row = (
 			WFTaskID => $dref->{intWFTaskID},
             TaskDescription => $taskDescription,
@@ -434,7 +436,9 @@ sub listTasks {
             OnHold => $dref->{OnHold},
             taskDate => $dref->{taskDate},
             viewURL => $viewTaskURL,
+            taskTypeLabel => $viewTaskURL,
 		);
+        print STDERR Dumper \%single_row;
    
 		push @TaskList, \%single_row;
 	}
@@ -476,6 +480,7 @@ sub listTasks {
             $taskCounts{$requestStatus}++;
             $taskCounts{$request->{'strRequestType'}}++;
             my %personRequest = (
+                personRequestLabel => $Defs::personReques{$request->{'strRequestType'}},
                 TaskType => $request->{'strRequestType'},
                 TaskDescription => $Data->{'lang'}->txt('Person Request'),
                 Name => $name,
@@ -487,6 +492,8 @@ sub listTasks {
                 requestFrom => $request->{'requestFrom'},
                 requestTo => $request->{'requestTo'},
             );
+
+            print STDERR Dumper \%personRequest;
             push @TaskList, \%personRequest;
         }
     }
