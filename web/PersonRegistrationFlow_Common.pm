@@ -294,7 +294,7 @@ sub checkUploadedRegoDocuments {
             AND intEntityLevel = ? 
             AND strRegistrationNature = ? 
             AND strDocumentFor = 'PERSON' 
-            AND strPersonType =''
+            AND strPersonType = ?
             AND strPersonLevel IN('', ? )
             AND strSport IN('', ? )
             AND strAgeLevel IN('', ? )

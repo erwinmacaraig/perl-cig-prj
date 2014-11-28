@@ -28,6 +28,9 @@
 [% IF !NoContinueButton %]
 	<div class="txtright"><input type = "submit" value = " [% Lang.txt('Continue') %] "  class = "button proceed-button"></div>
 [% END %]
+[% IF Back %]
+    <div class="txtright"><span class="button proceed-button"><a href="javascript:history.go(-1)"  onmouseover="this.style.textDecoration='none'"> [% Lang.txt(Back) %] </a></span></div>
+[% END %]
 	<input type = "hidden" name ="rfp" value ="[% FlowNextAction %]">
     [% END %]
 	[% HiddenFields %]
