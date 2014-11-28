@@ -296,10 +296,7 @@ fieldset .txtleft {
 	text-align: left;
 	font-size: 13px;
 } 
-#l_dtDOB_day, #l_dtDOB_mon, #l_dtDOB_year {
-	width: 100px;
-}
-#l_dtPassportExpiry_day, #l_dtPassportExpiry_mon, #l_dtPassportExpiry_year {
+.df_date_month, .df_date_day, .df_date_year {
 	width: 100px;
 }
 input[type="text"] {
