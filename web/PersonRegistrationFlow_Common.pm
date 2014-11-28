@@ -276,14 +276,19 @@ sub displayRegoFlowCertificates{
 
 sub checkUploadedRegoDocuments {
     my($Data,$personID, $regoID,$entityID,$entityLevel,$originLevel,$rego_ref) = @_;
-    
+
     my $query = qq[
         SELECT 
             count(intItemID) as items 
         FROM 
             tblRegistrationItem 
+       INNER JOIN 
+           tblDocumentType 
+       ON 
+           tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID
         WHERE 
-            intRealmID = ? 
+            tblRegistrationItem.intRealmID = ?
+            AND intRequired = 1 
             AND intOriginLevel = ? 
             AND strRuleFor = ? 
             AND intEntityLevel = ? 
@@ -295,6 +300,7 @@ sub checkUploadedRegoDocuments {
             AND strAgeLevel IN('', ? )
             AND strItemType = ? 
             AND (strISOCountry_IN ='' OR strISOCountry_IN IS NULL OR strISOCountry_IN LIKE CONCAT('%|',?,'|%')) AND (strISOCountry_NOTIN ='' OR strISOCountry_NOTIN IS NULL OR strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))  ];   
+
     my $sth = $Data->{'db'}->prepare($query);
     $sth->execute(  $Data->{'Realm'},
     				$originLevel,
@@ -310,25 +316,6 @@ sub checkUploadedRegoDocuments {
     				$rego_ref->{'strISONationality'}
     );
     
-
-	#open FH, ">dumpfile.txt";
-	#print FH "\nsql\n 
-	#SELECT count(intItemID) as items FROM tblRegistrationItem WHERE 
-	#intRealmID = 1 AND 
-	#intOriginLevel = '$originLevel' AND 
-	#strRuleFor = 'REGO' AND 
-	#intEntityLevel = $entityLevel AND 
-	#strRegistrationNature = '$rego_ref->{'strRegistrationNature'}' AND 
-	#strPersonType = '$rego_ref->{'strPersonType'}' AND 
-	#strPersonLevel = '$rego_ref->{'strPersonLevel'}' AND 
-	#strSport = '$rego_ref->{'strSport'}' AND 
-	#strAgeLevel = '$rego_ref->{'strAgeLevel'}' AND 
-	#strItemType = 'DOCUMENT' AND 
-	#(strISOCountry_IN ='' OR strISOCountry_IN IS NULL OR strISOCountry_IN LIKE CONCAT('%|$rego_ref->{'strISONationality'}|%')) AND 
-	#(strISOCountry_NOTIN ='' OR strISOCountry_NOTIN IS NULL OR strISOCountry_NOTIN NOT LIKE CONCAT('%|$rego_ref->{'strISONationality'}|%'))
-#
-#";
-
     my $dref = $sth->fetchrow_hashref();
     my $total_items = $dref->{'items'};     
     return 1 if($total_items == 0);
