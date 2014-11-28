@@ -11,10 +11,7 @@ use Cache::Memcached::Fast;
 use strict;
 
 my %cachetypes = (
-	sww => 1, #Sportzware Websites
-	swm => 2, #Sportzware Membership
-	mem => 3, #MySport based queries that would be useful in multiple systems
-	ls => 4, #Livestats
+	swm => $Defs::CountryCachePrefix,
 );
 
 sub new {

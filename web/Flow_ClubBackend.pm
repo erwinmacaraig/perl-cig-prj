@@ -240,6 +240,7 @@ sub setupValues {
                     datetype    => 'dropdown',
                     format      => 'dd/mm/yyyy',
                     validate    => 'DATE',
+                    maxyear     => (localtime)[5] + 1900,
                     compulsory => 1,
                 },
                 dissolved => {
@@ -255,6 +256,7 @@ sub setupValues {
                     datetype    => 'dropdown',
                     format      => 'dd/mm/yyyy',
                     validate    => 'DATE',
+                    maxyear     => (localtime)[5] + 1900,
                     readonly    => $dissDateReadOnly,
                 },
                 strCity         => {
@@ -310,15 +312,15 @@ sub setupValues {
             'order' => [qw(
                 strLocalName
                 strLocalShortName
+                intLocalLanguage
+                strLatinName
+                strLatinShortName
                 dtFrom
                 dissolved
                 dtTo
                 strCity
                 strRegion
                 strISOCountry
-                intLocalLanguage
-                strLatinName
-                strLatinShortName
             )],
             fieldtransform => {
                 textcase => {
