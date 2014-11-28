@@ -1239,6 +1239,8 @@ sub person_details {
                     datetype    => 'dropdown',
                     format      => 'dd/mm/yyyy',
                     validate    => 'DATE',
+                    minyear => '1980',
+                    maxyear => (localtime)[5] + 1900 + 15,
                     sectionname => 'identification',
                 },
                 strOtherPersonIdentifier => {
