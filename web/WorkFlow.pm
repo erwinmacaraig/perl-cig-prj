@@ -2239,6 +2239,7 @@ sub populateDocumentViewData {
                 AND addPersonItem.intOriginLevel = wr.intOriginLevel
                 AND addPersonItem.strRuleFor = 'PERSON'
                 AND addPersonItem.intID = rd.intDocumentTypeID
+                AND addPersonItem.strAgeLevel IN ('', '$dref->{'strAgeLevel'}')
                 )
         LEFT JOIN tblRegistrationItem as regoItem
             ON (
@@ -2248,10 +2249,10 @@ sub populateDocumentViewData {
                 AND regoItem.intID = rd.intDocumentTypeID
                 AND regoItem.strRegistrationNature = '$dref->{'strRegistrationNature'}'
                 AND regoItem.strPersonType = '$dref->{'strPersonType'}'
-                AND regoItem.strPersonLevel = '$dref->{'strPersonLevel'}'
-                AND regoItem.strSport = '$dref->{'strSport'}'
-                AND regoItem.strAgeLevel = '$dref->{'strAgeLevel'}'
-                AND regoItem.strPersonEntityRole = '$dref->{'strPersonEntityRole'}'
+                AND regoItem.strPersonLevel IN ('', '$dref->{'strPersonLevel'}')
+                AND regoItem.strSport IN ('', '$dref->{'strSport'}')
+                AND regoItem.strAgeLevel IN ('', '$dref->{'strAgeLevel'}')
+                AND regoItem.strPersonEntityRole IN ('', '$dref->{'strPersonEntityRole'}')
                 )
         LEFT JOIN tblRegistrationItem as entityItem
             ON (

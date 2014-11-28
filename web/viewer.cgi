@@ -64,7 +64,7 @@ sub main	{
 
     my $st = qq[
       SELECT 
-          *,
+          UF.*,
           DATE_FORMAT(dtUploaded,"%d/%m/%Y %H:%i") AS DateAdded_FMT, 
           tblDocuments.intDocumentTypeID,
           tblDocumentType.strLockAtLevel,
@@ -98,8 +98,8 @@ sub main	{
         $dref->{'fileURL'} = 'viewfile.cgi?client='.$client.'&amp;f=' . $dref->{'intFileID'};
     }
 
-    if($dref->{'intPersonID'})  {
-        my $object = getInstanceOf(\%Data,'person',$dref->{'intPersonID'});
+    if($dref->{'intEntityTypeID'} == 1)  {
+        my $object = getInstanceOf(\%Data,'person',$dref->{'intEntityID'});
         my $isocountries = getISOCountriesHash();
         $dref->{'person'} = {
             strSurname => $object->getValue('strLocalSurname'),
@@ -109,13 +109,15 @@ sub main	{
             nationality => $isocountries->{$object->getValue('strISONationality')},
             status => $object->getValue('strStatus'),
             nationalNum => $object->getValue('strNationalNum'),
-
-
-
         };
     }
-    if($dref->{'intEntityID'})  {
-        $dref->{'entity'} = getInstanceOf(\%Data,'entity',$dref->{'intEntityID'});
+    elsif($dref->{'intEntityID'})  {
+        my $object = getInstanceOf(\%Data,'entity',$dref->{'intEntityID'});
+        $dref->{'entity'} = {
+            name => $object->name(),
+            strStatus => $object->getValue('strStatus'),
+            maID => $object->getValue('strMAID'),
+        };    
     }
     # BUILD PAGE
     my $TemplateData = $dref;

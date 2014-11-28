@@ -139,13 +139,22 @@ sub main {
 
     if ( $action =~ /^E_/ ) {
         my $ID = getID( \%clientValues );
-        #( $resultHTML, $pageHeading ) = handleEntity( $action, \%Data, $ID, $typeID );
-        ( $resultHTML, $pageHeading ) = handleWorkflow($action, \%Data);
+        if ($action eq 'E_HOME')    {
+            ( $resultHTML, $pageHeading ) = handleWorkflow($action, \%Data) if ($action eq 'E_HOME');
+        }
+        else    {
+            ( $resultHTML, $pageHeading ) = handleEntity( $action, \%Data, $ID, $typeID );
+        }
     }
     elsif ( $action =~ /^C_/ ) {
         my $clubID= getID($Data{'clientValues'},$Defs::LEVEL_CLUB); 
         my $entityID = getLastEntityID($Data{'clientValues'});
-        ( $resultHTML, $pageHeading ) = handleClub( $action, \%Data, $entityID, $clubID, $typeID );
+        if ($action eq 'C_HOME')    {
+            ( $resultHTML, $pageHeading ) = handleWorkflow($action, \%Data) if ($action eq 'C_HOME');
+        }
+        else    {
+            ( $resultHTML, $pageHeading ) = handleClub( $action, \%Data, $entityID, $clubID, $typeID );
+        }
     }
     elsif ( $action =~ /^P_/ ) {
         my $personID= getID($Data{'clientValues'},$Defs::LEVEL_PERSON);

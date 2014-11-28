@@ -31,6 +31,8 @@ INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentN
 
 
 ## REFEREE DOCUMENTS
+INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON', 'Certificate of Medical Fitness', 'Referees over 35 must provide a current certificate of medical fitness');
+
 INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON',"Referee Qualification Certificate", "The most recent coaching certificate held by the Coach");
 
 INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentName, strDescription) VALUES (1, 1, 'PERSON',"Foreign Referee Certificate (official from CONF or MA)", "A refereeing certificate issued in a foreign country or by the Confederation  - only uploaded if applicable");
@@ -75,7 +77,126 @@ INSERT INTO tblDocumentType (intRealmID, intActive, strDocumentFor, strDocumentN
 
 
 
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strItemType, intID, intRequired) SELECT 1, 3, 'PERSON', 3, 'NEW', 'DOCUMENT', intDocumentTypeID , 1 FROM tblDocumentType WHERE intDocumentTypeID IN (32,33,34,35,36,37);
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strItemType, intID, intRequired) SELECT 1, 100, 'PERSON', 3, 'NEW', 'DOCUMENT', intDocumentTypeID , 1 FROM tblDocumentType WHERE intDocumentTypeID IN (32,33,34,35,36,37);
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strItemType, intID, intRequired) SELECT 1, 100, 'PERSON', 100, 'NEW', 'DOCUMENT', intDocumentTypeID , 1 FROM tblDocumentType WHERE intDocumentTypeID IN (32,33,34,35,36,37);
+
+
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strPersonType, strPersonLevel, strItemType, intID, intRequired) SELECT DISTINCT 1,intOriginLevel, 'PERSON', intEntityLevel, 'NEW', strPersonType, strPersonLevel, 'DOCUMENT', 38,1 FROM tblWFRule WHERE strPersonType ='PLAYER' AND strRegistrationNature ='NEW'  and strPersonLevel IN ('PROFESSIONAL', 'AMATEUR_U_C');
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strPersonType, strPersonLevel, strItemType, intID, intRequired) SELECT DISTINCT 1,intOriginLevel, 'PERSON', intEntityLevel, 'NEW', strPersonType, strPersonLevel, 'DOCUMENT', 39,1 FROM tblWFRule WHERE strPersonType ='PLAYER' AND strRegistrationNature ='NEW'  and strPersonLevel IN ('PROFESSIONAL', 'AMATEUR_U_C');
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strPersonType, strPersonLevel, strItemType, intID, intRequired, strISOCountry_NOTIN) SELECT DISTINCT 1,intOriginLevel, 'PERSON', intEntityLevel, 'NEW', strPersonType, '', 'DOCUMENT', 40,1, '|SGP|' FROM tblWFRule WHERE strPersonType ='PLAYER' AND strRegistrationNature ='NEW';
+
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strPersonType, strAgeLevel, strItemType, intID, intRequired) SELECT DISTINCT 1,intOriginLevel, 'PERSON', intEntityLevel, 'NEW', strPersonType, strAgeLevel, 'DOCUMENT', 41,0 FROM tblWFRule WHERE strPersonType ='PLAYER' AND strRegistrationNature ='NEW' and strAgeLevel='ADULT';
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strPersonType, strItemType, intID, intRequired) SELECT DISTINCT 1,intOriginLevel, 'PERSON', intEntityLevel, 'NEW', strPersonType,  'DOCUMENT', 42,0 FROM tblWFRule WHERE strPersonType ='PLAYER' AND strRegistrationNature ='NEW';
+
+##COACH
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strPersonType, strItemType, intID, intRequired) SELECT DISTINCT 1,intOriginLevel, 'PERSON', intEntityLevel, 'NEW', strPersonType,  'DOCUMENT', 43,1 FROM tblWFRule WHERE strPersonType ='COACH' AND strRegistrationNature ='NEW';
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strPersonType, strItemType, intID, intRequired) SELECT DISTINCT 1,intOriginLevel, 'PERSON', intEntityLevel, 'NEW', strPersonType,  'DOCUMENT', 44,1 FROM tblWFRule WHERE strPersonType ='COACH' AND strRegistrationNature ='NEW';
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strPersonType, strItemType, intID, intRequired) SELECT DISTINCT 1,intOriginLevel, 'PERSON', intEntityLevel, 'NEW', strPersonType,  'DOCUMENT', 45,0 FROM tblWFRule WHERE strPersonType ='COACH' AND strRegistrationNature ='NEW';
+
+
+##REF
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strPersonType, strAgeLevel, strItemType, intID, intRequired) SELECT DISTINCT 1,intOriginLevel, 'PERSON', intEntityLevel, 'NEW', strPersonType, 'ADULT', 'DOCUMENT', 62,0 FROM tblWFRule WHERE strPersonType ='REFEREE' AND strRegistrationNature ='NEW';
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strPersonType, strItemType, intID, intRequired) SELECT DISTINCT 1,intOriginLevel, 'PERSON', intEntityLevel, 'NEW', strPersonType,  'DOCUMENT', 46,1 FROM tblWFRule WHERE strPersonType ='REFEREE' AND strRegistrationNature ='NEW';
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strPersonType, strItemType, intID, intRequired) SELECT DISTINCT 1,intOriginLevel, 'PERSON', intEntityLevel, 'NEW', strPersonType,  'DOCUMENT', 47,0 FROM tblWFRule WHERE strPersonType ='REFEREE' AND strRegistrationNature ='NEW';
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strPersonType, strItemType, intID, intRequired) SELECT DISTINCT 1,intOriginLevel, 'PERSON', intEntityLevel, 'NEW', strPersonType,  'DOCUMENT', 48,0 FROM tblWFRule WHERE strPersonType ='REFEREE' AND strRegistrationNature ='NEW';
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strPersonType, strItemType, intID, intRequired) SELECT DISTINCT 1,intOriginLevel, 'PERSON', intEntityLevel, 'NEW', strPersonType,  'DOCUMENT', 49,0 FROM tblWFRule WHERE strPersonType ='REFEREE' AND strRegistrationNature ='NEW' and intOriginLevel=100;
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strPersonType, strItemType, intID, intRequired) SELECT DISTINCT 1,intOriginLevel, 'PERSON', intEntityLevel, 'NEW', strPersonType,  'DOCUMENT', 50,0 FROM tblWFRule WHERE strPersonType ='REFEREE' AND strRegistrationNature ='NEW' and intOriginLevel=100;
+
+## OFFICIALS
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strPersonType, strItemType, intID, intRequired) SELECT DISTINCT 1,intOriginLevel, 'PERSON', intEntityLevel, 'NEW', strPersonType,  'DOCUMENT', 52,0 FROM tblWFRule WHERE strPersonType IN ('MAOFFICIAL', 'TEAMOFFICIAL', 'CLUBOFFICIAL') AND strRegistrationNature ='NEW';
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strPersonType, strPersonEntityRole, strItemType, intID, intRequired) SELECT DISTINCT 1,intOriginLevel, 'PERSON', intEntityLevel, 'NEW', strPersonType, 'DOCTOR', 'DOCUMENT', 51,0 FROM tblWFRule WHERE strPersonType = 'TEAMOFFICIAL' AND strRegistrationNature ='NEW';
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strPersonType, strPersonEntityRole, strItemType, intID, intRequired) SELECT DISTINCT 1,intOriginLevel, 'PERSON', intEntityLevel, 'NEW', strPersonType, 'PHYSIO', 'DOCUMENT', 51,0 FROM tblWFRule WHERE strPersonType = 'TEAMOFFICIAL' AND strRegistrationNature ='NEW';
+
+
+## ORG DOCOS
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strItemType, intID, intRequired) SELECT 1, 100, 'ENTITY', 3, 'NEW', 'DOCUMENT', intDocumentTypeID , 1 FROM tblDocumentType WHERE intDocumentTypeID IN (53,54,55,56,57,58,59,60);
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strItemType, intID, intRequired) SELECT 1, 100, 'ENTITY', 3, 'NEW', 'DOCUMENT', intDocumentTypeID , 0 FROM tblDocumentType WHERE intDocumentTypeID IN (61);
+
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strItemType, intID, intRequired) SELECT 1, 3, 'ENTITY', 3, 'RENEWAL', 'DOCUMENT', intDocumentTypeID , 1 FROM tblDocumentType WHERE intDocumentTypeID IN (54,55,57);
+INSERT INTO tblRegistrationItem (intRealmID, intOriginLevel, strRuleFor, intEntityLevel , strRegistrationNature, strItemType, intID, intRequired) SELECT 1, 100, 'ENTITY', 3, 'RENEWAL', 'DOCUMENT', intDocumentTypeID , 1 FROM tblDocumentType WHERE intDocumentTypeID IN (54,55,57);
 
 
 
+
+## WF_RULE DOCOS -- PLAYER
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 32,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='PLAYER' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 33,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='PLAYER' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 34,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='PLAYER' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 35,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='PLAYER' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 36,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='PLAYER' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 37,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='PLAYER' AND strRegistrationNature='NEW' and strAgeLevel='MINOR';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 38,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='PLAYER' AND strRegistrationNature='NEW' and strPersonLevel IN ('PROFESSIONAL', 'AMATEUR_U_C');
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 39,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='PLAYER' AND strRegistrationNature='NEW' and strPersonLevel IN ('PROFESSIONAL', 'AMATEUR_U_C');
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 40,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='PLAYER' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 41,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='PLAYER' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 42,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='PLAYER' AND strRegistrationNature='NEW';
+
+
+## WF_RULE DOCOS -- COACH
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 32,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='COACH' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 33,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='COACH' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 34,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='COACH' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 35,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='COACH' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 36,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='COACH' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 37,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='COACH' AND strRegistrationNature='NEW'; # and strAgeLevel='MINOR';
+
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 43,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='COACH' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 44,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='COACH' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 45,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='COACH' AND strRegistrationNature='NEW';
+
+
+## WF_RULE DOCOS -- REF
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 32,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='REFEREE' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 33,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='REFEREE' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 34,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='REFEREE' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 35,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='REFEREE' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 36,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='REFEREE' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 37,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='REFEREE' AND strRegistrationNature='NEW'; # and strAgeLevel='MINOR';
+
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID,62,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='REFEREE' AND strRegistrationNature='NEW';  #and strAgeLevel='ADULT';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 46,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='REFEREE' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 47,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='REFEREE' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 48,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='REFEREE' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 49,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='REFEREE' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 50,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='REFEREE' AND strRegistrationNature='NEW';
+
+
+## WF_RULE DOCOS -- OFFICIALS
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 32,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='MAOFFICIAL' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 33,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='MAOFFICIAL' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 34,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='MAOFFICIAL' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 35,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='MAOFFICIAL' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 36,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='MAOFFICIAL' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 37,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='MAOFFICIAL' AND strRegistrationNature='NEW'; # and strAgeLevel='MINOR';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 52,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='MAOFFICIAL' AND strRegistrationNature='NEW';
+
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 32,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='TEAMOFFICIAL' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 33,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='TEAMOFFICIAL' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 34,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='TEAMOFFICIAL' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 35,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='TEAMOFFICIAL' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 36,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='TEAMOFFICIAL' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 37,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='TEAMOFFICIAL' AND strRegistrationNature='NEW'; # and strAgeLevel='MINOR';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 51,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='TEAMOFFICIAL' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 52,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='TEAMOFFICIAL' AND strRegistrationNature='NEW';
+
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 32,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='CLUBOFFICIAL' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 33,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='CLUBOFFICIAL' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 34,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='CLUBOFFICIAL' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 35,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='CLUBOFFICIAL' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 36,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='CLUBOFFICIAL' AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 37,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='CLUBOFFICIAL' AND strRegistrationNature='NEW'; # and strAgeLevel='MINOR';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 52,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='REGO' AND strPersonType='CLUBOFFICIAL' AND strRegistrationNature='NEW';
+
+
+### ORG DOCOS
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 53,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='ENTITY' AND intEntityLevel=3 AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 54,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='ENTITY' AND intEntityLevel=3 AND strRegistrationNature IN('NEW', 'RENEWAL');
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 55,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='ENTITY' AND intEntityLevel=3 AND strRegistrationNature IN('NEW', 'RENEWAL');
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 56,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='ENTITY' AND intEntityLevel=3 AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 57,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='ENTITY' AND intEntityLevel=3 AND strRegistrationNature IN('NEW', 'RENEWAL');
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 58,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='ENTITY' AND intEntityLevel=3 AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 59,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='ENTITY' AND intEntityLevel=3 AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 60,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='ENTITY' AND intEntityLevel=3 AND strRegistrationNature='NEW';
+INSERT INTO tblWFRuleDocuments SELECT 0, intWFRuleID, 61,1,1,1,1,NOW() FROM tblWFRule WHERE strWFRuleFor='ENTITY' AND intEntityLevel=3 AND strRegistrationNature='NEW';
 
