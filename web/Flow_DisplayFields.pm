@@ -309,23 +309,24 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
     my %usedsections = ();
     for my $s ( @{$sectionlist} ) {
 
-        my $sectionheader = $self->langlookup( $s->[1] );
+        my $sectionheader = $self->langlookup( $s->[1] ) || '';
 
         if ( $sections{ $s->[0] } ) {
             next if $s->[2] and not $self->display_section( $s->[2] );
+            my $extraclass = $s->[3] || '';
             $usedsections{ $s->[0] } = 1;
             if ($notabs) {
                 my $sh = '';
-                if ( $s->[1] ) {
+                if ( $sectionheader ) {
                     $sh = qq[ <div class = "sectionheader">$sectionheader</div>];
                 }
-                $returnstr .= qq[<div class = "fieldSectionGroup">$sh].$sections{ $s->[0] }.qq[</div>];
+                $returnstr .= qq[<div class = "fieldSectionGroup $extraclass" id = "fsg-].$s->[0].qq["> $sh].$sections{ $s->[0] }.qq[</div>];
             }
             else {
                 #my $style=$s ? 'style="display:none;" ' : '';
                 my $sh = q{};
                 if ( $s->[1] ) {
-                    $sh = qq[ <tr><th colspan="2" class="sectionheader">$sectionheader</th></tr>];
+                    $sh = qq[ <tr><th colspan="2" class="sectionheader $extraclass">$sectionheader</th></tr>];
                 }
                 $tabs .= qq[<li><a id="a_sec$s->[0]" class="tab_links" href="#sec$s->[0]">$sectionheader</a></li>];
 

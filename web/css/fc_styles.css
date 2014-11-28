@@ -1064,3 +1064,12 @@ table.table tr th {
 #flowFormID .col-md-6 {
 	position: relative;
 }
+
+.dynamic-panel  {
+    padding:20px 5px 5px;
+    margin: 10px 5px;
+    background-color:#777;
+}
+.fieldSectionGroup  {
+    overflow:auto;
+}
