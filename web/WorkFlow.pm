@@ -1910,7 +1910,7 @@ sub viewTask {
 
     my $db = $Data->{'db'};
     my $q = $db->prepare($st) or query_error($st);
-	open FH, ">>dumpfile.txt";
+	open FH, ">dumpfile.txt";
 	print FH "WFTaskID = $WFTaskID \n entityID = $entityID\n\n";    
 	$q->execute(
         $WFTaskID,
@@ -2001,6 +2001,7 @@ sub viewTask {
 
     my ($DocumentData, $fields) = populateDocumentViewData($Data, $dref);
     %DocumentData = %{$DocumentData};
+    print FH "\n\nDocument data contains: \n" . Dumper($DocumentData{'RelatedDocuments'}) . "\n\n";
 
     my $paymentBlock = '';
     if ($dref->{strWFRuleFor} eq 'REGO')    {
@@ -2359,7 +2360,12 @@ sub populateDocumentViewData {
 
         if($tdref->{'intDocumentID'}) {
             $displayView = 1;
-            $viewLink = qq[ <span style="position: relative" class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$tdref->{'intFileID'}" target="_blank">]. $Data->{'lang'}->txt('View') . q[</a></span>];
+            #$viewLink = qq[ <span style="position: relative" class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$tdref->{'intFileID'}" target="_blank">]. $Data->{'lang'}->txt('View') . q[</a></span>];
+
+			$viewLink = qq[ <span style="position: relative"> 
+<a href="#" class="btn-inside-docs-panel" onclick="docViewer($tdref->{'intFileID'},'client=$Data->{'client'}&amp;a=review');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];
+
+			
         }
 
         my %documents = (

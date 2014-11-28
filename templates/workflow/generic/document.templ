@@ -31,7 +31,7 @@
                 </td>
                 <td class="status-col">
                     [% IF document.DisplayView == 1 %]
-                        <a href="" class="btn-inside-docs-panel">[% Lang.txt('View') %]</a>
+                        [% document.viewLink %]
                     [% ELSIF document.DisplayAdd == 1 %]
                         [% document.addLink %]
                     [% ELSE %]

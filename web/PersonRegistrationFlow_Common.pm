@@ -293,7 +293,7 @@ sub checkUploadedRegoDocuments {
             AND strRuleFor = ? 
             AND intEntityLevel = ? 
             AND strRegistrationNature = ? 
-            AND strDocumentFor = 'PERSON' 
+            AND strDocumentFor IN ('TRANSFER','PERSON')
             AND strPersonType = ?
             AND strPersonLevel IN('', ? )
             AND strSport IN('', ? )
