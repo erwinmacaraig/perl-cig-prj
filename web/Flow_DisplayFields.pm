@@ -921,13 +921,13 @@ s/onChange=(['"])(.*)\1/onMouseOut=$1 if (changed_$fieldname==1) { $2 } $1/i;
       if ($onChange);
 
     my $daysfield =
-      $self->drop_down( "${fieldname}_day", \%days, \@order_d, $val_d, 1, 0, '', $otherinfo_d );
+      $self->drop_down( "${fieldname}_day", \%days, \@order_d, $val_d, 1, 0, '', $otherinfo_d,'','df_date_day' );
     my $monthsfield =
       $self->drop_down( "${fieldname}_mon", \%months, \@order_m, $val_m, 1, 0, '',
-        $otherinfo_m );
+        $otherinfo_m ,'','df_date_month');
     my $yearsfield =
       $self->drop_down( "${fieldname}_year", \%years, \@order_y, $val_y, 1, 0, '',
-        $otherinfo_y );
+        $otherinfo_y ,'','df_date_year');
 
     my $field_html =
 qq[ <span $onMouseOut> <script language="JavaScript1.2">var changed_$fieldname=0; var changed_temp_$fieldname=0</script> ];
