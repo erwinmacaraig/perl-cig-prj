@@ -297,7 +297,6 @@ sub setupValues {
                     type        => 'text',
                     size        => '40',
                     maxsize     => '50',
-                    compulsory  => 1,
                     active      => $nonLatin,
                     sectionname => 'latinnames',
                 },
