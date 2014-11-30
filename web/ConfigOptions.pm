@@ -442,7 +442,6 @@ sub getFieldsList	{
         intNatCustomBool3
         intNatCustomBool4
         intNatCustomBool5
-        strBirthCert 
         ));
     return \@memberFields if $fieldtype eq 'Person';
 
