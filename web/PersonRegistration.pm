@@ -14,6 +14,7 @@ require Exporter;
     rolloverExistingPersonRegistrations
     checkIsSuspended
     getRegistrationDetail
+    cleanPlayerPersonRegistrations
 );
 
 use strict;
@@ -26,6 +27,43 @@ use Data::Dumper;
 use Person;
 use PersonRegisterWhat;
 use AuditLog;
+sub cleanPlayerPersonRegistrations  {
+
+    my ($Data, $personID, $personRegistrationID) = @_;
+
+    my %Reg = (
+        personRegistrationID=> $personRegistrationID || 0,
+    );
+    my ($count, $reg_ref) = getRegistrationData(
+        $Data,
+        $personID,
+        \%Reg
+    );
+    
+    return if (! $count);
+    my %ExistingReg = (
+        sport=> $reg_ref->[0]{'strSport'} || '',
+        personType=> $reg_ref->[0]{'strPersonType'} || '',
+        entityID=> $reg_ref->[0]{'intEntityID'} || 0,
+        status=> $Defs::PERSONREGO_STATUS_ACTIVE,
+    );
+        #ageLevel=> $reg_ref->[0]{'strAgeLevel'} || '',
+    my ($countRecords, $regs_ref) = getRegistrationData(
+        $Data,
+        $personID,
+        \%ExistingReg
+    );
+    foreach my $rego (@{$regs_ref})  {
+        next if ($rego->{'intPersonRegistrationID'} == $personRegistrationID);
+        my $thisRego = $rego;
+        $thisRego->{'intCurrent'} = 0;
+        #$thisRego->{'strStatus'} = $Defs::PERSONREGO_STATUS_ROLLED_OVER;
+        $thisRego->{'strStatus'} = $Defs::PERSONREGO_STATUS_PASSIVE;
+        updatePersonRegistration($Data, $personID, $rego->{'intPersonRegistrationID'}, $thisRego, 0);
+    }
+}
+
+
 sub rolloverExistingPersonRegistrations {
 
     my ($Data, $personID, $personRegistrationID) = @_;
@@ -112,6 +150,7 @@ sub checkNewRegoOK  {
     my $ok = 1;
     foreach my $reg (@{$regs})  {
         next if $reg->{'intEntityID'} == $rego_ref->{'entityID'};
+        #$ok = 0 if ($reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_ROLLED_OVER or $reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_DELETED or $reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_TRANSFERRED);
         $ok = 0 if ($reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_DELETED or $reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_TRANSFERRED);
     }
 

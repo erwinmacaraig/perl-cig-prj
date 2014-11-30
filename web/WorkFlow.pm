@@ -1204,6 +1204,10 @@ sub checkForOutstandingTasks {
 				$qPR->execute($personRegistrationID);
 				my $ppref = $qPR->fetchrow_hashref();
                 # if check  pass call save
+                if($ppref->{'strPersonType'} eq 'PLAYER' and $Data->{'SystemConfig'}{'cleanPlayerPersonRecords'}) {
+                    PersonRegistration::cleanPlayerPersonRegistrations($Data, $personID, $personRegistrationID);
+                }
+    
                 if( ($ppref->{'strPersonType'} eq 'PLAYER') && ($ppref->{'strSport'} eq 'FOOTBALL'))    {
                 	savePlayerPassport($Data, $personID);
                 }
