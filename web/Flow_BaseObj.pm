@@ -127,16 +127,16 @@ sub Navigation {
             my $linkURL = $self->{'Target'}."?rfp=".$self->{'ProcessOrder'}[$i]{'action'}."&".$self->stringifyURLCarryField();
 
 			my $link = $showlink
-                ? qq[<a href="$linkURL" class = "stepname">$step. $name</a>]
-                : qq[<span class = "stepname">$step. $name</span>];
+                ? qq[<a href="$linkURL" class = "$currentclass">$step. $name</a>]
+                : qq[<a href="#" class = "$currentclass">$step. $name</a>];
             
-			$navstring .= qq[ <li class = "step step-$step"><span class="$currentclass step-num">$link</li> ];
+			$navstring .= qq[ <li>$link</li> ];
             $step_in_future = 2 if $current;
             $step++;
         }
     }
     my $returnHTML = '';
-    $returnHTML .= qq[<ul class = "playermenu list-inline form-nav">$navstring</ul><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;
+    $returnHTML .= qq[<ul>$navstring</ul><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;
    
 
     if(wantarray)   {

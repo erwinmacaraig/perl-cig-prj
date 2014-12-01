@@ -429,7 +429,7 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
             'addvenue'
         ]],
         [ $lang->txt('People'), 'menu',[
-            'persons',
+            'persons_search',
             'persons_addplayer',
             'persons_addcoach',
             'persons_addofficial',
@@ -437,7 +437,6 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
             'persons_addclubofficial',
             'persons_addmaofficial',
             'bulk',
-            'persons_search',
         ]],
         [ $lang->txt('Work Tasks'), 'menu',[
             'approvals',

@@ -5,11 +5,12 @@ require Exporter;
   formatPersonName
   personAge
   personIsMinor
+  minorComparisonDate
 );
 
 use strict;
 use lib '.', '..', 'Clearances';
-use Date::Calc qw(Today Delta_YMD);
+use Date::Calc qw(Today Delta_YMD Add_Delta_YM Add_Delta_Days);
 use Defs;
 use AssocTime;
 
@@ -46,6 +47,16 @@ sub personIsMinor   {
     return 0;
 }
 
-
+sub minorComparisonDate {
+    my ($Data) = @_;
+    #this function will return the oldest DOB to be accepted as a minor
+    my $timezone = $Data->{'SystemConfig'}{'Timezone'} || 'UTC';
+    my $today = dateatAssoc($timezone);
+    my $dateAs = $Data->{'SystemConfig'}{'Age-DateAsOf'} || $today;
+    my $adultAge = $Data->{'SystemConfig'}{'Age-Adult'} || 18;
+    my($dateAs_y,$dateAs_m,$dateAs_d) = $dateAs =~/(\d\d\d\d)-(\d{1,2})-(\d{1,2})/;
+    my ( $age_year, $age_month, $age_day ) = Add_Delta_Days(Add_Delta_YM( $dateAs_y, $dateAs_m, $dateAs_d, -$adultAge, 0),1);
+    return "$age_year-$age_month-$age_day";
+}
 1;
 

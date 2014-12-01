@@ -1,40 +1,76 @@
-<!-- <div class="utilities clearfix">
+<div class="utilities clearfix">
 	<div class="container">
 		<div class="row">
 			<div class="col-md-12">
-			<ul>
-				<li>[% Lang.txt('Welcome') %]<a href="#" title="">[% Data.UserName %] <span class="fa fa-caret-down"></span></a></li>
-				<li><a href ="http://support.sportingpulse.com">[% Lang.txt('Support') %]</a></li>
-				<li><a href="user/logout.cgi" title="[% Lang.txt('Logout') %]">[% Lang.txt('Logout') %]</a></li>
-			</ul>
+      
+        <div class="access-level">
+          <p class="viewAs">View as:</p>
+            <div class="nav_session_menu_wrap">
+              <div class="nav_session_placement">
+                <a class="nav_session_current" href="">
+                  <span class="nav-bar-name">[% NavTree.last.name %]</span>
+                  <span class="level-name">[% NavTree.last.levelname %]</span>
+                </a>
+              </div>
+              <ol class="nav_session_levels">
+                [% FOR level = NavTree %]
+                  <li class="session_item"><a href = "[% level.url %]"><span class="nav-bar-name">[% level.name %]</span>&nbsp;<span class="level-name">[% Lang.txt(level.levelname) %]</span></a></li>
+                [% END %]
+              </ol>
+              <script type="text/javascript">
+                var sessno = jQuery('li.session_item').length;
+                if(sessno > 1) {
+                  jQuery('.nav_session_placement').addClass('arrow_bg');
+                  jQuery('.nav_session_current').click(function() {
+                    jQuery('.nav_session_levels').toggleClass('nav_display');
+                      return false;
+                  });
+                }
+                else {
+                  jQuery('.nav_session_current').click(function() {
+                    return false;
+                  });
+                }
+                  jQuery('html').click(function() {
+                  jQuery('.nav_session_levels').removeClass('nav_display');
+                  });
+                </script> 
+            </div>
+        </div>
+
+  			<ul>
+  				<li>[% Lang.txt('Welcome') %] <a href="#" title="">[% Data.UserName %] <span class="fa fa-caret-down"></span></a></li>
+  				<li><a href ="http://support.sportingpulse.com">[% Lang.txt('Help') %]</a></li>
+  				<li><a href="user/logout.cgi" title="[% Lang.txt('Logout') %]">[% Lang.txt('Logout') %]</a></li>
+  			</ul>
 			</div>
 		</div>
 	</div>
-</div> -->
-<header>
-      <div class="logo-area clearfix">
-        <div class="container">
-          <div class="row">
-            <div class="col-md-12">
-              <!--<a href="#" title=""><img src="images/img-logo.png" alt="" /></a><h1>Finland Association</h1>-->
-              <ul>
-                <li>
-                  <strong>Member Association</strong><br/>
-                  Phone: <strong>4567 8658 689</strong><br/>
-                  Email: <strong>ma@ma.com</strong><br/>
-                  Website: <strong>www.ma.com</strong>
-                </li>
-                <li>
-                  <strong>Help Desk</strong><br/>
-                  Phone: <strong>4567 8658 689</strong><br/>
-                  Email: <strong>hd@hd.com</strong><br/>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>       
-    </header>
+</div>
+
+<div class="logo-area clearfix">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <!--<a href="#" title=""><img src="images/img-logo.png" alt="" /></a><h1>Finland Association</h1>-->
+        <ul>
+          <li>
+            <strong>Member Association</strong><br/>
+            Phone: <strong>4567 8658 689</strong><br/>
+            Email: <strong>ma@ma.com</strong><br/>
+            Website: <strong>www.ma.com</strong>
+          </li>
+          <li>
+            <strong>Help Desk</strong><br/>
+            Phone: <strong>4567 8658 689</strong><br/>
+            Email: <strong>hd@hd.com</strong><br/>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>       
+
 <script>
 jQuery(document).ready(function()  {
 

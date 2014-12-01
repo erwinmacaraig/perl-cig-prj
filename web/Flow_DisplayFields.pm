@@ -297,12 +297,22 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
             $sectioncount{$sname}++;
             my $rowcount =
               ( $sectioncount{$sname} % 2 ) ? 'HTr_odd' : 'HTr_even';
-            $sections{$sname} .= qq[
-            <div class="form-group" id = "l_row_$fieldname">
-            <label class="col-md-4 control-label txtright" for="l_$fieldname">$label</label>
-            <div class="col-md-6">$pretext$field_html$posttext</div>
-            </div>
-            ];
+            if($f->{'swapLabels'})  {
+                $sections{$sname} .= qq[
+                <div class="form-group" id = "l_row_$fieldname">
+                    <div class="col-md-4 txtright">$pretext$field_html$posttext</div>
+                    <label class="col-md-6 control-label" for="l_$fieldname">$label</label>
+                </div>
+                ];
+            }
+            else    {
+                $sections{$sname} .= qq[
+                <div class="form-group" id = "l_row_$fieldname">
+                    <label class="col-md-4 control-label txtright" for="l_$fieldname">$label</label>
+                    <div class="col-md-6">$pretext$field_html$posttext</div>
+                </div>
+                ];
+            }
         }
     }
 
