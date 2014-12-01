@@ -285,7 +285,7 @@ sub personRegistrationWorkTasks {
             width  => 30,
         },
         {
-            name   => $Data->{'lang'}->txt('Type'),
+            name   => $Data->{'lang'}->txt('Sport'),
             field  => 'Sport',
             width  => 40,
         },
@@ -295,7 +295,7 @@ sub personRegistrationWorkTasks {
             width  => 40,
         },
         {
-            name  => $Data->{'lang'}->txt('Status'),
+            name  => $Data->{'lang'}->txt('Task Status'),
             field => 'Status',
             width  => 40,
         },
@@ -309,11 +309,11 @@ sub personRegistrationWorkTasks {
             field => '',
             width  => 40,
         },
-        {
-            name  => $Data->{'lang'}->txt('Current Task'),
-            field => 'TaskType',
-            width  => 50,
-        },
+        #{
+        #    name  => $Data->{'lang'}->txt('Task Type'),
+        #    field => 'TaskType',
+        #    width  => 50,
+        #},
         #{
         #    name  => $Data->{'lang'}->txt('Task Assigned To'),
         #    field => 'TaskTo',
