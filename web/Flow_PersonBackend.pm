@@ -1787,7 +1787,7 @@ sub process_documents {
     
     #check for uploaded document
     my $isRequiredDocPresent = checkUploadedRegoDocuments($self->{'Data'},$personID, $regoID,$entityID,$entityLevel,$originLevel,$rego_ref);
-    if(!$isRequiredDocPresent){
+    if(1==2 && !$isRequiredDocPresent){
 		my $labelBackBtn = 'Back to Documents';
     	push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Required Document Missing");
     	my %PageData = (
