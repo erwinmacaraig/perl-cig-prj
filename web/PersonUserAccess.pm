@@ -5,6 +5,7 @@ require Exporter;
 
 @EXPORT = @EXPORT_OK = qw(
     doesUserHaveAccess
+    doesUserHaveEntityAccess
 );
 
 use lib ".", "..";
@@ -112,4 +113,32 @@ sub doesUserHaveAccess  {
     return 0;
 }
 
+sub doesUserHaveEntityAccess  {
+    my (
+        $Data,
+        $entityID,
+        $accessType,
+        $authLevel,
+    ) = @_;
+
+    my $client = setClient( $Data->{'clientValues'} ) || '';
+	my $topEntityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
+    #if we are here then the person isn't directly registered to the current entity
+
+    my $st = qq[
+        SELECT
+            intChildID 
+        FROM
+            tblTempEntityStructure
+        WHERE
+            intParentID = ?
+            AND intChildID = ?
+            AND intDataAccess = $Defs::DATA_ACCESS_FULL
+    ];
+    my $q = $Data->{'db'}->prepare($st);
+    $q->execute($topEntityID, $entityID);
+    my ($found) = $q->fetchrow_array();
+    $q->finish();
+    return $found || 0;
+}
 1;

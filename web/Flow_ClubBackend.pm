@@ -24,6 +24,7 @@ use CustomFields;
 use DefCodes;
 use RegoProducts;
 use RegistrationItem;
+use PersonUserAccess;
 use Data::Dumper;
 
 sub setProcessOrder {
@@ -297,7 +298,6 @@ sub setupValues {
                     type        => 'text',
                     size        => '40',
                     maxsize     => '50',
-                    compulsory  => 1,
                     active      => $nonLatin,
                     sectionname => 'latinnames',
                 },
@@ -359,7 +359,7 @@ sub setupValues {
                     type        => 'text',
                     size        => '30',
                     maxsize     => '100',
-                    compulsory  => 1,
+                    compulsory  => 0,
                 },
                 strState => {
                     label       => $FieldLabels->{'strState'},
@@ -381,7 +381,7 @@ sub setupValues {
                     type        => 'lookup',
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
-                    compulsory => 1,
+                    compulsory => 0,
                 },
                 strPostalCode => {
                     label       => $FieldLabels->{'strPostalCode'},
@@ -409,13 +409,13 @@ sub setupValues {
             'order' => [qw(
                 strAddress
                 strAddress2
-                strContactCity
                 strState
                 strPostalCode
+                strContact
+                strContactCity
                 strContactISOCountry
                 strPhone
                 strEmail
-                strContact
             )],
             #fieldtransform => {
                 #textcase => {
@@ -489,9 +489,23 @@ sub setupValues {
 sub display_core_details { 
     my $self = shift;
 
-    #my $fieldperms = $self->{'Data'}->{'Permissions'};
-    #my $memperm = ProcessPermissions($fieldperms, $self->{'FieldSets'}{'core'}, 'Person',);
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+    my $clubperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Club',);
+
+    my $id = $self->ID() || 0;
+    if($id)   {
+        my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id);
+        $clubObj->load();
+        if($clubObj->ID())    {
+            my $objectValues = $self->loadObjectValues($clubObj);
+            $self->setupValues($objectValues);
+        }
+        if(!doesUserHaveEntityAccess($self->{'Data'}, $id,'WRITE')) {
+            return ('Invalid User',0);
+        }
+
+    }
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($clubperm);
+
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -529,6 +543,9 @@ sub validate_core_details {
     my $id = $self->ID() || 0;
     my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id);
     $clubObj->load();
+    if(!doesUserHaveEntityAccess($self->{'Data'}, $id,'WRITE')) {
+        return ('Invalid User',0);
+    }
 
     my $clubStatus = ($clubData->{'dissolved'}) ? $Defs::ENTITY_STATUS_DE_REGISTERED : $Defs::ENTITY_STATUS_PENDING;
     $clubData->{'strStatus'} = $clubStatus;
@@ -574,8 +591,21 @@ sub validate_core_details {
 
 sub display_contact_details {
     my $self = shift;
+    my $id = $self->ID() || 0;
+    if($id)   {
+        my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id);
+        $clubObj->load();
+        if($clubObj->ID())    {
+            my $objectValues = $self->loadObjectValues($clubObj);
+            $self->setupValues($objectValues);
+        }
+        if(!doesUserHaveEntityAccess($self->{'Data'}, $id,'WRITE')) {
+            return ('Invalid User',0);
+        }
+    }
 
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+    my $clubperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'contactdetails'}, 'Club',);
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($clubperm);
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -596,9 +626,12 @@ sub validate_contact_details {
     my $self = shift;
 
     my $clubData = {};
-    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Club',);
-    ($clubData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
+    my $clubperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'contactdetails'}, 'Club',);
+    ($clubData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($clubperm);
     my $id = $self->ID() || 0;
+    if(!doesUserHaveEntityAccess($self->{'Data'}, $id,'WRITE')) {
+        return ('Invalid User',0);
+    }
     if(!$id){
         push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid club.';
     }
@@ -645,6 +678,9 @@ sub validate_role_details {
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Club',);
     ($clubData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
     my $id = $self->ID() || 0;
+    if(!doesUserHaveEntityAccess($self->{'Data'}, $id,'WRITE')) {
+        return ('Invalid User',0);
+    }
     #delete $clubData->{'strLevel'};
     if(!$id){
         push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid club.';
@@ -930,3 +966,46 @@ sub display_complete {
 
     return ($pagedata,0);
 }
+
+sub loadObjectValues    {
+    my $self = shift;
+    my ($object) = @_;
+
+    my %values = ();
+    if($object) {
+        for my $field (qw(
+            strLocalName
+            strLocalShortName
+            intLocalLanguage
+            strLatinName
+            strLatinShortName
+            dtFrom
+            dissolved
+            dtTo
+            strCity
+            strRegion
+            strISOCountry
+
+            strAddress
+            strAddress2
+            strContactCity
+            strState
+            strPostalCode
+            strContactISOCountry
+            strPhone
+            strEmail
+            strContact
+
+            strEntityType
+            intLegalTypeID
+            strLegalID
+            strDiscipline
+            strOrganisationLevel
+            strMANotes
+        )) {
+            $values{$field} = $object->getValue($field);
+        }
+    }
+    return \%values;
+}
+
