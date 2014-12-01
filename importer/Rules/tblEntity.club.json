@@ -1,19 +1,30 @@
 {
 	"rules" : {
 		"strStateLocalName" : {
-			"rule" : "insertLink",
+			"rule" : "removeLinkField",
 			"field" : "strStateLocalName",
 			"reference" : "strLocalName"
 		},
 		"strRegionLocalName" : {
-			"rule" : "insertLink",
+			"rule" : "removeLinkField",
 			"field" : "strRegionLocalName",
 			"reference" : "strLocalName"
 		},
 		"strZoneLocalName" : {
-			"rule" : "insertLink",
+			"rule" : "removeLinkField",
 			"field" : "strZoneLocalName",
 			"reference" : "strImportEntityCode"
+		},
+		"strISOCountry" : {
+			"rule" : "entityLink",
+			"field" : "strISOCountry",
+			"regionfld" : "strRegion",
+			"values" : {"FIN":"Finland", "SGP":"Singapore"}
+		},
+		"strEntityType" : {
+			"rule" : "insertField",
+			"field" : "intEntityLevel",
+			"values" : {"CLUB" : "3", "ACADEMY": "3", "REGION" : "20", "STATE" : "30"}
 		}
 	},
 	"mapping" : {

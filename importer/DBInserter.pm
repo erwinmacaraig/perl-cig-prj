@@ -1,8 +1,8 @@
 
 package DBInserter;
 require Exporter;
-@EXPORT = qw(insertBatch connectDB getRecord insertRow);
-@EXPORT_OK = qw(insertBatch connectDB getRecord insertRow);
+@EXPORT = qw(insertBatch connectDB getRecord insertRow isRecordEmpty createEntityStructure copyDbTable);
+@EXPORT_OK = qw(insertBatch connectDB getRecord insertRow isRecordEmpty createEntityStructure copyDbTable);
 @ISA =  qw(Exporter);
 use Data::Dumper;
 use DBI;
@@ -13,29 +13,38 @@ use POSIX qw(strftime);
 use feature qw(say);
 
 sub insertRow {
-	my ($db,$table,$record,$importId) = @_;
+	my ($db,$table,$record,$importId, $realmID) = @_;
 	my $keystr = (join ",\n        ", (keys $record));
 	my $valstr = join ', ', (split(/ /, "? " x (scalar(values $record))));
-	if(defined $importId){
+	if(defined $importId && $importId){
     	$keystr = (join ",\n        ","intImportID", $keystr);
     	$valstr = (join ",","$importId", $valstr);
     }
 	
-	my @tbl_array = ("tblImportTrack", "tblEntityLinks");
-	if( !grep(/^$table$/i, @tbl_array) ){	
-		my $val = join "", (values $record);
-		# skip insert if all data are empty
-		if( !$val ) {
-			say "no value";
-			return 0;
-		}
-		
+	if( isRecordEmpty($table, $record) ) {
+		say "no value";
+		return 0;
 	}
 	
-	# add realmid=1
-    if( isRealmExists($db, $table) ) {
+	#my @tbl_array = ("tblImportTrack"); #, "tblEntityLinks");
+	#if( !grep(/^$table$/i, @tbl_array) ){	
+	#	my $val = join "", (values $record);
+	#	# skip insert if all data are empty
+	#	if( !$val ) {
+	#		say "no value";
+	#		return 0;
+	#	}
+		
+	#}
+	
+	# add realmid
+    if( $realmID && isRealmExists($db, $table) ) {
         $keystr = (join ",\n        ","intRealmID", $keystr);
-        $valstr = (join ",","1", $valstr);
+		if( defined $realmID) {
+            $valstr = (join ",","$realmID", $valstr);
+		} else {
+            $valstr = (join ",","1", $valstr);
+		}
     }
 	
 	my @values = values $record;
@@ -67,40 +76,47 @@ sub insertRow {
 }
 
 sub updateRow {
-	my ($db,$table,$record) = @_;
+	my ($db,$table,$record,$importId) = @_;
 	my $uniq_id = $record->{'uniqField'};
 	my $filter_value = $record->{$uniq_id};
-	delete $record->{'uniqField'};
-	delete $record->{$uniq_id};
-	my $keystr = (join "=?, ", (keys $record));
-	$keystr .= "=?";
+	my $impid = getRecord($db, $table, $uniq_id, $uniq_id, $filter_value);
+	#if( !$impid ) {
+		#insertRow($db,$table,$record,$importId);
+	#	return 0;
+	if( $impid ) {
 	
-	my @values = values $record;
-
-	my %success = ();
-	my $query = qq[
-	    UPDATE $table 
-		    SET $keystr
-		WHERE $uniq_id = $filter_value
-	];
-
-	writeLog("INFO: UPDATE $table SET $keystr");
-	try {
-	    my $sth = $db->prepare($query) or die "Can't prepare insert: ".$db->errstr()."\n";
-	    my $result = $sth->execute(@values) or die "Can't execute insert: ".$db->errstr()."\n";
-	    writeLog("INFO: UPDATE SUCCESS :: TABLE:: '".$table."' ID:: ".$sth->{mysql_insertid}."' RECORDS:: '". join(', ', @values).")");
-		return $sth->{mysql_insertid};
+		delete $record->{'uniqField'};
+		delete $record->{$uniq_id};
+		my $keystr = (join "=?, ", (keys $record));
+		$keystr .= "=?";
+		
+		my @values = values $record;
 	
-	} catch {
-		writeLog("ERROR: $_");
-		warn "caught error: $_";
-		return 0; 
-	};
+		my %success = ();
+		my $query = qq[
+			UPDATE $table 
+				SET $keystr
+			WHERE $uniq_id = $filter_value
+		];
+	
+		writeLog("INFO: UPDATE $table SET $keystr");
+		try {
+			my $sth = $db->prepare($query) or die "Can't prepare insert: ".$db->errstr()."\n";
+			my $result = $sth->execute(@values) or die "Can't execute insert: ".$db->errstr()."\n";
+			print "UPDATE SUCCESS :: TABLE:: '",$table,"' ID:: ",$sth->{mysql_insertid},"' RECORDS:: '",join(', ', @values),"'\n";
+			writeLog("INFO: UPDATE SUCCESS :: TABLE:: '".$table."' ID:: ".$sth->{mysql_insertid}."' RECORDS:: '". join(', ', @values).")");
+			return $sth->{mysql_insertid};
+		
+		} catch {
+			writeLog("ERROR: $_");
+			warn "caught error: $_";
+			return 0; 
+		};
+	}
 }
 
 sub insertBatch {
-	my ($db,$table,$records,$importId, $rules) = @_;
-	$rules ||= "None";
+	my ($db,$table,$records,$importId, $realmID) = @_;
 	foreach my $i (@{$records}){
 		
 		#get nationalperiod id if any
@@ -115,9 +131,9 @@ sub insertBatch {
 		
 		# then insert the main file
 		if( exists $i->{'uniqField'} ) {
-			updateRow($db,$table,$i);
+			updateRow($db,$table,$i,$importId);
 		} else {		
-		    insertRow($db,$table,$i,$importId);
+		    insertRow($db,$table,$i,$importId, $realmID);
 		}
 	}
 }
@@ -130,12 +146,14 @@ sub getRecord{
 	      FROM $table
 	      WHERE $filter = ?
 	  ];
+	  #say $statement.$value;
 	  my $query = $db->prepare($statement);
 	  $query->execute($value);
-	  $field=$query->fetchrow_hashref();
+	  my $row=$query->fetchrow_hashref();
 	  $query->finish;
 	  
-	  return $field->{"intEntityID"};
+	  return $row->{$field};
+	  #return $field->{"intEntityID"};
 }
 
 sub connectDB{
@@ -143,6 +161,14 @@ sub connectDB{
     my $dbh = DBI->connect($ImporterConfig::DB_CONFIG{"DB_DSN"}, $ImporterConfig::DB_CONFIG{"DB_USER"},$ImporterConfig::DB_CONFIG{"DB_PASSWD"},{mysql_enable_utf8=>1} ) or die $DBI::errstr;
     $dbh->do("SET NAMES 'utf8'");
     return $dbh;
+}
+
+sub createEntityStructure{
+	my ($db, %record) = @_;
+	my $ret_id = insertRow($db,'tblTempEntityStructure',\%record);
+	if( $ret_id) {
+		writeLog("INFO: createEntityStructure() - tblTempEntityStructure". \%record);
+	}
 }
 
 sub isRealmExists {
@@ -199,6 +225,32 @@ sub createTransRecord {
     delete $rec->{'Amount'} if exists $rec->{'Amount'};
 	delete $rec->{'ProductCode'} if exists $rec->{'ProductCode'};
 	#return $rec;
+}
+
+sub isRecordEmpty{
+	my ($table, $record) = @_;
+    my @tbl_array = ("tblImportTrack"); #, "tblEntityLinks");
+	if( !grep(/^$table$/i, @tbl_array) && $record){
+		my $val = join "", (values $record);
+		# skip insert if all data are empty
+		if( !$val ) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+sub copyDbTable{
+    my ($db, $src, $dest) = @_;
+	say "CREATE TABLE $dest SELECT * FROM $src LIMIT 0";
+	my $tbl = $db->selectrow_array("SHOW tables LIKE '$dest'");
+	if( !$tbl) {
+        my $query = $db->prepare("CREATE TABLE $dest SELECT * FROM $src LIMIT 0");
+        $query->execute;
+        $query->finish;
+	} else {
+		say "$dest already exists";
+	}
 }
 
 sub writeLog{

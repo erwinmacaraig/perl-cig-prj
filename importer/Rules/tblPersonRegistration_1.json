@@ -5,6 +5,18 @@
 			"table" : "tblTransactions",
 			"refID" : "ProductCode",
 			"fields" : {"intProductID":"ProductCode", "intStatus":"1", "curAmount":"Amount"}
+		},
+		"strImportPersonCode" : {
+			"rule" : "linkIdEntry",
+			"table" : "tblPerson",
+			"destination" : "intPersonID",
+			"source" : "strImportPersonCode"
+		},
+		"intEntityID" : {
+			"rule" : "linkIdEntry",
+			"table" : "tblEntity",
+			"destination" : "intEntityID",
+			"source" : "strImportEntityCode"
 		}
 	},
 	"mapping" : {
