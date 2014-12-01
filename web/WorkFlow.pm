@@ -1920,8 +1920,7 @@ sub viewTask {
 
     my $db = $Data->{'db'};
     my $q = $db->prepare($st) or query_error($st);
-	open FH, ">dumpfile.txt";
-	print FH "WFTaskID = $WFTaskID \n entityID = $entityID\n\n";    
+	 
 	$q->execute(
         $WFTaskID,
         $entityID,
@@ -2011,7 +2010,7 @@ sub viewTask {
 
     my ($DocumentData, $fields) = populateDocumentViewData($Data, $dref);
     %DocumentData = %{$DocumentData};
-    print FH "\n\nDocument data contains: \n" . Dumper($DocumentData{'RelatedDocuments'}) . "\n\n";
+    
 
     my $paymentBlock = '';
     if ($dref->{strWFRuleFor} eq 'REGO')    {
@@ -2307,7 +2306,7 @@ sub populateDocumentViewData {
     while(my $tdref = $q->fetchrow_hashref()) {
         #skip if no registration item matches rego details combination (type/role/sport/rego_nature etc)
         next if (!$tdref->{'regoItemID'} and $dref->{'strWFRuleFor'} eq 'REGO');
-        #print STDERR Dumper $tdref;
+        
 
         next if((!$dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC') or ($dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC' and $dref->{'PersonStatus'} ne $Defs::PERSON_STATUS_PENDING));
 
