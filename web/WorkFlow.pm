@@ -364,7 +364,12 @@ sub listTasks {
 
     my $client = unescape($Data->{client});
 	while(my $dref= $q->fetchrow_hashref()) {
-        print STDERR Dumper $dref;
+        #FC-409 - don't include in list of taskStatus = REJECTED
+        next if ($dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_REJECTED);
+
+        #F-409 - skip if strTaskStatus = HOLD and approvalEntityID = current entity
+        next if ($dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_HOLD and $dref->{'intApprovalEntityID'} == $entityID);
+
         #moved checking of POSSIBLE_DUPLICATE here (if included in query, tasks for ENTITY are not capture)
         next if ($dref->{intSystemStatus} eq $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE and $dref->{strWFRuleFor} ne $Defs::WF_RULEFOR_PERSON);
 
@@ -442,7 +447,7 @@ sub listTasks {
             viewURL => $viewTaskURL,
             taskTypeLabel => $viewTaskURL,
 		);
-        print STDERR Dumper \%single_row;
+        #print STDERR Dumper \%single_row;
    
         if(!($Defs::registrationNature{$dref->{strRegistrationNature}} ~~ @taskType)){
             push @taskType, $Defs::registrationNature{$dref->{strRegistrationNature}};
@@ -529,20 +534,17 @@ sub listTasks {
 	};
 
 
-    print STDERR Dumper @taskStatus;
-    print STDERR Dumper @taskType;
-
     my %taskFilters = (
         'type' => \@taskType,
         'status' => \@taskStatus,
     );
 	my %TemplateData = (
-			TaskList => \@TaskList,
-			TaskCounts => \%taskCounts,
-			TaskMsg => $msg,
-			TaskEntityID => $entityID,
-			TaskFilters => \%taskFilters,
-			client => $Data->{client},
+        TaskList => \@TaskList,
+        TaskCounts => \%taskCounts,
+        TaskMsg => $msg,
+        TaskEntityID => $entityID,
+        TaskFilters => \%taskFilters,
+        client => $Data->{client},
 	);
 
     my $flashMessage = getFlashMessage($Data, 'WF_U_FM');
