@@ -22,8 +22,12 @@
         </div>
         [% IF showButtons %]
         <div class = "docViewerButtons">
-            <input type = "button" class = "btn-main" value = "Approve">
-            <input type = "button" class = "btn-main" value = "Reject">
+
+			
+			<span><a href="#" onclick="updateFileStatus([% intFileID %],'APPROVED','[% client %]'); return false;" class="btn-main">[% Lang.txt('APPROVE') %]</a></span> 	
+            <span><a href="#" onclick="updateFileStatus([% intFileID %],'REJECTED','[% client %]'); return fasle;" class="btn-main">[% Lang.txt('REJECT') %]</a></span> 
+				
+			
         </div>
         [% END %]
     </div>
@@ -56,6 +60,17 @@
         closeDocViewer();
         return false;
     });
+    function updateFileStatus(fileID,status,client){ 		
+		jQuery.ajax({
+			method: "POST",
+			url:"main.cgi",
+			data:"a=WF_Verify" + "&f=" + fileID + "&status=" + status + "&client="+client,
+		}).done(window.parent.location.reload());
+		
+		 	
+		 
+	}
+	
 
 </script>
 
