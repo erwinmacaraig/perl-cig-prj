@@ -8,7 +8,7 @@
                 <h4 class="panel-title">
                     <a href="#panel[% index %]" data-toggle="collapse" data-parent="#accordion">
                     [% IF entity.strLocalName %]
-                        
+                       
                             [% Lang.txt('Registrered To') %]
                             [% entity.strLocalName %]
                        
@@ -27,24 +27,45 @@
                         
                         <div id="doctab[% index %]" class="tab-pane fade in active">
                             <div class="documents-list">
-                                <table cellpadding="5" style="width:100%;">
+                                <table class="table" cellpadding="5" style="width:100%;">
                                     <thead>
                                         <tr class="document-table-header">
-                                            <th>Documents</th>
-                                            <th style="float:right">Status</th>
+                                            <th style="width: 70%">Document Type</th>
+                                            <th></th>
+                                            <th >Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+								
+									
+									[% FOREACH doc IN entity.documents %]	
+																
+
                                         <tr class="task-list">
                                             <td>
-                                                <span class="detail-value">ID Proof:</span>
+                                                <span class="detail-value">[%  doc.strDocumentName %]:</span>
                                             </td>
                                             <td class="status-col">
-                                                <a href="" class="btn-inside-docs-panel">View</a>
-                                                <i class="fa fa-circle ver-dots green"></i>
+                                                    <a href="#" onclick="docViewer([% doc.intFileID %],'client=[% client %]&amp;a=review');return false;" class="btn-inside-docs-panel">[% Lang.txt('View') %]</a>
+                                            </td>
+                                            <td class="status-col">
+											[% IF doc.strApprovalStatus == 'PENDING' %]
+                                                <i class="fa fa-circle ver-dots red"></i>
+                                                <span class="">Pending</span>
+											[% ELSE %]
+												 <i class="fa fa-circle ver-dots green"></i>
                                                 <span class="">Verified</span>
+											[% END %]
+											
                                             </td>
                                         </tr>
+									[% END %]
+
+
+
+
+
+                                        <!--
                                         <tr class="task-list">
                                             <td>
                                                 <span class="detail-value">Parental Content:</span>
@@ -105,6 +126,7 @@
                                                 <span class="">Verified</span>
                                             </td>
                                         </tr>
+                                        -->
                                     </tbody>
                                 </table>
                             </div>

@@ -1,13 +1,33 @@
-[% IF Notifications.size %]
-    <div class="col-md-9">
-        <div class="alert alert-info" role="alert">
-            <ul>
-            [% FOREACH message IN Notifications %]
-                <li>[% message.value %]</li>
-            [% END %]
-            </ul>
+[% IF FlashMessage.flash.type %]
+<div class="col-md-12">
+    <div class="alert alert-warning" role="alert">
+        <div>
+        [% IF FlashMessage.flash.type == 'success' %]
+            <span class="fa flash_success fa-exclamation"></span>
+            <p>[% FlashMessage.flash.message %]</p>
+        [% ELSIF FlashMessage.flash.type == 'error' %]
+            <span class="fa flash_error fa-exclamation"></span>
+            <p>[% FlashMessage.flash.message %]</p>
+        [% END %]
+        <br/>
         </div>
     </div>
+</div>
+[% END %]
+
+
+[% IF Notifications.size %]
+<div class="col-md-12">
+    <div class="alert alert-warning" role="alert">
+        <div>
+        <span class="fa fa-exclamation"></span>
+        [% FOREACH message IN Notifications %]
+            <p>[% message.value %]</p>
+        [% END %]
+        <br/>
+        </div>
+    </div>
+</div>
 [% END %]
 
 <div class="member-home-page">
@@ -91,6 +111,14 @@
                 </div>
 
                 <div id="regdetails" class="tab-pane fade">
+                    [% IF PersonRegoDetails.RegisterTo %]
+                        <span class="details-row">
+                            <span class="details-left">[% Lang.txt("Register To") %]:</span>
+                            <span class="details-left detail-value">[% PersonRegoDetails.RegisterTo %]</span>
+                        </span>
+                    [% END %]
+
+
                     [% IF PersonRegoDetails.RegoType %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Registration Type") %]:</span>
@@ -164,7 +192,7 @@
     <div class="col-md-3">
         <div id = "">
 
-        <h3 class="panel-header">Member ID: [% Details.NationalNum %]</h3>
+        <h3 class="panel-header">Member ID: [% PersonDetails.MID %]</h3>
         <div class="panel-body">
 
         <p class="reg-text">[% PersonDetails.LocalName %]</p>

@@ -117,16 +117,20 @@ sub Navigation {
                 $current || $step_in_future || 0,
             ];
             my $currentclass = '';
-            #$currentclass = 'nav-currentstep' if $current;
-            #$currentclass = 'nav-futurestep' if $step_in_future;
-            #$currentclass ||= 'nav-completedstep';            
-						$currentclass = 'current' if $current;
+            $currentclass = 'current' if $current;
             $currentclass = 'next' if $step_in_future;
             $currentclass ||= 'previous';
             $meter = $step if $current;
-            #$meter .= qq[ <span class="meter-$current"></span> ];
-            #$navstring .= qq[ <li class = "step step-$step $currentclass"><img src="images/tick.png" class="tick-image"><span class="step-num">$step.</span> <span class="br-mobile"><br></span>$name</li> ];
-			$navstring .= qq[ <li class = "step step-$step"><span class="$currentclass step-num"><a href="#">$step. $name</a></li> ];
+            my $showlink = 0;
+            $showlink = 1 if(!$current and !$step_in_future);
+            $showlink = 0 if($self->{'ProcessOrder'}[$i]{'noRevisit'});
+            my $linkURL = $self->{'Target'}."?rfp=".$self->{'ProcessOrder'}[$i]{'action'}."&".$self->stringifyURLCarryField();
+
+			my $link = $showlink
+                ? qq[<a href="$linkURL" class = "stepname">$step. $name</a>]
+                : qq[<span class = "stepname">$step. $name</span>];
+            
+			$navstring .= qq[ <li class = "step step-$step"><span class="$currentclass step-num">$link</li> ];
             $step_in_future = 2 if $current;
             $step++;
         }
@@ -259,8 +263,8 @@ sub displayFields {
     SystemConfig => $self->{'SystemConfig'},
     Fields => $self->{'FieldSets'}{$fieldSet},
   );
-
-  return $obj->build($permissions,'add',1);
+  my $action = $self->ID() ? 'edit' : 'add';
+  return $obj->build($permissions,$action,1);
 }
 
 sub gatherFields {
@@ -276,7 +280,8 @@ sub gatherFields {
     Fields => $self->{'FieldSets'}{$fieldSet},
   );
 
-  return $obj->gather($self->{'RunParams'},$permissions, 'add');
+  my $action = $self->ID() ? 'edit' : 'add';
+  return $obj->gather($self->{'RunParams'},$permissions, $action);
 }
 
 

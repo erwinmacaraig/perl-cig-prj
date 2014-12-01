@@ -50,9 +50,9 @@ sub build {
     my %sections       = ();
     my %sectioncount   = ();
     my $txt_compulsory = $self->langlookup( 'Compulsory Field' );
-    #my $compulsory =
-#qq[<span class="compulsory"><img src="images/compulsory.gif" alt="$txt_compulsory" title="$txt_compulsory"/></span>];
-    my $compulsory = qq[];
+    my $compulsory =
+qq[<span class="compulsory"><img src="images/compulsory.gif" alt="$txt_compulsory" title="$txt_compulsory"/></span>];
+    #my $compulsory = qq[];
     return '' if !$self->{'Fields'};
     return '' if !$self->{'Fields'}->{'order'};
     my @fieldorder =@{ $self->{'Fields'}->{'order'} };
@@ -202,10 +202,12 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 $val = '' if $val eq '0000-00-00';
                 $val ||= '';
                 my $datetype = $f->{'datetype'} || '';
+                my $maxyear = $f->{'maxyear'} || '';
+                my $minyear = $f->{'minyear'} || '';
                 if ( $datetype eq 'dropdown' ) {
                     $field_html =
                       $self->_date_selection_dropdown( $fieldname, $val, $f,
-                        $disabled, $onChange );
+                        $disabled, $onChange, $maxyear, $minyear );
                 }
                 else {
                     $field_html =
@@ -295,31 +297,46 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
             $sectioncount{$sname}++;
             my $rowcount =
               ( $sectioncount{$sname} % 2 ) ? 'HTr_odd' : 'HTr_even';
-            $sections{$sname} .= qq[
-            <div class="form-group" id = "l_row_$fieldname">
-            <label class="col-md-4 control-label txtright" for="l_$fieldname">$label</label>
-            <div class="col-md-6">$pretext$field_html$posttext</div>
-            </div>
-            ];
+            if($f->{'swapLabels'})  {
+                $sections{$sname} .= qq[
+                <div class="form-group" id = "l_row_$fieldname">
+                    <div class="col-md-4 txtright">$pretext$field_html$posttext</div>
+                    <label class="col-md-6 control-label" for="l_$fieldname">$label</label>
+                </div>
+                ];
+            }
+            else    {
+                $sections{$sname} .= qq[
+                <div class="form-group" id = "l_row_$fieldname">
+                    <label class="col-md-4 control-label txtright" for="l_$fieldname">$label</label>
+                    <div class="col-md-6">$pretext$field_html$posttext</div>
+                </div>
+                ];
+            }
         }
     }
 
     my %usedsections = ();
     for my $s ( @{$sectionlist} ) {
 
-        my $sectionheader = $self->langlookup( $s->[1] );
+        my $sectionheader = $self->langlookup( $s->[1] ) || '';
 
         if ( $sections{ $s->[0] } ) {
             next if $s->[2] and not $self->display_section( $s->[2] );
+            my $extraclass = $s->[3] || '';
             $usedsections{ $s->[0] } = 1;
             if ($notabs) {
-                $returnstr .= $sections{ $s->[0] };
+                my $sh = '';
+                if ( $sectionheader ) {
+                    $sh = qq[ <div class = "sectionheader">$sectionheader</div>];
+                }
+                $returnstr .= qq[<div class = "fieldSectionGroup $extraclass" id = "fsg-].$s->[0].qq["> $sh].$sections{ $s->[0] }.qq[</div>];
             }
             else {
                 #my $style=$s ? 'style="display:none;" ' : '';
                 my $sh = q{};
                 if ( $s->[1] ) {
-                    $sh = qq[ <tr><th colspan="2" class="sectionheader">$sectionheader</th></tr>];
+                    $sh = qq[ <tr><th colspan="2" class="sectionheader $extraclass">$sectionheader</th></tr>];
                 }
                 $tabs .= qq[<li><a id="a_sec$s->[0]" class="tab_links" href="#sec$s->[0]">$sectionheader</a></li>];
 
@@ -450,6 +467,7 @@ sub gather    {
     my @problems   = ();
     my @fieldorder = @{ $self->{'Fields'}->{'order'} };
     my %outputdata = ();
+    $permissions = undef if($permissions and !scalar(keys %{$permissions}));
     for my $fieldname (@fieldorder) {
         my $fieldvalue = '';
         my $name = "d_$fieldname";
@@ -457,11 +475,13 @@ sub gather    {
         $fv->{'old_value'} = $fv->{'value'};
 
         next if $self->{'Fields'}->{'fields'}{$fieldname}{'SkipProcessing'};
+        next if ( $permissions and !$permissions->{$fieldname} );
         if($option eq 'add')    {
             next if $self->{'Fields'}->{'fields'}{$fieldname}{'SkipAddProcessing'};
         }
         if($option eq 'edit')    {
             next if $self->{'Fields'}->{'fields'}{$fieldname}{'SkipEditProcessing'};
+            next if $self->{'Fields'}->{'fields'}{$fieldname}{'noedit'};
         }
         #Update the form display
         if ( exists $params->{$name}
@@ -847,7 +867,7 @@ sub _time_selection_box {
 
 sub _date_selection_dropdown {
     my $self = shift;
-    my ( $fieldname, $val, $f, $otherinfo, $onChange ) = @_;
+    my ( $fieldname, $val, $f, $otherinfo, $onChange, $maxyear, $minyear ) = @_;
     my ( $onBlur, $onMouseOut );
     if ($onChange) {
         ( $onBlur = $onChange ) =~
@@ -878,8 +898,9 @@ s/onChange=(['"])(.*)\1/onMouseOut=$1 if (changed_$fieldname==1) { $2 } $1/i;
         11 => $self->langlookup( 'Nov' ),
         12 => $self->langlookup( 'Dec' ),
     );
-    my $currentyear = (localtime)[5] + 1900 + 5;
-    my %years = map { $_ => $_ } ( 1900 .. $currentyear );
+    $maxyear ||= (localtime)[5] + 1900 + 5;
+    $minyear ||= 1900;
+    my %years = map { $_ => $_ } ( $minyear .. $maxyear );
     $years{0} = $self->langlookup( 'Year' );
 
     $val ||= '';
@@ -895,7 +916,7 @@ s/onChange=(['"])(.*)\1/onMouseOut=$1 if (changed_$fieldname==1) { $2 } $1/i;
 
     my @order_d = ( 0 .. 31 );
     my @order_m = ( 0 .. 12 );
-    my @order_y = reverse( 1900 .. $currentyear );
+    my @order_y = reverse( $minyear .. $maxyear );
     unshift( @order_y, 0 );
 
     my $otherinfo_d =
@@ -912,13 +933,13 @@ s/onChange=(['"])(.*)\1/onMouseOut=$1 if (changed_$fieldname==1) { $2 } $1/i;
       if ($onChange);
 
     my $daysfield =
-      $self->drop_down( "${fieldname}_day", \%days, \@order_d, $val_d, 1, 0, '', $otherinfo_d );
+      $self->drop_down( "${fieldname}_day", \%days, \@order_d, $val_d, 1, 0, '', $otherinfo_d,'','df_date_day' );
     my $monthsfield =
       $self->drop_down( "${fieldname}_mon", \%months, \@order_m, $val_m, 1, 0, '',
-        $otherinfo_m );
+        $otherinfo_m ,'','df_date_month');
     my $yearsfield =
       $self->drop_down( "${fieldname}_year", \%years, \@order_y, $val_y, 1, 0, '',
-        $otherinfo_y );
+        $otherinfo_y ,'','df_date_year');
 
     my $field_html =
 qq[ <span $onMouseOut> <script language="JavaScript1.2">var changed_$fieldname=0; var changed_temp_$fieldname=0</script> ];
@@ -1100,6 +1121,12 @@ sub generate_clientside_validation {
                     $valinfo{'messages'}{ $field_prefix . $k }{'number'} =
                       $self->langlookup( "Please enter a valid number",
                         $num1, $num2 );
+                }
+                elsif ( $t eq 'URL' ) {
+                    $valinfo{'rules'}{ $field_prefix . $k }{'url'} = 'true';
+                    $valinfo{'messages'}{ $field_prefix . $k }{'url'} =
+                      $self->langlookup(
+                        "Please enter a valid URL" );
                 }
             }
         }

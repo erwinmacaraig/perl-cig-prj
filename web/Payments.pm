@@ -863,7 +863,7 @@ sub getTXNDetails	{
 	my $st = qq[
         	SELECT T.intTransactionID, I.strInvoiceNumber, T.intTableType, T.intID, T.curAmount, P.strName as ProductName, P.strGSTText, T.intQty, P.strProductNotes, P.strGroup as ProductGroup
                 FROM tblTransactions as T
-			INNER JOIN tblInvoice I ON I.intInvoiceID = T.intInvoiceID
+			LEFT JOIN tblInvoice I ON I.intInvoiceID = T.intInvoiceID
 			INNER JOIN tblProducts as P ON (P.intProductID = T.intProductID)
                 WHERE T.intTransactionID = $txnID
                         AND T.intRealmID = $Data->{'Realm'}

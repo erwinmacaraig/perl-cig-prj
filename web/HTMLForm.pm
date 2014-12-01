@@ -42,8 +42,7 @@ warn("NT $notabs");
     my %sectioncount   = ();
     my $txt_compulsory = langlookup( $fields_ref, 'Compulsory Field' );
     my $compulsory =
-#qq[<span class="compulsory"><img src="images/compulsory.gif" alt="$txt_compulsory" title="$txt_compulsory"/></span>];
-qq[];
+qq[<span class="compulsory"><img src="images/compulsory.gif" alt="$txt_compulsory" title="$txt_compulsory"/></span>];
     my @fieldorder =
       (       defined $override_config
           and exists $override_config->{'order'}
@@ -223,10 +222,12 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 $val = '' if $val eq '0000-00-00';
                 $val ||= '';
                 my $datetype = $f->{'datetype'} || '';
+                my $maxyear = $f->{'maxyear'} || '';
+                my $minyear = $f->{'minyear'} || '';
                 if ( $datetype eq 'dropdown' ) {
                     $field_html =
                       _date_selection_dropdown( $fieldname, $val, $f,
-                        $disabled, $fields_ref, $onChange );
+                        $disabled, $fields_ref, $onChange, $maxyear, $minyear );
                 }
                 else {
                     $field_html =
@@ -330,8 +331,8 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
               ( $sectioncount{$sname} % 2 ) ? 'HTr_odd' : 'HTr_even';
             $sections{$sname} .= qq[
             <div id="l_row_$fieldname" class="form-group">
-                <label class="col-md-4 control-label">$label</label>
-                <div class="col-md-8">$pretext$field_html$posttext</div>
+                <label class="col-md-3 control-label">$label</label>
+                <div class="col-md-9">$pretext$field_html$posttext</div>
             </div>
             ];
         }
@@ -357,7 +358,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 $tabs .= qq[<li><a id="a_sec$s->[0]" class="tab_links" href="#sec$s->[0]">$sectionheader</a></li>];
 
                 $returnstr .= qq~
-                <div class="col-md-10"><fieldset id="sec$s->[0]" class="new_tab member-home-page">
+                <div class="col-md-12"><fieldset id="sec$s->[0]" class="new_tab member-home-page">
                 $sh
                 $sections{$s->[0]}
                 </fieldset>
@@ -457,17 +458,12 @@ qq[<input type="hidden" name="$cf" value="$fields_ref->{'carryfields'}{$cf}">];
         $returnstr = qq[
         $validation
         <form action="$fields_ref->{'options'}{'target'}" name="$fields_ref->{'options'}{'formname'}" method="POST" $enctype id = "$fields_ref->{'options'}{'formname'}ID">
-        <h3 class="panel-header" style="margin-top: 20px;">Registration Detail</h3>
-        <div class="panel-body">
-        <fieldset>
-        <div class="col-md-10 txtright">
-        $introtext
+        <div class="col-md-12">$introtext</div>
+        <div class="col-md-12 txtright">
         $button_top
         </div>
-        </fieldset>
         $returnstr
-        </div>
-        <div class="txtright">
+        <div class="col-md-12 txtright">
         $button_bottom
         <input type="hidden" name="HF_oldact" value="$oldaction">
         <input type="hidden" name="HF_subbutact" value="$subbutact">
@@ -1317,7 +1313,7 @@ sub _time_selection_box {
 }
 
 sub _date_selection_dropdown {
-    my ( $fieldname, $val, $f, $otherinfo, $fields_ref, $onChange ) = @_;
+    my ( $fieldname, $val, $f, $otherinfo, $fields_ref, $onChange, $maxyear, $minyear ) = @_;
     my ( $onBlur, $onMouseOut );
     if ($onChange) {
         ( $onBlur = $onChange ) =~
@@ -1348,8 +1344,9 @@ s/onChange=(['"])(.*)\1/onMouseOut=$1 if (changed_$fieldname==1) { $2 } $1/i;
         11 => langlookup( $fields_ref, 'Nov' ),
         12 => langlookup( $fields_ref, 'Dec' ),
     );
-    my $currentyear = (localtime)[5] + 1900 + 5;
-    my %years = map { $_ => $_ } ( 1900 .. $currentyear );
+    $maxyear ||= (localtime)[5] + 1900 + 5;
+    $minyear ||= 1900;
+    my %years = map { $_ => $_ } ( $minyear .. $maxyear );
     $years{0} = langlookup( $fields_ref, 'Year' );
 
     $val ||= '';
@@ -1365,7 +1362,7 @@ s/onChange=(['"])(.*)\1/onMouseOut=$1 if (changed_$fieldname==1) { $2 } $1/i;
 
     my @order_d = ( 0 .. 31 );
     my @order_m = ( 0 .. 12 );
-    my @order_y = reverse( 1900 .. $currentyear );
+    my @order_y = reverse( $minyear .. $maxyear );
     unshift( @order_y, 0 );
 
     my $otherinfo_d =

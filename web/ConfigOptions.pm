@@ -442,7 +442,6 @@ sub getFieldsList	{
         intNatCustomBool3
         intNatCustomBool4
         intNatCustomBool5
-        strBirthCert 
         ));
     return \@memberFields if $fieldtype eq 'Person';
 
@@ -483,6 +482,7 @@ sub getFieldsList	{
         dtFrom
         dtTo
         intNotifications
+        intFacilityTypeID
         ));
 
     return \@clubFields if $fieldtype eq 'Club';

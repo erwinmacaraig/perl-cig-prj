@@ -794,6 +794,7 @@ sub listVenues  {
         '',
         \%Defs::entityStatus,
         { 'ALL' => $Data->{'lang'}->txt('All'), },
+        'ACTIVE',
     ) || '';
 
     my @headers = (
@@ -913,9 +914,9 @@ sub postVenueAdd {
    $venuedocs = runTemplate($Data, \%PageData, 'entity/required_docs.templ') || '';  
       
       ####################################################################################
-      
+      ; # Venue ID = $id AND entityID = $entityID AND entityIDD = $entityIDD</div><br>
       return (0,qq[
-        <div class="OKmsg"> $Data->{'LevelNames'}{$Defs::LEVEL_VENUE} Added Successfully Venue ID = $id AND entityID = $entityID AND entityIDD = $entityIDD</div><br>
+        <div class="OKmsg"> $Data->{'LevelNames'}{$Defs::LEVEL_VENUE} Added Successfully</div><br>
         <div>
         $venuedocs
         </div>

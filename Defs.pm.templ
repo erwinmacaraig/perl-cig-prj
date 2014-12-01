@@ -32,6 +32,7 @@ log4perl.appender.Screen.layout.ConversionPattern=%M %m%n
    weight => 30000,
  },
 );
+$CountryCachePrefix = 'SG';
 
 ## DB ACCESS INFO
 
@@ -54,7 +55,7 @@ $duplicate_url = 'http://emacaraig.spildevel/FIFASPOnline/web'; ##CONFIG
 $sync_logs = 'http://emacaraig.spildevel/FIFASPOnline/sync/logs'; ##CONFIG
 $helpurl='http://support.sportingpulse.com';
 $sitename="SportingPulse";
-$page_title='Sportzware Membership';
+$page_title='FIFA Connect';
 
 $admin_email_name="Admin";
 $admin_email='warren@sportingpulse.com';
@@ -126,11 +127,11 @@ $WF_TASK_STATUS_REJECTED= 'REJECTED';
 $WF_TASK_STATUS_HOLD= 'HOLD';
 
 %wfTaskStatus= (
-    $WF_TASK_STATUS_PENDING=> 'Pending',
-    $WF_TASK_STATUS_ACTIVE=> 'Active',
-    $WF_TASK_STATUS_COMPLETE=> 'Complete',
-    $WF_TASK_STATUS_REJECTED=> 'Rejected',
-    $WF_TASK_STATUS_HOLD=> 'On hold',
+    $WF_TASK_STATUS_PENDING=> 'Task Pending',
+    $WF_TASK_STATUS_ACTIVE=> 'Ready to Approve',
+    $WF_TASK_STATUS_COMPLETE=> 'Task Complete',
+    $WF_TASK_STATUS_REJECTED=> 'Task Rejected',
+    $WF_TASK_STATUS_HOLD=> 'Task On Hold',
 );
 
 $WF_TASK_ACTION_REJECT = "REJECT";

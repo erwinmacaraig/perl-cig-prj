@@ -1,26 +1,35 @@
 <div id = "docViewerHeader">
-    <div class = "close"><a id = "docViewer-close-btn" href = "">[% Lang.txt('Close') %]</a></div>
+    <div class = "close"><a id = "docViewer-close-btn" href = ""><i class = "fa fa-close fa-2x white"></i></a></div>
     <div class = "docTitle">[% strDocumentName %]: [% strTitle %]</div>
 </div>
 <div id = "docViewerContent">
     <div id = "docViewerPanel">
         <div class = "docViewerEntityInfo">
-            [% IF ENTITY %]
-
-
-
-            [% ELSIF person %]
-                <b>[% person.strFirstname %] [% person.strSurname %]<br></b>
-                [% person.dtDOB %]<br>
-                [% person.gender %]<br>
-                [% person.nationality %]<br>
-
+            [% IF person %]
+                <h3 class="panel-header">[% Lang.txt('Member ID') %]: [% IF person.strStatus == "REGISTERED" OR person.strStatus != "PENDING" %][% person.nationalNum %][% ELSE %] - [% END %]</h3>
+                <div class="panel-body">
+                    <p class="reg-text">[% person.strFirstname %] [% person.strSurname %]</p>
+                    <p class="reg-text">[% person.gender %]</p>
+                    <p class="reg-text">[% person.dtDOB %]</p>
+                    <p class="reg-text">[% person.nationality %]</p>
+                </div>
+            [% ELSIF entity %]
+                <h3 class="panel-header">[% Lang.txt('ID') %]: [% IF entity.strStatus == "REGISTERED" OR entity.strStatus != "PENDING" %][% entity.maID %][% ELSE %] - [% END %]</h3>
+                <div class="panel-body">
+                    <p class="reg-text">[% entity.name %]</p>
+                </div>
             [% END %]
         </div>
+        [% IF showButtons %]
         <div class = "docViewerButtons">
-            <input type = "button" value = "Approve">
-            <input type = "button" value = "Reject">
+
+			
+			<span><a href="#" onclick="updateFileStatus([% intFileID %],'APPROVED','[% client %]'); return false;" class="btn-main">[% Lang.txt('APPROVE') %]</a></span> 	
+            <span><a href="#" onclick="updateFileStatus([% intFileID %],'REJECTED','[% client %]'); return false;" class="btn-main">[% Lang.txt('REJECT') %]</a></span> 
+				
+			
         </div>
+        [% END %]
     </div>
 
     <div id = "docViewerFileBlock">
@@ -51,6 +60,17 @@
         closeDocViewer();
         return false;
     });
+    function updateFileStatus(fileID,status,client){ 		
+		jQuery.ajax({
+			method: "POST",
+			url:"main.cgi",
+			data:"a=WF_Verify" + "&f=" + fileID + "&status=" + status + "&client="+client,
+		}).done(window.parent.location.reload());
+		
+		 	
+		 
+	}
+	
 
 </script>
 

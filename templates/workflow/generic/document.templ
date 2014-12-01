@@ -11,140 +11,67 @@
             [% END %]
 
             </div>
-            <div class="member-details">
-                <table class="table" style="width: 100%">
-                    <thead>
-                    <tr>
-                        <th>Document ID</th>
-                        <th>Status</th>
-                        <th>Document Type</th>
-                        <th>Action/s</th>
-                    </tr>
-                    </thead>
-                    <!-- loop here; -->
-                    [% FOREACH document IN RelatedDocuments %]
-                    <tr [% IF document.DisplayVerify != 1 %]style="color: #CFD1D0"[% END %]>
-                        <td><div class="member-data"> [% document.DocumentID %] </div></td>
-                        <td><div class="member-data"> [% document.Status %] </div></td>
-                        <td><div class="member-data"> [% document.DocumentType %] </div></td>
-                        <td>
-                            <div class="member-data">
-                                <!--
-                                <span class = "button-small generic-button">
-                                    <a href="">[% Lang.txt('View') %]</a>
-                                </span>
-                                -->
-                                [% IF document.DisplayView == 1 %]
-                                [% document.viewLink %]
-                                [% END %]
-
-                                [% IF document.DisplayReplace == 1 %]
-                                [% document.replaceLink %]
-                                [% END %]
-
-                                [% IF document.Status == 'PENDING' %]
-                                <form style="float: left; position:relative" action="[% DocumentAction.target %]" method="POST">
-                                    <input type="hidden" name="client" value="[% DocumentAction.client %]">
-                                    <input type="hidden" name="TID" value="[% DocumentAction.WFTaskID %]">
-                                    <input type="hidden" name="a" value="[% DocumentAction.action %]">
-                                    <input type="hidden" name="did" value="[% document.DocumentID %]">
-                                    [% IF document.DisplayVerify == 1 %]
-                                    <input class="button-small generic-button" type="submit" name="verify" value="verify">
-                                    [% END %]
-                                </form>
-                                [% END %]
-
-                                [% IF document.DisplayAdd == 1 %]
-                                [% document.addLink %]
-                                [% END %]
-                            </div>
-                        </td>
-                    </tr>
-                    [% END %]
-                </table>
-            </div>
         </div>
     </div>
 <!--This is a static version of the new document viewer.-->
 <div class="documents-list">
-    <table cellpadding="5" style="width:100%;">
+    <table cellpadding="5" class="table" style="width:100%;">
         <thead>
             <tr class="document-table-header">
-                <th>Documents</th>
-                <th style="float:right">Status</th>
+                <th style="width: 70%">Document Type</th>
+                <th></th>
+                <th style="text-align: right">Status</th>
             </tr>
         </thead>
         <tbody>
+            [% FOREACH document IN RelatedDocuments %]
             <tr class="task-list">
                 <td>
-                    <span class="detail-value">ID Proof:</span>
+                    <span class="detail-value">[% document.DocumentType %]</span>
                 </td>
                 <td class="status-col">
-                    <a href="" class="btn-inside-docs-panel">View</a>
-                    <i class="fa fa-circle ver-dots green"></i>
-                    <span class="">Verified</span>
-                </td>
-            </tr>
-            <tr class="task-list">
-                <td>
-                    <span class="detail-value">Parental Content:</span>
-                </td>
-                <td class="status-col">
-                    <a href="" class="btn-inside-docs-panel">View</a>
-                    <i class="fa fa-circle ver-dots red"></i>
-                    <span class="">Rejected</span>
-                </td>
-            </tr>
-            <tr class="task-list">
-                <td>
-                    <span class="detail-value">Contract:</span>
+                    [% IF document.DisplayView == 1 %]
+                        [% document.viewLink %]
+                    [% ELSIF document.DisplayAdd == 1 %]
+                        [% document.addLink %]
+                    [% ELSE %]
+
+                    [% END %]
+                    [% IF document.DisplayReplace == 1 %]
+                        [% document.replaceLink %]
+                    [% END %]
+
                 </td>
                 <td class="status-col">
-                    <a href="" class="btn-inside-docs-panel">View</a>
-                    <i class="fa fa-circle ver-dots yellow"></i>
-                    <span class="">Pending</span>
+                    [% IF document.Status == 'PENDING' %]
+
+                        <i class="fa fa-circle ver-dots yellow"></i>
+                        <span class="">[% Lang.txt('Pending') %]</span>
+
+                    [% ELSIF document.Status == 'REJECTED' %]
+
+                        <i class="fa fa-circle ver-dots red"></i>
+                        <span class="">[% Lang.txt('Rejected') %]</span>
+
+                    [% ELSIF document.Status == 'APPROVED' %]
+
+                        <i class="fa fa-circle ver-dots green"></i>
+                        <span class="">[% Lang.txt('Approved') %]</span>
+
+                    [% ELSIF document.Status == 'VERIFIED' %]
+
+                        <i class="fa fa-circle ver-dots green"></i>
+                        <span class="">[% Lang.txt('Verified') %]</span>
+
+                    [% ELSE %]
+
+                        <i class="fa fa-circle ver-dots gray"></i>
+                        <span class="">[% Lang.txt('Missing') %]</span>
+
+                    [% END %]
                 </td>
             </tr>
-            <tr class="task-list">
-                <td >
-                    <span class="detail-value">Signed Code of Conduct:</span>
-                </td>
-                <td class="status-col">
-                    <a href="" class="btn-inside-docs-panel">View</a>
-                    <i class="fa fa-circle ver-dots green"></i>
-                    <span class="">Verified</span>
-                </td>
-            </tr>
-            <tr class="task-list">
-                <td>
-                    <span class="detail-value">Medical Certificate:</span>
-                </td>
-                <td class="status-col">
-                    <a href="" class="btn-inside-docs-panel">View</a>
-                    <i class="fa fa-circle ver-dots green"></i>
-                    <span class="">Verified</span>
-                </td>
-            </tr>
-            <tr class="task-list">
-                <td>
-                    <span class="detail-value">NS Clearance:</span>
-                </td>
-                <td class="status-col">
-                    <a href="" class="btn-inside-docs-panel">View</a>
-                    <i class="fa fa-circle ver-dots green"></i>
-                    <span class="">Verified</span>
-                </td>
-            </tr>
-            <tr class="task-list">
-                <td>
-                    <span class="detail-value">Parental Content:</span>
-                </td>
-                <td class="status-col">
-                    <a href="" class="btn-inside-docs-panel">View</a>
-                    <i class="fa fa-circle ver-dots green"></i>
-                    <span class="">Verified</span>
-                </td>
-            </tr>
+            [% END %]
         </tbody>
     </table>
 </div>

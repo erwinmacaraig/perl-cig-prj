@@ -82,7 +82,7 @@ sub handleTransLogs {
 	  ($body, $header) = listTransLog($Data, $entityID, $personID);
   }
 	if ($action =~/payVIEW/)	{
-		($body, $header) = viewTransLog($Data, $Data->{'params'}{'tlID'});
+		($body, $header) = viewTransLog($Data, $Data->{'params'}{'tlID'},$Data->{'params'}{'pID'});
 	}
   if ($action=~/(edit|display|add)/) {
 	  ($body, $header)=entityDetails($action, $Data, $clientValues_ref, $db);
@@ -308,7 +308,6 @@ sub step2 {
 	my $intPersonID= $Data->{'clientValues'}{'personID'}; 
 	my $currentLevel = $Data->{'clientValues'}{'authLevel'};
 	
-print STDERR "DISPLAY OLY|".$Data->{params}{'subbut'} ."\n";
     my $hidePayCheckbox = 1; #$Data->{params}{'subbut'} || 0;
 	my ($transHTML, $transcount, $transCurrency_ref, $transAmount_ref)=getTransList($Data, $db, $entityID, $intPersonID, $whereClause, $clientValues_ref, 0, $displayonly, $hidePayCheckbox);
 
@@ -532,6 +531,7 @@ sub getTransList {
     $hidePay ||= 0;
     $hidePayment=0 if ($personID and $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB);
     $hidePayment=0 if ($entityID and ! $personID and $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB);
+	$hidePayment = 1 if($personID == -1);
 
     my $realmID = $Data->{'Realm'};
 	my $orderBy = $Data->{'SystemConfig'}{'TransListOrderBy'} || '';
@@ -580,21 +580,26 @@ sub getTransList {
     FROM 
       tblTransactions as t
       INNER JOIN tblProducts as P ON (P.intProductID = t.intProductID)
-	  INNER JOIN tblInvoice as i ON t.intInvoiceID = i.intInvoiceID
+	  LEFT JOIN tblInvoice as i ON t.intInvoiceID = i.intInvoiceID
       LEFT JOIN tblTransLog as tl ON (t.intTransLogID = tl.intLogID)
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (
             PR.intPersonRegistrationID = t.intPersonRegistrationID
         )
     WHERE
       t.intRealmID = $Data->{Realm}
-        AND (t.intPersonRegistrationID =0 or PR.strStatus NOT IN ('INPROGRESS'))
+        AND (t.intPersonRegistrationID =0 or t.intStatus= 1 or PR.strStatus NOT IN ('INPROGRESS'))
 			AND P.intProductType<>2
-	    $prodSellLevel
+        AND (t.intStatus<>1 or (t.intStatus=1 AND intPaymentByLevel <= $Data->{'clientValues'}{'authLevel'}))
       $whereClause
+        $prodSellLevel
 	  GROUP BY 
 		  t.intTransactionID
 		$orderBy
   ];
+
+	open FH, ">dumpfile.txt";
+	print FH "\nTo query transaction: \n $statement\n";
+	    #$prodSellLevel
     $statement =~ s/AND  AND/AND/g;
     my $query = $db->prepare($statement);
     $query->execute or print STDERR $statement;
@@ -666,8 +671,8 @@ sub getTransList {
     }
     $row_data->{SelectLink} = qq[main.cgi?client=$client&a=P_TXN_EDIT&personID=$row->{intID}&id=$row->{intTransLogID}&tID=$row->{intTransactionID}];
     if ($row->{StatusText} eq 'Paid') {
-      $row_data->{stuff} = qq[<a href="main.cgi?a=P_TXNLog_payVIEW&client=$client&tlID=$row->{intTransLogID}">].$Data->{'lang'}->txt('View Payment Record').qq[</a>];
-      $row_data->{strReceipt} = qq[<a href="printreceipt.cgi?client=$client&ids=$row->{intTransLogID}"  target="receipt">].$Data->{'lang'}->txt('View Receipt').qq[</a>];
+      $row_data->{stuff} = qq[<a href="main.cgi?a=P_TXNLog_payVIEW&client=$client&tlID=$row->{intTransLogID}&amp;pID=$row->{intID}">].$Data->{'lang'}->txt('View Payment Record').qq[</a>];
+      $row_data->{strReceipt} = qq[<a href="printreceipt.cgi?client=$client&amp;ids=$row->{intTransLogID}&amp;pID=$row->{intID}"  target="receipt">].$Data->{'lang'}->txt('View Receipt').qq[</a>];
       $row_data->{manual_payment} = '';
     }
     elsif ($row->{StatusText} eq 'Unpaid') {
@@ -836,7 +841,10 @@ warn("ENTITY: $entityID | $personID");
     my $whereClause = '';
     $whereClause .= qq[ AND t.intID=$personID and t.intTableType=$Defs::LEVEL_PERSON] if ($personID and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON);
 warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
-    $whereClause .= qq[ AND t.intID=$entityID and t.intTableType=$Defs::LEVEL_CLUB] if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB;
+    $whereClause .= qq[ AND t.intID=$entityID and t.intTableType=$Defs::LEVEL_CLUB] if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB && $personID != -1);
+
+	$whereClause .= qq[ AND t.intTableType=$Defs::LEVEL_PERSON] if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB && $personID == -1);
+
     $whereClause .= qq[ AND t1.intTLogID= $safePaymentID ] if $paymentID;
 
     $whereClause .= qq[ AND intTXNEntityID IN (0, $entityID)] if $entityID;
@@ -892,7 +900,10 @@ print STDERR "LISTING";
         my $targetManual = $Data->{'target'};
         my $targetOnline = 'paytry.cgi';
 
-    if ($transCount>0) {
+
+	my $unpaidTransactionsPresent = 0;	
+	$unpaidTransactionsPresent = checkPersonTransactionStatus($Data, $db, $entityID, $personID); 
+    if ($transCount>0 &&  $unpaidTransactionsPresent) {
 	    my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
         $Year+=1900;
         $Month++;
@@ -1005,6 +1016,11 @@ print STDERR "LISTING";
 						<td class="label"><label for="l_intPaymentType">].$lang->txt('Payment Type').qq[</label>:</td>
 						<td class="value">].drop_down('paymentType',\%Defs::manualPaymentTypes, undef, $paymentType, 1, 0,'','').qq[</td>
 					</tr>
+
+
+
+
+
 					<!--<tr>
 						<td class="label"><label for="l_strBank">Bank</label>:</td>
 						<td class="value"><input type="text" name="strBank" value="$Data->{params}{strBank}" id="l_strBank"   /></td>
@@ -1037,6 +1053,11 @@ print STDERR "LISTING";
 						<td class="label"><label for="l_intPartialPayment">Partial Payment</label>:</td>
 						<td class="value"><input type="checkbox" name="intPartialPayment" value="1" id="l_intPartialPayment" ].($Data->{params}{intPartialPayment} ? 'checked' : '').qq[  /> </td>
 					</tr>	-->
+
+
+
+
+
 					<tr>
 
 						<td class="label"><label for="l_strComments">].$lang->txt('Comments').qq[</label>:</td>
@@ -1356,10 +1377,11 @@ my (undef, undef, $id, $Data, $option, $tempClientValues_ref) = @_;
 
 sub viewTransLog	{
 
-	my ($Data, $intTransLogID)= @_;
+	my ($Data, $intTransLogID, $personID)= @_;
 
     my $lang = $Data->{'lang'};
 	$intTransLogID ||= 0;
+	$personID ||= 0;
 	my $db = $Data->{'db'};
 	my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
 	
@@ -1379,7 +1401,7 @@ sub viewTransLog	{
 			INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLog.intTXNID)
 			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
 			LEFT JOIN tblEntity as Entity on (Entity.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
-		WHERE intLogID = $intTransLogID
+		WHERE intLogID = $intTransLogID 
 		AND T.intRealmID = $Data->{'Realm'}
 	];
         
@@ -1392,11 +1414,11 @@ sub viewTransLog	{
 	my $st_trans = qq[
 		SELECT T.intTransactionID, M.strLocalSurname, M.strLocalFirstName, E.*, P.strName, P.strGroup, E.strLocalName as EntityName, T.intQty, T.curAmount, T.intTableType, I.strInvoiceNumber, T.intStatus
 		FROM tblTransactions as T
-			INNER JOIN tblInvoice I on I.intInvoiceID = T.intInvoiceID
+			LEFT JOIN tblInvoice I on I.intInvoiceID = T.intInvoiceID
 			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
 			LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
 			LEFT JOIN tblEntity as E ON (E.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
-		WHERE intTransLogID = $intTransLogID
+		WHERE intTransLogID = $intTransLogID  
 		AND T.intRealmID = $Data->{'Realm'}
 	];
 	
@@ -1853,6 +1875,20 @@ sub listTransLog	{
 	];
 	my $title=$textLabels{'listOfPaymentRecords'};
  	return ($resultHTML,$title);
+}
+
+sub checkPersonTransactionStatus {
+	my ($Data, $db, $entityID, $personID) = @_;
+	#check for unpaid transactions
+	my $sql = qq[SELECT count(intTransactionID) as total FROM tblTransactions WHERE intID = ? AND  dtPaid IS NULL  AND intTXNEntityID = ? AND intTransLogID = 0];
+
+	my $sth = $db->prepare($sql);
+	$sth->execute($personID,$entityID);
+
+	my $dref = $sth->fetchrow_hashref();
+	
+	return $dref->{'total'};
+
 }
 
 1;

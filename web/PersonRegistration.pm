@@ -14,6 +14,7 @@ require Exporter;
     rolloverExistingPersonRegistrations
     checkIsSuspended
     getRegistrationDetail
+    cleanPlayerPersonRegistrations
 );
 
 use strict;
@@ -26,6 +27,43 @@ use Data::Dumper;
 use Person;
 use PersonRegisterWhat;
 use AuditLog;
+sub cleanPlayerPersonRegistrations  {
+
+    my ($Data, $personID, $personRegistrationID) = @_;
+
+    my %Reg = (
+        personRegistrationID=> $personRegistrationID || 0,
+    );
+    my ($count, $reg_ref) = getRegistrationData(
+        $Data,
+        $personID,
+        \%Reg
+    );
+    
+    return if (! $count);
+    my %ExistingReg = (
+        sport=> $reg_ref->[0]{'strSport'} || '',
+        personType=> $reg_ref->[0]{'strPersonType'} || '',
+        entityID=> $reg_ref->[0]{'intEntityID'} || 0,
+        status=> $Defs::PERSONREGO_STATUS_ACTIVE,
+    );
+        #ageLevel=> $reg_ref->[0]{'strAgeLevel'} || '',
+    my ($countRecords, $regs_ref) = getRegistrationData(
+        $Data,
+        $personID,
+        \%ExistingReg
+    );
+    foreach my $rego (@{$regs_ref})  {
+        next if ($rego->{'intPersonRegistrationID'} == $personRegistrationID);
+        my $thisRego = $rego;
+        $thisRego->{'intCurrent'} = 0;
+        #$thisRego->{'strStatus'} = $Defs::PERSONREGO_STATUS_ROLLED_OVER;
+        $thisRego->{'strStatus'} = $Defs::PERSONREGO_STATUS_PASSIVE;
+        updatePersonRegistration($Data, $personID, $rego->{'intPersonRegistrationID'}, $thisRego, 0);
+    }
+}
+
+
 sub rolloverExistingPersonRegistrations {
 
     my ($Data, $personID, $personRegistrationID) = @_;
@@ -112,6 +150,7 @@ sub checkNewRegoOK  {
     my $ok = 1;
     foreach my $reg (@{$regs})  {
         next if $reg->{'intEntityID'} == $rego_ref->{'entityID'};
+        #$ok = 0 if ($reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_ROLLED_OVER or $reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_DELETED or $reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_TRANSFERRED);
         $ok = 0 if ($reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_DELETED or $reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_TRANSFERRED);
     }
 
@@ -556,7 +595,7 @@ sub getRegistrationData	{
     my $st= qq[
         SELECT 
             pr.*, 
-            np.strNationalPeriodName,
+			np.strNationalPeriodName,
             p.dtDOB,
             DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
@@ -594,7 +633,8 @@ sub getRegistrationData	{
             )
             INNER JOIN tblPerson as p ON (
                 p.intPersonID = pr.intPersonID
-            )
+            )	
+			
         WHERE     
             p.intPersonID = ?
             $where
@@ -603,14 +643,15 @@ sub getRegistrationData	{
         ORDER BY
           pr.dtAdded DESC
     ];	
+	
     my $db=$Data->{'db'};
     my $query = $db->prepare($st) or query_error($st);
 
     $query->execute(@values) or query_error($st);
     my $count=0;
-
+	#open FH, ">dumpfile.txt";
     my @Registrations = ();
-      
+    my @reg_docs = ();  
     while(my $dref= $query->fetchrow_hashref()) {
         $count++;
         $dref->{'Sport'} = $Defs::sportType{$dref->{'strSport'}} || '';
@@ -619,8 +660,26 @@ sub getRegistrationData	{
         $dref->{'AgeLevel'} = $Defs::ageLevel{$dref->{'strAgeLevel'}} || '';
         $dref->{'Status'} = $Defs::personRegoStatus{$dref->{'strStatus'}} || '';
         $dref->{'RegistrationNature'} = $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '';
+
+		my $sql = qq[
+			SELECT strApprovalStatus,strDocumentName, intFileID, pr.intPersonRegistrationID FROM tblUploadedFiles INNER JOIN tblDocuments 
+			ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID  
+			INNER JOIN tblDocumentType ON tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID   
+			INNER JOIN tblPersonRegistration_$Data->{'Realm'} as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID  
+			WHERE pr.intPersonRegistrationID = $dref->{intPersonRegistrationID} AND pr.intPersonID = $personID 
+		];
+		my $sth = $Data->{'db'}->prepare($sql);
+		$sth->execute();
+		while(my $data_ref = $sth->fetchrow_hashref()){
+			#push @reg_docs, $data_ref;	
+			push @{$dref->{'documents'}},$data_ref;				
+		}			
         push @Registrations, $dref;
+
+		
     }
+
+	
     return ($count, \@Registrations);
 }
 

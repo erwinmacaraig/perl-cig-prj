@@ -36,7 +36,9 @@
         [% END %]
 
         [% IF TaskAction.showEditFields %]
-        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=VENUE_Flist&venueID=[% TaskAction.venueID %]">[% Lang.txt('Edit Fields') %]</a></span>
+        <a class="btn-main" href = "main.cgi?client=[% TaskAction.client %]&a=VENUE_Flist&venueID=[% TaskAction.venueID %]">
+            [% Lang.txt('Edit Fields') %]
+        </a>
         [% END %]
 
     </div>

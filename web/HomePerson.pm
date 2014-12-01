@@ -86,7 +86,9 @@ sub showPersonHome	{
 		AddRegistrationURL => $addregistrationURL || '',
 		CardPrintingURL => $cardprintingURL || '',
 		Documents => $docs,
-		GroupData => $groupdata,
+		GroupData => $groupdata,		
+	    client => $client,
+	    url => "$Defs::base_url/viewer.cgi",
 		Details => {
 			Active => $Data->{'lang'}->txt(($personObj->getValue('intRecStatus') || '') ? 'Yes' : 'No'),
 			LatinFirstname=> $personObj->getValue('strLatinFirstname') || '',	
@@ -107,6 +109,7 @@ sub showPersonHome	{
 			SquadNum => $personObj->getValue('dblCustomDbl10') || '',
 			BirthCountry => $personObj->getValue('strCountryOfBirth') || '',
 			PassportNat => $personObj->getValue('strPassportNationality') || '',
+			Status => $personObj->getValue('strStatus') || '',
 		},
 
 	);
@@ -119,7 +122,9 @@ sub showPersonHome	{
     
     $RegFilters{'statusIN'} = \@statusIN;
     my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
-
+	
+	#open FH, ">dumpfile.txt";
+	
     foreach my $rego (@{$Reg_ref})  {
         my $renew = '';
         $rego->{'renew_link'} = '';
@@ -127,6 +132,8 @@ sub showPersonHome	{
         next if ($rego->{'strStatus'} !~ /$Defs::PERSONREGO_STATUS_ACTIVE|$Defs::PERSONREGO_STATUS_PASSIVE/);
         #my $ageLevel = $rego->{'strAgeLevel'}; #'ADULT'; ## HERE NEEDS TO CALCULATE IF MINOR/ADULT
         my $newAgeLevel = '';
+
+		
         if ($rego->{'strAgeLevel'}) { 
             $newAgeLevel = Person::calculateAgeLevel($Data, $rego->{'currentAge'});
         }
@@ -137,7 +144,13 @@ $renew = $Data->{'target'} . "?client=$client&amp;a=PREGF_TU&amp;pt=$rego->{'str
 
         $rego->{'Status'} = (($rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE) and $rego->{'intPaymentRequired'}) ? $Defs::personRegoStatus{$Defs::PERSONREGO_STATUS_ACTIVE_PENDING_PAYMENT} : $rego->{'Status'};
     }
+	
+	#$Reg_ref->[0]{'documents'} = \@reg_docs;
+	#push @{$Reg_ref},\%reg_docs;
     $TemplateData{'RegistrationInfo'} = $Reg_ref;
+	
+	#print FH "Dump of template data \n" . Dumper($TemplateData{'RegistrationInfo'}) . "\n"; 
+
 
 
 	my $statuspanel= runTemplate(
@@ -191,8 +204,8 @@ sub getMemFields {
 		push @{$fields_grouped{$group}}, [$f, $label];
 		my $string = '';
 		if (($val and $val ne '00/00/0000') or ($is_header))	{
-			$string .= qq[<span class="details-row"><span class = "details-left">$label</span>] if !$nolabelfields{$f};
-			$string .= '<span class="details-right">'.$val.'</span></span>';
+			$string .= qq[<div class=""><span class = "details-left">$label:</div>] if !$nolabelfields{$f};
+			$string .= '<span class="detail-value">'.$val.'</span></span>';
 			$fields{$group} .= $string;
 		}
 	}}

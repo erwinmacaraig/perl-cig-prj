@@ -196,9 +196,30 @@ sub pageMain {
         
     my $statscounter = $Defs::NoStats ? '' : getStatsCounterCode();
 
+    my %HomeAction = (
+        $Defs::LEVEL_INTERNATIONAL =>  'E_HOME',
+        $Defs::LEVEL_INTREGION =>  'E_HOME',
+        $Defs::LEVEL_INTZONE =>  'E_HOME',
+        $Defs::LEVEL_NATIONAL =>  'E_HOME',
+        $Defs::LEVEL_STATE =>  'E_HOME',
+        $Defs::LEVEL_REGION =>  'E_HOME',
+        $Defs::LEVEL_ZONE =>  'E_HOME',
+        $Defs::LEVEL_CLUB =>  'C_HOME',
+        $Defs::LEVEL_PERSON =>  'P_HOME',
+    );
+
+    my ($navTree, $navObjects) = Navbar::GenerateTree($Data, $clientValues_ref);
+
+    my %NavData= (
+        NavTree => $navTree,
+        Menu => '',
+        HomeURL => "$Data->{'target'}?client=$homeClient&amp;a=".$HomeAction{$Data->{'clientValues'}{'authLevel'}},
+    );
+
   my $globalnav = runTemplate(
     $Data,
-    {PassportLink => ''},
+    #{PassportLink => ''},
+    \%NavData,
     'user/globalnav.templ',
   );
 
@@ -234,8 +255,8 @@ sub pageMain {
         #$TemplateData{'TeamListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=T_L&amp;l=2" if(!$Data->{'SystemConfig'}{'NoTeams'});
     #}
     if($authLevel == $Defs::LEVEL_CLUB)    {
-        $TemplateData{'MemListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=M_L&amp;l=1";
-        $TemplateData{'TeamListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=T_L&amp;l=2" if(!$Data->{'SystemConfig'}{'NoTeams'});
+        #$TemplateData{'MemListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=M_L&amp;l=1";
+        #$TemplateData{'TeamListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=T_L&amp;l=2" if(!$Data->{'SystemConfig'}{'NoTeams'});
     }
 
     my $templateFile = 'page_wrapper/main_wrapper.templ';
@@ -322,6 +343,9 @@ sub printBasePage {
             <link rel="stylesheet" type="text/css" href="js/jquery-ui/css/theme/jquery-ui-1.8.22.custom.css">
             <script type="text/javascript" src="$Defs::base_url/js/jquery.ui.touch-punch.min.js"></script>
       <link rel="stylesheet" type="text/css" href="$Defs::base_url/css/style.css">
+      <link rel="stylesheet" type="text/css" href="$Defs::base_url/css/fc_styles.css">
+      <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
+
 $CSSFiles
 $CSSInline
 $TopJSFiles
@@ -349,9 +373,7 @@ warn(" IN PF");
     $meta->{'title'} = $title;
     $meta->{'head'} = $html_head;
     $meta->{'page_begin'} = qq[
-        <div id="global-nav-wrap">
         $page_navigator
-        </div>
     ];
     $meta->{'page_header'} = $page_header;
     $meta->{'page_content'} = $body;
@@ -483,7 +505,8 @@ sub getPageCustomization{
 
     my $paypal = $Data->{'PAYPAL'} ? qq[<img src="images/PP-CC.jpg" alt="PayPal" border="0"></img>] : '';
 
-    my $powered = qq[<span class="footerline">].$Data->{'lang'}->txt('COPYRIGHT').qq[</span>];
+    #my $powered = qq[<span class="footerline">].$Data->{'lang'}->txt('COPYRIGHT').qq[</span>];
+		my $powered = qq[];
 
     return ($html_head, $page_header, $nav, $paypal, $powered);
 }

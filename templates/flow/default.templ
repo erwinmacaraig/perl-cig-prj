@@ -18,15 +18,19 @@
 [% END %]
 
 [% TextTop %]
-<div class="col-md-8">
+<div class="col-md-9">
 <h3 class="panel-header">Personal Details</h3>
 <div class="panel-body">
 <fieldset><p><span class="notice-error">*Required fields.</span></p></fieldset>
+[% IF DocumentsLists %][% DocumentsLists %][% END %]
 <form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">
     [% IF Content %][% Content %][% END %]
     [% IF FlowNextAction %]
 [% IF !NoContinueButton %]
 	<div class="txtright"><input type = "submit" value = " [% Lang.txt('Continue') %] "  class = "button proceed-button"></div>
+[% END %]
+[% IF Back %]
+    <div class="txtright"><span class="button proceed-button"><a href="javascript:history.go(-1)"  onmouseover="this.style.textDecoration='none'"> [% Lang.txt(Back) %] </a></span></div>
 [% END %]
 	<input type = "hidden" name ="rfp" value ="[% FlowNextAction %]">
     [% END %]
@@ -36,11 +40,11 @@
 </div>
 </div>
 [% IF FlowSummary %]
-<div class="col-md-4">
+<div class="col-md-3">
 [% FStemplate = FlowSummaryTemplate or 'flow/flow_summary.templ' %]
 [% INCLUDE $FStemplate %]
 </div>
 [% END %]
 <br/>
-<div class="col-md-8"></div>
+<div class="col-md-9"></div>
 [% TextBottom %]

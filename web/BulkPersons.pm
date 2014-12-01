@@ -83,6 +83,7 @@ sub bulkPersonRollover {
                 AND PR.strStatus IN ("$Defs::PERSONREGO_STATUS_ACTIVE", "$Defs::PERSONREGO_STATUS_PASSIVE")
                 AND PR.intEntityID = ?
                 AND PR.intNationalPeriodID <> ?
+                AND PR.strAgeLevel = ?
             )
             LEFT JOIN tblPersonRegistration_$realmID as PRto ON (
                 PRto.intPersonID = P.intPersonID
@@ -102,13 +103,13 @@ sub bulkPersonRollover {
     ];
 
 
-        #$bulk_ref->{'ageLevel'} || '',
     my @values=(
         $bulk_ref->{'personType'} || '',
         $bulk_ref->{'personLevel'} || '',
         $bulk_ref->{'personEntityRole'} || '',
         $bulk_ref->{'entityID'} || '',
         $bulk_ref->{'nationalPeriodID'} || '',
+        $bulk_ref->{'ageLevel'} || '',
         $bulk_ref->{'nationalPeriodID'} || '',
         $realmID
     );

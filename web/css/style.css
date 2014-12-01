@@ -4608,6 +4608,9 @@ div#content div.member-home-page div.task-actions {
 #docViewerHeader .close {
     float:right;
 }
+#docViewerHeader a.close {
+    color:#fff;
+}
 
 #docViewerPanel {
     float: right;
@@ -4636,7 +4639,6 @@ div#content div.member-home-page div.task-actions {
 .docViewerEntityInfo    {
     background-color:#fff;
     margin:10px;
-    padding: 10px;
 }
 
 .docViewerButtons   {
@@ -4644,4 +4646,7 @@ div#content div.member-home-page div.task-actions {
     margin:10px;
     padding: 10px;
 
+}
+.white  {
+    color:#fff;
 }

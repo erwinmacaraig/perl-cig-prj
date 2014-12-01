@@ -132,11 +132,11 @@ sub getFieldLabels	{
             strISOCountry => 'Country of Address',
             strAddress => 'Address 1',
             strAddress2 => 'Address 2',
-            strContactCity => 'City',
+            strContactCity => 'City of Contact',
             strTown => 'Town',
             strState => 'State',
             strPostalCode => 'Postcode',
-            strContactISOCountry => 'Country',
+            strContactISOCountry => 'Country of Contact',
             strWebURL => 'Web Address',
             strEmail => 'Contact Email',
             strPhone => 'Contact Phone',
@@ -162,6 +162,7 @@ sub getFieldLabels	{
             intNotifications => 'Notification Toggle',
             strOrganisationLevel => 'Level',
             dissolved => 'Dissolved',
+            intFacilityTypeID => 'Venue Type',
             );
 	}
 
@@ -186,9 +187,9 @@ sub getFieldLabels	{
             strEmail => 'Contact Email',
             strPhone => 'Contact Number',
             strFax => 'Facsimile Number',
-            strContactCity => 'City',
+            strContactCity => 'City of Contact',
             strPostalCode => 'Postcode',
-            strContactISOCountry => 'Country of Address',
+            strContactISOCountry => 'Country of Contact',
             strContact => 'Contact Person',
             intIdentifierTypeID => 'Identifier Type',
             strIdentifier => 'Identifier',
@@ -208,6 +209,7 @@ sub getFieldLabels	{
             strEntityType => 'Entity Type',
             intNotifications => 'Notification Toggle',
             intEntityFieldCount => 'Number of Fields',
+            intFacilityTypeID => 'Venue Type',
             );
 	}
 

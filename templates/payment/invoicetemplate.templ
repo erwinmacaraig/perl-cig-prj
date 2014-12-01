@@ -34,48 +34,39 @@
 			<div class="receiptbox">
      
             <div style="text-align:center; padding-top: 50px;">
-				<h2>[% OtherInfo.0.strRealmName %] </h2>
-				<h3>[% OtherInfo.0.Club %]</h3>
+				<h2>[% entityName %] </h2>
 			</div>
 
 
        <table class="paymentlist">
 		<tr>
 			<td>[% index %]<b>Payment For:</b></td>
-			<td>[% Receipts.1.Info.Name %]</td>
+			<td>[% person %]</td>
 		</tr>
 		<tr>
-			<td><b>Payment Date:</b></td>
-			<td>[% Receipts.1.Info.dtLog_FMT %]</td>
-		</tr>
-		<tr>
-			<td><b>Payment Type:</b></td>
-			<td>[% Receipts.1.Info.PaymentType %]</td>
-		</tr>
-		<tr>
-			<td><b>Receipt No.:</b></td>
-			<td>[% Receipts.1.Info.intLogID %]</td>
+			<td><b>Invoice No.:</b></td>
+			<td>[% invoicenum %]</td>
 		</tr>
 	</table>
 	<br><br>
 	<table class="itemlist">
 		<tr style = " border-bottom:1px solid #aaa;">
-			<td style="width:80px;">Item</td>
-			<td style="width:20px;">QTY</td>
-			<td>Description</td>
+			<td style="width:80px;">Transaction Number</td>
+			<td>Item</td>
+			<td style="width:20px;">Quantity</td>
 			<td style="width:70px;">Cost</td>
 		</tr>
-	[% FOREACH i IN Receipts.0.Items %]
+	[% FOREACH t IN transactions %]
 		<tr>
-			<td>[% i.InvoiceNo %]</td>
-			<td>[% i.intQty %]</td>
-			<td>[% i.strName %]</td>
-			<td>\$[% i.curAmount %]</td>
+			<td>[% t.intTransactionID %]</td>
+			<td>[% t.strName %]</td>
+			<td>[% t.intQty %]</td>
+			<td>\$ [% t.curAmount %]</td>
 		</tr>
 	[% END %]
 		<tr style = " border-top:1px solid #aaa;">
-			<td colspan="3"><b>Payment Total:</b></td>
-			<td><b>\$[% Receipts.1.Info.intAmount %]</b></td>
+			<td colspan="3"><b>Amount To Pay:</b></td>
+			<td><b>\$ [% amount %]</b></td>
 		</tr>
 	</table>
 

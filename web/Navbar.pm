@@ -429,7 +429,7 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
             'addvenue'
         ]],
         [ $lang->txt('People'), 'menu',[
-            'persons',
+            'persons_search',
             'persons_addplayer',
             'persons_addcoach',
             'persons_addofficial',
@@ -437,7 +437,6 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
             'persons_addclubofficial',
             'persons_addmaofficial',
             'bulk',
-            'persons_search',
         ]],
         [ $lang->txt('Work Tasks'), 'menu',[
             'approvals',
@@ -464,261 +463,6 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
         'mrt_admin',
         'auditlog',
         'optin',
-        ]],
-    );
-
-    my $menudata = processmenudata(\%menuoptions, \@menu_structure);
-    return $menudata;
-
-}
-
-sub getAssocMenuData {
-    my (
-        $Data,
-        $currentLevel,
-        $currentID,
-        $client,
-        $assocObj,
-    ) = @_;
-
-    my $target=$Data->{'target'} || '';
-    my $lang = $Data->{'lang'} || '';
-    my %cvals=getClient($client);
-    $cvals{'currentLevel'}=$currentLevel ;
-    $client=setClient(\%cvals);
-    my $SystemConfig = $Data->{'SystemConfig'};
-    my $txt_SeasonsNames= $SystemConfig->{'txtSeasons'} || 'Seasons';
-    my $txt_AgeGroupsNames= $SystemConfig->{'txtAgeGroups'} || 'Age Groups';
-    my $txt_Clr = $SystemConfig->{'txtCLR'} || 'Clearance';
-    my $txt_Clr_ListOnline = $SystemConfig->{'txtCLRListOnline'} || "List Online Clearances";
-    my $txt_Clr_ListOffline = "List Offline Clearances";
-
-    my $swol_url = $Defs::SWOL_URL;
-    $swol_url = $Defs::SWOL_URL_v6 if ($Data->{'SystemConfig'}{'AssocConfig'}{'olrv6'});
-    my $DataAccess_ref = $Data->{'DataAccess'};
-
-    my (
-        $intAllowClearances, 
-        $intSWOL,
-        $hideAssocRollover,
-        $hideClubRollover,
-        $hideAllCheckbox,
-        $intAllowRegoForm,
-        $intAllowSeasons,
-    ) = $assocObj->getValue([
-        'intAllowClearances', 
-        'intSWOL',
-        'intHideRollover',
-        'intClubRollover',
-        'intHideAllRolloverCheckbox',
-        'intAllowRegoForm',
-        'intAllowSeasons',
-        ]);
-    $intSWOL = 0 if !$SystemConfig->{'AllowSWOL'};
-
-    my $paymentSplitSettings = ''; #getPaymentSplitSettings($Data);
-
-    my $baseurl = "$target?client=$client&amp;";
-    my %menuoptions = (
-        advancedsearch => {
-            name => $lang->txt('Advanced Search'),
-            url => $baseurl."a=SEARCH_F",
-        },
-        reports => {
-            name => $lang->txt('Reports'),
-            url => $baseurl."a=REP_SETUP",
-        },
-        home => {
-            name => $lang->txt('Dashboard'),
-            url => $baseurl."a=A_HOME",
-        },
-        persons => {
-            name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}),
-            url => $baseurl."a=P_L&amp;l=$Defs::LEVEL_PERSON",
-        },
-    );
-
-    if (
-        $Data->{'Permissions'}{'OtherOptions'}{ShowClubs} 
-            or !$SystemConfig->{'NoClubs'}) {
-        $menuoptions{'clubs'} = {
-            name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_CLUB.'_P'}),
-            url => $baseurl."a=C_L&amp;l=$Defs::LEVEL_CLUB",
-        };
-    }
-    if ($SystemConfig->{'AssocServices'} and !$Data->{'ReadOnlyLogin'}) {
-        $menuoptions{'services'} = {
-            name => $lang->txt('Locator'),
-            url => $baseurl."a=A_SV_DTE",
-        };
-    }
-
-    #first can the person looking see any other options anyway
-    my $data_access=$DataAccess_ref->{$Defs::LEVEL_ASSOC}{$currentID};
-    #$data_access=$Defs::DATA_ACCESS_FULL;
-    if (
-        $data_access==$Defs::DATA_ACCESS_FULL 
-            or $data_access==$Defs::DATA_ACCESS_READONLY
-    ) {
-
-        if(1==2 and $SystemConfig->{'AllowClearances'} 
-                and $intAllowClearances
-        ) {
-            $menuoptions{'clearances'} = {
-                name => $lang->txt($txt_Clr_ListOnline),
-                url => $baseurl."a=CL_list",
-            };
-        }
-        if(1==2 and $SystemConfig->{'DisplayOffLineClearances'}
-                and $intAllowClearances
-        )       {
-            $menuoptions{'clearancesoff'} = {
-                name => $lang->txt($txt_Clr_ListOffline),
-                url => $baseurl."a=CL_offlist",
-            };
-        }
-
-
-        if (
-            $data_access==$Defs::DATA_ACCESS_FULL
-                and !$Data->{'ReadOnlyLogin'}
-                and allowedAction($Data,'a_e')
-        ) {
-            $menuoptions{'usermanagement'} = {
-                name => $lang->txt('User Management'),
-                url => $baseurl."a=AM_",
-            };
-            if(!$SystemConfig->{'NoConfig'}) {
-                $menuoptions{'settings'} = {
-                    name => $lang->txt('Settings'),
-                    url => $baseurl."a=A_O_m",
-                };
-            }
-
-            if(isCheckDupl($Data)) {
-                $menuoptions{'duplicates'} = {
-                    name => $lang->txt('Duplicate Resolution'),
-                    url => $baseurl."a=DUPL_L",
-                };
-            }
-
-            if (allowedAction($Data,'ba_e')) {
-                if($paymentSplitSettings->{'psBanks'}) {
-                    $menuoptions{'bankdetails'} = {
-                        name => $lang->txt('Payment Configuration'),
-                        url => $baseurl."a=BA_",
-                    };
-                }
-            }
-            if($paymentSplitSettings->{'psSplits'}) {
-                $menuoptions{'paymentsplits'} = {
-                    name => $lang->txt('Payment Splits'),
-                    url => $baseurl."a=A_PS_showsplits",
-                };
-            }
-
-            if ($SystemConfig->{'AllowCardPrinting'}) {
-                $menuoptions{'cardprinting'} = {
-                    name => $lang->txt('Card Printing'),
-                    url => $baseurl."a=MEMCARD_BL",
-                };
-            }
-
-
-            if($SystemConfig->{'AllowTXNs'}) {
-                $menuoptions{'products'} = {
-                    name => $lang->txt('Products'),
-                    url => $baseurl."a=PR_",
-                };
-            }   
-            if (
-                $intAllowRegoForm
-                    and (
-                    $Data->{'SystemConfig'}{'AllowOnlineRego'}
-                        or $Data-> {'Permissions'}{'OtherOptions'}{'AllowOnlineRego'}
-                )
-            ) {
-                $menuoptions{'registrationforms'} = {
-                    name => $lang->txt('Registration Forms'),
-                    url => $baseurl."a=A_ORF_r",
-                };
-            }
-
-        }
-    }
-
-    if(
-            1==2 and
-        $intAllowSeasons
-            and ((!$Data->{'SystemConfig'}{'LockSeasons'}
-                    and !$Data->{'SystemConfig'}{'Rollover_HideAll'}
-                    and !$Data->{'SystemConfig'}{'Rollover_HideAssoc'}) or $Data->{'SystemConfig'}{'AssocConfig'}{'Rollover_AddRollover_Override'})
-            and !$hideAssocRollover
-            and allowedAction($Data, 'm_e')) {
-        $menuoptions{'personrollover'} = {
-            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON}.' Rollover'),
-            url => $baseurl."a=P_LSRO&amp;l=$Defs::LEVEL_PERSON",
-        };
-    }
-
-    if (
-        $Data->{'SystemConfig'}{'AllowPersonTransfers'}
-            and allowedAction($Data, 'a_e')
-    ) {
-        $menuoptions{'transferperson'} = {
-            url => $baseurl."a=P_TRANSFER&amp;l=$Defs::LEVEL_PERSON",
-            name => $Data->{'SystemConfig'}{'transferPersonText'} || $lang->txt('Transfer Person'),
-        };
-    }
-
-
-    # for assoc menu
-    if(!$SystemConfig->{'NoAuditLog'}) {
-        $menuoptions{'auditlog'} = {
-            name => $lang->txt('Audit Log'),
-            url => $baseurl."a=AL_",
-        };
-    }
-
-    #if ($Data->{'SystemConfig'}{'DefaultListAction'} and $Data->{'SystemConfig'}{'DefaultListAction'} eq 'SUMM') {
-    #push @assoc_options, [ $target, { client => $nc, a => 'A_SUMM' }, $textLabels{'Association Summary'}, ];
-    #}
-
-    my @menu_structure = (
-        [ $lang->txt('Dashboard'), 'home','home'],
-        [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}), 'menu', [
-        'persons',
-        'duplicates',
-        'clearances',    
-        'clearancesoff',    
-        'personrollover',
-        'transferperson',
-        'cardprinting',
-        ]],
-        [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_CLUB.'_P'}), 'menu', [
-        'clubs',
-        'clubchampionships',
-        ]],
-        [ $lang->txt('Registrations'), 'menu',[
-        'bankdetails',
-        'registrationforms',
-        'paymentsplits',
-        'services',
-        ]],
-        [ $lang->txt('Reports'), 'menu',[
-        'reports',
-        ]],
-        [ $lang->txt('Search'), 'search',[
-        'advancedsearch',
-        'nataccredsearch',
-        ]],
-        [ $lang->txt('System'), 'system',[
-        'settings',
-        'usermanagement',
-        'seasons',
-        'processlog',
-        'mrt_admin',
-        'auditlog',
         ]],
     );
 
@@ -1025,7 +769,7 @@ sub getClubMenuData {
     my @menu_structure = (
         [ $lang->txt('Dashboard'), 'home','home'],
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}), 'menu', [
-        'persons',
+        'persons_search',
         'newclearance',    
         'clearances',    
         'personrollover',
@@ -1043,7 +787,6 @@ sub getClubMenuData {
         'persons_addmaofficial',
         'bulk',
 		'bulkpayment',
-        'persons_search',
          ]],
 
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu',[

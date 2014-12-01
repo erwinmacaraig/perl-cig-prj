@@ -77,7 +77,7 @@ sub listPendingRegistrations    {
             p.intGender,
             p.intGender as Gender,
             DATE_FORMAT(pr.dtAdded, "%Y%m%d%H%i") as dtAdded_,
-            DATE_FORMAT(pr.dtAdded, "%Y-%m-%d %H:%i") as dtAdded_formatted,
+            DATE_FORMAT(pr.dtAdded, "%Y-%m-%d") as dtAdded_formatted,
             DATE_FORMAT(pr.dtLastUpdated, "%Y%m%d%H%i") as dtLastUpdated_,
             er.strEntityRoleName,
             WFT.strTaskType as WFTTaskType,
@@ -222,11 +222,11 @@ sub listPendingRegistrations    {
             field => 'Status',
             width  => 40,
         },
-        {
-            name  => $Data->{'lang'}->txt('Current Task'),
-            field => 'TaskType',
-            width  => 50,
-        },
+        #{
+        #    name  => $Data->{'lang'}->txt('Current Task'),
+        #    field => 'TaskType',
+        #    width  => 50,
+        #},
         {
             name  => $Data->{'lang'}->txt('Task Assigned To'),
             field => 'TaskTo',
@@ -327,7 +327,7 @@ sub listPendingRegistrations    {
    $title = '';
     # class="grid-filter-wrap"
     my $resultHTML = '';
-    #if(@rowdata){
+    if(@rowdata){
         $title = $lang->txt('Pending Registrations');
         my $grid = showGrid(
             Data    => $Data,
@@ -342,7 +342,7 @@ sub listPendingRegistrations    {
             $grid             
             </div>
         ];
-        #}
+    }
     if(@fielddata){
     	 my $grid2  = showGrid(
         Data    => $Data,
@@ -351,17 +351,16 @@ sub listPendingRegistrations    {
         gridid  => 'grid2',     
         width   => '99%',
         
-    );
-     $resultHTML .= qq[
-         <div style="clear:both"></div>
-         <div class="pageHeading">Pending Entity Registrations</div>
-         <div class="grid-filter-wrap">
-             $grid2          
-        </div> 
-    ];
-   
+        );
+        $resultHTML .= qq[
+            <div style="clear:both"></div>
+            <div class="pageHeading">Pending Entity Registrations</div>
+            <div class="grid-filter-wrap">
+                $grid2          
+            </div> 
+        ];
     }
-    else {
+    if(! @rowdata and ! @fielddata){
     	$resultHTML = 'No Pending Registrations';
     }
   
