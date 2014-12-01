@@ -12,7 +12,7 @@ use Utils;
 use strict;
 use AdminPageGen;
 use AdminCommon;
-use EventAdmin;
+#use EventAdmin;
 use FormHelpers;
 use HTMLForm;
 use TTTemplate;
@@ -35,66 +35,32 @@ sub main	{
 	my $target="admin_product.cgi";
 	my $error='';
 	my $db=connectDB();
-    if ($action eq "add") {
-	    #print $header;
-        my %Data = ();
-		$Data{'lang'} = '';
-		my $meta = {};
-		$meta->{'realms'} = getRealms($db, '', '&nbsp;');
-	    $meta->{'gendedropdown'} = popup_menu(
-					-name => 'gender',
-					-class => 'inputbox2',
-					-values => [0, $Defs::GENDER_MALE, $Defs::GENDER_FEMALE],
-					-labels => {
-						0 => 'Any',
-						$Defs::GENDER_MALE => $Defs::genderInfo{$Defs::GENDER_MALE},
-						$Defs::GENDER_FEMALE => $Defs::genderInfo{$Defs::GENDER_FEMALE},
-					},
-					-default => $Defs::genderInfo{$Defs::GENDER_NONE} || 0,
-				);
-		$meta->{'typedropdown'} = popup_menu(
-					-name => 'productfamily',
-					-class => 'inputbox2',
-					-values => ['', 'insurance', 'licence', 'transfer','passes'],
-					-labels => {
-						'' => 'Any',
-						'insurance' => 'Insurance', 'licence' => 'Licence',
-						'transfer' => 'Transfer Fee', 'passes' => 'Playing Pass',
-					},
-					-default => '',
-				);
-		
-		$meta->{'allowmultidropdown'} = popup_menu(
-					-name => 'allowmulti',
-					-class => 'inputbox2',
-					-values => ['0', '1'],
-					-labels => {'0' => 'One', '1' => 'Multiple',},
-					-default => '0',
-				);
-		
-		$meta->{'perioddropdown'} = getNationalPeriod($db, '', '&nbsp;');
 	
-        ($subBody,$menu) =  runTemplate(\%Data, $meta, 'admin/product/product_form.templ');
-        #($subBody,$menu) = show_add_product_form($db, $target);
+	my %Data = ();
+	$Data{'lang'} = '';
+    if ($action eq "add") {
+	
+        #($subBody,$menu) =  runTemplate(\%Data, $meta, 'admin/product/product_form.templ');
+        ($subBody,$menu) = show_add_product_form($db, \%Data);
     }	
 	elsif($action eq "addproduct" || $action eq "editproduct")	{
 		my $q = new CGI;
 	    my @names = $q->param;
-		#print "Content-type: text/html\n\n";
+		print "Content-type: text/html\n\n";
 		#foreach my $name (@names) {
 		#  say $name.'='.$q->param($name)."<br/>";
 		#}
 		($subBody,$menu)=handle_product($db, $action);
 	}
     elsif($action eq "edit") {
-		($subBody,$menu)=show_edit_product_form($db,$action,$target);
+		($subBody,$menu)=show_edit_product_form($db, \%Data);
 	}
 	
     elsif( $action eq "list") {
-        ($subBody,$menu) = list_products($db);
+        ($subBody,$menu) = list_products($db, \%Data);
    }
 	else	{
-		$subBody=list_products($db);
+		$subBody=list_products($db, \%Data);
 	}
 	$body=qq[<br> <div align="center"><a href="$target?action=add">Create New</a> | <a href="$target?action=list">Product List</a> | <a href="$target">Search</a> </div> $subBody] if $subBody;
 	disconnectDB($db) if $db;
@@ -156,10 +122,105 @@ sub getEntity {
 	return $db->selectrow_array($stmt);
 }
 
+sub gender_select{
+    my ($def_val) = @_;
+    return popup_menu(
+				-name => 'gender',
+				-class => 'inputbox2',
+				-values => [0, $Defs::GENDER_MALE, $Defs::GENDER_FEMALE],
+				-labels => {
+					0 => 'Any',
+					$Defs::GENDER_MALE => $Defs::genderInfo{$Defs::GENDER_MALE},
+					$Defs::GENDER_FEMALE => $Defs::genderInfo{$Defs::GENDER_FEMALE},
+				},
+				-default => $def_val || 0,
+			);
+}
+sub prodtype_select{
+    my ($def_val) = @_;
+    return popup_menu(
+					-name => 'productfamily',
+					-class => 'inputbox2',
+					-values => ['', 'insurance', 'licence', 'transfer','passes'],
+					-labels => {
+						'' => 'Any',
+						'insurance' => 'Insurance', 'licence' => 'Licence',
+						'transfer' => 'Transfer Fee', 'passes' => 'Playing Pass',
+					},
+					-default => $def_val,
+				);
+}
+
+sub allowmulti_select{
+    my ($def_val) = @_;
+    return popup_menu(
+			   -name => 'allowmulti',
+				-class => 'inputbox2',
+				-style => 'width:20%',
+				-values => ['0', '1'],
+				-labels => {'0' => 'One', '1' => 'Multiple',},
+				-default => $def_val,
+			);
+}
+
+sub agelevel_select{
+    my ($def_val) = @_;
+    return popup_menu(
+			-name => 'agelevel',
+			-class => 'inputbox2',
+			-values => [$Defs::AGE_LEVEL_ALL, $Defs::AGE_LEVEL_ADULT, $Defs::AGE_LEVEL_MINOR],
+				
+			-default => $def_val,
+		);
+}
+
+sub personlevel_select{
+    my ($def_val) = @_;
+    my @personlevel_keys = keys %Defs::personLevel;
+	my @personlevel_values = values %Defs::personLevel;
+    return popup_menu(
+			  -name => 'personlevel',
+			  -class => 'inputbox2',
+			  -values => [@personlevel_keys],
+			  -labels => \%Defs::personLevel,
+			  -default => $def_val,
+			  );
+}
+
+sub role_select{
+    my ($def_val) = @_;
+    popup_menu(
+			-name => 'role',
+			-class => 'inputbox2',
+			-values => ['1','2','3','4','5','6'],
+			-labels => {
+				'1' => $Defs::memberTypeName{'1'},
+				'2' => $Defs::memberTypeName{'2'},
+				'3' => $Defs::memberTypeName{'3'},
+				'4' => $Defs::memberTypeName{'4'},
+				'5' => $Defs::memberTypeName{'5'},
+				'6' => $Defs::memberTypeName{'6'}
+			},
+			-default => $def_val,
+			);
+}
+
+sub sports_select{
+    my ($def_val) = @_;
+    popup_menu(
+		-name => 'strSport',
+		-class => 'inputbox2',
+		-values => [keys \%Defs::sportType],
+		-labels => \%Defs::sportType,
+		-default => $def_val,
+		);
+}
+
 sub handle_product {
   my ($db,$action) = @_;
   
   my @values = ();
+  my @regvalues = ();
   my $productName = param('strname') || '';
   my $realmID = param('realmID') || '';
   #my $defaultAmount = param('defaultamount') || '0';
@@ -215,6 +276,36 @@ sub handle_product {
   my $q = $db->prepare($stmt);
   $q->execute(@values);
   my $prodtID = $q->{mysql_insertid};
+  
+  push @regvalues, ($realmID,
+		param('intOriginLevel') || '0',
+		param('strRuleFor') || 'REGO',
+		param('intEntityLevel') || '',
+		param('strRegistrationNature') || 'NEW',
+		uc( $Defs::memberTypeName{ param('role') } ),
+		param('personlevel'),
+		param('strSport') || '',
+		param('agelevel') || '',
+		'PRODUCT',
+		$prodtID);
+  
+  say Dumper(@regvalues);
+  
+  if( $prodtID ) {
+	  #
+	  $stmt = qq[
+	  INSERT INTO tblRegistrationItem
+	  (intRealmID, intOriginLevel, strRuleFor, intEntityLevel, strRegistrationNature,
+	   strPersonType, strPersonLevel, strSport, strAgeLevel,
+	   strItemType, intID)
+	  VALUES (?,?,?,?,?,?,?,?,?,?,?)
+	];
+	say $stmt;
+	my $q2 = $db->prepare($stmt);
+	$q2->execute(@regvalues);
+    my $prodtID = $q2->{mysql_insertid};
+  }
+  
   print "Content-type: text/html\n\n";
   print "<script type='text/javascript'>";
   print "window.parent.product.show_status('$msg');";
@@ -224,18 +315,20 @@ sub handle_product {
 }
 
 sub show_edit_product_form{
-    my ($db, $action) = @_;
+    my ($db, %Data) = @_;
 	my $pid = param('productid') || 0;
-	my %Data = ();
-	$Data{'lang'} = '';
+	#my %Data = ();
+	#$Data{'lang'} = '';
 	my $meta = {};
 	
 	my $stmt=qq[
 	SELECT p.intProductID, p.strName, p.strProductNotes, p.curDefaultAmount, p.strGSTText,
 	intProductGender, p.intRealmID, p.strProductType, p.intAllowMultiPurchase,
-	n.strNationalPeriodName, n.intNationalPeriodID
+	n.strNationalPeriodName, n.intNationalPeriodID, p.strNationality_IN,
+	r.strPersonType, r.strAgeLevel, r.strPersonLevel, r.strSport
 	FROM tblProducts p
 	LEFT JOIN tblNationalPeriod n ON p.intProductNationalPeriodID=n.intNationalPeriodID
+	LEFT JOIN tblRegistrationItem r ON p.intProductID=r.intID
 	WHERE intProductID = $pid
 	ORDER BY p.intProductID ASC
 	];
@@ -251,52 +344,62 @@ sub show_edit_product_form{
 	$meta->{defaultamount} = $results->{'curDefaultAmount'};
 	$meta->{strtaxtext} = $results->{'strGSTText'};
 	$meta->{strproductnotes} = $results->{'strProductNotes'};
-	$meta->{nationalperiod} = $results->{'strNationalPeriodName'};
-	$meta->{nationalperiod} = $results->{'strProductType'};
+	#$meta->{nationalperiod} = $results->{'strNationalPeriodName'};
+	#$meta->{nationalperiod} = $results->{'strProductType'};
+	$meta->{strnationality} = $results->{'strNationality_IN'};
 	
-	$meta->{'gendedropdown'} = popup_menu(
-					-name => 'gender',
-					-class => 'inputbox2',
-					-values => [0, $Defs::GENDER_MALE, $Defs::GENDER_FEMALE],
-					-labels => {
-						0 => 'Any',
-						$Defs::GENDER_MALE => $Defs::genderInfo{$Defs::GENDER_MALE},
-						$Defs::GENDER_FEMALE => $Defs::genderInfo{$Defs::GENDER_FEMALE},
-					},
-					-default => $results->{'intProductGender'} || 0,
-				);
-	
+	$meta->{'gendedropdown'} = gender_select($results->{'intProductGender'} || 0);
 	#$meta->{'realms'} = getDBdrop_down('realmID',$db,$rstmt,$results->{'intRealmID'}, '') || '';
 	$meta->{'realms'} = getRealms($db, $results->{'intRealmID'}, '');
+	$meta->{'typedropdown'} = prodtype_select($results->{'strProductType'});
 	
-	$meta->{'typedropdown'} = popup_menu(
-					-name => 'productfamily',
-					-class => 'inputbox2',
-					-values => ['', 'insurance', 'licence', 'transfer','passes'],
-					-labels => {
-						'' => 'Any',
-						'insurance' => 'Insurance', 'licence' => 'Licence',
-						'transfer' => 'Transfer Fee', 'passes' => 'Playing Pass',
-					},
-					-default => $results->{'strProductType'},
-				);
 	$meta->{'perioddropdown'} = getNationalPeriod($db, $results->{'intNationalPeriodID'}, '');
 	
-	$meta->{'allowmultidropdown'} = popup_menu(
-					-name => 'allowmulti',
-					-class => 'inputbox2',
-					-values => ['0', '1'],
-					-labels => {'0' => 'One', '1' => 'Multiple',},
-					-default => $results->{'intAllowMultiPurchase'} ? 0 : 1,
-				);
+	$meta->{'allowmultidropdown'} = allowmulti_select($results->{'intAllowMultiPurchase'} ? 0 : 1);
+	
+	$meta->{'agedropdown'} = agelevel_select($results->{'strAgeLevel'});
+	
+	$meta->{'roledropdown'} = role_select($results->{'strPersonType'});
+	$meta->{'personleveldropdown'} = personlevel_select($results->{'strPersonLevel'});
+	$meta->{'sportsdropdown'} = sports_select($results->{'strSport'});
 	
 	return runTemplate(\%Data, $meta, 'admin/product/product_form.templ');
 }
 
+sub show_add_product_form{
+  my ($db, %Data) = @_;
+  #my %Data = ();
+  #$Data{'lang'} = '';
+  my $meta = {};
+		$meta->{'realms'} = getRealms($db, '', '&nbsp;');
+	    $meta->{'gendedropdown'} = gender_select($Defs::genderInfo{$Defs::GENDER_NONE});
+		
+		$meta->{'typedropdown'} = prodtype_select('');
+		
+		$meta->{'allowmultidropdown'} = allowmulti_select('0');
+		
+		$meta->{'agedropdown'} = agelevel_select($Defs::AGE_LEVEL_ADULT);
+		
+		#print "Content-type: text/html\n\n";
+		
+		#say Dumper(@personlevel_keys);
+		#say Dumper(@personlevel_values);
+		$meta->{'personleveldropdown'} = personlevel_select('');
+		
+		$meta->{'roledropdown'} = role_select('');
+		
+		$meta->{'sportsdropdown'} = sports_select('');
+		
+		$meta->{'perioddropdown'} = getNationalPeriod($db, '', '&nbsp;');
+	
+        return runTemplate(\%Data, $meta, 'admin/product/product_form.templ');
+  
+}
+
 sub list_products{
-    my ($db, $pid) = @_;
-	my %Data = ();
-	$Data{'lang'} = '';
+    my ($db, %Data, $pid) = @_;
+	#my %Data = ();
+	#$Data{'lang'} = '';
 	my $meta = {};
 	
 	my $stmt=qq[
