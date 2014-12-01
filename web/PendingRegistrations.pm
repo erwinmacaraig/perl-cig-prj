@@ -222,11 +222,11 @@ sub listPendingRegistrations    {
             field => 'Status',
             width  => 40,
         },
-        {
-            name  => $Data->{'lang'}->txt('Current Task'),
-            field => 'TaskType',
-            width  => 50,
-        },
+        #{
+        #    name  => $Data->{'lang'}->txt('Current Task'),
+        #    field => 'TaskType',
+        #    width  => 50,
+        #},
         {
             name  => $Data->{'lang'}->txt('Task Assigned To'),
             field => 'TaskTo',
