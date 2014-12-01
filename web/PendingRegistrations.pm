@@ -77,7 +77,7 @@ sub listPendingRegistrations    {
             p.intGender,
             p.intGender as Gender,
             DATE_FORMAT(pr.dtAdded, "%Y%m%d%H%i") as dtAdded_,
-            DATE_FORMAT(pr.dtAdded, "%Y-%m-%d %H:%i") as dtAdded_formatted,
+            DATE_FORMAT(pr.dtAdded, "%Y-%m-%d") as dtAdded_formatted,
             DATE_FORMAT(pr.dtLastUpdated, "%Y%m%d%H%i") as dtLastUpdated_,
             er.strEntityRoleName,
             WFT.strTaskType as WFTTaskType,
