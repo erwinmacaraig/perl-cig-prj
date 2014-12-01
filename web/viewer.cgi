@@ -122,7 +122,7 @@ sub main	{
     # BUILD PAGE
     my $TemplateData = $dref;
     $TemplateData->{'showButtons'} = $action eq 'review' ? 1 : 0;
-
+	$TemplateData->{'client'} = $client;
     $resultHTML = runTemplate(
           \%Data,
           $TemplateData,

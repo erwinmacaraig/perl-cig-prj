@@ -1533,21 +1533,28 @@ sub setEntityStatus  {
 sub verifyDocument {
     my ($Data) = @_;
 
-    my $WFTaskID = safe_param('TID','number') || '';
-    my $documentID = safe_param('did','number') || '';
+    #my $WFTaskID = safe_param('TID','number') || '';
+    #my $documentID = safe_param('did','number') || '';
+	my  $documentID = safe_param('f','number') || 0;
+	my $documentStatus = param('status') || '';
+	if($documentID){
+    	my $st = qq[
+        	UPDATE tblDocuments
+        	SET
+        	    strApprovalStatus = ?
+        	WHERE
+        		intUploadFileID = ?
+    	];
 
-    my $st = qq[
-        UPDATE tblDocuments
-        SET
-            strApprovalStatus = 'VERIFIED'
-        WHERE
-        intDocumentID = ?
-    ];
-
-    my $q = $Data->{'db'}->prepare($st);
-    $q->execute(
-        $documentID
-    );
+    	my $q = $Data->{'db'}->prepare($st);
+    	$q->execute(
+			$documentStatus,
+        	$documentID
+    	);
+		open FH, ">dumpfile.txt";
+		print FH "Query: \n $st";
+		print FH "documentStatus: $documentStatus \n documentID = $documentID\n";
+	}
 
 }
 

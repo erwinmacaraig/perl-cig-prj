@@ -123,7 +123,7 @@ sub showPersonHome	{
     $RegFilters{'statusIN'} = \@statusIN;
     my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
 	
-	open FH, ">dumpfile.txt";
+	#open FH, ">dumpfile.txt";
 	
     foreach my $rego (@{$Reg_ref})  {
         my $renew = '';
@@ -149,7 +149,7 @@ $renew = $Data->{'target'} . "?client=$client&amp;a=PREGF_TU&amp;pt=$rego->{'str
 	#push @{$Reg_ref},\%reg_docs;
     $TemplateData{'RegistrationInfo'} = $Reg_ref;
 	
-	print FH "Dump of template data \n" . Dumper($TemplateData{'RegistrationInfo'}) . "\n"; 
+	#print FH "Dump of template data \n" . Dumper($TemplateData{'RegistrationInfo'}) . "\n"; 
 
 
 
