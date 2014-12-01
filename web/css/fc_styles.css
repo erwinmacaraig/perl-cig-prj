@@ -826,6 +826,15 @@ i.indicator {
     width: 100%;
 }
 
+.col-md-3 #flowSummary {
+    background-color: none;
+    border: 0px solid #000000;
+    float: right;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
 /* Search Styles:: Vincent R */
 .search-panel input{
 	padding: 10px 40px;
