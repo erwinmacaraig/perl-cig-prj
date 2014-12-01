@@ -1,4 +1,22 @@
-[% USE Dumper %]
+
+[% IF FlashMessage.flash.type %]
+<div class="col-md-12">
+    <div class="alert alert-warning" role="alert">
+        <div>
+        [% IF FlashMessage.flash.type == 'success' %]
+            <span class="fa flash_success fa-exclamation"></span>
+            <p>[% FlashMessage.flash.message %]</p>
+        [% ELSIF FlashMessage.flash.type == 'error' %]
+            <span class="fa flash_error fa-exclamation"></span>
+            <p>[% FlashMessage.flash.message %]</p>
+        [% END %]
+        <br/>
+        </div>
+    </div>
+</div>
+[% END %]
+
+
 [% IF Notifications.size %]
     <div class="col-md-9">
         <div class="alert alert-info" role="alert">
@@ -12,7 +30,7 @@
 [% END %]
 
 <div class="col-md-9 tasklist-content dashboard-tasklist">
-	<table id="example" cellpadding="5" width="100%">
+	<table id="worktasks" cellpadding="5" width="100%">
 		<thead>
 			<tr class="box-header">
 				<th>Tasklist</th>
@@ -20,26 +38,29 @@
 				<th>Status</th>
 				<th>Actions</th>
 			</tr>
-			<tr>
-				<td>Filter by:
+			<tr class="order-override">
+				<td><!--Filter by:-->
 					<select class="filter-tasks">
-			          <option selected="" value="-- Task --">-- Task --</option>
-			          <option value="Registrations">Registrations</option>
-			          <option value="Transfers">Transfers</option>
+			          <option selected="" value="">-- All --</option>
+			          <option value="New Registration">New Registration</option>
+			          <option value="Transfer">Transfer</option>
+			          <option value="Renewal">Renewal</option>
+			          <option value="Amendment">Amendment</option>
 			        </select>
 		        </td>
 				<td>
-					<select>
-			          <option value="-- Date --">-- Date --</option>
-			          <option value="Latest">Latest</option>
-			          <option value="Oldest">Oldest</option>
+					<select class="sort-date">
+			          <option value="asc">-- Sort --</option>
+			          <option value="desc">Latest</option>
+			          <option value="asc">Oldest</option>
 			        </select>
 				</td>
 				<td>
-					<select id="u53_input">
-			          <option value="-- Status --">-- Status --</option>
-			          <option value="Pending">Pending</option>
-			          <option value="In Progress">In Progress</option>
+					<select class="filter-status" id="u53_input">
+			          <option value="">-- All --</option>
+			          <option value="Active">Active</option>
+			          <option value="On hold">On hold</option>
+			          <option value="Rejected">Rejected</option>
 			        </select>
 				</td>
 				<td class="list-action-filter">
@@ -49,6 +70,13 @@
                     </div>
 				</td>
 			</tr>
+			<tr style="display: none" class="box-header">
+				<th>Tasklist</th>
+				<th>Started</th>
+				<th>Status</th>
+				<th>Actions</th>
+			</tr>
+
 		</thead>
 		<tbody>
 		    [% FOREACH task IN TaskList %]
@@ -57,7 +85,7 @@
                         <td style="word-wrap: break-word;width: 280px;">
                             <span style="float: left" class="fa fa-user"></span>
                             <div style="float: left; word-wrap: break-word;width: 80%;">
-                            Transfer of <br/>
+                            [% task.personRequestLabel %]<br/>
                             [% task.Name %] from <br/>
                             [% task.requestFrom %] to [% task.requestTo %]
                             </div>
@@ -66,7 +94,7 @@
                         <td style="word-wrap: break-word;width: 280px;">
                             <span style="float: left" class="fa fa-user"></span>
                             <div style="float: left; word-wrap: break-word;width: 80%;">
-                            Request Access of <br/>
+                            [% task.personRequestLabel %]<br/>
                             [% task.Name %] from <br/>
                             [% task.requestFrom %]
                             </div>
@@ -105,13 +133,6 @@
 		    [% END %]
 
 		</tbody>
-        <tfoot>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-        </tfoot>
-
 	</table>
 </div>
 
@@ -159,33 +180,51 @@
 	</div>
 </div>
 
-
 <script src = "//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript">
-/*
     jQuery().ready(function() {
-            // Setup - add a text input to each footer cell
-                jQuery('#example').dataTable({
-                    "ordering": false,
-                });
-                jQuery('#example tfoot th').each( function () {
-                            var title = jQuery('#example thead th').eq( jQuery(this).index() ).text();
-                                    jQuery(this).html( '<input type="text" placeholder="Search '+title+'" />' );
-                                        } );
-                 
-                     // DataTable
-                         var table = jQuery('#example').DataTable();
-                          
-                              // Apply the search
-                                  table.columns().eq( 0 ).each( function ( colIdx ) {
-                                              jQuery( 'input', table.column( colIdx ).footer() ).on( 'keyup change', function () {
-                                                              table
-                                                                              .column( colIdx )
-                                                                                              .search( this.value )
-                                                                                                              .draw();
-                                                                                                                      } );
-                                                  } );
+        var dttable = jQuery('#worktasks').dataTable({
+            "order": []
+        });
+
+        var api = dttable.api();
+        var taskscol = api.column(0);
+
+        var tasktype = jQuery("select.filter-tasks");
+
+        jQuery(tasktype).on('change', function(){
+            var index = jQuery(this).find(":selected").index();
+            var val = jQuery.fn.dataTable.util.escapeRegex(jQuery(this).val());
+
+            taskscol
+                .search( val ? val : '', true, false )
+                .draw();               
+        });
+
+        var taskstatus = jQuery("select.filter-status");
+
+        var tstatuscol = api.column(2);
+        jQuery(taskstatus).on('change', function(){
+            var index = jQuery(this).find(":selected").index();
+            var val = jQuery.fn.dataTable.util.escapeRegex(jQuery(this).val());
+
+            tstatuscol
+                .search( val ? '^'+val+'$' : '', true, false )
+                .draw();               
+
+        });
+
+        var tdate = jQuery("select.sort-date");
+        var tdatecol = api.column(1);
+
+        jQuery(tdate).on('change', function(){
+            var index = jQuery(this).find(":selected").index();
+            var val = jQuery.fn.dataTable.util.escapeRegex(jQuery(this).val());
+
+            tdatecol
+                .order(val).draw();
+        });
     });
-*/
+
 </script>
 
