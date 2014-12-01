@@ -2270,6 +2270,7 @@ sub populateDocumentViewData {
             ON (
                 entityItem.strItemType = 'DOCUMENT'
                 AND entityItem.intOriginLevel = wr.intOriginLevel
+                AND regoItem.strRegistrationNature = '$dref->{'strRegistrationNature'}'
                 AND entityItem.strRuleFor = 'ENTITY'
                 AND entityItem.intID = rd.intDocumentTypeID
                 AND entityItem.intEntityLevel = wr.intEntityLevel
