@@ -343,7 +343,6 @@ sub listPendingRegistrations    {
             </div>
         ];
         #}
-    if(@fielddata){
     	 my $grid2  = showGrid(
         Data    => $Data,
         columns => \@entityheadersgrid,
@@ -359,9 +358,7 @@ sub listPendingRegistrations    {
              $grid2          
         </div> 
     ];
-   
-    }
-    else {
+    if(! @rowdata and ! @fielddata){
     	$resultHTML = 'No Pending Registrations';
     }
   
