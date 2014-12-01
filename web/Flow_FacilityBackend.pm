@@ -845,7 +845,8 @@ sub display_documents {
         #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
         Content => '',
         Title => '',
-        TextTop => $content,
+        TextTop => '',
+				DocumentsLists => $content,
         TextBottom => '',
     );
 
