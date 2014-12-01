@@ -25,6 +25,7 @@ use DefCodes;
 use RegoProducts;
 use RegistrationItem;
 use FacilityTypes;
+use PersonUserAccess;
 use Data::Dumper;
 
 sub setProcessOrder {
@@ -143,29 +144,22 @@ sub setupValues {
         $nonlatinscript =   qq[
            <script>
                 jQuery(document).ready(function()  {
-                    jQuery('#l_row_strLatinName').find('input').prop('disabled', true);
-                    jQuery('#l_row_strLatinName').hide();
-                    jQuery('#l_row_strLatinShortName').find('input').prop('disabled', true);
-                    jQuery('#l_row_strLatinShortName').hide();
                     jQuery('#l_intLocalLanguage').change(function()   {
+                        showLocalLanguage();
+                    });
+                    function showLocalLanguage()    {
                         var lang = parseInt(jQuery('#l_intLocalLanguage').val());
                         nonlatinvals = [$vals];
                         if(nonlatinvals.indexOf(lang) !== -1 )  {
-                            jQuery('#l_row_strLatinName').find('input').prop('disabled', false);
-                            jQuery('#l_row_strLatinName').show();
-                            jQuery('#l_row_strLatinShortName').find('input').prop('disabled', false);
-                            jQuery('#l_row_strLatinShortName').show();
+                            jQuery('#fsg-latinnames').show();
                         }
                         else    {
-                            jQuery('#l_row_strLatinName').find('input').prop('disabled', true);
-                            jQuery('#l_row_strLatinName').hide();
-                            jQuery('#l_row_strLatinShortName').find('input').prop('disabled', true);
-                            jQuery('#l_row_strLatinShortName').hide();
+                            jQuery('#fsg-latinnames').hide();
                         }
-                    });
+                    }
+                    showLocalLanguage();
                 });
             </script> 
-
         ];
     }
     my ($DefCodes, $DefCodesOrder) = getDefCodes(
@@ -186,6 +180,7 @@ sub setupValues {
                     options     => \%facilityTypeOptions,
                     firstoption => [ '', 'Select Type' ],
                     compulsory => 1,
+                    sectionname => 'core2',
                 },
                 strLocalName => {
                     label       => $FieldLabels->{'strLocalName'},
@@ -194,6 +189,7 @@ sub setupValues {
                     size        => '40',
                     maxsize     => '50',
                     compulsory  => 1,
+                    sectionname => 'core',
                 },
                 strLocalShortName => {
                     label       => $FieldLabels->{'strLocalShortName'},
@@ -201,6 +197,7 @@ sub setupValues {
                     type        => 'text',
                     size        => '40',
                     maxsize     => '50',
+                    sectionname => 'core',
                 },
                 strCity         => {
                     label       => $FieldLabels->{'strCity'},
@@ -209,6 +206,7 @@ sub setupValues {
                     size        => '30',
                     maxsize     => '45',
                     compulsory  => 1,
+                    sectionname => 'core2',
                 },
                 strRegion       => {
                     label       => $FieldLabels->{'strRegion'},
@@ -216,6 +214,7 @@ sub setupValues {
                     type        => 'text',
                     size        => '30',
                     maxsize     => '45',
+                    sectionname => 'core2',
                 },
                 strISOCountry   => {
                     label       => $FieldLabels->{'strISOCountry'},
@@ -224,6 +223,7 @@ sub setupValues {
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
                     compulsory => 1,
+                    sectionname => 'core2',
                 },
                 intLocalLanguage => {
                     label       => $FieldLabels->{'intLocalLanguage'},
@@ -233,6 +233,7 @@ sub setupValues {
                     firstoption => [ '', 'Select Language' ],
                     compulsory => 1,
                     posttext => $nonlatinscript,
+                    sectionname => 'core',
                 },
                 strLatinName    => {
                     label       => $self->{'SystemConfig'}{'facility_strLatinNames'} || $FieldLabels->{'strLatinName'},
@@ -240,8 +241,8 @@ sub setupValues {
                     type        => 'text',
                     size        => '40',
                     maxsize     => '50',
-                    compulsory  => 1,
                     active      => $nonLatin,
+                    sectionname => 'latinnames',
                 },
                 strLatinShortName => {
                     label       => $self->{'SystemConfig'}{'facility_strLatinShortNames'} || $FieldLabels->{'strLatinShortName'},
@@ -250,19 +251,25 @@ sub setupValues {
                     size        => '40',
                     maxsize     => '50',
                     active      => $nonLatin,
+                    sectionname => 'latinnames',
                 },
             },
             'order' => [qw(
-                intFacilityTypeID
                 strLocalName
                 strLocalShortName
+                intLocalLanguage
                 strLatinName
                 strLatinShortName
+                intFacilityTypeID
                 strCity
                 strRegion
                 strISOCountry
-                intLocalLanguage
             )],
+            sections => [
+                [ 'core',        '' ],
+                [ 'latinnames',   '','','dynamic-panel'],
+                [ 'core2',        '' ],
+            ],
             fieldtransform => {
                 textcase => {
                     #strLocalFirstname => $field_case_rules->{'strLocalFirstname'} || '',
@@ -293,7 +300,6 @@ sub setupValues {
                     type        => 'text',
                     size        => '30',
                     maxsize     => '100',
-                    compulsory  => 1,
                 },
                 strState => {
                     label       => $FieldLabels->{'strState'},
@@ -338,6 +344,7 @@ sub setupValues {
                     type        => 'text',
                     size        => '50',
                     maxsize     => '100',
+                    compulsory  => 1,
                 },
                 strFax => {
                     label       => $FieldLabels->{'strFax'},
@@ -358,15 +365,15 @@ sub setupValues {
             'order' => [qw(
                 strAddress
                 strAddress2
-                strContactCity
                 strState
                 strPostalCode
-                strContactISOCountry
-                strPhone
-                strEmail
                 strFax
                 strWebURL
                 strContact
+                strContactCity
+                strContactISOCountry
+                strPhone
+                strEmail
             )],
             #fieldtransform => {
                 #textcase => {
@@ -405,8 +412,19 @@ sub setupValues {
 sub display_core_details { 
     my $self = shift;
 
-    #my $fieldperms = $self->{'Data'}->{'Permissions'};
-    #my $memperm = ProcessPermissions($fieldperms, $self->{'FieldSets'}{'core'}, 'Person',);
+    my $id = $self->ID() || 0;
+    if($id)   {
+        my $facilityObj = new EntityObj(db => $self->{'db'}, ID => $id);
+        $facilityObj->load();
+        if($facilityObj->ID())    {
+            my $objectValues = $self->loadObjectValues($facilityObj);
+            $self->setupValues($objectValues);
+        }
+        if(!doesUserHaveEntityAccess($self->{'Data'}, $id,'WRITE')) {
+            return ('Invalid User',0);
+        }
+    }
+
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
@@ -429,8 +447,7 @@ sub validate_core_details {
     my $self = shift;
 
     my $facilityData = {};
-    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Club',);
-    ($facilityData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
+    ($facilityData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields();
 
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
@@ -442,6 +459,11 @@ sub validate_core_details {
     my $entityID = getID($self->{'ClientValues'});
 
     my $id = $self->ID() || 0;
+    if($id) {
+        if(!doesUserHaveEntityAccess($self->{'Data'}, $id,'WRITE')) {
+            return ('Invalid User',0);
+        }
+    }
     my $facilityObj = new EntityObj(db => $self->{'db'}, ID => $id);
     $facilityObj->load();
     $facilityData->{'strStatus'} = $Defs::ENTITY_STATUS_PENDING;
@@ -476,12 +498,29 @@ sub validate_core_details {
         $query->finish();
         createTempEntityStructure($self->{'Data'}); 
     }
+    else    {
+        push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
+        $self->decrementCurrentProcessIndex();
+        return ('',2);
+    }
 
     return ('',1);
 }
 
 sub display_contact_details {
     my $self = shift;
+    my $id = $self->ID() || 0;
+    if($id)   {
+        my $facilityObj = new EntityObj(db => $self->{'db'}, ID => $id);
+        $facilityObj->load();
+        if($facilityObj->ID())    {
+            my $objectValues = $self->loadObjectValues($facilityObj);
+            $self->setupValues($objectValues);
+        }
+        if(!doesUserHaveEntityAccess($self->{'Data'}, $id,'WRITE')) {
+            return ('Invalid User',0);
+        }
+    }
 
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
     my %PageData = (
@@ -916,3 +955,49 @@ sub display_complete {
 
     return ($pagedata,0);
 }
+
+sub loadObjectValues    {
+    my $self = shift;
+    my ($object) = @_;
+
+    my %values = ();
+    if($object) {
+        for my $field (qw(
+            strLocalName
+            strLocalShortName
+            intLocalLanguage
+            strLatinName
+            strLatinShortName
+            strCity
+            strRegion
+            strISOCountry
+
+            strAddress
+            strAddress2
+            strContactCity
+            strState
+            strPostalCode
+            strContactISOCountry
+            strPhone
+            strEmail
+
+            strEntityType
+            intLegalTypeID
+            strLegalID
+            strDiscipline
+            strOrganisationLevel
+            strMANotes
+            intFacilityTypeID
+            strGender
+            strDiscipline
+            strEntityType
+            intNotifications
+            intEntityFieldCount
+
+        )) {
+            $values{$field} = $object->getValue($field);
+        }
+    }
+    return \%values;
+}
+

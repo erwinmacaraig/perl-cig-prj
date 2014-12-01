@@ -163,7 +163,7 @@ sub setupValues    {
         my $vals = join(',',@nonLatinLanguages);
         $nonlatinscript =   qq[
            <script>
-                \$(document).ready(function()  {
+                jQuery(document).ready(function()  {
                     jQuery('#l_intLocalLanguage').change(function()   {
                         showLocalLanguage();
                     });
@@ -171,10 +171,10 @@ sub setupValues    {
                         var lang = parseInt(jQuery('#l_intLocalLanguage').val());
                         nonlatinvals = [$vals];
                         if(nonlatinvals.indexOf(lang) !== -1 )  {
-                            \$('#fsg-latinnames').show();
+                            jQuery('#fsg-latinnames').show();
                         }
                         else    {
-                            \$('#fsg-latinnames').hide();
+                            jQuery('#fsg-latinnames').hide();
                         }
                     }
                     showLocalLanguage();
@@ -921,7 +921,6 @@ sub display_core_details    {
 
     my $id = $self->ID() || 0;
     my $defaultType = $self->{'RunParams'}{'dtype'} || '';
-warn("PPPID $id");
     if($id)   {
         my $personObj = new PersonObj(db => $self->{'db'}, ID => $id);
         $personObj->load();
