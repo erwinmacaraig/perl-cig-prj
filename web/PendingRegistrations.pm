@@ -327,7 +327,7 @@ sub listPendingRegistrations    {
    $title = '';
     # class="grid-filter-wrap"
     my $resultHTML = '';
-    #if(@rowdata){
+    if(@rowdata){
         $title = $lang->txt('Pending Registrations');
         my $grid = showGrid(
             Data    => $Data,
@@ -342,7 +342,8 @@ sub listPendingRegistrations    {
             $grid             
             </div>
         ];
-        #}
+    }
+    if(@fielddata){
     	 my $grid2  = showGrid(
         Data    => $Data,
         columns => \@entityheadersgrid,
@@ -350,14 +351,15 @@ sub listPendingRegistrations    {
         gridid  => 'grid2',     
         width   => '99%',
         
-    );
-     $resultHTML .= qq[
-         <div style="clear:both"></div>
-         <div class="pageHeading">Pending Entity Registrations</div>
-         <div class="grid-filter-wrap">
-             $grid2          
-        </div> 
-    ];
+        );
+        $resultHTML .= qq[
+            <div style="clear:both"></div>
+            <div class="pageHeading">Pending Entity Registrations</div>
+            <div class="grid-filter-wrap">
+                $grid2          
+            </div> 
+        ];
+    }
     if(! @rowdata and ! @fielddata){
     	$resultHTML = 'No Pending Registrations';
     }
