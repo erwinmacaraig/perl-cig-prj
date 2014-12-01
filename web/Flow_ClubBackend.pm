@@ -886,8 +886,9 @@ sub display_documents {
         #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
         Content => '',
         Title => '',
-        TextTop => $content,
+        TextTop => '',
         TextBottom => '',
+        DocumentsLists => $content,
     );
 
     my $pagedata = $self->display(\%PageData);
