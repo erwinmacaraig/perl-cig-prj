@@ -196,9 +196,30 @@ sub pageMain {
         
     my $statscounter = $Defs::NoStats ? '' : getStatsCounterCode();
 
+    my %HomeAction = (
+        $Defs::LEVEL_INTERNATIONAL =>  'E_HOME',
+        $Defs::LEVEL_INTREGION =>  'E_HOME',
+        $Defs::LEVEL_INTZONE =>  'E_HOME',
+        $Defs::LEVEL_NATIONAL =>  'E_HOME',
+        $Defs::LEVEL_STATE =>  'E_HOME',
+        $Defs::LEVEL_REGION =>  'E_HOME',
+        $Defs::LEVEL_ZONE =>  'E_HOME',
+        $Defs::LEVEL_CLUB =>  'C_HOME',
+        $Defs::LEVEL_PERSON =>  'P_HOME',
+    );
+
+    my ($navTree, $navObjects) = Navbar::GenerateTree($Data, $clientValues_ref);
+
+    my %NavData= (
+        NavTree => $navTree,
+        Menu => '',
+        HomeURL => "$Data->{'target'}?client=$homeClient&amp;a=".$HomeAction{$Data->{'clientValues'}{'authLevel'}},
+    );
+
   my $globalnav = runTemplate(
     $Data,
-    {PassportLink => ''},
+    #{PassportLink => ''},
+    \%NavData,
     'user/globalnav.templ',
   );
 

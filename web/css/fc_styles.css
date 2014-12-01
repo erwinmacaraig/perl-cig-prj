@@ -115,7 +115,7 @@ header .utilities {
 }
 
 header .utilities ul {
-	margin: 0;
+	margin: 5px 0 0 0;
 	padding: 0;
 	float: right;
 }
@@ -602,7 +602,7 @@ table.table tr td.align-right {
 }
 
 header nav ul#menu ul {
-	top:43px;
+	top:40px;
 }
 
 header ul#menu ul li a:hover {
@@ -925,10 +925,6 @@ a.btn-inside-docs-panel:hover {
 
 /*temporary adjustment to dispay drill down nav*/
 
-header nav {
-	padding-bottom:10px;
-}
-
 header nav ul li a {
 	padding-top:20px;
 	padding-bottom: 27px;
@@ -1081,4 +1077,19 @@ table.table tr th {
 }
 .fieldSectionGroup  {
     overflow:auto;
+}
+
+.access-level {
+	float:left;
+}
+
+.access-level p.viewAs {
+	color:#fff;
+	padding:5px 10px 0 0;
+	float:left;
+}
+
+.nav_session_levels {
+	-webkit-box-shadow:none;
+	box-shadow:none;
 }
