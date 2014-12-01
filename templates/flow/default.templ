@@ -22,6 +22,7 @@
 <h3 class="panel-header">Personal Details</h3>
 <div class="panel-body">
 <fieldset><p><span class="notice-error">*Required fields.</span></p></fieldset>
+[% IF DocumentsLists %][% DocumentsLists %][% END %]
 <form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">
     [% IF Content %][% Content %][% END %]
     [% IF FlowNextAction %]
