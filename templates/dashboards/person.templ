@@ -4,7 +4,7 @@
 		<div class="panel-body">
 			<br />
 			<div class="read-only">
-				<h4>Person information</h4>
+				<h4>[% Lang.txt('Personal Information') %]</h4>
 				<div class="read-only-text">
 					[% IF Details.LatinFirstname %]
 					<div class="">
@@ -29,14 +29,14 @@
 
 					[% IF Details.DOB %]
 				    <div class="">
-				        <span class="details-left">Date of Birth:</span>
+				        <span class="details-left">[% Lang.txt('Date of Birth') %]:</span>
 				        <span class="detail-value">[% Details.DOB %]</span>
 				    </div>
 					[% END %]
 
 					[% IF Details.BirthCountry %]
 				    <div class="">
-				      <span class="details-left">Country of Birth:</span>
+				      <span class="details-left">[% Lang.txt('Country of Birth') %]:</span>
 				      <span class="detail-value">[% Details.BirthCountry %]</span>
 				    </div>
 
@@ -44,14 +44,14 @@
 
 					[% IF Details.PassportNat %]
 				    <div class="">
-				      <span class="details-left">Nationality:</span>
+				      <span class="details-left">[% Lang.txt('Nationality') %]:</span>
 				      <span class="detail-value">[% Details.PassportNat %]</span>
 				    </div>
 					[% END %]
 
 					<div class="edit-container">
 					[% IF EditDetailsLink and !ReadOnlyLogin  %]
-					<a href = "[% EditDetailsLink %]" class="edit-link">
+					<a href = "[% EditDetailsLink %]&e_a=core" class="edit-link">
 						[% Lang.txt('Edit') %]
 					</a>
 					[% END %]
@@ -68,41 +68,38 @@
 					<div class="">
 					  	<span class="details-left">[% Lang.txt('Address 1:') %]</span>
 					  	<span class="detail-value">[% Details.Address1 %]</span>
+                        [% IF Details.Address2 %]
+                        <span class="detail-value">[% Details.Address2 %]</span>
+                        [% END %]
 					  	<span class="detail-value">[% Details.Suburb %]&nbsp;[% Details.State %]&nbsp;[% Details.PostalCode %]</span>
 				    </div>
 					[% END %]
 
-					[% IF Details.Address2 %]
-					<div class="">
-					<span class="details-left">[% Lang.txt('Address 2:') %]</span>
-					<span class="detail-value">[% Details.Address2 %]</span>
-					</div>
-					[% END %]
 
 					[% IF Details.PhoneHome %]
 					<span class="">
-				  	<span class="details-left">Home Phone:</span>
+				  	<span class="details-left">[% Lang.txt('Home Phone') %]:</span>
 				    <span class="detail-value">[% Details.PhoneHome %]</span>
 				  	</span>
 					[% END %]
 
 					[% IF Details.PhoneMobile %]
 					<span class="">
-				  	<span class="details-left">Mobile:</span>
+				  	<span class="details-left">[% Lang.txt('Mobile') %]:</span>
 				    <span class="detail-value">[% Details.PhoneMobile %]</span>
 				  	</span>
 					[% END %]
 
 					[% IF Details.Email %]
 					<span class="">
-				  	<span class="">Email:</span>
+				  	<span class="">[% Lang.txt('Email') %]:</span>
 				    <span class="detail-value"><a href="mailto:[% Details.Email %]">[% Details.Email %]</a></span>
 				  	</span>
 					[% END %]
 
 					<div class="edit-container">
 					[% IF EditDetailsLink and !ReadOnlyLogin  %]
-					<a href = "[% EditDetailsLink %]" class="edit-link">
+					<a href = "[% EditDetailsLink %]&e_a=con" class="edit-link">
 						[% Lang.txt('Edit') %]
 					</a>
 					[% END %]
@@ -154,7 +151,7 @@
 	<div class="col-md-3">
 		<div id = "">
 
-		<h3 class="panel-header">Member ID: [% IF Details.Status == "REGISTERED" OR Details.Status != "PENDING" %][% Details.NationalNum %][% ELSE %] - [% END %]</h3>
+		<h3 class="panel-header">[% Lang.txt('Member ID') %]: [% IF Details.Status == "REGISTERED" OR Details.Status != "PENDING" %][% Details.NationalNum %][% ELSE %] - [% END %]</h3>
 		<div class="panel-body">
 
 		<p class="reg-text">[% Name %]</p>

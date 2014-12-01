@@ -493,7 +493,7 @@ sub display_core_details {
 
     my $id = $self->ID() || 0;
     if($id)   {
-        my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id);
+        my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
         $clubObj->load();
         if($clubObj->ID())    {
             my $objectValues = $self->loadObjectValues($clubObj);
@@ -541,7 +541,7 @@ sub validate_core_details {
     my $entityID = getID($self->{'ClientValues'});
 
     my $id = $self->ID() || 0;
-    my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id);
+    my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
     $clubObj->load();
     if(!doesUserHaveEntityAccess($self->{'Data'}, $id,'WRITE')) {
         return ('Invalid User',0);
@@ -593,7 +593,7 @@ sub display_contact_details {
     my $self = shift;
     my $id = $self->ID() || 0;
     if($id)   {
-        my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id);
+        my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
         $clubObj->load();
         if($clubObj->ID())    {
             my $objectValues = $self->loadObjectValues($clubObj);
@@ -641,7 +641,7 @@ sub validate_contact_details {
         return ('',2);
     }
 
-    my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id);
+    my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
     $clubObj->load();
     $clubObj->setValues($clubData);
 
@@ -691,7 +691,7 @@ sub validate_role_details {
         return ('',2);
     }
 
-    my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id);
+    my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
     $clubObj->load();
     $clubObj->setValues($clubData);
 
@@ -912,7 +912,7 @@ sub display_complete {
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
     my $client = $self->{'Data'}->{'client'};
 
-    my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id);
+    my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
     $clubObj->load();
 
     my $content = '';

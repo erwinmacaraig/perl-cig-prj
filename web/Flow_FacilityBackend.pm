@@ -414,7 +414,7 @@ sub display_core_details {
 
     my $id = $self->ID() || 0;
     if($id)   {
-        my $facilityObj = new EntityObj(db => $self->{'db'}, ID => $id);
+        my $facilityObj = new EntityObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}->{'cache'});
         $facilityObj->load();
         if($facilityObj->ID())    {
             my $objectValues = $self->loadObjectValues($facilityObj);
@@ -464,7 +464,7 @@ sub validate_core_details {
             return ('Invalid User',0);
         }
     }
-    my $facilityObj = new EntityObj(db => $self->{'db'}, ID => $id);
+    my $facilityObj = new EntityObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}->{'cache'});
     $facilityObj->load();
     $facilityData->{'strStatus'} = $Defs::ENTITY_STATUS_PENDING;
     $facilityData->{'intRealmID'} = $self->{'Data'}{'Realm'};
@@ -511,7 +511,7 @@ sub display_contact_details {
     my $self = shift;
     my $id = $self->ID() || 0;
     if($id)   {
-        my $facilityObj = new EntityObj(db => $self->{'db'}, ID => $id);
+        my $facilityObj = new EntityObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}->{'cache'});
         $facilityObj->load();
         if($facilityObj->ID())    {
             my $objectValues = $self->loadObjectValues($facilityObj);
@@ -555,7 +555,7 @@ sub validate_contact_details {
         return ('',2);
     }
 
-    my $facilityObj = new EntityObj(db => $self->{'db'}, ID => $id);
+    my $facilityObj = new EntityObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}->{'cache'});
     $facilityObj->load();
     $facilityObj->setValues($facilityData);
 
