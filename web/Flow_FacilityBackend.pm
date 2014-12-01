@@ -256,12 +256,12 @@ sub setupValues {
                 intFacilityTypeID
                 strLocalName
                 strLocalShortName
+                strLatinName
+                strLatinShortName
                 strCity
                 strRegion
                 strISOCountry
                 intLocalLanguage
-                strLatinName
-                strLatinShortName
             )],
             fieldtransform => {
                 textcase => {
