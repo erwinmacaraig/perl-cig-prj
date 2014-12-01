@@ -1,4 +1,3 @@
-
 [% IF FlashMessage.flash.type %]
 <div class="col-md-12">
     <div class="alert alert-warning" role="alert">
@@ -42,10 +41,9 @@
 				<td><!--Filter by:-->
 					<select class="filter-tasks">
 			          <option selected="" value="">-- All --</option>
-			          <option value="New Registration">New Registration</option>
-			          <option value="Transfer">Transfer</option>
-			          <option value="Renewal">Renewal</option>
-			          <option value="Amendment">Amendment</option>
+                      [% FOREACH taskType IN TaskFilters.type %]
+                      <option value="[% taskType %]">[% taskType %]</option>
+                      [% END %]
 			        </select>
 		        </td>
 				<td>
@@ -58,9 +56,9 @@
 				<td>
 					<select class="filter-status" id="u53_input">
 			          <option value="">-- All --</option>
-			          <option value="Active">Active</option>
-			          <option value="On hold">On hold</option>
-			          <option value="Rejected">Rejected</option>
+                      [% FOREACH taskStatus IN TaskFilters.status %]
+                      <option value="[% taskStatus %]">[% taskStatus %]</option>
+                      [% END %]
 			        </select>
 				</td>
 				<td class="list-action-filter">

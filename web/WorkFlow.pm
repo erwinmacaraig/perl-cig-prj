@@ -357,10 +357,19 @@ sub listTasks {
 	) or query_error($st);
 
 	my @TaskList = ();
+    my @taskType = ();
+    my @taskStatus = ();
+
 	my $rowCount = 0;
 
     my $client = unescape($Data->{client});
 	while(my $dref= $q->fetchrow_hashref()) {
+        #FC-409 - don't include in list of taskStatus = REJECTED
+        next if ($dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_REJECTED);
+
+        #F-409 - skip if strTaskStatus = HOLD and approvalEntityID = current entity
+        next if ($dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_HOLD and $dref->{'intApprovalEntityID'} == $entityID);
+
         #moved checking of POSSIBLE_DUPLICATE here (if included in query, tasks for ENTITY are not capture)
         next if ($dref->{intSystemStatus} eq $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE and $dref->{strWFRuleFor} ne $Defs::WF_RULEFOR_PERSON);
 
@@ -438,8 +447,16 @@ sub listTasks {
             viewURL => $viewTaskURL,
             taskTypeLabel => $viewTaskURL,
 		);
-        print STDERR Dumper \%single_row;
+        #print STDERR Dumper \%single_row;
    
+        if(!($Defs::registrationNature{$dref->{strRegistrationNature}} ~~ @taskType)){
+            push @taskType, $Defs::registrationNature{$dref->{strRegistrationNature}};
+        }
+
+        if(!($Defs::wfTaskStatus{$dref->{strTaskStatus}} ~~ @taskStatus)){
+            push @taskStatus, $Defs::wfTaskStatus{$dref->{strTaskStatus}};
+        }
+
 		push @TaskList, \%single_row;
 	}
 
@@ -479,13 +496,15 @@ sub listTasks {
             my $requestStatus = $request->{'strRequestResponse'} ? $request->{'strRequestResponse'} : 'PENDING';
             $taskCounts{$requestStatus}++;
             $taskCounts{$request->{'strRequestType'}}++;
+
+            my $taskStatusLabel = $request->{'strRequestResponse'} ? $Defs::personRequestStatus{$request->{'strRequestResponse'}} : $Defs::personRequestStatus{'PENDING'};
             my %personRequest = (
                 personRequestLabel => $Defs::personReques{$request->{'strRequestType'}},
                 TaskType => $request->{'strRequestType'},
                 TaskDescription => $Data->{'lang'}->txt('Person Request'),
                 Name => $name,
                 TaskStatus => $request->{'strRequestResponse'} ? $request->{'strRequestResponse'} : 'PENDING',
-                TaskStatusLabel => $request->{'strRequestResponse'} ? $Defs::personRequestStatus{$request->{'strRequestResponse'}} : $Defs::personRequestStatus{'PENDING'},
+                TaskStatusLabel => $taskStatusLabel,
                 viewURL => $viewURL,
                 showView => 1,
                 taskDate => $request->{'prRequestDateFormatted'},
@@ -493,7 +512,15 @@ sub listTasks {
                 requestTo => $request->{'requestTo'},
             );
 
-            print STDERR Dumper \%personRequest;
+            if(!($Defs::personReques{$request->{'strRequestType'}} ~~ @taskType)){
+                push @taskType, $Defs::personReques{$request->{'strRequestType'}};
+            }
+
+            if(!($taskStatusLabel ~~ @taskStatus)){
+                push @taskStatus, $taskStatusLabel;
+            }
+
+            #print STDERR Dumper \%personRequest;
             push @TaskList, \%personRequest;
         }
     }
@@ -506,12 +533,18 @@ sub listTasks {
 		$msg = $Data->{'lang'}->txt('The following are the outstanding tasks to be authorised');
 	};
 
+
+    my %taskFilters = (
+        'type' => \@taskType,
+        'status' => \@taskStatus,
+    );
 	my %TemplateData = (
-			TaskList => \@TaskList,
-			TaskCounts => \%taskCounts,
-			TaskMsg => $msg,
-			TaskEntityID => $entityID,
-			client => $Data->{client},
+        TaskList => \@TaskList,
+        TaskCounts => \%taskCounts,
+        TaskMsg => $msg,
+        TaskEntityID => $entityID,
+        TaskFilters => \%taskFilters,
+        client => $Data->{client},
 	);
 
     my $flashMessage = getFlashMessage($Data, 'WF_U_FM');
