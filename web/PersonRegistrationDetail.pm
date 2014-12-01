@@ -309,11 +309,11 @@ sub personRegistrationWorkTasks {
             field => '',
             width  => 40,
         },
-        {
-            name  => $Data->{'lang'}->txt('Task Type'),
-            field => 'TaskType',
-            width  => 50,
-        },
+        #{
+        #    name  => $Data->{'lang'}->txt('Task Type'),
+        #    field => 'TaskType',
+        #    width  => 50,
+        #},
         #{
         #    name  => $Data->{'lang'}->txt('Task Assigned To'),
         #    field => 'TaskTo',
