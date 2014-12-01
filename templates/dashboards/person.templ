@@ -8,35 +8,35 @@
 				<div class="read-only-text">
 					[% IF Details.LatinFirstname %]
 					<div class="">
-						<span class="">[% Lang.txt("First name (Latin Characters)") %]:</span>
+						<span class="details-left">[% Lang.txt("First name (Latin Characters)") %]:</span>
 						<span class="detail-value">[% Details.LatinFirstname %]</span>
 					</div>
 					[% END %]
 
 					[% IF Details.LatinSurname %]
 					<div class="">
-						<span class="">[% Lang.txt("Family name (Latin Characters)") %]:</span>
+						<span class="details-left">[% Lang.txt("Family name (Latin Characters)") %]:</span>
 						<span class="detail-value">[% Details.LatinSurname %]</span>
 					</div>
 					[% END %]
 
 					[% IF Details.Gender %]
 					<div class="">
-						<span class="">[% Lang.txt('Gender') %]:</span>
+						<span class="details-left">[% Lang.txt('Gender') %]:</span>
 						<span class="detail-value">[% Details.Gender %]</span>
 					</div>
 					[% END %]
 
 					[% IF Details.DOB %]
 				    <div class="">
-				        <span class="">Date of Birth:</span>
+				        <span class="details-left">Date of Birth:</span>
 				        <span class="detail-value">[% Details.DOB %]</span>
 				    </div>
 					[% END %]
 
 					[% IF Details.BirthCountry %]
 				    <div class="">
-				      <span class="">Country of Birth:</span>
+				      <span class="details-left">Country of Birth:</span>
 				      <span class="detail-value">[% Details.BirthCountry %]</span>
 				    </div>
 
@@ -44,7 +44,7 @@
 
 					[% IF Details.PassportNat %]
 				    <div class="">
-				      <span class="">Nationality:</span>
+				      <span class="details-left">Nationality:</span>
 				      <span class="detail-value">[% Details.PassportNat %]</span>
 				    </div>
 					[% END %]
@@ -66,7 +66,7 @@
 				<div class="read-only-text">
 					[% IF Details.Address1 %]
 					<div class="">
-					  	<span class="">[% Lang.txt('Address 1:') %]</span>
+					  	<span class="details-left">[% Lang.txt('Address 1:') %]</span>
 					  	<span class="detail-value">[% Details.Address1 %]</span>
 					  	<span class="detail-value">[% Details.Suburb %]&nbsp;[% Details.State %]&nbsp;[% Details.PostalCode %]</span>
 				    </div>
@@ -74,20 +74,21 @@
 
 					[% IF Details.Address2 %]
 					<div class="">
+					<span class="details-left">[% Lang.txt('Address 2:') %]</span>
 					<span class="detail-value">[% Details.Address2 %]</span>
 					</div>
 					[% END %]
 
 					[% IF Details.PhoneHome %]
 					<span class="">
-				  	<span class="">Home Phone:</span>
+				  	<span class="details-left">Home Phone:</span>
 				    <span class="detail-value">[% Details.PhoneHome %]</span>
 				  	</span>
 					[% END %]
 
 					[% IF Details.PhoneMobile %]
 					<span class="">
-				  	<span class="">Mobile:</span>
+				  	<span class="details-left">Mobile:</span>
 				    <span class="detail-value">[% Details.PhoneMobile %]</span>
 				  	</span>
 					[% END %]

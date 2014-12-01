@@ -204,8 +204,8 @@ sub getMemFields {
 		push @{$fields_grouped{$group}}, [$f, $label];
 		my $string = '';
 		if (($val and $val ne '00/00/0000') or ($is_header))	{
-			$string .= qq[<span class="details-row"><span class = "details-left">$label</span>] if !$nolabelfields{$f};
-			$string .= '<span class="details-right">'.$val.'</span></span>';
+			$string .= qq[<div class=""><span class = "details-left">$label:</div>] if !$nolabelfields{$f};
+			$string .= '<span class="detail-value">'.$val.'</span></span>';
 			$fields{$group} .= $string;
 		}
 	}}
