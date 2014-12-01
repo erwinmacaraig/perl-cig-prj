@@ -1541,7 +1541,7 @@ $person_photo = '' if($option eq 'add');
 	$resultHTML =qq[
  $tabs
 $person_photo
-			<div class="col-md-8"><div class="panel-body">$resultHTML</div></div>
+			<div class="col-md-9"><div class="panel-body">$resultHTML</div></div>
 <style type="text/css">.pageHeading{font-size:48px;font-family:"DINMedium",sans-serif;letter-spacing:-2px;margin:40px 0;}.ad_heading{margin: 36px 0 0 0;}</style>] if!$processed;
     $resultHTML = qq[<p>$Data->{'PersonClrdOut'}</p> $resultHTML] if $Data->{'PersonClrdOut'};
     $option = 'display' if $processed;
