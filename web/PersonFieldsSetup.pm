@@ -485,6 +485,7 @@ sub personFieldsSetup {
                 dtBirthCertValidityDateFrom 
                 dtBirthCertValidityDateTo 
                 strBirthCertDesc 
+                strPassportNo
                 strPassportNationality
                 strPassportIssueCountry
                 dtPassportExpiry
