@@ -459,11 +459,11 @@ sub personFieldsSetup {
  
             },
             'order' => [qw(
-                strLocalFirstname
                 strLocalSurname
+                strLocalFirstname
                 intLocalLanguage
-                strLatinFirstname
                 strLatinSurname
+                strLatinFirstname
                 dtDOB
                 intGender
                 strMaidenName
