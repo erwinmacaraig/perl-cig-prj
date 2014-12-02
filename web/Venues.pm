@@ -313,7 +313,7 @@ sub venue_details   {
         sectionname => 'details',
       },
       strFax => {
-        label => 'Facsimile Number',
+        label => 'Fax',
         value => $field->{strFax},
         type  => 'text',
         size  => '20',
