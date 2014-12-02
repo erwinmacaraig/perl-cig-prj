@@ -882,10 +882,9 @@ sub display_documents {
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         #FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
         #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
-        Content => '',
+        Content => $content,
         Title => '',
         TextTop => '',
-				DocumentsLists => $content,
         TextBottom => '',
     );
 

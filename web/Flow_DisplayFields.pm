@@ -59,6 +59,7 @@ sub build {
 
     my $scripts = '';
 
+    my %sectionHasCompulsory = ();
   FIELD: for my $fieldname (@fieldorder) {
         next if !$fieldname;
         my $f = $self->{'Fields'}->{'fields'}{$fieldname};
@@ -90,7 +91,9 @@ sub build {
             )
                 or (  defined $permissions
                     and $permissions->{$fieldname} )
-                or ( defined $type and $type eq 'textblock' ) ? 1 : 0 );
+                or ( defined $type and $type eq 'textblock' ) 
+                or ( defined $type and $type eq 'htmlrow' ) 
+                ? 1 : 0 );
 
         if (   ( $edit and not $visible_for_edit )
             or ( $add and not $visible_for_add )
@@ -278,6 +281,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
 
         if ($f->{'compulsory'}) {
             $row_class = join(' ', $row_class, 'required');
+            $sectionHasCompulsory{$sname} = 1;
         }
 
         if (
@@ -318,6 +322,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
     for my $s ( @{$sectionlist} ) {
 
         my $sectionheader = $self->langlookup( $s->[1] ) || '';
+        my $requiredfield = $self->langlookup('Required fields') || '';
 
         if ( $sections{ $s->[0] } ) {
             next if $s->[2] and not $self->display_section( $s->[2] );
@@ -326,9 +331,13 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
             if ($notabs) {
                 my $sh = '';
                 if ( $sectionheader ) {
-                    $sh = qq[ <div class = "sectionheader">$sectionheader</div>];
+                    $sh = qq[ <h3 class="panel-header sectionheader">$sectionheader</h3>];
                 }
-                $returnstr .= qq[<div class = "fieldSectionGroup $extraclass" id = "fsg-].$s->[0].qq["> $sh].$sections{ $s->[0] }.qq[</div>];
+                my $compulsory_string = '';
+                if($sectionHasCompulsory{$s->[0]})   {
+                    $compulsory_string = '<p><span class="notice-error">'.$compulsory.$requiredfield.'</span></p>';
+                }
+                $returnstr .= qq[$sh<div class = "panel-body fieldSectionGroup $extraclass" id = "fsg-].$s->[0].qq["><fieldset>$compulsory_string].$sections{ $s->[0] }.qq[</fieldset></div>];
             }
             else {
                 #my $style=$s ? 'style="display:none;" ' : '';
@@ -347,12 +356,10 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
             }
         }
     }
+    if(!scalar(@{$sectionlist}))    {
+        $returnstr = qq[ <fieldset> $returnstr </fieldset> ];
+    }
     my $tableinfo = $self->{'Fields'}->{'options'}{'tableinfo'} || ' class = "HTF_table" ';
-    $returnstr = qq[
-    <fieldset>
-    $returnstr
-    </fieldset>
-    ];
     if ($returnstr) {
         my $validation =
           $self->generate_clientside_validation( \%clientside_validation);
@@ -760,6 +767,7 @@ sub langlookup {
     my %Lexicon = (
         'AUTO_INTROTEXT' =>
 qq[To modify this information change the information in the boxes below and when you have finished press the <strong>'[_1]'</strong> button.<br><span class="intro-subtext"><strong>Note:</strong> All boxes marked with a [_2] are compulsory and must be filled in.</span>],
+        'Required fields'            => 'Required fields',
         'Compulsory Field'            => 'Compulsory Field',
         'Invalid Date'                => 'Invalid Date',
         'Record added successfully'   => 'Record added successfully',

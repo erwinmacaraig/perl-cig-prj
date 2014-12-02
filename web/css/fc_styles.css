@@ -336,6 +336,17 @@ select {
     border-radius: 0;
     padding: 5px;
 }
+.chosen-container-single .chosen-single {
+	border: 1px solid #ccc;
+    background: #fff;
+    width: 100%;
+    border-radius: 0;
+    padding: 5px;
+    box-shadow:none;
+    font-size:inherit;
+    height:auto;
+    line-height:auto;
+}
 
 .toggle a {
 	background: #d8d8d8;
@@ -460,6 +471,14 @@ a.btn-inside-panels:hover {
 	font-size: 28px;
 	padding: 15px 20px;
 }
+
+.alert .fa-info {
+	background: #0297e4;
+	color: #fff;
+	font-size: 28px;
+	padding: 15px 20px;
+}
+
 
 .alert div {
 	width: 100%;
@@ -1107,13 +1126,20 @@ table.table tr th {
 	position: relative;
 }
 
+#flowFormID {
+    padding:0px;
+}
 .dynamic-panel  {
     padding:20px 5px 5px;
     margin: 10px 5px;
     background-color:#ddd;
+    float:left;
 }
 .fieldSectionGroup  {
-    overflow:auto;
+    margin-bottom:20px;
+}
+
+.button-row {
 }
 
 .access-level {

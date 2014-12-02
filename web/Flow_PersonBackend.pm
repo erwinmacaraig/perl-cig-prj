@@ -39,7 +39,8 @@ sub setProcessOrder {
         {
             'action' => 'cd',
             'function' => 'display_core_details',
-            'label'  => 'Core Details',
+            'label'  => 'Personal Details',
+            'title'  => 'Registration - Enter Personal Information',
             'fieldset'  => 'core',
             #'noRevisit' => 1,
         },
@@ -65,6 +66,7 @@ sub setProcessOrder {
             'function' => 'display_contact_details',
             'label'  => 'Contact Details',
             'fieldset'  => 'contactdetails',
+            'title'  => 'Registration - Enter Contact Information',
         },
         {
             'action' => 'condu',
@@ -86,6 +88,7 @@ sub setProcessOrder {
             'action' => 'r',
             'function' => 'display_registration',
             'label'  => 'Registration',
+            'title'  => 'Registration - Choose Registration Type',
         },
         {
             'action' => 'ru',
@@ -96,6 +99,7 @@ sub setProcessOrder {
             'function' => 'display_certifications',
             'label'  => 'Certifications',
             'fieldset'  => 'certifications',
+            'title'  => 'Registration - Enter Certifications',
         },
         {
             'action' => 'pcert',
@@ -106,6 +110,7 @@ sub setProcessOrder {
             'action' => 'd',
             'function' => 'display_documents',
             'label'  => 'Documents',
+            'title'  => 'Registration - Upload Documents',
         },
         {
             'action' => 'du',
@@ -115,6 +120,7 @@ sub setProcessOrder {
             'action' => 'p',
             'function' => 'display_products',
             'label'  => 'Products',
+            'title'  => 'Registration - Choose Documents',
         },
         {
             'action' => 'pu',
@@ -124,6 +130,7 @@ sub setProcessOrder {
             'action' => 'c',
             'function' => 'display_complete',
             'label'  => 'Complete',
+            'title'  => 'Registration - Summary',
         },
     ];
 }
@@ -152,6 +159,22 @@ sub display_core_details    {
 
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Person',);
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
+    my $newRegoWarning = '';
+    if(!$id)    {
+        my $lang = $self->{'Data'}{'lang'};
+        my $client = $self->{'Data'}{'client'};
+        my $burl = "$self->{'Data'}{'target'}?client=$client&amp;a=";
+        my $transfer = $burl."PRA_T";
+        my $search = $burl."INITSRCH_P";
+        my $txt = $lang->txt('Has this person already been registered?')
+            .qq[ <a href = "$transfer">].$lang->txt('If yes, they need to apply for a Transfer.').'</a>'
+            .$lang->txt(' Not sure?')
+            .qq[ <a href = "$search">].$lang->txt('Then use the Search.').'</a>' ;
+        $newRegoWarning = qq[
+            <div class="alert"> 
+                <div> <span class="fa fa-info"></span> <p>$txt</p> </div> </div>
+        ];
+    }
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -159,7 +182,7 @@ sub display_core_details    {
         Content => $fieldsContent || '',
         ScriptContent => $scriptContent || '',
         Title => '',
-        TextTop => '',
+        TextTop => $newRegoWarning,
         TextBottom => '',
     );
 
@@ -1145,10 +1168,12 @@ sub buildSummaryData    {
 
     return {} if !$personObj;
     return {} if !$personObj->ID();
+    my $isocountries  = getISOCountriesHash();
     my %summary = (
         'name' => $personObj->name(),
         'dob' => $personObj->getValue('dtDOB'),
         'gender' => $Defs::PersonGenderInfo{$personObj->getValue('intGender')},
+        'nationality' => $isocountries->{$personObj->getValue('strISONationality')},
     );
     return \%summary; 
 }

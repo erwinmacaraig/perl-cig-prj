@@ -223,6 +223,12 @@ sub ID  {
   return $self->{'ID'} || 0;
 }
 
+sub title {
+  my $self = shift;
+  my $title = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'title'} || '');
+  return $title || '';
+}
+
 sub setID  {
   my $self = shift;
   my($ID) = @_;
@@ -242,6 +248,7 @@ sub display {
   }
   if(!$templateData->{'Navigation'})  {
       $templateData->{'Navigation'} = $self->Navigation();
+      $templateData->{'PageTitle'} = $self->title();
   }
   my $output = runTemplate($self->{'Data'}, $templateData, $templateName);
   if(scalar(@{$templateData->{'Errors'}})) {

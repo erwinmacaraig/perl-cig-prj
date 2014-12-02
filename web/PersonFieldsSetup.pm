@@ -61,10 +61,10 @@ sub personFieldsSetup {
                         var lang = parseInt(jQuery('#l_intLocalLanguage').val());
                         nonlatinvals = [$vals];
                         if(nonlatinvals.indexOf(lang) !== -1 )  {
-                            jQuery('#fsg-latinnames').show();
+                            jQuery('#block-latinnames').show();
                         }
                         else    {
-                            jQuery('#fsg-latinnames').hide();
+                            jQuery('#block-latinnames').hide();
                         }
                     }
                     showLocalLanguage();
@@ -188,6 +188,7 @@ sub personFieldsSetup {
                     compulsory => 1,
                     posttext => $nonlatinscript,
                     sectionname => 'core',
+                    class       => 'chzn-select',
                     noedit      => 1,
                 },
                 strLatinFirstname => {
@@ -197,8 +198,22 @@ sub personFieldsSetup {
                     size        => '40',
                     maxsize     => '50',
                     active      => $nonLatin,
-                    sectionname => 'latinnames',
+                    sectionname => 'core',
                     noedit      => 1,
+                },
+                latinBlockStart => {
+                    label       => 'latinblockstart',
+                    value       => qq[<div id = "block-latinnames" class = "dynamic-panel">],
+                    type        => 'htmlrow',
+                    sectionname => 'core',
+                    active      => $nonLatin,
+                },
+                latinBlockEnd => {
+                    label       => 'latinblockend',
+                    value       => qq[</div>],
+                    type        => 'htmlrow',
+                    sectionname => 'core',
+                    active      => $nonLatin,
                 },
                 strLatinSurname => {
                     label       => $Data->{'SystemConfig'}{'person_strLatinNames'} || $FieldLabels->{'strLatinSurname'},
@@ -207,7 +222,7 @@ sub personFieldsSetup {
                     size        => '40',
                     maxsize     => '50',
                     active      => $nonLatin,
-                    sectionname => 'latinnames',
+                    sectionname => 'core',
                     noedit      => 1,
                 },
                 strMaidenName => {
@@ -217,7 +232,7 @@ sub personFieldsSetup {
                     size        => '40',
                     maxsize     => '50',
                     posttext    => $maidennamescript,
-                    sectionname => 'core2',
+                    sectionname => 'core',
                     noedit      => 1,
                 },
                 dtDOB => {
@@ -229,7 +244,7 @@ sub personFieldsSetup {
                     maxyear     => (localtime)[5] + 1900,
                     validate    => 'DATE',
                     compulsory => 1,
-                    sectionname => 'core2',
+                    sectionname => 'core',
                     noedit      => 1,
                 },
                 strISONationality => {
@@ -239,7 +254,8 @@ sub personFieldsSetup {
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
                     compulsory => 1,
-                    sectionname => 'core2',
+                    class       => 'chzn-select',
+                    sectionname => 'core',
                     noedit      => 1,
                 },
                 strISOCountryOfBirth => {
@@ -248,8 +264,9 @@ sub personFieldsSetup {
                     type        => 'lookup',
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
+                    class       => 'chzn-select',
                     compulsory => 1,
-                    sectionname => 'core2',
+                    sectionname => 'core',
                     noedit      => 1,
                 },
                 strRegionOfBirth => {
@@ -258,7 +275,7 @@ sub personFieldsSetup {
                     type        => 'text',
                     size        => '30',
                     maxsize     => '45',
-                    sectionname => 'core2',
+                    sectionname => 'core',
                     noedit      => 1,
                 },
                 strPlaceOfBirth => {
@@ -268,7 +285,7 @@ sub personFieldsSetup {
                     size        => '30',
                     maxsize     => '45',
                     compulsory => 1,
-                    sectionname => 'core2',
+                    sectionname => 'core',
                     noedit      => 1,
                 },
                 intGender => {
@@ -278,7 +295,7 @@ sub personFieldsSetup {
                     options     => \%genderoptions,
                     compulsory => 1,
                     firstoption => [ '', " " ],
-                    sectionname => 'core2',
+                    sectionname => 'core',
                     noedit      => 1,
                 },
 
@@ -297,6 +314,7 @@ sub personFieldsSetup {
                     options     => $DefCodes->{-8},
                     order       => $DefCodesOrder->{-8},
                     firstoption => [ '', " " ],
+                    class       => 'chzn-select',
                     sectionname => 'other',
                 },
                 strBirthCert => {
@@ -314,6 +332,7 @@ sub personFieldsSetup {
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
                     compulsory => 1,
+                    class       => 'chzn-select',
                     sectionname => 'other',
                   
         		},
@@ -358,6 +377,7 @@ sub personFieldsSetup {
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
                     sectionname => 'other',
+                    class       => 'chzn-select',
                 },
                 strPassportIssueCountry => {
                 	label => $FieldLabels->{'strPassportIssueCountry'},
@@ -366,6 +386,7 @@ sub personFieldsSetup {
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],                	
                     sectionname => 'other',
+                    class       => 'chzn-select',
                 },
                 dtPassportExpiry => {
                 	label => $FieldLabels->{'dtPassportExpiry'},
@@ -393,6 +414,7 @@ sub personFieldsSetup {
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
                     sectionname => 'other',
+                    class       => 'chzn-select',
                 },
                 dtOtherPersonIdentifierValidDateFrom => {
                 	label => $FieldLabels->{'dtValidFrom'},
@@ -463,8 +485,10 @@ sub personFieldsSetup {
                 strLocalSurname
                 strLocalFirstname
                 intLocalLanguage
+                latinBlockStart
                 strLatinSurname
                 strLatinFirstname
+                latinBlockEnd
                 dtDOB
                 intGender
                 strMaidenName
@@ -498,10 +522,8 @@ sub personFieldsSetup {
             )],
             sections => [
                 [ 'core',        'Personal Details' ],
-                [ 'latinnames',   '','','dynamic-panel'],
-                [ 'core2',        '' ],
-                [ 'minor',        'FIFA Minor Protection','','dynamic-panel' ],
-                [ 'other',        'Other Details' ],
+                [ 'mwwor',       'FIFA Minor Protection','','dynamic-panel' ],
+                [ 'other',       'Additional Information' ],
             ],
             fieldtransform => {
                 textcase => {
@@ -546,6 +568,7 @@ sub personFieldsSetup {
                     type        => 'lookup',
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
+                    class       => 'chzn-select',
                 },
                 strPostalCode => {
                     label       => $FieldLabels->{'strPostalCode'},
@@ -816,6 +839,7 @@ sub personFieldsSetup {
             options     => $DefCodes->{$intNatCustomLU_DefsCodes[$i]},
             order       => $DefCodesOrder->{$intNatCustomLU_DefsCodes[$i]},
             sectionname => 'other',
+            class       => 'chzn-select',
             firstoption => [ '', " " ],
         };
         push @{$fieldsets->{'core'}{'order'}} , $fieldname;
