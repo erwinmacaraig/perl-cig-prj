@@ -360,6 +360,36 @@ sub displayRegoFlowDocuments    {
         0,
         $rego_ref,
      );
+	my @docos = (); 
+	#check for uploaded documents present for a particular registration and person
+	my $query = qq[
+					SELECT distinct(tblDocuments.intDocumentTypeID), tblDocumentType.strDocumentName 
+					FROM tblDocuments 
+						INNER JOIN tblDocumentType
+					ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
+					INNER JOIN tblRegistrationItem 
+					ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID
+					WHERE tblDocuments.intPersonID = ? AND intPersonRegistrationID = ?;	
+	];
+   
+	my $sth = $Data->{'db'}->prepare($query);
+	$sth->execute($personID,$regoID);
+	my @uploaded_docs = ();
+	while(my $dref = $sth->fetchrow_hashref()){
+		push @uploaded_docs, $dref->{'intDocumentTypeID'};
+		
+	}
+	
+	my @diff = ();	
+		
+	#compare whats in the system and what is required
+	foreach my $doc_ref (@{$documents}){
+		
+		if(!grep /$doc_ref->{'ID'}/,@uploaded_docs){
+			push @diff,$doc_ref;	
+		}
+		
+	}
 
     my %PersonRef = ();
     $PersonRef{'strPersonType'} = $rego_ref->{'strPersonType'} || '';
@@ -399,7 +429,7 @@ sub displayRegoFlowDocuments    {
     }
      
     ### FOR FILTERING 
-    my @docos = (); 
+   
 	my %approved_docs = (); 
 	my @listing = ();
     my $db = $Data->{'db'}; 
@@ -410,7 +440,8 @@ sub displayRegoFlowDocuments    {
 	while(my @approved_doc_arr = $sth->fetchrow_array()){
 		$approved_docs{ $approved_doc_arr[0] } = 'APPROVED';
 	}	
-	foreach my $dc (@{$documents}){ 
+	#foreach my $dc (@{$documents}){ 
+	foreach my $dc (@diff){ 
     	#next if(exists $approved_docs{$dc->{'ID'}} && $dc->{'UseExistingAnyEntity'});
     	#push @docos,$dc;
     	if(exists $approved_docs{$dc->{'ID'}} && $dc->{'UseExistingAnyEntity'}){
@@ -429,7 +460,7 @@ sub displayRegoFlowDocuments    {
   my %PageData = (
         nextaction => "PREGF_DU",
         target => $Data->{'target'},
-        documents => $documents,
+        documents => \@docos,
         approveddocs => \@listing, 
         personleveldocs => $personLeveldocs,
         transferdocs=> $transferdocs,

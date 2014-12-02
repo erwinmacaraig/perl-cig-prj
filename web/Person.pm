@@ -364,8 +364,7 @@ sub listDocuments {
     my @statusNOTIN = ($Defs::PERSONREGO_STATUS_DELETED, $Defs::PERSONREGO_STATUS_INPROGRESS);
     $RegFilters{'statusNOTIN'} = \@statusNOTIN;
     my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
-    open FH,">dumpfile.txt";
-    print FH "Registration Data dump\n" . Dumper($Reg_ref) . "\n\n";
+   
     
     #does not matter how many, intPersonRegistrationID is the same all throughout
     my $pRIDRef = ${$Reg_ref}[0];
