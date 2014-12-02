@@ -1023,24 +1023,29 @@ sub process_documents {
 	);
     if(!$isRequiredDocPresent){
 	#if(1==1){
-		my $labelBackBtn = 'Back to Documents';
     	push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Required Document Missing") . $error_message;
-    	my %PageData = (
-        HiddenFields => $self->stringifyCarryField(),
-        Target => $self->{'Data'}{'target'},
-        Errors => $self->{'RunDetails'}{'Errors'} || [],
-        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
-        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
-        Content => '',
-        Title => '',
-        TextTop => $content,
-        TextBottom => '',
-        NoContinueButton => 1,       
-		Back => $labelBackBtn, 
-    );
-      my $pagedata = $self->display(\%PageData);
+        if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+            #There are errors - reset where we are to go back to the form again
+            $self->decrementCurrentProcessIndex();
+            return ('',2);
+        }
+		#my $labelBackBtn = 'Back to Documents';
+    	#my %PageData = (
+        #HiddenFields => $self->stringifyCarryField(),
+        #Target => $self->{'Data'}{'target'},
+        #Errors => $self->{'RunDetails'}{'Errors'} || [],
+        #FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
+        #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        #Content => '',
+        #Title => '',
+        #TextTop => $content,
+        #TextBottom => '',
+        #NoContinueButton => 1,       
+		#Back => $labelBackBtn, 
+    #);
+      #my $pagedata = $self->display(\%PageData);
      
-    	return ($pagedata,0);
+    	#return ($pagedata,0);
 
     }
     return ('',1);
