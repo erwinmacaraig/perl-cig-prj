@@ -1088,11 +1088,8 @@ table.table tr th {
 	float:right;
 }
 /*** compulsary ***/
-.panel-body span.compulsory img {
-    left: 0;
-    margin: 0px;
-    position: absolute;
-    top: 0;
+.panel-body span.compulsory {
+    color:red;
 }
 #flowFormID .col-md-6 {
 	position: relative;
