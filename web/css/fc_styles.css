@@ -225,6 +225,13 @@ header nav ul li a:hover {
 	text-decoration: none;
 }
 
+
+header nav ul li a.active {
+	background: #e3e3e3;
+	color: #000;
+	text-decoration: none;
+}
+
 h2.main-heading {
     font-family: 'noto_sansregular';
     font-weight: normal;

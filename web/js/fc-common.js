@@ -123,9 +123,79 @@ $(document).ready(function(){
         }
     });
 
-    //jQuery("form#personInitRequest").find("input[type=checkbox][name^=regoselected]").click(function(e){
-    //    var selected_option = jQuery(this).prop("id");
-    //    jQuery("form#personInitRequest textarea#comment" + selected_option).slideToggle("fast");
-    //});
+
+    function getUrlparameter (strParam) {
+      
+      var strPageUrl = window.location.search.substring(1);
+
+      var strUrlVars = strPageUrl.split('&');
+
+      for (var i = 0; i < strUrlVars.length; i++) {
+        
+        var strParamName = strUrlVars[i].split('=');
+
+        if (strParamName[0] ==strParam ) {
+          return strParamName[1];
+        }
+      }
+
+    }
+
+    var param = getUrlparameter("a");
+
+    console.log(param);
+
+    if (param == "E_HOME" || param == "C_HOME") {
+      
+      $("header nav ul li a[href*='E_HOME']").addClass("active");
+      $("header nav ul li a[href*='C_HOME']").addClass("active");
+    
+    } 
+
+    else if (param == "LOGIN") {
+      
+      $("header nav ul li a[href*='E_HOME']").addClass("active");
+    
+    }
+
+    else if (param == "E_L") {
+      
+      $("header nav ul li a[href*='E_L']").addClass("active");
+    
+    }
+
+    else if (param == "C_L" || param == "C_DTA") {
+     
+      $("header nav ul li.subnav a:contains(Clubs)").addClass("active")
+
+    }
+
+    else if (param == "VENUE_L" || param == "VENUE_DTA") {
+      
+      $("header nav ul li.subnav a:contains(Venues)").addClass("active");
+    
+    }
+
+    else if (param == "INITSRCH_P" || param == "PF_" || param == "DUPL_L" || param == "PRA_T" || param == "PRA_R" || param == "PREGFB_T" || param == "TXN_PAY_INV") {
+     
+      $("header nav ul li.subnav a:contains(People)").addClass("active")
+
+    }
+
+    else if (param == "WF_" || param == "PENDPR_") {
+     
+      $("header nav ul li.subnav a:contains(Work Tasks)").addClass("active")
+
+    }
+
+    else if (param == "REP_SETUP") {
+      
+      $("header nav ul li a[href*='REP_SETUP']").addClass("active");
+    
+    } else {
+
+      $("header nav ul li a[href*='E_HOME']").addClass("active");
+
+    }
 
 })
