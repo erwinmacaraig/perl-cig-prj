@@ -1176,6 +1176,7 @@ sub loadObjectValues    {
             
             strAddress1
             strAddress2
+            strISOCountry
             strSuburb
             strState
             strPostalCode
