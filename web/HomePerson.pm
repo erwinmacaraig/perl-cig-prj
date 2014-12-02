@@ -97,7 +97,7 @@ sub showPersonHome	{
 			Address2 => $personObj->getValue('strAddress2') || '',	
 			Suburb => $personObj->getValue('strSuburb') || '',	
 			State => $personObj->getValue('strState') || '',	
-			Country => $personObj->getValue('strCountry') || '',	
+			Country => $personObj->getValue('strISOCountry') || '',	
 			PostalCode => $personObj->getValue('strPostalCode') || '',	
 			PhoneHome => $personObj->getValue('strPhoneHome') || '',	
 			Email => $personObj->getValue('strEmail') || '',	
@@ -180,7 +180,7 @@ sub getMemFields {
 		strCityOfResidence => 1,
 		strState => 1,
 		strPostalCode => 1,
-		strCountry => 1,
+		strISOCountry => 1,
 	);
 	if(scalar($FieldDefinitions)>1){
 	

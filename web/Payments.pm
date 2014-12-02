@@ -754,7 +754,7 @@ sub TXNtoInvoiceNum {
 
 	my ($txnID) = @_;
 
-	my $invoice_num =qq[1] . sprintf("%0*d",7, $txnID);
+	my $invoice_num =qq[8] . sprintf("%0*d",7, $txnID);
 	$invoice_num = $invoice_num . calcTXNInvoiceNum($invoice_num);
 	return $invoice_num;
 }
@@ -762,7 +762,7 @@ sub TXNtoTXNNumber	{
 
 	my ($txnID) = @_;
 
-	my $invoice_num =qq[1] . sprintf("%0*d",7, $txnID);
+	my $invoice_num =qq[8] . sprintf("%0*d",7, $txnID);
 	$invoice_num = $invoice_num . calcTXNInvoiceNum($invoice_num);
 	return $invoice_num;
 }
