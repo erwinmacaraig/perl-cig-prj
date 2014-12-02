@@ -1,0 +1,45 @@
+/* Advanced Report Styles */
+
+#ROreportselect-wrapper label {
+  font-size: 13px;
+  color:#6A6A6A;
+}
+
+#ROselectedfields .RO_fieldblock {
+  overflow: hidden;
+}
+
+#ROselectedfields .RO_fieldname {
+  margin-bottom:10px;
+}
+
+
+.ROoptionblock-header {
+  font-size: 16px;
+}
+
+.RO_fielddata select, .RO_fielddata input, .ROoptionblock input[type="text"] {
+  border:1px solid #ccc;
+  width:auto;
+  background:#fff;
+  padding:3px;
+}
+
+.ROoptionblock table td {
+  padding:5px;
+}
+
+.ROoptionblock table select{
+  border:1px solid #ccc;
+  width:auto;
+  background:#fff;
+  padding:5px;
+}
+
+.ROoptionblock table td input[type="radio"], .ROoptionblock input[type="radio"]{
+  margin:4px 5px 0 0;
+}
+
+.ROoptionblock table td label {
+  margin: 0 15px 0 0;
+}
