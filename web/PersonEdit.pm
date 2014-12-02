@@ -87,14 +87,18 @@ sub handlePersonEdit {
         if($action eq 'PE_')    {
           my ($output, undef, $headJS, undef) = $obj->build($permissions,'edit',1);
           $body .= qq[
+            <div class="col-md-12">
             <form action = "$Data->{'target'}" method = "POST">
                 $output
                 $headJS
+                <div class="txtright">
                 <input type = "hidden" name = "client" value = "].unescape($client).qq["> 
                 <input type = "hidden" name = "a" value = "PE_U"> 
                 <input type = "hidden" name = "e_a" value = "$e_action"> 
                 <input type = "submit" value = "].$Data->{'lang'}->txt('Save').qq[" class = "button proceed-button"> 
+                </div>
             </form>
+            </div>
           ];
         }
     }
