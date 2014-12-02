@@ -1,4 +1,4 @@
-CREATE TABLE `fifasponline`.`tblFacilityType` (
+CREATE TABLE `tblFacilityType` (
     `intFacilityTypeID` INT NOT NULL AUTO_INCREMENT,
     `intRealmID` INT NOT NULL,
     `intSubRealmID` INT NULL,

@@ -467,6 +467,7 @@ sub gather    {
     my @problems   = ();
     my @fieldorder = @{ $self->{'Fields'}->{'order'} };
     my %outputdata = ();
+    $permissions = undef if($permissions and !scalar(keys %{$permissions}));
     for my $fieldname (@fieldorder) {
         my $fieldvalue = '';
         my $name = "d_$fieldname";

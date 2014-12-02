@@ -100,13 +100,10 @@ sub showPersonHome	{
 			Country => $personObj->getValue('strCountry') || '',	
 			PostalCode => $personObj->getValue('strPostalCode') || '',	
 			PhoneHome => $personObj->getValue('strPhoneHome') || '',	
-			PhoneWork => $personObj->getValue('strPhoneWork') || '',	
-			PhoneMobile => $personObj->getValue('strPhoneMobile') || '',	
 			Email => $personObj->getValue('strEmail') || '',	
 			Gender => $Data->{'lang'}->txt($Defs::genderInfo{$personObj->getValue('intGender') || 0}) || '',
 			DOB => $personObj->getValue('dtDOB') || '',
 			NationalNum => $personObj->getValue('strNationalNum') || '',
-			SquadNum => $personObj->getValue('dblCustomDbl10') || '',
 			BirthCountry => $personObj->getValue('strCountryOfBirth') || '',
 			PassportNat => $personObj->getValue('strPassportNationality') || '',
 			Status => $personObj->getValue('strStatus') || '',
@@ -246,7 +243,7 @@ sub showLink {
         my ($personID,$client,$Data) = @_;
            
         #check person level 
-        my $url = "$Data->{'target'}?client=$client&amp;a=P_DTE";
+        my $url = "$Data->{'target'}?client=$client&amp;a=PE_";
         return $url if ($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL);     
         my %Reg=();
         $Reg{'entityID'} = getLastEntityID($Data->{'clientValues'});

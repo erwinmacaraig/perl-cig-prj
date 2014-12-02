@@ -3,6 +3,11 @@
 		"intGender" : {
 			"rule" : "StrToIntEntry",
 			"value" : {"MALE":"1", "FEMALE":"2"}
+		},
+		"strISONationality" : {
+			"rule" : "insertField",
+			"field" : "intDataOrigin",
+			"values" : {"FIN" : "100", "SGP" : "100"}
 		}
 	},
 	

@@ -16,6 +16,7 @@ sub new {
 	$self->{'db'}=$params{'db'};
 	$self->{'ID'}=$params{'ID'};
 	$self->{'assocID'}=$params{'assocID'};
+	$self->{'cache'}=$params{'cache'} || undef;;
 	return undef if !$self->{'db'};
 	
 	# load DB data if provided
@@ -23,6 +24,7 @@ sub new {
         $self->{'DBData'} = $params{'DBData'};
     }
     
+    $self->setCachePrefix();
     return $self;
 }
 
@@ -255,6 +257,15 @@ sub write {
             }
         }
     }
+    if($self->{'cache'} and $self->{'cachePrefix'}) {
+        my $cachekey = $self->{'cachePrefix'}.'-'.$self->ID();
+        $self->{'cache'}->delete('swm',$cachekey);
+    }
+}
+
+sub setCachePrefix    {
+    my $self = shift;
+    $self->{'cachePrefix'} = '';
 }
 
 1;

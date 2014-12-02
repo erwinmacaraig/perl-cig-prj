@@ -2,8 +2,8 @@
 package TableRules;
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(multiplyEntry insertLink removeLinkField getConfig swapEntry strToIntEntry setUniqField multiDestEntry);
-@EXPORT_OK = qw(multiplyEntry insertLink removeLinkField getConfig swapEntry strToIntEntry setUniqField multiDestEntry);
+@EXPORT = qw(multiplyEntry insertLink removeLinkField getConfig strToIntEntry setUniqField multiDestEntry insertField entityLink linkIdEntry);
+@EXPORT_OK = qw(multiplyEntry insertLink removeLinkField getConfig strToIntEntry setUniqField multiDestEntry insertField entityLink linkIdEntry);
 
 # This is where you should include the migration rule for your table
 use Data::Dumper;
@@ -49,13 +49,14 @@ sub getConfig{
 # Allow cloning of record and change each clone value base on the collection attribute.
 
 sub multiplyEntry{
-    my ($records,$rule) = @_;
+    my ($records,$rule, $rulekey) = @_;
     my $collection = $rule->{"collection"};
     my @newRecords = ();
     foreach my $key ( @{$collection} ){
     	foreach my $record ( @{$records} ){
     		my $copy = {%$record};
 	        $copy->{$rule->{"field"}} = $key;
+			delete $copy->{$rulekey} if $rule->{"field"} ne $rulekey;
 	        push (@newRecords, $copy);
     	}
    }
@@ -75,22 +76,103 @@ sub removeLinkField{
 sub insertLink{
 	my ($links,$records,$rule) = @_;
     foreach my $record ( @{$records} ){
+		say $rule->{"field"};
         my %link = (
             "intParentEntityID" => getRecord($db,"tblEntity","intEntityID","strImportEntityCode",$record->{$rule->{"field"}}),
             "intChildEntityID" => getRecord($db,"tblEntity","intEntityID","strImportEntityCode",$record->{"strImportEntityCode"}),
         );
+		#say Dumper($record);
         push ($links,\%link)
     }
     return $links;
 }
-sub swapEntry{
-	my ($records,$rule) = @_;
+sub entityLink{
+	my ($links,$records,$rule) = @_;
+	my $entstruct = [];
+    foreach my $record ( @{$records} ){
+		say $rule->{"field"}.' =='. $rule->{"regionfld"};
+		my $values = $rule->{"values"};
+		my $isocntry = $record->{ $rule->{"field"} };
+		
+		say $rule->{"rule"};
+		
+		#my $realm = $db->selectrow_array("select intrealmid,strRealmName from tblRealms where $values->{}");
+		my $realmid = getRecord($db,"tblRealms","intrealmid","strRealmName",$values->{ $isocntry });
+		my $parentid = getRecord($db,"tblEntity","intEntityID","strLocalName",$values->{ $isocntry });
+		my $childid = getRecord($db,"tblEntity","intEntityID","strImportEntityCode",$record->{"strImportEntityCode"}),
+
+		my %link = ();
+		my %structure = ();
+		my $regionval = $record->{ $rule->{"regionfld"} };
+		if( ($isocntry eq "SGP" || $regionval eq "" ) && ($parentid)) {
+			$link{'intParentEntityID'} = $parentid;
+			$link{'intChildEntityID'} = getRecord($db,"tblEntity","intEntityID","strImportEntityCode",$record->{"strImportEntityCode"}),
+			
+			$structure{'intParentLevel'} = "100";
+			
+			
+			#$structure{'intChildLevel'} = "3";
+			$structure{'intDirect'} = "1";
+		} else {
+			$link{'intParentEntityID'} = getRecord($db,"tblEntity","intEntityID","strLocalName",$regionval);
+			#%link = (
+            #"intParentEntityID" => getRecord($db,"tblEntity","intEntityID","strLocalName",$regionval),
+            #"intChildEntityID" => getRecord($db,"tblEntity","intEntityID","strImportEntityCode",$record->{"strImportEntityCode"})
+			#);
+			$structure{'intParentLevel'} = getRecord($db,"tblEntity","intEntityLevel","strLocalName",$regionval);
+			
+			
+        
+		}
+		$link{'intChildEntityID'} = $childid;
+		
+		if( ($record->{'strEntityType'} eq 'CLUB') || ($record->{'strEntityType'} eq 'ACADEMY') ) {
+			$structure{'intChildLevel'} = "3";
+		}elsif( $record->{'strEntityType'} eq 'ZONE') {
+			$structure{'intChildLevel'} = "10";
+		}elsif( $record->{'strEntityType'} eq 'REGION') {
+			$structure{'intChildLevel'} = "20";
+		}elsif( $record->{'strEntityType'} eq 'STATE') {
+			$structure{'intChildLevel'} = "30";
+		}
+		
+		$structure{'intRealmID'} = $realmid;
+		$structure{'intParentID'} = $link{'intParentEntityID'};
+		$structure{'intChildID'} = $link{'intChildEntityID'};
+
+        push ($links,\%link);
+		push ($entstruct,\%structure)
+    }
+    return $links, $entstruct;
+}
+
+sub linkIdEntry{
+	my ($records,$rule, $rkey) = @_;
 	my @newRecords = ();
     foreach my $record ( @{$records} ){
     	my $copy = {%$record};
-	    $copy->{$rule->{"destination"}} = getRecord($db,$rule->{"table"},$rule->{"destination"},$rule->{"source"},$record->{$rule->{"source"}});
-	    delete $copy->{$rule->{"source"}};
+	    $copy->{$rule->{"destination"}} = getRecord($db,$rule->{"table"},$rule->{"destination"},$rule->{"source"},$record->{$rkey});
+	    delete $copy->{$rule->{"source"}}  if (defined $rule->{"swap"} && $copy->{$rule->{"swap"}});
 	    push (@newRecords, $copy);
+
+    }
+    return \@newRecords;
+}
+
+sub linkIdEntry2{
+	my ($records,$rule) = @_;
+	my @newRecords = ();
+	my $table = $rule->{"reference"};
+	say Dumper($table);
+	
+    foreach my $record ( @{$records} ){
+    	my $copy = {%$record};
+		foreach my $key ( keys %{$table} ){
+		    say $key.' == '.$table->{$key};
+	        $copy->{ $table->{$key} } = getRecord($db, $key, $table->{$key}, $rule->{"link"}, $record->{$rule->{"link"}});
+		}
+	    push (@newRecords, $copy);
+		
     }
     return \@newRecords;
 }
@@ -104,6 +186,47 @@ sub strToIntEntry{
         }
     }
     return $records;
+}
+
+sub insertField{
+	my ($records,$rule, $key) = @_;
+    my $values = $rule->{"values"};
+    my @newRecords = ();
+    foreach my $record ( @{$records} ){
+        my $copy = {%$record};
+        $copy->{$rule->{"field"}} = $values->{ $record->{$key} };
+        push (@newRecords, $copy);
+    }
+    return \@newRecords;
+}
+
+sub insertEntityLevel{
+	my ($records,$rule, $key) = @_;
+    my $values = $rule->{"values"};
+	say $rule->{"cntryfld"}.' =='. $rule->{"regionfld"};
+    my @newRecords = ();
+    foreach my $record ( @{$records} ){
+		my $copy = {%$record};
+		
+		say $rule->{"rule"};
+		my $isocntry = $record->{ $rule->{"cntryfld"} };
+
+		my $realmid = getRecord($db,"tblRealms","intrealmid","strRealmName",$values->{ $isocntry });
+		
+		if( ($isocntry eq "SGP") || ( $record->{ $rule->{"regionfld"} } eq "" ) ) {
+			my $parentE = $realmid;
+			$copy->{$rule->{"newfield"}} = "100";
+		} else {
+			my $val = join "", (values $record);
+			if( $val ) {
+			    $copy->{$rule->{"newfield"}} = "3";
+			}
+			
+		}
+		say Dumper($record);
+        push (@newRecords, $copy);
+    }
+    return \@newRecords;
 }
 
 sub multiDestEntry{

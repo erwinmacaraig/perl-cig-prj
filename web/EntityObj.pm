@@ -4,6 +4,11 @@ use strict;
 use BaseObject;
 our @ISA =qw(BaseObject);
 
+sub setCachePrefix    {
+    my $self = shift;
+    $self->{'cachePrefix'} = 'EntityObj';
+}
+
 sub load {
   my $self = shift;
 

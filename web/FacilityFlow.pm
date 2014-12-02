@@ -26,6 +26,9 @@ sub handleFacilityFlow {
     my $entityID = getLastEntityID($clientValues) || 0;
     my $entityLevel = getLastEntityLevel($clientValues) || 0;
     my $originLevel = $Data->{'clientValues'}{'authLevel'} || 0;
+    my $facilityID = param('vID') || 0;
+    $facilityID = 0 if $facilityID < 0;
+
 
     my $flow = new Flow_FacilityBackend(
         db => $Data->{'db'},
@@ -35,6 +38,7 @@ sub handleFacilityFlow {
             client => $client,
             a => $action,
         },
+        ID  => $facilityID || 0,
         SystemConfig => $Data->{'SystemConfig'},
         ClientValues => $clientValues,
         Target => $Data->{'target'},

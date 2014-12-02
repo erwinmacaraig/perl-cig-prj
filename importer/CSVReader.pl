@@ -11,24 +11,41 @@ use Text::CSV::Encoded;
 
 use feature qw(say);
 
-my $directory = '';  
+my $directory = '';
 my $format = '';
 my $notes = '';
+my $realmID = 0;
+my $fromNational = 1;
 my $db = connectDB();
 
-GetOptions ('directory=s' => \$directory, 'format=s' => \$format, 'notes=s' => \$notes);
+GetOptions ('directory=s' => \$directory, 'format=s' => \$format, 'notes=s' => \$notes, 'realmid=i' => \$realmID, 'national=i'=>$fromNational);
 
 foreach my $fp (glob("$directory/*.".$format)) {
     my %importRecord = (
     	"strNotes" => $notes,
     );
+	
+	if( $fromNational) {
+	    my $national = ucfirst((split '/', $directory)[1]);
+	    my $natID = getRecord($db,"tblEntity","intEntityID","strLocalName",$national);
+	    if( !$natID) {
+		    my %natRec = (
+			    'intEntityLevel' => '100',
+			    'strStatus' => 'ACTIVE',
+			    'strLocalName' => $national,
+			    'strISOCountry' => uc($national)
+		    );
+		    insertRow($db,"tblEntity",\%natRec, 0, $realmID);
+	    }
+	}
+	
     my ($importId) = insertRow($db,"tblImportTrack",\%importRecord);
-    readCSVFile($fp,$importId);
+    readCSVFile($fp,$importId, $realmID);
 }
 
 
 sub readCSVFile{
-    my ($file,$importId) = @_;
+    my ($file,$importId, $realmID) = @_;
     my @records;
     my @directory = split /\//, $file;
     my $dirlength  = scalar @directory;
@@ -52,9 +69,12 @@ sub readCSVFile{
     my $object =  $tag[0];
     my $tbl =  (split /\./, $object)[0];
     my $csv = Text::CSV::Encoded->new($csv_config) or die "Text::CSV error: " . Text::CSV->error_diag;
-	say $object;
+	
+	if( $object =~ /(\w+)_(\d+)/ && $1 eq "tblPersonRegistration") {
+        copyDbTable($db, $1."_1", $object);
+	}
+
     my @headers = $csv->getline($fh) or die "no header";
-	#say Dumper(@headers);
 	
     my $config = getConfig($object);
     my @keys = MapKeys(@headers, $config->{"mapping"});
@@ -68,9 +88,12 @@ sub readCSVFile{
     say 'Total Input Records: #'.$ctr;
     my $records = ApplyPreRules($config->{"rules"},\@records);
     my $inserts = ApplyRemoveLinks($config->{"rules"},$records);
-    insertBatch($db,$tbl,$inserts,$importId, $config->{"rules"});
-    my $links = ApplyPostRules($tbl,$config->{"rules"},\@records);
+    insertBatch($db,$tbl,$inserts,$importId, $realmID);
+    my ($links, $entstruct) = ApplyPostRules($tbl,$config->{"rules"},\@records);
+	say Dumper($links);
+	say Dumper($entstruct);
     insertBatch($db,"tblEntityLinks",$links,$importId);
+	insertBatch($db,"tblTempEntityStructure",$entstruct,0,0);
     close $fh;
 }
 
@@ -82,11 +105,11 @@ sub ApplyPreRules{
     foreach my $key ( keys %{$rules} ){
         my $rule = $rules->{$key};
         if($rule->{"rule"} eq "multiplyEntry"){
-           $records = multiplyEntry($records,$rule);
+           $records = multiplyEntry($records,$rule, $key);
         }
-        elsif($rule->{"rule"} eq "swapEntry"){
-           $records = swapEntry($records,$rule);
-        }
+        #elsif($rule->{"rule"} eq "swapEntry"){
+        #   $records = swapEntry($records,$rule);
+        #}
 		elsif($rule->{"rule"} eq "StrToIntEntry"){
 			$records = strToIntEntry($records, $key, $rule->{"value"});
         }
@@ -96,6 +119,12 @@ sub ApplyPreRules{
         elsif($rule->{"rule"} eq "multiDestEntry"){
             $records = multiDestEntry($records, $rule, $key);
         }
+		elsif($rule->{"rule"} eq "insertField") {
+            $records = insertField($records, $rule, $key);
+		}
+		elsif($rule->{"rule"} eq "linkIdEntry") {
+            $records = linkIdEntry($records, $rule, $key);
+		}
     }
     return $records;
 }
@@ -106,7 +135,8 @@ sub ApplyRemoveLinks{
     my @links = ();
     foreach my $key ( keys %{$rules} ){
         my $rule = $rules->{$key};
-        if($rule->{"rule"} eq "insertLink"){
+        #if($rule->{"rule"} eq "insertLink"){
+		if($rule->{"rule"} eq "removeLinkField"){
            $records = removeLinkField($records,$rule);
         }
     }
@@ -116,13 +146,17 @@ sub ApplyRemoveLinks{
 sub ApplyPostRules{
     my ($table,$rules,$records) = @_;
     my $links = [];
+	my $entstruct = [];
     foreach my $key ( keys %{$rules} ){
         my $rule = $rules->{$key};
+		
         if($rule->{"rule"} eq "insertLink"){
-           $links = insertLink($links,$records,$rule);
-        }
+           ($links, $entstruct) = insertLink($links,$records,$rule);
+        } elsif($rule->{"rule"} eq "entityLink") {
+			($links, $entstruct) = entityLink($links,$records,$rule);
+		}
     }
-    return $links;
+    return $links, $entstruct;
    
 }
 sub MapKeys{

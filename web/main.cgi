@@ -29,6 +29,7 @@ use Agreements;
 use Entity;
 use Club;
 use Person;
+use PersonEdit;
 use Changes;
 use MemberCard;
 
@@ -176,6 +177,9 @@ sub main {
     elsif ( $action =~ /^TB_/ ) {
         my $personID= getID($Data{'clientValues'},$Defs::LEVEL_PERSON);
         ( $resultHTML, $pageHeading ) = handlePerson( $action, \%Data, $personID );
+    }
+    elsif ( $action =~ /^PE_/ ) {
+        ( $resultHTML, $pageHeading ) = handlePersonEdit( $action, \%Data);
     }
     elsif ( $action =~ /^SEARCH_/ ) {
         ( $resultHTML, $pageHeading ) = handleSearch( $action, \%Data, $client );

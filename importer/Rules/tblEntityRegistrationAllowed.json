@@ -3,8 +3,8 @@
 		"strGender" : {
 			"rule" : "multiplyEntry",
 			"value" : "ALL",
-			"field" : "strGender",
-			"collection" : ["MALE","FEMALE"]
+			"field" : "intGender",
+			"collection" : ["1","2"]
 		},
 		"strSport" : {
 			"rule" : "multiplyEntry",
@@ -25,10 +25,11 @@
 			"collection" : ["MINOR","ADULT"]
 		},
 		"strImportEntityCode" : {
-			"rule" : "swapEntry",
+			"rule" : "linkIdEntry",
 			"source" : "strImportEntityCode",
 			"destination" : "intEntityID",
-			"table" : "tblEntity"
+			"table" : "tblEntity",
+			"swap" : "1"
 		}
 	},
 	"mapping" : {
