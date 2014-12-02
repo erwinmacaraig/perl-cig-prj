@@ -210,10 +210,36 @@ sub pageMain {
 
     my ($navTree, $navObjects) = Navbar::GenerateTree($Data, $clientValues_ref);
 
+    my $atloginlevel = 1;
+    my $currentLevel = $clientValues_ref->{'currentLevel'} || 0;
+    my $authLevel = $clientValues_ref->{'authLevel'} || 0;
+    if($currentLevel != $authLevel) {
+        my $cID = getID($clientValues_ref,$Defs::LEVEL_CLUB);
+        $cID = 0 if $cID < 0;
+        my $rID = getID($clientValues_ref,$Defs::LEVEL_REGION);
+        $rID = 0 if $rID < 0;
+        if(
+            $cID
+            and (
+                $authLevel == $Defs::LEVEL_NATIONAL
+                or $authLevel == $Defs::LEVEL_REGION
+            )   
+        )   {
+                $atloginlevel = 0;
+        }
+        if(
+            $rID
+            and $authLevel == $Defs::LEVEL_NATIONAL
+        )   {
+                $atloginlevel = 0;
+        }
+    }
+
     my %NavData= (
         NavTree => $navTree,
         Menu => '',
         HomeURL => "$Data->{'target'}?client=$homeClient&amp;a=".$HomeAction{$Data->{'clientValues'}{'authLevel'}},
+        AtLoginLevel => $atloginlevel,
     );
 
   my $globalnav = runTemplate(

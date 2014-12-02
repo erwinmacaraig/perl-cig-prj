@@ -32,6 +32,7 @@ sub navBar {
 
     my $clientValues_ref=$Data->{'clientValues'};
     my $currentLevel = $clientValues_ref->{INTERNAL_tempLevel} ||  $clientValues_ref->{currentLevel};
+    my $authLevel = $clientValues_ref->{authLevel};
     my $currentID = getID($clientValues_ref);
     $clientValues_ref->{personID} = $Defs::INVALID_ID if $currentLevel > $Defs::LEVEL_PERSON;
     $clientValues_ref->{clubID} = $Defs::INVALID_ID  if $currentLevel > $Defs::LEVEL_CLUB;
