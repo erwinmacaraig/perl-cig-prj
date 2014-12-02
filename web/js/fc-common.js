@@ -18,12 +18,6 @@ $(document).ready(function(){
   $("#accordion").on("hidden.bs.collapse", toggleChevron);
   $("#accordion").on("show.bs.collapse", toggleChevron);
 
-  //temporary workaround for the navs to keep it overlapping on the drilldown menu
-  //if ($("span.level-name").html() == "Person") {
-  	//$("body").find("header nav ul li a").css("padding-left","9px");
-  	//$("body").find("header nav ul li a").css("padding-right","9px");
-  //}
-
 
     // transfer type selection
     $("div#transfer_type_option a").click(function(e){
@@ -58,9 +52,6 @@ $(document).ready(function(){
 
     });
 
-    //here we remove the col-md-10 class used on the generic forms
-    //to flush the button to the right. this is a temporary fix.
-    //$("table.products-table").next("fieldset").find("div.txtright").removeClass("col-md-10");
     
     //this is a temporary fix for the last two steps - documents and complete
     $(".document-upload").insertAfter($("fieldset").first());
@@ -122,80 +113,5 @@ $(document).ready(function(){
             $("div#init_error").slideDown();
         }
     });
-
-
-    function getUrlparameter (strParam) {
-      
-      var strPageUrl = window.location.search.substring(1);
-
-      var strUrlVars = strPageUrl.split('&');
-
-      for (var i = 0; i < strUrlVars.length; i++) {
-        
-        var strParamName = strUrlVars[i].split('=');
-
-        if (strParamName[0] ==strParam ) {
-          return strParamName[1];
-        }
-      }
-
-    }
-
-    var param = getUrlparameter("a");
-
-    console.log(param);
-
-    if (param == "E_HOME" || param == "C_HOME") {
-      
-      $("header nav ul li a[href*='E_HOME']").addClass("active");
-      $("header nav ul li a[href*='C_HOME']").addClass("active");
-    
-    } 
-
-    else if (param == "LOGIN") {
-      
-      $("header nav ul li a[href*='E_HOME']").addClass("active");
-    
-    }
-
-    else if (param == "E_L") {
-      
-      $("header nav ul li a[href*='E_L']").addClass("active");
-    
-    }
-
-    else if (param == "C_L" || param == "C_DTA") {
-     
-      $("header nav ul li.subnav a:contains(Clubs)").addClass("active")
-
-    }
-
-    else if (param == "VENUE_L" || param == "VENUE_DTA") {
-      
-      $("header nav ul li.subnav a:contains(Venues)").addClass("active");
-    
-    }
-
-    else if (param == "INITSRCH_P" || param == "PF_" || param == "DUPL_L" || param == "PRA_T" || param == "PRA_R" || param == "PREGFB_T" || param == "TXN_PAY_INV") {
-     
-      $("header nav ul li.subnav a:contains(People)").addClass("active")
-
-    }
-
-    else if (param == "WF_" || param == "PENDPR_") {
-     
-      $("header nav ul li.subnav a:contains(Work Tasks)").addClass("active")
-
-    }
-
-    else if (param == "REP_SETUP") {
-      
-      $("header nav ul li a[href*='REP_SETUP']").addClass("active");
-    
-    } else {
-
-      $("header nav ul li a[href*='E_HOME']").addClass("active");
-
-    }
 
 })
