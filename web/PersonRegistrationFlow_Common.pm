@@ -275,61 +275,72 @@ sub displayRegoFlowCertificates{
 }
 
 sub checkUploadedRegoDocuments {
-    my($Data,$personID, $regoID,$entityID,$entityLevel,$originLevel,$rego_ref) = @_;
+    my ($Data, $regoID, $client, $entityRegisteringForLevel, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref) = @_; 
+	my $documents = getRegistrationItems(
+        $Data,
+        'REGO',
+        'DOCUMENT',
+        $originLevel,
+        $rego_ref->{'strRegistrationNature'} || $rego_ref->{'registrationNature'},
+        $entityID,
+        $entityRegisteringForLevel,
+        0,
+        $rego_ref,
+     );
+	
+	my @required = ();
+    foreach my $dc (@{$documents}){ 
+		if(($dc->{'DocumentFor'} eq 'TRANSFERITC' and $rego_ref->{'InternationalTransfer'}) or $dc->{'DocumentFor'} ne 'TRANSFERITC') {
+			push @required,$dc;
+		}		
+	}
+	my $total = @required;
+	#my @required_docs = ();
+    #while(my $dref = $sth->fetchrow_hashref()){
+	#	push @required_docs, $dref->{'intDocumentTypeID'};
+	#}
+    return ('',1) if(!$total);
 
-    my $query = qq[
-        SELECT 
-            count(intItemID) as items 
-        FROM 
-            tblRegistrationItem 
-       INNER JOIN 
-           tblDocumentType 
-       ON 
-           tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID
-        WHERE 
-            tblRegistrationItem.intRealmID = ?
-            AND intRequired = 1 
-            AND intOriginLevel = ? 
-            AND strRuleFor = ? 
-            AND intEntityLevel = ? 
-            AND strRegistrationNature = ? 
-            AND strDocumentFor IN ('TRANSFER','PERSON')
-            AND strPersonType = ?
-            AND strPersonLevel IN('', ? )
-            AND strSport IN('', ? )
-            AND strAgeLevel IN('', ? )
-            AND strItemType = ? 
-            AND (strISOCountry_IN ='' OR strISOCountry_IN IS NULL OR strISOCountry_IN LIKE CONCAT('%|',?,'|%')) AND (strISOCountry_NOTIN ='' OR strISOCountry_NOTIN IS NULL OR strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))  ];   
-
-    my $sth = $Data->{'db'}->prepare($query);
-    $sth->execute(  $Data->{'Realm'},
-    				$originLevel,
-    				'REGO',
-    				$entityLevel,
-    				$rego_ref->{'strRegistrationNature'}, 
-    				$rego_ref->{'strPersonType'},
-    				$rego_ref->{'strPersonLevel'},
-    				$rego_ref->{'strSport'},
-    				$rego_ref->{'strAgeLevel'},
-    				'DOCUMENT',
-    				$rego_ref->{'strISONationality'},
-    				$rego_ref->{'strISONationality'}
-    );
-    
-    my $dref = $sth->fetchrow_hashref();
-    my $total_items = $dref->{'items'};     
-    return 1 if($total_items == 0);
+    #my $total_items = $dref->{'items'};     
+    #return 1 if($total_items == 0);
     #there are no required documents to be uploaded
-     
-    $query = qq[SELECT count(intDocumentID) as tot FROM tblDocuments WHERE intPersonID = ? AND intPersonRegistrationID = ?];
+
+   my $query = qq[SELECT distinct(strDocumentName) FROM tblDocuments INNER JOIN tblDocumentType
+					ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intPersonID = ? AND 						tblDocuments.intPersonRegistrationID = ?];
     
-    $sth = $Data->{'db'}->prepare($query);
+   my @uploaded_docs = ();
+   my $sth = $Data->{'db'}->prepare($query);
     $sth->execute($personID, $regoID);
-    $dref = $sth->fetchrow_hashref();
+	
+	while(my $dref = $sth->fetchrow_hashref()){
+		push @uploaded_docs,$dref->{'strDocumentName'};
+	}   
     
-    $sth->finish();
-    return 1 if( ($dref->{'tot'} > 0) && $dref->{'tot'} == $total_items);
-    return 0;
+	my @diff=();
+	
+
+    #return 1 if( ($dref->{'tot'} > 0) && $dref->{'tot'} == $total_items);
+	return ('',1) if($#uploaded_docs == $total);   
+
+	#check for document not uploaded
+	foreach my $rdc (@required){
+		if(!grep /\Q$rdc->{'Name'}\E/,@uploaded_docs){
+			push @diff,$rdc->{'Name'};
+		}
+	}
+	
+	my $error_message = '<p><br /><ul>';
+	foreach my $d (@diff){
+		
+		$error_message .= qq[<li> $d </li>]; 
+	}
+   
+	$error_message .= '</ul> </p>';
+	
+	$sth->finish();
+
+	return ($error_message, 0) if (@diff);
+	return('',1);
 }
 sub displayRegoFlowDocuments    {
 
@@ -418,7 +429,7 @@ sub displayRegoFlowDocuments    {
   my %PageData = (
         nextaction => "PREGF_DU",
         target => $Data->{'target'},
-        documents => \@docos,
+        documents => $documents,
         approveddocs => \@listing, 
         personleveldocs => $personLeveldocs,
         transferdocs=> $transferdocs,

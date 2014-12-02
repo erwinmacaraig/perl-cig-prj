@@ -14,7 +14,7 @@ use Data::Dumper;
 
 sub getRegistrationItems    {
     my($Data, $ruleFor, $itemType, $originLevel, $regNature, $entityID, $entityLevel, $multiPersonType, $Rego_ref, $documentFor) = @_; 
-    #open(FH, ">$Defs::myerrorfile");
+
     $itemType ||= '';
     $originLevel ||= 0; 
     $regNature ||= '';
@@ -75,7 +75,9 @@ sub getRegistrationItems    {
 	        
 		) or query_error($st);
     
-    #####
+    
+	
+
     my @values = (); 
     push @values, $Data->{'Realm'};  
     push @values,$Data->{'RealmSubType'}; 
@@ -92,8 +94,7 @@ sub getRegistrationItems    {
     push @values,$itemType;
     push @values,$Rego_ref->{'Nationality'} || '';
     push @values,$Rego_ref->{'Nationality'} || '';
-    #print FH Dumper(@values);
-    ####  
+    
 
     my @Items=();
     while (my $dref = $q->fetchrow_hashref())   {

@@ -953,6 +953,7 @@ sub display_documents {
     else    {
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
     }
+	
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
         $self->decrementCurrentProcessIndex();
@@ -970,6 +971,7 @@ sub display_documents {
         TextBottom => '',
     );
     my $pagedata = $self->display(\%PageData);
+	
 
     return ($pagedata,0);
 
@@ -989,6 +991,7 @@ sub process_documents {
     my $client = $self->{'Data'}->{'client'};
 
     my $rego_ref = {};
+	my $personObj;
     my $content = '';
     if($regoID) {
         my $valid =0;
@@ -999,16 +1002,29 @@ sub process_documents {
             $entityID
         );
         $regoID = 0 if !$valid;
+		$personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
+    	$personObj->load();
+		my $nationality = $personObj->getValue('strISONationality') || ''; 
+        my $itc = $personObj->getValue('intInternationalTransfer') || '';
+        $rego_ref->{'Nationality'} = $nationality;
+        $rego_ref->{'InternationalTransfer'} = $itc;
     }
 
-    my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
-    $personObj->load();
-    
     #check for uploaded document
-    my $isRequiredDocPresent = checkUploadedRegoDocuments($self->{'Data'},$personID, $regoID,$entityID,$entityLevel,$originLevel,$rego_ref);
-    if(1==2 && !$isRequiredDocPresent){
+    my ($error_message, $isRequiredDocPresent) = checkUploadedRegoDocuments($self->{'Data'}, 
+            $regoID, 
+            $client, 
+            $entityLevel, 
+            $originLevel, 
+            $rego_ref, 
+            $entityID, 
+            $personID, 
+            {},
+	);
+    if(!$isRequiredDocPresent){
+	#if(1==1){
 		my $labelBackBtn = 'Back to Documents';
-    	push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Required Document Missing");
+    	push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Required Document Missing") . $error_message;
     	my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -1022,8 +1038,7 @@ sub process_documents {
         NoContinueButton => 1,       
 		Back => $labelBackBtn, 
     );
-         
-        my $pagedata = $self->display(\%PageData);
+      my $pagedata = $self->display(\%PageData);
      
     	return ($pagedata,0);
 
