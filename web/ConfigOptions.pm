@@ -334,7 +334,7 @@ sub getFieldsList	{
         strSuburb
         strState
         strPostalCode
-        strCountry
+        strISOCountry
         strPhoneHome
         strPhoneWork
         strPhoneMobile

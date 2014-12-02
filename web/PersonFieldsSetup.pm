@@ -538,6 +538,13 @@ sub personFieldsSetup {
                     type        => 'text',
                     size        => '50',
                     maxsize     => '100',
+                },                
+                strISOCountry => {
+                    label       => $FieldLabels->{'strISOCountry'},
+                    value       => $values->{'strISOCountry'},
+                    type        => 'lookup',
+                    options     => $isocountries,
+                    firstoption => [ '', 'Select Country' ],
                 },
                 strPostalCode => {
                     label       => $FieldLabels->{'strPostalCode'},
@@ -568,6 +575,7 @@ sub personFieldsSetup {
                 strAddress2
                 strSuburb
                 strState
+                strISOCountry
                 strPostalCode
                 strPhoneHome
                 strEmail

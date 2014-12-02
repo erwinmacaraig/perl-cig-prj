@@ -528,7 +528,7 @@ sub _qualifyDBFields    {
         strAddress2 => 'P',
         strSuburb => 'P',
         strState => 'P',
-        strCountry => 'P',
+        strISOCountry => 'P',
         strEmail => 'P',
         strPostalCode => 'P',
         strMobile => 'P',
