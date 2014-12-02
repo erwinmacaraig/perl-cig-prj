@@ -1223,3 +1223,28 @@ table.table tr th {
     color: #000;
     font-size: 13px;
 }
+
+/* Summary Read Only Texts */
+.summary .read-only.col-md-6 .read-only-text{
+	padding-bottom: 20px;
+	margin-bottom: 30px;
+}
+.summary .read-only.col-md-6 .read-only-text ul{
+	list-style-type: none;
+	margin-left: -70px;
+}
+.dataTables_length, .dataTables_info {
+	float:left;
+}
+
+.dataTables_paginate {
+	padding-top:8px;
+}
+
+a.paginate_button {
+	padding:0 5px 0 5px;
+}
+
+a.paginate_button.previous, a.paginate_button.next, a.paginate_button {
+	cursor: pointer;
+}
