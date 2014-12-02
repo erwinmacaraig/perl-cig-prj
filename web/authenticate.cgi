@@ -173,7 +173,7 @@ warn("SICC $success");
     print entity_cookie( new CGI, $level, $idcode );
 
     my $link =
-      "main.cgi?client=$client&lastlogin=$lastlogin&days=$days&amp;a=LOGIN";
+      "main.cgi?client=$client&lastlogin=$lastlogin&days=$days&a=LOGIN";
 
     print qq[
 	<HTML>
