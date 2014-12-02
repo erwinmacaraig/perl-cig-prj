@@ -53,7 +53,7 @@ sub displayRegoFlowCompleteBulk {
     if ($Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'} && $unpaid_cost)  { #hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0)   {
     print STDERR "SSS";    
 
-        $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
+        $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, '');
     }
     my %PageData = (
         target => $Data->{'target'},
@@ -132,15 +132,15 @@ print STDERR "OK IS $ok | $run\n\n";
         savePlayerPassport($Data, $personID) if (! $run);
         $hidden_ref->{'run'} = 1;
          if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
-            $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref);
+            $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
          }
          
+            #txns_url => $pay_url,
+		    #txn_invoice_url => $txn_invoice_url,
         my %PageData = (
             person_home_url => $url,
             gateways => $gateways,
 			txnCount => $txnCount,
-            txns_url => $pay_url,
-		    txn_invoice_url => $txn_invoice_url,
             target => $Data->{'target'},
             RegoStatus => $rego_ref->{'strStatus'},
             hidden_ref=> $hidden_ref,
@@ -530,13 +530,11 @@ sub displayRegoFlowProductsBulk {
 
 sub generateRegoFlow_Gateways   {
 
-    my ($Data, $client, $nextAction, $hidden_ref) = @_;
+    my ($Data, $client, $nextAction, $hidden_ref, $txn_invoice_url) = @_;
 
     my $lang = $Data->{'lang'};
     my ($paymentSettings, $paymentTypes) = getPaymentSettings($Data, 0, 0, $Data->{'clientValues'});
-    my $gateway_body = qq[
-        <div id = "payment_cc" sstyle= "display:none;"><br>
-    ];
+    my $gateway_body = '';
     my $gatewayCount = 0;
     my $paymentType = 0;
     foreach my $gateway (@{$paymentTypes})  {
@@ -548,13 +546,7 @@ sub generateRegoFlow_Gateways   {
         $gateway_body .= qq[
             <input type="submit" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
         ];
-            #<input type="hidden" value="$pType" name="pt_submit[$gatewayCount]">
-        #<input type="hidden" value="$gatewayCount" name="gatewayCount">
     }
-    $gateway_body .= qq[
-        <div style= "clear:both;"></div>
-        </div>
-    ];
     $gateway_body = '' if ! $gatewayCount;
     my $target = 'paytry.cgi';#$Data->{'target'};
 
@@ -567,6 +559,7 @@ sub generateRegoFlow_Gateways   {
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
         client=>$client,
+		txn_invoice_url => $txn_invoice_url,
     );
     if ($gatewayCount == 1) {
         $hidden_ref->{"pt_submit[1]"} = $paymentType; 
