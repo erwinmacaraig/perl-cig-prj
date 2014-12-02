@@ -226,6 +226,7 @@ sub personFieldsSetup {
                     type        => 'date',
                     datetype    => 'dropdown',
                     format      => 'dd/mm/yyyy',
+                    maxyear     => (localtime)[5] + 1900,
                     validate    => 'DATE',
                     compulsory => 1,
                     sectionname => 'core2',
