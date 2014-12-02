@@ -50,8 +50,7 @@ sub build {
     my %sections       = ();
     my %sectioncount   = ();
     my $txt_compulsory = $self->langlookup( 'Compulsory Field' );
-    my $compulsory =
-qq[<span class="compulsory"><img src="images/compulsory.gif" alt="$txt_compulsory" title="$txt_compulsory"/></span>];
+    my $compulsory = qq[<span class="compulsory">*</span>];
     #my $compulsory = qq[];
     return '' if !$self->{'Fields'};
     return '' if !$self->{'Fields'}->{'order'};
@@ -225,8 +224,6 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 $row_class = 'form-space';
                 $field_html = '&nbsp;';
             }
-            $field_html .= $compulsory
-            if $f->{'compulsory'} and $type ne 'hidden';
             if ( ( $f->{'compulsory'} or $f->{'validate'} )
                 and $type ne 'hidden' )
             {
@@ -263,6 +260,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
               if $f->{'label'} and !$f->{'nolabelsuffix'};
         }
         $label ||= '&nbsp;';
+        $label = $compulsory.$label if $f->{'compulsory'} and $type ne 'hidden';
         if (    $self->{'Fields'}->{'options'}
             and $self->{'Fields'}->{'options'}{'hideblank'}
             and !$f->{'neverHideBlank'} )
