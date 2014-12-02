@@ -360,7 +360,7 @@ sub club_details  {
       },
 
       strCity=> {
-        label => 'City of Organisation',
+        label => 'City',
         value => $field->{strCity},
         type  => 'text',
         size  => '40',

@@ -1550,10 +1550,7 @@ sub verifyDocument {
     	$q->execute(
 			$documentStatus,
         	$documentID
-    	);
-		open FH, ">dumpfile.txt";
-		print FH "Query: \n $st";
-		print FH "documentStatus: $documentStatus \n documentID = $documentID\n";
+    	);		
 	}
 
 }
