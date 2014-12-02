@@ -1303,4 +1303,6 @@ a.paginate_button.previous, a.paginate_button.next, a.paginate_button {
 	cursor: pointer;
 }
 
-
+.alert p {
+	font-size:12px;
+}
