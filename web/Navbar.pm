@@ -205,13 +205,13 @@ sub getEntityMenuData {
             url => $baseurl."a=P_L&amp;l=$Defs::LEVEL_PERSON",
         };
     #}
-    if($SystemConfig->{'menu_newperson_PLAYER_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+    if($SystemConfig->{'menu_newperson_PLAYER_'.$Data->{'clientValues'}{'authLevel'}.'_'.$currentLevel} && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'persons_addplayer'} = {
             name => $lang->txt('Add Player'),
             url => $baseurl."a=PF_&amp;dtype=PLAYER",
         };
     }
-    if($SystemConfig->{'menu_newperson_COACH_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+    if($SystemConfig->{'menu_newperson_COACH_'.$Data->{'clientValues'}{'authLevel'}.'_'.$currentLevel} && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'persons_addcoach'} = {
             name => $lang->txt('Add Coach'),
             url => $baseurl."a=PF_&amp;dtype=COACH",
@@ -235,7 +235,7 @@ sub getEntityMenuData {
             url => $baseurl."a=PF_&amp;dtype=CLUBOFFICIAL",
         };
     }
-    if($SystemConfig->{'menu_newperson_REFEREE_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+    if($SystemConfig->{'menu_newperson_REFEREE_'.$Data->{'clientValues'}{'authLevel'}.'_'.$currentLevel} && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'persons_addofficial'} = {
             name => $lang->txt('Add Referee'),
             url => $baseurl."a=PF_&amp;dtype=REFEREE",
@@ -709,13 +709,13 @@ sub getClubMenuData {
             url => $baseurl."a=PRA_R",
             };
         }
-        if($SystemConfig->{'menu_newperson_PLAYER_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+        if($SystemConfig->{'menu_newperson_PLAYER_'.$Data->{'clientValues'}{'authLevel'}.'_'.$currentLevel} && !$Data->{'ReadOnlyLogin'}) {
             $menuoptions{'persons_addplayer'} = {
                 name => $lang->txt('Add Player'),
                 url => $baseurl."a=PF_&amp;dtype=PLAYER",
             };
         }
-        if($SystemConfig->{'menu_newperson_COACH_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+        if($SystemConfig->{'menu_newperson_COACH_'.$Data->{'clientValues'}{'authLevel'}.'_'.$currentLevel} && !$Data->{'ReadOnlyLogin'}) {
             $menuoptions{'persons_addcoach'} = {
                 name => $lang->txt('Add Coach'),
                 url => $baseurl."a=PF_&amp;dtype=COACH",
@@ -739,7 +739,7 @@ sub getClubMenuData {
                 url => $baseurl."a=PF_&amp;dtype=CLUBOFFICIAL",
             };
         } 
-        if($SystemConfig->{'menu_newperson_REFEREE_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+        if($SystemConfig->{'menu_newperson_REFEREE_'.$Data->{'clientValues'}{'authLevel'}.'_'.$currentLevel} && !$Data->{'ReadOnlyLogin'}) {
             $menuoptions{'persons_addofficial'} = {
                 name => $lang->txt('Add Referee'),
                 url => $baseurl."a=PF_&amp;dtype=REFEREE",
