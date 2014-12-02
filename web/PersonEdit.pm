@@ -88,6 +88,8 @@ sub handlePersonEdit {
           my ($output, undef, $headJS, undef) = $obj->build($permissions,'edit',1);
           $body .= qq[
             <div class="col-md-12">
+            <h3 class="panel-header">Details</h3>
+            <div class="panel-body"> 
             <form action = "$Data->{'target'}" method = "POST">
                 $output
                 $headJS
@@ -98,6 +100,7 @@ sub handlePersonEdit {
                 <input type = "submit" value = "].$Data->{'lang'}->txt('Save').qq[" class = "button proceed-button"> 
                 </div>
             </form>
+            </div>
             </div>
           ];
         }
