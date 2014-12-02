@@ -82,15 +82,15 @@ sub setProcessOrder {
             'action' => 'du',
             'function' => 'process_documents',
         },
-        {
-            'action' => 'p',
-            'function' => 'display_products',
-            'label'  => 'Products',
-        },
-        {
-            'action' => 'pu',
-            'function' => 'process_products',
-        },
+        #{
+        #    'action' => 'p',
+        #    'function' => 'display_products',
+        #    'label'  => 'Products',
+        #},
+        #{
+        #    'action' => 'pu',
+        #    'function' => 'process_products',
+        #},
         {
             'action' => 'c',
             'function' => 'display_complete',
@@ -168,11 +168,29 @@ sub setupValues {
         subRealmID => $self->{'Data'}{'RealmSubType'},
     );
 
+    my %entityTypeOptions = ();
+    for my $eType ( keys %Defs::entityType ) {
+        next if !$eType;
+        next if $eType eq $Defs::EntityType_WORLD_FEDERATION;
+        next if $eType eq $Defs::EntityType_NATIONAL_ASSOCIATION;
+        next if $eType eq $Defs::EntityType_REGIONAL_ASSOCIATION;
+        $entityTypeOptions{$eType} = $Defs::entityType{$eType} || '';
+    }
+
     my @intNatCustomLU_DefsCodes = (undef, -53, -54, -55, -64, -65, -66, -67, -68,-69,-70);
     my $CustomFieldNames = getCustomFieldNames( $self->{'Data'}, $self->{'Data'}{'RealmSubType'}) || {};
     $self->{'FieldSets'} = {
         core => {
             'fields' => {
+                strEntityType   => {
+                    label       => $FieldLabels->{'strEntityType'},
+                    value       => $values->{strEntityType} || '',
+                    type        => 'lookup',
+                    options     => \%entityTypeOptions,
+                    firstoption => [ '', 'Select Type of Organisation' ],
+                    compulsory => 1,
+                    sectionname => 'core2',
+                },
                 intFacilityTypeID => {
                     label       => $FieldLabels->{'intFacilityTypeID'},
                     value       => $values->{'intFacilityTypeID'},
@@ -260,6 +278,7 @@ sub setupValues {
                 intLocalLanguage
                 strLatinName
                 strLatinShortName
+                strEntityType
                 intFacilityTypeID
                 strCity
                 strRegion

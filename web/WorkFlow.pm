@@ -2319,6 +2319,7 @@ sub populateDocumentViewData {
         WHERE
             wt.intWFTaskID = ?
             AND wt.intRealmID = ?
+        ORDER BY dt.strDocumentName, d.intDocumentID DESC
     ];
 
     
@@ -2332,6 +2333,7 @@ sub populateDocumentViewData {
 
 	my @RelatedDocuments = ();
 	my $rowCount = 0;
+    my %DocoSeen = ();
 
     my %DocumentAction = (
         'target' => 'main.cgi',
@@ -2342,6 +2344,8 @@ sub populateDocumentViewData {
 
     my $count = 0;
     while(my $tdref = $q->fetchrow_hashref()) {
+        next if exists $DocoSeen{$tdref->{'intDocumentTypeID'}};
+        $DocoSeen{$tdref->{'intDocumentTypeID'}} = 1;
         print STDERR Dumper $tdref;
         #skip if no registration item matches rego details combination (type/role/sport/rego_nature etc)
         next if (!$tdref->{'regoItemID'} and $dref->{'strWFRuleFor'} eq 'REGO');
