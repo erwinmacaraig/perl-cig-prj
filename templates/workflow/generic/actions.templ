@@ -97,11 +97,11 @@
                         .addClass("btn-main")
                         .unbind('click', disableAction)
                         .click(function(f){
-                            jQuery("div#showWorkflowNotes").modal();
 
                             var actiontype = jQuery(this).data('actiontype');
 
                             if(actiontype == "REJECT" || actiontype == "HOLD" || actiontype == "RESOLVE"){
+                                jQuery("div#showWorkflowNotes").modal();
                                 jQuery("#workFlowActionForm input[type=hidden][name=type]").val(actiontype);
                                 f.preventDefault();
                             }
