@@ -103,15 +103,6 @@ sub setProcessOrder {
             'fieldset'  => 'certifications',
         },
         {
-            'action' => 'p',
-            'function' => 'display_products',
-            'label'  => 'Products',
-        },
-        {
-            'action' => 'pu',
-            'function' => 'process_products',
-        },
-        {
             'action' => 'd',
             'function' => 'display_documents',
             'label'  => 'Documents',
@@ -120,7 +111,16 @@ sub setProcessOrder {
             'action' => 'du',
             'function' => 'process_documents',
         },
+         {
+            'action' => 'p',
+            'function' => 'display_products',
+            'label'  => 'Products',
+        },
         {
+            'action' => 'pu',
+            'function' => 'process_products',
+        },
+       {
             'action' => 'c',
             'function' => 'display_complete',
             'label'  => 'Complete',
