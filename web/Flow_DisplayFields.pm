@@ -351,12 +351,9 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
     }
     my $tableinfo = $self->{'Fields'}->{'options'}{'tableinfo'} || ' class = "HTF_table" ';
     $returnstr = qq[
-    <h3 class="panel-header">Core Details</h3>
-    <div class="panel-body"> 
     <fieldset>
     $returnstr
     </fieldset>
-    </div>
     ];
     if ($returnstr) {
         my $validation =
