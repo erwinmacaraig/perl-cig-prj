@@ -1223,3 +1223,19 @@ table.table tr th {
     color: #000;
     font-size: 13px;
 }
+
+.dataTables_length, .dataTables_info {
+	float:left;
+}
+
+.dataTables_paginate {
+	padding-top:8px;
+}
+
+a.paginate_button {
+	padding:0 5px 0 5px;
+}
+
+a.paginate_button.previous, a.paginate_button.next, a.paginate_button {
+	cursor: pointer;
+}
