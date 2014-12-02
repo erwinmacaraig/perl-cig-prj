@@ -803,7 +803,7 @@ i.indicator {
 	height: 0;
 	width: 0;
 	top: -10px;
-	left: 100%;
+	left: 99%;
 	position: absolute;
 	content: ' ';
 	border-left: solid 20px #0fa54a;
