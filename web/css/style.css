@@ -490,7 +490,7 @@ td.value .chzn-container-single .chzn-single div b{
 	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
 	box-sizing: border-box; 
 	font-weight:normal;
-	font-family: 'DINBold', sans-serif;
+	/*font-family: 'DINBold', sans-serif;*/
 	color:#008a00;
 	background-color:#c8eac9;
 	padding:10px;
@@ -681,7 +681,7 @@ div.eventwizheader	div.wizactive img.arrowfront{
 }
 
 .bold {
-		font-family: 'DINBold',sans-serif;
+		/*font-family: 'DINBold',sans-serif;*/
 }
 
 #fsMethod {
@@ -1233,7 +1233,7 @@ span.move a {
 
 .fieldconfig-header b {
 	font-weight: normal;
-	font-family: 'DINBold',sans-serif;
+	font-family: sans-serif;
 }
 
 .fieldconfig-header a {
@@ -1459,7 +1459,7 @@ ul#menu li:hover > ul {
 	border-bottom: 1px solid #0567A4;
 }
 .grid_group_title	{
-  font-family: 'DINRegular', sans-serif;
+  font-family: sans-serif;
 	font-size:12px;
   color: #0567A4;
 }
@@ -1545,7 +1545,7 @@ body.membership-login p {
 }
 
 body.membership-login p.pageHeading {
-  font-family: 'DINRegular',sans-serif;
+  font-family: sans-serif;
   background: none;
   font-size: 27px;
   font-weight: normal;
@@ -2100,23 +2100,12 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d9121212', e
      url('../fonts/DINWeb-Bold.ttf') format('truetype'); /* Safari, Android, iOS */
 }
 
-#passport_changeover {
-  font-family: 'DINRegular',sans-serif;
-  color: #464646;
-}
 @font-face {
     font-family: 'DINItalic';
     src: url('../fonts/DINWeb-Ita.eot'); /* IE9 Compat Modes */
     src: url('../fonts/DINWeb-Ita.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
      url('../fonts/DINWeb-Ita.woff') format('woff'), /* Modern Browsers */
      url('../fonts/DINWeb-Ita.ttf') format('truetype'); /* Safari, Android, iOS */
-}
-
-#passport_changeover p {
-  font-size: 14px;
-  letter-spacing: -0.5px;
-  line-height: 18px;
-  margin-bottom: 10px;
 }
 
 @font-face {
@@ -2127,41 +2116,12 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d9121212', e
      url('../fonts/DINWeb-BoldIta.ttf') format('truetype'); /* Safari, Android, iOS */
 }
 
-#passport_changeover p.changeover-title {
-  font-size: 22px;
-  letter-spacing: -1px;
-  line-height: 24px;
-  margin-bottom: 10px;
-}
 @font-face {
     font-family: 'DINRegular';
     src: url('../fonts/DINWeb.eot'); /* IE9 Compat Modes */
     src: url('../fonts/DINWeb.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
      url('../fonts/DINWeb.woff') format('woff'), /* Modern Browsers */
      url('../fonts/DINWeb.ttf') format('truetype'); /* Safari, Android, iOS */
-}
-
-#passport_changeover .pp-logo {
-  float: left;
-  text-align: left;
-  width: 100%;
-  background-color: #FFF;
-}
-
-#passport_changeover p, #pp-prompt-btns {
-  float:left;
-  width: 534px;
-  margin-left: 20px;
-  margin-right: 20px;
-}
-
-#pp-prompt-btns a {
-  margin-right: 18px;
-}
-
-#passport_changeover p.pc-disclaim {
-  font-size: 12px;
-  margin-top: 10px;
 }
 
 #globalnav {
@@ -3116,7 +3076,7 @@ body.report h1 {
 }
 
 .reporttab-button {
-	font-family: 'DINRegular',sans-serif;
+	font-family: sans-serif;
 	color: #6A6A6A;
 	border: 1px solid #C0C0C0;
 	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMSAxIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIj48bGluZWFyR3JhZGllbnQgaWQ9ImcxMzUwNTA1OTQyNjYyIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjUwJSIgeTE9IjEwMCUiIHgyPSI1MCUiIHkyPSIwJSI+PHN0b3Agb2Zmc2V0PSIzMCUiIHN0b3AtY29sb3I9IiNkYWRhZGEiIHN0b3Atb3BhY2l0eT0iMSIvPjxzdG9wIG9mZnNldD0iOTglIiBzdG9wLWNvbG9yPSIjZTZlNmU2IiBzdG9wLW9wYWNpdHk9IjEiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMSIvPiAgPC9saW5lYXJHcmFkaWVudD48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJ1cmwoI2cxMzUwNTA1OTQyNjYyKSIgLz48L3N2Zz4=);
@@ -3140,7 +3100,7 @@ body.report h1 {
 }
 
 .reporttab-datacontent b {
-	font-family: 'DINBold',sans-serif;
+	font-family: sans-serif;
 	font-weight: normal;
 }
 
@@ -3163,7 +3123,7 @@ body.report h1 {
 }
 
 .reportitem-title {
-	font-family: 'DINBold',sans-serif;
+	font-family: sans-serif;
 	font-weight: normal;
 }
 
@@ -3175,7 +3135,7 @@ body.report h1 {
   background-image: -webkit-linear-gradient(bottom, #dadada 30%, #e6e6e6 98%, #ffffff 100%);
   background-image: -moz-linear-gradient(bottom, #dadada 30%, #e6e6e6 98%, #ffffff 100%);  background-image: -o-linear-gradient(bottom, #dadada 30%, #e6e6e6 98%, #ffffff 100%);  background-image: -ms-linear-gradient(bottom, #dadada 30%, #e6e6e6 98%, #ffffff 100%);  background-image: linear-gradient(bottom, #dadada 30%, #e6e6e6 98%, #ffffff 100%);	
 	padding: 0 4px;
-	font-family: 'DINMedium',sans-serif;
+	font-family: sans-serif;
 	width: auto;
 }
 
@@ -3185,7 +3145,7 @@ body.report h1 {
 }
 
 .ui-widget {
-	font-family: 'DINRegular',sans-serif;
+	font-family: sans-serif;
 }
 
 #ROselectedfields-wrapper h3 {
@@ -3211,12 +3171,12 @@ body.report h1 {
 .ROoptionblock-header {
 	font-weight: normal;
 	color: #6A6A6A;
-	font-family: 'DINBold',sans-serif;
+	font-family: sans-serif;
 }
 
 #ROselectedfields .RO_fieldname {
 	font-weight: normal;
-	font-family: 'DINBold',sans-serif;
+	font-family: sans-serif;
 }
 
 input.ROButRun {
@@ -3278,19 +3238,19 @@ a img {
 	background-image: -ms-linear-gradient(bottom, #888888 0%, #6a6a6a 60%);
 	background-image: linear-gradient(bottom, #888888 0%, #6a6a6a 60%);
 	color:#FFF; 
-	font-family:'DINBold',sans-serif; 
+	font-family:sans-serif; 
 	border: 1px solid #6A6A6A;
 }
 
 #avfields .RO_headerblock .fieldlinks .thspecial {color:#CCC; }
 
 #avfields .RO_textblock {
-	font-family:'DINBold',sans-serif;
+	font-family:sans-serif;
 	color: #6A6A6A;
 }
 
 #avfields .RO_textblock .fieldlinks .thspecial {
-	font-family:'DINRegular',sans-serif;
+	font-family:sans-serif;
 	color: #777;
 }
 
@@ -3351,7 +3311,7 @@ th.sectionheader {
 }
 
 .psplit-outer h3 {
-	font-family: 'DINBold',sans-serif;
+	font-family: sans-serif;
 	color: #427091;
 	margin: 5px;	
 	letter-spacing: -0.5px;
