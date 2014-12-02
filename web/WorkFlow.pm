@@ -2342,6 +2342,7 @@ sub populateDocumentViewData {
 
     my $count = 0;
     while(my $tdref = $q->fetchrow_hashref()) {
+        print STDERR Dumper $tdref;
         #skip if no registration item matches rego details combination (type/role/sport/rego_nature etc)
         next if (!$tdref->{'regoItemID'} and $dref->{'strWFRuleFor'} eq 'REGO');
         
