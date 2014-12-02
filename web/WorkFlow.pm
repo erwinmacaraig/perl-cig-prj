@@ -2319,7 +2319,7 @@ sub populateDocumentViewData {
         WHERE
             wt.intWFTaskID = ?
             AND wt.intRealmID = ?
-        ORDER BY d.intDocumentID, dt.strDocumentName
+        ORDER BY dt.strDocumentName, d.intDocumentID DESC
     ];
 
     
