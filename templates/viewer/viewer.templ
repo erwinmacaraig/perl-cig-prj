@@ -65,12 +65,13 @@
 			method: "POST",
 			url:"main.cgi",
 			data:"a=WF_Verify" + "&f=" + fileID + "&status=" + status + "&client="+client,
-		}).done(window.parent.location.reload());
-		
-		 	
-		 
+		}).done(
+
+            function(){
+                window.parent.location.reload();
+            }
+        );		 
 	}
-	
 
 </script>
 
