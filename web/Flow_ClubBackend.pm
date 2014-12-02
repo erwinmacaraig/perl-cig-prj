@@ -34,8 +34,9 @@ sub setProcessOrder {
         {
             'action' => 'cd',
             'function' => 'display_core_details',
-            'label'  => 'Core Details',
+            'label'  => 'Club Details',
             'fieldset'  => 'core',
+            'title'  => 'Registration - Enter Club Information',
         },
         {
             'action' => 'cdu',
@@ -47,6 +48,7 @@ sub setProcessOrder {
             'function' => 'display_contact_details',
             'label'  => 'Contact Details',
             'fieldset'  => 'contactdetails',
+            'title'  => 'Registration - Enter Contact Information',
         },
         {
             'action' => 'condu',
@@ -58,6 +60,7 @@ sub setProcessOrder {
             'function' => 'display_role_details',
             'label'  => 'Organisation Details',
             'fieldset' => 'roledetails',
+            'title'  => 'Registration - Enter Organisation Information',
         },
         {
             'action' => 'roleu',
@@ -68,6 +71,7 @@ sub setProcessOrder {
             'action' => 'd',
             'function' => 'display_documents',
             'label'  => 'Documents',
+            'title'  => 'Registration - Upload Documents',
         },
         {
             'action' => 'du',
@@ -77,6 +81,7 @@ sub setProcessOrder {
             'action' => 'p',
             'function' => 'display_products',
             'label'  => 'Products',
+            'title'  => 'Registration - Choose Products',
         },
         {
             'action' => 'pu',
@@ -86,6 +91,7 @@ sub setProcessOrder {
             'action' => 'c',
             'function' => 'display_complete',
             'label'  => 'Complete',
+            'title'  => 'Registration - Summary',
         },
     ];
 }
@@ -153,17 +159,20 @@ sub setupValues {
         $nonlatinscript =   qq[
            <script>
                 jQuery(document).ready(function()  {
-                    jQuery('#fsg-latinnames').hide();
                     jQuery('#l_intLocalLanguage').change(function()   {
+                        showLocalLanguage();
+                    });
+                    showLocalLanguage();
+                    function showLocalLanguage()    {
                         var lang = parseInt(jQuery('#l_intLocalLanguage').val());
                         nonlatinvals = [$vals];
                         if(nonlatinvals.indexOf(lang) !== -1 )  {
-                            jQuery('#fsg-latinnames').show();
+                            jQuery('#block-latinnames').show();
                         }
                         else    {
-                            jQuery('#fsg-latinnames').hide();
+                            jQuery('#block-latinnames').hide();
                         }
-                    });
+                    }
                 });
             </script> 
 
@@ -236,14 +245,14 @@ sub setupValues {
                     validate    => 'DATE',
                     maxyear     => (localtime)[5] + 1900,
                     compulsory => 1,
-                    sectionname => 'core2',
+                    sectionname => 'core',
                 },
                 dissolved => {
                     label       => $FieldLabels->{'dissolved'},
                     value       => $values->{'dissolved'},
                     options     => \%dissolvedOptions,
                     type        => 'lookup',
-                    sectionname => 'core2',
+                    sectionname => 'core',
                 },
                 dtTo => {
                     label       => $FieldLabels->{'dtTo'},
@@ -254,7 +263,7 @@ sub setupValues {
                     validate    => 'DATE',
                     maxyear     => (localtime)[5] + 1900,
                     readonly    => $dissDateReadOnly,
-                    sectionname => 'core2',
+                    sectionname => 'core',
                 },
                 strCity         => {
                     label       => $FieldLabels->{'strCity'},
@@ -263,7 +272,7 @@ sub setupValues {
                     size        => '30',
                     maxsize     => '45',
                     compulsory  => 1,
-                    sectionname => 'core2',
+                    sectionname => 'core',
                 },
                 strRegion       => {
                     label       => $FieldLabels->{'strRegion'},
@@ -271,7 +280,7 @@ sub setupValues {
                     type        => 'text',
                     size        => '30',
                     maxsize     => '45',
-                    sectionname => 'core2',
+                    sectionname => 'core',
                 },
                 strISOCountry   => {
                     label       => $FieldLabels->{'strISOCountry'},
@@ -280,7 +289,7 @@ sub setupValues {
                     options     => \%Mcountriesonly,
                     firstoption => [ '', 'Select Country' ],
                     compulsory => 1,
-                    sectionname => 'core2',
+                    sectionname => 'core',
                 },
                 intLocalLanguage => {
                     label       => $FieldLabels->{'intLocalLanguage'},
@@ -299,7 +308,7 @@ sub setupValues {
                     size        => '40',
                     maxsize     => '50',
                     active      => $nonLatin,
-                    sectionname => 'latinnames',
+                    sectionname => 'core',
                 },
                 strLatinShortName => {
                     label       => $self->{'SystemConfig'}{'facility_strLatinShortNames'} || $FieldLabels->{'strLatinShortName'},
@@ -308,15 +317,32 @@ sub setupValues {
                     size        => '40',
                     maxsize     => '50',
                     active      => $nonLatin,
-                    sectionname => 'latinnames',
+                    sectionname => 'core',
                 },
+                latinBlockStart => {
+                    label       => 'latinblockstart',
+                    value       => qq[<div id = "block-latinnames" class = "dynamic-panel">],
+                    type        => 'htmlrow',
+                    sectionname => 'core',
+                    active      => $nonLatin,
+                },
+                latinBlockEnd => {
+                    label       => 'latinblockend',
+                    value       => qq[</div>],
+                    type        => 'htmlrow',
+                    sectionname => 'core',
+                    active      => $nonLatin,
+                },
+
             },
             'order' => [qw(
                 strLocalName
                 strLocalShortName
                 intLocalLanguage
+                latinBlockStart
                 strLatinName
                 strLatinShortName
+                latinBlockEnd
                 dtFrom
                 dissolved
                 dtTo
@@ -325,9 +351,7 @@ sub setupValues {
                 strISOCountry
             )],
             sections => [
-                [ 'core',        '' ],
-                [ 'latinnames',   '','','dynamic-panel'],
-                [ 'core2',        '' ],
+                [ 'core',        'Club Details' ],
             ],
             fieldtransform => {
                 textcase => {
@@ -543,7 +567,7 @@ sub validate_core_details {
     my $id = $self->ID() || 0;
     my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
     $clubObj->load();
-    if(!doesUserHaveEntityAccess($self->{'Data'}, $id,'WRITE')) {
+    if($id and !doesUserHaveEntityAccess($self->{'Data'}, $id,'WRITE')) {
         return ('Invalid User',0);
     }
 

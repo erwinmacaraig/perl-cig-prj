@@ -120,7 +120,7 @@ sub setProcessOrder {
             'action' => 'p',
             'function' => 'display_products',
             'label'  => 'Products',
-            'title'  => 'Registration - Choose Documents',
+            'title'  => 'Registration - Choose Products',
         },
         {
             'action' => 'pu',
@@ -1156,6 +1156,7 @@ print STDERR "RRRRRRRRULES RUNNINGS\n";
         Title => '',
         TextTop => $content,
         TextBottom => '',
+        NoContinueButton => 1,
     );
     my $pagedata = $self->display(\%PageData);
 
