@@ -46,6 +46,7 @@ use EmailNotifications::WorkFlow;
 use EntityFields;
 use EntityTypeRoles;
 use JSON;
+use Countries;
 
 sub cleanTasks  {
 
@@ -2115,6 +2116,7 @@ sub populateRegoViewData {
 
     my $role_ref = getEntityTypeRoles($Data, $dref->{'strSport'}, $dref->{'strPersonType'});
 
+    my $isocountries  = getISOCountriesHash();
 	%TemplateData = (
         PersonDetails => {
             Status => $Data->{'lang'}->txt($Defs::personStatus{$dref->{'PersonStatus'} || 0}) || '',
@@ -2123,7 +2125,7 @@ sub populateRegoViewData {
             LocalName => "$dref->{'strLocalFirstname'} $dref->{'strLocalMiddleName'} $dref->{'strLocalSurname'}" || '',
             LatinName => "$dref->{'strLatinFirstname'} $dref->{'strLatinMiddleName'} $dref->{'strLatinSurname'}" || '',
             Address => "$dref->{'strAddress1'} $dref->{'strAddress2'} $dref->{'strAddress2'} $dref->{'strSuburb'} $dref->{'strState'} $dref->{'strPostalCode'}" || '',
-            Nationality => $dref->{'strISONationality'} || '', #TODO identify extract string
+            Nationality => $isocountries->{$dref->{'strISONationality'}} || '',
             DateSuspendedUntil => '',
             LastUpdate => '',
             MID => $dref->{'strNationalNum'} || '',
