@@ -608,7 +608,7 @@ sub _validate {
         $t =~ s/:.*//g;
         my ( $num1, $num2 ) = ( '', '' );
         if ($param) {
-            ( $num1, $num2 ) = split /\-/, $param;
+            ( $num1, $num2 ) = split /\~/, $param;
         }
 
         if ( $t eq 'NUMBER' ) {
@@ -1096,7 +1096,7 @@ sub generate_clientside_validation {
                 $t =~ s/:.*//g;
                 my ( $num1, $num2 ) = ( '', '' );
                 if ($param) {
-                    ( $num1, $num2 ) = split /\-/, $param;
+                    ( $num1, $num2 ) = split /~/, $param;
                 }
                 if ( $t eq 'LENGTH' ) {
                     $valinfo{'rules'}{ $field_prefix . $k }{'minlength'} = $num1;

@@ -17,6 +17,7 @@ use PersonLanguages;
 use CustomFields;
 use DefCodes;
 use PersonUtils;
+use AssocTime;
 
 sub personFieldsSetup {
     my ($Data, $values) = @_;
@@ -48,6 +49,8 @@ sub personFieldsSetup {
             push @nonLatinLanguages, $l->{'intLanguageID'};
         }
     }
+    my $timezone = $Data->{'SystemConfig'}{'Timezone'} || 'UTC';
+    my $today = dateatAssoc($timezone);
     my $nonlatinscript = '';
     if($nonLatin)   {
         my $vals = join(',',@nonLatinLanguages);
@@ -242,7 +245,7 @@ sub personFieldsSetup {
                     datetype    => 'dropdown',
                     format      => 'dd/mm/yyyy',
                     maxyear     => (localtime)[5] + 1900,
-                    validate    => 'DATE',
+                    validate    => 'DATE,MORETHAN:'.$today,
                     compulsory => 1,
                     sectionname => 'core',
                     noedit      => 1,
