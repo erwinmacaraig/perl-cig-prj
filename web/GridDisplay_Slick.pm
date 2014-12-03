@@ -388,120 +388,30 @@ sub showGrid {
 	my $pagerdisplay = $display_pager ? '' : 'display:none;';
 
 	for my $i ((
-        "//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js",
+                "js/slickgrid/lib/jquery.event.drag-2.0.min.js",
+		"js/slickgrid/slick.core.js",
+		"js/slickgrid/slick.dataview.js",
+		"js/slickgrid/slick.grid.js",
+		"js/slickgrid/slick.editors.js",
+		"js/slickgrid/controls/slick.pager.js",
+		"js/slickgrid/plugins/slick.rowselectionmodel.js",
+		"js/slickgrid/plugins/slick.autotooltips.js",
+		"js/slickgrid/plugins/slick.checkboxselectcolumn.js",
+		"js/slickgrid/slick.groupitemmetadataprovider.js",
+		"js/slickgrid/plugins/slick.cellrangeselector.js",
+		"js/slickgrid/plugins/slick.cellrangedecorator.js",
+		"js/slickgrid/plugins/slick.cellselectionmodel.js",
+		"js/griddisplay.js",
 	))	{
 		$Data->{'AddToPage'}->add('js_bottom','file',$i);
 	}
 	for my $i ((
+		"js/slickgrid/slick.grid.css",
+		"js/slickgrid/slick-default-theme.css",
+		"js/slickgrid/controls/slick.pager.css",
 	))	{
 		$Data->{'AddToPage'}->add('css','file',$i);
 	}
-
-	$width ||= '';
-	my $headers = '';
-	my $tabledata = '';
-	for my $h (@{$columninfo})	{
-		my $field = $h->{'field'} || next;
-		my $name = $h->{'name'} || '';
-		next if $h->{'hide'};
-		$name = ' ' if $field eq 'SelectLink';
-		next if !$name;
-		$headers .= qq[<th>$name</th>];
-	}
-	my $cnt = 0;
-	for my $row (@{$grid_data})	{
-		$tabledata .= qq[<tr class = "">];
-		for my $h (@{$columninfo})	{
-			my $field = $h->{'field'} || next;
-			my $type = $h->{'type'} || '';
-			next if $h->{'hide'};
-			my $val = defined $row->{$field}
-				? $row->{$field}
-				: '';
-			if($type eq 'tick')	{
-				$val = $val
-					? qq[<img src="images/gridcell_tick.png">] 
-					: "";
-			}
-			if($field eq 'SelectLink' and $val)	{
-				$val = qq[<a href = "$val" class = "btn-inside-panels">].$Data->{'lang'}->txt('View') .qq[</a>];
-			}
-			$tabledata .=qq[<td>$val</td>];
-		}
-		$tabledata .= "</tr>";
-		$cnt++;
-	}
-	if($tabledata eq '') { $tabledata = '<tr><td colspan="20">Sorry there is no data to return</td></tr>'; }
-    my $js = qq[
-        var table = jQuery("#$gridID").DataTable();
-
-
-
-    ];
-	$Data->{'AddToPage'}->add('js_bottom','inline',$js);
-
-	return qq[
-		<table id = "$gridID" class = "table zebra" style = "$width">
-			<thead>
-				<tr class = "">$headers</tr>
-			</thead>
-			<tbody>
-			$tabledata
-			</tbody>
-		</table>
-	];
-
-}
-
-
-sub old {
-	my %params = @_;
-
-    my $self = shift;
-    my $flat = makeExportTable(%params);
-	my $Data                     = $params{'Data'}                     || return ''; #array of hashes of column names and details
-	my $columninfo               = $params{'columns'}                  || return ''; #array of hashes of column names and details
-	my $grid_data                = $params{'rowdata'}                  || return ''; #array of hashes with grid data
-	my $gridID                   = $params{'gridid'}                   || 'grid';
-	my $height                   = $params{'height'}                   || '';
-	my $width                    = $params{'width'}                    || '';
-	my $basicgrid                = $params{'basicgrid'}                || '';
-	my $filterfields             = $params{'filters'}                  || [];
-    my $cellValidator            = $params{'cellValidator'}            || ''; #a javascript function which does the required cell validation
-    my $msg_area_id              = $params{'msgareaid'}                || ''; #the id of the div which will contain any messages generated
-    my $content_width_adjustment = $params{'content_width_adjustment'} || 20;
- 	my $client                   = $params{'client'}                   || '';
-	my $saveurl                  = $params{'saveurl'}                  || '';
-	my $saveaction               = $params{'saveaction'}               || '';
-	my $ajax_keyfield            = $params{'ajax_keyfield'}            || 'id';
-	my $groupby                  = $params{'groupby'}                  || '';
-	my $groupby_collection_name  = $params{'groupby_collection_name'}  || 'items';
-	my $display_pager            = exists $params{'display_pager'} 
-		? $params{'display_pager'} 
-		: 1;
-
-	if($width)	{
-		$width .= 'px' if $width =~/^\d+$/;
-		$width = "width:$width";
-	}
-	my $autoheight = 'true';
-	if($height)	{
-		$height .= 'px' if $height =~/^\d+$/;
-		$height = "height:$height";
-		$autoheight = 'false';
-	}
-
-	if($params{'simple'})	{
-		return simpleGrid(
-			$Data,
-			$columninfo, 
-			$grid_data,
-			$width,
-		);
-	}
-
-	$display_pager = 0 if scalar(@{$grid_data}) < 25;
-	my $pagerdisplay = $display_pager ? '' : 'display:none;';
 
 	my ($columndef_str, $checkbox_row_select, $headerInfo) = processFieldHeaders($columninfo, $saveurl);
 	my $groupby_fieldlabel = '';
@@ -887,64 +797,6 @@ sub makeFilterJS		{
 	return ($update_filter_js, $filter_event_js);
 }
 
-sub buildGrid {
-
-	my (
-		$Data,
-		$columninfo, 
-		$grid_data,
-		$width,
-	) = @_;
-	$width ||= '';
-	my $headers = '';
-	my $tabledata = '';
-	for my $h (@{$columninfo})	{
-		my $field = $h->{'field'} || next;
-		my $name = $h->{'name'} || '';
-		next if $h->{'hide'};
-		$name = ' ' if $field eq 'SelectLink';
-		next if !$name;
-		$headers .= qq[<th>$name</th>];
-	}
-	my $cnt = 0;
-	for my $row (@{$grid_data})	{
-		$tabledata .= qq[<tr class = "">];
-		for my $h (@{$columninfo})	{
-			my $field = $h->{'field'} || next;
-			my $type = $h->{'type'} || '';
-			next if $h->{'hide'};
-			my $val = defined $row->{$field}
-				? $row->{$field}
-				: '';
-			if($type eq 'tick')	{
-				$val = $val
-					? qq[<img src="images/gridcell_tick.png">] 
-					: "";
-			}
-			if($field eq 'SelectLink' and $val)	{
-				$val = qq[<a href = "$val" class = "btn-inside-panels">].$Data->{'lang'}->txt('View') .qq[</a>];
-			}
-			$tabledata .=qq[<td>$val</td>];
-		}
-		$tabledata .= "</tr>";
-		$cnt++;
-	}
-	if($tabledata eq '') { $tabledata = '<tr><td colspan="20">Sorry there is no data to return</td></tr>'; }
-
-	return qq[
-		<table class = "table zebra" style = "$width">
-			<thead>
-				<tr class = "">$headers</tr>
-			</thead>
-			<tbody>
-			$tabledata
-			</tbody>
-		</table>
-	];
-}
-
-1;
-
 sub simpleGrid	{
 
 	my (
@@ -966,7 +818,8 @@ sub simpleGrid	{
 	}
 	my $cnt = 0;
 	for my $row (@{$grid_data})	{
-		$tabledata .= qq[<tr class = "">];
+		my $rowclass = $cnt % 2 == 0 ? 'even' : 'odd';
+		$tabledata .= qq[<tr class = "$rowclass">];
 		for my $h (@{$columninfo})	{
 			my $field = $h->{'field'} || next;
 			my $type = $h->{'type'} || '';
@@ -980,7 +833,7 @@ sub simpleGrid	{
 					: "";
 			}
 			if($field eq 'SelectLink' and $val)	{
-				$val = qq[<a href = "$val" class = "btn-inside-panels">].$Data->{'lang'}->txt('View') .qq[</a>];
+				$val = qq[<a href = "$val"><img src="images/gridcell_select.png"></a>];
 			}
 			$tabledata .=qq[<td>$val</td>];
 		}
@@ -990,9 +843,9 @@ sub simpleGrid	{
 	if($tabledata eq '') { $tabledata = '<tr><td colspan="20">Sorry there is no data to return</td></tr>'; }
 
 	return qq[
-		<table class = "table zebra" style = "$width">
+		<table class = "simplegrid" style = "$width">
 			<thead>
-				<tr class = "">$headers</tr>
+				<tr class = "ui-widget-header">$headers</tr>
 			</thead>
 			<tbody>
 			$tabledata
