@@ -385,8 +385,6 @@ sub showGrid {
 	}
 
 	$display_pager = 0 if scalar(@{$grid_data}) < 25;
-	my $pagerdisplay = $display_pager ? '' : 'display:none;';
-
 	for my $i ((
         "//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js",
 	))	{
@@ -432,11 +430,16 @@ sub showGrid {
 		$cnt++;
 	}
 	if($tabledata eq '') { $tabledata = '<tr><td colspan="20">Sorry there is no data to return</td></tr>'; }
+    my %gridConfig = ();
+    if(!$display_pager) {
+        $gridConfig{'paging'} = 'false';
+    }
+	my ($columndefs , $headerInfo) = processFieldHeaders($columninfo);
+    $gridConfig{'columns'} = $columndefs;
+	my $config_str = to_json(\%gridConfig);
+	$config_str =~s/"(false|true)"/$1/g;
     my $js = qq[
-        var table = jQuery("#$gridID").DataTable();
-
-
-
+        var table = jQuery("#$gridID").dataTable($config_str);
     ];
 	$Data->{'AddToPage'}->add('js_bottom','inline',$js);
 
@@ -788,19 +791,14 @@ jQuery(".show-select$basicgrid").click(function () {
 }
 
 sub processFieldHeaders	{
-	my ($headers, $saveurl) = @_;
+	my ($headers) = @_;
 
 	my @output_headers = ();
-	my $checkbox_row_select = 0;
 	my %headerInfo = ();
 	for my $field (@{$headers})	{
 		my $name = $field->{'name'};	
 		if($field->{'type'} and $field->{'type'} eq 'Selector')	{
 			$name = ' ';
-		}
-		if($field->{'type'} and $field->{'type'} eq 'RowCheckbox')	{
-			$checkbox_row_select = 1;
-			next;
 		}
 		next if !$name;
 		next if $field->{'hide'};
@@ -810,54 +808,32 @@ sub processFieldHeaders	{
 		if(exists $field->{'sortable'} and !$field->{'sortable'})	{
 			$sortable = 'false';
 		}
-		my $resizable= 'true';
-		if(exists $field->{'resizable'} and !$field->{'resizable'})	{
-			$resizable = 'false';
-		}
 		my %row = (
-            id => $id,
             name => $name,
-            field => $fieldname,
             sortable => $sortable,
-            resizable => $resizable,
-            direction => $field->{'direction'},
 		);
 
 		$row{'width'} = $field->{'width'} if $field->{'width'};
-		$row{'cssClass'} = $field->{'class'} if $field->{'class'};
-		if($field->{'editor'} and $saveurl)	{
-			$row{'editor'} = '!!!Slick.Editors.Date!!!' if $field->{'editor'} eq 'date';
-			$row{'editor'} = '!!!Slick.Editors.Text!!!' if $field->{'editor'} eq 'text';
-			$row{'editor'} = '!!!Slick.Editors.Checkbox!!!' if $field->{'editor'} eq 'checkbox';
-			$row{'editor'} = '!!!Slick.Editors.SelectBox!!!' if $field->{'editor'} eq 'selectbox';
-			$row{'editor'} = '!!!Slick.Editors.DateTime!!!' if $field->{'editor'} eq 'datetime';
-            $row{'validator'} = $field->{'validator'} if $field->{'validator'};
-		}
 		if($field->{'type'})	{
-			#$row{'formatter'} = 'Slick.Formatters.HTML' if $field->{'type'} = 'HTML';
-			$row{'formatter'} = '!!!SlickHTMLFormatter!!!' if $field->{'type'} eq 'HTML';
-			$row{'formatter'} = '!!!SlickTickFormatter!!!' if $field->{'type'} eq 'tick';
-			$row{'formatter'} = '!!!SlickSelectListFormatter!!!' if $field->{'type'} eq 'selectlist';
-			$row{'formatter'} = '!!!SlickDateTimeFormatter!!!' if $field->{'type'} eq 'datetime';
+			if($field->{'type'} eq 'HTML')  {
+				$row{'type'} = 'HTML';
+            }
+            if($field->{'type'} eq 'datetime')  {
+				$row{'type'} = 'date';
+            }
 			if($field->{'type'} eq 'Selector')	{
-				$row{'formatter'} = '!!!SlickSelectorFormatter!!!' if $field->{'type'} eq 'Selector';
-				$row{'width'} = 30;
 				$row{'sortable'} = 'false';
-				$row{'resizable'} = 'false';
+				$row{'searchable'} = 'false';
 			}
 		}
-		$row{'options'} = $field->{'options'} if $field->{'options'};
-		$row{'cssClass'} = $field->{'class'} if $field->{'class'};
+		$row{'className'} = $field->{'class'} if $field->{'class'};
 		$field->{'sorttype'} ||= '';
-		$row{'headerCssClass'} = 'grid_sorttype_num' if $field->{'sorttype'} eq 'number';
+		$row{'type'} = 'num' if $field->{'sorttype'} eq 'number';
 		$headerInfo{$fieldname} = \%row;
 		push @output_headers, \%row;
 	}
 
-	my $columndef_str = to_json(\@output_headers);
-	$columndef_str =~s/"*!!!"*//g;
-	$columndef_str =~s/"(false|true)"/$1/g;
-	return ($columndef_str, $checkbox_row_select, \%headerInfo);
+	return (\@output_headers, \%headerInfo);
 }
 
 sub makeFilterJS		{

@@ -2761,9 +2761,6 @@ a {
 /* Grid Updates */ 
 
 .grid-filter-wrap {
-	float:left;
-	width: 100%;
-	background: #F5F5F5;
 }
 
 .grid-filter-wrap .grid-widget {
