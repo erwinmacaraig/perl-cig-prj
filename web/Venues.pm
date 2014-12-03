@@ -919,12 +919,7 @@ sub postVenueAdd {
       ####################################################################################
       ; # Venue ID = $id AND entityID = $entityID AND entityIDD = $entityIDD</div><br>
       return (0,qq[
-        <div class="col-md-9">
-        <div class="alert">
-        <div><span class="flash_success fa fa-check"></span><p>$Data->{'LevelNames'}{$Defs::LEVEL_VENUE} Added Successfully</p></div>
-        </div>
-        </div>
-        <br>
+        <div class="OKmsg"> $Data->{'LevelNames'}{$Defs::LEVEL_VENUE} Added Successfully</div><br>
         <div>
         $venuedocs
         </div>
