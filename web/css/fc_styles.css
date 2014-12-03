@@ -200,7 +200,7 @@ header .logo-area ul li strong {
 
 header nav {
 	background: #004e7e;
-	padding: 20px 0;
+	padding: 10px 0;
 	-webkit-box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
 	-moz-box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
 	box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
@@ -351,7 +351,7 @@ select {
 .toggle a {
 	background: #d8d8d8;
 	border: 1px solid #cccccc;
-	font-size: 14px;
+	font-size: 13px;
 	padding: 8px 30px;
 	color: #000;
 	float: left;
@@ -366,7 +366,7 @@ select {
 .toggle a.active {
 	background: #045485;
 	border: 1px solid #045485;
-	font-size: 14px;
+	font-size: 13px;
 	padding: 8px 30px;
 	color: #fff;
 	float: left;
@@ -661,7 +661,7 @@ table.table tr td.align-right {
 }
 
 header nav ul#menu ul {
-	top:40px;
+	top:30px;
 }
 
 header ul#menu ul li a:hover {
@@ -671,7 +671,7 @@ header ul#menu ul li a:hover {
 
 /* Added Styles for Table in Task List Dashboard:: Vincent R; */
 .dashboard-tasklist td, .documents-list td{
-	padding: 20px 15px;
+	padding: 15px 15px;
 }
 .dashboard-tasklist th, .documents-list th{
 	padding: 10px 20px;
@@ -992,8 +992,8 @@ a.btn-inside-docs-panel:hover {
 /*temporary adjustment to dispay drill down nav*/
 
 header nav ul li a {
-	padding-top:20px;
-	padding-bottom: 27px;
+	padding-top:10px;
+	padding-bottom: 10px;
 }
 
 .nav_session_menu_wrap {
@@ -1004,6 +1004,7 @@ header nav ul li a {
 
 .nav_session_placement {
 	width:300px;
+	height:30px;
 	background-position: 272px;
 }
 
@@ -1013,7 +1014,7 @@ header nav ul li a {
 
 .nav-bar-name {
 	width:65%;
-	font-size:16px;
+	font-size:13px;
 }
 
 .dash-heading, .pageHeading {
