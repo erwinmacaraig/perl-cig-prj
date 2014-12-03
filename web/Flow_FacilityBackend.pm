@@ -979,7 +979,7 @@ sub display_complete {
         }
 
         my $facilityID = $facilityFields->getEntityID();
-        $content = qq [<div class="alert"><div><span class="flash_success fa fa-check"></span><p>$self->{'Data'}->{'LevelNames'}{$Defs::LEVEL_VENUE} Added Successfully</p></div></div>]; # Venue ID = $facilityID AND entityID = $entityID </div><br> ];
+        $content = qq [<div class="alert"><div><span class="flash_success fa fa-check"></span><p>$self->{'Data'}->{'LevelNames'}{$Defs::LEVEL_VENUE} submitted for approval</p></div></div>]; # Venue ID = $facilityID AND entityID = $entityID </div><br> ];
     }
     else {
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Facility ID");
