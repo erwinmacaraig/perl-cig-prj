@@ -66,6 +66,7 @@ CREATE TABLE tblPerson (
     dtIdentifierValidityDateFrom date,
     dtIdentifierValidityDateTo date,
     strPersonIdentifierDesc varchar(250) DEFAULT '',
+    intOtherPersonIdentifierTypeID INT DEFAULT 0,
     strOtherPersonIdentifier varchar(20) DEFAULT '',
     strOtherPersonIdentiferIssueCountry varchar(6) DEFAULT '',
     dtOtherPersonIdentiferValidDateFrom date,
