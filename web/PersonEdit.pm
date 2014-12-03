@@ -88,8 +88,6 @@ sub handlePersonEdit {
           my ($output, undef, $headJS, undef) = $obj->build($permissions,'edit',1);
           $body .= qq[
             <div class="col-md-12">
-            <h3 class="panel-header">Details</h3>
-            <div class="panel-body"> 
             <form action = "$Data->{'target'}" method = "POST">
                 $output
                 $headJS
@@ -97,10 +95,9 @@ sub handlePersonEdit {
                 <input type = "hidden" name = "client" value = "].unescape($client).qq["> 
                 <input type = "hidden" name = "a" value = "PE_U"> 
                 <input type = "hidden" name = "e_a" value = "$e_action"> 
-                <input type = "submit" value = "].$Data->{'lang'}->txt('Save').qq[" class = "button proceed-button"> 
+                <input type = "submit" value = "].$Data->{'lang'}->txt('Save').qq[" class = "btn-main"> 
                 </div>
             </form>
-            </div>
             </div>
           ];
         }

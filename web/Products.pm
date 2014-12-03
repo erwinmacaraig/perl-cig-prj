@@ -730,7 +730,7 @@ my $warning_note = $Data->{'SystemConfig'}{'ProductEditNote'} || '';
         if ( !$allow_ranged_price && $dref->{'intOriginalPricingType'} == $Defs::PRICING_TYPE_RANGED) {
             $validation{'amount'} = {
                 'compulsory' => 1,
-                'validate' => 'BETWEEN:' . $amounts{'curAmountMin'} . '-' . $amounts{'curAmountMax'},
+                'validate' => 'BETWEEN:' . $amounts{'curAmountMin'} . '~' . $amounts{'curAmountMax'},
             };
             $allow_multi_price = 0;
             $single_active = ' CHECKED ';
