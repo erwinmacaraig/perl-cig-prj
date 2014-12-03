@@ -139,8 +139,9 @@ print STDERR "OK IS $ok | $run\n\n";
           
 	    my $personObj = getInstanceOf($Data, 'person');
 		
-		#open FH, ">dumpfile.txt";
-		#print FH "PersonObj dump is " . Dumper($personObj) . "\n";
+		open FH, ">dumpfile.txt";
+		
+		print FH "PersonObj dump is " . Dumper($personObj) . "\n";
 
 		my %personData = ();
 		$personData{'Name'} = $personObj->getValue('strLocalFirstname');
@@ -159,13 +160,24 @@ print STDERR "OK IS $ok | $run\n\n";
 		$personData{'Phone'} = $personObj->getValue('strPhoneHome') || '';
 		$personData{'Countryaddress'} = $personObj->getValue('strISOCountry') || '';
 		$personData{'Email'} = $personObj->getValue('strEmail') || '';
+		
 		#$personData{''} = $personObj->getValue('') || '';
 
 
+ 		my $languages = PersonLanguages::getPersonLanguages( $Data, 1, 0);
+		for my $l ( @{$languages} ) {
+			if($l->{intLanguageID} == $personObj->getValue('intLocalLanguage')){
+				$personData{'Language'} = $l->{'language'};			
+				last;	
+			}
+		}
+		print FH "\nlanguages\n" . Dumper($languages) . "\n";
+		
 		
         my %PageData = (
             person_home_url => $url,
 			person => \%personData,
+			registration => $rego_ref,
             gateways => $gateways,
 			txnCount => $txnCount,
             target => $Data->{'target'},
@@ -704,9 +716,7 @@ sub add_rego_record{
     };
     my ($personStatus, $prStatus) = checkIsSuspended($Data, $personID, $entityID, $rego_ref->{'personType'});
     return (0, undef, 'SUSPENDED') if ($personStatus eq 'SUSPENDED' or $prStatus eq 'SUSPENDED');
-    
-	open FH, ">dumpfile.txt";
-	print FH "\n\$rego_ref contains \n ". Dumper($rego_ref) . "\n";   
+    	
     warn "REGISTRATION NATURE $rego_ref->{'registrationNature'}";
     if ($rego_ref->{'registrationNature'} ne 'RENEWAL' and $rego_ref->{'registrationNature'} ne 'TRANSFER') {
         my $ok = checkRegoTypeLimits($Data, $personID, 0, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'}, $rego_ref->{'entityID'}); 
