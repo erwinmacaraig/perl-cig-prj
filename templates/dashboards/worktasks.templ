@@ -41,9 +41,14 @@
 				<td><!--Filter by:-->
 					<select class="filter-tasks">
 			          <option selected="" value="">-- All --</option>
+			          <optionvalue="">New Registration</option>
+			          <optionvalue="">Renewal</option>
+			          <optionvalue="">Transfer</option>
+                      <!--
                       [% FOREACH taskType IN TaskFilters.type %]
                       <option value="[% taskType %]">[% taskType %]</option>
                       [% END %]
+                      -->
 			        </select>
 		        </td>
 				<td>
@@ -56,8 +61,14 @@
 				<td>
 					<select class="filter-status" id="u53_input">
 			          <option value="">-- All --</option>
+                      [% IF CurrentLevel == 100 OR CurrentLevel == 20 %]
+                      <option value="Ready to Approve">Ready to Approve</option>
+                      [% END %]
+                      <option value="Task On Hold">Task On Hold</option>
+                      <!--
                       [% FOREACH taskStatus IN TaskFilters.status %]
                       <option value="[% taskStatus %]">[% taskStatus %]</option>
+                        -->
                       [% END %]
 			        </select>
 				</td>
@@ -126,7 +137,11 @@
 		            [% END %]
                     <td>[% task.taskDate %]</td>
                     <td><span class="fa fa-clock-o"></span>[% task.TaskStatusLabel %]</td>
-                    <td><a href="[% task.viewURL %]" class="btn-inside-panels">View</a></td>
+                    [% IF CurrentLevel == 100 OR CurrentLevel == 20 %]
+                        <td><a href="[% task.viewURL %]" class="btn-inside-panels">View and Approve</a></td>
+                    [% ELSE %]
+                        <td><a href="[% task.viewURL %]" class="btn-inside-panels">View</a></td>
+                    [% END %]
                 </tr>
 		    [% END %]
 

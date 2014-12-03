@@ -511,6 +511,24 @@ sub insertRegoTransaction {
     #Get products selected
     my @productsselected=();
     my @already_in_cart_items=();
+
+    my $stPaid= qq[
+        SELECT 
+            intProductID
+        FROM
+            tblTransactions
+        WHERE
+            intPersonRegistrationID = ? 
+            AND intPersonRegistrationID > 0 
+            AND intID = ? 
+            AND intStatus=1 
+    ];
+    my $qryPaid= $db->prepare($stPaid);
+    my %Paid=();
+    while(my $pref=$qryPaid->fetchrow_hashref())  {
+        $Paid{$pref->{'intProductID'}} = 1;
+    }
+        
     for my $k (%{$params})  {
       if($k=~/prod_/) {
         if($params->{$k}==1)  {
@@ -554,6 +572,7 @@ sub insertRegoTransaction {
     if (scalar(@productsselected) or scalar(@already_in_cart_items)) {
         if (scalar(@productsselected)) {
             foreach my $product (@productsselected)    {
+                next if defined $Paid{$product};
                 ## Lets get rid of duplicate products
                 $q_txnclean->execute($regoID, $intID, $product);
                 
