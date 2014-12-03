@@ -364,6 +364,9 @@ sub listTasks {
 
     my $client = unescape($Data->{client});
 	while(my $dref= $q->fetchrow_hashref()) {
+        $taskCounts{$dref->{'strTaskStatus'}}++;
+        $taskCounts{$dref->{'strRegistrationNature'}}++;
+
         #FC-409 - don't include in list of taskStatus = REJECTED
         next if ($dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_REJECTED);
 
@@ -413,9 +416,6 @@ sub listTasks {
 
         my $showView = 0;
         $showView = 1 if(($showApprove and $dref->{'OnHold'} == 1) or ($showResolve and $dref->{'OnHold'} == 1) or $dref->{'OnHold'} == 0);
-
-        $taskCounts{$dref->{'strTaskStatus'}}++;
-        $taskCounts{$dref->{'strRegistrationNature'}}++;
 
         my $viewTaskURL = "$Data->{'target'}?client=$client&amp;a=WF_View&TID=$dref->{'intWFTaskID'}";
         my $taskTypeLabel = '';
