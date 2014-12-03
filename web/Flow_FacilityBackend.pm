@@ -35,8 +35,9 @@ sub setProcessOrder {
         {
             'action' => 'cd',
             'function' => 'display_core_details',
-            'label'  => 'Core Details',
+            'label'  => 'Venue Details',
             'fieldset'  => 'core',
+            'title'  => 'Registration - Enter Venue Information',
         },
         {
             'action' => 'cdu',
@@ -48,6 +49,7 @@ sub setProcessOrder {
             'function' => 'display_contact_details',
             'label'  => 'Contact Details',
             'fieldset'  => 'contactdetails',
+            'title'  => 'Registration - Enter Contact Details',
         },
         {
             'action' => 'condu',
@@ -58,6 +60,7 @@ sub setProcessOrder {
             'action' => 'role',
             'function' => 'display_role_details',
             'fieldset' => 'roledetails',
+            'title'  => 'Registration - Enter Role Details',
         },
         {
             'action' => 'roleu',
@@ -67,7 +70,8 @@ sub setProcessOrder {
         {
             'action' => 'fld',
             'function' => 'display_fields',
-            'label' => 'Fields'
+            'label' => 'Fields',
+            'title'  => 'Registration - Enter Additional Informatton',
         },
         {
             'action' => 'fldu',
@@ -77,6 +81,7 @@ sub setProcessOrder {
             'action' => 'd',
             'function' => 'display_documents',
             'label'  => 'Documents',
+            'title'  => 'Registration - Upload Documents',
         },
         {
             'action' => 'du',
@@ -95,6 +100,7 @@ sub setProcessOrder {
             'action' => 'c',
             'function' => 'display_complete',
             'label'  => 'Complete',
+            'title'  => 'Registration - Summary',
         },
     ];
 
@@ -151,10 +157,10 @@ sub setupValues {
                         var lang = parseInt(jQuery('#l_intLocalLanguage').val());
                         nonlatinvals = [$vals];
                         if(nonlatinvals.indexOf(lang) !== -1 )  {
-                            jQuery('#fsg-latinnames').show();
+                            jQuery('#block-latinnames').show();
                         }
                         else    {
-                            jQuery('#fsg-latinnames').hide();
+                            jQuery('#block-latinnames').hide();
                         }
                     }
                     showLocalLanguage();
@@ -189,7 +195,7 @@ sub setupValues {
                     options     => \%entityTypeOptions,
                     firstoption => [ '', 'Select Type of Organisation' ],
                     compulsory => 1,
-                    sectionname => 'core2',
+                    sectionname => 'core',
                 },
                 intFacilityTypeID => {
                     label       => $FieldLabels->{'intFacilityTypeID'},
@@ -198,7 +204,7 @@ sub setupValues {
                     options     => \%facilityTypeOptions,
                     firstoption => [ '', 'Select Type' ],
                     compulsory => 1,
-                    sectionname => 'core2',
+                    sectionname => 'core',
                 },
                 strLocalName => {
                     label       => $FieldLabels->{'strLocalName'},
@@ -224,7 +230,7 @@ sub setupValues {
                     size        => '30',
                     maxsize     => '45',
                     compulsory  => 1,
-                    sectionname => 'core2',
+                    sectionname => 'core',
                 },
                 strRegion       => {
                     label       => $FieldLabels->{'strRegion'},
@@ -232,7 +238,7 @@ sub setupValues {
                     type        => 'text',
                     size        => '30',
                     maxsize     => '45',
-                    sectionname => 'core2',
+                    sectionname => 'core',
                 },
                 strISOCountry   => {
                     label       => $FieldLabels->{'strISOCountry'},
@@ -241,7 +247,8 @@ sub setupValues {
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
                     compulsory => 1,
-                    sectionname => 'core2',
+                    sectionname => 'core',
+                    class       => 'chzn-select',
                 },
                 intLocalLanguage => {
                     label       => $FieldLabels->{'intLocalLanguage'},
@@ -260,7 +267,7 @@ sub setupValues {
                     size        => '40',
                     maxsize     => '50',
                     active      => $nonLatin,
-                    sectionname => 'latinnames',
+                    sectionname => 'core',
                 },
                 strLatinShortName => {
                     label       => $self->{'SystemConfig'}{'facility_strLatinShortNames'} || $FieldLabels->{'strLatinShortName'},
@@ -269,15 +276,31 @@ sub setupValues {
                     size        => '40',
                     maxsize     => '50',
                     active      => $nonLatin,
-                    sectionname => 'latinnames',
+                    sectionname => 'core',
                 },
+                latinBlockStart => {
+                    label       => 'latinblockstart',
+                    value       => qq[<div id = "block-latinnames" class = "dynamic-panel">],
+                    type        => 'htmlrow',
+                    sectionname => 'core',
+                    active      => $nonLatin,
+                },
+                latinBlockEnd => {
+                    label       => 'latinblockend',
+                    value       => qq[</div>],
+                    type        => 'htmlrow',
+                    sectionname => 'core',
+                },
+                    
             },
             'order' => [qw(
                 strLocalName
                 strLocalShortName
                 intLocalLanguage
+                latinBlockStart
                 strLatinName
                 strLatinShortName
+                latinBlockEnd
                 strEntityType
                 intFacilityTypeID
                 strCity
@@ -285,9 +308,7 @@ sub setupValues {
                 strISOCountry
             )],
             sections => [
-                [ 'core',        '' ],
-                [ 'latinnames',   '','','dynamic-panel'],
-                [ 'core2',        '' ],
+                [ 'core',        'Venue Details' ],
             ],
             fieldtransform => {
                 textcase => {
@@ -341,6 +362,7 @@ sub setupValues {
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
                     compulsory => 1,
+                    class       => 'chzn-select',
                 },
                 strPostalCode => {
                     label       => $FieldLabels->{'strPostalCode'},
@@ -394,6 +416,9 @@ sub setupValues {
                 strPhone
                 strEmail
             )],
+            sections => [
+                [ 'main',        'Contact Details' ],
+            ],
             #fieldtransform => {
                 #textcase => {
                     #strSuburb    => $field_case_rules->{'strSuburb'}    || '',
@@ -424,6 +449,9 @@ sub setupValues {
                 intEntityFieldCount
                 strParentEntityName
             )],
+            sections => [
+                [ 'main',        'Field Information' ],
+            ],
         },
     };
 }
@@ -617,7 +645,10 @@ sub validate_role_details {
     ($facilityFieldData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields(\%fieldCount);
 
     if(!$facilityFieldData->{'intEntityFieldCount'}){
-        push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid number of facility fields.';
+        #push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid number of facility fields.';
+        $self->incrementCurrentProcessIndex();
+        $self->incrementCurrentProcessIndex();
+        return ('',2);
     }
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again

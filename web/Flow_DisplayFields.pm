@@ -479,6 +479,7 @@ sub gather    {
         my $fv   = $self->{'Fields'}->{'fields'}{$fieldname};
         $fv->{'old_value'} = $fv->{'value'};
 
+        next if $self->{'Fields'}->{'fields'}{$fieldname}{'type'} eq 'htmlrow';
         next if $self->{'Fields'}->{'fields'}{$fieldname}{'SkipProcessing'};
         next if ( $permissions and !$permissions->{$fieldname} );
         if($option eq 'add')    {

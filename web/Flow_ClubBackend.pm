@@ -290,6 +290,7 @@ sub setupValues {
                     firstoption => [ '', 'Select Country' ],
                     compulsory => 1,
                     sectionname => 'core',
+                    class       => 'chzn-select',
                 },
                 intLocalLanguage => {
                     label       => $FieldLabels->{'intLocalLanguage'},
@@ -406,6 +407,7 @@ sub setupValues {
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
                     compulsory => 0,
+                    class       => 'chzn-select',
                 },
                 strPostalCode => {
                     label       => $FieldLabels->{'strPostalCode'},
@@ -441,6 +443,9 @@ sub setupValues {
                 strPhone
                 strEmail
             )],
+            sections => [
+                [ 'main',        'Contact Details' ],
+            ],
             #fieldtransform => {
                 #textcase => {
                     #strSuburb    => $field_case_rules->{'strSuburb'}    || '',
@@ -506,6 +511,9 @@ sub setupValues {
                 strOrganisationLevel
                 strMANotes
             )],
+            sections => [
+                [ 'main',        'Organisation Details' ],
+            ],
         },
     };
 }
