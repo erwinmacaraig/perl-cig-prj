@@ -351,10 +351,12 @@ select {
 .toggle a {
 	background: #d8d8d8;
 	border: 1px solid #cccccc;
-	font-size: 16px;
+	font-size: 14px;
 	padding: 8px 30px;
 	color: #000;
 	float: left;
+	
+	text-align: center;
 }
 
 .toggle a:hover {
@@ -364,7 +366,7 @@ select {
 .toggle a.active {
 	background: #045485;
 	border: 1px solid #045485;
-	font-size: 16px;
+	font-size: 14px;
 	padding: 8px 30px;
 	color: #fff;
 	float: left;
@@ -425,7 +427,7 @@ a.btn-inside-panels {
     font-weight: normal;
     font-size: 14px;
 	color: #fff;
-	padding: 8px 15px;
+	padding: 8px 14px;
 	display: inline-block;
 	background: #1870a5;
 	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzE4NzBhNSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwOTViOGQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
@@ -669,7 +671,7 @@ header ul#menu ul li a:hover {
 
 /* Added Styles for Table in Task List Dashboard:: Vincent R; */
 .dashboard-tasklist td, .documents-list td{
-	padding: 20px 20px;
+	padding: 20px 15px;
 }
 .dashboard-tasklist th, .documents-list th{
 	padding: 10px 20px;
@@ -684,8 +686,13 @@ header ul#menu ul li a:hover {
 .dashboard-tasklist tr, .documents-list tr{
 	border: 1px solid #cbcbcb;
 }
+
+.list-action-filter a {
+	width:50%;
+}
+
 .list-action-filter a, .list-action-filter a.active{
-	padding: 7px 6px;
+	padding: 7px 7px;
 	float: left;
 	cursor: pointer;
 }
@@ -1306,4 +1313,9 @@ a.paginate_button.previous, a.paginate_button.next, a.paginate_button {
 
 .alert p {
 	font-size:12px;
+}
+#worktasks tr td a.btn-inside-panels {
+	width: 100%;
+	text-align: center;
+	font-size: 13px;
 }

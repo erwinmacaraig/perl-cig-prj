@@ -46,6 +46,7 @@ use EmailNotifications::WorkFlow;
 use EntityFields;
 use EntityTypeRoles;
 use JSON;
+use Countries;
 
 sub cleanTasks  {
 
@@ -364,6 +365,9 @@ sub listTasks {
 
     my $client = unescape($Data->{client});
 	while(my $dref= $q->fetchrow_hashref()) {
+        $taskCounts{$dref->{'strTaskStatus'}}++;
+        $taskCounts{$dref->{'strRegistrationNature'}}++;
+
         #FC-409 - don't include in list of taskStatus = REJECTED
         next if ($dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_REJECTED);
 
@@ -413,9 +417,6 @@ sub listTasks {
 
         my $showView = 0;
         $showView = 1 if(($showApprove and $dref->{'OnHold'} == 1) or ($showResolve and $dref->{'OnHold'} == 1) or $dref->{'OnHold'} == 0);
-
-        $taskCounts{$dref->{'strTaskStatus'}}++;
-        $taskCounts{$dref->{'strRegistrationNature'}}++;
 
         my $viewTaskURL = "$Data->{'target'}?client=$client&amp;a=WF_View&TID=$dref->{'intWFTaskID'}";
         my $taskTypeLabel = '';
@@ -540,6 +541,7 @@ sub listTasks {
     );
 	my %TemplateData = (
         TaskList => \@TaskList,
+        CurrentLevel => $Data->{'clientValues'}{'currentLevel'},
         TaskCounts => \%taskCounts,
         TaskMsg => $msg,
         TaskEntityID => $entityID,
@@ -2114,6 +2116,7 @@ sub populateRegoViewData {
 
     my $role_ref = getEntityTypeRoles($Data, $dref->{'strSport'}, $dref->{'strPersonType'});
 
+    my $isocountries  = getISOCountriesHash();
 	%TemplateData = (
         PersonDetails => {
             Status => $Data->{'lang'}->txt($Defs::personStatus{$dref->{'PersonStatus'} || 0}) || '',
@@ -2122,7 +2125,7 @@ sub populateRegoViewData {
             LocalName => "$dref->{'strLocalFirstname'} $dref->{'strLocalMiddleName'} $dref->{'strLocalSurname'}" || '',
             LatinName => "$dref->{'strLatinFirstname'} $dref->{'strLatinMiddleName'} $dref->{'strLatinSurname'}" || '',
             Address => "$dref->{'strAddress1'} $dref->{'strAddress2'} $dref->{'strAddress2'} $dref->{'strSuburb'} $dref->{'strState'} $dref->{'strPostalCode'}" || '',
-            Nationality => $dref->{'strISONationality'} || '', #TODO identify extract string
+            Nationality => $isocountries->{$dref->{'strISONationality'}} || '',
             DateSuspendedUntil => '',
             LastUpdate => '',
             MID => $dref->{'strNationalNum'} || '',
@@ -2346,7 +2349,6 @@ sub populateDocumentViewData {
     while(my $tdref = $q->fetchrow_hashref()) {
         next if exists $DocoSeen{$tdref->{'intDocumentTypeID'}};
         $DocoSeen{$tdref->{'intDocumentTypeID'}} = 1;
-        print STDERR Dumper $tdref;
         #skip if no registration item matches rego details combination (type/role/sport/rego_nature etc)
         next if (!$tdref->{'regoItemID'} and $dref->{'strWFRuleFor'} eq 'REGO');
         
