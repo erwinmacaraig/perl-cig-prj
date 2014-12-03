@@ -540,6 +540,7 @@ sub listTasks {
     );
 	my %TemplateData = (
         TaskList => \@TaskList,
+        CurrentLevel => $Data->{'clientValues'}{'currentLevel'},
         TaskCounts => \%taskCounts,
         TaskMsg => $msg,
         TaskEntityID => $entityID,
@@ -2346,7 +2347,6 @@ sub populateDocumentViewData {
     while(my $tdref = $q->fetchrow_hashref()) {
         next if exists $DocoSeen{$tdref->{'intDocumentTypeID'}};
         $DocoSeen{$tdref->{'intDocumentTypeID'}} = 1;
-        print STDERR Dumper $tdref;
         #skip if no registration item matches rego details combination (type/role/sport/rego_nature etc)
         next if (!$tdref->{'regoItemID'} and $dref->{'strWFRuleFor'} eq 'REGO');
         

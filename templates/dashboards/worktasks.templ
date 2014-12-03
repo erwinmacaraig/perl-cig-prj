@@ -61,7 +61,9 @@
 				<td>
 					<select class="filter-status" id="u53_input">
 			          <option value="">-- All --</option>
+                      [% IF CurrentLevel == 100 OR CurrentLevel == 20 %]
                       <option value="Ready to Approve">Ready to Approve</option>
+                      [% END %]
                       <option value="Task On Hold">Task On Hold</option>
                       <!--
                       [% FOREACH taskStatus IN TaskFilters.status %]
