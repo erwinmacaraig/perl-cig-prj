@@ -267,10 +267,12 @@ sub getEntityMenuData {
             name => $lang->txt('Pending Registrations'),
             url => $baseurl."a=PENDPR_",
         };
-        $menuoptions{'bulk'} = {
-            name => $lang->txt('Bulk Renewals'),
-            url => $baseurl."a=PREGFB_T",
-        };
+        if ($SystemConfig->{'allowBulkRenewals'})   {
+            $menuoptions{'bulk'} = {
+                name => $lang->txt('Bulk Renewals'),
+                url => $baseurl."a=PREGFB_T",
+            };
+        }
         $menuoptions{'entityregistrationallowed'} = {
             name => $lang->txt('Registrations Allowed'),
             url => $baseurl."a=ERA_",
@@ -361,12 +363,14 @@ sub getEntityMenuData {
                     url => $baseurl."a=AGEGRP_L",
                 };
             }
+        if ($SystemConfig->{'allowDuplicateRes'})   {
             if(isCheckDupl($Data)) {
                 $menuoptions{'duplicates'} = {
                     name => $lang->txt('Duplicate Resolution'),
                     url => $baseurl."a=DUPL_L",
                 };
             }
+        }
 
 
         }
@@ -594,12 +598,14 @@ sub getClubMenuData {
                     url => $baseurl."a=A_SV_DTE",
                 };
             }
+        if ($SystemConfig->{'allowDuplicateRes'})   {
             if(isCheckDupl($Data)) {
                 $menuoptions{'duplicates'} = {
                     name => $lang->txt('Duplicate Resolution'),
                     url => $baseurl."a=DUPL_L",
                 };
             }
+        }
             if($SystemConfig->{'AllowTXNs'}
                     and $SystemConfig->{'AllowClubTXNs'}
             ) {
@@ -696,10 +702,12 @@ sub getClubMenuData {
     }
 
     if ($Data->{'clientValues'}{'authLevel'} > $Defs::LEVEL_CLUB or $clubObj->getValue('strStatus') ne $Defs::ENTITY_STATUS_DE_REGISTERED)    {
-        $menuoptions{'bulk'} = {
-            name => $lang->txt('Bulk Renewals'),
-            url => $baseurl."a=PREGFB_T",
-        };
+        if ($SystemConfig->{'allowBulkRenewals'})   {
+            $menuoptions{'bulk'} = {
+                name => $lang->txt('Bulk Renewals'),
+                url => $baseurl."a=PREGFB_T",
+            };
+        }
 		$menuoptions{'bulkpayment'} = { 
 			name => $lang->txt('Pay Invoice'),
 			url => $baseurl."a=TXN_PAY_INV",

@@ -188,15 +188,6 @@ sub setupValues {
     $self->{'FieldSets'} = {
         core => {
             'fields' => {
-                strEntityType   => {
-                    label       => $FieldLabels->{'strEntityType'},
-                    value       => $values->{strEntityType} || '',
-                    type        => 'lookup',
-                    options     => \%entityTypeOptions,
-                    firstoption => [ '', 'Select Type of Organisation' ],
-                    compulsory => 1,
-                    sectionname => 'core',
-                },
                 intFacilityTypeID => {
                     label       => $FieldLabels->{'intFacilityTypeID'},
                     value       => $values->{'intFacilityTypeID'},
@@ -301,7 +292,6 @@ sub setupValues {
                 strLatinName
                 strLatinShortName
                 latinBlockEnd
-                strEntityType
                 intFacilityTypeID
                 strCity
                 strRegion
@@ -406,15 +396,14 @@ sub setupValues {
             'order' => [qw(
                 strAddress
                 strAddress2
+                strContactCity
                 strState
                 strPostalCode
+                strContactISOCountry
+                strEmail
+                strPhone
                 strFax
                 strWebURL
-                strContact
-                strContactCity
-                strContactISOCountry
-                strPhone
-                strEmail
             )],
             sections => [
                 [ 'main',        'Contact Details' ],
