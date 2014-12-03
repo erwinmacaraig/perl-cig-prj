@@ -16,6 +16,8 @@ use EntityTypeRoles;
 use Person;
 use Entity;
 use RegoAgeRestrictions;
+use PersonRegistration;
+use SystemConfig;
 use CGI qw(param);
 
 use Data::Dumper;
@@ -276,20 +278,23 @@ sub optionsPersonRegisterWhat {
             #TODO
             #handle for other steps (person role, level, age group)
 
-            $st = qq[
-                SELECT DISTINCT $lookingForField, COUNT(intMatrixID) as CountNum
-                FROM tblMatrix
-                WHERE
-                    intOriginLevel  = ?
-                    AND intLocked=0
-                    AND intRealmID = ?
-                    AND intSubRealmID IN (0,?)
-                    $bulkWHERE
-                    $MATRIXwhere
-                GROUP BY $lookingForField
-            ];
+            $Data->{'Realm'} = $Data->{'Realm'} || $realmID;
+            my $personLevelFromMatrix = getPersonLevelFromMatrix($Data, $MATRIXwhere, \@MATRIXvalues, $bulk, $personType, $pref);
+            return ($personLevelFromMatrix, '');
+            #$st = qq[
+            #    SELECT DISTINCT $lookingForField, COUNT(intMatrixID) as CountNum
+            #    FROM tblMatrix
+            #    WHERE
+            #        intOriginLevel  = ?
+            #        AND intLocked=0
+            #        AND intRealmID = ?
+            #        AND intSubRealmID IN (0,?)
+            #        $bulkWHERE
+            #        $MATRIXwhere
+            #    GROUP BY $lookingForField
+            #];
 
-            @values = @MATRIXvalues;
+            #@values = @MATRIXvalues;
         }
         elsif ($lookingForField eq 'strAgeLevel') {
             #get age level from tblMatrix to narrow down selection in checkRegoAgeRestrictions
@@ -419,6 +424,7 @@ sub optionsPersonRegisterWhat {
 
     my $q = $Data->{'db'}->prepare($st);
     $q->execute(@values);
+
     my $lookup = ();
     while(my ($val, $countNum) = $q->fetchrow_array())   {
         if($val)    {
@@ -588,5 +594,51 @@ sub getAgeLevelFromMatrix {
     return 0 if(!$count);
     return \@retdata;
 }
+
+sub getPersonLevelFromMatrix {
+    my($Data, $where, $values_ref, $bulk, $personType, $pref) = @_;
+                       
+    my $systemConfig = getSystemConfig($Data);
+    my $bulkWHERE='';
+    my $st = qq[
+        SELECT DISTINCT strPersonLevel, COUNT(intMatrixID) as CountNum
+        FROM tblMatrix
+        WHERE
+            intOriginLevel  = ?
+            AND intLocked=0
+            AND intRealmID = ?
+            AND intSubRealmID IN (0,?)
+            $bulkWHERE
+            $where
+        GROUP BY strPersonLevel
+    ];
+
+    my $query = $Data->{'db'}->prepare($st);
+    $query->execute(@{$values_ref});
+    
+    my @retdata=();
+    my $count = 0;
+
+    my $personLevelList = \%Defs::personLevel;
+    while (my $dref = $query->fetchrow_hashref())   {
+        #if the player is under 16, "PROFESSIONAL" should not be available (specific to MA)
+        next if (
+            $systemConfig->{'age_breakpoint_PLAYER_PROFESSIONAL'}
+            and $personType eq $Defs::PERSON_TYPE_PLAYER
+            and $dref->{'strPersonLevel'} eq $Defs::PERSON_LEVEL_PROFESSIONAL
+            and $pref->{'currentAge'} lt $systemConfig->{'age_breakpoint_PLAYER_PROFESSIONAL'}
+        );
+
+        push @retdata, {
+            name => $personLevelList->{$dref->{'strPersonLevel'}},
+            value => $dref->{'strPersonLevel'},
+        }
+    }
+
+    #return 0 if(!$count);
+    return \@retdata;
+}
+
+
 
 1;
