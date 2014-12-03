@@ -108,6 +108,15 @@
                           <span class="details-left detail-value">[% PersonDetails.Status %]</span>
                         </span>
                     [% END %]
+
+                    [% IF EditDetailsLink and !ReadOnlyLogin  %]
+                        <span style="float: right" class="">
+                            <a href = "[% EditDetailsLink %]&e_a=core" class="edit-link">
+                                [% Lang.txt('Edit') %]
+                            </a>
+                        </span>
+                    [% END %]
+
                 </div>
 
                 <div id="regdetails" class="tab-pane fade">

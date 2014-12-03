@@ -47,6 +47,7 @@ use EntityFields;
 use EntityTypeRoles;
 use JSON;
 use Countries;
+use HomePerson;
 
 sub cleanTasks  {
 
@@ -2121,6 +2122,15 @@ sub populateRegoViewData {
     my $role_ref = getEntityTypeRoles($Data, $dref->{'strSport'}, $dref->{'strPersonType'});
 
     my $isocountries  = getISOCountriesHash();
+
+    my %tempClientValues = getClient($Data->{'client'});
+    $tempClientValues{currentLevel} = $Defs::LEVEL_PERSON;
+    $tempClientValues{personID} = $dref->{intPersonID};
+
+    my $tempClient= setClient(\%tempClientValues);
+    my $PersonEditLink = "$Data->{'target'}?client=$tempClient&amp;a=PE_";
+
+    my $readonly = !( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 );
 	%TemplateData = (
         PersonDetails => {
             Status => $Data->{'lang'}->txt($Defs::personStatus{$dref->{'PersonStatus'} || 0}) || '',
@@ -2146,6 +2156,8 @@ sub populateRegoViewData {
             RegisterTo => $dref->{'entityLocalName'} || '-',
             Status => $Defs::personRegoStatus{$dref->{'personRegistrationStatus'}} || '-',
         },
+        'EditDetailsLink' => $PersonEditLink,
+        'ReadOnlyLogin' => $readonly,
 	);
 
     $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.')
