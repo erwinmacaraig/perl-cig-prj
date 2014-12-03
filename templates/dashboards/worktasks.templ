@@ -137,7 +137,11 @@
 		            [% END %]
                     <td>[% task.taskDate %]</td>
                     <td><span class="fa fa-clock-o"></span>[% task.TaskStatusLabel %]</td>
-                    <td><a href="[% task.viewURL %]" class="btn-inside-panels">View</a></td>
+                    [% IF CurrentLevel == 100 OR CurrentLevel == 20 %]
+                        <td><a href="[% task.viewURL %]" class="btn-inside-panels">View and Approve</a></td>
+                    [% ELSE %]
+                        <td><a href="[% task.viewURL %]" class="btn-inside-panels">View</a></td>
+                    [% END %]
                 </tr>
 		    [% END %]
 
