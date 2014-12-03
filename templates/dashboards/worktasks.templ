@@ -41,9 +41,9 @@
 				<td><!--Filter by:-->
 					<select class="filter-tasks">
 			          <option selected="" value="">-- All --</option>
-			          <optionvalue="">New Registration</option>
-			          <optionvalue="">Renewal</option>
-			          <optionvalue="">Transfer</option>
+			          <option value="">New Registration</option>
+			          <option value="">Renewal</option>
+			          <option value="">Transfer</option>
                       <!--
                       [% FOREACH taskType IN TaskFilters.type %]
                       <option value="[% taskType %]">[% taskType %]</option>
@@ -68,8 +68,8 @@
                       <!--
                       [% FOREACH taskStatus IN TaskFilters.status %]
                       <option value="[% taskStatus %]">[% taskStatus %]</option>
-                        -->
                       [% END %]
+                        -->
 			        </select>
 				</td>
 				<td class="list-action-filter">
