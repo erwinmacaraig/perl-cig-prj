@@ -9,6 +9,7 @@ CREATE table tblEntityLinks (
 PRIMARY KEY (intEntityLinksID),
 KEY index_intParentEntityID (intParentEntityID),
 KEY index_intChildEntityID (intChildEntityID),
-KEY index_intPrimary(intPrimary)
+KEY index_intPrimary(intPrimary),
+UNIQUE KEY index_IDs(intParentEntityID, intChildEntityID)
 );
  

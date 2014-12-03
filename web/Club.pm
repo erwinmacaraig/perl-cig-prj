@@ -681,7 +681,7 @@ sub postClubAdd {
     if($id) {
       my $entityID = getID($Data->{'clientValues'});
       my $st=qq[
-        INSERT INTO tblEntityLinks (intParentEntityID, intChildEntityID)
+        INSERT IGNORE INTO tblEntityLinks (intParentEntityID, intChildEntityID)
         VALUES (?,?)
       ];
       my $query = $db->prepare($st);
