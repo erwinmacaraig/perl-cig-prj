@@ -396,15 +396,14 @@ sub setupValues {
             'order' => [qw(
                 strAddress
                 strAddress2
+                strContactCity
                 strState
                 strPostalCode
+                strContactISOCountry
+                strEmail
+                strPhone
                 strFax
                 strWebURL
-                strContact
-                strContactCity
-                strContactISOCountry
-                strPhone
-                strEmail
             )],
             sections => [
                 [ 'main',        'Contact Details' ],
