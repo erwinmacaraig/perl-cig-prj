@@ -928,18 +928,17 @@ sub process_products {
 
 sub display_documents { 
     my $self = shift;
-
+	
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
     }
-    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
+	my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
-
-    my $rego_ref = {};
+	my $rego_ref = {};
     my $content = '';
     if($regoID) {
         my $valid =0;
@@ -951,11 +950,9 @@ sub display_documents {
         );
         $regoID = 0 if !$valid;
     }
-
-    my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
+	my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
     $personObj->load();
-    if($regoID) {
-        my $nationality = $personObj->getValue('strISONationality') || ''; 
+	my $nationality = $personObj->getValue('strISONationality') || ''; 
         my $itc = $personObj->getValue('intInternationalTransfer') || '';
         $rego_ref->{'Nationality'} = $nationality;
         $rego_ref->{'InternationalTransfer'} = $itc;
@@ -972,17 +969,7 @@ sub display_documents {
             {},
             1
         );
-    }
-    else    {
-        push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
-    }
-	
-    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
-        #There are errors - reset where we are to go back to the form again
-        $self->decrementCurrentProcessIndex();
-        return ('',2);
-    }
-    my %PageData = (
+	my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
@@ -1007,6 +994,8 @@ sub process_documents {
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
     }
+
+	
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
@@ -1047,6 +1036,7 @@ sub process_documents {
     if(!$isRequiredDocPresent){
 	#if(1==1){
     	push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Required Document Missing") . $error_message;
+
         if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
             #There are errors - reset where we are to go back to the form again
             $self->decrementCurrentProcessIndex();
