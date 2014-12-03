@@ -245,7 +245,7 @@ sub personFieldsSetup {
                     datetype    => 'dropdown',
                     format      => 'dd/mm/yyyy',
                     maxyear     => (localtime)[5] + 1900,
-                    validate    => 'DATE,MORETHAN:'.$today,
+                    validate    => 'DATE,LESSTHAN:'.$today,
                     compulsory => 1,
                     sectionname => 'core',
                     noedit      => 1,
