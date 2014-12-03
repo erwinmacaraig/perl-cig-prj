@@ -629,9 +629,17 @@ sub getPersonLevelFromMatrix {
             and $pref->{'currentAge'} lt $systemConfig->{'age_breakpoint_PLAYER_PROFESSIONAL'}
         );
 
-        push @retdata, {
-            name => $personLevelList->{$dref->{'strPersonLevel'}},
-            value => $dref->{'strPersonLevel'},
+        if($dref->{'strPersonLevel'}){
+            push @retdata, {
+                name => $personLevelList->{$dref->{'strPersonLevel'}},
+                value => $dref->{'strPersonLevel'},
+            }
+        }
+        else {
+            push @retdata, {
+                name => '-',
+                value => '',
+            }
         }
     }
 
