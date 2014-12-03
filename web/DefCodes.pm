@@ -31,6 +31,7 @@ my %DefCodesTypes	= (
 	-15 => 'Accreditation Levels',
 	-16 => 'Misc. Official Types',
 	-17 => 'Match Officials Types',
+	-20 => 'Other Identifer Types',
 	#-18 => 'Coach Types',
 	#-19 => 'Discipline Types',
 	-31 => 'ID Document Types',

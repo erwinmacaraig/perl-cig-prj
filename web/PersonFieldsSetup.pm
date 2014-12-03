@@ -435,6 +435,15 @@ sub personFieldsSetup {
                     cols => '40',                	
                     sectionname => 'other',
                 },
+                 intOtherPersonIdentifierTypeID=> {
+                    label => $FieldLabels->{'intOtherPersonIdentifierTypeID'},
+                    value => $values->{'intOtherPersonIdentifierTypeID'},
+                    type        => 'lookup',
+                    options     => $DefCodes->{-20},
+                    order       => $DefCodesOrder->{-20},
+                    firstoption => [ '', " " ],
+                    sectionname => 'other',
+                },
                intMinorMoveOtherThanFootball => {
                     label => $FieldLabels->{'intMinorMoveOtherThanFootball'} || '',
                     value => $values->{'intMinorMoveOtherThanFootball'} || 0,
@@ -512,6 +521,7 @@ sub personFieldsSetup {
                 dtOtherPersonIdentifierValidDateFrom
                 dtOtherPersonIdentifierValidDateTo
                 strOtherPersonIdentifierDesc
+                intOtherPersonIdentifierTypeID
 
             )],
             sections => [

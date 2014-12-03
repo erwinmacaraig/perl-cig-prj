@@ -75,8 +75,6 @@ my $Fields = {
 		strMemberCustomNotes5
                 intMemberToHideID
                 intPhotoUseApproval
-                strOtherPersonIdentifier
-                strOtherPersonIdentifierDesc
                 strISONationality
                 strISOCountryOfBirth
                 strRegionOfBirth
@@ -86,11 +84,12 @@ my $Fields = {
                 dtBirthCertValidityDateFrom
                dtBirthCertValidityDateTo
         strBirthCertDesc
-        trOtherPersonIdentifier
+        strOtherPersonIdentifier
         strOtherPersonIdentifierIssueCountry
         dtOtherPersonIdentifierValidDateFrom
         dtOtherPersonIdentifierValidDateTo
         strOtherPersonIdentifierDesc
+        intOtherPersonIdentifierTypeID
         intMinorMoveOtherThanFootball
         intMinorDistance
         intMinorEU
