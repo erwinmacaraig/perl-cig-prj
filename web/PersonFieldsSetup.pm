@@ -95,40 +95,33 @@ sub personFieldsSetup {
         </script> 
     ];
 
-    my $minorComparisonDate  = minorComparisonDate($Data);
+    my ($minorComparisonDate_low, $minorComparisonDate_high)  = minorComparisonDate($Data);
     my $minorscript = qq[
         <script>
             jQuery(document).ready(function()  {
-                jQuery("#l_strISOCountryOfBirth, #l_strISONationality, #l_dtDOB_year, #l_dtDOB_mon, #l_dtDOB_day").change(function(){
+                jQuery("#l_dtDOB_year, #l_dtDOB_mon, #l_dtDOB_day").change(function(){
                     showMinorProtection();
                 });
     
                 function showMinorProtection()  {
-                    var cob = jQuery("#l_strISOCountryOfBirth").val();
-                    var nat = jQuery("#l_strISONationality").val();
                     var dob_y = jQuery("#l_dtDOB_year").val();
                     var dob_m = jQuery("#l_dtDOB_mon").val();
                     var dob_d = jQuery("#l_dtDOB_day").val();
-                    var show = 1;
-                    if(!cob || !nat || !dob_y || !dob_m || !dob_d)  {
-                        show = 0;
-                    }
-                    if(cob == nat) {
-                        show = 0;
-                    }
-                    if(show)    {
+                    var show = 0;
+                    if(dob_y && dob_m && dob_d)  {
                         if(dob_m < 10) { dob_m = '0' + dob_m; }
                         if(dob_d < 10) { dob_d = '0' + dob_d; }
                         var dob = dob_y + '-' + dob_m + '-' + dob_d;
-                        if(dob < '$minorComparisonDate')    {
-                            show = 0;
+                        if(dob > '$minorComparisonDate_low'
+                            && dob < '$minorComparisonDate_high')    {
+                            show = 1;
                         }
                     }
                     if(show)    {
-                        jQuery('#fsg-minor').show();
+                        jQuery('#block-minor').show();
                     }
                     else    {
-                        jQuery('#fsg-minor').hide();
+                        jQuery('#block-minor').hide();
                     }
                 }
                 showMinorProtection();
@@ -449,7 +442,7 @@ sub personFieldsSetup {
                     value => $values->{'intMinorMoveOtherThanFootball'} || 0,
                     type  => 'checkbox',
                     displaylookup => { 1 => 'Yes', 0 => 'No' },
-                    sectionname => 'minor',
+                    sectionname => 'core',
                     swapLabels => 1,
                     active => $allowMinorProtection,
                 },
@@ -458,7 +451,7 @@ sub personFieldsSetup {
                     value => $values->{'intMinorDistance'} || 0,
                     type  => 'checkbox',
                     displaylookup => { 1 => 'Yes', 0 => 'No' },
-                    sectionname => 'minor',
+                    sectionname => 'core',
                     swapLabels => 1,
                     active => $allowMinorProtection,
                 },
@@ -467,7 +460,7 @@ sub personFieldsSetup {
                     value => $values->{'intMinorEU'} || 0,
                     type  => 'checkbox',
                     displaylookup => { 1 => 'Yes', 0 => 'No' },
-                    sectionname => 'minor',
+                    sectionname => 'core',
                     swapLabels => 1,
                     active => $allowMinorProtection,
                 },
@@ -476,9 +469,27 @@ sub personFieldsSetup {
                     value => $values->{'intMinorNone'} || 0,
                     type  => 'checkbox',
                     displaylookup => { 1 => 'Yes', 0 => 'No' },
-                    sectionname => 'minor',
+                    sectionname => 'core',
                     posttext    => $minorscript,
                     swapLabels => 1,
+                    active => $allowMinorProtection,
+                },
+                minorBlockStart => {
+                    label       => 'minorblockstart',
+                    value       => qq[<div id = "block-minor" class = "dynamic-panel">
+                        <div class="form-group"> 
+                            <label class = "col-md-4 control-label txtright"><span class="compulsory">*</span>FIFA Minor Protection</label>
+                        </div>
+                    ],
+                    type        => 'htmlrow',
+                    sectionname => 'core',
+                    active => $allowMinorProtection,
+                },
+                minorBlockEnd => {
+                    label       => 'minorblockend',
+                    value       => qq[</div>],
+                    type        => 'htmlrow',
+                    sectionname => 'core',
                     active => $allowMinorProtection,
                 },
  
@@ -492,6 +503,14 @@ sub personFieldsSetup {
                 strLatinFirstname
                 latinBlockEnd
                 dtDOB
+
+                minorBlockStart
+                intMinorMoveOtherThanFootball
+                intMinorDistance
+                intMinorEU
+                intMinorNone
+                minorBlockEnd                
+
                 intGender
                 strMaidenName
                 strISONationality
@@ -499,10 +518,7 @@ sub personFieldsSetup {
                 strRegionOfBirth
                 strPlaceOfBirth
 
-                intMinorMoveOtherThanFootball
-                intMinorDistance
-                intMinorEU
-                intMinorNone
+
 
                 strPreferredLang
                 intEthnicityID                 

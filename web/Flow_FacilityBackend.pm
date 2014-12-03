@@ -281,6 +281,7 @@ sub setupValues {
                     value       => qq[</div>],
                     type        => 'htmlrow',
                     sectionname => 'core',
+                    active      => $nonLatin,
                 },
                     
             },
