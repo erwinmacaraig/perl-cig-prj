@@ -1,7 +1,7 @@
     <div class="task-actions">
 
         [% IF TaskAction.showApprove %]
-        <a class="btn-disabled workflow-action" href="main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]">
+        <a class="btn-disabled workflow-action" data-actiontype="APPROVE" data-disabled="[% TaskAction.disableApprove %]" href="main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]">
             [% IF TaskAction.ApprovalEntityLevel == 3 %]
                 [% Lang.txt('Accept') %]
             [% ELSE %]
@@ -92,20 +92,49 @@
                 jQuery(this).attr('data-visited', 'true');
                 
                 if(jQuery("ul.nav-tabs li a[data-visited=false]").length === 0){
-                    jQuery("a.workflow-action")
-                        .removeClass("btn-disabled")
-                        .addClass("btn-main")
-                        .unbind('click', disableAction)
-                        .click(function(f){
+                    jQuery("a.workflow-action").each(function(){
+                        var actiontype = jQuery(this).data('actiontype');
 
-                            var actiontype = jQuery(this).data('actiontype');
+                        switch(actiontype){
+                            case 'APPROVE':
+                                if(jQuery(this).data('disabled') == 0){
+                                    jQuery(this)
+                                        .removeClass("btn-disabled")
+                                        .addClass("btn-main")
+                                        .unbind("click", disableAction);
+                                }
+                                break;
+                            case 'HOLD':
+                            case 'REJECT':
+                            case 'RESOLVE':
+                                jQuery(this)
+                                    .removeClass("btn-disabled")
+                                    .addClass("btn-main")
+                                    .unbind("click", disableAction)
+                                    .click(function(f){
+                                        jQuery("div#showWorkflowNotes").modal();
+                                        jQuery("#workFlowActionForm input[type=hidden][name=type]").val(actiontype);
+                                        f.preventDefault();
+                                    });
+                                break;
+                        }
+                    });
 
-                            if(actiontype == "REJECT" || actiontype == "HOLD" || actiontype == "RESOLVE"){
-                                jQuery("div#showWorkflowNotes").modal();
-                                jQuery("#workFlowActionForm input[type=hidden][name=type]").val(actiontype);
-                                f.preventDefault();
-                            }
-                        });
+
+                    //jQuery("a.workflow-action")
+                    //    .removeClass("btn-disabled")
+                    //    .addClass("btn-main")
+                    //    .unbind('click', disableAction)
+                    //    .click(function(f){
+
+                    //        var actiontype = jQuery(this).data('actiontype');
+
+                    //        if(actiontype == "REJECT" || actiontype == "HOLD" || actiontype == "RESOLVE"){
+                    //            jQuery("div#showWorkflowNotes").modal();
+                    //            jQuery("#workFlowActionForm input[type=hidden][name=type]").val(actiontype);
+                    //            f.preventDefault();
+                    //        }
+                    //    });
                 } else {
                 }
             });
