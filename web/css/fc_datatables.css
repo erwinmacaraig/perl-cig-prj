@@ -7,6 +7,7 @@ div.dataTables_length label {
 div.dataTables_length select {
 	width: 75px;
 	display: inline-block;
+	padding:3px;
 }
 
 div.dataTables_filter {
@@ -27,12 +28,14 @@ div.dataTables_filter input {
 div.dataTables_info {
 	padding-top: 8px;
 	white-space: nowrap;
+	font-size: 13px;
 }
 
 div.dataTables_paginate {
 	margin: 0;
 	white-space: nowrap;
 	text-align: right;
+	font-size: 13px;
 }
 
 div.dataTables_paginate ul.pagination {

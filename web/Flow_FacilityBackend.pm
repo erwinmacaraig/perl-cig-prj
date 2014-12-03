@@ -188,15 +188,6 @@ sub setupValues {
     $self->{'FieldSets'} = {
         core => {
             'fields' => {
-                strEntityType   => {
-                    label       => $FieldLabels->{'strEntityType'},
-                    value       => $values->{strEntityType} || '',
-                    type        => 'lookup',
-                    options     => \%entityTypeOptions,
-                    firstoption => [ '', 'Select Type of Organisation' ],
-                    compulsory => 1,
-                    sectionname => 'core',
-                },
                 intFacilityTypeID => {
                     label       => $FieldLabels->{'intFacilityTypeID'},
                     value       => $values->{'intFacilityTypeID'},
@@ -301,7 +292,6 @@ sub setupValues {
                 strLatinName
                 strLatinShortName
                 latinBlockEnd
-                strEntityType
                 intFacilityTypeID
                 strCity
                 strRegion
@@ -406,15 +396,14 @@ sub setupValues {
             'order' => [qw(
                 strAddress
                 strAddress2
+                strContactCity
                 strState
                 strPostalCode
+                strContactISOCountry
+                strEmail
+                strPhone
                 strFax
                 strWebURL
-                strContact
-                strContactCity
-                strContactISOCountry
-                strPhone
-                strEmail
             )],
             sections => [
                 [ 'main',        'Contact Details' ],
@@ -979,7 +968,7 @@ sub display_complete {
         }
 
         my $facilityID = $facilityFields->getEntityID();
-        $content = qq [<div class="OKmsg"> $self->{'Data'}->{'LevelNames'}{$Defs::LEVEL_VENUE} Added Successfully</div><br>]; # Venue ID = $facilityID AND entityID = $entityID </div><br> ];
+        $content = qq [<div class="alert"><div><span class="flash_success fa fa-check"></span><p>$self->{'Data'}->{'LevelNames'}{$Defs::LEVEL_VENUE} submitted for approval</p></div></div>]; # Venue ID = $facilityID AND entityID = $entityID </div><br> ];
     }
     else {
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Facility ID");

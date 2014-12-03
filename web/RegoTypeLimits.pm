@@ -18,12 +18,13 @@ use Data::Dumper;
 
 sub checkRegoTypeLimits    {
 
-    my ($Data, $personID, $personRegistrationID, $sport, $personType, $entityRole, $personLevel, $ageLevel) = @_;
-
+    my ($Data, $personID, $personRegistrationID, $sport, $personType, $entityRole, $personLevel, $ageLevel,$entityID) = @_;
+	
+	
     ## Sport, PersonType mandatory.  But other fields can be blank in tblRegoTypeLimits
     $personID ||= 0;
     $personRegistrationID ||= 0;
-    my $entityID=0;
+    $entityID ||= 0;
     
     if ($personRegistrationID)  {
         my %Reg = (
@@ -34,6 +35,8 @@ sub checkRegoTypeLimits    {
             $personID,
             \%Reg
         );
+
+		
         if ($count ==1) {
             $sport = $regs->[0]{'strSport'};
             $personType= $regs->[0]{'strPersonType'};
@@ -64,30 +67,34 @@ sub checkRegoTypeLimits    {
         #$personType,
     );
     if (defined $sport) {
-        push @limitValues, $sport;
-        $st .= qq[ AND strSport IN ('', ?)];
+        #push @limitValues, $sport;
+       # $st .= qq[ AND strSport IN ('', ?)];
+		$st .= qq[ AND strSport IN ('', '$sport')];
     }
     if (defined $personType) {
-        push @limitValues, $personType;
-        $st .= qq[ AND strPersonType IN ('', ?)];   
+        #push @limitValues, $personType;
+        #$st .= qq[ AND strPersonType IN ('', ?)];  
+		$st .= qq[ AND strPersonType IN ('', '$personType')];   
     }
     if (defined $entityRole) {
-        push @limitValues, $entityRole;
-        $st .= qq[ AND strPersonEntityRole IN ('', ?)];
+        #push @limitValues, $entityRole;
+        #$st .= qq[ AND strPersonEntityRole IN ('', ?)];
+		$st .= qq[ AND strPersonEntityRole IN ('', '$entityRole')];
     }
     if (defined $personLevel) {
-        push @limitValues, $personLevel;
-        $st .= qq[ AND strPersonLevel IN ('', ?)];
+        #push @limitValues, $personLevel;
+        $st .= qq[ AND strPersonLevel IN ('', '$personLevel')];
     }
     if (defined $ageLevel) {
-        push @limitValues, $ageLevel;
-        $st .= qq[ AND strAgeLevel IN ('', ?)];
+        #push @limitValues, $ageLevel;
+        #$st .= qq[ AND strAgeLevel IN ('', ?)];
+		$st .= qq[ AND strAgeLevel IN ('', '$ageLevel')];
     }
 
     $st .= qq[ ORDER BY fieldSpecifiedExistCount DESC ];
     my $query = $Data->{'db'}->prepare($st);
-    $query -> execute(@limitValues);
-
+    $query->execute(@limitValues);
+		
     ## Build up an SQL for Count of Unique Person/Entity per sport/personType
     my $stPE = qq[
         SELECT
@@ -157,6 +164,7 @@ sub checkRegoTypeLimits    {
             ## Only runs on PersonType & Sport
             my $peCount = 0;
             my $qryPE = $Data->{'db'}->prepare($stPErow);
+
             $qryPE -> execute(@PErowValues);
             my $thisEntitySeen = 0;
             while (my $pe_ref = $qryPE->fetchrow_hashref()) {
@@ -164,9 +172,11 @@ sub checkRegoTypeLimits    {
                     $thisEntitySeen = 1;
                 }
                 $peCount++;
+				
             }
             $peCount++ if (!$thisEntitySeen);
             if ($peCount > $dref->{'intLimit'}) {
+
                 return 0;
             }
         }

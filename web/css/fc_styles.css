@@ -111,9 +111,9 @@ ul.icon-left li {
 
 header .utilities {
 	background: #004e7e;
-	padding: 10px;
+	padding: 7px;
     width:100%;
-    height:50px;
+    height:45px;
 }
 header .utilities.notloginlevel    {
     background:#000;
@@ -133,6 +133,7 @@ header .utilities ul li {
 	list-style-type: none;
 	color: #fff;
 	margin: 0 40px 0 0;
+	font-size:13px;
 }
 
 header .utilities ul li:last-child {
@@ -160,7 +161,7 @@ header .logo-area {
 }
 
 header .logo-area.notloginlevel    {
-    margin-top:50px;
+    margin-top:45px;
 }
 
 header .logo-area img {
@@ -200,7 +201,7 @@ header .logo-area ul li strong {
 
 header nav {
 	background: #004e7e;
-	padding: 20px 0;
+	padding: 10px 0;
 	-webkit-box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
 	-moz-box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
 	box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
@@ -351,11 +352,16 @@ select {
 .toggle a {
 	background: #d8d8d8;
 	border: 1px solid #cccccc;
-	font-size: 16px;
+	font-size: 13px;
 	padding: 8px 30px;
 	color: #000;
 	float: left;
+<<<<<<< HEAD
 	text-decoration: none;
+=======
+	
+	text-align: center;
+>>>>>>> 380dabdd0d5aee6a36ca3012390f789a9dac71c3
 }
 
 .toggle a:hover {
@@ -365,7 +371,7 @@ select {
 .toggle a.active {
 	background: #045485;
 	border: 1px solid #045485;
-	font-size: 16px;
+	font-size: 13px;
 	padding: 8px 30px;
 	color: #fff;
 	float: left;
@@ -427,7 +433,7 @@ a.btn-inside-panels {
     font-weight: normal;
     font-size: 14px;
 	color: #fff;
-	padding: 8px 15px;
+	padding: 8px 14px;
 	display: inline-block;
 	background: #1870a5;
 	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzE4NzBhNSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwOTViOGQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
@@ -661,7 +667,7 @@ table.table tr td.align-right {
 }
 
 header nav ul#menu ul {
-	top:40px;
+	top:30px;
 }
 
 header ul#menu ul li a:hover {
@@ -671,7 +677,7 @@ header ul#menu ul li a:hover {
 
 /* Added Styles for Table in Task List Dashboard:: Vincent R; */
 .dashboard-tasklist td, .documents-list td{
-	padding: 20px 20px;
+	padding: 15px 15px;
 }
 .dashboard-tasklist th, .documents-list th{
 	padding: 10px 20px;
@@ -686,8 +692,13 @@ header ul#menu ul li a:hover {
 .dashboard-tasklist tr, .documents-list tr{
 	border: 1px solid #cbcbcb;
 }
+
+.list-action-filter a {
+	width:50%;
+}
+
 .list-action-filter a, .list-action-filter a.active{
-	padding: 7px 6px;
+	padding: 7px 7px;
 	float: left;
 	cursor: pointer;
 }
@@ -987,8 +998,8 @@ a.btn-inside-docs-panel:hover {
 /*temporary adjustment to dispay drill down nav*/
 
 header nav ul li a {
-	padding-top:20px;
-	padding-bottom: 27px;
+	padding-top:10px;
+	padding-bottom: 10px;
 }
 
 .nav_session_menu_wrap {
@@ -999,6 +1010,7 @@ header nav ul li a {
 
 .nav_session_placement {
 	width:300px;
+	height:28px;
 	background-position: 272px;
 }
 
@@ -1008,7 +1020,7 @@ header nav ul li a {
 
 .nav-bar-name {
 	width:65%;
-	font-size:16px;
+	font-size:13px;
 }
 
 .dash-heading, .pageHeading {
@@ -1027,7 +1039,8 @@ header nav ul li a {
 
 /*** row spacing ***/
 .top-bottom-spacer { 
-	margin: 50px 0px;
+	margin: 20px 0 0 0;
+	overflow:hidden;
 }
 
 #regopt_wrapper {
@@ -1153,6 +1166,7 @@ table.table tr th {
 	color:#fff;
 	padding:5px 10px 0 0;
 	float:left;
+	font-size: 13px;
 }
 
 .nav_session_levels {
@@ -1308,4 +1322,13 @@ a.paginate_button.previous, a.paginate_button.next, a.paginate_button {
 
 .alert p {
 	font-size:12px;
+}
+#worktasks tr td a.btn-inside-panels {
+	width: 100%;
+	text-align: center;
+	font-size: 13px;
+}
+
+span.fa-user{
+	margin-top:3px;
 }
