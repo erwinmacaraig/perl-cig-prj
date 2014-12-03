@@ -1,7 +1,6 @@
 [% IF Navigation %]
-<div class = "col-md-12"><h2 class="main-heading">New Registration</h2></div>
-<div class = "col-md-12 steps">[% Navigation %]
-</div>
+<div class = "col-md-12"><h2 class="main-heading">[% PageTitle %]</h2></div>
+<div class = "col-md-12 steps">[% Navigation %]</div>
 [% END %]
 [% Title %]
 [% IF Errors.size %]
@@ -17,27 +16,24 @@
 </div>
 [% END %]
 
-[% TextTop %]
 <div class="col-md-9">
-<h3 class="panel-header dynamic-header">Personal Details</h3>
-<div class="panel-body">
-<fieldset><p><span class="notice-error">*Required fields.</span></p></fieldset>
-[% IF DocumentsLists %][% DocumentsLists %][% END %]
+[% TextTop %]
 <form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">
     [% IF Content %][% Content %][% END %]
     [% IF FlowNextAction %]
-[% IF !NoContinueButton %]
-	<div class="txtright"><input type = "submit" value = " [% Lang.txt('Continue') %] "  class = "button proceed-button"></div>
-[% END %]
-[% IF Back %]
-    <div class="txtright"><span class="button proceed-button"><a href="javascript:history.go(-1)"  onmouseover="this.style.textDecoration='none'"> [% Lang.txt(Back) %] </a></span></div>
-[% END %]
 	<input type = "hidden" name ="rfp" value ="[% FlowNextAction %]">
     [% END %]
 	[% HiddenFields %]
 
-</form>
+<div class = "button-row">
+[% IF !NoContinueButton %]
+	<div class="txtright"><input type = "submit" value = " [% Lang.txt('Continue') %] "  class = "btn-main"></div>
+[% END %]
+[% IF Back %]
+    <div class="txtright"><span class="btn-main"><a href="javascript:history.go(-1)"  onmouseover="this.style.textDecoration='none'"> [% Lang.txt(Back) %] </a></span></div>
+[% END %]
 </div>
+</form>
 </div>
 [% IF FlowSummary %]
 <div class="col-md-3">

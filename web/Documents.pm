@@ -67,27 +67,27 @@ sub handle_documents {
 					#procedure for replacing a file
 					my $toReplaceRegoDoc = param('fileId') || 0;
 
-					if(!$toReplaceRegoDoc){ # Means adding new file to rego docs
-						#get rule ids
-						$query = qq[SELECT intWFRuleID FROM tblWFTask WHERE intPersonID = ? AND intPersonRegistrationID = ? ];
-						$sth = $Data->{'db'}->prepare($query);
-						$sth->execute($memberID, $RegistrationID);
-					
-						while(my $dref = $sth->fetchrow_hashref()){
-							$query = qq[INSERT INTO tblWFRuleDocuments (intWFRuleID, intDocumentTypeID, intAllowApprovalEntityAdd,intAllowApprovalEntityVerify,intAllowProblemResolutionEntityAdd,intAllowProblemResolutionEntityVerify) VALUES (?,?,?,?,?,?)];
-   							my $sthandle = $Data->{'db'}->prepare($query);
-							$sthandle->execute($dref->{'intWFRuleID'},$DocumentTypeID,0,1,1,0);
-						}
+                    #if(!$toReplaceRegoDoc){ # Means adding new file to rego docs
+					#	#get rule ids
+                    #    $query = qq[SELECT intWFRuleID FROM tblWFTask WHERE intPersonID = ? AND intPersonRegistrationID = ? ];
+					#	$sth = $Data->{'db'}->prepare($query);
+					#	$sth->execute($memberID, $RegistrationID);
+					#
+					#	while(my $dref = $sth->fetchrow_hashref()){
+					#		$query = qq[INSERT INTO tblWFRuleDocuments (intWFRuleID, intDocumentTypeID, intAllowApprovalEntityAdd,intAllowApprovalEntityVerify,intAllowProblemResolutionEntityAdd,intAllowProblemResolutionEntityVerify) VALUES (?,?,?,?,?,?)];
+   					#		my $sthandle = $Data->{'db'}->prepare($query);
+					#		$sthandle->execute($dref->{'intWFRuleID'},$DocumentTypeID,0,1,1,0);
+					#	}
 
-                	 }    
+                	# }    
 					 
-    				$query = qq[UPDATE tblWFTask SET strTaskStatus = ? WHERE intPersonID = ? AND intPersonRegistrationID = ?];
-					$sth = $Data->{'db'}->prepare($query);
-					$sth->execute('ACTIVE', $memberID, $RegistrationID);
+                     #$query = qq[UPDATE tblWFTask SET strTaskStatus = ? WHERE intPersonID = ? AND intPersonRegistrationID = ?];
+					 #$sth = $Data->{'db'}->prepare($query);
+					 #$sth->execute('ACTIVE', $memberID, $RegistrationID);
 
-					$query = qq[UPDATE tblPersonRegistration_$Data->{'Realm'} SET strStatus = ? WHERE intPersonID = ? AND intPersonRegistrationID = ?]; 
-					$sth = $Data->{'db'}->prepare($query);
-					$sth->execute('PENDING', $memberID, $RegistrationID);
+					 #$query = qq[UPDATE tblPersonRegistration_$Data->{'Realm'} SET strStatus = ? WHERE intPersonID = ? AND intPersonRegistrationID = ?]; 
+					 #$sth = $Data->{'db'}->prepare($query);
+					 #$sth->execute('PENDING', $memberID, $RegistrationID);
 										
 				}
 			}

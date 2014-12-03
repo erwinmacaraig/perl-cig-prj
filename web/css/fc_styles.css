@@ -112,6 +112,14 @@ ul.icon-left li {
 header .utilities {
 	background: #004e7e;
 	padding: 10px;
+    width:100%;
+    height:50px;
+}
+header .utilities.notloginlevel    {
+    background:#000;
+    position:fixed;
+    top:0;
+    z-index:2;
 }
 
 header .utilities ul {
@@ -149,6 +157,10 @@ header .utilities ul li a:hover {
 header .logo-area {
 	background: #085a8c;
 	padding: 30px 0;
+}
+
+header .logo-area.notloginlevel    {
+    margin-top:50px;
 }
 
 header .logo-area img {
@@ -324,6 +336,17 @@ select {
     border-radius: 0;
     padding: 5px;
 }
+.chosen-container-single .chosen-single {
+	border: 1px solid #ccc;
+    background: #fff;
+    width: 100%;
+    border-radius: 0;
+    padding: 5px;
+    box-shadow:none;
+    font-size:inherit;
+    height:auto;
+    line-height:auto;
+}
 
 .toggle a {
 	background: #d8d8d8;
@@ -363,6 +386,25 @@ a.btn-main, input.btn-main {
 	background: -ms-linear-gradient(top,  #1870a5 0%,#095b8d 100%);
 	background: linear-gradient(to bottom,  #1870a5 0%,#095b8d 100%);
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1870a5', endColorstr='#095b8d',GradientType=0 );
+}
+
+/* if btn-disabled class name will be changed, check fc-common.js. btn-disabled links must return false */
+a.btn-disabled {
+	font-family: 'noto_sansbold';
+    font-weight: normal;
+    font-size: 14px;
+	color: #fff;
+	padding: 15px 30px;
+	display: inline-block;
+	background: #1870a5;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzE4NzBhNSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwOTViOGQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(top,  #d8d8d8 0%, #ccc 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#d8d8d8), color-stop(100%,#ccc));
+	background: -webkit-linear-gradient(top,  #d8d8d8 0%,#ccc 100%);
+	background: -o-linear-gradient(top,  #d8d8d8 0%,#ccc 100%);
+	background: -ms-linear-gradient(top,  #d8d8d8 0%,#ccc 100%);
+	background: linear-gradient(to bottom,  #d8d8d8 0%,#ccc 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d8d8d8', endColorstr='#ccc',GradientType=0 );
 }
 
 a.btn-main:hover, input.btn-main:hover {
@@ -429,6 +471,14 @@ a.btn-inside-panels:hover {
 	font-size: 28px;
 	padding: 15px 20px;
 }
+
+.alert .fa-info {
+	background: #0297e4;
+	color: #fff;
+	font-size: 28px;
+	padding: 15px 20px;
+}
+
 
 .alert div {
 	width: 100%;
@@ -965,6 +1015,7 @@ header nav ul li a {
     font-size: 36px;
     color: #000;
     padding-left:15px;
+    margin-top:65px;
 }
 
 .modal-body textarea {
@@ -1069,23 +1120,27 @@ table.table tr th {
 	float:right;
 }
 /*** compulsary ***/
-.panel-body span.compulsory img {
-    left: 0;
-    margin: 0px;
-    position: absolute;
-    top: 0;
+.panel-body span.compulsory {
+    color:red;
 }
 #flowFormID .col-md-6 {
 	position: relative;
 }
 
+#flowFormID {
+    padding:0px;
+}
 .dynamic-panel  {
     padding:20px 5px 5px;
     margin: 10px 5px;
     background-color:#ddd;
+    float:left;
 }
 .fieldSectionGroup  {
-    overflow:auto;
+    margin-bottom:20px;
+}
+
+.button-row {
 }
 
 .access-level {
@@ -1249,16 +1304,6 @@ a.paginate_button.previous, a.paginate_button.next, a.paginate_button {
 	cursor: pointer;
 }
 
-/***REPORTING*****/
-
-.RO_fieldblock {
-	overflow:hidden;
-}
-
-.RO_compoption select {
-	border:1px solid #ccc;
-}
-
-.RO_valfields input[type="text"], .RO_valfields select {
-	margin-top: 10px;
+.alert p {
+	font-size:12px;
 }

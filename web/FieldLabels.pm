@@ -185,7 +185,7 @@ sub getFieldLabels	{
             strWebURL => 'Web Address',
             strEmail => 'Contact Email',
             strPhone => 'Contact Number',
-            strFax => 'Facsimile Number',
+            strFax => 'Fax',
             strContactCity => 'City of Contact',
             strPostalCode => 'Postcode',
             strContactISOCountry => 'Country of Contact',

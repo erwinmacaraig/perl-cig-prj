@@ -1,7 +1,7 @@
     <div class="task-actions">
 
         [% IF TaskAction.showApprove %]
-        <a class="btn-main workflow-action" href="main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]">
+        <a class="btn-disabled workflow-action" href="main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]">
             [% IF TaskAction.ApprovalEntityLevel == 3 %]
                 [% Lang.txt('Accept') %]
             [% ELSE %]
@@ -11,20 +11,20 @@
         [% END %]
 
         [% IF TaskAction.showReject %]
-        <a class="btn-main workflow-action" data-toggle="modal" data-target="#showWorkflowNotes" data-actiontype="REJECT" href = "">
+        <a class="btn-disabled workflow-action" data-target="#showWorkflowNotes" data-actiontype="REJECT" href = "">
             [% Lang.txt('Reject') %]
         </a>
         [% END %]
 
         [% IF TaskAction.showResolve %]
         <!--<a class="btn-main workflow-action" href = "main.cgi?client=[% TaskAction.client %]&a=WF_Resolve&TID=[% TaskAction.WFTaskID %]">-->
-        <a class="btn-main workflow-action"data-toggle="modal" data-target="#showWorkflowNotes" data-actiontype="RESOLVE"  href = "">
+        <a class="btn-disabled workflow-action"data-target="#showWorkflowNotes" data-actiontype="RESOLVE"  href = "">
             [% Lang.txt('Resolve') %]
         </a>
         [% END %]
 
         [% IF TaskAction.showHold %]
-        <a class="btn-main workflow-action" data-toggle="modal" data-target="#showWorkflowNotes" data-actiontype="HOLD" href = "">
+        <a class="btn-disabled workflow-action" data-target="#showWorkflowNotes" data-actiontype="HOLD" href = "">
             [% Lang.txt('Put on-hold') %]
         </a>
         [% END %]
@@ -80,13 +80,37 @@
 <script src = "//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
 <script type="text/javascript">
     jQuery().ready(function() {
-        jQuery("a.workflow-action").click(function(e){
-            var actiontype = jQuery(this).data('actiontype');
-            if(actiontype == "REJECT" || actiontype == "HOLD" || actiontype == "RESOLVE"){
-                jQuery("#workFlowActionForm input[type=hidden][name=type]").val(actiontype);
-                e.preventDefault();
-            }
+
+        var disableAction = function(e) {
+            return false;
+        }
+
+        jQuery("a.workflow-action").bind('click', disableAction);
+
+        jQuery("ul.nav-tabs li a").each(function(){
+            jQuery(this).on('click', function(){
+                jQuery(this).attr('data-visited', 'true');
+                
+                if(jQuery("ul.nav-tabs li a[data-visited=false]").length === 0){
+                    jQuery("a.workflow-action")
+                        .removeClass("btn-disabled")
+                        .addClass("btn-main")
+                        .unbind('click', disableAction)
+                        .click(function(f){
+
+                            var actiontype = jQuery(this).data('actiontype');
+
+                            if(actiontype == "REJECT" || actiontype == "HOLD" || actiontype == "RESOLVE"){
+                                jQuery("div#showWorkflowNotes").modal();
+                                jQuery("#workFlowActionForm input[type=hidden][name=type]").val(actiontype);
+                                f.preventDefault();
+                            }
+                        });
+                } else {
+                }
+            });
         });
+
 
         // validate the comment form when it is submitted
         jQuery("#workFlowActionForm").validate({
