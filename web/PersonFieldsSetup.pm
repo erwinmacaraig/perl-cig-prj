@@ -523,7 +523,7 @@ sub personFieldsSetup {
             )],
             sections => [
                 [ 'core',        'Personal Details' ],
-                [ 'mwwor',       'FIFA Minor Protection','','dynamic-panel' ],
+                [ 'minor',       'FIFA Minor Protection','','dynamic-panel' ],
                 [ 'other',       'Additional Information' ],
             ],
             fieldtransform => {
@@ -595,6 +595,9 @@ sub personFieldsSetup {
                 },
 
             },
+            sections => [
+                [ 'main',        'Contact Details' ],
+            ],
             'order' => [qw(
                 strAddress1
                 strAddress2
@@ -793,6 +796,9 @@ sub personFieldsSetup {
                 dtValidUntil
                 strDescription
             )],
+            sections => [
+                [ 'main',        'Certifications' ],
+            ],
         },
 #        minor => {
 #            'fields' => {
