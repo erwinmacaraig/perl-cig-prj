@@ -177,6 +177,7 @@ sub personFieldsSetup {
                     value       => $values->{'intGender'},
                     type        => 'lookup',
                     options     => \%genderoptions,
+                    class       => 'fcToggleGroup',
                     compulsory => 1,
                     firstoption => [ '', " " ],
                     sectionname => 'core',
@@ -291,17 +292,6 @@ sub personFieldsSetup {
                     sectionname => 'core',
                     noedit      => 1,
                 },
-                intGender => {
-                    label       => $FieldLabels->{'intGender'},
-                    value       => $values->{'intGender'},
-                    type        => 'lookup',
-                    options     => \%genderoptions,
-                    compulsory => 1,
-                    firstoption => [ '', " " ],
-                    sectionname => 'core',
-                    noedit      => 1,
-                },
-
                 strPreferredLang => {
                     label       => $FieldLabels->{'strPreferredLang'},
                     value       => $values->{'strPreferredLang'},

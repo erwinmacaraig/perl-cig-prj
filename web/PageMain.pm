@@ -589,40 +589,6 @@ sub getHomeClient {
 
 sub getStatsCounterCode {
     return q[
-<!-- START Nielsen//NetRatings SiteCensus V5.1 -->
-<!-- COPYRIGHT 2005 Nielsen//NetRatings -->
-<script language="JavaScript" type="text/javascript">
-<!--
-        var _rsCI="sportingpulse";
-        var _rsCG="sportzmembership";
-        var _rsDT=0;
-        var _rsDU=0;
-        var _rsDO=1;
-        var _rsX6=0;
-        var _rsSI=escape(window.location);
-        var _rsLP=location.protocol.indexOf('https')>-1?'https:':'http:';
-        var _rsRP=escape(document.referrer);
-        var _rsND=_rsLP+'//secure-au.imrworldwide.com/';
-
-        if (parseInt(navigator.appVersion)>=4)
-        {
-                var _rsRD=(new Date()).getTime();
-                var _rsSE=0;
-                var _rsSV="";
-                var _rsSM=0;
-                _rsCL='<scr'+'ipt language="JavaScript" type="text/javascript" src="'+_rsND+'v51.js"></scr'+'ipt>';
-        }
-        else
-        {
-                _rsCL='<img src="'+_rsND+'cgi-bin/m?ci='+_rsCI+'&cg='+_rsCG+'&si='+_rsSI+'&rp='+_rsRP+'">';
-        }
-        document.write(_rsCL);
-//-->
-</script>
-<noscript>
-        <img src="//secure-au.imrworldwide.com/cgi-bin/m?ci=sportingpulse&amp;cg=0" alt="">
-</noscript>
-<!-- END Nielsen//NetRatings SiteCensus V5.1 -->
     ];    
 }
 
