@@ -288,10 +288,10 @@ sub setupValues {
                 strLocalName
                 strLocalShortName
                 intLocalLanguage
-                latinBlockStart
+                #latinBlockStart
                 strLatinName
                 strLatinShortName
-                latinBlockEnd
+                #latinBlockEnd
                 intFacilityTypeID
                 strCity
                 strRegion

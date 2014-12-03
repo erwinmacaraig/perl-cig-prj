@@ -49,14 +49,22 @@ sub personIsMinor   {
 
 sub minorComparisonDate {
     my ($Data) = @_;
-    #this function will return the oldest DOB to be accepted as a minor
+    #this function will return the DOB's where the person needs to be between to be accepted as a minor
     my $timezone = $Data->{'SystemConfig'}{'Timezone'} || 'UTC';
     my $today = dateatAssoc($timezone);
     my $dateAs = $Data->{'SystemConfig'}{'Age-DateAsOf'} || $today;
     my $adultAge = $Data->{'SystemConfig'}{'Age-Adult'} || 18;
+    my $tooYoungAge = $Data->{'SystemConfig'}{'Age-TooYoung'} || 12;
     my($dateAs_y,$dateAs_m,$dateAs_d) = $dateAs =~/(\d\d\d\d)-(\d{1,2})-(\d{1,2})/;
-    my ( $age_year, $age_month, $age_day ) = Add_Delta_Days(Add_Delta_YM( $dateAs_y, $dateAs_m, $dateAs_d, -$adultAge, 0),1);
-    return "$age_year-$age_month-$age_day";
+    my ( $age_year, $age_month, $age_day ) = Add_Delta_Days(Add_Delta_YM( $dateAs_y, $dateAs_m, $dateAs_d, -$adultAge, 0),-1);
+    $age_month = '0'.$age_month if $age_month < 10;
+    $age_day = '0'.$age_day if $age_day < 10;
+    my ( $agel_year, $agel_month, $agel_day ) = Add_Delta_Days(Add_Delta_YM( $dateAs_y, $dateAs_m, $dateAs_d, -$tooYoungAge, 0),1);
+    $agel_month = '0'.$agel_month if $agel_month < 10;
+    $agel_day = '0'.$agel_day if $agel_day < 10;
+    my $ageHigh = "$age_year-$age_month-$age_day";
+    my $ageLow= "$agel_year-$agel_month-$agel_day";
+    return ($ageHigh, $ageLow);
 }
 1;
 
