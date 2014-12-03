@@ -43,7 +43,6 @@ sub new {
 
     return undef if !$self->{'db'};
  
-    $self->setupValues();
     return $self;
 }
 
@@ -54,6 +53,7 @@ sub run {
 
     #Setup the variables and values we are going to need
     $self->_setupRun();
+    $self->setupValues();
 
     #Call function based on current process index
     my $next = 1;

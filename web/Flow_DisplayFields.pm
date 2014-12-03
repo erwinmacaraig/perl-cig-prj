@@ -337,7 +337,9 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 if($sectionHasCompulsory{$s->[0]})   {
                     $compulsory_string = '<p><span class="notice-error">'.$compulsory.$requiredfield.'</span></p>';
                 }
-                $returnstr .= qq[$sh<div class = "panel-body fieldSectionGroup $extraclass" id = "fsg-].$s->[0].qq["><fieldset>$compulsory_string].$sections{ $s->[0] }.qq[</fieldset></div>];
+                $returnstr .= qq[
+                    <div class = "fieldSectionGroupWrapper" id = "fsgw-].$s->[0].qq[">
+                    $sh<div class = "panel-body fieldSectionGroup $extraclass" id = "fsg-].$s->[0].qq["><fieldset>$compulsory_string].$sections{ $s->[0] }.qq[</fieldset></div></div>];
             }
             else {
                 #my $style=$s ? 'style="display:none;" ' : '';
