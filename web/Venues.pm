@@ -745,6 +745,7 @@ sub listVenues  {
 
     my $statement =qq[
       SELECT 
+        DISTINCT
         PN.intEntityID AS PNintEntityID, 
         CN.strLocalName, 
         CN.intEntityID AS CNintEntityID, 
@@ -760,6 +761,7 @@ sub listVenues  {
         AND CN.intDataAccess>$Defs::DATA_ACCESS_NONE
       ORDER BY CN.strLocalName
     ];
+print STDERR "VEN FOR $entityID | $Defs::LEVEL_VENUE\n";
     my $query = $Data->{'db'}->prepare($statement);
     $query->execute($entityID, $Defs::LEVEL_VENUE);
     my $results=0;
@@ -777,6 +779,7 @@ sub listVenues  {
         SelectLink => "$Data->{'target'}?client=$client&amp;a=VENUE_DTE&amp;venueID=$dref->{'CNintEntityID'}",
       };
     }
+print STDERR "VENUES$results\n";
     $query->finish;
 
     my $addlink='';
@@ -861,7 +864,7 @@ sub postVenueAdd {
     if($id) {
       my $entityID = getID($Data->{'clientValues'});
       my $st=qq[
-        INSERT INTO tblEntityLinks (intParentEntityID, intChildEntityID)
+        INSERT IGNORE INTO tblEntityLinks (intParentEntityID, intChildEntityID)
         VALUES (?,?)
       ];
       my $query = $db->prepare($st);
