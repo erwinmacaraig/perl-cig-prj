@@ -2031,6 +2031,11 @@ sub viewTask {
     $showAddFields = 1  if ($dref->{'intEntityLevel'} == $Defs::LEVEL_VENUE and $dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_HOLD and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);
     $showEditFields = 1  if ($dref->{'intEntityLevel'} == $Defs::LEVEL_VENUE and $dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_HOLD and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);
 
+    my ($DocumentData, $fields, $documentStatusCount) = populateDocumentViewData($Data, $dref);
+    %DocumentData = %{$DocumentData};
+
+    my $disableApprove = ($documentStatusCount->{'PENDING'} or $documentStatusCount->{'MISSING'} or $documentStatusCount->{'REJECTED'}) ? 1 : 0;
+
     my %TaskAction = (
         'ApprovalEntityLevel' => $dref->{'ApprovalEntityLevel'},
         'WFTaskID' => $dref->{intWFTaskID} || 0,
@@ -2045,11 +2050,10 @@ sub viewTask {
         'currentNoteID' => $dref->{'currentNoteID'} || 0,   #primary set to 0 will insert new row to table
         'onHold' => $dref->{'intOnHold'},
         'venueID' => ($dref->{'intEntityLevel'} == $Defs::LEVEL_VENUE) ? $dref->{'intEntityID'} : 0,
+        'disableApprove' => $disableApprove,
     );
 
-    my ($DocumentData, $fields) = populateDocumentViewData($Data, $dref);
-    %DocumentData = %{$DocumentData};
-    
+    print STDERR Dumper %TaskAction;
 
     my $paymentBlock = '';
     if ($dref->{strWFRuleFor} eq 'REGO')    {
@@ -2346,6 +2350,7 @@ sub populateDocumentViewData {
     );
 
     my $count = 0;
+    my %documentStatusCount;
     while(my $tdref = $q->fetchrow_hashref()) {
         next if exists $DocoSeen{$tdref->{'intDocumentTypeID'}};
         $DocoSeen{$tdref->{'intDocumentTypeID'}} = 1;
@@ -2356,6 +2361,12 @@ sub populateDocumentViewData {
         next if((!$dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC') or ($dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC' and $dref->{'PersonStatus'} ne $Defs::PERSON_STATUS_PENDING));
 
         $count++;
+        if(!$tdref->{'strApprovalStatus'}){
+            $documentStatusCount{'MISSING'}++;
+        }
+        else {
+            $documentStatusCount{$tdref->{'strApprovalStatus'}}++;
+        }
         my $displayVerify;
         my $displayAdd;
         my $displayView;
@@ -2442,12 +2453,13 @@ sub populateDocumentViewData {
         push @RelatedDocuments, \%documents;
     }
 
+
     %TemplateData = (
         DocumentAction => \%DocumentAction,
         RelatedDocuments => \@RelatedDocuments,
     );
 
-    return (\%TemplateData);
+    return (\%TemplateData, {}, \%documentStatusCount);
 
     my %DocumentData;
     my %fields = (
