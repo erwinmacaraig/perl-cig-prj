@@ -39,6 +39,7 @@ use Date::Parse;
 use PlayerPassport;
 use RegoAgeRestrictions;
 use DisplayPayResult;
+use InstanceOf;
 
 sub displayRegoFlowCompleteBulk {
 
@@ -135,10 +136,36 @@ print STDERR "OK IS $ok | $run\n\n";
             $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
          }
          
-            #txns_url => $pay_url,
-		    #txn_invoice_url => $txn_invoice_url,
+          
+	    my $personObj = getInstanceOf($Data, 'person');
+		
+		#open FH, ">dumpfile.txt";
+		#print FH "PersonObj dump is " . Dumper($personObj) . "\n";
+
+		my %personData = ();
+		$personData{'Name'} = $personObj->getValue('strLocalFirstname');
+        $personData{'Familyname'} = $personObj->getValue('strLocalSurname');
+		$personData{'DOB'} = $personObj->getValue('dtDOB');
+		$personData{'Gender'} = $Data->{'lang'}->txt($Defs::genderInfo{$personObj->getValue('intGender') || 0}) || '';
+		$personData{'Nationality'} = $personObj->getValue('strISONationality');
+		$personData{'Country'} = $personObj->getValue('strISOCountryOfBirth') || '';
+		$personData{'Region'} = $personObj->getValue('strRegionOfBirth') || '';
+
+		$personData{'Addressone'} = $personObj->getValue('strAddress1') || '';
+		$personData{'Addresstwo'} = $personObj->getValue('strAddress2') || '';
+		$personData{'City'} = $personObj->getValue('strSuburb') || '';
+		$personData{'State'} = $personObj->getValue('strState') || '';
+		$personData{'Postal'} = $personObj->getValue('strPostalCode') || '';
+		$personData{'Phone'} = $personObj->getValue('strPhoneHome') || '';
+		$personData{'Countryaddress'} = $personObj->getValue('strISOCountry') || '';
+		$personData{'Email'} = $personObj->getValue('strEmail') || '';
+		#$personData{''} = $personObj->getValue('') || '';
+
+
+		
         my %PageData = (
             person_home_url => $url,
+			person => \%personData,
             gateways => $gateways,
 			txnCount => $txnCount,
             target => $Data->{'target'},
@@ -677,12 +704,15 @@ sub add_rego_record{
     };
     my ($personStatus, $prStatus) = checkIsSuspended($Data, $personID, $entityID, $rego_ref->{'personType'});
     return (0, undef, 'SUSPENDED') if ($personStatus eq 'SUSPENDED' or $prStatus eq 'SUSPENDED');
-        
-    #warn "REGISTRATION NATURE $rego_ref->{'registrationNature'}";
+    
+	open FH, ">dumpfile.txt";
+	print FH "\n\$rego_ref contains \n ". Dumper($rego_ref) . "\n";   
+    warn "REGISTRATION NATURE $rego_ref->{'registrationNature'}";
     if ($rego_ref->{'registrationNature'} ne 'RENEWAL' and $rego_ref->{'registrationNature'} ne 'TRANSFER') {
-        my $ok = checkRegoTypeLimits($Data, $personID, 0, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
+        my $ok = checkRegoTypeLimits($Data, $personID, 0, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'}, $rego_ref->{'entityID'}); 
         return (0, undef, 'LIMIT_EXCEEDED') if (!$ok);
     }
+
     if ($rego_ref->{'registrationNature'} eq 'RENEWAL') {
         my $ok = checkRenewalRegoOK($Data, $personID, $rego_ref);
         return (0, undef, 'RENEWAL_FAILED') if (!$ok);
