@@ -236,7 +236,8 @@ sub _processUploadFile_single	{
 	return ('Invalid ID',0) if !$fileID; 
 	my $doc_st;
 	my $doc_q;
-	my $entitydocs = param('entitydocs') || 0; 
+	#my $entitydocs = param('entitydocs') || 0; 
+	my $entitydocs = $other_info->{'entitydocs'} if (exists $other_info->{'entitydocs'});
 	# need to distinguish Person FROM other entity
 	my $intPersonID = $EntityID;
 	my $intEntityID = 0;

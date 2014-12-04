@@ -139,10 +139,7 @@ print STDERR "OK IS $ok | $run\n\n";
           
 	    my $personObj = getInstanceOf($Data, 'person');
 		
-		open FH, ">dumpfile.txt";
 		
-		print FH "PersonObj dump is " . Dumper($personObj) . "\n";
-
 		my %personData = ();
 		$personData{'Name'} = $personObj->getValue('strLocalFirstname');
         $personData{'Familyname'} = $personObj->getValue('strLocalSurname');
@@ -171,9 +168,7 @@ print STDERR "OK IS $ok | $run\n\n";
 				last;	
 			}
 		}
-		print FH "\nlanguages\n" . Dumper($languages) . "\n";
-		
-		
+	
         my %PageData = (
             person_home_url => $url,
 			person => \%personData,
@@ -415,8 +410,7 @@ sub displayRegoFlowDocuments    {
 	$sth->execute($personID,$regoID);
 	my @uploaded_docs = ();
 	while(my $dref = $sth->fetchrow_hashref()){
-		push @uploaded_docs, $dref->{'intDocumentTypeID'};
-		
+		push @uploaded_docs, $dref->{'intDocumentTypeID'};		
 	}
 	
 	my @diff = ();	

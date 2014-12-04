@@ -337,6 +337,36 @@ sub delete_doc {
        ];
 }
 
+sub checkUploadedEntityDocuments {
+    my ($Data, $entityID, $documents) = @_;   
+
+	#1 check for uploaded documents present for a particular registration and person
+	my $query = qq[
+		SELECT distinct(tblDocuments.intDocumentTypeID), tblDocumentType.strDocumentName 
+		FROM tblDocuments INNER JOIN tblDocumentType
+		ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
+		INNER JOIN tblRegistrationItem 
+		ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID
+		WHERE tblDocuments.intEntityID = ?;	
+	];
+   
+	my $sth = $Data->{'db'}->prepare($query);
+	$sth->execute($entityID);
+	my @uploaded_docs = ();
+	while(my $dref = $sth->fetchrow_hashref()){
+		push @uploaded_docs, $dref->{'intDocumentTypeID'};		
+	}
+	my @diff = ();	
+		
+	#2 compare whats in the system and what is required
+	foreach my $doc_ref (@{$documents}){		
+		if(!grep /$doc_ref->{'ID'}/,@uploaded_docs){
+			push @diff,$doc_ref;	
+		}		
+	}
+	return \@diff;
+
+}
 
 
 1;

@@ -3,10 +3,10 @@
     <ul>
 	[% FOREACH doc IN documents %]
 		<li><h4>[% doc.Name %]</h4></li>
-		<form action="[% target %]" class="dropzone" method="post" enctype="multipart/form-data">
-		     <input type="hidden" name="DocumentTypeID" value="[% doc.ID %]" />
-		     <input type="hidden" name="a" value="C_DOCS_u">
-		     <input type="hidden" name="entitydocs" value=" " />
+		<form action="uploadregofile.cgi" class="dropzone" method="post" enctype="multipart/form-data">
+		     <input type="hidden" name="doctypeID" value="[% doc.ID %]" />
+			 <input type="hidden" name="pID" value="[% clubID %]" />
+		     <input type="hidden" name="entitydocs" value="1" />
 		     <input type="hidden" name="client" value="[% client %]" />
 		</form>
 		<br /><br />		

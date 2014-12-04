@@ -888,6 +888,7 @@ sub display_documents {
             undef,
             $Defs::DOC_FOR_VENUES,
         );
+		my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $facilityID,  $venue_documents);
 
         my $cl = setClient($self->{'Data'}->{'clientValues'}) || '';
         my %cv = getClient($cl);
@@ -897,7 +898,7 @@ sub display_documents {
 
         my %documentData = (
             target => $self->{'Data'}->{'target'},
-            documents => $venue_documents,
+            documents => $diff,
             Lang => $self->{'Data'}->{'lang'},
             nextaction => 'VENUE_DOCS_u',
             client => $clm,
@@ -910,11 +911,6 @@ sub display_documents {
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
     }
 
-    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
-        #There are errors - reset where we are to go back to the form again
-        $self->decrementCurrentProcessIndex();
-        return ('',2);
-    }
 
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
@@ -922,9 +918,9 @@ sub display_documents {
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         #FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
         #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
-        Content => $content,
+        Content => '',
         Title => '',
-        TextTop => '',
+        TextTop => $content,
         TextBottom => '',
     );
 
@@ -937,6 +933,34 @@ sub display_documents {
 sub process_documents { 
     my $self = shift;
 
+	my $facilityID = $self->ID();
+    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
+    my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
+    my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $client = $self->{'Data'}->{'client'};  
+
+	my $documents = getRegistrationItems(
+            $self->{'Data'},
+            'ENTITY',
+            'DOCUMENT',
+            $originLevel,
+            'NEW',
+            $facilityID,
+            $entityRegisteringForLevel,
+            0,
+            undef,
+            $Defs::DOC_FOR_VENUES,
+        );
+	my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $facilityID, $documents);
+	foreach my $dc (@{$diff}){ 
+		push @{$self->{'RunDetails'}{'Errors'}},$dc->{'Name'};		
+	}
+	if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+        #There are errors - reset where we are to go back to the form again
+        $self->decrementCurrentProcessIndex();
+        return ('',2);
+    }
     return ('',1);
 }
 
