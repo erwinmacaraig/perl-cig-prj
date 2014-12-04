@@ -795,7 +795,7 @@ sub person_details {
        #readonly      => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
 
 
-      my $languages = getPersonLanguages( $Data, 1, 0);
+    my $languages = getPersonLanguages( $Data, 1, 0);
     my %languageOptions = ();
     my $nonLatin = 0;
     my @nonLatinLanguages =();
