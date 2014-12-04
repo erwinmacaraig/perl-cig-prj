@@ -444,7 +444,7 @@ sub showGrid {
 	$Data->{'AddToPage'}->add('js_bottom','inline',$js);
 
 	return qq[
-		<table id = "$gridID" class = "table zebra" style = "$width">
+		<table id = "$gridID" class = "table tableboxheader zebra" style = "$width">
 			<thead>
 				<tr class = "">$headers</tr>
 			</thead>
