@@ -441,7 +441,9 @@ sub showGrid {
     my $js = qq[
         var table = jQuery("#$gridID").dataTable($config_str);
     ];
-	$Data->{'AddToPage'}->add('js_bottom','inline',$js);
+    if(scalar(@{$grid_data}) > 0)   {
+        $Data->{'AddToPage'}->add('js_bottom','inline',$js);
+    }
 
 	return qq[
 		<table id = "$gridID" class = "table tableboxheader zebra" style = "$width">

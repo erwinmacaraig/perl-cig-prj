@@ -344,8 +344,20 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
         if ( $sections{ $s->[0] } ) {
             next if $s->[2] and not display_section( $s->[2], $fields_ref );
             $usedsections{ $s->[0] } = 1;
+            my $extraclass = $s->[3] || '';
             if ($notabs) {
-                $returnstr .= $sections{ $s->[0] };
+                my $sh = '';
+                if ( $sectionheader ) {
+                    $sh = qq[ <h3 class="panel-header sectionheader">$sectionheader</h3>];
+                }
+                my $compulsory_string = '';
+                #if($sectionHasCompulsory{$s->[0]})   {
+                    #$compulsory_string = '<p><span class="notice-error">'.$compulsory.$requiredfield.'</span></p>';
+                #}
+                $returnstr .= qq[
+                    <div class = "fieldSectionGroupWrapper" id = "fsgw-].$s->[0].qq[">
+                    $sh<div class = "panel-body fieldSectionGroup $extraclass" id = "fsg-].$s->[0].qq["><fieldset>$compulsory_string].$sections{ $s->[0] }.qq[</fieldset></div></div>];
+
             }
             else {
                 #my $style=$s ? 'style="display:none;" ' : '';
@@ -1378,13 +1390,13 @@ s/onChange=(['"])(.*)\1/onMouseOut=$1 if (changed_$fieldname==1) { $2 } $1/i;
 
     my $daysfield =
       drop_down( "${fieldname}_day", \%days, \@order_d, $val_d, 1, 0, '',
-        $otherinfo_d );
+        $otherinfo_d, '', 'df_date_day');
     my $monthsfield =
       drop_down( "${fieldname}_mon", \%months, \@order_m, $val_m, 1, 0, '',
-        $otherinfo_m );
+        $otherinfo_m, '', 'df_date_month' );
     my $yearsfield =
       drop_down( "${fieldname}_year", \%years, \@order_y, $val_y, 1, 0, '',
-        $otherinfo_y );
+        $otherinfo_y, '', 'df_date_year' );
 
     my $field_html =
 qq[ <span $onMouseOut> <script language="JavaScript1.2">var changed_$fieldname=0; var changed_temp_$fieldname=0</script> ];
