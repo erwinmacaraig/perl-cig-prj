@@ -67,16 +67,16 @@ sub setProcessOrder {
             'function' => 'validate_role_details',
             'fieldset' => 'roledetails',
         },
-        {
-            'action' => 'd',
-            'function' => 'display_documents',
-            'label'  => 'Documents',
-            'title'  => 'Registration - Upload Documents',
-        },
-        {
-            'action' => 'du',
-            'function' => 'process_documents',
-        },
+        #{
+        #    'action' => 'd',
+        #    'function' => 'display_documents',
+        #    'label'  => 'Documents',
+        #    'title'  => 'Registration - Upload Documents',
+        #},
+        #{
+        #    'action' => 'du',
+        #    'function' => 'process_documents',
+        #},
         {
             'action' => 'p',
             'function' => 'display_products',
