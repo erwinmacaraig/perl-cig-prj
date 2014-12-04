@@ -4,14 +4,14 @@
 	    <h4>Personal Information</h4>
 	    <div class="read-only-text clearfix">
 		    <ul>
-		    	<li><span class="">Family Name:</span> <b class="">[% person.Familyname %]</b></li>
-		    	<li><span class="">First Name:</span> <b class="">[% person.Name %]</b></li>
-		    	<li><span class="">Language of name:</span> <b class=""> [% person.Language %]</b></li>
-		    	<li><span class="">Date of Birth:</span> <b class="">[% person.DOB %]</b></li>
-		    	<li><span class="">Gender:</span> <b class="">[% person.Gender %]</b></li>
-		    	<li><span class="">Nationality:</span> <b class="">[% person.Nationality %]</b></li>
-		    	<li><span class="">Country of Birth:</span> <b class="">[% person.Country %]</b></li>
-		    	<li><span class="">Region:</span> <b class="">[% person.Region %]</b></li>
+		    	<li><span>[% Lang.txt("Family Name") %]:</span> <b>[% person.Familyname %]</b></li>
+		    	<li><span>[% Lang.txt("First Name") %]:</span> <b>[% person.Name %]</b></li>
+		    	<li><span>[% Lang.txt("Language of name") %]:</span> <b> [% person.Language %]</b></li>
+		    	<li><span>[% Lang.txt("Date of Birth") %]:</span> <b>[% person.DOB %]</b></li>
+		    	<li><span>[% Lang.txt("Gender") %]:</span> <b>[% person.Gender %]</b></li>
+		    	<li><span>[% Lang.txt("Nationality") %]:</span> <b>[% person.Nationality %]</b></li>
+		    	<li><span>[% Lang.txt("Country of Birth") %]:</span> <b>[% person.Country %]</b></li>
+		    	<li><span>[% Lang.txt("Region") %]:</span> <b>[% person.Region %]</b></li>
 		    </ul>
 		    <a href="#" class="pull-right">Edit</a>
 	    </div>
@@ -22,14 +22,14 @@
 	    <h4>Contact Details</h4>
 	    <div class="read-only-text clearfix">
 		    <ul>
-		    	<li><span class="">Address 1:</span> <b class="">[% person.Addressone %]</b></li>
-		    	<li><span class="">Address 2:</span> <b class="">[% person.Addresstwo %]</b></li>
-		    	<li><span class="">City:</span> <b class="">[% person.City %]</b></li>
-		    	<li><span class="">State:</span> <b class="">[% person.State %]</b></li>
-		    	<li><span class="">Postal Code:</span> <b class="">[% person.Postal %]</b></li>
-		    	<li><span class="">Country:</span> <b class="">[% person.Countryaddress %]</b></li>
-		    	<li><span class="">Phone Number:</span> <b class="">[% person.Phone %]</b></li>
-		    	<li><span class="">Email Address:</span> <b class="">[% person.Email %]</b></li>
+		    	<li><span>[% Lang.txt("Address 1") %]:</span> <b>[% person.Addressone %]</b></li>
+		    	<li><span>[% Lang.txt("Address 2") %]:</span> <b>[% person.Addresstwo %]</b></li>
+		    	<li><span>[% Lang.txt("City") %]:</span> <b>[% person.City %]</b></li>
+		    	<li><span>[% Lang.txt("State") %]:</span> <b>[% person.State %]</b></li>
+		    	<li><span>[% Lang.txt("Postal Code") %]:</span> <b>[% person.Postal %]</b></li>
+		    	<li><span>[% Lang.txt("Country") %]:</span> <b>[% person.Countryaddress %]</b></li>
+		    	<li><span>[% Lang.txt("Phone Number") %]:</span> <b>[% person.Phone %]</b></li>
+		    	<li><span>[% Lang.txt("Email Address") %]:</span> <b>[% person.Email %]</b></li>
 		    </ul>
 		    <a href="#" class="pull-right">Edit</a>
 	    </div>
@@ -41,10 +41,10 @@
 		 <h4>Registration Details</h4>
 	     <div class="read-only-text clearfix">
 		    <ul>
-		    	<li><span class="">Register to:</span> <b class="">[% registration.strLocalName %]</b></li>
-		    	<li><span class="">Register as:</span> <b class="">[% registration.strPersonType %]</b></li>
-		    	<li><span class="">Sport:</span> <b class="">[% registration.strSport %]</b></li>
-		    	<li><span class="">Level:</span> <b class="">[% registration.strPersonLevel %]</b></li>
+		    	<li><span>[% Lang.txt("Register to") %]:</span> <b>[% registration.strLocalName %]</b></li>
+		    	<li><span>[% Lang.txt("Register as") %]:</span> <b>[% registration.strPersonType %]</b></li>
+		    	<li><span>[% Lang.txt("Sport") %]:</span> <b>[% registration.strSport %]</b></li>
+		    	<li><span>[% Lang.txt("Level") %]:</span> <b>[% registration.strPersonLevel %]</b></li>
 		    </ul>
 		    <a href="#" class="pull-right">Edit</a>
 	     </div>
@@ -57,7 +57,7 @@
 		 <div class="read-only-text clearfix">
 		    <ul>
 				[% FOREACH doc IN registration.documents %]
-				<li><span class="">[% doc.strDocumentName %]:<br /></span> <b class="">[% doc.strOrigFilename %]</b></li>
+				<li><span>[% doc.strDocumentName %]:<br /></span> <b>[% doc.strOrigFilename %]</b></li>
 				[% END %]
 		    </ul>
 		    <a href="#" class="pull-right">Edit</a>
