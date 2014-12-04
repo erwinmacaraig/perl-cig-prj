@@ -500,6 +500,7 @@ a.btn-inside-panels:hover {
 	font-size: 12px;
 }
 
+/* Table styles */
 table.table thead {
 	background: #d8d8d8;
 	border: 1px solid #ccc;
@@ -511,9 +512,33 @@ table.table tr td {
 	border-bottom: 1px solid #ccc;
 }
 
+table.table.tableboxheader tr td {
+	padding: 8px 15px;
+	border-bottom: 1px solid #ccc;
+}
+
 table.table tr td.align-right {
 	text-align: right;
 }
+
+table.table thead tr th {
+	background-color: #d8d8d8;
+	border-bottom:1px solid #ccc;
+	font-size: 16px;
+}
+
+table.table.tableboxheader thead tr th {
+	background-color: #004e7e;
+	border-bottom:1px solid #ccc;
+	font-size: 14px;
+    color: #fff;
+}
+
+table.table tr th {
+	padding:15px;
+	border-bottom:1px solid #ccc;
+}
+
 table.zebra tbody tr:nth-child(odd) {
     background-color:#ededed;
 }
@@ -1104,16 +1129,6 @@ header nav ul li a {
 }
 
 
-table.table thead tr th {
-	background: #d8d8d8;
-	border-bottom:1px solid #ccc;
-	font-size: 16px;
-}
-
-table.table tr th {
-	padding:15px;
-	border-bottom:1px solid #ccc;
-}
 
 .document-upload .document-notes p {
 	padding:0;

@@ -734,12 +734,6 @@ sub getTransList {
 			</div>
 	];
 	$filterHTML = '' if $displayonly;
-  $grid = qq[
-		<div class = "grid-filter-wrap">
-			$filterHTML
-			$grid
-		</div>
-  ];
   my $cl=setClient($Data->{'clientValues'}) || '';
         my $payment_records_link=qq[<br><br><a href="$Data->{'target'}?client=$cl&amp;a=P_TXNLog_payLIST">].$Data->{'lang'}->txt('List All Payment Records')."</a>" ;
   $payment_records_link = '' if ($hide_list_payments_link);
@@ -826,7 +820,6 @@ sub generateTXNListLink {
 
 sub listTransactions {
     my ($Data, $db, $entityID, $personID, $tempClientValues_ref, $action, $resultMessage) = @_;
-warn("ENTITY: $entityID | $personID");
     my ($body, $paidLink, $unpaidLink, $cancelledLink, $query) = ('', '', '', '', '');
     my $lang = $Data->{'lang'};
     my $txnStatus = $Data->{'ViewTXNStatus'} || $Defs::TXN_UNPAID;
@@ -840,7 +833,6 @@ warn("ENTITY: $entityID | $personID");
 
     my $whereClause = '';
     $whereClause .= qq[ AND t.intID=$personID and t.intTableType=$Defs::LEVEL_PERSON] if ($personID and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON);
-warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
     $whereClause .= qq[ AND t.intID=$entityID and t.intTableType=$Defs::LEVEL_CLUB] if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB && $personID != -1);
 
 	$whereClause .= qq[ AND t.intTableType=$Defs::LEVEL_PERSON] if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB && $personID == -1);
@@ -851,7 +843,6 @@ warn("CL: " . $Data->{'clientValues'}{'currentLevel'});
     $whereClause .= qq[ AND P.intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) ] if $txnStatus != $Defs::TXN_PAID;
 
 
-print STDERR "LISTING";
 	($tempBody, $transCount) = getTransList($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref,0,0,0);
 
 	$body .= $tempBody;
@@ -870,11 +861,11 @@ print STDERR "LISTING";
                 tblTransLog t 
                 INNER JOIN tblCurrencies c ON (t.intCurrencyID=c.intCurrencyID)
             WHERE 
-                t.intRealmID=$Data->{Realm} 
-                AND intLogID=$safePaymentID 
+                t.intRealmID = ?
+                AND intLogID = ?
         ];
         $query = $db->prepare($statement);
-        $query->execute;
+        $query->execute($Data->{'Realm'}, $safePaymentID);
         my $row = $query->fetchrow_hashref();
     }
 
@@ -887,7 +878,7 @@ print STDERR "LISTING";
 
     my $line = '';
     my $addLink = qq[
-        <div class="changeoptions"><span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=P_TXN_ADD">Add Transaction</a></span></div>
+        <div class="changeoptions"><a href="$Data->{'target'}?client=$client&amp;a=P_TXN_ADD" class = "btn-main">Add Transaction</a></div>
     ];
     $addLink = '' if $Data->{'ReadOnlyLogin'};
     $addLink = '' if ($Data->{'clientValues'}{'currentLevel'} == $Data->{'clientValues'}{'authLevel'});
