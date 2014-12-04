@@ -67,16 +67,16 @@ sub setProcessOrder {
             'function' => 'validate_role_details',
             'fieldset' => 'roledetails',
         },
-        #{
-        #    'action' => 'd',
-        #    'function' => 'display_documents',
-        #    'label'  => 'Documents',
-        #    'title'  => 'Registration - Upload Documents',
-        #},
-        #{
-        #    'action' => 'du',
-        #    'function' => 'process_documents',
-        #},
+        {
+            'action' => 'd',
+            'function' => 'display_documents',
+            'label'  => 'Documents',
+            'title'  => 'Registration - Upload Documents',
+        },
+        {
+            'action' => 'du',
+            'function' => 'process_documents',
+        },
         {
             'action' => 'p',
             'function' => 'display_products',
@@ -855,8 +855,7 @@ sub process_products {
 
 sub display_documents { 
     my $self = shift;
-
-    my $clubID = $self->ID();
+	my $clubID = $self->ID();
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
@@ -866,8 +865,8 @@ sub display_documents {
     my $rego_ref = {};
     my $club_documents = '';
     my $content = '';
-
-    if($clubID) {
+	
+	if($clubID) {
         $club_documents = getRegistrationItems(
             $self->{'Data'},
             'ENTITY',
@@ -881,7 +880,10 @@ sub display_documents {
             $Defs::DOC_FOR_CLUBS,
         );
 
-        my $cl = setClient($self->{'Data'}->{'clientValues'}) || '';
+			 
+		my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $clubID,  $club_documents);
+	
+		my $cl = setClient($self->{'Data'}->{'clientValues'}) || '';
         my %cv = getClient($cl);
         $cv{'clubID'} = $clubID;
         $cv{'currentLevel'} = $Defs::LEVEL_CLUB;
@@ -889,24 +891,21 @@ sub display_documents {
 
         my %documentData = (
             target => $self->{'Data'}->{'target'},
-            documents => $club_documents,
+            documents => $diff,
             Lang => $self->{'Data'}->{'lang'},
             #nextaction => 'VENUE_DOCS_u',
             client => $clm,
+			clubID => $clubID,
             #venue => $facilityID,
         );
  
         $content = runTemplate($self->{'Data'}, \%documentData, 'club/required_docs.templ') || '';  
-    }
-    else    {
+		print FH "content:\n $content \n";
+	}
+	else    {
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
     }
-
-    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
-        #There are errors - reset where we are to go back to the form again
-        $self->decrementCurrentProcessIndex();
-        return ('',2);
-    }
+    
 
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
@@ -914,9 +913,9 @@ sub display_documents {
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         #FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
         #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
-        Content => $content,
+        Content => '',
         Title => '',
-        TextTop => '',
+        TextTop => $content,
         TextBottom => '',
     );
 
@@ -928,7 +927,43 @@ sub display_documents {
 
 sub process_documents { 
     my $self = shift;
+	
+	my $clubID = $self->ID();
+    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
+    my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
+    my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $client = $self->{'Data'}->{'client'};
 
+    my $rego_ref = {};
+   
+    my $content = '';
+    #1 I just need to know how many documents are required
+	my $documents = getRegistrationItems(
+            $self->{'Data'},
+            'ENTITY',
+            'DOCUMENT',
+            $originLevel,
+            'NEW',
+            $clubID,
+            $entityRegisteringForLevel,
+            0,
+            undef,
+            $Defs::DOC_FOR_CLUBS,
+        );
+
+	my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $clubID, $documents);
+	
+	foreach my $dc (@{$diff}){ 
+		push @{$self->{'RunDetails'}{'Errors'}},"\n".$dc->{'Name'};
+		
+	}
+	if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+        #There are errors - reset where we are to go back to the form again
+        $self->decrementCurrentProcessIndex();
+        return ('',2);
+    }
+	
     return ('',1);
 }
 

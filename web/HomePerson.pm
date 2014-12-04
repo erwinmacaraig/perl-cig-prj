@@ -92,7 +92,7 @@ sub showPersonHome	{
 			Address2 => $personObj->getValue('strAddress2') || '',	
 			Suburb => $personObj->getValue('strSuburb') || '',	
 			State => $personObj->getValue('strState') || '',	
-			Country => $isoCountries->{$personObj->getValue('strISOCountry')},
+			Country => $personObj->getValue('strISOCountry') || '',
 			PostalCode => $personObj->getValue('strPostalCode') || '',	
 			PhoneHome => $personObj->getValue('strPhoneHome') || '',	
 			Email => $personObj->getValue('strEmail') || '',	
