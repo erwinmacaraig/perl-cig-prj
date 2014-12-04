@@ -532,12 +532,12 @@ sub personFieldsSetup {
                 strPassportIssueCountry
                 dtPassportExpiry
                
+                intOtherPersonIdentifierTypeID
                 strOtherPersonIdentifier
                 strOtherPersonIdentifierIssueCountry
                 dtOtherPersonIdentifierValidDateFrom
                 dtOtherPersonIdentifierValidDateTo
                 strOtherPersonIdentifierDesc
-                intOtherPersonIdentifierTypeID
 
             )],
             sections => [
