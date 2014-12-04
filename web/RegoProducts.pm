@@ -574,7 +574,6 @@ sub insertRegoTransaction {
         if (scalar(@productsselected)) {
             foreach my $product (@productsselected)    {
                 ## Lets get rid of duplicate products
-                    next if exists $Paid{$product};
                 $q_txnclean->execute($regoID, $intID, $product);
                 
                 my $amount= getItemCost($Data, $entityID, $entityLevel, $multipersonType, $product);
@@ -654,7 +653,6 @@ sub insertRegoTransaction {
       my $qry_update = $Data->{'db'}->prepare($st_upd);
             my %product_seen;
       while(my $dref=$query->fetchrow_hashref())  {
-                next if exists $Paid{$dref->{'intProductID'}};
                 next if $product_seen{$dref->{'intProductID'}};
           my $amount= getCorrectPrice($dref, $multipersonType);
           my $qty = $params->{'txnQTY_'.$dref->{'intTransactionID'}} || $params->{'prodQTY_'.$dref->{'intTransactionID'}} ||  0;
@@ -691,7 +689,7 @@ sub insertRegoTransaction {
 
         foreach my $product (@productsselected)    {
             next if $product_seen{$product}++;
-            next if exists $Paid{$product};
+#            next if exists $Paid{$product};
             my $amount= getItemCost($Data, $entityID, $entityLevel, $multipersonType, $product);
             
             $amount = 0 if (exists $ExistingProducts{$product} and $ExistingProducts{$product}==1);
