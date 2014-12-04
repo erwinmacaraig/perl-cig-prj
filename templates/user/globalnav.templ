@@ -1,3 +1,4 @@
+<header>
 <div class="utilities clearfix [% IF !AtLoginLevel %]notloginlevel[% END %]">
 	<div class="container">
 		<div class="row">
@@ -70,7 +71,7 @@
     </div>
   </div>
 </div>       
-
+</header>
 <script>
 jQuery(document).ready(function()  {
 
@@ -99,51 +100,146 @@ jQuery(document).ready(function()  {
 <style>
 @font-face {
     font-family: 'noto_sansbold';
-    src: url('css/fonts/noto-sans/notosans-bold-webfont.eot');
-    src: url('css/fonts/noto-sans/notosans-bold-webfont.eot?#iefix') format('embedded-opentype'),
-         url('css/fonts/noto-sans/notosans-bold-webfont.woff2') format('woff2'),
-         url('css/fonts/noto-sans/notosans-bold-webfont.woff') format('woff'),
-         url('css/fonts/noto-sans/notosans-bold-webfont.ttf') format('truetype'),
-         url('css/fonts/noto-sans/notosans-bold-webfont.svg#noto_sansbold') format('svg');
+    src: url('../css/fonts/noto-sans/notosans-bold-webfont.eot');
+    src: url('../css/fonts/noto-sans/notosans-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../css/fonts/noto-sans/notosans-bold-webfont.woff2') format('woff2'),
+         url('../css/fonts/noto-sans/notosans-bold-webfont.woff') format('woff'),
+         url('../css/fonts/noto-sans/notosans-bold-webfont.ttf') format('truetype'),
+         url('../css/fonts/noto-sans/notosans-bold-webfont.svg#noto_sansbold') format('svg');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'noto_sansbold_italic';
-    src: url('css/fonts/noto-sans/notosans-bolditalic-webfont.eot');
-    src: url('css/fonts/noto-sans/notosans-bolditalic-webfont.eot?#iefix') format('embedded-opentype'),
-         url('css/fonts/noto-sans/notosans-bolditalic-webfont.woff2') format('woff2'),
-         url('css/fonts/noto-sans/notosans-bolditalic-webfont.woff') format('woff'),
-         url('css/fonts/noto-sans/notosans-bolditalic-webfont.ttf') format('truetype'),
-         url('css/fonts/noto-sans/notosans-bolditalic-webfont.svg#noto_sansbold_italic') format('svg');
+    src: url('../css/fonts/noto-sans/notosans-bolditalic-webfont.eot');
+    src: url('../css/fonts/noto-sans/notosans-bolditalic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../css/fonts/noto-sans/notosans-bolditalic-webfont.woff2') format('woff2'),
+         url('../css/fonts/noto-sans/notosans-bolditalic-webfont.woff') format('woff'),
+         url('../css/fonts/noto-sans/notosans-bolditalic-webfont.ttf') format('truetype'),
+         url('../css/fonts/noto-sans/notosans-bolditalic-webfont.svg#noto_sansbold_italic') format('svg');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'noto_sansitalic';
-    src: url('css/fonts/noto-sans/notosans-italic-webfont.eot');
-    src: url('css/fonts/noto-sans/notosans-italic-webfont.eot?#iefix') format('embedded-opentype'),
-         url('css/fonts/noto-sans/notosans-italic-webfont.woff2') format('woff2'),
-         url('css/fonts/noto-sans/notosans-italic-webfont.woff') format('woff'),
-         url('css/fonts/noto-sans/notosans-italic-webfont.ttf') format('truetype'),
-         url('css/fonts/noto-sans/notosans-italic-webfont.svg#noto_sansitalic') format('svg');
+    src: url('../css/fonts/noto-sans/notosans-italic-webfont.eot');
+    src: url('../css/fonts/noto-sans/notosans-italic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../css/fonts/noto-sans/notosans-italic-webfont.woff2') format('woff2'),
+         url('../css/fonts/noto-sans/notosans-italic-webfont.woff') format('woff'),
+         url('../css/fonts/noto-sans/notosans-italic-webfont.ttf') format('truetype'),
+         url('../css/fonts/noto-sans/notosans-italic-webfont.svg#noto_sansitalic') format('svg');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'noto_sansregular';
-    src: url('css/fonts/noto-sans/notosans-regular-webfont.eot');
-    src: url('css/fonts/noto-sans/notosans-regular-webfont.eot?#iefix') format('embedded-opentype'),
-         url('css/fonts/noto-sans/notosans-regular-webfont.woff2') format('woff2'),
-         url('css/fonts/noto-sans/notosans-regular-webfont.woff') format('woff'),
-         url('css/fonts/noto-sans/notosans-regular-webfont.ttf') format('truetype'),
-         url('css/fonts/noto-sans/notosans-regular-webfont.svg#noto_sansregular') format('svg');
+    src: url('../css/fonts/noto-sans/notosans-regular-webfont.eot');
+    src: url('../css/fonts/noto-sans/notosans-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../css/fonts/noto-sans/notosans-regular-webfont.woff2') format('woff2'),
+         url('../css/fonts/noto-sans/notosans-regular-webfont.woff') format('woff'),
+         url('../css/fonts/noto-sans/notosans-regular-webfont.ttf') format('truetype'),
+         url('../css/fonts/noto-sans/notosans-regular-webfont.svg#noto_sansregular') format('svg');
     font-weight: normal;
     font-style: normal;
 
+}
+body {
+font-family: 'noto_sansregular', arial;
+font-size: 14px;
+background: #fff;
+}
+header .utilities {
+background: #004e7e;
+padding: 10px;
+width: 100%;
+height: 50px;
+}
+.access-level {
+float: left;
+}
+header .utilities ul {
+margin: 5px 0 0 0;
+padding: 0;
+float: right;
+}
+.access-level p.viewAs {
+color: #fff;
+padding: 5px 10px 0 0;
+float: left;
+margin-top: 0px;
+}
+.nav_session_menu_wrap {
+float: right;
+margin-top: 0;
+width: 300px;
+}
+.nav_session_placement {
+width: 300px;
+background-position: 272px;
+background-color: #FFF;
+background-repeat: no-repeat;
+border: 1px solid #CECECE;
+}
+.nav_session_placement a {
+padding-right: 10px;
+}
+.nav_session_placement a {
+display: inline-block;
+width: 100%;
+height: 27px;
+padding: 4px 36px 2px 10px;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+}
+.nav_session_levels {
+-webkit-box-shadow: none;
+box-shadow: none;
+}
+.nav_session_levels {
+width: 300px;
+}
+.nav_session_levels {
+list-style-type: none;
+margin: 30px 0 0 0;
+position: relative;
+width: 400px;
+padding: 0;
+margin: 0;
+background-color: #FFF;
+border: 1px solid #CECECE;
+border-top: 0px;
+-webkit-box-shadow: 0px 2px 1px 1px #EEE;
+box-shadow: 0px 2px 1px 1px #EEE;
+z-index: 2147483647;
+}
+.nav_session_levels {
+display: none;
+} 
+header .utilities ul li {
+float: left;
+list-style-type: none;
+color: #fff;
+margin: 0 40px 0 0;
+}
+header .utilities ul li a {
+color: #fff;
+text-decoration: underline;
+font-size: 13px;
+}
+span.fa {
+margin-right: 10px;
+}
+.fa {
+display: inline-block;
+font: normal normal normal 14px/1 FontAwesome;
+font-size: inherit;
+text-rendering: auto;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
 }
 #global-nav-wrap {
   /*    float: left; disabled due to being obscured */

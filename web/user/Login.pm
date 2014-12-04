@@ -121,7 +121,7 @@ sub verify_login {
             return $session->key();
 		}
 		else	{
-			push @{$errors}, $l->txt("Invalid Username & Password");
+			push @{$errors}, $l->txt("Invalid Usercode/Password");
 		}
 	}
 	else	{

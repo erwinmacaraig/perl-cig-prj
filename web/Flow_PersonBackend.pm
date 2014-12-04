@@ -1069,7 +1069,7 @@ sub process_documents {
 
 sub display_complete { 
     my $self = shift;
-
+    my $personObj;
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
@@ -1094,7 +1094,7 @@ sub display_complete {
     }
 
     if($regoID) {
-        my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
+        $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
         $personObj->load();
         my $nationality = $personObj->getValue('strISONationality') || ''; 
         $rego_ref->{'Nationality'} = $nationality;
@@ -1145,6 +1145,8 @@ print STDERR "RRRRRRRRULES RUNNINGS\n";
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
+        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
+        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
         Content => '',
         Title => '',
         TextTop => $content,

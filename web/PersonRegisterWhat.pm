@@ -341,7 +341,7 @@ sub optionsPersonRegisterWhat {
                     return (\@retdata, '');
                 }
 
-                if(scalar(@tempAgeLevel) == 1 and $tempAgeLevel[0] eq '' and $personType ne $Defs::PERSON_TYPE_PLAYER) {
+                if(scalar(@tempAgeLevel) == 1 and $tempAgeLevel[0] eq '' and ($personType ne $Defs::PERSON_TYPE_PLAYER and $personType ne $Defs::PERSON_TYPE_REFEREE)) {
                     my @retdata;
                     push @retdata, {
                         name => $Data->{'lang'}->txt('Selection Not Required'),
@@ -622,10 +622,10 @@ sub getPersonLevelFromMatrix {
     while (my $dref = $query->fetchrow_hashref())   {
         #if the player is under 16, "PROFESSIONAL" should not be available (specific to MA)
         next if (
-            $systemConfig->{'age_breakpoint_PLAYER_PROFESSIONAL'}
+            defined $systemConfig->{'age_breakpoint_PLAYER_PROFESSIONAL'}
             and $personType eq $Defs::PERSON_TYPE_PLAYER
             and $dref->{'strPersonLevel'} eq $Defs::PERSON_LEVEL_PROFESSIONAL
-            and $pref->{'currentAge'} lt $systemConfig->{'age_breakpoint_PLAYER_PROFESSIONAL'}
+            and $pref->{'currentAge'} < $systemConfig->{'age_breakpoint_PLAYER_PROFESSIONAL'}
         );
 
         if($dref->{'strPersonLevel'}){
