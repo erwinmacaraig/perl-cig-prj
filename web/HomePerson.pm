@@ -74,6 +74,9 @@ sub showPersonHome	{
     my $readonly = !( ($personObj->getValue('strStatus') eq 'REGISTERED' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
     $Data->{'ReadOnlyLogin'} ? $readonly = 1 : undef;
 
+    my $isoCountries = Countries::getISOCountriesHash();
+
+
 	my %TemplateData = (
         Lang => $Data->{'lang'},
 		Name => $name,
@@ -91,22 +94,23 @@ sub showPersonHome	{
 	    url => "$Defs::base_url/viewer.cgi",
 		Details => {
 			Active => $Data->{'lang'}->txt(($personObj->getValue('intRecStatus') || '') ? 'Yes' : 'No'),
-			strLocalFirstname => $personObj->getValue('strLocalFirstname'),
-       		strLocalSurname => $personObj->getValue('strLocalSurname'),
+			strLocalFirstname => $personObj->getValue('strLocalFirstname') || '',
+       		strLocalSurname => $personObj->getValue('strLocalSurname') || '',
 			LatinFirstname=> $personObj->getValue('strLatinFirstname') || '',	
 			LatinSurname=> $personObj->getValue('strLatinSurname') || '',	
 			Address1 => $personObj->getValue('strAddress1') || '',	
 			Address2 => $personObj->getValue('strAddress2') || '',	
 			Suburb => $personObj->getValue('strSuburb') || '',	
 			State => $personObj->getValue('strState') || '',	
-			Country => $personObj->getValue('strISOCountry') || '',	
+			#Country => $personObj->getValue('strISOCountry') || '',
+			Country => $isoCountries->{$personObj->getValue('strISOCountry')},
 			PostalCode => $personObj->getValue('strPostalCode') || '',	
 			PhoneHome => $personObj->getValue('strPhoneHome') || '',	
 			Email => $personObj->getValue('strEmail') || '',	
 			Gender => $Data->{'lang'}->txt($Defs::genderInfo{$personObj->getValue('intGender') || 0}) || '',
 			DOB => $personObj->getValue('dtDOB') || '',
 			NationalNum => $personObj->getValue('strNationalNum') || '',
-			BirthCountry => $personObj->getValue('strCountryOfBirth') || '',
+			BirthCountry => $personObj->getValue('strISOCountryOfBirth') || '',
 			PassportNat => $personObj->getValue('strPassportNationality') || '',
 			Status => $personObj->getValue('strStatus') || '',
 		},
@@ -203,8 +207,8 @@ sub getMemFields {
 		push @{$fields_grouped{$group}}, [$f, $label];
 		my $string = '';
 		if (($val and $val ne '00/00/0000') or ($is_header))	{
-			$string .= qq[<div class=""><span class = "details-left">$label:</div>] if !$nolabelfields{$f};
-			$string .= '<span class="detail-value">'.$val.'</span></span>';
+			$string .= qq[<div class=""><span class = "details-left" style="width:65%;">$label:</span>] if !$nolabelfields{$f};
+			$string .= '<span class="detail-value">'.$val.'</span></div>';
 			$fields{$group} .= $string;
 		}
 	}}
