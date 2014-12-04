@@ -509,6 +509,12 @@ table.table tr td {
 table.table tr td.align-right {
 	text-align: right;
 }
+table.zebra tbody tr:nth-child(odd) {
+    background-color:#ededed;
+}
+table.zebra tbody tr:nth-child(even) {
+    background-color:#f3f3f3;
+}
 
 .panel-body p.reg-text {
 	text-align: center;

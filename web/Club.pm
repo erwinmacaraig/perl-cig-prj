@@ -869,10 +869,6 @@ sub listClubs   {
 
   my @headers = (
     {
-      type => 'Selector',
-      field => 'SelectLink',
-    },
-    {
       name =>   $Data->{'lang'}->txt('Name'),
       field =>  'strName',
     },
@@ -893,6 +889,10 @@ sub listClubs   {
         name   => $Data->{'lang'}->txt('Status'),
         field  => 'strStatusText',
         width  => 30,
+    },
+    {
+      type => 'Selector',
+      field => 'SelectLink',
     },
 
   );

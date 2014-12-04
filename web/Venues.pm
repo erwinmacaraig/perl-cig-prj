@@ -802,10 +802,6 @@ print STDERR "VENUES$results\n";
 
     my @headers = (
         {
-            type  => 'Selector',
-            field => 'SelectLink',
-        },
-        {
             name  => $Data->{'lang'}->txt('Venue Name'),
             field => 'strLocalName',
         },
@@ -813,6 +809,10 @@ print STDERR "VENUES$results\n";
             name   => $Data->{'lang'}->txt('Status'),
             field  => 'strStatusText',
             width  => 30,
+        },
+        {
+            type  => 'Selector',
+            field => 'SelectLink',
         },
     );
     
@@ -835,14 +835,11 @@ print STDERR "VENUES$results\n";
         rowdata => \@rowdata,
         gridid  => 'grid',
         width   => '99%',
-        filters => $filterfields,
+        #filters => $filterfields,
     );
 
     $resultHTML = qq[
-        <div class="grid-filter-wrap">
-            <div style="width:99%;">$rectype_options</div>
             $grid
-        </div>
     ];
 
     return ($resultHTML,$title);
