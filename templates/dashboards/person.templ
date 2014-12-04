@@ -6,24 +6,28 @@
 			<div class="read-only">
 				<h4>[% Lang.txt('Personal Information') %]</h4>
 				<div class="read-only-text">
-					[% IF Details.LatinFirstname %]
-					<div class="">
-						<span class="details-left">[% Lang.txt("First name (Latin Characters)") %]:</span>
-						<span class="detail-value">[% Details.LatinFirstname %]</span>
-					</div>
-					[% END %]
 
 					[% IF Details.LatinSurname %]
 					<div class="">
 						<span class="details-left">[% Lang.txt("Family name (Latin Characters)") %]:</span>
 						<span class="detail-value">[% Details.LatinSurname %]</span>
 					</div>
+					[% ELSE %]
+					<div class="">
+						<span class="details-left">[% Lang.txt("Family name") %]:</span>
+						<span class="detail-value">[% Details.strLocalSurname %]</span>
+					</div>
 					[% END %]
 
-					[% IF Details.Gender %]
+					[% IF Details.LatinFirstname %]
 					<div class="">
-						<span class="details-left">[% Lang.txt('Gender') %]:</span>
-						<span class="detail-value">[% Details.Gender %]</span>
+						<span class="details-left">[% Lang.txt("First name (Latin Characters)") %]:</span>
+						<span class="detail-value">[% Details.LatinFirstname %]</span>
+					</div>
+					[% ELSE %]
+					<div class="">
+						<span class="details-left">[% Lang.txt("First name") %]:</span>
+						<span class="detail-value">[% Details.strLocalFirstname %]</span>
 					</div>
 					[% END %]
 
@@ -32,6 +36,13 @@
 				        <span class="details-left">[% Lang.txt('Date of Birth') %]:</span>
 				        <span class="detail-value">[% Details.DOB %]</span>
 				    </div>
+					[% END %]
+
+					[% IF Details.Gender %]
+					<div class="">
+						<span class="details-left">[% Lang.txt('Gender') %]:</span>
+						<span class="detail-value">[% Details.Gender %]</span>
+					</div>
 					[% END %]
 
 					[% IF Details.BirthCountry %]
@@ -68,33 +79,36 @@
 					<div class="">
 					  	<span class="details-left">[% Lang.txt('Address 1:') %]</span>
 					  	<span class="detail-value">[% Details.Address1 %]</span>
-                        [% IF Details.Address2 %]
-                        <span class="detail-value">[% Details.Address2 %]</span>
-                        [% END %]
-					  	<span class="detail-value">[% Details.Suburb %]&nbsp;[% Details.State %]&nbsp;[% Details.PostalCode %] [% Details.Country %]</span>
 				    </div>
+				    <div class="">
+				    	[% IF Details.Address2 %]
+				    	<span class="details-left">[% Lang.txt('Address 2:') %]</span>
+                        <span class="detail-value">[% Details.Address2 %]</span>
+                        <span class="detail-value">[% Details.Suburb %]&nbsp;[% Details.State %]&nbsp;[% Details.PostalCode %] [% Details.Country %]</span>
+                        [% END %]
+                    </div>
 					[% END %]
 
 
 					[% IF Details.PhoneHome %]
-					<span class="">
-				  	<span class="details-left">[% Lang.txt('Home Phone') %]:</span>
-				    <span class="detail-value">[% Details.PhoneHome %]</span>
-				  	</span>
+					<div class="">
+					  	<span class="details-left">[% Lang.txt('Home Phone') %]:</span>
+					    <span class="detail-value">[% Details.PhoneHome %]</span>
+				  	</div>
 					[% END %]
 
 					[% IF Details.PhoneMobile %]
-					<span class="">
-				  	<span class="details-left">[% Lang.txt('Mobile') %]:</span>
-				    <span class="detail-value">[% Details.PhoneMobile %]</span>
-				  	</span>
+					<div class="">
+					  	<span class="details-left">[% Lang.txt('Mobile') %]:</span>
+					    <span class="detail-value">[% Details.PhoneMobile %]</span>
+				  	</div>
 					[% END %]
 
 					[% IF Details.Email %]
-					<span class="">
-				  	<span class="">[% Lang.txt('Email') %]:</span>
-				    <span class="detail-value"><a href="mailto:[% Details.Email %]">[% Details.Email %]</a></span>
-				  	</span>
+					<div class="">
+					  	<span class="details-left">[% Lang.txt('Email') %]:</span>
+					    <span class="detail-value"><a href="mailto:[% Details.Email %]">[% Details.Email %]</a></span>
+				  	</div>
 					[% END %]
 
 					<div class="edit-container">
