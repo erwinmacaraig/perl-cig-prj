@@ -550,6 +550,11 @@ table.zebra tbody tr:nth-child(even) {
 	text-decoration: none;
 }
 
+.panel-body p.transfer-text {
+	margin-top:10px;
+	margin-bottom: 20px;
+}
+
 .read-only {
 	position: relative;
 }
