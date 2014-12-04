@@ -36,7 +36,9 @@ sub main	{
 	$Data{'target'}=$target;
 	$Data{'clientValues'} = \%clientValues;
 	# AUTHENTICATE
-	my $db=allowedTo(\%Data);
+        my $db=connectDB();
+$Data{'db'}=$db;
+
   ($Data{'Realm'}, $Data{'RealmSubType'})=getRealm(\%Data);
   
  
