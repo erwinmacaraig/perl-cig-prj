@@ -334,7 +334,6 @@ sub setupValues {
                     sectionname => 'core',
                     active      => $nonLatin,
                 },
-
             },
             'order' => [qw(
                 strLocalName
