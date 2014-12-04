@@ -988,7 +988,7 @@ sub setRequestResponse {
 
     my $requestID = safe_param('rid', 'number') || 0;
     my $response = safe_param('response', 'word') || '';
-    my $notes = safe_param('notes', 'words') || '';
+    my $notes = safe_param('request_notes', 'words') || '';
 	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
     my $requestStatus = '';
 
