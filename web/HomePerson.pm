@@ -63,17 +63,11 @@ sub showPersonHome	{
     my $addregistrationURL = "$Data->{'target'}?client=$client&amp;a=PF_&rfp=r&amp;_ss=r";
 	my $accreditations = ($Data->{'SystemConfig'}{'NationalAccreditation'}) ? AccreditationDisplay::ActiveNationalAccredSummary($Data, $personID) : '';#ActiveAccredSummary($Data, $personID, $Data->{'clientValues'}{'assocID'});
 
-  my $docs = getUploadedFiles(
-    $Data,
-    $Defs::LEVEL_PERSON,
-    $personID,
-    $Defs::UPLOADFILETYPE_DOC,
-    $Data->{'client'},
-  );
-
     my $readonly = !( ($personObj->getValue('strStatus') eq 'REGISTERED' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
     $Data->{'ReadOnlyLogin'} ? $readonly = 1 : undef;
 
+     my $c = Countries::getISOCountriesHash();
+    
 	my %TemplateData = (
         Lang => $Data->{'lang'},
 		Name => $name,
@@ -85,7 +79,6 @@ sub showPersonHome	{
 		AddDocumentURL => $adddocumentURL || '',
 		AddRegistrationURL => $addregistrationURL || '',
 		CardPrintingURL => $cardprintingURL || '',
-		Documents => $docs,
 		GroupData => $groupdata,		
 	    client => $client,
 	    url => "$Defs::base_url/viewer.cgi",
@@ -109,6 +102,7 @@ sub showPersonHome	{
 			BirthCountry => $personObj->getValue('strCountryOfBirth') || '',
 			PassportNat => $personObj->getValue('strPassportNationality') || '',
 			Status => $personObj->getValue('strStatus') || '',
+			Nationality => $c->{$personObj->getValue('strISONationality')}
 		},
 
 	);
@@ -122,7 +116,7 @@ sub showPersonHome	{
     $RegFilters{'statusIN'} = \@statusIN;
     my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
 	
-	#open FH, ">dumpfile.txt";
+
 	
     foreach my $rego (@{$Reg_ref})  {
         my $renew = '';
@@ -148,9 +142,6 @@ $renew = $Data->{'target'} . "?client=$client&amp;a=PREGF_TU&amp;pt=$rego->{'str
 	#push @{$Reg_ref},\%reg_docs;
     $TemplateData{'RegistrationInfo'} = $Reg_ref;
 	
-	#print FH "Dump of template data \n" . Dumper($TemplateData{'RegistrationInfo'}) . "\n"; 
-
-
 
 	my $statuspanel= runTemplate(
 		$Data,

@@ -551,7 +551,6 @@ sub display_core_details {
     my $pagedata = $self->display(\%PageData);
 
     return ($pagedata,0);
-
 }
 
 sub validate_core_details {
