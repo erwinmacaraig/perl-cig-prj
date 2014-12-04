@@ -1,6 +1,6 @@
 [% USE Dumper %]
 <div id="transfer_search_result" class="tasklist-content dashboard-tasklist search-panel">
-	<table cellpadding="5" style="width: 100%">
+	<table id="transferSearchResult" cellpadding="5" style="width: 100%">
 		<thead>
 			<tr class="box-header">
 				<th>Name</th>
@@ -8,42 +8,102 @@
 				<th>Date of Birth</th>
 				<th>&nbsp;</th>
 			</tr>
-		</thead>
-		<tbody>
 			<tr>
-				<td>Filter by:
-					<select class="filter-tasks">
-			          <option selected="" value="-- Task --">-- Name --</option>
-			          <option value="az">Name A-Z</option>
-			          <option value="za">Name Z-A</option>
-			        </select>
+				<td>
+                    <input class="search-name" type="text" placeholder="Search Name"/>
 		        </td>
 				<td>
-					<select>
-			          <option value="-- Member ID --">-- Member ID --</option>
-			          <option value="asc">Ascending</option>
-			          <option value="desc">Descending</option>
-			        </select>
-				</td>
+                    <input class="search-mid" type="text" placeholder="Search MA ID"/>
+		        </td>
 				<td>
-					<select>
-			          <option value="-- Date of Birth --">-- Date of Birth --</option>
-			          <option value="Latest">Latest</option>
-			          <option value="Oldest">Oldest</option>
+					<select class="sort-dob">
+			          <option value="">-- Sort --</option>
+			          <option value="desc">Latest</option>
+			          <option value="asc">Oldest</option>
 			        </select>
 				</td>
 				<td></td>
 			</tr>
+			<tr style="display: none" class="box-header">
+				<th></th>
+				<th></th>
+				<th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
 		    [% FOREACH rego IN RegoList %]
                 <tr class="task-list">
                     <td><span class="fa fa-user"></span>[% rego.name %]</td>
                     <td>[% rego.otherdetails.ma_id %]</td>
                     <td><span class="fa fa-clock-o"></span>[% rego.otherdetails.dob %]</td>
-                    <td><a href="[% rego.link %]" class="btn-inside-panels">View</a></td>
+                    <td>
+                    [% IF rego.inProgressRequestExists %]
+                        [% Lang.txt('Request Transfer sent to Club') %]
+                    [% ELSIF rego.submittedPersonRegistrationExists %]
+                        [% Lang.txt('Request Transfer for approval') %]
+                    [% ELSIF rego.acceptedRequestLink %]
+                        <a href="[% rego.acceptedRequestLink %]" class="btn-inside-panels">[% Lang.txt('View Request') %]</a>
+                    [% ELSE %]
+                        <a href="[% rego.link %]" class="btn-inside-panels">[% Lang.txt('Select') %]</a>
+                    [% END %]
+                    </td>
                 </tr>
 		    [% END %]
 		</tbody>
 	</table>
 </div>
+
+
+<script src = "//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+    jQuery().ready(function() {
+        var table = jQuery("#transferSearchResult").DataTable();
+
+        jQuery("input.search-name").on('keyup change', function(){
+            table
+                .column(0)
+                .search(this.value)
+                .draw();
+        });
+
+
+        jQuery("input.search-mid").on('keyup change', function(){
+            table
+                .column(1)
+                .search(this.value)
+                .draw();
+        });
+
+        var dob = jQuery("select.sort-dob");
+        var dobcol = table.column(2);
+
+        jQuery(dob).on('change', function(){
+            var index = jQuery(this).find(":selected").index();
+            var val = jQuery.fn.dataTable.util.escapeRegex(jQuery(this).val());
+
+            dobcol
+                .order(val)
+                .draw();               
+
+        });
+
+
+        var role = jQuery("select.filter-role");
+        var rolecol = table.column(3);
+
+        jQuery(role).on('change', function(){
+            var index = jQuery(this).find(":selected").index();
+            var val = jQuery.fn.dataTable.util.escapeRegex(jQuery(this).val());
+            console.log(val);
+
+            rolecol
+                .search( val ? '^'+val+'$' : '', true, false )
+                .draw();               
+
+        });
+
+    });
+</script>
 
 
