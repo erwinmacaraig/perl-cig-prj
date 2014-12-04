@@ -91,8 +91,8 @@ sub showPersonHome	{
 	    url => "$Defs::base_url/viewer.cgi",
 		Details => {
 			Active => $Data->{'lang'}->txt(($personObj->getValue('intRecStatus') || '') ? 'Yes' : 'No'),
-			strLocalFirstname => $personObj->getValue('strLocalFirstname');
-       		strLocalSurname = $personObj->getValue('strLocalSurname');
+			strLocalFirstname => $personObj->getValue('strLocalFirstname'),
+       		strLocalSurname = $personObj->getValue('strLocalSurname'),
 			LatinFirstname=> $personObj->getValue('strLatinFirstname') || '',	
 			LatinSurname=> $personObj->getValue('strLatinSurname') || '',	
 			Address1 => $personObj->getValue('strAddress1') || '',	
