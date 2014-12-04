@@ -67,6 +67,7 @@ sub main	{
           UF.*,
           DATE_FORMAT(dtUploaded,"%d/%m/%Y %H:%i") AS DateAdded_FMT, 
           tblDocuments.intDocumentTypeID,
+		  tblDocuments.strApprovalStatus,
           tblDocumentType.strLockAtLevel,
           tblDocumentType.strDocumentName
       FROM  
@@ -121,7 +122,7 @@ sub main	{
     }
     # BUILD PAGE
     my $TemplateData = $dref;
-    $TemplateData->{'showButtons'} = $action eq 'review' ? 1 : 0;
+    $TemplateData->{'showButtons'} = $action eq 'review' ? ($dref->{'strApprovalStatus'} eq 'PENDING' ? 1 : 0 ) : 0;
 	$TemplateData->{'client'} = $client;
     $resultHTML = runTemplate(
           \%Data,
