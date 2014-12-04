@@ -534,7 +534,7 @@ sub insertRegoTransaction {
         if($params->{$k}==1)  {
           my $prod=$k;
           $prod=~s/[^\d]//g;
-            next if exists $Paid{$prod};
+            next if defined $Paid{$prod} && $Paid{$prod} == 1;
           push @productsselected, $prod;
         }
       }
