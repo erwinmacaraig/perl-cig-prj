@@ -281,6 +281,7 @@ sub setupValues {
                     value       => qq[</div>],
                     type        => 'htmlrow',
                     sectionname => 'core',
+                    active      => $nonLatin,
                 },
                     
             },
@@ -288,10 +289,10 @@ sub setupValues {
                 strLocalName
                 strLocalShortName
                 intLocalLanguage
-                #latinBlockStart
+                latinBlockStart
                 strLatinName
                 strLatinShortName
-                #latinBlockEnd
+                latinBlockEnd
                 intFacilityTypeID
                 strCity
                 strRegion

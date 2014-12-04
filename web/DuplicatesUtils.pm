@@ -81,6 +81,7 @@ sub isPossibleDuplicate {
                 FROM tblPerson
                 WHERE  
                     tblPerson.intRealmID = ? 
+                    AND tblPerson.strStatus <> ?
                     AND tblPerson.intSystemStatus <> ?
                     $wherestr
                 ORDER BY 
@@ -89,6 +90,7 @@ sub isPossibleDuplicate {
             ];
             @st_fields = (
                 $Data->{'Realm'}, 
+                $Defs::PERSON_STATUS_INPROGRESS,
                 $Defs::PERSONSTATUS_DELETED, 
                 @where_fields,
             );

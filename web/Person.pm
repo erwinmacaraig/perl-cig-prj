@@ -1284,7 +1284,16 @@ sub person_details {
                     cols => '40',   
                     sectionname => 'identification',             	
                 },
-        	
+                intOtherPersonIdentifierTypeID=> {
+                	label => $FieldLabels->{'intOtherPersonIdentifierTypeID'},
+                	value => $field->{'intOtherPersonIdentifierTypeID'},
+                    type        => 'lookup',
+                    options     => $DefCodes->{-20},
+                    order       => $DefCodesOrder->{-20},
+                    firstoption => [ '', " " ],
+                    sectionname => 'identification',             	
+                },
+	
             PhotoUpload => {
                 label => ($Data->{'SystemConfig'}{'person_intPhoto'} && $Data->{'SystemConfig'}{'person_demographic'})? 'Photo' : '',
                 type  => 'htmlblock',
@@ -1329,6 +1338,7 @@ sub person_details {
             dtOtherPersonIdentifierValidDateFrom
             dtOtherPersonIdentifierValidDateTo
             strOtherPersonIdentifierDesc 
+            intOtherPersonIdentifierTypeID
             strP1FName 
             strP1SName 
             strP1Phone 

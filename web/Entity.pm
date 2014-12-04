@@ -456,10 +456,6 @@ sub listEntities {
 
   my @headers = (
     {
-      type => 'Selector',
-      field => 'SelectLink',
-    },
-    {
       name =>   $Data->{'lang'}->txt('Name'),
       field =>  'strName',
     },
@@ -475,6 +471,10 @@ sub listEntities {
     {
       name =>   $Data->{'lang'}->txt('Email'),
       field =>  'strEmail',
+    },
+    {
+      type => 'Selector',
+      field => 'SelectLink',
     },
   );
   

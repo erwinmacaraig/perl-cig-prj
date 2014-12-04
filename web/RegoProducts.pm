@@ -534,6 +534,7 @@ sub insertRegoTransaction {
         if($params->{$k}==1)  {
           my $prod=$k;
           $prod=~s/[^\d]//g;
+            next if exists $Paid{$prod};
           push @productsselected, $prod;
         }
       }
@@ -572,7 +573,6 @@ sub insertRegoTransaction {
     if (scalar(@productsselected) or scalar(@already_in_cart_items)) {
         if (scalar(@productsselected)) {
             foreach my $product (@productsselected)    {
-                next if defined $Paid{$product};
                 ## Lets get rid of duplicate products
                 $q_txnclean->execute($regoID, $intID, $product);
                 
@@ -689,6 +689,7 @@ sub insertRegoTransaction {
 
         foreach my $product (@productsselected)    {
             next if $product_seen{$product}++;
+#            next if exists $Paid{$product};
             my $amount= getItemCost($Data, $entityID, $entityLevel, $multipersonType, $product);
             
             $amount = 0 if (exists $ExistingProducts{$product} and $ExistingProducts{$product}==1);
