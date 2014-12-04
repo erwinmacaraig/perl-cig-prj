@@ -595,7 +595,7 @@ sub _getConfiguration {
             ],
 
             strOtherPersonIdentifier=> [
-                'Other Identifier Number',
+                $Data->{'SystemConfig'}{'strOtherPersonIdentifier_Text'} ? $Data->{'SystemConfig'}{'strOtherPersonIdentifier_Text'} : 'Other Identifier',
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
@@ -604,7 +604,7 @@ sub _getConfiguration {
                 }
             ],
             strOtherPersonIdentifierDesc=> [
-                'Other Identifier Notes',
+                $Data->{'SystemConfig'}{'strOtherPersonIdentifierDesc_Text'} ? $Data->{'SystemConfig'}{'strOtherPersonIdentifierDesc_Text'} : 'Other Identifier Description',
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
@@ -613,7 +613,7 @@ sub _getConfiguration {
                 }
             ],
             strOtherPersonIdentifierIssueCountry=> [
-                'Other Identifier Issue Country',
+                $Data->{'SystemConfig'}{'strOtherPersonIdentifierIssueCountry_Text'} ? $Data->{'SystemConfig'}{'strOtherPersonIdentifierIssueCountry_Text'} : 'Other Identifier Issuance Country',
                 {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
@@ -626,7 +626,7 @@ sub _getConfiguration {
             ],
 
             dtOtherPersonIdentifierValidDateFrom=> [
-                'Other Identifier Valid From',
+                $Data->{'SystemConfig'}{'dtOtherPersonIdentifierValidDateFrom_Text'} ? $Data->{'SystemConfig'}{'dtOtherPersonIdentifierValidDateFrom_Text'} : 'Other Identifier Validity Date From',
                 {
                     displaytype => 'date',
                     fieldtype   => 'date',
@@ -638,7 +638,7 @@ sub _getConfiguration {
                 }
             ],
             dtOtherPersonIdentifierValidDateTo=> [
-                'Other Identifier Valid To',
+                $Data->{'SystemConfig'}{'dtOtherPersonIdentifierValidDateTo_Text'} ? $Data->{'SystemConfig'}{'dtOtherPersonIdentifierValidDateTo_Text'} : 'Other Identifier Validity Date To',
                 {
                     displaytype => 'date',
                     fieldtype   => 'date',
@@ -647,6 +647,16 @@ sub _getConfiguration {
                       'DATE_FORMAT(tblPerson.dtOtherPersonIdentifierValidDateTo, "%d/%m/%Y")',
                     optiongroup => 'identifications',
                     dbfield     => 'tblPerson.dtOtherPersonIdentifierValidDateTo'
+                }
+            ],
+            intOtherPersonIdentifierTypeID=> [
+                $Data->{'SystemConfig'}{'intOtherPersonIdentifierTypeID_Text'} ? $Data->{'SystemConfig'}{'intOtherPersonIdentifierTypeID_Text'} : 'Other Identifier Type',
+                {
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => $CommonVals->{'DefCodes'}{-20},
+                    optiongroup => 'identifications',
+                    allowgrouping   => 1
                 }
             ],
 
@@ -1677,6 +1687,7 @@ sub _getConfiguration {
                 strOtherPersonIdentifierIssueCountry        
                 dtOtherPersonIdentifierValidDateFrom    
                 dtOtherPersonIdentifierValidDateTo
+                intOtherPersonIdentifierTypeID
 
                intOccupationID
 
