@@ -495,6 +495,11 @@ a.btn-inside-panels:hover {
 	margin: 0 20px;
 }
 
+.alert div ul {
+	margin-left:60px;
+	font-size: 12px;
+}
+
 table.table thead {
 	background: #d8d8d8;
 	border: 1px solid #ccc;
@@ -558,6 +563,17 @@ table.zebra tbody tr:nth-child(even) {
 	top: -20px;
 	left: 15px;
 	font-size: 16px;
+}
+
+.read-only ul {
+	list-style-type: none;
+}
+
+.read-only ul li {
+	margin-left:-40px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	border-bottom:1px solid #ccc;
 }
 
 .read-only-text {
