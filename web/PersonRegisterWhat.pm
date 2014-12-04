@@ -223,10 +223,9 @@ sub optionsPersonRegisterWhat {
     if (! checkMatrixOK($Data, $MATRIXwhere, \@MATRIXvalues, $bulk))   {
         return (\@retdata, '');
     }
-    
     ### ALL OK, LETS RETURN NEXT SET OF SELECTIONS
     if ($lookingForField eq 'strPersonEntityRole')  {
-        my $roledata_ref = returnEntityRoles($role_ref);
+        my $roledata_ref = returnEntityRoles($role_ref, $Data);
         return ($roledata_ref, '');
     }
     elsif ($lookingForField eq 'strPersonType') {
@@ -334,8 +333,8 @@ sub optionsPersonRegisterWhat {
                         }
                         else    {
                             push @retdata, {
-                                name => '-',
-                                value => '',
+                                name => $Data->{'lang'}->txt('Selection Not Required'),
+                                value => 0,
                             };
                        }
                     }
@@ -345,8 +344,8 @@ sub optionsPersonRegisterWhat {
                 if(scalar(@tempAgeLevel) == 1 and $tempAgeLevel[0] eq '' and $personType ne $Defs::PERSON_TYPE_PLAYER) {
                     my @retdata;
                     push @retdata, {
-                        name => '-',
-                        value => '',
+                        name => $Data->{'lang'}->txt('Selection Not Required'),
+                        value => 0,
                     };
 
                     return (\@retdata, '');
@@ -437,8 +436,8 @@ sub optionsPersonRegisterWhat {
         }
         else    {
             push @retdata, {
-                name => '-',
-                value => '',
+                name => $Data->{'lang'}->txt('Selection Not Required'),
+                value => 0,
             };
        }
     }
@@ -455,7 +454,7 @@ sub getOptionsFromMatrix {
 }
 sub returnEntityRoles   {
 
-    my ($role_ref) = @_;
+    my ($role_ref, $Data) = @_;
     my @retdata=();
     foreach my $key (keys %{$role_ref})   {
         push @retdata, {
@@ -465,8 +464,8 @@ sub returnEntityRoles   {
      }
      if (! @retdata) {
         push @retdata, {
-            name => '-',
-            value => '',
+            name => $Data->{'lang'}->txt('Selection Not Required'),
+            value => 0,
         };
      }
      return \@retdata;
@@ -637,8 +636,8 @@ sub getPersonLevelFromMatrix {
         }
         else {
             push @retdata, {
-                name => '-',
-                value => '',
+                name => $Data->{'lang'}->txt('Selection Not Required'),
+                value => 0,
             }
         }
     }

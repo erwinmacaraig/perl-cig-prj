@@ -518,6 +518,8 @@ sub display_registration {
     my $content = '';
     my $noContinueButton = 1;
 
+    $self->{'Data'}->{'AddToPage'}->add('js_bottom','file','js/regwhat.js');
+
     my $defaultType = $self->{'RunParams'}{'dtype'} || '';
     if($defaultType eq 'TRANSFER')   {
         $noContinueButton = 0;
@@ -576,7 +578,7 @@ sub display_registration {
         Title => '',
         TextTop => '',
         TextBottom => '',
-        NoContinueButton => $noContinueButton,
+        #NoContinueButton => $noContinueButton,
     );
     my $pagedata = $self->display(\%PageData);
 
@@ -592,12 +594,12 @@ sub process_registration {
     my $self = shift;
 
     #add rego record with types etc.
-    my $personType = $self->{'RunParams'}{'pt'} || '';
-    my $personEntityRole= $self->{'RunParams'}{'per'} || '';
-    my $personLevel = $self->{'RunParams'}{'pl'} || '';
-    my $sport = $self->{'RunParams'}{'sp'} || '';
-    my $ageLevel = $self->{'RunParams'}{'ag'} || '';
-    my $registrationNature = $self->{'RunParams'}{'nat'} || '';
+    my $personType = $self->{'RunParams'}{'d_type'} || '';
+    my $personEntityRole= $self->{'RunParams'}{'d_role'} || '';
+    my $personLevel = $self->{'RunParams'}{'d_level'} || '';
+    my $sport = $self->{'RunParams'}{'d_sport'} || '';
+    my $ageLevel = $self->{'RunParams'}{'d_age'} || '';
+    my $registrationNature = $self->{'RunParams'}{'d_nature'} || '';
     my $personRequestID = $self->{'RunParams'}{'prid'} || '';
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;

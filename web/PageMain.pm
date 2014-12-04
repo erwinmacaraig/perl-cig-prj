@@ -145,6 +145,11 @@ sub pageMain {
         'jQuery(".chzn-select").chosen({ disable_search_threshold: 10 });',
     );
 
+    $Data->{'AddToPage'}->add(
+        'js_bottom',
+        'inline',
+        'jQuery(".fcToggleGroup").fcToggle({ test:1 });',
+    );
     my $search_js = qq[
     jQuery.widget( "custom.catcomplete", jQuery.ui.autocomplete, {
         _renderMenu: function( ul, items ) {

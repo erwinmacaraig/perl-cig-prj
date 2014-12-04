@@ -27,7 +27,7 @@
 
 <div class = "button-row">
 [% IF !NoContinueButton %]
-	<div class="txtright"><input type = "submit" value = " [% Lang.txt('Continue') %] "  class = "btn-main"></div>
+	<div class="txtright"><input id = "flow-btn-continue" type = "submit" value = " [% Lang.txt('Continue') %] "  class = "btn-main"></div>
 [% END %]
 [% IF Back %]
     <div class="txtright"><span class="btn-main"><a href="javascript:history.go(-1)"  onmouseover="this.style.textDecoration='none'"> [% Lang.txt(Back) %] </a></span></div>

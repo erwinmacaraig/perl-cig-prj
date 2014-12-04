@@ -112,7 +112,7 @@ $(document).ready(function(){
         }
     });
 
-    jQuery('select.fcToggleGroup').each(function() {
+    jQuery('kkselect.fcToggleGroup').each(function() {
         var s = jQuery(this);
         var name = s.attr('name');
         var ele_id = 'toggleG' + name;
