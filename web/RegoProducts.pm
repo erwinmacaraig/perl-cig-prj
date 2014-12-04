@@ -524,6 +524,7 @@ sub insertRegoTransaction {
             AND intStatus=1 
     ];
     my $qryPaid= $db->prepare($stPaid);
+    $qryPaid->execute($regoID, $intID);
     my %Paid=();
     while(my $pref=$qryPaid->fetchrow_hashref())  {
         $Paid{$pref->{'intProductID'}} = 1;
@@ -534,7 +535,7 @@ sub insertRegoTransaction {
         if($params->{$k}==1)  {
           my $prod=$k;
           $prod=~s/[^\d]//g;
-            next if defined $Paid{$prod} && $Paid{$prod} == 1;
+          next if exists $Paid{$prod};
           push @productsselected, $prod;
         }
       }
