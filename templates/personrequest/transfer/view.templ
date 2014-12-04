@@ -2,7 +2,19 @@
     <div class="col-md-9">
         <div class="member-detail">
 
-            <h3 class = "panel-header">[% personFirstname %] [% personSurname %] - [% requestType %] [% requestTo %]</h3>
+            <h3 class = "panel-header">[% personFirstname %] [% personSurname %]</h3>
+				<div class="panel-body">
+
+				<p>[% requestTo %] has requested a transfer for [% personSurname %] [% personFirstname %]. Please approve or reject the request.</p>
+
+				<div class="alert">
+					<div>
+						<span class="fa fa-exclamation"></span>
+						<p>By approving you are giving access to all of [% personSurname %] [% personFirstname %] player details to [% requestTo %]</p>
+					</div>
+				</div>
+
+
 				<br/>
 		    	<ul class="nav nav-tabs">
 					<li class="active"><a data-toggle="tab" href="#oldclubdetails">Old Club Details</a></li>
@@ -132,7 +144,7 @@
 					</div>
 					<div id="documentsdetails" class="tab-pane fade"></div>
 				</div>
-
+				</div>
             </div>
                 <div class="task-actions">
                 [% IF RequestAction.showAction == 1 %]
