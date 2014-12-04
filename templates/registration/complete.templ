@@ -57,7 +57,7 @@
 		 <div class="read-only-text clearfix">
 		    <ul>
 				[% FOREACH doc IN registration.documents %]
-				<li><span class="">[% doc.strDocumentName %]: [% doc.strOrigFilename %] </span> <b class="">[% doc.strOrigFilename %]</b></li>
+				<li><span class="">[% doc.strDocumentName %]:<br /></span> <b class="">[% doc.strOrigFilename %]</b></li>
 				[% END %]
 		    </ul>
 		    <a href="#" class="pull-right">Edit</a>
