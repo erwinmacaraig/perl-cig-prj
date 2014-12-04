@@ -13,6 +13,7 @@
 		    	<li><span>[% Lang.txt("Country of Birth") %]:</span> <b>[% person.Country %]</b></li>
 		    	<li><span>[% Lang.txt("Region") %]:</span> <b>[% person.Region %]</b></li>
 		    </ul>
+		    <a href="#" class="pull-right">Edit</a>
 	    </div>
 	</div>
 </div>
@@ -30,6 +31,7 @@
 		    	<li><span>[% Lang.txt("Phone Number") %]:</span> <b>[% person.Phone %]</b></li>
 		    	<li><span>[% Lang.txt("Email Address") %]:</span> <b>[% person.Email %]</b></li>
 		    </ul>
+		    <a href="#" class="pull-right">Edit</a>
 	    </div>
 	</div>
 </div>
@@ -44,6 +46,7 @@
 		    	<li><span>[% Lang.txt("Sport") %]:</span> <b>[% registration.strSport %]</b></li>
 		    	<li><span>[% Lang.txt("Level") %]:</span> <b>[% registration.strPersonLevel %]</b></li>
 		    </ul>
+		    <a href="#" class="pull-right">Edit</a>
 	     </div>
 	</div>
 </div>
@@ -57,26 +60,18 @@
 				<li><span>[% doc.strDocumentName %]:<br /></span> <b>[% doc.strOrigFilename %]</b></li>
 				[% END %]
 		    </ul>
+		    <a href="#" class="pull-right">Edit</a>
 	     </div>
 	</div>
 </div>
 [% END %]
 
-<p>[% Lang.txt('Registration is complete') %]</p>
-
-<p>Status is [% RegoStatus %]</p>
-
-<a href="[% person_home_url %]">[% Lang.txt("Continue to Person Home") %]</a>
-<!--[% IF txnCount > 0 %]
-<div id="regopt_options_continue" style="float:right;">
-	<span class="proceed-button button">
-		<a href="[% txn_invoice_url %]" target="_blank" onmouseover="this.style.textDecoration = 'none'">[% Lang.txt("Generate Invoice") %]</a>
-	</span>
- OR
-	<span class="proceed-button button">
-		<a href="[% txns_url %]" onmouseover="this.style.textDecoration = 'none'">[% Lang.txt("Pay Now") %]</a>
-	</span>
-</div>
-[% END %]-->
-[% gateways %]
+<!--<form action="[% target %]" method="POST">
+    <input type="hidden" name="a" value="c">
+[% FOREACH h IN  hidden_ref %]
+<input type="hidden" name="[% h.key %]" value="[% h.value %]">
+[% END %]
+<input type="submit" name="submit" value="[% Lang.txt('Submit to Member Association') %]" class = "button proceed-button"><br><br>
+            </form>
+-->
 </div>
