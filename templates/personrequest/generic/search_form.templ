@@ -137,7 +137,7 @@
                                 <input type="hidden" value="[% client %]" name="client">
                                 <input type="hidden" value="[% request_type %]" name="request_type">
                                 <input type="hidden" value="[% transfer_type %]" name="transfer_type">
-                                <input type="submit" name="submit" class="btn btn-sm btn-primary" value="Send Request">   
+                                <!--<input type="submit" name="submit" class="btn btn-sm btn-primary" value="Send Request">   -->
                             </form>
                         [% END %]
                     </div>
@@ -158,7 +158,16 @@
                     </div>
                 [% END %]
             [% END %]
+
+
+            [% IF action_request %]
+            <a class="btn-main sendtransfer-request" data-target="#showSendRequest" data-actiontype="SENDREQUEST" href = "">
+                [% Lang.txt('Send Request') %]
+            </a>
+            [% END %]
+
         </div>
+
         <div class="col-md-3">
             <h3 class="panel-header">Transfer Summary</h3>
             <div class="panel-body">
@@ -210,6 +219,34 @@
                 </div>
             </div>
         </div>
+
+<div class="modal fade" id="showSendRequest" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" style="z-index:9999;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">[% Lang.txt('Request Transfer Notes') %]</h4>
+      </div>
+      
+      <form id="personRequestNotes" action="main.cgi" method="POST">
+          <div class="modal-body">
+            <label>Please enter request notes</label>
+            <textarea name="request_notes"></textarea>
+          </div>
+
+          <div id="hiddenfields" style="display: none">
+          </div>
+
+          <div class="modal-footer">
+            <a class="btn-main" data-dismiss="modal">Close</a>
+            <input class="btn-main" type="submit" name="submit" value="submit">
+          </div>
+      </form>
+      
+    </div>
+  </div>
+</div>
+
     <!--</div>-->
 
 <!--
@@ -227,3 +264,45 @@
     </div>
     [% script %]
     -->
+
+
+
+<script src = "//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+<script type="text/javascript">
+    jQuery().ready(function() {
+        
+
+        //$("form#personInitRequest").submit(function(e){
+        //    if($(this).find("input[type=checkbox]:checked").length == 0){
+        //        e.preventDefault();
+        //        $("div#init_error").slideDown();
+        //    }
+        //});
+
+    
+        jQuery("a.sendtransfer-request").click(function(e){
+            e.preventDefault();
+
+            if(jQuery("form#personInitRequest").find("input[type=checkbox]:checked").length == 0){
+                jQuery("div#init_error").slideDown();
+            } else {
+                if(jQuery.trim(jQuery("form#personRequestNotes div#hiddenfields").html()) == "") {
+                    jQuery("form#personRequestNotes div#hiddenfields").append(jQuery("form#personInitRequest input").clone());
+                }
+                jQuery("div#showSendRequest").modal();
+            }
+        });
+        // validate the comment form when it is submitted
+        jQuery("#personRequestNotes").validate({
+            rules: {
+                request_notes: {
+                    required: true
+                }
+            },
+            messages: {
+                request_notes: "Please add notes."
+            }
+        });
+    });
+</script>
+
