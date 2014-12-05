@@ -25,6 +25,7 @@ sub personFieldsSetup {
 
     my $FieldLabels   = FieldLabels::getFieldLabels( $Data, $Defs::LEVEL_PERSON );
     my $isocountries  = getISOCountriesHash();
+    my $isoHistoricalCountries  = getISOCountriesHash(historicalCountries => 1);
     my $field_case_rules = get_field_case_rules({
         dbh=>$Data->{'db'}, 
         client=>$Data->{'client'}, 
@@ -259,7 +260,7 @@ sub personFieldsSetup {
                     label       => $FieldLabels->{'strISOCountryOfBirth'},
                     value       => $values->{'strISOCountryOfBirth'},
                     type        => 'lookup',
-                    options     => $isocountries,
+                    options     => $isoHistoricalCountries,
                     firstoption => [ '', 'Select Country' ],
                     class       => 'chzn-select',
                     compulsory => 1,
@@ -315,7 +316,7 @@ sub personFieldsSetup {
         			label       => $FieldLabels->{'strBirthCertCountry'},
                     value       => $values->{'strBirthCertCountry'},
                     type        => 'lookup',
-                    options     => $isocountries,
+                    options     => $isoHistoricalCountries,
                     firstoption => [ '', 'Select Country' ],
                     compulsory => 1,
                     class       => 'chzn-select',
