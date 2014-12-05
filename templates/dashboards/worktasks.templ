@@ -97,8 +97,11 @@
                             <span style="float: left" class="fa fa-user"></span>
                             <div style="float: left; word-wrap: break-word;width: 80%;">
                             [% task.personRequestLabel %]<br/>
-                            [% task.Name %] from <br/>
-                            [% task.requestFrom %] to [% task.requestTo %]
+                            [% IF task.TaskStatus == 'ACCEPTED' %]
+                                [% task.requestTo %] has accepted request for [% task.Name %]
+                            [% ELSIF task.TaskStatus == 'PENDING' %]
+                                [% task.requestFrom %] has requested a transfer for [% task.Name %]
+                            [% END %]
                             </div>
                         </td>
                     [% ELSIF task.TaskType == 'ACCESS' %]
