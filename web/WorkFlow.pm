@@ -2295,6 +2295,7 @@ sub populateDocumentViewData {
             pr.intNewBaseRecord,
             addPersonItem.intItemID as addPersonItemID,
             regoItem.intItemID as regoItemID,
+			regoItem.intRequired as Required,
             entityItem.intItemID as entityItemID
         FROM tblWFRuleDocuments AS rd
         INNER JOIN tblWFTask AS wt ON (wt.intWFRuleID = rd.intWFRuleID)
@@ -2360,10 +2361,11 @@ sub populateDocumentViewData {
         'client' => $Data->{client} || 0,
         'action' => 'WF_Verify',
     );
-
+	open FH, ">dumpfile.txt";
     my $count = 0;
     my %documentStatusCount;
     while(my $tdref = $q->fetchrow_hashref()) {
+		print FH "\n----------------------------------------------------------------------------------\n" .Dumper($tdref) . "\n";
         next if exists $DocoSeen{$tdref->{'intDocumentTypeID'}};
         $DocoSeen{$tdref->{'intDocumentTypeID'}} = 1;
         #skip if no registration item matches rego details combination (type/role/sport/rego_nature etc)
@@ -2371,13 +2373,21 @@ sub populateDocumentViewData {
         
 
         next if((!$dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC') or ($dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC' and $dref->{'PersonStatus'} ne $Defs::PERSON_STATUS_PENDING));
-
+		my $status;
         $count++;
-        if(!$tdref->{'strApprovalStatus'}){
-            $documentStatusCount{'MISSING'}++;
+        if(!$tdref->{'strApprovalStatus'}){            
+			if($tdref->{'Required'}){
+				$documentStatusCount{'MISSING'}++;
+				$status = 'MISSING';
+			}
+			else {
+				$status = 'Optional. Not Provided.';
+			}
+			
         }
         else {
             $documentStatusCount{$tdref->{'strApprovalStatus'}}++;
+			$status = $tdref->{'strApprovalStatus'};
         }
         my $displayVerify;
         my $displayAdd;
@@ -2448,9 +2458,12 @@ sub populateDocumentViewData {
 			
         }
 
+		
+
         my %documents = (
             DocumentID => $tdref->{'intDocumentID'},
-            Status => $tdref->{'strApprovalStatus'} || "MISSING",
+            #Status => $tdref->{'strApprovalStatus'} || "MISSING",
+			Status => $status,
             DocumentType => $tdref->{'strDocumentName'},
             Verifier => $tdref->{'strLocalName'},
             DisplayVerify => $displayVerify || '',
