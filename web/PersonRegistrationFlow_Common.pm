@@ -155,7 +155,7 @@ sub displayRegoFlowSummary {
 				last;	
 			}
 		}
-	
+
         my %PageData = (
             person_home_url => $url,
 			person => \%personData,
