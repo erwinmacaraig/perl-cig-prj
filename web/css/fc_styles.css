@@ -1411,3 +1411,9 @@ span.fa-user{
 	width:100%;
 	text-align: center;
 }
+
+.document-upload.summary {
+	overflow:hidden;
+	margin-top: 20px;
+	padding:5px;
+}
