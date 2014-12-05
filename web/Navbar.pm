@@ -935,6 +935,11 @@ sub GenerateTree {
                 type => $levelType,
                 url => $url,
                 levelname => $Data->{'LevelNames'}{$levelType},
+                ma_phone_number => $Data->{'SystemConfig'}{'ma_phone_number'},
+                ma_website => $Data->{'SystemConfig'}{'ma_website'},
+                ma_email => $Data->{'SystemConfig'}{'ma_email'},
+                help_desk_email => $Data->{'SystemConfig'}{'help_desk_email'},
+                help_desk_phone_number => $Data->{'SystemConfig'}{'help_desk_phone_number'},
             };
         }
     }
