@@ -9,7 +9,12 @@
         <p class="reg-text">[% person.Nationality %]</p>
     </div>
     <!-- DO IF TEST HERE ON registration.strStatus -->
-    <div class="registration-pending">[% Lang.txt(registration.personRegoStatus) %]</div>
+    [% IF registration.strStatus == "PENDING" %]
+    	<div class="registration-pending">[% Lang.txt(registration.personRegoStatus) %]</div>
+    [% ELSIF registration.strStatus == "ACTIVE" %]
+    	<div class="registration-approved">[% Lang.txt(registration.personRegoStatus) %]</div>
+    [% END %]
+
 </div>
 
 <div class="col-md-9">
