@@ -1,82 +1,32 @@
-<div class="document-upload summary">
-<div class="col-md-6">
-	<div class="read-only">
-	    <h4>Personal Information</h4>
-	    <div class="read-only-text clearfix">
-		    <ul>
-		    	<li><span>[% Lang.txt("Family Name") %]:</span> <b>[% person.Familyname %]</b></li>
-		    	<li><span>[% Lang.txt("First Name") %]:</span> <b>[% person.Name %]</b></li>
-		    	<li><span>[% Lang.txt("Language of name") %]:</span> <b> [% person.Language %]</b></li>
-		    	<li><span>[% Lang.txt("Date of Birth") %]:</span> <b>[% person.DOB %]</b></li>
-		    	<li><span>[% Lang.txt("Gender") %]:</span> <b>[% person.Gender %]</b></li>
-		    	<li><span>[% Lang.txt("Nationality") %]:</span> <b>[% person.Nationality %]</b></li>
-		    	<li><span>[% Lang.txt("Country of Birth") %]:</span> <b>[% person.Country %]</b></li>
-		    	<li><span>[% Lang.txt("Region") %]:</span> <b>[% person.Region %]</b></li>
-		    </ul>
-	    </div>
-	</div>
+<div class="col-md-3" style="margin-left:-15px;">
+    <h3 class="panel-header">Member ID: [% MID %]</h3>
+    <div class="panel-body">
+        <div class="container-link"><a href="#" title="Upload Profile Image">+ Upload Profile Image</a></div>
+        <p class="reg-text">[% PersonRegistrationDetails.personSurname %]</p>
+        <p class="reg-text">[% PersonRegistrationDetails.personFirstname %]</p>
+        <p class="reg-text">[% PersonRegistrationDetails.gender  %]</p>
+        <p class="reg-text">[% PersonRegistrationDetails.dob %]</p>
+        <p class="reg-text">[% PersonRegistrationDetails.nationality %]</p>
+    </div>
+    <div class="registration-approved">[% Lang.txt('Complete') %]</div>
 </div>
-<div class="col-md-6">
-	<div class="read-only">
-	    <h4>Contact Details</h4>
-	    <div class="read-only-text clearfix">
-		    <ul>
-		    	<li><span>[% Lang.txt("Address 1") %]:</span> <b>[% person.Addressone %]</b></li>
-		    	<li><span>[% Lang.txt("Address 2") %]:</span> <b>[% person.Addresstwo %]</b></li>
-		    	<li><span>[% Lang.txt("City") %]:</span> <b>[% person.City %]</b></li>
-		    	<li><span>[% Lang.txt("State") %]:</span> <b>[% person.State %]</b></li>
-		    	<li><span>[% Lang.txt("Postal Code") %]:</span> <b>[% person.Postal %]</b></li>
-		    	<li><span>[% Lang.txt("Country") %]:</span> <b>[% person.Countryaddress %]</b></li>
-		    	<li><span>[% Lang.txt("Phone Number") %]:</span> <b>[% person.Phone %]</b></li>
-		    	<li><span>[% Lang.txt("Email Address") %]:</span> <b>[% person.Email %]</b></li>
-		    </ul>
-	    </div>
-	</div>
-</div>
-<div class="clearfix">&nbsp;</div>
-<div class="col-md-6">
-	<div class="read-only">
-		 <h4>Registration Details</h4>
-	     <div class="read-only-text clearfix">
-		    <ul>
-		    	<li><span>[% Lang.txt("Register to") %]:</span> <b>[% registration.strLocalName %]</b></li>
-		    	<li><span>[% Lang.txt("Register as") %]:</span> <b>[% registration.strPersonType %]</b></li>
-		    	<li><span>[% Lang.txt("Sport") %]:</span> <b>[% registration.strSport %]</b></li>
-		    	<li><span>[% Lang.txt("Level") %]:</span> <b>[% registration.strPersonLevel %]</b></li>
-		    </ul>
-	     </div>
-	</div>
-</div>
-[% IF registration.documents.size %]
-<div class="col-md-6">
-	<div class="read-only">
-		 <h4>Documents</h4>
-		 <div class="read-only-text clearfix">
-		    <ul>
-				[% FOREACH doc IN registration.documents %]
-				<li><span>[% doc.strDocumentName %]:<br /></span> <b>[% doc.strOrigFilename %]</b></li>
-				[% END %]
-		    </ul>
-	     </div>
-	</div>
-</div>
-[% END %]
 
-<p>[% Lang.txt('Registration is complete') %]</p>
-
-<p>Status is [% RegoStatus %]</p>
-
-<a href="[% person_home_url %]">[% Lang.txt("Continue to Person Home") %]</a>
-<!--[% IF txnCount > 0 %]
-<div id="regopt_options_continue" style="float:right;">
-	<span class="proceed-button button">
-		<a href="[% txn_invoice_url %]" target="_blank" onmouseover="this.style.textDecoration = 'none'">[% Lang.txt("Generate Invoice") %]</a>
-	</span>
- OR
-	<span class="proceed-button button">
-		<a href="[% txns_url %]" onmouseover="this.style.textDecoration = 'none'">[% Lang.txt("Pay Now") %]</a>
-	</span>
-</div>
-[% END %]-->
-[% gateways %]
+<div class="col-md-9">
+	<h3 class="panel-header">Thank you</h3>
+	<div class="panel-body">
+		<div class="reg-complete-wrapper">
+			<p class="reg-complete-text">Registration has been submitted to: <br /><br />
+			The registration should take 12 working days to process.<br /><br />
+			Once processing has taken place, the outcome will be emailed to your club and the player.
+			</p>
+			<div class="reg-complete-buttons">
+				<p>What would you like to do now?</p>
+				<ul>
+				<li><a href="#" class="btn-main">Register another player</a></li>
+				<li><a href="#" class="btn-main">View all currently submitted registrations</a></li>
+				<li><a href="#" class="btn-main">Got to your dashboard</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
 </div>

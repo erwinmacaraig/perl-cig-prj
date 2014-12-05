@@ -1195,6 +1195,7 @@ header nav ul li a {
 }
 
 .button-row {
+	margin-top:20px;
 }
 
 .access-level {
@@ -1370,4 +1371,36 @@ a.paginate_button.previous, a.paginate_button.next, a.paginate_button {
 
 span.fa-user{
 	margin-top:3px;
+}
+
+.reg-complete-wrapper {
+	padding:10px;
+}
+
+.reg-complete-text {
+	float:left;
+	width: 50%;
+	fon
+}
+
+.reg-complete-buttons {
+	float:right;
+}
+
+.reg-complete-buttons p {
+	font-weight: bold;
+}
+
+.reg-complete-buttons ul {
+	list-style-type: none;
+}
+
+.reg-complete-buttons ul li {
+	margin-left: -40px;
+	margin-bottom: 5px;
+}
+
+.reg-complete-buttons ul li a {
+	width:100%;
+	text-align: center;
 }

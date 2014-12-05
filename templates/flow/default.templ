@@ -16,7 +16,7 @@
 </div>
 [% END %]
 
-<div class="col-md-9">
+<div class="[% IF processStatus == 1 %]col-md-12[% ELSE %]col-md-9[% END %]">
 [% TextTop %]
 <form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">
     [% IF Content %][% Content %][% END %]
@@ -45,5 +45,4 @@
 </div>
 [% END %]
 <br/>
-<div class="col-md-9"></div>
 [% TextBottom %]
