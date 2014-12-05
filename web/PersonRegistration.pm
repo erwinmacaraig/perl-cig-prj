@@ -150,7 +150,7 @@ sub checkNewRegoOK  {
     foreach my $reg (@{$regs})  {
         next if $reg->{'intEntityID'} == $rego_ref->{'entityID'};
         #$ok = 0 if ($reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_ROLLED_OVER or $reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_DELETED or $reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_TRANSFERRED);
-        $ok = 0 if ($reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_DELETED or $reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_TRANSFERRED);
+        $ok = 0 if ($reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_DELETED or $reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_TRANSFERRED or $reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_INPROGRESS);
     }
 
     return $ok if (! $ok);
