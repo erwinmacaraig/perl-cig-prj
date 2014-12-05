@@ -2385,11 +2385,11 @@ sub populateDocumentViewData {
         'client' => $Data->{client} || 0,
         'action' => 'WF_Verify',
     );
-	open FH, ">dumpfile.txt";
+	
     my $count = 0;
     my %documentStatusCount;
     while(my $tdref = $q->fetchrow_hashref()) {
-		print FH "\n----------------------------------------------------------------------------------\n" .Dumper($tdref) . "\n";
+
         next if exists $DocoSeen{$tdref->{'intDocumentTypeID'}};
         $DocoSeen{$tdref->{'intDocumentTypeID'}} = 1;
         #skip if no registration item matches rego details combination (type/role/sport/rego_nature etc)
