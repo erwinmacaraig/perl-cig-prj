@@ -1,0 +1,77 @@
+<div class="document-upload summary">
+<div class="col-md-6">
+	<div class="read-only">
+	    <h4>Personal Information</h4>
+	    <div class="read-only-text clearfix">
+		    <ul>
+		    	<li><span>[% Lang.txt("Family Name") %]:</span> <b>[% person.Familyname %]</b></li>
+		    	<li><span>[% Lang.txt("First Name") %]:</span> <b>[% person.Name %]</b></li>
+		    	<li><span>[% Lang.txt("Language of name") %]:</span> <b> [% person.Language %]</b></li>
+		    	<li><span>[% Lang.txt("Date of Birth") %]:</span> <b>[% person.DOB %]</b></li>
+		    	<li><span>[% Lang.txt("Gender") %]:</span> <b>[% person.Gender %]</b></li>
+		    	<li><span>[% Lang.txt("Nationality") %]:</span> <b>[% person.Nationality %]</b></li>
+		    	<li><span>[% Lang.txt("Country of Birth") %]:</span> <b>[% person.Country %]</b></li>
+		    	<li><span>[% Lang.txt("Region") %]:</span> <b>[% person.Region %]</b></li>
+		    </ul>
+		    <a href="#" class="pull-right">Edit</a>
+	    </div>
+	</div>
+</div>
+<div class="col-md-6">
+	<div class="read-only">
+	    <h4>Contact Details</h4>
+	    <div class="read-only-text clearfix">
+		    <ul>
+		    	<li><span>[% Lang.txt("Address 1") %]:</span> <b>[% person.Addressone %]</b></li>
+		    	<li><span>[% Lang.txt("Address 2") %]:</span> <b>[% person.Addresstwo %]</b></li>
+		    	<li><span>[% Lang.txt("City") %]:</span> <b>[% person.City %]</b></li>
+		    	<li><span>[% Lang.txt("State") %]:</span> <b>[% person.State %]</b></li>
+		    	<li><span>[% Lang.txt("Postal Code") %]:</span> <b>[% person.Postal %]</b></li>
+		    	<li><span>[% Lang.txt("Country") %]:</span> <b>[% person.Countryaddress %]</b></li>
+		    	<li><span>[% Lang.txt("Phone Number") %]:</span> <b>[% person.Phone %]</b></li>
+		    	<li><span>[% Lang.txt("Email Address") %]:</span> <b>[% person.Email %]</b></li>
+		    </ul>
+		    <a href="#" class="pull-right">Edit</a>
+	    </div>
+	</div>
+</div>
+<div class="clearfix">&nbsp;</div>
+<div class="col-md-6">
+	<div class="read-only">
+		 <h4>Registration Details</h4>
+	     <div class="read-only-text clearfix">
+		    <ul>
+		    	<li><span>[% Lang.txt("Register to") %]:</span> <b>[% registration.strLocalName %]</b></li>
+		    	<li><span>[% Lang.txt("Register as") %]:</span> <b>[% registration.strPersonType %]</b></li>
+		    	<li><span>[% Lang.txt("Sport") %]:</span> <b>[% registration.strSport %]</b></li>
+		    	<li><span>[% Lang.txt("Level") %]:</span> <b>[% registration.strPersonLevel %]</b></li>
+		    </ul>
+		    <a href="#" class="pull-right">Edit</a>
+	     </div>
+	</div>
+</div>
+[% IF registration.documents.size %]
+<div class="col-md-6">
+	<div class="read-only">
+		 <h4>Documents</h4>
+		 <div class="read-only-text clearfix">
+		    <ul>
+				[% FOREACH doc IN registration.documents %]
+				<li><span>[% doc.strDocumentName %]:<br /></span> <b>[% doc.strOrigFilename %]</b></li>
+				[% END %]
+		    </ul>
+		    <a href="#" class="pull-right">Edit</a>
+	     </div>
+	</div>
+</div>
+[% END %]
+
+<!--<form action="[% target %]" method="POST">
+    <input type="hidden" name="a" value="c">
+[% FOREACH h IN  hidden_ref %]
+<input type="hidden" name="[% h.key %]" value="[% h.value %]">
+[% END %]
+<input type="submit" name="submit" value="[% Lang.txt('Submit to Member Association') %]" class = "button proceed-button"><br><br>
+            </form>
+-->
+</div>

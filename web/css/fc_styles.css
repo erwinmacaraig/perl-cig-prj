@@ -500,6 +500,7 @@ a.btn-inside-panels:hover {
 	font-size: 12px;
 }
 
+/* Table styles */
 table.table thead {
 	background: #d8d8d8;
 	border: 1px solid #ccc;
@@ -511,9 +512,33 @@ table.table tr td {
 	border-bottom: 1px solid #ccc;
 }
 
+table.table.tableboxheader tr td {
+	padding: 8px 15px;
+	border-bottom: 1px solid #ccc;
+}
+
 table.table tr td.align-right {
 	text-align: right;
 }
+
+table.table thead tr th {
+	background-color: #d8d8d8;
+	border-bottom:1px solid #ccc;
+	font-size: 16px;
+}
+
+table.table.tableboxheader thead tr th {
+	background-color: #004e7e;
+	border-bottom:1px solid #ccc;
+	font-size: 14px;
+    color: #fff;
+}
+
+table.table tr th {
+	padding:15px;
+	border-bottom:1px solid #ccc;
+}
+
 table.zebra tbody tr:nth-child(odd) {
     background-color:#ededed;
 }
@@ -1104,16 +1129,6 @@ header nav ul li a {
 }
 
 
-table.table thead tr th {
-	background: #d8d8d8;
-	border-bottom:1px solid #ccc;
-	font-size: 16px;
-}
-
-table.table tr th {
-	padding:15px;
-	border-bottom:1px solid #ccc;
-}
 
 .document-upload .document-notes p {
 	padding:0;
@@ -1180,6 +1195,7 @@ table.table tr th {
 }
 
 .button-row {
+	margin-top:20px;
 }
 
 .access-level {
@@ -1355,4 +1371,36 @@ a.paginate_button.previous, a.paginate_button.next, a.paginate_button {
 
 span.fa-user{
 	margin-top:3px;
+}
+
+.reg-complete-wrapper {
+	padding:10px;
+}
+
+.reg-complete-text {
+	float:left;
+	width: 50%;
+	fon
+}
+
+.reg-complete-buttons {
+	float:right;
+}
+
+.reg-complete-buttons p {
+	font-weight: bold;
+}
+
+.reg-complete-buttons ul {
+	list-style-type: none;
+}
+
+.reg-complete-buttons ul li {
+	margin-left: -40px;
+	margin-bottom: 5px;
+}
+
+.reg-complete-buttons ul li a {
+	width:100%;
+	text-align: center;
 }

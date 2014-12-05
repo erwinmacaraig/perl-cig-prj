@@ -82,7 +82,7 @@ sub doesUserHaveAccess  {
             return 1;
         }
         $entities{'WRITE'}{$dref->{'intEntityID'}} = 1 if $count == 1;
-        $entities{'WRITE'}{$dref->{'intRequestFromEntityID'}} = 1 if $count > 1;
+        $entities{'WRITE'}{$dref->{'intRequestFromEntityID'}} = 1 if $count >= 1;
         $entities{'READ'}{$dref->{'intEntityID'}} = 1;
         $entities{'READ'}{$dref->{'intRequestFromEntityID'}} = 1;
         $count++;

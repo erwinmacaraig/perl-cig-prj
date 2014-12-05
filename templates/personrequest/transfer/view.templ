@@ -5,12 +5,12 @@
             <h3 class = "panel-header">[% personFirstname %] [% personSurname %]</h3>
 				<div class="panel-body">
 
-				<p class="transfer-text">[% requestTo %] has requested a transfer for [% personFirstname %] [% personSurname %]. Please approve or reject the request.</p>
+				<p class="transfer-text">[% requestFrom %] has requested a transfer for [% personFirstname %] [% personSurname %]. Please approve or reject the request.</p>
 
 				<div class="alert">
 					<div>
 						<span class="fa fa-exclamation"></span>
-						<p>By approving you are giving access to all of [% personFirstname %] [% personSurname %] player details to [% requestTo %]</p>
+						<p>By approving you are giving access to all of [% personFirstname %] [% personSurname %] player details to [% requestFrom %]</p>
 					</div>
 				</div>
 
@@ -156,13 +156,11 @@
                         <input class="btn btn-main" type="submit" name="response" value="Accept">
                     </form>
                 
-                    <form action="[% RequestAction.target %]" method="POST" class="pull-left">
-                        <input type="hidden" name="client" value="[% RequestAction.client %]">
-                        <input type="hidden" name="request_type" value="[% RequestAction.request_type %]">
-                        <input type="hidden" name="a" value="[% RequestAction.action %]">
-                        <input type="hidden" name="rid" value="[% RequestAction.rid %]">
-                        <input class="btn btn-main" type="submit" name="response" value="Deny">
-                    </form>
+                    <div>
+                        <a class="btn-main transfer-deny" data-target="#showDenyRequestNotes" data-actiontype="DENY" href = "">
+                            [% Lang.txt('Deny') %]
+                        </a>
+                    </div>
                 [% END %]
 
             </div>
@@ -210,3 +208,60 @@
         </div>
 	</div>
 </div>
+
+<div class="modal fade" id="showDenyRequestNotes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" style="z-index:9999;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">[% Lang.txt('Transfer rejected') %]</h4>
+      </div>
+      
+      <form id="personRequestNotes" action="[% RequestAction.target %]" method="POST">
+          <div class="modal-body">
+            <label>[% Lang.txt("Please specify why transfer was rejected. All documents will be available for all parties involved.") %]</label>
+            <textarea name="request_notes"></textarea>
+          </div>
+
+          <div id="hiddenfields" style="display: none">
+                <input type="hidden" name="client" value="[% RequestAction.client %]">
+                <input type="hidden" name="request_type" value="[% RequestAction.request_type %]">
+                <input type="hidden" name="a" value="[% RequestAction.action %]">
+                <input type="hidden" name="rid" value="[% RequestAction.rid %]">
+                <input type="hidden" name="response" value="Deny">
+          </div>
+
+          <div class="modal-footer">
+            <a class="btn-main" data-dismiss="modal">Close</a>
+            <input class="btn-main" type="submit" name="submit" value="submit">
+          </div>
+      </form>
+      
+    </div>
+  </div>
+</div>
+
+
+<script src = "//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+<script type="text/javascript">
+    jQuery().ready(function() {
+        
+        jQuery("a.transfer-deny").click(function(e){
+            e.preventDefault();
+
+            jQuery("div#showDenyRequestNotes").modal();
+        });
+        // validate the comment form when it is submitted
+        jQuery("#personRequestNotes").validate({
+            rules: {
+                request_notes: {
+                    required: true
+                }
+            },
+            messages: {
+                request_notes: "Please add notes."
+            }
+        });
+    });
+</script>
+

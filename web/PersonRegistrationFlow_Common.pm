@@ -2,6 +2,7 @@ package PersonRegistrationFlow_Common;
 require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = @EXPORT_OK = qw(
+    displayRegoFlowSummary
     displayRegoFlowComplete
     displayRegoFlowCompleteBulk
     displayRegoFlowCheckout
@@ -77,6 +78,109 @@ sub displayRegoFlowCompleteBulk {
 }
 
 
+sub displayRegoFlowSummary {
+
+    my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref) = @_;
+    my $lang=$Data->{'lang'};
+
+    my $ok = 0;
+    if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER') {
+        $ok=1;
+    }
+    else    {
+        $ok = checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
+    }
+    my $body = '';
+    if (!$ok)   {
+        my $error = $lang->txt("You cannot register this combination, limit exceeded");
+        my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_T";
+        my %PageData = (
+            return_url => $url,
+            error => $error,
+            target => $Data->{'target'},
+            Lang => $lang,
+            client => $client,
+        );
+        $body = runTemplate($Data, \%PageData, 'registration/error.templ') || '';
+    }
+    if ($ok)   {
+        my @products= split /:/, $hidden_ref->{'prodIds'};
+        foreach my $prod (@products){ $hidden_ref->{"prod_$prod"} =1;}
+        my @productQty= split /:/, $hidden_ref->{'prodQty'};
+        foreach my $prodQty (@productQty){ 
+            my ($prodID, $qty) = split /-/, $prodQty;
+            $hidden_ref->{"prodQTY_$prodID"} =$qty;
+        }
+        #($hidden_ref->{'txnIds'}, undef) = save_rego_products($Data, $regoID, $personID, $entityID, $rego_ref->{'entityLevel'}, $rego_ref, $hidden_ref); #\%params);
+
+        my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
+        my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
+        my $gateways = '';
+	 	my $txnCount = 0;
+		my $logIDs;
+		my $txn_invoice_url = $Defs::base_url."/printinvoice.cgi?client=$client&amp;rID=$hidden_ref->{'rID'}&amp;pID=$personID";
+        ($txnCount, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
+         if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
+            $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
+         }
+         
+          
+	    my $personObj = getInstanceOf($Data, 'person');
+		
+		
+		my %personData = ();
+		$personData{'Name'} = $personObj->getValue('strLocalFirstname');
+        $personData{'Familyname'} = $personObj->getValue('strLocalSurname');
+		$personData{'DOB'} = $personObj->getValue('dtDOB');
+		$personData{'Gender'} = $Data->{'lang'}->txt($Defs::genderInfo{$personObj->getValue('intGender') || 0}) || '';
+		$personData{'Nationality'} = $personObj->getValue('strISONationality');
+		$personData{'Country'} = $personObj->getValue('strISOCountryOfBirth') || '';
+		$personData{'Region'} = $personObj->getValue('strRegionOfBirth') || '';
+
+		$personData{'Addressone'} = $personObj->getValue('strAddress1') || '';
+		$personData{'Addresstwo'} = $personObj->getValue('strAddress2') || '';
+		$personData{'City'} = $personObj->getValue('strSuburb') || '';
+		$personData{'State'} = $personObj->getValue('strState') || '';
+		$personData{'Postal'} = $personObj->getValue('strPostalCode') || '';
+		$personData{'Phone'} = $personObj->getValue('strPhoneHome') || '';
+		$personData{'Countryaddress'} = $personObj->getValue('strISOCountry') || '';
+		$personData{'Email'} = $personObj->getValue('strEmail') || '';
+		
+		#$personData{''} = $personObj->getValue('') || '';
+
+
+ 		my $languages = PersonLanguages::getPersonLanguages( $Data, 1, 0);
+		for my $l ( @{$languages} ) {
+			if($l->{intLanguageID} == $personObj->getValue('intLocalLanguage')){
+				$personData{'Language'} = $l->{'language'};			
+				last;	
+			}
+		}
+	
+        my %PageData = (
+            person_home_url => $url,
+			person => \%personData,
+			registration => $rego_ref,
+            gateways => $gateways,
+			txnCount => $txnCount,
+            target => $Data->{'target'},
+            RegoStatus => $rego_ref->{'strStatus'},
+            hidden_ref=> $hidden_ref,
+            Lang => $Data->{'lang'},
+            client=>$client,
+        );
+        
+        $body = runTemplate($Data, \%PageData, 'registration/summary.templ') || '';
+        my $logID = param('tl') || 0;
+        $logIDs->{$logID}=1;
+        foreach my $id (keys %{$logIDs}) {
+            next if ! $id;
+       #     $body .= displayPayResult($Data, $id);
+            $body .= displayPaymentResult($Data, $id, 1, '');
+        }
+    }
+    return $body;
+}
     
 sub displayRegoFlowComplete {
 
@@ -435,8 +539,7 @@ sub displayRegoFlowDocuments{
 	my @required_docs_listing = ();
 	my @optional_docs_listing = ();	
 
-	open FH, ">dumpfile.txt";
-	print FH Dumper(@diff);
+	
 	foreach my $dc (@diff){   
 		if($dc->{'Required'}){
 			push @required_docs_listing, $dc;

@@ -105,12 +105,12 @@ $(document).ready(function(){
 
     });
 
-    $("form#personInitRequest").submit(function(e){
-        if($(this).find("input[type=checkbox]:checked").length == 0){
-            e.preventDefault();
-            $("div#init_error").slideDown();
-        }
-    });
+    //$("form#personInitRequest").submit(function(e){
+    //    if($(this).find("input[type=checkbox]:checked").length == 0){
+    //        e.preventDefault();
+    //        $("div#init_error").slideDown();
+    //    }
+    //});
 
     jQuery('kkselect.fcToggleGroup').each(function() {
         var s = jQuery(this);

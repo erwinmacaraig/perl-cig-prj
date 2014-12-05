@@ -127,10 +127,16 @@ sub setProcessOrder {
             'function' => 'process_products',
         },
        {
+            'action' => 'summ',
+            'function' => 'display_summary',
+            'label'  => 'Summary',
+            'title'  => 'Registration - Summary',
+        },
+       {
             'action' => 'c',
             'function' => 'display_complete',
             'label'  => 'Complete',
-            'title'  => 'Registration - Summary',
+            'title'  => 'Registration - Submitted',
         },
     ];
 }
@@ -1066,6 +1072,78 @@ sub process_documents {
     return ('',1);
 }
 
+sub display_summary { 
+    my $self = shift;
+    my $personObj;
+    my $personID = $self->ID();
+    if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
+        return ('Invalid User',0);
+    }
+    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
+    my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
+    my $regoID = $self->{'RunParams'}{'rID'} || 0;
+    my $client = $self->{'Data'}->{'client'};
+
+    my $rego_ref = {};
+    my $content = '';
+    if($regoID) {
+        my $valid =0;
+        ($valid, $rego_ref) = validateRegoID(
+            $self->{'Data'}, 
+            $personID, 
+            $regoID, 
+            $entityID
+        );
+        $regoID = 0 if !$valid;
+    }
+
+    if($regoID) {
+        $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
+        $personObj->load();
+        my $nationality = $personObj->getValue('strISONationality') || ''; 
+        $rego_ref->{'Nationality'} = $nationality;
+
+        my $hiddenFields = $self->getCarryFields();
+        $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
+        $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
+        $content = displayRegoFlowSummary(
+            $self->{'Data'}, 
+            $regoID, 
+            $client, 
+            $originLevel, 
+            $rego_ref, 
+            $entityID, 
+            $personID, 
+            $hiddenFields,
+			
+        );
+    }
+    else    {
+        push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
+    }
+    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+        #There are errors - reset where we are to go back to the form again
+        $self->decrementCurrentProcessIndex();
+        return ('',2);
+    }
+    my %PageData = (
+        HiddenFields => $self->stringifyCarryField(),
+        Target => $self->{'Data'}{'target'},
+        Errors => $self->{'RunDetails'}{'Errors'} || [],
+        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
+        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        Content => '',
+        Title => '',
+        TextTop => $content,
+        TextBottom => '',
+        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+    );
+    my $pagedata = $self->display(\%PageData);
+
+    return ($pagedata,0);
+
+}
 
 sub display_complete { 
     my $self = shift;
@@ -1145,8 +1223,9 @@ print STDERR "RRRRRRRRULES RUNNINGS\n";
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
-        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        #FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
+        #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        processStatus => 1,
         Content => '',
         Title => '',
         TextTop => $content,

@@ -42,8 +42,10 @@
                 count++;
             }
         });
-        jQuery('#' + ele_id).remove();
-        if(count == 1)  {
+        if(count > 4)  {
+            return '';
+        }
+        else if(count == 1)  {
             jQuery(s).after('<span id = "' + ele_id + '" >' + lastText + '</span>');
         }
         else    {
@@ -54,10 +56,21 @@
     }
 
 
-    function build(s) {
-        var ele_id = createNewElement(s);
+    function remove(s) {
+        var name = s.attr('name');
+        var ele_id = 'toggleG' + name;
+        jQuery('#' + ele_id).remove();
         jQuery('#' + ele_id).off("click.fcToggle","a");
         jQuery(s).off("change.fcToggle");
+        jQuery(s).show();
+    }
+
+    function build(s) {
+        remove(s);
+        var ele_id = createNewElement(s);
+        if(ele_id == '') {
+            return false;
+        }
         jQuery('#' + ele_id).on("click.fcToggle", "a", function(e)   {
             if(!jQuery(this).hasClass('active')) {
                 val = jQuery(this).attr('data-val');

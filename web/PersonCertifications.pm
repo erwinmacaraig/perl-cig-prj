@@ -24,10 +24,6 @@ sub handleCertificates {
 	my $resultHTML='' ;
 	#Get Certification of Person Based on Certificate ID
 	my $intCertificationID = param('certID') || 0;
-	open(FH, ">$Defs::myerrorfile");
-    print FH "\n===================\n intCertificationID is $intCertificationID \n=========================\n\n";
-    close FH;
-    #print FH "\n\n======================\nALL POSTED DATA \n" . Dumper($postedData) . "\n=================\n";
     
 	my $cert_fields = loadCertificationDetails($Data,$intCertificationID);
 	my $option;
@@ -105,7 +101,7 @@ sub handleCertificates {
 	my $title='List Of Certifications';
 	my $addlink='';
     {
-      $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=P_CERT_A">].$Data->{'lang'}->txt('Add').qq[</a></span>] if(!$Data->{'ReadOnlyLogin'});
+      $addlink=qq[<a href="$Data->{'target'}?client=$client&amp;a=P_CERT_A" class = "btn-main">].$Data->{'lang'}->txt('Add Certification').qq[</a>] if(!$Data->{'ReadOnlyLogin'});
 
     }
 	my $modoptions=qq[<div class="changeoptions">$addlink</div>];
@@ -215,7 +211,7 @@ sub handleCertificates {
 		
 		 
 	
-   ($resultHTML, undef )=handleHTMLForm(\%FieldDefinitions, undef, $option, 0, $Data->{'db'});	
+   ($resultHTML, undef )=handleHTMLForm(\%FieldDefinitions, undef, $option, 1, $Data->{'db'});	
   
    
  

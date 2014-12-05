@@ -189,17 +189,52 @@ sub getTransfer {
                 tblPerson.dtDOB,
                 E.strLocalName AS EntityName,
                 E.intEntityID,
-                E.intEntityLevel
+                E.intEntityLevel,
+                PRQinprogress.intPersonRequestID as existingInProgressRequestID,
+                PRQaccepted.intPersonRequestID as existingAcceptedRequestID,
+                PRQactive.intPersonRequestID as existingPersonRegistrationID,
+                ePR.intPersonRegistrationID as existingPendingRegistrationID
             FROM
             tblPerson
             INNER JOIN tblPersonRegistration_$realmID AS PR ON (
                 tblPerson.intPersonID = PR.intPersonID
                 AND PR.strStatus IN ('ACTIVE', 'PASSIVE','PENDING')
+                AND
+                    (PR.strPersonType = 'PLAYER')
                 AND PR.intEntityID <> $filters->{'club'}
             )
             INNER JOIN tblEntity AS E ON (
                 PR.intEntityID = E.intEntityID
             )
+            LEFT JOIN tblPersonRequest AS PRQinprogress ON (
+                PRQinprogress.strRequestType = "TRANSFER"
+                AND PRQinprogress.intPersonID = tblPerson.intPersonID
+                AND PRQinprogress.strSport =  PR.strSport
+                AND PRQinprogress.strPersonType = PR.strPersonType
+                AND PRQinprogress.strRequestStatus = "INPROGRESS" AND PRQinprogress.strRequestResponse IS NULL
+                AND PRQinprogress.intRequestFromEntityID = "$clubID"
+            )
+            LEFT JOIN tblPersonRequest AS PRQaccepted ON (
+                PRQaccepted.strRequestType = "TRANSFER"
+                AND PRQaccepted.intPersonID = tblPerson.intPersonID
+                AND PRQaccepted.strSport =  PR.strSport
+                AND PRQaccepted.strPersonType = PR.strPersonType
+                AND PRQaccepted.strRequestStatus = "PENDING" AND PRQaccepted.strRequestResponse = "ACCEPTED"
+                AND PRQaccepted.intRequestFromEntityID = "$clubID"
+            )
+            LEFT JOIN tblPersonRegistration_$realmID ePR
+            ON (
+                ePR.intEntityID = "$clubID"
+                AND ePR.intPersonID = tblPerson.intPersonID
+                AND ePR.intRealmID = tblPerson.intRealmID
+                AND ePR.strStatus IN ('PENDING')
+                AND ePR.strSport = PR.strSport
+                AND ePR.strPersonType = PR.strPersonType
+            )
+            LEFT JOIN tblPersonRequest as PRQactive
+            ON  (
+                PRQactive.intPersonRequestID = PR.intPersonRequestID
+                )
             WHERE tblPerson.intPersonID IN ($person_list)
             ORDER BY 
                 strLocalSurname, 
@@ -213,8 +248,10 @@ sub getTransfer {
         my $target = $self->getData()->{'target'};
         my $client = $self->getData()->{'client'};
         while(my $dref = $q->fetchrow_hashref()) {
+            print STDERR Dumper $dref;
             $count++;
             my $name = "$dref->{'strLocalFirstname'} $dref->{'strLocalSurname'}" || '';
+            my $acceptedRequestLink = ($dref->{'existingAcceptedRequestID'}) ? "$target?client=$client&amp;a=PRA_V&rid=$dref->{'existingAcceptedRequestID'}" : '';
             push @memarray, {
                 id => $dref->{'intPersonID'} || next,
                 name => $name,
@@ -223,7 +260,10 @@ sub getTransfer {
                     dob => $dref->{'dtDOB'},
                     dtadded => $dref->{'dtadded'},
                     ma_id => $dref->{'strNationalNum'} || '',
-                }
+                },
+                inProgressRequestExists => $dref->{'existingInProgressRequestID'},
+                acceptedRequestLink => $acceptedRequestLink,
+                submittedPersonRegistrationExists => $dref->{'existingPendingRegistrationID'},
             };
         }
 
