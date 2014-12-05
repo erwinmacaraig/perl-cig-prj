@@ -1,14 +1,6 @@
 <div class="document-upload">
 	<!-- display document upload information --> 
 
-[% IF approveddocs.size %]
-<div class="sectionheader">Approved Documents</div> 
-<ul>
-[% FOREACH apprdocs IN approveddocs %] 
-<li>[% apprdocs.Name %]</li>
-[% END %]
-</ul>
-[% END %]
 <div class="sectionheader">Required Documents</div> 
 
 <div class="document-notes">
@@ -52,21 +44,47 @@
 </div>
 
 
-<br /><br />
-[% IF personleveldocs.size %]
-    <div class="sectionheader">Other Documents</div> 
-
-	[% FOREACH doc IN personleveldocs %] 
-		<p> [% doc.Name %] </p> 
-		<form action="[% target %]" method="POST" class="dropzone">
-		<input type="hidden" name="doctypeID" value="[% doc.ID %]" />
-		<input type="hidden" name="a" value="[% nextaction %]" />
-		[% FOREACH h IN hidden_ref %]
-			[% NEXT IF h.key == 'rID' %]
-			<input type="hidden" name="[% h.key %]" value="[% h.value %]" />
+[% IF optionaldocs.size %]
+<div class="sectionheader">Optional Documents</div> 
+<div class="document-notes">
+	<table class="table documents-table">
+		[% index = 0 %]
+		[% FOREACH doc IN optionaldocs %]
+		[% index = index + 1 %]
+			<tr>
+				<td>
+					<div>
+						<p><strong>Title:</strong> 
+						[% doc.Name %]
+						</p>
+						
+						[% IF doc.Description != '' %]
+						
+						<p><strong>Description: </strong>
+							[% doc.Description %]
+						</p>
+					
+						[% END %]
+					</div>
+				</td>
+				<td style="width:50%;">
+					<form action="uploadregofile.cgi" method="POST" class="dropzone" enctype="multipart/form-data">
+						<input type="hidden" name="client" value="[% client %]" />
+						<input type="hidden" name="rID" value="[% regoID %]" />
+						<input type="hidden" name="doctypeID" value="[% doc.ID %]" />
+						<input type="hidden" name="a" value="[% nextaction %]" />
+					
+						[% FOREACH h IN hidden_ref %]
+						
+						<input type="hidden" name="[% h.key %]" value="[% h.value %]" />
+						
+						[% END %]
+					</form>
+				</td>
+			</tr>
 		[% END %]
-		</form>
-	[% END %] 
+	</table>
+</div>
 
 [% END %]
 

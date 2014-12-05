@@ -324,7 +324,7 @@ sub checkUploadedRegoDocuments {
 	
 	my @required = ();
     foreach my $dc (@{$documents}){ 
-		if(($dc->{'DocumentFor'} eq 'TRANSFERITC' and $rego_ref->{'InternationalTransfer'}) or $dc->{'DocumentFor'} ne 'TRANSFERITC') {
+		if( $dc->{'Required'} ) {
 			push @required,$dc;
 		}		
 	}
@@ -340,7 +340,9 @@ sub checkUploadedRegoDocuments {
     #there are no required documents to be uploaded
 
    my $query = qq[SELECT distinct(strDocumentName) FROM tblDocuments INNER JOIN tblDocumentType
-					ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intPersonID = ? AND 						tblDocuments.intPersonRegistrationID = ?];
+					ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID 
+					INNER JOIN tblRegistrationItem ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID WHERE
+					tblDocuments.intPersonID = ? AND tblDocuments.intPersonRegistrationID = ? AND tblRegistrationItem.intRequired = 1];
     
    my @uploaded_docs = ();
    my $sth = $Data->{'db'}->prepare($query);
@@ -354,7 +356,7 @@ sub checkUploadedRegoDocuments {
 	
 
     #return 1 if( ($dref->{'tot'} > 0) && $dref->{'tot'} == $total_items);
-	return ('',1) if($#uploaded_docs == $total);   
+	#return ('',1) if($#uploaded_docs == $total);   
 
 	#check for document not uploaded
 	foreach my $rdc (@required){
@@ -364,8 +366,7 @@ sub checkUploadedRegoDocuments {
 	}
 	
 	my $error_message = '<p><br /><ul>';
-	foreach my $d (@diff){
-		
+	foreach my $d (@diff){		
 		$error_message .= qq[<li> $d </li>]; 
 	}
    
@@ -376,8 +377,7 @@ sub checkUploadedRegoDocuments {
 	return ($error_message, 0) if (@diff);
 	return('',1);
 }
-sub displayRegoFlowDocuments    {
-
+sub displayRegoFlowDocuments{
     my ($Data, $regoID, $client, $entityRegisteringForLevel, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref, $noFormFields) = @_;
     my $lang=$Data->{'lang'};
 	$hidden_ref->{'pID'} = $personID;
@@ -415,13 +415,11 @@ sub displayRegoFlowDocuments    {
 	
 	my @diff = ();	
 		
-	#compare whats in the system and what is required
-	foreach my $doc_ref (@{$documents}){
-		
+	#compare whats in the system and what docos are missing both required and optional
+	foreach my $doc_ref (@{$documents}){		
 		if(!grep /$doc_ref->{'ID'}/,@uploaded_docs){
 			push @diff,$doc_ref;	
 		}
-		
 	}
 
     my %PersonRef = ();
@@ -430,73 +428,30 @@ sub displayRegoFlowDocuments    {
     my $personRegoNature = 'NEW';
     my $pref = loadPersonDetails($Data->{'db'}, $personID);
 
-    if ($pref->{'strStatus'} ne $Defs::PERSON_STATUS_INPROGRESS)    {
+    if ($pref->{'strStatus'} ne $Defs::PERSON_STATUS_INPROGRESS){
         $personRegoNature = 'RENEWAL';
     }
-    my $personLeveldocs = getRegistrationItems(
-        $Data,
-        'PERSON',
-        'DOCUMENT',
-        $originLevel,
-        $personRegoNature,
-        $entityID,
-        $entityRegisteringForLevel,
-        0,
-        \%PersonRef,
-     );
+    
+	my @required_docs_listing = ();
+	my @optional_docs_listing = ();	
 
-     my $transferdocs  = '';
-     
-    if (1==2)   {
-        $transferdocs  = getRegistrationItems(
-            $Data,
-            'TRANSFER',
-            'DOCUMENT',
-            $originLevel,
-            $personRegoNature,
-            $entityID,
-            $entityRegisteringForLevel,
-            0,
-            \%PersonRef,
-        );
+	open FH, ">dumpfile.txt";
+	print FH Dumper(@diff);
+	foreach my $dc (@diff){   
+		if($dc->{'Required'}){
+			push @required_docs_listing, $dc;
+		}  	
+		else {
+			push @optional_docs_listing,$dc;
+		}
+    	
     }
-     
-    ### FOR FILTERING 
-   
-	my %approved_docs = (); 
-	my @listing = ();
-    my $db = $Data->{'db'}; 
-	my $query = qq[SELECT intDocumentTypeID FROM tblDocuments WHERE strApprovalStatus = ? AND intPersonID = ?  GROUP BY intDocumentTypeID]; 
-	my $sth = $db->prepare($query); 
-	$sth->execute('APPROVED',$personID);
-		
-	while(my @approved_doc_arr = $sth->fetchrow_array()){
-		$approved_docs{ $approved_doc_arr[0] } = 'APPROVED';
-	}	
-	#foreach my $dc (@{$documents}){ 
-	foreach my $dc (@diff){ 
-    	#next if(exists $approved_docs{$dc->{'ID'}} && $dc->{'UseExistingAnyEntity'});
-    	#push @docos,$dc;
-    	if(exists $approved_docs{$dc->{'ID'}} && $dc->{'UseExistingAnyEntity'}){
-    		push @listing,$dc;
-    	}
-    	elsif(($dc->{'DocumentFor'} eq 'TRANSFERITC' and $rego_ref->{'InternationalTransfer'}) or $dc->{'DocumentFor'} ne 'TRANSFERITC') {
-            push @docos,$dc;	
-    	}
-    }
-     
-     #END OF FILTERING 
-     ######################
-
-
     
   my %PageData = (
         nextaction => "PREGF_DU",
         target => $Data->{'target'},
-        documents => \@docos,
-        approveddocs => \@listing, 
-        personleveldocs => $personLeveldocs,
-        transferdocs=> $transferdocs,
+        documents => \@required_docs_listing,
+		optionaldocs => \@optional_docs_listing,
         hidden_ref => $hidden_ref,
         Lang => $Data->{'lang'},
         client => $client,
