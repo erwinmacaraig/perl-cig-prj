@@ -539,10 +539,23 @@ sub displayRegoFlowDocuments{
     
 	my @required_docs_listing = ();
 	my @optional_docs_listing = ();	
+	my @validdocsforallrego = ();
+	$query = qq[SELECT tblDocuments.intDocumentTypeID FROM tblDocuments INNER JOIN tblDocumentType
+				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
+				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
+				WHERE strApprovalStatus = 'APPROVED' AND intPersonID = ? AND 
+				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+				GROUP BY intDocumentTypeID];
+	$sth = $Data->{'db'}->prepare($query);
+	$sth->execute($personID);
+	while(my $dref = $sth->fetchrow_hashref()){
+		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
+	}
 
-	
 	foreach my $dc (@diff){   
 		if($dc->{'Required'}){
+			#check here 
+			next if( grep /$dc->{'ID'}/,@validdocsforallrego);
 			push @required_docs_listing, $dc;
 		}  	
 		else {
