@@ -441,8 +441,6 @@ sub listTasks {
             $ruleForType = $dref->{'strRegistrationNature'} . "_" . $dref->{'strPersonType'};
         }
 
-        print STDERR Dumper $ruleForType;
-
 	 my %single_row = (
 			WFTaskID => $dref->{intWFTaskID},
             TaskDescription => $taskDescription,
@@ -525,7 +523,7 @@ sub listTasks {
 
             my $taskStatusLabel = $request->{'strRequestResponse'} ? $Defs::personRequestStatus{$request->{'strRequestResponse'}} : $Defs::personRequestStatus{'PENDING'};
             my %personRequest = (
-                personRequestLabel => $Defs::personReques{$request->{'strRequestType'}},
+                personRequestLabel => $Defs::personRequest{$request->{'strRequestType'}},
                 TaskType => $request->{'strRequestType'},
                 TaskDescription => $Data->{'lang'}->txt('Person Request'),
                 Name => $name,
@@ -538,17 +536,17 @@ sub listTasks {
                 requestTo => $request->{'requestTo'},
             );
 
-            if(!($Defs::personReques{$request->{'strRequestType'}} ~~ @taskType)){
-                push @taskType, $Defs::personReques{$request->{'strRequestType'}};
+            if(!($Defs::personRequest{$request->{'strRequestType'}} ~~ @taskType)){
+                push @taskType, $Defs::personRequest{$request->{'strRequestType'}};
             }
 
             if(!($taskStatusLabel ~~ @taskStatus)){
                 push @taskStatus, $taskStatusLabel;
             }
 
-            #print STDERR Dumper \%personRequest;
             push @TaskList, \%personRequest;
         }
+
     }
 
 	my $msg = '';
@@ -584,7 +582,7 @@ sub listTasks {
 	);
 
 
-	return($body,$Data->{'lang'}->txt('Registration Authorisation'));
+	return($body,$Data->{'lang'}->txt('Dashboard'));
 }
 
 sub getEntityParentID   {
@@ -2077,8 +2075,6 @@ sub viewTask {
         'venueID' => ($dref->{'intEntityLevel'} == $Defs::LEVEL_VENUE) ? $dref->{'intEntityID'} : 0,
         'disableApprove' => $disableApprove,
     );
-
-    print STDERR Dumper %TaskAction;
 
     my $paymentBlock = '';
     if ($dref->{strWFRuleFor} eq 'REGO')    {
