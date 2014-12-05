@@ -855,7 +855,7 @@ sub listRequests {
 sub viewRequest {
     my ($Data) = @_;
 
-    my $requestID = safe_param('rid', 'number') || 0;
+    my $requestID = safe_param('rid', 'number') || -1;
 	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
     my $requestType = undef;
     my $action = undef;
@@ -870,13 +870,17 @@ sub viewRequest {
 
     my $title = $Defs::personRequest{$request->{'strRequestType'}};
 
-    return ("Request not found.", $title) if !$request;
+    #checking of who can only access what request is already handled in the getRequests query
+    # e.g. if requestTo already accepted the request, it would be able to view it again as the $request will be empty
+    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Person Request not found.")) if scalar(%{$request}) == 0;
 
     my $templateFile = undef;
-    print STDERR Dumper $request;
     switch($request->{'strRequestType'}) {
         case "$Defs::PERSON_REQUEST_TRANSFER" {
-            if($request->{'intPersonRegistrationID'} and $request->{'personRegoStatus'} eq $Defs::PERSONREGO_STATUS_PENDING) {
+            print STDERR Dumper $request->{'strRequestResponse'};
+            print STDERR Dumper $request->{'intPersonRequestID'};
+            print STDERR Dumper $Defs::PERSONREGO_STATUS_ACCEPTED;
+            if($request->{'intPersonRequestID'} and $request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_STATUS_ACCEPTED) {
                 $templateFile = "personrequest/transfer/new_club_view.templ";
             }
             else {
@@ -1089,7 +1093,8 @@ sub setRequestResponse {
     my $body = '';
     my $title = '';
 
-    if(scalar(%{$request}) == 0) {
+    print STDERR Dumper $request;
+    if(scalar(%{$request}) == 0 or $request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_STATUS_DENIED) {
         return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Response has been submitted already."));
     }
     else {
@@ -1152,7 +1157,7 @@ sub getRequests {
     my ($Data, $filter) = @_;
 
     my $where = '';
-    my $personRegoJoin = " LEFT JOIN tblPersonRegistration_$Data->{'Realm'} pr ON (pr.intPersonRequestID = pq.intPersonRequestID AND pr.intEntityID = intRequestFromEntityID) ";
+    my $personRegoJoin = " LEFT JOIN tblPersonRegistration_$Data->{'Realm'} pr ON (pr.intPersonRequestID = pq.intPersonRequestID AND pr.intEntityID = intRequestFromEntityID AND pr.strStatus <> 'ROLLED_OVER') ";
     my @values = (
         $Data->{'Realm'}
     );
