@@ -272,7 +272,14 @@ print STDERR "OK IS $ok | $run\n\n";
 				last;	
 			}
 		}
-	
+	   my $clubReg = getLastEntityID($Data->{'clientValues'});
+       my $cl = setClient($Data->{'clientValues'}) || '';
+       my %cv = getClient($cl);
+       #$cv{'clubID'} = $rego_ref->{'intEntityID'};
+       $cv{'clubID'} = $clubReg;
+       $cv{'currentLevel'} = $Defs::LEVEL_CLUB;
+       my $clm = setClient(\%cv);
+
         my %PageData = (
             person_home_url => $url,
 			person => \%personData,
@@ -283,7 +290,8 @@ print STDERR "OK IS $ok | $run\n\n";
             RegoStatus => $rego_ref->{'strStatus'},
             hidden_ref=> $hidden_ref,
             Lang => $Data->{'lang'},
-            client=>$client,
+            url => $Defs::base_url,
+            client=>$clm,
         );
         
         $body = runTemplate($Data, \%PageData, 'registration/complete.templ') || '';
