@@ -761,7 +761,7 @@ sub person_details {
     for my $c (@countries) {
         $countriesonly{$c} = $c;
     }
-    my $countries = getCountriesHash($Data);
+     my $countries = getCountriesHash($Data);
      my $isocountries = getISOCountriesHash();
 
     my ($DefCodes, $DefCodesOrder) = getDefCodes(
