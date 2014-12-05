@@ -40,7 +40,7 @@
         </div>
 
   			<ul>
-  				<li>[% Lang.txt('Welcome') %] <a href="#" title="">[% Data.UserName %] <span class="fa fa-caret-down"></span></a></li>
+  				<li>[% Lang.txt('Welcome') %] <a href="#" title="">[% Data.UserName %]<span class="fa fa-caret-down"></span></a></li>
   				<li><a href ="http://support.sportingpulse.com">[% Lang.txt('Help') %]</a></li>
   				<li><a href="user/logout.cgi" title="[% Lang.txt('Logout') %]">[% Lang.txt('Logout') %]</a></li>
   			</ul>
@@ -61,6 +61,14 @@
             Email: <strong>ma@ma.com</strong><br/>
             Website: <strong>www.ma.com</strong>
           </li>
+          [% IF Data.ELevel == 3 %]
+          <li>
+            <strong>Club Contact </strong><br/>
+            Phone: <strong>[% Data.Phone %]</strong><br/>
+            Email: <strong>[% Data.Email %]</strong><br/>
+            Website: <strong>[% Data.WebURL %]</strong>
+          </li>
+          [% END %]
           <li>
             <strong>Help Desk</strong><br/>
             Phone: <strong>4567 8658 689</strong><br/>
