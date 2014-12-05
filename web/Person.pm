@@ -757,12 +757,6 @@ sub person_details {
     my $natnumname = $Data->{'SystemConfig'}{'NationalNumName'} || 'National Number';
     my $FieldLabels   = FieldLabels::getFieldLabels( $Data, $Defs::LEVEL_PERSON );
 
-    my @countries     = getCountriesArray($Data);
-    my %countriesonly = ();
-    for my $c (@countries) {
-        $countriesonly{$c} = $c;
-    }
-     my $countries = getCountriesHash($Data);
      my $isocountries = getISOCountriesHash();
 
     my ($DefCodes, $DefCodesOrder) = getDefCodes(

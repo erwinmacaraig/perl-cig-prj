@@ -308,6 +308,10 @@ label {
     font-size: 14px;
     color: #000;
 }
+
+strong {
+	font-family:'noto_sansregular';
+}
  
 .txtright {
 	text-align: right;
@@ -1373,6 +1377,10 @@ span.fa-user{
 	margin-top:3px;
 }
 
+.reg-complete-summary-left-bar {
+	margin-left: -15px;
+}
+
 .reg-complete-wrapper {
 	padding:10px;
 }
@@ -1380,7 +1388,6 @@ span.fa-user{
 .reg-complete-text {
 	float:left;
 	width: 50%;
-	fon
 }
 
 .reg-complete-buttons {
