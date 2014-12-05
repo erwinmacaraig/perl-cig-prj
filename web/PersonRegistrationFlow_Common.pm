@@ -241,9 +241,8 @@ print STDERR "OK IS $ok | $run\n\n";
             $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
          }
          
-          
+       
 	    my $personObj = getInstanceOf($Data, 'person');
-		
 		
 		my %personData = ();
 		$personData{'Name'} = $personObj->getValue('strLocalFirstname');
