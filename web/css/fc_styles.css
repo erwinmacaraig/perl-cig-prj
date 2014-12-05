@@ -1438,3 +1438,23 @@ span.fa-user{
 	margin-top: 20px;
 	padding:5px;
 }
+
+span.circleBg {
+	background: #d8d8d8;
+	-moz-border-radius :70px;
+	-webkit-border-radius :70px;
+	border-radius :70px;
+	position:relative;
+	left:8px;
+}
+
+
+i.documents-incomplete {
+	display:none;
+}
+
+i.documents-complete {
+	color: #1baf37;
+	margin-left:3px;
+	margin-right:4px;
+}

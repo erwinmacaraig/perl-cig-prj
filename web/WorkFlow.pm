@@ -2104,7 +2104,7 @@ sub viewTask {
 
     my ($NotesData) = populateTaskNotesViewData($Data, $dref);
     %NotesData = %{$NotesData};
-
+    $DocumentData{'TotalPending'} = $documentStatusCount->{'PENDING'};
     my $documentBlock = runTemplate(
         $Data,
         \%DocumentData,
