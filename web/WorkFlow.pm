@@ -293,6 +293,7 @@ sub listTasks {
             pr.strPersonLevel,
             pr.strAgeLevel,
             pr.strSport,
+            pr.strPersonType,
             t.strRegistrationNature,
             DATE_FORMAT(t.tTimeStamp,'%d %b %Y') AS taskDate,
             dt.strDocumentName,
@@ -311,10 +312,15 @@ sub listTasks {
             t.intApprovalEntityID,
             t.intProblemResolutionEntityID,
             t.strTaskNotes as TaskNotes,
-            t.intOnHold as OnHold
+            t.intOnHold as OnHold,
+            preqFrom.strLocalName as preqFromClub,
+            preqTo.strLocalName as preqToClub
 	    FROM tblWFTask AS t
                 LEFT JOIN tblEntity as e ON (e.intEntityID = t.intEntityID)
 		LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (t.intPersonRegistrationID = pr.intPersonRegistrationID)
+		LEFT JOIN tblPersonRequest AS preq ON (preq.intPersonRequestID = pr.intPersonRequestID)
+		LEFT JOIN tblEntity AS preqFrom ON (preqFrom.intEntityID = preq.intRequestFromEntityID)
+		LEFT JOIN tblEntity AS preqTo ON (preqTo.intEntityID = preq.intRequestToEntityID)
 		LEFT JOIN tblPerson AS p ON (t.intPersonID = p.intPersonID)
 		LEFT JOIN tblUserAuthRole AS uar ON ( t.intApprovalEntityID = uar.entityID )
 		LEFT OUTER JOIN tblDocumentType AS dt ON (t.intDocumentTypeID = dt.intDocumentTypeID)
@@ -365,7 +371,9 @@ sub listTasks {
 	my $rowCount = 0;
 
     my $client = unescape($Data->{client});
+    my $taskTypeLabel = "";
 	while(my $dref= $q->fetchrow_hashref()) {
+        #print STDERR Dumper $dref;
         $taskCounts{$dref->{'strTaskStatus'}}++;
         $taskCounts{$dref->{'strRegistrationNature'}}++;
 
@@ -422,6 +430,19 @@ sub listTasks {
         my $viewTaskURL = "$Data->{'target'}?client=$client&amp;a=WF_View&TID=$dref->{'intWFTaskID'}";
         my $taskTypeLabel = '';
 
+        my $ruleForType = "";
+        if($dref->{'strWFRuleFor'} eq "ENTITY" and $dref->{'intEntityLevel'} == $Defs::LEVEL_CLUB){
+            $ruleForType = $dref->{'strRegistrationNature'} . "_CLUB";
+        }
+        elsif($dref->{'strWFRuleFor'} eq "ENTITY" and $dref->{'intEntityLevel'} == $Defs::LEVEL_VENUE) {
+            $ruleForType = $dref->{'strRegistrationNature'} . "_VENUE";
+        }
+        elsif($dref->{'strWFRuleFor'} eq "REGO") {
+            $ruleForType = $dref->{'strRegistrationNature'} . "_" . $dref->{'strPersonType'};
+        }
+
+        print STDERR Dumper $ruleForType;
+
 	 my %single_row = (
 			WFTaskID => $dref->{intWFTaskID},
             TaskDescription => $taskDescription,
@@ -430,7 +451,7 @@ sub listTasks {
 			AgeLevel => $dref->{strAgeLevel},
 			RuleFor=> $dref->{strWFRuleFor},
 			RegistrationNature => $dref->{strRegistrationNature},
-			RegistrationNatureLabel => $Defs::registrationNature{$dref->{strRegistrationNature}},
+			RegistrationNatureLabel => $Defs::workTaskTypeLabel{$ruleForType},
 			DocumentName => $dref->{strDocumentName},
             Name=>$name,
 			LocalEntityName=> $dref->{EntityLocalName},
@@ -448,11 +469,13 @@ sub listTasks {
             taskDate => $dref->{taskDate},
             viewURL => $viewTaskURL,
             taskTypeLabel => $viewTaskURL,
+            RequestFromClub => $dref->{'preqFromClub'},
+            RequestToClub => $dref->{'preqToClub'},
 		);
         #print STDERR Dumper \%single_row;
    
-        if(!($Defs::registrationNature{$dref->{strRegistrationNature}} ~~ @taskType)){
-            push @taskType, $Defs::registrationNature{$dref->{strRegistrationNature}};
+        if(!($Defs::workTaskTypeLabel{$ruleForType} ~~ @taskType)){
+            push @taskType, $Defs::workTaskTypeLabel{$ruleForType};
         }
 
         if(!($Defs::wfTaskStatus{$dref->{strTaskStatus}} ~~ @taskStatus)){
@@ -461,6 +484,7 @@ sub listTasks {
 
 		push @TaskList, \%single_row;
 	}
+
 
     ## Calc Dupl Res and Pending Clr here
     my $clrCount = 0; #getClrTaskCount($Data, $entityID);
@@ -490,7 +514,7 @@ sub listTasks {
     if(scalar @{$personRequests}) {
 
         for my $request (@{$personRequests}) {
-            next if ($request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+            next if ($request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_COMPLETED or $request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_DENIED);
             $rowCount++;
             my $name = formatPersonName($Data, $request->{'strLocalFirstname'}, $request->{'strLocalSurname'}, $request->{'intGender'});
             my $viewURL = "$Data->{'target'}?client=$client&amp;a=PRA_V&rid=$request->{'intPersonRequestID'}";
@@ -2295,6 +2319,7 @@ sub populateDocumentViewData {
             pr.intNewBaseRecord,
             addPersonItem.intItemID as addPersonItemID,
             regoItem.intItemID as regoItemID,
+			regoItem.intRequired as Required,
             entityItem.intItemID as entityItemID
         FROM tblWFRuleDocuments AS rd
         INNER JOIN tblWFTask AS wt ON (wt.intWFRuleID = rd.intWFRuleID)
@@ -2360,10 +2385,11 @@ sub populateDocumentViewData {
         'client' => $Data->{client} || 0,
         'action' => 'WF_Verify',
     );
-
+	
     my $count = 0;
     my %documentStatusCount;
     while(my $tdref = $q->fetchrow_hashref()) {
+
         next if exists $DocoSeen{$tdref->{'intDocumentTypeID'}};
         $DocoSeen{$tdref->{'intDocumentTypeID'}} = 1;
         #skip if no registration item matches rego details combination (type/role/sport/rego_nature etc)
@@ -2371,13 +2397,21 @@ sub populateDocumentViewData {
         
 
         next if((!$dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC') or ($dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC' and $dref->{'PersonStatus'} ne $Defs::PERSON_STATUS_PENDING));
-
+		my $status;
         $count++;
-        if(!$tdref->{'strApprovalStatus'}){
-            $documentStatusCount{'MISSING'}++;
+        if(!$tdref->{'strApprovalStatus'}){            
+			if($tdref->{'Required'}){
+				$documentStatusCount{'MISSING'}++;
+				$status = 'MISSING';
+			}
+			else {
+				$status = 'Optional. Not Provided.';
+			}
+			
         }
         else {
             $documentStatusCount{$tdref->{'strApprovalStatus'}}++;
+			$status = $tdref->{'strApprovalStatus'};
         }
         my $displayVerify;
         my $displayAdd;
@@ -2448,9 +2482,12 @@ sub populateDocumentViewData {
 			
         }
 
+		
+
         my %documents = (
             DocumentID => $tdref->{'intDocumentID'},
-            Status => $tdref->{'strApprovalStatus'} || "MISSING",
+            #Status => $tdref->{'strApprovalStatus'} || "MISSING",
+			Status => $status,
             DocumentType => $tdref->{'strDocumentName'},
             Verifier => $tdref->{'strLocalName'},
             DisplayVerify => $displayVerify || '',

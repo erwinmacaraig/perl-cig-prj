@@ -41,14 +41,16 @@
 				<td><!--Filter by:-->
 					<select class="filter-tasks">
 			          <option selected="" value="">-- All --</option>
+                      <!--
 			          <option value="New Registration">New Registration</option>
 			          <option value="Renewal">Renewal</option>
 			          <option value="Transfer">Transfer</option>
-                      <!--
-                      [% FOREACH taskType IN TaskFilters.type %]
-                      <option value="[% taskType %]">[% taskType %]</option>
-                      [% END %]
                       -->
+                      [% FOREACH taskType IN TaskFilters.type %]
+                          [% IF taskType %]
+                          <option value="[% taskType %]">[% taskType %]</option>
+                          [% END %]
+                      [% END %]
 			        </select>
 		        </td>
 				<td>
@@ -108,7 +110,16 @@
                             [% task.requestFrom %]
                             </div>
                         </td>
-                    [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'REGO' %]
+                    [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'REGO' AND task.RegistrationNature == 'TRANSFER' %]
+                        <td style="word-wrap: break-word;width: 280px;">
+                            <span class="fa fa-user" style="float: left"></span>
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
+                            [% task.RegistrationNatureLabel %]<br/>
+                            Review Transfer of [% task.Name %]<br/>
+                            From [% task.RequestFromClub %] to [% task.RequestToClub %]<br/>
+                            </div>
+                        </td>
+                    [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'REGO' AND task.RegistrationNature != 'TRANSFER' %]
                         <td style="word-wrap: break-word;width: 280px;">
                             <span class="fa fa-user" style="float: left"></span>
                             <div style="float: left; word-wrap: break-word;width: 80%;">
@@ -197,7 +208,8 @@
 <script type="text/javascript">
     jQuery().ready(function() {
         var dttable = jQuery('#worktasks').dataTable({
-            "order": []
+            "order": [],
+            "lengthMenu": [[50, 100, -1], [50, 100, "All"]]
         });
 
         var api = dttable.api();

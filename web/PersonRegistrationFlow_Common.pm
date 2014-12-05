@@ -210,8 +210,7 @@ print STDERR "OK IS $ok | $run\n\n";
         );
         $body = runTemplate($Data, \%PageData, 'registration/error.templ') || '';
     }
-        $rego_ref->{'personTypeText'} = $Defs::personType{$rego_ref->{'personType'}} || $Defs::personType{$rego_ref->{'strPersonType'}} || '';
-print STDERR "DDDD" . $rego_ref->{'personTypeText'};
+    $rego_ref->{'personTypeText'} = $Defs::personType{$rego_ref->{'personType'}} || $Defs::personType{$rego_ref->{'strPersonType'}} || '';
     if ($ok)   {
         submitPersonRegistration(
             $Data, 
@@ -242,8 +241,13 @@ print STDERR "DDDD" . $rego_ref->{'personTypeText'};
             $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
          }
          
-          
+       
 	    my $personObj = getInstanceOf($Data, 'person');
+
+		my $query = qq[SELECT strLocalName FROM tblEntity WHERE intEntityID = $rego_ref->{'intRealmID'}];
+		my $sth = $Data->{'db'}->prepare($query);
+		$sth->execute();
+		my @arr = $sth->fetchrow_array();
 		
 		
 		my %personData = ();
@@ -263,6 +267,7 @@ print STDERR "DDDD" . $rego_ref->{'personTypeText'};
 		$personData{'Phone'} = $personObj->getValue('strPhoneHome') || '';
 		$personData{'Countryaddress'} = $personObj->getValue('strISOCountry') || '';
 		$personData{'Email'} = $personObj->getValue('strEmail') || '';
+		$rego_ref->{'MA'} = $arr[0];
 		
 		#$personData{''} = $personObj->getValue('') || '';
 
@@ -274,7 +279,14 @@ print STDERR "DDDD" . $rego_ref->{'personTypeText'};
 				last;	
 			}
 		}
-	
+	   my $clubReg = getLastEntityID($Data->{'clientValues'});
+       my $cl = setClient($Data->{'clientValues'}) || '';
+       my %cv = getClient($cl);
+       #$cv{'clubID'} = $rego_ref->{'intEntityID'};
+       $cv{'clubID'} = $clubReg;
+       $cv{'currentLevel'} = $Defs::LEVEL_CLUB;
+       my $clm = setClient(\%cv);
+
         my %PageData = (
             person_home_url => $url,
 			person => \%personData,
@@ -285,7 +297,8 @@ print STDERR "DDDD" . $rego_ref->{'personTypeText'};
             RegoStatus => $rego_ref->{'strStatus'},
             hidden_ref=> $hidden_ref,
             Lang => $Data->{'lang'},
-            client=>$client,
+            url => $Defs::base_url,
+            client=>$clm,
         );
         
         $body = runTemplate($Data, \%PageData, 'registration/complete.templ') || '';
@@ -540,10 +553,23 @@ sub displayRegoFlowDocuments{
     
 	my @required_docs_listing = ();
 	my @optional_docs_listing = ();	
+	my @validdocsforallrego = ();
+	$query = qq[SELECT tblDocuments.intDocumentTypeID FROM tblDocuments INNER JOIN tblDocumentType
+				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
+				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
+				WHERE strApprovalStatus = 'APPROVED' AND intPersonID = ? AND 
+				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+				GROUP BY intDocumentTypeID];
+	$sth = $Data->{'db'}->prepare($query);
+	$sth->execute($personID);
+	while(my $dref = $sth->fetchrow_hashref()){
+		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
+	}
 
-	
 	foreach my $dc (@diff){   
 		if($dc->{'Required'}){
+			#check here 
+			next if( grep /$dc->{'ID'}/,@validdocsforallrego);
 			push @required_docs_listing, $dc;
 		}  	
 		else {

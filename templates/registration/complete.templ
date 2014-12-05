@@ -1,30 +1,30 @@
-<div class="col-md-3" style="margin-left:-15px;">
+<div class="col-md-3 reg-complete-summary-left-bar">
     <h3 class="panel-header">Member ID: [% MID %]</h3>
     <div class="panel-body">
         <div class="container-link"><a href="#" title="Upload Profile Image">+ Upload Profile Image</a></div>
-        <p class="reg-text">[% PersonRegistrationDetails.personSurname %]</p>
-        <p class="reg-text">[% PersonRegistrationDetails.personFirstname %]</p>
-        <p class="reg-text">[% PersonRegistrationDetails.gender  %]</p>
-        <p class="reg-text">[% PersonRegistrationDetails.dob %]</p>
-        <p class="reg-text">[% PersonRegistrationDetails.nationality %]</p>
+        <p class="reg-text">[% person.Familyname %]</p>
+        <p class="reg-text">[% person.Name %]</p>
+        <p class="reg-text">[% person.Gender  %]</p>
+        <p class="reg-text">[% person.DOB %]</p>
+        <p class="reg-text">[% person.Nationality %]</p>
     </div>
     <div class="registration-approved">[% Lang.txt('Complete') %]</div>
 </div>
 
 <div class="col-md-9">
-	<h3 class="panel-header">Thank you</h3>
+	<h3 class="panel-header">[% Lang.txt("Thank you") %]</h3>
 	<div class="panel-body">
 		<div class="reg-complete-wrapper">
-			<p class="reg-complete-text">Registration has been submitted to: <br /><br />
+			<p class="reg-complete-text">Registration has been submitted to: <strong>[% registration.MA %]</strong> <br /><br />
 			The registration should take 12 working days to process.<br /><br />
 			Once processing has taken place, the outcome will be emailed to your club and the player.
 			</p>
 			<div class="reg-complete-buttons">
-				<p>What would you like to do now?</p>
+				<p>[% Lang.txt("What would you like to do now?") %]</p>
 				<ul>
-				<li><a href="#" class="btn-main">Register another player</a></li>
-				<li><a href="#" class="btn-main">View all currently submitted registrations</a></li>
-				<li><a href="#" class="btn-main">Got to your dashboard</a></li>
+				<li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PF_&amp;dtype=PLAYER" class="btn-main">[% Lang.txt("Register another player") %]</a></li>
+				<li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PENDPR_" class="btn-main">[% Lang.txt("View all currently submitted registrations") %]</a></li>
+				<li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=WF_" class="btn-main">[% Lang.txt("Got to your dashboard") %]</a></li>
 				</ul>
 			</div>
 		</div>
