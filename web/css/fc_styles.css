@@ -680,6 +680,14 @@ table.zebra tbody tr:nth-child(even) {
 	color: #fff;
 }
 
+.transfer-denied, .registration-denied {
+	font-size: 14px;
+	padding: 10px;
+	background: #c4070a;
+	text-align: center;
+	color: #fff;
+}
+
 /*----Temporary Styles-----*/
 
 
