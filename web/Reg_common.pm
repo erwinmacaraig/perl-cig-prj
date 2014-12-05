@@ -166,6 +166,10 @@ sub allowedTo {
     my $intID        = 0;
     my $readOnly     = 0;
     my $roleID       = 0;
+    my $EntityLevel  = 0;
+    my $EntityPhone  = 0;
+    my $EntityEmail  = 0;
+    my $EntityWebURL = 0;
     my $UserName = 0;
     #User login
     my $user = new UserSession(
@@ -178,15 +182,24 @@ sub allowedTo {
 
     my $st = qq[
       SELECT
-        entityTypeID,
-        entityID,
-        readOnly
-      FROM tblUserAuth
+        ua.entityTypeID,
+        ua.entityID,
+        ua.readOnly,
+        e.intEntityID,
+        e.intEntityLevel AS EntityLevel,
+        e.strEmail AS EntityEmail,
+        e.strPhone AS EntityPhone,
+        e.strWebURL AS EntityWebURL
+      FROM 
+        tblUserAuth AS ua, 
+        tblEntity AS e
       WHERE
-        userID = ?
-        AND entityTypeID = ?
-        AND entityID = ?
+        ua.entityID = e.intEntityID AND
+        ua.userID = ? AND 
+        ua.entityTypeID = ? AND 
+        ua.entityID = ?
     ];
+
     my $q = $db->prepare($st);
     $q->execute(
         $userID,
@@ -194,7 +207,7 @@ sub allowedTo {
         getID( $clientValues_ref, $clientValues_ref->{authLevel} ),
     );
 
-    ( $level, $intID, $readOnly, $roleID ) = $q->fetchrow_array();
+    ( $level, $intID, $readOnly, $roleID, $EntityLevel, $EntityEmail, $EntityPhone, $EntityWebURL ) = $q->fetchrow_array();
     $q->finish();
     if ( !$level and !$intID ) {
         my $valid = validateGlobalAuth(
@@ -234,7 +247,10 @@ sub allowedTo {
     $Data->{'ReadOnlyLogin'}      = $readOnly || 0;
     $Data->{'AuthRoleID'}         = $roleID || 0;
     $Data->{'UserName'}       = $UserName || 0;
-
+    $Data->{'ELevel'}       = $EntityLevel || '-';
+    $Data->{'Email'}       = $EntityEmail || '-';
+    $Data->{'Phone'}       = $EntityPhone || '-';
+    $Data->{'WebURL'}       = $EntityWebURL || '-';
     ## RETURN DATABASE POINTER
     return ($db);
 
