@@ -858,7 +858,6 @@ sub viewRequest {
     my $requestID = safe_param('rid', 'number') || 0;
 	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
     my $requestType = undef;
-    my $title = "View Request";
     my $action = undef;
 
     my %regFilter = (
@@ -868,12 +867,22 @@ sub viewRequest {
     my $request = getRequests($Data, \%regFilter);
 
     $request = $request->[0];
+
+    my $title = $Defs::personRequest{$request->{'strRequestType'}};
+
     return ("Request not found.", $title) if !$request;
 
     my $templateFile = undef;
+    print STDERR Dumper $request;
     switch($request->{'strRequestType'}) {
         case "$Defs::PERSON_REQUEST_TRANSFER" {
-            $templateFile = "personrequest/transfer/view.templ";
+            if($request->{'intPersonRegistrationID'} and $request->{'personRegoStatus'} eq $Defs::PERSONREGO_STATUS_PENDING) {
+                $templateFile = "personrequest/transfer/new_club_view.templ";
+            }
+            else {
+                $templateFile = "personrequest/transfer/current_club_view.templ";
+            }
+
             $requestType = $Defs::PERSON_REQUEST_TRANSFER;
         }
         case "$Defs::PERSON_REQUEST_ACCESS" {
@@ -893,13 +902,35 @@ sub viewRequest {
         'requestID' => $request->{'intPersonRequestID'} || undef,
         'requestType' => $Defs::personRequest{$request->{'strRequestType'}} || '',
         'requestFrom' => $request->{'requestFrom'} || '',
+        'requestFromDiscipline' => $Defs::entitySportType{$request->{'requestFromDiscipline'}} || '',
+        'requestFromISOCountry' => $request->{'requestFromISOCountry'} || '',
+        'requestFromAddress' => $request->{'requestFromAddress'} || '',
+        'requestFromAddress2' => $request->{'requestFromAddress2'} || '',
+        'requestFromCity' => $request->{'requestFromCity'} || '',
+        'requestFromPostal' => $request->{'requestFromPostal'} || '',
+        'requestFromRegion' => $request->{'requestFromRegion'} || '',
+        'requestFromPhone' => $request->{'requestFromPhone'} || '',
+
+        'requestFromTo' => $request->{'requestFromTo'} || '',
+
         'requestTo' => $request->{'requestTo'} || '',
+        'requestToDiscipline' => $Defs::entitySportType{$request->{'requestToDiscipline'}} || '',
+        'requestToISOCountry' => $request->{'requestToISOCountry'} || '',
+        'requestToAddress' => $request->{'requestToAddress'} || '',
+        'requestToAddress2' => $request->{'requestToAddress2'} || '',
+        'requestToCity' => $request->{'requestToCity'} || '',
+        'requestToPostal' => $request->{'requestToPostal'} || '',
+        'requestToRegion' => $request->{'requestToRegion'} || '',
+        'requestToPhone' => $request->{'requestToPhone'} || '',
+
         'dateRequest' => $request->{'dtDateRequest'} || '',
         'requestResponse' => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || '',
         'responseBy' => $request->{'responseBy'} || '',
         'personFirstname' => $request->{'strLocalFirstname'} || '',
         'personSurname' => $request->{'strLocalSurname'} || '',
         'ISONationality' => $request->{'strISONationality'} || '',
+        'ISOCountryOfBirth' => $request->{'strISOCountryOfBirth'} || '',
+        'RegionOfBirth' => $request->{'strRegionOfBirth'} || '',
         'personGender' => $Defs::PersonGenderInfo{$request->{'intGender'} || 0} || '',
         'DOB' => $request->{'dtDOB'} || '',
         'personStatus' => $request->{'personStatus'} || '',
@@ -999,15 +1030,17 @@ sub setRequestResponse {
     my $request = getRequests($Data, \%regFilter);
     $request = $request->[0];
 
-
+    my $requestResponseSuffix = "";
     switch($response){
-        case 'Deny' {
+        case 'deny' {
             $response = $Defs::PERSON_REQUEST_RESPONSE_DENIED;
             $requestStatus = $Defs::PERSON_REQUEST_STATUS_DENIED;
+            $requestResponseSuffix = $Data->{'lang'}->txt("Rejected");
         }
-        case 'Accept' {
+        case 'accept' {
             $response = $Defs::PERSON_REQUEST_RESPONSE_ACCEPTED;
             $requestStatus = $Defs::PERSON_REQUEST_STATUS_PENDING;
+            $requestResponseSuffix = $Data->{'lang'}->txt("Approved");
         }
         else {
             $response = undef;
@@ -1054,14 +1087,44 @@ sub setRequestResponse {
     ) or query_error($st);
 
     my $body = '';
+    my $title = '';
+
     if(scalar(%{$request}) == 0) {
-        $body = $Data->{'lang'}->txt("Response has been submitted already.");
+        return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Response has been submitted already."));
     }
     else {
-        $body = $Data->{'lang'}->txt("You have " . $Defs::personRequestResponse{$response}) . " " . $request->{'requestFrom'} . "'s " . $Defs::personRequest{$request->{'strRequestType'}} . " request.";
-    }
+        #print STDERR Dumper $request;
+        my $templateFile = "";
+        $title = $Defs::personRequest{$request->{'strRequestType'}} . ' - ' . $requestResponseSuffix;
+        my $notifDetails = $Data->{'lang'}->txt("You have " . lc $requestResponseSuffix . " the " . $Defs::personRequest{$request->{'strRequestType'}} . " of ") . $request->{'strLocalFirstname'} . " " . $request->{'strLocalSurname'} . ".";
 
-    my $title = $Data->{'lang'}->txt("Request Response");
+        if($response eq "ACCEPTED"){
+            $templateFile = "personrequest/transfer/request_accepted.templ";
+            $notifDetails .= $Data->{'lang'}->txt(" You will be notified if ") . $request->{'requestFrom'} . $Data->{'lang'}->txt(" accepts or rejects the release.");
+        }
+        elsif($response eq "DENIED"){
+            $templateFile = "personrequest/transfer/request_denied.templ";
+        }
+
+        my %TemplateData = (
+            personDetails => {
+                firstname => $request->{'strLocalFirstname'},
+                surname => $request->{'strLocalSurname'},
+                gender => $Defs::PersonGenderInfo{$request->{'intGender'}},
+                dob => $request->{'dtDOB'},
+                nationality => $request->{'strISONationality'},
+                memberID => $request->{'strNationalNum'},
+            },
+            notifDetails => $notifDetails,
+            client => $Data->{'client'},
+        );
+
+        $body = runTemplate(
+            $Data,
+            \%TemplateData,
+            $templateFile,
+        );
+    }
 
     return ($body, $title);
 }
@@ -1183,11 +1246,31 @@ sub getRequests {
             p.strState,
             p.strPostalCode,
             p.strISOCountry,
+            p.strISOCountryOfBirth,
+            p.strRegionOfBirth,
             p.strPhoneHome,
             p.strEmail,
 		    TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             ef.strLocalName as requestFrom,
+            ef.strDiscipline as requestFromDiscipline,
+            ef.strISOCountry as requestFromISOCountry,
+            ef.strAddress as requestFromAddress,
+            ef.strAddress2 as requestFromAddress2,
+            ef.strCity as requestFromCity,
+            ef.strPostalCode as requestFromPostal,
+            ef.strRegion as requestFromRegion,
+            ef.strPhone as requestFromPhone,
+
             et.strLocalName as requestTo,
+            et.strDiscipline as requestToDiscipline,
+            et.strISOCountry as requestToISOCountry,
+            et.strAddress as requestToAddress,
+            et.strAddress2 as requestToAddress2,
+            et.strCity as requestToCity,
+            et.strPostalCode as requestToPostal,
+            et.strRegion as requestToRegion,
+            et.strPhone as requestToPhone,
+
             erb.strLocalName as responseBy,
             pr.intPersonRegistrationID,
             pr.strStatus as personRegoStatus
@@ -1293,6 +1376,21 @@ sub displayNoITC {
     #return text for now
     return ($body, $title);
 
+}
+
+sub displayGenericError {
+    my ($Data, $titleHeader, $message) = @_;
+
+    $titleHeader ||= $Data->{'lang'}->txt("Error");
+    my $body = runTemplate(
+        $Data,
+        {
+            message => $message,
+        },
+        'personrequest/generic/error.templ',
+    );
+
+    return ($body, $titleHeader);
 }
 
 1;
