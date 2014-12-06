@@ -1510,3 +1510,9 @@ i.documents-complete {
 	border: 1px solid #cccccc;
 }
 
+/*a class called upon a condition on the complete screen - 
+this is to nudge the "back to" button into position*/
+.nudge {
+	margin-left:15px;
+	margin-top: 10px;
+}
