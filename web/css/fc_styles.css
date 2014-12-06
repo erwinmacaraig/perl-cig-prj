@@ -318,6 +318,9 @@ strong {
 .txtright {
 	text-align: right;
 } 
+.txtcenter {
+	text-align: center;
+} 
 #allfilesgridid_filter label input[type="search"] {
 	border-radius: 5px;
     padding: 5px;
@@ -857,10 +860,15 @@ span.flash_error{
 }
 .advanced-search-fields{
 	display: none;
+	margin-bottom: 5px;
 }
 .advanced-search-fields span{
 	width: 50%;
 	float: left;
+}
+.advanced-search-fields span input[type=checkbox]{
+	margin-right: 10px;
+	vertical-align: top;
 }
 /* End Add */
 
