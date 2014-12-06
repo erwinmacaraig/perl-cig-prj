@@ -2780,6 +2780,8 @@ sub viewSummaryPage {
     $TemplateData{'TaskAction'} = \%TaskAction;
     $TemplateData{'Lang'} = $Data->{'lang'};
 
+    my $c = Countries::getISOCountriesHash();
+
     switch($task->{'strWFRuleFor'}) {
         case 'REGO' {
             $templateFile = 'workflow/summary/personregistration.templ';
@@ -2791,7 +2793,7 @@ sub viewSummaryPage {
             $TemplateData{'PersonRegistrationDetails'}{'personFirstname'} = $task->{'strLocalFirstname'};
             $TemplateData{'PersonRegistrationDetails'}{'personSurname'} = $task->{'strLocalSurname'};
             $TemplateData{'PersonRegistrationDetails'}{'registerTo'} = $task->{'registerToEntity'};
-            $TemplateData{'PersonRegistrationDetails'}{'nationality'} = $task->{'strISONationality'};
+            $TemplateData{'PersonRegistrationDetails'}{'nationality'} = $c->{$task->{'strISONationality'}};
             $TemplateData{'PersonRegistrationDetails'}{'dob'} = $task->{'DOB'};
             $TemplateData{'PersonRegistrationDetails'}{'gender'} = $Defs::PersonGenderInfo{$task->{'intGender'}};
             $TemplateData{'PersonRegistrationDetails'}{'personRoleName'} = $task->{'strEntityRoleName'};
