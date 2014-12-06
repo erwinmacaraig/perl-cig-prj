@@ -156,16 +156,6 @@
 	</div>
 
 	<div class="col-md-3">
-		<div id = "">
-
-		<h3 class="panel-header">[% Lang.txt('Member ID') %]: [% IF Details.Status == "REGISTERED" OR Details.Status != "PENDING" %][% Details.NationalNum %][% ELSE %] - [% END %]</h3>
-		<div class="panel-body">
-
-		<p class="reg-text">[% Name %]</p>
-		<p class="reg-text">[% Details.Gender %]</p>
-		<p class="reg-text">[% Details.DOB %]</p>
-		</div>
-		</div>
-
+        [% SummaryPanel %]
 	</div>
 </div>

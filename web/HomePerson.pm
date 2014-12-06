@@ -22,6 +22,7 @@ use Person;
 use NationalReportingPeriod;
 use DuplicatesUtils;
 use Data::Dumper;
+use PersonSummaryPanel;
 
 require AccreditationDisplay;
 
@@ -104,7 +105,7 @@ sub showPersonHome	{
 			Status => $personObj->getValue('strStatus') || '',
 			Nationality => $c->{$personObj->getValue('strISONationality')}
 		},
-
+        SummaryPanel => personSummaryPanel($Data, $personID) || '',
 	);
 	
     my %RegFilters=();
