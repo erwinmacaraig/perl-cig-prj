@@ -1529,3 +1529,16 @@ this is to nudge the "back to" button into position*/
 	margin:15px 15px 10px 15px;
 	padding-top:15px;
 }
+
+table.facility-field-summary tr td { 
+	padding: 5px;
+}
+
+.facility-field-summary thead tr td, .facility-field-summary tr td {
+	font-size: 13px;
+}
+
+.facility-field-summary tr td {
+	border-right: 1px solid #ccc;
+	border-left: 1px solid #ccc;
+}

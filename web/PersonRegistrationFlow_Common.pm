@@ -257,11 +257,13 @@ print STDERR "000OK IS $ok | $run\n\n";
 		
 		
 		my %personData = ();
+        my $c = Countries::getISOCountriesHash();
+
 		$personData{'Name'} = $personObj->getValue('strLocalFirstname');
         $personData{'Familyname'} = $personObj->getValue('strLocalSurname');
 		$personData{'DOB'} = $personObj->getValue('dtDOB');
 		$personData{'Gender'} = $Data->{'lang'}->txt($Defs::genderInfo{$personObj->getValue('intGender') || 0}) || '';
-		$personData{'Nationality'} = $personObj->getValue('strISONationality');
+		$personData{'Nationality'} = $c->{$personObj->getValue('strISONationality')};
 		$personData{'Country'} = $personObj->getValue('strISOCountryOfBirth') || '';
 		$personData{'Region'} = $personObj->getValue('strRegionOfBirth') || '';
 

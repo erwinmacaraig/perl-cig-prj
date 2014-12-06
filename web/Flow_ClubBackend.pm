@@ -580,13 +580,21 @@ sub display_summary     {
     my $content = '';
 
 ## Put into a template
-    $content = 'Include summary here';
+    #$content = 'Include summary here';
+    $content = '';
+
+    my %summaryClubData = ();
+    my $summaryClubContent = runTemplate(
+        $self->{'Data'},
+        \%summaryClubData,
+        'flow/club_summary.templ',
+    );
 
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        Content => '',
+        Content => $summaryClubContent,
         Title => '',
         TextTop => $content,
         ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
