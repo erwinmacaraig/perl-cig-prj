@@ -1524,3 +1524,8 @@ this is to nudge the "back to" button into position*/
 	margin-left:15px;
 	margin-top: 10px;
 }
+
+.docViewerEntityInfo p {
+	margin:15px 15px 10px 15px;
+	padding-top:15px;
+}
