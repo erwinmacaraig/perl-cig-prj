@@ -121,7 +121,7 @@ sub showPersonHome	{
     foreach my $rego (@{$Reg_ref})  {
         my $renew = '';
         $rego->{'renew_link'} = '';
-        next if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}));
+        next if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}) and $Data->{'authLevel'} != $Defs::LEVEL_NATIONAL);
         next if ($rego->{'strStatus'} !~ /$Defs::PERSONREGO_STATUS_ACTIVE|$Defs::PERSONREGO_STATUS_PASSIVE/);
         #my $ageLevel = $rego->{'strAgeLevel'}; #'ADULT'; ## HERE NEEDS TO CALCULATE IF MINOR/ADULT
         my $newAgeLevel = '';

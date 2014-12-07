@@ -37,7 +37,7 @@ sub setProcessOrder {
             'function' => 'display_core_details',
             'label'  => 'Club Details',
             'fieldset'  => 'core',
-            'title'  => 'Registration - Enter Club Information',
+            'title'  => 'Club - Enter Club Information',
         },
         {
             'action' => 'cdu',
@@ -49,7 +49,7 @@ sub setProcessOrder {
             'function' => 'display_contact_details',
             'label'  => 'Contact Details',
             'fieldset'  => 'contactdetails',
-            'title'  => 'Registration - Enter Contact Information',
+            'title'  => 'Club - Enter Contact Information',
         },
         {
             'action' => 'condu',
@@ -61,7 +61,7 @@ sub setProcessOrder {
             'function' => 'display_role_details',
             'label'  => 'Organisation Details',
             'fieldset' => 'roledetails',
-            'title'  => 'Registration - Enter Organisation Information',
+            'title'  => 'Club - Enter Organisation Information',
         },
         {
             'action' => 'roleu',
@@ -72,7 +72,7 @@ sub setProcessOrder {
             'action' => 'd',
             'function' => 'display_documents',
             'label'  => 'Documents',
-            'title'  => 'Registration - Upload Documents',
+            'title'  => 'Club - Upload Documents',
         },
         {
             'action' => 'du',
@@ -82,17 +82,23 @@ sub setProcessOrder {
             'action' => 'p',
             'function' => 'display_products',
             'label'  => 'Products',
-            'title'  => 'Registration - Choose Products',
+            'title'  => 'Club - Choose Products',
         },
         {
             'action' => 'pu',
             'function' => 'process_products',
         },
         {
+            'action' => 'summ',
+            'function' => 'display_summary',
+            'label'  => 'Summary',
+            'title'  => 'Club - Summary',
+        },
+        {
             'action' => 'c',
             'function' => 'display_complete',
             'label'  => 'Complete',
-            'title'  => 'Registration - Summary',
+            'title'  => 'Club - Submitted',
         },
     ];
 }
@@ -165,7 +171,7 @@ sub validate_core_details {
         return ('Invalid User',0);
     }
 
-    my $clubStatus = ($clubData->{'dissolved'}) ? $Defs::ENTITY_STATUS_DE_REGISTERED : $Defs::ENTITY_STATUS_PENDING;
+    my $clubStatus = ($clubData->{'dissolved'}) ? $Defs::ENTITY_STATUS_DE_REGISTERED : $Defs::ENTITY_STATUS_INPROGRESS;
     $clubData->{'strStatus'} = $clubStatus;
     $clubData->{'intRealmID'} = $self->{'Data'}{'Realm'};
     $clubData->{'intEntityLevel'} = $Defs::LEVEL_CLUB;
@@ -554,7 +560,37 @@ sub process_documents {
 	
     return ('',1);
 }
+sub display_summary     {
+    my $self = shift;
 
+    my $id = $self->ID() || 0;
+    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
+    my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
+    my $client = $self->{'Data'}->{'client'};
+
+    my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
+    $clubObj->load();
+
+    my $content = '';
+
+## Put into a template
+    $content = 'Include summary here';
+
+    my %PageData = (
+        HiddenFields => $self->stringifyCarryField(),
+        Target => $self->{'Data'}{'target'},
+        Errors => $self->{'RunDetails'}{'Errors'} || [],
+        Content => '',
+        Title => '',
+        TextTop => $content,
+        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+        TextBottom => '',
+    );
+    my $pagedata = $self->display(\%PageData);
+
+    return ($pagedata,0);
+}
 sub display_complete {
     my $self = shift;
 
@@ -568,10 +604,13 @@ sub display_complete {
     $clubObj->load();
 
     my $content = '';
+    my $clubStatus = $clubObj->getValue('strStatus');
     if($clubObj->ID()) {
-
-        my $clubStatus = $clubObj->getValue('strStatus');
-
+        my $PendingStatus =  {};
+        $PendingStatus->{'strStatus'} = $Defs::ENTITY_STATUS_PENDING;
+        $clubObj->setValues($PendingStatus);
+        $clubObj->write();
+        
         if($self->{'RunParams'}{'newclub'})  {
             my $rc = WorkFlow::addWorkFlowTasks(
                 $self->{'Data'},
@@ -592,6 +631,8 @@ sub display_complete {
             $clubObj->setValues($resetStatus);
             $clubObj->write();
         }
+        $clubObj->load();
+        my $clubStatus = $clubObj->getValue('strStatus');
 
         my $clubID = $clubObj->ID();
         $content = qq [<div class="col-md-9"><div class="alert"><div><span class="flash_success fa fa-check"></span><p>$self->{'Data'}->{'LevelNames'}{$Defs::LEVEL_CLUB} Added Successfully</p></div></div></div> ];
@@ -614,6 +655,7 @@ sub display_complete {
         Title => '',
         TextTop => $content,
         TextBottom => '',
+        NoContinueButton=>1,
     );
     my $pagedata = $self->display(\%PageData);
 
