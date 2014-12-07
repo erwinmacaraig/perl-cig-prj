@@ -247,7 +247,7 @@ sub personFieldsSetup {
                 },
                 strISONationality => {
                     label       => $FieldLabels->{'strISONationality'},
-                    value       => $values->{'strISONationality'} ||  $self->{'SystemConfig'}{'DefaultNationality'} || '',
+                    value       => $values->{'strISONationality'} ||  $Data->{'SystemConfig'}{'DefaultNationality'} || '',
                     type        => 'lookup',
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
@@ -258,7 +258,7 @@ sub personFieldsSetup {
                 },
                 strISOCountryOfBirth => {
                     label       => $FieldLabels->{'strISOCountryOfBirth'},
-                    value       => $values->{'strISOCountryOfBirth'} ||  $self->{'SystemConfig'}{'DefaultCountry'} || '',
+                    value       => $values->{'strISOCountryOfBirth'} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
                     type        => 'lookup',
                     options     => $isoHistoricalCountries,
                     firstoption => [ '', 'Select Country' ],
@@ -585,7 +585,7 @@ sub personFieldsSetup {
                 },                
                 strISOCountry => {
                     label       => $FieldLabels->{'strISOCountry'},
-                    value       => $values->{'strISOCountry'} ||  $self->{'SystemConfig'}{'DefaultCountry'} || '',
+                    value       => $values->{'strISOCountry'} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
                     type        => 'lookup',
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
