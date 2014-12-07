@@ -757,6 +757,7 @@ sub listVenues  {
         JOIN tblEntity as CN ON CN.intEntityID=tblEntityLinks.intChildEntityID
       WHERE PN.intEntityID = ?
         AND CN.strStatus <> 'DELETED'
+        AND CN.strStatus <> 'INPROGRESS'
         AND CN.intEntityLevel = ?
         AND CN.intDataAccess>$Defs::DATA_ACCESS_NONE
       ORDER BY CN.strLocalName
