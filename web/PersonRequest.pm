@@ -1234,6 +1234,7 @@ sub getRequests {
             pq.strRequestNotes,
             pq.dtDateRequest,
             DATE_FORMAT(pq.dtDateRequest,'%d %b %Y') AS prRequestDateFormatted,
+            UNIX_TIMESTAMP(pq.dtDateRequest) AS prRequestTimeStamp,
             pq.strRequestResponse,
             pq.strResponseNotes,
             pq.intResponseBy,
