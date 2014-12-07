@@ -88,6 +88,13 @@ sub handleEntityEdit {
             $action = 'EE_E';
           }
           else  {
+            my $status = $entityObj->getValue('strStatus');
+            my $dissolved = $userData->{'dissolved'};
+            if($dissolved)  {
+                $userData->{'strStatus'} = $Defs::ENTITY_STATUS_DE_REGISTERED;
+            }
+            delete($userData->{'dissolved'});
+
             $entityObj->setValues($userData);
             $entityObj->write();
             $body = 'updated';

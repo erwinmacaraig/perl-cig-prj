@@ -852,7 +852,7 @@ sub listClubs   {
     push @rowdata, {
       id => $dref->{'CNintEntityID'} || 0,
       strName => $dref->{'strLocalName'} || '',
-      SelectLink => "$Data->{'target'}?client=$tempClient&amp;a=C_HOME",
+      SelectLink => "$Data->{'target'}?client=$tempClient&amp;a=EE_D",
       strContact => $dref->{'strContact'} || '',
       strPhone => $dref->{'strPhone'} || '',
       strEmail => $dref->{'strEmail'} || '',
