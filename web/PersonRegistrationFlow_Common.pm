@@ -196,7 +196,7 @@ print STDERR "COMPLETE RUN" . $run;
     else    {
         $ok = $run ? 1 : checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
     }
-print STDERR "OK IS $ok | $run\n\n";
+print STDERR "000OK IS $ok | $run\n\n";
     my $body = '';
     if (!$ok)   {
         my $error = $lang->txt("You cannot register this combination, limit exceeded");
@@ -208,10 +208,11 @@ print STDERR "OK IS $ok | $run\n\n";
             Lang => $lang,
             client => $client,
         );
+print STDERR "NOT OK";
         $body = runTemplate($Data, \%PageData, 'registration/error.templ') || '';
     }
     $rego_ref->{'personTypeText'} = $Defs::personType{$rego_ref->{'personType'}} || $Defs::personType{$rego_ref->{'strPersonType'}} || '';
-    $rego_ref->{'personRegoStatus'} = $Defs::personRegoStatus{$rego_ref->{'strStatus'}} || '';
+print STDERR "STILL OK";
     if ($ok)   {
         submitPersonRegistration(
             $Data, 
@@ -219,6 +220,8 @@ print STDERR "OK IS $ok | $run\n\n";
             $regoID,
             $rego_ref
          ) if ! $run;
+print STDERR "STATUS IS " . $rego_ref->{'strStatus'};
+        $rego_ref->{'personRegoStatus'} = $Defs::personRegoStatus{$rego_ref->{'strStatus'}} || '';
          
         my @products= split /:/, $hidden_ref->{'prodIds'};
         foreach my $prod (@products){ $hidden_ref->{"prod_$prod"} =1;}
