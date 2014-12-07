@@ -623,8 +623,8 @@ sub personFieldsSetup {
                 strAddress2
                 strSuburb
                 strState
-                strISOCountry
                 strPostalCode
+                strISOCountry
                 strPhoneHome
                 strEmail
             )],

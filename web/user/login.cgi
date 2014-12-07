@@ -53,7 +53,8 @@ sub main {
             my $st = qq[
                 SELECT
                     entityTypeId,
-                    entityId
+                    entityId,
+                    UNIX_TIMESTAMP(lastLogin) as lastLoginUnixTimeStamp
                 FROM
                     tblUserAuth
                 WHERE
@@ -62,13 +63,19 @@ sub main {
             ];
             my $q = $db->prepare($st);
             $q->execute($uID);
-            my ( $type, $id) = $q->fetchrow_array();
+            my ( $type, $id, $lastLogin) = $q->fetchrow_array();
             $q->finish();
             if(!$type or !$id)  {
 
                 $Data{'RedirectTo'} = "$Defs::base_url/";
             }
             else    {
+                push @{$Data{'WriteCookies'}}, [
+                    $Defs::COOKIE_LASTLOGIN_TIMESTAMP,
+                    $lastLogin,
+                    '1h',
+                ];
+
                 $Data{'RedirectTo'} = "$Defs::base_url/authenticate.cgi?i=$id&amp;t=$type";
             }
         }

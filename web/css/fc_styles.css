@@ -550,6 +550,10 @@ table.zebra tbody tr:nth-child(even) {
     background-color:#f3f3f3;
 }
 
+table tr.new-task {
+    border-left: 5px solid #055688;
+}
+
 .panel-body p.reg-text {
 	text-align: center;
 	font-family: 'noto_sansbold';
@@ -680,6 +684,14 @@ table.zebra tbody tr:nth-child(even) {
 	color: #fff;
 }
 
+.transfer-denied, .registration-denied {
+	font-size: 14px;
+	padding: 10px;
+	background: #c4070a;
+	text-align: center;
+	color: #fff;
+}
+
 /*----Temporary Styles-----*/
 
 
@@ -751,7 +763,7 @@ header ul#menu ul li a:hover {
 }
 
 .list-action-filter a, .list-action-filter a.active{
-	padding: 7px 7px;
+    padding: 10px !important;
 	float: left;
 	cursor: pointer;
 }
