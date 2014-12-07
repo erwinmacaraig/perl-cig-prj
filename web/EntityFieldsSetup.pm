@@ -183,7 +183,7 @@ sub clubFieldsSetup {
                 },
                 strCity         => {
                     label       => $FieldLabels->{'strCity'},
-                    value       => $values->{'strCity'},
+                    value       => $values->{'strCity'} ||  $Data->{'SystemConfig'}{'DefaultCity'} || '',
                     type        => 'text',
                     size        => '30',
                     maxsize     => '45',
@@ -317,7 +317,7 @@ sub clubFieldsSetup {
                 },
                 strContactISOCountry   => {
                     label       => $FieldLabels->{'strContactISOCountry'},
-                    value       => $values->{'strContactISOCountry'},
+                    value       => $values->{'strContactISOCountry'} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
                     type        => 'lookup',
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
