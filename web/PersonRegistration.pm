@@ -873,12 +873,10 @@ sub submitPersonRegistration    {
         );
         personInProgressToPending($Data, $personID);
         ($count, $regs) = getRegistrationData($Data, $personID, \%Reg);
-print STDERR "SUBMIT COUNT IS $count\n";
         if ($count) {
             my $pr_ref = $regs->[0];
             $rego_ref->{'strStatus'} = $pr_ref->{'strStatus'};
         }
-print STDERR "SUBMIT STATUS IS " . $rego_ref;
     }
 }
 
