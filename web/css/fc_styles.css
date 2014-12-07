@@ -1195,6 +1195,10 @@ header nav ul li a {
 }
 
 .button-row {
+    margin-top:20px;
+}
+.button-row .button-right {
+    float:right;
 }
 
 .access-level {
