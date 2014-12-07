@@ -16,7 +16,7 @@
 </div>
 [% END %]
 
-<div class="col-md-9">
+<div class="[% IF processStatus == 1 %]col-md-12[% ELSE %]col-md-9[% END %]">
 [% TextTop %]
 <form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">
     [% IF Content %][% Content %][% END %]
@@ -32,9 +32,7 @@
 [% IF !NoContinueButton and ! ContinueButtonText %]
 	<div class="txtright"><input id = "flow-btn-continue" type = "submit" value = " [% Lang.txt('Continue') %] "  class = "btn-main"></div>
 [% END %]
-[% IF Back %]
-    <div class="txtright"><span class="btn-main"><a href="javascript:history.go(-1)"  onmouseover="this.style.textDecoration='none'"> [% Lang.txt(Back) %] </a></span></div>
-[% END %]
+
 </div>
 </form>
 </div>
@@ -45,5 +43,4 @@
 </div>
 [% END %]
 <br/>
-<div class="col-md-9"></div>
 [% TextBottom %]

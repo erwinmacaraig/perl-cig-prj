@@ -308,6 +308,10 @@ label {
     font-size: 14px;
     color: #000;
 }
+
+strong {
+	font-family:'noto_sansregular';
+}
  
 .txtright {
 	text-align: right;
@@ -546,6 +550,10 @@ table.zebra tbody tr:nth-child(even) {
     background-color:#f3f3f3;
 }
 
+table tr.new-task {
+    border-left: 5px solid #055688;
+}
+
 .panel-body p.reg-text {
 	text-align: center;
 	font-family: 'noto_sansbold';
@@ -676,6 +684,14 @@ table.zebra tbody tr:nth-child(even) {
 	color: #fff;
 }
 
+.transfer-denied, .registration-denied {
+	font-size: 14px;
+	padding: 10px;
+	background: #c4070a;
+	text-align: center;
+	color: #fff;
+}
+
 /*----Temporary Styles-----*/
 
 
@@ -747,7 +763,7 @@ header ul#menu ul li a:hover {
 }
 
 .list-action-filter a, .list-action-filter a.active{
-	padding: 7px 7px;
+    padding: 10px !important;
 	float: left;
 	cursor: pointer;
 }
@@ -1193,6 +1209,9 @@ header nav ul li a {
 .fieldSectionGroup  {
     margin-bottom:20px;
 }
+.fieldSectionGroupFooter {
+    text-align:right;
+}
 
 .button-row {
     margin-top:20px;
@@ -1374,4 +1393,45 @@ a.paginate_button.previous, a.paginate_button.next, a.paginate_button {
 
 span.fa-user{
 	margin-top:3px;
+}
+
+.reg-complete-summary-left-bar {
+	margin-left: -15px;
+}
+
+.reg-complete-wrapper {
+	padding:10px;
+}
+
+.reg-complete-text {
+	float:left;
+	width: 50%;
+}
+
+.reg-complete-buttons {
+	float:right;
+}
+
+.reg-complete-buttons p {
+	font-weight: bold;
+}
+
+.reg-complete-buttons ul {
+	list-style-type: none;
+}
+
+.reg-complete-buttons ul li {
+	margin-left: -40px;
+	margin-bottom: 5px;
+}
+
+.reg-complete-buttons ul li a {
+	width:100%;
+	text-align: center;
+}
+
+.document-upload.summary {
+	overflow:hidden;
+	margin-top: 20px;
+	padding:5px;
 }

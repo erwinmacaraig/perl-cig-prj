@@ -437,7 +437,8 @@ warn(" IN PF");
         my $p3p=q[policyref="/w3c/p3p.xml", CP="ALL DSP COR CURa ADMa DEVa TAIi PSAa PSDa IVAi IVDi CONi OTPi OUR BUS IND PHY ONL UNI COM NAV DEM STA"];
 
         if($Data->{'RedirectTo'})   {
-            $header = $output->redirect (-uri => $Data->{'RedirectTo'},-cookie=>[$cookies_string], -P3P => $p3p);
+            #$header = $output->redirect (-uri => $Data->{'RedirectTo'},-cookie=>[$cookies_string], -P3P => $p3p);
+            $header = $output->redirect (-uri => $Data->{'RedirectTo'},-cookie=>\@cookie_array, -P3P => $p3p);
 my $o = new CGI; #Don't know why this and next line are need - but it works
 my $h3eader = $o->header();
         }

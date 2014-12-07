@@ -32,23 +32,25 @@
 	<table id="worktasks" cellpadding="5" width="100%">
 		<thead>
 			<tr class="box-header">
-				<th>Tasklist</th>
+				<th>Tasklist [% IF TaskCounts.newTasks %]<span style="color: red">[% TaskCounts.newTasks %]</span>[% END %]</th>
 				<th>Started</th>
 				<th>Status</th>
 				<th>Actions</th>
 			</tr>
 			<tr class="order-override">
 				<td><!--Filter by:-->
-					<select class="filter-tasks">
+					<select class="filter-tasks" style="width: 100%">
 			          <option selected="" value="">-- All --</option>
+                      <!--
 			          <option value="New Registration">New Registration</option>
 			          <option value="Renewal">Renewal</option>
 			          <option value="Transfer">Transfer</option>
-                      <!--
-                      [% FOREACH taskType IN TaskFilters.type %]
-                      <option value="[% taskType %]">[% taskType %]</option>
-                      [% END %]
                       -->
+                      [% FOREACH taskType IN TaskFilters.type %]
+                          [% IF taskType %]
+                          <option value="[% taskType %]">[% taskType %]</option>
+                          [% END %]
+                      [% END %]
 			        </select>
 		        </td>
 				<td>
@@ -73,10 +75,10 @@
 			        </select>
 				</td>
 				<td class="list-action-filter">
-                    <div class="toggle">
-                        <a href="#" class="active">All tasks</a>
-                        <a href="#" class="">New task</a>
-                    </div>
+                    <select name="d_intTaskType" id="l_intTaskType" class="fcToogleGroup" style="display: none">
+                        <option value="all_tasks">All tasks</option>
+                        <option value="new_task">New task</option>
+                    </select>
 				</td>
 			</tr>
 			<tr style="display: none" class="box-header">
@@ -89,14 +91,17 @@
 		</thead>
 		<tbody>
 		    [% FOREACH task IN TaskList %]
-                <tr class="task-list">
+                <tr class="task-list [% IF task.newTask %]new-task[% END %]">
                     [% IF task.TaskType == 'TRANSFER' %]
                         <td style="word-wrap: break-word;width: 280px;">
                             <span style="float: left" class="fa fa-user"></span>
                             <div style="float: left; word-wrap: break-word;width: 80%;">
                             [% task.personRequestLabel %]<br/>
-                            [% task.Name %] from <br/>
-                            [% task.requestFrom %] to [% task.requestTo %]
+                            [% IF task.TaskStatus == 'ACCEPTED' %]
+                                [% task.requestTo %] has accepted request for [% task.Name %]
+                            [% ELSIF task.TaskStatus == 'PENDING' %]
+                                [% task.requestFrom %] has requested a transfer for [% task.Name %]
+                            [% END %]
                             </div>
                         </td>
                     [% ELSIF task.TaskType == 'ACCESS' %]
@@ -108,7 +113,16 @@
                             [% task.requestFrom %]
                             </div>
                         </td>
-                    [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'REGO' %]
+                    [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'REGO' AND task.RegistrationNature == 'TRANSFER' %]
+                        <td style="word-wrap: break-word;width: 280px;">
+                            <span class="fa fa-user" style="float: left"></span>
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
+                            [% task.RegistrationNatureLabel %]<br/>
+                            Review Transfer of [% task.Name %]<br/>
+                            From [% task.RequestFromClub %] to [% task.RequestToClub %]<br/>
+                            </div>
+                        </td>
+                    [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'REGO' AND task.RegistrationNature != 'TRANSFER' %]
                         <td style="word-wrap: break-word;width: 280px;">
                             <span class="fa fa-user" style="float: left"></span>
                             <div style="float: left; word-wrap: break-word;width: 80%;">
@@ -196,12 +210,33 @@
 <script src = "//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript">
     jQuery().ready(function() {
+        jQuery.fn.dataTableExt.afnFiltering.push(
+            function(settings, data, dataIndex) {
+                var index = jQuery("select#l_intTaskType").find(":selected").index();
+
+                var myRowClass = settings.aoData[dataIndex].nTr.className;
+                var myRowClasses = myRowClass.split(/\s+/);
+                if(index == 1 && jQuery.inArray("new-task", myRowClasses) == 1){
+                    return true;
+                }  else if(index == 0) {
+                    return true;
+                }
+            }
+        );
+
         var dttable = jQuery('#worktasks').dataTable({
-            "order": []
+            //"order": [[1, "desc"]],
+            "order": [],
+            "lengthMenu": [[50, 100, -1], [50, 100, "All"]]
         });
 
         var api = dttable.api();
         var taskscol = api.column(0);
+
+        jQuery("select#l_intTaskType").fcToggle('rebuild');
+        jQuery("select#l_intTaskType").on('change', function(){
+            api.draw();
+        });
 
         var tasktype = jQuery("select.filter-tasks");
 
@@ -237,6 +272,7 @@
             tdatecol
                 .order(val).draw();
         });
+
     });
 
 </script>

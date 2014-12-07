@@ -119,8 +119,8 @@ sub setProcessOrder {
          {
             'action' => 'p',
             'function' => 'display_products',
-            'label'  => 'Products',
-            'title'  => 'Registration - Choose Products',
+            'label'  => 'License',
+            'title'  => 'Registration - Confirm License',
         },
         {
             'action' => 'pu',
@@ -1223,8 +1223,9 @@ print STDERR "RRRRRRRRULES RUNNINGS\n";
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
-        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        #FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
+        #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        processStatus => 1,
         Content => '',
         Title => '',
         TextTop => $content,

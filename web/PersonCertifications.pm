@@ -81,11 +81,11 @@ sub handleCertificates {
               name =>   'Status',
               field =>  'strStatus',
          },   
-         {
-         	name => 'Description',
-         	field => 'strDescription',
-         },
   );
+         #{
+         #	name => 'Description',
+         #	field => 'strDescription',
+         #},
    my $grid  = showGrid(
     Data => $Data,
     columns => \@headers,

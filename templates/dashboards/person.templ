@@ -46,18 +46,10 @@
 					</div>
 					[% END %]
 
-					[% IF Details.BirthCountry %]
-				    <div class="">
-				      <span class="details-left">[% Lang.txt('Country of Birth') %]:</span>
-				      <span class="detail-value">[% Details.BirthCountry %]</span>
-				    </div>
-
-					[% END %]
-
-					[% IF Details.PassportNat %]
+					[% IF Details.Nationality %]
 				    <div class="">
 				      <span class="details-left">[% Lang.txt('Nationality') %]:</span>
-				      <span class="detail-value">[% Details.PassportNat %]</span>
+				      <span class="detail-value">[% Details.Nationality %]</span>
 				    </div>
 					[% END %]
 

@@ -9,118 +9,6 @@
 .btnPeoplelookupSearch { position:relative;right:-62px; }
 
 
-
-/***** SYMPLICIT FREEMADE STYLES *****/
-
-/*header .utilities {
-  background: #004e7e;
-  padding: 10px;
-}
-
-header .utilities ul {
-  margin: 0;
-  padding: 0;
-  float: right;
-}
-
-header .utilities ul li {
-  float: left;
-  list-style-type: none;
-  color: #fff;
-  margin: 0 40px 0 0;
-}
-
-header .utilities ul li:last-child {
-  margin: 0;
-}
-
-header .utilities ul li a {
-  color: #fff;
-  text-decoration: underline;
-}
-
-header .utilities ul li a {
-  color: #fff;
-  text-decoration: underline;
-  font-size: 13px;
-}
-
-header .utilities ul li a:hover {
-  text-decoration: none;
-}
-
-header .logo-area {
-  background: #085a8c;
-  padding: 30px 0;
-}
-
-header .logo-area img {
-  float: left;
-}
-
-header .logo-area h1 {
-  margin: 30px 20px;
-  color: #fff;
-  font-size: 24px;
-  font-family: 'noto_sansbold';
-  font-weight: normal;
-  float: left;
-}
-
-header .logo-area ul {
-  float: right;
-}
-
-header .logo-area ul li {
-  float: left;
-  text-align: center;
-  list-style-type: none;
-  font-size: 12px;
-  color: #fff;
-  margin: 0 40px 0 0;
-}
-
-header .logo-area ul li:last-child {
-  margin: 0;
-}
-
-header .logo-area ul li strong {
-  font-family: 'noto_sansbold';
-  font-weight: normal;
-}
-
-
-header nav ul {
-  margin: 0;
-  padding: 0;
-}
-
-header nav ul li {
-  float: left;
-  list-style-type: none;
-}
-
-header nav ul li:first-child a {
-  border: none;
-}
-
-header nav ul li:last-child a {
-  border-right: 1px solid #004e7e;
-}
-
-header nav ul li a {
-  border-left: 1px solid #004e7e;
-  color: #fff;
-  background: #085a8c;
-  padding: 20px;
-}
-
-header nav ul li a:hover {
-  background: #e3e3e3;
-  color: #000;
-  text-decoration: none;
-}*/
-
 .form-signin input[type="text"] {
   border: 1px solid #cccccc;
   padding: 5px;
@@ -196,6 +84,7 @@ span.notice-error {
 
 .toggle-type a:hover {
   text-decoration: none;
+  background: #045485;
 }
 
 .toggle-type a.active {
