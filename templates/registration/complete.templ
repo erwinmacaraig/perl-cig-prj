@@ -8,7 +8,8 @@
         <p class="reg-text">[% person.DOB %]</p>
         <p class="reg-text">[% person.Nationality %]</p>
     </div>
-    <div class="registration-pending">[% Lang.txt('Pending') %]</div>
+    <!-- DO IF TEST HERE ON registration.strStatus -->
+    <div class="registration-pending">[% Lang.txt(registration.personRegoStatus) %]</div>
 </div>
 
 <div class="col-md-9">

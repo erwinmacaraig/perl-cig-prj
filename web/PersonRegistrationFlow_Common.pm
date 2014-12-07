@@ -211,6 +211,7 @@ print STDERR "OK IS $ok | $run\n\n";
         $body = runTemplate($Data, \%PageData, 'registration/error.templ') || '';
     }
     $rego_ref->{'personTypeText'} = $Defs::personType{$rego_ref->{'personType'}} || $Defs::personType{$rego_ref->{'strPersonType'}} || '';
+    $rego_ref->{'personRegoStatus'} = $Defs::personRegoStatus{$rego_ref->{'strStatus'}} || '';
     if ($ok)   {
         submitPersonRegistration(
             $Data, 
