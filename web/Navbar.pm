@@ -156,10 +156,6 @@ sub getEntityMenuData {
 
     my $paymentSplitSettings = ''; #getPaymentSplitSettings($Data);
     my $baseurl = "$target?client=$client&amp;";
-    my $dashboardAction = 'E_HOME';
-    if($currentLevel != $Data->{'clientValues'}{'authLevel'})   {
-        $dashboardAction = 'EE_D';
-    }
     my %menuoptions = (
         advancedsearch => {
             name => $lang->txt('Advanced Search'),
@@ -171,9 +167,12 @@ sub getEntityMenuData {
         },
         home => {
             name => $lang->txt('Dashboard'),
-            url => $baseurl."a=$dashboardAction",
+            url => $baseurl."a=E_HOME",
         },
     );
+    if($currentLevel != $Data->{'clientValues'}{'authLevel'})   {
+        delete($menuoptions{'home'});
+    }
     if(exists $children->{$Defs::LEVEL_STATE})    {
         $menuoptions{'states'} = {
             name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_STATE.'_P'}),
@@ -264,6 +263,10 @@ sub getEntityMenuData {
         $menuoptions{'approvals'} = {
             name => $lang->txt('Work Tasks'),
             url => $baseurl."a=WF_",
+        };
+        $menuoptions{'myAssociation'} = {
+            name => $lang->txt('My Association'),
+            url => $baseurl."a=EE_D",
         };
 
     
@@ -456,6 +459,9 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
         'newclearance',    
         'clearancesAll',
         ]],
+        [ $lang->txt('My Association'), 'menu',[
+        'myAssociation',
+        ]],
         [ $lang->txt('Reports'), 'menu',[
         'reports',
         ]],
@@ -527,6 +533,9 @@ sub getClubMenuData {
             url => $baseurl."a=VENUE_L&amp;l=$Defs::LEVEL_VENUE",
         },
     );
+    if($currentLevel != $Data->{'clientValues'}{'authLevel'})   {
+        delete($menuoptions{'home'});
+    }
     my $txt_RequestCLR = $SystemConfig->{'txtRequestCLR'} || 'Request a Clearance';
 
     if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequestClearance'} 
@@ -680,6 +689,10 @@ sub getClubMenuData {
         $menuoptions{'clubdocs'} = {
         url => $baseurl."a=C_DOCS",
     };
+    $menuoptions{'myClub'} = {
+        name => $lang->txt('My Club'),
+        url => $baseurl."a=EE_D",
+    };
  
     if (1==2)   {
         $menuoptions{'clubidentifier'} = {
@@ -811,6 +824,9 @@ sub getClubMenuData {
             'pending'
         ]],
         [ $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Transactions"), 'menu','transactions',],
+        [ $lang->txt('My Club'), 'menu',[
+        'myClub',
+        ]],
         [ $lang->txt('Reports'), 'menu',[
         'reports',
         ]],
