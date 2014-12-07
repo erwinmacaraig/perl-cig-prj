@@ -51,6 +51,10 @@ sub handleEntityEdit {
     elsif($currentLevel == $Defs::LEVEL_REGION
      or $currentLevel == $Defs::LEVEL_NATIONAL)  {
         @sections = ('core', 'contactdetails');
+        if($action eq 'EE_D')   {
+            $values->{'footer-core'} = qq[<div class = "fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$Data->{'client'}&a=EE_E&e_a=core">].$Data->{'lang'}->txt('edit').qq[</a></div>];
+            $values->{'footer-contactdetails'} = qq[<div class = "fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$Data->{'client'}&a=EE_E&e_a=contactdetails">].$Data->{'lang'}->txt('edit').qq[</a></div>];
+        }
         $fieldset = entityFieldsSetup($Data, $values);
     }
     if(!scalar(@sections))  {
