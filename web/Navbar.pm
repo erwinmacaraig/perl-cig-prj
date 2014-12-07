@@ -156,6 +156,10 @@ sub getEntityMenuData {
 
     my $paymentSplitSettings = ''; #getPaymentSplitSettings($Data);
     my $baseurl = "$target?client=$client&amp;";
+    my $dashboardAction = 'E_HOME';
+    if($currentLevel != $Data->{'clientValues'}{'authLevel'})   {
+        $dashboardAction = 'EE_D';
+    }
     my %menuoptions = (
         advancedsearch => {
             name => $lang->txt('Advanced Search'),
@@ -167,7 +171,7 @@ sub getEntityMenuData {
         },
         home => {
             name => $lang->txt('Dashboard'),
-            url => $baseurl."a=E_HOME",
+            url => $baseurl."a=$dashboardAction",
         },
     );
     if(exists $children->{$Defs::LEVEL_STATE})    {

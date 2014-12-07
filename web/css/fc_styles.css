@@ -1209,9 +1209,15 @@ header nav ul li a {
 .fieldSectionGroup  {
     margin-bottom:20px;
 }
+.fieldSectionGroupFooter {
+    text-align:right;
+}
 
 .button-row {
-	margin-top:20px;
+    margin-top:20px;
+}
+.button-row .button-right {
+    float:right;
 }
 
 .access-level {

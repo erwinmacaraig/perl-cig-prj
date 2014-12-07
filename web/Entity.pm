@@ -309,13 +309,12 @@ sub entity_details  {
   );
   my $resultHTML='';
   ($resultHTML, undef )=handleHTMLForm(\%FieldDefinitions, undef, $option, '',$Data->{'db'});
-  my $title=$field->{strName};
+  my $title=$field->{strLocalName};
   my $logodisplay = '';
+  my $chgoptions='';
   if($option eq 'display')  {
-    my $chgoptions='';
-    $chgoptions.=qq[<div style="float:right;"><a href="$Data->{'target'}?client=$client&amp;a=E_DTE"><img src="images/edit_icon.gif" border="0" alt="].$Data->{'lang'}->txt('Edit') .qq["></a></div> ] if($Data->{'clientValues'}{'authLevel'} >= $entityLevel and allowedAction($Data, 'e_e'));
+    $chgoptions.=qq[<div class = "button-row"><a href="$Data->{'target'}?client=$client&amp;a=E_DTE" class = "btn-main button-right">].$Data->{'lang'}->txt('Edit') .qq[</a></div> ] if($Data->{'clientValues'}{'authLevel'} >= $entityLevel and allowedAction($Data, 'e_e'));
     $resultHTML=$resultHTML;
-    $title=$chgoptions.$title;
     my $editlink = allowedAction($Data, 'e_e') ? 1 : 0;
     $logodisplay = showLogo(
       $Data,
@@ -326,9 +325,25 @@ sub entity_details  {
     );
   }
 
-  $resultHTML = $logodisplay. $resultHTML;
+  my $body = qq[
 
-  return ($resultHTML,$title);
+<div class="col-md-9">
+    <h3 class = "panel-header">].$Data->{'lang'}->txt('Details').qq[</h3>
+    <div class = "panel-body">
+        $resultHTML
+    </div>
+    $chgoptions
+</div>
+<div class="col-md-3">
+    <h3 class = "panel-header">$title</h3>
+    <div class = "panel-body">
+    $logodisplay
+    </div>
+</div>
+        
+  ];
+
+  return ($body,$title);
 }
 
 
