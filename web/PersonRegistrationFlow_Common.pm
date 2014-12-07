@@ -208,11 +208,9 @@ print STDERR "000OK IS $ok | $run\n\n";
             Lang => $lang,
             client => $client,
         );
-print STDERR "NOT OK";
         $body = runTemplate($Data, \%PageData, 'registration/error.templ') || '';
     }
     $rego_ref->{'personTypeText'} = $Defs::personType{$rego_ref->{'personType'}} || $Defs::personType{$rego_ref->{'strPersonType'}} || '';
-print STDERR "STILL OK";
     if ($ok)   {
         submitPersonRegistration(
             $Data, 
@@ -220,7 +218,6 @@ print STDERR "STILL OK";
             $regoID,
             $rego_ref
          ) if ! $run;
-print STDERR "STATUS IS " . $rego_ref->{'strStatus'};
         $rego_ref->{'personRegoStatus'} = $Defs::personRegoStatus{$rego_ref->{'strStatus'}} || '';
          
         my @products= split /:/, $hidden_ref->{'prodIds'};
