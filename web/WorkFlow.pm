@@ -285,6 +285,9 @@ sub listTasks {
 	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
     my %taskCounts;
 
+    my $cquery = new CGI;
+    my $lastLoginTimeStamp = $cquery->cookie($Defs::COOKIE_LASTLOGIN_TIMESTAMP);
+
     $st = qq[
             SELECT
             t.intWFTaskID,
@@ -296,6 +299,7 @@ sub listTasks {
             pr.strPersonType,
             t.strRegistrationNature,
             DATE_FORMAT(t.tTimeStamp,'%d %b %Y') AS taskDate,
+            UNIX_TIMESTAMP(t.tTimeStamp) AS taskTimeStamp,
             dt.strDocumentName,
             p.intSystemStatus,
             p.strLocalFirstname, 
@@ -374,8 +378,10 @@ sub listTasks {
     my $taskTypeLabel = "";
 	while(my $dref= $q->fetchrow_hashref()) {
         #print STDERR Dumper $dref;
+        my $newTask = ($dref->{'taskTimeStamp'} >= $lastLoginTimeStamp) ? 1 : 0; #additional check if tTimeStamp > currentTimeStamp
         $taskCounts{$dref->{'strTaskStatus'}}++;
         $taskCounts{$dref->{'strRegistrationNature'}}++;
+        $taskCounts{"newTasks"}++ if $newTask;
 
         #FC-409 - don't include in list of taskStatus = REJECTED
         next if ($dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_REJECTED);
@@ -469,6 +475,8 @@ sub listTasks {
             taskTypeLabel => $viewTaskURL,
             RequestFromClub => $dref->{'preqFromClub'},
             RequestToClub => $dref->{'preqToClub'},
+            taskTimeStamp => $dref->{'taskTimeStamp'},
+            newTask => $newTask,
 		);
         #print STDERR Dumper \%single_row;
    
@@ -521,6 +529,9 @@ sub listTasks {
             $taskCounts{$requestStatus}++;
             $taskCounts{$request->{'strRequestType'}}++;
 
+            my $newTask = ($request->{'taskTimeStamp'} >= $lastLoginTimeStamp) ? 1 : 0; #additional check if tTimeStamp > currentTimeStamp
+            $taskCounts{"newTasks"}++ if $newTask;
+
             my $taskStatusLabel = $request->{'strRequestResponse'} ? $Defs::personRequestStatus{$request->{'strRequestResponse'}} : $Defs::personRequestStatus{'PENDING'};
             my %personRequest = (
                 personRequestLabel => $Defs::personRequest{$request->{'strRequestType'}},
@@ -534,6 +545,8 @@ sub listTasks {
                 taskDate => $request->{'prRequestDateFormatted'},
                 requestFrom => $request->{'requestFrom'},
                 requestTo => $request->{'requestTo'},
+                taskTimeStamp => $request->{'prRequestTimeStamp'},
+                newTask => $newTask,
             );
 
             if(!($Defs::personRequest{$request->{'strRequestType'}} ~~ @taskType)){
@@ -549,6 +562,7 @@ sub listTasks {
 
     }
 
+    my @sortedTaskList = sort { $b->{'taskTimeStamp'} <=> $a->{'taskTimeStamp'}} @TaskList;
 	my $msg = '';
 	if ($rowCount == 0) {
 		$msg = $Data->{'lang'}->txt('No outstanding tasks');
@@ -563,7 +577,8 @@ sub listTasks {
         'status' => \@taskStatus,
     );
 	my %TemplateData = (
-        TaskList => \@TaskList,
+        #TaskList => \@TaskList,
+        TaskList => \@sortedTaskList,
         CurrentLevel => $Data->{'clientValues'}{'currentLevel'},
         TaskCounts => \%taskCounts,
         TaskMsg => $msg,
