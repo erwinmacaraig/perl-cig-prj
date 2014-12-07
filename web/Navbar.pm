@@ -686,7 +686,7 @@ sub getClubMenuData {
 
     if ($SystemConfig->{'allowPersonRequest'}) {
         $menuoptions{'requesttransfer'} = {
-            name => $lang->txt('Request a Transfer'),
+            name => $lang->txt('Request or Start a Transfer'),
             url => $baseurl."a=PRA_T",
             #url => $baseurl."a=INITSRCH_P&type=transfer&amp;origin=" . $Data->{'clientValues'}{'authLevel'},
         };

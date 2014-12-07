@@ -196,7 +196,7 @@ print STDERR "COMPLETE RUN" . $run;
     else    {
         $ok = $run ? 1 : checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
     }
-print STDERR "OK IS $ok | $run\n\n";
+print STDERR "000OK IS $ok | $run\n\n";
     my $body = '';
     if (!$ok)   {
         my $error = $lang->txt("You cannot register this combination, limit exceeded");
@@ -218,6 +218,7 @@ print STDERR "OK IS $ok | $run\n\n";
             $regoID,
             $rego_ref
          ) if ! $run;
+        $rego_ref->{'personRegoStatus'} = $Defs::personRegoStatus{$rego_ref->{'strStatus'}} || '';
          
         my @products= split /:/, $hidden_ref->{'prodIds'};
         foreach my $prod (@products){ $hidden_ref->{"prod_$prod"} =1;}
