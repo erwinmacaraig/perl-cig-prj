@@ -267,7 +267,7 @@ sub setupValues {
                 },
                 strCity         => {
                     label       => $FieldLabels->{'strCity'},
-                    value       => $values->{'strCity'},
+                    value       => $values->{'strCity'} ||  $self->{'SystemConfig'}{'DefaultCity'} || '',
                     type        => 'text',
                     size        => '30',
                     maxsize     => '45',
