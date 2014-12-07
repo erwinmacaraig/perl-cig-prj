@@ -138,6 +138,9 @@ sub main {
         checkOnLogin( \%Data );
         $action = defaultAction( $clientValues{'authLevel'} );
     }
+    if($action eq 'E_HOME' and $clientValues{'currentLevel'} != $clientValues{'authLevel'}) {
+        $action = 'EE_D';
+    }
 
     if ( $action =~ /^E_/ ) {
         my $ID = getID( \%clientValues );
