@@ -296,7 +296,7 @@ sub clubFieldsSetup {
                 },
                 strContactCity  => {
                     label       => $FieldLabels->{'strContactCity'},
-                    value       => $values->{'strContactCity'},
+                    value       => $values->{'strContactCity'} || $Data->{'SystemConfig'}{'DefaultCity'} || '',
                     type        => 'text',
                     size        => '30',
                     maxsize     => '100',
@@ -352,10 +352,10 @@ sub clubFieldsSetup {
                 strAddress
                 strAddress2
                 strState
-                strPostalCode
-                strContact
                 strContactCity
+                strPostalCode
                 strContactISOCountry
+                strContact
                 strPhone
                 strEmail
             )],
