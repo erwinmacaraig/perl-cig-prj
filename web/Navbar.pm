@@ -732,7 +732,8 @@ sub getClubMenuData {
         if ($SystemConfig->{'allowPersonRequest'}) {
             $menuoptions{'requestaccess'} = {
             name => $lang->txt('Request for Person Details'),
-            url => $baseurl."a=PRA_R",
+            #url => $baseurl."a=PRA_R",
+            url => $baseurl."a=INITSRCH_P&type=access",
             };
         }
         if($SystemConfig->{'menu_newperson_PLAYER_'.$Data->{'clientValues'}{'authLevel'}.'_'.$currentLevel} && !$Data->{'ReadOnlyLogin'}) {
