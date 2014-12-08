@@ -444,6 +444,7 @@ sub checkUploadedRegoDocuments {
 	
 	my @required = ();
     foreach my $dc (@{$documents}){ 
+		next if(!$rego_ref->{'InternationalTransfer'} && $dc->{'DocumentFor'} eq 'TRANSFERITC');	#will only be included when there is an ITC
 		if( $dc->{'Required'} ) {
 			push @required,$dc;
 		}		
@@ -479,7 +480,7 @@ sub checkUploadedRegoDocuments {
 	#return ('',1) if($#uploaded_docs == $total);   
 
 	#check for document not uploaded
-	foreach my $rdc (@required){
+	foreach my $rdc (@required){		
 		if(!grep /\Q$rdc->{'Name'}\E/,@uploaded_docs){
 			push @diff,$rdc->{'Name'};
 		}
@@ -517,7 +518,7 @@ sub displayRegoFlowDocuments{
 	my @docos = (); 
 	#check for uploaded documents present for a particular registration and person
 	my $query = qq[
-					SELECT distinct(tblDocuments.intDocumentTypeID), tblDocumentType.strDocumentName 
+					SELECT distinct(tblDocuments.intDocumentTypeID), tblDocumentType.strDocumentName
 					FROM tblDocuments 
 						INNER JOIN tblDocumentType
 					ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
@@ -529,14 +530,15 @@ sub displayRegoFlowDocuments{
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute($personID,$regoID);
 	my @uploaded_docs = ();
-	while(my $dref = $sth->fetchrow_hashref()){
+	while(my $dref = $sth->fetchrow_hashref()){		
 		push @uploaded_docs, $dref->{'intDocumentTypeID'};		
 	}
 	
 	my @diff = ();	
-		
+	open FH, ">dumpfile.txt";	
 	#compare whats in the system and what docos are missing both required and optional
-	foreach my $doc_ref (@{$documents}){		
+	foreach my $doc_ref (@{$documents}){	
+		next if(!$rego_ref->{'InternationalTransfer'} && $doc_ref->{'DocumentFor'} eq 'TRANSFERITC');	
 		if(!grep /$doc_ref->{'ID'}/,@uploaded_docs){
 			push @diff,$doc_ref;	
 		}
