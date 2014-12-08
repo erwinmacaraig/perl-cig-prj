@@ -44,7 +44,7 @@ sub getFieldLabels	{
 			strAddress2 => 'Address 2',
 			strSuburb => 'City',
 			strState => 'State',
-			strISOCountry => 'Country of Address',
+			strISOCountry => 'Country',
 			strPostalCode => 'Postcode',
 			strPhoneHome => 'Contact Number',
 			strPhoneWork => 'Phone (Work)',
