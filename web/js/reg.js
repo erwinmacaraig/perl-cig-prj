@@ -24,6 +24,25 @@ function docViewer(id, params) {
 	jQuery('body').append(d);
 }
 
+         
+function replaceFile(id,doctype,regoID,personID, client, doctypename){ 
+    $('#docViewerOverlay').remove();
+	var url = 'fileform.cgi?client='+client + '&f='+id + '&doctype='+doctype + '&regoID='+regoID + '&pID='+personID + '&doctypename='+doctypename;
+	window.scrollTo(0,0);
+    var newdiv = $("<div></div>", {
+		"id":"docViewerOverlay"		
+	}); 
+	var newframe = $("<iframe></iframe>",{
+		"src":url,
+		"scrolling":"no"
+	});
+	$(newdiv).append(newframe);
+	$('body').append(newdiv);
+
+
+	
+
+}
 // Regs new simple tab code 9/8/2013
 
 $('ul.new_tabs').each(function(){

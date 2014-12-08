@@ -18,7 +18,7 @@ use FileUpload;
 use CGI qw(:cgi param unescape escape);
 use Reg_common;
 
-
+use Data::Dumper;
 
 my $File_MaxSize = 4*1024*1024; #4Mb;
 
@@ -119,9 +119,7 @@ sub processUploadFile	{
     $fileType,
     $other_info,
   ) = @_; 
-    
-        
-       
+      
 	my $ret = '';
 
 	for my $files (@{$files_to_process})	{
@@ -156,7 +154,8 @@ sub _processUploadFile_single	{
 		$options,
         $other_info,
 	) = @_;
-
+	open FH, ">>dumpfile.txt";
+	
 	my $intFileAddedBy = $Data->{'clientValues'}{'_intID'} || getLastEntityID($Data->{'clientValues'});
 	$options ||= {}; 
         my $DocumentTypeId = 0;
@@ -167,7 +166,7 @@ sub _processUploadFile_single	{
           $regoID = $other_info->{'regoID'} || 0;
           $oldFileId = $other_info->{'replaceFileID'} || 0;                   
         }   
-        
+  
   my $origfilename=param($file_field) || '';
 	$origfilename =~s/.*\///g;
 	$origfilename =~s/.*\\//g;
@@ -290,6 +289,7 @@ sub _processUploadFile_single	{
               $oldFileId,
               $intPersonID, 
         );
+		
         }
                 
        $doc_q->finish();
