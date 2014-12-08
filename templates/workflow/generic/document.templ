@@ -24,6 +24,9 @@
             </tr>
         </thead>
         <tbody>
+
+            <input type="hidden" value = "[% TotalPending %]" class="totalPendingDocs">
+            
             [% FOREACH document IN RelatedDocuments %]
             <tr class="task-list">
                 <td>
@@ -75,3 +78,7 @@
         </tbody>
     </table>
 </div>
+
+
+
+

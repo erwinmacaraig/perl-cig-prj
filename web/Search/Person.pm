@@ -30,7 +30,7 @@ sub process {
             return $self->getTransfer($raw);
         }
         case 'access' {
-            return;
+            return $self->getPersonAccess($raw);
         }
         case 'default' {
             return $self->getPersonRegistration($raw);
@@ -248,7 +248,6 @@ sub getTransfer {
         my $target = $self->getData()->{'target'};
         my $client = $self->getData()->{'client'};
         while(my $dref = $q->fetchrow_hashref()) {
-            print STDERR Dumper $dref;
             $count++;
             my $name = "$dref->{'strLocalFirstname'} $dref->{'strLocalSurname'}" || '';
             my $acceptedRequestLink = ($dref->{'existingAcceptedRequestID'}) ? "$target?client=$client&amp;a=PRA_V&rid=$dref->{'existingAcceptedRequestID'}" : '';
@@ -393,6 +392,141 @@ sub getPersonRegistration {
     }
 
     return;
+
+}
+
+sub getPersonAccess {
+    my ($self) = shift;
+    my ($raw) = @_;
+
+    $self->setGridTemplate("search/grid/personregistration.templ");
+
+    my ($intermediateNodes, $subNodes) = $self->getIntermediateNodes();
+    my $filters = $self->setupFilters($subNodes);
+
+    my $realmID = $self->getData()->{'Realm'};
+    $self->getSphinx()->ResetFilters();
+    $self->getSphinx()->SetFilter('intrealmid', [$filters->{'realm'}]);
+
+    #exclude persons that are already in the CLUB initiating the transfer
+    $self->getSphinx()->SetFilter('intentityid', [$filters->{'club'}], 1) if $filters->{'club'};
+    my $results = $self->getSphinx()->Query($self->getKeyword(), 'FIFA_Persons_r'.$filters->{'realm'});
+    my @persons = ();
+
+    if($results and $results->{'total'})  {
+        for my $r (@{$results->{'matches'}})  {
+            push @persons, $r->{'doc'};
+        }
+    }
+
+    my @memarray = ();
+    if(@persons)  {
+        my $person_list = join(',',@persons);
+
+        my $entity_list = '';
+        $entity_list = join(',', @{$subNodes});
+        warn "ENTITY LIST " . $entity_list;
+
+        my $clubID = $self->getData()->{'clientValues'}{'clubID'} || 0;
+        $clubID = 0 if $clubID == $Defs::INVALID_ID;
+
+        my $st = qq[
+            SELECT DISTINCT
+                tblPerson.intPersonID,
+                tblPerson.strLocalFirstname,
+                tblPerson.strLocalSurname,
+                tblPerson.strNationalNum,
+                tblPerson.strFIFAID,
+                tblPerson.dtDOB,
+                PR.strPersonType,
+                E.strLocalName AS EntityName,
+                E.intEntityID,
+                E.intEntityLevel,
+                PRQinprogress.intPersonRequestID as existingInProgressRequestID,
+                PRQaccepted.intPersonRequestID as existingAcceptedRequestID,
+                PRQactive.intPersonRequestID as existingPersonRegistrationID,
+                ePR.intPersonRegistrationID as existingPendingRegistrationID
+            FROM
+            tblPerson
+            INNER JOIN tblPersonRegistration_$realmID AS PR ON (
+                tblPerson.intPersonID = PR.intPersonID
+                AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
+                AND PR.intEntityID <> $filters->{'club'}
+            )
+            INNER JOIN tblEntity AS E ON (
+                PR.intEntityID = E.intEntityID
+            )
+            LEFT JOIN tblPersonRequest AS PRQinprogress ON (
+                PRQinprogress.strRequestType = "ACCESS"
+                AND PRQinprogress.intPersonID = tblPerson.intPersonID
+                AND PRQinprogress.strSport =  PR.strSport
+                AND PRQinprogress.strPersonType = PR.strPersonType
+                AND PRQinprogress.strRequestStatus = "INPROGRESS" AND PRQinprogress.strRequestResponse IS NULL
+                AND PRQinprogress.intRequestFromEntityID = "$clubID"
+            )
+            LEFT JOIN tblPersonRequest AS PRQaccepted ON (
+                PRQaccepted.strRequestType = "ACCESS"
+                AND PRQaccepted.intPersonID = tblPerson.intPersonID
+                AND PRQaccepted.strSport =  PR.strSport
+                AND PRQaccepted.strPersonType = PR.strPersonType
+                AND PRQaccepted.strRequestStatus = "PENDING" AND PRQaccepted.strRequestResponse = "ACCEPTED"
+                AND PRQaccepted.intRequestFromEntityID = "$clubID"
+            )
+            LEFT JOIN tblPersonRegistration_$realmID ePR
+            ON (
+                ePR.intEntityID = "$clubID"
+                AND ePR.intPersonID = tblPerson.intPersonID
+                AND ePR.intRealmID = tblPerson.intRealmID
+                AND ePR.strStatus IN ('PENDING')
+                AND ePR.strSport = PR.strSport
+                AND ePR.strPersonType = PR.strPersonType
+            )
+            LEFT JOIN tblPersonRequest as PRQactive
+            ON  (
+                PRQactive.intPersonRequestID = PR.intPersonRequestID
+                )
+            WHERE tblPerson.intPersonID IN ($person_list)
+            ORDER BY 
+                strLocalSurname, 
+                strLocalFirstname
+        ];
+        my $q = $self->getData->{'db'}->prepare($st);
+        $q->execute();
+        my %origClientValues = %{$self->getData()->{'clientValues'}};
+
+        my $count = 0;
+        my $target = $self->getData()->{'target'};
+        my $client = $self->getData()->{'client'};
+        while(my $dref = $q->fetchrow_hashref()) {
+            $count++;
+            my $name = "$dref->{'strLocalFirstname'} $dref->{'strLocalSurname'}" || '';
+            my $acceptedRequestLink = ($dref->{'existingAcceptedRequestID'}) ? "$target?client=$client&amp;a=PRA_V&rid=$dref->{'existingAcceptedRequestID'}" : '';
+            my $name = "$dref->{'strLocalFirstname'} $dref->{'strLocalSurname'}" || '';
+            push @memarray, {
+                id => $dref->{'intPersonID'} || next,
+                ma_id => $dref->{'strNationalNum'},
+                link => "$target?client=$client&amp;a=PRA_getrecord&request_type=access&amp;search_keyword=$dref->{'strNationalNum'}",
+                name => $name,
+                dob => $dref->{'dtDOB'},
+                role => $Defs::personType{$dref->{'strPersonType'}},
+                inProgressRequestExists => $dref->{'existingInProgressRequestID'},
+                acceptedRequestLink => $acceptedRequestLink,
+                submittedPersonRegistrationExists => $dref->{'existingPendingRegistrationID'},
+            };
+        }
+
+        $self->setResultCount($count);
+
+        if($raw){
+            return \@memarray;
+        }
+        else {
+            return $self->displayResultGrid(\@memarray) if $count;
+
+            return $count;
+        }
+
+    }
 
 }
 

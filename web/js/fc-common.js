@@ -13,6 +13,17 @@ function toggleChevron(e) {
 
 }
 
+ function checkIfDocsAllApproved() {
+    var numberOfPendingDocs = $(".totalPendingDocs").val();
+
+    if (numberOfPendingDocs == 0) {
+        $("body").find("i.documents-complete").removeClass("documents-incomplete");
+    } else {
+        $("body").find("i.documents-complete").addClass("documents-incomplete");
+    }
+ }
+    
+
 $(document).ready(function(){
   findInitialAccordionPanel();
   $("#accordion").on("hidden.bs.collapse", toggleChevron);
@@ -142,5 +153,8 @@ $(document).ready(function(){
         });
 
     });
+    
+    checkIfDocsAllApproved();
+   
 
 });

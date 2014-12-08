@@ -196,15 +196,29 @@
             </div>
         </div>
     </div>
-	<div class="sidebar-box">
-		<h3 class="panel-header">Quick Links</h3>
-		<ul class="quick-links">
-			<li><a href="main.cgi?client=[% client %]&a=PF_"><span class="fa fa-plus"></span>Start a New Registration</a></li>
-			<li><a href="main.cgi?client=[% client %]&a=PRA_T"><span class="fa fa-random"></span>Start a Transfer</a></li>
-			<li><a href="main.cgi?client=[% client %]&a=PENDPR_"><span class="fa fa-newspaper-o"></span>List Pending Registrations</a></li>
-			<li><a href="main.cgi?client=[% client %]&a=REP_SETUP"><span class="fa fa-paste"></span>Reports</a></li>
-		</ul>
-	</div>
+    [% IF CurrentLevel == 3 %]
+        <div class="sidebar-box">
+            <h3 class="panel-header">Quick Links</h3>
+            <ul class="quick-links">
+                <li><a href="main.cgi?client=[% client %]&a=PF_&dtype=PLAYER"><span class="fa fa-plus"></span>Start a New Player Registration</a></li>
+                <li><a href="main.cgi?client=[% client %]&a=PRA_T"><span class="fa fa-random"></span>Request or Start a Transfer</a></li>
+                <li><a href="main.cgi?client=[% client %]&a=PENDPR_"><span class="fa fa-newspaper-o"></span>List Pending Registrations</a></li>
+                <li><a href="main.cgi?client=[% client %]&a=REP_SETUP"><span class="fa fa-paste"></span>Reports</a></li>
+            </ul>
+        </div>
+    [% ELSE %]
+        <div class="sidebar-box">
+            <h3 class="panel-header">Quick Links</h3>
+            <ul class="quick-links">
+                <li><a href="main.cgi?client=[% client %]&a=PF_"><span class="fa fa-plus"></span>Start a New Registration</a></li>
+                [% IF MA_allowTransfer %]
+                    <li><a href="main.cgi?client=[% client %]&a=PRA_T"><span class="fa fa-random"></span>Request or Start a Transfer</a></li>
+                [% END %]
+                <li><a href="main.cgi?client=[% client %]&a=PENDPR_"><span class="fa fa-newspaper-o"></span>List Pending Registrations</a></li>
+                <li><a href="main.cgi?client=[% client %]&a=REP_SETUP"><span class="fa fa-paste"></span>Reports</a></li>
+            </ul>
+        </div>
+    [% END %]
 </div>
 
 <script src = "//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>

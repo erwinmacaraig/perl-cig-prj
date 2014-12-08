@@ -18,7 +18,7 @@ use FileUpload;
 use CGI qw(:cgi param unescape escape);
 use Reg_common;
 
-
+use Data::Dumper;
 
 my $File_MaxSize = 4*1024*1024; #4Mb;
 
@@ -72,8 +72,8 @@ sub getUploadedFiles	{
     		$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}";
 		    $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
 			$deleteURL .= qq[&amp;dctid=$dref->{'intDocumentTypeID'}&amp;regoID=$dref->{'regoID'}] if($dref->{'intDocumentTypeID'});
-	      	$deleteURLButton = qq[ <span class="button-small generic-button"><a href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a></span>];
-            $urlViewButton = qq[ <span class="button-small generic-button"><a href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a></span>];
+	      	$deleteURLButton = qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a></span>];
+            $urlViewButton = qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a></span>];
     	}
     	else {
     		my @authorizedLevelsArr = split(/\|/,$dref->{'strLockAtLevel'});
@@ -82,8 +82,8 @@ sub getUploadedFiles	{
                	$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}";
 		        $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
 				$deleteURL .= qq[&amp;dctid=$dref->{'intDocumentTypeID'}&amp;regoID=$dref->{'regoID'}] if($dref->{'intDocumentTypeID'});
-	         	$deleteURLButton = qq[ <span class="button-small generic-button"><a href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a></span>];
-                $urlViewButton = qq[ <span class="button-small generic-button"><a href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a></span>];
+	         	$deleteURLButton = qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a></span>];
+                $urlViewButton = qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a></span>];
             }
             else{
             	$deleteURLButton = qq[ <button class\"HTdisabled\">]. $Data->{'lang'}->txt('Delete'). q[</button>]; 
@@ -119,9 +119,7 @@ sub processUploadFile	{
     $fileType,
     $other_info,
   ) = @_; 
-    
-        
-       
+      
 	my $ret = '';
 
 	for my $files (@{$files_to_process})	{
@@ -156,7 +154,8 @@ sub _processUploadFile_single	{
 		$options,
         $other_info,
 	) = @_;
-
+	open FH, ">>dumpfile.txt";
+	
 	my $intFileAddedBy = $Data->{'clientValues'}{'_intID'} || getLastEntityID($Data->{'clientValues'});
 	$options ||= {}; 
         my $DocumentTypeId = 0;
@@ -167,7 +166,7 @@ sub _processUploadFile_single	{
           $regoID = $other_info->{'regoID'} || 0;
           $oldFileId = $other_info->{'replaceFileID'} || 0;                   
         }   
-        
+  
   my $origfilename=param($file_field) || '';
 	$origfilename =~s/.*\///g;
 	$origfilename =~s/.*\\//g;
@@ -290,6 +289,7 @@ sub _processUploadFile_single	{
               $oldFileId,
               $intPersonID, 
         );
+		
         }
                 
        $doc_q->finish();

@@ -121,6 +121,8 @@ sub showPersonHome	{
     foreach my $rego (@{$Reg_ref})  {
         my $renew = '';
         $rego->{'renew_link'} = '';
+        #next if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}) and $Data->{'authLevel'} != $Defs::LEVEL_NATIONAL);
+        ## Show MA the renew link remvoed as we need them to navigate to the club level for now
         next if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}));
         next if ($rego->{'strStatus'} !~ /$Defs::PERSONREGO_STATUS_ACTIVE|$Defs::PERSONREGO_STATUS_PASSIVE/);
         #my $ageLevel = $rego->{'strAgeLevel'}; #'ADULT'; ## HERE NEEDS TO CALCULATE IF MINOR/ADULT
@@ -194,7 +196,7 @@ sub getMemFields {
 		push @{$fields_grouped{$group}}, [$f, $label];
 		my $string = '';
 		if (($val and $val ne '00/00/0000') or ($is_header))	{
-			$string .= qq[<div class=""><span class = "details-left" style="width:65%;">$label:</span>] if !$nolabelfields{$f};
+			$string .= qq[<div class=""><span class = "details-left">$label:</span>] if !$nolabelfields{$f};
 			$string .= '<span class="detail-value">'.$val.'</span></div>';
 			$fields{$group} .= $string;
 		}
