@@ -125,6 +125,7 @@ sub Navigation {
             $showlink = 1 if(!$current and !$step_in_future);
             $showlink = 0 if($self->{'ProcessOrder'}[$i]{'noRevisit'});
             my $linkURL = $self->{'Target'}."?rfp=".$self->{'ProcessOrder'}[$i]{'action'}."&".$self->stringifyURLCarryField();
+            $self->{'RunDetails'}{'DirectLinks'}[$i] = $linkURL;
 
 			my $link = $showlink
                 ? qq[<a href="$linkURL" class = "stepname">$step. $name</a>]
@@ -250,6 +251,8 @@ sub display {
       $templateData->{'Navigation'} = $self->Navigation();
       $templateData->{'PageTitle'} = $self->title();
   }
+  $templateData->{'ContinueButtonText'} ||= 'Continue';
+  ($templateData->{'BackButtonURL'}, $templateData->{'BackButtonDestination'}) = $self->buildBackButton();
   my $output = runTemplate($self->{'Data'}, $templateData, $templateName);
   if(scalar(@{$templateData->{'Errors'}})) {
     my $filledin = HTML::FillInForm->fill(\$output, $self->{'RunParams'});
@@ -387,6 +390,27 @@ sub getCarryFields {
     my %tempcarry = %{$self->{'CarryFields'}};
     delete($tempcarry{'__cf'});
     return  \%tempcarry;
+}
+
+sub buildBackButton {
+  my $self = shift;
+
+  my $currentIndex = $self->{'CurrentIndex'} || 0;
+  if(!$currentIndex)  {
+    return ('','');
+  }
+  my $backIndex = $currentIndex - 1 ;
+  my $text = '';
+  while($backIndex >= 0 and $text eq '')    {
+    if(!$self->{'ProcessOrder'}[$backIndex]{'NoNav'})   {
+        $text = $self->{'ProcessOrder'}[$backIndex]{'label'} || '';
+    }
+    $backIndex-- if !$text;
+  }
+  return ('','') if !$text;
+  
+  my $url = $self->{'RunDetails'}{'DirectLinks'}[$backIndex] || '';
+  return ($url, $text);
 }
 
 # ------------------- Stub Functions ---
