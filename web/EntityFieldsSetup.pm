@@ -203,7 +203,7 @@ sub clubFieldsSetup {
                     label       => $FieldLabels->{'strISOCountry'},
                     value       => $values->{strISOCountry} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
                     type        => 'lookup',
-                    options     => \%Mcountriesonly,
+                    options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],
                     compulsory => 1,
                     sectionname => 'core',
