@@ -312,8 +312,46 @@ label {
 strong {
 	font-family:'noto_sansregular';
 }
- 
+.rowtop-spacing {
+	margin-top: 20px;
+}  
 .txtright {
+	text-align: right;
+} 
+#allfilesgridid_filter label input[type="search"] {
+	border-radius: 5px;
+    padding: 5px;
+    width: 71%;
+}
+#grid_wrapper #grid_filter label input[type="search"] {
+	border-radius: 5px;
+    padding: 5px;
+    width: 71%;
+}
+#personDocAdd select[name="doclisttype"] {
+    padding: 7px;
+    width: 40%;
+}
+#personDocAdd select[name=RegistrationID] {
+    padding: 7px;
+    width: 40%;	
+}
+#personDocAdd .button-small {
+    height: 22px;
+    margin-top: 5px;
+    padding: 3px 3px 10px;
+    width: 5%;
+}
+#pageholder div.showrecoptions {
+	float: left;
+}
+#grid td span .btn-inside-panels {
+	height: auto;
+}
+#allfilesgridid td span .btn-inside-panels {
+	height: auto;
+}
+div#content div.member-home-page div.task-actions.txtright {
 	text-align: right;
 } 
 fieldset .txtleft {
@@ -551,7 +589,7 @@ table.zebra tbody tr:nth-child(even) {
 }
 
 table tr.new-task {
-    border-left: 5px solid #055688;
+    border-left: 5px solid #c4070a;
 }
 
 .panel-body p.reg-text {
@@ -1434,4 +1472,24 @@ span.fa-user{
 	overflow:hidden;
 	margin-top: 20px;
 	padding:5px;
+}
+
+span.circleBg {
+	background: #d8d8d8;
+	-moz-border-radius :70px;
+	-webkit-border-radius :70px;
+	border-radius :70px;
+	position:relative;
+	left:8px;
+}
+
+
+i.documents-incomplete {
+	display:none;
+}
+
+i.documents-complete {
+	color: #1baf37;
+	margin-left:3px;
+	margin-right:4px;
 }

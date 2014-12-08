@@ -578,6 +578,7 @@ sub listTasks {
     );
 	my %TemplateData = (
         #TaskList => \@TaskList,
+        MA_allowTransfer => $Data->{'SystemConfig'}{'MA_allowTransfer'} || 0,
         TaskList => \@sortedTaskList,
         CurrentLevel => $Data->{'clientValues'}{'currentLevel'},
         TaskCounts => \%taskCounts,
@@ -1529,6 +1530,7 @@ sub updateTaskNotes {
 
     my %TemplateData = (
         TID=> $WFTaskID,
+        MA_allowTransfer => $Data->{'SystemConfig'}{'MA_allowTransfer'} || 0,
         Lang => $Data->{'lang'},
         TaskNotes=> $notes,
         client => $Data->{client},
@@ -1698,13 +1700,13 @@ sub resolveTask {
             AND intRealmID = ?
     ];
 
-    #if($task->{strWFRuleFor} eq 'ENTITY') {
-    #    setEntityStatus($Data, $WFTaskID, $Defs::WF_TASK_STATUS_PENDING);
-    #}
+    if($task->{strWFRuleFor} eq 'ENTITY') {
+        setEntityStatus($Data, $WFTaskID, $Defs::WF_TASK_STATUS_PENDING);
+    }
 
-    #if($task->{strWFRuleFor} eq 'REGO') {
-    #    setPersonRegoStatus($Data, $WFTaskID, $Defs::WF_TASK_STATUS_PENDING);
-    #}
+    if($task->{strWFRuleFor} eq 'REGO') {
+        setPersonRegoStatus($Data, $WFTaskID, $Defs::WF_TASK_STATUS_PENDING);
+    }
 
   	$q = $db->prepare($st);
   	$q->execute(
@@ -2105,6 +2107,10 @@ sub viewTask {
 
     my ($NotesData) = populateTaskNotesViewData($Data, $dref);
     %NotesData = %{$NotesData};
+
+
+    $DocumentData{'TotalPending'} = $documentStatusCount->{'PENDING'};
+
     my $documentBlock = runTemplate(
         $Data,
         \%DocumentData,

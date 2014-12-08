@@ -399,7 +399,8 @@ sub listPersonRecord {
         @tData = ();
     }
 
-    return ("$found record found.", $title) if !$found;
+    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("No record found.")) if !$found;
+    #return ("$found record found.", $title) if !$found;
 
     my $resultHTML = undef;
     if($requestType eq $Defs::PERSON_REQUEST_ACCESS) {

@@ -547,11 +547,11 @@ sub display_registration {
             $request->{'sport'} = $Defs::sportType{$request->{'strSport'}};
             $request->{'personLevel'} = $Defs::personLevel{$request->{'strPersonLevel'}};
 
-            $self->addCarryField('nat', 'TRANSFER');
-            $self->addCarryField('pt', $request->{'strPersonType'});
-            $self->addCarryField('pl', $request->{'strPersonLevel'});
-            $self->addCarryField('sp', $request->{'strSport'});
-            $self->addCarryField('ag', $request->{'personCurrentAgeLevel'});
+            $self->addCarryField('d_nature', 'TRANSFER');
+            $self->addCarryField('d_type', $request->{'strPersonType'});
+            $self->addCarryField('d_level', $request->{'strPersonLevel'});
+            $self->addCarryField('d_sport', $request->{'strSport'});
+            $self->addCarryField('d_age', $request->{'personCurrentAgeLevel'});
 
             $content = runTemplate(
                 $self->{'Data'},
@@ -636,6 +636,7 @@ sub process_registration {
             $personRequestID,
        );
     }
+
     if(!$personID)    {
         push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person';
     }
@@ -816,6 +817,10 @@ sub display_products {
             {},
             1,
         );
+        if (! $content)   {
+            $self->incrementCurrentProcessIndex();
+            return ('',2);
+        }
     }
     else    {
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
@@ -977,6 +982,10 @@ sub display_documents {
             {},
             1
         );
+        if (! $content)   {
+            $self->incrementCurrentProcessIndex();
+            return ('',2);
+        }
 	my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},

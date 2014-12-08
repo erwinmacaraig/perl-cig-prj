@@ -126,15 +126,15 @@ sub displayRegoFlowSummary {
          
           
 	    my $personObj = getInstanceOf($Data, 'person');
-		
+		my $c = Countries::getISOCountriesHash();
 		
 		my %personData = ();
 		$personData{'Name'} = $personObj->getValue('strLocalFirstname');
         $personData{'Familyname'} = $personObj->getValue('strLocalSurname');
 		$personData{'DOB'} = $personObj->getValue('dtDOB');
 		$personData{'Gender'} = $Data->{'lang'}->txt($Defs::genderInfo{$personObj->getValue('intGender') || 0}) || '';
-		$personData{'Nationality'} = $personObj->getValue('strISONationality');
-		$personData{'Country'} = $personObj->getValue('strISOCountryOfBirth') || '';
+		$personData{'Nationality'} = $c->{$personObj->getValue('strISONationality')};
+		$personData{'Country'} = $c->{$personObj->getValue('strISOCountryOfBirth')} || '';
 		$personData{'Region'} = $personObj->getValue('strRegionOfBirth') || '';
 
 		$personData{'Addressone'} = $personObj->getValue('strAddress1') || '';
@@ -148,7 +148,6 @@ sub displayRegoFlowSummary {
 		
 		#$personData{''} = $personObj->getValue('') || '';
 
-
  		my $languages = PersonLanguages::getPersonLanguages( $Data, 1, 0);
 		for my $l ( @{$languages} ) {
 			if($l->{intLanguageID} == $personObj->getValue('intLocalLanguage')){
@@ -156,7 +155,7 @@ sub displayRegoFlowSummary {
 				last;	
 			}
 		}
-	
+
         my %PageData = (
             person_home_url => $url,
 			person => \%personData,
@@ -580,6 +579,10 @@ sub displayRegoFlowDocuments{
 		}
     	
     }
+
+    if (! scalar @required_docs_listing and ! scalar @optional_docs_listing)  {
+        return '';
+    }
     
   my %PageData = (
         nextaction => "PREGF_DU",
@@ -631,7 +634,10 @@ sub displayRegoFlowProducts {
     my $product_body='';
     if (@prodIDs)   {
         $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
-     }
+    }
+    else    {
+        return '';
+    }
 
      my %PageData = (
         nextaction=>"PREGF_PU",
