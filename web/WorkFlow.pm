@@ -578,6 +578,7 @@ sub listTasks {
     );
 	my %TemplateData = (
         #TaskList => \@TaskList,
+        MA_allowTransfer => $Data->{'SystemConfig'}{'MA_allowTransfer'} || 0,
         TaskList => \@sortedTaskList,
         CurrentLevel => $Data->{'clientValues'}{'currentLevel'},
         TaskCounts => \%taskCounts,
@@ -1528,6 +1529,7 @@ sub updateTaskNotes {
 
     my %TemplateData = (
         TID=> $WFTaskID,
+        MA_allowTransfer => $Data->{'SystemConfig'}{'MA_allowTransfer'} || 0,
         Lang => $Data->{'lang'},
         TaskNotes=> $notes,
         client => $Data->{client},
