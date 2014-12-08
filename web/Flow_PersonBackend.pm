@@ -817,6 +817,10 @@ sub display_products {
             {},
             1,
         );
+        if (! $content)   {
+            $self->incrementCurrentProcessIndex();
+            return ('',2);
+        }
     }
     else    {
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
@@ -978,6 +982,10 @@ sub display_documents {
             {},
             1
         );
+        if (! $content)   {
+            $self->incrementCurrentProcessIndex();
+            return ('',2);
+        }
 	my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},

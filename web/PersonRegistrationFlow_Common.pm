@@ -580,6 +580,10 @@ sub displayRegoFlowDocuments{
 		}
     	
     }
+
+    if (! scalar @required_docs_listing and ! scalar @optional_docs_listing)  {
+        return '';
+    }
     
   my %PageData = (
         nextaction => "PREGF_DU",
@@ -631,7 +635,10 @@ sub displayRegoFlowProducts {
     my $product_body='';
     if (@prodIDs)   {
         $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
-     }
+    }
+    else    {
+        return '';
+    }
 
      my %PageData = (
         nextaction=>"PREGF_PU",
