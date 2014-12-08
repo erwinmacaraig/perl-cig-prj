@@ -37,7 +37,7 @@ sub setProcessOrder {
             'function' => 'display_core_details',
             'label'  => 'Venue Details',
             'fieldset'  => 'core',
-            'title'  => 'Registration - Enter Venue Information',
+            'title'  => 'Facility- Enter Venue Information',
         },
         {
             'action' => 'cdu',
@@ -49,7 +49,7 @@ sub setProcessOrder {
             'function' => 'display_contact_details',
             'label'  => 'Contact Details',
             'fieldset'  => 'contactdetails',
-            'title'  => 'Registration - Enter Contact Details',
+            'title'  => 'Facility - Enter Contact Details',
         },
         {
             'action' => 'condu',
@@ -60,7 +60,7 @@ sub setProcessOrder {
             'action' => 'role',
             'function' => 'display_role_details',
             'fieldset' => 'roledetails',
-            'title'  => 'Registration - Enter Role Details',
+            'title'  => 'Facility - Enter Role Details',
         },
         {
             'action' => 'roleu',
@@ -71,7 +71,7 @@ sub setProcessOrder {
             'action' => 'fld',
             'function' => 'display_fields',
             'label' => 'Fields',
-            'title'  => 'Registration - Enter Additional Informatton',
+            'title'  => 'Facility - Enter Additional Informatton',
         },
         {
             'action' => 'fldu',
@@ -81,7 +81,7 @@ sub setProcessOrder {
             'action' => 'd',
             'function' => 'display_documents',
             'label'  => 'Documents',
-            'title'  => 'Registration - Upload Documents',
+            'title'  => 'Facility - Upload Documents',
         },
         {
             'action' => 'du',
@@ -97,10 +97,16 @@ sub setProcessOrder {
         #    'function' => 'process_products',
         #},
         {
+            'action' => 'summ',
+            'function' => 'display_summary',
+            'label'  => 'Summary',
+            'title'  => 'Facility - Summary',
+        },
+        {
             'action' => 'c',
             'function' => 'display_complete',
             'label'  => 'Complete',
-            'title'  => 'Registration - Summary',
+            'title'  => 'Facility - Submitted',
         },
     ];
 
@@ -503,7 +509,7 @@ sub validate_core_details {
     }
     my $facilityObj = new EntityObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}->{'cache'});
     $facilityObj->load();
-    $facilityData->{'strStatus'} = $Defs::ENTITY_STATUS_PENDING;
+    $facilityData->{'strStatus'} = $Defs::ENTITY_STATUS_INPROGRESS;
     $facilityData->{'intRealmID'} = $self->{'Data'}{'Realm'};
     $facilityData->{'intEntityLevel'} = $Defs::LEVEL_VENUE;
     $facilityData->{'intCreatedByEntityID'} = $authID;
@@ -964,6 +970,40 @@ sub process_documents {
     return ('',1);
 }
 
+sub display_summary {
+    my $self = shift;
+
+    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
+    my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
+    my $client = $self->{'Data'}->{'client'};
+
+    my $facilityFields = new EntityFields();
+    $facilityFields->setEntityID($self->{'RunParams'}{'e'});
+    $facilityFields->setData($self->{'Data'});
+
+    my $content = '';
+
+    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+        #There are errors - reset where we are to go back to the form again
+        $self->decrementCurrentProcessIndex();
+        return ('',2);
+    }
+
+    my %PageData = (
+        HiddenFields => $self->stringifyCarryField(),
+        Target => $self->{'Data'}{'target'},
+        Errors => $self->{'RunDetails'}{'Errors'} || [],
+        Content => '',
+        Title => '',
+        TextTop => $content,
+        TextBottom => '',
+        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+    );
+    my $pagedata = $self->display(\%PageData);
+
+    return ($pagedata,0);
+}
 sub display_complete {
     my $self = shift;
 
@@ -978,7 +1018,13 @@ sub display_complete {
 
     my $content = '';
     if(scalar@{$facilityFields->getAll()}) {
-
+        my $facilityID = $facilityFields->getEntityID();
+        my $facilityObj = new EntityObj(db => $self->{'db'}, ID => $facilityID, cache => $self->{'Data'}->{'cache'});
+        $facilityObj->load();
+        my $PendingStatus =  {};
+        $PendingStatus->{'strStatus'} = $Defs::ENTITY_STATUS_PENDING;
+        $facilityObj->setValues($PendingStatus);
+        $facilityObj->write();
         if($self->{'RunParams'}{'newvenue'})  {
             my $rc = WorkFlow::addWorkFlowTasks(
                 $self->{'Data'},
@@ -991,8 +1037,8 @@ sub display_complete {
                 0,
             );
         }
+        $facilityObj->load();
 
-        my $facilityID = $facilityFields->getEntityID();
         $content = qq [<div class="alert"><div><span class="flash_success fa fa-check"></span><p>$self->{'Data'}->{'LevelNames'}{$Defs::LEVEL_VENUE} submitted for approval</p></div></div>]; # Venue ID = $facilityID AND entityID = $entityID </div><br> ];
     }
     else {
@@ -1013,6 +1059,7 @@ sub display_complete {
         Title => '',
         TextTop => $content,
         TextBottom => '',
+        NoContinueButton => 1,
     );
     my $pagedata = $self->display(\%PageData);
 

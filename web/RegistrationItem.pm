@@ -23,6 +23,7 @@ sub getRegistrationItems    {
     $multiPersonType ||= ''; ## For products, are multi regos used    
 
     return 0 if (! $itemType);
+
     my $st = qq[
    SELECT 
             RI.intID,
@@ -96,9 +97,13 @@ sub getRegistrationItems    {
     push @values,$Rego_ref->{'Nationality'} || '';
     
 
+
     my @Items=();
     while (my $dref = $q->fetchrow_hashref())   {
         next if($itemType eq 'DOCUMENT' and $documentFor and ($documentFor ne $dref->{'strDocumentFor'}));
+
+        #check if International Transfer
+        next if($dref->{'strDocumentFor'} eq 'TRANSFERITC' and !$Rego_ref->{'InternationalTransfer'});
 
         my %Item=();
         $Item{'ID'} = $dref->{'intID'};
