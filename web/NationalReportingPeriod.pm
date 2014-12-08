@@ -70,8 +70,12 @@ sub getNationalReportingPeriod {
     }
     if ($registrationNature and $registrationNature eq 'RENEWAL')   {
         $st .= qq[ 
-            AND 
-                intCurrentRenewal= 1 
+            AND intCurrentRenewal= 1 
+        ];
+    }
+    if ($registrationNature and $registrationNature eq 'TRANSFER')   {
+        $st .= qq[ 
+            AND intCurrentTransfer= 1 
         ];
     }
     $st .= qq[
