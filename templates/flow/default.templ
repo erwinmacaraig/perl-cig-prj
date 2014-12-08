@@ -26,12 +26,14 @@
 	[% HiddenFields %]
 
 <div class = "button-row">
-[% IF !NoContinueButton and ContinueButtonText %]
-	<div class="txtright"><input id = "flow-btn-continue" type = "submit" value = " [% ContinueButtonText %] "  class = "btn-main"></div>
+	<div class="txtright">
+[% IF !NoBackButton and BackButtonURL %]
+	<a href = "[% BackButtonURL %]" id = "flow-btn-back" class = "btn-main">[% IF BackButtonText %][% Lang.txt(BackButtonText) %][% ELSE %][% Lang.txt('Back to:') %] [% Lang.txt(BackButtonDestination) %][% END %]</a>
 [% END %]
-[% IF !NoContinueButton and ! ContinueButtonText %]
-	<div class="txtright"><input id = "flow-btn-continue" type = "submit" value = " [% Lang.txt('Continue') %] "  class = "btn-main"></div>
+[% IF !NoContinueButton %]
+<input id = "flow-btn-continue" type = "submit" value = " [% Lang.txt(ContinueButtonText) %] "  class = "btn-main">
 [% END %]
+</div>
 
 </div>
 </form>
