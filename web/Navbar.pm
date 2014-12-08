@@ -819,7 +819,7 @@ sub getClubMenuData {
             'venues',
             'addvenue'
         ]],
-        [ $lang->txt('Work Tasks'), 'menu',[
+        [ $lang->txt('Club Work Tasks'), 'menu',[
             'approvals',
             'pending'
         ]],
