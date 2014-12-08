@@ -316,6 +316,9 @@ strong {
 .txtright {
 	text-align: right;
 } 
+div#content div.member-home-page div.task-actions.txtright {
+	text-align: right;
+} 
 fieldset .txtleft {
 	text-align: left;
 	font-size: 13px;
