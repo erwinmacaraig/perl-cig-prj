@@ -177,7 +177,12 @@ sub list_docs {
 	##############################3
 	 my $allfilesgrid = '';
 	if(defined $docs->[0]->{'id'}){
-		$body = qq[<br /><div class="pageHeading">$title</div>];
+		if($title != ""){
+			$body = qq[<br /><div class="pageHeading">$title</div>];
+		}else{
+			$body = qq[<br /><div class="col-md-12 rowtop-spacing"></div>];
+		}
+	
 		my @headers2 = (
 		{ 
             type => 'Selector',

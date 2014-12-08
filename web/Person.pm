@@ -264,7 +264,7 @@ sub personRegistrationsHistory   {
     my %tempClientValues = getClient($client);
     {
         my $tempClient = setClient(\%tempClientValues);
-        $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if (!$Data->{'ReadOnlyLogin'});
+        $addlink=qq[<span class = "button-small generic-button"><a class="btn-inside-panels" href="$Data->{'target'}?client=$client&amp;a=VENUE_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if (!$Data->{'ReadOnlyLogin'});
 
     }
 
@@ -380,14 +380,14 @@ sub listDocuments {
     while(my $dref = $sth->fetchrow_hashref()){
     	#check if strLockLevel is empty which means world access to the file
     	if($dref->{'strLockAtLevel'} eq ''){
-    		$viewLink = qq[ <span class="button-small generic-button"><a href="#" onclick="docViewer($dref->{'intFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a></span>];
-    		$replaceLink =   qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$dref->{'intFileID'}&amp;regoID=$dref->{'regoID'}&amp;dID=$dref->{'doctypeID'}">]. $lang->txt('Replace File'). q[</a></span>];
+    		$viewLink = qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="#" onclick="docViewer($dref->{'intFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a></span>];
+    		$replaceLink =   qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$dref->{'intFileID'}&amp;regoID=$dref->{'regoID'}&amp;dID=$dref->{'doctypeID'}">]. $lang->txt('Replace File'). q[</a></span>];
     	}
     	else {
     		my @authorizedLevelsArr = split(/\|/,$dref->{'strLockAtLevel'});
     		 if(grep(/^$myCurrentValue/,@authorizedLevelsArr)){
-    		 	$viewLink = qq[ <span class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}" target="_blank">]. $lang->txt('Get File') . q[</a></span>];
-    		    $replaceLink =   qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$dref->{'intFileID'}&amp;regoID=$dref->{'regoID'}&amp;dID=$dref->{'doctypeID'}">]. $lang->txt('Replace File'). q[</a></span>];
+    		 	$viewLink = qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}" target="_blank">]. $lang->txt('Get File') . q[</a></span>];
+    		    $replaceLink =   qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$dref->{'intFileID'}&amp;regoID=$dref->{'regoID'}&amp;dID=$dref->{'doctypeID'}">]. $lang->txt('Replace File'). q[</a></span>];
     		 }
     		 else {
     		 	$viewLink = qq[ <button class\"HTdisabled\">]. $lang->txt('Get File') . q[</button>];    
@@ -458,7 +458,7 @@ sub listDocuments {
 
   my $addlink='';
   {
-      $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=DOC_L">].$Data->{'lang'}->txt('Add').qq[</a></span>] if (!$Data->{'ReadOnlyLogin'});
+      $addlink=qq[<span class = "button-small generic-button"><a class="btn-inside-panels" href="$Data->{'target'}?client=$client&amp;a=DOC_L">].$Data->{'lang'}->txt('Add').qq[</a></span>] if (!$Data->{'ReadOnlyLogin'});
   }
    $query = qq[
          SELECT strDocumentName, intDocumentTypeID FROM tblDocumentType WHERE strDocumentFor = ? AND intRealmID IN (0,?)
