@@ -312,10 +312,45 @@ label {
 strong {
 	font-family:'noto_sansregular';
 }
- 
+.rowtop-spacing {
+	margin-top: 20px;
+}  
 .txtright {
 	text-align: right;
 } 
+#allfilesgridid_filter label input[type="search"] {
+	border-radius: 5px;
+    padding: 5px;
+    width: 71%;
+}
+#grid_wrapper #grid_filter label input[type="search"] {
+	border-radius: 5px;
+    padding: 5px;
+    width: 71%;
+}
+#personDocAdd select[name="doclisttype"] {
+    padding: 7px;
+    width: 40%;
+}
+#personDocAdd select[name=RegistrationID] {
+    padding: 7px;
+    width: 40%;	
+}
+#personDocAdd .button-small {
+    height: 22px;
+    margin-top: 5px;
+    padding: 3px 3px 10px;
+    width: 5%;
+}
+#pageholder div.showrecoptions {
+	float: left;
+}
+#grid td span .btn-inside-panels {
+	height: auto;
+}
+#allfilesgridid td span .btn-inside-panels {
+	height: auto;
+}
 div#content div.member-home-page div.task-actions.txtright {
 	text-align: right;
 } 
