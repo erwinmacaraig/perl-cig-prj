@@ -76,7 +76,7 @@ span.notice-error {
 .toggle-type a {
   background: #d8d8d8;
   border: 1px solid #cccccc;
-  font-size: 16px;
+  font-size: 14px;
   padding: 8px 30px;
   color: #000;
   float: left;
@@ -90,7 +90,7 @@ span.notice-error {
 .toggle-type a.active {
   background: #045485;
   border: 1px solid #045485;
-  font-size: 16px;
+  font-size: 14px
   padding: 8px 30px;
   color: #fff;
   float: left;

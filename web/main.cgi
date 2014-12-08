@@ -30,6 +30,7 @@ use Entity;
 use Club;
 use Person;
 use PersonEdit;
+use EntityEdit;
 use Changes;
 use MemberCard;
 
@@ -137,6 +138,9 @@ sub main {
         checkOnLogin( \%Data );
         $action = defaultAction( $clientValues{'authLevel'} );
     }
+    if($action eq 'E_HOME' and $clientValues{'currentLevel'} != $clientValues{'authLevel'}) {
+        $action = 'EE_D';
+    }
 
     if ( $action =~ /^E_/ ) {
         my $ID = getID( \%clientValues );
@@ -180,6 +184,9 @@ sub main {
     }
     elsif ( $action =~ /^PE_/ ) {
         ( $resultHTML, $pageHeading ) = handlePersonEdit( $action, \%Data);
+    }
+    elsif ( $action =~ /^EE_/ ) {
+        ( $resultHTML, $pageHeading ) = handleEntityEdit( $action, \%Data);
     }
     elsif ( $action =~ /^SEARCH_/ ) {
         ( $resultHTML, $pageHeading ) = handleSearch( $action, \%Data, $client );

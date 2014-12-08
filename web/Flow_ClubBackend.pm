@@ -25,6 +25,7 @@ use DefCodes;
 use RegoProducts;
 use RegistrationItem;
 use PersonUserAccess;
+use EntityFieldsSetup;
 use Data::Dumper;
 
 sub setProcessOrder {
@@ -36,7 +37,7 @@ sub setProcessOrder {
             'function' => 'display_core_details',
             'label'  => 'Club Details',
             'fieldset'  => 'core',
-            'title'  => 'Registration - Enter Club Information',
+            'title'  => 'Club - Enter Club Information',
         },
         {
             'action' => 'cdu',
@@ -48,7 +49,7 @@ sub setProcessOrder {
             'function' => 'display_contact_details',
             'label'  => 'Contact Details',
             'fieldset'  => 'contactdetails',
-            'title'  => 'Registration - Enter Contact Information',
+            'title'  => 'Club - Enter Contact Information',
         },
         {
             'action' => 'condu',
@@ -60,7 +61,7 @@ sub setProcessOrder {
             'function' => 'display_role_details',
             'label'  => 'Organisation Details',
             'fieldset' => 'roledetails',
-            'title'  => 'Registration - Enter Organisation Information',
+            'title'  => 'Club - Enter Organisation Information',
         },
         {
             'action' => 'roleu',
@@ -71,7 +72,7 @@ sub setProcessOrder {
             'action' => 'd',
             'function' => 'display_documents',
             'label'  => 'Documents',
-            'title'  => 'Registration - Upload Documents',
+            'title'  => 'Club - Upload Documents',
         },
         {
             'action' => 'du',
@@ -81,441 +82,34 @@ sub setProcessOrder {
             'action' => 'p',
             'function' => 'display_products',
             'label'  => 'Products',
-            'title'  => 'Registration - Choose Products',
+            'title'  => 'Club - Choose Products',
         },
         {
             'action' => 'pu',
             'function' => 'process_products',
         },
         {
+            'action' => 'summ',
+            'function' => 'display_summary',
+            'label'  => 'Summary',
+            'title'  => 'Club - Summary',
+        },
+        {
             'action' => 'c',
             'function' => 'display_complete',
             'label'  => 'Complete',
-            'title'  => 'Registration - Summary',
+            'title'  => 'Club - Submitted',
         },
     ];
 }
 
-sub setupValues {
+sub setupValues    {
     my $self = shift;
     my ($values) = @_;
     $values ||= {};
-
-    #my $FieldLabels   = FieldLabels::getFieldLabels( $self->{'Data'}, $Defs::LEVEL_PERSON );
-    my $FieldLabels   = FieldLabels::getFieldLabels( $self->{'Data'}, $Defs::LEVEL_CLUB );
-    my $isocountries  = getISOCountriesHash();
-    my %countriesonly = ();
-    my %Mcountriesonly = ();
-
-    my @limitCountriesArr = ();
-    if($self->{'Data'}->{'RegoForm'} && $self->{'SystemConfig'}{'AllowedRegoCountries'}){
-    	@limitCountriesArr = split(/\|/, $self->{'SystemConfig'}{'AllowedRegoCountries'} );
-    }
-
-    while(my($k,$c) = each(%{$isocountries})){
-    	$countriesonly{$k} = $c;
-    	if(@limitCountriesArr){
-    		next if(grep(/^$k/, @limitCountriesArr));
-    	}
-    	$Mcountriesonly{$c} = $c;
-    }
-
-    my $dissDateReadOnly = 0;
-
-    if ($self->{'SystemConfig'}{'Entity_EditDissolutionDateMinLevel'} && $self->{'SystemConfig'}{'Entity_EditDissolutionDateMinLevel'} < $self->{'ClientValues'}{'authLevel'}){
-        $dissDateReadOnly = 1; ### Allow us to set custom Level that can edit. ###
-    }
-    elsif ($self->{'ClientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL){
-        $dissDateReadOnly = 1;
-    }
-
-    my $field_case_rules = get_field_case_rules({
-        dbh=>$self->{'db'}, 
-        client=>$self->{'Data'}{'client'}, 
-        type=>'Person'
-    });
-
-    my %genderoptions = ();
-    for my $k ( keys %Defs::PersonGenderInfo ) {
-        next if !$k;
-        next if ( $self->{'SystemConfig'}{'NoUnspecifiedGender'} and $k eq $Defs::GENDER_NONE );
-        $genderoptions{$k} = $Defs::PersonGenderInfo{$k} || '';
-    }
-
-    my $languages = getPersonLanguages( $self->{'Data'}, 1, 0);
-    my %languageOptions = ();
-    my $nonLatin = 0;
-    my @nonLatinLanguages =();
-    for my $l ( @{$languages} ) {
-        $languageOptions{$l->{'intLanguageID'}} = $l->{'language'} || next;
-        if($l->{'intNonLatin'}) {
-            $nonLatin = 1 ;
-            push @nonLatinLanguages, $l->{'intLanguageID'};
-        }
-    }
-    my $nonlatinscript = '';
-    if($nonLatin)   {
-        my $vals = join(',',@nonLatinLanguages);
-        $nonlatinscript =   qq[
-           <script>
-                jQuery(document).ready(function()  {
-                    jQuery('#l_intLocalLanguage').change(function()   {
-                        showLocalLanguage();
-                    });
-                    showLocalLanguage();
-                    function showLocalLanguage()    {
-                        var lang = parseInt(jQuery('#l_intLocalLanguage').val());
-                        nonlatinvals = [$vals];
-                        if(nonlatinvals.indexOf(lang) !== -1 )  {
-                            jQuery('#block-latinnames').show();
-                        }
-                        else    {
-                            jQuery('#block-latinnames').hide();
-                        }
-                    }
-                });
-            </script> 
-
-        ];
-    }
-    my ($DefCodes, $DefCodesOrder) = getDefCodes(
-        dbh        => $self->{'Data'}{'db'},
-        realmID    => $self->{'Data'}{'Realm'},
-        subRealmID => $self->{'Data'}{'RealmSubType'},
-    );
-
-    my @intNatCustomLU_DefsCodes = (undef, -53, -54, -55, -64, -65, -66, -67, -68,-69,-70);
-    my $CustomFieldNames = getCustomFieldNames( $self->{'Data'}, $self->{'Data'}{'RealmSubType'}) || {};
-
-    my %legalTypeOptions = ();
-    my $query = "SELECT strLegalType, intLegalTypeID FROM tblLegalType WHERE intRealmID IN (0,?)";
-    my $sth = $self->{'db'}->prepare($query);
-    $sth->execute($self->{'Data'}->{'Realm'});
-    while(my $href = $sth->fetchrow_hashref()){
-        $legalTypeOptions{$href->{'intLegalTypeID'}} = $href->{'strLegalType'};
-    }
-    $sth->finish();
-
-    my %entityTypeOptions = ();
-    for my $eType ( keys %Defs::entityType ) {
-        next if !$eType;
-        next if $eType eq $Defs::EntityType_WORLD_FEDERATION;
-        next if $eType eq $Defs::EntityType_NATIONAL_ASSOCIATION;
-        next if $eType eq $Defs::EntityType_REGIONAL_ASSOCIATION;
-        $entityTypeOptions{$eType} = $Defs::entityType{$eType} || '';
-    }
-
-    my %organisationLevel = (
-        PROFESSIONAL => 'Professional',
-        AMATEUR => 'Amateur',
-        BOTH => 'Both',
-    );
-
-    my %dissolvedOptions = (
-        0 => 'No',
-        1 => 'Yes',
-    );
-
-    $self->{'FieldSets'} = {
-        core => {
-            'fields' => {
-                strLocalName => {
-                    label       => $FieldLabels->{'strLocalName'},
-                    value       => $values->{'strLocalName'},
-                    type        => 'text',
-                    size        => '40',
-                    maxsize     => '50',
-                    compulsory  => 1,
-                    sectionname => 'core',
-                },
-                strLocalShortName => {
-                    label       => $FieldLabels->{'strLocalShortName'},
-                    value       => $values->{'strLocalShortName'},
-                    type        => 'text',
-                    size        => '40',
-                    maxsize     => '50',
-                    sectionname => 'core',
-                },
-                dtFrom => {
-                    label       => $FieldLabels->{'dtFrom'},
-                    value       => $values->{'dtFrom'},
-                    type        => 'date',
-                    datetype    => 'dropdown',
-                    format      => 'dd/mm/yyyy',
-                    validate    => 'DATE',
-                    maxyear     => (localtime)[5] + 1900,
-                    compulsory => 1,
-                    sectionname => 'core',
-                },
-                dissolved => {
-                    label       => $FieldLabels->{'dissolved'},
-                    value       => $values->{'dissolved'},
-                    options     => \%dissolvedOptions,
-                    type        => 'lookup',
-                    sectionname => 'core',
-                },
-                dtTo => {
-                    label       => $FieldLabels->{'dtTo'},
-                    value       => $values->{'dtTo'},
-                    type        => 'date',
-                    datetype    => 'dropdown',
-                    format      => 'dd/mm/yyyy',
-                    validate    => 'DATE',
-                    maxyear     => (localtime)[5] + 1900,
-                    readonly    => $dissDateReadOnly,
-                    sectionname => 'core',
-                },
-                strCity         => {
-                    label       => $FieldLabels->{'strCity'},
-                    value       => $values->{'strCity'},
-                    type        => 'text',
-                    size        => '30',
-                    maxsize     => '45',
-                    compulsory  => 1,
-                    sectionname => 'core',
-                },
-                strRegion       => {
-                    label       => $FieldLabels->{'strRegion'},
-                    value       => $values->{'strRegion'},
-                    type        => 'text',
-                    size        => '30',
-                    maxsize     => '45',
-                    sectionname => 'core',
-                },
-                strISOCountry   => {
-                    label       => $FieldLabels->{'strISOCountry'},
-                    value       => $values->{strISOCountry} ||  $self->{'SystemConfig'}{'DefaultCountry'} || '',
-                    type        => 'lookup',
-                    options     => \%Mcountriesonly,
-                    firstoption => [ '', 'Select Country' ],
-                    compulsory => 1,
-                    sectionname => 'core',
-                    class       => 'chzn-select',
-                },
-                intLocalLanguage => {
-                    label       => $FieldLabels->{'intLocalLanguage'},
-                    value       => $values->{'intLocalLanguage'},
-                    type        => 'lookup',
-                    options     => \%languageOptions,
-                    firstoption => [ '', 'Select Language' ],
-                    compulsory => 1,
-                    posttext => $nonlatinscript,
-                    sectionname => 'core',
-                },
-                strLatinName    => {
-                    label       => $self->{'SystemConfig'}{'facility_strLatinNames'} || $FieldLabels->{'strLatinName'},
-                    value       => $values->{'strLatinName'},
-                    type        => 'text',
-                    size        => '40',
-                    maxsize     => '50',
-                    active      => $nonLatin,
-                    sectionname => 'core',
-                },
-                strLatinShortName => {
-                    label       => $self->{'SystemConfig'}{'facility_strLatinShortNames'} || $FieldLabels->{'strLatinShortName'},
-                    value       => $values->{'strLatinShortName'},
-                    type        => 'text',
-                    size        => '40',
-                    maxsize     => '50',
-                    active      => $nonLatin,
-                    sectionname => 'core',
-                },
-                latinBlockStart => {
-                    label       => 'latinblockstart',
-                    value       => qq[<div id = "block-latinnames" class = "dynamic-panel">],
-                    type        => 'htmlrow',
-                    sectionname => 'core',
-                    active      => $nonLatin,
-                },
-                latinBlockEnd => {
-                    label       => 'latinblockend',
-                    value       => qq[</div>],
-                    type        => 'htmlrow',
-                    sectionname => 'core',
-                    active      => $nonLatin,
-                },
-            },
-            'order' => [qw(
-                strLocalName
-                strLocalShortName
-                intLocalLanguage
-                latinBlockStart
-                strLatinName
-                strLatinShortName
-                latinBlockEnd
-                dtFrom
-                dissolved
-                dtTo
-                strCity
-                strRegion
-                strISOCountry
-            )],
-            sections => [
-                [ 'core',        'Club Details' ],
-            ],
-            fieldtransform => {
-                textcase => {
-                    #strLocalFirstname => $field_case_rules->{'strLocalFirstname'} || '',
-                    #strLocalSurname   => $field_case_rules->{'strLocalSurname'}   || '',
-                }
-            },
-        },
-        contactdetails => {
-            'fields' => {
-                strAddress  => {
-                    label       => $FieldLabels->{'strAddress'},
-                    value       => $values->{'strAddress'},
-                    type        => 'text',
-                    size        => '50',
-                    maxsize     => '100',
-                    compulsory  => 1,
-                },
-                strAddress2 => {
-                    label       => $FieldLabels->{'strAddress2'},
-                    value       => $values->{'strAddress2'},
-                    type        => 'text',
-                    size        => '50',
-                    maxsize     => '100',
-                },
-                strContactCity  => {
-                    label       => $FieldLabels->{'strContactCity'},
-                    value       => $values->{'strContactCity'},
-                    type        => 'text',
-                    size        => '30',
-                    maxsize     => '100',
-                    compulsory  => 0,
-                },
-                strState => {
-                    label       => $FieldLabels->{'strState'},
-                    value       => $values->{'strState'},
-                    type        => 'text',
-                    size        => '50',
-                    maxsize     => '100',
-                },
-                strPhone => {
-                    label       => $FieldLabels->{'strPhone'},
-                    value       => $values->{'strPhone'},
-                    type        => 'text',
-                    size        => '15',
-                    maxsize     => '15',
-                },
-                strContactISOCountry   => {
-                    label       => $FieldLabels->{'strContactISOCountry'},
-                    value       => $values->{'strContactISOCountry'},
-                    type        => 'lookup',
-                    options     => $isocountries,
-                    firstoption => [ '', 'Select Country' ],
-                    compulsory => 0,
-                    class       => 'chzn-select',
-                },
-                strPostalCode => {
-                    label       => $FieldLabels->{'strPostalCode'},
-                    value       => $values->{'strPostalCode'},
-                    type        => 'text',
-                    size        => '50',
-                    maxsize     => '100',
-                },
-                strContact=> {
-                    label       => $FieldLabels->{'strContact'},
-                    value       => $values->{'strContact'},
-                    type        => 'text',
-                    size        => '50',
-                    maxsize     => '100',
-                },
-                strEmail => {
-                    label       => $FieldLabels->{'strEmail'},
-                    value       => $values->{'strEmail'},
-                    type        => 'text',
-                    size        => '50',
-                    maxsize     => '100',
-                    validate    => 'EMAIL',
-                },
-            },
-            'order' => [qw(
-                strAddress
-                strAddress2
-                strState
-                strPostalCode
-                strContact
-                strContactCity
-                strContactISOCountry
-                strPhone
-                strEmail
-            )],
-            sections => [
-                [ 'main',        'Contact Details' ],
-            ],
-            #fieldtransform => {
-                #textcase => {
-                    #strSuburb    => $field_case_rules->{'strSuburb'}    || '',
-                #}
-            #},
-        },
-        roledetails  => {
-            'fields' => {
-                strEntityType   => {
-                    label       => $FieldLabels->{'strEntityType'},
-                    value       => $values->{strEntityType} || '',
-                    type        => 'lookup',
-                    options     => \%entityTypeOptions,
-                    firstoption => [ '', 'Select Type of Organisation' ],
-                    compulsory => 1,
-                },
-                intLegalTypeID  => {
-                    label       => $FieldLabels->{'intLegalTypeID'},
-                    value       => $values->{'intLegalTypeID'},
-                    type        => 'lookup',
-                    options     => \%legalTypeOptions,
-                    firstoption => [ '', 'Select Legal Entity Type' ],
-                    compulsory  => 1,
-                },
-                strLegalID      => {
-                    label       => $FieldLabels->{'strLegalID'},
-                    value       => $values->{'strLegalID'},
-                    type        => 'text',
-                    size        => '40',
-                    maxsize     => '45',
-                    compulsory  => 1,
-                },
-                strDiscipline   => {
-                    label       => $FieldLabels->{'strDiscipline'},
-                    value       => $values->{'strDiscipline'},
-                    type        => 'lookup',
-                    options     => \%Defs::entitySportType,
-                    firstoption => [ '', 'Select Sport' ],
-                    compulsory  => 1,
-                },
-                strOrganisationLevel    => {
-                    label       => $FieldLabels->{'strOrganisationLevel'},
-                    value       => $values->{'strOrganisationLevel'},
-                    type        => 'lookup',
-                    options     => \%organisationLevel,
-                    firstoption => [ '', 'Select Level' ],
-                    compulsory  => 1,
-                },
-                strMANotes      => {
-                    label       => $FieldLabels->{'strMANotes'},
-                    value       => $values->{'strMANotes'},
-                    type        => 'text',
-                    size        => '50',
-                    maxsize     => '100',
-                    readonly    => $self->{'ClientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL ? 1 : 0,
-                },
-            },
-            'order' => [qw(
-                strEntityType
-                intLegalTypeID
-                strLegalID
-                strDiscipline
-                strOrganisationLevel
-                strMANotes
-            )],
-            sections => [
-                [ 'main',        'Organisation Details' ],
-            ],
-        },
-    };
+    $self->{'FieldSets'} = clubFieldsSetup($self->{'Data'}, $values);
 }
+
 
 sub display_core_details { 
     my $self = shift;
@@ -577,7 +171,7 @@ sub validate_core_details {
         return ('Invalid User',0);
     }
 
-    my $clubStatus = ($clubData->{'dissolved'}) ? $Defs::ENTITY_STATUS_DE_REGISTERED : $Defs::ENTITY_STATUS_PENDING;
+    my $clubStatus = ($clubData->{'dissolved'}) ? $Defs::ENTITY_STATUS_DE_REGISTERED : $Defs::ENTITY_STATUS_INPROGRESS;
     $clubData->{'strStatus'} = $clubStatus;
     $clubData->{'intRealmID'} = $self->{'Data'}{'Realm'};
     $clubData->{'intEntityLevel'} = $Defs::LEVEL_CLUB;
@@ -966,7 +560,37 @@ sub process_documents {
 	
     return ('',1);
 }
+sub display_summary     {
+    my $self = shift;
 
+    my $id = $self->ID() || 0;
+    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
+    my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
+    my $client = $self->{'Data'}->{'client'};
+
+    my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
+    $clubObj->load();
+
+    my $content = '';
+
+## Put into a template
+    $content = 'Include summary here';
+
+    my %PageData = (
+        HiddenFields => $self->stringifyCarryField(),
+        Target => $self->{'Data'}{'target'},
+        Errors => $self->{'RunDetails'}{'Errors'} || [],
+        Content => '',
+        Title => '',
+        TextTop => $content,
+        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+        TextBottom => '',
+    );
+    my $pagedata = $self->display(\%PageData);
+
+    return ($pagedata,0);
+}
 sub display_complete {
     my $self = shift;
 
@@ -980,10 +604,13 @@ sub display_complete {
     $clubObj->load();
 
     my $content = '';
+    my $clubStatus = $clubObj->getValue('strStatus');
     if($clubObj->ID()) {
-
-        my $clubStatus = $clubObj->getValue('strStatus');
-
+        my $PendingStatus =  {};
+        $PendingStatus->{'strStatus'} = $Defs::ENTITY_STATUS_PENDING;
+        $clubObj->setValues($PendingStatus);
+        $clubObj->write();
+        
         if($self->{'RunParams'}{'newclub'})  {
             my $rc = WorkFlow::addWorkFlowTasks(
                 $self->{'Data'},
@@ -1004,6 +631,8 @@ sub display_complete {
             $clubObj->setValues($resetStatus);
             $clubObj->write();
         }
+        $clubObj->load();
+        my $clubStatus = $clubObj->getValue('strStatus');
 
         my $clubID = $clubObj->ID();
         $content = qq [<div class="col-md-9"><div class="alert"><div><span class="flash_success fa fa-check"></span><p>$self->{'Data'}->{'LevelNames'}{$Defs::LEVEL_CLUB} Added Successfully</p></div></div></div> ];
@@ -1026,6 +655,7 @@ sub display_complete {
         Title => '',
         TextTop => $content,
         TextBottom => '',
+        NoContinueButton=>1,
     );
     my $pagedata = $self->display(\%PageData);
 

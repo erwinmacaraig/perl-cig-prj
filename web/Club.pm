@@ -837,6 +837,7 @@ sub listClubs   {
       JOIN tblEntity as CN ON CN.intEntityID=tblEntityLinks.intChildEntityID
     WHERE PN.intEntityID = ?
       AND CN.strStatus <> 'DELETED'
+      AND CN.strStatus <> 'INPROGRESS'
       AND CN.intEntityLevel = $Defs::LEVEL_CLUB
       AND CN.intDataAccess>$Defs::DATA_ACCESS_NONE
     ORDER BY CN.strLocalName
@@ -852,7 +853,7 @@ sub listClubs   {
     push @rowdata, {
       id => $dref->{'CNintEntityID'} || 0,
       strName => $dref->{'strLocalName'} || '',
-      SelectLink => "$Data->{'target'}?client=$tempClient&amp;a=C_HOME",
+      SelectLink => "$Data->{'target'}?client=$tempClient&amp;a=EE_D",
       strContact => $dref->{'strContact'} || '',
       strPhone => $dref->{'strPhone'} || '',
       strEmail => $dref->{'strEmail'} || '',

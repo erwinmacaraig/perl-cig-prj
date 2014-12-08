@@ -119,8 +119,8 @@ sub setProcessOrder {
          {
             'action' => 'p',
             'function' => 'display_products',
-            'label'  => 'Products',
-            'title'  => 'Registration - Choose Products',
+            'label'  => 'License',
+            'title'  => 'Registration - Confirm License',
         },
         {
             'action' => 'pu',

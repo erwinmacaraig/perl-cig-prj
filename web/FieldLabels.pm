@@ -39,7 +39,7 @@ sub getFieldLabels	{
 			dtDeath=> 'Date of Death',
 			dtSuspendedUntil=> 'Date Suspended Until',
 			strRegionOfBirth => 'Region or State of Birth',
-			strPlaceOfBirth => 'Town or Suburb of Birth',
+			strPlaceOfBirth => 'City of Birth',
 			strAddress1 => 'Address 1',
 			strAddress2 => 'Address 2',
 			strSuburb => 'City',

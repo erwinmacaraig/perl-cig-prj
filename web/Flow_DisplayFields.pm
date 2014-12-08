@@ -39,12 +39,14 @@ sub build {
         $permissions, 
         $action, 
         $notabs, 
+        $hideBlank
      )
       = @_;
     my $returnstr   = '';
     my $sectionlist = $self->{'Fields'}->{'sections'};
     $sectionlist = [ [ 'main', '' ] ] if !$sectionlist;
     $action ||= 'display';
+    $hideBlank ||= 0; #if action = display and no content in field - then hide
 
     my $tabs           = '';
     my %sections       = ();
@@ -52,6 +54,7 @@ sub build {
     my $txt_compulsory = $self->langlookup( 'Compulsory Field' );
     my $compulsory = qq[<span class="compulsory">*</span>];
     #my $compulsory = qq[];
+    if($action eq 'display')    { $compulsory = ''; }
     return '' if !$self->{'Fields'};
     return '' if !$self->{'Fields'}->{'order'};
     my @fieldorder =@{ $self->{'Fields'}->{'order'} };
@@ -241,6 +244,10 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
             if ( $type eq 'lookup' ) {
                 $field_html = $f->{'options'}{$val} || "&nbsp;";
             }
+            elsif ( $type eq 'htmlrow' ) {
+                $sections{$sname} .= $val || '';
+                next FIELD;
+            }
             elsif ( $f->{'displaylookup'} ) {
                 $field_html =
                   $self->langlookup( $f->{'displaylookup'}{$val} );
@@ -254,6 +261,8 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 $val = '' if $val eq '0000-00-00 00:00';
                 $field_html = $val;
             }
+            next FIELD if $val eq '';
+            
         }
 
         if (    $self->{'Fields'}->{'options'}
@@ -323,10 +332,12 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
 
         my $sectionheader = $self->langlookup( $s->[1] ) || '';
         my $requiredfield = $self->langlookup('Required fields') || '';
+        if($action eq 'display')    {$requiredfield = ''; }
 
         if ( $sections{ $s->[0] } ) {
             next if $s->[2] and not $self->display_section( $s->[2] );
             my $extraclass = $s->[3] || '';
+            my $footer = $s->[4] || '';
             $usedsections{ $s->[0] } = 1;
             if ($notabs) {
                 my $sh = '';
@@ -339,7 +350,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 }
                 $returnstr .= qq[
                     <div class = "fieldSectionGroupWrapper" id = "fsgw-].$s->[0].qq[">
-                    $sh<div class = "panel-body fieldSectionGroup $extraclass" id = "fsg-].$s->[0].qq["><fieldset>$compulsory_string].$sections{ $s->[0] }.qq[</fieldset></div></div>];
+                    $sh<div class = "panel-body fieldSectionGroup $extraclass" id = "fsg-].$s->[0].qq["><fieldset>$compulsory_string].$sections{ $s->[0] }.qq[</fieldset>$footer</div></div>];
             }
             else {
                 #my $style=$s ? 'style="display:none;" ' : '';

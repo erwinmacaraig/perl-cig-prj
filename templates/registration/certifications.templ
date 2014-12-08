@@ -5,14 +5,12 @@
 		<th>Certification</th>
 		<th>From</th>
 		<th>Until</th> 
-		<th>Description/Reference Number</th>
 	</tr> 
 	[% FOREACH c = certifications %]
         <tr>
           <td>[% c.strCertificationName %]</td>
           <td>[% c.dtValidFrom %]</td>
           <td>[% c.dtValidUntil  %]</td>
-          <td>[% c.strDescription %]</td> 
         </tr>
     [% END %]
 </table>
