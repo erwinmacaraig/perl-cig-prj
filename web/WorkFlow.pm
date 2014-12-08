@@ -1697,13 +1697,13 @@ sub resolveTask {
             AND intRealmID = ?
     ];
 
-    #if($task->{strWFRuleFor} eq 'ENTITY') {
-    #    setEntityStatus($Data, $WFTaskID, $Defs::WF_TASK_STATUS_PENDING);
-    #}
+    if($task->{strWFRuleFor} eq 'ENTITY') {
+        setEntityStatus($Data, $WFTaskID, $Defs::WF_TASK_STATUS_PENDING);
+    }
 
-    #if($task->{strWFRuleFor} eq 'REGO') {
-    #    setPersonRegoStatus($Data, $WFTaskID, $Defs::WF_TASK_STATUS_PENDING);
-    #}
+    if($task->{strWFRuleFor} eq 'REGO') {
+        setPersonRegoStatus($Data, $WFTaskID, $Defs::WF_TASK_STATUS_PENDING);
+    }
 
   	$q = $db->prepare($st);
   	$q->execute(
