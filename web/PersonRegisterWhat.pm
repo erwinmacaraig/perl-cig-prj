@@ -620,12 +620,20 @@ sub getPersonLevelFromMatrix {
 
     my $personLevelList = \%Defs::personLevel;
     while (my $dref = $query->fetchrow_hashref())   {
-        #if the player is under 16, "PROFESSIONAL" should not be available (specific to MA)
+        #if the player is under 16, "PROFESSIONAL" should not be available (specific to MA - sys config entry)
         next if (
             defined $systemConfig->{'age_breakpoint_PLAYER_PROFESSIONAL'}
             and $personType eq $Defs::PERSON_TYPE_PLAYER
             and $dref->{'strPersonLevel'} eq $Defs::PERSON_LEVEL_PROFESSIONAL
             and $pref->{'currentAge'} < $systemConfig->{'age_breakpoint_PLAYER_PROFESSIONAL'}
+        );
+
+        #if the player is under 16, "AMATEUR_U_C" should not be available (specific to MA - sys config entry)
+        next if (
+            defined $systemConfig->{'age_breakpoint_PLAYER_AMATEUR_U_C'}
+            and $personType eq $Defs::PERSON_TYPE_PLAYER
+            and $dref->{'strPersonLevel'} eq $Defs::PERSON_LEVEL_AMATEUR_UNDER_CONTRACT
+            and $pref->{'currentAge'} < $systemConfig->{'age_breakpoint_PLAYER_AMATEUR_U_C'}
         );
 
         if($dref->{'strPersonLevel'}){
