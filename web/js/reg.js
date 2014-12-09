@@ -34,7 +34,8 @@ function replaceFile(id,doctype,regoID,personID, client, doctypename){
 	}); 
 	var newframe = $("<iframe></iframe>",{
 		"src":url,
-		"scrolling":"no"
+		"scrolling":"no",
+		"id":"docViewerPage"
 	});
 	$(newdiv).append(newframe);
 	$('body').append(newdiv);

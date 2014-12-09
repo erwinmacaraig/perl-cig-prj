@@ -318,6 +318,9 @@ strong {
 .txtright {
 	text-align: right;
 } 
+.txtcenter {
+	text-align: center;
+} 
 #allfilesgridid_filter label input[type="search"] {
 	border-radius: 5px;
     padding: 5px;
@@ -857,10 +860,15 @@ span.flash_error{
 }
 .advanced-search-fields{
 	display: none;
+	margin-bottom: 5px;
 }
 .advanced-search-fields span{
 	width: 50%;
 	float: left;
+}
+.advanced-search-fields span input[type=checkbox]{
+	margin-right: 10px;
+	vertical-align: top;
 }
 /* End Add */
 
@@ -1492,4 +1500,32 @@ i.documents-complete {
 	color: #1baf37;
 	margin-left:3px;
 	margin-right:4px;
+}
+
+#flow-btn-back  {
+    float:left;
+}
+
+#ffg_venue td {
+	font-size: 13px;
+}
+#ffg_venue td input[type="text"] {
+	width: 100%;
+	padding: 5px 0px;
+}
+#ffg_venue td select {
+	width: 100%;
+	border: 1px solid #cccccc;
+}
+
+/*a class called upon a condition on the complete screen - 
+this is to nudge the "back to" button into position*/
+.nudge {
+	margin-left:15px;
+	margin-top: 10px;
+}
+
+.docViewerEntityInfo p {
+	margin:15px 15px 10px 15px;
+	padding-top:15px;
 }

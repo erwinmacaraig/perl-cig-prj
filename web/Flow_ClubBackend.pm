@@ -547,11 +547,16 @@ sub process_documents {
         );
 
 	my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $clubID, $documents);
-	
+	my $errStringPrepend = 'Required Document Missing <ul>';
 	foreach my $dc (@{$diff}){ 
-		push @{$self->{'RunDetails'}{'Errors'}},"\n".$dc->{'Name'};
-		
+        $errStringPrepend .= '<li>' . $dc->{'Name'} . '</li>';		
 	}
+    $errStringPrepend .= '</ul>';
+    
+    if(scalar(@{$diff})){
+            push @{$self->{'RunDetails'}{'Errors'}},$errStringPrepend;
+    }
+
 	if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
         $self->decrementCurrentProcessIndex();

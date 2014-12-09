@@ -41,6 +41,7 @@ use PlayerPassport;
 use RegoAgeRestrictions;
 use DisplayPayResult;
 use InstanceOf;
+use EntityTypeRoles;
 
 sub displayRegoFlowCompleteBulk {
 
@@ -80,7 +81,7 @@ sub displayRegoFlowCompleteBulk {
 
 sub displayRegoFlowSummary {
 
-    my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref) = @_;
+    my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref, $carryString) = @_;
     my $lang=$Data->{'lang'};
 
     my $ok = 0;
@@ -155,7 +156,10 @@ sub displayRegoFlowSummary {
 				last;	
 			}
 		}
+        my $role_ref = getEntityTypeRoles($Data, $rego_ref->{'strSport'}, $rego_ref->{'strPersonType'});
+        $rego_ref->{'roleName'} = $role_ref->{$rego_ref->{'strPersonEntityRole'}};
 
+        my $editlink =  $Data->{'target'}."?".$carryString;
         my %PageData = (
             person_home_url => $url,
 			person => \%personData,
@@ -167,6 +171,7 @@ sub displayRegoFlowSummary {
             hidden_ref=> $hidden_ref,
             Lang => $Data->{'lang'},
             client=>$client,
+            editlink => $editlink,
         );
         
         $body = runTemplate($Data, \%PageData, 'registration/summary.templ') || '';
@@ -607,6 +612,7 @@ sub displayRegoFlowProducts {
     my $lang=$Data->{'lang'};
 
     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_PU&amp;rID=$regoID";
+print STDERR "SSS: $entityRegisteringForLevel\n";
 #    my $pref = loadPersonDetails($Data->{'db'}, $personID);
  #   $rego_ref->{'Nationality'} = $pref->{'strISONationality'};
     my $CheckProducts = getRegistrationItems(

@@ -30,6 +30,8 @@ use Payments;
 use Products;
 use PersonRequest;
 use PersonFieldsSetup;
+use PersonRegistration;
+use PersonSummaryPanel;
 
 
 sub setProcessOrder {
@@ -362,8 +364,7 @@ sub display_contact_details    {
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $fieldsContent || '',
         ScriptContent => $scriptContent || '',
-        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
-        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
         Title => '',
         TextTop => '',
         TextBottom => '',
@@ -419,8 +420,7 @@ sub display_person_identifier {
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $fieldsContent || '',
         ScriptContent => $scriptContent || '',
-        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
-        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
         Title => '',
         TextTop => '',
         TextBottom => '',
@@ -476,8 +476,7 @@ sub display_other_details    {
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $fieldsContent || '',
         ScriptContent => $scriptContent || '',
-        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
-        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
         Title => '',
         TextTop => '',
         TextBottom => '',
@@ -537,6 +536,7 @@ sub display_registration {
     $self->{'Data'}->{'AddToPage'}->add('js_bottom','file','js/regwhat.js');
 
     my $defaultType = $self->{'RunParams'}{'dtype'} || '';
+    my $regoID = $self->{'RunParams'}{'rID'} || 0;
     if($defaultType eq 'TRANSFER')   {
         $noContinueButton = 0;
         my %regFilter = (
@@ -581,6 +581,8 @@ sub display_registration {
             $gender || 0,
             $originLevel,
             $url,
+            0,
+            $regoID,
         );
     }
 
@@ -589,8 +591,7 @@ sub display_registration {
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $content,
-        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
-        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
         Title => '',
         TextTop => '',
         TextBottom => '',
@@ -615,6 +616,8 @@ sub process_registration {
     my $personLevel = $self->{'RunParams'}{'d_level'} || '';
     my $sport = $self->{'RunParams'}{'d_sport'} || '';
     my $ageLevel = $self->{'RunParams'}{'d_age'} || '';
+    my $existingReg = $self->{'RunParams'}{'existingReg'} || 0;
+    my $changeExistingReg = $self->{'RunParams'}{'changeExisting'} || 0;
     my $registrationNature = $self->{'RunParams'}{'d_nature'} || '';
     my $personRequestID = $self->{'RunParams'}{'prid'} || '';
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
@@ -629,22 +632,30 @@ sub process_registration {
     my $regoID = 0;
     my $msg = '';
     if($personID)   {
-        ($regoID, undef, $msg) = add_rego_record(
-            $self->{'Data'}, 
-            $personID, 
-            $entityID, 
-            $entityLevel, 
-            $originLevel, 
-            $personType, 
-            $personEntityRole, 
-            $personLevel, 
-            $sport, 
-            $ageLevel, 
-            $registrationNature,
-            undef,
-            undef,
-            $personRequestID,
-       );
+        if($changeExistingReg)    {
+            $self->deleteExistingReg($existingReg, $personID);
+        }
+        if(!$existingReg or $changeExistingReg)    {
+            ($regoID, undef, $msg) = add_rego_record(
+                $self->{'Data'}, 
+                $personID, 
+                $entityID, 
+                $entityLevel, 
+                $originLevel, 
+                $personType, 
+                $personEntityRole, 
+                $personLevel, 
+                $sport, 
+                $ageLevel, 
+                $registrationNature,
+                undef,
+                undef,
+                $personRequestID,
+            );
+        }
+        if($changeExistingReg)  {
+            $self->moveDocuments($existingReg, $regoID, $personID);
+        }
     }
 
     if(!$personID)    {
@@ -665,8 +676,10 @@ sub process_registration {
         }
     }
     else    {
-        $self->addCarryField('rID',$regoID);
-        $self->addCarryField('pType',$personType);
+        if(!$existingReg or $changeExistingReg)   {
+            $self->addCarryField('rID',$regoID);
+            $self->addCarryField('pType',$personType);
+        }
     }
 
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
@@ -729,8 +742,7 @@ sub display_certifications {
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $fieldsContent || '',
         ScriptContent => $scriptContent || '',
-        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
-        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
         Title => '',
         TextTop => $content,
         TextBottom => '',
@@ -867,8 +879,7 @@ sub display_products {
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $content,
-        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
-        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
         Title => '',
         TextTop => '',
         TextBottom => '',
@@ -1000,8 +1011,7 @@ sub display_documents {
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
-        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
         Content => '',
         Title => '',
         TextTop => $content,
@@ -1135,7 +1145,7 @@ sub display_summary {
             $entityID, 
             $personID, 
             $hiddenFields,
-			
+		    $self->stringifyURLCarryField(),
         );
     }
     else    {
@@ -1150,8 +1160,7 @@ sub display_summary {
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
-        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
         Content => '',
         Title => '',
         TextTop => $content,
@@ -1197,11 +1206,9 @@ sub display_complete {
         $rego_ref->{'Nationality'} = $nationality;
 
         my $run = $self->{'RunParams'}{'run'} || 0;
-print STDERR "IN display_complete --- COMPLETE $run\n";
         if($self->{'RunParams'}{'newreg'} and ! $run)  {
                 #$self->{'RunParams'}{'run'} = 1;
                 #$self->addCarryField('run',1);
-print STDERR "RRRRRRRRULES RUNNINGS\n";
             my $rc = WorkFlow::addWorkFlowTasks(
                 $self->{'Data'},
                 'PERSON',
@@ -1319,15 +1326,168 @@ sub loadObjectValues    {
             dtOtherPersonIdentifierValidDateFrom
             dtOtherPersonIdentifierValidDateTo
             strOtherPersonIdentifierDesc
+            intOtherPersonIdentifierTypeID
 
             intMinorMoveOtherThanFootball
             intMinorDistance
             intMinorEU
             intMinorNone
+            intNatCustomLU1
+            intNatCustomLU2
+            intNatCustomLU3
+            intNatCustomLU4
+            intNatCustomLU5
+            intNatCustomLU6
+            intNatCustomLU7
+            intNatCustomLU8
+            intNatCustomLU9
+            intNatCustomLU10
+
+            intInternationalTransfer
+
+strLocalTitle
+strPreferredName
+intLocalLanguage
+dtDeath
+strFirstClubName
+strMaidenName
+strPhoneWork
+strPhoneMobile
+strFax
+strEmail
+strCityOfResidence
+strEmergContName
+strEmergContRel
+strEmergContNo
+strP1FName
+strP1SName
+strP2FName
+strP2SName
+strP1Email
+strP2Email
+strP1Phone
+strP2Phone
+strP1Salutation
+strP2Salutation
+intP1Gender
+intP2Gender
+strP1Phone2
+strP2Phone2
+strP1PhoneMobile
+strP2PhoneMobile
+strP1Email2
+strP2Email2
+intMedicalConditions
+intAllergies
+intAllowMedicalTreatment
+intConsentSignatureSighted
+strMotherCountry
+strFatherCountry
+strNatCustomStr1
+strNatCustomStr2
+strNatCustomStr3
+strNatCustomStr4
+strNatCustomStr5
+strNatCustomStr6
+strNatCustomStr7
+strNatCustomStr8
+strNatCustomStr9
+strNatCustomStr10
+strNatCustomStr11
+strNatCustomStr12
+strNatCustomStr13
+strNatCustomStr14
+strNatCustomStr15
+dblNatCustomDbl1
+dblNatCustomDbl2
+dblNatCustomDbl3
+dblNatCustomDbl4
+dblNatCustomDbl5
+dblNatCustomDbl6
+dblNatCustomDbl7
+dblNatCustomDbl8
+dblNatCustomDbl9
+dblNatCustomDbl10
+dtNatCustomDt1
+dtNatCustomDt2
+dtNatCustomDt3
+dtNatCustomDt4
+dtNatCustomDt5
+intNatCustomBool1
+intNatCustomBool2
+intNatCustomBool3
+intNatCustomBool4
+intNatCustomBool5
+strISOMotherCountry
+strISOFatherCountry
         )) {
             $values{$field} = $object->getValue($field);
         }
     }
     return \%values;
 }
+
+sub deleteExistingReg {
+    my $self = shift;
+    my ($regoID, $personID) = @_;
+    
+    my $realmID = $self->{'Data'}->{'Realm'};
+    my $st = qq[
+        DELETE TL FROM 
+            tblTransLog AS TL
+            INNER JOIN tblTransactions AS TX
+                ON TL.intLogID = TX.intTransLogID
+        WHERE 
+            TX.intPersonRegistrationID = ?
+            AND (TL.intStatus = 0 OR (TL.intStatus= 1 and TL.intAmount>0))
+            AND TL.intRealmID = ?
+    ];
+    my $q = $self->{'Data'}->{'db'}->prepare($st);
+    $q->execute($regoID, $realmID);
+
+    $st = qq[
+        DELETE FROM 
+            tblTransactions 
+        WHERE 
+            intPersonRegistrationID = ?
+            AND (intStatus = 0 OR (intStatus=1 AND curAmount = 0))
+            AND intRealmID = ?
+            AND intID = ?
+    ];
+    $q = $self->{'Data'}->{'db'}->prepare($st);
+    $q->execute($regoID, $realmID, $personID);
+
+    $st = qq[
+        DELETE FROM 
+            tblPersonRegistration_$self->{'Data'}->{'Realm'} 
+        WHERE 
+            intPersonRegistrationID = ?
+            AND strStatus = 'INPROGRESS'
+            AND intPersonID = ?
+    ];
+    $q=$self->{'Data'}->{'db'}->prepare($st);
+    $q->execute($regoID, $personID);
+
+    $q->finish();
+    return 1;
+}
+
+sub moveDocuments {
+    my $self = shift;
+    my ($oldRegoID, $newRegoID) = @_;
+
+    my $st = qq[
+        UPDATE tblDocuments
+        SET intPersonRegistrationID = ?
+        WHERE intPersonRegistrationID = ?
+    ];
+    my $q=$self->{'Data'}->{'db'}->prepare($st);
+    $q->execute($oldRegoID, $newRegoID);
+    $q->finish();
+    return 1;
+}
+
+ 
+
+ 
 

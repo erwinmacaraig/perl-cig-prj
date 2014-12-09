@@ -719,13 +719,13 @@ sub getLastEntityLevel {
     my ( $clientValues) = @_;
 
     return 0 if !$clientValues;
-    return $Defs::LEVEL_CLUB if ($clientValues->{clubID} and $clientValues->{'clubId'} != $Defs::INVALID_ID);
-    return $Defs::LEVEL_ZONE if ($clientValues->{zoneID} and $clientValues->{'zoneId'} != $Defs::INVALID_ID);
-    return $Defs::LEVEL_REGION if ($clientValues->{regionID} and $clientValues->{'regionId'} != $Defs::INVALID_ID);
-    return $Defs::LEVEL_STATE if ($clientValues->{stateID} and $clientValues->{'stateId'} != $Defs::INVALID_ID);
-    return $Defs::LEVEL_NATIONAL if ($clientValues->{natID} and $clientValues->{'natId'} != $Defs::INVALID_ID);
-    return $Defs::LEVEL_INTZONE if ($clientValues->{intzonID} and $clientValues->{'intzonId'} != $Defs::INVALID_ID);
-    return $Defs::LEVEL_INTREGION if ($clientValues->{intregID} and $clientValues->{'intregId'} != $Defs::INVALID_ID);
+    return $Defs::LEVEL_CLUB if ($clientValues->{clubID} and $clientValues->{'clubID'} != $Defs::INVALID_ID);
+    return $Defs::LEVEL_ZONE if ($clientValues->{zoneID} and $clientValues->{'zoneID'} != $Defs::INVALID_ID);
+    return $Defs::LEVEL_REGION if ($clientValues->{regionID} and $clientValues->{'regionID'} != $Defs::INVALID_ID);
+    return $Defs::LEVEL_STATE if ($clientValues->{stateID} and $clientValues->{'stateID'} != $Defs::INVALID_ID);
+    return $Defs::LEVEL_NATIONAL if ($clientValues->{natID} and $clientValues->{'natID'} != $Defs::INVALID_ID);
+    return $Defs::LEVEL_INTZONE if ($clientValues->{intzonID} and $clientValues->{'intzonID'} != $Defs::INVALID_ID);
+    return $Defs::LEVEL_INTREGION if ($clientValues->{intregID} and $clientValues->{'intregID'} != $Defs::INVALID_ID);
 
     return 0;
 }

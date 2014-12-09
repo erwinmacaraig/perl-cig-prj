@@ -173,20 +173,20 @@ sub handleWorkflow {
         ($body, $title) = updateTaskNotes( $Data );
         switch($type) {
             case "$Defs::WF_TASK_ACTION_RESOLVE" {
-                resolveTask($Data, $emailNotification);
+                my $actionMessage = resolveTask($Data, $emailNotification);
 
                 $flashMessage{'flash'}{'type'} = 'success';
-                $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt('Task has been resolved.');
+                $flashMessage{'flash'}{'message'} = $actionMessage;
 
                 setFlashMessage($Data, 'WF_U_FM', \%flashMessage);
                 $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_";
                 ($body, $title) = redirectTemplate($Data);
             }
             case "$Defs::WF_TASK_ACTION_REJECT" {
-                rejectTask($Data, $emailNotification);
+                my $actionMessage = rejectTask($Data, $emailNotification);
 
                 $flashMessage{'flash'}{'type'} = 'success';
-                $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt('Task has been rejected.');
+                $flashMessage{'flash'}{'message'} = $actionMessage;
 
                 setFlashMessage($Data, 'WF_U_FM', \%flashMessage);
                 $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_View&TID=$WFTaskID";
@@ -1740,8 +1740,7 @@ sub resolveTask {
         $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
     }
 
-    return(0);
-
+    return getNotificationMessage($Data, $task, 'RESOLVE');
 }
 
 sub rejectTask {
@@ -1817,8 +1816,38 @@ sub rejectTask {
         $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
     }
 
-    return(0);
+    return getNotificationMessage($Data, $task, 'REJECT');
+    #return(0);
 
+}
+
+sub getNotificationMessage {
+    my ($Data, $task, $type) = @_;
+
+    my $message;
+    my $notifPrefix;
+
+    switch($type) {
+        case 'REJECT' {
+            $message = $Data->{'lang'}->txt("has been rejected.");
+        }
+        case 'RESOLVE' {
+            $message = $Data->{'lang'}->txt("Task has been resolved.");
+            return $message;
+        }
+    }
+
+    if($task->{'strWFRuleFor'} eq "ENTITY" and $task->{'intEntityLevel'} == $Defs::LEVEL_CLUB){
+        $notifPrefix = $Defs::workTaskTypeLabel{$task->{'strRegistrationNature'} . "_CLUB"};
+    }
+    elsif($task->{'strWFRuleFor'} eq "ENTITY" and $task->{'intEntityLevel'} == $Defs::LEVEL_VENUE) {
+        $notifPrefix = $Defs::workTaskTypeLabel{$task->{'strRegistrationNature'} . "_VENUE"};
+    }
+    elsif($task->{'strWFRuleFor'} eq "REGO") {
+        $notifPrefix = $Defs::workTaskTypeLabel{$task->{'strRegistrationNature'} . "_" . $task->{'strPersonType'}};
+    }
+
+    return $notifPrefix . " " . $message;
 }
 
 sub getTask {
@@ -1839,6 +1868,7 @@ sub getTask {
             t.strWFRuleFor,
             t.strTaskStatus,
             t.intOnHold,
+            t.strRegistrationNature,
             e.*,
             IF(t.strWFRuleFor = 'ENTITY', IF(e.intEntityLevel = -47, 'VENUE', IF(e.intEntityLevel = 3, 'CLUB', '')), IF(t.strWFRuleFor = 'REGO', 'REGO', ''))as sysConfigApprovalLockRuleFor,
             IF(t.strWFRuleFor = 'ENTITY', e.intPaymentRequired, IF(t.strWFRuleFor = 'REGO', pr.intPaymentRequired, 0)) as paymentRequired,
@@ -1853,6 +1883,7 @@ sub getTask {
             p.strLocalSurname,
             p.strISONationality,
             p.intGender,
+            p.strNationalNum,
             DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             rnt.intTaskNoteID as rejectTaskNoteID,
@@ -2749,6 +2780,8 @@ sub viewSummaryPage {
     $TemplateData{'TaskAction'} = \%TaskAction;
     $TemplateData{'Lang'} = $Data->{'lang'};
 
+    my $c = Countries::getISOCountriesHash();
+
     switch($task->{'strWFRuleFor'}) {
         case 'REGO' {
             $templateFile = 'workflow/summary/personregistration.templ';
@@ -2760,10 +2793,11 @@ sub viewSummaryPage {
             $TemplateData{'PersonRegistrationDetails'}{'personFirstname'} = $task->{'strLocalFirstname'};
             $TemplateData{'PersonRegistrationDetails'}{'personSurname'} = $task->{'strLocalSurname'};
             $TemplateData{'PersonRegistrationDetails'}{'registerTo'} = $task->{'registerToEntity'};
-            $TemplateData{'PersonRegistrationDetails'}{'nationality'} = $task->{'strISONationality'};
+            $TemplateData{'PersonRegistrationDetails'}{'nationality'} = $c->{$task->{'strISONationality'}};
             $TemplateData{'PersonRegistrationDetails'}{'dob'} = $task->{'DOB'};
             $TemplateData{'PersonRegistrationDetails'}{'gender'} = $Defs::PersonGenderInfo{$task->{'intGender'}};
             $TemplateData{'PersonRegistrationDetails'}{'personRoleName'} = $task->{'strEntityRoleName'};
+            $TemplateData{'PersonRegistrationDetails'}{'MID'} = $task->{'strNationalNum'};
 
         }
         case 'ENTITY' {

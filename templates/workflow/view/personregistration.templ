@@ -120,6 +120,7 @@
                 </div>
 
                 <div id="regdetails" class="tab-pane fade">
+
                     [% IF PersonRegoDetails.RegisterTo %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Register To") %]:</span>
@@ -177,22 +178,21 @@
                             <span class="details-left detail-value">[% PersonRegoDetails.AgeLevel %]</span>
                         </span>
                     [% END %]
+
+                    <div class="row">
+                        <h3 class="panel-header">License and Payment Details</h3>
+                        <div class="panel-body">
+                            [% PaymentBlock %]
+                        </div>
+                    </div> 
+                    <div class="row">
+                        <h3 class="panel-header">Work History</h3>
+                        <div class="panel-body">
+                            [% NotesBlock %]
+                        </div>
+                    </div> 
                 </div>
             </div>
-        </div>
-
-        <br />
-
-        <h3 class="panel-header">License and Payment Details</h3>
-        <div class="panel-body">
-            [% PaymentBlock %]
-        </div>
-
-        <br />
-
-        <h3 class="panel-header">Task Notes</h3>
-        <div class="panel-body">
-            [% NotesBlock %]
         </div>
 
         [% ActionsBlock %]
@@ -201,7 +201,7 @@
     <div class="col-md-3">
         <div id = "">
 
-        <h3 class="panel-header">Member ID: [% PersonDetails.MID %]</h3>
+        <h3 class="panel-header">Member ID: </h3>
         <div class="panel-body">
 
         <p class="reg-text">[% PersonDetails.LocalName %]</p>
