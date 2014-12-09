@@ -19,6 +19,7 @@ use MCache;
 use TTTemplate;
 use InstanceOf;
 use Countries;
+use PersonSummaryPanel;
 
 main();	
 
@@ -102,15 +103,7 @@ sub main	{
     if($dref->{'intEntityTypeID'} == 1)  {
         my $object = getInstanceOf(\%Data,'person',$dref->{'intEntityID'});
         my $isocountries = getISOCountriesHash();
-        $dref->{'person'} = {
-            strSurname => $object->getValue('strLocalSurname'),
-            strFirstname => $object->getValue('strLocalFirstname'),
-            dtDOB => $object->getValue('dtDOB'),
-            gender => $Defs::PersonGenderInfo{$object->getValue('intGender')},
-            nationality => $isocountries->{$object->getValue('strISONationality')},
-            status => $object->getValue('strStatus'),
-            nationalNum => $object->getValue('strNationalNum'),
-        };
+        $dref->{'PersonSummaryPanel'} = personSummaryPanel(\%Data, $dref->{'intEntityID'}) || '';
     }
     elsif($dref->{'intEntityID'})  {
         my $object = getInstanceOf(\%Data,'entity',$dref->{'intEntityID'});

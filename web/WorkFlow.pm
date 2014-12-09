@@ -48,6 +48,7 @@ use EntityTypeRoles;
 use JSON;
 use Countries;
 use HomePerson;
+use PersonSummaryPanel;
 
 sub cleanTasks  {
 
@@ -1537,7 +1538,10 @@ sub updateTaskNotes {
         target=>$Data->{'target'},
         #action => 'WF_list',
         action => $targetAction,
+        #PersonSummary => personSummaryPanel($Data, $personID) || '',
     );
+
+warn("OO");
 
     $TemplateData{'Notifications'}{'actionResult'} = "ID: $WFTaskID " . $Data->{'lang'}->txt("Work Flow task updated.");
 
@@ -2215,6 +2219,7 @@ sub populateRegoViewData {
             DateSuspendedUntil => '',
             LastUpdate => '',
             MID => $dref->{'strNationalNum'} || '',
+            LatinSurname => $dref->{'strLatinSurname'} || '',
         },
         PersonRegoDetails => {
             ID => $dref->{'intPersonRegistrationID'},
@@ -2230,6 +2235,7 @@ sub populateRegoViewData {
         },
         'EditDetailsLink' => $PersonEditLink,
         'ReadOnlyLogin' => $readonly,
+        PersonSummary => personSummaryPanel($Data, $dref->{intPersonID}) || '',
 	);
 
     $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.')
@@ -2799,6 +2805,7 @@ sub viewSummaryPage {
             $TemplateData{'PersonRegistrationDetails'}{'gender'} = $Defs::PersonGenderInfo{$task->{'intGender'}};
             $TemplateData{'PersonRegistrationDetails'}{'personRoleName'} = $task->{'strEntityRoleName'};
             $TemplateData{'PersonRegistrationDetails'}{'MID'} = $task->{'strNationalNum'};
+            $TemplateData{'PersonSummaryPanel'} = personSummaryPanel($Data, $task->{'intPersonID'});
 
         }
         case 'ENTITY' {
@@ -2873,6 +2880,7 @@ sub viewApprovalPage {
             $TemplateData{'PersonRegistrationDetails'}{'dob'} = $task->{'DOB'};
             $TemplateData{'PersonRegistrationDetails'}{'gender'} = $Defs::PersonGenderInfo{$task->{'intGender'}};
             $TemplateData{'PersonRegistrationDetails'}{'personRoleName'} = $task->{'strEntityRoleName'};
+            $TemplateData{'PersonSummaryPanel'} = personSummaryPanel($Data, $task->{'intPersonID'});
         }
         case 'ENTITY' {
             switch ($task->{'intEntityLevel'}) {

@@ -54,12 +54,12 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title" id="myModalLabel">Work task notes </h4>
+        <h4 class="modal-title" id="myModalLabel">[% Lang.txt('Work task notes') %] </h4>
       </div>
       
       <form id="workFlowActionForm" action="main.cgi" method="POST">
           <div class="modal-body">
-            <label>Please enter Work task notes</label>
+            <label>[% Lang.txt('Please enter Work task notes') %]</label>
             <textarea name="notes"></textarea>
             <input type="hidden" name="client" value="[% TaskAction.client %]">
             <input type="hidden" name="TID" value="[% TaskAction.WFTaskID %]">
@@ -68,8 +68,8 @@
           </div>
 
           <div class="modal-footer">
-            <a class="btn-main" data-dismiss="modal">Close</a>
-            <input class="btn-main" type="submit" name="submit" value="Submit">
+            <a class="btn-inside-panels" data-dismiss="modal">[% Lang.txt('Close') %]</a>
+            <input class="btn-inside-panels" type="submit" name="submit" value="[% Lang.txt('Submit') %]">
           </div>
       </form>
       

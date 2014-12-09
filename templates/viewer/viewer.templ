@@ -5,14 +5,8 @@
 <div id = "docViewerContent">
     <div id = "docViewerPanel">
         <div class = "docViewerEntityInfo">
-            [% IF person %]
-                <h3 class="panel-header">[% Lang.txt('Member ID') %]: [% IF person.strStatus == "REGISTERED" OR person.strStatus != "PENDING" %][% person.nationalNum %][% ELSE %] - [% END %]</h3>
-                <div class="panel-body">
-                    <p class="reg-text">[% person.strFirstname %] [% person.strSurname %]</p>
-                    <p class="reg-text">[% person.gender %]</p>
-                    <p class="reg-text">[% person.dtDOB %]</p>
-                    <p class="reg-text">[% person.nationality %]</p>
-                </div>
+            [% IF PersonSummaryPanel %]
+                [% PersonSummaryPanel %]
             [% ELSIF entity %]
                 <h3 class="panel-header">[% Lang.txt('ID') %]: [% IF entity.strStatus == "REGISTERED" OR entity.strStatus != "PENDING" %][% entity.maID %][% ELSE %] - [% END %]</h3>
                 <div class="panel-body">

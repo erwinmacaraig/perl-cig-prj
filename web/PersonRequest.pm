@@ -22,11 +22,13 @@ use PersonRegistration;
 use Person;
 use EmailNotifications::PersonRequest;
 use Search::Person;
+use PersonSummaryPanel;
 
 use CGI qw(unescape param redirect);
 use Log;
 use Data::Dumper;
 use SystemConfig;
+use Countries;
 use Switch;
 
 
@@ -530,6 +532,7 @@ sub initRequestPage {
     }
 
     my %TemplateData;
+    $TemplateData{'PersonSummaryPanel'}  = personSummaryPanel($Data, $personID) || '';
 
     if($transferType eq $Defs::TRANSFER_TYPE_INTERNATIONAL) {
         $title = $Data->{'lang'}->txt("Do you have Player's International Transfer Certificate?");
@@ -755,6 +758,7 @@ sub displayCompletedRequest {
     $TemplateData{'personDetails'} = \%personDetails;
     $TemplateData{'personRequests'} = \@rowdata;
     $TemplateData{'client'} = $Data->{'client'};
+    $TemplateData{'PersonSummaryPanel'} = personSummaryPanel($Data, $personID) || 'PSP';
 
     $body = runTemplate(
         $Data,
@@ -903,12 +907,13 @@ sub viewRequest {
     my $personCurrAgeLevel = Person::calculateAgeLevel($Data, $personDetails->{'currentAge'});
     my $originLevel = $Data->{'clientValues'}{'authLevel'};
 
+    my $isocountries  = getISOCountriesHash();
     my %TemplateData = (
         'requestID' => $request->{'intPersonRequestID'} || undef,
         'requestType' => $Defs::personRequest{$request->{'strRequestType'}} || '',
         'requestFrom' => $request->{'requestFrom'} || '',
         'requestFromDiscipline' => $Defs::entitySportType{$request->{'requestFromDiscipline'}} || '',
-        'requestFromISOCountry' => $request->{'requestFromISOCountry'} || '',
+        'requestFromISOCountry' => $isocountries->{$request->{'requestFromISOCountry'}} || '',
         'requestFromAddress' => $request->{'requestFromAddress'} || '',
         'requestFromAddress2' => $request->{'requestFromAddress2'} || '',
         'requestFromCity' => $request->{'requestFromCity'} || '',
@@ -920,7 +925,7 @@ sub viewRequest {
 
         'requestTo' => $request->{'requestTo'} || '',
         'requestToDiscipline' => $Defs::entitySportType{$request->{'requestToDiscipline'}} || '',
-        'requestToISOCountry' => $request->{'requestToISOCountry'} || '',
+        'requestToISOCountry' => $isocountries->{$request->{'requestToISOCountry'}} || '',
         'requestToAddress' => $request->{'requestToAddress'} || '',
         'requestToAddress2' => $request->{'requestToAddress2'} || '',
         'requestToCity' => $request->{'requestToCity'} || '',
@@ -933,8 +938,8 @@ sub viewRequest {
         'responseBy' => $request->{'responseBy'} || '',
         'personFirstname' => $request->{'strLocalFirstname'} || '',
         'personSurname' => $request->{'strLocalSurname'} || '',
-        'ISONationality' => $request->{'strISONationality'} || '',
-        'ISOCountryOfBirth' => $request->{'strISOCountryOfBirth'} || '',
+        'ISONationality' => $isocountries->{$request->{'strISONationality'}} || '',
+        'ISOCountryOfBirth' => $isocountries->{$request->{'strISOCountryOfBirth'}} || '',
         'RegionOfBirth' => $request->{'strRegionOfBirth'} || '',
         'personGender' => $Defs::PersonGenderInfo{$request->{'intGender'} || 0} || '',
         'DOB' => $request->{'dtDOB'} || '',
@@ -959,9 +964,10 @@ sub viewRequest {
         'contactCity' => $request->{'strSuburb'},
         'contactState' => $request->{'strState'},
         'contactPostalCode' => $request->{'strPostalCode'},
-        'contactISOCountry' => $request->{'strISOCountry'},
+        'contactISOCountry' => $isocountries->{$request->{'strISOCountry'}},
         'contactPhoneHome' => $request->{'strPhoneHome'},
         'contactEmail' => $request->{'strEmail'},
+        PersonSummaryPanel => personSummaryPanel($Data, $request->{'intPersonID'}) || '',
     );
 
 
@@ -1094,7 +1100,6 @@ sub setRequestResponse {
     my $body = '';
     my $title = '';
 
-    print STDERR Dumper $request;
     if(scalar(%{$request}) == 0 or $request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_STATUS_DENIED) {
         return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Response has been submitted already."));
     }
@@ -1121,6 +1126,7 @@ sub setRequestResponse {
                 nationality => $request->{'strISONationality'},
                 memberID => $request->{'strNationalNum'},
             },
+            PersonSummaryPanel => personSummaryPanel($Data, $request->{'intPersonID'}) || '',
             notifDetails => $notifDetails,
             client => $Data->{'client'},
         );
