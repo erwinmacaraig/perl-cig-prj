@@ -32,8 +32,8 @@ sub getRenewalDetails {
         'personType' => $Defs::personType{$rego->{'strPersonType'}} || '',
         'sport' => $Defs::sportType{$rego->{'strSport'}} || '',
         'personRole' => $personRoles->{$rego->{'strPersonEntityRole'}} || '-',
-        'personLevel' => $Defs::personLevel{$rego->{'strPersonLevel'}},
-        'ageLevel' => $Defs::ageLevel{$newAgeLevel},
+        'personLevel' => $Defs::personLevel{$rego->{'strPersonLevel'}} || '-',
+        'ageLevel' => $rego->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER ? $Defs::ageLevel{$newAgeLevel} : '-',
     );
 
     my $content = runTemplate(

@@ -577,7 +577,7 @@ sub display_registration {
     }
     elsif($defaultRegistrationNature eq 'RENEWAL') {
         my $rawDetails;
-        ($content, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rtargetid'});
+        ($content, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rpID'});
 
         if(!$content or !$rawDetails) {
             push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt('Invalid Renewal Details');
@@ -588,7 +588,7 @@ sub display_registration {
         $self->addCarryField('d_type', $rawDetails->{'strPersonType'});
         $self->addCarryField('d_level', $rawDetails->{'strPersonLevel'});
         $self->addCarryField('d_sport', $rawDetails->{'strSport'});
-        $self->addCarryField('d_age', $rawDetails->{'newAgeLevel'});
+        $self->addCarryField('d_age', $rawDetails->{'newAgeLevel'}) if $rawDetails->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER;
         $self->addCarryField('d_role', $rawDetails->{'strPersonEntityRole'});
     }
     else {
