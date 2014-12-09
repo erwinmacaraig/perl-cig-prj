@@ -98,6 +98,7 @@ sub Navigation {
     my $step = 1;
     my $step_in_future = 0;
     my $noNav = $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'NoNav'} || 0;
+    my $noGoingBack = $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'NoGoingBack'} || 0;
     return '' if $noNav;
     my $startingStep = $self->{'RunParams'}{'_ss'} || '';
     my $includeStep = 1;
@@ -124,6 +125,7 @@ sub Navigation {
             my $showlink = 0;
             $showlink = 1 if(!$current and !$step_in_future);
             $showlink = 0 if($self->{'ProcessOrder'}[$i]{'noRevisit'});
+            $showlink = 0 if $noGoingBack;
             my $linkURL = $self->{'Target'}."?rfp=".$self->{'ProcessOrder'}[$i]{'action'}."&".$self->stringifyURLCarryField();
             $self->{'RunDetails'}{'DirectLinks'}[$i] = $linkURL;
 
@@ -396,7 +398,8 @@ sub buildBackButton {
   my $self = shift;
 
   my $currentIndex = $self->{'CurrentIndex'} || 0;
-  if(!$currentIndex)  {
+  my $noGoingBack = $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'NoGoingBack'} || 0;
+  if(!$currentIndex or $noGoingBack)  {
     return ('','');
   }
   my $backIndex = $currentIndex - 1 ;

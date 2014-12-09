@@ -112,6 +112,7 @@ sub setProcessOrder {
             'function' => 'display_complete',
             'label'  => 'Submit',
             'title'  => 'Transfer - Submitted',
+            'NoGoingBack' => 1,
         },
     ];
 }

@@ -140,6 +140,7 @@ sub setProcessOrder {
             'function' => 'display_complete',
             'label'  => 'Complete',
             'title'  => 'Registration - Submitted',
+            'NoGoingBack' => 1,
         },
     ];
 }

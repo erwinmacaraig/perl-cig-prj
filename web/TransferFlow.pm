@@ -60,6 +60,7 @@ sub handleTransferFlow {
         ClientValues => $clientValues,
         Target => $Data->{'target'},
         cgi => $cgi,
+        DefaultTemplate => 'flow/transfer.templ',
     );
 
     my ($content,  undef) = $flow->run();
