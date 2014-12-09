@@ -42,14 +42,14 @@ sub setProcessOrder {
         {
             'action' => 'club',
             'function' => 'display_old_club',
-            'label'  => 'Old Club Details',
+            'label'  => 'Previous Club',
             'fieldset'  => 'contactdetails',
             'title'  => 'Transfer - Old Club Details',
         },
         {
             'action' => 'cd',
             'function' => 'display_core_details',
-            'label'  => 'Check/Update Personal Details',
+            'label'  => 'Personal Details',
             'title'  => 'Transfer - Personal Information',
             'fieldset'  => 'core',
             #'noRevisit' => 1,
@@ -62,7 +62,7 @@ sub setProcessOrder {
         {
             'action' => 'cond',
             'function' => 'display_contact_details',
-            'label'  => 'Check/Update Contact Details',
+            'label'  => 'Contact Details',
             'fieldset'  => 'contactdetails',
             'title'  => 'Transfer - Contact Information',
         },
@@ -84,7 +84,7 @@ sub setProcessOrder {
         {
             'action' => 'd',
             'function' => 'display_documents',
-            'label'  => 'Check/Update Documents',
+            'label'  => 'Documents',
             'title'  => 'Transfer - Upload Documents',
         },
         {
@@ -94,7 +94,7 @@ sub setProcessOrder {
          {
             'action' => 'p',
             'function' => 'display_products',
-            'label'  => 'Products & Payments',
+            'label'  => 'Payments',
             'title'  => 'Confirm Transfer Fee',
         },
         {
@@ -112,6 +112,7 @@ sub setProcessOrder {
             'function' => 'display_complete',
             'label'  => 'Submit',
             'title'  => 'Transfer - Submitted',
+            'NoNav' => 1,
             'NoGoingBack' => 1,
         },
     ];
@@ -1336,6 +1337,63 @@ sub moveDocuments {
 }
 
  
+sub Navigation {
+    #May need to be overriden in child class to define correct order of steps
+  my $self = shift;
+
+    my $navstring = '';
+    my $meter = '';
+    my @navoptions = ();
+    my $step = 1;
+    my $step_in_future = 0;
+    my $noNav = $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'NoNav'} || 0;
+    my $noGoingBack = $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'NoGoingBack'} || 0;
+    return '' if $noNav;
+    my $startingStep = $self->{'RunParams'}{'_ss'} || '';
+    my $includeStep = 1;
+    $includeStep = 0 if $startingStep;
+    for my $i (0 .. $#{$self->{'ProcessOrder'}})    {
+        my $current = 0;
+        my $name = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'label'} || '');
+        if($startingStep and $self->{'ProcessOrder'}[$i]{'action'} eq $startingStep)   {
+            $includeStep = 1;
+        }
+        next if !$includeStep;
+        next if($self->{'ProcessOrder'}[$i]{'NoNav'});
+        if($name)   {
+            $current = 1 if $i == $self->{'CurrentIndex'};
+            push @navoptions, [
+                $name,
+                $current || $step_in_future || 0,
+            ];
+            my $currentclass = '';
+            $currentclass = 'active' if $current;
+            $currentclass = 'next' if $step_in_future;
+            $currentclass ||= 'previous';
+            $meter = $step if $current;
+            my $showlink = 0;
+            $showlink = 1 if(!$current and !$step_in_future);
+            $showlink = 0 if($self->{'ProcessOrder'}[$i]{'noRevisit'});
+            $showlink = 0 if $noGoingBack;
+            my $linkURL = $self->{'Target'}."?rfp=".$self->{'ProcessOrder'}[$i]{'action'}."&".$self->stringifyURLCarryField();
+            $self->{'RunDetails'}{'DirectLinks'}[$i] = $linkURL;
+
+            my $link = qq[<a href="$linkURL" class = "$currentclass">$name</a>];
+
+            $navstring .= qq[ <li class = "$currentclass">$link</li> ];
+            $step_in_future = 2 if $current;
+            $step++;
+        }
+    }
+    my $returnHTML = '';
+    $returnHTML .= qq[<ul class = "nav nav-tabs">$navstring</ul> ] if $navstring;
+
+
+    if(wantarray)   {
+        return ($returnHTML, \@navoptions);
+    }
+    return $returnHTML || '';
+}
 
  
 
