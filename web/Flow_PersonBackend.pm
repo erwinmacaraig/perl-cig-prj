@@ -636,7 +636,7 @@ sub process_registration {
     my $msg = '';
     if($personID)   {
         if($changeExistingReg)    {
-            $self->deleteExistingReg($existingReg);
+            $self->deleteExistingReg($existingReg, $personID);
         }
         if(!$existingReg or $changeExistingReg)    {
             ($regoID, undef, $msg) = add_rego_record(
@@ -657,7 +657,7 @@ sub process_registration {
             );
         }
         if($changeExistingReg)  {
-            $self->moveDocuments($existingReg, $regoID);
+            $self->moveDocuments($existingReg, $regoID, $personID);
         }
     }
 
@@ -1437,8 +1437,9 @@ strISOFatherCountry
 
 sub deleteExistingReg {
     my $self = shift;
-    my ($regoID) = @_;
-
+    my ($regoID, $personID) = @_;
+    
+    my $realmID = $self->{'Data'}->{'Realm'};
     my $st = qq[
         DELETE TL FROM 
             tblTransLog AS TL
@@ -1446,18 +1447,23 @@ sub deleteExistingReg {
                 ON TL.intLogID = TX.intTransLogID
         WHERE 
             TX.intPersonRegistrationID = ?
+            AND (TL.intStatus = 0 OR (TL.intStatus= 1 and TL.intAmount>0))
+            AND TL.intRealmID = ?
     ];
     my $q = $self->{'Data'}->{'db'}->prepare($st);
-    $q->execute($regoID);
+    $q->execute($regoID, $realmID);
 
     $st = qq[
         DELETE FROM 
             tblTransactions 
         WHERE 
             intPersonRegistrationID = ?
+            AND (intStatus = 0 OR (intStatus=1 AND curAmount = 0))
+            AND intRealmID = ?
+            AND intID = ?
     ];
     $q = $self->{'Data'}->{'db'}->prepare($st);
-    $q->execute($regoID);
+    $q->execute($regoID, $realmID, $personID);
 
     $st = qq[
         DELETE FROM 
@@ -1465,9 +1471,10 @@ sub deleteExistingReg {
         WHERE 
             intPersonRegistrationID = ?
             AND strStatus = 'INPROGRESS'
+            AND intPersonID = ?
     ];
     $q=$self->{'Data'}->{'db'}->prepare($st);
-    $q->execute($regoID);
+    $q->execute($regoID, $personID);
 
     $q->finish();
     return 1;
