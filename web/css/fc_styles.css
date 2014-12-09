@@ -1493,3 +1493,6 @@ i.documents-complete {
 	margin-left:3px;
 	margin-right:4px;
 }
+#flow-btn-back  {
+    float:left;
+}

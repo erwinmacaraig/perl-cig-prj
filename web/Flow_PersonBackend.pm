@@ -1340,6 +1340,94 @@ sub loadObjectValues    {
             intMinorDistance
             intMinorEU
             intMinorNone
+            intNatCustomLU1
+            intNatCustomLU2
+            intNatCustomLU3
+            intNatCustomLU4
+            intNatCustomLU5
+            intNatCustomLU6
+            intNatCustomLU7
+            intNatCustomLU8
+            intNatCustomLU9
+            intNatCustomLU10
+
+            intInternationalTransfer
+
+strLocalTitle
+strPreferredName
+intLocalLanguage
+dtDeath
+strFirstClubName
+strMaidenName
+strPhoneWork
+strPhoneMobile
+strFax
+strEmail
+strCityOfResidence
+strEmergContName
+strEmergContRel
+strEmergContNo
+strP1FName
+strP1SName
+strP2FName
+strP2SName
+strP1Email
+strP2Email
+strP1Phone
+strP2Phone
+strP1Salutation
+strP2Salutation
+intP1Gender
+intP2Gender
+strP1Phone2
+strP2Phone2
+strP1PhoneMobile
+strP2PhoneMobile
+strP1Email2
+strP2Email2
+intMedicalConditions
+intAllergies
+intAllowMedicalTreatment
+intConsentSignatureSighted
+strMotherCountry
+strFatherCountry
+strNatCustomStr1
+strNatCustomStr2
+strNatCustomStr3
+strNatCustomStr4
+strNatCustomStr5
+strNatCustomStr6
+strNatCustomStr7
+strNatCustomStr8
+strNatCustomStr9
+strNatCustomStr10
+strNatCustomStr11
+strNatCustomStr12
+strNatCustomStr13
+strNatCustomStr14
+strNatCustomStr15
+dblNatCustomDbl1
+dblNatCustomDbl2
+dblNatCustomDbl3
+dblNatCustomDbl4
+dblNatCustomDbl5
+dblNatCustomDbl6
+dblNatCustomDbl7
+dblNatCustomDbl8
+dblNatCustomDbl9
+dblNatCustomDbl10
+dtNatCustomDt1
+dtNatCustomDt2
+dtNatCustomDt3
+dtNatCustomDt4
+dtNatCustomDt5
+intNatCustomBool1
+intNatCustomBool2
+intNatCustomBool3
+intNatCustomBool4
+intNatCustomBool5
+strISOMotherCountry
+strISOFatherCountry
         )) {
             $values{$field} = $object->getValue($field);
         }
