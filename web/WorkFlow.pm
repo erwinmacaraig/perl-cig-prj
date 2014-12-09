@@ -1853,6 +1853,7 @@ sub getTask {
             p.strLocalSurname,
             p.strISONationality,
             p.intGender,
+            p.strNationalNum,
             DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             rnt.intTaskNoteID as rejectTaskNoteID,
@@ -2764,6 +2765,7 @@ sub viewSummaryPage {
             $TemplateData{'PersonRegistrationDetails'}{'dob'} = $task->{'DOB'};
             $TemplateData{'PersonRegistrationDetails'}{'gender'} = $Defs::PersonGenderInfo{$task->{'intGender'}};
             $TemplateData{'PersonRegistrationDetails'}{'personRoleName'} = $task->{'strEntityRoleName'};
+            $TemplateData{'PersonRegistrationDetails'}{'MID'} = $task->{'strNationalNum'};
 
         }
         case 'ENTITY' {
