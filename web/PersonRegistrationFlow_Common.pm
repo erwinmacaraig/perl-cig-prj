@@ -42,6 +42,7 @@ use RegoAgeRestrictions;
 use DisplayPayResult;
 use InstanceOf;
 use EntityTypeRoles;
+use PersonSummaryPanel;
 
 sub displayRegoFlowCompleteBulk {
 
@@ -304,6 +305,7 @@ print STDERR "000OK IS $ok | $run\n\n";
             Lang => $Data->{'lang'},
             url => $Defs::base_url,
             client=>$clm,
+            PersonSummaryPanel => personSummaryPanel($Data, $personObj->ID()),
         );
         
         $body = runTemplate($Data, \%PageData, 'registration/complete.templ') || '';

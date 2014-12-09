@@ -532,6 +532,7 @@ sub initRequestPage {
     }
 
     my %TemplateData;
+    $TemplateData{'PersonSummaryPanel'}  = personSummaryPanel($Data, $personID) || '';
 
     if($transferType eq $Defs::TRANSFER_TYPE_INTERNATIONAL) {
         $title = $Data->{'lang'}->txt("Do you have Player's International Transfer Certificate?");
