@@ -462,9 +462,6 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
         [ $lang->txt('My Association'), 'menu',[
         'myAssociation',
         ]],
-        [ $lang->txt('Reports'), 'menu',[
-        'reports',
-        ]],
         [ $lang->txt('Search'), 'search',[
         'advancedsearch',
         'nataccredsearch',
@@ -480,6 +477,7 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
         'optin',
         ]],
     );
+        #[ $lang->txt('Reports'), 'menu',[ 'reports', ]],
 
     my $menudata = processmenudata(\%menuoptions, \@menu_structure);
     return $menudata;
@@ -725,10 +723,12 @@ sub getClubMenuData {
                 url => $baseurl."a=PREGFB_T",
             };
         }
+        if ($SystemConfig->{'allowPayInvoice'}) {
 		$menuoptions{'bulkpayment'} = { 
 			name => $lang->txt('Pay Invoice'),
 			url => $baseurl."a=TXN_PAY_INV",
 		}; 
+        }
         if ($SystemConfig->{'allowPersonRequest'}) {
             $menuoptions{'requestaccess'} = {
             name => $lang->txt('Request for Person Details'),
@@ -828,9 +828,6 @@ sub getClubMenuData {
         [ $lang->txt('My Club'), 'menu',[
         'myClub',
         ]],
-        [ $lang->txt('Reports'), 'menu',[
-        'reports',
-        ]],
         [ $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Documents"), 'menu','clubdocs'],
         [ $lang->txt('Identifiers'), 'menu','clubidentifier'],
         [ $lang->txt('Search'), 'search',[
@@ -844,6 +841,7 @@ sub getClubMenuData {
         'auditlog',
         ]],
     );
+        #[ $lang->txt('Reports'), 'menu',[ 'reports', ]],
 
     my $menudata = processmenudata(\%menuoptions, \@menu_structure);
     return $menudata;
