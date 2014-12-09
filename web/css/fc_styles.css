@@ -1498,12 +1498,8 @@ i.documents-complete {
     float:left;
 }
 
-#ffg_venue th {
-	padding: 2px;
-	font-size: 13px;
-}
 #ffg_venue td {
-    padding: 1px;
+	font-size: 13px;
 }
 #ffg_venue td input[type="text"] {
 	width: 100%;
