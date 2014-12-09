@@ -78,7 +78,6 @@ sub getRegistrationItems    {
     
     
 	
-
     my @values = (); 
     push @values, $Data->{'Realm'};  
     push @values,$Data->{'RealmSubType'}; 
@@ -117,7 +116,7 @@ sub getRegistrationItems    {
         }
     
         if ($itemType eq 'PRODUCT') {
-            $Item{'Name'} = $dref->{'strProductName'} . $st;
+            $Item{'Name'} = $dref->{'strProductName'};
             $Item{'ProductPrice'} = getItemCost($Data, $entityID, $entityLevel, $multiPersonType, $dref->{'intID'}) || 0;
             
         }
