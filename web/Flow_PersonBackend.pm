@@ -1335,6 +1335,7 @@ sub loadObjectValues    {
             dtOtherPersonIdentifierValidDateFrom
             dtOtherPersonIdentifierValidDateTo
             strOtherPersonIdentifierDesc
+            intOtherPersonIdentifierTypeID
 
             intMinorMoveOtherThanFootball
             intMinorDistance
