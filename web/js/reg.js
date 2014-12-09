@@ -25,9 +25,9 @@ function docViewer(id, params) {
 }
 
          
-function replaceFile(id,doctype,regoID,personID, client, doctypename){ 
+function replaceFile(id,doctype,regoID,personID, client, doctypename, desc){ 
     $('#docViewerOverlay').remove();
-	var url = 'fileform.cgi?client='+client + '&f='+id + '&doctype='+doctype + '&regoID='+regoID + '&pID='+personID + '&doctypename='+doctypename;
+	var url = 'fileform.cgi?client='+client + '&f='+id + '&doctype='+doctype + '&regoID='+regoID + '&pID='+personID + '&doctypename='+doctypename + '&desc='+desc;
 	window.scrollTo(0,0);
     var newdiv = $("<div></div>", {
 		"id":"docViewerOverlay"		

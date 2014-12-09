@@ -23,6 +23,7 @@ my $docTypeID = param('doctype') || 0;
 my $personID = param('pID') || 0;
 my $replaceFileID = param('f') || 0;
 my $doctypename = param('doctypename') || '';
+my $docDesc = param('desc') || '';
 
 
   my %Data=();
@@ -53,6 +54,7 @@ my $doctypename = param('doctypename') || '';
 			docTypeID		=> 	$docTypeID,
 			replaceFileID	=>	$replaceFileID,
 			personID		=>	$personID,
+			description		=>	$docDesc,
 	};
 
 $resultHTML = runTemplate(
