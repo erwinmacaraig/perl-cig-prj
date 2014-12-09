@@ -318,6 +318,9 @@ strong {
 .txtright {
 	text-align: right;
 } 
+.txtcenter {
+	text-align: center;
+} 
 #allfilesgridid_filter label input[type="search"] {
 	border-radius: 5px;
     padding: 5px;
