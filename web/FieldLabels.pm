@@ -91,10 +91,7 @@ sub getFieldLabels	{
 			strPreferredLang => 'Preferred Language',
 			strISONationality => 'Nationality',
 			strISOCountryOfBirth => 'Country of Birth',
-            intMinorMoveOtherThanFootball => 'Move to Country for reasons other than football',
-            intMinorDistance => 'Live 50km from National border. Maximum distance between the players domicile and the Clubs HQ shall be 100km',
-            intMinorEU => 'The transfer takes place within the territory of the European Union and player is aged between 16 and 18',
-            intMinorNone => 'None of the Above',
+            intMinorProtection=> 'FIFA Minor Protection',
             intLocalLanguage => 'Language of Name',
        
             intCertificationTypeID => "Certification",

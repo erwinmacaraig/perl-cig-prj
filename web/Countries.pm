@@ -1,9 +1,9 @@
 package Countries;
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(getISOCountriesHash getISOCountriesArray );
+@EXPORT = qw(getISOCountriesHash getISOCountriesArray isEuropean);
 #@EXPORT = qw(getISOCountriesHash getCountriesHash getCountriesArray getISOCountriesArray );
-@EXPORT_OK = qw(getISOCountriesHash getISOCountriesArray getCountriesNameToData );
+@EXPORT_OK = qw(getISOCountriesHash getISOCountriesArray getCountriesNameToData isEuropean);
 #@EXPORT_OK = qw(getISOCountriesHash getCountriesHash getCountriesArray getISOCountriesArray getCountriesNameToData );
 
     my $noCountryDisclosedID = 20000;
@@ -295,6 +295,40 @@ require Exporter;
 
 	);
 
+    my %euroCountries = (
+        'AT' => 1, #Austria (also sometimes OE in German-speaking countries: for "Oesterreich"
+        'BE' => 1, #Belgium
+        'BG' => 1, #Bulgaria
+        'HR' => 1, #Croatia (local name: Hrvatska)
+        'CY' => 1, #Cyprus
+        'CZ' => 1, #Czech Republic
+        'DK' => 1, #Denmark
+        'EE' => 1, #Estonia
+        'FI' => 1, #Finland
+        'FR' => 1, #France
+        'DE' => 1, #Germany
+        'GR' => 1, #Greece
+        'HU' => 1, #Hungary
+        'IS' => 1, #Iceland
+        'IE' => 1, #Ireland
+        'IT' => 1, #Italy
+        'LV' => 1, #Latvia
+        'LT' => 1, #Lithuania
+        'LU' => 1, #Luxembourg
+        'MT' => 1, #Malta
+        'NL' => 1, #Netherlands
+        'NO' => 1, #Norway
+        'PO' => 1, #Poland
+        'PT' => 1, #Portugal
+        'RO' => 1, #Romania
+        'SK' => 1, #Slovakia (Slovakian Republic)
+        'SI' => 1, #Slovenia
+        'ES' => 1, #Spain
+        'SE' => 1, #Sweden
+        'CH' => 1, #Switzerland (from Confoederatio Helvetica)
+        'GB' => 1, #United Kingdom (of Great Britain and Northern Ireland)
+    );
+
 #sub getCountriesHash	{
     #my ($Data) =@_;
 	#my %cnames=();
@@ -341,6 +375,11 @@ sub getISOCountriesArray	{
 	#}
 	#return @countries;
 #}
+
+sub isEuropean {
+    my ($countryCode) = @_;
+    return $euroCountries{$countryCode} || 0;
+}
 
 sub getISOCountriesHash	{
     my (%params) = @_;

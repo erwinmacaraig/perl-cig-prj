@@ -90,12 +90,7 @@ my $Fields = {
         dtOtherPersonIdentifierValidDateTo
         strOtherPersonIdentifierDesc
         intOtherPersonIdentifierTypeID
-        intMinorMoveOtherThanFootball
-        intMinorDistance
-        intMinorEU
-        intMinorNone
-
-
+        intMinorProtection
 
 	),
 

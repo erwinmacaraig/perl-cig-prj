@@ -392,10 +392,7 @@ sub getFieldsList	{
         dtOtherPersonIdentifierValidDateTo
         strOtherPersonIdentifierDesc
         intOtherPersonIdentifierTypeID
-        intMinorMoveOtherThanFootball
-        intMinorDistance
-        intMinorEU
-        intMinorNone
+        intMinorProtection
 
 
         strNatCustomStr1

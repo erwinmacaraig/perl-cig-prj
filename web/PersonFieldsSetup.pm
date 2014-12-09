@@ -18,6 +18,7 @@ use CustomFields;
 use DefCodes;
 use PersonUtils;
 use AssocTime;
+use MinorProtection;
 
 sub personFieldsSetup {
     my ($Data, $values) = @_;
@@ -100,7 +101,7 @@ sub personFieldsSetup {
     my $minorscript = qq[
         <script>
             jQuery(document).ready(function()  {
-                jQuery("#l_dtDOB_year, #l_dtDOB_mon, #l_dtDOB_day").change(function(){
+                jQuery("#l_dtDOB_year, #l_dtDOB_mon, #l_dtDOB_day,#l_strISONationality").change(function(){
                     showMinorProtection();
                 });
     
@@ -108,8 +109,9 @@ sub personFieldsSetup {
                     var dob_y = jQuery("#l_dtDOB_year").val();
                     var dob_m = jQuery("#l_dtDOB_mon").val();
                     var dob_d = jQuery("#l_dtDOB_day").val();
+                    var nationality= jQuery("#l_strISONationality").val();
                     var show = 0;
-                    if(dob_y && dob_m && dob_d)  {
+                    if(dob_y && dob_m && dob_d && (nationality != '$Data->{'SystemConfig'}{'DefaultNationality'}'))  {
                         if(dob_m < 10) { dob_m = '0' + dob_m; }
                         if(dob_d < 10) { dob_d = '0' + dob_d; }
                         var dob = dob_y + '-' + dob_m + '-' + dob_d;
@@ -135,6 +137,8 @@ sub personFieldsSetup {
         #minor protection only for player
         $allowMinorProtection = 1;
     }
+    my $minorProtectionOptions = getMinorProtectionOptions($Data,$values->{'itc'} || 0);
+    my $minorProtectionExplanation= getMinorProtectionExplanation($Data,$values->{'itc'} || 0);
 
     my ($DefCodes, $DefCodesOrder) = getDefCodes(
         dbh        => $Data->{'db'},
@@ -438,48 +442,25 @@ sub personFieldsSetup {
                     firstoption => [ '', " " ],
                     sectionname => 'other',
                 },
-               intMinorMoveOtherThanFootball => {
-                    label => $FieldLabels->{'intMinorMoveOtherThanFootball'} || '',
-                    value => $values->{'intMinorMoveOtherThanFootball'} || 0,
-                    type  => 'checkbox',
-                    displaylookup => { 1 => 'Yes', 0 => 'No' },
+                intMinorProtection => {
+                    label => $FieldLabels->{'intMinorProtection'} || '',
+                    value => $values->{'intMinorProtection'} || 0,
+                    type        => 'lookup',
+                    options     => $minorProtectionOptions,
+                    firstoption => [ '', " " ],
                     sectionname => 'core',
-                    swapLabels => 1,
-                    active => $allowMinorProtection,
-                },
-                intMinorDistance => {
-                    label => $FieldLabels->{'intMinorDistance'} || '',
-                    value => $values->{'intMinorDistance'} || 0,
-                    type  => 'checkbox',
-                    displaylookup => { 1 => 'Yes', 0 => 'No' },
-                    sectionname => 'core',
-                    swapLabels => 1,
-                    active => $allowMinorProtection,
-                },
-                intMinorEU => {
-                    label => $FieldLabels->{'intMinorEU'} || '',
-                    value => $values->{'intMinorEU'} || 0,
-                    type  => 'checkbox',
-                    displaylookup => { 1 => 'Yes', 0 => 'No' },
-                    sectionname => 'core',
-                    swapLabels => 1,
-                    active => $allowMinorProtection,
-                },
-                intMinorNone => {
-                    label => $FieldLabels->{'intMinorNone'} || '',
-                    value => $values->{'intMinorNone'} || 0,
-                    type  => 'checkbox',
-                    displaylookup => { 1 => 'Yes', 0 => 'No' },
-                    sectionname => 'core',
+                    class       => 'fcToggleGroup',
                     posttext    => $minorscript,
-                    swapLabels => 1,
                     active => $allowMinorProtection,
                 },
                 minorBlockStart => {
                     label       => 'minorblockstart',
                     value       => qq[<div id = "block-minor" class = "dynamic-panel">
                         <div class="form-group"> 
-                            <label class = "col-md-4 control-label txtright"><span class="compulsory">*</span>FIFA Minor Protection</label>
+                            <div class="col-md-12">
+                                <p>$minorProtectionExplanation</p>
+                                <p>].$Data->{'lang'}->txt('You must choose one of the following options').qq[</p>
+                            </div>
                         </div>
                     ],
                     type        => 'htmlrow',
@@ -505,12 +486,6 @@ sub personFieldsSetup {
                 latinBlockEnd
                 dtDOB
 
-                minorBlockStart
-                intMinorMoveOtherThanFootball
-                intMinorDistance
-                intMinorEU
-                intMinorNone
-                minorBlockEnd                
 
                 intGender
                 strMaidenName
@@ -519,6 +494,9 @@ sub personFieldsSetup {
                 strRegionOfBirth
                 strPlaceOfBirth
 
+                minorBlockStart
+                intMinorProtection
+                minorBlockEnd                
 
 
                 strPreferredLang
@@ -820,40 +798,6 @@ sub personFieldsSetup {
                 [ 'main',        'Certifications' ],
             ],
         },
-#        minor => {
-#            'fields' => {
-#                intMinorMoveOtherThanFootball => {
-#                    label => $FieldLabels->{'intMinorMoveOtherThanFootball'} || '',
-#                    value => $values->{'intMinorMoveOtherThanFootball'} || 0,
-#                    type  => 'checkbox',
-#                    displaylookup => { 1 => 'Yes', 0 => 'No' },
-#                },
-#                intMinorDistance => {
-#                    label => $FieldLabels->{'intMinorDistance'} || '',
-#                    value => $values->{'intMinorDistance'} || 0,
-#                    type  => 'checkbox',
-#                    displaylookup => { 1 => 'Yes', 0 => 'No' },
-#                },
-#                intMinorEU => {
-#                    label => $FieldLabels->{'intMinorEU'} || '',
-#                    value => $values->{'intMinorEU'} || 0,
-#                    type  => 'checkbox',
-#                    displaylookup => { 1 => 'Yes', 0 => 'No' },
-#                },
-#                intMinorNone => {
-#                    label => $FieldLabels->{'intMinorNone'} || '',
-#                    value => $values->{'intMinorNone'} || 0,
-#                    type  => 'checkbox',
-#                    displaylookup => { 1 => 'Yes', 0 => 'No' },
-#                },
-#            },
-#            'order' => [qw(
-#                intMinorMoveOtherThanFootball
-#                intMinorDistance
-#                intMinorEU
-#                intMinorNone
-#            )],
-#        }
     };
     for my $i (1..10) {
         my $fieldname = "intNatCustomLU$i";

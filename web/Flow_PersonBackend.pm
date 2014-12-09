@@ -149,6 +149,7 @@ sub setupValues    {
     my ($values) = @_;
     $values ||= {};
     $values->{'defaultType'} = $self->{'RunParams'}{'dtype'} || '';
+    $values->{'itc'} = $self->{'RunParams'}{'itc'} || 0;
     $self->{'FieldSets'} = personFieldsSetup($self->{'Data'}, $values);
 }
 
@@ -157,11 +158,13 @@ sub display_core_details    {
 
     my $id = $self->ID() || 0;
     my $defaultType = $self->{'RunParams'}{'dtype'} || '';
+    my $itc = $self->{'RunParams'}{'itc'} || 0;
     if($id)   {
         my $personObj = new PersonObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
         $personObj->load();
         if($personObj->ID())    {
             my $objectValues = $self->loadObjectValues($personObj);
+            $objectValues->{'itc'} = $itc;
             $self->setupValues($objectValues);
         }
     }
@@ -1347,10 +1350,7 @@ sub loadObjectValues    {
             strOtherPersonIdentifierDesc
             intOtherPersonIdentifierTypeID
 
-            intMinorMoveOtherThanFootball
-            intMinorDistance
-            intMinorEU
-            intMinorNone
+            intMinorProtection
             intNatCustomLU1
             intNatCustomLU2
             intNatCustomLU3
