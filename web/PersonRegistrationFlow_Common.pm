@@ -447,32 +447,45 @@ sub checkUploadedRegoDocuments {
         0,
         $rego_ref,
      );
+
+	#check for Approved Documents that do not need to be uploaded
+	my @validdocsforallrego = ();
+	my $query = qq[SELECT tblDocuments.intDocumentTypeID FROM tblDocuments INNER JOIN tblDocumentType
+				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
+				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
+				WHERE strApprovalStatus = 'APPROVED' AND intPersonID = ? AND 
+				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+				GROUP BY intDocumentTypeID];
+	my $sth = $Data->{'db'}->prepare($query);
+	$sth->execute($personID);
+	while(my $dref = $sth->fetchrow_hashref()){
+		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
+	}
+	#end
 	
 	my @required = ();
     foreach my $dc (@{$documents}){ 
 		next if(!$rego_ref->{'InternationalTransfer'} && $dc->{'DocumentFor'} eq 'TRANSFERITC');	#will only be included when there is an ITC
+		next if( grep /$dc->{'ID'}/,@validdocsforallrego);
 		if( $dc->{'Required'} ) {
 			push @required,$dc;
 		}		
 	}
 	my $total = @required;
-	#my @required_docs = ();
-    #while(my $dref = $sth->fetchrow_hashref()){
-	#	push @required_docs, $dref->{'intDocumentTypeID'};
-	#}
+	
     return ('',1) if(!$total);
 
     #my $total_items = $dref->{'items'};     
     #return 1 if($total_items == 0);
     #there are no required documents to be uploaded
 
-   my $query = qq[SELECT distinct(strDocumentName) FROM tblDocuments INNER JOIN tblDocumentType
+    $query = qq[SELECT distinct(strDocumentName) FROM tblDocuments INNER JOIN tblDocumentType
 					ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID 
 					INNER JOIN tblRegistrationItem ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID WHERE
 					tblDocuments.intPersonID = ? AND tblDocuments.intPersonRegistrationID = ? AND tblRegistrationItem.intRequired = 1];
     
    my @uploaded_docs = ();
-   my $sth = $Data->{'db'}->prepare($query);
+    $sth = $Data->{'db'}->prepare($query);
     $sth->execute($personID, $regoID);
 	
 	while(my $dref = $sth->fetchrow_hashref()){
@@ -481,9 +494,6 @@ sub checkUploadedRegoDocuments {
     
 	my @diff=();
 	
-
-    #return 1 if( ($dref->{'tot'} > 0) && $dref->{'tot'} == $total_items);
-	#return ('',1) if($#uploaded_docs == $total);   
 
 	#check for document not uploaded
 	foreach my $rdc (@required){		
@@ -521,6 +531,11 @@ sub displayRegoFlowDocuments{
         0,
         $rego_ref,
      );
+
+
+
+
+
 	my @docos = (); 
 	#check for uploaded documents present for a particular registration and person
 	my $query = qq[
@@ -587,9 +602,9 @@ sub displayRegoFlowDocuments{
     	
     }
 
-    if (! scalar @required_docs_listing and ! scalar @optional_docs_listing)  {
-        return '';
-    }
+    #if (! scalar @required_docs_listing and ! scalar @optional_docs_listing)  {
+     #   return '';
+    #}
     
   my %PageData = (
         nextaction => "PREGF_DU",
