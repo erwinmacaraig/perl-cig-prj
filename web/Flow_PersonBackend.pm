@@ -172,10 +172,20 @@ sub display_core_details    {
         my $burl = "$self->{'Data'}{'target'}?client=$client&amp;a=";
         my $transfer = $burl."PRA_T";
         my $search = $burl."INITSRCH_P";
-        my $txt = $lang->txt('Has this person already been registered?')
-            .qq[ <a href = "$transfer">].$lang->txt('If yes, they need to apply for a Transfer.').'</a>'
-            .$lang->txt(' Not sure?')
-            .qq[ <a href = "$search">].$lang->txt('Then use the Search.').'</a>' ;
+        my $txt;
+
+        if($defaultType eq $Defs::PERSON_TYPE_PLAYER) {
+            $txt = $lang->txt('Has this person already been registered?')
+                .qq[ <a href = "$transfer">].$lang->txt('If yes, they need to apply for a Transfer.').'</a>'
+                .$lang->txt(' Not sure?')
+                .qq[ <a href = "$search">].$lang->txt('Then use the Search.').'</a>' ;
+        }
+        else {
+             $txt = $lang->txt('Has this person already been registered?')
+                .$lang->txt(' Not sure?')
+                .qq[ <a href = "$search">].$lang->txt('Then use the Search.').'</a>' ;       
+        }
+
         $newRegoWarning = qq[
             <div class="alert"> 
                 <div> <span class="fa fa-info"></span> <p>$txt</p> </div> </div>
