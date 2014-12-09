@@ -32,6 +32,7 @@ use PersonRequest;
 use PersonFieldsSetup;
 use PersonRegistration;
 use PersonSummaryPanel;
+use RenewalDetails;
 
 
 sub setProcessOrder {
@@ -533,11 +534,13 @@ sub display_registration {
     my $content = '';
     my $noContinueButton = 1;
 
+    my $lang = $self->{'Data'}{'lang'};
+
     $self->{'Data'}->{'AddToPage'}->add('js_bottom','file','js/regwhat.js');
 
-    my $defaultType = $self->{'RunParams'}{'dtype'} || '';
+    my $defaultRegistrationNature = $self->{'RunParams'}{'dnat'} || '';
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
-    if($defaultType eq 'TRANSFER')   {
+    if($defaultRegistrationNature eq 'TRANSFER')   {
         $noContinueButton = 0;
         my %regFilter = (
             'entityID' => $entityID,
@@ -572,6 +575,22 @@ sub display_registration {
             );
         }
     }
+    elsif($defaultRegistrationNature eq 'RENEWAL') {
+        my $rawDetails;
+        ($content, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rtargetid'});
+
+        if(!$content or !$rawDetails) {
+            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt('Invalid Renewal Details');
+            $content = $lang->txt("No record found.");
+        }
+
+        $self->addCarryField('d_nature', 'RENEWAL');
+        $self->addCarryField('d_type', $rawDetails->{'strPersonType'});
+        $self->addCarryField('d_level', $rawDetails->{'strPersonLevel'});
+        $self->addCarryField('d_sport', $rawDetails->{'strSport'});
+        $self->addCarryField('d_age', $rawDetails->{'newAgeLevel'});
+        $self->addCarryField('d_role', $rawDetails->{'strPersonEntityRole'});
+    }
     else {
          $content = displayPersonRegisterWhat(
             $self->{'Data'},
@@ -599,7 +618,7 @@ sub display_registration {
     );
     my $pagedata = $self->display(\%PageData);
 
-    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}}) and ($defaultType eq 'TRANSFER')) {
+    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}}) and ($defaultRegistrationNature eq 'TRANSFER' or $defaultRegistrationNature eq 'RENEWAL')) {
         #display the same step with error notification (for Transfers atm)
         return ($pagedata,0);
     }
