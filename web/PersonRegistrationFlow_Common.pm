@@ -144,7 +144,7 @@ sub displayRegoFlowSummary {
 		$personData{'State'} = $personObj->getValue('strState') || '';
 		$personData{'Postal'} = $personObj->getValue('strPostalCode') || '';
 		$personData{'Phone'} = $personObj->getValue('strPhoneHome') || '';
-		$personData{'Countryaddress'} = $personObj->getValue('strISOCountry') || '';
+		$personData{'Countryaddress'} = $c->{$personObj->getValue('strISOCountry')} || '';
 		$personData{'Email'} = $personObj->getValue('strEmail') || '';
 		
 		#$personData{''} = $personObj->getValue('') || '';
