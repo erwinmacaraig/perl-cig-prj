@@ -2367,6 +2367,7 @@ sub populateDocumentViewData {
             wt.intApprovalEntityID,
             wt.intProblemResolutionEntityID,
             dt.strDocumentName,
+			dt.strDescription AS descr,
             dt.strDocumentFor,
             d.strApprovalStatus,
             d.intDocumentID,
@@ -2496,13 +2497,13 @@ sub populateDocumentViewData {
         $cv{'personID'} = $targetID;
        $cv{'currentLevel'} = $level;
        my $clm = setClient(\%cv);
-		$replaceLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="replaceFile($tdref->{'intFileID'},$tdref->{'intDocumentTypeID'}, $registrationID, $targetID, '$clm', '$tdref->{'strDocumentName'}');return false;">]. $Data->{'lang'}->txt('Replace') . q[</a></span>]; 
+		$replaceLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="replaceFile($tdref->{'intFileID'},$tdref->{'intDocumentTypeID'}, $registrationID, $targetID, '$clm', '$tdref->{'strDocumentName'}', '$tdref->{'descr'}');return false;">]. $Data->{'lang'}->txt('Replace') . q[</a></span>]; 
 
 
 
         #$addLink = qq[ <a class="btn-inside-docs-panel" href="$Defs::base_url/main.cgi?client=$Data->{'client'}&amp;a=WF_amd&amp;RegistrationID=$registrationID&amp;trgtid=$targetID&amp;doclisttype=$tdref->{'intDocumentTypeID'}&amp;level=$level" target="_blank">]. $Data->{'lang'}->txt('Add') . q[</a>] if (!$Data->{'ReadOnlyLogin'});
 
-		$addLink = qq[ <a href="#" class="btn-inside-docs-panel" onclick="replaceFile(0,$tdref->{'intDocumentTypeID'}, $registrationID, $targetID, '$clm','$tdref->{'strDocumentName'}');return false;">]. $Data->{'lang'}->txt('Add') . q[</a>] if (!$Data->{'ReadOnlyLogin'});
+		$addLink = qq[ <a href="#" class="btn-inside-docs-panel" onclick="replaceFile(0,$tdref->{'intDocumentTypeID'}, $registrationID, $targetID, '$clm','$tdref->{'strDocumentName'}','$tdref->{'descr'}');return false;">]. $Data->{'lang'}->txt('Add') . q[</a>] if (!$Data->{'ReadOnlyLogin'});
 
         if($tdref->{'intAllowProblemResolutionEntityAdd'} == 1) {
             if(!$tdref->{'intDocumentID'}){
@@ -2786,6 +2787,8 @@ sub viewSummaryPage {
     $TemplateData{'TaskAction'} = \%TaskAction;
     $TemplateData{'Lang'} = $Data->{'lang'};
 
+    my $c = Countries::getISOCountriesHash();
+
     switch($task->{'strWFRuleFor'}) {
         case 'REGO' {
             $templateFile = 'workflow/summary/personregistration.templ';
@@ -2797,7 +2800,7 @@ sub viewSummaryPage {
             $TemplateData{'PersonRegistrationDetails'}{'personFirstname'} = $task->{'strLocalFirstname'};
             $TemplateData{'PersonRegistrationDetails'}{'personSurname'} = $task->{'strLocalSurname'};
             $TemplateData{'PersonRegistrationDetails'}{'registerTo'} = $task->{'registerToEntity'};
-            $TemplateData{'PersonRegistrationDetails'}{'nationality'} = $task->{'strISONationality'};
+            $TemplateData{'PersonRegistrationDetails'}{'nationality'} = $c->{$task->{'strISONationality'}};
             $TemplateData{'PersonRegistrationDetails'}{'dob'} = $task->{'DOB'};
             $TemplateData{'PersonRegistrationDetails'}{'gender'} = $Defs::PersonGenderInfo{$task->{'intGender'}};
             $TemplateData{'PersonRegistrationDetails'}{'personRoleName'} = $task->{'strEntityRoleName'};

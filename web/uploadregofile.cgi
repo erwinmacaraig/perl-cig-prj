@@ -11,6 +11,7 @@ use DeQuote;
 use UploadFiles;
 use MD5;
 use Data::Dumper;
+use JSON;
 use strict;
 print "Content-type: text/html \n\n"; 
 
@@ -48,7 +49,13 @@ $Data{'db'}=$db;
 	$other_person_info{'replaceFileID'} = $replaceFileID if ($replaceFileID); 
 
     #UploadFiles::processUploadFile(\%Data,\@files,$Defs::LEVEL_PERSON,$personID,$Defs::UPLOADFILETYPE_DOC,\%other_person_info,);   
-	UploadFiles::processUploadFile(\%Data,\@files, $Data{'clientValues'}{'currentLevel'}, $personID,$Defs::UPLOADFILETYPE_DOC,\%other_person_info,);            
+	my $fileID = UploadFiles::processUploadFile(\%Data,\@files, $Data{'clientValues'}{'currentLevel'}, $personID,$Defs::UPLOADFILETYPE_DOC,\%other_person_info,);   
+
+	
+	$other_person_info{'f'} = $fileID;  
+	my $jFileData = JSON->new->utf8->encode(\%other_person_info);
+	
+	print $jFileData;       
          
 }
 

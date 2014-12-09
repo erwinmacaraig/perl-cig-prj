@@ -2,6 +2,19 @@
     <div class = "close"><a id="docViewer-close-btn" href = ""><i class = "fa fa-close fa-2x white"></i></a></div>
     <div class = "docTitle">[% doctype %]</div>
 </div>
+<div id = "docViewerContent">
+
+    <div class = "docViewerEntityInfo">
+    <p><strong>Document description:</strong> [% description %]</p>
+        <form action="uploadregofile.cgi" method="POST" class="dropzone" id="uploaderfrm" enctype="multipart/form-data">
+        <input type="hidden" name="client" value="[% client %]" />
+        <input type="hidden" name="rID" value="[% regoID %]" />
+        <input type="hidden" name="doctypeID" value="[% docTypeID %]" />
+        <input type="hidden" name="f" value="[% replaceFileID %]" />
+        <input type="hidden" name="pID" value="[% personID %]" />
+        </form> 
+    </div>
+</div>
 
 <script type="text/javascript" src="[% url %]/js/dropzone.js"></script>
 <link rel="stylesheet" type="text/css" href="[% url %]/css/basicdropzone.css">
@@ -23,11 +36,5 @@ Dropzone.options.uploaderfrm = {
 };
 
 </script>
-<form action="uploadregofile.cgi" method="POST" class="dropzone" id="uploaderfrm" enctype="multipart/form-data">
-<input type="hidden" name="client" value="[% client %]" />
-<input type="hidden" name="rID" value="[% regoID %]" />
-<input type="hidden" name="doctypeID" value="[% docTypeID %]" />
-<input type="hidden" name="f" value="[% replaceFileID %]" />
-<input type="hidden" name="pID" value="[% personID %]" />
-</form> 
+
 
