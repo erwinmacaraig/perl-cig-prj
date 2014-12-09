@@ -73,7 +73,7 @@ span.notice-error {
   color: #c4070a;
 }
 
-.toggle-type a {
+.toggle-type a, .toggle-type a:visited {
   background: #d8d8d8;
   border: 1px solid #cccccc;
   font-size: 14px;
@@ -82,9 +82,10 @@ span.notice-error {
   float: left;
 }
 
-.toggle-type a:hover {
+.toggle-type a:hover, .toggle-type a:active {
   text-decoration: none;
   background: #045485;
+  color:#fff;
 }
 
 .toggle-type a.active {

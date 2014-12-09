@@ -38,10 +38,14 @@
 </div>
 </form>
 </div>
-[% IF FlowSummary %]
+[% IF FlowSummary or FlowSummaryContent %]
 <div class="col-md-3">
-[% FStemplate = FlowSummaryTemplate or 'flow/flow_summary.templ' %]
-[% INCLUDE $FStemplate %]
+    [% IF FlowSummaryContent %]
+        [% FlowSummaryContent %]
+    [% ELSE %]
+        [% FStemplate = FlowSummaryTemplate or 'flow/flow_summary.templ' %]
+        [% INCLUDE $FStemplate %]
+    [% END %]
 </div>
 [% END %]
 <br/>
