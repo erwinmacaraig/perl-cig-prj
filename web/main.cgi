@@ -282,6 +282,10 @@ sub main {
 use PersonFlow;
         ( $resultHTML, $pageHeading ) = handlePersonFlow($action, \%Data);
     }
+    elsif ( $action =~ /^PTF_/ ) {
+use TransferFlow;
+        ( $resultHTML, $pageHeading ) = handleTransferFlow($action, \%Data);
+    }
     elsif ( $action =~ /^PENDPR_/ ) {
         my $prID = safe_param( 'prID', 'number' );
         my $entityID = getID($Data{'clientValues'},$Data{'clientValues'}{'currentLevel'});
