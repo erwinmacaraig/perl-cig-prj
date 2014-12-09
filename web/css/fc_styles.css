@@ -469,7 +469,7 @@ a.btn-main:hover, input.btn-main:hover {
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2781b8', endColorstr='#176ea4',GradientType=0 );
 }
 
-a.btn-inside-panels {
+a.btn-inside-panels , input.btn-inside-panels{
 	font-family: 'noto_sansbold';
     font-weight: normal;
     font-size: 14px;

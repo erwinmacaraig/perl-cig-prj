@@ -1,15 +1,7 @@
 [% USE Dumper %]
 <!--<div class="row">-->
     <div class="col-md-3">
-        <h3 class="panel-header">Member ID: [% PersonRegistrationDetails.MID %]</h3>
-        <div class="panel-body">
-            <div class="container-link"><a href="#" title="Upload Profile Image">+ Upload Profile Image</a></div>
-            <p class="reg-text">[% PersonRegistrationDetails.personSurname %]</p>
-            <p class="reg-text">[% PersonRegistrationDetails.personFirstname %]</p>
-            <p class="reg-text">[% PersonRegistrationDetails.gender  %]</p>
-            <p class="reg-text">[% PersonRegistrationDetails.dob %]</p>
-            <p class="reg-text">[% PersonRegistrationDetails.nationality %]</p>
-        </div>
+        [% PersonSummaryPanel %]
         <div class="registration-approved">[% Lang.txt('Complete') %]</div>
     </div>
     <div class="col-md-9">
