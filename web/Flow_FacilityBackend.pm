@@ -990,11 +990,18 @@ sub display_summary {
         return ('',2);
     }
 
+    my %summaryData = ();
+    my $summaryContent = runTemplate(
+        $self->{'Data'},
+        \%summaryData,
+        'flow/facility_summary.templ',
+    );
+
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        Content => '',
+        Content => $summaryContent,
         Title => '',
         TextTop => $content,
         TextBottom => '',

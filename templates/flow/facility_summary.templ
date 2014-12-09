@@ -1,0 +1,89 @@
+<h3 class="panel-header">Summary</h3>
+<div class="panel-body">
+	<div class="document-upload summary">
+		<div class="col-md-6">
+			<div class="read-only">
+			    <h4>Venue Details</h4>
+			    <div class="read-only-text clearfix">
+				    <ul>
+				    	<li><span>[% Lang.txt("Venue Name") %]:</span> <b>[% person.Familyname %]</b></li>
+				    	<li><span>[% Lang.txt("Venue Short Name") %]:</span> <b>[% person.Name %]</b></li>
+				    	<li><span>[% Lang.txt("Language of Venue name") %]:</span> <b> [% person.Language %]</b></li>
+				    	<li><span>[% Lang.txt("Venue Type") %]:</span> <b>[% person.DOB %]</b></li>
+				    	<li><span>[% Lang.txt("City") %]:</span> <b>[% person.Gender %]</b></li>
+				    	<li><span>[% Lang.txt("Region") %]:</span> <b>[% person.Region %]</b></li>
+				    	<li><span>[% Lang.txt("Nationality") %]:</span> <b>[% person.Nationality %]</b></li>
+				    </ul>
+				    <a href="[% editlink %]&amp;rfp=cd" class="pull-right">Edit</a>
+			    </div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="read-only">
+			    <h4>Contact Details</h4>
+			    <div class="read-only-text clearfix">
+				    <ul>
+				    	<li><span>[% Lang.txt("Address 1") %]:</span> <b>[% person.Addressone %]</b></li>
+				    	<li><span>[% Lang.txt("Address 2") %]:</span> <b>[% person.Addresstwo %]</b></li>
+				    	<li><span>[% Lang.txt("City") %]:</span> <b>[% person.City %]</b></li>
+				    	<li><span>[% Lang.txt("State") %]:</span> <b>[% person.State %]</b></li>
+				    	<li><span>[% Lang.txt("Postal Code") %]:</span> <b>[% person.Postal %]</b></li>
+				    	<li><span>[% Lang.txt("Country") %]:</span> <b>[% person.Countryaddress %]</b></li>
+				    	<li><span>[% Lang.txt("Email Address") %]:</span> <b>[% person.Email %]</b></li>
+				    	<li><span>[% Lang.txt("Phone Number") %]:</span> <b>[% person.Phone %]</b></li>
+				    	<li><span>[% Lang.txt("Fax") %]:</span> <b>[% person.Email %]</b></li>
+				    	<li><span>[% Lang.txt("Web Address") %]:</span> <b>[% person.Email %]</b></li>
+				    	
+				    </ul>
+				    <a href="[% editlink %]&amp;rfp=cond" class="pull-right">Edit</a>
+			    </div>
+			</div>
+		</div>
+		<div class="clearfix" style="clear:both;">&nbsp;</div>
+		<div class="col-md-12">
+			<div class="read-only">
+				 <h4>Fields</h4>
+			     <div class="read-only-text clearfix">
+				    <table class="table facility-field-summary" cellspacing="0" cellpadding="0" border="0">
+				    	<thead>
+				    		<tr>
+				    			<td>Field number</td>
+				    			<td>Field name</td>
+				    			<td>Field Discipline</td>
+				    			<td>Type of field</td>
+				    			<td>Length of field</td>
+				    			<td>Width of field</td>
+				    			<td>Capactity of field</td>
+				    		</tr>
+				    	</thead>
+				    	<tbody>
+				    		<tr>
+				    			<td>#1</td>
+				    			<td>Sample Field name</td>
+				    			<td>Discipline</td>
+				    			<td>Footbal</td>
+				    			<td>300</td>
+				    			<td>300</td>
+				    			<td>900</td>
+				    		</tr>
+				    	</tbody>
+				    </table>
+				    <a href="[% editlink %]&amp;rfp=r" class="pull-right">Edit</a>
+			     </div>
+			</div>
+		</div>
+		<div class="clearfix" style="clear:both;">&nbsp;</div>
+		<div class="col-md-12">
+			<div class="read-only">
+				 <h4>Documents</h4>
+				 <div class="read-only-text clearfix">
+				    <ul>
+						<li><span>Document #1:</span></li>
+						<li><span>Document #2:</span></li>
+				    </ul>
+				    <a href="#" class="pull-right">Edit</a>
+			     </div>
+			</div>
+		</div>
+	</div>
+</div>
