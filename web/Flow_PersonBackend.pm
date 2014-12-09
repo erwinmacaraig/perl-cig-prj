@@ -30,6 +30,7 @@ use Payments;
 use Products;
 use PersonRequest;
 use PersonFieldsSetup;
+use PersonRegistration;
 
 
 sub setProcessOrder {
@@ -527,6 +528,7 @@ sub display_registration {
     $self->{'Data'}->{'AddToPage'}->add('js_bottom','file','js/regwhat.js');
 
     my $defaultType = $self->{'RunParams'}{'dtype'} || '';
+    my $regoID = $self->{'RunParams'}{'rID'} || 0;
     if($defaultType eq 'TRANSFER')   {
         $noContinueButton = 0;
         my %regFilter = (
@@ -571,6 +573,8 @@ sub display_registration {
             $gender || 0,
             $originLevel,
             $url,
+            0,
+            $regoID,
         );
     }
 
@@ -605,6 +609,8 @@ sub process_registration {
     my $personLevel = $self->{'RunParams'}{'d_level'} || '';
     my $sport = $self->{'RunParams'}{'d_sport'} || '';
     my $ageLevel = $self->{'RunParams'}{'d_age'} || '';
+    my $existingReg = $self->{'RunParams'}{'existingReg'} || 0;
+    my $changeExistingReg = $self->{'RunParams'}{'changeExisting'} || 0;
     my $registrationNature = $self->{'RunParams'}{'d_nature'} || '';
     my $personRequestID = $self->{'RunParams'}{'prid'} || '';
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
@@ -619,22 +625,30 @@ sub process_registration {
     my $regoID = 0;
     my $msg = '';
     if($personID)   {
-        ($regoID, undef, $msg) = add_rego_record(
-            $self->{'Data'}, 
-            $personID, 
-            $entityID, 
-            $entityLevel, 
-            $originLevel, 
-            $personType, 
-            $personEntityRole, 
-            $personLevel, 
-            $sport, 
-            $ageLevel, 
-            $registrationNature,
-            undef,
-            undef,
-            $personRequestID,
-       );
+        if($changeExistingReg)    {
+            $self->deleteExistingReg($existingReg);
+        }
+        if(!$existingReg or $changeExistingReg)    {
+            ($regoID, undef, $msg) = add_rego_record(
+                $self->{'Data'}, 
+                $personID, 
+                $entityID, 
+                $entityLevel, 
+                $originLevel, 
+                $personType, 
+                $personEntityRole, 
+                $personLevel, 
+                $sport, 
+                $ageLevel, 
+                $registrationNature,
+                undef,
+                undef,
+                $personRequestID,
+            );
+        }
+        if($changeExistingReg)  {
+            $self->moveDocuments($existingReg, $regoID);
+        }
     }
 
     if(!$personID)    {
@@ -655,8 +669,10 @@ sub process_registration {
         }
     }
     else    {
-        $self->addCarryField('rID',$regoID);
-        $self->addCarryField('pType',$personType);
+        if(!$existingReg or $changeExistingReg)   {
+            $self->addCarryField('rID',$regoID);
+            $self->addCarryField('pType',$personType);
+        }
     }
 
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
@@ -1125,7 +1141,7 @@ sub display_summary {
             $entityID, 
             $personID, 
             $hiddenFields,
-			
+		    $self->stringifyURLCarryField(),
         );
     }
     else    {
@@ -1320,4 +1336,61 @@ sub loadObjectValues    {
     }
     return \%values;
 }
+
+sub deleteExistingReg {
+    my $self = shift;
+    my ($regoID) = @_;
+
+    my $st = qq[
+        DELETE TL FROM 
+            tblTransLog AS TL
+            INNER JOIN tblTransactions AS TX
+                ON TL.intLogID = TX.intTransLogID
+        WHERE 
+            TX.intPersonRegistrationID = ?
+    ];
+    my $q = $self->{'Data'}->{'db'}->prepare($st);
+    $q->execute($regoID);
+
+    $st = qq[
+        DELETE FROM 
+            tblTransactions 
+        WHERE 
+            intPersonRegistrationID = ?
+    ];
+    $q = $self->{'Data'}->{'db'}->prepare($st);
+    $q->execute($regoID);
+
+    $st = qq[
+        DELETE FROM 
+            tblPersonRegistration_$self->{'Data'}->{'Realm'} 
+        WHERE 
+            intPersonRegistrationID = ?
+            AND strStatus = 'INPROGRESS'
+    ];
+    $q=$self->{'Data'}->{'db'}->prepare($st);
+    $q->execute($regoID);
+
+    $q->finish();
+    return 1;
+}
+
+sub moveDocuments {
+    my $self = shift;
+    my ($oldRegoID, $newRegoID) = @_;
+
+    my $st = qq[
+        UPDATE tblDocuments
+        SET intPersonRegistrationID = ?
+        WHERE intPersonRegistrationID = ?
+    ];
+    my $q=$self->{'Data'}->{'db'}->prepare($st);
+    $q->execute($oldRegoID, $newRegoID);
+    $q->finish();
+    return 1;
+}
+
+ 
+
+ 
 

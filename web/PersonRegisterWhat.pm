@@ -32,6 +32,7 @@ sub displayPersonRegisterWhat   {
         $originLevel,
         $continueURL,
         $bulk,
+        $regoID,
     ) = @_;
     $bulk ||= 0;
     my $defaultType = param('dtype') || '';
@@ -46,8 +47,34 @@ sub displayPersonRegisterWhat   {
         realmID => $Data->{'Realm'} || 0,
         realmSubTypeID => $Data->{'RealmSubType'} || 0,
         continueURL => $continueURL || '',
-        dtype=> $defaultType
+        dtype=> $defaultType,
+        existingReg => $regoID || 0,
     );
+    if($regoID) {
+        my $ref = getRegistrationDetail($Data, $regoID) || {};
+        my $existing = {};
+        if($ref and $ref->[0])    {
+            $existing = $ref->[0];
+        }
+        my $role_ref = getEntityTypeRoles($Data, $existing->{'strSport'}, $existing->{'strPersonType'});
+
+        my %existingRego = (
+            type => $existing->{'strPersonType'} || '',
+            typeName => $existing->{'PersonType'} || '',
+            sport => $existing->{'strSport'} || '',
+            sportName => $existing->{'Sport'} || '',
+            role => $existing->{'strPersonEntityRole'} || '',
+            roleName => $role_ref->{$existing->{'strPersonEntityRole'}} || '',
+            level => $existing->{'strPersonLevel'} || '',
+            levelName => $existing->{'PersonLevel'} || '',
+            age => $existing->{'strAgeLevel'} || '',
+            ageName => $existing->{'AgeLevel'} || '',
+            nature => $existing->{'strRegistrationNature'} || '',
+            natureName => $existing->{'RegistrationNature'} || '',
+
+        );
+        $templateData{'existing'} = \%existingRego;
+    }
 
     my $template = "registration/what.templ";
     $template = "registration/whatbulk.templ" if ($bulk);
