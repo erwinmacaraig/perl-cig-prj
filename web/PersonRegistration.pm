@@ -677,7 +677,6 @@ sub getRegistrationData	{
 		
     }
 
-	
     return ($count, \@Registrations);
 }
 
