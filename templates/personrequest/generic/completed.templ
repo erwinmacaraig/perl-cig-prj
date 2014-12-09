@@ -5,10 +5,10 @@
         <div class="transfer-pending">Transfer Status: Requested</div>
     </div>
     <div class="col-md-9">
-        <h3 class="panel-header">[% personDetails.memberID %]</h3>
+        <h3 class="panel-header">[% personDetails.firstname %] [% personDetails.surname %]</h3>
         <div class="panel-body">
             [% FOREACH request IN personRequests %]
-            <label>The [% request.requestType %] Request (ID: [% request.id %] --[% request.personType %]/[% request.sport %]--) has been sent to [% request.requestTo %].</label>
+            <label>The [% request.requestType %] Request << [% request.sport %] >> has been sent to [% request.requestTo %].</label>
             <br/>
             [% END %]
             <div class="row top-bottom-spacer">
