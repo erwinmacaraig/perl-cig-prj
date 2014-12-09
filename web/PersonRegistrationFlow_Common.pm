@@ -611,6 +611,7 @@ sub displayRegoFlowProducts {
     my $lang=$Data->{'lang'};
 
     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_PU&amp;rID=$regoID";
+print STDERR "SSS: $entityRegisteringForLevel\n";
 #    my $pref = loadPersonDetails($Data->{'db'}, $personID);
  #   $rego_ref->{'Nationality'} = $pref->{'strISONationality'};
     my $CheckProducts = getRegistrationItems(

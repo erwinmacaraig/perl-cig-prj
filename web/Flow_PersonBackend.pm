@@ -1206,11 +1206,9 @@ sub display_complete {
         $rego_ref->{'Nationality'} = $nationality;
 
         my $run = $self->{'RunParams'}{'run'} || 0;
-print STDERR "IN display_complete --- COMPLETE $run\n";
         if($self->{'RunParams'}{'newreg'} and ! $run)  {
                 #$self->{'RunParams'}{'run'} = 1;
                 #$self->addCarryField('run',1);
-print STDERR "RRRRRRRRULES RUNNINGS\n";
             my $rc = WorkFlow::addWorkFlowTasks(
                 $self->{'Data'},
                 'PERSON',

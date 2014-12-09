@@ -1,16 +1,18 @@
 [% USE Dumper %]
-<table cellpadding="5" style="width: 100%">
-    <tr>
-        <th></th>
-        <th>Field Number</th>
-        <th>Field Name</th>
-        <th>Discipline</th>
-        <th>Type of Field</th>
-        <th>Length of Field</th>
-        <th>Width of Field</th>
-        <th>Capacity of Field</th>
-    </tr>
 
+<table id="ffg_venue" class="table" cellpadding="0" style="width: 100%">
+    <thead>
+    <tr>
+        <td></th>
+        <td>Field Number</td>
+        <td>Field Name</td>
+        <td>Discipline</td>
+        <td>Type of Field</td>
+        <td>Length of Field</td>
+        <td>Width of Field</td>
+        <td>Capacity of Field</td>
+    </tr>
+    </thead>
     [% COUNT = 0 %]
     [% FOREACH fieldRow IN FieldElements %]
     <tr>
