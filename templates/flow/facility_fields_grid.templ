@@ -1,5 +1,7 @@
 [% USE Dumper %]
-<table cellpadding="5" style="width: 100%">
+<div class="panel-body">
+<table id="ffg_venue" cellpadding="0" style="width: 100%">
+    <thead>
     <tr>
         <th></th>
         <th>Field Number</th>
@@ -10,7 +12,7 @@
         <th>Width of Field</th>
         <th>Capacity of Field</th>
     </tr>
-
+    </thead>
     [% COUNT = 0 %]
     [% FOREACH fieldRow IN FieldElements %]
     <tr>
@@ -25,3 +27,4 @@
     </tr>
     [% END %]
 </table>
+</div>

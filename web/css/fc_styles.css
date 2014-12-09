@@ -1493,6 +1493,24 @@ i.documents-complete {
 	margin-left:3px;
 	margin-right:4px;
 }
+
 #flow-btn-back  {
     float:left;
 }
+
+#ffg_venue th {
+	padding: 2px;
+	font-size: 13px;
+}
+#ffg_venue td {
+    padding: 1px;
+}
+#ffg_venue td input[type="text"] {
+	width: 100%;
+	padding: 5px 0px;
+}
+#ffg_venue td select {
+	width: 100%;
+	border: 1px solid #cccccc;
+}
+
