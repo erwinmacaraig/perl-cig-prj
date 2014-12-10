@@ -1549,3 +1549,7 @@ table.facility-field-summary tr td {
 .row-padding {
 	padding: 15px 15px 5px 15px;
 }
+
+.products-table {
+	margin:0 auto;
+}

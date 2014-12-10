@@ -1,9 +1,13 @@
-[% IF allowManualPay %]
-    <p>Mark as manually paid ? <input name="markPaid" type="checkbox" value="1"></p>
-    <p>Pay via:<select name="paymentType">
-            <option value=''>[% Lang.txt('Select Payment Type') %]</option>
-            [% FOREACH p IN manualPaymentTypes %]
-                <option value="[% p.key %]">[% p.value %]</option>
-            [% END %]
-        </select></p>
-[% END %]
+<h3 class="panel-header">License</h3>
+<div class="panel-body">
+	[% IF allowManualPay %]
+	    <p>Mark as manually paid ? <input name="markPaid" type="checkbox" value="1"></p>
+	    <p>Pay via:<select name="paymentType">
+	            <option value=''>[% Lang.txt('Select Payment Type') %]</option>
+	            [% FOREACH p IN manualPaymentTypes %]
+	                <option value="[% p.key %]">[% p.value %]</option>
+	            [% END %]
+	        </select></p>
+	[% END %]
+
+</div>
