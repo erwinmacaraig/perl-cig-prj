@@ -210,6 +210,7 @@ sub display_core_details    {
         ScriptContent => $scriptContent || '',
         Title => '',
         TextTop => $newRegoWarning,
+        ContinueButtonText => $self->{'Lang'}->txt('Save & Continue'),
         TextBottom => '',
     );
 
@@ -312,6 +313,7 @@ sub display_minor_fields {
         ScriptContent => $scriptContent || '',
         FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
         FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        ContinueButtonText => $self->{'Lang'}->txt('Save & Continue'),
         Title => '',
         TextTop => '',
         TextBottom => '',
@@ -374,6 +376,7 @@ sub display_contact_details    {
         Content => $fieldsContent || '',
         ScriptContent => $scriptContent || '',
         FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
+        ContinueButtonText => $self->{'Lang'}->txt('Save & Continue'),
         Title => '',
         TextTop => '',
         TextBottom => '',
@@ -732,6 +735,7 @@ sub display_products {
         Title => '',
         TextTop => '',
         TextBottom => '',
+        ContinueButtonText => $self->{'Lang'}->txt('Save & Continue'),
     );
     my $pagedata = $self->display(\%PageData);
 
@@ -865,6 +869,7 @@ sub display_documents {
         Title => '',
         TextTop => $content,
         TextBottom => '',
+        ContinueButtonText => $self->{'Lang'}->txt('Save & Continue'),
     );
     my $pagedata = $self->display(\%PageData);
 	
