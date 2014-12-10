@@ -418,6 +418,10 @@ select {
 	float: left;
 }
 
+.btn {
+	border-radius: 0px;
+}
+
 a.btn-main, input.btn-main {
 	text-align: center;
 	font-family: 'noto_sansbold';
@@ -1478,7 +1482,6 @@ span.fa-user{
 }
 
 .document-upload.summary {
-	overflow:hidden;
 	margin-top: 20px;
 	padding:5px;
 }
