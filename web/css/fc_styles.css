@@ -1564,10 +1564,19 @@ table.facility-field-summary tr td {
 .products-table {
 	margin:0 auto;
 }
+form#flowFormID h3.panel-header {
+	font-weight: bold;
+}
+.document-upload h3.panel-header {
+	font-weight: bold;
+}
 form#flowFormID #fsg-core label {
 	margin-top: 6px;
 }
 form#flowFormID #fsg-main label {
+	margin-top: 6px;
+}
+form#flowFormID #fsgw-other label {
 	margin-top: 6px;
 }
 form#flowFormID #l_row_type,#l_row_sport label {
