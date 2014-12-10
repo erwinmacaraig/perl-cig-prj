@@ -543,6 +543,8 @@ a.btn-inside-panels:hover {
 .alert div p {
 	display: inline-block;
 	margin: 0 20px;
+	position: relative;
+	top:-4px;
 }
 
 .alert div ul {
