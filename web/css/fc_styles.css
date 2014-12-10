@@ -1555,6 +1555,12 @@ table.facility-field-summary tr td {
 .products-table {
 	margin:0 auto;
 }
-form#flowFormID label {
+form#flowFormID #fsg-core label {
 	margin-top: 6px;
+}
+form#flowFormID #fsg-main label {
+	margin-top: 6px;
+}
+form#flowFormID #l_row_type,#l_row_sport label {
+	margin-top: 0px;
 }
