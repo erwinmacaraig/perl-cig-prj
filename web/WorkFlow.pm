@@ -2333,6 +2333,23 @@ sub populateDocumentViewData {
     #since a specific work flow rule can have
     #multiple entries in tblWFRuleDocuments (1:n cardinality of task to document rules)
 
+	my @validdocsforallrego = ();
+	my %validdocs = ();
+	my $query = qq[SELECT tblDocuments.intDocumentTypeID, tblDocuments.intUploadFileID FROM tblDocuments INNER JOIN tblDocumentType
+				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
+				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
+				WHERE strApprovalStatus = 'APPROVED' AND intPersonID = ? AND 
+				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+				GROUP BY intDocumentTypeID];
+	my $sth = $Data->{'db'}->prepare($query);
+	$sth->execute($dref->{'intPersonID'});
+	while(my $dref = $sth->fetchrow_hashref()){
+		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
+		$validdocs{$dref->{'intDocumentTypeID'}} = $dref->{'intUploadFileID'};
+	}
+	my $fileID = 0;
+
+	
     my $joinCondition = '';
 
     switch($dref->{strWFRuleFor}) {
@@ -2369,6 +2386,7 @@ sub populateDocumentViewData {
             dt.strDocumentName,
 			dt.strDescription AS descr,
             dt.strDocumentFor,
+			dt.intDocumentTypeID AS doctypeid, 
             d.strApprovalStatus,
             d.intDocumentID,
             pr.intNewBaseRecord,
@@ -2420,8 +2438,7 @@ sub populateDocumentViewData {
             AND wt.intRealmID = ?
         ORDER BY dt.strDocumentName, d.intDocumentID DESC
     ];
-
-    
+   
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
     $q->execute(
         $dref->{'intWFTaskID'},
@@ -2454,20 +2471,30 @@ sub populateDocumentViewData {
         next if((!$dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC') or ($dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC' and $dref->{'PersonStatus'} ne $Defs::PERSON_STATUS_PENDING));
 		my $status;
         $count++;
-        if(!$tdref->{'strApprovalStatus'}){            
-			if($tdref->{'Required'}){
-				$documentStatusCount{'MISSING'}++;
-				$status = 'MISSING';
+		$fileID = $tdref->{'intFileID'};
+		if(!$tdref->{'strApprovalStatus'}){     
+			if(!grep /$tdref->{'doctypeid'}/,@validdocsforallrego){  
+
+				if($tdref->{'Required'}){				
+					$documentStatusCount{'MISSING'}++;
+					$status = 'MISSING';
+				}
+				else {
+					$status = 'Optional. Not Provided.';
+				}
 			}
-			else {
-				$status = 'Optional. Not Provided.';
+			else{
+				$status = 'APPROVED';
+				$documentStatusCount{'APPROVED'}++;
+				$fileID = $validdocs{$tdref->{'doctypeid'}};
 			}
 			
-        }
-        else {
-            $documentStatusCount{$tdref->{'strApprovalStatus'}}++;
+     	   }
+		else {
+			$documentStatusCount{$tdref->{'strApprovalStatus'}}++;
 			$status = $tdref->{'strApprovalStatus'};
-        }
+       	}
+		
         my $displayVerify;
         my $displayAdd;
         my $displayView;
@@ -2482,22 +2509,13 @@ sub populateDocumentViewData {
         my $level = (!$targetID and !$registrationID) ? $Defs::LEVEL_CLUB : $Defs::LEVEL_PERSON;
         $targetID = (!$targetID and !$registrationID) ? $dref->{'intEntityID'} : $targetID;
 
-        #warn "DOCUMENT TYPE ID " . $tdref->{'intDocumentTypeID'};
-        #if($tdref->{'intAllowProblemResolutionLevel'} eq 1 and $tdref->{'intAllowVerify'} == 1) {
-        #    $displayVerify = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
-        #}
-        #elsif ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowVerify'} == 1) {
-        #    $displayVerify = 1;
-        #}
-
-        #$replaceLink = qq[ <span style="position: relative" class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$tdref->{'intFileID'}" target="_blank">]. $Data->{'lang'}->txt('Replace') . q[</a></span>];
-        #$replaceLink = qq[ <a class="btn-inside-docs-panel" href="$Defs::base_url/main.cgi?client=$Data->{'client'}&amp;a=WF_amd&amp;RegistrationID=$registrationID&amp;trgtid=$targetID&amp;doclisttype=$tdref->{'intDocumentTypeID'}&amp;level=$level&amp;f=$tdref->{'intFileID'}" target="_blank">]. $Data->{'lang'}->txt('Replace') . q[</a>];
+       
 		my $cl = setClient($Data->{'clientValues'}) || '';
         my %cv = getClient($cl);
         $cv{'personID'} = $targetID;
        $cv{'currentLevel'} = $level;
        my $clm = setClient(\%cv);
-		$replaceLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="replaceFile($tdref->{'intFileID'},$tdref->{'intDocumentTypeID'}, $registrationID, $targetID, '$clm', '$tdref->{'strDocumentName'}', '$tdref->{'descr'}');return false;">]. $Data->{'lang'}->txt('Replace') . q[</a></span>]; 
+		$replaceLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="replaceFile($fileID,$tdref->{'intDocumentTypeID'}, $registrationID, $targetID, '$clm', '$tdref->{'strDocumentName'}', '$tdref->{'descr'}');return false;">]. $Data->{'lang'}->txt('Replace') . q[</a></span>]; 
 
 
 
@@ -2523,10 +2541,6 @@ sub populateDocumentViewData {
             }
         }
 
-
-
-
-
         if($tdref->{'intAllowProblemResolutionEntityVerify'} == 1 and !$tdref->{'intDocumentID'}) {
             $displayVerify = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
         }
@@ -2535,21 +2549,13 @@ sub populateDocumentViewData {
             $displayVerify = 1;
         }
 
-
-
-
-        if($tdref->{'intDocumentID'}) {
+        #if($tdref->{'intDocumentID'} ) {
+		if($fileID) {
             $displayView = 1;
-            #$viewLink = qq[ <span style="position: relative" class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$tdref->{'intFileID'}" target="_blank">]. $Data->{'lang'}->txt('View') . q[</a></span>];
-
-			$viewLink = qq[ <span style="position: relative"> 
-<a href="#" class="btn-inside-docs-panel" onclick="docViewer($tdref->{'intFileID'},'client=$Data->{'client'}&amp;a=review');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];
-
-			
+           	$viewLink = qq[ <span style="position: relative"> 
+<a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$Data->{'client'}&amp;a=review');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];			
         }
-
 		
-
         my %documents = (
             DocumentID => $tdref->{'intDocumentID'},
             #Status => $tdref->{'strApprovalStatus'} || "MISSING",
