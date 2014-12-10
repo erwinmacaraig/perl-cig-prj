@@ -623,7 +623,8 @@ sub submitRequestPage {
                         intRequestToMAOverride,
                         strRequestNotes,
                         strRequestStatus,
-                        dtDateRequest
+                        dtDateRequest,
+                        tTimeStamp
                     )
                     VALUES
                     (
@@ -639,6 +640,7 @@ sub submitRequestPage {
                         ?,
                         ?,
                         ?,
+                        NOW(),
                         NOW()
                     )
             ];
@@ -1082,7 +1084,8 @@ sub setRequestResponse {
             strRequestResponse = ?,
             intResponseBy = ?,
             strResponseNotes = ?,
-            strRequestStatus = ?
+            strRequestStatus = ?,
+            tTimeStamp = NOW()
         WHERE
             intPersonRequestID = ?
     ];
@@ -1242,6 +1245,7 @@ sub getRequests {
             pq.dtDateRequest,
             DATE_FORMAT(pq.dtDateRequest,'%d %b %Y') AS prRequestDateFormatted,
             UNIX_TIMESTAMP(pq.dtDateRequest) AS prRequestTimeStamp,
+            UNIX_TIMESTAMP(pq.tTimeStamp) AS prRequestUpdateTimeStamp,
             pq.strRequestResponse,
             pq.strResponseNotes,
             pq.intResponseBy,
@@ -1368,7 +1372,8 @@ sub setRequestStatus {
         UPDATE
             tblPersonRequest
         SET
-            strRequestStatus = ?
+            strRequestStatus = ?,
+            tTimeStamp = NOW()
         WHERE
             intPersonRequestID = ?
     ];

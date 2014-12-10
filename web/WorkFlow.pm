@@ -530,7 +530,7 @@ sub listTasks {
             $taskCounts{$requestStatus}++;
             $taskCounts{$request->{'strRequestType'}}++;
 
-            my $newTask = ($request->{'taskTimeStamp'} >= $lastLoginTimeStamp) ? 1 : 0; #additional check if tTimeStamp > currentTimeStamp
+            my $newTask = ($request->{'prRequestUpdateTimeStamp'} >= $lastLoginTimeStamp) ? 1 : 0; #additional check if tTimeStamp > currentTimeStamp
             $taskCounts{"newTasks"}++ if $newTask;
 
             my $taskStatusLabel = $request->{'strRequestResponse'} ? $Defs::personRequestStatus{$request->{'strRequestResponse'}} : $Defs::personRequestStatus{'PENDING'};
@@ -546,9 +546,12 @@ sub listTasks {
                 taskDate => $request->{'prRequestDateFormatted'},
                 requestFrom => $request->{'requestFrom'},
                 requestTo => $request->{'requestTo'},
-                taskTimeStamp => $request->{'prRequestTimeStamp'},
+                taskTimeStamp => $request->{'prRequestUpdateTimeStamp'},
+                currentClubView => $entityID == $request->{'intRequestToEntityID'} ? 1 : 0,
                 newTask => $newTask,
             );
+
+            print STDERR Dumper \%personRequest;
 
             if(!($Defs::personRequest{$request->{'strRequestType'}} ~~ @taskType)){
                 push @taskType, $Defs::personRequest{$request->{'strRequestType'}};
