@@ -210,6 +210,7 @@ sub display_core_details    {
         ScriptContent => $scriptContent || '',
         Title => '',
         TextTop => $newRegoWarning,
+        FlowSummaryContent => personSummaryPanel($self->{'Data'}, $id) || '',
         ContinueButtonText => $self->{'Lang'}->txt('Save & Continue'),
         TextBottom => '',
     );
@@ -278,78 +279,6 @@ sub validate_core_details    {
 #WR: SHoudl we check for duplicates here
     }
 
-    return ('',1);
-}
-
-sub display_minor_fields { 
-    my $self = shift;
-
-    my $id = $self->ID() || 0;
-    if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
-        return ('Invalid User',0);
-    }
-    my $personObj = new PersonObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
-    $personObj->load();
-    my $dob = $personObj->getValue('dtDOB');
-    my $isMinor = personIsMinor($self->{'Data'}, $dob);
-    my $defaultType = $self->{'RunParams'}{'dtype'} || '';
-    if(!$isMinor or $defaultType ne 'PLAYER')   {
-        $self->incrementCurrentProcessIndex();
-        $self->incrementCurrentProcessIndex();
-        return ('',2);
-    }
-    if($personObj->ID())    {
-        my $objectValues = $self->loadObjectValues();
-        $self->setupValues($objectValues);
-    }
-
-    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'minor'}, 'Person',);
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
-    my %PageData = (
-        HiddenFields => $self->stringifyCarryField(),
-        Target => $self->{'Data'}{'target'},
-        Errors => $self->{'RunDetails'}{'Errors'} || [],
-        Content => $fieldsContent || '',
-        ScriptContent => $scriptContent || '',
-        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
-        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
-        ContinueButtonText => $self->{'Lang'}->txt('Save & Continue'),
-        Title => '',
-        TextTop => '',
-        TextBottom => '',
-    );
-    my $pagedata = $self->display(\%PageData);
-
-    return ($pagedata,0);
-
-}
-
-sub validate_minor_fields { 
-    my $self = shift;
-
-    my $userData = {};
-    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'minor'}, 'Person',);
-    ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
-    my $id = $self->ID() || 0;
-    if(!$id)    {
-        push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person';
-    }
-    if($userData->{'intMinorNone'})   {
-        push @{$self->{'RunDetails'}{'Errors'}}, 'This person is not eligible for registration';
-    }
-    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
-        #There are errors - reset where we are to go back to the form again
-        $self->decrementCurrentProcessIndex();
-        return ('',2);
-    }
-
-    my $personObj = new PersonObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
-    $personObj->load();
-    if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
-        return ('Invalid User',0);
-    }
-    $personObj->setValues($userData);
-    $personObj->write();
     return ('',1);
 }
 
