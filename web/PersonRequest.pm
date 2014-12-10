@@ -782,7 +782,7 @@ sub listRequests {
         $reqFilters{'personID'} = $personID;
     }
     else    {
-        $reqFilters{'(entityID'} = $entityID
+        $reqFilters{'entityID'} = $entityID
     }
 
     my $personRequests = getRequests($Data, \%reqFilters);
