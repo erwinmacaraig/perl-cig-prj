@@ -42,7 +42,7 @@ sub setProcessOrder {
         {
             'action' => 'club',
             'function' => 'display_old_club',
-            'label'  => 'Previous Club',
+            'label'  => 'Old Club Details',
             'fieldset'  => 'contactdetails',
             'title'  => 'Transfer - Old Club Details',
         },
@@ -141,7 +141,35 @@ sub display_old_club {
     }
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'contactdetails'}, 'Person',);
     my $scriptContent = '';
-    my $fieldsContent = qq[OLD CLUB HERE];
+
+    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
+    my %regFilter = (
+        'entityID' => $entityID,
+        'requestID' => $self->{'RunParams'}{'rid'},
+    );
+    my $request = getRequests($self->{'Data'}, \%regFilter);
+    $request = $request->[0];
+
+    my $isocountries  = getISOCountriesHash();
+    my %prevClubDetails = (
+        name => $request->{'requestTo'},
+        sport => $Defs::entitySportType{$request->{'requestToDiscipline'}} || '',
+        country => $isocountries->{$request->{'requestToISOCountry'}} || '-',
+        address => $request->{'requestToAddress'} || '',
+        address2 => $request->{'requestToAddress2'} || '',
+        city => $request->{'requestToCity'} | '',
+        postal => $request->{'requestToPostal'} || '',
+        region => $request->{'requestToRegion'} || '',
+        phone => $request->{'requestToPhone'} || '-',
+    );
+
+    my $fieldsContent = runTemplate(
+        $self->{'Data'},
+        \%prevClubDetails,
+        'personrequest/transfer/oldclubdetails.templ',
+    );
+
+    print STDERR Dumper $fieldsContent;
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -163,6 +191,7 @@ sub display_old_club {
 sub display_core_details    { 
     my $self = shift;
 
+    $self->addCarryField('club_vstd', 1);
     my $id = $self->ID() || 0;
     my $defaultType = $self->{'RunParams'}{'dtype'} || '';
     if($id)   {
@@ -286,6 +315,7 @@ sub validate_core_details    {
 sub display_contact_details    { 
     my $self = shift;
 
+    $self->addCarryField('cd_vstd', 1);
     my $id = $self->ID() || 0;
     if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
         return ('Invalid User',0);
@@ -409,6 +439,7 @@ sub display_other_details    {
         my $objectValues = $self->loadObjectValues($personObj);
         $self->setupValues($objectValues);
     }
+
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'otherdetails'}, 'Person',);
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
     my %PageData = (
@@ -578,6 +609,7 @@ print STDERR "SPORT$sport$personType$personLevel\n";
 sub display_products { 
     my $self = shift;
 
+    $self->addCarryField('d_vstd', 1);
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
@@ -745,6 +777,7 @@ sub process_products {
 sub display_documents { 
     my $self = shift;
 	
+    $self->addCarryField('cond_vstd', 1);
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
@@ -886,6 +919,9 @@ sub process_documents {
 
 sub display_summary { 
     my $self = shift;
+
+    $self->addCarryField('p_vstd', 1);
+
     my $personObj;
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
@@ -1275,6 +1311,7 @@ sub Navigation {
     #May need to be overriden in child class to define correct order of steps
   my $self = shift;
 
+  print STDERR Dumper  $self->{'RunParams'};
     my $navstring = '';
     my $meter = '';
     my @navoptions = ();
@@ -1289,12 +1326,16 @@ sub Navigation {
     for my $i (0 .. $#{$self->{'ProcessOrder'}})    {
         my $current = 0;
         my $name = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'label'} || '');
+        my $action = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'action'} || ''); 
+        $name .= qq[<span class="circleBg"><i class="fa fa-check"></i></span>] if ($name and $self->{'RunParams'}{$action . '_vstd'});
+
         if($startingStep and $self->{'ProcessOrder'}[$i]{'action'} eq $startingStep)   {
             $includeStep = 1;
         }
         next if !$includeStep;
         next if($self->{'ProcessOrder'}[$i]{'NoNav'});
         if($name)   {
+            print STDERR Dumper $self->{'ProcessOrder'}[$i]{'action'};
             $current = 1 if $i == $self->{'CurrentIndex'};
             push @navoptions, [
                 $name,
