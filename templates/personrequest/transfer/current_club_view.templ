@@ -164,10 +164,28 @@
 				</div>
             </div>
                 <div class="task-actions">
-                    <div style="margin-top: 10px; width: 100%; float: left">
-                        <a style="float: right" class="btn-main" href = "main.cgi?client=[% RequestAction.client %]&a=C_HOME">
+                    <div style="width: 100%; float: left">
+                        <a style="float: left" class="btn-main" href = "main.cgi?client=[% RequestAction.client %]&a=C_HOME">
                             [% Lang.txt('Back to Dashboard') %]
                         </a>
+
+                        [% IF RequestAction.showAction == 1 %]
+                        <div style="float: right">
+                            <form style="" action="[% RequestAction.target %]" method="POST" class="pull-left">
+                                <input type="hidden" name="client" value="[% RequestAction.client %]">
+                                <input type="hidden" name="request_type" value="[% RequestAction.request_type %]">
+                                <input type="hidden" name="a" value="[% RequestAction.action %]">
+                                <input type="hidden" name="rid" value="[% RequestAction.rid %]">
+                                <input type="hidden" name="response" value="accept">
+                                <input class="btn-main" style="border: 0px solid" type="submit" name="action" value="[% Lang.txt('Approve transfer') %]">
+                            </form>
+
+                            <a style="" class="btn-main transfer-deny" data-target="#showDenyRequestNotes" data-actiontype="DENY" href = "">
+                                [% Lang.txt('Reject transfer') %]
+                            </a>
+                        </div>
+                        [% END %]
+
                     </div>
                 </div>
         </div>
@@ -178,6 +196,7 @@
 			<div class="transfer-pending">Transfer Status: Requested</div>
             <br/>
 
+            <!--
             [% IF RequestAction.showAction == 1 %]
                 <div>
                     <div style="width: 100%; float: left">
@@ -191,13 +210,14 @@
                         </form>
                     </div>
 
-                    <div style="margin-top: 10px; width: 100%; float: left">
+                    <div style="width: 100%; float: left">
                         <a style="width: 100%;" class="btn-main transfer-deny" data-target="#showDenyRequestNotes" data-actiontype="DENY" href = "">
                             [% Lang.txt('Reject transfer') %]
                         </a>
                     </div>
                 </div>
             [% END %]
+            -->
 
         </div>
 	</div>

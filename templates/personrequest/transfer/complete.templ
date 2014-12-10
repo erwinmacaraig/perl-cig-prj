@@ -10,17 +10,19 @@
 </div>
 
 <div class="col-md-9">
-	<h3 class="panel-header"><b>[% Lang.txt("Thank you") %]</b></h3>
+	<h3 class="panel-header">[% Lang.txt("Thank you") %]</h3>
 	<div class="panel-body">
 		<div class="reg-complete-wrapper">
-			<p class="reg-complete-text">[% Lang.txt('Registration has been submitted to') %]: <strong>[% registration.MA %]</strong> <br /><br />
-			The registration should take 12 working days to process.<br /><br />
-			Once processing has taken place, the outcome will be emailed to your club and the player.
+			<p class="reg-complete-text">
+                [% Lang.txt('Your transfer request has been submitted to MA for final approval.') %]
+            <br/>
+            <br/>
+                [% Lang.txt('You will be notified when this becomes effective.') %]
 			</p>
 			<div class="reg-complete-buttons">
 				<p>[% Lang.txt("What would you like to do now?") %]</p>
 				<ul>
-				<li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PF_&amp;dtype=[% registration.strPersonType %]" class="btn-inside-panels">[% Lang.txt("Register another") %] [% registration.personTypeText %]</a></li>
+				<li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PRA_T&amp class="btn-inside-panels">[% Lang.txt("Transfer another player") %]</a></li>
 				<li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PENDPR_" class="btn-inside-panels">[% Lang.txt("View all currently submitted registrations") %]</a></li>
 				<li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=WF_" class="btn-inside-panels">[% Lang.txt("Go to your dashboard") %]</a></li>
 				</ul>

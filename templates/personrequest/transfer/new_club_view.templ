@@ -19,7 +19,7 @@
 		    	<ul class="nav nav-tabs">
 					<li><a data-toggle="tab" href="#oldclubdetails">[% Lang.txt('Old Club Details') %]</a></li>
 					<li class="active"><a data-toggle="tab" href="#playerdetails">[% Lang.txt('Player Details') %]</a></li>
-					<li><a data-toggle="tab" href="#documentsdetails">[% Lang.txt('Documents') %]</a></li>
+					<!--<li><a data-toggle="tab" href="#documentsdetails">[% Lang.txt('Documents') %]</a></li>-->
 				</ul>
 				<div class="tab-content">
 					<div id="oldclubdetails" class="tab-pane fade">
@@ -198,10 +198,40 @@
 				</div>
             </div>
                 <div class="task-actions">
-                    <div style="margin-top: 10px; width: 100%; float: left">
-                        <a style="float: right" class="btn-main" href = "main.cgi?client=[% RequestAction.client %]&a=C_HOME">
+                    <div style="width: 100%; float: left">
+                        <a style="float: left" class="btn-main" href = "main.cgi?client=[% RequestAction.client %]&a=C_HOME">
                             [% Lang.txt('Back to Dashboard') %]
                         </a>
+
+                        [% IF RequestAction.initiateRequestProcess == 1 %]
+                                <div style="float: right">
+
+                                    <form style="" action="[% RequestAction.target %]" method="POST" class="pull-left">
+                                        <input type="hidden" name="client" value="[% RequestAction.client %]">
+                                        <input type="hidden" name="a" value="[% RequestAction.action %]">
+                                        <input type="hidden" name="sp" value="[% sport %]">
+                                        <input type="hidden" name="pt" value="[% personType %]">
+                                        <input type="hidden" name="per" value="[%  %]">
+                                        <input type="hidden" name="pl" value="[% personLevel %]">
+                                        <input type="hidden" name="ag" value="[% personAgeLevel %]">
+                                        <input type="hidden" name="nat" value="[% RequestAction.request_type %]">
+                                        <input type="hidden" name="ol" value="[% requestOriginLevel %]">
+                                        <input type="hidden" name="r" value="[%  %]">
+                                        <input type="hidden" name="sr" value="[%  %]">
+                                        <input type="hidden" name="eID" value="[% requestEntityID %]">
+                                        <input type="hidden" name="pID" value="[% personID %]">
+                                        <input type="hidden" name="reqID" value="[% requestID %]">
+                                        <input type="hidden" name="prid" value="[% requestID %]">
+                                        <input type="hidden" name="dnat" value="[% RequestAction.request_type %]">
+
+                                        <input style="border: 0px solid" class="btn-main" type="submit" name="submit" value="Continue Transfer">
+                                    </form>
+
+                                    <a style="" class="btn-main transfer-deny" data-target="#showDenyRequestNotes" data-actiontype="DENY" href = "">
+                                        [% Lang.txt('Cancel Transfer') %]
+                                    </a>
+                                </div>
+                        [% END %]
                     </div>
                 </div>
         </div>
@@ -212,6 +242,7 @@
 			<div class="transfer-pending">[% Lang.txt('Transfer Status: Released') %]</div>
             <br/>
 
+            <!--
              [% IF RequestAction.initiateRequestProcess == 1 %]
                 <div>
                     <div style="width: 100%; float: left">
@@ -246,6 +277,7 @@
                     </div>
                 </div>
             [% END %]
+            -->
 
         </div>
 	</div>

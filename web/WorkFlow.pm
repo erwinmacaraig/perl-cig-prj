@@ -495,7 +495,7 @@ sub listTasks {
 
     ## Calc Dupl Res and Pending Clr here
     my $clrCount = 0; #getClrTaskCount($Data, $entityID);
-    my $dupCount = Duplicates::getDupTaskCount($Data, $entityID);
+    my $dupCount = 0; #Duplicates::getDupTaskCount($Data, $entityID);
     if ($clrCount)   {
         my %row=(
             TaskType => 'TRANSFERS',
@@ -521,7 +521,11 @@ sub listTasks {
     if(scalar @{$personRequests}) {
 
         for my $request (@{$personRequests}) {
-            next if ($request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_COMPLETED or $request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_DENIED);
+            next if (
+                $request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_COMPLETED
+                or $request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_DENIED
+                or $request->{'personRegoStatus'} eq $Defs::PERSONREGO_STATUS_PENDING
+            );
             $rowCount++;
             my $name = formatPersonName($Data, $request->{'strLocalFirstname'}, $request->{'strLocalSurname'}, $request->{'intGender'});
             my $viewURL = "$Data->{'target'}?client=$client&amp;a=PRA_V&rid=$request->{'intPersonRequestID'}";
@@ -530,7 +534,7 @@ sub listTasks {
             $taskCounts{$requestStatus}++;
             $taskCounts{$request->{'strRequestType'}}++;
 
-            my $newTask = ($request->{'taskTimeStamp'} >= $lastLoginTimeStamp) ? 1 : 0; #additional check if tTimeStamp > currentTimeStamp
+            my $newTask = ($request->{'prRequestUpdateTimeStamp'} >= $lastLoginTimeStamp) ? 1 : 0; #additional check if tTimeStamp > currentTimeStamp
             $taskCounts{"newTasks"}++ if $newTask;
 
             my $taskStatusLabel = $request->{'strRequestResponse'} ? $Defs::personRequestStatus{$request->{'strRequestResponse'}} : $Defs::personRequestStatus{'PENDING'};
@@ -546,7 +550,8 @@ sub listTasks {
                 taskDate => $request->{'prRequestDateFormatted'},
                 requestFrom => $request->{'requestFrom'},
                 requestTo => $request->{'requestTo'},
-                taskTimeStamp => $request->{'prRequestTimeStamp'},
+                taskTimeStamp => $request->{'prRequestUpdateTimeStamp'},
+                currentClubView => $entityID == $request->{'intRequestToEntityID'} ? 1 : 0,
                 newTask => $newTask,
             );
 
