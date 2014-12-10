@@ -419,6 +419,7 @@ select {
 }
 
 a.btn-main, input.btn-main {
+	text-align: center;
 	font-family: 'noto_sansbold';
     font-weight: normal;
     font-size: 14px;
