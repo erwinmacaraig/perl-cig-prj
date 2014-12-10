@@ -26,7 +26,8 @@ sub personSummaryPanel {
     return '' if !$personObj->ID();
     my $isocountries  = getISOCountriesHash();
     my %templateData = (
-        'NationalNum' => $personObj->getValue('strNationalNum') || '',
+        #'NationalNum' => $personObj->getValue('strNationalNum') || '',
+        'NationalNum' => $personObj->getValue('strStatus') eq $Defs::PERSON_STATUS_REGISTERED ? $personObj->getValue('strNationalNum') || '' : '',
         'FamilyName' => $personObj->getValue('strLocalSurname') || '',
         'FirstName' => $personObj->getValue('strLocalFirstname') || '',
         'dob' => $personObj->getValue('dtDOB'),

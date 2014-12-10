@@ -5,7 +5,7 @@
             <h3 class = "panel-header">[% personFirstname %] [% personSurname %] - Transfer to [% requestFrom %]</h3>
 				<div class="panel-body">
 
-				<p class="transfer-text">[% requestTo %] has released [% personFirstname %] [% personSurname %]. Once approved you will have full access to the player details.</p>
+				<p class="transfer-text">[% requestTo %] has released [% personFirstname %] [% personSurname %]. Please continue the transfer process.</p>
 
 				<div class="alert">
 					<div>
@@ -199,7 +199,7 @@
             </div>
                 <div class="task-actions">
                     <div style="margin-top: 10px; width: 100%; float: left">
-                        <a style="float: left" class="btn btn-main" href = "main.cgi?client=[% RequestAction.client %]&a=C_HOME">
+                        <a style="float: right" class="btn-main" href = "main.cgi?client=[% RequestAction.client %]&a=C_HOME">
                             [% Lang.txt('Back to Dashboard') %]
                         </a>
                     </div>
@@ -234,14 +234,14 @@
                             <input type="hidden" name="prid" value="[% requestID %]">
                             <input type="hidden" name="dnat" value="[% RequestAction.request_type %]">
 
-                            <input style="width: 100%" class="btn btn-main" type="submit" name="submit" value="Initiate transfer">
+                            <input style="width: 100%" class="btn btn-main" type="submit" name="submit" value="Continue Transfer">
                         </form>
 
                     </div>
 
                     <div style="margin-top: 10px; width: 100%; float: left">
                         <a style="width: 100%;" class="btn btn-main transfer-deny" data-target="#showDenyRequestNotes" data-actiontype="DENY" href = "">
-                            [% Lang.txt('Reject transfer') %]
+                            [% Lang.txt('Cancel Transfer') %]
                         </a>
                     </div>
                 </div>

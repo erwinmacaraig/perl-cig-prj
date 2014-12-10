@@ -53,7 +53,7 @@ sub handlePersonRequest {
                 $transferTypeOption .= "<input type='radio' name='transfer_type' $defaultTypeChecked value='$transferType'>$Defs::personTransferType{$transferType}</input>";
                 $defaultTypeChecked = '';
             }
-            $title = "Request a Transfer";
+            $title = "Request/Initiate a Transfer";
 
             $TemplateData{'action'} = 'PRA_search';
             $TemplateData{'request_type'} = 'transfer';
@@ -992,7 +992,7 @@ sub viewRequest {
         switch($requestType) {
             case "$Defs::PERSON_REQUEST_TRANSFER" {
                 #$action = "PREGF_TU";
-                $action = "PF_";
+                $action = "PTF_";
             }
             case "$Defs::PERSON_REQUEST_ACCESS" {
                 my %tempClientValues = %{ $Data->{'clientValues'} };
@@ -1111,7 +1111,7 @@ sub setRequestResponse {
 
         if($response eq "ACCEPTED"){
             $templateFile = "personrequest/transfer/request_accepted.templ";
-            $notifDetails .= $Data->{'lang'}->txt(" You will be notified if ") . $request->{'requestFrom'} . $Data->{'lang'}->txt(" accepts or rejects the release.");
+            $notifDetails .= $Data->{'lang'}->txt(" You will be notified once the transfer is effective and approved by the MA"); #if ") . $request->{'requestFrom'} . $Data->{'lang'}->txt(" accepts or rejects the release.");
         }
         elsif($response eq "DENIED"){
             $templateFile = "personrequest/transfer/request_denied.templ";

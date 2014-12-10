@@ -179,34 +179,26 @@
                         </span>
                     [% END %]
 
+                    <div class="row-padding">
+                    <div style="clear: both;">&nbsp;</div>
                     <div class="row">
                         <h3 class="panel-header">License and Payment Details</h3>
                         <div class="panel-body">
                             [% PaymentBlock %]
                         </div>
                     </div> 
+
+                    <div style="clear: both;">&nbsp;</div>
                     <div class="row">
                         <h3 class="panel-header">Work History</h3>
                         <div class="panel-body">
                             [% NotesBlock %]
                         </div>
                     </div> 
+                    </div>
+
                 </div>
             </div>
-        </div>
-
-        <br />
-
-        <h3 class="panel-header">[% Lang.txt('License and Payment Details') %]</h3>
-        <div class="panel-body">
-            [% PaymentBlock %]
-        </div>
-
-        <br />
-
-        <h3 class="panel-header">[% Lang.txt('Work History') %]</h3>
-        <div class="panel-body">
-            [% NotesBlock %]
         </div>
 
         [% ActionsBlock %]

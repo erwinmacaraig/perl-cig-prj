@@ -419,6 +419,7 @@ select {
 }
 
 a.btn-main, input.btn-main {
+	text-align: center;
 	font-family: 'noto_sansbold';
     font-weight: normal;
     font-size: 14px;
@@ -1541,4 +1542,7 @@ table.facility-field-summary tr td {
 .facility-field-summary tr td {
 	border-right: 1px solid #ccc;
 	border-left: 1px solid #ccc;
+}
+.row-padding {
+	padding: 15px 15px 5px 15px;
 }

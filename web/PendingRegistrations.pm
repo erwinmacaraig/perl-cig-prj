@@ -92,7 +92,6 @@ sub listPendingRegistrations    {
             )
             LEFT JOIN tblEntityTypeRoles as er ON (
                 er.strEntityRoleKey = pr.strPersonEntityRole
-                and er.strSport = pr.strSport
                 and er.strPersonType = pr.strPersonType
             )
             INNER JOIN tblPerson as p ON (
@@ -145,13 +144,12 @@ sub listPendingRegistrations    {
             id => $dref->{'intPersonRegistrationID'} || 0,
             dtAdded=> $dref->{'dtAdded_formatted'} || '',
             PersonLevel=> $Defs::personLevel{$dref->{'strPersonLevel'}} || '',
-            PersonEntityRole=> $dref->{'strEntityRoleName'} || '',
             PersonType=> $Defs::personType{$dref->{'strPersonType'}} || '',
             AgeLevel=> $Defs::ageLevel{$dref->{'strAgeLevel'}} || '',
             RegistrationNature=> $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '',
             #Status=> $Defs::wfTaskStatus{$dref->{'strStatus'}} || '',
             Status=> $Defs::personRegoStatus{$dref->{'displayStatus'}} || '',
-            PersonEntityRole=> $dref->{'strPersonEntityRole'} || '',
+            PersonEntityRole=> $dref->{'strEntityRoleName'} || $dref->{'strPersonEntityRole'} || '',
             Sport=> $Defs::sportType{$dref->{'strSport'}} || '',
             LocalName=>$localname,
             LatinName=>$name,
