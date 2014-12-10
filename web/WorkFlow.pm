@@ -521,7 +521,11 @@ sub listTasks {
     if(scalar @{$personRequests}) {
 
         for my $request (@{$personRequests}) {
-            next if ($request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_COMPLETED or $request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_DENIED);
+            next if (
+                $request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_COMPLETED
+                or $request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_DENIED
+                or $request->{'personRegoStatus'} eq $Defs::PERSONREGO_STATUS_PENDING
+            );
             $rowCount++;
             my $name = formatPersonName($Data, $request->{'strLocalFirstname'}, $request->{'strLocalSurname'}, $request->{'intGender'});
             my $viewURL = "$Data->{'target'}?client=$client&amp;a=PRA_V&rid=$request->{'intPersonRequestID'}";
@@ -550,8 +554,6 @@ sub listTasks {
                 currentClubView => $entityID == $request->{'intRequestToEntityID'} ? 1 : 0,
                 newTask => $newTask,
             );
-
-            print STDERR Dumper \%personRequest;
 
             if(!($Defs::personRequest{$request->{'strRequestType'}} ~~ @taskType)){
                 push @taskType, $Defs::personRequest{$request->{'strRequestType'}};
