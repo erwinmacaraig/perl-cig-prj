@@ -1327,7 +1327,7 @@ sub Navigation {
         my $current = 0;
         my $name = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'label'} || '');
         my $action = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'action'} || ''); 
-        $name .= qq[<span class="circleBg"><i class="fa fa-check"></i></span>] if ($name and $self->{'RunParams'}{$action . '_vstd'});
+        $name .= qq[<span class="circle-check"><i class="fa fa-check"></i></span>] if ($name and $self->{'RunParams'}{$action . '_vstd'});
 
         if($startingStep and $self->{'ProcessOrder'}[$i]{'action'} eq $startingStep)   {
             $includeStep = 1;

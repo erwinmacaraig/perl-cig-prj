@@ -926,11 +926,37 @@ i.indicator {
 	padding:15px;
 }
 
+/*
+*.nav-tabs {
+*    width: 100%;
+*    display: table;
+*    table-layout: fixed;
+*}
+*
+*.nav-tabs > li {
+*    display: table-cell;
+*    float: none;
+*    width: 100%;
+*}
+*/
+
+.nav-tabs {
+    border-bottom: 0px;
+}
+
+.nav-tabs > li > a {
+    border-radius: 0 0 0 0;
+    margin-right: 0px;
+    display: block;
+    /*padding: 10px 10px;*/
+}
+
 .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover {
-	
 	background-color: #fff;
 	color:#000;
 	font-weight: bold;
+    padding-top: 15px;
+    margin-top: -5px;
 }
 
 .nav-tabs > li > a, .nav-tabs > li > a:hover {
@@ -1506,6 +1532,20 @@ span.circleBg {
 	left:8px;
 }
 
+span.circle-check {
+	background: #1baf37;
+	-moz-border-radius :70px;
+	-webkit-border-radius :70px;
+	border-radius :70px;
+	position:relative;
+	left:8px;
+}
+
+span.circle-check > i {
+    color: #ffffff;
+	margin-left:4px;
+	margin-right:4px;
+}
 
 i.documents-incomplete {
 	display:none;
