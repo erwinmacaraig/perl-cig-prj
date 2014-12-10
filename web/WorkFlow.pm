@@ -1889,6 +1889,7 @@ sub getTask {
             pr.strPersonEntityRole,
             pr.strSport,
             pr.strPersonLevel,
+            pr.intPersonRequestID,
             etr.strEntityRoleName,
             p.strLocalFirstname,
             p.strLocalSurname,
@@ -1962,6 +1963,7 @@ sub viewTask {
             pr.strPersonType,
             pr.strPersonEntityRole,
             pr.intPaymentRequired as regoPaymentRequired,
+            pr.intPersonRequestID,
             t.strRegistrationNature,
             dt.strDocumentName,
             p.strLocalFirstname,
@@ -2196,10 +2198,30 @@ sub viewTask {
 sub populateRegoViewData {
     my ($Data, $dref) = @_;
 
+    my $title;
+    my $templateFile;
     my %TemplateData;
+    my $personRequestData;
+	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+
+    if($dref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER){
+        $title = $Data->{'lang'}->txt('Transfer');
+        $templateFile = 'workflow/view/transfer.templ';
+
+        my %regFilter = (
+            'requestID' => $dref->{'intPersonRequestID'},
+        );
+        my $request = getRequests($Data, \%regFilter);
+        $personRequestData = $request->[0];
+    }
+    else {
+        $title = $Data->{'lang'}->txt('Person Registration Details');
+        $templateFile = 'workflow/view/personregistration.templ';
+    }
+
     my %fields = (
-        title => 'Person Registration Details',
-        templateFile => 'workflow/view/personregistration.templ',
+        title => $title,
+        templateFile => $templateFile,
     );
 
     my $role_ref = getEntityTypeRoles($Data, $dref->{'strSport'}, $dref->{'strPersonType'});
@@ -2240,9 +2262,16 @@ sub populateRegoViewData {
             RegisterTo => $dref->{'entityLocalName'} || '-',
             Status => $Defs::personRegoStatus{$dref->{'personRegistrationStatus'}} || '-',
         },
-        'EditDetailsLink' => $PersonEditLink,
-        'ReadOnlyLogin' => $readonly,
+        EditDetailsLink => $PersonEditLink,
+        ReadOnlyLogin => $readonly,
         PersonSummary => personSummaryPanel($Data, $dref->{intPersonID}) || '',
+        TransferDetails => {
+            TransferTo => $personRequestData->{'requestFrom'} || '-',
+            RegistrationStatus => '',
+            RegistrationDateFrom => '',
+            RegistrationDateTo => '',
+            Summary => $personRequestData->{'strRequestNotes'},
+        }
 	);
 
     $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.')
@@ -2804,8 +2833,26 @@ sub viewSummaryPage {
 
     switch($task->{'strWFRuleFor'}) {
         case 'REGO' {
-            $templateFile = 'workflow/summary/personregistration.templ';
-            $title = $Data->{'lang'}->txt('New' . ' ' . $Defs::personType{$task->{'strPersonType'}} . " " . "Registration - Approval");
+            if($task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER){
+                $templateFile = 'workflow/summary/transfer.templ';
+                $title = $Data->{'lang'}->txt("Transfer - Approved");
+                my %regFilter = (
+                    'requestID' => $task->{'intPersonRequestID'},
+                );
+                my $request = getRequests($Data, \%regFilter);
+                $request = $request->[0];
+
+                $TemplateData{'TransferDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
+                $TemplateData{'TransferDetails'}{'TransferTo'} = $request->{'requestFrom'};
+                $TemplateData{'TransferDetails'}{'TransferFrom'} = $request->{'requestTo'};
+                $TemplateData{'TransferDetails'}{'Summary'} = $request->{'strRequestNotes'};
+                
+            }
+            else {
+                $templateFile = 'workflow/summary/personregistration.templ';
+                $title = $Data->{'lang'}->txt('New' . ' ' . $Defs::personType{$task->{'strPersonType'}} . " " . "Registration - Approval");
+            }
+
             $TemplateData{'PersonRegistrationDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
             $TemplateData{'PersonRegistrationDetails'}{'personLevel'} = $Defs::personLevel{$task->{'strPersonLevel'}};
             $TemplateData{'PersonRegistrationDetails'}{'sport'} = $Defs::sportType{$task->{'strSport'}};
