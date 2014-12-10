@@ -150,11 +150,25 @@
                         <td><span class="fa fa-user"></span>Rego [% task.Name %]</td>
 		            [% END %]
                     <td>[% task.taskDate %]</td>
+
                     <td><span class="fa fa-clock-o"></span>[% task.TaskStatusLabel %]</td>
-                    [% IF CurrentLevel == 100 OR CurrentLevel == 20 %]
-                        <td><a href="[% task.viewURL %]" class="btn-inside-panels">View and Approve</a></td>
-                    [% ELSE %]
-                        <td><a href="[% task.viewURL %]" class="btn-inside-panels">View</a></td>
+
+                    [% IF task.TaskType == 'APPROVAL' %]
+
+                        [% IF CurrentLevel == 100 OR CurrentLevel == 20 %]
+                            <td><a href="[% task.viewURL %]" class="btn-inside-panels">View and Approve</a></td>
+                        [% ELSE %]
+                            <td><a href="[% task.viewURL %]" class="btn-inside-panels">View</a></td>
+                        [% END %]
+
+                    [% ELSIF task.TaskType == 'TRANSFER' %]
+
+                        [% IF task.currentClubView == 1 %]
+                            <td><a href="[% task.viewURL %]" class="btn-inside-panels">View and Approve</a></td>
+                        [% ELSE %]
+                            <td><a href="[% task.viewURL %]" class="btn-inside-panels">View and Process</a></td>
+                        [% END %]
+
                     [% END %]
                 </tr>
 		    [% END %]
