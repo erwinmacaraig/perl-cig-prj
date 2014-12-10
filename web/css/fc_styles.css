@@ -663,6 +663,15 @@ table tr.new-task {
 	font-size: 14px;
 }
 
+.read-only ul li span.details-left {
+	width:50%;
+	float:left;
+}
+
+.read-only ul li span.details-value {
+	font-weight: bold
+}
+
 .read-only-text {
 	border: 1px solid #aeaeae;
 	padding: 30px 15px 15px;
