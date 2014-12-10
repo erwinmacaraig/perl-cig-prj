@@ -1,0 +1,32 @@
+<div class="col-md-3 reg-complete-summary-left-bar">
+    [% PersonSummaryPanel %]
+    <!-- DO IF TEST HERE ON registration.strStatus -->
+    [% IF registration.strStatus == "PENDING" %]
+    	<div class="registration-pending">[% Lang.txt(registration.personRegoStatus) %]</div>
+    [% ELSIF registration.strStatus == "ACTIVE" %]
+    	<div class="registration-approved">[% Lang.txt(registration.personRegoStatus) %]</div>
+    [% END %]
+
+</div>
+
+<div class="col-md-9">
+	<h3 class="panel-header">[% Lang.txt("Thank you") %]</h3>
+	<div class="panel-body">
+		<div class="reg-complete-wrapper">
+			<p class="reg-complete-text">
+                [% Lang.txt('Your transfer request has been submitted to MA for final approval.') %]
+            <br/>
+            <br/>
+                [% Lang.txt('You will be notified when this becomes effective.') %]
+			</p>
+			<div class="reg-complete-buttons">
+				<p>[% Lang.txt("What would you like to do now?") %]</p>
+				<ul>
+				<li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PRA_T&amp class="btn-inside-panels">[% Lang.txt("Transfer another player") %]</a></li>
+				<li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PENDPR_" class="btn-inside-panels">[% Lang.txt("View all currently submitted registrations") %]</a></li>
+				<li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=WF_" class="btn-inside-panels">[% Lang.txt("Go to your dashboard") %]</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>

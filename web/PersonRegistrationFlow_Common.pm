@@ -310,7 +310,12 @@ print STDERR "000OK IS $ok | $run\n\n";
             PersonSummaryPanel => personSummaryPanel($Data, $personObj->ID()),
         );
         
-        $body = runTemplate($Data, \%PageData, 'registration/complete.templ') || '';
+        if($rego_ref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER) {
+            $body = runTemplate($Data, \%PageData, 'personrequest/transfer/complete.templ') || '';
+        }
+        else {
+            $body = runTemplate($Data, \%PageData, 'registration/complete.templ') || '';
+        }
         my $logID = param('tl') || 0;
         $logIDs->{$logID}=1;
         foreach my $id (keys %{$logIDs}) {
