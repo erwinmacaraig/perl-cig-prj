@@ -1582,3 +1582,7 @@ form#flowFormID #fsgw-other label {
 form#flowFormID #l_row_type,#l_row_sport label {
 	margin-top: 0px;
 }
+.paddingsummary {
+	float: left;
+    width: 95px;
+}
