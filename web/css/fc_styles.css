@@ -1555,3 +1555,6 @@ table.facility-field-summary tr td {
 .products-table {
 	margin:0 auto;
 }
+form#flowFormID label {
+	margin-top: 6px;
+}
