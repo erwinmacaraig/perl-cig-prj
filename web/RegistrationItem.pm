@@ -75,9 +75,7 @@ sub getRegistrationItems    {
 	        $Rego_ref->{'Nationality'} || '',
 	        
 		) or query_error($st);
-    
-    
-	
+   
     my @values = (); 
     push @values, $Data->{'Realm'};  
     push @values,$Data->{'RealmSubType'}; 

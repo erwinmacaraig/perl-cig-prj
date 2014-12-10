@@ -533,11 +533,6 @@ sub displayRegoFlowDocuments{
         0,
         $rego_ref,
      );
-
-
-
-
-
 	my @docos = (); 
 	#check for uploaded documents present for a particular registration and person
 	my $query = qq[
@@ -558,7 +553,7 @@ sub displayRegoFlowDocuments{
 	}
 	
 	my @diff = ();	
-	open FH, ">dumpfile.txt";	
+
 	#compare whats in the system and what docos are missing both required and optional
 	foreach my $doc_ref (@{$documents}){	
 		next if(!$rego_ref->{'InternationalTransfer'} && $doc_ref->{'DocumentFor'} eq 'TRANSFERITC');	

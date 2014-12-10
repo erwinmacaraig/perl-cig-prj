@@ -331,7 +331,8 @@ sub display_products {
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
-    my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    #my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+	my $entityRegisteringForLevel = $Defs::LEVEL_CLUB;
     my $client = $self->{'Data'}->{'client'};
     my $content = '';
 
@@ -453,9 +454,10 @@ sub display_documents {
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
-    my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    #my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+	my $entityRegisteringForLevel = $Defs::LEVEL_CLUB;
     my $client = $self->{'Data'}->{'client'};
-
+ 	my $ctrl = 0;
     my $rego_ref = {};
     my $club_documents = '';
     my $content = '';
@@ -474,9 +476,20 @@ sub display_documents {
             $Defs::DOC_FOR_CLUBS,
         );
 
-			 
-		my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $clubID,  $club_documents);
-	
+		#filter documents
+		my @required_docs_listing = ();
+		my @optional_docs_listing = ();
+		
+					 
+		my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $clubID,  $club_documents, $ctrl);
+		foreach my $rdc (@{$diff}){
+			if($rdc->{'Required'}){
+				push @required_docs_listing,$rdc;
+			}
+			else {
+				push @optional_docs_listing, $rdc;
+			}
+		}	
 		my $cl = setClient($self->{'Data'}->{'clientValues'}) || '';
         my %cv = getClient($cl);
         $cv{'clubID'} = $clubID;
@@ -485,16 +498,16 @@ sub display_documents {
 
         my %documentData = (
             target => $self->{'Data'}->{'target'},
-            documents => $diff,
-            Lang => $self->{'Data'}->{'lang'},
-            #nextaction => 'VENUE_DOCS_u',
+            documents => \@required_docs_listing,
+			optionaldocs => \@optional_docs_listing,
+            Lang => $self->{'Data'}->{'lang'},           
             client => $clm,
 			clubID => $clubID,
-            #venue => $facilityID,
+            
         );
  
         $content = runTemplate($self->{'Data'}, \%documentData, 'club/required_docs.templ') || '';  
-		print FH "content:\n $content \n";
+		
 	}
 	else    {
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
@@ -526,14 +539,15 @@ sub process_documents {
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
-    my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    #my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+	my $entityRegisteringForLevel = $Defs::LEVEL_CLUB;
     my $client = $self->{'Data'}->{'client'};
-
+	my $ctrl = 1;
     my $rego_ref = {};
    
     my $content = '';
     #1 I just need to know how many documents are required
-	my $documents = getRegistrationItems(
+	my $club_documents = getRegistrationItems(
             $self->{'Data'},
             'ENTITY',
             'DOCUMENT',
@@ -546,7 +560,19 @@ sub process_documents {
             $Defs::DOC_FOR_CLUBS,
         );
 
-	my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $clubID, $documents);
+	my @required_docs_listing = ();
+	my @optional_docs_listing = ();
+		
+	foreach my $rdc (@{$club_documents}){
+		if($rdc->{'Required'}){
+			push @required_docs_listing,$rdc;
+		}
+		else {
+			push @optional_docs_listing, $rdc;
+		}
+	}		
+
+	my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $clubID, \@required_docs_listing, $ctrl);
 	my $errStringPrepend = 'Required Document Missing <ul>';
 	foreach my $dc (@{$diff}){ 
         $errStringPrepend .= '<li>' . $dc->{'Name'} . '</li>';		
