@@ -495,7 +495,7 @@ sub listTasks {
 
     ## Calc Dupl Res and Pending Clr here
     my $clrCount = 0; #getClrTaskCount($Data, $entityID);
-    my $dupCount = Duplicates::getDupTaskCount($Data, $entityID);
+    my $dupCount = 0; #Duplicates::getDupTaskCount($Data, $entityID);
     if ($clrCount)   {
         my %row=(
             TaskType => 'TRANSFERS',
