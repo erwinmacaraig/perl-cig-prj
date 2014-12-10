@@ -15,18 +15,17 @@
 </div>
 [% END %]
 
+        <form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">
 <div class="[% IF processStatus == 1 %]col-md-12[% ELSE %]col-md-9[% END %]">
     [% Navigation %]
     <div class = "tab-content"><div class = "active tab-pane">
         [% TextTop %]
-        <form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">
             [% IF Content %][% Content %][% END %]
             [% IF FlowNextAction %]
             <input type = "hidden" name ="rfp" value ="[% FlowNextAction %]">
             [% END %]
             [% HiddenFields %]
 
-        </form>
     </div> </div>
         <div class = "button-row">
             <div class="txtright">
@@ -41,6 +40,7 @@
 
 
 </div>
+        </form>
 [% IF FlowSummary or FlowSummaryContent %]
 <div class="col-md-3">
     [% IF FlowSummaryContent %]
