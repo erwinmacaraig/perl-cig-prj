@@ -50,7 +50,7 @@ sub setProcessOrder {
             'action' => 'cd',
             'function' => 'display_core_details',
             'label'  => 'Personal Details',
-            'title'  => 'Transfer - Personal Information',
+            'title'  => 'Transfer - Check/Update Personal Details',
             'fieldset'  => 'core',
             #'noRevisit' => 1,
         },
@@ -64,7 +64,7 @@ sub setProcessOrder {
             'function' => 'display_contact_details',
             'label'  => 'Contact Details',
             'fieldset'  => 'contactdetails',
-            'title'  => 'Transfer - Contact Information',
+            'title'  => 'Transfer - Check/Update Contact Details',
         },
         {
             'action' => 'condu',
@@ -85,7 +85,7 @@ sub setProcessOrder {
             'action' => 'd',
             'function' => 'display_documents',
             'label'  => 'Documents',
-            'title'  => 'Transfer - Upload Documents',
+            'title'  => 'Transfer - Check/Update Documents',
         },
         {
             'action' => 'du',
@@ -95,7 +95,7 @@ sub setProcessOrder {
             'action' => 'p',
             'function' => 'display_products',
             'label'  => 'Payments',
-            'title'  => 'Confirm Transfer Fee',
+            'title'  => 'Transfer - Confirm Transfer Fee',
         },
         {
             'action' => 'pu',
@@ -105,7 +105,7 @@ sub setProcessOrder {
             'action' => 'summ',
             'function' => 'display_summary',
             'label'  => 'Summary',
-            'title'  => 'Summary',
+            'title'  => 'Transfer - Summary',
         },
        {
             'action' => 'c',
@@ -169,7 +169,6 @@ sub display_old_club {
         'personrequest/transfer/oldclubdetails.templ',
     );
 
-    print STDERR Dumper $fieldsContent;
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
