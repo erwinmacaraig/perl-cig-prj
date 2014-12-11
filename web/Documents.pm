@@ -224,9 +224,10 @@ sub list_docs {
         
    ); 
    $body .= qq[
-       
+       	<div class="panel-body">
 		<div class="sectionheader"> All Files </div> 
 		$allfilesgrid
+		</div>
 	];
     
 }

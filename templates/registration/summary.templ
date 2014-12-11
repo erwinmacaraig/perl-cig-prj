@@ -6,14 +6,14 @@
 				    <h4>Personal Information</h4>
 				    <div class="read-only-text clearfix">
 					    <ul>
-					    	<li><span class="details-left">[% Lang.txt("Family Name") %]:</span> <span class="detail-value">[% person.Familyname %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("First Name") %]:</span> <span class="detail-value">[% person.Name %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Language of name") %]:</span> <span class="detail-value"> [% person.Language %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Date of Birth") %]:</span> <span class="detail-value">[% person.DOB %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Gender") %]:</span> <span class="detail-value">[% person.Gender %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Nationality") %]:</span> <span class="detail-value">[% person.Nationality %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Country of Birth") %]:</span> <span class="detail-value">[% person.Country %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Region") %]:</span> <span class="detail-value">[% person.Region %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Family Name") %]:</span> <span class="detail-value">[% IF person.Familyname %] [% person.Familyname %] [% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("First Name") %]:</span> <span class="detail-value">[% IF person.Name %] [% person.Name %] [% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Language of name") %]:</span> <span class="detail-value">[% IF person.Language %] [% person.Language %] [% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Date of Birth") %]:</span> <span class="detail-value">[% IF person.DOB %] [% person.DOB %] [% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Gender") %]:</span> <span class="detail-value">[% IF person.Gender %] [% person.Gender %] [% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Nationality") %]:</span> <span class="detail-value">[% IF person.Nationality %] [% person.Nationality %] [% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Country of Birth") %]:</span> <span class="detail-value">[% IF person.Country %] [% person.Country %] [% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Region") %]:</span> <span class="detail-value">[% IF person.Region %] [% person.Region %] [% ELSE %] - [% END %]</span></li>
 					    </ul>
 					    <a href="[% editlink %]&amp;rfp=cd" class="pull-right">Edit</a>
 				    </div>
@@ -24,14 +24,14 @@
 				    <h4>Contact Details</h4>
 				    <div class="read-only-text clearfix">
 					    <ul>
-					    	<li><span class="details-left">[% Lang.txt("Address 1") %]:</span> <span class="detail-value">[% person.Addressone %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Address 2") %]:</span> <span class="detail-value">[% person.Addresstwo %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("City") %]:</span> <span class="detail-value">[% person.City %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("State") %]:</span> <span class="detail-value">[% person.State %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Postal Code") %]:</span> <span class="detail-value">[% person.Postal %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Country") %]:</span> <span class="detail-value">[% person.Countryaddress %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Phone Number") %]:</span> <span class="detail-value">[% person.Phone %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Email Address") %]:</span> <span class="detail-value">[% person.Email %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Address 1") %]:</span> <span class="detail-value">[% IF person.Addressone %] [% person.Addressone %] [% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Address 2") %]:</span> <span class="detail-value">[% IF person.Addresstwo %] [% person.Addresstwo %] [% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("City") %]:</span> <span class="detail-value">[% IF person.City %] [% person.City %] [% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("State") %]:</span> <span class="detail-value">[% IF person.State %] [% person.State %] [% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Postal Code") %]:</span> <span class="detail-value">[% IF person.Postal %] [% person.Postal %] [% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Country") %]:</span> <span class="detail-value">[% IF person.Countryaddress %] [% person.Countryaddress %] [% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Phone Number") %]:</span> <span class="detail-value">[% IF person.Phone %] [% person.Phone %] [% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Email Address") %]:</span> <span class="detail-value">[% IF person.Email %] [% person.Email %] [% ELSE %] - [% END %]</span></li>
 					    </ul>
 					    <a href="[% editlink %]&amp;rfp=cond" class="pull-right">Edit</a>
 				    </div>
