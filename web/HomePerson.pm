@@ -47,7 +47,7 @@ sub showPersonHome	{
 		if(!$Data->{'SystemConfig'}{'LockPerson'}){
 			$adddocumentURL = "$Data->{'target'}?client=$client&amp;a=DOC_L";
 			if(DuplicatesUtils::isCheckDupl($Data))	{
-				$markduplicateURL = "$Data->{'target'}?client=$client&amp;a=P_DUP_";
+				#$markduplicateURL = "$Data->{'target'}?client=$client&amp;a=P_DUP_";
 			}
 		}
 		#if($Data->{'SystemConfig'}{'AllowCardPrinting'})	{
