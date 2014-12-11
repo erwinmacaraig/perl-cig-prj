@@ -479,14 +479,13 @@ sub listDocuments {
 	my $reglisttype = qq[<select name="RegistrationID">];
     #query for existing registrations 
     foreach my $regs (@{$Reg_ref}) {
-		$reglisttype .= qq[<option value="$regs->{'intPersonRegistrationID'}"> $regs->{'strSport'} - $regs->{'strPersonType'} - $regs->{'strPersonLevel'}</option> 
-        ];		
-	}
+		$reglisttype .= qq[<option value="$regs->{'intPersonRegistrationID'}"> $regs->{'Sport'} - $regs->{'PersonType'} - $regs->{'PersonLevel'} - $regs->{'strNationalPeriodName'}</option> ];		
+    }
 	$reglisttype .= q[</select>];
 
    $doclisttype .= qq[     </select>
                            $reglisttype
-                           <input type="submit" class="button-small generic-button pull-right" value="Go" />
+                           <input type="submit" class="button-small generic-button pull-right" value="Add" />
                            </form>
                     ];
 #  my $modoptions=qq[<div class="changeoptions">$addlink</div>];
