@@ -1141,11 +1141,7 @@ a.btn-inside-docs-panel:hover {
 }
 
 .ver-dots.yellow {
-	color: yellow;
-}
-
-.ver-dots.yellow {
-	color: gray;
+	color: #ff6600;
 }
 
 /*temporary adjustment to dispay drill down nav*/
@@ -1524,7 +1520,7 @@ span.fa-user{
 }
 
 span.circleBg {
-	background: #d8d8d8;
+	background: #1baf37;
 	-moz-border-radius :70px;
 	-webkit-border-radius :70px;
 	border-radius :70px;
@@ -1552,7 +1548,7 @@ i.documents-incomplete, .documents-approved, i.tab-not-visited {
 }
 
 i.documents-complete, i.memdetails-visited, i.regdetails-visited {
-	color: #1baf37;
+	color: #ffffff;
 	margin-left:4px;
 	margin-right:4px;
 }
