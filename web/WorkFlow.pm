@@ -1891,12 +1891,15 @@ sub getTask {
             pr.strSport,
             pr.strPersonLevel,
             pr.intPersonRequestID,
+            DATE_FORMAT(pr.dtFrom,'%d %b %Y') AS dtFrom,
+            DATE_FORMAT(pr.dtTo,'%d %b %Y') AS dtTo,
             etr.strEntityRoleName,
             p.strLocalFirstname,
             p.strLocalSurname,
             p.strISONationality,
             p.intGender,
             p.strNationalNum,
+            p.strStatus as personStatus,
             DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             rnt.intTaskNoteID as rejectTaskNoteID,
@@ -1965,6 +1968,8 @@ sub viewTask {
             pr.strPersonEntityRole,
             pr.intPaymentRequired as regoPaymentRequired,
             pr.intPersonRequestID,
+            DATE_FORMAT(pr.dtFrom,'%d %b %Y') AS dtFrom,
+            DATE_FORMAT(pr.dtTo,'%d %b %Y') AS dtTo,
             t.strRegistrationNature,
             dt.strDocumentName,
             p.strLocalFirstname,
@@ -2264,6 +2269,8 @@ sub populateRegoViewData {
             AgeLevel => $Defs::ageLevel{$dref->{'strAgeLevel'}} || '-',
             RegisterTo => $dref->{'entityLocalName'} || '-',
             Status => $Defs::personRegoStatus{$dref->{'personRegistrationStatus'}} || '-',
+            DateFrom => $dref->{'dtFrom'} || '',
+            DateTo => $dref->{'dtTo'} || '',
         },
         EditDetailsLink => $PersonEditLink,
         ReadOnlyLogin => $readonly,
@@ -2846,10 +2853,13 @@ sub viewSummaryPage {
                 my $request = getRequests($Data, \%regFilter);
                 $request = $request->[0];
 
+                my ($PaymentsData) = populateRegoPaymentsViewData($Data, $task);
+        
                 $TemplateData{'TransferDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
                 $TemplateData{'TransferDetails'}{'TransferTo'} = $request->{'requestFrom'};
                 $TemplateData{'TransferDetails'}{'TransferFrom'} = $request->{'requestTo'};
                 $TemplateData{'TransferDetails'}{'Summary'} = $request->{'strRequestNotes'};
+                $TemplateData{'TransferDetails'}{'Fee'} = $PaymentsData->{'TXNs'}[0]{'Amount'};
                 
             }
             else {
@@ -2869,6 +2879,9 @@ sub viewSummaryPage {
             $TemplateData{'PersonRegistrationDetails'}{'gender'} = $Defs::PersonGenderInfo{$task->{'intGender'}};
             $TemplateData{'PersonRegistrationDetails'}{'personRoleName'} = $task->{'strEntityRoleName'};
             $TemplateData{'PersonRegistrationDetails'}{'MID'} = $task->{'strNationalNum'};
+            $TemplateData{'PersonRegistrationDetails'}{'Status'} = $Defs::personStatus{$task->{'personStatus'}};
+            $TemplateData{'PersonRegistrationDetails'}{'DateFrom'} = $task->{'dtFrom'};
+            $TemplateData{'PersonRegistrationDetails'}{'DateTo'} = $task->{'dtTo'};
             $TemplateData{'PersonSummaryPanel'} = personSummaryPanel($Data, $task->{'intPersonID'});
 
         }
