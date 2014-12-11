@@ -52,7 +52,8 @@
                         <span class="">[% Lang.txt('Pending') %]</span>
 
                     [% ELSIF document.Status == 'REJECTED' %]
-
+                        [% rejectFlag = "1" %]
+                        <input type="hidden" value = "[% rejectFlag %]" class="rejectedDocs">
                         <i class="fa fa-circle ver-dots red"></i>
                         <span class="">[% Lang.txt('Rejected') %]</span>
 

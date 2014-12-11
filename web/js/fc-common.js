@@ -15,12 +15,38 @@ function toggleChevron(e) {
 
  function checkIfDocsAllApproved() {
     var numberOfPendingDocs = $(".totalPendingDocs").val();
+    var rejectedDocsFlag = $(".rejectedDocs").val();
 
-    if (numberOfPendingDocs == 0) {
-        $("body").find("i.documents-complete").removeClass("documents-incomplete");
+    if(rejectedDocsFlag == 1){
+
+        $("span.circleBg").find("i.documents-rejected").removeClass("documents-approved");
+
     } else {
-        $("body").find("i.documents-complete").addClass("documents-incomplete");
+
+        $("span.circleBg").find("i.documents-rejected").addClass("documents-approved");
+
+        if (numberOfPendingDocs == 0) {
+            $("body").find("i.documents-complete").removeClass("documents-incomplete");
+        } else {
+            $("body").find("i.documents-complete").addClass("documents-incomplete");
+        }
+
     }
+
+    var storedTask = localStorage.getItem("data");
+    var taskID = $(".taskID").val();
+    
+    if (storedTask == taskID){
+        
+        $("body").find("i.memdetails-visited").removeClass("tab-not-visited");
+        $("body").find("i.regdetails-visited").removeClass("tab-not-visited");
+    
+    } else {
+        
+        //this means you are viewing a new work task
+        console.log("new task:" + taskID);
+    }
+    
  }
     
 
@@ -155,6 +181,5 @@ $(document).ready(function(){
     });
     
     checkIfDocsAllApproved();
-   
 
 });

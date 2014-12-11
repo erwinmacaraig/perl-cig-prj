@@ -43,7 +43,7 @@
 
     </div>
 
-
+<input type="hidden" value="[% TaskAction.WFTaskID %]" class="taskID">
 
 <!--trigger modal for each specific action-->
 
@@ -107,8 +107,8 @@
                             case 'HOLD':
                             case 'REJECT':
                             case 'RESOLVE':
-                                jQuery(this)
-                                    .removeClass("btn-disabled")
+                                jQuery(this
+)                                    .removeClass("btn-disabled")
                                     .addClass("btn-main")
                                     .unbind("click", disableAction)
                                     .click(function(f){
@@ -136,7 +136,22 @@
                     //        }
                     //    });
                 } else {
+
                 }
+                
+                if (jQuery(this).attr("data-visited") == "true") {
+
+                    var taskID = jQuery(".taskID").val();
+
+                    localStorage.removeItem("data");
+                    
+                    console.log("current task:" + taskID);
+                    
+                    jQuery(this).find("i").removeClass("tab-not-visited");
+                    
+                    localStorage.setItem("data", taskID);
+                }
+                
             });
         });
 
