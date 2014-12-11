@@ -22,6 +22,8 @@ sub handlePersonEdit {
     my $clientValues = $Data->{'clientValues'};
     my $cl = setClient($clientValues);
     my $e_action = param('e_a') || '';
+    my $back_screen = param('bscrn') || '';
+    #print STDERR Dumper $back_screen;
     my $personID = getID($clientValues, $Defs::LEVEL_PERSON);
     $personID = 0 if $personID < 0;
 
@@ -83,7 +85,16 @@ sub handlePersonEdit {
             $personObj->setValues($userData);
             $personObj->write();
             $body = 'updated';
-            $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=P_HOME";
+            if($back_screen){
+                my %tempClientValues = getClient($Data->{'client'});
+                $tempClientValues{currentLevel} = $tempClientValues{authLevel};
+                my $tempClient= setClient(\%tempClientValues);
+
+                $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$tempClient&$back_screen";
+            }
+            else {
+                $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=P_HOME";
+            }
           }
         }
         if($action eq 'PE_')    {
@@ -97,6 +108,7 @@ sub handlePersonEdit {
                 <input type = "hidden" name = "client" value = "].unescape($client).qq["> 
                 <input type = "hidden" name = "a" value = "PE_U"> 
                 <input type = "hidden" name = "e_a" value = "$e_action"> 
+                <input type = "hidden" name = "bscrn" value = "$back_screen"> 
                 <input type = "submit" value = "].$Data->{'lang'}->txt('Save').qq[" class = "btn-main"> 
                 </div>
             </form>
