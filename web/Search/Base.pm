@@ -115,11 +115,14 @@ sub displaySearchForm {
 
 sub displayResultGrid {
     my ($self) = shift;
-    my ($list) = @_;
+    my ($list, $filters) = @_;
 
     my %SearchFormData = (
         RegoList => $list,
+        Filters => $filters,
 	);
+
+    print STDERR Dumper $filters;
 
 	my $content = runTemplate(
         $self->getData(),

@@ -337,7 +337,7 @@ sub getPersonRegistration {
             tblPerson
             INNER JOIN tblPersonRegistration_$realmID AS PR ON (
                 tblPerson.intPersonID = PR.intPersonID
-                AND PR.strStatus IN ('ACTIVE', 'PASSIVE','PENDING')
+                AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
                 AND PR.intEntityID IN ($entity_list)
             )
             INNER JOIN tblEntity AS E ON (
@@ -380,6 +380,7 @@ sub getPersonRegistration {
                 ma_id => $dref->{'strNationalNum'} || $Defs::personStatus{$dref->{'PersonStatus'}} || '',
                 link => $link,
                 name => $name,
+                org => $dref->{'EntityName'},
                 dob => $dref->{'dtDOB'},
                 role => $Defs::personType{$dref->{'strPersonType'}},
             };
@@ -391,7 +392,16 @@ sub getPersonRegistration {
             return \@memarray;
         }
         else {
-            return $self->displayResultGrid(\@memarray) if $count;
+            my @roleFilters;
+            foreach my $role (keys %Defs::personType){
+                push @roleFilters, $Defs::personType{$role};
+            }
+
+            my %filters = (
+                role => \@roleFilters,
+            );
+
+            return $self->displayResultGrid(\@memarray, \%filters) if $count;
 
             return $count;
         }

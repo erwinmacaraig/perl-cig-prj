@@ -5,16 +5,20 @@
 			<tr class="box-header">
 				<th>MA ID</th>
 				<th>Name</th>
+				<th>Organisation</th>
 				<th>Date of Birth</th>
 				<th>Role</th>
 				<th>&nbsp;</th>
 			</tr>
 			<tr>
 				<td>
-                    <input class="search-mid" type="text" placeholder="Search MA ID"/>
+                    <input style="padding: 5px" class="search-mid" type="text" placeholder="Search MA ID"/>
 		        </td>
 				<td>
-                    <input class="search-name" type="text" placeholder="Search Name"/>
+                    <input style="padding: 5px" class="search-name" type="text" placeholder="Search Name"/>
+		        </td>
+				<td>
+                    <input style="padding: 5px" class="search-org" type="text" placeholder="Search Organisation"/>
 		        </td>
 				<td>
 					<select class="sort-dob">
@@ -26,15 +30,16 @@
 				<td>
                     <!-- should be dynamically populated based on search result -->
 					<select class="filter-role">
-			          <option value="">-- All --</option>
-			          <option value="Player">Player</option>
-			          <option value="Coach">Coach</option>
-			          <option value="Official">Official</option>
+                        <option value="">-- All --</option>
+                        [% FOREACH role IN Filters.role %]
+                        <option value="[% role %]">[% role %]</option>
+                        [% END %]
 			        </select>
 				</td>
 				<td></td>
 			</tr>
 			<tr style="display: none" class="box-header">
+				<th></th>
 				<th></th>
 				<th></th>
 				<th></th>
@@ -48,6 +53,7 @@
                 <tr class="task-list">
                     <td><span class="fa fa-user"></span>[% rego.ma_id %]</td>
                     <td>[% rego.name %]</td>
+                    <td>[% rego.org %]</td>
                     <td>[% rego.dob %]</td>
                     <td><span class="fa fa-clock-o"></span>[% rego.role %]</td>
                     <td><a href="[% rego.link %]" class="btn-inside-panels">View</a></td>
@@ -76,8 +82,15 @@
                 .draw();
         });
 
+        jQuery("input.search-org").on('keyup change', function(){
+            table
+                .column(2)
+                .search(this.value)
+                .draw();
+        });
+
         var dob = jQuery("select.sort-dob");
-        var dobcol = table.column(2);
+        var dobcol = table.column(3);
 
         jQuery(dob).on('change', function(){
             var index = jQuery(this).find(":selected").index();
@@ -91,7 +104,7 @@
 
 
         var role = jQuery("select.filter-role");
-        var rolecol = table.column(3);
+        var rolecol = table.column(4);
 
         jQuery(role).on('change', function(){
             var index = jQuery(this).find(":selected").index();
