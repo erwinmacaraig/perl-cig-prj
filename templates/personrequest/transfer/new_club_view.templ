@@ -5,12 +5,12 @@
             <h3 class = "panel-header">[% personFirstname %] [% personSurname %] - Transfer to [% requestFrom %]</h3>
 				<div class="panel-body">
 
-				<p class="transfer-text">[% requestTo %] has released [% personFirstname %] [% personSurname %]. Please continue the transfer process.</p>
+				<p class="transfer-text">[% requestTo %] [% Lang.txt('has released') %] [% personFirstname %] [% personSurname %]. [% Lang.txt('Please continue the transfer process.') %]</p>
 
 				<div class="alert">
 					<div>
 						<span class="fa fa-exclamation"></span>
-						<p>Please check and update all details before submitting to the Member Association for final approval.</p>
+						<p>[% Lang.txt('Please check and update all details before submitting to') %] [% MA %] [% Lang.txt('Member Association for final approval.') %]</p>
 					</div>
 				</div>
 
@@ -55,7 +55,7 @@
 					<div id="playerdetails" class="tab-pane fade in active">
 						<br/>
 						<div class="read-only">
-							<h4>Personal Information</h4>
+							<h4>[% Lang.txt('Personal Information') %]</h4>
 							<div class="read-only-text">
 								<div class="panel-body">
 								    <span class="details-row">
@@ -92,11 +92,11 @@
 
 						<br/>
 						<div class="read-only">
-							<h4>Contact Details</h4>
+							<h4>[% Lang.txt('Contact Details') %]</h4>
 							<div class="read-only-text">
 								<div class="panel-body">
 								    <span class="details-row">
-								        <span class="details-left">Address 1</span>
+								        <span class="details-left">[% Lang.txt('Address 1') %]</span>
 								        <span class="details-left detail-value">[% contactAddress1 %]</span>
 								    </span>
 								    <span class="details-row">
