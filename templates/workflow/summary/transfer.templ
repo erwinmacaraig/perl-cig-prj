@@ -21,19 +21,19 @@
 				    </div>
 					<div class="">
 					  	<span class="">[% Lang.txt('Registration Status') %]:</span>
-					  	<span class="detail-value">[%  %]</span>
+					  	<span class="detail-value">[% PersonRegistrationDetails.Status %]</span>
 				    </div>
 					<div class="">
 					  	<span class="">[% Lang.txt('Registration Date From') %]:</span>
-					  	<span class="detail-value">[%  %]</span>
+					  	<span class="detail-value">[% PersonRegistrationDetails.DateFrom %]</span>
 				    </div>
 					<div class="">
 					  	<span class="">[% Lang.txt('Registration Date to') %]:</span>
-					  	<span class="detail-value">[%  %]</span>
+					  	<span class="detail-value">[% PersonRegistrationDetails.DateTo %]</span>
 				    </div>
 					<div class="">
 					  	<span class="">[% Lang.txt('Transfer fee') %]:</span>
-					  	<span class="detail-value">[%  %]</span>
+					  	<span class="detail-value">[% TransferDetails.Fee %]</span>
 				    </div>
 					<div class="">
 					  	<span class="">[% Lang.txt('Summary Clubs transfer') %]:</span>
@@ -43,17 +43,19 @@
 				</div>
 			</div>
 
+            <!--
             [% FOREACH request IN personRequests %]
             <label>The [% request.requestType %] Request (ID: [% request.id %] --[% request.personType %]/[% request.sport %]--) has been sent to [% request.requestTo %].</label>
             <br/>
             [% END %]
+            -->
             <div class="top-bottom-spacer">
             
             <div class="pull-right">
             <p>[% Lang.txt('What would you like to do now?') %]</p>
             <p>
                 <a href="main.cgi?client=[% TaskAction.client %]&amp;a=WF_" title="" class="btn-main">[% Lang.txt('View next available task') %]</a>
-                <a href="main.cgi?client=[% TaskAction.client %]&amp;a=C_HOME" title="" class="">[% Lang.txt('Go to your dashboard') %]</a>
+                <a href="main.cgi?client=[% TaskAction.client %]&amp;a=C_HOME" title="" class="btn-main">[% Lang.txt('Go to your dashboard') %]</a>
             </p>
             </div>
             </div>

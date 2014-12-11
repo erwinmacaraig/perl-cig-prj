@@ -4,8 +4,6 @@
 
 [% IF Navigation %]
 <div class = "col-md-12"><h2 class="main-heading">[% PageTitle %]</h2></div>
-[% END %]
-[% Title %]
 
 <div class="col-md-12">
 	<div class="alert">
@@ -15,6 +13,10 @@
 		</div>
 	</div>
 </div>
+
+[% END %]
+
+<div class = "col-md-12"><h2 class="main-heading">[% Title %]</h2></div>
 
 [% IF Errors.size %]
 <div class="col-md-12">
