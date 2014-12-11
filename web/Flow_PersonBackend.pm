@@ -198,12 +198,15 @@ sub display_core_details    {
                 <div> <span class="fa fa-info"></span> <p>$txt</p> </div> </div>
         ];
     }
+    my $panel = '';
+    $panel = personSummaryPanel($self->{'Data'}, $id) if $id;
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $fieldsContent || '',
         ScriptContent => $scriptContent || '',
+        FlowSummaryContent => $panel || '',
         Title => '',
         TextTop => $newRegoWarning,
         TextBottom => '',
