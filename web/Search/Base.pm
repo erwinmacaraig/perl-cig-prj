@@ -295,11 +295,12 @@ sub getIntermediateNodes {
           zoneID => $zoneID || 0,  
           clubID => $clubID || 0,  
         };
-        $nodes{$nationalID || 0} = 1;
-        $nodes{$stateID || 0} = 1;
-        $nodes{$regionID || 0} = 1;
-        $nodes{$zoneID || 0} = 1;
-        $nodes{$clubID || 0} = 1;
+    ## Added if tests to the below
+        $nodes{$nationalID || 0} = 1 if $currentLevel>=$Defs::LEVEL_NATIONAL;
+        $nodes{$stateID || 0} = 1 if $currentLevel>=$Defs::LEVEL_STATE;
+        $nodes{$regionID || 0} = 1 if $currentLevel>=$Defs::LEVEL_REGION;
+        $nodes{$zoneID || 0} = 1 if $currentLevel>=$Defs::LEVEL_ZONE;
+        $nodes{$clubID || 0} = 1 if $currentLevel>=$Defs::LEVEL_CLUB;
     }
 
     delete $nodes{0};
