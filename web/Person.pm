@@ -468,7 +468,7 @@ sub listDocuments {
     my $doclisttype = qq[  <form action="$Data->{'target'}" id="personDocAdd">
                               <input type="hidden" name="client" value="$client" />
                               <input type="hidden" name="a" value="DOC_L" />
-                              <label>Add File For</label>
+                              <label>]. $lang->txt('Add File For') . qq[</label>
                               <select name="doclisttype" id="doclisttype">
                               <option value="0">Misc</option>
                        ];
@@ -484,8 +484,7 @@ sub listDocuments {
 	$reglisttype .= q[</select>];
 
    $doclisttype .= qq[     </select>
-                           $reglisttype
-                           <input type="submit" class="button-small generic-button pull-right" value="Add" />
+                           $reglisttype <input type="submit" class="button-small generic-button pull-right" value="Add" />
                            </form>
                     ];
 #  my $modoptions=qq[<div class="changeoptions">$addlink</div>];
