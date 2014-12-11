@@ -49,6 +49,7 @@ use JSON;
 use Countries;
 use HomePerson;
 use PersonSummaryPanel;
+use MinorProtection;
 
 sub cleanTasks  {
 
@@ -1977,6 +1978,7 @@ sub viewTask {
             p.strState,
             p.strPostalCode,
             p.strLocalSurname,
+            p.intMinorProtection,
             p.dtSuspendedUntil,
             p.strISONationality,
             p.intGender as PersonGender,
@@ -2233,9 +2235,9 @@ sub populateRegoViewData {
     $tempClientValues{personID} = $dref->{intPersonID};
 
     my $tempClient= setClient(\%tempClientValues);
-    my $PersonEditLink = "$Data->{'target'}?client=$tempClient&amp;a=PE_";
-
+    my $PersonEditLink = "$Data->{'target'}?client=$tempClient&amp;a=PE_&amp;dtype=$dref->{'strPersonType'}";
     my $readonly = !( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 );
+    my $minorProtectionOptions = getMinorProtectionOptions($Data, $dref->{'InternationalTransfer'});
 	%TemplateData = (
         PersonDetails => {
             Status => $Data->{'lang'}->txt($Defs::personStatus{$dref->{'PersonStatus'} || 0}) || '',
@@ -2249,6 +2251,7 @@ sub populateRegoViewData {
             LastUpdate => '',
             MID => $dref->{'strNationalNum'} || '',
             LatinSurname => $dref->{'strLatinSurname'} || '',
+            MinorProtection => $minorProtectionOptions->{$dref->{'intMinorProtection'}} || '',
         },
         PersonRegoDetails => {
             ID => $dref->{'intPersonRegistrationID'},
@@ -2350,6 +2353,7 @@ sub populatePersonViewData {
             LatinName => "$dref->{'strLatinFirstname'} $dref->{'strLatinMiddleName'} $dref->{'strLatinSurname'}" || '',
             Address => "$dref->{'strAddress1'} $dref->{'strAddress2'} $dref->{'strAddress2'} $dref->{'strSuburb'} $dref->{'strState'} $dref->{'strPostalCode'}" || '',
             Nationality => $dref->{'strISONationality'} || '', #TODO identify extract string
+            MinorProtection => $dref->{'intMinorProtection'} || '',
             DateSuspendedUntil => '',
             LastUpdate => '',
         },

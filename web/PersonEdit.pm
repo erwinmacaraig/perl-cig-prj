@@ -36,6 +36,8 @@ sub handlePersonEdit {
             $values->{$f} = $personObj->getValue($f);
         }
     }
+    my $dtype = param('dtype') || '';
+    $values->{'defaultType'} = $dtype;
 
     my $fieldset = personFieldsSetup($Data, $values);
 
