@@ -1001,6 +1001,7 @@ sub display_summary {
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
+        FlowSummaryContent => 'note: follow personSummaryPanel',
         Content => $summaryContent,
         Title => '',
         TextTop => $content,
@@ -1058,13 +1059,22 @@ sub display_complete {
         return ('',2);
     }
 
+    my %facilityApprovalData = ();
+    my $displayFacilityForApproval = runTemplate(
+        $self->{'Data'},
+        \%facilityApprovalData,
+        'entity/complete.templ',
+    );
+
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
+        processStatus => 1,
         Content => '',
         Title => '',
-        TextTop => $content,
+        #TextTop => $content,
+        TextTop => $displayFacilityForApproval,
         TextBottom => '',
         NoContinueButton => 1,
     );
