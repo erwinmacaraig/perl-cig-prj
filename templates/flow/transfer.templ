@@ -1,7 +1,21 @@
+
+<br/>
+<br/>
+
 [% IF Navigation %]
 <div class = "col-md-12"><h2 class="main-heading">[% PageTitle %]</h2></div>
 [% END %]
 [% Title %]
+
+<div class="col-md-12">
+	<div class="alert">
+		<div>
+			<span class="fa fa-exclamation"></span>
+            <p>[% Lang.txt('Please check and update all details before submitting to the Member Association for final approval.') %]</p>
+		</div>
+	</div>
+</div>
+
 [% IF Errors.size %]
 <div class="col-md-12">
 	<div class="alert">
