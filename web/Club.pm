@@ -498,6 +498,7 @@ sub club_details  {
         dtTo
         strGender
         strDiscipline
+        strOrganisationLevel
         strEntityType
         strStatus
         strAssocNature
@@ -634,6 +635,7 @@ sub loadClubDetails {
      strLocalShortName,
      strGender,
      strDiscipline,
+     strOrganisationLevel
      strLocalFacilityName,
      strLatinName,
      strLatinShortName,

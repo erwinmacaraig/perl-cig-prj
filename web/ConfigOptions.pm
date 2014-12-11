@@ -474,6 +474,7 @@ sub getFieldsList	{
         intLegalTypeID
         strLegalID
         strDiscipline
+        strOrganisationLevel
         strEntityType
         intClubClassification
         strMAID
