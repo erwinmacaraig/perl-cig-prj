@@ -1071,11 +1071,12 @@ sub display_complete {
         #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
         processStatus => 1,
         Content => '',
-        Title => '',
+        Title => $self->{'Data'}{'lang'}->txt('Transfer - Submitted'),
         TextTop => $content,
         TextBottom => '',
         NoContinueButton => 1,
     );
+
     my $pagedata = $self->display(\%PageData);
 
     return ($pagedata,0);
