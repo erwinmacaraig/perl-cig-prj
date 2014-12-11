@@ -238,6 +238,7 @@ sub getTransfer {
                 PRQactive.intPersonRequestID = PR.intPersonRequestID
                 )
             WHERE tblPerson.intPersonID IN ($person_list)
+                AND tblPerson.strStatus IN ('REGISTERED')
             ORDER BY 
                 strLocalSurname, 
                 strLocalFirstname
@@ -296,12 +297,9 @@ sub getPersonRegistration {
 
     #exclude persons that are already in the CLUB initiating the transfer
     $self->getSphinx()->SetFilter('intentityid', $filters->{'entity'}) if $filters->{'entity'};
-warn("AA");
     #my $results = $self->getSphinx()->Query($self->getKeyword(), 'FIFA_Persons_r'.$filters->{'realm'});
     my $indexName = $Defs::SphinxIndexes{'Person'}.'_r'.$filters->{'realm'};
     my $results = $self->getSphinx()->Query($self->getKeyword(), $indexName);
-use Data::Dumper;
-print STDERR Dumper($results);
     my @persons = ();
 
     if($results and $results->{'total'})  {
@@ -328,6 +326,7 @@ print STDERR Dumper($results);
                 tblPerson.strNationalNum,
                 tblPerson.strFIFAID,
                 tblPerson.dtDOB,
+                tblPerson.strStatus as PersonStatus,
                 PR.intPersonRegistrationID,
                 PR.strPersonType,
                 PR.strSport,
@@ -345,6 +344,7 @@ print STDERR Dumper($results);
                 PR.intEntityID = E.intEntityID
             )
             WHERE tblPerson.intPersonID IN ($person_list)
+                AND tblPerson.strStatus IN ('REGISTERED', 'PENDING')
             ORDER BY 
                 tblPerson.strLocalSurname,
                 tblPerson.strLocalFirstname,
@@ -377,7 +377,7 @@ print STDERR Dumper($results);
             my $name = "$dref->{'strLocalFirstname'} $dref->{'strLocalSurname'}" || '';
             push @memarray, {
                 id => $dref->{'intPersonID'} || next,
-                ma_id => $dref->{'strNationalNum'},
+                ma_id => $dref->{'strNationalNum'} || $Defs::personStatus{$dref->{'PersonStatus'}} || '',
                 link => $link,
                 name => $name,
                 dob => $dref->{'dtDOB'},
@@ -445,6 +445,7 @@ sub getPersonAccess {
                 tblPerson.strLocalSurname,
                 tblPerson.strNationalNum,
                 tblPerson.strFIFAID,
+                tblPerson.strStatus as PersonStatus,
                 tblPerson.dtDOB,
                 PR.strPersonType,
                 E.strLocalName AS EntityName,
@@ -494,6 +495,7 @@ sub getPersonAccess {
                 PRQactive.intPersonRequestID = PR.intPersonRequestID
                 )
             WHERE tblPerson.intPersonID IN ($person_list)
+                AND tblPerson.strStatus IN ('REGISTERED', 'PENDING')
             ORDER BY 
                 strLocalSurname, 
                 strLocalFirstname
@@ -512,7 +514,7 @@ sub getPersonAccess {
             my $name = "$dref->{'strLocalFirstname'} $dref->{'strLocalSurname'}" || '';
             push @memarray, {
                 id => $dref->{'intPersonID'} || next,
-                ma_id => $dref->{'strNationalNum'},
+                ma_id => $dref->{'strNationalNum'} || $Defs::personStatus{$dref->{'PersonStatus'}} || '',
                 link => "$target?client=$client&amp;a=PRA_getrecord&request_type=access&amp;search_keyword=$dref->{'strNationalNum'}",
                 name => $name,
                 dob => $dref->{'dtDOB'},
