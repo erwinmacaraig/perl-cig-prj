@@ -1547,14 +1547,20 @@ span.circle-check > i {
 	margin-right:4px;
 }
 
-i.documents-incomplete {
+i.documents-incomplete, .documents-approved, i.tab-not-visited {
 	display:none;
 }
 
-i.documents-complete {
+i.documents-complete, i.memdetails-visited, i.regdetails-visited {
 	color: #1baf37;
-	margin-left:3px;
+	margin-left:4px;
 	margin-right:4px;
+}
+
+i.documents-rejected {
+	color:red;
+	margin-left:6px;
+	margin-right:5px;
 }
 
 #flow-btn-back  {
