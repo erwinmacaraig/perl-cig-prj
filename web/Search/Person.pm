@@ -445,6 +445,7 @@ sub getPersonAccess {
                 tblPerson.strLocalSurname,
                 tblPerson.strNationalNum,
                 tblPerson.strFIFAID,
+                tblPerson.strStatus as PersonStatus,
                 tblPerson.dtDOB,
                 PR.strPersonType,
                 E.strLocalName AS EntityName,
@@ -513,7 +514,7 @@ sub getPersonAccess {
             my $name = "$dref->{'strLocalFirstname'} $dref->{'strLocalSurname'}" || '';
             push @memarray, {
                 id => $dref->{'intPersonID'} || next,
-                ma_id => $dref->{'strNationalNum'},
+                ma_id => $dref->{'strNationalNum'} || $Defs::personStatus{$dref->{'PersonStatus'}} || '',
                 link => "$target?client=$client&amp;a=PRA_getrecord&request_type=access&amp;search_keyword=$dref->{'strNationalNum'}",
                 name => $name,
                 dob => $dref->{'dtDOB'},
