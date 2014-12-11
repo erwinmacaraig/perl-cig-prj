@@ -45,6 +45,15 @@ $DevelMode = 1;
 
 $gatewayReturnDemo = 'http://emacaraig.spildevel/FIFASPOnline/web'; ##CONFIG
 
+$Sphinx_Host = '127.0.0.1';
+#$Sphinx_Host = '192.168.100.4';
+$Sphinx_Port = '9312';
+$Sphinx_PortSQL = '9306';
+%SphinxIndexes = (
+    'Person' => 'FIFA_Persons_RT',
+    'Entity' => 'FIFA_Entities_RT',
+);
+
 $REGO_FORM_SALT = "1234";
 $bank_export_dir="/u/web/swm/trunk/web/banksplits/";
 $bank_export_dir_web="banksplits/";

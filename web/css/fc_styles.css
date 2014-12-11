@@ -331,18 +331,38 @@ strong {
     padding: 5px;
     width: 71%;
 }
+div.showrecoptions form#personDocAdd {
+	position: relative;
+}
+#personDocAdd label {
+	margin-left: 15px;
+    margin-top: 15px;
+    padding-right: 10px;
+}
+.panel-body #grid_wrapper #grid td span .btn-inside-panels {
+	border-radius: 0px;
+}
+.panel-body #allfilesgridid_wrapper #allfilesgridid td span .btn-inside-panels {
+	border-radius: 0px;
+}
+.panel-body #allfilesgridid_wrapper #allfilesgridid_filter label input[type="search"] {
+	border-radius: 0px;
+}
+.panel-body #grid_wrapper #grid_filter label input[type="search"] {
+	border-radius: 0px;
+}
 #personDocAdd select[name="doclisttype"] {
     padding: 7px;
-    width: 40%;
+    width: 39%;
 }
 #personDocAdd select[name=RegistrationID] {
     padding: 7px;
-    width: 40%;	
+    width: 39%;	
 }
 #personDocAdd .button-small {
     height: 22px;
-    margin-top: 5px;
-    padding: 3px 3px 10px;
+    margin-top: 16px;
+    padding: 0;
     width: 5%;
 }
 #pageholder div.showrecoptions {
@@ -926,11 +946,37 @@ i.indicator {
 	padding:15px;
 }
 
+/*
+*.nav-tabs {
+*    width: 100%;
+*    display: table;
+*    table-layout: fixed;
+*}
+*
+*.nav-tabs > li {
+*    display: table-cell;
+*    float: none;
+*    width: 100%;
+*}
+*/
+
+.nav-tabs {
+    border-bottom: 0px;
+}
+
+.nav-tabs > li > a {
+    border-radius: 0 0 0 0;
+    margin-right: 0px;
+    display: block;
+    /*padding: 10px 10px;*/
+}
+
 .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover {
-	
 	background-color: #fff;
 	color:#000;
 	font-weight: bold;
+    padding-top: 15px;
+    margin-top: -5px;
 }
 
 .nav-tabs > li > a, .nav-tabs > li > a:hover {
@@ -1115,11 +1161,7 @@ a.btn-inside-docs-panel:hover {
 }
 
 .ver-dots.yellow {
-	color: yellow;
-}
-
-.ver-dots.yellow {
-	color: gray;
+	color: #ff6600;
 }
 
 /*temporary adjustment to dispay drill down nav*/
@@ -1498,6 +1540,15 @@ span.fa-user{
 }
 
 span.circleBg {
+	background: #1baf37;
+	-moz-border-radius :70px;
+	-webkit-border-radius :70px;
+	border-radius :70px;
+	position:relative;
+	left:8px;
+}
+
+span.circle-check {
 	background: #d8d8d8;
 	-moz-border-radius :70px;
 	-webkit-border-radius :70px;
@@ -1506,15 +1557,26 @@ span.circleBg {
 	left:8px;
 }
 
+span.circle-check > i {
+    color: #1baf37;
+	margin-left:3px;
+	margin-right:4px;
+}
 
-i.documents-incomplete {
+i.documents-incomplete, .documents-approved, i.tab-not-visited {
 	display:none;
 }
 
-i.documents-complete {
-	color: #1baf37;
-	margin-left:3px;
+i.documents-complete, i.memdetails-visited, i.regdetails-visited {
+	color: #ffffff;
+	margin-left:4px;
 	margin-right:4px;
+}
+
+i.documents-rejected {
+	color:red;
+	margin-left:6px;
+	margin-right:5px;
 }
 
 #flow-btn-back  {

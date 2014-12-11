@@ -54,7 +54,8 @@ sub getUnique {
     $self->getSphinx()->SetFilter('intrealmid', [$filters->{'realm'}]);
 
     $self->getSphinx()->SetFilter('intentityid', $filters->{'entity'}) if $filters->{'entity'};
-    my $results = $self->getSphinx()->Query($self->getKeyword(), 'FIFA_Persons_r'.$filters->{'realm'});
+    my $indexName = $Defs::SphinxIndexes{'Person'}.'_r'.$filters->{'realm'};
+    my $results = $self->getSphinx()->Query($self->getKeyword(), $indexName);
     my @persons = ();
 
     if($results and $results->{'total'})  {
@@ -159,7 +160,8 @@ sub getTransfer {
 
     #exclude persons that are already in the CLUB initiating the transfer
     $self->getSphinx()->SetFilter('intentityid', [$filters->{'club'}], 1) if $filters->{'club'};
-    my $results = $self->getSphinx()->Query($self->getKeyword(), 'FIFA_Persons_r'.$filters->{'realm'});
+    my $indexName = $Defs::SphinxIndexes{'Person'}.'_r'.$filters->{'realm'};
+    my $results = $self->getSphinx()->Query($self->getKeyword(), $indexName);
     my @persons = ();
 
     if($results and $results->{'total'})  {
@@ -236,6 +238,7 @@ sub getTransfer {
                 PRQactive.intPersonRequestID = PR.intPersonRequestID
                 )
             WHERE tblPerson.intPersonID IN ($person_list)
+                AND tblPerson.strStatus IN ('REGISTERED')
             ORDER BY 
                 strLocalSurname, 
                 strLocalFirstname
@@ -294,7 +297,9 @@ sub getPersonRegistration {
 
     #exclude persons that are already in the CLUB initiating the transfer
     $self->getSphinx()->SetFilter('intentityid', $filters->{'entity'}) if $filters->{'entity'};
-    my $results = $self->getSphinx()->Query($self->getKeyword(), 'FIFA_Persons_r'.$filters->{'realm'});
+    #my $results = $self->getSphinx()->Query($self->getKeyword(), 'FIFA_Persons_r'.$filters->{'realm'});
+    my $indexName = $Defs::SphinxIndexes{'Person'}.'_r'.$filters->{'realm'};
+    my $results = $self->getSphinx()->Query($self->getKeyword(), $indexName);
     my @persons = ();
 
     if($results and $results->{'total'})  {
@@ -321,6 +326,7 @@ sub getPersonRegistration {
                 tblPerson.strNationalNum,
                 tblPerson.strFIFAID,
                 tblPerson.dtDOB,
+                tblPerson.strStatus as PersonStatus,
                 PR.intPersonRegistrationID,
                 PR.strPersonType,
                 PR.strSport,
@@ -331,13 +337,14 @@ sub getPersonRegistration {
             tblPerson
             INNER JOIN tblPersonRegistration_$realmID AS PR ON (
                 tblPerson.intPersonID = PR.intPersonID
-                AND PR.strStatus IN ('ACTIVE', 'PASSIVE','PENDING')
+                AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
                 AND PR.intEntityID IN ($entity_list)
             )
             INNER JOIN tblEntity AS E ON (
                 PR.intEntityID = E.intEntityID
             )
             WHERE tblPerson.intPersonID IN ($person_list)
+                AND tblPerson.strStatus IN ('REGISTERED', 'PENDING')
             ORDER BY 
                 tblPerson.strLocalSurname,
                 tblPerson.strLocalFirstname,
@@ -370,9 +377,10 @@ sub getPersonRegistration {
             my $name = "$dref->{'strLocalFirstname'} $dref->{'strLocalSurname'}" || '';
             push @memarray, {
                 id => $dref->{'intPersonID'} || next,
-                ma_id => $dref->{'strNationalNum'},
+                ma_id => $dref->{'strNationalNum'} || $Defs::personStatus{$dref->{'PersonStatus'}} || '',
                 link => $link,
                 name => $name,
+                org => $dref->{'EntityName'},
                 dob => $dref->{'dtDOB'},
                 role => $Defs::personType{$dref->{'strPersonType'}},
             };
@@ -384,7 +392,16 @@ sub getPersonRegistration {
             return \@memarray;
         }
         else {
-            return $self->displayResultGrid(\@memarray) if $count;
+            my @roleFilters;
+            foreach my $role (keys %Defs::personType){
+                push @roleFilters, $Defs::personType{$role};
+            }
+
+            my %filters = (
+                role => \@roleFilters,
+            );
+
+            return $self->displayResultGrid(\@memarray, \%filters) if $count;
 
             return $count;
         }
@@ -410,7 +427,8 @@ sub getPersonAccess {
 
     #exclude persons that are already in the CLUB initiating the transfer
     $self->getSphinx()->SetFilter('intentityid', [$filters->{'club'}], 1) if $filters->{'club'};
-    my $results = $self->getSphinx()->Query($self->getKeyword(), 'FIFA_Persons_r'.$filters->{'realm'});
+    my $indexName = $Defs::SphinxIndexes{'Person'}.'_r'.$filters->{'realm'};
+    my $results = $self->getSphinx()->Query($self->getKeyword(), $indexName);
     my @persons = ();
 
     if($results and $results->{'total'})  {
@@ -437,6 +455,7 @@ sub getPersonAccess {
                 tblPerson.strLocalSurname,
                 tblPerson.strNationalNum,
                 tblPerson.strFIFAID,
+                tblPerson.strStatus as PersonStatus,
                 tblPerson.dtDOB,
                 PR.strPersonType,
                 E.strLocalName AS EntityName,
@@ -486,6 +505,7 @@ sub getPersonAccess {
                 PRQactive.intPersonRequestID = PR.intPersonRequestID
                 )
             WHERE tblPerson.intPersonID IN ($person_list)
+                AND tblPerson.strStatus IN ('REGISTERED', 'PENDING')
             ORDER BY 
                 strLocalSurname, 
                 strLocalFirstname
@@ -504,7 +524,7 @@ sub getPersonAccess {
             my $name = "$dref->{'strLocalFirstname'} $dref->{'strLocalSurname'}" || '';
             push @memarray, {
                 id => $dref->{'intPersonID'} || next,
-                ma_id => $dref->{'strNationalNum'},
+                ma_id => $dref->{'strNationalNum'} || $Defs::personStatus{$dref->{'PersonStatus'}} || '',
                 link => "$target?client=$client&amp;a=PRA_getrecord&request_type=access&amp;search_keyword=$dref->{'strNationalNum'}",
                 name => $name,
                 dob => $dref->{'dtDOB'},

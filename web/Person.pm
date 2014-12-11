@@ -468,7 +468,7 @@ sub listDocuments {
     my $doclisttype = qq[  <form action="$Data->{'target'}" id="personDocAdd">
                               <input type="hidden" name="client" value="$client" />
                               <input type="hidden" name="a" value="DOC_L" />
-                              <label>Add File For</label>
+                              <label>]. $lang->txt('Add File For') . qq[</label>
                               <select name="doclisttype" id="doclisttype">
                               <option value="0">Misc</option>
                        ];
@@ -479,14 +479,12 @@ sub listDocuments {
 	my $reglisttype = qq[<select name="RegistrationID">];
     #query for existing registrations 
     foreach my $regs (@{$Reg_ref}) {
-		$reglisttype .= qq[<option value="$regs->{'intPersonRegistrationID'}"> $regs->{'strSport'} - $regs->{'strPersonType'} - $regs->{'strPersonLevel'}</option> 
-        ];		
-	}
+		$reglisttype .= qq[<option value="$regs->{'intPersonRegistrationID'}"> $regs->{'Sport'} - $regs->{'PersonType'} - $regs->{'PersonLevel'} - $regs->{'strNationalPeriodName'}</option> ];		
+    }
 	$reglisttype .= q[</select>];
 
    $doclisttype .= qq[     </select>
-                           $reglisttype
-                           <input type="submit" class="button-small generic-button pull-right" value="Go" />
+                           $reglisttype <input type="submit" class="button-small generic-button pull-right" value="Add" />
                            </form>
                     ];
 #  my $modoptions=qq[<div class="changeoptions">$addlink</div>];
@@ -497,7 +495,7 @@ sub listDocuments {
        # $modoptions
         $resultHTML = qq[ $modoptions
                       <div class="showrecoptions"> $doclisttype </div>
-                       $grid
+                      <div class="panel-body">$grid</div>
            ];
 
 

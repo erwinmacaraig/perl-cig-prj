@@ -93,6 +93,7 @@ sub createTempEntityStructure  {
           level => $level,
           dataaccess => $dataaccess,
       };
+warn("AAA $id");
     }
 
     my $entity_list = join(',',keys %entities);

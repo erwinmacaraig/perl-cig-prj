@@ -60,44 +60,47 @@
 
             [% IF PersonDetails.DOB %]
                 <span class="details-row">
-                  <span class="details-left">Date of Birth:</span>
+                  <span class="details-left">[% Lang.txt('Date of Birth') %]:</span>
                   <span class="details-left">[% PersonDetails.DOB %]</span>
                 </span>
             [% END %]
 
             [% IF PersonDetails.Nationality %]
                 <span class="details-row">
-                  <span class="details-left">Nationality:</span>
+                  <span class="details-left">[% Lang.txt('Nationality') %]:</span>
                   <span class="details-left">[% PersonDetails.Nationality %]</span>
+                </span>
+            [% END %]
+            [% IF PersonDetails.MinorProtection %]
+                <span class="details-row">
+                  <span class="details-left">[% Lang.txt('Minor Protection') %]:</span>
+                  <span class="details-left">[% PersonDetails.MinorProtection %]</span>
                 </span>
             [% END %]
 
             [% IF PersonDetails.Address %]
                 <span class="details-row">
-                  <span class="details-left">Address:</span>
+                  <span class="details-left">[% Lang.txt('Address') %]:</span>
                   <span class="details-left">[% PersonDetails.Address %]</span>
                 </span>
             [% END %]
 
             [% IF PersonDetails.DateSuspendedUntil != '' %]
                 <span class="details-row">
-                  <span class="details-left">Suspended Until:</span>
+                  <span class="details-left">[% Lang.txt('Suspended Until') %]:</span>
                   <span class="details-left">[% PersonDetails.DateSuspendedUntil %]</span>
                 </span>
             [% END %]
 
             [% IF PersonDetails.LastUpdate %]
                 <span class="details-row">
-                  <span class="details-left">Last Update:</span>
+                  <span class="details-left">[% Lang.txt('Last Update') %]:</span>
                   <span class="details-left">[% PersonDetails.LastUpdate %]</span>
                 </span>
             [% END %]
-
-
-
             [% IF PersonDetails.Status %]
                 <span class="details-row">
-                  <span class="details-left">Status:</span>
+                  <span class="details-left">[% Lang.txt('Status') %]:</span>
                   <span class="details-left">[% PersonDetails.Status %]</span>
                 </span>
             [% END %]

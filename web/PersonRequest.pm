@@ -969,6 +969,7 @@ sub viewRequest {
         'contactISOCountry' => $isocountries->{$request->{'strISOCountry'}},
         'contactPhoneHome' => $request->{'strPhoneHome'},
         'contactEmail' => $request->{'strEmail'},
+        'MA' => $request->{'strRealmName'},
         PersonSummaryPanel => personSummaryPanel($Data, $request->{'intPersonID'}) || '',
     );
 
@@ -1290,7 +1291,9 @@ sub getRequests {
 
             erb.strLocalName as responseBy,
             pr.intPersonRegistrationID,
-            pr.strStatus as personRegoStatus
+            pr.strStatus as personRegoStatus,
+
+            realm.strRealmName
         FROM
             tblPersonRequest pq
         INNER JOIN
@@ -1301,6 +1304,8 @@ sub getRequests {
             tblEntity et ON (et.intEntityID = pq.intRequestToEntityID)
         LEFT JOIN
             tblEntity erb ON (erb.intEntityID = pq.intResponseBy)
+        INNER JOIN
+            tblRealms realm ON (realm.intRealmID = pq.intRealmID)
         $personRegoJoin
 
         WHERE

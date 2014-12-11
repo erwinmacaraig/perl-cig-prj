@@ -7,51 +7,48 @@
     <div class="col-md-9">
         <h3 class="panel-header">
             [% PersonRegistrationDetails.personFirstname %] [% PersonRegistrationDetails.personSurname %]
-
-            - [% PersonRegistrationDetails.personType %]
-
-            [% IF PersonRegistrationDetails.personRoleName %]
-                - [% PersonRegistrationDetails.personRoleName %]
-            [% END %]
-
-            - [% PersonRegistrationDetails.currentAge %]
-
-            [% IF PersonRegistrationDetails.personLevel %]
-                - [% PersonRegistrationDetails.personLevel %]
-            [% END %]
-
-            - [% PersonRegistrationDetails.sport %]
         </h3>
         <div class="panel-body">
             <br/>
-            <p>[% Lang.txt('The following registration has been approved.') %] [% PersonRegistrationDetails.registerTo %] [% Lang.txt('has been notified.') %]</p>
+            <p>[% Lang.txt('The following transfer has been approved.') %] [% TransferDetails.TransferTo %] [% Lang.txt('and') %]  [% TransferDetails.TransferFrom %] [% Lang.txt('have been notified') %].</p>
             <br/>
 			<div class="read-only">
-				<h4>[% Lang.txt('Registration Details') %]</h4>
+				<h4>[% Lang.txt('Transfer Details') %]</h4>
 				<div class="read-only-text">
 					<div class="">
-					  	<span class="paddingsummary">[% Lang.txt('Register to:') %]</span>
-					  	<span class="detail-value">[% PersonRegistrationDetails.registerTo %]</span>
+					  	<span class="">[% Lang.txt('Member ID') %]:</span>
+					  	<span class="detail-value">[% PersonRegistrationDetails.MID %]</span>
 				    </div>
 					<div class="">
-					  	<span class="paddingsummary">[% Lang.txt('Register as:') %]</span>
-					  	<span class="detail-value">[% PersonRegistrationDetails.personType %]</span>
+					  	<span class="">[% Lang.txt('Registration Status') %]:</span>
+					  	<span class="detail-value">[% PersonRegistrationDetails.Status %]</span>
 				    </div>
 					<div class="">
-					  	<span class="paddingsummary">[% Lang.txt('Sport:') %]</span>
-					  	<span class="detail-value">[% PersonRegistrationDetails.sport %]</span>
+					  	<span class="">[% Lang.txt('Registration Date From') %]:</span>
+					  	<span class="detail-value">[% PersonRegistrationDetails.DateFrom %]</span>
 				    </div>
 					<div class="">
-					  	<span class="paddingsummary">[% Lang.txt('Level:') %]</span>
-					  	<span class="detail-value">[% PersonRegistrationDetails.personLevel %]</span>
+					  	<span class="">[% Lang.txt('Registration Date to') %]:</span>
+					  	<span class="detail-value">[% PersonRegistrationDetails.DateTo %]</span>
 				    </div>
+					<div class="">
+					  	<span class="">[% Lang.txt('Transfer fee') %]:</span>
+					  	<span class="detail-value">[% TransferDetails.Fee %]</span>
+				    </div>
+					<div class="">
+					  	<span class="">[% Lang.txt('Summary Clubs transfer') %]:</span>
+					  	<span class="detail-value">[% TransferDetails.Summary %]</span>
+				    </div>
+
 				</div>
 			</div>
 
+            <!--
             [% FOREACH request IN personRequests %]
             <label>The [% request.requestType %] Request (ID: [% request.id %] --[% request.personType %]/[% request.sport %]--) has been sent to [% request.requestTo %].</label>
             <br/>
             [% END %]
+            -->
             <div class="top-bottom-spacer">
             
             <div class="pull-right">

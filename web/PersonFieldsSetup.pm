@@ -158,7 +158,7 @@ sub personFieldsSetup {
                     size        => '40',
                     maxsize     => '50',
                     sectionname => 'core',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },
                 strLocalSurname => {
                     label       => $Data->{'SystemConfig'}{'strLocalSurname_Text'} ? $Data->{'SystemConfig'}{'strLocalSurname_Text'} : $FieldLabels->{'strLocalSurname'},
@@ -168,7 +168,7 @@ sub personFieldsSetup {
                     maxsize     => '50',
                     compulsory => 1,
                     sectionname => 'core',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },
                 intGender => {
                     label       => $FieldLabels->{'intGender'},
@@ -179,7 +179,7 @@ sub personFieldsSetup {
                     compulsory => 1,
                     firstoption => [ '', " " ],
                     sectionname => 'core',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },                
                 intLocalLanguage => {
                     label       => $FieldLabels->{'intLocalLanguage'},
@@ -191,7 +191,7 @@ sub personFieldsSetup {
                     posttext => $nonlatinscript,
                     sectionname => 'core',
                     class       => 'chzn-select',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },
                 strLatinFirstname => {
                     label       => $Data->{'SystemConfig'}{'person_strLatinNames'} || $FieldLabels->{'strLatinFirstname'},
@@ -201,7 +201,7 @@ sub personFieldsSetup {
                     maxsize     => '50',
                     active      => $nonLatin,
                     sectionname => 'core',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },
                 latinBlockStart => {
                     label       => 'latinblockstart',
@@ -225,7 +225,7 @@ sub personFieldsSetup {
                     maxsize     => '50',
                     active      => $nonLatin,
                     sectionname => 'core',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },
                 strMaidenName => {
                     label       => $FieldLabels->{'strMaidenName'},
@@ -235,7 +235,7 @@ sub personFieldsSetup {
                     maxsize     => '50',
                     posttext    => $maidennamescript,
                     sectionname => 'core',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },
                 dtDOB => {
                     label       => $FieldLabels->{'dtDOB'},
@@ -247,7 +247,7 @@ sub personFieldsSetup {
                     validate    => 'DATE,LESSTHAN:'.$today,
                     compulsory => 1,
                     sectionname => 'core',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },
                 strISONationality => {
                     label       => $FieldLabels->{'strISONationality'},
@@ -258,7 +258,7 @@ sub personFieldsSetup {
                     compulsory => 1,
                     class       => 'chzn-select',
                     sectionname => 'core',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },
                 strISOCountryOfBirth => {
                     label       => $FieldLabels->{'strISOCountryOfBirth'},
@@ -269,7 +269,7 @@ sub personFieldsSetup {
                     class       => 'chzn-select',
                     compulsory => 1,
                     sectionname => 'core',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },
                 strRegionOfBirth => {
                     label       => $FieldLabels->{'strRegionOfBirth'},
@@ -278,7 +278,7 @@ sub personFieldsSetup {
                     size        => '30',
                     maxsize     => '45',
                     sectionname => 'core',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },
                 strPlaceOfBirth => {
                     label       => $FieldLabels->{'strPlaceOfBirth'},
@@ -288,7 +288,7 @@ sub personFieldsSetup {
                     maxsize     => '45',
                     compulsory => 1,
                     sectionname => 'core',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },
                 strPreferredLang => {
                     label       => $FieldLabels->{'strPreferredLang'},

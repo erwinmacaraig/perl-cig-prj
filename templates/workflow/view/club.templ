@@ -35,15 +35,15 @@
     <div class="col-md-12">
         <div class="panel-body">
             <ul class="nav nav-tabs">
-                <li class="active"><a data-toggle="tab" href="#memberdocs">Documents</a></li>
-                <li><a data-toggle="tab" href="#memberdetails">Personal Information</a></li>
-                <li><a data-toggle="tab" href="#tasknotesdocs">Task Details</a></li>
+                <li class="active"><a data-toggle="tab" href="#memberdocs">[% Lang.txt('Documents') %]</a></li>
+                <li><a data-toggle="tab" href="#memberdetails">[% Lang.txt('Personal Information') %]</a></li>
+                <li><a data-toggle="tab" href="#tasknotesdocs">[% Lang.txt('Task Details') %]</a></li>
             </ul>
 
 			<div class="tab-content">
                 
                <div id="memberdocs" class="tab-pane fade in active">
-                    <h3 class="panel-header">Documents</h3>
+                    <h3 class="panel-header">[% Lang.txt('Documents') %]</h3>
 					<div class="panel-body">
 						[% DocumentBlock %]
 					</div>
@@ -133,7 +133,7 @@
 					</div>
 				</div>
 		           	<div id="tasknotesdocs" class="tab-pane fade">
-						<h3 class="panel-header">Work History</h3>
+						<h3 class="panel-header">[% Lang.txt('Work History') %]</h3>
 						<div class="panel-body">
 							[% NotesBlock %]
 						</div>

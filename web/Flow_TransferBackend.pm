@@ -50,7 +50,7 @@ sub setProcessOrder {
             'action' => 'cd',
             'function' => 'display_core_details',
             'label'  => 'Personal Details',
-            'title'  => 'Transfer - Personal Information',
+            'title'  => 'Transfer - Check/Update Personal Details',
             'fieldset'  => 'core',
             #'noRevisit' => 1,
         },
@@ -64,7 +64,7 @@ sub setProcessOrder {
             'function' => 'display_contact_details',
             'label'  => 'Contact Details',
             'fieldset'  => 'contactdetails',
-            'title'  => 'Transfer - Contact Information',
+            'title'  => 'Transfer - Check/Update Contact Details',
         },
         {
             'action' => 'condu',
@@ -85,7 +85,7 @@ sub setProcessOrder {
             'action' => 'd',
             'function' => 'display_documents',
             'label'  => 'Documents',
-            'title'  => 'Transfer - Upload Documents',
+            'title'  => 'Transfer - Check/Update Documents',
         },
         {
             'action' => 'du',
@@ -95,7 +95,7 @@ sub setProcessOrder {
             'action' => 'p',
             'function' => 'display_products',
             'label'  => 'Payments',
-            'title'  => 'Confirm Transfer Fee',
+            'title'  => 'Transfer - Confirm Transfer Fee',
         },
         {
             'action' => 'pu',
@@ -105,7 +105,7 @@ sub setProcessOrder {
             'action' => 'summ',
             'function' => 'display_summary',
             'label'  => 'Summary',
-            'title'  => 'Summary',
+            'title'  => 'Transfer - Summary',
         },
        {
             'action' => 'c',
@@ -169,7 +169,6 @@ sub display_old_club {
         'personrequest/transfer/oldclubdetails.templ',
     );
 
-    print STDERR Dumper $fieldsContent;
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -265,11 +264,11 @@ sub validate_core_details    {
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Person',);
     ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
 
-    if(!scalar(@{$self->{'RunDetails'}{'Errors'}})) {
-        if(isPossibleDuplicate($self->{'Data'}, $userData))    {
-            push @{$self->{'RunDetails'}{'Errors'}}, 'This person is a possible duplicate';
-        }
-    }
+#    if(!scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+#        if(isPossibleDuplicate($self->{'Data'}, $userData))    {
+#            push @{$self->{'RunDetails'}{'Errors'}}, 'This person is a possible duplicate';
+#        }
+#    }
 
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
@@ -1072,11 +1071,12 @@ sub display_complete {
         #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
         processStatus => 1,
         Content => '',
-        Title => '',
+        Title => $self->{'Data'}{'lang'}->txt('Transfer - Submitted'),
         TextTop => $content,
         TextBottom => '',
         NoContinueButton => 1,
     );
+
     my $pagedata = $self->display(\%PageData);
 
     return ($pagedata,0);
@@ -1327,7 +1327,7 @@ sub Navigation {
         my $current = 0;
         my $name = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'label'} || '');
         my $action = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'action'} || ''); 
-        $name .= qq[<span class="circleBg"><i class="fa fa-check"></i></span>] if ($name and $self->{'RunParams'}{$action . '_vstd'});
+        $name .= qq[<span class="circle-check"><i class="fa fa-check"></i></span>] if ($name and $self->{'RunParams'}{$action . '_vstd'});
 
         if($startingStep and $self->{'ProcessOrder'}[$i]{'action'} eq $startingStep)   {
             $includeStep = 1;

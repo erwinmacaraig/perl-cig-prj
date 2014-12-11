@@ -41,7 +41,7 @@
 
   			<ul>
   				<li>[% Lang.txt('Welcome') %] <a href="#" title="">[% Data.UserName %]<span class="fa fa-caret-down"></span></a></li>
-  				<li><a href ="http://support.sportingpulse.com">[% Lang.txt('Help') %]</a></li>
+  				<li><a href ="#">[% Lang.txt('Help') %]</a></li>
   				<li><a href="user/logout.cgi" title="[% Lang.txt('Logout') %]">[% Lang.txt('Logout') %]</a></li>
   			</ul>
 			</div>
@@ -56,23 +56,23 @@
         <!--<a href="#" title=""><img src="images/img-logo.png" alt="" /></a><h1>Finland Association</h1>-->
         <ul>
           <li>
-            <strong>Member Association</strong><br/>
-            Phone: <strong>[% NavTree.last.ma_phone_number %]</strong><br/>
-            Email: <strong>[% NavTree.last.ma_email %]</strong><br/>
-            Website: <strong>[% NavTree.last.ma_website %]</strong>
+            <strong>[% Lang.txt('Member Association') %]</strong><br/>
+            [% Lang.txt('Phone') %]: <strong>[% NavTree.last.ma_phone_number %]</strong><br/>
+            [% Lang.txt('Email') %]: <strong>[% NavTree.last.ma_email %]</strong><br/>
+            [% Lang.txt('Website') %]: <strong>[% NavTree.last.ma_website %]</strong>
           </li>
           [% IF Data.ELevel == 3 %]
           <li>
-            <strong>Club Contact </strong><br/>
-            Phone: <strong>[% Data.Phone %]</strong><br/>
-            Email: <strong>[% Data.Email %]</strong><br/>
-            Website: <strong>[% Data.WebURL %]</strong>
+            <strong>[% Lang.txt('Club Contact') %] </strong><br/>
+            [% Lang.txt('Phone') %]: <strong>[% Data.Phone %]</strong><br/>
+            [% Lang.txt('Email') %]: <strong>[% Data.Email %]</strong><br/>
+            [% Lang.txt('Website') %]: <strong>[% Data.WebURL %]</strong>
           </li>
           [% END %]
           <li>
-            <strong>Help Desk</strong><br/>
-            Phone: <strong>[% NavTree.last.help_desk_phone_number %]</strong><br/>
-            Email: <strong>[% NavTree.last.help_desk_email %]</strong><br/>
+            <strong>[% Lang.txt('Help Desk') %]</strong><br/>
+            [% Lang.txt('Phone') %]: <strong>[% NavTree.last.help_desk_phone_number %]</strong><br/>
+            [% Lang.txt('Email') %]: <strong>[% NavTree.last.help_desk_email %]</strong><br/>
           </li>
         </ul>
       </div>

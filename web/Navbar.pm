@@ -198,11 +198,12 @@ sub getEntityMenuData {
         };
     #}
     #if(exists $children->{$Defs::LEVEL_VENUE})    {
+    if($SystemConfig->{'allowVenues'})  {
         $menuoptions{'venues'} = {
             name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}),
             url => $baseurl."a=VENUE_L&amp;l=$Defs::LEVEL_VENUE",
         };
-    #}
+    }
     #if(exists $children->{$Defs::LEVEL_PERSON})    {
         $menuoptions{'persons'} = {
             name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}),
@@ -395,7 +396,7 @@ sub getEntityMenuData {
         };
     }
 
-    if($SystemConfig->{'menu_newvenue_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+    if($SystemConfig->{'allowVenues'} && $SystemConfig->{'menu_newvenue_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'addvenue'} = {
              name => $lang->txt("Add $Data->{'LevelNames'}{$Defs::LEVEL_VENUE}"),
             url => $baseurl."a=VENUE_DTA",
@@ -526,11 +527,13 @@ sub getClubMenuData {
             name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}),
             url => $baseurl."a=P_L&amp;l=$Defs::LEVEL_PERSON",
         },
-        venues => {
+    );
+    if($SystemConfig->{'allowVenues'})  {
+        $menuoptions{'venues'} = {
             name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}),
             url => $baseurl."a=VENUE_L&amp;l=$Defs::LEVEL_VENUE",
-        },
-    );
+        };
+    }
     if($currentLevel != $Data->{'clientValues'}{'authLevel'})   {
         delete($menuoptions{'home'});
     }
@@ -784,7 +787,7 @@ sub getClubMenuData {
 
 
 
-    if($SystemConfig->{'menu_newvenue_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+    if($SystemConfig->{'allowVenues'} && $SystemConfig->{'menu_newvenue_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'addvenue'} = {
              name => $lang->txt("Add $Data->{'LevelNames'}{$Defs::LEVEL_VENUE}"),
             url => $baseurl."a=VENUE_DTA",

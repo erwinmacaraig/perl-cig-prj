@@ -49,6 +49,7 @@ use JSON;
 use Countries;
 use HomePerson;
 use PersonSummaryPanel;
+use MinorProtection;
 
 sub cleanTasks  {
 
@@ -1889,12 +1890,16 @@ sub getTask {
             pr.strPersonEntityRole,
             pr.strSport,
             pr.strPersonLevel,
+            pr.intPersonRequestID,
+            DATE_FORMAT(pr.dtFrom,'%d %b %Y') AS dtFrom,
+            DATE_FORMAT(pr.dtTo,'%d %b %Y') AS dtTo,
             etr.strEntityRoleName,
             p.strLocalFirstname,
             p.strLocalSurname,
             p.strISONationality,
             p.intGender,
             p.strNationalNum,
+            p.strStatus as personStatus,
             DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             rnt.intTaskNoteID as rejectTaskNoteID,
@@ -1962,6 +1967,9 @@ sub viewTask {
             pr.strPersonType,
             pr.strPersonEntityRole,
             pr.intPaymentRequired as regoPaymentRequired,
+            pr.intPersonRequestID,
+            DATE_FORMAT(pr.dtFrom,'%d %b %Y') AS dtFrom,
+            DATE_FORMAT(pr.dtTo,'%d %b %Y') AS dtTo,
             t.strRegistrationNature,
             dt.strDocumentName,
             p.strLocalFirstname,
@@ -1975,6 +1983,7 @@ sub viewTask {
             p.strState,
             p.strPostalCode,
             p.strLocalSurname,
+            p.intMinorProtection,
             p.dtSuspendedUntil,
             p.strISONationality,
             p.intGender as PersonGender,
@@ -2101,7 +2110,11 @@ sub viewTask {
 
     my $showReject = 0;
     #$showReject = 1 if ($dref->{'intOnHold'} == 0 and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} != $entityID);
-    $showReject = 1 if ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_ACTIVE and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} != $entityID);
+    $showReject = 1 if (
+        ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_ACTIVE and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} != $entityID)
+        or
+        ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_ACTIVE and $dref->{'intProblemResolutionEntityID'} eq $dref->{'intApprovalEntityID'})
+    );
 
     my $showApprove = 0;
     #$showApprove = 1 if ($dref->{'intOnHold'} == 0 and $dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID and !scalar($TemplateData{'Notifications'}{'LockApproval'}));
@@ -2196,10 +2209,30 @@ sub viewTask {
 sub populateRegoViewData {
     my ($Data, $dref) = @_;
 
+    my $title;
+    my $templateFile;
     my %TemplateData;
+    my $personRequestData;
+	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+
+    if($dref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER){
+        $title = $Data->{'lang'}->txt('Transfer');
+        $templateFile = 'workflow/view/transfer.templ';
+
+        my %regFilter = (
+            'requestID' => $dref->{'intPersonRequestID'},
+        );
+        my $request = getRequests($Data, \%regFilter);
+        $personRequestData = $request->[0];
+    }
+    else {
+        $title = $Data->{'lang'}->txt('Person Registration Details');
+        $templateFile = 'workflow/view/personregistration.templ';
+    }
+
     my %fields = (
-        title => 'Person Registration Details',
-        templateFile => 'workflow/view/personregistration.templ',
+        title => $title,
+        templateFile => $templateFile,
     );
 
     my $role_ref = getEntityTypeRoles($Data, $dref->{'strSport'}, $dref->{'strPersonType'});
@@ -2211,9 +2244,9 @@ sub populateRegoViewData {
     $tempClientValues{personID} = $dref->{intPersonID};
 
     my $tempClient= setClient(\%tempClientValues);
-    my $PersonEditLink = "$Data->{'target'}?client=$tempClient&amp;a=PE_";
-
+    my $PersonEditLink = "$Data->{'target'}?client=$tempClient&amp;a=PE_&amp;dtype=$dref->{'strPersonType'}";
     my $readonly = !( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 );
+    my $minorProtectionOptions = getMinorProtectionOptions($Data, $dref->{'InternationalTransfer'});
 	%TemplateData = (
         PersonDetails => {
             Status => $Data->{'lang'}->txt($Defs::personStatus{$dref->{'PersonStatus'} || 0}) || '',
@@ -2227,6 +2260,7 @@ sub populateRegoViewData {
             LastUpdate => '',
             MID => $dref->{'strNationalNum'} || '',
             LatinSurname => $dref->{'strLatinSurname'} || '',
+            MinorProtection => $minorProtectionOptions->{$dref->{'intMinorProtection'}} || '',
         },
         PersonRegoDetails => {
             ID => $dref->{'intPersonRegistrationID'},
@@ -2239,10 +2273,20 @@ sub populateRegoViewData {
             AgeLevel => $Defs::ageLevel{$dref->{'strAgeLevel'}} || '-',
             RegisterTo => $dref->{'entityLocalName'} || '-',
             Status => $Defs::personRegoStatus{$dref->{'personRegistrationStatus'}} || '-',
+            DateFrom => $dref->{'dtFrom'} || '',
+            DateTo => $dref->{'dtTo'} || '',
         },
-        'EditDetailsLink' => $PersonEditLink,
-        'ReadOnlyLogin' => $readonly,
+        EditDetailsLink => $PersonEditLink,
+        ReadOnlyLogin => $readonly,
         PersonSummary => personSummaryPanel($Data, $dref->{intPersonID}) || '',
+        TransferDetails => {
+            TransferTo => $personRequestData->{'requestFrom'} || '-',
+            RegistrationStatus => '',
+            RegistrationDateFrom => '',
+            RegistrationDateTo => '',
+            Summary => $personRequestData->{'strRequestNotes'},
+        },
+        WFTaskID => $dref->{'intWFTaskID'}
 	);
 
     $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.')
@@ -2321,6 +2365,7 @@ sub populatePersonViewData {
             LatinName => "$dref->{'strLatinFirstname'} $dref->{'strLatinMiddleName'} $dref->{'strLatinSurname'}" || '',
             Address => "$dref->{'strAddress1'} $dref->{'strAddress2'} $dref->{'strAddress2'} $dref->{'strSuburb'} $dref->{'strState'} $dref->{'strPostalCode'}" || '',
             Nationality => $dref->{'strISONationality'} || '', #TODO identify extract string
+            MinorProtection => $dref->{'intMinorProtection'} || '',
             DateSuspendedUntil => '',
             LastUpdate => '',
         },
@@ -2804,8 +2849,29 @@ sub viewSummaryPage {
 
     switch($task->{'strWFRuleFor'}) {
         case 'REGO' {
-            $templateFile = 'workflow/summary/personregistration.templ';
-            $title = $Data->{'lang'}->txt('New' . ' ' . $Defs::personType{$task->{'strPersonType'}} . " " . "Registration - Approval");
+            if($task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER){
+                $templateFile = 'workflow/summary/transfer.templ';
+                $title = $Data->{'lang'}->txt("Transfer - Approved");
+                my %regFilter = (
+                    'requestID' => $task->{'intPersonRequestID'},
+                );
+                my $request = getRequests($Data, \%regFilter);
+                $request = $request->[0];
+
+                my ($PaymentsData) = populateRegoPaymentsViewData($Data, $task);
+        
+                $TemplateData{'TransferDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
+                $TemplateData{'TransferDetails'}{'TransferTo'} = $request->{'requestFrom'};
+                $TemplateData{'TransferDetails'}{'TransferFrom'} = $request->{'requestTo'};
+                $TemplateData{'TransferDetails'}{'Summary'} = $request->{'strRequestNotes'};
+                $TemplateData{'TransferDetails'}{'Fee'} = $PaymentsData->{'TXNs'}[0]{'Amount'};
+                
+            }
+            else {
+                $templateFile = 'workflow/summary/personregistration.templ';
+                $title = $Data->{'lang'}->txt('New' . ' ' . $Defs::personType{$task->{'strPersonType'}} . " " . "Registration - Approval");
+            }
+
             $TemplateData{'PersonRegistrationDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
             $TemplateData{'PersonRegistrationDetails'}{'personLevel'} = $Defs::personLevel{$task->{'strPersonLevel'}};
             $TemplateData{'PersonRegistrationDetails'}{'sport'} = $Defs::sportType{$task->{'strSport'}};
@@ -2818,6 +2884,9 @@ sub viewSummaryPage {
             $TemplateData{'PersonRegistrationDetails'}{'gender'} = $Defs::PersonGenderInfo{$task->{'intGender'}};
             $TemplateData{'PersonRegistrationDetails'}{'personRoleName'} = $task->{'strEntityRoleName'};
             $TemplateData{'PersonRegistrationDetails'}{'MID'} = $task->{'strNationalNum'};
+            $TemplateData{'PersonRegistrationDetails'}{'Status'} = $Defs::personStatus{$task->{'personStatus'}};
+            $TemplateData{'PersonRegistrationDetails'}{'DateFrom'} = $task->{'dtFrom'};
+            $TemplateData{'PersonRegistrationDetails'}{'DateTo'} = $task->{'dtTo'};
             $TemplateData{'PersonSummaryPanel'} = personSummaryPanel($Data, $task->{'intPersonID'});
 
         }

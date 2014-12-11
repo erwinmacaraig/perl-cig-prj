@@ -1,7 +1,23 @@
+
+<br/>
+<br/>
+
 [% IF Navigation %]
 <div class = "col-md-12"><h2 class="main-heading">[% PageTitle %]</h2></div>
+
+<div class="col-md-12">
+	<div class="alert">
+		<div>
+			<span class="fa fa-exclamation"></span>
+            <p>[% Lang.txt('Please check and update all details before submitting to the Member Association for final approval.') %]</p>
+		</div>
+	</div>
+</div>
+
 [% END %]
-[% Title %]
+
+<div class = "col-md-12"><h2 class="main-heading">[% Title %]</h2></div>
+
 [% IF Errors.size %]
 <div class="col-md-12">
 	<div class="alert">
@@ -30,10 +46,10 @@
         <div class = "button-row">
             <div class="txtright">
         [% IF !NoBackButton and BackButtonURL %]
-            <a href = "[% BackButtonURL %]" id = "flow-btn-back" class = "btn-main [% IF processStatus == 1 %]nudge[% END %]">[% IF BackButtonText %][% Lang.txt(BackButtonText) %][% ELSE %][% Lang.txt('Back to') %] [% Lang.txt(BackButtonDestination) %][% END %]</a>
+            <a href = "[% BackButtonURL %]" id = "flow-btn-back" class = "btn-main [% IF processStatus == 1 %]nudge[% END %]">[% IF BackButtonText %][% Lang.txt(BackButtonText) %][% ELSE %][% Lang.txt('Back') %][% END %]</a>
         [% END %]
         [% IF !NoContinueButton %]
-        <input id = "flow-btn-continue" type = "submit" value = " [% Lang.txt(ContinueButtonText) %] "  class = "btn-main">
+        <input id = "flow-btn-continue" type = "submit" value = " [% Lang.txt(ContinueButtonText) %] "  class = "btn-main" style="border: 0px">
         [% END %]
         </div>
         </div>
@@ -49,6 +65,7 @@
         [% FStemplate = FlowSummaryTemplate or 'flow/flow_summary.templ' %]
         [% INCLUDE $FStemplate %]
     [% END %]
+        <div class="transfer-pending">[% Lang.txt('Transfer Status: Released') %]</div>
 </div>
 [% END %]
 <br/>

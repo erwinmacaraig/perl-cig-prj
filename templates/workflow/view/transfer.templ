@@ -32,15 +32,47 @@
 
 <div class="member-home-page">
     <div class="col-md-9">
-        <h3 class="panel-header">[% PersonDetails.LocalName %] - [% PersonRegoDetails.PersonType %]</h3>
+      
+        <h3 class="panel-header">[% PersonDetails.LocalName %] - [% Lang.txt('Transfer to') %] [% TransferDetails.TransferTo %]</h3>
         <div class="panel-body">
+             <div id="oldclubdetails" class="tab-pane">
+                <div class="read-only">
+                    <h4>[% Lang.txt('Transfer Details') %]</h4>
+                    <div class="read-only-text">
+                        <div class="panel-body" style="border: 0px">
+                            <span class="details-row">
+                                <span class="details-left">[% Lang.txt("Member ID") %]:</span>
+                                <span class="details-left detail-value">[% PersonDetails.MID %]</span>
+                            </span>
+                            <br/>
+                            <span class="details-row">
+                                <span class="details-left">[% Lang.txt("Registration Status") %]:</span>
+                                <span class="details-left detail-value">[% PersonDetails.Status %]</span>
+                            </span>
+                            <br/>
+                            <span class="details-row">
+                                <span class="details-left">[% Lang.txt("Registration Date from") %]:</span>
+                                <span class="details-left detail-value">[% PersonRegoDetails.DateFrom %]</span>
+                            </span>
+                            <br/>
+                            <span class="details-row">
+                                <span class="details-left">[% Lang.txt("Registration Date to") %]:</span>
+                                <span class="details-left detail-value">[% PersonRegoDetails.DateTo %]</span>
+                            </span>
+                            <br/>
+                            <span class="details-row">
+                                <span class="details-left">[% Lang.txt("Summary Clubs transfer") %]:</span>
+                                <span class="details-left detail-value">[% TransferDetails.Summary %]</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <ul class="nav nav-tabs">
-                <li class="active">
-                <a data-toggle="tab" data-visited="true" href="#memberdocs">[% Lang.txt('Documents') %]
-                <span class="circleBg"><i class="fa fa-check documents-complete documents-incomplete"></i><i class="fa fa-remove documents-rejected documents-approved"></i></span></a>
-                </li>
-                <li><a data-toggle="tab" data-visited="false" href="#memberdetails">[% Lang.txt('Member Detail Summary') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></span></a></a></li>
-                <li><a data-toggle="tab" data-visited="false" href="#regdetails">[% Lang.txt('Registration Details') %]<span class="circleBg"><i class="fa fa-check regdetails-visited tab-not-visited"></i></span></a></a></li>
+                <li class="active"><a data-toggle="tab" data-visited="true" href="#memberdocs">[% Lang.txt('Documents') %]<span class="circleBg"><i class="fa fa-check documents-complete documents-incomplete"></i></span></a></li>
+                <li><a data-toggle="tab" data-visited="false" href="#memberdetails">[% Lang.txt('Personal Information') %]</a></li>
+                <li><a data-toggle="tab" data-visited="false" href="#regdetails">[% Lang.txt('Transfer Details') %]</a></li>
             </ul>
             <div class="tab-content">
                 
@@ -90,12 +122,7 @@
                           <span class="details-left detail-value">[% PersonDetails.Address %]</span>
                         </span>
                     [% END %]
-                    [% IF PersonDetails.MinorProtection %]
-                        <span class="details-row">
-                          <span class="details-left">[% Lang.txt('Minor Protection') %]:</span>
-                          <span class="details-left detail-value">[% PersonDetails.MinorProtection %]</span>
-                        </span>
-                    [% END %]
+
                     [% IF PersonDetails.DateSuspendedUntil != '' %]
                         <span class="details-row">
                           <span class="details-left">[% Lang.txt('Suspended Until') %]:</span>
@@ -119,7 +146,7 @@
 
                     [% IF EditDetailsLink and !ReadOnlyLogin  %]
                         <span style="float: right" class="">
-                            <a href = "[% EditDetailsLink %]&e_a=core&bscrn=a%3DWF_View%26TID%3D[% WFTaskID %]" class="edit-link">
+                            <a href = "[% EditDetailsLink %]&e_a=core" class="edit-link">
                                 [% Lang.txt('Edit') %]
                             </a>
                         </span>
@@ -190,7 +217,7 @@
                     <div class="row-padding">
                     <div style="clear: both;">&nbsp;</div>
                     <div class="row">
-                        <h3 class="panel-header">License and Payment Details</h3>
+                        <h3 class="panel-header">[% Lang.txt('License and Payment Details') %]</h3>
                         <div class="panel-body">
                             [% PaymentBlock %]
                         </div>
@@ -214,6 +241,7 @@
     </div>
     <div class="col-md-3">
         [% PersonSummary %]
+        <div class="registration-approved">[% Lang.txt('Transfer Status: Accepted') %]</div>
     </div>
 </div>
 

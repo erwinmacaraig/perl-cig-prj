@@ -14,7 +14,7 @@
 	<div class="panel-body">
 		<div class="reg-complete-wrapper">
 			<p class="reg-complete-text">
-                [% Lang.txt('Your transfer request has been submitted to MA for final approval.') %]
+                [% Lang.txt('Your transfer request has been submitted to') %] [% registration.MA %] [% Lang.txt('Member Association for final approval.') %]
             <br/>
             <br/>
                 [% Lang.txt('You will be notified when this becomes effective.') %]
@@ -22,7 +22,7 @@
 			<div class="reg-complete-buttons">
 				<p>[% Lang.txt("What would you like to do now?") %]</p>
 				<ul>
-				<li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PRA_T&amp class="btn-inside-panels">[% Lang.txt("Transfer another player") %]</a></li>
+				<li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PRA_T" class="btn-inside-panels">[% Lang.txt("Transfer another player") %]</a></li>
 				<li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PENDPR_" class="btn-inside-panels">[% Lang.txt("View all currently submitted registrations") %]</a></li>
 				<li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=WF_" class="btn-inside-panels">[% Lang.txt("Go to your dashboard") %]</a></li>
 				</ul>

@@ -3,6 +3,7 @@ package EntityObj;
 use strict;
 use BaseObject;
 our @ISA =qw(BaseObject);
+use SphinxUpdate;
 
 sub setCachePrefix    {
     my $self = shift;
@@ -96,6 +97,13 @@ sub _get_sql_details{
     };
 
     return $field_details;
+}
+
+sub searchServerUpdate {
+    my $self = shift;
+    my ($actionType, $db, $cache) = @_;
+    updateSphinx($db, $cache, 'Entity', $actionType, $self);
+    return 1;
 }
 
 

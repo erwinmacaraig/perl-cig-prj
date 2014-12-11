@@ -198,12 +198,15 @@ sub display_core_details    {
                 <div> <span class="fa fa-info"></span> <p>$txt</p> </div> </div>
         ];
     }
+    my $panel = '';
+    $panel = personSummaryPanel($self->{'Data'}, $id) if $id;
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $fieldsContent || '',
         ScriptContent => $scriptContent || '',
+        FlowSummaryContent => $panel || '',
         Title => '',
         TextTop => $newRegoWarning,
         TextBottom => '',
@@ -230,8 +233,9 @@ sub validate_core_details    {
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Person',);
     ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
 
+    my $id = $self->ID() || 0;
     if(!scalar(@{$self->{'RunDetails'}{'Errors'}})) {
-        if(isPossibleDuplicate($self->{'Data'}, $userData))    {
+        if(!$id and isPossibleDuplicate($self->{'Data'}, $userData))    {
             push @{$self->{'RunDetails'}{'Errors'}}, 'This person is a possible duplicate';
         }
     }
@@ -242,7 +246,6 @@ sub validate_core_details    {
         return ('',2);
     }
 
-    my $id = $self->ID() || 0;
     my $newreg = $id ? 0 : 1;
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
     $personObj->load();

@@ -26,6 +26,7 @@ use RegoProducts;
 use RegistrationItem;
 use PersonUserAccess;
 use EntityFieldsSetup;
+use PersonSummaryPanel;
 use Data::Dumper;
 
 sub setProcessOrder {
@@ -206,7 +207,7 @@ sub validate_core_details {
         $query->execute($entityID, $clubObj->ID());
 
         $query->finish();
-        createTempEntityStructure($self->{'Data'}); 
+        createTempEntityStructure($self->{'Data'}, $clubData->{'intRealmID'}); 
     }
 
 
@@ -620,9 +621,10 @@ sub display_summary     {
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        Content => $summaryClubContent,
+        FlowSummaryContent => 'note: follow personSummaryPanel',
+        Content => '',
         Title => '',
-        TextTop => $content,
+        TextTop => $summaryClubContent,
         ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
         TextBottom => '',
     );
@@ -686,15 +688,25 @@ sub display_complete {
         return ('',2);
     }
 
+
+    my %clubApprovalData = ();
+    my $displayClubForApproval = runTemplate(
+        $self->{'Data'},
+        \%clubApprovalData,
+        'club/complete.templ',
+    );
+
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
+        processStatus => 1,
         Content => '',
         Title => '',
-        TextTop => $content,
+        #TextTop => $content,
+        TextTop => $displayClubForApproval,
         TextBottom => '',
-        NoContinueButton=>1,
+        NoContinueButton=> 1,
     );
     my $pagedata = $self->display(\%PageData);
 
