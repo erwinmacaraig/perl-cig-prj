@@ -32,10 +32,10 @@
 	<table id="worktasks" cellpadding="5" width="100%">
 		<thead>
 			<tr class="box-header">
-				<th>Tasklist [% IF TaskCounts.newTasks %]<span style="color: red">[% TaskCounts.newTasks %]</span>[% END %]</th>
-				<th>Started</th>
-				<th>Status</th>
-				<th>Actions</th>
+				<th>[% Lang.txt('Tasklist') %] [% IF TaskCounts.newTasks %]<span style="color: red">[% TaskCounts.newTasks %]</span>[% END %]</th>
+				<th>[% Lang.txt('Started') %]</th>
+				<th>[% Lang.txt('Status') %]</th>
+				<th>[% Lang.txt('Actions') %]</th>
 			</tr>
 			<tr class="order-override">
 				<td><!--Filter by:-->
@@ -76,16 +76,16 @@
 				</td>
 				<td class="list-action-filter">
                     <select name="d_intTaskType" id="l_intTaskType" class="fcToogleGroup" style="display: none">
-                        <option value="all_tasks">All tasks</option>
-                        <option value="new_task">New task</option>
+                        <option value="all_tasks">[% Lang.txt('All tasks') %]</option>
+                        <option value="new_task">[% Lang.txt('New task') %]</option>
                     </select>
 				</td>
 			</tr>
 			<tr style="display: none" class="box-header">
-				<th>Tasklist</th>
-				<th>Started</th>
-				<th>Status</th>
-				<th>Actions</th>
+				<th>[% Lang.txt('Tasklist') %]</th>
+				<th>[% Lang.txt('Started') %]</th>
+				<th>[% Lang.txt('Status') %]</th>
+				<th>[% Lang.txt('Actions') %]</th>
 			</tr>
 
 		</thead>
@@ -157,17 +157,17 @@
                     [% IF task.TaskType == 'APPROVAL' %]
 
                         [% IF CurrentLevel == 100 OR CurrentLevel == 20 %]
-                            <td><a href="[% task.viewURL %]" class="btn-inside-panels">View and Approve</a></td>
+                            <td><a href="[% task.viewURL %]" class="btn-inside-panels">[% Lang.txt('View and Approve') %]</a></td>
                         [% ELSE %]
-                            <td><a href="[% task.viewURL %]" class="btn-inside-panels">View</a></td>
+                            <td><a href="[% task.viewURL %]" class="btn-inside-panels">[% Lang.txt('View') %]</a></td>
                         [% END %]
 
                     [% ELSIF task.TaskType == 'TRANSFER' %]
 
                         [% IF task.currentClubView == 1 %]
-                            <td><a href="[% task.viewURL %]" class="btn-inside-panels">View and Approve</a></td>
+                            <td><a href="[% task.viewURL %]" class="btn-inside-panels">[% Lang.txt('View and Approve') %]</a></td>
                         [% ELSE %]
-                            <td><a href="[% task.viewURL %]" class="btn-inside-panels">View and Process</a></td>
+                            <td><a href="[% task.viewURL %]" class="btn-inside-panels">[% Lang.txt('View and Process') %]</a></td>
                         [% END %]
 
                     [% END %]
@@ -180,57 +180,57 @@
 
 <div class="col-md-3 dashboard-sidebar">
 	<div class="sidebar-box">
-		<h3 class="panel-header">Task at a Glance</h3>
+		<h3 class="panel-header">[% Lang.txt('Task at a Glance') %]</h3>
 		<ul>
-			<li>New Registrations: <b>[% IF TaskCounts.NEW %][% TaskCounts.NEW %][% ELSE %]0[% END %]</b></li>
-			<li>Renewals: <b>[% IF TaskCounts.RENEWAL %][% TaskCounts.RENEWAL %][% ELSE %]0[% END %]</b></li>
-			<li>Transfers: <b>[% IF TaskCounts.TRANSFER %][% TaskCounts.TRANSFER %][% ELSE %]0[% END %]</b></li>
-			<li>Request Access: <b>[% IF TaskCounts.ACCESS %][% TaskCounts.ACCESS %][% ELSE %]0[% END %]</b></li>
+			<li>[% Lang.txt('New Registrations')%]: <b>[% IF TaskCounts.NEW %][% TaskCounts.NEW %][% ELSE %]0[% END %]</b></li>
+			<li>[% Lang.txt('Renewals') %]: <b>[% IF TaskCounts.RENEWAL %][% TaskCounts.RENEWAL %][% ELSE %]0[% END %]</b></li>
+			<li>[% Lang.txt('Transfers') %]: <b>[% IF TaskCounts.TRANSFER %][% TaskCounts.TRANSFER %][% ELSE %]0[% END %]</b></li>
+			<li>[% Lang.txt('Request Access') %]: <b>[% IF TaskCounts.ACCESS %][% TaskCounts.ACCESS %][% ELSE %]0[% END %]</b></li>
 		</ul>
 		<ul>
-			<li>Total Task Active: <b>[% IF TaskCounts.ACTIVE %][% TaskCounts.ACTIVE %][% ELSE %]0[% END %]</b></li>
-			<li>Total Task On Hold: <b>[% IF TaskCounts.HOLD %][% TaskCounts.HOLD %][% ELSE %]0[% END %]</b></li>
-			<li>Total Task Pending: <b>[% IF TaskCounts.PENDING %][% TaskCounts.PENDING %][% ELSE %]0[% END %]</b></li>
-			<li>Total Task Rejected: <b>[% IF TaskCounts.REJECTED %][% TaskCounts.REJECTED %][% ELSE %]0[% END %]</b></li>
+			<li>[% Lang.txt('Total Task Active') %]: <b>[% IF TaskCounts.ACTIVE %][% TaskCounts.ACTIVE %][% ELSE %]0[% END %]</b></li>
+			<li>[% Lang.txt('Total Task On Hold') %]: <b>[% IF TaskCounts.HOLD %][% TaskCounts.HOLD %][% ELSE %]0[% END %]</b></li>
+			<li>[% Lang.txt('Total Task Pending') %]: <b>[% IF TaskCounts.PENDING %][% TaskCounts.PENDING %][% ELSE %]0[% END %]</b></li>
+			<li>[% Lang.txt('Total Task Rejected') %]: <b>[% IF TaskCounts.REJECTED %][% TaskCounts.REJECTED %][% ELSE %]0[% END %]</b></li>
 		</ul>
 	</div>
     <div class="sidebar-box clearfix">
-        <h3 class="panel-header">Quick Search</h3>
+        <h3 class="panel-header">[% Lang.txt('Quick Search') %]</h3>
         <div class="col-md-12">
             <div class="input-group">
                 <input class="form-control" type="text">
                 <span class="input-group-addon"><i class="fa fa-search"></i></span>
             </div>
-            <a class="show-advanced-search">Advanced Search</a>
+            <a class="show-advanced-search">[% Lang.txt('Advanced Search') %]</a>
             <div class="advanced-search-fields clearfix">
-                <span><input type="checkbox" value="checkbox">Player</span>
-                <span><input type="checkbox" value="checkbox">Official</span>
-                <span><input type="checkbox" value="checkbox">Coach</span>
-                <span><input type="checkbox" value="checkbox">Pending</span>
-                <span><input type="checkbox" value="checkbox">Referee</span>
+                <span><input type="checkbox" value="checkbox">[% Lang.txt('Player') %]</span>
+                <span><input type="checkbox" value="checkbox">[% Lang.txt('Official') %]</span>
+                <span><input type="checkbox" value="checkbox">[% Lang.txt('Coach') %]</span>
+                <span><input type="checkbox" value="checkbox">[% Lang.txt('Pending') %]</span>
+                <span><input type="checkbox" value="checkbox">[% Lang.txt('Referee') %]</span>
             </div>
         </div>
     </div>
     [% IF CurrentLevel == 3 %]
         <div class="sidebar-box">
-            <h3 class="panel-header">Quick Links</h3>
+            <h3 class="panel-header">[% Lang.txt('Quick Links') %]</h3>
             <ul class="quick-links">
-                <li><a href="main.cgi?client=[% client %]&a=PF_&dtype=PLAYER"><span class="fa fa-plus"></span>Start a New Player Registration</a></li>
-                <!--<li><a href="main.cgi?client=[% client %]&a=PRA_T"><span class="fa fa-random"></span>Request or Start a Transfer</a></li>-->
-                <li><a href="main.cgi?client=[% client %]&a=PENDPR_"><span class="fa fa-newspaper-o"></span>List Pending Registrations</a></li>
-                <!--<li><a href="main.cgi?client=[% client %]&a=REP_SETUP"><span class="fa fa-paste"></span>Reports</a></li>-->
+                <li><a href="main.cgi?client=[% client %]&a=PF_&dtype=PLAYER"><span class="fa fa-plus"></span>[% Lang.txt('Start a New Player Registration') %]</a></li>
+                <!--<li><a href="main.cgi?client=[% client %]&a=PRA_T"><span class="fa fa-random"></span>[% Lang.txt('Request or Start a Transfer') %]</a></li>-->
+                <li><a href="main.cgi?client=[% client %]&a=PENDPR_"><span class="fa fa-newspaper-o"></span>[% Lang.txt('List Pending Registrations') %]</a></li>
+                <!--<li><a href="main.cgi?client=[% client %]&a=REP_SETUP"><span class="fa fa-paste"></span>[% Lang.txt('Reports') %]</a></li>-->
             </ul>
         </div>
     [% ELSE %]
         <div class="sidebar-box">
-            <h3 class="panel-header">Quick Links</h3>
+            <h3 class="panel-header">[% Lang.txt('Quick Links') %]</h3>
             <ul class="quick-links">
-                <li><a href="main.cgi?client=[% client %]&a=PF_"><span class="fa fa-plus"></span>Start a New Registration</a></li>
+                <li><a href="main.cgi?client=[% client %]&a=PF_"><span class="fa fa-plus"></span>[% Lang.txt('Start a New Registration') %]</a></li>
                 [% IF MA_allowTransfer %]
-                    <!--<li><a href="main.cgi?client=[% client %]&a=PRA_T"><span class="fa fa-random"></span>Request or Start a Transfer</a></li>-->
+                    <!--<li><a href="main.cgi?client=[% client %]&a=PRA_T"><span class="fa fa-random"></span>[% Lang.txt('Request or Start a Transfer') %]</a></li>-->
                 [% END %]
-                <li><a href="main.cgi?client=[% client %]&a=PENDPR_"><span class="fa fa-newspaper-o"></span>List Pending Registrations</a></li>
-                <!--<li><a href="main.cgi?client=[% client %]&a=REP_SETUP"><span class="fa fa-paste"></span>Reports</a></li>-->
+                <li><a href="main.cgi?client=[% client %]&a=PENDPR_"><span class="fa fa-newspaper-o"></span>[% Lang.txt('List Pending Registrations') %]</a></li>
+                <!--<li><a href="main.cgi?client=[% client %]&a=REP_SETUP"><span class="fa fa-paste"></span>[% Lang.txt('Reports') %]</a></li>-->
             </ul>
         </div>
     [% END %]
