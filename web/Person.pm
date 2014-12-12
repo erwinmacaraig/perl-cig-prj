@@ -486,7 +486,7 @@ my @headers = (
 
         #$modoptions
         #$resultHTML = qq[<div class="pageHeading">Registration Documents</div>].$grid;
-        $resultHTML = $grid;
+        $resultHTML = qq[<div class="col-md-12">] . $grid . q[</div>];
 
 
     return ($resultHTML,$title);
