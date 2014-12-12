@@ -143,12 +143,7 @@ header .utilities ul li:last-child {
 header .utilities ul li a {
 	color: #fff;
 	text-decoration: underline;
-}
-
-header .utilities ul li a {
-	color: #fff;
-	text-decoration: underline;
-	font-size: 13px;
+	font-size: 14px;
 }
 
 header .utilities ul li a:hover {
@@ -243,6 +238,12 @@ header nav ul li a.active {
 	background: #e3e3e3;
 	color: #000;
 	text-decoration: none;
+}
+
+header strong.info-header{
+	float: left;
+	width: 100%;
+	margin-bottom: 5px;
 }
 
 h2.main-heading {
@@ -837,7 +838,7 @@ header ul#menu ul li a:hover {
 }
 .dashboard-tasklist td select.filter-tasks{
 	width: 130px;
-	margin-left: 10px;
+	margin-left: 0px;
 }
 .dashboard-tasklist tr, .documents-list tr{
 	border: 1px solid #cbcbcb;
@@ -875,6 +876,9 @@ span.flash_error{
 	margin-bottom: 20px;
 	padding-bottom: 0px;
 }
+.sidebar-box .col-md-12{
+	padding: 0 20px;
+}
 .sidebar-box ul{
 	list-style: none;
 	border-bottom: 1px solid #cbcbcb;
@@ -885,13 +889,13 @@ span.flash_error{
 	padding-bottom: 0px;
 }
 .sidebar-box ul li{
-	padding-left: 10px;
+	padding-left: 20px;
 }
 .sidebar-box .quick-links li{
 	border-bottom: 1px solid #cbcbcb;
 }
 .sidebar-box .quick-links li{
-	padding: 10px;
+	padding: 10px 20px;
 }
 .sidebar-box .quick-links li:last-child{
 	border-bottom: none;
