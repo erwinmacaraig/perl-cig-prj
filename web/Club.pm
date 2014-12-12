@@ -594,7 +594,7 @@ my $resultHTML='' ;
   if($option eq 'display')  {
 #    $resultHTML .= showContacts($Data,0, $editlink);
     my $chgoptions='';
-    $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_DTE">Edit $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}</a></span>] if allowedAction($Data, 'c_e');
+    $chgoptions.=qq[<span class = "btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DTE">Edit $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}</a></span>] if allowedAction($Data, 'c_e');
 
     $chgoptions=qq[<div class="changeoptions">$chgoptions</div>] if $chgoptions;
     $title=$chgoptions.$title;
@@ -943,7 +943,7 @@ sub listClubs   {
 
   my $addlink='';
   #{
-  #    $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if(!$Data->{'ReadOnlyLogin'});
+  #    $addlink=qq[<span class = "btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if(!$Data->{'ReadOnlyLogin'});
   # }
 
   my $modoptions=qq[<div class="changeoptions">$addlink</div>];

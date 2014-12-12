@@ -456,14 +456,14 @@ sub step2 {
 				<input type="hidden" name="a" value="P_TXNLogstep3">
 				<input type="hidden" name="client" value="$client">
 				<input type="hidden" name="mode" value="$mode"><input type="hidden" name="personID" value="$personID"><input type="hidden" name="client" value="$client"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="transLogID" value="$transLogID">
-				<input type="submit" name="subbut" value=" ]. $lang->txt('Confirm Payment') . qq[ " class="HF_submit button proceed-button">
+				<input type="submit" name="subbut" value=" ]. $lang->txt('Confirm Payment') . qq[ " class="btn-main">
 			</form>
 			<div style="clear:both;"></div>
 			<form action="$Data->{'target'}" method="POST">
 				<input type="hidden" name="a" value="P_TXNLoglist">
 				<input type="hidden" name="client" value="$client">
 				<input type="hidden" name="mode" value="$mode"><input type="hidden" name="personID" value="$personID"><input type="hidden" name="client" value="$client"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="dt_start_paid" value="$dtStart_paid"><input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
-				<input type="submit" name="subbut" value=" ]. $lang->txt('Cancel Payment') . qq[ " class="HF_submit button cancel-button">
+				<input type="submit" name="subbut" value=" ]. $lang->txt('Cancel Payment') . qq[ " class="btn-main">
 			</form>
 		 ]; 
 
@@ -1057,7 +1057,7 @@ sub listTransactions {
 				    </tbody>	
 				</table>
 			
-						<div class="HTbuttons"><input onclick="clicked='$targetManual'" type="submit" name="subbut" value="Submit Manual Payment" class="HF_submit button generic-button" id = "btn-manualpay"></div>
+						<div class="HTbuttons"><input onclick="clicked='$targetManual'" type="submit" name="subbut" value="Submit Manual Payment" class="btn-main" id = "btn-manualpay"></div>
 
 						<input type="hidden" name="personID" value="$TableID"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="dt_start_paid" value="$dtStart_paid"><input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
 					</form> 

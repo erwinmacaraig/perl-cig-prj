@@ -611,7 +611,7 @@ sub show_photo_product {
             my $no_photo_found = $Data->{'lang'}->txt('No Photo Found');
             my $add_photo      = $Data->{'lang'}->txt('Add Photo');
 	my $pID = "&$memberID";
-            my $script =  q[<input type="button" value = " Upload Photo " id = "photoupload" class="button generic-button">
+            my $script =  q[<input type="button" value = " Upload Photo " id = "photoupload" class="btn-inside-panels">
                                        <script>
                                         jQuery('#photoupload').click(function() {
                                                         jQuery('#photoupload_form').html('<iframe src="productphoto.cgi?client=].$client.$pID.q[" style="width:750px;height:650px;border:0px;"></iframe>');

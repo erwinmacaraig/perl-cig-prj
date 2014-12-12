@@ -537,8 +537,8 @@ sub initRequestPage {
     if($transferType eq $Defs::TRANSFER_TYPE_INTERNATIONAL) {
         $title = $Data->{'lang'}->txt("Do you have Player's International Transfer Certificate?");
 
-        $TemplateData{'noITC'} = qq[ <span class="button generic-button"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PRA_NC">]. $Data->{'lang'}->txt("No") . q[</a></span>];
-        $TemplateData{'withITC'} = qq[ <span class="button generic-button"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PF_&amp;dtype=PLAYER&amp;itc=1">]. $Data->{'lang'}->txt("Yes") . q[</a></span>];
+        $TemplateData{'noITC'} = qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PRA_NC">]. $Data->{'lang'}->txt("No") . q[</a></span>];
+        $TemplateData{'withITC'} = qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PF_&amp;dtype=PLAYER&amp;itc=1">]. $Data->{'lang'}->txt("Yes") . q[</a></span>];
 
         $body = runTemplate(
             $Data,

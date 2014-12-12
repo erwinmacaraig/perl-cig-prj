@@ -264,7 +264,7 @@ sub personRegistrationsHistory   {
     my %tempClientValues = getClient($client);
     {
         my $tempClient = setClient(\%tempClientValues);
-        $addlink=qq[<span class = "button-small generic-button"><a class="btn-inside-panels" href="$Data->{'target'}?client=$client&amp;a=VENUE_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if (!$Data->{'ReadOnlyLogin'});
+        $addlink=qq[<span class = "btn-inside-panels"><a class="btn-inside-panels" href="$Data->{'target'}?client=$client&amp;a=VENUE_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if (!$Data->{'ReadOnlyLogin'});
 
     }
 
@@ -437,9 +437,9 @@ my @headers = (
 			   if($regodoc->{'strLockAtLevel'} eq '' || $dref->{'intUseExistingThisEntity'} || $dref->{'intUseExistingAnyEntity'} || $registration->{'intEntityID'} == $currLoginID){	
 
 					print FH "\n\n \$registration->{'intEntityID'}:$registration->{'intEntityID'} ? \$currLoginID:$currLoginID\n";
-					$viewLink = qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="#" onclick="docViewer($regodoc->{'intFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a></span>];
+					$viewLink = qq[ <span class="btn-inside-panels"><a class="btn-inside-panels" href="#" onclick="docViewer($regodoc->{'intFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a></span>];
 
-    				$replaceLink =   qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a></span>];	
+    				$replaceLink =   qq[ <span class="btn-inside-panels"><a class="btn-inside-panels" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a></span>];	
 				}
 				else{
 					my @authorizedLevelsArr = split(/\|/,$regodoc->{'strLockAtLevel'});
@@ -453,9 +453,9 @@ my @headers = (
                 	$replaceLink =   qq[ <button class\"HTdisabled\">]. $lang->txt('Replace File'). q[</button>];
 
 					if(grep(/^$myCurrentLevelValue/,@authorizedLevelsArr) && $myCurrentLevelValue >  $ownerlevel ){
-						$viewLink = qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="#" onclick="docViewer($regodoc->{'intFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a></span>];
+						$viewLink = qq[ <span class="btn-inside-panels"><a class="btn-inside-panels" href="#" onclick="docViewer($regodoc->{'intFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a></span>];
 
-    				$replaceLink =   qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a></span>];	
+    				$replaceLink =   qq[ <span class="btn-inside-panels"><a class="btn-inside-panels" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a></span>];	
 					}									
 				}
 				push @rowdata, {
@@ -1516,7 +1516,7 @@ my $person_photo = qq[
       </div>
 ];
         #<h4>Documents</h4>
-        #<span class="button-small generic-button"><a href="?client='.$client.'&amp;a=DOC_L">Add Document</a></span>
+        #<span class="btn-inside-panels"><a href="?client='.$client.'&amp;a=DOC_L">Add Document</a></span>
 $person_photo = '' if($option eq 'add');
 #$tabs = '' if($option eq 'add'); #WR: may need to go back in
 	$resultHTML =qq[
