@@ -72,8 +72,8 @@ sub getUploadedFiles	{
     		$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}";
 		    $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
 			$deleteURL .= qq[&amp;dctid=$dref->{'intDocumentTypeID'}&amp;regoID=$dref->{'regoID'}] if($dref->{'intDocumentTypeID'});
-	      	$deleteURLButton = qq[ <span class="btn-inside-panels"><a class="btn-inside-panels" href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a></span>];
-            $urlViewButton = qq[ <span class="btn-inside-panels"><a class="btn-inside-panels" href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a></span>];
+	      	$deleteURLButton = qq[ <a class="btn-main btn-view-replace" href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a>];
+            $urlViewButton = qq[ <a class="btn-main btn-view-replace" href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a>];
     	}
     	else {
     		my @authorizedLevelsArr = split(/\|/,$dref->{'strLockAtLevel'});
@@ -82,12 +82,12 @@ sub getUploadedFiles	{
                	$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}";
 		        $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
 				$deleteURL .= qq[&amp;dctid=$dref->{'intDocumentTypeID'}&amp;regoID=$dref->{'regoID'}] if($dref->{'intDocumentTypeID'});
-	         	$deleteURLButton = qq[ <span class="btn-inside-panels"><a class="btn-inside-panels" href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a></span>];
-                $urlViewButton = qq[ <span class="btn-inside-panels"><a class="btn-inside-panels" href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a></span>];
+	         	$deleteURLButton = qq[ <a class="btn-main btn-view-replace" href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a>];
+                $urlViewButton = qq[ <a class="btn-main btn-view-replace" href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a>];
             }
             else{
-            	$deleteURLButton = qq[ <button class\"HTdisabled\">]. $Data->{'lang'}->txt('Delete'). q[</button>]; 
-            	$urlViewButton = qq[ <button class\"HTdisabled\">].$Data->{'lang'}->txt('View'). q[</button>];          	
+            	$deleteURLButton = qq[ <a class="HTdisabled btn-main btn-view-replace">]. $Data->{'lang'}->txt('Delete'). q[</a>]; 
+            	$urlViewButton = qq[ <a class="HTdisabled btn-main btn-view-replace">].$Data->{'lang'}->txt('View'). q[</a>];          	
             }
     	}
 		
