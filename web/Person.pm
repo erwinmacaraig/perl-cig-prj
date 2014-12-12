@@ -460,7 +460,7 @@ my @headers = (
 				}
 				push @rowdata, {
 	       			id => $regodoc->{'intFileID'} || 0,
-	        		SelectLink => $fileLink,
+	        		oldSelectLink => $fileLink,
 	        		strDocumentName => $regodoc->{'strDocumentName'},
 		    		strApprovalStatus => $regodoc->{'strApprovalStatus'},
             		DateUploaded => $regodoc->{'DateUploaded'},
