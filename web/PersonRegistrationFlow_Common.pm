@@ -250,7 +250,7 @@ print STDERR "000OK IS $ok | $run\n\n";
        
 	    my $personObj = getInstanceOf($Data, 'person');
 
-		my $query = qq[SELECT strLocalName FROM tblEntity WHERE intEntityID = $rego_ref->{'intRealmID'}];
+		my $query = qq[SELECT strRealmName FROM tblRealms WHERE intRealmID= $rego_ref->{'intRealmID'}];
 		my $sth = $Data->{'db'}->prepare($query);
 		$sth->execute();
 		my @arr = $sth->fetchrow_array();
