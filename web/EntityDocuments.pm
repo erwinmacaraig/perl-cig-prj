@@ -81,8 +81,8 @@ sub list_entity_docs{
                 $replaceLink =   qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a></span>];
             }
             else{
-            	$viewLink = qq[ <button class\"HTdisabled\">]. $lang->txt('Get File') . q[</button>];    
-                $replaceLink =   qq[ <button class\"HTdisabled\">]. $lang->txt('Replace File'). q[</button>];
+            	$viewLink = qq[ <a class\"HTdisabled btn-main btn-view-replace\">]. $lang->txt('Get File') . q[</a>];    
+                $replaceLink =   qq[ <a class\"HTdisabled btn-main btn-view-replace\">]. $lang->txt('Replace File'). q[</a>];
             }
     	}
     	

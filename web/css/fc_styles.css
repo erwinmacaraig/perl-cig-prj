@@ -1674,3 +1674,12 @@ form#flowFormID #l_row_type,#l_row_sport label {
 #flowFormID .col-md-9 .nav-tabs {
     width: 870px;
 }
+
+a.btn-main.btn-view-replace {
+	padding:5px 10px 5px 10px;
+	width:100%;
+}
+
+a.HTdisabled, a.HTdisabled:hover {
+	background: #ccc;
+}

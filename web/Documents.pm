@@ -184,10 +184,6 @@ sub list_docs {
 		}
 	
 		my @headers2 = (
-		{ 
-            type => 'Selector',
-            field => 'SelectLink',
-        }, 
 		{
 			name => $Data->{'lang'}->txt('Title'),
 			field => 'Title',
