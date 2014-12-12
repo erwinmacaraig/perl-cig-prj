@@ -87,15 +87,15 @@
     <div class="task-actions">
 
         [% IF TaskAction.showApprove %]
-        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Approve') %]</a></span>
+        <a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]" class = "btn-main">[% Lang.txt('Approve') %]</a>
         [% END %]
 
         [% IF TaskAction.showReject %]
-        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Reject&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Reject') %]</a></span>
+        <a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Reject&TID=[% TaskAction.WFTaskID %]" class = "btn-main">[% Lang.txt('Reject') %]</a>
         [% END %]
 
         [% IF TaskAction.showResolve %]
-        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Resolve&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Resolve') %]</a></span>
+        <a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Resolve&TID=[% TaskAction.WFTaskID %]" class = "btn-main">[% Lang.txt('Resolve') %]</a>
         [% END %]
 
     </div>
