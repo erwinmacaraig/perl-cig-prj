@@ -595,7 +595,7 @@ sub PersonTransfer {
 			</table>
                                 <input type="hidden" name="a" value="P_TRANSFER">
                                 <input type="hidden" name="client" value="$client">
-                                <input type="submit" value="Transfer Person" id="btnsubmit" name="btnsubmit"  class="button proceed-button">
+                                <input type="submit" value="Transfer Person" id="btnsubmit" name="btnsubmit"  class="btn-main">
                         </form>
 		];
     }
@@ -659,7 +659,7 @@ sub PersonTransfer {
                                 <input type="hidden" name="transfer_dob" value="$params{'transfer_dob'}">
                                 <input type="hidden" name="personID" value="$personID">
                                 <input type="hidden" name="client" value="$client">
-                                <input type="submit" value="Confirm transfer" id="btnsubmit" name="btnsubmit"  class="button proceed-button">
+                                <input type="submit" value="Confirm transfer" id="btnsubmit" name="btnsubmit"  class="btn-main">
                         </form>
                 ];
         $body = qq[<p class="warningmsg">Person already exists in this Association</p>] if ($thisassoc);
@@ -2048,7 +2048,7 @@ sub PersonDupl {
 				<span class="warningmsg">NOTE: Only mark the duplicate $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}, not the $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} you believe may be the original</span>.</p><br><br>
 				<input type="hidden" name="a" value="P_DUP_S">
 				<input type="hidden" name="client" value="$client">
-				<input type="submit" value="Mark as Duplicate" id="btnsubmit" name="btnsubmit"  class="button proceed-button">
+				<input type="submit" value="Mark as Duplicate" id="btnsubmit" name="btnsubmit"  class="btn-main">
 			</form>
 		];
         return ( $msg, 'Mark as Duplicate' );

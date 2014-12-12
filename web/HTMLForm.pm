@@ -396,7 +396,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
             my $txt = langlookup( $fields_ref,
                 $fields_ref->{'options'}{'submitlabelnondisable'} );
             $buttons .=
-qq[ <input type="submit" name="subbut" value="$txt" class="HF_submit button proceed-button" did="HFsubbut"> ];
+qq[ <input type="submit" name="subbut" value="$txt" class="HF_submit btn-main" did="HFsubbut"> ];
             $fields_ref->{'options'}{'submitlabel'} = '';
         }
         if (    $fields_ref->{'options'}{'submitlabel'}
@@ -405,7 +405,7 @@ qq[ <input type="submit" name="subbut" value="$txt" class="HF_submit button proc
             my $txt = langlookup( $fields_ref,
                 $fields_ref->{'options'}{'submitlabel'} );
             $buttons .=
-qq[ <input type="submit" name="subbut" value="$txt" class="HF_submit button proceed-button" id="HFsubbut"> ];
+qq[ <input type="submit" name="subbut" value="$txt" class="HF_submit btn-main" id="HFsubbut"> ];
         }
         if ( $fields_ref->{'options'}{'resetlabel'} and $action ne 'display' ) {
             my $txt =

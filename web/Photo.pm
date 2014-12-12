@@ -222,7 +222,7 @@ sub new_photo	{
       type="submit"
       name="submitb"
       value="$upload_photo"
-			class = "button proceed-button"
+			class = "btn-main"
       onclick="
         document.getElementById('photoselect').style.display='none';
         document.getElementById('pleasewait').style.display='block';
@@ -550,7 +550,7 @@ $form_header
 	</script>
 
 <form action="$Data->{'target'}" method="POST">
-      <input type="submit" value=" &nbsp; $save &nbsp; " class = "button proceed-button">
+      <input type="submit" value=" &nbsp; $save &nbsp; " class = "btn-main">
 	<div style="clear:both;"></div>
   <div style="float:left;">
 <b>$original</b>

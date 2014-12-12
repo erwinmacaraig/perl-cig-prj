@@ -230,7 +230,7 @@ $form_header
 	</script>
 
 <form action="$Data->{'target'}" method="POST">
-      <input type="submit" value=" &nbsp; $save &nbsp; " class = "button proceed-button">
+      <input type="submit" value=" &nbsp; $save &nbsp; " class = "btn-main">
 	<div style="clear:both;"></div>
   <div style="float:left;">
 <b>$original</b>
@@ -427,7 +427,7 @@ $body = qq[<form action="$target" method="POST" enctype="multipart/form-data">
       name="submitb"
       value="$upload_photo"
       style="width:160px;"
-                        class = "button proceed-button"
+                        class = "btn-main"
                         
       onclick="
         document.getElementById('photoselect').style.display='none';

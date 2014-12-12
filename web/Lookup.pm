@@ -156,7 +156,7 @@ sub details_sub	{
       <tr>
         <td><br></td>
         <td colspan="2"><br><br>
-          <input type=submit value="$update " class = "button proceed-button"><br><br>
+          <input type=submit value="$update " class = "btn-main"><br><br>
         </td>
       </tr>
 		];
