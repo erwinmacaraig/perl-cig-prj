@@ -665,9 +665,9 @@ sub getRegistrationData	{
         $dref->{'RegistrationNature'} = $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '';
 
 		my $sql = qq[
-			SELECT strApprovalStatus,strDocumentName, intFileID, strOrigFilename, pr.intPersonRegistrationID FROM tblUploadedFiles INNER JOIN tblDocuments ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID  
+			SELECT strApprovalStatus,strDocumentName, intFileID, strOrigFilename, pr.intPersonRegistrationID, tblDocumentType.intDocumentTypeID, strLockAtLevel,tblUploadedFiles.dtUploaded as DateUploaded FROM tblUploadedFiles INNER JOIN tblDocuments ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID  
 			INNER JOIN tblDocumentType ON tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID   
-			INNER JOIN tblPersonRegistration_$Data->{'Realm'} as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID  
+			INNER JOIN tblPersonRegistration_$Data->{'Realm'} as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID 
 			WHERE pr.intPersonRegistrationID = $dref->{intPersonRegistrationID} AND pr.intPersonID = $personID 
 		];
 		my $sth = $Data->{'db'}->prepare($sql);

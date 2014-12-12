@@ -356,153 +356,132 @@ sub listDocuments {
     my $resultHTML = '';
     my $lang = $Data->{'lang'};
     my $db = $Data->{'db'};
+	
     my $client = $Data->{'client'};
     my %clientValues = getClient($client);
-    
-	my $myCurrentValue = $clientValues{'authLevel'};
+    my $currLoginID = $Data->{'clientValues'}{'_intID'};
+	my $myCurrentLevelValue = $clientValues{'authLevel'};
     my %RegFilters=();
     my @statusNOTIN = ($Defs::PERSONREGO_STATUS_DELETED, $Defs::PERSONREGO_STATUS_INPROGRESS);
     $RegFilters{'statusNOTIN'} = \@statusNOTIN;
     my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
    
-    
+	open FH, ">dumpfile.txt";
+    print FH "\n" . Dumper($Data) . "\n";
     #does not matter how many, intPersonRegistrationID is the same all throughout
     my $pRIDRef = ${$Reg_ref}[0];
-    my $personRegistrationID = $pRIDRef->{'intPersonRegistrationID'};
-    my @rowdata = ();
-    my $query = qq[
-         SELECT tblUploadedFiles.intFileID,tblDocumentType.strDocumentName, tblDocumentType.strLockAtLevel, tblUploadedFiles.dtUploaded as DateUploaded, tblDocuments.strApprovalStatus, tblDocuments.intPersonRegistrationID as regoID, tblDocuments.intDocumentTypeID as doctypeID FROM tblDocuments INNER JOIN tblUploadedFiles ON tblDocuments.intUploadFileID = tblUploadedFiles.intFileID INNER JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intPersonID = ? AND tblUploadedFiles.intEntityTypeID = ?];
-
-    my $viewLink;
+	my $cnt = 0;
+	my $regoIDtemp = 0;
+	my $viewLink;
     my $replaceLink;
-    my $sth = $db->prepare($query);
-    $sth->execute($personID, $Defs::LEVEL_PERSON);
-    while(my $dref = $sth->fetchrow_hashref()){
-    	#check if strLockLevel is empty which means world access to the file
-    	if($dref->{'strLockAtLevel'} eq ''){
-    		$viewLink = qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="#" onclick="docViewer($dref->{'intFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a></span>];
-    		$replaceLink =   qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$dref->{'intFileID'}&amp;regoID=$dref->{'regoID'}&amp;dID=$dref->{'doctypeID'}">]. $lang->txt('Replace File'). q[</a></span>];
-    	}
-    	else {
-    		my @authorizedLevelsArr = split(/\|/,$dref->{'strLockAtLevel'});
-    		 if(grep(/^$myCurrentValue/,@authorizedLevelsArr)){
-    		 	$viewLink = qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}" target="_blank">]. $lang->txt('Get File') . q[</a></span>];
-    		    $replaceLink =   qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$dref->{'intFileID'}&amp;regoID=$dref->{'regoID'}&amp;dID=$dref->{'doctypeID'}">]. $lang->txt('Replace File'). q[</a></span>];
-    		 }
-    		 else {
-    		 	$viewLink = qq[ <button class\"HTdisabled\">]. $lang->txt('Get File') . q[</button>];    
-                $replaceLink =   qq[ <button class\"HTdisabled\">]. $lang->txt('Replace File'). q[</button>];
-    		 }
-    	}
 
+	my @rowdata = ();
+	my $fileLink = "#";
+	my $grid = '';
+my @headers = (
+       		 {
+          	  type => 'Selector',
+          	  field => 'SelectLink',
+      		  },
+       		 {
+           	 name => $lang->txt('Type'),
+          	  field => 'strDocumentName',
+       		 },
+       		 {
+      	      name => $lang->txt('Status'),
+      	      field => 'strApprovalStatus',
+     		 },
+      		 {
+      	      name => $lang->txt('Date Uploaded'),
+     	       field => 'DateUploaded',
+      		 },
+      		 {
+       		     name => $lang->txt('View'),
+       		     field => 'ViewDoc',
+       		     type => 'HTML',
+      		  },
+      		  {
+       		 	name => $lang->txt('Replace'),
+        			field => 'ReplaceFile',
+        			type => 'HTML',
+      		  },
+   			 );
+			 my $filterfields = [
+       			 {
+          		  field     => 'strApprovalStatus',
+          		  elementID => 'dd_actstatus',
+          		  allvalue  => 'ALL',
+      			  },
+   			 ];
+			
 
-       my $fileLink = "#$personRegistrationID";
+	foreach my $registration (@{$Reg_ref}){
+		$cnt++;
+		#print FH "\nRegistration Data $cnt: \n" . Dumper($registration) . "\n----------------------------------------------";
+		#get the documents here
+		$grid .= qq[<br />$registration->{'strPersonType'} - $registration->{'strSport'} - $registration->{'strPersonLevel'} <br />];
+			#loop over rego documents
+			foreach my $regodoc (@{$registration->{'documents'}}){
 
-       push @rowdata, {
-	        id => $dref->{'intFileID'} || 0,
-	        SelectLink => $fileLink,
-	        strDocumentName => $dref->{'strDocumentName'},
-		    strApprovalStatus => $dref->{'strApprovalStatus'},
-            DateUploaded => $dref->{'DateUploaded'},
-            ViewDoc => $viewLink,
-            ReplaceFile => $replaceLink,
-       };
-    }
+				#perform query for intUseThisEntity and intUseAnyEntity
+				my $query = qq[SELECT intUseExistingThisEntity,intUseExistingAnyEntity FROM tblRegistrationItem INNER JOIN
+                               tblDocumentType ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID INNER JOIN
+							   tblDocuments ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE 
+							   tblDocuments.strApprovalStatus = 'APPROVED' AND intPersonRegistrationID = ? AND 	
+							   tblDocumentType.intDocumentTypeID = ? AND tblDocuments.intPersonID = ?];
 
-    my @headers = (
-        {
-            type => 'Selector',
-            field => 'SelectLink',
-        },
-        {
-            name => $lang->txt('Type'),
-            field => 'strDocumentName',
-        },
-        {
-            name => $lang->txt('Status'),
-            field => 'strApprovalStatus',
-        },
-        {
-            name => $lang->txt('Date Uploaded'),
-            field => 'DateUploaded',
-        },
-        {
-            name => $lang->txt('View'),
-            field => 'ViewDoc',
-            type => 'HTML',
-        },
-        {
-        	name => $lang->txt('Replace'),
-        	field => 'ReplaceFile',
-        	type => 'HTML',
-        },
-    );
-    my $filterfields = [
-        {
-            field     => 'strApprovalStatus',
-            elementID => 'dd_actstatus',
-            allvalue  => 'ALL',
-        },
-    ];
+			   my $sth = $db->prepare($query); 
+               $sth->execute($regodoc->{'intPersonRegistrationID'}, $regodoc->{'intDocumentTypeID'},$personID);
+			   my $dref = $sth->fetchrow_hashref(); 
+				#checks for strLockAtLevel and intUseExistingThisEntity and intUseExistingAnyEntity and Owner against Currently Logged
+			   if($regodoc->{'strLockAtLevel'} eq '' || $dref->{'intUseExistingThisEntity'} || $dref->{'intUseExistingAnyEntity'} || $registration->{'intEntityID'} == $currLoginID){	
 
-    #### GRID  ####
-    my $grid = showGrid(
-        Data => $Data,
-        columns => \@headers,
-        rowdata => \@rowdata,
-        gridid => 'grid',
-        width => '99%',
+					print FH "\n\n \$registration->{'intEntityID'}:$registration->{'intEntityID'} ? \$currLoginID:$currLoginID\n";
+					$viewLink = qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="#" onclick="docViewer($regodoc->{'intFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a></span>];
 
-   );
+    				$replaceLink =   qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a></span>];	
+				}
+				else{
+					my @authorizedLevelsArr = split(/\|/,$regodoc->{'strLockAtLevel'});
+					#check level of the owner
+					$query = qq[SELECT intEntityLevel FROM tblEntity WHERE intEntityID = ? ];
+					$sth = $db->prepare($query); 
+					$dref =  $sth->fetchrow_hashref();
+					my $ownerlevel = $dref->{'intEntityLevel'};
+					
+					$viewLink = qq[ <button class\"HTdisabled\">]. $lang->txt('View') . q[</button>];    
+                	$replaceLink =   qq[ <button class\"HTdisabled\">]. $lang->txt('Replace File'). q[</button>];
 
+					if(grep(/^$myCurrentLevelValue/,@authorizedLevelsArr) && $myCurrentLevelValue >  $ownerlevel ){
+						$viewLink = qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="#" onclick="docViewer($regodoc->{'intFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a></span>];
 
-  my $addlink='';
-  {
-      $addlink=qq[<span class = "button-small generic-button"><a class="btn-inside-panels" href="$Data->{'target'}?client=$client&amp;a=DOC_L">].$Data->{'lang'}->txt('Add').qq[</a></span>] if (!$Data->{'ReadOnlyLogin'});
-  }
-   $query = qq[
-         SELECT strDocumentName, intDocumentTypeID FROM tblDocumentType WHERE strDocumentFor = ? AND intRealmID IN (0,?)
-    ];
-    $sth = $db->prepare($query);
-    $sth->execute($Defs::DOC_FOR_PERSON,$Data->{'Realm'});
-    my $doclisttype = qq[  <form action="$Data->{'target'}" id="personDocAdd">
-                              <input type="hidden" name="client" value="$client" />
-                              <input type="hidden" name="a" value="DOC_L" />
-                              <label>]. $lang->txt('Add File For') . qq[</label>
-                              <select name="doclisttype" id="doclisttype">
-                              <option value="0">Misc</option>
-                       ];
-    while(my $dref = $sth->fetchrow_hashref()){
-        $doclisttype .= qq[<option value="$dref->{'intDocumentTypeID'}">$dref->{'strDocumentName'}</option>];
-    }  
-
-	my $reglisttype = qq[<select name="RegistrationID">];
-    #query for existing registrations 
-    foreach my $regs (@{$Reg_ref}) {
-		$reglisttype .= qq[<option value="$regs->{'intPersonRegistrationID'}"> $regs->{'Sport'} - $regs->{'PersonType'} - $regs->{'PersonLevel'} - $regs->{'strNationalPeriodName'}</option> ];		
-    }
-	$reglisttype .= q[</select>];
-
-   $doclisttype .= qq[     </select>
-                           $reglisttype <input type="submit" class="button-small generic-button pull-right" value="Add" />
-                           </form>
-                    ];
-#  my $modoptions=qq[<div class="changeoptions">$addlink</div>];
- my $modoptions=qq[<div class="changeoptions"></div>];
-
+    				$replaceLink =   qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a></span>];	
+					}									
+				}
+				push @rowdata, {
+	       			id => $regodoc->{'intFileID'} || 0,
+	        		SelectLink => $fileLink,
+	        		strDocumentName => $regodoc->{'strDocumentName'},
+		    		strApprovalStatus => $regodoc->{'strApprovalStatus'},
+            		DateUploaded => $regodoc->{'DateUploaded'},
+            		ViewDoc => $viewLink,
+            		ReplaceFile => $replaceLink,
+     			};
+			}
+			$grid .= qq[<div class="panel-body">].showGrid(
+       		  Data => $Data,
+      		  columns => \@headers,
+      		  rowdata => \@rowdata,
+       		  gridid => "grid$registration->{'intPersonRegistrationID'}",
+       		  width => '99%',
+			);
+			$grid .= '</div>';	
+		
+	}
  my $title = $lang->txt('Registration Documents');
 
        # $modoptions
-        $resultHTML = qq[ $modoptions
-                      <div class="showrecoptions"> $doclisttype </div>
-                      <div class="panel-body">$grid</div>
-           ];
-
-
-################### <input type="hidden" value="$personRegistrationID" name="RegistrationID" />
-
-###################
-
+        $resultHTML = qq[<div class="panel-body">$grid</div>];
 
 
     return ($resultHTML,$title);
