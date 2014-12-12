@@ -159,7 +159,7 @@
                         [% IF CurrentLevel == 100 OR CurrentLevel == 20 %]
                             <td><a href="[% task.viewURL %]" class="btn-inside-panels">[% Lang.txt('View and Approve') %]</a></td>
                         [% ELSE %]
-                            <td><a href="[% task.viewURL %]" class="btn-inside-panels">[% Lang.txt('View') %]</a></td>
+                            <td class="just-view-text"><a href="[% task.viewURL %]" class="btn-inside-panels">[% Lang.txt('View') %]</a></td>
                         [% END %]
 
                     [% ELSIF task.TaskType == 'TRANSFER' %]

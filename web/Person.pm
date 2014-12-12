@@ -356,10 +356,11 @@ sub listDocuments {
     my $resultHTML = '';
     my $lang = $Data->{'lang'};
     my $db = $Data->{'db'};
+	
     my $client = $Data->{'client'};
     my %clientValues = getClient($client);
-    
-	my $myCurrentValue = $clientValues{'authLevel'};
+    my $currLoginID = $Data->{'clientValues'}{'_intID'};
+	my $myCurrentLevelValue = $clientValues{'authLevel'};
     my %RegFilters=();
     my @statusNOTIN = ($Defs::PERSONREGO_STATUS_DELETED, $Defs::PERSONREGO_STATUS_INPROGRESS);
     $RegFilters{'statusNOTIN'} = \@statusNOTIN;
@@ -373,7 +374,7 @@ sub listDocuments {
 	my $regoIDtemp = 0;
 	my $viewLink;
     my $replaceLink;
-	my $currLoginID = getEntityID(\%clientValues);
+
 	my @rowdata = ();
 	my $fileLink = "#";
 	my $grid = '';
@@ -447,8 +448,8 @@ my @headers = (
 					$sth = $db->prepare($query); 
 					$dref =  $sth->fetchrow_hashref();
 					my $ownerlevel = $dref->{'intEntityLevel'};
-					my $myCurrentLevelValue = getLastEntityLevel($Data->{'clientValues'}); # getLast because i have to go down to Person Level
-					$viewLink = qq[ <button class\"HTdisabled\">]. $lang->txt('Get File') . q[</button>];    
+					
+					$viewLink = qq[ <button class\"HTdisabled\">]. $lang->txt('View') . q[</button>];    
                 	$replaceLink =   qq[ <button class\"HTdisabled\">]. $lang->txt('Replace File'). q[</button>];
 
 					if(grep(/^$myCurrentLevelValue/,@authorizedLevelsArr) && $myCurrentLevelValue >  $ownerlevel ){
