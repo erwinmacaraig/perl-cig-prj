@@ -329,8 +329,8 @@ strong {
 }
 #grid_wrapper #grid_filter label input[type="search"] {
 	border-radius: 5px;
-    padding: 5px;
-    width: 71%;
+    /*padding: 5px;
+    width: 71%;*/
 }
 div.showrecoptions form#personDocAdd {
 	position: relative;
@@ -1284,7 +1284,7 @@ header nav ul li a {
 /* JS Generated Table style override:: Vincent R; */
 
 .container .grid-filter-wrap{
-	margin-left: 12px;
+	/*margin-left: 12px;*/
 	width: auto;
 }
 .container .grid-filter-wrap .grid-widget{
