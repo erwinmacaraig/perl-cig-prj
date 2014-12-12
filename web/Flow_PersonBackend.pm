@@ -549,8 +549,11 @@ sub display_registration {
     my $defaultRegistrationNature = $self->{'RunParams'}{'dnat'} || '';
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $entitySelectionNeeded= $self->{'RunParams'}{'es'} || 0;
-#    $entitySelectionNeeded=0;
-    if (1==2 and $entitySelectionNeeded and ! $regoID and $originLevel > $Defs::LEVEL_CLUB and $entityLevel > $Defs::LEVEL_CLUB) {
+    $entitySelectionNeeded=0;
+    if ($entitySelectionNeeded and ! $regoID and $originLevel > $Defs::LEVEL_CLUB and $entityLevel > $Defs::LEVEL_CLUB) {
+        $entitySelectionNeeded =1;
+        $self->addCarryField('es', 0);
+        $noContinueButton = 1;
         my %ESN=();
         my $nexturl = $self->{'Target'}."?";
         $ESN{'es'} = 0;
@@ -579,8 +582,6 @@ sub display_registration {
             'registration/entityselect.templ'
         );
 
-        $entitySelectionNeeded =1;
-        $self->addCarryField('es', 0);
     }
     else    {
         $entitySelectionNeeded =0;
