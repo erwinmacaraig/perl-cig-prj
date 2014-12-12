@@ -42,7 +42,7 @@ sub setProcessOrder {
         {
             'action' => 'club',
             'function' => 'display_old_club',
-            'label'  => 'Old Club Details',
+            'label'  => 'Old Club',
             'fieldset'  => 'contactdetails',
             'title'  => 'Transfer - Old Club Details',
         },
