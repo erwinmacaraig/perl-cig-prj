@@ -592,15 +592,15 @@ sub venue_details   {
     
     if($option eq 'display')  {
         # Edit Venue.
-        $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DTE&amp;venueID=$venueID">].$Data->{'lang'}->txt('Edit Venue').qq[</a></span> ] if allowedAction($Data, 'venue_e');
+        $chgoptions.=qq[<span class = "btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DTE&amp;venueID=$venueID">].$Data->{'lang'}->txt('Edit Venue').qq[</a></span> ] if allowedAction($Data, 'venue_e');
     }
     elsif ($option eq 'edit') {
         # Delete Venue.
         my $venueObj = new EntityObj('db'=>$Data->{db},ID=>$venueID,realmID=>$intRealmID);
         
-        $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_FPA&amp;venueID=$venueID">Add Fields</a> ] if (!$Data->{'ReadOnlyLogin'});
-        $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$venueID">Edit Fields</a> ] if (!$Data->{'ReadOnlyLogin'});
-        $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DEL&amp;venueID=$venueID" onclick="return confirm('Are you sure you want to delete this venue');">Delete Venue</a> ] if ($venueObj->canDelete() && !$Data->{'ReadOnlyLogin'});
+        $chgoptions.=qq[<span class = "btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_FPA&amp;venueID=$venueID">Add Fields</a> ] if (!$Data->{'ReadOnlyLogin'});
+        $chgoptions.=qq[<span class = "btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$venueID">Edit Fields</a> ] if (!$Data->{'ReadOnlyLogin'});
+        $chgoptions.=qq[<span class = "btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DEL&amp;venueID=$venueID" onclick="return confirm('Are you sure you want to delete this venue');">Delete Venue</a> ] if ($venueObj->canDelete() && !$Data->{'ReadOnlyLogin'});
     }
     
     $chgoptions=qq[<div class="changeoptions">$chgoptions</div>] if $chgoptions;
@@ -787,7 +787,7 @@ print STDERR "VENUES$results\n";
     my $title=qq[Venues];
     #{
     #    my $tempClient = setClient(\%tempClientValues);
-    #    $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if !$Data->{'ReadOnlyLogin'};
+    #    $addlink=qq[<span class = "btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if !$Data->{'ReadOnlyLogin'};
     #}
 
     my $modoptions=qq[<div class="changeoptions">$addlink</div>];

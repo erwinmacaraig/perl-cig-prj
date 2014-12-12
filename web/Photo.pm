@@ -104,8 +104,8 @@ sub show_photo	{
 			my $delete_photo  = $Data->{'lang'}->txt('Delete Photo');
 
 			$photoopts = qq[
-				<span class="button-small mobile-button"><a href="$target?client=$client&amp;a=M_PH_n">$replace_photo</a></span>  
-				<span class="button-small mobile-button"><a href="$target?client=$client&amp;a=M_PH_d">$delete_photo</a></span>
+				<span class="btn-inside-panels"><a href="$target?client=$client&amp;a=M_PH_n">$replace_photo</a></span>  
+				<span class="btn-inside-panels"><a href="$target?client=$client&amp;a=M_PH_d">$delete_photo</a></span>
 			];
     }
 
@@ -199,7 +199,7 @@ sub new_photo	{
 			<div id="webcam" style = "float:left;"></div>
 			<canvas id="canvas" height="600" width="600" style = "display:none;float:left;"></canvas>
 			<div class = "photobuttons" style = "display:none;">
-				<input id = "btn_snap" class="button generic-button" type = "button" onclick = "javascript:webcam.capture();void(0);" value = "Take Picture">
+				<input id = "btn_snap" class="btn-inside-panels" type = "button" onclick = "javascript:webcam.capture();void(0);" value = "Take Picture">
 				<input id = "btn_reset" class="button cancel-button" type = "button" onclick = "" value = "Reset Picture" style = "display:none;">
 			</div>
 			<div style = "clear:both;"></div>

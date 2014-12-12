@@ -125,14 +125,14 @@ sub handle_documents {
      	$resultHTML =  qq[
           <div class="OKmsg">Successfully deleted file.</div> 
           <br />  
-          <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=$retpage">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+          <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=$retpage">] . $Data->{'lang'}->txt('Continue').q[</a></span>
        ];
 		}
 		else {
 			$resultHTML = qq[
 			<div class="OKmsg">Error - $delOK </div> 
           <br />  
-          <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=$retpage">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+          <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=$retpage">] . $Data->{'lang'}->txt('Continue').q[</a></span>
 			];
 			
 		}
@@ -320,7 +320,7 @@ sub new_doc_form {
 			
 		</form> 
                 <br />  
-                <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=P_DOCS">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+                <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=P_DOCS">] . $Data->{'lang'}->txt('Continue').q[</a></span>
 		</div>
 	];
 	return $body;
