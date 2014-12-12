@@ -605,6 +605,8 @@ sub getRegistrationData	{
             p.strNationalNum,
             DATE_FORMAT(pr.dtFrom, "%Y%m%d") as dtFrom_,
             DATE_FORMAT(pr.dtTo, "%Y%m%d") as dtTo_,
+            DATE_FORMAT(pr.dtFrom,'%d %b %Y') AS spaneldtFrom,
+            DATE_FORMAT(pr.dtTo,'%d %b %Y') AS spaneldtTo,
             DATE_FORMAT(pr.dtAdded, "%Y%m%d%H%i") as dtAdded_,
             DATE_FORMAT(pr.dtAdded, "%Y-%m-%d %H:%i") as dtAdded_formatted,
             DATE_FORMAT(pr.dtLastUpdated, "%Y%m%d%H%i") as dtLastUpdated_,

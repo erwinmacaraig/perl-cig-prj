@@ -769,6 +769,14 @@ table tr.new-task {
 	color: #fff;
 }
 
+.registration-active {
+	font-size: 14px;
+	padding: 10px;
+	background: #0784FF;
+	text-align: center;
+	color: #fff;
+}
+
 /*----Temporary Styles-----*/
 
 
