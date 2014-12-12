@@ -11,6 +11,8 @@ use Defs;
 use PersonObj;
 use TTTemplate;
 use Countries;
+use PersonRegistration;
+use Data::Dumper;
 
 
 sub personSummaryPanel {
@@ -24,6 +26,21 @@ sub personSummaryPanel {
     $personObj->load();
     return '' if !$personObj;
     return '' if !$personObj->ID();
+
+    my ($count, $regs) = PersonRegistration::getRegistrationData(
+        $Data,
+        $personID,
+        {},
+    );
+
+    my @personRegistration = ();
+
+    foreach my $reg_rego_ref (@{$regs}) {
+        next if $reg_rego_ref->{'strStatus'} ne $Defs::PERSONREGO_STATUS_ACTIVE;
+
+        push @personRegistration, $Data->{'lang'}->txt($reg_rego_ref->{'PersonType'} . " valid to ") . $reg_rego_ref->{'spaneldtTo'};
+    }
+
     my $isocountries  = getISOCountriesHash();
     my %templateData = (
         #'NationalNum' => $personObj->getValue('strNationalNum') || '',
@@ -33,6 +50,7 @@ sub personSummaryPanel {
         'dob' => $personObj->getValue('dtDOB'),
         'gender' => $Defs::PersonGenderInfo{$personObj->getValue('intGender')},
         'nationality' => $isocountries->{$personObj->getValue('strISONationality')},
+        'registrations' => \@personRegistration,
     );
 
     my $content = runTemplate(

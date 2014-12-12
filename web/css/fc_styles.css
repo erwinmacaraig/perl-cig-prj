@@ -143,12 +143,7 @@ header .utilities ul li:last-child {
 header .utilities ul li a {
 	color: #fff;
 	text-decoration: underline;
-}
-
-header .utilities ul li a {
-	color: #fff;
-	text-decoration: underline;
-	font-size: 13px;
+	font-size: 14px;
 }
 
 header .utilities ul li a:hover {
@@ -245,6 +240,12 @@ header nav ul li a.active {
 	text-decoration: none;
 }
 
+header strong.info-header{
+	float: left;
+	width: 100%;
+	margin-bottom: 5px;
+}
+
 h2.main-heading {
     font-family: 'noto_sansregular';
     font-weight: normal;
@@ -328,8 +329,8 @@ strong {
 }
 #grid_wrapper #grid_filter label input[type="search"] {
 	border-radius: 5px;
-    padding: 5px;
-    width: 71%;
+    /*padding: 5px;
+    width: 71%;*/
 }
 div.showrecoptions form#personDocAdd {
 	position: relative;
@@ -769,6 +770,14 @@ table tr.new-task {
 	color: #fff;
 }
 
+.registration-active {
+	font-size: 14px;
+	padding: 10px;
+	background: #0784FF;
+	text-align: center;
+	color: #fff;
+}
+
 /*----Temporary Styles-----*/
 
 
@@ -829,7 +838,7 @@ header ul#menu ul li a:hover {
 }
 .dashboard-tasklist td select.filter-tasks{
 	width: 130px;
-	margin-left: 10px;
+	margin-left: 0px;
 }
 .dashboard-tasklist tr, .documents-list tr{
 	border: 1px solid #cbcbcb;
@@ -867,6 +876,9 @@ span.flash_error{
 	margin-bottom: 20px;
 	padding-bottom: 0px;
 }
+.sidebar-box .col-md-12{
+	padding: 0 20px;
+}
 .sidebar-box ul{
 	list-style: none;
 	border-bottom: 1px solid #cbcbcb;
@@ -877,13 +889,13 @@ span.flash_error{
 	padding-bottom: 0px;
 }
 .sidebar-box ul li{
-	padding-left: 10px;
+	padding-left: 20px;
 }
 .sidebar-box .quick-links li{
 	border-bottom: 1px solid #cbcbcb;
 }
 .sidebar-box .quick-links li{
-	padding: 10px;
+	padding: 10px 20px;
 }
 .sidebar-box .quick-links li:last-child{
 	border-bottom: none;
@@ -1272,7 +1284,7 @@ header nav ul li a {
 /* JS Generated Table style override:: Vincent R; */
 
 .container .grid-filter-wrap{
-	margin-left: 12px;
+	/*margin-left: 12px;*/
 	width: auto;
 }
 .container .grid-filter-wrap .grid-widget{
@@ -1647,4 +1659,10 @@ form#flowFormID #l_row_type,#l_row_sport label {
 .paddingsummary {
 	float: left;
     width: 95px;
+}
+#flowFormID .col-md-9 .nav-tabs li a {
+    font-size: 13px;
+}
+#flowFormID .col-md-9 .nav-tabs {
+    width: 870px;
 }

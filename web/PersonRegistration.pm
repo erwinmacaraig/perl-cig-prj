@@ -26,6 +26,7 @@ use Data::Dumper;
 use Person;
 use PersonRegisterWhat;
 use AuditLog;
+
 sub cleanPlayerPersonRegistrations  {
 
     my ($Data, $personID, $personRegistrationID) = @_;
@@ -96,6 +97,7 @@ sub rolloverExistingPersonRegistrations {
         my $thisRego = $rego;
         $thisRego->{'intCurrent'} = 0;
         $thisRego->{'strStatus'} = $Defs::PERSONREGO_STATUS_ROLLED_OVER;
+        
         updatePersonRegistration($Data, $personID, $rego->{'intPersonRegistrationID'}, $thisRego, 0);
     }
 }
@@ -605,6 +607,8 @@ sub getRegistrationData	{
             p.strNationalNum,
             DATE_FORMAT(pr.dtFrom, "%Y%m%d") as dtFrom_,
             DATE_FORMAT(pr.dtTo, "%Y%m%d") as dtTo_,
+            DATE_FORMAT(pr.dtFrom,'%d %b %Y') AS spaneldtFrom,
+            DATE_FORMAT(pr.dtTo,'%d %b %Y') AS spaneldtTo,
             DATE_FORMAT(pr.dtAdded, "%Y%m%d%H%i") as dtAdded_,
             DATE_FORMAT(pr.dtAdded, "%Y-%m-%d %H:%i") as dtAdded_formatted,
             DATE_FORMAT(pr.dtLastUpdated, "%Y%m%d%H%i") as dtLastUpdated_,
