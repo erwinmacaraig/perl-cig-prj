@@ -524,6 +524,7 @@ sub listTasks {
         for my $request (@{$personRequests}) {
             next if (
                 $request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_COMPLETED
+                or $request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_REJECTED
                 or $request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_DENIED
                 or $request->{'personRegoStatus'} eq $Defs::PERSONREGO_STATUS_PENDING
             );
@@ -1826,6 +1827,14 @@ sub rejectTask {
 
         my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
         $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
+    }
+
+    if($task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER) {
+        #check for pending tasks?
+
+        if($Data->{'clientValues'}{'currentLevel'} eq $Defs::LEVEL_NATIONAL) {
+            PersonRequest::setRequestStatus($Data, $task->{'intPersonRequestID'}, $Defs::PERSON_REQUEST_STATUS_REJECTED);
+        }
     }
 
     return getNotificationMessage($Data, $task, 'REJECT');

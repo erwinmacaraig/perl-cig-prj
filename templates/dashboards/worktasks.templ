@@ -119,7 +119,7 @@
                             <div style="float: left; word-wrap: break-word;width: 80%;">
                             [% task.RegistrationNatureLabel %]<br/>
                             Review Transfer of [% task.Name %]<br/>
-                            From [% task.RequestFromClub %] to [% task.RequestToClub %]<br/>
+                            From [% task.RequestToClub %] to [% task.RequestFromClub %]<br/>
                             </div>
                         </td>
                     [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'REGO' AND task.RegistrationNature != 'TRANSFER' %]
