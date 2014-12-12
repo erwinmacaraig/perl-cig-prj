@@ -357,8 +357,8 @@ sub listDocuments {
     my $lang = $Data->{'lang'};
     my $db = $Data->{'db'};
 	
-    my $client = $Data->{'client'};
-    my %clientValues = getClient($client);
+    #my $client = $Data->{'client'};
+    #my %clientValues = getClient($client);
     my $currLoginID = $Data->{'clientValues'}{'_intID'};
 	my $myCurrentLevelValue = $clientValues{'authLevel'};
     my %RegFilters=();
