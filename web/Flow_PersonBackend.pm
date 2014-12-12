@@ -181,7 +181,7 @@ sub display_core_details    {
         my $search = $burl."INITSRCH_P";
         my $txt;
 
-        if($defaultType eq $Defs::PERSON_TYPE_PLAYER) {
+        if($defaultType eq $Defs::PERSON_TYPE_PLAYER and $self->{'SystemConfig'}{'allowPersonRequest'}) {
             $txt = $lang->txt('Has this person already been registered?')
                 .qq[ <a href = "$transfer">].$lang->txt('If yes, they need to apply for a Transfer.').'</a>'
                 .$lang->txt(' Not sure?')
