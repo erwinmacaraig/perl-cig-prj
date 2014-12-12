@@ -419,7 +419,7 @@ my @headers = (
 		$cnt++;
 		#print FH "\nRegistration Data $cnt: \n" . Dumper($registration) . "\n----------------------------------------------";
 		#get the documents here
-		$grid .= qq[<br />$registration->{'strPersonType'} - $registration->{'strSport'} - $registration->{'strPersonLevel'} <br />];
+		$grid .= qq[<br />$registration->{'PersonType'} - $registration->{'Sport'} - $registration->{'PersonLevel'} ] . $lang->txt('for') . qq[ $registration->{'strNationalPeriodName'} <br />];
 			#loop over rego documents
 			foreach my $regodoc (@{$registration->{'documents'}}){
 
