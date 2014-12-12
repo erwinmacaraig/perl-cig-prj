@@ -373,7 +373,7 @@ sub show_bulk_options {
         </tr>
         <tr>
           <td>
-			      <input type="submit" value="Generate Bulk Print" class = "button proceed-button">
+			      <input type="submit" value="Generate Bulk Print" class = "btn-main">
 			      <input type="hidden" name="client" value="$unesc_client">
 			      <input type="hidden" name="a" value="MEMCARD_BC">
             <br><br>

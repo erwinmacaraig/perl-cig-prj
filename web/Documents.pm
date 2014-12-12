@@ -125,14 +125,14 @@ sub handle_documents {
      	$resultHTML =  qq[
           <div class="OKmsg">Successfully deleted file.</div> 
           <br />  
-          <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=$retpage">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+          <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=$retpage">] . $Data->{'lang'}->txt('Continue').q[</a></span>
        ];
 		}
 		else {
 			$resultHTML = qq[
 			<div class="OKmsg">Error - $delOK </div> 
           <br />  
-          <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=$retpage">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+          <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=$retpage">] . $Data->{'lang'}->txt('Continue').q[</a></span>
 			];
 			
 		}
@@ -178,16 +178,12 @@ sub list_docs {
 	 my $allfilesgrid = '';
 	if(defined $docs->[0]->{'id'}){
 		if($title != ""){
-			$body = qq[<br /><div class="pageHeading">$title</div>];
+			#$body = qq[<br /><div class="pageHeading">$title</div>];
 		}else{
-			$body = qq[<br /><div class="col-md-12 rowtop-spacing"></div>];
+			#$body = qq[<br /><div class="col-md-12 rowtop-spacing"></div>];
 		}
 	
 		my @headers2 = (
-		{ 
-            type => 'Selector',
-            field => 'SelectLink',
-        }, 
 		{
 			name => $Data->{'lang'}->txt('Title'),
 			field => 'Title',
@@ -220,13 +216,16 @@ sub list_docs {
         columns => \@headers2,
         rowdata => $docs,
         gridid => 'allfilesgridid',
-        width => '99%',
+        width => '100%',
         
    ); 
    $body .= qq[
-       	<div class="panel-body">
-		<div class="sectionheader"> All Files </div> 
-		$allfilesgrid
+       	<div style="clear:both;">&nbsp;</div>
+       	<div class="col-md-12">
+			<h3 class="panel-header"> All Files </h3> 
+			<div class="panel-body">
+				$allfilesgrid
+			</div>
 		</div>
 	];
     
@@ -320,7 +319,7 @@ sub new_doc_form {
 			
 		</form> 
                 <br />  
-                <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=P_DOCS">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+                <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=P_DOCS">] . $Data->{'lang'}->txt('Continue').q[</a></span>
 		</div>
 	];
 	return $body;

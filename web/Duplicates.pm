@@ -405,14 +405,14 @@ sub displayDuplicateProblems	{
 							
 <br>
 <br>
-							<input type="submit" value="Update Duplicates" class="button proceed-button">
+							<input type="submit" value="Update Duplicates" class="btn-main">
 	<div style="clear:both;"></div>		
 	<table border="0" cellpadding="0" cellspacing="0">
 				$body
 			</table>
 							<input type="hidden" name="client" value="].unescape($cl).qq[">
 							<input type="hidden" name="a" value="DUPL_U"><br><br>
-							<input type="submit" value="Update Duplicates" class="button proceed-button">
+							<input type="submit" value="Update Duplicates" class="btn-main">
 			</form>
 		] if $body;
 		$query->finish;

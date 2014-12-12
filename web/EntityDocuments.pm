@@ -71,18 +71,18 @@ sub list_entity_docs{
     while(my $dref = $sth->fetchrow_hashref()){
     	#check if strLockLevel is empty which means world access to the file
     	if($dref->{'strLockAtLevel'} eq ''){
-    		$viewLink = qq[ <span class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}" target="_blank">]. $lang->txt('Get File') . q[</a></span>];
-    		$replaceLink =   qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a></span>];     		 
+    		$viewLink = qq[ <span class="btn-inside-panels"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}" target="_blank">]. $lang->txt('Get File') . q[</a></span>];
+    		$replaceLink =   qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a></span>];     		 
     	}
     	else {
     	    my @authorizedLevelsArr = split(/\|/,$dref->{'strLockAtLevel'});
     	    if(grep(/^$myCurrentValue/,@authorizedLevelsArr)){
-               	$viewLink = qq[ <span class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}" target="_blank">]. $lang->txt('Get File') . q[</a></span>];    
-                $replaceLink =   qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a></span>];
+               	$viewLink = qq[ <span class="btn-inside-panels"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}" target="_blank">]. $lang->txt('Get File') . q[</a></span>];    
+                $replaceLink =   qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a></span>];
             }
             else{
-            	$viewLink = qq[ <button class\"HTdisabled\">]. $lang->txt('Get File') . q[</button>];    
-                $replaceLink =   qq[ <button class\"HTdisabled\">]. $lang->txt('Replace File'). q[</button>];
+            	$viewLink = qq[ <a class\"HTdisabled btn-main btn-view-replace\">]. $lang->txt('Get File') . q[</a>];    
+                $replaceLink =   qq[ <a class\"HTdisabled btn-main btn-view-replace\">]. $lang->txt('Replace File'). q[</a>];
             }
     	}
     	
@@ -169,7 +169,7 @@ sub list_entity_docs{
         $doclisttype .= qq[<option value="$dref->{'intDocumentTypeID'}">$dref->{'strDocumentName'}</option>];
     } 
    $doclisttype .= qq[     </select>                           
-                           <input type="submit" class="button-small generic-button pull-right" value="Go" />
+                           <input type="submit" class="btn-inside-panels pull-right" value="Go" />
                            </form>
                     ];
 	
@@ -283,7 +283,7 @@ sub new_doc_form {
 			
 		</form> 
                 <br />  
-                <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+                <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS">] . $Data->{'lang'}->txt('Continue').q[</a></span>
 		</div>
 	];
 	return $body;
@@ -334,7 +334,7 @@ sub delete_doc {
 	return qq[
           <div class="OKmsg">Successfully deleted file.</div> 
           <br />  
-          <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+          <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS">] . $Data->{'lang'}->txt('Continue').q[</a></span>
        ];
 }
 

@@ -201,10 +201,10 @@ sub provision{
     my $chgoptions='';
     if($option eq 'display')  {
         # Edit Venue.
-        $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_ID_DTE&amp;intIdentifierId=$id">].$Data->{'lang'}->txt('Edit Venue').qq[</a></span> ];
+        $chgoptions.=qq[<span class = "btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_ID_DTE&amp;intIdentifierId=$id">].$Data->{'lang'}->txt('Edit Venue').qq[</a></span> ];
     }
     elsif ($option eq 'edit') {
-        $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_ID_DTD&amp;intIdentifierId=$id" onclick="return confirm('Are you sure you want to delete this Identifer');">Delete Identifier</a> ];
+        $chgoptions.=qq[<span class = "btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_ID_DTD&amp;intIdentifierId=$id" onclick="return confirm('Are you sure you want to delete this Identifer');">Delete Identifier</a> ];
     }
     $chgoptions=qq[<div class="changeoptions">$chgoptions</div>] if $chgoptions;
     $title=$chgoptions.$title;
@@ -322,7 +322,7 @@ sub list{
     my $title=qq[Identifiers];
     {
         my $tempClient = setClient(\%tempClientValues);
-        $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_ID_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if (!$Data->{'ReadOnlyLogin'});
+        $addlink=qq[<span class = "btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_ID_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if (!$Data->{'ReadOnlyLogin'});
 
     }
     my $modoptions=qq[<div class="changeoptions">$addlink</div>];

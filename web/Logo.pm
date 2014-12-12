@@ -167,7 +167,7 @@ sub edit_logo_form {
 		<form action="$target" method="POST" enctype="multipart/form-data">
 				<td><input type="file" name="logo" class="browse-file"></td>
 			<br>
-			<input type="submit" name="submitb" value="Upload" onclick="logo.getElementById('logoselect').style.display='none';logo.getElementById('pleasewait').style.display='block'" class="button proceed-button">
+			<input type="submit" name="submitb" value="Upload" onclick="logo.getElementById('logoselect').style.display='none';logo.getElementById('pleasewait').style.display='block'" class="btn-main">
 			<input type="hidden" name="client" value="].unescape($client).qq[">
 			<input type="hidden" name="a" value="LOGO_u">
 		</form>

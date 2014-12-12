@@ -264,7 +264,7 @@ sub personRegistrationsHistory   {
     my %tempClientValues = getClient($client);
     {
         my $tempClient = setClient(\%tempClientValues);
-        $addlink=qq[<span class = "button-small generic-button"><a class="btn-inside-panels" href="$Data->{'target'}?client=$client&amp;a=VENUE_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if (!$Data->{'ReadOnlyLogin'});
+        $addlink=qq[<span class = "btn-inside-panels"><a class="btn-inside-panels" href="$Data->{'target'}?client=$client&amp;a=VENUE_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if (!$Data->{'ReadOnlyLogin'});
 
     }
 
@@ -380,10 +380,6 @@ sub listDocuments {
 	my $grid = '';
 my @headers = (
        		 {
-          	  type => 'Selector',
-          	  field => 'SelectLink',
-      		  },
-       		 {
            	 name => $lang->txt('Type'),
           	  field => 'strDocumentName',
        		 },
@@ -419,7 +415,9 @@ my @headers = (
 		$cnt++;
 		#print FH "\nRegistration Data $cnt: \n" . Dumper($registration) . "\n----------------------------------------------";
 		#get the documents here
-		$grid .= qq[<br />$registration->{'strPersonType'} - $registration->{'strSport'} - $registration->{'strPersonLevel'} <br />];
+
+		$grid .= qq[<br /><h3 class="panel-header">$registration->{'PersonType'} - $registration->{'Sport'} - $registration->{'PersonLevel'} ] . $lang->txt('for') . qq[ $registration->{'strNationalPeriodName'} </h3>];
+
 			#loop over rego documents
 			foreach my $regodoc (@{$registration->{'documents'}}){
 
@@ -437,9 +435,11 @@ my @headers = (
 			   if($regodoc->{'strLockAtLevel'} eq '' || $dref->{'intUseExistingThisEntity'} || $dref->{'intUseExistingAnyEntity'} || $registration->{'intEntityID'} == $currLoginID){	
 
 					print FH "\n\n \$registration->{'intEntityID'}:$registration->{'intEntityID'} ? \$currLoginID:$currLoginID\n";
-					$viewLink = qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="#" onclick="docViewer($regodoc->{'intFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a></span>];
 
-    				$replaceLink =   qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a></span>];	
+					$viewLink = qq[ <a class="btn-main btn-view-replace" href="#" onclick="docViewer($regodoc->{'intFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a>];
+
+    				$replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a>];	
+
 				}
 				else{
 					my @authorizedLevelsArr = split(/\|/,$regodoc->{'strLockAtLevel'});
@@ -453,14 +453,17 @@ my @headers = (
                 	$replaceLink =   qq[ <button class\"HTdisabled\">]. $lang->txt('Replace File'). q[</button>];
 
 					if(grep(/^$myCurrentLevelValue/,@authorizedLevelsArr) && $myCurrentLevelValue >  $ownerlevel ){
-						$viewLink = qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="#" onclick="docViewer($regodoc->{'intFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a></span>];
 
-    				$replaceLink =   qq[ <span class="button-small generic-button"><a class="btn-inside-panels" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a></span>];	
+    					$viewLink = qq[ <a class="btn-main btn-view-replace" href="#" onclick="docViewer($regodoc->{'intFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a></span>];
+
+        				$replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a>];	
+
 					}									
 				}
 				push @rowdata, {
 	       			id => $regodoc->{'intFileID'} || 0,
-	        		SelectLink => $fileLink,
+	        		#oldSelectLink => $fileLink,
+
 	        		strDocumentName => $regodoc->{'strDocumentName'},
 		    		strApprovalStatus => $regodoc->{'strApprovalStatus'},
             		DateUploaded => $regodoc->{'DateUploaded'},
@@ -473,15 +476,17 @@ my @headers = (
       		  columns => \@headers,
       		  rowdata => \@rowdata,
        		  gridid => "grid$registration->{'intPersonRegistrationID'}",
-       		  width => '99%',
+       		  width => '100%',
 			);
 			$grid .= '</div>';	
 		
 	}
- my $title = $lang->txt('Registration Documents');
+        my $title = $lang->txt('Registration Documents');
+        #my $title = '';
 
-       # $modoptions
-        $resultHTML = qq[<div class="panel-body">$grid</div>];
+        #$modoptions
+        #$resultHTML = qq[<div class="pageHeading">Registration Documents</div>].$grid;
+        $resultHTML = qq[<div class="col-md-12">] . $grid . q[</div>];
 
 
     return ($resultHTML,$title);
@@ -595,7 +600,7 @@ sub PersonTransfer {
 			</table>
                                 <input type="hidden" name="a" value="P_TRANSFER">
                                 <input type="hidden" name="client" value="$client">
-                                <input type="submit" value="Transfer Person" id="btnsubmit" name="btnsubmit"  class="button proceed-button">
+                                <input type="submit" value="Transfer Person" id="btnsubmit" name="btnsubmit"  class="btn-main">
                         </form>
 		];
     }
@@ -659,7 +664,7 @@ sub PersonTransfer {
                                 <input type="hidden" name="transfer_dob" value="$params{'transfer_dob'}">
                                 <input type="hidden" name="personID" value="$personID">
                                 <input type="hidden" name="client" value="$client">
-                                <input type="submit" value="Confirm transfer" id="btnsubmit" name="btnsubmit"  class="button proceed-button">
+                                <input type="submit" value="Confirm transfer" id="btnsubmit" name="btnsubmit"  class="btn-main">
                         </form>
                 ];
         $body = qq[<p class="warningmsg">Person already exists in this Association</p>] if ($thisassoc);
@@ -1516,7 +1521,7 @@ my $person_photo = qq[
       </div>
 ];
         #<h4>Documents</h4>
-        #<span class="button-small generic-button"><a href="?client='.$client.'&amp;a=DOC_L">Add Document</a></span>
+        #<span class="btn-inside-panels"><a href="?client='.$client.'&amp;a=DOC_L">Add Document</a></span>
 $person_photo = '' if($option eq 'add');
 #$tabs = '' if($option eq 'add'); #WR: may need to go back in
 	$resultHTML =qq[
@@ -2048,7 +2053,7 @@ sub PersonDupl {
 				<span class="warningmsg">NOTE: Only mark the duplicate $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}, not the $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} you believe may be the original</span>.</p><br><br>
 				<input type="hidden" name="a" value="P_DUP_S">
 				<input type="hidden" name="client" value="$client">
-				<input type="submit" value="Mark as Duplicate" id="btnsubmit" name="btnsubmit"  class="button proceed-button">
+				<input type="submit" value="Mark as Duplicate" id="btnsubmit" name="btnsubmit"  class="btn-main">
 			</form>
 		];
         return ( $msg, 'Mark as Duplicate' );
