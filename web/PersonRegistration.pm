@@ -26,6 +26,7 @@ use Data::Dumper;
 use Person;
 use PersonRegisterWhat;
 use AuditLog;
+
 sub cleanPlayerPersonRegistrations  {
 
     my ($Data, $personID, $personRegistrationID) = @_;
@@ -96,6 +97,7 @@ sub rolloverExistingPersonRegistrations {
         my $thisRego = $rego;
         $thisRego->{'intCurrent'} = 0;
         $thisRego->{'strStatus'} = $Defs::PERSONREGO_STATUS_ROLLED_OVER;
+        
         updatePersonRegistration($Data, $personID, $rego->{'intPersonRegistrationID'}, $thisRego, 0);
     }
 }

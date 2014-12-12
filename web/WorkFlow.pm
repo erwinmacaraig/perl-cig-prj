@@ -1270,7 +1270,8 @@ sub checkForOutstandingTasks {
                     SET
 	            	    PR.strStatus = 'ACTIVE',
                         PR.intCurrent=1,
-                        dtLastUpdated=NOW()
+                        dtLastUpdated=NOW(),
+                        dtFrom = IF (dtFrom<NOW(), NOW(), dtFrom)
 	    	        WHERE
                         PR.intPersonRegistrationID = ?
                         AND PR.strStatus IN ('PENDING', 'INPROGRESS')

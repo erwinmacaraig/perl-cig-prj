@@ -1345,7 +1345,9 @@ sub finaliseTransfer {
             tblPersonRegistration_$Data->{'Realm'}
         SET
             strPreTransferredStatus = strStatus,
-            strStatus = ?
+            strStatus = ?,
+            dtTo= IF(dtTo>NOW(), NOW(), dtTo),
+            dtTo= IF(dtFrom>NOW(), dtFrom, dtTo)
         WHERE
             intEntityID = ?
             AND strPersonType = ?
@@ -1353,6 +1355,8 @@ sub finaliseTransfer {
             AND intPersonID = ?
             AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
 	];
+## Basically Set dtTo = NOW if they left before end of peiod.
+## If dtFrom is in future (if they never started) that period won't be included in Passport
             #AND strPersonLevel = ?
 
     my $db = $Data->{'db'};
