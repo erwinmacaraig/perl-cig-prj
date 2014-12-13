@@ -549,7 +549,7 @@ sub display_registration {
     my $defaultRegistrationNature = $self->{'RunParams'}{'dnat'} || '';
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $entitySelectionNeeded= $self->{'RunParams'}{'es'} || 0;
-    $entitySelectionNeeded=0;
+    $entitySelectionNeeded=0; ## SWITCH IT OFF
     if ($entitySelectionNeeded and ! $regoID and $originLevel > $Defs::LEVEL_CLUB and $entityLevel > $Defs::LEVEL_CLUB) {
         $entitySelectionNeeded =1;
         $self->addCarryField('es', 0);
