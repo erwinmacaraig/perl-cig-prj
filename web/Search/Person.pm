@@ -46,7 +46,7 @@ sub getUnique {
     my ($self) = shift;
     my ($raw) = @_;
 
-    my ($intermediateNodes, $subNodes) = $self->getIntermediateNodes(0);
+    my ($intermediateNodes, $subNodes) = $self->getIntermediateNodes(1);
     my $filters = $self->setupFilters($subNodes);
 
     my $realmID = $self->getData()->{'Realm'};
