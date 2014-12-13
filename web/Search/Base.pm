@@ -221,7 +221,8 @@ sub getSearchLink  {
 }
 
 sub getIntermediateNodes {
-    my ($self, $myLevelAndLower) = shift;
+    my ($self) = shift;
+    my ($myLevelAndLower) = shift;
     $myLevelAndLower ||= 0;
 
     my $currentLevel = $self->getData()->{'clientValues'}{'currentLevel'} || 0;
