@@ -6,7 +6,7 @@ use Flow_BaseObj;
 our @ISA =qw(Flow_BaseObj);
 
 use TTTemplate;
-use CGI;
+use CGI qw(param);
 use FieldLabels;
 use PersonObj;
 use PersonUtils;
@@ -38,12 +38,17 @@ use RenewalDetails;
 sub setProcessOrder {
     my $self = shift;
   
+    my $dtype = param('dtype') || '';
+    my $typename = $Defs::personType{$dtype} || '';
+    my $regname = $typename
+        ? $typename .' Registration'
+        : 'Registration';
     $self->{'ProcessOrder'} = [       
         {
             'action' => 'cd',
             'function' => 'display_core_details',
             'label'  => 'Personal Details',
-            'title'  => 'Registration - Enter Personal Information',
+            'title'  => "$regname - Enter Personal Information",
             'fieldset'  => 'core',
             #'noRevisit' => 1,
         },
@@ -69,7 +74,7 @@ sub setProcessOrder {
             'function' => 'display_contact_details',
             'label'  => 'Contact Details',
             'fieldset'  => 'contactdetails',
-            'title'  => 'Registration - Enter Contact Information',
+            'title'  => "$regname - Enter Contact Information",
         },
         {
             'action' => 'condu',
@@ -91,7 +96,7 @@ sub setProcessOrder {
             'action' => 'r',
             'function' => 'display_registration',
             'label'  => 'Registration',
-            'title'  => 'Registration - Choose Registration Type',
+            'title'  => "$regname - Choose Registration Type",
         },
         {
             'action' => 'ru',
@@ -102,7 +107,7 @@ sub setProcessOrder {
             'function' => 'display_certifications',
             'label'  => 'Certifications',
             'fieldset'  => 'certifications',
-            'title'  => 'Registration - Enter Certifications',
+            'title'  => "$regname - Enter Certifications",
         },
         {
             'action' => 'pcert',
@@ -113,7 +118,7 @@ sub setProcessOrder {
             'action' => 'd',
             'function' => 'display_documents',
             'label'  => 'Documents',
-            'title'  => 'Registration - Upload Documents',
+            'title'  => "$regname - Upload Documents",
         },
         {
             'action' => 'du',
@@ -123,7 +128,7 @@ sub setProcessOrder {
             'action' => 'p',
             'function' => 'display_products',
             'label'  => 'License',
-            'title'  => 'Registration - Confirm License',
+            'title'  => "$regname - Confirm License",
         },
         {
             'action' => 'pu',
@@ -133,13 +138,13 @@ sub setProcessOrder {
             'action' => 'summ',
             'function' => 'display_summary',
             'label'  => 'Summary',
-            'title'  => 'Registration - Summary',
+            'title'  => "$regname - Summary",
         },
        {
             'action' => 'c',
             'function' => 'display_complete',
             'label'  => 'Complete',
-            'title'  => 'Registration - Submitted',
+            'title'  => "$regname - Submitted",
             'NoGoingBack' => 1,
         },
     ];

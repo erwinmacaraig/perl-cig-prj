@@ -206,6 +206,11 @@
                         [% IF RequestAction.initiateRequestProcess == 1 %]
                                 <div style="float: right">
 
+                                    <div class = "pull-left">
+                                    <a style="" class="btn-main transfer-deny" data-target="#showDenyRequestNotes" data-actiontype="DENY" href = "">
+                                        [% Lang.txt('Cancel Transfer') %]
+                                    </a>
+                                    </div>
                                     <form style="" action="[% RequestAction.target %]" method="POST" class="pull-left">
                                         <input type="hidden" name="client" value="[% RequestAction.client %]">
                                         <input type="hidden" name="a" value="[% RequestAction.action %]">
@@ -227,9 +232,6 @@
                                         <input style="border: 0px solid" class="btn-main" type="submit" name="submit" value="Continue Transfer">
                                     </form>
 
-                                    <a style="" class="btn-main transfer-deny" data-target="#showDenyRequestNotes" data-actiontype="DENY" href = "">
-                                        [% Lang.txt('Cancel Transfer') %]
-                                    </a>
                                 </div>
                         [% END %]
                     </div>
@@ -245,6 +247,11 @@
             <!--
              [% IF RequestAction.initiateRequestProcess == 1 %]
                 <div>
+                    <div style="margin-top: 10px; width: 100%; float: left">
+                        <a style="width: 100%;" class="btn btn-main transfer-deny" data-target="#showDenyRequestNotes" data-actiontype="DENY" href = "">
+                            [% Lang.txt('Cancel Transfer') %]
+                        </a>
+                    </div>
                     <div style="width: 100%; float: left">
 
                         <form style="width: 100%;" action="[% RequestAction.target %]" method="POST" class="pull-left">
@@ -270,11 +277,6 @@
 
                     </div>
 
-                    <div style="margin-top: 10px; width: 100%; float: left">
-                        <a style="width: 100%;" class="btn btn-main transfer-deny" data-target="#showDenyRequestNotes" data-actiontype="DENY" href = "">
-                            [% Lang.txt('Cancel Transfer') %]
-                        </a>
-                    </div>
                 </div>
             [% END %]
             -->
