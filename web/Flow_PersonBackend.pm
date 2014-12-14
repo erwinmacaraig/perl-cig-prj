@@ -554,7 +554,7 @@ sub display_registration {
     my $defaultRegistrationNature = $self->{'RunParams'}{'dnat'} || '';
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $entitySelectionNeeded= $self->{'RunParams'}{'es'} || 0;
-    $entitySelectionNeeded=0; ## SWITCH IT OFF
+    $entitySelectionNeeded = 0 if (! $self->{'SystemConfig'}{'maFlowEntitySelect'});
     if ($entitySelectionNeeded and ! $regoID and $originLevel > $Defs::LEVEL_CLUB and $entityLevel > $Defs::LEVEL_CLUB) {
         $entitySelectionNeeded =1;
         $self->addCarryField('es', 0);
@@ -567,16 +567,56 @@ sub display_registration {
         $ESN{'client'} = $client;
         $ESN{'RealmName'} = 'Singapore Football Association';
 
-         my %tempClientValues = getClient($client);
+        my %tempClientValues = getClient($client);
         $tempClientValues{currentLevel} = 1;
         $tempClientValues{clubID} = 823;
         $tempClientValues{personID} = $personID;
-        #setClientValue(\%tempClientValues, 3, 823);
         my $tempClient = setClient(\%tempClientValues);
         %tempClientValues = getClient($tempClient);
         print STDERR "NEW PER" . $tempClientValues{'personID'};
 
         $ESN{'tempclient'} = $tempClient;
+
+        my $st = qq[
+            SELECT 
+                E.intEntityID as childEntityID, 
+                E.strLocalName
+            FROM
+                tblEntity as E
+                INNER JOIN tblTempEntityStructure as TE ON (
+                    TE.intChildID = E.intEntityID
+                )
+            WHERE 
+                TE.intRealmID=?
+                AND TE.intParentID = ?
+                AND E.strStatus IN ('PENDING', 'ACTIVE')
+            ORDER BY 
+                strLocalName
+        ];
+        my $q = $self->{'Data'}->{'db'}->prepare($st);
+        $q->execute(
+            $self->{'Data'}->{'Realm'},     
+            $entityID
+        );
+
+        my @Entities = ();
+        while (my $dref = $q->fetchrow_hashref())   {
+            my %tempClientValues = getClient($client);
+            $tempClientValues{currentLevel} = $Defs::LEVEL_PERSON;
+            $tempClientValues{clubID} = $dref->{'childEntityID'};
+            $tempClientValues{personID} = $personID;
+            my $tempClient = setClient(\%tempClientValues);
+            my %Entity=();
+            $Entity{'client'} = $tempClient;
+            $Entity{'entityID'} = $dref->{'childEntityID'};
+            $Entity{'localName'} = $dref->{'strLocalName'};
+            push @Entities, \%Entity;
+        }
+    use Data::Dumper;
+        print STDERR Dumper(\@Entities);
+        $ESN{'entitySelections'} = \@Entities;        
+         
+                
         
 
         ## Build up list of clubs
