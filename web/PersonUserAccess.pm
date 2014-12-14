@@ -25,6 +25,8 @@ sub doesUserHaveAccess  {
         $authLevel,
     ) = @_;
 
+    return 1 if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_NATIONAL);
+
     my $client = setClient( $Data->{'clientValues'} ) || '';
 	my $entityID = $authLevel
         ? getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'})
