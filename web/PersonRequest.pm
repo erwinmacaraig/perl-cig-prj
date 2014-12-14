@@ -353,13 +353,15 @@ sub listPersonRecord {
         push @rowdata, {
             id => $tdref->{'intPersonRegistrationID'} || 0,
             currentClub => $tdref->{'currentClub'} || '',
-            personStatus => $tdref->{'personStatus'} || '',
-            personRegoStatus => $tdref->{'personRegistrationStatus'} || '',
-            sport => $tdref->{'Sport'} || '',
             localFirstname => $tdref->{'strLocalFirstname'} || '',
             localSurname => $tdref->{'strLocalSurname'} || '',
-            personType => $tdref->{'PersonType'} || '',
-            personLevel => $tdref->{'PersonLevel'} || '',
+
+            personStatus => $Defs::personStatus{$tdref->{'personStatus'}} || '',
+            personRegoStatus => $Defs::personRegoStatus{$tdref->{'personRegistrationStatus'}} || '',
+
+            sport => $Defs::sportType{$tdref->{'strSport'}} || '',
+            personType => $Defs::personType{$tdref->{'strPersonType'}} || '',
+            personLevel => $Defs::personLevel{$tdref->{'strPersonLevel'}} || '',
             DOB => $tdref->{'dtDOB'} || '',
             actionLink => $actionLink,
             SelectLink => ''
