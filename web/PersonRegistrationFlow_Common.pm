@@ -249,7 +249,6 @@ print STDERR "000OK IS $ok | $run\n\n";
          
        
 	    my $personObj = getInstanceOf($Data, 'person');
-
 	    my $maObj = getInstanceOf($Data, 'national');
 		
 		my %personData = ();

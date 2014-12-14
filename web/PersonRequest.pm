@@ -23,6 +23,7 @@ use Person;
 use EmailNotifications::PersonRequest;
 use Search::Person;
 use PersonSummaryPanel;
+use InstanceOf;
 
 use CGI qw(unescape param redirect);
 use Log;
@@ -909,6 +910,8 @@ sub viewRequest {
     my $personCurrAgeLevel = Person::calculateAgeLevel($Data, $personDetails->{'currentAge'});
     my $originLevel = $Data->{'clientValues'}{'authLevel'};
 
+    my $maObj = getInstanceOf($Data, 'national');
+
     my $isocountries  = getISOCountriesHash();
     my %TemplateData = (
         'requestID' => $request->{'intPersonRequestID'} || undef,
@@ -969,7 +972,7 @@ sub viewRequest {
         'contactISOCountry' => $isocountries->{$request->{'strISOCountry'}},
         'contactPhoneHome' => $request->{'strPhoneHome'},
         'contactEmail' => $request->{'strEmail'},
-        'MA' => $request->{'strRealmName'},
+        'MA' => $maObj->name(),
         PersonSummaryPanel => personSummaryPanel($Data, $request->{'intPersonID'}) || '',
     );
 
