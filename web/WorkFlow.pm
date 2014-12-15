@@ -2433,6 +2433,7 @@ sub populateDocumentViewData {
 
 	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
+    #print STDERR Dumper $dref;
     my $st = qq[
         SELECT
             rd.intWFRuleDocumentID,
@@ -2481,6 +2482,8 @@ sub populateDocumentViewData {
                 AND regoItem.strSport IN ('', '$dref->{'strSport'}')
                 AND regoItem.strAgeLevel IN ('', '$dref->{'strAgeLevel'}')
                 AND regoItem.strPersonEntityRole IN ('', '$dref->{'strPersonEntityRole'}')
+                AND (regoItem.strISOCountry_IN ='' OR regoItem.strISOCountry_IN IS NULL OR regoItem.strISOCountry_IN LIKE CONCAT('%|','$dref->{'strISONationality'}','|%'))
+                AND (regoItem.strISOCountry_NOTIN ='' OR regoItem.strISOCountry_NOTIN IS NULL OR regoItem.strISOCountry_NOTIN NOT LIKE CONCAT('%|','$dref->{'strISONationality'}','|%'))
                 )
         LEFT JOIN tblRegistrationItem as entityItem
             ON (
@@ -2523,7 +2526,6 @@ sub populateDocumentViewData {
     my $count = 0;
     my %documentStatusCount;
     while(my $tdref = $q->fetchrow_hashref()) {
-
         next if exists $DocoSeen{$tdref->{'intDocumentTypeID'}};
         $DocoSeen{$tdref->{'intDocumentTypeID'}} = 1;
         #skip if no registration item matches rego details combination (type/role/sport/rego_nature etc)
