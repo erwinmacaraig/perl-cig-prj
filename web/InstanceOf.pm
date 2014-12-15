@@ -11,6 +11,7 @@ use Defs;
 
 use PersonObj;
 use EntityObj;
+use Reg_common;
 
 sub getInstanceOf	{
 	my (
