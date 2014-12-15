@@ -19,6 +19,7 @@ use CGI qw(:cgi param unescape escape);
 use Reg_common;
 
 use Data::Dumper;
+use InstanceOf;
 
 my $File_MaxSize = 4*1024*1024; #4Mb;
 
@@ -32,14 +33,21 @@ sub getUploadedFiles	{
 	$page,
     ) = @_;
     
+    
+	my $client = $Data->{'client'};
     my %clientValues = getClient($client);
-	my $myCurrentValue = $clientValues{'authLevel'};
-	
+    my $currLoginID = $Data->{'clientValues'}{'_intID'};
+	my $myCurrentLevelValue = $clientValues{'authLevel'};
+	my $obj = getInstanceOf($Data, 'entity', $currLoginID);
+	#open FH, ">dumpfile.txt";
+	#print FH "\n\nInstance of: " . Dumper($obj) . "\n\n";
+    #print FH "\n" . Dumper($Data) . "\n";
+	print FH "\n\n intEntityLevel: " . $obj->getValue('intEntityLevel') . "\n\n";
 	my $st = qq[
-	SELECT *,DATE_FORMAT(dtUploaded,"%d/%m/%Y %H:%i") AS DateAdded_FMT, tblDocuments.intDocumentTypeID,tblDocuments.intPersonRegistrationID as regoID, tblDocumentType.strLockAtLevel
+	SELECT *, tblPersonRegistration_$Data->{'Realm'}.intEntityID AS owner, DATE_FORMAT(dtUploaded,"%d/%m/%Y %H:%i") AS DateAdded_FMT, tblDocuments.intDocumentTypeID,tblDocuments.intPersonRegistrationID as regoID, tblDocumentType.strLockAtLevel
     FROM  tblUploadedFiles AS UF LEFT JOIN tblDocuments ON UF.intFileID = tblDocuments.intUploadFileID 
-    LEFT JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID  WHERE UF.intEntityTypeID = ? AND
-    UF.intEntityID = ? AND UF.intFileType = ?
+	LEFT JOIN tblPersonRegistration_$Data->{'Realm'} On tblPersonRegistration_1.intPersonRegistrationID = tblDocuments.intPersonRegistrationID LEFT JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
+	WHERE UF.intEntityTypeID = ? AND UF.intEntityID = ? AND UF.intFileType = ?
 	];
 	
 	
@@ -67,30 +75,34 @@ sub getUploadedFiles	{
 
 	my @rows = ();
 	while(my $dref = $q->fetchrow_hashref())	{
+
+		$st = qq[SELECT intUseExistingThisEntity, intUseExistingAnyEntity FROM tblRegistrationItem tblRegistrationItem.intID = ?];
+		my $sth = $Data->{'db'}->prepare($st);
+		$sth->execute($dref->{'intDocumentTypeID'});
+		my $data = $sth->fetchrow_hashref();
 		#check if strLockLevel is empty which means world access to the file
-    	if($dref->{'strLockAtLevel'} eq ''){
-    		$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}";
+		 if($dref->{'strLockAtLevel'} eq '' || $data->{'intUseExistingThisEntity'} || $data->{'intUseExistingAnyEntity'} || $dref->{'owner'} == $currLoginID){
+			$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}";
 		    $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
 			$deleteURL .= qq[&amp;dctid=$dref->{'intDocumentTypeID'}&amp;regoID=$dref->{'regoID'}] if($dref->{'intDocumentTypeID'});
 	      	$deleteURLButton = qq[ <a class="btn-main btn-view-replace" href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a>];
             $urlViewButton = qq[ <a class="btn-main btn-view-replace" href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a>];
-    	}
-    	else {
-    		my @authorizedLevelsArr = split(/\|/,$dref->{'strLockAtLevel'});
-    		
-    	    if(grep(/^$myCurrentValue/,@authorizedLevelsArr)){
-               	$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}";
+
+		}
+		else{
+			my @authorizedLevelsArr = split(/\|/,$dref->{'strLockAtLevel'});
+			my $ownerlevel = $obj->getValue('intEntityLevel');					
+			$deleteURLButton = qq[ <a class="HTdisabled btn-main btn-view-replace">]. $Data->{'lang'}->txt('Delete'). q[</a>]; 
+           	$urlViewButton = qq[ <a class="HTdisabled btn-main btn-view-replace">].$Data->{'lang'}->txt('View'). q[</a>];    
+			if(grep(/^$myCurrentLevelValue/,@authorizedLevelsArr) && $myCurrentLevelValue >  $ownerlevel ){
+				$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}";
 		        $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
 				$deleteURL .= qq[&amp;dctid=$dref->{'intDocumentTypeID'}&amp;regoID=$dref->{'regoID'}] if($dref->{'intDocumentTypeID'});
 	         	$deleteURLButton = qq[ <a class="btn-main btn-view-replace" href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a>];
                 $urlViewButton = qq[ <a class="btn-main btn-view-replace" href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a>];
-            }
-            else{
-            	$deleteURLButton = qq[ <a class="HTdisabled btn-main btn-view-replace">]. $Data->{'lang'}->txt('Delete'). q[</a>]; 
-            	$urlViewButton = qq[ <a class="HTdisabled btn-main btn-view-replace">].$Data->{'lang'}->txt('View'). q[</a>];          	
-            }
-    	}
-		
+			}
+			
+		}
 		push @rows, {
 			id => $dref->{'intFileID'} || 0,
 			SelectLink => ' ',
@@ -102,7 +114,7 @@ sub getUploadedFiles	{
 			Size => sprintf("%0.2f",($dref->{'intBytes'} /1024/1024)),
 			DateAdded => $dref->{'DateAdded_FMT'},
 			DB => $dref,
-		};
+		};	
 	}
 	$q->finish();
 
