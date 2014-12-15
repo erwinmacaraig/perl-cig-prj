@@ -95,17 +95,14 @@ sub handleCertificates {
     height => 700,
   );
 
+    my $addlink=qq[<a href="$Data->{'target'}?client=$client&amp;a=P_CERT_A" class = "btn-main">].$Data->{'lang'}->txt('Add Certification').qq[</a>] if(!$Data->{'ReadOnlyLogin'});
+	my $modoptions=qq[<div class="button-row pull-right">$addlink</div>];
 	$resultHTML = qq[ 
 		$grid
+        $modoptions
 	];
-	my $title='List Of Certifications';
-	my $addlink='';
-    {
-      $addlink=qq[<a href="$Data->{'target'}?client=$client&amp;a=P_CERT_A" class = "btn-main">].$Data->{'lang'}->txt('Add Certification').qq[</a>] if(!$Data->{'ReadOnlyLogin'});
+	my $title='Certifications';
 
-    }
-	my $modoptions=qq[<div class="changeoptions">$addlink</div>];
-    $title=$modoptions.$title;
  	return ($resultHTML,$title);			
 	}
 	#end else
@@ -216,7 +213,6 @@ sub handleCertificates {
    
  
   my $title = 'Person Certifications';
-  
    
    return $resultHTML,$title;
 #######################################################################################
