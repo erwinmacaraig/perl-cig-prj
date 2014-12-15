@@ -1684,3 +1684,25 @@ a.btn-main.btn-view-replace {
 a.HTdisabled, a.HTdisabled:hover {
 	background: #ccc;
 }
+
+
+.button-row ul.row-btn-complete {
+	list-style: none;
+	margin:0;
+	padding:0;
+}
+
+.button-row ul.row-btn-complete li {
+	float:left;
+	padding-right:21px;
+	display: inline;
+}
+
+.button-row ul.row-btn-complete li:last-child {
+	padding-right:0px;
+}
+
+.button-row ul.row-btn-complete li a {
+	display:block;
+	padding:15px 12px 15px 12px;
+}
