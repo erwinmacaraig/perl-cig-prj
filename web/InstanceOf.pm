@@ -123,7 +123,7 @@ sub getInstanceOf	{
 		)	{
 
             my $lastEntityID = getLastEntityID($clientValues_ref);
-			if(!$lastEntityID)	{
+			if($lastEntityID)	{
 				my $st = qq[
                     SELECT      
                         intParentID
