@@ -219,6 +219,7 @@ sub list_docs {
         width => '100%',
         
    ); 
+
    $body .= qq[
        	<div style="clear:both;">&nbsp;</div>
        	<div class="col-md-12">

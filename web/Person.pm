@@ -365,9 +365,12 @@ sub listDocuments {
     my @statusNOTIN = ($Defs::PERSONREGO_STATUS_DELETED, $Defs::PERSONREGO_STATUS_INPROGRESS);
     $RegFilters{'statusNOTIN'} = \@statusNOTIN;
     my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
-   
-	open FH, ">dumpfile.txt";
-    print FH "\n" . Dumper($Data) . "\n";
+    my $obj = getInstanceOf($Data, 'entity', $currLoginID);
+	
+	#open FH, ">dumpfile.txt";
+	#print FH "\n\nInstance of: " . Dumper($obj) . "\n\n";
+    #print FH "\n" . Dumper(@{$Reg_ref}) . "\n";
+	#print FH "\n\n intEntityLevel: " . $obj->getValue('intEntityLevel') . "\n\n";
     #does not matter how many, intPersonRegistrationID is the same all throughout
     my $pRIDRef = ${$Reg_ref}[0];
 	my $cnt = 0;
@@ -434,7 +437,7 @@ my @headers = (
 				#checks for strLockAtLevel and intUseExistingThisEntity and intUseExistingAnyEntity and Owner against Currently Logged
 			   if($regodoc->{'strLockAtLevel'} eq '' || $dref->{'intUseExistingThisEntity'} || $dref->{'intUseExistingAnyEntity'} || $registration->{'intEntityID'} == $currLoginID){	
 
-					print FH "\n\n \$registration->{'intEntityID'}:$registration->{'intEntityID'} ? \$currLoginID:$currLoginID\n";
+					#print FH "\n\n \$registration->{'intEntityID'}:$registration->{'intEntityID'} ? \$currLoginID:$currLoginID\n";
 
 					$viewLink = qq[ <a class="btn-main btn-view-replace" href="#" onclick="docViewer($regodoc->{'intFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a>];
 
@@ -444,11 +447,7 @@ my @headers = (
 				else{
 					my @authorizedLevelsArr = split(/\|/,$regodoc->{'strLockAtLevel'});
 					#check level of the owner
-					$query = qq[SELECT intEntityLevel FROM tblEntity WHERE intEntityID = ? ];
-					$sth = $db->prepare($query); 
-					$dref =  $sth->fetchrow_hashref();
-					my $ownerlevel = $dref->{'intEntityLevel'};
-					
+					my $ownerlevel = $obj->getValue('intEntityLevel');					
 					$viewLink = qq[ <button class\"HTdisabled\">]. $lang->txt('View') . q[</button>];    
                 	$replaceLink =   qq[ <button class\"HTdisabled\">]. $lang->txt('Replace File'). q[</button>];
 
@@ -471,7 +470,35 @@ my @headers = (
             		ReplaceFile => $replaceLink,
      			};
 			}
-			$grid .= qq[<div class="panel-body">].showGrid(
+
+my $addlink='';
+	    {
+      		$addlink=qq[<span class = "button-small generic-button"><a class="btn-inside-panels" href="$Data->{'target'}?client=		$client&amp;a=DOC_L">].$Data->{'lang'}->txt('Add').qq[</a></span>] if (!$Data->{'ReadOnlyLogin'});
+ 		}
+   my $query = qq[
+         SELECT strDocumentName, intDocumentTypeID FROM tblDocumentType WHERE strDocumentFor = ? AND intRealmID IN (0,?)
+    ];
+    my $sth = $db->prepare($query);
+    $sth->execute($Defs::DOC_FOR_PERSON,$Data->{'Realm'});
+    my $doclisttype = qq[  <form action="$Data->{'target'}" id="personDocAdd">
+                              <input type="hidden" name="client" value="$client" />
+                              <input type="hidden" name="a" value="DOC_L" />
+							  <input type="hidden" name="RegistrationID" value="$registration->{'intPersonRegistrationID'}" />
+                              <label>]. $lang->txt('Add File For') . qq[</label>
+                              <select name="doclisttype" id="doclisttype">
+                              <option value=""> </option>
+                       ];
+    while(my $dref = $sth->fetchrow_hashref()){
+        $doclisttype .= qq[<option value="$dref->{'intDocumentTypeID'}">$dref->{'strDocumentName'}</option>];
+    }  
+	$doclisttype .= qq[ </select>
+                        <input type="submit" class="btn-inside-panels" value="Add" />
+					</form>];
+
+	 my $modoptions=qq[<div class="changeoptions"></div>];
+
+			$grid .= qq[ $modoptions
+                      <div class="showrecoptions"> $doclisttype </div> <div class="panel-body">].showGrid(
        		  Data => $Data,
       		  columns => \@headers,
       		  rowdata => \@rowdata,
@@ -486,7 +513,12 @@ my @headers = (
 
         #$modoptions
         #$resultHTML = qq[<div class="pageHeading">Registration Documents</div>].$grid;
-        $resultHTML = qq[<div class="col-md-12">] . $grid . q[</div>];
+		
+		
+
+        $resultHTML = qq[          
+						<div class="col-md-12">$grid</div>
+					];
 
 
     return ($resultHTML,$title);
