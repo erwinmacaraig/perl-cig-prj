@@ -13,18 +13,20 @@
 	<h3 class="panel-header"><b>[% Lang.txt("Thank you") %]</b></h3>
 	<div class="panel-body">
 		<div class="reg-complete-wrapper">
-			<p class="reg-complete-text">[% Lang.txt('Registration has been submitted to') %]: <strong>[% registration.MA %]</strong> <br /><br />
-			[% Lang.txt('Once processing has taken place, the outcome will be emailed to your club and the player.') %]
+			<p class="reg-complete-text">[% Lang.txt('Registration has been submitted to') %]: <strong>[% registration.MA %]</strong><br /><br />
+             [% Lang.txt('Once processing has taken place, the outcome will be emailed to your club and the ')%][% registration.PersonType %].
 			</p>
 		</div>
 	</div>
     <div class="button-row">
-        <div style =" float:left;">
-            <a href="[% url %]/[% target %]?client=[% client %]&amp;a=WF_" class="btn-main">[% Lang.txt("Go to your Dashboard") %]</a>
-        </div>
-        <div style =" float:right;">
-        <a href="[% url %]/[% target %]?client=[% client %]&amp;a=PENDPR_" class="btn-main">[% Lang.txt("View all currently submitted registrations") %]</a>
-<a href="[% url %]/[% target %]?client=[% client %]&amp;a=PF_&amp;" class="btn-main">[% Lang.txt("Register another Person") %]</a>
-        </div>
+        <ul class="row-btn-complete">
+            <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=WF_" class="btn-main">[% Lang.txt("Go to your Dashboard") %]</a></li>
+            <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PENDPR_" class="btn-main">[% Lang.txt("View all currently submitted registrations") %]</a></li>
+            [% IF dtype %]
+                <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PF_&amp;dtype=[% dtype %]" class="btn-main">[% Lang.txt("Register another ")%][% dtypeText %]</a></li>        
+            [% ELSE %]
+                <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PF_&amp;" class="btn-main">[% Lang.txt("Register another Person") %]</a></li>        
+            [% END %]
+        </ul>
     </div>
 </div>

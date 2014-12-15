@@ -31,6 +31,8 @@ use Data::Dumper;
 use SystemConfig;
 use Countries;
 use Switch;
+use SphinxUpdate;
+use InstanceOf;
 
 
 sub handlePersonRequest {
@@ -1375,6 +1377,11 @@ sub finaliseTransfer {
        $personRequest->{'strSport'},
        $personRequest->{'intPersonID'}
     ) or query_error($st);
+    if ($personRequest->{'intPersonID'})    {
+        my $personObject = getInstanceOf($Data, 'person',$personRequest->{'intPersonID'});
+        updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
+    }
+
         #$personRequest->{'strPersonLevel'},
 }
 

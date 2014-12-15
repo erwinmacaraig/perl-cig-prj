@@ -11,6 +11,7 @@ use Defs;
 
 use PersonObj;
 use EntityObj;
+use Reg_common;
 
 sub getInstanceOf	{
 	my (
@@ -122,7 +123,7 @@ sub getInstanceOf	{
 		)	{
 
             my $lastEntityID = getLastEntityID($clientValues_ref);
-			if(!$lastEntityID)	{
+			if($lastEntityID)	{
 				my $st = qq[
                     SELECT      
                         intParentID

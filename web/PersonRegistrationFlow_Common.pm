@@ -250,6 +250,9 @@ print STDERR "000OK IS $ok | $run\n\n";
        
 	    my $personObj = getInstanceOf($Data, 'person');
 	    my $maObj = getInstanceOf($Data, 'national');
+        my $maName = $maObj
+            ? $maObj->name()
+            : '';
 		
 		my %personData = ();
         my $c = Countries::getISOCountriesHash();
@@ -270,7 +273,7 @@ print STDERR "000OK IS $ok | $run\n\n";
 		$personData{'Phone'} = $personObj->getValue('strPhoneHome') || '';
 		$personData{'Countryaddress'} = $personObj->getValue('strISOCountry') || '';
 		$personData{'Email'} = $personObj->getValue('strEmail') || '';
-		$rego_ref->{'MA'} = $maObj->name() || '';
+		$rego_ref->{'MA'} = $maName || '';
 		
 		#$personData{''} = $personObj->getValue('') || '';
 
@@ -301,6 +304,8 @@ print STDERR "000OK IS $ok | $run\n\n";
             hidden_ref=> $hidden_ref,
             Lang => $Data->{'lang'},
             url => $Defs::base_url,
+            dtype => $hidden_ref->{'dtype'} || '',
+            dtypeText => $Defs::personType{$hidden_ref->{'dtype'}} || '',
             client=>$clm,
             PersonSummaryPanel => personSummaryPanel($Data, $personObj->ID()),
         );
