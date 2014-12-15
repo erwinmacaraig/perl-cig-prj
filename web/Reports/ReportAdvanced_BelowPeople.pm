@@ -265,6 +265,22 @@ sub _getConfiguration {
                 }
             ],
 
+            intMinorProtection => [
+                'Minor Protection',
+                {
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => {
+                        1 => 'Move non-football',
+                        2 => '50km from border',
+                        3 => 'Already in Country',
+                        4 => 'Inside EU',
+                    },
+                    optiongroup     => 'details',
+                    allowgrouping   => 1
+                }
+            ],
+
             PRstrPersonType=> [
                 'Registration Role',
                 {
@@ -1648,6 +1664,7 @@ sub _getConfiguration {
               intGender
               intDeceased
               intEthnicityID
+              intMinorProtection
 
                 PRstrPersonType 
                 PRstrPersonLevel
