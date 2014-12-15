@@ -1695,7 +1695,7 @@ a.HTdisabled, a.HTdisabled:hover {
 .button-row ul.row-btn-complete li {
 	float:left;
 	display: table-cell;
-	padding-right:25px;
+	padding-right:72px;
 }
 
 .button-row ul.row-btn-complete li:last-child {

@@ -5,7 +5,7 @@ DELETE FROM tblPersonRegistration_1;
 DELETE FROM tblPersonRequest;
 DELETE FROM tblDocuments;
 DELETE FROM tblTransactions;
-DELETE FROM tblTXNLog;
+DELETE FROM tblTXNLogs;
 DELETE FROM tblTransLog;
 DELETE FROM tblPersonCertifications;
 DELETE FROM tblEntityFields;
@@ -14,3 +14,5 @@ DELETE FROM tblPlayerPassport;
 DELETE FROM tblTransLog_Retry;
 DELETE FROM tblTransLog_Counts;
 
+DELETE FROM tblWFTask;
+DELETE FROM tblAuditLog;
