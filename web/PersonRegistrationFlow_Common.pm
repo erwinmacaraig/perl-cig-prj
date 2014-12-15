@@ -304,6 +304,8 @@ print STDERR "000OK IS $ok | $run\n\n";
             hidden_ref=> $hidden_ref,
             Lang => $Data->{'lang'},
             url => $Defs::base_url,
+            dtype => $hidden_ref->{'dtype'} || '',
+            dtypeText => $Defs::personType{$hidden_ref->{'dtype'}} || '',
             client=>$clm,
             PersonSummaryPanel => personSummaryPanel($Data, $personObj->ID()),
         );
