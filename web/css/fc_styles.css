@@ -563,9 +563,10 @@ a.btn-inside-panels:hover , input.btn-inside-panels:hover, span.btn-inside-panel
 
 .alert div p {
 	display: inline-block;
-	margin: 0 20px;
+	margin: 0 10px;
 	position: relative;
-	top:-4px;
+	top:6px;
+	width:85%;
 }
 
 .alert div ul {
