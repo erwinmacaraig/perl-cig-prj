@@ -23,6 +23,7 @@ use Person;
 use EmailNotifications::PersonRequest;
 use Search::Person;
 use PersonSummaryPanel;
+use InstanceOf;
 
 use CGI qw(unescape param redirect);
 use Log;
@@ -339,24 +340,28 @@ sub listPersonRecord {
         next if ($existsInRequestingClub and ($requestType eq $Defs::PERSON_REQUEST_ACCESS));
         $found++;
         my $actionLink = undef;
+        my $btnLabel = 'Request Access';
+        $btnLabel = 'Request Transfer' if ($requestType eq $Defs::PERSON_REQUEST_TRANSFER);
         if($tdref->{'currEntityPendingRequestID'} and $tdref->{'currEntityPendingRegistrationID'}) {
             #current logged-in entity hits the same pending request
             $actionLink = qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=PRA_V&amp;rid=$tdref->{'currEntityPendingRequestID'}">]. $Data->{'lang'}->txt("View pending") . q[</a></span>];    
         }
         else {
-            $actionLink = qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=PRA_initRequest&amp;pid=$tdref->{'intPersonID'}&amp;prid=$tdref->{'intPersonRegistrationID'}&amp;request_type=$request_type&amp;transfer_type=$transferType">]. $Data->{'lang'}->txt($request_type) . q[</a></span>];
+            $actionLink = qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=PRA_initRequest&amp;pid=$tdref->{'intPersonID'}&amp;prid=$tdref->{'intPersonRegistrationID'}&amp;request_type=$request_type&amp;transfer_type=$transferType">]. $Data->{'lang'}->txt($btnLabel) . q[</a></span>];
         }
 
         push @rowdata, {
             id => $tdref->{'intPersonRegistrationID'} || 0,
             currentClub => $tdref->{'currentClub'} || '',
-            personStatus => $tdref->{'personStatus'} || '',
-            personRegoStatus => $tdref->{'personRegistrationStatus'} || '',
-            sport => $tdref->{'strSport'} || '',
             localFirstname => $tdref->{'strLocalFirstname'} || '',
             localSurname => $tdref->{'strLocalSurname'} || '',
-            personType => $tdref->{'strPersonType'} || '',
-            personLevel => $tdref->{'strPersonLevel'} || '',
+
+            personStatus => $Defs::personStatus{$tdref->{'personStatus'}} || '',
+            personRegoStatus => $Defs::personRegoStatus{$tdref->{'personRegistrationStatus'}} || '',
+
+            sport => $Defs::sportType{$tdref->{'strSport'}} || '',
+            personType => $Defs::personType{$tdref->{'strPersonType'}} || '',
+            personLevel => $Defs::personLevel{$tdref->{'strPersonLevel'}} || '',
             DOB => $tdref->{'dtDOB'} || '',
             actionLink => $actionLink,
             SelectLink => ''
@@ -909,6 +914,8 @@ sub viewRequest {
     my $personCurrAgeLevel = Person::calculateAgeLevel($Data, $personDetails->{'currentAge'});
     my $originLevel = $Data->{'clientValues'}{'authLevel'};
 
+    my $maObj = getInstanceOf($Data, 'national');
+
     my $isocountries  = getISOCountriesHash();
     my %TemplateData = (
         'requestID' => $request->{'intPersonRequestID'} || undef,
@@ -969,7 +976,7 @@ sub viewRequest {
         'contactISOCountry' => $isocountries->{$request->{'strISOCountry'}},
         'contactPhoneHome' => $request->{'strPhoneHome'},
         'contactEmail' => $request->{'strEmail'},
-        'MA' => $request->{'strRealmName'},
+        'MA' => $maObj->name(),
         PersonSummaryPanel => personSummaryPanel($Data, $request->{'intPersonID'}) || '',
     );
 

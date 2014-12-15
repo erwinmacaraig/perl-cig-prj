@@ -1327,7 +1327,7 @@ sub Navigation {
         my $current = 0;
         my $name = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'label'} || '');
         my $action = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'action'} || ''); 
-        $name .= qq[<span class="circle-check"><i class="fa fa-check"></i></span>] if ($name and $self->{'RunParams'}{$action . '_vstd'});
+        $name .= qq[<span class="circleBg"><i class="fa fa-check tab-ticked"></i></span>] if ($name and $self->{'RunParams'}{$action . '_vstd'});
 
         if($startingStep and $self->{'ProcessOrder'}[$i]{'action'} eq $startingStep)   {
             $includeStep = 1;
@@ -1335,7 +1335,6 @@ sub Navigation {
         next if !$includeStep;
         next if($self->{'ProcessOrder'}[$i]{'NoNav'});
         if($name)   {
-            print STDERR Dumper $self->{'ProcessOrder'}[$i]{'action'};
             $current = 1 if $i == $self->{'CurrentIndex'};
             push @navoptions, [
                 $name,

@@ -46,7 +46,7 @@ sub getUnique {
     my ($self) = shift;
     my ($raw) = @_;
 
-    my ($intermediateNodes, $subNodes) = $self->getIntermediateNodes();
+    my ($intermediateNodes, $subNodes) = $self->getIntermediateNodes(1);
     my $filters = $self->setupFilters($subNodes);
 
     my $realmID = $self->getData()->{'Realm'};
@@ -151,7 +151,7 @@ sub getTransfer {
     my ($self) = shift;
     my ($raw) = @_;
 
-    my ($intermediateNodes, $subNodes) = $self->getIntermediateNodes();
+    my ($intermediateNodes, $subNodes) = $self->getIntermediateNodes(0);
     my $filters = $self->setupFilters($subNodes);
 
     my $realmID = $self->getData()->{'Realm'};
@@ -288,7 +288,7 @@ sub getPersonRegistration {
 
     $self->setGridTemplate("search/grid/personregistration.templ");
 
-    my ($intermediateNodes, $subNodes) = $self->getIntermediateNodes();
+    my ($intermediateNodes, $subNodes) = $self->getIntermediateNodes(1);
     my $filters = $self->setupFilters($subNodes);
 
     my $realmID = $self->getData()->{'Realm'};
@@ -418,7 +418,7 @@ sub getPersonAccess {
 
     $self->setGridTemplate("search/grid/personregistration.templ");
 
-    my ($intermediateNodes, $subNodes) = $self->getIntermediateNodes();
+    my ($intermediateNodes, $subNodes) = $self->getIntermediateNodes(0);
     my $filters = $self->setupFilters($subNodes);
 
     my $realmID = $self->getData()->{'Realm'};

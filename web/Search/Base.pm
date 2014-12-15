@@ -222,6 +222,8 @@ sub getSearchLink  {
 
 sub getIntermediateNodes {
     my ($self) = shift;
+    my ($myLevelAndLower) = shift;
+    $myLevelAndLower ||= 0;
 
     my $currentLevel = $self->getData()->{'clientValues'}{'currentLevel'} || 0;
     my $currentID = getID($self->getData()->{'clientValues'}) || 0;
@@ -299,11 +301,21 @@ sub getIntermediateNodes {
           clubID => $clubID || 0,  
         };
     ## Added if tests to the below
-        $nodes{$nationalID || 0} = 1 if $currentLevel>=$Defs::LEVEL_NATIONAL;
-        $nodes{$stateID || 0} = 1 if $currentLevel>=$Defs::LEVEL_STATE;
-        $nodes{$regionID || 0} = 1 if $currentLevel>=$Defs::LEVEL_REGION;
-        $nodes{$zoneID || 0} = 1 if $currentLevel>=$Defs::LEVEL_ZONE;
-        $nodes{$clubID || 0} = 1 if $currentLevel>=$Defs::LEVEL_CLUB;
+    #
+        if ($myLevelAndLower)   {
+            $nodes{$nationalID || 0} = 1 if $currentLevel>=$Defs::LEVEL_NATIONAL;
+            $nodes{$stateID || 0} = 1 if $currentLevel>=$Defs::LEVEL_STATE;
+            $nodes{$regionID || 0} = 1 if $currentLevel>=$Defs::LEVEL_REGION;
+            $nodes{$zoneID || 0} = 1 if $currentLevel>=$Defs::LEVEL_ZONE;
+            $nodes{$clubID || 0} = 1 if $currentLevel>=$Defs::LEVEL_CLUB;
+        }
+        else    {
+            $nodes{$nationalID || 0} = 1;
+            $nodes{$stateID || 0} = 1;
+            $nodes{$regionID || 0} = 1;
+            $nodes{$zoneID || 0} = 1;
+            $nodes{$clubID || 0} = 1;
+        }
     }
 
     delete $nodes{0};

@@ -1587,7 +1587,7 @@ i.documents-incomplete, .documents-approved, i.tab-not-visited {
 	display:none;
 }
 
-i.documents-complete, i.memdetails-visited, i.regdetails-visited {
+i.documents-complete, i.memdetails-visited, i.regdetails-visited, i.tab-ticked {
 	color: #ffffff;
 	margin-left:4px;
 	margin-right:4px;

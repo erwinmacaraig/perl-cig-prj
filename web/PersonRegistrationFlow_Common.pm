@@ -249,12 +249,7 @@ print STDERR "000OK IS $ok | $run\n\n";
          
        
 	    my $personObj = getInstanceOf($Data, 'person');
-
-		my $query = qq[SELECT strLocalName FROM tblEntity WHERE intEntityID = $rego_ref->{'intRealmID'}];
-		my $sth = $Data->{'db'}->prepare($query);
-		$sth->execute();
-		my @arr = $sth->fetchrow_array();
-		
+	    my $maObj = getInstanceOf($Data, 'national');
 		
 		my %personData = ();
         my $c = Countries::getISOCountriesHash();
@@ -275,7 +270,7 @@ print STDERR "000OK IS $ok | $run\n\n";
 		$personData{'Phone'} = $personObj->getValue('strPhoneHome') || '';
 		$personData{'Countryaddress'} = $personObj->getValue('strISOCountry') || '';
 		$personData{'Email'} = $personObj->getValue('strEmail') || '';
-		$rego_ref->{'MA'} = $arr[0];
+		$rego_ref->{'MA'} = $maObj->name() || '';
 		
 		#$personData{''} = $personObj->getValue('') || '';
 

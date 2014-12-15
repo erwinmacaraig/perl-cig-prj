@@ -6,7 +6,7 @@ use Flow_BaseObj;
 our @ISA =qw(Flow_BaseObj);
 
 use TTTemplate;
-use CGI;
+use CGI qw(param);
 use FieldLabels;
 use PersonObj;
 use PersonUtils;
@@ -38,12 +38,17 @@ use RenewalDetails;
 sub setProcessOrder {
     my $self = shift;
   
+    my $dtype = param('dtype') || '';
+    my $typename = $Defs::personType{$dtype} || '';
+    my $regname = $typename
+        ? $typename .' Registration'
+        : 'Registration';
     $self->{'ProcessOrder'} = [       
         {
             'action' => 'cd',
             'function' => 'display_core_details',
             'label'  => 'Personal Details',
-            'title'  => 'Registration - Enter Personal Information',
+            'title'  => "$regname - Enter Personal Information",
             'fieldset'  => 'core',
             #'noRevisit' => 1,
         },
@@ -69,7 +74,7 @@ sub setProcessOrder {
             'function' => 'display_contact_details',
             'label'  => 'Contact Details',
             'fieldset'  => 'contactdetails',
-            'title'  => 'Registration - Enter Contact Information',
+            'title'  => "$regname - Enter Contact Information",
         },
         {
             'action' => 'condu',
@@ -91,7 +96,7 @@ sub setProcessOrder {
             'action' => 'r',
             'function' => 'display_registration',
             'label'  => 'Registration',
-            'title'  => 'Registration - Choose Registration Type',
+            'title'  => "$regname - Choose Registration Type",
         },
         {
             'action' => 'ru',
@@ -102,7 +107,7 @@ sub setProcessOrder {
             'function' => 'display_certifications',
             'label'  => 'Certifications',
             'fieldset'  => 'certifications',
-            'title'  => 'Registration - Enter Certifications',
+            'title'  => "$regname - Enter Certifications",
         },
         {
             'action' => 'pcert',
@@ -113,7 +118,7 @@ sub setProcessOrder {
             'action' => 'd',
             'function' => 'display_documents',
             'label'  => 'Documents',
-            'title'  => 'Registration - Upload Documents',
+            'title'  => "$regname - Upload Documents",
         },
         {
             'action' => 'du',
@@ -123,7 +128,7 @@ sub setProcessOrder {
             'action' => 'p',
             'function' => 'display_products',
             'label'  => 'License',
-            'title'  => 'Registration - Confirm License',
+            'title'  => "$regname - Confirm License",
         },
         {
             'action' => 'pu',
@@ -133,13 +138,13 @@ sub setProcessOrder {
             'action' => 'summ',
             'function' => 'display_summary',
             'label'  => 'Summary',
-            'title'  => 'Registration - Summary',
+            'title'  => "$regname - Summary",
         },
        {
             'action' => 'c',
             'function' => 'display_complete',
             'label'  => 'Complete',
-            'title'  => 'Registration - Submitted',
+            'title'  => "$regname - Submitted",
             'NoGoingBack' => 1,
         },
     ];
@@ -182,7 +187,7 @@ sub display_core_details    {
         my $txt;
 
         if($defaultType eq $Defs::PERSON_TYPE_PLAYER and $self->{'SystemConfig'}{'allowPersonRequest'}) {
-            $txt = $lang->txt('Has this person already been registered?')
+            $txt = $lang->txt('Please check that this player as not been registered with another club?')
                 .qq[ <a href = "$transfer">].$lang->txt('If yes, they need to apply for a Transfer.').'</a>'
                 .$lang->txt(' Not sure?')
                 .qq[ <a href = "$search">].$lang->txt('Then use the Search.').'</a>' ;
@@ -528,6 +533,7 @@ sub display_registration {
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
     }
+        print STDERR "$personID PERSON IS : " . $self->{'ClientValues'}{'personID'};
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
@@ -547,69 +553,150 @@ sub display_registration {
 
     my $defaultRegistrationNature = $self->{'RunParams'}{'dnat'} || '';
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
-    if($defaultRegistrationNature eq 'TRANSFER')   {
-        $noContinueButton = 0;
-        my %regFilter = (
-            'entityID' => $entityID,
-            'requestID' => $self->{'RunParams'}{'prid'},
-            #'requestID' => 12213,
-        );
-        my $request = getRequests($self->{'Data'}, \%regFilter);
-        $request = $request->[0];
+    my $entitySelectionNeeded= $self->{'RunParams'}{'es'} || 0;
+    $entitySelectionNeeded = 0 if (! $self->{'SystemConfig'}{'maFlowEntitySelect'});
+    if ($entitySelectionNeeded and ! $regoID and $originLevel > $Defs::LEVEL_CLUB and $entityLevel > $Defs::LEVEL_CLUB) {
+        $entitySelectionNeeded =1;
+        $self->addCarryField('es', 0);
+        $noContinueButton = 1;
+        my %ESN=();
+        my $nexturl = $self->{'Target'}."?";
+        $ESN{'es'} = 0;
+        $ESN{'target'} = $self->{'Target'};
+        $ESN{'url'} = $nexturl;
+        $ESN{'client'} = $client;
+        $ESN{'RealmName'} = 'Singapore Football Association';
 
-        if(!$request) {
-            push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person Request';
-            $noContinueButton = 1;
-            $content = "Person Request Details not found.";
+        my %tempClientValues = getClient($client);
+        $tempClientValues{currentLevel} = 1;
+        $tempClientValues{clubID} = 823;
+        $tempClientValues{personID} = $personID;
+        my $tempClient = setClient(\%tempClientValues);
+        %tempClientValues = getClient($tempClient);
+        print STDERR "NEW PER" . $tempClientValues{'personID'};
+
+        $ESN{'tempclient'} = $tempClient;
+
+        my $st = qq[
+            SELECT 
+                E.intEntityID as childEntityID, 
+                E.strLocalName
+            FROM
+                tblEntity as E
+                INNER JOIN tblTempEntityStructure as TE ON (
+                    TE.intChildID = E.intEntityID
+                )
+            WHERE 
+                TE.intRealmID=?
+                AND TE.intParentID = ?
+                AND E.strStatus IN ('PENDING', 'ACTIVE')
+            ORDER BY 
+                strLocalName
+        ];
+        my $q = $self->{'Data'}->{'db'}->prepare($st);
+        $q->execute(
+            $self->{'Data'}->{'Realm'},     
+            $entityID
+        );
+
+        my @Entities = ();
+        while (my $dref = $q->fetchrow_hashref())   {
+            my %tempClientValues = getClient($client);
+            $tempClientValues{currentLevel} = $Defs::LEVEL_PERSON;
+            $tempClientValues{clubID} = $dref->{'childEntityID'};
+            $tempClientValues{personID} = $personID;
+            my $tempClient = setClient(\%tempClientValues);
+            my %Entity=();
+            $Entity{'client'} = $tempClient;
+            $Entity{'entityID'} = $dref->{'childEntityID'};
+            $Entity{'localName'} = $dref->{'strLocalName'};
+            push @Entities, \%Entity;
+        }
+    use Data::Dumper;
+        print STDERR Dumper(\@Entities);
+        $ESN{'entitySelections'} = \@Entities;        
+         
+                
+        
+
+        ## Build up list of clubs
+        ## upon click change to that level (ie in client string)
+        $content = runTemplate(
+            $self->{'Data'},
+            \%ESN,
+            'registration/entityselect.templ'
+        );
+
+    }
+    else    {
+        $entitySelectionNeeded =0;
+        $self->addCarryField('es', 0);
+    }
+    if (! $entitySelectionNeeded) {
+        if($defaultRegistrationNature eq 'TRANSFER')   {
+            $noContinueButton = 0;
+            my %regFilter = (
+                'entityID' => $entityID,
+                'requestID' => $self->{'RunParams'}{'prid'},
+                #'requestID' => 12213,
+            );
+            my $request = getRequests($self->{'Data'}, \%regFilter);
+            $request = $request->[0];
+
+            if(!$request) {
+                push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person Request';
+                $noContinueButton = 1;
+                $content = "Person Request Details not found.";
+            }
+            else {
+                $request->{'personType'} = $Defs::personType{$request->{'strPersonType'}};
+                $request->{'sport'} = $Defs::sportType{$request->{'strSport'}};
+                $request->{'personLevel'} = $Defs::personLevel{$request->{'strPersonLevel'}};
+
+                $self->addCarryField('d_nature', 'TRANSFER');
+                $self->addCarryField('d_type', $request->{'strPersonType'});
+                $self->addCarryField('d_level', $request->{'strPersonLevel'});
+                $self->addCarryField('d_sport', $request->{'strSport'});
+                $self->addCarryField('d_age', $request->{'personCurrentAgeLevel'});
+
+                $content = runTemplate(
+                    $self->{'Data'},
+                    {
+                        requestSummary => $request,
+                    },
+                    'personrequest/generic/reg_summary.templ'
+                );
+            }
+        }
+        elsif($defaultRegistrationNature eq 'RENEWAL') {
+            my $rawDetails;
+            ($content, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rpID'});
+
+            if(!$content or !$rawDetails) {
+                push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt('Invalid Renewal Details');
+                $content = $lang->txt("No record found.");
+            }
+
+            $self->addCarryField('d_nature', 'RENEWAL');
+            $self->addCarryField('d_type', $rawDetails->{'strPersonType'});
+            $self->addCarryField('d_level', $rawDetails->{'strPersonLevel'});
+            $self->addCarryField('d_sport', $rawDetails->{'strSport'});
+            $self->addCarryField('d_age', $rawDetails->{'newAgeLevel'}) if $rawDetails->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER;
+            $self->addCarryField('d_role', $rawDetails->{'strPersonEntityRole'});
         }
         else {
-            $request->{'personType'} = $Defs::personType{$request->{'strPersonType'}};
-            $request->{'sport'} = $Defs::sportType{$request->{'strSport'}};
-            $request->{'personLevel'} = $Defs::personLevel{$request->{'strPersonLevel'}};
-
-            $self->addCarryField('d_nature', 'TRANSFER');
-            $self->addCarryField('d_type', $request->{'strPersonType'});
-            $self->addCarryField('d_level', $request->{'strPersonLevel'});
-            $self->addCarryField('d_sport', $request->{'strSport'});
-            $self->addCarryField('d_age', $request->{'personCurrentAgeLevel'});
-
-            $content = runTemplate(
+             $content = displayPersonRegisterWhat(
                 $self->{'Data'},
-                {
-                    requestSummary => $request,
-                },
-                'personrequest/generic/reg_summary.templ'
+                $personID,
+                $entityID,
+                $dob || '',
+                $gender || 0,
+                $originLevel,
+                $url,
+                0,
+                $regoID,
             );
         }
-    }
-    elsif($defaultRegistrationNature eq 'RENEWAL') {
-        my $rawDetails;
-        ($content, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rpID'});
-
-        if(!$content or !$rawDetails) {
-            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt('Invalid Renewal Details');
-            $content = $lang->txt("No record found.");
-        }
-
-        $self->addCarryField('d_nature', 'RENEWAL');
-        $self->addCarryField('d_type', $rawDetails->{'strPersonType'});
-        $self->addCarryField('d_level', $rawDetails->{'strPersonLevel'});
-        $self->addCarryField('d_sport', $rawDetails->{'strSport'});
-        $self->addCarryField('d_age', $rawDetails->{'newAgeLevel'}) if $rawDetails->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER;
-        $self->addCarryField('d_role', $rawDetails->{'strPersonEntityRole'});
-    }
-    else {
-         $content = displayPersonRegisterWhat(
-            $self->{'Data'},
-            $personID,
-            $entityID,
-            $dob || '',
-            $gender || 0,
-            $originLevel,
-            $url,
-            0,
-            $regoID,
-        );
     }
 
     my %PageData = (
