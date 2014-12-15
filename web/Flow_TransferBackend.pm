@@ -828,7 +828,8 @@ sub display_documents {
         FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
         Content => '',
         Title => '',
-        TextTop => $content,
+        TextTop => '',
+        Documents => $content,
         TextBottom => '',
         ContinueButtonText => $self->{'Lang'}->txt('Save & Continue'),
     );
