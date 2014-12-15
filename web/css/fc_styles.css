@@ -1689,12 +1689,13 @@ a.HTdisabled, a.HTdisabled:hover {
 	list-style: none;
 	margin:0;
 	padding:0;
+	display:table;
 }
 
 .button-row ul.row-btn-complete li {
 	float:left;
-	padding-right:21px;
-	display: inline;
+	display: table-cell;
+	padding-right:25px;
 }
 
 .button-row ul.row-btn-complete li:last-child {
@@ -1703,5 +1704,11 @@ a.HTdisabled, a.HTdisabled:hover {
 
 .button-row ul.row-btn-complete li a {
 	display:block;
-	padding:15px 12px 15px 12px;
+	width:227px;
+	height:60px;
+	padding:12px 3px 15px 3px;
+}
+
+.button-row ul.row-btn-complete li:nth-child(1) a, .button-row ul.row-btn-complete li:nth-child(3) a {
+	padding-top:20px;
 }
