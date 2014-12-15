@@ -1,4 +1,4 @@
-header, .content-section, body {
+/*header, .content-section, body {
     min-width: 1046px !important;
     
 }
@@ -7,4 +7,16 @@ header, .content-section, body {
 }
 #pageholder {
     width: 1046px !important;
+}*/
+
+
+header, .content-section, body {
+    min-width: 1170px !important;
+    
+}
+.container  {
+    width: 1170px !important;
+}
+#pageholder {
+    width: 1170px !important;
 }
