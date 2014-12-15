@@ -1556,7 +1556,7 @@ span.fa-user{
 }
 
 .document-upload.summary .details-left{
-	float: none;
+	/*float: none;*/
 }
 
 span.circleBg {
@@ -1695,6 +1695,7 @@ a.HTdisabled, a.HTdisabled:hover {
 .button-row ul.row-btn-complete li {
 	float:left;
 	display: table-cell;
+	/*padding-right:25px;*/
 	padding-right:72px;
 }
 
@@ -1711,4 +1712,18 @@ a.HTdisabled, a.HTdisabled:hover {
 
 .button-row ul.row-btn-complete li:nth-child(1) a, .button-row ul.row-btn-complete li:nth-child(3) a {
 	padding-top:20px;
+}
+
+/*summary screen labels width*/
+
+.document-upload.summary .personal-information .details-left {
+	width:40%;
+}
+
+.document-upload.summary .contact-details .details-left {
+	width:35%;
+}
+
+.document-upload.summary .registration-details .details-left {
+	width:30%;
 }

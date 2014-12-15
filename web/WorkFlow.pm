@@ -170,6 +170,7 @@ sub handleWorkflow {
         my $WFTaskID = safe_param('TID', 'number') || '';
         my $notes= safe_param('notes','words') || '';
         my $type = safe_param('type','words') || '';
+        my $regNature = safe_param('regNat','words') || '';
         my %flashMessage;
 
         ($body, $title) = updateTaskNotes( $Data );
@@ -187,11 +188,17 @@ sub handleWorkflow {
             case "$Defs::WF_TASK_ACTION_REJECT" {
                 my $actionMessage = rejectTask($Data, $emailNotification);
 
-                $flashMessage{'flash'}{'type'} = 'success';
-                $flashMessage{'flash'}{'message'} = $actionMessage;
+                if($regNature eq $Defs::REGISTRATION_NATURE_TRANSFER){
+                    $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_PR_R&TID=$WFTaskID";
+                }
+                else {
+                    $flashMessage{'flash'}{'type'} = 'success';
+                    $flashMessage{'flash'}{'message'} = $actionMessage;
 
-                setFlashMessage($Data, 'WF_U_FM', \%flashMessage);
-                $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_View&TID=$WFTaskID";
+                    setFlashMessage($Data, 'WF_U_FM', \%flashMessage);
+
+                    $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_View&TID=$WFTaskID";
+                }
                 ($body, $title) = redirectTemplate($Data);
             }
             case "$Defs::WF_TASK_ACTION_HOLD" {
@@ -205,8 +212,14 @@ sub handleWorkflow {
                     $flashMessage{'flash'}{'type'} = 'success';
                     $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt('An error has been encountered.');
                 }
-                setFlashMessage($Data, 'WF_U_FM', \%flashMessage);
-                $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_View&TID=$WFTaskID";
+
+                if($regNature eq $Defs::REGISTRATION_NATURE_TRANSFER){
+                    $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_PR_H&TID=$WFTaskID";
+                }
+                else {
+                    setFlashMessage($Data, 'WF_U_FM', \%flashMessage);
+                    $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_View&TID=$WFTaskID";
+                }
                 ($body, $title) = redirectTemplate($Data);
                 #print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_View&TID=$WFTaskID");
             }
@@ -266,6 +279,9 @@ sub handleWorkflow {
     }
     elsif ($action eq 'WF_amd') {
         ($body, $title) = addMissingDocument($Data);
+    }
+    elsif ($action eq 'WF_PR_H' or $action eq 'WF_PR_R') {
+        ($body, $title) = HoldOrRejectTaskScreen($Data, $action);
     }
 	else {
         ( $body, $title ) = listTasks( $Data );
@@ -2142,6 +2158,7 @@ sub viewTask {
 
     my $disableApprove = ($documentStatusCount->{'PENDING'} or $documentStatusCount->{'MISSING'} or $documentStatusCount->{'REJECTED'}) ? 1 : 0;
 
+    #print STDERR Dumper $dref;
     my %TaskAction = (
         'ApprovalEntityLevel' => $dref->{'ApprovalEntityLevel'},
         'WFTaskID' => $dref->{intWFTaskID} || 0,
@@ -2157,6 +2174,7 @@ sub viewTask {
         'onHold' => $dref->{'intOnHold'},
         'venueID' => ($dref->{'intEntityLevel'} == $Defs::LEVEL_VENUE) ? $dref->{'intEntityID'} : 0,
         'disableApprove' => $disableApprove,
+        'RegistrationNature' => $dref->{'strRegistrationNature'},
     );
 
     my $paymentBlock = '';
@@ -2433,6 +2451,7 @@ sub populateDocumentViewData {
 
 	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
+    #print STDERR Dumper $dref;
     my $st = qq[
         SELECT
             rd.intWFRuleDocumentID,
@@ -2481,6 +2500,8 @@ sub populateDocumentViewData {
                 AND regoItem.strSport IN ('', '$dref->{'strSport'}')
                 AND regoItem.strAgeLevel IN ('', '$dref->{'strAgeLevel'}')
                 AND regoItem.strPersonEntityRole IN ('', '$dref->{'strPersonEntityRole'}')
+                AND (regoItem.strISOCountry_IN ='' OR regoItem.strISOCountry_IN IS NULL OR regoItem.strISOCountry_IN LIKE CONCAT('%|','$dref->{'strISONationality'}','|%'))
+                AND (regoItem.strISOCountry_NOTIN ='' OR regoItem.strISOCountry_NOTIN IS NULL OR regoItem.strISOCountry_NOTIN NOT LIKE CONCAT('%|','$dref->{'strISONationality'}','|%'))
                 )
         LEFT JOIN tblRegistrationItem as entityItem
             ON (
@@ -2523,7 +2544,6 @@ sub populateDocumentViewData {
     my $count = 0;
     my %documentStatusCount;
     while(my $tdref = $q->fetchrow_hashref()) {
-
         next if exists $DocoSeen{$tdref->{'intDocumentTypeID'}};
         $DocoSeen{$tdref->{'intDocumentTypeID'}} = 1;
         #skip if no registration item matches rego details combination (type/role/sport/rego_nature etc)
@@ -3024,6 +3044,65 @@ sub viewApprovalPage {
 	#);
 
     #return ($body, "Approval status:");
+}
+
+sub HoldOrRejectTaskScreen {
+    my ($Data, $action) = @_;
+
+    my $WFTaskID = safe_param('TID','number') || '';
+    my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+
+    my $task = getTask($Data, $WFTaskID);
+
+    return (" ", "Access forbidden.") if($entityID != $task->{'intApprovalEntityID'});
+
+    my $title;
+    my $titlePrefix;
+    my $message;
+    my $body;
+    my $status;
+
+    if($task->{'strWFRuleFor'} eq "ENTITY" and $task->{'intEntityLevel'} == $Defs::LEVEL_CLUB){
+        $titlePrefix = $Defs::workTaskTypeLabel{$task->{'strRegistrationNature'} . "_CLUB"};
+    }
+    elsif($task->{'strWFRuleFor'} eq "ENTITY" and $task->{'intEntityLevel'} == $Defs::LEVEL_VENUE) {
+        $titlePrefix = $Defs::workTaskTypeLabel{$task->{'strRegistrationNature'} . "_VENUE"};
+    }
+    elsif($task->{'strWFRuleFor'} eq "REGO") {
+        $titlePrefix = $Defs::workTaskTypeLabel{$task->{'strRegistrationNature'} . "_" . $task->{'strPersonType'}};
+    }
+
+    switch($action) {
+        case "WF_PR_H" {
+            $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'On-Hold');
+            $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the transfer process.");
+            $status = $Data->{'lang'}->txt("Pending");
+        }
+        case "WF_PR_R" {
+            $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'Rejected');
+            $message = $Data->{'lang'}->txt("You have rejected this transfer, the clubs will be informed. To proceed with this transfer the clubs need to start over the process.");
+            $status = $Data->{'lang'}->txt("Rejected");
+        }
+    }
+
+    my %TemplateData = (
+        'client' => $Data->{'client'},
+        'PersonSummaryPanel' => personSummaryPanel($Data, $task->{'intPersonID'}),
+        'message' => $message,
+        'PersonDetails' => {
+            'firstname' => $task->{'strLocalFirstname'},
+            'surname' => $task->{'strLocalSurname'},
+        },
+        'status' => $status,
+    );
+
+	$body = runTemplate(
+        $Data,
+        \%TemplateData,
+        'workflow/generic/hold_reject_taskscreen.templ',
+	);
+
+    return ($body, $title);
 }
 
 sub toggleTask {
