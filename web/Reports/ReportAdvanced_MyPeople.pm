@@ -1777,8 +1777,6 @@ sub _getConfiguration {
               dtStart
               dtEnd
               ClubPaymentID
-              strUsername
-              strPassword
               strMemberRecordTypeList
               dtMemberRecordIn
               )
@@ -1822,7 +1820,6 @@ sub _getConfiguration {
             regos=> [ 'Registrations',  {} ],
             contactdetails  => [ 'Contact Details',  {} ],
             contactdetails  => [ 'Contact Details',  {} ],
-            security        => [ 'Security',         {} ],
             identifications => [ 'Identifications',  {} ],
             financial       => [ 'Financial',        {} ],
             otherfields     => [ 'Other Fields',     {} ],
@@ -1839,38 +1836,6 @@ sub _getConfiguration {
           },
 
     );
-        $config{'Fields'} = {
-            %{$config{'Fields'}},
-            strUsername => [
-                'Username',
-                {
-                    optiongroup => 'security',
-                    displaytype => 'text',
-                    fieldtype   => 'text',
-                    allowsort   => 1,
-                    dbfield     => "CONCAT('1',tblAuth.strUsername)",
-                    dbfrom =>
-                    "LEFT JOIN tblAuth ON (tblPerson.intPersonID= tblAuth.intID and tblAuth.intLevel=1)"
-                }
-            ],
-        };
-    if ($Data->{'SystemConfig'}{'AssocConfig'}{'ShowPassword'}) {
-        $config{'Fields'} = {
-            %{$config{'Fields'}},
-            strPassword => [
-                'Password',
-                {
-                    optiongroup => 'security',
-                    displaytype => 'text',
-                    fieldtype   => 'text',
-                    allowsort   => 1,
-                    dbfield     => "strPassword",
-                    dbfrom =>
-                    "LEFT JOIN tblAuth ON (tblPerson.intPersonID= tblAuth.intID and tblAuth.intLevel=1)"
-                }
-            ],
-        };
-    }
 
     $self->{'Config'} = \%config;
 }
