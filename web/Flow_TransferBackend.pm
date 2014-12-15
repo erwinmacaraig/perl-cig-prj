@@ -105,7 +105,7 @@ sub setProcessOrder {
             'action' => 'summ',
             'function' => 'display_summary',
             'label'  => 'Summary',
-            'title'  => 'Transfer - Summary',
+            'title'  => 'Summary & Submission',
         },
        {
             'action' => 'c',
@@ -1071,7 +1071,7 @@ sub display_complete {
         #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
         processStatus => 1,
         Content => '',
-        Title => $self->{'Data'}{'lang'}->txt('Transfer - Submitted'),
+        Title => $self->{'Data'}{'lang'}->txt('Transfer Submitted to MA'),
         TextTop => $content,
         TextBottom => '',
         NoContinueButton => 1,
