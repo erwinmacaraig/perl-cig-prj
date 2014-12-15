@@ -1,0 +1,21 @@
+[% USE Dumper %]
+<!--<div class="row">-->
+    <div class="col-md-3">
+        [% PersonSummaryPanel %]
+        <div class="transfer-pending">[% Lang.txt('Transfer Status:') %] [% status %]</div>
+    </div>
+    <div class="col-md-9">
+        <h3 class="panel-header">[% PersonDetails.firstname %] [% PersonDetails.surname %]</h3>
+        <div class="panel-body">
+            <label>[% message %]</label>
+            <div class="row top-bottom-spacer">
+            <div class="col-md-3"></div>
+            <div class="col-md-9">
+            </div>
+            </div>
+        </div>
+        <div class = "button-row pull-right">
+            <a href="main.cgi?client=[% client %]&amp;a=E_HOME" title="" class="btn-main">Go to your dashboard</a>
+        </div>
+    </div>
+<!--</div>-->
