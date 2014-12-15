@@ -1,0 +1,10 @@
+header, .content-section, body {
+    min-width: 1046px !important;
+    
+}
+.container  {
+    width: 1046px !important;
+}
+#pageholder {
+    width: 1046px !important;
+}
