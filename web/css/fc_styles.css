@@ -906,7 +906,7 @@ span.flash_error{
 	border-bottom: 1px solid #cbcbcb;
 }
 .sidebar-box .quick-links li{
-	padding: 10px 20px;
+	/*padding: 10px 20px;*/
 }
 .sidebar-box .quick-links li:last-child{
 	border-bottom: none;
