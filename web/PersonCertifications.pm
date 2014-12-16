@@ -108,12 +108,14 @@ sub handleCertificates {
 	#end else
 	############################################ FORM SECTION #############################
  
-    my $query = qq[SELECT intCertificationTypeID, CONCAT(strCertificationType, ' - ', strCertificationName) AS Certificates FROM tblCertificationTypes WHERE intRealmID = ? AND intActive = 1];
+    my $query = qq[SELECT intCertificationTypeID, CONCAT(strCertificationType, ' - ', strCertificationName) AS Certificates FROM tblCertificationTypes WHERE intRealmID = ? AND intActive = 1 ORDER BY strCertificationType, intDisplayOrder, strCertificationName  ];
     my $st = $Data->{'db'}->prepare($query); 
     $st->execute($Data->{'Realm'});
     my %certificateTypes = (); 
+    my @certificationTypesOrder=();
     while(my $dref = $st->fetchrow_hashref()){
     	$certificateTypes{$dref->{'intCertificationTypeID'}} = $dref->{'Certificates'}; 
+        push @certificationTypesOrder, $dref->{'intCertificationTypeID'};
     }    
 	my %FieldDefinitions=(
    	    fields=>  {
@@ -122,6 +124,7 @@ sub handleCertificates {
                 value       =>  $cert_fields->{'intCertificationTypeID'},
                 type        => 'lookup',
                 options     => \%certificateTypes,
+                order       => \@certificationTypesOrder,
                 firstoption => [ '', 'Select Certification' ],
             },
             dtValidFrom => {
@@ -356,6 +359,7 @@ sub getPersonCertificationTypes {
 
             ORDER BY
                 CT.strCertificationType,
+                CT.intDisplayOrder,
                 CT.strCertificationName
         ];
         my $query = $db->prepare($statement);
