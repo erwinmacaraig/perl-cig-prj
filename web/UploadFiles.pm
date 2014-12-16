@@ -76,7 +76,7 @@ sub getUploadedFiles	{
 	my @rows = ();
 	while(my $dref = $q->fetchrow_hashref())	{
 
-		$st = qq[SELECT intUseExistingThisEntity, intUseExistingAnyEntity FROM tblRegistrationItem tblRegistrationItem.intID = ?];
+		$st = qq[SELECT intUseExistingThisEntity, intUseExistingAnyEntity FROM tblRegistrationItem WHERE tblRegistrationItem.intID = ?];
 		my $sth = $Data->{'db'}->prepare($st);
 		$sth->execute($dref->{'intDocumentTypeID'});
 		my $data = $sth->fetchrow_hashref();
