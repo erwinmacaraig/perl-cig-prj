@@ -497,8 +497,8 @@ my $addlink='';
 					</form></div>];
 
 	 my $modoptions=qq[<div class="changeoptions"></div>];
-
-			$grid .= qq[ $modoptions
+			#
+			$grid .= qq[
                     <div class="panel-body">].showGrid(
        		  Data => $Data,
       		  columns => \@headers,
@@ -506,9 +506,8 @@ my $addlink='';
        		  gridid => "grid$registration->{'intPersonRegistrationID'}",
        		  width => '100%',
 			);
-			$grid .= qq[<br>
-                <p>].$lang->txt('Add a new document to this registration').qq[</p>
-                $doclisttype </div>];
+			$grid .= qq[<br /><br /><p>].$lang->txt('Add a new document to this registration').qq[</p>$doclisttype </div>];
+		#
 		
 	}
         my $title = $lang->txt('Registration Documents');

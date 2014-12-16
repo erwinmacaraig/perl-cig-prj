@@ -716,7 +716,7 @@ sub getRegistrationData	{
         AND (RI.strISOCountry_NOTIN ='' OR RI.strISOCountry_NOTIN IS NULL OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|$dref->{'strISONationality'}|%'))
 ];		
 
-		#print FH "Query: \n=================\n $sql \n============================================";
+
 		my $sth = $Data->{'db'}->prepare($sql);
 		$sth->execute();
 		while(my $data_ref = $sth->fetchrow_hashref()){

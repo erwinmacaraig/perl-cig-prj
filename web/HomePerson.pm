@@ -130,9 +130,6 @@ sub showPersonHome	{
 		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
 		$validdocs{$dref->{'intDocumentTypeID'}} = $dref->{'intUploadFileID'};
 	}
-open FH, ">dumpfile.txt";
-	print FH "VALID DOCS\n\n=================================================\n\n" . Dumper(@validdocsforallrego) . "=========================\n\n";
-
     my %RegFilters=();
     #$RegFilters{'current'} = 1;
     my @statusIN = ($Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE); #, $Defs::PERSONREGO_STATUS_TRANSFERRED, $Defs::PERSONREGO_STATUS_SUSPENDED);
@@ -188,17 +185,19 @@ open FH, ">dumpfile.txt";
 			
        		}
 			#####
-		
+		my $documentName = $doc->{'strDocumentName'};
+		$documentName =~ s/[\/*?:@&=+$#']/_/g;
+
 		if($fileID) {
 			$displayView = 1;
             $viewLink = qq[ <span style="position: relative"> 
 <a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$clm&amp;a=view');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];			
         }
 
-		$replaceLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="replaceFile($fileID,$doc->{'intDocumentTypeID'}, $rego->{'intPersonRegistrationID'}, $personID, '$clm', '$doc->{'strDocumentName'}', ' ');return false;">]. $Data->{'lang'}->txt('Replace') . q[</a></span>]; 
+		$replaceLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="replaceFile($fileID,$doc->{'intDocumentTypeID'}, $rego->{'intPersonRegistrationID'}, $personID, '$clm', '$documentName', ' ');return false;">]. $Data->{'lang'}->txt('Replace') . q[</a></span>]; 
 
 
-		$addLink = qq[ <a href="#" class="btn-inside-docs-panel" onclick="replaceFile(0,$doc->{'intDocumentTypeID'}, $rego->{'intPersonRegistrationID'}, $personID, '$clm','$doc->{'strDocumentName'}',' ');return false;">]. $Data->{'lang'}->txt('Add') . q[</a>] if (!$Data->{'ReadOnlyLogin'});
+		$addLink = qq[ <a href="#" class="btn-inside-docs-panel" onclick="replaceFile(0,$doc->{'intDocumentTypeID'}, $rego->{'intPersonRegistrationID'}, $personID, '$clm','$documentName',' ');return false;">]. $Data->{'lang'}->txt('Add') . q[</a>] if (!$Data->{'ReadOnlyLogin'});
 
 		#push @alldocs, { . " - $rego->{intPersonRegistrationID} "
 		push @{$rego->{'alldocs'}},{
@@ -217,8 +216,7 @@ open FH, ">dumpfile.txt";
 		} #end for looping through registration documents
 		
 
-		#push @{$rego->{'alldocs'}},\@alldocs;
-		print FH "\n\n\$rego : \n" . Dumper($rego) . "\n\n-----------------------------------------------------------";
+		
 		my $renew = '';
         $rego->{'renew_link'} = '';
         #next if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}) and $Data->{'authLevel'} != $Defs::LEVEL_NATIONAL);
@@ -262,7 +260,7 @@ open FH, ">dumpfile.txt";
 	);
 
   $Data->{'NoHeadingAd'} = 1;
-   #print FH "============\n\nAll docs: \n\n" . Dumper(@{$Reg_ref}) . "\n\n" ;
+
 	my $title = $name;
 	return ($resultHTML, '');
 }

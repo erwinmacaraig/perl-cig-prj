@@ -81,7 +81,7 @@ sub getUploadedFiles	{
 		$sth->execute($dref->{'intDocumentTypeID'});
 		my $data = $sth->fetchrow_hashref();
 		#check if strLockLevel is empty which means world access to the file
-		 if($dref->{'strLockAtLevel'} eq '' || $data->{'intUseExistingThisEntity'} || $data->{'intUseExistingAnyEntity'} || $dref->{'owner'} == $currLoginID){
+		 if($dref->{'strLockAtLevel'} eq '' || $data->{'intUseExistingThisEntity'} || $data->{'intUseExistingAnyEntity'} ||$dref->{'owner'} == $currLoginID){
 			$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}";
 		    $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
 			$deleteURL .= qq[&amp;dctid=$dref->{'intDocumentTypeID'}&amp;regoID=$dref->{'regoID'}] if($dref->{'intDocumentTypeID'});
