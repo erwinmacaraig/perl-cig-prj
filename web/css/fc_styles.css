@@ -120,10 +120,10 @@ header .utilities.notloginlevel    {
     position:fixed;
     top:0;
     z-index:2;
-    display: none;
+    /*display: none;*/
 }
 #spheader.notloginlevel{ /* No image yet, remove this once image is available for error login page */
-    display: none;
+    /*display: none;*/
 }
 
 header .utilities ul {
@@ -569,7 +569,8 @@ a.btn-inside-panels:hover , input.btn-inside-panels:hover, span.btn-inside-panel
 	display: inline-block;
 	margin: 0 10px;
 	position: relative;
-	top:6px;
+	/*top:6px;*/
+	top: -4px;
 	width:85%;
 }
 
@@ -1325,6 +1326,7 @@ header nav ul li a {
 #flowFormID {
     padding:0px;
 }
+
 .dynamic-panel  {
     padding:20px 5px 5px;
     margin: 10px 5px;
@@ -1340,6 +1342,8 @@ header nav ul li a {
 
 .button-row {
     margin-top:20px;
+    clear:both;
+
 }
 .button-row .button-right {
     float:right;
@@ -1731,6 +1735,7 @@ a.HTdisabled, a.HTdisabled:hover {
 .document-upload.summary .registration-details .details-left {
 	width:30%;
 }
+
 .toppadding {
 	margin-top: 37px;
 }
@@ -1742,4 +1747,16 @@ a.HTdisabled, a.HTdisabled:hover {
 }
 .toppadding .sidebar-box ul:last-of-type {
     padding: 0 0 0px;
+}
+
+.steps .alert {
+	margin-left: -11px;
+	margin-bottom: 0px;
+	margin-top: 20px;
+}
+
+#content .error-alerts {
+	margin-left:10px;
+	margin-right:10px;
+	padding-left:4px;
 }
