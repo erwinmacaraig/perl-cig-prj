@@ -223,21 +223,33 @@ header nav ul li:first-child a {
 header nav ul li:last-child a {
 	border-right: 1px solid #085a8c;
 }
-
+header ul#menu ul li {
+	background: none;
+}
+header ul#menu ul li a{
+	padding: .3em 1em;
+	width: 90%;
+}
+header ul#menu li.hover, ul#menu li:hover  {
+  background: none;
+}
 header nav ul li a {
 	border-left: 1px solid #085a8c;
 	color: #fff;
 	background: #004e7e;
 	padding: 20px;
 }
-
+header nav ul li.subnav ul li a {
+	background: #d8d8d8;
+	border-left: 0px;
+	color: #555;
+}
 header nav ul li a:hover {
 	background: #e3e3e3;
 	color: #000;
 	text-decoration: none;
+	width: 90%;
 }
-
-
 header nav ul li a.active {
 	background: #e3e3e3;
 	color: #000;
@@ -833,8 +845,12 @@ header nav ul#menu ul {
 }
 
 header ul#menu ul li a:hover {
+	/*
 	background-color: #085a8c;
 	color:#fff;
+	*/
+	background-color: #ccc;
+	color:#555;
 }
 
 /* Added Styles for Table in Task List Dashboard:: Vincent R; */
@@ -1738,7 +1754,7 @@ a.HTdisabled, a.HTdisabled:hover {
 }
 
 .toppadding {
-	margin-top: 37px;
+	margin-top: 38px;
 }
 .toppadding .panel-header {
 	padding: 11px 20px;
@@ -1749,7 +1765,6 @@ a.HTdisabled, a.HTdisabled:hover {
 .toppadding .sidebar-box ul:last-of-type {
     padding: 0 0 0px;
 }
-
 .steps .alert {
 	margin-left: -11px;
 	margin-bottom: 0px;
@@ -1760,4 +1775,24 @@ a.HTdisabled, a.HTdisabled:hover {
 	margin-left:10px;
 	margin-right:10px;
 	padding-left:4px;
+}
+header nav ul li a.selected {
+	background-color: #e3e3e3;
+	color: #000;
+}
+#personRequestForm input[name="search_keyword"] {
+	width: 94%;
+}
+#personRequestForm .col-md-6 .col-md-8 {
+	padding: 0px;
+}
+#personRequestForm .col-md-6 .col-md-8 .error {
+	font-size: .9em;
+}
+#personRequestForm .col-md-6 .col-md-4 {
+	padding: 0px;
+}
+.read-only .mfloat {
+	float: left; 
+	width: 100%;
 }

@@ -13,7 +13,7 @@ function toggleChevron(e) {
 
 }
 
- function checkIfDocsAllApproved() {
+function checkIfDocsAllApproved() {
     var numberOfPendingDocs = $(".totalPendingDocs").val();
     var rejectedDocsFlag = $(".rejectedDocs").val();
 
@@ -48,9 +48,41 @@ function toggleChevron(e) {
     }
     
  }
-    
+
+function menuInn(){
+    $("#menu li.subnav a").mouseover(function(){
+        $(this).attr("class", "active");
+    });
+}
+function menuOut(){
+    $("#menu li.subnav a").attr("class", "");
+}
 
 $(document).ready(function(){
+
+  //$( "#menu li.subnav a" ).mouseover(function() {
+    //alert($( "#menu li.subnav a:selected" ).text());
+  //});
+
+    //$("#menu li.subnav a.reselected").mouseout(function(){
+        //$("#menu li.subnav a").removeClass();
+    //});
+
+    $("#menu li.subnav a.menutop").mouseover(function(){
+        $("#menu li.subnav a.menutop").removeClass("selected");
+        $(this).addClass("selected");
+    });
+
+    $("#menu li.subnav ul").mouseleave(function(){
+        $("#menu li.subnav a.menutop").removeClass("selected");
+    });
+/*
+    $("#menu li.subnav ul li a").mouseenter(function() {              
+        $("#menu li.subnav a.selected").attr("class", "active selected");     
+    }).mouseleave(function () {     
+        $("#menu li.subnav a.selected").attr("class", "selected");
+    });
+*/
   findInitialAccordionPanel();
   $("#accordion").on("hidden.bs.collapse", toggleChevron);
   $("#accordion").on("show.bs.collapse", toggleChevron);
