@@ -180,7 +180,7 @@
 	</table>
 </div>
 
-<div class="col-md-3 dashboard-sidebar">
+<div class="col-md-3 dashboard-sidebar toppadding">
 	<div class="sidebar-box">
 		<h3 class="panel-header">[% Lang.txt('Task at a Glance') %]</h3>
 		<ul>
@@ -196,23 +196,6 @@
 			<li>[% Lang.txt('Total Task Rejected') %]: <b>[% IF TaskCounts.REJECTED %][% TaskCounts.REJECTED %][% ELSE %]0[% END %]</b></li>
 		</ul>
 	</div>
-    <div class="sidebar-box clearfix">
-        <h3 class="panel-header">[% Lang.txt('Quick Search') %]</h3>
-        <div class="col-md-12">
-            <div class="input-group">
-                <input class="form-control" type="text">
-                <span class="input-group-addon"><i class="fa fa-search"></i></span>
-            </div>
-            <a class="show-advanced-search">[% Lang.txt('Advanced Search') %]</a>
-            <div class="advanced-search-fields clearfix">
-                <span><input type="checkbox" value="checkbox">[% Lang.txt('Player') %]</span>
-                <span><input type="checkbox" value="checkbox">[% Lang.txt('Official') %]</span>
-                <span><input type="checkbox" value="checkbox">[% Lang.txt('Coach') %]</span>
-                <span><input type="checkbox" value="checkbox">[% Lang.txt('Pending') %]</span>
-                <span><input type="checkbox" value="checkbox">[% Lang.txt('Referee') %]</span>
-            </div>
-        </div>
-    </div>
     [% IF CurrentLevel == 3 %]
         <div class="sidebar-box">
             <h3 class="panel-header">[% Lang.txt('Quick Links') %]</h3>
@@ -236,6 +219,23 @@
             </ul>
         </div>
     [% END %]
+    <div class="sidebar-box clearfix">
+        <h3 class="panel-header">[% Lang.txt('Quick Search') %]</h3>
+        <div class="col-md-12">
+            <div class="input-group">
+                <input class="form-control" type="text">
+                <span class="input-group-addon"><i class="fa fa-search"></i></span>
+            </div>
+            <a class="show-advanced-search">[% Lang.txt('Advanced Search') %]</a>
+            <div class="advanced-search-fields clearfix">
+                <span><input type="checkbox" value="checkbox">[% Lang.txt('Player') %]</span>
+                <span><input type="checkbox" value="checkbox">[% Lang.txt('Official') %]</span>
+                <span><input type="checkbox" value="checkbox">[% Lang.txt('Coach') %]</span>
+                <span><input type="checkbox" value="checkbox">[% Lang.txt('Pending') %]</span>
+                <span><input type="checkbox" value="checkbox">[% Lang.txt('Referee') %]</span>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src = "//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>

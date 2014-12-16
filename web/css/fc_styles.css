@@ -1727,4 +1727,15 @@ a.HTdisabled, a.HTdisabled:hover {
 .document-upload.summary .registration-details .details-left {
 	width:30%;
 }
-
+.toppadding {
+	margin-top: 37px;
+}
+.toppadding .panel-header {
+	padding: 11px 20px;
+}
+.toppadding .sidebar-box ul {
+    padding: 0 0 10px;
+}
+.toppadding .sidebar-box ul:last-of-type {
+    padding: 0 0 0px;
+}
