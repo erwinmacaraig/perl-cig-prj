@@ -1780,3 +1780,19 @@ header nav ul li a.selected {
 	background-color: #e3e3e3;
 	color: #000;
 }
+#personRequestForm input[name="search_keyword"] {
+	width: 94%;
+}
+#personRequestForm .col-md-6 .col-md-8 {
+	padding: 0px;
+}
+#personRequestForm .col-md-6 .col-md-8 .error {
+	font-size: .9em;
+}
+#personRequestForm .col-md-6 .col-md-4 {
+	padding: 0px;
+}
+.read-only .mfloat {
+	float: left; 
+	width: 100%;
+}
