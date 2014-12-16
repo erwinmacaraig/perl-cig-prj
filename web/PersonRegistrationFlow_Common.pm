@@ -416,7 +416,7 @@ sub displayRegoFlowCertificates{
 		
 	my @certificates = ();
 	#SQL QUERY FOR THE DROPDOWN BOX FOR 
-	my $query = qq[SELECT intCertificationTypeID, strCertificationName FROM tblCertificationTypes WHERE strCertificationtype = ? AND intRealmID = ?];
+	my $query = qq[SELECT intCertificationTypeID, strCertificationName FROM tblCertificationTypes WHERE strCertificationtype = ? AND intRealmID = ? ORDER BY intDisplayOrder, strCertificationName];
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute($rego_ref->{'personType'},$Data->{'Realm'});
 	while(my $dref = $sth->fetchrow_hashref()){
