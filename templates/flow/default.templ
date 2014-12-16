@@ -1,10 +1,17 @@
 [% IF Navigation %]
-<div class = "col-md-12"><h2 class="main-heading">[% PageTitle %]</h2></div>
-<div class = "col-md-12 steps">[% Navigation %]</div>
+<div class = "col-md-12">
+	<h2 class="main-heading">[% PageTitle %]</h2>
+</div>
+<div class = "col-md-12 steps">
+	[% Navigation %]
+	[% TextTop %]
+</div>
 [% END %]
+
 [% Title %]
+
 [% IF Errors.size %]
-<div class="col-md-12">
+<div class="col-md-12 error-alerts">
 	<div class="alert">
 		<div>
 			<span class="fa fa-exclamation"></span>
@@ -16,28 +23,40 @@
 </div>
 [% END %]
 
+<div class="col-md-12">
+	<div class = "notavailable" style="display:none;">
+	    <div class="alert">
+	        <div>
+	            <span class="fa fa-exclamation"></span>
+	            <p>[% Lang.txt("This type of registration is not available") %]</p>
+	        </div>
+	    </div>
+	</div>
+</div>
+
 <div class="[% IF processStatus == 1 %]col-md-12[% ELSE %]col-md-9[% END %]">
-[% TextTop %]
-<form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">
-    [% IF Content %][% Content %][% END %]
-    [% IF FlowNextAction %]
-	<input type = "hidden" name ="rfp" value ="[% FlowNextAction %]">
-    [% END %]
-	[% HiddenFields %]
+[% #TextTop %]
+[% DocUploader %]
+	<form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">
+	    [% IF Content %][% Content %][% END %]
+	    [% IF FlowNextAction %]
+		<input type = "hidden" name ="rfp" value ="[% FlowNextAction %]">
+	    [% END %]
+		[% HiddenFields %]
 
-<div class = "button-row">
-	<div class="txtright">
-[% IF !NoBackButton and BackButtonURL %]
-	<a href = "[% BackButtonURL %]" id = "flow-btn-back" class = "btn-main [% IF processStatus == 1 %]nudge[% END %]">[% IF BackButtonText %][% Lang.txt(BackButtonText) %][% ELSE %][% Lang.txt('Back') %][% END %]</a>
-[% END %]
-[% IF !NoContinueButton %]
-<input id = "flow-btn-continue" type = "submit" value = " [% Lang.txt(ContinueButtonText) %] "  class = "btn-main">
-[% END %]
+		<div class = "button-row">
+			<div class="txtright">
+			[% IF !NoBackButton and BackButtonURL %]
+				<a href = "[% BackButtonURL %]" id = "flow-btn-back" class = "btn-main [% IF processStatus == 1 %]nudge[% END %]">[% IF BackButtonText %][% Lang.txt(BackButtonText) %][% ELSE %][% Lang.txt('Back') %][% END %]</a>
+			[% END %]
+			[% IF !NoContinueButton %]
+				<input id = "flow-btn-continue" type = "submit" value = " [% Lang.txt(ContinueButtonText) %] "  class = "btn-main">
+			[% END %]
+			</div>
+		</div>
+	</form>
 </div>
 
-</div>
-</form>
-</div>
 [% IF FlowSummary or FlowSummaryContent %]
 <div class="col-md-3">
     [% IF FlowSummaryContent %]
@@ -49,4 +68,5 @@
 </div>
 [% END %]
 <br/>
+
 [% TextBottom %]

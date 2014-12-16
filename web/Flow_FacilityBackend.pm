@@ -71,7 +71,7 @@ sub setProcessOrder {
             'action' => 'fld',
             'function' => 'display_fields',
             'label' => 'Fields',
-            'title'  => 'Facility - Enter Additional Informatton',
+            'title'  => 'Facility - Enter Additional Information',
         },
         {
             'action' => 'fldu',
@@ -925,8 +925,9 @@ sub display_documents {
         #FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
         #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
         Content => '',
+        DocUploader => $content,
         Title => '',
-        TextTop => $content,
+        TextTop => '',
         TextBottom => '',
     );
 
@@ -1071,10 +1072,10 @@ sub display_complete {
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         processStatus => 1,
-        Content => '',
+        Content => $displayFacilityForApproval,
         Title => '',
         #TextTop => $content,
-        TextTop => $displayFacilityForApproval,
+        TextTop => '',
         TextBottom => '',
         NoContinueButton => 1,
     );
