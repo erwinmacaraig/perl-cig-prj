@@ -1618,6 +1618,13 @@ i.documents-complete, i.memdetails-visited, i.regdetails-visited, i.tab-ticked {
 	margin-right:4px;
 }
 
+i.file-uploaded {
+	color: #1baf37;
+	margin-left:4px;
+	margin-right:4px;
+    font-size: 20px;
+}
+
 i.documents-rejected {
 	color:red;
 	margin-left:6px;
