@@ -735,7 +735,7 @@ sub getTransList {
 	];
 	$filterHTML = '' if $displayonly;
   my $cl=setClient($Data->{'clientValues'}) || '';
-        my $payment_records_link=qq[<br><br><a href="$Data->{'target'}?client=$cl&amp;a=P_TXNLog_payLIST">].$Data->{'lang'}->txt('List All Payment Records')."</a>" ;
+  my $payment_records_link=qq[<br><br><a href="$Data->{'target'}?client=$cl&amp;a=P_TXNLog_payLIST" class = "btn-main">].$Data->{'lang'}->txt('List All Payment Records')."</a>" ;
   $payment_records_link = '' if ($hide_list_payments_link);
   $grid = $grid ? qq[$grid $payment_records_link]  : qq[<p class="error">].$Data->{'lang'}->txt('No records were found with this filter').qq[</p>$payment_records_link]; 
 
@@ -844,8 +844,12 @@ sub listTransactions {
 
 
 	($tempBody, $transCount) = getTransList($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref,0,0,0);
+    my $addLink = qq[<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_ADD" class = "btn-main">].$Data->{'lang'}->txt('Add Transaction').qq[</a>];
+    $addLink = '' if $Data->{'ReadOnlyLogin'};
+    $addLink = '' if ($Data->{'clientValues'}{'currentLevel'} == $Data->{'clientValues'}{'authLevel'});
 
 	$body .= $tempBody;
+$body.=' ' .$addLink;
 
     #GET FILTER TEXT
     my $filterCriterion = '';
@@ -877,16 +881,11 @@ sub listTransactions {
     my $checked_showall   = $txnStatus == $Defs::TXN_SHOWALL   ? 'SELECTED' : '' ;
 
     my $line = '';
-    my $addLink = qq[
-        <div class="changeoptions"><a href="$Data->{'target'}?client=$client&amp;a=P_TXN_ADD" class = "btn-main">Add Transaction</a></div>
-    ];
-    $addLink = '' if $Data->{'ReadOnlyLogin'};
-    $addLink = '' if ($Data->{'clientValues'}{'currentLevel'} == $Data->{'clientValues'}{'authLevel'});
 
     my $entityNamePlural = 'Transactions';
     $entityNamePlural= ($Data->{'SystemConfig'}{'txns_link_name'}) ? $Data->{'SystemConfig'}{'txns_link_name'} : $entityNamePlural;
 
-	my $header=qq[$addLink$entityNamePlural];
+	my $header=qq[$entityNamePlural];
 
         my $targetManual = $Data->{'target'};
         my $targetOnline = 'paytry.cgi';

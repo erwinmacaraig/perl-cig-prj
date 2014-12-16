@@ -262,6 +262,7 @@ sub getTransfer {
                     dob => $dref->{'dtDOB'},
                     dtadded => $dref->{'dtadded'},
                     ma_id => $dref->{'strNationalNum'} || '',
+                    org => $dref->{'EntityName'} || '',
                 },
                 inProgressRequestExists => $dref->{'existingInProgressRequestID'},
                 acceptedRequestLink => $acceptedRequestLink,

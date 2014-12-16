@@ -108,6 +108,7 @@ sub setProcessOrder {
             'label'  => 'Certifications',
             'fieldset'  => 'certifications',
             'title'  => "$regname - Enter Certifications",
+            'NoNav' => $dtype eq 'PLAYER' ? 1 : 0,
         },
         {
             'action' => 'pcert',
@@ -1127,7 +1128,9 @@ sub display_documents {
         FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
         Content => '',
         Title => '',
-        TextTop => $content,
+        DocUploader => $content,
+        #TextTop => $content,
+        TextTop => '',
         TextBottom => '',
     );
     my $pagedata = $self->display(\%PageData);
@@ -1274,9 +1277,9 @@ sub display_summary {
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
-        Content => '',
+        Content => $content,
         Title => '',
-        TextTop => $content,
+        TextTop => '',
         TextBottom => '',
         ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
     );
@@ -1365,9 +1368,9 @@ sub display_complete {
         #FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
         #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
         processStatus => 1,
-        Content => '',
+        Content => $content,
         Title => '',
-        TextTop => $content,
+        TextTop => '',
         TextBottom => '',
         NoContinueButton => 1,
     );

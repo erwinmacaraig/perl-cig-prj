@@ -522,8 +522,9 @@ sub display_documents {
         #FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
         #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
         Content => '',
+        DocUploader => $content,
         Title => '',
-        TextTop => $content,
+        TextTop => '',
         TextBottom => '',
     );
 
@@ -622,9 +623,9 @@ sub display_summary     {
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         FlowSummaryContent => 'note: follow personSummaryPanel',
-        Content => '',
+        Content => $summaryClubContent,
         Title => '',
-        TextTop => $summaryClubContent,
+        TextTop => '',
         ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
         TextBottom => '',
     );
@@ -701,10 +702,10 @@ sub display_complete {
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         processStatus => 1,
-        Content => '',
+        Content => $displayClubForApproval,
         Title => '',
         #TextTop => $content,
-        TextTop => $displayClubForApproval,
+        TextTop => '',
         TextBottom => '',
         NoContinueButton=> 1,
     );

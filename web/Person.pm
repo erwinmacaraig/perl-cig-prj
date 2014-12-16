@@ -479,11 +479,13 @@ my $addlink='';
     ];
     my $sth = $db->prepare($query);
     $sth->execute($Defs::DOC_FOR_PERSON,$Data->{'Realm'});
-    my $doclisttype = qq[  <form action="$Data->{'target'}" id="personDocAdd">
+    my $doclisttype = qq[  
+                    <div> 
+<form action="$Data->{'target'}" id="personDocAdd">
                               <input type="hidden" name="client" value="$client" />
                               <input type="hidden" name="a" value="DOC_L" />
 							  <input type="hidden" name="RegistrationID" value="$registration->{'intPersonRegistrationID'}" />
-                              <label>]. $lang->txt('Add File For') . qq[</label>
+                              <label>]. $lang->txt('Document Type') . qq[</label>
                               <select name="doclisttype" id="doclisttype">
                               <option value=""> </option>
                        ];
@@ -492,19 +494,21 @@ my $addlink='';
     }  
 	$doclisttype .= qq[ </select>
                         <input type="submit" class="btn-inside-panels" value="Add" />
-					</form>];
+					</form></div>];
 
 	 my $modoptions=qq[<div class="changeoptions"></div>];
 
 			$grid .= qq[ $modoptions
-                      <div class="showrecoptions"> $doclisttype </div> <div class="panel-body">].showGrid(
+                    <div class="panel-body">].showGrid(
        		  Data => $Data,
       		  columns => \@headers,
       		  rowdata => \@rowdata,
        		  gridid => "grid$registration->{'intPersonRegistrationID'}",
        		  width => '100%',
 			);
-			$grid .= '</div>';	
+			$grid .= qq[<br>
+                <p>].$lang->txt('Add a new document to this registration').qq[</p>
+                $doclisttype </div>];
 		
 	}
         my $title = $lang->txt('Registration Documents');

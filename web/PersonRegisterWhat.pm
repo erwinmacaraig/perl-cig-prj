@@ -368,7 +368,7 @@ sub optionsPersonRegisterWhat {
                     return (\@retdata, '');
                 }
 
-                if(scalar(@tempAgeLevel) == 1 and $tempAgeLevel[0] eq '' and ($personType ne $Defs::PERSON_TYPE_PLAYER and $personType ne $Defs::PERSON_TYPE_REFEREE)) {
+                if(scalar(@tempAgeLevel) == 1 and $tempAgeLevel[0] eq '' and ($personType ne $Defs::PERSON_TYPE_PLAYER and $personType ne $Defs::PERSON_TYPE_REFEREE and $personType ne $Defs::PERSON_TYPE_COACH)) {
                     my @retdata;
                     push @retdata, {
                         name => $Data->{'lang'}->txt('Selection Not Required'),

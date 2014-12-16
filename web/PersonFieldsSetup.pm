@@ -452,6 +452,7 @@ sub personFieldsSetup {
                     class       => 'fcToggleGroup',
                     posttext    => $minorscript,
                     active => $allowMinorProtection,
+                    compulsoryIfVisible => 'block-minor',
                 },
                 minorBlockStart => {
                     label       => 'minorblockstart',

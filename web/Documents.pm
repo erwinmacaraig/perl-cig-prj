@@ -294,7 +294,7 @@ sub new_doc_form {
 		my $title = $l->txt('New Document');
 	my $body = qq[
         <br />
-	<div class="sectionheader">$title</div>
+	<div class="pageHeading">$title</div>
 	<br />
          	<div id="docselect">
 		<form action="$target" method="POST" enctype="multipart/form-data" class="dropzone">			
@@ -320,7 +320,7 @@ sub new_doc_form {
 			
 		</form> 
                 <br />  
-                <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=P_DOCS">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+                <span class=""><a href="$Data->{'target'}?client=$client&amp;a=P_DOCS" class = "btn-main">] . $Data->{'lang'}->txt('Continue').q[</a></span>
 		</div>
 	];
 	return $body;

@@ -230,13 +230,15 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 $row_class = 'form-space';
                 $field_html = '&nbsp;';
             }
-            if ( ( $f->{'compulsory'} or $f->{'validate'} )
+            if ( ( $f->{'compulsory'} or $f->{'validate'} or $f->{'compulsoryIfVisible'})
                 and $type ne 'hidden' )
             {
                 $clientside_validation{$fieldname}{'compulsory'} =
                   $f->{'compulsory'};
                 $clientside_validation{$fieldname}{'validate'} =
                   $f->{'validate'};
+                $clientside_validation{$fieldname}{'compulsoryIfVisible'} =
+                  $f->{'compulsoryIfVisible'};
             }
             $label = qq[$label] if $label;
         }
@@ -1103,6 +1105,11 @@ sub generate_clientside_validation {
             $valinfo{'messages'}{ $field_prefix . $k }{'required'} =
               $self->langlookup( 'Field required' );
         }
+        if ( $validation->{$k}{'compulsoryIfVisible'} ) {
+            $valinfo{'rules'}{ $field_prefix . $k }{'required'} = qq[JAVASCRIPTfunction(element){if(jQuery('#].$validation->{$k}{'compulsoryIfVisible'}.qq[').is(SINGLEQUOTE:visibleSINGLEQUOTE)){return true;} return false;}JAVASCRIPT];
+            $valinfo{'messages'}{ $field_prefix . $k }{'required'} =
+              $self->langlookup( 'Field required' );
+        }
         if ( $validation->{$k}{'validate'} ) {
             for my $t ( split /\s*,\s*/, $validation->{$k}{'validate'} ) {
                 my ($param) = $t =~ /:(.*)/;
@@ -1159,9 +1166,12 @@ sub generate_clientside_validation {
     };
     if ( $val_rules and $val_rules ne '{}' ) {
 
-        $val_rules =~ s/"true"/true/g;
-        $val_rules =~ s/"false"/false/g;
+        $val_rules =~ s/['"]true['"]/true/g;
+        $val_rules =~ s/["']false['"]/false/g;
         $val_rules =~ s/}$//;
+        $val_rules =~ s/JAVASCRIPT['"]//g;
+        $val_rules =~ s/['"]JAVASCRIPT//g;
+        $val_rules =~ s/SINGLEQUOTE/'/g;
         $val_rules .= qq~
             ,
             ignore: ".ignore",

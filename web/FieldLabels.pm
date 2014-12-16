@@ -16,7 +16,7 @@ sub getFieldLabels	{
 	my %labels=();
 	return \%labels if(!$Data or !$level);
 
-	my $CustomFieldNames=CustomFields::getCustomFieldNames($Data);
+	my $customFieldNames=CustomFields::getCustomFieldNames($Data);
     my $natnumname=$Data->{'SystemConfig'}{'NationalNumName'} || 'National Number';
 
 	if($level== $Defs::LEVEL_PERSON)	{
@@ -111,6 +111,52 @@ sub getFieldLabels	{
             dtOtherPersonIdentifierValidDateTo => $Data->{'SystemConfig'}{'dtOtherPersonIdentifierValidDateTo_Text'} ? $Data->{'SystemConfig'}{'dtOtherPersonIdentifierValidDateTo_Text'} : 'Other Identifier Validity Date To',
             strOtherPersonIdentifierDesc => $Data->{'SystemConfig'}{'strOtherPersonIdentifierDesc_Text'} ? $Data->{'SystemConfig'}{'strOtherPersonIdentifierDesc_Text'} : 'Other Identifier Description',
             intOtherPersonIdentifierTypeID=> $Data->{'SystemConfig'}{'intOtherPersonIdentifierTypeID_Text'} ? $Data->{'SystemConfig'}{'intOtherPersonIdentifierTypeID_Text'} : 'Other Identifier Type',
+            strNatCustomStr1 => $customFieldNames->{'strNatCustomStr1'} || '',
+            strNatCustomStr2 => $customFieldNames->{'strNatCustomStr2'} || '',
+            strNatCustomStr3 => $customFieldNames->{'strNatCustomStr3'} || '',
+            strNatCustomStr4 => $customFieldNames->{'strNatCustomStr4'} || '',
+            strNatCustomStr5 => $customFieldNames->{'strNatCustomStr5'} || '',
+            strNatCustomStr6 => $customFieldNames->{'strNatCustomStr6'} || '',
+            strNatCustomStr7 => $customFieldNames->{'strNatCustomStr7'} || '',
+            strNatCustomStr8 => $customFieldNames->{'strNatCustomStr8'} || '',
+            strNatCustomStr9 => $customFieldNames->{'strNatCustomStr9'} || '',
+            strNatCustomStr10 => $customFieldNames->{'strNatCustomStr10'} || '',
+            strNatCustomStr11 => $customFieldNames->{'strNatCustomStr11'} || '',
+            strNatCustomStr12 => $customFieldNames->{'strNatCustomStr12'} || '',
+            strNatCustomStr13 => $customFieldNames->{'strNatCustomStr13'} || '',
+            strNatCustomStr14 => $customFieldNames->{'strNatCustomStr14'} || '',
+            strNatCustomStr15 => $customFieldNames->{'strNatCustomStr15'} || '',
+            dblNatCustomDbl1 => $customFieldNames->{'dblNatCustomDbl1'} || '',
+            dblNatCustomDbl2 => $customFieldNames->{'dblNatCustomDbl2'} || '',
+            dblNatCustomDbl3 => $customFieldNames->{'dblNatCustomDbl3'} || '',
+            dblNatCustomDbl4 => $customFieldNames->{'dblNatCustomDbl4'} || '',
+            dblNatCustomDbl5 => $customFieldNames->{'dblNatCustomDbl5'} || '',
+            dblNatCustomDbl6 => $customFieldNames->{'dblNatCustomDbl6'} || '',
+            dblNatCustomDbl7 => $customFieldNames->{'dblNatCustomDbl7'} || '',
+            dblNatCustomDbl8 => $customFieldNames->{'dblNatCustomDbl8'} || '',
+            dblNatCustomDbl9 => $customFieldNames->{'dblNatCustomDbl9'} || '',
+            dblNatCustomDbl10 => $customFieldNames->{'dblNatCustomDbl10'} || '',
+            dtNatCustomDt1 => $customFieldNames->{'dtNatCustomDt1'} || '',
+            dtNatCustomDt2 => $customFieldNames->{'dtNatCustomDt2'} || '',
+            dtNatCustomDt3 => $customFieldNames->{'dtNatCustomDt3'} || '',
+            dtNatCustomDt4 => $customFieldNames->{'dtNatCustomDt4'} || '',
+            dtNatCustomDt5 => $customFieldNames->{'dtNatCustomDt5'} || '',
+            intNatCustomBool1 => $customFieldNames->{'intNatCustomBool1'} || '',
+            intNatCustomBool2 => $customFieldNames->{'intNatCustomBool2'} || '',
+            intNatCustomBool3 => $customFieldNames->{'intNatCustomBool3'} || '',
+            intNatCustomBool4 => $customFieldNames->{'intNatCustomBool4'} || '',
+            intNatCustomBool5 => $customFieldNames->{'intNatCustomBool5'} || '',
+            intNatCustomLU1 => $customFieldNames->{'intNatCustomLU1'} || '',
+            intNatCustomLU2 => $customFieldNames->{'intNatCustomLU2'} || '',
+            intNatCustomLU3 => $customFieldNames->{'intNatCustomLU3'} || '',
+            intNatCustomLU4 => $customFieldNames->{'intNatCustomLU4'} || '',
+            intNatCustomLU5 => $customFieldNames->{'intNatCustomLU5'} || '',
+            intNatCustomLU6 => $customFieldNames->{'intNatCustomLU6'} || '',
+            intNatCustomLU7 => $customFieldNames->{'intNatCustomLU7'} || '',
+            intNatCustomLU8 => $customFieldNames->{'intNatCustomLU8'} || '',
+            intNatCustomLU9 => $customFieldNames->{'intNatCustomLU9'} || '',
+            intNatCustomLU10 => $customFieldNames->{'intNatCustomLU10'} || '',
+
              
             
 		);

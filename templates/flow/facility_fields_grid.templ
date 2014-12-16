@@ -1,29 +1,32 @@
 [% USE Dumper %]
+<h3 class="panel-header">[% Lang.txt('Fields') %]</h3>
+<div class="panel-body">
+    <table id="ffg_venue" class="table" cellpadding="0" style="width: 100%">
+        <thead>
+        <tr>
+            <td></th>
+            <td>[% Lang.txt('Field Number') %]</td>
+            <td>[% Lang.txt('Field Name') %]</td>
+            <td>[% Lang.txt('Discipline') %]</td>
+            <td>[% Lang.txt('Type of Field') %]</td>
+            <td>[% Lang.txt('Length of Field') %]</td>
+            <td>[% Lang.txt('Width of Field') %]</td>
+            <td>[% Lang.txt('Capacity of Field') %]</td>
+        </tr>
+        </thead>
+        [% COUNT = 0 %]
+        [% FOREACH fieldRow IN FieldElements %]
+        <tr>
+            <td>[% fieldRow.intEntityFieldID %][% COUNT = COUNT + 1 %][% COUNT %]</td>
+            <td>[% fieldRow.intFieldOrderNumber %]</td>
+            <td>[% fieldRow.strName %]</td>
+            <td>[% fieldRow.strDiscipline %]</td>
+            <td>[% fieldRow.strGroundNature %]</td>
+            <td>[% fieldRow.dblLength %]</td>
+            <td>[% fieldRow.dblWidth %]</td>
+            <td>[% fieldRow.intCapacity %]</td>
+        </tr>
+        [% END %]
+    </table>
 
-<table id="ffg_venue" class="table" cellpadding="0" style="width: 100%">
-    <thead>
-    <tr>
-        <td></th>
-        <td>Field Number</td>
-        <td>Field Name</td>
-        <td>Discipline</td>
-        <td>Type of Field</td>
-        <td>Length of Field</td>
-        <td>Width of Field</td>
-        <td>Capacity of Field</td>
-    </tr>
-    </thead>
-    [% COUNT = 0 %]
-    [% FOREACH fieldRow IN FieldElements %]
-    <tr>
-        <td>[% fieldRow.intEntityFieldID %][% COUNT = COUNT + 1 %][% COUNT %]</td>
-        <td>[% fieldRow.intFieldOrderNumber %]</td>
-        <td>[% fieldRow.strName %]</td>
-        <td>[% fieldRow.strDiscipline %]</td>
-        <td>[% fieldRow.strGroundNature %]</td>
-        <td>[% fieldRow.dblLength %]</td>
-        <td>[% fieldRow.dblWidth %]</td>
-        <td>[% fieldRow.intCapacity %]</td>
-    </tr>
-    [% END %]
-</table>
+</div>
