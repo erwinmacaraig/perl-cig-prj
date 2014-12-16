@@ -8,6 +8,8 @@
 .lblPeoplelookup { position:relative;left:20px; }
 .btnPeoplelookupSearch { position:relative;right:-62px; }
 .footer-section { height: 70px; }
+.paddingTop8 { padding-top: 8px; }
+.paddingBottom8 { padding-bottom: 8px; }
 
 
 .form-signin input[type="text"] {
