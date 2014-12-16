@@ -7,6 +7,7 @@
 .inline li { display: inline-block; }
 .lblPeoplelookup { position:relative;left:20px; }
 .btnPeoplelookupSearch { position:relative;right:-62px; }
+.footer-section { height: 70px; }
 
 
 .form-signin input[type="text"] {
@@ -114,6 +115,9 @@ li.peoplelookup input[type="text"] {
 .form-signin .form-signin-heading,
 .form-signin .checkbox {
   margin-bottom: 10px;
+}
+.form-signin-heading {
+  text-align: center;
 }
 .form-signin .checkbox {
   font-weight: normal;
