@@ -277,7 +277,6 @@ print STDERR "000OK IS $ok | $run\n\n";
 		
 		#$personData{''} = $personObj->getValue('') || '';
 
-
  		my $languages = PersonLanguages::getPersonLanguages( $Data, 1, 0);
 		for my $l ( @{$languages} ) {
 			if($l->{intLanguageID} == $personObj->getValue('intLocalLanguage')){
@@ -293,6 +292,11 @@ print STDERR "000OK IS $ok | $run\n\n";
        $cv{'currentLevel'} = $Defs::LEVEL_CLUB;
        my $clm = setClient(\%cv);
 
+
+       $cv{'entityID'} = $maObj->getValue('intEntityID');
+       $cv{'currentLevel'} = $Defs::LEVEL_NATIONAL;
+       my $mlm = setClient(\%cv);
+
         my %PageData = (
             person_home_url => $url,
 			person => \%personData,
@@ -307,6 +311,8 @@ print STDERR "000OK IS $ok | $run\n\n";
             dtype => $hidden_ref->{'dtype'} || '',
             dtypeText => $Defs::personType{$hidden_ref->{'dtype'}} || '',
             client=>$clm,
+            maclient => $mlm,
+            originLevel => $originLevel,
             PersonSummaryPanel => personSummaryPanel($Data, $personObj->ID()),
         );
         
