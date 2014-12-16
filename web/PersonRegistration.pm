@@ -26,6 +26,7 @@ use Data::Dumper;
 use Person;
 use PersonRegisterWhat;
 use AuditLog;
+use Reg_common;
 
 sub cleanPlayerPersonRegistrations  {
 
@@ -510,7 +511,9 @@ sub updatePersonRegistration    {
 
 sub getRegistrationData	{
 	my ( $Data, $personID, $regFilters_ref)=@_;
-	
+	my $client = $Data->{'client'} || '';
+    my %clientValues = getClient($client);
+	my $myCurrentLevelValue = $clientValues{'authLevel'};
     my @values = (
         $personID,
     );
@@ -652,7 +655,7 @@ sub getRegistrationData	{
 
     $query->execute(@values) or query_error($st);
     my $count=0;
-	#open FH, ">dumpfile.txt";
+	open FH, ">dumpfile.txt";
     my @Registrations = ();
     my @reg_docs = ();  
     while(my $dref= $query->fetchrow_hashref()) {
@@ -670,6 +673,50 @@ sub getRegistrationData	{
 			INNER JOIN tblPersonRegistration_$Data->{'Realm'} as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID 
 			WHERE pr.intPersonRegistrationID = $dref->{intPersonRegistrationID} AND pr.intPersonID = $personID 
 		];
+
+		$sql = qq[
+		SELECT
+	    t.strApprovalStatus,
+		D.intDocumentTypeID,
+	    t.intUploadFileID,
+	    t.strOrigFilename,
+	    t.DateUploaded,
+	    t.intPersonRegistrationID,
+	    D.strDocumentName,			
+	    RI.intID,
+            RI.intRequired,
+            RI.intUseExistingThisEntity,
+            RI.intUseExistingAnyEntity,
+	    D.strLockAtLevel            
+        FROM
+			tblRegistrationItem as RI				
+			LEFT JOIN tblDocumentType as D ON (intDocumentTypeID = RI.intID and strItemType='DOCUMENT')
+			LEFT JOIN (
+				SELECT intDocumentTypeID, strApprovalStatus, intUploadFileID, strOrigFilename, dtUploaded as DateUploaded,
+				pr.intPersonRegistrationID FROM tblDocuments 
+				INNER JOIN tblUploadedFiles  ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID 
+				INNER JOIN tblPersonRegistration_$Data->{'Realm'}  as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID 
+				WHERE pr.intPersonID = $personID
+				AND pr.intPersonRegistrationID = $dref->{intPersonRegistrationID}
+			) as t ON t.intDocumentTypeID = RI.intID 
+        WHERE
+            RI.intRealmID = $Data->{'Realm'}
+            AND RI.intSubRealmID IN (0, $dref->{'intSubRealmID'})
+            AND RI.strRuleFor = 'REGO'
+            AND RI.intOriginLevel = $dref->{'intOriginLevel'}
+	    AND RI.strRegistrationNature = '$dref->{'strRegistrationNature'}'
+            AND RI.intEntityLevel IN (0, $myCurrentLevelValue)
+	    AND RI.strPersonType IN ('', '$dref->{'strPersonType'}') 
+	    AND RI.strPersonLevel IN ('', '$dref->{'strPersonLevel'}')
+        AND RI.strPersonEntityRole IN ('', '')
+	    AND RI.strSport IN ('', '$dref->{'strSport'}')
+	    AND RI.strAgeLevel IN ('', '$dref->{'strAgeLevel'}')  
+        AND RI.strItemType = 'DOCUMENT' 
+        AND (RI.strISOCountry_IN ='' OR RI.strISOCountry_IN IS NULL OR RI.strISOCountry_IN LIKE CONCAT('%|$dref->{'strISONationality'}|%'))
+        AND (RI.strISOCountry_NOTIN ='' OR RI.strISOCountry_NOTIN IS NULL OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|$dref->{'strISONationality'}|%'))
+];		
+
+		#print FH "Query: \n=================\n $sql \n============================================";
 		my $sth = $Data->{'db'}->prepare($sql);
 		$sth->execute();
 		while(my $data_ref = $sth->fetchrow_hashref()){
@@ -680,7 +727,7 @@ sub getRegistrationData	{
 
 		
     }
-
+	
     return ($count, \@Registrations);
 }
 

@@ -116,6 +116,7 @@ sub main	{
     # BUILD PAGE
     my $TemplateData = $dref;
     #$TemplateData->{'showButtons'} = $action eq 'review' ? ($dref->{'strApprovalStatus'} eq 'PENDING' ? 1 : 0 ) : 0;
+	$TemplateData->{'showButtons'} = $action eq 'view' ? 0 : 1;
 	$TemplateData->{'showRejectButton'} = $dref->{'strApprovalStatus'} ne 'REJECTED' ? 1 : 0;
 	$TemplateData->{'showApproveButton'} = $dref->{'strApprovalStatus'} ne 'APPROVED' ? 1 : 0;
 	$TemplateData->{'client'} = $client;

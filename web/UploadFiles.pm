@@ -46,7 +46,7 @@ sub getUploadedFiles	{
 	my $st = qq[
 	SELECT *, tblPersonRegistration_$Data->{'Realm'}.intEntityID AS owner, DATE_FORMAT(dtUploaded,"%d/%m/%Y %H:%i") AS DateAdded_FMT, tblDocuments.intDocumentTypeID,tblDocuments.intPersonRegistrationID as regoID, tblDocumentType.strLockAtLevel
     FROM  tblUploadedFiles AS UF LEFT JOIN tblDocuments ON UF.intFileID = tblDocuments.intUploadFileID 
-	LEFT JOIN tblPersonRegistration_$Data->{'Realm'} On tblPersonRegistration_1.intPersonRegistrationID = tblDocuments.intPersonRegistrationID LEFT JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
+	LEFT JOIN tblPersonRegistration_$Data->{'Realm'} On tblPersonRegistration_$Data->{'Realm'}.intPersonRegistrationID = tblDocuments.intPersonRegistrationID LEFT JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
 	WHERE UF.intEntityTypeID = ? AND UF.intEntityID = ? AND UF.intFileType = ?
 	];
 	
