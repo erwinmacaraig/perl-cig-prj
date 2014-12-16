@@ -586,23 +586,50 @@ sub displayRegoFlowDocuments{
 	my @required_docs_listing = ();
 	my @optional_docs_listing = ();	
 	my @validdocsforallrego = ();
-	$query = qq[SELECT tblDocuments.intDocumentTypeID FROM tblDocuments INNER JOIN tblDocumentType
-				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
-				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
-				WHERE strApprovalStatus = 'APPROVED' AND intPersonID = ? AND 
-				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
-				GROUP BY intDocumentTypeID];
+	$query = qq[
+        SELECT
+        tblDocuments.intDocumentTypeID as ID,
+        tblRegistrationItem.intUseExistingThisEntity as UseExistingThisEntity,
+        tblRegistrationItem.intUseExistingAnyEntity as UseExistingAnyEntity,
+        tblUploadedFiles.strOrigFilename,
+        tblUploadedFiles.intFileID,
+        tblUploadedFiles.intAddedByTypeID as AddedByTypeID,
+        tblDocumentType.strDocumentName as Name,
+        tblDocumentType.strDescription as Description
+
+        FROM tblDocuments
+        INNER JOIN tblDocumentType
+            ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
+        INNER JOIN tblRegistrationItem 
+            ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
+        INNER JOIN tblUploadedFiles
+            ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID 
+        WHERE strApprovalStatus = 'APPROVED'
+        AND intPersonID = ?
+        AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+        GROUP BY tblDocuments.intDocumentTypeID
+    ];
+
 	$sth = $Data->{'db'}->prepare($query);
 	$sth->execute($personID);
+
+    my %existingDocuments;
 	while(my $dref = $sth->fetchrow_hashref()){
-		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
+        if(! exists $existingDocuments{$dref->{'ID'}}){
+            $existingDocuments{$dref->{'ID'}} = $dref;
+        }
 	}
 
 	foreach my $dc (@diff){   
 		if($dc->{'Required'}){
 			#check here 
-			next if( grep /$dc->{'ID'}/,@validdocsforallrego);
-			push @required_docs_listing, $dc;
+            #next if( grep /$dc->{'ID'}/,@validdocsforallrego);
+            if(defined $existingDocuments{$dc->{'ID'}}){
+			    push @required_docs_listing, $existingDocuments{$dc->{'ID'}};
+            }
+            else {
+			    push @required_docs_listing, $dc;
+            }
 		}  	
 		else {
 			push @optional_docs_listing,$dc;
@@ -610,6 +637,7 @@ sub displayRegoFlowDocuments{
     	
     }
 
+    print STDERR Dumper @required_docs_listing;
     #if (! scalar @required_docs_listing and ! scalar @optional_docs_listing)  {
      #   return '';
     #}
