@@ -120,6 +120,10 @@ header .utilities.notloginlevel    {
     position:fixed;
     top:0;
     z-index:2;
+    display: none;
+}
+#spheader.notloginlevel{ /* No image yet, remove this once image is available for error login page */
+    display: none;
 }
 
 header .utilities ul {
