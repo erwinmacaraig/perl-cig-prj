@@ -17,9 +17,9 @@
                 <tr>
                     <td><div class="member-data"> [% note.ParentNoteType %] </div></td>
                     <td><div class="member-data"> [% note.ParentNote %] </div></td>
-                    <td><div class="member-data"> [% note.ParentTimeStamp %] </div></td>
+                    <td><div class="member-data"> [% DateFormat.TZformat(note.ParentTimeStamp,'MEDIUM','SHORT' %] </div></td>
                     <td><div class="member-data"> [% note.ChildNote %] </div></td>
-                    <td><div class="member-data"> [% note.ChildTimeStamp %] </div></td>
+                    <td><div class="member-data"> [% DateFormat.TZformat(note.ChildTimeStamp,'MEDIUM','SHORT' %] </div></td>
                 [% END %]
             </table>
         </div>
