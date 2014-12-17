@@ -71,13 +71,13 @@ sub list_entity_docs{
     while(my $dref = $sth->fetchrow_hashref()){
     	#check if strLockLevel is empty which means world access to the file
     	if($dref->{'strLockAtLevel'} eq ''){
-    		$viewLink = qq[ <span class="btn-inside-panels"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}" target="_blank">]. $lang->txt('Get File') . q[</a></span>];
+    		$viewLink = qq[ <span class="btn-inside-panels"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}&amp;client=$client" target="_blank">]. $lang->txt('Get File') . q[</a></span>];
     		$replaceLink =   qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a></span>];     		 
     	}
     	else {
     	    my @authorizedLevelsArr = split(/\|/,$dref->{'strLockAtLevel'});
     	    if(grep(/^$myCurrentValue/,@authorizedLevelsArr)){
-               	$viewLink = qq[ <span class="btn-inside-panels"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}" target="_blank">]. $lang->txt('Get File') . q[</a></span>];    
+               	$viewLink = qq[ <span class="btn-inside-panels"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}&amp;client=$client" target="_blank">]. $lang->txt('Get File') . q[</a></span>];    
                 $replaceLink =   qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a></span>];
             }
             else{

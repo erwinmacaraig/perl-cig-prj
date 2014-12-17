@@ -25,8 +25,13 @@ sub main {
   my %Data=();
   $fileID =~ /^(\d+)$/;
   $fileID = $1;	
-                                                                                                        
-  my $db = connectDB();
+  #my $db = connectDB();
+
+  my %clientValues = getClient($client);
+  $Data{'clientValues'} = \%clientValues;
+  $Data{'cache'}  = new MCache();
+  my $db=allowedTo(\%Data);
+
   my $statement=qq[
 	SELECT *
 	FROM tblUploadedFiles
