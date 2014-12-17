@@ -1853,7 +1853,7 @@ header nav ul li a.selected {
 }
 
 .playermenu li.current {
-	padding:11px 20px 10px 25px;
+	padding:11px 16px 10px 25px;
 	background: #078b3c;
 }
 
@@ -1883,6 +1883,10 @@ header nav ul li a.selected {
 	content:"\f00c";
 	display: inline-block;
 	font: normal normal normal normal 14px/1 FontAwesome;
+	font-family: FontAwesome;
+	font-style:  normal;
+	font-weight: normal;
+	line-height: 1;
 	text-rendering:auto;
 	-webkit-font-smoothing: antialiased;
 	padding: 3px 3px;
