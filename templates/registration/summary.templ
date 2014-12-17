@@ -9,7 +9,7 @@
 					    	<li><span class="details-left">[% Lang.txt("Family Name") %]:</span> <span class="detail-value">[% IF person.Familyname %] [% person.Familyname %] [% ELSE %] - [% END %]</span></li>
 					    	<li><span class="details-left">[% Lang.txt("First Name") %]:</span> <span class="detail-value">[% IF person.Name %] [% person.Name %] [% ELSE %] - [% END %]</span></li>
 					    	<li><span class="details-left">[% Lang.txt("Language of name") %]:</span> <span class="detail-value">[% IF person.Language %] [% person.Language %] [% ELSE %] - [% END %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Date of Birth") %]:</span> <span class="detail-value">[% IF person.DOB %] [% person.DOB %] [% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Date of Birth") %]:</span> <span class="detail-value">[% IF person.DOB %] [% DateFormat.format(person.DOB,'MEDIUM') %] [% ELSE %] - [% END %]</span></li>
 					    	<li><span class="details-left">[% Lang.txt("Gender") %]:</span> <span class="detail-value">[% IF person.Gender %] [% person.Gender %] [% ELSE %] - [% END %]</span></li>
 					    	<li><span class="details-left">[% Lang.txt("Nationality") %]:</span> <span class="detail-value">[% IF person.Nationality %] [% person.Nationality %] [% ELSE %] - [% END %]</span></li>
 					    	<li><span class="details-left">[% Lang.txt("Country of Birth") %]:</span> <span class="detail-value">[% IF person.Country %] [% person.Country %] [% ELSE %] - [% END %]</span></li>

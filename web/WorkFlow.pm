@@ -316,7 +316,7 @@ sub listTasks {
             pr.strSport,
             pr.strPersonType,
             t.strRegistrationNature,
-            DATE_FORMAT(t.tTimeStamp,'%d %b %Y') AS taskDate,
+            t.tTimeStamp AS taskDate,
             UNIX_TIMESTAMP(t.tTimeStamp) AS taskTimeStamp,
             dt.strDocumentName,
             p.intSystemStatus,

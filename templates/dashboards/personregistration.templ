@@ -249,14 +249,14 @@
                             [% IF entity.dtFrom and entity.dtFrom != '0000-00-00' %]
                                 <span class="details-row">
                                     <span class="details-left">[% Lang.txt('Valid From') %]:</span>
-                                    <span class="details-left detail-value">[% entity.dtFrom %]</span>
+                                    <span class="details-left detail-value">[% DateFormat.format(entity.dtFrom,'MEDIUM') %]</span>
                                 </span>
                             [% END %]
 
                             [% IF entity.dtTo and entity.dtTo != '0000-00-00' %]
                                 <span class="details-row">
                                     <span class="details-left">[% Lang.txt('Valid To') %]:</span>
-                                    <span class="details-left detail-value">[% entity.dtTo %]</span>
+                                    <span class="details-left detail-value">[% DateFormat.format(entity.dtTo,'MEDIUM') %]</span>
                                 </span>
                             [% END %]
 

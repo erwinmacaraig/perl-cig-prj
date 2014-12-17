@@ -52,12 +52,12 @@
                             <br/>
                             <span class="details-row">
                                 <span class="details-left">[% Lang.txt("Registration Date from") %]:</span>
-                                <span class="details-left detail-value">[% PersonRegoDetails.DateFrom %]</span>
+                                <span class="details-left detail-value">[% DateFormat.format(PersonRegoDetails.DateFrom,'MEDIUM') %]</span>
                             </span>
                             <br/>
                             <span class="details-row">
                                 <span class="details-left">[% Lang.txt("Registration Date to") %]:</span>
-                                <span class="details-left detail-value">[% PersonRegoDetails.DateTo %]</span>
+                                <span class="details-left detail-value">[% DateFormat.format(PersonRegoDetails.DateTo,'MEDIUM') %]</span>
                             </span>
                             <br/>
                             <span class="details-row">
@@ -105,7 +105,7 @@
                     [% IF PersonDetails.DOB %]
                         <span class="details-row">
                           <span class="details-left">[% Lang.txt('Date of Birth') %]:</span>
-                          <span class="details-left detail-value">[% PersonDetails.DOB %]</span>
+                          <span class="details-left detail-value">[% DateFormat.format(PersonDetails.DOB,'MEDIUM') %]</span>
                         </span>
                     [% END %]
 
@@ -126,7 +126,7 @@
                     [% IF PersonDetails.DateSuspendedUntil != '' %]
                         <span class="details-row">
                           <span class="details-left">[% Lang.txt('Suspended Until') %]:</span>
-                          <span class="details-left detail-value">[% PersonDetails.DateSuspendedUntil %]</span>
+                          <span class="details-left detail-value">[% DateFormat.format(PersonDetails.DateSuspendedUntil,'MEDIUM') %]</span>
                         </span>
                     [% END %]
 

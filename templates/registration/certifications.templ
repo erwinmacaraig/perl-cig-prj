@@ -11,8 +11,8 @@
         <tr>
           <td>[% c.strCertificationName %]</td>
           <td>[% c.Status %]</td>
-          <td>[% c.dtValidFrom_Formatted %]</td>
-          <td>[% c.dtValidUntil_Formatted  %]</td>
+          <td>[% DateFormat.format(c.dtValidFrom,'MEDIUM') %]</td>
+          <td>[% DateFormat.format(c.dtValidUntil,'MEDIUM') %]</td>
         </tr>
     [% END %]
 </table>
