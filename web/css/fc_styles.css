@@ -1820,3 +1820,7 @@ header nav ul li a.selected {
 	float: left;
 	width: 100%;
 }
+.showrecoptions form #doclisttype {
+	padding: 9px;
+    width: 67%;
+}

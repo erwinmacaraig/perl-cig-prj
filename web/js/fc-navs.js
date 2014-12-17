@@ -51,6 +51,12 @@ $(document).ready(function(){
       $("header nav ul li.subnav a:contains(Clubs)").addClass("active")
 
     }
+    
+    else if (param == "EE_D") {
+
+      $("header nav ul li a:contains(My Club)").addClass("active")
+
+    }
 
     else if (param == "VENUE_L" || param == "VENUE_DTA") {
       
