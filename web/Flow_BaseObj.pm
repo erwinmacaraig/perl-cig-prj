@@ -133,7 +133,7 @@ sub Navigation {
                 ? qq[<a href="$linkURL" class = "stepname">$step. $name</a>]
                 : qq[<span class = "stepname">$step. $name</span>];
             
-			$navstring .= qq[ <li class = "step step-$step"><span class="$currentclass step-num">$link</li> ];
+			$navstring .= qq[ <li class = "$currentclass step step-$step"><span class="$currentclass step-num">$link</li> ];
             $step_in_future = 2 if $current;
             $step++;
         }
