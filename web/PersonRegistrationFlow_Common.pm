@@ -184,8 +184,7 @@ sub displayRegoFlowSummary {
             $body .= displayPaymentResult($Data, $id, 1, '');
         }
     }
-	open FH, ">dumpfile.txt";
-	print FH "\n\n\nRegistration Reference displayRegoFlowSummary: \n" . Dumper(%{$rego_ref}) . "\n";
+	
     return $body;
 }
     
