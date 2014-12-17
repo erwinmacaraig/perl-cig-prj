@@ -39,7 +39,9 @@
 							<input type="hidden" name="rID" value="[% regoID %]" />
 							<input type="hidden" name="doctypeID" value="[% doc.ID %]" />
 							<input type="hidden" name="a" value="[% nextaction %]" />
-						
+							[% IF doc.intFileID %]
+							<input type="hidden" name="f" value="[% doc.intFileID %]" />
+							[% END %]
 							[% FOREACH h IN hidden_ref %]
 							
 							<input type="hidden" name="[% h.key %]" value="[% h.value %]" />							
@@ -99,6 +101,14 @@
 							
 							<p><strong>Description: </strong>
 								[% doc.Description %]
+							</p>
+						
+							[% END %]
+
+							[% IF doc.strOrigFilename != '' %]
+							
+							<p>
+								<a href="#" onclick="docViewer([% doc.intFileID %], 'client=[% client %]&amp;a=view'); return false;">[% doc.strOrigFilename %]</a>
 							</p>
 						
 							[% END %]

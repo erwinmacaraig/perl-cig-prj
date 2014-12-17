@@ -84,7 +84,7 @@ sub displayRegoFlowSummary {
 
     my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref, $carryString) = @_;
     my $lang=$Data->{'lang'};
-
+	
     my $ok = 0;
     if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER') {
         $ok=1;
@@ -184,6 +184,8 @@ sub displayRegoFlowSummary {
             $body .= displayPaymentResult($Data, $id, 1, '');
         }
     }
+	open FH, ">dumpfile.txt";
+	print FH "\n\n\nRegistration Reference displayRegoFlowSummary: \n" . Dumper(%{$rego_ref}) . "\n";
     return $body;
 }
     
