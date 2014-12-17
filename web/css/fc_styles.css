@@ -1845,6 +1845,10 @@ header nav ul li a.selected {
 	width:185px;
 }
 
+.fiveStepWidth {
+	width:220px;
+}
+
 .playermenu li {
 	display:table-cell;
 	/*width:155px;*/
@@ -1932,25 +1936,14 @@ header nav ul li a.selected {
 	left:125px;
 }
 
-#doctab1 .documents-list table.table .task-list .status-col span {
-	float: left;
-	width: 50%;
-}
-#doctab1 .documents-list table.table .task-list .status-col i span {
-	float: left;
-	width: 100%;
-}
-#doctab1 .documents-list table.table .task-list .status-col i.fa-circle {
-	float: left;
-}
-#doctab1 .documents-list table.table .task-list .status-col a.btn-inside-docs-panel {
-	width: 95px;
-}
 
 .playermenu li.eightStepWidth.previous:after {
 	left:125px;
 }
 
+.playermenu li.fiveStepWidth.previous:after {
+	left:200px;
+}
 
 
 li.eightStepWidth.previous {
@@ -1977,4 +1970,19 @@ li:last-child.sevenStepWidth {
 li:last-child.eightStepWidth {
 	width:12.4%;
 
+}
+
+#doctab1 .documents-list table.table .task-list .status-col span {
+	float: left;
+	width: 50%;
+}
+#doctab1 .documents-list table.table .task-list .status-col i span {
+	float: left;
+	width: 100%;
+}
+#doctab1 .documents-list table.table .task-list .status-col i.fa-circle {
+	float: left;
+}
+#doctab1 .documents-list table.table .task-list .status-col a.btn-inside-docs-panel {
+	width: 95px;
 }
