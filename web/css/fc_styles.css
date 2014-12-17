@@ -1816,3 +1816,7 @@ header nav ul li a.selected {
 #grid_wrapper #grid {
 	width: 100%!important;
 }
+#flowFormID .form-group .col-md-6 .toggle-type {
+	float: left;
+	width: 100%;
+}
