@@ -32,7 +32,7 @@
 	<table id="worktasks" cellpadding="5" width="100%">
 		<thead>
 			<tr class="box-header">
-				<th>[% Lang.txt('Tasklist') %] [% IF TaskCounts.newTasks %]<span style="color: red">[% TaskCounts.newTasks %]</span>[% END %]</th>
+				<th>[% Lang.txt('Tasklist') %] [% IF TaskCounts.newTasks %]<div class="taskListCounter">[% TaskCounts.newTasks %]</div>[% END %]</th>
 				<th>[% Lang.txt('Started') %]</th>
 				<th>[% Lang.txt('Status') %]</th>
 				<th>[% Lang.txt('Actions') %]</th>
