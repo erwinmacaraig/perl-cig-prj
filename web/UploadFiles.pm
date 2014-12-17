@@ -292,12 +292,26 @@ sub _processUploadFile_single	{
         }
         else {
         	 $doc_st = qq[
-        		UPDATE tblDocuments SET intUploadFileID = ?, dtLastUpdated = NOW(), strApprovalStatus = ? WHERE intUploadFileID = ? AND intPersonID = ?
+        		UPDATE tblDocuments SET intUploadFileID = ?, dtLastUpdated = NOW(), strApprovalStatus = ? WHERE intUploadFileID = ? AND intPersonID = ?			
         	]; 
+
+			my $chkSQL = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem INNER JOIN tblDocumentType ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID INNER JOIN tblDocuments ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intUploadFileID = $oldFileId AND (intUseExistingThisEntity = 1 OR intUseExistingAnyEntity = 1)] ;		
+			my $newstat = 'PENDING';
+			$doc_q = $Data->{'db'}->prepare($chkSQL);
+			$doc_q->execute();
+			my $exists = $doc_q->fetchrow_hashref();
+			if($exists->{'tot'} > 0){
+				 $newstat = 'APPROVED';
+			}
+			
+			$doc_q->finish();
+
+			
+
         	$doc_q = $Data->{'db'}->prepare($doc_st); 
         	$doc_q->execute(
               $fileID,    
-			  'PENDING',          
+			  $newstat,          
               $oldFileId,
               $intPersonID, 
         );
