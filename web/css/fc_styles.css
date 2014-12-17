@@ -1945,7 +1945,7 @@ header nav ul li a.selected {
 }
 #doctab1 .documents-list table.table .task-list .status-col a.btn-inside-docs-panel {
 	width: 95px;
-=======
+}
 
 .playermenu li.eightStepWidth.previous:after {
 	left:125px;
@@ -1955,6 +1955,10 @@ header nav ul li a.selected {
 
 li.eightStepWidth.previous {
 	padding:11px 20px 10px 22px;
+}
+
+li.eightStepWidth.current {
+	padding:11px 14px 10px 23px;
 }
 
 li.sevenStepWidth.previous {
@@ -1972,5 +1976,5 @@ li:last-child.sevenStepWidth {
 
 li:last-child.eightStepWidth {
 	width:12.4%;
->>>>>>> Stashed changes
+
 }
