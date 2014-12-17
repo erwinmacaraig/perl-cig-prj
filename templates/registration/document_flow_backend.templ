@@ -39,7 +39,7 @@
 							<input type="hidden" name="rID" value="[% regoID %]" />
 							<input type="hidden" name="doctypeID" value="[% doc.ID %]" />
 							<input type="hidden" name="a" value="[% nextaction %]" />
-							[% IF doc.intFileID %]
+							[% IF doc.intFileID && nature == 'NEW' %]
 							<input type="hidden" name="f" value="[% doc.intFileID %]" />
 							[% END %]
 							[% FOREACH h IN hidden_ref %]

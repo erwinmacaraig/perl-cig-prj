@@ -685,6 +685,7 @@ sub displayRegoFlowDocuments{
         regoID => $regoID,
         NoFormFields =>$noFormFields,
 		url => $Defs::base_url,
+		nature => $rego_ref->{'strRegistrationNature'},
   );  
  my $pagedata = runTemplate($Data, \%PageData, 'registration/document_flow_backend.templ') || '';
 
