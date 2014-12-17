@@ -106,6 +106,13 @@ li.peoplelookup input[type="text"] {
   width: 300px;
 }
 
+.totalFont {
+   text-align: right;
+}
+.totalValue {
+    font-size: 16px !important;
+}
+
 
 
 /***** BOOTSTRAP STYLES *****/
