@@ -378,7 +378,7 @@ sub listDocuments {
 	my $viewLink;
     my $replaceLink;
 
-	my @rowdata = ();
+	
 	my $fileLink = "#";
 	my $grid = '';
 my @headers = (
@@ -413,14 +413,12 @@ my @headers = (
       			  },
    			 ];
 			
-
 	foreach my $registration (@{$Reg_ref}){
 		$cnt++;
-		#print FH "\nRegistration Data $cnt: \n" . Dumper($registration) . "\n----------------------------------------------";
-		#get the documents here
-		
+		my @rowdata = ();
+		#get the documents here		
 		$grid .= qq[<br /><h3 class="panel-header">$registration->{'PersonType'} - $registration->{'Sport'} - $registration->{'PersonLevel'} ] . $lang->txt('for') . qq[ $registration->{'strNationalPeriodName'} ] . $lang->txt('in') . qq[ $registration->{'strLocalName'}</h3>];
-
+			
 			#loop over rego documents
 			foreach my $regodoc (@{$registration->{'documents'}}){
 				next if(!$regodoc->{'intUploadFileID'});
@@ -429,16 +427,13 @@ my @headers = (
                                tblDocumentType ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID INNER JOIN
 							   tblDocuments ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE 
 							   tblDocuments.strApprovalStatus = 'APPROVED' AND intPersonRegistrationID = ? AND 	
-							   tblDocumentType.intDocumentTypeID = ? AND tblDocuments.intPersonID = ?];
+							   tblDocumentType.intDocumentTypeID = ? AND tblDocuments.intPersonID = ? ];
 
 			   my $sth = $db->prepare($query); 
                $sth->execute($regodoc->{'intPersonRegistrationID'}, $regodoc->{'intDocumentTypeID'},$personID);
 			   my $dref = $sth->fetchrow_hashref(); 
 				#checks for strLockAtLevel and intUseExistingThisEntity and intUseExistingAnyEntity and Owner against Currently Logged
 			   if($regodoc->{'strLockAtLevel'} eq '' || $dref->{'intUseExistingThisEntity'} || $dref->{'intUseExistingAnyEntity'} || $registration->{'intEntityID'} == $currLoginID){	
-
-					#print FH "\n\n \$registration->{'intEntityID'}:$registration->{'intEntityID'} ? \$currLoginID:$currLoginID\n";
-
 					$viewLink = qq[ <a class="btn-main btn-view-replace" href="#" onclick="docViewer($regodoc->{'intUploadFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a>];
 
     				$replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intUploadFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a>];	
@@ -508,6 +503,7 @@ my $addlink='';
 			);
 			$grid .= qq[<br /><br /><p>].$lang->txt('Add a new document to this registration').qq[</p>$doclisttype </div>];
 		#
+		print FH "\n===============================================END====================================\n";
 		
 	}
         my $title = $lang->txt('Registration Documents');
