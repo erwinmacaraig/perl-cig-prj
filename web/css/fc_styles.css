@@ -1029,7 +1029,7 @@ i.indicator {
 
 /** menu **/
 #content .steps {
-	margin: 20px 10px;
+	/*margin: 20px 10px;*/
 }
 .playermenu li {
 	list-style-type: none;
@@ -1776,8 +1776,8 @@ a.HTdisabled, a.HTdisabled:hover {
     padding: 0 0 0px;
 }
 .steps .alert {
-	margin-left: -11px;
-	margin-bottom: 0px;
+	/*margin-left: -11px;*/
+	margin-bottom: 20px;
 	margin-top: 20px;
 }
 
@@ -1828,15 +1828,17 @@ header nav ul li a.selected {
 }
 
 .list-inline {
-	margin-left:-9px;
+	/*margin-left:-9px;*/
+	margin-left:0px;
 }
 
 .sevenStepWidth {
-	width:164px;
+	width:159px;
 }
 
 .eightStepWidth {
-	width:141px;
+	width:139px;
+	/*width:141px;*/
 }
 
 .sixStepWidth {
@@ -1853,7 +1855,7 @@ header nav ul li a.selected {
 }
 
 .playermenu li.current {
-	padding:11px 16px 10px 25px;
+	padding:11px 16px 10px 23px;
 	background: #078b3c;
 }
 
@@ -1869,7 +1871,7 @@ header nav ul li a.selected {
 
 
 .playermenu li.next {
-	padding:11px 20px 10px 25px;
+	padding:11px 16px 10px 25px;
 	background: #fff;
 }
 
@@ -1918,17 +1920,18 @@ header nav ul li a.selected {
 	left:160px;
 }
 
-.playermenu li.sevenStepWidth.previous:after {
+.playermenu li:last-child.sixStepWidth.current:after {
 	left:145px;
 }
 
-.playermenu li:last-child.sixStepWidth.current:after {
+.playermenu li.sevenStepWidth.previous:after {
 	left:145px;
 }
 
 .playermenu li:last-child.sevenStepWidth.current:after {
 	left:125px;
 }
+<<<<<<< Updated upstream
 #doctab1 .documents-list table.table .task-list .status-col span {
 	float: left;
 	width: 50%;
@@ -1942,4 +1945,32 @@ header nav ul li a.selected {
 }
 #doctab1 .documents-list table.table .task-list .status-col a.btn-inside-docs-panel {
 	width: 95px;
+=======
+
+.playermenu li.eightStepWidth.previous:after {
+	left:125px;
+}
+
+
+
+li.eightStepWidth.previous {
+	padding:11px 20px 10px 22px;
+}
+
+li.sevenStepWidth.previous {
+	padding:11px 20px 10px 20px;
+}
+
+li.sevenStepWidth.current {
+	padding:11px 14px 10px 23px;
+}
+
+
+li:last-child.sevenStepWidth {
+	width:14.1%;
+}
+
+li:last-child.eightStepWidth {
+	width:12.4%;
+>>>>>>> Stashed changes
 }
