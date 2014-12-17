@@ -247,6 +247,9 @@ sub personFieldsSetup {
                     validate    => 'DATE,LESSTHAN:'.$today,
                     compulsory => 1,
                     sectionname => 'core',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
+
                     #noedit      => 1,
                 },
                 strISONationality => {
@@ -335,6 +338,8 @@ sub personFieldsSetup {
                     format      => 'dd/mm/yyyy',
                     validate    => 'DATE',
                     sectionname => 'other',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
         		},
         		dtBirthCertValidityDateTo => {
         			label       => $FieldLabels->{'dtValidUntil'},
@@ -344,6 +349,8 @@ sub personFieldsSetup {
                     format      => 'dd/mm/yyyy',
                     validate    => 'DATE',
                     sectionname => 'other',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
         		},
         		strBirthCertDesc => {
         			label => $FieldLabels->{'strDescription'},
@@ -389,6 +396,8 @@ sub personFieldsSetup {
                     minyear => '1980',
                     maxyear => (localtime)[5] + 1900 + 15,
                     sectionname => 'other',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
                 },
                 strOtherPersonIdentifier => {
                 	label => $FieldLabels->{'strOtherPersonIdentifier'},
@@ -415,6 +424,8 @@ sub personFieldsSetup {
                     format      => 'dd/mm/yyyy',
                     validate    => 'DATE',
                     sectionname => 'other',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
                 },
                 dtOtherPersonIdentifierValidDateTo => {
                 	label => $FieldLabels->{'dtValidUntil'},
@@ -424,6 +435,8 @@ sub personFieldsSetup {
                     format      => 'dd/mm/yyyy',
                     validate    => 'DATE',
                     sectionname => 'other',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
                 },
                 strOtherPersonIdentifierDesc => {
                 	label => $FieldLabels->{'strDescription'},
@@ -774,6 +787,8 @@ sub personFieldsSetup {
                     type        => 'date',
                     format      => 'yyyy-mm-dd',
                     validate    => 'DATE',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
                 },                
                 dtValidUntil => {
                     label       => $FieldLabels->{'dtValidUntil'},
@@ -781,6 +796,8 @@ sub personFieldsSetup {
                     type        => 'date',
                     format      => 'yyyy-mm-dd',
                     validate    => 'DATE',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
                 },
                 strDescription => {
                     label       => $FieldLabels->{'strDescription'},
@@ -788,6 +805,8 @@ sub personFieldsSetup {
                     type        => 'text',
                     size        => '30',
                     maxsize     => '100',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
                 },
             },
             'order' => [qw(
