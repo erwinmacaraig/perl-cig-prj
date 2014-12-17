@@ -163,6 +163,8 @@ sub clubFieldsSetup {
                     maxyear     => (localtime)[5] + 1900,
                     compulsory => 1,
                     sectionname => 'core',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
                 },
                 dissolved => {
                     label       => $FieldLabels->{'dissolved'},
@@ -181,6 +183,8 @@ sub clubFieldsSetup {
                     maxyear     => (localtime)[5] + 1900,
                     readonly    => $dissDateReadOnly,
                     sectionname => 'core',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
                 },
                 strCity         => {
                     label       => $FieldLabels->{'strCity'},
@@ -578,6 +582,8 @@ sub entityFieldsSetup {
                     maxyear     => (localtime)[5] + 1900,
                     compulsory => 1,
                     sectionname => 'core',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
                 },
                 dissolved => {
                     label       => $FieldLabels->{'dissolved'},
@@ -596,6 +602,8 @@ sub entityFieldsSetup {
                     maxyear     => (localtime)[5] + 1900,
                     readonly    => $dissDateReadOnly,
                     sectionname => 'core',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
                 },
                 strCity         => {
                     label       => $FieldLabels->{'strCity'},

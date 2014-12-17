@@ -254,6 +254,14 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 $field_html =
                   $self->langlookup( $f->{'displaylookup'}{$val} );
             }
+            elsif ( $f->{'displayFunction'} ) {
+                my @p = ();
+                if( $f->{'displayFunctionParams'} ) {
+                   @p =  @{$f->{'displayFunctionParams'}};
+                }
+                unshift @p, $val;
+                $field_html = $f->{'displayFunction'}->(@p);
+            }
             else {
                 $val =~ s/\n/<br>/g;
                 $val = '' if $val eq '00/00/00';
@@ -751,19 +759,6 @@ sub _fix_date {
     if    ( $yyyy < 10 )  { $yyyy += 2000; }
     elsif ( $yyyy < 100 ) { $yyyy += 1900; }
     return "$yyyy-$mm-$dd";
-}
-
-sub run_function {
-    my $self = shift;
-    my ( $params, $functiontype, $query ) = @_;
-    if ( $self->{'Fields'}->{'options'}{ $functiontype . 'Function' } ) {
-        my @params = ();
-        push @params, $query->{mysql_insertid} || 0 if $query;
-        push @params, $params;
-        push @params, @{ $self->{'Fields'}->{'options'}{ $functiontype . 'Params' } }
-          if $self->{'Fields'}->{'options'}{ $functiontype . 'Params' };
-        $self->{'Fields'}->{'options'}{ $functiontype . 'Function' }->(@params);
-    }
 }
 
 sub check_valid_date {
