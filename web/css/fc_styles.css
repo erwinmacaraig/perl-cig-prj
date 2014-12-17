@@ -1991,3 +1991,9 @@ li:last-child.eightStepWidth {
 #doctab1 .documents-list table.table .task-list .status-col a.btn-inside-docs-panel {
 	width: 95px;
 }
+
+.transferCompleteDisplay {
+	background:none!important;
+	padding:0!important;
+	border:none!important;
+}
