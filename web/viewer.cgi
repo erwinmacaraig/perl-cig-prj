@@ -16,6 +16,7 @@ use TTTemplate;
 use InstanceOf;
 use Countries;
 use PersonSummaryPanel;
+use Localisation;
 
 main();	
 
@@ -56,6 +57,7 @@ sub main	{
 
   $Data{'DataAccess'}=$DataAccess_ref;
 
+    initLocalisation(\%Data);
   my $resultHTML = '';
   if($fileID)   {
 
