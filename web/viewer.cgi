@@ -1,12 +1,8 @@
 #!/usr/bin/perl 
 
-#
-# $Header: svn://svn/SWM/trunk/web/lookupmanage.cgi 10133 2013-12-03 04:08:21Z tcourt $
-#
-
 use strict;
 use warnings;
-use CGI qw(param);
+use CGI qw(param escape);
 use lib "..",".","PaymentSplit","RegoFormBuilder";
 use Defs;
 use Reg_common;
@@ -98,6 +94,7 @@ sub main	{
         );
         $dref->{'doctype'} = $types{$extension} || 'file';
         $dref->{'fileURL'} = 'viewfile.cgi?client='.$client.'&amp;f=' . $dref->{'intFileID'};
+        $dref->{'fileURLescape'} = escape($Defs::base_url.'/viewfile.cgi?client='.$client.'&amp;f=' . $dref->{'intFileID'});
     }
 
     if($dref->{'intEntityTypeID'} == 1)  {
