@@ -103,6 +103,11 @@ jQuery(document).ready(function()  {
     thisfield.value = defaulttext;
     }
   }
+
+  //To Move to JS File
+  if(jQuery(".error.login-error-page").length){
+    jQuery(".utilities.clearfix.notloginlevel, #spheader").attr("style","display:none;");
+  }
 });
 </script>
 <style>
@@ -113,7 +118,10 @@ jQuery(document).ready(function()  {
 /*      height: 32px;*/
 	    background: url("images/global_nav_sprite.png") repeat-x scroll 0 0 transparent;
 }
-
+#content .error p{
+  margin-top: 20px;
+  color: #ff0000;
+}
 #globalnav {
 	    /*background: url("images/global_nav_sprite.png") repeat-x scroll 0 -33px transparent;*/
         /*float: left;*/

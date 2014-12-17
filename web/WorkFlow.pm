@@ -2598,13 +2598,19 @@ sub populateDocumentViewData {
         $cv{'personID'} = $targetID;
        $cv{'currentLevel'} = $level;
        my $clm = setClient(\%cv);
-		$replaceLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="replaceFile($fileID,$tdref->{'intDocumentTypeID'}, $registrationID, $targetID, '$clm', '$tdref->{'strDocumentName'}', '$tdref->{'descr'}');return false;">]. $Data->{'lang'}->txt('Replace') . q[</a></span>]; 
+
+        my $docDesc = $tdref->{'descr'};
+        $docDesc =~ s/'/\\\'/g;
+
+        my $docName = $tdref->{'strDocumentName'};
+        $docName =~ s/'/\\\'/g;
+		$replaceLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="replaceFile($fileID,$tdref->{'intDocumentTypeID'}, $registrationID, $targetID, '$clm', '$docName', '$docDesc');return false;">]. $Data->{'lang'}->txt('Replace') . q[</a></span>]; 
 
 
 
         #$addLink = qq[ <a class="btn-inside-docs-panel" href="$Defs::base_url/main.cgi?client=$Data->{'client'}&amp;a=WF_amd&amp;RegistrationID=$registrationID&amp;trgtid=$targetID&amp;doclisttype=$tdref->{'intDocumentTypeID'}&amp;level=$level" target="_blank">]. $Data->{'lang'}->txt('Add') . q[</a>] if (!$Data->{'ReadOnlyLogin'});
 
-		$addLink = qq[ <a href="#" class="btn-inside-docs-panel" onclick="replaceFile(0,$tdref->{'intDocumentTypeID'}, $registrationID, $targetID, '$clm','$tdref->{'strDocumentName'}','$tdref->{'descr'}');return false;">]. $Data->{'lang'}->txt('Add') . q[</a>] if (!$Data->{'ReadOnlyLogin'});
+		$addLink = qq[ <a href="#" class="btn-inside-docs-panel" onclick="replaceFile(0,$tdref->{'intDocumentTypeID'}, $registrationID, $targetID, '$clm','$docName','$docDesc');return false;">]. $Data->{'lang'}->txt('Add') . q[</a>] if (!$Data->{'ReadOnlyLogin'});
 
         if($tdref->{'intAllowProblemResolutionEntityAdd'} == 1) {
             if(!$tdref->{'intDocumentID'}){

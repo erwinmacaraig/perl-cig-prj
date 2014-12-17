@@ -60,14 +60,6 @@ function menuOut(){
 
 $(document).ready(function(){
 
-  //$( "#menu li.subnav a" ).mouseover(function() {
-    //alert($( "#menu li.subnav a:selected" ).text());
-  //});
-
-    //$("#menu li.subnav a.reselected").mouseout(function(){
-        //$("#menu li.subnav a").removeClass();
-    //});
-
     $("#menu li.subnav a.menutop").mouseover(function(){
         $("#menu li.subnav a.menutop").removeClass("selected");
         $(this).addClass("selected");
@@ -76,13 +68,7 @@ $(document).ready(function(){
     $("#menu li.subnav ul").mouseleave(function(){
         $("#menu li.subnav a.menutop").removeClass("selected");
     });
-/*
-    $("#menu li.subnav ul li a").mouseenter(function() {              
-        $("#menu li.subnav a.selected").attr("class", "active selected");     
-    }).mouseleave(function () {     
-        $("#menu li.subnav a.selected").attr("class", "selected");
-    });
-*/
+
   findInitialAccordionPanel();
   $("#accordion").on("hidden.bs.collapse", toggleChevron);
   $("#accordion").on("show.bs.collapse", toggleChevron);
@@ -124,7 +110,7 @@ $(document).ready(function(){
     
     //this is a temporary fix for the last two steps - documents and complete
     $(".document-upload").insertAfter($("fieldset").first());
-     
+
      $(document).on("change", "input.paytxn_chk", function(){
         if(this.checked){
           $('#payment_manual').show();
@@ -214,4 +200,13 @@ $(document).ready(function(){
     
     checkIfDocsAllApproved();
 
+});
+$(window).bind("load", function() {
+    $('#l_strISOCountry').insertAfter($("#l_strISOCountry_chosen"));
+    $('#l_strISOCountryOfBirth').insertAfter($("#l_strISOCountryOfBirth_chosen"));
+    $('#l_strISONationality').insertAfter($("#l_strISONationality_chosen"));
+    $('#l_intLocalLanguage').insertAfter($("#l_intLocalLanguage_chosen"));
+    $('#l_intNatCustomLU5').insertAfter($("#l_intNatCustomLU5_chosen"));
+    $('#l_intGender').insertAfter($("#toggleGd_intGender"));
+    $('#l_strContactISOCountry').insertAfter($("#l_strContactISOCountry_chosen")); 
 });
