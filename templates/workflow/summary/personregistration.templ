@@ -39,11 +39,11 @@
 				    </div>
 					<div class="">
 					  	<span class="paddingsummary">[% Lang.txt('Sport:') %]</span>
-					  	<span class="detail-value">[% PersonRegistrationDetails.sport %]</span>
+					  	<span class="detail-value">[% IF PersonRegistrationDetails.sport %][% PersonRegistrationDetails.sport %][% ELSE %] - [% END %]</span>
 				    </div>
 					<div class="">
 					  	<span class="paddingsummary">[% Lang.txt('Level:') %]</span>
-					  	<span class="detail-value">[% PersonRegistrationDetails.personLevel %]</span>
+					  	<span class="detail-value">[% IF PersonRegistrationDetails.personLevel %][% PersonRegistrationDetails.personLevel %][% ELSE %] - [% END %]</span>
 				    </div>
 				</div>
 			</div>
