@@ -332,6 +332,9 @@ strong {
 }
 .rowtop-spacing {
 	margin-top: 20px;
+} 
+.txtleft {
+	text-align: left;
 }  
 .txtright {
 	text-align: right;
@@ -1788,13 +1791,14 @@ header nav ul li a.selected {
 	color: #000;
 }
 #personRequestForm input[name="search_keyword"] {
-	width: 94%;
+	width: 100%;
 }
 #personRequestForm .col-md-6 .col-md-8 {
 	padding: 0px;
 }
 #personRequestForm .col-md-6 .col-md-8 .error {
 	font-size: .9em;
+	float: left;
 }
 #personRequestForm .col-md-6 .col-md-4 {
 	padding: 0px;
@@ -1802,4 +1806,10 @@ header nav ul li a.selected {
 .read-only .mfloat {
 	float: left; 
 	width: 100%;
+}
+#toggleGd_intTaskType {
+	text-align: center;
+}
+.col-md-6 #transfer_type_option a {
+	width: 50%;
 }
