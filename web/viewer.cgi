@@ -57,7 +57,7 @@ sub main	{
 
   $Data{'DataAccess'}=$DataAccess_ref;
 
-    initLocalisation(\%Data);
+  initLocalisation(\%Data);
   my $resultHTML = '';
   if($fileID)   {
 

@@ -100,6 +100,8 @@ sub setProcessOrder {
             'function' => 'display_complete',
             'label'  => 'Complete',
             'title'  => 'Club - Submitted',
+            'NoNav' => 1,
+            'NoGoingBack' => 1,
         },
     ];
 }
