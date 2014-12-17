@@ -131,17 +131,35 @@ sub Navigation {
             $self->{'RunDetails'}{'DirectLinks'}[$i] = $linkURL;
 
 			my $link = $showlink
+                #? qq[<a href="$linkURL" class = "stepname">$step. $name</a>]
+                #: qq[<span class = "stepname">$step. $name</span>];
+
                 ? qq[<a href="$linkURL" class = "stepname">$step. $name</a>]
                 : qq[<span class = "stepname">$step. $name</span>];
             
-			$navstring .= qq[ <li class = "$currentclass step step-$step"><span class="$currentclass step-num">$link</li> ];
+			#$navstring .= qq[ <li class = "$currentclass step step-$step"><span class="$currentclass step-num">$link</li> ];
+      $navstring .= qq[ <div class = "col-md-2 $currentclass step step-$step"><span class="$currentclass step-num">$link</span></div> ];
             $step_in_future = 2 if $current;
             $step++;
         }
     }
+    #my $returnHTML = '';
+    #$returnHTML .= qq[<ul class = "playermenu list-inline form-nav">$navstring</ul><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;
+    #$returnHTML .= qq[<div class = "progressFlow">$navstring</div><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;           
+
+    my $lastStep = $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'function'};
+    
     my $returnHTML = '';
-    $returnHTML .= qq[<ul class = "playermenu list-inline form-nav">$navstring</ul><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;
-   
+    
+    if($lastStep eq 'display_summary'){
+        
+        $returnHTML .= qq[<div class = "progressFlow progressComplete">$navstring</div><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;
+    
+    } else {
+        
+        $returnHTML .= qq[<div class = "progressFlow">$navstring</div><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;        
+    }
+    
 
     if(wantarray)   {
         return ($returnHTML, \@navoptions);
