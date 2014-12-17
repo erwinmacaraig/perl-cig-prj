@@ -385,6 +385,8 @@ sub printBasePage {
       <link rel="stylesheet" type="text/css" href="$Defs::base_url/css/fc_styles.css">
       <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
 
+      <link rel="stylesheet" type="text/css" href="$Defs::base_url/css/custom.css">
+
 $CSSFiles
 $CSSInline
 $TopJSFiles
