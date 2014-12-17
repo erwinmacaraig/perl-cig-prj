@@ -218,7 +218,6 @@ sub _runFormat   {
     }
     my ($y,$mon, $d, $h, $min, $s) = $value =~ /(\d\d\d\d)-([01]\d)\-([0123]\d) ([012]\d):([0-5]\d):([0-5]\d)/;
     my $output = '';
-    warn("OOOO ($y,$mon, $d, $h, $min, $s):$value");
     if(!$problemPattern)    {
         $output = POSIX::strftime (
             $format || '',
