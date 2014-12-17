@@ -35,7 +35,7 @@
 					[% IF Details.DOB %]
 				    <div class="">
 				        <span class="details-left">[% Lang.txt('Date of Birth') %]:</span>
-				        <span class="detail-value">[% Details.DOB %]</span>
+				        <span class="detail-value">[% DateFormat.format(Details.DOB,'MEDIUM') %]</span>
 				    </div>
 					[% END %]
 
