@@ -1929,3 +1929,17 @@ header nav ul li a.selected {
 .playermenu li:last-child.sevenStepWidth.current:after {
 	left:125px;
 }
+#doctab1 .documents-list table.table .task-list .status-col span {
+	float: left;
+	width: 50%;
+}
+#doctab1 .documents-list table.table .task-list .status-col i span {
+	float: left;
+	width: 100%;
+}
+#doctab1 .documents-list table.table .task-list .status-col i.fa-circle {
+	float: left;
+}
+#doctab1 .documents-list table.table .task-list .status-col a.btn-inside-docs-panel {
+	width: 95px;
+}
