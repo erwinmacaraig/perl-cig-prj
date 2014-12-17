@@ -1918,6 +1918,14 @@ header nav ul li a.selected {
 	left:160px;
 }
 
+.playermenu li.sevenStepWidth.previous:after {
+	left:145px;
+}
+
 .playermenu li:last-child.sixStepWidth.current:after {
 	left:145px;
+}
+
+.playermenu li:last-child.sevenStepWidth.current:after {
+	left:125px;
 }
