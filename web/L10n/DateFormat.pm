@@ -214,26 +214,39 @@ sub _runFormat   {
     return '' if !$format;
     my $problemPattern = 0;
     if($format =~/\%[aAbBhp]/)  { #outputs that need translating
-        #$problemPattern = 1;
+        $problemPattern = 1;
     }
     my ($y,$mon, $d, $h, $min, $s) = $value =~ /(\d\d\d\d)-([01]\d)\-([0123]\d) ([012]\d):([0-5]\d):([0-5]\d)/;
     my $output = '';
-    if(!$problemPattern)    {
-        $output = POSIX::strftime (
-            $format || '',
-            $s || 0,
-            $min || 0,
-            $h || 0,
-            $d,
-            ($mon-1),
-            ($y-1900)
-        );
+    if($problemPattern)    {
+        $format =~ s/(\%.)/~S~$1~E~/g;
     }
-    else    {
-
+    $output = POSIX::strftime (
+        $format || '',
+        $s || 0,
+        $min || 0,
+        $h || 0,
+        $d,
+        ($mon-1),
+        ($y-1900)
+    );
+    if($problemPattern)    {
+        $output =~ s/~S~(.*?)~E~/$self->trans($1)/eg;
     }
 
     return $output;
+}
+
+sub trans {
+	my $self = shift;
+    my (
+        $value,
+    ) = @_;
+    
+    if($self->{'Lang'}) {
+        return $self->{'Lang'}->txt($value);
+    }
+    return $value;
 }
 
 1;
