@@ -30,9 +30,12 @@
     <div id = "docViewerFileBlock">
     [% IF doctype == 'pdf' %]
     <object data="[% fileURL %]" type="application/pdf" width="100%" height="100%">
-     
+        <iframe src = "js/pdf/web/viewer.html?file=[% fileURLescape %]" style = "width:100%;height:100%;"> 
+        <div class = "panel-body">
       <p>[% Lang.txt("It appears you don't have a PDF plugin for this browser.") %]</p>
-      <p><a href="[% fileURL %]">[% Lang.txt('Click here to download the file.') %]</a></p>
+      <p><a href="[% fileURL %]&d=1">[% Lang.txt('Click here to download the file.') %]</a></p>
+        </div>
+        </iframe>
       
     </object>
     PDF

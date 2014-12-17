@@ -25,8 +25,13 @@ sub main {
   my %Data=();
   $fileID =~ /^(\d+)$/;
   $fileID = $1;	
-                                                                                                        
-  my $db = connectDB();
+  #my $db = connectDB();
+
+  my %clientValues = getClient($client);
+  $Data{'clientValues'} = \%clientValues;
+  $Data{'cache'}  = new MCache();
+  my $db=allowedTo(\%Data);
+
   my $statement=qq[
 	SELECT *
 	FROM tblUploadedFiles
@@ -64,7 +69,7 @@ sub main {
   print "Content-length: $size\n";
   print "Content-transfer-encoding: $size\n";
   if($download) {
-      print qq[Content-disposition: attachement; filename = "$origfilename"\n\n];
+      print qq[Content-disposition: attachment; filename = "$origfilename"\n\n];
   }
   else  {
       print qq[Content-disposition: inline; filename = "$origfilename"\n\n];
