@@ -150,7 +150,7 @@
 		            [% ELSE %]
                         <td><span class="fa fa-user"></span>Rego [% task.Name %]</td>
 		            [% END %]
-                    <td>[% task.taskDate %]</td>
+                    <td>[% DateFormat.format(task.taskDate,'MEDIUM') %]</td>
 
                     <td><span class="fa fa-clock-o"></span>[% task.TaskStatusLabel %]</td>
 

@@ -9,6 +9,7 @@ use CGI qw(param unescape escape cookie);
 
 use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit','Clearances', "user";
 use Lang;
+use Localisation;
 use Reg_common;
 use PageMain;
 use Navbar;
@@ -100,6 +101,7 @@ sub main {
     $Data{'LocalConfig'}  = getLocalConfig( \%Data );
     my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     $Data{'lang'} = $lang;
+    initLocalisation(\%Data);
 
     logPageData( \%Data, $action, $client);
 

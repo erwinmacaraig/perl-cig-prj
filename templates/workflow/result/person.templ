@@ -28,7 +28,7 @@
             [% IF PersonDetails.DOB %]
                 <span class="details-row">
                   <span class="details-left">[% Lang.txt('Date of Birth') %]:</span>
-                  <span class="details-left">[% PersonDetails.DOB %]</span>
+                  <span class="details-left">[% DateFormat.formt(PersonDetails.DOB,'MEDIUM') %]</span>
                 </span>
             [% END %]
 
@@ -49,14 +49,14 @@
             [% IF PersonDetails.DateSuspendedUntil != '' %]
                 <span class="details-row">
                   <span class="details-left">[% Lang.txt('Suspended Until') %]:</span>
-                  <span class="details-left">[% PersonDetails.DateSuspendedUntil %]</span>
+                  <span class="details-left">[% DateFormat.formt(PersonDetails.DateSuspendedUntil,'MEDIUM') %]</span>
                 </span>
             [% END %]
 
             [% IF PersonDetails.LastUpdate %]
                 <span class="details-row">
                   <span class="details-left">[% Lang.txt('Last Update') %]:</span>
-                  <span class="details-left">[% PersonDetails.LastUpdate %]</span>
+                  <span class="details-left">[% DateFormat.TZformat(PersonDetails.LastUpdate,'MEDIUM','MEDIUM) %]</span>
                 </span>
             [% END %]
 
