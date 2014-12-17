@@ -14,7 +14,7 @@
                 </div>
             [% END %]
         </div>
-       
+        [% IF showButtons %]
         <div class = "docViewerButtons txtcenter">	
 		
 			<span>[% IF showApproveButton %]<a href="#" onclick="updateFileStatus([% intFileID %],'APPROVED','[% client %]'); return false;" class="btn-main">[% Lang.txt('APPROVE') %]</a> [% END %]</span> 
@@ -24,7 +24,7 @@
             <span>[% IF showRejectButton %]<a href="#" onclick="updateFileStatus([% intFileID %],'REJECTED','[% client %]'); return false;" class="btn-main">[% Lang.txt('REJECT') %]</a> [% END %]</span> 
 
         </div>
-       
+       [% END %]
     </div>
 
     <div id = "docViewerFileBlock">

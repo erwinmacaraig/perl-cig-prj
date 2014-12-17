@@ -31,6 +31,14 @@ sub showPersonHome	{
 	my $client = $Data->{'client'} || '';
 	my $personObj = getInstanceOf($Data, 'person');
 	my $allowedit = allowedAction($Data, 'p_e') ? 1 : 0;
+
+	my $cl = setClient($Data->{'clientValues'}) || '';
+    my %cv = getClient($cl);
+    $cv{'personID'} = $personID;
+    $cv{'currentLevel'} = $Defs::LEVEL_PERSON;
+    my $clm = setClient(\%cv);
+
+
 	my $notifications = [];
 	my %configchanges = ();
 	if ( $Data->{'SystemConfig'}{'PersonFormReLayout'} ) {
@@ -108,6 +116,20 @@ sub showPersonHome	{
         SummaryPanel => personSummaryPanel($Data, $personID) || '',
 	);
 	
+	my @validdocsforallrego = ();
+	my %validdocs = ();
+	my $query = qq[SELECT tblDocuments.intDocumentTypeID, tblDocuments.intUploadFileID FROM tblDocuments INNER JOIN tblDocumentType
+				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
+				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
+				WHERE strApprovalStatus = 'APPROVED' AND intPersonID = ? AND 
+				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+				GROUP BY intDocumentTypeID];
+	my $sth = $Data->{'db'}->prepare($query);
+	$sth->execute($personID);
+	while(my $dref = $sth->fetchrow_hashref()){
+		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
+		$validdocs{$dref->{'intDocumentTypeID'}} = $dref->{'intUploadFileID'};
+	}
     my %RegFilters=();
     #$RegFilters{'current'} = 1;
     my @statusIN = ($Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE); #, $Defs::PERSONREGO_STATUS_TRANSFERRED, $Defs::PERSONREGO_STATUS_SUSPENDED);
@@ -116,11 +138,86 @@ sub showPersonHome	{
     
     $RegFilters{'statusIN'} = \@statusIN;
     my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
+	my $status;
 	
+	my $rego;
+    
+    foreach $rego (@{$Reg_ref})  {
+		my @alldocs = ();
+		my $fileID = 0;
+		my $doc;
+		my $viewLink;
+		my $replaceLink;
+		my $addLink; 
+		my $displayView = 0;
+		my $displayAdd = 0;
+		my $displayReplace = 0;
+		foreach $doc (@{$rego->{'documents'}}) {			
+			$displayAdd = 0;
+			$fileID = 0;
+			$displayView  = 0;			
+			$status = $doc->{'strApprovalStatus'};
+			if(!$doc->{'strApprovalStatus'}){ 			  
+				if(!grep /$doc->{'intDocumentTypeID'}/,@validdocsforallrego){  
+					$displayAdd = 1; 
+					$fileID = 0;
+					if($doc->{'Required'}){				
+						#$documentStatusCount{'MISSING'}++;
+						$status = 'MISSING';
+					}
+					else {
+						$status = 'Optional. Not Provided.';
+						$displayReplace = 0;
+					}
+				}
+				elsif(grep /$doc->{'intDocumentTypeID'}/,@validdocsforallrego){
+					$status = 'APPROVED';
+					#$documentStatusCount{'APPROVED'}++;
+					$fileID = $validdocs{$doc->{'intDocumentTypeID'}};
+				}
+			
+			}
+			else{
+				#$documentStatusCount{$tdref->{'strApprovalStatus'}}++;
+				$displayReplace = 1;
+				$displayAdd = 0;
+				$doc->{'intUploadFileID'} ? $fileID = $doc->{'intUploadFileID'} : 0;
+			
+       		}
+			#####
+		my $documentName = $doc->{'strDocumentName'};
+		$documentName =~ s/[\/*?:@&=+$#']/_/g;
 
-	
-    foreach my $rego (@{$Reg_ref})  {
-        my $renew = '';
+		if($fileID) {
+			$displayView = 1;
+            $viewLink = qq[ <span style="position: relative"> 
+<a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$clm&amp;a=view');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];			
+        }
+
+		$replaceLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="replaceFile($fileID,$doc->{'intDocumentTypeID'}, $rego->{'intPersonRegistrationID'}, $personID, '$clm', '$documentName', ' ');return false;">]. $Data->{'lang'}->txt('Replace') . q[</a></span>]; 
+
+
+		$addLink = qq[ <a href="#" class="btn-inside-docs-panel" onclick="replaceFile(0,$doc->{'intDocumentTypeID'}, $rego->{'intPersonRegistrationID'}, $personID, '$clm','$documentName',' ');return false;">]. $Data->{'lang'}->txt('Add') . q[</a>] if (!$Data->{'ReadOnlyLogin'});
+
+		#push @alldocs, { . " - $rego->{intPersonRegistrationID} "
+		push @{$rego->{'alldocs'}},{
+				strDocumentName => $doc->{'strDocumentName'}, 
+				Status => $status,
+				DocumentType => $doc->{'intDocumentTypeID'},
+				viewLink => $viewLink,
+           	    addLink => $addLink,
+           		replaceLink => $replaceLink,
+				DisplayView => $displayView,
+				DisplayAdd => $displayAdd || '',
+				DisplayReplace => $displayReplace,
+				
+			};
+
+		} #end for looping through registration documents
+		
+
+		
+		my $renew = '';
         $rego->{'renew_link'} = '';
         #next if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}) and $Data->{'authLevel'} != $Defs::LEVEL_NATIONAL);
         ## Show MA the renew link remvoed as we need them to navigate to the club level for now
@@ -145,6 +242,7 @@ sub showPersonHome	{
 	
 	#$Reg_ref->[0]{'documents'} = \@reg_docs;
 	#push @{$Reg_ref},\%reg_docs;
+	
     $TemplateData{'RegistrationInfo'} = $Reg_ref;
 	
 
@@ -199,7 +297,7 @@ sub getMemFields {
 		push @{$fields_grouped{$group}}, [$f, $label];
 		my $string = '';
 		if (($val and $val ne '00/00/0000') or ($is_header))	{
-			$string .= qq[<div class=""><span class = "details-left">$label:</span>] if !$nolabelfields{$f};
+			$string .= qq[<div class="mfloat"><span class = "details-left">$label:</span>] if !$nolabelfields{$f};
 			$string .= '<span class="detail-value">'.$val.'</span></div>';
 			$fields{$group} .= $string;
 		}

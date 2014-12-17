@@ -418,12 +418,12 @@ my @headers = (
 		$cnt++;
 		#print FH "\nRegistration Data $cnt: \n" . Dumper($registration) . "\n----------------------------------------------";
 		#get the documents here
-
-		$grid .= qq[<br /><h3 class="panel-header">$registration->{'PersonType'} - $registration->{'Sport'} - $registration->{'PersonLevel'} ] . $lang->txt('for') . qq[ $registration->{'strNationalPeriodName'} </h3>];
+		
+		$grid .= qq[<br /><h3 class="panel-header">$registration->{'PersonType'} - $registration->{'Sport'} - $registration->{'PersonLevel'} ] . $lang->txt('for') . qq[ $registration->{'strNationalPeriodName'} ] . $lang->txt('in') . qq[ $registration->{'strLocalName'}</h3>];
 
 			#loop over rego documents
 			foreach my $regodoc (@{$registration->{'documents'}}){
-
+				next if(!$regodoc->{'intUploadFileID'});
 				#perform query for intUseThisEntity and intUseAnyEntity
 				my $query = qq[SELECT intUseExistingThisEntity,intUseExistingAnyEntity FROM tblRegistrationItem INNER JOIN
                                tblDocumentType ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID INNER JOIN
@@ -439,9 +439,9 @@ my @headers = (
 
 					#print FH "\n\n \$registration->{'intEntityID'}:$registration->{'intEntityID'} ? \$currLoginID:$currLoginID\n";
 
-					$viewLink = qq[ <a class="btn-main btn-view-replace" href="#" onclick="docViewer($regodoc->{'intFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a>];
+					$viewLink = qq[ <a class="btn-main btn-view-replace" href="#" onclick="docViewer($regodoc->{'intUploadFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a>];
 
-    				$replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a>];	
+    				$replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intUploadFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a>];	
 
 				}
 				else{
@@ -453,16 +453,15 @@ my @headers = (
 
 					if(grep(/^$myCurrentLevelValue/,@authorizedLevelsArr) && $myCurrentLevelValue >  $ownerlevel ){
 
-    					$viewLink = qq[ <a class="btn-main btn-view-replace" href="#" onclick="docViewer($regodoc->{'intFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a></span>];
+    					$viewLink = qq[ <a class="btn-main btn-view-replace" href="#" onclick="docViewer($regodoc->{'intUploadFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a></span>];
 
-        				$replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a>];	
+        				$replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intUploadFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a>];	
 
 					}									
 				}
 				push @rowdata, {
-	       			id => $regodoc->{'intFileID'} || 0,
+	       			id => $regodoc->{'intUploadFileID'} || 0,
 	        		#oldSelectLink => $fileLink,
-
 	        		strDocumentName => $regodoc->{'strDocumentName'},
 		    		strApprovalStatus => $regodoc->{'strApprovalStatus'},
             		DateUploaded => $regodoc->{'DateUploaded'},
@@ -498,8 +497,8 @@ my $addlink='';
 					</form></div>];
 
 	 my $modoptions=qq[<div class="changeoptions"></div>];
-
-			$grid .= qq[ $modoptions
+			#
+			$grid .= qq[
                     <div class="panel-body">].showGrid(
        		  Data => $Data,
       		  columns => \@headers,
@@ -507,9 +506,8 @@ my $addlink='';
        		  gridid => "grid$registration->{'intPersonRegistrationID'}",
        		  width => '100%',
 			);
-			$grid .= qq[<br>
-                <p>].$lang->txt('Add a new document to this registration').qq[</p>
-                $doclisttype </div>];
+			$grid .= qq[<br /><br /><p>].$lang->txt('Add a new document to this registration').qq[</p>$doclisttype </div>];
+		#
 		
 	}
         my $title = $lang->txt('Registration Documents');

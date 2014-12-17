@@ -277,7 +277,6 @@ print STDERR "000OK IS $ok | $run\n\n";
 		
 		#$personData{''} = $personObj->getValue('') || '';
 
-
  		my $languages = PersonLanguages::getPersonLanguages( $Data, 1, 0);
 		for my $l ( @{$languages} ) {
 			if($l->{intLanguageID} == $personObj->getValue('intLocalLanguage')){
@@ -293,6 +292,11 @@ print STDERR "000OK IS $ok | $run\n\n";
        $cv{'currentLevel'} = $Defs::LEVEL_CLUB;
        my $clm = setClient(\%cv);
 
+
+       $cv{'entityID'} = $maObj->getValue('intEntityID');
+       $cv{'currentLevel'} = $Defs::LEVEL_NATIONAL;
+       my $mlm = setClient(\%cv);
+
         my %PageData = (
             person_home_url => $url,
 			person => \%personData,
@@ -307,6 +311,8 @@ print STDERR "000OK IS $ok | $run\n\n";
             dtype => $hidden_ref->{'dtype'} || '',
             dtypeText => $Defs::personType{$hidden_ref->{'dtype'}} || '',
             client=>$clm,
+            maclient => $mlm,
+            originLevel => $originLevel,
             PersonSummaryPanel => personSummaryPanel($Data, $personObj->ID()),
         );
         
@@ -410,7 +416,7 @@ sub displayRegoFlowCertificates{
 		
 	my @certificates = ();
 	#SQL QUERY FOR THE DROPDOWN BOX FOR 
-	my $query = qq[SELECT intCertificationTypeID, strCertificationName FROM tblCertificationTypes WHERE strCertificationtype = ? AND intRealmID = ?];
+	my $query = qq[SELECT intCertificationTypeID, strCertificationName FROM tblCertificationTypes WHERE strCertificationtype = ? AND intRealmID = ? ORDER BY intDisplayOrder, strCertificationName];
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute($rego_ref->{'personType'},$Data->{'Realm'});
 	while(my $dref = $sth->fetchrow_hashref()){
@@ -580,23 +586,50 @@ sub displayRegoFlowDocuments{
 	my @required_docs_listing = ();
 	my @optional_docs_listing = ();	
 	my @validdocsforallrego = ();
-	$query = qq[SELECT tblDocuments.intDocumentTypeID FROM tblDocuments INNER JOIN tblDocumentType
-				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
-				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
-				WHERE strApprovalStatus = 'APPROVED' AND intPersonID = ? AND 
-				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
-				GROUP BY intDocumentTypeID];
+	$query = qq[
+        SELECT
+        tblDocuments.intDocumentTypeID as ID,
+        tblRegistrationItem.intUseExistingThisEntity as UseExistingThisEntity,
+        tblRegistrationItem.intUseExistingAnyEntity as UseExistingAnyEntity,
+        tblUploadedFiles.strOrigFilename,
+        tblUploadedFiles.intFileID,
+        tblUploadedFiles.intAddedByTypeID as AddedByTypeID,
+        tblDocumentType.strDocumentName as Name,
+        tblDocumentType.strDescription as Description
+
+        FROM tblDocuments
+        INNER JOIN tblDocumentType
+            ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
+        INNER JOIN tblRegistrationItem 
+            ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
+        INNER JOIN tblUploadedFiles
+            ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID 
+        WHERE strApprovalStatus = 'APPROVED'
+        AND intPersonID = ?
+        AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+        GROUP BY tblDocuments.intDocumentTypeID
+    ];
+
 	$sth = $Data->{'db'}->prepare($query);
 	$sth->execute($personID);
+
+    my %existingDocuments;
 	while(my $dref = $sth->fetchrow_hashref()){
-		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
+        if(! exists $existingDocuments{$dref->{'ID'}}){
+            $existingDocuments{$dref->{'ID'}} = $dref;
+        }
 	}
 
 	foreach my $dc (@diff){   
 		if($dc->{'Required'}){
 			#check here 
-			next if( grep /$dc->{'ID'}/,@validdocsforallrego);
-			push @required_docs_listing, $dc;
+            #next if( grep /$dc->{'ID'}/,@validdocsforallrego);
+            if(defined $existingDocuments{$dc->{'ID'}}){
+			    push @required_docs_listing, $existingDocuments{$dc->{'ID'}};
+            }
+            else {
+			    push @required_docs_listing, $dc;
+            }
 		}  	
 		else {
 			push @optional_docs_listing,$dc;
@@ -604,6 +637,7 @@ sub displayRegoFlowDocuments{
     	
     }
 
+    print STDERR Dumper @required_docs_listing;
     #if (! scalar @required_docs_listing and ! scalar @optional_docs_listing)  {
      #   return '';
     #}

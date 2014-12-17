@@ -610,6 +610,7 @@ sub validate_contact_details {
 
 sub display_role_details {
     my $self = shift;
+print STDERR "BBBS";
 
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
     my %PageData = (
@@ -637,7 +638,6 @@ sub validate_role_details {
     my %fieldCount = (
         'intEntityFieldCount' => 1
     );
-
     ($facilityFieldData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields(\%fieldCount);
 
     if(!$facilityFieldData->{'intEntityFieldCount'}){
@@ -668,6 +668,7 @@ sub display_fields {
 
     my $facilityFieldCount = $self->{'RunParams'}{'facilityFieldCount'} || 0;
 
+print STDERR "SSSS";
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $facilityFields = new EntityFields();
     $facilityFields->setCount($facilityFieldCount);

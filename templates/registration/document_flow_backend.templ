@@ -23,6 +23,14 @@
 							</p>
 						
 							[% END %]
+
+							[% IF doc.strOrigFilename != '' %]
+							
+							<p>
+								<a href="#" onclick="docViewer([% doc.intFileID %], 'client=[% client %]&amp;a=view'); return false;">[% doc.strOrigFilename %]</a>
+							</p>
+						
+							[% END %]
 						</div>
 					</td>
 					<td style="width:50%;">
@@ -40,6 +48,11 @@
 						<script>
 							var doc;
 							Dropzone.options.myRegoDoc[% doc.ID %] = {
+                                [% IF doc.intFileID %]
+                                dictDefaultMessage: "<i class='fa fa-check file-uploaded'></i>[% Lang.txt('Uploaded') %] <br/> <i><span class='replace-text'>[% Lang.txt('To update this file drag and drop here') %]</span></i>",
+                                [% ELSE %]
+                                dictDefaultMessage: "[% Lang.txt('Drag and drop file here') %]",
+                                [% END %]
 								addRemoveLinks: true,							
 								init: function(){
 									this.on("success", function(file, response){										
@@ -57,7 +70,7 @@
 									});
 								}
 
-								
+
 							}
 						</script>
 					</td>
@@ -107,6 +120,11 @@
 						<script>
 							var doc;
 							Dropzone.options.myRegoDoc[% doc.ID %] = {
+                                [% IF doc.intFileID %]
+                                dictDefaultMessage: "<i class='fa fa-check file-uploaded'></i>[% Lang.txt('Uploaded') %] <br/> <i><span class='replace-text'>[% Lang.txt('To update this file drag and drop here') %]</span></i>",
+                                [% ELSE %]
+                                dictDefaultMessage: "[% Lang.txt('Drag and drop file here') %]",
+                                [% END %]
 								addRemoveLinks: true,							
 								init: function(){
 									this.on("success", function(file, response){										

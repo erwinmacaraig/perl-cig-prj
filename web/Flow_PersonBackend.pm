@@ -829,10 +829,13 @@ sub display_certifications {
             $personType,
         );
         my %ctypes = ();
+        my @certOrder=();
         for my $type (@{$certificationTypes})   {
+            push @certOrder, $type->{'intCertificationTypeID'};
             $ctypes{$type->{'intCertificationTypeID'}} = $type->{'strCertificationName'} || next;
         }
         $objectValues->{'certificationTypes'} = \%ctypes;
+        $objectValues->{'certificationTypesOrdered'} = \@certOrder;
         $self->setupValues($objectValues);
     }
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();

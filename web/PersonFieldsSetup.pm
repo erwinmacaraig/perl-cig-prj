@@ -765,6 +765,7 @@ sub personFieldsSetup {
                     value       => $values->{'intCertificationTypeID'},
                     type        => 'lookup',
                     options     => $values->{'certificationTypes'} || {},
+                    order       => $values->{'certificationTypesOrdered'},
                     firstoption => [ '', " " ],
                 },
                 dtValidFrom => {
