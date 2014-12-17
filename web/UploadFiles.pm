@@ -21,7 +21,7 @@ use Reg_common;
 use Data::Dumper;
 use InstanceOf;
 
-my $File_MaxSize = 4*1024*1024; #4Mb;
+my $File_MaxSize = 10*1024*1024; #10Mb;
 
 sub getUploadedFiles	{
 	my (
