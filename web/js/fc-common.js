@@ -210,3 +210,15 @@ $(window).bind("load", function() {
     $('#l_intGender').insertAfter($("#toggleGd_intGender"));
     $('#l_strContactISOCountry').insertAfter($("#l_strContactISOCountry_chosen")); 
 });
+
+//Show Hide Advanced Search Fields
+jQuery(".show-advanced-search").on("click", function(){
+    jQuery(this).parent().find((".advanced-search-fields")).slideToggle();
+});
+//Dynamic Form Header
+var str = jQuery("ul.form-nav li span.current").text().slice(3);
+jQuery("h3.dynamic-header").text(str);
+//To Move to JS File
+if(jQuery(".error.login-error-page").length){
+    jQuery(".utilities.clearfix.notloginlevel, #spheader").attr("style","display:none;");
+}

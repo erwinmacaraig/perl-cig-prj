@@ -83,15 +83,6 @@
 <script>
 jQuery(document).ready(function()  {
 
-	//Show Hide Advanced Search Fields :V:
-	jQuery(".show-advanced-search").on("click", function(){
-		jQuery(this).parent().find((".advanced-search-fields")).slideToggle();
-	});
-
-  //Dynamic Form Header :V:
-  var str = jQuery("ul.form-nav li span.current").text().slice(3);
-  jQuery("h3.dynamic-header").text(str);
-
   function clickclear(thisfield, defaulttext) {
     if (thisfield.value == defaulttext) {
     thisfield.value = "";
@@ -103,6 +94,7 @@ jQuery(document).ready(function()  {
     thisfield.value = defaulttext;
     }
   }
+
 });
 </script>
 <style>
@@ -113,7 +105,10 @@ jQuery(document).ready(function()  {
 /*      height: 32px;*/
 	    background: url("images/global_nav_sprite.png") repeat-x scroll 0 0 transparent;
 }
-
+#content .error p{
+  margin-top: 20px;
+  color: #ff0000;
+}
 #globalnav {
 	    /*background: url("images/global_nav_sprite.png") repeat-x scroll 0 -33px transparent;*/
         /*float: left;*/
