@@ -16,4 +16,4 @@ UPDATE tblMatrix SET strAgeLevel = 'MINOR' WHERE intMatrixID = 98;
 INSERT INTO tblRegoAgeRestrictions(intRegoAgeRestrictionID, intRealmID, intSubRealmID, strSport, strPersonType, strPersonEntityRole, strPersonLevel, strRestrictionType, strAgeLevel, intFromAge, intToAge, tTimestamp) SELECT 0, intRealmID, intSubRealmID, strSport, strPersonType, strPersonEntityRole, strPersonLevel, strRestrictionType, 'ADULT', 21, 45, tTimestamp FROM tblRegoAgeRestrictions WHERE intRegoAgeRestrictionID = 20;
 
 -- update to MINOR age range
-UPDATE tblRegoAgeRestrictions SET intFromAge = 16, intToAge = 20, strAgeLevel = 'MINOR' WHERE intRegoAgeRestrictionID = 20;
+UPDATE tblRegoAgeRestrictions SET intFromAge = 16, intToAge = 21, strAgeLevel = 'MINOR' WHERE intRegoAgeRestrictionID = 20;
