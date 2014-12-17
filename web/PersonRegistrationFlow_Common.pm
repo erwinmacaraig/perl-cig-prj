@@ -479,7 +479,7 @@ sub checkUploadedRegoDocuments {
 	my @required = ();
     foreach my $dc (@{$documents}){ 
 		next if(!$rego_ref->{'InternationalTransfer'} && $dc->{'DocumentFor'} eq 'TRANSFERITC');	#will only be included when there is an ITC
-		next if( grep /$dc->{'ID'}/,@validdocsforallrego);
+        next if( grep /$dc->{'ID'}/,@validdocsforallrego);
 		if( $dc->{'Required'} ) {
 			push @required,$dc;
 		}		
@@ -607,7 +607,7 @@ sub displayRegoFlowDocuments{
         WHERE strApprovalStatus = 'APPROVED'
         AND intPersonID = ?
         AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
-        GROUP BY tblDocuments.intDocumentTypeID
+        ORDER BY tblDocuments.intDocumentID DESC
     ];
 
 	$sth = $Data->{'db'}->prepare($query);
@@ -632,7 +632,12 @@ sub displayRegoFlowDocuments{
             }
 		}  	
 		else {
-			push @optional_docs_listing,$dc;
+            if(defined $existingDocuments{$dc->{'ID'}}){
+			    push @optional_docs_listing, $existingDocuments{$dc->{'ID'}};
+            }
+            else {
+			    push @optional_docs_listing, $dc;
+            }
 		}
     	
     }
