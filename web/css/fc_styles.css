@@ -1813,3 +1813,6 @@ header nav ul li a.selected {
 .col-md-6 #transfer_type_option a {
 	width: 50%;
 }
+#grid_wrapper #grid {
+	width: 100%!important;
+}
