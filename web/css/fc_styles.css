@@ -1998,3 +1998,8 @@ li:last-child.eightStepWidth {
 	width: 95px;
 }
 
+.transferCompleteDisplay {
+	background:none!important;
+	padding:0!important;
+	border:none!important;
+}

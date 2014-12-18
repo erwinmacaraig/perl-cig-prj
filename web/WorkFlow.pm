@@ -2549,7 +2549,7 @@ sub populateDocumentViewData {
     my $count = 0;
     my %documentStatusCount;
     while(my $tdref = $q->fetchrow_hashref()) {
-        next if exists $DocoSeen{$tdref->{'intDocumentTypeID'}};
+        next if exists $DocoSeen{$tdref->{'intDocumentTypeID'}}; 
         $DocoSeen{$tdref->{'intDocumentTypeID'}} = 1;
         #skip if no registration item matches rego details combination (type/role/sport/rego_nature etc)
         next if (!$tdref->{'regoItemID'} and $dref->{'strWFRuleFor'} eq 'REGO');
@@ -2590,31 +2590,40 @@ sub populateDocumentViewData {
         my $addLink = '';
         my $replaceLink = '';
 
-        my $registrationID = $tdref->{'regoItemID'} ? $dref->{'intPersonRegistrationID'} : 0;
+       	my $registrationID = $tdref->{'regoItemID'} ? $dref->{'intPersonRegistrationID'} : 0;
         my $targetID = $dref->{'intPersonID'};
         #document for ENTITY
         my $level = (!$targetID and !$registrationID) ? $Defs::LEVEL_CLUB : $Defs::LEVEL_PERSON;
         $targetID = (!$targetID and !$registrationID) ? $dref->{'intEntityID'} : $targetID;
-
+		
        
 		my $cl = setClient($Data->{'clientValues'}) || '';
         my %cv = getClient($cl);
-        $cv{'personID'} = $targetID;
+
+		if($level == $Defs::LEVEL_CLUB){
+			 $cv{'clubID'} = $targetID;
+		}
+		elsif($Defs::LEVEL_PERSON){
+			$cv{'personID'} = $targetID;
+		}        
        $cv{'currentLevel'} = $level;
        my $clm = setClient(\%cv);
+		
 
+		
         my $docDesc = $tdref->{'descr'};
         $docDesc =~ s/'/\\\'/g;
 
         my $docName = $tdref->{'strDocumentName'};
         $docName =~ s/'/\\\'/g;
-		$replaceLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="replaceFile($fileID,$tdref->{'intDocumentTypeID'}, $registrationID, $targetID, '$clm', '$docName', '$docDesc');return false;">]. $Data->{'lang'}->txt('Replace') . q[</a></span>]; 
+		my $parameters = qq[&amp;client=$clm&doctype=$tdref->{'intDocumentTypeID'}&pID=$targetID];
+		
+		$registrationID ? $parameters .= qq[&regoID=$registrationID] : $parameters .= qq[&entitydocs=1];
+		
+		$replaceLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="replaceFile($fileID,'$parameters','$docName','$docDesc');return false;">]. $Data->{'lang'}->txt('Replace') . q[</a></span>]; 
 
-
-
-        #$addLink = qq[ <a class="btn-inside-docs-panel" href="$Defs::base_url/main.cgi?client=$Data->{'client'}&amp;a=WF_amd&amp;RegistrationID=$registrationID&amp;trgtid=$targetID&amp;doclisttype=$tdref->{'intDocumentTypeID'}&amp;level=$level" target="_blank">]. $Data->{'lang'}->txt('Add') . q[</a>] if (!$Data->{'ReadOnlyLogin'});
-
-		$addLink = qq[ <a href="#" class="btn-inside-docs-panel" onclick="replaceFile(0,$tdref->{'intDocumentTypeID'}, $registrationID, $targetID, '$clm','$docName','$docDesc');return false;">]. $Data->{'lang'}->txt('Add') . q[</a>] if (!$Data->{'ReadOnlyLogin'});
+		
+		$addLink = qq[ <a href="#" class="btn-inside-docs-panel" onclick="replaceFile(0,'$parameters','$docName','$docDesc');return false;">]. $Data->{'lang'}->txt('Add') . q[</a>] if (!$Data->{'ReadOnlyLogin'});
 
         if($tdref->{'intAllowProblemResolutionEntityAdd'} == 1) {
             if(!$tdref->{'intDocumentID'}){
