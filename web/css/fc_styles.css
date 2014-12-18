@@ -1634,6 +1634,16 @@ span.circleBg {
 	left:8px;
 }
 
+span.rejectedBg {
+	background: red;
+	-moz-border-radius :70px;
+	-webkit-border-radius :70px;
+	border-radius :70px;
+	position:relative;
+	left:8px;
+}
+
+
 .taskListCounter {
 	background: #c4070a;
 	-moz-border-radius :70px;
@@ -1648,10 +1658,6 @@ span.circleBg {
 	height:23px;
 	line-height: 23px;
 	text-align: center;
-}
-
-.taskListCounter {
-
 }
 
 span.circle-check {
@@ -1687,7 +1693,7 @@ i.file-uploaded {
 }
 
 i.documents-rejected {
-	color:red;
+	color:#fff;
 	margin-left:6px;
 	margin-right:5px;
 }

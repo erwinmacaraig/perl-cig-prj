@@ -18,11 +18,11 @@ function checkIfDocsAllApproved() {
     var rejectedDocsFlag = $(".rejectedDocs").val();
 
     if(rejectedDocsFlag == 1){
-
+        $("li.active span.circleBg").addClass("rejectedBg");
         $("span.circleBg").find("i.documents-rejected").removeClass("documents-approved");
 
     } else {
-
+        $("li.active span.circleBg span.circleBg").removeClass("rejectedBg");
         $("span.circleBg").find("i.documents-rejected").addClass("documents-approved");
 
         if (numberOfPendingDocs == 0) {
