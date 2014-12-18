@@ -721,11 +721,6 @@ table tr.new-task {
 	font-size: 14px;
 }
 
-.read-only ul li span.details-left {
-	width:50%;
-	float:left;
-}
-
 .read-only ul li span.details-value {
 	font-weight: bold
 }
@@ -1816,6 +1811,21 @@ a.HTdisabled, a.HTdisabled:hover {
 
 .document-upload.summary .registration-details .details-left {
 	width:30%;
+}
+
+.document-upload.summary .club-details .details-left {
+	width: 60%;
+	float:left;
+}
+
+.document-upload.summary .club-contact-details .details-left {
+	width: 40%;
+	float:left;
+}
+
+.document-upload.summary .organization-details .details-left {
+	width: 70%;
+	float:left;
 }
 
 .toppadding {
