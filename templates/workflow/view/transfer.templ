@@ -33,13 +33,12 @@
 <div class="member-home-page">
     <div class="col-md-9">
       
-        <h3 class="panel-header">[% PersonDetails.LocalName %] - [% Lang.txt('Transfer to') %] [% TransferDetails.TransferTo %]</h3>
-        <div class="panel-body">
-             <div id="oldclubdetails" class="tab-pane">
+        <div class="">
+             <div id="oldclubdetails" class="">
                 <div class="read-only">
                     <h4>[% Lang.txt('Transfer Details') %]</h4>
                     <div class="read-only-text">
-                        <div class="panel-body" style="border: 0px">
+                        <div class="clearfix" style="border: 0px">
                             <span class="details-row">
                                 <span class="details-left">[% Lang.txt("Member ID") %]:</span>
                                 <span class="details-left detail-value">[% PersonDetails.MID %]</span>
@@ -68,7 +67,7 @@
                     </div>
                 </div>
             </div>
-
+<br>
             <ul class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" data-visited="true" href="#memberdocs">[% Lang.txt('Documents') %]<span class="circleBg"><i class="fa fa-check documents-complete documents-incomplete"></i></span></a></li>
                 <li><a data-toggle="tab" data-visited="false" href="#memberdetails">[% Lang.txt('Personal Information') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></a></li>
@@ -217,16 +216,16 @@
                     <div class="row-padding">
                     <div style="clear: both;">&nbsp;</div>
                     <div class="row">
-                        <h3 class="panel-header">[% Lang.txt('License and Payment Details') %]</h3>
-                        <div class="panel-body">
+                        <h2 class="section-header">[% Lang.txt('License and Payment Details') %]</h2>
+                        <div class="">
                             [% PaymentBlock %]
                         </div>
                     </div> 
 
                     <div style="clear: both;">&nbsp;</div>
                     <div class="row">
-                        <h3 class="panel-header">[% Lang.txt('Work History') %]</h3>
-                        <div class="panel-body">
+                        <h2 class="section-header">[% Lang.txt('Work History') %]</h2>
+                        <div class="">
                             [% NotesBlock %]
                         </div>
                     </div> 

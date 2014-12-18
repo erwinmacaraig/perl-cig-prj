@@ -1,18 +1,16 @@
     <div class="task-actions txtright">
 
-        [% IF TaskAction.showApprove %]
-        <a class="btn-disabled workflow-action" data-actiontype="APPROVE" data-disabled="[% TaskAction.disableApprove %]" href="main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]">
-            [% IF TaskAction.ApprovalEntityLevel == 3 %]
-                [% Lang.txt('Accept') %]
-            [% ELSE %]
-                [% Lang.txt('Approve') %]
-            [% END %]
-        </a>
-        [% END %]
-
+    
         [% IF TaskAction.showReject %]
         <a class="btn-disabled workflow-action" data-target="#showWorkflowNotes" data-actiontype="REJECT" href = "">
             [% Lang.txt('Reject') %]
+        </a>
+        [% END %]
+
+
+        [% IF TaskAction.showHold %]
+        <a class="btn-disabled workflow-action" data-target="#showWorkflowNotes" data-actiontype="HOLD" href = "">
+            [% Lang.txt('Put on-hold') %]
         </a>
         [% END %]
 
@@ -23,9 +21,13 @@
         </a>
         [% END %]
 
-        [% IF TaskAction.showHold %]
-        <a class="btn-disabled workflow-action" data-target="#showWorkflowNotes" data-actiontype="HOLD" href = "">
-            [% Lang.txt('Put on-hold') %]
+        [% IF TaskAction.showApprove %]
+        <a class="btn-disabled workflow-action" data-actiontype="APPROVE" data-disabled="[% TaskAction.disableApprove %]" href="main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]">
+            [% IF TaskAction.ApprovalEntityLevel == 3 %]
+                [% Lang.txt('Accept') %]
+            [% ELSE %]
+                [% Lang.txt('Approve') %]
+            [% END %]
         </a>
         [% END %]
 

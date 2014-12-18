@@ -367,11 +367,7 @@ sub listDocuments {
     my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
     my $obj = getInstanceOf($Data, 'entity', $currLoginID);
 	
-	#open FH, ">dumpfile.txt";
-	#print FH "\n\nInstance of: " . Dumper($obj) . "\n\n";
-    #print FH "\n" . Dumper(@{$Reg_ref}) . "\n";
-	#print FH "\n\n intEntityLevel: " . $obj->getValue('intEntityLevel') . "\n\n";
-    #does not matter how many, intPersonRegistrationID is the same all throughout
+	
     my $pRIDRef = ${$Reg_ref}[0];
 	my $cnt = 0;
 	my $regoIDtemp = 0;
@@ -389,20 +385,22 @@ my @headers = (
        		 {
       	      name => $lang->txt('Status'),
       	      field => 'strApprovalStatus',
-     		 },
+     		   },
       		 {
       	      name => $lang->txt('Date Uploaded'),
-     	       field => 'DateUploaded',
+     	       field => 'DateUploaded_FMT',
       		 },
       		 {
        		     name => $lang->txt('View'),
        		     field => 'ViewDoc',
        		     type => 'HTML',
+             sortable => 0,
       		  },
       		  {
        		 	name => $lang->txt('Replace'),
         			field => 'ReplaceFile',
         			type => 'HTML',
+             sortable => 0,
       		  },
    			 );
 			 my $filterfields = [
@@ -417,7 +415,7 @@ my @headers = (
 		$cnt++;
 		my @rowdata = ();
 		#get the documents here		
-		$grid .= qq[<br /><h3 class="panel-header">$registration->{'PersonType'} - $registration->{'Sport'} - $registration->{'PersonLevel'} ] . $lang->txt('for') . qq[ $registration->{'strNationalPeriodName'} ] . $lang->txt('in') . qq[ $registration->{'strLocalName'}</h3>];
+		$grid .= qq[<br /><h2 class="section-header">$registration->{'PersonType'} - $registration->{'Sport'} - $registration->{'PersonLevel'} ] . $lang->txt('for') . qq[ $registration->{'strNationalPeriodName'} ] . $lang->txt('in') . qq[ $registration->{'strLocalName'}</h2>];
 			
 			#loop over rego documents
 			foreach my $regodoc (@{$registration->{'documents'}}){
@@ -427,10 +425,10 @@ my @headers = (
                                tblDocumentType ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID INNER JOIN
 							   tblDocuments ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE 
 							   tblDocuments.strApprovalStatus = 'APPROVED' AND intPersonRegistrationID = ? AND 	
-							   tblDocumentType.intDocumentTypeID = ? AND tblDocuments.intPersonID = ? ];
+							   tblDocumentType.intDocumentTypeID = ? AND tblDocuments.intPersonID = ? AND tblRegistrationItem.intRealmID=?];
 
 			   my $sth = $db->prepare($query); 
-               $sth->execute($regodoc->{'intPersonRegistrationID'}, $regodoc->{'intDocumentTypeID'},$personID);
+               $sth->execute($regodoc->{'intPersonRegistrationID'}, $regodoc->{'intDocumentTypeID'},$personID, $Data->{'Realm'});
 			   my $dref = $sth->fetchrow_hashref(); 
 				#checks for strLockAtLevel and intUseExistingThisEntity and intUseExistingAnyEntity and Owner against Currently Logged
 			   if($regodoc->{'strLockAtLevel'} eq '' || $dref->{'intUseExistingThisEntity'} || $dref->{'intUseExistingAnyEntity'} || $registration->{'intEntityID'} == $currLoginID){	
@@ -494,16 +492,17 @@ my $addlink='';
 	 my $modoptions=qq[<div class="changeoptions"></div>];
 			#
 			$grid .= qq[
-                    <div class="panel-body">].showGrid(
+                    <div class="clearfix">].showGrid(
        		  Data => $Data,
       		  columns => \@headers,
       		  rowdata => \@rowdata,
        		  gridid => "grid$registration->{'intPersonRegistrationID'}",
        		  width => '100%',
+       		  coloredTop => 'no',
 			);
 			$grid .= qq[<br /><br /><p>].$lang->txt('Add a new document to this registration').qq[</p>$doclisttype </div>];
 		#
-		print FH "\n===============================================END====================================\n";
+
 		
 	}
         my $title = $lang->txt('Registration Documents');

@@ -75,10 +75,11 @@ sub getUploadedFiles	{
 
 	my @rows = ();
 	while(my $dref = $q->fetchrow_hashref())	{
+        $dref->{'DateAdded_FMT'} = $Data->{'l10n'}{'date'}->TZformat($dref->{'dtUploaded'},'MEDIUM','SHORT');
 
-		$st = qq[SELECT intUseExistingThisEntity, intUseExistingAnyEntity FROM tblRegistrationItem WHERE tblRegistrationItem.intID = ?];
+		$st = qq[SELECT intUseExistingThisEntity, intUseExistingAnyEntity FROM tblRegistrationItem WHERE tblRegistrationItem.intID = ? and tblRegistrationItem.intRealmID=?];
 		my $sth = $Data->{'db'}->prepare($st);
-		$sth->execute($dref->{'intDocumentTypeID'});
+		$sth->execute($dref->{'intDocumentTypeID'}, $Data->{'Realm'});
 		my $data = $sth->fetchrow_hashref();
 		#check if strLockLevel is empty which means world access to the file
 		 if($dref->{'strLockAtLevel'} eq '' || $data->{'intUseExistingThisEntity'} || $data->{'intUseExistingAnyEntity'} ||$dref->{'owner'} == $currLoginID){
@@ -133,9 +134,9 @@ sub processUploadFile	{
   ) = @_; 
       
 	my $ret = '';
-
-	for my $files (@{$files_to_process})	{
-		my $err = _processUploadFile_single(
+	my $fileID;
+	for my $files (@{$files_to_process})	{ 
+		 $fileID = _processUploadFile_single(
 			$Data,
 			$files->[0],
 			$files->[1],
@@ -146,12 +147,14 @@ sub processUploadFile	{
 			$files->[3] || undef,
             $other_info,
 		);
-		if($err)	{
-			$ret .= "'$files->[0]' : $err<br>";
-		}
+		#if($err)	{
+		#	$ret .= "'$files->[0]' : $err<br>";
+		#}
 	}
-
-  return $ret;
+	if($fileID =~ m/^(\d+)$/){
+		return $1; # need to get the file id back for updating previously uploaded file
+	}
+  return $fileID; # contains error
 }
 
 sub _processUploadFile_single	{
@@ -260,7 +263,8 @@ sub _processUploadFile_single	{
 	}
 	    #### START OF INSERTING DATA IN tblDocuments ##
         if($DocumentTypeId && !$oldFileId){
-           
+         open FH, ">dumpfile.txt";
+		 
            $doc_st = qq[
                 INSERT INTO tblDocuments ( 
                    intUploadFileID,
@@ -291,6 +295,12 @@ sub _processUploadFile_single	{
               $intPersonID, 
         );  
         #$EntityID = memberID (this should be the case)
+		print FH "\n\nfor tblDocuments: \n $fileID,
+              $DocumentTypeId,
+              $EntityTypeID,
+              $intEntityID,
+              $regoID,
+              $intPersonID,";  
         }
         else {
 			#update for person  documents      	 
@@ -300,10 +310,10 @@ sub _processUploadFile_single	{
 
 			#AND intPersonID = ?	- Remove this so entity documents can be handled accordingly since intUploadFileID will suffice
 
-			my $chkSQL = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem INNER JOIN tblDocumentType ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID INNER JOIN tblDocuments ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intUploadFileID = $oldFileId AND strApprovalStatus = 'APPROVED' AND (intUseExistingThisEntity = 1 OR intUseExistingAnyEntity = 1)] ;		
+			my $chkSQL = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem INNER JOIN tblDocumentType ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID INNER JOIN tblDocuments ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intUploadFileID = $oldFileId AND strApprovalStatus = 'APPROVED' AND (intUseExistingThisEntity = 1 OR intUseExistingAnyEntity = 1) AND tblRegistrationItem.intRealmID=?] ;		
 			my $newstat = 'PENDING';
 			$doc_q = $Data->{'db'}->prepare($chkSQL);
-			$doc_q->execute();
+			$doc_q->execute($Data->{'Realm'});
 			my $exists = $doc_q->fetchrow_hashref();
 			if($exists->{'tot'} > 0){
 				 $newstat = 'APPROVED';
@@ -394,8 +404,9 @@ sub _processUploadFile_single	{
 	if($error)	{
 		#Remove file
 		deleteFile( $Data, $fileID);
+		return $error;
 	}
-	return $error || '';
+	return $fileID;
 }
 
 sub deleteAllFiles	{

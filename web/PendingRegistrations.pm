@@ -142,7 +142,7 @@ sub listPendingRegistrations    {
         }
         push @rowdata, {
             id => $dref->{'intPersonRegistrationID'} || 0,
-            dtAdded=> $dref->{'dtAdded_formatted'} || '',
+            dtAdded=> $Data->{'l10n'}{'date'}->TZformat($dref->{'dtAdded'}|| '' , 'MEDIUM','SHORT'),
             PersonLevel=> $Defs::personLevel{$dref->{'strPersonLevel'}} || '',
             PersonType=> $Defs::personType{$dref->{'strPersonType'}} || '',
             AgeLevel=> $Defs::ageLevel{$dref->{'strAgeLevel'}} || '',
@@ -178,11 +178,7 @@ sub listPendingRegistrations    {
 
     my @headers = (
         {
-            type  => 'Selector',
-            field => 'SelectLink',
-        },
-        {
-            name  => $Data->{'lang'}->txt('Registration Type'),
+            name  => $Data->{'lang'}->txt('Type'),
             field => 'RegistrationNature',
             width  => 60,
         },
@@ -226,14 +222,19 @@ sub listPendingRegistrations    {
         #    width  => 50,
         #},
         {
-            name  => $Data->{'lang'}->txt('Task Assigned To'),
+            name  => $Data->{'lang'}->txt('Assigned To'),
             field => 'TaskTo',
             width  => 70,
         },
         {
-            name  => $Data->{'lang'}->txt('Date Registration Added'),
+            name  => $Data->{'lang'}->txt('Added'),
             field => 'dtAdded',
             width  => 50,
+        },
+        {
+            type  => 'Selector',
+            field => 'SelectLink',
+            width  => 100,
         },
     );
 
@@ -300,10 +301,6 @@ sub listPendingRegistrations    {
 
     my @entityheadersgrid = (
         {
-            type  => 'Selector',
-            field => 'SelectLink',
-        },
-        {
             name  => $Data->{'lang'}->txt('Name'),
             field => 'strLocalName',
             width  => 60,
@@ -311,11 +308,17 @@ sub listPendingRegistrations    {
         {
             name  => $Data->{'lang'}->txt('Level'),
             field => 'EntityLevel',
+            width  => 60,
         },
         {
             name   => $Data->{'lang'}->txt('Status'),
             #field  => 'strStatus',
             field  => 'displayStatus',
+            width  => 30,
+        },
+        {
+            type  => 'Selector',
+            field => 'SelectLink',
             width  => 30,
         },
        
@@ -337,12 +340,8 @@ sub listPendingRegistrations    {
         ); 
         $resultHTML .=  qq[
             <div style="clear:both">&nbsp;</div>
-            <h3 class="panel-header">Pending Registrations</h3>
-            <div class="panel-body">
-                <div class="grid-filter-wrap">
-                    <div style="width:99%;">$rectype_options</div>
+            <div class="clearfix">
                     $grid             
-                </div>
             </div>
         ];
     }
@@ -357,19 +356,15 @@ sub listPendingRegistrations    {
         );
         $resultHTML .= qq[
             <div style="clear:both">&nbsp;</div>
-            <h3 class="panel-header">Pending Entity Registrations</h3>
-            <div class="panel-body">
-                <div class="grid-filter-wrap">
+            <div class="clearfix">
                     $grid2          
-                </div> 
             </div>
         ];
     }
     if(! @rowdata and ! @fielddata){
     	$resultHTML = 'No Pending Registrations';
     }
-  
-
+    $title = $Data->{'lang'}->txt('Pending Registrations');
            
     return ($resultHTML,$title);
 }

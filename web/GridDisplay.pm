@@ -359,6 +359,7 @@ sub showGrid {
 	my $saveaction               = $params{'saveaction'}               || '';
 	my $ajax_keyfield            = $params{'ajax_keyfield'}            || 'id';
 	my $groupby                  = $params{'groupby'}                  || '';
+	my $coloredTopClass          = $params{'coloredTop'}               || 'yes';
 	my $groupby_collection_name  = $params{'groupby_collection_name'}  || 'items';
 	my $display_pager            = exists $params{'display_pager'} 
 		? $params{'display_pager'} 
@@ -434,6 +435,8 @@ sub showGrid {
     if(!$display_pager) {
         $gridConfig{'paging'} = 'false';
     }
+    $gridConfig{'dom'} = 'ilftpr';
+    $gridConfig{'language'}{'search'} = $Data->{'lang'}->txt('Filter');
 	my ($columndefs , $headerInfo) = processFieldHeaders($columninfo);
     $gridConfig{'columns'} = $columndefs;
 	my $config_str = to_json(\%gridConfig);
@@ -445,8 +448,9 @@ sub showGrid {
         $Data->{'AddToPage'}->add('js_bottom','inline',$js);
     }
 
+    my $coloredtop = $coloredTopClass eq 'yes' ? 'tableboxheader' : '';
 	return qq[
-		<table id = "$gridID" class = "table tableboxheader zebra" style = "$width">
+		<table id = "$gridID" class = "table $coloredtop zebra" style = "$width">
 			<thead>
 				<tr class = "">$headers</tr>
 			</thead>

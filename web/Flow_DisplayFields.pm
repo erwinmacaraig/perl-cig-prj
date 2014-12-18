@@ -342,7 +342,11 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
 
         my $sectionheader = $self->langlookup( $s->[1] ) || '';
         my $requiredfield = $self->langlookup('Required fields') || '';
-        if($action eq 'display')    {$requiredfield = ''; }
+        my $ROSectionclass = '';
+        if($action eq 'display')    {
+            $requiredfield = ''; 
+            $ROSectionclass = 'fieldSectionGroupWrapper-DisplayOnly';
+        }
 
         if ( $sections{ $s->[0] } ) {
             next if $s->[2] and not $self->display_section( $s->[2] );
@@ -359,7 +363,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                     $compulsory_string = '<p><span class="notice-error">'.$compulsory.$requiredfield.'</span></p>';
                 }
                 $returnstr .= qq[
-                    <div class = "fieldSectionGroupWrapper" id = "fsgw-].$s->[0].qq[">
+                    <div class = "fieldSectionGroupWrapper $ROSectionclass" id = "fsgw-].$s->[0].qq[">
                     $sh<div class = "panel-body fieldSectionGroup $extraclass" id = "fsg-].$s->[0].qq["><fieldset>$compulsory_string].$sections{ $s->[0] }.qq[</fieldset>$footer</div></div>];
             }
             else {

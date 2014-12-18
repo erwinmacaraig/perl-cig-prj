@@ -27,13 +27,9 @@
 	</div>
 	<div class="button-row">
         <ul class="row-btn-complete">
-            <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=WF_" class="btn-main">[% Lang.txt("Go to your Dashboard") %]</a></li>
+            <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=WF_" class="">[% Lang.txt("Go to your Dashboard") %]</a></li>
             <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PENDPR_" class="btn-main">[% Lang.txt("View all currently submitted registrations") %]</a></li>
-            [% IF dtype %]
-                <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PF_&amp;dtype=[% dtype %]" class="btn-main">[% Lang.txt("Register another ")%][% dtypeText %]</a></li>        
-            [% ELSE %]
-                <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PF_&amp;" class="btn-main">[% Lang.txt("Register another Person") %]</a></li>        
-            [% END %]
+            <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=C_DTA_&amp;" class="btn-main">[% Lang.txt("Register another Club") %]</a></li>        
         </ul>
     </div>
 </div>

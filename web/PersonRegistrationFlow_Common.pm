@@ -467,11 +467,11 @@ sub checkUploadedRegoDocuments {
 	my $query = qq[SELECT tblDocuments.intDocumentTypeID FROM tblDocuments INNER JOIN tblDocumentType
 				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
 				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
-				WHERE strApprovalStatus = 'APPROVED' AND intPersonID = ? AND 
+				WHERE strApprovalStatus IN ('PENDING','APPROVED') AND intPersonID = ? AND 
 				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
 				GROUP BY intDocumentTypeID];
 	my $sth = $Data->{'db'}->prepare($query);
-	$sth->execute($personID);
+	$sth->execute($personID, $Data->{'Realm'});
 	while(my $dref = $sth->fetchrow_hashref()){
 		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
 	}
@@ -479,6 +479,7 @@ sub checkUploadedRegoDocuments {
 	
 	my @required = ();
     foreach my $dc (@{$documents}){ 
+		#next if(!$dc);
 		next if(!$rego_ref->{'InternationalTransfer'} && $dc->{'DocumentFor'} eq 'TRANSFERITC');	#will only be included when there is an ITC
         next if( grep /$dc->{'ID'}/,@validdocsforallrego);
 		if( $dc->{'Required'} ) {
@@ -496,11 +497,11 @@ sub checkUploadedRegoDocuments {
     $query = qq[SELECT distinct(strDocumentName) FROM tblDocuments INNER JOIN tblDocumentType
 					ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID 
 					INNER JOIN tblRegistrationItem ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID WHERE
-					tblDocuments.intPersonID = ? AND tblDocuments.intPersonRegistrationID = ? AND tblRegistrationItem.intRequired = 1];
+					tblDocuments.intPersonID = ? AND tblDocuments.intPersonRegistrationID = ? AND tblRegistrationItem.intRequired = 1 AND tblRegistrationItem.intRealmID=?];
     
    my @uploaded_docs = ();
     $sth = $Data->{'db'}->prepare($query);
-    $sth->execute($personID, $regoID);
+    $sth->execute($personID, $regoID, $Data->{'Realm'});
 	
 	while(my $dref = $sth->fetchrow_hashref()){
 		push @uploaded_docs,$dref->{'strDocumentName'};
@@ -545,6 +546,8 @@ sub displayRegoFlowDocuments{
         0,
         $rego_ref,
      );
+
+
 	my @docos = (); 
 
     my %existingDocuments;
@@ -569,7 +572,6 @@ sub displayRegoFlowDocuments{
         tblUploadedFiles.intAddedByTypeID as AddedByTypeID,
         tblDocumentType.strDocumentName as Name,
         tblDocumentType.strDescription as Description
-
         FROM tblDocuments
         INNER JOIN tblDocumentType
             ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
@@ -579,11 +581,12 @@ sub displayRegoFlowDocuments{
             ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID 
         AND tblDocuments.intPersonID = ?
         AND tblDocuments.intPersonRegistrationID = ?
+        AND tblRegistrationItem.intRealmID=?
         ORDER BY tblDocuments.intDocumentID DESC
     ];
 
 	my $sth = $Data->{'db'}->prepare($query);
-	$sth->execute($personID,$regoID);
+	$sth->execute($personID,$regoID, $Data->{'Realm'});
 	my @uploaded_docs = ();
 	while(my $dref = $sth->fetchrow_hashref()){		
         #push @uploaded_docs, $dref->{'intDocumentTypeID'};		
@@ -595,7 +598,8 @@ sub displayRegoFlowDocuments{
 	my @diff = ();	
 
 	#compare whats in the system and what docos are missing both required and optional
-	foreach my $doc_ref (@{$documents}){	
+	foreach my $doc_ref (@{$documents}){
+		next if(!$doc_ref);	
 		next if(!$rego_ref->{'InternationalTransfer'} && $doc_ref->{'DocumentFor'} eq 'TRANSFERITC');	
 		if(!grep /$doc_ref->{'ID'}/,@uploaded_docs){
 			push @diff,$doc_ref;	
@@ -636,11 +640,12 @@ sub displayRegoFlowDocuments{
         WHERE strApprovalStatus IN ('APPROVED', 'PENDING')
         AND intPersonID = ?
         AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+        AND tblRegistrationItem.intRealmID=?
         ORDER BY tblDocuments.intDocumentID DESC
     ];
 
 	$sth = $Data->{'db'}->prepare($query);
-	$sth->execute($personID);
+	$sth->execute($personID, $Data->{'Realm'});
 
 	while(my $dref = $sth->fetchrow_hashref()){
         if(! exists $existingDocuments{$dref->{'ID'}}){
@@ -670,9 +675,7 @@ sub displayRegoFlowDocuments{
     	
     }
 
-    #if (! scalar @required_docs_listing and ! scalar @optional_docs_listing)  {
-     #   return '';
-    #}
+   
     
   my %PageData = (
         nextaction => "PREGF_DU",
@@ -686,8 +689,8 @@ sub displayRegoFlowDocuments{
         NoFormFields =>$noFormFields,
 		url => $Defs::base_url,
 		nature => $rego_ref->{'strRegistrationNature'},
-  );  
- my $pagedata = runTemplate($Data, \%PageData, 'registration/document_flow_backend.templ') || '';
+  );
+	my $pagedata = runTemplate($Data, \%PageData, 'registration/document_flow_backend.templ') || '';
 
     return $pagedata;
 }
