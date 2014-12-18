@@ -133,9 +133,9 @@ sub processUploadFile	{
   ) = @_; 
       
 	my $ret = '';
-
-	for my $files (@{$files_to_process})	{
-		my $err = _processUploadFile_single(
+	my $fileID;
+	for my $files (@{$files_to_process})	{ 
+		 $fileID = _processUploadFile_single(
 			$Data,
 			$files->[0],
 			$files->[1],
@@ -146,12 +146,14 @@ sub processUploadFile	{
 			$files->[3] || undef,
             $other_info,
 		);
-		if($err)	{
-			$ret .= "'$files->[0]' : $err<br>";
-		}
+		#if($err)	{
+		#	$ret .= "'$files->[0]' : $err<br>";
+		#}
 	}
-
-  return $ret;
+	if($fileID =~ m/^(\d+)$/){
+		return $1; # need to get the file id back for updating previously uploaded file
+	}
+  return $fileID; # contains error
 }
 
 sub _processUploadFile_single	{
@@ -260,7 +262,8 @@ sub _processUploadFile_single	{
 	}
 	    #### START OF INSERTING DATA IN tblDocuments ##
         if($DocumentTypeId && !$oldFileId){
-           
+         open FH, ">dumpfile.txt";
+		 
            $doc_st = qq[
                 INSERT INTO tblDocuments ( 
                    intUploadFileID,
@@ -291,6 +294,12 @@ sub _processUploadFile_single	{
               $intPersonID, 
         );  
         #$EntityID = memberID (this should be the case)
+		print FH "\n\nfor tblDocuments: \n $fileID,
+              $DocumentTypeId,
+              $EntityTypeID,
+              $intEntityID,
+              $regoID,
+              $intPersonID,";  
         }
         else {
 			#update for person  documents      	 
@@ -394,8 +403,9 @@ sub _processUploadFile_single	{
 	if($error)	{
 		#Remove file
 		deleteFile( $Data, $fileID);
+		return $error;
 	}
-	return $error || '';
+	return $fileID;
 }
 
 sub deleteAllFiles	{
