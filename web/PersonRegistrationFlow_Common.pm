@@ -551,7 +551,7 @@ sub checkUploadedRegoDocuments {
 			push @required,$dc;
 		}		
 	}
-	my $total = @required;
+	my $total = scalar @required;
 	
     return ('',1) if(!$total);
 
@@ -578,7 +578,7 @@ sub checkUploadedRegoDocuments {
 	#check for document not uploaded
 	foreach my $rdc (@required){		
 		if(!grep /\Q$rdc->{'Name'}\E/,@uploaded_docs){
-	#		push @diff,$rdc->{'Name'};
+		push @diff,$rdc->{'Name'};
 		}
 	}
 	
