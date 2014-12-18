@@ -2458,8 +2458,6 @@ sub populateDocumentViewData {
 	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
     $dref->{'currentAge'} ||= 0;
-    #print STDERR Dumper $dref;
-    $dref->{'currentAge'} ||= 0;
     my $st = qq[
         SELECT
             rd.intWFRuleDocumentID,
