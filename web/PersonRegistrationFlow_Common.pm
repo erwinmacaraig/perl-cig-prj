@@ -159,12 +159,73 @@ sub displayRegoFlowSummary {
 		}
         my $role_ref = getEntityTypeRoles($Data, $rego_ref->{'strSport'}, $rego_ref->{'strPersonType'});
         $rego_ref->{'roleName'} = $role_ref->{$rego_ref->{'strPersonEntityRole'}};
+		####################################################
 
+		my %existingDocuments;
+		my $query = qq[
+		SELECT
+        tblDocuments.intDocumentTypeID as ID,  
+        tblUploadedFiles.strOrigFilename,
+        tblUploadedFiles.intFileID,
+        tblDocumentType.strDocumentName as Name
+        FROM tblDocuments
+        INNER JOIN tblDocumentType
+            ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
+        INNER JOIN tblRegistrationItem 
+            ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
+        INNER JOIN tblUploadedFiles
+            ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID 
+        AND tblDocuments.intPersonID = ?
+        AND tblDocuments.intPersonRegistrationID = ?
+        AND tblRegistrationItem.intRealmID = ?
+        ORDER BY tblDocuments.intDocumentID DESC
+		];
+	
+
+		my $sth = $Data->{'db'}->prepare($query);
+		$sth->execute($personID,$regoID, $Data->{'Realm'});
+		 while(my $dref = $sth->fetchrow_hashref()){		
+            if(! exists $existingDocuments{$dref->{'ID'}}){
+                $existingDocuments{$dref->{'ID'}} = $dref;
+            }
+		} 
+	$query = qq[
+        SELECT
+        tblDocuments.intDocumentTypeID as ID,
+        tblUploadedFiles.strOrigFilename,
+        tblUploadedFiles.intFileID,
+        tblDocumentType.strDocumentName as Name,
+        FROM tblDocuments
+        INNER JOIN tblDocumentType
+            ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
+        INNER JOIN tblRegistrationItem 
+            ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
+        INNER JOIN tblUploadedFiles
+            ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID 
+        WHERE strApprovalStatus IN ('APPROVED', 'PENDING')
+        AND intPersonID = ?
+        AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+        AND tblRegistrationItem.intRealmID=?
+        ORDER BY tblDocuments.intDocumentID DESC
+    ];
+
+
+
+$sth = $Data->{'db'}->prepare($query);
+		$sth->execute($personID,$Data->{'Realm'});
+		 while(my $dref = $sth->fetchrow_hashref()){		
+            if(! exists $existingDocuments{$dref->{'ID'}}){
+                $existingDocuments{$dref->{'ID'}} = $dref;
+            }
+		} 
+
+		################################################
         my $editlink =  $Data->{'target'}."?".$carryString;
         my %PageData = (
             person_home_url => $url,
 			person => \%personData,
 			registration => $rego_ref,
+			alldocs => \%existingDocuments,
             gateways => $gateways,
 			txnCount => $txnCount,
             target => $Data->{'target'},
@@ -278,6 +339,8 @@ print STDERR "000OK IS $ok | $run\n\n";
 		
 		#$personData{''} = $personObj->getValue('') || '';
 
+		
+	
  		my $languages = PersonLanguages::getPersonLanguages( $Data, 1, 0);
 		for my $l ( @{$languages} ) {
 			if($l->{intLanguageID} == $personObj->getValue('intLocalLanguage')){
@@ -297,6 +360,8 @@ print STDERR "000OK IS $ok | $run\n\n";
        $cv{'entityID'} = $maObj->getValue('intEntityID');
        $cv{'currentLevel'} = $Defs::LEVEL_NATIONAL;
        my $mlm = setClient(\%cv);
+
+		
 
         my %PageData = (
             person_home_url => $url,
@@ -629,7 +694,6 @@ sub displayRegoFlowDocuments{
         tblUploadedFiles.intAddedByTypeID as AddedByTypeID,
         tblDocumentType.strDocumentName as Name,
         tblDocumentType.strDescription as Description
-
         FROM tblDocuments
         INNER JOIN tblDocumentType
             ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
