@@ -75,7 +75,27 @@ sub getRegistrationItems    {
 	        $Rego_ref->{'Nationality'} || '',
 	        
 		) or query_error($st);
-   
+   open FH, ">>dumpfile.txt";
+	print FH "\n\n\n--------------------------------------------------------\n
+    registrationitem:
+	\n
+	$Data->{'Realm'}, 
+	        $Data->{'RealmSubType'}, 
+	        strRuleFor = $ruleFor,
+	        intOriginLevel = $originLevel,
+		    regNature = $regNature,
+	        strEntityType = $Rego_ref->{'strEntityType'} || $Rego_ref->{'entityType'} || '',
+	        intEntityLevel = $entityLevel,
+		    strPersonType = $Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '',
+		    strPersonLevel = $Rego_ref->{'strPersonLevel'} || $Rego_ref->{'personLevel'} || '',
+		    strPersonEntityRole = $Rego_ref->{'strPersonEntityRole'} || $Rego_ref->{'personEntityRole'} || '',
+		    strSport = $Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '',
+		    strAgeLevel = $Rego_ref->{'strAgeLevel'} || $Rego_ref->{'ageLevel'} || '',
+	        itemType = $itemType, 
+	        Nationality = $Rego_ref->{'Nationality'} || '',
+	        Nationality = $Rego_ref->{'Nationality'} || '',
+	\n-------------------------------------------------------------------------\n
+	";
     my @values = (); 
     push @values, $Data->{'Realm'};  
     push @values,$Data->{'RealmSubType'}; 
