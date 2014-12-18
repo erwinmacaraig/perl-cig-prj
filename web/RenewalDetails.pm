@@ -33,7 +33,7 @@ sub getRenewalDetails {
         'sport' => $Defs::sportType{$rego->{'strSport'}} || '',
         'personRole' => $personRoles->{$rego->{'strPersonEntityRole'}} || '-',
         'personLevel' => $Defs::personLevel{$rego->{'strPersonLevel'}} || '-',
-        'ageLevel' => $Defs::ageLevel{$newAgeLevel} : '-',
+        'ageLevel' => $Defs::ageLevel{$newAgeLevel} || '-',
     );
 
     my $content = runTemplate(
