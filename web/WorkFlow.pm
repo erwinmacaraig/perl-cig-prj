@@ -2611,9 +2611,7 @@ sub populateDocumentViewData {
 		}        
        $cv{'currentLevel'} = $level;
        my $clm = setClient(\%cv);
-		
-
-		
+				
         my $docDesc = $tdref->{'descr'};
         $docDesc =~ s/'/\\\'/g;
 

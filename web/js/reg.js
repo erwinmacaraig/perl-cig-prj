@@ -23,7 +23,6 @@ function docViewer(id, params) {
     var d = jQuery('<div id = "docViewerOverlay"><iframe id="docViewerPage" src = "' + url +'" scrolling="no"></iframe>');
 	jQuery('body').append(d);
 }
-
          
 function replaceFile(id,parameters,doctypename,desc){ 
     $('#docViewerOverlay').remove();
