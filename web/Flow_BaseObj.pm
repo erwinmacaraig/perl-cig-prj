@@ -83,6 +83,9 @@ sub _setupRun   {
         $self->{'ID'} = $self->{'RunParams'}{'e'};
     }
     $self->addCarryField('e', $self->ID());
+    if($self->{'RunParams'}{'_ss'})   {
+        $self->addCarryField('_ss', $self->{'RunParams'}{'_ss'});
+    }
     $self->setCurrentProcessIndex($self->{'RunParams'}->{'rfp'});
 
     return 1;
