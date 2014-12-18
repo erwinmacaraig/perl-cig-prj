@@ -2241,3 +2241,7 @@ li:last-child.eightStepWidth {
     /*overflow: hidden;*/
     /*padding: 0;*/ /* reset style coming from bootstrap used only in this stylesheet */
 }
+
+.ui-datepicker {
+	z-index: 10!important;
+}
