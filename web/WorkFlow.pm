@@ -2013,6 +2013,7 @@ sub viewTask {
             p.intMinorProtection,
             p.dtSuspendedUntil,
             p.strISONationality,
+            TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             p.intGender as PersonGender,
             p.intInternationalTransfer as InternationalTransfer,
             e.strLocalName as EntityLocalName,
@@ -2507,6 +2508,8 @@ sub populateDocumentViewData {
                 AND regoItem.strPersonEntityRole IN ('', '$dref->{'strPersonEntityRole'}')
                 AND (regoItem.strISOCountry_IN ='' OR regoItem.strISOCountry_IN IS NULL OR regoItem.strISOCountry_IN LIKE CONCAT('%|','$dref->{'strISONationality'}','|%'))
                 AND (regoItem.strISOCountry_NOTIN ='' OR regoItem.strISOCountry_NOTIN IS NULL OR regoItem.strISOCountry_NOTIN NOT LIKE CONCAT('%|','$dref->{'strISONationality'}','|%'))
+                AND (regoItem.intFilterFromAge = 0 OR regoItem.intFilterFromAge <= $dref->{'currentAge'})
+                AND (regoItem.intFilterToAge = 0 OR regoItem.intFilterToAge >= $dref->{'currentAge'})
                 )
         LEFT JOIN tblRegistrationItem as entityItem
             ON (

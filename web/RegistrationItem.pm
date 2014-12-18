@@ -54,6 +54,8 @@ sub getRegistrationItems    {
         AND RI.strItemType = ? 
         AND (RI.strISOCountry_IN ='' OR RI.strISOCountry_IN IS NULL OR RI.strISOCountry_IN LIKE CONCAT('%|',?,'|%'))
         AND (RI.strISOCountry_NOTIN ='' OR RI.strISOCountry_NOTIN IS NULL OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))        
+        AND (RI.intFilterFromAge = 0 OR RI.intFilterFromAge <= ?)
+        AND (RI.intFilterToAge = 0 OR RI.intFilterToAge >= ?)
       ]; 
 
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
@@ -73,6 +75,8 @@ sub getRegistrationItems    {
 	        $itemType, 
 	        $Rego_ref->{'Nationality'} || '',
 	        $Rego_ref->{'Nationality'} || '',
+	        $Rego_ref->{'currentAge'} || 0,
+	        $Rego_ref->{'currentAge'} || 0,
 	        
 		) or query_error($st);
    
