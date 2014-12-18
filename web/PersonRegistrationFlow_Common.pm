@@ -554,8 +554,6 @@ sub checkUploadedRegoDocuments {
 	my $total = @required;
 	
     return ('',1) if(!$total);
-use Data::Dumper;
-print STDERR Dumper(\@required);
 
     #my $total_items = $dref->{'items'};     
     #return 1 if($total_items == 0);
