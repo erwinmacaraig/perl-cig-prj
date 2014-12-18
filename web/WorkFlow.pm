@@ -2244,26 +2244,6 @@ sub populateRegoViewData {
     my $personRequestData;
 	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
-    if($dref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER){
-        $title = $Data->{'lang'}->txt('Transfer');
-        $templateFile = 'workflow/view/transfer.templ';
-
-        my %regFilter = (
-            'requestID' => $dref->{'intPersonRequestID'},
-        );
-        my $request = getRequests($Data, \%regFilter);
-        $personRequestData = $request->[0];
-    }
-    else {
-        $title = $Data->{'lang'}->txt('Person Registration Details');
-        $templateFile = 'workflow/view/personregistration.templ';
-    }
-
-    my %fields = (
-        title => $title,
-        templateFile => $templateFile,
-    );
-
     my $role_ref = getEntityTypeRoles($Data, $dref->{'strSport'}, $dref->{'strPersonType'});
 
     my $isocountries  = getISOCountriesHash();
@@ -2276,12 +2256,14 @@ sub populateRegoViewData {
     my $PersonEditLink = "$Data->{'target'}?client=$tempClient&amp;a=PE_&amp;dtype=$dref->{'strPersonType'}";
     my $readonly = !( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 );
     my $minorProtectionOptions = getMinorProtectionOptions($Data, $dref->{'InternationalTransfer'});
+    my $LocalName = "$dref->{'strLocalFirstname'} $dref->{'strLocalMiddleName'} $dref->{'strLocalSurname'}" || '';
+    my $PersonType = $Data->{'lang'}->txt($Defs::personType{$dref->{'strPersonType'} || 0}) || '';
 	%TemplateData = (
         PersonDetails => {
             Status => $Data->{'lang'}->txt($Defs::personStatus{$dref->{'PersonStatus'} || 0}) || '',
             Gender => $Data->{'lang'}->txt($Defs::genderInfo{$dref->{'PersonGender'} || 0}) || '',
             DOB => $dref->{'dtDOB'} || '',
-            LocalName => "$dref->{'strLocalFirstname'} $dref->{'strLocalMiddleName'} $dref->{'strLocalSurname'}" || '',
+            LocalName => $LocalName,
             LatinName => "$dref->{'strLatinFirstname'} $dref->{'strLatinMiddleName'} $dref->{'strLatinSurname'}" || '',
             Address => "$dref->{'strAddress1'} $dref->{'strAddress2'} $dref->{'strAddress2'} $dref->{'strSuburb'} $dref->{'strState'} $dref->{'strPostalCode'}" || '',
             Nationality => $isocountries->{$dref->{'strISONationality'}} || '',
@@ -2295,7 +2277,7 @@ sub populateRegoViewData {
             ID => $dref->{'intPersonRegistrationID'},
             Status => $Data->{'lang'}->txt($Defs::personRegoStatus{$dref->{'personRegistrationStatus'} || 0}) || '-',
             RegoType => $Data->{'lang'}->txt($Defs::registrationNature{$dref->{'strRegistrationNature'} || 0}) || '-',
-            PersonType => $Data->{'lang'}->txt($Defs::personType{$dref->{'strPersonType'} || 0}) || '-',
+            PersonType => $PersonType || '-',
             PersonEntityTypeRole => $Data->{'lang'}->txt($role_ref->{$dref->{'strPersonEntityRole'} || 0}) || '-',
             Sport => $Defs::sportType{$dref->{'strSport'}} || '-',
             Level => $Defs::personLevel{$dref->{'strPersonLevel'}} || '-',
@@ -2320,6 +2302,28 @@ sub populateRegoViewData {
 
     $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.')
         if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_REGO'} == 1 and $dref->{'regoPaymentRequired'});
+
+    if($dref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER){
+        $title = $Data->{'lang'}->txt('Transfer') . " - $LocalName";;
+        $templateFile = 'workflow/view/transfer.templ';
+
+        my %regFilter = (
+            'requestID' => $dref->{'intPersonRequestID'},
+        );
+        my $request = getRequests($Data, \%regFilter);
+        $personRequestData = $request->[0];
+    }
+    else {
+        $title = $Data->{'lang'}->txt('Registration') . " - $LocalName";
+        $title .= ' - ' . $PersonType if $PersonType;
+        $templateFile = 'workflow/view/personregistration.templ';
+    }
+
+    my %fields = (
+        title => $title,
+        templateFile => $templateFile,
+    );
+
 
     return (\%TemplateData, \%fields);
 }
