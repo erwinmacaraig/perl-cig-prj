@@ -714,6 +714,8 @@ sub getRegistrationData	{
         AND RI.strItemType = 'DOCUMENT' 
         AND (RI.strISOCountry_IN ='' OR RI.strISOCountry_IN IS NULL OR RI.strISOCountry_IN LIKE CONCAT('%|$dref->{'strISONationality'}|%'))
         AND (RI.strISOCountry_NOTIN ='' OR RI.strISOCountry_NOTIN IS NULL OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|$dref->{'strISONationality'}|%'))
+        AND (RI.intFilterFromAge = 0 OR RI.intFilterFromAge <= $dref->{'currentAge'})
+        AND (RI.intFilterToAge = 0 OR RI.intFilterToAge >= $dref->{'currentAge'})
 ];		
 
 
