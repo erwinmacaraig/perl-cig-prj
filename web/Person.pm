@@ -247,7 +247,7 @@ sub personRegistrationsHistory   {
         id => $rego->{'intPersonRegistrationID'} || 0,
         EntityLocalName=> $name,
         EntityLatinName=> $rego->{'strLatinName'} || '',
-        dtAdded=> $rego->{'dtAdded_formatted'} || '',
+        dtAdded=> $Data->{'l10n'}{'date'}->TZformat($rego->{'dtAdded'},'MEDIUM','SHORT') || '',
         PersonType=> $rego->{'PersonType'} || '',
         PersonLevel=> $rego->{'PersonLevel'} || '',
         AgeLevel=> $rego->{'AgeLevel'} || '',
@@ -281,11 +281,7 @@ sub personRegistrationsHistory   {
 
     my @headers = (
         {
-            type  => 'Selector',
-            field => 'SelectLink',
-        },
-        {
-            name  => $Data->{'lang'}->txt('Registration Type'),
+            name  => $Data->{'lang'}->txt('Registration'),
             field => 'RegistrationNature',
         },
         {
@@ -318,6 +314,10 @@ sub personRegistrationsHistory   {
             name  => $Data->{'lang'}->txt('Date Registered'),
             field => 'dtAdded',
         },
+        {
+            type  => 'Selector',
+            field => 'SelectLink',
+        },
     );
 
     my $filterfields = [
@@ -338,13 +338,12 @@ sub personRegistrationsHistory   {
         columns => \@headers,
         rowdata => \@rowdata,
         gridid  => 'grid',
-        width   => '99%',
+        width   => '100%',
         filters => $filterfields,
     );
 
     my $resultHTML = qq[
-        <div class="grid-filter-wrap">
-            <div style="width:99%;">$rectype_options</div>
+        <div class="clearfix">
             $grid
         </div>
     ];

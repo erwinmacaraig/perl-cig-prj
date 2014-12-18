@@ -91,7 +91,7 @@ sub handleCertificates {
     columns => \@headers,
     rowdata => \@rowdata,
     gridid => 'grid',
-    width => '99%',
+    width => '100%',
     height => 700,
   );
 
