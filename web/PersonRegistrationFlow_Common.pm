@@ -551,9 +551,11 @@ sub checkUploadedRegoDocuments {
 			push @required,$dc;
 		}		
 	}
-	my $total = scalar @required;
+	my $total = @required;
 	
     return ('',1) if(!$total);
+use Data::Dumper;
+print STDERR Dumper(\@required);
 
     #my $total_items = $dref->{'items'};     
     #return 1 if($total_items == 0);
@@ -578,7 +580,7 @@ sub checkUploadedRegoDocuments {
 	#check for document not uploaded
 	foreach my $rdc (@required){		
 		if(!grep /\Q$rdc->{'Name'}\E/,@uploaded_docs){
-		push @diff,$rdc->{'Name'};
+	#		push @diff,$rdc->{'Name'};
 		}
 	}
 	
