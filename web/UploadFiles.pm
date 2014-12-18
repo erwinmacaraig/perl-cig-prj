@@ -77,9 +77,9 @@ sub getUploadedFiles	{
 	while(my $dref = $q->fetchrow_hashref())	{
         $dref->{'DateAdded_FMT'} = $Data->{'l10n'}{'date'}->TZformat($dref->{'dtUploaded'},'MEDIUM','SHORT');
 
-		$st = qq[SELECT intUseExistingThisEntity, intUseExistingAnyEntity FROM tblRegistrationItem WHERE tblRegistrationItem.intID = ?];
+		$st = qq[SELECT intUseExistingThisEntity, intUseExistingAnyEntity FROM tblRegistrationItem WHERE tblRegistrationItem.intID = ? and tblRegistrationItem.intRealmID=?];
 		my $sth = $Data->{'db'}->prepare($st);
-		$sth->execute($dref->{'intDocumentTypeID'});
+		$sth->execute($dref->{'intDocumentTypeID'}, $Data->{'Realm'});
 		my $data = $sth->fetchrow_hashref();
 		#check if strLockLevel is empty which means world access to the file
 		 if($dref->{'strLockAtLevel'} eq '' || $data->{'intUseExistingThisEntity'} || $data->{'intUseExistingAnyEntity'} ||$dref->{'owner'} == $currLoginID){
@@ -301,10 +301,10 @@ sub _processUploadFile_single	{
 
 			#AND intPersonID = ?	- Remove this so entity documents can be handled accordingly since intUploadFileID will suffice
 
-			my $chkSQL = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem INNER JOIN tblDocumentType ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID INNER JOIN tblDocuments ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intUploadFileID = $oldFileId AND strApprovalStatus = 'APPROVED' AND (intUseExistingThisEntity = 1 OR intUseExistingAnyEntity = 1)] ;		
+			my $chkSQL = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem INNER JOIN tblDocumentType ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID INNER JOIN tblDocuments ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intUploadFileID = $oldFileId AND strApprovalStatus = 'APPROVED' AND (intUseExistingThisEntity = 1 OR intUseExistingAnyEntity = 1) AND tblRegistrationItem.intRealmID=?] ;		
 			my $newstat = 'PENDING';
 			$doc_q = $Data->{'db'}->prepare($chkSQL);
-			$doc_q->execute();
+			$doc_q->execute($Data->{'Realm'});
 			my $exists = $doc_q->fetchrow_hashref();
 			if($exists->{'tot'} > 0){
 				 $newstat = 'APPROVED';

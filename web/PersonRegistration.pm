@@ -655,7 +655,7 @@ sub getRegistrationData	{
 
     $query->execute(@values) or query_error($st);
     my $count=0;
-	open FH, ">dumpfile.txt";
+	
     my @Registrations = ();
     my @reg_docs = ();  
     while(my $dref= $query->fetchrow_hashref()) {
