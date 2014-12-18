@@ -194,7 +194,7 @@ sub displayRegoFlowSummary {
         tblDocuments.intDocumentTypeID as ID,
         tblUploadedFiles.strOrigFilename,
         tblUploadedFiles.intFileID,
-        tblDocumentType.strDocumentName as Name,
+        tblDocumentType.strDocumentName as Name
         FROM tblDocuments
         INNER JOIN tblDocumentType
             ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
@@ -580,7 +580,7 @@ print STDERR Dumper(\@required);
 	#check for document not uploaded
 	foreach my $rdc (@required){		
 		if(!grep /\Q$rdc->{'Name'}\E/,@uploaded_docs){
-	#		push @diff,$rdc->{'Name'};
+			push @diff,$rdc->{'Name'};
 		}
 	}
 	
