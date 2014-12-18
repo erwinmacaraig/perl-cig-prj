@@ -100,6 +100,8 @@ sub setProcessOrder {
             'function' => 'display_complete',
             'label'  => 'Complete',
             'title'  => 'Club - Submitted',
+            'NoNav' => 1,
+            'NoGoingBack' => 1,
         },
     ];
 }
@@ -419,7 +421,7 @@ sub process_products {
     $self->addCarryField('prodQty',$prodQty);
     my $prodIds= join(':',@productsselected);
     $self->addCarryField('prodIds', $prodIds);
-
+use Data::Dumper;
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
@@ -441,7 +443,7 @@ sub process_products {
         undef,
     );
 
-    my ($txns_added, $amount) = insertRegoTransaction($self->{'Data'}, 0, 0, $self->{'RunParams'}, $entityID, $entityLevel, 1, '', $CheckProducts);
+    my ($txns_added, $amount) = insertRegoTransaction($self->{'Data'}, 0, $self->{'RunParams'}{'newclubid'}, $self->{'RunParams'}, $entityID, $entityLevel, $Defs::LEVEL_CLUB, '', $CheckProducts);
     $txnIds = join(':',@{$txns_added});
 
     $self->addCarryField('txnIds',$txnIds);

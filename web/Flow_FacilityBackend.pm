@@ -60,6 +60,7 @@ sub setProcessOrder {
             'action' => 'role',
             'function' => 'display_role_details',
             'fieldset' => 'roledetails',
+            'label' => 'Fields',
             'title'  => 'Facility - Enter Role Details',
         },
         {
@@ -70,8 +71,8 @@ sub setProcessOrder {
         {
             'action' => 'fld',
             'function' => 'display_fields',
-            'label' => 'Fields',
             'title'  => 'Facility - Enter Additional Information',
+            'ShareNav'  => 'Fields',
         },
         {
             'action' => 'fldu',
@@ -107,6 +108,8 @@ sub setProcessOrder {
             'function' => 'display_complete',
             'label'  => 'Complete',
             'title'  => 'Facility - Submitted',
+            'NoGoingBack' => 1,
+            'NoNav' => 1,
         },
     ];
 
@@ -425,21 +428,21 @@ sub setupValues {
             'fields' => {
                 intEntityFieldCount    => {
                     label       => $FieldLabels->{'intEntityFieldCount'},
-                    value       => $values->{'intEntityFieldCount'},
+                    value       => $self->{'RunParams'}{'facilityFieldCount'},
                     type        => 'text',
                     size        => '50',
                     maxsize     => '100',
                     compulsory  => 1,
                     validate    => 'NUMBER',
                 },
-                strParentEntityName => {
-                    label       => $self->{'ClientValues'}{'authLevel'} == $Defs::LEVEL_CLUB ? 'Club name' : 'Organisation',
-                    value       => "",
-                    type        => 'text',
-                    size        => '50',
-                    maxsize     => '100',
-                    disabled    => 1,
-                },
+                #strParentEntityName => {
+                #    label       => $self->{'ClientValues'}{'authLevel'} == $Defs::LEVEL_CLUB ? 'Club name' : 'Organisation',
+                #    value       => "",
+                #    type        => 'text',
+                #    size        => '50',
+                #    maxsize     => '100',
+                #    disabled    => 1,
+                #},
             },
             'order' => [qw(
                 intEntityFieldCount
@@ -586,7 +589,7 @@ sub validate_contact_details {
     my $self = shift;
 
     my $facilityData = {};
-    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Club',);
+    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'contactdetails'}, 'Club',);
     ($facilityData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
     my $id = $self->ID() || 0;
     if(!$id){
@@ -676,8 +679,16 @@ print STDERR "SSSS";
     $facilityFields->setData($self->{'Data'});
     
     my @facilityFieldsData = ();
+    my $startNewIndex = 1;
 
-    for my $i (1 .. $facilityFieldCount){
+    #if user navigates back, reload previous data
+    foreach my $fieldObjData (@{$facilityFields->getAll()}){
+        $facilityFields->setDBData($fieldObjData);
+        push @facilityFieldsData, $facilityFields->generateSingleRowField($startNewIndex, $fieldObjData->{'intEntityFieldID'});
+        $startNewIndex++;
+    }
+
+    for my $i ($startNewIndex .. $facilityFieldCount){
         $facilityFields->setDBData({});
         push @facilityFieldsData, $facilityFields->generateSingleRowField($i, undef);
     }
@@ -733,16 +744,26 @@ sub process_fields {
     my $addedFields = 0;
 
     #check current tblEntityFields entry count for this specific process to avoid duplicates
-    if($facilityFieldCount != scalar@{$facilityFields->getAll()}){
-        foreach my $fieldObjData (@{$facilityFieldDataCluster}){
-            my $entityFieldObj = new EntityFieldObj(db => $self->{'db'}, ID => 0);
-            $entityFieldObj->load();
-            $entityFieldObj->setValues($fieldObjData);
-            $entityFieldObj->write();
-            $addedFields++;
-        }
+    #if($facilityFieldCount != scalar@{$facilityFields->getAll()}){
+    #    foreach my $fieldObjData (@{$facilityFieldDataCluster}){
+    #        my $entityFieldObj = new EntityFieldObj(db => $self->{'db'}, ID => 0);
+    #        $entityFieldObj->load();
+    #        $entityFieldObj->setValues($fieldObjData);
+    #        $entityFieldObj->write();
+    #        $addedFields++;
+    #    }
 
-        $self->addCarryField('addedFields', $addedFields);
+    #    $self->addCarryField('addedFields', $addedFields);
+    #}
+
+    foreach my $fieldObjData (@{$facilityFieldDataCluster}){
+        my $existingEntityFieldID = $fieldObjData->{'intEntityFieldID'} || 0;
+        #if previously added, set ID to $existingEntityFieldID to update record instead of inserting duplicates
+        my $entityFieldObj = new EntityFieldObj(db => $self->{'db'}, ID => $existingEntityFieldID);
+        $entityFieldObj->load();
+        $entityFieldObj->setValues($fieldObjData);
+        $entityFieldObj->write();
+        $addedFields++;
     }
 
     return ('', 1);
@@ -1109,6 +1130,8 @@ sub loadObjectValues    {
             strContactISOCountry
             strPhone
             strEmail
+            strFax
+            strWebURL
 
             strEntityType
             intLegalTypeID
@@ -1128,5 +1151,99 @@ sub loadObjectValues    {
         }
     }
     return \%values;
+}
+
+sub Navigation {
+    #May need to be overriden in child class to define correct order of steps
+  my $self = shift;
+
+    my $navstring = '';
+    my $meter = '';
+    my @navoptions = ();
+    my $step = 1;
+    my $step_in_future = 0;
+    my $shared_nav = 0;
+    my $noNav = $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'NoNav'} || 0;
+    my $noGoingBack = $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'NoGoingBack'} || 0;
+    return '' if $noNav;
+
+    my $startingStep = $self->{'RunParams'}{'_ss'} || '';
+    my $includeStep = 1;
+    $includeStep = 0 if $startingStep;
+    for my $i (0 .. $#{$self->{'ProcessOrder'}})    {
+        my $current = 0;
+        my $name = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'label'} || $self->{'ProcessOrder'}[$i]{'ShareNav'} || '');
+
+        if($startingStep and $self->{'ProcessOrder'}[$i]{'action'} eq $startingStep)   {
+            $includeStep = 1;
+        }
+        next if !$includeStep;
+        next if($self->{'ProcessOrder'}[$i]{'NoNav'});
+        if($name)   {
+            $current = 1 if $i == $self->{'CurrentIndex'};
+            push @navoptions, [
+                $name,
+                $current || $step_in_future || 0,
+            ];
+
+            my $currentclass = '';
+            $currentclass = 'current' if $current;
+            $currentclass = 'next' if $step_in_future;
+            $currentclass ||= 'previous';
+            $meter = $step if $current;
+            my $showlink = 0;
+            $showlink = 1 if(!$current and !$step_in_future);
+            $showlink = 0 if($self->{'ProcessOrder'}[$i]{'noRevisit'});
+            $showlink = 0 if $noGoingBack;
+            my $linkURL = $self->{'Target'}."?rfp=".$self->{'ProcessOrder'}[$i]{'action'}."&".$self->stringifyURLCarryField();
+            $self->{'RunDetails'}{'DirectLinks'}[$i] = $linkURL;
+
+            if($self->{'ProcessOrder'}[$i]{'ShareNav'}){
+                $step_in_future = 2 if $current;
+                $shared_nav = 1;
+            }
+            else {
+                $shared_nav = 0;
+                my $link = $showlink
+                    ? qq[<a href="$linkURL" class = "stepname">$step. $name</a>]
+                    : qq[<span class = "stepname">$step. $name</span>];
+                
+                $navstring .= qq[ <li class = "$currentclass step step-$step"><span class="$currentclass step-num">$link</li> ];
+                $step_in_future = 2 if $current;
+                $step++;
+            }
+        }
+    }
+
+    my $returnHTML = '';
+    $returnHTML .= qq[<ul class = "playermenu list-inline form-nav">$navstring</ul><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;
+   
+
+    if(wantarray)   {
+        return ($returnHTML, \@navoptions);
+    }
+    return $returnHTML || '';
+}
+
+sub buildBackButton {
+  my $self = shift;
+
+  my $currentIndex = $self->{'CurrentIndex'} || 0;
+  my $noGoingBack = $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'NoGoingBack'} || 0;
+  if(!$currentIndex or $noGoingBack)  {
+    return ('','');
+  }
+  my $backIndex = $currentIndex - 1 ;
+  my $text = '';
+  while($backIndex >= 0 and $text eq '')    {
+    if(!$self->{'ProcessOrder'}[$backIndex]{'NoNav'})   {
+        $text = $self->{'ProcessOrder'}[$backIndex]{'label'} || '';
+    }
+    $backIndex-- if !$text;
+  }
+  return ('','') if !$text;
+  
+  my $url = $self->{'RunDetails'}{'DirectLinks'}[$backIndex] || '';
+  return ($url, $text);
 }
 

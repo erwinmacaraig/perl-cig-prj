@@ -147,6 +147,7 @@ sub setProcessOrder {
             'label'  => 'Complete',
             'title'  => "$regname - Submitted",
             'NoGoingBack' => 1,
+            'NoNav' => 1,
         },
     ];
 }
