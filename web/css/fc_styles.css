@@ -343,19 +343,19 @@ strong {
 	text-align: center;
 } 
 #allfilesgridid_filter label input[type="search"] {
-	border-radius: 5px;
-    padding: 5px;
-    width: 71%;
+	/*border-radius: 5px;*/
+    /*padding: 5px;*/
+    width: 74%;
 }
 #grid_wrapper #grid_filter label input[type="search"] {
 	border-radius: 5px;
     /*padding: 5px;
     width: 71%;*/
 }
-div.showrecoptions form#personDocAdd {
+div.showrecoptions form#personDocAdd, div.showrecoptions form#entityDocAdd {
 	position: relative;
 }
-#personDocAdd label {
+#personDocAdd label, #entityDocAdd label {
 	margin-left: 15px;
     margin-top: 15px;
     padding-right: 10px;
@@ -386,6 +386,12 @@ div.showrecoptions form#personDocAdd {
     padding: 0;
     width: 5%;
 }
+
+#entityDocAdd select[name="doclisttype"]{
+	padding: 7px;
+    width: 39%;
+}
+
 #pageholder div.showrecoptions {
 	float: left;
 }
@@ -1872,8 +1878,8 @@ header nav ul li a.selected {
 }
 
 .showrecoptions form #doclisttype {
-	padding: 9px;
-    width: 67%;
+	padding: 7px;
+    width: 68%;
 }
 
 /* START OLD PROGRESS STEP STYLES*/

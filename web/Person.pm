@@ -473,7 +473,7 @@ my $addlink='';
     $sth->execute($Defs::DOC_FOR_PERSON,$Data->{'Realm'});
     my $doclisttype = qq[  
                     <div> 
-<form action="$Data->{'target'}" id="personDocAdd">
+                              <form action="$Data->{'target'}" id="personDocAdd">
                               <input type="hidden" name="client" value="$client" />
                               <input type="hidden" name="a" value="DOC_L" />
 							  <input type="hidden" name="RegistrationID" value="$registration->{'intPersonRegistrationID'}" />
