@@ -2533,7 +2533,6 @@ sub populateDocumentViewData {
         ORDER BY dt.strDocumentName, d.intDocumentID DESC
     ];
    
-print STDERR $st;
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
     $q->execute(
         $dref->{'intWFTaskID'},
