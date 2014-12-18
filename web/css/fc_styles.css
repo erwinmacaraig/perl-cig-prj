@@ -857,10 +857,10 @@ header ul#menu ul li a:hover {
 }
 
 /* Added Styles for Table in Task List Dashboard:: Vincent R; */
-.dashboard-tasklist td, .documents-list td{
+.dashboard-tasklist td {
 	padding: 15px 15px;
 }
-.dashboard-tasklist th, .documents-list th{
+.dashboard-tasklist th {
 	padding: 10px 20px;
 }
 .dashboard-tasklist td select{
@@ -870,7 +870,7 @@ header ul#menu ul li a:hover {
 	width: 130px;
 	margin-left: 0px;
 }
-.dashboard-tasklist tr, .documents-list tr{
+.dashboard-tasklist tr{
 	border: 1px solid #cbcbcb;
 }
 
@@ -895,16 +895,17 @@ span.flash_success{
 span.flash_error{
 	margin-right: 10px;
 }
-.box-header{
+.box-header {
 	padding: 13px 25px;
-	background: #004e7e;
+	background: #004e7e !important;
 	color: #fff;
-	font-size: 14px;
+	font-size: 13px;
 }
 .sidebar-box{
 	border: 1px solid #cbcbcb;
 	margin-bottom: 20px;
 	padding-bottom: 0px;
+    background-color:#ededed;
 }
 .sidebar-box .col-md-12{
 	padding: 0 20px;
@@ -1540,6 +1541,10 @@ a.paginate_button.previous, a.paginate_button.next, a.paginate_button {
 	font-size: 13px;
 }
 
+#worktasks tr {
+    background-color:#ededed;
+}
+
 span.fa-user{
 	margin-top:3px;
 }
@@ -1845,6 +1850,10 @@ header nav ul li a.selected {
 	width:185px;
 }
 
+.fiveStepWidth {
+	width:220px;
+}
+
 .playermenu li {
 	display:table-cell;
 	/*width:155px;*/
@@ -1932,25 +1941,14 @@ header nav ul li a.selected {
 	left:125px;
 }
 
-#doctab1 .documents-list table.table .task-list .status-col span {
-	float: left;
-	width: 50%;
-}
-#doctab1 .documents-list table.table .task-list .status-col i span {
-	float: left;
-	width: 100%;
-}
-#doctab1 .documents-list table.table .task-list .status-col i.fa-circle {
-	float: left;
-}
-#doctab1 .documents-list table.table .task-list .status-col a.btn-inside-docs-panel {
-	width: 95px;
-}
 
 .playermenu li.eightStepWidth.previous:after {
 	left:125px;
 }
 
+.playermenu li.fiveStepWidth.previous:after {
+	left:200px;
+}
 
 
 li.eightStepWidth.previous {
@@ -1977,4 +1975,19 @@ li:last-child.sevenStepWidth {
 li:last-child.eightStepWidth {
 	width:12.4%;
 
+}
+
+#doctab1 .documents-list table.table .task-list .status-col span {
+	float: left;
+	width: 50%;
+}
+#doctab1 .documents-list table.table .task-list .status-col i span {
+	float: left;
+	width: 100%;
+}
+#doctab1 .documents-list table.table .task-list .status-col i.fa-circle {
+	float: left;
+}
+#doctab1 .documents-list table.table .task-list .status-col a.btn-inside-docs-panel {
+	width: 95px;
 }

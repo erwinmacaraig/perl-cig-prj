@@ -32,8 +32,7 @@
 
 <div class="member-home-page">
     <div class="col-md-9">
-        <h3 class="panel-header">[% PersonDetails.LocalName %] - [% PersonRegoDetails.PersonType %]</h3>
-        <div class="panel-body">
+        <div class="">
             <ul class="nav nav-tabs">
                 <li class="active">
                 <a data-toggle="tab" data-visited="true" href="#memberdocs">[% Lang.txt('Documents') %]
@@ -190,16 +189,16 @@
                     <div class="row-padding">
                     <div style="clear: both;">&nbsp;</div>
                     <div class="row">
-                        <h3 class="panel-header">License and Payment Details</h3>
-                        <div class="panel-body">
+                        <h2 class="section-header">[% Lang.txt('License and Payment Details') %]</h2>
+                        <div class="">
                             [% PaymentBlock %]
                         </div>
                     </div> 
 
                     <div style="clear: both;">&nbsp;</div>
                     <div class="row">
-                        <h3 class="panel-header">[% Lang.txt('Work History') %]</h3>
-                        <div class="panel-body">
+                        <h2 class="section-header">[% Lang.txt('Work History') %]</h2>
+                        <div class="">
                             [% NotesBlock %]
                         </div>
                     </div> 

@@ -142,7 +142,7 @@ sub pageMain {
     $Data->{'AddToPage'}->add(
         'js_bottom',
         'inline',
-        'jQuery(".chzn-select").chosen({ disable_search_threshold: 10 });',
+        'jQuery(".chzn-select").chosen({ disable_search_threshold: 30 });',
     );
 
     $Data->{'AddToPage'}->add(

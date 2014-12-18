@@ -26,9 +26,10 @@ div.dataTables_filter input {
 }
 
 div.dataTables_info {
-	padding-top: 8px;
 	white-space: nowrap;
-	font-size: 13px;
+	padding:3px;
+    margin:3px;
+    color:#000;
 }
 
 div.dataTables_paginate {
