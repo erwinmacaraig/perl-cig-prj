@@ -56,9 +56,9 @@ sub handle_documents {
 		else {
 			if($retvalue eq '' && length($retvalue) == 0){
         	# check if the document to be uploaded is a REGO document 
-            	my $query = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem WHERE strRuleFor = ? AND strItemType = ? AND intID = ? AND intRequired = ?];
+            	my $query = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem WHERE strRuleFor = ? AND strItemType = ? AND intID = ? AND intRequired = ? and intRealmID= ?];
 				my $sth = $Data->{'db'}->prepare($query); 
-    			$sth->execute('REGO', 'DOCUMENT', $DocumentTypeID, 1);
+    			$sth->execute('REGO', 'DOCUMENT', $DocumentTypeID, 1, $Data->{'Realm'});
 				my $isREGODocument = 0;
 				my $dref = $sth->fetchrow_hashref();
 				$isREGODocument = $dref->{'tot'};
@@ -105,9 +105,9 @@ sub handle_documents {
 		if($delOK){
 
 			if($DocumentTypeID){	
-				my $query = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem WHERE strRuleFor = ? AND strItemType = ? AND intID = ? AND intRequired = ?];
+				my $query = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem WHERE strRuleFor = ? AND strItemType = ? AND intID = ? AND intRequired = ? and intRealmID = ?];
 				my $sth = $Data->{'db'}->prepare($query); 
-    			$sth->execute('REGO', 'DOCUMENT', $DocumentTypeID, 1);
+    			$sth->execute('REGO', 'DOCUMENT', $DocumentTypeID, 1, $Data->{'Realm'});
 				my $isREGODocument = 0;
 
 				if($isREGODocument){
@@ -204,11 +204,13 @@ sub list_docs {
             name => $Data->{'lang'}->txt('View'),
             field => 'View',
             type => 'HTML',
+            sortable => 0,
         },
          {
             name => $Data->{'lang'}->txt('Delete'),
             field => 'Delete',
             type => 'HTML',
+            sortable => 0,
         },
     ); 
    $allfilesgrid = showGrid(
@@ -217,14 +219,15 @@ sub list_docs {
         rowdata => $docs,
         gridid => 'allfilesgridid',
         width => '100%',
+        coloredTop => 'no',
         
    ); 
 
    $body .= qq[
        	<div style="clear:both;">&nbsp;</div>
        	<div class="col-md-12">
-			<h3 class="panel-header"> All Files </h3> 
-			<div class="panel-body">
+			<h2 class="section-header">].$Data->{'lang'}->txt('All Files').qq[</h2> 
+			<div class="">
 				$allfilesgrid
 			</div>
 		</div>

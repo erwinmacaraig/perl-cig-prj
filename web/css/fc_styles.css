@@ -613,6 +613,7 @@ table.table tr td {
 table.table.tableboxheader tr td {
 	padding: 8px 20px;
 	border-bottom: 1px solid #ccc;
+	vertical-align: middle;
 }
 
 table.table.tableboxheader tr td.just-view-text{
@@ -807,6 +808,18 @@ table tr.new-task {
 	color: #fff;
 }
 
+.regoType_PLAYER {
+    background-color: #0784d4;
+}
+.regoType_COACH {
+    background-color: #1b94e2;
+}
+.regoType_REFEREE {
+    background-color: #1b94e2;
+}
+.regoType_CLUBOFFICIAL, .regoType_MAOFFICIAL, .regoType_TEAMOFFICIAL {
+    background-color: #33a7f2;
+}
 /*----Temporary Styles-----*/
 
 
@@ -1523,8 +1536,9 @@ header nav ul li a {
 	float:left;
 }
 
-.dataTables_paginate {
+div .dataTables_paginate {
 	padding-top:8px;
+    text-align:center;
 }
 
 a.paginate_button {
@@ -2006,4 +2020,11 @@ li:last-child.eightStepWidth {
 .dz-details img {
     margin:auto;
     display:inline;
+}
+
+.update-regview{
+	margin: 20px 0px;
+}
+.sectionheader{
+	padding-left: 8px;
 }

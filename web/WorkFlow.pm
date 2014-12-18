@@ -2424,11 +2424,11 @@ sub populateDocumentViewData {
 	my $query = qq[SELECT tblDocuments.intDocumentTypeID, tblDocuments.intUploadFileID FROM tblDocuments INNER JOIN tblDocumentType
 				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
 				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
-				WHERE strApprovalStatus = 'APPROVED' AND intPersonID = ? AND 
+				WHERE strApprovalStatus = 'APPROVED' AND intPersonID = ? AND tblRegistrationItem.intRealmID=? AND 
 				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
 				GROUP BY intDocumentTypeID];
 	my $sth = $Data->{'db'}->prepare($query);
-	$sth->execute($dref->{'intPersonID'});
+	$sth->execute($dref->{'intPersonID'}, $Data->{'Realm'});
 	while(my $dref = $sth->fetchrow_hashref()){
 		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
 		$validdocs{$dref->{'intDocumentTypeID'}} = $dref->{'intUploadFileID'};
@@ -2457,6 +2457,7 @@ sub populateDocumentViewData {
 
 	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
+    $dref->{'currentAge'} ||= 0;
     #print STDERR Dumper $dref;
     my $st = qq[
         SELECT
@@ -2492,10 +2493,12 @@ sub populateDocumentViewData {
                 AND addPersonItem.strRuleFor = 'PERSON'
                 AND addPersonItem.intID = rd.intDocumentTypeID
                 AND addPersonItem.strAgeLevel IN ('', '$dref->{'strAgeLevel'}')
+                AND addPersonItem.intRealmID = wt.intRealmID
                 )
         LEFT JOIN tblRegistrationItem as regoItem
             ON (
                 regoItem.strItemType = 'DOCUMENT'
+                AND regoItem.intRealmID = wt.intRealmID
                 AND regoItem.intOriginLevel = wr.intOriginLevel
                 AND regoItem.strRuleFor = 'REGO'
                 AND regoItem.intID = rd.intDocumentTypeID
@@ -2514,8 +2517,9 @@ sub populateDocumentViewData {
         LEFT JOIN tblRegistrationItem as entityItem
             ON (
                 entityItem.strItemType = 'DOCUMENT'
+                AND entityItem.intRealmID= wt.intRealmID
                 AND entityItem.intOriginLevel = wr.intOriginLevel
-                AND regoItem.strRegistrationNature = '$dref->{'strRegistrationNature'}'
+                AND entityItem.strRegistrationNature = '$dref->{'strRegistrationNature'}'
                 AND entityItem.strRuleFor = 'ENTITY'
                 AND entityItem.intID = rd.intDocumentTypeID
                 AND entityItem.intEntityLevel = wr.intEntityLevel

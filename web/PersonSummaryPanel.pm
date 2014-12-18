@@ -38,7 +38,10 @@ sub personSummaryPanel {
     foreach my $reg_rego_ref (@{$regs}) {
         next if $reg_rego_ref->{'strStatus'} ne $Defs::PERSONREGO_STATUS_ACTIVE;
 
-        push @personRegistration, $Data->{'lang'}->txt($reg_rego_ref->{'PersonType'} . " valid to ") . $Data->{'l10n'}{'date'}->format($reg_rego_ref->{'dtTo'},'MEDIUM');
+        push @personRegistration, [ 
+            $Data->{'lang'}->txt($reg_rego_ref->{'PersonType'} . " valid to ") . $Data->{'l10n'}{'date'}->format($reg_rego_ref->{'dtTo'},'MEDIUM'),
+            $reg_rego_ref->{'strPersonType'},
+        ];
     }
 
     my $isocountries  = getISOCountriesHash();

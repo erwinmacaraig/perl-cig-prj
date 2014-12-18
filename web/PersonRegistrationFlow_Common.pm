@@ -471,7 +471,7 @@ sub checkUploadedRegoDocuments {
 				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
 				GROUP BY intDocumentTypeID];
 	my $sth = $Data->{'db'}->prepare($query);
-	$sth->execute($personID);
+	$sth->execute($personID, $Data->{'Realm'});
 	while(my $dref = $sth->fetchrow_hashref()){
 		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
 	}
@@ -497,11 +497,11 @@ sub checkUploadedRegoDocuments {
     $query = qq[SELECT distinct(strDocumentName) FROM tblDocuments INNER JOIN tblDocumentType
 					ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID 
 					INNER JOIN tblRegistrationItem ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID WHERE
-					tblDocuments.intPersonID = ? AND tblDocuments.intPersonRegistrationID = ? AND tblRegistrationItem.intRequired = 1];
+					tblDocuments.intPersonID = ? AND tblDocuments.intPersonRegistrationID = ? AND tblRegistrationItem.intRequired = 1 AND tblRegistrationItem.intRealmID=?];
     
    my @uploaded_docs = ();
     $sth = $Data->{'db'}->prepare($query);
-    $sth->execute($personID, $regoID);
+    $sth->execute($personID, $regoID, $Data->{'Realm'});
 	
 	while(my $dref = $sth->fetchrow_hashref()){
 		push @uploaded_docs,$dref->{'strDocumentName'};
@@ -581,11 +581,12 @@ sub displayRegoFlowDocuments{
             ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID 
         AND tblDocuments.intPersonID = ?
         AND tblDocuments.intPersonRegistrationID = ?
+        AND tblRegistrationItem.intRealmID=?
         ORDER BY tblDocuments.intDocumentID DESC
     ];
 
 	my $sth = $Data->{'db'}->prepare($query);
-	$sth->execute($personID,$regoID);
+	$sth->execute($personID,$regoID, $Data->{'Realm'});
 	my @uploaded_docs = ();
 	while(my $dref = $sth->fetchrow_hashref()){		
         #push @uploaded_docs, $dref->{'intDocumentTypeID'};		
@@ -639,11 +640,12 @@ sub displayRegoFlowDocuments{
         WHERE strApprovalStatus IN ('APPROVED', 'PENDING')
         AND intPersonID = ?
         AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+        AND tblRegistrationItem.intRealmID=?
         ORDER BY tblDocuments.intDocumentID DESC
     ];
 
 	$sth = $Data->{'db'}->prepare($query);
-	$sth->execute($personID);
+	$sth->execute($personID, $Data->{'Realm'});
 
 	while(my $dref = $sth->fetchrow_hashref()){
         if(! exists $existingDocuments{$dref->{'ID'}}){
