@@ -109,7 +109,7 @@ sub setProcessOrder {
             'label'  => 'Complete',
             'title'  => 'Facility - Submitted',
             'NoGoingBack' => 1,
-            'NoNav' => 1,
+            'NoDisplayInNav' => 1,
         },
     ];
 

@@ -1643,7 +1643,7 @@ i.documents-rejected {
 }
 
 #flow-btn-back  {
-    float:left;
+    margin-right:30px;
 }
 
 #ffg_venue td {
@@ -2002,4 +2002,8 @@ li:last-child.eightStepWidth {
 	background:none!important;
 	padding:0!important;
 	border:none!important;
+}
+.dz-details img {
+    margin:auto;
+    display:inline;
 }
