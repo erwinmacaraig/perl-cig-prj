@@ -64,9 +64,5 @@ $resultHTML = runTemplate(
           'workflow/view/document_upload.templ',
     );
 
-open FH, ">dumpfile.txt";
-print FH "resultHTML = \n\n $resultHTML \n\n";
-
-
 printBasePage($resultHTML, 'Sportzware Membership');
 
