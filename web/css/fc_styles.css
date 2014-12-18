@@ -807,6 +807,18 @@ table tr.new-task {
 	color: #fff;
 }
 
+.regoType_PLAYER {
+    background-color: #0784d4;
+}
+.regoType_COACH {
+    background-color: #1b94e2;
+}
+.regoType_REFEREE {
+    background-color: #1b94e2;
+}
+.regoType_CLUBOFFICIAL, .regoType_MAOFFICIAL, .regoType_TEAMOFFICIAL {
+    background-color: #33a7f2;
+}
 /*----Temporary Styles-----*/
 
 
@@ -1523,8 +1535,9 @@ header nav ul li a {
 	float:left;
 }
 
-.dataTables_paginate {
+div .dataTables_paginate {
 	padding-top:8px;
+    text-align:center;
 }
 
 a.paginate_button {

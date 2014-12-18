@@ -723,6 +723,11 @@ sub getRegistrationData	{
 		$sth->execute();
 		while(my $data_ref = $sth->fetchrow_hashref()){
 			#push @reg_docs, $data_ref;	
+            $data_ref->{'DateUploaded'} = $Data->{'l10n'}{'date'}->TZformat(
+                $data_ref->{'DateUploaded'},
+                'MEDIUM',
+                'SHORT'
+            );
 			push @{$dref->{'documents'}},$data_ref;				
 		}			
         push @Registrations, $dref;

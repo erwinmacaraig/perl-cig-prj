@@ -1,5 +1,5 @@
 [% USE Dumper %]
-<div class="col-md-12 tasklist-content dashboard-tasklist search-panel">
+<div class="col-md-12 tasklist-content dashboard-tasklist ">
 	<table id="searchResult" cellpadding="5" class = "zebra" style="width: 100%">
 		<thead>
 			<tr class="box-header">
@@ -66,7 +66,12 @@
 <script src = "//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript">
     jQuery().ready(function() {
-        var table = jQuery("#searchResult").DataTable();
+        var table = jQuery("#searchResult").DataTable({
+            "dom" : "ilftpr",
+            "language" : {
+                "search": "[% Lang.txt('Filter') %]"
+            }
+        });
 
         jQuery("input.search-mid").on('keyup change', function(){
             table

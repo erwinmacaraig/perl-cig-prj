@@ -389,20 +389,22 @@ my @headers = (
        		 {
       	      name => $lang->txt('Status'),
       	      field => 'strApprovalStatus',
-     		 },
+     		   },
       		 {
       	      name => $lang->txt('Date Uploaded'),
-     	       field => 'DateUploaded',
+     	       field => 'DateUploaded_FMT',
       		 },
       		 {
        		     name => $lang->txt('View'),
        		     field => 'ViewDoc',
        		     type => 'HTML',
+             sortable => 0,
       		  },
       		  {
        		 	name => $lang->txt('Replace'),
         			field => 'ReplaceFile',
         			type => 'HTML',
+             sortable => 0,
       		  },
    			 );
 			 my $filterfields = [
@@ -417,7 +419,7 @@ my @headers = (
 		$cnt++;
 		my @rowdata = ();
 		#get the documents here		
-		$grid .= qq[<br /><h3 class="panel-header">$registration->{'PersonType'} - $registration->{'Sport'} - $registration->{'PersonLevel'} ] . $lang->txt('for') . qq[ $registration->{'strNationalPeriodName'} ] . $lang->txt('in') . qq[ $registration->{'strLocalName'}</h3>];
+		$grid .= qq[<br /><h2 class="section-header">$registration->{'PersonType'} - $registration->{'Sport'} - $registration->{'PersonLevel'} ] . $lang->txt('for') . qq[ $registration->{'strNationalPeriodName'} ] . $lang->txt('in') . qq[ $registration->{'strLocalName'}</h2>];
 			
 			#loop over rego documents
 			foreach my $regodoc (@{$registration->{'documents'}}){
@@ -494,12 +496,13 @@ my $addlink='';
 	 my $modoptions=qq[<div class="changeoptions"></div>];
 			#
 			$grid .= qq[
-                    <div class="panel-body">].showGrid(
+                    <div class="clearfix">].showGrid(
        		  Data => $Data,
       		  columns => \@headers,
       		  rowdata => \@rowdata,
        		  gridid => "grid$registration->{'intPersonRegistrationID'}",
        		  width => '100%',
+       		  coloredTop => 'no',
 			);
 			$grid .= qq[<br /><br /><p>].$lang->txt('Add a new document to this registration').qq[</p>$doclisttype </div>];
 		#

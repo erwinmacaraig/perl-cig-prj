@@ -183,3 +183,9 @@ hr {
   border: 0;
   border-top: 1px solid #E2E1E2;
 }
+
+div .dataTables_paginate {
+    padding-top:8px;
+    text-align:center;
+}
+
