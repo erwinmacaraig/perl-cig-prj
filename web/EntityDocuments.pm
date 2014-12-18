@@ -351,13 +351,14 @@ sub checkUploadedEntityDocuments {
 		INNER JOIN tblRegistrationItem 
 		ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID
 		WHERE tblDocuments.intEntityID = ?
+            AND tblRegistrationItem.intRealmID=?
 	];
    # ;	
 	if($ctrl){
 		$query .= qq[ AND tblRegistrationItem.intRequired = 1];
 	}
 	my $sth = $Data->{'db'}->prepare($query);
-	$sth->execute($entityID);
+	$sth->execute($entityID, $Data->{'Realm'});
 	my @uploaded_docs = ();
 	while(my $dref = $sth->fetchrow_hashref()){
 		push @uploaded_docs, $dref->{'intDocumentTypeID'};		
@@ -367,11 +368,11 @@ sub checkUploadedEntityDocuments {
 	$query = qq[SELECT tblDocuments.intDocumentTypeID FROM tblDocuments INNER JOIN tblDocumentType
 				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
 				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
-				WHERE strApprovalStatus = 'APPROVED' AND tblDocuments.intEntityID = ? AND 
+				WHERE strApprovalStatus = 'APPROVED' AND tblDocuments.intEntityID = ? AND tblRegistrationItem.intRealmID=? AND 
 				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
 				GROUP BY intDocumentTypeID];
 	$sth = $Data->{'db'}->prepare($query);
-	$sth->execute($entityID);
+	$sth->execute($entityID, $Data->{'Realm'});
 
 	while(my $dref = $sth->fetchrow_hashref()){
 		push @validdocsforallrego, $dref->{'intDocumentTypeID'};

@@ -427,10 +427,10 @@ my @headers = (
                                tblDocumentType ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID INNER JOIN
 							   tblDocuments ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE 
 							   tblDocuments.strApprovalStatus = 'APPROVED' AND intPersonRegistrationID = ? AND 	
-							   tblDocumentType.intDocumentTypeID = ? AND tblDocuments.intPersonID = ? ];
+							   tblDocumentType.intDocumentTypeID = ? AND tblDocuments.intPersonID = ? AND tblRegistrationItem.intRealmID=?];
 
 			   my $sth = $db->prepare($query); 
-               $sth->execute($regodoc->{'intPersonRegistrationID'}, $regodoc->{'intDocumentTypeID'},$personID);
+               $sth->execute($regodoc->{'intPersonRegistrationID'}, $regodoc->{'intDocumentTypeID'},$personID, $Data->{'Realm'});
 			   my $dref = $sth->fetchrow_hashref(); 
 				#checks for strLockAtLevel and intUseExistingThisEntity and intUseExistingAnyEntity and Owner against Currently Logged
 			   if($regodoc->{'strLockAtLevel'} eq '' || $dref->{'intUseExistingThisEntity'} || $dref->{'intUseExistingAnyEntity'} || $registration->{'intEntityID'} == $currLoginID){	
