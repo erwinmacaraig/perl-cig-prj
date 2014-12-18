@@ -63,6 +63,5 @@ $resultHTML = runTemplate(
           $TemplateData,
           'workflow/view/document_upload.templ',
     );
-
 printBasePage($resultHTML, 'Sportzware Membership');
 

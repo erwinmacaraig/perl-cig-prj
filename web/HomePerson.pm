@@ -186,7 +186,7 @@ sub showPersonHome	{
        		}
 			#####
 		my $documentName = $doc->{'strDocumentName'};
-		$documentName =~ s/[\/*?:@&=+$#']/_/g;
+		$documentName =~ s/'/\\\'/g;
 
 		if($fileID) {
 			$displayView = 1;
