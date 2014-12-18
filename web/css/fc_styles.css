@@ -463,7 +463,7 @@ select {
 	border-radius: 0px;
 }
 
-a.btn-main, input.btn-main {
+a.btn-main, input.btn-main, button.btn-main {
 	text-align: center;
 	font-family: 'noto_sansbold';
     font-weight: normal;
@@ -480,6 +480,9 @@ a.btn-main, input.btn-main {
 	background: -ms-linear-gradient(top,  #1870a5 0%,#095b8d 100%);
 	background: linear-gradient(to bottom,  #1870a5 0%,#095b8d 100%);
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1870a5', endColorstr='#095b8d',GradientType=0 );
+}
+a.btn-proceed:after, input.btn-proceed:after, button.btn-main:after {
+    content: "TEST";
 }
 
 /* if btn-disabled class name will be changed, check fc-common.js. btn-disabled links must return false */
@@ -683,11 +686,11 @@ table tr.new-task {
 	margin-bottom: 20px;
 }
 
-.read-only {
+.read-only, .fieldSectionGroupWrapper-DisplayOnly {
 	position: relative;
 }
 
-.read-only h4 {
+.read-only h4, .fieldSectionGroupWrapper-DisplayOnly h3.panel-header {
 	display: inline-block;
 	background: #e3e3e3;
 	color: #000;
@@ -719,7 +722,7 @@ table tr.new-task {
 	font-weight: bold
 }
 
-.read-only-text {
+.read-only-text, .fieldSectionGroupWrapper-DisplayOnly .panel-body {
 	border: 1px solid #aeaeae;
 	padding: 30px 15px 15px;
 }
@@ -1640,7 +1643,7 @@ i.documents-rejected {
 }
 
 #flow-btn-back  {
-    float:left;
+    margin-right:30px;
 }
 
 #ffg_venue td {
@@ -1889,6 +1892,9 @@ header nav ul li a.selected {
 	padding:11px 20px 10px 25px;
 	background: #0fa54a;
 }
+.playermenu li.previous a{
+    text-decoration:underline;
+}
 
 .playermenu li.previous:after, .playermenu li:last-child.current:after {
 	content:"\f00c";
@@ -1996,4 +2002,8 @@ li:last-child.eightStepWidth {
 	background:none!important;
 	padding:0!important;
 	border:none!important;
+}
+.dz-details img {
+    margin:auto;
+    display:inline;
 }
