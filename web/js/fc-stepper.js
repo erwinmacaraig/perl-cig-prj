@@ -39,6 +39,11 @@ $(document).ready(function(){
     } else if (countFormStep == 6) {
 
     	$(playermenuElement).addClass("sixStepWidth");
+    
+    } else if (countFormStep == 5) {
+
+      $(playermenuElement).addClass("fiveStepWidth");
+
     }
 
 });
