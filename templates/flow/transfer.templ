@@ -33,35 +33,46 @@
     [% Navigation %]
     <div class = "tab-content">
         <div class = "active tab-pane [% IF processStatus == 1 %]transferCompleteDisplay[% END %]">
-        [% Documents %] <!-- documents form upload conflicts with form#flowFormID !-->
+        [% Documents %]
+            <form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">
+                
+                [% IF processStatus == 1 %]
+                <div class="container">
+                    <div class="row">
+                [% END %]
 
-    <form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">
-        [% TextTop %]
-        
-        [% IF Content %]
-            [% Content %]
-        [% END %]
+                        [% TextTop %]
+                
+                        [% IF Content %]
+                            [% Content %]
+                        [% END %]
+                        
+                        <div class = "button-row">
+                            <div class="txtright">
+                                [% IF FlowNextAction %]
+                                    <input type = "hidden" name ="rfp" value ="[% FlowNextAction %]">
+                                [% END %]
+
+                                [% HiddenFields %]
+
+                                [% IF !NoBackButton and BackButtonURL %]
+                                    <a href = "[% BackButtonURL %]" id = "flow-btn-back" class = "btn-main [% IF processStatus == 1 %]nudge[% END %]">[% IF BackButtonText %][% Lang.txt(BackButtonText) %][% ELSE %][% Lang.txt('Back') %][% END %]</a>
+                                [% END %]
+
+                                [% IF !NoContinueButton %]
+                                    <input id = "flow-btn-continue" type = "submit" value = " [% Lang.txt(ContinueButtonText) %] "  class = "btn-main" style="border: 0px">
+                                [% END %]
+                            </div>
+                        </div>
+                
+                [% IF processStatus == 1 %]    
+                    </div>
+                </div>
+                [% END %]
+
+            </form>
         </div>
     </div>
-
-        <div class = "button-row">
-            <div class="txtright">
-            [% IF FlowNextAction %]
-                <input type = "hidden" name ="rfp" value ="[% FlowNextAction %]">
-            [% END %]
-
-            [% HiddenFields %]
-
-            [% IF !NoBackButton and BackButtonURL %]
-                <a href = "[% BackButtonURL %]" id = "flow-btn-back" class = "btn-main [% IF processStatus == 1 %]nudge[% END %]">[% IF BackButtonText %][% Lang.txt(BackButtonText) %][% ELSE %][% Lang.txt('Back') %][% END %]</a>
-            [% END %]
-
-            [% IF !NoContinueButton %]
-                <input id = "flow-btn-continue" type = "submit" value = " [% Lang.txt(ContinueButtonText) %] "  class = "btn-main" style="border: 0px">
-            [% END %]
-            </div>
-        </div>
-    </form>
 </div>
 [% IF FlowSummary or FlowSummaryContent %]
 <div class="col-md-3">
