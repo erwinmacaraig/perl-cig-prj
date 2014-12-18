@@ -367,11 +367,7 @@ sub listDocuments {
     my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
     my $obj = getInstanceOf($Data, 'entity', $currLoginID);
 	
-	#open FH, ">dumpfile.txt";
-	#print FH "\n\nInstance of: " . Dumper($obj) . "\n\n";
-    #print FH "\n" . Dumper(@{$Reg_ref}) . "\n";
-	#print FH "\n\n intEntityLevel: " . $obj->getValue('intEntityLevel') . "\n\n";
-    #does not matter how many, intPersonRegistrationID is the same all throughout
+	
     my $pRIDRef = ${$Reg_ref}[0];
 	my $cnt = 0;
 	my $regoIDtemp = 0;
@@ -503,7 +499,7 @@ my $addlink='';
 			);
 			$grid .= qq[<br /><br /><p>].$lang->txt('Add a new document to this registration').qq[</p>$doclisttype </div>];
 		#
-		print FH "\n===============================================END====================================\n";
+
 		
 	}
         my $title = $lang->txt('Registration Documents');
