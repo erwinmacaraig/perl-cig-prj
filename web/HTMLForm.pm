@@ -368,7 +368,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 $tabs .= qq[<li><a id="a_sec$s->[0]" class="tab_links" href="#sec$s->[0]">$sectionheader</a></li>];
 
                 $returnstr .= qq~
-                <div class="col-md-12"><fieldset id="sec$s->[0]" class="new_tab member-home-page">
+                <div class="col-md-12 panel-body"><fieldset id="sec$s->[0]" class="new_tab member-home-page">
                 $sh
                 $sections{$s->[0]}
                 </fieldset>
@@ -405,7 +405,7 @@ qq[ <input type="submit" name="subbut" value="$txt" class="HF_submit btn-main" d
             my $txt = langlookup( $fields_ref,
                 $fields_ref->{'options'}{'submitlabel'} );
             $buttons .=
-qq[ <input type="submit" name="subbut" value="$txt" class="HF_submit btn-main" id="HFsubbut"> ];
+qq[ <input type="submit" name="subbut" value="$txt" class="update-regview HF_submit btn-main" id="HFsubbut"> ];
         }
         if ( $fields_ref->{'options'}{'resetlabel'} and $action ne 'display' ) {
             my $txt =

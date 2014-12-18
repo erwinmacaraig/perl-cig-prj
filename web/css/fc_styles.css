@@ -613,6 +613,7 @@ table.table tr td {
 table.table.tableboxheader tr td {
 	padding: 8px 20px;
 	border-bottom: 1px solid #ccc;
+	vertical-align: middle;
 }
 
 table.table.tableboxheader tr td.just-view-text{
@@ -2019,4 +2020,11 @@ li:last-child.eightStepWidth {
 .dz-details img {
     margin:auto;
     display:inline;
+}
+
+.update-regview{
+	margin: 20px 0px;
+}
+.sectionheader{
+	padding-left: 8px;
 }
