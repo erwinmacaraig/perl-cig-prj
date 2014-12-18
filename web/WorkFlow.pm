@@ -2352,7 +2352,7 @@ sub populateEntityViewData {
     switch ($dref->{intEntityLevel}) {
         case "$Defs::LEVEL_CLUB"  {
             %fields = (
-                title => 'Club Registration Details',
+                title => $Data->{'lang'}->txt('Club Registration') .' - ' . $dref->{'entityLocalName'},
                 templateFile => 'workflow/view/club.templ',
             );
 
@@ -2363,7 +2363,7 @@ sub populateEntityViewData {
         }
         case "$Defs::LEVEL_VENUE" {
             %fields = (
-                title => 'Venue Registration Details',
+                title => $Data->{'lang'}->txt('Venue Registration') .' - ' . $dref->{'entityLocalName'},
                 templateFile => 'workflow/view/venue.templ',
             );
 
