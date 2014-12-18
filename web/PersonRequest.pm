@@ -364,7 +364,7 @@ sub listPersonRecord {
             sport => $Defs::sportType{$tdref->{'strSport'}} || '',
             personType => $Defs::personType{$tdref->{'strPersonType'}} || '',
             personLevel => $Defs::personLevel{$tdref->{'strPersonLevel'}} || '',
-            DOB => $tdref->{'dtDOB'} || '',
+            DOB => $Data->{'l10n'}{'date'}->format($tdref->{'dtDOB'} || '','MEDIUM'),
             actionLink => $actionLink,
             SelectLink => ''
         };
@@ -381,7 +381,7 @@ sub listPersonRecord {
             localSurname => $tdref->{'strLocalSurname'} || '',
             personType => $tdref->{'strPersonType'} || '',
             personLevel => $tdref->{'strPersonLevel'} || '',
-            DOB => $tdref->{'dtDOB'} || '',
+            DOB => $Data->{'l10n'}{'date'}->format($tdref->{'dtDOB'} || '','MEDIUM'),
         };
 
         $personFname = $tdref->{'strLocalFirstname'} if !$personFname;
@@ -414,10 +414,6 @@ sub listPersonRecord {
     my $resultHTML = undef;
     if($requestType eq $Defs::PERSON_REQUEST_ACCESS) {
         my @headers = (
-            { 
-                type => 'Selector',
-                field => 'SelectLink',
-            }, 
             {
                 name => $Data->{'lang'}->txt('Registered To'),
                 field => 'currentClub',
@@ -459,7 +455,6 @@ sub listPersonRecord {
                 field => 'actionLink',
                 type => 'HTML', 
             },
-
         ); 
 
         my $rectype_options = '';
@@ -472,9 +467,8 @@ sub listPersonRecord {
         ); 
 
         $resultHTML = qq[
-            <div class="grid-filter-wrap">
-                <div style="width:99%;">$rectype_options</div>
-                $grid
+            <div class = "clearfix">
+            $grid
             </div>
         ];
     }
