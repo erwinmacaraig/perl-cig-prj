@@ -532,7 +532,7 @@ sub checkUploadedRegoDocuments {
 	my $query = qq[SELECT tblDocuments.intDocumentTypeID FROM tblDocuments INNER JOIN tblDocumentType
 				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
 				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
-				WHERE strApprovalStatus IN ('PENDING','APPROVED') AND intPersonID = ? AND 
+				WHERE strApprovalStatus IN ('PENDING','APPROVED') AND intPersonID = ? AND tblRegistrationItem.intRealmID=?
 				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
 				GROUP BY intDocumentTypeID];
 	my $sth = $Data->{'db'}->prepare($query);
