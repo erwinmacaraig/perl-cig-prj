@@ -75,6 +75,7 @@ sub getUploadedFiles	{
 
 	my @rows = ();
 	while(my $dref = $q->fetchrow_hashref())	{
+        $dref->{'DateAdded_FMT'} = $Data->{'l10n'}{'date'}->TZformat($dref->{'dtUploaded'},'MEDIUM','SHORT');
 
 		$st = qq[SELECT intUseExistingThisEntity, intUseExistingAnyEntity FROM tblRegistrationItem WHERE tblRegistrationItem.intID = ?];
 		my $sth = $Data->{'db'}->prepare($st);
