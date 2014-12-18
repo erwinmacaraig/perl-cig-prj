@@ -2209,3 +2209,10 @@ li:last-child.eightStepWidth {
     padding: 10px;
     text-align: center;
 }
+
+.form-panel-body {
+    background: #ededed;
+    border: 1px solid #cccccc;
+    overflow: hidden;
+    /*padding: 0;*/ /* reset style coming from bootstrap used only in this stylesheet */
+}
