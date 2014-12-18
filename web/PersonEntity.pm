@@ -14,8 +14,9 @@ use AuditLog;
 use Reg_common;
 
 sub closePERecord {
-    my($Data, $personID, $entityID, $status, $dtTo, $Reg_ref) = @_;
+    my($Data, $personID, $entityID, $dtTo, $Reg_ref) = @_;
 
+    my $status = $Defs::PERSON_ENTITY_STATUS_INACTIVE;
     my %reg = ();
     if (! $dtTo)    {
         my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
