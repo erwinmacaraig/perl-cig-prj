@@ -1335,6 +1335,7 @@ sub Navigation {
         }
         next if !$includeStep;
         next if($self->{'ProcessOrder'}[$i]{'NoNav'});
+        next if($self->{'ProcessOrder'}[$i]{'NoDisplayInNav'});
         if($name)   {
             $current = 1 if $i == $self->{'CurrentIndex'};
             push @navoptions, [
