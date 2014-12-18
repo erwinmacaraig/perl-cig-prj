@@ -8,10 +8,14 @@
     <p><strong>Document description:</strong> [% description %]</p>
         <form action="uploadregofile.cgi" method="POST" class="dropzone" id="uploaderfrm" enctype="multipart/form-data">
         <input type="hidden" name="client" value="[% client %]" />
-        <input type="hidden" name="rID" value="[% regoID %]" />
+        [% IF regoID %]
+        	<input type="hidden" name="rID" value="[% regoID %]" />        	
+        [% ELSE %]
+        	<input type="hidden" name="entitydocs" value="[% entitydocs %]" />
+        [% END %]
+        <input type="hidden" name="pID" value="[% personID %]" />
         <input type="hidden" name="doctypeID" value="[% docTypeID %]" />
         <input type="hidden" name="f" value="[% replaceFileID %]" />
-        <input type="hidden" name="pID" value="[% personID %]" />
         </form> 
     </div>
 </div>

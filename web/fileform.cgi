@@ -24,7 +24,7 @@ my $personID = param('pID') || 0;
 my $replaceFileID = param('f') || 0;
 my $doctypename = param('doctypename') || '';
 my $docDesc = param('desc') || '';
-
+my $isForEntity = param('entitydocs') || 0;
 
   my %Data=();
   my $target='viewer.cgi';
@@ -54,6 +54,7 @@ my $docDesc = param('desc') || '';
 			docTypeID		=> 	$docTypeID,
 			replaceFileID	=>	$replaceFileID,
 			personID		=>	$personID,
+			entitydocs		=> 	$isForEntity,
 			description		=>	$docDesc,
 	};
 
@@ -62,6 +63,10 @@ $resultHTML = runTemplate(
           $TemplateData,
           'workflow/view/document_upload.templ',
     );
+
+open FH, ">dumpfile.txt";
+print FH "resultHTML = \n\n $resultHTML \n\n";
+
 
 printBasePage($resultHTML, 'Sportzware Membership');
 

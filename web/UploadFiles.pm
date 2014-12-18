@@ -252,9 +252,11 @@ sub _processUploadFile_single	{
 	# need to distinguish Person FROM other entity
 	my $intPersonID = $EntityID;
 	my $intEntityID = 0;
+	
 	if($entitydocs){ 
 		$intPersonID = 0;	
 		$intEntityID = $EntityID;	
+		
 	}
 	    #### START OF INSERTING DATA IN tblDocuments ##
         if($DocumentTypeId && !$oldFileId){
@@ -291,11 +293,14 @@ sub _processUploadFile_single	{
         #$EntityID = memberID (this should be the case)
         }
         else {
-        	 $doc_st = qq[
-        		UPDATE tblDocuments SET intUploadFileID = ?, dtLastUpdated = NOW(), strApprovalStatus = ? WHERE intUploadFileID = ? AND intPersonID = ?			
+			#update for person  documents      	 
+			$doc_st = qq[
+        		UPDATE tblDocuments SET intUploadFileID = ?, dtLastUpdated = NOW(), strApprovalStatus = ? WHERE intUploadFileID = ?	
         	]; 
 
-			my $chkSQL = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem INNER JOIN tblDocumentType ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID INNER JOIN tblDocuments ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intUploadFileID = $oldFileId AND (intUseExistingThisEntity = 1 OR intUseExistingAnyEntity = 1)] ;		
+			#AND intPersonID = ?	- Remove this so entity documents can be handled accordingly since intUploadFileID will suffice
+
+			my $chkSQL = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem INNER JOIN tblDocumentType ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID INNER JOIN tblDocuments ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intUploadFileID = $oldFileId AND strApprovalStatus = 'APPROVED' AND (intUseExistingThisEntity = 1 OR intUseExistingAnyEntity = 1)] ;		
 			my $newstat = 'PENDING';
 			$doc_q = $Data->{'db'}->prepare($chkSQL);
 			$doc_q->execute();
@@ -313,9 +318,9 @@ sub _processUploadFile_single	{
               $fileID,    
 			  $newstat,          
               $oldFileId,
-              $intPersonID, 
+              
         );
-		
+		#$intPersonID - Remove this so entity documents can be handled accordingly since intUploadFileID will suffice
         }
                 
        $doc_q->finish();
