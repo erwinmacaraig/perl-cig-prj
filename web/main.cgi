@@ -34,6 +34,7 @@ use PersonEdit;
 use EntityEdit;
 use Changes;
 use MemberCard;
+use FacilityEdit;
 
 use BankSplit;
 use PaymentSplitRun;
@@ -189,6 +190,9 @@ sub main {
     }
     elsif ( $action =~ /^EE_/ ) {
         ( $resultHTML, $pageHeading ) = handleEntityEdit( $action, \%Data);
+    }
+    elsif ( $action =~ /^FE_/ ) {
+        ( $resultHTML, $pageHeading ) = handleFacilityEdit( $action, \%Data);
     }
     elsif ( $action =~ /^SEARCH_/ ) {
         ( $resultHTML, $pageHeading ) = handleSearch( $action, \%Data, $client );

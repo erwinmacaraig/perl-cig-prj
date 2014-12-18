@@ -210,7 +210,7 @@ sub facilityFieldsSetup {
                 strISOCountry
             )],
             sections => [
-                [ 'core',        'Venue Details' ],
+                [ 'core',        'Venue Details','','',$values->{'footer-core'} ],
             ],
             fieldtransform => {
                 textcase => {
@@ -227,6 +227,7 @@ sub facilityFieldsSetup {
                     type        => 'text',
                     size        => '50',
                     maxsize     => '100',
+                    sectionname => 'contactdetails',
                     compulsory  => 1,
                 },
                 strAddress2 => {
@@ -235,6 +236,7 @@ sub facilityFieldsSetup {
                     type        => 'text',
                     size        => '50',
                     maxsize     => '100',
+                    sectionname => 'contactdetails',
                 },
                 strContactCity  => {
                     label       => $FieldLabels->{'strContactCity'},
@@ -242,6 +244,7 @@ sub facilityFieldsSetup {
                     type        => 'text',
                     size        => '30',
                     maxsize     => '100',
+                    sectionname => 'contactdetails',
                 },
                 strState => {
                     label       => $FieldLabels->{'strState'},
@@ -249,6 +252,7 @@ sub facilityFieldsSetup {
                     type        => 'text',
                     size        => '50',
                     maxsize     => '100',
+                    sectionname => 'contactdetails',
                 },
                 strPhone => {
                     label       => $FieldLabels->{'strPhone'},
@@ -256,6 +260,7 @@ sub facilityFieldsSetup {
                     type        => 'text',
                     size        => '15',
                     maxsize     => '15',
+                    sectionname => 'contactdetails',
                 },
                 strContactISOCountry   => {
                     label       => $FieldLabels->{'strContactISOCountry'},
@@ -265,6 +270,7 @@ sub facilityFieldsSetup {
                     firstoption => [ '', 'Select Country' ],
                     compulsory => 1,
                     class       => 'chzn-select',
+                    sectionname => 'contactdetails',
                 },
                 strPostalCode => {
                     label       => $FieldLabels->{'strPostalCode'},
@@ -272,6 +278,7 @@ sub facilityFieldsSetup {
                     type        => 'text',
                     size        => '50',
                     maxsize     => '100',
+                    sectionname => 'contactdetails',
                 },
                 strEmail => {
                     label       => $FieldLabels->{'strEmail'},
@@ -280,6 +287,7 @@ sub facilityFieldsSetup {
                     size        => '50',
                     maxsize     => '100',
                     validate    => 'EMAIL',
+                    sectionname => 'contactdetails',
                 },
                 strContact=> {
                     label       => $FieldLabels->{'strContact'},
@@ -288,6 +296,7 @@ sub facilityFieldsSetup {
                     size        => '50',
                     maxsize     => '100',
                     compulsory  => 1,
+                    sectionname => 'contactdetails',
                 },
                 strFax => {
                     label       => $FieldLabels->{'strFax'},
@@ -295,6 +304,7 @@ sub facilityFieldsSetup {
                     type        => 'text',
                     size        => '50',
                     maxsize     => '100',
+                    sectionname => 'contactdetails',
                 },
                 strWebURL => {
                     label       => $FieldLabels->{'strWebURL'},
@@ -303,6 +313,7 @@ sub facilityFieldsSetup {
                     size        => '50',
                     maxsize     => '100',
                     validate    => 'URL',
+                    sectionname => 'contactdetails',
                 },
             },
             'order' => [qw(
@@ -318,7 +329,7 @@ sub facilityFieldsSetup {
                 strWebURL
             )],
             sections => [
-                [ 'main',        'Contact Details' ],
+                [ 'contactdetails',        'Contact Details','','',$values->{'footer-contactdetails'} ],
             ],
             #fieldtransform => {
                 #textcase => {
@@ -329,21 +340,21 @@ sub facilityFieldsSetup {
         roledetails  => {
             'fields' => {
                 intEntityFieldCount    => {
-                    label       => $FieldLabels->{'intEntityFieldCount'},
+                    label       => $FieldLabels->{'intEntityFieldCount'} || 'fff',
                     value       => $facilityFieldCount,
                     type        => 'text',
                     size        => '50',
                     maxsize     => '100',
                     compulsory  => 1,
                     validate    => 'NUMBER',
+                    sectionname => 'roledetails',
                 },
             },
             'order' => [qw(
                 intEntityFieldCount
-                strParentEntityName
             )],
             sections => [
-                [ 'main',        'Field Information' ],
+                [ 'roledetails', 'Field Information','','',$values->{'footer-roledetails'} ],
             ],
         },
     };
