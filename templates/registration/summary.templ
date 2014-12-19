@@ -60,8 +60,10 @@
 			 <h4>Documents</h4>
 			 <div class="read-only-text documents-list clearfix">
 			    <ul>
-					[% FOREACH doc IN registration.documents %]
-					<li><span>[% doc.strDocumentName %]:<br /></span> <b>[% doc.strOrigFilename %]</b></li>
+					[% FOREACH key IN alldocs.keys %]
+
+					<li><span>[% alldocs.$key.Name %]:<br /></span> <b>[% alldocs.$key.strOrigFilename %]</b></li>
+
 					[% END %]
 			    </ul>
                 <a href="[% editlink %]&amp;rfp=d" class="pull-right">Edit</a>

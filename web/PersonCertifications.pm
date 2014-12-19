@@ -43,7 +43,7 @@ sub handleCertificates {
 		my @rowdata = ();
 		my $link;
 		foreach my $rowdataref ( @{$rawrowdata} ){
-			#print FH "RowDataRef Data FROM PersonCertifications.pm\n" . Dumper($rowdataref) . "\n=================\n"; 
+
 			$link = "$Data->{'target'}?client=$client&amp;a=P_CERT_ED&amp;certID=$rowdataref->{'intCertificationID'}";
 			push @rowdata,{
 				id => $rowdataref->{'intCertificationID'},
@@ -312,7 +312,7 @@ sub getPersonCertifications {
                 PC.dtValidFrom,
                 PC.dtValidUntil
         ];
-        print FH "Query is: $statement \n\n";
+
         my $query = $db->prepare($statement);
         $query->execute(@vals);
         while (my $dref = $query->fetchrow_hashref) {
