@@ -551,8 +551,8 @@ sub checkUploadedRegoDocuments {
 				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
 				GROUP BY intDocumentTypeID];
 
-	open FH, ">dumpfile.txt";
-	print FH "\n\nQuery: \n$query \n personID = $personID \n\n";
+	#open FH, ">dumpfile.txt";
+	#print FH "\n\nQuery: \n$query \n personID = $personID \n\n";
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute($personID, $Data->{'Realm'});
 	while(my $dref = $sth->fetchrow_hashref()){
@@ -574,14 +574,14 @@ sub checkUploadedRegoDocuments {
     return ('',1) if(!$total); # no required documents
 
      $query = qq[SELECT distinct(strDocumentName) FROM tblDocuments INNER JOIN tblDocumentType
-					ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID 
-					INNER JOIN tblRegistrationItem ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID WHERE
-					tblDocuments.intPersonID = ? AND tblRegistrationItem.intRequired = 1 AND tblRegistrationItem.intRealmID=?];
+                                        ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
+                                        INNER JOIN tblRegistrationItem ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID WHERE
+                                        tblDocuments.intPersonID = ? AND tblDocuments.intPersonRegistrationID = ? AND tblRegistrationItem.intRequired = 1 AND tblRegistrationItem.intRealmID=?];
     
-print FH "\nGetting Uploaded Documents: \n $query \n personID = $personID, regoID = $regoID\n";
+#print FH "\nGetting Uploaded Documents: \n $query \n personID = $personID, regoID = $regoID\n";
    my @uploaded_docs = ();
     $sth = $Data->{'db'}->prepare($query);
-    $sth->execute($personID, $Data->{'Realm'});
+    $sth->execute($personID, $regoID, $Data->{'Realm'});
 	
 	while(my $dref = $sth->fetchrow_hashref()){
 		push @uploaded_docs,$dref->{'strDocumentName'};
