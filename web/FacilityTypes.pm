@@ -1,7 +1,7 @@
 package FacilityTypes;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT=qw(getAll, getByID);
+@EXPORT=qw(getAll getByID);
 
 use strict;
 
