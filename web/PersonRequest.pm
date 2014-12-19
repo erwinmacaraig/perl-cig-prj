@@ -1111,6 +1111,9 @@ sub setRequestResponse {
         return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Response has been submitted already."));
     }
     else {
+        my $maObj = getInstanceOf($Data, 'national');
+        my $maName = $maObj ? $maObj->name() : '';
+	
         #print STDERR Dumper $request;
         my $templateFile = "";
         $title = $Defs::personRequest{$request->{'strRequestType'}} . ' - ' . $requestResponseSuffix;
@@ -1118,7 +1121,7 @@ sub setRequestResponse {
 
         if($response eq "ACCEPTED"){
             $templateFile = "personrequest/transfer/request_accepted.templ";
-            $notifDetails .= $Data->{'lang'}->txt(" You will be notified once the transfer is effective and approved by the MA"); #if ") . $request->{'requestFrom'} . $Data->{'lang'}->txt(" accepts or rejects the release.");
+            $notifDetails .= $Data->{'lang'}->txt(" You will be notified once the transfer is effective and approved by ") . $maName; #if ") . $request->{'requestFrom'} . $Data->{'lang'}->txt(" accepts or rejects the release.");
         }
         elsif($response eq "DENIED"){
             $templateFile = "personrequest/transfer/request_denied.templ";
