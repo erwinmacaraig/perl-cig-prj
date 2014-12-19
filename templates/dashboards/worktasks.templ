@@ -98,9 +98,9 @@
                             <div style="float: left; word-wrap: break-word;width: 80%;">
                             [% task.personRequestLabel %]<br/>
                             [% IF task.TaskStatus == 'ACCEPTED' %]
-                                [% task.requestTo %] has accepted request for [% task.Name %]
+                                [% task.requestTo %] [% Lang.txt('has accepted request for') %] [% task.Name %]
                             [% ELSIF task.TaskStatus == 'PENDING' %]
-                                [% task.requestFrom %] has requested a transfer for [% task.Name %]
+                                [% task.requestFrom %] [% Lang.txt('has requested a transfer for') %] [% task.Name %]
                             [% END %]
                             </div>
                         </td>
@@ -109,8 +109,11 @@
                             <span style="float: left" class="fa fa-user"></span>
                             <div style="float: left; word-wrap: break-word;width: 80%;">
                             [% task.personRequestLabel %]<br/>
-                            [% task.Name %] from <br/>
-                            [% task.requestFrom %]
+                            [% IF task.TaskStatus == 'ACCEPTED' %]
+                                [% task.requestTo %] [% Lang.txt('has accepted request for') %] [% task.Name %]
+                            [% ELSIF task.TaskStatus == 'PENDING' %]
+                                [% task.requestFrom %] [% Lang.txt('has requested access for') %] [% task.Name %]
+                            [% END %]
                             </div>
                         </td>
                     [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'REGO' AND task.RegistrationNature == 'TRANSFER' %]
@@ -162,7 +165,7 @@
                             <td class="just-view-text"><a href="[% task.viewURL %]" class="btn-inside-panels">[% Lang.txt('View') %]</a></td>
                         [% END %]
 
-                    [% ELSIF task.TaskType == 'TRANSFER' %]
+                    [% ELSIF task.TaskType == 'TRANSFER' or task.TaskType == 'ACCESS' %]
 
                         [% IF task.currentClubView == 1 %]
                             <td><a href="[% task.viewURL %]" class="btn-inside-panels">[% Lang.txt('View and Approve') %]</a></td>
