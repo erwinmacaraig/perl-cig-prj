@@ -1171,7 +1171,7 @@ sub getRequests {
     my ($Data, $filter) = @_;
 
     my $where = '';
-    my $personRegoJoin = " LEFT JOIN tblPersonRegistration_$Data->{'Realm'} pr ON (pr.intPersonRequestID = pq.intPersonRequestID AND pr.intEntityID = intRequestFromEntityID AND pr.strStatus NOT IN ('INPROGRESS')) ";
+    my $personRegoJoin = qq[ LEFT JOIN tblPersonRegistration_$Data->{'Realm'} pr ON (pr.intPersonRequestID = pq.intPersonRequestID AND pr.intEntityID = intRequestFromEntityID AND pr.strStatus NOT IN ('INPROGRESS')) ];
     my @values = (
         $Data->{'Realm'}
     );
@@ -1199,7 +1199,7 @@ sub getRequests {
     }
 
     if($filter->{'requestID'} and $filter->{'entityID'}) {
-        $where .= "
+        $where .= qq[
             AND (
                     (pq.intParentMAEntityID = ? AND pq.intRequestToMAOverride = 1 AND pq.strRequestResponse is NULL)
                     OR
@@ -1207,7 +1207,7 @@ sub getRequests {
                     OR
                     (pq.intRequestFromEntityID = ? AND pq.intPersonRequestID = ? AND pq.strRequestResponse in (?, ?))
                 )
-            ";
+            ];
         push @values, $filter->{'entityID'};
         push @values, $filter->{'entityID'};
         push @values, $filter->{'requestID'};
@@ -1342,6 +1342,7 @@ sub finaliseTransfer {
 
     my $personRequest = getRequests($Data, \%reqFilters);
     $personRequest = $personRequest->[0];
+    my $db = $Data->{'db'};
 
     my $st = qq[
         UPDATE
@@ -1358,11 +1359,70 @@ sub finaliseTransfer {
             AND intPersonID = ?
             AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
 	];
+    my $stDates = qq[
+        UPDATE
+            tblPersonRegistration_$Data->{'Realm'}
+        SET
+            dtFrom = IF(dtFrom>NOW(), NOW(), dtFrom),
+            dtTo= IF(dtTo>NOW(), NOW(), dtTo)
+        WHERE
+            intEntityID = ?
+            AND strPersonType = ?
+            AND strSport = ?
+            AND intPersonID = ?
+            AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
+	];
+    my $query = $db->prepare($stDates) or query_error($st);
+    $query->execute(
+       $personRequest->{'intRequestToEntityID'},
+       $personRequest->{'strPersonType'},
+       $personRequest->{'strSport'},
+       $personRequest->{'intPersonID'}
+    ) or query_error($st);
+
+    ## Now handle LAST date
+    $stDates = qq[
+        UPDATE
+            tblPersonRegistration_$Data->{'Realm'}
+        SET
+            dtTo= NOW()
+        WHERE
+            intEntityID = ?
+            AND strPersonType = ?
+            AND strSport = ?
+            AND intPersonID = ?
+            AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
+        ORDER BY 
+            dtTo DESC LIMIT 1
+	];
+    my $query = $db->prepare($stDates) or query_error($st);
+    $query->execute(
+       $personRequest->{'intRequestToEntityID'},
+       $personRequest->{'strPersonType'},
+       $personRequest->{'strSport'},
+       $personRequest->{'intPersonID'}
+    ) or query_error($st);
+
+
+    
+    my $st = qq[
+        UPDATE
+            tblPersonRegistration_$Data->{'Realm'}
+        SET
+            strPreTransferredStatus = strStatus,
+            strStatus = ?
+        WHERE
+            intEntityID = ?
+            AND strPersonType = ?
+            AND strSport = ?
+            AND intPersonID = ?
+            AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
+	];
+
 ## Basically Set dtTo = NOW if they left before end of peiod.
 ## If dtFrom is in future (if they never started) that period won't be included in Passport
             #AND strPersonLevel = ?
 
-    my $db = $Data->{'db'};
     my $query = $db->prepare($st) or query_error($st);
     $query->execute(
        $Defs::PERSONREGO_STATUS_TRANSFERRED,

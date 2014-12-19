@@ -1288,12 +1288,13 @@ sub checkForOutstandingTasks {
 	            	    PR.strStatus = 'ACTIVE',
                         PR.intCurrent=1,
                         dtLastUpdated=NOW(),
-                        dtFrom = IF (dtFrom<NOW(), NOW(), dtFrom),
+                        dtFrom = NOW(),
                         dtTo = IF (dtFrom>dtTo, dtFrom, dtTo)
 	    	        WHERE
                         PR.intPersonRegistrationID = ?
                         AND PR.strStatus IN ('PENDING', 'INPROGRESS')
 	        	];
+                        #dtFrom = IF (dtFrom<NOW(), NOW(), dtFrom),
                         #AND strStatus NOT IN ('SUSPENDED', 'TRANSFERRED', 'DELETED')
 
 		        $q = $db->prepare($st);

@@ -45,9 +45,9 @@ sub savePlayerPassport{
             AND PR.strPersonType = 'PLAYER' 
             AND PR.strSport = 'FOOTBALL' 
             AND PR.strStatus IN ('PASSIVE', 'ACTIVE', 'ROLLED_OVER', 'TRANSFERRED')
-            AND PR.dtFrom<>PR.dtTo
         ORDER BY PR.dtFrom
     ];	
+            #AND PR.dtFrom<>PR.dtTo
 	
 	$sth = $Data->{'db'}->prepare($query); 
 	$sth->execute($personID); 
