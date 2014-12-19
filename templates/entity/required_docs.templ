@@ -1,19 +1,118 @@
-<h3 class="panel-header">Required Documents</h3>
-<div class="panel-body">
 [% IF documents.size %]
-<h3>Required Documents</h3>
-    <ul>
-        [% FOREACH doc IN documents %]
-                <li><h4>[% doc.Name %]</h4></li>
-                <form action="[% target %]" class="dropzone" method="post" enctype="multipart/form-data">
-                     <input type="hidden" name="DocumentTypeID" value="[% doc.ID %]" />
-                     <input type="hidden" name="a" value="[% nextaction %]">
-                     <input type="hidden" name="entitydocs" value=" " />
-                     <input type="hidden" name="client" value="[% client %]" />
-                     <input type="hidden" name="venueID" value="[% venue %]" />
-                </form>
-                <br /><br />
-        [% END %]
-    </ul>
-[% END %]
+<h3 class="panel-header">[% Lang.txt('Required Venue Documents') %]</h3>
+<div class="panel-body">
+	<div class="document-notes">
+		<table class="table documents-table">
+			[% FOREACH doc IN documents %]
+			<tr>
+				<td>
+					<div>
+						<p><strong>Title:</strong> 
+						[% doc.Name %]
+						</p>
+						[% IF doc.Description != '' %]
+							<p><strong>Description: </strong>
+								[% doc.Description %]
+							</p>
+						[% END %]
+					</div>
+				</td>
+				<td style="width:50%;">
+					<form action="uploadregofile.cgi" class="dropzone" method="post" enctype="multipart/form-data" id="myRegoDoc[% doc.ID %]">
+					     <input type="hidden" name="doctypeID" value="[% doc.ID %]" />
+						 <input type="hidden" name="pID" value="[% venueID %]" />
+					     <input type="hidden" name="entitydocs" value="1" />
+					     <input type="hidden" name="client" value="[% client %]" />
+					</form>
+					<script>
+							var doc;
+							Dropzone.options.myRegoDoc[% doc.ID %] = {
+								addRemoveLinks: true,							
+                                dictDefaultMessage :'[% Lang.txt('Click here to upload this file') %]',
+								init: function(){
+									this.on("success", function(file, response){										
+										doc = response;		
+									});								
+									this.on("removedfile", function(file, response){
+										var fObject = JSON.parse(doc);
+										\$.ajax({
+											type: 'POST',
+											url: '[% url %]/deleteregofile.cgi',
+											data: "f="+fObject.f + "&doctypeID="+fObject.docTypeID + "&rID="+fObject.regoID + "&client=[% client %]"
+										}).done(
+											
+										);
+									});
+								}
+							}
+						</script>
+				</td>
+			</tr>
+			[% END %]
+		</table>
+	</div>
 </div>
+[% END %]
+
+
+<div class="clearfix">&nbsp;</div>
+[% IF optionaldocs.size %]
+<h3 class="panel-header">[% Lang.txt('Optional Documents') %]</h3> 
+<div class="panel-body">
+	<div class="document-notes">
+		<table class="table documents-table">
+			[% index = 0 %]
+			[% FOREACH doc IN optionaldocs %]
+			[% index = index + 1 %]
+				<tr>
+					<td>
+						<div>
+							<p><strong>Title:</strong> 
+							[% doc.Name %]
+							</p>
+							
+							[% IF doc.Description != '' %]
+							
+							<p><strong>Description: </strong>
+								[% doc.Description %]
+							</p>
+						
+							[% END %]
+						</div>
+					</td>
+					<td style="width:50%;">
+					<form action="uploadregofile.cgi" class="dropzone" method="post" enctype="multipart/form-data" id="myRegoDoc[% doc.ID %]">
+					     <input type="hidden" name="doctypeID" value="[% doc.ID %]" />
+						 <input type="hidden" name="pID" value="[% venueID %]" />
+					     <input type="hidden" name="entitydocs" value="1" />
+					     <input type="hidden" name="client" value="[% client %]" />
+					</form>
+					<script>
+							var doc;
+							Dropzone.options.myRegoDoc[% doc.ID %] = {
+								addRemoveLinks: true,							
+								init: function(){
+									this.on("success", function(file, response){										
+										doc = response;		
+									});								
+									this.on("removedfile", function(file, response){
+										var fObject = JSON.parse(doc);
+										\$.ajax({
+											type: 'POST',
+											url: '[% url %]/deleteregofile.cgi',
+											data: "f="+fObject.f + "&doctypeID="+fObject.docTypeID + "&rID="+fObject.regoID + "&client=[% client %]"
+										}).done(
+											
+										);
+									});
+								}
+							}
+						</script>
+				</td>
+				</tr>
+			[% END %]
+		</table>
+	</div>
+</div>
+
+[% END %]
