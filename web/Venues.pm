@@ -777,10 +777,9 @@ print STDERR "VEN FOR $entityID | $Defs::LEVEL_VENUE\n";
         strLocalName => $dref->{'strLocalName'} || '',
         strStatus => $dref->{'strStatus'} || '',
         strStatusText => $Data->{'lang'}->txt($Defs::entityStatus{$dref->{'strStatus'}} || ''),
-        SelectLink => "$Data->{'target'}?client=$client&amp;a=VENUE_DTE&amp;venueID=$dref->{'CNintEntityID'}",
+        SelectLink => "$Data->{'target'}?client=$client&amp;a=FE_D&amp;venueID=$dref->{'CNintEntityID'}",
       };
     }
-print STDERR "VENUES$results\n";
     $query->finish;
 
     my $addlink='';
@@ -835,7 +834,7 @@ print STDERR "VENUES$results\n";
         columns => \@headers,
         rowdata => \@rowdata,
         gridid  => 'grid',
-        width   => '99%',
+        width   => '100%',
         #filters => $filterfields,
     );
 

@@ -683,7 +683,7 @@ sub display_registration {
             $self->addCarryField('d_type', $rawDetails->{'strPersonType'});
             $self->addCarryField('d_level', $rawDetails->{'strPersonLevel'});
             $self->addCarryField('d_sport', $rawDetails->{'strSport'});
-            $self->addCarryField('d_age', $rawDetails->{'newAgeLevel'}) if $rawDetails->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER;
+            $self->addCarryField('d_age', $rawDetails->{'newAgeLevel'}); # if $rawDetails->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER;
             $self->addCarryField('d_role', $rawDetails->{'strPersonEntityRole'});
         }
         else {

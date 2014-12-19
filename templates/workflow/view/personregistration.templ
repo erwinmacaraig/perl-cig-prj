@@ -186,6 +186,13 @@
                         </span>
                     [% END %]
 
+                    [% IF PersonRegoDetails.strPersonType == "REFEREE" OR PersonRegoDetails.strPersonType == "COACH" %]
+                        <span class="details-row">
+                            <span class="details-left">[% Lang.txt("Certifications") %]:</span>
+                            <span class="details-left detail-value">[% IF PersonRegoDetails.Certifications %] [% PersonRegoDetails.Certifications %] [% ELSE %] - [% END %]</span>
+                        </span>
+                    [% END %]
+
                     <div class="row-padding">
                     <div style="clear: both;">&nbsp;</div>
                     <div class="row">

@@ -95,6 +95,7 @@ sub showPersonHome	{
 			Active => $Data->{'lang'}->txt(($personObj->getValue('intRecStatus') || '') ? 'Yes' : 'No'),
 			strLocalFirstname => $personObj->getValue('strLocalFirstname') || '',
        		strLocalSurname => $personObj->getValue('strLocalSurname') || '',
+       		strMaidenName => $personObj->getValue('strMaidenName') || '',
 			LatinFirstname=> $personObj->getValue('strLatinFirstname') || '',	
 			LatinSurname=> $personObj->getValue('strLatinSurname') || '',	
 			Address1 => $personObj->getValue('strAddress1') || '',	
@@ -111,7 +112,8 @@ sub showPersonHome	{
 			BirthCountry => $personObj->getValue('strISOCountryOfBirth') || '',
 			PassportNat => $personObj->getValue('strPassportNationality') || '',
 			Status => $personObj->getValue('strStatus') || '',
-			Nationality => $c->{$personObj->getValue('strISONationality')}
+			Nationality => $c->{$personObj->getValue('strISONationality')},
+			intGender => $personObj->getValue('intGender'),
 		},
         SummaryPanel => personSummaryPanel($Data, $personID) || '',
 	);

@@ -43,6 +43,7 @@ use DisplayPayResult;
 use InstanceOf;
 use EntityTypeRoles;
 use PersonSummaryPanel;
+use PersonCertifications;
 
 sub displayRegoFlowCompleteBulk {
 
@@ -133,6 +134,7 @@ sub displayRegoFlowSummary {
 		my %personData = ();
 		$personData{'Name'} = $personObj->getValue('strLocalFirstname');
         $personData{'Familyname'} = $personObj->getValue('strLocalSurname');
+        $personData{'Maidenname'} = $personObj->getValue('strMaidenName');
 		$personData{'DOB'} = $personObj->getValue('dtDOB');
 		$personData{'Gender'} = $Data->{'lang'}->txt($Defs::genderInfo{$personObj->getValue('intGender') || 0}) || '';
 		$personData{'Nationality'} = $c->{$personObj->getValue('strISONationality')};
@@ -194,7 +196,7 @@ sub displayRegoFlowSummary {
         tblDocuments.intDocumentTypeID as ID,
         tblUploadedFiles.strOrigFilename,
         tblUploadedFiles.intFileID,
-        tblDocumentType.strDocumentName as Name,
+        tblDocumentType.strDocumentName as Name
         FROM tblDocuments
         INNER JOIN tblDocumentType
             ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
@@ -209,6 +211,18 @@ sub displayRegoFlowSummary {
         ORDER BY tblDocuments.intDocumentID DESC
     ];
 
+
+    my $certifications = getPersonCertifications(
+        $Data,
+        $personID,
+        $rego_ref->{'strPersonType'},
+        0
+    );
+
+    my @certString;
+    foreach my $cert (@{$certifications}) {
+        push @certString, $cert->{'strCertificationName'};
+    }
 
 
 $sth = $Data->{'db'}->prepare($query);
@@ -234,6 +248,7 @@ $sth = $Data->{'db'}->prepare($query);
             Lang => $Data->{'lang'},
             client=>$client,
             editlink => $editlink,
+            certifications => join(', ', @certString),
         );
         
         $body = runTemplate($Data, \%PageData, 'registration/summary.templ') || '';
@@ -532,7 +547,7 @@ sub checkUploadedRegoDocuments {
 	my $query = qq[SELECT tblDocuments.intDocumentTypeID FROM tblDocuments INNER JOIN tblDocumentType
 				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
 				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
-				WHERE strApprovalStatus IN ('PENDING','APPROVED') AND intPersonID = ? AND 
+				WHERE strApprovalStatus IN ('PENDING','APPROVED') AND intPersonID = ? AND tblRegistrationItem.intRealmID=? AND
 				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
 				GROUP BY intDocumentTypeID];
 

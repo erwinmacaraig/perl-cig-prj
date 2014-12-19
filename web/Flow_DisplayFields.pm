@@ -349,6 +349,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
         }
 
         if ( $sections{ $s->[0] } ) {
+        #if ( $sections{ $s->[0] } or $s->[4] ) {
             next if $s->[2] and not $self->display_section( $s->[2] );
             my $extraclass = $s->[3] || '';
             my $footer = $s->[4] || '';

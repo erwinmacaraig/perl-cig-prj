@@ -83,6 +83,9 @@ sub _setupRun   {
         $self->{'ID'} = $self->{'RunParams'}{'e'};
     }
     $self->addCarryField('e', $self->ID());
+    if($self->{'RunParams'}{'_ss'})   {
+        $self->addCarryField('_ss', $self->{'RunParams'}{'_ss'});
+    }
     $self->setCurrentProcessIndex($self->{'RunParams'}->{'rfp'});
 
     return 1;
@@ -103,6 +106,7 @@ sub Navigation {
     my $startingStep = $self->{'RunParams'}{'_ss'} || '';
     my $includeStep = 1;
     $includeStep = 0 if $startingStep;
+    my $lastDisplayIndex = 0;
     for my $i (0 .. $#{$self->{'ProcessOrder'}})    {
         my $current = 0;
         my $name = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'label'} || '');
@@ -138,27 +142,21 @@ sub Navigation {
                 : qq[<span class = "stepname">$step. $name</span>];
             
 			#$navstring .= qq[ <li class = "$currentclass step step-$step"><span class="$currentclass step-num">$link</li> ];
-      $navstring .= qq[ <div class = "col-md-2 $currentclass step step-$step"><span class="$currentclass step-num">$link</span></div> ];
+            $navstring .= qq[ <div class = "col-md-2 $currentclass step step-$step"><span class="$currentclass step-num">$link</span></div> ];
             $step_in_future = 2 if $current;
             $step++;
+            $lastDisplayIndex = $i;
         }
     }
     #my $returnHTML = '';
     #$returnHTML .= qq[<ul class = "playermenu list-inline form-nav">$navstring</ul><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;
     #$returnHTML .= qq[<div class = "progressFlow">$navstring</div><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;           
 
-    my $lastStep = $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'function'};
-    
+    my $onLastStep = $self->{'CurrentIndex'} >= $lastDisplayIndex;
+    my $completeClass = $onLastStep ? 'progressComplete' : '';
     my $returnHTML = '';
     
-    if($lastStep eq 'display_summary'){
-        
-        $returnHTML .= qq[<div class = "progressFlow progressComplete">$navstring</div><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;
-    
-    } else {
-        
-        $returnHTML .= qq[<div class = "progressFlow">$navstring</div><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;        
-    }
+    $returnHTML .= qq[<div class = "progressFlow $completeClass ">$navstring</div><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;        
     
 
     if(wantarray)   {

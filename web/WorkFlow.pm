@@ -50,6 +50,7 @@ use Countries;
 use HomePerson;
 use PersonSummaryPanel;
 use MinorProtection;
+use PersonCertifications;
 
 sub cleanTasks  {
 
@@ -2259,6 +2260,19 @@ sub populateRegoViewData {
     my $minorProtectionOptions = getMinorProtectionOptions($Data, $dref->{'InternationalTransfer'});
     my $LocalName = "$dref->{'strLocalFirstname'} $dref->{'strLocalMiddleName'} $dref->{'strLocalSurname'}" || '';
     my $PersonType = $Data->{'lang'}->txt($Defs::personType{$dref->{'strPersonType'} || 0}) || '';
+
+    my $certifications = getPersonCertifications(
+        $Data,
+        $dref->{'intPersonID'},
+        $dref->{'strPersonType'},
+        0
+    );
+
+    my @certString;
+    foreach my $cert (@{$certifications}) {
+        push @certString, $cert->{'strCertificationName'};
+    }
+
 	%TemplateData = (
         PersonDetails => {
             Status => $Data->{'lang'}->txt($Defs::personStatus{$dref->{'PersonStatus'} || 0}) || '',
@@ -2287,6 +2301,8 @@ sub populateRegoViewData {
             Status => $Defs::personRegoStatus{$dref->{'personRegistrationStatus'}} || '-',
             DateFrom => $dref->{'dtFrom'} || '',
             DateTo => $dref->{'dtTo'} || '',
+            Certifications => join(', ', @certString),
+            strPersonType => $dref->{'strPersonType'},
         },
         EditDetailsLink => $PersonEditLink,
         ReadOnlyLogin => $readonly,
@@ -2424,7 +2440,7 @@ sub populateDocumentViewData {
 	my $query = qq[SELECT tblDocuments.intDocumentTypeID, tblDocuments.intUploadFileID FROM tblDocuments INNER JOIN tblDocumentType
 				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
 				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
-				WHERE strApprovalStatus = 'APPROVED' AND intPersonID = ? AND tblRegistrationItem.intRealmID=? AND 
+				WHERE strApprovalStatus IN('PENDING', 'APPROVED') AND intPersonID = ? AND tblRegistrationItem.intRealmID=? AND 
 				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
 				GROUP BY intDocumentTypeID];
 	my $sth = $Data->{'db'}->prepare($query);

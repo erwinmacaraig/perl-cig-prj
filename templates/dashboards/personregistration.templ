@@ -260,6 +260,13 @@
                                 </span>
                             [% END %]
 
+                            [% IF entity.strPersonType == 'REFEREE' or entity.strPersonType == 'COACH' %]
+                                <span class="details-row">
+                                    <span class="details-left">[% Lang.txt('Certifications') %]:</span>
+                                    <span class="details-left detail-value">[% IF entity.regCertifications %] [% entity.regCertifications %] [% ELSE %] - [% END %]</span>
+                                </span>
+                            [% END %]
+
                             [% IF entity.renew_link %]
                                 <div class="pull-right">
                                     <span class=""><a class="btn-inside-panels" href="[% entity.renew_link %]">[% Lang.txt('Renew Registration') %]</a></span>

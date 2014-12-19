@@ -27,6 +27,7 @@ use Person;
 use PersonRegisterWhat;
 use AuditLog;
 use Reg_common;
+use PersonCertifications;
 
 sub cleanPlayerPersonRegistrations  {
 
@@ -730,6 +731,21 @@ sub getRegistrationData	{
             );
 			push @{$dref->{'documents'}},$data_ref;				
 		}			
+
+        my $certifications = getPersonCertifications(
+            $Data,
+            $dref->{'intPersonID'},
+            $dref->{'strPersonType'},
+            0
+        );
+
+        my @certString;
+        foreach my $cert (@{$certifications}) {
+            push @certString, $cert->{'strCertificationName'};
+        }
+
+        $dref->{'regCertifications'} = join(', ', @certString);				
+
         push @Registrations, $dref;
 
 		

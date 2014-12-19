@@ -23,6 +23,7 @@ $(document).ready(function(){
     }
 
     var param = getUrlparameter("a");
+    var pageHeading = $(".pageHeading").text();
 
     console.log(param);
 
@@ -64,7 +65,7 @@ $(document).ready(function(){
     
     }
 
-    else if (param == "INITSRCH_P" || param == "PF_" || param == "DUPL_L" || param == "PRA_T" || param == "PRA_R" || param == "PREGFB_T" || param == "TXN_PAY_INV") {
+    else if (param == "INITSRCH_P" || param == "PF_" || param == "DUPL_L" || param == "PRA_T" || param == "PRA_R" || param == "PREGFB_T" || param == "TXN_PAY_INV" || pageHeading == "Search") {
      
       $("header nav ul li.subnav a:contains(People)").addClass("active")
 

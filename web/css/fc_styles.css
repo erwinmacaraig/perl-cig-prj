@@ -119,7 +119,7 @@ header .utilities.notloginlevel    {
     background:#000;
     position:fixed;
     top:0;
-    z-index:2;
+    z-index:5;
     /*display: none;*/
 }
 #spheader.notloginlevel{ /* No image yet, remove this once image is available for error login page */
@@ -182,7 +182,7 @@ header .logo-area ul {
 
 header .logo-area ul li {
 	float: left;
-	text-align: center;
+	text-align: left;
 	list-style-type: none;
 	font-size: 12px;
 	color: #fff;
@@ -581,7 +581,7 @@ a.btn-inside-panels:hover , input.btn-inside-panels:hover, span.btn-inside-panel
 .alert div {
 	width: 100%;
 	background: #ededed;
-	border: 1px solid #cccccc;
+	/*border: 1px solid #cccccc;*/
 }
 
 .alert div p {
@@ -917,6 +917,11 @@ span.flash_error{
 	color: #fff;
 	font-size: 13px;
 }
+
+.box-header th:first-child{
+	position: relative;
+}
+
 .sidebar-box{
 	border: 1px solid #cbcbcb;
 	margin-bottom: 20px;
@@ -1534,6 +1539,7 @@ header nav ul li a {
 }
 .dataTables_length, .dataTables_info {
 	float:left;
+	margin-left: 29%;
 }
 
 div .dataTables_paginate {
@@ -1616,6 +1622,26 @@ span.circleBg {
 	border-radius :70px;
 	position:relative;
 	left:8px;
+}
+
+.taskListCounter {
+	background: #c4070a;
+	-moz-border-radius :70px;
+	-webkit-border-radius :70px;
+	border-radius :70px;
+	position:absolute;
+	left:24%;
+	top:7px;
+	font-size: 12px;
+	color:#fff;
+	width: 23px;
+	height:23px;
+	line-height: 23px;
+	text-align: center;
+}
+
+.taskListCounter {
+
 }
 
 span.circle-check {
@@ -1804,9 +1830,9 @@ a.HTdisabled, a.HTdisabled:hover {
 }
 
 #content .error-alerts {
-	margin-left:10px;
+	/*margin-left:10px;
 	margin-right:10px;
-	padding-left:4px;
+	padding-left:4px;*/
 }
 header nav ul li a.selected {
 	background-color: #e3e3e3;
