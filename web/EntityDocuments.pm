@@ -372,6 +372,7 @@ sub checkUploadedEntityDocuments {
 		ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID
 		WHERE tblDocuments.intEntityID = ?
             AND tblRegistrationItem.intRealmID=?
+            AND tblRegistrationItem.strItemType='DOCUMENT'
 	];
    # ;	
 	if($ctrl){
@@ -390,6 +391,7 @@ sub checkUploadedEntityDocuments {
 				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
 				WHERE strApprovalStatus = 'APPROVED' AND tblDocuments.intEntityID = ? AND tblRegistrationItem.intRealmID=? AND 
 				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+                 AND tblRegistrationItem.strItemType='DOCUMENT'
 				GROUP BY intDocumentTypeID];
 	$sth = $Data->{'db'}->prepare($query);
 	$sth->execute($entityID, $Data->{'Realm'});
