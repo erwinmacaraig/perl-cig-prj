@@ -8,7 +8,7 @@
         <h3 class="panel-header">[% personDetails.firstname %] [% personDetails.surname %]</h3>
         <div class="panel-body">
             [% FOREACH request IN personRequests %]
-            <label>The [% request.requestType %] Request for [% personDetails.firstname %] [% personDetails.surname %] has been sent to [% request.requestTo %].</label>
+            <label>The [% request.requestType %] [% personDetails.firstname %] [% personDetails.surname %] has been sent to [% request.requestTo %].</label>
             <br/>
             [% END %]
             <div class="row top-bottom-spacer">
