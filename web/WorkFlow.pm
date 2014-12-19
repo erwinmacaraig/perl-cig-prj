@@ -50,6 +50,7 @@ use Countries;
 use HomePerson;
 use PersonSummaryPanel;
 use MinorProtection;
+use PersonCertifications;
 
 sub cleanTasks  {
 
@@ -2259,6 +2260,19 @@ sub populateRegoViewData {
     my $minorProtectionOptions = getMinorProtectionOptions($Data, $dref->{'InternationalTransfer'});
     my $LocalName = "$dref->{'strLocalFirstname'} $dref->{'strLocalMiddleName'} $dref->{'strLocalSurname'}" || '';
     my $PersonType = $Data->{'lang'}->txt($Defs::personType{$dref->{'strPersonType'} || 0}) || '';
+
+    my $certifications = getPersonCertifications(
+        $Data,
+        $dref->{'intPersonID'},
+        $dref->{'strPersonType'},
+        0
+    );
+
+    my @certString;
+    foreach my $cert (@{$certifications}) {
+        push @certString, $cert->{'strCertificationName'};
+    }
+
 	%TemplateData = (
         PersonDetails => {
             Status => $Data->{'lang'}->txt($Defs::personStatus{$dref->{'PersonStatus'} || 0}) || '',
@@ -2287,6 +2301,8 @@ sub populateRegoViewData {
             Status => $Defs::personRegoStatus{$dref->{'personRegistrationStatus'}} || '-',
             DateFrom => $dref->{'dtFrom'} || '',
             DateTo => $dref->{'dtTo'} || '',
+            Certifications => join(', ', @certString),
+            strPersonType => $dref->{'strPersonType'},
         },
         EditDetailsLink => $PersonEditLink,
         ReadOnlyLogin => $readonly,

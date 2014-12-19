@@ -31,6 +31,13 @@
 					</div>
 					[% END %]
 
+					[% IF Details.intGender ==2 %]
+				    <div class="">
+				        <span class="details-left">[% Lang.txt('Maiden name') %]:</span>
+				        <span class="detail-value">[% IF Details.strMaidenName %] [% Details.strMaidenName %] [% ELSE %] - [% END %]</span>
+				    </div>
+					[% END %]
+
 					[% IF Details.DOB %]
 				    <div class="">
 				        <span class="details-left">[% Lang.txt('Date of Birth') %]:</span>
