@@ -567,7 +567,7 @@ sub listTasks {
                 TaskStatusLabel => $taskStatusLabel,
                 viewURL => $viewURL,
                 showView => 1,
-                taskDate => $request->{'prRequestDateFormatted'},
+                taskDate => $request->{'dtDateRequest'},
                 requestFrom => $request->{'requestFrom'},
                 requestTo => $request->{'requestTo'},
                 taskTimeStamp => $request->{'prRequestUpdateTimeStamp'},
