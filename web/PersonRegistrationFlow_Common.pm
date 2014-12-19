@@ -180,6 +180,7 @@ sub displayRegoFlowSummary {
         AND tblDocuments.intPersonID = ?
         AND tblDocuments.intPersonRegistrationID = ?
         AND tblRegistrationItem.intRealmID = ?
+        AND tblRegistrationItem.strItemType='DOCUMENT'
         ORDER BY tblDocuments.intDocumentID DESC
 		];
 	
@@ -191,6 +192,7 @@ sub displayRegoFlowSummary {
                 $existingDocuments{$dref->{'ID'}} = $dref;
             }
 		} 
+## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
 	$query = qq[
         SELECT
         tblDocuments.intDocumentTypeID as ID,
@@ -208,6 +210,7 @@ sub displayRegoFlowSummary {
         AND intPersonID = ?
         AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
         AND tblRegistrationItem.intRealmID=?
+        AND tblRegistrationItem.strItemType='DOCUMENT'
         ORDER BY tblDocuments.intDocumentID DESC
     ];
 
@@ -544,11 +547,13 @@ sub checkUploadedRegoDocuments {
 
 	#check for Approved Documents that do not need to be uploaded
 	my @validdocsforallrego = ();
+## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
 	my $query = qq[SELECT tblDocuments.intDocumentTypeID FROM tblDocuments INNER JOIN tblDocumentType
 				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
 				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
 				WHERE strApprovalStatus IN ('PENDING','APPROVED') AND intPersonID = ? AND tblRegistrationItem.intRealmID=? AND
 				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+                AND tblRegistrationItem.strItemType='DOCUMENT'
 				GROUP BY intDocumentTypeID];
 
 	#open FH, ">dumpfile.txt";
@@ -576,7 +581,7 @@ sub checkUploadedRegoDocuments {
      $query = qq[SELECT distinct(strDocumentName) FROM tblDocuments INNER JOIN tblDocumentType
                                         ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
                                         INNER JOIN tblRegistrationItem ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID WHERE
-                                        tblDocuments.intPersonID = ? AND tblDocuments.intPersonRegistrationID = ? AND tblRegistrationItem.intRequired = 1 AND tblRegistrationItem.intRealmID=?];
+                                        tblDocuments.intPersonID = ? AND tblDocuments.intPersonRegistrationID = ? AND tblRegistrationItem.intRequired = 1 AND tblRegistrationItem.intRealmID=? AND tblRegistrationItem.strItemType='DOCUMENT'];
     
 #print FH "\nGetting Uploaded Documents: \n $query \n personID = $personID, regoID = $regoID\n";
    my @uploaded_docs = ();
@@ -642,6 +647,7 @@ sub displayRegoFlowDocuments{
 	#				WHERE tblDocuments.intPersonID = ? AND intPersonRegistrationID = ?;	
 	#];
    
+## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
     my $query = qq [
         SELECT
         tblDocuments.intDocumentTypeID as ID,
@@ -662,6 +668,7 @@ sub displayRegoFlowDocuments{
         AND tblDocuments.intPersonID = ?
         AND tblDocuments.intPersonRegistrationID = ?
         AND tblRegistrationItem.intRealmID=?
+        AND tblRegistrationItem.strItemType='DOCUMENT'
         ORDER BY tblDocuments.intDocumentID DESC
     ];
 
@@ -699,6 +706,7 @@ sub displayRegoFlowDocuments{
 	my @required_docs_listing = ();
 	my @optional_docs_listing = ();	
 	my @validdocsforallrego = ();
+## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
 	$query = qq[
         SELECT
         tblDocuments.intDocumentTypeID as ID,
@@ -720,6 +728,7 @@ sub displayRegoFlowDocuments{
         AND intPersonID = ?
         AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
         AND tblRegistrationItem.intRealmID=?
+        AND tblRegistrationItem.strItemType='DOCUMENT'
         ORDER BY tblDocuments.intDocumentID DESC
     ];
 

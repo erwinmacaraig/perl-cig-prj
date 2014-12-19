@@ -2439,18 +2439,20 @@ sub populateDocumentViewData {
 	my @validdocsforallrego = ();
 	my %validdocs = ();
 	my %validdocsStatus = ();
+## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
 	my $query = qq[SELECT tblDocuments.strApprovalStatus, tblDocuments.intDocumentTypeID, tblDocuments.intUploadFileID FROM tblDocuments INNER JOIN tblDocumentType
 				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
 				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
 				WHERE strApprovalStatus IN('PENDING', 'APPROVED') AND intPersonID = ? AND tblRegistrationItem.intRealmID=? AND 
 				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+                AND tblRegistrationItem.strItemType='DOCUMENT'
 				GROUP BY intDocumentTypeID];
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute($dref->{'intPersonID'}, $Data->{'Realm'});
-	while(my $dref = $sth->fetchrow_hashref()){
-	    $validdocsStatus{$dref->{'intDocumentTypeID'}} = $dref->{'strApprovalStatus'};
-		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
-		$validdocs{$dref->{'intDocumentTypeID'}} = $dref->{'intUploadFileID'};
+	while(my $adref = $sth->fetchrow_hashref()){
+	    $validdocsStatus{$adref->{'intDocumentTypeID'}} = $adref->{'strApprovalStatus'};
+		push @validdocsforallrego, $adref->{'intDocumentTypeID'};
+		$validdocs{$adref->{'intDocumentTypeID'}} = $adref->{'intUploadFileID'};
 	}
 	my $fileID = 0;
 

@@ -420,11 +420,12 @@ my @headers = (
 			foreach my $regodoc (@{$registration->{'documents'}}){
 				next if(!$regodoc->{'intUploadFileID'});
 				#perform query for intUseThisEntity and intUseAnyEntity
+## BAFF: Below needs WHERE tblRegistrationItem.strPersonType IN ('', XX) AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
 				my $query = qq[SELECT intUseExistingThisEntity,intUseExistingAnyEntity FROM tblRegistrationItem INNER JOIN
                                tblDocumentType ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID INNER JOIN
 							   tblDocuments ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE 
 							   tblDocuments.strApprovalStatus IN ('PENDING', 'APPROVED') AND intPersonRegistrationID = ? AND 	
-							   tblDocumentType.intDocumentTypeID = ? AND tblDocuments.intPersonID = ? AND tblRegistrationItem.intRealmID=?];
+							   tblDocumentType.intDocumentTypeID = ? AND tblDocuments.intPersonID = ? AND tblRegistrationItem.intRealmID=? AND tblRegistrationItem.strItemType='DOCUMENT'];
 
 			   my $sth = $db->prepare($query); 
                $sth->execute($regodoc->{'intPersonRegistrationID'}, $regodoc->{'intDocumentTypeID'},$personID, $Data->{'Realm'});
