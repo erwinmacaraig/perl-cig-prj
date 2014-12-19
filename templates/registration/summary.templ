@@ -1,3 +1,4 @@
+[% USE Dumper %]
 <h3 class="panel-header"><b>Summary</b></h3>
 	<div class="panel-body">
 		<div class="document-upload summary">
@@ -8,6 +9,9 @@
 					    <ul>
 					    	<li><span class="details-left">[% Lang.txt("Family Name") %]:</span> <span class="detail-value">[% IF person.Familyname %] [% person.Familyname %] [% ELSE %] - [% END %]</span></li>
 					    	<li><span class="details-left">[% Lang.txt("First Name") %]:</span> <span class="detail-value">[% IF person.Name %] [% person.Name %] [% ELSE %] - [% END %]</span></li>
+                            [% IF registration.intGender == 2 %]
+					    	    <li><span class="details-left">[% Lang.txt("Maiden Name") %]:</span> <span class="detail-value">[% IF person.Maidenname %] [% person.Maidenname %] [% ELSE %] - [% END %]</span></li>
+                            [% END %]
 					    	<li><span class="details-left">[% Lang.txt("Language of name") %]:</span> <span class="detail-value">[% IF person.Language %] [% person.Language %] [% ELSE %] - [% END %]</span></li>
 					    	<li><span class="details-left">[% Lang.txt("Date of Birth") %]:</span> <span class="detail-value">[% IF person.DOB %] [% DateFormat.format(person.DOB,'MEDIUM') %] [% ELSE %] - [% END %]</span></li>
 					    	<li><span class="details-left">[% Lang.txt("Gender") %]:</span> <span class="detail-value">[% IF person.Gender %] [% person.Gender %] [% ELSE %] - [% END %]</span></li>
@@ -48,6 +52,9 @@
 					    	<li><span class="details-left">[% Lang.txt("Sport") %]:</span> <span class="detail-value">[% IF registration.Sport %] [% registration.Sport %] [% ELSE %] - [% END %]</span></li>
 					    	[% IF registration.PersonLevel %]
 					    		<li><span class="details-left">[% Lang.txt("Level") %]:</span> <span class="detail-value">[% registration.PersonLevel %]</span></li>							
+					    	[% END %]
+                            [% IF certifications %]
+					    		<li><span class="details-left">[% Lang.txt("Certifications") %]:</span> <span class="detail-value">[% certifications %]</span></li>							
 					    	[% END %]
 					    </ul>
 					    <a href="[% editlink %]&amp;rfp=r" class="pull-right">Edit</a>
