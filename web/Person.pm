@@ -423,7 +423,7 @@ my @headers = (
 				my $query = qq[SELECT intUseExistingThisEntity,intUseExistingAnyEntity FROM tblRegistrationItem INNER JOIN
                                tblDocumentType ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID INNER JOIN
 							   tblDocuments ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE 
-							   tblDocuments.strApprovalStatus = 'APPROVED' AND intPersonRegistrationID = ? AND 	
+							   tblDocuments.strApprovalStatus IN ('PENDING', 'APPROVED') AND intPersonRegistrationID = ? AND 	
 							   tblDocumentType.intDocumentTypeID = ? AND tblDocuments.intPersonID = ? AND tblRegistrationItem.intRealmID=?];
 
 			   my $sth = $db->prepare($query); 
