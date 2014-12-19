@@ -317,7 +317,7 @@ sub validate_role_details {
         #push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid number of facility fields.';
         $self->incrementCurrentProcessIndex();
         $self->incrementCurrentProcessIndex();
-        $self->incrementCurrentProcessIndex();
+        #$self->incrementCurrentProcessIndex();
         return ('',2);
     }
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
@@ -590,13 +590,24 @@ sub display_documents {
             $Defs::DOC_FOR_VENUES,
         );
 
-        if(! scalar(@{$venue_documents})){
+        if(! scalar(@{$venue_documents})) {
             $self->incrementCurrentProcessIndex();
-            #$self->incrementCurrentProcessIndex();
+            $self->incrementCurrentProcessIndex();
             return ('',2);
         }
-        
-		my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $facilityID,  $venue_documents);
+
+        my @required_docs_listing = ();
+        my @optional_docs_listing = ();
+	
+		my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $facilityID,  $venue_documents, 0);
+        foreach my $rdc (@{$diff}){
+            if($rdc->{'Required'}){
+                push @required_docs_listing, $rdc;
+            }
+            else {
+                push @optional_docs_listing, $rdc;
+            }
+		}
 
         my $cl = setClient($self->{'Data'}->{'clientValues'}) || '';
         my %cv = getClient($cl);
@@ -606,11 +617,11 @@ sub display_documents {
 
         my %documentData = (
             target => $self->{'Data'}->{'target'},
-            documents => $diff,
+            documents => \@required_docs_listing,
+            optionaldocs => \@optional_docs_listing,
             Lang => $self->{'Data'}->{'lang'},
-            nextaction => 'VENUE_DOCS_u',
             client => $clm,
-            venue => $facilityID,
+            venueID => $facilityID,
         );
  
         $content = runTemplate($self->{'Data'}, \%documentData, 'entity/required_docs.templ') || '';  
@@ -619,13 +630,12 @@ sub display_documents {
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
     }
 
-
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $facilityID);
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        #FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
-        #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        FlowSummaryContent => $entitySummaryPanel,
         Content => '',
         DocUploader => $content,
         Title => '',
@@ -661,10 +671,31 @@ sub process_documents {
             undef,
             $Defs::DOC_FOR_VENUES,
         );
-	my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $facilityID, $documents);
-	foreach my $dc (@{$diff}){ 
-		push @{$self->{'RunDetails'}{'Errors'}},$dc->{'Name'};		
-	}
+
+    my @required_docs_listing = ();
+    my @optional_docs_listing = ();
+		
+    foreach my $rdc (@{$documents}){
+        if($rdc->{'Required'}){
+            push @required_docs_listing,$rdc;
+        }
+		else {
+            push @optional_docs_listing, $rdc;
+        }
+    }
+
+	my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $facilityID, \@required_docs_listing, 1);
+
+    my $errStringPrepend = $self->{'Lang'}->txt('Required Document Missing') . '<ul>';
+    foreach my $dc (@{$diff}){ 
+        $errStringPrepend .= '<li>' . $dc->{'Name'} . '</li>';		
+    }
+    $errStringPrepend .= '</ul>';
+
+    if(scalar(@{$diff})){
+        push @{$self->{'RunDetails'}{'Errors'}},$errStringPrepend;
+    }
+
 	if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
         $self->decrementCurrentProcessIndex();
@@ -800,33 +831,32 @@ sub display_complete {
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
     my $client = $self->{'Data'}->{'client'};
 
-    my $facilityFields = new EntityFields();
-    $facilityFields->setEntityID($self->{'RunParams'}{'e'});
-    $facilityFields->setData($self->{'Data'});
+    my $facilityID = $self->ID() || 0;
 
-    my $facilityID = $facilityFields->getEntityID();
+    my $facilityObj = new EntityObj(db => $self->{'db'}, ID => $facilityID, cache => $self->{'Data'}->{'cache'});
 
     my $content = '';
-    if(scalar@{$facilityFields->getAll()}) {
-        my $facilityObj = new EntityObj(db => $self->{'db'}, ID => $facilityID, cache => $self->{'Data'}->{'cache'});
+
+    #if(scalar@{$facilityFields->getAll()}) {
+    if($facilityID) {
         $facilityObj->load();
         my $PendingStatus =  {};
         $PendingStatus->{'strStatus'} = $Defs::ENTITY_STATUS_PENDING;
         $facilityObj->setValues($PendingStatus);
         $facilityObj->write();
 
-        #if($self->{'RunParams'}{'newvenue'})  {
-        #    my $rc = WorkFlow::addWorkFlowTasks(
-        #        $self->{'Data'},
-        #        'ENTITY',
-        #        'NEW',
-        #        $self->{'ClientValues'}{'authLevel'} || 0,
-        #        $facilityFields->getEntityID(),
-        #        0,
-        #        0,
-        #        0,
-        #    );
-        #}
+        if($self->{'RunParams'}{'newvenue'})  {
+            my $rc = WorkFlow::addWorkFlowTasks(
+                $self->{'Data'},
+                'ENTITY',
+                'NEW',
+                $self->{'ClientValues'}{'authLevel'} || 0,
+                $facilityID,
+                0,
+                0,
+                0,
+            );
+        }
         $facilityObj->load();
 
         $content = qq [<div class="alert"><div><span class="flash_success fa fa-check"></span><p>$self->{'Data'}->{'LevelNames'}{$Defs::LEVEL_VENUE} submitted for approval</p></div></div>]; # Venue ID = $facilityID AND entityID = $entityID </div><br> ];
