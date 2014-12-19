@@ -80,6 +80,11 @@
                 </div>
 
                 <div id="memberdetails" class="tab-pane fade">
+
+                <div class="read-only">
+                    <h4>Personal Information</h4>
+                    <div class="read-only-text">
+
                     [% IF PersonDetails.LatinSurname %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Name (Latin Characters)") %]:</span>
@@ -151,9 +156,15 @@
                         </span>
                     [% END %]
 
+                    </div>
+                </div>
                 </div>
 
                 <div id="regdetails" class="tab-pane fade">
+
+                <div class="read-only">
+                    <h4>Registration Details</h4>
+                    <div class="read-only-text">
 
                     [% IF PersonRegoDetails.RegisterTo %]
                         <span class="details-row">
@@ -212,6 +223,8 @@
                             <span class="details-left detail-value">[% PersonRegoDetails.AgeLevel %]</span>
                         </span>
                     [% END %]
+                    </div>
+                </div>
 
                     <div class="row-padding">
                     <div style="clear: both;">&nbsp;</div>

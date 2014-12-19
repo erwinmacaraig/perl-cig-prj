@@ -591,6 +591,7 @@ a.btn-inside-panels:hover , input.btn-inside-panels:hover, span.btn-inside-panel
 	/*top:6px;*/
 	top: -4px;
 	width:85%;
+	vertical-align: middle;
 }
 
 .alert div ul {
@@ -2179,3 +2180,32 @@ li:last-child.eightStepWidth {
 }
 
 /*NEW PROGRESS STEP STYLES*/
+
+#memberdetails.tab-pane .read-only {
+	margin-top: 10px;
+}
+#memberdetails.tab-pane .read-only .read-only-text {
+	float: left;
+	width: 100%;
+}
+#memberdetails.tab-pane .read-only h4 {
+	background-color: #fff;
+}
+
+#regdetails.tab-pane .read-only {
+	margin-top: 10px;
+}
+#regdetails.tab-pane .read-only .read-only-text {
+	float: left;
+	width: 100%;
+}
+#regdetails.tab-pane .read-only h4 {
+	background-color: #fff;
+}
+.transfer-rejected {
+	background-color: #c4070a;
+    color: #fff;
+    font-size: 14px;
+    padding: 10px;
+    text-align: center;
+}

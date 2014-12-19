@@ -3120,7 +3120,7 @@ sub HoldOrRejectTaskScreen {
         }
         case "WF_PR_R" {
             $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'Rejected');
-            $message = $Data->{'lang'}->txt("You have rejected this transfer, the clubs will be informed. To proceed with this transfer the clubs need to start over the process.");
+            $message = $Data->{'lang'}->txt("You have rejected this transfer, the clubs will be informed. To proceed with this transfer the clubs need to start a new transfer.");
             $status = $Data->{'lang'}->txt("Rejected");
         }
     }

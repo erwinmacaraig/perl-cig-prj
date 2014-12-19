@@ -2,7 +2,7 @@
 <!--<div class="row">-->
     <div class="col-md-3">
         [% PersonSummaryPanel %]
-        <div class="transfer-pending">[% Lang.txt('Transfer Status:') %] [% status %]</div>
+        <div class="[% IF status == 'Rejected' %]transfer-rejected[% ELSE %]transfer-pending[% END %]">[% Lang.txt('Transfer Status:') %] [% status %]</div>
     </div>
     <div class="col-md-9">
         <h3 class="panel-header">[% PersonDetails.firstname %] [% PersonDetails.surname %]</h3>
