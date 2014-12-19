@@ -51,6 +51,7 @@ use HomePerson;
 use PersonSummaryPanel;
 use MinorProtection;
 use PersonCertifications;
+use EntitySummaryPanel;
 
 sub cleanTasks  {
 
@@ -2389,6 +2390,9 @@ sub populateEntityViewData {
                 if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_VENUE'} == 1 and $dref->{'entityPaymentRequired'});
 
             #TODO: add details specific to VENUE
+
+            my $entitySummaryPanel = entitySummaryPanel($Data, $dref->{'intEntityID'});
+            $TemplateData{'EntitySummaryPanel'} = $entitySummaryPanel;
         }
         else {
 
