@@ -601,6 +601,8 @@ sub getRegistrationData	{
         SELECT 
             pr.*, 
 			np.strNationalPeriodName,
+			np.dtFrom as npdtFrom,
+			np.dtTo as npdtTo,
             p.dtDOB,
             DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
