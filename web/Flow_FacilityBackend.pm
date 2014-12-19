@@ -28,6 +28,7 @@ use FacilityTypes;
 use PersonUserAccess;
 use Data::Dumper;
 use FacilityFieldsSetup;
+use EntitySummaryPanel;
 
 sub setProcessOrder {
     my $self = shift;
@@ -89,15 +90,6 @@ sub setProcessOrder {
             'action' => 'du',
             'function' => 'process_documents',
         },
-        #{
-        #    'action' => 'p',
-        #    'function' => 'display_products',
-        #    'label'  => 'Products',
-        #},
-        #{
-        #    'action' => 'pu',
-        #    'function' => 'process_products',
-        #},
         {
             'action' => 'summ',
             'function' => 'display_summary',
@@ -140,11 +132,14 @@ sub display_core_details {
     }
 
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id) if $id;
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $fieldsContent || '',
+        FlowSummaryContent => $entitySummaryPanel,
         ScriptContent => $scriptContent || '',
         Title => '',
         TextTop => '',
@@ -236,6 +231,8 @@ sub display_contact_details {
         }
     }
 
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
+
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
@@ -243,6 +240,7 @@ sub display_contact_details {
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $fieldsContent || '',
         ScriptContent => $scriptContent || '',
+        FlowSummaryContent => $entitySummaryPanel,
         Title => '',
         TextTop => '',
         TextBottom => '',
@@ -283,11 +281,16 @@ sub display_role_details {
     my $self = shift;
 
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+
+    my $id = $self->ID() || 0;
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
+
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $fieldsContent || '',
+        FlowSummaryContent => $entitySummaryPanel,
         ScriptContent => $scriptContent || '',
         Title => '',
         TextTop => '',
@@ -312,6 +315,7 @@ sub validate_role_details {
 
     if(!$facilityFieldData->{'intEntityFieldCount'}){
         #push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid number of facility fields.';
+        $self->incrementCurrentProcessIndex();
         $self->incrementCurrentProcessIndex();
         $self->incrementCurrentProcessIndex();
         return ('',2);
@@ -370,11 +374,13 @@ print STDERR "SSSS";
         'flow/facility_fields_grid.templ',
     );
 
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $self->ID());
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $facilityFieldsContent || '',
+        FlowSummaryContent => $entitySummaryPanel,
         ScriptContent => '',
         Title => '',
         TextTop => '',
@@ -583,6 +589,13 @@ sub display_documents {
             undef,
             $Defs::DOC_FOR_VENUES,
         );
+
+        if(! scalar(@{$venue_documents})){
+            $self->incrementCurrentProcessIndex();
+            #$self->incrementCurrentProcessIndex();
+            return ('',2);
+        }
+        
 		my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $facilityID,  $venue_documents);
 
         my $cl = setClient($self->{'Data'}->{'clientValues'}) || '';
@@ -674,24 +687,101 @@ sub display_summary {
 
     my $content = '';
 
+    my $id = $self->ID() || 0;
+    my $facilityObj;
+    if($id)   {
+        $facilityObj = new EntityObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}->{'cache'});
+        $facilityObj->load();
+        if(!doesUserHaveEntityAccess($self->{'Data'}, $id,'WRITE')) {
+            return ('Invalid User',0);
+        }
+    }
+
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
         $self->decrementCurrentProcessIndex();
         return ('',2);
     }
 
-    my %summaryData = ();
+    my $languages = PersonLanguages::getPersonLanguages($self->{'Data'}, 1, 0);
+    my $selectedLanguage;
+    for my $l ( @{$languages} ) {
+        if($l->{intLanguageID} == $facilityObj->getValue('intLocalLanguage')){
+             $selectedLanguage = $l->{'language'};
+            last
+        }
+    }
+
+    my $facilityTypes = FacilityTypes::getAll($self->{'Data'});
+    my $selectedFacilityType;
+    for my $l ( @{$facilityTypes} ) {
+        if($l->{intFacilityTypeID} == $facilityObj->getValue('intFacilityTypeID')){
+             $selectedFacilityType = $l->{'strName'};
+            last
+        }
+    }
+
+    my $facilityFields = new EntityFields();
+    my $facilityFieldCount = $self->{'RunParams'}{'facilityFieldCount'} || 0;
+    $facilityFields->setCount($facilityFieldCount);
+    $facilityFields->setEntityID($self->{'RunParams'}{'e'});
+    $facilityFields->setData($self->{'Data'});
+    
+    my @facilityFieldsData = ();
+    my $startNewIndex = 1;
+
+    foreach my $fieldObjData (@{$facilityFields->getAll()}){
+        $fieldObjData->{'strGroundNature'} = $Defs::fieldGroundNatureType{$fieldObjData->{'strGroundNature'}};
+        $fieldObjData->{'strDiscipline'} = $Defs::entitySportType{$fieldObjData->{'strDiscipline'}};
+        #$facilityFields->setDBData($fieldObjData);
+        push @facilityFieldsData, $fieldObjData;
+        #$startNewIndex++;
+    }
+
+    my $isocountries  = getISOCountriesHash();
+    my %summaryData = (
+        FacilityCoreDetails => {
+            Name => $facilityObj->getValue('strLocalName') || '',
+            ShortName => $facilityObj->getValue('strLocalShortName') || '',
+            Language => $selectedLanguage || '',
+            VenueType => $selectedFacilityType || '',
+            City => $facilityObj->getValue('strCity') || '',
+            Region => $facilityObj->getValue('strRegion') || '',
+            Country => $isocountries->{$facilityObj->getValue('strISOCountry')} || '',
+        },
+        FacilityContactDetails => {
+            Address1 => $facilityObj->getValue('strAddress') || '',
+            Address2 => $facilityObj->getValue('strAddress2') || '',
+            City => $facilityObj->getValue('strContactCity') || '',
+            State => $facilityObj->getValue('strState') || '',
+            PostalCode => $facilityObj->getValue('strPostalCode') || '',
+            Country => $isocountries->{$facilityObj->getValue('strContactISOCountry')} || '',
+            Email => $facilityObj->getValue('strEmail') || '',
+            Phone => $facilityObj->getValue('strPhone') || '',
+            Fax => $facilityObj->getValue('strFax') || '',
+            WebAddress => $facilityObj->getValue('strWebURL') || '',
+        },
+        FacilityFields => \@facilityFieldsData,
+        FacilityDocuments => {
+        
+        },
+        editlink => $self->stringifyURLCarryField(),
+        target => $self->{'Data'}{'target'},
+    );
     my $summaryContent = runTemplate(
         $self->{'Data'},
         \%summaryData,
         'flow/facility_summary.templ',
     );
 
+
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $facilityObj->ID());
+
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        FlowSummaryContent => 'note: follow personSummaryPanel',
+        FlowSummaryContent => $entitySummaryPanel,
         Content => $summaryContent,
         Title => '',
         TextTop => $content,
@@ -714,27 +804,29 @@ sub display_complete {
     $facilityFields->setEntityID($self->{'RunParams'}{'e'});
     $facilityFields->setData($self->{'Data'});
 
+    my $facilityID = $facilityFields->getEntityID();
+
     my $content = '';
     if(scalar@{$facilityFields->getAll()}) {
-        my $facilityID = $facilityFields->getEntityID();
         my $facilityObj = new EntityObj(db => $self->{'db'}, ID => $facilityID, cache => $self->{'Data'}->{'cache'});
         $facilityObj->load();
         my $PendingStatus =  {};
         $PendingStatus->{'strStatus'} = $Defs::ENTITY_STATUS_PENDING;
         $facilityObj->setValues($PendingStatus);
         $facilityObj->write();
-        if($self->{'RunParams'}{'newvenue'})  {
-            my $rc = WorkFlow::addWorkFlowTasks(
-                $self->{'Data'},
-                'ENTITY',
-                'NEW',
-                $self->{'ClientValues'}{'authLevel'} || 0,
-                $facilityFields->getEntityID(),
-                0,
-                0,
-                0,
-            );
-        }
+
+        #if($self->{'RunParams'}{'newvenue'})  {
+        #    my $rc = WorkFlow::addWorkFlowTasks(
+        #        $self->{'Data'},
+        #        'ENTITY',
+        #        'NEW',
+        #        $self->{'ClientValues'}{'authLevel'} || 0,
+        #        $facilityFields->getEntityID(),
+        #        0,
+        #        0,
+        #        0,
+        #    );
+        #}
         $facilityObj->load();
 
         $content = qq [<div class="alert"><div><span class="flash_success fa fa-check"></span><p>$self->{'Data'}->{'LevelNames'}{$Defs::LEVEL_VENUE} submitted for approval</p></div></div>]; # Venue ID = $facilityID AND entityID = $entityID </div><br> ];
@@ -749,7 +841,17 @@ sub display_complete {
         return ('',2);
     }
 
-    my %facilityApprovalData = ();
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $facilityID);
+
+    my $maObj = getInstanceOf($self->{'Data'}, 'national');
+    my $maName = $maObj ? $maObj->name() : '';
+	
+    my %facilityApprovalData = ( 
+        EntitySummaryPanel => $entitySummaryPanel,
+        client => $self->{'Data'}->{'client'},
+        target => $self->{'Data'}->{'target'},
+        MA => $maName,
+    );
     my $displayFacilityForApproval = runTemplate(
         $self->{'Data'},
         \%facilityApprovalData,
@@ -819,5 +921,89 @@ sub loadObjectValues    {
     }
     return \%values;
 }
+
+sub Navigation {
+    #May need to be overriden in child class to define correct order of steps
+  my $self = shift;
+
+    my $navstring = '';
+    my $meter = '';
+    my @navoptions = ();
+    my $step = 1;
+    my $step_in_future = 0;
+    my $shared_nav = 0;
+    my $noNav = $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'NoNav'} || 0;
+    my $noGoingBack = $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'NoGoingBack'} || 0;
+    return '' if $noNav;
+    my $startingStep = $self->{'RunParams'}{'_ss'} || '';
+    my $includeStep = 1;
+    $includeStep = 0 if $startingStep;
+    my $lastDisplayIndex = 0;
+    for my $i (0 .. $#{$self->{'ProcessOrder'}})    {
+        my $current = 0;
+        my $name = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'label'} || $self->{'ProcessOrder'}[$i]{'ShareNav'} || '');
+        if($startingStep and $self->{'ProcessOrder'}[$i]{'action'} eq $startingStep)   {
+            $includeStep = 1;
+        }
+        next if !$includeStep;
+        next if($self->{'ProcessOrder'}[$i]{'NoNav'});
+        next if($self->{'ProcessOrder'}[$i]{'NoDisplayInNav'});
+        if($name)   {
+            $current = 1 if $i == $self->{'CurrentIndex'};
+            push @navoptions, [
+                $name,
+                $current || $step_in_future || 0,
+            ];
+            my $currentclass = '';
+            $currentclass = 'current' if $current;
+            $currentclass = 'next' if $step_in_future;
+            $currentclass ||= 'previous';
+            $meter = $step if $current;
+            my $showlink = 0;
+            $showlink = 1 if(!$current and !$step_in_future);
+            $showlink = 0 if($self->{'ProcessOrder'}[$i]{'noRevisit'});
+            $showlink = 0 if $noGoingBack;
+            $showlink = 0 if $self->{'ProcessOrder'}[$i]{'ShareNav'};
+            my $linkURL = $self->{'Target'}."?rfp=".$self->{'ProcessOrder'}[$i]{'action'}."&".$self->stringifyURLCarryField();
+            $self->{'RunDetails'}{'DirectLinks'}[$i] = $linkURL;
+
+            if($self->{'ProcessOrder'}[$i]{'ShareNav'}){
+                $step_in_future = 2 if $current;
+                $shared_nav = 1;
+            }
+            else {
+                $shared_nav = 0;
+                my $link = $showlink
+                    #? qq[<a href="$linkURL" class = "stepname">$step. $name</a>]
+                    #: qq[<span class = "stepname">$step. $name</span>];
+
+                    ? qq[<a href="$linkURL" class = "stepname">$step. $name</a>]
+                    : qq[<span class = "stepname">$step. $name</span>];
+                
+                #$navstring .= qq[ <li class = "$currentclass step step-$step"><span class="$currentclass step-num">$link</li> ];
+                $navstring .= qq[ <div class = "col-md-2 $currentclass step step-$step"><span class="$currentclass step-num">$link</span></div> ];
+                $step_in_future = 2 if $current;
+                $step++;
+                $lastDisplayIndex = $i;
+            }
+        }
+    }
+    #my $returnHTML = '';
+    #$returnHTML .= qq[<ul class = "playermenu list-inline form-nav">$navstring</ul><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;
+    #$returnHTML .= qq[<div class = "progressFlow">$navstring</div><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;           
+
+    my $onLastStep = $self->{'CurrentIndex'} >= $lastDisplayIndex;
+    my $completeClass = $onLastStep ? 'progressComplete' : '';
+    my $returnHTML = '';
+    
+    $returnHTML .= qq[<div class = "progressFlow $completeClass ">$navstring</div><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;        
+    
+
+    if(wantarray)   {
+        return ($returnHTML, \@navoptions);
+    }
+    return $returnHTML || '';
+}
+
 
 1;
