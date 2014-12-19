@@ -1,0 +1,15 @@
+[% USE Dumper %]
+<div class = "summaryPanel">
+<h3 class="panel-header">[% IF NationalNum %][% Lang.txt('Member ID') %]: [% NationalNum %][% ELSE %]&nbsp;[% END %]</h3>
+    <div class="panel-body">
+        <p class="reg-text">[% LocalName %]</p>
+        <p class="reg-text">[% Country %]</p>
+        [% IF FacilityType %]
+        <p class="reg-text">[% FacilityType %]</p>
+        [% END %]
+
+        [% IF FoundationDate %]
+        <p class="reg-text">[% FoundationDate %]</p>
+        [% END %]
+    </div>
+</div>
