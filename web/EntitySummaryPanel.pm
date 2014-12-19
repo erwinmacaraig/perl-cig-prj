@@ -35,6 +35,7 @@ sub entitySummaryPanel {
         'NationalNum' => $entityObj->getValue('strStatus') eq $Defs::ENTITY_STATUS_ACTIVE ? $entityObj->getValue('strNationalNum') || '' : '',
         'LocalName' => $entityObj->getValue('strLocalName') || '',
         'Country' => $isocountries->{$entityObj->getValue('strISOCountry')},
+        'Status' => $Defs::entityStatus{$entityObj->getValue('strStatus')},
     );
 
     switch ($entityObj->getValue('intEntityLevel')) {
