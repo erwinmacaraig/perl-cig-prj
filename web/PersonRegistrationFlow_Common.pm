@@ -581,7 +581,7 @@ sub checkUploadedRegoDocuments {
 print FH "\nGetting Uploaded Documents: \n $query \n personID = $personID, regoID = $regoID\n";
    my @uploaded_docs = ();
     $sth = $Data->{'db'}->prepare($query);
-    $sth->execute($personID, $regoID, $Data->{'Realm'});
+    $sth->execute($personID, $Data->{'Realm'});
 	
 	while(my $dref = $sth->fetchrow_hashref()){
 		push @uploaded_docs,$dref->{'strDocumentName'};
