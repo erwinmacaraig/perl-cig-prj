@@ -306,6 +306,11 @@ use TransferFlow;
 		my $clubID = getID($Data{'clientValues'},$Defs::LEVEL_CLUB); 
 		($resultHTML, $pageHeading) = PayInvoice::handlePayInvoice($action, \%Data, $clubID);				
 	}
+
+	elsif($action eq 'itcf'){
+		use ITC_TransferCertificate;
+		($resultHTML, $pageHeading) = ITC_TransferCertificate::show_itc_request_form(\%Data);
+	}
     
    
     # BUILD PAGE

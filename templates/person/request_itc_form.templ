@@ -1,0 +1,67 @@
+<form>
+	<table>
+		<tr>
+			<th colspan="2">Player's Data </th>
+		</tr>
+		<tr>
+			<td>[% strLocalSurname.label %]:</td>
+			<td><input type="text" name="[% strLocalSurname.name %]" size="[% strLocalSurname.size %]" /> </td>
+		</tr>
+		<tr>
+			<td>[% strLocalFirstname.label %]:</td>
+			<td><input type="text" name="[% strLocalFirstname.name %]" size="[% strLocalFirstname.size %]" /></td>
+		</tr>
+		<tr>
+			<td>[% dtDOB.label %]: </td>			
+			<td>
+				<script type="text/javascript">
+                   jQuery().ready(function() {
+                       jQuery("#[% dtDOB.name %]").datepicker({
+                          dateFormat: 'yy-mm-dd',
+                          showButtonPanel: true
+                        });            
+                   });
+               </script>  
+				<input type="text" name="[% dtDOB.name %]"  id="[% dtDOB.name %]"  value="" size="[% dtDOB.size %]" />
+			</td>
+		</tr>
+		<tr>
+			<td>[% strISONationality.label %]: </td>
+			<td>
+				<select name="[% strISONationality.name %]" id="[% strISONationality.name %]" class="[% strISONationality.class %]">
+					    <option value="">Select Country</option>
+						[% FOREACH nationality IN strISONationality.options.keys.sort %]
+							<option value="[% nationality %]">[% strISONationality.options.$nationality %]</option>
+						[% END %]
+				</select>		
+		</td>
+		</tr>
+		<tr>
+			<td>[% strPlayerID.label %]</td>
+			<td><input type="text" name="[% strPlayerID.name %] size="[% strPlayerID.size %]" /></td>
+		</tr>
+		<tr>
+			<th colspan="2">Previous Club </th>
+		</tr>
+		<tr>
+			<td>[% strISOCountry.label %]</td>
+			<td>
+				<select name="[% strISOCountry.name %]" id="[% strISOCountry.name %]" class="[% strISOCountry.class %]">
+					 <option value="">Select Country</option>
+					[% FOREACH nationality IN strISONationality.options.keys.sort %]
+							<option value="[% nationality %]">[% strISONationality.options.$nationality %]</option>
+						[% END %]
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				[% strClubName.label %]
+			</td>
+			<td>
+				<input type="text" name="[% strClubName.name %]" size="[% strClubName.size %]" />
+			</td>
+		</tr>
+		
+	</table>
+</form>
