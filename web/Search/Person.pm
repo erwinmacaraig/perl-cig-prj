@@ -529,6 +529,7 @@ sub getPersonAccess {
                 link => "$target?client=$client&amp;a=PRA_getrecord&request_type=access&amp;search_keyword=$dref->{'strNationalNum'}",
                 name => $name,
                 dob => $dref->{'dtDOB'},
+                org => $dref->{'EntityName'},
                 role => $Defs::personType{$dref->{'strPersonType'}},
                 inProgressRequestExists => $dref->{'existingInProgressRequestID'},
                 acceptedRequestLink => $acceptedRequestLink,
@@ -542,7 +543,16 @@ sub getPersonAccess {
             return \@memarray;
         }
         else {
-            return $self->displayResultGrid(\@memarray) if $count;
+            my @roleFilters;
+            foreach my $role (keys %Defs::personType){
+                push @roleFilters, $Defs::personType{$role};
+            }
+
+            my %filters = (
+                role => \@roleFilters,
+            );
+
+            return $self->displayResultGrid(\@memarray, \%filters) if $count;
 
             return $count;
         }
