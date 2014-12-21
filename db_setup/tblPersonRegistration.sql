@@ -19,13 +19,14 @@ CREATE TABLE tblPersonRegistration_XX (
     strRegistrationNature VARCHAR(30) default '', /*NEW, REREG, AMEND etc*/
     strAgeLevel VARCHAR(100) default '',
 
-    dtFrom date COMMENT 'The date when the validity of this registration starts, e.g. when a player joins and officially registers for a club.',
-    dtTo date COMMENT 'The date when the validity of the registration ends, e.g. when a player officially leaves a club.',
+    dtFrom date default '0000-00-00' COMMENT 'The date when the validity of this registration starts, e.g. when a player joins and officially registers for a club.',
+    dtTo date default '0000-00-00' COMMENT 'The date when the validity of the registration ends, e.g. when a player officially leaves a club.',
 
     intRealmID  INT DEFAULT 0,
     intSubRealmID  INT DEFAULT 0,
     
     dtAdded datetime,
+    dtApproved datetime,
     dtLastUpdated datetime,
     intIsPaid tinyint default 0,
     intNationalPeriodID INT NOT NULL DEFAULT 0,

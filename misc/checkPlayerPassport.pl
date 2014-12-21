@@ -15,6 +15,7 @@ use WorkFlow;
 use UserObj;
 use CGI qw(unescape);
 use PlayerPassport;
+use SystemConfig;
 use Data::Dumper;
 
 main();
@@ -24,10 +25,11 @@ sub main	{
 
 	my %Data = ();
 	my $db = connectDB();
-    my $personID= 10759110;
+    my $personID= 10759663;
 	$Data{'db'} = $db;
 	$Data{'Realm'} = 1;
 	$Data{'RealmSubType'} = 0;
+    $Data{'SystemConfig'}=getSystemConfig(\%Data);
     
    savePlayerPassport(\%Data, $personID);
 }

@@ -1347,64 +1347,90 @@ sub finaliseTransfer {
     $personRequest = $personRequest->[0];
     my $db = $Data->{'db'};
 
-    my $st = qq[
-        UPDATE
-            tblPersonRegistration_$Data->{'Realm'}
-        SET
-            strPreTransferredStatus = strStatus,
-            strStatus = ?,
-            dtTo= IF(dtTo>NOW(), NOW(), dtTo),
-            dtTo= IF(dtFrom>NOW(), dtFrom, dtTo)
-        WHERE
-            intEntityID = ?
-            AND strPersonType = ?
-            AND strSport = ?
-            AND intPersonID = ?
-            AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
-	];
+#    my $st = qq[
+#        UPDATE
+#            tblPersonRegistration_$Data->{'Realm'}
+#        SET
+#            strPreTransferredStatus = strStatus,
+#            strStatus = ?,
+#            dtTo= IF(dtTo>NOW(), NOW(), dtTo),
+#            dtTo= IF(dtFrom>NOW(), dtFrom, dtTo)
+#        WHERE
+#            intEntityID = ?
+#            AND strPersonType = ?
+#            AND strSport = ?
+#            AND intPersonID = ?
+#            AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
+#	];
     my $stDates = qq[
         UPDATE
             tblPersonRegistration_$Data->{'Realm'}
         SET
-            dtFrom = IF(dtFrom>NOW(), NOW(), dtFrom),
-            dtTo= IF(dtTo>NOW(), NOW(), dtTo)
+            dtFrom = IF(dtFrom>NOW(), NULL, dtFrom),
+            dtTo= IF(dtTo>NOW(), NULL, dtTo)
         WHERE
             intEntityID = ?
             AND strPersonType = ?
+            AND strPersonLevel= ?
             AND strSport = ?
             AND intPersonID = ?
             AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
 	];
-    my $query = $db->prepare($stDates) or query_error($st);
+            #dtTo= IF(dtTo>NOW(), NOW(), dtTo)
+            #dtFrom = IF(dtFrom>NOW(), NOW(), dtFrom),
+    my $query = $db->prepare($stDates) or query_error($stDates);
     $query->execute(
        $personRequest->{'intRequestToEntityID'},
        $personRequest->{'strPersonType'},
+       $personRequest->{'strPersonLevel'},
        $personRequest->{'strSport'},
        $personRequest->{'intPersonID'}
-    ) or query_error($st);
+    ) or query_error($stDates);
 
     ## Now handle LAST date
+    my $stPeriods = qq[
+        SELECT 
+            intNationalPeriodID
+        FROM 
+            tblNationalPeriod
+        WHERE 
+            intRealmID = ?
+        ORDER BY
+            dtTo DESC
+    ];
+
     $stDates = qq[
         UPDATE
-            tblPersonRegistration_$Data->{'Realm'}
+            tblPersonRegistration_$Data->{'Realm'} as R
         SET
-            dtTo= NOW()
+            R.dtTo= NOW()
         WHERE
-            intEntityID = ?
-            AND strPersonType = ?
-            AND strSport = ?
-            AND intPersonID = ?
-            AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
-        ORDER BY 
-            dtTo DESC LIMIT 1
+            R.intEntityID = ?
+            AND R.intNationalPeriodID = ?
+            AND R.strPersonType = ?
+            AND R.strPersonLevel= ?
+            AND R.strSport = ?
+            AND R.intPersonID = ?
+            AND R.strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
+        LIMIT 1
 	];
-    my $query = $db->prepare($stDates) or query_error($st);
-    $query->execute(
-       $personRequest->{'intRequestToEntityID'},
-       $personRequest->{'strPersonType'},
-       $personRequest->{'strSport'},
-       $personRequest->{'intPersonID'}
-    ) or query_error($st);
+    my $query = $db->prepare($stDates) or query_error($stDates);
+
+    my $qryNP= $db->prepare($stPeriods) or query_error($stPeriods);
+    $qryNP->execute($Data->{'Realm'});
+    while (my $pref = $qryNP->fetchrow_hashref) {
+        $query->execute(
+           $personRequest->{'intRequestToEntityID'},
+            $pref->{'intNationalPeriodID'},
+           $personRequest->{'strPersonType'},
+           $personRequest->{'strPersonLevel'},
+           $personRequest->{'strSport'},
+           $personRequest->{'intPersonID'}
+        ) or query_error($stDates);
+        my $rows = $query->rows;
+        last if $rows;
+    }
+    
 
 
     
@@ -1417,6 +1443,7 @@ sub finaliseTransfer {
         WHERE
             intEntityID = ?
             AND strPersonType = ?
+            AND strPersonLevel = ?
             AND strSport = ?
             AND intPersonID = ?
             AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
@@ -1431,6 +1458,7 @@ sub finaliseTransfer {
        $Defs::PERSONREGO_STATUS_TRANSFERRED,
        $personRequest->{'intRequestToEntityID'},
        $personRequest->{'strPersonType'},
+       $personRequest->{'strPersonLevel'},
        $personRequest->{'strSport'},
        $personRequest->{'intPersonID'}
     ) or query_error($st);

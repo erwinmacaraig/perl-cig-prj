@@ -1217,8 +1217,7 @@ sub checkForOutstandingTasks {
             $st = qq[
                     UPDATE tblEntity
                     SET
-                        strStatus = 'ACTIVE',
-                        dtFrom = NOW()
+                        strStatus = 'ACTIVE'
                     WHERE
                         intEntityID= ?
                 ];
@@ -1289,12 +1288,13 @@ sub checkForOutstandingTasks {
 	            	    PR.strStatus = 'ACTIVE',
                         PR.intCurrent=1,
                         dtLastUpdated=NOW(),
-                        dtFrom = NOW(),
-                        dtTo = IF (dtFrom>dtTo, dtFrom, dtTo)
+                        dtApproved=NOW(),
+                        dtFrom = NOW()
 	    	        WHERE
                         PR.intPersonRegistrationID = ?
                         AND PR.strStatus IN ('PENDING', 'INPROGRESS')
 	        	];
+                        #dtTo = IF (dtFrom>dtTo, dtFrom, dtTo)
                         #dtFrom = IF (dtFrom<NOW(), NOW(), dtFrom),
                         #AND strStatus NOT IN ('SUSPENDED', 'TRANSFERRED', 'DELETED')
 

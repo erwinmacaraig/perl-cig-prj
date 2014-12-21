@@ -199,7 +199,7 @@ sub handlePerson {
 sub listPlayerPassport {
 	my ($Data, $personID) = @_;
 
-	my $query = qq[ SELECT strPersonLevel, strEntityName, strMAName, dtFrom, dtTo FROM tblPlayerPassport WHERE intPersonID = ? ORDER BY dtFrom,dtTo DESC
+	my $query = qq[ SELECT strPersonLevel, strEntityName, strMAName, dtFrom, IF(dtTo > NOW(), '', dtTo) as dtTo FROM tblPlayerPassport WHERE intPersonID = ? ORDER BY dtFrom,dtTo DESC
 	];
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute($personID);
