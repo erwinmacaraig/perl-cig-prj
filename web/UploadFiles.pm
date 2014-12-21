@@ -39,12 +39,9 @@ sub getUploadedFiles	{
     my $currLoginID = $Data->{'clientValues'}{'_intID'};
 	my $myCurrentLevelValue = $clientValues{'authLevel'};
 	my $obj = getInstanceOf($Data, 'entity', $currLoginID);
-	#open FH, ">dumpfile.txt";
-	#print FH "\n\nInstance of: " . Dumper($obj) . "\n\n";
-    #print FH "\n" . Dumper($Data) . "\n";
-	print FH "\n\n intEntityLevel: " . $obj->getValue('intEntityLevel') . "\n\n";
+	
 	my $st = qq[
-	SELECT *, tblPersonRegistration_$Data->{'Realm'}.intEntityID AS owner, DATE_FORMAT(dtUploaded,"%d/%m/%Y %H:%i") AS DateAdded_FMT, tblDocuments.intDocumentTypeID,tblDocuments.intPersonRegistrationID as regoID, tblDocumentType.strLockAtLevel
+	SELECT *, tblDocumentType.strDocumentName, UF.strOrigFilename, tblPersonRegistration_$Data->{'Realm'}.intEntityID AS owner, DATE_FORMAT(dtUploaded,"%d/%m/%Y %H:%i") AS DateAdded_FMT, tblDocuments.intDocumentTypeID,tblDocuments.intPersonRegistrationID as regoID, tblDocumentType.strLockAtLevel
     FROM  tblUploadedFiles AS UF LEFT JOIN tblDocuments ON UF.intFileID = tblDocuments.intUploadFileID 
 	LEFT JOIN tblPersonRegistration_$Data->{'Realm'} On tblPersonRegistration_$Data->{'Realm'}.intPersonRegistrationID = tblDocuments.intPersonRegistrationID LEFT JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
 	WHERE UF.intEntityTypeID = ? AND UF.intEntityID = ? AND UF.intFileType = ?
@@ -114,6 +111,8 @@ sub getUploadedFiles	{
 			Ext => $dref->{'strExtension'} || '',
 			Size => sprintf("%0.2f",($dref->{'intBytes'} /1024/1024)),
 			DateAdded => $dref->{'DateAdded_FMT'},
+			Name => $dref->{'strDocumentName'},
+			OrigFilename => $dref->{'strOrigFilename'},
 			DB => $dref,
 		};	
 	}
