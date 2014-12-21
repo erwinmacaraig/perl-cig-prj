@@ -57,7 +57,7 @@ sub cleanPlayerPersonRegistrations  {
     );
     foreach my $rego (@{$regs_ref})  {
         next if ($rego->{'intPersonRegistrationID'} == $personRegistrationID);
-        next if ($rego->{'strPersonLevel'} eq $reg_ref->[0]{'strPersonLevel'});
+#        next if ($rego->{'strPersonLevel'} eq $reg_ref->[0]{'strPersonLevel'});
         my $thisRego = $rego;
         $thisRego->{'intCurrent'} = 0;
         $thisRego->{'strStatus'} = $Defs::PERSONREGO_STATUS_ROLLED_OVER;
@@ -65,7 +65,7 @@ sub cleanPlayerPersonRegistrations  {
         my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
         $Year+=1900;
         $Month++;
-        $thisRego->{'dtTo'} = "$Year-$Month-$Day";
+        $thisRego->{'dtTo'} = "$Year-$Month-$Day" if (! $rego->{'dtTo'} or $rego->{'dtTo'} eq '0000-00-00');
         updatePersonRegistration($Data, $personID, $rego->{'intPersonRegistrationID'}, $thisRego, 0);
     }
 }
