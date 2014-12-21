@@ -1817,7 +1817,6 @@ EOS
             updateProductRangePricing($Data->{'db'}, $id, $curAmountMin, $curAmountMax);    
         };
 
-		##BAFF
 		my %attributes_to_insert = (
 				$Defs::PRODUCT_MEMBER_TYPES => \@memberTypes,
 				$Defs::PRODUCT_AGE_GROUPS   =>\@ageGroups,

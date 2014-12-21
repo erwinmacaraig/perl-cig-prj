@@ -303,7 +303,6 @@ sub step2 {
     #my $entityID = getID($Data->{'clientValues'}, $authLevel) || 0;
 
     my $entityID = getLastEntityID($Data->{'clientValues'});
-#BAFF
     $entityID= 0 if ($entityID== $Defs::INVALID_ID);
 	my $intPersonID= $Data->{'clientValues'}{'personID'}; 
 	my $currentLevel = $Data->{'clientValues'}{'authLevel'};
