@@ -26,7 +26,7 @@ CREATE TABLE tblPersonRegistration_XX (
     intSubRealmID  INT DEFAULT 0,
     
     dtAdded datetime,
-    dtApproved datetime,
+    dtApproved datetime default '0000-00-00 00:00:00',
     dtLastUpdated datetime,
     intIsPaid tinyint default 0,
     intNationalPeriodID INT NOT NULL DEFAULT 0,
