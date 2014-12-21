@@ -840,7 +840,7 @@ sub listTransactions {
     $whereClause .= qq[ AND t1.intTLogID= $safePaymentID ] if $paymentID;
 
     my $authID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
-    $whereClause .= qq[ AND intTXNEntityID IN (0, $entityID, $authID)] if $entityID;
+   # $whereClause .= qq[ AND intTXNEntityID IN (0, $entityID, $authID)] if $entityID;
     $whereClause .= qq[ AND P.intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) ] if $txnStatus != $Defs::TXN_PAID;
 
 
