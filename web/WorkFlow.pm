@@ -52,6 +52,7 @@ use PersonSummaryPanel;
 use MinorProtection;
 use PersonCertifications;
 use EntitySummaryPanel;
+use PersonEntity;
 
 sub cleanTasks  {
 
@@ -1305,10 +1306,20 @@ sub checkForOutstandingTasks {
 	        	$rc = 1;	# All registration tasks have been completed
                 PersonRegistration::rolloverExistingPersonRegistrations($Data, $personID, $personRegistrationID);
 				# Do the check
-				$st = qq[SELECT strPersonType, strSport FROM tblPersonRegistration_$Data->{Realm} WHERE intPersonRegistrationID = ?];
+				$st = qq[SELECT * FROM tblPersonRegistration_$Data->{Realm} WHERE intPersonRegistrationID = ?];
                 my $qPR = $db->prepare($st);
 				$qPR->execute($personRegistrationID);
 				my $ppref = $qPR->fetchrow_hashref();
+                if ($ppref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_NEW)    {
+                    my %PE = ();
+                    $PE{'personType'} = $ppref->{'strPersonType'} || '';
+                    $PE{'personLevel'} = $ppref->{'strPersonLevel'} || '';
+                    $PE{'personEntityRole'} = $ppref->{'strPersonEntityRole'} || '';
+                    $PE{'sport'} = $ppref->{'strSport'} || '';
+                    
+                    my $peID = doesOpenPEExist($Data, $personID, $ppref->{'intEntityID'}, \%PE);
+                    addPERecord($Data, $personID, $ppref->{'intEntityID'}, \%PE) if (! $peID);
+                }
                 # if check  pass call save
                 if($ppref->{'strPersonType'} eq 'PLAYER' and $Data->{'SystemConfig'}{'cleanPlayerPersonRecords'}) {
                     PersonRegistration::cleanPlayerPersonRegistrations($Data, $personID, $personRegistrationID);

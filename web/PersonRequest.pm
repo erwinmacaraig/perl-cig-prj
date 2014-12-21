@@ -33,6 +33,7 @@ use Countries;
 use Switch;
 use SphinxUpdate;
 use InstanceOf;
+use PersonEntity;
 
 
 sub handlePersonRequest {
@@ -1431,9 +1432,6 @@ sub finaliseTransfer {
         last if $rows;
     }
     
-
-
-    
     my $st = qq[
         UPDATE
             tblPersonRegistration_$Data->{'Realm'}
@@ -1462,6 +1460,18 @@ sub finaliseTransfer {
        $personRequest->{'strSport'},
        $personRequest->{'intPersonID'}
     ) or query_error($st);
+    my %PE = ();
+    {
+    $PE{'personType'} = $personRequest->{'strPersonType'} || '';
+    $PE{'personLevel'} = $personRequest->{'strPersonLevel'} || '';
+    $PE{'personEntityRole'} = $personRequest->{'strPersonEntityRole'} || '';
+    $PE{'sport'} = $personRequest->{'strSport'} || '';
+    closePERecord($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestToEntityID'}, \%PE);
+    my $peID = doesOpenPEExist($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestFromEntityID'}, \%PE);
+    addPERecord($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestFromEntityID'}, \%PE) if (! $peID)
+    }
+    
+
     if ($personRequest->{'intPersonID'})    {
         my $personObject = getInstanceOf($Data, 'person',$personRequest->{'intPersonID'});
         updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
