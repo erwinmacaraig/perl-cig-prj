@@ -158,6 +158,8 @@ sub setupValues    {
     $values ||= {};
     $values->{'defaultType'} = $self->{'RunParams'}{'dtype'} || '';
     $values->{'itc'} = $self->{'RunParams'}{'itc'} || 0;
+    my $client = $self->{'Data'}{'client'};
+    $values->{'BaseURL'} = "$self->{'Data'}{'target'}?client=$client&amp;a=";
     $self->{'FieldSets'} = personFieldsSetup($self->{'Data'}, $values);
 }
 
