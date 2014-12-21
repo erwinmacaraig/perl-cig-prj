@@ -1311,6 +1311,7 @@ sub checkForOutstandingTasks {
 				$qPR->execute($personRegistrationID);
 				my $ppref = $qPR->fetchrow_hashref();
 #                if ($ppref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_NEW)    {
+                {
                     my %PE = ();
                     $PE{'personType'} = $ppref->{'strPersonType'} || '';
                     $PE{'personLevel'} = $ppref->{'strPersonLevel'} || '';
@@ -1319,7 +1320,7 @@ sub checkForOutstandingTasks {
                     
                     my $peID = doesOpenPEExist($Data, $personID, $ppref->{'intEntityID'}, \%PE);
                     addPERecord($Data, $personID, $ppref->{'intEntityID'}, \%PE) if (! $peID);
- #               }
+                }
                 # if check  pass call save
                 if($ppref->{'strPersonType'} eq 'PLAYER' and $Data->{'SystemConfig'}{'cleanPlayerPersonRecords'}) {
                     PersonRegistration::cleanPlayerPersonRegistrations($Data, $personID, $personRegistrationID);
