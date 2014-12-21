@@ -37,7 +37,6 @@ CREATE TABLE tblPersonRegistration_XX (
     strShortNotes VARCHAR(250) NULL DEFAULT NULL COMMENT 'can only be added/edited/viewed by MA level',
 
   PRIMARY KEY  (intPersonRegistrationID),
-  UNIQUE INDEX `strImportPersonCode_UNIQUE` (`strImportPersonCode` ASC),
   KEY index_intPersonID (intPersonID),
   KEY index_intEntityID (intEntityID),
   KEY index_strPersonType (strPersonType),
