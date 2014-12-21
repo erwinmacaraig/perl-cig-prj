@@ -28,6 +28,7 @@ use PersonRegisterWhat;
 use AuditLog;
 use Reg_common;
 use PersonCertifications;
+use PersonEntity;
 
 sub cleanPlayerPersonRegistrations  {
 
@@ -41,8 +42,19 @@ sub cleanPlayerPersonRegistrations  {
         $personID,
         \%Reg
     );
-    
+
     return if (! $count);
+    my %PE = ();
+    {
+        my $entityID = $reg_ref->[0]{'intEntityID'};
+        $PE{'personType'} = $reg_ref->[0]{'strPersonType'} || '';
+        $PE{'personLevel'} = $reg_ref->[0]{'strPersonLevel'} || '';
+        $PE{'personEntityRole'} = $reg_ref->[0]{'strPersonEntityRole'} || '';
+        $PE{'sport'} = $reg_ref->[0]{'strSport'} || '';
+        my $peID = doesOpenPEExist($Data, $personID, $entityID, \%PE);
+        addPERecord($Data, $personID, $entityID, \%PE) if (! $peID)
+    }
+    
     my %ExistingReg = (
         sport=> $reg_ref->[0]{'strSport'} || '',
         personType=> $reg_ref->[0]{'strPersonType'} || '',
@@ -66,6 +78,9 @@ sub cleanPlayerPersonRegistrations  {
         $Year+=1900;
         $Month++;
         $thisRego->{'dtTo'} = "$Year-$Month-$Day" if (! $rego->{'dtTo'} or $rego->{'dtTo'} eq '0000-00-00');
+
+        $PE{'personLevel'} = $thisRego->{'strPersonLevel'} || '';
+        closePERecord($Data, $personID, $thisRego->{'intEntityID'}, \%PE);
         updatePersonRegistration($Data, $personID, $rego->{'intPersonRegistrationID'}, $thisRego, 0);
     }
 }
