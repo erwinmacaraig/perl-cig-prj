@@ -783,7 +783,7 @@ sub addRegistration {
     }
     my ($nationalPeriodID, $npFrom, $npTo) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $Reg_ref->{'sport'}, $Reg_ref->{'personType'}, $Reg_ref->{'registrationNature'});
     #$Reg_ref->{'dateFrom'} = $npFrom if (! $Reg_ref->{'dtFrom'});
-    $Reg_ref->{'dateTo'} = $npTo if (! $Reg_ref->{'dtTo'} and $Reg_ref->{'personType'} ne $Defs::PERSON_TYPE_PLAYER);
+    #$Reg_ref->{'dateTo'} = $npTo if (! $Reg_ref->{'dtTo'} and $Reg_ref->{'personType'} ne $Defs::PERSON_TYPE_PLAYER);
     my $genAgeGroup ||=new GenAgeGroup ($Data->{'db'},$Data->{'Realm'}, $Data->{'RealmSubType'});
     my $ageGroupID = 0;
 
