@@ -1,7 +1,7 @@
 <div class="document-upload">
 	<!-- display document upload information --> 
 
-<h3 class="panel-header">Required Documents</h3> 
+<h3 class="panel-header">[% Lang.txt('Required Documents') %]</h3> 
 
 <div class="panel-body">
 	<div class="document-notes">
@@ -39,6 +39,21 @@
 							<input type="hidden" name="rID" value="[% regoID %]" />
 							<input type="hidden" name="doctypeID" value="[% doc.ID %]" />
 							<input type="hidden" name="a" value="[% nextaction %]" />
+                            <div class = "fallback">
+							<input type="hidden" name="u" value="[% currentURL %]" class = "fallback"/>
+                                [% IF doc.strOrigFilename != '' %]
+                                <i class='fa fa-check file-uploaded'></i>[% Lang.txt('Uploaded') %] <br/><a href = "#" onclick = "jQuery('.manualupload_[% doc.ID %]').toggle();jQuery(this).hide();return false;"><i><span class='replace-text'>[% Lang.txt('Click here to update this file') %]</span></i></a>
+                                <div class = "manualupload_[% doc.ID %]" style = "display:none;">
+                                    <input type="file" name="file" />
+                                    <input type="submit" name="uploadbtn" value = "[% Lang.txt('Upload') %]" />
+                                </div>
+                                [% ELSE %]
+                                <div class = "manualupload_[% doc.ID %]">
+                                    <input type="file" name="file" />
+                                    <input type="submit" name="uploadbtn" value = "[% Lang.txt('Upload') %]" />
+                                </div>
+                                [% END %]
+                            </div>
 							[% IF doc.intFileID && nature == 'NEW' %]
 							<input type="hidden" name="f" value="[% doc.intFileID %]" />
 							[% END %]
@@ -50,10 +65,11 @@
 						<script>
 							var doc;
 							Dropzone.options.myRegoDoc[% doc.ID %] = {
+                                dictFallbackMessage: '',
                                 [% IF doc.intFileID %]
-                                dictDefaultMessage: "<i class='fa fa-check file-uploaded'></i>[% Lang.txt('Uploaded') %] <br/> <i><span class='replace-text'>[% Lang.txt('To update this file drag and drop here') %]</span></i>",
+                                dictDefaultMessage: "<i class='fa fa-check file-uploaded'></i>[% Lang.txt('Uploaded') %] <br/> <i><span class='replace-text'>[% Lang.txt('Click here to update this file') %]</span></i>",
                                 [% ELSE %]
-                                dictDefaultMessage: "[% Lang.txt('Drag and drop file here') %]",
+                                dictDefaultMessage: "[% Lang.txt('Click here to upload file') %]",
                                 [% END %]
 								addRemoveLinks: true,							
 								init: function(){
@@ -84,7 +100,7 @@
 </div>
 <div class="clearfix">&nbsp;</div>
 [% IF optionaldocs.size %]
-<h3 class="panel-header">Optional Documents</h3> 
+<h3 class="panel-header">[% Lang.txt('Optional Documents') %]</h3> 
 <div class="panel-body">
 	<div class="document-notes">
 		<table class="table documents-table">
@@ -94,13 +110,13 @@
 				<tr>
 					<td>
 						<div>
-							<p><strong>Title:</strong> 
+							<p><strong>[% Lang.txt('Title') %]:</strong> 
 							[% doc.Name %]
 							</p>
 							
 							[% IF doc.Description != '' %]
 							
-							<p><strong>Description: </strong>
+							<p><strong>[% Lang.txt('Description') %]: </strong>
 								[% doc.Description %]
 							</p>
 						
@@ -123,7 +139,22 @@
 							<input type="hidden" name="rID" value="[% regoID %]" />
 							<input type="hidden" name="doctypeID" value="[% doc.ID %]" />
 							<input type="hidden" name="a" value="[% nextaction %]" />
-							[% IF doc.intFileID && nature == 'NEW' %]
+                            <div class = "fallback">
+							<input type="hidden" name="u" value="[% currentURL %]" class = "fallback"/>
+                                [% IF doc.strOrigFilename != '' %]
+                                <i class='fa fa-check file-uploaded'></i>[% Lang.txt('Uploaded') %] <br/><a href = "#" onclick = "jQuery('.manualupload_[% doc.ID %]').toggle();jQuery(this).hide();return false;"><i><span class='replace-text'>[% Lang.txt('Click here to update this file') %]</span></i></a>
+                                <div class = "manualupload_[% doc.ID %]" style = "display:none;">
+                                    <input type="file" name="file" />
+                                    <input type="submit" name="uploadbtn" value = "[% Lang.txt('Upload') %]" />
+                                </div>
+                                [% ELSE %]
+                                <div class = "manualupload_[% doc.ID %]">
+                                    <input type="file" name="file" />
+                                    <input type="submit" name="uploadbtn" value = "[% Lang.txt('Upload') %]" />
+                                </div>
+                                [% END %]
+                            </div>
+                            [% IF doc.intFileID && nature == 'NEW' %]
 								<input type="hidden" name="f" value="[% doc.intFileID %]" />
 							[% END %]
 							[% FOREACH h IN hidden_ref %]
@@ -135,10 +166,11 @@
 						<script>
 							var doc;
 							Dropzone.options.myRegoDoc[% doc.ID %] = {
+                                dictFallbackMessage: '',
                                 [% IF doc.intFileID %]
-                                dictDefaultMessage: "<i class='fa fa-check file-uploaded'></i>[% Lang.txt('Uploaded') %] <br/> <i><span class='replace-text'>[% Lang.txt('To update this file drag and drop here') %]</span></i>",
+                                dictDefaultMessage: "<i class='fa fa-check file-uploaded'></i>[% Lang.txt('Uploaded') %] <br/> <i><span class='replace-text'>[% Lang.txt('Click here to update this file') %]</span></i>",
                                 [% ELSE %]
-                                dictDefaultMessage: "[% Lang.txt('Drag and drop file here') %]",
+                                dictDefaultMessage: "[% Lang.txt('Click here to upload file') %]",
                                 [% END %]
 								addRemoveLinks: true,							
 								init: function(){

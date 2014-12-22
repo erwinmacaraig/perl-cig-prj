@@ -765,6 +765,8 @@ sub displayRegoFlowDocuments{
 
    
     
+  my $cgi = new CGI;
+  my $currentURL = $cgi->url(-full => 1, query => 1);
   my %PageData = (
         nextaction => "PREGF_DU",
         target => $Data->{'target'},
@@ -776,6 +778,7 @@ sub displayRegoFlowDocuments{
         regoID => $regoID,
         NoFormFields =>$noFormFields,
 		url => $Defs::base_url,
+		currentURL => $currentURL,
 		nature => $rego_ref->{'strRegistrationNature'},
   );
 	my $pagedata = runTemplate($Data, \%PageData, 'registration/document_flow_backend.templ') || '';
