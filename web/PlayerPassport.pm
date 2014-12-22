@@ -110,8 +110,9 @@ sub savePlayerPassport{
      	if($rowCount == 0){
      		$eID = $dref->{'intEntityID'};
      		$level = $dref->{'strPersonLevel'}; 
-     		$dtFrom = $dref->{'dtFrom'};
-     		$dtFrom = $dref->{'WhenFrom'} if ($Data->{'SystemConfig'}{'PP_UseDOBasFrom'});
+     		#$dtFrom = $dref->{'dtFrom'};
+     		#$dtFrom = $dref->{'WhenFrom'} if ($Data->{'SystemConfig'}{'PP_UseDOBasFrom'});
+     		$dtFrom = $dref->{'WhenFrom'};
      		$dtTo = $dref->{'dtTo'}; 
             $lastRealmName = $dref->{'strRealmName'};
             $lastEntityName= $dref->{'EntityName'};
@@ -126,8 +127,9 @@ sub savePlayerPassport{
         	$qPP->execute($personID,'REGO', $level, $eID, $lastEntityName,$lastRealmName, $dtFrom, $dtTo);
         	$eID = $dref->{'intEntityID'};
      		$level = $dref->{'strPersonLevel'}; 
-     		$dtFrom = $dref->{'dtFrom'};
-     		$dtFrom = $dref->{'WhenFrom'} if ($Data->{'SystemConfig'}{'PP_UseDOBasFrom'});
+     		#$dtFrom = $dref->{'dtFrom'};
+     		#$dtFrom = $dref->{'WhenFrom'} if ($Data->{'SystemConfig'}{'PP_UseDOBasFrom'});
+     		$dtFrom = $dref->{'WhenFrom'};
      		$dtTo = $dref->{'dtTo'}; 
             $lastRealmName = $dref->{'strRealmName'};
             $lastEntityName= $dref->{'EntityName'};
