@@ -50,7 +50,7 @@ sub savePlayerPassport{
             AND PR.strStatus IN ('PASSIVE', 'ACTIVE', 'ROLLED_OVER', 'TRANSFERRED')
         HAVING
             PRToCalc > When12
-        ORDER BY PR.dtFrom
+        ORDER BY PR.dtFrom, PR.intPersonRegistrationID DESC
     ];	
             #YEAR(IF(PR.dtTo > '1900-01-01', PR.dtTo, NOW())) as yrDtTo,
             #YEAR(PR.dtTo) as yrDtTo,
@@ -146,7 +146,7 @@ sub savePlayerPassport{
       $qPP->execute($personID,'REGO', $level, $eID, $lastEntityName, $lastRealmName, $dtFrom, $dtTo);
         }
         
-	    $query = "UPDATE tblPlayerPassport SET dtTo = '0000-00-00' WHERE dtTo>NOW() AND intPersonID= ? and strOrigin= 'REGO'";
+	    $query = "UPDATE tblPlayerPassport SET dtTo = '0000-00-00' WHERE (dtTo IS NULL or dtTo>NOW()) AND intPersonID= ? and strOrigin= 'REGO'";
 	    $sth = $Data->{'db'}->prepare($query); 
 	    $sth->execute($personID);
         ###
