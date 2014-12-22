@@ -309,25 +309,22 @@ sub _processUploadFile_single	{
 
 			#AND intPersonID = ?	- Remove this so entity documents can be handled accordingly since intUploadFileID will suffice
 
-			my $chkSQL = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem INNER JOIN tblDocumentType ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID INNER JOIN tblDocuments ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intUploadFileID = $oldFileId AND strApprovalStatus = 'APPROVED' AND (intUseExistingThisEntity = 1 OR intUseExistingAnyEntity = 1) AND tblRegistrationItem.intRealmID=? AND tblRegistrationItem.strItemType='DOCUMENT'] ;		
-			my $newstat = 'PENDING';
-			$doc_q = $Data->{'db'}->prepare($chkSQL);
-			$doc_q->execute($Data->{'Realm'});
-			my $exists = $doc_q->fetchrow_hashref();
-			if($exists->{'tot'} > 0){
-				 $newstat = 'APPROVED';
-			}
+			#my $chkSQL = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem INNER JOIN tblDocumentType ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID INNER JOIN tblDocuments ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intUploadFileID = $oldFileId AND strApprovalStatus = 'APPROVED' AND (intUseExistingThisEntity = 1 OR intUseExistingAnyEntity = 1) AND tblRegistrationItem.intRealmID=? AND tblRegistrationItem.strItemType='DOCUMENT'] ;		
+			#my $newstat = 'PENDING';
+			#$doc_q = $Data->{'db'}->prepare($chkSQL);
+			#$doc_q->execute($Data->{'Realm'});
+			#my $exists = $doc_q->fetchrow_hashref();
+			#if($exists->{'tot'} > 0){
+			#	 $newstat = 'APPROVED';
+			#}
 			
-			$doc_q->finish();
-
-			
+			#$doc_q->finish();
 
         	$doc_q = $Data->{'db'}->prepare($doc_st); 
         	$doc_q->execute(
               $fileID,    
-			  $newstat,          
-              $oldFileId,
-              
+			  'PENDING',          
+              $oldFileId,              
         );
 		#$intPersonID - Remove this so entity documents can be handled accordingly since intUploadFileID will suffice
         }
