@@ -2253,7 +2253,7 @@ li:last-child.eightStepWidth {
 	z-index: 10!important;
 }
 #l_row_intOtherPersonIdentifierTypeID .col-md-6,
-#l_row_intLocalLanguage .col-md-6,
+/*#l_row_intLocalLanguage .col-md-6,*/
 #l_row_intFacilityTypeID .col-md-6{
 	border: solid 1px #cbcbcb;
 	margin-left: 15px;
@@ -2264,7 +2264,7 @@ li:last-child.eightStepWidth {
 	background-position: 111% 7px;
 }
 #l_row_intOtherPersonIdentifierTypeID .col-md-6 select,
-#l_row_intLocalLanguage .col-md-6 select,
+/*#l_row_intLocalLanguage .col-md-6 select,*/
 #l_row_intFacilityTypeID .col-md-6 select{
 	width: 360px;
 	-webkit-appearance: none;
