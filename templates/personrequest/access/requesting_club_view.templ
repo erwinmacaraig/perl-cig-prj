@@ -5,12 +5,12 @@
             <h3 class = "panel-header">[% personFirstname %] [% personSurname %]</h3>
 				<div class="panel-body">
 
-				<p class="transfer-text">[% requestTo %] [% Lang.txt('has released') %] [% personFirstname %] [% personSurname %]. [% Lang.txt('Please continue the transfer process.') %]</p>
+				<p class="transfer-text">[% requestTo %] [% Lang.txt('has approved access of') %] [% personFirstname %] [% personSurname %] [% Lang.txt('details.') %]</p>
 
 				<div class="alert">
 					<div>
 						<span class="fa fa-exclamation"></span>
-						<p>[% Lang.txt('Please check and update all details before submitting to') %] [% MA %] [% Lang.txt('Member Association for final approval.') %]</p>
+						<p>[% Lang.txt('Please continue with the Add Role process and submit to') %] [% MA %] [% Lang.txt('Member Association for final approval.') %]</p>
 					</div>
 				</div>
 
@@ -24,20 +24,20 @@
 				<div class="tab-content">
 					<div id="oldclubdetails" class="tab-pane fade">
 						<div class="read-only">
-							<h4>[% Lang.txt('Old Club Details') %]</h4>
+							<h4>[% Lang.txt('Current Club Details') %]</h4>
 							<div class="read-only-text">
 								<div class="panel-body">
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Club") %]:</span>
-								        <span class="details-left detail-value">[% requestTo %]</span>
+								        <span class="details-left detail-value">[% requestTo or '-' %]</span>
 								    </span>
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Sport") %]:</span>
-								        <span class="details-left detail-value">[% requestToDiscipline %]</span>
+								        <span class="details-left detail-value">[% requestToDiscipline or '-' %]</span>
 								    </span>
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Country") %]:</span>
-								        <span class="details-left detail-value">[% requestToISOCountry %]</span>
+								        <span class="details-left detail-value">[% requestToISOCountry or '-' %]</span>
 								    </span>
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Address") %]:</span>
@@ -45,7 +45,7 @@
 								    </span>
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Phone") %]:</span>
-								        <span class="details-left detail-value">[% requestToPhone %]</span>
+								        <span class="details-left detail-value">[% requestToPhone or '-' %]</span>
 								    </span>
 								</div>
 							</div>
@@ -60,31 +60,31 @@
 								<div class="panel-body">
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Family Name") %]:</span>
-								        <span class="details-left detail-value">[% personSurname %]</span>
+								        <span class="details-left detail-value">[% personSurname or '-' %]</span>
 								    </span>
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("First Name") %]:</span>
-								        <span class="details-left detail-value">[% personFirstname %]</span>
+								        <span class="details-left detail-value">[% personFirstname or '-' %]</span>
 								    </span>								    
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Date of Birth") %]:</span>
-                                        <span class="details-left details-value">[% DateFormat.format(DOB,'MEDIUM') %]</span>
+                                        <span class="details-left detail-value">[% DateFormat.format(DOB,'MEDIUM') or '-' %]</span>
 								    </span>
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Gender") %]:</span>
-								        <span class="details-left detail-value">[% personGender %]</span>
+								        <span class="details-left detail-value">[% personGender or '-' %]</span>
 								    </span>
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Nationality") %]:</span>
-								        <span class="details-left detail-value">[% ISONationality %]</span>
+								        <span class="details-left detail-value">[% ISONationality or '-' %]</span>
 								    </span>
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Country of Birth") %]:</span>
-								        <span class="details-left detail-value">[% ISOCountryOfBirth %]</span>
+								        <span class="details-left detail-value">[% ISOCountryOfBirth or '-' %]</span>
 								    </span>
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Region of Birth") %]:</span>
-								        <span class="details-left detail-value">[% RegionOfBirth %]</span>
+								        <span class="details-left detail-value">[% RegionOfBirth or '-' %]</span>
 								    </span>
 								</div>
 							</div>
@@ -97,35 +97,35 @@
 								<div class="panel-body">
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt('Address 1') %]</span>
-								        <span class="details-left detail-value">[% contactAddress1 %]</span>
+								        <span class="details-left detail-value">[% contactAddress1 or '-' %]</span>
 								    </span>
 								    <span class="details-row">
 								        <span class="details-left">Address 2</span>
-								        <span class="details-left detail-value">[% contactAddress2 %]</span>
+								        <span class="details-left detail-value">[% contactAddress2 or '-' %]</span>
 								    </span>								    
 								    <span class="details-row">
 								        <span class="details-left">City</span>
-								        <span class="details-left detail-value">[% contactCity %]</span>
+								        <span class="details-left detail-value">[% contactCity or '-' %]</span>
 								    </span>
 								    <span class="details-row">
 								        <span class="details-left">State</span>
-								        <span class="details-left detail-value">[% contactState %]</span>
+								        <span class="details-left detail-value">[% contactState or '-' %]</span>
 								    </span>								    
 									<span class="details-row">
 								        <span class="details-left">Postal Code</span>
-								        <span class="details-left detail-value">[% contactPostalCode %]</span>
+								        <span class="details-left detail-value">[% contactPostalCode or '-' %]</span>
 								    </span>								    
 									<span class="details-row">
 								        <span class="details-left">Country</span>
-								        <span class="details-left detail-value">[% contactISOCountry %]</span>
+								        <span class="details-left detail-value">[% contactISOCountry or '-' %]</span>
 								    </span>									
 									<span class="details-row">
 								        <span class="details-left">Phone Number</span>
-								        <span class="details-left detail-value">[% contactPhoneHome %]</span>
+								        <span class="details-left detail-value">[% contactPhoneHome or '-' %]</span>
 								    </span>									
 									<span class="details-row">
 								        <span class="details-left">Email Address</span>
-								        <span class="details-left detail-value">[% contactEmail %]</span>
+								        <span class="details-left detail-value">[% contactEmail or '-' %]</span>
 								    </span>
 								</div>
 							</div>
@@ -138,10 +138,10 @@
 								<div class="panel-body">
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Request from") %]:</span>
-								        <span class="details-left detail-value">[% requestFrom %]</span>
+								        <span class="details-left detail-value">[% requestFrom or '-' %]</span>
 								    </span>
 								        <span class="details-left">[% Lang.txt("Additional Comments") %]:</span>
-								        <span class="details-left detail-value">[% requestNotes %]</span>
+								        <span class="details-left detail-value">[% requestNotes or '-' %]</span>
 								    </span>
 								</div>
 							</div>
@@ -158,15 +158,15 @@
 								<div class="panel-body">
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Club") %]:</span>
-								        <span class="details-left detail-value">[% requestFrom %]</span>
+								        <span class="details-left detail-value">[% requestFrom or '-' %]</span>
 								    </span>
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Sport") %]:</span>
-								        <span class="details-left detail-value">[% requestFromDiscipline %]</span>
+								        <span class="details-left detail-value">[% requestFromDiscipline or '-' %]</span>
 								    </span>
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Country") %]:</span>
-								        <span class="details-left detail-value">[% requestFromISOCountry %]</span>
+								        <span class="details-left detail-value">[% requestFromISOCountry or '-' %]</span>
 								    </span>
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Address") %]:</span>
@@ -174,7 +174,7 @@
 								    </span>
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Phone") %]:</span>
-								        <span class="details-left detail-value">[% requestFromPhone %]</span>
+								        <span class="details-left detail-value">[% requestFromPhone or '-' %]</span>
 								    </span>
 								</div>
 							</div>
