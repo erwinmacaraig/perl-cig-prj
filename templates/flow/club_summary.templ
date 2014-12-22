@@ -5,11 +5,12 @@
 			    <h4>Club Details</h4>
 			    <div class="read-only-text clearfix">
 				    <ul>
-				    	<li><span class="details-left">[% Lang.txt("Organisation name") %]:</span> <span class="details-value">&ndash;</span></li>
-				    	<li><span class="details-left">[% Lang.txt("Organisation Short Name") %]:</span> <span class="details-value">&ndash;</span></li>
-				    	<li><span class="details-left">[% Lang.txt("Organisation foundation date") %]:</span> <span class="details-value">&ndash;</span></li>
-				    	<li><span class="details-left">[% Lang.txt("Organisation dissolution date") %]:</span> <span class="details-value">&ndash;</span></li>
-				    	<li><span class="details-left">[% Lang.txt("Country") %]:</span> <span class="details-value">&ndash;</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Organisation name") %]:</span> <span class="details-value">
+[% organization %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Organisation Short Name") %]:</span> <span class="details-value">[% organizationShortName %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Organisation foundation date") %]:</span> <span class="details-value">[% foundingdate %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Organisation dissolution date") %]:</span> <span class="details-value">[% dissolutiondate %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Country") %]:</span> <span class="details-value">[% country %]</span></li>
 				    </ul><br/>
 				    <a href="[% editlink %]&amp;rfp=cd" class="pull-right">Edit</a>
 			    </div>
@@ -20,11 +21,11 @@
 			    <h4>Contact Details</h4>
 			    <div class="read-only-text clearfix">
 				    <ul>
-				    	<li><span class="details-left">[% Lang.txt("Address 1") %]:</span> <span class="details-value">&ndash;</span></li>   	
-				    	<li><span class="details-left">[% Lang.txt("Postcode") %]:</span> <span class="details-value">&ndash;</span></li>
-				    	<li><span class="details-left">[% Lang.txt("Contact person") %]:</span> <span class="details-value">&ndash;</span></li>
-				    	<li><span class="details-left">[% Lang.txt("Contact Phone") %]:</span> <span class="details-value">&ndash;</span></li>
-				    	<li><span class="details-left">[% Lang.txt("Contact Email") %]:</span> <span class="details-value">&ndash;</span></li>				    	
+				    	<li><span class="details-left">[% Lang.txt("Address 1") %]:</span> <span class="details-value">[% contactAddress %]</span></li>   	
+				    	<li><span class="details-left">[% Lang.txt("Postcode") %]:</span> <span class="details-value">[% postalcode %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Contact person") %]:</span> <span class="details-value">[% contactPerson %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Contact Phone") %]:</span> <span class="details-value">[% contactPhone %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Contact Email") %]:</span> <span class="details-value">[% contactEmail %]</span></li>				    	
 				    </ul><br/>
 				    <a href="[% editlink %]&amp;rfp=cond" class="pull-right">Edit</a>
 			    </div>
@@ -36,14 +37,14 @@
 				 <h4>Organisation Details</h4>
 			     <div class="read-only-text clearfix">
 				    <ul>
-				    	<li><span class="details-left">[% Lang.txt("Organisation type") %]:</span> <span class="details-value">&ndash;</span></li>
-				    	<li><span class="details-left">[% Lang.txt("Type of Legal entity") %]:</span> <span class="details-value">&ndash;</span></li>
-				    	<li><span class="details-left">[% Lang.txt("Legal entity identification number") %]:</span> <span class="details-value">&ndash;</span></li>
-				    	<li><span class="details-left">[% Lang.txt("Sport") %]:</span> <span class="details-value">&ndash;</span></li>
-				    	<li><span class="details-left">[% Lang.txt("Level") %]:</span> <span class="details-value">&ndash;</span></li>
-				    	<li><span class="details-left">[% Lang.txt("MA Comment") %]:</span> <span class="details-value">&ndash;</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Organisation type") %]:</span> <span class="details-value">[% organizationType %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Type of Legal entity") %]:</span> <span class="details-value">[% legaltype %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Legal entity identification number") %]:</span> <span class="details-value">[% strLegalID %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Sport") %]:</span> <span class="details-value">[% sport %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Level") %]:</span> <span class="details-value">[% organizationLevel %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("MA Comment") %]:</span> <span class="details-value">[% comment %]</span></li>
 				    </ul><br/>
-				    <a href="[% editlink %]&amp;rfp=r" class="pull-right">Edit</a>
+				    <a href="[% editlink %]&amp;rfp=role" class="pull-right">Edit</a>
 			     </div>
 			</div>
 		</div>
@@ -52,11 +53,14 @@
 			<div class="read-only">
 				 <h4>Documents</h4>
 				 <div class="read-only-text clearfix">
-				    <ul>
-						<li><span class="details-left">[% Lang.txt("Document #1") %]:</span><span class="details-value">&ndash;</span></li>
-						<li><span class="details-left">[% Lang.txt("Document #2") %]:</span><span class="details-value">&ndash;</span></li>
+				    <ul>  
+					[% FOREACH doc IN documents %]
+							<li><span class="details-left">[% doc.Name %]:</span>
+							<span class="details-value">[% doc.OrigFilename %]</span></li>	
+					[% END %]
+						
 				    </ul><br/>
-				    <a href="#" class="pull-right">Edit</a>
+				    <a href="[% editlink %]&amp;rfp=d" class="pull-right">Edit</a>
 			     </div>
 			</div>
 		</div>
