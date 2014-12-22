@@ -1,5 +1,5 @@
 
-<div class="pageHeading">Person Certifications</div>
+<div class="pageHeading">[% Lang.txt('Person Certifications') %]</div>
 <form action="[% target %]" method="POST">
     
     [% IF certificationtypes.size %]
@@ -7,7 +7,7 @@
     <table cellpadding="2" cellspacing="0" border="0"  class = "HTF_table" >    
         <tbody id="secmain" class="new_tab">
             <tr class="HTr_odd" id="l_row_intCertificationTypeID">
-            <td class="label"><label for="l_intCertificationTypeID">Certifcation Type</label>:</td>
+            <td class="label"><label for="l_intCertificationTypeID">[% Lang.txt('Certifcation Type') %]</label>:</td>
             <td class="value">
                 <select name="intCertificationTypeID">
                     <option value=""></option>
@@ -18,7 +18,7 @@
             </td>
             </tr>
             <tr class="HTr_even form-select" id = "l_row_strStatus">
-            <td class="label"><label for="l_strStatus">Status</label>:</td>
+            <td class="label"><label for="l_strStatus">[% Lang.txt('Status') %]</label>:</td>
             <td class="value">
                 <select name="strStatus" id="l_strStatus">
                     <option value="">Status</option> 
@@ -28,7 +28,7 @@
                 </select>
             </td>
              <tr class="HTr_odd form-select" id = "l_row_dtValidFrom">
-            <td class="label"><label for="l_dtValidFrom">Date Valid From</label>:</td>
+            <td class="label"><label for="l_dtValidFrom">[% Lang.txt('Date Valid From') %]</label>:</td>
             <td class="value">
                <script type="text/javascript">
                    jQuery().ready(function() {
@@ -42,7 +42,7 @@
             </td>
             </tr>
             <tr class="HTr_even form-select" id = "l_row_dtValidUntil">
-            <td class="label"><label for="l_dtValidUntil">Date Valid Until</label>:</td>
+            <td class="label"><label for="l_dtValidUntil">[% Lang.txt('Date Valid Until') %]</label>:</td>
             <td class="value">
                 <script type="text/javascript">
                     jQuery().ready(function() {
@@ -56,14 +56,14 @@
             </td>
             </tr>
             <tr class="HTr_odd id="l_row_strDescription">
-            <td class="label"><label for="l_strDescription">Description</label>:</td>
+            <td class="label"><label for="l_strDescription">[% Lang.txt('Description') %]</label>:</td>
             <td class="value"><textarea name="strDescription" id="l_strDescription"  rows="10"   cols="40"></textarea>
             </td>
             </tr>
         </tbody>
     </table>
  [% ELSE %]
- <h3>No Certification Required </h3>
+ <h3>[% Lang.txt('No Certification Required') %] </h3>
  <input type="hidden" name="a" value="PREGF_D">
  [% END %]
     [% FOREACH h IN hidden_ref %]
