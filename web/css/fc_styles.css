@@ -729,6 +729,14 @@ table tr.new-task {
 	border: 1px solid #aeaeae;
 	padding: 30px 15px 15px;
 }
+.fieldSectionGroupWrapper-DisplayOnly .panel-body {
+    background-color:transparent;
+}
+
+.fieldSectionGroupWrapper-DisplayOnly .panel-header{
+    font-weight:normal;
+    margin:10px 0px;
+}
 
 .offical-status {
 	font-size: 14px;

@@ -41,9 +41,8 @@ sub handleVenues    {
         ($resultHTML,$title) = handleFacilityFlow($action, $Data);
     }
     elsif($action =~/^VENUE_DTE/){
-        #TODO
         #still to be implemented
-        ($resultHTML,$title)=venue_details($action, $Data, $venueID);
+        #($resultHTML,$title)=venue_details($action, $Data, $venueID);
     }
     elsif ($action =~/^VENUE_L/) {
         #List Venues
@@ -1077,6 +1076,7 @@ sub update_venue_fields {
     $PageData{'Success'} = $updatedFields;
     delete $PageData{'Errors'};
 
+    $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&amp;a=FE_D&amp;venueID=$venueID";
     $fieldsPage = runTemplate(
         $Data,
         \%PageData,

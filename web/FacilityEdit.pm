@@ -14,6 +14,8 @@ use ConfigOptions qw(ProcessPermissions);
 use FacilityFieldsSetup;
 use FieldLabels;
 use Data::Dumper;
+use PersonUserAccess;
+use TTTemplate;
 
 sub handleFacilityEdit {
     my ($action, $Data) = @_;
@@ -23,7 +25,11 @@ sub handleFacilityEdit {
     my $currentLevel = $Data->{'clientValues'}{'currentLevel'};
     my $cl = setClient($clientValues);
     my $e_action = param('e_a') || '';
-    my $entityID = getID($clientValues);
+    my $entityID = param('venueID') || 0;
+    if(!doesUserHaveEntityAccess($Data, $entityID,'WRITE')) {
+        return ('Invalid User',0);
+    }
+
     $entityID = 0 if $entityID < 0;
     return '' if !$entityID;
     my $entityObj = new EntityObj(db => $Data->{'db'}, ID => $entityID, cache => $Data->{'cache'});
@@ -39,9 +45,9 @@ sub handleFacilityEdit {
     my $fieldset = undef;
     my @sections = ('core', 'contactdetails','roledetails');
     if($action eq 'FE_D')   {
-        $values->{'footer-core'} = qq[<div class = "fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$Data->{'client'}&a=FE_E&e_a=core">].$Data->{'lang'}->txt('edit').qq[</a></div>];
-        $values->{'footer-contactdetails'} = qq[<div class = "fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$Data->{'client'}&a=FE_E&e_a=contactdetails">].$Data->{'lang'}->txt('edit').qq[</a></div>];
-        $values->{'footer-roledetails'} = qq[<div class = "fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$Data->{'client'}&a=FE_E&e_a=roledetails">].$Data->{'lang'}->txt('edit').qq[</a></div>];
+        $values->{'footer-core'} = qq[<div class = "fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$Data->{'client'}&a=FE_E&e_a=core&amp;venueID=$entityID">].$Data->{'lang'}->txt('edit').qq[</a></div>];
+        $values->{'footer-contactdetails'} = qq[<div class = "fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$Data->{'client'}&a=FE_E&e_a=contactdetails&amp;venueID=$entityID">].$Data->{'lang'}->txt('edit').qq[</a></div>];
+        $values->{'footer-roledetails'} = qq[<div class = "fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$Data->{'client'}&a=FE_E&e_a=roledetails&amp;venueID=$entityID">].$Data->{'lang'}->txt('edit').qq[</a></div>];
     }
     $fieldset = facilityFieldsSetup($Data, $values);
     if(!scalar(@sections))  {
@@ -89,7 +95,7 @@ sub handleFacilityEdit {
             $entityObj->setValues($userData);
             $entityObj->write();
             $body = 'updated';
-            $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=FE_D";
+            $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=FE_D&amp;venueID=$entityID";
           }
     }
     if($action eq 'FE_E')    {
@@ -108,6 +114,7 @@ sub handleFacilityEdit {
                 <div class="txtright">
                 <input type = "hidden" name = "client" value = "].unescape($client).qq["> 
                 <input type = "hidden" name = "a" value = "FE_U"> 
+                <input type = "hidden" name = "venueID" value = "$entityID"> 
                 <input type = "hidden" name = "e_a" value = "$e_action"> 
                 <input type = "submit" value = "].$Data->{'lang'}->txt('Save').qq[" class = "btn-main"> 
                 </div>
@@ -128,6 +135,28 @@ sub handleFacilityEdit {
                     $output
             ];
         }
+        
+        my $facilityFields = new EntityFields();
+        $facilityFields->setEntityID($entityID);
+        $facilityFields->setData($Data);
+        my $fields = $facilityFields->getAll('RAW');
+        my %templateData = (
+            Disciplines => \%Defs::sportType,
+            GroundNature => \%Defs::fieldGroundNatureType,
+            fieldData   => $fields,
+        ); 
+        my $fields_summary = runTemplate($Data,\%templateData,'entity/venue_fields_summary.templ');
+        $body .= qq[
+<div class="read-only">
+    <h4>].$Data->{'lang'}->txt('Fields') .qq[</h4>
+    <div class="read-only-text">
+        $fields_summary
+        <div class="fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$entityID">edit</a></div>
+    </div>
+    
+</div>
+];
+
     }
 
     $body = qq[ <div class="col-md-12">$body</div>];
