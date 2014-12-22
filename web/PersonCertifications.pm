@@ -304,6 +304,8 @@ sub getPersonCertifications {
             WHERE 
                 PC.intRealmID = ?
                 AND PC.intPersonID = ?
+                AND UNIX_TIMESTAMP(PC.dtValidFrom) != 0
+                AND UNIX_TIMESTAMP(PC.dtValidUntil) != 0
                 $statusfilter
                 $typefilter
 
