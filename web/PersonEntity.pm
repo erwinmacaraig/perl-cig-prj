@@ -35,9 +35,10 @@ sub closePERecord {
 
     my $st = qq[
        UPDATE tblPersonEntity_$Data->{'Realm'}
-        SET strStatus=?, dtPETo = ?
+        SET strPEStatus=?, dtPETo = ?
        WHERE
             intRealmID=?
+            AND strPEStatus='ACTIVE'
             AND intPersonID=?
             AND intEntityID=?
             AND strPEPersonType=?
