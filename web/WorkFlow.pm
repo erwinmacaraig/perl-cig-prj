@@ -2026,8 +2026,16 @@ sub viewTask {
             p.strState,
             p.strPostalCode,
             p.strLocalSurname,
+            p.intLocalLanguage,
+            p.strRegionOfBirth,
+            p.strSuburb,
+            p.strState,
+            p.strISOCountry,
+            p.strPhoneHome,
+            p.strEmail,
             p.intMinorProtection,
             p.dtSuspendedUntil,
+            p.strISOCountryOfBirth,
             p.strISONationality,
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             p.intGender as PersonGender,
@@ -2288,6 +2296,15 @@ sub populateRegoViewData {
         push @certString, $cert->{'strCertificationName'};
     }
 
+    my $languages = PersonLanguages::getPersonLanguages($Data, 1, 0);
+    my $selectedLanguage;
+    for my $l ( @{$languages} ) {
+        if($l->{intLanguageID} == $dref->{'intLocalLanguage'}){
+             $selectedLanguage = $l->{'language'};
+            last
+        }
+    }
+
 	%TemplateData = (
         PersonDetails => {
             Status => $Data->{'lang'}->txt($Defs::personStatus{$dref->{'PersonStatus'} || 0}) || '',
@@ -2302,6 +2319,20 @@ sub populateRegoViewData {
             MID => $dref->{'strNationalNum'} || '',
             LatinSurname => $dref->{'strLatinSurname'} || '',
             MinorProtection => $minorProtectionOptions->{$dref->{'intMinorProtection'}} || '',
+
+            Address1 => $dref->{'strAddress1'} || '',
+            Address2 => $dref->{'strAddress2'} || '',
+            FirstName => $dref->{'strLocalFirstname'} || '',
+            LastName => $dref->{'strLocalSurname'} || '',
+            CountryOfBirth => $isocountries->{$dref->{'strISOCountryOfBirth'}} || '',
+            LanguageOfName => $selectedLanguage || '',
+            RegionOfBirth => $dref->{'strRegionOfBirth'} || '',
+            City =>$dref->{'strSuburb'} || '',
+            State =>$dref->{'strState'} || '',
+            ContactISOCountry =>$isocountries->{$dref->{'strISOCountry'}} || '',
+            ContactPhone =>$dref->{'strPhoneHome'} || '',
+            Email =>$dref->{'strEmail'} || '',
+            PostalCode => $dref->{'strPostalCode'} || '',
         },
         PersonRegoDetails => {
             ID => $dref->{'intPersonRegistrationID'},
