@@ -300,7 +300,7 @@ sub club_details  {
         value => $field->{strEntityType},
         type => 'lookup',
         options => \%Defs::clubLevelSubtype,
-        firstoption => [ '', 'Select Type' ],
+        firstoption => [ '', 'Hello' ],
         compulsory => 1,
      },
       strStatus => {
@@ -950,5 +950,15 @@ sub listClubs   {
   $title=$modoptions.$title;
 
   return ($resultHTML,$title);
+}
+
+sub getLegalTypeName {
+	my ($Data, $legalTypeID) = @_;
+
+	my $query = qq[SELECT strLegalType FROm tblLegalType WHERE intLegalTypeID = ?];
+	my $sth = $Data->{'db'}->prepare($query);
+	$sth->execute($legalTypeID);
+	my $dref = $sth->fetchrow_hashref();
+	return $dref->{'intLegalType'};
 }
 1;
