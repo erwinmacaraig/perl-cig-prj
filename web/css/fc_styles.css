@@ -2252,24 +2252,3 @@ li:last-child.eightStepWidth {
 .ui-datepicker {
 	z-index: 10!important;
 }
-#l_row_intOtherPersonIdentifierTypeID .col-md-6,
-/*#l_row_intLocalLanguage .col-md-6,*/
-#l_row_intFacilityTypeID .col-md-6{
-	border: solid 1px #cbcbcb;
-	margin-left: 15px;
-	width: 360px;
-	overflow: hidden;
-	background: #fff url(/js/chosen/chosen-sprite.png) no-repeat 0 7px;
-	padding-left: 0px;
-	background-position: 111% 7px;
-}
-#l_row_intOtherPersonIdentifierTypeID .col-md-6 select,
-/*#l_row_intLocalLanguage .col-md-6 select,*/
-#l_row_intFacilityTypeID .col-md-6 select{
-	width: 360px;
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	text-indent: 1px;
-	text-overflow: '';
-	background: none;
-}
