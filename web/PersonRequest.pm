@@ -741,8 +741,12 @@ sub displayCompletedRequest {
     $TemplateData{'personDetails'} = \%personDetails;
     $TemplateData{'personRequests'} = \@rowdata;
     $TemplateData{'client'} = $Data->{'client'};
+    $TemplateData{'requesttype'} = "Transfer" if $rtype eq $Defs::PERSON_REQUEST_TRANSFER;;
+    $TemplateData{'requesttype'} = "Request Access" if $rtype eq $Defs::PERSON_REQUEST_ACCESS;
+
     $TemplateData{'PersonSummaryPanel'} = personSummaryPanel($Data, $personID) || 'PSP';
 
+    print STDERR Dumper %TemplateData;
     $body = runTemplate(
         $Data,
         \%TemplateData,

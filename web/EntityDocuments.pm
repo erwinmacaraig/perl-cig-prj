@@ -401,7 +401,7 @@ sub checkUploadedEntityDocuments {
 	}
 	my @diff = ();	
 	my @docos = ();	
-	open FH, ">dumpfile.txt";
+
 	#2 compare whats in the system and what is required
 	foreach my $doc_ref (@{$documents}){	
 		next if(grep /$doc_ref->{'ID'}/, @validdocsforallrego);	
