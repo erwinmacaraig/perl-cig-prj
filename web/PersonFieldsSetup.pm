@@ -819,6 +819,8 @@ sub personFieldsSetup {
                     validate    => 'DATE',
                     displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
                     displayFunctionParams=> ['MEDIUM'],
+                    datetype    => 'dropdown',
+                    maxyear => (localtime)[5] + 1900,
                 },                
                 dtValidUntil => {
                     label       => $FieldLabels->{'dtValidUntil'},
@@ -828,6 +830,8 @@ sub personFieldsSetup {
                     validate    => 'DATE',
                     displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
                     displayFunctionParams=> ['MEDIUM'],
+                    datetype    => 'dropdown',
+                    maxyear => (localtime)[5] + 1900 + 15,
                 },
                 strDescription => {
                     label       => $FieldLabels->{'strDescription'},
