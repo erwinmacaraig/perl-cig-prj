@@ -213,8 +213,7 @@ sub getTransfer {
                 AND PRQinprogress.intPersonID = tblPerson.intPersonID
                 AND PRQinprogress.strSport =  PR.strSport
                 AND PRQinprogress.strPersonType = PR.strPersonType
-                AND PRQinprogress.strRequestStatus = "INPROGRESS" AND PRQinprogress.strRequestResponse IS NULL
-                AND PRQinprogress.intRequestFromEntityID = "$clubID"
+                AND PRQinprogress.strRequestStatus NOT IN ("COMPLETED", "DENIED", "REJECTED")
             )
             LEFT JOIN tblPersonRequest AS PRQaccepted ON (
                 PRQaccepted.strRequestType = "TRANSFER"
@@ -239,10 +238,13 @@ sub getTransfer {
                 )
             WHERE tblPerson.intPersonID IN ($person_list)
                 AND tblPerson.strStatus IN ('REGISTERED')
+                AND PRQinprogress.intPersonRequestID IS NULL
             ORDER BY 
                 strLocalSurname, 
                 strLocalFirstname
         ];
+                #AND PRQinprogress.intRequestFromEntityID = "$clubID"
+                #AND PRQinprogress.strRequestStatus = "INPROGRESS" AND PRQinprogress.strRequestResponse IS NULL
         my $q = $self->getData->{'db'}->prepare($st);
         $q->execute();
         my %origClientValues = %{$self->getData()->{'clientValues'}};
