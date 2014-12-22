@@ -80,7 +80,7 @@ sub cleanPlayerPersonRegistrations  {
         $thisRego->{'dtTo'} = "$Year-$Month-$Day" if (! $rego->{'dtTo'} or $rego->{'dtTo'} eq '0000-00-00');
 
         $PE{'personLevel'} = $thisRego->{'strPersonLevel'} || '';
-        closePERecord($Data, $personID, $thisRego->{'intEntityID'}, \%PE);
+        closePERecord($Data, $personID, $thisRego->{'intEntityID'}, '', \%PE);
         updatePersonRegistration($Data, $personID, $rego->{'intPersonRegistrationID'}, $thisRego, 0);
     }
 }
