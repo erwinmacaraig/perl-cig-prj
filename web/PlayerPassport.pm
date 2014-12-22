@@ -50,7 +50,7 @@ sub savePlayerPassport{
             AND PR.strStatus IN ('PASSIVE', 'ACTIVE', 'ROLLED_OVER', 'TRANSFERRED')
         HAVING
             PRToCalc > When12
-        ORDER BY PR.dtFrom, PR.intPersonRegistrationID DESC
+        ORDER BY PR.dtFrom
     ];	
             #YEAR(IF(PR.dtTo > '1900-01-01', PR.dtTo, NOW())) as yrDtTo,
             #YEAR(PR.dtTo) as yrDtTo,
