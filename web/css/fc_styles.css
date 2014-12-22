@@ -722,7 +722,13 @@ table tr.new-task {
 }
 
 .read-only ul li span.details-value {
-	font-weight: bold
+	font-weight: bold;
+
+}
+
+.read-only ul li span.details-left {
+	width:50%;
+	float:left;
 }
 
 .read-only-text, .fieldSectionGroupWrapper-DisplayOnly .panel-body {
