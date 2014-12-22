@@ -1,22 +1,44 @@
 [% IF certifications.size() > 0 %]
-<h3>[% Lang.txt('Existing Certifications') %]</h3>
-<table class="listTable">
-	<tr> 
-		<th>[% Lang.txt('Certification') %]</th>
-		<th>[% Lang.txt('Status') %]</th>
-		<th>[% Lang.txt('Valid From') %]</th>
-		<th>[% Lang.txt('Valid Until') %]</th>
-	</tr> 
-	[% FOREACH c = certifications %]
-        <tr>
-          <td>[% c.strCertificationName %]</td>
-          <td>[% c.Status %]</td>
-          <td>[% DateFormat.format(c.dtValidFrom,'MEDIUM') %]</td>
-          <td>[% DateFormat.format(c.dtValidUntil,'MEDIUM') %]</td>
-        </tr>
-    [% END %]
-</table>
+<h3 class="panel-header">[% Lang.txt('Existing Certifications') %]</h3>
+<div class="panel-body">
+    <table id="certifications" style="width: 100%">
+		<thead>
+			<tr class="box-header">
+				<th style="padding: 10px">[% Lang.txt('Certification') %]</th>
+				<th style="padding: 10px">[% Lang.txt('Status') %]</th>
+				<th style="padding: 10px">[% Lang.txt('Valid From') %]</th>
+				<th style="padding: 10px">[% Lang.txt('Valid Until') %]</th>
+			</tr>
+		</thead>
+        [% FOREACH c = certifications %]
+            <tr>
+              <td style="padding: 5px">[% c.strCertificationName %]</td>
+              <td style="padding: 5px">[% c.Status %]</td>
+              <td style="padding: 5px">[% DateFormat.format(c.dtValidFrom,'MEDIUM') %]</td>
+              <td style="padding: 5px">[% DateFormat.format(c.dtValidUntil,'MEDIUM') %]</td>
+            </tr>
+        [% END %]
+    </table>
+</div>
 <br />
-[% ELSE %]
-<h4>[% Lang.txt('No Previous Certifications found') %]</h4>
+
+<script src = "//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+    jQuery().ready(function() {
+        var dttable = jQuery('#certifications').dataTable({
+            //"order": [[1, "desc"]],
+            "order": [],
+            "lengthMenu": [[50, 100, -1], [50, 100, "All"]],
+            "language" : {
+                "search": "[% Lang.txt('Filter') %]"
+            },
+            "paging": false,
+            "searching": false
+        });
+
+    });
+</script>
+
 [% END %]
+
+
