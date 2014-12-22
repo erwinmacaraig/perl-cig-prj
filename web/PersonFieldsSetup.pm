@@ -467,6 +467,7 @@ sub personFieldsSetup {
                     order       => $DefCodesOrder->{-20},
                     firstoption => [ '', " " ],
                     sectionname => 'other',
+                    class       => 'chzn-select',
                 },
                 intMinorProtection => {
                     label => $FieldLabels->{'intMinorProtection'} || '',

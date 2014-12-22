@@ -722,7 +722,13 @@ table tr.new-task {
 }
 
 .read-only ul li span.details-value {
-	font-weight: bold
+	font-weight: bold;
+
+}
+
+.read-only ul li span.details-left {
+	width:50%;
+	float:left;
 }
 
 .read-only-text, .fieldSectionGroupWrapper-DisplayOnly .panel-body {
@@ -1235,7 +1241,7 @@ a.btn-inside-docs-panel:hover {
 }
 
 .ver-dots.yellow {
-	color: #ff6600;
+	color:#f0a624;
 }
 
 /*temporary adjustment to dispay drill down nav*/
@@ -1634,6 +1640,16 @@ span.circleBg {
 	left:8px;
 }
 
+span.rejectedBg {
+	background: red;
+	-moz-border-radius :70px;
+	-webkit-border-radius :70px;
+	border-radius :70px;
+	position:relative;
+	left:8px;
+}
+
+
 .taskListCounter {
 	background: #c4070a;
 	-moz-border-radius :70px;
@@ -1648,10 +1664,6 @@ span.circleBg {
 	height:23px;
 	line-height: 23px;
 	text-align: center;
-}
-
-.taskListCounter {
-
 }
 
 span.circle-check {
@@ -1687,7 +1699,7 @@ i.file-uploaded {
 }
 
 i.documents-rejected {
-	color:red;
+	color:#fff;
 	margin-left:6px;
 	margin-right:5px;
 }
@@ -2053,12 +2065,14 @@ li:last-child.eightStepWidth {
 /* END OLD PROGRESS STEP STYLES */
 
 #doctab1 .documents-list table.table .task-list .status-col span {
-	float: left;
-	width: 50%;
+    float: left;
+    padding-left: 3px;
+    width: 49%;
 }
 #doctab1 .documents-list table.table .task-list .status-col i span {
-	float: left;
-	width: 100%;
+    float: left;
+    padding-left: 9%;
+    width: 91%;
 }
 #doctab1 .documents-list table.table .task-list .status-col i.fa-circle {
 	float: left;
@@ -2071,6 +2085,7 @@ li:last-child.eightStepWidth {
 	background:none!important;
 	padding:0!important;
 	border:none!important;
+	overflow: inherit !important;
 }
 .dz-details img {
     margin:auto;
@@ -2240,4 +2255,13 @@ li:last-child.eightStepWidth {
     min-height: 500px;
     /*overflow: hidden;*/
     /*padding: 0;*/ /* reset style coming from bootstrap used only in this stylesheet */
+}
+
+.ui-datepicker {
+	z-index: 10!important;
+}
+
+
+.close {
+	opacity: 1;
 }

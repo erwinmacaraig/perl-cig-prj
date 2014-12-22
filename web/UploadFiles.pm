@@ -294,12 +294,7 @@ sub _processUploadFile_single	{
               $intPersonID, 
         );  
         #$EntityID = memberID (this should be the case)
-		print FH "\n\nfor tblDocuments: \n $fileID,
-              $DocumentTypeId,
-              $EntityTypeID,
-              $intEntityID,
-              $regoID,
-              $intPersonID,";  
+		 
         }
         else {
 			#update for person  documents      	 

@@ -56,11 +56,10 @@
 					 <div class="read-only-text clearfix">
 					    <ul>  
 						[% FOREACH doc IN documents %]
-								<li><span class="details-left">[% doc.Name %]:</span>
-								<span class="details-value">[% doc.OrigFilename %]</span></li>	
+								<li><span>[% doc.Name %]:<br /></span>
+								<b>[% doc.OrigFilename %]</b></li>	
 						[% END %]
-							
-					    </ul><br/>
+					    </ul>
 					    <a href="[% editlink %]&amp;rfp=d" class="pull-right">Edit</a>
 				     </div>
 				</div>

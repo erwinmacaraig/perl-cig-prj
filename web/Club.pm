@@ -956,9 +956,10 @@ sub getLegalTypeName {
 	my ($Data, $legalTypeID) = @_;
 
 	my $query = qq[SELECT strLegalType FROm tblLegalType WHERE intLegalTypeID = ?];
+	
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute($legalTypeID);
 	my $dref = $sth->fetchrow_hashref();
-	return $dref->{'intLegalType'};
+	return $dref->{'strLegalType'};
 }
 1;

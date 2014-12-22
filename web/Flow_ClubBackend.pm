@@ -29,6 +29,8 @@ use EntityFieldsSetup;
 use PersonSummaryPanel;
 use Data::Dumper;
 use UploadFiles;
+use EntitySummaryPanel;
+
 
 
 sub setProcessOrder {
@@ -235,12 +237,14 @@ sub display_contact_details {
 
     my $clubperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'contactdetails'}, 'Club',);
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($clubperm);
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $fieldsContent || '',
         ScriptContent => $scriptContent || '',
+        FlowSummaryContent => $entitySummaryPanel,
         Title => '',
         TextTop => '',
         TextBottom => '',
@@ -284,11 +288,16 @@ sub display_role_details {
     my $self = shift;
 
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+    
+    my $id = $self->ID() || 0;
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
+
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $fieldsContent || '',
+        FlowSummaryContent => $entitySummaryPanel || '',
         ScriptContent => $scriptContent || '',
         Title => '',
         TextTop => '',
@@ -383,6 +392,10 @@ sub display_products {
         client => $client,
         NoFormFields => 1,
     );
+    
+    my $id = $self->ID() || 0;
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
+    
     $content = runTemplate($self->{'Data'}, \%ProductPageData, 'registration/product_flow_backend.templ') || '';
 
     my %PageData = (
@@ -390,8 +403,7 @@ sub display_products {
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $content,
-        FlowSummary => '',
-        FlowSummaryTemplate => '',
+        FlowSummaryContent => $entitySummaryPanel,
         Title => '',
         TextTop => '',
         TextBottom => '',
@@ -469,6 +481,7 @@ sub display_documents {
     my $rego_ref = {};
     my $club_documents = '';
     my $content = '';
+
 	
 	if($clubID) {
         $club_documents = getRegistrationItems(
@@ -513,7 +526,7 @@ sub display_documents {
 			clubID => $clubID,
             
         );
- 
+        
         $content = runTemplate($self->{'Data'}, \%documentData, 'club/required_docs.templ') || '';  
 		
 	}
@@ -521,13 +534,14 @@ sub display_documents {
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
     }
     
-
+    my $id = $self->ID() || 0;
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
+    
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        #FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
-        #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        FlowSummaryContent => $entitySummaryPanel || '',
         Content => '',
         DocUploader => $content,
         Title => '',
@@ -613,7 +627,9 @@ sub display_summary     {
     $clubObj->load();
 
     my $content = '';
-		
+	
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
+
     $content = '';
 	my $documents = getUploadedFiles( $self->{'Data'}, $Defs::LEVEL_CLUB, $id, $Defs::UPLOADFILETYPE_DOC , $client );
 	use Club;	
@@ -654,7 +670,7 @@ sub display_summary     {
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        FlowSummaryContent => 'note: follow personSummaryPanel',
+        FlowSummaryContent => $entitySummaryPanel || '',
         Content => $summaryClubContent,
         Title => '',
         TextTop => '',
@@ -721,8 +737,17 @@ sub display_complete {
         return ('',2);
     }
 
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
+    
+    my $maObj = getInstanceOf($self->{'Data'}, 'national');
+    my $maName = $maObj ? $maObj->name() : '';
 
-    my %clubApprovalData = ();
+    my %clubApprovalData = (
+        EntitySummaryPanel => $entitySummaryPanel,
+        client => $self->{'Data'}->{'client'},
+        target => $self->{'Data'}->{'target'},
+        MA => $maName,
+    );
     my $displayClubForApproval = runTemplate(
         $self->{'Data'},
         \%clubApprovalData,

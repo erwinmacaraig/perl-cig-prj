@@ -51,12 +51,12 @@
                             <br/>
                             <span class="details-row">
                                 <span class="details-left">[% Lang.txt("Registration Date from") %]:</span>
-                                <span class="details-left detail-value">[% DateFormat.format(PersonRegoDetails.DateFrom,'MEDIUM') %]</span>
+                                <span class="details-left detail-value">[% TransferDetails.TransferFrom %], [% DateFormat.format(PersonRegoDetails.DateFrom,'MEDIUM') %]</span>
                             </span>
                             <br/>
                             <span class="details-row">
                                 <span class="details-left">[% Lang.txt("Registration Date to") %]:</span>
-                                <span class="details-left detail-value">[% DateFormat.format(PersonRegoDetails.DateTo,'MEDIUM') %]</span>
+                                <span class="details-left detail-value">[% TransferDetails.TransferTo %] [% DateFormat.format(PersonRegoDetails.DateTo,'MEDIUM') %]</span>
                             </span>
                             <br/>
                             <span class="details-row">
@@ -81,148 +81,150 @@
 
                 <div id="memberdetails" class="tab-pane fade">
 
-                <div class="read-only">
-                    <h4>Personal Information</h4>
-                    <div class="read-only-text">
+                    <div class="read-only">
+                        <h4 style="position: relative">[% Lang.txt('Personal Information') %]</h4>
+                        <div class="read-only-text" style="margin-top: -45px">
 
-                    [% IF PersonDetails.LatinSurname %]
-                        <span class="details-row">
-                            <span class="details-left">[% Lang.txt("Name (Latin Characters)") %]:</span>
-                            <span class="details-left">[% PersonDetails.LatinName %]</span>
-                        </span>
-                    [% END %]
+                            <span class="details-row">
+                                <span class="details-left">[% Lang.txt("Family Name") %]:</span>
+                                <span class="details-left detail-value">[% PersonDetails.LastName or '-' %]</span>
+                            </span>
 
-                    [% IF PersonDetails.LocalName %]
-                        <span class="details-row">
-                            <span class="details-left">[% Lang.txt("Local Name") %]:</span>
-                            <span class="details-left detail-value">[% PersonDetails.LocalName %]</span>
-                        </span>
-                    [% END %]
+                            <span class="details-row">
+                                <span class="details-left">[% Lang.txt("First Name") %]:</span>
+                                <span class="details-left detail-value">[% PersonDetails.FirstName or '-' %]</span>
+                            </span>
 
-                    [% IF PersonDetails.Gender %]
-                        <span class="details-row">
-                            <span class="details-left">[% Lang.txt('Gender') %]:</span>
-                            <span class="details-left detail-value">[% PersonDetails.Gender %]</span>
-                        </span>
-                    [% END %]
+                            <span class="details-row">
+                                <span class="details-left">[% Lang.txt("Language of name") %]:</span>
+                                <span class="details-left detail-value">[% PersonDetails.LanguageOfName or '-' %]</span>
+                            </span>
 
-                    [% IF PersonDetails.DOB %]
-                        <span class="details-row">
-                          <span class="details-left">[% Lang.txt('Date of Birth') %]:</span>
-                          <span class="details-left detail-value">[% DateFormat.format(PersonDetails.DOB,'MEDIUM') %]</span>
-                        </span>
-                    [% END %]
+                            <span class="details-row">
+                                <span class="details-left">[% Lang.txt("Gender") %]:</span>
+                                <span class="details-left detail-value">[% PersonDetails.Gender or '-' %]</span>
+                            </span>
 
-                    [% IF PersonDetails.Nationality %]
-                        <span class="details-row">
-                          <span class="details-left">[% Lang.txt('Nationality') %]:</span>
-                          <span class="details-left detail-value">[% PersonDetails.Nationality %]</span>
-                        </span>
-                    [% END %]
+                            <span class="details-row">
+                                <span class="details-left">[% Lang.txt("Nationality") %]:</span>
+                                <span class="details-left detail-value">[% PersonDetails.Nationality or '-' %]</span>
+                            </span>
 
-                    [% IF PersonDetails.Address %]
-                        <span class="details-row">
-                          <span class="details-left">[% Lang.txt('Address') %]:</span>
-                          <span class="details-left detail-value">[% PersonDetails.Address %]</span>
-                        </span>
-                    [% END %]
+                            <span class="details-row">
+                                <span class="details-left">[% Lang.txt("Country of Birth") %]:</span>
+                                <span class="details-left detail-value">[% PersonDetails.CountryOfBirth or '-' %]</span>
+                            </span>
 
-                    [% IF PersonDetails.DateSuspendedUntil != '' %]
-                        <span class="details-row">
-                          <span class="details-left">[% Lang.txt('Suspended Until') %]:</span>
-                          <span class="details-left detail-value">[% DateFormat.format(PersonDetails.DateSuspendedUntil,'MEDIUM') %]</span>
-                        </span>
-                    [% END %]
+                            <span class="details-row">
+                                <span class="details-left">[% Lang.txt("Region") %]:</span>
+                                <span class="details-left detail-value">[% PersonDetails.RegionOfBirth or '-' %]</span>
+                            </span>
 
-                    [% IF PersonDetails.LastUpdate %]
-                        <span class="details-row">
-                          <span class="details-left">[% Lang.txt('Last Update') %]:</span>
-                          <span class="details-left detail-value">[% PersonDetails.LastUpdate %]</span>
-                        </span>
-                    [% END %]
 
-                    [% IF PersonDetails.Status %]
-                        <span class="details-row">
-                          <span class="details-left">[% Lang.txt('Status') %]:</span>
-                          <span class="details-left detail-value">[% PersonDetails.Status %]</span>
-                        </span>
-                    [% END %]
+                        [% IF EditDetailsLink and !ReadOnlyLogin  %]
+                            <span style="float: right" class="">
+                                <a href = "[% EditDetailsLink %]&e_a=core" class="edit-link">
+                                    [% Lang.txt('Edit') %]
+                                </a>
+                            </span>
+                        [% END %]
 
-                    [% IF EditDetailsLink and !ReadOnlyLogin  %]
-                        <span style="float: right" class="">
-                            <a href = "[% EditDetailsLink %]&e_a=core" class="edit-link">
-                                [% Lang.txt('Edit') %]
-                            </a>
-                        </span>
-                    [% END %]
-
+                        </div>
                     </div>
-                </div>
+
+                    <div style="clear: both;">&nbsp;</div>
+
+                    <div class="read-only">
+                        <h4 style="position: relative">[% Lang.txt('Contact Details') %]</h4>
+                        <div class="read-only-text" style="margin-top: -45px">
+
+                            <span class="details-row">
+                                <span class="details-left">[% Lang.txt("Address 1") %]:</span>
+                                <span class="details-left detail-value">[% PersonDetails.Address1 or '-' %]</span>
+                            </span>
+
+                            <span class="details-row">
+                                <span class="details-left">[% Lang.txt("Address 2") %]:</span>
+                                <span class="details-left detail-value">[% PersonDetails.Address2 or '-' %]</span>
+                            </span>
+
+                            <span class="details-row">
+                                <span class="details-left">[% Lang.txt("City") %]:</span>
+                                <span class="details-left detail-value">[% PersonDetails.City or '-' %]</span>
+                            </span>
+
+                            <span class="details-row">
+                                <span class="details-left">[% Lang.txt("State") %]:</span>
+                                <span class="details-left detail-value">[% PersonDetails.State or '-' %]</span>
+                            </span>
+
+                            <span class="details-row">
+                                <span class="details-left">[% Lang.txt("Postal Code") %]:</span>
+                                <span class="details-left detail-value">[% PersonDetails.PostalCode or '-' %]</span>
+                            </span>
+
+                            <span class="details-row">
+                                <span class="details-left">[% Lang.txt("Country") %]:</span>
+                                <span class="details-left detail-value">[% PersonDetails.ContactISOCountry or '-' %]</span>
+                            </span>
+
+                            <span class="details-row">
+                                <span class="details-left">[% Lang.txt("Phone Number") %]:</span>
+                                <span class="details-left detail-value">[% PersonDetails.ContactPhone or '-' %]</span>
+                            </span>
+
+                            <span class="details-row">
+                                <span class="details-left">[% Lang.txt("Email Address") %]:</span>
+                                <span class="details-left detail-value">[% PersonDetails.Email or '-' %]</span>
+                            </span>
+
+
+                        [% IF EditDetailsLink and !ReadOnlyLogin  %]
+                            <span style="float: right" class="">
+                                <a href = "[% EditDetailsLink %]&e_a=core" class="edit-link">
+                                    [% Lang.txt('Edit') %]
+                                </a>
+                            </span>
+                        [% END %]
+
+                        </div>
+                    </div>
+
                 </div>
 
                 <div id="regdetails" class="tab-pane fade">
 
                 <div class="read-only">
-                    <h4>Registration Details</h4>
+                    <h4>[% Lang.txt("Registration Details") %]</h4>
                     <div class="read-only-text">
 
-                    [% IF PersonRegoDetails.RegisterTo %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Register To") %]:</span>
                             <span class="details-left detail-value">[% PersonRegoDetails.RegisterTo %]</span>
                         </span>
-                    [% END %]
 
-
-                    [% IF PersonRegoDetails.RegoType %]
-                        <span class="details-row">
-                            <span class="details-left">[% Lang.txt("Registration Type") %]:</span>
-                            <span class="details-left detail-value">[% PersonRegoDetails.RegoType %]</span>
-                        </span>
-                    [% END %]
-
-                    [% IF PersonRegoDetails.Status %]
-                        <span class="details-row">
-                            <span class="details-left">[% Lang.txt("Status") %]:</span>
-                            <span class="details-left detail-value">[% PersonRegoDetails.Status %]</span>
-                        </span>
-                    [% END %]
-
-                    [% IF PersonRegoDetails.PersonType %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Person Type") %]:</span>
                             <span class="details-left detail-value">[% PersonRegoDetails.PersonType %]</span>
                         </span>
-                    [% END %]
 
-                    [% IF PersonRegoDetails.PersonEntityTypeRole %]
-                        <span class="details-row">
-                            <span class="details-left">[% Lang.txt("Person Role") %]:</span>
-                            <span class="details-left detail-value">[% PersonRegoDetails.PersonEntityTypeRole %]</span>
-                        </span>
-                    [% END %]
-
-
-                    [% IF PersonRegoDetails.Sport %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Sport") %]:</span>
                             <span class="details-left detail-value">[% PersonRegoDetails.Sport %]</span>
                         </span>
-                    [% END %]
 
-                    [% IF PersonRegoDetails.Level %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Level") %]:</span>
                             <span class="details-left detail-value">[% PersonRegoDetails.Level %]</span>
                         </span>
-                    [% END %]
 
-                    [% IF PersonRegoDetails.AgeLevel %]
                         <span class="details-row">
-                            <span class="details-left">[% Lang.txt("Age Level") %]:</span>
-                            <span class="details-left detail-value">[% PersonRegoDetails.AgeLevel %]</span>
+                            <span class="details-left">[% Lang.txt("Additional Comments") %]:</span>
+                            <span class="details-left detail-value">[% TransferDetails.Summary %]</span>
                         </span>
-                    [% END %]
+
+
+
                     </div>
                 </div>
 

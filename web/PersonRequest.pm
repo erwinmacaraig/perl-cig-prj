@@ -746,7 +746,6 @@ sub displayCompletedRequest {
 
     $TemplateData{'PersonSummaryPanel'} = personSummaryPanel($Data, $personID) || 'PSP';
 
-    print STDERR Dumper %TemplateData;
     $body = runTemplate(
         $Data,
         \%TemplateData,
