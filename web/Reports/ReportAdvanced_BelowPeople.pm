@@ -1647,7 +1647,6 @@ sub _getConfiguration {
           Order => [
             qw(
               strNationalNum
-              MemberID
               PstrStatus
               strLocalFirstname
               strLocalSurname
@@ -1686,7 +1685,6 @@ sub _getConfiguration {
               strCountry
               strPostalCode
               strPhoneHome
-              strPhoneMobile
               strEmail
               strEmail2
               strPassportIssueCountry
