@@ -146,16 +146,18 @@ sub handleFacilityEdit {
             fieldData   => $fields,
         ); 
         my $fields_summary = runTemplate($Data,\%templateData,'entity/venue_fields_summary.templ');
-        $body .= qq[
-<div class="read-only">
-    <h4>].$Data->{'lang'}->txt('Fields') .qq[</h4>
-    <div class="read-only-text">
-        $fields_summary
-        <div class="fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$entityID">edit</a></div>
+        if($fields_summary) {
+            $body .= qq[
+    <div class="read-only">
+        <h4>].$Data->{'lang'}->txt('Fields') .qq[</h4>
+        <div class="read-only-text">
+            $fields_summary
+            <div class="fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$entityID">edit</a></div>
+        </div>
+        
     </div>
-    
-</div>
-];
+            ];
+        }
 
     }
 
