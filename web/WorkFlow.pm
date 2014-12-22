@@ -185,7 +185,8 @@ sub handleWorkflow {
                 $flashMessage{'flash'}{'message'} = $actionMessage;
 
                 setFlashMessage($Data, 'WF_U_FM', \%flashMessage);
-                $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_";
+                #$Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_";
+                $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_PR_S&TID=$WFTaskID";
                 ($body, $title) = redirectTemplate($Data);
             }
             case "$Defs::WF_TASK_ACTION_REJECT" {
@@ -283,8 +284,8 @@ sub handleWorkflow {
     elsif ($action eq 'WF_amd') {
         ($body, $title) = addMissingDocument($Data);
     }
-    elsif ($action eq 'WF_PR_H' or $action eq 'WF_PR_R') {
-        ($body, $title) = HoldOrRejectTaskScreen($Data, $action);
+    elsif ($action eq 'WF_PR_H' or $action eq 'WF_PR_R' or $action eq 'WF_PR_S') {
+        ($body, $title) = updateTaskScreen($Data, $action);
     }
 	else {
         ( $body, $title ) = listTasks( $Data );
@@ -2321,13 +2322,6 @@ sub populateRegoViewData {
         EditDetailsLink => $PersonEditLink,
         ReadOnlyLogin => $readonly,
         PersonSummary => personSummaryPanel($Data, $dref->{intPersonID}) || '',
-        TransferDetails => {
-            TransferTo => $personRequestData->{'requestFrom'} || '-',
-            RegistrationStatus => '',
-            RegistrationDateFrom => '',
-            RegistrationDateTo => '',
-            Summary => $personRequestData->{'strRequestNotes'},
-        },
         WFTaskID => $dref->{'intWFTaskID'}
 	);
 
@@ -2343,6 +2337,12 @@ sub populateRegoViewData {
         );
         my $request = getRequests($Data, \%regFilter);
         $personRequestData = $request->[0];
+        #print STDERR Dumper $personRequestData;
+        $TemplateData{'TransferDetails'}{'TransferTo'} = $personRequestData->{'requestFrom'} || '';
+        $TemplateData{'TransferDetails'}{'TransferFrom'} = $personRequestData->{'requestTo'} || '';
+        $TemplateData{'TransferDetails'}{'RegistrationDateFrom'} = '';
+        $TemplateData{'TransferDetails'}{'RegistrationDateTo'} = '';
+        $TemplateData{'TransferDetails'}{'Summary'} = $personRequestData->{'strRequestNotes'} || '';
     }
     else {
         $title = $Data->{'lang'}->txt('Registration') . " - $LocalName";
@@ -2690,15 +2690,21 @@ sub populateDocumentViewData {
             $displayVerify = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
         }
 
-        if ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityVerify'} == 1 and $tdref->{'intDocumentID'}) {
+        #if ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityVerify'} == 1 and $tdref->{'intDocumentID'}) {
+        if ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityVerify'} == 1 and ($tdref->{'intDocumentID'} or $fileID)) {
             $displayVerify = 1;
         }
 
         #if($tdref->{'intDocumentID'} ) {
 		if($fileID) {
             $displayView = 1;
+            $displayReplace = 1; #FC-518; approval entity/club should have the abilit to replace documents
+
+            my $action = "view";
+            $action = "review" if($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityAdd'} == 1);
+
            	$viewLink = qq[ <span style="position: relative"> 
-<a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$Data->{'client'}&amp;a=review');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];			
+<a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$Data->{'client'}&amp;a=$action');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];			
         }
 		
         my %documents = (
@@ -3109,7 +3115,7 @@ sub viewApprovalPage {
     #return ($body, "Approval status:");
 }
 
-sub HoldOrRejectTaskScreen {
+sub updateTaskScreen {
     my ($Data, $action) = @_;
 
     my $WFTaskID = safe_param('TID','number') || '';
@@ -3117,7 +3123,7 @@ sub HoldOrRejectTaskScreen {
 
     my $task = getTask($Data, $WFTaskID);
 
-    return (" ", "Access forbidden.") if($entityID != $task->{'intApprovalEntityID'});
+    #return (" ", "Access forbidden.") if($entityID != $task->{'intApprovalEntityID'});
 
     my $title;
     my $titlePrefix;
@@ -3145,6 +3151,11 @@ sub HoldOrRejectTaskScreen {
             $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'Rejected');
             $message = $Data->{'lang'}->txt("You have rejected this transfer, the clubs will be informed. To proceed with this transfer the clubs need to start a new transfer.");
             $status = $Data->{'lang'}->txt("Rejected");
+        }
+        case "WF_PR_S" {
+            $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'Resolved');
+            $message = $Data->{'lang'}->txt("You have resolved this task.");
+            $status = $Data->{'lang'}->txt("Resolved");
         }
     }
 
