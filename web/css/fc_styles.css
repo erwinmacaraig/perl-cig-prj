@@ -2260,3 +2260,8 @@ li:last-child.eightStepWidth {
 .ui-datepicker {
 	z-index: 10!important;
 }
+
+
+.close {
+	opacity: 1;
+}
