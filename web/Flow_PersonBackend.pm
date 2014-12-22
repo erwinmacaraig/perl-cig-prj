@@ -849,13 +849,28 @@ sub display_certifications {
         $personType,
         0
     );
-    my $content = runTemplate(
-        $self->{'Data'},
-        {
-            certifications => $certifications,
-        },
-        'registration/certifications.templ'
-    );
+
+    my $no_prev_cert;
+    my $prev_cert;
+
+    if(! scalar(@{$certifications})){
+         $no_prev_cert = runTemplate(
+            $self->{'Data'},
+            {},
+            'registration/no_prev_certification.templ'
+        );       
+    }
+    else {
+        $prev_cert = runTemplate(
+            $self->{'Data'},
+            {
+                certifications => $certifications,
+            },
+            'registration/certifications.templ'
+        );
+    }
+
+    $fieldsContent = $prev_cert . $fieldsContent;
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -864,7 +879,7 @@ sub display_certifications {
         ScriptContent => $scriptContent || '',
         FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
         Title => '',
-        TextTop => $content,
+        TextTop => $no_prev_cert,
         TextBottom => '',
     );
     my $pagedata = $self->display(\%PageData);
