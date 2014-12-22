@@ -1,3 +1,4 @@
+drop table if exists tblPlayerPassport;
 CREATE TABLE tblPlayerPassport (
      intPlayerPassportID INT NOT NULL AUTO_INCREMENT, 
      intPersonID INT, 
@@ -8,5 +9,8 @@ CREATE TABLE tblPlayerPassport (
      strMAName VARCHAR(200), 
      dtFrom DATE, 
      dtTo DATE,
-     CONSTRAINT PRIMARY KEY (intPlayerPassportID)
-); 
+    tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT PRIMARY KEY (intPlayerPassportID),
+    KEY INDEX_intPersonID (intPersonID)
+    
+)  DEFAULT CHARSET=utf8; 
