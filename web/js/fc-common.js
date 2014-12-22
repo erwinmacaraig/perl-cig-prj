@@ -48,17 +48,21 @@ function checkIfDocsAllApproved() {
     }
     
  }
-
-function menuInn(){
-    $("#menu li.subnav a").mouseover(function(){
-        $(this).attr("class", "active");
+function calculateProducts(){
+    var totalProduct = 0;
+    $('input[type="checkbox"]:checked').each(function() {
+        totalProduct += parseFloat($('#cost_'+this.name+'').val());          
     });
-}
-function menuOut(){
-    $("#menu li.subnav a").attr("class", "");
+    $('.totalValue').html('$'+totalProduct.toFixed(2));
 }
 
 $(document).ready(function(){
+    
+    calculateProducts();
+
+    $('form#flowFormID td.col-1 input[type="checkbox"]').click(function(){
+        calculateProducts();
+    });
 
     $("#menu li.subnav a.menutop").mouseover(function(){
         $("#menu li.subnav a.menutop").removeClass("selected");

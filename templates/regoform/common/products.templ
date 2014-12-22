@@ -77,7 +77,9 @@
 				</td>
 				<td class="col-3"><label for = "up_prod_[% p.ProductID %]">[% p.Name %]</label></td>
 	[% IF !HideCost %]
-				<td class="col-4">[% CurrencySymbol %][% p.Amount %]</td>
+				<td class="col-4">[% CurrencySymbol %][% p.Amount %] 
+				<input type="hidden" id="cost_prod_[% p.ProductID %]" value="[% p.Amount %]">
+				</td>
 	[% END %]
 			</tr>
 	[% IF !HideNotes and p.ProductNotes %]
