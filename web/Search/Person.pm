@@ -213,7 +213,7 @@ sub getTransfer {
                 AND PRQinprogress.intPersonID = tblPerson.intPersonID
                 AND PRQinprogress.strSport =  PR.strSport
                 AND PRQinprogress.strPersonType = PR.strPersonType
-                AND PRQinprogress.strRequestStatus NOT IN ("COMPLETED", "DENIED", "REJECTED")
+                AND PRQinprogress.strRequestStatus NOT IN ("COMPLETED", "DENIED", "REJECTED", "CANCELLED")
             )
             LEFT JOIN tblPersonRequest AS PRQaccepted ON (
                 PRQaccepted.strRequestType = "TRANSFER"
