@@ -28,6 +28,8 @@ use PersonUserAccess;
 use EntityFieldsSetup;
 use PersonSummaryPanel;
 use Data::Dumper;
+use UploadFiles;
+
 
 sub setProcessOrder {
     my $self = shift;
@@ -302,8 +304,11 @@ sub validate_role_details {
     my $self = shift;
 
     my $clubData = {};
-    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Club',);
+    #my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Club',); roledetails
+	my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'roledetails'}, 'Club',); 
+	
     ($clubData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
+
     my $id = $self->ID() || 0;
     if(!doesUserHaveEntityAccess($self->{'Data'}, $id,'WRITE')) {
         return ('Invalid User',0);
@@ -608,17 +613,42 @@ sub display_summary     {
     $clubObj->load();
 
     my $content = '';
-
-## Put into a template
-    #$content = 'Include summary here';
+		
     $content = '';
-
-    my %summaryClubData = ();
+	my $documents = getUploadedFiles( $self->{'Data'}, $Defs::LEVEL_CLUB, $id, $Defs::UPLOADFILETYPE_DOC , $client );
+	use Club;	
+	use Countries;
+	my $isocountries  = getISOCountriesHash();
+    my %summaryClubData = (
+			organization => $clubObj->{'DBData'}{'strLocalName'}, 
+			organizationShortName => $clubObj->{'DBData'}{'strLocalShortName'},
+			foundingdate => $self->{'Data'}{'l10n'}{'date'}->format($clubObj->{'DBData'}{'dtFrom'},'LONG'),
+			dissolutiondate => $self->{'Data'}{'l10n'}{'date'}->format($clubObj->{'DBData'}{'dtTo'},'LONG'),
+			country => $isocountries->{$clubObj->{'DBData'}{'strISOCountry'}},
+			strLegalID => $clubObj->{'DBData'}{'strLegalID'},
+			sport => $clubObj->{'DBData'}{'strDiscipline'},
+			comment => $clubObj->{'DBData'}{'strMANotes'},
+			contactEmail => $clubObj->{'DBData'}{'strEmail'},
+			postalcode => $clubObj->{'DBData'}{'strPostalCode'},
+			contactPerson => $clubObj->{'DBData'}{'strContact'},
+			contactPhone => $clubObj->{'DBData'}{'strPhone'},
+			contactAddress => $clubObj->{'DBData'}{'strAddress'},
+			comment => $clubObj->{'DBData'}{'strMANotes'},
+			entityType => $clubObj->{'DBData'}{'strEntityType'},
+			documents => $documents,
+			legaltype => Club::getLegalTypeName($self->{'Data'},$clubObj->{'DBData'}{'intLegalTypeID'}),
+			organizationType => $clubObj->{'DBData'}{'strEntityType'},
+			organizationLevel => $clubObj->{'DBData'}{'strOrganisationLevel'},  
+			editlink =>  $self->{'Data'}{'target'}."?".$self->stringifyURLCarryField(),
+	);
+	
     my $summaryClubContent = runTemplate(
         $self->{'Data'},
-        \%summaryClubData,
+       \%summaryClubData,
         'flow/club_summary.templ',
     );
+
+	
 
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
