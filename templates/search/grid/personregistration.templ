@@ -3,11 +3,11 @@
 	<table id="searchResult" cellpadding="5" class = "zebra" style="width: 100%">
 		<thead>
 			<tr class="box-header">
-				<th>MA ID</th>
-				<th>Name</th>
-				<th>Organisation</th>
-				<th>Date of Birth</th>
-				<th>Role</th>
+				<th>[% Lang.txt('MA ID') %]</th>
+				<th>[% Lang.txt('Name') %]</th>
+				<th>[% Lang.txt('Organisation') %]</th>
+				<th>[% Lang.txt('Date of Birth') %]</th>
+				<th>[% Lang.txt('Role') %]</th>
 				<th>&nbsp;</th>
 			</tr>
 			<tr>
@@ -22,15 +22,15 @@
 		        </td>
 				<td>
 					<select class="sort-dob">
-			          <option value="">-- Sort --</option>
-			          <option value="desc">Latest</option>
-			          <option value="asc">Oldest</option>
+			          <option value="">-- [% Lang.txt('Sort') %] --</option>
+			          <option value="desc">[% Lang.txt('Youngest') %]</option>
+			          <option value="asc">[% Lang.txt('Oldest') %]</option>
 			        </select>
 				</td>
 				<td>
                     <!-- should be dynamically populated based on search result -->
 					<select class="filter-role">
-                        <option value="">-- All --</option>
+                        <option value="">-- [% Lang.txt('All') %] --</option>
                         [% FOREACH role IN Filters.role %]
                         <option value="[% role %]">[% role %]</option>
                         [% END %]
@@ -56,7 +56,7 @@
                     <td>[% rego.org %]</td>
                     <td>[% DateFormat.format(rego.dob,'MEDIUM') %]</td>
                     <td><span class="fa fa-clock-o"></span>[% rego.role %]</td>
-                    <td><a href="[% rego.link %]" class="btn-inside-panels">View</a></td>
+                    <td><a href="[% rego.link %]" class="btn-inside-panels">[% Lang.txt('View') %]</a></td>
                 </tr>
 		    [% END %]
 		</tbody>

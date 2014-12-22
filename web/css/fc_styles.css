@@ -1786,7 +1786,7 @@ a.HTdisabled, a.HTdisabled:hover {
 	float:left;
 	display: table-cell;
 	/*padding-right:25px;*/
-	padding-right:72px;
+	padding-right:83px;
 }
 
 .button-row ul.row-btn-complete li:last-child {
@@ -2219,6 +2219,7 @@ li:last-child.eightStepWidth {
 .form-panel-body {
     background: #ededed;
     border: 1px solid #cccccc;
-    overflow: hidden;
+    min-height: 500px;
+    /*overflow: hidden;*/
     /*padding: 0;*/ /* reset style coming from bootstrap used only in this stylesheet */
 }

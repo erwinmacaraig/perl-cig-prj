@@ -146,7 +146,7 @@ sub savePlayerPassport{
       $qPP->execute($personID,'REGO', $level, $eID, $lastEntityName, $lastRealmName, $dtFrom, $dtTo);
         }
         
-	    $query = "UPDATE tblPlayerPassport SET dtTo = '0000-00-00' WHERE dtTo>NOW() AND intPersonID= ? and strOrigin= 'REGO'";
+	    $query = "UPDATE tblPlayerPassport SET dtTo = '0000-00-00' WHERE (dtTo IS NULL or dtTo>NOW()) AND intPersonID= ? and strOrigin= 'REGO'";
 	    $sth = $Data->{'db'}->prepare($query); 
 	    $sth->execute($personID);
         ###

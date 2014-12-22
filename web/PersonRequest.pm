@@ -1466,7 +1466,7 @@ sub finaliseTransfer {
     $PE{'personLevel'} = $personRequest->{'strPersonLevel'} || '';
     $PE{'personEntityRole'} = $personRequest->{'strPersonEntityRole'} || '';
     $PE{'sport'} = $personRequest->{'strSport'} || '';
-    closePERecord($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestToEntityID'}, \%PE);
+    closePERecord($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestToEntityID'}, '', \%PE);
     my $peID = doesOpenPEExist($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestFromEntityID'}, \%PE);
     addPERecord($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestFromEntityID'}, \%PE) if (! $peID)
     }
