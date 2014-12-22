@@ -578,7 +578,6 @@ sub insertRegoTransaction {
                 $q_txnclean->execute($regoID, $intID, $product);
                 
                 my $amount= getItemCost($Data, $entityID, $entityLevel, $multipersonType, $product);
-#                $amount = 0 if (); BAFF
                 foreach my $existproduct (@{$rego_products})  {
                     next if ($existproduct->{'ID'} != $product);
                     next if ($level != $Defs::LEVEL_PERSON);
@@ -694,7 +693,6 @@ sub insertRegoTransaction {
             my $amount= getItemCost($Data, $entityID, $entityLevel, $multipersonType, $product);
             
             $amount = 0 if (exists $ExistingProducts{$product} and $ExistingProducts{$product}==1);
-            #$amount = 0 if (); BAFF
             my $status = ($total_amount eq '0.00' or $total_amount == 0) ? 1: 0;
             $status = 0 if $Data->{'SystemConfig'}{'RegoForm_DontPayZero'};
             my $qty = $params->{'txnQTY_'.$product} || $params->{'prodQTY_'.$product} || 1;

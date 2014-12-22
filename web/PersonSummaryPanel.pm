@@ -39,7 +39,7 @@ sub personSummaryPanel {
         next if $reg_rego_ref->{'strStatus'} ne $Defs::PERSONREGO_STATUS_ACTIVE;
 
         push @personRegistration, [ 
-            $Data->{'lang'}->txt($reg_rego_ref->{'PersonType'} . " valid to ") . $Data->{'l10n'}{'date'}->format($reg_rego_ref->{'dtTo'},'MEDIUM'),
+            $Data->{'lang'}->txt($reg_rego_ref->{'PersonType'} . " valid to ") . $Data->{'l10n'}{'date'}->format($reg_rego_ref->{'npdtTo'},'MEDIUM'),
             $reg_rego_ref->{'strPersonType'},
         ];
     }

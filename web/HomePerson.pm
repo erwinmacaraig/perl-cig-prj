@@ -125,6 +125,7 @@ sub showPersonHome	{
 				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
 				WHERE strApprovalStatus = 'APPROVED' AND intPersonID = ? AND 
                     tblRegistrationItem.intRealmID=? AND
+                    tblRegistrationItem.strItemType='DOCUMENT' AND
 				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
 				GROUP BY intDocumentTypeID];
 	my $sth = $Data->{'db'}->prepare($query);

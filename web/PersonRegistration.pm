@@ -28,6 +28,7 @@ use PersonRegisterWhat;
 use AuditLog;
 use Reg_common;
 use PersonCertifications;
+use PersonEntity;
 
 sub cleanPlayerPersonRegistrations  {
 
@@ -41,8 +42,19 @@ sub cleanPlayerPersonRegistrations  {
         $personID,
         \%Reg
     );
-    
+
     return if (! $count);
+    my %PE = ();
+    {
+        my $entityID = $reg_ref->[0]{'intEntityID'};
+        $PE{'personType'} = $reg_ref->[0]{'strPersonType'} || '';
+        $PE{'personLevel'} = $reg_ref->[0]{'strPersonLevel'} || '';
+        $PE{'personEntityRole'} = $reg_ref->[0]{'strPersonEntityRole'} || '';
+        $PE{'sport'} = $reg_ref->[0]{'strSport'} || '';
+        my $peID = doesOpenPEExist($Data, $personID, $entityID, \%PE);
+        addPERecord($Data, $personID, $entityID, \%PE) if (! $peID)
+    }
+    
     my %ExistingReg = (
         sport=> $reg_ref->[0]{'strSport'} || '',
         personType=> $reg_ref->[0]{'strPersonType'} || '',
@@ -57,10 +69,18 @@ sub cleanPlayerPersonRegistrations  {
     );
     foreach my $rego (@{$regs_ref})  {
         next if ($rego->{'intPersonRegistrationID'} == $personRegistrationID);
+#        next if ($rego->{'strPersonLevel'} eq $reg_ref->[0]{'strPersonLevel'});
         my $thisRego = $rego;
         $thisRego->{'intCurrent'} = 0;
-        #$thisRego->{'strStatus'} = $Defs::PERSONREGO_STATUS_ROLLED_OVER;
-        $thisRego->{'strStatus'} = $Defs::PERSONREGO_STATUS_PASSIVE;
+        $thisRego->{'strStatus'} = $Defs::PERSONREGO_STATUS_ROLLED_OVER;
+        #$thisRego->{'strStatus'} = $Defs::PERSONREGO_STATUS_PASSIVE;
+        my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
+        $Year+=1900;
+        $Month++;
+        $thisRego->{'dtTo'} = "$Year-$Month-$Day" if (! $rego->{'dtTo'} or $rego->{'dtTo'} eq '0000-00-00');
+
+        $PE{'personLevel'} = $thisRego->{'strPersonLevel'} || '';
+        closePERecord($Data, $personID, $thisRego->{'intEntityID'}, \%PE);
         updatePersonRegistration($Data, $personID, $rego->{'intPersonRegistrationID'}, $thisRego, 0);
     }
 }
@@ -99,6 +119,10 @@ sub rolloverExistingPersonRegistrations {
         my $thisRego = $rego;
         $thisRego->{'intCurrent'} = 0;
         $thisRego->{'strStatus'} = $Defs::PERSONREGO_STATUS_ROLLED_OVER;
+        my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
+        $Year+=1900;
+        $Month++;
+        $thisRego->{'dtTo'} = "$Year-$Month-$Day";
         
         updatePersonRegistration($Data, $personID, $rego->{'intPersonRegistrationID'}, $thisRego, 0);
     }
@@ -151,11 +175,10 @@ sub checkNewRegoOK  {
         \%Reg
     );
     my $ok = 1;
-    foreach my $reg (@{$regs})  {
-        next if $reg->{'intEntityID'} == $rego_ref->{'entityID'};
-        #$ok = 0 if ($reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_ROLLED_OVER or $reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_DELETED or $reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_TRANSFERRED);
-        $ok = 0 if ($reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_DELETED or $reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_TRANSFERRED or $reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_INPROGRESS);
-    }
+#    foreach my $reg (@{$regs})  {
+#       next if $reg->{'intEntityID'} == $rego_ref->{'entityID'};
+#       $ok = 0 if ($reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_DELETED or $reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_TRANSFERRED or $reg->{'strStatus'} ne $Defs::PERSONREGO_STATUS_INPROGRESS);
+#    }
 
     return $ok if (! $ok);
     ## I assume the above is handled via checkLimits?
@@ -169,8 +192,8 @@ sub checkNewRegoOK  {
         entityID => $rego_ref->{'entityID'},
         personEntityRole=> $rego_ref->{'personEntityRole'} || '',
         personLevel=> $rego_ref->{'personLevel'} || '',
-        ageLevel=> $rego_ref->{'ageLevel'} || '',
     );
+        #ageLevel=> $rego_ref->{'ageLevel'} || '',
     $count=0;
     $regs='';
     ($count, $regs) = getRegistrationData(
@@ -601,6 +624,8 @@ sub getRegistrationData	{
         SELECT 
             pr.*, 
 			np.strNationalPeriodName,
+			np.dtFrom as npdtFrom,
+			np.dtTo as npdtTo,
             p.dtDOB,
             DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
@@ -767,13 +792,13 @@ sub addRegistration {
         $ruleFor = $Reg_ref->{'ruleFor'} if ($Reg_ref->{'ruleFor'});
         my $matrix_ref = getRuleMatrix($Data, $Reg_ref->{'originLevel'}, $Reg_ref->{'entityLevel'}, $Defs::LEVEL_PERSON, $Reg_ref->{'entityType'} || '', $ruleFor, $Reg_ref);
         $Reg_ref->{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
-        $Reg_ref->{'dateFrom'} = $matrix_ref->{'dtFrom'} if (! $Reg_ref->{'dtFrom'});
-        $Reg_ref->{'dateTo'} = $matrix_ref->{'dtTo'} if (! $Reg_ref->{'dtTo'});
+        #$Reg_ref->{'dateFrom'} = $matrix_ref->{'dtFrom'} if (! $Reg_ref->{'dtFrom'});
+        #$Reg_ref->{'dateTo'} = $matrix_ref->{'dtTo'} if (! $Reg_ref->{'dtTo'});
         $Reg_ref->{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
     }
     my ($nationalPeriodID, $npFrom, $npTo) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $Reg_ref->{'sport'}, $Reg_ref->{'personType'}, $Reg_ref->{'registrationNature'});
-    $Reg_ref->{'dateFrom'} = $npFrom if (! $Reg_ref->{'dtFrom'});
-    $Reg_ref->{'dateTo'} = $npTo if (! $Reg_ref->{'dtTo'});
+    #$Reg_ref->{'dateFrom'} = $npFrom if (! $Reg_ref->{'dtFrom'});
+    #$Reg_ref->{'dateTo'} = $npTo if (! $Reg_ref->{'dtTo'} and $Reg_ref->{'personType'} ne $Defs::PERSON_TYPE_PLAYER);
     my $genAgeGroup ||=new GenAgeGroup ($Data->{'db'},$Data->{'Realm'}, $Data->{'RealmSubType'});
     my $ageGroupID = 0;
 

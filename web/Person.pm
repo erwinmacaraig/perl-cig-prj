@@ -199,7 +199,7 @@ sub handlePerson {
 sub listPlayerPassport {
 	my ($Data, $personID) = @_;
 
-	my $query = qq[ SELECT strPersonLevel, strEntityName, strMAName, dtFrom, dtTo FROM tblPlayerPassport WHERE intPersonID = ? ORDER BY dtFrom,dtTo DESC
+	my $query = qq[ SELECT strPersonLevel, strEntityName, strMAName, dtFrom, IF(dtTo > NOW(), '', dtTo) as dtTo FROM tblPlayerPassport WHERE intPersonID = ? ORDER BY dtFrom,dtTo DESC
 	];
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute($personID);
@@ -420,11 +420,12 @@ my @headers = (
 			foreach my $regodoc (@{$registration->{'documents'}}){
 				next if(!$regodoc->{'intUploadFileID'});
 				#perform query for intUseThisEntity and intUseAnyEntity
+## BAFF: Below needs WHERE tblRegistrationItem.strPersonType IN ('', XX) AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
 				my $query = qq[SELECT intUseExistingThisEntity,intUseExistingAnyEntity FROM tblRegistrationItem INNER JOIN
                                tblDocumentType ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID INNER JOIN
 							   tblDocuments ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE 
 							   tblDocuments.strApprovalStatus IN ('PENDING', 'APPROVED') AND intPersonRegistrationID = ? AND 	
-							   tblDocumentType.intDocumentTypeID = ? AND tblDocuments.intPersonID = ? AND tblRegistrationItem.intRealmID=?];
+							   tblDocumentType.intDocumentTypeID = ? AND tblDocuments.intPersonID = ? AND tblRegistrationItem.intRealmID=? AND tblRegistrationItem.strItemType='DOCUMENT'];
 
 			   my $sth = $db->prepare($query); 
                $sth->execute($regodoc->{'intPersonRegistrationID'}, $regodoc->{'intDocumentTypeID'},$personID, $Data->{'Realm'});
@@ -473,7 +474,7 @@ my $addlink='';
     $sth->execute($Defs::DOC_FOR_PERSON,$Data->{'Realm'});
     my $doclisttype = qq[  
                     <div> 
-<form action="$Data->{'target'}" id="personDocAdd">
+                              <form action="$Data->{'target'}" id="personDocAdd">
                               <input type="hidden" name="client" value="$client" />
                               <input type="hidden" name="a" value="DOC_L" />
 							  <input type="hidden" name="RegistrationID" value="$registration->{'intPersonRegistrationID'}" />

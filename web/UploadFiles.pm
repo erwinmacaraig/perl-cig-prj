@@ -74,7 +74,7 @@ sub getUploadedFiles	{
 	while(my $dref = $q->fetchrow_hashref())	{
         $dref->{'DateAdded_FMT'} = $Data->{'l10n'}{'date'}->TZformat($dref->{'dtUploaded'},'MEDIUM','SHORT');
 
-		$st = qq[SELECT intUseExistingThisEntity, intUseExistingAnyEntity FROM tblRegistrationItem WHERE tblRegistrationItem.intID = ? and tblRegistrationItem.intRealmID=?];
+		$st = qq[SELECT intUseExistingThisEntity, intUseExistingAnyEntity FROM tblRegistrationItem WHERE tblRegistrationItem.intID = ? and tblRegistrationItem.intRealmID=? AND tblRegistrationItem.strItemType='DOCUMENT'];
 		my $sth = $Data->{'db'}->prepare($st);
 		$sth->execute($dref->{'intDocumentTypeID'}, $Data->{'Realm'});
 		my $data = $sth->fetchrow_hashref();
@@ -309,7 +309,7 @@ sub _processUploadFile_single	{
 
 			#AND intPersonID = ?	- Remove this so entity documents can be handled accordingly since intUploadFileID will suffice
 
-			my $chkSQL = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem INNER JOIN tblDocumentType ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID INNER JOIN tblDocuments ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intUploadFileID = $oldFileId AND strApprovalStatus = 'APPROVED' AND (intUseExistingThisEntity = 1 OR intUseExistingAnyEntity = 1) AND tblRegistrationItem.intRealmID=?] ;		
+			my $chkSQL = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem INNER JOIN tblDocumentType ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID INNER JOIN tblDocuments ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intUploadFileID = $oldFileId AND strApprovalStatus = 'APPROVED' AND (intUseExistingThisEntity = 1 OR intUseExistingAnyEntity = 1) AND tblRegistrationItem.intRealmID=? AND tblRegistrationItem.strItemType='DOCUMENT'] ;		
 			my $newstat = 'PENDING';
 			$doc_q = $Data->{'db'}->prepare($chkSQL);
 			$doc_q->execute($Data->{'Realm'});

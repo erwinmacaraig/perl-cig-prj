@@ -283,7 +283,6 @@ sub retrieveFormFieldData {
         Fields => undef,
     );
 
-
     for my $index (1 .. $self->getCount()) {
         $facilityFieldData = {};
         $facilityFieldData->{'intEntityID'} = $self->getEntityID();
@@ -296,11 +295,18 @@ sub retrieveFormFieldData {
                 push @errors, $fieldlabel . " " . $index . ": " . $obj->langlookup('Field required');
             }
 
-            my $errs = $obj->_validate($fields{$field}{'validate'}, $params->{$fieldname});
+            my $sysconfigLenRange = $self->getData()->{'SystemConfig'}{$params->{"strDiscipline_" . $index} . '_FIELD_LENGTH_RANGE'};
+            my $sysconfigWdtRange = $self->getData()->{'SystemConfig'}{$params->{"strDiscipline_" . $index} . '_FIELD_WIDTH_RANGE'};
+
+            my $dblLenRange = ",BETWEEN:" . $sysconfigLenRange if($field eq "dblLength" and $sysconfigLenRange);
+            my $dblWdtRange = ",BETWEEN:" . $sysconfigWdtRange if($field eq "dblWidth" and $sysconfigWdtRange);
+
+            my $errs = $obj->_validate($fields{$field}{'validate'} . $dblLenRange . $dblWdtRange, $params->{$fieldname});
 
             for my $err ( @{$errs} ) {
                 push @errors, $fieldlabel . " " . $index . ": " . $err;
             }
+
 
             $facilityFieldData->{$field} = $params->{$fieldname};
         }

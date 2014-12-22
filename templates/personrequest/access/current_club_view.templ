@@ -2,60 +2,29 @@
     <div class="col-md-9">
         <div class="member-detail">
 
-            <h3 class = "panel-header">[% personFirstname %] [% personSurname %] - Transfer to [% requestFrom %]</h3>
+            <h3 class = "panel-header">[% personFirstname %] [% personSurname %]</h3>
 				<div class="panel-body">
 
-				<p class="transfer-text">[% requestTo %] [% Lang.txt('has released') %] [% personFirstname %] [% personSurname %]. [% Lang.txt('Please continue the transfer process.') %]</p>
+				<p class="transfer-text">[% requestFrom %] [% Lang.txt('has requested data access for') %] [% personFirstname %] [% personSurname %]. [% Lang.txt('Please approve or reject the request.') %]</p>
 
 				<div class="alert">
 					<div>
 						<span class="fa fa-exclamation"></span>
-						<p>[% Lang.txt('Please check and update all details before submitting to') %] [% MA %] [% Lang.txt('Member Association for final approval.') %]</p>
+						<p>Notice here</p>
 					</div>
 				</div>
 
 
 				<br/>
 		    	<ul class="nav nav-tabs">
-					<li><a data-toggle="tab" href="#oldclubdetails">[% Lang.txt('Old Club Details') %]</a></li>
-					<li class="active"><a data-toggle="tab" href="#playerdetails">[% Lang.txt('Player Details') %]</a></li>
-					<!--<li><a data-toggle="tab" href="#documentsdetails">[% Lang.txt('Documents') %]</a></li>-->
+					<li class="active"><a data-toggle="tab" href="#playerdetails">[% Lang.txt('Member Details') %]</a></li>
+					<li><a data-toggle="tab" href="#newclubdetails">[% Lang.txt('Requesting Club Details') %]</a></li>
 				</ul>
 				<div class="tab-content">
-					<div id="oldclubdetails" class="tab-pane fade">
-						<div class="read-only">
-							<h4>[% Lang.txt('Old Club Details') %]</h4>
-							<div class="read-only-text">
-								<div class="panel-body">
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Club") %]:</span>
-								        <span class="details-left detail-value">[% requestTo %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Sport") %]:</span>
-								        <span class="details-left detail-value">[% requestToDiscipline %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Country") %]:</span>
-								        <span class="details-left detail-value">[% requestToISOCountry %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Address") %]:</span>
-								        <span class="details-left detail-value">[% requestToAddress %] [% requestToAddress2 %] [%%] [% requestToCity %] [% requestToPostal %] [% requestToRegion %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Phone") %]:</span>
-								        <span class="details-left detail-value">[% requestToPhone %]</span>
-								    </span>
-								</div>
-							</div>
-						</div>
-                    </div>
-
 					<div id="playerdetails" class="tab-pane fade in active">
 						<br/>
 						<div class="read-only">
-							<h4>[% Lang.txt('Personal Information') %]</h4>
+							<h4>Personal Information</h4>
 							<div class="read-only-text">
 								<div class="panel-body">
 								    <span class="details-row">
@@ -92,11 +61,11 @@
 
 						<br/>
 						<div class="read-only">
-							<h4>[% Lang.txt('Contact Details') %]</h4>
+							<h4>Contact Details</h4>
 							<div class="read-only-text">
 								<div class="panel-body">
 								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt('Address 1') %]</span>
+								        <span class="details-left">Address 1</span>
 								        <span class="details-left detail-value">[% contactAddress1 %]</span>
 								    </span>
 								    <span class="details-row">
@@ -133,24 +102,12 @@
 						
 						<br/>
 						<div class="read-only">
-							<h4>Registration Details</h4>
+							<h4>[% Lang.txt("Request Details" ) %]</h4>
 							<div class="read-only-text">
 								<div class="panel-body">
 								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Register to") %]:</span>
+								        <span class="details-left">[% Lang.txt("Request from") %]:</span>
 								        <span class="details-left detail-value">[% requestFrom %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Register as") %]:</span>
-								        <span class="details-left detail-value">[% personType %]</span>
-								    </span>
-									<span class="details-row">
-								        <span class="details-left">Sport</span>
-								        <span class="details-left detail-value">[% sport %]</span>
-								    </span>	
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Level") %]:</span>
-								        <span class="details-left detail-value">[% personLevel %]</span>
 								    </span>
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Additional Comments") %]:</span>
@@ -161,12 +118,10 @@
 						</div>
 
 					</div>
-					<div id="documentsdetails" class="tab-pane fade">
+					<div id="newclubdetails" class="tab-pane fade">
                         <br/>
-                        documents here
-                        <!--
 						<div class="read-only">
-							<h4>[% Lang.txt('Registration Details') %]</h4>
+							<h4>[% Lang.txt('Requesting Club Details') %]</h4>
 							<div class="read-only-text">
 								<div class="panel-body">
 								    <span class="details-row">
@@ -192,7 +147,6 @@
 								</div>
 							</div>
 						</div>
-                        -->
                     </div>
 				</div>
 				</div>
@@ -203,37 +157,23 @@
                             [% Lang.txt('Back to Dashboard') %]
                         </a>
 
-                        [% IF RequestAction.initiateRequestProcess == 1 %]
-                                <div style="float: right">
+                        [% IF RequestAction.showAction == 1 %]
+                        <div style="float: right">
+                            <form style="" action="[% RequestAction.target %]" method="POST" class="pull-left">
+                                <input type="hidden" name="client" value="[% RequestAction.client %]">
+                                <input type="hidden" name="request_type" value="[% RequestAction.request_type %]">
+                                <input type="hidden" name="a" value="[% RequestAction.action %]">
+                                <input type="hidden" name="rid" value="[% RequestAction.rid %]">
+                                <input type="hidden" name="response" value="accept">
+                                <input class="btn-main" style="border: 0px solid" type="submit" name="action" value="[% Lang.txt('Approve access') %]">
+                            </form>
 
-                                    <div class = "pull-left">
-                                    <a style="" class="btn-main transfer-deny" data-target="#showDenyRequestNotes" data-actiontype="DENY" href = "">
-                                        [% Lang.txt('Cancel Transfer') %]
-                                    </a>
-                                    </div>
-                                    <form style="" action="[% RequestAction.target %]" method="POST" class="pull-left">
-                                        <input type="hidden" name="client" value="[% RequestAction.client %]">
-                                        <input type="hidden" name="a" value="[% RequestAction.action %]">
-                                        <input type="hidden" name="sp" value="[% sport %]">
-                                        <input type="hidden" name="pt" value="[% personType %]">
-                                        <input type="hidden" name="per" value="[%  %]">
-                                        <input type="hidden" name="pl" value="[% personLevel %]">
-                                        <input type="hidden" name="ag" value="[% personAgeLevel %]">
-                                        <input type="hidden" name="nat" value="[% RequestAction.request_type %]">
-                                        <input type="hidden" name="ol" value="[% requestOriginLevel %]">
-                                        <input type="hidden" name="r" value="[%  %]">
-                                        <input type="hidden" name="sr" value="[%  %]">
-                                        <input type="hidden" name="eID" value="[% requestEntityID %]">
-                                        <input type="hidden" name="pID" value="[% personID %]">
-                                        <input type="hidden" name="reqID" value="[% requestID %]">
-                                        <input type="hidden" name="prid" value="[% requestID %]">
-                                        <input type="hidden" name="dnat" value="[% RequestAction.request_type %]">
-
-                                        <input style="border: 0px solid" class="btn-main" type="submit" name="submit" value="Continue Transfer">
-                                    </form>
-
-                                </div>
+                            <a style="" class="btn-main transfer-deny" data-target="#showDenyRequestNotes" data-actiontype="DENY" href = "">
+                                [% Lang.txt('Reject access') %]
+                            </a>
+                        </div>
                         [% END %]
+
                     </div>
                 </div>
         </div>
@@ -241,8 +181,31 @@
 	<div class="col-md-3">
         <div id = "">
             [% PersonSummaryPanel %]
-			<div class="transfer-pending">[% Lang.txt('Transfer Status: Released') %]</div>
+			<div class="transfer-pending">[% Lang.txt('Request Status: Pending') %]</div>
             <br/>
+
+            <!--
+            [% IF RequestAction.showAction == 1 %]
+                <div>
+                    <div style="width: 100%; float: left">
+                        <form style="width: 100%;" action="[% RequestAction.target %]" method="POST" class="pull-left">
+                            <input type="hidden" name="client" value="[% RequestAction.client %]">
+                            <input type="hidden" name="request_type" value="[% RequestAction.request_type %]">
+                            <input type="hidden" name="a" value="[% RequestAction.action %]">
+                            <input type="hidden" name="rid" value="[% RequestAction.rid %]">
+                            <input type="hidden" name="response" value="accept">
+                            <input class="btn-main" style="width: 100%" type="submit" name="action" value="[% Lang.txt('Approve transfer') %]">
+                        </form>
+                    </div>
+
+                    <div style="width: 100%; float: left">
+                        <a style="width: 100%;" class="btn-main transfer-deny" data-target="#showDenyRequestNotes" data-actiontype="DENY" href = "">
+                            [% Lang.txt('Reject transfer') %]
+                        </a>
+                    </div>
+                </div>
+            [% END %]
+            -->
 
         </div>
 	</div>
@@ -253,21 +216,21 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title" id="myModalLabel">[% Lang.txt('Transfer cancelled') %]</h4>
+        <h4 class="modal-title" id="myModalLabel">[% Lang.txt('Request Access rejected') %]</h4>
       </div>
       
       <form id="personRequestNotes" action="[% RequestAction.target %]" method="POST">
           <div class="modal-body">
-            <label>[% Lang.txt("Please specify why transfer was cancelled.") %]</label>
+            <label>[% Lang.txt("Please specify why request access was rejected.") %]</label>
             <textarea name="request_notes"></textarea>
           </div>
 
           <div id="hiddenfields" style="display: none">
                 <input type="hidden" name="client" value="[% RequestAction.client %]">
                 <input type="hidden" name="request_type" value="[% RequestAction.request_type %]">
-                <input type="hidden" name="a" value="PRA_S">
+                <input type="hidden" name="a" value="[% RequestAction.action %]">
                 <input type="hidden" name="rid" value="[% RequestAction.rid %]">
-                <input type="hidden" name="response" value="cancel">
+                <input type="hidden" name="response" value="deny">
           </div>
 
           <div class="modal-footer">

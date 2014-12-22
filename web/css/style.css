@@ -551,7 +551,7 @@ table.lkTable	{
 
 div.showrecoptions	{
 	float:right;
-	font-size:10px;
+	/*font-size:10px;*/
 	/*height:48px;*/
 	height:auto;
 	vertical-align:bottom;

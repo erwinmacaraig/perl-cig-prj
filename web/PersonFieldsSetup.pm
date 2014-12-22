@@ -111,6 +111,7 @@ sub personFieldsSetup {
                     var dob_d = jQuery("#l_dtDOB_day").val();
                     var nationality= jQuery("#l_strISONationality").val();
                     var show = 0;
+                    var showITC = 0;
                     if(dob_y && dob_m && dob_d && (nationality != '$Data->{'SystemConfig'}{'DefaultNationality'}'))  {
                         if(dob_m < 10) { dob_m = '0' + dob_m; }
                         if(dob_d < 10) { dob_d = '0' + dob_d; }
@@ -119,12 +120,21 @@ sub personFieldsSetup {
                             && dob < '$minorComparisonDate_high')    {
                             show = 1;
                         }
+                        if(dob < '$minorComparisonDate_low')    {
+                            showITC = 1;
+                        }
                     }
                     if(show)    {
                         jQuery('#block-minor').show();
                     }
                     else    {
                         jQuery('#block-minor').hide();
+                    }
+                    if(showITC)    {
+                        jQuery('#block-itc').show();
+                    }
+                    else    {
+                        jQuery('#block-itc').hide();
                     }
                 }
                 showMinorProtection();
@@ -133,10 +143,13 @@ sub personFieldsSetup {
     ];
 
     my $allowMinorProtection = 0;
+    my $showITCReminder = 0;
     if($values->{'defaultType'} eq 'PLAYER')    {
         #minor protection only for player
         $allowMinorProtection = 1;
+        $showITCReminder = 1;
     }
+    $showITCReminder = 0 if $values->{'itc'};
     my $minorProtectionOptions = getMinorProtectionOptions($Data,$values->{'itc'} || 0);
     my $minorProtectionExplanation= getMinorProtectionExplanation($Data,$values->{'itc'} || 0);
 
@@ -488,6 +501,22 @@ sub personFieldsSetup {
                     sectionname => 'core',
                     active => $allowMinorProtection,
                 },
+                ITCReminder => {
+                    label       => 'itcreminder',
+                    value       => qq[<div id = "block-itc" class = "ddynamic-panel">
+                        <div class="form-group"> 
+                            <div class="col-md-12">
+                                <div class = "alert">
+                                    <div><span class = "fa fa-info"></span>
+                                <p>].$Data->{'lang'}->txt(qq[If the player has been registered in another country before, you will need an ITC to continue with the registration.]).qq[  <a href = "$values->{'BaseURL'}PRA_T">].$Data->{'lang'}->txt(qq[If you have the ITC then please start the transfer process here.]).qq[  <a href = "$values->{'BaseURL'}PRA_NC">].$Data->{'lang'}->txt(qq[If you don't have an ITC you can request it here prior to the registration.]).qq[</a></p>
+                            </div> </div>
+                            </div>
+                        </div>
+                    ],
+                    type        => 'htmlrow',
+                    sectionname => 'core',
+                    active => $showITCReminder,
+                },
  
             },
             'order' => [qw(
@@ -511,7 +540,7 @@ sub personFieldsSetup {
                 minorBlockStart
                 intMinorProtection
                 minorBlockEnd                
-
+                ITCReminder
 
                 strPreferredLang
                 intEthnicityID                 

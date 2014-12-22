@@ -51,6 +51,8 @@ use HomePerson;
 use PersonSummaryPanel;
 use MinorProtection;
 use PersonCertifications;
+use EntitySummaryPanel;
+use PersonEntity;
 
 sub cleanTasks  {
 
@@ -566,7 +568,7 @@ sub listTasks {
                 TaskStatusLabel => $taskStatusLabel,
                 viewURL => $viewURL,
                 showView => 1,
-                taskDate => $request->{'prRequestDateFormatted'},
+                taskDate => $request->{'dtDateRequest'},
                 requestFrom => $request->{'requestFrom'},
                 requestTo => $request->{'requestTo'},
                 taskTimeStamp => $request->{'prRequestUpdateTimeStamp'},
@@ -1216,8 +1218,7 @@ sub checkForOutstandingTasks {
             $st = qq[
                     UPDATE tblEntity
                     SET
-                        strStatus = 'ACTIVE',
-                        dtFrom = NOW()
+                        strStatus = 'ACTIVE'
                     WHERE
                         intEntityID= ?
                 ];
@@ -1288,12 +1289,14 @@ sub checkForOutstandingTasks {
 	            	    PR.strStatus = 'ACTIVE',
                         PR.intCurrent=1,
                         dtLastUpdated=NOW(),
-                        dtFrom = IF (dtFrom<NOW(), NOW(), dtFrom),
-                        dtTo = IF (dtFrom>dtTo, dtFrom, dtTo)
+                        dtApproved=NOW(),
+                        dtFrom = NOW()
 	    	        WHERE
                         PR.intPersonRegistrationID = ?
                         AND PR.strStatus IN ('PENDING', 'INPROGRESS')
 	        	];
+                        #dtTo = IF (dtFrom>dtTo, dtFrom, dtTo)
+                        #dtFrom = IF (dtFrom<NOW(), NOW(), dtFrom),
                         #AND strStatus NOT IN ('SUSPENDED', 'TRANSFERRED', 'DELETED')
 
 		        $q = $db->prepare($st);
@@ -1303,10 +1306,21 @@ sub checkForOutstandingTasks {
 	        	$rc = 1;	# All registration tasks have been completed
                 PersonRegistration::rolloverExistingPersonRegistrations($Data, $personID, $personRegistrationID);
 				# Do the check
-				$st = qq[SELECT strPersonType, strSport FROM tblPersonRegistration_$Data->{Realm} WHERE intPersonRegistrationID = ?];
+				$st = qq[SELECT * FROM tblPersonRegistration_$Data->{Realm} WHERE intPersonRegistrationID = ?];
                 my $qPR = $db->prepare($st);
 				$qPR->execute($personRegistrationID);
 				my $ppref = $qPR->fetchrow_hashref();
+#                if ($ppref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_NEW)    {
+                {
+                    my %PE = ();
+                    $PE{'personType'} = $ppref->{'strPersonType'} || '';
+                    $PE{'personLevel'} = $ppref->{'strPersonLevel'} || '';
+                    $PE{'personEntityRole'} = $ppref->{'strPersonEntityRole'} || '';
+                    $PE{'sport'} = $ppref->{'strSport'} || '';
+                    
+                    my $peID = doesOpenPEExist($Data, $personID, $ppref->{'intEntityID'}, \%PE);
+                    addPERecord($Data, $personID, $ppref->{'intEntityID'}, \%PE) if (! $peID);
+                }
                 # if check  pass call save
                 if($ppref->{'strPersonType'} eq 'PLAYER' and $Data->{'SystemConfig'}{'cleanPlayerPersonRecords'}) {
                     PersonRegistration::cleanPlayerPersonRegistrations($Data, $personID, $personRegistrationID);
@@ -2388,6 +2402,9 @@ sub populateEntityViewData {
                 if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_VENUE'} == 1 and $dref->{'entityPaymentRequired'});
 
             #TODO: add details specific to VENUE
+
+            my $entitySummaryPanel = entitySummaryPanel($Data, $dref->{'intEntityID'});
+            $TemplateData{'EntitySummaryPanel'} = $entitySummaryPanel;
         }
         else {
 
@@ -2438,18 +2455,20 @@ sub populateDocumentViewData {
 	my @validdocsforallrego = ();
 	my %validdocs = ();
 	my %validdocsStatus = ();
+## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
 	my $query = qq[SELECT tblDocuments.strApprovalStatus, tblDocuments.intDocumentTypeID, tblDocuments.intUploadFileID FROM tblDocuments INNER JOIN tblDocumentType
 				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
 				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
 				WHERE strApprovalStatus IN('PENDING', 'APPROVED') AND intPersonID = ? AND tblRegistrationItem.intRealmID=? AND 
 				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+                AND tblRegistrationItem.strItemType='DOCUMENT'
 				GROUP BY intDocumentTypeID];
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute($dref->{'intPersonID'}, $Data->{'Realm'});
-	while(my $dref = $sth->fetchrow_hashref()){
-	    $validdocsStatus{$dref->{'intDocumentTypeID'}} = $dref->{'strApprovalStatus'};
-		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
-		$validdocs{$dref->{'intDocumentTypeID'}} = $dref->{'intUploadFileID'};
+	while(my $adref = $sth->fetchrow_hashref()){
+	    $validdocsStatus{$adref->{'intDocumentTypeID'}} = $adref->{'strApprovalStatus'};
+		push @validdocsforallrego, $adref->{'intDocumentTypeID'};
+		$validdocs{$adref->{'intDocumentTypeID'}} = $adref->{'intUploadFileID'};
 	}
 	my $fileID = 0;
 

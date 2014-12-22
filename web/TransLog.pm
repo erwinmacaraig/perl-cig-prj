@@ -303,7 +303,6 @@ sub step2 {
     #my $entityID = getID($Data->{'clientValues'}, $authLevel) || 0;
 
     my $entityID = getLastEntityID($Data->{'clientValues'});
-#BAFF
     $entityID= 0 if ($entityID== $Defs::INVALID_ID);
 	my $intPersonID= $Data->{'clientValues'}{'personID'}; 
 	my $currentLevel = $Data->{'clientValues'}{'authLevel'};
@@ -840,7 +839,7 @@ sub listTransactions {
     $whereClause .= qq[ AND t1.intTLogID= $safePaymentID ] if $paymentID;
 
     my $authID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
-    $whereClause .= qq[ AND intTXNEntityID IN (0, $entityID, $authID)] if $entityID;
+   # $whereClause .= qq[ AND intTXNEntityID IN (0, $entityID, $authID)] if $entityID;
     $whereClause .= qq[ AND P.intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) ] if $txnStatus != $Defs::TXN_PAID;
 
 

@@ -141,16 +141,16 @@ sub list_entity_docs{
         Data => $Data,
         columns => \@headers,
         rowdata => \@rowdata,
-        gridid => 'grid',
+        gridid => 'entityFilesGridID',
         width => '99%',
-        
+        coloredTop => 'no',
    ); 
     
     
   
 	
 	my $title = $lang->txt('Documents');
-	my $body = qq[<br /><div class="pageHeading">$title</div>];
+	my $body = '';
 	my $options = '';
 	my $count = 0;
 	
@@ -159,29 +159,38 @@ sub list_entity_docs{
     ]; 
     $sth = $db->prepare($query);
     $sth->execute($doc_for,$Data->{'Realm'});
-    my $doclisttype = qq[  <form action="$Data->{'target'}">
+    my $doclisttype = qq[<form action="$Data->{'target'}" id="entityDocAdd">
                               <input type="hidden" name="client" value="$client" />
-                              <input type="hidden" name="a" value="C_DOCS_frm" /><label>] . $lang->txt('Add a new document to this club')
+                              <input type="hidden" name="a" value="C_DOCS_frm" />]
 							. qq[
-                              <select name="doclisttype" id="doclisttype">
-                              <option value="0">Misc</option>  
+							  <label>]. $lang->txt('Document Type') . qq[</label>
+		                      <select name="doclisttype" id="doclisttype">
+		                      <option value="0">Misc</option>  
                        ];
     while(my $dref = $sth->fetchrow_hashref()){
         $doclisttype .= qq[<option value="$dref->{'intDocumentTypeID'}">$dref->{'strDocumentName'}</option>];
     } 
    $doclisttype .= qq[     </select>                           
-                           <input type="submit" class="btn-inside-panels pull-right" value="Go" />
+                           <input type="submit" class="btn-inside-panels" value="Add" />
                            </form>
                     ];
 	
 	my $modoptions=qq[<div class="changeoptions"></div>];
 	
 	
-	$body .= qq[ 
-		$modoptions	<div class="showrecoptions"> $doclisttype </div><br />
-		 
-		$grid 
+	$body .= qq[ <div style="clear:both;">&nbsp;</div>
+       	<div class="col-md-12">
+       	<h2 class="section-header">$title</h2>
+		$modoptions
+			
+			<div class="clearfix">
+				$grid] . qq[<br /><br /><p>] . $lang->txt('Add a new document to this club') . qq[</p>
+				<div>
+					$doclisttype
+				</div>
+			</div>
 		
+		</div>
 		];
 		
 	
@@ -233,13 +242,25 @@ sub list_entity_docs{
         rowdata => $docs,
         gridid => 'allfilesgridid',
         width => '99%',
+        coloredTop => 'no',
         
    ); 
    
-   $body .= qq[
-        <br /><br />
-		<div class="sectionheader"> All Files </div> 
-		$allfilesgrid
+   #$body .= qq[
+        #<br /><br />
+		#<div class="sectionheader"> All Files </div> 
+		#<div class="sectionheader"> All Files </div> 
+		#$allfilesgrid
+	#];
+
+	$body .= qq[
+       	<div style="clear:both;">&nbsp;</div>
+       	<div class="col-md-12">
+			<h2 class="section-header">].$Data->{'lang'}->txt('All Files').qq[</h2> 
+			<div class="">
+				$allfilesgrid
+			</div>
+		</div>
 	];
 } 
 	
@@ -264,8 +285,7 @@ sub new_doc_form {
 	<div class="sectionheader">$title</div>
 	<br />
          	<div id="docselect">
-		<form action="uploadregofile.cgi" method="POST" enctype="multipart/form-data" class="dropzone">			
-
+		<form action="uploadregofile.cgi" method="POST" enctype="multipart/form-data" class="dropzone">
 		<input type="hidden" name="client" value="].unescape($client).qq[">];
 	if($DocumentTypeID){
 		$body .= qq[
@@ -352,6 +372,7 @@ sub checkUploadedEntityDocuments {
 		ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID
 		WHERE tblDocuments.intEntityID = ?
             AND tblRegistrationItem.intRealmID=?
+            AND tblRegistrationItem.strItemType='DOCUMENT'
 	];
    # ;	
 	if($ctrl){
@@ -370,6 +391,7 @@ sub checkUploadedEntityDocuments {
 				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
 				WHERE strApprovalStatus = 'APPROVED' AND tblDocuments.intEntityID = ? AND tblRegistrationItem.intRealmID=? AND 
 				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+                 AND tblRegistrationItem.strItemType='DOCUMENT'
 				GROUP BY intDocumentTypeID];
 	$sth = $Data->{'db'}->prepare($query);
 	$sth->execute($entityID, $Data->{'Realm'});
