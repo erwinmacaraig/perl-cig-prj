@@ -1,8 +1,18 @@
 [% USE Dumper %]
 <!--<div class="row">-->
     <div class="col-md-3">
+        [% IF PersonSummaryPanel %]
         [% PersonSummaryPanel %]
-        <div class="[% IF status == 'Rejected' %]transfer-rejected[% ELSE %]transfer-pending[% END %]">[% Lang.txt('Transfer Status:') %] [% status %]</div>
+        [% ELSE %]
+        [% EntitySummaryPanel %]
+        [% END %]
+        <div class="[% IF status == 'Rejected' %]transfer-rejected[% ELSE %]transfer-pending[% END %]">
+            [% IF taskType == 'TRANSFER_PLAYER' %]
+                [% Lang.txt('Transfer Status:') %] [% status %]
+            [% ELSE %]
+                [% Lang.txt('Approval Status:') %] [% status %]
+            [% END %]
+        </div>
     </div>
     <div class="col-md-9">
         <h3 class="panel-header">[% PersonDetails.firstname %] [% PersonDetails.surname %]</h3>

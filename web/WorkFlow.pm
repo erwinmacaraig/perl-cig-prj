@@ -219,13 +219,15 @@ sub handleWorkflow {
                     $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt('An error has been encountered.');
                 }
 
-                if($regNature eq $Defs::REGISTRATION_NATURE_TRANSFER){
-                    $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_PR_H&TID=$WFTaskID";
-                }
-                else {
-                    setFlashMessage($Data, 'WF_U_FM', \%flashMessage);
-                    $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_View&TID=$WFTaskID";
-                }
+                #if($regNature eq $Defs::REGISTRATION_NATURE_TRANSFER){
+                    #$Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_PR_H&TID=$WFTaskID";
+                #}
+                #else {
+                    #setFlashMessage($Data, 'WF_U_FM', \%flashMessage);
+                #    $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_View&TID=$WFTaskID";
+                #}
+
+                $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_PR_H&TID=$WFTaskID";
                 ($body, $title) = redirectTemplate($Data);
                 #print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_View&TID=$WFTaskID");
             }
@@ -3185,6 +3187,7 @@ sub updateTaskScreen {
 
     my $task = getTask($Data, $WFTaskID);
 
+
     #return (" ", "Access forbidden.") if($entityID != $task->{'intApprovalEntityID'});
 
     my $title;
@@ -3192,22 +3195,46 @@ sub updateTaskScreen {
     my $message;
     my $body;
     my $status;
+    my $TaskType;
 
     if($task->{'strWFRuleFor'} eq "ENTITY" and $task->{'intEntityLevel'} == $Defs::LEVEL_CLUB){
         $titlePrefix = $Defs::workTaskTypeLabel{$task->{'strRegistrationNature'} . "_CLUB"};
+        $TaskType = $task->{'strRegistrationNature'} . "_CLUB";
     }
     elsif($task->{'strWFRuleFor'} eq "ENTITY" and $task->{'intEntityLevel'} == $Defs::LEVEL_VENUE) {
         $titlePrefix = $Defs::workTaskTypeLabel{$task->{'strRegistrationNature'} . "_VENUE"};
+        $TaskType = $task->{'strRegistrationNature'} . "_VENUE";
     }
     elsif($task->{'strWFRuleFor'} eq "REGO") {
-        $titlePrefix = $Defs::workTaskTypeLabel{$task->{'strRegistrationNature'} . "_" . $task->{'strPersonType'}};
+        $titlePrefix = $Defs::workTaskTypeLabel{$task->{'strRegistrationNature'} . "_" . $task->{'strPersonType'}}; 
+        $TaskType = $task->{'strRegistrationNature'} . "_" . $task->{'strPersonType'};
     }
+
+    open FH, ">dumpfile.txt";
+    print FH "Group DataL \n\n" . Dumper($titlePrefix) . "\n" . Dumper($task) . "\n" . Dumper($TaskType) . "\n";   
 
     switch($action) {
         case "WF_PR_H" {
             $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'On-Hold');
-            $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the transfer process.");
-            $status = $Data->{'lang'}->txt("Pending");
+            
+            if($TaskType eq 'TRANSFER_PLAYER') {
+                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Transfer process.");
+                $status = $Data->{'lang'}->txt("Pending");
+            }
+
+            elsif($TaskType eq 'NEW_PLAYER') {
+                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Player Registration process.");
+                $status = $Data->{'lang'}->txt("Pending");
+            }
+            elsif($TaskType eq 'NEW_VENUE') {
+                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the New Facility Registration process.");
+                $status = $Data->{'lang'}->txt("Pending");
+            }
+            elsif($TaskType eq 'NEW_CLUB') {
+                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the New Club Registration process.");
+                $status = $Data->{'lang'}->txt("Pending");
+            }
+
         }
         case "WF_PR_R" {
             $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'Rejected');
@@ -3224,12 +3251,15 @@ sub updateTaskScreen {
     my %TemplateData = (
         'client' => $Data->{'client'},
         'PersonSummaryPanel' => personSummaryPanel($Data, $task->{'intPersonID'}),
+        'EntitySummaryPanel' => entitySummaryPanel($Data, $task->{'intEntityID'}),
         'message' => $message,
         'PersonDetails' => {
-            'firstname' => $task->{'strLocalFirstname'},
+            'firstname' => $task->{'strLocalFirstname'} || $task->{'strLocalName'},
             'surname' => $task->{'strLocalSurname'},
+            'localname' => $task->{'strLocalName'},
         },
         'status' => $status,
+        'taskType' => $TaskType,
     );
 
 	$body = runTemplate(
