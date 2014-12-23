@@ -106,7 +106,6 @@ sub setupValues    {
 sub process_person_select   {
     my $self = shift;
     my $rolloverIDs = $self->{'RunParams'}{'rolloverIDs'};
-$rolloverIDs = 10760050;
     $self->addCarryField('rolloverIDs',$rolloverIDs);
     
     return ('',1);
@@ -255,86 +254,8 @@ sub process_registration {
     $self->addCarryField('d_age',$ageLevel);
     $self->addCarryField('d_nature',$registrationNature);
 
-return ('',1);
-
-    #add rego record with types etc.
-    my $personEntityRole= $self->{'RunParams'}{'d_role'} || '';
-    my $personLevel = $self->{'RunParams'}{'d_level'} || '';
-    my $sport = $self->{'RunParams'}{'d_sport'} || '';
-    my $ageLevel = $self->{'RunParams'}{'d_age'} || '';
-    my $existingReg = $self->{'RunParams'}{'existingReg'} || 0;
-    my $changeExistingReg = $self->{'RunParams'}{'changeExisting'} || 0;
-    my $registrationNature = $self->{'RunParams'}{'d_nature'} || '';
-    my $personRequestID = $self->{'RunParams'}{'prid'} || '';
-    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
-    my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
-    my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
-    my $lang = $self->{'Lang'};
-
-    my $personID = $self->ID() || 0;
-    if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
-        return ('Invalid User',0);
-    }
-    my $regoID = 0;
-    my $msg = '';
-    if($personID)   {
-        if($changeExistingReg)    {
-            $self->deleteExistingReg($existingReg, $personID);
-        }
-        if(!$existingReg or $changeExistingReg)    {
-            ($regoID, undef, $msg) = add_rego_record(
-                $self->{'Data'}, 
-                $personID, 
-                $entityID, 
-                $entityLevel, 
-                $originLevel, 
-                $personType, 
-                $personEntityRole, 
-                $personLevel, 
-                $sport, 
-                $ageLevel, 
-                $registrationNature,
-                undef,
-                undef,
-                $personRequestID,
-            );
-        }
-        if($changeExistingReg)  {
-            $self->moveDocuments($existingReg, $regoID, $personID);
-        }
-    }
-
-    if(!$personID)    {
-        push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person';
-    }
-    if (!$regoID)   {
-        if ($msg eq 'SUSPENDED')   {
-            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("You cannot register at this time, Person is currently SUSPENDED");
-        }
-        if ($msg eq 'LIMIT_EXCEEDED')   {
-            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("You cannot register this combination, limit exceeded");
-        }
-        if ($msg eq 'NEW_FAILED')   {
-            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("New failed, existing registration found.  In order to continue, a Transfer from the existing Entity must be organised.");
-        }
-        if ($msg eq 'RENEWAL_FAILED')   {
-            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Renewal failed, cannot find existing registration. Might have already been renewed");
-        }
-    }
-    else    {
-        if(!$existingReg or $changeExistingReg)   {
-            $self->addCarryField('rID',$regoID);
-            $self->addCarryField('pType',$personType);
-        }
-    }
-
-    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
-        #There are errors - reset where we are to go back to the form again
-        $self->decrementCurrentProcessIndex();
-        return ('',2);
-    }
-
     return ('',1);
+
 }
 
 sub display_products { 
@@ -505,9 +426,6 @@ sub display_complete {
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
     my $lang = $self->{'Lang'};
 
-
-print STDERR Dumper($self->{'RunParams'});
-
     my $bulk_ref = {
             personType => $personType,
             personEntityRole=> $personEntityRole,
@@ -521,13 +439,10 @@ print STDERR Dumper($self->{'RunParams'});
             entityLevel => $entityLevel,
             current => 1,
      };
-print STDERR "AAAAAAAAAAAAAAAA_____" . Dumper($bulk_ref);
- ##################
     my @productsselected=();
     my @productsqty=();
     my $hiddenFields = $self->getCarryFields();
 
-print STDERR "COMPLETE:ROLLOVERIDs:" . $self->getCarryFields('rolloverIDs') . "\n";
     ($bulk_ref->{'nationalPeriodID'}, undef, undef) = getNationalReportingPeriod($self->{'Data'}->{db}, $self->{'Data'}->{'Realm'}, $self->{'Data'}->{'RealmSubType'}, $bulk_ref->{'sport'}, $bulk_ref->{'personType'}, $bulk_ref->{'registrationNature'});
         my $count = bulkPersonRollover($self->{'Data'}, 'PREGFB_SPU', $bulk_ref, $hiddenFields, 1);
 
@@ -548,8 +463,6 @@ print STDERR "COMPLETE COUNT $count\n";
         }
         $content.= qq[ROLLOVER FOR $rolloverIDs];
         $hiddenFields->{'rolloverIDs'} = $rolloverIDs;
-
-################### 
 
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};

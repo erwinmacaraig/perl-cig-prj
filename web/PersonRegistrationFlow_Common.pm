@@ -136,7 +136,7 @@ sub displayRegoFlowSummaryBulk  {
         editlink => $editlink,
     );
     
-    $body = runTemplate($Data, \%PageData, 'registration/summary.templ') || '';
+    $body = runTemplate($Data, \%PageData, 'registration/summarybulk.templ') || '';
     my $logID = param('tl') || 0;
     $logIDs->{$logID}=1;
     foreach my $id (keys %{$logIDs}) {
