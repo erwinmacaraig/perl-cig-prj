@@ -1,5 +1,9 @@
 <div class="search-panel col-md-12">
-	<h3 class="panel-header">[% Lang.txt('Search') %]</h3>
+    [% IF type == 'access' %]
+    	<h3 class="panel-header">[% Lang.txt('Person Details') %]</h3>
+    [% ELSE %]
+	    <h3 class="panel-header">[% Lang.txt('Search') %]</h3>
+    [% END %]
 	<div class="panel-body">
 		<form id="searchForm" action="main.cgi" method="POST">
 			<span class="formw"><input size="105" type="text" placeholder="[% Lang.txt('Enter a person\'s name or Member ID') %]" name="search_keyword" value="[% search_keyword %]"></span>

@@ -242,6 +242,7 @@ sub getTransfer {
             ORDER BY 
                 strLocalSurname, 
                 strLocalFirstname
+            LIMIT 100
         ];
                 #AND PRQinprogress.intRequestFromEntityID = "$clubID"
                 #AND PRQinprogress.strRequestStatus = "INPROGRESS" AND PRQinprogress.strRequestResponse IS NULL
@@ -352,6 +353,7 @@ sub getPersonRegistration {
                 tblPerson.strLocalSurname,
                 tblPerson.strLocalFirstname,
                 tblPerson.strNationalNum
+            LIMIT 100
         ];
         my $q = $self->getData->{'db'}->prepare($st);
         $q->execute();
@@ -512,6 +514,7 @@ sub getPersonAccess {
             ORDER BY 
                 strLocalSurname, 
                 strLocalFirstname
+            LIMIT 100
         ];
         my $q = $self->getData->{'db'}->prepare($st);
         $q->execute();

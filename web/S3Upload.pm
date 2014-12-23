@@ -9,8 +9,8 @@ use lib "..",".";
 use Defs;
 use Utils;
 
-#use Net::Amazon::S3;
-#use Net::Amazon::S3::Client;
+use Net::Amazon::S3;
+use Net::Amazon::S3::Client;
 use CGI qw(:cgi param unescape escape);
 
 sub _getS3 {

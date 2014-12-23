@@ -28,6 +28,7 @@ use FormHelpers;
 use AuditLog;
 use Log;
 use TTTemplate;
+use Person;
 use Data::Dumper;
 
 sub bulkPersonRollover {
@@ -71,6 +72,7 @@ sub bulkPersonRollover {
             P.strLocalSurname,
             P.strLocalFirstname,
             DATE_FORMAT(P.dtDOB,"%d/%m/%Y") AS dtDOB,
+            TIMESTAMPDIFF(YEAR, P.dtDOB, CURDATE()) as currentAge
             P.dtDOB AS dtDOB_RAW,
             P.strNationalNum
         FROM 
@@ -83,7 +85,6 @@ sub bulkPersonRollover {
                 AND PR.strStatus IN ("$Defs::PERSONREGO_STATUS_ACTIVE", "$Defs::PERSONREGO_STATUS_PASSIVE")
                 AND PR.intEntityID = ?
                 AND PR.intNationalPeriodID <> ?
-                AND PR.strAgeLevel = ?
             )
             LEFT JOIN tblPersonRegistration_$realmID as PRto ON (
                 PRto.intPersonID = P.intPersonID
@@ -102,10 +103,11 @@ sub bulkPersonRollover {
         ORDER BY strLocalSurname, strLocalFirstname
     ];
 
+                #AND PR.strAgeLevel = ?
+        #$bulk_ref->{'personLevel'} || '',
 
     my @values=(
         $bulk_ref->{'personType'} || '',
-        $bulk_ref->{'personLevel'} || '',
         $bulk_ref->{'personEntityRole'} || '',
         $bulk_ref->{'entityID'} || '',
         $bulk_ref->{'nationalPeriodID'} || '',
@@ -114,18 +116,17 @@ sub bulkPersonRollover {
         $realmID
     );
 
-print STDERR $st;
-print STDERR Dumper(\@values);
-
-    
     my $q = $Data->{'db'}->prepare($st);
     $q->execute(@values);
     my $count = 0;
     my @rowdata    = ();
 
     while (my $dref = $q->fetchrow_hashref()) {
+        my $newAgeLevel = Person::calculateAgeLevel($Data, $dref->{'currentAge'});
+        next if $newAgeLevel ne $bulk_ref->{'personLevel'};
         $count++;
         my %row = ();
+        
         for my $i (qw(intPersonID strLocalSurname strLocalFirstname dtDOB dtDOB_RAW strNationalNum))    {
             $row{$i} = $dref->{$i};
         }
