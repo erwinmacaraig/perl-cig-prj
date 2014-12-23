@@ -9,3 +9,21 @@
 	    </form>
     </div>
 </div>
+
+<script src = "//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+<script type="text/javascript">
+    jQuery().ready(function() {
+        
+        jQuery("#searchForm").validate({
+            rules: {
+                search_keyword: {
+                    required: true
+                }
+            },
+            messages: {
+                search_keyword: "[% Lang.txt('Search keyword is required.') %]"
+            }
+        });
+    });
+</script>
+

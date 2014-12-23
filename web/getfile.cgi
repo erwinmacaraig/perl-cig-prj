@@ -13,6 +13,7 @@ use Reg_common;
 use Utils;
 use Lang;
 use UploadFiles;
+use S3Upload;
 
 main();	
 
@@ -68,11 +69,17 @@ sub main	{
 	
 	if($allowed)	{
 		if($dref and (allowFileAccess(\%Data, $dref) or $isadmin))	{
-			my $filename= "$Defs::fs_upload_dir/files/$dref->{'strPath'}$dref->{'strFilename'}.$dref->{'strExtension'}";
-			open (FILE, "<$filename");
-			my $file='';
-			while(<FILE>)  { $file.= $_; }
-			close (FILE);
+            my $file='';
+            if($Defs::aws_upload_bucket)    {
+                my $key= "$dref->{'strPath'}$dref->{'strFilename'}.$dref->{'strExtension'}";
+                $file = getFileFromS3($key);
+            }
+            else    {
+                my $filename= "$Defs::fs_upload_dir/files/$dref->{'strPath'}$dref->{'strFilename'}.$dref->{'strExtension'}";
+                open (FILE, "<$filename");
+                while(<FILE>)  { $file.= $_; }
+                close (FILE);
+            }
 			my $size = $dref->{'intBytes'} || 0;
 			my $contenttype ='';
 			my $ext = $dref->{'strExtension'} || '';

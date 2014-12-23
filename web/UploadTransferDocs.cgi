@@ -8,6 +8,7 @@ my $File_MaxSize = 4*1024*1024; #4Mb;
 use ImageUpload;
 use FileUpload;
 use Utils;
+use S3Upload;
 my $dbh = connectDB(); 
 
 my $fileType = param('Filetype');
@@ -149,6 +150,7 @@ my $st_a = qq[
 				'jpg',
 				$fileID,
 			);
+      putFileToS3("$path$fileID".'.jpg',$filename);
 			
     }   ##end %field
 
@@ -174,6 +176,7 @@ my $st_a = qq[
         $file->Ext(),
 				$fileID,
 			);
+      putFileToS3("$path$fileID".'.'.$file->Ext(),$filename.'.'.$file->Ext());
     }
   } #end else File
   ### ends here

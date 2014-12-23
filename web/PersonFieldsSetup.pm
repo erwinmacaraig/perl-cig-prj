@@ -850,7 +850,7 @@ sub personFieldsSetup {
                 strDescription
             )],
             sections => [
-                [ 'main',        'Certifications' ],
+                [ 'main',        'Add New Certification' ],
             ],
         },
     };
