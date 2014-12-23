@@ -1354,6 +1354,7 @@ header nav ul li a {
 .container .grid-filter-wrap{
 	/*margin-left: 12px;*/
 	width: auto;
+	clear:both;
 }
 .container .grid-filter-wrap .grid-widget{
 	margin: 0 0 12px 0px;

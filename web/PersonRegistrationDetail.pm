@@ -344,13 +344,13 @@ sub personRegistrationWorkTasks {
         columns => \@headers,
         rowdata => \@rowdata,
         gridid  => 'grid',
-        width   => '99%',
+        width   => '100%',
         filters => $filterfields,
     );
 
     my $resultHTML = qq[
         <div class="grid-filter-wrap">
-            <div style="width:99%;">$rectype_options</div>
+            <div style="width:100%;">$rectype_options</div>
             $grid
         </div>
     ];
