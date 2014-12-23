@@ -53,8 +53,6 @@ use MinorProtection;
 use PersonCertifications;
 use EntitySummaryPanel;
 use PersonEntity;
-use NationalReportingPeriod;
-use Date::Calc;
 
 sub cleanTasks  {
 
@@ -194,17 +192,18 @@ sub handleWorkflow {
             case "$Defs::WF_TASK_ACTION_REJECT" {
                 my $actionMessage = rejectTask($Data, $emailNotification);
 
-                if($regNature eq $Defs::REGISTRATION_NATURE_TRANSFER){
-                    $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_PR_R&TID=$WFTaskID";
-                }
-                else {
-                    $flashMessage{'flash'}{'type'} = 'success';
-                    $flashMessage{'flash'}{'message'} = $actionMessage;
+                #if($regNature eq $Defs::REGISTRATION_NATURE_TRANSFER){
+                    #$Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_PR_R&TID=$WFTaskID";
+                #}
+                #else {
+                    #$flashMessage{'flash'}{'type'} = 'success';
+                    #$flashMessage{'flash'}{'message'} = $actionMessage;
 
-                    setFlashMessage($Data, 'WF_U_FM', \%flashMessage);
+                    #setFlashMessage($Data, 'WF_U_FM', \%flashMessage);
 
-                    $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_View&TID=$WFTaskID";
-                }
+                    #$Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_View&TID=$WFTaskID";
+                #}
+                $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_PR_R&TID=$WFTaskID";
                 ($body, $title) = redirectTemplate($Data);
             }
             case "$Defs::WF_TASK_ACTION_HOLD" {
@@ -1939,7 +1938,6 @@ sub getTask {
             pr.strPersonLevel,
             pr.intPersonRequestID,
             DATE_FORMAT(pr.dtFrom,'%d %b %Y') AS dtFrom,
-            pr.dtFrom AS TdtFrom,
             DATE_FORMAT(pr.dtTo,'%d %b %Y') AS dtTo,
             etr.strEntityRoleName,
             p.strLocalFirstname,
@@ -2018,7 +2016,6 @@ sub viewTask {
             pr.intPersonRequestID,
             DATE_FORMAT(pr.dtFrom,'%d %b %Y') AS dtFrom,
             DATE_FORMAT(pr.dtTo,'%d %b %Y') AS dtTo,
-            DATE_FORMAT(NOW(), '%Y-%m-%d')as currentDate,
             t.strRegistrationNature,
             dt.strDocumentName,
             p.strLocalFirstname,
@@ -2366,22 +2363,6 @@ sub populateRegoViewData {
         if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_REGO'} == 1 and $dref->{'regoPaymentRequired'});
 
     if($dref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER){
-
-        my ($nationalPeriodID, $dtFrom, $dtTo) = getNationalReportingPeriod(
-            $Data->{db},
-            $Data->{'Realm'},
-            $Data->{'RealmSubType'},
-            '',
-            '',
-            'TRANSFER'
-        );
-
-        my @currDate = split /\-/, $dref->{'currentDate'};
-        my @dtToDate = split /\-/, $dtFrom;
-
-        my $dateDiff = Dumper Date::Calc::Delta_Days(@dtToDate, @currDate);
-        my $dtFrom =  $dateDiff lt 0 ? $dref->{'currentDate'} : $dtFrom;
-
         $title = $Data->{'lang'}->txt('Transfer') . " - $LocalName";;
         $templateFile = 'workflow/view/transfer.templ';
 
@@ -2393,8 +2374,8 @@ sub populateRegoViewData {
         #print STDERR Dumper $personRequestData;
         $TemplateData{'TransferDetails'}{'TransferTo'} = $personRequestData->{'requestFrom'} || '';
         $TemplateData{'TransferDetails'}{'TransferFrom'} = $personRequestData->{'requestTo'} || '';
-        $TemplateData{'TransferDetails'}{'RegistrationDateFrom'} = $dtFrom;
-        $TemplateData{'TransferDetails'}{'RegistrationDateTo'} = $dtTo;
+        $TemplateData{'TransferDetails'}{'RegistrationDateFrom'} = '';
+        $TemplateData{'TransferDetails'}{'RegistrationDateTo'} = '';
         $TemplateData{'TransferDetails'}{'Summary'} = $personRequestData->{'strRequestNotes'} || '';
     }
     else {
@@ -3012,20 +2993,9 @@ sub viewSummaryPage {
 
                 my ($PaymentsData) = populateRegoPaymentsViewData($Data, $task);
         
-                my ($nationalPeriodID, $dtFrom, $dtTo) = getNationalReportingPeriod(
-                    $Data->{db},
-                    $Data->{'Realm'},
-                    $Data->{'RealmSubType'},
-                    '',
-                    '',
-                    'TRANSFER'
-                );
-
                 $TemplateData{'TransferDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
                 $TemplateData{'TransferDetails'}{'TransferTo'} = $request->{'requestFrom'};
                 $TemplateData{'TransferDetails'}{'TransferFrom'} = $request->{'requestTo'};
-                $TemplateData{'TransferDetails'}{'DateFrom'} = $task->{'TdtFrom'};
-                $TemplateData{'TransferDetails'}{'DateTo'} = $dtTo;
                 $TemplateData{'TransferDetails'}{'Summary'} = $request->{'strRequestNotes'};
                 $TemplateData{'TransferDetails'}{'Fee'} = $PaymentsData->{'TXNs'}[0]{'Amount'};
                 
@@ -3221,9 +3191,28 @@ sub updateTaskScreen {
                 $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Transfer process.");
                 $status = $Data->{'lang'}->txt("Pending");
             }
-
             elsif($TaskType eq 'NEW_PLAYER') {
                 $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Player Registration process.");
+                $status = $Data->{'lang'}->txt("Pending");
+            }
+            elsif($TaskType eq 'NEW_COACH') {
+                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Coach Registration process.");
+                $status = $Data->{'lang'}->txt("Pending");
+            }
+            elsif($TaskType eq 'NEW_REFEREE') {
+                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the Referee Registration process.");
+                $status = $Data->{'lang'}->txt("Pending");
+            }
+            elsif($TaskType eq 'NEW_MAOFFICIAL') {
+                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the MA Official Registration process.");
+                $status = $Data->{'lang'}->txt("Pending");
+            }
+            elsif($TaskType eq 'NEW_CLUBOFFICIAL') {
+                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Club Official Registration process.");
+                $status = $Data->{'lang'}->txt("Pending");
+            }
+            elsif($TaskType eq 'NEW_TEAMOFFICIAL') {
+                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Team Official Registration process.");
                 $status = $Data->{'lang'}->txt("Pending");
             }
             elsif($TaskType eq 'NEW_VENUE') {
@@ -3237,9 +3226,44 @@ sub updateTaskScreen {
 
         }
         case "WF_PR_R" {
+
             $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'Rejected');
-            $message = $Data->{'lang'}->txt("You have rejected this transfer, the clubs will be informed. To proceed with this transfer the clubs need to start a new transfer.");
-            $status = $Data->{'lang'}->txt("Rejected");
+            if($TaskType eq 'TRANSFER_PLAYER') {
+                $message = $Data->{'lang'}->txt("You have rejected this transfer, the clubs will be informed. To proceed with this transfer the clubs need to start a new transfer.");
+                $status = $Data->{'lang'}->txt("Rejected");
+            }
+            elsif($TaskType eq 'NEW_PLAYER') {
+                $message = $Data->{'lang'}->txt("You have rejected this Player Registration, the clubs will be informed. To proceed with this Registration the clubs need to start a new Registration.");
+                $status = $Data->{'lang'}->txt("Rejected");
+            }
+            elsif($TaskType eq 'NEW_COACH') {
+                $message = $Data->{'lang'}->txt("You have rejected this Coach Registration, the clubs will be informed. To proceed with this Registration the clubs need to start a new Registration.");
+                $status = $Data->{'lang'}->txt("Rejected");
+            }
+            elsif($TaskType eq 'NEW_REFEREE') {
+                $message = $Data->{'lang'}->txt("You have rejected this Referee Registration, the clubs will be informed. To proceed with this Registration the clubs need to start a new Registration.");
+                $status = $Data->{'lang'}->txt("Rejected");
+            }
+            elsif($TaskType eq 'NEW_MAOFFICIAL') {
+                $message = $Data->{'lang'}->txt("You have rejected this MA Official Registration, the clubs will be informed. To proceed with this Registration the clubs need to start a new Registration.");
+                $status = $Data->{'lang'}->txt("Rejected");
+            }
+            elsif($TaskType eq 'NEW_CLUBOFFICIAL') {
+                $message = $Data->{'lang'}->txt("You have rejected this Club Official Registration, the clubs will be informed. To proceed with this Registration the clubs need to start a new Registration.");
+                $status = $Data->{'lang'}->txt("Rejected");
+            }
+            elsif($TaskType eq 'NEW_TEAMOFFICIAL') {
+                $message = $Data->{'lang'}->txt("You have rejected this Team Official Registration, the clubs will be informed. To proceed with this Registration the clubs need to start a new Registration.");
+                $status = $Data->{'lang'}->txt("Rejected");
+            }
+            elsif($TaskType eq 'NEW_VENUE') {
+                $message = $Data->{'lang'}->txt("You have rejected this Venue Registration, the clubs will be informed. To proceed with this Registration the clubs need to start a new Venue Registration.");
+                $status = $Data->{'lang'}->txt("Rejected");
+            }
+            elsif($TaskType eq 'NEW_CLUB') {
+                $message = $Data->{'lang'}->txt("You have rejected this Venue Registration, the clubs will be informed. To proceed with this Registration the clubs need to start a new Venue Registration.");
+                $status = $Data->{'lang'}->txt("Rejected");
+            }
         }
         case "WF_PR_S" {
             $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'Resolved');

@@ -12,5 +12,7 @@
         <p class="reg-text">[% FoundationDate %]</p>
         [% END %]
     </div>
+    [% IF Status %]
     <div class="registration-pending">[% Lang.txt(Status) %]</div>
+    [% END %]
 </div>
