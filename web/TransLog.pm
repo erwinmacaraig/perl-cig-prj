@@ -604,7 +604,6 @@ sub getTransList {
     $query->execute or print STDERR $statement;
     my $client = setClient($Data->{clientValues});
     my @Columns = ();
-    push (@Columns, {Name => '', Field => 'SelectLink', type => 'Selector', hide => $displayonly});
     ###
     push (@Columns, {Name => 'Invoice Number', Field => 'strInvoiceNumber', width => 20});
     ###
@@ -613,9 +612,9 @@ sub getTransList {
 
     push (@Columns, {Name => 'Item Name', Field => 'strName'});
     push (@Columns, {Name => 'Quantity', Field => 'intQty', width => 15});
-    push (@Columns, {Name => 'Current Amount', Field => 'curAmount', width =>20});
+    #push (@Columns, {Name => 'Current Amount', Field => 'curAmount', width =>20});
     ########    
-    push (@Columns, {Name => 'Tax Total', Field => 'TaxTotal', width => 15});
+    #push (@Columns, {Name => 'Tax Total', Field => 'TaxTotal', width => 15});
     push (@Columns, {Name => 'Amount', Field => 'NetAmount', width => 20});    
     #######
     push (@Columns, {Name => 'Start', Field => 'dtStart', width => 20});
@@ -628,6 +627,7 @@ sub getTransList {
     push (@Columns, {Name => 'Pay', Field => 'manual_payment', type => 'HTML', width => 10, hide => ($hidePayment or $hidePay)});
     push (@Columns, {Name => 'Notes', Field => 'strNotes',  width => 50, hide => $displayonly});
     push (@Columns, {Name => 'View Receipt', Field => 'strReceipt', type=>"HTML", width => 50, hide => $displayonly});
+    push (@Columns, {Name => '', Field => 'SelectLink', type => 'Selector', hide => $displayonly});
 
     my @headers = ();
     foreach my $header (@Columns) {
