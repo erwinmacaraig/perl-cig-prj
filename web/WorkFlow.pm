@@ -3261,7 +3261,7 @@ sub updateTaskScreen {
                 $status = $Data->{'lang'}->txt("Rejected");
             }
             elsif($TaskType eq 'NEW_CLUB') {
-                $message = $Data->{'lang'}->txt("You have rejected this Venue Registration, the clubs will be informed. To proceed with this Registration the clubs need to start a new Venue Registration.");
+                $message = $Data->{'lang'}->txt("You have rejected this Club Registration, the clubs will be informed. To proceed with this Registration the clubs need to start a new Venue Registration.");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
         }
