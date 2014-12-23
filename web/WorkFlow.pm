@@ -53,6 +53,8 @@ use MinorProtection;
 use PersonCertifications;
 use EntitySummaryPanel;
 use PersonEntity;
+use NationalReportingPeriod;
+use Date::Calc;
 
 sub cleanTasks  {
 
@@ -185,7 +187,8 @@ sub handleWorkflow {
                 $flashMessage{'flash'}{'message'} = $actionMessage;
 
                 setFlashMessage($Data, 'WF_U_FM', \%flashMessage);
-                $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_";
+                #$Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_";
+                $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_PR_S&TID=$WFTaskID";
                 ($body, $title) = redirectTemplate($Data);
             }
             case "$Defs::WF_TASK_ACTION_REJECT" {
@@ -283,8 +286,8 @@ sub handleWorkflow {
     elsif ($action eq 'WF_amd') {
         ($body, $title) = addMissingDocument($Data);
     }
-    elsif ($action eq 'WF_PR_H' or $action eq 'WF_PR_R') {
-        ($body, $title) = HoldOrRejectTaskScreen($Data, $action);
+    elsif ($action eq 'WF_PR_H' or $action eq 'WF_PR_R' or $action eq 'WF_PR_S') {
+        ($body, $title) = updateTaskScreen($Data, $action);
     }
 	else {
         ( $body, $title ) = listTasks( $Data );
@@ -1934,6 +1937,7 @@ sub getTask {
             pr.strPersonLevel,
             pr.intPersonRequestID,
             DATE_FORMAT(pr.dtFrom,'%d %b %Y') AS dtFrom,
+            pr.dtFrom AS TdtFrom,
             DATE_FORMAT(pr.dtTo,'%d %b %Y') AS dtTo,
             etr.strEntityRoleName,
             p.strLocalFirstname,
@@ -2012,6 +2016,7 @@ sub viewTask {
             pr.intPersonRequestID,
             DATE_FORMAT(pr.dtFrom,'%d %b %Y') AS dtFrom,
             DATE_FORMAT(pr.dtTo,'%d %b %Y') AS dtTo,
+            DATE_FORMAT(NOW(), '%Y-%m-%d')as currentDate,
             t.strRegistrationNature,
             dt.strDocumentName,
             p.strLocalFirstname,
@@ -2025,8 +2030,16 @@ sub viewTask {
             p.strState,
             p.strPostalCode,
             p.strLocalSurname,
+            p.intLocalLanguage,
+            p.strRegionOfBirth,
+            p.strSuburb,
+            p.strState,
+            p.strISOCountry,
+            p.strPhoneHome,
+            p.strEmail,
             p.intMinorProtection,
             p.dtSuspendedUntil,
+            p.strISOCountryOfBirth,
             p.strISONationality,
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             p.intGender as PersonGender,
@@ -2287,6 +2300,15 @@ sub populateRegoViewData {
         push @certString, $cert->{'strCertificationName'};
     }
 
+    my $languages = PersonLanguages::getPersonLanguages($Data, 1, 0);
+    my $selectedLanguage;
+    for my $l ( @{$languages} ) {
+        if($l->{intLanguageID} == $dref->{'intLocalLanguage'}){
+             $selectedLanguage = $l->{'language'};
+            last
+        }
+    }
+
 	%TemplateData = (
         PersonDetails => {
             Status => $Data->{'lang'}->txt($Defs::personStatus{$dref->{'PersonStatus'} || 0}) || '',
@@ -2301,6 +2323,20 @@ sub populateRegoViewData {
             MID => $dref->{'strNationalNum'} || '',
             LatinSurname => $dref->{'strLatinSurname'} || '',
             MinorProtection => $minorProtectionOptions->{$dref->{'intMinorProtection'}} || '',
+
+            Address1 => $dref->{'strAddress1'} || '',
+            Address2 => $dref->{'strAddress2'} || '',
+            FirstName => $dref->{'strLocalFirstname'} || '',
+            LastName => $dref->{'strLocalSurname'} || '',
+            CountryOfBirth => $isocountries->{$dref->{'strISOCountryOfBirth'}} || '',
+            LanguageOfName => $selectedLanguage || '',
+            RegionOfBirth => $dref->{'strRegionOfBirth'} || '',
+            City =>$dref->{'strSuburb'} || '',
+            State =>$dref->{'strState'} || '',
+            ContactISOCountry =>$isocountries->{$dref->{'strISOCountry'}} || '',
+            ContactPhone =>$dref->{'strPhoneHome'} || '',
+            Email =>$dref->{'strEmail'} || '',
+            PostalCode => $dref->{'strPostalCode'} || '',
         },
         PersonRegoDetails => {
             ID => $dref->{'intPersonRegistrationID'},
@@ -2321,13 +2357,6 @@ sub populateRegoViewData {
         EditDetailsLink => $PersonEditLink,
         ReadOnlyLogin => $readonly,
         PersonSummary => personSummaryPanel($Data, $dref->{intPersonID}) || '',
-        TransferDetails => {
-            TransferTo => $personRequestData->{'requestFrom'} || '-',
-            RegistrationStatus => '',
-            RegistrationDateFrom => '',
-            RegistrationDateTo => '',
-            Summary => $personRequestData->{'strRequestNotes'},
-        },
         WFTaskID => $dref->{'intWFTaskID'}
 	);
 
@@ -2335,6 +2364,22 @@ sub populateRegoViewData {
         if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_REGO'} == 1 and $dref->{'regoPaymentRequired'});
 
     if($dref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER){
+
+        my ($nationalPeriodID, $dtFrom, $dtTo) = getNationalReportingPeriod(
+            $Data->{db},
+            $Data->{'Realm'},
+            $Data->{'RealmSubType'},
+            '',
+            '',
+            'TRANSFER'
+        );
+
+        my @currDate = split /\-/, $dref->{'currentDate'};
+        my @dtToDate = split /\-/, $dtFrom;
+
+        my $dateDiff = Dumper Date::Calc::Delta_Days(@dtToDate, @currDate);
+        my $dtFrom =  $dateDiff lt 0 ? $dref->{'currentDate'} : $dtFrom;
+
         $title = $Data->{'lang'}->txt('Transfer') . " - $LocalName";;
         $templateFile = 'workflow/view/transfer.templ';
 
@@ -2343,6 +2388,12 @@ sub populateRegoViewData {
         );
         my $request = getRequests($Data, \%regFilter);
         $personRequestData = $request->[0];
+        #print STDERR Dumper $personRequestData;
+        $TemplateData{'TransferDetails'}{'TransferTo'} = $personRequestData->{'requestFrom'} || '';
+        $TemplateData{'TransferDetails'}{'TransferFrom'} = $personRequestData->{'requestTo'} || '';
+        $TemplateData{'TransferDetails'}{'RegistrationDateFrom'} = $dtFrom;
+        $TemplateData{'TransferDetails'}{'RegistrationDateTo'} = $dtTo;
+        $TemplateData{'TransferDetails'}{'Summary'} = $personRequestData->{'strRequestNotes'} || '';
     }
     else {
         $title = $Data->{'lang'}->txt('Registration') . " - $LocalName";
@@ -2690,15 +2741,21 @@ sub populateDocumentViewData {
             $displayVerify = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
         }
 
-        if ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityVerify'} == 1 and $tdref->{'intDocumentID'}) {
+        #if ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityVerify'} == 1 and $tdref->{'intDocumentID'}) {
+        if ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityVerify'} == 1 and ($tdref->{'intDocumentID'} or $fileID)) {
             $displayVerify = 1;
         }
 
         #if($tdref->{'intDocumentID'} ) {
 		if($fileID) {
             $displayView = 1;
+            $displayReplace = 1; #FC-518; approval entity/club should have the abilit to replace documents
+
+            my $action = "view";
+            $action = "review" if($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityAdd'} == 1);
+
            	$viewLink = qq[ <span style="position: relative"> 
-<a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$Data->{'client'}&amp;a=review');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];			
+<a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$Data->{'client'}&amp;a=$action');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];			
         }
 		
         my %documents = (
@@ -2953,9 +3010,20 @@ sub viewSummaryPage {
 
                 my ($PaymentsData) = populateRegoPaymentsViewData($Data, $task);
         
+                my ($nationalPeriodID, $dtFrom, $dtTo) = getNationalReportingPeriod(
+                    $Data->{db},
+                    $Data->{'Realm'},
+                    $Data->{'RealmSubType'},
+                    '',
+                    '',
+                    'TRANSFER'
+                );
+
                 $TemplateData{'TransferDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
                 $TemplateData{'TransferDetails'}{'TransferTo'} = $request->{'requestFrom'};
                 $TemplateData{'TransferDetails'}{'TransferFrom'} = $request->{'requestTo'};
+                $TemplateData{'TransferDetails'}{'DateFrom'} = $task->{'TdtFrom'};
+                $TemplateData{'TransferDetails'}{'DateTo'} = $dtTo;
                 $TemplateData{'TransferDetails'}{'Summary'} = $request->{'strRequestNotes'};
                 $TemplateData{'TransferDetails'}{'Fee'} = $PaymentsData->{'TXNs'}[0]{'Amount'};
                 
@@ -3109,7 +3177,7 @@ sub viewApprovalPage {
     #return ($body, "Approval status:");
 }
 
-sub HoldOrRejectTaskScreen {
+sub updateTaskScreen {
     my ($Data, $action) = @_;
 
     my $WFTaskID = safe_param('TID','number') || '';
@@ -3117,7 +3185,7 @@ sub HoldOrRejectTaskScreen {
 
     my $task = getTask($Data, $WFTaskID);
 
-    return (" ", "Access forbidden.") if($entityID != $task->{'intApprovalEntityID'});
+    #return (" ", "Access forbidden.") if($entityID != $task->{'intApprovalEntityID'});
 
     my $title;
     my $titlePrefix;
@@ -3145,6 +3213,11 @@ sub HoldOrRejectTaskScreen {
             $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'Rejected');
             $message = $Data->{'lang'}->txt("You have rejected this transfer, the clubs will be informed. To proceed with this transfer the clubs need to start a new transfer.");
             $status = $Data->{'lang'}->txt("Rejected");
+        }
+        case "WF_PR_S" {
+            $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'Resolved');
+            $message = $Data->{'lang'}->txt("You have resolved this task.");
+            $status = $Data->{'lang'}->txt("Resolved");
         }
     }
 

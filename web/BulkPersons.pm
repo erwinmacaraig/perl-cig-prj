@@ -114,6 +114,8 @@ sub bulkPersonRollover {
         $realmID
     );
 
+print STDERR $st;
+print STDERR Dumper(\@values);
 
     
     my $q = $Data->{'db'}->prepare($st);
@@ -139,6 +141,10 @@ sub bulkPersonRollover {
     my @headers = (
         {
             type => 'RowCheckbox',
+        },
+        {
+            name => "ID for now",
+            field => 'intPersonID',
         },
         {
             name => $memfieldlabels->{'strNationalNum'} || $Data->{'lang'}->txt('National Num.'),

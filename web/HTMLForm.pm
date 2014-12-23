@@ -26,7 +26,6 @@ sub genHTMLForm {
         $override_config )
       = @_;
     my $returnstr   = '';
-warn("NT $notabs");
     my $sectionlist = $fields_ref->{'sections'};
     $sectionlist = [ [ 'main', '' ] ] if !$sectionlist;
     $action ||= 'display';

@@ -107,6 +107,7 @@ sub facilityFieldsSetup {
                     firstoption => [ '', 'Select Type' ],
                     compulsory => 1,
                     sectionname => 'core',
+                    class       => 'chzn-select',
                 },
                 strLocalName => {
                     label       => $FieldLabels->{'strLocalName'},
@@ -161,6 +162,7 @@ sub facilityFieldsSetup {
                     compulsory => 1,
                     posttext => $nonlatinscript,
                     sectionname => 'core',
+                    class       => 'chzn-select',
                 },
                 strLatinName    => {
                     label       => $Data->{'SystemConfig'}{'facility_strLatinNames'} || $FieldLabels->{'strLatinName'},

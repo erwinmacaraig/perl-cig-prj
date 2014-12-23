@@ -50,17 +50,13 @@ sub handleCertificates {
 				SelectLink => $link,
 				strCertificationType => $rowdataref->{'strCertificationType'},
 				strCertificationName => $rowdataref->{'strCertificationName'},
-				dtValidFrom          => $rowdataref->{'dtValidFrom'},
-				dtValidUntil         => $rowdataref->{'dtValidUntil'},
+				dtValidFrom          => $Data->{'l10n'}{'date'}->format($rowdataref->{'dtValidFrom'},'MEDIUM'),
+				dtValidUntil         => $Data->{'l10n'}{'date'}->format($rowdataref->{'dtValidUntil'},'MEDIUM'),
 				strStatus            => $rowdataref->{'strStatus'},
 				strDescription       => $rowdataref->{'strDescription'},				
 			};
 		}
 		my @headers = (
-            {
-                type => 'Selector',
-                field => 'SelectLink',
-            },
             {
                 name =>   'Certification Type',
                 field =>  'strCertificationType',
@@ -81,6 +77,10 @@ sub handleCertificates {
               name =>   'Status',
               field =>  'strStatus',
          },   
+        {
+            type => 'Selector',
+            field => 'SelectLink',
+        },
   );
          #{
          #	name => 'Description',
@@ -158,6 +158,9 @@ sub handleCertificates {
                    cols => '40',       
               },
    		    },
+      sections => [
+                [ 'main', 'Certifications' ],
+      ],
                order => [qw(intCertificationID intCertificationTypeID strStatus dtValidFrom dtValidUntil strDescription)],            
                options => {
                    labelsuffix => ':',
@@ -165,7 +168,7 @@ sub handleCertificates {
                    target => $Data->{'target'},
                    formname => 'n_form',
                    submitlabel => $Data->{'lang'}->txt('Update'),
-                   introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
+                   introtext => '',
                    NoHTML => 1,
                    updateSQL => qq[
                          UPDATE tblPersonCertifications
@@ -213,9 +216,8 @@ sub handleCertificates {
 	
    ($resultHTML, undef )=handleHTMLForm(\%FieldDefinitions, undef, $option, 1, $Data->{'db'});	
   
-   
  
-  my $title = 'Person Certifications';
+   my $title = 'Person Certifications';
    
    return $resultHTML,$title;
 #######################################################################################

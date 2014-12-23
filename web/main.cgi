@@ -284,6 +284,10 @@ sub main {
     elsif ( $action =~ /^PREGFB_/ ) {
         ( $resultHTML, $pageHeading ) = handleRegistrationFlowBulk($action, \%Data);
     }
+    elsif ( $action =~ /^PFB_/ ) {
+use BulkRenewalsFlow;
+        ( $resultHTML, $pageHeading ) = handleBulkRenewalsFlow($action, \%Data);
+    }
     elsif ( $action =~ /^PF_/ ) {
 use PersonFlow;
         ( $resultHTML, $pageHeading ) = handlePersonFlow($action, \%Data);

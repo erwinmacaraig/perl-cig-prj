@@ -315,7 +315,11 @@ sub getMemFields {
         }
 		if (($val and $val ne '00/00/0000') or ($is_header))	{
 			$string .= qq[<div class="mfloat"><span class = "details-left">$label:</span>] if !$nolabelfields{$f};
-			$string .= '<span class="detail-value">'.$val.'</span></div>';
+			if(length($label) >= 46)  {
+				$string .= '<span class="detail-value"><br/>'.$val.'</span></div>';
+			}else{
+				$string .= '<span class="detail-value">'.$val.'</span></div>';
+			}
 			$fields{$group} .= $string;
 		}
 	}}

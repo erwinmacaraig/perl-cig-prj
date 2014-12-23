@@ -13,7 +13,6 @@ use MD5;
 use Data::Dumper;
 use JSON;
 use strict;
-print "Content-type: text/html \n\n"; 
 
 my $client = param('client') || 0;
 my $regoID = param('rID') || 0;
@@ -22,8 +21,7 @@ my $docTypeID = param('doctypeID') || 0;
 my $personID = param('pID') || 0;
 my $isForEntity = param('entitydocs') || 0;
 my $replaceFileID = param('f') || 0;
-
-  
+my $fromURL = param('u') || '';
 
 my $db=connectDB();
 my %Data=();
@@ -36,10 +34,10 @@ $Data{'db'}=$db;
 
 
 
-	if($uploaded_filename ne ''){  
-		my $filefield = 'file';  
-        my $permission = 1; 
-        my @files = (
+if($uploaded_filename ne ''){  
+    my $filefield = 'file';  
+    my $permission = 1; 
+    my @files = (
 	        [$uploaded_filename, $filefield, $permission,],
     );  
     my %other_person_info = ();
@@ -53,9 +51,15 @@ $Data{'db'}=$db;
 
 	
 	$other_person_info{'f'} = $fileID;  
-	my $jFileData = JSON->new->utf8->encode(\%other_person_info);
-	
-	print $jFileData;       
+    if($fromURL)    {
+        my $cgi = new CGI;
+        print $cgi->redirect($fromURL);
+    }
+    else    {
+        print "Content-type: text/html \n\n"; 
+        my $jFileData = JSON->new->utf8->encode(\%other_person_info);
+        print $jFileData;       
+    }
          
 }
 

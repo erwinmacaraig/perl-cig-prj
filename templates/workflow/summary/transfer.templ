@@ -25,11 +25,11 @@
 				    </div>
 					<div class="">
 					  	<span class="">[% Lang.txt('Registration Date From') %]:</span>
-					  	<span class="detail-value"><strong>[% PersonRegistrationDetails.DateFrom %]</strong></span>
+					  	<span class="detail-value"><strong>[% TransferDetails.TransferFrom %], [% DateFormat.format(TransferDetails.DateFrom, 'MEDIUM') %]</strong></span>
 				    </div>
 					<div class="">
 					  	<span class="">[% Lang.txt('Registration Date to') %]:</span>
-					  	<span class="detail-value"><strong>[% PersonRegistrationDetails.DateTo %]</strong></span>
+					  	<span class="detail-value"><strong>[% TransferDetails.TransferTo %], [% DateFormat.format(TransferDetails.DateTo, 'MEDIUM') %]</strong></span>
 				    </div>
 					<div class="">
 					  	<span class="">[% Lang.txt('Transfer fee') %]:</span>

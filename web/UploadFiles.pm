@@ -1,7 +1,3 @@
-#
-# $Header: svn://svn/SWM/trunk/web/UploadFiles.pm 8251 2013-04-08 09:00:53Z rlee $
-#
-
 package UploadFiles;
 require Exporter;
 @ISA =  qw(Exporter);
@@ -20,6 +16,7 @@ use Reg_common;
 
 use Data::Dumper;
 use InstanceOf;
+use S3Upload;
 
 my $File_MaxSize = 10*1024*1024; #10Mb;
 
@@ -367,8 +364,8 @@ sub _processUploadFile_single	{
 				'jpg',
 				$fileID,
 			);
+      putFileToS3("$path$fileID".'.jpg',$filename);
     }
-
   }
   else { #File
     my $filename= "$Defs::fs_upload_dir/files/$path$fileID";
@@ -390,6 +387,7 @@ sub _processUploadFile_single	{
         $file->Ext(),
 				$fileID,
 			);
+      putFileToS3("$path$fileID".'.'.$file->Ext(),$filename.'.'.$file->Ext());
     }
   }
 	if($error)	{
@@ -450,8 +448,10 @@ sub deleteFile	{
 
 		my @tobedeleted=();
     my $filename= "$Defs::fs_upload_dir/files/$dref->{'strPath'}$dref->{'strFilename'}.$dref->{'strExtension'}";
+        my $key = "$dref->{'strPath'}$dref->{'strFilename'}.$dref->{'strExtension'}";
 		push @tobedeleted, $filename;
 		unlink @tobedeleted;
+        deleteFromS3($key);
 	
 		my $st_d = qq[
 			DELETE FROM tblUploadedFiles
