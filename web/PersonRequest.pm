@@ -126,6 +126,9 @@ sub handlePersonRequest {
         case 'PRA_NC' {
             ($body, $title) = displayNoITC($Data);
         }
+		case 'PRA_NC_PROC' {
+			($body,$title) = sendITC($Data);
+		}
         case 'PRA_F' {
             ($body, $title) = displayCompletedRequest($Data);
         }
@@ -1567,15 +1570,50 @@ sub displayNoITC {
 					size => '50',
 					name => 'strClubName',
    		    	},
+				client => $Data->{'client'},
+			
    	); #end of FieldDefinitions
 
 	my $body = runTemplate($Data, \%FieldDefinitions, 'person/request_itc_form.templ');
 	my $title = $Data->{'lang'}->txt("Request Form For An International Transfer Certificate");
-	#return ($resultHTML, 'Request Form For An International Transfer Certificate');   
-    #my $body = $Data->{'lang'}->txt("Please request Player's ITC via TMS or directly to the other MA.");
-    #return text for now
-    return ($body, $title);
+	return ($body, $title);
 
+}
+
+sub sendITC {
+	my ($Data) = @_;
+	#get posted values 
+	my $q = new CGI;
+	my %h = $q->Vars;
+	my $message = runTemplate($Data, \%h,'emails/notification/1/personrequest/html/request_itc.templ');
+	
+	use Email;
+	my $title = "title";
+	my $maObj = getInstanceOf($Data, 'national');
+	my $clubObj = getInstanceOf($Data, 'club');
+
+	open FH, ">dumpfile.txt";
+	print FH "\nInstance of Club:\n" . Dumper($clubObj) . "\n";
+	my $email_to = $maObj->{'DBData'}{'strEmail'};	
+	my $email_from = $clubObj->{'DBData'}{'strEmail'};
+	print FH "\n\$email_to: $email_to \n";
+	print FH "\n\$email_from: $email_from \n";
+	my $emailsentOK = Email::sendEmail('ines_erwinmacaraig@yahoo.com', 'erwin.macaraig@gmail.com','REQUEST FORM FOR AN INTERNATIONAL TRANSFER CERTIFICATE', 'REQUEST FORM FOR AN INTERNATIONAL TRANSFER CERTIFICATE', $message, '','ITC','');
+	if($emailsentOK){
+		#store to DB;
+		
+		return qq[
+          <div class="OKmsg">International Transfer Certificate Sent .</div> 
+          <br />  
+          <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PRA_T">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+       ];
+	}	
+	else {
+		return ('Error',$title);
+	}
+
+	
+	
 }
 
 sub displayGenericError {
