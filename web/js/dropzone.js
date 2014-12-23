@@ -983,10 +983,10 @@ require.register("dropzone/lib/dropzone.js", function (exports, module) {
         string = "GiB";
       } else if (size >= 1024 * 1024 / 10) {
         size = size / (1024 * 1024 / 10);
-        string = "MiB";
+        string = "Mb";
       } else if (size >= 1024 / 10) {
         size = size / (1024 / 10);
-        string = "KiB";
+        string = "Kb";
       } else {
         size = size * 10;
         string = "b";
