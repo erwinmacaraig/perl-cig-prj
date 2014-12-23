@@ -3,6 +3,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = @EXPORT_OK = qw(
     displayRegoFlowSummary
+    displayRegoFlowSummaryBulk
     displayRegoFlowComplete
     displayRegoFlowCompleteBulk
     displayRegoFlowCheckout
@@ -80,7 +81,72 @@ sub displayRegoFlowCompleteBulk {
     return $body;
 }
 
+sub displayRegoFlowSummaryBulk  {
 
+    my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref, $carryString) = @_;
+    my $lang=$Data->{'lang'};
+	
+    my $body = '';
+
+    my @products= split /:/, $hidden_ref->{'prodIds'};
+    foreach my $prod (@products){ $hidden_ref->{"prod_$prod"} =1;}
+    my @productQty= split /:/, $hidden_ref->{'prodQty'};
+    foreach my $prodQty (@productQty){ 
+        my ($prodID, $qty) = split /-/, $prodQty;
+        $hidden_ref->{"prodQTY_$prodID"} =$qty;
+    }
+    #($hidden_ref->{'txnIds'}, undef) = save_rego_products($Data, $regoID, $personID, $entityID, $rego_ref->{'entityLevel'}, $rego_ref, $hidden_ref); #\%params);
+
+    my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
+    my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
+    my $gateways = '';
+    my $txnCount = 0;
+    my $logIDs;
+    my $txn_invoice_url = $Defs::base_url."/printinvoice.cgi?client=$client&amp;rID=$hidden_ref->{'rID'}&amp;pID=$personID";
+    ($txnCount, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
+     if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
+        $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
+     }
+     
+      
+    my $personObj = getInstanceOf($Data, 'person');
+    my $c = Countries::getISOCountriesHash();
+    
+    my $languages = PersonLanguages::getPersonLanguages( $Data, 1, 0);
+    #for my $l ( @{$languages} ) {
+    #    if($l->{intLanguageID} == $personObj->getValue('intLocalLanguage')){
+    #        $personData{'Language'} = $l->{'language'};			
+    #        last;	
+    #    }
+    #}
+    my $role_ref = getEntityTypeRoles($Data, $rego_ref->{'strSport'}, $rego_ref->{'strPersonType'});
+    $rego_ref->{'roleName'} = $role_ref->{$rego_ref->{'strPersonEntityRole'}};
+
+    my $editlink =  $Data->{'target'}."?".$carryString;
+    my %PageData = (
+        person_home_url => $url,
+        registration => $rego_ref,
+        gateways => $gateways,
+        txnCount => $txnCount,
+        target => $Data->{'target'},
+        RegoStatus => $rego_ref->{'strStatus'},
+        hidden_ref=> $hidden_ref,
+        Lang => $Data->{'lang'},
+        client=>$client,
+        editlink => $editlink,
+    );
+    
+    $body = runTemplate($Data, \%PageData, 'registration/summary.templ') || '';
+    my $logID = param('tl') || 0;
+    $logIDs->{$logID}=1;
+    foreach my $id (keys %{$logIDs}) {
+        next if ! $id;
+   #     $body .= displayPayResult($Data, $id);
+        $body .= displayPaymentResult($Data, $id, 1, '');
+    }
+
+    return $body;
+}
 sub displayRegoFlowSummary {
 
     my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref, $carryString) = @_;
@@ -868,15 +934,19 @@ sub displayRegoFlowProductsBulk {
     if (@prodIDs)   {
         $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
      }
+    else    {
+        return '';
+    }
 
      my %PageData = (
         nextaction=>"PREGFB_PU",
         target => $Data->{'target'},
         product_body => $product_body,
-        allowManualPay=> 1,
+        allowManualPay=> 0,
         manualPaymentTypes => \%Defs::manualPaymentTypes,
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
+        NoFormFields =>1,
         client=>$client,
     );
     my $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ') || '';
