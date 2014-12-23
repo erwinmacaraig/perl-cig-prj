@@ -61,7 +61,6 @@ sub putFileToS3 {
   return undef if !$keyname;
   return undef if !$localfile;
   my ($extension) = $localfile =~/.*\.(.*?)/;
-warn("OO $keyname:$localfile");
   my $contenttype = '';
   if(
     lc($extension) eq 'jpg'
