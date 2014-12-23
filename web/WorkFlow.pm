@@ -53,6 +53,8 @@ use MinorProtection;
 use PersonCertifications;
 use EntitySummaryPanel;
 use PersonEntity;
+use NationalReportingPeriod;
+use Date::Calc;
 
 sub cleanTasks  {
 
@@ -1935,6 +1937,7 @@ sub getTask {
             pr.strPersonLevel,
             pr.intPersonRequestID,
             DATE_FORMAT(pr.dtFrom,'%d %b %Y') AS dtFrom,
+            pr.dtFrom AS TdtFrom,
             DATE_FORMAT(pr.dtTo,'%d %b %Y') AS dtTo,
             etr.strEntityRoleName,
             p.strLocalFirstname,
@@ -2013,6 +2016,7 @@ sub viewTask {
             pr.intPersonRequestID,
             DATE_FORMAT(pr.dtFrom,'%d %b %Y') AS dtFrom,
             DATE_FORMAT(pr.dtTo,'%d %b %Y') AS dtTo,
+            DATE_FORMAT(NOW(), '%Y-%m-%d')as currentDate,
             t.strRegistrationNature,
             dt.strDocumentName,
             p.strLocalFirstname,
@@ -2360,6 +2364,22 @@ sub populateRegoViewData {
         if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_REGO'} == 1 and $dref->{'regoPaymentRequired'});
 
     if($dref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER){
+
+        my ($nationalPeriodID, $dtFrom, $dtTo) = getNationalReportingPeriod(
+            $Data->{db},
+            $Data->{'Realm'},
+            $Data->{'RealmSubType'},
+            '',
+            '',
+            'TRANSFER'
+        );
+
+        my @currDate = split /\-/, $dref->{'currentDate'};
+        my @dtToDate = split /\-/, $dtFrom;
+
+        my $dateDiff = Dumper Date::Calc::Delta_Days(@dtToDate, @currDate);
+        my $dtFrom =  $dateDiff lt 0 ? $dref->{'currentDate'} : $dtFrom;
+
         $title = $Data->{'lang'}->txt('Transfer') . " - $LocalName";;
         $templateFile = 'workflow/view/transfer.templ';
 
@@ -2371,8 +2391,8 @@ sub populateRegoViewData {
         #print STDERR Dumper $personRequestData;
         $TemplateData{'TransferDetails'}{'TransferTo'} = $personRequestData->{'requestFrom'} || '';
         $TemplateData{'TransferDetails'}{'TransferFrom'} = $personRequestData->{'requestTo'} || '';
-        $TemplateData{'TransferDetails'}{'RegistrationDateFrom'} = '';
-        $TemplateData{'TransferDetails'}{'RegistrationDateTo'} = '';
+        $TemplateData{'TransferDetails'}{'RegistrationDateFrom'} = $dtFrom;
+        $TemplateData{'TransferDetails'}{'RegistrationDateTo'} = $dtTo;
         $TemplateData{'TransferDetails'}{'Summary'} = $personRequestData->{'strRequestNotes'} || '';
     }
     else {
@@ -2990,9 +3010,20 @@ sub viewSummaryPage {
 
                 my ($PaymentsData) = populateRegoPaymentsViewData($Data, $task);
         
+                my ($nationalPeriodID, $dtFrom, $dtTo) = getNationalReportingPeriod(
+                    $Data->{db},
+                    $Data->{'Realm'},
+                    $Data->{'RealmSubType'},
+                    '',
+                    '',
+                    'TRANSFER'
+                );
+
                 $TemplateData{'TransferDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
                 $TemplateData{'TransferDetails'}{'TransferTo'} = $request->{'requestFrom'};
                 $TemplateData{'TransferDetails'}{'TransferFrom'} = $request->{'requestTo'};
+                $TemplateData{'TransferDetails'}{'DateFrom'} = $task->{'TdtFrom'};
+                $TemplateData{'TransferDetails'}{'DateTo'} = $dtTo;
                 $TemplateData{'TransferDetails'}{'Summary'} = $request->{'strRequestNotes'};
                 $TemplateData{'TransferDetails'}{'Fee'} = $PaymentsData->{'TXNs'}[0]{'Amount'};
                 
