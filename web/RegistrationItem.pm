@@ -54,6 +54,8 @@ sub getRegistrationItems    {
         AND RI.strItemType = ? 
         AND (RI.strISOCountry_IN ='' OR RI.strISOCountry_IN IS NULL OR RI.strISOCountry_IN LIKE CONCAT('%|',?,'|%'))
         AND (RI.strISOCountry_NOTIN ='' OR RI.strISOCountry_NOTIN IS NULL OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))        
+        AND (RI.intFilterFromAge = 0 OR RI.intFilterFromAge <= ?)
+        AND (RI.intFilterToAge = 0 OR RI.intFilterToAge >= ?)
       ]; 
 
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
@@ -73,12 +75,31 @@ sub getRegistrationItems    {
 	        $itemType, 
 	        $Rego_ref->{'Nationality'} || '',
 	        $Rego_ref->{'Nationality'} || '',
+	        $Rego_ref->{'currentAge'} || 0,
+	        $Rego_ref->{'currentAge'} || 0,
 	        
 		) or query_error($st);
-    
-    
-	
-
+   open FH, ">>dumpfile.txt";
+	print FH "\n\n\n--------------------------------------------------------\n
+    registrationitem:
+	\n
+	$Data->{'Realm'}, 
+	        $Data->{'RealmSubType'}, 
+	        strRuleFor = $ruleFor,
+	        intOriginLevel = $originLevel,
+		    regNature = $regNature,
+	        strEntityType = $Rego_ref->{'strEntityType'} || $Rego_ref->{'entityType'} || '',
+	        intEntityLevel = $entityLevel,
+		    strPersonType = $Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '',
+		    strPersonLevel = $Rego_ref->{'strPersonLevel'} || $Rego_ref->{'personLevel'} || '',
+		    strPersonEntityRole = $Rego_ref->{'strPersonEntityRole'} || $Rego_ref->{'personEntityRole'} || '',
+		    strSport = $Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '',
+		    strAgeLevel = $Rego_ref->{'strAgeLevel'} || $Rego_ref->{'ageLevel'} || '',
+	        itemType = $itemType, 
+	        Nationality = $Rego_ref->{'Nationality'} || '',
+	        Nationality = $Rego_ref->{'Nationality'} || '',
+	\n-------------------------------------------------------------------------\n
+	";
     my @values = (); 
     push @values, $Data->{'Realm'};  
     push @values,$Data->{'RealmSubType'}; 
@@ -117,7 +138,7 @@ sub getRegistrationItems    {
         }
     
         if ($itemType eq 'PRODUCT') {
-            $Item{'Name'} = $dref->{'strProductName'} . $st;
+            $Item{'Name'} = $dref->{'strProductName'};
             $Item{'ProductPrice'} = getItemCost($Data, $entityID, $entityLevel, $multiPersonType, $dref->{'intID'}) || 0;
             
         }

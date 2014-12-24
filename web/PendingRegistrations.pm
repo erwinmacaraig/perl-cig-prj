@@ -92,7 +92,6 @@ sub listPendingRegistrations    {
             )
             LEFT JOIN tblEntityTypeRoles as er ON (
                 er.strEntityRoleKey = pr.strPersonEntityRole
-                and er.strSport = pr.strSport
                 and er.strPersonType = pr.strPersonType
             )
             INNER JOIN tblPerson as p ON (
@@ -143,15 +142,14 @@ sub listPendingRegistrations    {
         }
         push @rowdata, {
             id => $dref->{'intPersonRegistrationID'} || 0,
-            dtAdded=> $dref->{'dtAdded_formatted'} || '',
+            dtAdded=> $Data->{'l10n'}{'date'}->TZformat($dref->{'dtAdded'}|| '' , 'MEDIUM','SHORT'),
             PersonLevel=> $Defs::personLevel{$dref->{'strPersonLevel'}} || '',
-            PersonEntityRole=> $dref->{'strEntityRoleName'} || '',
             PersonType=> $Defs::personType{$dref->{'strPersonType'}} || '',
             AgeLevel=> $Defs::ageLevel{$dref->{'strAgeLevel'}} || '',
             RegistrationNature=> $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '',
             #Status=> $Defs::wfTaskStatus{$dref->{'strStatus'}} || '',
             Status=> $Defs::personRegoStatus{$dref->{'displayStatus'}} || '',
-            PersonEntityRole=> $dref->{'strPersonEntityRole'} || '',
+            PersonEntityRole=> $dref->{'strEntityRoleName'} || $dref->{'strPersonEntityRole'} || '',
             Sport=> $Defs::sportType{$dref->{'strSport'}} || '',
             LocalName=>$localname,
             LatinName=>$name,
@@ -180,11 +178,7 @@ sub listPendingRegistrations    {
 
     my @headers = (
         {
-            type  => 'Selector',
-            field => 'SelectLink',
-        },
-        {
-            name  => $Data->{'lang'}->txt('Registration Type'),
+            name  => $Data->{'lang'}->txt('Type'),
             field => 'RegistrationNature',
             width  => 60,
         },
@@ -228,14 +222,19 @@ sub listPendingRegistrations    {
         #    width  => 50,
         #},
         {
-            name  => $Data->{'lang'}->txt('Task Assigned To'),
+            name  => $Data->{'lang'}->txt('Assigned To'),
             field => 'TaskTo',
             width  => 70,
         },
         {
-            name  => $Data->{'lang'}->txt('Date Registration Added'),
+            name  => $Data->{'lang'}->txt('Added'),
             field => 'dtAdded',
             width  => 50,
+        },
+        {
+            type  => 'Selector',
+            field => 'SelectLink',
+            width  => 100,
         },
     );
 
@@ -302,10 +301,6 @@ sub listPendingRegistrations    {
 
     my @entityheadersgrid = (
         {
-            type  => 'Selector',
-            field => 'SelectLink',
-        },
-        {
             name  => $Data->{'lang'}->txt('Name'),
             field => 'strLocalName',
             width  => 60,
@@ -313,11 +308,17 @@ sub listPendingRegistrations    {
         {
             name  => $Data->{'lang'}->txt('Level'),
             field => 'EntityLevel',
+            width  => 60,
         },
         {
             name   => $Data->{'lang'}->txt('Status'),
             #field  => 'strStatus',
             field  => 'displayStatus',
+            width  => 30,
+        },
+        {
+            type  => 'Selector',
+            field => 'SelectLink',
             width  => 30,
         },
        
@@ -328,18 +329,19 @@ sub listPendingRegistrations    {
     # class="grid-filter-wrap"
     my $resultHTML = '';
     if(@rowdata){
-        $title = $lang->txt('Pending Registrations');
+        #$title = $lang->txt('Pending Registrations');
         my $grid = showGrid(
             Data    => $Data,
             columns => \@headers,
             rowdata => \@rowdata,
             gridid  => 'grid',
-            width   => '99%',
+            width   => '100%',
             filters => $filterfields,
         ); 
-        $resultHTML .=  qq[<div class="grid-filter-wrap">
-            <div style="width:99%;">$rectype_options</div>
-            $grid             
+        $resultHTML .=  qq[
+            <div style="clear:both">&nbsp;</div>
+            <div class="clearfix">
+                    $grid             
             </div>
         ];
     }
@@ -349,22 +351,20 @@ sub listPendingRegistrations    {
         columns => \@entityheadersgrid,
         rowdata => \@fielddata,   
         gridid  => 'grid2',     
-        width   => '99%',
+        width   => '100%',
         
         );
         $resultHTML .= qq[
-            <div style="clear:both"></div>
-            <div class="pageHeading">Pending Entity Registrations</div>
-            <div class="grid-filter-wrap">
-                $grid2          
-            </div> 
+            <div style="clear:both">&nbsp;</div>
+            <div class="clearfix">
+                    $grid2          
+            </div>
         ];
     }
     if(! @rowdata and ! @fielddata){
     	$resultHTML = 'No Pending Registrations';
     }
-  
-
+    $title = $Data->{'lang'}->txt('Pending Registrations');
            
     return ($resultHTML,$title);
 }

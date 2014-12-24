@@ -27,36 +27,36 @@
 
             [% IF PersonDetails.DOB %]
                 <span class="details-row">
-                  <span class="details-left">Date of Birth:</span>
-                  <span class="details-left">[% PersonDetails.DOB %]</span>
+                  <span class="details-left">[% Lang.txt('Date of Birth') %]:</span>
+                  <span class="details-left">[% DateFormat.formt(PersonDetails.DOB,'MEDIUM') %]</span>
                 </span>
             [% END %]
 
             [% IF PersonDetails.Nationality %]
                 <span class="details-row">
-                  <span class="details-left">Nationality:</span>
+                  <span class="details-left">[% Lang.txt('Nationality') %]:</span>
                   <span class="details-left">[% PersonDetails.Nationality %]</span>
                 </span>
             [% END %]
 
             [% IF PersonDetails.Address %]
                 <span class="details-row">
-                  <span class="details-left">Address:</span>
+                  <span class="details-left">[% Lang.txt('Address') %]:</span>
                   <span class="details-left">[% PersonDetails.Address %]</span>
                 </span>
             [% END %]
 
             [% IF PersonDetails.DateSuspendedUntil != '' %]
                 <span class="details-row">
-                  <span class="details-left">Suspended Until:</span>
-                  <span class="details-left">[% PersonDetails.DateSuspendedUntil %]</span>
+                  <span class="details-left">[% Lang.txt('Suspended Until') %]:</span>
+                  <span class="details-left">[% DateFormat.formt(PersonDetails.DateSuspendedUntil,'MEDIUM') %]</span>
                 </span>
             [% END %]
 
             [% IF PersonDetails.LastUpdate %]
                 <span class="details-row">
-                  <span class="details-left">Last Update:</span>
-                  <span class="details-left">[% PersonDetails.LastUpdate %]</span>
+                  <span class="details-left">[% Lang.txt('Last Update') %]:</span>
+                  <span class="details-left">[% DateFormat.TZformat(PersonDetails.LastUpdate,'MEDIUM','MEDIUM) %]</span>
                 </span>
             [% END %]
 
@@ -64,7 +64,7 @@
 
             [% IF PersonDetails.Status %]
                 <span class="details-row">
-                  <span class="details-left">Status:</span>
+                  <span class="details-left">[% Lang.txt('Status') %]:</span>
                   <span class="details-left">[% PersonDetails.Status %]</span>
                 </span>
             [% END %]
@@ -90,15 +90,15 @@
     <div class="task-actions">
 
         [% IF TaskAction.showApprove %]
-        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Approve') %]</a></span>
+        <a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]" class = "btn-main">[% Lang.txt('Approve') %]</a>
         [% END %]
 
         [% IF TaskAction.showReject %]
-        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Reject&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Reject') %]</a></span>
+        <a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Reject&TID=[% TaskAction.WFTaskID %]" class = "btn-main">[% Lang.txt('Reject') %]</a>
         [% END %]
 
         [% IF TaskAction.showResolve %]
-        <span class = "button-medium generic-button"><a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Resolve&TID=[% TaskAction.WFTaskID %]">[% Lang.txt('Resolve') %]</a></span>
+        <a href = "main.cgi?client=[% TaskAction.client %]&a=WF_Resolve&TID=[% TaskAction.WFTaskID %]" class = "btn-main">[% Lang.txt('Resolve') %]</a>
         [% END %]
 
     </div>

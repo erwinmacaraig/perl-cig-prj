@@ -7,6 +7,9 @@
 .inline li { display: inline-block; }
 .lblPeoplelookup { position:relative;left:20px; }
 .btnPeoplelookupSearch { position:relative;right:-62px; }
+.footer-section { height: 70px; }
+.paddingTop8 { padding-top: 8px; }
+.paddingBottom8 { padding-bottom: 8px; }
 
 
 .form-signin input[type="text"] {
@@ -73,18 +76,19 @@ span.notice-error {
   color: #c4070a;
 }
 
-.toggle-type a {
+.toggle-type a, .toggle-type a:visited {
   background: #d8d8d8;
   border: 1px solid #cccccc;
   font-size: 14px;
-  padding: 8px 30px;
+  padding: 8px 20px;
   color: #000;
   float: left;
 }
 
-.toggle-type a:hover {
+.toggle-type a:hover, .toggle-type a:active {
   text-decoration: none;
   background: #045485;
+  color:#fff;
 }
 
 .toggle-type a.active {
@@ -102,6 +106,13 @@ li.peoplelookup input[type="text"] {
   width: 300px;
 }
 
+.totalFont {
+   text-align: right;
+}
+.totalValue {
+    font-size: 16px !important;
+}
+
 
 
 /***** BOOTSTRAP STYLES *****/
@@ -113,6 +124,9 @@ li.peoplelookup input[type="text"] {
 .form-signin .form-signin-heading,
 .form-signin .checkbox {
   margin-bottom: 10px;
+}
+.form-signin-heading {
+  text-align: center;
 }
 .form-signin .checkbox {
   font-weight: normal;
@@ -169,3 +183,9 @@ hr {
   border: 0;
   border-top: 1px solid #E2E1E2;
 }
+
+div .dataTables_paginate {
+    padding-top:8px;
+    text-align:center;
+}
+

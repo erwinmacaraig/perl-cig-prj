@@ -9,20 +9,12 @@
         [% END %]
     [% END %]
 
-    <input type="submit" name="submit" class="button-small generic-button" value="Submit">
+    <input type="submit" name="submit" class="btn-inside-panels" value="Submit">
 
 	<!--<div class="row">-->
 		<div class="col-md-3">
-			<h3 class="panel-header">Member ID:</h3>
-			<div class="panel-body">
-				<div class="container-link"><a href="#" title="Upload Profile Image">+ Upload Profile Image</a></div>
-				<p class="reg-text">Lim</p>
-				<p class="reg-text">Ka Shern</p>
-				<p class="reg-text">Male</p>
-				<p class="reg-text">1 June 1990</p>
-				<p class="reg-text">Chinese</p>
-			</div>
-			<div class="transfer-pending">Transfer pending: Accepted</div>
+            [% PersonSummaryPanel %]
+			<div class="transfer-pending">Transfer Status: Accepted</div>
 		</div>
 		<div class="col-md-9">
 			<h3 class="panel-header">Lim Ka Shern</h3>
@@ -31,14 +23,12 @@
 				<div class="row top-bottom-spacer">
 				<div class="col-md-3"></div>
 				<div class="col-md-9">
-				<p>What would you like to do now?</p>
-				<p>
-					<a href="#" title="" class="btn-main">Transfer another player</a>
-					<a href="#" title="" class="btn-main">Go to your dashboard</a>
-				</p>
 				</div>
 				</div>
 			</div>
+            <div class = "button-row">
+                <a href="#" title="" class="btn-main pull-right">Go to your dashboard</a>
+            </div>
 		</div>
 	<!-</div>-->
 

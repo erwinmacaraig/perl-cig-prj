@@ -3,6 +3,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = @EXPORT_OK = qw(
     displayRegoFlowSummary
+    displayRegoFlowSummaryBulk
     displayRegoFlowComplete
     displayRegoFlowCompleteBulk
     displayRegoFlowCheckout
@@ -41,6 +42,9 @@ use PlayerPassport;
 use RegoAgeRestrictions;
 use DisplayPayResult;
 use InstanceOf;
+use EntityTypeRoles;
+use PersonSummaryPanel;
+use PersonCertifications;
 
 sub displayRegoFlowCompleteBulk {
 
@@ -77,18 +81,84 @@ sub displayRegoFlowCompleteBulk {
     return $body;
 }
 
+sub displayRegoFlowSummaryBulk  {
 
+    my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref, $carryString) = @_;
+    my $lang=$Data->{'lang'};
+	
+    my $body = '';
+
+    my @products= split /:/, $hidden_ref->{'prodIds'};
+    foreach my $prod (@products){ $hidden_ref->{"prod_$prod"} =1;}
+    my @productQty= split /:/, $hidden_ref->{'prodQty'};
+    foreach my $prodQty (@productQty){ 
+        my ($prodID, $qty) = split /-/, $prodQty;
+        $hidden_ref->{"prodQTY_$prodID"} =$qty;
+    }
+    #($hidden_ref->{'txnIds'}, undef) = save_rego_products($Data, $regoID, $personID, $entityID, $rego_ref->{'entityLevel'}, $rego_ref, $hidden_ref); #\%params);
+
+    my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
+    my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
+    my $gateways = '';
+    my $txnCount = 0;
+    my $logIDs;
+    my $txn_invoice_url = $Defs::base_url."/printinvoice.cgi?client=$client&amp;rID=$hidden_ref->{'rID'}&amp;pID=$personID";
+    ($txnCount, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
+     if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
+        $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
+     }
+     
+      
+    my $personObj = getInstanceOf($Data, 'person');
+    my $c = Countries::getISOCountriesHash();
+    
+    my $languages = PersonLanguages::getPersonLanguages( $Data, 1, 0);
+    #for my $l ( @{$languages} ) {
+    #    if($l->{intLanguageID} == $personObj->getValue('intLocalLanguage')){
+    #        $personData{'Language'} = $l->{'language'};			
+    #        last;	
+    #    }
+    #}
+    my $role_ref = getEntityTypeRoles($Data, $rego_ref->{'strSport'}, $rego_ref->{'strPersonType'});
+    $rego_ref->{'roleName'} = $role_ref->{$rego_ref->{'strPersonEntityRole'}};
+
+    my $editlink =  $Data->{'target'}."?".$carryString;
+    my %PageData = (
+        person_home_url => $url,
+        registration => $rego_ref,
+        gateways => $gateways,
+        txnCount => $txnCount,
+        target => $Data->{'target'},
+        RegoStatus => $rego_ref->{'strStatus'},
+        hidden_ref=> $hidden_ref,
+        Lang => $Data->{'lang'},
+        client=>$client,
+        editlink => $editlink,
+    );
+    
+    $body = runTemplate($Data, \%PageData, 'registration/summarybulk.templ') || '';
+    my $logID = param('tl') || 0;
+    $logIDs->{$logID}=1;
+    foreach my $id (keys %{$logIDs}) {
+        next if ! $id;
+   #     $body .= displayPayResult($Data, $id);
+        $body .= displayPaymentResult($Data, $id, 1, '');
+    }
+
+    return $body;
+}
 sub displayRegoFlowSummary {
 
-    my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref) = @_;
+    my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref, $carryString) = @_;
     my $lang=$Data->{'lang'};
-
+	
     my $ok = 0;
-    if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER') {
+    if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER' or $rego_ref->{'registrationNature'} eq 'TRANSFER') {
         $ok=1;
     }
     else    {
-        $ok = checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
+print STDERR Dumper($rego_ref);
+        $ok = checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'strSport'}, $rego_ref->{'strPersonType'}, $rego_ref->{'strPersonEntityRole'}, $rego_ref->{'strPersonLevel'}, $rego_ref->{'strAgeLevel'});
     }
     my $body = '';
     if (!$ok)   {
@@ -126,15 +196,16 @@ sub displayRegoFlowSummary {
          
           
 	    my $personObj = getInstanceOf($Data, 'person');
-		
+		my $c = Countries::getISOCountriesHash();
 		
 		my %personData = ();
 		$personData{'Name'} = $personObj->getValue('strLocalFirstname');
         $personData{'Familyname'} = $personObj->getValue('strLocalSurname');
+        $personData{'Maidenname'} = $personObj->getValue('strMaidenName');
 		$personData{'DOB'} = $personObj->getValue('dtDOB');
 		$personData{'Gender'} = $Data->{'lang'}->txt($Defs::genderInfo{$personObj->getValue('intGender') || 0}) || '';
-		$personData{'Nationality'} = $personObj->getValue('strISONationality');
-		$personData{'Country'} = $personObj->getValue('strISOCountryOfBirth') || '';
+		$personData{'Nationality'} = $c->{$personObj->getValue('strISONationality')};
+		$personData{'Country'} = $c->{$personObj->getValue('strISOCountryOfBirth')} || '';
 		$personData{'Region'} = $personObj->getValue('strRegionOfBirth') || '';
 
 		$personData{'Addressone'} = $personObj->getValue('strAddress1') || '';
@@ -143,11 +214,10 @@ sub displayRegoFlowSummary {
 		$personData{'State'} = $personObj->getValue('strState') || '';
 		$personData{'Postal'} = $personObj->getValue('strPostalCode') || '';
 		$personData{'Phone'} = $personObj->getValue('strPhoneHome') || '';
-		$personData{'Countryaddress'} = $personObj->getValue('strISOCountry') || '';
+		$personData{'Countryaddress'} = $c->{$personObj->getValue('strISOCountry')} || '';
 		$personData{'Email'} = $personObj->getValue('strEmail') || '';
 		
 		#$personData{''} = $personObj->getValue('') || '';
-
 
  		my $languages = PersonLanguages::getPersonLanguages( $Data, 1, 0);
 		for my $l ( @{$languages} ) {
@@ -156,11 +226,101 @@ sub displayRegoFlowSummary {
 				last;	
 			}
 		}
+        my $role_ref = getEntityTypeRoles($Data, $rego_ref->{'strSport'}, $rego_ref->{'strPersonType'});
+        $rego_ref->{'roleName'} = $role_ref->{$rego_ref->{'strPersonEntityRole'}};
+		####################################################
+
+		my %existingDocuments;
+		my $query = qq[
+		SELECT
+        tblDocuments.intDocumentTypeID as ID,  
+        tblUploadedFiles.strOrigFilename,
+        tblUploadedFiles.intFileID,
+        tblDocumentType.strDocumentName as Name
+        FROM tblDocuments
+        INNER JOIN tblDocumentType
+            ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
+        INNER JOIN tblRegistrationItem 
+            ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
+        INNER JOIN tblUploadedFiles
+            ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID 
+        AND tblDocuments.intPersonID = ?
+        AND tblDocuments.intPersonRegistrationID = ?
+        AND tblRegistrationItem.intRealmID = ?
+        AND tblRegistrationItem.strItemType='DOCUMENT'
+        ORDER BY tblDocuments.intDocumentID DESC
+		];
 	
+
+		my $sth = $Data->{'db'}->prepare($query);
+		$sth->execute($personID,$regoID, $Data->{'Realm'});
+		 while(my $dref = $sth->fetchrow_hashref()){		
+            if(! exists $existingDocuments{$dref->{'ID'}}){
+                $existingDocuments{$dref->{'ID'}} = $dref;
+            }
+		} 
+## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
+	$query = qq[
+        SELECT
+            tblDocuments.intDocumentTypeID as ID,
+            tblUploadedFiles.strOrigFilename,
+            tblUploadedFiles.intFileID,
+            tblDocumentType.strDocumentName as Name
+        FROM tblDocuments
+            INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID)
+        INNER JOIN tblRegistrationItem ON (tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID)
+        INNER JOIN tblUploadedFiles ON (tblUploadedFiles.intFileID = tblDocuments.intUploadFileID )
+        WHERE 
+            strApprovalStatus IN ('APPROVED', 'PENDING')
+            AND intPersonID = ?
+            AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+            AND tblRegistrationItem.intRealmID=?
+            AND tblRegistrationItem.strItemType='DOCUMENT'
+        ORDER BY tblDocuments.intDocumentID DESC
+    ];
+
+     #AND tblRegistrationItem.strPersonType IN ('', ?)
+     #AND tblRegistrationItem.strRegistrationNature IN ('', ?)
+     #AND tblRegistrationItem.strAgeLevel IN ('', ?)
+     #AND tblRegistrationItem.strPersonLevel IN ('', ?)
+     #AND tblRegistrationItem.intOriginLevel = ?
+     #AND tblRegistrationItem.intEntityLevel = ? ##### PUT INT
+
+
+    my $certifications = getPersonCertifications(
+        $Data,
+        $personID,
+        $rego_ref->{'strPersonType'},
+        0
+    );
+     # $rego_ref->{'strPersonType'} || '',
+     # $rego_ref->{'strRegistrationNature'} || '',
+     # $rego_ref->{'strAgeLevel'} || '',
+     # $rego_ref->{'strPersonLevel'} || '',
+     # $rego_ref->{'intOriginLevel'},
+     # $rego_ref->{'intEntityLevel'},
+
+    my @certString;
+    foreach my $cert (@{$certifications}) {
+        push @certString, $cert->{'strCertificationName'};
+    }
+
+
+$sth = $Data->{'db'}->prepare($query);
+		$sth->execute($personID,$Data->{'Realm'});
+		 while(my $dref = $sth->fetchrow_hashref()){		
+            if(! exists $existingDocuments{$dref->{'ID'}}){
+                $existingDocuments{$dref->{'ID'}} = $dref;
+            }
+		} 
+
+		################################################
+        my $editlink =  $Data->{'target'}."?".$carryString;
         my %PageData = (
             person_home_url => $url,
 			person => \%personData,
 			registration => $rego_ref,
+			alldocs => \%existingDocuments,
             gateways => $gateways,
 			txnCount => $txnCount,
             target => $Data->{'target'},
@@ -168,6 +328,8 @@ sub displayRegoFlowSummary {
             hidden_ref=> $hidden_ref,
             Lang => $Data->{'lang'},
             client=>$client,
+            editlink => $editlink,
+            certifications => join(', ', @certString),
         );
         
         $body = runTemplate($Data, \%PageData, 'registration/summary.templ') || '';
@@ -179,6 +341,7 @@ sub displayRegoFlowSummary {
             $body .= displayPaymentResult($Data, $id, 1, '');
         }
     }
+	
     return $body;
 }
     
@@ -190,11 +353,11 @@ sub displayRegoFlowComplete {
     my $ok = 0;
     my $run = $hidden_ref->{'run'} || param('run') || 0;
 print STDERR "COMPLETE RUN" . $run;
-    if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER') {
+    if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER' or $rego_ref->{'registrationNature'} eq 'TRANSFER') {
         $ok=1;
     }
     else    {
-        $ok = $run ? 1 : checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
+        $ok = $run ? 1 : checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'strSport'}, $rego_ref->{'strPersonType'}, $rego_ref->{'strPersonEntityRole'}, $rego_ref->{'strPersonLevel'}, $rego_ref->{'strAgeLevel'});
     }
 print STDERR "000OK IS $ok | $run\n\n";
     my $body = '';
@@ -244,19 +407,19 @@ print STDERR "000OK IS $ok | $run\n\n";
          
        
 	    my $personObj = getInstanceOf($Data, 'person');
-
-		my $query = qq[SELECT strLocalName FROM tblEntity WHERE intEntityID = $rego_ref->{'intRealmID'}];
-		my $sth = $Data->{'db'}->prepare($query);
-		$sth->execute();
-		my @arr = $sth->fetchrow_array();
-		
+	    my $maObj = getInstanceOf($Data, 'national');
+        my $maName = $maObj
+            ? $maObj->name()
+            : '';
 		
 		my %personData = ();
+        my $c = Countries::getISOCountriesHash();
+
 		$personData{'Name'} = $personObj->getValue('strLocalFirstname');
         $personData{'Familyname'} = $personObj->getValue('strLocalSurname');
 		$personData{'DOB'} = $personObj->getValue('dtDOB');
 		$personData{'Gender'} = $Data->{'lang'}->txt($Defs::genderInfo{$personObj->getValue('intGender') || 0}) || '';
-		$personData{'Nationality'} = $personObj->getValue('strISONationality');
+		$personData{'Nationality'} = $c->{$personObj->getValue('strISONationality')};
 		$personData{'Country'} = $personObj->getValue('strISOCountryOfBirth') || '';
 		$personData{'Region'} = $personObj->getValue('strRegionOfBirth') || '';
 
@@ -268,11 +431,12 @@ print STDERR "000OK IS $ok | $run\n\n";
 		$personData{'Phone'} = $personObj->getValue('strPhoneHome') || '';
 		$personData{'Countryaddress'} = $personObj->getValue('strISOCountry') || '';
 		$personData{'Email'} = $personObj->getValue('strEmail') || '';
-		$rego_ref->{'MA'} = $arr[0];
+		$rego_ref->{'MA'} = $maName || '';
 		
 		#$personData{''} = $personObj->getValue('') || '';
 
-
+		
+	
  		my $languages = PersonLanguages::getPersonLanguages( $Data, 1, 0);
 		for my $l ( @{$languages} ) {
 			if($l->{intLanguageID} == $personObj->getValue('intLocalLanguage')){
@@ -288,6 +452,13 @@ print STDERR "000OK IS $ok | $run\n\n";
        $cv{'currentLevel'} = $Defs::LEVEL_CLUB;
        my $clm = setClient(\%cv);
 
+
+       $cv{'entityID'} = $maObj->getValue('intEntityID');
+       $cv{'currentLevel'} = $Defs::LEVEL_NATIONAL;
+       my $mlm = setClient(\%cv);
+
+		
+
         my %PageData = (
             person_home_url => $url,
 			person => \%personData,
@@ -299,10 +470,20 @@ print STDERR "000OK IS $ok | $run\n\n";
             hidden_ref=> $hidden_ref,
             Lang => $Data->{'lang'},
             url => $Defs::base_url,
+            dtype => $hidden_ref->{'dtype'} || '',
+            dtypeText => $Defs::personType{$hidden_ref->{'dtype'}} || '',
             client=>$clm,
+            maclient => $mlm,
+            originLevel => $originLevel,
+            PersonSummaryPanel => personSummaryPanel($Data, $personObj->ID()),
         );
         
-        $body = runTemplate($Data, \%PageData, 'registration/complete.templ') || '';
+        if($rego_ref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER) {
+            $body = runTemplate($Data, \%PageData, 'personrequest/transfer/complete.templ') || '';
+        }
+        else {
+            $body = runTemplate($Data, \%PageData, 'registration/complete.templ') || '';
+        }
         my $logID = param('tl') || 0;
         $logIDs->{$logID}=1;
         foreach my $id (keys %{$logIDs}) {
@@ -397,7 +578,7 @@ sub displayRegoFlowCertificates{
 		
 	my @certificates = ();
 	#SQL QUERY FOR THE DROPDOWN BOX FOR 
-	my $query = qq[SELECT intCertificationTypeID, strCertificationName FROM tblCertificationTypes WHERE strCertificationtype = ? AND intRealmID = ?];
+	my $query = qq[SELECT intCertificationTypeID, strCertificationName FROM tblCertificationTypes WHERE strCertificationtype = ? AND intRealmID = ? ORDER BY intDisplayOrder, strCertificationName];
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute($rego_ref->{'personType'},$Data->{'Realm'});
 	while(my $dref = $sth->fetchrow_hashref()){
@@ -441,33 +622,69 @@ sub checkUploadedRegoDocuments {
         0,
         $rego_ref,
      );
+
+	#check for Approved Documents that do not need to be uploaded
+	my @validdocsforallrego = ();
+## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
+	my $query = qq[
+            SELECT 
+                tblDocuments.intDocumentTypeID 
+            FROM 
+                tblDocuments INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID)
+                INNER JOIN tblRegistrationItem ON (tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID)
+			WHERE 
+                strApprovalStatus IN ('PENDING','APPROVED') 
+                AND intPersonID = ? 
+                AND tblRegistrationItem.intRealmID=? 
+                AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+                AND tblRegistrationItem.strItemType='DOCUMENT'
+			GROUP BY intDocumentTypeID];
+
+          #AND tblRegistrationItem.strPersonType IN ('', ?)
+          #AND tblRegistrationItem.strRegistrationNature IN ('', ?)
+          #AND tblRegistrationItem.strAgeLevel IN ('', ?)
+          #AND tblRegistrationItem.strPersonLevel IN ('', ?)
+          #AND tblRegistrationItem.intOriginLevel = ?
+          #AND tblRegistrationItem.intEntityLevel = ?
+
+	#open FH, ">dumpfile.txt";
+	#print FH "\n\nQuery: \n$query \n personID = $personID \n\n";
+	my $sth = $Data->{'db'}->prepare($query);
+	$sth->execute($personID, $Data->{'Realm'});
+
+     # $rego_ref->{'strPersonType'} || '',
+     # $rego_ref->{'strRegistrationNature'} || '',
+     # $rego_ref->{'strAgeLevel'} || '',
+     # $rego_ref->{'strPersonLevel'} || '',
+     # $rego_ref->{'intOriginLevel'},
+     # $rego_ref->{'intEntityLevel'},
+	while(my $dref = $sth->fetchrow_hashref()){
+		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
+	}
+	#end
 	
 	my @required = ();
     foreach my $dc (@{$documents}){ 
+		#next if(!$dc);
 		next if(!$rego_ref->{'InternationalTransfer'} && $dc->{'DocumentFor'} eq 'TRANSFERITC');	#will only be included when there is an ITC
+        next if( grep /$dc->{'ID'}/,@validdocsforallrego);
 		if( $dc->{'Required'} ) {
 			push @required,$dc;
 		}		
 	}
-	my $total = @required;
-	#my @required_docs = ();
-    #while(my $dref = $sth->fetchrow_hashref()){
-	#	push @required_docs, $dref->{'intDocumentTypeID'};
-	#}
-    return ('',1) if(!$total);
+	my $total = scalar @required;
+	
+    return ('',1) if(!$total); # no required documents
 
-    #my $total_items = $dref->{'items'};     
-    #return 1 if($total_items == 0);
-    #there are no required documents to be uploaded
-
-   my $query = qq[SELECT distinct(strDocumentName) FROM tblDocuments INNER JOIN tblDocumentType
-					ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID 
-					INNER JOIN tblRegistrationItem ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID WHERE
-					tblDocuments.intPersonID = ? AND tblDocuments.intPersonRegistrationID = ? AND tblRegistrationItem.intRequired = 1];
+     $query = qq[SELECT distinct(strDocumentName) FROM tblDocuments INNER JOIN tblDocumentType
+                                        ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
+                                        INNER JOIN tblRegistrationItem ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID WHERE
+                                        tblDocuments.intPersonID = ? AND tblDocuments.intPersonRegistrationID = ? AND tblRegistrationItem.intRequired = 1 AND tblRegistrationItem.intRealmID=? AND tblRegistrationItem.strItemType='DOCUMENT'];
     
+#print FH "\nGetting Uploaded Documents: \n $query \n personID = $personID, regoID = $regoID\n";
    my @uploaded_docs = ();
-   my $sth = $Data->{'db'}->prepare($query);
-    $sth->execute($personID, $regoID);
+    $sth = $Data->{'db'}->prepare($query);
+    $sth->execute($personID, $regoID, $Data->{'Realm'});
 	
 	while(my $dref = $sth->fetchrow_hashref()){
 		push @uploaded_docs,$dref->{'strDocumentName'};
@@ -475,9 +692,6 @@ sub checkUploadedRegoDocuments {
     
 	my @diff=();
 	
-
-    #return 1 if( ($dref->{'tot'} > 0) && $dref->{'tot'} == $total_items);
-	#return ('',1) if($#uploaded_docs == $total);   
 
 	#check for document not uploaded
 	foreach my $rdc (@required){		
@@ -515,29 +729,74 @@ sub displayRegoFlowDocuments{
         0,
         $rego_ref,
      );
+
+
 	my @docos = (); 
+
+    my %existingDocuments;
 	#check for uploaded documents present for a particular registration and person
-	my $query = qq[
-					SELECT distinct(tblDocuments.intDocumentTypeID), tblDocumentType.strDocumentName
-					FROM tblDocuments 
-						INNER JOIN tblDocumentType
-					ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
-					INNER JOIN tblRegistrationItem 
-					ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID
-					WHERE tblDocuments.intPersonID = ? AND intPersonRegistrationID = ?;	
-	];
+    #my $query = qq[
+	#				SELECT distinct(tblDocuments.intDocumentTypeID), tblDocumentType.strDocumentName
+	#				FROM tblDocuments 
+	#					INNER JOIN tblDocumentType
+	#				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
+	#				INNER JOIN tblRegistrationItem 
+	#				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID
+	#				WHERE tblDocuments.intPersonID = ? AND intPersonRegistrationID = ?;	
+	#];
    
+## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
+    my $query = qq [
+        SELECT
+            tblDocuments.intDocumentTypeID as ID,
+            tblRegistrationItem.intUseExistingThisEntity as UseExistingThisEntity,
+            tblRegistrationItem.intUseExistingAnyEntity as UseExistingAnyEntity,
+            tblUploadedFiles.strOrigFilename,
+            tblUploadedFiles.intFileID,
+            tblUploadedFiles.intAddedByTypeID as AddedByTypeID,
+            tblDocumentType.strDocumentName as Name,
+            tblDocumentType.strDescription as Description
+        FROM tblDocuments
+        INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID)
+        INNER JOIN tblRegistrationItem ON (tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID )
+        INNER JOIN tblUploadedFiles ON ( tblUploadedFiles.intFileID = tblDocuments.intUploadFileID )
+        WHERE
+            tblDocuments.intPersonID = ?
+            AND tblDocuments.intPersonRegistrationID = ?
+            AND tblRegistrationItem.intRealmID=?
+            AND tblRegistrationItem.strItemType='DOCUMENT'
+        ORDER BY tblDocuments.intDocumentID DESC
+    ];
+      #AND tblRegistrationItem.strPersonType IN ('', ?)
+      #AND tblRegistrationItem.strRegistrationNature IN ('', ?)
+      #AND tblRegistrationItem.strAgeLevel IN ('', ?)
+      #AND tblRegistrationItem.strPersonLevel IN ('', ?)
+      #AND tblRegistrationItem.intOriginLevel = ?
+      #AND tblRegistrationItem.intEntityLevel = ?
+
 	my $sth = $Data->{'db'}->prepare($query);
-	$sth->execute($personID,$regoID);
+	$sth->execute($personID,$regoID, $Data->{'Realm'});
+    # $rego_ref->{'strPersonType'} || '',
+    # $rego_ref->{'strRegistrationNature'} || '',
+    # $rego_ref->{'strAgeLevel'} || '',
+    # $rego_ref->{'strPersonLevel'} || '',
+    # $rego_ref->{'intOriginLevel'},
+    # $rego_ref->{'intEntityLevel'},
+
+
 	my @uploaded_docs = ();
 	while(my $dref = $sth->fetchrow_hashref()){		
-		push @uploaded_docs, $dref->{'intDocumentTypeID'};		
+        #push @uploaded_docs, $dref->{'intDocumentTypeID'};		
+        if(! exists $existingDocuments{$dref->{'ID'}}){
+            $existingDocuments{$dref->{'ID'}} = $dref;
+        }
 	}
 	
 	my @diff = ();	
-	open FH, ">dumpfile.txt";	
+
 	#compare whats in the system and what docos are missing both required and optional
-	foreach my $doc_ref (@{$documents}){	
+	foreach my $doc_ref (@{$documents}){
+		next if(!$doc_ref);	
 		next if(!$rego_ref->{'InternationalTransfer'} && $doc_ref->{'DocumentFor'} eq 'TRANSFERITC');	
 		if(!grep /$doc_ref->{'ID'}/,@uploaded_docs){
 			push @diff,$doc_ref;	
@@ -557,30 +816,76 @@ sub displayRegoFlowDocuments{
 	my @required_docs_listing = ();
 	my @optional_docs_listing = ();	
 	my @validdocsforallrego = ();
-	$query = qq[SELECT tblDocuments.intDocumentTypeID FROM tblDocuments INNER JOIN tblDocumentType
-				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
-				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
-				WHERE strApprovalStatus = 'APPROVED' AND intPersonID = ? AND 
-				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
-				GROUP BY intDocumentTypeID];
+## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
+	$query = qq[
+        SELECT
+            tblDocuments.intDocumentTypeID as ID,
+            tblRegistrationItem.intUseExistingThisEntity as UseExistingThisEntity,
+            tblRegistrationItem.intUseExistingAnyEntity as UseExistingAnyEntity,
+            tblUploadedFiles.strOrigFilename,
+            tblUploadedFiles.intFileID,
+            tblUploadedFiles.intAddedByTypeID as AddedByTypeID,
+            tblDocumentType.strDocumentName as Name,
+            tblDocumentType.strDescription as Description
+        FROM 
+            tblDocuments
+            INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID)
+            INNER JOIN tblRegistrationItem ON (tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID )
+            INNER JOIN tblUploadedFiles ON (tblUploadedFiles.intFileID = tblDocuments.intUploadFileID )
+        WHERE 
+            strApprovalStatus IN ('APPROVED', 'PENDING')
+            AND intPersonID = ?
+            AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+            AND tblRegistrationItem.intRealmID=?
+            AND tblRegistrationItem.strItemType='DOCUMENT'
+        ORDER BY tblDocuments.intDocumentID DESC
+    ];
+      #AND tblRegistrationItem.strPersonType IN ('', ?)
+      #AND tblRegistrationItem.strRegistrationNature IN ('', ?)
+      #AND tblRegistrationItem.strAgeLevel IN ('', ?)
+      #AND tblRegistrationItem.strPersonLevel IN ('', ?)
+      #AND tblRegistrationItem.intOriginLevel = ?
+
 	$sth = $Data->{'db'}->prepare($query);
-	$sth->execute($personID);
+	$sth->execute($personID, $Data->{'Realm'});
+    # $rego_ref->{'strPersonType'} || '',
+    # $rego_ref->{'strRegistrationNature'} || '',
+    # $rego_ref->{'strAgeLevel'} || '',
+    # $rego_ref->{'strPersonLevel'} || '',
+    # $rego_ref->{'intOriginLevel'},
+
 	while(my $dref = $sth->fetchrow_hashref()){
-		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
+        if(! exists $existingDocuments{$dref->{'ID'}}){
+            $existingDocuments{$dref->{'ID'}} = $dref;
+        }
 	}
 
 	foreach my $dc (@diff){   
 		if($dc->{'Required'}){
 			#check here 
-			next if( grep /$dc->{'ID'}/,@validdocsforallrego);
-			push @required_docs_listing, $dc;
+            #next if( grep /$dc->{'ID'}/,@validdocsforallrego);
+            if(defined $existingDocuments{$dc->{'ID'}}){
+			    push @required_docs_listing, $existingDocuments{$dc->{'ID'}};
+            }
+            else {
+			    push @required_docs_listing, $dc;
+            }
 		}  	
 		else {
-			push @optional_docs_listing,$dc;
+            if(defined $existingDocuments{$dc->{'ID'}}){
+			    push @optional_docs_listing, $existingDocuments{$dc->{'ID'}};
+            }
+            else {
+			    push @optional_docs_listing, $dc;
+            }
 		}
     	
     }
+
+   
     
+  my $cgi = new CGI;
+  my $currentURL = $cgi->url(-full => 1, query => 1);
   my %PageData = (
         nextaction => "PREGF_DU",
         target => $Data->{'target'},
@@ -591,8 +896,11 @@ sub displayRegoFlowDocuments{
         client => $client,
         regoID => $regoID,
         NoFormFields =>$noFormFields,
-  );  
- my $pagedata = runTemplate($Data, \%PageData, 'registration/document_flow_backend.templ') || '';
+		url => $Defs::base_url,
+		currentURL => $currentURL,
+		nature => $rego_ref->{'strRegistrationNature'},
+  );
+	my $pagedata = runTemplate($Data, \%PageData, 'registration/document_flow_backend.templ') || '';
 
     return $pagedata;
 }
@@ -603,6 +911,7 @@ sub displayRegoFlowProducts {
     my $lang=$Data->{'lang'};
 
     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_PU&amp;rID=$regoID";
+print STDERR "SSS: $entityRegisteringForLevel\n";
 #    my $pref = loadPersonDetails($Data->{'db'}, $personID);
  #   $rego_ref->{'Nationality'} = $pref->{'strISONationality'};
     my $CheckProducts = getRegistrationItems(
@@ -631,7 +940,10 @@ sub displayRegoFlowProducts {
     my $product_body='';
     if (@prodIDs)   {
         $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
-     }
+    }
+    else    {
+        return '';
+    }
 
      my %PageData = (
         nextaction=>"PREGF_PU",
@@ -675,15 +987,19 @@ sub displayRegoFlowProductsBulk {
     if (@prodIDs)   {
         $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
      }
+    else    {
+        return '';
+    }
 
      my %PageData = (
         nextaction=>"PREGFB_PU",
         target => $Data->{'target'},
         product_body => $product_body,
-        allowManualPay=> 1,
+        allowManualPay=> 0,
         manualPaymentTypes => \%Defs::manualPaymentTypes,
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
+        NoFormFields =>1,
         client=>$client,
     );
     my $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ') || '';
@@ -708,7 +1024,7 @@ sub generateRegoFlow_Gateways   {
         $paymentType = $pType;
         my $name = $gateway->{'gatewayName'};
         $gateway_body .= qq[
-            <input type="submit" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
+            <input type="submit" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "btn-main"><br><br>
         ];
     }
     $gateway_body = '' if ! $gatewayCount;

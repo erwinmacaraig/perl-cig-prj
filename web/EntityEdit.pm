@@ -115,7 +115,7 @@ sub handleEntityEdit {
         );
         my ($output, undef, $headJS, undef) = $obj->build($permissions,'edit',1);
         $body .= qq[
-            <form action = "$Data->{'target'}" method = "POST">
+            <form  id = "flowFormID" action = "$Data->{'target'}" method = "POST">
                 $output
                 $headJS
                 <div class="txtright">

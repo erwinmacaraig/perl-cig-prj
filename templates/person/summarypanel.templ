@@ -1,0 +1,15 @@
+[% USE Dumper %]
+<div class = "summaryPanel">
+<h3 class="panel-header">[% IF NationalNum %][% Lang.txt('Member ID') %]: [% NationalNum %][% ELSE %]&nbsp;[% END %]</h3>
+    <div class="panel-body">
+        <p class="reg-text">[% FamilyName %]</p>
+        <p class="reg-text">[% FirstName %]</p>
+        <p class="reg-text">[% gender %]</p>
+        <p class="reg-text">[% DateFormat.format(dob,'MEDIUM') %]</p>
+        <p class="reg-text">[% nationality %]</p>
+
+    </div>
+    [% FOREACH registration IN registrations %]
+        <div class="registration-active regoType_[% registration.1 %]">[% registration.0 %]</div>
+    [% END %]
+</div>

@@ -133,11 +133,11 @@
 	[% END %]
 	[% IF registerInto_currentSeason == 1 and !ReadOnlyLogin and !Details.isDeRegister %]
 		[% IF registerInto_currentSeason_URL_add %]
-			<span class = "button-small generic-button"><a href = "[% registerInto_currentSeason_URL_add %]">[% Lang.txt('Register') %]</a></span>
+			<span class = "btn-inside-panels"><a href = "[% registerInto_currentSeason_URL_add %]">[% Lang.txt('Register') %]</a></span>
 		[% ELSIF registerInto_currentSeason_URL_edit and currentSeason_MSID %]
-			<span class = "button-small generic-button"><a href = "[% registerInto_currentSeason_URL_edit %]">[% Lang.txt('Register') %]</a></span>
+			<span class = "btn-inside-panels"><a href = "[% registerInto_currentSeason_URL_edit %]">[% Lang.txt('Register') %]</a></span>
 		[% ELSIF registerInto_currentSeason_URL_edit %]
-			<span class = "button-small generic-button"><a href = "[% registerInto_currentSeason_URL_edit %]">[% Lang.txt('Edit Registration') %]</a></span>
+			<span class = "btn-inside-panels"><a href = "[% registerInto_currentSeason_URL_edit %]">[% Lang.txt('Edit Registration') %]</a></span>
 		[% END %]
 	[% END %]
 	</div>
@@ -183,11 +183,11 @@
 	[% END %]
 	[% IF registerInto_newRegoSeason == 1  and !ReadOnlyLogin and !Details.isDeRegister %]
 		[% IF registerInto_newRegoSeason_URL_add %]
-			<span class = "button-small generic-button"><a href = "[% registerInto_newRegoSeason_URL_add %]">[% Lang.txt('Register') %]</a></span>
+			<span class = "btn-inside-panels"><a href = "[% registerInto_newRegoSeason_URL_add %]">[% Lang.txt('Register') %]</a></span>
 		[% ELSIF registerInto_newRegoSeason_URL_edit and newRegoSeason_MSID %]
-			<span class = "button-small generic-button"><a href = "[% registerInto_currentSeason_URL_edit %]">[% Lang.txt('Register') %]</a></span>
+			<span class = "btn-inside-panels"><a href = "[% registerInto_currentSeason_URL_edit %]">[% Lang.txt('Register') %]</a></span>
 		[% ELSIF registerInto_newRegoSeason_URL_edit %]
-			<span class = "button-small generic-button"><a href = "[% registerInto_newRegoSeason_URL_edit %]">[% Lang.txt('Edit Registration') %]</a></span>
+			<span class = "btn-inside-panels"><a href = "[% registerInto_newRegoSeason_URL_edit %]">[% Lang.txt('Edit Registration') %]</a></span>
 		[% END %]
 	[% END %]
 	</div>

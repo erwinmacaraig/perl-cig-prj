@@ -29,6 +29,8 @@ CREATE TABLE tblRegistrationItem (
     intRequired TINYINT DEFAULT 0 COMMENT '0=Optional, 1 =Required',
     strISOCountry_IN varchar(200) DEFAULT NULL,
     strISOCountry_NOTIN varchar(200) DEFAULT NULL,
+    intFilterFromAge INT DEFAULT 0,
+    intFilterToAge INT DEFAULT 0,
     tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
 

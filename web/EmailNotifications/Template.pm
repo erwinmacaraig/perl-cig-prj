@@ -112,10 +112,11 @@ sub build {
 
     if(defined $config) {
         my $content = undef;
-        my $realmName = $config->{'strRealmName'} || 'generic';
+        #my $realmName = $config->{'strRealmName'} || 'generic';
+        my $realmID = $self->{_notificationObj}->getRealmID() || 'generic';
         my $replace = "__REALMNAME__";
         my $templatePath = (defined $config->{'strHTMLTemplatePath'} and $config->{'strHTMLTemplatePath'}) ? $config->{'strHTMLTemplatePath'} : $config->{'strTextTemplatePath'};
-        $templatePath =~ s/\Q$replace/\E$realmName/g;
+        $templatePath =~ s/\Q$replace/\E$realmID/g;
         my $templateFile = $templatePath . '/' . $config->{'strFileNamePrefix'} . '.templ';
 
         my %Data = (

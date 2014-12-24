@@ -1,19 +1,27 @@
 [% IF certifications.size() > 0 %]
-<h3>Existing Certifications</h3>
-<table class="listTable">
-	<tr> 
-		<th>Certification</th>
-		<th>From</th>
-		<th>Until</th> 
-	</tr> 
-	[% FOREACH c = certifications %]
-        <tr>
-          <td>[% c.strCertificationName %]</td>
-          <td>[% c.dtValidFrom %]</td>
-          <td>[% c.dtValidUntil  %]</td>
-        </tr>
-    [% END %]
-</table>
-[% ELSE %]
-<h4> No Record Found. </h4>
+<h3 class="section-header">[% Lang.txt('Existing Certifications') %]</h3>
+<div class="">
+    <table id="certifications" style="width: 100%" class = "table">
+		<thead>
+			<tr class="">
+				<th>[% Lang.txt('Certification') %]</th>
+				<th>[% Lang.txt('Status') %]</th>
+				<th>[% Lang.txt('Valid From') %]</th>
+				<th>[% Lang.txt('Valid Until') %]</th>
+			</tr>
+		</thead>
+        [% FOREACH c = certifications %]
+            <tr>
+              <td>[% c.strCertificationName %]</td>
+              <td>[% c.Status %]</td>
+              <td>[% DateFormat.format(c.dtValidFrom,'MEDIUM') %]</td>
+              <td>[% DateFormat.format(c.dtValidUntil,'MEDIUM') %]</td>
+            </tr>
+        [% END %]
+    </table>
+</div>
+<br />
+
 [% END %]
+
+

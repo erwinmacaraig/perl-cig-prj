@@ -13,7 +13,66 @@ function toggleChevron(e) {
 
 }
 
+function checkIfDocsAllApproved() {
+    var numberOfPendingDocs = $(".totalPendingDocs").val();
+    var rejectedDocsFlag = $(".rejectedDocs").val();
+
+    if(rejectedDocsFlag == 1){
+        $("li.active span.circleBg").addClass("rejectedBg");
+        $("span.circleBg").find("i.documents-rejected").removeClass("documents-approved");
+
+    } else {
+        $("li.active span.circleBg span.circleBg").removeClass("rejectedBg");
+        $("span.circleBg").find("i.documents-rejected").addClass("documents-approved");
+
+        if (numberOfPendingDocs == 0) {
+            $("body").find("i.documents-complete").removeClass("documents-incomplete");
+        } else {
+            $("body").find("i.documents-complete").addClass("documents-incomplete");
+        }
+
+    }
+
+    var storedTask = localStorage.getItem("data");
+    var taskID = $(".taskID").val();
+    
+    if (storedTask == taskID){
+        
+        $("body").find("i.memdetails-visited").removeClass("tab-not-visited");
+        $("body").find("i.regdetails-visited").removeClass("tab-not-visited");
+    
+    } else {
+        
+        //this means you are viewing a new work task
+        console.log("new task:" + taskID);
+    }
+    
+ }
+function calculateProducts(){
+    var totalProduct = 0;
+    $('input[type="checkbox"]:checked').each(function() {
+        totalProduct += parseFloat($('#cost_'+this.name+'').val());          
+    });
+    $('.totalValue').html('$'+totalProduct.toFixed(2));
+}
+
 $(document).ready(function(){
+    
+    calculateProducts();
+
+    $('form#flowFormID td.col-1 input[type="checkbox"]').click(function(){
+        calculateProducts();
+    });
+
+    $("#menu li.subnav a.menutop").mouseover(function(){
+        $("#menu li.subnav a.menutop").removeClass("selected");
+        $(this).addClass("selected");
+    });
+
+    $("#menu li.subnav ul").mouseleave(function(){
+        $("#menu li.subnav a.menutop").removeClass("selected");
+    });
+
   findInitialAccordionPanel();
   $("#accordion").on("hidden.bs.collapse", toggleChevron);
   $("#accordion").on("show.bs.collapse", toggleChevron);
@@ -55,7 +114,7 @@ $(document).ready(function(){
     
     //this is a temporary fix for the last two steps - documents and complete
     $(".document-upload").insertAfter($("fieldset").first());
-     
+
      $(document).on("change", "input.paytxn_chk", function(){
         if(this.checked){
           $('#payment_manual').show();
@@ -142,5 +201,16 @@ $(document).ready(function(){
         });
 
     });
+    
+    checkIfDocsAllApproved();
 
+});
+$(window).bind("load", function() {
+    $('#l_strISOCountry').insertAfter($("#l_strISOCountry_chosen"));
+    $('#l_strISOCountryOfBirth').insertAfter($("#l_strISOCountryOfBirth_chosen"));
+    $('#l_strISONationality').insertAfter($("#l_strISONationality_chosen"));
+    $('#l_intLocalLanguage').insertAfter($("#l_intLocalLanguage_chosen"));
+    $('#l_intNatCustomLU5').insertAfter($("#l_intNatCustomLU5_chosen"));
+    $('#l_intGender').insertAfter($("#toggleGd_intGender"));
+    $('#l_strContactISOCountry').insertAfter($("#l_strContactISOCountry_chosen")); 
 });

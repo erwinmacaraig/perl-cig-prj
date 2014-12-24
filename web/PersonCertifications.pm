@@ -43,24 +43,20 @@ sub handleCertificates {
 		my @rowdata = ();
 		my $link;
 		foreach my $rowdataref ( @{$rawrowdata} ){
-			#print FH "RowDataRef Data FROM PersonCertifications.pm\n" . Dumper($rowdataref) . "\n=================\n"; 
+
 			$link = "$Data->{'target'}?client=$client&amp;a=P_CERT_ED&amp;certID=$rowdataref->{'intCertificationID'}";
 			push @rowdata,{
 				id => $rowdataref->{'intCertificationID'},
 				SelectLink => $link,
 				strCertificationType => $rowdataref->{'strCertificationType'},
 				strCertificationName => $rowdataref->{'strCertificationName'},
-				dtValidFrom          => $rowdataref->{'dtValidFrom'},
-				dtValidUntil         => $rowdataref->{'dtValidUntil'},
+				dtValidFrom          => $Data->{'l10n'}{'date'}->format($rowdataref->{'dtValidFrom'},'MEDIUM'),
+				dtValidUntil         => $Data->{'l10n'}{'date'}->format($rowdataref->{'dtValidUntil'},'MEDIUM'),
 				strStatus            => $rowdataref->{'strStatus'},
 				strDescription       => $rowdataref->{'strDescription'},				
 			};
 		}
 		my @headers = (
-            {
-                type => 'Selector',
-                field => 'SelectLink',
-            },
             {
                 name =>   'Certification Type',
                 field =>  'strCertificationType',
@@ -81,6 +77,10 @@ sub handleCertificates {
               name =>   'Status',
               field =>  'strStatus',
          },   
+        {
+            type => 'Selector',
+            field => 'SelectLink',
+        },
   );
          #{
          #	name => 'Description',
@@ -91,32 +91,31 @@ sub handleCertificates {
     columns => \@headers,
     rowdata => \@rowdata,
     gridid => 'grid',
-    width => '99%',
+    width => '100%',
     height => 700,
   );
 
+    my $addlink=qq[<a href="$Data->{'target'}?client=$client&amp;a=P_CERT_A" class = "btn-main">].$Data->{'lang'}->txt('Add Certification').qq[</a>] if(!$Data->{'ReadOnlyLogin'});
+	my $modoptions=qq[<div class="button-row pull-right">$addlink</div>];
 	$resultHTML = qq[ 
 		$grid
+        $modoptions
 	];
-	my $title='List Of Certifications';
-	my $addlink='';
-    {
-      $addlink=qq[<a href="$Data->{'target'}?client=$client&amp;a=P_CERT_A" class = "btn-main">].$Data->{'lang'}->txt('Add Certification').qq[</a>] if(!$Data->{'ReadOnlyLogin'});
+	my $title='Certifications';
 
-    }
-	my $modoptions=qq[<div class="changeoptions">$addlink</div>];
-    $title=$modoptions.$title;
  	return ($resultHTML,$title);			
 	}
 	#end else
 	############################################ FORM SECTION #############################
  
-    my $query = qq[SELECT intCertificationTypeID, CONCAT(strCertificationType, ' - ', strCertificationName) AS Certificates FROM tblCertificationTypes WHERE intRealmID = ? AND intActive = 1];
+    my $query = qq[SELECT intCertificationTypeID, CONCAT(strCertificationType, ' - ', strCertificationName) AS Certificates FROM tblCertificationTypes WHERE intRealmID = ? AND intActive = 1 ORDER BY strCertificationType, intDisplayOrder, strCertificationName  ];
     my $st = $Data->{'db'}->prepare($query); 
     $st->execute($Data->{'Realm'});
     my %certificateTypes = (); 
+    my @certificationTypesOrder=();
     while(my $dref = $st->fetchrow_hashref()){
     	$certificateTypes{$dref->{'intCertificationTypeID'}} = $dref->{'Certificates'}; 
+        push @certificationTypesOrder, $dref->{'intCertificationTypeID'};
     }    
 	my %FieldDefinitions=(
    	    fields=>  {
@@ -125,6 +124,7 @@ sub handleCertificates {
                 value       =>  $cert_fields->{'intCertificationTypeID'},
                 type        => 'lookup',
                 options     => \%certificateTypes,
+                order       => \@certificationTypesOrder,
                 firstoption => [ '', 'Select Certification' ],
             },
             dtValidFrom => {
@@ -158,6 +158,9 @@ sub handleCertificates {
                    cols => '40',       
               },
    		    },
+      sections => [
+                [ 'main', 'Certifications' ],
+      ],
                order => [qw(intCertificationID intCertificationTypeID strStatus dtValidFrom dtValidUntil strDescription)],            
                options => {
                    labelsuffix => ':',
@@ -165,7 +168,7 @@ sub handleCertificates {
                    target => $Data->{'target'},
                    formname => 'n_form',
                    submitlabel => $Data->{'lang'}->txt('Update'),
-                   introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
+                   introtext => '',
                    NoHTML => 1,
                    updateSQL => qq[
                          UPDATE tblPersonCertifications
@@ -213,10 +216,8 @@ sub handleCertificates {
 	
    ($resultHTML, undef )=handleHTMLForm(\%FieldDefinitions, undef, $option, 1, $Data->{'db'});	
   
-   
  
-  my $title = 'Person Certifications';
-  
+   my $title = 'Person Certifications';
    
    return $resultHTML,$title;
 #######################################################################################
@@ -292,6 +293,8 @@ sub getPersonCertifications {
                 PC.intCertificationTypeID,
                 PC.dtValidFrom,
                 PC.dtValidUntil,
+                DATE_FORMAT(PC.dtValidFrom,'%d %b %Y') AS dtValidFrom_Formatted,
+                DATE_FORMAT(PC.dtValidUntil,'%d %b %Y') AS dtValidUntil_Formatted,
                 PC.strDescription,
                 PC.strStatus,
                 CT.strCertificationName,
@@ -303,6 +306,8 @@ sub getPersonCertifications {
             WHERE 
                 PC.intRealmID = ?
                 AND PC.intPersonID = ?
+                AND UNIX_TIMESTAMP(PC.dtValidFrom) != 0
+                AND UNIX_TIMESTAMP(PC.dtValidUntil) != 0
                 $statusfilter
                 $typefilter
 
@@ -311,10 +316,11 @@ sub getPersonCertifications {
                 PC.dtValidFrom,
                 PC.dtValidUntil
         ];
-        print FH "Query is: $statement \n\n";
+
         my $query = $db->prepare($statement);
         $query->execute(@vals);
         while (my $dref = $query->fetchrow_hashref) {
+            $dref->{'Status'} = $Defs::person_certification_status{$dref->{'strStatus'}} || '';
             push @certifications, $dref;
         }
     }
@@ -357,6 +363,7 @@ sub getPersonCertificationTypes {
 
             ORDER BY
                 CT.strCertificationType,
+                CT.intDisplayOrder,
                 CT.strCertificationName
         ];
         my $query = $db->prepare($statement);

@@ -9,6 +9,7 @@ use CGI qw(param unescape escape cookie);
 
 use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit','Clearances', "user";
 use Lang;
+use Localisation;
 use Reg_common;
 use PageMain;
 use Navbar;
@@ -33,6 +34,7 @@ use PersonEdit;
 use EntityEdit;
 use Changes;
 use MemberCard;
+use FacilityEdit;
 
 use BankSplit;
 use PaymentSplitRun;
@@ -100,6 +102,7 @@ sub main {
     $Data{'LocalConfig'}  = getLocalConfig( \%Data );
     my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     $Data{'lang'} = $lang;
+    initLocalisation(\%Data);
 
     logPageData( \%Data, $action, $client);
 
@@ -187,6 +190,9 @@ sub main {
     }
     elsif ( $action =~ /^EE_/ ) {
         ( $resultHTML, $pageHeading ) = handleEntityEdit( $action, \%Data);
+    }
+    elsif ( $action =~ /^FE_/ ) {
+        ( $resultHTML, $pageHeading ) = handleFacilityEdit( $action, \%Data);
     }
     elsif ( $action =~ /^SEARCH_/ ) {
         ( $resultHTML, $pageHeading ) = handleSearch( $action, \%Data, $client );
@@ -278,9 +284,17 @@ sub main {
     elsif ( $action =~ /^PREGFB_/ ) {
         ( $resultHTML, $pageHeading ) = handleRegistrationFlowBulk($action, \%Data);
     }
+    elsif ( $action =~ /^PFB_/ ) {
+use BulkRenewalsFlow;
+        ( $resultHTML, $pageHeading ) = handleBulkRenewalsFlow($action, \%Data);
+    }
     elsif ( $action =~ /^PF_/ ) {
 use PersonFlow;
         ( $resultHTML, $pageHeading ) = handlePersonFlow($action, \%Data);
+    }
+    elsif ( $action =~ /^PTF_/ ) {
+use TransferFlow;
+        ( $resultHTML, $pageHeading ) = handleTransferFlow($action, \%Data);
     }
     elsif ( $action =~ /^PENDPR_/ ) {
         my $prID = safe_param( 'prID', 'number' );
@@ -299,6 +313,11 @@ use PersonFlow;
 		use PayInvoice;
 		my $clubID = getID($Data{'clientValues'},$Defs::LEVEL_CLUB); 
 		($resultHTML, $pageHeading) = PayInvoice::handlePayInvoice($action, \%Data, $clubID);				
+	}
+
+	elsif($action eq 'itcf'){
+		use ITC_TransferCertificate;
+		($resultHTML, $pageHeading) = ITC_TransferCertificate::show_itc_request_form(\%Data);
 	}
     
    

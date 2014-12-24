@@ -43,9 +43,6 @@ sub handleRegistrationFlowBulk {
     my $originLevel = $Data->{'clientValues'}{'authLevel'} || 0;
 
     my %Flow = ();
-    #$Flow{'PREGFB_TU'} = 'PREGFB_P'; #Typees
-    #$Flow{'PREGFB_PU'} = 'PREGFB_SP'; #Products-
-    #$Flow{'PREGFB_SPU'} = 'PREGFB_C'; #Select people submit->Complete
     $Flow{'PREGFB_TU'} = 'PREGFB_SP'; #Typees
     $Flow{'PREGFB_SPU'} = 'PREGFB_P'; #Products-
     $Flow{'PREGFB_PU'} = 'PREGFB_C'; #Select people submit->Complete
@@ -90,6 +87,8 @@ sub handleRegistrationFlowBulk {
     }
 
     my $rolloverIDs= param('rolloverIDs') || '';
+$rolloverIDs = 10760050;
+print STDERR "REMOVE THIS!!!!!!!!!!!!!!!!";
     $Hidden{'rolloverIDs'} = $rolloverIDs;
     if ( $action eq 'PREGFB_SPU' ) {
         $action = $Flow{$action};

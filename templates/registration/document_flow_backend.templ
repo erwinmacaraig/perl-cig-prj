@@ -1,7 +1,7 @@
 <div class="document-upload">
 	<!-- display document upload information --> 
 
-<h3 class="panel-header">Required Documents</h3> 
+<h3 class="panel-header">[% Lang.txt('Required Documents') %]</h3> 
 
 <div class="panel-body">
 	<div class="document-notes">
@@ -23,21 +23,75 @@
 							</p>
 						
 							[% END %]
+
+							[% IF doc.strOrigFilename != '' %]
+							
+							<p>
+								<a href="#" onclick="docViewer([% doc.intFileID %], 'client=[% client %]&amp;a=view'); return false;">[% doc.strOrigFilename %]</a>
+							</p>
+						
+							[% END %]
 						</div>
 					</td>
 					<td style="width:50%;">
-						<form action="uploadregofile.cgi" method="POST" class="dropzone" enctype="multipart/form-data">
+						<form action="uploadregofile.cgi" method="POST" class="dropzone" enctype="multipart/form-data" id="myRegoDoc[% doc.ID %]">
 							<input type="hidden" name="client" value="[% client %]" />
 							<input type="hidden" name="rID" value="[% regoID %]" />
 							<input type="hidden" name="doctypeID" value="[% doc.ID %]" />
 							<input type="hidden" name="a" value="[% nextaction %]" />
-						
+                            <div class = "fallback">
+							<input type="hidden" name="u" value="[% currentURL %]" class = "fallback"/>
+                                [% IF doc.strOrigFilename != '' %]
+                                <i class='fa fa-check file-uploaded'></i>[% Lang.txt('Uploaded') %] <br/><a href = "#" onclick = "jQuery('.manualupload_[% doc.ID %]').toggle();jQuery(this).hide();return false;"><i><span class='replace-text'>[% Lang.txt('Click here to update this file') %]</span></i></a>
+                                <div class = "manualupload_[% doc.ID %]" style = "display:none;">
+                                    <input type="file" name="file" />
+                                    <input type="submit" name="uploadbtn" value = "[% Lang.txt('Upload') %]" />
+                                </div>
+                                [% ELSE %]
+                                <div class = "manualupload_[% doc.ID %]">
+                                    <input type="file" name="file" />
+                                    <input type="submit" name="uploadbtn" value = "[% Lang.txt('Upload') %]" />
+                                </div>
+                                [% END %]
+                            </div>
+							[% IF doc.intFileID && nature == 'NEW' %]
+							<input type="hidden" name="f" value="[% doc.intFileID %]" />
+							[% END %]
 							[% FOREACH h IN hidden_ref %]
 							
-							<input type="hidden" name="[% h.key %]" value="[% h.value %]" />
-							
-							[% END %]
+							<input type="hidden" name="[% h.key %]" value="[% h.value %]" />							
+							[% END %]		
 						</form>
+						<script>
+							var doc;
+							Dropzone.options.myRegoDoc[% doc.ID %] = {
+                                dictFallbackMessage: '',
+                                [% IF doc.intFileID %]
+                                dictDefaultMessage: "<i class='fa fa-check file-uploaded'></i>[% Lang.txt('Uploaded') %] <br/> <i><span class='replace-text'>[% Lang.txt('Click here to update this file') %]</span></i>",
+                                [% ELSE %]
+                                dictDefaultMessage: "[% Lang.txt('Click here to upload file') %]",
+                                [% END %]
+								addRemoveLinks: true,							
+								init: function(){
+									this.on("success", function(file, response){										
+										doc = response;		
+										console.log(doc);								
+									});								
+									this.on("removedfile", function(file, response){
+										var fObject = JSON.parse(doc);
+										\$.ajax({
+											type: 'POST',
+											url: '[% url %]/deleteregofile.cgi',
+											data: "f="+fObject.f + "&doctypeID="+fObject.docTypeID + "&rID="+fObject.regoID + "&client=[% client %]"
+										}).done(
+
+										);
+									});
+								}
+
+
+							}
+						</script>
 					</td>
 				</tr>
 			[% END %]
@@ -46,7 +100,7 @@
 </div>
 <div class="clearfix">&nbsp;</div>
 [% IF optionaldocs.size %]
-<h3 class="panel-header">Optional Documents</h3> 
+<h3 class="panel-header">[% Lang.txt('Optional Documents') %]</h3> 
 <div class="panel-body">
 	<div class="document-notes">
 		<table class="table documents-table">
@@ -56,32 +110,87 @@
 				<tr>
 					<td>
 						<div>
-							<p><strong>Title:</strong> 
+							<p><strong>[% Lang.txt('Title') %]:</strong> 
 							[% doc.Name %]
 							</p>
 							
 							[% IF doc.Description != '' %]
 							
-							<p><strong>Description: </strong>
+							<p><strong>[% Lang.txt('Description') %]: </strong>
 								[% doc.Description %]
 							</p>
 						
 							[% END %]
+
+
+							[% IF doc.strOrigFilename != '' %]
+							
+							<p>
+								<a href="#" onclick="docViewer([% doc.intFileID %], 'client=[% client %]&amp;a=view'); return false;">[% doc.strOrigFilename %]</a>
+							</p>
+						
+							[% END %]
+
 						</div>
 					</td>
 					<td style="width:50%;">
-						<form action="uploadregofile.cgi" method="POST" class="dropzone" enctype="multipart/form-data">
+						<form action="uploadregofile.cgi" method="POST" class="dropzone" enctype="multipart/form-data" id="myRegoDoc[% doc.ID %]">
 							<input type="hidden" name="client" value="[% client %]" />
 							<input type="hidden" name="rID" value="[% regoID %]" />
 							<input type="hidden" name="doctypeID" value="[% doc.ID %]" />
 							<input type="hidden" name="a" value="[% nextaction %]" />
-						
+                            <div class = "fallback">
+							<input type="hidden" name="u" value="[% currentURL %]" class = "fallback"/>
+                                [% IF doc.strOrigFilename != '' %]
+                                <i class='fa fa-check file-uploaded'></i>[% Lang.txt('Uploaded') %] <br/><a href = "#" onclick = "jQuery('.manualupload_[% doc.ID %]').toggle();jQuery(this).hide();return false;"><i><span class='replace-text'>[% Lang.txt('Click here to update this file') %]</span></i></a>
+                                <div class = "manualupload_[% doc.ID %]" style = "display:none;">
+                                    <input type="file" name="file" />
+                                    <input type="submit" name="uploadbtn" value = "[% Lang.txt('Upload') %]" />
+                                </div>
+                                [% ELSE %]
+                                <div class = "manualupload_[% doc.ID %]">
+                                    <input type="file" name="file" />
+                                    <input type="submit" name="uploadbtn" value = "[% Lang.txt('Upload') %]" />
+                                </div>
+                                [% END %]
+                            </div>
+                            [% IF doc.intFileID && nature == 'NEW' %]
+								<input type="hidden" name="f" value="[% doc.intFileID %]" />
+							[% END %]
 							[% FOREACH h IN hidden_ref %]
 							
 							<input type="hidden" name="[% h.key %]" value="[% h.value %]" />
 							
 							[% END %]
 						</form>
+						<script>
+							var doc;
+							Dropzone.options.myRegoDoc[% doc.ID %] = {
+                                dictFallbackMessage: '',
+                                [% IF doc.intFileID %]
+                                dictDefaultMessage: "<i class='fa fa-check file-uploaded'></i>[% Lang.txt('Uploaded') %] <br/> <i><span class='replace-text'>[% Lang.txt('Click here to update this file') %]</span></i>",
+                                [% ELSE %]
+                                dictDefaultMessage: "[% Lang.txt('Click here to upload file') %]",
+                                [% END %]
+								addRemoveLinks: true,							
+								init: function(){
+									this.on("success", function(file, response){										
+										doc = response;	
+										console.log(doc);	
+									});								
+									this.on("removedfile", function(file, response){
+										var fObject = JSON.parse(doc);
+										\$.ajax({
+											type: 'POST',
+											url: '[% url %]/deleteregofile.cgi',
+											data: "f="+fObject.f + "&doctypeID="+fObject.docTypeID + "&rID="+fObject.regoID + "&client=[% client %]"
+										}).done(
+											
+										);
+									});
+								}
+							}
+						</script>
 					</td>
 				</tr>
 			[% END %]

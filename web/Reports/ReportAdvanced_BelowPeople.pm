@@ -265,6 +265,22 @@ sub _getConfiguration {
                 }
             ],
 
+            intMinorProtection => [
+                'Minor Protection',
+                {
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => {
+                        1 => 'Move non-football',
+                        2 => '50km from border',
+                        3 => 'Already in Country',
+                        4 => 'Inside EU',
+                    },
+                    optiongroup     => 'details',
+                    allowgrouping   => 1
+                }
+            ],
+
             PRstrPersonType=> [
                 'Registration Role',
                 {
@@ -1631,7 +1647,6 @@ sub _getConfiguration {
           Order => [
             qw(
               strNationalNum
-              MemberID
               PstrStatus
               strLocalFirstname
               strLocalSurname
@@ -1648,6 +1663,7 @@ sub _getConfiguration {
               intGender
               intDeceased
               intEthnicityID
+              intMinorProtection
 
                 PRstrPersonType 
                 PRstrPersonLevel
@@ -1669,7 +1685,6 @@ sub _getConfiguration {
               strCountry
               strPostalCode
               strPhoneHome
-              strPhoneMobile
               strEmail
               strEmail2
               strPassportIssueCountry
@@ -1760,8 +1775,6 @@ sub _getConfiguration {
               dtStart
               dtEnd
               ClubPaymentID
-              strUsername
-              strPassword
               strMemberRecordTypeList
               dtMemberRecordIn
               )
@@ -1776,36 +1789,11 @@ sub _getConfiguration {
                 qw(tblPerson.strEmail tblPerson.strPhoneMobile tblPerson.strSurname tblPerson.strFirstname tblPerson.intPersonID)
             ],
           },
-          ExportFormats => {
-            MeetManager => {
-                Name => 'Meet Manager',
-                Select =>
-"strSurname, strFirstname, IF(intGender<>1,'M','F') AS Gender, DATE_FORMAT(dtDOB, '%m/%d/%Y') AS dtDOB, tblPerson.strAddress1, tblPerson.strAddress2, tblPerson.strSuburb, tblPerson.strState, tblPerson.strPostalCode, tblPerson.strCountry, strPassportNationality, strPhoneHome, strPhoneWork, tblPerson.strFax, tblPerson.strEmail",
-                Order => [
-                    'I',                      'strSurname',
-                    'strFirstname',           '',
-                    'Gender',                 'dtDOB',
-                    '',                       '',
-                    '',                       '',
-                    'strAddress1',            'strAddress2',
-                    'strSuburb',              'strState',
-                    'strPostalCode',          'strCountry',
-                    'strPassportNationality', 'strPhoneHome',
-                    'strPhoneWork',           'strFax',
-                    '',                       '',
-                    '',                       'strEmail'
-                ],
-                Headers        => 0,
-                ExportFileName => 'export.txt',
-                Delimiter      => ';',
-            },
-          },
           OptionGroups => {
             details         => [ 'Personal Details', { active => 1 } ],
             regos=> [ 'Registrations',  {} ],
             contactdetails  => [ 'Contact Details',  {} ],
             contactdetails  => [ 'Contact Details',  {} ],
-            security        => [ 'Security',         {} ],
             identifications => [ 'Identifications',  {} ],
             financial       => [ 'Financial',        {} ],
             otherfields     => [ 'Other Fields',     {} ],
@@ -1822,38 +1810,6 @@ sub _getConfiguration {
           },
 
     );
-        $config{'Fields'} = {
-            %{$config{'Fields'}},
-            strUsername => [
-                'Username',
-                {
-                    optiongroup => 'security',
-                    displaytype => 'text',
-                    fieldtype   => 'text',
-                    allowsort   => 1,
-                    dbfield     => "CONCAT('1',tblAuth.strUsername)",
-                    dbfrom =>
-                    "LEFT JOIN tblAuth ON (tblPerson.intPersonID= tblAuth.intID and tblAuth.intLevel=1)"
-                }
-            ],
-        };
-    if ($Data->{'SystemConfig'}{'AssocConfig'}{'ShowPassword'}) {
-        $config{'Fields'} = {
-            %{$config{'Fields'}},
-            strPassword => [
-                'Password',
-                {
-                    optiongroup => 'security',
-                    displaytype => 'text',
-                    fieldtype   => 'text',
-                    allowsort   => 1,
-                    dbfield     => "strPassword",
-                    dbfrom =>
-                    "LEFT JOIN tblAuth ON (tblPerson.intPersonID= tblAuth.intID and tblAuth.intLevel=1)"
-                }
-            ],
-        };
-    }
 
     $self->{'Config'} = \%config;
 }

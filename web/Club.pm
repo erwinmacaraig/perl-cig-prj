@@ -300,7 +300,7 @@ sub club_details  {
         value => $field->{strEntityType},
         type => 'lookup',
         options => \%Defs::clubLevelSubtype,
-        firstoption => [ '', 'Select Type' ],
+        firstoption => [ '', 'Hello' ],
         compulsory => 1,
      },
       strStatus => {
@@ -498,6 +498,7 @@ sub club_details  {
         dtTo
         strGender
         strDiscipline
+        strOrganisationLevel
         strEntityType
         strStatus
         strAssocNature
@@ -593,7 +594,7 @@ my $resultHTML='' ;
   if($option eq 'display')  {
 #    $resultHTML .= showContacts($Data,0, $editlink);
     my $chgoptions='';
-    $chgoptions.=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_DTE">Edit $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}</a></span>] if allowedAction($Data, 'c_e');
+    $chgoptions.=qq[<span class = "btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DTE">Edit $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}</a></span>] if allowedAction($Data, 'c_e');
 
     $chgoptions=qq[<div class="changeoptions">$chgoptions</div>] if $chgoptions;
     $title=$chgoptions.$title;
@@ -634,6 +635,7 @@ sub loadClubDetails {
      strLocalShortName,
      strGender,
      strDiscipline,
+     strOrganisationLevel
      strLocalFacilityName,
      strLatinName,
      strLatinShortName,
@@ -941,12 +943,23 @@ sub listClubs   {
 
   my $addlink='';
   #{
-  #    $addlink=qq[<span class = "button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if(!$Data->{'ReadOnlyLogin'});
+  #    $addlink=qq[<span class = "btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if(!$Data->{'ReadOnlyLogin'});
   # }
 
   my $modoptions=qq[<div class="changeoptions">$addlink</div>];
   $title=$modoptions.$title;
 
   return ($resultHTML,$title);
+}
+
+sub getLegalTypeName {
+	my ($Data, $legalTypeID) = @_;
+
+	my $query = qq[SELECT strLegalType FROm tblLegalType WHERE intLegalTypeID = ?];
+	
+	my $sth = $Data->{'db'}->prepare($query);
+	$sth->execute($legalTypeID);
+	my $dref = $sth->fetchrow_hashref();
+	return $dref->{'strLegalType'};
 }
 1;

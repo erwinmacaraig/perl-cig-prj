@@ -23,7 +23,26 @@ function docViewer(id, params) {
     var d = jQuery('<div id = "docViewerOverlay"><iframe id="docViewerPage" src = "' + url +'" scrolling="no"></iframe>');
 	jQuery('body').append(d);
 }
+         
+function replaceFile(id,parameters,doctypename,desc){ 
+    $('#docViewerOverlay').remove();
+	var url = 'fileform.cgi?f='+id + parameters + '&doctypename='+doctypename + '&desc='+desc;
+	window.scrollTo(0,0);
+    var newdiv = $("<div></div>", {
+		"id":"docViewerOverlay"		
+	}); 
+	var newframe = $("<iframe></iframe>",{
+		"src":url,
+		"scrolling":"no",
+		"id":"docViewerPage"
+	});
+	$(newdiv).append(newframe);
+	$('body').append(newdiv);
 
+
+	
+
+}
 // Regs new simple tab code 9/8/2013
 
 $('ul.new_tabs').each(function(){

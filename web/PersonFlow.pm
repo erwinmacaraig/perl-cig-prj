@@ -30,11 +30,15 @@ sub handlePersonFlow {
     my $entityLevel = getLastEntityLevel($clientValues) || 0;
     my $originLevel = $Data->{'clientValues'}{'authLevel'} || 0;
     my $defaultType = $params{'dtype'} || '';
+    my $defaultRegistrationNature = $params{'dnat'} || '';
     my $internationalTransfer = $params{'itc'} || '';
     my $startingStep = $params{'ss'} || '';
 
     #specific to Transfers
     my $personRequestID = $params{'prid'} || '';
+
+    #specific to Renewals
+    my $renewalTargetRegoID = $params{'rpID'} || '';
 
     my $flow = new Flow_PersonBackend(
         db => $Data->{'db'},
@@ -44,9 +48,12 @@ sub handlePersonFlow {
             client => $client,
             a => $action,
             dtype => $defaultType,
+            dnat => $defaultRegistrationNature,
             itc => $internationalTransfer,
             ss => $startingStep,
             prid => $personRequestID,
+
+            rtargetid => $renewalTargetRegoID,
         },
         ID  => $personID || 0,
         SystemConfig => $Data->{'SystemConfig'},

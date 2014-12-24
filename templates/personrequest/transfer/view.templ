@@ -36,7 +36,7 @@
 					<div id="playerdetails" class="tab-pane fade">
 						<br/>
 						<div class="read-only">
-							<h4>Personal Information</h4>
+							<h4>[% Lang.txt("Personal Information") %]</h4>
 							<div class="read-only-text">
 								<div class="panel-body">
 								    <span class="details-row">
@@ -49,7 +49,8 @@
 								    </span>								    
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Date of Birth") %]:</span>
-								        <span class="details-left detail-value">[% DOB %]</span>
+                                        <span class="details-left detail-value">[% DateFormat.format(DOB,'MEDIUM') %]</span>
+
 								    </span>
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Gender") %]:</span>
@@ -69,35 +70,35 @@
 							<div class="read-only-text">
 								<div class="panel-body">
 								    <span class="details-row">
-								        <span class="details-left">Address 1</span>
+								        <span class="details-left">[% Lang.txt("Address 1") %]</span>
 								        <span class="details-left detail-value">[% contactAddress1 %]</span>
 								    </span>
 								    <span class="details-row">
-								        <span class="details-left">Address 2</span>
+								        <span class="details-left">[% Lang.txt("Address 2") %]</span>
 								        <span class="details-left detail-value">[% contactAddress2 %]</span>
 								    </span>								    
 								    <span class="details-row">
-								        <span class="details-left">City</span>
+								        <span class="details-left">[% Lang.txt("City") %]</span>
 								        <span class="details-left detail-value">[% contactCity %]</span>
 								    </span>
 								    <span class="details-row">
-								        <span class="details-left">State</span>
+								        <span class="details-left">[% Lang.txt("State") %]</span>
 								        <span class="details-left detail-value">[% contactState %]</span>
 								    </span>								    
 									<span class="details-row">
-								        <span class="details-left">Postal Code</span>
+								        <span class="details-left">[% Lang.txt("Postal Code") %]</span>
 								        <span class="details-left detail-value">[% contactPostalCode %]</span>
 								    </span>								    
 									<span class="details-row">
-								        <span class="details-left">Country</span>
+								        <span class="details-left">[% Lang.txt("Country") %]</span>
 								        <span class="details-left detail-value">[% contactISOCountry %]</span>
 								    </span>									
 									<span class="details-row">
-								        <span class="details-left">Phone Number</span>
+								        <span class="details-left">[% Lang.txt("Phone Number") %]</span>
 								        <span class="details-left detail-value">[% contactPhoneHome %]</span>
 								    </span>									
 									<span class="details-row">
-								        <span class="details-left">Email Address</span>
+								        <span class="details-left">[% Lang.txt("Email Address") %]</span>
 								        <span class="details-left detail-value">[% contactEmail %]</span>
 								    </span>
 								</div>
@@ -127,7 +128,7 @@
 								    </span>							    
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Date of Birth") %]:</span>
-								        <span class="details-left detail-value">[% DOB %]</span>
+                                        <span class="details-left detail-value">[% DateFormat.format(DOB,'MEDIUM') %]</span>
 								    </span>
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Gender") %]:</span>
@@ -168,12 +169,7 @@
     </div>
 	<div class="col-md-3">
         <div id = "">
-            <h3 class="panel-header">Member ID: [% MID %]</h3>
-            <div class="panel-body">
-                <p class="reg-text">[% personSurname %]</p>
-                <p class="reg-text">[% personFirstname %]</p>
-                <p class="reg-text">[% DOB %]</p>
-            </div>
+            [% PersonSummaryPanel %]
         </div>
         <br/>
 		<div>
@@ -199,7 +195,7 @@
                     <input class="btn btn-main" type="submit" name="submit" value="Initiate [% RequestAction.request_type %]">
                 </form>
                 <!--
-                <span class="button-small generic-button">
+                <span class="btn-inside-panels">
                 <a href="main.cgi?client=[% RequestAction.client %]&a=[% RequestAction.action %]&dtype=undefined&sp=[% sport %]&pt=[% personType %]&per=&pl=[% personLevel %]&ag=[% personAgeLevel %]&nat=[% RequestAction.request_type %]&ol=[% requestOriginLevel %]&r=1&sr=0&eID=[% requestEntityID %]&pID=[% personID %]">Initiate [% RequestAction.request_type %]</a>
                 </span>
                 -->

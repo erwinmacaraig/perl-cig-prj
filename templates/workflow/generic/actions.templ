@@ -1,18 +1,16 @@
-    <div class="task-actions">
+    <div class="task-actions txtright">
 
-        [% IF TaskAction.showApprove %]
-        <a class="btn-disabled workflow-action" data-actiontype="APPROVE" data-disabled="[% TaskAction.disableApprove %]" href="main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]">
-            [% IF TaskAction.ApprovalEntityLevel == 3 %]
-                [% Lang.txt('Accept') %]
-            [% ELSE %]
-                [% Lang.txt('Approve') %]
-            [% END %]
-        </a>
-        [% END %]
-
+    
         [% IF TaskAction.showReject %]
         <a class="btn-disabled workflow-action" data-target="#showWorkflowNotes" data-actiontype="REJECT" href = "">
             [% Lang.txt('Reject') %]
+        </a>
+        [% END %]
+
+
+        [% IF TaskAction.showHold %]
+        <a class="btn-disabled workflow-action" data-target="#showWorkflowNotes" data-actiontype="HOLD" href = "">
+            [% Lang.txt('Put on-hold') %]
         </a>
         [% END %]
 
@@ -23,9 +21,13 @@
         </a>
         [% END %]
 
-        [% IF TaskAction.showHold %]
-        <a class="btn-disabled workflow-action" data-target="#showWorkflowNotes" data-actiontype="HOLD" href = "">
-            [% Lang.txt('Put on-hold') %]
+        [% IF TaskAction.showApprove %]
+        <a class="btn-disabled workflow-action" data-actiontype="APPROVE" data-disabled="[% TaskAction.disableApprove %]" href="main.cgi?client=[% TaskAction.client %]&a=WF_Approve&TID=[% TaskAction.WFTaskID %]">
+            [% IF TaskAction.ApprovalEntityLevel == 3 %]
+                [% Lang.txt('Accept') %]
+            [% ELSE %]
+                [% Lang.txt('Approve') %]
+            [% END %]
         </a>
         [% END %]
 
@@ -43,7 +45,7 @@
 
     </div>
 
-
+<input type="hidden" value="[% TaskAction.WFTaskID %]" class="taskID">
 
 <!--trigger modal for each specific action-->
 
@@ -54,22 +56,23 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title" id="myModalLabel">Work task notes </h4>
+        <h4 class="modal-title" id="myModalLabel">[% Lang.txt('Work task notes') %] </h4>
       </div>
       
       <form id="workFlowActionForm" action="main.cgi" method="POST">
           <div class="modal-body">
-            <label>Please enter Work task notes</label>
+            <label>[% Lang.txt('Please enter Work task notes') %]</label>
             <textarea name="notes"></textarea>
             <input type="hidden" name="client" value="[% TaskAction.client %]">
             <input type="hidden" name="TID" value="[% TaskAction.WFTaskID %]">
             <input type="hidden" name="type" value="">
+            <input type="hidden" name="regNat" value="[% TaskAction.RegistrationNature %]">
             <input type="hidden" name="a" value="WF_updateAction">
           </div>
 
           <div class="modal-footer">
-            <a class="btn-main" data-dismiss="modal">Close</a>
-            <input class="btn-main" type="submit" name="submit" value="Submit">
+            <a class="btn-inside-panels" data-dismiss="modal">[% Lang.txt('Close') %]</a>
+            <input class="btn-inside-panels" type="submit" name="submit" value="[% Lang.txt('Submit') %]">
           </div>
       </form>
       
@@ -107,8 +110,8 @@
                             case 'HOLD':
                             case 'REJECT':
                             case 'RESOLVE':
-                                jQuery(this)
-                                    .removeClass("btn-disabled")
+                                jQuery(this
+)                                    .removeClass("btn-disabled")
                                     .addClass("btn-main")
                                     .unbind("click", disableAction)
                                     .click(function(f){
@@ -136,7 +139,22 @@
                     //        }
                     //    });
                 } else {
+
                 }
+                
+                if (jQuery(this).attr("data-visited") == "true") {
+
+                    var taskID = jQuery(".taskID").val();
+
+                    localStorage.removeItem("data");
+                    
+                    console.log("current task:" + taskID);
+                    
+                    jQuery(this).find("i").removeClass("tab-not-visited");
+                    
+                    localStorage.setItem("data", taskID);
+                }
+                
             });
         });
 

@@ -1,12 +1,8 @@
 #!/usr/bin/perl 
 
-#
-# $Header: svn://svn/SWM/trunk/web/lookupmanage.cgi 10133 2013-12-03 04:08:21Z tcourt $
-#
-
 use strict;
 use warnings;
-use CGI qw(param);
+use CGI qw(param escape);
 use lib "..",".","PaymentSplit","RegoFormBuilder";
 use Defs;
 use Reg_common;
@@ -19,6 +15,8 @@ use MCache;
 use TTTemplate;
 use InstanceOf;
 use Countries;
+use PersonSummaryPanel;
+use Localisation;
 
 main();	
 
@@ -59,6 +57,7 @@ sub main	{
 
   $Data{'DataAccess'}=$DataAccess_ref;
 
+  initLocalisation(\%Data);
   my $resultHTML = '';
   if($fileID)   {
 
@@ -97,20 +96,13 @@ sub main	{
         );
         $dref->{'doctype'} = $types{$extension} || 'file';
         $dref->{'fileURL'} = 'viewfile.cgi?client='.$client.'&amp;f=' . $dref->{'intFileID'};
+        $dref->{'fileURLescape'} = escape($Defs::base_url.'/viewfile.cgi?client='.$client.'&amp;f=' . $dref->{'intFileID'});
     }
 
     if($dref->{'intEntityTypeID'} == 1)  {
         my $object = getInstanceOf(\%Data,'person',$dref->{'intEntityID'});
         my $isocountries = getISOCountriesHash();
-        $dref->{'person'} = {
-            strSurname => $object->getValue('strLocalSurname'),
-            strFirstname => $object->getValue('strLocalFirstname'),
-            dtDOB => $object->getValue('dtDOB'),
-            gender => $Defs::PersonGenderInfo{$object->getValue('intGender')},
-            nationality => $isocountries->{$object->getValue('strISONationality')},
-            status => $object->getValue('strStatus'),
-            nationalNum => $object->getValue('strNationalNum'),
-        };
+        $dref->{'PersonSummaryPanel'} = personSummaryPanel(\%Data, $dref->{'intEntityID'}) || '';
     }
     elsif($dref->{'intEntityID'})  {
         my $object = getInstanceOf(\%Data,'entity',$dref->{'intEntityID'});
@@ -122,7 +114,10 @@ sub main	{
     }
     # BUILD PAGE
     my $TemplateData = $dref;
-    $TemplateData->{'showButtons'} = $action eq 'review' ? ($dref->{'strApprovalStatus'} eq 'PENDING' ? 1 : 0 ) : 0;
+    #$TemplateData->{'showButtons'} = $action eq 'review' ? ($dref->{'strApprovalStatus'} eq 'PENDING' ? 1 : 0 ) : 0;
+	$TemplateData->{'showButtons'} = $action eq 'view' ? 0 : 1;
+	$TemplateData->{'showRejectButton'} = $dref->{'strApprovalStatus'} ne 'REJECTED' ? 1 : 0;
+	$TemplateData->{'showApproveButton'} = $dref->{'strApprovalStatus'} ne 'APPROVED' ? 1 : 0;
 	$TemplateData->{'client'} = $client;
     $resultHTML = runTemplate(
           \%Data,

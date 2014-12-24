@@ -17,6 +17,7 @@ use AuditLog;
 use UploadFiles;
 use FormHelpers; 
 use GridDisplay;
+use Data::Dumper;
 
 sub handle_entity_documents{ 
 	my($action, $Data, $entityID, $typeID, $doc_for)=@_; 
@@ -28,7 +29,7 @@ sub handle_entity_documents{
 	#by default list out all documents 
 	$resultHTML = list_entity_docs($Data, $entityID, $client, $DocumentTypeID,$typeID, $doc_for);
 	if($action eq 'C_DOCS_frm'){
-		  $resultHTML =  new_doc_form($Data, $client, $DocumentTypeID); 
+		  $resultHTML =  new_doc_form($Data, $client, $entityID, $DocumentTypeID); 
 	}
 	elsif($action eq 'C_DOCS_u' || $action eq 'VENUE_DOCS_u'){
 	   	my $retvalue = process_doc_upload( 
@@ -63,25 +64,31 @@ sub list_entity_docs{
         INNER JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
         WHERE tblDocuments.intEntityID = ? AND intPersonID = 0 AND intClearanceID = 0
     ]; 
+# 
+
     my $sth = $db->prepare($query); 
-    $sth->execute($entityID); 
-    my $viewLink;
+    $sth->execute($entityID); 	
+    my $urlViewButton;
+	my $viewLink;
     my $replaceLink;
+	# $replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a>];
     while(my $dref = $sth->fetchrow_hashref()){
+		my $url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}&amp;client=$client";
     	#check if strLockLevel is empty which means world access to the file
     	if($dref->{'strLockAtLevel'} eq ''){
-    		$viewLink = qq[ <span class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}" target="_blank">]. $lang->txt('Get File') . q[</a></span>];
-    		$replaceLink =   qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a></span>];     		 
+    		 $urlViewButton = qq[ <a class="btn-main btn-view-replace" href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a>];
+    		#$replaceLink =   qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a></span>]; 
+			$replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a>]    		 
     	}
     	else {
     	    my @authorizedLevelsArr = split(/\|/,$dref->{'strLockAtLevel'});
     	    if(grep(/^$myCurrentValue/,@authorizedLevelsArr)){
-               	$viewLink = qq[ <span class="button-small generic-button"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}" target="_blank">]. $lang->txt('Get File') . q[</a></span>];    
-                $replaceLink =   qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a></span>];
+               	$viewLink = qq[ <span class="btn-inside-panels"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}&amp;client=$client" target="_blank">]. $lang->txt('Get File') . q[</a></span>];    
+                $replaceLink =   qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a></span>];
             }
             else{
-            	$viewLink = qq[ <button class\"HTdisabled\">]. $lang->txt('Get File') . q[</button>];    
-                $replaceLink =   qq[ <button class\"HTdisabled\">]. $lang->txt('Replace File'). q[</button>];
+            	$viewLink = qq[ <a class\"HTdisabled btn-main btn-view-replace\">]. $lang->txt('Get File') . q[</a>];    
+                $replaceLink =   qq[ <a class\"HTdisabled btn-main btn-view-replace\">]. $lang->txt('Replace File'). q[</a>];
             }
     	}
     	
@@ -90,19 +97,14 @@ sub list_entity_docs{
    
     push @rowdata, {  
 	        id => $dref->{'intFileID'} || 0,
-	        SelectLink => ' ',
 	        strDocumentName => $dref->{'strDocumentName'},
 		    strApprovalStatus => $dref->{'strApprovalStatus'},
             DateUploaded => $dref->{'DateUploaded'}, 
-            ViewDoc => $viewLink, 
+            ViewDoc => $urlViewButton, 
             ReplaceFile => $replaceLink,              
        };
     }
     my @headers = (
-        { 
-            type => 'Selector',
-            field => 'SelectLink',
-        }, 
         {
             name => $lang->txt('Type'),
             field => 'strDocumentName',
@@ -139,16 +141,16 @@ sub list_entity_docs{
         Data => $Data,
         columns => \@headers,
         rowdata => \@rowdata,
-        gridid => 'grid',
+        gridid => 'entityFilesGridID',
         width => '99%',
-        
+        coloredTop => 'no',
    ); 
     
     
   
 	
 	my $title = $lang->txt('Documents');
-	my $body = qq[<br /><div class="pageHeading">$title</div>];
+	my $body = '';
 	my $options = '';
 	my $count = 0;
 	
@@ -157,30 +159,42 @@ sub list_entity_docs{
     ]; 
     $sth = $db->prepare($query);
     $sth->execute($doc_for,$Data->{'Realm'});
-    my $doclisttype = qq[  <form action="$Data->{'target'}">
+    my $doclisttype = qq[<form action="$Data->{'target'}" id="entityDocAdd">
                               <input type="hidden" name="client" value="$client" />
-                              <input type="hidden" name="a" value="C_DOCS_frm" />
-                              <label>Add File For</label>  
-                              <select name="doclisttype" id="doclisttype">
-                              <option value="0">Misc</option>  
+                              <input type="hidden" name="a" value="C_DOCS_frm" />]
+							. qq[
+							  <label>]. $lang->txt('Document Type') . qq[</label>
+		                      <select name="doclisttype" id="doclisttype">
+		                      <option value="0">Misc</option>  
                        ];
     while(my $dref = $sth->fetchrow_hashref()){
         $doclisttype .= qq[<option value="$dref->{'intDocumentTypeID'}">$dref->{'strDocumentName'}</option>];
     } 
    $doclisttype .= qq[     </select>                           
-                           <input type="submit" class="button-small generic-button pull-right" value="Go" />
+                           <input type="submit" class="btn-inside-panels" value="Add" />
                            </form>
                     ];
 	
 	my $modoptions=qq[<div class="changeoptions"></div>];
 	
 	
-	$body .= qq[ 
+	$body .= qq[ <div style="clear:both;">&nbsp;</div>
+       	<div class="col-md-12">
+       	<h2 class="section-header">$title</h2>
 		$modoptions
-		<div class="showrecoptions"> $doclisttype </div> 
-		$grid
+			
+			<div class="clearfix">
+				$grid] . qq[<br /><br /><p>] . $lang->txt('Add a new document to this club') . qq[</p>
+				<div>
+					$doclisttype
+				</div>
+			</div>
 		
+		</div>
 		];
+		
+	
+	# <div class="showrecoptions"> $doclisttype </div> 
 	
 	#device a lookup table for different entities - leave it as static (C_DOCS) for now
 	
@@ -194,11 +208,7 @@ sub list_entity_docs{
 	); 
     my $allfilesgrid = '';
 	if(defined $docs->[0]->{'id'}){
-		my @headers2 = (
-		{ 
-            type => 'Selector',
-            field => 'SelectLink',
-        }, 
+		my @headers2 = (	
 		{
 			name => $lang->txt('Title'),
 			field => 'Title',
@@ -232,13 +242,25 @@ sub list_entity_docs{
         rowdata => $docs,
         gridid => 'allfilesgridid',
         width => '99%',
+        coloredTop => 'no',
         
    ); 
    
-   $body .= qq[
-        <br /><br />
-		<div class="sectionheader"> All Files </div> 
-		$allfilesgrid
+   #$body .= qq[
+        #<br /><br />
+		#<div class="sectionheader"> All Files </div> 
+		#<div class="sectionheader"> All Files </div> 
+		#$allfilesgrid
+	#];
+
+	$body .= qq[
+       	<div style="clear:both;">&nbsp;</div>
+       	<div class="col-md-12">
+			<h2 class="section-header">].$Data->{'lang'}->txt('All Files').qq[</h2> 
+			<div class="">
+				$allfilesgrid
+			</div>
+		</div>
 	];
 } 
 	
@@ -249,8 +271,8 @@ sub new_doc_form {
 	my(
 		$Data, 
 		$client,
-        $DocumentTypeID,
-		$RegistrationID,
+		$entityID,
+        $DocumentTypeID		
 	)=@_;
 
 	my $l = $Data->{'lang'};
@@ -263,26 +285,26 @@ sub new_doc_form {
 	<div class="sectionheader">$title</div>
 	<br />
          	<div id="docselect">
-		<form action="$target" method="POST" enctype="multipart/form-data" class="dropzone">			
-
+		<form action="uploadregofile.cgi" method="POST" enctype="multipart/form-data" class="dropzone">
 		<input type="hidden" name="client" value="].unescape($client).qq[">];
 	if($DocumentTypeID){
 		$body .= qq[
-                <input type="hidden" name="DocumentTypeID" value="$DocumentTypeID" />];
+                <input type="hidden" name="doctypeID" value="$DocumentTypeID" />];
         }
 
     if($fileToReplace){ 
     	$body .= qq[
-    	       <input type="hidden" name="fileId" value="$fileToReplace" />
+    	       <input type="hidden" name="f" value="$fileToReplace" />
     	]; 
     }
 	$body .=	qq[
-	<input type="hidden" name="entitydocs" value=" " />
-	<input type="hidden" name="a" value="C_DOCS_u">
+	<input type="hidden" name="entitydocs" value="1" />
+	<input type="hidden" name="a" value="C_DOCS_u" />
+	<input type="hidden" name="pID" value="$entityID" />
 			
 		</form> 
                 <br />  
-                <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+                <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS">] . $Data->{'lang'}->txt('Continue').q[</a></span>
 		</div>
 	];
 	return $body;
@@ -333,39 +355,63 @@ sub delete_doc {
 	return qq[
           <div class="OKmsg">Successfully deleted file.</div> 
           <br />  
-          <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+          <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS">] . $Data->{'lang'}->txt('Continue').q[</a></span>
        ];
 }
 
 sub checkUploadedEntityDocuments {
-    my ($Data, $entityID, $documents) = @_;   
+    my ($Data, $entityID, $documents, $ctrl) = @_;   
 
-	#1 check for uploaded documents present for a particular registration and person
+	
+	#1 check for uploaded documents present for a particular entity (required and optional)
 	my $query = qq[
 		SELECT distinct(tblDocuments.intDocumentTypeID), tblDocumentType.strDocumentName 
 		FROM tblDocuments INNER JOIN tblDocumentType
 		ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
 		INNER JOIN tblRegistrationItem 
 		ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID
-		WHERE tblDocuments.intEntityID = ?;	
+		WHERE tblDocuments.intEntityID = ?
+            AND tblRegistrationItem.intRealmID=?
+            AND tblRegistrationItem.strItemType='DOCUMENT'
 	];
-   
+   # ;	
+	if($ctrl){
+		$query .= qq[ AND tblRegistrationItem.intRequired = 1];
+	}
 	my $sth = $Data->{'db'}->prepare($query);
-	$sth->execute($entityID);
+	$sth->execute($entityID, $Data->{'Realm'});
 	my @uploaded_docs = ();
 	while(my $dref = $sth->fetchrow_hashref()){
 		push @uploaded_docs, $dref->{'intDocumentTypeID'};		
 	}
+	
+	my @validdocsforallrego = ();
+	$query = qq[SELECT tblDocuments.intDocumentTypeID FROM tblDocuments INNER JOIN tblDocumentType
+				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
+				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
+				WHERE strApprovalStatus = 'APPROVED' AND tblDocuments.intEntityID = ? AND tblRegistrationItem.intRealmID=? AND 
+				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+                 AND tblRegistrationItem.strItemType='DOCUMENT'
+				GROUP BY intDocumentTypeID];
+	$sth = $Data->{'db'}->prepare($query);
+	$sth->execute($entityID, $Data->{'Realm'});
+
+	while(my $dref = $sth->fetchrow_hashref()){
+		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
+	}
 	my @diff = ();	
-		
+	my @docos = ();	
+
 	#2 compare whats in the system and what is required
-	foreach my $doc_ref (@{$documents}){		
+	foreach my $doc_ref (@{$documents}){	
+		next if(grep /$doc_ref->{'ID'}/, @validdocsforallrego);	
 		if(!grep /$doc_ref->{'ID'}/,@uploaded_docs){
 			push @diff,$doc_ref;	
+			print FH "\nPushing: " . Dumper($doc_ref) . "\n";
 		}		
 	}
+	#need to filter required docs in @diff
 	return \@diff;
-
 }
 
 

@@ -56,9 +56,9 @@ sub handle_documents {
 		else {
 			if($retvalue eq '' && length($retvalue) == 0){
         	# check if the document to be uploaded is a REGO document 
-            	my $query = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem WHERE strRuleFor = ? AND strItemType = ? AND intID = ? AND intRequired = ?];
+            	my $query = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem WHERE strRuleFor = ? AND strItemType = ? AND intID = ? AND intRequired = ? and intRealmID= ?];
 				my $sth = $Data->{'db'}->prepare($query); 
-    			$sth->execute('REGO', 'DOCUMENT', $DocumentTypeID, 1);
+    			$sth->execute('REGO', 'DOCUMENT', $DocumentTypeID, 1, $Data->{'Realm'});
 				my $isREGODocument = 0;
 				my $dref = $sth->fetchrow_hashref();
 				$isREGODocument = $dref->{'tot'};
@@ -105,9 +105,9 @@ sub handle_documents {
 		if($delOK){
 
 			if($DocumentTypeID){	
-				my $query = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem WHERE strRuleFor = ? AND strItemType = ? AND intID = ? AND intRequired = ?];
+				my $query = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem WHERE strRuleFor = ? AND strItemType = ? AND intID = ? AND intRequired = ? and intRealmID = ?];
 				my $sth = $Data->{'db'}->prepare($query); 
-    			$sth->execute('REGO', 'DOCUMENT', $DocumentTypeID, 1);
+    			$sth->execute('REGO', 'DOCUMENT', $DocumentTypeID, 1, $Data->{'Realm'});
 				my $isREGODocument = 0;
 
 				if($isREGODocument){
@@ -125,14 +125,14 @@ sub handle_documents {
      	$resultHTML =  qq[
           <div class="OKmsg">Successfully deleted file.</div> 
           <br />  
-          <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=$retpage">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+          <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=$retpage">] . $Data->{'lang'}->txt('Continue').q[</a></span>
        ];
 		}
 		else {
 			$resultHTML = qq[
 			<div class="OKmsg">Error - $delOK </div> 
           <br />  
-          <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=$retpage">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+          <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=$retpage">] . $Data->{'lang'}->txt('Continue').q[</a></span>
 			];
 			
 		}
@@ -177,12 +177,13 @@ sub list_docs {
 	##############################3
 	 my $allfilesgrid = '';
 	if(defined $docs->[0]->{'id'}){
-		$body = qq[<br /><div class="pageHeading">$title</div>];
+		if($title != ""){
+			#$body = qq[<br /><div class="pageHeading">$title</div>];
+		}else{
+			#$body = qq[<br /><div class="col-md-12 rowtop-spacing"></div>];
+		}
+	
 		my @headers2 = (
-		{ 
-            type => 'Selector',
-            field => 'SelectLink',
-        }, 
 		{
 			name => $Data->{'lang'}->txt('Title'),
 			field => 'Title',
@@ -203,11 +204,13 @@ sub list_docs {
             name => $Data->{'lang'}->txt('View'),
             field => 'View',
             type => 'HTML',
+            sortable => 0,
         },
          {
             name => $Data->{'lang'}->txt('Delete'),
             field => 'Delete',
             type => 'HTML',
+            sortable => 0,
         },
     ); 
    $allfilesgrid = showGrid(
@@ -215,13 +218,19 @@ sub list_docs {
         columns => \@headers2,
         rowdata => $docs,
         gridid => 'allfilesgridid',
-        width => '99%',
+        width => '100%',
+        coloredTop => 'no',
         
    ); 
+
    $body .= qq[
-       
-		<div class="sectionheader"> All Files </div> 
-		$allfilesgrid
+       	<div style="clear:both;">&nbsp;</div>
+       	<div class="col-md-12">
+			<h2 class="section-header">].$Data->{'lang'}->txt('All Files').qq[</h2> 
+			<div class="">
+				$allfilesgrid
+			</div>
+		</div>
 	];
     
 }
@@ -288,7 +297,7 @@ sub new_doc_form {
 		my $title = $l->txt('New Document');
 	my $body = qq[
         <br />
-	<div class="sectionheader">$title</div>
+	<div class="pageHeading">$title</div>
 	<br />
          	<div id="docselect">
 		<form action="$target" method="POST" enctype="multipart/form-data" class="dropzone">			
@@ -314,7 +323,7 @@ sub new_doc_form {
 			
 		</form> 
                 <br />  
-                <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=P_DOCS">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+                <span class=""><a href="$Data->{'target'}?client=$client&amp;a=P_DOCS" class = "btn-main">] . $Data->{'lang'}->txt('Continue').q[</a></span>
 		</div>
 	];
 	return $body;

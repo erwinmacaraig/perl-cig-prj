@@ -27,6 +27,8 @@ use RegistrationItem;
 use FacilityTypes;
 use PersonUserAccess;
 use Data::Dumper;
+use FacilityFieldsSetup;
+use EntitySummaryPanel;
 
 sub setProcessOrder {
     my $self = shift;
@@ -60,6 +62,7 @@ sub setProcessOrder {
             'action' => 'role',
             'function' => 'display_role_details',
             'fieldset' => 'roledetails',
+            'label' => 'Fields',
             'title'  => 'Facility - Enter Role Details',
         },
         {
@@ -70,8 +73,8 @@ sub setProcessOrder {
         {
             'action' => 'fld',
             'function' => 'display_fields',
-            'label' => 'Fields',
-            'title'  => 'Facility - Enter Additional Informatton',
+            'title'  => 'Facility - Enter Additional Information',
+            'ShareNav'  => 'Fields',
         },
         {
             'action' => 'fldu',
@@ -87,15 +90,6 @@ sub setProcessOrder {
             'action' => 'du',
             'function' => 'process_documents',
         },
-        #{
-        #    'action' => 'p',
-        #    'function' => 'display_products',
-        #    'label'  => 'Products',
-        #},
-        #{
-        #    'action' => 'pu',
-        #    'function' => 'process_products',
-        #},
         {
             'action' => 'summ',
             'function' => 'display_summary',
@@ -107,349 +101,18 @@ sub setProcessOrder {
             'function' => 'display_complete',
             'label'  => 'Complete',
             'title'  => 'Facility - Submitted',
+            'NoGoingBack' => 1,
+            'NoDisplayInNav' => 1,
         },
     ];
 
 }
 
-sub setupValues {
+sub setupValues    {
     my $self = shift;
     my ($values) = @_;
     $values ||= {};
-
-    #my $FieldLabels   = FieldLabels::getFieldLabels( $self->{'Data'}, $Defs::LEVEL_PERSON );
-    my $FieldLabels   = FieldLabels::getFieldLabels( $self->{'Data'}, $Defs::LEVEL_VENUE );
-    my $isocountries  = getISOCountriesHash();
-    my $field_case_rules = get_field_case_rules({
-        dbh=>$self->{'db'}, 
-        client=>$self->{'Data'}{'client'}, 
-        type=>'Person'
-    });
-
-    my %facilityTypeOptions = ();
-    my $facilityTypes = FacilityTypes::getAll($self->{'Data'});
-    for my $ft ( @{$facilityTypes} ) {
-        $facilityTypeOptions{$ft->{'intFacilityTypeID'}} = $ft->{'strName'} || next;
-    }
-
-    my %genderoptions = ();
-    for my $k ( keys %Defs::PersonGenderInfo ) {
-        next if !$k;
-        next if ( $self->{'SystemConfig'}{'NoUnspecifiedGender'} and $k eq $Defs::GENDER_NONE );
-        $genderoptions{$k} = $Defs::PersonGenderInfo{$k} || '';
-    }
-
-    my $languages = getPersonLanguages( $self->{'Data'}, 1, 0);
-    my %languageOptions = ();
-    my $nonLatin = 0;
-    my @nonLatinLanguages =();
-    for my $l ( @{$languages} ) {
-        $languageOptions{$l->{'intLanguageID'}} = $l->{'language'} || next;
-        if($l->{'intNonLatin'}) {
-            $nonLatin = 1 ;
-            push @nonLatinLanguages, $l->{'intLanguageID'};
-        }
-    }
-    my $nonlatinscript = '';
-    if($nonLatin)   {
-        my $vals = join(',',@nonLatinLanguages);
-        $nonlatinscript =   qq[
-           <script>
-                jQuery(document).ready(function()  {
-                    jQuery('#l_intLocalLanguage').change(function()   {
-                        showLocalLanguage();
-                    });
-                    function showLocalLanguage()    {
-                        var lang = parseInt(jQuery('#l_intLocalLanguage').val());
-                        nonlatinvals = [$vals];
-                        if(nonlatinvals.indexOf(lang) !== -1 )  {
-                            jQuery('#block-latinnames').show();
-                        }
-                        else    {
-                            jQuery('#block-latinnames').hide();
-                        }
-                    }
-                    showLocalLanguage();
-                });
-            </script> 
-        ];
-    }
-    my ($DefCodes, $DefCodesOrder) = getDefCodes(
-        dbh        => $self->{'Data'}{'db'},
-        realmID    => $self->{'Data'}{'Realm'},
-        subRealmID => $self->{'Data'}{'RealmSubType'},
-    );
-
-    my %entityTypeOptions = ();
-    for my $eType ( keys %Defs::entityType ) {
-        next if !$eType;
-        next if $eType eq $Defs::EntityType_WORLD_FEDERATION;
-        next if $eType eq $Defs::EntityType_NATIONAL_ASSOCIATION;
-        next if $eType eq $Defs::EntityType_REGIONAL_ASSOCIATION;
-        $entityTypeOptions{$eType} = $Defs::entityType{$eType} || '';
-    }
-
-    my @intNatCustomLU_DefsCodes = (undef, -53, -54, -55, -64, -65, -66, -67, -68,-69,-70);
-    my $CustomFieldNames = getCustomFieldNames( $self->{'Data'}, $self->{'Data'}{'RealmSubType'}) || {};
-    $self->{'FieldSets'} = {
-        core => {
-            'fields' => {
-                intFacilityTypeID => {
-                    label       => $FieldLabels->{'intFacilityTypeID'},
-                    value       => $values->{'intFacilityTypeID'},
-                    type        => 'lookup',
-                    options     => \%facilityTypeOptions,
-                    firstoption => [ '', 'Select Type' ],
-                    compulsory => 1,
-                    sectionname => 'core',
-                },
-                strLocalName => {
-                    label       => $FieldLabels->{'strLocalName'},
-                    value       => $values->{'strLocalName'},
-                    type        => 'text',
-                    size        => '40',
-                    maxsize     => '50',
-                    compulsory  => 1,
-                    sectionname => 'core',
-                },
-                strLocalShortName => {
-                    label       => $FieldLabels->{'strLocalShortName'},
-                    value       => $values->{'strLocalShortName'},
-                    type        => 'text',
-                    size        => '40',
-                    maxsize     => '50',
-                    sectionname => 'core',
-                },
-                strCity         => {
-                    label       => $FieldLabels->{'strCity'},
-                    value       => $values->{'strCity'} ||  $self->{'SystemConfig'}{'DefaultCity'} || '',
-                    type        => 'text',
-                    size        => '30',
-                    maxsize     => '45',
-                    compulsory  => 1,
-                    sectionname => 'core',
-                },
-                strRegion       => {
-                    label       => $FieldLabels->{'strRegion'},
-                    value       => $values->{'strRegion'},
-                    type        => 'text',
-                    size        => '30',
-                    maxsize     => '45',
-                    sectionname => 'core',
-                },
-                strISOCountry   => {
-                    label       => $FieldLabels->{'strISOCountry'},
-                    value       => $values->{'strISOCountry'} ||  $self->{'SystemConfig'}{'DefaultCountry'} || '',
-                    type        => 'lookup',
-                    options     => $isocountries,
-                    firstoption => [ '', 'Select Country' ],
-                    compulsory => 1,
-                    sectionname => 'core',
-                    class       => 'chzn-select',
-                },
-                intLocalLanguage => {
-                    label       => $FieldLabels->{'intLocalLanguage'},
-                    value       => $values->{'intLocalLanguage'},
-                    type        => 'lookup',
-                    options     => \%languageOptions,
-                    firstoption => [ '', 'Select Language' ],
-                    compulsory => 1,
-                    posttext => $nonlatinscript,
-                    sectionname => 'core',
-                },
-                strLatinName    => {
-                    label       => $self->{'SystemConfig'}{'facility_strLatinNames'} || $FieldLabels->{'strLatinName'},
-                    value       => $values->{'strLatinName'},
-                    type        => 'text',
-                    size        => '40',
-                    maxsize     => '50',
-                    active      => $nonLatin,
-                    sectionname => 'core',
-                },
-                strLatinShortName => {
-                    label       => $self->{'SystemConfig'}{'facility_strLatinShortNames'} || $FieldLabels->{'strLatinShortName'},
-                    value       => $values->{'strLatinShortName'},
-                    type        => 'text',
-                    size        => '40',
-                    maxsize     => '50',
-                    active      => $nonLatin,
-                    sectionname => 'core',
-                },
-                latinBlockStart => {
-                    label       => 'latinblockstart',
-                    value       => qq[<div id = "block-latinnames" class = "dynamic-panel">],
-                    type        => 'htmlrow',
-                    sectionname => 'core',
-                    active      => $nonLatin,
-                },
-                latinBlockEnd => {
-                    label       => 'latinblockend',
-                    value       => qq[</div>],
-                    type        => 'htmlrow',
-                    sectionname => 'core',
-                    active      => $nonLatin,
-                },
-                    
-            },
-            'order' => [qw(
-                strLocalName
-                strLocalShortName
-                intLocalLanguage
-                latinBlockStart
-                strLatinName
-                strLatinShortName
-                latinBlockEnd
-                intFacilityTypeID
-                strCity
-                strRegion
-                strISOCountry
-            )],
-            sections => [
-                [ 'core',        'Venue Details' ],
-            ],
-            fieldtransform => {
-                textcase => {
-                    #strLocalFirstname => $field_case_rules->{'strLocalFirstname'} || '',
-                    #strLocalSurname   => $field_case_rules->{'strLocalSurname'}   || '',
-                }
-            },
-        },
-        contactdetails => {
-            'fields' => {
-                strAddress  => {
-                    label       => $FieldLabels->{'strAddress'},
-                    value       => $values->{'strAddress'},
-                    type        => 'text',
-                    size        => '50',
-                    maxsize     => '100',
-                    compulsory  => 1,
-                },
-                strAddress2 => {
-                    label       => $FieldLabels->{'strAddress2'},
-                    value       => $values->{'strAddress2'},
-                    type        => 'text',
-                    size        => '50',
-                    maxsize     => '100',
-                },
-                strContactCity  => {
-                    label       => $FieldLabels->{'strContactCity'},
-                    value       => $values->{'strContactCity'} ||  $self->{'SystemConfig'}{'DefaultCity'} || '',
-                    type        => 'text',
-                    size        => '30',
-                    maxsize     => '100',
-                },
-                strState => {
-                    label       => $FieldLabels->{'strState'},
-                    value       => $values->{'strState'},
-                    type        => 'text',
-                    size        => '50',
-                    maxsize     => '100',
-                },
-                strPhone => {
-                    label       => $FieldLabels->{'strPhone'},
-                    value       => $values->{'strPhone'},
-                    type        => 'text',
-                    size        => '15',
-                    maxsize     => '15',
-                },
-                strContactISOCountry   => {
-                    label       => $FieldLabels->{'strContactISOCountry'},
-                    value       => $values->{'strContactISOCountry'},
-                    type        => 'lookup',
-                    options     => $isocountries,
-                    firstoption => [ '', 'Select Country' ],
-                    compulsory => 1,
-                    class       => 'chzn-select',
-                },
-                strPostalCode => {
-                    label       => $FieldLabels->{'strPostalCode'},
-                    value       => $values->{'strPostalCode'},
-                    type        => 'text',
-                    size        => '50',
-                    maxsize     => '100',
-                },
-                strEmail => {
-                    label       => $FieldLabels->{'strEmail'},
-                    value       => $values->{'strEmail'},
-                    type        => 'text',
-                    size        => '50',
-                    maxsize     => '100',
-                    validate    => 'EMAIL',
-                },
-                strContact=> {
-                    label       => $FieldLabels->{'strContact'},
-                    value       => $values->{'strContact'},
-                    type        => 'text',
-                    size        => '50',
-                    maxsize     => '100',
-                    compulsory  => 1,
-                },
-                strFax => {
-                    label       => $FieldLabels->{'strFax'},
-                    value       => $values->{'strFax'},
-                    type        => 'text',
-                    size        => '50',
-                    maxsize     => '100',
-                },
-                strWebURL => {
-                    label       => $FieldLabels->{'strWebURL'},
-                    value       => $values->{'strWebURL'},
-                    type        => 'text',
-                    size        => '50',
-                    maxsize     => '100',
-                    validate    => 'URL',
-                },
-            },
-            'order' => [qw(
-                strAddress
-                strAddress2
-                strContactCity
-                strState
-                strPostalCode
-                strContactISOCountry
-                strEmail
-                strPhone
-                strFax
-                strWebURL
-            )],
-            sections => [
-                [ 'main',        'Contact Details' ],
-            ],
-            #fieldtransform => {
-                #textcase => {
-                    #strSuburb    => $field_case_rules->{'strSuburb'}    || '',
-                #}
-            #},
-        },
-        roledetails  => {
-            'fields' => {
-                intEntityFieldCount    => {
-                    label       => $FieldLabels->{'intEntityFieldCount'},
-                    value       => $values->{'intEntityFieldCount'},
-                    type        => 'text',
-                    size        => '50',
-                    maxsize     => '100',
-                    compulsory  => 1,
-                    validate    => 'NUMBER',
-                },
-                strParentEntityName => {
-                    label       => $self->{'ClientValues'}{'authLevel'} == $Defs::LEVEL_CLUB ? 'Club name' : 'Organisation',
-                    value       => "",
-                    type        => 'text',
-                    size        => '50',
-                    maxsize     => '100',
-                    disabled    => 1,
-                },
-            },
-            'order' => [qw(
-                intEntityFieldCount
-                strParentEntityName
-            )],
-            sections => [
-                [ 'main',        'Field Information' ],
-            ],
-        },
-    };
+    $self->{'FieldSets'} = facilityFieldsSetup($self->{'Data'}, $values);
 }
 
 sub display_core_details { 
@@ -469,11 +132,14 @@ sub display_core_details {
     }
 
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id) if $id;
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $fieldsContent || '',
+        FlowSummaryContent => $entitySummaryPanel,
         ScriptContent => $scriptContent || '',
         Title => '',
         TextTop => '',
@@ -565,6 +231,8 @@ sub display_contact_details {
         }
     }
 
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
+
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
@@ -572,6 +240,7 @@ sub display_contact_details {
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $fieldsContent || '',
         ScriptContent => $scriptContent || '',
+        FlowSummaryContent => $entitySummaryPanel,
         Title => '',
         TextTop => '',
         TextBottom => '',
@@ -586,7 +255,7 @@ sub validate_contact_details {
     my $self = shift;
 
     my $facilityData = {};
-    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Club',);
+    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'contactdetails'}, 'Club',);
     ($facilityData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
     my $id = $self->ID() || 0;
     if(!$id){
@@ -612,11 +281,16 @@ sub display_role_details {
     my $self = shift;
 
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+
+    my $id = $self->ID() || 0;
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
+
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $fieldsContent || '',
+        FlowSummaryContent => $entitySummaryPanel,
         ScriptContent => $scriptContent || '',
         Title => '',
         TextTop => '',
@@ -637,13 +311,13 @@ sub validate_role_details {
     my %fieldCount = (
         'intEntityFieldCount' => 1
     );
-
     ($facilityFieldData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields(\%fieldCount);
 
     if(!$facilityFieldData->{'intEntityFieldCount'}){
         #push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid number of facility fields.';
         $self->incrementCurrentProcessIndex();
         $self->incrementCurrentProcessIndex();
+        #$self->incrementCurrentProcessIndex();
         return ('',2);
     }
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
@@ -668,6 +342,7 @@ sub display_fields {
 
     my $facilityFieldCount = $self->{'RunParams'}{'facilityFieldCount'} || 0;
 
+print STDERR "SSSS";
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $facilityFields = new EntityFields();
     $facilityFields->setCount($facilityFieldCount);
@@ -675,8 +350,16 @@ sub display_fields {
     $facilityFields->setData($self->{'Data'});
     
     my @facilityFieldsData = ();
+    my $startNewIndex = 1;
 
-    for my $i (1 .. $facilityFieldCount){
+    #if user navigates back, reload previous data
+    foreach my $fieldObjData (@{$facilityFields->getAll()}){
+        $facilityFields->setDBData($fieldObjData);
+        push @facilityFieldsData, $facilityFields->generateSingleRowField($startNewIndex, $fieldObjData->{'intEntityFieldID'});
+        $startNewIndex++;
+    }
+
+    for my $i ($startNewIndex .. $facilityFieldCount){
         $facilityFields->setDBData({});
         push @facilityFieldsData, $facilityFields->generateSingleRowField($i, undef);
     }
@@ -691,11 +374,13 @@ sub display_fields {
         'flow/facility_fields_grid.templ',
     );
 
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $self->ID());
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $facilityFieldsContent || '',
+        FlowSummaryContent => $entitySummaryPanel,
         ScriptContent => '',
         Title => '',
         TextTop => '',
@@ -732,16 +417,26 @@ sub process_fields {
     my $addedFields = 0;
 
     #check current tblEntityFields entry count for this specific process to avoid duplicates
-    if($facilityFieldCount != scalar@{$facilityFields->getAll()}){
-        foreach my $fieldObjData (@{$facilityFieldDataCluster}){
-            my $entityFieldObj = new EntityFieldObj(db => $self->{'db'}, ID => 0);
-            $entityFieldObj->load();
-            $entityFieldObj->setValues($fieldObjData);
-            $entityFieldObj->write();
-            $addedFields++;
-        }
+    #if($facilityFieldCount != scalar@{$facilityFields->getAll()}){
+    #    foreach my $fieldObjData (@{$facilityFieldDataCluster}){
+    #        my $entityFieldObj = new EntityFieldObj(db => $self->{'db'}, ID => 0);
+    #        $entityFieldObj->load();
+    #        $entityFieldObj->setValues($fieldObjData);
+    #        $entityFieldObj->write();
+    #        $addedFields++;
+    #    }
 
-        $self->addCarryField('addedFields', $addedFields);
+    #    $self->addCarryField('addedFields', $addedFields);
+    #}
+
+    foreach my $fieldObjData (@{$facilityFieldDataCluster}){
+        my $existingEntityFieldID = $fieldObjData->{'intEntityFieldID'} || 0;
+        #if previously added, set ID to $existingEntityFieldID to update record instead of inserting duplicates
+        my $entityFieldObj = new EntityFieldObj(db => $self->{'db'}, ID => $existingEntityFieldID);
+        $entityFieldObj->load();
+        $entityFieldObj->setValues($fieldObjData);
+        $entityFieldObj->write();
+        $addedFields++;
     }
 
     return ('', 1);
@@ -894,7 +589,25 @@ sub display_documents {
             undef,
             $Defs::DOC_FOR_VENUES,
         );
-		my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $facilityID,  $venue_documents);
+
+        if(! scalar(@{$venue_documents})) {
+            $self->incrementCurrentProcessIndex();
+            $self->incrementCurrentProcessIndex();
+            return ('',2);
+        }
+
+        my @required_docs_listing = ();
+        my @optional_docs_listing = ();
+	
+		my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $facilityID,  $venue_documents, 0);
+        foreach my $rdc (@{$diff}){
+            if($rdc->{'Required'}){
+                push @required_docs_listing, $rdc;
+            }
+            else {
+                push @optional_docs_listing, $rdc;
+            }
+		}
 
         my $cl = setClient($self->{'Data'}->{'clientValues'}) || '';
         my %cv = getClient($cl);
@@ -904,11 +617,11 @@ sub display_documents {
 
         my %documentData = (
             target => $self->{'Data'}->{'target'},
-            documents => $diff,
+            documents => \@required_docs_listing,
+            optionaldocs => \@optional_docs_listing,
             Lang => $self->{'Data'}->{'lang'},
-            nextaction => 'VENUE_DOCS_u',
             client => $clm,
-            venue => $facilityID,
+            venueID => $facilityID,
         );
  
         $content = runTemplate($self->{'Data'}, \%documentData, 'entity/required_docs.templ') || '';  
@@ -917,16 +630,16 @@ sub display_documents {
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
     }
 
-
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $facilityID);
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        #FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
-        #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        FlowSummaryContent => $entitySummaryPanel,
         Content => '',
+        DocUploader => $content,
         Title => '',
-        TextTop => $content,
+        TextTop => '',
         TextBottom => '',
     );
 
@@ -958,10 +671,31 @@ sub process_documents {
             undef,
             $Defs::DOC_FOR_VENUES,
         );
-	my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $facilityID, $documents);
-	foreach my $dc (@{$diff}){ 
-		push @{$self->{'RunDetails'}{'Errors'}},$dc->{'Name'};		
-	}
+
+    my @required_docs_listing = ();
+    my @optional_docs_listing = ();
+		
+    foreach my $rdc (@{$documents}){
+        if($rdc->{'Required'}){
+            push @required_docs_listing,$rdc;
+        }
+		else {
+            push @optional_docs_listing, $rdc;
+        }
+    }
+
+	my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $facilityID, \@required_docs_listing, 1);
+
+    my $errStringPrepend = $self->{'Lang'}->txt('Required Document Missing') . '<ul>';
+    foreach my $dc (@{$diff}){ 
+        $errStringPrepend .= '<li>' . $dc->{'Name'} . '</li>';		
+    }
+    $errStringPrepend .= '</ul>';
+
+    if(scalar(@{$diff})){
+        push @{$self->{'RunDetails'}{'Errors'}},$errStringPrepend;
+    }
+
 	if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
         $self->decrementCurrentProcessIndex();
@@ -984,17 +718,102 @@ sub display_summary {
 
     my $content = '';
 
+    my $id = $self->ID() || 0;
+    my $facilityObj;
+    if($id)   {
+        $facilityObj = new EntityObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}->{'cache'});
+        $facilityObj->load();
+        if(!doesUserHaveEntityAccess($self->{'Data'}, $id,'WRITE')) {
+            return ('Invalid User',0);
+        }
+    }
+
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
         $self->decrementCurrentProcessIndex();
         return ('',2);
     }
 
+    my $languages = PersonLanguages::getPersonLanguages($self->{'Data'}, 1, 0);
+    my $selectedLanguage;
+    for my $l ( @{$languages} ) {
+        if($l->{intLanguageID} == $facilityObj->getValue('intLocalLanguage')){
+             $selectedLanguage = $l->{'language'};
+            last
+        }
+    }
+
+    my $facilityTypes = FacilityTypes::getAll($self->{'Data'});
+    my $selectedFacilityType;
+    for my $l ( @{$facilityTypes} ) {
+        if($l->{intFacilityTypeID} == $facilityObj->getValue('intFacilityTypeID')){
+             $selectedFacilityType = $l->{'strName'};
+            last
+        }
+    }
+
+    my $facilityFields = new EntityFields();
+    my $facilityFieldCount = $self->{'RunParams'}{'facilityFieldCount'} || 0;
+    $facilityFields->setCount($facilityFieldCount);
+    $facilityFields->setEntityID($self->{'RunParams'}{'e'});
+    $facilityFields->setData($self->{'Data'});
+    
+    my @facilityFieldsData = ();
+    my $startNewIndex = 1;
+
+    foreach my $fieldObjData (@{$facilityFields->getAll()}){
+        $fieldObjData->{'strGroundNature'} = $Defs::fieldGroundNatureType{$fieldObjData->{'strGroundNature'}};
+        $fieldObjData->{'strDiscipline'} = $Defs::entitySportType{$fieldObjData->{'strDiscipline'}};
+        #$facilityFields->setDBData($fieldObjData);
+        push @facilityFieldsData, $fieldObjData;
+        #$startNewIndex++;
+    }
+
+    my $isocountries  = getISOCountriesHash();
+    my %summaryData = (
+        FacilityCoreDetails => {
+            Name => $facilityObj->getValue('strLocalName') || '',
+            ShortName => $facilityObj->getValue('strLocalShortName') || '',
+            Language => $selectedLanguage || '',
+            VenueType => $selectedFacilityType || '',
+            City => $facilityObj->getValue('strCity') || '',
+            Region => $facilityObj->getValue('strRegion') || '',
+            Country => $isocountries->{$facilityObj->getValue('strISOCountry')} || '',
+        },
+        FacilityContactDetails => {
+            Address1 => $facilityObj->getValue('strAddress') || '',
+            Address2 => $facilityObj->getValue('strAddress2') || '',
+            City => $facilityObj->getValue('strContactCity') || '',
+            State => $facilityObj->getValue('strState') || '',
+            PostalCode => $facilityObj->getValue('strPostalCode') || '',
+            Country => $isocountries->{$facilityObj->getValue('strContactISOCountry')} || '',
+            Email => $facilityObj->getValue('strEmail') || '',
+            Phone => $facilityObj->getValue('strPhone') || '',
+            Fax => $facilityObj->getValue('strFax') || '',
+            WebAddress => $facilityObj->getValue('strWebURL') || '',
+        },
+        FacilityFields => \@facilityFieldsData,
+        FacilityDocuments => {
+        
+        },
+        editlink => $self->stringifyURLCarryField(),
+        target => $self->{'Data'}{'target'},
+    );
+    my $summaryContent = runTemplate(
+        $self->{'Data'},
+        \%summaryData,
+        'flow/facility_summary.templ',
+    );
+
+
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $facilityObj->ID());
+
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        Content => '',
+        FlowSummaryContent => $entitySummaryPanel,
+        Content => $summaryContent,
         Title => '',
         TextTop => $content,
         TextBottom => '',
@@ -1012,26 +831,27 @@ sub display_complete {
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
     my $client = $self->{'Data'}->{'client'};
 
-    my $facilityFields = new EntityFields();
-    $facilityFields->setEntityID($self->{'RunParams'}{'e'});
-    $facilityFields->setData($self->{'Data'});
+    my $facilityID = $self->ID() || 0;
+
+    my $facilityObj = new EntityObj(db => $self->{'db'}, ID => $facilityID, cache => $self->{'Data'}->{'cache'});
 
     my $content = '';
-    if(scalar@{$facilityFields->getAll()}) {
-        my $facilityID = $facilityFields->getEntityID();
-        my $facilityObj = new EntityObj(db => $self->{'db'}, ID => $facilityID, cache => $self->{'Data'}->{'cache'});
+
+    #if(scalar@{$facilityFields->getAll()}) {
+    if($facilityID) {
         $facilityObj->load();
         my $PendingStatus =  {};
         $PendingStatus->{'strStatus'} = $Defs::ENTITY_STATUS_PENDING;
         $facilityObj->setValues($PendingStatus);
         $facilityObj->write();
+
         if($self->{'RunParams'}{'newvenue'})  {
             my $rc = WorkFlow::addWorkFlowTasks(
                 $self->{'Data'},
                 'ENTITY',
                 'NEW',
                 $self->{'ClientValues'}{'authLevel'} || 0,
-                $facilityFields->getEntityID(),
+                $facilityID,
                 0,
                 0,
                 0,
@@ -1051,13 +871,32 @@ sub display_complete {
         return ('',2);
     }
 
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $facilityID);
+
+    my $maObj = getInstanceOf($self->{'Data'}, 'national');
+    my $maName = $maObj ? $maObj->name() : '';
+	
+    my %facilityApprovalData = ( 
+        EntitySummaryPanel => $entitySummaryPanel,
+        client => $self->{'Data'}->{'client'},
+        target => $self->{'Data'}->{'target'},
+        MA => $maName,
+    );
+    my $displayFacilityForApproval = runTemplate(
+        $self->{'Data'},
+        \%facilityApprovalData,
+        'entity/complete.templ',
+    );
+
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        Content => '',
+        processStatus => 1,
+        Content => $displayFacilityForApproval,
         Title => '',
-        TextTop => $content,
+        #TextTop => $content,
+        TextTop => '',
         TextBottom => '',
         NoContinueButton => 1,
     );
@@ -1090,6 +929,8 @@ sub loadObjectValues    {
             strContactISOCountry
             strPhone
             strEmail
+            strFax
+            strWebURL
 
             strEntityType
             intLegalTypeID
@@ -1111,3 +952,88 @@ sub loadObjectValues    {
     return \%values;
 }
 
+sub Navigation {
+    #May need to be overriden in child class to define correct order of steps
+  my $self = shift;
+
+    my $navstring = '';
+    my $meter = '';
+    my @navoptions = ();
+    my $step = 1;
+    my $step_in_future = 0;
+    my $shared_nav = 0;
+    my $noNav = $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'NoNav'} || 0;
+    my $noGoingBack = $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'NoGoingBack'} || 0;
+    return '' if $noNav;
+    my $startingStep = $self->{'RunParams'}{'_ss'} || '';
+    my $includeStep = 1;
+    $includeStep = 0 if $startingStep;
+    my $lastDisplayIndex = 0;
+    for my $i (0 .. $#{$self->{'ProcessOrder'}})    {
+        my $current = 0;
+        my $name = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'label'} || $self->{'ProcessOrder'}[$i]{'ShareNav'} || '');
+        if($startingStep and $self->{'ProcessOrder'}[$i]{'action'} eq $startingStep)   {
+            $includeStep = 1;
+        }
+        next if !$includeStep;
+        next if($self->{'ProcessOrder'}[$i]{'NoNav'});
+        next if($self->{'ProcessOrder'}[$i]{'NoDisplayInNav'});
+        if($name)   {
+            $current = 1 if $i == $self->{'CurrentIndex'};
+            push @navoptions, [
+                $name,
+                $current || $step_in_future || 0,
+            ];
+            my $currentclass = '';
+            $currentclass = 'current' if $current;
+            $currentclass = 'next' if $step_in_future;
+            $currentclass ||= 'previous';
+            $meter = $step if $current;
+            my $showlink = 0;
+            $showlink = 1 if(!$current and !$step_in_future);
+            $showlink = 0 if($self->{'ProcessOrder'}[$i]{'noRevisit'});
+            $showlink = 0 if $noGoingBack;
+            $showlink = 0 if $self->{'ProcessOrder'}[$i]{'ShareNav'};
+            my $linkURL = $self->{'Target'}."?rfp=".$self->{'ProcessOrder'}[$i]{'action'}."&".$self->stringifyURLCarryField();
+            $self->{'RunDetails'}{'DirectLinks'}[$i] = $linkURL;
+
+            if($self->{'ProcessOrder'}[$i]{'ShareNav'}){
+                $step_in_future = 2 if $current;
+                $shared_nav = 1;
+            }
+            else {
+                $shared_nav = 0;
+                my $link = $showlink
+                    #? qq[<a href="$linkURL" class = "stepname">$step. $name</a>]
+                    #: qq[<span class = "stepname">$step. $name</span>];
+
+                    ? qq[<a href="$linkURL" class = "stepname">$step. $name</a>]
+                    : qq[<span class = "stepname">$step. $name</span>];
+                
+                #$navstring .= qq[ <li class = "$currentclass step step-$step"><span class="$currentclass step-num">$link</li> ];
+                $navstring .= qq[ <div class = "col-md-2 $currentclass step step-$step"><span class="$currentclass step-num">$link</span></div> ];
+                $step_in_future = 2 if $current;
+                $step++;
+                $lastDisplayIndex = $i;
+            }
+        }
+    }
+    #my $returnHTML = '';
+    #$returnHTML .= qq[<ul class = "playermenu list-inline form-nav">$navstring</ul><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;
+    #$returnHTML .= qq[<div class = "progressFlow">$navstring</div><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;           
+
+    my $onLastStep = $self->{'CurrentIndex'} >= $lastDisplayIndex;
+    my $completeClass = $onLastStep ? 'progressComplete' : '';
+    my $returnHTML = '';
+    
+    $returnHTML .= qq[<div class = "progressFlow $completeClass ">$navstring</div><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;        
+    
+
+    if(wantarray)   {
+        return ($returnHTML, \@navoptions);
+    }
+    return $returnHTML || '';
+}
+
+
+1;

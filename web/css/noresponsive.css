@@ -1,0 +1,9 @@
+header, .content-section, body {
+    min-width: 1170px !important;
+}
+.container  {
+    width: 1170px !important;
+}
+#pageholder {
+    width: 1170px !important;
+}

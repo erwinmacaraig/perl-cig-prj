@@ -1,4 +1,4 @@
-    <div class="">
+    <!--<div class="">
         <div class="document-detail">
             <div class = "sectionheader">
 
@@ -12,18 +12,21 @@
 
             </div>
         </div>
-    </div>
+    </div>-->
 <!--This is a static version of the new document viewer.-->
 <div class="documents-list">
     <table cellpadding="5" class="table" style="width:100%;">
         <thead>
             <tr class="document-table-header">
-                <th style="width: 50%">Document Type</th>
+                <th style="width: 50%">[% Lang.txt('Document Type') %]</th>
                 <th style="width: 32%"></th>
-                <th style="width: 18%; text-align: right">Status</th>
+                <th style="width: 18%; text-align: left">[% Lang.txt('Status') %]</th>
             </tr>
         </thead>
         <tbody>
+
+            <input type="hidden" value = "[% TotalPending %]" class="totalPendingDocs">
+            
             [% FOREACH document IN RelatedDocuments %]
             <tr class="task-list">
                 <td>
@@ -49,7 +52,8 @@
                         <span class="">[% Lang.txt('Pending') %]</span>
 
                     [% ELSIF document.Status == 'REJECTED' %]
-
+                        [% rejectFlag = "1" %]
+                        <input type="hidden" value = "[% rejectFlag %]" class="rejectedDocs">
                         <i class="fa fa-circle ver-dots red"></i>
                         <span class="">[% Lang.txt('Rejected') %]</span>
 
@@ -75,3 +79,7 @@
         </tbody>
     </table>
 </div>
+
+
+
+

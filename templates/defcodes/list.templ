@@ -28,7 +28,7 @@
                                     [% IF defCode.intAssocID %]
                                         <a href="[% target %]?client=[% client %]&amp;lki=[% defCode.intCodeID %]&amp;a=[% editAction %]&amp;t=[% dcType %]">Edit</a>
                                     [% ELSE %]
-                                        <<span class="button-small generic-button">Locked</span>
+                                        <span class="btn-inside-panels">Locked</span>
                                     [% END %]
                                     [% IF allowBulkTags AND dcType == -24 %]
                                         <a href="[% target %]?client=[% client %]&amp;lki=[% defCode.intCodeID %]&amp;a=[% clearAction %]&amp;t=[% dcType %]">Clear All</a>
@@ -46,12 +46,12 @@
         </div>
 
         [% IF allowAdds %]
-	        <p><span class="button-small generic-button"><a href="[% target %]?client=[% client %]&amp;a=[% editAction %]&amp;t=[% dcType %]">Add a New Option</a></span></p>
+	        <p><span class="btn-inside-panels"><a href="[% target %]?client=[% client %]&amp;a=[% editAction %]&amp;t=[% dcType %]">Add a New Option</a></span></p>
         [% END %]
     [% ELSE %]
 		<div class="warningmsg">No Records could be found</div>
         [% IF allowAdds %]
-	        <p><span class="button-small generic-button"><a href="[% target %]?client=[% client %]&amp;a=[% editAction %]&amp;t=[% dcType %]">Add a New Option</a></span></p>
+	        <p><span class="btn-inside-panels"><a href="[% target %]?client=[% client %]&amp;a=[% editAction %]&amp;t=[% dcType %]">Add a New Option</a></span></p>
         [% END %]
     [% END %]
 </div>

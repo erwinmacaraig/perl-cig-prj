@@ -13,6 +13,7 @@ use Reg_common;
 use Utils;
 use Lang;
 use UploadFiles;
+use S3Upload;
 
 main();	
 
@@ -25,8 +26,13 @@ sub main {
   my %Data=();
   $fileID =~ /^(\d+)$/;
   $fileID = $1;	
-                                                                                                        
-  my $db = connectDB();
+  #my $db = connectDB();
+
+  my %clientValues = getClient($client);
+  $Data{'clientValues'} = \%clientValues;
+  $Data{'cache'}  = new MCache();
+  my $db=allowedTo(\%Data);
+
   my $statement=qq[
 	SELECT *
 	FROM tblUploadedFiles
@@ -37,11 +43,18 @@ sub main {
   my $dref =$query->fetchrow_hashref();
   $query->finish();
   disconnectDB($db);
-  my $filename= "$Defs::fs_upload_dir/files/$dref->{'strPath'}$dref->{'strFilename'}.$dref->{'strExtension'}";
-  open (FILE, "<$filename");
   my $file='';
-  while(<FILE>)  { $file.= $_; }
-  close (FILE);
+  if($Defs::aws_upload_bucket)    {
+      my $key= "$dref->{'strPath'}$dref->{'strFilename'}.$dref->{'strExtension'}";
+      $file = getFileFromS3($key);
+  }
+  else    {
+      my $filename= "$Defs::fs_upload_dir/files/$dref->{'strPath'}$dref->{'strFilename'}.$dref->{'strExtension'}";
+      open (FILE, "<$filename");
+      while(<FILE>)  { $file.= $_; }
+      close (FILE);
+  }
+
   my $size = $dref->{'intBytes'} || 0;
   my $contenttype ='';
   my $ext = $dref->{'strExtension'} || '';
@@ -64,7 +77,7 @@ sub main {
   print "Content-length: $size\n";
   print "Content-transfer-encoding: $size\n";
   if($download) {
-      print qq[Content-disposition: attachement; filename = "$origfilename"\n\n];
+      print qq[Content-disposition: attachment; filename = "$origfilename"\n\n];
   }
   else  {
       print qq[Content-disposition: inline; filename = "$origfilename"\n\n];

@@ -18,6 +18,7 @@ use CustomFields;
 use DefCodes;
 use PersonUtils;
 use AssocTime;
+use MinorProtection;
 
 sub personFieldsSetup {
     my ($Data, $values) = @_;
@@ -100,7 +101,7 @@ sub personFieldsSetup {
     my $minorscript = qq[
         <script>
             jQuery(document).ready(function()  {
-                jQuery("#l_dtDOB_year, #l_dtDOB_mon, #l_dtDOB_day").change(function(){
+                jQuery("#l_dtDOB_year, #l_dtDOB_mon, #l_dtDOB_day,#l_strISONationality").change(function(){
                     showMinorProtection();
                 });
     
@@ -108,14 +109,19 @@ sub personFieldsSetup {
                     var dob_y = jQuery("#l_dtDOB_year").val();
                     var dob_m = jQuery("#l_dtDOB_mon").val();
                     var dob_d = jQuery("#l_dtDOB_day").val();
+                    var nationality= jQuery("#l_strISONationality").val();
                     var show = 0;
-                    if(dob_y && dob_m && dob_d)  {
+                    var showITC = 0;
+                    if(dob_y && dob_m && dob_d && (nationality != '$Data->{'SystemConfig'}{'DefaultNationality'}'))  {
                         if(dob_m < 10) { dob_m = '0' + dob_m; }
                         if(dob_d < 10) { dob_d = '0' + dob_d; }
                         var dob = dob_y + '-' + dob_m + '-' + dob_d;
                         if(dob > '$minorComparisonDate_low'
                             && dob < '$minorComparisonDate_high')    {
                             show = 1;
+                        }
+                        if(dob < '$minorComparisonDate_low')    {
+                            showITC = 1;
                         }
                     }
                     if(show)    {
@@ -124,6 +130,12 @@ sub personFieldsSetup {
                     else    {
                         jQuery('#block-minor').hide();
                     }
+                    if(showITC)    {
+                        jQuery('#block-itc').show();
+                    }
+                    else    {
+                        jQuery('#block-itc').hide();
+                    }
                 }
                 showMinorProtection();
             });
@@ -131,10 +143,15 @@ sub personFieldsSetup {
     ];
 
     my $allowMinorProtection = 0;
+    my $showITCReminder = 0;
     if($values->{'defaultType'} eq 'PLAYER')    {
         #minor protection only for player
         $allowMinorProtection = 1;
+        $showITCReminder = 1;
     }
+    $showITCReminder = 0 if $values->{'itc'};
+    my $minorProtectionOptions = getMinorProtectionOptions($Data,$values->{'itc'} || 0);
+    my $minorProtectionExplanation= getMinorProtectionExplanation($Data,$values->{'itc'} || 0);
 
     my ($DefCodes, $DefCodesOrder) = getDefCodes(
         dbh        => $Data->{'db'},
@@ -154,7 +171,7 @@ sub personFieldsSetup {
                     size        => '40',
                     maxsize     => '50',
                     sectionname => 'core',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },
                 strLocalSurname => {
                     label       => $Data->{'SystemConfig'}{'strLocalSurname_Text'} ? $Data->{'SystemConfig'}{'strLocalSurname_Text'} : $FieldLabels->{'strLocalSurname'},
@@ -164,7 +181,7 @@ sub personFieldsSetup {
                     maxsize     => '50',
                     compulsory => 1,
                     sectionname => 'core',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },
                 intGender => {
                     label       => $FieldLabels->{'intGender'},
@@ -175,7 +192,7 @@ sub personFieldsSetup {
                     compulsory => 1,
                     firstoption => [ '', " " ],
                     sectionname => 'core',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },                
                 intLocalLanguage => {
                     label       => $FieldLabels->{'intLocalLanguage'},
@@ -187,7 +204,7 @@ sub personFieldsSetup {
                     posttext => $nonlatinscript,
                     sectionname => 'core',
                     class       => 'chzn-select',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },
                 strLatinFirstname => {
                     label       => $Data->{'SystemConfig'}{'person_strLatinNames'} || $FieldLabels->{'strLatinFirstname'},
@@ -197,7 +214,7 @@ sub personFieldsSetup {
                     maxsize     => '50',
                     active      => $nonLatin,
                     sectionname => 'core',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },
                 latinBlockStart => {
                     label       => 'latinblockstart',
@@ -221,7 +238,7 @@ sub personFieldsSetup {
                     maxsize     => '50',
                     active      => $nonLatin,
                     sectionname => 'core',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },
                 strMaidenName => {
                     label       => $FieldLabels->{'strMaidenName'},
@@ -231,7 +248,7 @@ sub personFieldsSetup {
                     maxsize     => '50',
                     posttext    => $maidennamescript,
                     sectionname => 'core',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },
                 dtDOB => {
                     label       => $FieldLabels->{'dtDOB'},
@@ -243,7 +260,10 @@ sub personFieldsSetup {
                     validate    => 'DATE,LESSTHAN:'.$today,
                     compulsory => 1,
                     sectionname => 'core',
-                    noedit      => 1,
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
+
+                    #noedit      => 1,
                 },
                 strISONationality => {
                     label       => $FieldLabels->{'strISONationality'},
@@ -254,7 +274,7 @@ sub personFieldsSetup {
                     compulsory => 1,
                     class       => 'chzn-select',
                     sectionname => 'core',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },
                 strISOCountryOfBirth => {
                     label       => $FieldLabels->{'strISOCountryOfBirth'},
@@ -265,7 +285,7 @@ sub personFieldsSetup {
                     class       => 'chzn-select',
                     compulsory => 1,
                     sectionname => 'core',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },
                 strRegionOfBirth => {
                     label       => $FieldLabels->{'strRegionOfBirth'},
@@ -274,7 +294,7 @@ sub personFieldsSetup {
                     size        => '30',
                     maxsize     => '45',
                     sectionname => 'core',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },
                 strPlaceOfBirth => {
                     label       => $FieldLabels->{'strPlaceOfBirth'},
@@ -284,7 +304,7 @@ sub personFieldsSetup {
                     maxsize     => '45',
                     compulsory => 1,
                     sectionname => 'core',
-                    noedit      => 1,
+                    #noedit      => 1,
                 },
                 strPreferredLang => {
                     label       => $FieldLabels->{'strPreferredLang'},
@@ -331,6 +351,8 @@ sub personFieldsSetup {
                     format      => 'dd/mm/yyyy',
                     validate    => 'DATE',
                     sectionname => 'other',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
         		},
         		dtBirthCertValidityDateTo => {
         			label       => $FieldLabels->{'dtValidUntil'},
@@ -340,6 +362,8 @@ sub personFieldsSetup {
                     format      => 'dd/mm/yyyy',
                     validate    => 'DATE',
                     sectionname => 'other',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
         		},
         		strBirthCertDesc => {
         			label => $FieldLabels->{'strDescription'},
@@ -385,6 +409,8 @@ sub personFieldsSetup {
                     minyear => '1980',
                     maxyear => (localtime)[5] + 1900 + 15,
                     sectionname => 'other',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
                 },
                 strOtherPersonIdentifier => {
                 	label => $FieldLabels->{'strOtherPersonIdentifier'},
@@ -411,6 +437,8 @@ sub personFieldsSetup {
                     format      => 'dd/mm/yyyy',
                     validate    => 'DATE',
                     sectionname => 'other',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
                 },
                 dtOtherPersonIdentifierValidDateTo => {
                 	label => $FieldLabels->{'dtValidUntil'},
@@ -420,6 +448,8 @@ sub personFieldsSetup {
                     format      => 'dd/mm/yyyy',
                     validate    => 'DATE',
                     sectionname => 'other',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
                 },
                 strOtherPersonIdentifierDesc => {
                 	label => $FieldLabels->{'strDescription'},
@@ -437,49 +467,28 @@ sub personFieldsSetup {
                     order       => $DefCodesOrder->{-20},
                     firstoption => [ '', " " ],
                     sectionname => 'other',
+                    class       => 'chzn-select',
                 },
-               intMinorMoveOtherThanFootball => {
-                    label => $FieldLabels->{'intMinorMoveOtherThanFootball'} || '',
-                    value => $values->{'intMinorMoveOtherThanFootball'} || 0,
-                    type  => 'checkbox',
-                    displaylookup => { 1 => 'Yes', 0 => 'No' },
+                intMinorProtection => {
+                    label => $FieldLabels->{'intMinorProtection'} || '',
+                    value => $values->{'intMinorProtection'} || 0,
+                    type        => 'lookup',
+                    options     => $minorProtectionOptions,
+                    firstoption => [ '', " " ],
                     sectionname => 'core',
-                    swapLabels => 1,
-                    active => $allowMinorProtection,
-                },
-                intMinorDistance => {
-                    label => $FieldLabels->{'intMinorDistance'} || '',
-                    value => $values->{'intMinorDistance'} || 0,
-                    type  => 'checkbox',
-                    displaylookup => { 1 => 'Yes', 0 => 'No' },
-                    sectionname => 'core',
-                    swapLabels => 1,
-                    active => $allowMinorProtection,
-                },
-                intMinorEU => {
-                    label => $FieldLabels->{'intMinorEU'} || '',
-                    value => $values->{'intMinorEU'} || 0,
-                    type  => 'checkbox',
-                    displaylookup => { 1 => 'Yes', 0 => 'No' },
-                    sectionname => 'core',
-                    swapLabels => 1,
-                    active => $allowMinorProtection,
-                },
-                intMinorNone => {
-                    label => $FieldLabels->{'intMinorNone'} || '',
-                    value => $values->{'intMinorNone'} || 0,
-                    type  => 'checkbox',
-                    displaylookup => { 1 => 'Yes', 0 => 'No' },
-                    sectionname => 'core',
+                    class       => 'fcToggleGroup',
                     posttext    => $minorscript,
-                    swapLabels => 1,
                     active => $allowMinorProtection,
+                    compulsoryIfVisible => 'block-minor',
                 },
                 minorBlockStart => {
                     label       => 'minorblockstart',
                     value       => qq[<div id = "block-minor" class = "dynamic-panel">
                         <div class="form-group"> 
-                            <label class = "col-md-4 control-label txtright"><span class="compulsory">*</span>FIFA Minor Protection</label>
+                            <div class="col-md-12">
+                                <p>$minorProtectionExplanation</p>
+                                <p>].$Data->{'lang'}->txt('You must choose one of the following options').qq[</p>
+                            </div>
                         </div>
                     ],
                     type        => 'htmlrow',
@@ -493,6 +502,22 @@ sub personFieldsSetup {
                     sectionname => 'core',
                     active => $allowMinorProtection,
                 },
+                ITCReminder => {
+                    label       => 'itcreminder',
+                    value       => qq[<div id = "block-itc" class = "ddynamic-panel">
+                        <div class="form-group"> 
+                            <div class="col-md-12">
+                                <div class = "alert">
+                                    <div><span class = "fa fa-info"></span>
+                                <p>].$Data->{'lang'}->txt(qq[If the player has been registered in another country before, you will need an ITC to continue with the registration.]).qq[  <a href = "$values->{'BaseURL'}PRA_T">].$Data->{'lang'}->txt(qq[If you have the ITC then please start the transfer process here.]).qq[  <a href = "$values->{'BaseURL'}PRA_NC">].$Data->{'lang'}->txt(qq[If you don't have an ITC you can request it here prior to the registration.]).qq[</a></p>
+                            </div> </div>
+                            </div>
+                        </div>
+                    ],
+                    type        => 'htmlrow',
+                    sectionname => 'core',
+                    active => $showITCReminder,
+                },
  
             },
             'order' => [qw(
@@ -505,12 +530,6 @@ sub personFieldsSetup {
                 latinBlockEnd
                 dtDOB
 
-                minorBlockStart
-                intMinorMoveOtherThanFootball
-                intMinorDistance
-                intMinorEU
-                intMinorNone
-                minorBlockEnd                
 
                 intGender
                 strMaidenName
@@ -519,7 +538,10 @@ sub personFieldsSetup {
                 strRegionOfBirth
                 strPlaceOfBirth
 
-
+                minorBlockStart
+                intMinorProtection
+                minorBlockEnd                
+                ITCReminder
 
                 strPreferredLang
                 intEthnicityID                 
@@ -786,6 +808,7 @@ sub personFieldsSetup {
                     value       => $values->{'intCertificationTypeID'},
                     type        => 'lookup',
                     options     => $values->{'certificationTypes'} || {},
+                    order       => $values->{'certificationTypesOrdered'},
                     firstoption => [ '', " " ],
                 },
                 dtValidFrom => {
@@ -794,6 +817,10 @@ sub personFieldsSetup {
                     type        => 'date',
                     format      => 'yyyy-mm-dd',
                     validate    => 'DATE',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
+                    datetype    => 'dropdown',
+                    maxyear => (localtime)[5] + 1900,
                 },                
                 dtValidUntil => {
                     label       => $FieldLabels->{'dtValidUntil'},
@@ -801,6 +828,10 @@ sub personFieldsSetup {
                     type        => 'date',
                     format      => 'yyyy-mm-dd',
                     validate    => 'DATE',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
+                    datetype    => 'dropdown',
+                    maxyear => (localtime)[5] + 1900 + 15,
                 },
                 strDescription => {
                     label       => $FieldLabels->{'strDescription'},
@@ -808,6 +839,8 @@ sub personFieldsSetup {
                     type        => 'text',
                     size        => '30',
                     maxsize     => '100',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
                 },
             },
             'order' => [qw(
@@ -817,43 +850,9 @@ sub personFieldsSetup {
                 strDescription
             )],
             sections => [
-                [ 'main',        'Certifications' ],
+                [ 'main',        'Add New Certification' ],
             ],
         },
-#        minor => {
-#            'fields' => {
-#                intMinorMoveOtherThanFootball => {
-#                    label => $FieldLabels->{'intMinorMoveOtherThanFootball'} || '',
-#                    value => $values->{'intMinorMoveOtherThanFootball'} || 0,
-#                    type  => 'checkbox',
-#                    displaylookup => { 1 => 'Yes', 0 => 'No' },
-#                },
-#                intMinorDistance => {
-#                    label => $FieldLabels->{'intMinorDistance'} || '',
-#                    value => $values->{'intMinorDistance'} || 0,
-#                    type  => 'checkbox',
-#                    displaylookup => { 1 => 'Yes', 0 => 'No' },
-#                },
-#                intMinorEU => {
-#                    label => $FieldLabels->{'intMinorEU'} || '',
-#                    value => $values->{'intMinorEU'} || 0,
-#                    type  => 'checkbox',
-#                    displaylookup => { 1 => 'Yes', 0 => 'No' },
-#                },
-#                intMinorNone => {
-#                    label => $FieldLabels->{'intMinorNone'} || '',
-#                    value => $values->{'intMinorNone'} || 0,
-#                    type  => 'checkbox',
-#                    displaylookup => { 1 => 'Yes', 0 => 'No' },
-#                },
-#            },
-#            'order' => [qw(
-#                intMinorMoveOtherThanFootball
-#                intMinorDistance
-#                intMinorEU
-#                intMinorNone
-#            )],
-#        }
     };
     for my $i (1..10) {
         my $fieldname = "intNatCustomLU$i";

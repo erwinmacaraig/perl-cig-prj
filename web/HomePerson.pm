@@ -22,6 +22,7 @@ use Person;
 use NationalReportingPeriod;
 use DuplicatesUtils;
 use Data::Dumper;
+use PersonSummaryPanel;
 
 require AccreditationDisplay;
 
@@ -30,6 +31,14 @@ sub showPersonHome	{
 	my $client = $Data->{'client'} || '';
 	my $personObj = getInstanceOf($Data, 'person');
 	my $allowedit = allowedAction($Data, 'p_e') ? 1 : 0;
+
+	my $cl = setClient($Data->{'clientValues'}) || '';
+    my %cv = getClient($cl);
+    $cv{'personID'} = $personID;
+    $cv{'currentLevel'} = $Defs::LEVEL_PERSON;
+    my $clm = setClient(\%cv);
+
+
 	my $notifications = [];
 	my %configchanges = ();
 	if ( $Data->{'SystemConfig'}{'PersonFormReLayout'} ) {
@@ -46,7 +55,7 @@ sub showPersonHome	{
 		if(!$Data->{'SystemConfig'}{'LockPerson'}){
 			$adddocumentURL = "$Data->{'target'}?client=$client&amp;a=DOC_L";
 			if(DuplicatesUtils::isCheckDupl($Data))	{
-				$markduplicateURL = "$Data->{'target'}?client=$client&amp;a=P_DUP_";
+				#$markduplicateURL = "$Data->{'target'}?client=$client&amp;a=P_DUP_";
 			}
 		}
 		#if($Data->{'SystemConfig'}{'AllowCardPrinting'})	{
@@ -60,7 +69,7 @@ sub showPersonHome	{
 		}
 
 	}
-    my $addregistrationURL = "$Data->{'target'}?client=$client&amp;a=PF_&rfp=r&amp;_ss=r";
+    my $addregistrationURL = "$Data->{'target'}?client=$client&amp;a=PF_&rfp=r&amp;_ss=r&amp;es=1";
 	my $accreditations = ($Data->{'SystemConfig'}{'NationalAccreditation'}) ? AccreditationDisplay::ActiveNationalAccredSummary($Data, $personID) : '';#ActiveAccredSummary($Data, $personID, $Data->{'clientValues'}{'assocID'});
 
     my $readonly = !( ($personObj->getValue('strStatus') eq 'REGISTERED' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
@@ -86,6 +95,7 @@ sub showPersonHome	{
 			Active => $Data->{'lang'}->txt(($personObj->getValue('intRecStatus') || '') ? 'Yes' : 'No'),
 			strLocalFirstname => $personObj->getValue('strLocalFirstname') || '',
        		strLocalSurname => $personObj->getValue('strLocalSurname') || '',
+       		strMaidenName => $personObj->getValue('strMaidenName') || '',
 			LatinFirstname=> $personObj->getValue('strLatinFirstname') || '',	
 			LatinSurname=> $personObj->getValue('strLatinSurname') || '',	
 			Address1 => $personObj->getValue('strAddress1') || '',	
@@ -102,11 +112,28 @@ sub showPersonHome	{
 			BirthCountry => $personObj->getValue('strISOCountryOfBirth') || '',
 			PassportNat => $personObj->getValue('strPassportNationality') || '',
 			Status => $personObj->getValue('strStatus') || '',
-			Nationality => $c->{$personObj->getValue('strISONationality')}
+			Nationality => $c->{$personObj->getValue('strISONationality')},
+			intGender => $personObj->getValue('intGender'),
 		},
-
+        SummaryPanel => personSummaryPanel($Data, $personID) || '',
 	);
 	
+	my @validdocsforallrego = ();
+	my %validdocs = ();
+	my $query = qq[SELECT tblDocuments.intDocumentTypeID, tblDocuments.intUploadFileID FROM tblDocuments INNER JOIN tblDocumentType
+				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
+				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
+				WHERE strApprovalStatus = 'APPROVED' AND intPersonID = ? AND 
+                    tblRegistrationItem.intRealmID=? AND
+                    tblRegistrationItem.strItemType='DOCUMENT' AND
+				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+				GROUP BY intDocumentTypeID];
+	my $sth = $Data->{'db'}->prepare($query);
+	$sth->execute($personID, $Data->{'Realm'});
+	while(my $dref = $sth->fetchrow_hashref()){
+		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
+		$validdocs{$dref->{'intDocumentTypeID'}} = $dref->{'intUploadFileID'};
+	}
     my %RegFilters=();
     #$RegFilters{'current'} = 1;
     my @statusIN = ($Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE); #, $Defs::PERSONREGO_STATUS_TRANSFERRED, $Defs::PERSONREGO_STATUS_SUSPENDED);
@@ -115,11 +142,91 @@ sub showPersonHome	{
     
     $RegFilters{'statusIN'} = \@statusIN;
     my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $personID, \%RegFilters);
+	my $status;
 	
+	my $rego;
+    
+    foreach $rego (@{$Reg_ref})  {
+		my @alldocs = ();
+		my $fileID = 0;
+		my $doc;
+		my $viewLink;
+		my $replaceLink;
+		my $addLink; 
+		my $displayView = 0;
+		my $displayAdd = 0;
+		my $displayReplace = 0;
+		foreach $doc (@{$rego->{'documents'}}) {			
+			$displayAdd = 0;
+			$fileID = 0;
+			$displayView  = 0;			
+			$status = $doc->{'strApprovalStatus'};
+			if(!$doc->{'strApprovalStatus'}){ 			  
+				if(!grep /$doc->{'intDocumentTypeID'}/,@validdocsforallrego){  
+					$displayAdd = 1; 
+					$fileID = 0;
+					if($doc->{'Required'}){				
+						#$documentStatusCount{'MISSING'}++;
+						$status = 'MISSING';
+					}
+					else {
+						$status = 'Optional. Not Provided.';
+						$displayReplace = 0;
+					}
+				}
+				elsif(grep /$doc->{'intDocumentTypeID'}/,@validdocsforallrego){
+					$status = 'APPROVED';
+					#$documentStatusCount{'APPROVED'}++;
+					$fileID = $validdocs{$doc->{'intDocumentTypeID'}};
+				}
+			
+			}
+			else{
+				#$documentStatusCount{$tdref->{'strApprovalStatus'}}++;
+				$displayReplace = 1;
+				$displayAdd = 0;
+				$doc->{'intUploadFileID'} ? $fileID = $doc->{'intUploadFileID'} : 0;
+			
+       		}
+			#####
+		my $documentName = $doc->{'strDocumentName'};
+		$documentName =~ s/'/\\\'/g;
 
-	
-    foreach my $rego (@{$Reg_ref})  {
-        my $renew = '';
+		my $parameters = qq[&amp;client=$clm&doctype=$doc->{'intDocumentTypeID'}&pID=$personID&regoID=$rego->{'intPersonRegistrationID'}];
+		
+
+		if($fileID) {
+			$displayView = 1;
+            $viewLink = qq[ <span style="position: relative"> 
+<a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$clm&amp;a=view');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];		
+
+				
+        }
+		#$replaceLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="replaceFile($fileID,$doc->{'intDocumentTypeID'}, $rego->{'intPersonRegistrationID'}, $personID, '$clm', '$documentName', ' ');return false;">]. $Data->{'lang'}->txt('Replace') . q[</a></span>]; 
+		$replaceLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="replaceFile($fileID,'$parameters','$documentName','');return false;"> ]. $Data->{'lang'}->txt('Replace') . q[</a></span>];	
+
+		#$addLink = qq[ <a href="#" class="btn-inside-docs-panel" onclick="replaceFile(0,$doc->{'intDocumentTypeID'}, $rego->{'intPersonRegistrationID'}, $personID, '$clm','$documentName',' ');return false;">]. $Data->{'lang'}->txt('Add') . q[</a>] if (!$Data->{'ReadOnlyLogin'});
+		$addLink = qq[ <a href="#" class="btn-inside-docs-panel" onclick="replaceFile(0,'$parameters','$documentName','');return false;">]. $Data->{'lang'}->txt('Add') . q[</a>] if (!$Data->{'ReadOnlyLogin'});
+
+		#push @alldocs, { . " - $rego->{intPersonRegistrationID} "
+		push @{$rego->{'alldocs'}},{
+				strDocumentName => $doc->{'strDocumentName'}, 
+				Status => $status,
+				DocumentType => $doc->{'intDocumentTypeID'},
+				viewLink => $viewLink,
+           	    addLink => $addLink,
+           		replaceLink => $replaceLink,
+				DisplayView => $displayView,
+				DisplayAdd => $displayAdd || '',
+				DisplayReplace => $displayReplace,
+				
+			};
+
+		} #end for looping through registration documents
+		
+
+		
+		my $renew = '';
         $rego->{'renew_link'} = '';
         #next if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}) and $Data->{'authLevel'} != $Defs::LEVEL_NATIONAL);
         ## Show MA the renew link remvoed as we need them to navigate to the club level for now
@@ -134,7 +241,9 @@ sub showPersonHome	{
         }
         my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $rego->{'strSport'}, $rego->{'personType'}, 'RENEWAL');
         next if ($rego->{'intNationalPeriodID'} == $nationalPeriodID);
-$renew = $Data->{'target'} . "?client=$client&amp;a=PREGF_TU&amp;pt=$rego->{'strPersonType'}&amp;per=$rego->{'strPersonEntityRole'}&amp;pl=$rego->{'strPersonLevel'}&amp;sp=$rego->{'strSport'}&amp;ag=$newAgeLevel&amp;nat=RENEWAL";
+        #$renew = $Data->{'target'} . "?client=$client&amp;a=PREGF_TU&amp;pt=$rego->{'strPersonType'}&amp;per=$rego->{'strPersonEntityRole'}&amp;pl=$rego->{'strPersonLevel'}&amp;sp=$rego->{'strSport'}&amp;ag=$newAgeLevel&amp;nat=RENEWAL";
+        #$renew = $Data->{'target'} . "?client=$client&amp;a=PF_&amp;pID=$rego->{'intPersonID'}&amp;dnat=RENEWAL&amp;rsp=$rego->{'strSport'}&amp;rpl=$rego->{'strPersonLevel'}&amp;rper=$rego->{'strPersonEntityRole'}&amp;rag=$newAgeLevel&amp;rpt=$rego->{'strPersonType'}";
+        $renew = $Data->{'target'} . "?client=$client&amp;a=PF_&amp;pID=$rego->{'intPersonID'}&amp;dnat=RENEWAL&amp;rpID=$rego->{'intPersonRegistrationID'}&amp;_ss=r&amp;rfp=r";
         $rego->{'renew_link'} = $renew;
 
         $rego->{'Status'} = (($rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE) and $rego->{'intPaymentRequired'}) ? $Defs::personRegoStatus{$Defs::PERSONREGO_STATUS_ACTIVE_PENDING_PAYMENT} : $rego->{'Status'};
@@ -142,6 +251,7 @@ $renew = $Data->{'target'} . "?client=$client&amp;a=PREGF_TU&amp;pt=$rego->{'str
 	
 	#$Reg_ref->[0]{'documents'} = \@reg_docs;
 	#push @{$Reg_ref},\%reg_docs;
+	
     $TemplateData{'RegistrationInfo'} = $Reg_ref;
 	
 
@@ -195,9 +305,21 @@ sub getMemFields {
 		}
 		push @{$fields_grouped{$group}}, [$f, $label];
 		my $string = '';
+        if($f =~/^dt/)  {
+            if($f eq 'dtLastUpdate')    {
+                $val = $Data->{'l10n'}{'date'}->TZformat($val,'MEDIUM','MEDIUM');
+            }
+            else    {
+                $val = $Data->{'l10n'}{'date'}->format($val,'MEDIUM');
+            }
+        }
 		if (($val and $val ne '00/00/0000') or ($is_header))	{
-			$string .= qq[<div class=""><span class = "details-left" style="width:65%;">$label:</span>] if !$nolabelfields{$f};
-			$string .= '<span class="detail-value">'.$val.'</span></div>';
+			$string .= qq[<div class="mfloat"><span class = "details-left">$label:</span>] if !$nolabelfields{$f};
+			if(length($label) >= 46)  {
+				$string .= '<span class="detail-value"><br/>'.$val.'</span></div>';
+			}else{
+				$string .= '<span class="detail-value">'.$val.'</span></div>';
+			}
 			$fields{$group} .= $string;
 		}
 	}}

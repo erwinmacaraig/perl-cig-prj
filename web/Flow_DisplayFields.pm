@@ -230,13 +230,15 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 $row_class = 'form-space';
                 $field_html = '&nbsp;';
             }
-            if ( ( $f->{'compulsory'} or $f->{'validate'} )
+            if ( ( $f->{'compulsory'} or $f->{'validate'} or $f->{'compulsoryIfVisible'})
                 and $type ne 'hidden' )
             {
                 $clientside_validation{$fieldname}{'compulsory'} =
                   $f->{'compulsory'};
                 $clientside_validation{$fieldname}{'validate'} =
                   $f->{'validate'};
+                $clientside_validation{$fieldname}{'compulsoryIfVisible'} =
+                  $f->{'compulsoryIfVisible'};
             }
             $label = qq[$label] if $label;
         }
@@ -251,6 +253,14 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
             elsif ( $f->{'displaylookup'} ) {
                 $field_html =
                   $self->langlookup( $f->{'displaylookup'}{$val} );
+            }
+            elsif ( $f->{'displayFunction'} ) {
+                my @p = ();
+                if( $f->{'displayFunctionParams'} ) {
+                   @p =  @{$f->{'displayFunctionParams'}};
+                }
+                unshift @p, $val;
+                $field_html = $f->{'displayFunction'}->(@p);
             }
             else {
                 $val =~ s/\n/<br>/g;
@@ -332,9 +342,14 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
 
         my $sectionheader = $self->langlookup( $s->[1] ) || '';
         my $requiredfield = $self->langlookup('Required fields') || '';
-        if($action eq 'display')    {$requiredfield = ''; }
+        my $ROSectionclass = '';
+        if($action eq 'display')    {
+            $requiredfield = ''; 
+            $ROSectionclass = 'fieldSectionGroupWrapper-DisplayOnly';
+        }
 
         if ( $sections{ $s->[0] } ) {
+        #if ( $sections{ $s->[0] } or $s->[4] ) {
             next if $s->[2] and not $self->display_section( $s->[2] );
             my $extraclass = $s->[3] || '';
             my $footer = $s->[4] || '';
@@ -349,7 +364,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                     $compulsory_string = '<p><span class="notice-error">'.$compulsory.$requiredfield.'</span></p>';
                 }
                 $returnstr .= qq[
-                    <div class = "fieldSectionGroupWrapper" id = "fsgw-].$s->[0].qq[">
+                    <div class = "fieldSectionGroupWrapper $ROSectionclass" id = "fsgw-].$s->[0].qq[">
                     $sh<div class = "panel-body fieldSectionGroup $extraclass" id = "fsg-].$s->[0].qq["><fieldset>$compulsory_string].$sections{ $s->[0] }.qq[</fieldset>$footer</div></div>];
             }
             else {
@@ -751,19 +766,6 @@ sub _fix_date {
     return "$yyyy-$mm-$dd";
 }
 
-sub run_function {
-    my $self = shift;
-    my ( $params, $functiontype, $query ) = @_;
-    if ( $self->{'Fields'}->{'options'}{ $functiontype . 'Function' } ) {
-        my @params = ();
-        push @params, $query->{mysql_insertid} || 0 if $query;
-        push @params, $params;
-        push @params, @{ $self->{'Fields'}->{'options'}{ $functiontype . 'Params' } }
-          if $self->{'Fields'}->{'options'}{ $functiontype . 'Params' };
-        $self->{'Fields'}->{'options'}{ $functiontype . 'Function' }->(@params);
-    }
-}
-
 sub check_valid_date {
     my $self = shift;
     my ($date) = @_;
@@ -953,13 +955,13 @@ s/onChange=(['"])(.*)\1/onMouseOut=$1 if (changed_$fieldname==1) { $2 } $1/i;
       if ($onChange);
 
     my $daysfield =
-      $self->drop_down( "${fieldname}_day", \%days, \@order_d, $val_d, 1, 0, '', $otherinfo_d,'','df_date_day' );
+      $self->drop_down( "${fieldname}_day", \%days, \@order_d, $val_d, 1, 0, '', $otherinfo_d,'','df_date_day chzn-select' );
     my $monthsfield =
       $self->drop_down( "${fieldname}_mon", \%months, \@order_m, $val_m, 1, 0, '',
-        $otherinfo_m ,'','df_date_month');
+        $otherinfo_m ,'','df_date_month chzn-select');
     my $yearsfield =
       $self->drop_down( "${fieldname}_year", \%years, \@order_y, $val_y, 1, 0, '',
-        $otherinfo_y ,'','df_date_year');
+        $otherinfo_y ,'','df_date_year chzn-select');
 
     my $field_html =
 qq[ <span $onMouseOut> <script language="JavaScript1.2">var changed_$fieldname=0; var changed_temp_$fieldname=0</script> ];
@@ -1103,6 +1105,11 @@ sub generate_clientside_validation {
             $valinfo{'messages'}{ $field_prefix . $k }{'required'} =
               $self->langlookup( 'Field required' );
         }
+        if ( $validation->{$k}{'compulsoryIfVisible'} ) {
+            $valinfo{'rules'}{ $field_prefix . $k }{'required'} = qq[JAVASCRIPTfunction(element){if(jQuery('#].$validation->{$k}{'compulsoryIfVisible'}.qq[').is(SINGLEQUOTE:visibleSINGLEQUOTE)){return true;} return false;}JAVASCRIPT];
+            $valinfo{'messages'}{ $field_prefix . $k }{'required'} =
+              $self->langlookup( 'Field required' );
+        }
         if ( $validation->{$k}{'validate'} ) {
             for my $t ( split /\s*,\s*/, $validation->{$k}{'validate'} ) {
                 my ($param) = $t =~ /:(.*)/;
@@ -1159,9 +1166,12 @@ sub generate_clientside_validation {
     };
     if ( $val_rules and $val_rules ne '{}' ) {
 
-        $val_rules =~ s/"true"/true/g;
-        $val_rules =~ s/"false"/false/g;
+        $val_rules =~ s/['"]true['"]/true/g;
+        $val_rules =~ s/["']false['"]/false/g;
         $val_rules =~ s/}$//;
+        $val_rules =~ s/JAVASCRIPT['"]//g;
+        $val_rules =~ s/['"]JAVASCRIPT//g;
+        $val_rules =~ s/SINGLEQUOTE/'/g;
         $val_rules .= qq~
             ,
             ignore: ".ignore",

@@ -83,6 +83,9 @@ sub _setupRun   {
         $self->{'ID'} = $self->{'RunParams'}{'e'};
     }
     $self->addCarryField('e', $self->ID());
+    if($self->{'RunParams'}{'_ss'})   {
+        $self->addCarryField('_ss', $self->{'RunParams'}{'_ss'});
+    }
     $self->setCurrentProcessIndex($self->{'RunParams'}->{'rfp'});
 
     return 1;
@@ -98,10 +101,12 @@ sub Navigation {
     my $step = 1;
     my $step_in_future = 0;
     my $noNav = $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'NoNav'} || 0;
+    my $noGoingBack = $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'NoGoingBack'} || 0;
     return '' if $noNav;
     my $startingStep = $self->{'RunParams'}{'_ss'} || '';
     my $includeStep = 1;
     $includeStep = 0 if $startingStep;
+    my $lastDisplayIndex = 0;
     for my $i (0 .. $#{$self->{'ProcessOrder'}})    {
         my $current = 0;
         my $name = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'label'} || '');
@@ -110,6 +115,7 @@ sub Navigation {
         }
         next if !$includeStep;
         next if($self->{'ProcessOrder'}[$i]{'NoNav'});
+        next if($self->{'ProcessOrder'}[$i]{'NoDisplayInNav'});
         if($name)   {
             $current = 1 if $i == $self->{'CurrentIndex'};
             push @navoptions, [
@@ -124,20 +130,34 @@ sub Navigation {
             my $showlink = 0;
             $showlink = 1 if(!$current and !$step_in_future);
             $showlink = 0 if($self->{'ProcessOrder'}[$i]{'noRevisit'});
+            $showlink = 0 if $noGoingBack;
             my $linkURL = $self->{'Target'}."?rfp=".$self->{'ProcessOrder'}[$i]{'action'}."&".$self->stringifyURLCarryField();
+            $self->{'RunDetails'}{'DirectLinks'}[$i] = $linkURL;
 
 			my $link = $showlink
+                #? qq[<a href="$linkURL" class = "stepname">$step. $name</a>]
+                #: qq[<span class = "stepname">$step. $name</span>];
+
                 ? qq[<a href="$linkURL" class = "stepname">$step. $name</a>]
                 : qq[<span class = "stepname">$step. $name</span>];
             
-			$navstring .= qq[ <li class = "step step-$step"><span class="$currentclass step-num">$link</li> ];
+			#$navstring .= qq[ <li class = "$currentclass step step-$step"><span class="$currentclass step-num">$link</li> ];
+            $navstring .= qq[ <div class = "col-md-2 $currentclass step step-$step"><span class="$currentclass step-num">$link</span></div> ];
             $step_in_future = 2 if $current;
             $step++;
+            $lastDisplayIndex = $i;
         }
     }
+    #my $returnHTML = '';
+    #$returnHTML .= qq[<ul class = "playermenu list-inline form-nav">$navstring</ul><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;
+    #$returnHTML .= qq[<div class = "progressFlow">$navstring</div><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;           
+
+    my $onLastStep = $self->{'CurrentIndex'} >= $lastDisplayIndex;
+    my $completeClass = $onLastStep ? 'progressComplete' : '';
     my $returnHTML = '';
-    $returnHTML .= qq[<ul class = "playermenu list-inline form-nav">$navstring</ul><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;
-   
+    
+    $returnHTML .= qq[<div class = "progressFlow $completeClass ">$navstring</div><div class="meter"><span class="meter-$meter"></span></div> ] if $navstring;        
+    
 
     if(wantarray)   {
         return ($returnHTML, \@navoptions);
@@ -250,6 +270,8 @@ sub display {
       $templateData->{'Navigation'} = $self->Navigation();
       $templateData->{'PageTitle'} = $self->title();
   }
+  $templateData->{'ContinueButtonText'} ||= 'Continue';
+  ($templateData->{'BackButtonURL'}, $templateData->{'BackButtonDestination'}) = $self->buildBackButton();
   my $output = runTemplate($self->{'Data'}, $templateData, $templateName);
   if(scalar(@{$templateData->{'Errors'}})) {
     my $filledin = HTML::FillInForm->fill(\$output, $self->{'RunParams'});
@@ -387,6 +409,28 @@ sub getCarryFields {
     my %tempcarry = %{$self->{'CarryFields'}};
     delete($tempcarry{'__cf'});
     return  \%tempcarry;
+}
+
+sub buildBackButton {
+  my $self = shift;
+
+  my $currentIndex = $self->{'CurrentIndex'} || 0;
+  my $noGoingBack = $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'NoGoingBack'} || 0;
+  if(!$currentIndex or $noGoingBack)  {
+    return ('','');
+  }
+  my $backIndex = $currentIndex - 1 ;
+  my $text = '';
+  while($backIndex >= 0 and $text eq '')    {
+    if(!$self->{'ProcessOrder'}[$backIndex]{'NoNav'})   {
+        $text = $self->{'ProcessOrder'}[$backIndex]{'label'} || '';
+    }
+    $backIndex-- if !$text;
+  }
+  return ('','') if !$text;
+  
+  my $url = $self->{'RunDetails'}{'DirectLinks'}[$backIndex] || '';
+  return ($url, $text);
 }
 
 # ------------------- Stub Functions ---

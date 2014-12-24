@@ -32,6 +32,7 @@ sub displayPersonRegisterWhat   {
         $originLevel,
         $continueURL,
         $bulk,
+        $regoID,
     ) = @_;
     $bulk ||= 0;
     my $defaultType = param('dtype') || '';
@@ -46,8 +47,34 @@ sub displayPersonRegisterWhat   {
         realmID => $Data->{'Realm'} || 0,
         realmSubTypeID => $Data->{'RealmSubType'} || 0,
         continueURL => $continueURL || '',
-        dtype=> $defaultType
+        dtype=> $defaultType,
+        existingReg => $regoID || 0,
     );
+    if($regoID) {
+        my $ref = getRegistrationDetail($Data, $regoID) || {};
+        my $existing = {};
+        if($ref and $ref->[0])    {
+            $existing = $ref->[0];
+        }
+        my $role_ref = getEntityTypeRoles($Data, $existing->{'strSport'}, $existing->{'strPersonType'});
+
+        my %existingRego = (
+            type => $existing->{'strPersonType'} || '',
+            typeName => $existing->{'PersonType'} || '',
+            sport => $existing->{'strSport'} || '',
+            sportName => $existing->{'Sport'} || '',
+            role => $existing->{'strPersonEntityRole'} || '',
+            roleName => $role_ref->{$existing->{'strPersonEntityRole'}} || '',
+            level => $existing->{'strPersonLevel'} || '',
+            levelName => $existing->{'PersonLevel'} || '',
+            age => $existing->{'strAgeLevel'} || '',
+            ageName => $existing->{'AgeLevel'} || '',
+            nature => $existing->{'strRegistrationNature'} || '',
+            natureName => $existing->{'RegistrationNature'} || '',
+
+        );
+        $templateData{'existing'} = \%existingRego;
+    }
 
     my $template = "registration/what.templ";
     $template = "registration/whatbulk.templ" if ($bulk);
@@ -341,7 +368,7 @@ sub optionsPersonRegisterWhat {
                     return (\@retdata, '');
                 }
 
-                if(scalar(@tempAgeLevel) == 1 and $tempAgeLevel[0] eq '' and ($personType ne $Defs::PERSON_TYPE_PLAYER and $personType ne $Defs::PERSON_TYPE_REFEREE)) {
+                if(scalar(@tempAgeLevel) == 1 and $tempAgeLevel[0] eq '' and ($personType ne $Defs::PERSON_TYPE_PLAYER and $personType ne $Defs::PERSON_TYPE_REFEREE and $personType ne $Defs::PERSON_TYPE_COACH)) {
                     my @retdata;
                     push @retdata, {
                         name => $Data->{'lang'}->txt('Selection Not Required'),
@@ -620,12 +647,20 @@ sub getPersonLevelFromMatrix {
 
     my $personLevelList = \%Defs::personLevel;
     while (my $dref = $query->fetchrow_hashref())   {
-        #if the player is under 16, "PROFESSIONAL" should not be available (specific to MA)
+        #if the player is under 16, "PROFESSIONAL" should not be available (specific to MA - sys config entry)
         next if (
             defined $systemConfig->{'age_breakpoint_PLAYER_PROFESSIONAL'}
             and $personType eq $Defs::PERSON_TYPE_PLAYER
             and $dref->{'strPersonLevel'} eq $Defs::PERSON_LEVEL_PROFESSIONAL
             and $pref->{'currentAge'} < $systemConfig->{'age_breakpoint_PLAYER_PROFESSIONAL'}
+        );
+
+        #if the player is under 16, "AMATEUR_U_C" should not be available (specific to MA - sys config entry)
+        next if (
+            defined $systemConfig->{'age_breakpoint_PLAYER_AMATEUR_U_C'}
+            and $personType eq $Defs::PERSON_TYPE_PLAYER
+            and $dref->{'strPersonLevel'} eq $Defs::PERSON_LEVEL_AMATEUR_UNDER_CONTRACT
+            and $pref->{'currentAge'} < $systemConfig->{'age_breakpoint_PLAYER_AMATEUR_U_C'}
         );
 
         if($dref->{'strPersonLevel'}){

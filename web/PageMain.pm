@@ -142,7 +142,7 @@ sub pageMain {
     $Data->{'AddToPage'}->add(
         'js_bottom',
         'inline',
-        'jQuery(".chzn-select").chosen({ disable_search_threshold: 10 });',
+        'jQuery(".chzn-select").chosen({ disable_search_threshold: 32 });',
     );
 
     $Data->{'AddToPage'}->add(
@@ -187,13 +187,20 @@ sub pageMain {
         });
     ];
     $Data->{'AddToPage'}->add('js_bottom','file','js/jscookie.js');
-    $Data->{'AddToPage'}->add(
-        'js_bottom',
-        'inline',
-        $search_js,
-    );
+    #$Data->{'AddToPage'}->add(
+        #'js_bottom',
+        #'inline',
+        #$search_js,
+    #);
 
-    
+   if($Defs::DisableResponsiveLayout)    {
+        $Data->{'AddToPage'}->add( 
+            'css',
+            'file',
+            'css/noresponsive.css',
+        );
+    }
+ 
     my $helpURL=$Data->{'SystemConfig'}{'HELP'} 
         ? "$Data->{'target'}?client=$client&amp;a=HELP"
         : $Defs::helpurl;
@@ -275,7 +282,8 @@ sub pageMain {
         TopJSInline => $Data->{'AddToPage'}->get('js_top','inline') || '',
         BottomJSFiles => $Data->{'AddToPage'}->get('js_bottom','file') || '',
         BottomJSInline => $Data->{'AddToPage'}->get('js_bottom','inline') || '',
-        FullScreen => $Data->{'FullScreen'} || 0,
+        DisableResponsiveLayout => $Defs::DisableResponsiveLayout || 0,
+        #FullScreen => $Data->{'FullScreen'} || 0,
     );
 
     my $authLevel = $clientValues_ref->{'authLevel'} || 0;
@@ -376,6 +384,8 @@ sub printBasePage {
       <link rel="stylesheet" type="text/css" href="$Defs::base_url/css/style.css">
       <link rel="stylesheet" type="text/css" href="$Defs::base_url/css/fc_styles.css">
       <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
+
+      <link rel="stylesheet" type="text/css" href="$Defs::base_url/css/custom.css">
 
 $CSSFiles
 $CSSInline

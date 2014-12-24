@@ -1,0 +1,99 @@
+[% USE Dumper %]
+
+<h3 class="panel-header">Summary</h3>
+<div class="panel-body">
+	<div class="document-upload summary">
+		<div class="col-md-6">
+			<div class="read-only">
+			    <h4>Venue Details</h4>
+			    <div class="read-only-text clearfix">
+				    <ul>
+				    	<li><span class="details-left">[% Lang.txt("Venue Name") %]:</span> <span class="details-value">[% FacilityCoreDetails.Name or '-' %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Venue Short Name") %]:</span> <span class="details-value">[% FacilityCoreDetails.ShortName or '-' %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Language") %]:</span> <span class="details-value">[% FacilityCoreDetails.Language or '-' %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Venue Type") %]:</span> <span class="details-value">[% FacilityCoreDetails.VenueType or '-' %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("City") %]:</span> <span class="details-value">[% FacilityCoreDetails.City or '-' %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Region") %]:</span> <span class="details-value">[% FacilityCoreDetails.Region or '-' %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Country") %]:</span> <span class="details-value">[% FacilityCoreDetails.Country or '-' %]</span></li>
+				    </ul>
+				    <a href="[% target %]?[% editlink %]&amp;rfp=cd" class="pull-right">[% Lang.txt("Edit") %]</a>
+			    </div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="read-only">
+			    <h4>Contact Details</h4>
+			    <div class="read-only-text clearfix">
+				    <ul>
+				    	<li><span class="details-left">[% Lang.txt("Address 1") %]:</span> <span class="details-value">[% FacilityContactDetails.Address1 or '-' %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Address 2") %]:</span> <span class="details-value">[% FacilityContactDetails.Address2 or '-' %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("City") %]:</span> <span class="details-value">[% FacilityContactDetails.City or '-' %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("State") %]:</span> <span class="details-value">[% FacilityContactDetails.State or '-' %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Postal Code") %]:</span> <span class="details-value">[% FacilityContactDetails.PostalCode or '-' %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Country") %]:</span> <span class="details-value">[% FacilityContactDetails.Country or '-' %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Email Address") %]:</span> <span class="details-value">[% FacilityContactDetails.Email or '-' %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Phone Number") %]:</span> <span class="details-value">[% FacilityContactDetails.Phone or '-' %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Fax") %]:</span> <span class="details-value">[% FacilityContactDetails.Fax or '-' %]</span></li>
+				    	<li><span class="details-left">[% Lang.txt("Web Address") %]:</span> <span class="details-value">[% FacilityContactDetails.WebAddress or '-' %]</span></li>
+				    	
+				    </ul>
+				    <a href="[% target %]?[% editlink %]&amp;rfp=cond" class="pull-right">[% Lang.txt("Edit") %]</a>
+			    </div>
+			</div>
+		</div>
+		<div class="clearfix" style="clear:both;">&nbsp;</div>
+        [% IF FacilityFields.size %]
+		<div class="col-md-12">
+			<div class="read-only">
+				 <h4>Fields</h4>
+			     <div class="read-only-text clearfix">
+				    <table class="table facility-field-summary" cellspacing="0" cellpadding="0" border="0">
+				    	<thead>
+				    		<tr>
+				    			<td>[% Lang.txt("Field number") %]</td>
+				    			<td>[% Lang.txt("Field name") %]</td>
+				    			<td>[% Lang.txt("Field Discipline") %]</td>
+				    			<td>[% Lang.txt("Type of field") %]</td>
+				    			<td>[% Lang.txt("Length of field") %]</td>
+				    			<td>[% Lang.txt("Width of field") %]</td>
+				    			<td>[% Lang.txt("Capactity of field") %]</td>
+				    		</tr>
+				    	</thead>
+				    	<tbody>
+                        [% FOREACH facilityField IN FacilityFields %]
+				    		<tr>
+				    			<td>[% facilityField.intFieldOrderNumber %]</td>
+				    			<td>[% facilityField.strName %]</td>
+				    			<td>[% facilityField.strDiscipline %]</td>
+				    			<td>[% facilityField.strGroundNature %]</td>
+				    			<td>[% facilityField.dblLength %]</td>
+				    			<td>[% facilityField.dblWidth %]</td>
+				    			<td>[% facilityField.intCapacity %]</td>
+				    		</tr>
+                        [% END %]
+				    	</tbody>
+				    </table>
+				    <a href="[% target %]?[% editlink %]&amp;rfp=role" class="pull-right">[% Lang.txt("Edit") %]</a>
+			     </div>
+			</div>
+		</div>
+        [% END %]
+
+		<div class="clearfix" style="clear:both;">&nbsp;</div>
+
+        <!--
+		<div class="col-md-12">
+			<div class="read-only">
+				 <h4>Documents</h4>
+				 <div class="read-only-text clearfix">
+				    <ul>
+						<li><span class="details-left">Document #1:</span><span class="details-value">&ndash;</span></li>
+						<li><span class="details-left">Document #2:</span><span class="details-value">&ndash;</span></li>
+				    </ul>
+				    <a href="[% target %]?[% editlink %]&amp;rfp=d" class="pull-right">[% Lang.txt("Edit") %]</a>
+			     </div>
+			</div>
+		</div>
+        -->
+	</div>
+</div>

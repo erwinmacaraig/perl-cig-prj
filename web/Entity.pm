@@ -187,6 +187,13 @@ sub entity_details  {
         size  => '30',
         maxsize => '50',
       },
+strAddress2 => {
+        label => 'Address 2',
+        value => $field->{strAddress2},
+        type  => 'text',
+        size  => '40',
+        maxsize => '50',
+      },
 
       strAddress => {
         label => 'Address',
@@ -270,7 +277,7 @@ sub entity_details  {
       },
     },
     order => [qw(
-        strFIFAID strLocalName strLocalShortName intLocalLanguage strLatinName strLatinShortName dtFrom dtTo strISOCountry strRegion strPostalCode strTown strAddress strWebURL strEmail strPhone strFax strContactTitle strContactEmail strContactPhone strContact strShortNotes intNotifications
+        strFIFAID strLocalName strLocalShortName intLocalLanguage strLatinName strLatinShortName dtFrom dtTo strISOCountry strRegion strPostalCode strTown strAddress strAddress2 strWebURL strEmail strPhone strFax strContactTitle strContactEmail strContactPhone strContact strShortNotes intNotifications
     )],
     options => {
       labelsuffix => ':',
@@ -373,6 +380,7 @@ sub loadEntityDetails {
      strPostalCode,
      strTown,
      strAddress,
+     strAddress2,
      strWebURL,
      strEmail,
      strPhone,

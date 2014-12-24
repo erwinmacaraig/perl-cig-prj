@@ -1,0 +1,23 @@
+<div class="container">
+	<div class="row">
+		<div class="col-md-3 reg-complete-summary-left-bar">
+		    [% EntitySummaryPanel %]
+		</div>
+		<div class="col-md-9">
+			<h3 class="panel-header"><b>[% Lang.txt("Thank You") %]</b></h3>
+			<div class="panel-body">
+				<div class="reg-complete-wrapper">
+					<p class="reg-complete-text">[% Lang.txt('Registration has been submitted to') %] <strong>[% MA %]</strong> <br /><br />
+					</p>
+				</div>
+			</div>
+			<div class="button-row">
+		        <ul class="row-btn-complete">
+		            <li><a href="[% target %]?client=[% client %]&amp;a=WF_" class="btn-main">[% Lang.txt("Go to your Dashboard") %]</a></li>
+		            <li><a href="[% target %]?client=[% client %]&amp;a=PENDPR_" class="btn-main">[% Lang.txt("View all currently submitted registrations") %]</a></li>
+		            <li><a href="[% target %]?client=[% client %]&amp;a=VENUE_DTA" class="btn-main">[% Lang.txt("Add another venue") %]</a></li>        
+		        </ul>
+		    </div>
+		</div>
+	</div>
+</div>

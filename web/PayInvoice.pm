@@ -334,7 +334,7 @@ sub displayResults {
     	 $paymentType = $pType;
       	 my $name = $gateway->{'gatewayName'};
   		 $gateway_body .= qq[
-            <input type="submit" onclick="clicked='paytry.cgi'" name="cc_submit[$gatewayCount]" value="]. $Data->{'lang'}->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>
+            <input type="submit" onclick="clicked='paytry.cgi'" name="cc_submit[$gatewayCount]" value="]. $Data->{'lang'}->txt("Pay via").qq[ $name" class = "btn-main"><br><br>
         ];   		 
     	}
 	 $gateway_body .= qq[

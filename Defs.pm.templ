@@ -45,6 +45,15 @@ $DevelMode = 1;
 
 $gatewayReturnDemo = 'http://emacaraig.spildevel/FIFASPOnline/web'; ##CONFIG
 
+$Sphinx_Host = '127.0.0.1';
+#$Sphinx_Host = '192.168.100.4';
+$Sphinx_Port = '9312';
+$Sphinx_PortSQL = '9306';
+%SphinxIndexes = (
+    'Person' => 'FIFA_Persons_RT',
+    'Entity' => 'FIFA_Entities_RT',
+);
+
 $REGO_FORM_SALT = "1234";
 $bank_export_dir="/u/web/swm/trunk/web/banksplits/";
 $bank_export_dir_web="banksplits/";
@@ -194,7 +203,8 @@ $PERSON_LEVEL_PROFESSIONAL = 'PROFESSIONAL';
         'ACTIVE' => 'Active',
         'INACTIVE' => 'Inactive',
         'DE-REGISTERED' => 'De-registered',
-        'SUSPENDED' => 'Suspended'
+        'SUSPENDED' => 'Suspended',
+        'HOLD' => 'On Hold',
 );
 
 $ENTITY_STATUS_INPROGRESS= 'INPROGRESS';
@@ -203,6 +213,7 @@ $ENTITY_STATUS_ACTIVE = 'ACTIVE';
 $ENTITY_STATUS_INACTIVE = 'INACTIVE';
 $ENTITY_STATUS_DE_REGISTERED = 'DE-REGISTERED';
 $ENTITY_STATUS_SUSPENDED = 'SUSPENDED';
+$ENTITY_STATUS_HOLD = 'HOLD';
 
 %registrationNature = (
 	'NEW'=>'New Registration',	
@@ -236,6 +247,18 @@ $PERSON_STATUS_DELETED= 'DELETED';
         $PERSON_STATUS_DELETED=> 'Deleted',
 );
 
+$PERSON_ENTITY_STATUS_ACTIVE = 'ACTIVE';
+$PERSON_ENTITY_STATUS_INACTIVE = 'INACTIVE';
+$PERSON_ENTITY_STATUS_PASSIVE= 'PASSIVE';
+$PERSON_ENTITY_STATUS_DELETED= 'DELETED';
+
+%personEntityStatus = (
+        $PERSON_ENTITY_STATUS_ACTIVE => 'Active',
+        $PERSON_ENTITY_STATUS_INACTIVE => 'Inactive',
+        $PERSON_ENTITY_STATUS_PASSIVE=> 'Passive',
+        $PERSON_ENTITY_STATUS_DELETED=> 'Deleted',
+);
+
 $PERSONREGO_STATUS_PENDING = 'PENDING';
 $PERSONREGO_STATUS_ACTIVE = 'ACTIVE';
 $PERSONREGO_STATUS_ROLLED_OVER= 'ROLLED_OVER';
@@ -244,19 +267,22 @@ $PERSONREGO_STATUS_TRANSFERRED = 'TRANSFERRED';
 $PERSONREGO_STATUS_INPROGRESS = 'INPROGRESS';
 $PERSONREGO_STATUS_DELETED= 'DELETED';
 $PERSONREGO_STATUS_REJECTED= 'REJECTED';
+$PERSONREGO_STATUS_HOLD= 'HOLD';
 $PERSONREGO_STATUS_ACTIVE_PENDING_PAYMENT= 'ACTIVE_PENDING_PAYMENT'; #this is for display only
 
 %personRegoStatus = (
         $PERSONREGO_STATUS_PENDING => 'Pending',
         $PERSONREGO_STATUS_ACTIVE => 'Active',
-        $PERSONREGO_STATUS_ROLLED_OVER=> 'InActive (Rolled over)',
+        $PERSONREGO_STATUS_ROLLED_OVER=> 'Rolled over/Renewed',
         $PERSONREGO_STATUS_PASSIVE=> 'Passive',
         $PERSONREGO_STATUS_TRANSFERRED => 'Transferred',
         $PERSONREGO_STATUS_INPROGRESS => 'In Progress',
         $PERSONREGO_STATUS_DELETED=> 'Deleted',
         $PERSONREGO_STATUS_REJECTED=> 'Rejected',
+        $PERSONREGO_STATUS_HOLD => 'On hold',
         $PERSONREGO_STATUS_ACTIVE_PENDING_PAYMENT=> 'Active (Pending Payment)',
 );
+#InActive (Rolled over)
 
 #End of Registration constants
 $EntityType_WORLD_FEDERATION = 'WORLD FEDERATION';
@@ -904,10 +930,12 @@ $PERSON_REQUEST_ACCESS = 'ACCESS';
 
 $PERSON_REQUEST_RESPONSE_ACCEPTED = "ACCEPTED";
 $PERSON_REQUEST_RESPONSE_DENIED = "DENIED";
+$PERSON_REQUEST_RESPONSE_CANCELLED = "CANCELLED";
 
 %personRequestResponse = (
     $PERSON_REQUEST_RESPONSE_ACCEPTED => "Accepted",
     $PERSON_REQUEST_RESPONSE_DENIED => "Denied",
+    $PERSON_REQUEST_RESPONSE_CANCELLED => "Cancelled",
 );
 
 $PERSON_REQUEST_STATUS_INPROGRESS = "INPROGRESS";
@@ -916,6 +944,8 @@ $PERSON_REQUEST_STATUS_ACTIVE = "ACTIVE";
 $PERSON_REQUEST_STATUS_COMPLETED = "COMPLETED";
 $PERSON_REQUEST_STATUS_DENIED = "DENIED";
 $PERSON_REQUEST_STATUS_ACCEPTED = "ACCEPTED";
+$PERSON_REQUEST_STATUS_REJECTED = "REJECTED";
+$PERSON_REQUEST_STATUS_CANCELLED = "CANCELLED";
 
 %personRequestStatus= (
     $PERSON_REQUEST_STATUS_INPROGRESS => "In Progress",
@@ -924,6 +954,7 @@ $PERSON_REQUEST_STATUS_ACCEPTED = "ACCEPTED";
     $PERSON_REQUEST_STATUS_COMPLETED => "Completed",
     $PERSON_REQUEST_STATUS_DENIED => "Denied",
     $PERSON_REQUEST_STATUS_ACCEPTED => "Accepted",
+    $PERSON_REQUEST_STATUS_REJECTED => "Rejected",
 );
 
 # WF RULE FOR
@@ -971,9 +1002,9 @@ $person_certification_status_inactive = 'INACTIVE';
 $person_certification_status_pending = 'PENDING';
 
 %person_certification_status = (
-	$person_certification_status_active => 'ACTIVE',
-    $person_certification_status_inactive => 'INACTIVE',
-    $person_certification_status_pending => 'PENDING',
+    $person_certification_status_active => 'Active',
+    $person_certification_status_inactive => 'Inactive',
+    $person_certification_status_pending => 'Pending',
 );
 
 $GROUND_NATURE_GRASS = "NATURAL_GRASS";
@@ -1003,5 +1034,15 @@ $GROUND_NATURE_UNKNOWN = "UNKNOWN";
 
     "NEW_CLUB" => "New Club Registration",
     "NEW_VENUE" => "New Facility Registration",
+
+    "RENEWAL_COACH" => "Renewal of Coach Registration",
+    "RENEWAL_PLAYER" => "Renewal of Player Registration",
+    "RENEWAL_MAOFFICIAL" => "Renewal of MA Official Registration",
+    "RENEWAL_CLUBOFFICIAL" => "Renewal of Club Official Registration",
+    "RENEWAL_TEAMOFFICIAL" => "Renewal of Team Official Registration",
+    "RENEWAL_REFEREE" => "Renewal of Referee Registration",
+
+    "RENEWAL_CLUB" => "Renewal of Club Registration",
+    "RENEWAL_VENUE" => "Renewal of Facility Registration",
 );
 1;

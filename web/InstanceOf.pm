@@ -11,6 +11,7 @@ use Defs;
 
 use PersonObj;
 use EntityObj;
+use Reg_common;
 
 sub getInstanceOf	{
 	my (
@@ -120,36 +121,32 @@ sub getInstanceOf	{
 				or $type eq 'national'
 			)
 		)	{
-			#my $assoc_struct = $cache->get('swm',"AssocStructure-$assocID") if $cache;
-			#if(!$assoc_struct)	{
-				#my $st = qq[
-					#SELECT
-						#intRealmID,
-						#int100_ID,
-						#int30_ID,
-						#int20_ID,
-						#int10_ID,
-						#intAssocID
-					#FROM tblTempEntityStructure
-					#WHERE intAssocID = ?
-				#];
-				#my $q = $db->prepare($st);
-				#$q->execute($assocID);
-				#my $dref = $q->fetchrow_hashref();
-				#$q->finish();
-#
-				#$cache->set(
-					#'swm',
-					#"AssocStructure-$assocID",
-					#$dref, 
-					#'',
-					#60*60*5, # 5hours
-				#) if $cache;
-				#$id = $dref->{'int10_ID'} if $type eq 'zone';
-				#$id = $dref->{'int20_ID'} if $type eq 'region';
-				#$id = $dref->{'int30_ID'} if $type eq 'state';
-				#$id = $dref->{'int100_ID'} if $type eq 'national';
-			#}
+
+            my $lastEntityID = getLastEntityID($clientValues_ref);
+			if($lastEntityID)	{
+				my $st = qq[
+                    SELECT      
+                        intParentID
+                    FROM 
+                        tblTempEntityStructure
+                    WHERE
+                        intParentLevel = ?
+                        AND intChildID = ?
+				];
+                my $wantedLevel = 0;
+				$wantedLevel = $Defs::LEVEL_ZONE if $type eq 'zone';
+				$wantedLevel = $Defs::LEVEL_REGION if $type eq 'region';
+				$wantedLevel = $Defs::LEVEL_STATE if $type eq 'state';
+				$wantedLevel = $Defs::LEVEL_NATIONAL if $type eq 'national';
+				my $q = $db->prepare($st);
+				$q->execute(
+                    $wantedLevel,
+                    $lastEntityID
+                );
+				my ($eID) = $q->fetchrow_array();
+				$q->finish();
+                $id = $eID if $eID;
+			}
 		} 
 
 		return undef if !$id;

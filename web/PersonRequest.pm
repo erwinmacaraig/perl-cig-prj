@@ -22,12 +22,18 @@ use PersonRegistration;
 use Person;
 use EmailNotifications::PersonRequest;
 use Search::Person;
+use PersonSummaryPanel;
+use InstanceOf;
 
 use CGI qw(unescape param redirect);
 use Log;
 use Data::Dumper;
 use SystemConfig;
+use Countries;
 use Switch;
+use SphinxUpdate;
+use InstanceOf;
+use PersonEntity;
 
 
 sub handlePersonRequest {
@@ -51,7 +57,7 @@ sub handlePersonRequest {
                 $transferTypeOption .= "<input type='radio' name='transfer_type' $defaultTypeChecked value='$transferType'>$Defs::personTransferType{$transferType}</input>";
                 $defaultTypeChecked = '';
             }
-            $title = "Request a Transfer";
+            $title = "Request/Initiate a Transfer";
 
             $TemplateData{'action'} = 'PRA_search';
             $TemplateData{'request_type'} = 'transfer';
@@ -120,6 +126,9 @@ sub handlePersonRequest {
         case 'PRA_NC' {
             ($body, $title) = displayNoITC($Data);
         }
+		case 'PRA_NC_PROC' {
+			($body,$title) = sendITC($Data);
+		}
         case 'PRA_F' {
             ($body, $title) = displayCompletedRequest($Data);
         }
@@ -230,7 +239,7 @@ sub listPersonRecord {
                 CASE WHEN PR.strPersonType = 'PLAYER' AND PR.strSport = 'FOOTBALL' THEN personLevelWeight END desc,
                 CASE WHEN PR.strPersonType != 'PLAYER' AND PR.strSport != 'FOOTBALL' THEN PR.dtAdded END asc
         ];
-        $limit = qq[ LIMIT 1 ];
+        #$limit = qq[ LIMIT 1 ];
     }
     elsif($requestType eq $Defs::PERSON_REQUEST_TRANSFER) {
         $joinCondition = qq [ AND PR.strPersonType = 'PLAYER' ];
@@ -320,6 +329,8 @@ sub listPersonRecord {
     my $personLname = '';
     my $personFname = '';
     my $personMID = '';
+    my $personID = '';
+    my $personRegistrationID = ''; #specific for person request access
 
     my %RegFilters=();
 
@@ -331,31 +342,39 @@ sub listPersonRecord {
         my ($RegCount, $Reg_ref) = PersonRegistration::getRegistrationData($Data, $tdref->{'intPersonID'}, \%RegFilters);
         foreach my $reg_rego_ref (@{$Reg_ref}) {
             next if $existsInRequestingClub;
-            $existsInRequestingClub = 1 if ($reg_rego_ref->{'intEntityID'} == $entityID);
+            $existsInRequestingClub = 1 if ($reg_rego_ref->{'intEntityID'} == $entityID and $reg_rego_ref->{'personRegistrationStatus'} eq $Defs::PERSON_STATUS_REGISTERED);
         }
 
-        next if ($existsInRequestingClub and ($requestType eq $Defs::PERSON_REQUEST_ACCESS));
+        #next if ($existsInRequestingClub and ($requestType eq $Defs::PERSON_REQUEST_ACCESS));
+        return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Member is currently registered.")) if ($existsInRequestingClub and ($requestType eq $Defs::PERSON_REQUEST_ACCESS));
+
         $found++;
         my $actionLink = undef;
+        my $btnLabel = 'Request Access';
+        $btnLabel = 'Request Transfer' if ($requestType eq $Defs::PERSON_REQUEST_TRANSFER);
         if($tdref->{'currEntityPendingRequestID'} and $tdref->{'currEntityPendingRegistrationID'}) {
+            return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Pending request has been found."));
+
             #current logged-in entity hits the same pending request
-            $actionLink = qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=PRA_V&amp;rid=$tdref->{'currEntityPendingRequestID'}">]. $Data->{'lang'}->txt("View pending") . q[</a></span>];    
+            #$actionLink = qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=PRA_V&amp;rid=$tdref->{'currEntityPendingRequestID'}">]. $Data->{'lang'}->txt("View pending") . q[</a></span>];    
         }
         else {
-            $actionLink = qq[ <span class="button-small generic-button"><a href="$Data->{'target'}?client=$client&amp;a=PRA_initRequest&amp;pid=$tdref->{'intPersonID'}&amp;prid=$tdref->{'intPersonRegistrationID'}&amp;request_type=$request_type&amp;transfer_type=$transferType">]. $Data->{'lang'}->txt($request_type) . q[</a></span>];
+            $actionLink = qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=PRA_initRequest&amp;pid=$tdref->{'intPersonID'}&amp;prid=$tdref->{'intPersonRegistrationID'}&amp;request_type=$request_type&amp;transfer_type=$transferType">]. $Data->{'lang'}->txt($btnLabel) . q[</a></span>];
         }
 
         push @rowdata, {
             id => $tdref->{'intPersonRegistrationID'} || 0,
             currentClub => $tdref->{'currentClub'} || '',
-            personStatus => $tdref->{'personStatus'} || '',
-            personRegoStatus => $tdref->{'personRegistrationStatus'} || '',
-            sport => $tdref->{'strSport'} || '',
             localFirstname => $tdref->{'strLocalFirstname'} || '',
             localSurname => $tdref->{'strLocalSurname'} || '',
-            personType => $tdref->{'strPersonType'} || '',
-            personLevel => $tdref->{'strPersonLevel'} || '',
-            DOB => $tdref->{'dtDOB'} || '',
+
+            personStatus => $Defs::personStatus{$tdref->{'personStatus'}} || '',
+            personRegoStatus => $Defs::personRegoStatus{$tdref->{'personRegistrationStatus'}} || '',
+
+            sport => $Defs::sportType{$tdref->{'strSport'}} || '',
+            personType => $Defs::personType{$tdref->{'strPersonType'}} || '',
+            personLevel => $Defs::personLevel{$tdref->{'strPersonLevel'}} || '',
+            DOB => $Data->{'l10n'}{'date'}->format($tdref->{'dtDOB'} || '','MEDIUM'),
             actionLink => $actionLink,
             SelectLink => ''
         };
@@ -372,12 +391,14 @@ sub listPersonRecord {
             localSurname => $tdref->{'strLocalSurname'} || '',
             personType => $tdref->{'strPersonType'} || '',
             personLevel => $tdref->{'strPersonLevel'} || '',
-            DOB => $tdref->{'dtDOB'} || '',
+            DOB => $Data->{'l10n'}{'date'}->format($tdref->{'dtDOB'} || '','MEDIUM'),
         };
 
         $personFname = $tdref->{'strLocalFirstname'} if !$personFname;
         $personLname = $tdref->{'strLocalSurname'} if !$personLname;
         $personMID = $tdref->{'strNationalNum'} if !$personMID;
+        $personID = $tdref->{'intPersonID'} if !$personID;
+        $personRegistrationID = $tdref->{'intPersonRegistrationID'} if !$personRegistrationID;
 
         if(!($Defs::personType{$tdref->{'strPersonType'}} ~~ @personCurrentRegistrations)){
             push @personCurrentRegistrations, $Defs::personType{$tdref->{'strPersonType'}};
@@ -399,74 +420,31 @@ sub listPersonRecord {
         @tData = ();
     }
 
-    return ("$found record found.", $title) if !$found;
+    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("No record found.")) if !$found;
+    #return ("$found record found.", $title) if !$found;
 
     my $resultHTML = undef;
     if($requestType eq $Defs::PERSON_REQUEST_ACCESS) {
-        my @headers = (
-            { 
-                type => 'Selector',
-                field => 'SelectLink',
-            }, 
-            {
-                name => $Data->{'lang'}->txt('Registered To'),
-                field => 'currentClub',
-            }, 
-            {
-                name => $Data->{'lang'}->txt('First Name'),
-                field => 'localFirstname',
-            },
-            {
-                name => $Data->{'lang'}->txt('Last Name'),
-                field => 'localSurname',
-            },
-            {
-                name => $Data->{'lang'}->txt('Date of birth'),
-                field => 'DOB',
-            },
-            {
-                name => $Data->{'lang'}->txt('Person Status'),
-                field => 'personStatus',
-            },
-            {
-                name => $Data->{'lang'}->txt('Sport'),
-                field => 'sport',
-            }, 
-            #{
-            #    name => $Data->{'lang'}->txt('Type'),
-            #    field => 'personType',
-            #}, 
-            #{
-            #    name => $Data->{'lang'}->txt('Person Level'),
-            #    field => 'personLevel',
-            #}, 
-            #{
-            #    name => $Data->{'lang'}->txt('Registration Status'),
-            #    field => 'personRegoStatus',
-            #},
-            {
-                name => $Data->{'lang'}->txt('Action'),
-                field => 'actionLink',
-                type => 'HTML', 
-            },
+        $title = $Data->{'lang'}->txt($Defs::personRequest{$Defs::PERSON_REQUEST_ACCESS});
 
-        ); 
-
-        my $rectype_options = '';
-        my $grid = showGrid(
-            Data => $Data,
-            columns => \@headers,
-            rowdata => \@rowdata,
-            gridid => 'grid',
-            width => '99%',
-        ); 
-
-        $resultHTML = qq[
-            <div class="grid-filter-wrap">
-                <div style="width:99%;">$rectype_options</div>
-                $grid
-            </div>
-        ];
+        my %TemplateData = (
+            PersonFirstName => $personFname,
+            PersonSurName => $personLname,
+            CurrentRegistrations => join(', ', @personCurrentRegistrations),
+            CurrentSports => join(', ', @personCurrentSports),
+            CurrentClub => join(', ', @personCurrentClubs),
+            PersonSummaryPanel => personSummaryPanel($Data, $personID),
+            PersonID => $personID,
+            PersonRegistrationID => $personRegistrationID,
+            action_request => "PRA_submit",
+            request_type => $request_type,
+            client => $Data->{'client'}
+        );
+        $resultHTML = runTemplate(
+            $Data,
+            \%TemplateData,
+            'personrequest/access/personregistration_summary.templ',
+        );
     }
     elsif($requestType eq $Defs::PERSON_REQUEST_TRANSFER) {
         $resultHTML = ' ';
@@ -529,12 +507,13 @@ sub initRequestPage {
     }
 
     my %TemplateData;
+    $TemplateData{'PersonSummaryPanel'}  = personSummaryPanel($Data, $personID) || '';
 
     if($transferType eq $Defs::TRANSFER_TYPE_INTERNATIONAL) {
         $title = $Data->{'lang'}->txt("Do you have Player's International Transfer Certificate?");
 
-        $TemplateData{'noITC'} = qq[ <span class="button generic-button"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PRA_NC">]. $Data->{'lang'}->txt("No") . q[</a></span>];
-        $TemplateData{'withITC'} = qq[ <span class="button generic-button"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PF_&amp;dtype=PLAYER&amp;itc=1">]. $Data->{'lang'}->txt("Yes") . q[</a></span>];
+        $TemplateData{'noITC'} = qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PRA_NC">]. $Data->{'lang'}->txt("No") . q[</a></span>];
+        $TemplateData{'withITC'} = qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PF_&amp;dtype=PLAYER&amp;itc=1">]. $Data->{'lang'}->txt("Yes") . q[</a></span>];
 
         $body = runTemplate(
             $Data,
@@ -619,7 +598,8 @@ sub submitRequestPage {
                         intRequestToMAOverride,
                         strRequestNotes,
                         strRequestStatus,
-                        dtDateRequest
+                        dtDateRequest,
+                        tTimeStamp
                     )
                     VALUES
                     (
@@ -635,6 +615,7 @@ sub submitRequestPage {
                         ?,
                         ?,
                         ?,
+                        NOW(),
                         NOW()
                     )
             ];
@@ -690,7 +671,8 @@ sub submitRequestPage {
     }
 
     my $query = new CGI;
-    print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=PRA_F&pr=" . join(',', @requestIDs));
+    my $rType = getRequestType();
+    print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=PRA_F&rtype=$rType&pr=" . join(',', @requestIDs));
     #my $resultHTML;
     #return ($resultHTML, 'Request Summary');
 }
@@ -700,9 +682,14 @@ sub displayCompletedRequest {
 
     my $body = " ";
     #todo 
-    my $title = $Data->{'lang'}->txt("Request a Transfer - Submitted to Current Club");
+    #my $title = $Data->{'lang'}->txt("Request a Transfer - Submitted to Current Club");
     my $pr = param('pr');
     my @prids = split(',', $pr);
+
+    my $rtype = param('rtype');
+    my $title;
+    $title = $Data->{'lang'}->txt("Request a Transfer - Submitted to Current Club") if $rtype eq $Defs::PERSON_REQUEST_TRANSFER;
+    $title = $Data->{'lang'}->txt("Request Access (Add Role) - Submitted to Current Club") if $rtype eq $Defs::PERSON_REQUEST_ACCESS;
 
     my %reqFilters = (
         'requestIDs' => \@prids
@@ -716,8 +703,11 @@ sub displayCompletedRequest {
     my $error = 0;
     my @rowdata;
     my %personDetails;
+    my $itemRequestType;
 
     for my $request (@{$personRequests}) {
+        $itemRequestType = $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}} . " Request for") if $rtype eq $Defs::PERSON_REQUEST_TRANSFER;
+        $itemRequestType = $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}} . " for") if $rtype eq $Defs::PERSON_REQUEST_ACCESS;
         $found = 1;
         if(!$personID) {
             $personID = $request->{'intPersonID'};
@@ -736,7 +726,7 @@ sub displayCompletedRequest {
             personType => $Defs::personType{$request->{'strPersonType'}},
             requestFrom => $request->{'requestFrom'} || '',
             requestTo => $request->{'requestTo'} || '',
-            requestType => $Defs::personRequest{$request->{'strRequestType'}},
+            requestType => $itemRequestType,
             requestResponse => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || "N/A",
             #SelectLink => $selectLink,
         };
@@ -748,12 +738,16 @@ sub displayCompletedRequest {
         $personDetails{'dob'} = $request->{'dtDOB'} || '';
     }
 
-    return ("An error has been encountered.", " ") if $error; 
+    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("An error has been encountered.")) if $error;
     my %TemplateData;
 
     $TemplateData{'personDetails'} = \%personDetails;
     $TemplateData{'personRequests'} = \@rowdata;
     $TemplateData{'client'} = $Data->{'client'};
+    $TemplateData{'requesttype'} = "Transfer" if $rtype eq $Defs::PERSON_REQUEST_TRANSFER;;
+    $TemplateData{'requesttype'} = "Request Access" if $rtype eq $Defs::PERSON_REQUEST_ACCESS;
+
+    $TemplateData{'PersonSummaryPanel'} = personSummaryPanel($Data, $personID) || 'PSP';
 
     $body = runTemplate(
         $Data,
@@ -777,7 +771,7 @@ sub listRequests {
         $reqFilters{'personID'} = $personID;
     }
     else    {
-        $reqFilters{'(entityID'} = $entityID
+        $reqFilters{'entityID'} = $entityID
     }
 
     my $personRequests = getRequests($Data, \%reqFilters);
@@ -890,7 +884,15 @@ sub viewRequest {
             $requestType = $Defs::PERSON_REQUEST_TRANSFER;
         }
         case "$Defs::PERSON_REQUEST_ACCESS" {
-            $templateFile = "personrequest/access/view.templ";
+            print STDERR Dumper  $request->{'intPersonRequestID'};
+            print STDERR Dumper  $request->{'strRequestResponse'};
+            if($request->{'intPersonRequestID'} and $request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_STATUS_ACCEPTED) {
+                $templateFile = "personrequest/access/requesting_club_view.templ";
+            }
+            else {
+                $templateFile = "personrequest/access/current_club_view.templ";
+            }
+
             $requestType = $Defs::PERSON_REQUEST_ACCESS;
         }
         else {
@@ -902,12 +904,15 @@ sub viewRequest {
     my $personCurrAgeLevel = Person::calculateAgeLevel($Data, $personDetails->{'currentAge'});
     my $originLevel = $Data->{'clientValues'}{'authLevel'};
 
+    my $maObj = getInstanceOf($Data, 'national');
+
+    my $isocountries  = getISOCountriesHash();
     my %TemplateData = (
         'requestID' => $request->{'intPersonRequestID'} || undef,
         'requestType' => $Defs::personRequest{$request->{'strRequestType'}} || '',
         'requestFrom' => $request->{'requestFrom'} || '',
         'requestFromDiscipline' => $Defs::entitySportType{$request->{'requestFromDiscipline'}} || '',
-        'requestFromISOCountry' => $request->{'requestFromISOCountry'} || '',
+        'requestFromISOCountry' => $isocountries->{$request->{'requestFromISOCountry'}} || '',
         'requestFromAddress' => $request->{'requestFromAddress'} || '',
         'requestFromAddress2' => $request->{'requestFromAddress2'} || '',
         'requestFromCity' => $request->{'requestFromCity'} || '',
@@ -919,7 +924,7 @@ sub viewRequest {
 
         'requestTo' => $request->{'requestTo'} || '',
         'requestToDiscipline' => $Defs::entitySportType{$request->{'requestToDiscipline'}} || '',
-        'requestToISOCountry' => $request->{'requestToISOCountry'} || '',
+        'requestToISOCountry' => $isocountries->{$request->{'requestToISOCountry'}} || '',
         'requestToAddress' => $request->{'requestToAddress'} || '',
         'requestToAddress2' => $request->{'requestToAddress2'} || '',
         'requestToCity' => $request->{'requestToCity'} || '',
@@ -932,8 +937,8 @@ sub viewRequest {
         'responseBy' => $request->{'responseBy'} || '',
         'personFirstname' => $request->{'strLocalFirstname'} || '',
         'personSurname' => $request->{'strLocalSurname'} || '',
-        'ISONationality' => $request->{'strISONationality'} || '',
-        'ISOCountryOfBirth' => $request->{'strISOCountryOfBirth'} || '',
+        'ISONationality' => $isocountries->{$request->{'strISONationality'}} || '',
+        'ISOCountryOfBirth' => $isocountries->{$request->{'strISOCountryOfBirth'}} || '',
         'RegionOfBirth' => $request->{'strRegionOfBirth'} || '',
         'personGender' => $Defs::PersonGenderInfo{$request->{'intGender'} || 0} || '',
         'DOB' => $request->{'dtDOB'} || '',
@@ -958,9 +963,11 @@ sub viewRequest {
         'contactCity' => $request->{'strSuburb'},
         'contactState' => $request->{'strState'},
         'contactPostalCode' => $request->{'strPostalCode'},
-        'contactISOCountry' => $request->{'strISOCountry'},
+        'contactISOCountry' => $isocountries->{$request->{'strISOCountry'}},
         'contactPhoneHome' => $request->{'strPhoneHome'},
         'contactEmail' => $request->{'strEmail'},
+        'MA' => $maObj->name(),
+        PersonSummaryPanel => personSummaryPanel($Data, $request->{'intPersonID'}) || '',
     );
 
 
@@ -985,7 +992,7 @@ sub viewRequest {
         switch($requestType) {
             case "$Defs::PERSON_REQUEST_TRANSFER" {
                 #$action = "PREGF_TU";
-                $action = "PF_";
+                $action = "PTF_";
             }
             case "$Defs::PERSON_REQUEST_ACCESS" {
                 my %tempClientValues = %{ $Data->{'clientValues'} };
@@ -999,7 +1006,9 @@ sub viewRequest {
     }
 
     my %RequestAction = (
-        'client' => $tempClient || $Data->{client} || 0,
+        'client' => $Data->{client} || 0,
+        'initiateAddRoleClient' => $tempClient || 0,
+        'initiateAddRoleAction' => "PF_",
         'rid' => $requestID,
         'action' => $action,
         'showAction' => $showAction,
@@ -1046,6 +1055,11 @@ sub setRequestResponse {
             $requestStatus = $Defs::PERSON_REQUEST_STATUS_PENDING;
             $requestResponseSuffix = $Data->{'lang'}->txt("Approved");
         }
+        case 'cancel' {
+            $response = $Defs::PERSON_REQUEST_RESPONSE_CANCELLED;
+            $requestStatus = $Defs::PERSON_REQUEST_STATUS_CANCELLED;
+            $requestResponseSuffix = $Data->{'lang'}->txt("Cancelled");
+        }
         else {
             $response = undef;
         }
@@ -1075,7 +1089,8 @@ sub setRequestResponse {
             strRequestResponse = ?,
             intResponseBy = ?,
             strResponseNotes = ?,
-            strRequestStatus = ?
+            strRequestStatus = ?,
+            tTimeStamp = NOW()
         WHERE
             intPersonRequestID = ?
     ];
@@ -1093,22 +1108,30 @@ sub setRequestResponse {
     my $body = '';
     my $title = '';
 
-    print STDERR Dumper $request;
-    if(scalar(%{$request}) == 0 or $request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_STATUS_DENIED) {
+    if(scalar(%{$request}) == 0 or $request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_STATUS_DENIED or $request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_STATUS_CANCELLED) {
         return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Response has been submitted already."));
     }
     else {
+        my $maObj = getInstanceOf($Data, 'national');
+        my $maName = $maObj ? $maObj->name() : '';
+	
         #print STDERR Dumper $request;
         my $templateFile = "";
         $title = $Defs::personRequest{$request->{'strRequestType'}} . ' - ' . $requestResponseSuffix;
         my $notifDetails = $Data->{'lang'}->txt("You have " . lc $requestResponseSuffix . " the " . $Defs::personRequest{$request->{'strRequestType'}} . " of ") . $request->{'strLocalFirstname'} . " " . $request->{'strLocalSurname'} . ".";
 
         if($response eq "ACCEPTED"){
-            $templateFile = "personrequest/transfer/request_accepted.templ";
-            $notifDetails .= $Data->{'lang'}->txt(" You will be notified if ") . $request->{'requestFrom'} . $Data->{'lang'}->txt(" accepts or rejects the release.");
+            $templateFile = "personrequest/transfer/request_accepted.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
+            $templateFile = "personrequest/access/request_accepted.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_ACCESS;
+            $notifDetails .= $Data->{'lang'}->txt(" You will be notified once the transfer is effective and approved by ") . $maName if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
         }
         elsif($response eq "DENIED"){
-            $templateFile = "personrequest/transfer/request_denied.templ";
+            $templateFile = "personrequest/transfer/request_denied.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
+            $templateFile = "personrequest/access/request_denied.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_ACCESS;
+        }
+        elsif($response eq "CANCELLED") {
+            $templateFile = "personrequest/transfer/request_cancelled.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
+            $templateFile = "personrequest/access/request_cancelled.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_ACCESS;       
         }
 
         my %TemplateData = (
@@ -1120,6 +1143,7 @@ sub setRequestResponse {
                 nationality => $request->{'strISONationality'},
                 memberID => $request->{'strNationalNum'},
             },
+            PersonSummaryPanel => personSummaryPanel($Data, $request->{'intPersonID'}) || '',
             notifDetails => $notifDetails,
             client => $Data->{'client'},
         );
@@ -1157,7 +1181,7 @@ sub getRequests {
     my ($Data, $filter) = @_;
 
     my $where = '';
-    my $personRegoJoin = " LEFT JOIN tblPersonRegistration_$Data->{'Realm'} pr ON (pr.intPersonRequestID = pq.intPersonRequestID AND pr.intEntityID = intRequestFromEntityID AND pr.strStatus <> 'ROLLED_OVER') ";
+    my $personRegoJoin = qq[ LEFT JOIN tblPersonRegistration_$Data->{'Realm'} pr ON (pr.intPersonRequestID = pq.intPersonRequestID AND pr.intEntityID = intRequestFromEntityID AND pr.strStatus NOT IN ('INPROGRESS')) ];
     my @values = (
         $Data->{'Realm'}
     );
@@ -1185,7 +1209,7 @@ sub getRequests {
     }
 
     if($filter->{'requestID'} and $filter->{'entityID'}) {
-        $where .= "
+        $where .= qq[
             AND (
                     (pq.intParentMAEntityID = ? AND pq.intRequestToMAOverride = 1 AND pq.strRequestResponse is NULL)
                     OR
@@ -1193,7 +1217,7 @@ sub getRequests {
                     OR
                     (pq.intRequestFromEntityID = ? AND pq.intPersonRequestID = ? AND pq.strRequestResponse in (?, ?))
                 )
-            ";
+            ];
         push @values, $filter->{'entityID'};
         push @values, $filter->{'entityID'};
         push @values, $filter->{'requestID'};
@@ -1235,6 +1259,7 @@ sub getRequests {
             pq.dtDateRequest,
             DATE_FORMAT(pq.dtDateRequest,'%d %b %Y') AS prRequestDateFormatted,
             UNIX_TIMESTAMP(pq.dtDateRequest) AS prRequestTimeStamp,
+            UNIX_TIMESTAMP(pq.tTimeStamp) AS prRequestUpdateTimeStamp,
             pq.strRequestResponse,
             pq.strResponseNotes,
             pq.intResponseBy,
@@ -1279,7 +1304,9 @@ sub getRequests {
 
             erb.strLocalName as responseBy,
             pr.intPersonRegistrationID,
-            pr.strStatus as personRegoStatus
+            pr.strStatus as personRegoStatus,
+
+            realm.strRealmName
         FROM
             tblPersonRequest pq
         INNER JOIN
@@ -1290,6 +1317,8 @@ sub getRequests {
             tblEntity et ON (et.intEntityID = pq.intRequestToEntityID)
         LEFT JOIN
             tblEntity erb ON (erb.intEntityID = pq.intResponseBy)
+        INNER JOIN
+            tblRealms realm ON (realm.intRealmID = pq.intRealmID)
         $personRegoJoin
 
         WHERE
@@ -1323,7 +1352,92 @@ sub finaliseTransfer {
 
     my $personRequest = getRequests($Data, \%reqFilters);
     $personRequest = $personRequest->[0];
+    my $db = $Data->{'db'};
 
+#    my $st = qq[
+#        UPDATE
+#            tblPersonRegistration_$Data->{'Realm'}
+#        SET
+#            strPreTransferredStatus = strStatus,
+#            strStatus = ?,
+#            dtTo= IF(dtTo>NOW(), NOW(), dtTo),
+#            dtTo= IF(dtFrom>NOW(), dtFrom, dtTo)
+#        WHERE
+#            intEntityID = ?
+#            AND strPersonType = ?
+#            AND strSport = ?
+#            AND intPersonID = ?
+#            AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
+#	];
+    my $stDates = qq[
+        UPDATE
+            tblPersonRegistration_$Data->{'Realm'}
+        SET
+            dtFrom = IF(dtFrom>NOW(), NULL, dtFrom),
+            dtTo= IF(dtTo>NOW(), NULL, dtTo)
+        WHERE
+            intEntityID = ?
+            AND strPersonType = ?
+            AND strPersonLevel= ?
+            AND strSport = ?
+            AND intPersonID = ?
+            AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
+	];
+            #dtTo= IF(dtTo>NOW(), NOW(), dtTo)
+            #dtFrom = IF(dtFrom>NOW(), NOW(), dtFrom),
+    my $query = $db->prepare($stDates) or query_error($stDates);
+    $query->execute(
+       $personRequest->{'intRequestToEntityID'},
+       $personRequest->{'strPersonType'},
+       $personRequest->{'strPersonLevel'},
+       $personRequest->{'strSport'},
+       $personRequest->{'intPersonID'}
+    ) or query_error($stDates);
+
+    ## Now handle LAST date
+    my $stPeriods = qq[
+        SELECT 
+            intNationalPeriodID
+        FROM 
+            tblNationalPeriod
+        WHERE 
+            intRealmID = ?
+        ORDER BY
+            dtTo DESC
+    ];
+
+    $stDates = qq[
+        UPDATE
+            tblPersonRegistration_$Data->{'Realm'} as R
+        SET
+            R.dtTo= NOW()
+        WHERE
+            R.intEntityID = ?
+            AND R.intNationalPeriodID = ?
+            AND R.strPersonType = ?
+            AND R.strPersonLevel= ?
+            AND R.strSport = ?
+            AND R.intPersonID = ?
+            AND R.strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
+        LIMIT 1
+	];
+    my $query = $db->prepare($stDates) or query_error($stDates);
+
+    my $qryNP= $db->prepare($stPeriods) or query_error($stPeriods);
+    $qryNP->execute($Data->{'Realm'});
+    while (my $pref = $qryNP->fetchrow_hashref) {
+        $query->execute(
+           $personRequest->{'intRequestToEntityID'},
+            $pref->{'intNationalPeriodID'},
+           $personRequest->{'strPersonType'},
+           $personRequest->{'strPersonLevel'},
+           $personRequest->{'strSport'},
+           $personRequest->{'intPersonID'}
+        ) or query_error($stDates);
+        my $rows = $query->rows;
+        last if $rows;
+    }
+    
     my $st = qq[
         UPDATE
             tblPersonRegistration_$Data->{'Realm'}
@@ -1333,21 +1447,42 @@ sub finaliseTransfer {
         WHERE
             intEntityID = ?
             AND strPersonType = ?
+            AND strPersonLevel = ?
             AND strSport = ?
             AND intPersonID = ?
             AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
 	];
+
+## Basically Set dtTo = NOW if they left before end of peiod.
+## If dtFrom is in future (if they never started) that period won't be included in Passport
             #AND strPersonLevel = ?
 
-    my $db = $Data->{'db'};
     my $query = $db->prepare($st) or query_error($st);
     $query->execute(
        $Defs::PERSONREGO_STATUS_TRANSFERRED,
        $personRequest->{'intRequestToEntityID'},
        $personRequest->{'strPersonType'},
+       $personRequest->{'strPersonLevel'},
        $personRequest->{'strSport'},
        $personRequest->{'intPersonID'}
     ) or query_error($st);
+    my %PE = ();
+    {
+    $PE{'personType'} = $personRequest->{'strPersonType'} || '';
+    $PE{'personLevel'} = $personRequest->{'strPersonLevel'} || '';
+    $PE{'personEntityRole'} = $personRequest->{'strPersonEntityRole'} || '';
+    $PE{'sport'} = $personRequest->{'strSport'} || '';
+    closePERecord($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestToEntityID'}, '', \%PE);
+    my $peID = doesOpenPEExist($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestFromEntityID'}, \%PE);
+    addPERecord($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestFromEntityID'}, \%PE) if (! $peID)
+    }
+    
+
+    if ($personRequest->{'intPersonID'})    {
+        my $personObject = getInstanceOf($Data, 'person',$personRequest->{'intPersonID'});
+        updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
+    }
+
         #$personRequest->{'strPersonLevel'},
 }
 
@@ -1361,7 +1496,8 @@ sub setRequestStatus {
         UPDATE
             tblPersonRequest
         SET
-            strRequestStatus = ?
+            strRequestStatus = ?,
+            tTimeStamp = NOW()
         WHERE
             intPersonRequestID = ?
     ];
@@ -1376,12 +1512,107 @@ sub setRequestStatus {
 
 sub displayNoITC {
     my ($Data) = @_;
+	my $isocountries  = getISOCountriesHash();
+    my %countriesonly = ();
+    my %Mcountriesonly = ();	
+    my @limitCountriesArr = ();
+    while(my($k,$c) = each(%{$isocountries})){
+    	$countriesonly{$k} = $c;
+    	if(@limitCountriesArr){
+    		next if(grep(/^$k/, @limitCountriesArr));
+    	}
+    	$Mcountriesonly{$c} = $c;
+    }
+	my $FieldLabelsPerson = FieldLabels::getFieldLabels($Data, $Defs::LEVEL_PERSON);
+	my %FieldDefinitions=(		
+   		    	strLocalFirstname => {
+   		    		label => $FieldLabelsPerson->{'strLocalFirstname'},
+   		    		type => 'text',
+   		    		size  => '50',
+                	compulsory => 1,
+   		    		name => 'strLocalFirstname',
+   		    	},
+   		    	strLocalSurname => {   		    		
+					label => $FieldLabelsPerson->{'strLocalSurname'},   		    			
+					type => 'text',
+					size => '50',					
+                	compulsory => 1,  
+					name => 'strLocalSurname', 		    		
+   		    	},
+   		    	dtDOB => {   		    	
+   		    		label => $FieldLabelsPerson->{'dtDOB'},
+   		    		type => 'text',
+   		    		size => '20',
+					name => 'dtDOB',
+   		    	},
+   		    	strISONationality => {   		    	
+   		    		label => $FieldLabelsPerson->{'strISONationality'},
+   		    		options => \%Mcountriesonly, 
+   		    		name => 'strISONationality',
+   		    		class => 'chzn-select',
+   		    	},
+   		    	strPlayerID => {   		    		
+   		    		label => 'Player\'s ID(Previous Football Association, if available)',
+   		    		name => 'strPlayerID',
+   		    		type => 'text',
+   		    		size => '50',
+   		    	},  
+   		    	strISOCountry => {   		    	
+   		    		label => $FieldLabelsPerson->{'strISOCountry'},
+   		    		name	=> 'strISOCountry',
+   		    		class   => 'chzn-select',
+   		    	},
+   		    	strClubName => {   		    	
+   		    		label => 'Club\'s Name',
+   		    		type => 'text',
+   		    		value => '',
+					size => '50',
+					name => 'strClubName',
+   		    	},
+				client => $Data->{'client'},
+			
+   	); #end of FieldDefinitions
 
-    my $title = $Data->{'lang'}->txt("Next step");
-    my $body = $Data->{'lang'}->txt("Please request Player's ITC via TMS or directly to the other MA.");
-    #return text for now
-    return ($body, $title);
+	my $body = runTemplate($Data, \%FieldDefinitions, 'person/request_itc_form.templ');
+	my $title = $Data->{'lang'}->txt("Request Form For An International Transfer Certificate");
+	return ($body, $title);
 
+}
+
+sub sendITC {
+	my ($Data) = @_;
+	#get posted values 
+	my $q = new CGI;
+	my %h = $q->Vars;
+	my $message = runTemplate($Data, \%h,'emails/notification/1/personrequest/html/request_itc.templ');
+	
+	use Email;
+	my $title = "title";
+	my $maObj = getInstanceOf($Data, 'national');
+	my $clubObj = getInstanceOf($Data, 'club');
+
+	open FH, ">dumpfile.txt";
+	print FH "\nInstance of Club:\n" . Dumper($clubObj) . "\n";
+	my $email_to = $maObj->{'DBData'}{'strEmail'};	
+	my $email_from = $clubObj->{'DBData'}{'strEmail'};
+	print FH "\n\$email_to: $email_to \n";
+	print FH "\n\$email_from: $email_from \n";
+	my $emailsentOK = Email::sendEmail('ines_erwinmacaraig@yahoo.com', 'erwin.macaraig@gmail.com','REQUEST FORM FOR AN INTERNATIONAL TRANSFER CERTIFICATE', 'REQUEST FORM FOR AN INTERNATIONAL TRANSFER CERTIFICATE', $message, '','ITC','');
+	if($emailsentOK){
+		#store to DB;
+		
+		return qq[
+          <div class="OKmsg">International Transfer Certificate Sent .</div> 
+          <br />  
+          <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PRA_T">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+       ];
+	}	
+	else {
+		return ('Error',$title);
+	}
+
+	
+	
 }
 
 sub displayGenericError {

@@ -314,11 +314,11 @@ sub show_fieldconfig {
     my $body=qq[
     <p>$intro</p>
     <form action="$Data->{'target'}" method="POST">
-    <input type="submit" value="].$l->txt('Save Options').qq[" class = "savebtn button proceed-button"><br><br>
+    <input type="submit" value="].$l->txt('Save Options').qq[" class = "savebtn btn-main"><br><br>
     <div style = "clear:right;"></div>
     $tabs
     <div style = "clear:right;"></div><br><br>
-    <input type="submit" value="].$l->txt('Save Options').qq[" class = "savebtn button proceed-button"><br><br>
+    <input type="submit" value="].$l->txt('Save Options').qq[" class = "savebtn btn-main"><br><br>
     <input type="hidden" name="a" value="FC_C_s">
     <input type="hidden" name="client" value="$unescclient">
     </form>

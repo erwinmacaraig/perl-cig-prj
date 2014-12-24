@@ -14,6 +14,7 @@ use ConfigOptions qw(ProcessPermissions);
 use PersonFieldsSetup;
 use FieldLabels;
 use Data::Dumper;
+use WorkFlow;
 
 sub handlePersonEdit {
     my ($action, $Data) = @_;
@@ -22,6 +23,8 @@ sub handlePersonEdit {
     my $clientValues = $Data->{'clientValues'};
     my $cl = setClient($clientValues);
     my $e_action = param('e_a') || '';
+    my $back_screen = param('bscrn') || '';
+    #print STDERR Dumper $back_screen;
     my $personID = getID($clientValues, $Defs::LEVEL_PERSON);
     $personID = 0 if $personID < 0;
 
@@ -36,6 +39,8 @@ sub handlePersonEdit {
             $values->{$f} = $personObj->getValue($f);
         }
     }
+    my $dtype = param('dtype') || '';
+    $values->{'defaultType'} = $dtype;
 
     my $fieldset = personFieldsSetup($Data, $values);
 
@@ -57,6 +62,7 @@ sub handlePersonEdit {
           Fields => $fieldset->{$fieldsetType},
         );
         if($action eq 'PE_U')    {
+#print STDERR "SURNAME WAS" . $personObj->getValue('strLocalSurname');
           my $p = new CGI;
           my %params = $p->Vars();
           my ($userData, $errors) = $obj->gather(\%params, $permissions,'edit');
@@ -80,21 +86,33 @@ sub handlePersonEdit {
           else  {
             $personObj->setValues($userData);
             $personObj->write();
+            triggerRule($Data, $personObj) if ($personObj->getValue('strStatus') eq 'REGISTERED');
+#print STDERR "SURNAME IS NOW" . $personObj->getValue('strLocalSurname');
             $body = 'updated';
-            $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=P_HOME";
+            if($back_screen){
+                my %tempClientValues = getClient($Data->{'client'});
+                $tempClientValues{currentLevel} = $tempClientValues{authLevel};
+                my $tempClient= setClient(\%tempClientValues);
+
+                $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$tempClient&$back_screen";
+            }
+            else {
+                $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=P_HOME";
+            }
           }
         }
         if($action eq 'PE_')    {
           my ($output, undef, $headJS, undef) = $obj->build($permissions,'edit',1);
           $body .= qq[
             <div class="col-md-12">
-            <form action = "$Data->{'target'}" method = "POST">
+            <form id = "flowFormID" action = "$Data->{'target'}" method = "POST">
                 $output
                 $headJS
                 <div class="txtright">
                 <input type = "hidden" name = "client" value = "].unescape($client).qq["> 
                 <input type = "hidden" name = "a" value = "PE_U"> 
                 <input type = "hidden" name = "e_a" value = "$e_action"> 
+                <input type = "hidden" name = "bscrn" value = "$back_screen"> 
                 <input type = "submit" value = "].$Data->{'lang'}->txt('Save').qq[" class = "btn-main"> 
                 </div>
             </form>
@@ -105,4 +123,37 @@ sub handlePersonEdit {
 
     my $pageHeading = 'Edit Person';
     return ($body, $pageHeading);
+}
+
+sub triggerRule {
+
+    my ($Data, $personObj) = @_;
+
+return;
+
+
+    ## JERVY
+
+    ## Perhaps change UPDATE to be personObj->write /
+
+    my $personID = $personObj->getValue('intPersonID') || return;
+
+    my $st = qq[
+        UPDATE tblPerson SET strStatus = "$Defs::PERSON_STATUS_PENDING" WHERE intPersonID = ? LIMIT 1
+    ];
+    my $query = $Data->{'db'}->prepare($st);
+    $query->execute($personID) or print STDERR "EDIT";
+
+    my $originEntityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'authLevel'}) || getLastEntityID($Data->{'clientValues'});
+
+    my $rc = WorkFlow::addWorkFlowTasks(
+        $Data,
+        'PERSON',
+        'AMENDMENT',
+        $Data->{'clientValues'}{'authLevel'} || 0,
+        $originEntityID,
+        $personID,
+        0,
+        0,
+    );
 }

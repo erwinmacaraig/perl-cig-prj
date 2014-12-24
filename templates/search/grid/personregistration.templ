@@ -1,40 +1,45 @@
 [% USE Dumper %]
-<div class="col-md-12 tasklist-content dashboard-tasklist search-panel">
+<div class="col-md-12 tasklist-content dashboard-tasklist ">
 	<table id="searchResult" cellpadding="5" class = "zebra" style="width: 100%">
 		<thead>
 			<tr class="box-header">
-				<th>MA ID</th>
-				<th>Name</th>
-				<th>Date of Birth</th>
-				<th>Role</th>
+				<th>[% Lang.txt('MA ID') %]</th>
+				<th>[% Lang.txt('Name') %]</th>
+				<th>[% Lang.txt('Organisation') %]</th>
+				<th>[% Lang.txt('Date of Birth') %]</th>
+				<th>[% Lang.txt('Role') %]</th>
 				<th>&nbsp;</th>
 			</tr>
 			<tr>
 				<td>
-                    <input class="search-mid" type="text" placeholder="Search MA ID"/>
+                    <input style="padding: 5px" class="search-mid" type="text" placeholder="Search MA ID"/>
 		        </td>
 				<td>
-                    <input class="search-name" type="text" placeholder="Search Name"/>
+                    <input style="padding: 5px" class="search-name" type="text" placeholder="Search Name"/>
+		        </td>
+				<td>
+                    <input style="padding: 5px" class="search-org" type="text" placeholder="Search Organisation"/>
 		        </td>
 				<td>
 					<select class="sort-dob">
-			          <option value="">-- Sort --</option>
-			          <option value="desc">Latest</option>
-			          <option value="asc">Oldest</option>
+			          <option value="">-- [% Lang.txt('Sort') %] --</option>
+			          <option value="desc">[% Lang.txt('Youngest') %]</option>
+			          <option value="asc">[% Lang.txt('Oldest') %]</option>
 			        </select>
 				</td>
 				<td>
                     <!-- should be dynamically populated based on search result -->
 					<select class="filter-role">
-			          <option value="">-- All --</option>
-			          <option value="Player">Player</option>
-			          <option value="Coach">Coach</option>
-			          <option value="Official">Official</option>
+                        <option value="">-- [% Lang.txt('All') %] --</option>
+                        [% FOREACH role IN Filters.role %]
+                        <option value="[% role %]">[% role %]</option>
+                        [% END %]
 			        </select>
 				</td>
 				<td></td>
 			</tr>
 			<tr style="display: none" class="box-header">
+				<th></th>
 				<th></th>
 				<th></th>
 				<th></th>
@@ -48,9 +53,10 @@
                 <tr class="task-list">
                     <td><span class="fa fa-user"></span>[% rego.ma_id %]</td>
                     <td>[% rego.name %]</td>
-                    <td>[% rego.dob %]</td>
+                    <td>[% rego.org %]</td>
+                    <td>[% DateFormat.format(rego.dob,'MEDIUM') %]</td>
                     <td><span class="fa fa-clock-o"></span>[% rego.role %]</td>
-                    <td><a href="[% rego.link %]" class="btn-inside-panels">View</a></td>
+                    <td><a href="[% rego.link %]" class="btn-inside-panels">[% Lang.txt('View') %]</a></td>
                 </tr>
 		    [% END %]
 		</tbody>
@@ -60,7 +66,12 @@
 <script src = "//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript">
     jQuery().ready(function() {
-        var table = jQuery("#searchResult").DataTable();
+        var table = jQuery("#searchResult").DataTable({
+            "dom" : "ilftpr",
+            "language" : {
+                "search": "[% Lang.txt('Filter') %]"
+            }
+        });
 
         jQuery("input.search-mid").on('keyup change', function(){
             table
@@ -76,8 +87,15 @@
                 .draw();
         });
 
+        jQuery("input.search-org").on('keyup change', function(){
+            table
+                .column(2)
+                .search(this.value)
+                .draw();
+        });
+
         var dob = jQuery("select.sort-dob");
-        var dobcol = table.column(2);
+        var dobcol = table.column(3);
 
         jQuery(dob).on('change', function(){
             var index = jQuery(this).find(":selected").index();
@@ -91,7 +109,7 @@
 
 
         var role = jQuery("select.filter-role");
-        var rolecol = table.column(3);
+        var rolecol = table.column(4);
 
         jQuery(role).on('change', function(){
             var index = jQuery(this).find(":selected").index();

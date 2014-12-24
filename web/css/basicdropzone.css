@@ -19,6 +19,12 @@
 .dropzone.dz-clickable .dz-message,
 .dropzone.dz-clickable .dz-message span {
   cursor: pointer;
+  text-align: center;
+  display: block;
+}
+.dropzone.dz-clickable .dz-message span.replace-text {
+    font-size: 12px;
+    color: gray;
 }
 .dropzone.dz-clickable * {
   cursor: default;

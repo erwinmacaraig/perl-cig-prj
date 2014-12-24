@@ -1,0 +1,69 @@
+<h3 class="panel-header">Summary</h3>
+<div class="panel-body">
+	<div class="clearfix">
+		<div class="document-upload summary">
+			<div class="col-md-6">
+				<div class="read-only club-details">
+				    <h4>Club Details</h4>
+				    <div class="read-only-text clearfix">
+					    <ul>
+					    	<li><span class="details-left">[% Lang.txt("Organisation name") %]:</span> <span class="details-value">[% IF organization %][% organization %][% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Organisation Short Name") %]:</span> <span class="details-value">[% IF organizationShortName %][% organizationShortName %][% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Organisation foundation date") %]:</span> <span class="details-value">[% IF foundingdate %][% foundingdate %][% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Organisation dissolution date") %]:</span> <span class="details-value">[% IF dissolutiondate %][% dissolutiondate %][% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Country") %]:</span> <span class="details-value">[% IF country %][% country %][% ELSE %] - [% END %]</span></li>
+					    </ul><br/>
+					    <a href="[% editlink %]&amp;rfp=cd" class="pull-right">Edit</a>
+				    </div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="read-only club-contact-details">
+				    <h4>Contact Details</h4>
+				    <div class="read-only-text clearfix">
+					    <ul>
+					    	<li><span class="details-left">[% Lang.txt("Address 1") %]:</span> <span class="details-value">[% IF contactAddress %][% contactAddress %][% ELSE %] - [% END %]</span></li>   	
+					    	<li><span class="details-left">[% Lang.txt("Postcode") %]:</span> <span class="details-value">[% IF postalcode %][% postalcode %][% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Contact person") %]:</span> <span class="details-value">[% IF contactPerson %][% contactPerson %][% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Contact Phone") %]:</span> <span class="details-value">[% IF contactPhone %][% contactPhone %][% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Contact Email") %]:</span> <span class="details-value">[% IF contactEmail %][% contactEmail %][% ELSE %] - [% END %]</span></li>				    	
+					    </ul><br/>
+					    <a href="[% editlink %]&amp;rfp=cond" class="pull-right">Edit</a>
+				    </div>
+				</div>
+			</div>
+			<div class="clearfix" style="clear:both;">&nbsp;</div>
+			<div class="col-md-6">
+				<div class="read-only organization-details">
+					 <h4>Organisation Details</h4>
+				     <div class="read-only-text clearfix">
+					    <ul>
+					    	<li><span class="details-left">[% Lang.txt("Organisation type") %]:</span> <span class="details-value">[% IF organizationType %][% organizationType %][% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Type of Legal entity") %]:</span> <span class="details-value">[% IF legaltype %][% legaltype %][% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Legal entity identification number") %]:</span> <span class="details-value">[% IF strLegalID %][% strLegalID%][% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Sport") %]:</span> <span class="details-value">[% IF sport %][% sport %][% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Level") %]:</span> <span class="details-value">[% IF organizationLevel %][% organizationLevel %][% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("MA Comment") %]:</span> <span class="details-value">[% IF comment %][% comment %][% ELSE %] - [% END %]</span></li>
+					    </ul><br/>
+					    <a href="[% editlink %]&amp;rfp=role" class="pull-right">Edit</a>
+				     </div>
+				</div>
+			</div>
+			
+			<div class="col-md-6">
+				<div class="read-only">
+					 <h4>Documents</h4>
+					 <div class="read-only-text clearfix">
+					    <ul>  
+						[% FOREACH doc IN documents %]
+								<li><span>[% doc.Name %]:<br /></span>
+								<b>[% doc.OrigFilename %]</b></li>	
+						[% END %]
+					    </ul>
+					    <a href="[% editlink %]&amp;rfp=d" class="pull-right">Edit</a>
+				     </div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -11,6 +11,8 @@
                        
                             [% Lang.txt('Registered To') %]
                             [% entity.strLocalName %]
+                            [% Lang.txt('as') %]
+                            [% entity.PersonType %]
                        
                     [% END %]
                     </a>
@@ -20,8 +22,8 @@
             <div id="panel[% index %]" class="panel-collapse collapse">
                 <div class="panel-body">                    
                     <ul class="nav nav-tabs">
-                        <li class="active"><a data-toggle="tab" href="#doctab[% index %]">Documents</a></li>
-                        <li><a data-toggle="tab" href="#regtab[% index %]">Registration details</a></li>
+                        <li class="active"><a data-toggle="tab" href="#doctab[% index %]">[% Lang.txt('Documents') %]</a></li>
+                        <li><a data-toggle="tab" href="#regtab[% index %]">[% Lang.txt('Registration details') %]</a></li>
                     </ul>
                     <div class="tab-content">
                         
@@ -30,34 +32,83 @@
                                 <table class="table" cellpadding="5" style="width:100%;">
                                     <thead>
                                         <tr class="document-table-header">
-                                            <th style="width: 70%">Document Type</th>
-                                            <th></th>
-                                            <th >Status</th>
+                                            <th style="width: 50%">[% Lang.txt('Document Type') %]</th>
+                                            <th style="width: 25%"></th>
+                                            <th style="width: 15%">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
 								
 									
-									[% FOREACH doc IN entity.documents %]	
+									[% FOREACH doc IN entity.alldocs %]	
 																
 
                                         <tr class="task-list">
                                             <td>
                                                 <span class="detail-value">[%  doc.strDocumentName %]:</span>
                                             </td>
+											<td class="status-col">
+				
+											<!--
+											
+  											-->
+											[% IF doc.DisplayView == 1 %]
+												[% doc.viewLink %]
+											[% ELSIF doc.DisplayAdd == 1 %]
+												[% doc.addLink %]
+
+
+											[% END %]
+											[% IF doc.DisplayReplace == 1 %]
+												[% doc.replaceLink %]
+											[% END %]
+               								 </td> 
+											<td class="status-col">
+												 [% IF doc.Status == 'PENDING' %]
+
+													<i class="fa fa-circle ver-dots yellow"></i>
+													<span class="">[% Lang.txt('Pending') %]</span>
+
+												[% ELSIF doc.Status == 'REJECTED' %]
+													[% rejectFlag = "1" %]
+													<input type="hidden" value = "[% rejectFlag %]" class="rejectedDocs">
+													<i class="fa fa-circle ver-dots red"></i>
+													<span class="">[% Lang.txt('Rejected') %]</span>
+
+												[% ELSIF doc.Status == 'APPROVED' %]
+
+													<i class="fa fa-circle ver-dots green"></i>
+													<span class="">[% Lang.txt('Approved') %]</span>
+
+												[% ELSIF doc.Status == 'VERIFIED' %]
+
+													<i class="fa fa-circle ver-dots green"></i>
+													<span class="">[% Lang.txt('Verified') %]</span>
+
+												[% ELSE %]
+
+													<i><span class="">[% doc.Status %]</span></i>
+												
+
+												[% END %]           
+							                </td>
+
+
+											<!--
                                             <td class="status-col">
                                                     <a href="#" onclick="docViewer([% doc.intFileID %],'client=[% client %]&amp;a=review');return false;" class="btn-inside-docs-panel">[% Lang.txt('View') %]</a>
                                             </td>
                                             <td class="status-col">
 											[% IF doc.strApprovalStatus == 'PENDING' %]
-                                                <i class="fa fa-circle ver-dots red"></i>
-                                                <span class="">Pending</span>
+                                                <i class="fa fa-circle ver-dots yellow"></i>
+                                                <span class="">[% Lang.txt('Pending') %]</span>
 											[% ELSE %]
 												 <i class="fa fa-circle ver-dots green"></i>
-                                                <span class="">Verified</span>
+                                                <span class="">[% Lang.txt('Verified') %]</span>
 											[% END %]
 											
                                             </td>
+   										-->
                                         </tr>
 									[% END %]
 
@@ -195,23 +246,30 @@
                                 </span>
                             [% END %]
 
-                            [% IF entity.dtFrom and entity.dtFrom != '0000-00-00' %]
+                            [% IF entity.npdtFrom and entity.npdtFrom != '0000-00-00' %]
                                 <span class="details-row">
                                     <span class="details-left">[% Lang.txt('Valid From') %]:</span>
-                                    <span class="details-left detail-value">[% entity.dtFrom %]</span>
+                                    <span class="details-left detail-value">[% DateFormat.format(entity.npdtFrom,'MEDIUM') %]</span>
                                 </span>
                             [% END %]
 
-                            [% IF entity.dtTo and entity.dtTo != '0000-00-00' %]
+                            [% IF entity.npdtTo and entity.npdtTo != '0000-00-00' %]
                                 <span class="details-row">
                                     <span class="details-left">[% Lang.txt('Valid To') %]:</span>
-                                    <span class="details-left detail-value">[% entity.dtTo %]</span>
+                                    <span class="details-left detail-value">[% DateFormat.format(entity.npdtTo,'MEDIUM') %]</span>
+                                </span>
+                            [% END %]
+
+                            [% IF entity.strPersonType == 'REFEREE' or entity.strPersonType == 'COACH' %]
+                                <span class="details-row">
+                                    <span class="details-left">[% Lang.txt('Certifications') %]:</span>
+                                    <span class="details-left detail-value">[% IF entity.regCertifications %] [% entity.regCertifications %] [% ELSE %] - [% END %]</span>
                                 </span>
                             [% END %]
 
                             [% IF entity.renew_link %]
                                 <div class="pull-right">
-                                    <span class=""><a class="btn-main" href="[% entity.renew_link %]">[% Lang.txt('Renew Registration') %]</a></span>
+                                    <span class=""><a class="btn-inside-panels" href="[% entity.renew_link %]">[% Lang.txt('Renew Registration') %]</a></span>
                                 </div>
                             [% END %]
                         </div>

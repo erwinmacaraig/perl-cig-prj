@@ -3,17 +3,21 @@
 	<table id="transferSearchResult" cellpadding="5" style="width: 100%">
 		<thead>
 			<tr class="box-header">
+				<th style="width: 18%">Member ID</th>
 				<th>Name</th>
-				<th>Member ID</th>
+				<th>Organisation</th>
 				<th>Date of Birth</th>
 				<th>&nbsp;</th>
 			</tr>
 			<tr>
 				<td>
-                    <input class="search-name" type="text" placeholder="Search Name"/>
+                    <input style="padding: 5px" class="search-mid" type="text" placeholder="Search MA ID"/>
 		        </td>
 				<td>
-                    <input class="search-mid" type="text" placeholder="Search MA ID"/>
+                    <input style="padding: 5px" class="search-name" type="text" placeholder="Search Name"/>
+		        </td>
+				<td>
+                    <input style="padding: 5px" class="search-org" type="text" placeholder="Search Organisation"/>
 		        </td>
 				<td>
 					<select class="sort-dob">
@@ -29,13 +33,15 @@
 				<th></th>
 				<th></th>
 				<th></th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>
 		    [% FOREACH rego IN RegoList %]
                 <tr class="task-list">
-                    <td><span class="fa fa-user"></span>[% rego.name %]</td>
                     <td>[% rego.otherdetails.ma_id %]</td>
+                    <td><span class="fa fa-user"></span>[% rego.name %]</td>
+                    <td>[% rego.otherdetails.org %]</td>
                     <td><span class="fa fa-clock-o"></span>[% rego.otherdetails.dob %]</td>
                     <td>
                     [% IF rego.inProgressRequestExists %]
@@ -60,7 +66,7 @@
     jQuery().ready(function() {
         var table = jQuery("#transferSearchResult").DataTable();
 
-        jQuery("input.search-name").on('keyup change', function(){
+        jQuery("input.search-mid").on('keyup change', function(){
             table
                 .column(0)
                 .search(this.value)
@@ -68,15 +74,22 @@
         });
 
 
-        jQuery("input.search-mid").on('keyup change', function(){
+        jQuery("input.search-name").on('keyup change', function(){
             table
                 .column(1)
                 .search(this.value)
                 .draw();
         });
 
+        jQuery("input.search-org").on('keyup change', function(){
+            table
+                .column(2)
+                .search(this.value)
+                .draw();
+        });
+
         var dob = jQuery("select.sort-dob");
-        var dobcol = table.column(2);
+        var dobcol = table.column(3);
 
         jQuery(dob).on('change', function(){
             var index = jQuery(this).find(":selected").index();

@@ -1,0 +1,30 @@
+<div class="container">
+	<div class="row">
+		<!--<div class="alert">
+			<div>
+				<span class="flash_success fa fa-check"></span>
+				<p>$self->{'Data'}->{'LevelNames'}{$Defs::LEVEL_CLUB} Added Successfully</p>
+			</div>
+		</div>-->
+		<div class="col-md-3 reg-complete-summary-left-bar">
+			[% EntitySummaryPanel %]
+		</div>
+		<div class="col-md-9">
+		<h3 class="panel-header"><b>[% Lang.txt("Thank You") %]</b></h3>
+			<div class="panel-body">
+				<div class="reg-complete-wrapper">
+					<p class="reg-complete-text">[% Lang.txt('Registration has been submitted to') %]: <strong>[% MA %]</strong> <br /><br />
+					Once processing has taken place, the outcome will be emailed to your club.
+					</p>
+				</div>
+			</div>
+			<div class="button-row">
+		        <ul class="row-btn-complete">
+		            <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=WF_" class="btn-main">[% Lang.txt("Go to your Dashboard") %]</a></li>
+		            <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PENDPR_" class="btn-main">[% Lang.txt("View all currently submitted registrations") %]</a></li>
+		            <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=C_DTA_&amp;" class="btn-main">[% Lang.txt("Register another Club") %]</a></li>        
+		        </ul>
+		    </div>
+		</div>
+	</div>
+</div>

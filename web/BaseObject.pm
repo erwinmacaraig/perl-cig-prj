@@ -235,6 +235,7 @@ sub write {
             @values,
             $self->ID(),
         );  
+        $self->searchServerUpdate('update', $self->{'db'}, $self->{'cache'} );
     }
     else {
         my $fields_sql = join(', ', @fields);
@@ -256,6 +257,7 @@ sub write {
                 $self->{'ID'} = $newId;
             }
         }
+        $self->searchServerUpdate('insert', $self->{'db'}, $self->{'cache'} );
     }
     if($self->{'cache'} and $self->{'cachePrefix'}) {
         my $cachekey = $self->{'cachePrefix'}.'-'.$self->ID();
@@ -268,4 +270,9 @@ sub setCachePrefix    {
     $self->{'cachePrefix'} = '';
 }
 
+sub searchServerUpdate {
+    my $self = shift;
+    my ($actionType, $db, $cache) = @_;
+    return 1;
+}
 1;

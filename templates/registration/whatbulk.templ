@@ -1,150 +1,81 @@
-<form>
 <input type = "hidden" id = "selected_entityID" value = "[% entityID %]">
 <input type = "hidden" id = "originLevel" value = "[% originLevel %]">
+<input type = "hidden" id = "pID" value = "[% personID %]">
 <input type = "hidden" id = "rID" value = "[% realmID %]">
 <input type = "hidden" id = "srID" value = "[% realmSubTypeID %]">
 <input type = "hidden" id = "client" value = "[% client %]">
 
-<a href = "" id = "regopt-reset-btn">[% Lang.txt('Reset') %]</a>
-<div id = "chosenOptions_wrapper">
-    <input type = "hidden" id = "selected_sport">
-    <input type = "hidden" id = "selected_type">
-    <input type = "hidden" id = "selected_role">
-    <input type = "hidden" id = "selected_level">
-    <input type = "hidden" id = "selected_age">
-    <input type = "hidden" id = "selected_nature">
-    <div class = "co_row">
-        <div class = "co_label">[% Lang.txt('Role') %]:</div>
-        <div class = "co_value" id = "selected_type_name"></div>
+
+<!--We are moving this to the default.templ-->
+<!--<div class = "notavailable" style="display:none;">
+    <div class="alert">
+        <div>
+            <span class="fa fa-exclamation"></span>
+            <p>[% Lang.txt("This type of registration is not available") %]</p>
+        </div>
     </div>
-    <div class = "co_row">
-        <div class = "co_label">[% Lang.txt('Sport') %]:</div>
-        <div class = "co_value" id = "selected_sport_name"></div>
+</div>-->
+
+<h3 class="panel-header">Bulk Renewal Registration</h3>
+<div class = "panel-body">
+    <div class = "regoptions">
+    <fieldset>
+[% IF existing.type %]
+        <div class="alert existingReg">
+            <div>
+                <span class="fa fa-info"></span>
+                <p>[% Lang.txt("Your registration details are already set. To change the values on this page press the 'Reset Registration' button below.") %]</p>
+            </div>
+        </div>
+        <p class = "existingReg"><a href = "#" class = "btn-inside-panels" id = "reset-btn">[% Lang.txt('Reset Registration') %]</a></p>
+[% END %]
+        <p><span class="notice-error"><span class="compulsory">*</span>Required fields</span></p>
+        <div class="form-group" id = "l_row_type">
+            <label class="col-md-3 control-label txtright" for="l_type"><span class="compulsory">*</span>[% Lang.txt('Role') %]</label>
+            <div class="col-md-9"><select name = "d_type" size = "1" id="l_type" data-type = "type" class = "fcToggleGroup"></select>[% IF existing.typeName %]<span class = "existingReg">[% existing.typeName %][% END %]</div>
+        </div>
+        <div class="form-group" id = "l_row_sport">
+            <label class="col-md-3 control-label txtright" for="l_sport"><span class="compulsory">*</span>[% Lang.txt('Sport') %]</label>
+            <div class="col-md-9"><select name = "d_sport" size = "1" id="l_sport" data-type = "sport" class = "fcToggleGroup"></select>[% IF existing.sportName %]<span class = "existingReg">[% existing.sportName %][% END %]</div>
+        </div>
+        <div class="form-group" id = "l_row_role">
+            <label class="col-md-3 control-label txtright" for="l_role"><span class="compulsory">*</span>[% Lang.txt('Sub Role') %]</label>
+            <div class="col-md-9"><select name = "d_role" size = "1" id="l_role" data-type = "role" class = "fcToggleGroup"></select>[% IF existing.roleName %]<span class = "existingReg">[% existing.roleName %][% END %]</div>
+        </div>
+        <div class="form-group" id = "l_row_level">
+            <label class="col-md-3 control-label txtright" for="l_level"><span class="compulsory">*</span>[% Lang.txt('Level') %]</label>
+            <div class="col-md-9"><select name = "d_level" size = "1" id="l_level" data-type = "level" class = "fcToggleGroup"></select>[% IF existing.levelName %]<span class = "existingReg">[% existing.levelName %][% END %]</div>
+        </div>
+        <div class="form-group" id = "l_row_age">
+            <label class="col-md-3 control-label txtright" for="l_age"><span class="compulsory">*</span>[% Lang.txt('Age group') %]</label>
+            <div class="col-md-9"><select name = "d_age" size = "1" id="l_age" data-type = "age" class = "fcToggleGroup"></select>[% IF existing.ageName %]<span class = "existingReg">[% existing.ageName %][% END %]</div>
+        </div>
+        <div class="form-group" id = "l_row_nature">
+            <label class="col-md-3 control-label txtright" for="l_nature"><span class="compulsory">*</span>[% Lang.txt('Nature of Registration') %]</label>
+            <div class="col-md-9"><select name = "d_nature" size = "1" id="l_nature" data-type = "nature" class = "fcToggleGroup"></select>[% IF existing.natureName %]<span class = "existingReg">[% existing.natureName %][% END %]</div>
+        </div>
+    </fieldset>
     </div>
-    <div class = "co_row">
-        <div class = "co_label">[% Lang.txt('Sub Role') %]:</div>
-        <div class = "co_value" id = "selected_role_name"></div>
-    </div>
-    <div class = "co_row">
-        <div class = "co_label">[% Lang.txt('Level') %]:</div>
-        <div class = "co_value" id = "selected_level_name"></div>
-    </div>
-    <div class = "co_row">
-        <div class = "co_label">[% Lang.txt('Age group') %]:</div>
-        <div class = "co_value" id = "selected_age_name"></div>
-    </div>
-    <div class = "co_row">
-        <div class = "co_label">[% Lang.txt('Nature of Registration') %]:</div>
-        <div class = "co_value" id = "selected_nature_name"></div>
-    </div>
+    <input type = "hidden" name = "existingReg" value = "[% existingReg %]">
+    <input type = "hidden" name = "changeExisting" value = "0" id = "ce">
 </div>
 
-<div id = "regopt_wrapper">
-    <div id  = "regopt_options_title" class = "regoptions_title">[% Lang.txt('Choose the type') %] </div>
-    <div id  = "regopt_options" class = "regoptions"></div>
-    <div id  = "regopt_options_continue" style = "display:none;">
-        <span class = "proceed-button button"><a href = "[% continueURL %]">[% Lang.txt('Continue') %]</a></span>
-    </div>
-</div>
-<div class = "option_titles" style="display:none;">
-    <span id = "regopt_title_sport">[% Lang.txt("Choose the sport") %]</span>
-    <span id = "regopt_title_type">[% Lang.txt("Choose the role") %]</span>
-    <span id = "regopt_title_role">[% Lang.txt("Choose the sub role") %]</span>
-    <span id = "regopt_title_level">[% Lang.txt("Choose the level") %]</span>
-    <span id = "regopt_title_age">[% Lang.txt("Choose the age group") %]</span>
-    <span id = "regopt_title_nature">[% Lang.txt("Choose the nature of the registration") %]</span>
-    <span id = "regopt_title_nooptions">[% Lang.txt("This type of registration is not available") %]</span>
-</div>
 
-</form>
 <script>
-    function regopt_start()   {
-        update_options('type');
-    }
-    function update_options(optionType)   {
+jQuery(document).ready(function()  {
+    [% IF !existing.type %]
+    jQuery('#flow-btn-continue').hide();
+    update_options('type', '[% dtype %]');
+    [% END %]
 
-        var qstring = '';
-        qstring = qstring + '&sp=' + jQuery('#selected_sport').val();
-        qstring = qstring + '&pt=' + jQuery('#selected_type').val();
-        qstring = qstring + '&per=' + jQuery('#selected_role').val();
-        qstring = qstring + '&pl=' + jQuery('#selected_level').val();
-        qstring = qstring + '&ag=' + jQuery('#selected_age').val();
-        qstring = qstring + '&nat=' + jQuery('#selected_nature').val();
-        qstring = qstring + '&ol=' + jQuery('#originLevel').val();
-        qstring = qstring + '&r=' + jQuery('#rID').val();
-        qstring = qstring + '&sr=' + jQuery('#srID').val();
-        qstring = qstring + '&eID=' + jQuery('#selected_entityID').val();
-
-        if(optionType == 'complete')    {
-          jQuery('#regopt_options').hide();
-          jQuery('#regopt_options_title').hide();
-          var url = jQuery('#regopt_options_continue a').attr('href');
-          url = url + qstring;
-          jQuery('#regopt_options_continue a').attr('href',url);
-          jQuery('#regopt_options_continue').show();
-        }
-        else    {
-            jQuery.getJSON('ajax/aj_person_registerwhat.cgi?bulk=1&otype=' + optionType + qstring, function(data)    {
-              var items = [];
-              if(data.results == 1) {
-                chooseOption(data.options[0].value,optionType, data.options[0].name); 
-              }
-              else if(data.results > 1) {
-                  jQuery.each( data.options, function( key, val ) {
-                    items.push( '<a href = "#" data-val = "' + val.value + '" data-optiontype = "' + optionType + '" data-optionname = "' + val.name + '">' + val.name + '</a>' );
-                  });
-                  jQuery('#regopt_options').html(items.join(''));
-                  jQuery('#regopt_options_title').html(jQuery('#regopt_title_' + optionType).html());
-              }
-              else  {
-                  jQuery('#regopt_options').html(jQuery('#regopt_title_nooptions').html());
-                  jQuery('#regopt_options_title').html('');
-              }
-            });
-        }
-    }
-
-    function chooseOption(val, optionType, name)  {
-        jQuery('#selected_' + optionType).val(val);
-        jQuery('#selected_' + optionType + "_name").html(name);
-        var nextlayer = {
-            'type' : 'sport',
-            'sport' : 'role',
-            'role' : 'level',
-            'level' : 'age',
-            'age' : 'nature',
-            'nature' : 'complete'
-        };
-        update_options(nextlayer[optionType]);
-    }
-
-    jQuery('.regoptions').on('click','a',function(e) {
-        var v = jQuery(this).attr('data-val');
-        var optionType = jQuery(this).attr('data-optiontype');
-        var optionName = jQuery(this).attr('data-optionname');
-        chooseOption(v, optionType, optionName);
+    jQuery('#reset-btn').click(function(e) {
+        jQuery('#ce').val(1);
+        jQuery('.existingReg').hide();
+        jQuery('#flow-btn-continue').hide();
+        update_options('type', '[% dtype %]');
         e.preventDefault();
-        return false; 
     });
-
-    jQuery('#regopt-reset-btn').on('click',function(e) {
-        jQuery('#regopt_options').show();
-        jQuery('#regopt_options_title').show();
-        jQuery('#selected_sport').val('');
-        jQuery('#selected_type').val('');
-        jQuery('#selected_role').val('');
-        jQuery('#selected_level').val('');
-        jQuery('#selected_age').val('');
-        jQuery('#selected_nature').val('');
-        jQuery('.co_value').html('');
-        jQuery('#regopt_options_continue').hide();
-        regopt_start();
-        e.preventDefault();
-        return false; 
-
-    });
-
-    regopt_start();
+});
 </script>
 
 

@@ -21,8 +21,8 @@
           [% ELSE %]
               <tr>
           [% END %] 
-          <td>[% p.From %]</td>
-          <td>[% p.To %]</td>
+          <td>[% DateFormat.format(p.From,'MEDIUM') %]</td>
+          <td>[% DateFormat.format(p.To,'MEDIUM') %]</td>
           <td>[% p.Club %]</td>
           <td>[% p.Level %]</td> 
           <td>[% p.MAName %]</td>

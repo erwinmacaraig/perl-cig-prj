@@ -33,15 +33,15 @@
               <!--<a href="#" title=""><img src="images/img-logo.png" alt="" /></a><h1>Finland Association</h1>-->
               <ul>
                 <li>
-                  <strong>Member Association</strong><br/>
-                  Phone: <strong>4567 8658 689</strong><br/>
-                  Email: <strong>ma@ma.com</strong><br/>
-                  Website: <strong>www.ma.com</strong>
+                  <strong>[% Lang.txt('Member Association') %]</strong><br/>
+                  [% Lang.txt('Phone') %]: <strong>4567 8658 689</strong><br/>
+                  [% Lang.txt('Email') %]: <strong>ma@ma.com</strong><br/>
+                  [% Lang.txt('Website') %]: <strong>www.ma.com</strong>
                 </li>
                 <li>
-                  <strong>Help Desk</strong><br/>
-                  Phone: <strong>4567 8658 689</strong><br/>
-                  Email: <strong>hd@hd.com</strong><br/>
+                  <strong>[% Lang.txt('Help Desk') %]</strong><br/>
+                  [% Lang.txt('Phone') %]: <strong>4567 8658 689</strong><br/>
+                  [% Lang.txt('Email') %]: <strong>hd@hd.com</strong><br/>
                 </li>
               </ul>
             </div>
@@ -58,6 +58,33 @@
 		    <div id="footer-content"></div>
       </div>
     </div> <!-- End Page Holder -->
+    <div class="footer-section section">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <div id="footer">
+        <!--
+              [% IF !NoSPLogo %]
+              <a href="http://www.sportingpulse.com"><img src="images/SP_powered.png" alt="SportingPulse"></a>
+              [% END %]
+              <div class="footerline">
+                [% Lang.txt('COPYRIGHT') %]
+              </div>
+        -->
+            </div>
+          </div>
+          <script type="text/javascript" src="js/reg.js"></script>
+          <script type="text/javascript" src="js/chosen/chosen.jquery.min.js"></script>
+          <script type="text/javascript" src="js/fc-common.js"></script>
+          <script type="text/javascript" src="js/fc-navs.js"></script>
+          <script type="text/javascript" src="js/fcToggle.js"></script>
+          [% BottomJSFiles %]
+          [% BottomJSInline %]
+          [% StatsCounter %]
+          </div>
+        </div>
+      </div>
+    </div>
 </div> <!-- End wrapper -->
 <!-- START Nielsen Online SiteCensus V5.3 -->
 <!-- COPYRIGHT 2009 Nielsen Online -->

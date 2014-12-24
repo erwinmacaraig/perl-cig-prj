@@ -303,7 +303,6 @@ sub step2 {
     #my $entityID = getID($Data->{'clientValues'}, $authLevel) || 0;
 
     my $entityID = getLastEntityID($Data->{'clientValues'});
-#BAFF
     $entityID= 0 if ($entityID== $Defs::INVALID_ID);
 	my $intPersonID= $Data->{'clientValues'}{'personID'}; 
 	my $currentLevel = $Data->{'clientValues'}{'authLevel'};
@@ -456,14 +455,14 @@ sub step2 {
 				<input type="hidden" name="a" value="P_TXNLogstep3">
 				<input type="hidden" name="client" value="$client">
 				<input type="hidden" name="mode" value="$mode"><input type="hidden" name="personID" value="$personID"><input type="hidden" name="client" value="$client"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="transLogID" value="$transLogID">
-				<input type="submit" name="subbut" value=" ]. $lang->txt('Confirm Payment') . qq[ " class="HF_submit button proceed-button">
+				<input type="submit" name="subbut" value=" ]. $lang->txt('Confirm Payment') . qq[ " class="btn-main">
 			</form>
 			<div style="clear:both;"></div>
 			<form action="$Data->{'target'}" method="POST">
 				<input type="hidden" name="a" value="P_TXNLoglist">
 				<input type="hidden" name="client" value="$client">
 				<input type="hidden" name="mode" value="$mode"><input type="hidden" name="personID" value="$personID"><input type="hidden" name="client" value="$client"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="dt_start_paid" value="$dtStart_paid"><input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
-				<input type="submit" name="subbut" value=" ]. $lang->txt('Cancel Payment') . qq[ " class="HF_submit button cancel-button">
+				<input type="submit" name="subbut" value=" ]. $lang->txt('Cancel Payment') . qq[ " class="btn-main">
 			</form>
 		 ]; 
 
@@ -596,16 +595,15 @@ sub getTransList {
 		  t.intTransactionID
 		$orderBy
   ];
-
-	open FH, ">dumpfile.txt";
-	print FH "\nTo query transaction: \n $statement\n";
+#
+#	open FH, ">dumpfile.txt";
+#	print FH "\nTo query transaction: \n $statement\n";
 	    #$prodSellLevel
     $statement =~ s/AND  AND/AND/g;
     my $query = $db->prepare($statement);
     $query->execute or print STDERR $statement;
     my $client = setClient($Data->{clientValues});
     my @Columns = ();
-    push (@Columns, {Name => '', Field => 'SelectLink', type => 'Selector', hide => $displayonly});
     ###
     push (@Columns, {Name => 'Invoice Number', Field => 'strInvoiceNumber', width => 20});
     ###
@@ -614,9 +612,9 @@ sub getTransList {
 
     push (@Columns, {Name => 'Item Name', Field => 'strName'});
     push (@Columns, {Name => 'Quantity', Field => 'intQty', width => 15});
-    push (@Columns, {Name => 'Current Amount', Field => 'curAmount', width =>20});
+    #push (@Columns, {Name => 'Current Amount', Field => 'curAmount', width =>20});
     ########    
-    push (@Columns, {Name => 'Tax Total', Field => 'TaxTotal', width => 15});
+    #push (@Columns, {Name => 'Tax Total', Field => 'TaxTotal', width => 15});
     push (@Columns, {Name => 'Amount', Field => 'NetAmount', width => 20});    
     #######
     push (@Columns, {Name => 'Start', Field => 'dtStart', width => 20});
@@ -629,6 +627,7 @@ sub getTransList {
     push (@Columns, {Name => 'Pay', Field => 'manual_payment', type => 'HTML', width => 10, hide => ($hidePayment or $hidePay)});
     push (@Columns, {Name => 'Notes', Field => 'strNotes',  width => 50, hide => $displayonly});
     push (@Columns, {Name => 'View Receipt', Field => 'strReceipt', type=>"HTML", width => 50, hide => $displayonly});
+    push (@Columns, {Name => '', Field => 'SelectLink', type => 'Selector', hide => $displayonly});
 
     my @headers = ();
     foreach my $header (@Columns) {
@@ -735,7 +734,7 @@ sub getTransList {
 	];
 	$filterHTML = '' if $displayonly;
   my $cl=setClient($Data->{'clientValues'}) || '';
-        my $payment_records_link=qq[<br><br><a href="$Data->{'target'}?client=$cl&amp;a=P_TXNLog_payLIST">].$Data->{'lang'}->txt('List All Payment Records')."</a>" ;
+  my $payment_records_link=qq[<br><br><a href="$Data->{'target'}?client=$cl&amp;a=P_TXNLog_payLIST" class = "btn-main">].$Data->{'lang'}->txt('List All Payment Records')."</a>" ;
   $payment_records_link = '' if ($hide_list_payments_link);
   $grid = $grid ? qq[$grid $payment_records_link]  : qq[<p class="error">].$Data->{'lang'}->txt('No records were found with this filter').qq[</p>$payment_records_link]; 
 
@@ -839,13 +838,18 @@ sub listTransactions {
 
     $whereClause .= qq[ AND t1.intTLogID= $safePaymentID ] if $paymentID;
 
-    $whereClause .= qq[ AND intTXNEntityID IN (0, $entityID)] if $entityID;
+    my $authID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
+   # $whereClause .= qq[ AND intTXNEntityID IN (0, $entityID, $authID)] if $entityID;
     $whereClause .= qq[ AND P.intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) ] if $txnStatus != $Defs::TXN_PAID;
 
 
 	($tempBody, $transCount) = getTransList($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref,0,0,0);
+    my $addLink = qq[<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_ADD" class = "btn-main">].$Data->{'lang'}->txt('Add Transaction').qq[</a>];
+    $addLink = '' if $Data->{'ReadOnlyLogin'};
+    $addLink = '' if ($Data->{'clientValues'}{'currentLevel'} == $Data->{'clientValues'}{'authLevel'});
 
 	$body .= $tempBody;
+$body.=' ' .$addLink;
 
     #GET FILTER TEXT
     my $filterCriterion = '';
@@ -877,16 +881,11 @@ sub listTransactions {
     my $checked_showall   = $txnStatus == $Defs::TXN_SHOWALL   ? 'SELECTED' : '' ;
 
     my $line = '';
-    my $addLink = qq[
-        <div class="changeoptions"><a href="$Data->{'target'}?client=$client&amp;a=P_TXN_ADD" class = "btn-main">Add Transaction</a></div>
-    ];
-    $addLink = '' if $Data->{'ReadOnlyLogin'};
-    $addLink = '' if ($Data->{'clientValues'}{'currentLevel'} == $Data->{'clientValues'}{'authLevel'});
 
     my $entityNamePlural = 'Transactions';
     $entityNamePlural= ($Data->{'SystemConfig'}{'txns_link_name'}) ? $Data->{'SystemConfig'}{'txns_link_name'} : $entityNamePlural;
 
-	my $header=qq[$addLink$entityNamePlural];
+	my $header=qq[$entityNamePlural];
 
         my $targetManual = $Data->{'target'};
         my $targetOnline = 'paytry.cgi';
@@ -911,7 +910,7 @@ sub listTransactions {
             my $id = $gateway->{'intPaymentConfigID'};
             my $pType = $gateway->{'paymentType'};
             my $name = $gateway->{'gatewayName'};
-            $CC_body .= qq[ <input type="submit" onclick="clicked='$targetOnline'" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "button proceed-button"><br><br>];
+            $CC_body .= qq[ <input type="submit" onclick="clicked='$targetOnline'" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "btn-main"><br><br>];
 
             $CC_body .= qq[ <input type="hidden" value="$pType" name="pt_submit[$gatewayCount]"> ];
         }
@@ -1057,7 +1056,7 @@ sub listTransactions {
 				    </tbody>	
 				</table>
 			
-						<div class="HTbuttons"><input onclick="clicked='$targetManual'" type="submit" name="subbut" value="Submit Manual Payment" class="HF_submit button generic-button" id = "btn-manualpay"></div>
+						<div class="HTbuttons"><input onclick="clicked='$targetManual'" type="submit" name="subbut" value="Submit Manual Payment" class="btn-main" id = "btn-manualpay"></div>
 
 						<input type="hidden" name="personID" value="$TableID"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="dt_start_paid" value="$dtStart_paid"><input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
 					</form> 

@@ -376,7 +376,7 @@ sub list_products	{
   ];
 
 	my $allowadds = 1;
-	my $addlink = qq[<span class = "button-small generic-button"><a href="$target?client=$client&amp;a=PR_E">Add</a></span></a>];
+	my $addlink = qq[<span class = "btn-inside-panels"><a href="$target?client=$client&amp;a=PR_E">Add</a></span></a>];
 
 	$addlink = '' if !$allowadds;
     my $group_ddl = '';
@@ -617,7 +617,7 @@ my $warning_note = $Data->{'SystemConfig'}{'ProductEditNote'} || '';
 		my $photo =  q[
                                         <div id="photoupload_result">].$photolink.q[</div>
                                         <div id="photoupload_form"></div>
-                                        <input type="button" value = " Upload Photo " id = "photoupload" class="button generic-button">
+                                        <input type="button" value = " Upload Photo " id = "photoupload" class="btn-inside-panels">
                                         <input type="hidden" name = "d_PhotoUpload" value = "].($photolink ? 'valid' : '').q[">
                                         <script>
                                         jQuery('#photoupload').click(function() {
@@ -1817,7 +1817,6 @@ EOS
             updateProductRangePricing($Data->{'db'}, $id, $curAmountMin, $curAmountMax);    
         };
 
-		##BAFF
 		my %attributes_to_insert = (
 				$Defs::PRODUCT_MEMBER_TYPES => \@memberTypes,
 				$Defs::PRODUCT_AGE_GROUPS   =>\@ageGroups,

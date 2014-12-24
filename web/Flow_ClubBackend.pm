@@ -26,7 +26,12 @@ use RegoProducts;
 use RegistrationItem;
 use PersonUserAccess;
 use EntityFieldsSetup;
+use PersonSummaryPanel;
 use Data::Dumper;
+use UploadFiles;
+use EntitySummaryPanel;
+
+
 
 sub setProcessOrder {
     my $self = shift;
@@ -99,6 +104,8 @@ sub setProcessOrder {
             'function' => 'display_complete',
             'label'  => 'Complete',
             'title'  => 'Club - Submitted',
+            'NoDisplayInNav' => 1,
+            'NoGoingBack' => 1,
         },
     ];
 }
@@ -206,7 +213,7 @@ sub validate_core_details {
         $query->execute($entityID, $clubObj->ID());
 
         $query->finish();
-        createTempEntityStructure($self->{'Data'}); 
+        createTempEntityStructure($self->{'Data'}, $clubData->{'intRealmID'}); 
     }
 
 
@@ -230,12 +237,14 @@ sub display_contact_details {
 
     my $clubperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'contactdetails'}, 'Club',);
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($clubperm);
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $fieldsContent || '',
         ScriptContent => $scriptContent || '',
+        FlowSummaryContent => $entitySummaryPanel,
         Title => '',
         TextTop => '',
         TextBottom => '',
@@ -279,11 +288,16 @@ sub display_role_details {
     my $self = shift;
 
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+    
+    my $id = $self->ID() || 0;
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
+
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $fieldsContent || '',
+        FlowSummaryContent => $entitySummaryPanel || '',
         ScriptContent => $scriptContent || '',
         Title => '',
         TextTop => '',
@@ -299,8 +313,11 @@ sub validate_role_details {
     my $self = shift;
 
     my $clubData = {};
-    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Club',);
+    #my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Club',); roledetails
+	my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'roledetails'}, 'Club',); 
+	
     ($clubData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
+
     my $id = $self->ID() || 0;
     if(!doesUserHaveEntityAccess($self->{'Data'}, $id,'WRITE')) {
         return ('Invalid User',0);
@@ -331,7 +348,8 @@ sub display_products {
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
-    my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    #my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+	my $entityRegisteringForLevel = $Defs::LEVEL_CLUB;
     my $client = $self->{'Data'}->{'client'};
     my $content = '';
 
@@ -374,6 +392,10 @@ sub display_products {
         client => $client,
         NoFormFields => 1,
     );
+    
+    my $id = $self->ID() || 0;
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
+    
     $content = runTemplate($self->{'Data'}, \%ProductPageData, 'registration/product_flow_backend.templ') || '';
 
     my %PageData = (
@@ -381,8 +403,7 @@ sub display_products {
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $content,
-        FlowSummary => '',
-        FlowSummaryTemplate => '',
+        FlowSummaryContent => $entitySummaryPanel,
         Title => '',
         TextTop => '',
         TextBottom => '',
@@ -417,7 +438,7 @@ sub process_products {
     $self->addCarryField('prodQty',$prodQty);
     my $prodIds= join(':',@productsselected);
     $self->addCarryField('prodIds', $prodIds);
-
+use Data::Dumper;
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
@@ -439,7 +460,7 @@ sub process_products {
         undef,
     );
 
-    my ($txns_added, $amount) = insertRegoTransaction($self->{'Data'}, 0, 0, $self->{'RunParams'}, $entityID, $entityLevel, 1, '', $CheckProducts);
+    my ($txns_added, $amount) = insertRegoTransaction($self->{'Data'}, 0, $self->{'RunParams'}{'newclubid'}, $self->{'RunParams'}, $entityID, $entityLevel, $Defs::LEVEL_CLUB, '', $CheckProducts);
     $txnIds = join(':',@{$txns_added});
 
     $self->addCarryField('txnIds',$txnIds);
@@ -453,12 +474,14 @@ sub display_documents {
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
-    my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    #my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+	my $entityRegisteringForLevel = $Defs::LEVEL_CLUB;
     my $client = $self->{'Data'}->{'client'};
-
+ 	my $ctrl = 0;
     my $rego_ref = {};
     my $club_documents = '';
     my $content = '';
+
 	
 	if($clubID) {
         $club_documents = getRegistrationItems(
@@ -474,9 +497,20 @@ sub display_documents {
             $Defs::DOC_FOR_CLUBS,
         );
 
-			 
-		my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $clubID,  $club_documents);
-	
+		#filter documents
+		my @required_docs_listing = ();
+		my @optional_docs_listing = ();
+		
+					 
+		my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $clubID,  $club_documents, $ctrl);
+		foreach my $rdc (@{$diff}){
+			if($rdc->{'Required'}){
+				push @required_docs_listing,$rdc;
+			}
+			else {
+				push @optional_docs_listing, $rdc;
+			}
+		}	
 		my $cl = setClient($self->{'Data'}->{'clientValues'}) || '';
         my %cv = getClient($cl);
         $cv{'clubID'} = $clubID;
@@ -485,31 +519,33 @@ sub display_documents {
 
         my %documentData = (
             target => $self->{'Data'}->{'target'},
-            documents => $diff,
-            Lang => $self->{'Data'}->{'lang'},
-            #nextaction => 'VENUE_DOCS_u',
+            documents => \@required_docs_listing,
+			optionaldocs => \@optional_docs_listing,
+            Lang => $self->{'Data'}->{'lang'},           
             client => $clm,
 			clubID => $clubID,
-            #venue => $facilityID,
+            
         );
- 
+        
         $content = runTemplate($self->{'Data'}, \%documentData, 'club/required_docs.templ') || '';  
-		print FH "content:\n $content \n";
+		
 	}
 	else    {
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
     }
     
-
+    my $id = $self->ID() || 0;
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
+    
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        #FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
-        #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
+        FlowSummaryContent => $entitySummaryPanel || '',
         Content => '',
+        DocUploader => $content,
         Title => '',
-        TextTop => $content,
+        TextTop => '',
         TextBottom => '',
     );
 
@@ -526,14 +562,15 @@ sub process_documents {
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
-    my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    #my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+	my $entityRegisteringForLevel = $Defs::LEVEL_CLUB;
     my $client = $self->{'Data'}->{'client'};
-
+	my $ctrl = 1;
     my $rego_ref = {};
    
     my $content = '';
     #1 I just need to know how many documents are required
-	my $documents = getRegistrationItems(
+	my $club_documents = getRegistrationItems(
             $self->{'Data'},
             'ENTITY',
             'DOCUMENT',
@@ -546,12 +583,29 @@ sub process_documents {
             $Defs::DOC_FOR_CLUBS,
         );
 
-	my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $clubID, $documents);
-	
-	foreach my $dc (@{$diff}){ 
-		push @{$self->{'RunDetails'}{'Errors'}},"\n".$dc->{'Name'};
+	my @required_docs_listing = ();
+	my @optional_docs_listing = ();
 		
+	foreach my $rdc (@{$club_documents}){
+		if($rdc->{'Required'}){
+			push @required_docs_listing,$rdc;
+		}
+		else {
+			push @optional_docs_listing, $rdc;
+		}
+	}		
+
+	my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $clubID, \@required_docs_listing, $ctrl);
+	my $errStringPrepend = 'Required Document Missing <ul>';
+	foreach my $dc (@{$diff}){ 
+        $errStringPrepend .= '<li>' . $dc->{'Name'} . '</li>';		
 	}
+    $errStringPrepend .= '</ul>';
+    
+    if(scalar(@{$diff})){
+            push @{$self->{'RunDetails'}{'Errors'}},$errStringPrepend;
+    }
+
 	if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
         $self->decrementCurrentProcessIndex();
@@ -573,17 +627,53 @@ sub display_summary     {
     $clubObj->load();
 
     my $content = '';
+	
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
 
-## Put into a template
-    $content = 'Include summary here';
+    $content = '';
+	my $documents = getUploadedFiles( $self->{'Data'}, $Defs::LEVEL_CLUB, $id, $Defs::UPLOADFILETYPE_DOC , $client );
+	use Club;	
+	use Countries;
+	my $isocountries  = getISOCountriesHash();
+    my %summaryClubData = (
+			organization => $clubObj->{'DBData'}{'strLocalName'}, 
+			organizationShortName => $clubObj->{'DBData'}{'strLocalShortName'},
+			foundingdate => $self->{'Data'}{'l10n'}{'date'}->format($clubObj->{'DBData'}{'dtFrom'},'LONG'),
+			dissolutiondate => $self->{'Data'}{'l10n'}{'date'}->format($clubObj->{'DBData'}{'dtTo'},'LONG'),
+			country => $isocountries->{$clubObj->{'DBData'}{'strISOCountry'}},
+			strLegalID => $clubObj->{'DBData'}{'strLegalID'},
+			sport => $clubObj->{'DBData'}{'strDiscipline'},
+			comment => $clubObj->{'DBData'}{'strMANotes'},
+			contactEmail => $clubObj->{'DBData'}{'strEmail'},
+			postalcode => $clubObj->{'DBData'}{'strPostalCode'},
+			contactPerson => $clubObj->{'DBData'}{'strContact'},
+			contactPhone => $clubObj->{'DBData'}{'strPhone'},
+			contactAddress => $clubObj->{'DBData'}{'strAddress'},
+			comment => $clubObj->{'DBData'}{'strMANotes'},
+			entityType => $clubObj->{'DBData'}{'strEntityType'},
+			documents => $documents,
+			legaltype => Club::getLegalTypeName($self->{'Data'},$clubObj->{'DBData'}{'intLegalTypeID'}),
+			organizationType => $clubObj->{'DBData'}{'strEntityType'},
+			organizationLevel => $clubObj->{'DBData'}{'strOrganisationLevel'},  
+			editlink =>  $self->{'Data'}{'target'}."?".$self->stringifyURLCarryField(),
+	);
+	
+    my $summaryClubContent = runTemplate(
+        $self->{'Data'},
+       \%summaryClubData,
+        'flow/club_summary.templ',
+    );
+
+	
 
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        Content => '',
+        FlowSummaryContent => $entitySummaryPanel || '',
+        Content => $summaryClubContent,
         Title => '',
-        TextTop => $content,
+        TextTop => '',
         ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
         TextBottom => '',
     );
@@ -647,15 +737,34 @@ sub display_complete {
         return ('',2);
     }
 
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
+    
+    my $maObj = getInstanceOf($self->{'Data'}, 'national');
+    my $maName = $maObj ? $maObj->name() : '';
+
+    my %clubApprovalData = (
+        EntitySummaryPanel => $entitySummaryPanel,
+        client => $self->{'Data'}->{'client'},
+        target => $self->{'Data'}->{'target'},
+        MA => $maName,
+    );
+    my $displayClubForApproval = runTemplate(
+        $self->{'Data'},
+        \%clubApprovalData,
+        'club/complete.templ',
+    );
+
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        Content => '',
+        processStatus => 1,
+        Content => $displayClubForApproval,
         Title => '',
-        TextTop => $content,
+        #TextTop => $content,
+        TextTop => '',
         TextBottom => '',
-        NoContinueButton=>1,
+        NoContinueButton=> 1,
     );
     my $pagedata = $self->display(\%PageData);
 

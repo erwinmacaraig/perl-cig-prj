@@ -1,7 +1,3 @@
-#
-# $Header: svn://svn/SWM/trunk/web/UploadFiles.pm 8251 2013-04-08 09:00:53Z rlee $
-#
-
 package UploadFiles;
 require Exporter;
 @ISA =  qw(Exporter);
@@ -18,9 +14,11 @@ use FileUpload;
 use CGI qw(:cgi param unescape escape);
 use Reg_common;
 
+use Data::Dumper;
+use InstanceOf;
+use S3Upload;
 
-
-my $File_MaxSize = 4*1024*1024; #4Mb;
+my $File_MaxSize = 10*1024*1024; #10Mb;
 
 sub getUploadedFiles	{
 	my (
@@ -32,14 +30,18 @@ sub getUploadedFiles	{
 	$page,
     ) = @_;
     
+    
+	my $client = $Data->{'client'};
     my %clientValues = getClient($client);
-	my $myCurrentValue = $clientValues{'authLevel'};
+    my $currLoginID = $Data->{'clientValues'}{'_intID'};
+	my $myCurrentLevelValue = $clientValues{'authLevel'};
+	my $obj = getInstanceOf($Data, 'entity', $currLoginID);
 	
 	my $st = qq[
-	SELECT *,DATE_FORMAT(dtUploaded,"%d/%m/%Y %H:%i") AS DateAdded_FMT, tblDocuments.intDocumentTypeID,tblDocuments.intPersonRegistrationID as regoID, tblDocumentType.strLockAtLevel
+	SELECT *, tblDocumentType.strDocumentName, UF.strOrigFilename, tblPersonRegistration_$Data->{'Realm'}.intEntityID AS owner, DATE_FORMAT(dtUploaded,"%d/%m/%Y %H:%i") AS DateAdded_FMT, tblDocuments.intDocumentTypeID,tblDocuments.intPersonRegistrationID as regoID, tblDocumentType.strLockAtLevel
     FROM  tblUploadedFiles AS UF LEFT JOIN tblDocuments ON UF.intFileID = tblDocuments.intUploadFileID 
-    LEFT JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID  WHERE UF.intEntityTypeID = ? AND
-    UF.intEntityID = ? AND UF.intFileType = ?
+	LEFT JOIN tblPersonRegistration_$Data->{'Realm'} On tblPersonRegistration_$Data->{'Realm'}.intPersonRegistrationID = tblDocuments.intPersonRegistrationID LEFT JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
+	WHERE UF.intEntityTypeID = ? AND UF.intEntityID = ? AND UF.intFileType = ?
 	];
 	
 	
@@ -67,30 +69,35 @@ sub getUploadedFiles	{
 
 	my @rows = ();
 	while(my $dref = $q->fetchrow_hashref())	{
+        $dref->{'DateAdded_FMT'} = $Data->{'l10n'}{'date'}->TZformat($dref->{'dtUploaded'},'MEDIUM','SHORT');
+
+		$st = qq[SELECT intUseExistingThisEntity, intUseExistingAnyEntity FROM tblRegistrationItem WHERE tblRegistrationItem.intID = ? and tblRegistrationItem.intRealmID=? AND tblRegistrationItem.strItemType='DOCUMENT'];
+		my $sth = $Data->{'db'}->prepare($st);
+		$sth->execute($dref->{'intDocumentTypeID'}, $Data->{'Realm'});
+		my $data = $sth->fetchrow_hashref();
 		#check if strLockLevel is empty which means world access to the file
-    	if($dref->{'strLockAtLevel'} eq ''){
-    		$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}";
+		 if($dref->{'strLockAtLevel'} eq '' || $data->{'intUseExistingThisEntity'} || $data->{'intUseExistingAnyEntity'} ||$dref->{'owner'} == $currLoginID){
+			$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}&amp;client=$client";
 		    $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
 			$deleteURL .= qq[&amp;dctid=$dref->{'intDocumentTypeID'}&amp;regoID=$dref->{'regoID'}] if($dref->{'intDocumentTypeID'});
-	      	$deleteURLButton = qq[ <span class="button-small generic-button"><a href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a></span>];
-            $urlViewButton = qq[ <span class="button-small generic-button"><a href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a></span>];
-    	}
-    	else {
-    		my @authorizedLevelsArr = split(/\|/,$dref->{'strLockAtLevel'});
-    		
-    	    if(grep(/^$myCurrentValue/,@authorizedLevelsArr)){
-               	$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}";
+	      	$deleteURLButton = qq[ <a class="btn-main btn-view-replace" href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a>];
+            $urlViewButton = qq[ <a class="btn-main btn-view-replace" href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a>];
+
+		}
+		else{
+			my @authorizedLevelsArr = split(/\|/,$dref->{'strLockAtLevel'});
+			my $ownerlevel = $obj->getValue('intEntityLevel');					
+			$deleteURLButton = qq[ <a class="HTdisabled btn-main btn-view-replace">]. $Data->{'lang'}->txt('Delete'). q[</a>]; 
+           	$urlViewButton = qq[ <a class="HTdisabled btn-main btn-view-replace">].$Data->{'lang'}->txt('View'). q[</a>];    
+			if(grep(/^$myCurrentLevelValue/,@authorizedLevelsArr) && $myCurrentLevelValue >  $ownerlevel ){
+				$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}&amp;client=$client";
 		        $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
 				$deleteURL .= qq[&amp;dctid=$dref->{'intDocumentTypeID'}&amp;regoID=$dref->{'regoID'}] if($dref->{'intDocumentTypeID'});
-	         	$deleteURLButton = qq[ <span class="button-small generic-button"><a href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a></span>];
-                $urlViewButton = qq[ <span class="button-small generic-button"><a href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a></span>];
-            }
-            else{
-            	$deleteURLButton = qq[ <button class\"HTdisabled\">]. $Data->{'lang'}->txt('Delete'). q[</button>]; 
-            	$urlViewButton = qq[ <button class\"HTdisabled\">].$Data->{'lang'}->txt('View'). q[</button>];          	
-            }
-    	}
-		
+	         	$deleteURLButton = qq[ <a class="btn-main btn-view-replace" href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a>];
+                $urlViewButton = qq[ <a class="btn-main btn-view-replace" href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a>];
+			}
+			
+		}
 		push @rows, {
 			id => $dref->{'intFileID'} || 0,
 			SelectLink => ' ',
@@ -101,8 +108,10 @@ sub getUploadedFiles	{
 			Ext => $dref->{'strExtension'} || '',
 			Size => sprintf("%0.2f",($dref->{'intBytes'} /1024/1024)),
 			DateAdded => $dref->{'DateAdded_FMT'},
+			Name => $dref->{'strDocumentName'},
+			OrigFilename => $dref->{'strOrigFilename'},
 			DB => $dref,
-		};
+		};	
 	}
 	$q->finish();
 
@@ -119,13 +128,11 @@ sub processUploadFile	{
     $fileType,
     $other_info,
   ) = @_; 
-    
-        
-       
+      
 	my $ret = '';
-
-	for my $files (@{$files_to_process})	{
-		my $err = _processUploadFile_single(
+	my $fileID;
+	for my $files (@{$files_to_process})	{ 
+		 $fileID = _processUploadFile_single(
 			$Data,
 			$files->[0],
 			$files->[1],
@@ -136,12 +143,14 @@ sub processUploadFile	{
 			$files->[3] || undef,
             $other_info,
 		);
-		if($err)	{
-			$ret .= "'$files->[0]' : $err<br>";
-		}
+		#if($err)	{
+		#	$ret .= "'$files->[0]' : $err<br>";
+		#}
 	}
-
-  return $ret;
+	if($fileID =~ m/^(\d+)$/){
+		return $1; # need to get the file id back for updating previously uploaded file
+	}
+  return $fileID; # contains error
 }
 
 sub _processUploadFile_single	{
@@ -156,7 +165,8 @@ sub _processUploadFile_single	{
 		$options,
         $other_info,
 	) = @_;
-
+	open FH, ">>dumpfile.txt";
+	
 	my $intFileAddedBy = $Data->{'clientValues'}{'_intID'} || getLastEntityID($Data->{'clientValues'});
 	$options ||= {}; 
         my $DocumentTypeId = 0;
@@ -167,7 +177,7 @@ sub _processUploadFile_single	{
           $regoID = $other_info->{'regoID'} || 0;
           $oldFileId = $other_info->{'replaceFileID'} || 0;                   
         }   
-        
+  
   my $origfilename=param($file_field) || '';
 	$origfilename =~s/.*\///g;
 	$origfilename =~s/.*\\//g;
@@ -241,13 +251,16 @@ sub _processUploadFile_single	{
 	# need to distinguish Person FROM other entity
 	my $intPersonID = $EntityID;
 	my $intEntityID = 0;
+	
 	if($entitydocs){ 
 		$intPersonID = 0;	
 		$intEntityID = $EntityID;	
+		
 	}
 	    #### START OF INSERTING DATA IN tblDocuments ##
         if($DocumentTypeId && !$oldFileId){
-           
+         open FH, ">dumpfile.txt";
+		 
            $doc_st = qq[
                 INSERT INTO tblDocuments ( 
                    intUploadFileID,
@@ -278,18 +291,34 @@ sub _processUploadFile_single	{
               $intPersonID, 
         );  
         #$EntityID = memberID (this should be the case)
+		 
         }
         else {
-        	 $doc_st = qq[
-        		UPDATE tblDocuments SET intUploadFileID = ?, dtLastUpdated = NOW(), strApprovalStatus = ? WHERE intUploadFileID = ? AND intPersonID = ?
+			#update for person  documents      	 
+			$doc_st = qq[
+        		UPDATE tblDocuments SET intUploadFileID = ?, dtLastUpdated = NOW(), strApprovalStatus = ? WHERE intUploadFileID = ?	
         	]; 
+
+			#AND intPersonID = ?	- Remove this so entity documents can be handled accordingly since intUploadFileID will suffice
+
+			#my $chkSQL = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem INNER JOIN tblDocumentType ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID INNER JOIN tblDocuments ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE tblDocuments.intUploadFileID = $oldFileId AND strApprovalStatus = 'APPROVED' AND (intUseExistingThisEntity = 1 OR intUseExistingAnyEntity = 1) AND tblRegistrationItem.intRealmID=? AND tblRegistrationItem.strItemType='DOCUMENT'] ;		
+			#my $newstat = 'PENDING';
+			#$doc_q = $Data->{'db'}->prepare($chkSQL);
+			#$doc_q->execute($Data->{'Realm'});
+			#my $exists = $doc_q->fetchrow_hashref();
+			#if($exists->{'tot'} > 0){
+			#	 $newstat = 'APPROVED';
+			#}
+			
+			#$doc_q->finish();
+
         	$doc_q = $Data->{'db'}->prepare($doc_st); 
         	$doc_q->execute(
               $fileID,    
 			  'PENDING',          
-              $oldFileId,
-              $intPersonID, 
+              $oldFileId,              
         );
+		#$intPersonID - Remove this so entity documents can be handled accordingly since intUploadFileID will suffice
         }
                 
        $doc_q->finish();
@@ -335,8 +364,8 @@ sub _processUploadFile_single	{
 				'jpg',
 				$fileID,
 			);
+      putFileToS3("$path$fileID".'.jpg',$filename);
     }
-
   }
   else { #File
     my $filename= "$Defs::fs_upload_dir/files/$path$fileID";
@@ -358,13 +387,15 @@ sub _processUploadFile_single	{
         $file->Ext(),
 				$fileID,
 			);
+      putFileToS3("$path$fileID".'.'.$file->Ext(),$filename.'.'.$file->Ext());
     }
   }
 	if($error)	{
 		#Remove file
 		deleteFile( $Data, $fileID);
+		return $error;
 	}
-	return $error || '';
+	return $fileID;
 }
 
 sub deleteAllFiles	{
@@ -417,8 +448,10 @@ sub deleteFile	{
 
 		my @tobedeleted=();
     my $filename= "$Defs::fs_upload_dir/files/$dref->{'strPath'}$dref->{'strFilename'}.$dref->{'strExtension'}";
+        my $key = "$dref->{'strPath'}$dref->{'strFilename'}.$dref->{'strExtension'}";
 		push @tobedeleted, $filename;
 		unlink @tobedeleted;
+        deleteFromS3($key);
 	
 		my $st_d = qq[
 			DELETE FROM tblUploadedFiles

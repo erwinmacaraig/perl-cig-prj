@@ -1,0 +1,5 @@
+sudo indexer --all --rotate
+
+echo 'ATTACH INDEX FIFA_Persons_r1 TO RTINDEX FIFA_Persons_RT_r1; ATTACH INDEX FIFA_Entities_r1 TO RTINDEX FIFA_Entities_RT_r1' | mysql --host=127.0.01 --port=9306
+
+

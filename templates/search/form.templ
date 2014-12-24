@@ -1,11 +1,33 @@
 <div class="search-panel col-md-12">
-	<h3 class="panel-header">Search</h3>
+    [% IF type == 'access' %]
+    	<h3 class="panel-header">[% Lang.txt('Person Details') %]</h3>
+    [% ELSE %]
+	    <h3 class="panel-header">[% Lang.txt('Search') %]</h3>
+    [% END %]
 	<div class="panel-body">
 		<form id="searchForm" action="main.cgi" method="POST">
-			<span class="formw"><input size="105" type="text" placeholder="Enter a person's name or Member ID" name="search_keyword" value="[% search_keyword %]"></span>
-		    <input type="submit" name="submit" value="Search" >   
+			<span class="formw"><input size="105" type="text" placeholder="[% Lang.txt('Enter a person\'s name or Member ID') %]" name="search_keyword" value="[% search_keyword %]"></span>
+		    <input type="submit" name="submit" value="Search" class = "btn-inside-panels">   
 		    <input type="hidden" value="[% action %]" name="a"> <input type="hidden" value="[% client %]" name="client">
 		    <input type="hidden" value="[% type %]" name="type">
 	    </form>
     </div>
 </div>
+
+<script src = "//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+<script type="text/javascript">
+    jQuery().ready(function() {
+        
+        jQuery("#searchForm").validate({
+            rules: {
+                search_keyword: {
+                    required: true
+                }
+            },
+            messages: {
+                search_keyword: "[% Lang.txt('Search keyword is required.') %]"
+            }
+        });
+    });
+</script>
+

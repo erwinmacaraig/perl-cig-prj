@@ -32,12 +32,14 @@
 
 <div class="member-home-page">
     <div class="col-md-9">
-        <h3 class="panel-header">[% PersonDetails.LocalName %] - [% PersonRegoDetails.PersonType %]</h3>
-        <div class="panel-body">
+        <div class="">
             <ul class="nav nav-tabs">
-                <li class="active"><a data-toggle="tab" data-visited="true" href="#memberdocs">Documents</a></li>
-                <li><a data-toggle="tab" data-visited="false" href="#memberdetails">Member Detail Summary</a></li>
-                <li><a data-toggle="tab" data-visited="false" href="#regdetails">Registration Details</a></li>
+                <li class="active">
+                <a data-toggle="tab" data-visited="true" href="#memberdocs">[% Lang.txt('Documents') %]
+                <span class="circleBg"><i class="fa fa-check documents-complete documents-incomplete"></i><i class="fa fa-remove documents-rejected documents-approved"></i></span></a>
+                </li>
+                <li><a data-toggle="tab" data-visited="false" href="#memberdetails">[% Lang.txt('Member Detail Summary') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></span></a></a></li>
+                <li><a data-toggle="tab" data-visited="false" href="#regdetails">[% Lang.txt('Registration Details') %]<span class="circleBg"><i class="fa fa-check regdetails-visited tab-not-visited"></i></span></a></a></li>
             </ul>
             <div class="tab-content">
                 
@@ -46,10 +48,10 @@
                 </div>
 
                 <div id="memberdetails" class="tab-pane fade">
-                    [% IF PersonDetails.LatinName %]
+                    [% IF PersonDetails.LatinSurname %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Name (Latin Characters)") %]:</span>
-                            <span class="details-left">[% PersonDetails.LatinFirstname %]</span>
+                            <span class="details-left">[% PersonDetails.LatinName %]</span>
                         </span>
                     [% END %]
 
@@ -69,49 +71,54 @@
 
                     [% IF PersonDetails.DOB %]
                         <span class="details-row">
-                          <span class="details-left">Date of Birth:</span>
-                          <span class="details-left detail-value">[% PersonDetails.DOB %]</span>
+                          <span class="details-left">[% Lang.txt('Date of Birth') %]:</span>
+                          <span class="details-left detail-value">[% DateFormat.format(PersonDetails.DOB,'MEDIUM') %]</span>
                         </span>
                     [% END %]
 
                     [% IF PersonDetails.Nationality %]
                         <span class="details-row">
-                          <span class="details-left">Nationality:</span>
+                          <span class="details-left">[% Lang.txt('Nationality') %]:</span>
                           <span class="details-left detail-value">[% PersonDetails.Nationality %]</span>
                         </span>
                     [% END %]
 
                     [% IF PersonDetails.Address %]
                         <span class="details-row">
-                          <span class="details-left">Address:</span>
+                          <span class="details-left">[% Lang.txt('Address') %]:</span>
                           <span class="details-left detail-value">[% PersonDetails.Address %]</span>
                         </span>
                     [% END %]
-
+                    [% IF PersonDetails.MinorProtection %]
+                        <span class="details-row">
+                          <span class="details-left">[% Lang.txt('Minor Protection') %]:</span>
+                          <span class="details-left detail-value">[% PersonDetails.MinorProtection %]</span>
+                        </span>
+                    [% END %]
                     [% IF PersonDetails.DateSuspendedUntil != '' %]
                         <span class="details-row">
-                          <span class="details-left">Suspended Until:</span>
-                          <span class="details-left detail-value">[% PersonDetails.DateSuspendedUntil %]</span>
+                          <span class="details-left">[% Lang.txt('Suspended Until') %]:</span>
+                          <span class="details-left detail-value">[% DateFormat.format(PersonDetails.DateSuspendedUntil,'MEDIUM') %]</span>
                         </span>
                     [% END %]
 
                     [% IF PersonDetails.LastUpdate %]
                         <span class="details-row">
-                          <span class="details-left">Last Update:</span>
+                          <span class="details-left">[% Lang.txt('Last Update') %]:</span>
                           <span class="details-left detail-value">[% PersonDetails.LastUpdate %]</span>
                         </span>
                     [% END %]
 
                     [% IF PersonDetails.Status %]
                         <span class="details-row">
-                          <span class="details-left">Status:</span>
+                          <span class="details-left">[% Lang.txt('Status') %]:</span>
                           <span class="details-left detail-value">[% PersonDetails.Status %]</span>
                         </span>
                     [% END %]
 
                     [% IF EditDetailsLink and !ReadOnlyLogin  %]
                         <span style="float: right" class="">
-                            <a href = "[% EditDetailsLink %]&e_a=core" class="edit-link">
+                            <a href = "[% EditDetailsLink %]&e_a=core&bscrn=a%3DWF_View%26TID%3D[% WFTaskID %]" class="edit-link">
                                 [% Lang.txt('Edit') %]
                             </a>
                         </span>
@@ -120,6 +127,7 @@
                 </div>
 
                 <div id="regdetails" class="tab-pane fade">
+
                     [% IF PersonRegoDetails.RegisterTo %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Register To") %]:</span>
@@ -177,40 +185,41 @@
                             <span class="details-left detail-value">[% PersonRegoDetails.AgeLevel %]</span>
                         </span>
                     [% END %]
+
+                    [% IF PersonRegoDetails.strPersonType == "REFEREE" OR PersonRegoDetails.strPersonType == "COACH" %]
+                        <span class="details-row">
+                            <span class="details-left">[% Lang.txt("Certifications") %]:</span>
+                            <span class="details-left detail-value">[% IF PersonRegoDetails.Certifications %] [% PersonRegoDetails.Certifications %] [% ELSE %] - [% END %]</span>
+                        </span>
+                    [% END %]
+
+                    <div class="row-padding">
+                    <div style="clear: both;">&nbsp;</div>
+                    <div class="row">
+                        <h2 class="section-header">[% Lang.txt('License and Payment Details') %]</h2>
+                        <div class="">
+                            [% PaymentBlock %]
+                        </div>
+                    </div> 
+
+                    <div style="clear: both;">&nbsp;</div>
+                    <div class="row">
+                        <h2 class="section-header">[% Lang.txt('Work History') %]</h2>
+                        <div class="">
+                            [% NotesBlock %]
+                        </div>
+                    </div> 
+                    </div>
+
                 </div>
             </div>
-        </div>
-
-        <br />
-
-        <h3 class="panel-header">License and Payment Details</h3>
-        <div class="panel-body">
-            [% PaymentBlock %]
-        </div>
-
-        <br />
-
-        <h3 class="panel-header">Task Notes</h3>
-        <div class="panel-body">
-            [% NotesBlock %]
         </div>
 
         [% ActionsBlock %]
 
     </div>
     <div class="col-md-3">
-        <div id = "">
-
-        <h3 class="panel-header">Member ID: [% PersonDetails.MID %]</h3>
-        <div class="panel-body">
-
-        <p class="reg-text">[% PersonDetails.LocalName %]</p>
-        <p class="reg-text">[% PersonRegoDetails.PersonType %]</p>
-        <p class="reg-text">[% PersonRegoDetails.Sport %]</p>
-        <p class="reg-text">[% PersonRegoDetails.Level %]</p>
-        </div>
-        </div>
-
+        [% PersonSummary %]
     </div>
 </div>
 

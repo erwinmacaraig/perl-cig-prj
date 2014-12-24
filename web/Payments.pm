@@ -260,7 +260,7 @@ sub checkoutConfirm	{
     	    $externalGateway .= qq[ <a href="$paymentURL"  id ="payment" type="button" style="padding:2px 30px;font-size:16px;"><img src="images/paynow.gif" alt="Pay Now"></a>];
 	  	}
 	  	else	{
-    	    $externalGateway .= qq[<span class="button proceed-button"><a ttarget="paywin" href="$paymentURL">Proceed to Payment</a></span>];
+    	    $externalGateway .= qq[<span class="btn-main"><a ttarget="paywin" href="$paymentURL">Proceed to Payment</a></span>];
 	  	}
     }
 

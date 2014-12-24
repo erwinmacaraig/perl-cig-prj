@@ -19,6 +19,7 @@ use CGI qw(:cgi param unescape escape);
 use Reg_common;
 use AuditLog;
 use MIME::Base64;
+use S3Upload;
 
 sub handle_photo	{
 	my($action, $Data, $memberID, $returnlink, $otherformdata, $tempfilename, $fromRegoForm)=@_;
@@ -104,8 +105,8 @@ sub show_photo	{
 			my $delete_photo  = $Data->{'lang'}->txt('Delete Photo');
 
 			$photoopts = qq[
-				<span class="button-small mobile-button"><a href="$target?client=$client&amp;a=M_PH_n">$replace_photo</a></span>  
-				<span class="button-small mobile-button"><a href="$target?client=$client&amp;a=M_PH_d">$delete_photo</a></span>
+				<span class="btn-inside-panels"><a href="$target?client=$client&amp;a=M_PH_n">$replace_photo</a></span>  
+				<span class="btn-inside-panels"><a href="$target?client=$client&amp;a=M_PH_d">$delete_photo</a></span>
 			];
     }
 
@@ -199,7 +200,7 @@ sub new_photo	{
 			<div id="webcam" style = "float:left;"></div>
 			<canvas id="canvas" height="600" width="600" style = "display:none;float:left;"></canvas>
 			<div class = "photobuttons" style = "display:none;">
-				<input id = "btn_snap" class="button generic-button" type = "button" onclick = "javascript:webcam.capture();void(0);" value = "Take Picture">
+				<input id = "btn_snap" class="btn-inside-panels" type = "button" onclick = "javascript:webcam.capture();void(0);" value = "Take Picture">
 				<input id = "btn_reset" class="button cancel-button" type = "button" onclick = "" value = "Reset Picture" style = "display:none;">
 			</div>
 			<div style = "clear:both;"></div>
@@ -222,7 +223,7 @@ sub new_photo	{
       type="submit"
       name="submitb"
       value="$upload_photo"
-			class = "button proceed-button"
+			class = "btn-main"
       onclick="
         document.getElementById('photoselect').style.display='none';
         document.getElementById('pleasewait').style.display='block';
@@ -351,6 +352,8 @@ sub process_upload	{
 	my $path='';
 	my $orig_file = '';
 	my $temp_file = '';
+	my $orig_key = '';
+	my $temp_key = '';
 	$tempfile_prefix =~ /^([\da-zA-Z]+)$/;
 	$tempfile_prefix = $1;
 	
@@ -368,6 +371,8 @@ sub process_upload	{
 		}
 		$orig_file="$Defs::fs_upload_dir/$path$memberID.jpg";
 		$temp_file="$Defs::fs_upload_dir/$path$memberID".'_temp.jpg';
+		$orig_key ="$path$memberID.jpg";
+		$temp_key ="$path$memberID".'_temp.jpg';
 	}
 	my $returnlink=param('ra') || '';
 	my $newphotolink=new_photo($Data, $memberID, $client, $returnlink);
@@ -400,8 +405,10 @@ sub process_upload	{
 					$memberID
 				); 
 		}
-}
-
+        else    {
+          putFileToS3($temp_key,$temp_file);
+        }
+    }
 
 	my $img=new ImageUpload(fieldname=>"$temp_file", existing=>1, filename=>$orig_file, overwrite=>1, maxsize=>3145728);
 	if($img->Error())	{return do_delete(q[<div class="warningmsg">Cannot create Upload object].$img->Error()."</div>".$newphotolink,$Data->{'db'},$memberID);}
@@ -417,6 +424,10 @@ sub process_upload	{
 				$memberID
 			); 
 		}
+        else    {
+          putFileToS3($orig_key,$orig_file);
+        }
+
 	}
 
 	if(
@@ -550,7 +561,7 @@ $form_header
 	</script>
 
 <form action="$Data->{'target'}" method="POST">
-      <input type="submit" value=" &nbsp; $save &nbsp; " class = "button proceed-button">
+      <input type="submit" value=" &nbsp; $save &nbsp; " class = "btn-main">
 	<div style="clear:both;"></div>
   <div style="float:left;">
 <b>$original</b>
@@ -602,6 +613,7 @@ sub rotate_photo	{
 	my($Data, $memberID,$client, $action, $returnlink, $tempfile_prefix, $fromRegoForm)=@_;
 
 	my $filename = '';
+	my $filekey = '';
 	if($memberID == -1000)	{
 		$filename = "$Defs::fs_upload_dir/temp/$tempfile_prefix".'_temp.jpg';
 	}
@@ -616,6 +628,7 @@ sub rotate_photo	{
 			}
 		}
 		$filename="$Defs::fs_upload_dir/$path$memberID".'_temp.jpg';
+		$filekey="$path$memberID".'_temp.jpg';
 	}
 
 	my $direction= $action eq 'M_PH_rl' ? -90 : 90;
@@ -624,6 +637,7 @@ sub rotate_photo	{
 	my $error='';
 	my $q = Image::Magick->new;
 	{
+        getFileFromS3($filekey,$filename);
 		my $x= $q->Read($filename);
 		$error="Bad Image Type in Read :$x" if $x;
 	}
@@ -634,6 +648,7 @@ sub rotate_photo	{
 	if(!$error)	{
 		my $x = $q->Write($filename);
 		$error="Bad Write:$x" if $x;
+       putFileToS3($filekey,$filename);
 	}
 	$error=qq[<div class="warningmsg">$error</div>] if $error;
 	return $error.edit_photo($Data, $memberID, $client, $returnlink, $tempfile_prefix, $fromRegoForm);
@@ -643,7 +658,9 @@ sub crop_photo	{
 	my($Data, $memberID,$client, $returnlink, $tempfile_prefix, $fromregoform)=@_;
 
   my $filename = '';
-	my $tmpfilename= '';
+  my $tmpfilename= '';
+  my $filekey = '';
+  my $tmpfilekey= '';
   if($memberID == -1000)  {
     $filename = "$Defs::fs_upload_dir/temp/$tempfile_prefix.jpg";
     $tmpfilename = "$Defs::fs_upload_dir/temp/$tempfile_prefix".'_temp.jpg';
@@ -661,6 +678,8 @@ sub crop_photo	{
 		}
 		$tmpfilename="$Defs::fs_upload_dir/$path$memberID".'_temp.jpg';
 		$filename="$Defs::fs_upload_dir/$path$memberID.jpg";
+		$tmpfilekey="$path$memberID".'_temp.jpg';
+		$filekey="$path$memberID.jpg";
 	}
 	my $PhotoHeight=$Data->{'SystemConfig'}{'PhotoHeight'} || 200;
 	my $PhotoWidth=$Data->{'SystemConfig'}{'PhotoWidth'} || 154;
@@ -674,6 +693,7 @@ sub crop_photo	{
 	my $error='';
 	my $q = Image::Magick->new;
 	{
+        getFileFromS3($tmpfilekey,$tmpfilename);
 		my $x= $q->Read($tmpfilename);
 		$error="Bad Image Type in Read :$x" if $x;
 	}
@@ -693,6 +713,9 @@ sub crop_photo	{
 		$error=qq[<div class="warningmsg">$error</div>];
 		return ($error.edit_photo($Data, $memberID, $client, $returnlink, $tempfile_prefix, $fromregoform),'')
 	}
+    else    {
+       putFileToS3($filekey,$filename);
+    }
 	my $newaction= ($Data->{'SystemConfig'}{'DefaultListAction'} || 'DT') eq 'SUMM' ? 'M_SEL_l' : 'M_DT';
 	return ('',$newaction);
 }

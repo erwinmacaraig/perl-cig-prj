@@ -551,7 +551,7 @@ table.lkTable	{
 
 div.showrecoptions	{
 	float:right;
-	font-size:10px;
+	/*font-size:10px;*/
 	/*height:48px;*/
 	height:auto;
 	vertical-align:bottom;
@@ -1388,7 +1388,6 @@ ul#menu ul li  {
   z-index:10;
   background: #ddd;
   width: 16em;
-  font-size:12px;
 }
 
 /* IE 6 & 7 Needs Inline Block */
@@ -1401,7 +1400,6 @@ ul#menu ul li a {
   line-height: 26px;
   padding: 0 1em;
   border-bottom: 1px solid #FFF;
-  font-size:12px;
 }
 
 /* ----- Level 3 ----- */

@@ -33,25 +33,23 @@
 
 <div class="member-home-page">
     <div class="col-md-12">
-        <div class="panel-body">
+        <div class="">
             <ul class="nav nav-tabs">
-                <li class="active"><a data-toggle="tab" href="#memberdocs">Documents</a></li>
-                <li><a data-toggle="tab" href="#memberdetails">Personal Information</a></li>
-                <li><a data-toggle="tab" href="#tasknotesdocs">Task Details</a></li>
+                <li class="active"><a data-toggle="tab" href="#memberdocs">[% Lang.txt('Documents') %]<span class="circleBg"><i class="fa fa-check documents-complete documents-incomplete"></i><i class="fa fa-remove documents-rejected documents-approved"></i></span></a></li>
+                <li><a data-toggle="tab" href="#memberdetails">[% Lang.txt('Club Information') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></span></a></li>
+                <li><a data-toggle="tab" href="#tasknotesdocs">[% Lang.txt('Task Details') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></span></a></li>
             </ul>
 
 			<div class="tab-content">
                 
                <div id="memberdocs" class="tab-pane fade in active">
-                    <h3 class="panel-header">Documents</h3>
-					<div class="panel-body">
+					<div class="">
 						[% DocumentBlock %]
 					</div>
                 </div>
                 <div id="memberdetails" class="tab-pane fade">
 					<div class="rego-detail">
-						<h3 class="panel-header">[% Lang.txt('Registration Details') %] 1</h3>
-				        <div class="panel-body">
+				        <div class="">
 				            [% IF EditDetailsLink and !ReadOnlyLogin  %]
 				            <a href = "[% EditDetailsLink %]" class="edit-link">
 				                [% Lang.txt('Edit') %]
@@ -133,8 +131,7 @@
 					</div>
 				</div>
 		           	<div id="tasknotesdocs" class="tab-pane fade">
-						<h3 class="panel-header">Task Notes</h3>
-						<div class="panel-body">
+						<div class="">
 							[% NotesBlock %]
 						</div>
 		            </div>

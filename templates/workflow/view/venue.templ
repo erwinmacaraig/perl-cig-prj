@@ -32,13 +32,13 @@
 [% END %]
 
 <div class="member-home-page">
-    <div class="col-md-12">
-        <div class="panel-body">
+    <div class="col-md-9">
+        <div class="">
             <ul class="nav nav-tabs">
-            <li class="active"><a data-toggle="tab" href="#venueRegDetails">Registration Details</a></li>
-            <li><a data-toggle="tab" href="#venueFields">Fields</a></li>
-            <li><a data-toggle="tab" href="#venueRegDocs">Registration Documents</a></li>
-            <li><a data-toggle="tab" href="#venueTaskNotes">Task Notes</a></li>
+            <li class="active"><a data-toggle="tab" href="#venueRegDetails">[% Lang.txt('Registration Details') %]</a></li>
+            <li><a data-toggle="tab" href="#venueFields">[% Lang.txt('Fields') %]</a></li>
+            <li><a data-toggle="tab" href="#venueRegDocs">[% Lang.txt('Registration Documents') %]</a></li>
+            <li><a data-toggle="tab" href="#venueTaskNotes">[% Lang.txt('Work History') %]</a></li>
             </ul>
 
         <div class="tab-content">
@@ -52,75 +52,55 @@
                         [% END %]
                     </div>
                     <div class="member-details">
-                    [% IF EntityDetails.Status %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Status") %]:</span>
-                            <span class="details-left detail-value">[% EntityDetails.Status %]</span>
+                            <span class="details-left detail-value">[% EntityDetails.Status or '-' %]</span>
                         </span>
-                    [% END %]
 
-                    [% IF EntityDetails.LocalShortName %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Short Name") %]:</span>
-                            <span class="details-left detail-value">[% EntityDetails.LocalShortName %]</span>
+                            <span class="details-left detail-value">[% EntityDetails.LocalShortName or '-' %]</span>
                         </span>
-                    [% END %]
 
-                    [% IF EntityDetails.LocalName %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Local Name") %]:</span>
-                            <span class="details-left detail-value">[% EntityDetails.LocalName %]</span>
+                            <span class="details-left detail-value">[% EntityDetails.LocalName or '-' %]</span>
                         </span>
-                    [% END %]
 
-                    [% IF EntityDetails.Region %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Region") %]:</span>
-                            <span class="details-left detail-value">[% EntityDetails.Region %]</span>
+                            <span class="details-left detail-value">[% EntityDetails.Region or '-' %]</span>
                         </span>
-                    [% END %]
 
-                    [% IF EntityDetails.Address %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Address") %]:</span>
-                            <span class="details-left detail-value">[% EntityDetails.Address %]</span>
+                            <span class="details-left detail-value">[% EntityDetails.Address or '-' %]</span>
                         </span>
-                    [% END %]
 
-                    [% IF EntityDetails.Town %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Town") %]:</span>
-                            <span class="details-left detail-value">[% EntityDetails.Town %]</span>
+                            <span class="details-left detail-value">[% EntityDetails.Town or '-' %]</span>
                         </span>
-                    [% END %]
 
-                    [% IF EntityDetails.WebUrl %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("WebUrl") %]:</span>
-                            <span class="details-left detail-value">[% EntityDetails.WebUrl %]</span>
+                            <span class="details-left detail-value">[% EntityDetails.WebUrl or '-' %]</span>
                         </span>
-                    [% END %]
 
-                    [% IF EntityDetails.Email %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Email") %]:</span>
-                            <span class="details-left detail-value">[% EntityDetails.Email %]</span>
+                            <span class="details-left detail-value">[% EntityDetails.Email or '-' %]</span>
                         </span>
-                    [% END %]
 
-                    [% IF EntityDetails.Phone %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Phone") %]:</span>
-                            <span class="details-left detail-value">[% EntityDetails.Phone %]</span>
+                            <span class="details-left detail-value">[% EntityDetails.Phone or '-' %]</span>
                         </span>
-                    [% END %]
 
-                    [% IF EntityDetails.Fax %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Fax") %]:</span>
-                            <span class="details-left">[% EntityDetails.Fax %]</span>
+                            <span class="details-left detail-value">[% EntityDetails.Fax or '-' %]</span>
                         </span>
-                    [% END %]
 
                     </div>
                 </div>
@@ -145,6 +125,8 @@
         [% ActionsBlock %]
     </div>
 
-    
+    <div class="col-md-3">
+        [% EntitySummaryPanel %]
+    </div> 
 
 </div>

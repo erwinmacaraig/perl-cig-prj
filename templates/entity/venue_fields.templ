@@ -15,19 +15,22 @@
 
 <form action="main.cgi" method="POST">
 [% USE Dumper %]
-    <table cellpadding="5" style="width: 100%">
+    <table cellpadding="5" style="width: 100%" class = "table">
+        <thead>
         <tr>
             <th></th>
-            <th>Field Number</th>
-            <th>Field Name</th>
-            <th>Discipline</th>
-            <th>Type of Field</th>
-            <th>Length of Field</th>
-            <th>Width of Field</th>
-            <th>Capacity of Field</th>
+            <th>[% Lang.txt('Field Number') %]</th>
+            <th>[% Lang.txt('Field Name') %]</th>
+            <th>[% Lang.txt('Discipline') %]</th>
+            <th>[% Lang.txt('Type of Field') %]</th>
+            <th>[% Lang.txt('Length of Field') %]</th>
+            <th>[% Lang.txt('Width of Field') %]</th>
+            <th>[% Lang.txt('Capacity of Field') %]</th>
         </tr>
+        </thead>
 
         [% COUNT = 0 %]
+        <tbody>
         [% FOREACH fieldRow IN FieldElements %]
         <tr>
             <td>[% fieldRow.intEntityFieldID %][% COUNT = COUNT + 1 %][% COUNT %]</td>
@@ -40,9 +43,10 @@
             <td>[% fieldRow.intCapacity %]</td>
         </tr>
         [% END %]
+        </tbody>
     </table>
     <input type="hidden" value="[% action %]" name="a">
     <input type="hidden" value="[% client %]" name="client">
     <input type="hidden" value="[% venueID %]" name="venueID">
-    <input type="submit" class="button generic-button" name="submit" value="Submit">   
+    <input type="submit" class="btn-main" name="submit" value="[% Lang.txt('Save') %]">   
 </form>

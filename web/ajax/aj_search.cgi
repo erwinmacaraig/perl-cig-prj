@@ -116,7 +116,8 @@ sub search_persons  {
   $sphinx->SetFilter('intrealmid',[$filters->{'realm'}]);
 
   $sphinx->SetFilter('intentityid',$filters->{'entity'}) if $filters->{'entity'};
-  my $results = $sphinx->Query($searchval, 'FIFA_Persons_r'.$filters->{'realm'});
+  my $indexName = $Defs::SphinxIndexes{'Person'}.'_r'.$filters->{'realm'};
+  my $results = $sphinx->Query($searchval, $indexName);
   my @persons = ();
   if($results and $results->{'total'})  {
     for my $r (@{$results->{'matches'}})  {

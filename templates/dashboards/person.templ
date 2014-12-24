@@ -1,8 +1,7 @@
 <div class="member-home-page">
     <h3 class="pageHeading">[% Name %]</h3>
 	<div class="col-md-9">
-		<h3 class="panel-header">[% Name %]</h3>
-		<div class="panel-body">
+		<div class="clearfix">
 			<br />
 			<div class="read-only">
 				<h4>[% Lang.txt('Personal Information') %]</h4>
@@ -23,19 +22,26 @@
 					[% IF Details.LatinFirstname %]
 					<div class="">
 						<span class="details-left">[% Lang.txt("First name (Latin Characters)") %]:</span>
-						<span class="detail-value">[% Details.LatinFirstname %]</span>
+						<span class="detail-value">[% Details.LatinFirstname %]&nbsp;</span>
 					</div>
 					[% ELSE %]
 					<div class="">
 						<span class="details-left">[% Lang.txt("First name") %]:</span>
-						<span class="detail-value">[% Details.strLocalFirstname %]</span>
+						<span class="detail-value">[% Details.strLocalFirstname %]&nbsp;</span>
 					</div>
+					[% END %]
+
+					[% IF Details.intGender ==2 %]
+				    <div class="">
+				        <span class="details-left">[% Lang.txt('Maiden name') %]:</span>
+				        <span class="detail-value">[% IF Details.strMaidenName %] [% Details.strMaidenName %] [% ELSE %] - [% END %]</span>
+				    </div>
 					[% END %]
 
 					[% IF Details.DOB %]
 				    <div class="">
 				        <span class="details-left">[% Lang.txt('Date of Birth') %]:</span>
-				        <span class="detail-value">[% Details.DOB %]</span>
+				        <span class="detail-value">[% DateFormat.format(Details.DOB,'MEDIUM') %]</span>
 				    </div>
 					[% END %]
 
@@ -121,7 +127,7 @@
 				[% secondcount = secondcount + 1 %]
 				[% doneother = 1 %]
 				<h4>[% Lang.txt('Other Details') %]</h4>
-				<div class="read-only-text">
+				<div class="read-only-text mfloat">
 					[% GroupData.other %]
 				</div>
 				[% END %]
@@ -138,7 +144,7 @@
 			<div class = "changeoptions">
 			[% IF AddRegistrationURL and !ReadOnlyLogin %]
 			    <span>
-			    	<a class="btn-main" href = "[% AddRegistrationURL %]">[% Lang.txt('Add Registration') %]</a>
+			    	<a class="btn-main" href = "[% AddRegistrationURL %]">[% Lang.txt('Add New Role') %]</a>
 			    </span>
 			[% END %]
 
@@ -149,23 +155,13 @@
 			[% END %]
 
 			<!--[% IF CardPrintingURL  and !ReadOnlyLogin %]
-			<span class = "button-small generic-button"><a href = "[% CardPrintingURL %]">[% Lang.txt("Member Cards") %]</a></span>
+			<span class = "btn-inside-panels"><a href = "[% CardPrintingURL %]">[% Lang.txt("Member Cards") %]</a></span>
 			[% END %]-->
 			</div>
 
 	</div>
 
 	<div class="col-md-3">
-		<div id = "">
-
-		<h3 class="panel-header">[% Lang.txt('Member ID') %]: [% IF Details.Status == "REGISTERED" OR Details.Status != "PENDING" %][% Details.NationalNum %][% ELSE %] - [% END %]</h3>
-		<div class="panel-body">
-
-		<p class="reg-text">[% Name %]</p>
-		<p class="reg-text">[% Details.Gender %]</p>
-		<p class="reg-text">[% Details.DOB %]</p>
-		</div>
-		</div>
-
+        [% SummaryPanel %]
 	</div>
 </div>

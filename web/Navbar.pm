@@ -198,11 +198,12 @@ sub getEntityMenuData {
         };
     #}
     #if(exists $children->{$Defs::LEVEL_VENUE})    {
+    if($SystemConfig->{'allowVenues'})  {
         $menuoptions{'venues'} = {
             name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}),
             url => $baseurl."a=VENUE_L&amp;l=$Defs::LEVEL_VENUE",
         };
-    #}
+    }
     #if(exists $children->{$Defs::LEVEL_PERSON})    {
         $menuoptions{'persons'} = {
             name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}),
@@ -395,7 +396,7 @@ sub getEntityMenuData {
         };
     }
 
-    if($SystemConfig->{'menu_newvenue_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+    if($SystemConfig->{'allowVenues'} && $SystemConfig->{'menu_newvenue_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'addvenue'} = {
              name => $lang->txt("Add $Data->{'LevelNames'}{$Defs::LEVEL_VENUE}"),
             url => $baseurl."a=VENUE_DTA",
@@ -444,9 +445,9 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
             'persons_search',
             'persons_addplayer',
             'persons_addcoach',
-            'persons_addofficial',
             'persons_addteamofficial',
             'persons_addclubofficial',
+            'persons_addofficial',
             'persons_addmaofficial',
             'bulk',
         ]],
@@ -461,9 +462,6 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
         ]],
         [ $lang->txt('My Association'), 'menu',[
         'myAssociation',
-        ]],
-        [ $lang->txt('Reports'), 'menu',[
-        'reports',
         ]],
         [ $lang->txt('Search'), 'search',[
         'advancedsearch',
@@ -480,6 +478,7 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
         'optin',
         ]],
     );
+        #[ $lang->txt('Reports'), 'menu',[ 'reports', ]],
 
     my $menudata = processmenudata(\%menuoptions, \@menu_structure);
     return $menudata;
@@ -528,11 +527,13 @@ sub getClubMenuData {
             name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}),
             url => $baseurl."a=P_L&amp;l=$Defs::LEVEL_PERSON",
         },
-        venues => {
+    );
+    if($SystemConfig->{'allowVenues'})  {
+        $menuoptions{'venues'} = {
             name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}),
             url => $baseurl."a=VENUE_L&amp;l=$Defs::LEVEL_VENUE",
-        },
-    );
+        };
+    }
     if($currentLevel != $Data->{'clientValues'}{'authLevel'})   {
         delete($menuoptions{'home'});
     }
@@ -711,7 +712,7 @@ sub getClubMenuData {
 
 
     #hide for now; list is already included in Work Tasks
-    if (0) {
+    if ($SystemConfig->{'allowPersonRequest'}) {
         $menuoptions{'listrequests'} = {
            name => $lang->txt('List Requests'),
            url => $baseurl."a=PRA_L",
@@ -725,14 +726,17 @@ sub getClubMenuData {
                 url => $baseurl."a=PREGFB_T",
             };
         }
+        if ($SystemConfig->{'allowPayInvoice'}) {
 		$menuoptions{'bulkpayment'} = { 
 			name => $lang->txt('Pay Invoice'),
 			url => $baseurl."a=TXN_PAY_INV",
 		}; 
+        }
         if ($SystemConfig->{'allowPersonRequest'}) {
             $menuoptions{'requestaccess'} = {
             name => $lang->txt('Request for Person Details'),
-            url => $baseurl."a=PRA_R",
+            #url => $baseurl."a=PRA_R",
+            url => $baseurl."a=INITSRCH_P&type=access",
             };
         }
         if($SystemConfig->{'menu_newperson_PLAYER_'.$Data->{'clientValues'}{'authLevel'}.'_'.$currentLevel} && !$Data->{'ReadOnlyLogin'}) {
@@ -783,7 +787,7 @@ sub getClubMenuData {
 
 
 
-    if($SystemConfig->{'menu_newvenue_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+    if($SystemConfig->{'allowVenues'} && $SystemConfig->{'menu_newvenue_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'addvenue'} = {
              name => $lang->txt("Add $Data->{'LevelNames'}{$Defs::LEVEL_VENUE}"),
             url => $baseurl."a=VENUE_DTA",
@@ -796,21 +800,22 @@ sub getClubMenuData {
         [ $lang->txt('Dashboard'), 'home','home'],
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}), 'menu', [
         'persons_search',
+        'persons_addplayer',
+        'persons_addcoach',
+        'persons_addteamofficial',
+        'persons_addclubofficial',
+        'persons_addofficial',
+        'persons_addmaofficial',
+
+        'requesttransfer',
+        'requestaccess',
         'newclearance',    
         'clearances',    
         'personrollover',
         'transferperson',
-        'duplicates',
         'pendingregistration',
-        'requesttransfer',
-        'requestaccess',
         'listrequests',
-        'persons_addplayer',
-        'persons_addcoach',
-        'persons_addofficial',
-        'persons_addteamofficial',
-        'persons_addclubofficial',
-        'persons_addmaofficial',
+        'duplicates',
         'bulk',
 		'bulkpayment',
          ]],
@@ -819,16 +824,13 @@ sub getClubMenuData {
             'venues',
             'addvenue'
         ]],
-        [ $lang->txt('Work Tasks'), 'menu',[
+        [ $lang->txt('Club Work Tasks'), 'menu',[
             'approvals',
             'pending'
         ]],
         [ $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Transactions"), 'menu','transactions',],
         [ $lang->txt('My Club'), 'menu',[
         'myClub',
-        ]],
-        [ $lang->txt('Reports'), 'menu',[
-        'reports',
         ]],
         [ $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Documents"), 'menu','clubdocs'],
         [ $lang->txt('Identifiers'), 'menu','clubidentifier'],
@@ -843,6 +845,7 @@ sub getClubMenuData {
         'auditlog',
         ]],
     );
+        #[ $lang->txt('Reports'), 'menu',[ 'reports', ]],
 
     my $menudata = processmenudata(\%menuoptions, \@menu_structure);
     return $menudata;

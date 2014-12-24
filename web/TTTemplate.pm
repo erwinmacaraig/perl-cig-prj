@@ -18,6 +18,7 @@ sub runTemplate	{
 	return '' if (!$filename and !$content);
 	$InData->{'Data'}=$Data;
 	$InData->{'Lang'}=$Data->{'lang'};
+	$InData->{'DateFormat'}=$Data->{'l10n'}{'date'};
 	$InData->{'BaseURL'}=$Defs::base_url;
 	$InData->{'UploadedURL'}=$Defs::uploaded_url;
   my $config = {
