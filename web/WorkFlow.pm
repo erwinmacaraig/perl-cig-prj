@@ -3017,7 +3017,7 @@ sub resetRelatedTasks {
 }
 
 sub viewSummaryPage {
-    my ($Data) = @_;
+    my ($Data, $dref) = @_;
 
     my $WFTaskID = safe_param('TID','number') || '';
     my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
@@ -3039,6 +3039,9 @@ sub viewSummaryPage {
     $TemplateData{'Lang'} = $Data->{'lang'};
 
     my $c = Countries::getISOCountriesHash();
+
+    open FH, ">dumpfile.txt";
+    print FH "Group DataL \n\n" . Dumper($task) . "\n";
 
     switch($task->{'strWFRuleFor'}) {
         case 'REGO' {
@@ -3090,6 +3093,7 @@ sub viewSummaryPage {
                 case "$Defs::LEVEL_CLUB"  {
                     #TODO: add details specific to CLUB
                     $templateFile = 'workflow/summary/club.templ';
+                    $title = 'New Club Registration - Approval';
                 }
                 case "$Defs::LEVEL_VENUE" {
                     #TODO: add details specific to VENUE
@@ -3099,6 +3103,21 @@ sub viewSummaryPage {
 
                 }
             }
+             %TemplateData = (
+                EntityDetails => {
+                    Status => $Data->{'lang'}->txt($Defs::entityStatus{$dref->{'entityStatus'} || 0}) || '',
+                    LocalShortName => $task->{'strLocalShortName'} || '',
+                    LocalName => $task->{'strLocalName'} || '',
+                    LegalID => $task->{'strLegalID'} || '',
+                    FoundationDate => $task->{'dtFrom'} || '',
+                    ISOCountry => $c->{$task->{'strISOCountry'}} || '',
+                    Discipline => $Defs::entitySportType{$task->{'strDiscipline'}} || '',
+                    ContactPerson => $task->{'strContact'} || '',
+                    Email => $task->{'strEmail'} || '',
+                },
+            );
+             
+            $TemplateData{'EntitySummaryPanel'} = entitySummaryPanel($Data, $task->{'intEntityID'});
         }
         case 'PERSON' {
             $templateFile = 'workflow/summary/person.templ';
