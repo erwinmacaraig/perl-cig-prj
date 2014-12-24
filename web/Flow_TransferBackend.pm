@@ -576,6 +576,7 @@ print STDERR "SPORT$sport$personType$personLevel\n";
     if(!$personID)    {
         push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person';
     }
+$regoID=0;
     if (!$regoID)   {
         if ($msg eq 'SUSPENDED')   {
             push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("You cannot register at this time, Person is currently SUSPENDED");
