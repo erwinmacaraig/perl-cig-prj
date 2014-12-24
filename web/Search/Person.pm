@@ -198,6 +198,11 @@ sub getTransfer {
                 ePR.intPersonRegistrationID as existingPendingRegistrationID
             FROM
             tblPerson
+            LEFT JOIN tblPersonRegistration_$realmID AS PRAlready ON (
+                tblPerson.intPersonID = PRAlready.intPersonID
+                AND PRAlready.strStatus IN ('ACTIVE', 'PASSIVE','PENDING')
+                AND PRAlready.intEntityID = $filters->{'club'}
+            )
             INNER JOIN tblPersonRegistration_$realmID AS PR ON (
                 tblPerson.intPersonID = PR.intPersonID
                 AND PR.strStatus IN ('ACTIVE', 'PASSIVE','PENDING')
@@ -239,6 +244,7 @@ sub getTransfer {
             WHERE tblPerson.intPersonID IN ($person_list)
                 AND tblPerson.strStatus IN ('REGISTERED')
                 AND PRQinprogress.intPersonRequestID IS NULL
+                AND PRAlready.intPersonRegistrationID IS NULL
             ORDER BY 
                 strLocalSurname, 
                 strLocalFirstname
