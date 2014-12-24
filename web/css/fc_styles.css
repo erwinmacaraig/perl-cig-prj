@@ -1556,7 +1556,8 @@ header nav ul li a {
 }
 .dataTables_length, .dataTables_info {
 	float:left;
-	margin-left: 29%;
+	/*margin-left: 29%;*/
+	margin-left: 90px;
 }
 
 div .dataTables_paginate {

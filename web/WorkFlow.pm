@@ -3273,35 +3273,35 @@ sub updateTaskScreen {
                 $status = $Data->{'lang'}->txt("Rejected");
             }
             elsif($TaskType eq 'NEW_PLAYER') {
-                $message = $Data->{'lang'}->txt("You have rejected this Player Registration, the clubs will be informed. To proceed with this Registration the clubs need to start a new Registration.");
+                $message = $Data->{'lang'}->txt("You have rejected this Player Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration.");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
             elsif($TaskType eq 'NEW_COACH') {
-                $message = $Data->{'lang'}->txt("You have rejected this Coach Registration, the clubs will be informed. To proceed with this Registration the clubs need to start a new Registration.");
+                $message = $Data->{'lang'}->txt("You have rejected this Coach Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration.");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
             elsif($TaskType eq 'NEW_REFEREE') {
-                $message = $Data->{'lang'}->txt("You have rejected this Referee Registration, the clubs will be informed. To proceed with this Registration the clubs need to start a new Registration.");
+                $message = $Data->{'lang'}->txt("You have rejected this Referee Registration. To proceed with this Registration, start a new Registration.");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
             elsif($TaskType eq 'NEW_MAOFFICIAL') {
-                $message = $Data->{'lang'}->txt("You have rejected this MA Official Registration, the clubs will be informed. To proceed with this Registration the clubs need to start a new Registration.");
+                $message = $Data->{'lang'}->txt("You have rejected this MA Official Registration. To proceed with this Registration, start a new Registration.");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
             elsif($TaskType eq 'NEW_CLUBOFFICIAL') {
-                $message = $Data->{'lang'}->txt("You have rejected this Club Official Registration, the clubs will be informed. To proceed with this Registration the clubs need to start a new Registration.");
+                $message = $Data->{'lang'}->txt("You have rejected this Club Official Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration.");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
             elsif($TaskType eq 'NEW_TEAMOFFICIAL') {
-                $message = $Data->{'lang'}->txt("You have rejected this Team Official Registration, the clubs will be informed. To proceed with this Registration the clubs need to start a new Registration.");
+                $message = $Data->{'lang'}->txt("You have rejected this Team Official Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration.");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
             elsif($TaskType eq 'NEW_VENUE') {
-                $message = $Data->{'lang'}->txt("You have rejected this Venue Registration, the clubs will be informed. To proceed with this Registration the clubs need to start a new Venue Registration.");
+                $message = $Data->{'lang'}->txt("You have rejected this Venue Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration.");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
             elsif($TaskType eq 'NEW_CLUB') {
-                $message = $Data->{'lang'}->txt("You have rejected this Club Registration, the clubs will be informed. To proceed with this Registration the clubs need to start a new Venue Registration.");
+                $message = $Data->{'lang'}->txt("You have rejected this Club Registration. To proceed with this Registration, start a new Registration.");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
         }
