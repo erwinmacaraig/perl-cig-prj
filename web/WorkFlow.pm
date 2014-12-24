@@ -2361,6 +2361,7 @@ sub populateRegoViewData {
 
     $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.')
         if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_REGO'} == 1 and $dref->{'regoPaymentRequired'});
+print STDERR "SSSSSSSSSSSSSS " . $dref->{'regoPaymentRequired'} . $dref->{'intPersonRegistrationID'};
 
     if($dref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER){
         $title = $Data->{'lang'}->txt('Transfer') . " - $LocalName";;
@@ -2551,10 +2552,13 @@ sub populateDocumentViewData {
             addPersonItem.intItemID as addPersonItemID,
             regoItem.intItemID as regoItemID,
 			regoItem.intRequired as Required,
+			addPersonItem.intRequired as PersonRequired,
+			entityItem.intRequired as EntityRequired,
             entityItem.intItemID as entityItemID
         FROM tblWFRuleDocuments AS rd
         INNER JOIN tblWFTask AS wt ON (wt.intWFRuleID = rd.intWFRuleID)
         INNER JOIN tblWFRule as wr ON (wr.intWFRuleID = wt.intWFRuleID)
+        LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (pr.intPersonRegistrationID = wt.intPersonRegistrationID)
         LEFT JOIN tblRegistrationItem as addPersonItem
             ON (
                 addPersonItem.strItemType = 'DOCUMENT'
@@ -2564,6 +2568,10 @@ sub populateDocumentViewData {
                 AND addPersonItem.intID = rd.intDocumentTypeID
                 AND addPersonItem.strAgeLevel IN ('', '$dref->{'strAgeLevel'}')
                 AND addPersonItem.intRealmID = wt.intRealmID
+                AND (addPersonItem.strISOCountry_IN ='' OR addPersonItem.strISOCountry_IN IS NULL OR addPersonItem.strISOCountry_IN LIKE CONCAT('%|','$dref->{'strISONationality'}','|%'))
+                AND (addPersonItem.strISOCountry_NOTIN ='' OR addPersonItem.strISOCountry_NOTIN IS NULL OR addPersonItem.strISOCountry_NOTIN NOT LIKE CONCAT('%|','$dref->{'strISONationality'}','|%'))
+                AND (addPersonItem.intFilterFromAge = 0 OR addPersonItem.intFilterFromAge <= $dref->{'currentAge'})
+                AND (addPersonItem.intFilterToAge = 0 OR addPersonItem.intFilterToAge >= $dref->{'currentAge'})
                 )
         LEFT JOIN tblRegistrationItem as regoItem
             ON (
@@ -2571,6 +2579,7 @@ sub populateDocumentViewData {
                 AND regoItem.intRealmID = wt.intRealmID
                 AND regoItem.intOriginLevel = wr.intOriginLevel
                 AND regoItem.strRuleFor = 'REGO'
+                AND pr.intPersonRegistrationID > 0
                 AND regoItem.intID = rd.intDocumentTypeID
                 AND regoItem.intEntityLevel = wr.intEntityLevel
                 AND regoItem.strRegistrationNature = '$dref->{'strRegistrationNature'}'
@@ -2594,7 +2603,6 @@ sub populateDocumentViewData {
                 AND entityItem.intID = rd.intDocumentTypeID
                 AND entityItem.intEntityLevel = wr.intEntityLevel
                 )
-        LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (pr.intPersonRegistrationID = wt.intPersonRegistrationID)
         LEFT JOIN tblDocuments AS d ON $joinCondition
         LEFT JOIN tblDocumentType dt ON (dt.intDocumentTypeID = rd.intDocumentTypeID )
         LEFT JOIN tblUploadedFiles tuf ON (tuf.intFileID = d.intUploadFileID)
@@ -2640,6 +2648,7 @@ sub populateDocumentViewData {
 			if(!grep /$tdref->{'doctypeid'}/,@validdocsforallrego){  
 
 				if($tdref->{'Required'}){				
+#or $tref->{'PersonRequired'} or $tref->{'EntityRequired'}
 					$documentStatusCount{'MISSING'}++;
 					$status = 'MISSING';
 				}

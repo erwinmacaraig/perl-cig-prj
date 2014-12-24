@@ -72,7 +72,7 @@ sub bulkPersonRollover {
             P.strLocalSurname,
             P.strLocalFirstname,
             DATE_FORMAT(P.dtDOB,"%d/%m/%Y") AS dtDOB,
-            TIMESTAMPDIFF(YEAR, P.dtDOB, CURDATE()) as currentAge
+            TIMESTAMPDIFF(YEAR, P.dtDOB, CURDATE()) as currentAge,
             P.dtDOB AS dtDOB_RAW,
             P.strNationalNum
         FROM 
@@ -80,6 +80,7 @@ sub bulkPersonRollover {
             INNER JOIN tblPersonRegistration_$realmID as PR ON (
                 PR.intPersonID = P.intPersonID
                 AND PR.strPersonType = ?
+                AND PR.strSport = ?
                 AND PR.strPersonLevel= ?
                 AND PR.strPersonEntityRole= ?
                 AND PR.strStatus IN ("$Defs::PERSONREGO_STATUS_ACTIVE", "$Defs::PERSONREGO_STATUS_PASSIVE")
@@ -89,6 +90,7 @@ sub bulkPersonRollover {
             LEFT JOIN tblPersonRegistration_$realmID as PRto ON (
                 PRto.intPersonID = P.intPersonID
                 AND PRto.strPersonType = PR.strPersonType
+                AND PRto.strSport = PR.strSport 
                 AND PRto.strPersonLevel= PR.strPersonLevel
                 AND PRto.strPersonEntityRole= PR.strPersonEntityRole
                 AND PRto.strStatus IN ("$Defs::PERSONREGO_STATUS_ACTIVE", "$Defs::PERSONREGO_STATUS_PASSIVE", "$Defs::PERSONREGO_STATUS_PENDING")
@@ -103,15 +105,13 @@ sub bulkPersonRollover {
         ORDER BY strLocalSurname, strLocalFirstname
     ];
 
-                #AND PR.strAgeLevel = ?
-        #$bulk_ref->{'personLevel'} || '',
-
     my @values=(
         $bulk_ref->{'personType'} || '',
+        $bulk_ref->{'sport'} || '',
+        $bulk_ref->{'personLevel'} || '',
         $bulk_ref->{'personEntityRole'} || '',
         $bulk_ref->{'entityID'} || '',
         $bulk_ref->{'nationalPeriodID'} || '',
-        $bulk_ref->{'ageLevel'} || '',
         $bulk_ref->{'nationalPeriodID'} || '',
         $realmID
     );
@@ -123,7 +123,7 @@ sub bulkPersonRollover {
 
     while (my $dref = $q->fetchrow_hashref()) {
         my $newAgeLevel = Person::calculateAgeLevel($Data, $dref->{'currentAge'});
-        next if $newAgeLevel ne $bulk_ref->{'personLevel'};
+        next if $newAgeLevel ne $bulk_ref->{'ageLevel'};
         $count++;
         my %row = ();
         

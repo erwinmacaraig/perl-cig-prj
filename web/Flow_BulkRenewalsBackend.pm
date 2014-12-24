@@ -127,7 +127,7 @@ print STDERR "d_type:" . $self->getCarryFields('d_type') . "\n";
     my $personLevel = $self->getCarryFields('d_level') || '';
     my $sport = $self->getCarryFields('d_sport') || '';
     my $ageLevel = $self->getCarryFields('d_age') || '';
-    my $registrationNature = $self->getCarryFields('d_nature') || '';
+    my $registrationNature = $self->getCarryFields('d_nat') || '';
 #    my $existingReg = $self->{'RunParams'}{'existingReg'} || 0;
 #    my $changeExistingReg = $self->{'RunParams'}{'changeExisting'} || 0;
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
@@ -158,6 +158,7 @@ print STDERR "d_type:" . $self->getCarryFields('d_type') . "\n";
     #$Hidden{'prodQty'} = $params{'prodQty'} || '';
     #$Hidden{'upd'} = $params{'upd'} || 0;
 
+print STDERR Dumper($bulk_ref);
     ($bulk_ref->{'nationalPeriodID'}, undef, undef) = getNationalReportingPeriod($self->{'Data'}->{db}, $self->{'Data'}->{'Realm'}, $self->{'Data'}->{'RealmSubType'}, $bulk_ref->{'sport'}, $bulk_ref->{'personType'}, $bulk_ref->{'registrationNature'});
     my ($listPersons_body, undef) = bulkPersonRollover($self->{'Data'}, 'PREGFB_SPU', $bulk_ref, \%Hidden, 0);
     my $content = $listPersons_body;
@@ -247,13 +248,13 @@ sub process_registration {
     my $personLevel = $self->{'RunParams'}{'d_level'} || '';
     my $sport = $self->{'RunParams'}{'d_sport'} || '';
     my $ageLevel = $self->{'RunParams'}{'d_age'} || '';
-    my $registrationNature = $self->{'RunParams'}{'d_nature'} || '';
+    my $registrationNature = 'RENEWAL';
     $self->addCarryField('d_type',$personType);
     $self->addCarryField('d_role',$personEntityRole);
     $self->addCarryField('d_level',$personLevel);
     $self->addCarryField('d_sport',$sport);
     $self->addCarryField('d_age',$ageLevel);
-    $self->addCarryField('d_nature',$registrationNature);
+    $self->addCarryField('d_nat',$registrationNature);
 
     return ('',1);
 
@@ -275,7 +276,7 @@ print STDERR "PT INS " .$self->{'RunParams'}{'d_type'};
     my $personLevel = $self->getCarryFields('d_level') || '';
     my $sport = $self->getCarryFields('d_sport') || '';
     my $ageLevel = $self->getCarryFields('d_age') || '';
-    my $registrationNature = $self->getCarryFields('d_nature') || '';
+    my $registrationNature = $self->getCarryFields('d_nat') || '';
 
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
@@ -421,7 +422,7 @@ sub display_complete {
     my $personLevel = $self->getCarryFields('d_level') || '';
     my $sport = $self->getCarryFields('d_sport') || '';
     my $ageLevel = $self->getCarryFields('d_age') || '';
-    my $registrationNature = $self->getCarryFields('d_nature') || '';
+    my $registrationNature = $self->getCarryFields('d_nat') || '';
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;

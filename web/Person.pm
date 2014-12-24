@@ -1819,7 +1819,7 @@ sub postPersonUpdate {
                 my $st = qq[UPDATE tblPerson SET strStatus = "$Defs::PERSON_STATUS_PENDING" WHERE intPersonID = $id LIMIT 1];
                 
                 if($db->do($st)) {
-                    my $originEntityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'authLevel'}) || getID($Data->{'clientValues'}) || 0;
+                    my $originEntityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'authLevel'}) || getLastEntityID($Data->{'clientValues'});
 
                     my $rc = WorkFlow::addWorkFlowTasks(
                         $Data,

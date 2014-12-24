@@ -14,6 +14,7 @@ use ConfigOptions qw(ProcessPermissions);
 use PersonFieldsSetup;
 use FieldLabels;
 use Data::Dumper;
+use WorkFlow;
 
 sub handlePersonEdit {
     my ($action, $Data) = @_;
@@ -61,6 +62,7 @@ sub handlePersonEdit {
           Fields => $fieldset->{$fieldsetType},
         );
         if($action eq 'PE_U')    {
+#print STDERR "SURNAME WAS" . $personObj->getValue('strLocalSurname');
           my $p = new CGI;
           my %params = $p->Vars();
           my ($userData, $errors) = $obj->gather(\%params, $permissions,'edit');
@@ -84,6 +86,8 @@ sub handlePersonEdit {
           else  {
             $personObj->setValues($userData);
             $personObj->write();
+            triggerRule($Data, $personObj) if ($personObj->getValue('strStatus') eq 'REGISTERED');
+#print STDERR "SURNAME IS NOW" . $personObj->getValue('strLocalSurname');
             $body = 'updated';
             if($back_screen){
                 my %tempClientValues = getClient($Data->{'client'});
@@ -119,4 +123,37 @@ sub handlePersonEdit {
 
     my $pageHeading = 'Edit Person';
     return ($body, $pageHeading);
+}
+
+sub triggerRule {
+
+    my ($Data, $personObj) = @_;
+
+return;
+
+
+    ## JERVY
+
+    ## Perhaps change UPDATE to be personObj->write /
+
+    my $personID = $personObj->getValue('intPersonID') || return;
+
+    my $st = qq[
+        UPDATE tblPerson SET strStatus = "$Defs::PERSON_STATUS_PENDING" WHERE intPersonID = ? LIMIT 1
+    ];
+    my $query = $Data->{'db'}->prepare($st);
+    $query->execute($personID) or print STDERR "EDIT";
+
+    my $originEntityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'authLevel'}) || getLastEntityID($Data->{'clientValues'});
+
+    my $rc = WorkFlow::addWorkFlowTasks(
+        $Data,
+        'PERSON',
+        'AMENDMENT',
+        $Data->{'clientValues'}{'authLevel'} || 0,
+        $originEntityID,
+        $personID,
+        0,
+        0,
+    );
 }
