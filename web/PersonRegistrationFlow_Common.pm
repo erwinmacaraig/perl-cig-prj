@@ -627,7 +627,7 @@ sub checkUploadedRegoDocuments {
         $rego_ref,
      );
 
-print STDERR "~~~~~~~~~~~~~~~CHECK UPLOADED REGO DOCUMENTS:$entityRegisteringForLevel\n";
+print STDERR "~~~~~~~~~~~~~~~CHECK UPLOADED REGO DOCUMENTS:$entityRegisteringForLevel $entityID $personID $regoID\n";
 	#check for Approved Documents that do not need to be uploaded
 	my @validdocsforallrego = ();
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
