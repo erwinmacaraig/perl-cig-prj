@@ -278,7 +278,7 @@ sub getEntityMenuData {
         if ($SystemConfig->{'allowBulkRenewals'})   {
             $menuoptions{'bulk'} = {
                 name => $lang->txt('Bulk Renewals'),
-                url => $baseurl."a=PREGFB_T",
+                url => $baseurl."a=PFB_", #PREGFB_T",
             };
         }
         $menuoptions{'entityregistrationallowed'} = {
@@ -723,7 +723,7 @@ sub getClubMenuData {
         if ($SystemConfig->{'allowBulkRenewals'})   {
             $menuoptions{'bulk'} = {
                 name => $lang->txt('Bulk Renewals'),
-                url => $baseurl."a=PREGFB_T",
+                url => $baseurl."a=PFB_", #PREGFB_T",
             };
         }
         if ($SystemConfig->{'allowPayInvoice'}) {
