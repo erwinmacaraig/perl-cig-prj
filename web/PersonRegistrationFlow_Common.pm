@@ -152,12 +152,12 @@ sub displayRegoFlowSummary {
     my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref, $carryString) = @_;
     my $lang=$Data->{'lang'};
 	
+print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~displayRegoFlowSummary\n";
     my $ok = 0;
     if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER' or $rego_ref->{'registrationNature'} eq 'TRANSFER') {
         $ok=1;
     }
     else    {
-print STDERR Dumper($rego_ref);
         $ok = checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'strSport'}, $rego_ref->{'strPersonType'}, $rego_ref->{'strPersonEntityRole'}, $rego_ref->{'strPersonLevel'}, $rego_ref->{'strAgeLevel'});
     }
     my $body = '';
@@ -276,14 +276,15 @@ print STDERR Dumper($rego_ref);
             AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
             AND tblRegistrationItem.intRealmID=?
             AND tblRegistrationItem.strItemType='DOCUMENT'
+     AND tblRegistrationItem.strPersonType IN ('', ?)
+     AND tblRegistrationItem.strRegistrationNature IN ('', ?)
+     AND tblRegistrationItem.strAgeLevel IN ('', ?)
+     AND tblRegistrationItem.strPersonLevel IN ('', ?)
+     AND tblRegistrationItem.intOriginLevel = ?
+     AND tblRegistrationItem.intEntityLevel = ?
         ORDER BY tblDocuments.intDocumentID DESC
     ];
 
-     #AND tblRegistrationItem.strPersonType IN ('', ?)
-     #AND tblRegistrationItem.strRegistrationNature IN ('', ?)
-     #AND tblRegistrationItem.strAgeLevel IN ('', ?)
-     #AND tblRegistrationItem.strPersonLevel IN ('', ?)
-     #AND tblRegistrationItem.intOriginLevel = ?
      #AND tblRegistrationItem.intEntityLevel = ? ##### PUT INT
 
 
@@ -293,12 +294,6 @@ print STDERR Dumper($rego_ref);
         $rego_ref->{'strPersonType'},
         0
     );
-     # $rego_ref->{'strPersonType'} || '',
-     # $rego_ref->{'strRegistrationNature'} || '',
-     # $rego_ref->{'strAgeLevel'} || '',
-     # $rego_ref->{'strPersonLevel'} || '',
-     # $rego_ref->{'intOriginLevel'},
-     # $rego_ref->{'intEntityLevel'},
 
     my @certString;
     foreach my $cert (@{$certifications}) {
@@ -307,7 +302,16 @@ print STDERR Dumper($rego_ref);
 
 
 $sth = $Data->{'db'}->prepare($query);
-		$sth->execute($personID,$Data->{'Realm'});
+		$sth->execute(
+            $personID,
+            $Data->{'Realm'},
+            $rego_ref->{'strPersonType'} || '',
+            $rego_ref->{'strRegistrationNature'} || '',
+            $rego_ref->{'strAgeLevel'} || '',
+            $rego_ref->{'strPersonLevel'} || '',
+            $rego_ref->{'intOriginLevel'},
+            $rego_ref->{'intEntityLevel'},
+        );
 		 while(my $dref = $sth->fetchrow_hashref()){		
             if(! exists $existingDocuments{$dref->{'ID'}}){
                 $existingDocuments{$dref->{'ID'}} = $dref;
@@ -623,6 +627,7 @@ sub checkUploadedRegoDocuments {
         $rego_ref,
      );
 
+print STDERR "~~~~~~~~~~~~~~~CHECK UPLOADED REGO DOCUMENTS:$entityRegisteringForLevel\n";
 	#check for Approved Documents that do not need to be uploaded
 	my @validdocsforallrego = ();
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
@@ -638,26 +643,28 @@ sub checkUploadedRegoDocuments {
                 AND tblRegistrationItem.intRealmID=? 
                 AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
                 AND tblRegistrationItem.strItemType='DOCUMENT'
+          AND tblRegistrationItem.strPersonType IN ('', ?)
+          AND tblRegistrationItem.strRegistrationNature IN ('', ?)
+          AND tblRegistrationItem.strAgeLevel IN ('', ?)
+          AND tblRegistrationItem.strPersonLevel IN ('', ?)
+          AND tblRegistrationItem.intOriginLevel = ?
+          AND tblRegistrationItem.intEntityLevel = ?
 			GROUP BY intDocumentTypeID];
 
-          #AND tblRegistrationItem.strPersonType IN ('', ?)
-          #AND tblRegistrationItem.strRegistrationNature IN ('', ?)
-          #AND tblRegistrationItem.strAgeLevel IN ('', ?)
-          #AND tblRegistrationItem.strPersonLevel IN ('', ?)
-          #AND tblRegistrationItem.intOriginLevel = ?
-          #AND tblRegistrationItem.intEntityLevel = ?
 
 	#open FH, ">dumpfile.txt";
 	#print FH "\n\nQuery: \n$query \n personID = $personID \n\n";
 	my $sth = $Data->{'db'}->prepare($query);
-	$sth->execute($personID, $Data->{'Realm'});
-
-     # $rego_ref->{'strPersonType'} || '',
-     # $rego_ref->{'strRegistrationNature'} || '',
-     # $rego_ref->{'strAgeLevel'} || '',
-     # $rego_ref->{'strPersonLevel'} || '',
-     # $rego_ref->{'intOriginLevel'},
-     # $rego_ref->{'intEntityLevel'},
+	$sth->execute(
+        $personID, 
+        $Data->{'Realm'},
+      $rego_ref->{'strPersonType'} || '',
+      $rego_ref->{'strRegistrationNature'} || '',
+      $rego_ref->{'strAgeLevel'} || '',
+      $rego_ref->{'strPersonLevel'} || '',
+      $rego_ref->{'intOriginLevel'},
+        $entityRegisteringForLevel,
+    );
 	while(my $dref = $sth->fetchrow_hashref()){
 		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
 	}
@@ -745,6 +752,7 @@ sub displayRegoFlowDocuments{
 	#				WHERE tblDocuments.intPersonID = ? AND intPersonRegistrationID = ?;	
 	#];
    
+print STDERR "~~~~~~~~~~~~~~~displayRegoFlowDocuments\n";
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
     my $query = qq [
         SELECT
@@ -765,24 +773,27 @@ sub displayRegoFlowDocuments{
             AND tblDocuments.intPersonRegistrationID = ?
             AND tblRegistrationItem.intRealmID=?
             AND tblRegistrationItem.strItemType='DOCUMENT'
+AND tblRegistrationItem.strPersonType IN ('', ?)
+      AND tblRegistrationItem.intOriginLevel = ?
+      AND tblRegistrationItem.intEntityLevel = ?
+      AND tblRegistrationItem.strAgeLevel IN ('', ?)
+      AND tblRegistrationItem.strPersonLevel IN ('', ?)
+      AND tblRegistrationItem.strRegistrationNature IN ('', ?)
         ORDER BY tblDocuments.intDocumentID DESC
     ];
-      #AND tblRegistrationItem.strPersonType IN ('', ?)
-      #AND tblRegistrationItem.strRegistrationNature IN ('', ?)
-      #AND tblRegistrationItem.strAgeLevel IN ('', ?)
-      #AND tblRegistrationItem.strPersonLevel IN ('', ?)
-      #AND tblRegistrationItem.intOriginLevel = ?
-      #AND tblRegistrationItem.intEntityLevel = ?
 
 	my $sth = $Data->{'db'}->prepare($query);
-	$sth->execute($personID,$regoID, $Data->{'Realm'});
-    # $rego_ref->{'strPersonType'} || '',
-    # $rego_ref->{'strRegistrationNature'} || '',
-    # $rego_ref->{'strAgeLevel'} || '',
-    # $rego_ref->{'strPersonLevel'} || '',
-    # $rego_ref->{'intOriginLevel'},
-    # $rego_ref->{'intEntityLevel'},
-
+	$sth->execute(
+        $personID,
+        $regoID, 
+        $Data->{'Realm'},
+        $rego_ref->{'strPersonType'} || '',
+        $rego_ref->{'intOriginLevel'},
+        $entityRegisteringForLevel,
+        $rego_ref->{'strAgeLevel'} || '',
+        $rego_ref->{'strPersonLevel'} || '',
+        $rego_ref->{'strRegistrationNature'} || '',
+    );
 
 	my @uploaded_docs = ();
 	while(my $dref = $sth->fetchrow_hashref()){		
@@ -838,21 +849,26 @@ sub displayRegoFlowDocuments{
             AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
             AND tblRegistrationItem.intRealmID=?
             AND tblRegistrationItem.strItemType='DOCUMENT'
+      AND tblRegistrationItem.strPersonType IN ('', ?)
+     AND tblRegistrationItem.strPersonLevel IN ('', ?)
+     AND tblRegistrationItem.intOriginLevel = ?
+     AND tblRegistrationItem.intEntityLevel = ?
+      AND tblRegistrationItem.strRegistrationNature IN ('', ?)
+      AND tblRegistrationItem.strAgeLevel IN ('', ?)
         ORDER BY tblDocuments.intDocumentID DESC
     ];
-      #AND tblRegistrationItem.strPersonType IN ('', ?)
-      #AND tblRegistrationItem.strRegistrationNature IN ('', ?)
-      #AND tblRegistrationItem.strAgeLevel IN ('', ?)
-      #AND tblRegistrationItem.strPersonLevel IN ('', ?)
-      #AND tblRegistrationItem.intOriginLevel = ?
 
 	$sth = $Data->{'db'}->prepare($query);
-	$sth->execute($personID, $Data->{'Realm'});
-    # $rego_ref->{'strPersonType'} || '',
-    # $rego_ref->{'strRegistrationNature'} || '',
-    # $rego_ref->{'strAgeLevel'} || '',
-    # $rego_ref->{'strPersonLevel'} || '',
-    # $rego_ref->{'intOriginLevel'},
+	$sth->execute(
+        $personID, 
+        $Data->{'Realm'},
+        $rego_ref->{'strPersonType'} || '',
+        $rego_ref->{'strPersonLevel'} || '',
+        $rego_ref->{'intOriginLevel'},
+        $entityRegisteringForLevel,
+        $rego_ref->{'strRegistrationNature'} || '',
+        $rego_ref->{'strAgeLevel'} || '',
+    );
 
 	while(my $dref = $sth->fetchrow_hashref()){
         if(! exists $existingDocuments{$dref->{'ID'}}){

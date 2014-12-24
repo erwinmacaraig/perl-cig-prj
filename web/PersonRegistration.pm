@@ -644,6 +644,7 @@ sub getRegistrationData	{
             COUNT(DISTINCT T.intTransactionID) as CountTXNs,
             er.strEntityRoleName,
             e.strLocalName,
+            e.intEntityLevel,
             e.strLatinName,
             e.intEntityLevel,
             e.intEntityID
