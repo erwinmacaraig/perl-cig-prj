@@ -442,6 +442,7 @@ my @headers = (
                         #AND tblRegistrationItem.strAgeLevel IN ('', ?)
                         #AND tblRegistrationItem.strPersonLevel IN ('', ?)
                         #AND tblRegistrationItem.intOriginLevel = ?
+                        #AND tblRegistrationItem.intEntityLevel = ?
 
 			   my $sth = $db->prepare($query); 
                $sth->execute(
@@ -455,6 +456,7 @@ my @headers = (
                # $registration->{'strAgeLevel'} || '',
                # $registration->{'strPersonLevel'} || '',
                # $registration->{'intOriginLevel'},
+               # $registration->{'intEntityLevel'},
             
 			   my $dref = $sth->fetchrow_hashref(); 
 				#checks for strLockAtLevel and intUseExistingThisEntity and intUseExistingAnyEntity and Owner against Currently Logged

@@ -284,6 +284,7 @@ print STDERR Dumper($rego_ref);
      #AND tblRegistrationItem.strAgeLevel IN ('', ?)
      #AND tblRegistrationItem.strPersonLevel IN ('', ?)
      #AND tblRegistrationItem.intOriginLevel = ?
+     #AND tblRegistrationItem.intEntityLevel = ? ##### PUT INT
 
 
     my $certifications = getPersonCertifications(
@@ -297,6 +298,7 @@ print STDERR Dumper($rego_ref);
      # $rego_ref->{'strAgeLevel'} || '',
      # $rego_ref->{'strPersonLevel'} || '',
      # $rego_ref->{'intOriginLevel'},
+     # $rego_ref->{'intEntityLevel'},
 
     my @certString;
     foreach my $cert (@{$certifications}) {
@@ -643,6 +645,7 @@ sub checkUploadedRegoDocuments {
           #AND tblRegistrationItem.strAgeLevel IN ('', ?)
           #AND tblRegistrationItem.strPersonLevel IN ('', ?)
           #AND tblRegistrationItem.intOriginLevel = ?
+          #AND tblRegistrationItem.intEntityLevel = ?
 
 	#open FH, ">dumpfile.txt";
 	#print FH "\n\nQuery: \n$query \n personID = $personID \n\n";
@@ -654,6 +657,7 @@ sub checkUploadedRegoDocuments {
      # $rego_ref->{'strAgeLevel'} || '',
      # $rego_ref->{'strPersonLevel'} || '',
      # $rego_ref->{'intOriginLevel'},
+     # $rego_ref->{'intEntityLevel'},
 	while(my $dref = $sth->fetchrow_hashref()){
 		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
 	}
@@ -768,6 +772,7 @@ sub displayRegoFlowDocuments{
       #AND tblRegistrationItem.strAgeLevel IN ('', ?)
       #AND tblRegistrationItem.strPersonLevel IN ('', ?)
       #AND tblRegistrationItem.intOriginLevel = ?
+      #AND tblRegistrationItem.intEntityLevel = ?
 
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute($personID,$regoID, $Data->{'Realm'});
@@ -776,6 +781,7 @@ sub displayRegoFlowDocuments{
     # $rego_ref->{'strAgeLevel'} || '',
     # $rego_ref->{'strPersonLevel'} || '',
     # $rego_ref->{'intOriginLevel'},
+    # $rego_ref->{'intEntityLevel'},
 
 
 	my @uploaded_docs = ();
