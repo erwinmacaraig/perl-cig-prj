@@ -794,7 +794,7 @@ sub display_documents {
     my $client = $self->{'Data'}->{'client'};
 	my $rego_ref = {};
     my $content = '';
-$regoID=0;
+#$regoID=0;
     if($regoID) {
         my $valid =0;
         ($valid, $rego_ref) = validateRegoID(
@@ -806,10 +806,10 @@ $regoID=0;
         $regoID = 0 if !$valid;
     }
     else    {
-        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
-        $self->decrementCurrentProcessIndex();
-        $self->decrementCurrentProcessIndex();
-        return ('',2);
+#        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
+#        $self->decrementCurrentProcessIndex();
+#        $self->decrementCurrentProcessIndex();
+#        return ('',2);
     }
 	my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
     $personObj->load();
