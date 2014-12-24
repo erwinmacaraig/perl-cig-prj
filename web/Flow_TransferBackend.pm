@@ -536,7 +536,7 @@ sub process_registration {
     my $personLevel = $self->{'RunParams'}{'d_level'} || '';
     my $sport = $self->{'RunParams'}{'d_sport'} || '';
     my $ageLevel = $self->{'RunParams'}{'d_age'} || '';
-    my $existingReg = $self->{'RunParams'}{'existingReg'} || 0;
+    my $existingReg = 0; #$self->{'RunParams'}{'existingReg'} || 0;
     my $changeExistingReg = $self->{'RunParams'}{'changeExisting'} || 0;
     my $registrationNature = $self->{'RunParams'}{'d_nature'} || '';
     my $personRequestID = $self->{'RunParams'}{'prid'} || '';
@@ -589,6 +589,7 @@ print STDERR "SPORT$sport$personType$personLevel\n";
         if ($msg eq 'RENEWAL_FAILED')   {
             push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Renewal failed, cannot find existing registration. Might have already been renewed");
         }
+        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
     }
     else    {
         if(!$existingReg or $changeExistingReg)   {
@@ -652,10 +653,10 @@ sub display_products {
             {},
             1,
         );
-        if (! $content)   {
-            $self->incrementCurrentProcessIndex();
-            return ('',2);
-        }
+        #if (! $content)   {
+        #    $self->incrementCurrentProcessIndex();
+        #    return ('',2);
+        #}
     }
     else    {
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
