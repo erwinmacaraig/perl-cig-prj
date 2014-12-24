@@ -163,6 +163,7 @@ sub getTransfer {
     my $indexName = $Defs::SphinxIndexes{'Person'}.'_r'.$filters->{'realm'};
     my $results = $self->getSphinx()->Query($self->getKeyword(), $indexName);
     my @persons = ();
+print STDERR "IN GET TRANSFER";
 
     if($results and $results->{'total'})  {
         for my $r (@{$results->{'matches'}})  {
