@@ -2516,10 +2516,10 @@ sub populateDocumentViewData {
      AND tblRegistrationItem.strRegistrationNature IN ('', ?)
      AND tblRegistrationItem.strAgeLevel IN ('', ?)
      AND tblRegistrationItem.strPersonLevel IN ('', ?)
-     AND tblRegistrationItem.intOriginLevel = ?
-     AND tblRegistrationItem.intEntityLevel = ?
 		GROUP BY intDocumentTypeID];
 
+     #AND tblRegistrationItem.intOriginLevel = ?
+     #AND tblRegistrationItem.intEntityLevel = ?
 
 
 	my $sth = $Data->{'db'}->prepare($query);
@@ -2528,9 +2528,9 @@ sub populateDocumentViewData {
       $dref->{'strRegistrationNature'} || '',
       $dref->{'strAgeLevel'} || '',
       $dref->{'strPersonLevel'} || '',
-      $dref->{'intOriginLevel'},
-      $dref->{'intEntityLevel'},
     );
+      #$dref->{'intOriginLevel'},
+      #$dref->{'intEntityLevel'},
 	while(my $adref = $sth->fetchrow_hashref()){
 	    $validdocsStatus{$adref->{'intDocumentTypeID'}} = $adref->{'strApprovalStatus'};
 		push @validdocsforallrego, $adref->{'intDocumentTypeID'};
