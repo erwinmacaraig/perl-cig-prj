@@ -663,8 +663,8 @@ print STDERR "~~~~~~~~~~~~~~~CHECK UPLOADED REGO DOCUMENTS:$entityRegisteringFor
       $rego_ref->{'strAgeLevel'} || '',
       $rego_ref->{'strPersonLevel'} || '',
     );
-      # $originLevel,
-      #  $entityRegisteringForLevel,
+       #$rego_ref->{'intOriginLevel'},
+       # $entityRegisteringForLevel,
 	while(my $dref = $sth->fetchrow_hashref()){
 		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
 	}
@@ -792,6 +792,8 @@ AND tblRegistrationItem.strPersonType IN ('', ?)
         $rego_ref->{'strPersonLevel'} || '',
         $rego_ref->{'strRegistrationNature'} || '',
     );
+       #$rego_ref->{'intOriginLevel'},
+       # $entityRegisteringForLevel,
         #$originLevel,
         #$entityRegisteringForLevel,
 

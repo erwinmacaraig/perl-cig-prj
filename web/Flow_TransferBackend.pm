@@ -818,10 +818,10 @@ sub display_documents {
             {},
             1
         );
-        if (! $content)   {
-            $self->incrementCurrentProcessIndex();
-            return ('',2);
-        }
+        #if (! $content)   {
+        #    $self->incrementCurrentProcessIndex();
+        #    return ('',2);
+        #}
 	my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
