@@ -246,6 +246,7 @@ sub getTransfer {
         ];
                 #AND PRQinprogress.intRequestFromEntityID = "$clubID"
                 #AND PRQinprogress.strRequestStatus = "INPROGRESS" AND PRQinprogress.strRequestResponse IS NULL
+print STDERR $st;
         my $q = $self->getData->{'db'}->prepare($st);
         $q->execute();
         my %origClientValues = %{$self->getData()->{'clientValues'}};
