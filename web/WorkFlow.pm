@@ -2361,7 +2361,6 @@ sub populateRegoViewData {
 
     $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.')
         if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_REGO'} == 1 and $dref->{'regoPaymentRequired'});
-print STDERR "SSSSSSSSSSSSSS " . $dref->{'regoPaymentRequired'} . $dref->{'intPersonRegistrationID'};
 
     if($dref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER){
         $title = $Data->{'lang'}->txt('Transfer') . " - $LocalName";;
