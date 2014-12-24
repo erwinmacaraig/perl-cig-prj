@@ -2012,6 +2012,7 @@ sub viewTask {
             pr.strSport,
             pr.strPersonType,
             pr.strPersonEntityRole,
+            pr.intOriginLevel,
             pr.intPaymentRequired as regoPaymentRequired,
             pr.intPersonRequestID,
             DATE_FORMAT(pr.dtFrom,'%d %b %Y') AS dtFrom,
@@ -2505,25 +2506,25 @@ sub populateDocumentViewData {
             AND tblRegistrationItem.intRealmID=? 
             AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
             AND tblRegistrationItem.strItemType='DOCUMENT'
+     AND tblRegistrationItem.strPersonType IN ('', ?)
+     AND tblRegistrationItem.strRegistrationNature IN ('', ?)
+     AND tblRegistrationItem.strAgeLevel IN ('', ?)
+     AND tblRegistrationItem.strPersonLevel IN ('', ?)
+     AND tblRegistrationItem.intOriginLevel = ?
+     AND tblRegistrationItem.intEntityLevel = ?
 		GROUP BY intDocumentTypeID];
 
 
-     #AND tblRegistrationItem.strPersonType IN ('', ?)
-     #AND tblRegistrationItem.strRegistrationNature IN ('', ?)
-     #AND tblRegistrationItem.strAgeLevel IN ('', ?)
-     #AND tblRegistrationItem.strPersonLevel IN ('', ?)
-     #AND tblRegistrationItem.intOriginLevel = ?
-     #AND tblRegistrationItem.intEntityLevel = ?
 
 	my $sth = $Data->{'db'}->prepare($query);
-	$sth->execute($dref->{'intPersonID'}, $Data->{'Realm'});
-
-     # $dref->{'strPersonType'} || '',
-     # $dref->{'strRegistrationNature'} || '',
-     # $dref->{'strAgeLevel'} || '',
-     # $dref->{'strPersonLevel'} || '',
-     # $dref->{'intOriginLevel'},
-     # $dref->{'intEntityLevel'},
+	$sth->execute($dref->{'intPersonID'}, $Data->{'Realm'},
+      $dref->{'strPersonType'} || '',
+      $dref->{'strRegistrationNature'} || '',
+      $dref->{'strAgeLevel'} || '',
+      $dref->{'strPersonLevel'} || '',
+      $dref->{'intOriginLevel'},
+      $dref->{'intEntityLevel'},
+    );
 	while(my $adref = $sth->fetchrow_hashref()){
 	    $validdocsStatus{$adref->{'intDocumentTypeID'}} = $adref->{'strApprovalStatus'};
 		push @validdocsforallrego, $adref->{'intDocumentTypeID'};
