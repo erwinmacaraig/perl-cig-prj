@@ -794,7 +794,6 @@ sub display_documents {
     my $client = $self->{'Data'}->{'client'};
 	my $rego_ref = {};
     my $content = '';
-#$regoID=0;
     if($regoID) {
         my $valid =0;
         ($valid, $rego_ref) = validateRegoID(
@@ -806,10 +805,10 @@ sub display_documents {
         $regoID = 0 if !$valid;
     }
     else    {
-#        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
-#        $self->decrementCurrentProcessIndex();
-#        $self->decrementCurrentProcessIndex();
-#        return ('',2);
+        my $lang = $self->{'Data'}{'lang'};
+        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
+        $self->decrementCurrentProcessIndex();
+        return ('',2);
     }
 	my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
     $personObj->load();
@@ -886,6 +885,12 @@ sub process_documents {
         my $itc = $personObj->getValue('intInternationalTransfer') || '';
         $rego_ref->{'Nationality'} = $nationality;
         $rego_ref->{'InternationalTransfer'} = $itc;
+    }
+    else    {
+        my $lang = $self->{'Data'}{'lang'};
+        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
+        $self->decrementCurrentProcessIndex();
+        return ('',2);
     }
 
     #check for uploaded document
