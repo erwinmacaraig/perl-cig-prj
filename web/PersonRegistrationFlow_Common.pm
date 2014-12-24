@@ -152,7 +152,7 @@ sub displayRegoFlowSummary {
     my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref, $carryString) = @_;
     my $lang=$Data->{'lang'};
 	
-print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~displayRegoFlowSummary\n";
+print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~displayRegoFlowSummary $personID\n";
     my $ok = 0;
     if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER' or $rego_ref->{'registrationNature'} eq 'TRANSFER') {
         $ok=1;
@@ -196,6 +196,7 @@ print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~displayRegoFlowSummary\n";
          
           
 	    my $personObj = getInstanceOf($Data, 'person');
+        return if (! $personObj);
 		my $c = Countries::getISOCountriesHash();
 		
 		my %personData = ();

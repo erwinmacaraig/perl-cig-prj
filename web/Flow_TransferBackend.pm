@@ -635,6 +635,13 @@ sub display_products {
         $regoID = 0 if !$valid;
     }
 
+    if (! $regoID)  {
+        my $lang = $self->{'Data'}{'lang'};
+        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
+        $self->decrementCurrentProcessIndex();
+        $self->decrementCurrentProcessIndex();
+        return ('',2);
+    }
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
     $personObj->load();
 
@@ -664,7 +671,7 @@ sub display_products {
     }
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
-        $self->decrementCurrentProcessIndex();
+        #$self->decrementCurrentProcessIndex();
         return ('',2);
     }
     my %ManualPayPageData = (
@@ -804,7 +811,7 @@ sub display_documents {
         );
         $regoID = 0 if !$valid;
     }
-    else    {
+    if (! $regoID)  {
         my $lang = $self->{'Data'}{'lang'};
         push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
         $self->decrementCurrentProcessIndex();
@@ -886,7 +893,7 @@ sub process_documents {
         $rego_ref->{'Nationality'} = $nationality;
         $rego_ref->{'InternationalTransfer'} = $itc;
     }
-    else    {
+    if (! $regoID)  {
         my $lang = $self->{'Data'}{'lang'};
         push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
         $self->decrementCurrentProcessIndex();
@@ -911,6 +918,7 @@ sub process_documents {
         if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
             #There are errors - reset where we are to go back to the form again
             $self->decrementCurrentProcessIndex();
+#            $self->decrementCurrentProcessIndex();
             return ('',2);
         }
 		#my $labelBackBtn = 'Back to Documents';
@@ -964,6 +972,13 @@ sub display_summary {
         $regoID = 0 if !$valid;
     }
 
+    if (! $regoID)  {
+        my $lang = $self->{'Data'}{'lang'};
+        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
+        $self->decrementCurrentProcessIndex();
+        $self->decrementCurrentProcessIndex();
+        return ('',2);
+    }
     if($regoID) {
         $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
         $personObj->load();
@@ -984,8 +999,21 @@ sub display_summary {
             $hiddenFields,
 		    $self->stringifyURLCarryField(),
         );
+        $content = '' if ! $content;
+        if (! $content)  {
+            my $lang = $self->{'Data'}{'lang'};
+            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
+            $self->decrementCurrentProcessIndex();
+            $self->decrementCurrentProcessIndex();
+            $self->decrementCurrentProcessIndex();
+            $self->decrementCurrentProcessIndex();
+            return ('',2);
+        }
+        
+
     }
     else    {
+        my $lang = $self->{'Data'}{'lang'};
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
     }
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
@@ -1330,7 +1358,6 @@ sub Navigation {
     #May need to be overriden in child class to define correct order of steps
   my $self = shift;
 
-  print STDERR Dumper  $self->{'RunParams'};
     my $navstring = '';
     my $meter = '';
     my @navoptions = ();
