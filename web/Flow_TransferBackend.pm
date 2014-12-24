@@ -576,6 +576,7 @@ print STDERR "SPORT$sport$personType$personLevel\n";
     if(!$personID)    {
         push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person';
     }
+$regoID=0;
     if (!$regoID)   {
         if ($msg eq 'SUSPENDED')   {
             push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("You cannot register at this time, Person is currently SUSPENDED");
@@ -600,6 +601,7 @@ print STDERR "SPORT$sport$personType$personLevel\n";
 
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
+        $self->decrementCurrentProcessIndex();
         $self->decrementCurrentProcessIndex();
         return ('',2);
     }
