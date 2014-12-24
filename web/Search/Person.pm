@@ -159,11 +159,10 @@ sub getTransfer {
     $self->getSphinx()->SetFilter('intrealmid', [$filters->{'realm'}]);
 
     #exclude persons that are already in the CLUB initiating the transfer
-    #$self->getSphinx()->SetFilter('intentityid', [$filters->{'club'}], 1) if $filters->{'club'};
+#    $self->getSphinx()->SetFilter('intentityid', [$filters->{'club'}], 1) if $filters->{'club'};
     my $indexName = $Defs::SphinxIndexes{'Person'}.'_r'.$filters->{'realm'};
     my $results = $self->getSphinx()->Query($self->getKeyword(), $indexName);
     my @persons = ();
-print STDERR "IN GET TRANSFER";
 
     if($results and $results->{'total'})  {
         for my $r (@{$results->{'matches'}})  {
@@ -247,7 +246,6 @@ print STDERR "IN GET TRANSFER";
         ];
                 #AND PRQinprogress.intRequestFromEntityID = "$clubID"
                 #AND PRQinprogress.strRequestStatus = "INPROGRESS" AND PRQinprogress.strRequestResponse IS NULL
-print STDERR $st;
         my $q = $self->getData->{'db'}->prepare($st);
         $q->execute();
         my %origClientValues = %{$self->getData()->{'clientValues'}};
