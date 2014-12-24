@@ -1937,8 +1937,10 @@ sub getTask {
             pr.strSport,
             pr.strPersonLevel,
             pr.intPersonRequestID,
-            DATE_FORMAT(pr.dtFrom,'%d %b %Y') AS dtFrom,
-            DATE_FORMAT(pr.dtTo,'%d %b %Y') AS dtTo,
+            NP.dtFrom,
+            NP.dtTo,
+            DATE_FORMAT(NP.dtFrom,'%d %b %Y') AS dtFromOld,
+            DATE_FORMAT(NP.dtTo,'%d %b %Y') AS dtToOld,
             etr.strEntityRoleName,
             p.strLocalFirstname,
             p.strLocalSurname,
@@ -1962,6 +1964,7 @@ sub getTask {
         LEFT JOIN tblPerson AS p ON (t.intPersonID = p.intPersonID)
         LEFT JOIN tblEntity AS pre ON (pre.intEntityID = pr.intEntityID)
         LEFT JOIN tblEntityTypeRoles AS etr ON (etr.strPersonType = pr.strPersonType AND etr.strEntityRoleKey = pr.strPersonEntityRole)
+        LEFT JOIN tblNationalPeriod as NP ON (NP.intNationalPeriodID = pr.intNationalPeriodID)
 	  	WHERE
             t.intWFTaskID = ?
             AND t.intRealmID = ?
@@ -2015,8 +2018,10 @@ sub viewTask {
             pr.intOriginLevel,
             pr.intPaymentRequired as regoPaymentRequired,
             pr.intPersonRequestID,
-            DATE_FORMAT(pr.dtFrom,'%d %b %Y') AS dtFrom,
-            DATE_FORMAT(pr.dtTo,'%d %b %Y') AS dtTo,
+            NP.dtFrom as NPdtFrom,
+            NP.dtTo as NPdtTo,
+            DATE_FORMAT(NP.dtFrom,'%d %b %Y') AS NPdtFromold,
+            DATE_FORMAT(NP.dtTo,'%d %b %Y') AS NPdtToold,
             t.strRegistrationNature,
             dt.strDocumentName,
             p.strLocalFirstname,
@@ -2094,6 +2099,7 @@ sub viewTask {
         LEFT JOIN tblUploadedFiles as uf ON (dPersonRego.intUploadFileID = uf.intFileID)
         LEFT JOIN tblDocumentType as dt ON (dPersonRego.intDocumentTypeID = dt.intDocumentTypeID)
         LEFT JOIN tblWFTaskNotes as tn ON (tn.intWFTaskID = t.intWFTaskID AND tn.intCurrent = 1)
+        LEFT JOIN tblNationalPeriod as NP ON (NP.intNationalPeriodID = pr.intNationalPeriodID)
         WHERE
             t.intRealmID = $Data->{'Realm'}
             AND t.intWFTaskID = ?
@@ -2375,8 +2381,8 @@ sub populateRegoViewData {
         #print STDERR Dumper $personRequestData;
         $TemplateData{'TransferDetails'}{'TransferTo'} = $personRequestData->{'requestFrom'} || '';
         $TemplateData{'TransferDetails'}{'TransferFrom'} = $personRequestData->{'requestTo'} || '';
-        $TemplateData{'TransferDetails'}{'RegistrationDateFrom'} = '';
-        $TemplateData{'TransferDetails'}{'RegistrationDateTo'} = '';
+        $TemplateData{'TransferDetails'}{'RegistrationDateFrom'} = $dref->{'NPdtFrom'};
+        $TemplateData{'TransferDetails'}{'RegistrationDateTo'} = $dref->{'NPdtTo'};
         $TemplateData{'TransferDetails'}{'Summary'} = $personRequestData->{'strRequestNotes'} || '';
     }
     else {

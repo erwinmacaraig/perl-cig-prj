@@ -1031,6 +1031,7 @@ sub getRegistrationDetail {
             DATE_FORMAT(pr.dtLastUpdated, "%Y%m%d%H%i") as dtLastUpdated_,
             er.strEntityRoleName,
             e.strLocalName,
+            e.intEntityLevel,
             e.strLatinName
         FROM
             tblPersonRegistration_$Data->{'Realm'} AS pr
@@ -1068,6 +1069,12 @@ sub getRegistrationDetail {
         $dref->{'strStatus'} = $dref->{'strStatus'} || '';
         $dref->{'displayStatus'} = $dref->{'displayStatus'} || '';
         $dref->{'RegistrationNature'} = $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '';
+
+        $dref->{'sport'} = $dref->{'strSport'} || '';
+        $dref->{'personType'} = $dref->{'strPersonType'} || '';
+        $dref->{'personLevel'} = $dref->{'strPersonLevel'} || '';
+        $dref->{'ageLevel'} = $dref->{'strAgeLevel'} || '';
+        $dref->{'registrationNature'} = $dref->{'strRegistrationNature'} || '';
         push @RegistrationDetail, $dref;
     }
     return (\@RegistrationDetail);
