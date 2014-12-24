@@ -440,11 +440,10 @@ my @headers = (
                         AND tblRegistrationItem.strRegistrationNature IN ('', ?)
                         AND tblRegistrationItem.strAgeLevel IN ('', ?)
                         AND tblRegistrationItem.strPersonLevel IN ('', ?)
-                        AND tblRegistrationItem.intOriginLevel = ?
-                        AND tblRegistrationItem.intEntityLevel = ?
                 ];
+                        #AND tblRegistrationItem.intOriginLevel = ?
+                        #AND tblRegistrationItem.intEntityLevel = ?
 
-print STDERR Dumper($registration);
 			   my $sth = $db->prepare($query); 
                $sth->execute(
                     $regodoc->{'intPersonRegistrationID'}, 
@@ -455,9 +454,9 @@ print STDERR Dumper($registration);
                 $registration->{'strRegistrationNature'} || '',
                 $registration->{'strAgeLevel'} || '',
                 $registration->{'strPersonLevel'} || '',
-                $registration->{'intOriginLevel'},
-                $registration->{'intEntityLevel'},
                );
+                #$registration->{'intOriginLevel'},
+                #$registration->{'intEntityLevel'},
             
 			   my $dref = $sth->fetchrow_hashref(); 
 				#checks for strLockAtLevel and intUseExistingThisEntity and intUseExistingAnyEntity and Owner against Currently Logged
