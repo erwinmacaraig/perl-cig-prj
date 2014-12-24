@@ -686,6 +686,12 @@ sub getRegistrationData	{
     my @reg_docs = ();  
     while(my $dref= $query->fetchrow_hashref()) {
         $count++;
+        $dref->{'sport'} = $dref->{'strSport'} || '';
+        $dref->{'personType'} = $dref->{'strPersonType'} || '';
+        $dref->{'personLevel'} = $dref->{'strPersonLevel'} || '';
+        $dref->{'ageLevel'} = $dref->{'strAgeLevel'} || '';
+        $dref->{'registrationNature'} = $dref->{'strRegistrationNature'} || '';
+
         $dref->{'Sport'} = $Defs::sportType{$dref->{'strSport'}} || '';
         $dref->{'PersonType'} = $Defs::personType{$dref->{'strPersonType'}} || '';
         $dref->{'PersonLevel'} = $Defs::personLevel{$dref->{'strPersonLevel'}} || '';

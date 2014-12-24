@@ -157,7 +157,8 @@ sub displayRegoFlowSummary {
         $ok=1;
     }
     else    {
-        $ok = checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
+print STDERR Dumper($rego_ref);
+        $ok = checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'strSport'}, $rego_ref->{'strPersonType'}, $rego_ref->{'strPersonEntityRole'}, $rego_ref->{'strPersonLevel'}, $rego_ref->{'strAgeLevel'});
     }
     my $body = '';
     if (!$ok)   {
@@ -261,24 +262,28 @@ sub displayRegoFlowSummary {
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
 	$query = qq[
         SELECT
-        tblDocuments.intDocumentTypeID as ID,
-        tblUploadedFiles.strOrigFilename,
-        tblUploadedFiles.intFileID,
-        tblDocumentType.strDocumentName as Name
+            tblDocuments.intDocumentTypeID as ID,
+            tblUploadedFiles.strOrigFilename,
+            tblUploadedFiles.intFileID,
+            tblDocumentType.strDocumentName as Name
         FROM tblDocuments
-        INNER JOIN tblDocumentType
-            ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
-        INNER JOIN tblRegistrationItem 
-            ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
-        INNER JOIN tblUploadedFiles
-            ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID 
-        WHERE strApprovalStatus IN ('APPROVED', 'PENDING')
-        AND intPersonID = ?
-        AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
-        AND tblRegistrationItem.intRealmID=?
-        AND tblRegistrationItem.strItemType='DOCUMENT'
+            INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID)
+        INNER JOIN tblRegistrationItem ON (tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID)
+        INNER JOIN tblUploadedFiles ON (tblUploadedFiles.intFileID = tblDocuments.intUploadFileID )
+        WHERE 
+            strApprovalStatus IN ('APPROVED', 'PENDING')
+            AND intPersonID = ?
+            AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+            AND tblRegistrationItem.intRealmID=?
+            AND tblRegistrationItem.strItemType='DOCUMENT'
         ORDER BY tblDocuments.intDocumentID DESC
     ];
+
+     #AND tblRegistrationItem.strPersonType IN ('', ?)
+     #AND tblRegistrationItem.strRegistrationNature IN ('', ?)
+     #AND tblRegistrationItem.strAgeLevel IN ('', ?)
+     #AND tblRegistrationItem.strPersonLevel IN ('', ?)
+     #AND tblRegistrationItem.intOriginLevel = ?
 
 
     my $certifications = getPersonCertifications(
@@ -287,6 +292,11 @@ sub displayRegoFlowSummary {
         $rego_ref->{'strPersonType'},
         0
     );
+     # $rego_ref->{'strPersonType'} || '',
+     # $rego_ref->{'strRegistrationNature'} || '',
+     # $rego_ref->{'strAgeLevel'} || '',
+     # $rego_ref->{'strPersonLevel'} || '',
+     # $rego_ref->{'intOriginLevel'},
 
     my @certString;
     foreach my $cert (@{$certifications}) {
@@ -345,7 +355,7 @@ print STDERR "COMPLETE RUN" . $run;
         $ok=1;
     }
     else    {
-        $ok = $run ? 1 : checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'});
+        $ok = $run ? 1 : checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'strSport'}, $rego_ref->{'strPersonType'}, $rego_ref->{'strPersonEntityRole'}, $rego_ref->{'strPersonLevel'}, $rego_ref->{'strAgeLevel'});
     }
 print STDERR "000OK IS $ok | $run\n\n";
     my $body = '';
@@ -614,18 +624,36 @@ sub checkUploadedRegoDocuments {
 	#check for Approved Documents that do not need to be uploaded
 	my @validdocsforallrego = ();
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
-	my $query = qq[SELECT tblDocuments.intDocumentTypeID FROM tblDocuments INNER JOIN tblDocumentType
-				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
-				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
-				WHERE strApprovalStatus IN ('PENDING','APPROVED') AND intPersonID = ? AND tblRegistrationItem.intRealmID=? AND
-				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+	my $query = qq[
+            SELECT 
+                tblDocuments.intDocumentTypeID 
+            FROM 
+                tblDocuments INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID)
+                INNER JOIN tblRegistrationItem ON (tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID)
+			WHERE 
+                strApprovalStatus IN ('PENDING','APPROVED') 
+                AND intPersonID = ? 
+                AND tblRegistrationItem.intRealmID=? 
+                AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
                 AND tblRegistrationItem.strItemType='DOCUMENT'
-				GROUP BY intDocumentTypeID];
+			GROUP BY intDocumentTypeID];
+
+          #AND tblRegistrationItem.strPersonType IN ('', ?)
+          #AND tblRegistrationItem.strRegistrationNature IN ('', ?)
+          #AND tblRegistrationItem.strAgeLevel IN ('', ?)
+          #AND tblRegistrationItem.strPersonLevel IN ('', ?)
+          #AND tblRegistrationItem.intOriginLevel = ?
 
 	#open FH, ">dumpfile.txt";
 	#print FH "\n\nQuery: \n$query \n personID = $personID \n\n";
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute($personID, $Data->{'Realm'});
+
+     # $rego_ref->{'strPersonType'} || '',
+     # $rego_ref->{'strRegistrationNature'} || '',
+     # $rego_ref->{'strAgeLevel'} || '',
+     # $rego_ref->{'strPersonLevel'} || '',
+     # $rego_ref->{'intOriginLevel'},
 	while(my $dref = $sth->fetchrow_hashref()){
 		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
 	}
@@ -716,30 +744,40 @@ sub displayRegoFlowDocuments{
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
     my $query = qq [
         SELECT
-        tblDocuments.intDocumentTypeID as ID,
-        tblRegistrationItem.intUseExistingThisEntity as UseExistingThisEntity,
-        tblRegistrationItem.intUseExistingAnyEntity as UseExistingAnyEntity,
-        tblUploadedFiles.strOrigFilename,
-        tblUploadedFiles.intFileID,
-        tblUploadedFiles.intAddedByTypeID as AddedByTypeID,
-        tblDocumentType.strDocumentName as Name,
-        tblDocumentType.strDescription as Description
+            tblDocuments.intDocumentTypeID as ID,
+            tblRegistrationItem.intUseExistingThisEntity as UseExistingThisEntity,
+            tblRegistrationItem.intUseExistingAnyEntity as UseExistingAnyEntity,
+            tblUploadedFiles.strOrigFilename,
+            tblUploadedFiles.intFileID,
+            tblUploadedFiles.intAddedByTypeID as AddedByTypeID,
+            tblDocumentType.strDocumentName as Name,
+            tblDocumentType.strDescription as Description
         FROM tblDocuments
-        INNER JOIN tblDocumentType
-            ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
-        INNER JOIN tblRegistrationItem 
-            ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
-        INNER JOIN tblUploadedFiles
-            ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID 
-        AND tblDocuments.intPersonID = ?
-        AND tblDocuments.intPersonRegistrationID = ?
-        AND tblRegistrationItem.intRealmID=?
-        AND tblRegistrationItem.strItemType='DOCUMENT'
+        INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID)
+        INNER JOIN tblRegistrationItem ON (tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID )
+        INNER JOIN tblUploadedFiles ON ( tblUploadedFiles.intFileID = tblDocuments.intUploadFileID )
+        WHERE
+            tblDocuments.intPersonID = ?
+            AND tblDocuments.intPersonRegistrationID = ?
+            AND tblRegistrationItem.intRealmID=?
+            AND tblRegistrationItem.strItemType='DOCUMENT'
         ORDER BY tblDocuments.intDocumentID DESC
     ];
+      #AND tblRegistrationItem.strPersonType IN ('', ?)
+      #AND tblRegistrationItem.strRegistrationNature IN ('', ?)
+      #AND tblRegistrationItem.strAgeLevel IN ('', ?)
+      #AND tblRegistrationItem.strPersonLevel IN ('', ?)
+      #AND tblRegistrationItem.intOriginLevel = ?
 
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute($personID,$regoID, $Data->{'Realm'});
+    # $rego_ref->{'strPersonType'} || '',
+    # $rego_ref->{'strRegistrationNature'} || '',
+    # $rego_ref->{'strAgeLevel'} || '',
+    # $rego_ref->{'strPersonLevel'} || '',
+    # $rego_ref->{'intOriginLevel'},
+
+
 	my @uploaded_docs = ();
 	while(my $dref = $sth->fetchrow_hashref()){		
         #push @uploaded_docs, $dref->{'intDocumentTypeID'};		
@@ -775,31 +813,40 @@ sub displayRegoFlowDocuments{
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
 	$query = qq[
         SELECT
-        tblDocuments.intDocumentTypeID as ID,
-        tblRegistrationItem.intUseExistingThisEntity as UseExistingThisEntity,
-        tblRegistrationItem.intUseExistingAnyEntity as UseExistingAnyEntity,
-        tblUploadedFiles.strOrigFilename,
-        tblUploadedFiles.intFileID,
-        tblUploadedFiles.intAddedByTypeID as AddedByTypeID,
-        tblDocumentType.strDocumentName as Name,
-        tblDocumentType.strDescription as Description
-        FROM tblDocuments
-        INNER JOIN tblDocumentType
-            ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
-        INNER JOIN tblRegistrationItem 
-            ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
-        INNER JOIN tblUploadedFiles
-            ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID 
-        WHERE strApprovalStatus IN ('APPROVED', 'PENDING')
-        AND intPersonID = ?
-        AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
-        AND tblRegistrationItem.intRealmID=?
-        AND tblRegistrationItem.strItemType='DOCUMENT'
+            tblDocuments.intDocumentTypeID as ID,
+            tblRegistrationItem.intUseExistingThisEntity as UseExistingThisEntity,
+            tblRegistrationItem.intUseExistingAnyEntity as UseExistingAnyEntity,
+            tblUploadedFiles.strOrigFilename,
+            tblUploadedFiles.intFileID,
+            tblUploadedFiles.intAddedByTypeID as AddedByTypeID,
+            tblDocumentType.strDocumentName as Name,
+            tblDocumentType.strDescription as Description
+        FROM 
+            tblDocuments
+            INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID)
+            INNER JOIN tblRegistrationItem ON (tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID )
+            INNER JOIN tblUploadedFiles ON (tblUploadedFiles.intFileID = tblDocuments.intUploadFileID )
+        WHERE 
+            strApprovalStatus IN ('APPROVED', 'PENDING')
+            AND intPersonID = ?
+            AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+            AND tblRegistrationItem.intRealmID=?
+            AND tblRegistrationItem.strItemType='DOCUMENT'
         ORDER BY tblDocuments.intDocumentID DESC
     ];
+      #AND tblRegistrationItem.strPersonType IN ('', ?)
+      #AND tblRegistrationItem.strRegistrationNature IN ('', ?)
+      #AND tblRegistrationItem.strAgeLevel IN ('', ?)
+      #AND tblRegistrationItem.strPersonLevel IN ('', ?)
+      #AND tblRegistrationItem.intOriginLevel = ?
 
 	$sth = $Data->{'db'}->prepare($query);
 	$sth->execute($personID, $Data->{'Realm'});
+    # $rego_ref->{'strPersonType'} || '',
+    # $rego_ref->{'strRegistrationNature'} || '',
+    # $rego_ref->{'strAgeLevel'} || '',
+    # $rego_ref->{'strPersonLevel'} || '',
+    # $rego_ref->{'intOriginLevel'},
 
 	while(my $dref = $sth->fetchrow_hashref()){
         if(! exists $existingDocuments{$dref->{'ID'}}){

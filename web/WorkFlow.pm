@@ -2490,15 +2490,38 @@ sub populateDocumentViewData {
 	my %validdocs = ();
 	my %validdocsStatus = ();
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
-	my $query = qq[SELECT tblDocuments.strApprovalStatus, tblDocuments.intDocumentTypeID, tblDocuments.intUploadFileID FROM tblDocuments INNER JOIN tblDocumentType
-				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
-				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
-				WHERE strApprovalStatus IN('PENDING', 'APPROVED') AND intPersonID = ? AND tblRegistrationItem.intRealmID=? AND 
-				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
-                AND tblRegistrationItem.strItemType='DOCUMENT'
-				GROUP BY intDocumentTypeID];
+	my $query = qq[
+        SELECT 
+            tblDocuments.strApprovalStatus, 
+            tblDocuments.intDocumentTypeID, 
+            tblDocuments.intUploadFileID 
+        FROM 
+            tblDocuments 
+            INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID) 
+            INNER JOIN tblRegistrationItem ON (tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID)
+		WHERE 
+            strApprovalStatus IN('PENDING', 'APPROVED') 
+            AND intPersonID = ? 
+            AND tblRegistrationItem.intRealmID=? 
+            AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+            AND tblRegistrationItem.strItemType='DOCUMENT'
+		GROUP BY intDocumentTypeID];
+
+
+     #AND tblRegistrationItem.strPersonType IN ('', ?)
+     #AND tblRegistrationItem.strRegistrationNature IN ('', ?)
+     #AND tblRegistrationItem.strAgeLevel IN ('', ?)
+     #AND tblRegistrationItem.strPersonLevel IN ('', ?)
+     #AND tblRegistrationItem.intOriginLevel = ?
+
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute($dref->{'intPersonID'}, $Data->{'Realm'});
+
+     # $dref->{'strPersonType'} || '',
+     # $dref->{'strRegistrationNature'} || '',
+     # $dref->{'strAgeLevel'} || '',
+     # $dref->{'strPersonLevel'} || '',
+     # $dref->{'intOriginLevel'},
 	while(my $adref = $sth->fetchrow_hashref()){
 	    $validdocsStatus{$adref->{'intDocumentTypeID'}} = $adref->{'strApprovalStatus'};
 		push @validdocsforallrego, $adref->{'intDocumentTypeID'};

@@ -421,14 +421,41 @@ my @headers = (
 				next if(!$regodoc->{'intUploadFileID'});
 				#perform query for intUseThisEntity and intUseAnyEntity
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType IN ('', XX) AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
-				my $query = qq[SELECT intUseExistingThisEntity,intUseExistingAnyEntity FROM tblRegistrationItem INNER JOIN
-                               tblDocumentType ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID INNER JOIN
-							   tblDocuments ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID WHERE 
-							   tblDocuments.strApprovalStatus IN ('PENDING', 'APPROVED') AND intPersonRegistrationID = ? AND 	
-							   tblDocumentType.intDocumentTypeID = ? AND tblDocuments.intPersonID = ? AND tblRegistrationItem.intRealmID=? AND tblRegistrationItem.strItemType='DOCUMENT'];
+				my $query = qq[
+                    SELECT 
+                        intUseExistingThisEntity,
+                        intUseExistingAnyEntity 
+                    FROM 
+                        tblRegistrationItem 
+                        INNER JOIN tblDocumentType ON (tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID)
+                        INNER JOIN tblDocuments ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID)
+                    WHERE 
+						tblDocuments.strApprovalStatus IN ('PENDING', 'APPROVED') 
+                        AND intPersonRegistrationID = ? 
+                        AND tblDocumentType.intDocumentTypeID = ? 
+                        AND tblDocuments.intPersonID = ? 
+                        AND tblRegistrationItem.intRealmID=? 
+                        AND tblRegistrationItem.strItemType='DOCUMENT'
+                ];
+                        #AND tblRegistrationItem.strPersonType IN ('', ?)
+                        #AND tblRegistrationItem.strRegistrationNature IN ('', ?)
+                        #AND tblRegistrationItem.strAgeLevel IN ('', ?)
+                        #AND tblRegistrationItem.strPersonLevel IN ('', ?)
+                        #AND tblRegistrationItem.intOriginLevel = ?
 
 			   my $sth = $db->prepare($query); 
-               $sth->execute($regodoc->{'intPersonRegistrationID'}, $regodoc->{'intDocumentTypeID'},$personID, $Data->{'Realm'});
+               $sth->execute(
+                    $regodoc->{'intPersonRegistrationID'}, 
+                    $regodoc->{'intDocumentTypeID'},
+                    $personID, 
+                    $Data->{'Realm'}
+               );
+               # $registration->{'strPersonType'} || '',
+               # $registration->{'strRegistrationNature'} || '',
+               # $registration->{'strAgeLevel'} || '',
+               # $registration->{'strPersonLevel'} || '',
+               # $registration->{'intOriginLevel'},
+            
 			   my $dref = $sth->fetchrow_hashref(); 
 				#checks for strLockAtLevel and intUseExistingThisEntity and intUseExistingAnyEntity and Owner against Currently Logged
 			   if($regodoc->{'strLockAtLevel'} eq '' || $dref->{'intUseExistingThisEntity'} || $dref->{'intUseExistingAnyEntity'} || $registration->{'intEntityID'} == $currLoginID){	
