@@ -290,6 +290,9 @@ sub handleWorkflow {
     elsif ($action eq 'WF_PR_H' or $action eq 'WF_PR_R' or $action eq 'WF_PR_S') {
         ($body, $title) = updateTaskScreen($Data, $action);
     }
+    elsif ($action eq 'WF_VNA') {
+        ($body, $title) = viewNextAvailableTask($Data);
+    }
 	else {
         ( $body, $title ) = listTasks( $Data );
 	};
@@ -1937,8 +1940,8 @@ sub getTask {
             pr.strSport,
             pr.strPersonLevel,
             pr.intPersonRequestID,
-            NP.dtFrom,
-            NP.dtTo,
+            NP.dtFrom as NPdtFrom,
+            NP.dtTo as NPdtTo,
             DATE_FORMAT(NP.dtFrom,'%d %b %Y') AS dtFromOld,
             DATE_FORMAT(NP.dtTo,'%d %b %Y') AS dtToOld,
             etr.strEntityRoleName,
@@ -3036,6 +3039,8 @@ sub viewSummaryPage {
                 $TemplateData{'TransferDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
                 $TemplateData{'TransferDetails'}{'TransferTo'} = $request->{'requestFrom'};
                 $TemplateData{'TransferDetails'}{'TransferFrom'} = $request->{'requestTo'};
+                $TemplateData{'TransferDetails'}{'DateFrom'} = $task->{'NPdtFrom'};
+                $TemplateData{'TransferDetails'}{'DateTo'} = $task->{'NPdtTo'};
                 $TemplateData{'TransferDetails'}{'Summary'} = $request->{'strRequestNotes'};
                 $TemplateData{'TransferDetails'}{'Fee'} = $PaymentsData->{'TXNs'}[0]{'Amount'};
                 
@@ -3563,6 +3568,36 @@ sub deleteRegoTransactions {
 	) or query_error($st);
 
     return $res;
+}
+
+sub viewNextAvailableTask {
+    my ($Data) = @_;
+
+	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+
+    my $st = qq[
+        SELECT
+            intWFTaskID
+        FROM
+            tblWFTask
+        WHERE
+            intRealmID = ?
+            AND intApprovalEntityID = ?
+            AND strTaskStatus = 'ACTIVE'
+        ORDER BY
+            intWFTaskID DESC
+        LIMIT 1
+    ];
+
+    my $q = $Data->{'db'}->prepare($st) or query_error($st);
+	my $res = $q->execute(
+        $Data->{'Realm'},
+        $entityID,
+	) or query_error($st);
+
+    my $nextID = $q->fetchrow_array();
+    $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_View&TID=$nextID";
+    return redirectTemplate($Data);
 }
 
 sub redirectTemplate {
