@@ -2474,6 +2474,7 @@ sub populatePersonViewData {
         templateFile => 'workflow/view/person.templ',
     );
 
+    my $isocountries  = getISOCountriesHash();
 	%TemplateData = (
         PersonDetails => {
             Status => $Data->{'lang'}->txt($Defs::personStatus{$dref->{'PersonStatus'} || 0}) || '',
@@ -2482,7 +2483,7 @@ sub populatePersonViewData {
             LocalName => "$dref->{'strLocalFirstname'} $dref->{'strLocalMiddleName'} $dref->{'strLocalSurname'}" || '',
             LatinName => "$dref->{'strLatinFirstname'} $dref->{'strLatinMiddleName'} $dref->{'strLatinSurname'}" || '',
             Address => "$dref->{'strAddress1'} $dref->{'strAddress2'} $dref->{'strAddress2'} $dref->{'strSuburb'} $dref->{'strState'} $dref->{'strPostalCode'}" || '',
-            Nationality => $dref->{'strISONationality'} || '', #TODO identify extract string
+            Nationality => $isocountries->{$dref->{'strISONationality'}} || '', #TODO identify extract string
             MinorProtection => $dref->{'intMinorProtection'} || '',
             DateSuspendedUntil => '',
             LastUpdate => '',
