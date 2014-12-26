@@ -184,7 +184,7 @@ sub handleWorkflow {
                 $flashMessage{'flash'}{'type'} = 'success';
                 $flashMessage{'flash'}{'message'} = $actionMessage;
 
-                setFlashMessage($Data, 'WF_U_FM', \%flashMessage);
+                #setFlashMessage($Data, 'WF_U_FM', \%flashMessage);
                 #$Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_";
                 $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_PR_S&TID=$WFTaskID";
                 ($body, $title) = redirectTemplate($Data);
@@ -477,8 +477,6 @@ sub listTasks {
         elsif($dref->{'strWFRuleFor'} eq "PERSON") {
             $ruleForType = $dref->{'strRegistrationNature'} . "_PERSON";
         }
-
-        print STDERR Dumper "RULE FOR TYPE " . $ruleForType;
 
 	 my %single_row = (
 			WFTaskID => $dref->{intWFTaskID},
@@ -2467,8 +2465,12 @@ sub populatePersonViewData {
     my ($Data, $dref) = @_;
 
     my %TemplateData;
+
+    my $LocalName = "$dref->{'strLocalFirstname'} $dref->{'strLocalMiddleName'} $dref->{'strLocalSurname'}" || '';
+    my $ruleForType = $dref->{'strRegistrationNature'} . "_PERSON";
+
     my %fields = (
-        title => 'Person Details',
+        title => $Data->{'lang'}->txt($Defs::workTaskTypeLabel{$ruleForType}) . ' - ' . $LocalName,
         templateFile => 'workflow/view/person.templ',
     );
 
@@ -2485,6 +2487,7 @@ sub populatePersonViewData {
             DateSuspendedUntil => '',
             LastUpdate => '',
         },
+        PersonSummary => personSummaryPanel($Data, $dref->{intPersonID}) || '',
 	);
 
     $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.')
@@ -2591,7 +2594,7 @@ sub populateDocumentViewData {
             addPersonItem.intItemID as addPersonItemID,
             regoItem.intItemID as regoItemID,
 			regoItem.intRequired as Required,
-			addPersonItem.intRequired as PersonRequired,
+			addPersonItem.intRequired as Required,
 			entityItem.intRequired as EntityRequired,
             entityItem.intItemID as entityItemID
         FROM tblWFRuleDocuments AS rd
@@ -2678,7 +2681,6 @@ sub populateDocumentViewData {
         #skip if no registration item matches rego details combination (type/role/sport/rego_nature etc)
         next if (!$tdref->{'regoItemID'} and $dref->{'strWFRuleFor'} eq 'REGO');
         
-
         next if((!$dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC') or ($dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC' and $dref->{'PersonStatus'} ne $Defs::PERSON_STATUS_PENDING));
 		my $status;
         $count++;
@@ -3229,11 +3231,12 @@ sub updateTaskScreen {
         $titlePrefix = $Defs::workTaskTypeLabel{$task->{'strRegistrationNature'} . "_" . $task->{'strPersonType'}}; 
         $TaskType = $task->{'strRegistrationNature'} . "_" . $task->{'strPersonType'};
     }
+    elsif($task->{'strWFRuleFor'} eq "PERSON") {
+        $titlePrefix = $Defs::workTaskTypeLabel{$task->{'strRegistrationNature'} . "_PERSON"}; 
+        $TaskType = $task->{'strRegistrationNature'} . "_PERSON";
+    }
 
-    open FH, ">dumpfile.txt";
-    print FH "Group DataL \n\n" . Dumper($titlePrefix) . "\n" . Dumper($task) . "\n" . Dumper($TaskType) . "\n";   
-
-    switch($action) {
+   switch($action) {
         case "WF_PR_H" {
             $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'On-Hold');
             
@@ -3271,6 +3274,10 @@ sub updateTaskScreen {
             }
             elsif($TaskType eq 'NEW_CLUB') {
                 $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the New Club Registration process.");
+                $status = $Data->{'lang'}->txt("Pending");
+            }
+            elsif($TaskType eq 'AMENDMENT_PERSON') {
+                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Amendment of Person Details process.");
                 $status = $Data->{'lang'}->txt("Pending");
             }
 
@@ -3312,6 +3319,10 @@ sub updateTaskScreen {
             }
             elsif($TaskType eq 'NEW_CLUB') {
                 $message = $Data->{'lang'}->txt("You have rejected this Club Registration. To proceed with this Registration, start a new Registration.");
+                $status = $Data->{'lang'}->txt("Rejected");
+            }
+            elsif($TaskType eq 'AMENDMENT_PERSON') {
+                $message = $Data->{'lang'}->txt("You have rejected this Amendment of Person Registration.");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
         }
