@@ -2595,14 +2595,15 @@ sub populateDocumentViewData {
             addPersonItem.intItemID as addPersonItemID,
             regoItem.intItemID as regoItemID,
 			regoItem.intRequired as Required,
-			addPersonItem.intRequired as Required,
+			addPersonItem.intRequired as personRequired,
+			addPersonItem.intItemID as personItemID,
 			entityItem.intRequired as EntityRequired,
             entityItem.intItemID as entityItemID
         FROM tblWFRuleDocuments AS rd
         INNER JOIN tblWFTask AS wt ON (wt.intWFRuleID = rd.intWFRuleID)
         INNER JOIN tblWFRule as wr ON (wr.intWFRuleID = wt.intWFRuleID)
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (pr.intPersonRegistrationID = wt.intPersonRegistrationID)
-        LEFT JOIN tblRegistrationItem as addPersonItem
+        INNER JOIN tblRegistrationItem as addPersonItem
             ON (
                 addPersonItem.strItemType = 'DOCUMENT'
                 AND addPersonItem.intOriginLevel = wr.intOriginLevel
@@ -2679,6 +2680,7 @@ sub populateDocumentViewData {
     while(my $tdref = $q->fetchrow_hashref()) {
         next if exists $DocoSeen{$tdref->{'intDocumentTypeID'}}; 
         $DocoSeen{$tdref->{'intDocumentTypeID'}} = 1;
+
         #skip if no registration item matches rego details combination (type/role/sport/rego_nature etc)
         next if (!$tdref->{'regoItemID'} and $dref->{'strWFRuleFor'} eq 'REGO');
         
@@ -2689,7 +2691,7 @@ sub populateDocumentViewData {
 		if(!$tdref->{'strApprovalStatus'}){     
 			if(!grep /$tdref->{'doctypeid'}/,@validdocsforallrego){  
 
-				if($tdref->{'Required'}){				
+				if($tdref->{'Required'} or $tdref->{'personRequired'}){				
 #or $tref->{'PersonRequired'} or $tref->{'EntityRequired'}
 					$documentStatusCount{'MISSING'}++;
 					$status = 'MISSING';
@@ -2733,9 +2735,10 @@ sub populateDocumentViewData {
 		if($level == $Defs::LEVEL_CLUB){
 			 $cv{'clubID'} = $targetID;
 		}
-		elsif($Defs::LEVEL_PERSON){
+		elsif($level == $Defs::LEVEL_PERSON){
 			$cv{'personID'} = $targetID;
 		}        
+
        $cv{'currentLevel'} = $level;
        my $clm = setClient(\%cv);
 				
@@ -2746,7 +2749,7 @@ sub populateDocumentViewData {
         $docName =~ s/'/\\\'/g;
 		my $parameters = qq[&amp;client=$clm&doctype=$tdref->{'intDocumentTypeID'}&pID=$targetID];
 		
-		$registrationID ? $parameters .= qq[&regoID=$registrationID] : $parameters .= qq[&entitydocs=1];
+        #$registrationID ? $parameters .= qq[&regoID=$registrationID] : $parameters .= qq[&entitydocs=1];
 		
 		$replaceLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="replaceFile($fileID,'$parameters','$docName','$docDesc');return false;">]. $Data->{'lang'}->txt('Replace') . q[</a></span>]; 
 
