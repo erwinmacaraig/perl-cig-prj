@@ -474,6 +474,11 @@ sub listTasks {
         elsif($dref->{'strWFRuleFor'} eq "REGO") {
             $ruleForType = $dref->{'strRegistrationNature'} . "_" . $dref->{'strPersonType'};
         }
+        elsif($dref->{'strWFRuleFor'} eq "PERSON") {
+            $ruleForType = $dref->{'strRegistrationNature'} . "_PERSON";
+        }
+
+        print STDERR Dumper "RULE FOR TYPE " . $ruleForType;
 
 	 my %single_row = (
 			WFTaskID => $dref->{intWFTaskID},
