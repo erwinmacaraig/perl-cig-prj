@@ -267,7 +267,7 @@
                                 </span>
                             [% END %]
 
-                            [% IF entity.renew_link %]
+                            [% IF entity.renew_link and enableRenew %]
                                 <div class="pull-right">
                                     <span class=""><a class="btn-inside-panels" href="[% entity.renew_link %]">[% Lang.txt('Renew Registration') %]</a></span>
                                 </div>
