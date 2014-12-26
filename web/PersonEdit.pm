@@ -62,7 +62,6 @@ sub handlePersonEdit {
           Fields => $fieldset->{$fieldsetType},
         );
         if($action eq 'PE_U')    {
-#print STDERR "SURNAME WAS" . $personObj->getValue('strLocalSurname');
           my $p = new CGI;
           my %params = $p->Vars();
           my ($userData, $errors) = $obj->gather(\%params, $permissions,'edit');
@@ -84,10 +83,12 @@ sub handlePersonEdit {
             $action = 'PE_';
           }
           else  {
+
             $personObj->setValues($userData);
             $personObj->write();
-            triggerRule($Data, $personObj) if ($personObj->getValue('strStatus') eq 'REGISTERED');
-#print STDERR "SURNAME IS NOW" . $personObj->getValue('strLocalSurname');
+
+            triggerRule($Data, $values, $personObj) if ($personObj->getValue('strStatus') eq $Defs::PERSON_STATUS_REGISTERED);
+
             $body = 'updated';
             if($back_screen){
                 my %tempClientValues = getClient($Data->{'client'});
@@ -127,33 +128,44 @@ sub handlePersonEdit {
 
 sub triggerRule {
 
-    my ($Data, $personObj) = @_;
+    my ($Data, $prevValues, $currPersonObj) = @_;
 
-return;
+    my $personID = $currPersonObj->getValue('intPersonID') || return;
 
+    my @fieldsToTriggerWF = split /\|/, $Data->{'SystemConfig'}{'triggerWorkFlowPersonDataUpdate'};
 
-    ## JERVY
+    if(scalar(@fieldsToTriggerWF)) {
+        my $triggerWFPersonUpdate = 0;
+        foreach (@fieldsToTriggerWF) {
+            my $field = $_;
+            next if !$field || $triggerWFPersonUpdate;
 
-    ## Perhaps change UPDATE to be personObj->write /
+            my $currVal = $currPersonObj->getValue($field);
+            my $prevVal = $prevValues->{$field};
 
-    my $personID = $personObj->getValue('intPersonID') || return;
+            $triggerWFPersonUpdate = 1 if($currVal and $currVal ne $prevVal);
+        }
 
-    my $st = qq[
-        UPDATE tblPerson SET strStatus = "$Defs::PERSON_STATUS_PENDING" WHERE intPersonID = ? LIMIT 1
-    ];
-    my $query = $Data->{'db'}->prepare($st);
-    $query->execute($personID) or print STDERR "EDIT";
+        if($triggerWFPersonUpdate){
+            
+            $currPersonObj->setValues({'strStatus' => $Defs::PERSON_STATUS_PENDING});
+            $currPersonObj->write();
 
-    my $originEntityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'authLevel'}) || getLastEntityID($Data->{'clientValues'});
+            my $originEntityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'authLevel'}) || getLastEntityID($Data->{'clientValues'});
 
-    my $rc = WorkFlow::addWorkFlowTasks(
-        $Data,
-        'PERSON',
-        'AMENDMENT',
-        $Data->{'clientValues'}{'authLevel'} || 0,
-        $originEntityID,
-        $personID,
-        0,
-        0,
-    );
+            my $rc = WorkFlow::addWorkFlowTasks(
+                $Data,
+                'PERSON',
+                'AMENDMENT',
+                $Data->{'clientValues'}{'authLevel'} || 0,
+                $originEntityID,
+                $personID,
+                0,
+                0,
+            );
+        }
+
+    }
+
+    return 1;
 }
