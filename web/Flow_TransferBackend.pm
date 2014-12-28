@@ -983,7 +983,6 @@ print STDERR "display_summary $regoID p$personID\n";
         $regoID = 0 if !$valid;
     }
 
-
     if (! $regoID or ! $personID)  {
         my $lang = $self->{'Data'}{'lang'};
         push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
@@ -1020,6 +1019,7 @@ print STDERR "display_summary $regoID p$personID\n";
         );
         $content = '' if ! $content;
         if (! $content)  {
+            my $lang = $self->{'Data'}{'lang'};
             push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
         $self->setCurrentProcessIndex(1);
         #    $self->decrementCurrentProcessIndex();
