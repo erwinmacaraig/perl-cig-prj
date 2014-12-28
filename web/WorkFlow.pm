@@ -184,7 +184,7 @@ sub handleWorkflow {
                 $flashMessage{'flash'}{'type'} = 'success';
                 $flashMessage{'flash'}{'message'} = $actionMessage;
 
-                setFlashMessage($Data, 'WF_U_FM', \%flashMessage);
+                #setFlashMessage($Data, 'WF_U_FM', \%flashMessage);
                 #$Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_";
                 $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_PR_S&TID=$WFTaskID";
                 ($body, $title) = redirectTemplate($Data);
@@ -289,6 +289,9 @@ sub handleWorkflow {
     }
     elsif ($action eq 'WF_PR_H' or $action eq 'WF_PR_R' or $action eq 'WF_PR_S') {
         ($body, $title) = updateTaskScreen($Data, $action);
+    }
+    elsif ($action eq 'WF_VNA') {
+        ($body, $title) = viewNextAvailableTask($Data);
     }
 	else {
         ( $body, $title ) = listTasks( $Data );
@@ -412,7 +415,7 @@ sub listTasks {
         next if ($dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_REJECTED);
 
         #F-409 - skip if strTaskStatus = HOLD and approvalEntityID = current entity
-        #next if ($dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_HOLD and $dref->{'intApprovalEntityID'} == $entityID);
+        next if ($dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_HOLD and $dref->{'intApprovalEntityID'} == $entityID);
 
         #moved checking of POSSIBLE_DUPLICATE here (if included in query, tasks for ENTITY are not capture)
         next if ($dref->{intSystemStatus} eq $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE and $dref->{strWFRuleFor} ne $Defs::WF_RULEFOR_PERSON);
@@ -470,6 +473,9 @@ sub listTasks {
         }
         elsif($dref->{'strWFRuleFor'} eq "REGO") {
             $ruleForType = $dref->{'strRegistrationNature'} . "_" . $dref->{'strPersonType'};
+        }
+        elsif($dref->{'strWFRuleFor'} eq "PERSON") {
+            $ruleForType = $dref->{'strRegistrationNature'} . "_PERSON";
         }
 
 	 my %single_row = (
@@ -1937,8 +1943,8 @@ sub getTask {
             pr.strSport,
             pr.strPersonLevel,
             pr.intPersonRequestID,
-            NP.dtFrom,
-            NP.dtTo,
+            NP.dtFrom as NPdtFrom,
+            NP.dtTo as NPdtTo,
             DATE_FORMAT(NP.dtFrom,'%d %b %Y') AS dtFromOld,
             DATE_FORMAT(NP.dtTo,'%d %b %Y') AS dtToOld,
             etr.strEntityRoleName,
@@ -2459,11 +2465,16 @@ sub populatePersonViewData {
     my ($Data, $dref) = @_;
 
     my %TemplateData;
+
+    my $LocalName = "$dref->{'strLocalFirstname'} $dref->{'strLocalMiddleName'} $dref->{'strLocalSurname'}" || '';
+    my $ruleForType = $dref->{'strRegistrationNature'} . "_PERSON";
+
     my %fields = (
-        title => 'Person Details',
+        title => $Data->{'lang'}->txt($Defs::workTaskTypeLabel{$ruleForType}) . ' - ' . $LocalName,
         templateFile => 'workflow/view/person.templ',
     );
 
+    my $isocountries  = getISOCountriesHash();
 	%TemplateData = (
         PersonDetails => {
             Status => $Data->{'lang'}->txt($Defs::personStatus{$dref->{'PersonStatus'} || 0}) || '',
@@ -2472,11 +2483,12 @@ sub populatePersonViewData {
             LocalName => "$dref->{'strLocalFirstname'} $dref->{'strLocalMiddleName'} $dref->{'strLocalSurname'}" || '',
             LatinName => "$dref->{'strLatinFirstname'} $dref->{'strLatinMiddleName'} $dref->{'strLatinSurname'}" || '',
             Address => "$dref->{'strAddress1'} $dref->{'strAddress2'} $dref->{'strAddress2'} $dref->{'strSuburb'} $dref->{'strState'} $dref->{'strPostalCode'}" || '',
-            Nationality => $dref->{'strISONationality'} || '', #TODO identify extract string
+            Nationality => $isocountries->{$dref->{'strISONationality'}} || '', #TODO identify extract string
             MinorProtection => $dref->{'intMinorProtection'} || '',
             DateSuspendedUntil => '',
             LastUpdate => '',
         },
+        PersonSummary => personSummaryPanel($Data, $dref->{intPersonID}) || '',
 	);
 
     $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.')
@@ -2583,7 +2595,8 @@ sub populateDocumentViewData {
             addPersonItem.intItemID as addPersonItemID,
             regoItem.intItemID as regoItemID,
 			regoItem.intRequired as Required,
-			addPersonItem.intRequired as PersonRequired,
+			addPersonItem.intRequired as personRequired,
+			addPersonItem.intItemID as personItemID,
 			entityItem.intRequired as EntityRequired,
             entityItem.intItemID as entityItemID
         FROM tblWFRuleDocuments AS rd
@@ -2667,10 +2680,10 @@ sub populateDocumentViewData {
     while(my $tdref = $q->fetchrow_hashref()) {
         next if exists $DocoSeen{$tdref->{'intDocumentTypeID'}}; 
         $DocoSeen{$tdref->{'intDocumentTypeID'}} = 1;
+
         #skip if no registration item matches rego details combination (type/role/sport/rego_nature etc)
         next if (!$tdref->{'regoItemID'} and $dref->{'strWFRuleFor'} eq 'REGO');
         
-
         next if((!$dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC') or ($dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC' and $dref->{'PersonStatus'} ne $Defs::PERSON_STATUS_PENDING));
 		my $status;
         $count++;
@@ -2678,7 +2691,7 @@ sub populateDocumentViewData {
 		if(!$tdref->{'strApprovalStatus'}){     
 			if(!grep /$tdref->{'doctypeid'}/,@validdocsforallrego){  
 
-				if($tdref->{'Required'}){				
+				if($tdref->{'Required'} or $tdref->{'personRequired'}){				
 #or $tref->{'PersonRequired'} or $tref->{'EntityRequired'}
 					$documentStatusCount{'MISSING'}++;
 					$status = 'MISSING';
@@ -2722,9 +2735,10 @@ sub populateDocumentViewData {
 		if($level == $Defs::LEVEL_CLUB){
 			 $cv{'clubID'} = $targetID;
 		}
-		elsif($Defs::LEVEL_PERSON){
+		elsif($level == $Defs::LEVEL_PERSON){
 			$cv{'personID'} = $targetID;
 		}        
+
        $cv{'currentLevel'} = $level;
        my $clm = setClient(\%cv);
 				
@@ -2735,7 +2749,9 @@ sub populateDocumentViewData {
         $docName =~ s/'/\\\'/g;
 		my $parameters = qq[&amp;client=$clm&doctype=$tdref->{'intDocumentTypeID'}&pID=$targetID];
 		
-		$registrationID ? $parameters .= qq[&regoID=$registrationID] : $parameters .= qq[&entitydocs=1];
+        #$registrationID ? $parameters .= qq[&regoID=$registrationID] : $parameters .= qq[&entitydocs=1];
+        $registrationID ? $parameters .= qq[&regoID=$registrationID] : $parameters .= '';
+        $level != $Defs::LEVEL_PERSON ? $parameters .= qq[&entitydocs=1] : $parameters .= '';
 		
 		$replaceLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="replaceFile($fileID,'$parameters','$docName','$docDesc');return false;">]. $Data->{'lang'}->txt('Replace') . q[</a></span>]; 
 
@@ -3036,6 +3052,8 @@ sub viewSummaryPage {
                 $TemplateData{'TransferDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
                 $TemplateData{'TransferDetails'}{'TransferTo'} = $request->{'requestFrom'};
                 $TemplateData{'TransferDetails'}{'TransferFrom'} = $request->{'requestTo'};
+                $TemplateData{'TransferDetails'}{'DateFrom'} = $task->{'NPdtFrom'};
+                $TemplateData{'TransferDetails'}{'DateTo'} = $task->{'NPdtTo'};
                 $TemplateData{'TransferDetails'}{'Summary'} = $request->{'strRequestNotes'};
                 $TemplateData{'TransferDetails'}{'Fee'} = $PaymentsData->{'TXNs'}[0]{'Amount'};
                 
@@ -3219,11 +3237,12 @@ sub updateTaskScreen {
         $titlePrefix = $Defs::workTaskTypeLabel{$task->{'strRegistrationNature'} . "_" . $task->{'strPersonType'}}; 
         $TaskType = $task->{'strRegistrationNature'} . "_" . $task->{'strPersonType'};
     }
+    elsif($task->{'strWFRuleFor'} eq "PERSON") {
+        $titlePrefix = $Defs::workTaskTypeLabel{$task->{'strRegistrationNature'} . "_PERSON"}; 
+        $TaskType = $task->{'strRegistrationNature'} . "_PERSON";
+    }
 
-    open FH, ">dumpfile.txt";
-    print FH "Group DataL \n\n" . Dumper($titlePrefix) . "\n" . Dumper($task) . "\n" . Dumper($TaskType) . "\n";   
-
-    switch($action) {
+   switch($action) {
         case "WF_PR_H" {
             $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'On-Hold');
             
@@ -3261,6 +3280,10 @@ sub updateTaskScreen {
             }
             elsif($TaskType eq 'NEW_CLUB') {
                 $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the New Club Registration process.");
+                $status = $Data->{'lang'}->txt("Pending");
+            }
+            elsif($TaskType eq 'AMENDMENT_PERSON') {
+                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Amendment of Person Details process.");
                 $status = $Data->{'lang'}->txt("Pending");
             }
 
@@ -3302,6 +3325,10 @@ sub updateTaskScreen {
             }
             elsif($TaskType eq 'NEW_CLUB') {
                 $message = $Data->{'lang'}->txt("You have rejected this Club Registration. To proceed with this Registration, start a new Registration.");
+                $status = $Data->{'lang'}->txt("Rejected");
+            }
+            elsif($TaskType eq 'AMENDMENT_PERSON') {
+                $message = $Data->{'lang'}->txt("You have rejected this Amendment of Person Registration.");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
         }
@@ -3563,6 +3590,36 @@ sub deleteRegoTransactions {
 	) or query_error($st);
 
     return $res;
+}
+
+sub viewNextAvailableTask {
+    my ($Data) = @_;
+
+	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+
+    my $st = qq[
+        SELECT
+            intWFTaskID
+        FROM
+            tblWFTask
+        WHERE
+            intRealmID = ?
+            AND intApprovalEntityID = ?
+            AND strTaskStatus = 'ACTIVE'
+        ORDER BY
+            intWFTaskID DESC
+        LIMIT 1
+    ];
+
+    my $q = $Data->{'db'}->prepare($st) or query_error($st);
+	my $res = $q->execute(
+        $Data->{'Realm'},
+        $entityID,
+	) or query_error($st);
+
+    my $nextID = $q->fetchrow_array();
+    $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=WF_View&TID=$nextID";
+    return redirectTemplate($Data);
 }
 
 sub redirectTemplate {

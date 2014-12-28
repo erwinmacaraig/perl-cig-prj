@@ -56,7 +56,7 @@
                                 [% HiddenFields %]
 
                                 [% IF !NoBackButton and BackButtonURL %]
-                                    <a href = "[% BackButtonURL %]" id = "flow-btn-back" class = "btn-main [% IF processStatus == 1 %]nudge[% END %]">[% IF BackButtonText %][% Lang.txt(BackButtonText) %][% ELSE %][% Lang.txt('Back') %][% END %]</a>
+                                    <a href = "[% BackButtonURL %]" id = "flow-btn-back" class = "[% IF processStatus == 1 %]nudge[% END %]">[% IF BackButtonText %][% Lang.txt(BackButtonText) %][% ELSE %][% Lang.txt('Back') %][% END %]</a>
                                 [% END %]
 
                                 [% IF !NoContinueButton %]
