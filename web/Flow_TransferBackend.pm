@@ -536,12 +536,15 @@ sub process_registration {
     my $personLevel = $self->{'RunParams'}{'d_level'} || '';
     my $sport = $self->{'RunParams'}{'d_sport'} || '';
     my $ageLevel = $self->{'RunParams'}{'d_age'} || '';
-    my $existingReg = 0; #$self->{'RunParams'}{'existingReg'} || 0;
+    my $existingReg = $self->{'RunParams'}{'existingReg'} || 0;
     my $changeExistingReg = $self->{'RunParams'}{'changeExisting'} || 0;
+    $existingReg = $regoID ? 1 : 0;
+    $changeExistingReg= $regoID ? 1 : 0;
+    
     my $registrationNature = $self->{'RunParams'}{'d_nature'} || '';
     my $personRequestID = $self->{'RunParams'}{'prid'} || '';
 
-print STDERR "SPORT$sport$personType$personLevel\n";
+print STDERR "SPORT$sport$personType$personLevel$regoID\n";
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
     }
@@ -550,7 +553,8 @@ print STDERR "SPORT$sport$personType$personLevel\n";
         if($changeExistingReg)    {
             $self->deleteExistingReg($existingReg, $personID);
         }
-        if(!$existingReg or $changeExistingReg)    {
+        if(! $regoID) {#!$existingReg or $changeExistingReg)    {
+print STDERR "ADD REGO WAS $regoID";
             ($regoID, undef, $msg) = add_rego_record(
                 $self->{'Data'}, 
                 $personID, 
@@ -567,9 +571,7 @@ print STDERR "SPORT$sport$personType$personLevel\n";
                 undef,
                 $personRequestID,
             );
-        }
-        if($changeExistingReg)  {
-            $self->moveDocuments($existingReg, $regoID, $personID);
+            #$self->moveDocuments($existingReg, $regoID, $personID);
         }
     }
 
@@ -582,12 +584,6 @@ print STDERR "SPORT$sport$personType$personLevel\n";
         }
         if ($msg eq 'LIMIT_EXCEEDED')   {
             push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("You cannot register this combination, limit exceeded");
-        }
-        if ($msg eq 'NEW_FAILED')   {
-            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("New failed, existing registration found.  In order to continue, a Transfer from the existing Entity must be organised.");
-        }
-        if ($msg eq 'RENEWAL_FAILED')   {
-            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Renewal failed, cannot find existing registration. Might have already been renewed");
         }
         push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
     }
@@ -621,6 +617,9 @@ sub display_products {
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
+print STDERR "DISPLAY_PRODUCTS FOR $personID $regoID\n";
+
+print STDERR Dumper($self->{'RunDetails'}{'Errors'});
 
     my $rego_ref = {};
     my $content = '';
@@ -635,11 +634,12 @@ sub display_products {
         $regoID = 0 if !$valid;
     }
 
-    if (! $regoID)  {
+    if (! $regoID or ! $personID)  {
         my $lang = $self->{'Data'}{'lang'};
         push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
-        $self->decrementCurrentProcessIndex();
-        $self->decrementCurrentProcessIndex();
+        $self->setCurrentProcessIndex(1);
+        #$self->decrementCurrentProcessIndex();
+        #$self->decrementCurrentProcessIndex();
         return ('',2);
     }
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
@@ -668,11 +668,14 @@ sub display_products {
     }
     else    {
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
+        $self->setCurrentProcessIndex(1);
+        return ('',2);
     }
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
+        #$self->setCurrentProcessIndex(1);
         #$self->decrementCurrentProcessIndex();
-        return ('',2);
+        #return ('',2);
     }
     my %ManualPayPageData = (
         HiddenFields => $self->stringifyCarryField(),
@@ -716,6 +719,8 @@ sub display_products {
 sub process_products { 
     my $self = shift;
 
+print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~~~~PROCESS PRODUCTS";
+    $self->addCarryField('seenProds', 1);
     my @productsselected=();
     my @productsqty=();
     for my $k (keys %{$self->{'RunParams'}})  {
@@ -738,6 +743,7 @@ sub process_products {
     $self->addCarryField('prodQty',$prodQty);
     my $prodIds= join(':',@productsselected);
     $self->addCarryField('prodIds', $prodIds);
+
 
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
@@ -779,6 +785,7 @@ sub process_products {
 ####
 
     $self->addCarryField('txnIds',$txnIds);
+print STDERR "TXN IDS" . $txnIds;
 
     return ('',1);
 }
@@ -811,10 +818,11 @@ sub display_documents {
         );
         $regoID = 0 if !$valid;
     }
-    if (! $regoID)  {
+    if (! $regoID or ! $personID)  {
         my $lang = $self->{'Data'}{'lang'};
         push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
-        $self->decrementCurrentProcessIndex();
+        $self->setCurrentProcessIndex(1);
+        #$self->decrementCurrentProcessIndex();
         return ('',2);
     }
 	my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
@@ -893,10 +901,11 @@ sub process_documents {
         $rego_ref->{'Nationality'} = $nationality;
         $rego_ref->{'InternationalTransfer'} = $itc;
     }
-    if (! $regoID)  {
+    if (! $regoID or ! $personID)  {
         my $lang = $self->{'Data'}{'lang'};
         push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
-        $self->decrementCurrentProcessIndex();
+        $self->setCurrentProcessIndex(1);
+        #$self->decrementCurrentProcessIndex();
         return ('',2);
     }
 
@@ -958,7 +967,9 @@ sub display_summary {
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
+    my $lang = $self->{'Data'}{'lang'};
 
+print STDERR "display_summary $regoID p$personID\n";
     my $rego_ref = {};
     my $content = '';
     if($regoID) {
@@ -972,13 +983,21 @@ sub display_summary {
         $regoID = 0 if !$valid;
     }
 
-    if (! $regoID)  {
+
+    if (! $regoID or ! $personID)  {
         my $lang = $self->{'Data'}{'lang'};
         push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
-        $self->decrementCurrentProcessIndex();
-        $self->decrementCurrentProcessIndex();
+        $self->setCurrentProcessIndex(1);
+        #$self->decrementCurrentProcessIndex();
+        #$self->decrementCurrentProcessIndex();
         return ('',2);
     }
+
+    #if (! $self->{'RunParams'}{'seenProds'})  {
+     #   push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, you must step through Payments screen.");
+     #   $self->setCurrentProcessIndex('p');
+     #   return ('',2);
+    #}
     if($regoID) {
         $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
         $personObj->load();
@@ -1001,12 +1020,12 @@ sub display_summary {
         );
         $content = '' if ! $content;
         if (! $content)  {
-            my $lang = $self->{'Data'}{'lang'};
             push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
-            $self->decrementCurrentProcessIndex();
-            $self->decrementCurrentProcessIndex();
-            $self->decrementCurrentProcessIndex();
-            $self->decrementCurrentProcessIndex();
+        $self->setCurrentProcessIndex(1);
+        #    $self->decrementCurrentProcessIndex();
+        #    $self->decrementCurrentProcessIndex();
+        #    $self->decrementCurrentProcessIndex();
+        #    $self->decrementCurrentProcessIndex();
             return ('',2);
         }
         
