@@ -16,7 +16,6 @@
 [% END %]
 
 
-
 [% IF Notifications.size %]
 <div class="col-md-12">
     <div class="alert alert-warning" role="alert">
@@ -32,97 +31,114 @@
 [% END %]
 
 <div class="member-home-page">
-    <div class="">
-        <div class="member-detail">
-            <div class = "sectionheader">[% Lang.txt('Registration Details') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin  %]<a href = "[% EditDetailsLink %]"         class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
-            <div class="member-details">
+    <div class="col-md-9">
+        <div class="">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                <a data-toggle="tab" data-visited="true" href="#memberdocs">[% Lang.txt('Documents') %]
+                <span class="circleBg"><i class="fa fa-check documents-complete documents-incomplete"></i><i class="fa fa-remove documents-rejected documents-approved"></i></span></a>
+                </li>
+                <li><a data-toggle="tab" data-visited="false" href="#memberdetails">[% Lang.txt('Member Detail Summary') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></span></a></a></li>
+                <li><a data-toggle="tab" data-visited="false" href="#tasknotes">[% Lang.txt('Work History') %]</a></li>
+            </ul>
+            <div class="tab-content">
+                
+                <div id="memberdocs" class="tab-pane fade in active">
+                    [% DocumentBlock %]
+                </div>
 
-            [% IF PersonDetails.LatinName %]
-                <span class="details-row">
-                    <span class="details-left">[% Lang.txt("Name (Latin Characters)") %]:</span>
-                    <span class="details-left">[% PersonDetails.LatinFirstname %]</span>
-                </span>
-            [% END %]
+                <div id="memberdetails" class="tab-pane fade">
+                    [% IF PersonDetails.LatinSurname %]
+                        <span class="details-row">
+                            <span class="details-left">[% Lang.txt("Name (Latin Characters)") %]:</span>
+                            <span class="details-left">[% PersonDetails.LatinName %]</span>
+                        </span>
+                    [% END %]
 
-            [% IF PersonDetails.LocalName %]
-                <span class="details-row">
-                    <span class="details-left">[% Lang.txt("Local Name") %]:</span>
-                    <span class="details-left">[% PersonDetails.LocalName %]</span>
-                </span>
-            [% END %]
+                    [% IF PersonDetails.LocalName %]
+                        <span class="details-row">
+                            <span class="details-left">[% Lang.txt("Local Name") %]:</span>
+                            <span class="details-left detail-value">[% PersonDetails.LocalName %]</span>
+                        </span>
+                    [% END %]
 
-            [% IF PersonDetails.Gender %]
-                <span class="details-row">
-                    <span class="details-left">[% Lang.txt('Gender') %]:</span>
-                    <span class="details-left">[% PersonDetails.Gender %]</span>
-                </span>
-            [% END %]
+                    [% IF PersonDetails.Gender %]
+                        <span class="details-row">
+                            <span class="details-left">[% Lang.txt('Gender') %]:</span>
+                            <span class="details-left detail-value">[% PersonDetails.Gender %]</span>
+                        </span>
+                    [% END %]
 
-            [% IF PersonDetails.DOB %]
-                <span class="details-row">
-                  <span class="details-left">[% Lang.txt('Date of Birth') %]:</span>
-                  <span class="details-left">[% DateFormat.format(PersonDetails.DOB,'MEDIUM') %]</span>
-                </span>
-            [% END %]
+                    [% IF PersonDetails.DOB %]
+                        <span class="details-row">
+                          <span class="details-left">[% Lang.txt('Date of Birth') %]:</span>
+                          <span class="details-left detail-value">[% DateFormat.format(PersonDetails.DOB,'MEDIUM') %]</span>
+                        </span>
+                    [% END %]
 
-            [% IF PersonDetails.Nationality %]
-                <span class="details-row">
-                  <span class="details-left">[% Lang.txt('Nationality') %]:</span>
-                  <span class="details-left">[% PersonDetails.Nationality %]</span>
-                </span>
-            [% END %]
-            [% IF PersonDetails.MinorProtection %]
-                <span class="details-row">
-                  <span class="details-left">[% Lang.txt('Minor Protection') %]:</span>
-                  <span class="details-left">[% PersonDetails.MinorProtection %]</span>
-                </span>
-            [% END %]
+                    [% IF PersonDetails.Nationality %]
+                        <span class="details-row">
+                          <span class="details-left">[% Lang.txt('Nationality') %]:</span>
+                          <span class="details-left detail-value">[% PersonDetails.Nationality %]</span>
+                        </span>
+                    [% END %]
 
-            [% IF PersonDetails.Address %]
-                <span class="details-row">
-                  <span class="details-left">[% Lang.txt('Address') %]:</span>
-                  <span class="details-left">[% PersonDetails.Address %]</span>
-                </span>
-            [% END %]
+                    [% IF PersonDetails.Address %]
+                        <span class="details-row">
+                          <span class="details-left">[% Lang.txt('Address') %]:</span>
+                          <span class="details-left detail-value">[% PersonDetails.Address %]</span>
+                        </span>
+                    [% END %]
+                    [% IF PersonDetails.MinorProtection %]
+                        <span class="details-row">
+                          <span class="details-left">[% Lang.txt('Minor Protection') %]:</span>
+                          <span class="details-left detail-value">[% PersonDetails.MinorProtection %]</span>
+                        </span>
+                    [% END %]
+                    [% IF PersonDetails.DateSuspendedUntil != '' %]
+                        <span class="details-row">
+                          <span class="details-left">[% Lang.txt('Suspended Until') %]:</span>
+                          <span class="details-left detail-value">[% DateFormat.format(PersonDetails.DateSuspendedUntil,'MEDIUM') %]</span>
+                        </span>
+                    [% END %]
 
-            [% IF PersonDetails.DateSuspendedUntil != '' %]
-                <span class="details-row">
-                  <span class="details-left">[% Lang.txt('Suspended Until') %]:</span>
-                  <span class="details-left">[% DateFormat.format(PersonDetails.DateSuspendedUntil,'MEDIUM') %]</span>
-                </span>
-            [% END %]
+                    [% IF PersonDetails.LastUpdate %]
+                        <span class="details-row">
+                          <span class="details-left">[% Lang.txt('Last Update') %]:</span>
+                          <span class="details-left detail-value">[% PersonDetails.LastUpdate %]</span>
+                        </span>
+                    [% END %]
 
-            [% IF PersonDetails.LastUpdate %]
-                <span class="details-row">
-                  <span class="details-left">[% Lang.txt('Last Update') %]:</span>
-                  <span class="details-left">[% PersonDetails.LastUpdate %]</span>
-                </span>
-            [% END %]
-            [% IF PersonDetails.Status %]
-                <span class="details-row">
-                  <span class="details-left">[% Lang.txt('Status') %]:</span>
-                  <span class="details-left">[% PersonDetails.Status %]</span>
-                </span>
-            [% END %]
+                    [% IF PersonDetails.Status %]
+                        <span class="details-row">
+                          <span class="details-left">[% Lang.txt('Status') %]:</span>
+                          <span class="details-left detail-value">[% PersonDetails.Status %]</span>
+                        </span>
+                    [% END %]
+
+                    [% IF EditDetailsLink and !ReadOnlyLogin  %]
+                        <span style="float: right" class="">
+                            <a href = "[% EditDetailsLink %]&e_a=core&bscrn=a%3DWF_View%26TID%3D[% WFTaskID %]" class="edit-link">
+                                [% Lang.txt('Edit') %]
+                            </a>
+                        </span>
+                    [% END %]
+
+                </div>
+
+                <div id="tasknotes" class="tab-pane fade in">
+                    [% NotesBlock %]
+                </div>
 
             </div>
         </div>
+
+        [% ActionsBlock %]
+
     </div>
-
-    <div class="">
-        <div class="payment-detail">
-            <div class = "sectionheader">[% Lang.txt('License and Payment Details') %]&nbsp;&nbsp;[% IF EditDetailsLink and !ReadOnlyLogin  %]<a href = "[% EditDetailsLink %]"         class="edit-link">[% Lang.txt('Edit') %]</a>[% END %]</div>
-            <div class="member-details">
-            </div>
-        </div>
+    <div class="col-md-3">
+        [% PersonSummary %]
     </div>
-
-    [% PaymentBlock %]
-
-    [% DocumentBlock %]
-
-    [% NotesBlock %]
-
-    [% ActionsBlock %]
-
 </div>
+
+

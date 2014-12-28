@@ -75,8 +75,13 @@ sub showPersonHome	{
     my $readonly = !( ($personObj->getValue('strStatus') eq 'REGISTERED' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
     $Data->{'ReadOnlyLogin'} ? $readonly = 1 : undef;
 
+    #print STDERR Dumper $personObj;
+    my $enableRenew = 1;
+    my $enableAdd = 1;
 
-     my $c = Countries::getISOCountriesHash();
+    $enableRenew = $enableAdd = 0 if $personObj->getValue('strStatus') ne $Defs::PERSON_STATUS_REGISTERED;
+
+    my $c = Countries::getISOCountriesHash();
 	my %TemplateData = (
         Lang => $Data->{'lang'},
 		Name => $name,
@@ -91,6 +96,8 @@ sub showPersonHome	{
 		GroupData => $groupdata,		
 	    client => $client,
 	    url => "$Defs::base_url/viewer.cgi",
+        enableRenew => $enableRenew,
+        enableAdd => $enableAdd,
 		Details => {
 			Active => $Data->{'lang'}->txt(($personObj->getValue('intRecStatus') || '') ? 'Yes' : 'No'),
 			strLocalFirstname => $personObj->getValue('strLocalFirstname') || '',

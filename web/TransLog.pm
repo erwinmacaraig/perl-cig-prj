@@ -717,9 +717,10 @@ sub getTransList {
     columns => \@headers,
     rowdata => \@rowdata,
     gridid => 'grid',
-    width => '99%',
+    width => '100%',
     height => '',
     filters => $displayonly ? undef : $filterfields,
+    class => 'trans',
   );
 	my $filterHTML = qq[
 			<div class = "showrecoptions">
@@ -734,12 +735,14 @@ sub getTransList {
 	];
 	$filterHTML = '' if $displayonly;
   my $cl=setClient($Data->{'clientValues'}) || '';
-  my $payment_records_link=qq[<br><br><a href="$Data->{'target'}?client=$cl&amp;a=P_TXNLog_payLIST" class = "btn-main">].$Data->{'lang'}->txt('List All Payment Records')."</a>" ;
+  my $payment_records_link=qq[<div class="button-row"><a href="$Data->{'target'}?client=$cl&amp;a=P_TXNLog_payLIST" class = "btn-main">].$Data->{'lang'}->txt('List All Payment Records')."</a>" ;
+  
   $payment_records_link = '' if ($hide_list_payments_link);
+  
   $grid = $grid ? qq[$grid $payment_records_link]  : qq[<p class="error">].$Data->{'lang'}->txt('No records were found with this filter').qq[</p>$payment_records_link]; 
 
 
-  return ($grid, $i, \@transCurrency, \@transAmount);
+  return (qq[<div class="col-md-12"><div class="transaction_container">] . $grid, $i, \@transCurrency, \@transAmount);
 }
 
 sub setupStandardList {
@@ -844,7 +847,7 @@ sub listTransactions {
 
 
 	($tempBody, $transCount) = getTransList($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref,0,0,0);
-    my $addLink = qq[<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_ADD" class = "btn-main">].$Data->{'lang'}->txt('Add Transaction').qq[</a>];
+    my $addLink = qq[<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_ADD" class = "btn-main">].$Data->{'lang'}->txt('Add Transaction').qq[</a></div></div></div>];
     $addLink = '' if $Data->{'ReadOnlyLogin'};
     $addLink = '' if ($Data->{'clientValues'}{'currentLevel'} == $Data->{'clientValues'}{'authLevel'});
 

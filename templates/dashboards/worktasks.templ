@@ -147,7 +147,8 @@
                             <span class="fa fa-user" style="float: left"></span>
                             <div style="float: left; word-wrap: break-word;width: 80%;">
                             [% task.RegistrationNatureLabel %]<br/>
-                            [% task.Name %]
+                            [% task.Name %]<br/>
+                            [% task.LocalEntityName %]
                             </div>
                         </td>
 		            [% ELSE %]
@@ -191,6 +192,7 @@
 			<li>[% Lang.txt('Renewals') %]: <b>[% IF TaskCounts.RENEWAL %][% TaskCounts.RENEWAL %][% ELSE %]0[% END %]</b></li>
 			<li>[% Lang.txt('Transfers') %]: <b>[% IF TaskCounts.TRANSFER %][% TaskCounts.TRANSFER %][% ELSE %]0[% END %]</b></li>
 			<li>[% Lang.txt('Request Access') %]: <b>[% IF TaskCounts.ACCESS %][% TaskCounts.ACCESS %][% ELSE %]0[% END %]</b></li>
+			<li>[% Lang.txt('Amendment') %]: <b>[% IF TaskCounts.AMENDMENT %][% TaskCounts.AMENDMENT %][% ELSE %]0[% END %]</b></li>
 		</ul>
 		<ul>
 			<li>[% Lang.txt('Total Task Active') %]: <b>[% IF TaskCounts.ACTIVE %][% TaskCounts.ACTIVE %][% ELSE %]0[% END %]</b></li>

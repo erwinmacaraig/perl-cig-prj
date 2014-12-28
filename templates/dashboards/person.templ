@@ -142,7 +142,7 @@
 			<!--Accordion end-->
 
 			<div class = "changeoptions">
-			[% IF AddRegistrationURL and !ReadOnlyLogin %]
+			[% IF AddRegistrationURL and !ReadOnlyLogin and enableAdd %]
 			    <span>
 			    	<a class="btn-main" href = "[% AddRegistrationURL %]">[% Lang.txt('Add New Role') %]</a>
 			    </span>

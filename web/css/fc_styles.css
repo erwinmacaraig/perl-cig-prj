@@ -1914,157 +1914,6 @@ header nav ul li a.selected {
     width: 68%;
 }
 
-/* START OLD PROGRESS STEP STYLES*/
-
-.list-inline {
-	/*margin-left:-9px;*/
-	margin-left:0px;
-}
-
-.sevenStepWidth {
-	width:159px;
-}
-
-.eightStepWidth {
-	width:139px;
-	/*width:141px;*/
-}
-
-.sixStepWidth {
-	width:185px;
-}
-
-.fiveStepWidth {
-	width:220px;
-}
-
-.playermenu li {
-	display:table-cell;
-	/*width:155px;*/
-}
-
-.playermenu li .current, .playermenu li .next, .playermenu li .previous {
-	padding:0;
-}
-
-.playermenu li.current {
-	padding:11px 16px 10px 23px;
-	background: #078b3c;
-}
-
-
-.playermenu li .current:after {
-	top: 0px;
-	left: 100%;
-}
-
-.playermenu li:last-child.current .current:after  {
-	 display:none;
-}
-
-
-.playermenu li.next {
-	padding:11px 16px 10px 25px;
-	background: #fff;
-}
-
-
-.playermenu li.previous {
-	padding:11px 20px 10px 25px;
-	background: #0fa54a;
-}
-.playermenu li.previous a{
-    text-decoration:underline;
-}
-
-.playermenu li.previous:after, .playermenu li:last-child.current:after {
-	content:"\f00c";
-	display: inline-block;
-	font: normal normal normal normal 14px/1 FontAwesome;
-	font-family: FontAwesome;
-	font-style:  normal;
-	font-weight: normal;
-	line-height: 1;
-	text-rendering:auto;
-	-webkit-font-smoothing: antialiased;
-	padding: 3px 3px;
-	color:#fff;
-	border-radius:40px;
-	background-color: green;
-	position:absolute;
-	left:130px;
-	z-index:1;
-
-}
-
-.playermenu li .next:after {
-	top: 0;
-	left: 100%;
-}
-
-
-.playermenu li .previous:after {
-	top: 0;
-	left: 100%;
-}
-
-.playermenu li:last-child.current:after {
-	left:110px;
-}
-
-.playermenu li.sixStepWidth.previous:after {
-	left:160px;
-}
-
-.playermenu li:last-child.sixStepWidth.current:after {
-	left:145px;
-}
-
-.playermenu li.sevenStepWidth.previous:after {
-	left:145px;
-}
-
-.playermenu li:last-child.sevenStepWidth.current:after {
-	left:125px;
-}
-
-
-.playermenu li.eightStepWidth.previous:after {
-	left:125px;
-}
-
-.playermenu li.fiveStepWidth.previous:after {
-	left:200px;
-}
-
-
-li.eightStepWidth.previous {
-	padding:11px 20px 10px 22px;
-}
-
-li.eightStepWidth.current {
-	padding:11px 0px 10px 22px;
-}
-
-li.sevenStepWidth.previous {
-	padding:11px 20px 10px 20px;
-}
-
-li.sevenStepWidth.current {
-	padding:11px 14px 10px 23px;
-}
-
-
-li:last-child.sevenStepWidth {
-	width:14.1%;
-}
-
-li:last-child.eightStepWidth {
-	width:12.4%;
-
-}
-
-/* END OLD PROGRESS STEP STYLES */
 
 #doctab1 .documents-list table.table .task-list .status-col span {
     float: left;
@@ -2253,7 +2102,7 @@ li:last-child.eightStepWidth {
 
 .form-panel-body {
     background: #ededed;
-    border: 1px solid #cccccc;
+    border: 1px solid #cccccc;	
     min-height: 500px;
     /*overflow: hidden;*/
     /*padding: 0;*/ /* reset style coming from bootstrap used only in this stylesheet */
@@ -2266,4 +2115,18 @@ li:last-child.eightStepWidth {
 
 .close {
 	opacity: 1;
+}
+
+.transaction_container > .dataTables_wrapper table tr td {
+	font-size:12px;
+}
+
+.transaction_container > .dataTables_wrapper table thead tr th {
+	font-size:13px;
+}
+
+.subtext {
+	margin-top:10px;
+	margin-bottom:10px;
+	font-weight:bold;
 }
