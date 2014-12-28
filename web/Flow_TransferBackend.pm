@@ -1377,10 +1377,7 @@ sub Navigation {
     #May need to be overriden in child class to define correct order of steps
   my $self = shift;
 
-<<<<<<< HEAD
-=======
     my $lang = $self->{'Data'}{'lang'};
->>>>>>> 90aa205595ecd506cbf93ddb2bd1512ac59e1a45
     my $navstring = '';
     my $meter = '';
     my @navoptions = ();
