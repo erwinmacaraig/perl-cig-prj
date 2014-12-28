@@ -1377,6 +1377,10 @@ sub Navigation {
     #May need to be overriden in child class to define correct order of steps
   my $self = shift;
 
+<<<<<<< HEAD
+=======
+    my $lang = $self->{'Data'}{'lang'};
+>>>>>>> 90aa205595ecd506cbf93ddb2bd1512ac59e1a45
     my $navstring = '';
     my $meter = '';
     my @navoptions = ();
@@ -1418,7 +1422,11 @@ sub Navigation {
             my $linkURL = $self->{'Target'}."?rfp=".$self->{'ProcessOrder'}[$i]{'action'}."&".$self->stringifyURLCarryField();
             $self->{'RunDetails'}{'DirectLinks'}[$i] = $linkURL;
 
-            my $link = qq[<a href="$linkURL" class = "$currentclass">$name</a>];
+            my $js = '';
+            if($step_in_future) {
+                $js = qq[onclick="alert('].$lang->txt('Use the Continue button to go to the next page').qq[');return false;" ];
+            }
+            my $link = qq[<a href="$linkURL" class = "$currentclass" $js>$name</a>];
 
             $navstring .= qq[ <li class = "$currentclass">$link</li> ];
             $step_in_future = 2 if $current;
