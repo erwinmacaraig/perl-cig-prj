@@ -2528,11 +2528,16 @@ sub populateDocumentViewData {
      AND tblRegistrationItem.strRegistrationNature IN ('', ?)
      AND tblRegistrationItem.strAgeLevel IN ('', ?)
      AND tblRegistrationItem.strPersonLevel IN ('', ?)
-     AND tblRegistrationItem.intOriginLevel = ?
      AND tblRegistrationItem.intEntityLevel = ?
-		GROUP BY intDocumentTypeID];
+    ];
+    my @levels = ();
+    push @levels, $dref->{'intEntityLevel'};
+    if ($dref->{'intOriginLevel'} && $dref->{'intOriginLevel'} > 0)   {
+        $query .= qq[ AND tblRegistrationItem.intOriginLevel = ?  ];
+        push @levels, $dref->{'intOriginLevel'};
+    }
 
-
+	$query .= qq[GROUP BY intDocumentTypeID];
 
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute($dref->{'intPersonID'}, $Data->{'Realm'},
@@ -2540,8 +2545,7 @@ sub populateDocumentViewData {
       $dref->{'strRegistrationNature'} || '',
       $dref->{'strAgeLevel'} || '',
       $dref->{'strPersonLevel'} || '',
-      $dref->{'intOriginLevel'},
-      $dref->{'intEntityLevel'},
+      @levels
     );
 	while(my $adref = $sth->fetchrow_hashref()){
 	    $validdocsStatus{$adref->{'intDocumentTypeID'}} = $adref->{'strApprovalStatus'};
