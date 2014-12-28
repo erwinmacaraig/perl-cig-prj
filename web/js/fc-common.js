@@ -72,6 +72,9 @@ $(document).ready(function(){
     $("#menu li.subnav ul").mouseleave(function(){
         $("#menu li.subnav a.menutop").removeClass("selected");
     });
+    $("#menu li.subnav a.menutop").mouseleave(function(){
+        $("#menu li.subnav a.menutop").removeClass("selected");
+    });
 
   findInitialAccordionPanel();
   $("#accordion").on("hidden.bs.collapse", toggleChevron);
