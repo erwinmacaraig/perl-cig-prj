@@ -2528,11 +2528,16 @@ sub populateDocumentViewData {
      AND tblRegistrationItem.strRegistrationNature IN ('', ?)
      AND tblRegistrationItem.strAgeLevel IN ('', ?)
      AND tblRegistrationItem.strPersonLevel IN ('', ?)
-		GROUP BY intDocumentTypeID];
+     AND tblRegistrationItem.intEntityLevel = ?
+    ];
+    my @levels = ();
+    push @levels, $dref->{'intEntityLevel'};
+    if ($dref->{'intOriginLevel'} && $dref->{'intOriginLevel'} > 0)   {
+        $query .= qq[ AND tblRegistrationItem.intOriginLevel = ?  ];
+        push @levels, $dref->{'intOriginLevel'};
+    }
 
-     #AND tblRegistrationItem.intOriginLevel = ?
-     #AND tblRegistrationItem.intEntityLevel = ?
-
+	$query .= qq[GROUP BY intDocumentTypeID];
 
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute($dref->{'intPersonID'}, $Data->{'Realm'},
@@ -2540,9 +2545,8 @@ sub populateDocumentViewData {
       $dref->{'strRegistrationNature'} || '',
       $dref->{'strAgeLevel'} || '',
       $dref->{'strPersonLevel'} || '',
+      @levels
     );
-      #$dref->{'intOriginLevel'},
-      #$dref->{'intEntityLevel'},
 	while(my $adref = $sth->fetchrow_hashref()){
 	    $validdocsStatus{$adref->{'intDocumentTypeID'}} = $adref->{'strApprovalStatus'};
 		push @validdocsforallrego, $adref->{'intDocumentTypeID'};
@@ -3013,7 +3017,7 @@ sub resetRelatedTasks {
 }
 
 sub viewSummaryPage {
-    my ($Data) = @_;
+    my ($Data, $dref) = @_;
 
     my $WFTaskID = safe_param('TID','number') || '';
     my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
@@ -3035,6 +3039,9 @@ sub viewSummaryPage {
     $TemplateData{'Lang'} = $Data->{'lang'};
 
     my $c = Countries::getISOCountriesHash();
+
+    open FH, ">dumpfile.txt";
+    print FH "Group DataL \n\n" . Dumper($task) . "\n";
 
     switch($task->{'strWFRuleFor'}) {
         case 'REGO' {
@@ -3086,15 +3093,32 @@ sub viewSummaryPage {
                 case "$Defs::LEVEL_CLUB"  {
                     #TODO: add details specific to CLUB
                     $templateFile = 'workflow/summary/club.templ';
+                    $title = 'New Club Registration - Approval';
                 }
                 case "$Defs::LEVEL_VENUE" {
                     #TODO: add details specific to VENUE
                     $templateFile = 'workflow/summary/venue.templ';
+                    $title = 'New Facility Registration - Approval';
                 }
                 else {
 
                 }
             }
+             %TemplateData = (
+                EntityDetails => {
+                    Status => $Data->{'lang'}->txt($Defs::entityStatus{$dref->{'entityStatus'} || 0}) || '',
+                    LocalShortName => $task->{'strLocalShortName'} || '',
+                    LocalName => $task->{'strLocalName'} || '',
+                    LegalID => $task->{'strLegalID'} || '',
+                    FoundationDate => $task->{'dtFrom'} || '',
+                    ISOCountry => $c->{$task->{'strISOCountry'}} || '',
+                    Discipline => $Defs::entitySportType{$task->{'strDiscipline'}} || '',
+                    ContactPerson => $task->{'strContact'} || '',
+                    Email => $task->{'strEmail'} || '',
+                    Website => $task->{'strWebURL'} || '',
+                },
+            );
+            $TemplateData{'EntitySummaryPanel'} = entitySummaryPanel($Data, $task->{'intEntityID'});
         }
         case 'PERSON' {
             $templateFile = 'workflow/summary/person.templ';
@@ -3115,7 +3139,7 @@ sub viewSummaryPage {
 }
 
 sub viewApprovalPage {
-    my ($Data) = @_;
+    my ($Data, $dref) = @_;
 
     #display page for now; details to be passed aren't finalised yet
     #use generic template for now
@@ -3135,6 +3159,8 @@ sub viewApprovalPage {
         'WFTaskID' => $task->{intWFTaskID} || 0,
         'client' => $Data->{client} || 0,
     );
+
+    my $c = Countries::getISOCountriesHash();
 
     $TemplateData{'TaskAction'} = \%TaskAction;
 

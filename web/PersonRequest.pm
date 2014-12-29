@@ -1591,16 +1591,39 @@ sub sendITC {
 	my $maObj = getInstanceOf($Data, 'national');
 	my $clubObj = getInstanceOf($Data, 'club');
 
-	open FH, ">dumpfile.txt";
-	print FH "\nInstance of Club:\n" . Dumper($clubObj) . "\n";
+	
 	my $email_to = $maObj->{'DBData'}{'strEmail'};	
 	my $email_from = $clubObj->{'DBData'}{'strEmail'};
-	print FH "\n\$email_to: $email_to \n";
-	print FH "\n\$email_from: $email_from \n";
-	my $emailsentOK = Email::sendEmail('ines_erwinmacaraig@yahoo.com', 'erwin.macaraig@gmail.com','REQUEST FORM FOR AN INTERNATIONAL TRANSFER CERTIFICATE', 'REQUEST FORM FOR AN INTERNATIONAL TRANSFER CERTIFICATE', $message, '','ITC','');
+	my $emailsentOK = Email::sendEmail($email_to, $email_from,'REQUEST FORM FOR AN INTERNATIONAL TRANSFER CERTIFICATE', 'REQUEST FORM FOR AN INTERNATIONAL TRANSFER CERTIFICATE', $message, '','ITC','');
 	if($emailsentOK){
 		#store to DB;
-		
+		my $query = qq[INSERT INTO tblITCMessagesLog (
+						intEntityFromID, 
+					    intEntityToID,
+						strFirstname,
+						strSurname,
+						dtDOB,
+						strNationality,
+						strPlayerID,
+						strClubCountry,
+						strClubName,
+						strMessage
+						) 
+						VALUES (
+							?,
+							?,
+							?,
+							?,
+							?,
+							?,
+							?,
+							?,
+							?,
+							?
+						)];
+
+			my $sth = $Data->{'db'}->prepare($query);
+			$sth->execute($clubObj->{'ID'}, $maObj->{'ID'}, $h{'strLocalFirstname'}, $h{'strLocalSurname'},$h{'dtDOB'}, $h{'strISONationality'}, $h{'strPlayerID'},$h{'strISOCountry'}, $h{'strClubName'},$message);
 		return qq[
           <div class="OKmsg">International Transfer Certificate Sent .</div> 
           <br />  
