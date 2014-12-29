@@ -213,6 +213,10 @@ sub list_entity_docs{
 			name => $lang->txt('Title'),
 			field => 'Title',
 		},
+		{
+			name => $lang->txt('Document Type'),
+			field => 'Name',
+		},
        {
             name => $lang->txt('Size (MB)'),
             field => 'Size',

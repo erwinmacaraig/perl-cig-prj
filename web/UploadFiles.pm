@@ -108,7 +108,7 @@ sub getUploadedFiles	{
 			Ext => $dref->{'strExtension'} || '',
 			Size => sprintf("%0.2f",($dref->{'intBytes'} /1024/1024)),
 			DateAdded => $dref->{'DateAdded_FMT'},
-			Name => $dref->{'strDocumentName'},
+			Name => $dref->{'strDocumentName'} || 'Misc',
 			OrigFilename => $dref->{'strOrigFilename'},
 			DB => $dref,
 		};	
