@@ -739,7 +739,7 @@ sub getRegistrationData	{
             AND RI.intSubRealmID IN (0, $dref->{'intSubRealmID'})
             AND RI.strRuleFor = 'REGO'
 	    AND RI.strRegistrationNature = '$dref->{'strRegistrationNature'}'
-            AND RI.intEntityLevel IN (0, $myCurrentLevelValue)
+            AND RI.intEntityLevel IN (0, $dref->{'intEntityLevel'})
             AND RI.intOriginLevel = $dref->{'intOriginLevel'}
 	    AND RI.strPersonType IN ('', '$dref->{'strPersonType'}') 
 	    AND RI.strPersonLevel IN ('', '$dref->{'strPersonLevel'}')
@@ -752,6 +752,7 @@ sub getRegistrationData	{
         AND (RI.intFilterFromAge = 0 OR RI.intFilterFromAge <= $dref->{'currentAge'})
         AND (RI.intFilterToAge = 0 OR RI.intFilterToAge >= $dref->{'currentAge'})
 ];		
+            #AND RI.intEntityLevel IN (0, $myCurrentLevelValue)
             #AND RI.intOriginLevel = $Data->{'clientValues'}{'authLevel'}
 
 
