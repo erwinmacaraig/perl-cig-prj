@@ -54,6 +54,9 @@ use PersonCertifications;
 use EntitySummaryPanel;
 use PersonEntity;
 
+use SphinxUpdate;
+use InstanceOf;
+
 sub cleanTasks  {
 
     my ($Data, $personID, $entityID, $personRegistrationID, $ruleFor) = @_;
@@ -1330,6 +1333,9 @@ sub checkForOutstandingTasks {
                     
                     my $peID = doesOpenPEExist($Data, $personID, $ppref->{'intEntityID'}, \%PE);
                     addPERecord($Data, $personID, $ppref->{'intEntityID'}, \%PE) if (! $peID);
+
+                    my $personObject = getInstanceOf($Data, 'person',$personID);
+                    updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
                 }
                 # if check  pass call save
                 if($ppref->{'strPersonType'} eq 'PLAYER' and $Data->{'SystemConfig'}{'cleanPlayerPersonRecords'}) {
@@ -3017,7 +3023,7 @@ sub resetRelatedTasks {
 }
 
 sub viewSummaryPage {
-    my ($Data) = @_;
+    my ($Data, $dref) = @_;
 
     my $WFTaskID = safe_param('TID','number') || '';
     my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
@@ -3039,6 +3045,9 @@ sub viewSummaryPage {
     $TemplateData{'Lang'} = $Data->{'lang'};
 
     my $c = Countries::getISOCountriesHash();
+
+    #open FH, ">dumpfile.txt";
+    #print FH "Group DataL \n\n" . Dumper($task) . "\n";
 
     switch($task->{'strWFRuleFor'}) {
         case 'REGO' {
@@ -3090,15 +3099,32 @@ sub viewSummaryPage {
                 case "$Defs::LEVEL_CLUB"  {
                     #TODO: add details specific to CLUB
                     $templateFile = 'workflow/summary/club.templ';
+                    $title = 'New Club Registration - Approval';
                 }
                 case "$Defs::LEVEL_VENUE" {
                     #TODO: add details specific to VENUE
                     $templateFile = 'workflow/summary/venue.templ';
+                    $title = 'New Facility Registration - Approval';
                 }
                 else {
 
                 }
             }
+             %TemplateData = (
+                EntityDetails => {
+                    Status => $Data->{'lang'}->txt($Defs::entityStatus{$dref->{'entityStatus'} || 0}) || '',
+                    LocalShortName => $task->{'strLocalShortName'} || '',
+                    LocalName => $task->{'strLocalName'} || '',
+                    LegalID => $task->{'strLegalID'} || '',
+                    FoundationDate => $task->{'dtFrom'} || '',
+                    ISOCountry => $c->{$task->{'strISOCountry'}} || '',
+                    Discipline => $Defs::entitySportType{$task->{'strDiscipline'}} || '',
+                    ContactPerson => $task->{'strContact'} || '',
+                    Email => $task->{'strEmail'} || '',
+                    Website => $task->{'strWebURL'} || '',
+                },
+            );
+            $TemplateData{'EntitySummaryPanel'} = entitySummaryPanel($Data, $task->{'intEntityID'});
         }
         case 'PERSON' {
             $templateFile = 'workflow/summary/person.templ';
@@ -3119,7 +3145,7 @@ sub viewSummaryPage {
 }
 
 sub viewApprovalPage {
-    my ($Data) = @_;
+    my ($Data, $dref) = @_;
 
     #display page for now; details to be passed aren't finalised yet
     #use generic template for now
@@ -3139,6 +3165,8 @@ sub viewApprovalPage {
         'WFTaskID' => $task->{intWFTaskID} || 0,
         'client' => $Data->{client} || 0,
     );
+
+    my $c = Countries::getISOCountriesHash();
 
     $TemplateData{'TaskAction'} = \%TaskAction;
 

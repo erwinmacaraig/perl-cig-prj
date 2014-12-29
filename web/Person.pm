@@ -440,8 +440,6 @@ my @headers = (
                         AND tblRegistrationItem.strRegistrationNature IN ('', ?)
                         AND tblRegistrationItem.strAgeLevel IN ('', ?)
                         AND tblRegistrationItem.strPersonLevel IN ('', ?)
-                        AND tblRegistrationItem.intOriginLevel = ?
-                        AND tblRegistrationItem.intEntityLevel = ?
                 ];
 
 			   my $sth = $db->prepare($query); 
@@ -450,12 +448,10 @@ my @headers = (
                     $regodoc->{'intDocumentTypeID'},
                     $personID, 
                     $Data->{'Realm'},
-                $registration->{'strPersonType'} || '',
-                $registration->{'strRegistrationNature'} || '',
-                $registration->{'strAgeLevel'} || '',
-                $registration->{'strPersonLevel'} || '',
-                $registration->{'intOriginLevel'},
-                $registration->{'intEntityLevel'},
+                    $registration->{'strPersonType'} || '',
+                    $registration->{'strRegistrationNature'} || '',
+                    $registration->{'strAgeLevel'} || '',
+                    $registration->{'strPersonLevel'} || '',
                );
             
 			   my $dref = $sth->fetchrow_hashref(); 

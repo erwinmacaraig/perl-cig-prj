@@ -71,7 +71,7 @@ sub bulkPersonRollover {
             P.intPersonID,
             P.strLocalSurname,
             P.strLocalFirstname,
-            DATE_FORMAT(P.dtDOB,"%d/%m/%Y") AS dtDOB,
+            P.dtDOB,
             TIMESTAMPDIFF(YEAR, P.dtDOB, CURDATE()) as currentAge,
             P.dtDOB AS dtDOB_RAW,
             P.strNationalNum
@@ -130,6 +130,7 @@ sub bulkPersonRollover {
         for my $i (qw(intPersonID strLocalSurname strLocalFirstname dtDOB dtDOB_RAW strNationalNum))    {
             $row{$i} = $dref->{$i};
         }
+        $row{'dtDOB'} = $Data->{'l10n'}{'date'}->format($dref->{'dtDOB'},'MEDIUM');
         $row{'id'} = $dref->{'intPersonID'};
         push @rowdata, \%row;
     }
@@ -141,12 +142,14 @@ sub bulkPersonRollover {
     my $memfieldlabels=FieldLabels::getFieldLabels($Data,$Defs::LEVEL_PERSON);
     my @headers = (
         {
+            name => "Check",
+            field => 'intPersonID',
             type => 'RowCheckbox',
         },
-        {
-            name => "ID for now",
-            field => 'intPersonID',
-        },
+        #{
+            #name => "ID for now",
+            #field => 'intPersonID',
+        #},
         {
             name => $memfieldlabels->{'strNationalNum'} || $Data->{'lang'}->txt('National Num.'),
             field => 'strNationalNum',

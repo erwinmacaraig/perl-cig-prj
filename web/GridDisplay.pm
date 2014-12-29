@@ -422,6 +422,9 @@ sub showGrid {
 					? qq[<img src="images/gridcell_tick.png">] 
 					: "";
 			}
+			if($type eq 'RowCheckbox')	{
+				$val = qq[<input type = "checkbox" name = "chk_$field].qq[_$val" class = "grid_chk chk_$field" value = "$val">];
+			}
 			if($field eq 'SelectLink' and $val)	{
 				$val = qq[<a href = "$val" class = "btn-inside-panels">].$Data->{'lang'}->txt('View') .qq[</a>];
 			}
