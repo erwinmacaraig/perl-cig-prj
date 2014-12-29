@@ -66,7 +66,7 @@ sub handle {
             'search/wrapper.templ',
         );
 
-        return ($content, "Search");
+        return ($content, "Request for Person Details Search");
     }
     else {
     
