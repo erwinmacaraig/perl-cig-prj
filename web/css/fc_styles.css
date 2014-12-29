@@ -1195,7 +1195,8 @@ a.btn-inside-docs-panel {
     font-weight: normal;
     font-size: 14px;
 	color: #fff;
-	padding: 5px 25px;
+	/*padding: 5px 25px;*/
+	padding: 5px 20px;
 	display: inline-block;
     text-align: center;
 	background: #1870a5;
@@ -1916,20 +1917,20 @@ header nav ul li a.selected {
 }
 
 
-#doctab1 .documents-list table.table .task-list .status-col span {
+div[id*="doctab"] .documents-list table.table .task-list .status-col span {
     float: left;
     padding-left: 3px;
     width: 49%;
 }
-#doctab1 .documents-list table.table .task-list .status-col i span {
+div[id*="doctab"] .documents-list table.table .task-list .status-col i span {
     float: left;
     padding-left: 9%;
     width: 91%;
 }
-#doctab1 .documents-list table.table .task-list .status-col i.fa-circle {
+div[id*="doctab"] .documents-list table.table .task-list .status-col i.fa-circle {
 	float: left;
 }
-#doctab1 .documents-list table.table .task-list .status-col a.btn-inside-docs-panel {
+div[id*="doctab"] .documents-list table.table .task-list .status-col a.btn-inside-docs-panel {
 	width: 95px;
 }
 

@@ -26,7 +26,6 @@
                         <li><a data-toggle="tab" href="#regtab[% index %]">[% Lang.txt('Registration details') %]</a></li>
                     </ul>
                     <div class="tab-content">
-                        
                         <div id="doctab[% index %]" class="tab-pane fade in active">
                             <div class="documents-list">
                                 <table class="table" cellpadding="5" style="width:100%;">
@@ -38,146 +37,44 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-								
-									
 									[% FOREACH doc IN entity.alldocs %]	
-																
-
                                         <tr class="task-list">
                                             <td>
                                                 <span class="detail-value">[%  doc.strDocumentName %]:</span>
                                             </td>
 											<td class="status-col">
 				
-											<!--
-											
-  											-->
 											[% IF doc.DisplayView == 1 %]
 												[% doc.viewLink %]
 											[% ELSIF doc.DisplayAdd == 1 %]
 												[% doc.addLink %]
-
-
 											[% END %]
 											[% IF doc.DisplayReplace == 1 %]
 												[% doc.replaceLink %]
 											[% END %]
-               								 </td> 
+                                            </td> 
 											<td class="status-col">
 												 [% IF doc.Status == 'PENDING' %]
-
 													<i class="fa fa-circle ver-dots yellow"></i>
 													<span class="">[% Lang.txt('Pending') %]</span>
-
 												[% ELSIF doc.Status == 'REJECTED' %]
 													[% rejectFlag = "1" %]
 													<input type="hidden" value = "[% rejectFlag %]" class="rejectedDocs">
 													<i class="fa fa-circle ver-dots red"></i>
 													<span class="">[% Lang.txt('Rejected') %]</span>
-
 												[% ELSIF doc.Status == 'APPROVED' %]
-
 													<i class="fa fa-circle ver-dots green"></i>
 													<span class="">[% Lang.txt('Approved') %]</span>
-
 												[% ELSIF doc.Status == 'VERIFIED' %]
-
 													<i class="fa fa-circle ver-dots green"></i>
 													<span class="">[% Lang.txt('Verified') %]</span>
 
 												[% ELSE %]
-
 													<i><span class="">[% doc.Status %]</span></i>
-												
-
 												[% END %]           
 							                </td>
-
-
-											<!--
-                                            <td class="status-col">
-                                                    <a href="#" onclick="docViewer([% doc.intFileID %],'client=[% client %]&amp;a=review');return false;" class="btn-inside-docs-panel">[% Lang.txt('View') %]</a>
-                                            </td>
-                                            <td class="status-col">
-											[% IF doc.strApprovalStatus == 'PENDING' %]
-                                                <i class="fa fa-circle ver-dots yellow"></i>
-                                                <span class="">[% Lang.txt('Pending') %]</span>
-											[% ELSE %]
-												 <i class="fa fa-circle ver-dots green"></i>
-                                                <span class="">[% Lang.txt('Verified') %]</span>
-											[% END %]
-											
-                                            </td>
-   										-->
                                         </tr>
 									[% END %]
-
-
-
-
-
-                                        <!--
-                                        <tr class="task-list">
-                                            <td>
-                                                <span class="detail-value">Parental Content:</span>
-                                            </td>
-                                            <td class="status-col">
-                                                <a href="" class="btn-inside-docs-panel">View</a>
-                                                <i class="fa fa-circle ver-dots red"></i>
-                                                <span class="">Rejected</span>
-                                            </td>
-                                        </tr>
-                                        <tr class="task-list">
-                                            <td>
-                                                <span class="detail-value">Contract:</span>
-                                            </td>
-                                            <td class="status-col">
-                                                <a href="" class="btn-inside-docs-panel">View</a>
-                                                <i class="fa fa-circle ver-dots yellow"></i>
-                                                <span class="">Pending</span>
-                                            </td>
-                                        </tr>
-                                        <tr class="task-list">
-                                            <td >
-                                                <span class="detail-value">Signed Code of Conduct:</span>
-                                            </td>
-                                            <td class="status-col">
-                                                <a href="" class="btn-inside-docs-panel">View</a>
-                                                <i class="fa fa-circle ver-dots green"></i>
-                                                <span class="">Verified</span>
-                                            </td>
-                                        </tr>
-                                        <tr class="task-list">
-                                            <td>
-                                                <span class="detail-value">Medical Certificate:</span>
-                                            </td>
-                                            <td class="status-col">
-                                                <a href="" class="btn-inside-docs-panel">View</a>
-                                                <i class="fa fa-circle ver-dots green"></i>
-                                                <span class="">Verified</span>
-                                            </td>
-                                        </tr>
-                                        <tr class="task-list">
-                                            <td>
-                                                <span class="detail-value">NS Clearance:</span>
-                                            </td>
-                                            <td class="status-col">
-                                                <a href="" class="btn-inside-docs-panel">View</a>
-                                                <i class="fa fa-circle ver-dots green"></i>
-                                                <span class="">Verified</span>
-                                            </td>
-                                        </tr>
-                                        <tr class="task-list">
-                                            <td>
-                                                <span class="detail-value">Parental Content:</span>
-                                            </td>
-                                            <td class="status-col">
-                                                <a href="" class="btn-inside-docs-panel">View</a>
-                                                <i class="fa fa-circle ver-dots green"></i>
-                                                <span class="">Verified</span>
-                                            </td>
-                                        </tr>
-                                        -->
                                     </tbody>
                                 </table>
                             </div>
