@@ -15,11 +15,13 @@ sub handle {
 
     my $searchObj = undef;
     my $searchType = param('type') || '';
-
+	my $title = 'Search';
 
     switch ($action) {
         case 'INITSRCH_P' {
             $searchObj = new Search::Person();
+			$title = "Request for Person Details Search" if($searchType eq 'access');
+			
         }
         case 'INITSRCH_C' {
             return;
@@ -66,7 +68,7 @@ sub handle {
             'search/wrapper.templ',
         );
 
-        return ($content, "Request for Person Details Search");
+        return ($content, $title);
     }
     else {
     
