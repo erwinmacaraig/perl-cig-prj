@@ -537,7 +537,8 @@ sub getRegistrationData	{
 	my ( $Data, $personID, $regFilters_ref)=@_;
 	my $client = $Data->{'client'} || '';
     my %clientValues = getClient($client);
-	my $myCurrentLevelValue = $clientValues{'authLevel'};
+	#my $myCurrentLevelValue = $clientValues{'authLevel'};
+    my $myCurrentLevelValue = getLastEntityLevel($Data->{'clientValues'}) || 0;
     my @values = (
         $personID,
     );
@@ -716,6 +717,8 @@ sub getRegistrationData	{
 	    t.strOrigFilename,
 	    t.DateUploaded,
 	    t.intPersonRegistrationID,
+        t.intEntityID as DocoEntityID,
+        t.intEntityLevel as DocoEntityLevel,
 	    D.strDocumentName,			
 	    RI.intID,
             RI.intRequired,
@@ -727,9 +730,10 @@ sub getRegistrationData	{
 			LEFT JOIN tblDocumentType as D ON (intDocumentTypeID = RI.intID and strItemType='DOCUMENT')
 			LEFT JOIN (
 				SELECT intDocumentTypeID, strApprovalStatus, intUploadFileID, strOrigFilename, dtUploaded as DateUploaded,
-				pr.intPersonRegistrationID FROM tblDocuments 
-				INNER JOIN tblUploadedFiles  ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID 
-				INNER JOIN tblPersonRegistration_$Data->{'Realm'}  as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID 
+				pr.intPersonRegistrationID, E.intEntityID, E.intEntityLevel FROM tblDocuments 
+				INNER JOIN tblUploadedFiles  ON (tblUploadedFiles.intFileID = tblDocuments.intUploadFileID )
+				INNER JOIN tblPersonRegistration_$Data->{'Realm'}  as pr ON (pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID )
+                LEFT JOIN tblEntity as E ON (E.intEntityID=pr.intEntityID)
 				WHERE pr.intPersonID = $personID
 				AND pr.intPersonRegistrationID = $dref->{intPersonRegistrationID}
 			) as t ON t.intDocumentTypeID = RI.intID 
@@ -737,9 +741,9 @@ sub getRegistrationData	{
             RI.intRealmID = $Data->{'Realm'}
             AND RI.intSubRealmID IN (0, $dref->{'intSubRealmID'})
             AND RI.strRuleFor = 'REGO'
-            AND RI.intOriginLevel = $dref->{'intOriginLevel'}
 	    AND RI.strRegistrationNature = '$dref->{'strRegistrationNature'}'
-            AND RI.intEntityLevel IN (0, $myCurrentLevelValue)
+            AND RI.intEntityLevel IN (0, $dref->{'intEntityLevel'})
+            AND RI.intOriginLevel = $dref->{'intOriginLevel'}
 	    AND RI.strPersonType IN ('', '$dref->{'strPersonType'}') 
 	    AND RI.strPersonLevel IN ('', '$dref->{'strPersonLevel'}')
         AND RI.strPersonEntityRole IN ('', '')
@@ -751,7 +755,8 @@ sub getRegistrationData	{
         AND (RI.intFilterFromAge = 0 OR RI.intFilterFromAge <= $dref->{'currentAge'})
         AND (RI.intFilterToAge = 0 OR RI.intFilterToAge >= $dref->{'currentAge'})
 ];		
-
+            #AND RI.intEntityLevel IN (0, $myCurrentLevelValue)
+            #AND RI.intOriginLevel = $Data->{'clientValues'}{'authLevel'}
 
 		my $sth = $Data->{'db'}->prepare($sql);
 		$sth->execute();

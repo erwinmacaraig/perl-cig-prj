@@ -1,47 +1,28 @@
 [% USE Dumper %]
-<p>SHOW LIST OF PEOPLE IN A DIV THAT USER CAN EXPAND TO SHOW LIST</p>
 <h3 class="panel-header"><b>Summary</b></h3>
-	<div class="panel-body">
-		<div class="document-upload summary">
-			<div class="col-md-6">
-				<div class="read-only personal-information">
-				    <h4>Personal Information</h4>
-				    <div class="read-only-text clearfix">
-					    <ul>
-					    	<li><span class="details-left">[% Lang.txt("Family Name") %]:</span> <span class="detail-value">[% IF person.Familyname %] [% person.Familyname %] [% ELSE %] - [% END %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("First Name") %]:</span> <span class="detail-value">[% IF person.Name %] [% person.Name %] [% ELSE %] - [% END %]</span></li>
-                            [% IF registration.intGender == 2 %]
-					    	    <li><span class="details-left">[% Lang.txt("Maiden Name") %]:</span> <span class="detail-value">[% IF person.Maidenname %] [% person.Maidenname %] [% ELSE %] - [% END %]</span></li>
-                            [% END %]
-					    	<li><span class="details-left">[% Lang.txt("Language of name") %]:</span> <span class="detail-value">[% IF person.Language %] [% person.Language %] [% ELSE %] - [% END %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Date of Birth") %]:</span> <span class="detail-value">[% IF person.DOB %] [% DateFormat.format(person.DOB,'MEDIUM') %] [% ELSE %] - [% END %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Gender") %]:</span> <span class="detail-value">[% IF person.Gender %] [% person.Gender %] [% ELSE %] - [% END %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Nationality") %]:</span> <span class="detail-value">[% IF person.Nationality %] [% person.Nationality %] [% ELSE %] - [% END %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Country of Birth") %]:</span> <span class="detail-value">[% IF person.Country %] [% person.Country %] [% ELSE %] - [% END %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Region") %]:</span> <span class="detail-value">[% IF person.Region %] [% person.Region %] [% ELSE %] - [% END %]</span></li>
-					    </ul>
-					    <a href="[% editlink %]&amp;rfp=cd" class="pull-right">Edit</a>
-				    </div>
-				</div>
-			</div>
-			<div class="col-md-6">
-				<div class="read-only contact-details">
-				    <h4>Contact Details</h4>
-				    <div class="read-only-text clearfix">
-					    <ul>
-					    	<li><span class="details-left">[% Lang.txt("Address 1") %]:</span> <span class="detail-value">[% IF person.Addressone %] [% person.Addressone %] [% ELSE %] - [% END %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Address 2") %]:</span> <span class="detail-value">[% IF person.Addresstwo %] [% person.Addresstwo %] [% ELSE %] - [% END %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("City") %]:</span> <span class="detail-value">[% IF person.City %] [% person.City %] [% ELSE %] - [% END %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("State") %]:</span> <span class="detail-value">[% IF person.State %] [% person.State %] [% ELSE %] - [% END %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Postal Code") %]:</span> <span class="detail-value">[% IF person.Postal %] [% person.Postal %] [% ELSE %] - [% END %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Country") %]:</span> <span class="detail-value">[% IF person.Countryaddress %] [% person.Countryaddress %] [% ELSE %] - [% END %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Phone Number") %]:</span> <span class="detail-value">[% IF person.Phone %] [% person.Phone %] [% ELSE %] - [% END %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Email Address") %]:</span> <span class="detail-value">[% IF person.Email %] [% person.Email %] [% ELSE %] - [% END %]</span></li>
-					    </ul>
-					    <a href="[% editlink %]&amp;rfp=cond" class="pull-right">Edit</a>
-				    </div>
-				</div>
-			</div>
+<div class="panel-body">
+    <table>
+        <tr>
+            <td>[% Lang.txt("MA ID") %]</td>
+            <td>[% Lang.txt("Family Name") %]</td>
+            <td>[% Lang.txt("First Name") %]</td>
+            <td>[% Lang.txt("Date of Birth") %]</td>
+            <td>[% Lang.txt("Gender") %]</td>
+            <td>[% Lang.txt("Nationality") %]</td>
+            <td>[% Lang.txt("Country of Birth") %]</td>
+        </tr>
+    [% FOREACH person IN people %]
+        <tr>
+            <td>[% IF person.MAID %] [% person.MAID %] [% ELSE %] - [% END %]</td>
+            <td>[% IF person.Familyname %] [% person.Familyname %] [% ELSE %] - [% END %]</td>
+            <td>[% IF person.Name %] [% person.Name %] [% ELSE %] - [% END %]</td>
+            <td>[% IF person.DOB %] [% DateFormat.format(person.DOB,'MEDIUM') %] [% ELSE %] - [% END %]</td>
+            <td>[% IF person.Gender %] [% person.Gender %] [% ELSE %] - [% END %]</td>
+            <td>[% IF person.Nationality %] [% person.Nationality %] [% ELSE %] - [% END %]</td>
+            <td>[% IF person.Country %] [% person.Country %] [% ELSE %] - [% END %]</td>
+        </tr>
+    [% END %]
+    </table>
 	<div class="clearfix" style="clear:both;">&nbsp;</div>
 			<div class="col-md-6">
 				<div class="read-only registration-details">
@@ -59,34 +40,7 @@
 					    	[% END %]
 					    </ul>
 					    <a href="[% editlink %]&amp;rfp=r" class="pull-right">Edit</a>
-				     </div>
 				</div>
-			</div>
-	[% IF registration.documents.size %]
-	<div class="col-md-6">
-		<div class="read-only">
-			 <h4>Documents</h4>
-			 <div class="read-only-text documents-list clearfix">
-			    <ul>
-					[% FOREACH key IN alldocs.keys %]
-
-					<li><span>[% alldocs.$key.Name %]:<br /></span> <b>[% alldocs.$key.strOrigFilename %]</b></li>
-
-					[% END %]
-			    </ul>
-                <a href="[% editlink %]&amp;rfp=d" class="pull-right">Edit</a>
-		     </div>
 		</div>
-	</div>
-	[% END %]
-
-	<!--<form action="[% target %]" method="POST">
-	    <input type="hidden" name="a" value="c">
-	[% FOREACH h IN  hidden_ref %]
-	<input type="hidden" name="[% h.key %]" value="[% h.value %]">
-	[% END %]
-	<input type="submit" name="submit" value="[% Lang.txt('Submit to Member Association') %]" class = "button proceed-button"><br><br>
-	            </form>
-	-->
-	</div>
+    </div>
 </div>

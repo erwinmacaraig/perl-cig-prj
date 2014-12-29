@@ -54,6 +54,9 @@ use PersonCertifications;
 use EntitySummaryPanel;
 use PersonEntity;
 
+use SphinxUpdate;
+use InstanceOf;
+
 sub cleanTasks  {
 
     my ($Data, $personID, $entityID, $personRegistrationID, $ruleFor) = @_;
@@ -1330,6 +1333,9 @@ sub checkForOutstandingTasks {
                     
                     my $peID = doesOpenPEExist($Data, $personID, $ppref->{'intEntityID'}, \%PE);
                     addPERecord($Data, $personID, $ppref->{'intEntityID'}, \%PE) if (! $peID);
+
+                    my $personObject = getInstanceOf($Data, 'person',$personID);
+                    updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
                 }
                 # if check  pass call save
                 if($ppref->{'strPersonType'} eq 'PLAYER' and $Data->{'SystemConfig'}{'cleanPlayerPersonRecords'}) {
@@ -2602,11 +2608,15 @@ sub populateDocumentViewData {
 			addPersonItem.intRequired as personRequired,
 			addPersonItem.intItemID as personItemID,
 			entityItem.intRequired as EntityRequired,
-            entityItem.intItemID as entityItemID
+            entityItem.intItemID as entityItemID,
+            E.intEntityID as DocoEntityID,
+            E.intEntityLevel as DocoEntityLevel,
+            dt.strLockAtLevel 
         FROM tblWFRuleDocuments AS rd
         INNER JOIN tblWFTask AS wt ON (wt.intWFRuleID = rd.intWFRuleID)
         INNER JOIN tblWFRule as wr ON (wr.intWFRuleID = wt.intWFRuleID)
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (pr.intPersonRegistrationID = wt.intPersonRegistrationID)
+        LEFT JOIN tblEntity as E ON (E.intEntityID=pr.intEntityID)
         LEFT JOIN tblRegistrationItem as addPersonItem
             ON (
                 addPersonItem.strItemType = 'DOCUMENT'
@@ -2799,6 +2809,13 @@ sub populateDocumentViewData {
 
            	$viewLink = qq[ <span style="position: relative"> 
 <a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$Data->{'client'}&amp;a=$action');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];			
+        }
+
+        if($tdref->{'strLockAtLevel'})   {
+            if($tdref->{'strLockAtLevel'} =~ /\|$Data->{'clientValues'}{'authLevel'}\|/ and getLastEntityID($Data->{'clientValues'}) != $tdref->{'DocoEntityID'}){
+                $displayView=0;
+                $displayReplace=0;
+            }
         }
 		
         my %documents = (
@@ -3040,8 +3057,17 @@ sub viewSummaryPage {
 
     my $c = Countries::getISOCountriesHash();
 
+    my $club = qq[SELECT strLocalName FROM tblEntity WHERE intEntityID = ?];
+    my $sth = $Data->{'db'}->prepare($club);
+
+    $sth->execute($task->{'intCreatedByEntityID'});
+
+    my $dref = $sth->fetchrow_hashref();
+
+    my $clubName = $dref->{'strLocalName'};
+
     open FH, ">dumpfile.txt";
-    print FH "Group DataL \n\n" . Dumper($task) . "\n";
+    print FH "Group DataL \n\n" . Dumper($Data) . "\n";
 
     switch($task->{'strWFRuleFor'}) {
         case 'REGO' {
@@ -3104,6 +3130,7 @@ sub viewSummaryPage {
 
                 }
             }
+
              %TemplateData = (
                 EntityDetails => {
                     Status => $Data->{'lang'}->txt($Defs::entityStatus{$dref->{'entityStatus'} || 0}) || '',
@@ -3116,6 +3143,8 @@ sub viewSummaryPage {
                     ContactPerson => $task->{'strContact'} || '',
                     Email => $task->{'strEmail'} || '',
                     Website => $task->{'strWebURL'} || '',
+                    EntityID => $task->{'intCreatedByEntityID'} || '',
+                    ClubName => $clubName,
                 },
             );
             $TemplateData{'EntitySummaryPanel'} = entitySummaryPanel($Data, $task->{'intEntityID'});

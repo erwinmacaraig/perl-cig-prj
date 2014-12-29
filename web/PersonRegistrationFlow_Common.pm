@@ -95,7 +95,34 @@ sub displayRegoFlowSummaryBulk  {
         my ($prodID, $qty) = split /-/, $prodQty;
         $hidden_ref->{"prodQTY_$prodID"} =$qty;
     }
-    #($hidden_ref->{'txnIds'}, undef) = save_rego_products($Data, $regoID, $personID, $entityID, $rego_ref->{'entityLevel'}, $rego_ref, $hidden_ref); #\%params);
+    my @IDs= split /\|/, $hidden_ref->{'rolloverIDs'};
+		my $c = Countries::getISOCountriesHash();
+    
+    my @People=();
+    for my $pID (@IDs)   {
+        my $personObj = getInstanceOf($Data, 'person', $pID);
+        my %personData = ();
+        $personData{'MAID'} = $personObj->getValue('strNationalNum');
+        $personData{'Name'} = $personObj->getValue('strLocalFirstname');
+        $personData{'Familyname'} = $personObj->getValue('strLocalSurname');
+        $personData{'Maidenname'} = $personObj->getValue('strMaidenName');
+        $personData{'DOB'} = $personObj->getValue('dtDOB');
+        $personData{'Gender'} = $Data->{'lang'}->txt($Defs::genderInfo{$personObj->getValue('intGender') || 0}) || '';
+        $personData{'Nationality'} = $c->{$personObj->getValue('strISONationality')};
+        $personData{'Country'} = $c->{$personObj->getValue('strISOCountryOfBirth')} || '';
+        $personData{'Region'} = $personObj->getValue('strRegionOfBirth') || '';
+
+        $personData{'Addressone'} = $personObj->getValue('strAddress1') || '';
+        $personData{'Addresstwo'} = $personObj->getValue('strAddress2') || '';
+        $personData{'City'} = $personObj->getValue('strSuburb') || '';
+        $personData{'State'} = $personObj->getValue('strState') || '';
+        $personData{'Postal'} = $personObj->getValue('strPostalCode') || '';
+        $personData{'Phone'} = $personObj->getValue('strPhoneHome') || '';
+        $personData{'Countryaddress'} = $c->{$personObj->getValue('strISOCountry')} || '';
+        $personData{'Email'} = $personObj->getValue('strEmail') || '';
+        push @People, \%personData;
+    }
+
 
     my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
     my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
@@ -125,6 +152,7 @@ sub displayRegoFlowSummaryBulk  {
     my $editlink =  $Data->{'target'}."?".$carryString;
     my %PageData = (
         person_home_url => $url,
+        people=> \@People,
         registration => $rego_ref,
         gateways => $gateways,
         txnCount => $txnCount,
@@ -147,6 +175,7 @@ sub displayRegoFlowSummaryBulk  {
 
     return $body;
 }
+
 sub displayRegoFlowSummary {
 
     my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref, $carryString) = @_;
