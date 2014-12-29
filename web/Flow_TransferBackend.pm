@@ -927,7 +927,6 @@ sub process_documents {
         if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
             #There are errors - reset where we are to go back to the form again
             $self->decrementCurrentProcessIndex();
-#            $self->decrementCurrentProcessIndex();
             return ('',2);
         }
 		#my $labelBackBtn = 'Back to Documents';
