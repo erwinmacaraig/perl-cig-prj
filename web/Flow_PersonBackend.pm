@@ -684,6 +684,9 @@ sub process_registration {
             $entityLevel = $entityTypeSelected;
         }
     }
+    if($entityID != getLastEntityID($self->{'ClientValues'}))   {
+        $self->rebuildClient($entityID, $entityLevel);
+    }
 
     my $personID = $self->ID() || 0;
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
@@ -1568,6 +1571,54 @@ sub moveDocuments {
 }
 
  
+
+sub rebuildClient   {
+    # Called if inserting into entity that is not the current entity.
+    # Rebuilds and updates client string so that the entity is the
+    # current entity
+    my $self = shift;
+    my ($entityID, $entityLevel) = @_;
+
+    my $clientValues = $self->{'ClientValues'};
+    my $currentLevel = $clientValues->{'currentLevel'};
+    my $authLevel = $clientValues->{'authLevel'};
+    if($currentLevel != $Defs::LEVEL_PERSON)    {
+        $clientValues->{'currentLevel'} = $entityLevel;
+    }
+
+    $clientValues->{clubID} = $Defs::INVALID_ID  if $entityLevel > $Defs::LEVEL_CLUB;
+    $clientValues->{zoneID} = $Defs::INVALID_ID if $entityLevel > $Defs::LEVEL_ZONE;
+    $clientValues->{regionID} = $Defs::INVALID_ID if $entityLevel > $Defs::LEVEL_REGION;
+    setClientValue($clientValues, $entityLevel, $entityID);
+
+    #if MA is inserting into club then need to rebuild region into client string
+    #work out regional level
+    if($entityLevel == $Defs::LEVEL_CLUB and $authLevel == $Defs::LEVEL_NATIONAL)   {
+        my $st = qq[
+            SELECT      
+                intParentID
+            FROM 
+                tblTempEntityStructure
+            WHERE
+                intParentLevel = $Defs::LEVEL_REGION
+                AND intChildID = ?
+        ];
+        my $q = $self->{'db'}->prepare($st);
+        $q->execute(
+            $entityID,
+        );
+        my ($regionID) = $q->fetchrow_array();
+        $q->finish();
+        setClientValue($clientValues, $Defs::LEVEL_REGION,$regionID) if $regionID;
+    }
+
+    $self->{'ClientValues'} = $clientValues;
+    $self->{'Data'}{'clientValues'} = $clientValues;
+    my $client = setClient($clientValues);
+    $self->{'Data'}{'client'} = $client;
+    $self->addCarryField('client',$client);
+    return 1;
+}
 
  
 
