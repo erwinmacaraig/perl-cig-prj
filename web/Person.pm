@@ -436,11 +436,11 @@ my @headers = (
                         AND tblDocuments.intPersonID = ? 
                         AND tblRegistrationItem.intRealmID=? 
                         AND tblRegistrationItem.strItemType='DOCUMENT'
-                        AND tblRegistrationItem.strPersonType IN ('', ?)
-                        AND tblRegistrationItem.strRegistrationNature IN ('', ?)
-                        AND tblRegistrationItem.strAgeLevel IN ('', ?)
-                        AND tblRegistrationItem.strPersonLevel IN ('', ?)
                 ];
+                        #AND tblRegistrationItem.strPersonType IN ('', ?)
+                        #AND tblRegistrationItem.strRegistrationNature IN ('', ?)
+                        #AND tblRegistrationItem.strAgeLevel IN ('', ?)
+                        #AND tblRegistrationItem.strPersonLevel IN ('', ?)
 
 			   my $sth = $db->prepare($query); 
                $sth->execute(
@@ -448,11 +448,11 @@ my @headers = (
                     $regodoc->{'intDocumentTypeID'},
                     $personID, 
                     $Data->{'Realm'},
-                $registration->{'strPersonType'} || '',
-                $registration->{'strRegistrationNature'} || '',
-                $registration->{'strAgeLevel'} || '',
-                $registration->{'strPersonLevel'} || '',
                );
+                #$registration->{'strPersonType'} || '',
+                #$registration->{'strRegistrationNature'} || '',
+                #$registration->{'strAgeLevel'} || '',
+                #$registration->{'strPersonLevel'} || '',
             
 			   my $dref = $sth->fetchrow_hashref(); 
 				#checks for strLockAtLevel and intUseExistingThisEntity and intUseExistingAnyEntity and Owner against Currently Logged
