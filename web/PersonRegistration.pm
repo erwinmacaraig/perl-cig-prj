@@ -537,7 +537,8 @@ sub getRegistrationData	{
 	my ( $Data, $personID, $regFilters_ref)=@_;
 	my $client = $Data->{'client'} || '';
     my %clientValues = getClient($client);
-	my $myCurrentLevelValue = $clientValues{'authLevel'};
+	#my $myCurrentLevelValue = $clientValues{'authLevel'};
+    my $myCurrentLevelValue = getLastEntityLevel($Data->{'clientValues'}) || 0;
     my @values = (
         $personID,
     );
@@ -739,6 +740,7 @@ sub getRegistrationData	{
             AND RI.strRuleFor = 'REGO'
 	    AND RI.strRegistrationNature = '$dref->{'strRegistrationNature'}'
             AND RI.intEntityLevel IN (0, $myCurrentLevelValue)
+            AND RI.intOriginLevel = $dref->{'intOriginLevel'}
 	    AND RI.strPersonType IN ('', '$dref->{'strPersonType'}') 
 	    AND RI.strPersonLevel IN ('', '$dref->{'strPersonLevel'}')
         AND RI.strPersonEntityRole IN ('', '')
@@ -750,7 +752,7 @@ sub getRegistrationData	{
         AND (RI.intFilterFromAge = 0 OR RI.intFilterFromAge <= $dref->{'currentAge'})
         AND (RI.intFilterToAge = 0 OR RI.intFilterToAge >= $dref->{'currentAge'})
 ];		
-            #AND RI.intOriginLevel = $dref->{'intOriginLevel'}
+            #AND RI.intOriginLevel = $Data->{'clientValues'}{'authLevel'}
 
 
 		my $sth = $Data->{'db'}->prepare($sql);
