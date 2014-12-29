@@ -3057,8 +3057,17 @@ sub viewSummaryPage {
 
     my $c = Countries::getISOCountriesHash();
 
-    #open FH, ">dumpfile.txt";
-    #print FH "Group DataL \n\n" . Dumper($task) . "\n";
+    my $club = qq[SELECT strLocalName FROM tblEntity WHERE intEntityID = ?];
+    my $sth = $Data->{'db'}->prepare($club);
+
+    $sth->execute($task->{'intCreatedByEntityID'});
+
+    my $dref = $sth->fetchrow_hashref();
+
+    my $clubName = $dref->{'strLocalName'};
+
+    open FH, ">dumpfile.txt";
+    print FH "Group DataL \n\n" . Dumper($Data) . "\n";
 
     switch($task->{'strWFRuleFor'}) {
         case 'REGO' {
@@ -3121,6 +3130,7 @@ sub viewSummaryPage {
 
                 }
             }
+
              %TemplateData = (
                 EntityDetails => {
                     Status => $Data->{'lang'}->txt($Defs::entityStatus{$dref->{'entityStatus'} || 0}) || '',
@@ -3133,6 +3143,8 @@ sub viewSummaryPage {
                     ContactPerson => $task->{'strContact'} || '',
                     Email => $task->{'strEmail'} || '',
                     Website => $task->{'strWebURL'} || '',
+                    EntityID => $task->{'intCreatedByEntityID'} || '',
+                    ClubName => $clubName,
                 },
             );
             $TemplateData{'EntitySummaryPanel'} = entitySummaryPanel($Data, $task->{'intEntityID'});
