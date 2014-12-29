@@ -105,8 +105,7 @@ sub setupValues    {
 
 sub process_person_select   {
     my $self = shift;
-    my $rolloverIDs = $self->{'RunParams'}{'rolloverIDs'};
-$rolloverIDs = 10760050;
+    my $rolloverIDs = $self->{'RunParams'}{'roIds'};
     $self->addCarryField('rolloverIDs',$rolloverIDs);
     
     return ('',1);
@@ -158,7 +157,6 @@ print STDERR "d_type:" . $self->getCarryFields('d_type') . "\n";
     #$Hidden{'prodQty'} = $params{'prodQty'} || '';
     #$Hidden{'upd'} = $params{'upd'} || 0;
 
-print STDERR Dumper($bulk_ref);
     ($bulk_ref->{'nationalPeriodID'}, undef, undef) = getNationalReportingPeriod($self->{'Data'}->{db}, $self->{'Data'}->{'Realm'}, $self->{'Data'}->{'RealmSubType'}, $bulk_ref->{'sport'}, $bulk_ref->{'personType'}, $bulk_ref->{'registrationNature'});
     my ($listPersons_body, undef) = bulkPersonRollover($self->{'Data'}, 'PREGFB_SPU', $bulk_ref, \%Hidden, 0);
     my $content = $listPersons_body;

@@ -3104,6 +3104,7 @@ sub viewSummaryPage {
                 case "$Defs::LEVEL_VENUE" {
                     #TODO: add details specific to VENUE
                     $templateFile = 'workflow/summary/venue.templ';
+                    $title = 'New Facility Registration - Approval';
                 }
                 else {
 
@@ -3120,9 +3121,9 @@ sub viewSummaryPage {
                     Discipline => $Defs::entitySportType{$task->{'strDiscipline'}} || '',
                     ContactPerson => $task->{'strContact'} || '',
                     Email => $task->{'strEmail'} || '',
+                    Website => $task->{'strWebURL'} || '',
                 },
             );
-             
             $TemplateData{'EntitySummaryPanel'} = entitySummaryPanel($Data, $task->{'intEntityID'});
         }
         case 'PERSON' {
@@ -3144,7 +3145,7 @@ sub viewSummaryPage {
 }
 
 sub viewApprovalPage {
-    my ($Data) = @_;
+    my ($Data, $dref) = @_;
 
     #display page for now; details to be passed aren't finalised yet
     #use generic template for now
@@ -3164,6 +3165,8 @@ sub viewApprovalPage {
         'WFTaskID' => $task->{intWFTaskID} || 0,
         'client' => $Data->{client} || 0,
     );
+
+    my $c = Countries::getISOCountriesHash();
 
     $TemplateData{'TaskAction'} = \%TaskAction;
 

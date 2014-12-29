@@ -1,5 +1,49 @@
-<div class="member-home-page">
-    <span>All related Tasks for this Venue Registration has been completed. Please review Venue details below.</span>
+<div class="col-md-3">
+    [% EntitySummaryPanel %]
+</div>
+<div class="col-md-9">
+	<h3 class="panel-header">[% EntityDetails.LocalName %] - [% EntityDetails.ISOCountry %]</h3>
+	<div class="panel-body">
+	<br/>
+    <p>[% Lang.txt('The following registration has been approved.') %] [% EntityDetails.LocalName %] [% Lang.txt('has been notified.') %]</p>
     <br/>
-    <br/>
+	
+		<div class="read-only">
+			<h4>[% Lang.txt('Registration Details') %]</h4>
+			<div class="read-only-text">
+				[% IF EntityDetails.LocalName %]
+				<div class="">
+				  	<span class="paddingsummary">[% Lang.txt('Venue name:') %]</span>
+				  	<span class="detail-value">[% EntityDetails.LocalName %]</span>
+			    </div>
+			    [% END %]
+
+			    [% IF EntityDetails.Email %]
+			    <div class="">
+				  	<span class="paddingsummary">[% Lang.txt('Email:') %]</span>
+				  	<span class="detail-value">[% EntityDetails.Email %]</span>
+			    </div>
+			    [% END %]
+
+			    [% IF EntityDetails.Website %]
+			    <div class="">
+				  	<span class="paddingsummary">[% Lang.txt('Website:') %]</span>
+				  	<span class="detail-value">[% EntityDetails.Website %]</span>
+			    </div>
+			    [% END %]
+
+			</div>
+		</div>
+
+		<div class="top-bottom-spacer">
+        
+        <div class="pull-right">
+            <p>[% Lang.txt('What would you like to do now?') %]</p>
+	            <p>
+	                <a href="main.cgi?client=[% TaskAction.client %]&amp;a=WF_VNA" title="" class="btn-main">[% Lang.txt('View next available task') %]</a>
+	                <a href="main.cgi?client=[% TaskAction.client %]&amp;a=C_HOME" title="" class="btn-main">[% Lang.txt('Go to your dashboard') %]</a>
+	            </p>
+            </div>
+        </div>
+	</div>
 </div>
