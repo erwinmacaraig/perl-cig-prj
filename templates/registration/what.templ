@@ -1,9 +1,10 @@
-<input type = "hidden" id = "selected_entityID" value = "[% entityID %]">
 <input type = "hidden" id = "originLevel" value = "[% originLevel %]">
 <input type = "hidden" id = "pID" value = "[% personID %]">
 <input type = "hidden" id = "rID" value = "[% realmID %]">
 <input type = "hidden" id = "srID" value = "[% realmSubTypeID %]">
 <input type = "hidden" id = "client" value = "[% client %]">
+<input type = "hidden" id = "eselect" value = "[% EntitySelection %]">
+<input type = "hidden" id = "defvalue_eId" value = "[% DefaultEntity %]">
 
 
 <!--We are moving this to the default.templ-->
@@ -30,10 +31,23 @@
         <p class = "existingReg"><a href = "#" class = "btn-inside-panels" id = "reset-btn">[% Lang.txt('Reset Registration') %]</a></p>
 [% END %]
         <p><span class="notice-error"><span class="compulsory">*</span>Required fields</span></p>
+
         <div class="form-group" id = "l_row_type">
             <label class="col-md-3 control-label txtright" for="l_type"><span class="compulsory">*</span>[% Lang.txt('Role') %]</label>
             <div class="col-md-9"><select name = "d_type" size = "1" id="l_type" data-type = "type" class = "fcToggleGroup"></select>[% IF existing.typeName %]<span class = "existingReg">[% existing.typeName %][% END %]</div>
         </div>
+[% IF EntitySelection %]
+        <div class="form-group" id = "l_row_type">
+            <label class="col-md-3 control-label txtright" for="l_etype"><span class="compulsory">*</span>[% Lang.txt('Organisation Type') %]</label>
+            <div class="col-md-9"><select name = "d_etype" size = "1" id="l_etype" data-type = "etype" class = "fcToggleGroup"></select>[% IF existing.etypeName %]<span class = "existingReg">[% existing.etypeName %][% END %]</div>
+        </div>
+        <div class="form-group" id = "l_row_type">
+            <label class="col-md-3 control-label txtright" for="l_type"><span class="compulsory">*</span>[% Lang.txt('Organisation') %]</label>
+            <div class="col-md-9"><select name = "d_eId" size = "1" id="l_eId" data-type = "eId" class = "fcToggleGroup"></select>[% IF existing.entityName %]<span class = "existingReg">[% existing.entityName %][% END %]</div>
+        </div>
+[% ELSE %]        
+<input type = "hidden" id = "l_eId" value = "[% entityID %]">
+[% END %]        
         <div class="form-group" id = "l_row_sport">
             <label class="col-md-3 control-label txtright" for="l_sport"><span class="compulsory">*</span>[% Lang.txt('Sport') %]</label>
             <div class="col-md-9"><select name = "d_sport" size = "1" id="l_sport" data-type = "sport" class = "fcToggleGroup"></select>[% IF existing.sportName %]<span class = "existingReg">[% existing.sportName %][% END %]</div>

@@ -33,6 +33,7 @@ sub main	{
     my $subRealmIN = param('sr') || 0;
     my $bulk= param('bulk') || 0;
     my $defaultType = param('dtype') || '';
+    my $etype = param('etype') || '';
 
     my %Data=();
     my $target='aj_person_registerwhat.cgi';
@@ -66,7 +67,10 @@ sub main	{
             $dob,
             $gender,
             $lookingFor,
-            $bulk
+            $bulk,
+            $etype,
+            getLastEntityLevel(\%clientValues),
+            getLastEntityID(\%clientValues),
         );
 	}
 

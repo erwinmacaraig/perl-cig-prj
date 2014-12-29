@@ -1,6 +1,7 @@
 function update_options(optionType, dtype)   {
     var qstring = '';
     qstring = qstring + '&dtype=' + dtype;
+    qstring = qstring + '&etype=' + jQuery('#l_etype').val();
     qstring = qstring + '&sp=' + jQuery('#l_sport').val();
     qstring = qstring + '&pt=' + jQuery('#l_type').val();
     qstring = qstring + '&per=' + jQuery('#l_role').val();
@@ -10,8 +11,9 @@ function update_options(optionType, dtype)   {
     qstring = qstring + '&ol=' + jQuery('#originLevel').val();
     qstring = qstring + '&r=' + jQuery('#rID').val();
     qstring = qstring + '&sr=' + jQuery('#srID').val();
-    qstring = qstring + '&eID=' + jQuery('#selected_entityID').val();
+    qstring = qstring + '&eID=' + jQuery('#l_eId').val();
     qstring = qstring + '&pID=' + jQuery('#pID').val();
+    qstring = qstring + '&client=' + jQuery('#client').val();
 
     if(optionType == 'complete')    {
       jQuery('#flow-btn-continue').show();
@@ -25,8 +27,10 @@ function update_options(optionType, dtype)   {
             chooseOption(data.options[0].value,optionType, data.options[0].name); 
           }
           else if(data.results > 1) {
+              var defValue = jQuery('#defvalue_' + optionType).val();
               jQuery.each( data.options, function( key, val ) {
-                items.push( '<option value = "' + val.value + '">' + val.name + '</option>' );
+                var selected = '';//(defValue && defValue == val.value) ? ' SELECTED ' : '';
+                items.push( '<option value = "' + val.value + '" ' + selected + '>' + val.name + '</option>' );
               });
               jQuery('#l_' + optionType ).html('<option />' + items.join(''));
               jQuery('#l_' + optionType ).fcToggle('rebuild');
@@ -45,14 +49,20 @@ function update_options(optionType, dtype)   {
 function chooseOption(val, optionType, name)  {
     jQuery('#l_' + optionType).val(val);
     var nextlayer = {
-        'type' : 'sport',
+        'type' : 'etype',
+        'etype' : 'eId',
+        'eId' : 'sport',
         'sport' : 'role',
         'role' : 'level',
         'level' : 'age',
         'age' : 'nature',
         'nature' : 'complete'
     };
-    update_options(nextlayer[optionType]);
+    var next = nextlayer[optionType];
+    if(next == 'etype' && jQuery('#eselect').val() == 0)    {
+        next = 'sport';
+    }
+    update_options(next);
 }
 
 jQuery('.regoptions').on('change','select',function(e) {
@@ -69,6 +79,12 @@ function clearBelow(optionType) {
 
     switch (optionType) {
         case 'type':
+            jQuery('#l_etype').html('');
+            jQuery('#l_etype').fcToggle('rebuild');
+        case 'etype':
+            jQuery('#l_eId').html('');
+            jQuery('#l_eId').fcToggle('rebuild');
+        case 'eId':
             jQuery('#l_sport').html('');
             jQuery('#l_sport').fcToggle('rebuild');
         case 'sport':
