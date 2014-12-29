@@ -537,7 +537,6 @@ sub display_registration {
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
     }
-        print STDERR "$personID PERSON IS : " . $self->{'ClientValues'}{'personID'};
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
@@ -558,6 +557,13 @@ sub display_registration {
     my $defaultRegistrationNature = $self->{'RunParams'}{'dnat'} || '';
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $entitySelection = $originLevel == $Defs::LEVEL_CLUB ? 0 : 1;
+    if(
+        $entitySelection 
+        and exists $self->{'SystemConfig'}{'maFlowEntitySelect'}
+        and $self->{'SystemConfig'}{'maFlowEntitySelect'} == 0
+    )   {
+        $entitySelection = 0;
+    }
     if($defaultRegistrationNature eq 'TRANSFER')   {
         $noContinueButton = 0;
         my %regFilter = (
@@ -665,6 +671,13 @@ sub process_registration {
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
     my $lang = $self->{'Lang'};
     my $entitySelection = $originLevel == $Defs::LEVEL_CLUB ? 0 : 1;
+    if(
+        $entitySelection 
+        and exists $self->{'SystemConfig'}{'maFlowEntitySelect'}
+        and $self->{'SystemConfig'}{'maFlowEntitySelect'} == 0
+    )   {
+        $entitySelection = 0;
+    }
     if($entitySelection)    {
         if($entitySelected and $entityTypeSelected) {
             $entityID = $entitySelected;
