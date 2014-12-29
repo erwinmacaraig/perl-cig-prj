@@ -54,6 +54,9 @@ use PersonCertifications;
 use EntitySummaryPanel;
 use PersonEntity;
 
+use SphinxUpdate;
+use InstanceOf;
+
 sub cleanTasks  {
 
     my ($Data, $personID, $entityID, $personRegistrationID, $ruleFor) = @_;
@@ -1330,6 +1333,9 @@ sub checkForOutstandingTasks {
                     
                     my $peID = doesOpenPEExist($Data, $personID, $ppref->{'intEntityID'}, \%PE);
                     addPERecord($Data, $personID, $ppref->{'intEntityID'}, \%PE) if (! $peID);
+
+                    my $personObject = getInstanceOf($Data, 'person',$personID);
+                    updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
                 }
                 # if check  pass call save
                 if($ppref->{'strPersonType'} eq 'PLAYER' and $Data->{'SystemConfig'}{'cleanPlayerPersonRecords'}) {
