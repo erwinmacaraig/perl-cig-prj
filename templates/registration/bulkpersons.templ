@@ -1,20 +1,25 @@
-<p>Please select the people you wish to register from the list below and click on the update button to commit your change.</p>
-    <script>
+<p>[% Lang.txt('Please select the people you wish to register from the list below and click on the update button to commit your change.') %]</p>
+<script>
+jQuery().ready(function() {
+    jQuery('#grid').on('change','.grid_chk',function(){
+        update_selected();
+    });
     function update_selected()    {
-        var rows = grid_grid.getSelectedRows();
         var changedIDs = [];
-        for(var i=0, len=rows.length; i < len; i++){
-            changedIDs.push(dataView_grid.getItem(rows[i]).id);
-        }
+        jQuery('.chk_intPersonID:checked').each(function()  {
+                var v = jQuery(this).val();
+                changedIDs.push(jQuery(this).val());
+        });
         jQuery('#rolloverIDs').val(changedIDs.join('|'));
     }
-    </script>
-    <input type="hidden" name="rolloverIDs" value="" id = "rolloverIDs">
+});
+</script>
+<input type="hidden" name="roIds" value="" id = "rolloverIDs">
 
 [% FOREACH h IN  hidden_ref %]
 <input type="hidden" name="[% h.key %]" value="[% h.value %]">
 [% END %]
-    <br>
-    [% grid %]
+<br>
+[% grid %]
 
 
