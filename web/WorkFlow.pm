@@ -2608,11 +2608,15 @@ sub populateDocumentViewData {
 			addPersonItem.intRequired as personRequired,
 			addPersonItem.intItemID as personItemID,
 			entityItem.intRequired as EntityRequired,
-            entityItem.intItemID as entityItemID
+            entityItem.intItemID as entityItemID,
+            E.intEntityID as DocoEntityID,
+            E.intEntityLevel as DocoEntityLevel,
+            dt.strLockAtLevel 
         FROM tblWFRuleDocuments AS rd
         INNER JOIN tblWFTask AS wt ON (wt.intWFRuleID = rd.intWFRuleID)
         INNER JOIN tblWFRule as wr ON (wr.intWFRuleID = wt.intWFRuleID)
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (pr.intPersonRegistrationID = wt.intPersonRegistrationID)
+        LEFT JOIN tblEntity as E ON (E.intEntityID=pr.intEntityID)
         LEFT JOIN tblRegistrationItem as addPersonItem
             ON (
                 addPersonItem.strItemType = 'DOCUMENT'
@@ -2805,6 +2809,13 @@ sub populateDocumentViewData {
 
            	$viewLink = qq[ <span style="position: relative"> 
 <a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$Data->{'client'}&amp;a=$action');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];			
+        }
+
+        if($tdref->{'strLockAtLevel'})   {
+            if($tdref->{'strLockAtLevel'} =~ /\|$Data->{'clientValues'}{'authLevel'}\|/ and getLastEntityID($Data->{'clientValues'}) != $tdref->{'DocoEntityID'}){
+                $displayView=0;
+                $displayReplace=0;
+            }
         }
 		
         my %documents = (

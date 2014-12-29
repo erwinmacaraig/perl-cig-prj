@@ -462,21 +462,28 @@ my @headers = (
     				$replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intUploadFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a>];	
 
 				}
-				else{
-					my @authorizedLevelsArr = split(/\|/,$regodoc->{'strLockAtLevel'});
-					#check level of the owner
-					my $ownerlevel = $obj->getValue('intEntityLevel');					
-					$viewLink = qq[ <button class\"HTdisabled\">]. $lang->txt('View') . q[</button>];    
-                	$replaceLink =   qq[ <button class\"HTdisabled\">]. $lang->txt('Replace File'). q[</button>];
-
-					if(grep(/^$myCurrentLevelValue/,@authorizedLevelsArr) && $myCurrentLevelValue >  $ownerlevel ){
-
-    					$viewLink = qq[ <a class="btn-main btn-view-replace" href="#" onclick="docViewer($regodoc->{'intUploadFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a></span>];
-
-        				$replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intUploadFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a>];	
-
-					}									
-				}
+			#	else{
+					#my @authorizedLevelsArr = split(/\|/,$regodoc->{'strLockAtLevel'});
+					##check level of the owner
+					#my $ownerlevel = $obj->getValue('intEntityLevel');					
+					#$viewLink = qq[ <button class\"HTdisabled\">]. $lang->txt('View') . q[</button>];    
+                	#$replaceLink =   qq[ <button class\"HTdisabled\">]. $lang->txt('Replace File'). q[</button>];
+#
+#					if(grep(/^$myCurrentLevelValue/,@authorizedLevelsArr) && $myCurrentLevelValue >  $ownerlevel ){
+#
+#    					$viewLink = qq[ <a class="btn-main btn-view-replace" href="#" onclick="docViewer($regodoc->{'intUploadFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a></span>];
+#
+#        				$replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intUploadFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a>];	
+#
+#					}									
+                    
+        if($regodoc->{'strLockAtLevel'})   {
+            if($regodoc->{'strLockAtLevel'} =~ /\|$Data->{'clientValues'}{'authLevel'}\|/ and getLastEntityID($Data->{'clientValues'}) != $regodoc->{'DocoEntityID'}){
+                    $viewLink = qq[ <button class\"HTdisabled\">]. $Data->{'lang'}->txt('View') . q[</button>];
+                    $replaceLink =   qq[ <button class\"HTdisabled\">]. $Data->{'lang'}->txt('Replace File'). q[</button>];
+            }
+        }
+		#		}
 				push @rowdata, {
 	       			id => $regodoc->{'intUploadFileID'} || 0,
 	        		#oldSelectLink => $fileLink,

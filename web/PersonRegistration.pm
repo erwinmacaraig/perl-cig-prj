@@ -717,6 +717,8 @@ sub getRegistrationData	{
 	    t.strOrigFilename,
 	    t.DateUploaded,
 	    t.intPersonRegistrationID,
+        t.intEntityID as DocoEntityID,
+        t.intEntityLevel as DocoEntityLevel,
 	    D.strDocumentName,			
 	    RI.intID,
             RI.intRequired,
@@ -728,9 +730,10 @@ sub getRegistrationData	{
 			LEFT JOIN tblDocumentType as D ON (intDocumentTypeID = RI.intID and strItemType='DOCUMENT')
 			LEFT JOIN (
 				SELECT intDocumentTypeID, strApprovalStatus, intUploadFileID, strOrigFilename, dtUploaded as DateUploaded,
-				pr.intPersonRegistrationID FROM tblDocuments 
-				INNER JOIN tblUploadedFiles  ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID 
-				INNER JOIN tblPersonRegistration_$Data->{'Realm'}  as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID 
+				pr.intPersonRegistrationID, E.intEntityID, E.intEntityLevel FROM tblDocuments 
+				INNER JOIN tblUploadedFiles  ON (tblUploadedFiles.intFileID = tblDocuments.intUploadFileID )
+				INNER JOIN tblPersonRegistration_$Data->{'Realm'}  as pr ON (pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID )
+                LEFT JOIN tblEntity as E ON (E.intEntityID=pr.intEntityID)
 				WHERE pr.intPersonID = $personID
 				AND pr.intPersonRegistrationID = $dref->{intPersonRegistrationID}
 			) as t ON t.intDocumentTypeID = RI.intID 
@@ -754,7 +757,6 @@ sub getRegistrationData	{
 ];		
             #AND RI.intEntityLevel IN (0, $myCurrentLevelValue)
             #AND RI.intOriginLevel = $Data->{'clientValues'}{'authLevel'}
-
 
 		my $sth = $Data->{'db'}->prepare($sql);
 		$sth->execute();

@@ -125,22 +125,6 @@ sub showPersonHome	{
         SummaryPanel => personSummaryPanel($Data, $personID) || '',
 	);
 	
-	my @validdocsforallrego = ();
-	my %validdocs = ();
-	my $query = qq[SELECT tblDocuments.intDocumentTypeID, tblDocuments.intUploadFileID FROM tblDocuments INNER JOIN tblDocumentType
-				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
-				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
-				WHERE strApprovalStatus = 'APPROVED' AND intPersonID = ? AND 
-                    tblRegistrationItem.intRealmID=? AND
-                    tblRegistrationItem.strItemType='DOCUMENT' AND
-				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
-				GROUP BY intDocumentTypeID];
-	my $sth = $Data->{'db'}->prepare($query);
-	$sth->execute($personID, $Data->{'Realm'});
-	while(my $dref = $sth->fetchrow_hashref()){
-		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
-		$validdocs{$dref->{'intDocumentTypeID'}} = $dref->{'intUploadFileID'};
-	}
     my %RegFilters=();
     #$RegFilters{'current'} = 1;
     my @statusIN = ($Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE); #, $Defs::PERSONREGO_STATUS_TRANSFERRED, $Defs::PERSONREGO_STATUS_SUSPENDED);
@@ -163,6 +147,50 @@ sub showPersonHome	{
 		my $displayView = 0;
 		my $displayAdd = 0;
 		my $displayReplace = 0;
+
+#BAFF
+	    my @validdocsforallrego = ();
+	    my %validdocs = ();
+	    my $query = qq[
+            SELECT 
+                tblDocuments.intDocumentTypeID, 
+                tblDocuments.intUploadFileID 
+            FROM 
+                tblDocuments 
+                INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID) 
+                INNER JOIN tblRegistrationItem ON (tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID )
+            WHERE 
+                strApprovalStatus IN ('PENDING', 'APPROVED') 
+                AND intPersonID = ? 
+                AND tblRegistrationItem.intRealmID=? 
+                AND tblRegistrationItem.strItemType='DOCUMENT' 
+                AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+                AND tblRegistrationItem.strPersonType IN ('', ?)
+                AND tblRegistrationItem.strRegistrationNature IN ('', ?)
+                AND tblRegistrationItem.strAgeLevel IN ('', ?)
+                AND tblRegistrationItem.strPersonLevel IN ('', ?)
+                AND tblRegistrationItem.intOriginLevel = ?
+                AND tblRegistrationItem.intEntityLevel = ?
+            GROUP BY intDocumentTypeID
+    ];
+	my $sth = $Data->{'db'}->prepare($query);
+	$sth->execute(
+        $personID, 
+        $Data->{'Realm'},
+        $rego->{'strPersonType'} || '',
+        $rego->{'strRegistrationNature'} || '',
+        $rego->{'strAgeLevel'} || '',
+        $rego->{'strPersonLevel'} || '',
+        $rego->{'intOriginLevel'}, 
+        $rego->{'intEntityLevel'}, 
+    );
+	while(my $dref = $sth->fetchrow_hashref()){
+		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
+		$validdocs{$dref->{'intDocumentTypeID'}} = $dref->{'intUploadFileID'};
+	}
+
+
+
 		foreach $doc (@{$rego->{'documents'}}) {			
 			$displayAdd = 0;
 			$fileID = 0;
@@ -173,7 +201,6 @@ sub showPersonHome	{
 					$displayAdd = 1; 
 					$fileID = 0;
 					if($doc->{'Required'}){				
-						#$documentStatusCount{'MISSING'}++;
 						$status = 'MISSING';
 					}
 					else {
@@ -183,13 +210,11 @@ sub showPersonHome	{
 				}
 				elsif(grep /$doc->{'intDocumentTypeID'}/,@validdocsforallrego){
 					$status = 'APPROVED';
-					#$documentStatusCount{'APPROVED'}++;
 					$fileID = $validdocs{$doc->{'intDocumentTypeID'}};
 				}
 			
 			}
 			else{
-				#$documentStatusCount{$tdref->{'strApprovalStatus'}}++;
 				$displayReplace = 1;
 				$displayAdd = 0;
 				$doc->{'intUploadFileID'} ? $fileID = $doc->{'intUploadFileID'} : 0;
@@ -208,6 +233,15 @@ sub showPersonHome	{
         }
 		$replaceLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="replaceFile($fileID,'$parameters','$documentName','');return false;">]. $Data->{'lang'}->txt('Replace') . q[</a></span>];
 		$addLink = qq[ <a href="#" class="btn-inside-docs-panel" onclick="replaceFile(0,'$parameters','$documentName','');return false;">]. $Data->{'lang'}->txt('Add') . q[</a>] if (!$Data->{'ReadOnlyLogin'});
+
+        if($doc->{'strLockAtLevel'})   {
+            if($doc->{'strLockAtLevel'} =~ /\|$Data->{'clientValues'}{'authLevel'}\|/ and getLastEntityID($Data->{'clientValues'}) != $doc->{'DocoEntityID'}){ 
+                    $viewLink = qq[ <button class\"HTdisabled\">]. $Data->{'lang'}->txt('View') . q[</button>];
+                    $replaceLink =   qq[ <button class\"HTdisabled\">]. $Data->{'lang'}->txt('Replace File'). q[</button>];
+            }
+        }
+
+
 
 		#push @alldocs, { . " - $rego->{intPersonRegistrationID} "
 		push @{$rego->{'alldocs'}},{
