@@ -1075,6 +1075,13 @@ sub display_documents {
         $rego_ref->{'Nationality'} = $nationality;
         $rego_ref->{'InternationalTransfer'} = $itc;
 
+     if (! $regoID or ! $personID)  {
+        my $lang = $self->{'Data'}{'lang'};
+        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Registration failed, cannot find registration.");
+        $self->setCurrentProcessIndex('r');
+        return ('',2);
+    }
+
         $content = displayRegoFlowDocuments(
             $self->{'Data'}, 
             $regoID, 
@@ -1145,6 +1152,12 @@ sub process_documents {
         $rego_ref->{'InternationalTransfer'} = $itc;
     }
 
+     if (! $regoID or ! $personID)  {
+        my $lang = $self->{'Data'}{'lang'};
+        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Registration failed, cannot find registration.");
+        $self->setCurrentProcessIndex('r');
+        return ('',2);
+    }
     #check for uploaded document
     my ($error_message, $isRequiredDocPresent) = checkUploadedRegoDocuments($self->{'Data'}, 
             $regoID, 
