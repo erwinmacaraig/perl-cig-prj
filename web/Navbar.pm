@@ -161,10 +161,6 @@ sub getEntityMenuData {
             name => $lang->txt('Advanced Search'),
             url => $baseurl."a=SEARCH_F",
         },
-        reports => {
-            name => $lang->txt('Reports'),
-            url => $baseurl."a=REP_SETUP",
-        },
         home => {
             name => $lang->txt('Dashboard'),
             url => $baseurl."a=E_HOME",
@@ -172,6 +168,12 @@ sub getEntityMenuData {
     );
     if($currentLevel != $Data->{'clientValues'}{'authLevel'})   {
         delete($menuoptions{'home'});
+    }
+    if($SystemConfig->{'allowReports'})  {
+        $menuoptions{'reports'} = {
+            name => $lang->txt('Reports'),
+            url => $baseurl."a=REP_SETUP",
+        };
     }
     if(exists $children->{$Defs::LEVEL_STATE})    {
         $menuoptions{'states'} = {
@@ -477,8 +479,8 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
         'auditlog',
         'optin',
         ]],
+        [ $lang->txt('Reports'), 'menu',[ 'reports', ]],
     );
-        #[ $lang->txt('Reports'), 'menu',[ 'reports', ]],
 
     my $menudata = processmenudata(\%menuoptions, \@menu_structure);
     return $menudata;
@@ -515,10 +517,6 @@ sub getClubMenuData {
             name => $lang->txt('Advanced Search'),
             url => $baseurl."a=SEARCH_F",
         },
-        reports => {
-            name => $lang->txt('Reports'),
-            url => $baseurl."a=REP_SETUP",
-        },
         home => {
             name => $lang->txt('Dashboard'),
             url => $baseurl."a=C_HOME",
@@ -528,6 +526,12 @@ sub getClubMenuData {
             url => $baseurl."a=P_L&amp;l=$Defs::LEVEL_PERSON",
         },
     );
+    if($SystemConfig->{'allowReports'})  {
+        $menuoptions{'reports'} = {
+            name => $lang->txt('Reports'),
+            url => $baseurl."a=REP_SETUP",
+        };
+    }
     if($SystemConfig->{'allowVenues'})  {
         $menuoptions{'venues'} = {
             name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}),
@@ -844,8 +848,8 @@ sub getClubMenuData {
         'mrt_admin',
         'auditlog',
         ]],
+        [ $lang->txt('Reports'), 'menu',[ 'reports', ]],
     );
-        #[ $lang->txt('Reports'), 'menu',[ 'reports', ]],
 
     my $menudata = processmenudata(\%menuoptions, \@menu_structure);
     return $menudata;
