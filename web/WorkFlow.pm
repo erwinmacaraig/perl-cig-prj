@@ -3046,8 +3046,8 @@ sub viewSummaryPage {
 
     my $c = Countries::getISOCountriesHash();
 
-    open FH, ">dumpfile.txt";
-    print FH "Group DataL \n\n" . Dumper($task) . "\n";
+    #open FH, ">dumpfile.txt";
+    #print FH "Group DataL \n\n" . Dumper($task) . "\n";
 
     switch($task->{'strWFRuleFor'}) {
         case 'REGO' {
