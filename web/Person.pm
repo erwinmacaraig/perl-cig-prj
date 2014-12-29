@@ -440,8 +440,6 @@ my @headers = (
                         AND tblRegistrationItem.strRegistrationNature IN ('', ?)
                         AND tblRegistrationItem.strAgeLevel IN ('', ?)
                         AND tblRegistrationItem.strPersonLevel IN ('', ?)
-                        AND tblRegistrationItem.intOriginLevel = ?
-                        AND tblRegistrationItem.intEntityLevel = ?
                 ];
 
 			   my $sth = $db->prepare($query); 
@@ -454,8 +452,6 @@ my @headers = (
                 $registration->{'strRegistrationNature'} || '',
                 $registration->{'strAgeLevel'} || '',
                 $registration->{'strPersonLevel'} || '',
-                $registration->{'intOriginLevel'},
-                $registration->{'intEntityLevel'},
                );
             
 			   my $dref = $sth->fetchrow_hashref(); 
