@@ -146,8 +146,14 @@ sub displayRegoFlowSummaryBulk  {
     #        last;	
     #    }
     #}
-    my $role_ref = getEntityTypeRoles($Data, $rego_ref->{'strSport'}, $rego_ref->{'strPersonType'});
-    $rego_ref->{'roleName'} = $role_ref->{$rego_ref->{'strPersonEntityRole'}};
+    my $role_ref = getEntityTypeRoles($Data, $hidden_ref->{'d_sport'}, $hidden_ref->{'d_type'});
+    $rego_ref->{'roleName'} = $role_ref->{$hidden_ref->{'d_role'}};
+
+    $rego_ref->{'Sport'} = $Defs::sportType{$hidden_ref->{'d_sport'}} || '';
+    $rego_ref->{'PersonType'} = $Defs::personType{$hidden_ref->{'d_type'}} || '';
+    $rego_ref->{'PersonLevel'} = $Defs::personLevel{$hidden_ref->{'d_level'}} || '';
+    $rego_ref->{'AgeLevel'} = $Defs::ageLevel{$hidden_ref->{'d_age'}} || '';
+    $rego_ref->{'RegistrationNature'} = $Defs::registrationNature{$hidden_ref->{'d_nat'}} || '';
 
     my $editlink =  $Data->{'target'}."?".$carryString;
     my %PageData = (
