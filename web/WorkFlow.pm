@@ -1076,6 +1076,9 @@ sub approveTask {
             PersonRequest::setRequestStatus($Data, $personRequestID, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
         }
     }
+    elsif($personRequestID and $registrationNature eq $Defs::REGISTRATION_NATURE_NEW) {
+        PersonRequest::setRequestStatus($Data, $personRequestID, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+    }
 
    	my $rc = checkForOutstandingTasks($Data,$ruleFor, $taskType, $entityID, $personID, $personRegistrationID, $documentID);
 
@@ -1884,6 +1887,9 @@ sub rejectTask {
         if($Data->{'clientValues'}{'currentLevel'} eq $Defs::LEVEL_NATIONAL) {
             PersonRequest::setRequestStatus($Data, $task->{'intPersonRequestID'}, $Defs::PERSON_REQUEST_STATUS_REJECTED);
         }
+    }
+    elsif($task->{'intPersonRequestID'} and $task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_NEW) {
+        PersonRequest::setRequestStatus($Data, $task->{'intPersonRequestID'}, $Defs::PERSON_REQUEST_STATUS_REJECTED);
     }
 
     return getNotificationMessage($Data, $task, 'REJECT');
