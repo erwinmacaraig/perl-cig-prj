@@ -349,7 +349,8 @@ sub listTasks {
             t.strTaskNotes as TaskNotes,
             t.intOnHold as OnHold,
             preqFrom.strLocalName as preqFromClub,
-            preqTo.strLocalName as preqToClub
+            preqTo.strLocalName as preqToClub,
+            IF(t.strWFRuleFor = 'ENTITY', e.intCreatedByEntityID, IF(t.strWFRuleFor = 'REGO', pr.intOriginID, 0)) as CreatedByEntityID
 	    FROM tblWFTask AS t
                 LEFT JOIN tblEntity as e ON (e.intEntityID = t.intEntityID)
 		LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (t.intPersonRegistrationID = pr.intPersonRegistrationID)
@@ -408,20 +409,23 @@ sub listTasks {
     my $client = unescape($Data->{client});
     my $taskTypeLabel = "";
 	while(my $dref= $q->fetchrow_hashref()) {
-        #print STDERR Dumper $dref;
+        #FC-409 - don't include in list of taskStatus = REJECTED
+        next if ($dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_REJECTED);
+
+        #F-609 - list in dashboard if ON-HOLD and created by == approval entity
+        next if (
+            $dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_HOLD
+            and $dref->{'intApprovalEntityID'} == $entityID
+            and ($dref->{'CreatedByEntityID'} != $entityID)
+        );
+
+        #moved checking of POSSIBLE_DUPLICATE here (if included in query, tasks for ENTITY are not capture)
+        next if ($dref->{intSystemStatus} eq $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE and $dref->{strWFRuleFor} ne $Defs::WF_RULEFOR_PERSON);
+
         my $newTask = ($dref->{'taskTimeStamp'} >= $lastLoginTimeStamp) ? 1 : 0; #additional check if tTimeStamp > currentTimeStamp
         $taskCounts{$dref->{'strTaskStatus'}}++;
         $taskCounts{$dref->{'strRegistrationNature'}}++;
         $taskCounts{"newTasks"}++ if $newTask;
-
-        #FC-409 - don't include in list of taskStatus = REJECTED
-        next if ($dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_REJECTED);
-
-        #F-409 - skip if strTaskStatus = HOLD and approvalEntityID = current entity
-        next if ($dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_HOLD and $dref->{'intApprovalEntityID'} == $entityID);
-
-        #moved checking of POSSIBLE_DUPLICATE here (if included in query, tasks for ENTITY are not capture)
-        next if ($dref->{intSystemStatus} eq $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE and $dref->{strWFRuleFor} ne $Defs::WF_RULEFOR_PERSON);
 
         my %tempClientValues = getClient($client);
 		$rowCount ++;
