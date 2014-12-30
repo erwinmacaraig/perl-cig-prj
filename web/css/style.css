@@ -1081,10 +1081,11 @@ span.move a {
   #ROallfields{
     width:250px;
   }
-  #ROallfields .connectedSortable li { 
+  #ROallfields ul { 
+    padding: 0 0 10px;
+  }
+  #ROallfields li { 
     margin: 0;
-    padding: 1px;
-    font-size: 0.9em;
   }
   #ROallfields-wrapper {
     float:left;
@@ -1141,6 +1142,13 @@ span.move a {
 	.RO_report_name	{
 		white-space:nowrap;
 	}
+  .RO_fieldnameblock {
+    vertical-align:middle;
+  }
+  .RO_fieldnameblock label{
+    padding:2px 5px;
+    margin:0px;
+  }
 
 .reportitem	{
 	width:250px;

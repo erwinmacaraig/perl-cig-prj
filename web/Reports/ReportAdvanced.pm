@@ -263,10 +263,10 @@ sub displayOptions {
 		my $removetxt = $lang->txt('Remove');
 		$comp_options = qq[<label for ="f_chk_$field_name">$filterlabel :</label> $comp_options] if $comp_options;
    	my $fieldblock =qq[
-      <div class="RO_fieldblock" id="fld_$field_name">
+      <div class="RO_fieldblock" id="fld_$field_name" style = "display:none;">
 				<div class="RO_remove">
-					<a href="" onclick="removefield('fld_$field_name'); return false;"><img src="images/report_field_remove.png" alt="$removetxt"></a>
-					<a href="" onclick="removefield('fld_$field_name'); return false;">$removetxt</a> 
+					<a href="" onclick="removefield('$field_name'); return false;"><img src="images/report_field_remove.png" alt="$removetxt"></a>
+					<a href="" onclick="removefield('$field_name'); return false;">$removetxt</a> 
 				</div>
 					<div class="RO_fielddisplay"><input type="checkbox" name="f_chk_$field_name" value="1" class="ROnb" id="f_chk_$field_name" checked title="$displaylabel"></div>
 				<div class="RO_fieldname $nclass">$displayname$fonlytext</div>
@@ -277,7 +277,12 @@ sub displayOptions {
 				<div class="RO_fieldblockbottom"></div>
       </div>
     ];
-		push @{$groupdata{$optiongroup}}, [$field_name, $fieldblock];
+   	my $nameblock =qq[
+      <div class="RO_fieldnameblock" id="fldname_$field_name">
+            <input type="checkbox" name="f_chk_$field_name" value="1" class="ROnb fieldcheck" data-fieldname = "$field_name" id="f_namechk_$field_name" title="$displaylabel"><label for = "f_namechk_$field_name">$displayname$fonlytext</label>
+      </div>
+    ];
+	push @{$groupdata{$optiongroup}}, [$field_name, $fieldblock, $nameblock];
     if(exists $options->{'allowsort'} and $options->{'allowsort'})  {
       push @sort, $field_name;
     }
@@ -287,17 +292,19 @@ sub displayOptions {
   }
 
   my $allfields ='';
+  my $outputfields = '';
 	for my $group (@groupingorder)	{
 		my $grpdata = '';
 		for my $i (@{$groupdata{$group}})	{
-			$grpdata .= qq[<li class="fieldblock-li">$i->[1]</li>] || '';
+			$grpdata .= qq[<li class="fieldblock-li">$i->[2]</li>] || '';
+			$outputfields .= $i->[1] || '';
 		}
 		my $groupname = $lang->txt($self->{'Config'}->{'OptionGroups'}{$group}[0]);
 		if($grpdata)	{
 			$allfields .= qq[
 				<h3><a href="#">$groupname</a></h3>
 				<div>
-					<ul class="connectedSortable" id="fieldgrouping_$group">
+					<ul class="" id="fieldgrouping_$group">
 						$grpdata
 					</ul>
 				</div>	
@@ -499,7 +506,7 @@ sub displayOptions {
 				<div id = "ROselectedfields-wrapper">
 					<h3>Selected Fields</h3><br>
 					<div id = "ROselectedfields">
-						<ul class="connectedSortable" id="ROselectedfields-list"> </ul>
+						<ul class="connectedSortable" id="ROselectedfields-list"> $outputfields</ul>
 					</div>
 				</div>
 					$returnstr

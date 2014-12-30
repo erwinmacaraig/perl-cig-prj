@@ -17,7 +17,7 @@ jQuery(function() {
 	}).sortable("option", "connectWith", '.connectedSortable');
 	jQuery("#reportform").submit(function () {
 		 var activefields = [];
-		 jQuery('#ROselectedfields .RO_fieldblock').each(function() {
+		 jQuery('#ROselectedfields .RO_fieldblock:visible').each(function() {
 			 activefields.push(jQuery(this).attr('id'));
 		 })
 		 jQuery('#ROselectedfieldlist').val(activefields.join(','));
@@ -29,6 +29,10 @@ jQuery(function() {
 	$(".dateinput").datepicker({ dateFormat: 'dd/mm/yy', autoSize: true, changeMonth: true, changeYear: true, yearRange: '1900:2020'});
 	$(".timeinput").timepicker({ dateFormat: 'dd/mm/yy', autoSize: true, changeMonth: true, changeYear: true, yearRange: '1900:2020'});
 	$(".datetimeinput").datetimepicker({minDate: '01/01/1900', maxDate: '01/01/2020'});
+    jQuery('#ROallfields').on('change','.fieldcheck',function()  {
+        var fieldname = jQuery(this).attr('data-fieldname');
+        jQuery('#fld_' + fieldname).toggle();
+    });
 });
 
 function applyDropDownExtra(selector) {
@@ -65,10 +69,8 @@ function displaybox(fieldname, nodropdownextra)  {
 }
 
 function removefield (liID)	{
-	var node = jQuery('#' + liID);
-	var parent = node.parent();
-	var newparent = node.data('parent');
-	parent.appendTo('#' + newparent);
+	jQuery('#fld_' + liID).hide();
+	jQuery('#f_namechk_' + liID).attr('checked',false);
 }
 
 function loadSaved ()	{
@@ -84,12 +86,14 @@ function loadSaved ()	{
 	var jsonfields = JSONobj.fields;
 	jQuery.each(jsonfields, function(index, row) {
 		var fieldname = row.name;
-		var field = jQuery('#fld_' + fieldname);
-		var fieldparent = field.parent();
-		var grandparent = fieldparent.parent();
-		var grandparent2 = grandparent.attr("id");
-		field.data('parent',grandparent.attr("id"));
-		fieldparent.appendTo('#ROselectedfields-list');
+        jQuery('#f_namechk_' + fieldname).prop('checked',true);
+        jQuery('#fld_' + fieldname).toggle();
+		//var field = jQuery('#fld_' + fieldname);
+		//var fieldparent = field.parent();
+		//var grandparent = fieldparent.parent();
+		//var grandparent2 = grandparent.attr("id");
+		//field.data('parent',grandparent.attr("id"));
+		//fieldparent.appendTo('#ROselectedfields-list');
 		if(row.comp)	{
 			var id = '#fid_comp_' + fieldname;
 			jQuery(id).val(row.comp);
