@@ -265,8 +265,7 @@ sub displayOptions {
    	my $fieldblock =qq[
       <div class="RO_fieldblock" id="fld_$field_name" style = "display:none;">
 				<div class="RO_remove">
-					<a href="" onclick="removefield('$field_name'); return false;"><img src="images/report_field_remove.png" alt="$removetxt"></a>
-					<a href="" onclick="removefield('$field_name'); return false;">$removetxt</a> 
+					<a href="" onclick="removefield('$field_name'); return false;"><span class ="fa fa-close"></span></a> 
 				</div>
 					<div class="RO_fielddisplay"><input type="checkbox" name="f_chk_$field_name" value="1" class="ROnb" id="f_chk_$field_name" checked title="$displaylabel"></div>
 				<div class="RO_fieldname $nclass">$displayname$fonlytext</div>
@@ -318,7 +317,7 @@ sub displayOptions {
 				$self->{'Config'}->{'Config'}{'RunButtonLabel'}
 		);
 		$returnstr.=qq[
-			<div class="ROrunButton"><input type="submit" value="$run_button_label" class="button proceed-button ROButRun"></div>
+			<div class="ROrunButton"><input type="submit" value="$run_button_label" class="btn-main ROButRun"></div>
 		];
 	}
   if (
@@ -348,7 +347,8 @@ sub displayOptions {
 
 		$returnstr.=qq[
 			<div class="ROoptionblock">
-				<div class="ROoptionblock-header">$options_header</div>
+                <h3 class = "panel-header ROoptionblock-header">$options_header</h3>
+                <div class = "panel-body">
 				<table>
 						<tr>
 								<td>$show_label</td>
@@ -426,13 +426,13 @@ sub displayOptions {
     </tr>
     ];
   }
-  $returnstr.='</table></div>';
+  $returnstr.='</table></div></div><br>';
 
   if($self->{'Config'}->{'Config'}{'EmailExport'})  {
     $returnstr.=qq[
       <div class="ROoptionblock">
-          <div class="ROoptionblock-header">Report Output</div>
-        <div style="">
+        <h3 class = "panel-header ROoptionblock-header">].$lang->txt('Report Output').qq[</h3>
+        <div class = "panel-body">
           Choose how you want to receive the data from this report.
 
           <div style="padding:5px;">
@@ -453,7 +453,7 @@ sub displayOptions {
     ];
   }
   $returnstr.=qq[
-      <div class="ROrunButton"><input type="submit" value="$self->{'Config'}->{'Config'}{'RunButtonLabel'}" class="button proceed-button ROButRun"></div>
+      <div class="ROrunButton"><input type="submit" value="$self->{'Config'}->{'Config'}{'RunButtonLabel'}" class="btn-main ROButRun"></div>
   ] if $self->{'Config'}->{'Config'}{'RunButtonLabel'};
   if($returnstr)  {
 		my $carryfields = '';
@@ -503,8 +503,8 @@ sub displayOptions {
 				$preblock_beforeform
 			<form action = "$self->{'Data'}{'target'}" method="POST" id="reportform">
 				$preblock
-				<div id = "ROselectedfields-wrapper">
-					<h3>Selected Fields</h3><br>
+                <h3 class = "panel-header">Selected Fields</h3>
+				<div id = "ROselectedfields-wrapper" class = "panel-body">
 					<div id = "ROselectedfields">
 						<ul class="connectedSortable" id="ROselectedfields-list"> $outputfields</ul>
 					</div>
@@ -1072,6 +1072,7 @@ sub SavedReportBlock	{
 	my $self = shift;
 	my $db = $self->{'db'};
 	my $id = $self->{'ID'} || 0;
+	my $lang = $self->{'Lang'};
 
 	my $options = $self->_getSavedReportList();
 	my $editbutton = q[<input type="submit" name="RO_SR_load" value="Edit" class="button-small generic-button">];
@@ -1111,14 +1112,16 @@ sub SavedReportBlock	{
     </script>
 		].qq[
 		<div class="ROoptionblock">
-			<div class="ROoptionblock-header">Saved Reports</div>
-			$options
-			$runbutton
-			$editbutton
-			<input type="submit" name="RO_SR_savebut" value="Save" id="ROSaveButton" class="button-small generic-button">
-			<input type="hidden" name="RO_SR_save" value="0" id="ROSaveButtonVal">
-			<input type="hidden" name="RO_NewReportName" value="" id="RO_NewReportNameID">
-			$delbutton
+			<h3 class="panel-header ROoptionblock-header">].$lang->txt('Saved Reports').qq[</h3>
+			<div class="panel-body">
+                $options
+                $runbutton
+                $editbutton
+                <input type="submit" name="RO_SR_savebut" value="Save" id="ROSaveButton" class="button-small generic-button">
+                <input type="hidden" name="RO_SR_save" value="0" id="ROSaveButtonVal">
+                <input type="hidden" name="RO_NewReportName" value="" id="RO_NewReportNameID">
+                $delbutton
+            </div>
 		</div>
 		<div id="ROsavedialog" style="display:none;">
 		<br><br>
