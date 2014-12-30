@@ -426,13 +426,10 @@ sub displayOptions {
     </tr>
     ];
   }
-  $returnstr.='</table></div></div><br>';
-
+  $returnstr.='</table>';
   if($self->{'Config'}->{'Config'}{'EmailExport'})  {
-    $returnstr.=qq[
-      <div class="ROoptionblock">
-        <h3 class = "panel-header ROoptionblock-header">].$lang->txt('Report Output').qq[</h3>
-        <div class = "panel-body">
+    $returnstr .= qq[
+        <h4 class = "sectionHeader">Output</h4>
           Choose how you want to receive the data from this report.
 
           <div style="padding:5px;">
@@ -448,10 +445,9 @@ sub displayOptions {
               <b>Email Address</b> <input type="text" size="45" name="RO_OutputEmail">
             </div>
           </div>
-      </div>
-      </div>
     ];
   }
+  $returnstr .='</div></div><br>';
   $returnstr.=qq[
       <div class="ROrunButton"><input type="submit" value="$self->{'Config'}->{'Config'}{'RunButtonLabel'}" class="btn-main ROButRun"></div>
   ] if $self->{'Config'}->{'Config'}{'RunButtonLabel'};

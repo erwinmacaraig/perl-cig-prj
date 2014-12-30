@@ -250,17 +250,13 @@ body.report h1	{
 	margin-bottom:10px;
 	margin-left:auto;
 	margin-right:auto;
-	width: auto;
 }
 
 .report-table thead,
 	.report-table tfoot,	
 	 .report-wrapper table.listTable thead {
-	background-color: #1e4763;
-	border-bottom:5px solid #fff;
-	-moz-border-radius: 5px;
-	border-radius: 5px;
-	border-bottom:5px solid #fff;
+    background: #d8d8d8;
+    border: 1px solid #ccc;
 }
 
 .report-numrows	{
@@ -272,9 +268,8 @@ body.report h1	{
 
 .report-table th,
 	 .report-wrapper table.listTable th {
-  background: none repeat scroll 0 0 #1E4763;
 	font-size:9px;
-	color: #fff;
+	color: #000;
 	padding:5px;
 }
 .report-table td,
@@ -3144,9 +3139,6 @@ body.report h1 {
 .ROoptionblock-header {
 }
 
-#ROselectedfields .RO_fieldname {
-	font-weight: normal;
-}
 #ROselectedfields .panel-body img{
     margin:auto;
 }
