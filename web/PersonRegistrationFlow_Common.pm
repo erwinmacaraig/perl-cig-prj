@@ -155,6 +155,12 @@ sub displayRegoFlowSummaryBulk  {
     $rego_ref->{'AgeLevel'} = $Defs::ageLevel{$hidden_ref->{'d_age'}} || '';
     $rego_ref->{'RegistrationNature'} = $Defs::registrationNature{$hidden_ref->{'d_nat'}} || '';
 
+    my $entityObj = getInstanceOf($Data, 'entity', $entityID);
+    if ($entityObj) {
+        $rego_ref->{'strLocalName'} = $entityObj->getValue('strLocalName');
+    }
+
+
     my $editlink =  $Data->{'target'}."?".$carryString;
     my %PageData = (
         person_home_url => $url,
