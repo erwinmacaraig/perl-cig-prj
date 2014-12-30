@@ -207,6 +207,8 @@ $(document).ready(function(){
     
     checkIfDocsAllApproved();
 
+    jQuery("input.search").quicksearch();
+
 });
 $(window).bind("load", function() {
     $('#l_strISOCountry').insertAfter($("#l_strISOCountry_chosen"));
