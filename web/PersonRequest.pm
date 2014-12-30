@@ -330,11 +330,13 @@ sub listPersonRecord {
     my $personFname = '';
     my $personMID = '';
     my $personID = '';
+    my $personStatus = '';
     my $personRegistrationID = ''; #specific for person request access
 
     my %RegFilters=();
 
     while(my $tdref = $q->fetchrow_hashref()) {
+        $personStatus = $tdref->{'personStatus'};
         $existsInRequestingClub = 0;
         #other club hits an still in-progress or pending request
         next if ($entityID != $tdref->{'intEntityID'} and $tdref->{'existPendingRequestID'} and ($tdref->{'personRegistrationStatus'} eq 'PENDING' or $tdref->{'personRegistrationStatus'} eq 'INPROGRESS'));
@@ -427,6 +429,9 @@ sub listPersonRecord {
     if($requestType eq $Defs::PERSON_REQUEST_ACCESS) {
         $title = $Data->{'lang'}->txt($Defs::personRequest{$Defs::PERSON_REQUEST_ACCESS});
 
+        my $error;
+        $error = $Data->{'lang'}->txt("Request Access cannot continue until re-approved by MA.") if($personStatus eq $Defs::PERSON_STATUS_PENDING);
+
         my %TemplateData = (
             PersonFirstName => $personFname,
             PersonSurName => $personLname,
@@ -438,7 +443,8 @@ sub listPersonRecord {
             PersonRegistrationID => $personRegistrationID,
             action_request => "PRA_submit",
             request_type => $request_type,
-            client => $Data->{'client'}
+            client => $Data->{'client'},
+            error => $error || '',
         );
         $resultHTML = runTemplate(
             $Data,
