@@ -387,7 +387,7 @@ my @headers = (
      		   },
       		 {
       	      name => $lang->txt('Date Uploaded'),
-     	       field => 'DateUploaded_FMT',
+     	       field => 'DateUploaded',
       		 },
       		 {
        		     name => $lang->txt('View'),
