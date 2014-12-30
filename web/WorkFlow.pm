@@ -3080,7 +3080,7 @@ sub viewSummaryPage {
     print FH "Group DataL \n\n" . Dumper($Data) . "\n";
 
     switch($task->{'strWFRuleFor'}) {
-        case 'REGO' {
+        case ['REGO', 'PERSON'] {
             if($task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER){
                 $templateFile = 'workflow/summary/transfer.templ';
                 $title = $Data->{'lang'}->txt("Transfer - Approved");
@@ -3100,6 +3100,13 @@ sub viewSummaryPage {
                 $TemplateData{'TransferDetails'}{'Summary'} = $request->{'strRequestNotes'};
                 $TemplateData{'TransferDetails'}{'Fee'} = $PaymentsData->{'TXNs'}[0]{'Amount'};
                 
+            }
+            elsif($task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_AMENDMENT){
+                $TemplateData{'PersonRegistrationDetails'}{'currentClub'} = $task->{'strLocalName'};
+                $templateFile = 'workflow/summary/person.templ';
+                my $header = $Defs::workTaskTypeLabel{$task->{'strRegistrationNature'} . "_PERSON"}; 
+
+                $title = $Data->{'lang'}->txt($header . " - Approval");
             }
             else {
                 $templateFile = 'workflow/summary/personregistration.templ';
@@ -3159,9 +3166,9 @@ sub viewSummaryPage {
             );
             $TemplateData{'EntitySummaryPanel'} = entitySummaryPanel($Data, $task->{'intEntityID'});
         }
-        case 'PERSON' {
-            $templateFile = 'workflow/summary/person.templ';
-        }
+        #case 'PERSON' {
+        #    $templateFile = 'workflow/summary/person.templ';
+        #}
         else {
             my ($TemplateData, $fields) = (undef, undef);
         }
