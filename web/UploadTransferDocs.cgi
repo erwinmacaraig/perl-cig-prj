@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use lib ".", "..", "../..";
 use CGI qw(param unescape escape); 
-my $File_MaxSize = 4*1024*1024; #4Mb;
+my $File_MaxSize = 10*1024*1024; #10Mb;
 
 use ImageUpload;
 use FileUpload;
