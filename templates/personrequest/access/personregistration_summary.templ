@@ -1,4 +1,14 @@
-[% USE Dumper %]
+    [% IF error != '' %]
+    <div class="col-md-12">
+        <div class="alert">
+            <div>
+                <span class="fa fa-exclamation"></span>
+                <p>[% error %]</p>
+            </div>
+        </div>
+    </div>
+    [% END %]
+
     <div class="col-md-3">
         [% PersonSummaryPanel %]
     </div>
@@ -34,11 +44,14 @@
 
             <div class="top-bottom-spacer">
             
-            <div class="pull-right">
-            <p>
-                <a href="#" title="" class="btn-main sendaccess-request">[% Lang.txt('Send Request') %]</a>
-            </p>
-            </div>
+            [% IF error == '' %]
+                <div class="pull-right">
+                <p>
+                    <a href="#" title="" class="btn-main sendaccess-request">[% Lang.txt('Send Request') %]</a>
+                </p>
+                </div>
+            [% END %]
+
             </div>
 
     </div>
