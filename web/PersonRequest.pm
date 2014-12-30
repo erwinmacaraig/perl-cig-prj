@@ -875,11 +875,10 @@ sub viewRequest {
     return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Person Request not found.")) if scalar(%{$request}) == 0;
 
     my $templateFile = undef;
+    my $error = undef;
+
     switch($request->{'strRequestType'}) {
         case "$Defs::PERSON_REQUEST_TRANSFER" {
-            print STDERR Dumper $request->{'strRequestResponse'};
-            print STDERR Dumper $request->{'intPersonRequestID'};
-            print STDERR Dumper $Defs::PERSONREGO_STATUS_ACCEPTED;
             if($request->{'intPersonRequestID'} and $request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_STATUS_ACCEPTED) {
                 $templateFile = "personrequest/transfer/new_club_view.templ";
             }
@@ -890,8 +889,6 @@ sub viewRequest {
             $requestType = $Defs::PERSON_REQUEST_TRANSFER;
         }
         case "$Defs::PERSON_REQUEST_ACCESS" {
-            print STDERR Dumper  $request->{'intPersonRequestID'};
-            print STDERR Dumper  $request->{'strRequestResponse'};
             if($request->{'intPersonRequestID'} and $request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_STATUS_ACCEPTED) {
                 $templateFile = "personrequest/access/requesting_club_view.templ";
             }
