@@ -1,5 +1,33 @@
-<div class="member-home-page">
-    <span>All related Tasks for this Person has been completed. Please review Person details below.</span>
-    <br/>
-    <br/>
-</div>
+[% USE Dumper %]
+<!--<div class="row">-->
+    <div class="col-md-3">
+        [% PersonSummaryPanel %]
+        <div class="registration-approved">[% Lang.txt('Complete') %]</div>
+    </div>
+    <div class="col-md-9">
+        <h3 class="panel-header">
+            [% PersonRegistrationDetails.personFirstname %] [% PersonRegistrationDetails.personSurname %]
+        </h3>
+
+        <div class="panel-body">
+            <br/>
+            <p>[% Lang.txt('This request has been approved.') %] [% PersonRegistrationDetails.currentClub %] [% Lang.txt('has been notified.') %]</p>
+            <br/>
+
+            [% FOREACH request IN personRequests %]
+            <label>The [% request.requestType %] Request (ID: [% request.id %] --[% request.personType %]/[% request.sport %]--) has been sent to [% request.requestTo %].</label>
+            <br/>
+            [% END %]
+            <div class="top-bottom-spacer">
+            
+            <div class="pull-right">
+            <p>[% Lang.txt('What would you like to do now?') %]</p>
+            <p>
+                <a href="main.cgi?client=[% TaskAction.client %]&amp;a=WF_VNA" title="" class="btn-main">[% Lang.txt('View next available task') %]</a>
+                <a href="main.cgi?client=[% TaskAction.client %]&amp;a=C_HOME" title="" class="btn-main">[% Lang.txt('Go to your dashboard') %]</a>
+            </p>
+            </div>
+            </div>
+        </div>
+    </div>
+<!--</div>-->
