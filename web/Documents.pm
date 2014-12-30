@@ -188,6 +188,10 @@ sub list_docs {
 			name => $Data->{'lang'}->txt('Title'),
 			field => 'Title',
 		},
+		{
+			name => $Data->{'lang'}->txt('Document Type'),
+			field => 'DocumentType',
+		},
        {
             name => $Data->{'lang'}->txt('Size'),
             field => 'Size',
