@@ -267,7 +267,7 @@ sub displayOptions {
 				<div class="RO_remove">
 					<a href="" onclick="removefield('$field_name'); return false;"><span class ="fa fa-close"></span></a> 
 				</div>
-					<div class="RO_fielddisplay"><input type="checkbox" name="f_chk_$field_name" value="1" class="ROnb" id="f_chk_$field_name" checked title="$displaylabel"></div>
+				<div class="RO_fielddisplay"><input type="checkbox" name="f_chk_$field_name" value="1" class="ROnb" id="f_chk_$field_name" checked title="$displaylabel"></div>
 				<div class="RO_fieldname $nclass">$displayname$fonlytext</div>
 				<div class="RO_fielddata">
 					<div class="RO_compoption">$comp_options</div>
