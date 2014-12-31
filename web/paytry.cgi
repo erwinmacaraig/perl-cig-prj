@@ -79,6 +79,7 @@ sub main	{
 
     my ($logID, $amount, $chkvalue, $session, $paymentSettings) = Payments::checkoutConfirm(\%Data, $paymentType, \@transactions,1,1);
     
+print STDERR "LOG: $logID\n";
     
 	my $st = qq[
         INSERT INTO tblPayTry (

@@ -78,7 +78,7 @@ sub displayRegoFlowCompleteBulk {
         $body .= displayPaymentResult($Data, $id, 1, '');
     }
     
-    return $body;
+    return ($body, $gateways);
 }
 
 sub displayRegoFlowSummaryBulk  {
@@ -137,7 +137,6 @@ sub displayRegoFlowSummaryBulk  {
      
       
     my $personObj = getInstanceOf($Data, 'person');
-    my $c = Countries::getISOCountriesHash();
     
     my $languages = PersonLanguages::getPersonLanguages( $Data, 1, 0);
     #for my $l ( @{$languages} ) {
@@ -407,6 +406,7 @@ print STDERR "COMPLETE RUN" . $run;
     }
 print STDERR "000OK IS $ok | $run\n\n";
     my $body = '';
+    my $gateways = '';
     if (!$ok)   {
         my $error = $lang->txt("You cannot register this combination, limit exceeded");
         my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_T";
@@ -440,7 +440,6 @@ print STDERR "000OK IS $ok | $run\n\n";
 
         my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
         my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
-        my $gateways = '';
 	 	my $txnCount = 0;
 		my $logIDs;
 		my $txn_invoice_url = $Defs::base_url."/printinvoice.cgi?client=$client&amp;rID=$hidden_ref->{'rID'}&amp;pID=$personID";
@@ -538,7 +537,7 @@ print STDERR "000OK IS $ok | $run\n\n";
             $body .= displayPaymentResult($Data, $id, 1, '');
         }
     }
-    return $body;
+    return ($body, $gateways);
 }
 sub getRegoTXNDetails  {
 

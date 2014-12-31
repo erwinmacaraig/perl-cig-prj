@@ -420,7 +420,7 @@ sub listTasks {
         );
 
         #moved checking of POSSIBLE_DUPLICATE here (if included in query, tasks for ENTITY are not capture)
-        next if ($dref->{intSystemStatus} eq $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE and $dref->{strWFRuleFor} ne $Defs::WF_RULEFOR_PERSON);
+        next if (defined $dref->{intSystemStatus} && $dref->{intSystemStatus} eq $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE && $dref->{strWFRuleFor} ne $Defs::WF_RULEFOR_PERSON);
 
         my $newTask = ($dref->{'taskTimeStamp'} >= $lastLoginTimeStamp) ? 1 : 0; #additional check if tTimeStamp > currentTimeStamp
         $taskCounts{$dref->{'strTaskStatus'}}++;
@@ -2777,7 +2777,9 @@ sub populateDocumentViewData {
         $registrationID ? $parameters .= qq[&regoID=$registrationID] : $parameters .= '';
         $level != $Defs::LEVEL_PERSON ? $parameters .= qq[&entitydocs=1] : $parameters .= '';
 		
-		$replaceLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="replaceFile($fileID,'$parameters','$docName','$docDesc');return false;">]. $Data->{'lang'}->txt('Replace') . q[</a></span>]; 
+        if ($fileID)    {
+		    $replaceLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="replaceFile($fileID,'$parameters','$docName','$docDesc');return false;">]. $Data->{'lang'}->txt('Replace') . q[</a></span>]; 
+        }
 
 		
 		$addLink = qq[ <a href="#" class="btn-inside-docs-panel" onclick="replaceFile(0,'$parameters','$docName','$docDesc');return false;">]. $Data->{'lang'}->txt('Add') . q[</a>] if (!$Data->{'ReadOnlyLogin'});
@@ -3067,12 +3069,12 @@ sub viewSummaryPage {
 
     my $c = Countries::getISOCountriesHash();
 
-    my $club = qq[SELECT strLocalName FROM tblEntity WHERE intEntityID = ?];
+    my $club = qq[SELECT strStatus as entityStatus, strLocalName FROM tblEntity WHERE intEntityID = ?];
     my $sth = $Data->{'db'}->prepare($club);
 
     $sth->execute($task->{'intCreatedByEntityID'});
 
-    my $dref = $sth->fetchrow_hashref();
+    $dref = $sth->fetchrow_hashref();
 
     my $clubName = $dref->{'strLocalName'};
 

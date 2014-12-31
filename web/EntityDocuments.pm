@@ -411,7 +411,7 @@ sub checkUploadedEntityDocuments {
 		next if(grep /$doc_ref->{'ID'}/, @validdocsforallrego);	
 		if(!grep /$doc_ref->{'ID'}/,@uploaded_docs){
 			push @diff,$doc_ref;	
-			print FH "\nPushing: " . Dumper($doc_ref) . "\n";
+			#print FH "\nPushing: " . Dumper($doc_ref) . "\n";
 		}		
 	}
 	#need to filter required docs in @diff

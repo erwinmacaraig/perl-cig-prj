@@ -1,0 +1,93 @@
+<div id="itcrequestform" class="col-md-12">
+	<form method="post" action="main.cgi">
+	<input type="hidden" name="a" value="PRA_NC_PROC" />
+	<input type="hidden" name="client" value="[% client %]" />s
+		<fieldset>
+			<div class="form-panel-body">
+				<div class="form-group">
+					<h3 class="panel-header">Player's Data</h3>
+				</div>
+
+				
+				<div class="form-group">
+					<label class="col-md-4 control-label txtright">[% strLocalSurname.label %]:</label>
+					<div class="col-md-5">
+						<input type="text" name="[% strLocalSurname.name %]" size="[% strLocalSurname.size %]" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-md-4 control-label txtright">[% strLocalFirstname.label %]:</label>
+					<div class="col-md-5">
+						<input type="text" name="[% strLocalFirstname.name %]" size="[% strLocalFirstname.size %]" />
+					</div>
+				</div>
+
+				<div class="form-group">
+				<script type="text/javascript">
+		           jQuery().ready(function() {
+		               jQuery("#[% dtDOB.name %]").datepicker({
+		                  dateFormat: 'yy-mm-dd',
+		                  showButtonPanel: true
+		                });            
+		           });
+		       </script>  
+					<label class="col-md-4 control-label txtright">[% dtDOB.label %]:</label>
+					<div class="col-md-5">
+						<input type="text" name="[% dtDOB.name %]"  id="[% dtDOB.name %]"  value="" size="[% dtDOB.size %]" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-md-4 control-label txtright">[% strISONationality.label %]:</label>
+					<div class="col-md-5">
+						<select name="[% strISONationality.name %]" id="[% strISONationality.name %]" class="[% strISONationality.class %]">
+							    <option value="">Select Country</option>
+								[% FOREACH nationality IN strISONationality.options.keys.sort %]
+									<option value="[% nationality %]">[% strISONationality.options.$nationality %]</option>
+								[% END %]
+						</select>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-md-4 control-label txtright">[% strPlayerID.label %]:</label>
+					<div class="col-md-5">
+						<input type="text" name="[% strPlayerID.name %]" size="[% strPlayerID.size %]" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<h3 class="panel-header">Previous Club</h3>
+				</div>	
+				
+				<div class="form-group">
+					<label class="col-md-4 control-label txtright">[% strISOCountry.label %]:</label>
+					<div class="col-md-5">
+						<select name="[% strISOCountry.name %]" id="[% strISOCountry.name %]" class="[% strISOCountry.class %]">
+							 <option value="">Select Country</option>
+							[% FOREACH nationality IN strISONationality.options.keys.sort %]
+									<option value="[% nationality %]">[% strISONationality.options.$nationality %]</option>
+								[% END %]
+						</select>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-md-4 control-label txtright">[% strClubName.label %]:</label>
+					<div class="col-md-5">
+						<input type="text" name="[% strClubName.name %]" size="[% strClubName.size %]" />
+					</div>
+				</div>
+			</div>
+
+			<div class = "button-row">
+				<div class="txtright">
+					<input id = "flow-btn-continue" type = "submit" value = "Submit"  class = "btn-main">
+				</div>
+			</div>
+
+	</fieldset>
+	
+	</form>
+</div>

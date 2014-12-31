@@ -1426,7 +1426,7 @@ sub finaliseTransfer {
             AND R.strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
         LIMIT 1
 	];
-    my $query = $db->prepare($stDates) or query_error($stDates);
+    $query = $db->prepare($stDates) or query_error($stDates);
 
     my $qryNP= $db->prepare($stPeriods) or query_error($stPeriods);
     $qryNP->execute($Data->{'Realm'});
@@ -1462,7 +1462,7 @@ sub finaliseTransfer {
 ## If dtFrom is in future (if they never started) that period won't be included in Passport
             #AND strPersonLevel = ?
 
-    my $query = $db->prepare($st) or query_error($st);
+    $query = $db->prepare($st) or query_error($st);
     $query->execute(
        $Defs::PERSONREGO_STATUS_TRANSFERRED,
        $personRequest->{'intRequestToEntityID'},

@@ -1769,6 +1769,9 @@ form#flowFormID #fsg-main label {
 form#flowFormID #fsgw-other label {
 	margin-top: 6px;
 }
+#itcrequestform .form-group label {
+	margin-top: 6px;
+}
 form#flowFormID #l_row_type,#l_row_sport label {
 	margin-top: 0px;
 }
