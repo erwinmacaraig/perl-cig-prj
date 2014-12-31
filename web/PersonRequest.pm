@@ -1544,9 +1544,12 @@ sub displayNoITC {
    		    	},
    		    	dtDOB => {   		    	
    		    		label => $FieldLabelsPerson->{'dtDOB'},
-   		    		type => 'text',
+   		    		type => 'date',
    		    		size => '20',
 					name => 'dtDOB',
+                    datetype    => 'dropdown',
+                    validate    => 'DATE',
+
    		    	},
    		    	strISONationality => {   		    	
    		    		label => $FieldLabelsPerson->{'strISONationality'},

@@ -51,10 +51,8 @@ sub send {
 		$params{$o} ||= '';
 	}
 	my %compulsory = (
-		MessageID => 1,
 		Subject => 1,
 		FromAddress => 1,
-		BCCRecipients => 1,
 		ToAddress => 1,
 	);
 
@@ -102,29 +100,30 @@ sub send {
 		},
 	);
 	$outputparams{'x-smtpapi'} = to_json(\%options_to_json);
-	my @addresses = ();
-	my %address_seen = ();
-	for my $email (@{ $params{'BCCRecipients'}})	{
-		next if $address_seen{$email};
-		next if $email !~/\@/;
-		next if $email !~/\./;
-		push @addresses, $email;
-		$address_seen{$email} = 1;
-	}
-	return (0, 'No Recipients') if !scalar(@addresses);
+	if($params{'BCCRecipients'})    {
+        my @addresses = ();
+        my %address_seen = ();
+        for my $email (@{ $params{'BCCRecipients'}})	{
+            next if $address_seen{$email};
+            next if $email !~/\@/;
+            next if $email !~/\./;
+            push @addresses, $email;
+            $address_seen{$email} = 1;
+        }
+        return (0, 'No Recipients') if !scalar(@addresses);
 
-	$outputparams{'bcc'} = \@addresses;
+        $outputparams{'bcc'} = \@addresses;
+    }
 
-  my $url = 'https://sendgrid.com/api/mail.send.json';
-  my $ua = LWP::UserAgent->new();
-  my $req = POST $url, \%outputparams;
-  my $res= $ua->request($req);
+    my $url = 'https://sendgrid.com/api/mail.send.json';
+    my $ua = LWP::UserAgent->new();
+    my $req = POST $url, \%outputparams;
+    my $res= $ua->request($req);
 	my $retvalue = $res->content() || '';
 	my $retvalues = from_json($retvalue);
 
-
-	return (1, '') if $retvalues->{'message'} || '';
-	return (0, '') if $retvalues->{'error'} || '';
+	return (1, $retvalues->{'message'} || '') if $retvalues->{'message'};
+	return (0, $retvalues->{'error'} || '') if $retvalues->{'error'};
 }
 
 

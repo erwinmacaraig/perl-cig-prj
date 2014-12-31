@@ -2,17 +2,17 @@
 use Email; 
 
 use strict; 
-my $to = 'jervy.escoto@gmail.com'; 
-my $from = 'j.escoto@sportingpulseinternational.com';
+my $to = 'w.rodie@sportingpulseinternational.com'; 
+my $from = 'w.rodie@sportingpulseinternational.com';
 my $sbj = 'This is a test email.';
 my $hdr = 'test testtwo testthree';
 my $hMsg = '<strong>Hello world</strong>';
 my $txtMsg = 'test message';
 my $log_text = 'another test'; 
-my $BCC = 'j.escoto@sportingpulseinternational.com';
+my $BCC = '';
 
-sendEmail($to,$from,$sbj,$hdr, $hMsg, $txtMsg, $log_text, $BCC);
+my $ret = sendEmail($to,$from,$sbj,$hdr, $hMsg, $txtMsg, $log_text, $BCC);
 
-print "Check email if successful!";
+print "Check email if successful! $ret\n";
 
 
