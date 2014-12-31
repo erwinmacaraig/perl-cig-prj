@@ -31,7 +31,7 @@ sub getUploadedFiles	{
     ) = @_;
     
     
-	my $client = $Data->{'client'};
+	$client = $Data->{'client'};
     my %clientValues = getClient($client);
     my $currLoginID = $Data->{'clientValues'}{'_intID'};
 	my $myCurrentLevelValue = $clientValues{'authLevel'};
