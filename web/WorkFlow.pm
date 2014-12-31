@@ -2777,7 +2777,9 @@ sub populateDocumentViewData {
         $registrationID ? $parameters .= qq[&regoID=$registrationID] : $parameters .= '';
         $level != $Defs::LEVEL_PERSON ? $parameters .= qq[&entitydocs=1] : $parameters .= '';
 		
-		$replaceLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="replaceFile($fileID,'$parameters','$docName','$docDesc');return false;">]. $Data->{'lang'}->txt('Replace') . q[</a></span>]; 
+        if ($fileID)    {
+		    $replaceLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="replaceFile($fileID,'$parameters','$docName','$docDesc');return false;">]. $Data->{'lang'}->txt('Replace') . q[</a></span>]; 
+        }
 
 		
 		$addLink = qq[ <a href="#" class="btn-inside-docs-panel" onclick="replaceFile(0,'$parameters','$docName','$docDesc');return false;">]. $Data->{'lang'}->txt('Add') . q[</a>] if (!$Data->{'ReadOnlyLogin'});
