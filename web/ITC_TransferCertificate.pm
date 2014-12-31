@@ -43,9 +43,11 @@ sub show_itc_request_form {
    		    	},
    		    	dtDOB => {   		    	
    		    		label => $FieldLabelsPerson->{'dtDOB'},
-   		    		type => 'text',
+   		    		type => 'date',
    		    		size => '20',
+                    datetype    => 'dropdown',
 					name => 'dtDOB',
+                    validate    => 'DATE',
    		    	},
    		    	strISONationality => {   		    	
    		    		label => $FieldLabelsPerson->{'strISONationality'},

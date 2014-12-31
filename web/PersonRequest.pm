@@ -34,6 +34,8 @@ use Switch;
 use SphinxUpdate;
 use InstanceOf;
 use PersonEntity;
+use TemplateEmail;
+use Flow_DisplayFields;
 
 
 sub handlePersonRequest {
@@ -1513,27 +1515,19 @@ sub setRequestStatus {
     ) or query_error($st);
 }
 
-sub displayNoITC {
+sub itcFields {
     my ($Data) = @_;
 	my $isocountries  = getISOCountriesHash();
-    my %countriesonly = ();
-    my %Mcountriesonly = ();	
-    my @limitCountriesArr = ();
-    while(my($k,$c) = each(%{$isocountries})){
-    	$countriesonly{$k} = $c;
-    	if(@limitCountriesArr){
-    		next if(grep(/^$k/, @limitCountriesArr));
-    	}
-    	$Mcountriesonly{$c} = $c;
-    }
 	my $FieldLabelsPerson = FieldLabels::getFieldLabels($Data, $Defs::LEVEL_PERSON);
 	my %FieldDefinitions=(		
+        fields => {
    		    	strLocalFirstname => {
    		    		label => $FieldLabelsPerson->{'strLocalFirstname'},
    		    		type => 'text',
    		    		size  => '50',
                 	compulsory => 1,
    		    		name => 'strLocalFirstname',
+                    sectionname => 'person',
    		    	},
    		    	strLocalSurname => {   		    		
 					label => $FieldLabelsPerson->{'strLocalSurname'},   		    			
@@ -1541,43 +1535,99 @@ sub displayNoITC {
 					size => '50',					
                 	compulsory => 1,  
 					name => 'strLocalSurname', 		    		
+                    sectionname => 'person',
    		    	},
    		    	dtDOB => {   		    	
    		    		label => $FieldLabelsPerson->{'dtDOB'},
-   		    		type => 'text',
+   		    		type => 'date',
    		    		size => '20',
 					name => 'dtDOB',
+                    datetype    => 'dropdown',
+                    validate    => 'DATE',
+                    sectionname => 'person',
+                	compulsory => 1,  
    		    	},
    		    	strISONationality => {   		    	
    		    		label => $FieldLabelsPerson->{'strISONationality'},
-   		    		options => \%Mcountriesonly, 
+   		    		options => $isocountries, 
    		    		name => 'strISONationality',
    		    		class => 'chzn-select',
+                    sectionname => 'person',
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
+                    type        => 'lookup',
    		    	},
    		    	strPlayerID => {   		    		
    		    		label => 'Player\'s ID(Previous Football Association, if available)',
    		    		name => 'strPlayerID',
    		    		type => 'text',
    		    		size => '50',
+                    sectionname => 'person',
    		    	},  
    		    	strISOCountry => {   		    	
    		    		label => $FieldLabelsPerson->{'strISOCountry'},
    		    		name	=> 'strISOCountry',
    		    		class   => 'chzn-select',
+                    type        => 'lookup',
+   		    		options => $isocountries, 
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
+                    sectionname => 'oldclub',
+                	compulsory => 1,  
    		    	},
    		    	strClubName => {   		    	
    		    		label => 'Club\'s Name',
    		    		type => 'text',
    		    		value => '',
+                	compulsory => 1,  
 					size => '50',
 					name => 'strClubName',
+                    sectionname => 'oldclub',
    		    	},
-				client => $Data->{'client'},
+        },
+        'order' => [qw(
+            strLocalSurname
+            strLocalFirstname
+            dtDOB
+            strISONationality
+            strPlayerID
+            strISOCountry
+            strClubName
+        )],
+        sections => [
+            [ 'person',      'Player Details' ],
+            [ 'oldclub',     'Previous Club' ],
+        ],
+        client => $Data->{'client'},
 			
    	); #end of FieldDefinitions
+    return \%FieldDefinitions;
+}
 
-	my $body = runTemplate($Data, \%FieldDefinitions, 'person/request_itc_form.templ');
-	my $title = $Data->{'lang'}->txt("Request Form For An International Transfer Certificate");
+sub displayNoITC {
+    my ($Data) = @_;
+	my $FieldDefinitions= itcFields($Data);
+    my $obj = new Flow_DisplayFields(
+      Data => $Data,
+      Lang => $Data->{'lang'},
+      SystemConfig => $Data->{'SystemConfig'},
+      Fields =>  $FieldDefinitions ,
+    );
+    my ($body, undef, $headJS, undef) = $obj->build({},'edit',1);
+
+	#my $body = runTemplate($Data, $FieldDefinitions, 'person/request_itc_form.templ');
+    $body = qq[
+        <form method="post" action="$Data->{'target'}" id = "flowFormID">
+            <input type="hidden" name="a" value="PRA_NC_PROC" />
+            <input type="hidden" name="client" value="$Data->{'client'}" />
+            $headJS
+            $body
+            <div class = "button-row">
+                <div class="txtright">
+                    <input id = "flow-btn-continue" type = "submit" value = "].$Data->{'lang'}->txt('Submit').qq["  class = "btn-main">
+                </div>
+            </div>
+        </form>
+    ];
+	my $title = $Data->{'lang'}->txt("Request for an International Transfer Certificate");
 	return ($body, $title);
 
 }
@@ -1585,56 +1635,85 @@ sub displayNoITC {
 sub sendITC {
 	my ($Data) = @_;
 	#get posted values 
-	my $q = new CGI;
-	my %h = $q->Vars;
-	my $message = runTemplate($Data, \%h,'emails/notification/1/personrequest/html/request_itc.templ');
-	
-	use Email;
-	my $title = "title";
+    my $FieldDefinitions= itcFields($Data);
+    my $obj = new Flow_DisplayFields(
+      Data => $Data,
+      Lang => $Data->{'lang'},
+      SystemConfig => $Data->{'SystemConfig'},
+      Fields =>  $FieldDefinitions ,
+    );
+
+	my $templateFile = 'notification/'.$Data->{'Realm'}.'/personrequest/html/request_itc.templ';
+    my $p = new CGI;
+    my %params = $p->Vars();
+    my ($userData, $errors) = $obj->gather(\%params, {},'edit');
+
 	my $maObj = getInstanceOf($Data, 'national');
 	my $clubObj = getInstanceOf($Data, 'club');
 
-	
-	my $email_to = $maObj->{'DBData'}{'strEmail'};	
-	my $email_from = $clubObj->{'DBData'}{'strEmail'};
-	my $emailsentOK = Email::sendEmail($email_to, $email_from,'REQUEST FORM FOR AN INTERNATIONAL TRANSFER CERTIFICATE', 'REQUEST FORM FOR AN INTERNATIONAL TRANSFER CERTIFICATE', $message, '','ITC','');
+	my $email_to = $maObj->getValue('strEmail');	
+	my $email_from = $clubObj->getValue('strEmail');
+	my $isocountries  = getISOCountriesHash();
+    $userData->{'strISOCountryName'} = $isocountries->{$userData->{'strISOCountry'}} || '';
+    $userData->{'strISONationalityName'} = $isocountries->{$userData->{'strISONationality'}} || '';
+    my ($emailsentOK, $message)  = sendTemplateEmail(
+        $Data,
+        $templateFile,
+        $userData,
+        $email_to,
+        $Data->{'lang'}->txt('Request for an International Transfer Certificate'),
+        '',#$email_from,
+    );
 	if($emailsentOK){
 		#store to DB;
-		my $query = qq[INSERT INTO tblITCMessagesLog (
-						intEntityFromID, 
-					    intEntityToID,
-						strFirstname,
-						strSurname,
-						dtDOB,
-						strNationality,
-						strPlayerID,
-						strClubCountry,
-						strClubName,
-						strMessage
-						) 
-						VALUES (
-							?,
-							?,
-							?,
-							?,
-							?,
-							?,
-							?,
-							?,
-							?,
-							?
-						)];
+		my $query = qq[
+            INSERT INTO tblITCMessagesLog (
+                intEntityFromID, 
+                intEntityToID,
+                strFirstname,
+                strSurname,
+                dtDOB,
+                strNationality,
+                strPlayerID,
+                strClubCountry,
+                strClubName,
+                strMessage
+                ) 
+                VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                )
+        ];
 
-			my $sth = $Data->{'db'}->prepare($query);
-			$sth->execute($clubObj->{'ID'}, $maObj->{'ID'}, $h{'strLocalFirstname'}, $h{'strLocalSurname'},$h{'dtDOB'}, $h{'strISONationality'}, $h{'strPlayerID'},$h{'strISOCountry'}, $h{'strClubName'},$message);
+        my $sth = $Data->{'db'}->prepare($query);
+        $sth->execute(
+            $clubObj->ID(), 
+            $maObj->ID(),
+            $userData->{'strLocalFirstname'}, 
+            $userData->{'strLocalSurname'},
+            $userData->{'dtDOB'}, 
+            $userData->{'strISONationality'}, 
+            $userData->{'strPlayerID'},
+            $userData->{'strISOCountry'}, 
+            $userData->{'strClubName'},
+            $message
+        );
 		return qq[
-          <div class="OKmsg">International Transfer Certificate Sent .</div> 
+          <div class="OKmsg">].$Data->{'lang'}->txt('International Transfer Certificate request has been sent').qq[ .</div> 
           <br />  
           <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PRA_T">] . $Data->{'lang'}->txt('Continue').q[</a></span>
        ];
 	}	
 	else {
-		return ('Error',$title);
+		return ('Error','');
 	}
 
 	
