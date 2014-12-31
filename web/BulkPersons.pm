@@ -165,6 +165,7 @@ sub bulkPersonRollover {
         {
             name => $memfieldlabels->{'dtDOB'} || $Data->{'lang'}->txt('Date of Birth'),
             field => 'dtDOB',
+            sortdata => 'dtDOB_RAW',
         },
 
     );

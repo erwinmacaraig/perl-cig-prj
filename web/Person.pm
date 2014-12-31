@@ -248,6 +248,7 @@ sub personRegistrationsHistory   {
         EntityLocalName=> $name,
         EntityLatinName=> $rego->{'strLatinName'} || '',
         dtAdded=> $Data->{'l10n'}{'date'}->TZformat($rego->{'dtAdded'},'MEDIUM','SHORT') || '',
+        dtAdded_RAW=> $rego->{'dtAdded'} || '',
         PersonType=> $rego->{'PersonType'} || '',
         PersonLevel=> $rego->{'PersonLevel'} || '',
         AgeLevel=> $rego->{'AgeLevel'} || '',
@@ -313,6 +314,7 @@ sub personRegistrationsHistory   {
         {
             name  => $Data->{'lang'}->txt('Date Registered'),
             field => 'dtAdded',
+            sortdata => 'dtAdded_RAW',
         },
         {
             type  => 'Selector',
@@ -388,6 +390,7 @@ my @headers = (
       		 {
       	      name => $lang->txt('Date Uploaded'),
      	       field => 'DateUploaded',
+     	       sortdata => 'DateUploaded_RAW',
       		 },
       		 {
        		     name => $lang->txt('View'),
@@ -490,6 +493,7 @@ my @headers = (
 	        		strDocumentName => $regodoc->{'strDocumentName'},
 		    		strApprovalStatus => $regodoc->{'strApprovalStatus'},
             		DateUploaded => $regodoc->{'DateUploaded'},
+            		DateUploaded_RAW => $regodoc->{'DateUploaded_RAW'},
             		ViewDoc => $viewLink,
             		ReplaceFile => $replaceLink,
      			};

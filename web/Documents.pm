@@ -203,6 +203,7 @@ sub list_docs {
         {
             name => $Data->{'lang'}->txt('Date Uploaded'),
             field => 'DateAdded',
+            sortdata => 'DateAdded_RAW',
         }, 
         {
             name => $Data->{'lang'}->txt('View'),

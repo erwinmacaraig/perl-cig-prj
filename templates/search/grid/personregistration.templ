@@ -54,7 +54,7 @@
                     <td><span class="fa fa-user"></span>[% rego.ma_id %]</td>
                     <td>[% rego.name %]</td>
                     <td>[% rego.org %]</td>
-                    <td>[% DateFormat.format(rego.dob,'MEDIUM') %]</td>
+                    <td data-order = "[% rego.dob %]">[% DateFormat.format(rego.dob,'MEDIUM') %]</td>
                     <td><span class="fa fa-clock-o"></span>[% rego.role %]</td>
 
                     <td>

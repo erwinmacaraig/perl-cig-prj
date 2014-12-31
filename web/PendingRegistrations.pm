@@ -143,6 +143,7 @@ sub listPendingRegistrations    {
         push @rowdata, {
             id => $dref->{'intPersonRegistrationID'} || 0,
             dtAdded=> $Data->{'l10n'}{'date'}->TZformat($dref->{'dtAdded'}|| '' , 'MEDIUM','SHORT'),
+            dtAdded_RAW => $dref->{'dtAdded'} || '',
             PersonLevel=> $Defs::personLevel{$dref->{'strPersonLevel'}} || '',
             PersonType=> $Defs::personType{$dref->{'strPersonType'}} || '',
             AgeLevel=> $Defs::ageLevel{$dref->{'strAgeLevel'}} || '',
@@ -229,6 +230,7 @@ sub listPendingRegistrations    {
         {
             name  => $Data->{'lang'}->txt('Added'),
             field => 'dtAdded',
+            sortdata => 'dtAdded_RAW',
             width  => 50,
         },
         {

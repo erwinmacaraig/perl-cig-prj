@@ -51,7 +51,9 @@ sub handleCertificates {
 				strCertificationType => $rowdataref->{'strCertificationType'},
 				strCertificationName => $rowdataref->{'strCertificationName'},
 				dtValidFrom          => $Data->{'l10n'}{'date'}->format($rowdataref->{'dtValidFrom'},'MEDIUM'),
+				dtValidFrom_RAW      => $rowdataref->{'dtValidFrom'},
 				dtValidUntil         => $Data->{'l10n'}{'date'}->format($rowdataref->{'dtValidUntil'},'MEDIUM'),
+				dtValidUntil_RAW     => $rowdataref->{'dtValidUntil'},
 				strStatus            => $rowdataref->{'strStatus'},
 				strDescription       => $rowdataref->{'strDescription'},				
 			};
@@ -68,10 +70,12 @@ sub handleCertificates {
            {
                name =>   'Valid From',
                field =>  'dtValidFrom',
+               sortdata =>  'dtValidFrom_RAW',
           },
           {
               name =>   'Valid Until',
               field =>  'dtValidUntil',
+              sortdata =>  'dtValidUntil_RAW',
          },
          {
               name =>   'Status',

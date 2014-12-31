@@ -1768,7 +1768,6 @@ sub listTransLog	{
 	my $statement =qq[
 		SELECT 
       DISTINCT TL.*, 
-      DATE_FORMAT(TL.dtLog,"%d/%m/%Y %H:%i") AS dtLog,
       TL.dtLog AS dtLog_RAW
 		FROM 
       tblTransLog as TL
@@ -1804,7 +1803,7 @@ sub listTransLog	{
            	intAmount => $dref->{'intAmount'}, 		
             status => $dref->{'status'},
 			strResponseCode => $dref->{'strResponseCode'},
-			dtLog => $dref->{'dtLog'},
+			dtLog => $Data->{'l10n'}{'date'}->TZformat($dref->{'dtLog'},'MEDIUM','SHORT'),
 			dtLog_RAW => $dref->{'dtLog_RAW'},
 			receipt => qq[<a href = "printreceipt.cgi?client=$client&ids=$dref->{intLogID}" target="receipt">].$textLabels{'viewReceipt'}."</a>",
 			strComments => $dref->{'strComments'},
@@ -1842,6 +1841,7 @@ sub listTransLog	{
     {
       name =>   $Data->{'lang'}->txt('Date'),
       field =>  'dtLog',
+      sortdata =>  'dtLog_RAW',
     },
     {
       name =>   $Data->{'lang'}->txt('Comments'),

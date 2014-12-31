@@ -379,6 +379,7 @@ sub listPersonRecord {
             personType => $Defs::personType{$tdref->{'strPersonType'}} || '',
             personLevel => $Defs::personLevel{$tdref->{'strPersonLevel'}} || '',
             DOB => $Data->{'l10n'}{'date'}->format($tdref->{'dtDOB'} || '','MEDIUM'),
+            DOB_RAW => $tdref->{'dtDOB'} || '',
             actionLink => $actionLink,
             SelectLink => ''
         };
@@ -396,6 +397,7 @@ sub listPersonRecord {
             personType => $tdref->{'strPersonType'} || '',
             personLevel => $tdref->{'strPersonLevel'} || '',
             DOB => $Data->{'l10n'}{'date'}->format($tdref->{'dtDOB'} || '','MEDIUM'),
+            DOB_RAW => $tdref->{'dtDOB'} || '',
         };
 
         $personFname = $tdref->{'strLocalFirstname'} if !$personFname;
