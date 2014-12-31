@@ -137,7 +137,6 @@ sub displayRegoFlowSummaryBulk  {
      
       
     my $personObj = getInstanceOf($Data, 'person');
-    my $c = Countries::getISOCountriesHash();
     
     my $languages = PersonLanguages::getPersonLanguages( $Data, 1, 0);
     #for my $l ( @{$languages} ) {

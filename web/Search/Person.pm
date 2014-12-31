@@ -535,7 +535,6 @@ sub getPersonAccess {
             $count++;
             my $name = "$dref->{'strLocalFirstname'} $dref->{'strLocalSurname'}" || '';
             my $acceptedRequestLink = ($dref->{'existingAcceptedRequestID'}) ? "$target?client=$client&amp;a=PRA_V&rid=$dref->{'existingAcceptedRequestID'}" : '';
-            my $name = "$dref->{'strLocalFirstname'} $dref->{'strLocalSurname'}" || '';
             push @memarray, {
                 id => $dref->{'intPersonID'} || next,
                 ma_id => $dref->{'strNationalNum'} || $Defs::personStatus{$dref->{'PersonStatus'}} || '',

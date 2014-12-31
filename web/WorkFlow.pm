@@ -3069,12 +3069,12 @@ sub viewSummaryPage {
 
     my $c = Countries::getISOCountriesHash();
 
-    my $club = qq[SELECT strLocalName FROM tblEntity WHERE intEntityID = ?];
+    my $club = qq[SELECT strStatus as entityStatus, strLocalName FROM tblEntity WHERE intEntityID = ?];
     my $sth = $Data->{'db'}->prepare($club);
 
     $sth->execute($task->{'intCreatedByEntityID'});
 
-    my $dref = $sth->fetchrow_hashref();
+    $dref = $sth->fetchrow_hashref();
 
     my $clubName = $dref->{'strLocalName'};
 

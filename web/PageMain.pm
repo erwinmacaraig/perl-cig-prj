@@ -286,7 +286,7 @@ sub pageMain {
         #FullScreen => $Data->{'FullScreen'} || 0,
     );
 
-    my $authLevel = $clientValues_ref->{'authLevel'} || 0;
+    $authLevel = $clientValues_ref->{'authLevel'} || 0;
     #if($authLevel == $Defs::LEVEL_ASSOC)    {
         #$TemplateData{'MemListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=M_L&amp;l=1";
         #$TemplateData{'CompListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=CO_L&amp;l=4" if(!$Data->{'SystemConfig'}{'NoComps'});
