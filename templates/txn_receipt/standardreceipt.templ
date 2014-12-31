@@ -41,29 +41,29 @@
 
        <table class="paymentlist">
 		<tr>
-			<td>[% index %]<b>Payment For:</b></td>
+			<td>[% index %]<b>[% Lang.txt('Payment For') %]:</b></td>
 			<td>[% Receipts.1.Info.Name %]</td>
 		</tr>
 		<tr>
-			<td><b>Payment Date:</b></td>
+			<td><b>[% Lang.txt('Payment Date') %]:</b></td>
 			<td>[% Receipts.1.Info.dtLog_FMT %]</td>
 		</tr>
 		<tr>
-			<td><b>Payment Type:</b></td>
+			<td><b>[% Lang.txt('Payment Type') %]:</b></td>
 			<td>[% Receipts.1.Info.PaymentType %]</td>
 		</tr>
 		<tr>
-			<td><b>Receipt No.:</b></td>
+			<td><b>[% Lang.txt('Receipt No') %].:</b></td>
 			<td>[% Receipts.1.Info.intLogID %]</td>
 		</tr>
 	</table>
 	<br><br>
 	<table class="itemlist">
 		<tr style = " border-bottom:1px solid #aaa;">
-			<td style="width:80px;">Item</td>
-			<td style="width:20px;">QTY</td>
-			<td>Description</td>
-			<td style="width:70px;">Cost</td>
+			<td style="width:80px;">[% Lang.txt('Item') %]</td>
+			<td style="width:20px;">[% Lang.txt('QTY') %]</td>
+			<td>[% Lang.txt('Description') %]</td>
+			<td style="width:70px;">[% Lang.txt('Cost') %]</td>
 		</tr>
 	[% FOREACH i IN Receipts.0.Items %]
 		<tr>
@@ -74,7 +74,7 @@
 		</tr>
 	[% END %]
 		<tr style = " border-top:1px solid #aaa;">
-			<td colspan="3"><b>Payment Total:</b></td>
+			<td colspan="3"><b>[% Lang.txt('Payment Total') %]:</b></td>
 			<td><b>\$[% Receipts.1.Info.intAmount %]</b></td>
 		</tr>
 	</table>

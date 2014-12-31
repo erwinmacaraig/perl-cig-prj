@@ -3,7 +3,7 @@
 [% FOREACH l = ReportData %]
 	<h2>[% l.Title %]</h2>
 	[% l.Content%]
-	<div><span class="report-daterun">Report Run [% DateRun %]</span></div>
+	<div><span class="report-daterun">[% Lang.txt('Report Run') %] [% DateRun %]</span></div>
 	[% IF !loop.last %]
 <div style="page-break-after:always"></div>
 	[% END %]

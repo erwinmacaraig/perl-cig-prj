@@ -3,7 +3,7 @@
     <div class="col-md-12">
     <div>
     <div class="col-md-3">
-        <h3 class="panel-header">Member Details:</h3>
+        <h3 class="panel-header">[% Lang.txt('Member Details') %]:</h3>
         <div class="panel-body">
             <div class="container-link"><a href="#" title="Upload Profile Image">+ [% Lang.txt('Upload Profile Image') %]</a></div>
             <p class="reg-text">[% personDetails.memberID %]</p>
@@ -24,7 +24,7 @@
             <div class="row top-bottom-spacer">
             <div class="col-md-3"></div>
             <div class="col-md-9">
-            <p>What would you like to do now?</p>
+            <p>[% Lang.txt('What would you like to do now?') %]</p>
             <p>
                 <a href="main.cgi?client=[% client %]&amp;a=PRA_T" title="" class="btn-main">[% Lang.txt('Transfer another player') %]</a>
                 <a href="main.cgi?client=[% client %]&amp;a=C_HOME" title="" class="btn-main">[% Lang.txt('Go to your dashboard') %]</a>
