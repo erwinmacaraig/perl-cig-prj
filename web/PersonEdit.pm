@@ -57,7 +57,7 @@ sub handlePersonEdit {
         my $permissions = ProcessPermissions($Data->{'Permissions'}, $fieldset->{$fieldsetType}, 'Person',);
         my $obj = new Flow_DisplayFields(
           Data => $Data,
-          Lang => $Data->{'Lang'},
+          Lang => $Data->{'lang'},
           SystemConfig => $Data->{'SystemConfig'},
           Fields => $fieldset->{$fieldsetType},
         );

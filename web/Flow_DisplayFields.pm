@@ -401,7 +401,9 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
         ];
     }
     my $html_head_init = $self->_date_selection_picker_init();
-    return ( $returnstr, \%usedsections, $html_head_init, $tabs );
+    return wantarray
+        ?( $returnstr, \%usedsections, $html_head_init, $tabs )
+        : $returnstr;
 }
 
 sub display_section {
