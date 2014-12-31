@@ -21,7 +21,7 @@ sub sendEmail {
     $htmlMsg= qq[
         <html>
             <head>
-                <META http-equiv=Content-Type content="text/html; charset=us-ascii">
+                <META http-equiv=Content-Type content="text/html; charset=utf-8">
             </head>
             <body style="font-family:Arial, Sans-Serif">
                 <h1>$header</h1>

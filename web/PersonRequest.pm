@@ -34,6 +34,7 @@ use Switch;
 use SphinxUpdate;
 use InstanceOf;
 use PersonEntity;
+use TemplateEmail;
 
 
 sub handlePersonRequest {
@@ -1590,54 +1591,72 @@ sub sendITC {
 	#get posted values 
 	my $q = new CGI;
 	my %h = $q->Vars;
-	my $message = runTemplate($Data, \%h,'emails/notification/1/personrequest/html/request_itc.templ');
-	
-	use Email;
-	my $title = "title";
+	my $templateFile = 'notification/'.$Data->{'Realm'}.'/personrequest/html/request_itc.templ';
+
 	my $maObj = getInstanceOf($Data, 'national');
 	my $clubObj = getInstanceOf($Data, 'club');
 
 	
-	my $email_to = $maObj->{'DBData'}{'strEmail'};	
-	my $email_from = $clubObj->{'DBData'}{'strEmail'};
-	my $emailsentOK = Email::sendEmail($email_to, $email_from,'REQUEST FORM FOR AN INTERNATIONAL TRANSFER CERTIFICATE', 'REQUEST FORM FOR AN INTERNATIONAL TRANSFER CERTIFICATE', $message, '','ITC','');
+	my $email_to = $maObj->getValue('strEmail');	
+	my $email_from = $clubObj->getValue('strEmail');
+    my ($emailsentOK, $message)  = sendTemplateEmail(
+        $Data,
+        $templateFile,
+        \%h,
+        $email_to,
+        $Data->{'lang'}->txt('Request for an International Transfer Certificate'),
+        '',#$email_from,
+    );
 	if($emailsentOK){
 		#store to DB;
-		my $query = qq[INSERT INTO tblITCMessagesLog (
-						intEntityFromID, 
-					    intEntityToID,
-						strFirstname,
-						strSurname,
-						dtDOB,
-						strNationality,
-						strPlayerID,
-						strClubCountry,
-						strClubName,
-						strMessage
-						) 
-						VALUES (
-							?,
-							?,
-							?,
-							?,
-							?,
-							?,
-							?,
-							?,
-							?,
-							?
-						)];
+		my $query = qq[
+            INSERT INTO tblITCMessagesLog (
+                intEntityFromID, 
+                intEntityToID,
+                strFirstname,
+                strSurname,
+                dtDOB,
+                strNationality,
+                strPlayerID,
+                strClubCountry,
+                strClubName,
+                strMessage
+                ) 
+                VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                )
+        ];
 
-			my $sth = $Data->{'db'}->prepare($query);
-			$sth->execute($clubObj->{'ID'}, $maObj->{'ID'}, $h{'strLocalFirstname'}, $h{'strLocalSurname'},$h{'dtDOB'}, $h{'strISONationality'}, $h{'strPlayerID'},$h{'strISOCountry'}, $h{'strClubName'},$message);
+        my $sth = $Data->{'db'}->prepare($query);
+        $sth->execute(
+            $clubObj->ID(), 
+            $maObj->{'ID'}, 
+            $h{'strLocalFirstname'}, 
+            $h{'strLocalSurname'},
+            $h{'dtDOB'}, 
+            $h{'strISONationality'}, 
+            $h{'strPlayerID'},
+            $h{'strISOCountry'}, 
+            $h{'strClubName'},
+            $message
+        );
 		return qq[
-          <div class="OKmsg">International Transfer Certificate Sent .</div> 
+          <div class="OKmsg">].$Data->{'lang'}->txt('International Transfer Certificate request has been sent').qq[ .</div> 
           <br />  
           <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PRA_T">] . $Data->{'lang'}->txt('Continue').q[</a></span>
        ];
 	}	
 	else {
-		return ('Error',$title);
+		return ('Error','');
 	}
 
 	

@@ -100,7 +100,11 @@ sub send {
 		},
 	);
 	$outputparams{'x-smtpapi'} = to_json(\%options_to_json);
-	if($params{'BCCRecipients'})    {
+	if(
+        $params{'BCCRecipients'} 
+        and ref($params{'BCCRecipients'}) eq 'ARRAY' 
+        and scalar(@{$params{'BCCRecipients'}})
+    )    {
         my @addresses = ();
         my %address_seen = ();
         for my $email (@{ $params{'BCCRecipients'}})	{
