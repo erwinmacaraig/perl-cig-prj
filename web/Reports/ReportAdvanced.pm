@@ -268,12 +268,13 @@ sub displayOptions {
 					<a href="" onclick="removefield('$field_name'); return false;"><span class ="fa fa-close"></span></a> 
 				</div>
 				<div class="RO_fielddisplay"><input type="checkbox" name="f_chk_$field_name" value="1" class="ROnb" id="f_chk_$field_name" checked title="$displaylabel"></div>
-				<div class="RO_fieldname $nclass">$displayname$fonlytext</div>
+				<div class="RO_fieldname $nclass"><span class = "handle">$displayname</span>$fonlytext</div>
 				<div class="RO_fielddata">
 					<div class="RO_compoption">$comp_options</div>
 					<div class="RO_valfields">$linestr<br></div>
 				</div>
-				<div class="RO_fieldblockbottom"></div>
+				<div class="RO_fieldblockbottom">
+                </div>
       </div>
     ];
    	my $nameblock =qq[

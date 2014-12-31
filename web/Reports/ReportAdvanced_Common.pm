@@ -210,10 +210,8 @@ $levelWHERE = '';
 	}
 
 	if($options->{'Countries'})	{
-  	my @countries=getISOCountriesArray($Data);
-  	my %countriesonly=();
-  	for my $c (@countries)  { $countriesonly{$c}=$c;  }
-		$optvalues{'Countries'} = \%countriesonly;
+		$optvalues{'Countries'} = getISOCountriesHash();
+		$optvalues{'CountriesHistorical'} = getISOCountriesHash(historicalCountries => 1);
 	}
 
 	if($options->{'FieldLabels'})	{
