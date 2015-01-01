@@ -267,13 +267,14 @@ sub displayOptions {
 				<div class="RO_remove">
 					<a href="" onclick="removefield('$field_name'); return false;"><span class ="fa fa-close"></span></a> 
 				</div>
-					<div class="RO_fielddisplay"><input type="checkbox" name="f_chk_$field_name" value="1" class="ROnb" id="f_chk_$field_name" checked title="$displaylabel"></div>
-				<div class="RO_fieldname $nclass">$displayname$fonlytext</div>
+				<div class="RO_fielddisplay"><input type="checkbox" name="f_chk_$field_name" value="1" class="ROnb" id="f_chk_$field_name" checked title="$displaylabel"></div>
+				<div class="RO_fieldname $nclass"><span class = "handle">$displayname</span>$fonlytext</div>
 				<div class="RO_fielddata">
 					<div class="RO_compoption">$comp_options</div>
 					<div class="RO_valfields">$linestr<br></div>
 				</div>
-				<div class="RO_fieldblockbottom"></div>
+				<div class="RO_fieldblockbottom">
+                </div>
       </div>
     ];
    	my $nameblock =qq[
@@ -429,8 +430,8 @@ sub displayOptions {
   $returnstr.='</table>';
   if($self->{'Config'}->{'Config'}{'EmailExport'})  {
     $returnstr .= qq[
-        <h4 class = "sectionHeader">Output</h4>
-          Choose how you want to receive the data from this report.
+        <h4 class = "sectionHeader">].$lang->txt('Output').qq[</h4>
+          ].$lang->txtr('Choose how you want to receive the data from this report.').qq[
 
           <div style="padding:5px;">
             <input type="radio" name="RO_OutputType" value="screen" class="ROnb" checked id="RO_Output_display"><label for="RO_Output_display"> <b>Display</b></label>
@@ -489,7 +490,7 @@ sub displayOptions {
 .ui-timepicker-rtl dl { text-align: right; }
 .ui-timepicker-rtl dl dd { margin: 0 65px 10px 10px; }
 </style>
-		<div class="RO_adv_intro">$intro</div>
+		<div class="RO_adv_intro"></div>
 		<div id = "ROallfields-wrapper">
 			<div id = "ROallfields">
 			$allfields

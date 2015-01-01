@@ -174,48 +174,25 @@ $(document).ready(function(){
     //    }
     //});
 
-    jQuery('kkselect.fcToggleGroup').each(function() {
-        var s = jQuery(this);
-        var name = s.attr('name');
-        var ele_id = 'toggleG' + name;
-        var toggleOptions = '';
-        jQuery(s).children('option').each(function()    {
-            var o = jQuery(this);
-            var val = o.val();
-            var txt = o.text();
-            var tclass = '';
-            if(val != '')   {
-                if(jQuery(s).val() == val)  { tclass = 'active'; } 
-                toggleOptions = toggleOptions + '<a id ="' + ele_id + '_' + val + '" class = "' + tclass +'" title = "' + txt + '" href = "#" data-val = "' + val + '">' + txt + '</a>';
-            }
-        });
-        jQuery(s).after('<div class = "toggle-type" id = "' + ele_id + '">' + toggleOptions + '</div>');
-        jQuery(s).hide();
-        jQuery('#' + ele_id).on("click", "a", function(e)   {
-            val = jQuery(this).attr('data-val');
-            jQuery(s).val(val);
-            jQuery(s).trigger('change');
-            e.preventDefault();
-        });
-        jQuery(s).on('change', function(e)   {
-            jQuery('#' + ele_id).children('a').removeClass('active');
-            var newval = jQuery(s).val();
-            jQuery('#' + ele_id + '_' + newval).addClass('active');
-        });
-
-    });
-    
     checkIfDocsAllApproved();
 
     jQuery("input.search").quicksearch();
 
 });
-$(window).bind("load", function() {
-    $('#l_strISOCountry').insertAfter($("#l_strISOCountry_chosen"));
-    $('#l_strISOCountryOfBirth').insertAfter($("#l_strISOCountryOfBirth_chosen"));
-    $('#l_strISONationality').insertAfter($("#l_strISONationality_chosen"));
-    $('#l_intLocalLanguage').insertAfter($("#l_intLocalLanguage_chosen"));
-    $('#l_intNatCustomLU5').insertAfter($("#l_intNatCustomLU5_chosen"));
-    $('#l_intGender').insertAfter($("#toggleGd_intGender"));
-    $('#l_strContactISOCountry').insertAfter($("#l_strContactISOCountry_chosen")); 
+jQuery(document).ready(function(){
+
+    jQuery('input.btn-proceed').each(function() {
+        var text = jQuery(this).val();
+        var id = 'replaced' + jQuery(this).attr('id');
+        var classes = jQuery(this).attr('class');
+        jQuery(this).after('<a href = "#" class = "' + classes + '" id = "' + id + '">' + text + '<span class ="fa fa-angle-right fa-2x proceed-chevron"></span></a>');
+        jQuery(this).hide();
+        form = jQuery(this).parents('form').get(0);
+        jQuery('#' + id).click(function(e)   {
+            jQuery(form).submit();
+            e.preventDefault();
+        });
+
+    });
+
 });

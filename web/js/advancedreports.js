@@ -4,13 +4,13 @@ jQuery(function() {
 		fillSpace: true
 	}).disableSelection();
 	jQuery( ".connectedSortable" ).sortable({
-		helper: "clone",
 		appendTo: 'body',
+		handle: '.handle',
 		cancel: ':input,button,.chzn-drop',
 		remove: function(event, ui)	{
-			var parent = jQuery(this).attr("id");
-			var child = jQuery(ui.item).children(':first-child').attr("id");
-			jQuery('#' + child).data('parent',parent);
+			//var parent = jQuery(this).attr("id");
+			//var child = jQuery(ui.item).children(':first-child').attr("id");
+			//jQuery('#' + child).data('parent',parent);
 		},
 		placeholder: "ui-state-highlight"
 		

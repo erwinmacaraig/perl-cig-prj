@@ -1198,7 +1198,15 @@ sub generate_clientside_validation {
                     }
                     //alert("Got invalid input on tab " + tabname);
                 }
-            }
+            },
+            errorPlacement: function(error, element) {
+                if(jQuery(element).is(":visible"))  {
+                    error.insertAfter(element);
+                }
+                else    {
+                    error.insertAfter(jQuery(element).next(':visible')); 
+                }
+            },
         }
         ~;
         return qq[

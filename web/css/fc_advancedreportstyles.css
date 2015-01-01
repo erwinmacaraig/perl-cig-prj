@@ -5,10 +5,6 @@
   color:#6A6A6A;
 }
 
-#ROselectedfields .RO_fieldblock {
-  overflow: hidden;
-}
-
 #ROselectedfields .RO_fieldname {
   margin-bottom:10px;
 }

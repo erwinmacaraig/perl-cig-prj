@@ -1053,6 +1053,10 @@ span.move a {
     color: #888;
     text-align:right;
   }
+  #ROselectedfields .ui-state-highlight {
+    height:81px;
+  }
+    
   .ROoptionblock {
   }
 
@@ -1106,8 +1110,11 @@ span.move a {
     margin-right:5px;
   }
   #ROselectedfields .RO_compoption {
-    float:left;
+    display:inline;
     margin-right:30px;
+  }
+  #ROselectedfields .RO_valfields{
+    display:inline;
   }
   #ROselectedfields .RO_fieldblockbottom {
   }

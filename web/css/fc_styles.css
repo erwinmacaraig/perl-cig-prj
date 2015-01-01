@@ -486,9 +486,17 @@ a.btn-main, input.btn-main, button.btn-main {
 	background: -ms-linear-gradient(top,  #1870a5 0%,#095b8d 100%);
 	background: linear-gradient(to bottom,  #1870a5 0%,#095b8d 100%);
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1870a5', endColorstr='#095b8d',GradientType=0 );
+    border:1px solid #b5b8c8;
 }
-a.btn-proceed:after, input.btn-proceed:after, button.btn-main:after {
-    content: "TEST";
+a.btn-main.btn-proceed {
+    padding-left:20px;
+}
+.proceed-chevron    {
+    float:right;
+    position:absolute;
+    bottom:13px;
+    right:17px;
+    font-weight:bold;
 }
 
 /* if btn-disabled class name will be changed, check fc-common.js. btn-disabled links must return false */
