@@ -430,8 +430,8 @@ sub displayOptions {
   $returnstr.='</table>';
   if($self->{'Config'}->{'Config'}{'EmailExport'})  {
     $returnstr .= qq[
-        <h4 class = "sectionHeader">Output</h4>
-          Choose how you want to receive the data from this report.
+        <h4 class = "sectionHeader">].$lang->txt('Output').qq[</h4>
+          ].$lang->txtr('Choose how you want to receive the data from this report.').qq[
 
           <div style="padding:5px;">
             <input type="radio" name="RO_OutputType" value="screen" class="ROnb" checked id="RO_Output_display"><label for="RO_Output_display"> <b>Display</b></label>
@@ -490,7 +490,7 @@ sub displayOptions {
 .ui-timepicker-rtl dl { text-align: right; }
 .ui-timepicker-rtl dl dd { margin: 0 65px 10px 10px; }
 </style>
-		<div class="RO_adv_intro">$intro</div>
+		<div class="RO_adv_intro"></div>
 		<div id = "ROallfields-wrapper">
 			<div id = "ROallfields">
 			$allfields

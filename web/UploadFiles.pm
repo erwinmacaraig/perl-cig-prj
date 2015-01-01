@@ -18,7 +18,7 @@ use Data::Dumper;
 use InstanceOf;
 use S3Upload;
 
-my $File_MaxSize = 10*1024*1024; #10Mb;
+my $File_MaxSize = 25*1024*1024; #25Mb;
 
 sub getUploadedFiles	{
 	my (
