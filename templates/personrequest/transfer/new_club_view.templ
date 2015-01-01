@@ -2,8 +2,7 @@
     <div class="col-md-9">
         <div class="member-detail">
 
-            <h3 class = "panel-header">[% personFirstname %] [% personSurname %] - Transfer to [% requestFrom %]</h3>
-				<div class="panel-body">
+				<div class="">
 
 				<p class="transfer-text">[% requestTo %] [% Lang.txt('has released') %] [% personFirstname %] [% personSurname %]. [% Lang.txt('Please continue the transfer process.') %]</p>
 
@@ -205,7 +204,7 @@
             </div>
                 <div class="task-actions">
                     <div style="width: 100%; float: left">
-                        <a style="float: left" class="btn-main" href = "main.cgi?client=[% RequestAction.client %]&a=C_HOME">
+                        <a style="float: left" class="" href = "main.cgi?client=[% RequestAction.client %]&a=C_HOME">
                             [% Lang.txt('Back to Dashboard') %]
                         </a>
 
@@ -235,7 +234,7 @@
                                         <input type="hidden" name="prid" value="[% requestID %]">
                                         <input type="hidden" name="dnat" value="[% RequestAction.request_type %]">
 
-                                        <input style="border: 0px solid" class="btn-main btn-proceed" type="submit" name="submit" value="Continue Transfer">
+                                        <input style="border: 0px solid" class="btn-main btn-proceed" type="submit" name="submitbtn" value="Continue Transfer">
                                     </form>
 
                                 </div>
@@ -278,7 +277,7 @@
 
           <div class="modal-footer">
             <a class="btn-main" data-dismiss="modal">Close</a>
-            <input class="btn-main" type="submit" name="submit" value="Submit">
+            <input class="btn-main" type="submit" name="submitbtn" value="Submit">
           </div>
       </form>
       

@@ -490,7 +490,7 @@ a.btn-main, input.btn-main, button.btn-main {
 }
 a.btn-main.btn-proceed {
     padding-left:20px;
-    padding-bottom:9px;
+    padding-bottom:7px;
 }
 .proceed-chevron    {
     float:right;
@@ -1186,6 +1186,9 @@ i.indicator {
 	border-right: solid 1px  #ddd;
 	border-bottom: solid 1px  #ddd;
 	overflow:hidden;
+}
+div.transfertabs.tab-content > .active {
+	overflow:visible;
 }
 
 .member-home-page {

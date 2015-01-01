@@ -192,9 +192,14 @@ jQuery(document).ready(function(){
         jQuery(this).after('<a href = "#" class = "' + classes + '" id = "' + id + '">' + text + '<span class ="fa fa-angle-right fa-2x proceed-chevron"></span></a>');
         jQuery(this).hide();
         form = jQuery(this).parents('form').get(0);
+        formId = jQuery(form).attr('id');
+        if(!formId) {
+            jQuery(form).attr('id','proceedbtn-form');
+            formId = 'proceedbtn-form';
+        }
         jQuery('#' + id).click(function(e)   {
-            jQuery(form).submit();
             e.preventDefault();
+            jQuery('#' + formId).submit();
         });
 
     });

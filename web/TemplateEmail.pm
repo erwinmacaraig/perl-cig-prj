@@ -65,8 +65,8 @@ sub sendTemplateEmail	{
                 ToAddress => $toaddress,
                 FromAddress => $fromaddress,
                 FromName => $fromname,
-                BCCRecipients => split("\s*,\s*",$bccaddress) || [],
-                CCRecipients => split("\s*,\s*",$ccaddress) || [],
+                BCCRecipients => (split /\s*,\s*/, $bccaddress) || [],
+                CCRecipients => (split /\s*,\s*/, $ccaddress) || [],
             );
             if($ok) {
                 print MAILLOG (scalar localtime()).":Template:$subject:$toaddress: FROM $fromaddress Sent OK\n";

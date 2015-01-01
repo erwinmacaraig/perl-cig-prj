@@ -872,8 +872,6 @@ sub viewRequest {
 
     $request = $request->[0];
 
-    my $title = $Defs::personRequest{$request->{'strRequestType'}};
-
     #checking of who can only access what request is already handled in the getRequests query
     # e.g. if requestTo already accepted the request, it would be able to view it again as the $request will be empty
     return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Person Request not found.")) if scalar(%{$request}) == 0;
@@ -977,6 +975,14 @@ sub viewRequest {
         PersonSummaryPanel => personSummaryPanel($Data, $request->{'intPersonID'}) || '',
     );
 
+    my $title = join(' ',(
+        $request->{'strLocalFirstname'} || '',
+        $request->{'strLocalSurname'} || '',
+        ' - ',
+        $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}}),
+        ': ',
+        $request->{'requestFrom'}
+    ));
 
     my $showAction = 0;
     if (($entityID == $request->{'intRequestToEntityID'} and $request->{'intRequestToMAOverride'} == 0) or ($entityID == $request->{'intRequestToMAOverride'} and $request->{'intRequestToMAOverride'} == 1)) {
@@ -1012,6 +1018,7 @@ sub viewRequest {
         }
     }
 
+warn("TARE $Data->{'target'}:$templateFile");
     my %RequestAction = (
         'client' => $Data->{client} || 0,
         'initiateAddRoleClient' => $tempClient || 0,
@@ -1020,7 +1027,8 @@ sub viewRequest {
         'action' => $action,
         'showAction' => $showAction,
         'initiateRequestProcess' => $initiateRequestProcess,
-        'request_type' => $requestType
+        'request_type' => $requestType,
+        'target' => $Data->{'target'},
     );
 
     $TemplateData{'RequestAction'} = \%RequestAction;
