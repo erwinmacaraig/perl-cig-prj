@@ -407,7 +407,6 @@ sub pageForm    {
     $title ||= '';
     $body||= textMessage("Oops !<br> This shouldn't be happening!<br> Please contact <a href=\"mailto:info\@sportingpulse.com\">info\@sportingpulse.com</a>");
  $Data->{'TagManager'}='';#getTagManager($Data);
-warn(" IN PF");
 
     my ($html_head, $page_header, $page_navigator, $paypal, $powered) = getPageCustomization($Data);
     my $meta = {};
