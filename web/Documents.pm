@@ -305,7 +305,13 @@ sub new_doc_form {
 	<div class="pageHeading">$title</div>
 	<br />
          	<div id="docselect">
-		<form action="$target" method="POST" enctype="multipart/form-data" class="dropzone">			
+		<form action="$target" method="POST" enctype="multipart/form-data" class="dropzone" id = "docform">			
+         <script>
+              Dropzone.options.docform = { 
+                  maxFilesize: 25 // MB 
+              };
+         </script>
+
 
 		<input type="hidden" name="client" value="].unescape($client).qq[">];
 	if($DocumentTypeID){
@@ -328,7 +334,7 @@ sub new_doc_form {
 			
 		</form> 
                 <br />  
-                <span class=""><a href="$Data->{'target'}?client=$client&amp;a=P_DOCS" class = "btn-main">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+                <span class=""><a href="$Data->{'target'}?client=$client&amp;a=P_DOCS" class = "btn-main btn-proceed">] . $Data->{'lang'}->txt('Continue').q[</a></span>
 		</div>
 	];
 	return $body;

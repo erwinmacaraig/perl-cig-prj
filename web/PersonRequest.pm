@@ -1624,7 +1624,7 @@ sub displayNoITC {
             $body
             <div class = "button-row">
                 <div class="txtright">
-                    <input id = "flow-btn-continue" type = "submit" value = "].$Data->{'lang'}->txt('Submit').qq["  class = "btn-main">
+                    <input id = "flow-btn-continue" type = "submit" value = "].$Data->{'lang'}->txt('Submit').qq["  class = "btn-main btn-proceed">
                 </div>
             </div>
         </form>

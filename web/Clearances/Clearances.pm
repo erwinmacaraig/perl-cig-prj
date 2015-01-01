@@ -2952,7 +2952,7 @@ sub transferDocsForm {
 	     </form>
 	     <script>
               Dropzone.options.transferdocs = { 
-                  maxFilesize: 2, // MB 
+                  maxFilesize: 25, // MB 
 	              maxFiles: 10
               };
          </script>

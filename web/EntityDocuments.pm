@@ -289,7 +289,13 @@ sub new_doc_form {
 	<div class="sectionheader">$title</div>
 	<br />
          	<div id="docselect">
-		<form action="uploadregofile.cgi" method="POST" enctype="multipart/form-data" class="dropzone">
+		<form action="uploadregofile.cgi" method="POST" enctype="multipart/form-data" class="dropzone" id = "docform">
+         <script>
+              Dropzone.options.docform = { 
+                  maxFilesize: 25 // MB 
+              };
+         </script>
+
 		<input type="hidden" name="client" value="].unescape($client).qq[">];
 	if($DocumentTypeID){
 		$body .= qq[
