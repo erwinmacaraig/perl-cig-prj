@@ -15,12 +15,12 @@ sub handle {
 
     my $searchObj = undef;
     my $searchType = param('type') || '';
-	my $title = 'Search';
+	my $title = $Data->{'lang'}->txt('Search');
 
     switch ($action) {
         case 'INITSRCH_P' {
             $searchObj = new Search::Person();
-			$title = "Request for Person Details Search" if($searchType eq 'access');
+			$title = $Data->{'lang'}->txt('Request for Person Details Search') if($searchType eq 'access');
 			
         }
         case 'INITSRCH_C' {

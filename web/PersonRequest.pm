@@ -59,7 +59,7 @@ sub handlePersonRequest {
                 $transferTypeOption .= "<input type='radio' name='transfer_type' $defaultTypeChecked value='$transferType'>$Defs::personTransferType{$transferType}</input>";
                 $defaultTypeChecked = '';
             }
-            $title = "Request/Initiate a Transfer";
+            $title = $Data->{'lang'}->txt('Request/Initiate a Transfer');
 
             $TemplateData{'action'} = 'PRA_search';
             $TemplateData{'request_type'} = 'transfer';
@@ -95,7 +95,7 @@ sub handlePersonRequest {
         case 'PRA_R' {
             return;
 
-            $title = "Request Access to Person Details";
+            $title = $Data->{'lang'}->txt('Request Access to Person Details');
             $TemplateData{'request_type'} = 'access';
             $TemplateData{'action'} = 'PRA_getrecord';
             $body = runTemplate(
