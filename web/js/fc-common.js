@@ -181,6 +181,10 @@ $(document).ready(function(){
 });
 jQuery(document).ready(function(){
 
+    jQuery('a.btn-proceed').each(function() {
+        var t = jQuery(this).html();
+        jQuery(this).html(jQuery(this).html() + ' <span class ="fa fa-angle-right fa-2x proceed-chevron"></span>');
+    });
     jQuery('input.btn-proceed').each(function() {
         var text = jQuery(this).val();
         var id = 'replaced' + jQuery(this).attr('id');
