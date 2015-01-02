@@ -566,6 +566,7 @@ sub getTransList {
       t.intTransLogID, 
       t.intID, 
 	  i.strInvoiceNumber,
+	  t.dtPaid,
       intQty, 
       t.dtStart AS dtStart_RAW, 
       DATE_FORMAT(t.dtStart, '%d/%m/%Y') AS dtStart, 
@@ -603,46 +604,65 @@ sub getTransList {
     my $query = $db->prepare($statement);
     $query->execute or print STDERR $statement;
     my $client = setClient($Data->{clientValues});
-    my @Columns = ();
-    ###
-    push (@Columns, {Name => 'Invoice Number', Field => 'strInvoiceNumber', width => 20});
-    ###
-
-    push (@Columns, {Name => 'Transaction Number', Field => 'intTransactionID', width => 20});
-
-    push (@Columns, {Name => 'Item Name', Field => 'strName'});
-    push (@Columns, {Name => 'Quantity', Field => 'intQty', width => 15});
-    #push (@Columns, {Name => 'Current Amount', Field => 'curAmount', width =>20});
-    ########    
-    #push (@Columns, {Name => 'Tax Total', Field => 'TaxTotal', width => 15});
-    push (@Columns, {Name => 'Amount', Field => 'NetAmount', width => 20});    
-    #######
-    push (@Columns, {Name => 'Start', Field => 'dtStart', width => 20});
-    push (@Columns, {Name => 'Start_RAW', Field => 'dtStart_RAW', hide=>1});
-    push (@Columns, {Name => 'End', Field => 'dtEnd', width => 20});
-    push (@Columns, {Name => 'End_RAW', Field => 'dtEnd_RAW', hide=>1});
-    push (@Columns, {Name => 'Status', Field => 'StatusTextLang', width => 20});
-    push (@Columns, {Name => 'Status_raw', Field => 'intStatus', hide => 1});
-    push (@Columns, {Name => '&nbsp;', Field => 'stuff', type => 'HTML', hide => $displayonly});
-    push (@Columns, {Name => 'Pay', Field => 'manual_payment', type => 'HTML', width => 10, hide => ($hidePayment or $hidePay)});
-    push (@Columns, {Name => 'Notes', Field => 'strNotes',  width => 50, hide => $displayonly});
-    push (@Columns, {Name => 'View Receipt', Field => 'strReceipt', type=>"HTML", width => 50, hide => $displayonly});
-    push (@Columns, {Name => '', Field => 'SelectLink', type => 'Selector', hide => $displayonly});
-
-    my @headers = ();
-    foreach my $header (@Columns) {
-        my $sorttype = ($header->{Field} =~ m/int/) ? 'number' : 'text';
-        my $width = $header->{width} || "200";
-        my %href = (
-            name => $header->{Name},
-            field => $header->{Field},
-            sorttype => $sorttype,
-            hide => $header->{hide},
-            type => $header->{type},
-            width => $width
-        );
-        push @headers, \%href;
+warn("LL $hidePayment:$hidePay:$displayonly");
+    my @headers = (
+    {
+        name => 'Invoice Number', 
+        field => 'strInvoiceNumber', 
+        width => 20
+    },
+    {
+        name => 'Select', 
+        field => 'manual_payment', 
+        type => 'HTML', 
+        width => 10, 
+        hide => ($hidePayment or $hidePay), 
+        sortable => 0,
+    },
+    {
+        name => 'Transaction Number', 
+        field => 'intTransactionID', 
+        width => 20
+    },
+    {
+        name => 'Status', 
+        field => 'StatusTextLang', 
+        width => 20
+    },
+    {
+        name => 'Item', 
+        field => 'strName'
+    },
+    {
+        name => 'Quantity', 
+        field => 'intQty', 
+        width => 15
+    },
+    {
+        name => 'Amount', 
+        field => 'NetAmount', 
+        width => 20
+    },
+    {
+        name => 'Date Paid', 
+        field => 'dtPaid',
+        sortdata => 'dtPaid_RAW'
+    },
+    {
+        name => '&nbsp;', 
+        field => 'stuff', 
+        type => 'HTML', 
+        hide => $displayonly, 
+        sortable => 0
+    },
+    {
+        name => '', 
+        field => 'SelectLink', 
+        type => 'Selector', 
+        text => 'Edit', 
+        hide => $displayonly
     }
+    );
     my @rowdata = ();
     my @transCurrency = ();
     my @transAmount = ();
@@ -653,8 +673,8 @@ sub getTransList {
         push @transAmount, $row->{curAmount};
         my $row_data = {};
         $row_data->{id} = $i;
-        foreach my $header (@Columns) {
-            if ($header->{Field} eq 'StatusTextLang') {
+        foreach my $header (@headers) {
+            if ($header->{field} eq 'StatusTextLang') {
                my $status = $row->{intStatus};
                $row->{StatusText} = 'Unpaid' if ($status == 0);
                $row->{StatusText} = 'Paid' if ($status == 1);
@@ -664,15 +684,15 @@ sub getTransList {
                $row->{StatusTextLang} = $Data->{'lang'}->txt('Paid') if ($status == 1);
                $row->{StatusTextLang} = $Data->{'lang'}->txt('Cancelled') if ($status == 2);
              }
-        $row_data->{$header->{Field}} = $row->{$header->{Field}}; 
-              
-
+        $row_data->{$header->{field}} = $row->{$header->{field}}; 
+        $row_data->{'dtPaid_RAW'} = $row->{'dtPaid'}; 
+        $row_data->{'dtPaid'} = $Data->{'l10n'}{'date'}->TZformat($row->{'dtPaid'},'MEDIUM','SHORT'); 
     }
     $row_data->{SelectLink} = qq[main.cgi?client=$client&a=P_TXN_EDIT&personID=$row->{intID}&id=$row->{intTransLogID}&tID=$row->{intTransactionID}];
     if ($row->{StatusText} eq 'Paid') {
-      $row_data->{stuff} = qq[<a href="main.cgi?a=P_TXNLog_payVIEW&client=$client&tlID=$row->{intTransLogID}&amp;pID=$row->{intID}">].$Data->{'lang'}->txt('View Payment Record').qq[</a>];
-      $row_data->{strReceipt} = qq[<a href="printreceipt.cgi?client=$client&amp;ids=$row->{intTransLogID}&amp;pID=$row->{intID}"  target="receipt">].$Data->{'lang'}->txt('View Receipt').qq[</a>];
-      $row_data->{manual_payment} = '';
+      $row_data->{stuff} = qq[<ul><li><a href="main.cgi?a=P_TXNLog_payVIEW&client=$client&tlID=$row->{intTransLogID}&amp;pID=$row->{intID}" class = "">].$Data->{'lang'}->txt('View Payments').qq[</a> ];
+      $row_data->{stuff} .= qq[<li><a href="printreceipt.cgi?client=$client&amp;ids=$row->{intTransLogID}&amp;pID=$row->{intID}"  target="receipt" class = "btn-dinside-panels">].$Data->{'lang'}->txt('View Receipt').qq[</a></ul>];
+      $row_data->{manual_payment} = '-';
     }
     elsif ($row->{StatusText} eq 'Unpaid') {
       $row_data->{strReceipt} = qq[];

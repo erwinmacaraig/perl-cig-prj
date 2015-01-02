@@ -405,7 +405,9 @@ sub showGrid {
 				$val = qq[<input type = "checkbox" name = "chk_$field].qq[_$val" class = "grid_chk chk_$field" value = "$val">];
 			}
 			if($field eq 'SelectLink' and $val)	{
-				$val = qq[<a href = "$val" class = "btn-inside-panels">].$Data->{'lang'}->txt('View') .qq[</a>];
+                my $txt = $Data->{'lang'}->txt('View');
+                $txt = $h->{'text'} if $h->{'text'};
+				$val = qq[<a href = "$val" class = "btn-inside-panels">$txt</a>];
 			}
             my $sortdata = '';
 			if($h->{'sortdata'})    {
@@ -521,64 +523,6 @@ sub makeFilterJS		{
 
 	return ($update_filter_js, $filter_event_js);
 }
-
-sub buildGrid {
-
-	my (
-		$Data,
-		$columninfo, 
-		$grid_data,
-		$width,
-	) = @_;
-	$width ||= '';
-	my $headers = '';
-	my $tabledata = '';
-	for my $h (@{$columninfo})	{
-		my $field = $h->{'field'} || next;
-		my $name = $h->{'name'} || '';
-		next if $h->{'hide'};
-		$name = ' ' if $field eq 'SelectLink';
-		next if !$name;
-		$headers .= qq[<th>$name</th>];
-	}
-	my $cnt = 0;
-	for my $row (@{$grid_data})	{
-		$tabledata .= qq[<tr class = "">];
-		for my $h (@{$columninfo})	{
-			my $field = $h->{'field'} || next;
-			my $type = $h->{'type'} || '';
-			next if $h->{'hide'};
-			my $val = defined $row->{$field}
-				? $row->{$field}
-				: '';
-			if($type eq 'tick')	{
-				$val = $val
-					? qq[<img src="images/gridcell_tick.png">] 
-					: "";
-			}
-			if($field eq 'SelectLink' and $val)	{
-				$val = qq[<a href = "$val" class = "btn-inside-panels">].$Data->{'lang'}->txt('View') .qq[</a>];
-			}
-			$tabledata .=qq[<td>$val</td>];
-		}
-		$tabledata .= "</tr>";
-		$cnt++;
-	}
-	if($tabledata eq '') { $tabledata = '<tr><td colspan="20">Sorry there is no data to return</td></tr>'; }
-
-	return qq[
-		<table class = "table zebra" style = "$width">
-			<thead>
-				<tr class = "">$headers</tr>
-			</thead>
-			<tbody>
-			$tabledata
-			</tbody>
-		</table>
-	];
-}
-
-1;
 
 sub simpleGrid	{
 

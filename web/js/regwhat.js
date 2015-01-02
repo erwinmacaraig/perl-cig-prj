@@ -16,7 +16,12 @@ function update_options(optionType, dtype)   {
     qstring = qstring + '&client=' + jQuery('#client').val();
 
     if(optionType == 'complete')    {
-      jQuery('#flow-btn-continue').show();
+      if(jQuery('#replacedflow-btn-continue').length>0) {
+          jQuery('#replacedflow-btn-continue').show();
+      }
+      else {
+          jQuery('#flow-btn-continue').show();
+      }
     }
     else    {
         jQuery.getJSON('ajax/aj_person_registerwhat.cgi?otype=' + optionType + qstring, function(data)    {

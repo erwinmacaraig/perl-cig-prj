@@ -190,6 +190,9 @@ jQuery(document).ready(function(){
         var id = 'replaced' + jQuery(this).attr('id');
         var classes = jQuery(this).attr('class');
         jQuery(this).after('<a href = "#" class = "' + classes + '" id = "' + id + '">' + text + '<span class ="fa fa-angle-right fa-2x proceed-chevron"></span></a>');
+        if(!jQuery(this).is(':visible')) {
+            jQuery('#' + id).hide(); 
+        }
         jQuery(this).hide();
         form = jQuery(this).parents('form').get(0);
         formId = jQuery(form).attr('id');
