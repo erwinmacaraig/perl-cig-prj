@@ -31,7 +31,7 @@
 
 <div class="[% IF processStatus == 1 %]col-md-12[% ELSE %]col-md-9[% END %]">
     [% Navigation %]
-    <div class = "tab-content">
+    <div class = "tab-content transfertabs">
         <div class = "active tab-pane [% IF processStatus == 1 %]transferCompleteDisplay[% END %]">
         [% Documents %]
             <form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">

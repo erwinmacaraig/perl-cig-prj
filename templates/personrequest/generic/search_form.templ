@@ -64,7 +64,7 @@
                                     <input type="text" name="search_keyword" value="[% search_keyword %]">
                                         <div class="col-md-8 txtleft" style="padding: 5px 0px 0px 0px;"><p id="errorMsg"></p></div>
                                         <div class="col-md-4 txtright" style="padding: 5px 0px 0px 0px;">
-                                            <input class="btn-inside-panels" type="submit" name="submit" value="Search">   
+                                            <input class="btn-inside-panels" type="submit" name="submitb" value="Search">   
                                             <input type="hidden" value="[% action %]" name="a"> <input type="hidden" value="[% client %]" name="client">
                                             <input type="hidden" value="[% request_type %]" name="request_type">
                                         </div>
@@ -81,7 +81,7 @@
                                     <li class="btnPeoplelookupSearch">
                                         <!--<button class="btn btn-sm btn-primary" type="submit">Search people</button>-->
                                         <!--
-                                        <input class="btn-inside-panels" type="submit" name="submit" value="Search">   
+                                        <input class="btn-inside-panels" type="submit" name="submitb" value="Search">   
                                         <input type="hidden" value="[% action %]" name="a"> <input type="hidden" value="[% client %]" name="client">
                                         <input type="hidden" value="[% request_type %]" name="request_type">
                                         -->
@@ -142,7 +142,7 @@
                                 <input type="hidden" value="[% client %]" name="client">
                                 <input type="hidden" value="[% request_type %]" name="request_type">
                                 <input type="hidden" value="[% transfer_type %]" name="transfer_type">
-                                <!--<input type="submit" name="submit" class="btn btn-sm btn-primary" value="Send Request">   -->
+                                <!--<input type="submit" name="submitb" class="btn btn-sm btn-primary" value="Send Request">   -->
                             </form>
                         [% END %]
                     </div>
@@ -246,7 +246,7 @@
 
           <div class="modal-footer">
             <a class="btn-main" data-dismiss="modal">Close</a>
-            <input class="btn-main" type="submit" name="submit" value="Submit">
+            <input class="btn-main" type="submit" name="submitb" value="Submit">
           </div>
       </form>
       
@@ -264,7 +264,7 @@
             <tbody><tr><td><span class="label">Person Lookup:</span></td><td><span class="formw"><input type="text" name="search_keyword" value=""></span></td></tr>
             <tbody><tr><td><span class="label"></span></td><td><span class="label">Enter Name or Member ID</span></td></tr>
             </tbody></table>
-            <input type="submit" name="submit" value="Search">   
+            <input type="submit" name="submitb" value="Search">   
             <input type="hidden" value="[% action %]" name="a"> <input type="hidden" value="[% client %]" name="client">
             <input type="hidden" value="[% request_type %]" name="request_type">
         </form>
