@@ -980,13 +980,14 @@ sub listTransactions {
                 }
             </script>
 
-			<form action = "$Data->{'target'}" name="payform" method="POST" onsubmit="submitForm();return true;">
+			<form name="payform" method="POST" onsubmit="submitForm();return true;">
             <input type="hidden" name="a" value="P_TXNLogstep2">
             <input type="hidden" name="client" value="$client">
 	
 		$body
 		  <br><br>
 		  ];
+    #action="$Data->{'target'}" 
 
 		  $body .= qq[
 			  $CC_body
@@ -1082,6 +1083,9 @@ sub listTransactions {
 
 						<input type="hidden" name="personID" value="$TableID"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="dt_start_paid" value="$dtStart_paid"><input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
 			] if $allowMP;
+
+## Removed btn-process from class of Submit Manual Payment
+
         $body .=qq[
             </div> <!-- manualpayment -->
 					</form> 

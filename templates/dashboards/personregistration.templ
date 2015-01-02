@@ -129,6 +129,13 @@
                                 </span>
                             [% END %]
 
+                            [% IF entity.strEntityRoleName %]
+                                <span class="details-row">
+                                    <span class="details-left">[% Lang.txt('Role') %]:</span>
+                                    <span class="details-left detail-value">[% entity.strEntityRoleName %]</span>
+                                </span>
+                            [% END %]
+
                             [% IF entity.PersonLevel %]
                                 <span class="details-row">
                                     <span class="details-left">[% Lang.txt('Level') %]:</span>

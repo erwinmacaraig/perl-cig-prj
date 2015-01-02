@@ -2400,7 +2400,7 @@ sub apply_product_rules {
 				}
         $dtEnd = "DATE_ADD($dtStart, INTERVAL $product->{intProductExpiryDays} DAY)";
     }
-    elsif($product->{dtProductExpiry}){
+    elsif($product->{dtProductExpiry} and $product->{dtProductExpiry} ne '0000-00-00 00:00:00'){
         $dtStart = 'SYSDATE()';
         $dtEnd = "'$product->{dtProductExpiry}'";
     }
