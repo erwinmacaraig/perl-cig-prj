@@ -236,13 +236,16 @@ sub showPersonHome	{
 
         if($doc->{'strLockAtLevel'})   {
             if($doc->{'strLockAtLevel'} =~ /\|$Data->{'clientValues'}{'authLevel'}\|/ and getLastEntityID($Data->{'clientValues'}) != $doc->{'DocoEntityID'}){ 
-                    $viewLink = qq[ <button class\"HTdisabled\">]. $Data->{'lang'}->txt('View') . q[</button>];
-                    $replaceLink =   qq[ <button class\"HTdisabled\">]. $Data->{'lang'}->txt('Replace File'). q[</button>];
+                    #$viewLink = qq[ <button class\"HTdisabled\">]. $Data->{'lang'}->txt('View') . q[</button>];
+                    #$replaceLink =   qq[ <button class\"HTdisabled\">]. $Data->{'lang'}->txt('Replace File'). q[</button>];
+                    $viewLink= qq[ <span style="position: relative"><a class="HTdisabled btn-inside-docs-panel btn-view-replace">].$Data->{'lang'}->txt('View'). q[</a></span>];
+                    $replaceLink= qq[ <span style="position: relative"><a class="HTdisabled btn-inside-docs-panel btn-view-replace">].$Data->{'lang'}->txt('Replace'). q[</a></span>];
             }
         }
 
         if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}) && $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB)    {
             $replaceLink = '';
+            $replaceLink= qq[ <span style="position: relative"><a class="HTdisabled btn-inside-docs-panel btn-view-replace">].$Data->{'lang'}->txt('Replace'). q[</a></span>];
         }
 
 

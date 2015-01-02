@@ -92,6 +92,9 @@ sub getUploadedFiles	{
                	$urlViewButton = qq[ <a class="HTdisabled btn-main btn-view-replace">].$Data->{'lang'}->txt('View'). q[</a>];    
             }
         }
+        if ($dref->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}) && $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB)    {
+    	$deleteURLButton = qq[ <a class="HTdisabled btn-main btn-view-replace">]. $Data->{'lang'}->txt('Delete'). q[</a>]; 
+        }
 
 			#my @authorizedLevelsArr = split(/\|/,$dref->{'strLockAtLevel'});
 			#my $ownerlevel = $obj->getValue('intEntityLevel');					
