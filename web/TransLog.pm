@@ -1079,7 +1079,7 @@ sub listTransactions {
 				</table>
 			
 				</div><!-- panel-body -->
-						<div class="button-row"><input onclick="clicked='$targetManual'" type="submit" name="subbut" value="Submit Manual Payment" class="btn-main btn-proceed" id = "btn-manualpay"></div>
+						<div class="button-row"><input onclick="clicked='$targetManual'" type="submit" name="subbut" value="Submit Manual Payment" class="btn-main" id = "btn-manualpay"></div>
 
 						<input type="hidden" name="personID" value="$TableID"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="dt_start_paid" value="$dtStart_paid"><input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
 			] if $allowMP;
