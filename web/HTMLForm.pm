@@ -335,6 +335,11 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
         }
     }
 
+    my $ROSectionclass = '';
+    if($action eq 'display')    {
+        $ROSectionclass = 'fieldSectionGroupWrapper-DisplayOnly';
+    }
+
     my %usedsections = ();
     for my $s ( @{$sectionlist} ) {
 
@@ -354,7 +359,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                     #$compulsory_string = '<p><span class="notice-error">'.$compulsory.$requiredfield.'</span></p>';
                 #}
                 $returnstr .= qq[
-                    <div class = "fieldSectionGroupWrapper" id = "fsgw-].$s->[0].qq[">
+                    <div class = "fieldSectionGroupWrapper $ROSectionclass" id = "fsgw-].$s->[0].qq[">
                     $sh<div class = "panel-body fieldSectionGroup $extraclass" id = "fsg-].$s->[0].qq["><fieldset>$compulsory_string].$sections{ $s->[0] }.qq[</fieldset></div></div>];
 
             }

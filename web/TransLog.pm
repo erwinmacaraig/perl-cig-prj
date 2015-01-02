@@ -755,14 +755,14 @@ warn("LL $hidePayment:$hidePay:$displayonly");
 	];
 	$filterHTML = '' if $displayonly;
   my $cl=setClient($Data->{'clientValues'}) || '';
-  my $payment_records_link=qq[<div class="button-row"><a href="$Data->{'target'}?client=$cl&amp;a=P_TXNLog_payLIST" class = "btn-main">].$Data->{'lang'}->txt('List All Payment Records')."</a>" ;
+  my $payment_records_link=qq[<a href="$Data->{'target'}?client=$cl&amp;a=P_TXNLog_payLIST" class = "btn-main">].$Data->{'lang'}->txt('List All Payment Records')."</a>" ;
   
   $payment_records_link = '' if ($hide_list_payments_link);
   
   $grid = $grid ? qq[$grid $payment_records_link]  : qq[<p class="error">].$Data->{'lang'}->txt('No records were found with this filter').qq[</p>$payment_records_link]; 
 
 
-  return (qq[<div class="col-md-12"><div class="transaction_container">] . $grid, $i, \@transCurrency, \@transAmount);
+  return ($grid, $i, \@transCurrency, \@transAmount);
 }
 
 sub setupStandardList {
@@ -867,12 +867,16 @@ sub listTransactions {
 
 
 	($tempBody, $transCount) = getTransList($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref,0,0,0);
-    my $addLink = qq[<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_ADD" class = "btn-main">].$Data->{'lang'}->txt('Add Transaction').qq[</a></div></div></div>];
+    my $addLink = qq[<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_ADD" class = "btn-main">].$Data->{'lang'}->txt('Add Transaction').qq[</a>];
     $addLink = '' if $Data->{'ReadOnlyLogin'};
     $addLink = '' if ($Data->{'clientValues'}{'currentLevel'} == $Data->{'clientValues'}{'authLevel'});
 
-	$body .= $tempBody;
-$body.=' ' .$addLink;
+	$body .= qq[
+        <div class="transaction_container">
+            $tempBody
+            $addLink
+        </div><!-- end-transaction_container -->
+    ];
 
     #GET FILTER TEXT
     my $filterCriterion = '';
@@ -976,7 +980,7 @@ $body.=' ' .$addLink;
                 }
             </script>
 
-			<form name="payform" method="POST" onsubmit="submitForm();return true;">
+			<form action = "$Data->{'target'}" name="payform" method="POST" onsubmit="submitForm();return true;">
             <input type="hidden" name="a" value="P_TXNLogstep2">
             <input type="hidden" name="client" value="$client">
 	
@@ -1012,8 +1016,10 @@ $body.=' ' .$addLink;
         ];
 
         $body .= qq[
-			  <div class="sectionheader">].$lang->txt('Manual Payment').qq[</div>
+			<h3 class="panel-header">].$lang->txt('Manual Payment').qq[</h3>
+            <div class = "panel-body">
 				  $resultMessage
+    
 					<table cellpadding="2" cellspacing="0" border="0">
 					<tbody id="secmain2" >	
 					<tr>
@@ -1029,10 +1035,6 @@ $body.=' ' .$addLink;
 						<td class="label"><label for="l_intPaymentType">].$lang->txt('Payment Type').qq[</label>:</td>
 						<td class="value">].drop_down('paymentType',\%Defs::manualPaymentTypes, undef, $paymentType, 1, 0,'','').qq[</td>
 					</tr>
-
-
-
-
 
 					<!--<tr>
 						<td class="label"><label for="l_strBank">Bank</label>:</td>
@@ -1067,10 +1069,6 @@ $body.=' ' .$addLink;
 						<td class="value"><input type="checkbox" name="intPartialPayment" value="1" id="l_intPartialPayment" ].($Data->{params}{intPartialPayment} ? 'checked' : '').qq[  /> </td>
 					</tr>	-->
 
-
-
-
-
 					<tr>
 
 						<td class="label"><label for="l_strComments">].$lang->txt('Comments').qq[</label>:</td>
@@ -1079,13 +1077,16 @@ $body.=' ' .$addLink;
 				    </tbody>	
 				</table>
 			
-						<div class="HTbuttons"><input onclick="clicked='$targetManual'" type="submit" name="subbut" value="Submit Manual Payment" class="btn-main" id = "btn-manualpay"></div>
+				</div><!-- panel-body -->
+						<div class="button-row"><input onclick="clicked='$targetManual'" type="submit" name="subbut" value="Submit Manual Payment" class="btn-main btn-proceed" id = "btn-manualpay"></div>
 
 						<input type="hidden" name="personID" value="$TableID"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="dt_start_paid" value="$dtStart_paid"><input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
-					</form> 
-				</div>
 			] if $allowMP;
-	  }
+        $body .=qq[
+            </div> <!-- manualpayment -->
+					</form> 
+        ];
+	}
   	else	{
 		  $body = qq[
 			 <form action="$Data->{target}" name="n_form" method="POST">
@@ -1111,7 +1112,7 @@ $body.=' ' .$addLink;
 
       }
   } 
-	$body = qq[<div style="width:99%;">$line</div>$body];
+	$body = qq[<div class = "col-md-12">$body</div>];
   return ($body, $header);
 }
 
@@ -1523,12 +1524,12 @@ sub viewTransLog	{
                 },
         );
 	
-        my ($resultHTML, undef )=handleHTMLForm($FieldDefs{'TXNLOG'}, undef, 'display', '',$db);
+        my ($resultHTML, undef )=handleHTMLForm($FieldDefs{'TXNLOG'}, undef, 'display', 1,$db);
 
 	#my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
   my $previousAttemptsBody = qq[
-    <div class="sectionheader">].$lang->txt('Previous Payment attempts') . qq[</div>
-    <table class="listTable">
+    <h2 class="section-header">].$lang->txt('Previous Payment attempts') . qq[</h2>
+    <table class="table">
     <tr>
       <th>].$lang->txt('Payment Type') . qq[</th>
       <th>].$lang->txt('Date/Time') . qq[</th>
@@ -1569,8 +1570,8 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 
 	my $body = qq[
     $previousAttemptsBody
-		<div class="sectionheader">].$lang->txt('Items making up this Payment').qq[</div>
-		<table class="listTable">
+		<h2 class="section-header">].$lang->txt('Items making up this Payment').qq[</h2>
+		<table class="table">
 		<tr>
 			<th>].$lang->txt('Invoice Number').qq[</th>
 			<th>].$lang->txt('Transaction Number').qq[</th>
@@ -1609,7 +1610,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 
 	$body .= qq[</table>];
 	
-	$body = $count ? qq[<div class="sectionheader">].$lang->txt('Payment Summary').qq[</div>] . $resultHTML.$body: $resultHTML;
+	$body = $count ? qq[<h2 class="section-header">].$lang->txt('Payment Summary').qq[</h2>] . $resultHTML.$body: $resultHTML;
 	
 	my $chgoptions='';
     
@@ -1712,7 +1713,7 @@ sub viewPayLaterTransLog    {
 	$headerText = $Data->{'SystemConfig'}{'regoform_PayLaterText'} if ($Data->{'SystemConfig'}{'regoform_PayLaterText'});
 	my $body = qq[
 		$headerText
-		<div class="sectionheader">Items making up this order</div>
+		<h2 class="section-header">Items making up this order</h2>
 		<table class="listTable">
 		<tr>
 			<th>Transaction Number</th>
@@ -1879,7 +1880,7 @@ sub listTransLog	{
     columns => \@headers,
     rowdata => \@rowdata,
     gridid => 'grid',
-    width => '99%',
+    width => '100%',
     height => 700,
   );
 
