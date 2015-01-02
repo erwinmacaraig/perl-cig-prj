@@ -431,7 +431,7 @@ sub displayOptions {
   if($self->{'Config'}->{'Config'}{'EmailExport'})  {
     $returnstr .= qq[
         <h4 class = "sectionHeader">].$lang->txt('Output').qq[</h4>
-          ].$lang->txtr('Choose how you want to receive the data from this report.').qq[
+          ].$lang->txt('Choose how you want to receive the data from this report.').qq[
 
           <div style="padding:5px;">
             <input type="radio" name="RO_OutputType" value="screen" class="ROnb" checked id="RO_Output_display"><label for="RO_Output_display"> <b>Display</b></label>
