@@ -241,6 +241,10 @@ sub showPersonHome	{
             }
         }
 
+        if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}) && $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB)    {
+            $replaceLink = '';
+        }
+
 
 
 		#push @alldocs, { . " - $rego->{intPersonRegistrationID} "

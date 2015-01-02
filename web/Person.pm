@@ -486,6 +486,10 @@ my @headers = (
                     $replaceLink =   qq[ <button class\"HTdisabled\">]. $Data->{'lang'}->txt('Replace File'). q[</button>];
             }
         }
+        
+        if ($registration->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}) && $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB)    {
+            $replaceLink = '';
+        }
 		#		}
 				push @rowdata, {
 	       			id => $regodoc->{'intUploadFileID'} || 0,
