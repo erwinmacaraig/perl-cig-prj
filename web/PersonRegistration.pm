@@ -1046,7 +1046,7 @@ sub getRegistrationDetail {
             )
             LEFT JOIN tblEntityTypeRoles as er ON (
                 er.strEntityRoleKey = pr.strPersonEntityRole
-                and er.strSport = pr.strSport
+                and er.strSport IN ('', pr.strSport)
                 and er.strPersonType = pr.strPersonType
             )
             INNER JOIN tblEntity e ON (
