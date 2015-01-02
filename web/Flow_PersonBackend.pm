@@ -182,6 +182,7 @@ sub display_core_details    {
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Person',);
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
     my $newRegoWarning = '';
+    my $bypassduplicate = '';
     if(!$id)    {
         my $lang = $self->{'Data'}{'lang'};
         my $client = $self->{'Data'}{'client'};
@@ -206,6 +207,23 @@ sub display_core_details    {
             <div class="alert"> 
                 <div> <span class="fa fa-info"></span> <p>$txt</p> </div> </div>
         ];
+        if($self->{'RunDetails'}{'FoundDuplicate'}) {
+            $bypassduplicate = qq[
+                <p>
+                <a href = "#" id = "btn-notduplicate" class = "btn-main btn-proceed">].$lang->txt('I have validated that this person is not a duplicate').qq[</a>
+                </p>
+                <script>
+                    jQuery(document).ready(function(){
+                        jQuery('#btn-notduplicate').click(function(e)   {
+                            e.preventDefault();
+                            jQuery('#flowFormID').append('<input type = "hidden" name = "bd" value = "1">');
+                            jQuery('#flowFormID').submit();
+                        });
+
+                    });
+                </script>
+            ];
+        }
     }
     my $panel = '';
     $panel = personSummaryPanel($self->{'Data'}, $id) if $id;
@@ -217,7 +235,8 @@ sub display_core_details    {
         ScriptContent => $scriptContent || '',
         FlowSummaryContent => $panel || '',
         Title => '',
-        TextTop => $newRegoWarning,
+        PageInfo => $newRegoWarning,
+        TextTop => $bypassduplicate,
         TextBottom => '',
     );
 
@@ -243,9 +262,13 @@ sub validate_core_details    {
     ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
 
     my $id = $self->ID() || 0;
+    my $lang = $self->{'Data'}{'lang'};
     if(!scalar(@{$self->{'RunDetails'}{'Errors'}})) {
-        if(!$id and isPossibleDuplicate($self->{'Data'}, $userData))    {
-            push @{$self->{'RunDetails'}{'Errors'}}, 'This person is a possible duplicate';
+        if(!$id and isPossibleDuplicate($self->{'Data'}, $userData) and !$self->{'RunParams'}{'bd'})    {
+            my $msg = $lang->txt('This person is a possible duplicate.');
+            $msg .= $lang->txt(qq[  If you have checked and this person is not a duplicate, then click the button below.]);
+            push @{$self->{'RunDetails'}{'Errors'}}, $msg;
+            $self->{'RunDetails'}{'FoundDuplicate'} = 1;
         }
     }
 
