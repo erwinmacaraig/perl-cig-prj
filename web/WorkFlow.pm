@@ -702,6 +702,37 @@ sub addWorkFlowTasks {
 
 	my $q = '';
 	my $db=$Data->{'db'};
+    my $checkOk = 1;
+
+    if ($ruleFor ne 'DOCUMENT') {
+        my $stCheck = qq[
+            SELECT 
+                intWFTaskID
+            FROM
+                tblWFTask
+            WHERE
+                intRealmID=?
+                AND strWFRuleFor = ?
+                AND intPersonID=?
+                AND intPersonRegistrationID=?
+                AND intEntityID = ?
+                AND strTaskStatus IN ('ACTIVE', 'HOLD')
+            ORDER BY intWFTaskID DESC
+            LIMIT 1
+        ];
+        my $qCheck = $Data->{'db'}->prepare($stCheck);
+        $qCheck->execute(
+            $Data->{'Realm'},
+            $ruleFor,
+            $personID,
+            $personRegistrationID,
+            $entityID,
+        );
+        my $existingTaskID = $qCheck->fetchrow_array() || 0;
+        $checkOk = 0 if $existingTaskID;
+    }
+            
+    
 
 	my $stINS = qq[
 		INSERT IGNORE INTO tblWFTask (
@@ -892,69 +923,71 @@ sub addWorkFlowTasks {
 
     my $emailNotification = new EmailNotifications::WorkFlow();
 
-    while (my $dref= $q->fetchrow_hashref())    {
-        my $approvalEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intApprovalEntityLevel'}) || 0;
-        my $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intProblemResolutionEntityLevel'});
-        next if (! $approvalEntityID and ! $problemEntityID);
-  	    $qINS->execute(
-            $dref->{'intWFRuleID'},
-            $dref->{'intRealmID'},
-            $dref->{'intSubRealmID'},
-            $Data->{'clientValues'}{'userID'} || 0,
-            $approvalEntityID,
-            $dref->{'strTaskType'},
-            $ruleFor,
-            $regNature,
-            $dref->{'intDocumentTypeID'},
-            $dref->{'strTaskStatus'},
-            $problemEntityID,
-            $entityID,
-            $dref->{'intPersonID'},
-            $dref->{'intPersonRegistrationID'},
-            $dref->{'DocumentID'}
-        );
+    if ($checkOk)   {
+        while (my $dref= $q->fetchrow_hashref())    {
+            my $approvalEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intApprovalEntityLevel'}) || 0;
+            my $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intProblemResolutionEntityLevel'});
+            next if (! $approvalEntityID and ! $problemEntityID);
+            $qINS->execute(
+                $dref->{'intWFRuleID'},
+                $dref->{'intRealmID'},
+                $dref->{'intSubRealmID'},
+                $Data->{'clientValues'}{'userID'} || 0,
+                $approvalEntityID,
+                $dref->{'strTaskType'},
+                $ruleFor,
+                $regNature,
+                $dref->{'intDocumentTypeID'},
+                $dref->{'strTaskStatus'},
+                $problemEntityID,
+                $entityID,
+                $dref->{'intPersonID'},
+                $dref->{'intPersonRegistrationID'},
+                $dref->{'DocumentID'}
+            );
 
-        $emailNotification->setRealmID($Data->{'Realm'});
-        $emailNotification->setSubRealmID(0);
-        $emailNotification->setToEntityID($approvalEntityID);
-        $emailNotification->setFromEntityID($problemEntityID);
-        $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
-        $emailNotification->setDefsName($Defs::admin_email_name);
-        $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_ADDED);
-        $emailNotification->setSubject("Work Task ID ");
-        $emailNotification->setLang($Data->{'lang'});
-        $emailNotification->setDbh($Data->{'db'});
+            $emailNotification->setRealmID($Data->{'Realm'});
+            $emailNotification->setSubRealmID(0);
+            $emailNotification->setToEntityID($approvalEntityID);
+            $emailNotification->setFromEntityID($problemEntityID);
+            $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
+            $emailNotification->setDefsName($Defs::admin_email_name);
+            $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_ADDED);
+            $emailNotification->setSubject("Work Task ID ");
+            $emailNotification->setLang($Data->{'lang'});
+            $emailNotification->setDbh($Data->{'db'});
 
-        my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
-        $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
+            my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+            $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
 
+        }
     }
 
 	if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
 	}
-	$st = qq[
-		INSERT IGNORE INTO tblWFTaskPreReq (
-			intWFTaskID,
-			intWFRuleID,
-			intPreReqWFRuleID
-		)
-		SELECT
-			t.intWFTaskID,
-			t.intWFRuleID,
-			rpr.intPreReqWFRuleID
-		FROM tblWFTask AS t
-		INNER JOIN tblWFRulePreReq AS rpr
-			ON t.intWFRuleID = rpr.intWFRuleID
-		WHERE t.intPersonRegistrationID = ?
-		];
-
-  	$q = $db->prepare($st);
-  	$q->execute($personRegistrationID);
-
-	if ($q->errstr) {
-		return $q->errstr . '<br>' . $st;
-	}
+	#$st = qq[
+	#	INSERT IGNORE INTO tblWFTaskPreReq (
+	#		intWFTaskID,
+	#		intWFRuleID,
+	#		intPreReqWFRuleID
+	#	)
+	#	SELECT
+	#		t.intWFTaskID,
+	#		t.intWFRuleID,
+	#		rpr.intPreReqWFRuleID
+	#	FROM tblWFTask AS t
+	#	INNER JOIN tblWFRulePreReq AS rpr
+	#		ON t.intWFRuleID = rpr.intWFRuleID
+	#	WHERE t.intPersonRegistrationID = ?
+	#	];
+#
+#  	$q = $db->prepare($st);
+#  	$q->execute($personRegistrationID);
+#
+#	if ($q->errstr) {
+#		return $q->errstr . '<br>' . $st;
+#	}
 
 	my $rc = checkForOutstandingTasks($Data, $ruleFor, '', $entityID, $personID, $personRegistrationID, $documentID);
 
