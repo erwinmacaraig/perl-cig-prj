@@ -409,6 +409,7 @@ sub display_complete {
 #    }
     my $rego_ref = {};
     my $content = '';
+    my $gateways = '';
         
     my $client = $self->{'Data'}->{'client'};
     my $clientValues = $self->{'Data'}->{'clientValues'};
@@ -461,12 +462,11 @@ print STDERR "COMPLETE COUNT $count\n";
             $hiddenFields->{'totalAmount'} = $txnTotalAmount || 0;
             $totalAmount = $txnTotalAmount;
         }
-        $content.= qq[ROLLOVER FOR $rolloverIDs];
         $hiddenFields->{'rolloverIDs'} = $rolloverIDs;
 
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
-        $content .= displayRegoFlowCompleteBulk(
+        ($content, $gateways) = displayRegoFlowCompleteBulk(
             $self->{'Data'}, 
             $client, 
             $hiddenFields,

@@ -32,6 +32,7 @@
     });
 
 Dropzone.options.uploaderfrm = {
+    maxFilesize: 25,
     init: function(){
     	this.on("success", function(){
 		   window.parent.location.reload();

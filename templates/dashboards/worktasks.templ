@@ -154,7 +154,7 @@
 		            [% ELSE %]
                         <td><span class="fa fa-user"></span>Rego [% task.Name %]</td>
 		            [% END %]
-                    <td>[% DateFormat.format(task.taskDate,'MEDIUM') %]</td>
+                    <td data-order = "[% task.taskDate %]">[% DateFormat.format(task.taskDate,'MEDIUM') %]</td>
 
                     <td><span class="fa fa-clock-o"></span>[% task.TaskStatusLabel %]</td>
 
@@ -228,7 +228,8 @@
         <h3 class="panel-header">[% Lang.txt('Quick Search') %]</h3>
         <div class="col-md-12">
             <div class="input-group">
-                <input class="form-control" type="text">
+                <input class="form-control search" type="text">
+                <input class="form-control search-client-string" value="[% client %]" type="hidden">
                 <span class="input-group-addon"><i class="fa fa-search"></i></span>
             </div>
             <a class="show-advanced-search">[% Lang.txt('Advanced Search') %]</a>

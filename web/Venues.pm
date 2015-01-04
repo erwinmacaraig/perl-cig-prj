@@ -782,7 +782,7 @@ print STDERR "VEN FOR $entityID | $Defs::LEVEL_VENUE\n";
     $query->finish;
 
     my $addlink='';
-    my $title=qq[Venues];
+    my $title = $Data->{'lang'}->txt('Venues');
     #{
     #    my $tempClient = setClient(\%tempClientValues);
     #    $addlink=qq[<span class = "btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=VENUE_DTA">].$Data->{'lang'}->txt('Add').qq[</a></span>] if !$Data->{'ReadOnlyLogin'};

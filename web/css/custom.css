@@ -189,3 +189,6 @@ div .dataTables_paginate {
     text-align:center;
 }
 
+#searchForm .formw input.error {
+  font-size: 14px;
+}

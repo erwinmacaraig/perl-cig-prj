@@ -1878,8 +1878,8 @@ sub SQLBuilder {
             $from_list
             $products_join
         WHERE
-            $where_list
             $where_levels
+            $where_list
             $current_where
             AND PR.intEntityID = $entityID
     ];

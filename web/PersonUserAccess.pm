@@ -125,6 +125,7 @@ sub doesUserHaveEntityAccess  {
 
     my $client = setClient( $Data->{'clientValues'} ) || '';
 	my $topEntityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
+    return 1 if $entityID == $topEntityID;
     #if we are here then the person isn't directly registered to the current entity
 
     my $st = qq[

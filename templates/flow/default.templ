@@ -4,7 +4,7 @@
 </div>
 <div class = "col-md-12 steps">
 	[% Navigation %]
-	[% TextTop %]
+	[% PageInfo %]
 </div>
 [% END %]
 
@@ -35,6 +35,7 @@
 [% END %]
 
 <div class="col-md-12">
+	[% TextTop %]
 	<div class = "notavailable" style="display:none;">
 	    <div class="alert">
 	        <div>
@@ -46,7 +47,6 @@
 </div>
 
 <div class="[% IF processStatus == 1 %]col-md-12[% ELSE %]col-md-9[% END %]">
-[% #TextTop %]
 [% DocUploader %]
 	<form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">
 	    [% IF Content %][% Content %][% END %]
@@ -61,7 +61,7 @@
 				<a href = "[% BackButtonURL %]" id = "flow-btn-back" class = "[% IF processStatus == 1 %]nudge[% END %]">[% IF BackButtonText %][% Lang.txt(BackButtonText) %][% ELSE %][% Lang.txt('Back') %][% END %]</a>
 			[% END %]
 			[% IF !NoContinueButton %]
-				<input id = "flow-btn-continue" type = "submit" value = " [% Lang.txt(ContinueButtonText) %] "  class = "btn-main">
+				<input id = "flow-btn-continue" type = "submit" value = " [% Lang.txt(ContinueButtonText) %] "  class = "btn-main btn-proceed">
 			[% END %]
 			</div>
 		</div>
@@ -81,3 +81,4 @@
 <br/>
 
 [% TextBottom %]
+[% gateways %]

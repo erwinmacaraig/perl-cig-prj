@@ -248,6 +248,7 @@ sub personRegistrationsHistory   {
         EntityLocalName=> $name,
         EntityLatinName=> $rego->{'strLatinName'} || '',
         dtAdded=> $Data->{'l10n'}{'date'}->TZformat($rego->{'dtAdded'},'MEDIUM','SHORT') || '',
+        dtAdded_RAW=> $rego->{'dtAdded'} || '',
         PersonType=> $rego->{'PersonType'} || '',
         PersonLevel=> $rego->{'PersonLevel'} || '',
         AgeLevel=> $rego->{'AgeLevel'} || '',
@@ -313,6 +314,7 @@ sub personRegistrationsHistory   {
         {
             name  => $Data->{'lang'}->txt('Date Registered'),
             field => 'dtAdded',
+            sortdata => 'dtAdded_RAW',
         },
         {
             type  => 'Selector',
@@ -387,7 +389,8 @@ my @headers = (
      		   },
       		 {
       	      name => $lang->txt('Date Uploaded'),
-     	       field => 'DateUploaded_FMT',
+     	       field => 'DateUploaded',
+     	       sortdata => 'DateUploaded_RAW',
       		 },
       		 {
        		     name => $lang->txt('View'),
@@ -462,27 +465,42 @@ my @headers = (
     				$replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intUploadFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a>];	
 
 				}
-				else{
-					my @authorizedLevelsArr = split(/\|/,$regodoc->{'strLockAtLevel'});
-					#check level of the owner
-					my $ownerlevel = $obj->getValue('intEntityLevel');					
-					$viewLink = qq[ <button class\"HTdisabled\">]. $lang->txt('View') . q[</button>];    
-                	$replaceLink =   qq[ <button class\"HTdisabled\">]. $lang->txt('Replace File'). q[</button>];
-
-					if(grep(/^$myCurrentLevelValue/,@authorizedLevelsArr) && $myCurrentLevelValue >  $ownerlevel ){
-
-    					$viewLink = qq[ <a class="btn-main btn-view-replace" href="#" onclick="docViewer($regodoc->{'intUploadFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a></span>];
-
-        				$replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intUploadFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a>];	
-
-					}									
-				}
+			#	else{
+					#my @authorizedLevelsArr = split(/\|/,$regodoc->{'strLockAtLevel'});
+					##check level of the owner
+					#my $ownerlevel = $obj->getValue('intEntityLevel');					
+					#$viewLink = qq[ <button class\"HTdisabled\">]. $lang->txt('View') . q[</button>];    
+                	#$replaceLink =   qq[ <button class\"HTdisabled\">]. $lang->txt('Replace File'). q[</button>];
+#
+#					if(grep(/^$myCurrentLevelValue/,@authorizedLevelsArr) && $myCurrentLevelValue >  $ownerlevel ){
+#
+#    					$viewLink = qq[ <a class="btn-main btn-view-replace" href="#" onclick="docViewer($regodoc->{'intUploadFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a></span>];
+#
+#        				$replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intUploadFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a>];	
+#
+#					}									
+                    
+        if($regodoc->{'strLockAtLevel'})   {
+            if($regodoc->{'strLockAtLevel'} =~ /\|$Data->{'clientValues'}{'authLevel'}\|/ and getLastEntityID($Data->{'clientValues'}) != $regodoc->{'DocoEntityID'}){
+                    #$viewLink = qq[ <button class\"HTdisabled\">]. $Data->{'lang'}->txt('View') . q[</button>];
+                    #$replaceLink =   qq[ <button class\"HTdisabled\">]. $Data->{'lang'}->txt('Replace File'). q[</button>];
+                    $viewLink= qq[ <span style="position: relative"><a class="HTdisabled btn-main btn-view-replace">].$Data->{'lang'}->txt('View'). q[</a></span>];
+                    $replaceLink= qq[ <span style="position: relative"><a class="HTdisabled btn-main btn-view-replace">].$Data->{'lang'}->txt('Replace'). q[</a></span>];
+            }
+        }
+        
+        if ($registration->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}) && $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB)    {
+            $replaceLink = '';
+            $replaceLink= qq[ <span style="position: relative"><a class="HTdisabled btn-main btn-view-replace">].$Data->{'lang'}->txt('Replace'). q[</a></span>];
+        }
+		#		}
 				push @rowdata, {
 	       			id => $regodoc->{'intUploadFileID'} || 0,
 	        		#oldSelectLink => $fileLink,
 	        		strDocumentName => $regodoc->{'strDocumentName'},
 		    		strApprovalStatus => $regodoc->{'strApprovalStatus'},
             		DateUploaded => $regodoc->{'DateUploaded'},
+            		DateUploaded_RAW => $regodoc->{'DateUploaded_RAW'},
             		ViewDoc => $viewLink,
             		ReplaceFile => $replaceLink,
      			};

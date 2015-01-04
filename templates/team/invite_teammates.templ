@@ -1,34 +1,34 @@
 <form id="frmInviteTeammates" action="">
     <div id="seasons" style="display:none";>
-        <div class="sectionheader">Choose season</div>
+        <div class="sectionheader">[% Lang.txt('Choose season') %]</div>
         <div id="seasonsintro">
-            Select the season of the competition that you would like to invite your teammates to join.</p>
+            [% Lang.txt('Select the season of the competition that you would like to invite your teammates to join') %].</p>
         </div>
         <div>[% seasonsDD %]</div>
         <br>
     </div>
     <div id="comps" style="display:none";>
-        <div class="sectionheader">Choose competition</div>
+        <div class="sectionheader">[% Lang.txt('Choose competition') %]</div>
         <div id="compsintro">
-            Select the competition that you would like to invite your teammates to join.</p>
+            [% Lang.txt('Select the competition that you would like to invite your teammates to join') %].</p>
         </div>
         <div>[% compsDD %]</div>
         <br>
     </div>
     <div id="regoforms" style="display:none";>
-        <div class="sectionheader">Choose form</div>
+        <div class="sectionheader">[% Lang.txt('Choose form') %]</div>
         <div id="formsintro">
-            <p>The email that will be sent to your teammates, will contain a link to a registration form.
-            <br>Select the registration form that should be used.</p>
+            <p>[% Lang.txt('The email that will be sent to your teammates, will contain a link to a registration form') %].
+            <br>[% Lang.txt('Select the registration form that should be used') %].</p>
         </div>
         <div>[% formsDD %]</div>
         <br>
     </div>
-    <div class="sectionheader">Invite teammates</div>
+    <div class="sectionheader">[% Lang.txt('Invite teammates') %]</div>
     <div id="teammatesresult">
-        <p>Enter the email addresses of all your proposed teammates. Put a comma after each email address.
-        <br>You can put each (email address) on a new line if preferred.</p>
-        <p>When you have finished click 'Invite Teammates Now'.</p>
+        <p>[% Lang.txt('Enter the email addresses of all your proposed teammates. Put a comma after each email address') %].
+        <br>[% Lang.txt('You can put each (email address) on a new line if preferred') %].</p>
+        <p>[% Lang.txt("When you have finished click 'Invite Teammates Now'") %].</p>
     </div>
     <div>
         <textarea name="teammates" id="d_teammates" style="width:350px;height:150px;"></textarea>

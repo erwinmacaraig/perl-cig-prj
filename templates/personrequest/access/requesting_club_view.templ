@@ -10,7 +10,11 @@
 				<div class="alert">
 					<div>
 						<span class="fa fa-exclamation"></span>
-						<p>[% Lang.txt('Please continue with the Add Role process and submit to') %] [% MA %] [% Lang.txt('Member Association for final approval.') %]</p>
+                        [% IF personStatus == 'PENDING' %]
+						    <p>[% Lang.txt('Add Role process cannot continue until re-approved by ') %] [% MA %].</p>
+                        [% ELSE %]
+						    <p>[% Lang.txt('Please continue with the Add Role process and submit to') %] [% MA %] [% Lang.txt('Member Association for final approval.') %]</p>
+                        [% END %]
 					</div>
 				</div>
 
@@ -198,6 +202,7 @@
                                         [% Lang.txt('Cancel Access') %]
                                     </a>
                                     </div>
+                                    [% IF personStatus != 'PENDING' %]
                                     <form style="" action="[% RequestAction.target %]" method="POST" class="pull-left">
                                         <input type="hidden" name="client" value="[% RequestAction.initiateAddRoleClient %]">
                                         <input type="hidden" name="a" value="[% RequestAction.initiateAddRoleAction %]">
@@ -226,8 +231,9 @@
                                         <input type="hidden" name="dnat" value="[% RequestAction.request_type %]">
                                         -->
 
-                                        <input style="border: 0px solid" class="btn-main" type="submit" name="submit" value="Add Role">
+                                        <input style="border: 0px solid" class="btn-main btn-proceed" type="submit" name="submitb" value="Add Role">
                                     </form>
+                                    [% END %]
 
                                 </div>
                         [% END %]
@@ -268,7 +274,7 @@
 
           <div class="modal-footer">
             <a class="btn-main" data-dismiss="modal">Close</a>
-            <input class="btn-main" type="submit" name="submit" value="Submit">
+            <input class="btn-main" type="submit" name="submitb" value="Submit">
           </div>
       </form>
       

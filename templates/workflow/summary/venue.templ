@@ -1,11 +1,16 @@
 <div class="col-md-3">
     [% EntitySummaryPanel %]
+    <div class="registration-approved">[% Lang.txt('Complete') %]</div>
 </div>
 <div class="col-md-9">
 	<h3 class="panel-header">[% EntityDetails.LocalName %] - [% EntityDetails.ISOCountry %]</h3>
 	<div class="panel-body">
 	<br/>
-    <p>[% Lang.txt('The following registration has been approved.') %] [% EntityDetails.LocalName %] [% Lang.txt('has been notified.') %]</p>
+	[% IF EntityDetails.EntityID == 1 %]
+    <p>[% Lang.txt('The following registration has been approved.') %]</p>
+    [% ELSE %]
+    <p>[% Lang.txt('The following registration has been approved.') %] [% EntityDetails.ClubName %] [% Lang.txt('has been notified.') %]</p>
+    [% END %]
     <br/>
 	
 		<div class="read-only">

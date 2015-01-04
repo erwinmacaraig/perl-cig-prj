@@ -83,14 +83,12 @@ sub displayTXNToPay {
     my @transactions= split /:/, $trans;
 
     my $external = 0;
-    my $external = 0;
     my $lang = $Data->{'lang'};
     my ($count, $dollars, $cents) = getCheckoutAmount($Data, \@transactions);
     my $amount = "$dollars.$cents";
     my $invoiceList ='';
      my $allowPayment = $paymentSettings->{'allowPayment'} || 0;
     $allowPayment=0 if (! $external and $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_CLUB);
-    my $body = '';
     my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
     my $client=setClient($Data->{'clientValues'}) || '';
 

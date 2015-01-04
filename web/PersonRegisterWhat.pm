@@ -33,8 +33,10 @@ sub displayPersonRegisterWhat   {
         $continueURL,
         $bulk,
         $regoID,
+        $entitySelection,
     ) = @_;
     $bulk ||= 0;
+    $entitySelection ||= 0;
     my $defaultType = param('dtype') || '';
 
     my %templateData = (
@@ -49,7 +51,12 @@ sub displayPersonRegisterWhat   {
         continueURL => $continueURL || '',
         dtype=> $defaultType,
         existingReg => $regoID || 0,
+        EntitySelection => $entitySelection || 0,
+        DefaultEntity => getLastEntityID($Data->{'clientValues'}) || 0,
     );
+    if($entitySelection)    {
+        $templateData{'entityID'} = 0;
+    }
     if($regoID) {
         my $ref = getRegistrationDetail($Data, $regoID) || {};
         my $existing = {};
@@ -59,6 +66,10 @@ sub displayPersonRegisterWhat   {
         my $role_ref = getEntityTypeRoles($Data, $existing->{'strSport'}, $existing->{'strPersonType'});
 
         my %existingRego = (
+            etype => $existing->{'intEntityLevel'} || '',
+            etypeName => $Data->{'lang'}->txt($Data->{'LevelNames'}{$existing->{'intEntityLevel'}} || $Defs::LevelNames{$existing->{'intEntityLevel'}}) || '',
+            entity => $existing->{'intEntityID'} || '',
+            entityName => $existing->{'strLocalName'} || '',
             type => $existing->{'strPersonType'} || '',
             typeName => $existing->{'PersonType'} || '',
             sport => $existing->{'strSport'} || '',
@@ -77,7 +88,7 @@ sub displayPersonRegisterWhat   {
     }
 
     my $template = "registration/what.templ";
-    $template = "registration/whatbulk.templ" if ($bulk);
+    $template = "registration/whatbulk.templ" if $bulk;
     my $body = runTemplate(
         $Data, 
         \%templateData, 
@@ -106,7 +117,10 @@ sub optionsPersonRegisterWhat {
         $dob,
         $gender,
         $lookingFor,
-        $bulk
+        $bulk,
+        $etype,
+        $currentLevel,
+        $currentEntityID,
     ) = @_;
     $bulk ||= 0;
 
@@ -123,6 +137,8 @@ sub optionsPersonRegisterWhat {
         age => 'strAgeLevel',
         sport => 'strSport',
         role => 'strPersonEntityRole',
+        etype => 'entityType',
+        eId => 'entityId',
     );
 
     #my %genderList = (
@@ -164,6 +180,21 @@ sub optionsPersonRegisterWhat {
             value => 'NEW',
         };
         return (\@retdata, '');
+    }
+    if($lookingFor eq 'etype' and $originLevel)  {
+        my $levels = _entityTypeList($Data, getID($Data->{'clientValues'}, $originLevel));
+        push @{$levels}, $originLevel;
+        foreach my $l (@{$levels})  {
+            push @retdata, {
+                name => $Data->{'lang'}->txt($Data->{'LevelNames'}{$l} || $Defs::LevelNames{$l}),
+                value => $l,
+            };
+        }
+        return (\@retdata, '');
+    }
+    if($lookingFor eq 'eId' and $etype)  {
+        my $levels = _entityList($Data, $etype, getID($Data->{'clientValues'}, $originLevel));
+        return ($levels,'');
     }
 
     my @values = ();
@@ -680,6 +711,85 @@ sub getPersonLevelFromMatrix {
     #return 0 if(!$count);
     return \@retdata;
 }
+
+sub _entityList {
+    my ($Data, $etype, $currentEntityID) = @_;
+
+    my $st = qq[
+        (
+        SELECT
+            E.strLocalName,
+            E.intEntityID
+        FROM
+            tblTempEntityStructure AS TES
+            INNER JOIN tblEntity AS E
+                ON TES.intChildID = E.intEntityID
+        WHERE
+            E.intRealmID = ?
+            AND intParentID = ?
+            AND intChildLevel = ?
+            AND E.strStatus = 'ACTIVE'
+        ORDER BY
+            E.strLocalName
+        )
+        UNION
+        (
+        SELECT
+            E.strLocalName,
+            E.intEntityID
+        FROM
+            tblEntity AS E
+        WHERE
+            E.intRealmID = ?
+            AND intEntityID = ?
+            AND intEntityLevel = ?
+            AND E.strStatus = 'ACTIVE'
+        )
+    ];
+    my $q = $Data->{'db'}->prepare($st);
+    $q->execute((
+        $Data->{'Realm'},
+        $currentEntityID,
+        $etype,
+        $Data->{'Realm'},
+        $currentEntityID,
+        $etype,
+    ));
+    my @vals = ();
+    while(my ($name, $id) = $q->fetchrow_array())   {
+        push @vals, {
+            name => $name,
+            value => $id,
+        };
+    }
+    return \@vals;
+}
+
+sub _entityTypeList {
+    my ($Data, $currentEntityID) = @_;
+
+    my $st = qq[
+        SELECT
+            DISTINCT intChildLevel
+        FROM
+            tblTempEntityStructure AS TES
+        WHERE
+            intRealmID = ?
+            AND intParentID = ?
+            AND intChildLevel > 0
+    ];
+    my $q = $Data->{'db'}->prepare($st);
+    $q->execute((
+        $Data->{'Realm'},
+        $currentEntityID,
+    ));
+    my @vals = ();
+    while(my ($level) = $q->fetchrow_array())   {
+        push @vals, $level;
+    }
+    return \@vals;
+}
+
 
 
 

@@ -60,7 +60,7 @@ sub handleFacilityEdit {
           my $permissions = ProcessPermissions($Data->{'Permissions'}, $fieldset->{$e_action}, 'Entity',);
           my $obj = new Flow_DisplayFields(
               Data => $Data,
-              Lang => $Data->{'Lang'},
+              Lang => $Data->{'lang'},
               SystemConfig => $Data->{'SystemConfig'},
               Fields => $fieldset->{$e_action},
           );
@@ -102,7 +102,7 @@ sub handleFacilityEdit {
         my $permissions = ProcessPermissions($Data->{'Permissions'}, $fieldset->{$e_action}, 'Entity',);
         my $obj = new Flow_DisplayFields(
           Data => $Data,
-          Lang => $Data->{'Lang'},
+          Lang => $Data->{'lang'},
           SystemConfig => $Data->{'SystemConfig'},
           Fields => $fieldset->{$e_action},
         );
@@ -126,7 +126,7 @@ sub handleFacilityEdit {
             my $permissions = ProcessPermissions($Data->{'Permissions'}, $fieldset->{$section}, 'Entity',);
             my $obj = new Flow_DisplayFields(
               Data => $Data,
-              Lang => $Data->{'Lang'},
+              Lang => $Data->{'lang'},
               SystemConfig => $Data->{'SystemConfig'},
               Fields => $fieldset->{$section},
             );

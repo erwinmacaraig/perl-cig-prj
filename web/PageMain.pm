@@ -286,7 +286,7 @@ sub pageMain {
         #FullScreen => $Data->{'FullScreen'} || 0,
     );
 
-    my $authLevel = $clientValues_ref->{'authLevel'} || 0;
+    $authLevel = $clientValues_ref->{'authLevel'} || 0;
     #if($authLevel == $Defs::LEVEL_ASSOC)    {
         #$TemplateData{'MemListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=M_L&amp;l=1";
         #$TemplateData{'CompListURL'} = "$Data->{'target'}?client=$homeClient&amp;a=CO_L&amp;l=4" if(!$Data->{'SystemConfig'}{'NoComps'});
@@ -407,7 +407,6 @@ sub pageForm    {
     $title ||= '';
     $body||= textMessage("Oops !<br> This shouldn't be happening!<br> Please contact <a href=\"mailto:info\@sportingpulse.com\">info\@sportingpulse.com</a>");
  $Data->{'TagManager'}='';#getTagManager($Data);
-warn(" IN PF");
 
     my ($html_head, $page_header, $page_navigator, $paypal, $powered) = getPageCustomization($Data);
     my $meta = {};

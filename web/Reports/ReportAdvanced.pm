@@ -263,21 +263,26 @@ sub displayOptions {
 		my $removetxt = $lang->txt('Remove');
 		$comp_options = qq[<label for ="f_chk_$field_name">$filterlabel :</label> $comp_options] if $comp_options;
    	my $fieldblock =qq[
-      <div class="RO_fieldblock" id="fld_$field_name">
+      <div class="RO_fieldblock" id="fld_$field_name" style = "display:none;">
 				<div class="RO_remove">
-					<a href="" onclick="removefield('fld_$field_name'); return false;"><img src="images/report_field_remove.png" alt="$removetxt"></a>
-					<a href="" onclick="removefield('fld_$field_name'); return false;">$removetxt</a> 
+					<a href="" onclick="removefield('$field_name'); return false;"><span class ="fa fa-close"></span></a> 
 				</div>
-					<div class="RO_fielddisplay"><input type="checkbox" name="f_chk_$field_name" value="1" class="ROnb" id="f_chk_$field_name" checked title="$displaylabel"></div>
-				<div class="RO_fieldname $nclass">$displayname$fonlytext</div>
+				<div class="RO_fielddisplay"><input type="checkbox" name="f_chk_$field_name" value="1" class="ROnb" id="f_chk_$field_name" checked title="$displaylabel"></div>
+				<div class="RO_fieldname $nclass"><span class = "handle">$displayname</span>$fonlytext</div>
 				<div class="RO_fielddata">
 					<div class="RO_compoption">$comp_options</div>
 					<div class="RO_valfields">$linestr<br></div>
 				</div>
-				<div class="RO_fieldblockbottom"></div>
+				<div class="RO_fieldblockbottom">
+                </div>
       </div>
     ];
-		push @{$groupdata{$optiongroup}}, [$field_name, $fieldblock];
+   	my $nameblock =qq[
+      <div class="RO_fieldnameblock" id="fldname_$field_name">
+            <input type="checkbox" name="f_chk_$field_name" value="1" class="ROnb fieldcheck" data-fieldname = "$field_name" id="f_namechk_$field_name" title="$displaylabel"><label for = "f_namechk_$field_name">$displayname$fonlytext</label>
+      </div>
+    ];
+	push @{$groupdata{$optiongroup}}, [$field_name, $fieldblock, $nameblock];
     if(exists $options->{'allowsort'} and $options->{'allowsort'})  {
       push @sort, $field_name;
     }
@@ -287,17 +292,19 @@ sub displayOptions {
   }
 
   my $allfields ='';
+  my $outputfields = '';
 	for my $group (@groupingorder)	{
 		my $grpdata = '';
 		for my $i (@{$groupdata{$group}})	{
-			$grpdata .= qq[<li class="fieldblock-li">$i->[1]</li>] || '';
+			$grpdata .= qq[<li class="fieldblock-li">$i->[2]</li>] || '';
+			$outputfields .= $i->[1] || '';
 		}
 		my $groupname = $lang->txt($self->{'Config'}->{'OptionGroups'}{$group}[0]);
 		if($grpdata)	{
 			$allfields .= qq[
 				<h3><a href="#">$groupname</a></h3>
 				<div>
-					<ul class="connectedSortable" id="fieldgrouping_$group">
+					<ul class="" id="fieldgrouping_$group">
 						$grpdata
 					</ul>
 				</div>	
@@ -311,7 +318,7 @@ sub displayOptions {
 				$self->{'Config'}->{'Config'}{'RunButtonLabel'}
 		);
 		$returnstr.=qq[
-			<div class="ROrunButton"><input type="submit" value="$run_button_label" class="button proceed-button ROButRun"></div>
+			<div class="ROrunButton"><input type="submit" value="$run_button_label" class="btn-main ROButRun"></div>
 		];
 	}
   if (
@@ -341,7 +348,8 @@ sub displayOptions {
 
 		$returnstr.=qq[
 			<div class="ROoptionblock">
-				<div class="ROoptionblock-header">$options_header</div>
+                <h3 class = "panel-header ROoptionblock-header">$options_header</h3>
+                <div class = "panel-body">
 				<table>
 						<tr>
 								<td>$show_label</td>
@@ -419,14 +427,11 @@ sub displayOptions {
     </tr>
     ];
   }
-  $returnstr.='</table></div>';
-
+  $returnstr.='</table>';
   if($self->{'Config'}->{'Config'}{'EmailExport'})  {
-    $returnstr.=qq[
-      <div class="ROoptionblock">
-          <div class="ROoptionblock-header">Report Output</div>
-        <div style="">
-          Choose how you want to receive the data from this report.
+    $returnstr .= qq[
+        <h4 class = "sectionHeader">].$lang->txt('Output').qq[</h4>
+          ].$lang->txt('Choose how you want to receive the data from this report.').qq[
 
           <div style="padding:5px;">
             <input type="radio" name="RO_OutputType" value="screen" class="ROnb" checked id="RO_Output_display"><label for="RO_Output_display"> <b>Display</b></label>
@@ -441,12 +446,11 @@ sub displayOptions {
               <b>Email Address</b> <input type="text" size="45" name="RO_OutputEmail">
             </div>
           </div>
-      </div>
-      </div>
     ];
   }
+  $returnstr .='</div></div><br>';
   $returnstr.=qq[
-      <div class="ROrunButton"><input type="submit" value="$self->{'Config'}->{'Config'}{'RunButtonLabel'}" class="button proceed-button ROButRun"></div>
+      <div class="ROrunButton"><input type="submit" value="$self->{'Config'}->{'Config'}{'RunButtonLabel'}" class="btn-main ROButRun"></div>
   ] if $self->{'Config'}->{'Config'}{'RunButtonLabel'};
   if($returnstr)  {
 		my $carryfields = '';
@@ -486,7 +490,7 @@ sub displayOptions {
 .ui-timepicker-rtl dl { text-align: right; }
 .ui-timepicker-rtl dl dd { margin: 0 65px 10px 10px; }
 </style>
-		<div class="RO_adv_intro">$intro</div>
+		<div class="RO_adv_intro"></div>
 		<div id = "ROallfields-wrapper">
 			<div id = "ROallfields">
 			$allfields
@@ -496,10 +500,10 @@ sub displayOptions {
 				$preblock_beforeform
 			<form action = "$self->{'Data'}{'target'}" method="POST" id="reportform">
 				$preblock
-				<div id = "ROselectedfields-wrapper">
-					<h3>Selected Fields</h3><br>
+                <h3 class = "panel-header">Selected Fields</h3>
+				<div id = "ROselectedfields-wrapper" class = "panel-body">
 					<div id = "ROselectedfields">
-						<ul class="connectedSortable" id="ROselectedfields-list"> </ul>
+						<ul class="connectedSortable" id="ROselectedfields-list"> $outputfields</ul>
 					</div>
 				</div>
 					$returnstr
@@ -1065,6 +1069,7 @@ sub SavedReportBlock	{
 	my $self = shift;
 	my $db = $self->{'db'};
 	my $id = $self->{'ID'} || 0;
+	my $lang = $self->{'Lang'};
 
 	my $options = $self->_getSavedReportList();
 	my $editbutton = q[<input type="submit" name="RO_SR_load" value="Edit" class="button-small generic-button">];
@@ -1104,14 +1109,16 @@ sub SavedReportBlock	{
     </script>
 		].qq[
 		<div class="ROoptionblock">
-			<div class="ROoptionblock-header">Saved Reports</div>
-			$options
-			$runbutton
-			$editbutton
-			<input type="submit" name="RO_SR_savebut" value="Save" id="ROSaveButton" class="button-small generic-button">
-			<input type="hidden" name="RO_SR_save" value="0" id="ROSaveButtonVal">
-			<input type="hidden" name="RO_NewReportName" value="" id="RO_NewReportNameID">
-			$delbutton
+			<h3 class="panel-header ROoptionblock-header">].$lang->txt('Saved Reports').qq[</h3>
+			<div class="panel-body">
+                $options
+                $runbutton
+                $editbutton
+                <input type="submit" name="RO_SR_savebut" value="Save" id="ROSaveButton" class="button-small generic-button">
+                <input type="hidden" name="RO_SR_save" value="0" id="ROSaveButtonVal">
+                <input type="hidden" name="RO_NewReportName" value="" id="RO_NewReportNameID">
+                $delbutton
+            </div>
 		</div>
 		<div id="ROsavedialog" style="display:none;">
 		<br><br>

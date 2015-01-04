@@ -16,3 +16,6 @@ DELETE FROM tblTransLog_Counts;
 
 DELETE FROM tblWFTask;
 DELETE FROM tblAuditLog;
+
+DELETE FROM tblUploadedFiles;
+DELETE FROM tblDocuments;

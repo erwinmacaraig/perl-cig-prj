@@ -566,6 +566,7 @@ sub getTransList {
       t.intTransLogID, 
       t.intID, 
 	  i.strInvoiceNumber,
+	  t.dtPaid,
       intQty, 
       t.dtStart AS dtStart_RAW, 
       DATE_FORMAT(t.dtStart, '%d/%m/%Y') AS dtStart, 
@@ -603,46 +604,65 @@ sub getTransList {
     my $query = $db->prepare($statement);
     $query->execute or print STDERR $statement;
     my $client = setClient($Data->{clientValues});
-    my @Columns = ();
-    ###
-    push (@Columns, {Name => 'Invoice Number', Field => 'strInvoiceNumber', width => 20});
-    ###
-
-    push (@Columns, {Name => 'Transaction Number', Field => 'intTransactionID', width => 20});
-
-    push (@Columns, {Name => 'Item Name', Field => 'strName'});
-    push (@Columns, {Name => 'Quantity', Field => 'intQty', width => 15});
-    #push (@Columns, {Name => 'Current Amount', Field => 'curAmount', width =>20});
-    ########    
-    #push (@Columns, {Name => 'Tax Total', Field => 'TaxTotal', width => 15});
-    push (@Columns, {Name => 'Amount', Field => 'NetAmount', width => 20});    
-    #######
-    push (@Columns, {Name => 'Start', Field => 'dtStart', width => 20});
-    push (@Columns, {Name => 'Start_RAW', Field => 'dtStart_RAW', hide=>1});
-    push (@Columns, {Name => 'End', Field => 'dtEnd', width => 20});
-    push (@Columns, {Name => 'End_RAW', Field => 'dtEnd_RAW', hide=>1});
-    push (@Columns, {Name => 'Status', Field => 'StatusTextLang', width => 20});
-    push (@Columns, {Name => 'Status_raw', Field => 'intStatus', hide => 1});
-    push (@Columns, {Name => '&nbsp;', Field => 'stuff', type => 'HTML', hide => $displayonly});
-    push (@Columns, {Name => 'Pay', Field => 'manual_payment', type => 'HTML', width => 10, hide => ($hidePayment or $hidePay)});
-    push (@Columns, {Name => 'Notes', Field => 'strNotes',  width => 50, hide => $displayonly});
-    push (@Columns, {Name => 'View Receipt', Field => 'strReceipt', type=>"HTML", width => 50, hide => $displayonly});
-    push (@Columns, {Name => '', Field => 'SelectLink', type => 'Selector', hide => $displayonly});
-
-    my @headers = ();
-    foreach my $header (@Columns) {
-        my $sorttype = ($header->{Field} =~ m/int/) ? 'number' : 'text';
-        my $width = $header->{width} || "200";
-        my %href = (
-            name => $header->{Name},
-            field => $header->{Field},
-            sorttype => $sorttype,
-            hide => $header->{hide},
-            type => $header->{type},
-            width => $width
-        );
-        push @headers, \%href;
+warn("LL $hidePayment:$hidePay:$displayonly");
+    my @headers = (
+    {
+        name => 'Invoice Number', 
+        field => 'strInvoiceNumber', 
+        width => 20
+    },
+    {
+        name => 'Select', 
+        field => 'manual_payment', 
+        type => 'HTML', 
+        width => 10, 
+        hide => ($hidePayment or $hidePay), 
+        sortable => 0,
+    },
+    {
+        name => 'Transaction Number', 
+        field => 'intTransactionID', 
+        width => 20
+    },
+    {
+        name => 'Status', 
+        field => 'StatusTextLang', 
+        width => 20
+    },
+    {
+        name => 'Item', 
+        field => 'strName'
+    },
+    {
+        name => 'Quantity', 
+        field => 'intQty', 
+        width => 15
+    },
+    {
+        name => 'Amount', 
+        field => 'NetAmount', 
+        width => 20
+    },
+    {
+        name => 'Date Paid', 
+        field => 'dtPaid',
+        sortdata => 'dtPaid_RAW'
+    },
+    {
+        name => '&nbsp;', 
+        field => 'stuff', 
+        type => 'HTML', 
+        hide => $displayonly, 
+        sortable => 0
+    },
+    {
+        name => '', 
+        field => 'SelectLink', 
+        type => 'Selector', 
+        text => 'Edit', 
+        hide => $displayonly
     }
+    );
     my @rowdata = ();
     my @transCurrency = ();
     my @transAmount = ();
@@ -653,8 +673,8 @@ sub getTransList {
         push @transAmount, $row->{curAmount};
         my $row_data = {};
         $row_data->{id} = $i;
-        foreach my $header (@Columns) {
-            if ($header->{Field} eq 'StatusTextLang') {
+        foreach my $header (@headers) {
+            if ($header->{field} eq 'StatusTextLang') {
                my $status = $row->{intStatus};
                $row->{StatusText} = 'Unpaid' if ($status == 0);
                $row->{StatusText} = 'Paid' if ($status == 1);
@@ -664,15 +684,15 @@ sub getTransList {
                $row->{StatusTextLang} = $Data->{'lang'}->txt('Paid') if ($status == 1);
                $row->{StatusTextLang} = $Data->{'lang'}->txt('Cancelled') if ($status == 2);
              }
-        $row_data->{$header->{Field}} = $row->{$header->{Field}}; 
-              
-
+        $row_data->{$header->{field}} = $row->{$header->{field}}; 
+        $row_data->{'dtPaid_RAW'} = $row->{'dtPaid'}; 
+        $row_data->{'dtPaid'} = $Data->{'l10n'}{'date'}->TZformat($row->{'dtPaid'},'MEDIUM','SHORT'); 
     }
     $row_data->{SelectLink} = qq[main.cgi?client=$client&a=P_TXN_EDIT&personID=$row->{intID}&id=$row->{intTransLogID}&tID=$row->{intTransactionID}];
     if ($row->{StatusText} eq 'Paid') {
-      $row_data->{stuff} = qq[<a href="main.cgi?a=P_TXNLog_payVIEW&client=$client&tlID=$row->{intTransLogID}&amp;pID=$row->{intID}">].$Data->{'lang'}->txt('View Payment Record').qq[</a>];
-      $row_data->{strReceipt} = qq[<a href="printreceipt.cgi?client=$client&amp;ids=$row->{intTransLogID}&amp;pID=$row->{intID}"  target="receipt">].$Data->{'lang'}->txt('View Receipt').qq[</a>];
-      $row_data->{manual_payment} = '';
+      $row_data->{stuff} = qq[<ul><li><a href="main.cgi?a=P_TXNLog_payVIEW&client=$client&tlID=$row->{intTransLogID}&amp;pID=$row->{intID}" class = "">].$Data->{'lang'}->txt('View Payments').qq[</a> ];
+      $row_data->{stuff} .= qq[<li><a href="printreceipt.cgi?client=$client&amp;ids=$row->{intTransLogID}&amp;pID=$row->{intID}"  target="receipt" class = "btn-dinside-panels">].$Data->{'lang'}->txt('View Receipt').qq[</a></ul>];
+      $row_data->{manual_payment} = '-';
     }
     elsif ($row->{StatusText} eq 'Unpaid') {
       $row_data->{strReceipt} = qq[];
@@ -735,14 +755,14 @@ sub getTransList {
 	];
 	$filterHTML = '' if $displayonly;
   my $cl=setClient($Data->{'clientValues'}) || '';
-  my $payment_records_link=qq[<div class="button-row"><a href="$Data->{'target'}?client=$cl&amp;a=P_TXNLog_payLIST" class = "btn-main">].$Data->{'lang'}->txt('List All Payment Records')."</a>" ;
+  my $payment_records_link=qq[<a href="$Data->{'target'}?client=$cl&amp;a=P_TXNLog_payLIST" class = "btn-main">].$Data->{'lang'}->txt('List All Payment Records')."</a>" ;
   
   $payment_records_link = '' if ($hide_list_payments_link);
   
   $grid = $grid ? qq[$grid $payment_records_link]  : qq[<p class="error">].$Data->{'lang'}->txt('No records were found with this filter').qq[</p>$payment_records_link]; 
 
 
-  return (qq[<div class="col-md-12"><div class="transaction_container">] . $grid, $i, \@transCurrency, \@transAmount);
+  return ($grid, $i, \@transCurrency, \@transAmount);
 }
 
 sub setupStandardList {
@@ -847,12 +867,16 @@ sub listTransactions {
 
 
 	($tempBody, $transCount) = getTransList($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref,0,0,0);
-    my $addLink = qq[<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_ADD" class = "btn-main">].$Data->{'lang'}->txt('Add Transaction').qq[</a></div></div></div>];
+    my $addLink = qq[<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_ADD" class = "btn-main">].$Data->{'lang'}->txt('Add Transaction').qq[</a>];
     $addLink = '' if $Data->{'ReadOnlyLogin'};
     $addLink = '' if ($Data->{'clientValues'}{'currentLevel'} == $Data->{'clientValues'}{'authLevel'});
 
-	$body .= $tempBody;
-$body.=' ' .$addLink;
+	$body .= qq[
+        <div class="transaction_container">
+            $tempBody
+            $addLink
+        </div><!-- end-transaction_container -->
+    ];
 
     #GET FILTER TEXT
     my $filterCriterion = '';
@@ -963,6 +987,7 @@ $body.=' ' .$addLink;
 		$body
 		  <br><br>
 		  ];
+    #action="$Data->{'target'}" 
 
 		  $body .= qq[
 			  $CC_body
@@ -992,8 +1017,10 @@ $body.=' ' .$addLink;
         ];
 
         $body .= qq[
-			  <div class="sectionheader">].$lang->txt('Manual Payment').qq[</div>
+			<h3 class="panel-header">].$lang->txt('Manual Payment').qq[</h3>
+            <div class = "panel-body">
 				  $resultMessage
+    
 					<table cellpadding="2" cellspacing="0" border="0">
 					<tbody id="secmain2" >	
 					<tr>
@@ -1009,10 +1036,6 @@ $body.=' ' .$addLink;
 						<td class="label"><label for="l_intPaymentType">].$lang->txt('Payment Type').qq[</label>:</td>
 						<td class="value">].drop_down('paymentType',\%Defs::manualPaymentTypes, undef, $paymentType, 1, 0,'','').qq[</td>
 					</tr>
-
-
-
-
 
 					<!--<tr>
 						<td class="label"><label for="l_strBank">Bank</label>:</td>
@@ -1047,10 +1070,6 @@ $body.=' ' .$addLink;
 						<td class="value"><input type="checkbox" name="intPartialPayment" value="1" id="l_intPartialPayment" ].($Data->{params}{intPartialPayment} ? 'checked' : '').qq[  /> </td>
 					</tr>	-->
 
-
-
-
-
 					<tr>
 
 						<td class="label"><label for="l_strComments">].$lang->txt('Comments').qq[</label>:</td>
@@ -1059,13 +1078,19 @@ $body.=' ' .$addLink;
 				    </tbody>	
 				</table>
 			
-						<div class="HTbuttons"><input onclick="clicked='$targetManual'" type="submit" name="subbut" value="Submit Manual Payment" class="btn-main" id = "btn-manualpay"></div>
+				</div><!-- panel-body -->
+						<div class="button-row"><input onclick="clicked='$targetManual'" type="submit" name="subbut" value="Submit Manual Payment" class="btn-main" id = "btn-manualpay"></div>
 
 						<input type="hidden" name="personID" value="$TableID"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="dt_start_paid" value="$dtStart_paid"><input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
-					</form> 
-				</div>
 			] if $allowMP;
-	  }
+
+## Removed btn-process from class of Submit Manual Payment
+
+        $body .=qq[
+            </div> <!-- manualpayment -->
+					</form> 
+        ];
+	}
   	else	{
 		  $body = qq[
 			 <form action="$Data->{target}" name="n_form" method="POST">
@@ -1091,7 +1116,7 @@ $body.=' ' .$addLink;
 
       }
   } 
-	$body = qq[<div style="width:99%;">$line</div>$body];
+	$body = qq[<div class = "col-md-12">$body</div>];
   return ($body, $header);
 }
 
@@ -1503,12 +1528,12 @@ sub viewTransLog	{
                 },
         );
 	
-        my ($resultHTML, undef )=handleHTMLForm($FieldDefs{'TXNLOG'}, undef, 'display', '',$db);
+        my ($resultHTML, undef )=handleHTMLForm($FieldDefs{'TXNLOG'}, undef, 'display', 1,$db);
 
 	#my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
   my $previousAttemptsBody = qq[
-    <div class="sectionheader">].$lang->txt('Previous Payment attempts') . qq[</div>
-    <table class="listTable">
+    <h2 class="section-header">].$lang->txt('Previous Payment attempts') . qq[</h2>
+    <table class="table">
     <tr>
       <th>].$lang->txt('Payment Type') . qq[</th>
       <th>].$lang->txt('Date/Time') . qq[</th>
@@ -1549,8 +1574,8 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 
 	my $body = qq[
     $previousAttemptsBody
-		<div class="sectionheader">].$lang->txt('Items making up this Payment').qq[</div>
-		<table class="listTable">
+		<h2 class="section-header">].$lang->txt('Items making up this Payment').qq[</h2>
+		<table class="table">
 		<tr>
 			<th>].$lang->txt('Invoice Number').qq[</th>
 			<th>].$lang->txt('Transaction Number').qq[</th>
@@ -1589,7 +1614,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 
 	$body .= qq[</table>];
 	
-	$body = $count ? qq[<div class="sectionheader">].$lang->txt('Payment Summary').qq[</div>] . $resultHTML.$body: $resultHTML;
+	$body = $count ? qq[<h2 class="section-header">].$lang->txt('Payment Summary').qq[</h2>] . $resultHTML.$body: $resultHTML;
 	
 	my $chgoptions='';
     
@@ -1692,7 +1717,7 @@ sub viewPayLaterTransLog    {
 	$headerText = $Data->{'SystemConfig'}{'regoform_PayLaterText'} if ($Data->{'SystemConfig'}{'regoform_PayLaterText'});
 	my $body = qq[
 		$headerText
-		<div class="sectionheader">Items making up this order</div>
+		<h2 class="section-header">Items making up this order</h2>
 		<table class="listTable">
 		<tr>
 			<th>Transaction Number</th>
@@ -1768,7 +1793,6 @@ sub listTransLog	{
 	my $statement =qq[
 		SELECT 
       DISTINCT TL.*, 
-      DATE_FORMAT(TL.dtLog,"%d/%m/%Y %H:%i") AS dtLog,
       TL.dtLog AS dtLog_RAW
 		FROM 
       tblTransLog as TL
@@ -1804,7 +1828,7 @@ sub listTransLog	{
            	intAmount => $dref->{'intAmount'}, 		
             status => $dref->{'status'},
 			strResponseCode => $dref->{'strResponseCode'},
-			dtLog => $dref->{'dtLog'},
+			dtLog => $Data->{'l10n'}{'date'}->TZformat($dref->{'dtLog'},'MEDIUM','SHORT'),
 			dtLog_RAW => $dref->{'dtLog_RAW'},
 			receipt => qq[<a href = "printreceipt.cgi?client=$client&ids=$dref->{intLogID}" target="receipt">].$textLabels{'viewReceipt'}."</a>",
 			strComments => $dref->{'strComments'},
@@ -1842,6 +1866,7 @@ sub listTransLog	{
     {
       name =>   $Data->{'lang'}->txt('Date'),
       field =>  'dtLog',
+      sortdata =>  'dtLog_RAW',
     },
     {
       name =>   $Data->{'lang'}->txt('Comments'),
@@ -1859,7 +1884,7 @@ sub listTransLog	{
     columns => \@headers,
     rowdata => \@rowdata,
     gridid => 'grid',
-    width => '99%',
+    width => '100%',
     height => 700,
   );
 

@@ -12,13 +12,13 @@
 			</tr>
 			<tr>
 				<td>
-                    <input style="padding: 5px" class="search-mid" type="text" placeholder="Search MA ID"/>
+                    <input style="padding: 5px" class="search-mid" type="text" placeholder="[% Lang.txt('Search MA ID') %]"/>
 		        </td>
 				<td>
-                    <input style="padding: 5px" class="search-name" type="text" placeholder="Search Name"/>
+                    <input style="padding: 5px" class="search-name" type="text" placeholder="[% Lang.txt('Search Name') %]"/>
 		        </td>
 				<td>
-                    <input style="padding: 5px" class="search-org" type="text" placeholder="Search Organisation"/>
+                    <input style="padding: 5px" class="search-org" type="text" placeholder="[% Lang.txt('Search Organisation') %]"/>
 		        </td>
 				<td>
 					<select class="sort-dob">
@@ -54,9 +54,20 @@
                     <td><span class="fa fa-user"></span>[% rego.ma_id %]</td>
                     <td>[% rego.name %]</td>
                     <td>[% rego.org %]</td>
-                    <td>[% DateFormat.format(rego.dob,'MEDIUM') %]</td>
+                    <td data-order = "[% rego.dob %]">[% DateFormat.format(rego.dob,'MEDIUM') %]</td>
                     <td><span class="fa fa-clock-o"></span>[% rego.role %]</td>
-                    <td><a href="[% rego.link %]" class="btn-inside-panels">[% Lang.txt('View') %]</a></td>
+
+                    <td>
+                    [% IF rego.inProgressRequestExists %]
+                        [% Lang.txt('Request Access sent to Club') %]
+                    [% ELSIF rego.submittedPersonRegistrationExists %]
+                        [% Lang.txt('Request Access for approval') %]
+                    [% ELSIF rego.acceptedRequestLink %]
+                        <a href="[% rego.acceptedRequestLink %]" class="btn-inside-panels">[% Lang.txt('View Request') %]</a>
+                    [% ELSE %]
+                        <a href="[% rego.link %]" class="btn-inside-panels">[% Lang.txt('View') %]</a>
+                    [% END %]
+                    </td>
                 </tr>
 		    [% END %]
 		</tbody>

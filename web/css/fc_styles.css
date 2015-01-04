@@ -486,9 +486,20 @@ a.btn-main, input.btn-main, button.btn-main {
 	background: -ms-linear-gradient(top,  #1870a5 0%,#095b8d 100%);
 	background: linear-gradient(to bottom,  #1870a5 0%,#095b8d 100%);
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1870a5', endColorstr='#095b8d',GradientType=0 );
+    border:1px solid #b5b8c8;
 }
-a.btn-proceed:after, input.btn-proceed:after, button.btn-main:after {
-    content: "TEST";
+a.btn-main.btn-proceed {
+    padding-left:20px;
+    padding-bottom:7px;
+}
+.proceed-chevron    {
+    float:right;
+    position:relative;
+    bottom:3px;
+    right:-10px;
+    font-weight:bold;
+    margin:0 !important;
+    padding:0px;
 }
 
 /* if btn-disabled class name will be changed, check fc-common.js. btn-disabled links must return false */
@@ -1176,6 +1187,9 @@ i.indicator {
 	border-bottom: solid 1px  #ddd;
 	overflow:hidden;
 }
+div.transfertabs.tab-content > .active {
+	overflow:visible;
+}
 
 .member-home-page {
 	margin-top:30px;
@@ -1195,7 +1209,8 @@ a.btn-inside-docs-panel {
     font-weight: normal;
     font-size: 14px;
 	color: #fff;
-	padding: 5px 25px;
+	/*padding: 5px 25px;*/
+	padding: 5px 20px;
 	display: inline-block;
     text-align: center;
 	background: #1870a5;
@@ -1768,6 +1783,9 @@ form#flowFormID #fsg-main label {
 form#flowFormID #fsgw-other label {
 	margin-top: 6px;
 }
+#itcrequestform .form-group label {
+	margin-top: 6px;
+}
 form#flowFormID #l_row_type,#l_row_sport label {
 	margin-top: 0px;
 }
@@ -1916,20 +1934,20 @@ header nav ul li a.selected {
 }
 
 
-#doctab1 .documents-list table.table .task-list .status-col span {
+div[id*="doctab"] .documents-list table.table .task-list .status-col span {
     float: left;
     padding-left: 3px;
     width: 49%;
 }
-#doctab1 .documents-list table.table .task-list .status-col i span {
+div[id*="doctab"] .documents-list table.table .task-list .status-col i span {
     float: left;
     padding-left: 9%;
     width: 91%;
 }
-#doctab1 .documents-list table.table .task-list .status-col i.fa-circle {
+div[id*="doctab"] .documents-list table.table .task-list .status-col i.fa-circle {
 	float: left;
 }
-#doctab1 .documents-list table.table .task-list .status-col a.btn-inside-docs-panel {
+div[id*="doctab"] .documents-list table.table .task-list .status-col a.btn-inside-docs-panel {
 	width: 95px;
 }
 

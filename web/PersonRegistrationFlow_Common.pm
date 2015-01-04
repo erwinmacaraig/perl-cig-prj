@@ -78,7 +78,7 @@ sub displayRegoFlowCompleteBulk {
         $body .= displayPaymentResult($Data, $id, 1, '');
     }
     
-    return $body;
+    return ($body, $gateways);
 }
 
 sub displayRegoFlowSummaryBulk  {
@@ -95,7 +95,34 @@ sub displayRegoFlowSummaryBulk  {
         my ($prodID, $qty) = split /-/, $prodQty;
         $hidden_ref->{"prodQTY_$prodID"} =$qty;
     }
-    #($hidden_ref->{'txnIds'}, undef) = save_rego_products($Data, $regoID, $personID, $entityID, $rego_ref->{'entityLevel'}, $rego_ref, $hidden_ref); #\%params);
+    my @IDs= split /\|/, $hidden_ref->{'rolloverIDs'};
+		my $c = Countries::getISOCountriesHash();
+    
+    my @People=();
+    for my $pID (@IDs)   {
+        my $personObj = getInstanceOf($Data, 'person', $pID);
+        my %personData = ();
+        $personData{'MAID'} = $personObj->getValue('strNationalNum');
+        $personData{'Name'} = $personObj->getValue('strLocalFirstname');
+        $personData{'Familyname'} = $personObj->getValue('strLocalSurname');
+        $personData{'Maidenname'} = $personObj->getValue('strMaidenName');
+        $personData{'DOB'} = $personObj->getValue('dtDOB');
+        $personData{'Gender'} = $Data->{'lang'}->txt($Defs::genderInfo{$personObj->getValue('intGender') || 0}) || '';
+        $personData{'Nationality'} = $c->{$personObj->getValue('strISONationality')};
+        $personData{'Country'} = $c->{$personObj->getValue('strISOCountryOfBirth')} || '';
+        $personData{'Region'} = $personObj->getValue('strRegionOfBirth') || '';
+
+        $personData{'Addressone'} = $personObj->getValue('strAddress1') || '';
+        $personData{'Addresstwo'} = $personObj->getValue('strAddress2') || '';
+        $personData{'City'} = $personObj->getValue('strSuburb') || '';
+        $personData{'State'} = $personObj->getValue('strState') || '';
+        $personData{'Postal'} = $personObj->getValue('strPostalCode') || '';
+        $personData{'Phone'} = $personObj->getValue('strPhoneHome') || '';
+        $personData{'Countryaddress'} = $c->{$personObj->getValue('strISOCountry')} || '';
+        $personData{'Email'} = $personObj->getValue('strEmail') || '';
+        push @People, \%personData;
+    }
+
 
     my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
     my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
@@ -110,7 +137,6 @@ sub displayRegoFlowSummaryBulk  {
      
       
     my $personObj = getInstanceOf($Data, 'person');
-    my $c = Countries::getISOCountriesHash();
     
     my $languages = PersonLanguages::getPersonLanguages( $Data, 1, 0);
     #for my $l ( @{$languages} ) {
@@ -119,12 +145,25 @@ sub displayRegoFlowSummaryBulk  {
     #        last;	
     #    }
     #}
-    my $role_ref = getEntityTypeRoles($Data, $rego_ref->{'strSport'}, $rego_ref->{'strPersonType'});
-    $rego_ref->{'roleName'} = $role_ref->{$rego_ref->{'strPersonEntityRole'}};
+    my $role_ref = getEntityTypeRoles($Data, $hidden_ref->{'d_sport'}, $hidden_ref->{'d_type'});
+    $rego_ref->{'roleName'} = $role_ref->{$hidden_ref->{'d_role'}};
+
+    $rego_ref->{'Sport'} = $Defs::sportType{$hidden_ref->{'d_sport'}} || '';
+    $rego_ref->{'PersonType'} = $Defs::personType{$hidden_ref->{'d_type'}} || '';
+    $rego_ref->{'PersonLevel'} = $Defs::personLevel{$hidden_ref->{'d_level'}} || '';
+    $rego_ref->{'AgeLevel'} = $Defs::ageLevel{$hidden_ref->{'d_age'}} || '';
+    $rego_ref->{'RegistrationNature'} = $Defs::registrationNature{$hidden_ref->{'d_nat'}} || '';
+
+    my $entityObj = getInstanceOf($Data, 'entity', $entityID);
+    if ($entityObj) {
+        $rego_ref->{'strLocalName'} = $entityObj->getValue('strLocalName');
+    }
+
 
     my $editlink =  $Data->{'target'}."?".$carryString;
     my %PageData = (
         person_home_url => $url,
+        people=> \@People,
         registration => $rego_ref,
         gateways => $gateways,
         txnCount => $txnCount,
@@ -147,6 +186,7 @@ sub displayRegoFlowSummaryBulk  {
 
     return $body;
 }
+
 sub displayRegoFlowSummary {
 
     my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref, $carryString) = @_;
@@ -366,6 +406,7 @@ print STDERR "COMPLETE RUN" . $run;
     }
 print STDERR "000OK IS $ok | $run\n\n";
     my $body = '';
+    my $gateways = '';
     if (!$ok)   {
         my $error = $lang->txt("You cannot register this combination, limit exceeded");
         my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_T";
@@ -399,7 +440,6 @@ print STDERR "000OK IS $ok | $run\n\n";
 
         my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
         my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
-        my $gateways = '';
 	 	my $txnCount = 0;
 		my $logIDs;
 		my $txn_invoice_url = $Defs::base_url."/printinvoice.cgi?client=$client&amp;rID=$hidden_ref->{'rID'}&amp;pID=$personID";
@@ -497,7 +537,7 @@ print STDERR "000OK IS $ok | $run\n\n";
             $body .= displayPaymentResult($Data, $id, 1, '');
         }
     }
-    return $body;
+    return ($body, $gateways);
 }
 sub getRegoTXNDetails  {
 

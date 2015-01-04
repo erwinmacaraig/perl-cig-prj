@@ -752,7 +752,7 @@ sub display_summary {
         }
     }
 
-    my $facilityFields = new EntityFields();
+    $facilityFields = new EntityFields();
     my $facilityFieldCount = $self->{'RunParams'}{'facilityFieldCount'} || 0;
     $facilityFields->setCount($facilityFieldCount);
     $facilityFields->setEntityID($self->{'RunParams'}{'e'});

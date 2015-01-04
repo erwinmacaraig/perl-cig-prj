@@ -10,7 +10,11 @@
 				<div class="alert">
 					<div>
 						<span class="fa fa-exclamation"></span>
-						<p>[% Lang.txt('By approving you are giving access to all of') %] [% personFirstname %] [% personSurname %] [% Lang.txt('details to') %] [% requestFrom %]</p>
+                        [% IF personStatus == 'PENDING' %]
+						    <p>[% Lang.txt('Add Role process cannot continue until re-approved by ') %] [% MA %].</p>
+                        [% ELSE %]
+						    <p>[% Lang.txt('By approving you are giving access to all of') %] [% personFirstname %] [% personSurname %] [% Lang.txt('details to') %] [% requestFrom %]</p>
+                        [% END %]
 					</div>
 				</div>
 
@@ -159,14 +163,16 @@
 
                         [% IF RequestAction.showAction == 1 %]
                         <div style="float: right">
-                            <form style="" action="[% RequestAction.target %]" method="POST" class="pull-left">
-                                <input type="hidden" name="client" value="[% RequestAction.client %]">
-                                <input type="hidden" name="request_type" value="[% RequestAction.request_type %]">
-                                <input type="hidden" name="a" value="[% RequestAction.action %]">
-                                <input type="hidden" name="rid" value="[% RequestAction.rid %]">
-                                <input type="hidden" name="response" value="accept">
-                                <input class="btn-main" style="border: 0px solid" type="submit" name="action" value="[% Lang.txt('Approve access') %]">
-                            </form>
+                            [% IF personStatus == 'REGISTERED' %]
+                                <form style="" action="[% RequestAction.target %]" method="POST" class="pull-left">
+                                    <input type="hidden" name="client" value="[% RequestAction.client %]">
+                                    <input type="hidden" name="request_type" value="[% RequestAction.request_type %]">
+                                    <input type="hidden" name="a" value="[% RequestAction.action %]">
+                                    <input type="hidden" name="rid" value="[% RequestAction.rid %]">
+                                    <input type="hidden" name="response" value="accept">
+                                    <input class="btn-main" style="border: 0px solid" type="submit" name="action" value="[% Lang.txt('Approve access') %]">
+                                </form>
+                            [% END %]
 
                             <a style="" class="btn-main transfer-deny" data-target="#showDenyRequestNotes" data-actiontype="DENY" href = "">
                                 [% Lang.txt('Reject access') %]
@@ -235,7 +241,7 @@
 
           <div class="modal-footer">
             <a class="btn-main" data-dismiss="modal">Close</a>
-            <input class="btn-main" type="submit" name="submit" value="Submit">
+            <input class="btn-main" type="submit" name="submitb" value="Submit">
           </div>
       </form>
       

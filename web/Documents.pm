@@ -5,8 +5,8 @@
 package Documents;
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(handle_documents);
-@EXPORT_OK = qw(handle_documents);
+@EXPORT = qw(handle_documents pendingDocumentActions);
+@EXPORT_OK = qw(handle_documents pendingDocumentActions);
 
 use strict;
 use lib "..",".";
@@ -21,6 +21,11 @@ use AuditLog;
 use UploadFiles;
 use FormHelpers;
 use GridDisplay;
+
+use PersonObj;
+use WorkFlow;
+
+
 use Data::Dumper;
 
 sub handle_documents {
@@ -188,6 +193,10 @@ sub list_docs {
 			name => $Data->{'lang'}->txt('Title'),
 			field => 'Title',
 		},
+		{
+			name => $Data->{'lang'}->txt('Document Type'),
+			field => 'DocumentType',
+		},
        {
             name => $Data->{'lang'}->txt('Size'),
             field => 'Size',
@@ -199,6 +208,7 @@ sub list_docs {
         {
             name => $Data->{'lang'}->txt('Date Uploaded'),
             field => 'DateAdded',
+            sortdata => 'DateAdded_RAW',
         }, 
         {
             name => $Data->{'lang'}->txt('View'),
@@ -300,7 +310,13 @@ sub new_doc_form {
 	<div class="pageHeading">$title</div>
 	<br />
          	<div id="docselect">
-		<form action="$target" method="POST" enctype="multipart/form-data" class="dropzone">			
+		<form action="$target" method="POST" enctype="multipart/form-data" class="dropzone" id = "docform">			
+         <script>
+              Dropzone.options.docform = { 
+                  maxFilesize: 25 // MB 
+              };
+         </script>
+
 
 		<input type="hidden" name="client" value="].unescape($client).qq[">];
 	if($DocumentTypeID){
@@ -323,7 +339,7 @@ sub new_doc_form {
 			
 		</form> 
                 <br />  
-                <span class=""><a href="$Data->{'target'}?client=$client&amp;a=P_DOCS" class = "btn-main">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+                <span class=""><a href="$Data->{'target'}?client=$client&amp;a=P_DOCS" class = "btn-main btn-proceed">] . $Data->{'lang'}->txt('Continue').q[</a></span>
 		</div>
 	];
 	return $body;
@@ -379,5 +395,74 @@ sub delete_doc {
   return $response;
 	
 }
+
+sub pendingDocumentActions {
+    my ($Data, $personID, $regoID, $documentID) = @_;
+
+    return if (!$personID);
+    my $originEntityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'authLevel'}) || getLastEntityID($Data->{'clientValues'});
+
+    my $stDT = qq[
+        SELECT strActionPending, PR.intEntityID, PR.strRegistrationNature
+        FROM tblDocuments as D INNER JOIN tblDocumentType as DT ON (DT.intDocumentTypeID=D.intDocumentTypeID)
+            LEFT JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (PR.intPersonRegistrationID = D.intPersonRegistrationID and PR.intPersonRegistrationID=?)
+        WHERE 
+            D.intDocumentID=?
+            AND D.intPersonID=?
+    ];
+    my $query = $Data->{'db'}->prepare($stDT);
+    $query->execute(
+        $regoID,
+        $documentID,
+        $personID,
+    );
+    my ($valuePending,$entityID, $nature) = $query->fetchrow_array();
+    
+    if ($valuePending eq 'PERSON' or $valuePending eq 'BOTH') {
+        my $personObj = new PersonObj(db => $Data->{'db'}, ID => $personID, cache => $Data->{'cache'});
+        $personObj->load();
+        if ($personObj) {
+            $personObj->setValues({'strStatus' => $Defs::PERSON_STATUS_PENDING});
+            $personObj->write();
+        }
+        my $rc = WorkFlow::addWorkFlowTasks(
+            $Data,
+            'PERSON',
+            'AMENDMENT',
+            $Data->{'clientValues'}{'authLevel'} || 0,
+            $entityID, #originEntityID,
+            $personID,
+            0,
+            0,
+        );
+    }
+    if ($regoID and ($valuePending eq 'REGO' or $valuePending eq 'BOTH'))   {
+        my $st = qq[
+            UPDATE tblPersonRegistration_$Data->{'Realm'}
+            SET strStatus='PENDING'
+            WHERE strStatus IN ('ACTIVE')
+                AND intPersonID=?
+                AND intPersonRegistrationID=?
+        ];
+        $query = $Data->{'db'}->prepare($st);
+        $query->execute(
+            $personID, 
+            $regoID
+        );
+        my $rc = WorkFlow::addWorkFlowTasks(
+            $Data,
+            'REGO',
+            $nature,
+            $Data->{'clientValues'}{'authLevel'} || 0,
+            $entityID || 0,
+            $personID,
+            $regoID,
+            0
+        );
+    }
+}
+
+
+
 
 1;

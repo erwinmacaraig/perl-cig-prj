@@ -182,6 +182,7 @@ sub display_core_details    {
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Person',);
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
     my $newRegoWarning = '';
+    my $bypassduplicate = '';
     if(!$id)    {
         my $lang = $self->{'Data'}{'lang'};
         my $client = $self->{'Data'}{'client'};
@@ -206,6 +207,23 @@ sub display_core_details    {
             <div class="alert"> 
                 <div> <span class="fa fa-info"></span> <p>$txt</p> </div> </div>
         ];
+        if($self->{'RunDetails'}{'FoundDuplicate'}) {
+            $bypassduplicate = qq[
+                <p>
+                <a href = "#" id = "btn-notduplicate" class = "btn-main btn-proceed">].$lang->txt('I have validated that this person is not a duplicate').qq[</a>
+                </p>
+                <script>
+                    jQuery(document).ready(function(){
+                        jQuery('#btn-notduplicate').click(function(e)   {
+                            e.preventDefault();
+                            jQuery('#flowFormID').append('<input type = "hidden" name = "bd" value = "1">');
+                            jQuery('#flowFormID').submit();
+                        });
+
+                    });
+                </script>
+            ];
+        }
     }
     my $panel = '';
     $panel = personSummaryPanel($self->{'Data'}, $id) if $id;
@@ -217,7 +235,8 @@ sub display_core_details    {
         ScriptContent => $scriptContent || '',
         FlowSummaryContent => $panel || '',
         Title => '',
-        TextTop => $newRegoWarning,
+        PageInfo => $newRegoWarning,
+        TextTop => $bypassduplicate,
         TextBottom => '',
     );
 
@@ -243,9 +262,13 @@ sub validate_core_details    {
     ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
 
     my $id = $self->ID() || 0;
+    my $lang = $self->{'Data'}{'lang'};
     if(!scalar(@{$self->{'RunDetails'}{'Errors'}})) {
-        if(!$id and isPossibleDuplicate($self->{'Data'}, $userData))    {
-            push @{$self->{'RunDetails'}{'Errors'}}, 'This person is a possible duplicate';
+        if(!$id and isPossibleDuplicate($self->{'Data'}, $userData) and !$self->{'RunParams'}{'bd'})    {
+            my $msg = $lang->txt('This person is a possible duplicate.');
+            $msg .= $lang->txt(qq[  If you have checked and this person is not a duplicate, then click the button below.]);
+            push @{$self->{'RunDetails'}{'Errors'}}, $msg;
+            $self->{'RunDetails'}{'FoundDuplicate'} = 1;
         }
     }
 
@@ -537,7 +560,6 @@ sub display_registration {
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
     }
-        print STDERR "$personID PERSON IS : " . $self->{'ClientValues'}{'personID'};
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
@@ -557,150 +579,78 @@ sub display_registration {
 
     my $defaultRegistrationNature = $self->{'RunParams'}{'dnat'} || '';
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
-    my $entitySelectionNeeded= $self->{'RunParams'}{'es'} || 0;
-    $entitySelectionNeeded = 0 if (! $self->{'SystemConfig'}{'maFlowEntitySelect'});
-    if ($entitySelectionNeeded and ! $regoID and $originLevel > $Defs::LEVEL_CLUB and $entityLevel > $Defs::LEVEL_CLUB) {
-        $entitySelectionNeeded =1;
-        $self->addCarryField('es', 0);
-        $noContinueButton = 1;
-        my %ESN=();
-        my $nexturl = $self->{'Target'}."?";
-        $ESN{'es'} = 0;
-        $ESN{'target'} = $self->{'Target'};
-        $ESN{'url'} = $nexturl;
-        $ESN{'client'} = $client;
-        $ESN{'RealmName'} = 'Singapore Football Association';
-
-        my %tempClientValues = getClient($client);
-        $tempClientValues{currentLevel} = 1;
-        $tempClientValues{clubID} = 823;
-        $tempClientValues{personID} = $personID;
-        my $tempClient = setClient(\%tempClientValues);
-        %tempClientValues = getClient($tempClient);
-        print STDERR "NEW PER" . $tempClientValues{'personID'};
-
-        $ESN{'tempclient'} = $tempClient;
-
-        my $st = qq[
-            SELECT 
-                E.intEntityID as childEntityID, 
-                E.strLocalName
-            FROM
-                tblEntity as E
-                INNER JOIN tblTempEntityStructure as TE ON (
-                    TE.intChildID = E.intEntityID
-                )
-            WHERE 
-                TE.intRealmID=?
-                AND TE.intParentID = ?
-                AND E.strStatus IN ('PENDING', 'ACTIVE')
-            ORDER BY 
-                strLocalName
-        ];
-        my $q = $self->{'Data'}->{'db'}->prepare($st);
-        $q->execute(
-            $self->{'Data'}->{'Realm'},     
-            $entityID
-        );
-
-        my @Entities = ();
-        while (my $dref = $q->fetchrow_hashref())   {
-            my %tempClientValues = getClient($client);
-            $tempClientValues{currentLevel} = $Defs::LEVEL_PERSON;
-            $tempClientValues{clubID} = $dref->{'childEntityID'};
-            $tempClientValues{personID} = $personID;
-            my $tempClient = setClient(\%tempClientValues);
-            my %Entity=();
-            $Entity{'client'} = $tempClient;
-            $Entity{'entityID'} = $dref->{'childEntityID'};
-            $Entity{'localName'} = $dref->{'strLocalName'};
-            push @Entities, \%Entity;
-        }
-    use Data::Dumper;
-        print STDERR Dumper(\@Entities);
-        $ESN{'entitySelections'} = \@Entities;        
-         
-                
-        
-
-        ## Build up list of clubs
-        ## upon click change to that level (ie in client string)
-        $content = runTemplate(
-            $self->{'Data'},
-            \%ESN,
-            'registration/entityselect.templ'
-        );
-
+    my $entitySelection = $originLevel == $Defs::LEVEL_CLUB ? 0 : 1;
+    if(
+        $entitySelection 
+        and exists $self->{'SystemConfig'}{'maFlowEntitySelect'}
+        and $self->{'SystemConfig'}{'maFlowEntitySelect'} == 0
+    )   {
+        $entitySelection = 0;
     }
-    else    {
-        $entitySelectionNeeded =0;
-        $self->addCarryField('es', 0);
-    }
-    if (! $entitySelectionNeeded) {
-        if($defaultRegistrationNature eq 'TRANSFER')   {
-            $noContinueButton = 0;
-            my %regFilter = (
-                'entityID' => $entityID,
-                'requestID' => $self->{'RunParams'}{'prid'},
-                #'requestID' => 12213,
-            );
-            my $request = getRequests($self->{'Data'}, \%regFilter);
-            $request = $request->[0];
+    if($defaultRegistrationNature eq 'TRANSFER')   {
+        $noContinueButton = 0;
+        my %regFilter = (
+            'entityID' => $entityID,
+            'requestID' => $self->{'RunParams'}{'prid'},
+            #'requestID' => 12213,
+        );
+        my $request = getRequests($self->{'Data'}, \%regFilter);
+        $request = $request->[0];
 
-            if(!$request) {
-                push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person Request';
-                $noContinueButton = 1;
-                $content = "Person Request Details not found.";
-            }
-            else {
-                $request->{'personType'} = $Defs::personType{$request->{'strPersonType'}};
-                $request->{'sport'} = $Defs::sportType{$request->{'strSport'}};
-                $request->{'personLevel'} = $Defs::personLevel{$request->{'strPersonLevel'}};
-
-                $self->addCarryField('d_nature', 'TRANSFER');
-                $self->addCarryField('d_type', $request->{'strPersonType'});
-                $self->addCarryField('d_level', $request->{'strPersonLevel'});
-                $self->addCarryField('d_sport', $request->{'strSport'});
-                $self->addCarryField('d_age', $request->{'personCurrentAgeLevel'});
-
-                $content = runTemplate(
-                    $self->{'Data'},
-                    {
-                        requestSummary => $request,
-                    },
-                    'personrequest/generic/reg_summary.templ'
-                );
-            }
-        }
-        elsif($defaultRegistrationNature eq 'RENEWAL') {
-            my $rawDetails;
-            ($content, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rpID'});
-
-            if(!$content or !$rawDetails) {
-                push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt('Invalid Renewal Details');
-                $content = $lang->txt("No record found.");
-            }
-
-            $self->addCarryField('d_nature', 'RENEWAL');
-            $self->addCarryField('d_type', $rawDetails->{'strPersonType'});
-            $self->addCarryField('d_level', $rawDetails->{'strPersonLevel'});
-            $self->addCarryField('d_sport', $rawDetails->{'strSport'});
-            $self->addCarryField('d_age', $rawDetails->{'newAgeLevel'}); # if $rawDetails->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER;
-            $self->addCarryField('d_role', $rawDetails->{'strPersonEntityRole'});
+        if(!$request) {
+            push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person Request';
+            $noContinueButton = 1;
+            $content = "Person Request Details not found.";
         }
         else {
-             $content = displayPersonRegisterWhat(
+            $request->{'personType'} = $Defs::personType{$request->{'strPersonType'}};
+            $request->{'sport'} = $Defs::sportType{$request->{'strSport'}};
+            $request->{'personLevel'} = $Defs::personLevel{$request->{'strPersonLevel'}};
+
+            $self->addCarryField('d_nature', 'TRANSFER');
+            $self->addCarryField('d_type', $request->{'strPersonType'});
+            $self->addCarryField('d_level', $request->{'strPersonLevel'});
+            $self->addCarryField('d_sport', $request->{'strSport'});
+            $self->addCarryField('d_age', $request->{'personCurrentAgeLevel'});
+
+            $content = runTemplate(
                 $self->{'Data'},
-                $personID,
-                $entityID,
-                $dob || '',
-                $gender || 0,
-                $originLevel,
-                $url,
-                0,
-                $regoID,
+                {
+                    requestSummary => $request,
+                },
+                'personrequest/generic/reg_summary.templ'
             );
         }
+    }
+    elsif($defaultRegistrationNature eq 'RENEWAL') {
+        my $rawDetails;
+        ($content, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rpID'});
+
+        if(!$content or !$rawDetails) {
+            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt('Invalid Renewal Details');
+            $content = $lang->txt("No record found.");
+        }
+
+        $self->addCarryField('d_nature', 'RENEWAL');
+        $self->addCarryField('d_type', $rawDetails->{'strPersonType'});
+        $self->addCarryField('d_level', $rawDetails->{'strPersonLevel'});
+        $self->addCarryField('d_sport', $rawDetails->{'strSport'});
+        $self->addCarryField('d_age', $rawDetails->{'newAgeLevel'}); # if $rawDetails->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER;
+        $self->addCarryField('d_role', $rawDetails->{'strPersonEntityRole'});
+    }
+    else {
+         $content = displayPersonRegisterWhat(
+            $self->{'Data'},
+            $personID,
+            $entityID,
+            $dob || '',
+            $gender || 0,
+            $originLevel,
+            $url,
+            0,
+            $regoID,
+            $entitySelection, #display entity Selection
+        );
     }
 
     my %PageData = (
@@ -737,13 +687,35 @@ sub process_registration {
     my $changeExistingReg = $self->{'RunParams'}{'changeExisting'} || 0;
     my $registrationNature = $self->{'RunParams'}{'d_nature'} || '';
     my $personRequestID = $self->{'RunParams'}{'prid'} || '';
+    my $entitySelected = $self->{'RunParams'}{'d_eId'} || '';
+    my $entityTypeSelected = $self->{'RunParams'}{'d_etype'} || '';
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
     my $lang = $self->{'Lang'};
+    my $entitySelection = $originLevel == $Defs::LEVEL_CLUB ? 0 : 1;
+    if(
+        $entitySelection 
+        and exists $self->{'SystemConfig'}{'maFlowEntitySelect'}
+        and $self->{'SystemConfig'}{'maFlowEntitySelect'} == 0
+    )   {
+        $entitySelection = 0;
+    }
+    if($entitySelection)    {
+        if($entitySelected and $entityTypeSelected) {
+            $entityID = $entitySelected;
+            $entityLevel = $entityTypeSelected;
+        }
+    }
+    if($entityID != getLastEntityID($self->{'ClientValues'}))   {
+        $self->rebuildClient($entityID, $entityLevel);
+    }
 
     my $personID = $self->ID() || 0;
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
+        return ('Invalid User',0);
+    }
+    if(!doesUserHaveEntityAccess($self->{'Data'}, $entityID,'WRITE')) {
         return ('Invalid User',0);
     }
     my $regoID = 0;
@@ -1126,6 +1098,13 @@ sub display_documents {
         $rego_ref->{'Nationality'} = $nationality;
         $rego_ref->{'InternationalTransfer'} = $itc;
 
+     if (! $regoID or ! $personID)  {
+        my $lang = $self->{'Data'}{'lang'};
+        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Registration failed, cannot find registration.");
+        $self->setCurrentProcessIndex('r');
+        return ('',2);
+    }
+
         $content = displayRegoFlowDocuments(
             $self->{'Data'}, 
             $regoID, 
@@ -1196,6 +1175,12 @@ sub process_documents {
         $rego_ref->{'InternationalTransfer'} = $itc;
     }
 
+     if (! $regoID or ! $personID)  {
+        my $lang = $self->{'Data'}{'lang'};
+        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Registration failed, cannot find registration.");
+        $self->setCurrentProcessIndex('r');
+        return ('',2);
+    }
     #check for uploaded document
     my ($error_message, $isRequiredDocPresent) = checkUploadedRegoDocuments($self->{'Data'}, 
             $regoID, 
@@ -1325,6 +1310,7 @@ sub display_complete {
 
     my $rego_ref = {};
     my $content = '';
+    my $gateways= '';
     if($regoID) {
         my $valid =0;
         ($valid, $rego_ref) = validateRegoID(
@@ -1362,7 +1348,7 @@ sub display_complete {
         my $hiddenFields = $self->getCarryFields();
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
-        $content = displayRegoFlowComplete(
+        ($content, $gateways) = displayRegoFlowComplete(
             $self->{'Data'}, 
             $regoID, 
             $client, 
@@ -1394,6 +1380,7 @@ sub display_complete {
         TextTop => '',
         TextBottom => '',
         NoContinueButton => 1,
+        gateways => $gateways
     );
     my $pagedata = $self->display(\%PageData);
 
@@ -1622,6 +1609,54 @@ sub moveDocuments {
 }
 
  
+
+sub rebuildClient   {
+    # Called if inserting into entity that is not the current entity.
+    # Rebuilds and updates client string so that the entity is the
+    # current entity
+    my $self = shift;
+    my ($entityID, $entityLevel) = @_;
+
+    my $clientValues = $self->{'ClientValues'};
+    my $currentLevel = $clientValues->{'currentLevel'};
+    my $authLevel = $clientValues->{'authLevel'};
+    if($currentLevel != $Defs::LEVEL_PERSON)    {
+        $clientValues->{'currentLevel'} = $entityLevel;
+    }
+
+    $clientValues->{clubID} = $Defs::INVALID_ID  if $entityLevel > $Defs::LEVEL_CLUB;
+    $clientValues->{zoneID} = $Defs::INVALID_ID if $entityLevel > $Defs::LEVEL_ZONE;
+    $clientValues->{regionID} = $Defs::INVALID_ID if $entityLevel > $Defs::LEVEL_REGION;
+    setClientValue($clientValues, $entityLevel, $entityID);
+
+    #if MA is inserting into club then need to rebuild region into client string
+    #work out regional level
+    if($entityLevel == $Defs::LEVEL_CLUB and $authLevel == $Defs::LEVEL_NATIONAL)   {
+        my $st = qq[
+            SELECT      
+                intParentID
+            FROM 
+                tblTempEntityStructure
+            WHERE
+                intParentLevel = $Defs::LEVEL_REGION
+                AND intChildID = ?
+        ];
+        my $q = $self->{'db'}->prepare($st);
+        $q->execute(
+            $entityID,
+        );
+        my ($regionID) = $q->fetchrow_array();
+        $q->finish();
+        setClientValue($clientValues, $Defs::LEVEL_REGION,$regionID) if $regionID;
+    }
+
+    $self->{'ClientValues'} = $clientValues;
+    $self->{'Data'}{'clientValues'} = $clientValues;
+    my $client = setClient($clientValues);
+    $self->{'Data'}{'client'} = $client;
+    $self->addCarryField('client',$client);
+    return 1;
+}
 
  
 

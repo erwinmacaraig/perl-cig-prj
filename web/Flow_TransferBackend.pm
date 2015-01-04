@@ -1071,6 +1071,7 @@ sub display_complete {
 
     my $rego_ref = {};
     my $content = '';
+    my $gateways = '';
     if($regoID) {
         my $valid =0;
         ($valid, $rego_ref) = validateRegoID(
@@ -1108,7 +1109,7 @@ sub display_complete {
         my $hiddenFields = $self->getCarryFields();
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
-        $content = displayRegoFlowComplete(
+        ($content, $gateways) = displayRegoFlowComplete(
             $self->{'Data'}, 
             $regoID, 
             $client, 

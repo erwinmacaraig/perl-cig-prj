@@ -2400,7 +2400,7 @@ sub apply_product_rules {
 				}
         $dtEnd = "DATE_ADD($dtStart, INTERVAL $product->{intProductExpiryDays} DAY)";
     }
-    elsif($product->{dtProductExpiry}){
+    elsif($product->{dtProductExpiry} and $product->{dtProductExpiry} ne '0000-00-00 00:00:00'){
         $dtStart = 'SYSDATE()';
         $dtEnd = "'$product->{dtProductExpiry}'";
     }
@@ -2456,6 +2456,35 @@ sub apply_product_rules {
         $query2 .= " WHERE intPersonID = $personID ";
         
         $Data->{'db'}->do($query2);
+    }
+
+   {
+
+        my $st = qq[
+            UPDATE tblTransactions as T
+                INNER JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON ( PR.intPersonRegistrationID = T.intPersonRegistrationID)
+                INNER JOIN tblNationalPeriod as NP ON (NP.intNationalPeriodID = PR.intNationalPeriodID)
+            SET
+                T.dtStart = NP.dtFrom,
+                T.dtEnd= NP.dtTo
+            WHERE
+                T.intTransLogID= ?
+                AND T.intRealmID = ?
+                AND (
+                    NOT T.dtStart
+                    OR T.dtStart IS NULL
+                    OR T.dtStart = '0000-00-00'
+                )
+				AND T.intTableType = $Defs::LEVEL_PERSON
+				AND T.intID = ?
+        ];
+
+		my $q = $Data->{'db'}->prepare($st);
+		$q->execute(
+		    $transID,
+    		$Data->{'Realm'},
+            $personID
+		);
     }
 
     warn("PERSON REGO RECORD HERE ?");
