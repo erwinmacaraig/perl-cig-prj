@@ -1594,6 +1594,8 @@ sub sendITC {
 	
 	my $email_to = $maObj->{'DBData'}{'strEmail'};	
 	my $email_from = $clubObj->{'DBData'}{'strEmail'};
+
+	
 	my $emailsentOK = Email::sendEmail($email_to, $email_from,'REQUEST FORM FOR AN INTERNATIONAL TRANSFER CERTIFICATE', 'REQUEST FORM FOR AN INTERNATIONAL TRANSFER CERTIFICATE', $message, '','ITC','');
 	if($emailsentOK){
 		#store to DB;
