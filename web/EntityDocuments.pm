@@ -73,6 +73,7 @@ sub list_entity_docs{
     my $replaceLink;
 	# $replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a>];
     while(my $dref = $sth->fetchrow_hashref()){
+        $dref->{'DateUploaded'} = $Data->{'l10n'}{'date'}->TZformat($dref->{'DateUploaded'},'MEDIUM','SHORT');
 		my $url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}&amp;client=$client";
     	#check if strLockLevel is empty which means world access to the file
     	if($dref->{'strLockAtLevel'} eq ''){
