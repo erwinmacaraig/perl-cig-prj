@@ -17,6 +17,8 @@ function checkIfDocsAllApproved() {
     var numberOfPendingDocs = $(".totalPendingDocs").val();
     var rejectedDocsFlag = $(".rejectedDocs").val();
 
+    var docsComplete = false;
+
     if(rejectedDocsFlag == 1){
         //$("li.active span.circleBg").addClass("rejectedBg");
         $("li#docstab span.circleBg").addClass("rejectedBg");
@@ -27,6 +29,7 @@ function checkIfDocsAllApproved() {
         $("span.circleBg").find("i.documents-rejected").addClass("documents-approved");
 
         if (numberOfPendingDocs == 0) {
+            docsComplete = true;
             $("body").find("i.documents-complete").removeClass("documents-incomplete");
         } else {
             $("body").find("i.documents-complete").addClass("documents-incomplete");
@@ -37,11 +40,43 @@ function checkIfDocsAllApproved() {
     var storedTask = localStorage.getItem("data");
     var taskID = $(".taskID").val();
     
+    var disableAction = function(e) {
+        return false;
+    }
+
     if (storedTask == taskID){
         
         $("body").find("i.memdetails-visited").removeClass("tab-not-visited");
         $("body").find("i.regdetails-visited").removeClass("tab-not-visited");
-    
+
+        jQuery("a.workflow-action").each(function(){
+            var actiontype = jQuery(this).data('actiontype');
+
+            switch(actiontype){
+                case 'APPROVE':
+                    if(docsComplete){
+                        jQuery(this)
+                            .removeClass("btn-disabled")
+                            .addClass("btn-main")
+                            .unbind("click", disableAction);
+                    }
+                    break;
+                case 'HOLD':
+                case 'REJECT':
+                case 'RESOLVE':
+                    jQuery(this)
+                        .removeClass("btn-disabled")
+                        .addClass("btn-main")
+                        .unbind("click", disableAction)
+                        .click(function(f){
+                            jQuery("div#showWorkflowNotes").modal();
+                            jQuery("#workFlowActionForm input[type=hidden][name=type]").val(actiontype);
+                            f.preventDefault();
+                        });
+                    break;
+            }
+        });
+   
     } else {
         
         //this means you are viewing a new work task
