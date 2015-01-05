@@ -669,6 +669,7 @@ table.zebra tbody tr:nth-child(even) {
 
 table tr.new-task {
     border-left: 5px solid #c4070a;
+    background-color:#c0c0c0!important;
 }
 
 .panel-body p.reg-text {
@@ -1197,7 +1198,7 @@ div.transfertabs.tab-content > .active {
 
 .document-table-header{
 	padding: 13px 25px;
-	background: #ddd;
+	background: #ddthand;
 	color: #000;
 	font-size: 14px;
 }
