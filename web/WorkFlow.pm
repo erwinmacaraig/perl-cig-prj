@@ -2541,6 +2541,7 @@ sub populatePersonViewData {
             MinorProtection => $dref->{'intMinorProtection'} || '',
             DateSuspendedUntil => '',
             LastUpdate => '',
+            ruleForPerson => $ruleForType || '',
         },
         PersonSummary => personSummaryPanel($Data, $dref->{intPersonID}) || '',
 	);
@@ -3115,9 +3116,6 @@ sub viewSummaryPage {
     $dref = $sth->fetchrow_hashref();
 
     my $clubName = $dref->{'strLocalName'};
-
-    open FH, ">dumpfile.txt";
-    print FH "Group DataL \n\n" . Dumper($Data) . "\n";
 
     switch($task->{'strWFRuleFor'}) {
         case ['REGO', 'PERSON'] {

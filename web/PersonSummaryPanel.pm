@@ -47,7 +47,8 @@ sub personSummaryPanel {
     my $isocountries  = getISOCountriesHash();
     my %templateData = (
         #'NationalNum' => $personObj->getValue('strNationalNum') || '',
-        'NationalNum' => $personObj->getValue('strStatus') eq $Defs::PERSON_STATUS_REGISTERED ? $personObj->getValue('strNationalNum') || '' : $personObj->getValue('strNationalNum') ? $Defs::personStatus{$Defs::PERSON_STATUS_PENDING} : '',
+        #'NationalNum' => $personObj->getValue('strStatus') eq $Defs::PERSON_STATUS_REGISTERED ? $personObj->getValue('strNationalNum') || '' : $personObj->getValue('strNationalNum') ? $Defs::personStatus{$Defs::PERSON_STATUS_PENDING} : '',
+        'NationalNum' => $personObj->getValue('strNationalNum') || '',
         'FamilyName' => $personObj->getValue('strLocalSurname') || '',
         'FirstName' => $personObj->getValue('strLocalFirstname') || '',
         'dob' => $personObj->getValue('dtDOB'),
@@ -55,6 +56,9 @@ sub personSummaryPanel {
         'nationality' => $isocountries->{$personObj->getValue('strISONationality')},
         'registrations' => \@personRegistration,
     );
+
+    #open FH, ">dumpfile.txt";
+    #print FH "Group DataL \n\n" . Dumper($personObj) . "\n";
 
     my $content = runTemplate(
         $Data,

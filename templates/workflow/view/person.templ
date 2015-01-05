@@ -138,6 +138,9 @@
     </div>
     <div class="col-md-3">
         [% PersonSummary %]
+        [% IF PersonDetails.ruleForPerson == 'AMENDMENT_PERSON' %]
+        <div class="registration-pending">[% Lang.txt('Amendment: Pending') %]</div>
+        [% END %]
     </div>
 </div>
 
