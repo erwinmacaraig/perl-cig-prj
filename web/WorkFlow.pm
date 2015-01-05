@@ -3432,7 +3432,13 @@ sub updateTaskScreen {
                 $status = $Data->{'lang'}->txt("Rejected");
             }
             elsif($TaskType eq 'NEW_VENUE') {
-                $message = $Data->{'lang'}->txt("You have rejected this Venue Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration.");
+
+                if ($task->{'intCreatedByEntityID'} eq '1') {
+                 $message = $Data->{'lang'}->txt("You have rejected this Venue Registration. To proceed with this Registration start a new Registration.");   
+                } else {
+                 $message = $Data->{'lang'}->txt("You have rejected this Venue Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration.");   
+                }
+                
                 $status = $Data->{'lang'}->txt("Rejected");
             }
             elsif($TaskType eq 'NEW_CLUB') {
