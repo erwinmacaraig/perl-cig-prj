@@ -204,7 +204,7 @@ sub showPersonHome	{
 						$status = 'MISSING';
 					}
 					else {
-						$status = 'Optional. Not Provided.';
+						$status = 'Optional. Not Provided';
 						$displayReplace = 0;
 					}
 				}
