@@ -72,7 +72,7 @@
                     var params = url[1].split("&");
                     params.pop();
                     params.push("at=1");
-                    location.href = url[0] + "?" + params.join("&");
+                    window.parent.location.href = url[0] + "?" + params.join("&");
                 } else {
                     window.parent.location.reload();
                 }
