@@ -2422,6 +2422,7 @@ sub populateRegoViewData {
         PersonSummary => personSummaryPanel($Data, $dref->{intPersonID}) || '',
         WFTaskID => $dref->{'intWFTaskID'},
         ActiveTab => $activeTab,
+        EntityLevel => $Data->{'clientValues'}{'authLevel'}
 	);
 
     $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.')
@@ -2442,6 +2443,7 @@ sub populateRegoViewData {
         $TemplateData{'TransferDetails'}{'RegistrationDateFrom'} = $dref->{'NPdtFrom'};
         $TemplateData{'TransferDetails'}{'RegistrationDateTo'} = $dref->{'NPdtTo'};
         $TemplateData{'TransferDetails'}{'Summary'} = $personRequestData->{'strRequestNotes'} || '';
+
     }
     else {
         $title = $Data->{'lang'}->txt('Registration') . " - $LocalName";
