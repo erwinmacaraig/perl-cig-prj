@@ -224,7 +224,7 @@ sub showPersonHome	{
 		my $documentName = $doc->{'strDocumentName'};
 		$documentName =~ s/'/\\\'/g;
 
-		my $parameters = qq[&amp;client=$clm&doctype=$doc->{'intDocumentTypeID'}&pID=$personID&regoID=$rego->{'intPersonRegistrationID'}];
+		my $parameters = qq[&amp;client=$clm&doctype=$doc->{'intDocumentTypeID'}&pID=$personID&regoID=$rego->{'intPersonRegistrationID'}&nff=1];
 		
 
 		if($fileID) {

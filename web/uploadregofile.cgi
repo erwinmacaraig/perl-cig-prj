@@ -11,6 +11,7 @@ use DeQuote;
 use UploadFiles;
 use MD5;
 use Data::Dumper;
+use Documents;
 use JSON;
 use strict;
 
@@ -22,6 +23,7 @@ my $personID = param('pID') || 0;
 my $isForEntity = param('entitydocs') || 0;
 my $replaceFileID = param('f') || 0;
 my $fromURL = param('u') || '';
+my $notFromFlow = param('nff') || 0;
 
 my $db=connectDB();
 my %Data=();
@@ -46,10 +48,11 @@ if($uploaded_filename ne ''){
  	$other_person_info{'entitydocs'} = $isForEntity if ($isForEntity); 
 	$other_person_info{'replaceFileID'} = $replaceFileID if ($replaceFileID); 
 
+
     #UploadFiles::processUploadFile(\%Data,\@files,$Defs::LEVEL_PERSON,$personID,$Defs::UPLOADFILETYPE_DOC,\%other_person_info,);   
 	my $fileID = UploadFiles::processUploadFile(\%Data,\@files, $Data{'clientValues'}{'currentLevel'}, $personID,$Defs::UPLOADFILETYPE_DOC,\%other_person_info,);   
 
-	
+	pendingDocumentActions(\%Data,$personID,$regoID,$fileID)if($notFromFlow);
 	$other_person_info{'f'} = $fileID;  
     if($fromURL)    {
         my $cgi = new CGI;

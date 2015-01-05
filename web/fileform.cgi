@@ -25,6 +25,7 @@ my $replaceFileID = param('f') || 0;
 my $doctypename = param('doctypename') || '';
 my $docDesc = param('desc') || '';
 my $isForEntity = param('entitydocs') || 0;
+my $fromFlow = param('nff') || 0;
 
   my %Data=();
   my $target='viewer.cgi';
@@ -56,6 +57,8 @@ my $isForEntity = param('entitydocs') || 0;
 			personID		=>	$personID,
 			entitydocs		=> 	$isForEntity,
 			description		=>	$docDesc,
+			fromFlow		=>  $fromFlow,
+			
 	};
 
 $resultHTML = runTemplate(

@@ -16,6 +16,10 @@
         <input type="hidden" name="pID" value="[% personID %]" />
         <input type="hidden" name="doctypeID" value="[% docTypeID %]" />
         <input type="hidden" name="f" value="[% replaceFileID %]" />
+
+		[% IF fromFlow %]
+			<input type="hidden" name="nff" value="[% fromFlow %]" />
+		[% END %]
         </form> 
     </div>
 </div>
