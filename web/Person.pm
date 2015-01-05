@@ -385,7 +385,7 @@ my @headers = (
        		 },
        		 {
       	      name => $lang->txt('Status'),
-      	      field => 'strApprovalStatus',
+      	      field => 'ApprovalStatus',
      		   },
       		 {
       	      name => $lang->txt('Date Uploaded'),
@@ -407,7 +407,7 @@ my @headers = (
    			 );
 			 my $filterfields = [
        			 {
-          		  field     => 'strApprovalStatus',
+          		  field     => 'ApprovalStatus',
           		  elementID => 'dd_actstatus',
           		  allvalue  => 'ALL',
       			  },
@@ -422,6 +422,7 @@ my @headers = (
 			#loop over rego documents
 			foreach my $regodoc (@{$registration->{'documents'}}){
 				next if(!$regodoc->{'intUploadFileID'});
+                $regodoc->{'ApprovalStatus'} = $Defs::DocumentStatus{$regodoc->{'strApprovalStatus'}} || '';
 				#perform query for intUseThisEntity and intUseAnyEntity
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType IN ('', XX) AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
 				my $query = qq[
@@ -498,7 +499,7 @@ my @headers = (
 	       			id => $regodoc->{'intUploadFileID'} || 0,
 	        		#oldSelectLink => $fileLink,
 	        		strDocumentName => $regodoc->{'strDocumentName'},
-		    		strApprovalStatus => $regodoc->{'strApprovalStatus'},
+		    		ApprovalStatus => $regodoc->{'ApprovalStatus'},
             		DateUploaded => $regodoc->{'DateUploaded'},
             		DateUploaded_RAW => $regodoc->{'DateUploaded_RAW'},
             		ViewDoc => $viewLink,

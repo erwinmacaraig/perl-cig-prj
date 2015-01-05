@@ -73,6 +73,8 @@ sub list_entity_docs{
     my $replaceLink;
 	# $replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a>];
     while(my $dref = $sth->fetchrow_hashref()){
+        $dref->{'DateUploaded'} = $Data->{'l10n'}{'date'}->TZformat($dref->{'DateUploaded'},'MEDIUM','SHORT');
+        $dref->{'ApprovalStatus'} = $Defs::DocumentStatus{$dref->{'strApprovalStatus'}} || '';
 		my $url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}&amp;client=$client";
     	#check if strLockLevel is empty which means world access to the file
     	if($dref->{'strLockAtLevel'} eq ''){
@@ -99,6 +101,7 @@ sub list_entity_docs{
 	        id => $dref->{'intFileID'} || 0,
 	        strDocumentName => $dref->{'strDocumentName'},
 		    strApprovalStatus => $dref->{'strApprovalStatus'},
+		    ApprovalStatus => $dref->{'ApprovalStatus'},
             DateUploaded => $dref->{'DateUploaded'}, 
             ViewDoc => $urlViewButton, 
             ReplaceFile => $replaceLink,              
@@ -111,7 +114,7 @@ sub list_entity_docs{
         }, 
         {
             name => $lang->txt('Status'),
-            field => 'strApprovalStatus',
+            field => 'ApprovalStatus',
         },
         {
             name => $lang->txt('Date Uploaded'),
@@ -130,7 +133,7 @@ sub list_entity_docs{
     ); 
     my $filterfields = [
         {
-            field     => 'strApprovalStatus',
+            field     => 'ApprovalStatus',
             elementID => 'dd_actstatus',
             allvalue  => 'ALL',
         },

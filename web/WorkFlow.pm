@@ -2328,6 +2328,8 @@ sub viewTask {
 sub populateRegoViewData {
     my ($Data, $dref) = @_;
 
+    my $activeTab = safe_param('at','number') || 1;
+
     my $title;
     my $templateFile;
     my %TemplateData;
@@ -2418,7 +2420,9 @@ sub populateRegoViewData {
         EditDetailsLink => $PersonEditLink,
         ReadOnlyLogin => $readonly,
         PersonSummary => personSummaryPanel($Data, $dref->{intPersonID}) || '',
-        WFTaskID => $dref->{'intWFTaskID'}
+        WFTaskID => $dref->{'intWFTaskID'},
+        ActiveTab => $activeTab,
+        EntityLevel => $Data->{'clientValues'}{'authLevel'}
 	);
 
     $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.')
@@ -2439,6 +2443,7 @@ sub populateRegoViewData {
         $TemplateData{'TransferDetails'}{'RegistrationDateFrom'} = $dref->{'NPdtFrom'};
         $TemplateData{'TransferDetails'}{'RegistrationDateTo'} = $dref->{'NPdtTo'};
         $TemplateData{'TransferDetails'}{'Summary'} = $personRequestData->{'strRequestNotes'} || '';
+
     }
     else {
         $title = $Data->{'lang'}->txt('Registration') . " - $LocalName";
