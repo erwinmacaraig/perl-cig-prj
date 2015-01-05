@@ -314,7 +314,6 @@ sub new_doc_form {
 	<input type="hidden" name="entitydocs" value="1" />
 	<input type="hidden" name="a" value="C_DOCS_u" />
 	<input type="hidden" name="pID" value="$entityID" />
-			
 		</form> 
                 <br />  
                 <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS">] . $Data->{'lang'}->txt('Continue').q[</a></span>

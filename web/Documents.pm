@@ -49,28 +49,31 @@ sub handle_documents {
 	
   if ($action eq 'DOC_u') {
 		$DocumentTypeID = param('DocumentTypeID') || 0;
-           
+        my $toReplaceRegoDoc = param('fileId') || 0;  
+		
 		my $retvalue = process_doc_upload( 
 			$Data,
 			$memberID, 
 			$client,
 		);
-		if($retvalue){
-			$resultHTML = qq[<div class="warningmsg">$retvalue</div>];
-		}
-		else {
-			if($retvalue eq '' && length($retvalue) == 0){
+		pendingDocumentActions($Data,$memberID,$RegistrationID,$retvalue);
+		
+		#if($retvalue){
+		#	$resultHTML = qq[<div class="warningmsg">$retvalue</div>];
+		#}
+		#else {
+		#	if($retvalue eq '' && length($retvalue) == 0){
         	# check if the document to be uploaded is a REGO document 
-            	my $query = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem WHERE strRuleFor = ? AND strItemType = ? AND intID = ? AND intRequired = ? and intRealmID= ?];
-				my $sth = $Data->{'db'}->prepare($query); 
-    			$sth->execute('REGO', 'DOCUMENT', $DocumentTypeID, 1, $Data->{'Realm'});
-				my $isREGODocument = 0;
-				my $dref = $sth->fetchrow_hashref();
-				$isREGODocument = $dref->{'tot'};
-				if($isREGODocument){ 
+         #   	my $query = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem WHERE strRuleFor = ? AND strItemType = ? AND intID = ? AND intRequired = ? and intRealmID= ?];
+			#	my $sth = $Data->{'db'}->prepare($query); 
+    	#		$sth->execute('REGO', 'DOCUMENT', $DocumentTypeID, 1, $Data->{'Realm'});
+		#		my $isREGODocument = 0;
+		#		my $dref = $sth->fetchrow_hashref();
+		#		$isREGODocument = $dref->{'tot'};
+		#		if($isREGODocument){ 
 										
 					#procedure for replacing a file
-					my $toReplaceRegoDoc = param('fileId') || 0;
+					#my $toReplaceRegoDoc = param('fileId') || 0;
 
                     #if(!$toReplaceRegoDoc){ # Means adding new file to rego docs
 					#	#get rule ids
@@ -94,9 +97,10 @@ sub handle_documents {
 					 #$sth = $Data->{'db'}->prepare($query);
 					 #$sth->execute('PENDING', $memberID, $RegistrationID);
 										
-				}
-			}
-		}
+				#}
+			#}
+		#}		
+		
 		$type = 'Add Document'; 
                 
 	}
@@ -335,7 +339,8 @@ sub new_doc_form {
     	       <input type="hidden" name="fileId" value="$fileToReplace" />
     	];
     }
-	$body .=	qq[<input type="hidden" name="a" value="DOC_u">
+	$body .=	qq[<input type="hidden" name="a" value="DOC_u" />
+					<input type="hidden" name="nff" value="1" />
 			
 		</form> 
                 <br />  
@@ -407,9 +412,11 @@ sub pendingDocumentActions {
         FROM tblDocuments as D INNER JOIN tblDocumentType as DT ON (DT.intDocumentTypeID=D.intDocumentTypeID)
             LEFT JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (PR.intPersonRegistrationID = D.intPersonRegistrationID and PR.intPersonRegistrationID=?)
         WHERE 
-            D.intDocumentID=?
+            D.intUploadFileID = ?
             AND D.intPersonID=?
     ];
+	# D.intDocumentID
+
     my $query = $Data->{'db'}->prepare($stDT);
     $query->execute(
         $regoID,

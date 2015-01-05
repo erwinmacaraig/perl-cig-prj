@@ -1673,6 +1673,7 @@ sub sendITC {
         $Data->{'lang'}->txt('Request for an International Transfer Certificate'),
         '',#$email_from,
     );
+
 	if($emailsentOK){
 		#store to DB;
 		my $query = qq[
