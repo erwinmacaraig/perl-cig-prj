@@ -57,6 +57,8 @@ use PersonEntity;
 use SphinxUpdate;
 use InstanceOf;
 
+use PersonLanguages;
+
 sub cleanTasks  {
 
     my ($Data, $personID, $entityID, $personRegistrationID, $ruleFor) = @_;
@@ -2386,7 +2388,6 @@ sub populateRegoViewData {
             MID => $dref->{'strNationalNum'} || '',
             LatinSurname => $dref->{'strLatinSurname'} || '',
             MinorProtection => $minorProtectionOptions->{$dref->{'intMinorProtection'}} || '',
-
             Address1 => $dref->{'strAddress1'} || '',
             Address2 => $dref->{'strAddress2'} || '',
             FirstName => $dref->{'strLocalFirstname'} || '',
@@ -2394,8 +2395,8 @@ sub populateRegoViewData {
             CountryOfBirth => $isocountries->{$dref->{'strISOCountryOfBirth'}} || '',
             LanguageOfName => $selectedLanguage || '',
             RegionOfBirth => $dref->{'strRegionOfBirth'} || '',
-            City =>$dref->{'strSuburb'} || '',
-            State =>$dref->{'strState'} || '',
+            City => $dref->{'strSuburb'} || '',
+            State => $dref->{'strState'} || '',
             ContactISOCountry =>$isocountries->{$dref->{'strISOCountry'}} || '',
             ContactPhone =>$dref->{'strPhoneHome'} || '',
             Email =>$dref->{'strEmail'} || '',
@@ -2520,6 +2521,15 @@ sub populatePersonViewData {
 
     my %TemplateData;
 
+    my $languages = PersonLanguages::getPersonLanguages($Data, 1, 0);
+    my $selectedLanguage;
+    for my $l ( @{$languages} ) {
+        if($l->{intLanguageID} == $dref->{'intLocalLanguage'}){
+             $selectedLanguage = $l->{'language'};
+            last
+        }
+    }
+
     my $LocalName = "$dref->{'strLocalFirstname'} $dref->{'strLocalMiddleName'} $dref->{'strLocalSurname'}" || '';
     my $ruleForType = $dref->{'strRegistrationNature'} . "_PERSON";
 
@@ -2536,8 +2546,21 @@ sub populatePersonViewData {
             DOB => $dref->{'dtDOB'} || '',
             LocalName => "$dref->{'strLocalFirstname'} $dref->{'strLocalMiddleName'} $dref->{'strLocalSurname'}" || '',
             LatinName => "$dref->{'strLatinFirstname'} $dref->{'strLatinMiddleName'} $dref->{'strLatinSurname'}" || '',
+            FamilyName => "$dref->{'strLocalSurname'}" || '',
+            FirstName => "$dref->{'strLocalFirstname'}" || '',
+            LanguageOfName => $selectedLanguage || '',
             Address => "$dref->{'strAddress1'} $dref->{'strAddress2'} $dref->{'strAddress2'} $dref->{'strSuburb'} $dref->{'strState'} $dref->{'strPostalCode'}" || '',
+            Address1 => $dref->{'strAddress1'} || '',
+            Address2 => $dref->{'strAddress2'} || '',
+            City => $dref->{'strSuburb'} || '',          
+            State => "$dref->{'strState'}" || '',
+            PostalCode => "$dref->{'strPostalCode'}" || '',
+            ContactISOCountry => $isocountries->{$dref->{'strISOCountry'}} || '',
+            ContactPhone => $dref->{'strPhoneHome'} || '',
+            Email => $dref->{'strEmail'} || '',
             Nationality => $isocountries->{$dref->{'strISONationality'}} || '', #TODO identify extract string
+            BirthCountry => $isocountries->{$dref->{'strISOCountryOfBirth'}} || '', #TODO identify extract string
+            BirthRegion => "$dref->{'strRegionOfBirth'}" || '',
             MinorProtection => $dref->{'intMinorProtection'} || '',
             DateSuspendedUntil => '',
             LastUpdate => '',
