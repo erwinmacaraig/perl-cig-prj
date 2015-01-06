@@ -153,15 +153,15 @@ sub savePlayerPassport{
 	    $sth = $Data->{'db'}->prepare($query); 
 	    $sth->execute($personID);
 
-	    #$query = "SELECT * FROM tblPlayerPassport WHERE intPersonID= ? ORDER BY intPlayerPassportID DESC LIMIT 1";
-	    #$sth = $Data->{'db'}->prepare($query); 
-	    #$sth->execute($personID);
-        #my $dref = $sth->fetchrow_hashref();
-        #if ($dref and $dref->{'strOrigin'} eq 'REGO')   {
-	    #    $query = "UPDATE tblPlayerPassport SET dtTo = '0000-00-00' WHERE intPersonID= ? and intPlayerPassportID=? LIMIT 1";
-	    #    $sth = $Data->{'db'}->prepare($query); 
-	    #    $sth->execute($personID, $dref->{'intPlayerPassportID'});
-        #}
+	    $query = "SELECT * FROM tblPlayerPassport WHERE intPersonID= ? ORDER BY intPlayerPassportID DESC LIMIT 1";
+	    $sth = $Data->{'db'}->prepare($query); 
+	    $sth->execute($personID);
+        my $dref = $sth->fetchrow_hashref();
+        if ($dref and $dref->{'strOrigin'} eq 'REGO')   {
+	        $query = "UPDATE tblPlayerPassport SET dtTo = '0000-00-00' WHERE intPersonID= ? and intPlayerPassportID=? LIMIT 1";
+	        $sth = $Data->{'db'}->prepare($query); 
+	        $sth->execute($personID, $dref->{'intPlayerPassportID'});
+        }
         ###
 		auditLog($personID, $Data, 'Add Player Passport', 'Player Passport');
 		###
