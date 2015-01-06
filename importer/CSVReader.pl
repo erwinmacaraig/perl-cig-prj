@@ -15,7 +15,7 @@ my $directory = '';
 my $format = '';
 my $notes = '';
 my $realmID = 0;
-my $fromNational = 1;
+my $fromNational = 0;
 my $db = connectDB();
 
 GetOptions ('directory=s' => \$directory, 'format=s' => \$format, 'notes=s' => \$notes, 'realmid=i' => \$realmID, 'national=i'=>$fromNational);
