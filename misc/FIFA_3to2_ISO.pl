@@ -30,7 +30,7 @@ sub main	{
 	$Data{'RealmSubType'} = 0;
     $Data{'SystemConfig'}=getSystemConfig(\%Data);
     
-    my @dbFields = qw(strISOCountryOfBirth strISOCountry strISOMotherCountry strISOFatherCountry);
+    my @dbFields = qw(strISOCountryOfBirth strISOCountry strISOMotherCountry strISOFatherCountry strISONationality);
 
     my %Countries = ();
 ## Jervy, as we look at the Data after 1st run, we will update below hash
