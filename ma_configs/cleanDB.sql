@@ -19,3 +19,9 @@ DELETE FROM tblAuditLog;
 
 DELETE FROM tblUploadedFiles;
 DELETE FROM tblDocuments;
+
+DELETE FROM tblImportTrack;
+
+DELETE FROM tblEntityLinks;
+
+DELETE FROM tblTempEntityStructure;
