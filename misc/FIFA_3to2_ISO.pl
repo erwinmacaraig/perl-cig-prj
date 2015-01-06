@@ -11,12 +11,8 @@ use lib "..","../web","../web/comp", "../web/user", '../web/RegoForm', "../web/d
 use Defs;
 use Utils;
 use DBI;
-use WorkFlow;
-use UserObj;
 use CGI qw(unescape);
-use PlayerPassport;
 use SystemConfig;
-use Data::Dumper;
 
 main();
 
@@ -45,4 +41,19 @@ sub main	{
             $qryField->execute($Countries{$key}, $key, $Data{'Realm'}); 
         }
     }
+print "PERSON RECORDS DONE\n";
+
+## Now do tblEntity
+    @dbFields = qw(strContactISOCountry strISOCountry);
+
+    for my $field (@dbFields)   {
+        my $st = qq[
+            UPDATE tblEntity SET $field=? WHERE $field=? AND intRealmID=?
+        ];
+        my $qryField= $db->prepare($st);
+        foreach my $key (keys %Countries)   {
+            $qryField->execute($Countries{$key}, $key, $Data{'Realm'}); 
+        }
+    }
+print "ENTITY RECORDS DONE\n";
 }
