@@ -1,0 +1,66 @@
+{
+	"rules" : {
+		"strStateLocalName" : {
+			"rule" : "removeLinkField",
+			"field" : "strStateLocalName",
+			"reference" : "strLocalName"
+		},
+		"strRegionLocalName" : {
+			"rule" : "removeLinkField",
+			"field" : "strRegionLocalName",
+			"reference" : "strLocalName"
+		},
+		"strZoneLocalName" : {
+			"rule" : "removeLinkField",
+			"field" : "strZoneLocalName",
+			"reference" : "strImportEntityCode"
+		},
+		"strISOCountry" : {
+			"rule" : "entityLink",
+			"field" : "strISOCountry",
+			"regionfld" : "strRegion",
+			"values" : {"FI":"Finland", "SG":"Singapore"}
+		},
+		"strEntityType" : {
+			"rule" : "insertField",
+			"field" : "intEntityLevel",
+			"values" : {"VENUE": "-47"}
+		},
+		"intFacilityTypeID" : {
+			"rule" : "insertField",
+			"field" : "intFacilityTypeID",
+			"values" : {"Stadium" : "1", "Football Pitch" : "2", "Training Grounds" : "3", "Venue" : "4"}
+		}
+	},
+	"mapping" : {
+		"VenueCode" : "strImportEntityCode",
+		"StateName" : "strStateLocalName",
+		"RegionName" : "strRegionLocalName",
+		"ZoneName" : "strZoneLocalName",
+		"EntityType" : "strEntityType",
+		"VenueType" : "intFacilityTypeID",
+		"Status" : "strStatus",
+		"LocalName" : "strLocalName",
+		"LocalShortName" : "strLocalShortName",
+		"LocalLanguageCode" : "intLocalLanguage",
+		"LatinName" : "strLatinName",
+		"LatinShortName" : "strLatinShortName",
+		"FoundationDate" : "dtFrom",
+		"DissolutionDate" : "dtTo",
+		"Country" : "strISOCountry",
+		"Region" : "strRegion",
+		"PostalCode" : "strPostalCode",
+		"State" : "strTown",
+		"Address1" : "strAddress",
+		"Address2" : "strAddress2",
+		"WebURL" : "strWebURL",
+		"Email" : "strEmail",
+		"Phone" : "strPhone",
+		"Fax" : "strFax",
+		"NationalCustomString1" : "strNatCustomStr1",
+		"NationalCustomString2" : "strNatCustomStr2",
+		"NationalCustomString3" : "strNatCustomStr3",
+		"NationalCustomString4" : "strNatCustomStr4",
+		"NationalCustomString5" : "strNatCustomStr5"
+	}
+}
