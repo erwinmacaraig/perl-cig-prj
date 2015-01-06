@@ -43,6 +43,7 @@ sub savePlayerPassport{
         INNER JOIN tblPerson as P ON (P.intPersonID=PR.intPersonID)
         INNER JOIN tblRealms ON (PR.intRealmID = tblRealms.intRealmID) 
         INNER JOIN tblEntity as E ON (E.intEntityID = PR.intEntityID)
+        LEFT JOIN tblNationalPeriod as NP ON (NP.intNationalPeriodID = PR.intNationalPeriodID)
         WHERE 
             PR.intPersonID = ? 
             AND PR.strPersonType = 'PLAYER' 
@@ -50,7 +51,7 @@ sub savePlayerPassport{
             AND PR.strStatus IN ('PASSIVE', 'ACTIVE', 'ROLLED_OVER', 'TRANSFERRED')
         HAVING
             PRToCalc > When12
-        ORDER BY PR.dtFrom
+        ORDER BY PR.dtFrom, NP.dtFrom
     ];	
             #YEAR(IF(PR.dtTo > '1900-01-01', PR.dtTo, NOW())) as yrDtTo,
             #YEAR(PR.dtTo) as yrDtTo,
@@ -151,6 +152,16 @@ sub savePlayerPassport{
 	    $query = "UPDATE tblPlayerPassport SET dtTo = '0000-00-00' WHERE (dtTo IS NULL or dtTo>NOW()) AND intPersonID= ? and strOrigin= 'REGO'";
 	    $sth = $Data->{'db'}->prepare($query); 
 	    $sth->execute($personID);
+
+	    #$query = "SELECT * FROM tblPlayerPassport WHERE intPersonID= ? ORDER BY intPlayerPassportID DESC LIMIT 1";
+	    #$sth = $Data->{'db'}->prepare($query); 
+	    #$sth->execute($personID);
+        #my $dref = $sth->fetchrow_hashref();
+        #if ($dref and $dref->{'strOrigin'} eq 'REGO')   {
+	    #    $query = "UPDATE tblPlayerPassport SET dtTo = '0000-00-00' WHERE intPersonID= ? and intPlayerPassportID=? LIMIT 1";
+	    #    $sth = $Data->{'db'}->prepare($query); 
+	    #    $sth->execute($personID, $dref->{'intPlayerPassportID'});
+        #}
         ###
 		auditLog($personID, $Data, 'Add Player Passport', 'Player Passport');
 		###
