@@ -382,7 +382,7 @@ div.showrecoptions form#personDocAdd, div.showrecoptions form#entityDocAdd {
 	position: relative;
 }
 #personDocAdd label, #entityDocAdd label {
-	margin-left: 15px;
+	/*margin-left: 15px;*/
     margin-top: 15px;
     padding-right: 10px;
 }
@@ -650,8 +650,9 @@ table.table thead {
 }
 
 table.table tr td {
-	padding: 10px;
+	padding: 10px 5px;
 	border-bottom: 1px solid #ccc;
+	vertical-align: middle;
 }
 
 table.table.tableboxheader tr td {
@@ -1753,7 +1754,7 @@ i.documents-rejected {
 }
 
 #ffg_venue td {
-	font-size: 13px;
+	font-size: 12px;
 }
 #ffg_venue td input[type="text"] {
 	width: 100%;
@@ -2181,4 +2182,7 @@ div[id*="doctab"] .documents-list table.table .task-list .status-col a.btn-insid
 }
 #tasknotes.tab-pane .read-only {
 	margin-top: 10px;
+}
+.progressFlow .col-md-2.previous.step.step-3{
+	width: 16%;
 }

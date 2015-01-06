@@ -3253,12 +3253,11 @@ sub viewSummaryPage {
                     EntityID => $task->{'intCreatedByEntityID'} || '',
                     ClubName => $clubName,
                 },
+                TaskAction => \%TaskAction,
             );
             $TemplateData{'EntitySummaryPanel'} = entitySummaryPanel($Data, $task->{'intEntityID'});
         }
-        #case 'PERSON' {
-        #    $templateFile = 'workflow/summary/person.templ';
-        #}
+        
         else {
             my ($TemplateData, $fields) = (undef, undef);
         }

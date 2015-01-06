@@ -1,16 +1,18 @@
 [% USE Dumper %]
 <h3 class="panel-header"><b>Summary</b></h3>
 <div class="panel-body">
-    <table>
-        <tr>
-            <td>[% Lang.txt("MA ID") %]</td>
-            <td>[% Lang.txt("Family Name") %]</td>
-            <td>[% Lang.txt("First Name") %]</td>
-            <td>[% Lang.txt("Date of Birth") %]</td>
-            <td>[% Lang.txt("Gender") %]</td>
-            <td>[% Lang.txt("Nationality") %]</td>
-            <td>[% Lang.txt("Country of Birth") %]</td>
-        </tr>
+    <table class="table" cellspacing="0" cellpadding="0" border="0">
+        <thead>
+            <tr>
+                <td>[% Lang.txt("MA ID") %]</td>
+                <td>[% Lang.txt("Family Name") %]</td>
+                <td>[% Lang.txt("First Name") %]</td>
+                <td>[% Lang.txt("Date of Birth") %]</td>
+                <td>[% Lang.txt("Gender") %]</td>
+                <td>[% Lang.txt("Nationality") %]</td>
+                <td>[% Lang.txt("Country of Birth") %]</td>
+            </tr>
+        </thead>
     [% FOREACH person IN people %]
         <tr>
             <td>[% IF person.MAID %] [% person.MAID %] [% ELSE %] - [% END %]</td>
