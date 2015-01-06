@@ -38,7 +38,11 @@ sub main	{
         ];
         my $qryField= $db->prepare($st);
         foreach my $key (keys %Countries)   {
-            $qryField->execute($Countries{$key}, $key, $Data{'Realm'}); 
+            $qryField->execute(
+                $Countries{$key}, 
+                $key, 
+                $Data{'Realm'}
+            ); 
         }
     }
 print "PERSON RECORDS DONE\n";
@@ -52,7 +56,11 @@ print "PERSON RECORDS DONE\n";
         ];
         my $qryField= $db->prepare($st);
         foreach my $key (keys %Countries)   {
-            $qryField->execute($Countries{$key}, $key, $Data{'Realm'}); 
+            $qryField->execute(
+                $Countries{$key}, 
+                $key, 
+                $Data{'Realm'}
+            ); 
         }
     }
 print "ENTITY RECORDS DONE\n";
