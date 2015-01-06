@@ -356,7 +356,7 @@ div.showrecoptions form#personDocAdd, div.showrecoptions form#entityDocAdd {
 	position: relative;
 }
 #personDocAdd label, #entityDocAdd label {
-	margin-left: 15px;
+	/*margin-left: 15px;*/
     margin-top: 15px;
     padding-right: 10px;
 }
@@ -2150,4 +2150,7 @@ div[id*="doctab"] .documents-list table.table .task-list .status-col a.btn-insid
 	margin-top:10px;
 	margin-bottom:10px;
 	font-weight:bold;
+}
+.progressFlow .col-md-2.previous.step.step-3{
+	width: 16%;
 }
