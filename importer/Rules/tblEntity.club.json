@@ -19,12 +19,12 @@
 			"rule" : "entityLink",
 			"field" : "strISOCountry",
 			"regionfld" : "strRegion",
-			"values" : {"FIN":"Finland", "SGP":"Singapore"}
+			"values" : {"FI":"Finland", "SG":"Singapore"}
 		},
 		"strEntityType" : {
 			"rule" : "insertField",
 			"field" : "intEntityLevel",
-			"values" : {"CLUB" : "3", "ACADEMY": "3", "REGION" : "20", "STATE" : "30"}
+			"values" : {"CLUB" : "3", "MA ACADEMY": "3", "SCHOOL": "3", "GRASSROOT PROGRAM": "3", "PRIVATE ACADEMY": "3", "COLLEGE": "3", "UNIVERSITY": "3", "OTHER": "3", "REGION" : "20", "STATE" : "30"}
 		}
 	},
 	"mapping" : {
@@ -51,6 +51,8 @@
 		"Email" : "strEmail",
 		"Phone" : "strPhone",
 		"Fax" : "strFax",
+		"Discipline" : "strDiscipline",
+		"Gender" : "strGender",
 		"NationalCustomString1" : "strNatCustomStr1",
 		"NationalCustomString2" : "strNatCustomStr2",
 		"NationalCustomString3" : "strNatCustomStr3",
