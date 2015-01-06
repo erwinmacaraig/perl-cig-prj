@@ -2596,9 +2596,7 @@ WHERE pr.intPersonID = ? AND pr.intEntityID = ?];
         PersonSummary => personSummaryPanel($Data, $dref->{intPersonID}) || '',
 	);
 
-	open FH, ">dumpfile.txt";
-	print FH "\nDump of Dref at populatePersonViewData: \n" . Dumper($dref) . "\n";
-    $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.')
+	$TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.')
         if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_PERSON'} == 1 and $dref->{'regoPaymentRequired'});
 
     return (\%TemplateData, \%fields);
