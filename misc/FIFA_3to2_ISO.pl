@@ -31,6 +31,7 @@ sub main	{
     my %Countries = ();
 ## Jervy, as we look at the Data after 1st run, we will update below hash
     $Countries{'SGP'} = 'SG';
+    $Countries{'SINGAPORE'} = 'SG';
 
     for my $field (@dbFields)   {
         my $st = qq[
