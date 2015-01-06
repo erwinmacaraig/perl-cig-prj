@@ -1674,6 +1674,15 @@ sub sendITC {
         '',#$email_from,
     );
 
+    my $conf_template = runTemplate(
+        $Data, 
+        { firstname => $Data->{'lang'}->txt($userData->{'strLocalFirstname'}),
+          lastname => $Data->{'lang'}->txt($userData->{'strLocalSurname'}),
+          dob => $Data->{'lang'}->txt($userData->{'dtDOB'}),
+        },
+        'personrequest/generic/itc_confirmation.templ'
+    );
+    
 	if($emailsentOK){
 		#store to DB;
 		my $query = qq[
@@ -1716,18 +1725,20 @@ sub sendITC {
             $userData->{'strClubName'},
             $message
         );
-		return qq[
-          <div class="OKmsg">].$Data->{'lang'}->txt('International Transfer Certificate request has been sent').qq[ .</div> 
-          <br />  
-          <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PRA_T">] . $Data->{'lang'}->txt('Continue').q[</a></span>
-       ];
-	}	
-	else {
-		return ('Error','');
+
+		#return qq[
+          #<div class="OKmsg">].$Data->{'lang'}->txt('International Transfer Certificate request has been sent').qq[ .</div> 
+          #<br />  
+          #<span class="btn-inside-panels"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PRA_T">] . $Data->{'lang'}->txt('Continue').q[</a></span>
+        #];
+        return ($conf_template);
 	}
 
-	
-	
+	else {
+		return ('Error','');
+        #this is for test purposes of the template
+        #return ($conf_template);
+	}
 }
 
 sub displayGenericError {
