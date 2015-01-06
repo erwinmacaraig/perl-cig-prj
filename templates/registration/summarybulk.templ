@@ -26,20 +26,18 @@
     [% END %]
     </table>
 	<div class="clearfix" style="clear:both;">&nbsp;</div>
-			<div class="col-md-6">
-				<div class="read-only registration-details">
-					 <h4>[% Lang.txt('Registration Details') %]</h4>
-				     <div class="read-only-text clearfix">
-					    <ul>
-					    	<li><span class="details-left">[% Lang.txt("Register to") %]:</span> <span class="detail-value">[% registration.strLocalName %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Register as") %]:</span> <span class="detail-value">[% registration.PersonType %][% IF registration.roleName %] - [% Lang.txt(registration.roleName ) %][% END %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Sport") %]:</span> <span class="detail-value">[% IF registration.Sport %] [% registration.Sport %] [% ELSE %] - [% END %]</span></li>
-					    	[% IF registration.PersonLevel %]
-					    		<li><span class="details-left">[% Lang.txt("Level") %]:</span> <span class="detail-value">[% registration.PersonLevel %]</span></li>							
-					    	[% END %]
-					    </ul>
-					    <a href="[% editlink %]&amp;rfp=r" class="pull-right">[% Lang.txt('Edit') %]</a>
-				</div>
-		</div>
+	<div class="read-only registration-details">
+	 <h4>[% Lang.txt('Registration Details') %]</h4>
+		  <div class="read-only-text clearfix">
+		    <ul>
+		    	<li><span class="details-left">[% Lang.txt("Register to") %]:</span> <span class="detail-value">[% registration.strLocalName %]</span></li>
+		    	<li><span class="details-left">[% Lang.txt("Register as") %]:</span> <span class="detail-value">[% registration.PersonType %][% IF registration.roleName %] - [% Lang.txt(registration.roleName ) %][% END %]</span></li>
+		    	<li><span class="details-left">[% Lang.txt("Sport") %]:</span> <span class="detail-value">[% IF registration.Sport %] [% registration.Sport %] [% ELSE %] - [% END %]</span></li>
+		    	[% IF registration.PersonLevel %]
+		    		<li><span class="details-left">[% Lang.txt("Level") %]:</span> <span class="detail-value">[% registration.PersonLevel %]</span></li>							
+		    	[% END %]
+		    </ul>
+		    <a href="[% editlink %]&amp;rfp=r" class="pull-right">[% Lang.txt('Edit') %]</a>
+		  </div>
+        </div>
     </div>
-</div>
