@@ -1679,10 +1679,12 @@ sub sendITC {
         { firstname => $Data->{'lang'}->txt($userData->{'strLocalFirstname'}),
           lastname => $Data->{'lang'}->txt($userData->{'strLocalSurname'}),
           dob => $Data->{'lang'}->txt($userData->{'dtDOB'}),
+          target => $Data->{'target'},
+          client => $Data->{'client'},
         },
         'personrequest/generic/itc_confirmation.templ'
     );
-    
+
 	if($emailsentOK){
 		#store to DB;
 		my $query = qq[
