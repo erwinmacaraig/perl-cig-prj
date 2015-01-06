@@ -432,7 +432,7 @@ sub pendingDocumentActions {
             $personObj->setValues({'strStatus' => $Defs::PERSON_STATUS_PENDING});
             $personObj->write();
         }
-        my $rc = WorkFlow::addWorkFlowTasks(
+		my $rc = WorkFlow::addWorkFlowTasks(
             $Data,
             'PERSON',
             'AMENDMENT',
@@ -442,6 +442,8 @@ sub pendingDocumentActions {
             0,
             0,
         );
+
+		
     }
     if ($regoID and ($valuePending eq 'REGO' or $valuePending eq 'BOTH'))   {
         my $st = qq[

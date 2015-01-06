@@ -39,7 +39,7 @@
                 <span class="circleBg"><i class="fa fa-check documents-complete documents-incomplete"></i><i class="fa fa-remove documents-rejected documents-approved"></i></span></a>
                 </li>
                 <li><a data-toggle="tab" data-visited="false" href="#memberdetails">[% Lang.txt('Member Detail Summary') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></span></a></a></li>
-                <li><a data-toggle="tab" data-visited="false" href="#tasknotes">[% Lang.txt('Work History') %]</a></li>
+                <li><a data-toggle="tab" data-visited="false" href="#tasknotes">[% Lang.txt('Registrations') %]</a></li>
             </ul>
             <div class="tab-content">
                 
@@ -197,6 +197,7 @@
                                 </span>
                             [% END %]
 
+
                             [% IF EditDetailsLink and !ReadOnlyLogin  %]
                                 <span style="float: right" class="">
                                     <a href = "[% EditDetailsLink %]&e_a=core&bscrn=a%3DWF_View%26TID%3D[% WFTaskID %]%26at%3D2" class="edit-link">
@@ -211,8 +212,62 @@
 
                 </div>
 
-                <div id="tasknotes" class="tab-pane fade in">
-                    [% NotesBlock %]
+                <div id="tasknotes" class="tab-pane">    
+					
+					[% FOREACH rego IN PersonRegoDetails %]
+						<div class="read-only">
+						<h4>[% rego.strLocalName %]</h4>
+                       	 <div class="read-only-text">
+                            <div class="clearfix">
+						<span class="details-row">
+                            <span class="details-left">[% Lang.txt("Registration Period") %]:</span>
+                            <span class="details-left detail-value">[% rego.strNationalPeriodName %]</span>
+                        </span>
+
+						<span class="details-row">
+                            <span class="details-left">[% Lang.txt("Registration Type") %]:</span>
+                            <span class="details-left detail-value">[% rego.strRegistrationNature %]</span>
+                        </span>
+
+						<span class="details-row">
+                            <span class="details-left">[% Lang.txt("Status") %]:</span>
+                            <span class="details-left detail-value">[% rego.strStatus %]</span>
+                        </span> 
+
+						<span class="details-row">
+                            <span class="details-left">[% Lang.txt("Person Type") %]:</span>
+                            <span class="details-left detail-value">[% rego.strPersonType %]</span>
+                        </span>
+
+						[% IF rego.strPersonEntityRole %]
+                        <span class="details-row">
+                            <span class="details-left">[% Lang.txt("Person Role") %]:</span>
+                            <span class="details-left detail-value">[% rego.strPersonEntityRole %]</span>
+                        </span>
+	                    [% END %]
+
+						<span class="details-row">
+                            <span class="details-left">[% Lang.txt("Level") %]:</span>
+                            <span class="details-left detail-value">[% rego.strPersonLevel %]</span>
+                        </span>
+
+						 <span class="details-row">
+                            <span class="details-left">[% Lang.txt("Age Level") %]:</span>
+                            <span class="details-left detail-value">[% rego.strAgeLevel %]</span>
+                        </span>
+
+						  <span class="details-row">
+                              <span class="details-left">[% Lang.txt('Valid From') %]:</span>
+                              <span class="details-left detail-value">[% DateFormat.format(rego.dtFrom,'MEDIUM') %]</span>
+                        </span>
+						<span class="details-row">
+                              <span class="details-left">[% Lang.txt('Valid To') %]:</span>
+                              <span class="details-left detail-value">[% DateFormat.format(rego.dtTo,'MEDIUM') %]</span>
+                        </span>
+					</div> 
+					</div>
+					</div>
+					[% END %]
                 </div>
 
             </div>

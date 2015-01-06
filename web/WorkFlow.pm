@@ -2194,15 +2194,16 @@ sub viewTask {
     my %PaymentsData;
     my %ActionsData;
     my %fields;
-
+	open FH, ">dumpfile.txt";
+	
     switch($dref->{strWFRuleFor}) {
         case 'REGO' {
-            my ($TemplateData, $fields) = populateRegoViewData($Data, $dref);
+            my ($TemplateData, $fields) = populateRegoViewData($Data, $dref); print FH "\nAt REGO Dref contains: \n". Dumper($dref) . "\n"; 
             %TemplateData = %{$TemplateData};
             %fields = %{$fields};
         }
         case 'ENTITY' {
-            my ($TemplateData, $fields) = populateEntityViewData($Data, $dref);
+            my ($TemplateData, $fields) = populateEntityViewData($Data, $dref); print FH "\nAt ENTITY Dref contains: \n". Dumper($dref) . "\n"; 
             %TemplateData = %{$TemplateData};
             %fields = %{$fields};
         }
@@ -2539,6 +2540,31 @@ sub populatePersonViewData {
     );
 
     my $isocountries  = getISOCountriesHash();
+
+	#get Registration Details for this person within this club
+	my $sql = qq[SELECT tblEntity.strLocalName, pr.strPersonType, pr.strRegistrationNature, pr.strPersonLevel, pr.strPersonEntityRole, pr.strStatus, pr.strSport, pr.strAgeLevel, tblNationalPeriod.strNationalPeriodName, tblNationalPeriod.dtFrom, tblNationalPeriod.dtTo FROM tblPersonRegistration_$Data->{'Realm'} as pr 
+INNER JOIN tblNationalPeriod ON pr.intNationalPeriodID = tblNationalPeriod.intNationalPeriodID INNER JOIN tblEntity ON tblEntity.intEntityID = pr.intEntityID
+WHERE pr.intPersonID = ? AND pr.intEntityID = ?];
+	my $sth = $Data->{'db'}->prepare($sql);
+	$sth->execute($dref->{'intPersonID'} ,$dref->{'intEntityID'});
+
+	my @registrations = ();
+	while(my $data = $sth->fetchrow_hashref()){
+		push @registrations, $data;
+	}
+	
+	my $certifications = getPersonCertifications(
+        $Data,
+        $dref->{'intPersonID'},
+        $dref->{'strPersonType'},
+        0
+    );
+
+    my @certString;
+    foreach my $cert (@{$certifications}) {
+        push @certString, $cert->{'strCertificationName'};
+    }
+
 	%TemplateData = (
         PersonDetails => {
             Status => $Data->{'lang'}->txt($Defs::personStatus{$dref->{'PersonStatus'} || 0}) || '',
@@ -2566,9 +2592,12 @@ sub populatePersonViewData {
             LastUpdate => '',
             ruleForPerson => $ruleForType || '',
         },
+		PersonRegoDetails => \@registrations,
         PersonSummary => personSummaryPanel($Data, $dref->{intPersonID}) || '',
 	);
 
+	open FH, ">dumpfile.txt";
+	print FH "\nDump of Dref at populatePersonViewData: \n" . Dumper($dref) . "\n";
     $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.')
         if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_PERSON'} == 1 and $dref->{'regoPaymentRequired'});
 
