@@ -169,6 +169,7 @@ print STDERR "d_type:" . $self->getCarryFields('d_type') . "\n";
         Title => '',
         TextTop => '',
         TextBottom => '',
+        processStatus => 1,
     );
     my $pagedata = $self->display(\%PageData);
 
@@ -227,6 +228,7 @@ print STDERR $url;
         TextTop => '',
         TextBottom => '',
         #NoContinueButton => $noContinueButton,
+        processStatus => 1,
     );
     my $pagedata = $self->display(\%PageData);
 
@@ -310,6 +312,7 @@ print STDERR "PT INS " .$self->{'RunParams'}{'d_type'};
         Title => '',
         TextTop => '',
         TextBottom => '',
+        processStatus => 1,
     );
     my $pagedata = $self->display(\%PageData);
 
@@ -392,6 +395,7 @@ print STDERR "ROLLOVERIDs:" . $self->getCarryFields('rolloverIDs') . "\n";
         Title => '',
         TextTop => '',
         TextBottom => '',
+        processStatus => 1,
         ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
     );
     my $pagedata = $self->display(\%PageData);
