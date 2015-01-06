@@ -6,4 +6,6 @@ require Exporter;
 		"DB_USER" => "root",
 		"DB_PASSWD" => ""
 );
+
+$DefaultISOCountry = "SG";
 1;
