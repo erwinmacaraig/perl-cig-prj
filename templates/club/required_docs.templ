@@ -103,7 +103,13 @@
 							<p><strong>Description: </strong>
 								[% doc.Description %]
 							</p>
+						[% IF doc.strOrigFilename != '' %]
+							
+							<p>
+								<a href="#" onclick="docViewer([% doc.intFileID %], 'client=[% client %]&amp;a=view'); return false;">[% doc.strOrigFilename %]</a>
+							</p>
 						
+							[% END %]
 							[% END %]
 						</div>
 					</td>
@@ -113,6 +119,24 @@
 						 <input type="hidden" name="pID" value="[% clubID %]" />
 					     <input type="hidden" name="entitydocs" value="1" />
 					     <input type="hidden" name="client" value="[% client %]" />
+<div class = "fallback">
+							<input type="hidden" name="u" value="[% currentURL %]" class = "fallback"/>
+                                [% IF doc.strOrigFilename != '' %]
+                                <i class='fa fa-check file-uploaded'></i>[% Lang.txt('Uploaded') %] <br/><a href = "#" onclick = "jQuery('.manualupload_[% doc.ID %]').toggle();jQuery(this).hide();return false;"><i><span class='replace-text'>[% Lang.txt('Click here to update this file') %]</span></i></a>
+                                <div class = "manualupload_[% doc.ID %]" style = "display:none;">
+                                    <input type="file" name="file" />
+                                    <input type="submit" name="uploadbtn" value = "[% Lang.txt('Upload') %]" />
+                                </div>
+                                [% ELSE %]
+                                <div class = "manualupload_[% doc.ID %]">
+                                    <input type="file" name="file" />
+                                    <input type="submit" name="uploadbtn" value = "[% Lang.txt('Upload') %]" />
+                                </div>
+                                [% END %]
+                            </div>
+							[% IF doc.intFileID %]
+							<input type="hidden" name="f" value="[% doc.intFileID %]" />
+							[% END %]
 					</form>
 					<script>
 							var doc;
