@@ -64,9 +64,12 @@ function checkIfDocsAllApproved() {
                         jQuery(this)
                             .removeClass("btn-disabled")
                             .addClass("btn-main")
-                            .unbind("click", disableAction);
+                            .unbind("click", disableAction)
+                            .click(function(){
+                                location.href = jQuery(this).attr("href");
+                            });
                     } else {
-                        jQuery(this).bind('click', disableAction);
+                        //jQuery(this).bind('click', disableAction);
                     }
                     break;
                 case 'HOLD':
