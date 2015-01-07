@@ -287,7 +287,6 @@ sub validate_contact_details {
 sub display_role_details {
     my $self = shift;
 	my $id = $self->ID() || 0;
-
 	if($id){
         my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
         $clubObj->load();
@@ -299,12 +298,9 @@ sub display_role_details {
             return ('Invalid User',0);
         }
     }
-
     my $clubperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'roledetails'}, 'Club',);
-
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
-    
-    my $id = $self->ID() || 0;
+   
     my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
 
     my %PageData = (
@@ -328,8 +324,7 @@ sub validate_role_details {
     my $self = shift;
 
     my $clubData = {};
-    #my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Club',); roledetails
-	my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'roledetails'}, 'Club',); 
+    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'roledetails'}, 'Club',); 
 	
     ($clubData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
 
