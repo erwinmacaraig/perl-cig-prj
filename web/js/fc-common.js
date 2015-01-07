@@ -60,7 +60,7 @@ function checkIfDocsAllApproved() {
 
             switch(actiontype){
                 case 'APPROVE':
-                    if(docsComplete && jQuery("ul.nav-tabs li a i.tab-not-visited").length == 0){
+                    if(jQuery(this).data('disabled') == 0  && docsComplete && jQuery("ul.nav-tabs li a i.tab-not-visited").length == 0){
                         jQuery(this)
                             .removeClass("btn-disabled")
                             .addClass("btn-main")
