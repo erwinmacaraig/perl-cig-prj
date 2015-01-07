@@ -39,7 +39,7 @@
                 <span class="circleBg"><i class="fa fa-check documents-complete documents-incomplete"></i><i class="fa fa-remove documents-rejected documents-approved"></i></span></a>
                 </li>
                 <li><a data-toggle="tab" data-visited="false" href="#memberdetails">[% Lang.txt('Member Detail Summary') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></span></a></a></li>
-                <li><a data-toggle="tab" data-visited="false" href="#tasknotes">[% Lang.txt('Registrations') %]</a></li>
+                <li><a data-toggle="tab" data-visited="false" href="#regdetails">[% Lang.txt('Registrations') %]<span class="circleBg"><i class="fa fa-check regdetails-visited tab-not-visited"></i></span></a></li>
             </ul>
             <div class="tab-content">
                 
@@ -212,7 +212,7 @@
 
                 </div>
 
-                <div id="tasknotes" class="tab-pane">    
+                <div id="regdetails" class="tab-pane">    
 					
 					[% FOREACH rego IN PersonRegoDetails %]
 						<div class="read-only">
