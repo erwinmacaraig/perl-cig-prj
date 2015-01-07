@@ -15,7 +15,27 @@ use feature qw(say);
 sub insertRow {
 	my ($db,$table,$record,$importId, $realmID) = @_;
 	my $keystr = (join ",\n        ", (keys $record));
-	my $valstr = join ', ', (split(/ /, "? " x (scalar(values $record))));
+    #my $valstr = join ', ', (split(/ /, "? " x (scalar(values $record))));
+
+    my @values = values $record;
+    my @tempValues = values $record;
+
+    my @valStrArr;
+    my $ctr = 0;
+    foreach my $value (@tempValues) {
+        my $gval = quotemeta($value);
+         if(grep(/^$gval$/i, @ImporterConfig::PREDEFINED)) {
+             push @valStrArr, $value; 
+             splice @values, $ctr, 1;
+         } else {
+             push @valStrArr, "?"; 
+         }
+
+         $ctr++;
+    }
+
+    my $valstr = join(", ", @valStrArr);
+
 	if(defined $importId && $importId){
     	$keystr = (join ",\n        ","intImportID", $keystr);
     	$valstr = (join ",","$importId", $valstr);
@@ -47,7 +67,6 @@ sub insertRow {
 		}
     }
 	
-	my @values = values $record;
 	my %success = ();
 	my $query = qq[
 	    INSERT INTO $table (
@@ -57,10 +76,11 @@ sub insertRow {
 		    $valstr
 		)
 	];
+    #print STDERR Dumper $valstr;
 	# write log for each insert
 	writeLog("INFO: INSERT INTO $table ($keystr) VALUES(". join(', ', @values).")");
 	try {
-	    my $sth = $db->prepare($query) or die "Can't prepare insert: ".$db->errstr()."\n";
+        my $sth = $db->prepare($query) or die "Can't prepare insert: ".$db->errstr()."\n";
 	    my $result = $sth->execute(@values) or die "Can't execute insert: ".$db->errstr()."\n";
 		print "INSERT SUCCESS :: TABLE:: '",$table,"' ID:: ",$sth->{mysql_insertid},"' RECORDS:: '",join(', ', @values),"'\n";
 	    writeLog("INFO: INSERT SUCCESS :: TABLE:: '".$table."' ID:: ".$sth->{mysql_insertid}."' RECORDS:: '". join(', ', @values).")");
