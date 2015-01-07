@@ -2,8 +2,8 @@
 package TableRules;
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(multiplyEntry insertLink removeLinkField getConfig strToIntEntry setUniqField multiDestEntry insertField entityLink linkIdEntry);
-@EXPORT_OK = qw(multiplyEntry insertLink removeLinkField getConfig strToIntEntry setUniqField multiDestEntry insertField entityLink linkIdEntry);
+@EXPORT = qw(multiplyEntry insertLink removeLinkField getConfig strToIntEntry setUniqField multiDestEntry insertField entityLink linkIdEntry defaultValue);
+@EXPORT_OK = qw(multiplyEntry insertLink removeLinkField getConfig strToIntEntry setUniqField multiDestEntry insertField entityLink linkIdEntry defaultValue);
 
 # This is where you should include the migration rule for your table
 use Data::Dumper;
@@ -161,6 +161,20 @@ sub linkIdEntry{
 	    push (@newRecords, $copy);
 
     }
+    return \@newRecords;
+}
+
+sub defaultValue{
+	my ($records,$rule, $rkey) = @_;
+
+    my $value = $rule->{"value"};
+    my @newRecords = ();
+    foreach my $record ( @{$records} ){
+    	my $copy = {%$record};
+        $copy->{'dtAdded'} = $value;
+	    push (@newRecords, $copy);
+    }
+
     return \@newRecords;
 }
 
