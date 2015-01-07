@@ -374,56 +374,93 @@ sub delete_doc {
 sub checkUploadedEntityDocuments {
     my ($Data, $entityID, $documents, $ctrl) = @_;   
 
+
+	    my %existingDocuments;
 	
 	#1 check for uploaded documents present for a particular entity (required and optional)
 	my $query = qq[
-		SELECT distinct(tblDocuments.intDocumentTypeID), tblDocumentType.strDocumentName 
-		FROM tblDocuments INNER JOIN tblDocumentType
-		ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
-		INNER JOIN tblRegistrationItem 
-		ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID
-		WHERE tblDocuments.intEntityID = ?
-            AND tblRegistrationItem.intRealmID=?
-            AND tblRegistrationItem.strItemType='DOCUMENT'
-	];
+			SELECT
+            tblDocuments.intDocumentTypeID as ID,
+            tblRegistrationItem.intUseExistingThisEntity as UseExistingThisEntity,
+            tblRegistrationItem.intUseExistingAnyEntity as UseExistingAnyEntity,
+            tblUploadedFiles.strOrigFilename,
+            tblUploadedFiles.intFileID,
+            tblUploadedFiles.intAddedByTypeID as AddedByTypeID,
+            tblDocumentType.strDocumentName as Name,
+            tblDocumentType.strDescription as Description
+        FROM tblDocuments
+        INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID)
+        INNER JOIN tblRegistrationItem ON (tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID )
+        INNER JOIN tblUploadedFiles ON ( tblUploadedFiles.intFileID = tblDocuments.intUploadFileID )
+        WHERE 
+	      tblDocuments.intEntityID = ? AND tblRegistrationItem.intRealmID=?
+	       AND tblRegistrationItem.strItemType='DOCUMENT' ];
+
+	#1 check for uploaded documents present for a particular entity (required and optional)
+	#my $query = qq[
+	#	SELECT distinct(tblDocuments.intDocumentTypeID), tblDocumentType.strDocumentName 
+	#	FROM tblDocuments INNER JOIN tblDocumentType
+	#	ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
+	#	INNER JOIN tblRegistrationItem 
+	#	ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID
+	#	WHERE tblDocuments.intEntityID = ?
+    #        AND tblRegistrationItem.intRealmID=?
+    #        AND tblRegistrationItem.strItemType='DOCUMENT'
+	#];
    # ;	
 	if($ctrl){
 		$query .= qq[ AND tblRegistrationItem.intRequired = 1];
 	}
+
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute($entityID, $Data->{'Realm'});
 	my @uploaded_docs = ();
 	while(my $dref = $sth->fetchrow_hashref()){
-		push @uploaded_docs, $dref->{'intDocumentTypeID'};		
+		#push @uploaded_docs, $dref->{'intDocumentTypeID'};		
+		if(! exists $existingDocuments{$dref->{'ID'}}){
+            $existingDocuments{$dref->{'ID'}} = $dref;
+        }
 	}
 	
-	my @validdocsforallrego = ();
-	$query = qq[SELECT tblDocuments.intDocumentTypeID FROM tblDocuments INNER JOIN tblDocumentType
-				ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
-				ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
-				WHERE strApprovalStatus = 'APPROVED' AND tblDocuments.intEntityID = ? AND tblRegistrationItem.intRealmID=? AND 
-				(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
-                 AND tblRegistrationItem.strItemType='DOCUMENT'
-				GROUP BY intDocumentTypeID];
-	$sth = $Data->{'db'}->prepare($query);
-	$sth->execute($entityID, $Data->{'Realm'});
 
-	while(my $dref = $sth->fetchrow_hashref()){
-		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
-	}
+	#my @validdocsforallrego = ();
+	#$query = qq[SELECT tblDocuments.intDocumentTypeID FROM tblDocuments INNER JOIN tblDocumentType
+	#			ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID INNER JOIN tblRegistrationItem 
+	#			ON tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID 
+	#			WHERE strApprovalStatus = 'APPROVED' AND tblDocuments.intEntityID = ? AND tblRegistrationItem.intRealmID=? AND 
+	#			(tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+    #             AND tblRegistrationItem.strItemType='DOCUMENT'
+	#			GROUP BY intDocumentTypeID];
+	#$sth = $Data->{'db'}->prepare($query);
+	#$sth->execute($entityID, $Data->{'Realm'});
+
+	#while(my $dref = $sth->fetchrow_hashref()){
+	#	push @validdocsforallrego, $dref->{'intDocumentTypeID'};
+	#}
 	my @diff = ();	
 	my @docos = ();	
 
 	#2 compare whats in the system and what is required
 	foreach my $doc_ref (@{$documents}){	
-		next if(grep /$doc_ref->{'ID'}/, @validdocsforallrego);	
-		if(!grep /$doc_ref->{'ID'}/,@uploaded_docs){
-			push @diff,$doc_ref;	
+		if(! exists $existingDocuments{$doc_ref->{'ID'}}){
+			push @diff, $doc_ref
+		}
+		#if(exists $existingDocuments{$doc_ref->{'ID'}}){
+			$doc_ref->{'strOrigFilename'} = $existingDocuments{$doc_ref->{'ID'}}{'strOrigFilename'};
+			$doc_ref->{'intFileID'} = $existingDocuments{$doc_ref->{'ID'}}{'intFileID'};		
+			push @docos, $doc_ref;
+		#}		
+		#next if(grep /$doc_ref->{'ID'}/, @validdocsforallrego);	
+		#if(!grep /$doc_ref->{'ID'}/,@uploaded_docs){
+		#	push @diff,$doc_ref;	
 			#print FH "\nPushing: " . Dumper($doc_ref) . "\n";
-		}		
+		#}		
 	}
+
+		
 	#need to filter required docs in @diff
-	return \@diff;
+	return \@diff if($ctrl);
+	return \@docos;
 }
 
 

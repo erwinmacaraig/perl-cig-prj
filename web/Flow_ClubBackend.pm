@@ -286,6 +286,21 @@ sub validate_contact_details {
 
 sub display_role_details {
     my $self = shift;
+	my $id = $self->ID() || 0;
+
+	if($id){
+        my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
+        $clubObj->load();
+        if($clubObj->ID())    {
+            my $objectValues = $self->loadObjectValues($clubObj);
+            $self->setupValues($objectValues);
+        }
+        if(!doesUserHaveEntityAccess($self->{'Data'}, $id,'WRITE')) {
+            return ('Invalid User',0);
+        }
+    }
+
+    my $clubperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'roledetails'}, 'Club',);
 
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
     
@@ -630,7 +645,7 @@ sub display_summary     {
 	
     my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
 
-    $content = '';
+    $content = ''; 
 	my $documents = getUploadedFiles( $self->{'Data'}, $Defs::LEVEL_CLUB, $id, $Defs::UPLOADFILETYPE_DOC , $client );
 	use Club;	
 	use Countries;
