@@ -30,6 +30,11 @@
 			"rule" : "insertField",
 			"field" : "intFacilityTypeID",
 			"values" : {"Stadium" : "1", "Football Pitch" : "2", "Training Grounds" : "3", "Venue" : "4"}
+		},
+		"dtAdded" : {
+			"rule" : "defaultValue",
+			"field" : "dtAdded",
+			"value" : "NOW()"
 		}
 	},
 	"mapping" : {
@@ -61,6 +66,11 @@
 		"NationalCustomString2" : "strNatCustomStr2",
 		"NationalCustomString3" : "strNatCustomStr3",
 		"NationalCustomString4" : "strNatCustomStr4",
-		"NationalCustomString5" : "strNatCustomStr5"
+		"NationalCustomString5" : "strNatCustomStr5",
+		"MAID" : "strMAID",
+		"RealmApproved" : "intRealmApproved",
+		"ContactCountry" : "strContactISOCountry",
+		"LegalID" : "strLegalID",
+		"Added" : "dtAdded"
 	}
 }
