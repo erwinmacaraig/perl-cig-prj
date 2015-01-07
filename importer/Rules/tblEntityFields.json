@@ -1,0 +1,23 @@
+{
+	"rules" : {
+		"intEntityID" : {
+			"rule" : "linkIdEntry",
+			"table" : "tblEntity",
+			"destination" : "intEntityID",
+			"source" : "strImportEntityCode"
+		},
+		"strGroundNature" : {
+			"rule" : "insertField",
+			"field" : "strGroundNature",
+			"values" : {"GRASS" : "NATURAL_GRASS", "TURF 2 STAR" : "TURF2STAR", "TURF 1 STAR" : "TURF1STAR", "TURF" : "TURF", "HARD PITCH" : "HARD_PITCH", "UNKNOWN" : "UNKNOWN"}
+		}
+	},
+	"mapping" : {
+		"VenueCode" : "intEntityID",
+		"Capacity" : "intCapacity",
+		"Sport" : "strDiscipline",
+		"GroundType" : "strGroundNature",
+		"Length" : "dblLength",
+		"Width" : "dblWidth"
+	}
+}

@@ -17,5 +17,6 @@ CREATE TABLE `tblEntityFields` (
     `intCoveredStandingPlaces` INT NULL,
     `intUncoveredStandingPlaces` INT NULL,
     `intLightCapacity` INT NULL,
+    `intImportId` INT NULL,
     PRIMARY KEY (`intEntityFieldID`))
 COMMENT = 'FacilityType as per FIFA FDS (additional fields moved from tblEntity)';

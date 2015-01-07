@@ -374,8 +374,8 @@ strong {
     width: 74%;
 }
 #grid_wrapper #grid_filter label input[type="search"] {
-	border-radius: 5px;
-    /*padding: 5px;
+	/*border-radius: 5px;
+    padding: 5px;
     width: 71%;*/
 }
 div.showrecoptions form#personDocAdd, div.showrecoptions form#entityDocAdd {

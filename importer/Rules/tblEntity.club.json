@@ -25,6 +25,11 @@
 			"rule" : "insertField",
 			"field" : "intEntityLevel",
 			"values" : {"CLUB" : "3", "MA ACADEMY": "3", "SCHOOL": "3", "GRASSROOT PROGRAM": "3", "PRIVATE ACADEMY": "3", "COLLEGE": "3", "UNIVERSITY": "3", "OTHER": "3", "REGION" : "20", "STATE" : "30"}
+		},
+		"dtAdded" : {
+			"rule" : "defaultValue",
+			"field" : "dtAdded",
+			"value" : "NOW()"
 		}
 	},
 	"mapping" : {
@@ -53,10 +58,16 @@
 		"Fax" : "strFax",
 		"Discipline" : "strDiscipline",
 		"Gender" : "strGender",
+		"MAID" : "strMAID",
+		"RealmApproved" : "intRealmApproved",
+		"ContactCountry" : "strContactISOCountry",
+		"OrganisationLevel" : "strOrganisationLevel",
+		"LegalID" : "strLegalID",
 		"NationalCustomString1" : "strNatCustomStr1",
 		"NationalCustomString2" : "strNatCustomStr2",
 		"NationalCustomString3" : "strNatCustomStr3",
 		"NationalCustomString4" : "strNatCustomStr4",
-		"NationalCustomString5" : "strNatCustomStr5"
+		"NationalCustomString5" : "strNatCustomStr5",
+		"Added" : "dtAdded"
 	}
 }
