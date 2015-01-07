@@ -125,6 +125,9 @@ sub ApplyPreRules{
 		elsif($rule->{"rule"} eq "linkIdEntry") {
             $records = linkIdEntry($records, $rule, $key);
 		}
+		elsif($rule->{"rule"} eq "defaultValue") {
+            $records = defaultValue($records, $rule, $key);
+		}
     }
     return $records;
 }
