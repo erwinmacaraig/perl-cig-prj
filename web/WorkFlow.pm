@@ -695,7 +695,7 @@ sub addWorkFlowTasks {
         $personRegistrationID,
         $documentID
     ) = @_;
-
+	
     $entityID ||= 0;
     $personID ||= 0;
     $originLevel ||= 0;
@@ -722,6 +722,7 @@ sub addWorkFlowTasks {
             ORDER BY intWFTaskID DESC
             LIMIT 1
         ];
+		
         my $qCheck = $Data->{'db'}->prepare($stCheck);
         $qCheck->execute(
             $Data->{'Realm'},
@@ -732,6 +733,7 @@ sub addWorkFlowTasks {
         );
         my $existingTaskID = $qCheck->fetchrow_array() || 0;
         $checkOk = 0 if $existingTaskID;
+		
     }
             
     
@@ -807,7 +809,7 @@ sub addWorkFlowTasks {
 		];
         #0 as RegoEntity,
 	    $q = $db->prepare($st);
-  	    $q->execute($personID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
+  	    $q->execute($personID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);		
     }
 
     if ($ruleFor eq 'REGO' and $personRegistrationID)   {
@@ -924,12 +926,14 @@ sub addWorkFlowTasks {
 
 
     my $emailNotification = new EmailNotifications::WorkFlow();
-
+	
     if ($checkOk)   {
         while (my $dref= $q->fetchrow_hashref())    {
+			
             my $approvalEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intApprovalEntityLevel'}) || 0;
             my $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intProblemResolutionEntityLevel'});
             next if (! $approvalEntityID and ! $problemEntityID);
+			
             $qINS->execute(
                 $dref->{'intWFRuleID'},
                 $dref->{'intRealmID'},
@@ -2198,12 +2202,12 @@ sub viewTask {
 	
     switch($dref->{strWFRuleFor}) {
         case 'REGO' {
-            my ($TemplateData, $fields) = populateRegoViewData($Data, $dref); print FH "\nAt REGO Dref contains: \n". Dumper($dref) . "\n"; 
+            my ($TemplateData, $fields) = populateRegoViewData($Data, $dref); 
             %TemplateData = %{$TemplateData};
             %fields = %{$fields};
         }
         case 'ENTITY' {
-            my ($TemplateData, $fields) = populateEntityViewData($Data, $dref); print FH "\nAt ENTITY Dref contains: \n". Dumper($dref) . "\n"; 
+            my ($TemplateData, $fields) = populateEntityViewData($Data, $dref); 
             %TemplateData = %{$TemplateData};
             %fields = %{$fields};
         }
@@ -2540,6 +2544,7 @@ sub populatePersonViewData {
     );
 
     my $isocountries  = getISOCountriesHash();
+	
 
 	#get Registration Details for this person within this club
 	my $sql = qq[SELECT tblEntity.strLocalName, pr.strPersonType, pr.strRegistrationNature, pr.strPersonLevel, pr.strPersonEntityRole, pr.strStatus, pr.strSport, pr.strAgeLevel, tblNationalPeriod.strNationalPeriodName, tblNationalPeriod.dtFrom, tblNationalPeriod.dtTo FROM tblPersonRegistration_$Data->{'Realm'} as pr 
@@ -2550,20 +2555,30 @@ WHERE pr.intPersonID = ? AND pr.intEntityID = ?];
 
 	my @registrations = ();
 	while(my $data = $sth->fetchrow_hashref()){
-		push @registrations, $data;
-	}
-	
-	my $certifications = getPersonCertifications(
+		
+		my $certifications = getPersonCertifications(
         $Data,
         $dref->{'intPersonID'},
-        $dref->{'strPersonType'},
+        $data->{'strPersonType'},
         0
-    );
+ 	   ); # anonymous array that contains certifications
+		my @certString;
+		if(scalar @{$certifications}){
+			 foreach my $cert (@{$certifications}) {
+       			 push @certString, $cert->{'strCertificationName'};
+   			 }
+			$data->{'certifications'} = join(', ', @certString);  # append to the specific registration
+		}
+		
+		push @registrations, $data;
+		
+		
+	}
+	
+	
 
-    my @certString;
-    foreach my $cert (@{$certifications}) {
-        push @certString, $cert->{'strCertificationName'};
-    }
+   
+   
 
 	%TemplateData = (
         PersonDetails => {
@@ -2593,6 +2608,7 @@ WHERE pr.intPersonID = ? AND pr.intEntityID = ?];
             ruleForPerson => $ruleForType || '',
         },
 		PersonRegoDetails => \@registrations,
+		
         PersonSummary => personSummaryPanel($Data, $dref->{intPersonID}) || '',
 	);
 
