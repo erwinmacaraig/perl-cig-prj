@@ -9,6 +9,7 @@ require Exporter;
 use Data::Dumper;
 use JSON;
 use DBInserter;
+use ImporterConfig;
 
 use feature qw(say);
 my $db = connectDB();
@@ -92,19 +93,21 @@ sub entityLink{
     foreach my $record ( @{$records} ){
 		say $rule->{"field"}.' =='. $rule->{"regionfld"};
 		my $values = $rule->{"values"};
-		my $isocntry = $record->{ $rule->{"field"} };
+        #my $isocntry = $record->{ $rule->{"field"} };
+        my $isocntry = $ImporterConfig::DefaultISOCountry;
 		
 		say $rule->{"rule"};
 		
 		#my $realm = $db->selectrow_array("select intrealmid,strRealmName from tblRealms where $values->{}");
-		my $realmid = getRecord($db,"tblRealms","intrealmid","strRealmName",$values->{ $isocntry });
-		my $parentid = getRecord($db,"tblEntity","intEntityID","strLocalName",$values->{ $isocntry });
+        my $realmid = getRecord($db,"tblRealms","intrealmid","strRealmName",$values->{ $isocntry });
+        #my $parentid = getRecord($db,"tblEntity","intEntityID","strLocalName",$values->{ $isocntry });
+        my $parentid = getRecord($db,"tblEntity","intEntityID","strLocalShortName",$values->{ $isocntry });
 		my $childid = getRecord($db,"tblEntity","intEntityID","strImportEntityCode",$record->{"strImportEntityCode"}),
 
 		my %link = ();
 		my %structure = ();
 		my $regionval = $record->{ $rule->{"regionfld"} };
-		if( ($isocntry eq "SGP" || $regionval eq "" ) && ($parentid)) {
+		if( ($isocntry eq "SG" || $regionval eq "" ) && ($parentid)) {
 			$link{'intParentEntityID'} = $parentid;
 			$link{'intChildEntityID'} = getRecord($db,"tblEntity","intEntityID","strImportEntityCode",$record->{"strImportEntityCode"}),
 			
@@ -134,6 +137,8 @@ sub entityLink{
 			$structure{'intChildLevel'} = "20";
 		}elsif( $record->{'strEntityType'} eq 'STATE') {
 			$structure{'intChildLevel'} = "30";
+		}elsif( $record->{'strEntityType'} eq 'VENUE') {
+			$structure{'intChildLevel'} = "-47";
 		}
 		
 		$structure{'intRealmID'} = $realmid;
@@ -209,11 +214,12 @@ sub insertEntityLevel{
 		my $copy = {%$record};
 		
 		say $rule->{"rule"};
-		my $isocntry = $record->{ $rule->{"cntryfld"} };
+        #my $isocntry = $record->{ $rule->{"cntryfld"} };
+        my $isocntry = $ImporterConfig::DefaultISOCountry;
 
-		my $realmid = getRecord($db,"tblRealms","intrealmid","strRealmName",$values->{ $isocntry });
+        my $realmid = getRecord($db,"tblRealms","intrealmid","strRealmName",$values->{ $isocntry });
 		
-		if( ($isocntry eq "SGP") || ( $record->{ $rule->{"regionfld"} } eq "" ) ) {
+		if( ($isocntry eq "SG") || ( $record->{ $rule->{"regionfld"} } eq "" ) ) {
 			my $parentE = $realmid;
 			$copy->{$rule->{"newfield"}} = "100";
 		} else {

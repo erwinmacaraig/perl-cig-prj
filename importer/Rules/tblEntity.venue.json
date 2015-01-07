@@ -24,15 +24,21 @@
 		"strEntityType" : {
 			"rule" : "insertField",
 			"field" : "intEntityLevel",
-			"values" : {"CLUB" : "3", "MA ACADEMY": "3", "SCHOOL": "3", "GRASSROOT PROGRAM": "3", "PRIVATE ACADEMY": "3", "COLLEGE": "3", "UNIVERSITY": "3", "OTHER": "3", "REGION" : "20", "STATE" : "30"}
+			"values" : {"VENUE": "-47"}
+		},
+		"intFacilityTypeID" : {
+			"rule" : "insertField",
+			"field" : "intFacilityTypeID",
+			"values" : {"Stadium" : "1", "Football Pitch" : "2", "Training Grounds" : "3", "Venue" : "4"}
 		}
 	},
 	"mapping" : {
-		"EntityCode" : "strImportEntityCode",
+		"VenueCode" : "strImportEntityCode",
 		"StateName" : "strStateLocalName",
 		"RegionName" : "strRegionLocalName",
 		"ZoneName" : "strZoneLocalName",
-		"SubType" : "strEntityType",
+		"EntityType" : "strEntityType",
+		"VenueType" : "intFacilityTypeID",
 		"Status" : "strStatus",
 		"LocalName" : "strLocalName",
 		"LocalShortName" : "strLocalShortName",
@@ -51,8 +57,6 @@
 		"Email" : "strEmail",
 		"Phone" : "strPhone",
 		"Fax" : "strFax",
-		"Discipline" : "strDiscipline",
-		"Gender" : "strGender",
 		"NationalCustomString1" : "strNatCustomStr1",
 		"NationalCustomString2" : "strNatCustomStr2",
 		"NationalCustomString3" : "strNatCustomStr3",

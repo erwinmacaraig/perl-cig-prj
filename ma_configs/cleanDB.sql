@@ -2,6 +2,7 @@ DELETE FROM tblEntity WHERE intEntityID<>1;
 DELETE FROM tblUserAuth WHERE entityId>1;
 DELETE FROM tblPerson;
 DELETE FROM tblPersonRegistration_1;
+DELETE FROM tblPersonEntity_1;
 DELETE FROM tblPersonRequest;
 DELETE FROM tblDocuments;
 DELETE FROM tblTransactions;
@@ -19,3 +20,9 @@ DELETE FROM tblAuditLog;
 
 DELETE FROM tblUploadedFiles;
 DELETE FROM tblDocuments;
+
+DELETE FROM tblImportTrack;
+
+DELETE FROM tblEntityLinks;
+
+DELETE FROM tblTempEntityStructure;

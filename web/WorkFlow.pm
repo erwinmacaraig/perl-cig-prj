@@ -2427,8 +2427,7 @@ sub populateRegoViewData {
         ReadOnlyLogin => $readonly,
         PersonSummary => personSummaryPanel($Data, $dref->{intPersonID}) || '',
         WFTaskID => $dref->{'intWFTaskID'},
-        ActiveTab => $activeTab,
-        EntityLevel => $Data->{'clientValues'}{'authLevel'}
+        ActiveTab => $activeTab
 	);
 
     $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.')
