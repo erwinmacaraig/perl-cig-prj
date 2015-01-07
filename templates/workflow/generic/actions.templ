@@ -88,30 +88,37 @@
             return false;
         }
 
-        jQuery("a.workflow-action").bind('click', disableAction);
+        var workflowtabs = {};
+        var visitedtabs = [];
+
+        var numberOfPendingDocs = jQuery(".totalPendingDocs").val();
+        var rejectedDocsFlag = jQuery(".rejectedDocs").val();
 
         jQuery("ul.nav-tabs li a").each(function(){
             jQuery(this).on('click', function(){
                 jQuery(this).attr('data-visited', 'true');
-                
-                if(jQuery("ul.nav-tabs li a[data-visited=false]").length === 0){
-                    jQuery("a.workflow-action").each(function(){
-                        var actiontype = jQuery(this).data('actiontype');
+                jQuery(this).find("i").removeClass("tab-not-visited");
 
-                        switch(actiontype){
-                            case 'APPROVE':
-                                if(jQuery(this).data('disabled') == 0){
-                                    jQuery(this)
-                                        .removeClass("btn-disabled")
-                                        .addClass("btn-main")
-                                        .unbind("click", disableAction);
-                                }
-                                break;
-                            case 'HOLD':
-                            case 'REJECT':
-                            case 'RESOLVE':
-                                jQuery(this
-)                                    .removeClass("btn-disabled")
+                jQuery("a.workflow-action").each(function(){
+                    var actiontype = jQuery(this).data('actiontype');
+
+                    switch(actiontype){
+                        case 'APPROVE':
+                            if(jQuery(this).data('disabled') == 0
+                                && ((rejectedDocsFlag < 1 || rejectedDocsFlag == "" || typeof rejectDocsFlag === 'undefined') && (numberOfPendingDocs < 1 || numberOfPendingDocs == ''))
+                            ){
+                                jQuery(this)
+                                    .removeClass("btn-disabled")
+                                    .addClass("btn-main")
+                                    .unbind("click", disableAction);
+                            }
+                            break;
+                        case 'HOLD':
+                        case 'REJECT':
+                        case 'RESOLVE':
+                            if(jQuery("ul.nav-tabs li a i.tab-not-visited").length == 0){
+                                jQuery(this)
+                                    .removeClass("btn-disabled")
                                     .addClass("btn-main")
                                     .unbind("click", disableAction)
                                     .click(function(f){
@@ -119,42 +126,42 @@
                                         jQuery("#workFlowActionForm input[type=hidden][name=type]").val(actiontype);
                                         f.preventDefault();
                                     });
-                                break;
-                        }
-                    });
+                            }
+                            break;
+                    }
+                });
 
-
-                    //jQuery("a.workflow-action")
-                    //    .removeClass("btn-disabled")
-                    //    .addClass("btn-main")
-                    //    .unbind('click', disableAction)
-                    //    .click(function(f){
-
-                    //        var actiontype = jQuery(this).data('actiontype');
-
-                    //        if(actiontype == "REJECT" || actiontype == "HOLD" || actiontype == "RESOLVE"){
-                    //            jQuery("div#showWorkflowNotes").modal();
-                    //            jQuery("#workFlowActionForm input[type=hidden][name=type]").val(actiontype);
-                    //            f.preventDefault();
-                    //        }
-                    //    });
-                } else {
-
-                }
-                
                 if (jQuery(this).attr("data-visited") == "true") {
-
                     var taskID = jQuery(".taskID").val();
+                    var existingworkflowtabs = localStorage.getItem("workflowtabs");
 
-                    localStorage.removeItem("data");
-                    
-                    console.log("current task:" + taskID);
-                    
-                    jQuery(this).find("i").removeClass("tab-not-visited");
-                    
-                    localStorage.setItem("data", taskID);
+
+                    if(existingworkflowtabs != null) {
+                        var eTempWFtabs = JSON.parse(existingworkflowtabs);
+                        if(eTempWFtabs.taskid != taskID) {
+                            localStorage.removeItem("workflowtabs");
+                            existingworkflowtabs = null;
+                        }
+                    }
+
+                    if(existingworkflowtabs == null) {
+                        visitedtabs.push(jQuery(this).attr("href"));
+                        workflowtabs['taskid'] = taskID;
+                        workflowtabs['visited'] = visitedtabs;
+
+                        localStorage.setItem("workflowtabs", JSON.stringify(workflowtabs));
+                    } else {
+                        existingworkflowtabs = JSON.parse(existingworkflowtabs);
+                        existingworkflowtabs.taskid = taskID;
+
+                        if(existingworkflowtabs.visited.indexOf(jQuery(this).attr("href")) < 0) {
+                            existingworkflowtabs.visited.push(jQuery(this).attr("href"));
+                        }
+
+                        localStorage.setItem("workflowtabs", JSON.stringify(existingworkflowtabs));
+                    }
+
                 }
-                
             });
         });
 

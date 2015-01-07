@@ -37,48 +37,59 @@ function checkIfDocsAllApproved() {
 
     }
 
-    var storedTask = localStorage.getItem("data");
+    var storedWorkTaskTabs = localStorage.getItem("workflowtabs");
+    var visitedWorkTask = JSON.parse(storedWorkTaskTabs);
+
     var taskID = $(".taskID").val();
     
     var disableAction = function(e) {
         return false;
     }
 
-    if (storedTask == taskID){
+    if (visitedWorkTask != null && visitedWorkTask.taskid == taskID){
+
+        for (i = 0; i < visitedWorkTask.visited.length; i++) {
+            jQuery("ul.nav-tabs li a[href="+ visitedWorkTask.visited[i] +"] i").removeClass("tab-not-visited");
+        }
         
-        $("body").find("i.memdetails-visited").removeClass("tab-not-visited");
-        $("body").find("i.regdetails-visited").removeClass("tab-not-visited");
+        //$("body").find("i.memdetails-visited").removeClass("tab-not-visited");
+        //$("body").find("i.regdetails-visited").removeClass("tab-not-visited");
 
         jQuery("a.workflow-action").each(function(){
             var actiontype = jQuery(this).data('actiontype');
 
             switch(actiontype){
                 case 'APPROVE':
-                    if(docsComplete){
+                    if(jQuery(this).data('disabled') == 0  && docsComplete && jQuery("ul.nav-tabs li a i.tab-not-visited").length == 0){
                         jQuery(this)
                             .removeClass("btn-disabled")
                             .addClass("btn-main")
                             .unbind("click", disableAction);
+                    } else {
+                        jQuery(this).bind('click', disableAction);
                     }
                     break;
                 case 'HOLD':
                 case 'REJECT':
                 case 'RESOLVE':
-                    jQuery(this)
-                        .removeClass("btn-disabled")
-                        .addClass("btn-main")
-                        .unbind("click", disableAction)
-                        .click(function(f){
-                            jQuery("div#showWorkflowNotes").modal();
-                            jQuery("#workFlowActionForm input[type=hidden][name=type]").val(actiontype);
-                            f.preventDefault();
-                        });
+                    if(jQuery("ul.nav-tabs li a i.tab-not-visited").length == 0){
+                        jQuery(this)
+                            .removeClass("btn-disabled")
+                            .addClass("btn-main")
+                            .unbind("click", disableAction)
+                            .click(function(f){
+                                jQuery("div#showWorkflowNotes").modal();
+                                jQuery("#workFlowActionForm input[type=hidden][name=type]").val(actiontype);
+                                f.preventDefault();
+                            });
+                    }
                     break;
             }
         });
    
     } else {
-        
+        jQuery("a.workflow-action").bind('click', disableAction);
+        //localStorage.removeItem("workflowtabs");
         //this means you are viewing a new work task
         console.log("new task:" + taskID);
     }

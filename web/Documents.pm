@@ -417,6 +417,7 @@ sub pendingDocumentActions {
     ];
 	# D.intDocumentID
 
+	
     my $query = $Data->{'db'}->prepare($stDT);
     $query->execute(
         $regoID,
@@ -424,7 +425,7 @@ sub pendingDocumentActions {
         $personID,
     );
     my ($valuePending,$entityID, $nature) = $query->fetchrow_array();
-    
+
     if ($valuePending eq 'PERSON' or $valuePending eq 'BOTH') {
         my $personObj = new PersonObj(db => $Data->{'db'}, ID => $personID, cache => $Data->{'cache'});
         $personObj->load();
@@ -442,7 +443,7 @@ sub pendingDocumentActions {
             0,
             0,
         );
-
+		
 		
     }
     if ($regoID and ($valuePending eq 'REGO' or $valuePending eq 'BOTH'))   {
@@ -468,6 +469,7 @@ sub pendingDocumentActions {
             $regoID,
             0
         );
+		
     }
 }
 
