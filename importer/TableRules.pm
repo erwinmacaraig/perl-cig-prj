@@ -156,7 +156,8 @@ sub linkIdEntry{
 	my @newRecords = ();
     foreach my $record ( @{$records} ){
     	my $copy = {%$record};
-	    $copy->{$rule->{"destination"}} = getRecord($db,$rule->{"table"},$rule->{"destination"},$rule->{"source"},$record->{$rkey});
+        my $selectColumn = $rule->{"primarykey"} ? $rule->{"primarykey"} : $rule->{"destination"};
+	    $copy->{$rule->{"destination"}} = getRecord($db,$rule->{"table"},$selectColumn,$rule->{"source"},$record->{$rkey});
 	    delete $copy->{$rule->{"source"}}  if (defined $rule->{"swap"} && $copy->{$rule->{"swap"}});
 	    push (@newRecords, $copy);
 
