@@ -15,7 +15,7 @@ use Documents;
 use JSON;
 use strict;
 
-my $client = param('client') || 0;
+my $client = param('client') || param('clm') || 0;
 my $regoID = param('rID') || 0;
 my $uploaded_filename = param('file') || ''; 
 my $docTypeID = param('doctypeID') || 0; 
@@ -33,8 +33,6 @@ $Data{'db'}=$db;
     $Data{'clientValues'} = \%clientValues;
     ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
      my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
-
-
 
 if($uploaded_filename ne ''){  
     my $filefield = 'file';  
