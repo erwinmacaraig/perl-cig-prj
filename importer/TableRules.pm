@@ -155,6 +155,9 @@ sub linkIdEntry{
 	my ($records,$rule, $rkey) = @_;
 	my @newRecords = ();
     foreach my $record ( @{$records} ){
+        #TODO add checking $rule->{"required"}
+        # if $rule->{"required"} eq "true" and there's no found link, skip current record (needed for PersonRegistration)
+
     	my $copy = {%$record};
         my $selectColumn = $rule->{"primarykey"} ? $rule->{"primarykey"} : $rule->{"destination"};
 	    $copy->{$rule->{"destination"}} = getRecord($db,$rule->{"table"},$selectColumn,$rule->{"source"},$record->{$rkey});
