@@ -25,7 +25,7 @@ sub main	{
 
 	my %Data = ();
 	my $db = connectDB();
-    my $personID= 10759663;
+    my $personID= 10759606;
 	$Data{'db'} = $db;
 	$Data{'Realm'} = 1;
 	$Data{'RealmSubType'} = 0;
