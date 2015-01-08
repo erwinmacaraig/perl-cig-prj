@@ -56,8 +56,10 @@
 					 <div class="read-only-text clearfix">
 					    <ul>  
 						[% FOREACH doc IN documents %]
+							[% IF doc.DocumentType %]		
 								<li><span>[% doc.Name %]:<br /></span>
-								<b>[% doc.OrigFilename %]</b></li>	
+								<b>[% doc.OrigFilename %]</b></li>
+							[% END %]	
 						[% END %]
 					    </ul>
 					    <a href="[% editlink %]&amp;rfp=d" class="pull-right">Edit</a>

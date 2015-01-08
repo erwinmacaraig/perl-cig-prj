@@ -7,7 +7,26 @@
 		"strISONationality" : {
 			"rule" : "insertField",
 			"field" : "intDataOrigin",
-			"values" : {"FIN" : "100", "SGP" : "100"}
+			"values" : {"FI" : "100", "SG" : "100"}
+		},
+		"strStatus" : {
+			"rule" : "insertField",
+			"field" : "strStatus",
+			"values" : {"PENDING" : "PENDING", "ACTIVE" : "REGISTERED", "INACTIVE" : "REGISTERED", "TRANSFERRED" : "TRANSFERRED", "INPROGRESS" : "INPROGRESS", "SUSPENDED" : "SUSPENDED", "DECEASED" : "DECEASED", "DELETED" : "DELETED"}
+		},
+		"intEthnicityID" : {
+			"rule" : "linkIdEntry",
+			"table" : "tblDefCodes",
+			"destination" : "intEthnicityID",
+			"primarykey" : "intCodeID",
+			"source" : "strName"
+		},
+		"intNatCustomLU1" : {
+			"rule" : "linkIdEntry",
+			"table" : "tblDefCodes",
+			"destination" : "intNatCustomLU1",
+			"primarykey" : "intCodeID",
+			"source" : "strName"
 		}
 	},
 	
@@ -33,6 +52,8 @@
 		"PostalCode" : "strPostalCode",
 		"Suburb" : "strSuburb",
 		"State" : "strState",
-		"Email" : "strEmail"
+		"Email" : "strEmail",
+		"DemographicField2" : "intEthnicityID",
+		"DemographicField3" : "intNatCustomLU1"
 	}
 }
