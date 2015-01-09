@@ -122,12 +122,6 @@ sub clubFieldsSetup {
         $entityTypeOptions{$eType} = $Defs::entityType{$eType} || '';
     }
 
-    my %organisationLevel = (
-        PROFESSIONAL => 'Professional',
-        AMATEUR => 'Amateur',
-        BOTH => 'Both',
-    );
-
     my %dissolvedOptions = (
         0 => 'No',
         1 => 'Yes',
@@ -410,7 +404,7 @@ sub clubFieldsSetup {
                     label       => $FieldLabels->{'strOrganisationLevel'},
                     value       => $values->{'strOrganisationLevel'},
                     type        => 'lookup',
-                    options     => \%organisationLevel,
+                    options     => \%Defs::organisationLevel,
                     firstoption => [ '', 'Select Level' ],
                     compulsory  => 1,
                 },

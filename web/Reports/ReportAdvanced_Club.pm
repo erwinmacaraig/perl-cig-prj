@@ -66,7 +66,7 @@ sub _getConfiguration {
             strISOCountry=> [ 'Country (ISO)', { displaytype     => 'lookup', fieldtype       => 'dropdown', dropdownoptions => $CommonVals->{'Countries'}, allowsort => 1, dbfield=> 'UCASE(strISOCountry)', allowgrouping=> 1 } ],
 
             strDiscipline=> [ 'Sport', { displaytype => 'lookup', fieldtype => 'dropdown', dropdownoptions => \%Defs::entitySportType, } ],
-            strOrganisationLevel=> [ 'Level', { displaytype => 'lookup', fieldtype => 'dropdown', dropdownoptions => \%Defs::entitySportType, } ],
+            strOrganisationLevel=> [ 'Level', { displaytype => 'lookup', fieldtype => 'dropdown', dropdownoptions => \%Defs::organisationLevel, } ],
 
             strPostalCode => [ 'Postal Code', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, } ],
             strPhone => [ 'Phone', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield     => 'E.strPhone', } ],
