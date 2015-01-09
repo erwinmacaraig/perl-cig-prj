@@ -25,8 +25,9 @@ sub insertRow {
     foreach my $value (@tempValues) {
         my $gval = quotemeta($value);
          if(grep(/^$gval$/i, @ImporterConfig::PREDEFINED)) {
-             push @valStrArr, $value; 
-             splice @values, $ctr, 1;
+            push @valStrArr, $value; 
+            splice @values, $ctr, 1;
+            $ctr--;
          } else {
              push @valStrArr, "?"; 
          }
