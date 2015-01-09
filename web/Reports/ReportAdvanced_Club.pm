@@ -142,7 +142,7 @@ sub SQLBuilder  {
   my $sql = '';
   { #Work out SQL
 
-    $where_list=' AND '.$where_list if $where_list and ($where_levels or $current_where);
+    $where_list=' AND '.$where_list if $where_list;# and ($where_levels or $current_where);
 
     $sql = qq[
         SELECT
