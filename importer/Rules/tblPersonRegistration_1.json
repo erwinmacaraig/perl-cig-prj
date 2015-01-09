@@ -47,6 +47,43 @@
                 "REJECTED" : "REJECTED",
                 "ROLLED_OVER" : "ROLLED_OVER"
             }
+		},
+		"strAgeLevel" : {
+			"rule" : "calculateAgeLevel",
+            "table" : "tblPerson",
+            "primarykey" : "intPersonID",
+            "source" : "dtDOB",
+			"destination" : "strAgeLevel",
+            "deltafield" : "dtFrom"
+		},
+		"strPersonLevel" : {
+			"rule" : "insertField",
+			"field" : "strPersonLevel",
+			"values" : {
+                "PROFESSIONAL" : "PROFESSIONAL",
+                "AMATEUR" : "AMATEUR",
+                "AMATEUR WITH CONTRACT" : "AMATEUR_U_C"
+            }
+		},
+		"dtAdded" : {
+			"rule" : "defaultValue",
+			"field" : "dtAdded",
+			"value" : "NOW()"
+		},
+		"dtLastUpdated" : {
+			"rule" : "defaultValue",
+			"field" : "dtLastUpdated",
+			"value" : "NOW()"
+		},
+		"dtApproved" : {
+			"rule" : "defaultValue",
+			"field" : "dtApproved",
+			"value" : "NOW()"
+		},
+		"intAgeGroupID" : {
+			"rule" : "defaultValue",
+			"field" : "intAgeGroupID",
+			"value" : "0"
 		}
 	},
 	"mapping" : {
@@ -65,6 +102,12 @@
 		"NationalSeason" : "intNationalPeriodID",
 		"ProductCode" : "ProductCode",
 		"Amount" : "Amount",
-		"IsPaid" : "intIsPaid"
+		"IsPaid" : "intIsPaid",
+		"OriginLevel" : "intOriginLevel",
+		"OriginID" : "intOriginID",
+		"Added" : "dtAdded",
+		"Updated" : "dtLastUpdated",
+		"Approved" : "dtApproved",
+		"AgeGroup" : "intAgeGroupID"
 	}
 }
