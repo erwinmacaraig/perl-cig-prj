@@ -77,7 +77,6 @@ sub main {
         $q->finish();
         $success = 1 if $idcode;
 
-warn("SICCA $success");
         if ($success) {
             my $statement = qq[
 				UPDATE tblUserAuth
@@ -99,7 +98,6 @@ warn("SICCA $success");
             }
         }
     }
-warn("SICC $success");
     if ( !$success ) {
         disconnectDB($db);
 
@@ -170,10 +168,15 @@ warn("SICC $success");
 
     $client = setClient( \%clientValues );
 
-    print entity_cookie( new CGI, $level, $idcode );
+    my $cgi = new CGI;
+    my $cookie  = entity_cookie( $cgi, $level, $idcode );
 
     my $link =
       "main.cgi?client=$client&lastlogin=$lastlogin&days=$days&a=LOGIN";
+
+    my $p3p=q[policyref="/w3c/p3p.xml", CP="ALL DSP COR CURa ADMa DEVa TAIi PSAa PSDa IVAi IVDi CONi OTPi OUR BUS IND PHY ONL UNI COM NAV DEM STA"];
+
+    print $cgi->redirect (-uri => $link, -cookie=>[$cookie], -P3P => $p3p);
 
     print qq[
 	<HTML>
@@ -206,7 +209,8 @@ sub entity_cookie {
         -path   => "/"
     );
 
-    my $header = $output->header( -cookie => [$entity_cookie] );
+    return $entity_cookie;
+    #my $header = $output->header( -cookie => [$entity_cookie] );
 
-    return $header || '';
+    #return $header || '';
 }
