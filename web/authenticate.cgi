@@ -172,10 +172,11 @@ sub main {
     my $cookie  = entity_cookie( $cgi, $level, $idcode );
 
     my $link =
-      "main.cgi?client=$client&lastlogin=$lastlogin&days=$days&a=LOGIN";
+      $Defs::base_url."/main.cgi?client=$client&lastlogin=$lastlogin&days=$days&a=LOGIN";
 
     my $p3p=q[policyref="/w3c/p3p.xml", CP="ALL DSP COR CURa ADMa DEVa TAIi PSAa PSDa IVAi IVDi CONi OTPi OUR BUS IND PHY ONL UNI COM NAV DEM STA"];
 
+    my $h = $cgi->header(-uri => $link, -cookie=>[$cookie], -P3P => $p3p); #This is needed, I don't know why
     print $cgi->redirect (-uri => $link, -cookie=>[$cookie], -P3P => $p3p);
 
     print qq[
