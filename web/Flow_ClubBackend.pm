@@ -484,7 +484,8 @@ sub display_documents {
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
-    #my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    #my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0; 
+	#my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
 	my $entityRegisteringForLevel = $Defs::LEVEL_CLUB;
     my $client = $self->{'Data'}->{'client'};
  	my $ctrl = 0;
@@ -521,31 +522,32 @@ sub display_documents {
 				push @optional_docs_listing, $rdc;
 			}
 		}	
-		my $cl = setClient($self->{'Data'}->{'clientValues'}) || '';
-        my %cv = getClient($cl);
-        $cv{'clubID'} = $clubID;
-        $cv{'currentLevel'} = $Defs::LEVEL_CLUB;
-        my $clm = setClient(\%cv);
+
+		my %clientValues = getClient($client);
+		
+
+		$clientValues{'clubID'} = $self->ID;
+		$clientValues{'currentLevel'} = $Defs::LEVEL_CLUB; 
+		my $clmx = setClient(\%clientValues);
 
         my %documentData = (
             target => $self->{'Data'}->{'target'},
             documents => \@required_docs_listing,
 			optionaldocs => \@optional_docs_listing,
             Lang => $self->{'Data'}->{'lang'},           
-            client => $clm,
+			client => $clmx,
 			clubID => $clubID,
             
         );
-        
+		
         $content = runTemplate($self->{'Data'}, \%documentData, 'club/required_docs.templ') || '';  
 		
 	}
 	else    {
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
     }
-    
-    my $id = $self->ID() || 0;
-    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
+   
+    my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $clubID);
     
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
@@ -617,8 +619,9 @@ sub process_documents {
     }
 
 	if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
-        #There are errors - reset where we are to go back to the form again
+        #There are errors - reset where we are to go back to the form again		
         $self->decrementCurrentProcessIndex();
+		
         return ('',2);
     }
 	

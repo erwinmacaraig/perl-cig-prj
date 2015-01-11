@@ -10,13 +10,80 @@
 			"rule" : "linkIdEntry",
 			"table" : "tblPerson",
 			"destination" : "intPersonID",
-			"source" : "strImportPersonCode"
+			"source" : "strImportPersonCode",
+            "required" : "true"
 		},
 		"intEntityID" : {
 			"rule" : "linkIdEntry",
 			"table" : "tblEntity",
 			"destination" : "intEntityID",
 			"source" : "strImportEntityCode"
+		},
+		"intCurrent" : {
+			"rule" : "StrToIntEntry",
+			"value" : {"YES":"1", "NO":"0", "1": "1", "0": "0"}
+		},
+		"intNationalPeriodID" : {
+			"rule" : "linkIdEntry",
+			"table" : "tblNationalPeriod",
+			"destination" : "intNationalPeriodID",
+			"primarykey" : "intNationalPeriodID",
+			"source" : "strNationalPeriodName"
+		},
+		"intIsPaid" : {
+			"rule" : "StrToIntEntry",
+			"value" : {"YES":"1", "NO":"0", "1": "1", "0": "0"}
+		},
+		"strStatus" : {
+			"rule" : "insertField",
+			"field" : "strStatus",
+			"values" : {
+                "INACTIVE" : "PASSIVE",
+                "PENDING" : "PENDING",
+                "ACTIVE" : "ACTIVE",
+                "PASSIVE" : "PASSIVE",
+                "TRANSFERRED" : "TRANSFERRED",
+                "DELETED" : "DELETED",
+                "REJECTED" : "REJECTED",
+                "ROLLED_OVER" : "ROLLED_OVER"
+            }
+		},
+		"strAgeLevel" : {
+			"rule" : "calculateAgeLevel",
+            "table" : "tblPerson",
+            "primarykey" : "intPersonID",
+            "source" : "dtDOB",
+			"destination" : "strAgeLevel",
+            "deltafield" : "dtFrom"
+		},
+		"strPersonLevel" : {
+			"rule" : "insertField",
+			"field" : "strPersonLevel",
+			"values" : {
+                "PROFESSIONAL" : "PROFESSIONAL",
+                "AMATEUR" : "AMATEUR",
+                "AMATEUR WITH CONTRACT" : "AMATEUR_U_C"
+            }
+		},
+		"dtAdded" : {
+			"rule" : "defaultValue",
+			"field" : "dtAdded",
+			"value" : "NOW()"
+		},
+		"dtLastUpdated" : {
+			"rule" : "defaultValue",
+			"field" : "dtLastUpdated",
+			"value" : "NOW()"
+		},
+		"dtApproved" : {
+			"rule" : "defaultValue",
+			"field" : "dtApproved",
+			"value" : "NOW()"
+		},
+		"intAgeGroupID" : {
+			"rule" : "defaultValue",
+			"field" : "intAgeGroupID",
+			"value" : "0"
 		}
 	},
 	"mapping" : {
@@ -32,10 +99,15 @@
 		"AgeLevel" : "strAgeLevel",
 		"DateFrom" : "dtFrom",
 		"DateTo" : "dtTo",
-		"NationalSeason" : "NationalSeason",
+		"NationalSeason" : "intNationalPeriodID",
 		"ProductCode" : "ProductCode",
 		"Amount" : "Amount",
 		"IsPaid" : "intIsPaid",
-		"PaymentReference" : "PaymentReference"
+		"OriginLevel" : "intOriginLevel",
+		"OriginID" : "intOriginID",
+		"Added" : "dtAdded",
+		"Updated" : "dtLastUpdated",
+		"Approved" : "dtApproved",
+		"AgeGroup" : "intAgeGroupID"
 	}
 }

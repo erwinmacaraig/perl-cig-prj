@@ -32,7 +32,10 @@ sub savePlayerPassport{
             PR.strPersonLevel, 
             PR.dtFrom, 
             IF(PR.dtFrom > DATE_ADD(dtDOB,INTERVAL 12 YEAR), PR.dtFrom, DATE_ADD(dtDOB,INTERVAL 12 YEAR)) as WhenFrom,
+            IF(PR.dtFrom > DATE_ADD(dtDOB,INTERVAL 12 YEAR), DATE_FORMAT(PR.dtFrom, "%Y%m%d"), DATE_FORMAT(DATE_ADD(dtDOB,INTERVAL 12 YEAR), "%Y%m%d")) as WhenFrom_,
             PR.dtTo,
+            DATE_FORMAT(PR.dtTo, "%Y%m%d") as dtTo_,
+            DATE_FORMAT(PR.dtFrom, "%Y%m%d") as dtFrom_,
             PR.intNationalPeriodID, 
             strRealmName, 
             PR.strAgeLevel, 
@@ -94,7 +97,9 @@ sub savePlayerPassport{
      my $eID = 0;
      my $level = '';
      my $dtFrom = '';
+     my $dtFrom_ = '';
      my $dtTo = '';
+     my $dtTo_ = '';
      my $rowCount = 0;
      my $currentunixtimevalue = 0;
      my $tempunixtimevalue = 0;
@@ -114,7 +119,9 @@ sub savePlayerPassport{
      		#$dtFrom = $dref->{'dtFrom'};
      		#$dtFrom = $dref->{'WhenFrom'} if ($Data->{'SystemConfig'}{'PP_UseDOBasFrom'});
      		$dtFrom = $dref->{'WhenFrom'};
+     		$dtFrom_ = $dref->{'WhenFrom_'};
      		$dtTo = $dref->{'dtTo'}; 
+     		$dtTo_ = $dref->{'dtTo_'}; 
             $lastRealmName = $dref->{'strRealmName'};
             $lastEntityName= $dref->{'EntityName'};
      		$rowCount++;
@@ -124,14 +131,18 @@ sub savePlayerPassport{
         $rowCount++;
         if( $eID != $dref->{'intEntityID'} || $level ne $dref->{'strPersonLevel'} ){
         	#need to get strEntityName, strMAName,  
-            $dtTo = $dref->{'dtFrom'} if (!$dtTo or $dtTo eq '0000-00-00'); ## Set End date to start of next period if blank
+
+            $dtTo = $dref->{'dtFrom'} if (!$dtTo or $dtTo eq '0000-00-00' or $dtTo_ > $dref->{'dtFrom_'}); ## Set End date to start of next period if blank
+
         	$qPP->execute($personID,'REGO', $level, $eID, $lastEntityName,$lastRealmName, $dtFrom, $dtTo);
         	$eID = $dref->{'intEntityID'};
      		$level = $dref->{'strPersonLevel'}; 
      		#$dtFrom = $dref->{'dtFrom'};
      		#$dtFrom = $dref->{'WhenFrom'} if ($Data->{'SystemConfig'}{'PP_UseDOBasFrom'});
      		$dtFrom = $dref->{'WhenFrom'};
+     		$dtFrom_ = $dref->{'WhenFrom_'};
      		$dtTo = $dref->{'dtTo'}; 
+     		$dtTo_ = $dref->{'dtTo_'}; 
             $lastRealmName = $dref->{'strRealmName'};
             $lastEntityName= $dref->{'EntityName'};
         }
@@ -140,6 +151,7 @@ sub savePlayerPassport{
     	     $tempunixtimevalue = str2time($dtTo);
     	     if($currentunixtimevalue > $tempunixtimevalue){
     	     	$dtTo = $dref->{'dtTo'}; 
+    	     	$dtTo_ = $dref->{'dtTo_'}; 
     	     }
         }
         $lastRealmName = $dref->{'strRealmName'};
@@ -149,9 +161,9 @@ sub savePlayerPassport{
       $qPP->execute($personID,'REGO', $level, $eID, $lastEntityName, $lastRealmName, $dtFrom, $dtTo);
         }
         
-	    $query = "UPDATE tblPlayerPassport SET dtTo = '0000-00-00' WHERE (dtTo IS NULL or dtTo>NOW()) AND intPersonID= ? and strOrigin= 'REGO'";
-	    $sth = $Data->{'db'}->prepare($query); 
-	    $sth->execute($personID);
+	    #$query = "UPDATE tblPlayerPassport SET dtTo = '0000-00-00' WHERE (dtTo IS NULL or dtTo>NOW()) AND intPersonID= ? and strOrigin= 'REGO'";
+	    #$sth = $Data->{'db'}->prepare($query); 
+	    #$sth->execute($personID);
 
 	    $query = "SELECT * FROM tblPlayerPassport WHERE intPersonID= ? ORDER BY intPlayerPassportID DESC LIMIT 1";
 	    $sth = $Data->{'db'}->prepare($query); 

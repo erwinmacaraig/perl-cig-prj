@@ -88,6 +88,8 @@ sub readCSVFile{
     say 'Total Input Records: #'.$ctr;
     my $records = ApplyPreRules($config->{"rules"},\@records);
     my $inserts = ApplyRemoveLinks($config->{"rules"},$records);
+
+    #print STDERR Dumper $inserts;
     insertBatch($db,$tbl,$inserts,$importId, $realmID);
     my ($links, $entstruct) = ApplyPostRules($tbl,$config->{"rules"},\@records);
 	say Dumper($links);
@@ -128,7 +130,11 @@ sub ApplyPreRules{
 		elsif($rule->{"rule"} eq "defaultValue") {
             $records = defaultValue($records, $rule, $key);
 		}
+		elsif($rule->{"rule"} eq "calculateAgeLevel") {
+            $records = calculateAgeLevel($records, $rule, $key);
+		}
     }
+
     return $records;
 }
 

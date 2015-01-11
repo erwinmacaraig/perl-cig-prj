@@ -25,11 +25,11 @@
 					</div>
 				</td>
 				<td style="width:50%;">
-					<form action="uploadregofile.cgi" class="dropzone" method="post" enctype="multipart/form-data" id="myRegoDoc[% doc.ID %]">
+					<form action="uploadregofile.cgi?client=[% client %]" class="dropzone" method="post" enctype="multipart/form-data" id="myRegoDoc[% doc.ID %]">
 					     <input type="hidden" name="doctypeID" value="[% doc.ID %]" />
 						 <input type="hidden" name="pID" value="[% clubID %]" />
 					     <input type="hidden" name="entitydocs" value="1" />
-					     <input type="hidden" name="client" value="[% client %]" />
+						<input type="hidden" name="clm" value="[% client %]" />					     
 						<div class = "fallback">
 							<input type="hidden" name="u" value="[% currentURL %]" class = "fallback"/>
                                 [% IF doc.strOrigFilename != '' %]

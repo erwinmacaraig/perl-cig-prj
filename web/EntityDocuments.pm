@@ -373,9 +373,7 @@ sub delete_doc {
 
 sub checkUploadedEntityDocuments {
     my ($Data, $entityID, $documents, $ctrl) = @_;   
-
-
-	    my %existingDocuments;
+	my %existingDocuments;
 	
 	#1 check for uploaded documents present for a particular entity (required and optional)
 	my $query = qq[

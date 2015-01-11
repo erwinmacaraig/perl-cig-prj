@@ -55,12 +55,17 @@ sub cleanPlayerPersonRegistrations  {
         addPERecord($Data, $personID, $entityID, \%PE) if (! $peID)
     }
     
+    my @statusIN = ($Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);
+
+
     my %ExistingReg = (
         sport=> $reg_ref->[0]{'strSport'} || '',
         personType=> $reg_ref->[0]{'strPersonType'} || '',
         entityID=> $reg_ref->[0]{'intEntityID'} || 0,
-        status=> $Defs::PERSONREGO_STATUS_ACTIVE,
+        statusIN => \@statusIN,
     );
+        #status=> $Defs::PERSONREGO_STATUS_ACTIVE,
+
         #ageLevel=> $reg_ref->[0]{'strAgeLevel'} || '',
     my ($countRecords, $regs_ref) = getRegistrationData(
         $Data,
