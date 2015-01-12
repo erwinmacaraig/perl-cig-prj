@@ -304,24 +304,32 @@ sub multiDestEntry{
 	foreach my $record ( @{$records}) {
 		my $copy = {%$record};
 		foreach my $type (@types) {
-			if( $record->{$key} && $record->{$key} eq $type ) {
+			if( $record->{$key} && uc($record->{$key}) eq uc($type) ) {
 				my $newfields = $rule->{'type'}->{$type};
 				foreach my $fld (keys %{$newfields}) {
-					# check if new field is not equal from orig field
-					if( $fld ne $newfields->{$fld} ) {
-						# create the new key/value pair
-						$copy->{$fld} = $record->{ $newfields->{$fld} };
-					}
-					# delete the orig key
-					delete $copy->{ $newfields->{$fld} } if exists $copy->{ $newfields->{$fld} };
+                    if($fld eq "defaultValue") {
+                        my ($defaultkeyval) = keys %{$newfields->{$fld}};
+                        $copy->{$defaultkeyval} = $newfields->{$fld}->{$defaultkeyval} if $defaultkeyval;
+                    }
+                    else {
+                        # check if new field is not equal from orig field
+                        if( $fld ne $newfields->{$fld} ) {
+                            # create the new key/value pair
+                            $copy->{$fld} = $record->{ $newfields->{$fld} };
+                        }
+                        # delete the orig key
+                        delete $copy->{ $newfields->{$fld} } if exists $copy->{ $newfields->{$fld} };
+                    }
 				}
 			}
 		}
 		# we must delete the source iden type since its not on the table
-		delete $copy->{$key};
+        delete $copy->{$key};
 		# finally, fill out the new records
+        #print STDERR Dumper $copy;
 		push @newrecords, $copy;
 	}
+    print STDERR Dumper @newrecords;
 	return \@newrecords;
 }
 
