@@ -112,16 +112,23 @@ sub updateRow {
 		$keystr .= "=?";
 		
 		my @values = values $record;
+        push @values, $filter_value;
 	
 		my %success = ();
-		my $query = qq[
+        #my $query = qq[
+		#	UPDATE $table 
+		#		SET $keystr
+		#	WHERE $uniq_id = $filter_value
+		#];
+	
+        my $query = qq[
 			UPDATE $table 
 				SET $keystr
-			WHERE $uniq_id = $filter_value
+			WHERE $uniq_id = ?
 		];
 	
 		writeLog("INFO: UPDATE $table SET $keystr");
-		try {
+        try {
 			my $sth = $db->prepare($query) or die "Can't prepare insert: ".$db->errstr()."\n";
 			my $result = $sth->execute(@values) or die "Can't execute insert: ".$db->errstr()."\n";
 			print "UPDATE SUCCESS :: TABLE:: '",$table,"' ID:: ",$sth->{mysql_insertid},"' RECORDS:: '",join(', ', @values),"'\n";
