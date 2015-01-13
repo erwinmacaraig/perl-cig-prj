@@ -1,4 +1,8 @@
 mysql -u root XXX -p < ma_config/cleanDB.sql
+
+#depends on the current MA and tblEntity.intEntityID; needed for linking Venue to MA if not in Club
+UPDATE tblEntity SET strImportEntityCode = 'FAS' WHERE intEntityID = 1 LIMIT 1;
+
 perl CSVReader.pl -directory=csv/singapore -format=csv -realmid=1 -notes=import test -national=0
 
 from importer/
@@ -12,8 +16,3 @@ UPDATE tblPersonRegistration_1 SET strPersonLevel ="" WHERE strPersonLevel IS NU
 UPDATE tblPerson SET intSystemStatus =1;
 
 - ./importer_assignNationalNumber.pl
-
-
-
-
-
