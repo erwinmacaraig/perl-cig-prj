@@ -340,7 +340,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
     my %usedsections = ();
     for my $s ( @{$sectionlist} ) {
 
-        my $sectionheader = $self->langlookup( $s->[1] ) || '';
+        my $sectionheader = $self->{'Data'}->{'lang'}->txt($self->langlookup( $s->[1] )) || '';
         my $requiredfield = $self->langlookup('Required fields') || '';
         my $ROSectionclass = '';
         if($action eq 'display')    {
