@@ -626,6 +626,7 @@ sub listTasks {
         #TaskList => \@TaskList,
         MA_allowTransfer => $Data->{'SystemConfig'}{'MA_allowTransfer'} || 0,
         TaskList => \@sortedTaskList,
+		PersonType => \%Defs::personType,
         CurrentLevel => $Data->{'clientValues'}{'currentLevel'},
         TaskCounts => \%taskCounts,
         TaskMsg => $msg,
