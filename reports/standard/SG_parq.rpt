@@ -7,6 +7,7 @@ SELECT DISTINCT
     P.strLocalFirstname, 
     P.strLocalSurname, 
     P.dtDOB, 
+    TIMESTAMPDIFF(YEAR, P.dtDOB, CURDATE()) as currentAge,
     NP.strNationalPeriodName, 
     D.strApprovalStatus 
 FROM 
@@ -41,6 +42,7 @@ WHERE
 		['strLocalFirstname','First Name'],
 		['strLocalSurname','Family Name'],
 		['dtDOB','Date of Birth'],
+		['currentAge','Current Age'],
 		['strNationalPeriodName','National Period'],
 		['strApprovalStatus','Par Q Status'],
 	],
