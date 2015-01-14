@@ -37,7 +37,7 @@ WHERE
 		['strPhoneHome','Contact Number'],
 		['dtDOB','Date of Birth'],
 		['currentAge','Current Age'],
-		['strApprovalStatus','Par Q Status'],
+		['strApprovalStatus','Clearance Letter Status'],
 	],
 	Sort => [
 		['strLocalSurname','ASC','string'],
