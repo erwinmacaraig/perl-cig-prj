@@ -19,7 +19,6 @@ FROM
             ) 
 WHERE 
     P.intRealmID = ###REALMID###
-    AND P.dtDOB <= '1980-12-31' 
     AND (D.strApprovalStatus IS NULL OR D.strApprovalStatus <> 'APPROVED') 
     AND P.strNationalNum <> ''
     AND P.intNatCustomLU5 = 558007
