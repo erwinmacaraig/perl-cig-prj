@@ -307,7 +307,6 @@ sub pageMain {
     my $header = '';
     my $output = new CGI;
     if($Data->{'WriteCookies'})    {
-warn("IN WRITE");
         my $cookies_string = '';
         my @cookie_array = ();
         for my $i (@{$Data->{'WriteCookies'}})    {
@@ -383,7 +382,7 @@ sub printBasePage {
             <script type="text/javascript" src="$Defs::base_url/js/jquery.ui.touch-punch.min.js"></script>
       <link rel="stylesheet" type="text/css" href="$Defs::base_url/css/style.css">
       <link rel="stylesheet" type="text/css" href="$Defs::base_url/css/fc_styles.css">
-      <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
+      <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
 
       <link rel="stylesheet" type="text/css" href="$Defs::base_url/css/custom.css">
 

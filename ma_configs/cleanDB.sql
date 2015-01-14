@@ -26,3 +26,4 @@ DELETE FROM tblImportTrack;
 DELETE FROM tblEntityLinks;
 
 DELETE FROM tblTempEntityStructure;
+DELETE FROM tblTempTreeStructure;

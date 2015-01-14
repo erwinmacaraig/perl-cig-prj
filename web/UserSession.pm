@@ -66,7 +66,7 @@ sub create  {
       );
 
       if($self->{'cache'})  {
-        $self->{'cache'}->set('pp',"USESSION-".$self->{'key'}, \%cdata,'',8*60*60);
+        $self->{'cache'}->set('swm',"USESSION-".$self->{'key'}, \%cdata,'',8*60*60);
       }
     }
   }
@@ -84,7 +84,7 @@ sub load {
   my $info = '';
   my $userID = 0;
   if($self->{'cache'})  {
-    $info = $self->{'cache'}->get('pp',"USESSION-$sessionkey");
+    $info = $self->{'cache'}->get('swm',"USESSION-$sessionkey");
   }
   if($info) {
     $userID = $info->{'UserID'} || 0;

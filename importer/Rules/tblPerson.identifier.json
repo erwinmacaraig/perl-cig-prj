@@ -4,6 +4,9 @@
 			"rule" : "multiDestEntry",
 			"type" : {
 				"Passport" : {
+					"defaultValue" : {
+                        "intOtherPersonIdentifierTypeID" : "558019"
+                    },
 					"strPassportNo" : "strOtherPersonIdentifier",
 					"strPassportIssueCountry" : "strOtherPersonIdentifierIssueCountry",
 					"dtPassportExpiry" : "dtOtherPersonIdentifierValidDateTo",
@@ -11,11 +14,17 @@
 					"strOtherPersonIdentifierDesc" : "strOtherPersonIdentifierDesc"
 				},
 				"BirthCertificate" : {
+					"intOtherPersonIdentifierTypeID" : "test",
 					"strBithCert" : "strOtherPersonIdentifier",
 					"strBirthCertCountry" : "strOtherPersonIdentifierIssueCountry",
 					"dtBirthCertValidityDateFrom" : "dtOtherPersonIdentifierValidDateFrom",
 					"dtBirthCertValidityDateTo" : "dtOtherPersonIdentifierValidDateTo",
 					"strBirthCertDesc" : "strOtherPersonIdentifierDesc"
+				},
+				"NRIC" : {
+					"defaultValue" : {
+                        "intOtherPersonIdentifierTypeID" : "558018"
+                    }
 				}
 			}
 		},
@@ -26,6 +35,7 @@
 	"mapping" : {
 		"PersonCode" : "strImportPersonCode",
 		"Identifier" : "strOtherPersonIdentifier",
+		"IdentifierTypeID" : "intOtherPersonIdentifierTypeID",
 		"IdentifierType" : "IdentifierType",
 		"CountryIssued" : "strOtherPersonIdentifierIssueCountry",
 		"DateFrom" : "dtOtherPersonIdentifierValidDateFrom",

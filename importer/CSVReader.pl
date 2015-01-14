@@ -70,7 +70,9 @@ sub readCSVFile{
     my $tbl =  (split /\./, $object)[0];
     my $csv = Text::CSV::Encoded->new($csv_config) or die "Text::CSV error: " . Text::CSV->error_diag;
 	
+    my $tblPRFlag = 0;
 	if( $object =~ /(\w+)_(\d+)/ && $1 eq "tblPersonRegistration") {
+        $tblPRFlag = 1;
         copyDbTable($db, $1."_1", $object);
 	}
 
@@ -82,12 +84,34 @@ sub readCSVFile{
     my $ctr = 0;
 
     while (my $hashref = $csv->getline_hr($fh)) {
+        if($tblPRFlag) {
+            #ordering of tblPersonRegistration_x.dtFrom matters
+            my @dtFrom = split('-', $hashref->{'dtFrom'});
+            @dtFrom = split('/', $hashref->{'dtFrom'}) if scalar(@dtFrom) < 3; #failover if diff format
+
+            $hashref->{'dtFromSortValue'} = join('', @dtFrom);
+        }
+
 	    push @records, $hashref;
 	    $ctr++;
     }
+
+    if($tblPRFlag) {
+        my @tempRecords;
+        my @sortedRecords = sort { $a->{'dtFromSortValue'} <=> $b->{'dtFromSortValue'}} @records;
+        foreach my $rec (@sortedRecords) {
+            delete $rec->{'dtFromSortValue'};
+	        push @tempRecords, $rec;
+        }
+
+        @records = @tempRecords;
+    }
+
     say 'Total Input Records: #'.$ctr;
     my $records = ApplyPreRules($config->{"rules"},\@records);
     my $inserts = ApplyRemoveLinks($config->{"rules"},$records);
+
+    #print STDERR Dumper $inserts;
     insertBatch($db,$tbl,$inserts,$importId, $realmID);
     my ($links, $entstruct) = ApplyPostRules($tbl,$config->{"rules"},\@records);
 	say Dumper($links);
@@ -128,7 +152,11 @@ sub ApplyPreRules{
 		elsif($rule->{"rule"} eq "defaultValue") {
             $records = defaultValue($records, $rule, $key);
 		}
+		elsif($rule->{"rule"} eq "calculateAgeLevel") {
+            $records = calculateAgeLevel($records, $rule, $key);
+		}
     }
+
     return $records;
 }
 

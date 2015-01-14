@@ -25,11 +25,26 @@ sub main	{
 
 	my %Data = ();
 	my $db = connectDB();
-    my $personID= 10759687;
 	$Data{'db'} = $db;
 	$Data{'Realm'} = 1;
 	$Data{'RealmSubType'} = 0;
     $Data{'SystemConfig'}=getSystemConfig(\%Data);
-    
-   savePlayerPassport(\%Data, $personID);
+
+    my $st = qq[
+        SELECT DISTINCT 
+            P.intPersonID
+        FROM 
+            tblPerson as P 
+            INNER JOIN tblPersonRegistration_1 as PR ON (
+                PR.intPersonID = P.intPersonID
+                AND PR.strPersonType='PLAYER'
+            )
+    ];
+           
+    my $query= $db->prepare($st);
+    $query->execute;
+
+    while (my $personID = $query->fetchrow_array()) {
+        savePlayerPassport(\%Data, $personID);
+    }
 }

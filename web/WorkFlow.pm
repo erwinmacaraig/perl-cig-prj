@@ -2490,7 +2490,7 @@ sub populateEntityViewData {
     switch ($dref->{intEntityLevel}) {
         case "$Defs::LEVEL_CLUB"  {
             %fields = (
-                title => $Data->{'lang'}->txt('Club Registration') .' - ' . $dref->{'entityLocalName'},
+                title => $Data->{'lang'}->txt('Club Registration') .' - ' . $Data->{'lang'}->txt($dref->{'entityLocalName'}),
                 templateFile => 'workflow/view/club.templ',
             );
 
@@ -2501,7 +2501,7 @@ sub populateEntityViewData {
         }
         case "$Defs::LEVEL_VENUE" {
             %fields = (
-                title => $Data->{'lang'}->txt('Venue Registration') .' - ' . $dref->{'entityLocalName'},
+                title => $Data->{'lang'}->txt('Venue Registration') .' - ' . $Data->{'lang'}->txt($dref->{'entityLocalName'}),
                 templateFile => 'workflow/view/venue.templ',
             );
 
@@ -2823,10 +2823,10 @@ sub populateDocumentViewData {
 				if($tdref->{'Required'} or $tdref->{'personRequired'}){				
 #or $tref->{'PersonRequired'} or $tref->{'EntityRequired'}
 					$documentStatusCount{'MISSING'}++;
-					$status = 'MISSING';
+					$status = $Data->{'lang'}->txt('MISSING');
 				}
 				else {
-					$status = 'Optional. Not Provided.';
+					$status = $Data->{'lang'}->txt('Optional. Not Provided.');
 				}
 			}
 			else{
@@ -3240,12 +3240,12 @@ sub viewSummaryPage {
                 case "$Defs::LEVEL_CLUB"  {
                     #TODO: add details specific to CLUB
                     $templateFile = 'workflow/summary/club.templ';
-                    $title = 'New Club Registration - Approval';
+                    $title = $Data->{'lang'}->txt('New Club Registration - Approval');
                 }
                 case "$Defs::LEVEL_VENUE" {
                     #TODO: add details specific to VENUE
                     $templateFile = 'workflow/summary/venue.templ';
-                    $title = 'New Facility Registration - Approval';
+                    $title = $Data->{'lang'}->txt('New Facility Registration - Approval');
                 }
                 else {
 

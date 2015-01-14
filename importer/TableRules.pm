@@ -2,14 +2,17 @@
 package TableRules;
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(multiplyEntry insertLink removeLinkField getConfig strToIntEntry setUniqField multiDestEntry insertField entityLink linkIdEntry defaultValue);
-@EXPORT_OK = qw(multiplyEntry insertLink removeLinkField getConfig strToIntEntry setUniqField multiDestEntry insertField entityLink linkIdEntry defaultValue);
+@EXPORT = qw(multiplyEntry insertLink removeLinkField getConfig strToIntEntry setUniqField multiDestEntry insertField entityLink linkIdEntry defaultValue calculateAgeLevel);
+@EXPORT_OK = qw(multiplyEntry insertLink removeLinkField getConfig strToIntEntry setUniqField multiDestEntry insertField entityLink linkIdEntry defaultValue calculateAgeLevel);
 
 # This is where you should include the migration rule for your table
+use lib '..', '../..', '../web/';
 use Data::Dumper;
 use JSON;
 use DBInserter;
 use ImporterConfig;
+use Date::Calc;
+use Localisation;
 
 use feature qw(say);
 my $db = connectDB();
@@ -155,8 +158,15 @@ sub linkIdEntry{
 	my ($records,$rule, $rkey) = @_;
 	my @newRecords = ();
     foreach my $record ( @{$records} ){
+        #TODO add checking $rule->{"required"}
+        # if $rule->{"required"} eq "true" and there's no found link, skip current record (needed for PersonRegistration)
+
     	my $copy = {%$record};
-	    $copy->{$rule->{"destination"}} = getRecord($db,$rule->{"table"},$rule->{"destination"},$rule->{"source"},$record->{$rkey});
+        my $selectColumn = $rule->{"primarykey"} ? $rule->{"primarykey"} : $rule->{"destination"};
+
+        #next if(($rule->{"required"} and $rule->{"required"} eq "true") and $selectColumn);
+
+	    $copy->{$rule->{"destination"}} = getRecord($db,$rule->{"table"},$selectColumn,$rule->{"source"},$record->{$rkey});
 	    delete $copy->{$rule->{"source"}}  if (defined $rule->{"swap"} && $copy->{$rule->{"swap"}});
 	    push (@newRecords, $copy);
 
@@ -171,8 +181,46 @@ sub defaultValue{
     my @newRecords = ();
     foreach my $record ( @{$records} ){
     	my $copy = {%$record};
-        $copy->{'dtAdded'} = $value;
+        $copy->{$rkey} = $value if !$copy->{$rkey};
 	    push (@newRecords, $copy);
+    }
+
+    return \@newRecords;
+}
+
+sub calculateAgeLevel {
+	my ($records,$rule, $rkey) = @_;
+
+    my @newRecords = ();
+    foreach my $record ( @{$records} ){
+    	my $copy = {%$record};
+        my $selectColumn = $rule->{"primarykey"} ? $rule->{"primarykey"} : $rule->{"destination"};
+        my $source = getRecord($db, $rule->{'table'}, $rule->{'source'}, $selectColumn, $record->{$selectColumn});
+
+        next if(!$source);
+        #print STDERR Dumper $source;
+
+        my @dob = split('-', $source);
+
+        if($dob[0] eq "0000" or $dob[1] eq "00" or $dob[2] eq "00") {
+	        push (@newRecords, $copy);
+        }
+        else {
+            my @natPeriod = split('-', $record->{$rule->{'deltafield'}});
+            my $ageLevel;
+
+            my @currAgeArr = Date::Calc::N_Delta_YMD($dob[0], $dob[1], $dob[2], $natPeriod[0], $natPeriod[1], $natPeriod[2]);
+
+            if($currAgeArr[0] >= $ImporterConfig::ADULT_AGE{'FROM'} and $currAgeArr[0] <= $ImporterConfig::ADULT_AGE{'TO'}) {
+                $ageLevel = $ImporterConfig::AGE_LEVEL_ADULT;
+            }
+            elsif($currAgeArr[0] < $ImporterConfig::ADULT_AGE{'FROM'}) {
+                $ageLevel = $ImporterConfig::AGE_LEVEL_MINOR;
+            }
+
+            $copy->{$rkey} = $ageLevel;
+            push (@newRecords, $copy);
+        }
     }
 
     return \@newRecords;
@@ -256,24 +304,32 @@ sub multiDestEntry{
 	foreach my $record ( @{$records}) {
 		my $copy = {%$record};
 		foreach my $type (@types) {
-			if( $record->{$key} && $record->{$key} eq $type ) {
+			if( $record->{$key} && uc($record->{$key}) eq uc($type) ) {
 				my $newfields = $rule->{'type'}->{$type};
 				foreach my $fld (keys %{$newfields}) {
-					# check if new field is not equal from orig field
-					if( $fld ne $newfields->{$fld} ) {
-						# create the new key/value pair
-						$copy->{$fld} = $record->{ $newfields->{$fld} };
-					}
-					# delete the orig key
-					delete $copy->{ $newfields->{$fld} } if exists $copy->{ $newfields->{$fld} };
+                    if($fld eq "defaultValue") {
+                        my ($defaultkeyval) = keys %{$newfields->{$fld}};
+                        $copy->{$defaultkeyval} = $newfields->{$fld}->{$defaultkeyval} if $defaultkeyval;
+                    }
+                    else {
+                        # check if new field is not equal from orig field
+                        if( $fld ne $newfields->{$fld} ) {
+                            # create the new key/value pair
+                            $copy->{$fld} = $record->{ $newfields->{$fld} };
+                        }
+                        # delete the orig key
+                        delete $copy->{ $newfields->{$fld} } if exists $copy->{ $newfields->{$fld} };
+                    }
 				}
 			}
 		}
 		# we must delete the source iden type since its not on the table
-		delete $copy->{$key};
+        delete $copy->{$key};
 		# finally, fill out the new records
+        #print STDERR Dumper $copy;
 		push @newrecords, $copy;
 	}
+    print STDERR Dumper @newrecords;
 	return \@newrecords;
 }
 

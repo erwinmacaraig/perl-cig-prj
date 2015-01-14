@@ -63,7 +63,7 @@ sub setProcessOrder {
             'function' => 'display_role_details',
             'fieldset' => 'roledetails',
             'label' => 'Fields',
-            'title'  => 'Facility - Enter Role Details',
+            'title'  => 'Facility - Enter Number of Fields',
         },
         {
             'action' => 'roleu',

@@ -35,6 +35,7 @@ CREATE TABLE tblPersonRegistration_XX (
     intPaymentRequired TINYINT DEFAULT 0,
     intClearanceID  INT DEFAULT 0,
     strShortNotes VARCHAR(250) NULL DEFAULT NULL COMMENT 'can only be added/edited/viewed by MA level',
+    `intImportId` INT NULL,
 
   PRIMARY KEY  (intPersonRegistrationID),
   KEY index_intPersonID (intPersonID),
