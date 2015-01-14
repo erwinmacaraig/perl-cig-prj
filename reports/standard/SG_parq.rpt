@@ -1,0 +1,51 @@
+{
+	SQL => qq[
+
+SELECT DISTINCT
+    E.strLocalName, 
+    P.strNationalNum, 
+    P.strLocalFirstname, 
+    P.strLocalSurname, 
+    P.dtDOB, 
+    NP.strNationalPeriodName, 
+    D.strApprovalStatus 
+FROM 
+    tblPerson as P 
+        INNER JOIN tblPersonRegistration_1 as PR 
+            ON (PR.intPersonID=P.intPersonID) 
+        LEFT JOIN tblDocuments as D 
+            ON (
+                D.intPersonRegistrationID=PR.intPersonRegistrationID 
+                AND D.intPersonID=P.intPersonID
+            ) 
+        LEFT JOIN tblNationalPeriod as NP 
+            ON (NP.intNationalPeriodID=PR.intNationalPeriodID) 
+        INNER JOIN tblEntity as E 
+            ON (E.intEntityID=PR.intEntityID) 
+WHERE 
+    P.intRealmID = ###REALMID###
+    AND P.dtDOB <= '1980-12-31' 
+    AND PR.strPersonType='PLAYER' 
+    AND PR.strStatus='ACTIVE' 
+    AND (D.strApprovalStatus IS NULL OR D.strApprovalStatus <> 'APPROVED') 
+    AND P.strNationalNum <> ''
+	],
+	StatsReport => 0,
+	ReportEntity => 100,
+	ReportLevel => 0,
+	Template => 'default',
+	DistinctValues => 1,
+	Labels => [
+		['strLocalName','Club'],
+		['strNationalNum','MA ID'],
+		['strLocalFirstname','First Name'],
+		['strLocalSurname','Family Name'],
+		['dtDOB','Date of Birth'],
+		['strNationalPeriodName','National Period'],
+		['strApprovalStatus','Par Q Status'],
+	],
+	Sort => [
+		['strLocalSurname','ASC','string'],
+		['strLocalFirstname','ASC','string'],
+	],
+}
