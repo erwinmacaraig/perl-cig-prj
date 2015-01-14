@@ -6,6 +6,7 @@ CREATE TABLE `tblProducts` (
   `strName` varchar(100) DEFAULT '',
   `curDefaultAmount` decimal(12,2) DEFAULT '0.00',
   `intMinChangeLevel` int(11) DEFAULT '0',
+  `intSellLevel` int(11) DEFAULT '0',
   `intMinSellLevel` int(11) DEFAULT '0',
   `intCreatedLevel` int(11) DEFAULT '0',
   `intCreatedID` int(11) DEFAULT '0',
