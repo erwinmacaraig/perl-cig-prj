@@ -236,51 +236,69 @@
             </div>
             <a class="show-advanced-search">[% Lang.txt('Advanced Search') %]</a>
             <div class="advanced-search-fields clearfix">
-                <span><input type="checkbox" class="role" value="role">[% Lang.txt('Role') %]</span>
-				<select name="PersonType" id="PersonType" class="chosen">
-					<option value=""> </option>
-					[% FOREACH key IN PersonType.keys %]
-						<option value="[% key %]">[% PersonType.$key %]</option>
-					[% END %]
-				</select>
-			<span><input type="checkbox" class="task" value="task">[% Lang.txt('Task') %]</span>
-					<select name="TaskType" id="TaskType" class="chosen">
-						<option value="ALL">[% Lang.txt('All Tasks') %]</option>
-						<option value="REGO-NEW-REFEREE">[% Lang.txt('New Referee Registration') %]</option>
-						<option value="REGO-NEW-PLAYER">[% Lang.txt('New Player Registration') %]</option>
-						<option value="ENTITY-NEW">[% Lang.txt('New Club Registration') %]</option>
-						<option value="REGO-NEW-COACH">[% Lang.txt('New Coach Registration') %]</option>
-						<option value="ENTITY-NEW-VENUE">[% Lang.txt('New Facility Registration') %]</option>
-						<option value="REGO-NEW-TEAMOFFICIAL">[% Lang.txt('New Team Official Registration') %]</option>
-						<option value="REGO-NEW-CLUBOFFICIAL">[% Lang.txt('New Club Official Registration') %]</option>
-						<option value="REGO-NEW-MAOFFICIAL">[% Lang.txt('New MA Official Registration') %]</option>
-						<option value="REGO-TRANSFER">[% Lang.txt('Transfer') %]</option>
-						<option value="REGO-RENEWAL-PLAYER">[% Lang.txt('Renewal of Player Registration') %]</option>
-						<option value="REGO-RENEWAL-REFEREE">[% Lang.txt('Renewal of Referee Registration') %]</option>
-						<option value="REGO-RENEWAL-COACH">[% Lang.txt('Renewal of Coach Registration') %]</option>
-						<option value="PERSON-AMENDMENT">[% Lang.txt('Amendment of Person Details') %]</option>
-					</select>
-			<span><input type="checkbox" class="club" value="club">[% Lang.txt('Club') %]</span>
-			<span><input type="checkbox" class="venue" value="venue">[% Lang.txt('Venue') %]</span>
-			<span><input type="checkbox" class="daterange" value="daterange">[% Lang.txt('Within these dates') %]</span>
- 			<script type="text/javascript">
+                <div>
+                    <span><input type="checkbox" class="role" value="role">[% Lang.txt('Role') %]</span>
+                    <select name="PersonType" id="PersonType" class="chosen">
+                        <option value=""> </option>
+                        [% FOREACH key IN PersonType.keys %]
+                            <option value="[% key %]">[% PersonType.$key %]</option>
+                        [% END %]
+                    </select>
+                </div>
+			    <div>
+                    <span><input type="checkbox" class="task" value="task">[% Lang.txt('Task') %]</span>
+                    <select name="TaskType" id="TaskType" class="chosen">
+                        <option value="ALL">[% Lang.txt('All Tasks') %]</option>
+                        <option value="REGO-NEW-REFEREE">[% Lang.txt('New Referee Registration') %]</option>
+                        <option value="REGO-NEW-PLAYER">[% Lang.txt('New Player Registration') %]</option>
+                        <option value="ENTITY-NEW">[% Lang.txt('New Club Registration') %]</option>
+                        <option value="REGO-NEW-COACH">[% Lang.txt('New Coach Registration') %]</option>
+                        <option value="ENTITY-NEW-VENUE">[% Lang.txt('New Facility Registration') %]</option>
+                        <option value="REGO-NEW-TEAMOFFICIAL">[% Lang.txt('New Team Official Registration') %]</option>
+                        <option value="REGO-NEW-CLUBOFFICIAL">[% Lang.txt('New Club Official Registration') %]</option>
+                        <option value="REGO-NEW-MAOFFICIAL">[% Lang.txt('New MA Official Registration') %]</option>
+                        <option value="REGO-TRANSFER">[% Lang.txt('Transfer') %]</option>
+                        <option value="REGO-RENEWAL-PLAYER">[% Lang.txt('Renewal of Player Registration') %]</option>
+                        <option value="REGO-RENEWAL-REFEREE">[% Lang.txt('Renewal of Referee Registration') %]</option>
+                        <option value="REGO-RENEWAL-COACH">[% Lang.txt('Renewal of Coach Registration') %]</option>
+                        <option value="PERSON-AMENDMENT">[% Lang.txt('Amendment of Person Details') %]</option>
+                    </select>
+                </div>
+
+			<div>
+                <span><input type="checkbox" class="club" value="club">[% Lang.txt('Club') %]</span>
+            </div>
+			
+            <div>
+                <span><input type="checkbox" class="venue" value="venue">[% Lang.txt('Venue') %]</span>
+			</div>
+
+            <div>
+                <span><input type="checkbox" class="daterange" value="daterange">[% Lang.txt('Within these dates') %]</span>
+            </div>
+ 			
+            <script type="text/javascript">
                    jQuery().ready(function() {
                        jQuery("#dtValidFrom").datepicker({
                           dateFormat: 'yy-mm-dd',
                           showButtonPanel: true
                         });            
                    });
-               </script>   			
-              <label>From</label> <input type="text" name="dtValidFrom" value="" id="dtValidFrom" size="12" class="datepicker">
-			 <script type="text/javascript">
-                    jQuery().ready(function() {
-                        jQuery("#dtValidUntil").datepicker({
-                            dateFormat: 'yy-mm-dd',
-                            showButtonPanel: true
-                        });            
-                    });
-                </script>  
-				<label>To</label><input type="text" name="dtValidUntil" value="" id="dtValidUntil" size="12" class="datepicker">
+               </script>
+               <div class="datepickerFields">
+                    <label>From</label><input type="text" name="dtValidFrom" value="" id="dtValidFrom" size="12" class="datepicker"><i class="fa fa-calendar fa-2"></i>
+            	</div>
+                		<script type="text/javascript">
+                            jQuery().ready(function() {
+                                jQuery("#dtValidUntil").datepicker({
+                                    dateFormat: 'yy-mm-dd',
+                                    showButtonPanel: true
+                                });            
+                            });
+                        </script>
+                <div class="datepickerFields">
+        		    <label>To</label><input type="text" name="dtValidUntil" value="" id="dtValidUntil" size="12" class="datepicker"><i class="fa fa-calendar" fa-2></i>
+                </div>
 				
 
             </div>

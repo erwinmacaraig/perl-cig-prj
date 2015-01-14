@@ -2160,3 +2160,39 @@ div[id*="doctab"] .documents-list table.table .task-list .status-col a.btn-insid
 .progressFlow .col-md-2.previous.step.step-3{
 	width: 16%;
 }
+
+.advanced-search-fields div {
+	margin-top:10px; overflow:auto;
+}
+
+.advanced-search-fields div:last-of-type {
+	margin-bottom:10px;
+}
+
+.advanced-search-fields div span {
+	width:auto; padding-top:5px;
+}
+
+.advanced-search-fields div select {
+	width:70%; padding:3px; float:right;
+}
+
+.advanced-search-fields div input.datepicker {
+	width: 55%;
+	padding:3px;
+	/*float:right;*/
+	margin-right:12px;
+}
+
+.advanced-search-fields .datepickerFields {
+	text-align: right;
+}
+
+.advanced-search-fields .datepickerFields label {
+	margin-right:15px;
+}
+
+.advanced-search-fields .datepickerFields i {
+	float: right;
+	padding-top: 5px;
+}
