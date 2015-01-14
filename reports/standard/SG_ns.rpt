@@ -2,7 +2,6 @@
 	SQL => qq[
 
 SELECT DISTINCT
-    E.strLocalName, 
     P.strNationalNum, 
     P.strLocalFirstname, 
     P.strLocalSurname, 
@@ -10,29 +9,20 @@ SELECT DISTINCT
     P.strEmail,
     P.strPhoneHome,
     TIMESTAMPDIFF(YEAR, P.dtDOB, CURDATE()) as currentAge,
-    NP.strNationalPeriodName, 
     D.strApprovalStatus 
 FROM 
     tblPerson as P 
-        INNER JOIN tblPersonRegistration_1 as PR 
-            ON (PR.intPersonID=P.intPersonID) 
         LEFT JOIN tblDocuments as D 
             ON (
-                D.intPersonRegistrationID=PR.intPersonRegistrationID 
-                AND D.intPersonID=P.intPersonID
-                AND D.intDocumentTypeID=41
+                D.intPersonID=P.intPersonID
+                AND D.intDocumentTypeID=35
             ) 
-        LEFT JOIN tblNationalPeriod as NP 
-            ON (NP.intNationalPeriodID=PR.intNationalPeriodID) 
-        INNER JOIN tblEntity as E 
-            ON (E.intEntityID=PR.intEntityID) 
 WHERE 
     P.intRealmID = ###REALMID###
     AND P.dtDOB <= '1980-12-31' 
-    AND PR.strPersonType='PLAYER' 
-    AND PR.strStatus='ACTIVE' 
     AND (D.strApprovalStatus IS NULL OR D.strApprovalStatus <> 'APPROVED') 
     AND P.strNationalNum <> ''
+    AND P.intNatCustomLU5 = 558007
 	],
 	StatsReport => 0,
 	ReportEntity => 100,
@@ -40,7 +30,6 @@ WHERE
 	Template => 'default',
 	DistinctValues => 1,
 	Labels => [
-		['strLocalName','Club'],
 		['strNationalNum','MA ID'],
 		['strLocalFirstname','First Name'],
 		['strLocalSurname','Family Name'],
@@ -48,7 +37,6 @@ WHERE
 		['strPhoneHome','Contact Number'],
 		['dtDOB','Date of Birth'],
 		['currentAge','Current Age'],
-		['strNationalPeriodName','National Period'],
 		['strApprovalStatus','Par Q Status'],
 	],
 	Sort => [
