@@ -29,11 +29,6 @@ sub main  {
 
   my $personparams = '';
   
-
-  #for processing json data 
-	#my $cgi = CGI->new;
-	
-  # end of processing json data
   my %Data=();
   my $target='main.cgi';
   $Data{'target'}=$target;

@@ -2133,9 +2133,19 @@ sub viewTask {
             e.strTown as entityTown,
             e.strAddress as entityAddress,
             e.strWebUrl as entityWebUrl,
+            e.dtFrom as dateFrom,
+            e.dtTo as dateTo,
+            e.intLegalTypeID as intLegalTypeID,
+            e.strLegalID as strLegalID,
+            e.strDiscipline as strDiscipline,
+            e.strOrganisationLevel as strOrganisationLevel,
+            e.strMANotes as strMANotes,
+            e.strContact as entityContact,
             e.strEmail as entityEmail,
             e.strPhone as entityPhone,
+            e.strCity as strCity,
             e.strFax as entityFax,
+            e.strISOCountry as entityCountry,
             e.tTimeStamp as entityCreatedUpdated,
             dPersonRego.intDocumentID as documentID,
             dPersonRego.strApprovalStatus as documentApprovalStatus,
@@ -2469,14 +2479,26 @@ sub populateRegoViewData {
 sub populateEntityViewData {
     my ($Data, $dref) = @_;
 
+    my $self = shift;
     my %TemplateData;
     my %fields;
+    my $isocountries  = getISOCountriesHash();
+    use Club;
+    my $client=setClient($Data->{'clientValues'});
+    my %tempClientValues = getClient($client);
+    $tempClientValues{currentLevel} = $dref->{intEntityLevel};
+    setClientValue(\%tempClientValues, $dref->{intEntityLevel}, $dref->{intEntityID});
+    my $tempClient = setClient(\%tempClientValues);
+    my $readonly = !( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 );
 
 	%TemplateData = (
         EntityDetails => {
             Status => $Data->{'lang'}->txt($Defs::entityStatus{$dref->{'entityStatus'} || 0}) || '',
-            LocalShortName => $dref->{'entityLocalShortName'} || '',
+            LocalShortName => $dref->{'strLocalShortName'} || '',
             LocalName => $dref->{'entityLocalName'} || '',
+            FoundationDate => $dref->{'dateFrom'} || '',
+            DissolutionDate => $dref->{'dateTo'} || '',
+            Country => $isocountries->{$dref->{'entityCountry'}},
             Region => $dref->{'entityRegion'} || '',
             Address => $dref->{'entityAddress'} || '',
             Town => $dref->{'entityTown'} || '',
@@ -2484,7 +2506,19 @@ sub populateEntityViewData {
             Email => $dref->{'entityEmail'} || '',
             Phone => $dref->{'entityPhone'} || '',
             Fax => $dref->{'entityFax'} || '',
+            PostalCode => $dref->{'entityPostalCode'} || '',
+            Contact => $dref->{'entityContact'} || '',
+            organizationType => $dref->{'strEntityType'},
+            strLegalID => $dref->{'strLegalID'},
+            comment => $dref->{'strMANotes'},
+            sport => $dref->{'strDiscipline'},
+            strCity => $dref->{'strCity'},
+            organizationLevel => $dref->{'strOrganisationLevel'},
+            legaltype => Club::getLegalTypeName($Data, $dref->{'intLegalTypeID'}),
+            intEntityID => $dref->{'intEntityID'},
         },
+        EditDetailsLink => "$Data->{'target'}?client=$tempClient",
+        ReadOnlyLogin => $readonly,
 	);
 
     switch ($dref->{intEntityLevel}) {

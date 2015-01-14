@@ -90,6 +90,7 @@ sub getUnique {
             INNER JOIN tblPersonRegistration_$realmID AS PR ON (
               tblPerson.intPersonID = PR.intPersonID
               AND PR.strStatus <> 'DELETED'
+              AND PR.strStatus <> 'INPROGRESS'
               AND PR.intEntityID IN ($entity_list)
             )
             INNER JOIN tblEntity AS E ON (
