@@ -17,3 +17,4 @@ UPDATE tblPerson SET intSystemStatus =1;
 
 ./importer_AuditLog.pl
 ./importer_assignNationalNumber.pl
+./importer_SG_ActiveProducts.pl
