@@ -41,12 +41,12 @@ sub process {
 	
 
 	my @memarray = ();
-	my $query = qq[SELECT intWFRuleID FROM tblWFRule WHERE strWFRuleFor = ? AND strRegistrationNature = ? AND strPersonType = ? AND intApprovalEntityLevel = ?];
+	my $query = qq[SELECT intWFRuleID FROM tblWFRule WHERE strWFRuleFor = ? AND strRegistrationNature = ? AND strPersonType = ? AND intApprovalEntityLevel = ? AND intRealmID = ?];
 
 
 
 	my $q = $self->getData->{'db'}->prepare($query);
-    $q->execute($strWFRuleFor,$strRegistrationNature,$strPersonType,$self->getData()->{'clientValues'}{'currentLevel'});    
+    $q->execute($strWFRuleFor,$strRegistrationNature,$strPersonType,$self->getData()->{'clientValues'}{'currentLevel'},$realmID);    
 	while(my $dref = $q->fetchrow_hashref()){
 		push @taskids,$dref->{'intWFRuleID'};
 	}
