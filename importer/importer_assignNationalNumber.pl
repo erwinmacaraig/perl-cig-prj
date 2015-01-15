@@ -77,9 +77,15 @@ sub main	{
     $qryE->execute();
 
     while (my $edref = $qryE->fetchrow_hashref())    {
+        my $entityType = "ENTITY";
+        my $entityLevel = $edref->{'intEntityLevel'};
+
+        $entityType = "ENTITY" if ($entityLevel == 3);
+        $entityType = "FACILITY" if ($entityLevel == -47);
+
         assignNationalNumber(
             \%Data,
-            'ENTITY',
+            $entityType,
             $edref->{'intEntityID'},
         );
     }
