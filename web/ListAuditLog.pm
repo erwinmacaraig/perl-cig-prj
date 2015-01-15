@@ -34,6 +34,7 @@ sub listPersonAuditLog    {
             AL.strUsername,
             AL.strType,
             AL.strSection,
+            AL.strLocalName,
             AL.dtUpdated
         FROM
             tblAuditLog as AL
@@ -72,6 +73,7 @@ sub listPersonAuditLog    {
 	while(my $ref= $sth->fetchrow_hashref()){
 		push @rowdata,{
 			Username=> $ref->{'strUsername'},
+			UserEntity=> $ref->{'strLocalName'},
 			Type => $ref->{'strType'},
 			Section=> $ref->{'strSection'},
 			DateUpdated=> $ref->{'dtUpdated'},

@@ -8,6 +8,7 @@
     		<th>[% Lang.txt('Date Last Updated') %]</th>
     		<th>[% Lang.txt('Type') %]</th>
     		<th>[% Lang.txt('Username') %]</th>
+    		<th>[% Lang.txt('Organisation') %]</th>
         </tr>
 	</thead>
 	[% FOREACH al = AuditLog %]
@@ -22,6 +23,7 @@
           <td>[% DateFormat.format(al.DateUpdated,'MEDIUM', 'SHORT') %]</td>
           <td>[% Lang.txt(al.Type) %]</td>
           <td>[% al.Username %]</td>
+          <td>[% al.UserEntity %]</td>
 	[% END %]  
 </table>
 </div>

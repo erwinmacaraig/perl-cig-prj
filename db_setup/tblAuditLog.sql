@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS `tblAuditLog`;
 CREATE TABLE `tblAuditLog` (
   `intAuditLogID` int(11) NOT NULL AUTO_INCREMENT,
   `intID` int(11) NOT NULL DEFAULT '0',
+  `intUserID` int(11) DEFAULT '0',
   `strUsername` varchar(30) DEFAULT '',
   `strType` varchar(80) DEFAULT '',
   `strSection` varchar(30) DEFAULT '',
