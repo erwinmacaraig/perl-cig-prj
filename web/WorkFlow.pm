@@ -2287,7 +2287,7 @@ sub viewTask {
     );
 
     my $paymentBlock = '';
-    if ($dref->{strWFRuleFor} eq 'REGO')    {
+    if ($dref->{strWFRuleFor} eq 'REGO' or $dref->{strWFRuleFor} eq 'ENTITY')    {
         my ($PaymentsData) = populateRegoPaymentsViewData($Data, $dref);
         %PaymentsData = %{$PaymentsData};
         $paymentBlock = runTemplate(
@@ -2491,6 +2491,11 @@ sub populateEntityViewData {
     my $tempClient = setClient(\%tempClientValues);
     my $readonly = !( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 );
 
+    my $WFTaskID = safe_param('TID','number') || '';
+    my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+
+    my $task = getTask($Data, $WFTaskID);
+
 	%TemplateData = (
         EntityDetails => {
             Status => $Data->{'lang'}->txt($Defs::entityStatus{$dref->{'entityStatus'} || 0}) || '',
@@ -2520,6 +2525,7 @@ sub populateEntityViewData {
         EditDetailsLink => "$Data->{'target'}?client=$tempClient",
         ReadOnlyLogin => $readonly,
 	);
+    my ($PaymentsData) = populateRegoPaymentsViewData($Data, $task);
 
     switch ($dref->{intEntityLevel}) {
         case "$Defs::LEVEL_CLUB"  {
@@ -3011,6 +3017,26 @@ sub populateRegoPaymentsViewData {
 
     my %TemplateData = ();
 
+    my $targetID = 0;
+    my $targetLEVEL = 0;
+    my $otherID = 0;
+
+    if($dref->{'strWFRuleFor'} eq "ENTITY" and $dref->{'intEntityLevel'} == $Defs::LEVEL_CLUB){
+        $targetID = $dref->{'intEntityID'};
+        $targetLEVEL = $Defs::LEVEL_CLUB;
+        $otherID = 0; 
+    }
+    elsif($dref->{'strWFRuleFor'} eq "ENTITY" and $dref->{'intEntityLevel'} == $Defs::LEVEL_VENUE) {
+        $targetID = $dref->{'intEntityID'};
+        $targetLEVEL = $Defs::LEVEL_VENUE;
+        $otherID = 0; 
+    }
+    elsif($dref->{'strWFRuleFor'} eq "REGO") {
+        $targetID = $dref->{'intPersonID'};
+        $targetLEVEL = $Defs::LEVEL_PERSON;
+        $otherID = $dref->{'intPersonRegistrationID'}; 
+    }
+
     my $st = qq[
         SELECT
             T.intQty,
@@ -3030,11 +3056,11 @@ sub populateRegoPaymentsViewData {
     ];
 
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
-	$q->execute(
-        $dref->{'intPersonID'},
-        $Defs::LEVEL_PERSON,
-        $dref->{'intPersonRegistrationID'},
-	) or query_error($st);
+    $q->execute(
+        $targetID,
+        $targetLEVEL,
+        $otherID,
+    ) or query_error($st);
 
 	my @TXNs= ();
 	my $rowCount = 0;
@@ -3273,11 +3299,13 @@ sub viewSummaryPage {
             switch ($task->{'intEntityLevel'}) {
                 case "$Defs::LEVEL_CLUB"  {
                     #TODO: add details specific to CLUB
+                    my ($PaymentsData) = populateRegoPaymentsViewData($Data, $task);
                     $templateFile = 'workflow/summary/club.templ';
                     $title = $Data->{'lang'}->txt('New Club Registration - Approval');
                 }
                 case "$Defs::LEVEL_VENUE" {
                     #TODO: add details specific to VENUE
+                    my ($PaymentsData) = populateRegoPaymentsViewData($Data, $task);
                     $templateFile = 'workflow/summary/venue.templ';
                     $title = $Data->{'lang'}->txt('New Facility Registration - Approval');
                 }
