@@ -24,12 +24,17 @@
 		"strEntityType" : {
 			"rule" : "insertField",
 			"field" : "intEntityLevel",
-			"values" : {"CLUB" : "3", "MA ACADEMY": "3", "SCHOOL": "3", "GRASSROOT PROGRAM": "3", "PRIVATE ACADEMY": "3", "COLLEGE": "3", "UNIVERSITY": "3", "OTHER": "3", "REGION" : "20", "STATE" : "30"}
+			"values" : {"ACADEMY" : "3", "CLUB" : "3", "MA ACADEMY": "3", "SCHOOL": "3", "GRASSROOT PROGRAM": "3", "PRIVATE ACADEMY": "3", "COLLEGE": "3", "UNIVERSITY": "3", "OTHER": "3", "REGION" : "20", "STATE" : "30"}
 		},
 		"dtAdded" : {
 			"rule" : "defaultValue",
 			"field" : "dtAdded",
 			"value" : "NOW()"
+		},
+		"strStatus" : {
+			"rule" : "insertField",
+			"field" : "strStatus",
+			"values" : {"PENDING" : "PENDING", "ACTIVE" : "ACTIVE", "INACTIVE" : "INACTIVE", "DE-REGISTERED" : "DE-REGISTERED", "INPROGRESS" : "INPROGRESS", "SUSPENDED" : "SUSPENDED", "DISSOLVED" : "DE-REGISTERED"}
 		}
 	},
 	"mapping" : {
