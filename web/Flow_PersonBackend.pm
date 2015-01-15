@@ -301,8 +301,8 @@ sub validate_core_details    {
             auditLog(
                 $personObj->ID(),
                 $self->{'Data'},
-                'ADD',
-                'PERSON',
+                'Add',
+                'Person',
             );
         }
 #WR: SHoudl we check for duplicates here

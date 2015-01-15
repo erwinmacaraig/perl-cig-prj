@@ -15,6 +15,7 @@ use PersonFieldsSetup;
 use FieldLabels;
 use Data::Dumper;
 use WorkFlow;
+use AuditLog;
 
 sub handlePersonEdit {
     my ($action, $Data) = @_;
@@ -88,6 +89,12 @@ sub handlePersonEdit {
             $personObj->write();
 
             triggerRule($Data, $values, $personObj) if ($personObj->getValue('strStatus') eq $Defs::PERSON_STATUS_REGISTERED);
+            auditLog(
+                $personID,
+                $Data,
+                'Update Person',
+                'Person',
+            );
 
             $body = 'updated';
             if($back_screen){

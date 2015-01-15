@@ -49,6 +49,7 @@ sub assignNationalNumber {
                 }
             }
 
+            auditLog($id, $Data, 'Assign National Number', 'Person');
         }
 
     }
@@ -79,7 +80,7 @@ sub assignNationalNumber {
                     $Data->{'cache'}->delete('swm','EntityObj-'.$id) if $Data->{'cache'};
                 }
             }
-
+            auditLog($id, $Data, 'Assign National Number', 'Entity');
         }
     }
 

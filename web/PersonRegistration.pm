@@ -926,7 +926,7 @@ sub addRegistration {
 	}
   	my $personRegistrationID = $q->{mysql_insertid};
   	####
-  	auditLog($personRegistrationID, $Data, 'Add Person Registration', 'Person');
+  	auditLog($personRegistrationID, $Data, 'Add Person Registration', 'Person Registration');
   	###	
     my $rc=0;
     if ($status eq 'PENDING')   {
@@ -1013,7 +1013,7 @@ sub personInProgressToPending {
     my $qry=$Data->{'db'}->prepare($st);
     $qry->execute($personID, $Data->{'Realm'}); 
     ####
-    auditLog($personID, $Data, 'UPDATE Person Registration To Pending','Person Registration');
+    auditLog($personID, $Data, 'Update Person Registration To Pending','Person Registration');
     ###
 }
 

@@ -175,7 +175,7 @@ sub savePlayerPassport{
 	        $sth->execute($personID, $dref->{'intPlayerPassportID'});
         }
         ###
-		auditLog($personID, $Data, 'Add Player Passport', 'Player Passport');
+		auditLog($personID, $Data, 'Update Player Passport', 'Player Passport');
 		###
       # need to get the Date because we need to get the age
     

@@ -1050,7 +1050,7 @@ sub approveTask {
             $Data->{'Realm'}
         );
   	    ####
-  	    auditLog($WFTaskID, $Data, 'Updated WFTask', 'WFTask');
+  	    auditLog($WFTaskID, $Data, 'Updated Work Task', 'WFTask');
   	    ###
         setDocumentStatus($Data, $WFTaskID, 'APPROVED');
 	    if ($q->errstr) {
@@ -1241,7 +1241,7 @@ sub checkForOutstandingTasks {
 			return $q->errstr . '<br>' . $st
 		}
 		####
-  	    auditLog('', $Data, 'Updated WFTask', 'WFTask');
+  	    auditLog('', $Data, 'Updated Work Task', 'WFTask');
       	###
 
 	}
@@ -1294,6 +1294,7 @@ sub checkForOutstandingTasks {
                     'ENTITY',
                     $entityID,
                 );
+                auditLog($entityID, $Data, 'Registration Approved', 'Entity');
         }
         if ($ruleFor eq 'DOCUMENT' and $documentID and !$rowCount)   {
             $st = qq[
@@ -1332,6 +1333,7 @@ sub checkForOutstandingTasks {
                         $personRegistrationID,
                     );
                 }
+                auditLog($personID, $Data, 'Person Registered', 'Person');
 
         	#}
         }
@@ -1392,6 +1394,7 @@ sub checkForOutstandingTasks {
                 if( ($ppref->{'strPersonType'} eq 'PLAYER') && ($ppref->{'strSport'} eq 'FOOTBALL'))    {
                 	savePlayerPassport($Data, $personID);
                 }
+                auditLog($personRegistrationID, $Data, 'Registration Approved', 'Person Registration');
            ##############################################################################################################
         }
        	}
@@ -1830,7 +1833,7 @@ sub resolveTask {
 
     resetRelatedTasks($Data, $WFTaskID, 'ACTIVE');
     ####
-  	auditLog($WFTaskID, $Data, 'Updated WFTask', 'WFTask');
+  	auditLog($WFTaskID, $Data, 'Updated Work Task', 'WFTask');
   	###
 
     if($emailNotification) {
@@ -1906,7 +1909,7 @@ sub rejectTask {
 		return $q->errstr . '<br>' . $st
 	}
     ####
-  	auditLog($WFTaskID, $Data, 'Updated WFTask', 'WFTask');
+  	auditLog($WFTaskID, $Data, 'Updated Work Task to Rejected', 'WFTask');
   	###
 
     if($emailNotification) {
