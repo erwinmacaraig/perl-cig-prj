@@ -3,6 +3,7 @@ CREATE TABLE `tblAuditLog` (
   `intAuditLogID` int(11) NOT NULL AUTO_INCREMENT,
   `intID` int(11) NOT NULL DEFAULT '0',
   `intUserID` int(11) DEFAULT '0',
+    strLocalName varchar(150) default '',
   `strUsername` varchar(30) DEFAULT '',
   `strType` varchar(80) DEFAULT '',
   `strSection` varchar(30) DEFAULT '',
