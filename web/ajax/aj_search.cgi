@@ -296,6 +296,7 @@ sub search_entities  {
   $sphinx->SetFilter('intrealmid',[$filters->{'realm'}]);
   #$sphinx->SetFilter('intentitylevel',[3]);
   my $results = $sphinx->Query($searchval, 'FIFA_Entities_r'.$filters->{'realm'});
+  
   my @matchlist = ();
   if($results and $results->{'total'})  {
     for my $r (@{$results->{'matches'}})  {

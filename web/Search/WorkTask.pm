@@ -41,12 +41,20 @@ sub process {
 	
 
 	my @memarray = ();
-	my $query = qq[SELECT intWFRuleID FROM tblWFRule WHERE strWFRuleFor = ? AND strRegistrationNature = ? AND strPersonType = ? AND intApprovalEntityLevel = ? AND intRealmID = ?];
+	my $query = qq[SELECT intWFRuleID FROM tblWFRule WHERE strWFRuleFor = ? AND strRegistrationNature = ? AND intApprovalEntityLevel = ? AND intRealmID = ? ];
 
-
-
+	if($strWFRuleFor eq 'ENTITY' && $strPersonType eq 'CLUB'){
+		$query .= qq[AND intEntityLevel = $Defs::LEVEL_CLUB];
+	}
+	elsif($strWFRuleFor eq 'ENTITY' && $strPersonType eq 'VENUE'){
+		$query .= qq[AND intEntityLevel = $Defs::LEVEL_VENUE];
+	}
+	else {
+		$query .= qq[AND strPersonType = '$strPersonType'];
+	}
+	
 	my $q = $self->getData->{'db'}->prepare($query);
-    $q->execute($strWFRuleFor,$strRegistrationNature,$strPersonType,$self->getData()->{'clientValues'}{'currentLevel'},$realmID);    
+    $q->execute($strWFRuleFor,$strRegistrationNature,$self->getData()->{'clientValues'}{'currentLevel'},$realmID);    
 	while(my $dref = $q->fetchrow_hashref()){
 		push @taskids,$dref->{'intWFRuleID'};
 	}
@@ -54,17 +62,16 @@ sub process {
 	$taskids_list = join(',',@taskids);
 
 	my $client = setClient($self->getData()->{'clientValues'});
-        #my $person_list = join(',',@persons);
+
 
         my $entity_list = '';
         $entity_list = join(',', @{$subNodes});
-
-        #my $clubID = $self->getData()->{'clientValues'}{'clubID'} || 0; 
-        #$clubID = 0 if $clubID == $Defs::INVALID_ID;
+    
 
 
 	switch($strWFRuleFor){
-		case 'REGO' {
+		case ['REGO','PERSON'] {
+		
 			my $keywordsearch = $self->getKeyword();
 			$keywordsearch =~ s/[,\-\']+//g;
 			$st = qq[
@@ -94,14 +101,12 @@ sub process {
 				AND
 				T.intPersonRegistrationID = PR.intPersonRegistrationID
 				AND
-				T.strTaskStatus = 'ACTIVE'
-				AND 
-				T.intWFRuleID IN ($taskids_list)				
+				T.strTaskStatus = 'ACTIVE'							
 			)
-			WHERE tblPerson.strLocalFirstname LIKE '%$keywordsearch%' OR tblPerson.strLocalSurname LIKE '%$keywordsearch%'];
+			WHERE tblPerson.strLocalFirstname LIKE '%$keywordsearch%' OR tblPerson.strLocalSurname LIKE '%$keywordsearch%' AND 
+				T.intWFRuleID IN ($taskids_list)] ;
 			$q = $self->getData->{'db'}->prepare($st);
       		$q->execute();
-				
 			while(my $dref = $q->fetchrow_hashref()){
 				 my $name = "$dref->{'strLocalSurname'}, $dref->{'strLocalFirstname'}" || '';
 				 $name .= "  ($dref->{'EntityName'})" if $dref->{'EntityName'};
@@ -117,18 +122,29 @@ sub process {
 
 		}
 		case 'ENTITY' {
+			
+			my $keywordsearch = $self->getKeyword();
+			$keywordsearch =~ s/[,\-\']+//g;
+			my $intermediateNodes = {};
+		    my $subNodes = [];
+			($intermediateNodes, $subNodes) = $self->getIntermediateNodes($self->getData()); # $subnodes contains intEntityID
+
+			my $filters = $self->setupFilters($subNodes);
+			my $entity_list = '';
+      		$entity_list = join(',', @{$subNodes});
 			$self->getSphinx()->ResetFilters();
 			$self->getSphinx()->SetFilter('intrealmid', [$filters->{'realm'}]);
-			$indexName = $Defs::SphinxIndexes{'Entity'}.'_r'.$filters->{'realm'};
+			my $indexName = "FIFA_Entities_r".$filters->{'realm'}; #FIFA_Entities_r
 			$results = $self->getSphinx()->Query($self->getKeyword(), $indexName);
-		
+
+
  	   		if($results and $results->{'total'})  {
     			for my $r (@{$results->{'matches'}})  {
       				push @matchlist, $r->{'doc'};
     			}
   			}
 
-			if(@matchlist)  {
+			if(@matchlist)  { #
    				my $id_list = join(',',@matchlist);
 				$st = qq[ SELECT 
        					 tblEntity.intEntityID,
@@ -144,19 +160,19 @@ sub process {
 						AND
 						T.strTaskStatus = 'ACTIVE'
 						AND 
-						T.intWFRuleID IN ($taskids_list)	
+						T.intWFRuleID IN ($taskids_list)							
 					)				
-      				WHERE tblEntity.intEntityID IN ($id_list)
-      				   AND intEntityLevel < ?
-       		          AND TES.intParentID = ?
-        	          AND TES.intDataAccess >= $Defs::DATA_ACCESS_READONLY
+      					WHERE tblEntity.intEntityID IN ($id_list)
+						AND tblEntity.intRealmID = $realmID					
+      				    AND intEntityLevel < ?
+       		            AND TES.intParentID = ?
+        	            AND TES.intDataAccess >= $Defs::DATA_ACCESS_READONLY
      				ORDER BY 
        				 strLocalName 
      			 LIMIT 10];
 				my $currentLevel = $self->getData()->{'clientValues'}{'currentLevel'} || 0;
-               
-			# 
-				
+               #WHERE tblEntity.intEntityID IN ($id_list)	WHERE tblEntity.strLocalName LIKE '%$keywordsearch%'
+
 				$q = $self->getData->{'db'}->prepare($st);
       			$q->execute(
 					$currentLevel,
@@ -173,11 +189,10 @@ sub process {
 						 link => $link,
 					}
 			   }
-			}
+			} #
 
 		}
-
-		
+				
 	}
 
 

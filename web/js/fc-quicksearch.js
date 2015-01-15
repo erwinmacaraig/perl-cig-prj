@@ -7,25 +7,25 @@
 		var dtFrom;
 		var dtTo;
 		var tasktype;
-		if(jQuery(".role").is(":checked")){
-			role = 	jQuery("#PersonType").val();
-			console.log(role);
+		if($(".role").is(":checked")){			
+			role = 	$("#PersonType").val();
+			//console.log(role);
 		}
-		if(jQuery(".club").is(":checked")){
+		if($(".club").is(":checked")){
 			entity.push(3);
 			
 		}
-		if(jQuery(".venue").is(":checked")){
+		if($(".venue").is(":checked")){
 			entity.push(-47);
 		}
-		if(jQuery(".daterange").is(":checked")){			
-			dtFrom = jQuery("input#dtValidFrom").val();
- 			dtTo = jQuery("input#dtValidUntil").val();
+		if($(".daterange").is(":checked")){			
+			dtFrom = $("input#dtValidFrom").val();
+ 			dtTo = $("input#dtValidUntil").val();
 
 		}
 		var entities = entity.join();
-		if(jQuery(".task").is(":checked")){
-			tasktype = jQuery("#TaskType").val();
+		if($(".task").is(":checked")){
+			tasktype = $("#TaskType").val();
 				
 		}		
 		    /*	
