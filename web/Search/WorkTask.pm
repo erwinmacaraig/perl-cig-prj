@@ -101,9 +101,10 @@ sub process {
 				AND
 				T.intPersonRegistrationID = PR.intPersonRegistrationID
 				AND
-				T.strTaskStatus = 'ACTIVE'							
+				T.strTaskStatus = 'ACTIVE'	
+				AND T.intRealmID = $realmID						
 			)
-			WHERE tblPerson.strLocalFirstname LIKE '%$keywordsearch%' OR tblPerson.strLocalSurname LIKE '%$keywordsearch%' AND 
+			WHERE tblPerson.intRealmID = $realmID AND tblPerson.strLocalFirstname LIKE '%$keywordsearch%' OR tblPerson.strLocalSurname LIKE '%$keywordsearch%' AND 
 				T.intWFRuleID IN ($taskids_list)] ;
 			$q = $self->getData->{'db'}->prepare($st);
       		$q->execute();
