@@ -12,6 +12,7 @@ use JSON;
 use Lang;
 use Data::Dumper;
 use Search::Person;
+use Search::WorkTask;
 
 main();  
 
@@ -19,7 +20,20 @@ sub main  {
   # GET INFO FROM URL
   my $client = param('client') || '';
   my $searchval = param('term') || '';
+  my $role= param('role') || '';
+  my $entityfilters = param('entity') || 0;
+  my $dtFrom = param('dtFrom') || '';
+  my $dtTo = param('dtTo') || '';
+  my $tasktype = param('tasktype') || '';
+  my $otherparams = '';
 
+  my $personparams = '';
+  
+
+  #for processing json data 
+	#my $cgi = CGI->new;
+	
+  # end of processing json data
   my %Data=();
   my $target='main.cgi';
   $Data{'target'}=$target;
@@ -30,7 +44,7 @@ sub main  {
   my %clientValues = getClient($client);
   $Data{'clientValues'} = \%clientValues;
   my $db=allowedTo(\%Data);
-  $Data{'db'} = $db;
+  $Data{'db'} = $db;	
 
   my $currentLevel = $Data{'clientValues'}{'currentLevel'} || 0;
   ($Data{'Realm'}, $Data{'RealmSubType'})=getRealm(\%Data);
@@ -38,9 +52,10 @@ sub main  {
   # AUTHENTICATE
   my $output = '';
   if($db)  {
-    my %results = ();
-
-    my $sphinx = Sphinx::Search->new;
+     my %results = ();
+	 my @r = ();
+	 my @iterationItems = ();
+     my $sphinx = Sphinx::Search->new;
 
     $sphinx->SetServer($Defs::Sphinx_Host, $Defs::Sphinx_Port);
     $sphinx->SetLimits(0,1000);
@@ -49,7 +64,18 @@ sub main  {
     my $subNodes = [];
     my $rawResult = 1;
 
-    if($currentLevel > $Defs::LEVEL_PERSON)  {
+	if($role){
+		#$roles  =~ s/,/','/g;
+		#$otherparams .= qq[AND strPersonType IN ('$roles') ]; 	
+		$otherparams .= qq[AND strPersonType = '$role' ]; 			
+	}
+	if($dtFrom && $dtTo){
+		$otherparams .= qq[AND ('$dtTo' BETWEEN dtFrom AND dtTo AND '$dtFrom' BETWEEN dtFrom AND dtTo ) ]; 	
+	}
+
+	if($otherparams){
+			#$personSearchObj->setQueryParam($otherparams);
+		if($currentLevel > $Defs::LEVEL_PERSON)  {
         #$results{'persons'} = search_persons(
         #  \%Data,
         #  $sphinx,
@@ -59,37 +85,91 @@ sub main  {
         #  $subNodes,
         #);
 
-        my $personSearchObj = new Search::Person();
-        $personSearchObj
+		    my $personSearchObj = new Search::Person();
+		    $personSearchObj
+		        ->setRealmID($Data{'Realm'})
+		        ->setSubRealmID(0)
+		        ->setSearchType("unique")
+		        ->setData(\%Data)
+		        ->setKeyword($searchval)
+		        ->setSphinx($sphinx)
+				->setQueryParam($otherparams);		
+		    #intermediateNodes, subNodes and filters are initialised in Search/Person.pm
+		    $results{'persons'} = $personSearchObj->process($rawResult);
+			@iterationItems = ('persons');
+
+   		}
+	} # end $otherparams
+
+	elsif($entityfilters){
+		if($currentLevel > $Defs::LEVEL_CLUB)  {
+		    my $intermediateNodes = {};
+		    my $subNodes = [];
+		    ($intermediateNodes, $subNodes) = getIntermediateNodes(\%Data);
+		    my $filters = setupFilters(\%Data, $subNodes);
+			my $entityfiltersetup = '';
+			$entityfiltersetup = qq[ AND intEntityLevel IN ($entityfilters) ];
+			$results{'entities'} = search_entities(
+				\%Data,
+				$sphinx,
+				$searchval,
+				$filters,
+				$intermediateNodes,
+				$entityfiltersetup,
+		  	);
+		 }
+		@iterationItems = ('entities');
+	} #enityfilters
+	elsif($tasktype){	
+		
+		my($strRuleFor,$nature,$type) = split(/-/,$tasktype);
+		my $taskSearchObj = new Search::WorkTask();
+      	  $taskSearchObj
             ->setRealmID($Data{'Realm'})
             ->setSubRealmID(0)
-            ->setSearchType("unique")
             ->setData(\%Data)
             ->setKeyword($searchval)
             ->setSphinx($sphinx);
 
-        #intermediateNodes, subNodes and filters are initialised in Search/Person.pm
-        $results{'persons'} = $personSearchObj->process($rawResult);
+			
+		$results{'tasks'} = $taskSearchObj->process($strRuleFor,$nature,$type);
 
-    }
-    if($currentLevel > $Defs::LEVEL_CLUB)  {
-        my $intermediateNodes = {};
-        my $subNodes = [];
-        ($intermediateNodes, $subNodes) = getIntermediateNodes(\%Data);
-        my $filters = setupFilters(\%Data, $subNodes);
+		@iterationItems = ('tasks');
+	}
+	else{
+		 my $personSearchObj = new Search::Person();
+		 $personSearchObj
+		        ->setRealmID($Data{'Realm'})
+		        ->setSubRealmID(0)
+		        ->setSearchType("unique")
+		        ->setData(\%Data)
+		        ->setKeyword($searchval)
+		        ->setSphinx($sphinx)
+				->setQueryParam($otherparams);		
+		    #intermediateNodes, subNodes and filters are initialised in Search/Person.pm
+		    $results{'persons'} = $personSearchObj->process($rawResult);
 
-
-      $results{'entities'} = search_entities(
-        \%Data,
-        $sphinx,
-        $searchval,
-        $filters,
-        $intermediateNodes,
-      );
-    }
-
-    my @r = ();
-    for my $k (qw(entities persons))  {
+		if($currentLevel > $Defs::LEVEL_CLUB)  {
+		    my $intermediateNodes = {};
+		    my $subNodes = [];
+		    ($intermediateNodes, $subNodes) = getIntermediateNodes(\%Data);
+		    my $filters = setupFilters(\%Data, $subNodes);
+			my $entityfiltersetup = '';
+			$results{'entities'} = search_entities(
+				\%Data,
+				$sphinx,
+				$searchval,
+				$filters,
+				$intermediateNodes,
+				'',
+		  	);
+		 }
+		@iterationItems = ('entities','persons');
+	}
+   
+    #for my $k (qw(entities persons tasks))  { 
+	#for my $k (qw(entities tasks)){ 
+	foreach my $k (@iterationItems){
       if($results{$k} and scalar(@{$results{$k}}))  {
         for my $r (@{$results{$k}})  {
           push @r, $r;
@@ -110,7 +190,7 @@ sub search_persons  {
     $filters,
     $intermediateNodes,
     $subEntities,
-  ) = @_;
+    ) = @_;
   $sphinx->ResetFilters();
   my $realmID = $Data->{'Realm'};
   $sphinx->SetFilter('intrealmid',[$filters->{'realm'}]);
@@ -132,6 +212,7 @@ sub search_persons  {
     $entity_list = join(',', @{$subEntities});
     my $clubID = $Data->{'clientValues'}{'clubID'} || 0;
     $clubID = 0 if $clubID == $Defs::INVALID_ID;
+	
     my $st = qq[
       SELECT DISTINCT
         tblPerson.intPersonID,
@@ -214,6 +295,7 @@ sub search_entities  {
     $searchval,
     $filters,
     $intermediateNodes,
+	$entityfilter,
   ) = @_;
   $sphinx->ResetFilters();
   $sphinx->SetFilter('intrealmid',[$filters->{'realm'}]);
@@ -242,16 +324,20 @@ sub search_entities  {
         AND intEntityLevel < ?
         AND TES.intParentID = ?
         AND TES.intDataAccess >= $Defs::DATA_ACCESS_READONLY
+		$entityfilter
       ORDER BY 
         strLocalName 
       LIMIT 10
     ];
-    my $q = $Data->{'db'}->prepare($st);
+
+
+	my $q = $Data->{'db'}->prepare($st);
     my $currentLevel = $Data->{'clientValues'}{'currentLevel'} || 0;
     $q->execute(
         $currentLevel,
         getID($Data->{'clientValues'}),
     );
+
     my $numnotshown = ($results->{'total'} || 0) - 10;
     $numnotshown = 0 if $numnotshown < 0;
     while(my $dref = $q->fetchrow_hashref())  {

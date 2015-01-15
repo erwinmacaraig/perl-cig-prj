@@ -254,7 +254,9 @@ $(document).ready(function(){
 
     checkIfDocsAllApproved();
 
-    jQuery("input.search").quicksearch();
+    jQuery("input.search").on("keypress", function(){
+		jQuery("input.search").quicksearch();
+	});
 
 });
 jQuery(document).ready(function(){

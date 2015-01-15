@@ -73,7 +73,7 @@ sub getUnique {
 
         my $clubID = $self->getData()->{'clientValues'}{'clubID'} || 0;
         $clubID = 0 if $clubID == $Defs::INVALID_ID;
-
+		
         my $st = qq[
           SELECT DISTINCT
             tblPerson.intPersonID,
@@ -95,13 +95,13 @@ sub getUnique {
             INNER JOIN tblEntity AS E ON (
               PR.intEntityID = E.intEntityID
             )
-          WHERE tblPerson.intPersonID IN ($person_list)
-          ORDER BY 
+          WHERE tblPerson.intPersonID IN ($person_list) ] . $self->getQueryParam() . qq[ 
+		  ORDER BY 
             strLocalSurname, 
             strLocalFirstname
           LIMIT 10
         ];
-        my $q = $self->getData->{'db'}->prepare($st);
+		my $q = $self->getData->{'db'}->prepare($st);
         $q->execute();
         my %origClientValues = %{$self->getData()->{'clientValues'}};
 
@@ -132,8 +132,8 @@ sub getUnique {
             link => $link,
             numnotshown => $numnotshown,
             otherdetails => {
-                dob => $dref->{'dtDOB'},
-                dtadded => $dref->{'dtadded'},
+            dob => $dref->{'dtDOB'},
+            dtadded => $dref->{'dtadded'},
             }
           };
         }
