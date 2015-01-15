@@ -46,10 +46,10 @@ sub assignNationalNumber {
                     $person->setValues({ strNationalNum => $newNumber });
                     $person->write();
                     $Data->{'cache'}->delete('swm','PersonObj-'.$id) if $Data->{'cache'};
+                auditLog($id, $Data, 'Assign National Number', 'Person');
                 }
             }
 
-            auditLog($id, $Data, 'Assign National Number', 'Person');
         }
 
     }
@@ -78,9 +78,9 @@ sub assignNationalNumber {
                     $entity->setValues({ strMAID => $newNumber });
                     $entity->write();
                     $Data->{'cache'}->delete('swm','EntityObj-'.$id) if $Data->{'cache'};
+            auditLog($id, $Data, 'Assign National Number', 'Entity');
                 }
             }
-            auditLog($id, $Data, 'Assign National Number', 'Entity');
         }
     }
 
