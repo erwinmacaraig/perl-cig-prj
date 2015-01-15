@@ -2534,8 +2534,6 @@ sub populateEntityViewData {
             #TODO: add details specific to CLUB
         }
         case "$Defs::LEVEL_VENUE" {
-    open FH, ">test.txt";
-    print FH "\n" . Dumper($dref) . "\n";
             %fields = (
                 title => $Data->{'lang'}->txt('Venue Registration') .' - ' . $Data->{'lang'}->txt($dref->{'entityLocalName'}),
                 templateFile => 'workflow/view/venue.templ',
