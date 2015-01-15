@@ -54,7 +54,9 @@
   <div class="container">
     <div class="row">
       <div class="col-md-12">
-        <!--<a href="#" title=""><img src="images/img-logo.png" alt="" /></a><h1>Finland Association</h1>-->
+      [% IF Data.ELevel != 3 %]
+        <a href="#" title=""><img class="header-logo" src="images/FAS-logo.png" alt="" /></a><h1>MyFAS</h1>
+      [% END %]  
         <ul>
           <li>
             <strong class="info-header">[% Lang.txt('Member Association') %]</strong><br/>
