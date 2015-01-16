@@ -14,6 +14,7 @@ use ConfigOptions qw(ProcessPermissions);
 use EntityFieldsSetup;
 use FieldLabels;
 use Data::Dumper;
+use AuditLog;
 
 sub handleEntityEdit {
     my ($action, $Data) = @_;
@@ -103,6 +104,12 @@ sub handleEntityEdit {
             $entityObj->setValues($userData);
             $entityObj->write();
             $body = 'updated';
+            auditLog(
+                $entityID,
+                $Data,
+                'Update',
+                'Entity',
+            );
             if($back_screen){
                 my %tempClientValues = getClient($Data->{'client'});
                 $tempClientValues{currentLevel} = $tempClientValues{authLevel};

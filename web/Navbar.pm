@@ -674,12 +674,12 @@ sub getClubMenuData {
 
     # for club menu
 
-    if(!$SystemConfig->{'NoAuditLog'}) {
-        $menuoptions{'auditlog'} = {
-            name => $lang->txt('Audit Log'),
-            url => $baseurl."a=AL_",
-        };
-    }
+    #if(!$SystemConfig->{'NoAuditLog'}) {
+    #    $menuoptions{'auditlog'} = {
+    #        name => $lang->txt('Audit Log'),
+    #        url => $baseurl."a=AL_",
+    #    };
+    #}
      if($Data->{'clientValues'}{'authLevel'} > $Defs::LEVEL_CLUB and $SystemConfig->{'AllowTXNs'} and $SystemConfig->{'AllowClubTXNs'}) {
         $menuoptions{'transactions'} = {
             name => $lang->txt('Transactions'),
@@ -698,6 +698,14 @@ sub getClubMenuData {
         name => $lang->txt('My Club'),
         url => $baseurl."a=EE_D",
     };
+    if (1==2 && $Data->{'clientValues'}{'authLevel'}>= $Defs::LEVEL_NATIONAL )   {
+        $menuoptions{'auditlog'} = {
+            name => $lang->txt("Audit Trail"),
+            url => $baseurl."a=C_HISTLOG",
+        };
+    }
+
+
  
     if (1==2)   {
         $menuoptions{'clubidentifier'} = {
@@ -836,20 +844,24 @@ sub getClubMenuData {
         [ $lang->txt('My Club'), 'menu',[
         'myClub',
         ]],
+         [ $lang->txt('Audit Trail'), 'menu',[
+            'auditlog'
+        ]],
+
         [ $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Documents"), 'menu','clubdocs'],
         [ $lang->txt('Identifiers'), 'menu','clubidentifier'],
         [ $lang->txt('Search'), 'search',[
         'advancedsearch',
         'nataccredsearch',
         ]],
-        [ $lang->txt('System'), 'system',[
-        'usermanagement',
-        'clearancesettings',
-        'mrt_admin',
-        'auditlog',
-        ]],
-        [ $lang->txt('Reports'), 'menu',[ 'reports', ]],
+                [ $lang->txt('Reports'), 'menu',[ 'reports', ]],
     );
+#[ $lang->txt('System'), 'system',[
+#        'usermanagement',
+#        'clearancesettings',
+#        'mrt_admin',
+#        'auditlog',
+#        ]],
 
     my $menudata = processmenudata(\%menuoptions, \@menu_structure);
     return $menudata;

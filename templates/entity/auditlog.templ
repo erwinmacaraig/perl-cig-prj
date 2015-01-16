@@ -1,0 +1,32 @@
+[% IF AuditLog.size() > 0 %]
+
+[% count = 0 %]
+<div class="col-md-12 tasklist-content dashboard-tasklist">
+<table class="" cellpadding="5" width="100%">
+	<thead>
+        <tr class="box-header">
+    		<th>[% Lang.txt('Date Last Updated') %]</th>
+    		<th>[% Lang.txt('Type') %]</th>
+    		<th>[% Lang.txt('Username') %]</th>
+    		<th>[% Lang.txt('Organisation') %]</th>
+        </tr>
+	</thead>
+	[% FOREACH al = AuditLog %]
+	    [% count = count + 1 
+           c = count mod 2; 
+           IF count == 0    
+         %]
+              <tr class="rowshade">
+          [% ELSE %]
+              <tr>
+          [% END %] 
+          <td>[% DateFormat.format(al.DateUpdated,'MEDIUM', 'SHORT') %]</td>
+          <td>[% Lang.txt(al.Type) %]</td>
+          <td>[% al.Username %]</td>
+          <td>[% al.UserEntity %]</td>
+	[% END %]  
+</table>
+</div>
+[% ELSE %]
+<h4> [% Lang.txt('No Record Found') %]</h4>
+[% END %]
