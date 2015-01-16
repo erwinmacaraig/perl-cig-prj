@@ -193,8 +193,8 @@ sub validate_core_details {
         auditLog(
             $facilityObj->ID(),
             $self->{'Data'},
-            'ADD',
-            'VENUE',
+            'Add',
+            'Venue',
         );
 
         my $st = qq[

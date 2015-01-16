@@ -1050,7 +1050,7 @@ sub approveTask {
             $Data->{'Realm'}
         );
   	    ####
-  	    auditLog($WFTaskID, $Data, 'Updated WFTask', 'WFTask');
+  	    auditLog($WFTaskID, $Data, 'Updated Work Task', 'WFTask');
   	    ###
         setDocumentStatus($Data, $WFTaskID, 'APPROVED');
 	    if ($q->errstr) {
@@ -1241,7 +1241,7 @@ sub checkForOutstandingTasks {
 			return $q->errstr . '<br>' . $st
 		}
 		####
-  	    auditLog('', $Data, 'Updated WFTask', 'WFTask');
+  	    auditLog('', $Data, 'Updated Work Task', 'WFTask');
       	###
 
 	}
@@ -1294,6 +1294,7 @@ sub checkForOutstandingTasks {
                     'ENTITY',
                     $entityID,
                 );
+                auditLog($entityID, $Data, 'Registration Approved', 'Entity');
         }
         if ($ruleFor eq 'DOCUMENT' and $documentID and !$rowCount)   {
             $st = qq[
@@ -1332,6 +1333,7 @@ sub checkForOutstandingTasks {
                         $personRegistrationID,
                     );
                 }
+                auditLog($personID, $Data, 'Person Registered', 'Person');
 
         	#}
         }
@@ -1392,6 +1394,7 @@ sub checkForOutstandingTasks {
                 if( ($ppref->{'strPersonType'} eq 'PLAYER') && ($ppref->{'strSport'} eq 'FOOTBALL'))    {
                 	savePlayerPassport($Data, $personID);
                 }
+                auditLog($personRegistrationID, $Data, 'Registration Approved', 'Person Registration');
            ##############################################################################################################
         }
        	}
@@ -1830,7 +1833,7 @@ sub resolveTask {
 
     resetRelatedTasks($Data, $WFTaskID, 'ACTIVE');
     ####
-  	auditLog($WFTaskID, $Data, 'Updated WFTask', 'WFTask');
+  	auditLog($WFTaskID, $Data, 'Updated Work Task', 'WFTask');
   	###
 
     if($emailNotification) {
@@ -1906,7 +1909,7 @@ sub rejectTask {
 		return $q->errstr . '<br>' . $st
 	}
     ####
-  	auditLog($WFTaskID, $Data, 'Updated WFTask', 'WFTask');
+  	auditLog($WFTaskID, $Data, 'Updated Work Task to Rejected', 'WFTask');
   	###
 
     if($emailNotification) {
@@ -2488,6 +2491,7 @@ sub populateEntityViewData {
     my %tempClientValues = getClient($client);
     $tempClientValues{currentLevel} = $dref->{intEntityLevel};
     setClientValue(\%tempClientValues, $dref->{intEntityLevel}, $dref->{intEntityID});
+
     my $tempClient = setClient(\%tempClientValues);
     my $readonly = !( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 );
 
@@ -2495,6 +2499,8 @@ sub populateEntityViewData {
     my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
     my $task = getTask($Data, $WFTaskID);
+
+    my $activeTab = safe_param('at','number') || 1;
 
 	%TemplateData = (
         EntityDetails => {
@@ -2522,8 +2528,11 @@ sub populateEntityViewData {
             legaltype => Club::getLegalTypeName($Data, $dref->{'intLegalTypeID'}),
             intEntityID => $dref->{'intEntityID'},
         },
-        EditDetailsLink => "$Data->{'target'}?client=$tempClient",
+        EditDetailsLink => "$Data->{'target'}?client=$tempClient&amp;dtype=$dref->{'strPersonType'}",
         ReadOnlyLogin => $readonly,
+        intWFTaskID => $dref->{'intWFTaskID'},
+        ActiveTab => $activeTab,
+        
 	);
     my ($PaymentsData) = populateRegoPaymentsViewData($Data, $task);
 

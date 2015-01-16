@@ -60,7 +60,7 @@ sub closePERecord {
   		$reg{'personEntityRole'},  		
   		$reg{'sport'},  		
     );
-  	auditLog($personID, $Data, $Data->{'lang'}->txt('Close Person Entity'), 'Person');
+  	auditLog($personID, $Data, $Data->{'lang'}->txt('Close Person Entity'), 'Person Entity');
 }
 
 sub doesOpenPEExist {
@@ -169,7 +169,7 @@ sub addPERecord {
   		$reg{'sport'} || '',  		
   	);
 	
-  	auditLog($personID, $Data, $Data->{'lang'}->txt('Add Person Entity'), 'Person');
+  	auditLog($personID, $Data, $Data->{'lang'}->txt('Add Person Entity'), 'Person Entity');
 }
 
 1;

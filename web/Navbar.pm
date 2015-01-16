@@ -1039,12 +1039,12 @@ sub getPersonMenuData {
             url => $baseurl."a=P_HOME",
         },
     );
-       if(!$SystemConfig->{'NoAuditLog'}) {
-           $menuoptions{'auditlog'} = {
-               name => $lang->txt('Audit Log'),
-               url => $baseurl."a=AL_",
-           };
-       }
+       #if(!$SystemConfig->{'NoAuditLog'}) {
+       #    $menuoptions{'auditlog'} = {
+       #        name => $lang->txt('Audit Log'),
+       #        url => $baseurl."a=AL_",
+       #    };
+       #}
        if ($SystemConfig->{'NationalAccreditation'} or $SystemConfig->{'AssocConfig'}{'NationalAccreditation'}) {
            $menuoptions{'accreditation'} = {
                name => $lang->txt($accreditation_title),
@@ -1074,7 +1074,12 @@ sub getPersonMenuData {
             and $SystemConfig->{'PersonMenus_level'} >= $Data->{'clientValues'}{'authLevel'}
         )
     )   {
+        $menuoptions{'auditlog'} = {
+            name => $lang->txt("Audit Trail"),
+            url => $baseurl."a=P_HISTLOG",
+        };
         $menuoptions{'regos'} = {
+            name => $lang->txt("Registration History"),
             url => $baseurl."a=P_REGOS",
         };
         if($clr)    {
@@ -1085,20 +1090,24 @@ sub getPersonMenuData {
         }
     }
 
-
     $Data->{'SystemConfig'}{'TYPE_NAME_3'} = '' if not exists $Data->{'SystemConfig'}{'TYPE_NAME_3'};
     my @menu_structure = (
         [ $lang->txt('Person Dashboard'), 'home','home'],
         [ $lang->txt('Player Passport'), 'menu','passport'],
         [ $lang->txt($SystemConfig->{'txns_link_name'} || 'Transactions'), 'menu','transactions'],
-        [ $lang->txt('Transfer History'), 'menu','clr'],
         [ $lang->txt('Certificates'), 'menu','certificates'],
-        [ $lang->txt('Registration History'), 'menu','regos'],
-        [ $lang->txt('Documents'), 'menu','docs'],
-        [ $lang->txt('System'), 'system',[
-        'auditlog',
+        [ $lang->txt('History'), 'menu',[
+            'regos',
+            'clr',
+            'auditlog'
         ]],
+        [ $lang->txt('Documents'), 'menu','docs'],
     );
+        #[ $lang->txt('Transfer History'), 'menu','clr'],
+    #    [ $lang->txt('System'), 'system',[
+    #    'auditlog',
+    #    ]],
+    #);
 
     my $menudata = processmenudata(\%menuoptions, \@menu_structure );
     return $menudata;

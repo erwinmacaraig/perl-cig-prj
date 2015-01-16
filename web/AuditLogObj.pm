@@ -29,6 +29,7 @@ sub log {
     INSERT INTO tblAuditLog (
       intAuditLogID,
       intID,
+      intUserID,
       strUsername,
       intPassportID,
       strType,
@@ -50,12 +51,14 @@ sub log {
       ?,
       ?,
       ?,
+      ?,
       now()
     )
   ];
     my $q = $self->{'db'}->prepare($st);
     $q->execute(
         $params{'id'},
+        $params{'userID'}          || '',
         $params{'username'}          || '',
         $params{'passportID'}        || 0,
         $params{'type'}              || '',
@@ -66,6 +69,25 @@ sub log {
         $params{'entity'}            || 0
     );
     my $logID = $q->{mysql_insertid} || 0;
+
+    $st = qq[
+        UPDATE 
+            tblAuditLog as AL
+            LEFT JOIN tblUserAuth as UA ON (
+                UA.userID=AL.intUserID
+            )
+            LEFT JOIN tblEntity as E ON (
+                E.intEntityID=UA.entityId
+            )
+        SET 
+            AL.strLocalName = E.strLocalName
+        WHERE
+            intAuditLogID = ?
+    ];
+    $q = $self->{'db'}->prepare($st);
+    $q->execute(
+        $logID
+    );
 
     if ( $params{'fields'} ) {
         my $details_sql = qq[

@@ -23,6 +23,7 @@ sub handleEntityEdit {
     my $currentLevel = $Data->{'clientValues'}{'currentLevel'};
     my $cl = setClient($clientValues);
     my $e_action = param('e_a') || '';
+    my $back_screen = param('bscrn') || '';
     my $entityID = getID($clientValues);
     $entityID = 0 if $entityID < 0;
     return '' if !$entityID;
@@ -102,7 +103,17 @@ sub handleEntityEdit {
             $entityObj->setValues($userData);
             $entityObj->write();
             $body = 'updated';
-            $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=EE_D";
+            if($back_screen){
+                my %tempClientValues = getClient($Data->{'client'});
+                $tempClientValues{currentLevel} = $tempClientValues{authLevel};
+                my $tempClient= setClient(\%tempClientValues);
+
+                $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$tempClient&$back_screen";
+            }
+            else {
+                $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=EE_D";
+            }
+            
           }
     }
     if($action eq 'EE_E')    {
@@ -122,6 +133,7 @@ sub handleEntityEdit {
                 <input type = "hidden" name = "client" value = "].unescape($client).qq["> 
                 <input type = "hidden" name = "a" value = "EE_U"> 
                 <input type = "hidden" name = "e_a" value = "$e_action"> 
+                <input type = "hidden" name = "bscrn" value = "$back_screen"> 
                 <input type = "submit" value = "].$Data->{'lang'}->txt('Save').qq[" class = "btn-main"> 
                 </div>
             </form>

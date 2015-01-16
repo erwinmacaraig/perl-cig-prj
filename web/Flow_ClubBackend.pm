@@ -201,8 +201,8 @@ sub validate_core_details {
         auditLog(
             $clubObj->ID(),
             $self->{'Data'},
-            'ADD',
-            'CLUB',
+            'Add',
+            'Club',
         );
 
         my $st = qq[

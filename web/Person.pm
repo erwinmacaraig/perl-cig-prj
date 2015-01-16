@@ -65,7 +65,7 @@ use TTTemplate;
 use PersonRequest;
 use BulkPersons;
 use PersonLanguages;
-
+use ListAuditLog;
 
 sub handlePerson {
     my ( $action, $Data, $personID ) = @_;
@@ -182,6 +182,9 @@ sub handlePerson {
            }
     elsif($action =~ /P_PASS/){
     	($resultHTML,$title) = listPlayerPassport($Data, $personID);
+    } 
+    elsif($action =~ /P_HISTLOG/){
+    	($resultHTML,$title) = listPersonAuditLog($Data, $personID);
     } 
     elsif($action =~ /P_CERT/){
     	($resultHTML, $title) = PersonCertifications::handleCertificates($action,$Data,$personID);  
