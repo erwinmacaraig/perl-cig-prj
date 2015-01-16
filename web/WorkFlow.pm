@@ -2491,6 +2491,7 @@ sub populateEntityViewData {
     my %tempClientValues = getClient($client);
     $tempClientValues{currentLevel} = $dref->{intEntityLevel};
     setClientValue(\%tempClientValues, $dref->{intEntityLevel}, $dref->{intEntityID});
+
     my $tempClient = setClient(\%tempClientValues);
     my $readonly = !( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 );
 
@@ -2498,6 +2499,8 @@ sub populateEntityViewData {
     my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
     my $task = getTask($Data, $WFTaskID);
+
+    my $activeTab = safe_param('at','number') || 1;
 
 	%TemplateData = (
         EntityDetails => {
@@ -2525,8 +2528,11 @@ sub populateEntityViewData {
             legaltype => Club::getLegalTypeName($Data, $dref->{'intLegalTypeID'}),
             intEntityID => $dref->{'intEntityID'},
         },
-        EditDetailsLink => "$Data->{'target'}?client=$tempClient",
+        EditDetailsLink => "$Data->{'target'}?client=$tempClient&amp;dtype=$dref->{'strPersonType'}",
         ReadOnlyLogin => $readonly,
+        intWFTaskID => $dref->{'intWFTaskID'},
+        ActiveTab => $activeTab,
+        
 	);
     my ($PaymentsData) = populateRegoPaymentsViewData($Data, $task);
 

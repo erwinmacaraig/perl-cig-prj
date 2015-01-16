@@ -25,6 +25,7 @@ sub handleFacilityEdit {
     my $currentLevel = $Data->{'clientValues'}{'currentLevel'};
     my $cl = setClient($clientValues);
     my $e_action = param('e_a') || '';
+    my $back_screen = param('bscrn') || '';
     my $entityID = param('venueID') || 0;
     if(!doesUserHaveEntityAccess($Data, $entityID,'WRITE')) {
         return ('Invalid User',0);
@@ -95,7 +96,17 @@ sub handleFacilityEdit {
             $entityObj->setValues($userData);
             $entityObj->write();
             $body = 'updated';
-            $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=FE_D&amp;venueID=$entityID";
+            if($back_screen){
+                my %tempClientValues = getClient($Data->{'client'});
+                $tempClientValues{currentLevel} = $tempClientValues{authLevel};
+                my $tempClient= setClient(\%tempClientValues);
+
+                $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$tempClient&venueID=$entityID&$back_screen";
+            }
+            else {
+                $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=FE_D&amp;venueID=$entityID";
+            }
+            
           }
     }
     if($action eq 'FE_E')    {
@@ -116,6 +127,7 @@ sub handleFacilityEdit {
                 <input type = "hidden" name = "a" value = "FE_U"> 
                 <input type = "hidden" name = "venueID" value = "$entityID"> 
                 <input type = "hidden" name = "e_a" value = "$e_action"> 
+                <input type = "hidden" name = "bscrn" value = "$back_screen">
                 <input type = "submit" value = "].$Data->{'lang'}->txt('Save').qq[" class = "btn-main"> 
                 </div>
             </form>

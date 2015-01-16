@@ -35,19 +35,19 @@
     <div class="col-md-12">
         <div class="">
             <ul class="nav nav-tabs">
-                <li id="docstab" class="active"><a data-toggle="tab" href="#memberdocs">[% Lang.txt('Documents') %]<span class="circleBg"><i class="fa fa-check documents-complete documents-incomplete"></i><i class="fa fa-remove documents-rejected documents-approved"></i></span></a></li>
-                <li><a data-toggle="tab" href="#memberdetails">[% Lang.txt('Club Information') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></span></a></li>
-                <li><a data-toggle="tab" href="#tasknotesdocs">[% Lang.txt('Task Details') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></span></a></li>
+                <li id="docstab" [% IF ActiveTab == 1 %]class="active"[% END %]><a data-toggle="tab" href="#memberdocs">[% Lang.txt('Documents') %]<span class="circleBg"><i class="fa fa-check documents-complete documents-incomplete"></i><i class="fa fa-remove documents-rejected documents-approved"></i></span></a></li>
+                <li [% IF ActiveTab == 2 %]class="active"[% END %]><a data-toggle="tab" href="#memberdetails">[% Lang.txt('Club Information') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></span></a></li>
+                <li [% IF ActiveTab == 3 %]class="active"[% END %]><a data-toggle="tab" href="#tasknotesdocs">[% Lang.txt('Task Details') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></span></a></li>
             </ul>
 
 			<div class="tab-content">
                 
-               <div id="memberdocs" class="tab-pane fade in active">
+               <div id="memberdocs" class="tab-pane fade [% IF ActiveTab == 1 %]in active[% END %] ">
 					<div class="">
 						[% DocumentBlock %]
 					</div>
                 </div>
-                <div id="memberdetails" class="tab-pane fade">
+                <div id="memberdetails" class="tab-pane fade [% IF ActiveTab == 2 %]in active[% END %]">
 					<div class="rego-detail">
 
 						<div class="read-only">
@@ -99,7 +99,7 @@
 
 	                            [% IF EditDetailsLink and !ReadOnlyLogin  %]
 	                                <span style="float: right" class="">
-	                                    <a href = "[% EditDetailsLink %]&a=EE_E&e_a=core" class="edit-link">[% Lang.txt('Edit') %]</a>
+	                                    <a href = "[% EditDetailsLink %]&a=EE_E&e_a=core&bscrn=a%3DWF_View%26TID%3D[% intWFTaskID %]%26at%3D2" class="edit-link">[% Lang.txt('Edit') %]</a>
 	                                </span>
 	                            [% END %]
 
@@ -151,7 +151,7 @@
 
 	                            [% IF EditDetailsLink and !ReadOnlyLogin  %]
 	                                <span style="float: right" class="">
-	                                    <a href = "[% EditDetailsLink %]&a=EE_E&e_a=contactdetails" class="edit-link">[% Lang.txt('Edit') %]</a>
+	                                    <a href = "[% EditDetailsLink %]&a=EE_E&e_a=contactdetails&bscrn=a%3DWF_View%26TID%3D[% intWFTaskID %]%26at%3D2" class="edit-link">[% Lang.txt('Edit') %]</a>
 	                                </span>
 	                            [% END %]
 
@@ -210,7 +210,7 @@
 
 	                            [% IF EditDetailsLink and !ReadOnlyLogin  %]
 	                                <span style="float: right" class="">
-	                                    <a href = "[% EditDetailsLink %]&a=EE_E&e_a=roledetails" class="edit-link">[% Lang.txt('Edit') %]</a>
+	                                    <a href = "[% EditDetailsLink %]&a=EE_E&e_a=roledetails&bscrn=a%3DWF_View%26TID%3D[% intWFTaskID %]%26at%3D2" class="edit-link">[% Lang.txt('Edit') %]</a>
 	                                </span>
 	                            [% END %]
 
@@ -220,7 +220,7 @@
 
 					</div>
 				</div>
-		           	<div id="tasknotesdocs" class="tab-pane fade">
+		           	<div id="tasknotesdocs" class="tab-pane fade [% IF ActiveTab == 3 %]in active[% END %]">
 		                <div class="row-padding">
 		                    <div style="clear: both;">&nbsp;</div>
 		                    <div class="row">
