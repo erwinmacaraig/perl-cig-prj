@@ -59,6 +59,7 @@ sub listPersonAuditLog    {
                 OR P.intPersonID=?
             )
             AND AL.strSection NOT IN ('Person Entity')
+            AND AL.strSection IN ("Player Passport", "PERSON", "Person", "Person Registration", "WFTask")
         ORDER BY 
             AL.dtUpdated DESC
     
@@ -106,6 +107,7 @@ sub listEntityAuditLog {
                 WFT.intWFTaskID = AL.intID 
                 AND AL.strSection="WFTask"
                 AND WFT.intPersonID=0
+                AND WFT.strWFRuleFor = "ENTITY"
             )
             LEFT JOIN tblEntity as E ON (
                 E.intEntityID= AL.intID 
@@ -117,6 +119,7 @@ sub listEntityAuditLog {
                 OR WFT.intEntityID=? 
                 OR E.intEntityID=?
             )
+            AND AL.strSection IN ("Club", "Entity", "Venue", "WFTask")
         ORDER BY 
             AL.dtUpdated DESC
     
