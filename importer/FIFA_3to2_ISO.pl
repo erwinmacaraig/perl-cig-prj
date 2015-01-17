@@ -68,6 +68,24 @@ sub main	{
     $Countries{'DEU'} = 'DE';
     $Countries{'DUE'} = 'DE';
     $Countries{'Freanch'} = 'FR';
+    $Countries{'JPN'} = 'JP';
+    $Countries{'DZA'} = 'DZ';
+    $Countries{'BRN'} = 'BN';
+    $Countries{'CAN'} = 'CA';
+    $Countries{'DNK'} = 'DK';
+    $Countries{'BIH'} = 'BA';
+    $Countries{'AUS'} = 'AU';
+    $Countries{'COL'} = 'CO';
+    $Countries{'ARG'} = 'AR';
+    $Countries{'CHN'} = 'CN';
+    $Countries{'BRA'} = 'BR';
+    $Countries{'CMR'} = 'CM';
+    $Countries{'EGY'} = 'EG';
+    $Countries{'TUN'} = 'TN';
+    $Countries{'Mali'} = 'ML';
+    $Countries{'India'} = 'IN';
+    $Countries{'CHL'} = 'CL';
+    $Countries{'TUN'} = 'TN';
 
     for my $field (@dbFields)   {
         my $st = qq[

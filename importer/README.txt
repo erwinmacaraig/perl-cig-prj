@@ -9,7 +9,7 @@ from importer/
 ./FIFA_3to2_ISO.pl
 ./importer_FixPRs.pl
 ./runAllPlayerPassport.pl
-cd automatic -> ./tempEntityStructure.pl
+cd ../automatic -> ./tempEntityStructure.pl
 
 UPDATE tblPerson SET strOtherPersonIdentifier=strPassportNo, intOtherPersonIdentifierTypeID=558019 WHERE (strOtherPersonIdentifier IS NULL or strOtherPersonIdentifier="") and (strPassportNo <> "" and strPassportNo IS NOT NULL) AND intRealmID=1;
 UPDATE tblPersonRegistration_1 SET strPersonLevel ="" WHERE strPersonLevel IS NULL;
@@ -18,3 +18,20 @@ UPDATE tblPerson SET intSystemStatus =1;
 ./importer_AuditLog.pl
 ./importer_assignNationalNumber.pl
 ./importer_SG_ActiveProducts.pl
+
+
+## THEN:
+mysqldump ...
+gzip file
+sftp to demo 1 or 2
+gunzip...
+mysql <
+
+### REBUILDING SPHINX
+sudo service searchd stop
+sudo rm -rf /var/lib/sphinx/*
+sudo service searchd start
+sudo indexer --all --rotate
+echo 'ATTACH INDEX FIFA_Persons_r1 TO RTINDEX FIFA_Persons_RT_r1; ATTACH INDEX FIFA_Entities_r1 TO RTINDEX FIFA_Entities_RT_r1' | mysql --host=127.0.0.1 --port=9306
+#####
+
