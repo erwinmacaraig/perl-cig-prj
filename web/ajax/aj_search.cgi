@@ -22,8 +22,6 @@ sub main  {
   my $searchval = param('term') || '';
   my $role= param('role') || '';
   my $entityfilters = param('entity') || 0;
-  my $dtFrom = param('dtFrom') || '';
-  my $dtTo = param('dtTo') || '';
   my $tasktype = param('tasktype') || '';
   my $otherparams = '';
 
@@ -64,10 +62,7 @@ sub main  {
 		#$otherparams .= qq[AND strPersonType IN ('$roles') ]; 	
 		$otherparams .= qq[AND strPersonType = '$role' ]; 			
 	}
-	if($dtFrom && $dtTo){
-		$otherparams .= qq[AND ('$dtTo' BETWEEN dtFrom AND dtTo AND '$dtFrom' BETWEEN dtFrom AND dtTo ) ]; 	
-	}
-
+	
 	if($otherparams){
 			#$personSearchObj->setQueryParam($otherparams);
 		if($currentLevel > $Defs::LEVEL_PERSON)  {
