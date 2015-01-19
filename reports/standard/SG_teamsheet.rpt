@@ -2,7 +2,7 @@
 	SQL => qq[
 
 SELECT DISTINCT
-    '' as RowCount,
+    '' as SN,
     P.strNationalNum, 
     CONCAT(P.strLocalFirstname, " ", P.strLocalSurname) as FullName,
     P.dtDOB,
@@ -41,7 +41,9 @@ WHERE
     AND PR.intEntityID = ###CLUBID###
     AND PR.strPersonType='PLAYER' 
     AND P.strNationalNum <> ''
-    AND PR.intNationalPeriodID=7
+    AND PR.intNationalPeriodID=8
+ORDER BY 
+    P.strLocalSurname
 	],
 	StatsReport => 0,
 	ReportEntity => 100,
@@ -49,7 +51,7 @@ WHERE
 	Template => 'default',
 	DistinctValues => 1,
 	Labels => [
-		['RowCount','S/N'],
+		['SN','S/N'],
 		['strNationalNum','Registration Number'],
 		['FullName','Full Name'],
 		['dtDOB','DOB'],
