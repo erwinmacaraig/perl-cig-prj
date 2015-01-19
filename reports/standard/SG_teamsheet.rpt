@@ -41,7 +41,7 @@ WHERE
     AND PR.intEntityID = ###CLUBID###
     AND PR.strPersonType='PLAYER' 
     AND P.strNationalNum <> ''
-    AND PR.intNationalPeriodID=8
+    AND PR.intNationalPeriodID=7
 ORDER BY 
     P.strLocalSurname
 	],
