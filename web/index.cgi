@@ -15,7 +15,7 @@ use TTTemplate;
 	
 	my $pheading=$lang->txt('Sign in to <span class="sporange">Membership</span>');
 	my $txtexpl=$lang->txt('Here you can sign in to your SportingPulse Membership database.');
-	my $title=$lang->txt('APPNAME') || 'SportingPulse Membership';
+	my $title=$lang->txt('APPNAME') || 'FIFA Connect';
 
     my %Data = (
         lang=> $lang
