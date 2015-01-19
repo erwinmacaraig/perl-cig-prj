@@ -976,6 +976,7 @@ sub venueAllowed    {
 
 sub list_venue_fields {
     my ($action, $Data, $venueID) = @_;
+    my $back_screen = param('bscrn') || '';
 
     warn "METHOD CALL $venueID";
     my $entityID = getID($Data->{'clientValues'});
@@ -1001,6 +1002,7 @@ sub list_venue_fields {
         action  => 'VENUE_Fupdate',
         client  => $Data->{'client'},
         venueID => $venueID,
+        bscrn => $back_screen,
         #fields  => $fields,
         FieldElements => $fields,
     );  
@@ -1016,9 +1018,10 @@ sub list_venue_fields {
 
 sub update_venue_fields {
     my ($action, $Data, $venueID) = @_;
+    my $back_screen = param('bscrn') || '';
 
-	my $p = new CGI;
-	my %params = $p->Vars();
+    my $p = new CGI;
+	  my %params = $p->Vars();
 
     my $entityID = getID($Data->{'clientValues'});
     my $venueDetails = loadVenueDetails($Data->{'db'}, $venueID);
@@ -1076,7 +1079,16 @@ sub update_venue_fields {
     $PageData{'Success'} = $updatedFields;
     delete $PageData{'Errors'};
 
-    $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&amp;a=FE_D&amp;venueID=$venueID";
+    if($back_screen){
+      my %tempClientValues = getClient($Data->{'client'});
+      $tempClientValues{currentLevel} = $tempClientValues{authLevel};
+      my $tempClient= setClient(\%tempClientValues);
+        $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$tempClient&venueID=$venueID&$back_screen";
+      }
+      else {
+        $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&amp;a=FE_D&amp;venueID=$venueID";
+      }
+     
     $fieldsPage = runTemplate(
         $Data,
         \%PageData,

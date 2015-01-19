@@ -48,5 +48,9 @@
     <input type="hidden" value="[% action %]" name="a">
     <input type="hidden" value="[% client %]" name="client">
     <input type="hidden" value="[% venueID %]" name="venueID">
+    <input type="hidden" value="[% bscrn %]" name="bscrn">
+    [% IF bscrn %]
+    <input type="hidden" value="[% bscrn %]" name="bscrn">
+    [% END %]
     <input type="submit" class="btn-main" name="submitb" value="[% Lang.txt('Save') %]">   
 </form>

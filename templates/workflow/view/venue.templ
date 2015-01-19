@@ -164,6 +164,11 @@
 
             <div id="venueFields" class="tab-pane fade in">
                 [% VenueFieldsBlock %]
+                [% IF EditDetailsLink and !ReadOnlyLogin  %]
+                <span style="float: right" class="">
+                    <a href = "[% EditDetailsLink %]&a=VENUE_Flist&venueID=[% EntityDetails.intEntityID %]&bscrn=a%3DWF_View%26TID%3D[% intWFTaskID %]%26at%3D2" class="edit-link">[% Lang.txt('Edit') %]</a>
+                </span>
+                [% END %]
             </div>
 
             <div id="venueRegDocs" class="tab-pane fade in">
