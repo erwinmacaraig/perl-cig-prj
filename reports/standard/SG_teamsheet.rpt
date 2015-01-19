@@ -11,18 +11,23 @@ SELECT DISTINCT
     P.strOtherPersonIdentifier,
     PR.dtFrom,
     PR.dtTo,
-    PR.strPersonLevel,
-    "" as MAControl,
-    "" as JNo,
-    "" as PO,
-    "" as NameInTeamSheet,
-    "" as Height,
-    "" as Weight,
-    "" as ContractStart,
-    "" as ContractEnd,
-    "" as ESPass,
-    "" as ITC,
-    "" as Remark
+    CASE PR.strPersonLevel 
+        WHEN 'PROFESSIONAL' THEN 'Professional'
+        WHEN 'AMATEUR' THEN 'Amateur'
+        WHEN 'AMATEUR_U_C' THEN 'Amateur (Under Contract)'
+        ELSE ''
+    END as PersonLevel,
+    '' as MAControl,
+    '' as JNo,
+    '' as PO,
+    '' as NameInTeamSheet,
+    '' as Height,
+    '' as Weight,
+    '' as ContractStart,
+    '' as ContractEnd,
+    '' as ESPass,
+    '' as ITC,
+    '' as Remark
 FROM 
     tblPerson as P 
         INNER JOIN tblPersonRegistration_1 as PR 
@@ -53,7 +58,7 @@ WHERE
 		['strOtherPersonIdentifier','NRCI/PP'],
 		['dtFrom','Reg Date'],
 		['dtTo','Dereg Date'],
-		['strPersonLevel','Contract Type'],
+		['PersonLevel','Contract Type'],
 		['MAControl','MA Control'],
 		['','J/No'],
 		['','Pos'],
