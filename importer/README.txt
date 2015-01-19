@@ -6,6 +6,9 @@ UPDATE tblEntity SET strImportEntityCode = 'FAS' WHERE intEntityID = 1 LIMIT 1;
 perl CSVReader.pl -directory=csv/singapore -format=csv -realmid=1 -notes=import test -national=0
 
 UPDATE tblPersonRegistration_1 SET strSport='FOOTBALL' WHERE strPersonType='REFEREE';
+UPDATE tblSystemConfig SET strValue ='myfashelpdesk@fas.org.sg' WHERE strOption ='ma_email';
+INSERT INTO tblReports VALUES (0, 'Club Teamsheet', 'Check teamsheet', 1, 'SG_teamsheet.rpt', '', 'People', 0,0,'');
+INSERT INTO tblReportEntity VALUES (100,1,0,0,0,3,3);
 
 from importer/
 ./FIFA_3to2_ISO.pl
