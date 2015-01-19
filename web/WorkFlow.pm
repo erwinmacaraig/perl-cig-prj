@@ -633,6 +633,10 @@ sub listTasks {
         TaskEntityID => $entityID,
         TaskFilters => \%taskFilters,
         client => $Data->{client},
+		Levels => {
+			CLUB => $Defs::LEVEL_CLUB,
+			NATIONAL => $Defs::LEVEL_NATIONAL,	
+		},
 	);
 
     my $flashMessage = getFlashMessage($Data, 'WF_U_FM');

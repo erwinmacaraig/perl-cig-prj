@@ -15,6 +15,9 @@ UPDATE tblPerson SET strOtherPersonIdentifier=strPassportNo, intOtherPersonIdent
 UPDATE tblPersonRegistration_1 SET strPersonLevel ="" WHERE strPersonLevel IS NULL;
 UPDATE tblPerson SET intSystemStatus =1;
 
+UPDATE tblGenerate SET intCurrentNum=0 WHERE intGenerateID=2;
+UPDATE tblProducts SET intProductNationalPeriodID=8;
+
 ./importer_AuditLog.pl
 ./importer_assignNationalNumber.pl
 ./importer_SG_ActiveProducts.pl
