@@ -805,7 +805,7 @@ msgid "Contact Email 2"
 msgstr "Contact Email 2"
 
 msgid "APPNAME"
-msgstr "SportingPulse Membership"
+msgstr "FIFA Connect"
 
 msgid "Database Error in Update"
 msgstr "Database Error in Update"
