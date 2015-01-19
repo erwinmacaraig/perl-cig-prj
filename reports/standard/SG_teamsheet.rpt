@@ -10,7 +10,7 @@ SELECT DISTINCT
     P.strISONationality,
     P.strOtherPersonIdentifier,
     PR.dtFrom,
-    PR.dtTo,
+    IF(PR.dtTo = '0000-00-00', '', PR.dtTo) as DateTo,
     CASE PR.strPersonLevel 
         WHEN 'PROFESSIONAL' THEN 'Professional'
         WHEN 'AMATEUR' THEN 'Amateur'
@@ -57,7 +57,7 @@ WHERE
 		['strISONationality','Nationality'],
 		['strOtherPersonIdentifier','NRCI/PP'],
 		['dtFrom','Reg Date'],
-		['dtTo','Dereg Date'],
+		['DateTo','Dereg Date'],
 		['PersonLevel','Contract Type'],
 		['MAControl','MA Control'],
 		['','J/No'],
