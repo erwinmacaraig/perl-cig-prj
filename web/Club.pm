@@ -37,6 +37,7 @@ use Countries;
 use PersonLanguages;
 
 use ClubFlow;
+use ListAuditLog;
 
 
 sub handleClub  {
@@ -55,6 +56,9 @@ sub handleClub  {
   }
   elsif ($action =~/C_CFG_/) {
     #Club Configuration
+  }
+  elsif ($action =~/^C_HISTLOG/) {
+        ($resultHTML,$title) = listEntityAuditLog($Data, $clubID);
   }
   elsif ($action =~/^C_L/) {
         ($resultHTML,$title)=listClubs($Data, $parentID);

@@ -48,6 +48,16 @@ sub main	{
         auditLog($dref->{'intPersonRegistrationID'}, \%Data, 'Person Registration Imported', 'Person Registration');
     }
 
+    my $st = qq[
+        SELECT intEntityID FROM tblEntity WHERE intRealmID=?
+    ];
+    my $qry= $db->prepare($st);
+    $qry->execute($Data{'Realm'}); 
+    while (my $dref= $qry->fetchrow_hashref()) {
+        auditLog($dref->{'intEntityID'}, \%Data, 'Imported', 'Entity');
+    }
+
+
 
 
 }

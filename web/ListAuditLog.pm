@@ -3,6 +3,7 @@ require Exporter;
 @ISA    = qw(Exporter);
 @EXPORT = @EXPORT_OK = qw(
     listPersonAuditLog
+    listEntityAuditLog
 );
 
 use strict;
@@ -58,6 +59,7 @@ sub listPersonAuditLog    {
                 OR P.intPersonID=?
             )
             AND AL.strSection NOT IN ('Person Entity')
+            AND AL.strSection IN ("Player Passport", "PERSON", "Person", "Person Registration", "WFTask")
         ORDER BY 
             AL.dtUpdated DESC
     
@@ -89,6 +91,64 @@ sub listPersonAuditLog    {
 	 $title = 'Audit Trail';
 	 return ($resultHTML, $title);
 }
+sub listEntityAuditLog {
+	my ($Data, $entityID) = @_;
 
+	my $query = qq[ 
+        SELECT
+            AL.strUsername,
+            AL.strType,
+            AL.strSection,
+            AL.strLocalName,
+            AL.dtUpdated
+        FROM
+            tblAuditLog as AL
+            LEFT JOIN tblWFTask as WFT ON (
+                WFT.intWFTaskID = AL.intID 
+                AND AL.strSection="WFTask"
+                AND WFT.intPersonID=0
+                AND WFT.strWFRuleFor = "ENTITY"
+            )
+            LEFT JOIN tblEntity as E ON (
+                E.intEntityID= AL.intID 
+                AND AL.strSection IN ("Club", "Entity", "Venue")
+            )
+        WHERE
+            (
+                AL.intID=? 
+                OR WFT.intEntityID=? 
+                OR E.intEntityID=?
+            )
+            AND AL.strSection IN ("Club", "Entity", "Venue", "WFTask")
+        ORDER BY 
+            AL.dtUpdated DESC
+    
+	];
+	my $sth = $Data->{'db'}->prepare($query);
+	$sth->execute(
+        $entityID,
+        $entityID,
+        $entityID,
+    );
+	my @rowdata = ();
+	while(my $ref= $sth->fetchrow_hashref()){
+		push @rowdata,{
+			Username=> $ref->{'strUsername'},
+			UserEntity=> $ref->{'strLocalName'},
+			Type => $ref->{'strType'},
+			Section=> $ref->{'strSection'},
+			DateUpdated=> $ref->{'dtUpdated'},
+		};
+	}
+	$sth->finish();
+	my $PageContent = {
+		Lang => $Data->{'lang'},
+		AuditLog=> \@rowdata,
+	};
+	 my $title = '';
+	 my $resultHTML = runTemplate($Data, $PageContent, 'person/auditlog.templ') || '';
+	 $title = 'Audit Trail';
+	 return ($resultHTML, $title);
+}
 1;
 
