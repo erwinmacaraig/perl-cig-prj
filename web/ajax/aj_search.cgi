@@ -312,7 +312,7 @@ sub search_entities  {
           ON TES.intChildID = tblEntity.intEntityID
 
       WHERE intEntityID IN ($id_list)
-        AND intEntityLevel < ?
+        AND  intEntityLevel < ? AND intEntityLevel <> $Defs::LEVEL_VENUE
         AND TES.intParentID = ?
         AND TES.intDataAccess >= $Defs::DATA_ACCESS_READONLY
 		$entityfilter
