@@ -36,6 +36,7 @@ WHERE
     AND PR.intEntityID = ###CLUBID###
     AND PR.strPersonType='PLAYER' 
     AND P.strNationalNum <> ''
+    AND PR.intNationalPeriodID=7
 	],
 	StatsReport => 0,
 	ReportEntity => 100,
