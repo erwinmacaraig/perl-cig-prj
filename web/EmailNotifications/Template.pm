@@ -164,6 +164,10 @@ sub build {
             MA_HelpDeskEmail => $self->{_notificationObj}->getData()->{'SystemConfig'}{'help_desk_email'},
             MA_Website => $self->{_notificationObj}->getData()->{'SystemConfig'}{'ma_website'},
 
+            #Person Request below
+            CurrentClub => $self->{_notificationObj}->getWorkTaskDetails()->{'CurrentClub'},
+            RequestingClub => $self->{_notificationObj}->getWorkTaskDetails()->{'RequestingClub'} || $config->{'fromEntityName'},
+            MA => $self->{_notificationObj}->getWorkTaskDetails()->{'MA'} || '',
         );
 
         $content = runTemplate(
