@@ -654,17 +654,26 @@ sub submitRequestPage {
 
             my $notificationType = undef;
 
+            my %notificationData = (
+                Reason => $notes,
+                WorkTaskType => $Defs::personRequest{$requestType},
+                Person => $regDetails->{'strLocalFirstname'} . ' ' . $regDetails->{'strLocalSurname'},
+                CurrentClub => $regDetails->{'strLocalName'} || '',
+            );
+
             my $emailNotification = new EmailNotifications::PersonRequest();
             $emailNotification->setRealmID($Data->{'Realm'});
             $emailNotification->setSubRealmID(0);
             $emailNotification->setToEntityID($regDetails->{'intEntityID'});
             $emailNotification->setFromEntityID($entityID);
-            $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
-            $emailNotification->setDefsName($Defs::admin_email_name);
+            #$emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
+            #$emailNotification->setDefsName($Defs::admin_email_name);
             $emailNotification->setNotificationType($requestType, "SENT");
             $emailNotification->setSubject("Request ID - " . $requestID);
             $emailNotification->setLang($Data->{'lang'});
             $emailNotification->setDbh($Data->{'db'});
+            $emailNotification->setData($Data);
+            $emailNotification->setWorkTaskDetails(\%notificationData);
 
             my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
             $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
@@ -1058,38 +1067,65 @@ sub setRequestResponse {
     $request = $request->[0];
 
     my $requestResponseSuffix = "";
+    my $entityAsSenderID;
+    my $entityAsReceiverID;
+
     switch($response){
         case 'deny' {
             $response = $Defs::PERSON_REQUEST_RESPONSE_DENIED;
             $requestStatus = $Defs::PERSON_REQUEST_STATUS_DENIED;
             $requestResponseSuffix = $Data->{'lang'}->txt("Rejected");
+
+            $entityAsSenderID = $request->{'intRequestToEntityID'};
+            $entityAsReceiverID = $request->{'intRequestFromEntityID'};
         }
         case 'accept' {
             $response = $Defs::PERSON_REQUEST_RESPONSE_ACCEPTED;
             $requestStatus = $Defs::PERSON_REQUEST_STATUS_PENDING;
             $requestResponseSuffix = $Data->{'lang'}->txt("Approved");
+
+            $entityAsSenderID = $request->{'intRequestToEntityID'};
+            $entityAsReceiverID = $request->{'intRequestFromEntityID'};
         }
         case 'cancel' {
             $response = $Defs::PERSON_REQUEST_RESPONSE_CANCELLED;
             $requestStatus = $Defs::PERSON_REQUEST_STATUS_CANCELLED;
             $requestResponseSuffix = $Data->{'lang'}->txt("Cancelled");
+
+            $entityAsSenderID = $request->{'intRequestFromEntityID'};
+            $entityAsReceiverID = $request->{'intRequestToEntityID'};
         }
         else {
             $response = undef;
         }
     }
 
+    print STDERR Dumper $request;
+
+    my %notificationData = (
+        Reason => $notes,
+        WorkTaskType => $Defs::personRequest{$request->{'strRequestType'}},
+        Person => $request->{'strLocalFirstname'} . ' ' . $request->{'strLocalSurname'},
+        CurrentClub => $request->{'requestTo'} || '',
+        RequestingClub => $request->{'requestFrom'} || '',
+    );
+
+
     my $emailNotification = new EmailNotifications::PersonRequest();
     $emailNotification->setRealmID($Data->{'Realm'});
     $emailNotification->setSubRealmID(0);
-    $emailNotification->setToEntityID($request->{'intRequestFromEntityID'});
-    $emailNotification->setFromEntityID($request->{'intRequestToEntityID'});
-    $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
-    $emailNotification->setDefsName($Defs::admin_email_name);
+    #$emailNotification->setToEntityID($request->{'intRequestFromEntityID'});
+    #$emailNotification->setFromEntityID($request->{'intRequestToEntityID'});
+    $emailNotification->setToEntityID($entityAsReceiverID);
+    $emailNotification->setFromEntityID($entityAsSenderID);
+    #$emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
+    #$emailNotification->setDefsName($Defs::admin_email_name);
     $emailNotification->setNotificationType($request->{'strRequestType'}, $response);
     $emailNotification->setSubject("Request ID - " . $requestID);
     $emailNotification->setLang($Data->{'lang'});
     $emailNotification->setDbh($Data->{'db'});
+    $emailNotification->setData($Data);
+    $emailNotification->setWorkTaskDetails(\%notificationData);
 
     my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
     $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
@@ -1501,10 +1537,16 @@ sub finaliseTransfer {
 }
 
 sub setRequestStatus {
-    my ($Data, $requestID, $requestStatus) = @_;
+    my ($Data, $task, $requestStatus) = @_;
 
-    $requestID ||= 0;
     $requestStatus ||= '';
+
+    my %reqFilters = (
+        'requestID' => $task->{'intPersonRequestID'} || 0,
+    );
+
+    my $request = getRequests($Data, \%reqFilters);
+    $request = $request->[0];
 
     my $st = qq[
         UPDATE
@@ -1520,8 +1562,54 @@ sub setRequestStatus {
     my $q = $db->prepare($st);
     $q->execute(
         $requestStatus,
-        $requestID
+        $task->{'intPersonRequestID'}
     ) or query_error($st);
+
+    my $maObj = getInstanceOf($Data, 'national');
+
+    my %notificationData = (
+        Reason => $task->{'rejectNotes'},
+        WorkTaskType => $Defs::personRequest{$request->{'strRequestType'}},
+        Person => $request->{'strLocalFirstname'} . ' ' . $request->{'strLocalSurname'},
+        CurrentClub => $request->{'requestTo'} || '',
+        RequestingClub => $request->{'requestFrom'} || '',
+        MA => $maObj->name(),
+    );
+
+    my $emailNotification = new EmailNotifications::PersonRequest();
+    $emailNotification->setRealmID($Data->{'Realm'});
+    $emailNotification->setSubRealmID(0);
+    $emailNotification->setFromEntityID($task->{'intApprovalEntityID'});
+    $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
+    $emailNotification->setDefsName($Defs::admin_email_name);
+    $emailNotification->setSubject("Request ID - " . $task->{'intPersonRequestID'});
+    $emailNotification->setLang($Data->{'lang'});
+    $emailNotification->setDbh($Data->{'db'});
+    $emailNotification->setData($Data);
+    $emailNotification->setWorkTaskDetails(\%notificationData);
+
+    if($requestStatus eq $Defs::PERSON_REQUEST_STATUS_REJECTED) {
+        $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
+
+        $emailNotification->setNotificationType($request->{'strRequestType'}, $Defs::PERSON_REQUEST_STATUS_REJECTED);
+
+        my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+        $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
+    }
+    elsif($requestStatus eq $Defs::PERSON_REQUEST_STATUS_COMPLETED) {
+        $emailNotification->setNotificationType($request->{'strRequestType'}, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+
+        #send to new club
+        $emailNotification->setToEntityID($request->{'intRequestFromEntityID'});
+        my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+        $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
+
+        #send to previous club
+        $emailNotification->setToEntityID($request->{'intRequestToEntityID'});
+        my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+        $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
+    }
+
 }
 
 sub itcFields {
