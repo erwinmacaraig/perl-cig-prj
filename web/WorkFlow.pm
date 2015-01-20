@@ -1035,17 +1035,6 @@ sub approveTask {
 
     my $task = getTask($Data, $WFTaskID);
 
-    my %notificationData = (
-        'Reason' => $task->{'holdNotes'},
-        'WorkTaskType' => getWorkTaskType($Data, $task),
-        'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
-        'PersonRegisterTo' => $task->{'registerToEntity'},
-        'Club' => $task->{'strLocalName'},
-        'Venue' => $task->{'strLocalName'},
-        'PersonRegisterTo' => $task->{'registerToEntity'},
-        'RegistrationType' => $task->{'sysConfigApprovalLockRuleFor'},
-    );
-
     my $sysConfigApprovalLockPaymentRequired = $Data->{'SystemConfig'}{'lockApproval_PaymentRequired_' . $task->{'sysConfigApprovalLockRuleFor'}};
     my $error = 0;
     my $response;
@@ -1088,24 +1077,6 @@ sub approveTask {
 	    	return $q->errstr . '<br>' . $st
 	    }
 
-        if($emailNotification) {
-            $emailNotification->setRealmID($Data->{'Realm'});
-            $emailNotification->setSubRealmID(0);
-            $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
-            $emailNotification->setFromEntityID($task->{'intApprovalEntityID'});
-            $emailNotification->setDefsEmail($Defs::admin_email);
-            $emailNotification->setDefsName($Defs::admin_email_name);
-            $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_APPROVED);
-            $emailNotification->setSubject("Work Task ID " . $WFTaskID);
-            $emailNotification->setLang($Data->{'lang'});
-            $emailNotification->setDbh($Data->{'db'});
-            $emailNotification->setData($Data);
-            $emailNotification->setWorkTaskDetails(\%notificationData);
-
-            my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
-            $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
-        }
-
     $st = qq[
         SELECT
             wft.intPersonID,
@@ -1146,15 +1117,46 @@ sub approveTask {
         my $allComplete = checkRelatedTasks($Data);
         if($Data->{'clientValues'}{'currentLevel'} eq $Defs::LEVEL_NATIONAL) {
             PersonRequest::finaliseTransfer($Data, $personRequestID);
-            PersonRequest::setRequestStatus($Data, $personRequestID, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+            PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
         }
         elsif ($allComplete) {
             PersonRequest::finaliseTransfer($Data, $personRequestID);
-            PersonRequest::setRequestStatus($Data, $personRequestID, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+            PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
         }
     }
     elsif($personRequestID and $registrationNature eq $Defs::REGISTRATION_NATURE_NEW) {
-        PersonRequest::setRequestStatus($Data, $personRequestID, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+        PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+    }
+    else {
+        my %notificationData = (
+            'Reason' => $task->{'holdNotes'},
+            'WorkTaskType' => getWorkTaskType($Data, $task),
+            'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+            'PersonRegisterTo' => $task->{'registerToEntity'},
+            'Club' => $task->{'strLocalName'},
+            'Venue' => $task->{'strLocalName'},
+            'PersonRegisterTo' => $task->{'registerToEntity'},
+            'RegistrationType' => $task->{'sysConfigApprovalLockRuleFor'},
+        );
+
+        if($emailNotification) {
+            $emailNotification->setRealmID($Data->{'Realm'});
+            $emailNotification->setSubRealmID(0);
+            $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
+            $emailNotification->setFromEntityID($task->{'intApprovalEntityID'});
+            $emailNotification->setDefsEmail($Defs::admin_email);
+            $emailNotification->setDefsName($Defs::admin_email_name);
+            $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_APPROVED);
+            $emailNotification->setSubject("Work Task ID " . $WFTaskID);
+            $emailNotification->setLang($Data->{'lang'});
+            $emailNotification->setDbh($Data->{'db'});
+            $emailNotification->setData($Data);
+            $emailNotification->setWorkTaskDetails(\%notificationData);
+
+            my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+            $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
+        }
+
     }
 
    	my $rc = checkForOutstandingTasks($Data,$ruleFor, $taskType, $entityID, $personID, $personRegistrationID, $documentID);
@@ -1821,8 +1823,6 @@ sub resolveTask {
     #FC-144 get current task based on taskid param
     my $task = getTask($Data, $WFTaskID);
 
-    print STDERR Dumper $task;
-
     my %notificationData = (
         'Reason' => $task->{'holdNotes'},
         'WorkTaskType' => getWorkTaskType($Data, $task),
@@ -1919,18 +1919,6 @@ sub rejectTask {
     #FC-144 get current task based on taskid param
     my $task = getTask($Data, $WFTaskID);
 
-    my %notificationData = (
-        'Reason' => $task->{'rejectNotes'},
-        'WorkTaskType' => getWorkTaskType($Data, $task),
-        'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
-        'PersonRegisterTo' => $task->{'registerToEntity'},
-        'Club' => $task->{'strLocalName'},
-        'Venue' => $task->{'strLocalName'},
-        'PersonRegisterTo' => $task->{'registerToEntity'},
-        'RegistrationType' => $task->{'sysConfigApprovalLockRuleFor'},
-    );
-
-
 
     return if (!$task or ($task eq undef));
 
@@ -1973,33 +1961,45 @@ sub rejectTask {
   	auditLog($WFTaskID, $Data, 'Updated Work Task to Rejected', 'WFTask');
   	###
 
-    if($emailNotification) {
-        $emailNotification->setRealmID($Data->{'Realm'});
-        $emailNotification->setSubRealmID(0);
-        $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
-        $emailNotification->setFromEntityID($task->{'intApprovalEntityID'});
-        $emailNotification->setDefsEmail($Defs::admin_email);
-        $emailNotification->setDefsName($Defs::admin_email_name);
-        $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_REJECTED);
-        $emailNotification->setSubject("Work Task ID " . $WFTaskID);
-        $emailNotification->setLang($Data->{'lang'});
-        $emailNotification->setDbh($Data->{'db'});
-        $emailNotification->setData($Data);
-        $emailNotification->setWorkTaskDetails(\%notificationData);
-
-        my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
-        $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
-    }
-
     if($task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER) {
         #check for pending tasks?
 
         if($Data->{'clientValues'}{'currentLevel'} eq $Defs::LEVEL_NATIONAL) {
-            PersonRequest::setRequestStatus($Data, $task->{'intPersonRequestID'}, $Defs::PERSON_REQUEST_STATUS_REJECTED);
+            PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_REJECTED);
         }
     }
     elsif($task->{'intPersonRequestID'} and $task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_NEW) {
-        PersonRequest::setRequestStatus($Data, $task->{'intPersonRequestID'}, $Defs::PERSON_REQUEST_STATUS_REJECTED);
+        PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_REJECTED);
+    }
+    else {
+        my %notificationData = (
+            'Reason' => $task->{'rejectNotes'},
+            'WorkTaskType' => getWorkTaskType($Data, $task),
+            'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+            'PersonRegisterTo' => $task->{'registerToEntity'},
+            'Club' => $task->{'strLocalName'},
+            'Venue' => $task->{'strLocalName'},
+            'PersonRegisterTo' => $task->{'registerToEntity'},
+            'RegistrationType' => $task->{'sysConfigApprovalLockRuleFor'},
+        );
+
+        if($emailNotification) {
+            $emailNotification->setRealmID($Data->{'Realm'});
+            $emailNotification->setSubRealmID(0);
+            $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
+            $emailNotification->setFromEntityID($task->{'intApprovalEntityID'});
+            $emailNotification->setDefsEmail($Defs::admin_email);
+            $emailNotification->setDefsName($Defs::admin_email_name);
+            $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_REJECTED);
+            $emailNotification->setSubject("Work Task ID " . $WFTaskID);
+            $emailNotification->setLang($Data->{'lang'});
+            $emailNotification->setDbh($Data->{'db'});
+            $emailNotification->setData($Data);
+            $emailNotification->setWorkTaskDetails(\%notificationData);
+
+            my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+            $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
+        }
     }
 
     return getNotificationMessage($Data, $task, 'REJECT');
