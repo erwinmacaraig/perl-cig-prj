@@ -1019,6 +1019,7 @@ sub list_venue_fields {
 sub update_venue_fields {
     my ($action, $Data, $venueID) = @_;
     my $back_screen = param('bscrn') || '';
+    my $activeTab = safe_param('at','number') || 1;
 
     my $p = new CGI;
 	  my %params = $p->Vars();
@@ -1054,6 +1055,7 @@ sub update_venue_fields {
         venueID => $venueID,
         Errors  => $errors,
         FieldElements  => $fieldElements,
+        ActiveTab => $activeTab,
     );
  
     my $fieldsPage = runTemplate(
