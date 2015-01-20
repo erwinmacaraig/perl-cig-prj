@@ -35,14 +35,14 @@
     <div class="col-md-9">
         <div class="">
             <ul class="nav nav-tabs">
-            <li id="docstab" class="active"><a data-toggle="tab" href="#venueRegDetails">[% Lang.txt('Registration Details') %]</a></li>
-            <li><a data-toggle="tab" href="#venueFields">[% Lang.txt('Fields') %]</a></li>
+            <li id="docstab" [% IF ActiveTab == 1 %]class="active"[% END %]><a data-toggle="tab" href="#venueRegDetails">[% Lang.txt('Registration Details') %]</a></li>
+            <li [% IF ActiveTab == 2 %]class="active"[% END %]><a data-toggle="tab" href="#venueFields">[% Lang.txt('Fields') %]</a></li>
             <li><a data-toggle="tab" href="#venueRegDocs">[% Lang.txt('Registration Documents') %]</a></li>
             <li><a data-toggle="tab" href="#venueTaskNotes">[% Lang.txt('Work History') %]</a></li>
             </ul>
 
         <div class="tab-content">
-            <div id="venueRegDetails" class="tab-pane fade in active">
+            <div id="venueRegDetails" class="tab-pane fade in [% IF ActiveTab == 1 %]in active[% END %]">
 
                 <div class="rego-detail">
 
@@ -88,7 +88,7 @@
 
                                 [% IF EditDetailsLink and !ReadOnlyLogin  %]
                                     <span style="float: right" class="">
-                                        <a href = "[% EditDetailsLink %]&a=FE_E&e_a=core&venueID=[% EntityDetails.intEntityID %]&bscrn=a%3DWF_View%26TID%3D[% intWFTaskID %]%26at%3D2" class="edit-link">[% Lang.txt('Edit') %]</a>
+                                        <a href = "[% EditDetailsLink %]&a=FE_E&e_a=core&venueID=[% EntityDetails.intEntityID %]&bscrn=a%3DWF_View%26TID%3D[% intWFTaskID %]%26at%3D1" class="edit-link">[% Lang.txt('Edit') %]</a>
                                     </span>
                                 [% END %]
 
@@ -147,7 +147,7 @@
                                                                
                                 [% IF EditDetailsLink and !ReadOnlyLogin  %]
                                     <span style="float: right" class="">
-                                        <a href = "[% EditDetailsLink %]&a=FE_E&e_a=contactdetails&venueID=[% EntityDetails.intEntityID %]&bscrn=a%3DWF_View%26TID%3D[% intWFTaskID %]%26at%3D2" class="edit-link">[% Lang.txt('Edit') %]</a>
+                                        <a href = "[% EditDetailsLink %]&a=FE_E&e_a=contactdetails&venueID=[% EntityDetails.intEntityID %]&bscrn=a%3DWF_View%26TID%3D[% intWFTaskID %]%26at%3D1" class="edit-link">[% Lang.txt('Edit') %]</a>
                                     </span>
                                 [% END %]
 
@@ -162,7 +162,7 @@
                 </div>
             </div>
 
-            <div id="venueFields" class="tab-pane fade in">
+            <div id="venueFields" class="tab-pane fade [% IF ActiveTab == 2 %]in active[% END %]">
                 [% VenueFieldsBlock %]
                 [% IF EditDetailsLink and !ReadOnlyLogin  %]
                 <span style="float: right" class="">

@@ -165,7 +165,7 @@ header .logo-area.notloginlevel    {
 
 header .logo-area img.header-logo {
 	float: left;
-	max-width:15%;
+	max-width:125px;
 }
 
 header .logo-area h1 {
@@ -176,7 +176,7 @@ header .logo-area h1 {
 	font-weight: normal;
 	float: left;
 	position:relative;
-	top:70px;
+	top:50px;
 }
 
 header .logo-area ul {

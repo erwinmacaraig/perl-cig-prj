@@ -957,6 +957,19 @@ sub addWorkFlowTasks {
                 $dref->{'DocumentID'}
             );
 
+            my $task = getTask($Data, $qINS->{mysql_insertid});
+
+            my %notificationData = (
+                'Reason' => '',
+                'WorkTaskType' => getWorkTaskType($Data, $task),
+                'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+                'PersonRegisterTo' => $task->{'registerToEntity'},
+                'Club' => $task->{'strLocalName'},
+                'Venue' => $task->{'strLocalName'},
+                'PersonRegisterTo' => $task->{'registerToEntity'},
+                'RegistrationType' => $task->{'sysConfigApprovalLockRuleFor'},
+            );
+
             $emailNotification->setRealmID($Data->{'Realm'});
             $emailNotification->setSubRealmID(0);
             $emailNotification->setToEntityID($approvalEntityID);
@@ -967,6 +980,8 @@ sub addWorkFlowTasks {
             $emailNotification->setSubject("Work Task ID ");
             $emailNotification->setLang($Data->{'lang'});
             $emailNotification->setDbh($Data->{'db'});
+            $emailNotification->setData($Data);
+            $emailNotification->setWorkTaskDetails(\%notificationData);
 
             my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
             $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
@@ -1019,6 +1034,18 @@ sub approveTask {
     my $WFTaskID = safe_param('TID','number') || '';
 
     my $task = getTask($Data, $WFTaskID);
+
+    my %notificationData = (
+        'Reason' => $task->{'holdNotes'},
+        'WorkTaskType' => getWorkTaskType($Data, $task),
+        'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+        'PersonRegisterTo' => $task->{'registerToEntity'},
+        'Club' => $task->{'strLocalName'},
+        'Venue' => $task->{'strLocalName'},
+        'PersonRegisterTo' => $task->{'registerToEntity'},
+        'RegistrationType' => $task->{'sysConfigApprovalLockRuleFor'},
+    );
+
     my $sysConfigApprovalLockPaymentRequired = $Data->{'SystemConfig'}{'lockApproval_PaymentRequired_' . $task->{'sysConfigApprovalLockRuleFor'}};
     my $error = 0;
     my $response;
@@ -1072,9 +1099,11 @@ sub approveTask {
             $emailNotification->setSubject("Work Task ID " . $WFTaskID);
             $emailNotification->setLang($Data->{'lang'});
             $emailNotification->setDbh($Data->{'db'});
+            $emailNotification->setData($Data);
+            $emailNotification->setWorkTaskDetails(\%notificationData);
 
             my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
-            #$emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
+            $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
         }
 
     $st = qq[
@@ -1792,6 +1821,19 @@ sub resolveTask {
     #FC-144 get current task based on taskid param
     my $task = getTask($Data, $WFTaskID);
 
+    print STDERR Dumper $task;
+
+    my %notificationData = (
+        'Reason' => $task->{'holdNotes'},
+        'WorkTaskType' => getWorkTaskType($Data, $task),
+        'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+        'PersonRegisterTo' => $task->{'registerToEntity'},
+        'Club' => $task->{'strLocalName'},
+        'Venue' => $task->{'strLocalName'},
+        'PersonRegisterTo' => $task->{'registerToEntity'},
+        'RegistrationType' => $task->{'sysConfigApprovalLockRuleFor'},
+    );
+
     return if (!$task or ($task eq undef));
 
     #if($task->{strWFRuleFor} eq 'ENTITY') {
@@ -1851,6 +1893,8 @@ sub resolveTask {
         $emailNotification->setSubject("Work Task ID " . $WFTaskID);
         $emailNotification->setLang($Data->{'lang'});
         $emailNotification->setDbh($Data->{'db'});
+        $emailNotification->setData($Data);
+        $emailNotification->setWorkTaskDetails(\%notificationData);
 
         my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
         $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
@@ -1874,6 +1918,19 @@ sub rejectTask {
 
     #FC-144 get current task based on taskid param
     my $task = getTask($Data, $WFTaskID);
+
+    my %notificationData = (
+        'Reason' => $task->{'rejectNotes'},
+        'WorkTaskType' => getWorkTaskType($Data, $task),
+        'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+        'PersonRegisterTo' => $task->{'registerToEntity'},
+        'Club' => $task->{'strLocalName'},
+        'Venue' => $task->{'strLocalName'},
+        'PersonRegisterTo' => $task->{'registerToEntity'},
+        'RegistrationType' => $task->{'sysConfigApprovalLockRuleFor'},
+    );
+
+
 
     return if (!$task or ($task eq undef));
 
@@ -1927,6 +1984,8 @@ sub rejectTask {
         $emailNotification->setSubject("Work Task ID " . $WFTaskID);
         $emailNotification->setLang($Data->{'lang'});
         $emailNotification->setDbh($Data->{'db'});
+        $emailNotification->setData($Data);
+        $emailNotification->setWorkTaskDetails(\%notificationData);
 
         my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
         $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
@@ -1977,6 +2036,27 @@ sub getNotificationMessage {
     return $notifPrefix . " " . $message;
 }
 
+sub getWorkTaskType {
+    my ($Data, $task) = @_;
+
+    my $ruleForType;
+
+    if($task->{'strWFRuleFor'} eq "ENTITY" and $task->{'intEntityLevel'} == $Defs::LEVEL_CLUB){
+        $ruleForType = $task->{'strRegistrationNature'} . "_CLUB";
+    }
+    elsif($task->{'strWFRuleFor'} eq "ENTITY" and $task->{'intEntityLevel'} == $Defs::LEVEL_VENUE) {
+        $ruleForType = $task->{'strRegistrationNature'} . "_VENUE";
+    }
+    elsif($task->{'strWFRuleFor'} eq "REGO") {
+        $ruleForType = $task->{'strRegistrationNature'} . "_" . $task->{'strPersonType'};
+    }
+    elsif($task->{'strWFRuleFor'} eq "PERSON") {
+        $ruleForType = $task->{'strRegistrationNature'} . "_PERSON";
+    }
+
+    return $Data->{'lang'}->txt($Defs::workTaskTypeLabel{$ruleForType});
+}
+
 sub getTask {
     my ($Data, $WFTaskID) = @_;
 
@@ -2021,7 +2101,9 @@ sub getTask {
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             rnt.intTaskNoteID as rejectTaskNoteID,
             rnt.intCurrent as rejectCurrent,
+            rnt.strNotes as rejectNotes,
             tnt.intTaskNoteID as holdTaskNoteID,
+            tnt.strNotes as holdNotes,
             pre.strLocalName as registerToEntity,
             tnt.intCurrent as holdCurrent
         FROM
@@ -3672,6 +3754,7 @@ sub toggleTask {
             $emailNotification->setSubject("Work Task ID " . $WFTaskID);
             $emailNotification->setLang($Data->{'lang'});
             $emailNotification->setDbh($Data->{'db'});
+            $emailNotification->setData($Data);
 
             my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
             $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
@@ -3688,6 +3771,18 @@ sub holdTask {
 
     my $WFTaskID = safe_param('TID','number') || '';
     my $task = getTask($Data, $WFTaskID);
+
+    my %notificationData = (
+        'Reason' => $task->{'holdNotes'},
+        'WorkTaskType' => getWorkTaskType($Data, $task),
+        'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+        'PersonRegisterTo' => $task->{'registerToEntity'},
+        'Club' => $task->{'strLocalName'},
+        'Venue' => $task->{'strLocalName'},
+        'PersonRegisterTo' => $task->{'registerToEntity'},
+        'RegistrationType' => $task->{'sysConfigApprovalLockRuleFor'},
+    );
+
     my $currentToggle = safe_param('t', 'number') || 0;
     my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
@@ -3745,6 +3840,8 @@ sub holdTask {
             $emailNotification->setSubject("Work Task ID " . $WFTaskID);
             $emailNotification->setLang($Data->{'lang'});
             $emailNotification->setDbh($Data->{'db'});
+            $emailNotification->setData($Data);
+            $emailNotification->setWorkTaskDetails(\%notificationData);
 
             my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
             $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
