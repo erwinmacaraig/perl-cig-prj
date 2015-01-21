@@ -5,6 +5,8 @@ UPDATE tblEntity SET strImportEntityCode = 'FAS' WHERE intEntityID = 1 LIMIT 1;
 
 perl CSVReader.pl -directory=csv/singapore -format=csv -realmid=1 -notes=import test -national=0
 
+UPDATE tblPersonRegistration_1 SET strSport='FOOTBALL' WHERE strPersonType='REFEREE';
+
 from importer/
 ./FIFA_3to2_ISO.pl
 ./importer_FixPRs.pl
@@ -14,6 +16,9 @@ cd ../automatic -> ./tempEntityStructure.pl
 UPDATE tblPerson SET strOtherPersonIdentifier=strPassportNo, intOtherPersonIdentifierTypeID=558019 WHERE (strOtherPersonIdentifier IS NULL or strOtherPersonIdentifier="") and (strPassportNo <> "" and strPassportNo IS NOT NULL) AND intRealmID=1;
 UPDATE tblPersonRegistration_1 SET strPersonLevel ="" WHERE strPersonLevel IS NULL;
 UPDATE tblPerson SET intSystemStatus =1;
+UPDATE tblGenerate SET intCurrentNum=0 WHERE intGenerateID=2;
+UPDATE tblProducts SET intProductNationalPeriodID=8;
+UPDATE tblPersonRegistration_1 SET dtApproved=dtFrom;
 
 ./importer_AuditLog.pl
 ./importer_assignNationalNumber.pl

@@ -250,8 +250,8 @@ sub personRegistrationsHistory   {
         id => $rego->{'intPersonRegistrationID'} || 0,
         EntityLocalName=> $name,
         EntityLatinName=> $rego->{'strLatinName'} || '',
-        dtAdded=> $Data->{'l10n'}{'date'}->TZformat($rego->{'dtAdded'},'MEDIUM','SHORT') || '',
-        dtAdded_RAW=> $rego->{'dtAdded'} || '',
+        dtApproved=> $Data->{'l10n'}{'date'}->TZformat($rego->{'dtApproved'},'MEDIUM','SHORT') || '',
+        dtApproved_RAW=> $rego->{'dtApproved'} || '',
         PersonType=> $rego->{'PersonType'} || '',
         PersonLevel=> $rego->{'PersonLevel'} || '',
         AgeLevel=> $rego->{'AgeLevel'} || '',
@@ -316,8 +316,8 @@ sub personRegistrationsHistory   {
         },
         {
             name  => $Data->{'lang'}->txt('Date Registered'),
-            field => 'dtAdded',
-            sortdata => 'dtAdded_RAW',
+            field => 'dtApproved',
+            sortdata => 'dtApproved_RAW',
         },
         {
             type  => 'Selector',

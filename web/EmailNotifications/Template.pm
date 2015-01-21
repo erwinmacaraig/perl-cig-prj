@@ -55,6 +55,7 @@ sub retrieve {
             r.strRealmName,
             ett.strTemplateType,
             ett.strFileNamePrefix,
+            ett.strStatus,
             et.strHTMLTemplatePath,
             et.strTextTemplatePath,
             et.strSubjectPrefix,
@@ -116,37 +117,67 @@ sub build {
         my $realmID = $self->{_notificationObj}->getRealmID() || 'generic';
         my $replace = "__REALMNAME__";
         my $templatePath = (defined $config->{'strHTMLTemplatePath'} and $config->{'strHTMLTemplatePath'}) ? $config->{'strHTMLTemplatePath'} : $config->{'strTextTemplatePath'};
-        $templatePath =~ s/\Q$replace/\E$realmID/g;
-        my $templateFile = $templatePath . '/' . $config->{'strFileNamePrefix'} . '.templ';
+        #$templatePath =~ s/\Q$replace/\E$realmID/g;
+        #my $templateFile = $templatePath . '/' . $config->{'strFileNamePrefix'} . '.templ';
+        my $templateFile = $templatePath . $config->{'strFileNamePrefix'} . '.templ';
 
+        #print STDERR Dumper "TEMPLATE FILE " . $templateFile;
         my %Data = (
             lang => $self->{_notificationObj}->getLang(),
             Realm => $self->{_notificationObj}->getRealmID(),
         );
 
+        #print STDERR Dumper $self->{_notificationObj}->getWorkTaskDetails();
         my %TemplateData = (
             To => {
                 email => $config->{'toEntityContactEmail'} ? $config->{'toEntityContactEmail'} : $config->{'toEntityEmail'} ? $config->{'toEntityEmail'} : $config->{'toClubContactEmail'},
                 name => $config->{'toEntityName'},
             },
             From => {
-                email => $self->{_notificationObj}->getDefsEmail() ? $self->{_notificationObj}->getDefsEmail() : $config->{'fromEntityContactEmail'} ? $config->{'fromEntityContactEmail'} : $config->{'fromClubContactEmail'},
+                email => $self->{_notificationObj}->getDefsEmail() ? $self->{_notificationObj}->getDefsEmail() : $config->{'fromEntityEmail'} ? $config->{'fromEntityEmail'} : $config->{'fromEntityContactEmail'},
                 name => $self->{_notificationObj}->getDefsName() ? $self->{_notificationObj}->getDefsName() : $config->{'fromEntityName'},
             },
             CC => {
                 email => undef,
                 name => undef,
             },
-            OtherData => {
-            },
+            RecipientName => $config->{'toEntityName'},
+            WorkTaskType => $self->{_notificationObj}->getWorkTaskDetails()->{'WorkTaskType'},
+            Person => $self->{_notificationObj}->getWorkTaskDetails()->{'Person'},
+            Club => $self->{_notificationObj}->getWorkTaskDetails()->{'Club'},
+            Venue => $self->{_notificationObj}->getWorkTaskDetails()->{'Venue'},
+            PersonRegisterTo => $self->{_notificationObj}->getWorkTaskDetails->{'PersonRegisterTo'},
+            ClubRegisterTo => $self->{_notificationObj}->getWorkTaskDetails()->{'ClubRegisterTo'},
+            VenueRegisterTo => $self->{_notificationObj}->getWorkTaskDetails()->{'VenueRegisterTo'},
+
+            Originator => $config->{'fromEntityName'},
+            SenderName => $config->{'fromEntityName'} || $self->{_notificationObj}->getDefsName() || 'Admin',
+            TemplateFile => $templateFile,
+            Reason => $self->{_notificationObj}->getWorkTaskDetails()->{'Reason'},
+            Status => $config->{'strStatus'},
+            RegistrationType => $self->{_notificationObj}->getWorkTaskDetails->{'RegistrationType'},
+            MA_HeaderName => $self->{_notificationObj}->getData()->{'SystemConfig'}{'EmailNotificationSysName'},
+            SysName => $self->{_notificationObj}->getData()->{'SystemConfig'}{'EmailNotificationSysName'},
+
+            MA_PhoneNumber => $self->{_notificationObj}->getData()->{'SystemConfig'}{'ma_phone_number'},
+            MA_HelpDeskPhone => $self->{_notificationObj}->getData()->{'SystemConfig'}{'help_desk_phone_number'},
+            MA_HelpDeskEmail => $self->{_notificationObj}->getData()->{'SystemConfig'}{'help_desk_email'},
+            MA_Website => $self->{_notificationObj}->getData()->{'SystemConfig'}{'ma_website'},
+
+            #Person Request below
+            CurrentClub => $self->{_notificationObj}->getWorkTaskDetails()->{'CurrentClub'},
+            RequestingClub => $self->{_notificationObj}->getWorkTaskDetails()->{'RequestingClub'} || $config->{'fromEntityName'},
+            MA => $self->{_notificationObj}->getWorkTaskDetails()->{'MA'} || '',
         );
-	
+
         $content = runTemplate(
-            \%Data,
+            $self->{_notificationObj}->getData(),
             \%TemplateData,
-            $templateFile
+            'emails/' . $templateFile
         );
-        
+
+        $TemplateData{'content'} = $content;
+
         $self->setContent($content);
         $self->setTemplateData(\%TemplateData);
     }

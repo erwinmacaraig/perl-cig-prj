@@ -27,3 +27,7 @@ DELETE FROM tblEntityLinks;
 
 DELETE FROM tblTempEntityStructure;
 DELETE FROM tblTempTreeStructure;
+DELETE FROM tblInvoice;
+DELETE FROM tblWFTaskNotes;
+DELETE FROM tblPayTry;
+DELETE FROM tblITCMessagesLog;

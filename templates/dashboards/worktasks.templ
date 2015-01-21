@@ -234,7 +234,9 @@
                 <input class="form-control search-client-string" value="[% client %]" type="hidden">
                 <span class="input-group-addon"><i class="fa fa-search"></i></span>
             </div>
+			
             <a class="show-advanced-search">[% Lang.txt('Advanced Search') %]</a>
+			[% IF CurrentLevel == Levels.NATIONAL %]
             <div class="advanced-search-fields clearfix">
                 <div>
                     <span><input type="checkbox" class="role" value="role">[% Lang.txt('Role') %]</span>
@@ -268,42 +270,39 @@
 			<div>
                 <span><input type="checkbox" class="club" value="club">[% Lang.txt('Club') %]</span>
             </div>
-			
+			<!--
             <div>
                 <span><input type="checkbox" class="venue" value="venue">[% Lang.txt('Venue') %]</span>
 			</div>
+			-->
 
-            <div>
-                <span><input type="checkbox" class="daterange" value="daterange">[% Lang.txt('Within these dates') %]</span>
-            </div>
- 			
-            <script type="text/javascript">
-                   jQuery().ready(function() {
-                       jQuery("#dtValidFrom").datepicker({
-                          dateFormat: 'yy-mm-dd',
-                          showButtonPanel: true
-                        });            
-                   });
-               </script>
-               <div class="datepickerFields">
-                    <label>From</label><input type="text" name="dtValidFrom" value="" id="dtValidFrom" size="12" class="datepicker"><i class="fa fa-calendar fa-2"></i>
-            	</div>
-                		<script type="text/javascript">
-                            jQuery().ready(function() {
-                                jQuery("#dtValidUntil").datepicker({
-                                    dateFormat: 'yy-mm-dd',
-                                    showButtonPanel: true
-                                });            
-                            });
-                        </script>
-                <div class="datepickerFields">
-        		    <label>To</label><input type="text" name="dtValidUntil" value="" id="dtValidUntil" size="12" class="datepicker"><i class="fa fa-calendar" fa-2></i>
-                </div>
+           
 				
 
             </div>
         </div>
     </div>
+	
+	[% ELSIF CurrentLevel == Levels.CLUB %]
+	<div class="advanced-search-fields clearfix">
+                <div>
+                    <span><input type="checkbox" class="role" value="role">[% Lang.txt('Role') %]</span>
+                    <select name="PersonType" id="PersonType" class="chosen">
+                        <option value=""> </option>
+                        [% FOREACH key IN PersonType.keys %]
+							[% NEXT IF key == 'MAOFFICIAL' %]
+							[% NEXT IF key == 'REFEREE' %]
+                            <option value="[% key %]">[% PersonType.$key %]</option>
+                        [% END %]
+                    </select>
+                </div>
+            
+				
+
+            </div>
+        </div>
+    </div>
+	[% END %]
 </div>
 
 <script src = "//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>

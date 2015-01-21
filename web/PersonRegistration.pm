@@ -640,6 +640,8 @@ sub getRegistrationData	{
             p.strStatus as personStatus,
             p.strISONationality,
             p.strNationalNum,
+            p.strLocalFirstname,
+            p.strLocalSurname,
             DATE_FORMAT(pr.dtFrom, "%Y%m%d") as dtFrom_,
             DATE_FORMAT(pr.dtTo, "%Y%m%d") as dtTo_,
             DATE_FORMAT(pr.dtFrom,'%d %b %Y') AS spaneldtFrom,

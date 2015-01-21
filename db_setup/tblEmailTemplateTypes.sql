@@ -7,6 +7,7 @@ CREATE TABLE `tblEmailTemplateTypes` (
     `strTemplateType` VARCHAR(100) NULL,
     `strFileNamePrefix` VARCHAR(100) NULL,
     `intActive` INT NULL DEFAULT '1',
+    `strStatus` VARCHAR(45) NULL DEFAULT 'NA',
     `tTimestamp` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`intEmailTemplateTypeID`),
     UNIQUE KEY `realm_template_type` (`intRealmID`, `strTemplateType`));
