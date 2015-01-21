@@ -54,8 +54,8 @@ ORDER BY
 	Labels => [
 		['SN','S/N'],
 		['strNationalNum','Registration Number'],
-		['Last Name','strLocalSurname'],
-		['First Name','strLocalFirstname'],
+		['strLocalSurname', 'Last Name'],
+		['strLocalFirstname', 'First Name'],
 		['dtDOB','DOB'],
 		['currentAge','Current Age'],
 		['strISONationality','Nationality'],
