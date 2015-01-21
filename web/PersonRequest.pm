@@ -1740,7 +1740,10 @@ sub sendITC {
       Fields =>  $FieldDefinitions ,
     );
 
-	my $templateFile = 'notification/'.$Data->{'Realm'}.'/personrequest/html/request_itc.templ';
+    #my $templateFile = 'notification/'.$Data->{'Realm'}.'/personrequest/html/request_itc.templ';
+    my $templateFileContent = 'emails/notification/personrequest/html/request_itc_content.templ';
+    my $templateWrapper = $Data->{'SystemConfig'}{'EmailNotificationWrapperTemplate'};
+
     my $p = new CGI;
     my %params = $p->Vars();
     my ($userData, $errors) = $obj->gather(\%params, {},'edit');
@@ -1753,10 +1756,28 @@ sub sendITC {
 	my $isocountries  = getISOCountriesHash();
     $userData->{'strISOCountryName'} = $isocountries->{$userData->{'strISOCountry'}} || '';
     $userData->{'strISONationalityName'} = $isocountries->{$userData->{'strISONationality'}} || '';
+
+    $userData->{'Status'} = 'ITCREQUEST';
+    $userData->{'WorkTaskType'} = $Data->{'lang'}->txt('Request for an International Transfer Certificate');
+    $userData->{'Originator'} = $clubObj->getValue('strLocalName') || $clubObj->getValue('strLatinShortName');
+    $userData->{'RecipientName'} = $maObj->name();
+    $userData->{'SenderName'} = $Defs::admin_email_name;
+
+    my $content = runTemplate(
+        $Data,
+        $userData,
+        $templateFileContent,
+    );
+
+    my %emailTemplateContent = (
+        content => $content,
+    );
+
     my ($emailsentOK, $message)  = sendTemplateEmail(
         $Data,
-        $templateFile,
-        $userData,
+        $templateWrapper,
+        #$userData,
+        \%emailTemplateContent,
         $email_to,
         $Data->{'lang'}->txt('Request for an International Transfer Certificate'),
         '',#$email_from,
