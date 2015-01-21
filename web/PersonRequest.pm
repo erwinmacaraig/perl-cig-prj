@@ -1771,6 +1771,11 @@ sub sendITC {
 
     my %emailTemplateContent = (
         content => $content,
+        MA_PhoneNumber => $Data->{'SystemConfig'}{'ma_phone_number'},
+        MA_HelpDeskPhone => $Data->{'SystemConfig'}{'help_desk_phone_number'},
+        MA_HelpDeskEmail => $Data->{'SystemConfig'}{'help_desk_email'},
+        MA_Website => $Data->{'SystemConfig'}{'ma_website'},
+        MA_HeaderName => $Data->{'SystemConfig'}{'EmailNotificationSysName'},
     );
 
     my ($emailsentOK, $message)  = sendTemplateEmail(
