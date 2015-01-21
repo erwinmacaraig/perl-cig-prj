@@ -1761,7 +1761,7 @@ sub sendITC {
     $userData->{'WorkTaskType'} = $Data->{'lang'}->txt('Request for an International Transfer Certificate');
     $userData->{'Originator'} = $clubObj->getValue('strLocalName') || $clubObj->getValue('strLatinShortName');
     $userData->{'RecipientName'} = $maObj->name();
-    $userData->{'SenderName'} = $Defs::admin_email_name;
+    $userData->{'SenderName'} = $clubObj->getValue('strLocalName') || $clubObj->getValue('strLatinShortName') || $Defs::admin_email_name;
 
     my $content = runTemplate(
         $Data,
@@ -1784,7 +1784,7 @@ sub sendITC {
         #$userData,
         \%emailTemplateContent,
         $email_to,
-        $Data->{'lang'}->txt('Request for an International Transfer Certificate'),
+        $Data->{'lang'}->txt('Request for an International Transfer Certificate') . ": " . $userData->{'strLocalFirstname'} . " " . $userData->{'strLocalSurname'},
         '',#$email_from,
     );
 
