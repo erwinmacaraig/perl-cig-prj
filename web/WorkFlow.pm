@@ -959,9 +959,10 @@ sub addWorkFlowTasks {
 
             my $task = getTask($Data, $qINS->{mysql_insertid});
 
+            my $workTaskType = getWorkTaskType($Data, $task);
             my %notificationData = (
                 'Reason' => '',
-                'WorkTaskType' => getWorkTaskType($Data, $task),
+                'WorkTaskType' => $workTaskType,
                 'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
                 'PersonRegisterTo' => $task->{'registerToEntity'},
                 'Club' => $task->{'strLocalName'},
@@ -977,7 +978,7 @@ sub addWorkFlowTasks {
             $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
             $emailNotification->setDefsName($Defs::admin_email_name);
             $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_ADDED);
-            $emailNotification->setSubject("Work Task ID ");
+            $emailNotification->setSubject($workTaskType);
             $emailNotification->setLang($Data->{'lang'});
             $emailNotification->setDbh($Data->{'db'});
             $emailNotification->setData($Data);
@@ -1128,9 +1129,10 @@ sub approveTask {
         PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
     }
     else {
+        my $workTaskType = getWorkTaskType($Data, $task);
         my %notificationData = (
             'Reason' => $task->{'holdNotes'},
-            'WorkTaskType' => getWorkTaskType($Data, $task),
+            'WorkTaskType' => $workTaskType,
             'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
             'PersonRegisterTo' => $task->{'registerToEntity'},
             'Club' => $task->{'strLocalName'},
@@ -1147,7 +1149,7 @@ sub approveTask {
             $emailNotification->setDefsEmail($Defs::admin_email);
             $emailNotification->setDefsName($Defs::admin_email_name);
             $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_APPROVED);
-            $emailNotification->setSubject("Work Task ID " . $WFTaskID);
+            $emailNotification->setSubject($workTaskType);
             $emailNotification->setLang($Data->{'lang'});
             $emailNotification->setDbh($Data->{'db'});
             $emailNotification->setData($Data);
@@ -1823,9 +1825,26 @@ sub resolveTask {
     #FC-144 get current task based on taskid param
     my $task = getTask($Data, $WFTaskID);
 
+	my $srn = qq[
+        SELECT
+            strNotes
+        FROM tblWFTaskNotes
+        WHERE
+            intWFTaskID = ?
+            AND strType = 'RESOLVE'
+        ORDER BY
+            intTaskNoteID
+        LIMIT 1
+    ];
+
+    my $nq = $db->prepare($srn);
+    $nq->execute($WFTaskID);
+    my $nr = $nq->fetchrow_hashref();
+
+    my $workTaskType = getWorkTaskType($Data, $task);
     my %notificationData = (
-        'Reason' => $task->{'holdNotes'},
-        'WorkTaskType' => getWorkTaskType($Data, $task),
+        'Reason' => $nr->{'strNotes'},
+        'WorkTaskType' => $workTaskType,
         'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
         'PersonRegisterTo' => $task->{'registerToEntity'},
         'Club' => $task->{'strLocalName'},
@@ -1890,7 +1909,7 @@ sub resolveTask {
         $emailNotification->setDefsEmail($Defs::admin_email);
         $emailNotification->setDefsName($Defs::admin_email_name);
         $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_RESOLVED);
-        $emailNotification->setSubject("Work Task ID " . $WFTaskID);
+        $emailNotification->setSubject($workTaskType);
         $emailNotification->setLang($Data->{'lang'});
         $emailNotification->setDbh($Data->{'db'});
         $emailNotification->setData($Data);
@@ -1972,9 +1991,10 @@ sub rejectTask {
         PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_REJECTED);
     }
     else {
+        my $workTaskType = getWorkTaskType($Data, $task);
         my %notificationData = (
             'Reason' => $task->{'rejectNotes'},
-            'WorkTaskType' => getWorkTaskType($Data, $task),
+            'WorkTaskType' => $workTaskType,
             'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
             'PersonRegisterTo' => $task->{'registerToEntity'},
             'Club' => $task->{'strLocalName'},
@@ -1991,7 +2011,7 @@ sub rejectTask {
             $emailNotification->setDefsEmail($Defs::admin_email);
             $emailNotification->setDefsName($Defs::admin_email_name);
             $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_REJECTED);
-            $emailNotification->setSubject("Work Task ID " . $WFTaskID);
+            $emailNotification->setSubject($workTaskType);
             $emailNotification->setLang($Data->{'lang'});
             $emailNotification->setDbh($Data->{'db'});
             $emailNotification->setData($Data);
@@ -3772,9 +3792,10 @@ sub holdTask {
     my $WFTaskID = safe_param('TID','number') || '';
     my $task = getTask($Data, $WFTaskID);
 
+    my $workTaskType = getWorkTaskType($Data, $task);
     my %notificationData = (
         'Reason' => $task->{'holdNotes'},
-        'WorkTaskType' => getWorkTaskType($Data, $task),
+        'WorkTaskType' => $workTaskType,
         'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
         'PersonRegisterTo' => $task->{'registerToEntity'},
         'Club' => $task->{'strLocalName'},
@@ -3837,7 +3858,7 @@ sub holdTask {
             $emailNotification->setDefsEmail($Defs::admin_email);
             $emailNotification->setDefsName($Defs::admin_email_name);
             $emailNotification->setNotificationType($nType);
-            $emailNotification->setSubject("Work Task ID " . $WFTaskID);
+            $emailNotification->setSubject($workTaskType);
             $emailNotification->setLang($Data->{'lang'});
             $emailNotification->setDbh($Data->{'db'});
             $emailNotification->setData($Data);
