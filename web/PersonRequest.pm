@@ -661,15 +661,17 @@ sub submitRequestPage {
                 CurrentClub => $regDetails->{'strLocalName'} || '',
             );
 
+            my $clubObj = getInstanceOf($Data, 'club');
+
             my $emailNotification = new EmailNotifications::PersonRequest();
             $emailNotification->setRealmID($Data->{'Realm'});
             $emailNotification->setSubRealmID(0);
             $emailNotification->setToEntityID($regDetails->{'intEntityID'});
             $emailNotification->setFromEntityID($entityID);
-            #$emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
-            #$emailNotification->setDefsName($Defs::admin_email_name);
+            $emailNotification->setDefsEmail($clubObj->getValue('strEmail')); #if set, this will be used instead of toEntityID
+            $emailNotification->setDefsName($clubObj->getValue('strLocalName') || $Defs::admin_email_name);
             $emailNotification->setNotificationType($requestType, "SENT");
-            $emailNotification->setSubject("Request ID - " . $requestID);
+            $emailNotification->setSubject($regDetails->{'strLocalFirstname'} . " " . $regDetails->{'strLocalSurname'});
             $emailNotification->setLang($Data->{'lang'});
             $emailNotification->setDbh($Data->{'db'});
             $emailNotification->setData($Data);
@@ -1121,7 +1123,7 @@ sub setRequestResponse {
     #$emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
     #$emailNotification->setDefsName($Defs::admin_email_name);
     $emailNotification->setNotificationType($request->{'strRequestType'}, $response);
-    $emailNotification->setSubject("Request ID - " . $requestID);
+    $emailNotification->setSubject($request->{'strLocalFirstname'} . ' ' . $request->{'strLocalSurname'});
     $emailNotification->setLang($Data->{'lang'});
     $emailNotification->setDbh($Data->{'db'});
     $emailNotification->setData($Data);
@@ -1582,17 +1584,21 @@ sub setRequestStatus {
     $emailNotification->setFromEntityID($task->{'intApprovalEntityID'});
     $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
     $emailNotification->setDefsName($Defs::admin_email_name);
-    $emailNotification->setSubject("Request ID - " . $task->{'intPersonRequestID'});
+    $emailNotification->setSubject($request->{'strLocalFirstname'} . ' ' . $request->{'strLocalSurname'});
     $emailNotification->setLang($Data->{'lang'});
     $emailNotification->setDbh($Data->{'db'});
     $emailNotification->setData($Data);
     $emailNotification->setWorkTaskDetails(\%notificationData);
 
     if($requestStatus eq $Defs::PERSON_REQUEST_STATUS_REJECTED) {
-        $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
-
         $emailNotification->setNotificationType($request->{'strRequestType'}, $Defs::PERSON_REQUEST_STATUS_REJECTED);
 
+        $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
+        my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+        $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
+
+        #send to previous club
+        $emailNotification->setToEntityID($request->{'intRequestToEntityID'});
         my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
         $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
     }
