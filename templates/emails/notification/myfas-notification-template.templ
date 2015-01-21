@@ -18,11 +18,11 @@
 </tr>
 <tr style="background-color:#085a8c; ">
 	<td width="50" style="padding-top:8px; padding-bottom:8px; padding-left:40px;">
-	  <h1 style="font-size:25px; font-weight:bold; color:#fff; font-family:arial, sans-serif; position:relative; top:20px; float:right; ">[% MA_HeaderName %]</h1>
+	  <h1 style="font-size:25px; font-weight:bold; color:#fff; font-family:arial, sans-serif; top:20px; float:right; margin-top: 35px">[% MA_HeaderName %]</h1>
 	  <img style="" src="[% BaseURL %]/images/emails/img-email-FAS-logo.png" border="0" />
 	</td>
 <td style="padding-top:8px; padding-bottom:8px;">&nbsp;</td>
-<td style="padding-top:8px; padding-bottom:8px;" width="125">
+<td style="padding-top:8px; padding-bottom:8px; padding-right: 80px"  width="125">
   <a href="[% BaseURL %]"><img src="[% BaseURL %]/images/emails/img-email-login-btn.png" border="0" /></a>
 </td>
 </tr>
@@ -30,27 +30,29 @@
 [% content %]
 
 <tr style="background-color: #085a8c;"><!--Email footer content -->
-  <td valign="top" style="padding-top:30px; padding-bottom:30px;">
-    <ul style="font-family:arial, sans-serif; font-size:12px; color:#fff; list-style:none; width:200px;">
+  <td valign="top" style="padding-top:30px; padding-bottom:30px; width: 50%">
+    <ul style="font-family:arial, sans-serif; font-size:12px; color:#fff; list-style:none;">
       <li style="padding-bottom:8px;"><strong>[% Lang.txt("Member Association") %]</strong></li>
-      <li style="padding-bottom:8px;"><strong>[% Lang.txt("Phone") %]:</strong> [% MA_PhoneNumber %]</li>
-      <li style="padding-bottom:8px;"><strong>[% Lang.txt("Website") %]:</strong>&nbsp;<a href="[% MA_Website %]">[% MA_Website %]</a></li>
+      <li style="padding-bottom:8px;><strong>[% Lang.txt("Phone") %]:</strong> [% MA_PhoneNumber %]</li>
+      <li style="padding-bottom:8px; color: #fff""><strong>[% Lang.txt("Website") %]:</strong>&nbsp;<a style="color: #fff" href="[% MA_Website %]">[% MA_Website %]</a></li>
     </ul>
   </td>
-  <td valign="top" style="padding-top:30px; padding-bottom:30px;">
+  <td valign="top" style="padding-top:30px; padding-bottom:30px; width: 50%">
     <ul style="font-family:arial, sans-serif; font-size:12px; color:#fff; list-style:none;">
       <li style="padding-bottom:8px;"><strong>[% Lang.txt("Help Desk") %]</strong></li>
       <li style="padding-bottom:8px;"><strong>[% Lang.txt("Phone") %]:</strong> [% MA_HelpDeskPhone %]</li>
-      <li style="padding-bottom:8px;"><strong>[% Lang.txt("Email") %]:</strong> [% MA_HelpDeskEmail %]</li>
+      <li style="padding-bottom:8px; color: #fff""><strong>[% Lang.txt("Email") %]:</strong> <span style="color: #fff">[% MA_HelpDeskEmail %]</span></li>
     </ul>
   </td>
   <td>&nbsp;</td>
 </tr>
+<!--
 <tr style="background-color:#004e7e;">
 <td colspan="3" style="background-color: #004e7e; text-align:center; font-size:11px; color:#95a5a5; font-family:arial; height:23px;">
   [% Lang.txt("Copyright text goes here") %]
 </td>
 </tr>
+-->
 </table>
   </table>
 </body>
