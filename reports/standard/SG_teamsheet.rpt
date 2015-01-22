@@ -1,0 +1,82 @@
+{
+	SQL => qq[
+
+SELECT DISTINCT
+    '' as SN,
+    P.strNationalNum, 
+    P.strLocalSurname,
+    P.strLocalFirstname, 
+    P.dtDOB,
+    TIMESTAMPDIFF(YEAR, P.dtDOB, CURDATE()) as currentAge,
+    P.strISONationality,
+    P.strOtherPersonIdentifier,
+    PR.dtFrom,
+    IF(PR.dtTo = '0000-00-00', '', PR.dtTo) as DateTo,
+    CASE PR.strPersonLevel 
+        WHEN 'PROFESSIONAL' THEN 'Professional'
+        WHEN 'AMATEUR' THEN 'Amateur'
+        WHEN 'AMATEUR_U_C' THEN 'Amateur (Under Contract)'
+        ELSE ''
+    END as PersonLevel,
+    '' as MAControl,
+    '' as JNo,
+    '' as PO,
+    '' as NameInTeamSheet,
+    '' as Height,
+    '' as Weight,
+    '' as ContractStart,
+    '' as ContractEnd,
+    '' as ESPass,
+    '' as ITC,
+    '' as Remark
+FROM 
+    tblPerson as P 
+        INNER JOIN tblPersonRegistration_1 as PR 
+            ON (PR.intPersonID=P.intPersonID) 
+        INNER JOIN tblNationalPeriod as NP 
+            ON (NP.intNationalPeriodID=PR.intNationalPeriodID) 
+        INNER JOIN tblEntity as E 
+            ON (E.intEntityID=PR.intEntityID) 
+WHERE 
+    P.intRealmID = ###REALMID###
+    AND PR.intEntityID = ###CLUBID###
+    AND PR.strPersonType='PLAYER' 
+    AND P.strNationalNum <> ''
+    AND PR.intNationalPeriodID=8
+ORDER BY 
+    P.strLocalSurname
+	],
+	StatsReport => 0,
+	ReportEntity => 100,
+	ReportLevel => 0,
+	Template => 'default',
+	DistinctValues => 1,
+	Labels => [
+		['SN','S/N'],
+		['strNationalNum','Registration Number'],
+		['strLocalSurname', 'Last Name'],
+		['strLocalFirstname', 'First Name'],
+		['dtDOB','DOB'],
+		['currentAge','Current Age'],
+		['strISONationality','Nationality'],
+		['strOtherPersonIdentifier','NRCI/PP'],
+		['dtFrom','Reg Date'],
+		['DateTo','Dereg Date'],
+		['PersonLevel','Contract Type'],
+		['MAControl','MA Control'],
+		['','J/No'],
+		['','Pos'],
+		['','Name in Team Sheet'],
+		['','H (in mm)'],
+		['','W (in kg)'],
+		['','Contract Start'],
+		['','Contract End'],
+		['','ES Pass Expiry or In Principle'],
+		['','ITC'],
+		['','Remark'],
+	],
+	Sort => [
+		['strLocalSurname','ASC','string'],
+		['strLocalFirstname','ASC','string'],
+	],
+}

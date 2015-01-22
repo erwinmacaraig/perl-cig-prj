@@ -86,9 +86,9 @@ sub personRegistrationDetail   {
                 type => 'text',
                 readonly => 1,
             },
-            strPersonLevel => {
+            DateRego=> {
                 label => 'Date Registration Added',
-                value => $RegistrationDetail->{'dtAdded_formatted'},
+                value => $Data->{'l10n'}{'date'}->TZformat($RegistrationDetail->{'dtApproved'},'MEDIUM','SHORT'),
                 type => 'text',
                 readonly => 1,
             },
@@ -106,7 +106,7 @@ sub personRegistrationDetail   {
             strGender
             strRegistrationNature
             strPersonType
-            strPersonLevel
+            DateRego
             strShortNotes
         )],
         options => {
@@ -249,7 +249,7 @@ sub personRegistrationWorkTasks {
 
         push @rowdata, {
             id => $dref->{'WFTTaskID'} || 0,
-            dtAdded=> $dref->{'dtAdded_formatted'} || '',
+            dtAdded=>  $Data->{'l10n'}{'date'}->TZformat($dref->{'dtApproved'},'MEDIUM','SHORT') || '',
             PersonLevel=> $Defs::personLevel{$dref->{'strPersonLevel'}} || '',
             PersonEntityRole=> $dref->{'strEntityRoleName'} || '',
             PersonType=> $Defs::personType{$dref->{'strPersonType'}} || '',

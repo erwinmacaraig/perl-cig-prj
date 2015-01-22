@@ -1,0 +1,98 @@
+<tr>
+    <td colspan="3" style="background-color: #f6f6f6; padding:40px;">
+
+        <h2 style="color: #555e68; font-weight:bold; font-family:arial, sans-serif;">
+        [% Lang.txt("Dear") %] [% RecipientName %],
+        </h2>
+
+        <p style="font-family:arial, sans-serif; font-size:14px; color: #7d8892;">
+            [% Originator %] [% Lang.txt("has submitted an ITC request for the person listed below.") %]
+        </p>
+
+        <table style="font-family: arial, sans-serif; font-size:12px; color: #555e68; margin-left:-5px;" cellpadding="5">
+            <tr>
+                <td>[% Lang.txt("Work Task") %]:</td>
+                <td><strong>[% Lang.txt(WorkTaskType) %]</strong></td>
+            </tr>
+
+            <tr>
+                <td>[% Lang.txt("Requesting Club") %]:</td>
+                <td><strong>[% Originator %]</strong></td>
+            </tr>
+
+            <tr>
+                <td>[% Lang.txt("Status") %]:</td>
+                <td>
+                    [% IF Status == 'PENDING' %]
+                        <img src="[% BaseURL %]/images/emails/img-email-status-pending.png" border="0" />
+                    [% ELSIF Status == 'APPROVED' %]
+                        <img src="[% BaseURL %]/images/emails/img-email-status-approved.png" border="0" />&nbsp;
+                    [% ELSIF Status == 'REJECTED' %]
+                        <img src="[% BaseURL %]/images/emails/img-email-status-rejected.png" border="0" />&nbsp;
+                    [% ELSIF Status == 'REASSIGNED' %]
+                        <img src="[% BaseURL %]/images/emails/img-email-status-reassigned.png" border="0" />&nbsp;
+                    [% ELSIF Status == 'CANCELLED' %]
+                        <img src="[% BaseURL %]/images/emails/img-email-status-cancelled.png" border="0" />&nbsp;
+                    [% ELSIF Status == 'ITCREQUEST' %]
+                        <img src="[% BaseURL %]/images/emails/img-email-status-itc-request.png" border="0" />&nbsp;
+                    [% ELSE %]
+                        <strong>[% Lang.txt("N/A") %]</strong>
+                    [% END %]
+                </td>
+            </tr>
+
+            <tr><br/></tr>
+
+            <tr>
+                <td><strong> - [% Lang.txt("Player\'s Data") %] - </strong></td>
+            </tr>
+
+            <tr>
+                <td>[% Lang.txt("Family Name") %]:</td>
+                <td><strong>[% strLocalSurname %]</strong></td>
+            </tr>
+
+            <tr>
+                <td>[% Lang.txt("First Name") %]:</td>
+                <td><strong>[% strLocalFirstname %]</strong></td>
+            </tr>
+
+            <tr>
+                <td>[% Lang.txt("Date of Birth") %]:</td>
+                <td><strong>[% DateFormat.format(dtDOB,'MEDIUM') %]</strong></td>
+            </tr>
+
+            <tr>
+                <td>[% Lang.txt("Nationality") %]:</td>
+                <td><strong>[% strISONationalityName %]</strong></td>
+            </tr>
+
+            <tr>
+                <td>[% Lang.txt("Player\'s ID") %]:</td>
+                <td><strong>[% strPlayerID %]</strong></td>
+            </tr>
+
+            <tr><br/></tr>
+
+            <tr>
+                <td><strong> - [% Lang.txt("Previous Club") %] - </strong></td>
+            </tr>
+
+            <tr>
+                <td>[% Lang.txt("Country") %]:</td>
+                <td><strong>[% strISOCountryName %]</strong></td>
+            </tr>
+
+            <tr>
+                <td>[% Lang.txt("Club\'s Name") %]:</td>
+                <td><strong>[% strClubName %]</strong></td>
+            </tr>
+
+        </table>
+
+        <p style="font-family:arial, sans-serif; font-size:14px; color: #7d8892;">
+            [% Lang.txt("Regards") %],<br />
+            [% SenderName %]
+        </p>
+    </td>
+</tr>

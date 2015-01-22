@@ -163,21 +163,25 @@ header .logo-area.notloginlevel    {
     margin-top:45px;
 }
 
-header .logo-area img {
+header .logo-area img.header-logo {
 	float: left;
+	max-width:125px;
 }
 
 header .logo-area h1 {
-	margin: 30px 20px;
+	margin: 0px 20px;
 	color: #fff;
-	font-size: 24px;
+	font-size: 30px;
 	font-family: 'noto_sansbold';
 	font-weight: normal;
 	float: left;
+	position:relative;
+	top:50px;
 }
 
 header .logo-area ul {
 	float: right;
+	margin-top:40px;
 }
 
 header .logo-area ul li {
