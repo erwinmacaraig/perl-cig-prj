@@ -754,6 +754,7 @@ table tr.new-task {
 }
 .fieldSectionGroupWrapper-DisplayOnly .panel-body {
     background-color:transparent;
+    margin-top:20px;
 }
 
 .fieldSectionGroupWrapper-DisplayOnly .panel-header{
