@@ -38,7 +38,11 @@ sub sendTemplateEmail	{
 	$fromaddress ||= $Defs::admin_email;
     $fromaddress = $Defs::admin_email if  $fromaddress eq ';';
     my $fromname = '';
-    if($fromaddress eq $Defs::admin_email)  {
+
+    if($Data->{'SystemConfig'}{'AdminEmailSenderName'}) {
+        $fromname = $Data->{'SystemConfig'}{'AdminEmailSenderName'};
+    }
+    elsif($fromaddress eq $Defs::admin_email)  {
         $fromname = $Defs::admin_email_name;
     }
 
