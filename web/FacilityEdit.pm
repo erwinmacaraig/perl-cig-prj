@@ -173,7 +173,12 @@ sub handleFacilityEdit {
 
     }
 
-    $body = qq[ <div class="col-md-12">$body</div>];
+    my $auditLog = '';
+    if ($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL) {
+        #$auditLog = qq[<a href="$Data->{'target'}?client=$client&amp;a=V_HISTLOG&amp;venueID=$entityID">].$Data->{'lang'}->txt('Audit Trail').qq[</a>];
+        $auditLog = qq[<a href="$Data->{'target'}?client=$client&amp;a=V_HISTLOG&amp;venueID=$entityID" class = "btn-main">].$Data->{'lang'}->txt('Audit Trail')."</a><br><br>" ;
+    }
+    $body = qq[ $auditLog<div class="col-md-12">$body</div>];
 
     my $pageHeading = $entityObj->name();
     return ($body, $pageHeading);
