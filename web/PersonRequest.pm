@@ -668,8 +668,10 @@ sub submitRequestPage {
             $emailNotification->setSubRealmID(0);
             $emailNotification->setToEntityID($regDetails->{'intEntityID'});
             $emailNotification->setFromEntityID($entityID);
-            $emailNotification->setDefsEmail($clubObj->getValue('strEmail')); #if set, this will be used instead of toEntityID
-            $emailNotification->setDefsName($clubObj->getValue('strLocalName') || $Defs::admin_email_name);
+            #$emailNotification->setDefsEmail($clubObj->getValue('strEmail')); #if set, this will be used instead of toEntityID
+            #$emailNotification->setDefsName($clubObj->getValue('strLocalName') || $Defs::admin_email_name);
+            $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
+            $emailNotification->setDefsName($Defs::admin_email_name);
             $emailNotification->setNotificationType($requestType, "SENT");
             $emailNotification->setSubject($regDetails->{'strLocalFirstname'} . " " . $regDetails->{'strLocalSurname'});
             $emailNotification->setLang($Data->{'lang'});
@@ -1120,8 +1122,8 @@ sub setRequestResponse {
     #$emailNotification->setFromEntityID($request->{'intRequestToEntityID'});
     $emailNotification->setToEntityID($entityAsReceiverID);
     $emailNotification->setFromEntityID($entityAsSenderID);
-    #$emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
-    #$emailNotification->setDefsName($Defs::admin_email_name);
+    $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
+    $emailNotification->setDefsName($Defs::admin_email_name);
     $emailNotification->setNotificationType($request->{'strRequestType'}, $response);
     $emailNotification->setSubject($request->{'strLocalFirstname'} . ' ' . $request->{'strLocalSurname'});
     $emailNotification->setLang($Data->{'lang'});
