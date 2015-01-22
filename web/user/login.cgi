@@ -78,6 +78,13 @@ sub main {
 
                 $Data{'RedirectTo'} = "$Defs::base_url/authenticate.cgi?i=$id&amp;t=$type";
             }
+        $body = qq[
+                <SCRIPT LANGUAGE="JavaScript1.2">
+                        parent.location.href="$Defs::base_url/authenticate.cgi?i=$id&amp;t=$type";
+                        noScript = 1;
+                </SCRIPT>
+        ];
+
         }
 
     }

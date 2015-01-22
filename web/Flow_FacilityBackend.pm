@@ -255,8 +255,8 @@ sub validate_contact_details {
     my $self = shift;
 
     my $facilityData = {};
-    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'contactdetails'}, 'Club',);
-    ($facilityData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
+    #my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'contactdetails'}, 'Club',);
+    ($facilityData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields();
     my $id = $self->ID() || 0;
     if(!$id){
         push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid facility.';
