@@ -265,7 +265,7 @@ sub processData {
 		}
 		else 	{
 			$output_array = $data_array;
-			print STDERR $@;
+			#print STDERR $@;
 		}
 	}
 	else	{
