@@ -1526,11 +1526,13 @@ body.membership-login {
 }
 
 body.membership-login p {
-  font-size: 18px;
-  color: #464646;
   margin: 15px 0;
   letter-spacing: -0.5px;
   line-height: 22px;
+  font-size: 13px;
+  font-weight: normal;
+  color:#a7a7a7;
+  text-align: center;
 }
 
 body.membership-login p.pageHeading {

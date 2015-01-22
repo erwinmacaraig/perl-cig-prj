@@ -2200,10 +2200,3 @@ div[id*="doctab"] .documents-list table.table .task-list .status-col a.btn-insid
 	float: right;
 	padding-top: 5px;
 }
-
-p.forgotPassword {
-	text-align: center;
-	font-size: 13px!important;
-	font-weight: normal;
-	color:#a7a7a7!important;
-}
