@@ -29,7 +29,7 @@
 
     <div id = "docViewerFileBlock">
     [% IF doctype == 'pdf' %]
-    <object data="[% fileURL %]" type="application/pdf" width="100%" height="100%">
+    <!--<object data="[% fileURL %]" type="application/pdf" width="100%" height="100%">-->
         <iframe src = "js/pdf/web/viewer.html?file=[% fileURLescape %]" style = "width:100%;height:100%;"> 
         <div class = "panel-body">
       <p>[% Lang.txt("It appears you don't have a PDF plugin for this browser.") %]</p>
@@ -37,7 +37,7 @@
         </div>
         </iframe>
       
-    </object>
+    <!--</object>-->
     PDF
     [% ELSIF doctype == 'image' %]
         <div class = "docViewer-imgBlock"><img src="[% fileURL %]" ></div>
