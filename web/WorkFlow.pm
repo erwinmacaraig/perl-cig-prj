@@ -513,7 +513,6 @@ sub listTasks {
             taskDate => $dref->{taskDate},
             viewURL => $viewTaskURL,
             taskTypeLabel => $viewTaskURL,
-            RequestFromClub => $dref->{'preqFromClub'},
             RequestToClub => $dref->{'preqToClub'},
             taskTimeStamp => $dref->{'taskTimeStamp'},
             newTask => $newTask,
@@ -895,7 +894,7 @@ sub addWorkFlowTasks {
         #AND e.strEntityType = r.strEntityType
 	    $q = $db->prepare($st);
   	    $q->execute($entityID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
-    }
+	}
     if ($ruleFor eq 'DOCUMENT' and $documentID)    {
         ## APPROVAL FOR DOCUMENT
         $st = qq[
@@ -2298,7 +2297,7 @@ sub viewTask {
     my %PaymentsData;
     my %ActionsData;
     my %fields;
-	open FH, ">dumpfile.txt";
+
 	
     switch($dref->{strWFRuleFor}) {
         case 'REGO' {
@@ -2356,7 +2355,7 @@ sub viewTask {
 
     my $disableApprove = ($documentStatusCount->{'PENDING'} or $documentStatusCount->{'MISSING'} or $documentStatusCount->{'REJECTED'}) ? 1 : 0;
 
-    #print STDERR Dumper $dref;
+
     my %TaskAction = (
         'ApprovalEntityLevel' => $dref->{'ApprovalEntityLevel'},
         'WFTaskID' => $dref->{intWFTaskID} || 0,
@@ -2919,7 +2918,8 @@ sub populateDocumentViewData {
             AND wt.intRealmID = ?
         ORDER BY dt.strDocumentName, d.intDocumentID DESC
     ];
-   
+
+	 
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
     $q->execute(
         $dref->{'intWFTaskID'},
