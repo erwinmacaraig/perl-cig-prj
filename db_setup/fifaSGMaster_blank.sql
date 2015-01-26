@@ -987,7 +987,7 @@ CREATE TABLE `tblClearance` (
   KEY `index_intClearanceYear` (`intClearanceYear`),
   KEY `index_FromYear` (`intCreatedFrom`,`intClearanceYear`),
   KEY `index_dtApplied` (`dtApplied`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1089,7 +1089,7 @@ CREATE TABLE `tblClearancePath` (
   KEY `index_intID` (`intID`),
   KEY `index_intClearanceStatus` (`intClearanceStatus`),
   KEY `index_intClearanceID` (`intClearanceID`)
-) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1866,7 +1866,7 @@ CREATE TABLE `tblDuplChanges` (
   KEY `index_intNewID` (`intNewID`),
   KEY `index_intEntityIDtstampNew` (`intEntityID`,`tTimeStamp`,`intNewID`),
   KEY `index_intEntityIDtstampOld` (`intEntityID`,`tTimeStamp`,`intOldID`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1891,11 +1891,12 @@ CREATE TABLE `tblEmailTemplateTypes` (
   `intSubRealmID` int(11) NOT NULL,
   `strTemplateType` varchar(100) DEFAULT NULL,
   `strFileNamePrefix` varchar(100) DEFAULT NULL,
+  `strStatus` varchar(45) DEFAULT 'NA',
   `intActive` int(11) DEFAULT '1',
   `tTimestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`intEmailTemplateTypeID`),
   UNIQUE KEY `realm_template_type` (`intRealmID`,`strTemplateType`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1904,7 +1905,7 @@ CREATE TABLE `tblEmailTemplateTypes` (
 
 LOCK TABLES `tblEmailTemplateTypes` WRITE;
 /*!40000 ALTER TABLE `tblEmailTemplateTypes` DISABLE KEYS */;
-INSERT INTO `tblEmailTemplateTypes` VALUES (1,1,0,'NOTIFICATION_WFTASK_ADDED','wftask_added',1,'2014-10-16 02:46:57'),(2,1,0,'NOTIFICATION_WFTASK_APPROVED','wftask_approved',1,'2014-10-16 02:46:57'),(3,1,0,'NOTIFICATION_WFTASK_REJECTED','wftask_rejected',1,'2014-10-16 02:46:57'),(4,1,0,'NOTIFICATION_WFTASK_RESOLVED','wftask_resolved',1,'2014-10-16 02:46:57'),(5,1,0,'NOTIFICATION_WFTASK_HELD','wftask_held',1,'2014-10-16 02:46:57'),(6,1,0,'NOTIFICATION_WFTASK_RESUMED','wftask_resumed',1,'2014-10-16 02:46:57'),(7,1,0,'NOTIFICATION_REQUESTACCESS_ACCEPTED','requestaccess_accepted',1,'2014-10-16 02:46:57'),(8,1,0,'NOTIFICATION_REQUESTACCESS_DENIED','requestaccess_denied',1,'2014-10-16 02:46:57'),(9,1,0,'NOTIFICATION_REQUESTACCESS_OVERRIDDEN','requestaccess_overridden',1,'2014-10-16 02:46:57'),(10,1,0,'NOTIFICATION_REQUESTACCESS_REJECTED','requestaccess_rejected',1,'2014-10-16 02:46:57'),(11,1,0,'NOTIFICATION_REQUESTACCESS_COMPLETED','requestaccess_completed',1,'2014-10-16 02:46:57'),(12,1,0,'NOTIFICATION_REQUESTTRANSFER_ACCEPTED','requesttransfer_accepted',1,'2014-10-16 02:46:57'),(13,1,0,'NOTIFICATION_REQUESTTRANSFER_DENIED','requesttransfer_denied',1,'2014-10-16 02:46:57'),(14,1,0,'NOTIFICATION_REQUESTTRANSFER_OVERRIDDEN','requesttransfer_overridden',1,'2014-10-16 02:46:57'),(15,1,0,'NOTIFICATION_REQUESTTRANSFER_REJECTED','requesttransfer_rejected',1,'2014-10-16 02:46:57'),(16,1,0,'NOTIFICATION_REQUESTTRANSFER_COMPLETED','requesttransfer_completed',1,'2014-10-16 02:46:57'),(17,1,0,'NOTIFICATION_REQUESTACCESS_SENT','requestaccess_sent',1,'2014-10-16 02:46:57'),(18,1,0,'NOTIFICATION_REQUESTTRANSFER_SENT','requesttransfer_sent',1,'2014-10-16 02:46:57');
+INSERT INTO `tblEmailTemplateTypes` VALUES (1,1,0,'NOTIFICATION_WFTASK_ADDED','wftask_added','PENDING',1,'2015-01-20 20:06:10'),(2,1,0,'NOTIFICATION_WFTASK_APPROVED','wftask_approved','APPROVED',1,'2015-01-20 20:06:10'),(3,1,0,'NOTIFICATION_WFTASK_REJECTED','wftask_rejected','REJECTED',1,'2015-01-20 20:06:10'),(4,1,0,'NOTIFICATION_WFTASK_RESOLVED','wftask_resolved','PENDING',1,'2015-01-20 20:06:10'),(5,1,0,'NOTIFICATION_WFTASK_HELD','wftask_held','PENDING',1,'2015-01-20 20:06:10'),(6,1,0,'NOTIFICATION_WFTASK_RESUMED','wftask_resumed','PENDING',1,'2015-01-20 20:06:10'),(7,1,0,'NOTIFICATION_REQUESTACCESS_ACCEPTED','requestaccess_accepted','APPROVED',1,'2015-01-20 20:06:10'),(8,1,0,'NOTIFICATION_REQUESTACCESS_DENIED','requestaccess_denied','REJECTED',1,'2015-01-20 20:06:10'),(9,1,0,'NOTIFICATION_REQUESTACCESS_OVERRIDDEN','requestaccess_overridden','REASSIGNED',1,'2015-01-20 20:06:10'),(10,1,0,'NOTIFICATION_REQUESTACCESS_REJECTED','requestaccess_rejected','REJECTED',1,'2015-01-20 20:06:10'),(11,1,0,'NOTIFICATION_REQUESTACCESS_COMPLETED','requestaccess_completed','APPROVED',1,'2015-01-20 20:06:10'),(12,1,0,'NOTIFICATION_REQUESTTRANSFER_ACCEPTED','requesttransfer_accepted','APPROVED',1,'2015-01-20 20:06:10'),(13,1,0,'NOTIFICATION_REQUESTTRANSFER_DENIED','requesttransfer_denied','REJECTED',1,'2015-01-20 20:06:10'),(14,1,0,'NOTIFICATION_REQUESTTRANSFER_OVERRIDDEN','requesttransfer_overridden','REASSIGNED',1,'2015-01-20 20:06:10'),(15,1,0,'NOTIFICATION_REQUESTTRANSFER_REJECTED','requesttransfer_rejected','REJECTED',1,'2015-01-20 20:06:10'),(16,1,0,'NOTIFICATION_REQUESTTRANSFER_COMPLETED','requesttransfer_completed','APPROVED',1,'2015-01-20 20:06:10'),(17,1,0,'NOTIFICATION_REQUESTACCESS_SENT','requestaccess_sent','PENDING',1,'2015-01-20 20:06:10'),(18,1,0,'NOTIFICATION_REQUESTTRANSFER_SENT','requesttransfer_sent','PENDING',1,'2015-01-20 20:06:10'),(19,1,0,'NOTIFICATION_REQUESTACCESS_CANCELLED','requestaccess_cancelled','CANCELLED',1,'2015-01-20 20:06:10'),(20,1,0,'NOTIFICATION_REQUESTTRANSFER_CANCELLED','requesttransfer_cancelled','CANCELLED',1,'2015-01-20 20:06:10');
 /*!40000 ALTER TABLE `tblEmailTemplateTypes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1925,7 +1926,7 @@ CREATE TABLE `tblEmailTemplates` (
   `intActive` int(11) DEFAULT '1',
   `tTimestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`intEmailTemplateID`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1934,7 +1935,7 @@ CREATE TABLE `tblEmailTemplates` (
 
 LOCK TABLES `tblEmailTemplates` WRITE;
 /*!40000 ALTER TABLE `tblEmailTemplates` DISABLE KEYS */;
-INSERT INTO `tblEmailTemplates` VALUES (1,1,'emails/notification/__REALMNAME__/workflow/html/','','WORK TASK ADDED: ',1,1,'2014-10-16 02:47:01'),(2,2,'emails/notification/__REALMNAME__/workflow/html/','','WORK TASK APPROVED: ',1,1,'2014-10-16 02:47:01'),(3,3,'emails/notification/__REALMNAME__/workflow/html/','','WORK TASK REJECTED: ',1,1,'2014-10-16 02:47:01'),(4,4,'emails/notification/__REALMNAME__/workflow/html/','','WORK TASK RESOLVED: ',1,1,'2014-10-16 02:47:01'),(5,5,'emails/notification/__REALMNAME__/workflow/html/','','WORK TASK HELD: ',1,1,'2014-10-16 02:47:01'),(6,6,'emails/notification/__REALMNAME__/workflow/html/','','WORK TASK RESUMED: ',1,1,'2014-10-16 02:47:01'),(7,7,'emails/notification/__REALMNAME__/personrequest/html/','','PERSON REQUEST ACCESS ACCEPTED: ',1,1,'2014-10-16 02:47:01'),(8,8,'emails/notification/__REALMNAME__/personrequest/html/','','PERSON REQUEST ACCESS DENIED: ',1,1,'2014-10-16 02:47:01'),(9,9,'emails/notification/__REALMNAME__/personrequest/html/','','PERSON REQUEST ACCESS OVERRIDDEN: ',1,1,'2014-10-16 02:47:01'),(10,10,'emails/notification/__REALMNAME__/personrequest/html/','','PERSON REQUEST ACCESS REJECTED: ',1,1,'2014-10-16 02:47:01'),(11,11,'emails/notification/__REALMNAME__/personrequest/html/','','PERSON REQUEST ACCESS COMPLETED: ',1,1,'2014-10-16 02:47:01'),(12,12,'emails/notification/__REALMNAME__/personrequest/html/','','PERSON REQUEST TRANSFER ACCEPTED: ',1,1,'2014-10-16 02:47:01'),(13,13,'emails/notification/__REALMNAME__/personrequest/html/','','PERSON REQUEST TRANSFER DENIED: ',1,1,'2014-10-16 02:47:01'),(14,14,'emails/notification/__REALMNAME__/personrequest/html/','','PERSON REQUEST TRANSFER OVERRIDDEN: ',1,1,'2014-10-16 02:47:01'),(15,15,'emails/notification/__REALMNAME__/personrequest/html/','','PERSON REQUEST TRANSFER REJECTED: ',1,1,'2014-10-16 02:47:01'),(16,16,'emails/notification/__REALMNAME__/personrequest/html/','','PERSON REQUEST TRANSFER COMPLETED: ',1,1,'2014-10-16 02:47:01'),(17,17,'emails/notification/__REALMNAME__/personrequest/html/','','PERSON REQUEST ACCESS SENT: ',1,1,'2014-10-16 02:47:01'),(18,18,'emails/notification/__REALMNAME__/personrequest/html/','','PERSON REQUEST TRANSFER SENT: ',1,1,'2014-10-16 02:47:01');
+INSERT INTO `tblEmailTemplates` VALUES (1,1,'notification/workflow/html/','','WORK TASK ADDED: ',1,1,'2015-01-20 20:06:10'),(2,2,'notification/workflow/html/','','WORK TASK APPROVED: ',1,1,'2015-01-20 20:06:10'),(3,3,'notification/workflow/html/','','WORK TASK REJECTED: ',1,1,'2015-01-20 20:06:10'),(4,4,'notification/workflow/html/','','WORK TASK RESOLVED: ',1,1,'2015-01-20 20:06:10'),(5,5,'notification/workflow/html/','','WORK TASK HELD: ',1,1,'2015-01-20 20:06:10'),(6,6,'notification/workflow/html/','','WORK TASK RESUMED: ',1,1,'2015-01-20 20:06:10'),(7,7,'notification/personrequest/html/','','PERSON REQUEST ACCESS ACCEPTED: ',1,1,'2015-01-20 20:06:10'),(8,8,'notification/personrequest/html/','','PERSON REQUEST ACCESS DENIED: ',1,1,'2015-01-20 20:06:10'),(9,9,'notification/personrequest/html/','','PERSON REQUEST ACCESS OVERRIDDEN: ',1,1,'2015-01-20 20:06:10'),(10,10,'notification/personrequest/html/','','PERSON REQUEST ACCESS REJECTED: ',1,1,'2015-01-20 20:06:10'),(11,11,'notification/personrequest/html/','','PERSON REQUEST ACCESS COMPLETED: ',1,1,'2015-01-20 20:06:10'),(12,12,'notification/personrequest/html/','','PERSON REQUEST TRANSFER ACCEPTED: ',1,1,'2015-01-20 20:06:10'),(13,13,'notification/personrequest/html/','','PERSON REQUEST TRANSFER DENIED: ',1,1,'2015-01-20 20:06:10'),(14,14,'notification/personrequest/html/','','PERSON REQUEST TRANSFER OVERRIDDEN: ',1,1,'2015-01-20 20:06:10'),(15,15,'notification/personrequest/html/','','PERSON REQUEST TRANSFER REJECTED: ',1,1,'2015-01-20 20:06:10'),(16,16,'notification/personrequest/html/','','PERSON REQUEST TRANSFER COMPLETED: ',1,1,'2015-01-20 20:06:10'),(17,17,'notification/personrequest/html/','','PERSON REQUEST ACCESS SENT: ',1,1,'2015-01-20 20:06:10'),(18,18,'notification/personrequest/html/','','PERSON REQUEST TRANSFER SENT: ',1,1,'2015-01-20 20:06:10'),(19,19,'notification/personrequest/html/','','PERSON REQUEST ACCESS CANCELLED: ',1,1,'2015-01-20 20:06:10'),(20,20,'notification/personrequest/html/','','PERSON REQUEST TRANSFER CANCELLED: ',1,1,'2015-01-20 20:06:10');
 /*!40000 ALTER TABLE `tblEmailTemplates` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2021,7 +2022,7 @@ CREATE TABLE `tblEntity` (
   KEY `index_intRealmID` (`intRealmID`),
   KEY `index_intEntityLevel` (`intEntityLevel`),
   KEY `index_strFIFAID` (`strFIFAID`)
-) ENGINE=InnoDB AUTO_INCREMENT=90 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2091,7 +2092,7 @@ CREATE TABLE `tblEntityFields` (
   `intLightCapacity` int(11) DEFAULT NULL,
   `intImportID` int(11) DEFAULT NULL,
   PRIMARY KEY (`intEntityFieldID`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 COMMENT='FacilityType as per FIFA FDS (additional fields moved from tblEntity)';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='FacilityType as per FIFA FDS (additional fields moved from tblEntity)';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2125,7 +2126,7 @@ CREATE TABLE `tblEntityIdentifier` (
   `tTimestamp` varchar(45) DEFAULT 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
   `intStatus` int(11) DEFAULT '1',
   PRIMARY KEY (`intIdentifierId`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2156,7 +2157,7 @@ CREATE TABLE `tblEntityLinks` (
   KEY `index_intParentEntityID` (`intParentEntityID`),
   KEY `index_intChildEntityID` (`intChildEntityID`),
   KEY `index_intPrimary` (`intPrimary`)
-) ENGINE=InnoDB AUTO_INCREMENT=89 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2467,7 +2468,7 @@ CREATE TABLE `tblITCMessagesLog` (
   `dtDateSent` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `strMessage` text,
   PRIMARY KEY (`intITCMessagesLog`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2491,7 +2492,7 @@ CREATE TABLE `tblImportTrack` (
   `strNotes` varchar(250) DEFAULT NULL COMMENT 'Specific notes or justification of the said import',
   `tTimeStamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`intImportID`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2516,7 +2517,7 @@ CREATE TABLE `tblInvoice` (
   `intRealmID` int(11) DEFAULT NULL,
   `tTimeStamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`intInvoiceID`)
-) ENGINE=InnoDB AUTO_INCREMENT=844 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3836,7 +3837,7 @@ CREATE TABLE `tblPayTry` (
   PRIMARY KEY (`intTryID`),
   KEY `index_realmID` (`intRealmID`),
   KEY `index_transLogID` (`intTransLogID`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4477,7 +4478,7 @@ CREATE TABLE `tblPerson` (
   KEY `index_RealmEmail` (`intRealmID`,`strEmail`),
   KEY `index_FIFA` (`strFIFAID`),
   KEY `index_RealmNatNumMID` (`intRealmID`,`strNationalNum`,`intPersonID`)
-) ENGINE=InnoDB AUTO_INCREMENT=2134 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4632,7 +4633,7 @@ CREATE TABLE `tblPersonRegistration_1` (
   KEY `index_strPersonType` (`strPersonType`),
   KEY `index_strStatus` (`strStatus`),
   KEY `index_IDs` (`intEntityID`,`intPersonID`)
-) ENGINE=InnoDB AUTO_INCREMENT=3219 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4707,7 +4708,7 @@ CREATE TABLE `tblPlayerPassport` (
   `tTimeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`intPlayerPassportID`),
   KEY `INDEX_intPersonID` (`intPersonID`)
-) ENGINE=InnoDB AUTO_INCREMENT=2392 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5876,7 +5877,7 @@ CREATE TABLE `tblRolePerson` (
   `tTimeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`intPersonID`,`intRolePersonID`),
   KEY `index_intRolePersonID` (`intRolePersonID`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6104,7 +6105,7 @@ CREATE TABLE `tblSystemConfig` (
   KEY `index_TypeOption` (`intTypeID`,`strOption`),
   KEY `index_intRealm` (`intRealmID`),
   KEY `index_RealmOption` (`intRealmID`,`strOption`)
-) ENGINE=MyISAM AUTO_INCREMENT=3787 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=3789 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6113,7 +6114,7 @@ CREATE TABLE `tblSystemConfig` (
 
 LOCK TABLES `tblSystemConfig` WRITE;
 /*!40000 ALTER TABLE `tblSystemConfig` DISABLE KEYS */;
-INSERT INTO `tblSystemConfig` VALUES (3679,1,'UmpireLabel','Referee','2014-01-16 22:44:06',1,0),(3656,1,'AllowOnlineRego_node','1','2014-01-16 22:02:06',1,0),(3657,1,'AllowProdTXNs','1','2014-01-16 22:02:06',1,0),(3658,1,'AllowClearances','1','2014-01-16 22:02:06',1,0),(3659,1,'AllowOnlineRego','1','2014-01-16 22:02:06',1,0),(3660,1,'NoTeams','1','2014-01-16 22:02:06',1,0),(3661,1,'NoComps','1','2014-01-16 22:02:06',1,0),(3685,1,'NotAllowCommunicator','1','2014-01-22 04:19:20',1,0),(3663,1,'AllowTXNs','1','2014-01-16 22:02:06',1,0),(3664,1,'AllowClearances','1','2014-04-14 17:11:24',1,0),(3665,1,'AllowSeasons','1','2014-01-16 22:02:06',1,0),(3666,1,'DuplCheck','1','2014-01-16 22:02:06',1,0),(3667,1,'AllowCardPrinting','1','2014-01-16 22:02:06',1,0),(3668,1,'NoAds','1','2014-01-16 22:02:06',1,0),(3669,1,'AllowStatusChange','1','2014-01-16 22:02:06',1,0),(3670,1,'Header','<img src=\"/headers/finland_football.jpg\" alt=\"\" border=\"0\" style = \"width:100%;\">','2014-01-16 22:02:06',1,1),(3671,1,'Header','<img src=\"/headers/singapore_football.jpg\" alt=\"\" border=\"0\" style = \"width:100%;\">','2014-01-16 22:02:06',1,2),(3672,1,'AllowPendingRegistration','1','2014-01-16 22:02:06',1,0),(3673,1,'txtRequestCLR','Request a Transfer','2014-01-16 22:04:28',1,0),(3674,1,'txtCLR','Transfer','2014-01-16 22:04:46',1,0),(3678,1,'GenMemberNo','1','2014-01-16 22:41:52',1,0),(3681,1,'clrAuthSurnameSearch','1','2014-01-20 05:06:25',1,0),(3680,1,'AllowNABSignup','0','2014-04-14 17:06:30',1,0),(3682,1,'clrDOBSurnameSearch','1','2014-01-20 05:06:49',1,0),(3683,1,'AllowTXNrpts','1','2014-01-20 05:47:35',1,0),(3684,1,'HeaderBG','#spheader {height:150px;}','2014-01-21 20:55:28',1,0),(3694,1,'FieldLabel_strMemberNo','PalloID','2014-01-23 03:27:48',1,1),(3690,1,'..AllowedRegoCountries',';FINLAND;SWEDEN;NORWAY;','2014-11-26 22:00:36',1,1),(3689,1,'DefaultCountry','SG','2014-12-07 23:44:29',1,0),(3692,1,'DefaultNationality','SG','2014-12-07 23:44:29',1,2),(3693,1,'DefaultNationality','FINLAND','2014-01-22 23:07:10',1,1),(3695,1,'NoMemberTags','1','2014-01-23 00:58:42',1,0),(3696,1,'NoMemberTypes','1','2014-01-23 00:59:22',1,0),(3697,1,'txtClrs','Transfers','2014-01-23 01:00:01',1,0),(3698,1,'txtCLRs','Transfers','2014-01-23 01:00:16',1,0),(3699,1,'clrHide_intPlayerFinancial','1','2014-01-24 03:23:35',1,0),(3700,1,'clrHide_intPlayerSuspended','1','2014-01-24 03:23:54',1,0),(3701,1,'clrHide_clearanceFee','1','2014-01-24 03:24:08',1,0),(3705,1,'clrClearanceYear','2014','2014-01-24 03:27:44',1,0),(3703,1,'clrHide_intClearanceDevelopmentFeeID','1','2014-01-24 03:24:43',1,0),(3704,1,'clrHide_curDevelFee','1','2014-01-24 03:25:11',1,0),(3706,1,'clrHide_dtAlert','1','2014-01-24 03:31:36',1,0),(3707,1,'.DollarSymbol','&euro;','2014-12-08 23:44:09',0,1),(3708,1,'---DuplicateFields','strLocalSurname|strLocalFirstname|dtDOB','2014-06-25 22:45:38',1,0),(3709,1,'AllowClubTXNs','1','2014-06-29 23:44:08',1,0),(3710,1,'AllowTXNs_CCs','0','2014-12-05 06:42:39',1,0),(3711,1,'TestPay','1','2014-07-03 01:47:07',1,0),(3712,1,'clrReasonSelfInitiatedID','558004','2014-07-29 03:34:10',1,0),(3713,1,'entity_strLatinNames','1','2014-09-23 00:38:26',1,0),(3714,1,'AdultAge','21-100','2014-11-26 21:58:20',1,0),(3715,1,'personRequestTimeout','7','2014-10-03 01:14:02',1,0),(3716,1,'allowPersonRequest','1','2014-12-12 07:21:19',1,0),(3717,1,'menu_newperson_PLAYER_3','1','2014-10-09 03:50:03',1,0),(3718,1,'menu_newperson_PLAYER_20','1','2014-10-09 03:50:03',1,0),(3719,1,'menu_newperson_PLAYER_100','1','2014-10-09 03:50:03',1,0),(3720,1,'menu_newperson_COACH_3','1','2014-10-09 03:50:04',1,0),(3721,1,'menu_newperson_COACH_20','1','2014-10-09 03:50:04',1,0),(3722,1,'menu_newperson_COACH_100','1','2014-10-09 03:50:04',1,0),(3723,1,'menu_newperson_REFEREE_3','1','2014-10-09 03:50:04',1,0),(3724,1,'menu_newperson_REFEREE_20','1','2014-10-09 03:50:04',1,0),(3725,1,'menu_newperson_REFEREE_100','1','2014-10-09 03:50:04',1,0),(3726,1,'menu_newperson_TEAMOFFICIAL_3','1','2014-10-09 03:50:04',1,0),(3727,1,'menu_newperson_TEAMOFFICIAL_20','1','2014-10-09 03:50:04',1,0),(3728,1,'menu_newperson_TEAMOFFICIAL_100','1','2014-10-09 03:50:04',1,0),(3729,1,'menu_newperson_CLUBOFFICIAL_3','1','2014-10-09 03:50:04',1,0),(3730,1,'menu_newperson_CLUBOFFICIAL_20','1','2014-10-09 03:50:04',1,0),(3731,1,'menu_newperson_CLUBOFFICIAL_100','1','2014-10-09 03:50:04',1,0),(3732,1,'menu_newperson_MAOFFICIAL_100','1','2014-10-09 03:50:05',1,0),(3733,1,'maxFacilityFieldCount','50','2014-10-28 22:40:32',1,0),(3734,1,'lockApproval_PaymentRequired_REGO','1','2014-11-07 05:45:02',1,0),(3735,1,'lockApproval_PaymentRequired_CLUB','1','2014-11-07 05:45:02',1,0),(3736,1,'lockApproval_PaymentRequired_VENUE','1','2014-11-07 05:45:02',1,0),(3737,1,'lockApproval_PaymentRequired_PERSON','1','2014-11-07 05:45:04',1,0),(3739,1,'menu_newclub_20','1','2014-11-10 05:44:52',1,0),(3740,1,'menu_newclub_100','1','2014-11-10 05:44:52',1,0),(3741,1,'menu_newvenue_100','1','2014-11-10 05:44:52',1,0),(3742,1,'menu_newvenue_20','1','2014-11-10 05:44:52',1,0),(3743,1,'menu_newvenue_3','1','2014-11-10 05:44:53',1,0),(3744,1,'menu_searchpeople_3','1','2014-11-10 20:22:24',1,0),(3745,1,'menu_searchpeople_20','1','2014-11-10 20:22:24',1,0),(3746,1,'menu_searchpeople_100','1','2014-11-10 20:22:24',1,0),(3747,1,'AllowTXNs_CCs_roleFlow','0','2014-12-05 06:42:39',1,0),(3748,1,'AllowTXNs_Manual_roleFlow','0','2014-12-03 01:48:40',1,0),(3750,1,'strOtherPersonIdentifier_Text','NRIC or Passport Number','2014-12-12 11:39:26',1,0),(3751,1,'dtOtherPersonIdentifierValidDateFrom_Text','NRIC Number Valid From','2014-11-17 04:39:23',1,0),(3752,1,'dtOtherPersonIdentifierValidDateTo_Text','NRIC Number Valid To','2014-11-17 04:39:30',1,0),(3753,1,'strOtherPersonIdentifierIssueCountry_Text','NRIC Number Issue Country','2014-11-17 04:40:15',1,0),(3754,1,'NationalNumName','FAS Identification Number','2014-11-17 05:57:34',1,0),(3755,1,'entity_strLatinNames','1','2014-11-17 05:59:07',1,0),(3756,1,'triggerWorkFlowPersonDataUpdate','dtDOB|strLocalFirstname|strLocalSurname|strISONationality','2014-11-21 21:09:27',1,0),(3757,1,'cleanPlayerPersonRecords','1','2014-11-30 20:09:55',1,0),(3758,1,'menu_newperson_REFEREE_100_100','1','2014-12-02 12:20:41',1,0),(3759,1,'menu_newperson_PLAYER_100_3','1','2014-12-02 12:20:52',1,0),(3760,1,'menu_newperson_COACH_100_3','1','2014-12-02 12:21:44',1,0),(3761,1,'menu_newperson_COACH_3_3','1','2014-12-02 12:21:44',1,0),(3762,1,'menu_newperson_PLAYER_3_3','1','2014-12-02 12:21:46',1,0),(3763,1,'age_breakpoint_PLAYER_PROFESSIONAL','16','2014-12-03 06:50:10',1,0),(3764,1,'intOtherPersonIdentifierTypeID_Text','Document Type','2014-12-03 19:59:22',1,0),(3765,1,'strOtherPersonIdentifierDesc_Text','NRIC Number Description','2014-12-04 21:41:01',1,0),(3766,1,'ma_phone_number','(65) 6348 3477 / 6293 1477','2014-12-05 06:17:42',1,0),(3767,1,'ma_website','http://www.fas.org.sg','2014-12-05 06:17:42',1,0),(3768,1,'ma_email','myfashelpdesk@fas.org.sg','2015-01-19 05:53:07',1,0),(3769,1,'help_desk_email','myfashelpdesk@fas.org.sg','2014-12-05 06:17:42',1,0),(3770,1,'help_desk_phone_number','(65) 68803118','2014-12-05 06:17:42',1,0),(3771,1,'DefaultNationality','SG','2014-12-07 23:44:29',1,0),(3772,1,'DefaultCity','SINGAPORE','2014-12-07 21:34:51',1,0),(3773,1,'age_breakpoint_PLAYER_AMATEUR_U_C','16','2014-12-08 04:12:51',1,0),(3774,1,'MA_allowTransfer','0','2014-12-08 05:53:25',1,0),(3775,1,'allowVenues','1','2014-12-22 05:38:20',1,0),(3776,1,'DontAllowManualPayments','1','2014-12-17 03:02:26',1,0),(3777,1,'FOOTBALL_FIELD_LENGTH_RANGE','90~120','2015-01-06 04:45:07',1,0),(3778,1,'FOOTBALL_FIELD_WIDTH_RANGE','45~90','2015-01-06 04:45:07',1,0),(3779,1,'Timezone','Asia/Singapore','2014-12-21 21:58:48',1,0),(3780,1,'PP_UseDOBasFrom','1','2014-12-22 07:43:39',1,0),(3781,1,'allowBulkRenewals','0','2014-12-22 23:51:36',1,0),(3782,1,'allowReports','1','2015-01-02 03:58:16',1,0),(3783,1,'stopDeleteDocos_CLUB','1','2015-01-04 22:06:04',1,0),(3784,1,'stopDeleteDocos_ALL','1','2015-01-04 22:06:22',1,0),(3785,1,'FUTSAL_FIELD_LENGTH_RANGE','25~42','2015-01-06 05:50:00',1,0),(3786,1,'FUTSAL_FIELD_WIDTH_RANGE','16~25','2015-01-06 05:50:01',1,0);
+INSERT INTO `tblSystemConfig` VALUES (3679,1,'UmpireLabel','Referee','2014-01-16 22:44:06',1,0),(3656,1,'AllowOnlineRego_node','1','2014-01-16 22:02:06',1,0),(3657,1,'AllowProdTXNs','1','2014-01-16 22:02:06',1,0),(3658,1,'AllowClearances','1','2014-01-16 22:02:06',1,0),(3659,1,'AllowOnlineRego','1','2014-01-16 22:02:06',1,0),(3660,1,'NoTeams','1','2014-01-16 22:02:06',1,0),(3661,1,'NoComps','1','2014-01-16 22:02:06',1,0),(3685,1,'NotAllowCommunicator','1','2014-01-22 04:19:20',1,0),(3663,1,'AllowTXNs','1','2014-01-16 22:02:06',1,0),(3664,1,'AllowClearances','1','2014-04-14 17:11:24',1,0),(3665,1,'AllowSeasons','1','2014-01-16 22:02:06',1,0),(3666,1,'DuplCheck','1','2014-01-16 22:02:06',1,0),(3667,1,'AllowCardPrinting','1','2014-01-16 22:02:06',1,0),(3668,1,'NoAds','1','2014-01-16 22:02:06',1,0),(3669,1,'AllowStatusChange','1','2014-01-16 22:02:06',1,0),(3670,1,'Header','<img src=\"/headers/finland_football.jpg\" alt=\"\" border=\"0\" style = \"width:100%;\">','2014-01-16 22:02:06',1,1),(3671,1,'Header','<img src=\"/headers/singapore_football.jpg\" alt=\"\" border=\"0\" style = \"width:100%;\">','2014-01-16 22:02:06',1,2),(3672,1,'AllowPendingRegistration','1','2014-01-16 22:02:06',1,0),(3673,1,'txtRequestCLR','Request a Transfer','2014-01-16 22:04:28',1,0),(3674,1,'txtCLR','Transfer','2014-01-16 22:04:46',1,0),(3678,1,'GenMemberNo','1','2014-01-16 22:41:52',1,0),(3681,1,'clrAuthSurnameSearch','1','2014-01-20 05:06:25',1,0),(3680,1,'AllowNABSignup','0','2014-04-14 17:06:30',1,0),(3682,1,'clrDOBSurnameSearch','1','2014-01-20 05:06:49',1,0),(3683,1,'AllowTXNrpts','1','2014-01-20 05:47:35',1,0),(3684,1,'HeaderBG','#spheader {height:150px;}','2014-01-21 20:55:28',1,0),(3694,1,'FieldLabel_strMemberNo','PalloID','2014-01-23 03:27:48',1,1),(3690,1,'..AllowedRegoCountries',';FINLAND;SWEDEN;NORWAY;','2014-11-26 22:00:36',1,1),(3689,1,'DefaultCountry','SG','2014-12-07 23:44:29',1,0),(3692,1,'DefaultNationality','SG','2014-12-07 23:44:29',1,2),(3693,1,'DefaultNationality','FINLAND','2014-01-22 23:07:10',1,1),(3695,1,'NoMemberTags','1','2014-01-23 00:58:42',1,0),(3696,1,'NoMemberTypes','1','2014-01-23 00:59:22',1,0),(3697,1,'txtClrs','Transfers','2014-01-23 01:00:01',1,0),(3698,1,'txtCLRs','Transfers','2014-01-23 01:00:16',1,0),(3699,1,'clrHide_intPlayerFinancial','1','2014-01-24 03:23:35',1,0),(3700,1,'clrHide_intPlayerSuspended','1','2014-01-24 03:23:54',1,0),(3701,1,'clrHide_clearanceFee','1','2014-01-24 03:24:08',1,0),(3705,1,'clrClearanceYear','2014','2014-01-24 03:27:44',1,0),(3703,1,'clrHide_intClearanceDevelopmentFeeID','1','2014-01-24 03:24:43',1,0),(3704,1,'clrHide_curDevelFee','1','2014-01-24 03:25:11',1,0),(3706,1,'clrHide_dtAlert','1','2014-01-24 03:31:36',1,0),(3707,1,'.DollarSymbol','&euro;','2014-12-08 23:44:09',0,1),(3708,1,'---DuplicateFields','strLocalSurname|strLocalFirstname|dtDOB','2014-06-25 22:45:38',1,0),(3709,1,'AllowClubTXNs','1','2014-06-29 23:44:08',1,0),(3710,1,'AllowTXNs_CCs','0','2014-12-05 06:42:39',1,0),(3711,1,'TestPay','1','2014-07-03 01:47:07',1,0),(3712,1,'clrReasonSelfInitiatedID','558004','2014-07-29 03:34:10',1,0),(3713,1,'entity_strLatinNames','1','2014-09-23 00:38:26',1,0),(3714,1,'AdultAge','21-100','2014-11-26 21:58:20',1,0),(3715,1,'personRequestTimeout','7','2014-10-03 01:14:02',1,0),(3716,1,'allowPersonRequest','1','2014-12-12 07:21:19',1,0),(3717,1,'menu_newperson_PLAYER_3','1','2014-10-09 03:50:03',1,0),(3718,1,'menu_newperson_PLAYER_20','1','2014-10-09 03:50:03',1,0),(3719,1,'menu_newperson_PLAYER_100','1','2014-10-09 03:50:03',1,0),(3720,1,'menu_newperson_COACH_3','1','2014-10-09 03:50:04',1,0),(3721,1,'menu_newperson_COACH_20','1','2014-10-09 03:50:04',1,0),(3722,1,'menu_newperson_COACH_100','1','2014-10-09 03:50:04',1,0),(3723,1,'menu_newperson_REFEREE_3','1','2014-10-09 03:50:04',1,0),(3724,1,'menu_newperson_REFEREE_20','1','2014-10-09 03:50:04',1,0),(3725,1,'menu_newperson_REFEREE_100','1','2014-10-09 03:50:04',1,0),(3726,1,'menu_newperson_TEAMOFFICIAL_3','1','2014-10-09 03:50:04',1,0),(3727,1,'menu_newperson_TEAMOFFICIAL_20','1','2014-10-09 03:50:04',1,0),(3728,1,'menu_newperson_TEAMOFFICIAL_100','1','2014-10-09 03:50:04',1,0),(3729,1,'menu_newperson_CLUBOFFICIAL_3','1','2014-10-09 03:50:04',1,0),(3730,1,'menu_newperson_CLUBOFFICIAL_20','1','2014-10-09 03:50:04',1,0),(3731,1,'menu_newperson_CLUBOFFICIAL_100','1','2014-10-09 03:50:04',1,0),(3732,1,'menu_newperson_MAOFFICIAL_100','1','2014-10-09 03:50:05',1,0),(3733,1,'maxFacilityFieldCount','50','2014-10-28 22:40:32',1,0),(3734,1,'lockApproval_PaymentRequired_REGO','1','2014-11-07 05:45:02',1,0),(3735,1,'lockApproval_PaymentRequired_CLUB','1','2014-11-07 05:45:02',1,0),(3736,1,'lockApproval_PaymentRequired_VENUE','1','2014-11-07 05:45:02',1,0),(3737,1,'lockApproval_PaymentRequired_PERSON','1','2014-11-07 05:45:04',1,0),(3739,1,'menu_newclub_20','1','2014-11-10 05:44:52',1,0),(3740,1,'menu_newclub_100','1','2014-11-10 05:44:52',1,0),(3741,1,'menu_newvenue_100','1','2014-11-10 05:44:52',1,0),(3742,1,'menu_newvenue_20','1','2014-11-10 05:44:52',1,0),(3743,1,'menu_newvenue_3','1','2014-11-10 05:44:53',1,0),(3744,1,'menu_searchpeople_3','1','2014-11-10 20:22:24',1,0),(3745,1,'menu_searchpeople_20','1','2014-11-10 20:22:24',1,0),(3746,1,'menu_searchpeople_100','1','2014-11-10 20:22:24',1,0),(3747,1,'AllowTXNs_CCs_roleFlow','0','2014-12-05 06:42:39',1,0),(3748,1,'AllowTXNs_Manual_roleFlow','0','2014-12-03 01:48:40',1,0),(3750,1,'strOtherPersonIdentifier_Text','NRIC or Passport Number','2014-12-12 11:39:26',1,0),(3751,1,'dtOtherPersonIdentifierValidDateFrom_Text','NRIC Number Valid From','2014-11-17 04:39:23',1,0),(3752,1,'dtOtherPersonIdentifierValidDateTo_Text','NRIC Number Valid To','2014-11-17 04:39:30',1,0),(3753,1,'strOtherPersonIdentifierIssueCountry_Text','NRIC Number Issue Country','2014-11-17 04:40:15',1,0),(3754,1,'NationalNumName','FAS Identification Number','2014-11-17 05:57:34',1,0),(3755,1,'entity_strLatinNames','1','2014-11-17 05:59:07',1,0),(3756,1,'triggerWorkFlowPersonDataUpdate','dtDOB|strLocalFirstname|strLocalSurname|strISONationality','2014-11-21 21:09:27',1,0),(3757,1,'cleanPlayerPersonRecords','1','2014-11-30 20:09:55',1,0),(3758,1,'menu_newperson_REFEREE_100_100','1','2014-12-02 12:20:41',1,0),(3759,1,'menu_newperson_PLAYER_100_3','1','2014-12-02 12:20:52',1,0),(3760,1,'menu_newperson_COACH_100_3','1','2014-12-02 12:21:44',1,0),(3761,1,'menu_newperson_COACH_3_3','1','2014-12-02 12:21:44',1,0),(3762,1,'menu_newperson_PLAYER_3_3','1','2014-12-02 12:21:46',1,0),(3763,1,'age_breakpoint_PLAYER_PROFESSIONAL','16','2014-12-03 06:50:10',1,0),(3764,1,'intOtherPersonIdentifierTypeID_Text','Document Type','2014-12-03 19:59:22',1,0),(3765,1,'strOtherPersonIdentifierDesc_Text','NRIC Number Description','2014-12-04 21:41:01',1,0),(3766,1,'ma_phone_number','(65) 6348 3477 / 6293 1477','2014-12-05 06:17:42',1,0),(3767,1,'ma_website','http://www.fas.org.sg','2014-12-05 06:17:42',1,0),(3768,1,'ma_email','myfashelpdesk@fas.org.sg','2015-01-19 05:53:07',1,0),(3769,1,'help_desk_email','myfashelpdesk@fas.org.sg','2014-12-05 06:17:42',1,0),(3770,1,'help_desk_phone_number','(65) 68803118','2014-12-05 06:17:42',1,0),(3771,1,'DefaultNationality','SG','2014-12-07 23:44:29',1,0),(3772,1,'DefaultCity','SINGAPORE','2014-12-07 21:34:51',1,0),(3773,1,'age_breakpoint_PLAYER_AMATEUR_U_C','16','2014-12-08 04:12:51',1,0),(3774,1,'MA_allowTransfer','0','2014-12-08 05:53:25',1,0),(3775,1,'allowVenues','1','2014-12-22 05:38:20',1,0),(3776,1,'DontAllowManualPayments','1','2014-12-17 03:02:26',1,0),(3777,1,'FOOTBALL_FIELD_LENGTH_RANGE','90~120','2015-01-06 04:45:07',1,0),(3778,1,'FOOTBALL_FIELD_WIDTH_RANGE','45~90','2015-01-06 04:45:07',1,0),(3779,1,'Timezone','Asia/Singapore','2014-12-21 21:58:48',1,0),(3780,1,'PP_UseDOBasFrom','1','2014-12-22 07:43:39',1,0),(3781,1,'allowBulkRenewals','0','2014-12-22 23:51:36',1,0),(3782,1,'allowReports','1','2015-01-02 03:58:16',1,0),(3783,1,'stopDeleteDocos_CLUB','1','2015-01-04 22:06:04',1,0),(3784,1,'stopDeleteDocos_ALL','1','2015-01-04 22:06:22',1,0),(3785,1,'FUTSAL_FIELD_LENGTH_RANGE','25~42','2015-01-06 05:50:00',1,0),(3786,1,'FUTSAL_FIELD_WIDTH_RANGE','16~25','2015-01-06 05:50:01',1,0),(3787,1,'EmailNotificationWrapperTemplate','notification/myfas-notification-template.templ','2015-01-20 10:09:04',1,0),(3788,1,'EmailNotificationSysName','MyFas','2015-01-20 10:09:04',1,0);
 /*!40000 ALTER TABLE `tblSystemConfig` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -6428,7 +6429,7 @@ CREATE TABLE `tblTransLog` (
   KEY `intCurrencyID` (`intCurrencyID`),
   KEY `intStatus` (`intStatus`),
   KEY `intPartialPayment` (`intPartialPayment`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6549,7 +6550,7 @@ CREATE TABLE `tblTransactions` (
   KEY `index_intIDintTableType` (`intID`,`intTableType`),
   KEY `intTableType` (`intTableType`),
   KEY `intProductID` (`intProductID`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6951,7 +6952,7 @@ CREATE TABLE `tblWFTaskNotes` (
   `intCurrent` int(11) NOT NULL DEFAULT '1',
   `tTimeStamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`intTaskNoteID`)
-) ENGINE=InnoDB AUTO_INCREMENT=204 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7028,4 +7029,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-01-20  9:30:18
+-- Dump completed on 2015-01-21  7:13:35

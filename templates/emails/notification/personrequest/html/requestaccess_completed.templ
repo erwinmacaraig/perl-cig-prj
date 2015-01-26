@@ -1,11 +1,61 @@
+<tr>
+    <td colspan="3" style="background-color: #f6f6f6; padding:40px;">
 
-<div>
-    <strong>[% Lang.txt("Greetings") %], [% To.name %]</strong>
+        <h2 style="color: #555e68; font-weight:bold; font-family:arial, sans-serif;">
+        [% Lang.txt("Dear") %] [% RecipientName %],
+        </h2>
 
-    <div>[% Lang.txt("Person Request access has been completed.") %]</div>
+        <p style="font-family:arial, sans-serif; font-size:14px; color: #7d8892;">
+            [% Lang.txt("Request Access Completed") %].
+        </p>
 
-    <div>Footer here.</div>
+        <table style="font-family: arial, sans-serif; font-size:12px; color: #555e68; margin-left:-5px;" cellpadding="5">
+            <tr>
+                <td>[% Lang.txt("Work Task") %]:</td>
+                <td><strong>[% Lang.txt(WorkTaskType) %]</strong></td>
+            </tr>
 
-    <strong>[% Lang.txt("Regards") %],</strong>
-    <strong>[% From.name %]</strong>
-</div>
+            <tr>
+                <td>[% Lang.txt("Person") %]/[% Lang.txt("Organisation") %]:</td>
+                <td><strong>[% Person %]/[% CurrentClub %]</strong></td>
+            </tr>
+
+            <tr>
+                <td>[% Lang.txt("Originator") %]:</td>
+                <td><strong>[% Originator %]</strong></td>
+            </tr>
+
+            <tr>
+                <td>[% Lang.txt("Status") %]:</td>
+                <td>
+                    [% IF Status == 'PENDING' %]
+                        <img src="[% BaseURL %]/images/emails/img-email-status-pending.png" border="0" />
+                    [% ELSIF Status == 'APPROVED' %]
+                        <img src="[% BaseURL %]/images/emails/img-email-status-approved.png" border="0" />&nbsp;
+                    [% ELSIF Status == 'REJECTED' %]
+                        <img src="[% BaseURL %]/images/emails/img-email-status-rejected.png" border="0" />&nbsp;
+                    [% ELSIF Status == 'REASSIGNED' %]
+                        <img src="[% BaseURL %]/images/emails/img-email-status-reassigned.png" border="0" />&nbsp;
+                    [% ELSIF Status == 'CANCELLED' %]
+                        <img src="[% BaseURL %]/images/emails/img-email-status-cancelled.png" border="0" />&nbsp;
+                    [% ELSIF Status == 'ITCREQUEST' %]
+                        <img src="[% BaseURL %]/images/emails/img-email-status-itc-request.png" border="0" />&nbsp;
+                    [% ELSE %]
+                        <strong>[% Lang.txt("N/A") %]</strong>
+                    [% END %]
+                </td>
+            </tr>
+
+            <tr>
+                <td>[% Lang.txt("Reason") %]:</td>
+                <td><strong>[% Reason %]</strong></td>
+            </tr>
+
+        </table>
+
+        <p style="font-family:arial, sans-serif; font-size:14px; color: #7d8892;">
+            [% Lang.txt("Regards") %],<br />
+            [% SenderName %]
+        </p>
+    </td>
+</tr>

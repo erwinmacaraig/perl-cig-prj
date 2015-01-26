@@ -4,7 +4,8 @@
 SELECT DISTINCT
     '' as SN,
     P.strNationalNum, 
-    CONCAT(P.strLocalFirstname, " ", P.strLocalSurname) as FullName,
+    P.strLocalSurname,
+    P.strLocalFirstname, 
     P.dtDOB,
     TIMESTAMPDIFF(YEAR, P.dtDOB, CURDATE()) as currentAge,
     P.strISONationality,
@@ -41,7 +42,7 @@ WHERE
     AND PR.intEntityID = ###CLUBID###
     AND PR.strPersonType='PLAYER' 
     AND P.strNationalNum <> ''
-    AND PR.intNationalPeriodID>=7
+    AND PR.intNationalPeriodID=8
 ORDER BY 
     P.strLocalSurname
 	],
@@ -53,7 +54,8 @@ ORDER BY
 	Labels => [
 		['SN','S/N'],
 		['strNationalNum','Registration Number'],
-		['FullName','Full Name'],
+		['strLocalSurname', 'Last Name'],
+		['strLocalFirstname', 'First Name'],
 		['dtDOB','DOB'],
 		['currentAge','Current Age'],
 		['strISONationality','Nationality'],
