@@ -2416,49 +2416,10 @@ sub apply_product_rules {
     
     #if($dtStart ne 'NULL' || $dtEnd ne 'NULL'){
     #print STDERR $query;
-    
     $Data->{'db'}->do($query);
     #}
     
-    # Update the Member_Associations table.
-    # - Check if we should set the members financial status or registered until date.
-    my %ColumnsValues = ();
-    my $query2 = qq[
-                        UPDATE tblPerson_Associations SET
-                        ];
-    
-    if ($product->{intProductMemberPackageID}) {
-        $ColumnsValues{'intMemberPackageID'} = $product->{intProductMemberPackageID};
-        $ColumnsValues{'dtLastRegistered'} = qq[NOW()];
-        $ColumnsValues{'dtFirstRegistered'} = qq[IF(dtFirstRegistered, dtFirstRegistered, NOW())];
-    }
-    
-    if($product->{intSetMemberFinancial}){
-        $ColumnsValues{'intFinancialActive'} = 1;
-    }
-    if($product->{intSetMemberActive}){
-        $ColumnsValues{'intRecStatus'} = 1;
-    }
-    
-    
-    if($product->{intMemberExpiryDays} > 0) {
-        $ColumnsValues{'dtRegisteredUntil'} = 'DATE_ADD(SYSDATE(), INTERVAL ' . $product->{intMemberExpiryDays} . ' DAY)';
-        }
-    elsif($product->{dtMemberExpiry} and $product->{dtMemberExpiry} ne '0000-00-00 00:00:00' and $product->{dtMemberExpiry} ne '0000-00-00' ){
-        $ColumnsValues{'dtRegisteredUntil'} = "'$product->{dtMemberExpiry}'";
-    }
-    
-    if(scalar (keys %ColumnsValues)) {
-        while(my ($column, $value) = (each %ColumnsValues)){
-            $query2 .= "$column = $value,";
-        }
-        $query2 =~s/\,$//;
-        $query2 .= " WHERE intPersonID = $personID ";
-        
-        $Data->{'db'}->do($query2);
-    }
-
-   {
+     {
 
         my $st = qq[
             UPDATE tblTransactions as T
