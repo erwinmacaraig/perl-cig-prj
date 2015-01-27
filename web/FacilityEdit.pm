@@ -159,17 +159,32 @@ sub handleFacilityEdit {
         ); 
         my $fields_summary = runTemplate($Data,\%templateData,'entity/venue_fields_summary.templ');
         if($fields_summary) {
+            
             $body .= qq[
-    <div class="read-only">
-        <h4>].$Data->{'lang'}->txt('Fields') .qq[</h4>
-        <div class="read-only-text">
-            $fields_summary
-            <div class="fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$entityID">edit</a></div>
-        </div>
-        
-    </div>
+                <div class="fieldSectiopGroupWrapper fieldSectionGroupWrapper-DisplayOnly">
+                    <h3 class="panel-header sectionheader">].$Data->{'lang'}->txt('Fields') .qq[</h3>
+                    <div class="panel-body fieldSectionGroup">
+                        $fields_summary
+                        <div class="fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$entityID">edit</a></div>
+                    </div>
+                    
+                </div>
             ];
+
         }
+
+        my $docs_summary = runTemplate($Data,\%templateData,'entity/venue_docs_summary.templ');
+
+        $body .= qq[
+                <div class="fieldSectiopGroupWrapper fieldSectionGroupWrapper-DisplayOnly">
+                    <h3 class="panel-header sectionheader">].$Data->{'lang'}->txt('Documents') .qq[</h3>
+                    <div class="panel-body fieldSectionGroup">
+                        $docs_summary
+                        <div class="fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$entityID">edit</a></div>
+                    </div>
+                    
+                </div>
+            ];
 
     }
 
