@@ -569,7 +569,8 @@ sub display_documents {
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
-    my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    #my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+	my $entityRegisteringForLevel = $Defs::LEVEL_VENUE;
     my $client = $self->{'Data'}->{'client'};
 
     my $rego_ref = {};
@@ -656,7 +657,8 @@ sub process_documents {
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
-    my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    #my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $entityRegisteringForLevel = $Defs::LEVEL_VENUE;
     my $client = $self->{'Data'}->{'client'};  
 
 	my $documents = getRegistrationItems(
