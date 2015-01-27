@@ -24,7 +24,7 @@ use GridDisplay;
 
 use PersonObj;
 use WorkFlow;
-
+use Switch;
 
 use Data::Dumper;
 
@@ -472,7 +472,45 @@ sub pendingDocumentActions {
 		
     }
 }
+sub pendingEntityDocumentActions {
+	my ($Data, $entityID, $fileID) = @_;
+	my $query = qq[ SELECT strActionPending FROM tblDocuments INNER JOIN tblEntity 
+					ON tblDocuments.intEntityID = tblEntity.intEntityID 
+					INNER JOIN tblDocumentType ON 
+					(tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID 
+					AND tblDocumentType.intRealmID = tblEntity.intRealmID)
+					WHERE tblDocuments.intUploadFileID = ? AND tblEntity.intEntityID = ?];
+	
+	my $sth = $Data->{'db'}->prepare($query);
+	$sth->execute($fileID, $entityID);	
 
+	my ($valuePending) = $sth->fetchrow_array();
+
+	switch ($valuePending) {
+		case ['CLUB','VENUE'] {
+			my $entityObj = new EntityObj(db => $Data->{'db'}, ID => $entityID, cache => $Data->{'cache'});
+			$entityObj->load();
+			if($entityObj){
+				$entityObj->setValues({'strStatus' => $Defs::ENTITY_STATUS_PENDING});
+           		$entityObj->write();
+			}
+		}
+		
+
+	}
+	my $rc = WorkFlow::addWorkFlowTasks(
+                $Data,
+                'ENTITY',
+                'AMENDMENT',
+                $Data->{'clientValues'}{'authLevel'} || 0,
+                $entityID, #originEntityID,
+                0,
+                0,
+                0,
+            );
+	
+
+}
 
 
 
