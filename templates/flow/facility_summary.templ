@@ -3,7 +3,7 @@
 <h3 class="panel-header">Summary</h3>
 <div class="panel-body">
 	<div class="document-upload summary">
-		<div class="col-md-6">
+		<div class="col-md-12">
 			<div class="read-only">
 			    <h4>Venue Details</h4>
 			    <div class="read-only-text clearfix">
@@ -20,6 +20,8 @@
 			    </div>
 			</div>
 		</div>
+
+		<div class="clearfix" style="clear:both;">&nbsp;</div>
 		<div class="col-md-6">
 			<div class="read-only">
 			    <h4>Contact Details</h4>
@@ -41,7 +43,22 @@
 			    </div>
 			</div>
 		</div>
+
+		<div class="col-md-6">
+			<div class="read-only">
+			    <h4>Documents</h4>
+			    <div class="read-only-text clearfix">
+				    <ul>
+						<li><span class="details-left">Document #1:</span><span class="details-value">&ndash;</span></li>
+						<li><span class="details-left">Document #2:</span><span class="details-value">&ndash;</span></li>
+				    </ul>
+				    <a href="[% editlink %]&amp;rfp=d" class="pull-right">Edit</a>
+			    </div>
+			</div>
+		</div>
+
 		<div class="clearfix" style="clear:both;">&nbsp;</div>
+        
         [% IF FacilityFields.size %]
 		<div class="col-md-12">
 			<div class="read-only">
