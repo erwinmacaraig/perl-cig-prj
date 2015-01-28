@@ -5,8 +5,8 @@
                 <th>[% Lang.txt('MA ID') %]</th>
                 <th>[% Lang.txt('Name') %]</th>
                 <th>[% Lang.txt('Date of Birth') %]</th>
+                <th>[% Lang.txt('Type') %]</th>
                 <th>[% Lang.txt('Role') %]</th>
-                <th>[% Lang.txt('Sub-Role') %]</th>
                 <th>[% Lang.txt('Level') %]</th>
                 <th>&nbsp;</th>
             </tr>
@@ -94,7 +94,8 @@
             "dom" : "ilftpr",
             "language" : {
                 "search": "[% Lang.txt('Filter') %]"
-            }
+            },
+            "aaSorting": [ ]
         });
 
         jQuery("input.search-mid").on('keyup change', function(){

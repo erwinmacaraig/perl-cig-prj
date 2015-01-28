@@ -126,6 +126,7 @@ sub listPersons {
             and $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL
         );
 
+        $dref->{'strNationalNum'} ||= $Defs::personStatus{$dref->{'strStatus'}} || '';
         $dref->{'PRStatus'} = $dref->{'PRActiveStatus'} if ($dref->{'PRActiveStatus'});
         $dref->{'PRStatus'} = ($dref->{'PRStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE and $dref->{'PRintPaymentRequired'}) ? $Defs::PERSONREGO_STATUS_ACTIVE_PENDING_PAYMENT : $Defs::PERSONREGO_STATUS_ACTIVE;
 
