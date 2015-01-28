@@ -2546,6 +2546,8 @@ sub populateRegoViewData {
         EditDetailsLink => $PersonEditLink,
         ReadOnlyLogin => $readonly,
         PersonSummary => personSummaryPanel($Data, $dref->{intPersonID}) || '',
+        childEntityID => $dref->{'intEntityID'},
+        parentEntityID => $Data->{'clientValues'}{'_intID'},
         WFTaskID => $dref->{'intWFTaskID'},
         ActiveTab => $activeTab
 	);

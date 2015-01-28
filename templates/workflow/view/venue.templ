@@ -90,6 +90,10 @@
                                     <span style="float: right" class="">
                                         <a href = "[% EditDetailsLink %]&a=FE_E&e_a=core&venueID=[% EntityDetails.intEntityID %]&bscrn=a%3DWF_View%26TID%3D[% intWFTaskID %]%26at%3D1" class="edit-link">[% Lang.txt('Edit') %]</a>
                                     </span>
+                                [% ELSIF parentEntityID == childEntityID %]
+                                    <span style="float: right" class="">
+                                        <a href = "[% EditDetailsLink %]&a=FE_E&e_a=core&venueID=[% EntityDetails.intEntityID %]&bscrn=a%3DWF_View%26TID%3D[% intWFTaskID %]%26at%3D1" class="edit-link">[% Lang.txt('Edit') %]</a>
+                                    </span>
                                 [% END %]
 
                                 </div>
@@ -149,6 +153,10 @@
                                     <span style="float: right" class="">
                                         <a href = "[% EditDetailsLink %]&a=FE_E&e_a=contactdetails&venueID=[% EntityDetails.intEntityID %]&bscrn=a%3DWF_View%26TID%3D[% intWFTaskID %]%26at%3D1" class="edit-link">[% Lang.txt('Edit') %]</a>
                                     </span>
+                                [% ELSIF parentEntityID == childEntityID %]
+                                    <span style="float: right" class="">
+                                        <a href = "[% EditDetailsLink %]&a=FE_E&e_a=contactdetails&venueID=[% EntityDetails.intEntityID %]&bscrn=a%3DWF_View%26TID%3D[% intWFTaskID %]%26at%3D1" class="edit-link">[% Lang.txt('Edit') %]</a>
+                                    </span>
                                 [% END %]
 
                                 </div>
@@ -165,6 +173,10 @@
             <div id="venueFields" class="tab-pane fade [% IF ActiveTab == 2 %]in active[% END %]">
                 [% VenueFieldsBlock %]
                 [% IF EditDetailsLink and !ReadOnlyLogin  %]
+                <span style="float: right" class="">
+                    <a href = "[% EditDetailsLink %]&a=VENUE_Flist&venueID=[% EntityDetails.intEntityID %]&bscrn=a%3DWF_View%26TID%3D[% intWFTaskID %]%26at%3D2" class="edit-link">[% Lang.txt('Edit') %]</a>
+                </span>
+                [% ELSIF parentEntityID == childEntityID %]
                 <span style="float: right" class="">
                     <a href = "[% EditDetailsLink %]&a=VENUE_Flist&venueID=[% EntityDetails.intEntityID %]&bscrn=a%3DWF_View%26TID%3D[% intWFTaskID %]%26at%3D2" class="edit-link">[% Lang.txt('Edit') %]</a>
                 </span>

@@ -116,6 +116,12 @@
                                         [% Lang.txt('Edit') %]
                                     </a>
                                 </span>
+                            [% ELSIF parentEntityID == childEntityID %]
+                                <span style="float: right" class="">
+                                    <a href = "[% EditDetailsLink %]&e_a=core&bscrn=a%3DWF_View%26TID%3D[% WFTaskID %]%26at%3D2" class="edit-link">
+                                        [% Lang.txt('Edit') %]
+                                    </a>
+                                </span>
                             [% END %]
 
                             </div>
@@ -209,6 +215,12 @@
                             [% IF EditDetailsLink and !ReadOnlyLogin  %]
                                 <span style="float: right" class="">
                                     <a href = "[% EditDetailsLink %]&e_a=con&bscrn=a%3DWF_View%26TID%3D[% WFTaskID %]%26at%3D2" class="edit-link">[% Lang.txt('Edit') %]</a>
+                                </span>
+                            [% ELSIF parentEntityID == childEntityID %]
+                                <span style="float: right" class="">
+                                    <a href = "[% EditDetailsLink %]&e_a=core&bscrn=a%3DWF_View%26TID%3D[% WFTaskID %]%26at%3D2" class="edit-link">
+                                        [% Lang.txt('Edit') %]
+                                    </a>
                                 </span>
                             [% END %]
 
