@@ -1,5 +1,5 @@
 <div class="col-md-12 tasklist-content dashboard-tasklist ">
-    <table id="searchResult" cellpadding="5" class = "zebra" style="width: 100%">
+    <table id="searchResult" cellpadding="5" class = "table-responsive zebra" style="width: 100%">
         <thead>
             <tr class="box-header">
                 <th>[% Lang.txt('MA ID') %]</th>
@@ -8,6 +8,7 @@
                 <th>[% Lang.txt('Type') %]</th>
                 <th>[% Lang.txt('Role') %]</th>
                 <th>[% Lang.txt('Level') %]</th>
+                <th>[% Lang.txt('Certificate') %]</th>
                 <th>&nbsp;</th>
             </tr>
             <tr>
@@ -48,9 +49,18 @@
                         [% END %]
                     </select>
                 </td>
+                <td>
+                    <select class="filter-cert">
+                        <option value="">-- [% Lang.txt('All') %] --</option>
+                        [% FOREACH t IN filter.certs.keys %]
+                        <option value="[% t %]">[% filter.certs.$t %]</option>
+                        [% END %]
+                    </select>
+                </td>
                 <td></td>
             </tr>
             <tr style="display: none" class="box-header">
+                <th></th>
                 <th></th>
                 <th></th>
                 <th></th>
@@ -68,8 +78,9 @@
                     <td>[% rego.strLocalFirstname %] [% rego.strLocalSurname %]</td>
                     <td data-order = "[% rego.dtDOB %]">[% DateFormat.format(rego.dtDOB,'MEDIUM') %]</td>
                     <td>[% rego.types %]</td>
-                    <td>[% rego.subtypes %]</td>
+                    <td><span style = "[% IF rego.subtypes.length > 110 %]font-size:10px;[% END %]">[% rego.subtypes%]</span></td>
                     <td>[% rego.levels %]</td>
+                    <td><span style = "[% IF rego.certs.length > 110 %]font-size:10px;[% END %]">[% rego.certs %]</span></td>
                     <td>
                     [% IF rego.inProgressRequestExists %]
                         [% Lang.txt('Request Access sent to Club') %]
@@ -155,6 +166,17 @@
             var index = jQuery(this).find(":selected").index();
             var val = jQuery.fn.dataTable.util.escapeRegex(jQuery(this).val());
             levelcol
+                .search( val ? val : '', true, false )
+                .draw();               
+
+        });
+        var cert = jQuery("select.filter-cert");
+        var certcol = table.column(6);
+
+        jQuery(cert).on('change', function(){
+            var index = jQuery(this).find(":selected").index();
+            var val = jQuery.fn.dataTable.util.escapeRegex(jQuery(this).val());
+            certcol
                 .search( val ? val : '', true, false )
                 .draw();               
 

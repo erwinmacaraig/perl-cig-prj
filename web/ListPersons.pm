@@ -75,7 +75,9 @@ sub listPersons {
             PR.strPersonSubType AS PRstrPersonSubType,
             PR.strPersonEntityRole AS PRstrPersonEntityRole,
             ETR.strEntityRoleName AS PRstrPersonEntityRoleName,
-            PR.strPersonLevel AS PRstrPersonLevel
+            PR.strPersonLevel AS PRstrPersonLevel,
+            PC.intCertificationTypeID,
+            CT.strCertificationName
         FROM tblPerson  AS P
             INNER JOIN tblPersonRegistration_$realm_id AS PR ON ( 
                 P.intPersonID = PR.intPersonID
@@ -85,15 +87,23 @@ sub listPersons {
             LEFT JOIN tblEntityTypeRoles as ETR ON (
                 ETR.strEntityRoleKey = PR.strPersonEntityRole
             ) 
+            LEFT JOIN tblPersonCertifications as PC ON (
+                P.intPersonID = PC.intPersonID
+                AND PC.strStatus = 'ACTIVE'
+            ) 
+            LEFT JOIN tblCertificationTypes as CT ON (
+                PC.intCertificationTypeID = CT.intCertificationTypeID
+            ) 
         WHERE 
             P.strStatus <> 'DELETED' 
-            AND PR.strStatus <> 'INPROGRESS'
+            AND PR.strStatus = 'ACTIVE'
             AND P.intRealmID = $realm_id
         ORDER BY 
             strLocalSurname, 
             strLocalFirstname,
             P.intPersonID
     ];
+            #AND PR.strStatus <> 'INPROGRESS'
 
     my $query = $Data->{'db'}->prepare($statement);
     $query->execute(
@@ -112,6 +122,8 @@ sub listPersons {
     my %UsedSubRoles = ();
     my %UsedLevels = ();
     my %subRoleNames = ();
+    my %certNames = ();
+    my %UsedCerts = ();
     while (my $dref = $query->fetchrow_hashref()) {
         next if (defined $dref->{intSystemStatus} and $dref->{intSystemStatus} == $Defs::PERSONSTATUS_DELETED);
         next if (
@@ -139,6 +151,7 @@ sub listPersons {
             subtype => $dref->{'PRstrPersonSubType'},
             level => $dref->{'PRstrPersonLevel'},
             entityrole => $dref->{'PRstrPersonEntityRole'},
+            certType => $dref->{'intCertificationTypeID'} || 0,
         };
         if($dref->{'PRstrPersonEntityRole'})    {
             $UsedSubRoles{$dref->{'PRstrPersonEntityRole'}} =  1;
@@ -147,6 +160,10 @@ sub listPersons {
         $UsedLevels{$dref->{'PRstrPersonLevel'}} =  1 if $dref->{'PRstrPersonLevel'};
         if($dref->{'PRstrPersonType'})  {
             $UsedTypes{$dref->{'PRstrPersonType'}} =  1;
+        }
+        if($dref->{'intCertificationTypeID'})  {
+            $certNames{$dref->{'intCertificationTypeID'}} =  $dref->{'strCertificationName'} || '';
+            $UsedCerts{$dref->{'intCertificationTypeID'}} =  1;
         }
         next if exists $PersonSeen{$dref->{'intPersonID'}};
         $PersonSeen{$dref->{'intPersonID'}} = 1;
@@ -187,12 +204,14 @@ sub listPersons {
         my %subtypes = ();
         my %levels = ();
         my %entityroles = ();
+        my %certs = ();
         foreach my $reg (@{$PersonRegos{$id}}) {
             my $type = $reg->{'type'} || '';
             my $status = $reg->{'status'} || 'PASSIVE';
             my $subtype = $reg->{'subtype'} || '';
             my $level = $reg->{'level'} || '';
             my $entityrole = $reg->{'entityrole'} || '';
+            my $cert = $reg->{'certType'} || '';
             if(
                 !exists $types{$type}
                 or (exists $types{$type} and $status eq 'ACTIVE')
@@ -216,6 +235,12 @@ sub listPersons {
                 or (exists $entityroles{$entityrole} and $status eq 'ACTIVE')
             ) {
                 $entityroles{$entityrole} = $status;
+            }
+            if(
+                !exists $certs{$cert}
+                or (exists $certs{$cert} and $status eq 'ACTIVE')
+            ) {
+                $certs{$cert} = $status;
             }
         } 
         my $types_str = '';
@@ -245,9 +270,17 @@ sub listPersons {
             $levels_str .= '/' if $levels_str;
             $levels_str .= qq[<span class = "LEVEL_STATUS_$status"><span class = "hidden-col-val">$l</span>].$lang->txt($Defs::personLevel{$l}).qq[</span>];
         }
+        my $certs_str = '';
+        for my $l (keys %certs) {
+            next if !$l;
+            my $status = $certs{$l} || 'PASSIVE';
+            $certs_str .= '/' if $certs_str;
+            $certs_str .= qq[<span class = "CERT_STATUS_$status"><span class = "hidden-col-val">$l</span>].$lang->txt($certNames{$l}).qq[</span>];
+        }
         $row->{'types'} = $types_str;
         $row->{'subtypes'} = $subtypes_str;
         $row->{'levels'} = $levels_str;
+        $row->{'certs'} = $certs_str;
     }
 
 
@@ -256,6 +289,7 @@ sub listPersons {
     my %typeValues = (); 
     my %subRoleValues = ();
     my %levelValues = ();
+    my %certValues = ();
 
     for my $i (keys %UsedTypes) {
         $typeValues{$i} =  $Defs::personType{$i} || '';
@@ -266,6 +300,9 @@ sub listPersons {
     for my $i (keys %UsedLevels) {
         $levelValues{$i} =  $Defs::personLevel{$i} || '';
     }
+    for my $i (keys %UsedCerts) {
+        $certValues{$i} =  $certNames{$i} || '';
+    }
     $resultHTML = runTemplate(
         $Data,
         {
@@ -274,6 +311,7 @@ sub listPersons {
                 types => \%typeValues,
                 subtypes => \%subRoleValues,
                 levels => \%levelValues,
+                certs => \%certValues,
             }
         },
         'person/list.templ',

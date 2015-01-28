@@ -831,6 +831,7 @@ sub getClubMenuData {
         'duplicates',
         'bulk',
 		'bulkpayment',
+        'persons',
          ]],
 
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu',[
