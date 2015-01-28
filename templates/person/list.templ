@@ -25,19 +25,34 @@
 			        </select>
 				</td>
 				<td>
-                    <!-- should be dynamically populated based on search result -->
 					<select class="filter-role">
                         <option value="">-- [% Lang.txt('All') %] --</option>
-                        [% FOREACH role IN Filters.role %]
-                        <option value="[% role %]">[% role %]</option>
+                        [% FOREACH t IN filter.types.keys %]
+                        <option value="[% t %]">[% filter.types.$t %]</option>
                         [% END %]
 			        </select>
 				</td>
-				<td>subrole</td>
-				<td>level</td>
+				<td>
+					<select class="filter-subrole">
+                        <option value="">-- [% Lang.txt('All') %] --</option>
+                        [% FOREACH t IN filter.subtypes.keys %]
+                        <option value="[% t %]">[% filter.subtypes.$t %]</option>
+                        [% END %]
+			        </select>
+				</td>
+				<td>
+					<select class="filter-level">
+                        <option value="">-- [% Lang.txt('All') %] --</option>
+                        [% FOREACH t IN filter.levels.keys %]
+                        <option value="[% t %]">[% filter.levels.$t %]</option>
+                        [% END %]
+			        </select>
+				</td>
 				<td></td>
 			</tr>
 			<tr style="display: none" class="box-header">
+				<th></th>
+				<th></th>
 				<th></th>
 				<th></th>
 				<th></th>
@@ -52,9 +67,9 @@
                     <td><span class="fa fa-user"></span>[% rego.strNationalNum %]</td>
                     <td>[% rego.strLocalFirstname %] [% rego.strLocalSurname %]</td>
                     <td data-order = "[% rego.dtDOB %]">[% DateFormat.format(rego.dtDOB,'MEDIUM') %]</td>
-				<td>subrole</td>
-				<td>level</td>
-				<td></td>
+                    <td>[% rego.types %]</td>
+                    <td>[% rego.subtypes %]</td>
+                    <td>[% rego.levels %]</td>
                     <td>
                     [% IF rego.inProgressRequestExists %]
                         [% Lang.txt('Request Access sent to Club') %]
@@ -116,13 +131,34 @@
         jQuery(role).on('change', function(){
             var index = jQuery(this).find(":selected").index();
             var val = jQuery.fn.dataTable.util.escapeRegex(jQuery(this).val());
-            console.log(val);
-
             rolecol
-                .search( val ? '^'+val+'$' : '', true, false )
+                .search( val ? val : '', true, false )
                 .draw();               
 
         });
+        var subrole = jQuery("select.filter-subrole");
+        var subrolecol = table.column(4);
+
+        jQuery(subrole).on('change', function(){
+            var index = jQuery(this).find(":selected").index();
+            var val = jQuery.fn.dataTable.util.escapeRegex(jQuery(this).val());
+            subrolecol
+                .search( val ? val : '', true, false )
+                .draw();               
+
+        });
+        var level = jQuery("select.filter-level");
+        var levelcol = table.column(5);
+
+        jQuery(level).on('change', function(){
+            var index = jQuery(this).find(":selected").index();
+            var val = jQuery.fn.dataTable.util.escapeRegex(jQuery(this).val());
+            levelcol
+                .search( val ? val : '', true, false )
+                .draw();               
+
+        });
+
 
     });
 </script>

@@ -73,6 +73,8 @@ sub listPersons {
             PR.strPersonType AS PRstrPersonType,
             PR.strStatus AS PRStatus,
             PR.strPersonSubType AS PRstrPersonSubType,
+            PR.strPersonEntityRole AS PRstrPersonEntityRole,
+            ETR.strEntityRoleName AS PRstrPersonEntityRoleName,
             PR.strPersonLevel AS PRstrPersonLevel
         FROM tblPerson  AS P
             INNER JOIN tblPersonRegistration_$realm_id AS PR ON ( 
@@ -80,6 +82,9 @@ sub listPersons {
                 AND PR.strStatus NOT IN ('ROLLED_OVER')
                 AND PR.intEntityID = ?
             )
+            LEFT JOIN tblEntityTypeRoles as ETR ON (
+                ETR.strEntityRoleKey = PR.strPersonEntityRole
+            ) 
         WHERE 
             P.strStatus <> 'DELETED' 
             AND PR.strStatus <> 'INPROGRESS'
@@ -94,7 +99,6 @@ sub listPersons {
     $query->execute(
         $entityID, 
     );
-warn($entityID.$statement);
     my $found = 0;
     my @rowdata = ();
     my $newaction='P_HOME';
@@ -104,6 +108,10 @@ warn($entityID.$statement);
     $tempClientValues{currentLevel} = $Defs::LEVEL_PERSON;
     my %PersonSeen=();
     my %PersonRegos = ();
+    my %UsedTypes = ();
+    my %UsedSubRoles = ();
+    my %UsedLevels = ();
+    my %subRoleNames = ();
     while (my $dref = $query->fetchrow_hashref()) {
         next if (defined $dref->{intSystemStatus} and $dref->{intSystemStatus} == $Defs::PERSONSTATUS_DELETED);
         next if (
@@ -129,7 +137,16 @@ warn($entityID.$statement);
             status => $dref->{'PRStatus'},
             subtype => $dref->{'PRstrPersonSubType'},
             level => $dref->{'PRstrPersonLevel'},
+            entityrole => $dref->{'PRstrPersonEntityRole'},
         };
+        if($dref->{'PRstrPersonEntityRole'})    {
+            $UsedSubRoles{$dref->{'PRstrPersonEntityRole'}} =  1;
+            $subRoleNames{$dref->{'PRstrPersonEntityRole'}} = $dref->{'PRstrPersonEntityRoleName'} || '';
+        }
+        $UsedLevels{$dref->{'PRstrPersonLevel'}} =  1 if $dref->{'PRstrPersonLevel'};
+        if($dref->{'PRstrPersonType'})  {
+            $UsedTypes{$dref->{'PRstrPersonType'}} =  1;
+        }
         next if exists $PersonSeen{$dref->{'intPersonID'}};
         $PersonSeen{$dref->{'intPersonID'}} = 1;
 
@@ -159,7 +176,7 @@ warn($entityID.$statement);
         }
         $tempClientValues{personID} = $dref->{intPersonID};
         my $tempClient = setClient(\%tempClientValues);
-        $dref->{'SelectLink'} = "$target?client=$tempClient&amp;a=$newaction";
+        $dref->{'link'} = "$target?client=$tempClient&amp;a=$newaction";
         push @rowdata, $dref;
         $found++;
     }
@@ -168,11 +185,13 @@ warn($entityID.$statement);
         my %types = ();
         my %subtypes = ();
         my %levels = ();
+        my %entityroles = ();
         foreach my $reg (@{$PersonRegos{$id}}) {
             my $type = $reg->{'type'} || '';
-            my $status = $reg->{'status'} || 'INACTIVE';
+            my $status = $reg->{'status'} || 'PASSIVE';
             my $subtype = $reg->{'subtype'} || '';
             my $level = $reg->{'level'} || '';
+            my $entityrole = $reg->{'entityrole'} || '';
             if(
                 !exists $types{$type}
                 or (exists $types{$type} and $status eq 'ACTIVE')
@@ -191,24 +210,39 @@ warn($entityID.$statement);
             ) {
                 $levels{$level} = $status;
             }
+            if(
+                !exists $entityroles{$entityrole}
+                or (exists $entityroles{$entityrole} and $status eq 'ACTIVE')
+            ) {
+                $entityroles{$entityrole} = $status;
+            }
         } 
         my $types_str = '';
         for my $t (keys %types) {
             next if !$t;
-            my $status = $types{$t} || 'INACTIVE';
-            $types_str .= qq[<span class = "TYPE_STATUS_$status">].$lang->txt($Defs::personType{$t}).qq[</span> ];
+            my $status = $types{$t} || 'PASSIVE';
+            $types_str .= '/' if $types_str;
+            $types_str .= qq[<span class = "TYPE_STATUS_$status"><span class = "hidden-col-val">$t</span>].$lang->txt($Defs::personType{$t}).qq[</span>];
         }
         my $subtypes_str = '';
         for my $st (keys %subtypes) {
             next if !$st;
-            my $status = $subtypes{$st} || 'INACTIVE';
-            $subtypes_str .= qq[<span class = "SUBTYPE_STATUS_$status">].$lang->txt($st).qq[</span> ];
+            my $status = $subtypes{$st} || 'PASSIVE';
+            $subtypes_str .= '/' if $subtypes_str;
+            $subtypes_str .= qq[<span class = "SUBTYPE_STATUS_$status"><span class = "hidden-col-val">$st</span>].$lang->txt($subRoleNames{$st}).qq[</span>];
+        }
+        for my $er (keys %entityroles) {
+            next if !$er;
+            my $status = $entityroles{$er} || 'PASSIVE';
+            $subtypes_str .= '/' if $subtypes_str;
+            $subtypes_str .= qq[<span class = "SUBTYPE_STATUS_$status"><span class = "hidden-col-val">$er</span>].$lang->txt($subRoleNames{$er}).qq[</span>];
         }
         my $levels_str = '';
         for my $l (keys %levels) {
             next if !$l;
-            my $status = $levels{$l} || 'INACTIVE';
-            $levels_str .= qq[<span class = "SUBTYPE_STATUS_$status">].$lang->txt($l).qq[</span> ];
+            my $status = $levels{$l} || 'PASSIVE';
+            $levels_str .= '/' if $levels_str;
+            $levels_str .= qq[<span class = "LEVEL_STATUS_$status"><span class = "hidden-col-val">$l</span>].$lang->txt($Defs::personLevel{$l}).qq[</span>];
         }
         $row->{'types'} = $types_str;
         $row->{'subtypes'} = $subtypes_str;
@@ -218,10 +252,28 @@ warn($entityID.$statement);
 
     $title = $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'} in $Data->{'LevelNames'}{$type}");
 
+    my %typeValues = (); 
+    my %subRoleValues = ();
+    my %levelValues = ();
+
+    for my $i (keys %UsedTypes) {
+        $typeValues{$i} =  $Defs::personType{$i} || '';
+    }
+    for my $i (keys %UsedSubRoles) {
+        $subRoleValues{$i} =  $subRoleNames{$i} || '';
+    }
+    for my $i (keys %UsedLevels) {
+        $levelValues{$i} =  $Defs::personLevel{$i} || '';
+    }
     $resultHTML = runTemplate(
         $Data,
         {
             rowdata => \@rowdata,
+            filter => {
+                types => \%typeValues,
+                subtypes => \%subRoleValues,
+                levels => \%levelValues,
+            }
         },
         'person/list.templ',
     );
