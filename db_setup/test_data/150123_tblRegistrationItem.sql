@@ -15,4 +15,5 @@ INSERT INTO tblRegistrationItem (intRealmID, intSubRealmID, intOriginLevel, strR
 INSERT INTO tblRegistrationItem (intRealmID, intSubRealmID, intOriginLevel, strRuleFor, intEntityLevel, strRegistrationNature, strItemType, intID, intUseExistingThisEntity, intUseExistingAnyEntity, intRequired, intFilterFromAge, intFilterToAge) VALUES ('1', '0', '100', 'ENTITY', '3', 'AMENDMENT', 'DOCUMENT', '60', '0', '0', '0', '0', '0');
 
 INSERT INTO tblRegistrationItem (intRealmID, intSubRealmID, intOriginLevel, strRuleFor, intEntityLevel, strRegistrationNature, strItemType, intID, intUseExistingThisEntity, intUseExistingAnyEntity, intRequired, intFilterFromAge, intFilterToAge) VALUES ('1', '0', '100', 'ENTITY', '3', 'AMENDMENT', 'DOCUMENT', '61', '0', '0', '0', '0', '0');
+INSERT INTO tblRegistrationItem (intRealmID, intSubRealmID, intOriginLevel, strRuleFor, intEntityLevel, strRegistrationNature, strItemType, intID, intUseExistingThisEntity, intUseExistingAnyEntity, intRequired, intFilterFromAge, intFilterToAge) VALUES ('1', '0', '100', 'ENTITY', '3', 'AMENDMENT', 'DOCUMENT', '63', '0', '0', '0', '0', '0');
 
