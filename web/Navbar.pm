@@ -973,7 +973,7 @@ sub GenerateTree {
                 name => $name,
                 type => $levelType,
                 url => $url,
-                levelname => $Data->{'LevelNames'}{$levelType},
+                levelname => $Data->{'lang'}->txt($Data->{'LevelNames'}{$levelType}),
                 ma_phone_number => $Data->{'SystemConfig'}{'ma_phone_number'},
                 ma_website => $Data->{'SystemConfig'}{'ma_website'},
                 ma_email => $Data->{'SystemConfig'}{'ma_email'},
