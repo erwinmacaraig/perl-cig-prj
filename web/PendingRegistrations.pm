@@ -124,7 +124,6 @@ sub listPendingRegistrations    {
         $Data->{'Realm'},
         $entityID
     );
-    my $lang = $Data->{'lang'};
     while (my $dref = $query->fetchrow_hashref) {
         $results=1;
         my $localname = formatPersonName($Data, $dref->{'strLocalFirstname'}, $dref->{'strLocalSurname'}, $dref->{'intGender'});

@@ -242,7 +242,6 @@ sub personRegistrationsHistory   {
     my @rowdata = ();
     my $results = 0;
     my $client           = setClient( $Data->{'clientValues'} ) || '';
-    my $lang = $Data->{'lang'};
     foreach my $rego (@{$Reg_ref})  {
       $results=1;
         my $name = $rego->{'strLocalName'};

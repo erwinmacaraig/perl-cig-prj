@@ -14,7 +14,7 @@ sub txt (@) {
 
   my $s = $self->maketext(@temp); 
   #return $s;
-  return qq[<span style="color:red !important;">$s</span>];
+  return qq[<span style='color:red !important;'>$s</span>];
 } 
 
 # I decree that this project's first language is English.

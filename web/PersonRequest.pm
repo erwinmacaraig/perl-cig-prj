@@ -1679,7 +1679,7 @@ sub itcFields {
                 	compulsory => 1,  
    		    	},
    		    	strClubName => {   		    	
-   		    		label => 'Club\'s Name',
+   		    		label => 'Club Name',
    		    		type => 'text',
    		    		value => '',
                 	compulsory => 1,  
