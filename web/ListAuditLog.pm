@@ -73,12 +73,13 @@ sub listPersonAuditLog    {
     );
 	my @rowdata = ();
 	while(my $ref= $sth->fetchrow_hashref()){
+        my $dt = $Data->{'l10n'}{'date'}->TZformat($ref->{'dtUpdated'},'MEDIUM','SHORT');
 		push @rowdata,{
 			Username=> $ref->{'strUsername'},
 			UserEntity=> $ref->{'strLocalName'},
 			Type => $ref->{'strType'},
 			Section=> $ref->{'strSection'},
-			DateUpdated=> $ref->{'dtUpdated'},
+			DateUpdated=> $dt,
 		};
 	}
 	$sth->finish();
@@ -132,12 +133,13 @@ sub listEntityAuditLog {
     );
 	my @rowdata = ();
 	while(my $ref= $sth->fetchrow_hashref()){
+        my $dt = $Data->{'l10n'}{'date'}->TZformat($ref->{'dtUpdated'},'MEDIUM','SHORT');
 		push @rowdata,{
 			Username=> $ref->{'strUsername'},
 			UserEntity=> $ref->{'strLocalName'},
 			Type => $ref->{'strType'},
 			Section=> $ref->{'strSection'},
-			DateUpdated=> $ref->{'dtUpdated'},
+			DateUpdated=> $dt,
 		};
 	}
 	$sth->finish();
@@ -146,7 +148,7 @@ sub listEntityAuditLog {
 		AuditLog=> \@rowdata,
 	};
 	 my $title = '';
-	 my $resultHTML = runTemplate($Data, $PageContent, 'person/auditlog.templ') || '';
+	 my $resultHTML = runTemplate($Data, $PageContent, 'entity/auditlog.templ') || '';
 	 $title = 'Audit Trail';
 	 return ($resultHTML, $title);
 }
