@@ -242,6 +242,7 @@ sub personRegistrationsHistory   {
     my @rowdata = ();
     my $results = 0;
     my $client           = setClient( $Data->{'clientValues'} ) || '';
+    my $lang = $Data->{'lang'};
     foreach my $rego (@{$Reg_ref})  {
       $results=1;
         my $name = $rego->{'strLocalName'};
@@ -252,13 +253,13 @@ sub personRegistrationsHistory   {
         EntityLatinName=> $rego->{'strLatinName'} || '',
         dtApproved=> $Data->{'l10n'}{'date'}->TZformat($rego->{'dtApproved'},'MEDIUM','SHORT') || '',
         dtApproved_RAW=> $rego->{'dtApproved'} || '',
-        PersonType=> $rego->{'PersonType'} || '',
-        PersonLevel=> $rego->{'PersonLevel'} || '',
-        AgeLevel=> $rego->{'AgeLevel'} || '',
-        RegistrationNature=> $rego->{'RegistrationNature'} || '',
-        Status=> $rego->{'Status'} || '',
-        PersonEntityRole=> $rego->{'strPersonEntityRole'} || '',
-        Sport=> $rego->{'Sport'} || '',
+        PersonType=> $lang->txt($rego->{'PersonType'} || ''),
+        PersonLevel=> $lang->txt($rego->{'PersonLevel'} || ''),
+        AgeLevel=> $lang->txt($rego->{'AgeLevel'} || ''),
+        RegistrationNature=> $lang->txt($rego->{'RegistrationNature'} || ''),
+        Status=> $lang->txt($rego->{'Status'} || ''),
+        PersonEntityRole=> $lang->txt($rego->{'strPersonEntityRole'} || ''),
+        Sport=> $lang->txt($rego->{'Sport'} || ''),
         SelectLink => "$Data->{'target'}?client=$client&amp;a=P_REGO&amp;prID=$rego->{'intPersonRegistrationID'}",
       };
     }
@@ -420,7 +421,7 @@ my @headers = (
 		$cnt++;
 		my @rowdata = ();
 		#get the documents here		
-		$grid .= qq[<br /><h2 class="section-header">$registration->{'PersonType'} - $registration->{'Sport'} - $registration->{'PersonLevel'} ] . $lang->txt('for') . qq[ $registration->{'strNationalPeriodName'} ] . $lang->txt('in') . qq[ $registration->{'strLocalName'}</h2>];
+		$grid .= qq[<br /><h2 class="section-header">].$lang->txt($registration->{'PersonType'}).' - '. $lang->txt($registration->{'Sport'}) .' - ' . $lang->txt($registration->{'PersonLevel'})  . $lang->txt('for') . qq[ $registration->{'strNationalPeriodName'} ] . $lang->txt('in') . qq[ $registration->{'strLocalName'}</h2>];
 			
 			#loop over rego documents
 			foreach my $regodoc (@{$registration->{'documents'}}){
@@ -530,10 +531,10 @@ my $addlink='';
                               <option value=""> </option>
                        ];
     while(my $dref = $sth->fetchrow_hashref()){
-        $doclisttype .= qq[<option value="$dref->{'intDocumentTypeID'}">$dref->{'strDocumentName'}</option>];
+        $doclisttype .= qq[<option value="$dref->{'intDocumentTypeID'}">].$lang->txt($dref->{'strDocumentName'}).qq[</option>];
     }  
 	$doclisttype .= qq[ </select>
-                        <input type="submit" class="btn-inside-panels" value="Add" />
+                        <input type="submit" class="btn-inside-panels" value="].$lang->txt('Add').qq[" />
 					</form></div>];
 
 	 my $modoptions=qq[<div class="changeoptions"></div>];

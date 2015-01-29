@@ -787,7 +787,7 @@ sub listRequests {
 
 	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
     my $client = setClient( $Data->{'clientValues'} ) || '';
-    my $title = "Requests";
+    my $title = $Data->{'lang'}->txt("Requests");
 
     my %reqFilters =  ();
     if ($personID)  {
@@ -820,7 +820,7 @@ sub listRequests {
         }
     }
 
-    return ("$found record found.", $title) if !$found;
+    return ($Data->{'lang'}->txt("Records found").': '. $found, $title) if !$found;
 
     my @headers = (
         { 

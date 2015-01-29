@@ -418,7 +418,7 @@ sub showGrid {
 		$tabledata .= "</tr>";
 		$cnt++;
 	}
-	if($tabledata eq '') { $tabledata = '<tr><td colspan="20">Sorry there is no data to return</td></tr>'; }
+	if($tabledata eq '') { $tabledata = '<tr><td colspan="20">'.$Data->{'lang'}->txt('Sorry there is no data to return').'</td></tr>'; }
     my %gridConfig = ();
     if(!$display_pager) {
         $gridConfig{'paging'} = 'false';

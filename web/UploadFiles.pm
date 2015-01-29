@@ -117,7 +117,7 @@ sub getUploadedFiles	{
 			id => $dref->{'intFileID'} || 0,
 			SelectLink => ' ',
 			Title => $dref->{'strTitle'} || '',
-			DocumentType=> $dref->{'strDocumentName'} || '',
+			DocumentType=> $Data->{'lang'}->txt($dref->{'strDocumentName'}) || '',
 			URL => $url,
 			Delete => $deleteURLButton, 
 			View => $urlViewButton,
