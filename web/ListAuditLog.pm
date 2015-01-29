@@ -73,7 +73,7 @@ sub listPersonAuditLog    {
     );
 	my @rowdata = ();
 	while(my $ref= $sth->fetchrow_hashref()){
-        my $dt = $Data->{'l10n'}{'date'}->TZFormat($ref->{'dtUpdated'},'MEDIUM','SHORT');
+        my $dt = $Data->{'l10n'}{'date'}->TZformat($ref->{'dtUpdated'},'MEDIUM','SHORT');
 		push @rowdata,{
 			Username=> $ref->{'strUsername'},
 			UserEntity=> $ref->{'strLocalName'},
