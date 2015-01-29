@@ -425,6 +425,7 @@ sub showGrid {
     }
     $gridConfig{'dom'} = 'ilftpr';
     $gridConfig{'language'}{'search'} = $Data->{'lang'}->txt('Filter');
+    $gridConfig{'language'}{'sInfo'} = $Data->{'lang'}->txt('Showing _START_ to _END_ of _TOTAL_ entries');
 	my ($columndefs , $headerInfo) = processFieldHeaders($columninfo);
     $gridConfig{'columns'} = $columndefs;
 	my $config_str = to_json(\%gridConfig);
