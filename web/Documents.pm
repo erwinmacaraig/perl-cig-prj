@@ -5,8 +5,8 @@
 package Documents;
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(handle_documents pendingDocumentActions);
-@EXPORT_OK = qw(handle_documents pendingDocumentActions);
+@EXPORT = qw(handle_documents pendingDocumentActions pendingEntityDocumentActions);
+@EXPORT_OK = qw(handle_documents pendingDocumentActions pendingEntityDocumentActions);
 
 use strict;
 use lib "..",".";
@@ -24,7 +24,7 @@ use GridDisplay;
 
 use PersonObj;
 use WorkFlow;
-
+use Switch;
 
 use Data::Dumper;
 
@@ -471,6 +471,44 @@ sub pendingDocumentActions {
         );
 		
     }
+}
+sub pendingEntityDocumentActions {
+	my ($Data, $entityID, $fileID) = @_;
+	my $query = qq[ SELECT strActionPending FROM tblDocuments INNER JOIN tblEntity 
+					ON tblDocuments.intEntityID = tblEntity.intEntityID 
+					INNER JOIN tblDocumentType ON 
+					(tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID 
+					AND tblDocumentType.intRealmID = tblEntity.intRealmID)
+					WHERE tblDocuments.intUploadFileID = ? AND tblEntity.intEntityID = ?];
+	
+	my $sth = $Data->{'db'}->prepare($query);
+	$sth->execute($fileID, $entityID);	
+
+	my ($valuePending) = $sth->fetchrow_array();
+
+	switch ($valuePending) {
+		case 'CLUB' {
+			my $clubObj = new EntityObj(db => $Data->{'db'}, ID => $entityID, cache => $Data->{'cache'});
+			$clubObj->load();
+			if($clubObj){
+				$clubObj->setValues({'strStatus' => $Defs::ENTITY_STATUS_PENDING});
+           		$clubObj->write();
+			}
+			my $rc = WorkFlow::addWorkFlowTasks(
+                $Data,
+                'ENTITY',
+                'AMENDMENT',
+                $Data->{'clientValues'}{'authLevel'} || 0,
+                $entityID, #originEntityID,
+                0,
+                0,
+                0,
+            );
+
+		}
+
+	}
+
 }
 
 

@@ -182,7 +182,7 @@ sub _processUploadFile_single	{
 		$options,
         $other_info,
 	) = @_;
-	open FH, ">>dumpfile.txt";
+
 	
 	my $intFileAddedBy = $Data->{'clientValues'}{'_intID'} || getLastEntityID($Data->{'clientValues'});
 	$options ||= {}; 
@@ -276,7 +276,7 @@ sub _processUploadFile_single	{
 	}
 	    #### START OF INSERTING DATA IN tblDocuments ##
         if($DocumentTypeId && !$oldFileId){
-         open FH, ">dumpfile.txt";
+
 		 
            $doc_st = qq[
                 INSERT INTO tblDocuments ( 
