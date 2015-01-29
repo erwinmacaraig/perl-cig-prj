@@ -698,7 +698,7 @@ sub getClubMenuData {
         name => $lang->txt('My Club'),
         url => $baseurl."a=EE_D",
     };
-    if (1==2 && $Data->{'clientValues'}{'authLevel'}>= $Defs::LEVEL_NATIONAL )   {
+    if ($Data->{'clientValues'}{'authLevel'}>= $Defs::LEVEL_NATIONAL )   {
         $menuoptions{'auditlog'} = {
             name => $lang->txt("Audit Trail"),
             url => $baseurl."a=C_HISTLOG",

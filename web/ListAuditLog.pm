@@ -111,7 +111,7 @@ sub listEntityAuditLog {
             )
             LEFT JOIN tblEntity as E ON (
                 E.intEntityID= AL.intID 
-                AND AL.strSection IN ("Club", "Entity", "Venue")
+                AND AL.strSection IN ("Imported", "Club", "Entity", "Venue")
             )
         WHERE
             (
@@ -119,7 +119,7 @@ sub listEntityAuditLog {
                 OR WFT.intEntityID=? 
                 OR E.intEntityID=?
             )
-            AND AL.strSection IN ("Club", "Entity", "Venue", "WFTask")
+            AND AL.strSection IN ("Imported", "Club", "Entity", "Venue", "WFTask")
         ORDER BY 
             AL.dtUpdated DESC
     
