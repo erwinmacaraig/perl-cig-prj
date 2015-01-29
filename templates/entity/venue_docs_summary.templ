@@ -8,15 +8,19 @@
         <th>[% Lang.txt('Replace') %]</th>
     </tr>
     </thead>
+<!--
     <tbody>
-    [% FOREACH fieldRow IN fieldData %]
+    [% FOREACH docs IN venueDocuments %]
     <tr>
-        <td>[% fieldRow.intFieldOrderNumber %]</td>
-        <td>[% fieldRow.strName %]</td>
-        <td>[% Disciplines.item(fieldRow.strDiscipline) %]</td>
+        <td>[% docs.strDocumentname %]</td>
+        <td>[% docs.strApprovalStatus %]</td>
+        <td>[% docs.dtUploaded %]</td>
         <td><a class="btn-main btn-view-replace">View</a></td>
         <td><a class="btn-main btn-view-replace">Replace</a></td>
     </tr>
     [% END %]
     </tbody>
 </table>
+-->
+
+

@@ -50,7 +50,10 @@ if($uploaded_filename ne ''){
     #UploadFiles::processUploadFile(\%Data,\@files,$Defs::LEVEL_PERSON,$personID,$Defs::UPLOADFILETYPE_DOC,\%other_person_info,);   
 	my $fileID = UploadFiles::processUploadFile(\%Data,\@files, $Data{'clientValues'}{'currentLevel'}, $personID,$Defs::UPLOADFILETYPE_DOC,\%other_person_info,);   
 
-	pendingDocumentActions(\%Data,$personID,$regoID,$fileID)if($notFromFlow);
+	#pendingDocumentActions(\%Data,$personID,$regoID,$fileID)if($notFromFlow);
+	if($notFromFlow){
+		(!$isForEntity) ? pendingDocumentActions(\%Data,$personID,$regoID,$fileID) : pendingEntityDocumentActions(\%Data,$personID,$fileID);
+	}
 	$other_person_info{'f'} = $fileID;  
     if($fromURL)    {
         my $cgi = new CGI;

@@ -5,8 +5,8 @@
 package Documents;
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(handle_documents pendingDocumentActions);
-@EXPORT_OK = qw(handle_documents pendingDocumentActions);
+@EXPORT = qw(handle_documents pendingDocumentActions pendingEntityDocumentActions);
+@EXPORT_OK = qw(handle_documents pendingDocumentActions pendingEntityDocumentActions);
 
 use strict;
 use lib "..",".";
