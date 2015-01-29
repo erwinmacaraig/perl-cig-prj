@@ -223,7 +223,7 @@ sub listPlayerPassport {
 	};
 	 my $title = '';
 	 my $resultHTML = runTemplate($Data, $PageContent, 'registration/playerpassport.templ') || '';
-	 $title = 'Player Passport';
+	 $title = $Data->{'lang'}->txt('Player Passport');
 	 return ($resultHTML, $title);
 }
 
@@ -1537,6 +1537,7 @@ sub person_details {
             firstoption => [ '', " " ],
             sectionname => 'other',
             readonly    => ( $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL and $Data->{'SystemConfig'}{"NationalOnly_$fieldname"} ? 1 : 0 ),
+            translateLookupValues => 1,
         };
     }
 
@@ -1549,7 +1550,7 @@ sub person_details {
             value => $field->{$fieldname},
             type  => 'checkbox',
             sectionname   => 'other',
-            displaylookup => { 1 => 'Yes', 0 => 'No' },
+            displaylookup => { 1 => $Data->{'lang'}->txt('Yes'), 0 => $Data->{'lang'}->txt('No') },
             readonly      => ( $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL and $Data->{'SystemConfig'}{"NationalOnly_$fieldname"} ? 1 : 0 ),
         };
     }
