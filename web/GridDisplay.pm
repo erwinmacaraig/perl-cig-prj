@@ -426,6 +426,14 @@ sub showGrid {
     $gridConfig{'dom'} = 'ilftpr';
     $gridConfig{'language'}{'search'} = $Data->{'lang'}->txt('Filter');
     $gridConfig{'language'}{'sInfo'} = $Data->{'lang'}->txt('Showing _START_ to _END_ of _TOTAL_ entries');
+    $gridConfig{'language'}{'sLengthMenu'} = $Data->{'lang'}->txt('Show _MENU_ entries');
+    $gridConfig{'language'}{'oPaginate'} = {
+        sFirst=>    $Data->{'lang'}->txt("First"),
+        sLast=>     $Data->{'lang'}->txt("Last"),
+        sNext=>     $Data->{'lang'}->txt("Next"),
+        sPrevious=> $Data->{'lang'}->txt("Previous")
+    };
+    $gridConfig{'language'}{'sZeroRecords'} = $Data->{'lang'}->txt("No matching records found");
 	my ($columndefs , $headerInfo) = processFieldHeaders($columninfo);
     $gridConfig{'columns'} = $columndefs;
 	my $config_str = to_json(\%gridConfig);

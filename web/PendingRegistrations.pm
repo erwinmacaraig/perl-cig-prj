@@ -124,6 +124,7 @@ sub listPendingRegistrations    {
         $Data->{'Realm'},
         $entityID
     );
+    my $lang = $Data->{'lang'};
     while (my $dref = $query->fetchrow_hashref) {
         $results=1;
         my $localname = formatPersonName($Data, $dref->{'strLocalFirstname'}, $dref->{'strLocalSurname'}, $dref->{'intGender'});
@@ -144,14 +145,14 @@ sub listPendingRegistrations    {
             id => $dref->{'intPersonRegistrationID'} || 0,
             dtAdded=> $Data->{'l10n'}{'date'}->TZformat($dref->{'dtAdded'}|| '' , 'MEDIUM','SHORT'),
             dtAdded_RAW => $dref->{'dtAdded'} || '',
-            PersonLevel=> $Defs::personLevel{$dref->{'strPersonLevel'}} || '',
-            PersonType=> $Defs::personType{$dref->{'strPersonType'}} || '',
-            AgeLevel=> $Defs::ageLevel{$dref->{'strAgeLevel'}} || '',
-            RegistrationNature=> $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '',
+            PersonLevel=> $lang->txt($Defs::personLevel{$dref->{'strPersonLevel'}}) || '',
+            PersonType=> $lang->txt($Defs::personType{$dref->{'strPersonType'}}) || '',
+            AgeLevel=> $lang->txt($Defs::ageLevel{$dref->{'strAgeLevel'}}) || '',
+            RegistrationNature=> $lang->txt($Defs::registrationNature{$dref->{'strRegistrationNature'}}) || '',
             #Status=> $Defs::wfTaskStatus{$dref->{'strStatus'}} || '',
-            Status=> $Defs::personRegoStatus{$dref->{'displayStatus'}} || '',
-            PersonEntityRole=> $dref->{'strEntityRoleName'} || $dref->{'strPersonEntityRole'} || '',
-            Sport=> $Defs::sportType{$dref->{'strSport'}} || '',
+            Status=> $lang->txt($Defs::personRegoStatus{$dref->{'displayStatus'}}) || '',
+            PersonEntityRole=> $lang->txt($dref->{'strEntityRoleName'} || $dref->{'strPersonEntityRole'}) || '',
+            Sport=> $lang->txt($Defs::sportType{$dref->{'strSport'}}) || '',
             LocalName=>$localname,
             LatinName=>$name,
             LocalLatinName=>$local_latin_name,
@@ -159,7 +160,7 @@ sub listPendingRegistrations    {
             CurrentTaskApproval=>$dref->{'intApprovalEntityID'},
             CurrentTaskProblem=>$dref->{'intProblemResolutionEntityID'},
             NationalPeriodName => $dref->{'strNationalPeriodName'} || '',
-            TaskType => $Defs::wfTaskType{$dref->{'WFTTaskType'}} || '',
+            TaskType => $lang->txt($Defs::wfTaskType{$dref->{'WFTTaskType'}}) || '',
             TaskTo=>$taskTo,
             SelectLink => "$Data->{'target'}?client=$client&amp;a=PENDPR_D&amp;prID=$dref->{'intPersonRegistrationID'}",
           };
@@ -295,9 +296,9 @@ sub listPendingRegistrations    {
             id => $dref->{intEntityID},
             SelectLink => "$tempaction",
             strLocalName => $dref->{strLocalName},
-            EntityLevel => $Defs::LevelNames{$dref->{intEntityLevel}},
+            EntityLevel => $Data->{'lang'}->txt($Defs::LevelNames{$dref->{intEntityLevel}}),
             strStatus => $dref->{strStatus}, 
-            displayStatus => $Defs::personRegoStatus{$dref->{displayStatus}},
+            displayStatus => $Data->{'lang'}->txt($Defs::personRegoStatus{$dref->{displayStatus}}),
        };
     }
 
