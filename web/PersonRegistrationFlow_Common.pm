@@ -213,6 +213,7 @@ print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~displayRegoFlowSummary $personID\n";
         );
         $body = runTemplate($Data, \%PageData, 'registration/error.templ') || '';
     }
+        my $gateways = '';
     if ($ok)   {
         my @products= split /:/, $hidden_ref->{'prodIds'};
         foreach my $prod (@products){ $hidden_ref->{"prod_$prod"} =1;}
@@ -225,10 +226,10 @@ print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~displayRegoFlowSummary $personID\n";
 
         my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
         my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
-        my $gateways = '';
 	 	my $txnCount = 0;
 		my $logIDs;
 		my $txn_invoice_url = $Defs::base_url."/printinvoice.cgi?client=$client&amp;rID=$hidden_ref->{'rID'}&amp;pID=$personID";
+print STDERR "HIDDEN" . Dumper($hidden_ref);
         ($txnCount, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
          if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
             $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
@@ -387,7 +388,8 @@ $sth = $Data->{'db'}->prepare($query);
         }
     }
 	
-    return $body;
+    #return $body;
+    return ($body, $gateways);
 }
     
 sub displayRegoFlowComplete {
@@ -397,6 +399,7 @@ sub displayRegoFlowComplete {
 
     my $ok = 0;
     my $run = $hidden_ref->{'run'} || param('run') || 0;
+#$run=0;
 print STDERR "COMPLETE RUN" . $run;
     if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER' or $rego_ref->{'registrationNature'} eq 'TRANSFER') {
         $ok=1;
@@ -573,6 +576,7 @@ sub getPersonRegoTXN    {
 
     my ($Data, $personID, $regoID) = @_;
 
+print STDERR "GETPRTXN\n";
     my $st = qq[
         SELECT intTransLogID, intTransactionID, intStatus
         FROM tblTransactions
@@ -588,6 +592,7 @@ sub getPersonRegoTXN    {
     my $count = 0;
    my %tlogIDs=();
     while (my $dref= $qry->fetchrow_hashref())  {
+print STDERR "DREF $personID $regoID\n";
         $tlogIDs{$dref->{'intTransLogID'}} = 1 if ($dref->{'intTransLogID'} and ! exists $tlogIDs{$dref->{'intTransLogID'}});
         if ($dref->{'intStatus'} == 0)  {
             $count++;

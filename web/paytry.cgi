@@ -116,7 +116,7 @@ print STDERR "LOG: $logID\n";
     $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;chkv=$chkvalue&amp;session=$session&amp;amount=$amount];
 
     my $payTry = payTryRead(\%Data, $logID, $tryID);
-    my $cancelURL = payTryRedirectBack($payTry, $client, $logID, 0);
+    my $cancelURL = payTryRedirectBack(\%Data, $payTry, $client, $logID, 0);
 
     if ($paymentSettings->{'paymentType'} == $Defs::PAYMENT_ONLINEPAYPAL) {
         $paymentURL = qq[$Defs::base_url/paypal.cgi?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;session=$session];

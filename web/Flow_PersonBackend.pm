@@ -1238,6 +1238,7 @@ sub display_summary {
 
     my $rego_ref = {};
     my $content = '';
+    my $gateways= '';
     if($regoID) {
         my $valid =0;
         ($valid, $rego_ref) = validateRegoID(
@@ -1254,11 +1255,13 @@ sub display_summary {
         $personObj->load();
         my $nationality = $personObj->getValue('strISONationality') || ''; 
         $rego_ref->{'Nationality'} = $nationality;
-
+#BAFF
+    $self->addCarryField('txnIds', $self->{'RunParams'}{'txnIds'} || 0);
+    
         my $hiddenFields = $self->getCarryFields();
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
-        $content = displayRegoFlowSummary(
+        ($content, $gateways) = displayRegoFlowSummary(
             $self->{'Data'}, 
             $regoID, 
             $client, 
@@ -1287,7 +1290,9 @@ sub display_summary {
         Title => '',
         TextTop => '',
         TextBottom => '',
-        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+        cContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+        NoContinueButton => 1,  ## Look at putting this in if $ due and SystemConfig->enforceFlowPayment or something ?
+        gateways => $gateways
     );
     my $pagedata = $self->display(\%PageData);
 

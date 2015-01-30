@@ -48,6 +48,7 @@
 
 <div class="[% IF processStatus == 1 %]col-md-12[% ELSE %]col-md-9[% END %]">
 [% DocUploader %]
+[% gateways %]
 	<form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">
 	    [% IF Content %][% Content %][% END %]
 	    [% IF FlowNextAction %]
@@ -81,4 +82,3 @@
 <br/>
 
 [% TextBottom %]
-[% gateways %]

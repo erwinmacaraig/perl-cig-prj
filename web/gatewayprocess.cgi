@@ -74,7 +74,7 @@ sub main	{
 	disconnectDB($db);
 
     if ($display_action eq '1')    {
-        payTryRedirectBack($payTry, $client, $logID, 1);
+        payTryRedirectBack(\%Data, $payTry, $client, $logID, 1);
     }
 }
 

@@ -967,6 +967,7 @@ sub display_summary {
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
     my $lang = $self->{'Data'}{'lang'};
+    my $gateways= '';
 
 print STDERR "display_summary $regoID p$personID\n";
     my $rego_ref = {};
@@ -1005,7 +1006,7 @@ print STDERR "display_summary $regoID p$personID\n";
         my $hiddenFields = $self->getCarryFields();
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
-        $content = displayRegoFlowSummary(
+        ($content, $gateways) = displayRegoFlowSummary(
             $self->{'Data'}, 
             $regoID, 
             $client, 
