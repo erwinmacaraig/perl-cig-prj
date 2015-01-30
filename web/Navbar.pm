@@ -393,7 +393,7 @@ sub getEntityMenuData {
     # for Entity menu
     if($SystemConfig->{'menu_newclub_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'addclub'} = {
-             name => $lang->txt("Add $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}"),
+             name => $lang->txt("Add Club"),
             url => $baseurl."a=C_DTA",
         };
     }
@@ -522,7 +522,7 @@ sub getClubMenuData {
             url => $baseurl."a=C_HOME",
         },
         persons => {
-            name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}),
+            name => $lang->txt('List Persons'),
             url => $baseurl."a=P_L&amp;l=$Defs::LEVEL_PERSON",
         },
     );
@@ -541,7 +541,7 @@ sub getClubMenuData {
     if($currentLevel != $Data->{'clientValues'}{'authLevel'})   {
         delete($menuoptions{'home'});
     }
-    my $txt_RequestCLR = $SystemConfig->{'txtRequestCLR'} || 'Request a Clearance';
+    my $txt_RequestCLR = 'Request a Transfer';
 
     if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequestClearance'} 
     ) {
@@ -667,7 +667,7 @@ sub getClubMenuData {
             )
             and allowedAction($Data, 'm_e')) {
         $menuoptions{'personrollover'} = {
-            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON}.' Rollover'),
+            name => $lang->txt('Person Rollover'),
             url => $baseurl."a=P_LSRO&amp;l=$Defs::LEVEL_PERSON",
         };
     }
@@ -716,7 +716,7 @@ sub getClubMenuData {
 
     if ($SystemConfig->{'allowPersonRequest'}) {
         $menuoptions{'requesttransfer'} = {
-            name => $lang->txt('Request or Start a Transfer'),
+            name => $lang->txt('Request or start a transfer'),
             url => $baseurl."a=PRA_T",
             #url => $baseurl."a=INITSRCH_P&type=transfer&amp;origin=" . $Data->{'clientValues'}{'authLevel'},
         };
@@ -840,7 +840,7 @@ sub getClubMenuData {
             'approvals',
             'pending'
         ]],
-        [ $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Transactions"), 'menu','transactions',],
+        [ $lang->txt("Club Transactions"), 'menu','transactions',],
         [ $lang->txt('My Club'), 'menu',[
         'myClub',
         ]],
@@ -848,7 +848,7 @@ sub getClubMenuData {
             'auditlog'
         ]],
 
-        [ $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Documents"), 'menu','clubdocs'],
+        [ $lang->txt("Club Documents"), 'menu','clubdocs'],
         [ $lang->txt('Identifiers'), 'menu','clubidentifier'],
         [ $lang->txt('Search'), 'search',[
         'advancedsearch',
@@ -1106,7 +1106,7 @@ sub getPersonMenuData {
     my @menu_structure = (
         [ $lang->txt('Person Dashboard'), 'home','home'],
         [ $lang->txt('Player Passport'), 'menu','passport'],
-        [ $lang->txt($SystemConfig->{'txns_link_name'} || 'Transactions'), 'menu','transactions'],
+        [ $lang->txt('Transactions'), 'menu','transactions'],
         [ $lang->txt('Certificates'), 'menu','certificates'],
         [ $lang->txt('History'), 'menu',[
             'regos',
