@@ -38,7 +38,7 @@ sub handlePersonFlow {
     my $personRequestID = $params{'prid'} || '';
 
     #specific to Renewals
-    my $renewalTargetRegoID = $params{'rpID'} || '';
+    my $renewalTargetRegoID = $params{'rtargetid'} || '';
 
     my $flow = new Flow_PersonBackend(
         db => $Data->{'db'},
