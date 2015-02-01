@@ -285,7 +285,7 @@ sub showPersonHome	{
         next if ($rego->{'intNationalPeriodID'} == $nationalPeriodID);
         #$renew = $Data->{'target'} . "?client=$client&amp;a=PREGF_TU&amp;pt=$rego->{'strPersonType'}&amp;per=$rego->{'strPersonEntityRole'}&amp;pl=$rego->{'strPersonLevel'}&amp;sp=$rego->{'strSport'}&amp;ag=$newAgeLevel&amp;nat=RENEWAL";
         #$renew = $Data->{'target'} . "?client=$client&amp;a=PF_&amp;pID=$rego->{'intPersonID'}&amp;dnat=RENEWAL&amp;rsp=$rego->{'strSport'}&amp;rpl=$rego->{'strPersonLevel'}&amp;rper=$rego->{'strPersonEntityRole'}&amp;rag=$newAgeLevel&amp;rpt=$rego->{'strPersonType'}";
-        $renew = $Data->{'target'} . "?client=$client&amp;a=PF_&amp;pID=$rego->{'intPersonID'}&amp;dnat=RENEWAL&amp;rpID=$rego->{'intPersonRegistrationID'}&amp;_ss=r&amp;rfp=r";
+        $renew = $Data->{'target'} . "?client=$client&amp;a=PF_&amp;pID=$rego->{'intPersonID'}&amp;dnat=RENEWAL&amp;rtargetid=$rego->{'intPersonRegistrationID'}&amp;_ss=r&amp;rfp=r";
         $rego->{'renew_link'} = $renew;
 
         $rego->{'Status'} = (($rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE) and $rego->{'intPaymentRequired'}) ? $Defs::personRegoStatus{$Defs::PERSONREGO_STATUS_ACTIVE_PENDING_PAYMENT} : $rego->{'Status'};
