@@ -62,7 +62,10 @@ sub run {
     while($next) {
         ($retvalue, $next) = $self->runNextFunction();
         $body .= $retvalue;
-        $next = $self->incrementCurrentProcessIndex() if $next == 1;
+        if($next == 1)  {
+            $next = $self->incrementCurrentProcessIndex();
+            $self->saveState();
+        }
     }
     
     return ($body, $self->{'CookiesToWrite'});
@@ -191,6 +194,16 @@ sub getNextAction {
   my $self = shift;
 
     my $index = $self->{'CurrentIndex'} + 1;
+    if($index <= $#{$self->{'ProcessOrder'}})   {
+        return $self->{'ProcessOrder'}[$index]{'action'} || '';
+    }
+    return '';
+}
+
+sub getCurrentAction {
+  my $self = shift;
+
+    my $index = $self->{'CurrentIndex'};
     if($index <= $#{$self->{'ProcessOrder'}})   {
         return $self->{'ProcessOrder'}[$index]{'action'} || '';
     }
@@ -459,6 +472,7 @@ sub setProcessOrder {
     
 }
 
+sub saveState{return 1 };
 
 sub display_form {return ('',1);}
 sub validate_form {return ('',1);}

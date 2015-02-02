@@ -33,6 +33,7 @@ use PersonFieldsSetup;
 use PersonRegistration;
 use PersonSummaryPanel;
 use RenewalDetails;
+use JSON;
 
 
 sub setProcessOrder {
@@ -1659,4 +1660,75 @@ sub rebuildClient   {
 }
 
  
+sub saveState   {
+    my $self = shift;
+    my $id = $self->ID();
+
+    my $st = qq[
+        INSERT INTO tblRegoState (
+            userEntityID,
+            userID,
+            regoType,
+            entityID,
+            regoID,
+            parameters,
+            ts
+        )
+        VALUES (
+            ?,
+            ?,
+            'PERSON',
+            ?,
+            ?,
+            ?,
+            NOW()
+        )
+        ON DUPLICATE KEY UPDATE
+            userID = ?,
+            parameters = ?,
+            ts = NOW()
+    ];
+    my $clientValues = $self->{'ClientValues'};
+    my $currentLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $userEntityID = getID($self->{'ClientValues'}, $currentLevel) || 0;
+    my $userID = $clientValues->{'userID'};
+
+    my $regoID = $self->{'RunParams'}{'rID'} || 0;
+    my %params = %{$self->{'RunParams'}};
+    $params{'rfp'} = $self->getCurrentAction();
+
+    my $q = $self->{'db'}->prepare($st);
+    $q->execute(
+        $userEntityID,
+        $userID,
+        $id,
+        $regoID,
+        encode_json(\%params),
+        $userID,
+        encode_json(\%params),
+    );
+    if($regoID) {
+        # Handle the case where the stats is saved and now added regoID
+        my $st_d = qq[
+            DELETE FROM 
+                tblRegoState
+            WHERE
+                userEntityID = ?
+                AND userID = ?
+                AND regoType = 'PERSON'
+                AND entityID = ?
+                AND regoID = 0
+        ];
+        my $q_d = $self->{'db'}->prepare($st_d);
+        $q_d->execute(
+            $userEntityID,
+            $userID,
+            $id,
+        );
+    }
+
+    return 1 
+
+}
+
 
