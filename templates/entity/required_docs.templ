@@ -7,11 +7,11 @@
 			<tr>
 				<td>
 					<div>
-						<p><strong>Title:</strong> 
+						<p><strong>[% Lang.txt('Title') %]:</strong> 
 						[% doc.Name %]
 						</p>
 						[% IF doc.Description != '' %]
-							<p><strong>Description: </strong>
+							<p><strong>[% Lang.txt('Description') %]: </strong>
 								[% doc.Description %]
 							</p>
 						[% END %]
@@ -54,7 +54,7 @@
 							Dropzone.options.myRegoDoc[% doc.ID %] = {
 								addRemoveLinks: true,							
                                 maxFilesize: 25,
-                                dictDefaultMessage :'[% Lang.txt('Click here to upload this file') %]',
+                                dictDefaultMessage :'[% Lang.txt('Click here to upload file') %]',
 								init: function(){
 									this.on("success", function(file, response){										
 										doc = response;		
@@ -93,13 +93,13 @@
 				<tr>
 					<td>
 						<div>
-							<p><strong>Title:</strong> 
+							<p><strong>[% Lang.txt('Title') %]:</strong> 
 							[% doc.Name %]
 							</p>
 							
 							[% IF doc.Description != '' %]
 							
-							<p><strong>Description: </strong>
+							<p><strong>[% Lang.txt('Description') %]: </strong>
 								[% doc.Description %]
 							</p>						
 							[% END %]
@@ -141,6 +141,7 @@
 							Dropzone.options.myRegoDoc[% doc.ID %] = {
 								addRemoveLinks: true,							
                                 maxFilesize: 25,
+                                dictDefaultMessage :'[% Lang.txt('Click here to upload file') %]',
 								init: function(){
 									this.on("success", function(file, response){										
 										doc = response;		
