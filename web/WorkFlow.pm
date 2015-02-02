@@ -564,10 +564,10 @@ sub listTasks {
 
         for my $request (@{$personRequests}) {
             next if (
-                $request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_COMPLETED
-                or $request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_REJECTED
-                or $request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_DENIED
-                or $request->{'personRegoStatus'} eq $Defs::PERSONREGO_STATUS_PENDING
+                chomp $request->{'strRequestStatus'} eq chomp $Defs::PERSON_REQUEST_STATUS_COMPLETED
+                or chomp $request->{'strRequestStatus'} eq chomp $Defs::PERSON_REQUEST_STATUS_REJECTED
+                or chomp $request->{'strRequestStatus'} eq chomp $Defs::PERSON_REQUEST_STATUS_DENIED
+                or chomp $request->{'personRegoStatus'} eq chomp $Defs::PERSONREGO_STATUS_PENDING
             );
             $rowCount++;
             my $name = formatPersonName($Data, $request->{'strLocalFirstname'}, $request->{'strLocalSurname'}, $request->{'intGender'});
