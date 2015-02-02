@@ -62,7 +62,7 @@ if($uploaded_filename ne ''){
     else    {
         print "Content-type: text/html \n\n"; 
         my $jFileData = JSON->new->utf8->encode(\%other_person_info);
-        print $jFileData;       
+        print $jFileData if(!$notFromFlow);       
     }
          
 }

@@ -1,11 +1,11 @@
 [% USE Dumper %]
 
-<h3 class="panel-header">Summary</h3>
+<h3 class="panel-header">[% Lang.txt("Summary") %]</h3>
 <div class="panel-body">
 	<div class="document-upload summary">
-		<div class="col-md-12">
+		<div class="col-md-6">
 			<div class="read-only">
-			    <h4>Venue Details</h4>
+			    <h4>[% Lang.txt("Venue Details") %]</h4>
 			    <div class="read-only-text clearfix">
 				    <ul>
 				    	<li><span class="details-left">[% Lang.txt("Venue Name") %]:</span> <span class="details-value">[% FacilityCoreDetails.Name or '-' %]</span></li>
@@ -20,11 +20,9 @@
 			    </div>
 			</div>
 		</div>
-
-		<div class="clearfix" style="clear:both;">&nbsp;</div>
 		<div class="col-md-6">
 			<div class="read-only">
-			    <h4>Contact Details</h4>
+			    <h4>[% Lang.txt("Contact Details") %]</h4>
 			    <div class="read-only-text clearfix">
 				    <ul>
 				    	<li><span class="details-left">[% Lang.txt("Address 1") %]:</span> <span class="details-value">[% FacilityContactDetails.Address1 or '-' %]</span></li>
@@ -43,26 +41,11 @@
 			    </div>
 			</div>
 		</div>
-
-		<div class="col-md-6">
-			<div class="read-only">
-			    <h4>Documents</h4>
-			    <div class="read-only-text clearfix">
-				    <ul>
-						<li><span class="details-left">Document #1:</span><span class="details-value">&ndash;</span></li>
-						<li><span class="details-left">Document #2:</span><span class="details-value">&ndash;</span></li>
-				    </ul>
-				    <a href="[% editlink %]&amp;rfp=d" class="pull-right">Edit</a>
-			    </div>
-			</div>
-		</div>
-
 		<div class="clearfix" style="clear:both;">&nbsp;</div>
-        
         [% IF FacilityFields.size %]
 		<div class="col-md-12">
 			<div class="read-only">
-				 <h4>Fields</h4>
+				 <h4>[% Lang.txt("Fields") %]</h4>
 			     <div class="read-only-text clearfix">
 				    <table class="table facility-field-summary" cellspacing="0" cellpadding="0" border="0">
 				    	<thead>
@@ -95,22 +78,6 @@
 			</div>
 		</div>
         [% END %]
-
-		<div class="clearfix" style="clear:both;">&nbsp;</div>
-
-        <!--
-		<div class="col-md-12">
-			<div class="read-only">
-				 <h4>Documents</h4>
-				 <div class="read-only-text clearfix">
-				    <ul>
-						<li><span class="details-left">Document #1:</span><span class="details-value">&ndash;</span></li>
-						<li><span class="details-left">Document #2:</span><span class="details-value">&ndash;</span></li>
-				    </ul>
-				    <a href="[% target %]?[% editlink %]&amp;rfp=d" class="pull-right">[% Lang.txt("Edit") %]</a>
-			     </div>
-			</div>
-		</div>
-        -->
+		<div class="clearfix" style="clear:both;">&nbsp;</div>        
 	</div>
 </div>
