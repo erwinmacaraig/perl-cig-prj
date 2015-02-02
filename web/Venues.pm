@@ -1138,6 +1138,7 @@ sub add_venue_fields {
         action  => 'VENUE_Fprocadd',
         client  => $Data->{'client'},
         venueID => $venueID,
+        field_count => $params{'field_count'},
         FieldElements => \@facilityFieldsData,
     );
 
