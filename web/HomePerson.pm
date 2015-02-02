@@ -23,6 +23,7 @@ use NationalReportingPeriod;
 use DuplicatesUtils;
 use Data::Dumper;
 use PersonSummaryPanel;
+use WorkFlow;
 
 require AccreditationDisplay;
 
@@ -138,6 +139,15 @@ sub showPersonHome	{
 	my $rego;
     
     foreach $rego (@{$Reg_ref})  {
+        my %getwtparams = (
+            type => 'PERSON',
+            registrationid => $rego->{'intPersonRegistrationID'},
+            personid => $rego->{'intPersonID'},
+        );
+
+        my $workTaskHistory = WorkFlow::getRegistrationWorkTasks($Data, \%getwtparams);
+        $rego->{'worktaskhistory'} = $workTaskHistory;
+
 		my @alldocs = ();
 		my $fileID = 0;
 		my $doc;
@@ -148,6 +158,8 @@ sub showPersonHome	{
 		my $displayAdd = 0;
 		my $displayReplace = 0;
 
+        my @regoworktasks = ();
+        #push @regoworktask
 #BAFF
 	    my @validdocsforallrego = ();
 	    my %validdocs = ();
@@ -204,7 +216,7 @@ sub showPersonHome	{
 						$status = 'MISSING';
 					}
 					else {
-						$status = 'Optional. Not Provided';
+						$status = $Data->{'lang'}->txt('Optional. Not Provided');
 						$displayReplace = 0;
 					}
 				}

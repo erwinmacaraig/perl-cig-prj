@@ -122,6 +122,10 @@ sub handlePersonRequest {
         case 'PRA_V' {
             ($body, $title) = viewRequest($Data);
         }
+        case 'PRA_VR' {
+            my $readonly = 1;
+            ($body, $title) = viewRequestHistory($Data, $readonly);
+        }
         case 'PRA_S' {
             ($body, $title) = setRequestResponse($Data);
         }
@@ -816,17 +820,13 @@ sub listRequests {
             requestTo => $request->{'requestTo'} || '',
             requestType => $Defs::personRequest{$request->{'strRequestType'}},
             requestResponse => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || "N/A",
-            SelectLink => $selectLink,
+            SelectLink => "$Data->{'target'}?client=$client&amp;a=PRA_VR&rid=$request->{'intPersonRequestID'}",
         }
     }
 
     return ("$found record found.", $title) if !$found;
 
     my @headers = (
-        { 
-            type => 'Selector',
-            field => 'SelectLink',
-        }, 
         {
             name => $Data->{'lang'}->txt('Person ID'),
             field => 'personID',
@@ -847,6 +847,12 @@ sub listRequests {
             name => $Data->{'lang'}->txt('Response Status'),
             field => 'requestResponse',
         }, 
+        {
+            name  => $Data->{'lang'}->txt('Task Type'),
+            field => 'SelectLink',
+            width  => 50,
+        },
+
     ); 
 
     my $rectype_options = '';
@@ -873,13 +879,13 @@ sub viewRequest {
     my ($Data) = @_;
 
     my $requestID = safe_param('rid', 'number') || -1;
-	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
+    my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
     my $requestType = undef;
     my $action = undef;
 
     my %regFilter = (
         'entityID' => $entityID,
-        'requestID' => $requestID
+        'requestID' => $requestID,
     );
     my $request = getRequests($Data, \%regFilter);
 
@@ -887,7 +893,7 @@ sub viewRequest {
 
     #checking of who can only access what request is already handled in the getRequests query
     # e.g. if requestTo already accepted the request, it would be able to view it again as the $request will be empty
-    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Person Request not found.")) if scalar(%{$request}) == 0;
+    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Person Request not found.")) if (!$request or scalar(%{$request}) == 0);
 
     my $templateFile = undef;
     my $error = undef;
@@ -1104,7 +1110,6 @@ sub setRequestResponse {
         }
     }
 
-    print STDERR Dumper $request;
 
     my %notificationData = (
         Reason => $notes,
@@ -1240,7 +1245,7 @@ sub getRequests {
         $Data->{'Realm'}
     );
 
-    if($filter->{'entityID'}) {
+    if($filter->{'entityID'} and !$filter->{'requestID'}) {
         $where .= "
             AND (
                     (pq.intParentMAEntityID = ? AND pq.intRequestToMAOverride = 1 AND pq.strRequestResponse is NULL)
@@ -1263,8 +1268,18 @@ sub getRequests {
     }
 
     if($filter->{'requestID'} and $filter->{'entityID'}) {
+        my $readonlyCond = '';
+        if($filter->{'readonly'}) {
+            $readonlyCond = qq[
+                (pq.intPersonRequestID = ?)
+                OR
+            ];
+            push @values, $filter->{'requestID'};
+        }
+
         $where .= qq[
             AND (
+                    $readonlyCond
                     (pq.intParentMAEntityID = ? AND pq.intRequestToMAOverride = 1 AND pq.strRequestResponse is NULL)
                     OR
                     (pq.intRequestToEntityID = ? AND pq.strRequestResponse is NULL AND pq.intPersonRequestID = ? AND pq.intRequestToMAOverride = 0)
@@ -1296,6 +1311,7 @@ sub getRequests {
         $where .= " AND pq.intPersonRequestID IN ($placeholder_in)";
     }
 
+
     my $st = qq[
         SELECT
             pq.intPersonRequestID,
@@ -1311,6 +1327,7 @@ sub getRequests {
             pq.intRequestToMAOverride,
             pq.strRequestNotes,
             pq.dtDateRequest,
+            pq.tTimeStamp,
             DATE_FORMAT(pq.dtDateRequest,'%d %b %Y') AS prRequestDateFormatted,
             UNIX_TIMESTAMP(pq.dtDateRequest) AS prRequestTimeStamp,
             UNIX_TIMESTAMP(pq.tTimeStamp) AS prRequestUpdateTimeStamp,
@@ -1863,6 +1880,75 @@ sub sendITC {
         #this is for test purposes of the template
         #return ($conf_template);
 	}
+}
+
+sub viewRequestHistory {
+    my ($Data, $readonly) = @_;
+
+    my $requestID = safe_param('rid', 'number') || -1;
+    #my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
+    my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
+    my $requestType = undef;
+    my $action = undef;
+
+    my %regFilter = (
+        'entityID' => $entityID,
+        'requestID' => $requestID,
+        'readonly' => $readonly || 0,
+    );
+    my $request = getRequests($Data, \%regFilter);
+
+    $request = $request->[0];
+
+    #checking of who can only access what request is already handled in the getRequests query
+    # e.g. if requestTo already accepted the request, it would be able to view it again as the $request will be empty
+    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Person Request not found.")) if (!$request or scalar(%{$request}) == 0);
+
+    my $templateFile = undef;
+    my $error = undef;
+
+    switch($request->{'strRequestType'}) {
+        case "$Defs::PERSON_REQUEST_TRANSFER" {
+            if($request->{'intPersonRequestID'} and $request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_STATUS_ACCEPTED) {
+                $templateFile = "personrequest/transfer/new_club_view.templ";
+            }
+            else {
+                $templateFile = "personrequest/transfer/current_club_view.templ";
+            }
+
+            $requestType = $Defs::PERSON_REQUEST_TRANSFER;
+        }
+        case "$Defs::PERSON_REQUEST_ACCESS" {
+            if($request->{'intPersonRequestID'} and $request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_STATUS_ACCEPTED) {
+                $templateFile = "personrequest/access/requesting_club_view.templ";
+            }
+            else {
+                $templateFile = "personrequest/access/current_club_view.templ";
+            }
+
+            $requestType = $Defs::PERSON_REQUEST_ACCESS;
+        }
+        else {
+
+        }
+    }
+
+    if($readonly) {
+        $request->{'RequestResponse'} = $Defs::personRequestResponse{$request->{'strRequestResponse'}};
+        $request->{'RequestStatus'} = $Defs::personRequestResponse{$request->{'strRequestStatus'}} || $Defs::personRegoStatus{$request->{'personRegoStatus'}};
+
+        my %readonlyTemplateData = (
+            request => $request,
+            Label => $Defs::personRequest{$request->{'strRequestType'}},
+        );
+        my $readonlyHTML = runTemplate(
+            $Data,
+            \%readonlyTemplateData,
+            'personrequest/history.templ'
+        );
+
+        return ($readonlyHTML, $Data->{'lang'}->txt('Person Request History'));
+    }
 }
 
 sub displayGenericError {

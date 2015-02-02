@@ -1,0 +1,41 @@
+<div class="tab-content">
+    <h3 class="panel-header">[% Lang.txt(Label) %] [% Lang.txt('of') %] [% request.strLocalFirstname %] [% request.strLocalSurname %]</h3>
+    <div class="panel-body">
+        <table class="table" cellpadding="5">
+            <tr>
+                <td>[% Lang.txt('Request to') %]:</td>
+                <td><strong>[% request.requestTo %]</strong></td>
+            </tr>
+            <tr>
+                <td>[% Lang.txt('Request from') %]:</td>
+                <td><strong>[% request.requestFrom %]</strong></td>
+            </tr>
+            <tr>
+                <td>[% Lang.txt('Request response') %]:</td>
+                <td><strong>[% request.RequestResponse or Lang.txt('N/A') %]</strong></td>
+            </tr>
+            <tr>
+                <td>[% Lang.txt('Request approval status') %]:</td>
+                <td><strong>[% request.RequestStatus %]</strong></td>
+            </tr>
+        </table>
+
+        <table class="table" style="width: 100%">
+            <thead>
+                <tr>
+                    <th>[% Lang.txt('Request Notes') %]</th>
+                    <th>[% Lang.txt('Request Added') %]</th>
+                    <th>[% Lang.txt('Response Notes') %]</th>
+                    <th>[% Lang.txt('Updated') %]</th>
+                </tr>
+            </thead>
+            <tr>
+                <td><div class="member-data"> [% request.strRequestNotes %] </div></td>
+                <td><div class="member-data"> [% DateFormat.TZformat(request.dtDateRequest,'MEDIUM','SHORT') %] </div></td>
+                <td><div class="member-data"> [% request.strResponseNotes %] </div></td>
+                <td><div class="member-data"> [% DateFormat.TZformat(request.tTimeStamp,'MEDIUM','SHORT') %] </div></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
