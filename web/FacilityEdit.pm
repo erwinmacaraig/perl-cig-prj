@@ -164,7 +164,10 @@ sub handleFacilityEdit {
         <h4>].$Data->{'lang'}->txt('Fields') .qq[</h4>
         <div class="read-only-text">
             $fields_summary
-            <div class="fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$entityID">edit</a></div>
+            <div class="fieldSectionGroupFooter">
+                <a href = "$Data->{'target'}?client=$client&amp;a=VENUE_FPA&amp;venueID=$entityID">add field</a> |
+                <a href = "$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$entityID">edit</a>
+            </div>
         </div>
         
     </div>
