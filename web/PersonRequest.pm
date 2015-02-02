@@ -1935,7 +1935,7 @@ sub viewRequestHistory {
 
     if($readonly) {
         $request->{'RequestResponse'} = $Defs::personRequestResponse{$request->{'strRequestResponse'}};
-        $request->{'RequestStatus'} = $Defs::personRequestResponse{$request->{'strRequestStatus'}} || $Defs::personRegoStatus{$request->{'strRequestStatus'}};
+        $request->{'RequestStatus'} = $Defs::personRequestResponse{$request->{'strRequestStatus'}} || $Defs::personRegoStatus{$request->{'personRegoStatus'}};
 
         my %readonlyTemplateData = (
             request => $request,
