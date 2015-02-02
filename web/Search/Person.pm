@@ -104,7 +104,6 @@ sub getUnique {
 		my $q = $self->getData->{'db'}->prepare($st);
         $q->execute();
         my %origClientValues = %{$self->getData()->{'clientValues'}};
-
         my $numnotshown = ($results->{'total'} || 0) - 10;
         $numnotshown = 0 if $numnotshown < 0;
         while(my $dref = $q->fetchrow_hashref())  {

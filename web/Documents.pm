@@ -317,7 +317,8 @@ sub new_doc_form {
 		<form action="$target" method="POST" enctype="multipart/form-data" class="dropzone" id = "docform">			
          <script>
               Dropzone.options.docform = { 
-                  maxFilesize: 25 // MB 
+                  maxFilesize: 25, // MB
+				  dictDefaultMessage:"] . $Data->{'lang'}->txt('Click here to upload file') . qq["	 
               };
          </script>
 
@@ -506,11 +507,28 @@ sub pendingEntityDocumentActions {
             );
 
 		}
-
+        case ['CLUB','VENUE'] {
+			my $entityObj = new EntityObj(db => $Data->{'db'}, ID => $entityID, cache => $Data->{'cache'});
+			$entityObj->load();
+			if($entityObj){
+				$entityObj->setValues({'strStatus' => $Defs::ENTITY_STATUS_PENDING});
+           		$entityObj->write();
+			}
+		}
 	}
+	my $rc = WorkFlow::addWorkFlowTasks(
+                $Data,
+                'ENTITY',
+                'AMENDMENT',
+                $Data->{'clientValues'}{'authLevel'} || 0,
+                $entityID, #originEntityID,
+                0,
+                0,
+                0,
+            );
+	
 
 }
-
 
 
 
