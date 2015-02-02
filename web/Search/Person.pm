@@ -89,8 +89,7 @@ sub getUnique {
             tblPerson
             INNER JOIN tblPersonRegistration_$realmID AS PR ON (
               tblPerson.intPersonID = PR.intPersonID
-              AND PR.strStatus <> 'DELETED'
-              AND PR.strStatus <> 'INPROGRESS'
+              AND PR.strStatus IN ('ACTIVE','PASSIVE','PENDING')			
               AND PR.intEntityID IN ($entity_list)
             )
             INNER JOIN tblEntity AS E ON (
@@ -105,7 +104,7 @@ sub getUnique {
 		my $q = $self->getData->{'db'}->prepare($st);
         $q->execute();
         my %origClientValues = %{$self->getData()->{'clientValues'}};
-        open FH, ">../dumpfile.txt"; print FH "\nSQL : $st \n";
+
         my $numnotshown = ($results->{'total'} || 0) - 10;
         $numnotshown = 0 if $numnotshown < 0;
         while(my $dref = $q->fetchrow_hashref())  {
