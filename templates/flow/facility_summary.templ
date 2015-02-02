@@ -78,6 +78,24 @@
 			</div>
 		</div>
         [% END %]
-		<div class="clearfix" style="clear:both;">&nbsp;</div>        
+		<div class="clearfix" style="clear:both;">&nbsp;</div>   
+
+		<div class="col-md-12">
+			<div class="read-only">
+				 <h4>[% Lang.txt("Documents") %]</h4>
+				 <div class="read-only-text clearfix">
+				    <ul>
+						[% FOREACH doc IN documents %]
+							[% IF doc.DocumentType %]		
+								<li><span>[% doc.Name %]:<br /></span>
+								<b>[% doc.OrigFilename %]</b></li>
+							[% END %]	
+						[% END %]
+				    </ul>
+				    <a href="[% target %]?[% editlink %]&amp;rfp=d" class="pull-right">[% Lang.txt("Edit") %]</a>
+			     </div>
+			</div>
+		</div>
+         
 	</div>
 </div>

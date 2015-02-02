@@ -29,7 +29,7 @@ use PersonUserAccess;
 use Data::Dumper;
 use FacilityFieldsSetup;
 use EntitySummaryPanel;
-
+use UploadFiles;
 sub setProcessOrder {
     my $self = shift;
   
@@ -770,7 +770,7 @@ sub display_summary {
         push @facilityFieldsData, $fieldObjData;
         #$startNewIndex++;
     }
-
+	my $documents = getUploadedFiles( $self->{'Data'}, $Defs::LEVEL_VENUE, $id, $Defs::UPLOADFILETYPE_DOC , $client );
     my $isocountries  = getISOCountriesHash();
     my %summaryData = (
         FacilityCoreDetails => {
@@ -795,9 +795,7 @@ sub display_summary {
             WebAddress => $facilityObj->getValue('strWebURL') || '',
         },
         FacilityFields => \@facilityFieldsData,
-        FacilityDocuments => {
-        
-        },
+        documents => $documents,
         editlink => $self->stringifyURLCarryField(),
         target => $self->{'Data'}{'target'},
     );
