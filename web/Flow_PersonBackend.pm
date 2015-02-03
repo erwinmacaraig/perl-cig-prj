@@ -1240,7 +1240,7 @@ sub display_summary {
 
     my $rego_ref = {};
     my $content = '';
-    my $gateways= '';
+    my $gatewayConfig = undef;
     if($regoID) {
         my $valid =0;
         ($valid, $rego_ref) = validateRegoID(
@@ -1266,7 +1266,7 @@ sub display_summary {
         my $hiddenFields = $self->getCarryFields();
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
-        ($content, $gateways) = displayRegoFlowSummary(
+        ($content, $gatewayConfig) = displayRegoFlowSummary(
             $self->{'Data'}, 
             $regoID, 
             $client, 
@@ -1291,18 +1291,19 @@ sub display_summary {
     #    $gateways = '';
     #}
     my %PageData = (
-        HiddenFields => $self->stringifyCarryField(),
-        Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
         Content => $content,
         Title => '',
         TextTop => '',
         TextBottom => '',
+        HiddenFields => $self->stringifyCarryField(),
+        Target => $self->{'Data'}{'target'},
         ContinueButtonText => $payMethod eq 'now' ? '' : $self->{'Lang'}->txt('Submit to Member Association'),
-        NoContinueButton => $payMethod eq 'now' ? 1 : 0,  ## Look at putting this in if $ due and SystemConfig->enforceFlowPayment or something ?
-            PayMethod => $payMethod,
-        gateways => $gateways
+        NoContinueButton => $payMethod eq 'now' ? 1 : 0,  
+        altContinue=> $payMethod eq 'now' ? 1 : 0,  
+        altContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to Member Association'),
+        altContinueFormConfig=> $gatewayConfig
     );
     my $pagedata = $self->display(\%PageData);
 

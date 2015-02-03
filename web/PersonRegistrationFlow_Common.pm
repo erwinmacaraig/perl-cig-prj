@@ -57,15 +57,12 @@ sub displayRegoFlowCompleteBulk {
     #	if ($hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0) {
 
     if ($Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'} && $unpaid_cost)  { #hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0)   {
-    print STDERR "SSS";    
-
-        $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, '');
+        #$gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, '');
     }
     my %PageData = (
         target => $Data->{'target'},
         Lang => $Data->{'lang'},
         client=>$client,
-        gateways => $gateways,
     );
 
     my $body = runTemplate($Data, \%PageData, 'registration/completebulk.templ') || '';
@@ -213,7 +210,7 @@ print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~displayRegoFlowSummary $personID\n";
         );
         $body = runTemplate($Data, \%PageData, 'registration/error.templ') || '';
     }
-        my $gateways = '';
+        my $gatewayConfig = undef;
     if ($ok)   {
         my @products= split /:/, $hidden_ref->{'prodIds'};
         foreach my $prod (@products){ $hidden_ref->{"prod_$prod"} =1;}
@@ -232,7 +229,7 @@ print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~displayRegoFlowSummary $personID\n";
 print STDERR "HIDDEN" . Dumper($hidden_ref);
         ($txnCount, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
          if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
-            $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
+            $gatewayConfig = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
          }
          
           
@@ -367,7 +364,6 @@ $sth = $Data->{'db'}->prepare($query);
 			person => \%personData,
 			registration => $rego_ref,
 			alldocs => \%existingDocuments,
-            gateways => $gateways,
 			txnCount => $txnCount,
             target => $Data->{'target'},
             RegoStatus => $rego_ref->{'strStatus'},
@@ -389,7 +385,7 @@ $sth = $Data->{'db'}->prepare($query);
     }
 	
     #return $body;
-    return ($body, $gateways);
+    return ($body, $gatewayConfig);
 }
     
 sub displayRegoFlowComplete {
@@ -449,9 +445,9 @@ print STDERR "000OK IS $ok | $run\n\n";
         ($txnCount, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
         savePlayerPassport($Data, $personID) if (! $run);
         $hidden_ref->{'run'} = 1;
-         if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
-            $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
-         }
+         #if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
+         #   $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
+         #}
          
        
 	    my $personObj = getInstanceOf($Data, 'person');
@@ -1078,41 +1074,41 @@ sub generateRegoFlow_Gateways   {
 
     my $lang = $Data->{'lang'};
     my ($paymentSettings, $paymentTypes) = getPaymentSettings($Data, 0, 0, $Data->{'clientValues'});
-    my $gateway_body = '';
+    my %gatewayBtns = ();
     my $gatewayCount = 0;
     my $paymentType = 0;
     foreach my $gateway (@{$paymentTypes})  {
         $gatewayCount++;
-        my $id = $gateway->{'intPaymentConfigID'};
         my $pType = $gateway->{'paymentType'};
         $paymentType = $pType;
-        my $name = $gateway->{'gatewayName'};
-        $gateway_body .= qq[
-            <input type="submit" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Proceed to Payment and Submit to Member Association").qq[" class = "btn-main"><br><br>
-        ];
+        last;
     }
-    $gateway_body = '' if ! $gatewayCount;
     my $target = 'paytry.cgi';#$Data->{'target'};
 
     my $txnList = displayTXNToPay($Data, $hidden_ref->{'txnIds'}, $paymentSettings);
-    my %PageData = (
-        nextaction=>$nextAction,
-        target => $target,
-        txnList =>$txnList,
-        gateway_body => $gateway_body,
-        hidden_ref=> $hidden_ref,
-        Lang => $Data->{'lang'},
-        client=>$client,
-		txn_invoice_url => $txn_invoice_url,
-    );
     if ($gatewayCount == 1) {
         $hidden_ref->{"pt_submit[1]"} = $paymentType; 
+        $hidden_ref->{"cc_submit[1]"} = $paymentType; 
         $hidden_ref->{"gatewayCount"} = 1;
     }
     else    {
         $hidden_ref->{"gatewayCount"} = $gatewayCount;
     }
-    return runTemplate($Data, \%PageData, 'registration/show_gateways.templ') || '';
+    $hidden_ref->{"client"} = $client;
+    my $HiddenFields = '';
+    foreach my $hf (keys %{$hidden_ref})    {
+        $HiddenFields .= qq[<input type="hidden" name="$hf" value="$hidden_ref->{$hf}">\n];
+    }
+    my %GatewayConfig= (
+        nextaction=>$nextAction,
+        Target => $target,
+        txnList =>$txnList,
+        ContinueBtns=> \%gatewayBtns,
+        HiddenFields=> $HiddenFields,
+        client=>$client,
+		txn_invoice_url => $txn_invoice_url,
+    );
+    return \%GatewayConfig;
 }
 
 sub validateRegoID {
