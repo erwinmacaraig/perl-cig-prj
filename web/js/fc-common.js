@@ -258,6 +258,16 @@ $(document).ready(function(){
 		jQuery("input.search").quicksearch();
 	});
 
+    jQuery("input[type=checkbox]#selectall").on("click", function(){
+        var targetprefix = jQuery(this).data("targetprefix");
+
+        if(jQuery(this).prop("checked")) {
+            jQuery("input[id^=" + targetprefix + "]").prop("checked", true);
+        } else {
+            jQuery("input[id^=" + targetprefix + "]").prop("checked", false);
+        }
+    });
+
 });
 jQuery(document).ready(function(){
 
