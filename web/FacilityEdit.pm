@@ -166,8 +166,9 @@ sub handleFacilityEdit {
                     <div class="panel-body fieldSectionGroup">
                         $fields_summary
                         <div class="fieldSectionGroupFooter">
-                            <a href = "$Data->{'target'}?client=$client&amp;a=VENUE_FPA&amp;venueID=$entityID">add field</a> |
-                            <a href = "$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$entityID">edit</a>
+                            <a href = "$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$entityID">edit</a> |
+                            <a href = "$Data->{'target'}?client=$client&amp;a=VENUE_FPA&amp;venueID=$entityID">add</a> |
+                            <a href = "$Data->{'target'}?client=$client&amp;a=VENUE_FPD&amp;venueID=$entityID">delete</a>
                         </div>
                     </div>
                     
