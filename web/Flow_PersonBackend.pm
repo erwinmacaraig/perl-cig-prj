@@ -1048,6 +1048,8 @@ sub process_products {
 
 ####
     my $paymentType = $self->{'RunParams'}{'paymentType'} || 0;
+    my $payMethod= $self->{'RunParams'}{'payMethod'} || '';
+    $self->addCarryField('payMethod',$payMethod);
     my $markPaid= $self->{'RunParams'}{'markPaid'} || 0;
     my @txnIds = split ':',$txnIds ;
     if ($paymentType and $markPaid)  {
@@ -1250,6 +1252,7 @@ sub display_summary {
         $regoID = 0 if !$valid;
     }
 
+    my $payMethod = '';
     if($regoID) {
         $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
         $personObj->load();
@@ -1257,6 +1260,8 @@ sub display_summary {
         $rego_ref->{'Nationality'} = $nationality;
 #BAFF
     $self->addCarryField('txnIds', $self->{'RunParams'}{'txnIds'} || 0);
+    $self->addCarryField('payMethod', $self->{'RunParams'}{'payMethod'} || '');
+        $payMethod = $self->{'RunParams'}{'payMethod'} || '';
     
         my $hiddenFields = $self->getCarryFields();
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
@@ -1281,6 +1286,10 @@ sub display_summary {
         $self->decrementCurrentProcessIndex();
         return ('',2);
     }
+    
+    #if ($payMethod ne 'now')    {
+    #    $gateways = '';
+    #}
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -1290,8 +1299,9 @@ sub display_summary {
         Title => '',
         TextTop => '',
         TextBottom => '',
-        cContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
-        NoContinueButton => 1,  ## Look at putting this in if $ due and SystemConfig->enforceFlowPayment or something ?
+        ContinueButtonText => $payMethod eq 'now' ? '' : $self->{'Lang'}->txt('Submit to Member Association'),
+        NoContinueButton => $payMethod eq 'now' ? 1 : 0,  ## Look at putting this in if $ due and SystemConfig->enforceFlowPayment or something ?
+            PayMethod => $payMethod,
         gateways => $gateways
     );
     my $pagedata = $self->display(\%PageData);

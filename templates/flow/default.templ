@@ -48,7 +48,6 @@
 
 <div class="[% IF processStatus == 1 %]col-md-12[% ELSE %]col-md-9[% END %]">
 [% DocUploader %]
-[% gateways %]
 	<form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">
 	    [% IF Content %][% Content %][% END %]
 	    [% IF FlowNextAction %]
@@ -61,12 +60,15 @@
 			[% IF !NoBackButton and BackButtonURL %]
 				<a href = "[% BackButtonURL %]" id = "flow-btn-back" class = "[% IF processStatus == 1 %]nudge[% END %]">[% IF BackButtonText %][% Lang.txt(BackButtonText) %][% ELSE %][% Lang.txt('Back') %][% END %]</a>
 			[% END %]
-			[% IF !NoContinueButton %]
+			[% IF !NoContinueButton and PayMethod  == "later" %]
 				<input id = "flow-btn-continue" type = "submit" value = " [% Lang.txt(ContinueButtonText) %] "  class = "btn-main btn-proceed">
 			[% END %]
 			</div>
 		</div>
 	</form>
+    [% IF NoContinueButton %]
+        [% gateways %]
+    [% END %]
 </div>
 
 [% IF FlowSummary or FlowSummaryContent %]

@@ -31,29 +31,8 @@ print STDERR "IN REDIRECT BACK!!\n";
 
     $autoRun ||= 0;
     my $a = $payTry->{'nextPayAction'} || $payTry->{'a'};
-    my $redirect_link = "main.cgi?client=$client&amp;a=$a&amp;run=1&tl=$logID";
-
-    my $TLStatus=0;
-    {
-        my $st = qq[
-            SELECT 
-                intStatus
-            FROM
-                tblTransLog
-            WHERE
-                intLogID=?
-                AND intRealmID=?
-                LIMIT 1
-        ];
-        my $query = $Data->{'db'}->prepare($st);
-        $query->execute(
-            $logID, 
-            $Data->{'Realm'}
-        );
-        my $dref = $query->fetchrow_hashref();
-        $TLStatus = $dref->{'intStatus'} || 0;
-    }
-
+    #my $redirect_link = "main.cgi?client=$client&amp;a=$a&amp;run=1&tl=$logID";
+    my $redirect_link = "main.cgi?client=$client&amp;a=$a&amp;run=0&tl=$logID";
 
     foreach my $k (keys %{$payTry}) {
         next if $k eq 'client';
@@ -64,7 +43,6 @@ print STDERR "IN REDIRECT BACK!!\n";
         next if $k =~/^ss$/;
         next if $k =~/^cc_submit/;
         next if $k =~/^pt_submit/;
-        if ($k eq "rfp" and $payTry->{$k} eq 'c' and $TLStatus != $Defs::TXNLOG_SUCCESS)    { $payTry->{$k} = 'summ';}
         $redirect_link .= "&$k=".$payTry->{$k};
     }
     my $body = "HELLO";

@@ -12,6 +12,9 @@
         </select></p>
 [% END %]
 [% product_body %]
+<input type="radio" class="inputbox" name="payMethod" value="now" checked />Pay Now&nbsp;&nbsp;&nbsp;
+<input type="radio" class="inputbox" name="payMethod" value="later"/>Pay Later
+
 [% IF !NoFormFields %]
 [% FOREACH h IN  hidden_ref %]
 <input type="hidden" name="[% h.key %]" value="[% h.value %]">

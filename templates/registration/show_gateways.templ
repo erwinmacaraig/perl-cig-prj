@@ -1,13 +1,15 @@
 <form ttarget="_pay" action="[% target %]" method="POST">
-    [% txnList %]
+    <!--[% txnList %]-->
         <div >
             <span class="proceed-button button">
                 [% gateway_body %]
             </span>
-            [% IF gateway_body %] OR [% END %]
-            <span class="proceed-button button">
-                <a href="[% txn_invoice_url %]" target="_blank" onmouseover="this.style.textDecoration = 'none'">[% Lang.txt("Generate Invoice") %]</a>
-            </span>
+            <!-- 
+                [% IF gateway_body %] OR [% END %]
+                    <span class="proceed-button button">
+                        <a href="[% txn_invoice_url %]" target="_blank" onmouseover="this.style.textDecoration = 'none'">[% Lang.txt("Generate Invoice") %]</a>
+                    </span>
+            -->
         </div>
     [% FOREACH h IN  hidden_ref %]
         <input type="hidden" name="[% h.key %]" value="[% h.value %]">

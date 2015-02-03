@@ -1088,7 +1088,7 @@ sub generateRegoFlow_Gateways   {
         $paymentType = $pType;
         my $name = $gateway->{'gatewayName'};
         $gateway_body .= qq[
-            <input type="submit" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "btn-main"><br><br>
+            <input type="submit" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Proceed to Payment and Submit to Member Association").qq[" class = "btn-main"><br><br>
         ];
     }
     $gateway_body = '' if ! $gatewayCount;
