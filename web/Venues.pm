@@ -29,6 +29,8 @@ use EntityFields;
 use FacilityFlow;
 use PersonLanguages;
 
+use FlashMessage;
+
 sub handleVenues    {
     my ($action, $Data, $parentID, $typeID)=@_;
 
@@ -1000,7 +1002,7 @@ sub list_venue_fields {
     my $fields = $entityFields->getAll("HTML");
     my $count = scalar(@{$fields});
 
-    return ("Facility Field(s) not found.", "Error") if(!$count);
+    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Facility Field(s) not found.")) if(!$count);
 
     my %PageData = (
         target  => $Data->{'target'},
@@ -1044,7 +1046,7 @@ sub update_venue_fields {
     my $fields = $entityFields->getAll("HTML");
     my $count = scalar(@{$fields});
 
-    return ("Invalid Venue ID", "Error") if(!$count);
+    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Invalid Venue/Facility ID.")) if(!$count);
 
     $entityFields->setCount($count);
 
@@ -1086,6 +1088,12 @@ sub update_venue_fields {
     #$PageData{'FieldElements'} = $entityFields->getAll();
     $PageData{'Success'} = $updatedFields;
     delete $PageData{'Errors'};
+
+    my %flashMessage;
+    $flashMessage{'flash'}{'type'} = 'success';
+    $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt("Facility fields updated.");
+
+    FlashMessage::setFlashMessage($Data, 'FAC_FM', \%flashMessage);
 
     if($back_screen){
       my %tempClientValues = getClient($Data->{'client'});
@@ -1191,17 +1199,26 @@ sub add_venue_fields {
             $updatedFields++;
         }
 
-        $FieldsGridData{'Success'} = $updatedFields;
-        $FieldsGridData{'action'} = "VENUE_Fadd";
-        delete $FieldsGridData{'Errors'};
+        my %flashMessage;
+        $flashMessage{'flash'}{'type'} = 'success';
+        $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt("Facility fields have been updated.");
 
-        $facilityFieldsContent = runTemplate(
-            $Data,
-            \%FieldsGridData,
-            'entity/venue_fields.templ'
-        );
+        FlashMessage::setFlashMessage($Data, 'FAC_FM', \%flashMessage);
+        $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&amp;a=FE_D&amp;venueID=$venueID";
 
-        return($facilityFieldsContent, $title);
+        return redirectTemplate($Data);
+
+        #$FieldsGridData{'Success'} = $updatedFields;
+        #$FieldsGridData{'action'} = "VENUE_Fadd";
+        #delete $FieldsGridData{'Errors'};
+
+        #$facilityFieldsContent = runTemplate(
+        #    $Data,
+        #    \%FieldsGridData,
+        #    'entity/venue_fields.templ'
+        #);
+
+        #return($facilityFieldsContent, $title);
 
     }
 }
@@ -1228,7 +1245,7 @@ sub delete_venue_fields {
     my $fields = $entityFields->getAll("RAW");
     my $count = scalar(@{$fields});
 
-    return ("Invalid Venue ID", "Error") if(!$count);
+    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Invalid Venue/Facility ID.")) if(!$count);
 
     $entityFields->setCount($count);
 
@@ -1277,6 +1294,14 @@ sub proc_delete_venue_fields {
     $query->execute(@target_fields) or query_error($st);
     $query->finish;
 
+    my %flashMessage;
+    $flashMessage{'flash'}{'type'} = 'success';
+    $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt("Facility fields have been updated.");
+
+    FlashMessage::setFlashMessage($Data, 'FAC_FM', \%flashMessage);
+    $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&amp;a=FE_D&amp;venueID=$venueID";
+
+    return redirectTemplate($Data);
 }
 
 sub pre_add_venue_fields {
@@ -1315,6 +1340,18 @@ sub displayGenericError {
     );
 
     return ($body, $titleHeader);
+}
+
+sub redirectTemplate {
+    my ($Data) = @_;
+
+    my $body = runTemplate(
+        $Data,
+        {},
+        '',
+    );
+
+    return ($body, ' ');
 }
 
 
