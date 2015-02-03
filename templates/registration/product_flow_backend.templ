@@ -12,8 +12,18 @@
         </select></p>
 [% END %]
 [% product_body %]
-<input type="radio" class="inputbox" name="payMethod" value="now" checked />Pay Now&nbsp;&nbsp;&nbsp;
-<input type="radio" class="inputbox" name="payMethod" value="later"/>Pay Later
+[% IF mandatoryPayment %]
+    <br>
+    <h3 class="panel-header">[% Lang.txt('Payment Options') %]</h3>
+    <div class="panel-body">
+        <div>
+            <input type="radio" class="inputbox" name="payMethod" value="now" checked />&nbsp;[% Lang.txt('Pay Now') %]&nbsp;[% Lang.txt('(after you submit the registration to the Member Association, the system will connect you to the payment portal)')%]
+        </div>
+        <div>
+            <input type="radio" class="inputbox" name="payMethod" value="later"/>&nbsp;[% Lang.txt('Pay Later') %]&nbsp;[% Lang.txt('(after you submit the registration to the Member Association, the system will create an invoice for you to pay later)') %]
+        </div>
+    </div>
+[% END %]
 
 [% IF !NoFormFields %]
 [% FOREACH h IN  hidden_ref %]

@@ -1,6 +1,6 @@
 <!--<div style="clear:both">&nbsp;</div>-->
 [% IF !HideItemHeader %]
-<h3 class="panel-header">Items</h3>
+<h3 class="panel-header">[% Lang.txt('Items') %]</h3>
 [% END %]
 
 <div class="panel-body">
@@ -17,9 +17,9 @@
 				<th class="col-1">[% Lang.txt('Select') %]</th>
 				<th class="col_i"></th>
 				<th class="col-2">[% IF !HideQty %]Qty[% END %]</th>
-				<th class="col-3">Name</th>
+				<th class="col-3">[% Lang.txt('Name') %]</th>
 			[% IF !HideCost %]
-				<th class="col-4">Cost</th>
+				<th class="col-4">[% Lang.txt('Cost') %]</th>
 			[% END %]
 			</tr>
 	</thead>

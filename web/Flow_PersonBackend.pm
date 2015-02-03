@@ -1290,6 +1290,20 @@ sub display_summary {
     #if ($payMethod ne 'now')    {
     #    $gateways = '';
     #}
+    my %Config = (
+        HiddenFields => $self->stringifyCarryField(),
+        Target => $self->{'Data'}{'target'},
+        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+    );
+    if ($payMethod eq 'now')    {
+        ## Change Target etc
+        %Config = (
+            HiddenFields => $gatewayConfig->{'HiddenFields'},
+            Target => $gatewayConfig->{'Target'},
+            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to Member Association'),
+        );
+    }
+
     my %PageData = (
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
@@ -1297,13 +1311,9 @@ sub display_summary {
         Title => '',
         TextTop => '',
         TextBottom => '',
-        HiddenFields => $self->stringifyCarryField(),
-        Target => $self->{'Data'}{'target'},
-        ContinueButtonText => $payMethod eq 'now' ? '' : $self->{'Lang'}->txt('Submit to Member Association'),
-        NoContinueButton => $payMethod eq 'now' ? 1 : 0,  
-        altContinue=> $payMethod eq 'now' ? 1 : 0,  
-        altContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to Member Association'),
-        altContinueFormConfig=> $gatewayConfig
+        HiddenFields => $Config{'HiddenFields'},
+        Target => $Config{'Target'},
+        ContinueButtonText => $Config{'ContinueButtonText'},
     );
     my $pagedata = $self->display(\%PageData);
 

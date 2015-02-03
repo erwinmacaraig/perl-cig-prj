@@ -1009,6 +1009,7 @@ print STDERR "SSS: $entityRegisteringForLevel\n";
         nextaction=>"PREGF_PU",
         target => $Data->{'target'},
         product_body => $product_body,
+        mandatoryPayment => $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'},
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
         client=>$client,
@@ -1097,6 +1098,7 @@ sub generateRegoFlow_Gateways   {
     $hidden_ref->{"client"} = $client;
     my $HiddenFields = '';
     foreach my $hf (keys %{$hidden_ref})    {
+        next if $hf eq 'rfp';
         $HiddenFields .= qq[<input type="hidden" name="$hf" value="$hidden_ref->{$hf}">\n];
     }
     my %GatewayConfig= (

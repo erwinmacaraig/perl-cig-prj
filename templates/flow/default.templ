@@ -48,9 +48,9 @@
 
 <div class="[% IF processStatus == 1 %]col-md-12[% ELSE %]col-md-9[% END %]">
 [% DocUploader %]
-	<form action = "[% IF !altContinue %][% Target %][% ELSE %][% altContinueFormConfig.Target %][% END %]" method = "POST" id = "[% FormID or 'flowFormID' %]">
-	    [% IF !altContinue and FlowNextAction %] <input type = "hidden" name ="rfp" value ="[% FlowNextAction %]"> [% END %]
-        [% IF !altContinue %][% HiddenFields %][% ELSE %][% altContinueFormConfig.HiddenFields %][% END %]
+	<form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">
+	    [% IF FlowNextAction %] <input type = "hidden" name ="rfp" value ="[% FlowNextAction %]"> [% END %]
+        [% HiddenFields %]
 	    [% IF Content %][% Content %][% END %]
 
 		<div class = "button-row">
@@ -60,9 +60,6 @@
 			[% END %]
 			[% IF !NoContinueButton %]
 				<input id = "flow-btn-continue" type = "submit" value = " [% Lang.txt(ContinueButtonText) %] "  class = "btn-main btn-proceed">
-			[% END %]
-			[% IF altContinue and NoContinueButton %]
-				<input id = "flow-btn-continue" type = "submit" value = " [% Lang.txt(altContinueButtonText) %] "  class = "btn-main btn-proceed">
 			[% END %]
 			</div>
 		</div>
