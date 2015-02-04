@@ -220,11 +220,12 @@ sub handleFacilityEdit {
 			];
 		}
 
-        $body .= qq[</tbody> </table><div class="fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$entityID">edit</a></div>
+        $body .= qq[</tbody> </table>
                     </div>
                     
                 </div>
             ];
+		#<div class="fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$entityID">edit</a></div>
 
     }
 

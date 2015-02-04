@@ -483,6 +483,7 @@ sub listTasks {
         }
         elsif($dref->{'strWFRuleFor'} eq "ENTITY" and $dref->{'intEntityLevel'} == $Defs::LEVEL_VENUE) {
             $ruleForType = $dref->{'strRegistrationNature'} . "_VENUE";
+			$viewTaskURL = "$Data->{'target'}?client=$client&amp;a=WF_View&TID=$dref->{'intWFTaskID'}&at=3";
         }
         elsif($dref->{'strWFRuleFor'} eq "REGO") {
             $ruleForType = $dref->{'strRegistrationNature'} . "_" . $dref->{'strPersonType'};
