@@ -277,6 +277,11 @@ sub getEntityMenuData {
             name => $lang->txt('Pending Registrations'),
             url => $baseurl."a=PENDPR_",
         };
+        $menuoptions{'incomplete'} = {
+            name => $lang->txt('Incomplete Registrations'),
+            url => $baseurl."a=INCOMPLPR_",
+        };
+
         if ($SystemConfig->{'allowBulkRenewals'})   {
             $menuoptions{'bulk'} = {
                 name => $lang->txt('Bulk Renewals'),
@@ -455,7 +460,8 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
         ]],
         [ $lang->txt('Work Tasks'), 'menu',[
             'approvals',
-            'pending'
+            'pending',
+            'incomplete'
         ]],
         [ $lang->txt('Transfers'), 'menu', [
         'clearances',    
@@ -690,6 +696,10 @@ sub getClubMenuData {
             name => $lang->txt('Pending Registrations'),
             url => $baseurl."a=PENDPR_",
         };
+        $menuoptions{'incomplete'} = {
+            name => $lang->txt('Incomplete Registrations'),
+            url => $baseurl."a=INCOMPLPR_",
+        };
       
         $menuoptions{'clubdocs'} = {
         url => $baseurl."a=C_DOCS",
@@ -838,7 +848,8 @@ sub getClubMenuData {
         ]],
         [ $lang->txt('Club Work Tasks'), 'menu',[
             'approvals',
-            'pending'
+            'pending',
+            'incomplete'
         ]],
         [ $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Transactions"), 'menu','transactions',],
         [ $lang->txt('My Club'), 'menu',[

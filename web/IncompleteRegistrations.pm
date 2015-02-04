@@ -85,7 +85,7 @@ sub listIncompleteRegistrations    {
         GROUP BY 
             pr.intPersonRegistrationID
         ORDER BY
-          pr.dtAdded ASC
+          pr.dtAdded DESC
     ];
     my $results=0;
     my @rowdata = ();
