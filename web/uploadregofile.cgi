@@ -33,7 +33,7 @@ $Data{'db'}=$db;
     $Data{'clientValues'} = \%clientValues;
     ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
      my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
-
+	$Data{'lang'} = $lang;
 if($uploaded_filename ne ''){  
     my $filefield = 'file';  
     my $permission = 1; 
@@ -64,7 +64,7 @@ if($uploaded_filename ne ''){
     else    {
         print "Content-type: text/html \n\n"; 
         my $jFileData = JSON->new->utf8->encode(\%other_person_info);
-        print $jFileData if(!$notFromFlow);       
+        print $jFileData if($notFromFlow == 0);       
     }
          
 }
