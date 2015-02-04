@@ -250,8 +250,8 @@ sub personRegistrationsHistory   {
         id => $rego->{'intPersonRegistrationID'} || 0,
         EntityLocalName=> $name,
         EntityLatinName=> $rego->{'strLatinName'} || '',
-        dtApproved=> $Data->{'l10n'}{'date'}->TZformat($rego->{'dtApproved'},'MEDIUM','SHORT') || '',
-        dtApproved_RAW=> $rego->{'dtApproved'} || '',
+        Date => $Data->{'l10n'}{'date'}->TZformat($rego->{'dtApproved'},'MEDIUM','SHORT') || $Data->{'l10n'}{'date'}->TZformat($rego->{'dtLastUpdated'},'MEDIUM','SHORT') || $Data->{'l10n'}{'date'}->TZformat($rego->{'dtAdded'},'MEDIUM','SHORT') || '',
+        Date_RAW => $rego->{'dtApproved'} || $rego->{'dtLastUpdated'} || $rego->{'dtAdded'} || '',
         PersonType=> $rego->{'PersonType'} || '',
         PersonLevel=> $rego->{'PersonLevel'} || '',
         AgeLevel=> $rego->{'AgeLevel'} || '',
@@ -315,9 +315,9 @@ sub personRegistrationsHistory   {
             field => 'Status',
         },
         {
-            name  => $Data->{'lang'}->txt('Date Registered'),
-            field => 'dtApproved',
-            sortdata => 'dtApproved_RAW',
+            name  => $Data->{'lang'}->txt('Date'),
+            field => 'Date',
+            sortdata => 'Date_RAW',
         },
         {
             type  => 'Selector',

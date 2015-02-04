@@ -791,7 +791,7 @@ sub listRequests {
 
 	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
     my $client = setClient( $Data->{'clientValues'} ) || '';
-    my $title = "Requests";
+    my $title = $Data->{'lang'}->txt('Requests');
 
     my %reqFilters =  ();
     if ($personID)  {
@@ -816,11 +816,14 @@ sub listRequests {
         push @rowdata, {
             id => $request->{'intPersonRequestID'} || 0,
             personID => $request->{'intPersonID'} || 0,
+            MAID => $request->{'strNationalNum'} || 0,
             requestFrom => $request->{'requestFrom'} || '',
             requestTo => $request->{'requestTo'} || '',
             requestType => $Defs::personRequest{$request->{'strRequestType'}},
             requestResponse => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || "N/A",
             SelectLink => "$Data->{'target'}?client=$client&amp;a=PRA_VR&rid=$request->{'intPersonRequestID'}",
+            Date => $Data->{'l10n'}{'date'}->TZformat($request->{'tTimeStamp'},'MEDIUM','SHORT') || $Data->{'l10n'}{'date'}->TZformat($request->{'dtDateRequest'},'MEDIUM','SHORT') || '',
+            Name => $request->{'strLocalFirstname'} . ' ' . $request->{'strLocalSurname'},
         }
     }
 
@@ -828,9 +831,13 @@ sub listRequests {
 
     my @headers = (
         {
-            name => $Data->{'lang'}->txt('Person ID'),
-            field => 'personID',
+            name => $Data->{'lang'}->txt('MA ID'),
+            field => 'MAID',
         }, 
+        {
+            name => $Data->{'lang'}->txt('Name'),
+            field => 'Name',
+        },
         {
             name => $Data->{'lang'}->txt('Request From'),
             field => 'requestFrom',
@@ -848,12 +855,18 @@ sub listRequests {
             field => 'requestResponse',
         }, 
         {
+            name => $Data->{'lang'}->txt('Date'),
+            field => 'Date',
+        }, 
+        {
             name  => $Data->{'lang'}->txt('Task Type'),
             field => 'SelectLink',
             width  => 50,
         },
 
     ); 
+
+    splice @headers, 1, 1 if $personID; #exclude name if navigated down to person
 
     my $rectype_options = '';
     my $grid = showGrid(

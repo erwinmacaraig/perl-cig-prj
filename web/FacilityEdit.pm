@@ -16,6 +16,7 @@ use FieldLabels;
 use Data::Dumper;
 use PersonUserAccess;
 use TTTemplate;
+use FlashMessage;
 
 sub handleFacilityEdit {
     my ($action, $Data) = @_;
@@ -166,8 +167,9 @@ sub handleFacilityEdit {
                     <div class="panel-body fieldSectionGroup">
                         $fields_summary
                         <div class="fieldSectionGroupFooter">
-                            <a href = "$Data->{'target'}?client=$client&amp;a=VENUE_FPA&amp;venueID=$entityID">add field</a> |
-                            <a href = "$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$entityID">edit</a>
+                            <a href = "$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$entityID">edit</a> |
+                            <a href = "$Data->{'target'}?client=$client&amp;a=VENUE_FPA&amp;venueID=$entityID">add</a> |
+                            <a href = "$Data->{'target'}?client=$client&amp;a=VENUE_FPD&amp;venueID=$entityID">delete</a>
                         </div>
                     </div>
                     
@@ -232,7 +234,12 @@ sub handleFacilityEdit {
         #$auditLog = qq[<a href="$Data->{'target'}?client=$client&amp;a=V_HISTLOG&amp;venueID=$entityID">].$Data->{'lang'}->txt('Audit Trail').qq[</a>];
         $auditLog = qq[<a href="$Data->{'target'}?client=$client&amp;a=V_HISTLOG&amp;venueID=$entityID" class = "btn-main">].$Data->{'lang'}->txt('Audit Trail')."</a>" ;
     }
+
+    my %flashMessage;
+    my $rflashMessage = FlashMessage::getFlashMessage($Data, 'FAC_FM');
+
     $body = qq[<div class="col-md-12">
+                $rflashMessage
                 $auditLog
                 $body
             </div>];
