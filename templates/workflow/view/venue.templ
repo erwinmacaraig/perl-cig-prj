@@ -35,14 +35,26 @@
     <div class="col-md-9">
         <div class="">
             <ul class="nav nav-tabs">
-            <li id="docstab" [% IF ActiveTab == 1 %]class="active"[% END %]><a data-toggle="tab" href="#venueRegDetails">[% Lang.txt('Registration Details') %]</a></li>
-            <li [% IF ActiveTab == 2 %]class="active"[% END %]><a data-toggle="tab" href="#venueFields">[% Lang.txt('Fields') %]</a></li>
-            <li><a data-toggle="tab" href="#venueRegDocs">[% Lang.txt('Registration Documents') %]</a></li>
-            <li><a data-toggle="tab" href="#venueTaskNotes">[% Lang.txt('Work History') %]</a></li>
+           		 <li [% IF ActiveTab == 1 %]class="active"[% END %]>
+					<a data-toggle="tab" href="#venueRegDetails">[% Lang.txt('Registration Details') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></span>
+					</a>
+				</li>
+           		<li [% IF ActiveTab == 2 %]class="active"[% END %]>
+					<a data-toggle="tab" href="#venueFields">[% Lang.txt('Fields') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></span>
+					</a>
+				</li>
+           		<li id="docstab" [% IF ActiveTab == 3 %] class="active"[% END %]>
+					<a data-toggle="tab" href="#venueRegDocs">[% Lang.txt('Registration Documents') %]<span class="circleBg"><i class="fa fa-check documents-complete documents-incomplete"></i><i class="fa fa-remove documents-rejected documents-approved"></i></span>
+					</a>
+				</li>
+            	<li [% IF ActiveTab == 4 %] class="active"[% END %]>
+					<a data-toggle="tab" href="#venueTaskNotes">[% Lang.txt('Work History') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></span>
+					</a>
+			    </li>
             </ul>
 
         <div class="tab-content">
-            <div id="venueRegDetails" class="tab-pane fade in [% IF ActiveTab == 1 %]in active[% END %]">
+            <div id="venueRegDetails" class="tab-pane fade [% IF ActiveTab == 1 %]in active[% END %]">
 
                 <div class="rego-detail">
 
@@ -183,11 +195,11 @@
                 [% END %]
             </div>
 
-            <div id="venueRegDocs" class="tab-pane fade in">
+            <div id="venueRegDocs" class="tab-pane fade [% IF ActiveTab == 3 %]in active[% END %]">
                 [% DocumentBlock %]
             </div>
 
-            <div id="venueTaskNotes" class="tab-pane fade in">
+            <div id="venueTaskNotes" class="tab-pane fade [% IF ActiveTab == 4 %]in active[% END %]">
 
                 <div class="row-padding">
                     <div style="clear: both;">&nbsp;</div>
