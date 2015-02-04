@@ -363,10 +363,12 @@ sub display_summary {
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
+    my $gatewayConfig = undef;
 print STDERR "ROLLOVERIDs:" . $self->getCarryFields('rolloverIDs') . "\n";
     my $rego_ref = {};
     my $content = '';
 
+        $self->create_bulk_records();
         $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
         $personObj->load();
         my $nationality = $personObj->getValue('strISONationality') || ''; 
@@ -375,7 +377,7 @@ print STDERR "ROLLOVERIDs:" . $self->getCarryFields('rolloverIDs') . "\n";
         my $hiddenFields = $self->getCarryFields();
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
-        $content = displayRegoFlowSummaryBulk(
+        ($content, $gatewayConfig) = displayRegoFlowSummaryBulk(
             $self->{'Data'}, 
             $regoID, 
             $client, 
@@ -404,13 +406,11 @@ print STDERR "ROLLOVERIDs:" . $self->getCarryFields('rolloverIDs') . "\n";
 
 }
 
-sub display_complete { 
+sub create_bulk_records {
+
     my $self = shift;
     my $personObj;
     my $personID = 0; #$self->ID();
-#    if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
-#        return ('Invalid User',0);
-#    }
     my $rego_ref = {};
     my $content = '';
     my $gateways = '';
@@ -418,7 +418,6 @@ sub display_complete {
     my $client = $self->{'Data'}->{'client'};
     my $clientValues = $self->{'Data'}->{'clientValues'};
     my $cl = setClient($clientValues);
-
 
     my $personType = $self->getCarryFields('d_type') || '';
     my $personEntityRole= $self->getCarryFields('d_role') || '';
@@ -459,22 +458,66 @@ sub display_complete {
 
         #FC-145 (having duplicate entries upon page refresh.. need to check number of records upon submit)
     my $totalAmount=0;
-print STDERR "COMPLETE COUNT $count\n";
         if($count > 0) {
-            my ($txnTotalAmount, $txnIds) = bulkRegoSubmit($self->{'Data'}, $bulk_ref, $rolloverIDs, $prodIds, $prodQty, $markPaid, $paymentType);
+            my ($txnTotalAmount, $txnIds, $regoIDs_ref) = bulkRegoCreate($self->{'Data'}, $bulk_ref, $rolloverIDs, $prodIds, $prodQty, $markPaid, $paymentType);
             $hiddenFields->{'txnIds'} = $txnIds;
             $hiddenFields->{'totalAmount'} = $txnTotalAmount || 0;
+           $self->addCarryField("txnIds",$txnIds);
             $totalAmount = $txnTotalAmount;
-        }
+            for my $k (keys %{$regoIDs_ref})  {
+print STDERR "regoID_$k $regoIDs_ref->{$k}\n";
+                $self->addCarryField("regoID_$k",$regoIDs_ref->{$k});
+            }
         $hiddenFields->{'rolloverIDs'} = $rolloverIDs;
 
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
-        ($content, $gateways) = displayRegoFlowCompleteBulk(
-            $self->{'Data'}, 
-            $client, 
-            $hiddenFields,
-        );
+        }
+    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+        #There are errors - reset where we are to go back to the form again
+        $self->decrementCurrentProcessIndex();
+        return ('',2);
+    }
+
+}
+sub display_complete { 
+    my $self = shift;
+    my $personObj;
+    my $personID = 0; #$self->ID();
+#    if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
+#        return ('Invalid User',0);
+#    }
+    my $rego_ref = {};
+    my $content = '';
+    my $gateways = '';
+        
+    my $client = $self->{'Data'}->{'client'};
+    my $clientValues = $self->{'Data'}->{'clientValues'};
+    my $cl = setClient($clientValues);
+
+
+    my $lang = $self->{'Lang'};
+
+    my $hiddenFields = $self->getCarryFields();
+
+    my $rolloverIDs=$self->getCarryFields('rolloverIDs');
+    my $prodIds = $self->getCarryFields('prodIds');
+    my $prodQty = $self->getCarryFields('prodQty');
+    my $markPaid = $self->getCarryFields('markPaid');
+    my $paymentType= $self->getCarryFields('paymentType');
+
+    #FC-145 (having duplicate entries upon page refresh.. need to check number of records upon submit)
+    my $totalAmount=0;
+    $hiddenFields->{'rolloverIDs'} = $rolloverIDs;
+    $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
+    $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
+
+    bulkRegoSubmit($self->{'Data'}, undef, $rolloverIDs);
+    ($content, $gateways) = displayRegoFlowCompleteBulk(
+        $self->{'Data'}, 
+        $client, 
+        $hiddenFields,
+    );
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
         $self->decrementCurrentProcessIndex();
@@ -484,8 +527,6 @@ print STDERR "COMPLETE COUNT $count\n";
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        #FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
-        #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
         processStatus => 1,
         Content => $content,
         Title => '',

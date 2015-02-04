@@ -334,7 +334,8 @@ sub displayResults {
     	 $paymentType = $pType;
       	 my $name = $gateway->{'gatewayName'};
   		 $gateway_body .= qq[
-            <input type="submit" onclick="clicked='paytry.cgi'" name="cc_submit[$gatewayCount]" value="]. $Data->{'lang'}->txt("Pay via").qq[ $name" class = "btn-main"><br><br>
+            <input type="submit" onclick="clicked='paytry.cgi'" name="cc_submit[$gatewayCount]" value="]. $Data->{'lang'}->txt("Pay Invoices Now").qq[" class = "btn-main"><br><br>
+            <input type="hidden" name="pt_submit[$gatewayCount]" value="$paymentType">
         ];   		 
     	}
 	 $gateway_body .= qq[
@@ -342,6 +343,9 @@ sub displayResults {
         </div>
     ];
 	$gateway_body = '' if ! $gatewayCount;
+    my %Hidden = (
+        gatewayCount => $gatewayCount,
+    );
 
 	my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
     $Year+=1900;
@@ -415,6 +419,7 @@ my $target = 'paytry.cgi';#$Data->{'target'};
         target => $target,
         Lang => $Data->{'lang'},
         client => $client,
+        hidden_ref => \%Hidden,
 	);
     my $body = runTemplate($Data, \%PageData, 'payment/bulkinvoicelisting.templ') || '';
 

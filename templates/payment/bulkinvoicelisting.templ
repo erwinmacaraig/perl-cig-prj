@@ -1,11 +1,11 @@
 <p>Please select the people you wish to register from the list below and click on the update button to commit your change.</p>
 	<script type="text/javascript">
 		var clicked;
-		function submitForm(){
+		function AsubmitForm(){
 			document.payform.action = clicked;
 			return true;  
 	</script>
-    <form name="payform" method="POST" onsubmit="submitForm(); return true;"> 
+    <form name="payform" method="POST" onsubmit="document.payform.action = clicked;" action=""> 
 	[% grid %]   
     <input type="hidden" name="a" value="[% nextAction %]">
     <input type="hidden" name="client" value="[% client %]">

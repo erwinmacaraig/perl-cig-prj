@@ -41,3 +41,18 @@
 		  </div>
         </div>
     </div>
+    [% IF DisplayPayment %]
+            <div class="clearfix" style="clear:both;">&nbsp;</div>
+            <div class="col-md-6">
+                <div class="read-only license-details">
+                     <h4>[% Lang.txt('Payment Options') %]</h4>
+                     <div class="read-only-text clearfix">
+                        <ul>
+                            <li><span class="details-left">[% Lang.txt("Total") %]:</span> <span class="detail-value">[% payment.dollarSymbol %][% payment.totalAmountDue %]</span></li>
+                            <li><span class="details-left">[% Lang.txt("Payment Method") %]:</span> <span class="detail-value">[% Lang.txt(payment.paymentMethodText) %]</span></li>
+                        </ul>
+                        <a href="[% editlink %]&amp;rfp=p" class="pull-right">[% Lang.txt('Edit') %]</a>
+                     </div>
+                </div>
+            </div>
+    [% END %]

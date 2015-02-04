@@ -716,6 +716,7 @@ warn("LL $hidePayment:$hidePay:$displayonly");
 
 
     #if($row->{'dblTaxRate'}){
+        $row->{'dblTaxRate'} || 0;
         my $temppricerate = 1 + $row->{'dblTaxRate'}; 
         $row_data->{'NetAmount'} = sprintf( "%.2f",($row->{curAmount} / $temppricerate));
         $row_data->{'TaxTotal'} =sprintf("%.2f",($row->{'dblTaxRate'} * $row_data->{'NetAmount'}));  

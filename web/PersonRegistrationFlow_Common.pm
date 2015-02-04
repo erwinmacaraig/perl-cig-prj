@@ -16,6 +16,7 @@ require Exporter;
     save_rego_products
     add_rego_record
     bulkRegoSubmit
+    bulkRegoCreate
     checkUploadedRegoDocuments
     getRegoTXNDetails
 );
@@ -82,6 +83,10 @@ sub displayRegoFlowSummaryBulk  {
 	
     my $body = '';
 
+print STDERR "HIDDEN BULK TXNids" . $hidden_ref->{'txnIds'};
+    my ($unpaid_cost, $logIDs) = getRegoTXNDetails($Data, $hidden_ref->{'txnIds'});
+    $hidden_ref->{'totalAmount'} = $unpaid_cost;
+
     my @products= split /:/, $hidden_ref->{'prodIds'};
     foreach my $prod (@products){ $hidden_ref->{"prod_$prod"} =1;}
     my @productQty= split /:/, $hidden_ref->{'prodQty'};
@@ -120,14 +125,17 @@ sub displayRegoFlowSummaryBulk  {
 
     my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
     my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
-    my $gateways = '';
+    my $gatewayConfig = undef;
     my $txnCount = 0;
     my $amountDue = 0;
     my $logIDs;
     my $txn_invoice_url = $Defs::base_url."/printinvoice.cgi?client=$client&amp;rID=$hidden_ref->{'rID'}&amp;pID=$personID";
     ($txnCount, $amountDue, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
+print STDERR "TXN COUNT $txnCount\n";
+    $txnCount = 1;
      if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
-        $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
+        $gatewayConfig = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
+        $gatewayConfig->{'amountDue'} = $amountDue;
      }
      
       
@@ -154,13 +162,18 @@ sub displayRegoFlowSummaryBulk  {
         $rego_ref->{'strLocalName'} = $entityObj->getValue('strLocalName');
     }
 
-
     my $editlink =  $Data->{'target'}."?".$carryString;
+    $hidden_ref->{'payMethod'} = 'notrequired' if (! $amountDue);
+    my %PaymentConfig = (
+        totalAmountDue => $amountDue,
+        dollarSymbol => $Data->{'SystemConfig'}{'DollarSymbol'} || '$',
+        paymentMethodText => $Defs::paymentMethod{$hidden_ref->{'payMethod'}} || '',
+    );
+
     my %PageData = (
         person_home_url => $url,
         people=> \@People,
         registration => $rego_ref,
-        gateways => $gateways,
         txnCount => $txnCount,
         target => $Data->{'target'},
         RegoStatus => $rego_ref->{'strStatus'},
@@ -168,13 +181,16 @@ sub displayRegoFlowSummaryBulk  {
         Lang => $Data->{'lang'},
         client=>$client,
         editlink => $editlink,
+        DisplayPayment => $hidden_ref->{'payMethod'},
+        payment => \%PaymentConfig,
     );
     
     $body = runTemplate($Data, \%PageData, 'registration/summarybulk.templ') || '';
     my $logID = param('tl') || 0;
     #    $body .= displayPaymentResult($Data, $id, 1, '');
 
-    return $body;
+    return ($body, $gatewayConfig);
+    #return $body;
 }
 
 sub displayRegoFlowSummary {
@@ -1064,6 +1080,7 @@ sub displayRegoFlowProductsBulk {
         target => $Data->{'target'},
         product_body => $product_body,
         allowManualPay=> 0,
+        mandatoryPayment => $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'},
         manualPaymentTypes => \%Defs::manualPaymentTypes,
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
@@ -1205,8 +1222,7 @@ sub add_rego_record{
     }
     return (0, undef, '');
 }
- 
-sub bulkRegoSubmit {
+sub bulkRegoCreate  {
 
     my ($Data, $bulk_ref, $rolloverIDs, $productIDs, $productQtys, $markPaid, $paymentType) = @_;
 
@@ -1243,6 +1259,7 @@ sub bulkRegoSubmit {
 	$qryy->execute($invoiceNumber,$invoiceID); 
 	$qryy->finish();
 
+    my %RegoIDs=();
     for my $pID (@IDs)   {
         my $pref = loadPersonDetails($Data->{'db'}, $pID) if ($pID);
         my $ageLevelOptions = checkRegoAgeRestrictions(
@@ -1275,18 +1292,13 @@ sub bulkRegoSubmit {
             "BULKREGO"
         );
         next if (! $regoID);
-        #cleanTasks(
-        #    $Data,
-        #    $pID,
-        #    $bulk_ref->{'entityID'},
-        #    $regoID,
-        #    'REGO'
-        #);
-        submitPersonRegistration(
+        $RegoIDs{$pID} = $regoID;
+        cleanTasks(
             $Data,
             $pID,
+            $bulk_ref->{'entityID'},
             $regoID,
-            $bulk_ref
+            'REGO'
         );
         my @products = split /\:/, $productIDs;
         my %Products=();
@@ -1322,7 +1334,7 @@ sub bulkRegoSubmit {
         #    UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $logID);
         #    product_apply_transaction($Data,$logID);
         #}
-          savePlayerPassport($Data, $pID);
+        #  savePlayerPassport($Data, $pID);
     }
     if (scalar(@total_txns_added) and $paymentType and $markPaid)  {
         my %Settings=();
@@ -1336,7 +1348,35 @@ sub bulkRegoSubmit {
     my $txnIds = join(':',@total_txns_added);
     
  
-    return ($totalAmount, $txnIds);
+    return ($totalAmount, $txnIds, \%RegoIDs);
+}
+
+sub bulkRegoSubmit {
+
+    my ($Data, $bulk_ref, $rolloverIDs) = @_;
+
+    my $body = 'Submitting';
+    my @IDs= split /\|/, $rolloverIDs;
+
+    for my $pID (@IDs)   {
+        my $pref = loadPersonDetails($Data->{'db'}, $pID) if ($pID);
+        my $regoID=param('regoID_'.$pID);
+        next if (! $regoID);
+        #cleanTasks(
+        #    $Data,
+        #    $pID,
+        #    $bulk_ref->{'entityID'},
+        #    $regoID,
+        #    'REGO'
+        #);
+       submitPersonRegistration(
+            $Data,
+            $pID,
+            $regoID,
+        #    $bulk_ref
+        );
+        savePlayerPassport($Data, $pID);
+    }
 }
 1;
 
