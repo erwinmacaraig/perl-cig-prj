@@ -754,7 +754,7 @@ sub displayCompletedRequest {
             requestFrom => $request->{'requestFrom'} || '',
             requestTo => $request->{'requestTo'} || '',
             requestType => $itemRequestType,
-            requestResponse => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || "N/A",
+            requestResponse => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || $Data->{'lang'}->txt('Requested'),
             #SelectLink => $selectLink,
         };
 
@@ -820,7 +820,7 @@ sub listRequests {
             requestFrom => $request->{'requestFrom'} || '',
             requestTo => $request->{'requestTo'} || '',
             requestType => $Defs::personRequest{$request->{'strRequestType'}},
-            requestResponse => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || "N/A",
+            requestResponse => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || $Data->{'lang'}->txt('Requested'),
             SelectLink => "$Data->{'target'}?client=$client&amp;a=PRA_VR&rid=$request->{'intPersonRequestID'}",
             Date => $Data->{'l10n'}{'date'}->TZformat($request->{'tTimeStamp'},'MEDIUM','SHORT') || $Data->{'l10n'}{'date'}->TZformat($request->{'dtDateRequest'},'MEDIUM','SHORT') || '',
             Name => $request->{'strLocalFirstname'} . ' ' . $request->{'strLocalSurname'},
@@ -1263,16 +1263,19 @@ sub getRequests {
             AND (
                     (pq.intParentMAEntityID = ? AND pq.intRequestToMAOverride = 1 AND pq.strRequestResponse is NULL)
                     OR
-                    (pq.intRequestToEntityID = ? AND pq.strRequestResponse is NULL AND pq.intRequestToMAOverride = 0)
+                    (pq.intRequestToEntityID = ?)
                     OR
-                    (pq.intRequestFromEntityID = ? AND pq.strRequestResponse in (?, ?))
+                    (pq.intRequestFromEntityID = ? AND pq.strRequestResponse in (?, ?, ?))
                 )
             ";
+            #(pq.intRequestToEntityID = ? AND pq.strRequestResponse is NULL AND pq.intRequestToMAOverride = 0)
+
         push @values, $filter->{'entityID'};
         push @values, $filter->{'entityID'};
         push @values, $filter->{'entityID'};
         push @values, $Defs::PERSON_REQUEST_RESPONSE_ACCEPTED;
         push @values, $Defs::PERSON_REQUEST_RESPONSE_DENIED;
+        push @values, $Defs::PERSON_REQUEST_RESPONSE_CANCELLED;
     }
 
     if($filter->{'personID'}) {
@@ -1947,7 +1950,7 @@ sub viewRequestHistory {
     }
 
     if($readonly) {
-        $request->{'RequestResponse'} = $Defs::personRequestResponse{$request->{'strRequestResponse'}};
+        $request->{'RequestResponse'} = $Defs::personRequestResponse{$request->{'strRequestResponse'}} || $Data->{'lang'}->txt('Requested');
         $request->{'RequestStatus'} = $Defs::personRequestResponse{$request->{'strRequestStatus'}} || $Defs::personRegoStatus{$request->{'personRegoStatus'}};
 
         my %readonlyTemplateData = (
