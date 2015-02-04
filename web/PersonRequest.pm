@@ -866,6 +866,8 @@ sub listRequests {
 
     ); 
 
+    splice @headers, 1, 1 if $personID; #exclude name if navigated down to person
+
     my $rectype_options = '';
     my $grid = showGrid(
         Data => $Data,
