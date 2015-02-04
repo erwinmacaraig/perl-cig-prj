@@ -826,3 +826,22 @@ sub loadObjectValues    {
     return \%values;
 }
 
+
+sub getStateIds {
+    my $self = shift;
+
+    my $currentLevel = $self->{'ClientValues'}{'authLevel'} || 0;
+    my $userEntityID = getID($self->{'ClientValues'}, $currentLevel) || 0;
+
+    return (
+        'CLUB',
+        $userEntityID,
+        $self->ID(),
+        0,
+        $self->{'ClientValues'}{'userID'},
+    );
+}
+
+sub cancelFlow{return 1 };
+
+1;

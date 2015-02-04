@@ -1665,8 +1665,7 @@ sub rebuildClient   {
 sub getStateIds {
     my $self = shift;
 
-    my $clientValues = $self->{'ClientValues'};
-    my $currentLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $currentLevel = $self->{'ClientValues'}{'authLevel'} || 0;
     my $userEntityID = getID($self->{'ClientValues'}, $currentLevel) || 0;
 
     return (
@@ -1674,7 +1673,7 @@ sub getStateIds {
         $userEntityID,
         $self->ID(),
         $self->{'RunParams'}{'rID'} || 0,
-        $clientValues->{'userID'},
+        $self->{'ClientValues'}{'userID'},
     );
 }
 

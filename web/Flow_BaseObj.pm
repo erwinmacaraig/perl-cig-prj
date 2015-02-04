@@ -65,14 +65,14 @@ sub run {
     my $body = '';
     ($body, $next) = $self->_handleCancelSave();
     while($next) {
-        if($self->isLastPage()) {
+        if($self->isLastPage() and $self->{'AllowSaveState'}) {
             $self->clearState();
         }
         ($retvalue, $next) = $self->runNextFunction();
         $body .= $retvalue;
         if($next == 1)  {
             $next = $self->incrementCurrentProcessIndex();
-            $self->saveState();
+            $self->saveState() if $self->{'AllowSaveState'};
         }
     }
     
@@ -105,7 +105,7 @@ sub _setupRun   {
 sub _handleCancelSave {
     my $self = shift;
 
-    my $rfp = $self->{'RunParams'}{'rfp'};
+    my $rfp = $self->{'RunParams'}{'rfp'} || '';
     if(
         $rfp eq '_cancel'
         or $rfp eq '_save'

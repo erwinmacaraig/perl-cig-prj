@@ -56,8 +56,8 @@ sub listIncompleteRegistrations    {
         SELECT
             RS.id,
             RS.parameters,
+            RS.ts,
             pr.*,
-            IF(pr.strStatus != 'ACTIVE', pr.strStatus, IF(pr.strStatus = 'ACTIVE' AND pr.intPaymentRequired = 1, 'ACTIVE_INCOMPLING_PAYMENT', pr.strStatus)) AS displayStatus,
             p.strLocalFirstname,
             p.strLocalSurname,
             p.strLatinFirstname,
@@ -129,8 +129,8 @@ sub listIncompleteRegistrations    {
         
         push @rowdata, {
             id => $dref->{'intPersonRegistrationID'} || 0,
-            dtAdded=> $Data->{'l10n'}{'date'}->TZformat($dref->{'dtAdded'}|| '' , 'MEDIUM','SHORT'),
-            dtAdded_RAW => $dref->{'dtAdded'} || '',
+            dtAdded=> $Data->{'l10n'}{'date'}->TZformat($dref->{'ts'}|| '' , 'MEDIUM','SHORT'),
+            dtAdded_RAW => $dref->{'ts'} || '',
             PersonLevel=> $Defs::personLevel{$dref->{'strPersonLevel'}} || '',
             PersonType=> $Defs::personType{$dref->{'strPersonType'}} || '',
             AgeLevel=> $Defs::ageLevel{$dref->{'strAgeLevel'}} || '',
@@ -202,55 +202,69 @@ sub listIncompleteRegistrations    {
         },
     );
 
-    my $filterfields = [
-        {
-            field     => 'strLocalName',
-            elementID => 'id_textfilterfield',
-            type      => 'regex',
-        },
-        {
-            field     => 'strStatus',
-            elementID => 'dd_actstatus',
-            allvalue  => 'ALL',
-        },
-    ];   
     $client=setClient($Data->{'clientValues'}) || '';
     my %tempClientValues = getClient($client);
     my @fielddata = ();
     my $tempaction;
     $st = qq[
         SELECT
-            intEntityLevel,
-            IF(strStatus != 'ACTIVE', strStatus, IF(strStatus = 'ACTIVE' AND intPaymentRequired = 1, 'ACTIVE_INCOMPLING_PAYMENT', strStatus)) AS displayStatus,
-            intEntityID,
-            strLocalName,
-            strStatus
+            RS.id,
+            RS.parameters,
+            RS.ts,
+            RS.regoType,
+            tblEntity.intEntityLevel,
+            tblEntity.intEntityID,
+            tblEntity.strLocalName
         FROM
-            tblEntity
-        INNER JOIN
-            tblEntityLinks ON (tblEntity.intEntityID = tblEntityLinks.intChildEntityID)
+            tblRegoState AS RS
+            INNER JOIN 
+                tblEntity ON (RS.entityID = tblEntity.intEntityID)
         WHERE
-            intParentEntityID = ?
-            AND intRealmID = ?
-            AND (strStatus IN ('INCOMPLING') OR (strStatus IN ('ACTIVE') AND intPaymentRequired = 1))
+            RS.regoType IN ('CLUB','VENUE')
+            AND RS.userEntityID = ?
         ORDER BY
-            intEntityLevel, strLocalName ASC 
+            RS.ts DESC
         ];
     $query = $Data->{db}->prepare($st);
-    $query->execute( $entityID, $Data->{Realm} );
+    $query->execute( $entityID);
     while (my $dref = $query->fetchrow_hashref) {
-        print STDERR Dumper $dref;
-        $tempClientValues{currentLevel} = $dref->{intEntityLevel};
-        setClientValue(\%tempClientValues, $dref->{intEntityLevel}, $dref->{intEntityID});
-        my $tempClient = setClient(\%tempClientValues);
-        		$tempaction = "$Data->{'target'}?client=$client&amp;a=VENUE_DTE&amp;venueID=".$dref->{intEntityID};
+        my $delete = qq[
+            <a href = "$Data->{'target'}?client=$client&amp;a=INCOMPLPR_D&amp;irID=$dref->{'id'}" class = "btn btn-inside-panels" onclick = "return confirm('].$lang->txt('Are you sure you want to delete this registration?').qq[');">].$lang->txt('Delete').qq[</a>
+        ];
+
+        my $resume = '';
+        {
+            my $postfields = '';
+            my $pf = decode_json($dref->{'parameters'});
+            my %resumeClient = getClient($pf->{'client'},1);
+            $resumeClient{'authLevel'} = $Data->{'clientValues'}{'authLevel'};
+            $resumeClient{'userID'} = $Data->{'clientValues'}{'userID'};
+            my $resClient = setClient(\%resumeClient);
+            $pf->{'client'}= $resClient;
+            for my $k (keys \%{$pf})  {
+                $postfields .= qq[<input type = "hidden" name = "$k" value = "$pf->{$k}">];
+
+            }
+            $resume = qq[
+                <form action = "$Data->{'target'}" method = "POST">
+                    <input type ="submit" value = "].$lang->txt('Resume').qq[" class = "btn btn-inside-panels">
+                    $postfields
+                </form>
+            ];
+
+        }
+        my $type = $dref->{'regoType'} eq 'VENUE'
+            ? $Data->{'lang'}->txt('Venue')
+            : $Data->{'lang'}->txt('Club');
         push @fielddata, {
             id => $dref->{intEntityID},
-            SelectLink => "$tempaction",
+            dtAdded=> $Data->{'l10n'}{'date'}->TZformat($dref->{'ts'}|| '' , 'MEDIUM','SHORT'),
+            dtAdded_RAW => $dref->{'ts'} || '',
             strLocalName => $dref->{strLocalName},
+            regoType => $type,
             EntityLevel => $Defs::LevelNames{$dref->{intEntityLevel}},
-            strStatus => $dref->{strStatus}, 
-            displayStatus => $Defs::personRegoStatus{$dref->{displayStatus}},
+            resume => $resume,
+            delete => $delete,
        };
     }
 
@@ -258,25 +272,32 @@ sub listIncompleteRegistrations    {
         {
             name  => $Data->{'lang'}->txt('Name'),
             field => 'strLocalName',
+        },
+        {
+            name  => $Data->{'lang'}->txt('Type'),
+            field => 'regoType',
             width  => 60,
         },
         {
-            name  => $Data->{'lang'}->txt('Level'),
-            field => 'EntityLevel',
-            width  => 60,
+            name  => $Data->{'lang'}->txt('Added'),
+            field => 'dtAdded',
+            sortdata => 'dtAdded_RAW',
+            width  => 50,
         },
         {
-            name   => $Data->{'lang'}->txt('Status'),
-            #field  => 'strStatus',
-            field  => 'displayStatus',
-            width  => 30,
+            name => ' ',
+            type  => 'HTML',
+            field => 'resume',
+            width  => 100,
+            sortable => 0,
         },
         {
-            type  => 'Selector',
-            field => 'SelectLink',
-            width  => 30,
+            name => ' ',
+            type  => 'HTML',
+            field => 'delete',
+            width  => 100,
+            sortable => 0,
         },
-       
     );
    
 
@@ -288,7 +309,6 @@ sub listIncompleteRegistrations    {
             rowdata => \@rowdata,
             gridid  => 'grid',
             width   => '100%',
-            filters => $filterfields,
         ); 
         $resultHTML .=  qq[
             <h2 class = "section-header">].$lang->txt('Persons') .qq[</h2>
