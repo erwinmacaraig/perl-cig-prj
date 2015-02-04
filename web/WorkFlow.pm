@@ -564,10 +564,13 @@ sub listTasks {
 
         for my $request (@{$personRequests}) {
             next if (
-                chomp $request->{'strRequestStatus'} eq chomp $Defs::PERSON_REQUEST_STATUS_COMPLETED
-                or chomp $request->{'strRequestStatus'} eq chomp $Defs::PERSON_REQUEST_STATUS_REJECTED
-                or chomp $request->{'strRequestStatus'} eq chomp $Defs::PERSON_REQUEST_STATUS_DENIED
-                or chomp $request->{'personRegoStatus'} eq chomp $Defs::PERSONREGO_STATUS_PENDING
+                $request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_COMPLETED
+                or $request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_REJECTED
+                or $request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_DENIED
+                or $request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_CANCELLED
+                or ($request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_STATUS_ACCEPTED and $entityID == $request->{'intRequestToEntityID'})
+                or $request->{'personRegoStatus'} eq $Defs::PERSONREGO_STATUS_PENDING
+                or $request->{'personRegoStatus'} eq $Defs::PERSONREGO_STATUS_HOLD
             );
             $rowCount++;
             my $name = formatPersonName($Data, $request->{'strLocalFirstname'}, $request->{'strLocalSurname'}, $request->{'intGender'});
@@ -625,6 +628,7 @@ sub listTasks {
         'type' => \@taskType,
         'status' => \@taskStatus,
     );
+
 	my %TemplateData = (
         #TaskList => \@TaskList,
         MA_allowTransfer => $Data->{'SystemConfig'}{'MA_allowTransfer'} || 0,
