@@ -904,6 +904,7 @@ sub process_certifications {
 sub display_products { 
     my $self = shift;
 
+    $self->addCarryField('payMethod','');
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
@@ -1259,8 +1260,8 @@ sub display_summary {
         my $nationality = $personObj->getValue('strISONationality') || ''; 
         $rego_ref->{'Nationality'} = $nationality;
 #BAFF
-    $self->addCarryField('txnIds', $self->{'RunParams'}{'txnIds'} || 0);
-    $self->addCarryField('payMethod', $self->{'RunParams'}{'payMethod'} || '');
+        $self->addCarryField('txnIds', $self->{'RunParams'}{'txnIds'} || 0);
+        $self->addCarryField('payMethod', $self->{'RunParams'}{'payMethod'} || '');
         $payMethod = $self->{'RunParams'}{'payMethod'} || '';
     
         my $hiddenFields = $self->getCarryFields();
@@ -1295,7 +1296,7 @@ sub display_summary {
         Target => $self->{'Data'}{'target'},
         ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
     );
-    if ($payMethod eq 'now')    {
+    if ($gatewayConfig->{'amountDue'} and $payMethod eq 'now')    {
         ## Change Target etc
         %Config = (
             HiddenFields => $gatewayConfig->{'HiddenFields'},
@@ -1356,8 +1357,6 @@ sub display_complete {
 
         my $run = $self->{'RunParams'}{'run'} || 0;
         if($self->{'RunParams'}{'newreg'} and ! $run)  {
-                #$self->{'RunParams'}{'run'} = 1;
-                #$self->addCarryField('run',1);
             my $rc = WorkFlow::addWorkFlowTasks(
                 $self->{'Data'},
                 'PERSON',
@@ -1398,8 +1397,6 @@ sub display_complete {
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        #FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
-        #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
         processStatus => 1,
         Content => $content,
         Title => '',

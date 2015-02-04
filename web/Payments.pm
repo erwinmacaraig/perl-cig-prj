@@ -36,7 +36,8 @@ sub handlePayments	{
 	my $body = '';
 	if ($action =~ /DISPLAY/)	{
 		my $intLogID = param('ci') || 0;
-		$body = displayPaymentResult($Data, $intLogID, $external);
+        my $paySuccess =0 ;
+		($paySuccess, $body) = displayPaymentResult($Data, $intLogID, $external);
 	}	
 	if ($action =~ /LATER/)	{
 		my $intLogID = param('ci') || 0;
@@ -642,7 +643,7 @@ sub displayPaymentResult        {
     $qry->execute or query_error($st);
     my $transref = $qry->fetchrow_hashref();
 
-    return '' if (! $transref); ## Don't display if no TLog found.... Note Amount must be > 0
+    return (-1, '') if (! $transref); ## Don't display if no TLog found.... Note Amount must be > 0
 
 	$Data->{'RegoFormID'} = $transref->{'intRegoFormID'} || 0;
 	$Data->{'RealmSubType'} ||= $transref->{'intSubRealmID'} || 0;
@@ -654,12 +655,12 @@ sub displayPaymentResult        {
     if ($transref->{strResponseCode} eq "1" or $transref->{strResponseCode} eq "OK" or $transref->{strResponseCode} eq "00" or $transref->{strResponseCode} eq "08" or $transref->{strResponseCode} eq 'Success')    {
         my $ttime = time();
         $body .= qq[
-            <div align="center" class="OKmsg" style="font-size:14px;">Congratulations payment has been successful</div>
+            <div align="center" class="OKmsg" style="font-size:14px;">Congratulations your payment has been successful</div>
         ];
 		$success=1;
     }
     else    {
-		$msg = qq[ <div align="center" class="warningmsg" style="font-size:14px;">There was an error with your transaction</div> ] if (! $msg and $transref->{'intAmount'});
+		$msg = qq[ <div align="center" class="warningmsg" style="font-size:14px;">We are sorry, there was a problem with your payment !!</div> ] if (! $msg and $transref->{'intAmount'});
         $body .= qq[ <center>$msg<br></center> ];
 		if ($external)	{
 			$st = qq[
@@ -680,8 +681,8 @@ sub displayPaymentResult        {
 		}
     }
 	my ($viewTLBody, $header) = TransLog::viewTransLog($Data, $intLogID);
-	$body .= $viewTLBody;
-	return $body;
+	$body .= $viewTLBody if ($success);
+	return ($success, $body);
 }
 
 sub processTransLogFailure    {

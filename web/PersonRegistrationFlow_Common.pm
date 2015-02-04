@@ -69,11 +69,8 @@ sub displayRegoFlowCompleteBulk {
 
     my $logID = param('tl') || 0;
     $logIDs->{$logID}=1;
-    foreach my $id (keys %{$logIDs}) {
-        next if ! $id;
-#        $body .= displayPayResult($Data, $id);
-        $body .= displayPaymentResult($Data, $id, 1, '');
-    }
+    my ($success, $payBody) = displayPaymentResult($Data, $logID, 1, '');
+    $body .= $payBody;
     
     return ($body, $gateways);
 }
@@ -125,9 +122,10 @@ sub displayRegoFlowSummaryBulk  {
     my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
     my $gateways = '';
     my $txnCount = 0;
+    my $amountDue = 0;
     my $logIDs;
     my $txn_invoice_url = $Defs::base_url."/printinvoice.cgi?client=$client&amp;rID=$hidden_ref->{'rID'}&amp;pID=$personID";
-    ($txnCount, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
+    ($txnCount, $amountDue, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
      if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
         $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
      }
@@ -174,12 +172,7 @@ sub displayRegoFlowSummaryBulk  {
     
     $body = runTemplate($Data, \%PageData, 'registration/summarybulk.templ') || '';
     my $logID = param('tl') || 0;
-    $logIDs->{$logID}=1;
-    foreach my $id (keys %{$logIDs}) {
-        next if ! $id;
-   #     $body .= displayPayResult($Data, $id);
-        $body .= displayPaymentResult($Data, $id, 1, '');
-    }
+    #    $body .= displayPaymentResult($Data, $id, 1, '');
 
     return $body;
 }
@@ -211,6 +204,7 @@ print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~displayRegoFlowSummary $personID\n";
         $body = runTemplate($Data, \%PageData, 'registration/error.templ') || '';
     }
         my $gatewayConfig = undef;
+    my $amountDue = 0;
     if ($ok)   {
         my @products= split /:/, $hidden_ref->{'prodIds'};
         foreach my $prod (@products){ $hidden_ref->{"prod_$prod"} =1;}
@@ -226,11 +220,11 @@ print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~displayRegoFlowSummary $personID\n";
 	 	my $txnCount = 0;
 		my $logIDs;
 		my $txn_invoice_url = $Defs::base_url."/printinvoice.cgi?client=$client&amp;rID=$hidden_ref->{'rID'}&amp;pID=$personID";
-print STDERR "HIDDEN" . Dumper($hidden_ref);
-        ($txnCount, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
+        ($txnCount, $amountDue, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
          if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
             $gatewayConfig = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
          }
+        $gatewayConfig->{'amountDue'} = $amountDue;
          
           
 	    my $personObj = getInstanceOf($Data, 'person');
@@ -358,6 +352,13 @@ $sth = $Data->{'db'}->prepare($query);
 		} 
 
 		################################################
+        $hidden_ref->{'payMethod'} = 'notrequired' if (! $amountDue);
+        my %PaymentConfig = (
+            totalAmountDue => $amountDue,
+            dollarSymbol => $Data->{'SystemConfig'}{'DollarSymbol'} || '$',
+            paymentMethodText => $Defs::paymentMethod{$hidden_ref->{'payMethod'}} || '',
+        );
+            
         my $editlink =  $Data->{'target'}."?".$carryString;
         my %PageData = (
             person_home_url => $url,
@@ -372,6 +373,8 @@ $sth = $Data->{'db'}->prepare($query);
             client=>$client,
             editlink => $editlink,
             certifications => join(', ', @certString),
+            DisplayPayment => $hidden_ref->{'payMethod'},
+            payment => \%PaymentConfig,
         );
         
         $body = runTemplate($Data, \%PageData, 'registration/summary.templ') || '';
@@ -380,7 +383,7 @@ $sth = $Data->{'db'}->prepare($query);
         foreach my $id (keys %{$logIDs}) {
             next if ! $id;
        #     $body .= displayPayResult($Data, $id);
-            $body .= displayPaymentResult($Data, $id, 1, '');
+            #$body .= displayPaymentResult($Data, $id, 1, '');
         }
     }
 	
@@ -395,14 +398,15 @@ sub displayRegoFlowComplete {
 
     my $ok = 0;
     my $run = $hidden_ref->{'run'} || param('run') || 0;
+    my $payMethod= $hidden_ref->{'payMethod'} || param('payMethod') || '';
 #$run=0;
 print STDERR "COMPLETE RUN" . $run;
-    if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER' or $rego_ref->{'registrationNature'} eq 'TRANSFER') {
+    #if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER' or $rego_ref->{'registrationNature'} eq 'TRANSFER') {
         $ok=1;
-    }
-    else    {
-        $ok = $run ? 1 : checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'strSport'}, $rego_ref->{'strPersonType'}, $rego_ref->{'strPersonEntityRole'}, $rego_ref->{'strPersonLevel'}, $rego_ref->{'strAgeLevel'});
-    }
+    #}
+    #else    {
+    #    $ok = $run ? 1 : checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'strSport'}, $rego_ref->{'strPersonType'}, $rego_ref->{'strPersonEntityRole'}, $rego_ref->{'strPersonLevel'}, $rego_ref->{'strAgeLevel'});
+    #}
 print STDERR "000OK IS $ok | $run\n\n";
     my $body = '';
     my $gateways = '';
@@ -441,8 +445,9 @@ print STDERR "000OK IS $ok | $run\n\n";
         my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
 	 	my $txnCount = 0;
 		my $logIDs;
+        my $amountDue = 0;
 		my $txn_invoice_url = $Defs::base_url."/printinvoice.cgi?client=$client&amp;rID=$hidden_ref->{'rID'}&amp;pID=$personID";
-        ($txnCount, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
+        ($txnCount, $amountDue, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
         savePlayerPassport($Data, $personID) if (! $run);
         $hidden_ref->{'run'} = 1;
          #if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
@@ -501,9 +506,18 @@ print STDERR "000OK IS $ok | $run\n\n";
        $cv{'currentLevel'} = $Defs::LEVEL_NATIONAL;
        my $mlm = setClient(\%cv);
 
-		
+	    ## PaymentMethod
+        #payLaterOn	 = 1/0
+        my $logID = param('tl') || 0;
+        my $paymentResult = '';
+        my $paySuccess = 0;
+        ($paySuccess, $paymentResult) = displayPaymentResult($Data, $logID, 1, '');
 
         my %PageData = (
+            payLaterFlag=> ($amountDue and $payMethod eq 'later') ? 1 : 0,
+            payNowFlag=> ($amountDue and $payMethod eq 'now') ? 1 : 0,
+            payNowMsg=> ($amountDue and $payMethod eq 'now') ? $paymentResult : '',
+            payNowSuccess => $paySuccess,
             person_home_url => $url,
 			person => \%personData,
 			registration => $rego_ref,
@@ -527,13 +541,6 @@ print STDERR "000OK IS $ok | $run\n\n";
         }
         else {
             $body = runTemplate($Data, \%PageData, 'registration/complete.templ') || '';
-        }
-        my $logID = param('tl') || 0;
-        $logIDs->{$logID}=1;
-        foreach my $id (keys %{$logIDs}) {
-            next if ! $id;
-       #     $body .= displayPayResult($Data, $id);
-            $body .= displayPaymentResult($Data, $id, 1, '');
         }
     }
     return ($body, $gateways);
@@ -574,7 +581,7 @@ sub getPersonRegoTXN    {
 
 print STDERR "GETPRTXN\n";
     my $st = qq[
-        SELECT intTransLogID, intTransactionID, intStatus
+        SELECT curAmount, intTransLogID, intTransactionID, intStatus
         FROM tblTransactions
         WHERE
             intRealmID =?
@@ -587,14 +594,15 @@ print STDERR "GETPRTXN\n";
 	$qry->execute($Data->{'Realm'}, $personID, $regoID);
     my $count = 0;
    my %tlogIDs=();
+    my $amount = 0;
     while (my $dref= $qry->fetchrow_hashref())  {
-print STDERR "DREF $personID $regoID\n";
+        $amount += $dref->{'curAmount'};
         $tlogIDs{$dref->{'intTransLogID'}} = 1 if ($dref->{'intTransLogID'} and ! exists $tlogIDs{$dref->{'intTransLogID'}});
         if ($dref->{'intStatus'} == 0)  {
             $count++;
         }
     }
-    return ($count, \%tlogIDs);
+    return ($count, $amount, \%tlogIDs);
 }
 
 sub displayRegoFlowCheckout {
@@ -971,7 +979,6 @@ sub displayRegoFlowProducts {
     my $lang=$Data->{'lang'};
 
     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_PU&amp;rID=$regoID";
-print STDERR "SSS: $entityRegisteringForLevel\n";
 #    my $pref = loadPersonDetails($Data->{'db'}, $personID);
  #   $rego_ref->{'Nationality'} = $pref->{'strISONationality'};
     my $CheckProducts = getRegistrationItems(

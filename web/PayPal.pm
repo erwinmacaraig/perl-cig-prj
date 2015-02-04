@@ -121,7 +121,8 @@ warn("LLLLine: $line");
         	print $cgi->redirect($url);
 	}
 	else	{
-		my $body .= displayPaymentResult($Data, $logID, 1);
+	    my ($paySuccess, $payBody) = displayPaymentResult($Data, $logID, 1);
+        $body .= $payBody;
 		$body .= qq[<br><p><a href="$Defs::base_url/main.cgi?client=$client&a=P_TXNLog_list&mode=p">Return to Membership System</a></p>] if ! $external;
 		return $body;
 	}
@@ -278,7 +279,7 @@ print STDERR "paypal CART DONE ABOUT TO EMAIL FOR $logID\n";
 				return '';
 			}
 	}
-	my $body = displayPaymentResult($Data, $logID, 1);
+	my ($paySuccess, $body) = displayPaymentResult($Data, $logID, 1);
 	$body .= qq[<br><p><a href="$Defs::base_url/main.cgi?client=$client&a=P_TXNLog_list&mode=p">Return to Membership System</a></p>] if ! $external;
 	return $body;
 }
