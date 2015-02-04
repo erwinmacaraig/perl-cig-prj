@@ -111,6 +111,7 @@ sub _handleCancelSave {
         or $rfp eq '_save'
     )   {
         if($rfp eq '_cancel')   {
+            $self->clearState();
             $self->cancelFlow();
         }
         my $body = $self->display({
