@@ -35,13 +35,16 @@
 
 [% END %]
 
-<form action="main.cgi" method="POST">
 [% USE Dumper %]
+<form id="fields_edit_form" action="main.cgi" method="POST">
         <div class="col-md-12">
             <table cellpadding="5" style="width: 100%" class = "table">
                 <thead>
                 <tr>
-                    <th></th>
+                    <th>
+                    [% IF type == 'delete' %]
+                        <input type="checkbox" id="selectall" data-targetprefix="selectall-"/></th>
+                    [% END %]
                     <th>[% Lang.txt('Field Number') %]</th>
                     <th>[% Lang.txt('Field Name') %]</th>
                     <th>[% Lang.txt('Discipline') %]</th>
@@ -56,11 +59,29 @@
                 <tbody>
                 [% FOREACH fieldRow IN FieldElements %]
                 <tr>
-                    <td>[% fieldRow.intEntityFieldID %][% COUNT = COUNT + 1 %][% COUNT %]</td>
+                    <td style="padding: 15px">
+                    [% IF type == 'delete' %]
+                        <input id="selectall-[% fieldRow.intEntityFieldID %]" type="checkbox" name="deletefield[]" value="[% fieldRow.intEntityFieldID %]"/>
+                    [% ELSE %]
+                        [% fieldRow.intEntityFieldID %][% COUNT = COUNT + 1 %][% COUNT %]
+                    [% END %]
+                    </td>
                     <td>[% fieldRow.intFieldOrderNumber %]</td>
                     <td>[% fieldRow.strName %]</td>
-                    <td>[% fieldRow.strDiscipline %]</td>
-                    <td>[% fieldRow.strGroundNature %]</td>
+                    <td>
+                    [% IF type == 'delete' %]
+                        [% Disciplines.item(fieldRow.strDiscipline) %]
+                    [% ELSE %]
+                        [% fieldRow.strDiscipline %]
+                    [% END %]
+                    </td>
+                    <td>
+                    [% IF type == 'delete' %]
+                        [% Disciplines.item(fieldRow.strGroundNature) %]
+                    [% ELSE %]
+                        [% fieldRow.strGroundNature %]
+                    [% END %]
+                    </td>
                     <td>[% fieldRow.dblLength %]</td>
                     <td>[% fieldRow.dblWidth %]</td>
                     <td>[% fieldRow.intCapacity %]</td>
@@ -76,5 +97,76 @@
     [% IF bscrn %]
     <input type="hidden" value="[% bscrn %]" name="bscrn">
     [% END %]
-    <input type="submit" class="btn-main" name="submitb" value="[% Lang.txt('Save') %]">   
+
+    [% IF type == 'delete' %]
+        <input type="submit" class="btn-main" name="submitb" value="[% Lang.txt('Continue') %]">   
+    [% ELSE %]
+        <input type="submit" class="btn-main" name="submitb" value="[% Lang.txt('Save') %]">   
+    [% END %]
 </form>
+
+
+[% IF type == 'delete' %]
+    <div class="modal fade" id="confirmDeleteFields" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog" style="z-index:9999;">
+
+        <div id="error" class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="myModalLabel">[% Lang.txt('Error') %]</h4>
+          </div>
+          
+          <div class="modal-body">
+            <label>[% Lang.txt("Please select from the list of fields.") %]</label>
+          </div>
+        </div>
+
+        <div id="continue" class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="myModalLabel">[% Lang.txt('Confirm delete fields') %]</h4>
+          </div>
+          
+          <form id="personRequestNotes" action="main.cgi" method="POST">
+              <div class="modal-body">
+                <label>[% Lang.txt("Please click 'Submit' to proceed, 'Close' otherwise.") %]</label>
+              </div>
+
+              <div class="modal-footer">
+                <a class="btn-main" data-dismiss="modal">[% Lang.txt('Close') %]</a>
+                <input class="btn-main" type="submit" name="continue_submit" value="[% Lang.txt('Submit') %]">
+              </div>
+          </form>
+          
+        </div>
+
+      </div>
+    </div>
+
+<script type="text/javascript">
+    jQuery().ready(function() {
+        
+        jQuery("input[name=submitb]").click(function(e){
+            e.preventDefault();
+
+            if(jQuery("form#fields_edit_form").find("input[type=checkbox]:checked").length == 0){
+                jQuery("div#confirmDeleteFields div#continue").hide();
+                jQuery("div#confirmDeleteFields div#error").show();
+            } else {
+                jQuery("div#confirmDeleteFields div#continue").show();
+                jQuery("div#confirmDeleteFields div#error").hide();
+            }
+
+            jQuery("div#confirmDeleteFields").modal();
+        });
+
+        jQuery("input[name=continue_submit]").click(function(e){
+            e.preventDefault();
+            jQuery("form#fields_edit_form").submit();
+        });
+
+    });
+</script>
+
+
+[% END %]

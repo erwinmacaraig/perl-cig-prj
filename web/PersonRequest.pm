@@ -823,7 +823,7 @@ sub listRequests {
             requestResponse => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || "N/A",
             SelectLink => "$Data->{'target'}?client=$client&amp;a=PRA_VR&rid=$request->{'intPersonRequestID'}",
             Date => $Data->{'l10n'}{'date'}->TZformat($request->{'tTimeStamp'},'MEDIUM','SHORT') || $Data->{'l10n'}{'date'}->TZformat($request->{'dtDateRequest'},'MEDIUM','SHORT') || '',
-            Name => $request->{'strLocalFirstname'} . ' ' . $request->{'trLocalSurname'},
+            Name => $request->{'strLocalFirstname'} . ' ' . $request->{'strLocalSurname'},
         }
     }
 
@@ -865,6 +865,8 @@ sub listRequests {
         },
 
     ); 
+
+    splice @headers, 1, 1 if $personID; #exclude name if navigated down to person
 
     my $rectype_options = '';
     my $grid = showGrid(

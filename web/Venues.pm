@@ -29,6 +29,8 @@ use EntityFields;
 use FacilityFlow;
 use PersonLanguages;
 
+use FlashMessage;
+
 sub handleVenues    {
     my ($action, $Data, $parentID, $typeID)=@_;
 
@@ -66,6 +68,12 @@ sub handleVenues    {
     }
     elsif($action =~ /^VENUE_Fadd/ or $action =~ /^VENUE_Fprocadd/){
         ($resultHTML, $title) = add_venue_fields($action, $Data, $venueID);
+    }
+    elsif($action =~ /^VENUE_FPD/){
+        ($resultHTML, $title) = delete_venue_fields($action, $Data, $venueID);
+    }
+    elsif($action =~ /^VENUE_Fprocdel/){
+        ($resultHTML, $title) = proc_delete_venue_fields($action, $Data, $venueID);
     }
     return ($resultHTML,$title);
 }
@@ -983,7 +991,7 @@ sub list_venue_fields {
     warn "METHOD CALL $entityID";
     my $venueDetails = loadVenueDetails($Data->{'db'}, $venueID);
 
-    return ("Only Venue/Facility can have fields.", "Error") if($venueDetails->{'intEntityLevel'} != $Defs::LEVEL_VENUE);
+    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Invalid Venue/Facility ID.")) if($venueDetails->{'intEntityLevel'} != $Defs::LEVEL_VENUE);
     
     my $entityFields = new EntityFields();
     my $title = $venueDetails->{strLocalName} . ": " . "Fields";;
@@ -994,7 +1002,7 @@ sub list_venue_fields {
     my $fields = $entityFields->getAll("HTML");
     my $count = scalar(@{$fields});
 
-    return ("Facility Field(s) not found.", "Error") if(!$count);
+    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Facility Field(s) not found.")) if(!$count);
 
     my %PageData = (
         target  => $Data->{'target'},
@@ -1027,7 +1035,7 @@ sub update_venue_fields {
     my $entityID = getID($Data->{'clientValues'});
     my $venueDetails = loadVenueDetails($Data->{'db'}, $venueID);
 
-    return ("Only Venue/Facility can have fields.", "Error") if($venueDetails->{'intEntityLevel'} != $Defs::LEVEL_VENUE);
+    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Invalid Venue/Facility ID.")) if($venueDetails->{'intEntityLevel'} != $Defs::LEVEL_VENUE);
 
     my $entityFields = new EntityFields();
     my $title = $venueDetails->{strLocalName} . ": " . "Fields";;
@@ -1038,7 +1046,7 @@ sub update_venue_fields {
     my $fields = $entityFields->getAll("HTML");
     my $count = scalar(@{$fields});
 
-    return ("Invalid Venue ID", "Error") if(!$count);
+    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Invalid Venue/Facility ID.")) if(!$count);
 
     $entityFields->setCount($count);
 
@@ -1081,6 +1089,12 @@ sub update_venue_fields {
     $PageData{'Success'} = $updatedFields;
     delete $PageData{'Errors'};
 
+    my %flashMessage;
+    $flashMessage{'flash'}{'type'} = 'success';
+    $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt("Facility fields updated.");
+
+    FlashMessage::setFlashMessage($Data, 'FAC_FM', \%flashMessage);
+
     if($back_screen){
       my %tempClientValues = getClient($Data->{'client'});
       $tempClientValues{currentLevel} = $tempClientValues{authLevel};
@@ -1120,7 +1134,7 @@ sub add_venue_fields {
     my $venueDetails = loadVenueDetails($Data->{'db'}, $venueID);
     my $title = $venueDetails->{strLocalName} . ": " . "Add Fields";;
 
-    return ("Only Venue/Facility can have fields.", "Error") if($venueDetails->{'intEntityLevel'} != $Defs::LEVEL_VENUE);
+    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Invalid Venue/Facility ID.")) if($venueDetails->{'intEntityLevel'} != $Defs::LEVEL_VENUE);
 
     #TODO: create form to accept number of fields
     my $facilityFieldCount = $params{'field_count'};
@@ -1185,19 +1199,109 @@ sub add_venue_fields {
             $updatedFields++;
         }
 
-        $FieldsGridData{'Success'} = $updatedFields;
-        $FieldsGridData{'action'} = "VENUE_Fadd";
-        delete $FieldsGridData{'Errors'};
+        my %flashMessage;
+        $flashMessage{'flash'}{'type'} = 'success';
+        $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt("Facility fields have been updated.");
 
-        $facilityFieldsContent = runTemplate(
-            $Data,
-            \%FieldsGridData,
-            'entity/venue_fields.templ'
-        );
+        FlashMessage::setFlashMessage($Data, 'FAC_FM', \%flashMessage);
+        $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&amp;a=FE_D&amp;venueID=$venueID";
 
-        return($facilityFieldsContent, $title);
+        return redirectTemplate($Data);
+
+        #$FieldsGridData{'Success'} = $updatedFields;
+        #$FieldsGridData{'action'} = "VENUE_Fadd";
+        #delete $FieldsGridData{'Errors'};
+
+        #$facilityFieldsContent = runTemplate(
+        #    $Data,
+        #    \%FieldsGridData,
+        #    'entity/venue_fields.templ'
+        #);
+
+        #return($facilityFieldsContent, $title);
 
     }
+}
+
+sub delete_venue_fields {
+    my ($action, $Data, $venueID) = @_;
+    my $back_screen = param('bscrn') || '';
+    my $activeTab = safe_param('at','number') || 1;
+
+    my $p = new CGI;
+	  my %params = $p->Vars();
+
+    my $entityID = getID($Data->{'clientValues'});
+    my $venueDetails = loadVenueDetails($Data->{'db'}, $venueID);
+
+    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Invalid Venue/Facility ID.")) if($venueDetails->{'intEntityLevel'} != $Defs::LEVEL_VENUE);
+
+    my $entityFields = new EntityFields();
+    my $title = $venueDetails->{strLocalName} . ": " . "Delete Fields";;
+
+    $entityFields->setEntityID($venueID);
+    $entityFields->setData($Data);
+
+    my $fields = $entityFields->getAll("RAW");
+    my $count = scalar(@{$fields});
+
+    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Invalid Venue/Facility ID.")) if(!$count);
+
+    $entityFields->setCount($count);
+
+    my %templateData = (
+        Disciplines => \%Defs::sportType,
+        GroundNature => \%Defs::fieldGroundNatureType,
+        FieldElements => $fields,
+        action => 'VENUE_Fprocdel',
+        client  => $Data->{'client'},
+        venueID => $venueID,
+        type => 'delete',
+    );
+
+    my $fields_summary = runTemplate(
+        $Data,
+        \%templateData,
+        'entity/venue_fields.templ'
+    );
+
+    return ($fields_summary, $title);
+}
+
+sub proc_delete_venue_fields {
+    my ($action, $Data, $venueID) = @_;
+
+    my $p = new CGI;
+    my %params = $p->Vars();
+
+    my @target_fields = $p->param('deletefield[]');
+
+    my $count = scalar(@target_fields);
+    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Invalid number of fields to be deleted.")) if !$count;
+
+    my $bind_str = join ', ', (split(/ /, "? " x ($count)));
+    push @target_fields, $venueID;
+
+    my $st = qq[
+        UPDATE tblEntityFields
+        SET
+            strStatus = 'DELETED'
+        WHERE
+            intEntityFieldID IN ($bind_str)
+            AND intEntityID = ?
+    ];
+    my $query = $Data->{'db'}->prepare($st);
+    $query->execute(@target_fields) or query_error($st);
+    $query->finish;
+
+    my %flashMessage;
+    $flashMessage{'flash'}{'type'} = 'success';
+    $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt("Facility fields have been updated.");
+
+    FlashMessage::setFlashMessage($Data, 'FAC_FM', \%flashMessage);
+    $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&amp;a=FE_D&amp;venueID=$venueID";
+
+    return redirectTemplate($Data);
 }
 
 sub pre_add_venue_fields {
@@ -1222,6 +1326,35 @@ sub pre_add_venue_fields {
 
     return ($body, $title);
 }
+
+sub displayGenericError {
+    my ($Data, $titleHeader, $message) = @_;
+
+    $titleHeader ||= $Data->{'lang'}->txt("Error");
+    my $body = runTemplate(
+        $Data,
+        {
+            message => $message,
+        },
+        'personrequest/generic/error.templ',
+    );
+
+    return ($body, $titleHeader);
+}
+
+sub redirectTemplate {
+    my ($Data) = @_;
+
+    my $body = runTemplate(
+        $Data,
+        {},
+        '',
+    );
+
+    return ($body, ' ');
+}
+
+
 
 1;
 

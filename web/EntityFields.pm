@@ -131,6 +131,7 @@ sub getAll {
         WHERE
             EF.intEntityID = ?
             AND E.intRealmID = ?
+            AND EF.strStatus = 'ACTIVE'
     ];
 
     my $q = $db->prepare($st);
