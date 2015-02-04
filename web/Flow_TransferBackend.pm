@@ -607,6 +607,7 @@ print STDERR "ADD REGO WAS $regoID";
 sub display_products { 
     my $self = shift;
 
+    $self->addCarryField('payMethod','');
     $self->addCarryField('d_vstd', 1);
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {

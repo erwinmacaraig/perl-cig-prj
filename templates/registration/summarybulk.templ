@@ -11,6 +11,7 @@
                 <td>[% Lang.txt("Gender") %]</td>
                 <td>[% Lang.txt("Nationality") %]</td>
                 <td>[% Lang.txt("Country of Birth") %]</td>
+                <td>[% Lang.txt("Amount Due") %]</td>
             </tr>
         </thead>
     [% FOREACH person IN people %]
@@ -22,6 +23,7 @@
             <td>[% IF person.Gender %] [% person.Gender %] [% ELSE %] - [% END %]</td>
             <td>[% IF person.Nationality %] [% person.Nationality %] [% ELSE %] - [% END %]</td>
             <td>[% IF person.Country %] [% person.Country %] [% ELSE %] - [% END %]</td>
+            <td>[% IF person.AmountDue %] [% payment.dollarSymbol %][% person.AmountDue %] [% ELSE %] - [% END %]</td>
         </tr>
     [% END %]
     </table>

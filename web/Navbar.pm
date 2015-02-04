@@ -428,8 +428,22 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
             };
         }
     }
+    if ($SystemConfig->{'allowPayInvoice'}) {
+		$menuoptions{'bulkpayment'} = { 
+			name => $lang->txt('Pay Invoice'),
+			url => $baseurl."a=TXN_PAY_INV",
+		}; 
+		$menuoptions{'payinvoice'} = { 
+			name => $lang->txt('Invoices'),
+			    url => $baseurl."strInvoiceNumber=&amp;a=TXN_PAY_INV_NUM",
+		}; 
+    }
+	$menuoptions{'paymenthistory'} = { 
+	    name => $lang->txt('Payments History'),
+		url => $baseurl."a=TXN_PAY_HISTORY",
+	}; 
 
-    
+
     my @menu_structure = (
         [ $lang->txt('Dashboard'), 'home','home'],
         [ $lang->txt('States'), 'menu','states'],
@@ -464,6 +478,11 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
         ]],
         [ $lang->txt('My Association'), 'menu',[
         'myAssociation',
+        ]],
+        [ $lang->txt('Payments'), 'menu',[
+		    'payinvoice',
+		    'bulkpayment',
+		    'paymenthistory',
         ]],
         [ $lang->txt('Search'), 'search',[
         'advancedsearch',
@@ -739,11 +758,20 @@ sub getClubMenuData {
             };
         }
         if ($SystemConfig->{'allowPayInvoice'}) {
-		$menuoptions{'bulkpayment'} = { 
-			name => $lang->txt('Pay Invoice'),
-			url => $baseurl."a=TXN_PAY_INV",
-		}; 
+		    $menuoptions{'bulkpayment'} = { 
+			    name => $lang->txt('Pay Invoice'),
+			    url => $baseurl."a=TXN_PAY_INV",
+		    }; 
+		    $menuoptions{'payinvoice'} = { 
+			    name => $lang->txt('Invoices'),
+			    url => $baseurl."strInvoiceNumber=&amp;a=TXN_PAY_INV_NUM",
+		    }; 
         }
+		$menuoptions{'paymenthistory'} = { 
+			name => $lang->txt('Payments History'),
+			url => $baseurl."a=TXN_PAY_HISTORY",
+		}; 
+
         if ($SystemConfig->{'allowPersonRequest'}) {
             $menuoptions{'requestaccess'} = {
             name => $lang->txt('Request for Person Details'),
@@ -829,7 +857,6 @@ sub getClubMenuData {
         'listrequests',
         'duplicates',
         'bulk',
-		'bulkpayment',
          ]],
 
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu',[
@@ -846,6 +873,11 @@ sub getClubMenuData {
         ]],
          [ $lang->txt('Audit Trail'), 'menu',[
             'auditlog'
+        ]],
+         [ $lang->txt('Payments'), 'menu',[
+		    'payinvoice',
+		    'bulkpayment',
+		    'paymenthistory',
         ]],
 
         [ $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Documents"), 'menu','clubdocs'],

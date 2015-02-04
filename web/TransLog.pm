@@ -1402,7 +1402,7 @@ sub viewTransLog	{
 	$intTransLogID ||= 0;
 	$personID ||= 0;
 	my $db = $Data->{'db'};
-	my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
+	my $dollarSymbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
 	
 	#my $st = qq[
 	#	SELECT tblTransLog.*, IF(T.intTableType = $Defs::LEVEL_CLUB, Entity.strLocalName, CONCAT(strLocalFirstname,' ',strLocalSurname)) as Name, DATE_FORMAT(dtSettlement,'%d/%m/%Y') as dtSettlement

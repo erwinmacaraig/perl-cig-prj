@@ -262,6 +262,7 @@ sub process_registration {
 
 sub display_products { 
     my $self = shift;
+    $self->addCarryField('payMethod','');
 
 print STDERR "ROLLOVERIDs:" . $self->getCarryFields('rolloverIDs') . "\n";
 
@@ -368,6 +369,10 @@ print STDERR "ROLLOVERIDs:" . $self->getCarryFields('rolloverIDs') . "\n";
     my $rego_ref = {};
     my $content = '';
 
+    $self->addCarryField('txnIds', $self->{'RunParams'}{'txnIds'} || 0);
+    $self->addCarryField('payMethod', $self->{'RunParams'}{'payMethod'} || '');
+    my $payMethod = $self->{'RunParams'}{'payMethod'} || '';
+
         $self->create_bulk_records();
         $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
         $personObj->load();
@@ -388,9 +393,21 @@ print STDERR "ROLLOVERIDs:" . $self->getCarryFields('rolloverIDs') . "\n";
             $hiddenFields,
 		    $self->stringifyURLCarryField(),
         );
-    my %PageData = (
+    my %Config = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
+        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+    );
+    if ($gatewayConfig->{'amountDue'} and $payMethod eq 'now')    {
+        ## Change Target etc
+        %Config = (
+            HiddenFields => $gatewayConfig->{'HiddenFields'},
+            Target => $gatewayConfig->{'Target'},
+            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to Member Association'),
+        );
+    }
+
+    my %PageData = (
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
         Content => $content,
@@ -398,7 +415,9 @@ print STDERR "ROLLOVERIDs:" . $self->getCarryFields('rolloverIDs') . "\n";
         TextTop => '',
         TextBottom => '',
         processStatus => 1,
-        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+        HiddenFields => $Config{'HiddenFields'},
+        Target => $Config{'Target'},
+        ContinueButtonText => $Config{'ContinueButtonText'},
     );
     my $pagedata = $self->display(\%PageData);
 
