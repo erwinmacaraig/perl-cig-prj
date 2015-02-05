@@ -370,9 +370,9 @@ sub listTasks {
 		WHERE
                   t.intRealmID = $Data->{'Realm'}
 		    AND (
-                      (intApprovalEntityID = ? AND (t.strTaskStatus = 'ACTIVE' OR t.strTaskStatus = 'HOLD' OR t.strTaskStatus = 'REJECTED'))
+                      (intApprovalEntityID = ? AND (t.strTaskStatus = 'ACTIVE' OR t.strTaskStatus = 'REJECTED'))
                         OR
-                      (intProblemResolutionEntityID = ? AND t.strTaskStatus = 'HOLD')
+                      (((intProblemResolutionEntityID = ?) or (intProblemResolutionEntityID = ? AND intApprovalEntityID = ?)) AND t.strTaskStatus = 'HOLD')
             )
     ];
     #OR
@@ -404,6 +404,8 @@ sub listTasks {
 	$q->execute(
 		$entityID,
 		$entityID,
+		$entityID,
+		$entityID,
 	) or query_error($st);
 
 	my @TaskList = ();
@@ -419,12 +421,12 @@ sub listTasks {
         next if ($dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_REJECTED);
 
         #F-609 - list in dashboard if ON-HOLD and created by == approval entity
-        next if (
-            $dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_HOLD
-            and $dref->{'intApprovalEntityID'} != $entityID
-            and $dref->{'intProblemResolutionEntityID'} != $entityID
+        #next if (
+        #    $dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_HOLD
+        #    and $dref->{'intApprovalEntityID'} != $entityID
+        #    and $dref->{'intProblemResolutionEntityID'} != $entityID
         #    and ($dref->{'CreatedByEntityID'} != $entityID)
-        );
+        #);
 
         #moved checking of POSSIBLE_DUPLICATE here (if included in query, tasks for ENTITY are not capture)
         next if (defined $dref->{intSystemStatus} && $dref->{intSystemStatus} eq $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE && $dref->{strWFRuleFor} ne $Defs::WF_RULEFOR_PERSON);
