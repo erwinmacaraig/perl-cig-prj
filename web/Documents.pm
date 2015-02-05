@@ -488,26 +488,7 @@ sub pendingEntityDocumentActions {
 	my ($valuePending) = $sth->fetchrow_array();
 
 	switch ($valuePending) {
-		case 'CLUB' {
-			my $clubObj = new EntityObj(db => $Data->{'db'}, ID => $entityID, cache => $Data->{'cache'});
-			$clubObj->load();
-			if($clubObj){
-				$clubObj->setValues({'strStatus' => $Defs::ENTITY_STATUS_PENDING});
-           		$clubObj->write();
-			}
-			my $rc = WorkFlow::addWorkFlowTasks(
-                $Data,
-                'ENTITY',
-                'AMENDMENT',
-                $Data->{'clientValues'}{'authLevel'} || 0,
-                $entityID, #originEntityID,
-                0,
-                0,
-                0,
-            );
-
-		}
-        case ['CLUB','VENUE'] {
+		case ['CLUB','VENUE'] {
 			my $entityObj = new EntityObj(db => $Data->{'db'}, ID => $entityID, cache => $Data->{'cache'});
 			$entityObj->load();
 			if($entityObj){

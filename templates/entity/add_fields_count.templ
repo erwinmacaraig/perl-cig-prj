@@ -37,7 +37,12 @@
                 <input type="hidden" value="[% action %]" name="a">
                 <input type="hidden" value="[% client %]" name="client">
                 <input type="hidden" value="[% venueID %]" name="venueID">
-
+				[% IF TID.length %]
+					<input type="hidden" value="[% TID %]" name="TID" />
+				[% END %]
+				[% IF at.length %]
+					<input type="hidden" value="[% at %]" name="at" />
+				[% END %]
             </form>
         </div>
     </div>

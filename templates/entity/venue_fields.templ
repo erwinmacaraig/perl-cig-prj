@@ -94,6 +94,12 @@
     <input type="hidden" value="[% client %]" name="client">
     <input type="hidden" value="[% venueID %]" name="venueID">
     <input type="hidden" value="[% field_count %]" name="field_count">
+	[% IF TID.length %]
+		<input type="hidden" value="[% TID %]" name="TID" /> 
+	[% END %]
+	[% IF at.length %]
+		<input type="hidden" value="[% at %]" name="at" />
+	[% END %]
     [% IF bscrn %]
     <input type="hidden" value="[% bscrn %]" name="bscrn">
     [% END %]

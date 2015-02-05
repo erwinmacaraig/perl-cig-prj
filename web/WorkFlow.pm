@@ -483,7 +483,7 @@ sub listTasks {
         }
         elsif($dref->{'strWFRuleFor'} eq "ENTITY" and $dref->{'intEntityLevel'} == $Defs::LEVEL_VENUE) {
             $ruleForType = $dref->{'strRegistrationNature'} . "_VENUE";
-			$viewTaskURL = "$Data->{'target'}?client=$client&amp;a=WF_View&TID=$dref->{'intWFTaskID'}&at=3";
+			$viewTaskURL = "$Data->{'target'}?client=$client&amp;a=WF_View&TID=$dref->{'intWFTaskID'}";
         }
         elsif($dref->{'strWFRuleFor'} eq "REGO") {
             $ruleForType = $dref->{'strRegistrationNature'} . "_" . $dref->{'strPersonType'};
@@ -2621,7 +2621,7 @@ sub populateEntityViewData {
     my $task = getTask($Data, $WFTaskID);
 
     my $activeTab = safe_param('at','number') || 1;
-
+	
 	%TemplateData = (
         EntityDetails => {
             Status => $Data->{'lang'}->txt($Defs::entityStatus{$dref->{'entityStatus'} || 0}) || '',
@@ -2649,6 +2649,7 @@ sub populateEntityViewData {
             intEntityID => $dref->{'intEntityID'},
         },
         EditDetailsLink => "$Data->{'target'}?client=$tempClient&amp;dtype=$dref->{'strPersonType'}",
+		AddDetailsLink => "$Data->{'target'}?client=$client",
         ReadOnlyLogin => $readonly,
         intWFTaskID => $dref->{'intWFTaskID'},
         ActiveTab => $activeTab,
@@ -2675,12 +2676,14 @@ sub populateEntityViewData {
             );
 
             $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.')
-                if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_VENUE'} == 1 and $dref->{'entityPaymentRequired'});
-
+            if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_VENUE'} == 1 and $dref->{'entityPaymentRequired'});
+			$TemplateData{'VenueDocuments'} = $Data->{'SystemConfig'}{'hasVenueDocuments'};
+			$TemplateData{'ActiveTab'} = $Data->{'SystemConfig'}{'hasVenueDocuments'}?$activeTab: param('at')? param('at') : 2; 
             #TODO: add details specific to VENUE
 
             my $entitySummaryPanel = entitySummaryPanel($Data, $dref->{'intEntityID'});
             $TemplateData{'EntitySummaryPanel'} = $entitySummaryPanel;
+			
         }
         else {
 

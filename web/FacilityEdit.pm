@@ -28,6 +28,7 @@ sub handleFacilityEdit {
     my $e_action = param('e_a') || '';
     my $back_screen = param('bscrn') || '';
     my $entityID = param('venueID') || 0;
+	
     if(!doesUserHaveEntityAccess($Data, $entityID,'WRITE')) {
         return ('Invalid User',0);
     }
@@ -232,7 +233,10 @@ sub handleFacilityEdit {
     my $auditLog = '';
     if ($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL) {
         #$auditLog = qq[<a href="$Data->{'target'}?client=$client&amp;a=V_HISTLOG&amp;venueID=$entityID">].$Data->{'lang'}->txt('Audit Trail').qq[</a>];
-        $auditLog = qq[<a href="$Data->{'target'}?client=$client&amp;a=V_HISTLOG&amp;venueID=$entityID" class = "btn-main">].$Data->{'lang'}->txt('Audit Trail')."</a>" ;
+        $auditLog =  $back_screen ? '' : qq[<a href="$Data->{'target'}?client=$client&amp;a=V_HISTLOG&amp;venueID=$entityID" class = "btn-main">].$Data->{'lang'}->txt('Audit Trail'). "</a>" ;
+
+
+		#$auditLog = qq[<a href="$Data->{'target'}?client=$client&amp;a=V_HISTLOG&amp;venueID=$entityID" class = "btn-main">].$Data->{'lang'}->txt('Audit Trail')."</a>" ;
     }
 
     my %flashMessage;
