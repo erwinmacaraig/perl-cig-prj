@@ -13,6 +13,7 @@ use MD5;
 use Data::Dumper;
 use Documents;
 use JSON;
+use SystemConfig;
 use strict;
 
 my $client = param('client') || param('clm') || 0;
@@ -32,6 +33,7 @@ $Data{'db'}=$db;
     my %clientValues = getClient($client);
     $Data{'clientValues'} = \%clientValues;
     ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
+    $Data{'SystemConfig'} = getSystemConfig( \%Data );
      my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
 	$Data{'lang'} = $lang;
 if($uploaded_filename ne ''){  

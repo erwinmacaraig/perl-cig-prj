@@ -138,7 +138,7 @@ sub build {
                 name => $self->{_notificationObj}->getDefsName() ? $self->{_notificationObj}->getDefsName() : $config->{'fromEntityName'},
             },
             CC => {
-                email => undef,
+                email => $self->{_notificationObj}->getWorkTaskDetails()->{'CC'} || '',
                 name => undef,
             },
             RecipientName => $config->{'toEntityName'},
