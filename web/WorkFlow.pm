@@ -2375,7 +2375,7 @@ sub viewTask {
     my $showApprove = 0;
     #$showApprove = 1 if ($dref->{'intOnHold'} == 0 and $dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID and !scalar($TemplateData{'Notifications'}{'LockApproval'}));
     $showApprove = 1 if (($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_ACTIVE) and $dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID and !scalar($TemplateData{'Notifications'}{'LockApproval'}));
-
+	
     my $showResolve = 0;
     $showResolve = 1 if ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_HOLD and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);
 
@@ -2387,7 +2387,7 @@ sub viewTask {
     %DocumentData = %{$DocumentData};
 
     my $disableApprove = ($documentStatusCount->{'PENDING'} or $documentStatusCount->{'MISSING'} or $documentStatusCount->{'REJECTED'}) ? 1 : 0;
-
+	
 
     my %TaskAction = (
         'ApprovalEntityLevel' => $dref->{'ApprovalEntityLevel'},
@@ -2423,7 +2423,7 @@ sub viewTask {
 
 
     $DocumentData{'TotalPending'} = $documentStatusCount->{'PENDING'};
-
+	
     my $documentBlock = runTemplate(
         $Data,
         \%DocumentData,
