@@ -92,6 +92,7 @@
         var visitedtabs = [];
 
         var numberOfPendingDocs = jQuery(".totalPendingDocs").val();
+		
         var rejectedDocsFlag = jQuery(".rejectedDocs").val();
 
         jQuery("ul.nav-tabs li a").each(function(){
@@ -101,13 +102,13 @@
 
                 jQuery("a.workflow-action").each(function(){
                     var actiontype = jQuery(this).data('actiontype');
-
+					
                     switch(actiontype){
                         case 'APPROVE':
-                            if(jQuery(this).data('disabled') == 0
-                                && ((rejectedDocsFlag < 1 || rejectedDocsFlag == "" || typeof rejectDocsFlag === 'undefined') && (numberOfPendingDocs < 1 || numberOfPendingDocs == ''))
+							if(jQuery(this).data('disabled') == 0
+                                && ((rejectedDocsFlag < 1 || rejectedDocsFlag == "" || typeof rejectDocsFlag === 'undefined') && (numberOfPendingDocs < 1 || numberOfPendingDocs == '' || numberOfPendingDocs == 'undefined'))
                                 && jQuery("ul.nav-tabs li a i.tab-not-visited").length == 0
-                            ){
+                            ){								
                                 jQuery(this)
                                     .removeClass("btn-disabled")
                                     .addClass("btn-main")

@@ -38,7 +38,7 @@
 [% IF VenueDocuments %]				 
  <li id="docstab" [% IF ActiveTab == 1 %]class="active"[% END %]><a data-toggle="tab" href="#memberdocs">[% Lang.txt('Registration Documents') %]<span class="circleBg"><i class="fa fa-check documents-complete documents-incomplete"></i><i class="fa fa-remove documents-rejected documents-approved"></i></span></a></li>
 [% END %]           		 
-<li [% IF ActiveTab == 2 %]class="active"[% END %]><a data-toggle="tab" href="#memberdetails">[% Lang.txt('Registration Details') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></span></a></li>
+<li [% IF ActiveTab == 2 %]class="active"[% END %]><a data-toggle="tab" href="#memberdetails">[% Lang.txt('Registration Details') %]<span class="circleBg"><i class="fa fa-check memdetails-visited [% IF VenueDocuments %]tab-not-visited[% ELSE %]tab-visited[% END %]"></i></span></a></li>
            		<li [% IF ActiveTab == 3 %]class="active"[% END %]><a data-toggle="tab" href="#venueFields">[% Lang.txt('Fields') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></span></a></li>
            		
             	<li [% IF ActiveTab == 4 %] class="active"[% END %]><a data-toggle="tab" href="#venueTaskNotes">[% Lang.txt('Work History') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></span></a></li>
@@ -186,7 +186,7 @@
                 </span>
                 [% ELSIF parentEntityID == childEntityID %]
                 <span style="float: right" class="">
-                    <a href = "[% EditDetailsLink %]&a=VENUE_Flist&venueID=[% EntityDetails.intEntityID %]&bscrn=a%3DWF_View%26TID%3D[% intWFTaskID %]%26at%3D2" class="edit-link">[% Lang.txt('Edit') %]</a>
+                    <a href = "[% EditDetailsLink %]&a=VENUE_Flist&venueID=[% EntityDetails.intEntityID %]&bscrn=a%3DWF_View%26TID%3D[% intWFTaskID %]%26at%3D3" class="edit-link">[% Lang.txt('Edit') %]</a>
                 </span>
                 [% END %]
             </div>           
@@ -222,5 +222,7 @@
     <div class="col-md-3">
         [% EntitySummaryPanel %]
     </div> 
-
+	[% IF !VenueDocuments %]
+	            <input type="hidden" value="0" class="totalPendingDocs" />
+	[% END %]
 </div>
