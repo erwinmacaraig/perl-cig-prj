@@ -596,7 +596,11 @@ sub display_documents {
             $self->incrementCurrentProcessIndex();
             return ('',2);
         }
-
+		if(!$self->{'Data'}->{'SystemConfig'}{'hasVenueDocuments'}){
+			$self->incrementCurrentProcessIndex();
+            $self->incrementCurrentProcessIndex();
+            return ('',2);
+		}
         my @required_docs_listing = ();
         my @optional_docs_listing = ();
 	

@@ -1119,7 +1119,7 @@ sub add_venue_fields {
 
 	my $p = new CGI;
 	my %params = $p->Vars();
-
+	
     my @err;
     if (!$params{'field_count'}) {
         push @err, $Data->{'lang'}->txt("Number of Fields: required");
@@ -1155,6 +1155,8 @@ sub add_venue_fields {
         field_count => $params{'field_count'},
         FieldElements => \@facilityFieldsData,
     );
+	$FieldsGridData{'TID'} = $params{'TID'} if($params{'TID'});	
+	$FieldsGridData{'at'} = $params{'at'} if($params{'at'});
 
     if($action =~ /^VENUE_Fadd/) {
         for my $i (1 .. $facilityFieldCount){
@@ -1204,8 +1206,9 @@ sub add_venue_fields {
         $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt("Facility fields have been updated.");
 
         FlashMessage::setFlashMessage($Data, 'FAC_FM', \%flashMessage);
-        $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&amp;a=FE_D&amp;venueID=$venueID";
-
+        #$Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&amp;a=FE_D&amp;venueID=$venueID";
+		
+		$Data->{'RedirectTo'} = $params{'TID'} ? "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&amp;a=WF_View&TID=$params{'TID'}&amp;at=$params{'at'}" : "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&amp;a=FE_D&amp;venueID=$venueID";
         return redirectTemplate($Data);
 
         #$FieldsGridData{'Success'} = $updatedFields;
@@ -1309,6 +1312,7 @@ sub pre_add_venue_fields {
 
 	my $p = new CGI;
 	my %params = $p->Vars();
+	
 
     my $title = $Data->{'lang'}->txt("Number of Fields");
     my %TemplateData;
@@ -1317,6 +1321,9 @@ sub pre_add_venue_fields {
     $TemplateData{'venueID'} = $venueID;
     $TemplateData{'Errors'} = $err if scalar($err);
     $TemplateData{'field_count'} = $params{'field_count'} if $params{'field_count'};
+
+	$TemplateData{'TID'} = $params{'TID'} if($params{'TID'});
+	$TemplateData{'at'} = $params{'at'} if($params{'at'});
 
     my $body = runTemplate(
         $Data,
