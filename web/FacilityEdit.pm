@@ -183,7 +183,7 @@ sub handleFacilityEdit {
 		
 		my $query = qq[SELECT 
 						T.intDocumentTypeID,
-						T.strDocumentname,
+						T.strDocumentName,
 						T.strLockAtLevel, 
 						D.strApprovalStatus, 
 						D.intUploadFileID, 
@@ -208,11 +208,11 @@ sub handleFacilityEdit {
 			$sth->execute($entityID, $Data->{'Realm'});
 			while(my $dref = $sth->fetchrow_hashref()){
 				my $parameters = qq[&amp;client=$client&doctype=$dref->{'intDocumentTypeID'}&pID=$entityID&nff=1&entitydocs=1];
-				my $documentName = $dref->{'strDocumentname'};
+				my $documentName = $dref->{'strDocumentName'};
 				$documentName =~ s/'/\\\'/g;
 				$body .= qq[
 					<tr>
-		   				 <td>$dref->{'strDocumentname'}</td>
+		   				 <td>$dref->{'strDocumentName'}</td>
 						 <td>$dref->{'strApprovalStatus'}</td>
 						 <td>$dref->{'dtUploaded'}</td>
 						 <td><a href="#" class="btn-main btn-view-replace" onclick="docViewer($dref->{'intUploadFileID'},'client=$client&amp;a=view');return false;">] . $Data->{'lang'}->txt('View'). qq[</a></td>
