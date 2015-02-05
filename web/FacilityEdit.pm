@@ -158,7 +158,7 @@ sub handleFacilityEdit {
             Disciplines => \%Defs::sportType,
             GroundNature => \%Defs::fieldGroundNatureType,
             fieldData   => $fields,
-        ); 
+	    ); 
         my $fields_summary = runTemplate($Data,\%templateData,'entity/venue_fields_summary.templ');
         if($fields_summary) {
             
@@ -198,34 +198,35 @@ sub handleFacilityEdit {
 		# 	
 			
         my $docs_summary = runTemplate($Data,\%templateData,'entity/venue_docs_summary.templ');
+        if($Data->{'SystemConfig'}{'hasVenueDocuments'}){
+		    $body .= qq[
+		            <div class="fieldSectiopGroupWrapper fieldSectionGroupWrapper-DisplayOnly">
+		                <h3 class="panel-header sectionheader">].$Data->{'lang'}->txt('Documents') .qq[</h3>
+		                <div class="panel-body fieldSectionGroup"> $docs_summary <tbody>];
+		    #<a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$client&amp;a=view');return false;">]. $Data->{'lang'}->txt('View') . q[</a>               
+			my $sth = $Data->{'db'}->prepare($query);
+			$sth->execute($entityID, $Data->{'Realm'});
+			while(my $dref = $sth->fetchrow_hashref()){
+				my $parameters = qq[&amp;client=$client&doctype=$dref->{'intDocumentTypeID'}&pID=$entityID&nff=1&entitydocs=1];
+				my $documentName = $dref->{'strDocumentname'};
+				$documentName =~ s/'/\\\'/g;
+				$body .= qq[
+					<tr>
+		   				 <td>$dref->{'strDocumentname'}</td>
+						 <td>$dref->{'strApprovalStatus'}</td>
+						 <td>$dref->{'dtUploaded'}</td>
+						 <td><a href="#" class="btn-main btn-view-replace" onclick="docViewer($dref->{'intUploadFileID'},'client=$client&amp;a=view');return false;">] . $Data->{'lang'}->txt('View'). qq[</a></td>
+		   				 <td><a href="#" class="btn-main btn-view-replace" onclick="replaceFile($dref->{'intUploadFileID'},'$parameters','$documentName','');return false;">] . $Data->{'lang'}->txt('Replace') . qq[</a></td>
+					</tr>
+				];
+			}
 
-        $body .= qq[
-                <div class="fieldSectiopGroupWrapper fieldSectionGroupWrapper-DisplayOnly">
-                    <h3 class="panel-header sectionheader">].$Data->{'lang'}->txt('Documents') .qq[</h3>
-                    <div class="panel-body fieldSectionGroup"> $docs_summary <tbody>];
-        #<a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$client&amp;a=view');return false;">]. $Data->{'lang'}->txt('View') . q[</a>               
-		my $sth = $Data->{'db'}->prepare($query);
-		$sth->execute($entityID, $Data->{'Realm'});
-		while(my $dref = $sth->fetchrow_hashref()){
-			my $parameters = qq[&amp;client=$client&doctype=$dref->{'intDocumentTypeID'}&pID=$entityID&nff=1&entitydocs=1];
-			my $documentName = $dref->{'strDocumentname'};
-			$documentName =~ s/'/\\\'/g;
-			$body .= qq[
-				<tr>
-       				 <td>$dref->{'strDocumentname'}</td>
-					 <td>$dref->{'strApprovalStatus'}</td>
-					 <td>$dref->{'dtUploaded'}</td>
-					 <td><a href="#" class="btn-main btn-view-replace" onclick="docViewer($dref->{'intUploadFileID'},'client=$client&amp;a=view');return false;">] . $Data->{'lang'}->txt('View'). qq[</a></td>
-       				 <td><a href="#" class="btn-main btn-view-replace" onclick="replaceFile($dref->{'intUploadFileID'},'$parameters','$documentName','');return false;">] . $Data->{'lang'}->txt('Replace') . qq[</a></td>
-				</tr>
-			];
+		    $body .= qq[</tbody> </table>
+		                </div>
+		                
+		            </div>
+		        ];
 		}
-
-        $body .= qq[</tbody> </table>
-                    </div>
-                    
-                </div>
-            ];
 		#<div class="fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$entityID">edit</a></div>
 
     }

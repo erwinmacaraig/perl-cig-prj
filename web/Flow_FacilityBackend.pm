@@ -802,6 +802,7 @@ sub display_summary {
         documents => $documents,
         editlink => $self->stringifyURLCarryField(),
         target => $self->{'Data'}{'target'},
+		documentEnable => $self->{'Data'}->{'SystemConfig'}{'hasVenueDocuments'},
     );
     my $summaryContent = runTemplate(
         $self->{'Data'},
