@@ -1093,7 +1093,7 @@ sub update_venue_fields {
     $flashMessage{'flash'}{'type'} = 'success';
     $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt("Facility fields updated.");
 
-    FlashMessage::setFlashMessage($Data, 'FAC_FM', \%flashMessage);
+    #FlashMessage::setFlashMessage($Data, 'FAC_FM', \%flashMessage);
 
     if($back_screen){
       my %tempClientValues = getClient($Data->{'client'});
@@ -1102,6 +1102,7 @@ sub update_venue_fields {
         $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$tempClient&venueID=$venueID&$back_screen";
       }
       else {
+		FlashMessage::setFlashMessage($Data, 'FAC_FM', \%flashMessage);
         $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&amp;a=FE_D&amp;venueID=$venueID";
       }
      
