@@ -2815,6 +2815,7 @@ sub populateDocumentViewData {
 
     my $query = qq[
         SELECT
+            DISTINCT
             tblDocuments.strApprovalStatus,
             tblDocuments.intDocumentTypeID,
             tblDocuments.intUploadFileID
@@ -2822,17 +2823,17 @@ sub populateDocumentViewData {
             tblDocuments
             INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID)
             INNER JOIN tblRegistrationItem ON (tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID)
-                WHERE
+        WHERE
             strApprovalStatus IN('PENDING', 'APPROVED')
             AND intPersonID = ?
             AND tblRegistrationItem.intRealmID=?
             AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1)
             AND tblRegistrationItem.strItemType='DOCUMENT'
-     AND tblRegistrationItem.strPersonType IN ('', ?)
-     AND tblRegistrationItem.strRegistrationNature IN ('', ?)
-     AND tblRegistrationItem.strAgeLevel IN ('', ?)
-     AND tblRegistrationItem.strPersonLevel IN ('', ?)
-     AND tblRegistrationItem.intEntityLevel = ?
+            AND tblRegistrationItem.strPersonType IN ('', ?)
+            AND tblRegistrationItem.strRegistrationNature IN ('', ?)
+            AND tblRegistrationItem.strAgeLevel IN ('', ?)
+            AND tblRegistrationItem.strPersonLevel IN ('', ?)
+            AND tblRegistrationItem.intEntityLevel = ?
     ];
     my @levels = ();
     push @levels, $dref->{'intEntityLevel'};
@@ -2841,7 +2842,9 @@ sub populateDocumentViewData {
         push @levels, $dref->{'intOriginLevel'};
     }
 
-        $query .= qq[GROUP BY intDocumentTypeID, intUploadFileID];
+        #$query .= qq[GROUP BY intDocumentTypeID, intUploadFileID];
+        $query .= qq[ORDER BY tblDocuments.tTimeStamp DESC];
+
 
         my $sth = $Data->{'db'}->prepare($query);
         $sth->execute($dref->{'intPersonID'}, $Data->{'Realm'},
@@ -2852,11 +2855,13 @@ sub populateDocumentViewData {
       @levels
     );
         while(my $adref = $sth->fetchrow_hashref()){
-                if (! exists $validdocsStatus{$adref->{'intDocumentTypeID'}} or $adref->{'strApprovalStatus'} eq 'PENDING')     {
+                if (! exists $validdocs{$adref->{'intDocumentTypeID'}} or $adref->{'strApprovalStatus'} eq 'PENDING')     {
                     $validdocsStatus{$adref->{'intDocumentTypeID'}} = $adref->{'strApprovalStatus'};
+                    if ( ! exists $validdocs{$adref->{'intDocumentTypeID'}})    {
+                        push @validdocsforallrego, $adref->{'intDocumentTypeID'};
+                    }
+                    $validdocs{$adref->{'intDocumentTypeID'}} = $adref->{'intUploadFileID'};
                 }
-                push @validdocsforallrego, $adref->{'intDocumentTypeID'} if ( ! exists $validdocs{$adref->{'intDocumentTypeID'}});
-                $validdocs{$adref->{'intDocumentTypeID'}} = $adref->{'intUploadFileID'};
         }
         my $fileID = 0;
 
