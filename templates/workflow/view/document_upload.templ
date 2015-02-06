@@ -37,6 +37,7 @@
 
 Dropzone.options.uploaderfrm = {
     maxFilesize: 25,
+	dictDefaultMessage: "[% Lang.txt('Click here to upload file') %]",
     init: function(){
     	this.on("success", function(){
 		   window.parent.location.reload();
