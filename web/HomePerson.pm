@@ -165,8 +165,11 @@ sub showPersonHome	{
 	    my %validdocs = ();
 	    my $query = qq[
             SELECT 
-                tblDocuments.intDocumentTypeID, 
-                tblDocuments.intUploadFileID 
+                DISTINCT
+                tblDocuments.strApprovalStatus,
+                tblDocuments.intDocumentTypeID,
+                tblDocumentType.strActionPending,
+                tblDocuments.intUploadFileID
             FROM 
                 tblDocuments 
                 INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID) 
@@ -183,7 +186,9 @@ sub showPersonHome	{
                 AND tblRegistrationItem.strPersonLevel IN ('', ?)
                 AND tblRegistrationItem.intOriginLevel = ?
                 AND tblRegistrationItem.intEntityLevel = ?
-            GROUP BY intDocumentTypeID
+            ORDER BY 
+                tblDocuments.tTimeStamp DESC, 
+                tblDocuments.intUploadFileID DESC
     ];
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute(
@@ -197,6 +202,8 @@ sub showPersonHome	{
         $rego->{'intEntityLevel'}, 
     );
 	while(my $dref = $sth->fetchrow_hashref()){
+        next if $dref->{'strApprovalStatus'} ne 'APPROVED';
+        next if exists $validdocs{$dref->{'intDocumentTypeID'}};
 		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
 		$validdocs{$dref->{'intDocumentTypeID'}} = $dref->{'intUploadFileID'};
 	}

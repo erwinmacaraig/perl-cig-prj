@@ -2842,7 +2842,11 @@ sub populateDocumentViewData {
         $query .= qq[ AND tblRegistrationItem.intOriginLevel = ?  ];
         push @levels, $dref->{'intOriginLevel'};
     }
-    $query .= qq[ORDER BY tblDocuments.tTimeStamp DESC, intUploadFileID DESC];
+    $query .= qq[
+        ORDER BY
+            tblDocuments.tTimeStamp DESC,
+            tblDocuments.intUploadFileID DESC
+    ];
 
     my $sth = $Data->{'db'}->prepare($query);
     $sth->execute(
@@ -2856,13 +2860,13 @@ sub populateDocumentViewData {
     while(my $adref = $sth->fetchrow_hashref()){
         next if (defined $dref->{'intPersonRegistrationID'} and $adref->{'strApprovalStatus'} eq 'REJECTED' and $adref->{'strActionPending'} ne 'REGO'); ## If its a personRego ID lets only get Approved/Pending docos
         next if exists $validdocs{$adref->{'intDocumentTypeID'}};
-        if (! exists $validdocs{$adref->{'intDocumentTypeID'}} or $adref->{'strApprovalStatus'} ne 'APPROVED')     {
-            $validdocsStatus{$adref->{'intDocumentTypeID'}} = $adref->{'strApprovalStatus'};
-            if ( ! exists $validdocs{$adref->{'intDocumentTypeID'}})    {
-                push @validdocsforallrego, $adref->{'intDocumentTypeID'};
-            }
-            $validdocs{$adref->{'intDocumentTypeID'}} = $adref->{'intUploadFileID'};
-        }
+        #if (! exists $validdocs{$adref->{'intDocumentTypeID'}} or $adref->{'strApprovalStatus'} ne 'APPROVED')     {
+        $validdocsStatus{$adref->{'intDocumentTypeID'}} = $adref->{'strApprovalStatus'};
+        #if ( ! exists $validdocs{$adref->{'intDocumentTypeID'}})    {
+        push @validdocsforallrego, $adref->{'intDocumentTypeID'};
+        #}
+        $validdocs{$adref->{'intDocumentTypeID'}} = $adref->{'intUploadFileID'};
+        #}
     }
         my $fileID = 0;
 
