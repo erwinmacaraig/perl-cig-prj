@@ -842,6 +842,23 @@ sub getStateIds {
     );
 }
 
-sub cancelFlow{return 1 };
+sub cancelFlow{
+    my $self = shift;
+
+    my $id = $self->ID(),
+    my $st = qq[
+        DELETE FROM tblEntity
+        WHERE
+            intEntityID = ?
+            AND strStatus = 'INPROGRESS'
+    ];
+    my $query = $self->{'db'}->prepare($st);
+    $query->execute($id);
+    $query->finish();
+#Need to do more work here on connecting tables
+
+    return 1;
+}
+
 
 1;
