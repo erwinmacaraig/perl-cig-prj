@@ -625,7 +625,7 @@ sub display_registration {
     }
     elsif($defaultRegistrationNature eq 'RENEWAL') {
         my $rawDetails;
-        ($content, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rpID'});
+        ($content, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rtargetid'});
 
         if(!$content or !$rawDetails) {
             push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt('Invalid Renewal Details');

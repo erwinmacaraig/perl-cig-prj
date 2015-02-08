@@ -218,7 +218,7 @@ sub personRegistrationWorkTasks {
         WHERE
             p.intRealmID = ?
             AND pr.intPersonRegistrationID = ?
-            AND pr.strStatus IN ('PENDING', 'REJECTED')
+            AND pr.strStatus IN ('ACTIVE', 'PENDING', 'REJECTED')
         ORDER BY
           pr.dtAdded DESC
     ];
@@ -267,7 +267,8 @@ sub personRegistrationWorkTasks {
             NationalPeriodName => $dref->{'strNationalPeriodName'} || '',
             TaskType => $Defs::wfTaskType{$dref->{'WFTTaskType'}} || '',
             TaskTo=>$taskTo,
-            SelectLink => "$Data->{'target'}?client=$client&amp;a=PENDPR_D&amp;prID=$dref->{'intPersonRegistrationID'}",
+            #SelectLink => "$Data->{'target'}?client=$client&amp;a=PENDPR_D&amp;prID=$dref->{'intPersonRegistrationID'}",
+            SelectLink => "$Data->{'target'}?client=$client&amp;a=WF_H&amp;id=$dref->{'WFTTaskID'}",
           };
     }
 
@@ -308,11 +309,11 @@ sub personRegistrationWorkTasks {
             field => '',
             width  => 40,
         },
-        #{
-        #    name  => $Data->{'lang'}->txt('Task Type'),
-        #    field => 'TaskType',
-        #    width  => 50,
-        #},
+        {
+            name  => $Data->{'lang'}->txt('Task Type'),
+            field => 'SelectLink',
+            width  => 50,
+        },
         #{
         #    name  => $Data->{'lang'}->txt('Task Assigned To'),
         #    field => 'TaskTo',

@@ -1100,12 +1100,13 @@ sub getPersonMenuData {
         $menuoptions{'auditlog'} = {
             name => $lang->txt("Audit Trail"),
             url => $baseurl."a=P_HISTLOG",
-        };
+        } if ($Data->{'clientValues'}{'authLevel'}>= $Defs::LEVEL_NATIONAL);
+
         $menuoptions{'regos'} = {
             name => $lang->txt("Registration History"),
             url => $baseurl."a=P_REGOS",
         };
-        if($clr)    {
+        if($clr and $Data->{'clientValues'}{'authLevel'}>= $Defs::LEVEL_NATIONAL)    {
             $menuoptions{'clr'} = {
                     name => $lang->txt('Transfer History'),
                  url => $baseurl."a=P_CLR",

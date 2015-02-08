@@ -266,7 +266,7 @@ sub facilityFieldsSetup {
                 },
                 strContactISOCountry   => {
                     label       => $FieldLabels->{'strContactISOCountry'},
-                    value       => $values->{'strContactISOCountry'},
+                    value       => $values->{'strISOCountry'} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
                     type        => 'lookup',
                     options     => $isocountries,
                     firstoption => [ '', 'Select Country' ],

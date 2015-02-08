@@ -29,7 +29,7 @@ use PersonUserAccess;
 use Data::Dumper;
 use FacilityFieldsSetup;
 use EntitySummaryPanel;
-
+use UploadFiles;
 sub setProcessOrder {
     my $self = shift;
   
@@ -569,7 +569,8 @@ sub display_documents {
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
-    my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    #my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+	my $entityRegisteringForLevel = $Defs::LEVEL_VENUE;
     my $client = $self->{'Data'}->{'client'};
 
     my $rego_ref = {};
@@ -595,7 +596,11 @@ sub display_documents {
             $self->incrementCurrentProcessIndex();
             return ('',2);
         }
-
+		if(!$self->{'Data'}->{'SystemConfig'}{'hasVenueDocuments'}){
+			$self->incrementCurrentProcessIndex();
+            $self->incrementCurrentProcessIndex();
+            return ('',2);
+		}
         my @required_docs_listing = ();
         my @optional_docs_listing = ();
 	
@@ -656,7 +661,8 @@ sub process_documents {
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
-    my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    #my $entityRegisteringForLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $entityRegisteringForLevel = $Defs::LEVEL_VENUE;
     my $client = $self->{'Data'}->{'client'};  
 
 	my $documents = getRegistrationItems(
@@ -768,7 +774,7 @@ sub display_summary {
         push @facilityFieldsData, $fieldObjData;
         #$startNewIndex++;
     }
-
+	my $documents = getUploadedFiles( $self->{'Data'}, $Defs::LEVEL_VENUE, $id, $Defs::UPLOADFILETYPE_DOC , $client );
     my $isocountries  = getISOCountriesHash();
     my %summaryData = (
         FacilityCoreDetails => {
@@ -793,11 +799,10 @@ sub display_summary {
             WebAddress => $facilityObj->getValue('strWebURL') || '',
         },
         FacilityFields => \@facilityFieldsData,
-        FacilityDocuments => {
-        
-        },
+        documents => $documents,
         editlink => $self->stringifyURLCarryField(),
         target => $self->{'Data'}{'target'},
+		documentEnable => $self->{'Data'}->{'SystemConfig'}{'hasVenueDocuments'},
     );
     my $summaryContent = runTemplate(
         $self->{'Data'},

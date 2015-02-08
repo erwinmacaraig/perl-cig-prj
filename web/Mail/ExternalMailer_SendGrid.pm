@@ -43,6 +43,7 @@ sub send {
 		FromAddress
 		ReplyToAddress
 		BCCRecipients
+		CCRecipients
 		ToAddress
 		ToName
 		MessageCategory
@@ -117,6 +118,25 @@ sub send {
         return (0, 'No Recipients') if !scalar(@addresses);
 
         $outputparams{'bcc'} = \@addresses;
+    }
+
+	if(
+        $params{'CCRecipients'} 
+        and ref($params{'CCRecipients'}) eq 'ARRAY' 
+        and scalar(@{$params{'CCRecipients'}})
+    )    {
+        my @addresses = ();
+        my %address_seen = ();
+        for my $email (@{ $params{'CCRecipients'}})	{
+            next if $address_seen{$email};
+            next if $email !~/\@/;
+            next if $email !~/\./;
+            push @addresses, $email;
+            $address_seen{$email} = 1;
+        }
+        return (0, 'No Recipients') if !scalar(@addresses);
+
+        $outputparams{'cc'} = \@addresses;
     }
 
     my $url = 'https://sendgrid.com/api/mail.send.json';
