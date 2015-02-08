@@ -2818,13 +2818,14 @@ sub populateDocumentViewData {
             DISTINCT
             tblDocuments.strApprovalStatus,
             tblDocuments.intDocumentTypeID,
+            tblDocumentType.strActionPending,
             tblDocuments.intUploadFileID
         FROM
             tblDocuments
             INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID)
             INNER JOIN tblRegistrationItem ON (tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID)
         WHERE
-            strApprovalStatus IN('PENDING', 'APPROVED')
+            strApprovalStatus IN('PENDING', 'APPROVED', 'REJECTED')
             AND intPersonID = ?
             AND tblRegistrationItem.intRealmID=?
             AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1)
@@ -2844,6 +2845,7 @@ sub populateDocumentViewData {
 
         #$query .= qq[GROUP BY intDocumentTypeID, intUploadFileID];
         $query .= qq[ORDER BY tblDocuments.tTimeStamp DESC];
+print STDERR $query;
 
 
         my $sth = $Data->{'db'}->prepare($query);
@@ -2855,7 +2857,9 @@ sub populateDocumentViewData {
       @levels
     );
         while(my $adref = $sth->fetchrow_hashref()){
-                if (! exists $validdocs{$adref->{'intDocumentTypeID'}} or $adref->{'strApprovalStatus'} eq 'PENDING')     {
+                next if (defined $dref->{'intPersonRegistrationID'} and $adref->{'strApprovalStatus'} eq 'REJECTED' and $adref->{'strActionPending'} ne 'REGO');
+                next if exists $validdocs{$adref->{'intDocumentTypeID'}};
+                if (! exists $validdocs{$adref->{'intDocumentTypeID'}} or $adref->{'strApprovalStatus'} ne 'APPROVED')     {
                     $validdocsStatus{$adref->{'intDocumentTypeID'}} = $adref->{'strApprovalStatus'};
                     if ( ! exists $validdocs{$adref->{'intDocumentTypeID'}})    {
                         push @validdocsforallrego, $adref->{'intDocumentTypeID'};
