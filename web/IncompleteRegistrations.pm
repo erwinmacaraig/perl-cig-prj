@@ -3,6 +3,7 @@ require Exporter;
 @ISA    = qw(Exporter);
 @EXPORT = @EXPORT_OK = qw(
     handleIncompleteRegistrations
+    deleteRelatedRegistrationRecords
 );
 
 use strict;
@@ -19,6 +20,8 @@ use Utils;
 use Data::Dumper;
 
 use JSON;
+use FlashMessage;
+use Switch;
 
 sub handleIncompleteRegistrations  {
     my ($action, $Data, $entityID) = @_;
@@ -32,6 +35,8 @@ sub handleIncompleteRegistrations  {
     if ( $action eq 'INCOMPLPR_D')   {
         ($resultHTML , $title)= deleteIncompleteRegistrations( $Data, $entityID, $incompleteID) ;
         $action = 'INCOMPLPR_';
+
+        $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=INCOMPLPR_";
     }
     if ( $action eq 'INCOMPLPR_')   {
         ($resultHTML , $title)= listIncompleteRegistrations( $Data, $entityID) ;
@@ -340,6 +345,10 @@ sub listIncompleteRegistrations    {
     }
     my $title = $Data->{'lang'}->txt('Incomplete Registrations');
            
+
+    my $flashMessage = getFlashMessage($Data, 'IR_FM');
+    $resultHTML = $flashMessage . $resultHTML if($flashMessage);
+
     return ($resultHTML,$title);
 }
 
@@ -350,25 +359,109 @@ sub deleteIncompleteRegistrations    {
     
     my $lang = $Data->{'lang'};
     my $client = setClient( $Data->{'clientValues'} ) || '';
+    my %flashMessage;
 
-    my $st = qq[
-        DELETE FROM
-            tblRegoState
-        WHERE
-            id = ?
-            AND userEntityID = ?
-        LIMIT 1
-    ];
-            #AND userID = ?
-    my $query = $Data->{db}->prepare($st);
-    my $userID = $Data->{'clientValues'}{'userID'} || 0;
-    $query->execute( 
-        $incompleteID,
-        $entityID, 
-    );
-        #$userID,
+    my $stateRegoRef = getRegoStateById($Data, $incompleteID);
+
+    if($entityID != $stateRegoRef->{'userEntityID'} or !$stateRegoRef) {
+        $flashMessage{'flash'}{'type'} = 'error';
+        $flashMessage{'flash'}{'message'} = $lang->txt('Invalid ID');
+        setFlashMessage($Data, 'IR_FM', \%flashMessage);
+
+        return 0;
+    }
+    else {
+    
+        my $st = qq[
+            DELETE FROM
+                tblRegoState
+            WHERE
+                id = ?
+                AND userEntityID = ?
+            LIMIT 1
+        ];
+                #AND userID = ?
+        my $query = $Data->{db}->prepare($st);
+        my $userID = $Data->{'clientValues'}{'userID'} || 0;
+        $query->execute( 
+            $incompleteID,
+            $entityID, 
+        );
+
+            #$userID,
+
+        if($query->rows) {
+            my $deletedRecords = deleteRelatedRegistrationRecords(
+                $Data,
+                $stateRegoRef->{'regoType'},
+                $stateRegoRef->{'userEntityID'},
+                $stateRegoRef->{'entityID'},
+                $stateRegoRef->{'regoID'},
+                $userID,
+            );
+
+            $flashMessage{'flash'}{'type'} = 'success';
+            $flashMessage{'flash'}{'message'} = $lang->txt('Incomplete registration has been delete');
+            setFlashMessage($Data, 'IR_FM', \%flashMessage);
+
+            return 1;
+        }
+        else {
+            $flashMessage{'flash'}{'type'} = 'error';
+            $flashMessage{'flash'}{'message'} = $lang->txt('Invalid ID');
+            setFlashMessage($Data, 'IR_FM', \%flashMessage);
+
+            return 0;
+        }
+
+    }
+}
+
+sub deleteRelatedRegistrationRecords {
+    my ($Data, $type, $userEntityID, $entityID, $regoID, $userID) = @_;
+
+    switch($type) {
+        case 'PERSON' {
+            #TODO: need to determine additional condition to be considered as newly added person (tblPerson.strStatus = 'INPROGRESS' etc)
+        }
+        case ['CLUB', 'VENUE'] {
+            my $id = $entityID,
+            my $st = qq[
+                DELETE FROM tblEntity
+                WHERE
+                    intEntityID = ?
+                    AND strStatus = 'INPROGRESS'
+            ];
+            my $query = $Data->{'db'}->prepare($st);
+            $query->execute($entityID);
+            $query->finish();
+        }
+    }
+
     return 1;
 }
 
+sub getRegoStateById {
+    my ($Data, $stateID) = @_;
+
+    my $st = qq[
+        SELECT
+            id,
+            userEntityID,
+            regoType,
+            entityID,
+            regoID
+        FROM
+            tblRegoState
+        WHERE
+            id = ?
+        LIMIT 1
+    ];
+
+    my $query = $Data->{db}->prepare($st);
+    $query->execute($stateID) or query_error($st);
+
+    return $query->fetchrow_hashref;
+}
 
 1;
