@@ -30,6 +30,7 @@ use PersonSummaryPanel;
 use Data::Dumper;
 use UploadFiles;
 use EntitySummaryPanel;
+use IncompleteRegistrations;
 
 
 
@@ -845,17 +846,10 @@ sub getStateIds {
 sub cancelFlow{
     my $self = shift;
 
-    my $id = $self->ID(),
-    my $st = qq[
-        DELETE FROM tblEntity
-        WHERE
-            intEntityID = ?
-            AND strStatus = 'INPROGRESS'
-    ];
-    my $query = $self->{'db'}->prepare($st);
-    $query->execute($id);
-    $query->finish();
-#Need to do more work here on connecting tables
+    print STDERR Dumper $self->getStateIds();
+    #call IncompleteRegistrations::deleteRelatedRegistrationRecords
+
+    #Need to do more work here on connecting tables
 
     return 1;
 }

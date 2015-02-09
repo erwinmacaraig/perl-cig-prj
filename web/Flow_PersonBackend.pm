@@ -1677,5 +1677,12 @@ sub getStateIds {
     );
 }
 
-sub cancelFlow{return 1 };
+sub cancelFlow{
+    my $self = shift;
+
+    print STDERR Dumper $self->getStateIds();
+    #call IncompleteRegistrations::deleteRelatedRegistrationRecords
+
+    return 1
+};
 
