@@ -7,6 +7,9 @@
         [% ELSIF FlashMessage.flash.type == 'error' %]
             <span class="fa flash_error fa-exclamation"></span>
             <p>[% FlashMessage.flash.message %]</p>
+        [% ELSIF FlashMessage.flash.type == 'info' %]
+            <span class="fa fa-info fa-exclamation"></span>
+            <p>[% FlashMessage.flash.message %]</p>
         [% END %]
         <br/>
         </div>
