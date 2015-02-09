@@ -1416,13 +1416,14 @@ sub checkForOutstandingTasks {
 		       		$personRegistrationID
 		  			);
 	        	$rc = 1;	# All registration tasks have been completed
-                PersonRegistration::rolloverExistingPersonRegistrations($Data, $personID, $personRegistrationID);
 				# Do the check
 				$st = qq[SELECT * FROM tblPersonRegistration_$Data->{Realm} WHERE intPersonRegistrationID = ?];
                 my $qPR = $db->prepare($st);
 				$qPR->execute($personRegistrationID);
 				my $ppref = $qPR->fetchrow_hashref();
-#                if ($ppref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_NEW)    {
+                if ($ppref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_RENEWAL)    {
+                    PersonRegistration::rolloverExistingPersonRegistrations($Data, $personID, $personRegistrationID);
+                }
                 {
                     my %PE = ();
                     $PE{'personType'} = $ppref->{'strPersonType'} || '';
@@ -2821,26 +2822,29 @@ sub populateDocumentViewData {
 	my %validdocs = ();
 	my %validdocsStatus = ();
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
-	my $query = qq[
-        SELECT 
-            tblDocuments.strApprovalStatus, 
-            tblDocuments.intDocumentTypeID, 
-            tblDocuments.intUploadFileID 
-        FROM 
-            tblDocuments 
-            INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID) 
+
+    my $query = qq[
+        SELECT
+            DISTINCT
+            tblDocuments.strApprovalStatus,
+            tblDocuments.intDocumentTypeID,
+            tblDocumentType.strActionPending,
+            tblDocuments.intUploadFileID
+        FROM
+            tblDocuments
+            INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID)
             INNER JOIN tblRegistrationItem ON (tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID)
-		WHERE 
-            strApprovalStatus IN('PENDING', 'APPROVED') 
-            AND intPersonID = ? 
-            AND tblRegistrationItem.intRealmID=? 
-            AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+        WHERE
+            strApprovalStatus IN('PENDING', 'APPROVED', 'REJECTED')
+            AND intPersonID = ?
+            AND tblRegistrationItem.intRealmID=?
+            AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1)
             AND tblRegistrationItem.strItemType='DOCUMENT'
-     AND tblRegistrationItem.strPersonType IN ('', ?)
-     AND tblRegistrationItem.strRegistrationNature IN ('', ?)
-     AND tblRegistrationItem.strAgeLevel IN ('', ?)
-     AND tblRegistrationItem.strPersonLevel IN ('', ?)
-     AND tblRegistrationItem.intEntityLevel = ?
+            AND tblRegistrationItem.strPersonType IN ('', ?)
+            AND tblRegistrationItem.strRegistrationNature IN ('', ?)
+            AND tblRegistrationItem.strAgeLevel IN ('', ?)
+            AND tblRegistrationItem.strPersonLevel IN ('', ?)
+            AND tblRegistrationItem.intEntityLevel = ?
     ];
     my @levels = ();
     push @levels, $dref->{'intEntityLevel'};
@@ -2848,23 +2852,33 @@ sub populateDocumentViewData {
         $query .= qq[ AND tblRegistrationItem.intOriginLevel = ?  ];
         push @levels, $dref->{'intOriginLevel'};
     }
+    $query .= qq[
+        ORDER BY
+            tblDocuments.tTimeStamp DESC,
+            tblDocuments.intUploadFileID DESC
+    ];
 
-	$query .= qq[GROUP BY intDocumentTypeID];
-
-	my $sth = $Data->{'db'}->prepare($query);
-	$sth->execute($dref->{'intPersonID'}, $Data->{'Realm'},
-      $dref->{'strPersonType'} || '',
-      $dref->{'strRegistrationNature'} || '',
-      $dref->{'strAgeLevel'} || '',
-      $dref->{'strPersonLevel'} || '',
-      @levels
+    my $sth = $Data->{'db'}->prepare($query);
+    $sth->execute(
+        $dref->{'intPersonID'}, $Data->{'Realm'},
+        $dref->{'strPersonType'} || '',
+        $dref->{'strRegistrationNature'} || '',
+        $dref->{'strAgeLevel'} || '',
+        $dref->{'strPersonLevel'} || '',
+        @levels
     );
-	while(my $adref = $sth->fetchrow_hashref()){
-	    $validdocsStatus{$adref->{'intDocumentTypeID'}} = $adref->{'strApprovalStatus'};
-		push @validdocsforallrego, $adref->{'intDocumentTypeID'};
-		$validdocs{$adref->{'intDocumentTypeID'}} = $adref->{'intUploadFileID'};
-	}
-	my $fileID = 0;
+    while(my $adref = $sth->fetchrow_hashref()){
+        next if (defined $dref->{'intPersonRegistrationID'} and $adref->{'strApprovalStatus'} eq 'REJECTED' and $adref->{'strActionPending'} ne 'REGO'); ## If its a personRego ID lets only get Approved/Pending docos
+        next if exists $validdocs{$adref->{'intDocumentTypeID'}};
+        #if (! exists $validdocs{$adref->{'intDocumentTypeID'}} or $adref->{'strApprovalStatus'} ne 'APPROVED')     {
+        $validdocsStatus{$adref->{'intDocumentTypeID'}} = $adref->{'strApprovalStatus'};
+        #if ( ! exists $validdocs{$adref->{'intDocumentTypeID'}})    {
+        push @validdocsforallrego, $adref->{'intDocumentTypeID'};
+        #}
+        $validdocs{$adref->{'intDocumentTypeID'}} = $adref->{'intUploadFileID'};
+        #}
+    }
+        my $fileID = 0;
 
 	
     my $joinCondition = '';
