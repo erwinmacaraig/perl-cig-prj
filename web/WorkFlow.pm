@@ -1781,7 +1781,7 @@ sub verifyDocument {
 	my $q;
 	if($regoID && $documentID){
 		$st = qq[
-			UPDATE tblDocuments as D INNER JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (D.intPersonRegistrationID = PR.intPersonRegistrationID AND D.intPersonID=PR.intPersonID) SET D.intPersonRegistrationID = ? WHERE PR.strStatus = 'INPROGRESS' AND D.intUploadFileID = ? AND D.intRealmID = ?];
+			UPDATE tblDocuments as D INNER JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (D.intPersonRegistrationID = PR.intPersonRegistrationID AND D.intPersonID=PR.intPersonID) SET D.intPersonRegistrationID = ? WHERE PR.strStatus = 'INPROGRESS' AND D.intUploadFileID = ? AND PR.intRealmID = ?];
 		$q = $Data->{'db'}->prepare($st);
 		$q->execute($regoID,$documentID,$Data->{'RealmID'});
 	}
