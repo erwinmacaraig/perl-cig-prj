@@ -64,6 +64,7 @@ sub handleReports	{
 			my $b = time();
 			my $continue = 1;
 			($body, $continue) = $reportObj->runReport();
+			$title = $lang->txt($reportObj->Name());
 			$body ||= '';
 			if(!$continue)	{
 				$action = 'REP_CONFIG';
@@ -173,57 +174,81 @@ sub displayReportList	{
 	my @grouplist = ();
 	my $groups = '';
 
+    my $cnt = 0;
 	for my $group (sort keys %{$reports})	{
+        $cnt++;
 		if($lastgroup ne $group)	{
 			my $groupkey = lc $group;
 			$groupkey =~s/[^\da-zA-Z]//g;
 			push @grouplist, [$groupkey, $group];
 			my $groupname = $l->txt($group);
+            my $active = $cnt == 1 ? 'in active' : '';
 			$groups .=qq[ 
-				<div class="reportgroup" id="repgroup-$groupkey" style="display:none;">
-					<div class="reportgroup-title">$groupname</div> 
+				<div class="tab-pane fade $active" id="repgroup-$groupkey" role = "tabpanel">
+					<h2 class="section-header">$groupname</h2> 
 			];
 			$lastgroup = $group;
 		}
-		for my $report (@{$reports->{$group}})	{
-			my $hasParams = $report->{'intParameters'} || 0;
-			my $reptarget = 'report';
-			my $buttonevent = $report->{'intParameters'}
-				? qq[ onclick="showParams($report->{'intReportID'}); return false;" ]
-				: '';
-			my $newaction = 'REP_REPORT';
-			my $buttoncaption = $l->txt('Run');
-			if($report->{'intType'} == 3)	{
-				#Advanced Report
-				$reptarget= '';
-				$newaction = 'REP_CONFIG';
-				$buttonevent = '';
-				$buttoncaption = $l->txt('Configure');
-			}
-			$groups .= qq[
-				<div class="reportitem" id="repitem_$report->{'intReportID'}">
-					<form action = "$Data->{'target'}" method="GET" target="$reptarget"> 
-						<div class="reportitem-title">$report->{'strName'}</div>
-						<div class="reportitem-desc">$report->{'strDescription'}</div>
-						<div class="reportitem-button"><input type="submit" value ="$buttoncaption" $buttonevent ></div>
-						<input type="hidden" name="a" value="$newaction">
-						<input type="hidden" name="client" value="$clientValues->{unesc_client}">
-						<input type="hidden" name="rID" value="$report->{'intReportID'}">
-					</form>
-				</div>
-			];
-		}
-		$groups .= '<div style="clear:both;"></div></div>';
+        for my $subtype ('build','run') {
+            if(!exists $reports->{$group}{$subtype})   {
+                next;
+            }
+            my $subtypename = $subtype eq 'build'
+                ? $Data->{'lang'}->txt('Build a Report')
+                : $Data->{'lang'}->txt('Run a Report');
+            $groups .= qq[
+                <h4>$subtypename</h4>
+                <table class = "table table-striped">
+            ];
+            for my $report (@{$reports->{$group}{$subtype}})	{
+                my $hasParams = $report->{'intParameters'} || 0;
+                my $reptarget = 'report';
+                my $buttonevent = $report->{'intParameters'}
+                    ? qq[ onclick="showParams($report->{'intReportID'}); return false;" ]
+                    : '';
+                my $newaction = 'REP_REPORT';
+                my $buttoncaption = $l->txt('Run');
+                my $repID = '';
+                my $run = '';
+                my $delete = '';
+                if($report->{'intType'} == 3)	{
+                    #Advanced Report
+                    $reptarget= '';
+                    $newaction = 'REP_CONFIG';
+                    $buttonevent = '';
+                    $buttoncaption = $l->txt('Build');
+                }
+                elsif($report->{'intType'} == 6)	{
+                    $newaction = 'REP_CONFIG';
+                    $repID = $report->{'intSavedReportID'} || '';
+                    $buttonevent = '';
+                    $buttoncaption = $l->txt('Edit');
+                    $run = qq[
+                        <a href = "$Data->{'target'}?client=$clientValues->{unesc_client}&amp;a=REP_REPORT&amp;rID=$report->{'intReportID'}&amp;repID=$repID" class = "btn-inside-panels">].$Data->{'lang'}->txt('Run').qq[</a>
+                    ];
+                }
+                $groups .= qq[
+                    <tr>
+                        <td>
+                            <b>$report->{'strName'}</b><br>
+                            $report->{'strDescription'}
+                        </td>
+                        <td style = "width:200px;">
+                            $delete
+                            <a href = "$Data->{'target'}?client=$clientValues->{unesc_client}&amp;a=$newaction&amp;rID=$report->{'intReportID'}&amp;repID=$repID" class = "btn-inside-panels">$buttoncaption</a>
+                            $run
+                        </td>
+                    </tr>
+                ];
+            }
+            $groups .= '</table>';
+        }
+		$groups .= '</div>';
 	}
-	my $intro_report_text = $l->txt('REPORT_INTRO_TEXT').'<br>';
-	$intro_report_text .= $l->txt('REPORT_INTRO_DESC_TEXT');
-	$groups .=qq[
-		<div class="reportgroup">$intro_report_text</div>
-	];
 	my $tablist = '';
 	for my $g(@grouplist)	{
 		$tablist .= qq[
-			<input type = 'button' value="$g->[1]" onclick="showreporttab('$g->[0]'); return false;" class="reporttab-button" id="reporttab-button-$g->[0]">
+			<li role = "presentation"><a href = "#repgroup-$g->[0]" aria-controls="#repgroup-$g->[0]" role="tab" data-toggle="tab">$g->[1]</a></li>
 		];
 	}
 	my $paramcode = qq[
@@ -252,21 +277,15 @@ sub displayReportList	{
 				});
 				d.dialog('open');
 			}
-
-			function showreporttab(groupkey)	{
-				jQuery('.reportgroup').hide();
-				jQuery('.reporttab-button').removeClass('reporttab-button-active');
-				jQuery('#repgroup-' + groupkey).show();
-				jQuery('#reporttab-button-' + groupkey).addClass('reporttab-button-active');
-			}
-	
 		</script>
 	];
 	$body = qq[
 		$paramcode
-		<div class="reporttabs">	$tablist</div>
-		<div class="reporttab-data">
-			<div class="reporttab-datacontent">
+        <div role = "tabpanel">
+                <ul class = "nav nav-tabs">
+                    $tablist
+                </ul>
+			<div class="tab-content">
 				$groups
 			</div>
 		</div>
@@ -327,9 +346,41 @@ sub getReportsInfo  {
 			$dref->{'strName'} = field_changetext($Data, $dref->{'strName'});
 			$dref->{'strDescription'} = field_changetext($Data, $dref->{'strDescription'});
 
-			push @{$reports{$dref->{'strGroup'}}}, $dref;
+            my $subtype = $dref->{'intType'} == 3 ? 'build' : 'run';
+            push @{$reports{$dref->{'strGroup'}}{$subtype}}, $dref;
 		}
   }
+
+    #Now get saved Reports
+      my $st = qq[
+        SELECT 
+            S.strReportName,
+            S.intSavedReportID,
+            R.strGroup,
+            R.intReportID,
+            R.intType
+        FROM 
+            tblSavedReports AS S
+            INNER JOIN tblReports AS R ON (R.intReportID = S.intReportID)
+        WHERE 
+          S.intLevelID = ?
+          AND S.intID = ?
+          AND S.intTemporary = 0
+        ORDER BY strReportName
+      ];
+      my $q = $db->prepare($st);
+      $q->execute(
+        $currentLevel,
+        $userID,
+      );
+      while (my $dref = $q->fetchrow_hashref()) {
+                $dref->{'strGroup'} = field_changetext($Data, $dref->{'strGroup'});
+                $dref->{'strName'} = $dref->{'strReportName'} || '';
+                $dref->{'strDescription'} = '';
+                $dref->{'intType'} = 6;
+
+                push @{$reports{$dref->{'strGroup'}}{'run'}}, $dref;
+      }
 
 	return \%reports;
 }

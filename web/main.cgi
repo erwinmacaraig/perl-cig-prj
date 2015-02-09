@@ -328,7 +328,7 @@ use TransferFlow;
 
    
     # BUILD PAGE
-    if ( !$report ) {
+    #if ( !$report ) {
         $client = setClient( \%clientValues );
         $clientValues{INTERNAL_db} = $db;
         my $navbar = navBar( \%Data, $DataAccess_ref, $Data{'SystemConfig'} );
@@ -343,8 +343,8 @@ use TransferFlow;
 		] if $pageHeading;
         pageMain( $Defs::page_title, $navbar, $resultHTML, \%clientValues,
             $client, \%Data );
-    }
-    else { printReport( $resultHTML, $lang ); }
+    #}
+    #else { printReport( $resultHTML, $lang ); }
     disconnectDB($db);
 }
 

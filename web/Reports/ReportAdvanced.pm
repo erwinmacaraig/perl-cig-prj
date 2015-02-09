@@ -112,6 +112,7 @@ sub makeSQL {
 sub displayOptions {
 	my $self = shift;
 
+
   my $prefix = $self->{'Config'}{'FormFieldPrefix'} || '';
   my $formname = $self->{'Config'}{'FormName'} || 'updateform';
   $prefix.='_' if $prefix;
@@ -515,6 +516,16 @@ sub displayOptions {
 			</div>
     ];
   }
+  my $params = $self->{'FormParams'};
+  if($params->{'RO_SR_load'} and $params->{'repID'})	{
+      my ($reportname, $reportdata) = $self->loadSavedReportData($params->{'repID'});
+      $reportname =~s/"/&quot;/g;
+      $reportdata =~s/"/&quot;/g;
+      $returnstr .= qq[
+          <input type="hidden" name="savedreportname" id = "SavedReportName" value="$reportname">
+          <input type="hidden" name="savedreportdata" id = "SavedReportData" value="$reportdata">
+      ];
+  }
 
   return $returnstr;
 }
@@ -535,28 +546,31 @@ sub processSubmission {
   my %activeWherelist=();
 
 	my $params = $self->{'FormParams'};
+warn("III");
 	if(
 		$params->{'RO_SR_run'}
 		or $params->{'RO_SR_load'}
-		or $params->{'RO_SR_save'}
+		#or $params->{'RO_SR_save'}
 		or $params->{'RO_SR_del'}
 	)	{
+warn("III");
 		my $response = '';
 		if($params->{'RO_SR_run'} and $params->{'repID'})	{
 			$self->processSavedReportData($params->{'repID'});
 		}
-		elsif($params->{'RO_SR_save'})	{
-			my $newID = 0;
-			($response, $newID) = $self->saveReportData($params);
-			$params->{'RO_SR_load'} = 1;
-			$params->{'repID'} = $newID;
+		#elsif($params->{'RO_SR_save'})	{
+			#my $newID = 0;
+			#($response, $newID) = $self->saveReportData($params);
+			#$params->{'RO_SR_load'} = 1;
+			#$params->{'repID'} = $newID;
 			#return ('','','','','',0,$response);
-		}
+		#}
 		elsif($params->{'RO_SR_del'} and $params->{'repID'})	{
 			$response = $self->deleteSavedReportData($params->{'repID'});
 			return ('','','','','',0,$response);
 		}
 		if($params->{'RO_SR_load'} and $params->{'repID'})	{
+warn("LOAD $params->{'repID'}");
 			my ($reportname, $reportdata) = $self->loadSavedReportData($params->{'repID'});
 			$reportname =~s/"/&quot;/g;
 			$reportdata =~s/"/&quot;/g;
@@ -564,9 +578,15 @@ sub processSubmission {
 				<input type="hidden" name="savedreportname" id = "SavedReportName" value="$reportname">
 				<input type="hidden" name="savedreportdata" id = "SavedReportData" value="$reportdata">
 			]. $response;
+warn($returnstr);
 			return ('','','','','',0,$returnstr);
 		}
 	}
+    if(!$params->{'RO_SR_load'})    {
+        my ($newID) = $self->saveReportData($params);
+        $params->{'repID'} = $newID;
+        $self->{'SavedReportID'} = $newID;
+    }
 	if($params->{'d_ROselectedfieldlist'})	{
 		my @o = split(/\s*,\s*/,$params->{'d_ROselectedfieldlist'});
 		for my $o (@o)	{
@@ -1139,10 +1159,14 @@ sub loadSavedReportData	{
 		FROM tblSavedReports
 		WHERE 
 			intSavedReportID = ?
+            AND intLevelID = ?
+            AND (intID = 0 OR intID = ?)
 	];
 	my $q = $db->prepare($st);
 	$q->execute(
 		$reportID,
+		$self->{'EntityTypeID'},
+		$self->{'EntityID'},
 	);
 	my ($name, $data) = $q->fetchrow_array();
 	$q->finish();
@@ -1179,6 +1203,81 @@ sub processSavedReportData	{
 }
 
 sub saveReportData	{
+	my $self = shift;
+	my $db = $self->{'db'};
+
+	my $params = $self->{'FormParams'};
+
+	my %options = ();
+	my @fields = ();
+	my @optarray = (qw(
+		RO_RecordFilter 
+		RO_SortBy1 
+		RO_SortByDir1 
+		RO_SortBy2 
+		RO_SortByDir2 
+		RO_GroupBy 
+		RO_OutputType 
+		RO_OutputEmail
+	));
+	for my $o (@optarray)	{
+		my $okey = $o;
+		$okey =~ s/^RO_//;
+		$options{$okey} = $params->{$o};
+	}
+	for my $k (keys %{$params})	{
+		if($k =~ /^_EXT/)	{
+			$options{$k} = $params->{$k};
+		}
+	}
+
+	if($params->{'d_ROselectedfieldlist'})	{
+		my @order = split(/\s*,\s*/,$params->{'d_ROselectedfieldlist'});
+		for my $o (@order)	{
+			$o=~s/^fld_//g;
+			push @fields, {
+				name => $o,
+				comp => $params->{'f_comp_'.$o},
+				display => $params->{'f_chk_'.$o},
+				v1 => $params->{'f_'.$o.'_1'},
+				v2 => $params->{'f_'.$o.'_2'},
+			};
+		}
+	}
+	my %reportdatahash = (
+		fields => \@fields,
+		options => \%options
+	);
+	my $json = to_json(\%reportdatahash);
+	return ('',0) if !$json;
+	my $st = qq[
+		INSERT INTO tblSavedReports(
+			intReportID,
+			intLevelID,
+			intID,
+			strReportData,
+            intTemporary
+		)
+		VALUES (
+			?,
+			?,
+			?,
+			?,
+            1
+		)
+	];
+	my $q=$self->{'db'}->prepare($st);
+	$q->execute(
+		$self->{'ID'},
+		$self->{'EntityTypeID'},
+		$self->{'EntityID'},
+		$json,
+	);
+	my $newID = $q->{mysql_insertid} || 0;
+	return $newID || 0;
+}
+
+sub saveReportName {
 	my $self = shift;
 	my $db = $self->{'db'};
 

@@ -38,6 +38,7 @@ sub new {
 	$self->{'ReturnURL'}=$params{'ReturnURL'};
 	$self->{'SystemConfig'}=$params{'SystemConfig'};
 	$self->{'OtherOptions'}=$params{'OtherOptions'};
+	$self->{'SavedReportID'} = 0;
 	$self->{'DEBUG'} ||= 0;
 
 	return undef if !$self->{'db'};
@@ -172,6 +173,7 @@ sub deliverReport {
 			$self->{'Data'},
 			{
 				Name => $self->Name(),
+				SavedReportID => $self->IDName(),
 				DateRun => scalar(localtime()),
 				RunOrder => $self->{'RunParams'}{'FieldOrder'} || $self->{'RunParams'}{'Order'},
 				RecordCount => $self->{'RunParams'}{'RecordCount'},
@@ -210,8 +212,10 @@ sub formatOutput {
     $self->{'Data'},    
     {
 			Name => $self->Name(),
-      Labels => $self->{'Config'}{'Labels'},
-      ReportData => $data_array, 
+			ReportID => $self->ID(),
+			SavedReportID => $self->{'SavedReportID'},
+            Labels => $self->{'Config'}{'Labels'},
+            ReportData => $data_array, 
 			DateRun => scalar(localtime()),
 			RunOrder => $self->{'RunParams'}{'FieldOrder'} || $self->{'RunParams'}{'Order'},
 			RecordCount => $self->{'RunParams'}{'RecordCount'},

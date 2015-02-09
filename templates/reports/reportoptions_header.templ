@@ -1,0 +1,47 @@
+<div class = "">
+    ID = [% SavedReportID %]:
+        <div class = "pull-left"><a href = "[% Data.target %]?client=[% Data.client %]&amp;a=REP_CONFIG&amp;RO_SR_load=1&amp;repID=[% SavedReportID %]&amp;rID=[% ReportID %]" class = "btn-inside-panels">[% Lang.txt('Back to Configure') %]</a></div>
+
+        <div class = "pull-right">
+            <a href = "#" class = "btn-inside-panels">Email Report</a>
+            <a href = "#" class = "btn-inside-panels" id = "btn-saverpt">Save Report</a>
+        </div>
+</div>
+<div id = "savereport-panel">
+    <div class = "panel-body">
+        <form method = "POST" action = "[% Data.target %]">
+            <h3>[% Lang.txt('Save the report') %]</h3>
+            <div class="form-group">
+                <label class = "col-md-4 control-label txtright" for = "l_repname">[% Lang.txt('Name') %]</label>
+                <div class="col-md-6">
+                    <input type = "text" id = "l_repname" name = "repName">
+                </div>
+            </div>
+          <div class="form-group">
+            <div class="col-md-offset-4 col-md-6">
+              [% Lang.txt('or') %]
+            </div>
+          </div>
+            <div class="form-group">
+                <label class = "col-md-4 control-label txtright" for = "l_replace">[% Lang.txt('Replace Existing Report') %]</label>
+                <div class="col-md-6">
+                    <select id  "l_replace" name = "repreplace"></select>
+                </div>
+            </div>
+          <div class="form-group">
+            <div class="col-md-offset-4 col-md-6">
+              <input type = "submit" value = "[% Lang.txt('Save') %]" class = "btn-inside-panels">
+            </div>
+          </div>
+        </form>
+    </div>
+</div>
+<script>
+jQuery(document).ready(function(){
+    jQuery('#btn-saverpt').click(function(e) {
+        jQuery('#savereport-panel').toggle();
+        e.preventDefault();
+    });
+
+});
+</script>
