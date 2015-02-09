@@ -131,6 +131,7 @@ sub getAll {
         WHERE
             EF.intEntityID = ?
             AND E.intRealmID = ?
+            AND EF.strStatus = 'ACTIVE'
     ];
 
     my $q = $db->prepare($st);
@@ -292,7 +293,7 @@ sub retrieveFormFieldData {
             my $fieldlabel = $fields{$field}{'label'};
 
             if(($field ne 'intEntityFieldID') and !$params->{$fieldname}){
-                push @errors, $fieldlabel . " " . $index . ": " . $obj->langlookup('Field required');
+                push @errors, $fieldlabel . " " . $index . ": " . $obj->langlookup('Field required') if $fieldname eq 'intCapacity';
             }
 
             my $sysconfigLenRange = $self->getData()->{'SystemConfig'}{$params->{"strDiscipline_" . $index} . '_FIELD_LENGTH_RANGE'};

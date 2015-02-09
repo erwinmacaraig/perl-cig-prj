@@ -73,6 +73,7 @@ use PersonRequest;
 
 use Log;
 use Data::Dumper;
+use ListAuditLog;
 
 main();
 
@@ -319,7 +320,12 @@ use TransferFlow;
 		use ITC_TransferCertificate;
 		($resultHTML, $pageHeading) = ITC_TransferCertificate::show_itc_request_form(\%Data);
 	}
-    
+    elsif ( $action =~ /^V_HISTLOG/ ) {
+        my $venueID= safe_param( 'venueID', 'number' );
+        ($resultHTML,$pageHeading) = listEntityAuditLog(\%Data, $venueID);
+        
+    }
+
    
     # BUILD PAGE
     if ( !$report ) {

@@ -1,34 +1,51 @@
-    [% IF Errors.size %]
-        <div class = "warningmsg">
-            <ul>
-            [% FOREACH error IN Errors %]
-                <li>[% error %]</li>
-            [% END %]
-            </ul>
+[% IF Errors.size %]
+<div class="col-md-12 error-alerts">
+	<div class="alert">
+		<div>
+			<span class="fa fa-exclamation"></span>
+			[% IF Errors.size > 1%]
+				<p>[% Lang.txt("An error occured") %]</p>
+				<ul>
+				[% FOREACH error IN Errors %]
+					<li>[% error %]</li>
+				[% END %]
+				</ul>
+				<p></p>
+				<p></p>
+			[% ELSIF Errors.size == 1 %]
+				[% FOREACH error IN Errors %]
+					<p>[% error %]</p>
+				[% END %]
+			[% END %]
+		</div>
+	</div>
+</div>
+[% END %]
+
+
+    <br/>
+    <div class="row" style="">
+        <div class="col-md-12">
+            <form action="main.cgi" method="POST">
+                    <div class="col-md-3">
+                        <p>[% Lang.txt('Enter the number of additional fields') %]</p>
+                        <input type="text" style="padding: 15px" name="field_count" value="[% field_count %]">
+                    </div>
+                    <div class="col-md-9">
+                        <p>&nbsp;</p>
+                        <input class="btn-main btn-proceed" type="submit" name="submitb" value="[% Lang.txt('Continue') %]">   
+                    </div>
+
+                <input type="hidden" value="[% action %]" name="a">
+                <input type="hidden" value="[% client %]" name="client">
+                <input type="hidden" value="[% venueID %]" name="venueID">
+				[% IF TID.length %]
+					<input type="hidden" value="[% TID %]" name="TID" />
+				[% END %]
+				[% IF at.length %]
+					<input type="hidden" value="[% at %]" name="at" />
+				[% END %]
+            </form>
         </div>
-    [% END %]
-
-    [% IF transferTypeOption != '' %]
-    <span class="label">Transfer type:</span></td><td><span class="formw">[% transferTypeOption %]</span>
-
-    <br/>
-    <br/>
-    <div id="international" style="display: none;">
-        <span>Do You have the Player's ITC?</span><span>[% withITC %][% noITC %]</span>
-    </div>
-
-    [% END %]
-
-    <br/>
-    <div id="domestic">
-        <form action="main.cgi" method="POST">
-            <table>
-            <tbody><tr><td><span class="label">Enter Number Of Fields:</span></td><td><span class="formw"><input type="text" name="field_count" value="[% field_count %]"></span></td></tr>
-            </tbody></table>
-            <input class="btn-main btn-proceed" type="submit" name="submitb" value="Continue">   
-            <input type="hidden" value="[% action %]" name="a">
-            <input type="hidden" value="[% client %]" name="client">
-            <input type="hidden" value="[% venueID %]" name="venueID">
-        </form>
     </div>
     [% script %]
