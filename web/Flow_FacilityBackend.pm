@@ -1060,9 +1060,10 @@ sub cancelFlow {
     my $self = shift;
 
     print STDERR Dumper $self->getStateIds();
+    IncompleteRegistrations::deleteRelatedRegistrationRecords($self->{'Data'}, $self->getStateIds());
     #call IncompleteRegistrations::deleteRelatedRegistrationRecords
 
-    return 1
+    return 1;
 };
 
 
