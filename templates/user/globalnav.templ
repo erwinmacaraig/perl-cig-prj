@@ -55,13 +55,26 @@
     <div class="row">
       <div class="col-md-12">
       [% IF Data.ELevel != 3 %]
-        <a href="#" title=""><img class="header-logo" src="images/FAS-logo.png" alt="" /></a><h1>MyFAS</h1>
+        <a href="#" title=""><img class="header-logo" src="../images/FAS-logo.png" alt="" /></a>
       [% END %]  
         <ul>
           <li>
             <strong class="info-header">[% Lang.txt('Member Association') %]</strong><br/>
-            [% Lang.txt('Phone') %]: <strong>[% NavTree.last.ma_phone_number %]</strong><br/>
-            [% Lang.txt('Website') %]: <strong>[% NavTree.last.ma_website %]</strong>
+            [% Lang.txt('Phone') %]: 
+            <strong>
+            [% IF NavTree.last.ma_phone_number != '' %]
+              [% NavTree.last.ma_phone_number %]
+            [% ELSE %]
+              (65) 6348 3477 / 6293 1477
+            [% END %]
+            </strong><br/>
+            [% Lang.txt('Website') %]: <strong>
+            [% IF NavTree.last.ma_website != '' %]
+              [% NavTree.last.ma_website %]
+            [% ELSE %]
+              http://www.fas.org.sg
+            [% END %]
+            </strong>
           </li>
           [% IF Data.ELevel == 3 %]
           <li>
@@ -73,8 +86,20 @@
           [% END %]
           <li>
             <strong class="info-header">[% Lang.txt('Help Desk') %]</strong><br/>
-            [% Lang.txt('Phone') %]: <strong>[% NavTree.last.help_desk_phone_number %]</strong><br/>
-            [% Lang.txt('Email') %]: <strong>[% NavTree.last.help_desk_email %]</strong><br/>
+            [% Lang.txt('Phone') %]: <strong>
+            [% IF NavTree.last.help_desk_phone_number != '' %]
+              [% NavTree.last.help_desk_phone_number %]
+            [% ELSE %]
+              6880 3197
+            [% END %]
+            </strong><br/>
+            [% Lang.txt('Email') %]: <strong>
+            [% IF NavTree.last.help_desk_email != '' %]
+              [% NavTree.last.help_desk_email %]
+            [% ELSE %]
+              support@myfas.zendesk.com
+            [% END %]
+            </strong><br/>
           </li>
         </ul>
       </div>
