@@ -63,7 +63,7 @@
                     [% IF type == 'delete' %]
                         <input id="selectall-[% fieldRow.intEntityFieldID %]" type="checkbox" name="deletefield[]" value="[% fieldRow.intEntityFieldID %]"/>
                     [% ELSE %]
-                        [% fieldRow.intEntityFieldID %][% COUNT = COUNT + 1 %][% COUNT %]
+                        <!--[% fieldRow.intEntityFieldID %][% COUNT = COUNT + 1 %][% COUNT %]-->
                     [% END %]
                     </td>
                     <td>[% fieldRow.intFieldOrderNumber %]</td>
