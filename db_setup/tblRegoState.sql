@@ -13,4 +13,4 @@ CREATE TABLE tblRegoState (
     UNIQUE KEY (regoType, userEntityID, entityID, regoID),
     KEY index_userEntityID (userEntityID),
     KEY index_userID (userID)
-);
+) DEFAULT CHARSET=utf8;
