@@ -208,7 +208,7 @@ sub getEntityMenuData {
     }
     #if(exists $children->{$Defs::LEVEL_PERSON})    {
         $menuoptions{'persons'} = {
-            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}),
+            name => $lang->txt("List $Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}"),
             url => $baseurl."a=P_L&amp;l=$Defs::LEVEL_PERSON",
         };
     #}
@@ -457,6 +457,7 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
             'persons_addofficial',
             'persons_addmaofficial',
             'bulk',
+            'persons',
         ]],
         [ $lang->txt('Work Tasks'), 'menu',[
             'approvals',
@@ -840,6 +841,7 @@ sub getClubMenuData {
         'duplicates',
         'bulk',
 		'bulkpayment',
+        'persons',
          ]],
 
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu',[

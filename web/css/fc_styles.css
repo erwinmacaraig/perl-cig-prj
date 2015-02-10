@@ -160,7 +160,17 @@ header .logo-area {
 }
 
 header .logo-area.notloginlevel    {
-    margin-top:45px;
+    margin-top:0px;
+}
+#pageholder #contentholder {
+    background-color: #fff;
+    margin-top: 20px;
+}
+#pageholder {
+	background: transparent;
+}
+#content .login-error-page {
+	padding: 20px 10px;
 }
 
 header .logo-area img.header-logo {
@@ -2200,4 +2210,7 @@ div[id*="doctab"] .documents-list table.table .task-list .status-col a.btn-insid
 .advanced-search-fields .datepickerFields i {
 	float: right;
 	padding-top: 5px;
+}
+.hidden-col-val {
+    display:none;
 }
