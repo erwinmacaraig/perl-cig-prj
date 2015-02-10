@@ -318,10 +318,19 @@ sub getPersonRegistration {
             push @persons, $r->{'doc'};
         }
     }
+	my @persontypes = ();
+	my $filterstring = '';
 	my $personTypeFilter = '';
 	my $currentLevel = $self->getData()->{'clientValues'}{'currentLevel'};
 	if($currentLevel == $Defs::LEVEL_CLUB){
-		$personTypeFilter = qq[AND PR.strPersonType NOT IN ('MAOFFICIAL','REFEREE') ]
+		my $filterstatement = qq[ SELECT DISTINCT strPersonType FROM tblMatrix WHERE intRealmID = ? and intEntityLevel= ?];
+		my $query = $self->getData->{'db'}->prepare($filterstatement);
+        $query->execute($self->getData()->{'Realm'},$Defs::LEVEL_CLUB);
+		while(my $dref = $query->fetchrow_hashref()){
+			push @persontypes, $dref->{'strPersonType'};
+		}
+		$filterstring = q['] . join("','",@persontypes) . q['];
+		$personTypeFilter = qq[AND PR.strPersonType IN ($filterstring) ];
 	}
 
     my @memarray = ();
@@ -368,7 +377,7 @@ sub getPersonRegistration {
                 tblPerson.strNationalNum
             LIMIT 100
         ];
-		
+
         my $q = $self->getData->{'db'}->prepare($st);
         $q->execute();
         my %origClientValues = %{$self->getData()->{'clientValues'}};
@@ -404,7 +413,7 @@ sub getPersonRegistration {
                 role => $Defs::personType{$dref->{'strPersonType'}},
             };
         }
-
+		
         $self->setResultCount($count);
 
         if($raw){
@@ -412,10 +421,16 @@ sub getPersonRegistration {
         }
         else {
             my @roleFilters;
-            foreach my $role (keys %Defs::personType){
-                push @roleFilters, $Defs::personType{$role};
-            }
-
+			foreach my $role (keys %Defs::personType){
+				if(scalar @persontypes){
+					if(grep /$role/,@persontypes){
+	                	push @roleFilters, $Defs::personType{$role};
+					}
+				}
+				else {
+					push @roleFilters, $Defs::personType{$role};
+				}
+			}			
             my %filters = (
                 role => \@roleFilters,
             );
