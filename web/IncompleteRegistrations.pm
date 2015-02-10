@@ -422,15 +422,58 @@ sub deleteRelatedRegistrationRecords {
 
     switch($type) {
         case 'PERSON' {
-            #TODO: need to determine additional condition to be considered as newly added person (tblPerson.strStatus = 'INPROGRESS' etc)
+            my $sdp = qq [
+                DELETE
+                    tp.*,
+                    tpc.*,
+                    td.*,
+                    tuf.*
+                FROM tblPerson tp
+                LEFT JOIN tblPersonCertifications tpc ON (tpc.intPersonID = tp.intPersonID)
+                LEFT JOIN tblDocuments td ON (td.intPersonID = tp.intPersonID)
+                LEFT JOIN tblUploadedFiles tuf ON (tuf.intFileID = td.intUploadFileID)
+                WHERE
+                    tp.intPersonID = ?
+                    AND tp.strStatus = 'INPROGRESS'
+            ];
+            my $query = $Data->{'db'}->prepare($sdp);
+            $query->execute($entityID);
+            $query->finish();
+
+            if($regoID) {
+                #join to other tables here: tblCertifications etc
+                my $sdpr = qq [
+                    DELETE FROM
+                        tblPersonRegistration_$Data->{'Realm'}
+                    WHERE
+                        intPersonID = ?
+                        AND intPersonRegistrationID = ?
+                        AND strStatus = 'INPROGRESS'
+                ];
+
+                $query = $Data->{'db'}->prepare($sdpr);
+                $query->execute(
+                    $entityID,
+                    $regoID
+                );
+                $query->finish();
+            }
         }
         case ['CLUB', 'VENUE'] {
             my $id = $entityID,
             my $st = qq[
-                DELETE FROM tblEntity
+                DELETE
+                    te.*,
+                    tef.*,
+                    td.*,
+                    tuf.*
+                FROM tblEntity te
+                LEFT JOIN tblEntityFields tef ON (tef.intEntityID = te.intEntityID)
+                LEFT JOIN tblDocuments td ON (td.intEntityID = te.intEntityID AND td.intEntityLevel = te.intEntityLevel AND td.intPersonID = 0 AND td.intPersonRegistrationID = 0)
+                LEFT JOIN tblUploadedFiles tuf ON (tuf.intFileID = td.intUploadFileID)
                 WHERE
-                    intEntityID = ?
-                    AND strStatus = 'INPROGRESS'
+                    te.intEntityID = ?
+                    AND te.strStatus = 'INPROGRESS'
             ];
             my $query = $Data->{'db'}->prepare($st);
             $query->execute($entityID);
