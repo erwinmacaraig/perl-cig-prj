@@ -1774,17 +1774,19 @@ sub verifyDocument {
 
     #my $WFTaskID = safe_param('TID','number') || '';
     #my $documentID = safe_param('did','number') || '';
-	my  $documentID = safe_param('f','number') || 0;
+	my $documentID = safe_param('f','number') || 0;
 	my $regoID = safe_param('regoID','number') || 0;
 	my $documentStatus = param('status') || '';
+print STDERR "UPDATE $documentID for $regoID\n";
 	my $st;
 	my $q;
-	if($regoID && $documentID){
-		$st = qq[
-			UPDATE tblDocuments as D INNER JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (D.intPersonRegistrationID = PR.intPersonRegistrationID AND D.intPersonID=PR.intPersonID) SET D.intPersonRegistrationID = ? WHERE PR.strStatus = 'INPROGRESS' AND D.intUploadFileID = ? AND PR.intRealmID = ?];
-		$q = $Data->{'db'}->prepare($st);
-		$q->execute($regoID,$documentID,$Data->{'RealmID'});
-	}
+
+    if($regoID && $documentID){
+        $st = qq[
+            UPDATE tblDocuments as D INNER JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (D.intPersonRegistrationID = PR.intPersonRegistrationID AND D.intPersonID=PR.intPersonID) SET D.intPersonRegistrationID = ? WHERE PR.strStatus = 'INPROGRESS' AND D.intUploadFileID= ? AND PR.intRealmID = ?];
+        $q = $Data->{'db'}->prepare($st);
+        $q->execute($regoID,$documentID,$Data->{'Realm'});
+    }
 
 	if($documentID){
     	$st = qq[
