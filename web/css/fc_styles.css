@@ -160,7 +160,17 @@ header .logo-area {
 }
 
 header .logo-area.notloginlevel    {
-    margin-top:45px;
+    margin-top:0px;
+}
+#pageholder #contentholder {
+    background-color: #fff;
+    margin-top: 20px;
+}
+#pageholder {
+	background: transparent;
+}
+#content .login-error-page {
+	padding: 20px 10px;
 }
 
 header .logo-area img.header-logo {
