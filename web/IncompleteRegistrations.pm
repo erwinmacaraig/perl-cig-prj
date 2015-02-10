@@ -125,7 +125,7 @@ sub listIncompleteRegistrations    {
             }
             $resume = qq[
                 <form action = "$Data->{'target'}" method = "POST">
-                    <input type ="submit" value = "].$lang->txt('Resume').qq[" class = "btn btn-inside-panels">
+                    <input type ="submit" value = "].$lang->txt('View & Resume').qq[" class = "btn btn-inside-panels">
                     $postfields
                 </form>
             ];
@@ -252,7 +252,7 @@ sub listIncompleteRegistrations    {
             }
             $resume = qq[
                 <form action = "$Data->{'target'}" method = "POST">
-                    <input type ="submit" value = "].$lang->txt('Resume').qq[" class = "btn btn-inside-panels">
+                    <input type ="submit" value = "].$lang->txt('View & Resume').qq[" class = "btn btn-inside-panels">
                     $postfields
                 </form>
             ];
