@@ -212,7 +212,7 @@ sub listPlayerPassport {
 			From => $passportref->{'dtFrom'},
 			To => $passportref->{'dtTo'},
 			Club => $passportref->{'strEntityName'},
-			Level => $passportref->{'strPersonLevel'},
+			Level => $Defs::personLevel{$passportref->{'strPersonLevel'}} || '',
 			MAName => $passportref->{'strMAName'},
 		};
 	}
