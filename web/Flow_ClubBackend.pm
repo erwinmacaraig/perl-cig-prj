@@ -846,11 +846,7 @@ sub getStateIds {
 sub cancelFlow{
     my $self = shift;
 
-    print STDERR Dumper $self->getStateIds();
     IncompleteRegistrations::deleteRelatedRegistrationRecords($self->{'Data'}, $self->getStateIds());
-    #call IncompleteRegistrations::deleteRelatedRegistrationRecords
-
-    #Need to do more work here on connecting tables
 
     return 1;
 }

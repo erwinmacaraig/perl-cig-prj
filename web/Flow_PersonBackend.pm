@@ -34,6 +34,7 @@ use PersonRegistration;
 use PersonSummaryPanel;
 use RenewalDetails;
 use JSON;
+use IncompleteRegistrations;
 
 
 sub setProcessOrder {
@@ -1680,8 +1681,7 @@ sub getStateIds {
 sub cancelFlow{
     my $self = shift;
 
-    print STDERR Dumper $self->getStateIds();
-    #call IncompleteRegistrations::deleteRelatedRegistrationRecords
+    IncompleteRegistrations::deleteRelatedRegistrationRecords($self->{'Data'}, $self->getStateIds());
 
     return 1
 };

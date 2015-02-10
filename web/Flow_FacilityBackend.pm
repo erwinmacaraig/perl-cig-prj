@@ -30,6 +30,8 @@ use Data::Dumper;
 use FacilityFieldsSetup;
 use EntitySummaryPanel;
 use UploadFiles;
+use IncompleteRegistrations;
+
 sub setProcessOrder {
     my $self = shift;
   
@@ -1059,9 +1061,7 @@ sub getStateIds {
 sub cancelFlow {
     my $self = shift;
 
-    print STDERR Dumper $self->getStateIds();
     IncompleteRegistrations::deleteRelatedRegistrationRecords($self->{'Data'}, $self->getStateIds());
-    #call IncompleteRegistrations::deleteRelatedRegistrationRecords
 
     return 1;
 };
