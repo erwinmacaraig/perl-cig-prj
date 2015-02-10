@@ -73,7 +73,7 @@ sub getUnique {
 
         my $clubID = $self->getData()->{'clientValues'}{'clubID'} || 0;
         $clubID = 0 if $clubID == $Defs::INVALID_ID;
-		
+			
         my $st = qq[
           SELECT DISTINCT
             tblPerson.intPersonID,
@@ -89,7 +89,7 @@ sub getUnique {
             tblPerson
             INNER JOIN tblPersonRegistration_$realmID AS PR ON (
               tblPerson.intPersonID = PR.intPersonID
-              AND PR.strStatus IN ('ACTIVE','PASSIVE','PENDING')			
+              AND PR.strStatus IN ('ACTIVE','PASSIVE','PENDING')
               AND PR.intEntityID IN ($entity_list)
             )
             INNER JOIN tblEntity AS E ON (
@@ -318,6 +318,11 @@ sub getPersonRegistration {
             push @persons, $r->{'doc'};
         }
     }
+	my $personTypeFilter = '';
+	my $currentLevel = $self->getData()->{'clientValues'}{'currentLevel'};
+	if($currentLevel == $Defs::LEVEL_CLUB){
+		$personTypeFilter = qq[AND PR.strPersonType NOT IN ('MAOFFICIAL','REFEREE') ]
+	}
 
     my @memarray = ();
     if(@persons)  {
@@ -356,12 +361,14 @@ sub getPersonRegistration {
             )
             WHERE tblPerson.intPersonID IN ($person_list)
                 AND tblPerson.strStatus IN ('REGISTERED', 'PENDING')
+                $personTypeFilter
             ORDER BY 
                 tblPerson.strLocalSurname,
                 tblPerson.strLocalFirstname,
                 tblPerson.strNationalNum
             LIMIT 100
         ];
+		
         my $q = $self->getData->{'db'}->prepare($st);
         $q->execute();
         my %origClientValues = %{$self->getData()->{'clientValues'}};
