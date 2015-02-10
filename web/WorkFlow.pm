@@ -1779,11 +1779,13 @@ sub verifyDocument {
 	my $documentStatus = param('status') || '';
 	my $st;
 	my $q;
-	if($regoID){
+
+	if($regoID && $documentID){
 		$st = qq[
-			UPDATE tblDocuments as D INNER JOIN tblPersonRegistration_X as PR ON (D.intPersonRegistrationID = PR.intPersonRegistrationID AND D.intPersonID=PR.intPersonID)SET D.intPersonRegistrationID = ? WHERE PR.strStatus = 'INPROGRESS' AND D.intUploadFileID = ? ];
+			UPDATE tblDocuments as D INNER JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (D.intPersonRegistrationID = PR.intPersonRegistrationID AND D.intPersonID=PR.intPersonID) SET D.intPersonRegistrationID = ? WHERE PR.strStatus = 'INPROGRESS' AND D.intUploadFileID = ? AND PR.intRealmID = ?];
 		$q = $Data->{'db'}->prepare($st);
-		$q->execute($regoID,$documentID);
+		$q->execute($regoID,$documentID,$Data->{'RealmID'});
+
 	}
 
 	if($documentID){
@@ -3129,9 +3131,12 @@ sub populateDocumentViewData {
 
             my $action = "view";
             $action = "review" if($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityAdd'} == 1);
-	        $parameters .= qq[&regoID=$registrationID] if($registrationID); 
-           	#$viewLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$Data->{'client'}&amp;a=$action');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];	
-			$viewLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'$parameters');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];			
+
+			$parameters = qq[client=$Data->{'client'}&amp;a=$action];
+			$parameters .= qq[&regoID=$registrationID] if($registrationID); 
+			$viewLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'$parameters');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];	
+           	#$viewLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$Data->{'client'}&amp;a=$action');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];			
+
         }
 
         if($tdref->{'strLockAtLevel'})   {
