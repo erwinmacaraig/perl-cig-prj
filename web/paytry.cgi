@@ -78,6 +78,7 @@ sub main	{
     }
 
     my ($logID, $amount, $chkvalue, $session, $paymentSettings) = Payments::checkoutConfirm(\%Data, $paymentType, \@transactions,1,1);
+print STDERR "CHK VALUE IS $chkvalue\n";
     
 	my $st = qq[
         INSERT INTO tblPayTry (
@@ -104,14 +105,69 @@ sub main	{
         ) or query_error($st);
     my $tryID= $qry->{mysql_insertid};
     disconnectDB($db);
+    my $cancelPayPalURL = $Defs::base_url . $paymentSettings->{'gatewayCancelURL'} . qq[&amp;ci=$logID&client=$client]; ##$Defs::paypal_CANCEL_URL;
 
     ## In here I will build up URL per Gateway -- intPaymentConfigID or have a GATEWAYCODE ?
     ## Pass control to gateway
     my $paymentURL = '';
+    my %gatewaySpecific = ();
+
+
     if ($paymentSettings->{'gatewayCode'} eq 'NABExt1') {
         print STDERR "YEP";
+        $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;chkv=$chkvalue&amp;session=$session&amp;amount=$amount];
     }
-    $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;chkv=$chkvalue&amp;session=$session&amp;amount=$amount];
+    if ($paymentSettings->{'gatewayCode'} eq 'checkoutfi')  {
+        print STDERR "CHECKOUT FINLAND";
+        $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;chkv=$chkvalue&amp;session=$session];
+        my $cents = $amount * 100;
+        my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
+        $Year+=1900;
+        $Month++;    
+        $Month = sprintf("%02s", $Month);
+        my $DeliveryDate = "$Year$Month$Day";
+        my $cancelURL = $Defs::base_url . $paymentSettings->{'gatewayCancelURL'} . qq[&ci=$logID&client=$client]; 
+        my $returnURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&client=$client&ci=$logID&chkv=$chkvalue&session=$session];
+
+        $gatewaySpecific{'VERSION'} = "0001";
+        $gatewaySpecific{'STAMP'} = $logID;
+        $gatewaySpecific{'AMOUNT'} = $cents;
+        $gatewaySpecific{'REFERENCE'} = $logID;
+        $gatewaySpecific{'MESSAGE'} = "";
+        $gatewaySpecific{'LANGUAGE'} = "EN";
+        $gatewaySpecific{'MERCHANT'} = $paymentSettings->{'gatewayUsername'};
+        $gatewaySpecific{'RETURN'} = $returnURL;
+        $gatewaySpecific{'CANCEL'} = $cancelURL;
+        $gatewaySpecific{'REJECT'} = "";
+        $gatewaySpecific{'DELAYED'} = "";
+        $gatewaySpecific{'COUNTRY'} = "FIN";
+        $gatewaySpecific{'CURRENCY'} = $paymentSettings->{'currency'};
+        $gatewaySpecific{'DEVICE'} = 1;
+        $gatewaySpecific{'CONTENT'} = 1;
+        $gatewaySpecific{'TYPE'} = 0;
+        $gatewaySpecific{'ALGORITHM'} = 3;
+
+        $gatewaySpecific{'DELIVERY_DATE'} = $DeliveryDate;
+        $gatewaySpecific{'FIRSTNAME'} = "";
+        $gatewaySpecific{'FAMILYNAME'} = "";
+        $gatewaySpecific{'ADDRESS'} = "";
+        $gatewaySpecific{'POSTCODE'} = "";
+        $gatewaySpecific{'POSTOFFICE'} = "";
+
+        my $m = new MD5;
+        my $coKey = $gatewaySpecific{'VERSION'} ."+". $gatewaySpecific{'STAMP'} ."+". $gatewaySpecific{'AMOUNT'} ."+". $gatewaySpecific{'REFERENCE'} ."+". $gatewaySpecific{'MESSAGE'} ."+". $gatewaySpecific{'LANGUAGE'} ."+". $gatewaySpecific{'MERCHANT'} ."+". $gatewaySpecific{'RETURN'} ."+". $gatewaySpecific{'CANCEL'} ."+". $gatewaySpecific{'REJECT'} ."+". $gatewaySpecific{'DELAYED'} ."+". $gatewaySpecific{'COUNTRY'} ."+". $gatewaySpecific{'CURRENCY'} ."+". $gatewaySpecific{'DEVICE'} ."+". $gatewaySpecific{'CONTENT'} ."+". $gatewaySpecific{'TYPE'} ."+". $gatewaySpecific{'ALGORITHM'} ."+". $gatewaySpecific{'DELIVERY_DATE'} ."+". $gatewaySpecific{'FIRSTNAME'} ."+". $gatewaySpecific{'FAMILYNAME'} ."+". $gatewaySpecific{'ADDRESS'} ."+". $gatewaySpecific{'POSTCODE'} ."+". $gatewaySpecific{'POSTOFFICE'} ."+". $paymentSettings->{'gatewayPassword'};
+print STDERR "$coKey\n";
+    
+        $m->reset();
+        $m->add($coKey);
+        my $authKey= uc($m->hexdigest());
+print STDERR $authKey;
+        $gatewaySpecific{'MAC'} = $authKey;
+
+        $gatewaySpecific{'EMAIL'} = "";
+        $gatewaySpecific{'PHONE'} = "";
+
+    }
 
     my $payTry = payTryRead(\%Data, $logID, $tryID);
     my $cancelURL = payTryRedirectBack(\%Data, $payTry, $client, $logID, 0);
@@ -121,7 +177,6 @@ sub main	{
     }
     my $gateway_body= qq[<a href="$paymentURL">Proceed to Payment</a>];
     my $cancel_body= qq[<a href="$cancelURL">Cancel Payment</a>];
-    my $cancelPayPalURL = $Defs::base_url . $paymentSettings->{'gatewayCancelURL'} . qq[&amp;ci=$logID&client=$client]; ##$Defs::paypal_CANCEL_URL;
 
     my $proceed_body = qq[
     <html>
@@ -133,13 +188,20 @@ sub main	{
             <input type = "hidden" name = "ci" value = "$logID">
             <input type = "hidden" name = "chkv" value = "$chkvalue">
             <input type = "hidden" name = "sessions" value = "$session">
-            <input type = "hidden" name = "amount" value = "$amount">
+    ];
+    if ($paymentSettings->{'gatewayCode'} eq 'NABExt1') {
+        $proceed_body .= qq[ <input type = "hidden" name = "amount" value = "$amount"> ];
+    }
+    foreach my $k (keys %gatewaySpecific) {
+        $proceed_body .= qq[<input type="hidden" name="$k" value="$gatewaySpecific{$k}">];
+    } 
+    $proceed_body .= qq[
         </form>
     </body>
     </html>
     ];
-            #<input type = "hidden" name = "client" value = "].unescape($client).qq[">
-            #<input type = "hidden" name = "nh" value = "$Data{'noheader'}"
+
+
     my $body = '';
 if ($amount eq "0" or $amount eq "0.00" or ! $amount)   {
     print "Status: 302 Moved Temporarily\n";

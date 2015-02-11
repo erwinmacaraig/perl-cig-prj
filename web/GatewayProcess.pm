@@ -100,7 +100,8 @@ print STDERR $st;
 
 sub gatewayProcess {
 
-    my ($Data, $logID, $client, $returnVals_ref) = @_;
+    my ($Data, $logID, $client, $returnVals_ref, $check_action) = @_;
+print STDERR "IN GATEWAY PROCESS";
 
     my $db = $Data->{'db'};
 	my $action = $returnVals_ref->{'action'} || '';
@@ -132,17 +133,18 @@ sub gatewayProcess {
   }
 
 
-
-
   {
-    my $chkvalue= param('rescode') . $Order->{'TotalAmount'}. $logID; ## NOTE: Different to one being sent
+    #my $chkvalue= param('rescode') . $Order->{'TotalAmount'}. $logID; ## NOTE: Different to one being sent
+    my $chkvalue= $returnVals_ref->{'GATEWAY_RESPONSE_CODE'} . $Order->{'TotalAmount'}. $logID; ## NOTE: Different to one being senn
     my $m;
     $m = new MD5;
     $m->reset();
     $m->add($paymentSettings->{'gatewaySalt'}, $chkvalue);
     $chkvalue = $m->hexdigest();
     warn "chkv VS. chkvalue :: $chkv :::::  $chkvalue ";
-    $Order->{'Status'} = -1 if ($chkv ne $chkvalue);
+    unless ($check_action eq 'skip') {
+        $Order->{'Status'} = -1 if ($chkv ne $chkvalue);
+    }
   }
    my $body='';
 	if ($Order->{'Status'} != 0)	{

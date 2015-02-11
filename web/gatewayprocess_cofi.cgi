@@ -64,15 +64,16 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
         #$returnVals{'ei'} = param('ei') || 0;
         $returnVals{'chkv'} = param('chkv') || 0;
 
-        $returnVals{'GATEWAY_TXN_ID'}= param('txnid') || '';
-        $returnVals{'GATEWAY_AUTH_ID'}= param('authid') || '';
-        $returnVals{'GATEWAY_SIG'}= param('sig') || '';
-        $returnVals{'GATEWAY_SETTLEMENT_DATE'}= param('settdate') || '';
-        $returnVals{'GATEWAY_RESPONSE_CODE'}= param('rescode') || '';
-        $returnVals{'GATEWAY_RESPONSE_TEXT'}= param('restext') || '';
-        $returnVals{'Other1'} = param('restext') || '';
-        $returnVals{'Other2'} = param('authid') || '';
-        gatewayProcess(\%Data, $logID, $client, \%returnVals, '');
+        $returnVals{'GATEWAY_TXN_ID'}= param('PAYMENT') || '';
+        $returnVals{'GATEWAY_AUTH_ID'}= param('REFERENCE') || '';
+        #$returnVals{'GATEWAY_SETTLEMENT_DATE'}= param('settdate') || '';
+        my $co_status = param('STATUS') || '';
+        $returnVals{'GATEWAY_RESPONSE_CODE'}= "99";
+        $returnVals{'GATEWAY_RESPONSE_CODE'}= "OK" if ($co_status eq "2");
+        $returnVals{'GATEWAY_RESPONSE_TEXT'}= param('REFERENCE') || '';
+        $returnVals{'Other1'} = $co_status || '';
+        $returnVals{'Other2'} = param('MAC') || '';
+        gatewayProcess(\%Data, $logID, $client, \%returnVals, 'skip');
     }
 
 	disconnectDB($db);

@@ -240,7 +240,7 @@ sub checkoutConfirm	{
 	];
 
     my $chkvalue= $amount . $intLogID . $paymentSettings->{'currency'};
-    if ($paymentType == $Defs::PAYMENT_ONLINENAB)    {
+    if ($paymentType == $Defs::PAYMENT_ONLINENAB or $paymentType == $Defs::PAYMENT_ONLINECREDITCARD)    {
         my $m;
 #warn("AM:$amount $intLogID " . $paymentSettings->{'currency'} . "#######" . $paymentSettings->{'gatewaySalt'});
         $m = new MD5;
