@@ -93,7 +93,8 @@ my $st_a = qq[
                    intEntityID,                   
                    intPersonID,
                    intClearanceID,
-                   dtAdded
+                   dtAdded,
+                    dtLastUpdated
                 )
                 VALUES (
                    ?,
@@ -101,6 +102,7 @@ my $st_a = qq[
                    ?,
                    ?,
                    ?,
+                   NOW(),
                    NOW()
                  ) 
         ]; 
