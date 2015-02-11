@@ -1175,7 +1175,7 @@ sub approveTask {
     }
 
    	my $rc = checkForOutstandingTasks($Data,$ruleFor, $taskType, $entityID, $personID, $personRegistrationID, $documentID);
-
+	
     return($rc);
 
 }
@@ -1777,7 +1777,7 @@ sub verifyDocument {
 	my $documentID = safe_param('f','number') || 0;
 	my $regoID = safe_param('regoID','number') || 0;
 	my $documentStatus = param('status') || '';
-print STDERR "UPDATE $documentID for $regoID\n";
+
 	my $st;
 	my $q;
 
