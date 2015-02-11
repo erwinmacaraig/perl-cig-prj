@@ -25,6 +25,7 @@ use Gateway_Common;
 use TTTemplate;
 use Data::Dumper;
 use GatewayProcess;
+use Localisation;
 
 use Digest::SHA qw(hmac_sha256_hex);
 
@@ -36,9 +37,11 @@ sub main	{
 
     ## Need one of these PER gateway
 
-	my $logID= param('ci') || 0;
+	my $logID= param('STAMP') || param('ci') || 0;
 	my $submit_action= param('sa') || '';
 	my $display_action= param('da') || '';
+    my $process_action= param('pa') || '';
+
     my $db=connectDB();
 	my %Data=();
 	$Data{'db'}=$db;
@@ -57,6 +60,7 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
     $Data{'sessionKey'} = $payTry->{'session'};
     getDBConfig(\%Data);
     $Data{'SystemConfig'}=getSystemConfig(\%Data);
+    initLocalisation(\%Data);
 
     # Do they update
     if ($submit_action eq '1') {
@@ -75,8 +79,13 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
         $Vals{'ALGORITHM'}= param('ALGORITHM') || '';
         $Vals{'MAC'}= param('MAC') || '';
         
+########
+my ($Order, $Transactions) = gatewayTransactions(\%Data, $logID);
+my ($paymentSettings, undef) = getPaymentSettings(\%Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, 1);
+########
+
         my $str = "$Vals{'VERSION'}&$Vals{'STAMP'}&$Vals{'REFERENCE'}&$Vals{'PAYMENT'}&$Vals{'STATUS'}&$Vals{'ALGORITHM'}";
-        my $digest=uc(hmac_sha256_hex($str, "SAIPPUAKAUPPIAS"));
+        my $digest=uc(hmac_sha256_hex($str, $paymentSettings->{'gatewayPassword'}));
         my $chkAction = 'FAILURE';
         if ($Vals{'MAC'} eq $digest)    {
             $chkAction = 'SUCCESS';
@@ -96,10 +105,14 @@ print STDERR "MAC ACTION IS $chkAction\n";
     }
 
 	disconnectDB($db);
+    if ($process_action eq '1')    {
+        payTryContinueProcess(\%Data, $payTry, $client, $logID, 1);
+    }
 
     if ($display_action eq '1')    {
         payTryRedirectBack(\%Data, $payTry, $client, $logID, 1);
     }
+
 }
 
 1;

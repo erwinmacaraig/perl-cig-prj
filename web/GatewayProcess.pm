@@ -1,8 +1,8 @@
 package GatewayProcess;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT=qw(gatewayProcess payTryRead payTryRedirectBack);
-@EXPORT_OK=qw(gatewayProcess payTryRead payTryRedirectBack);
+@EXPORT=qw(gatewayProcess payTryRead payTryRedirectBack payTryContinueProcess);
+@EXPORT_OK=qw(gatewayProcess payTryRead payTryRedirectBack payTryContinueProcess);
 
 use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 
@@ -23,6 +23,21 @@ use ExternalGateway;
 use Gateway_Common;
 use TTTemplate;
 use Data::Dumper;
+
+sub payTryContinueProcess {
+
+    my ($Data, $payTry, $client, $logID, $autoRun) = @_;
+
+    print STDERR Dumper($payTry);
+    $payTry->{'return'} = 1;
+    if ($payTry->{'strContinueAction'} eq 'REGOFLOW')   {
+print STDERR "CONTINUE PROCESS~!!!!!!\n";
+        use PersonFlow;
+        handlePersonFlow($payTry->{'a'}, $Data, $payTry);
+    }
+
+    return;
+}
 
 sub payTryRedirectBack  {
 print STDERR "IN REDIRECT BACK!!\n";
@@ -95,6 +110,7 @@ sub payTryRead  {
     my $href = $query->fetchrow_hashref();
 print STDERR $st;
     my $values = JSON::from_json($href->{'strLog'});
+    $values->{'strContinueAction'} = $href->{'strContinueAction'};
     return $values;
 }
 

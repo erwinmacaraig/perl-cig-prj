@@ -25,6 +25,7 @@ use Gateway_Common;
 use TTTemplate;
 use Data::Dumper;
 use GatewayProcess;
+use Localisation;
 
 #use Crypt::CBC;
 
@@ -37,6 +38,7 @@ sub main	{
 	my $logID= param('ci') || 0;
 	my $submit_action= param('sa') || '';
 	my $display_action= param('da') || '';
+	my $process_action= param('pa') || '';
     my $db=connectDB();
 	my %Data=();
 	$Data{'db'}=$db;
@@ -55,6 +57,7 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
     $Data{'sessionKey'} = $payTry->{'session'};
     getDBConfig(\%Data);
     $Data{'SystemConfig'}=getSystemConfig(\%Data);
+    initLocalisation(\%Data);
 
     # Do they update
     if ($submit_action eq '1') {
@@ -76,10 +79,14 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
     }
 
 	disconnectDB($db);
+    if ($process_action eq '1')    {
+        payTryContinueProcess(\%Data, $payTry, $client, $logID, 1);
+    }
 
     if ($display_action eq '1')    {
         payTryRedirectBack(\%Data, $payTry, $client, $logID, 1);
     }
+
 }
 
 1;

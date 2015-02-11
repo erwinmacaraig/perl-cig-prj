@@ -70,6 +70,7 @@ sub main	{
     require JSON;
     my $datalog= JSON::to_json( \%params);
     my $gCount = param('gatewayCount') || 0;
+    my $continueAction = param('cA') || '';
     my $paymentType= '';
     foreach my $i (1 .. $gCount)    {
         if (param("cc_submit[$i]")) {
@@ -86,9 +87,11 @@ print STDERR "CHK VALUE IS $chkvalue\n";
             strPayReference,
             intTransLogID,
             strLog,
+            strContinueAction,
             dtTry
         )
         VALUES (
+            ?,
             ?,
             ?,
             ?,
@@ -102,6 +105,7 @@ print STDERR "CHK VALUE IS $chkvalue\n";
         '',
         $logID,
         $datalog,
+        $continueAction
         ) or query_error($st);
     my $tryID= $qry->{mysql_insertid};
     disconnectDB($db);
@@ -126,8 +130,11 @@ print STDERR "CHK VALUE IS $chkvalue\n";
         $Month++;    
         $Month = sprintf("%02s", $Month);
         my $DeliveryDate = "$Year$Month$Day";
-        my $cancelURL = $Defs::base_url . $paymentSettings->{'gatewayCancelURL'} . qq[&ci=$logID&client=$client]; 
+        #my $cancelURL = $Defs::base_url . $paymentSettings->{'gatewayCancelURL'} . qq[&ci=$logID&client=$client]; 
+        my $cancelURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=0&da=1&client=$client&ci=$logID&chkv=$chkvalue&session=$session];
         my $returnURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&client=$client&ci=$logID&chkv=$chkvalue&session=$session];
+        my $rejectURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&client=$client&ci=$logID&chkv=$chkvalue&session=$session];
+        my $delayedURL= $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=1&client=$client&ci=$logID&chkv=$chkvalue&session=$session];
 
         $gatewaySpecific{'VERSION'} = "0001";
         $gatewaySpecific{'STAMP'} = $logID;
@@ -138,8 +145,8 @@ print STDERR "CHK VALUE IS $chkvalue\n";
         $gatewaySpecific{'MERCHANT'} = $paymentSettings->{'gatewayUsername'};
         $gatewaySpecific{'RETURN'} = $returnURL;
         $gatewaySpecific{'CANCEL'} = $cancelURL;
-        $gatewaySpecific{'REJECT'} = "";
-        $gatewaySpecific{'DELAYED'} = "";
+        $gatewaySpecific{'REJECT'} = $rejectURL;
+        $gatewaySpecific{'DELAYED'} = $delayedURL;
         $gatewaySpecific{'COUNTRY'} = "FIN";
         $gatewaySpecific{'CURRENCY'} = $paymentSettings->{'currency'};
         $gatewaySpecific{'DEVICE'} = 1;

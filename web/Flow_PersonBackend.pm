@@ -1267,6 +1267,7 @@ sub display_summary {
         my $hiddenFields = $self->getCarryFields();
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
+        $hiddenFields->{'cA'} = "REGOFLOW";
         ($content, $gatewayConfig) = displayRegoFlowSummary(
             $self->{'Data'}, 
             $regoID, 
@@ -1326,6 +1327,7 @@ sub display_complete {
     my $self = shift;
     my $personObj;
     my $personID = $self->ID();
+print STDERR "~~~IN DISPLAY_COMPLETE\n";
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
     }
@@ -1348,6 +1350,7 @@ sub display_complete {
         );
         $regoID = 0 if !$valid;
     }
+print STDERR "~~~IN DISPLAY_COMPLETE FOR $regoID\n";
 
     if($regoID) {
         $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
@@ -1357,6 +1360,8 @@ sub display_complete {
 
         my $run = $self->{'RunParams'}{'run'} || 0;
         if($self->{'RunParams'}{'newreg'} and ! $run)  {
+
+print STDERR "~~~IN DISPLAY_COMPLETE ABOUT TO ADD WORK TASKS\n";
             my $rc = WorkFlow::addWorkFlowTasks(
                 $self->{'Data'},
                 'PERSON',
