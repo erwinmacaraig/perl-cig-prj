@@ -1439,7 +1439,7 @@ sub checkForOutstandingTasks {
                     updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
                 }
                 # if check  pass call save
-                if($ppref->{'strPersonType'} eq 'PLAYER' and $Data->{'SystemConfig'}{'cleanPlayerPersonRecords'})   {# and ($ppref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_RENEWAL or $ppref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_NEW)) {
+                if($ppref->{'strPersonType'} eq 'PLAYER' and $Data->{'SystemConfig'}{'cleanPlayerPersonRecords'})   {
                     PersonRegistration::cleanPlayerPersonRegistrations($Data, $personID, $personRegistrationID);
                 }
     
