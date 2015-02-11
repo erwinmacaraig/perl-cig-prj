@@ -2201,3 +2201,7 @@ div[id*="doctab"] .documents-list table.table .task-list .status-col a.btn-insid
 	float: right;
 	padding-top: 5px;
 }
+
+.report-option-button-row {
+    margin-bottom:20px;
+}

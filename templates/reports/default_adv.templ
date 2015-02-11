@@ -1,5 +1,5 @@
 [% INCLUDE 'reports/reportoptions_header.templ' %]
-<div class = "report-wrapper table-responsive">
+<div class = "report-wrapper table-responsive" id = "report-data-wrapper">
 <table class="sreport-table table tableboxheader table-striped table-bordered table-condensed [% IF Labels.size > 7 %]shrink-table[% END %]">
 <caption>
 	<div class="report-numrows">[% Lang.txt('Records returned:') %] [% RecordCount %] </div>

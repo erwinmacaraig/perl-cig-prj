@@ -46,8 +46,16 @@ sub handleReports	{
 	my $lang = $Data->{'lang'};
 	my $title = $lang->txt('Reports Manager');
 	my $body = '';
+	if($action eq 'REP_SAVE')	{
+		$body .= convertSavedReport($db, $Data, $clientValues_ref);
+        $action = 'REP_SETUP';
+	}
+	elsif($action eq 'REP_DELETE')	{
+		$body .= deleteSavedReport($db, $Data, $clientValues_ref);
+        $action = 'REP_SETUP';
+	}
 	if($action eq 'REP_SETUP')	{
-		$body = displayReportList($db, $Data, $clientValues_ref);
+		$body .= displayReportList($db, $Data, $clientValues_ref);
 	}
 	else	{
 		my $reportingdb = connectDB('reporting');
@@ -143,6 +151,8 @@ sub getReportObj {
 
 	eval "require $object";	
 	if($object) {
+
+        $otheroptions{'OtherReports'} = getSavedReportsBasedOn($db, $Data, $clientValues_ref, $reportID);
 		my $r = $object->new(
 			Data => $Data,
 			db => $db,
@@ -185,7 +195,6 @@ sub displayReportList	{
             my $active = $cnt == 1 ? 'in active' : '';
 			$groups .=qq[ 
 				<div class="tab-pane fade $active" id="repgroup-$groupkey" role = "tabpanel">
-					<h2 class="section-header">$groupname</h2> 
 			];
 			$lastgroup = $group;
 		}
@@ -198,6 +207,7 @@ sub displayReportList	{
                 : $Data->{'lang'}->txt('Run a Report');
             $groups .= qq[
                 <h4>$subtypename</h4>
+                <div style = "padding-left:20px;">
                 <table class = "table table-striped">
             ];
             for my $report (@{$reports->{$group}{$subtype}})	{
@@ -223,6 +233,9 @@ sub displayReportList	{
                     $repID = $report->{'intSavedReportID'} || '';
                     $buttonevent = '';
                     $buttoncaption = $l->txt('Edit');
+                    $delete = qq[
+                        <a href = "$Data->{'target'}?client=$clientValues->{unesc_client}&amp;a=REP_DELETE&amp;rID=$report->{'intReportID'}&amp;repID=$repID" class = "btn-inside-panels" onclick = "return confirm('].$l->txt('Are you sure you want to delete this saved report?').qq[');">].$Data->{'lang'}->txt('Delete').qq[</a>
+                    ];
                     $run = qq[
                         <a href = "$Data->{'target'}?client=$clientValues->{unesc_client}&amp;a=REP_REPORT&amp;rID=$report->{'intReportID'}&amp;repID=$repID" class = "btn-inside-panels">].$Data->{'lang'}->txt('Run').qq[</a>
                     ];
@@ -234,14 +247,14 @@ sub displayReportList	{
                             $report->{'strDescription'}
                         </td>
                         <td style = "width:200px;">
-                            $delete
                             <a href = "$Data->{'target'}?client=$clientValues->{unesc_client}&amp;a=$newaction&amp;rID=$report->{'intReportID'}&amp;repID=$repID" class = "btn-inside-panels">$buttoncaption</a>
+                            $delete
                             $run
                         </td>
                     </tr>
                 ];
             }
-            $groups .= '</table>';
+            $groups .= '</table></div>';
         }
 		$groups .= '</div>';
 	}
@@ -299,7 +312,6 @@ sub getReportsInfo  {
 	my %reports = ();
 
   my $currentLevel = $clientValues_ref->{'currentLevel'};
-
   my $userID=getID($clientValues_ref, $clientValues_ref->{'authLevel'}) || 0;
   my $realmID = $Data->{'Realm'} || 0;
   my $subRealmID = $Data->{'RealmSubType'} || 0;
@@ -352,7 +364,7 @@ sub getReportsInfo  {
   }
 
     #Now get saved Reports
-      my $st = qq[
+      $st = qq[
         SELECT 
             S.strReportName,
             S.intSavedReportID,
@@ -368,7 +380,7 @@ sub getReportsInfo  {
           AND S.intTemporary = 0
         ORDER BY strReportName
       ];
-      my $q = $db->prepare($st);
+      $q = $db->prepare($st);
       $q->execute(
         $currentLevel,
         $userID,
@@ -453,6 +465,41 @@ sub convert_permissions {
   return \%newperms;
 }
 
+sub getSavedReportsBasedOn {
+    my($db, $Data, $clientValues_ref, $reportID) = @_;
+
+    my $entityTypeID = $clientValues_ref->{'currentLevel'};
+    my $entityID = getID($clientValues_ref, $clientValues_ref->{'authLevel'}) || 0;
+
+    my $st = qq[
+        SELECT 
+            S.strReportName,
+            S.intSavedReportID
+        FROM 
+            tblSavedReports AS S
+        WHERE 
+          S.intLevelID = ?
+          AND S.intID = ?
+          AND S.intTemporary = 0
+          AND S.intReportID = ?
+        ORDER BY strReportName
+    ];
+    my $q = $db->prepare($st);
+    $q->execute(
+        $entityTypeID,
+        $entityID,
+        $reportID,
+    );
+    my @otherreports = ();
+    while (my $dref = $q->fetchrow_hashref()) {
+        push @otherreports, [ 
+            $dref->{'intSavedReportID'} || 0,
+            $dref->{'strReportName'} || '',
+        ];
+    }
+    return \@otherreports;
+}
+
 sub getSavedReportData  {
   my(
 		$Data, 
@@ -512,6 +559,132 @@ sub getReportDisplayConfig	{
 	return \%options;
 }
 
+sub convertSavedReport  {
+    my($db, $Data, $clientValues_ref) = @_;
+
+    my $id = param('repID') || '';
+    my $name = param('repname') || '';
+    my $repreplace = param('repreplace') || '';
+    my $entityTypeID = $clientValues_ref->{'currentLevel'};
+    my $entityID = getID($clientValues_ref, $clientValues_ref->{'authLevel'}) || 0;
+
+    my $error = 0;
+    my $msg = '';
+    if($repreplace) {
+        my $st = qq[
+            SELECT strReportData
+            FROM tblSavedReports
+            WHERE intSavedReportID = ?
+        ];
+        my $q = $Data->{'db'}->prepare($st);
+        $q->execute($id);
+        my ($reportData) = $q->fetchrow_array();
+        $q->finish();
+
+        my $st_u = qq[
+            UPDATE tblSavedReports
+            SET
+                strReportData = ?
+            WHERE 
+                intSavedReportID = ?
+                AND intLevelID = ?
+                AND intID = ?
+        ];
+        my $q_u = $Data->{'db'}->prepare($st_u);
+		$q_u->execute(
+            $reportData,
+            $repreplace,
+            $entityTypeID,
+            $entityID,
+        );
+		$q_u->finish();
+
+        $msg = 'Report Saved';
+    }
+    elsif($name)    {
+        my $st = qq[
+            UPDATE tblSavedReports
+            SET 
+                strReportName = ?,
+                intTemporary = 0
+            WHERE
+                intSavedReportID = ?
+                AND intLevelID = ?
+                AND intID = ?
+        ];
+		my $q = $Data->{'db'}->prepare($st);
+		$q->execute(
+            $name,
+            $id,
+            $entityTypeID,
+            $entityID,
+        );
+		$q->finish();
+        $msg = 'Report Saved';
+    }
+    else {
+        $error = 1;
+        $msg = 'Report not saved';
+
+    }
+    my $alertclass = $error 
+        ? ''
+        : 'fa-info';
+    my $alert = qq[
+<div class="alert">
+    <div>
+        <span class="fa $alertclass fa-exclamation"></span>
+        <p>$msg</p>
+    </div>
+</div>
+    ];
+    return $alert;
+}
+
+sub deleteSavedReport  {
+    my($db, $Data, $clientValues_ref) = @_;
+
+    my $id = param('repID') || '';
+    my $entityTypeID = $clientValues_ref->{'currentLevel'};
+    my $entityID = getID($clientValues_ref, $clientValues_ref->{'authLevel'}) || 0;
+
+    my $error = 0;
+    my $msg = '';
+    if($id) {
+        my $st = qq[
+            DELETE FROM tblSavedReports
+            WHERE
+                intSavedReportID = ?
+                AND intLevelID = ?
+                AND intID = ?
+        ];
+		my $q = $Data->{'db'}->prepare($st);
+		$q->execute(
+            $id,
+            $entityTypeID,
+            $entityID,
+        );
+		$q->finish();
+        $msg = 'Report deleted';
+    }
+    else {
+        $error = 1;
+        $msg = 'Report not deleted';
+
+    }
+    my $alertclass = $error 
+        ? ''
+        : 'fa-info';
+    my $alert = qq[
+<div class="alert">
+    <div>
+        <span class="fa $alertclass fa-exclamation"></span>
+        <p>$msg</p>
+    </div>
+</div>
+    ];
+    return $alert;
+}
 
 
 1;
