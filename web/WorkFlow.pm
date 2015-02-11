@@ -1350,7 +1350,8 @@ sub checkForOutstandingTasks {
             $st = qq[
                     UPDATE tblDocuments
                     SET
-                        strApprovalStatus = 'APPROVED'
+                        strApprovalStatus = 'APPROVED',
+                        dtLastUpdated=NOW()
                     WHERE
                         intDocumentID= ?
                 ];
@@ -1485,7 +1486,8 @@ sub setDocumentStatus  {
 
     $st = qq[
         UPDATE tblDocuments
-        SET strApprovalStatus = ?
+        SET strApprovalStatus = ?,
+                        dtLastUpdated=NOW()
         WHERE
             1=1
     ];
@@ -1783,16 +1785,33 @@ sub verifyDocument {
 
     if($regoID && $documentID){
         $st = qq[
-            UPDATE tblDocuments as D INNER JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (D.intPersonRegistrationID = PR.intPersonRegistrationID AND D.intPersonID=PR.intPersonID) SET D.intPersonRegistrationID = ? WHERE PR.strStatus = 'INPROGRESS' AND D.intUploadFileID= ? AND PR.intRealmID = ?];
+            UPDATE 
+                tblDocuments as D 
+                LEFT JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (
+                    D.intPersonRegistrationID = PR.intPersonRegistrationID 
+                    AND D.intPersonID=PR.intPersonID
+                ) 
+            SET 
+                D.intPersonRegistrationID = ? ,
+                D.dtLastUpdated=NOW()
+            WHERE 
+                D.intPersonRegistrationID > 0
+                AND (
+                    PR.intPersonID IS NULL 
+                    OR PR.strStatus = 'INPROGRESS'
+                ) 
+                AND D.intUploadFileID= ?
+        ];
         $q = $Data->{'db'}->prepare($st);
-        $q->execute($regoID,$documentID,$Data->{'Realm'});
+        $q->execute($regoID,$documentID);
     }
 
 	if($documentID){
     	$st = qq[
         	UPDATE tblDocuments
         	SET
-        	    strApprovalStatus = ?
+        	    strApprovalStatus = ?,
+                dtLastUpdated=NOW()
         	WHERE
         		intUploadFileID = ?
     	];
