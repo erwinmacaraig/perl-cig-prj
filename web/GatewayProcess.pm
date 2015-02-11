@@ -142,7 +142,7 @@ print STDERR "IN GATEWAY PROCESS";
     $m->add($paymentSettings->{'gatewaySalt'}, $chkvalue);
     $chkvalue = $m->hexdigest();
     warn "chkv VS. chkvalue :: $chkv :::::  $chkvalue ";
-    unless ($check_action eq 'skip') {
+    unless ($check_action eq 'SUCCESS') {
         $Order->{'Status'} = -1 if ($chkv ne $chkvalue);
     }
   }

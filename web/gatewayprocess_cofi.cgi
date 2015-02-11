@@ -26,6 +26,8 @@ use TTTemplate;
 use Data::Dumper;
 use GatewayProcess;
 
+use Digest::SHA qw(hmac_sha256_hex);
+
 #use Crypt::CBC;
 
 main();
@@ -64,6 +66,23 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
         #$returnVals{'ei'} = param('ei') || 0;
         $returnVals{'chkv'} = param('chkv') || 0;
 
+        my %Vals = ();
+        $Vals{'VERSION'}= param('VERSION') || '';
+        $Vals{'STAMP'}= param('STAMP') || '';
+        $Vals{'REFERENCE'}= param('REFERENCE') || '';
+        $Vals{'PAYMENT'}= param('PAYMENT') || '';
+        $Vals{'STATUS'}= param('STATUS') || '';
+        $Vals{'ALGORITHM'}= param('ALGORITHM') || '';
+        $Vals{'MAC'}= param('MAC') || '';
+        
+        my $str = "$Vals{'VERSION'}&$Vals{'STAMP'}&$Vals{'REFERENCE'}&$Vals{'PAYMENT'}&$Vals{'STATUS'}&$Vals{'ALGORITHM'}";
+        my $digest=uc(hmac_sha256_hex($str, "SAIPPUAKAUPPIAS"));
+        my $chkAction = 'FAILURE';
+        if ($Vals{'MAC'} eq $digest)    {
+            $chkAction = 'SUCCESS';
+        }
+print STDERR "MAC ACTION IS $chkAction\n";
+
         $returnVals{'GATEWAY_TXN_ID'}= param('PAYMENT') || '';
         $returnVals{'GATEWAY_AUTH_ID'}= param('REFERENCE') || '';
         #$returnVals{'GATEWAY_SETTLEMENT_DATE'}= param('settdate') || '';
@@ -73,7 +92,7 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
         $returnVals{'GATEWAY_RESPONSE_TEXT'}= param('REFERENCE') || '';
         $returnVals{'Other1'} = $co_status || '';
         $returnVals{'Other2'} = param('MAC') || '';
-        gatewayProcess(\%Data, $logID, $client, \%returnVals, 'skip');
+        gatewayProcess(\%Data, $logID, $client, \%returnVals, $chkAction);
     }
 
 	disconnectDB($db);
