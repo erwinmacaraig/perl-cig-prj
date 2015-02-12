@@ -480,10 +480,12 @@ sub deleteFile	{
 		);
 
                 ### DELETE FROM tblDocuments ###
-                $st_d = qq[ DELETE FROM tblDocuments WHERE intUploadFileID = ?]; 
-                $q_d = $Data->{'db'}->prepare($st_d);
-                $q_d->execute( $fileID, );
-                ## END DELETE FROM tblDocuments ### 
+				
+				    $st_d = qq[ DELETE FROM tblDocuments WHERE intUploadFileID = ?]; 
+    	            $q_d = $Data->{'db'}->prepare($st_d);
+    	            $q_d->execute( $fileID, );
+    	            ## END DELETE FROM tblDocuments ### 
+				
 		$q_d->finish();
 		return 1;
 	}
