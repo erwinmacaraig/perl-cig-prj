@@ -252,6 +252,7 @@ sub pageMain {
         Menu => '',
         HomeURL => "$Data->{'target'}?client=$homeClient&amp;a=".$HomeAction{$Data->{'clientValues'}{'authLevel'}},
         AtLoginLevel => $atloginlevel,
+        HeaderLogo => $Data->{'SystemConfig'}{'MA_logo'},
     );
 
   my $globalnav = runTemplate(
