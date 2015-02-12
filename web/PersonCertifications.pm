@@ -48,6 +48,7 @@ sub cleanPersonCertifications   {
             tblPersonCertifications as PC
             INNER JOIN tblCertificationTypes as CT ON (PC.intCertificationTypeID = CT.intCertificationTypeID)
         SET 
+            PC.strPreviousStatus = IF(PC.strPreviousStatus<>'', PC.strPreviousStatus, PC.strStatus),
             PC.strStatus = 'INACTIVE'
         WHERE
             CT.strCertificationType = ?
