@@ -6,6 +6,7 @@ require Exporter;
   getPersonCertificationTypes
   addPersonCertification
   deletePersonCertification
+  cleanPersonCertifications         
 );
 
 use strict;
@@ -18,6 +19,56 @@ use Data::Dumper;
 use GridDisplay;
 use CGI qw(param unescape escape cookie);
  
+sub cleanPersonCertifications   {
+    
+	my ($Data, $personID) = @_; 
+
+    my $st = qq[
+        SELECT 
+            MAX(CT.intActiveOrder) as maxOrder, 
+            CT.strCertificationType
+        FROM 
+            tblPersonCertifications as PC 
+            INNER JOIN tblCertificationTypes as CT ON (PC.intCertificationTypeID = CT.intCertificationTypeID)
+        WHERE
+            PC.intPersonID = ?
+            AND PC.intRealmID = ?
+            AND PC.strStatus = 'ACTIVE'
+        GROUP BY        
+            CT.strCertificationType
+    ];
+    my $qry = $Data->{'db'}->prepare($st); 
+    $qry->execute(
+        $personID,
+        $Data->{'Realm'}
+    );
+
+    my $upd = qq[
+        UPDATE 
+            tblPersonCertifications as PC
+            INNER JOIN tblCertificationTypes as CT ON (PC.intCertificationTypeID = CT.intCertificationTypeID)
+        SET 
+            PC.strPreviousStatus = IF(PC.strPreviousStatus<>'', PC.strPreviousStatus, PC.strStatus),
+            PC.strStatus = 'INACTIVE'
+        WHERE
+            CT.strCertificationType = ?
+            AND PC.intPersonID = ?
+            AND CT.intActiveOrder < ?
+            AND CT.intActiveOrder > 0
+            AND PC.intRealmID = ?
+            AND PC.strStatus = 'ACTIVE'
+    ];
+    my $qryUpd = $Data->{'db'}->prepare($upd); 
+    while(my $dref = $qry->fetchrow_hashref()){
+        $qryUpd->execute(
+            $dref->{'strCertificationType'},
+            $personID,
+            $dref->{'maxOrder'},
+            $Data->{'Realm'}
+        );
+    }
+}
+
 sub handleCertificates {
 	my ($action, $Data, $personID) = @_; 
 	my $client = setClient($Data->{'clientValues'});
@@ -203,9 +254,9 @@ sub handleCertificates {
         'PersonCertification'
       ],
       afteraddFunction => \&postCertificateAdd,
-      afteraddParams => [$Data, $client],
+      afteraddParams => [$Data, $personID],
       afterupdateFunction => \&postCertificateUpdate,
-      afterupdateParams => [$Data, $client, $intCertificationID],
+      afterupdateParams => [$Data, $client, $intCertificationID, $personID],
       LocaleMakeText => $Data->{'lang'},
                	
                },
@@ -232,8 +283,9 @@ sub handleCertificates {
 
 
 sub postCertificateUpdate {
-	my($id,$params,$Data,$client,$intCertificationID) = @_; 	
+	my($id,$params,$Data,$client,$intCertificationID, $personID) = @_; 	
 	#my $client = setClient($Data->{'clientValues'});	 
+     cleanPersonCertifications($Data, $personID);
 	return (0,qq[
         <div class="OKmsg"> Certificate Updated Successfully</div><br>
         <a href="$Data->{'target'}?client=$client&amp;a=P_CERT_VW&amp;certID=$intCertificationID">To View Certificate Details </a><br><br>
@@ -243,7 +295,8 @@ sub postCertificateUpdate {
 }
 
 sub postCertificateAdd {
-  my($id,$params,$Data)=@_;
+  my($id,$params,$Data, $personID)=@_;
+     cleanPersonCertifications($Data, $personID);
 	my $client = setClient($Data->{'clientValues'});	 
 	return (0,qq[
         <div class="OKmsg"> Certificate Added Successfully</div><br>
@@ -441,6 +494,8 @@ sub addPersonCertification {
             warn($DBI::errstr);
             return 0;
         }
+        cleanPersonCertifications($Data, $personID);
+        
         return 1;
     }
 }

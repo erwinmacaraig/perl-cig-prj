@@ -17,11 +17,11 @@
         [% IF showButtons %]
         <div class = "docViewerButtons txtcenter">	
 		
-			<span>[% IF showApproveButton %]<a href="#" onclick="updateFileStatus([% intFileID %],'APPROVED','[% client %]'); return false;" class="btn-main">[% Lang.txt('APPROVE') %]</a> [% END %]</span> 
+			<span>[% IF showApproveButton %]<a href="#" onclick="updateFileStatus([% intFileID %],'APPROVED','[% client %]','[% regoID %]'); return false;" class="btn-main">[% Lang.txt('APPROVE') %]</a> [% END %]</span> 
 
 
 		
-            <span>[% IF showRejectButton %]<a href="#" onclick="updateFileStatus([% intFileID %],'REJECTED','[% client %]'); return false;" class="btn-main">[% Lang.txt('REJECT') %]</a> [% END %]</span> 
+            <span>[% IF showRejectButton %]<a href="#" onclick="updateFileStatus([% intFileID %],'REJECTED','[% client %]',[% regoID %]); return false;" class="btn-main">[% Lang.txt('REJECT') %]</a> [% END %]</span> 
 
         </div>
        [% END %]
@@ -58,11 +58,11 @@
         closeDocViewer();
         return false;
     });
-    function updateFileStatus(fileID,status,client){ 		
+    function updateFileStatus(fileID,status,client,regoID){ 		
 		jQuery.ajax({
 			method: "POST",
 			url:"main.cgi",
-			data:"a=WF_Verify" + "&f=" + fileID + "&status=" + status + "&client="+client,
+			data:"a=WF_Verify" + "&f=" + fileID + "&status=" + status + "&client="+client + "&regoID="+regoID,
 		}).done(
 
             function(){
