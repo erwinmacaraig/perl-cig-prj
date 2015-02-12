@@ -22,18 +22,25 @@ use CGI qw(param unescape escape);
 use ExternalGateway;
 use Gateway_Common;
 use TTTemplate;
+use PersonFlow;
+use TransferFlow;
+use BulkRenewalsFlow;
+
 use Data::Dumper;
 
 sub payTryContinueProcess {
 
-    my ($Data, $payTry, $client, $logID, $autoRun) = @_;
+    my ($Data, $payTry, $client, $logID) = @_;
 
-    print STDERR Dumper($payTry);
     $payTry->{'return'} = 1;
     if ($payTry->{'strContinueAction'} eq 'REGOFLOW')   {
-print STDERR "CONTINUE PROCESS~!!!!!!\n";
-        use PersonFlow;
         handlePersonFlow($payTry->{'a'}, $Data, $payTry);
+    }
+    if ($payTry->{'strContinueAction'} eq 'TRANSFER')   {
+        handleTransferFlow($payTry->{'a'}, $Data, $payTry);
+    }
+    if ($payTry->{'strContinueAction'} eq 'BULKRENEWALS')   {
+        handleBulkRenewalsFlow($payTry->{'a'}, $Data, $payTry);
     }
 
     return;

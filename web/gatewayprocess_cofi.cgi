@@ -67,7 +67,6 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
         my %returnVals = ();
         $returnVals{'action'} = param('sa') || 0;
         $returnVals{'ext'} = param('ext') || 0;
-        #$returnVals{'ei'} = param('ei') || 0;
         $returnVals{'chkv'} = param('chkv') || 0;
 
         my %Vals = ();
@@ -94,10 +93,17 @@ print STDERR "MAC ACTION IS $chkAction\n";
 
         $returnVals{'GATEWAY_TXN_ID'}= param('PAYMENT') || '';
         $returnVals{'GATEWAY_AUTH_ID'}= param('REFERENCE') || '';
-        #$returnVals{'GATEWAY_SETTLEMENT_DATE'}= param('settdate') || '';
         my $co_status = param('STATUS') || '';
         $returnVals{'GATEWAY_RESPONSE_CODE'}= "99";
-        $returnVals{'GATEWAY_RESPONSE_CODE'}= "OK" if ($co_status eq "2");
+        $returnVals{'GATEWAY_RESPONSE_CODE'}= "OK" if (
+            $co_status eq "2" 
+            or $co_status eq "5" 
+            or $co_status eq "6"
+            or $co_status eq "7"
+            or $co_status eq "8"
+            or $co_status eq "9"
+            or $co_status eq "10"
+        );
         $returnVals{'GATEWAY_RESPONSE_TEXT'}= param('REFERENCE') || '';
         $returnVals{'Other1'} = $co_status || '';
         $returnVals{'Other2'} = param('MAC') || '';
@@ -106,7 +112,7 @@ print STDERR "MAC ACTION IS $chkAction\n";
 
 	disconnectDB($db);
     if ($process_action eq '1')    {
-        payTryContinueProcess(\%Data, $payTry, $client, $logID, 1);
+        payTryContinueProcess(\%Data, $payTry, $client, $logID);
     }
 
     if ($display_action eq '1')    {

@@ -382,6 +382,7 @@ print STDERR "ROLLOVERIDs:" . $self->getCarryFields('rolloverIDs') . "\n";
         my $hiddenFields = $self->getCarryFields();
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
+        $hiddenFields->{'cA'} = "BULKRENEWALS";
         ($content, $gatewayConfig) = displayRegoFlowSummaryBulk(
             $self->{'Data'}, 
             $regoID, 

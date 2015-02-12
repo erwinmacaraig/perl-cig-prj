@@ -15,6 +15,7 @@ use Data::Dumper;
 sub handlePersonFlow {
     my ($action, $Data, $paramRef) = @_;
 
+    my $paramRef ||= undef;
     my $body = '';
     my $title = '';
     my $client = $Data->{'client'};
@@ -22,7 +23,7 @@ sub handlePersonFlow {
     my $cl = setClient($clientValues);
     my $rego_ref = {};
     my $cgi=new CGI;
-    if ($paramRef->{'return'})  {
+    if (defined $paramRef && $paramRef->{'return'})  {
         foreach my $k (keys %{$paramRef})   {
             $cgi->param(-name=>$k, -value=>$paramRef->{$k});
         }
@@ -38,8 +39,6 @@ sub handlePersonFlow {
     my $defaultRegistrationNature = $params{'dnat'} || '';
     my $internationalTransfer = $params{'itc'} || '';
     my $startingStep = $params{'ss'} || '';
-
-
 
     #specific to Transfers
     my $personRequestID = $params{'prid'} || '';
