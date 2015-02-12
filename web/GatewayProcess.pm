@@ -31,6 +31,7 @@ use Data::Dumper;
 sub payTryContinueProcess {
 
     my ($Data, $payTry, $client, $logID) = @_;
+print STDERR "********** IN payTryContinueProcess FOR $logID for $payTry->{'strContinueAction'}\n";
 
     $payTry->{'return'} = 1;
     if ($payTry->{'strContinueAction'} eq 'REGOFLOW')   {
@@ -42,7 +43,6 @@ sub payTryContinueProcess {
     if ($payTry->{'strContinueAction'} eq 'BULKRENEWALS')   {
         handleBulkRenewalsFlow($payTry->{'a'}, $Data, $payTry);
     }
-
     return;
 }
 
@@ -67,14 +67,8 @@ print STDERR "IN REDIRECT BACK!!\n";
         next if $k =~/^pt_submit/;
         $redirect_link .= "&$k=".$payTry->{$k};
     }
-    my $body = "HELLO";
-    #print "Content-type: text/html\n\n";
-    #print $body;
-    #print qq[<a href="$redirect_link">LINK</a><br>$redirect_link];
     return $redirect_link if ! $autoRun;
 
-print STDERR $redirect_link;
-print STDERR "SSSS";
     print "Status: 302 Moved Temporarily\n";
     print "Location: $redirect_link\n\n";
     return;
@@ -115,7 +109,6 @@ sub payTryRead  {
     my $query = $Data->{'db'}->prepare($st);
     $query->execute($id);
     my $href = $query->fetchrow_hashref();
-print STDERR $st;
     my $values = JSON::from_json($href->{'strLog'});
     $values->{'strContinueAction'} = $href->{'strContinueAction'};
     return $values;

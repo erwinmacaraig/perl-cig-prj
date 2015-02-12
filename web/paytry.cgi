@@ -79,7 +79,6 @@ sub main	{
     }
 
     my ($logID, $amount, $chkvalue, $session, $paymentSettings) = Payments::checkoutConfirm(\%Data, $paymentType, \@transactions,1,1);
-print STDERR "CHK VALUE IS $chkvalue\n";
     
 	my $st = qq[
         INSERT INTO tblPayTry (
@@ -118,11 +117,9 @@ print STDERR "CHK VALUE IS $chkvalue\n";
 
 
     if ($paymentSettings->{'gatewayCode'} eq 'NABExt1') {
-        print STDERR "YEP";
         $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;chkv=$chkvalue&amp;session=$session&amp;amount=$amount];
     }
     if ($paymentSettings->{'gatewayCode'} eq 'checkoutfi')  {
-        print STDERR "CHECKOUT FINLAND";
         $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;chkv=$chkvalue&amp;session=$session];
         my $cents = $amount * 100;
         my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
@@ -131,10 +128,15 @@ print STDERR "CHK VALUE IS $chkvalue\n";
         $Month = sprintf("%02s", $Month);
         my $DeliveryDate = "$Year$Month$Day";
         #my $cancelURL = $Defs::base_url . $paymentSettings->{'gatewayCancelURL'} . qq[&ci=$logID&client=$client]; 
+        my $delayedURL= "http://fspotest.sportingpulseinternational.com/cofi.cgi"; #$Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=1&client=$client&ci=$logID&chkv=$chkvalue&session=$session];
+        my $delayedURL= $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=1&client=$client&ci=$logID&chkv=$chkvalue&session=$session];
         my $cancelURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=0&da=1&client=$client&ci=$logID&chkv=$chkvalue&session=$session];
         my $returnURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&client=$client&ci=$logID&chkv=$chkvalue&session=$session];
         my $rejectURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&client=$client&ci=$logID&chkv=$chkvalue&session=$session];
-        my $delayedURL= $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=1&client=$client&ci=$logID&chkv=$chkvalue&session=$session];
+
+        #$cancelURL = $delayedURL;
+        #$returnURL = $delayedURL;
+        #$rejectURL = $delayedURL;
 
         $gatewaySpecific{'VERSION'} = "0001";
         $gatewaySpecific{'STAMP'} = $logID;
@@ -163,12 +165,10 @@ print STDERR "CHK VALUE IS $chkvalue\n";
 
         my $m = new MD5;
         my $coKey = $gatewaySpecific{'VERSION'} ."+". $gatewaySpecific{'STAMP'} ."+". $gatewaySpecific{'AMOUNT'} ."+". $gatewaySpecific{'REFERENCE'} ."+". $gatewaySpecific{'MESSAGE'} ."+". $gatewaySpecific{'LANGUAGE'} ."+". $gatewaySpecific{'MERCHANT'} ."+". $gatewaySpecific{'RETURN'} ."+". $gatewaySpecific{'CANCEL'} ."+". $gatewaySpecific{'REJECT'} ."+". $gatewaySpecific{'DELAYED'} ."+". $gatewaySpecific{'COUNTRY'} ."+". $gatewaySpecific{'CURRENCY'} ."+". $gatewaySpecific{'DEVICE'} ."+". $gatewaySpecific{'CONTENT'} ."+". $gatewaySpecific{'TYPE'} ."+". $gatewaySpecific{'ALGORITHM'} ."+". $gatewaySpecific{'DELIVERY_DATE'} ."+". $gatewaySpecific{'FIRSTNAME'} ."+". $gatewaySpecific{'FAMILYNAME'} ."+". $gatewaySpecific{'ADDRESS'} ."+". $gatewaySpecific{'POSTCODE'} ."+". $gatewaySpecific{'POSTOFFICE'} ."+". $paymentSettings->{'gatewayPassword'};
-print STDERR "$coKey\n";
     
         $m->reset();
         $m->add($coKey);
         my $authKey= uc($m->hexdigest());
-print STDERR $authKey;
         $gatewaySpecific{'MAC'} = $authKey;
 
         $gatewaySpecific{'EMAIL'} = "";

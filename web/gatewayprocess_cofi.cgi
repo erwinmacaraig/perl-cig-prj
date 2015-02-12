@@ -36,6 +36,7 @@ main();
 sub main	{
 
     ## Need one of these PER gateway
+print STDERR "IN GATEWAYPROCESS_cofi\n";
 
 	my $logID= param('STAMP') || param('ci') || 0;
 	my $submit_action= param('sa') || '';
