@@ -285,6 +285,15 @@ sub listPersons {
 
 
     $title = $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'} in $Data->{'LevelNames'}{$type}");
+    if ($type == $Defs::LEVEL_NATIONAL) {
+        $title = $lang->txt("List of people registered directly with the Member Association");
+    }
+    if ($type == $Defs::LEVEL_REGION) {
+        $title = $lang->txt("List of people registered directly with the Region");
+    }
+    if ($type == $Defs::LEVEL_CLUB) {
+        $title = $lang->txt("List of people registered with the Club");
+    }
 
     my %typeValues = (); 
     my %subRoleValues = ();
