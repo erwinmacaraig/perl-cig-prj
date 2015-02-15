@@ -6,6 +6,8 @@ CREATE TABLE tblPayTry  (
     intTransLogID INT default 0,
     strLog text,
     dtTry datetime default NULL,
+    strContinueAction varchar(50) default '';
+
     tTimeStamp TIMESTAMP,
   PRIMARY KEY  (intTryID),
   KEY index_realmID (intRealmID),
