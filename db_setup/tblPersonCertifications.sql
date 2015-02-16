@@ -8,5 +8,6 @@ CREATE TABLE IF NOT EXISTS `tblPersonCertifications` (
   `dtValidUntil` DATE NULL,
   `strDescription` VARCHAR(250) NULL,
   `strStatus` VARCHAR(45) NOT NULL DEFAULT 'ACTIVE',
+  strPreviousStatus VARCHAR(45) DEFAULT '',
   PRIMARY KEY (`intCertificationID`)
 ) DEFAULT CHARSET=utf8;

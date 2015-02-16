@@ -5,10 +5,10 @@
                 <th>[% Lang.txt('MA ID') %]</th>
                 <th>[% Lang.txt('Name') %]</th>
                 <th>[% Lang.txt('Date of Birth') %]</th>
-                <th>[% Lang.txt('Type') %]</th>
                 <th>[% Lang.txt('Role') %]</th>
+                <th>[% Lang.txt('Sub-Role') %]</th>
                 <th>[% Lang.txt('Level') %]</th>
-                <th>[% Lang.txt('Certificate') %]</th>
+                <th>[% Lang.txt('Certificates') %]</th>
                 <th>&nbsp;</th>
             </tr>
             <tr>
@@ -76,7 +76,7 @@
                 <tr class="task-list">
                     <td><span class="fa fa-user"></span>[% rego.strNationalNum %]</td>
                     <td>[% rego.strLocalFirstname %] [% rego.strLocalSurname %]</td>
-                    <td data-order = "[% rego.dtDOB %]">[% DateFormat.format(rego.dtDOB,'MEDIUM') %]</td>
+                    <td data-order = "[% rego.dtDOB %]" style = "white-space: nowrap;">[% DateFormat.format(rego.dtDOB,'MEDIUM') %]</td>
                     <td>[% rego.types %]</td>
                     <td><span style = "[% IF rego.subtypes.length > 110 %]font-size:10px;[% END %]">[% rego.subtypes%]</span></td>
                     <td>[% rego.levels %]</td>

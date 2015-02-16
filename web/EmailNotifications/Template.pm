@@ -60,7 +60,6 @@ sub retrieve {
             et.strTextTemplatePath,
             et.strSubjectPrefix,
             et.intLanguageID,
-            tl.strLocale,
             toEntity.strEmail as toEntityEmail,
             toEntity.strContactEmail as toEntityContactEmail,
             toEntity.strLocalName as toEntityName,
@@ -74,7 +73,6 @@ sub retrieve {
         FROM tblEmailTemplateTypes ett
             INNER JOIN tblRealms r ON (r.intRealmID = ett.intRealmID)
             INNER JOIN tblEmailTemplates et ON (et.intEmailTemplateTypeID = ett.intEmailTemplateTypeID)
-            INNER JOIN tblLanguages tl ON (tl.intLanguageID = et.intLanguageID AND tl.intRealmID = ett.intRealmID)
             INNER JOIN tblEntity toEntity ON (toEntity.intRealmID = ett.intRealmID AND toEntity.intEntityID = ?)
             INNER JOIN tblEntity fromEntity ON (fromEntity.intRealmID = ett.intRealmID AND fromEntity.intEntityID = ?)
             LEFT JOIN tblContactRoles tcrs ON (tcrs.intRealmID = ett.intRealmID AND tcrs.strRoleName = 'Secretary')
@@ -89,6 +87,8 @@ sub retrieve {
         LIMIT 1
 
     ];
+    #tl.strLocale,
+    #INNER JOIN tblLanguages tl ON (tl.intLanguageID = et.intLanguageID AND tl.intRealmID = ett.intRealmID)
 
     #ADD LOCALE CHECK ON tblLanguages or SystemConfig->DefaultLocale or Cookie_Locale
     my $q = $self->{_notificationObj}->getDbh()->prepare($st);

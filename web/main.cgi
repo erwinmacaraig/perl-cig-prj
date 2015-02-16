@@ -68,6 +68,7 @@ use EntityRegistrationAllowedEdit;
 use PersonRegistrationFlow_Backend;
 use PersonRegistrationFlow_Bulk;
 use PendingRegistrations;
+use IncompleteRegistrations;
 
 use PersonRequest;
 
@@ -302,7 +303,11 @@ use TransferFlow;
         my $entityID = getID($Data{'clientValues'},$Data{'clientValues'}{'currentLevel'});
         ( $resultHTML, $pageHeading ) = handlePendingRegistrations($action, \%Data, $entityID, $prID);
        # $pageHeading = $pageHeading . "entityID = " . $entityID;    
-}
+    }
+    elsif ( $action =~ /^INCOMPLPR_/ ) {
+        my $entityID = getID($Data{'clientValues'},$Data{'clientValues'}{'currentLevel'});
+        ( $resultHTML, $pageHeading ) = handleIncompleteRegistrations($action, \%Data, $entityID);
+    }
     elsif ( $action =~ /^PRA_/) {
         ($resultHTML, $pageHeading) = handlePersonRequest($action, \%Data);
     }
