@@ -1004,28 +1004,28 @@ sub addWorkFlowTasks {
 	if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
 	}
-	#$st = qq[
-	#	INSERT IGNORE INTO tblWFTaskPreReq (
-	#		intWFTaskID,
-	#		intWFRuleID,
-	#		intPreReqWFRuleID
-	#	)
-	#	SELECT
-	#		t.intWFTaskID,
-	#		t.intWFRuleID,
-	#		rpr.intPreReqWFRuleID
-	#	FROM tblWFTask AS t
-	#	INNER JOIN tblWFRulePreReq AS rpr
-	#		ON t.intWFRuleID = rpr.intWFRuleID
-	#	WHERE t.intPersonRegistrationID = ?
-	#	];
-#
-#  	$q = $db->prepare($st);
-#  	$q->execute($personRegistrationID);
-#
-#	if ($q->errstr) {
-#		return $q->errstr . '<br>' . $st;
-#	}
+	$st = qq[
+		INSERT IGNORE INTO tblWFTaskPreReq (
+			intWFTaskID,
+			intWFRuleID,
+			intPreReqWFRuleID
+		)
+		SELECT
+			t.intWFTaskID,
+			t.intWFRuleID,
+			rpr.intPreReqWFRuleID
+		FROM tblWFTask AS t
+		INNER JOIN tblWFRulePreReq AS rpr
+			ON t.intWFRuleID = rpr.intWFRuleID
+		WHERE t.intPersonRegistrationID = ?
+		];
+
+  	$q = $db->prepare($st);
+  	$q->execute($personRegistrationID);
+
+	if ($q->errstr) {
+		return $q->errstr . '<br>' . $st;
+	}
 
 	my $rc = checkForOutstandingTasks($Data, $ruleFor, '', $entityID, $personID, $personRegistrationID, $documentID);
 
