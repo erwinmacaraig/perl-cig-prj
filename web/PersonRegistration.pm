@@ -34,8 +34,10 @@ sub cleanPlayerPersonRegistrations  {
 
     my ($Data, $personID, $personRegistrationID) = @_;
 
+    my @statusIN = ($Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);
     my %Reg = (
         personRegistrationID=> $personRegistrationID || 0,
+        statusIN => \@statusIN,
     );
     my ($count, $reg_ref) = getRegistrationData(
         $Data,
@@ -55,7 +57,6 @@ sub cleanPlayerPersonRegistrations  {
         addPERecord($Data, $personID, $entityID, \%PE) if (! $peID)
     }
     
-    my @statusIN = ($Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);
 
 
     my %ExistingReg = (

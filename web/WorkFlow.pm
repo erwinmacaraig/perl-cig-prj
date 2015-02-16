@@ -1175,7 +1175,7 @@ sub approveTask {
     }
 
    	my $rc = checkForOutstandingTasks($Data,$ruleFor, $taskType, $entityID, $personID, $personRegistrationID, $documentID);
-
+	
     return($rc);
 
 }
@@ -1350,7 +1350,8 @@ sub checkForOutstandingTasks {
             $st = qq[
                     UPDATE tblDocuments
                     SET
-                        strApprovalStatus = 'APPROVED'
+                        strApprovalStatus = 'APPROVED',
+                        dtLastUpdated=NOW()
                     WHERE
                         intDocumentID= ?
                 ];
@@ -1485,7 +1486,8 @@ sub setDocumentStatus  {
 
     $st = qq[
         UPDATE tblDocuments
-        SET strApprovalStatus = ?
+        SET strApprovalStatus = ?,
+                        dtLastUpdated=NOW()
         WHERE
             1=1
     ];
@@ -1774,18 +1776,47 @@ sub verifyDocument {
 
     #my $WFTaskID = safe_param('TID','number') || '';
     #my $documentID = safe_param('did','number') || '';
-	my  $documentID = safe_param('f','number') || 0;
+	my $documentID = safe_param('f','number') || 0;
+	my $regoID = safe_param('regoID','number') || 0;
 	my $documentStatus = param('status') || '';
+
+	my $st;
+	my $q;
+
+    if($regoID && $documentID){
+        $st = qq[
+            UPDATE 
+                tblDocuments as D 
+                LEFT JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (
+                    D.intPersonRegistrationID = PR.intPersonRegistrationID 
+                    AND D.intPersonID=PR.intPersonID
+                ) 
+            SET 
+                D.intPersonRegistrationID = ? ,
+                D.dtLastUpdated=NOW()
+            WHERE 
+                D.intPersonRegistrationID > 0
+                AND (
+                    PR.intPersonID IS NULL 
+                    OR PR.strStatus = 'INPROGRESS'
+                ) 
+                AND D.intUploadFileID= ?
+        ];
+        $q = $Data->{'db'}->prepare($st);
+        $q->execute($regoID,$documentID);
+    }
+
 	if($documentID){
-    	my $st = qq[
+    	$st = qq[
         	UPDATE tblDocuments
         	SET
-        	    strApprovalStatus = ?
+        	    strApprovalStatus = ?,
+                dtLastUpdated=NOW()
         	WHERE
         		intUploadFileID = ?
     	];
 
-    	my $q = $Data->{'db'}->prepare($st);
+    	$q = $Data->{'db'}->prepare($st);
     	$q->execute(
 			$documentStatus,
         	$documentID
@@ -3119,9 +3150,10 @@ sub populateDocumentViewData {
 
             my $action = "view";
             $action = "review" if($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityAdd'} == 1);
-
-           	$viewLink = qq[ <span style="position: relative"> 
-<a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$Data->{'client'}&amp;a=$action');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];			
+			$parameters = qq[client=$Data->{'client'}&amp;a=$action];
+			$parameters .= qq[&regoID=$registrationID] if($registrationID); 
+			$viewLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'$parameters');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];	
+           	#$viewLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$Data->{'client'}&amp;a=$action');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];			
         }
 
         if($tdref->{'strLockAtLevel'})   {
