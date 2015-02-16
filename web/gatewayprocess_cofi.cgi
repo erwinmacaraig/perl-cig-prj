@@ -55,9 +55,14 @@ print STDERR Dumper(\%params);
 print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
     my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     $Data{'lang'}=$lang;
-    $Data{'clientValues'} = $payTry;
-    my $client= setClient(\%{$payTry});
+    #$Data{'clientValues'} = $payTry;
+    #my $client= setClient(\%{$payTry});
+    #$Data{'client'}=$client;
+    my %clientValues = getClient($payTry->{'client'});
+    my $client= setClient(\%clientValues);
     $Data{'client'}=$client;
+    $Data{'clientValues'} = \%clientValues;
+
     $Data{'sessionKey'} = $payTry->{'session'};
     getDBConfig(\%Data);
     $Data{'SystemConfig'}=getSystemConfig(\%Data);
