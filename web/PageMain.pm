@@ -465,7 +465,7 @@ my $h3eader = $o->header();
 }
 
 sub regoPageForm {
-    my($title, $body, $clientValues_ref,$client, $Data) = @_;
+    my($title, $body, $clientValues_ref, $client, $Data) = @_;
     $title ||= '';
     $body||= textMessage("Oops !<br> This shouldn't be happening!<br> Please contact <a href=\"mailto:info\@sportingpulse.com\">info\@sportingpulse.com</a>");
     $Data->{'TagManager'}=''; #getTagManager($Data);
@@ -491,36 +491,14 @@ sub regoPageForm {
         print "Content-type: text/html\n\n";
     }
 
-    my ($html_head, $page_header, $page_navigator, $paypal, $powered) = getPageCustomization($Data);
-    my $meta = {};
-    $meta->{'title'} = $title;
-    $meta->{'head'} = $html_head;
-    $meta->{'page_begin'} = qq[
-        <div id="global-nav-wrap">
-        $page_navigator
-        </div>
-    ];
-    $meta->{'page_header'} = qq[
-        <div> 
-        $page_header 
-        </div>
-    ];
+    print runTemplate(
+        $Data,      
+        {
+            Content => $body,
 
-    $meta->{'page_content'} = $body;
-    $meta->{'page_footer'} = qq [
-        <div id="footer-links">
-            $powered
-        </div>
-    ];
-    $meta->{'page_end'} = qq [
-        <script type="text/javascript">
-        $Data->{'TagManager'}
-        </script>
-    ];
-
-    print runTemplate($Data, $meta, 'regoform/main.templ');
-    #New regoform wrapper not ready for public consumption, Regs 16/4/14
-    #print runTemplate($Data, $meta, 'regoform/main_2014.templ');
+        },
+       'selfrego/wrapper.templ'
+    );
 }
 
 sub getPageCustomization{

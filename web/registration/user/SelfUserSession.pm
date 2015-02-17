@@ -1,12 +1,12 @@
-package UserSession;
+package SelfUserSession;
 require Exporter;
 
 use strict;
 use CGI;
 
-use lib "user","../user","../../user";
+use lib "user","../user";
 use Data::Random qw(:all);
-use UserObj;
+use SelfUserObj;
 
 sub new {
   my $this = shift;
@@ -55,7 +55,7 @@ sub create  {
   $self->{'key'} = _newKey();
     
   if($self->{'UserID'}) {
-    my $user = new UserObj(db => $self->{'db'}, id => $self->{'UserID'});
+    my $user = new SelfUserObj(db => $self->{'db'}, id => $self->{'UserID'});
     if($user->ID()) {
       my %cdata = (
         UserID => $user->ID(),
@@ -66,7 +66,7 @@ sub create  {
       );
 
       if($self->{'cache'})  {
-        $self->{'cache'}->set('swm',"USESSION-".$self->{'key'}, \%cdata,'',8*60*60);
+        $self->{'cache'}->set('swm',"SRSESSION-".$self->{'key'}, \%cdata,'',8*60*60);
       }
     }
   }
@@ -79,12 +79,12 @@ sub load {
   my ($sessionK) = @_;
 
   my $output = new CGI;
-  my $sessionkey = $sessionK || $output->cookie($Defs::COOKIE_LOGIN) || '';
+  my $sessionkey = $sessionK || $output->cookie($Defs::COOKIE_SRLOGIN) || '';
   return undef if !$sessionkey;
   my $info = '';
   my $userID = 0;
   if($self->{'cache'})  {
-    $info = $self->{'cache'}->get('swm',"USESSION-$sessionkey");
+    $info = $self->{'cache'}->get('swm',"SRSESSION-$sessionkey");
   }
   if($info) {
     $userID = $info->{'UserID'} || 0;

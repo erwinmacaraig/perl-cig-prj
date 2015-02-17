@@ -21,13 +21,13 @@ use Email;
 use PaymentSplitExport;
 use ServicesContacts;
 use TemplateEmail;
-use RegoFormUtils;
+#use RegoFormUtils;
 use ContactsObj;
 
 require Products;
 require TransLog;
 require PaymentSplitMoneyLog;
-require RegoForm::RegoFormFactory;
+#require RegoForm::RegoFormFactory;
   
 sub handlePayments	{
 

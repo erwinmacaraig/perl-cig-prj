@@ -27,8 +27,8 @@ use HTTP::Request::Common qw(POST);
 use LWP::UserAgent;
 use CGI qw(param unescape escape);
 
-use RegoForm_MemberFunctions qw(rego_addRealMember);
-use RegoForm::RegoFormFactory;
+#use RegoForm_MemberFunctions qw(rego_addRealMember);
+#use RegoForm::RegoFormFactory;
 
 use PageMain;
 use Log;
