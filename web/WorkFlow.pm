@@ -1783,15 +1783,7 @@ sub verifyDocument {
 	my $st;
 	my $q;
 
-<<<<<<< HEAD
-	if($regoID && $documentID){
-		$st = qq[
-			UPDATE tblDocuments as D INNER JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (D.intPersonRegistrationID = PR.intPersonRegistrationID AND D.intPersonID=PR.intPersonID) SET D.intPersonRegistrationID = ? WHERE PR.strStatus = 'INPROGRESS' AND D.intUploadFileID = ? AND PR.intRealmID = ?];
-		$q = $Data->{'db'}->prepare($st);
-		$q->execute($regoID,$documentID,$Data->{'RealmID'});
 
-	}
-=======
     if($regoID && $documentID){
         $st = qq[
             UPDATE 
@@ -1814,7 +1806,7 @@ sub verifyDocument {
         $q = $Data->{'db'}->prepare($st);
         $q->execute($regoID,$documentID);
     }
->>>>>>> 1b806cb4aefd3305f0a6a0e3b7cd70a9d90c6ac7
+
 
 	if($documentID){
     	$st = qq[

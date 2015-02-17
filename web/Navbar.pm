@@ -446,6 +446,7 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
         ]],
         [ $lang->txt('Venues'), 'menu',[
             'venues',
+
             'addvenue'
         ]],
         [ $lang->txt('People'), 'menu',[
@@ -859,6 +860,10 @@ sub getClubMenuData {
         ]],
          [ $lang->txt('Audit Trail'), 'menu',[
             'auditlog'
+        ]],
+		[ $lang->txt('Payments'), 'menu',[
+            'bulkpayment',
+			'bulk',
         ]],
 
         [ $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Documents"), 'menu','clubdocs'],
