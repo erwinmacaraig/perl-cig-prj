@@ -522,6 +522,7 @@ sub listTasks {
             viewURL => $viewTaskURL,
             taskTypeLabel => $viewTaskURL,
             RequestToClub => $dref->{'preqToClub'},
+            RequestFromClub => $dref->{'preqFromClub'},
             taskTimeStamp => $dref->{'taskTimeStamp'},
             newTask => $newTask,
 		);
