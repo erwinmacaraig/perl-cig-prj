@@ -51,10 +51,15 @@ print STDERR Dumper(\%params);
 print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
     my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     $Data{'lang'}=$lang;
-    my %clientValues = getClient($payTry->{'client'});
-    my $client= setClient(\%clientValues);
+    #my %clientValues = getClient($payTry->{'client'});
+    #my $client= setClient(\%clientValues);
+    #$Data{'client'}=$client;
+    #$Data{'clientValues'} = \%clientValues;
+
+     $Data{'clientValues'} = $payTry;
+    my $client= setClient(\%{$payTry});
     $Data{'client'}=$client;
-    $Data{'clientValues'} = \%clientValues;
+
     $Data{'sessionKey'} = $payTry->{'session'};
     getDBConfig(\%Data);
     $Data{'SystemConfig'}=getSystemConfig(\%Data);
@@ -73,7 +78,9 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
         $returnVals{'GATEWAY_SIG'}= param('sig') || '';
         $returnVals{'GATEWAY_SETTLEMENT_DATE'}= param('settdate') || '';
         $returnVals{'GATEWAY_RESPONSE_CODE'}= param('rescode') || '';
+        $returnVals{'ResponseCode'}= "OK" if (param('rescode') =~ /08|00/);
         $returnVals{'GATEWAY_RESPONSE_TEXT'}= param('restext') || '';
+        $returnVals{'ResponseText'}= param('restext') || '';
         $returnVals{'Other1'} = param('restext') || '';
         $returnVals{'Other2'} = param('authid') || '';
         gatewayProcess(\%Data, $logID, $client, \%returnVals, '');

@@ -5,6 +5,7 @@ CREATE TABLE tblTransLog (
     intAmount decimal(16,2) default 0.00,
     strTXN varchar(200) default NULL,
     strResponseCode varchar(10) default NULL,
+    strGatewayResponseCode varchar(10) default '',
     strResponseText varchar(100) default NULL,
     strComments text,
     intPaymentType int(11) default NULL,

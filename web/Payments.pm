@@ -268,7 +268,7 @@ sub checkoutConfirm	{
 	if (($onlinePayment) and $amount eq '0.00')	{
 	    my $responsetext = 'Zero paid';
         my $txn = 'Zero-' . time(); 
-		processTransLog($Data->{'db'}, $txn, 'OK', $responsetext, $intLogID, $paymentSettings, undef, undef, '', '', '', '', '', '','',1);
+		processTransLog($Data->{'db'}, $txn, 'OK', 'OK', $responsetext, $intLogID, $paymentSettings, undef, undef, '', '', '', '', '', '','',1);
 		UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $intLogID);
 #        EmailPaymentConfirmation($Data, $paymentSettings, $intLogID, $client, $RegoFormObj);
 #        Products::product_apply_transaction($Data,$intLogID);
@@ -652,7 +652,8 @@ sub displayPaymentResult        {
 
     my $body = '';
 	my $success=0;
-    if ($transref->{strResponseCode} eq "1" or $transref->{strResponseCode} eq "OK" or $transref->{strResponseCode} eq "00" or $transref->{strResponseCode} eq "08" or $transref->{strResponseCode} eq 'Success')    {
+    #if ($transref->{strResponseCode} eq "1" or $transref->{strResponseCode} eq "OK" or $transref->{strResponseCode} eq "00" or $transref->{strResponseCode} eq "08" or $transref->{strResponseCode} eq 'Success')    {
+    if ($transref->{strResponseCode} eq "OK")   {
         my $ttime = time();
         $body .= qq[
             <div align="center" class="OKmsg" style="font-size:14px;">Congratulations your payment has been successful</div>
@@ -687,10 +688,11 @@ sub displayPaymentResult        {
 
 sub processTransLogFailure    {
 
-    my ($db, $intLogID, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text) = @_;
+    my ($db, $intLogID, $gatewayResponseCode, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text) = @_;
     $intLogID ||= 0;
 
     my %fields=();
+    $fields{gatewayResponseCode} = $gatewayResponseCode || '';
     $fields{otherRef1} = $otherRef1 || '';
     $fields{otherRef2} = $otherRef2 || '';
     $fields{otherRef3} = $otherRef3 || '';
@@ -702,13 +704,13 @@ sub processTransLogFailure    {
 
     my $st= qq[
         UPDATE tblTransLog
-        SET strResponseCode = "-1", strResponseText = "FAILED", intStatus = $Defs::TXNLOG_FAILED, strOtherRef1 = ?, strOtherRef2 = ?, strOtherRef3 = ?, strOtherRef4 = ?, strOtherRef5 = ?, strAuthID=?, strText=?
+        SET strResponseCode = "-1", strResponseText = "FAILED", intStatus = $Defs::TXNLOG_FAILED, strGatewayResponseCode = ?, strOtherRef1 = ?, strOtherRef2 = ?, strOtherRef3 = ?, strOtherRef4 = ?, strOtherRef5 = ?, strAuthID=?, strText=?
         WHERE intLogID = $intLogID
 		    AND intStatus = $Defs::TXNLOG_PENDING
             AND strResponseCode IS NULL
     ];
     my $query = $db->prepare($st) or query_error($st);
-    $query->execute($fields{otherRef1}, $fields{otherRef2}, $fields{otherRef3}, $fields{otherRef4}, $fields{otherRef5}, $fields{GATEWAY_AUTH_ID}, $fields{GATEWAY_RESPONSE_TEXT}) or query_error($st);
+    $query->execute($fields{'gatewayResponseCode'}, $fields{otherRef1}, $fields{otherRef2}, $fields{otherRef3}, $fields{otherRef4}, $fields{otherRef5}, $fields{GATEWAY_AUTH_ID}, $fields{GATEWAY_RESPONSE_TEXT}) or query_error($st);
 }
 
 sub calcTXNInvoiceNum       {
@@ -1275,13 +1277,14 @@ sub logRetry	{
 
 sub processTransLog    {
 
-    my ($db, $txn, $responsecode, $responsetext, $intLogID, $paymentSettings, $passedChkValue, $settlement_date, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text, $exportOK) = @_;
+    my ($db, $txn, $responsecode, $gatewayresponsecode, $responsetext, $intLogID, $paymentSettings, $passedChkValue, $settlement_date, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text, $exportOK) = @_;
 print STDERR "DHDHDHDHDHD\n";
 
 	$exportOK ||= 0;
     my %fields=();
     $intLogID ||= 0;
     $fields{txn} = $txn || '';
+    $fields{gatewayresponsecode} = $gatewayresponsecode || '';
     $fields{responsecode} = $responsecode || '';
     $fields{responsetext} = $responsetext || '';
     $fields{settlement_date} = $settlement_date || '';
@@ -1292,7 +1295,8 @@ print STDERR "DHDHDHDHDHD\n";
     $fields{otherRef5} = $otherRef5 || '';
 
 	my $intStatus = $Defs::TXNLOG_FAILED;
-	$intStatus = $Defs::TXNLOG_SUCCESS if ($responsecode eq "00" or $responsecode eq "08" or $responsecode eq "OK" or $responsecode eq "1" or $responsecode eq 'Success');
+	#$intStatus = $Defs::TXNLOG_SUCCESS if ($responsecode eq "00" or $responsecode eq "08" or $responsecode eq "OK" or $responsecode eq "1" or $responsecode eq 'Success');
+	$intStatus = $Defs::TXNLOG_SUCCESS if ($responsecode eq "OK");
 	my $statement = qq[
 		SELECT intAmount, strResponseCode, intLogID
 		FROM tblTransLog
@@ -1316,7 +1320,7 @@ print STDERR "DHDHDHDHDHD\n";
 #    deQuote($db, \%fields);
 	if (! $responsecode)	{
 print STDERR "IN NOT";
-		processTransLogFailure($db, $intLogID, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text);
+		processTransLogFailure($db, $intLogID, $gatewayresponsecode, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text);
 	}
 	else	{
 		if ($existingResponseCode and $existingLogID)	{
@@ -1324,7 +1328,7 @@ print STDERR "IN NOT";
 		}
     	$statement = qq[
             UPDATE tblTransLog
-        	SET dtLog=SYSDATE(), strTXN = ?, strResponseCode = ?, strResponseText = ?, intStatus = $intStatus, dtSettlement=?, strOtherRef1 = ?, strOtherRef2 = ?, strOtherRef3 = ?, strOtherRef4 = ?, strOtherRef5 = ? , intExportOK = $exportOK, strAuthID=?, strText=?
+        	SET dtLog=SYSDATE(), strTXN = ?, strResponseCode = ?, strResponseText = ?, intStatus = $intStatus, dtSettlement=?, strGatewayResponseCode = ?, strOtherRef1 = ?, strOtherRef2 = ?, strOtherRef3 = ?, strOtherRef4 = ?, strOtherRef5 = ? , intExportOK = $exportOK, strAuthID=?, strText=?
         	WHERE intLogID = $intLogID
 			    AND intStatus<> 1
     	];
@@ -1335,6 +1339,7 @@ print STDERR $statement;
             $fields{responsecode},
             $fields{responsetext},
             $fields{settlement_date},
+            $fields{gatewayresponsecode},
             $fields{otherRef1},
             $fields{otherRef2},
             $fields{otherRef3},

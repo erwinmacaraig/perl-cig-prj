@@ -142,11 +142,11 @@ print STDERR "IN GATEWAY PROCESS";
 
     print STDERR $paymentSettings->{'gatewayCode'};
     ### Might need IF test here per gatewayCode
-  $returnVals_ref->{'ResponseText'} = NABResponseCodes($returnVals_ref->{'GATEWAY_RESPONSE_CODE'});
+  #$returnVals_ref->{'ResponseText'} = NABResponseCodes($returnVals_ref->{'GATEWAY_RESPONSE_CODE'});
   $returnVals_ref->{'ResponseCode'} = $returnVals_ref->{'GATEWAY_RESPONSE_CODE'};
-  if ($returnVals_ref->{'GATEWAY_RESPONSE_CODE'} =~/^00|08|OK$/)  {
-    $returnVals_ref->{'ResponseCode'} = 'OK';
-  }
+  ##if ($returnVals_ref->{'GATEWAY_RESPONSE_CODE'} =~/^00|08|OK$/)  {
+  #  $returnVals_ref->{'ResponseCode'} = 'OK';
+  #}
 
 
   {
