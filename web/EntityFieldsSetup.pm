@@ -358,6 +358,7 @@ sub clubFieldsSetup {
                     class       => 'fcToggleGroup',
                     compulsory => 1,
                     firstoption => [ '', " " ],
+                    noadd      => 1,
                     #noedit      => 1,
                 },                
             },
