@@ -79,6 +79,7 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
         $returnVals{'GATEWAY_SETTLEMENT_DATE'}= param('settdate') || '';
         $returnVals{'GATEWAY_RESPONSE_CODE'}= param('rescode') || '';
         $returnVals{'ResponseCode'}= "OK" if (param('rescode') =~ /08|00/);
+        $returnVals{'GatewayResponseCode'}= param('rescode') || '';
         $returnVals{'GATEWAY_RESPONSE_TEXT'}= param('restext') || '';
         $returnVals{'ResponseText'}= param('restext') || '';
         $returnVals{'Other1'} = param('restext') || '';
