@@ -28,11 +28,15 @@
                             <a href="[% url %]/[% target %]?client=[% maclient %]&amp;a=E_HOME" class="btn-main">[% Lang.txt("Go to your Dashboard") %]</a>
                         [% END %]
                     </li>
-                    <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PENDPR_" class="btn-main">[% Lang.txt("View all currently submitted registrations") %]</a></li>
-                    [% IF dtype %]
-                        <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PF_&amp;dtype=[% dtype %]" class="btn-main">[% Lang.txt("Register another ")%][% dtypeText %]</a></li>        
+                    [% IF originLevel == 1 %]
+                            <a href="[% url %]/registration/" class="btn-main">[% Lang.txt("Return to your Dashboard") %]</a>
                     [% ELSE %]
-                        <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PF_&amp;" class="btn-main">[% Lang.txt("Register another Person") %]</a></li>        
+                        <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PENDPR_" class="btn-main">[% Lang.txt("View all currently submitted registrations") %]</a></li>
+                        [% IF dtype %]
+                            <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PF_&amp;dtype=[% dtype %]" class="btn-main">[% Lang.txt("Register another ")%][% dtypeText %]</a></li>        
+                        [% ELSE %]
+                            <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PF_&amp;" class="btn-main">[% Lang.txt("Register another Person") %]</a></li>        
+                        [% END %]
                     [% END %]
                 </ul>
             </div>

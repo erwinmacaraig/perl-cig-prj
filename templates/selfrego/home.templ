@@ -3,17 +3,17 @@
 <p>[% Lang.txt('Welcome') %] [% Name %]</p>
 
 [% IF !Found.adult %]
-<a href = "" class = "btn-main">[% Lang.txt('New Registration for me') %]</a>
+<a href = "?a=REG_NEW" class = "btn-main">[% Lang.txt('New Registration for me') %]</a>
 [% END %]
 [% IF !Found.minor %]
-<a href = "" class = "btn-main">[% Lang.txt('New Registration for a minor in my care') %]</a>
+<a href = "?a=REG_NEW&amp;minor=1" class = "btn-main">[% Lang.txt('New Registration for a minor in my care') %]</a>
 [% END %]
 
 [% IF PreviousRegistrations.size > 0 %]
 
     [% FOREACH person IN People %]
         <h4>[% person.strLocalFirstname %] [% person.strLocalSurname %] [% IF person.intMinor %]([% Lang.txt('Minor') %])[% END %]</h4>
-        <a href = "" class = "btn-inside-panels">[% Lang.txt('Add New Registration') %]</a>
+        <a href = "?a=REG_NEW&amp;pID=[% person.intPersonID %][% IF perosn.intMinor %]&amp;minor=1[% END %]" class = "btn-inside-panels">[% Lang.txt('Add New Registration') %]</a>
         <table class = "table">
         [% FOREACH rego IN  PreviousRegistrations.item(person.intPersonID) %]
             <tr>

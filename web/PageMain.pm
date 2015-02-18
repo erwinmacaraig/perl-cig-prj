@@ -491,11 +491,32 @@ sub regoPageForm {
         print "Content-type: text/html\n\n";
     }
 
+    my $globalnav = runTemplate(
+      $Data,
+      {
+        AtLoginLevel => 1,
+      },
+      'user/globalnav.templ',
+    );
+    $Data->{'AddToPage'}->add(
+        'js_bottom',
+        'inline',
+        'jQuery(".fcToggleGroup").fcToggle({ test:1 });',
+    );
+
     print runTemplate(
         $Data,      
         {
             Content => $body,
-
+            GlobalNav => $globalnav,
+            Header => $Data->{'SystemConfig'}{'Header'} || '',
+            CSSFiles => $Data->{'AddToPage'}->get('css','file') || '',
+            CSSInline => $Data->{'AddToPage'}->get('css','inline') || '',
+            TopJSFiles => $Data->{'AddToPage'}->get('js_top','file') || '',
+            TopJSInline => $Data->{'AddToPage'}->get('js_top','inline') || '',
+            BottomJSFiles => $Data->{'AddToPage'}->get('js_bottom','file') || '',
+            BottomJSInline => $Data->{'AddToPage'}->get('js_bottom','inline') || '',
+            DisableResponsiveLayout => $Defs::DisableResponsiveLayout || 0,
         },
        'selfrego/wrapper.templ'
     );

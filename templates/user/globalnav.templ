@@ -4,6 +4,7 @@
 		<div class="row">
 			<div class="col-md-12">
       
+[% IF NavTree %]
         <div class="access-level">
           <p class="viewAs">View as:</p>
             <div class="nav_session_menu_wrap">
@@ -38,9 +39,10 @@
                 </script> 
             </div>
         </div>
+[% END %]
 
   			<ul>
-  				<li>[% Lang.txt('Welcome') %] [% Data.UserName %]</li>
+  				<li>[% Lang.txt('Welcome') %] [% UserName || Data.UserName %]</li>
   				<!--<li>[% Lang.txt('Welcome') %] <a href="#" title="">[% Data.UserName %]<span class="fa fa-caret-down"></span></a></li>-->
   				<li><a href ="#">[% Lang.txt('Help') %]</a></li>
   				<li><a href="user/logout.cgi" title="[% Lang.txt('Logout') %]">[% Lang.txt('Logout') %]</a></li>

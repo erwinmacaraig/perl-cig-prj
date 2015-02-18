@@ -366,7 +366,7 @@ sub personFieldsSetup {
                     displayFunctionParams=> ['MEDIUM'],
         		},
         		strBirthCertDesc => {
-        			label => $FieldLabels->{'strDescription'},
+        			label => $FieldLabels->{'strBirthCertDesc'},
       	            value => $values->{'strBirthCertDesc'},
                     type => 'textarea',
                     rows => '10',
@@ -452,7 +452,7 @@ sub personFieldsSetup {
                     displayFunctionParams=> ['MEDIUM'],
                 },
                 strOtherPersonIdentifierDesc => {
-                	label => $FieldLabels->{'strDescription'},
+                	label => $FieldLabels->{'strOtherPersonIdentifierDesc'},
                 	value => $values->{'strOtherPersonIdentifierDesc'},
                     type => 'textarea',
                     rows => '10',

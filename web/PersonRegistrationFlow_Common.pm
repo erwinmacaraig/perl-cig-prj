@@ -397,14 +397,12 @@ sub displayRegoFlowComplete {
 
     my $ok = 0;
     my $run = $hidden_ref->{'run'} || param('run') || 0;
-print STDERR "COMPLETE RUN" . $run;
     if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER' or $rego_ref->{'registrationNature'} eq 'TRANSFER') {
         $ok=1;
     }
     else    {
         $ok = $run ? 1 : checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'strSport'}, $rego_ref->{'strPersonType'}, $rego_ref->{'strPersonEntityRole'}, $rego_ref->{'strPersonLevel'}, $rego_ref->{'strAgeLevel'});
     }
-print STDERR "000OK IS $ok | $run\n\n";
     my $body = '';
     my $gateways = '';
     if (!$ok)   {
@@ -502,8 +500,9 @@ print STDERR "000OK IS $ok | $run\n\n";
        $cv{'currentLevel'} = $Defs::LEVEL_NATIONAL;
        my $mlm = setClient(\%cv);
 
-		
 
+        my $DoNotDisplayRegoSummary = ($originLevel == $Defs::LEVEL_PERSON ? 1 : 0);
+warn("KKKKK $DoNotDisplayRegoSummary:$originLevel");
         my %PageData = (
             person_home_url => $url,
 			person => \%personData,
@@ -520,7 +519,7 @@ print STDERR "000OK IS $ok | $run\n\n";
             client=>$clm,
             maclient => $mlm,
             originLevel => $originLevel,
-            PersonSummaryPanel => personSummaryPanel($Data, $personObj->ID()),
+            PersonSummaryPanel => personSummaryPanel($Data, $personObj->ID(), $DoNotDisplayRegoSummary),
         );
         
         if($rego_ref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER) {

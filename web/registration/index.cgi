@@ -20,6 +20,7 @@ use TTTemplate;
 use AddToPage;
 
 use SelfUserHome;
+use Flow_PersonSelfReg;
 
 main();
 
@@ -64,11 +65,11 @@ sub main {
 
     $Data{'Permissions'} = GetPermissions(
         \%Data,
-        $clientValues{'authLevel'},
-        getID( \%clientValues, $clientValues{'authLevel'} ),
+        $Defs::LEVEL_NATIONAL,
+        1,
         $Data{'Realm'},
         $Data{'RealmSubType'},
-        $clientValues{'authLevel'},
+        'regoform',
         0,
     );
     my $user = new SelfUserSession(
@@ -77,6 +78,7 @@ sub main {
     );
     $user->load();
     my $userID = $user->id() || 0;
+    $Data{'UserName'} = $user->name();
 
     if(!$action and $userID)  {
         $action = 'HOME';
@@ -87,6 +89,45 @@ sub main {
     elsif ( $action =~ /SIGNUP_/ ) {
     }
     elsif ( $action =~ /REG_/ ) {
+
+        my $cgi=new CGI;
+        my $personID = param('pID') || 0;
+        $personID = 0 if $personID < 0;
+        my $defaultType = param('dtype') || '';
+        my $defaultRegistrationNature = param('dnat') || '';
+        my $internationalTransfer = param('itc') || '';
+        my $startingStep = param('ss') || '';
+
+        #specific to Transfers
+        my $personRequestID = param('prid') || '';
+
+        #specific to Renewals
+        my $renewalTargetRegoID = param('rtargetid') || '';
+
+        my $flow = new Flow_PersonSelfReg(
+            db => $Data{'db'},
+            Data => \%Data,
+            Lang => $lang,
+            CarryFields => {
+                client => $client,
+                a => $action,
+                dtype => $defaultType,
+                dnat => $defaultRegistrationNature,
+                itc => $internationalTransfer,
+                ss => $startingStep,
+                prid => $personRequestID,
+                rtargetid => $renewalTargetRegoID,
+            },
+            ID  => $personID || 0,
+            UserID  => $userID || 0,
+            SystemConfig => $Data{'SystemConfig'},
+            ClientValues => \%clientValues,
+            Target => $Data{'target'},
+            cgi => $cgi,
+        );
+
+        my ($content,  undef) = $flow->run();
+        $resultHTML .= $content;
     }
     else {
         # Display login page

@@ -16,7 +16,7 @@ use Data::Dumper;
 
 
 sub personSummaryPanel {
-    my ($Data, $personID) = @_;
+    my ($Data, $personID, $noRego) = @_;
 
     my $personObj = new PersonObj(
         db => $Data->{'db'}, 
@@ -26,7 +26,7 @@ sub personSummaryPanel {
     $personObj->load();
     return '' if !$personObj;
     return '' if !$personObj->ID();
-
+    $noRego ||= 0;
     my ($count, $regs) = PersonRegistration::getRegistrationData(
         $Data,
         $personID,
@@ -34,14 +34,15 @@ sub personSummaryPanel {
     );
 
     my @personRegistration = ();
+    if(!$noRego)    {
+        foreach my $reg_rego_ref (@{$regs}) {
+            next if $reg_rego_ref->{'strStatus'} ne $Defs::PERSONREGO_STATUS_ACTIVE;
 
-    foreach my $reg_rego_ref (@{$regs}) {
-        next if $reg_rego_ref->{'strStatus'} ne $Defs::PERSONREGO_STATUS_ACTIVE;
-
-        push @personRegistration, [ 
-            $Data->{'lang'}->txt($reg_rego_ref->{'PersonType'} . " valid to ") . $Data->{'l10n'}{'date'}->format($reg_rego_ref->{'npdtTo'},'MEDIUM'),
-            $reg_rego_ref->{'strPersonType'},
-        ];
+            push @personRegistration, [ 
+                $Data->{'lang'}->txt($reg_rego_ref->{'PersonType'} . " valid to ") . $Data->{'l10n'}{'date'}->format($reg_rego_ref->{'npdtTo'},'MEDIUM'),
+                $reg_rego_ref->{'strPersonType'},
+            ];
+        }
     }
 
     my $isocountries  = getISOCountriesHash();
