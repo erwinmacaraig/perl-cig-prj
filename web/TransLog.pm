@@ -1431,7 +1431,7 @@ sub viewTransLog	{
 	my $TLref = $qry->fetchrow_hashref();
 
 	my $st_trans = qq[
-		SELECT T.intTransactionID, M.strLocalSurname, M.strLocalFirstName, E.*, P.strName, P.strGroup, E.strLocalName as EntityName, T.intQty, T.curAmount, T.intTableType, I.strInvoiceNumber, T.intStatus
+		SELECT T.intTransactionID, M.strLocalSurname, M.strLocalFirstName, E.*, P.strName, P.strGroup, E.strLocalName as EntityName, T.intQty, T.curAmount, T.intTableType, I.strInvoiceNumber, T.intStatus, P.curPriceTax, P.dblTaxRate
 		FROM tblTransactions as T
 			LEFT JOIN tblInvoice I on I.intInvoiceID = T.intInvoiceID
 			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
@@ -1583,6 +1583,8 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 			<th>].$lang->txt('Item').qq[</th>
 			<th>].$lang->txt('Payment For').qq[</th>
 			<th>].$lang->txt('Quantity').qq[</th>
+			<th>].$lang->txt('Tax Rate').qq[</th>
+			<th>].$lang->txt('Tax Price').qq[</th>
 			<th>].$lang->txt('Total Amount').qq[</th>
 			<th>].$lang->txt('Status').qq[</th>
 		</tr>
@@ -1599,6 +1601,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 		my $productname = $dref->{strName};
 		$productname = qq[$dref->{strGroup}-].$productname if ($dref->{strGroup});
 		# 	Payments::TXNtoInvoiceNum($dref->{intTransactionID})	
+		my $taxRateinPercent = $dref->{'dblTaxRate'} * 100;
 		$body .= qq[
 			<tr>
 				<td>$dref->{'strInvoiceNumber'}</td>
@@ -1606,7 +1609,9 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 				<td>$productname</a></td>
 				<td>$paymentFor</a></td>
 				<td>$dref->{intQty}</a></td>
-				<td>$dollarSymbol $dref->{curAmount}</td>
+				<td>$taxRateinPercent&#37;</a></td>
+				<td>$dollarSymbol $dref->{'curPriceTax'}</td>
+				<td>$dollarSymbol $dref->{'curAmount'}</td>
 				<td>$Defs::TransactionStatus{$dref->{intStatus}}</td>
 			</tr>
 		];
@@ -1644,7 +1649,7 @@ sub viewPayLaterTransLog    {
 
 	$intTransLogID ||= 0;
 	my $db = $Data->{'db'};
-	my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
+	my $dollarSymbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
 
 	my $st = qq[
 		SELECT tblTransLog.*, IF(T.intTableType = $Defs::LEVEL_CLUB, Entity.strLocalName, CONCAT(strLocalFirstname,' ',strLocalSurname)) as Name, DATE_FORMAT(dtSettlement,'%d/%m/%Y') as dtSettlement

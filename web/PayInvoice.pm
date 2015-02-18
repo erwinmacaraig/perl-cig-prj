@@ -48,22 +48,19 @@ sub handlePayInvoice {
 		
 		if(length($invoiceNumber) > 0 || $invoiceNumber ne '' ){
 			$a = $Flow{$action};
-			$resultHTML = queryInvoiceByNumber($a, $Data, $clubID, $invoiceNumber, $client);
-			#Query Transactions Here 
-			#my @invoicearr = queryInvoiceByNumber($action, $Data, $clubID,$invoiceNumber);
-			if(!$resultHTML){
-				# found Invoice Number - Display Results
-
+			$resultHTML = queryInvoiceByNumber($a, $Data, $invoiceNumber, $client);
+			
+			if(!$resultHTML){				
 				$action = 'TXN_PAY_INV_INFO';
 			}			
 		}
 		else {
-			#$action = $Flow{'TXN_PAY_INV_INFO'}; 
-			$resultHTML = displayQueryByOtherInfoFields($Data, $clubID, $client, $invoiceNumber);	
+			
+			$resultHTML = displayQueryByOtherInfoFields($Data, $client, $invoiceNumber);	
 		}
 	}
 	if($action eq 'TXN_PAY_INV_INFO'){ 
-		$resultHTML = displayQueryByOtherInfoFields($Data, $clubID, $client, $invoiceNumber);			
+		$resultHTML = displayQueryByOtherInfoFields($Data, $client, $invoiceNumber);			
 	}
 	if($action eq 'TXN_PAY_INV_QUERY_INFO'){
 		$resultHTML = queryInvoiceByOtherInfo($Data, $clubID, $client);
@@ -80,6 +77,7 @@ sub displayQueryByInvoiceField {
 	my %pagecontent = (
 			client =>  $client, 
 			a => 'TXN_PAY_INV_NUM', 
+			Lang => $Data->{'lang'},
 	);
 	my $form = runTemplate($Data, \%pagecontent,'payment/invoicenum_frm.templ');	
    return $form;
@@ -87,7 +85,7 @@ sub displayQueryByInvoiceField {
 } 
 
 sub displayQueryByOtherInfoFields {  
-	my ($Data, $clubID, $client, $invoiceNumber) = @_; 
+	my ($Data, $client, $invoiceNumber) = @_; 
 
 	my $query = qq[SELECT intNationalPeriodID, strNationalPeriodName FROM tblNationalPeriod  WHERE intRealmID = ?];
 	my $sth = $Data->{'db'}->prepare($query);
@@ -118,6 +116,7 @@ sub displayQueryByOtherInfoFields {
       		a => 'TXN_PAY_INV_QUERY_INFO',
     	},
 		invoiceNumber => $invoiceNumber,
+		Lang => $Data->{'lang'},
 	);
 
 	my $body = runTemplate($Data,\%OtherFormFields,'payment/bulk_invoice_query_fields.templ');
@@ -129,16 +128,9 @@ sub displayQueryByOtherInfoFields {
 }
 
 sub queryInvoiceByNumber { 
-	my ($action, $Data, $clubID, $invoiceNumber, $client) = @_; 
-
-	#convert invoice number to transaction 
-	# 100000405
-	my $convertedInvoiceNumberToTXNID = invoiceNumToTXN($invoiceNumber);
-
-	#my $convertedInvoiceNumberToTXNID = TXNtoInvoiceNum($invoiceNumber);
-	#my $convertedInvoiceNumberToTXNID = TXNtoTXNNumber($invoiceNumber);
+	my ($action, $Data, $invoiceNumber, $client) = @_; 
 	
-
+	my $convertedInvoiceNumberToTXNID = invoiceNumToTXN($invoiceNumber);
 	my $content = '';
 	my $results = 0;
 	my @rowdata = ();
@@ -157,7 +149,7 @@ sub queryInvoiceByNumber {
 			INNER JOIN tblProducts ON tblProducts.intProductID = tblTransactions.intProductID
 			INNER JOIN tblPerson ON tblPerson.intPersonID = tblTransactions.intID 
 			WHERE tblTransactions.intInvoiceID = $convertedInvoiceNumberToTXNID AND intStatus = 0 
-			AND tblTransactions.intRealmID = $Data->{'Realm'} AND intTransLogID = 0 AND intTXNEntityID = $clubID
+			AND tblTransactions.intRealmID = $Data->{'Realm'} AND intTransLogID = 0
 	];
 	
 	my $sth = $Data->{'db'}->prepare($query);
@@ -406,8 +398,6 @@ sub displayResults {
 			] 
 
 	}
-
-
 
 my $target = 'paytry.cgi';#$Data->{'target'};
 
