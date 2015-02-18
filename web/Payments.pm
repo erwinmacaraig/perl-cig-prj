@@ -729,7 +729,7 @@ sub TXNNumberToTXN	{
 
 	my ($invoice_num) = @_;
 
-	my $txnID = $invoice_num - 100000000; ## 1 more to handle checksum
+	my $txnID = $invoice_num - 800000000; ## 1 more to handle checksum
 	$txnID = substr($txnID, 0, length($txnID)-1);
 	if ($invoice_num == TXNtoTXNNumber($txnID))	{
 		return $txnID;
@@ -742,7 +742,7 @@ sub invoiceNumToTXN	{
 
 	my ($invoice_num) = @_;
 
-	my $txnID = $invoice_num - 100000000; ## 1 more to handle checksum
+	my $txnID = $invoice_num - 800000000; ## 1 more to handle checksum
 	$txnID = substr($txnID, 0, length($txnID)-1);
 	if ($invoice_num == TXNtoTXNNumber($txnID))	{
 		return $txnID;
