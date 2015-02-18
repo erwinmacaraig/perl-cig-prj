@@ -38,77 +38,84 @@
 [% USE Dumper %]
 <form id="fields_edit_form" action="main.cgi" method="POST">
         <div class="col-md-12">
-            <table cellpadding="5" style="width: 100%" class = "table">
-                <thead>
-                <tr>
-                    <th>
-                    [% IF type == 'delete' %]
-                        <input type="checkbox" id="selectall" data-targetprefix="selectall-"/></th>
-                    [% END %]
-                    <th>[% Lang.txt('Field Number') %]</th>
-                    <th>[% Lang.txt('Field Name') %]</th>
-                    <th>[% Lang.txt('Discipline') %]</th>
-                    <th>[% Lang.txt('Type of Field') %]</th>
-                    <th>[% Lang.txt('Length of Field') %]</th>
-                    <th>[% Lang.txt('Width of Field') %]</th>
-                    <th>[% Lang.txt('Capacity of Field') %]</th>
-                </tr>
-                </thead>
+            <h3 class="panel-header">[% Lang.txt('Fields') %]</h3>
+            <div class="panel-body">
+                <table id="ffg_venue" class="table" cellpadding="0" style="width: 100%">
+                    <thead>
+                    <tr>
+                        <td>
+                        [% IF type == 'delete' %]
+                            <input type="checkbox" id="selectall" data-targetprefix="selectall-"/>
+                        [% END %]
+                        </th>
+                        <td>[% Lang.txt('Field Number') %]</td>
+                        <td>[% Lang.txt('Field Name') %]</td>
+                        <td>[% Lang.txt('Discipline') %]</td>
+                        <td>[% Lang.txt('Type of Field') %]</td>
+                        <td>[% Lang.txt('Lengtd of Field') %]</td>
+                        <td>[% Lang.txt('Widtd of Field') %]</td>
+                        <td>[% Lang.txt('Capacity of Field') %]</td>
+                    </tr>
+                    </thead>
 
-                [% COUNT = 0 %]
-                <tbody>
-                [% FOREACH fieldRow IN FieldElements %]
-                <tr>
-                    <td style="padding: 15px">
-                    [% IF type == 'delete' %]
-                        <input id="selectall-[% fieldRow.intEntityFieldID %]" type="checkbox" name="deletefield[]" value="[% fieldRow.intEntityFieldID %]"/>
-                    [% ELSE %]
-                        [% fieldRow.intEntityFieldID %][% COUNT = COUNT + 1 %][% COUNT %]
+                    [% COUNT = 0 %]
+                    <tbody>
+                    [% FOREACH fieldRow IN FieldElements %]
+                    <tr>
+                        <td style="padding: 15px">
+                        [% IF type == 'delete' %]
+                            <input id="selectall-[% fieldRow.intEntityFieldID %]" type="checkbox" name="deletefield[]" value="[% fieldRow.intEntityFieldID %]"/>
+                        [% ELSE %]
+                            [% fieldRow.intEntityFieldID %][% COUNT = COUNT + 1 %][% COUNT %]
+                        [% END %]
+                        </td>
+                        <td>[% fieldRow.intFieldOrderNumber %]</td>
+                        <td>[% fieldRow.strName %]</td>
+                        <td>
+                        [% IF type == 'delete' %]
+                            [% Disciplines.item(fieldRow.strDiscipline) %]
+                        [% ELSE %]
+                            [% fieldRow.strDiscipline %]
+                        [% END %]
+                        </td>
+                        <td>
+                        [% IF type == 'delete' %]
+                            [% Disciplines.item(fieldRow.strGroundNature) %]
+                        [% ELSE %]
+                            [% fieldRow.strGroundNature %]
+                        [% END %]
+                        </td>
+                        <td>[% fieldRow.dblLength %]</td>
+                        <td>[% fieldRow.dblWidth %]</td>
+                        <td>[% fieldRow.intCapacity %]</td>
+                    </tr>
                     [% END %]
-                    </td>
-                    <td>[% fieldRow.intFieldOrderNumber %]</td>
-                    <td>[% fieldRow.strName %]</td>
-                    <td>
-                    [% IF type == 'delete' %]
-                        [% Disciplines.item(fieldRow.strDiscipline) %]
-                    [% ELSE %]
-                        [% fieldRow.strDiscipline %]
-                    [% END %]
-                    </td>
-                    <td>
-                    [% IF type == 'delete' %]
-                        [% Disciplines.item(fieldRow.strGroundNature) %]
-                    [% ELSE %]
-                        [% fieldRow.strGroundNature %]
-                    [% END %]
-                    </td>
-                    <td>[% fieldRow.dblLength %]</td>
-                    <td>[% fieldRow.dblWidth %]</td>
-                    <td>[% fieldRow.intCapacity %]</td>
-                </tr>
+                    </tbody>
+                </table>
+
+                <input type="hidden" value="[% action %]" name="a">
+                <input type="hidden" value="[% client %]" name="client">
+                <input type="hidden" value="[% venueID %]" name="venueID">
+                <input type="hidden" value="[% field_count %]" name="field_count">
+                [% IF TID.length %]
+                    <input type="hidden" value="[% TID %]" name="TID" /> 
                 [% END %]
-                </tbody>
-            </table>
-        </div>
-    <input type="hidden" value="[% action %]" name="a">
-    <input type="hidden" value="[% client %]" name="client">
-    <input type="hidden" value="[% venueID %]" name="venueID">
-    <input type="hidden" value="[% field_count %]" name="field_count">
-	[% IF TID.length %]
-		<input type="hidden" value="[% TID %]" name="TID" /> 
-	[% END %]
-	[% IF at.length %]
-		<input type="hidden" value="[% at %]" name="at" />
-	[% END %]
-    [% IF bscrn %]
-    <input type="hidden" value="[% bscrn %]" name="bscrn">
-    [% END %]
+                [% IF at.length %]
+                    <input type="hidden" value="[% at %]" name="at" />
+                [% END %]
+                [% IF bscrn %]
+                <input type="hidden" value="[% bscrn %]" name="bscrn">
+                [% END %]
 
-    [% IF type == 'delete' %]
-        <input type="submit" class="btn-main" name="submitb" value="[% Lang.txt('Continue') %]">   
-    [% ELSE %]
-        <input type="submit" class="btn-main" name="submitb" value="[% Lang.txt('Save') %]">   
-    [% END %]
+                [% IF type == 'delete' %]
+                    <input type="submit" class="btn-main" name="submitb" value="[% Lang.txt('Continue') %]">   
+                [% ELSE %]
+                    <input type="submit" class="btn-main" name="submitb" value="[% Lang.txt('Save') %]">   
+                [% END %]
+
+            </div>
+
+        </div>
 </form>
 
 
