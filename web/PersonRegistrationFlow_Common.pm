@@ -1311,7 +1311,7 @@ sub bulkRegoCreate  {
         my %Settings=();
         $Settings{'paymentType'} = $paymentType;
         my $logID = createTransLog($Data, \%Settings, $bulk_ref->{'entityID'},\@total_txns_added, $totalAmount);
-        processTransLog($Data->{'db'}, '', 'OK', 'APPROVED', $logID, \%Settings, undef, undef, '', '', '', '', '', '','',1);
+        processTransLog($Data->{'db'}, '', 'OK', 'OK', 'APPROVED', $logID, \%Settings, undef, undef, '', '', '', '', '', '','',1);
        print STDERR "MANUAL PAYMENT $logID\n"; 
         UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $logID);
         product_apply_transaction($Data,$logID);

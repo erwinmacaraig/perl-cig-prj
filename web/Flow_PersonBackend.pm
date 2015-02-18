@@ -1057,7 +1057,7 @@ sub process_products {
             my %Settings=();
             $Settings{'paymentType'} = $paymentType;
             my $logID = createTransLog($self->{'Data'}, \%Settings, $entityID,\@txnIds, $amount);
-            processTransLog($self->{'Data'}->{'db'}, '', 'OK', 'APPROVED', $logID, \%Settings, undef, undef, '', '', '', '', '', '','',1);
+            processTransLog($self->{'Data'}->{'db'}, '', 'OK', 'OK', 'APPROVED', $logID, \%Settings, undef, undef, '', '', '', '', '', '','',1);
             UpdateCart($self->{'Data'}, undef, $self->{'Data'}->{'client'}, undef, undef, $logID);
             product_apply_transaction($self->{'Data'},$logID);
         }

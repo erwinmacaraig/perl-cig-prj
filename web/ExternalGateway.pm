@@ -168,7 +168,7 @@ print STDERR "IN HERE FOR EXTERNAL GATEWAY UPDATE\n";
 
 	my $exportOK = 0;
 	$exportOK=1 if ($returnVals->{'ResponseCode'} eq 'OK');
-  	processTransLog($Data->{'db'}, $txn, $returnVals->{'ResponseCode'}, $responseText, $logID, $paymentSettings, undef, $settlement_date, $otherRef1, $otherRef2, $otherRef3, $otherRef4, '', $returnVals->{'GATEWAY_AUTH_ID'}, $returnVals->{'GATEWAY_RESPONSE_TEXT'}, $exportOK);
+  	processTransLog($Data->{'db'}, $txn, $returnVals->{'ResponseCode'}, $returnVals->{'GatewayResponseCode'}, $responseText, $logID, $paymentSettings, undef, $settlement_date, $otherRef1, $otherRef2, $otherRef3, $otherRef4, '', $returnVals->{'GATEWAY_AUTH_ID'}, $returnVals->{'GATEWAY_RESPONSE_TEXT'}, $exportOK);
   	my $template_ref = getPaymentTemplate($Data, $assocID);
   	my $templateBody = $template_ref->{'strFailureTemplate'} || 'payment_failure.templ';
     my $itemData;
