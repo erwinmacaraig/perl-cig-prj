@@ -4209,10 +4209,10 @@ sub getRegistrationWorkTasks {
                 $problemResolutionEntity = getInstanceOf($Data, 'club', $tdref->{'intProblemResolutionEntityID'});
             }
             case 20 {
-                $problemResolutionEntity = getInstanceOf($Data, 'region');
+                $problemResolutionEntity = getInstanceOf($Data, 'entity', $tdref->{'intProblemResolutionEntityID'});
             }
             case 100 {
-                $problemResolutionEntity = getInstanceOf($Data, 'national');
+                $problemResolutionEntity = getInstanceOf($Data, 'entity', $tdref->{'intProblemResolutionEntityID'});
             }
         }
 
@@ -4222,11 +4222,11 @@ sub getRegistrationWorkTasks {
                 $taskType = $Data->{'lang'}->txt('Approval by Club');
             }
             case 20 {
-                $approvalEntity = getInstanceOf($Data, 'region');
+                $approvalEntity = getInstanceOf($Data, 'entity', $tdref->{'intApprovalEntityID'});
                 $taskType = $Data->{'lang'}->txt('Approval by Regional Association');
             }
             case 100 {
-                $approvalEntity = getInstanceOf($Data, 'national');
+                $approvalEntity = getInstanceOf($Data, 'entity', $tdref->{'intApprovalEntityID'});
                 $taskType = $Data->{'lang'}->txt('Approval by Member Association');
             }
         }
