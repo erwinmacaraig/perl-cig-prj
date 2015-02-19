@@ -3771,6 +3771,10 @@ sub updateTaskScreen {
                 $message = $Data->{'lang'}->txt("You have rejected this Amendment of Person Registration.");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
+            elsif($TaskType eq 'RENEWAL_PLAYER') {
+                $message = $Data->{'lang'}->txt("You have rejected this Player. To proceed with this Renewal, start a new Renewal.");
+                $status = $Data->{'lang'}->txt("Rejected");
+            }
         }
         case "WF_PR_S" {
             $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'Resolved');
