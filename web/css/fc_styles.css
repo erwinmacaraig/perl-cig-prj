@@ -2266,6 +2266,22 @@ header nav.navbar-default .navbar-nav > li > a {
   td { font-size: 12px; }
   #worktasks tr td a.btn-inside-panels { font-size: 11px; }
   #worktasks #toggleGd_intTaskType a { font-size: 12px; }
+  div#content div.member-home-page div.task-actions.txtright {
+  	margin-bottom: 10px;
+  }
+  .dash-heading, .pageHeading {
+  	color: #000;
+    font-size: 25px;
+    margin-top: 15px;
+    width: 100%;
+  }
+  h2.section-header {
+  	font-size: 18px;
+  	padding: 0px 15px;
+  }
+  table.table thead tr th {
+    font-size: 12px;
+  }
 }
 @media (min-width: 250px) and (max-width: 480px) {
   header .logo-area ul li { margin: 0px 15px 0px 0px; }
@@ -2321,5 +2337,27 @@ header nav.navbar-default .navbar-nav > li > a {
   }
   #pageholder #contentholder {
   	margin-top: 16px;
+  }
+
+  .nav-tabs > li {
+  	width: 100%;
+  }
+  a.btn-main, input.btn-main, button.btn-main {
+  	font-size: 13px;
+  	padding: 11px 25px;
+  }
+  a.btn-disabled {
+  	font-size: 13px;
+  	padding: 11px 25px;
+  }
+  div#content div.member-home-page div.task-actions.txtright {
+  	margin-bottom: 10px;
+  }
+  h2.section-header {
+  	font-size: 15px;
+  	padding: 0px 15px;
+  }
+  table.table thead tr th {
+    font-size: 10px;
   }
 }
