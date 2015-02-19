@@ -1170,7 +1170,6 @@ sub copyTransaction	{
       dtTransaction,
       dtPaid,
       intDelivered,
-      intAssocID,
       intRealmID,
       intRealmSubTypeID,
       intID,
@@ -1180,12 +1179,14 @@ sub copyTransaction	{
       intTransLogID,
       intCurrencyID,
       intTempLogID,
-			intExportAssocBankFileID,
+	intExportAssocBankFileID,
       dtStart,
       dtEnd,
       curPerItem,
       intTXNEntityID,
-      intRenewed
+      intRenewed,
+        intPersonRegistrationID,
+        intInvoiceID
 		)
 		SELECT
 			1,
@@ -1195,7 +1196,6 @@ sub copyTransaction	{
       dtTransaction,
       NOW(),
       intDelivered,
-      intAssocID,
       intRealmID,
       intRealmSubTypeID,
       intID,
@@ -1210,7 +1210,9 @@ sub copyTransaction	{
       dtEnd,
       curPerItem,
       intTXNEntityID,
-      intRenewed
+      intRenewed,
+        intPersonRegistrationID,
+        intInvoiceID
 		FROM
 			tblTransactions
 		WHERE

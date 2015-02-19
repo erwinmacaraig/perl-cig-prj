@@ -135,13 +135,10 @@ sub main	{
         #my $rejectURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&client=$client&ci=$logID&chkv=$chkvalue&session=$session];
 
 print STDERR "TEST BELOW WITH NO CLIENT ETC\n";
-        my $delayedURL= $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=1&ci=$logID];
+        my $delayedURL= $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&pa=1&ci=$logID];
         my $cancelURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=0&da=1&ci=$logID];
         my $returnURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&ci=$logID];
         my $rejectURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&ci=$logID];
-        #$cancelURL = $delayedURL;
-        #$returnURL = $delayedURL;
-        #$rejectURL = $delayedURL;
 
         $gatewaySpecific{'VERSION'} = "0001";
         $gatewaySpecific{'STAMP'} = $logID;
