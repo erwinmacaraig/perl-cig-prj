@@ -33,10 +33,8 @@ sub payTryContinueProcess {
     my ($Data, $payTry, $client, $logID) = @_;
 print STDERR "********** IN payTryContinueProcess FOR $logID for $payTry->{'strContinueAction'}\n";
 
-print STDERR Dumper($payTry);
     $payTry->{'return'} = 1;
     if ($payTry->{'strContinueAction'} eq 'REGOFLOW')   {
-print STDERR "IIIIIIIIIIIIIIIII\n";
         handlePersonFlow($payTry->{'a'}, $Data, $payTry);
     }
     if ($payTry->{'strContinueAction'} eq 'TRANSFER')   {
