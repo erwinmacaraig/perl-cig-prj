@@ -19,6 +19,7 @@ sub showHome {
 	my (
 		$Data,
         $user,
+        $srp
 	) = @_;
 
     my (
@@ -34,6 +35,7 @@ sub showHome {
             PreviousRegistrations => $previousRegos,
             People => $people,
             Found => $found,
+            srp => $srp,
         },
         'selfrego/home.templ',
     );    
@@ -68,7 +70,7 @@ sub getPreviousRegos {
         WHERE
             A.intSelfUserID = ?
         ORDER BY 
-            intMinor DESC,
+            intMinor ASC,
             dtApproved DESC, 
             dtAdded DESC
     ];

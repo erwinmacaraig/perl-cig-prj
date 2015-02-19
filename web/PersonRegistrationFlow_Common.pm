@@ -449,8 +449,8 @@ sub displayRegoFlowComplete {
          }
          
        
-	    my $personObj = getInstanceOf($Data, 'person');
-	    my $maObj = getInstanceOf($Data, 'national');
+	    my $personObj = getInstanceOf($Data, 'person', $personID);
+	    my $maObj = getInstanceOf($Data, 'national', 0, $entityID);
         my $maName = $maObj
             ? $maObj->name()
             : '';

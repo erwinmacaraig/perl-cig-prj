@@ -626,6 +626,10 @@ sub getRegistrationData	{
         push @values, $regFilters_ref->{'entityID'};
         $where .= " AND pr.intEntityID= ? ";
     }
+    if(exists $regFilters_ref->{'originLevel'})  {
+        push @values, $regFilters_ref->{'originLevel'};
+        $where .= " AND pr.intOriginLevel = ? ";
+    }
 
     my $st= qq[
         SELECT 
@@ -741,7 +745,7 @@ sub getRegistrationData	{
 				INNER JOIN tblUploadedFiles  ON (tblUploadedFiles.intFileID = tblDocuments.intUploadFileID )
 				INNER JOIN tblPersonRegistration_$Data->{'Realm'}  as pr ON (pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID )
                 LEFT JOIN tblEntity as E ON (E.intEntityID=pr.intEntityID)
-				WHERE pr.intPersonID = $personID
+				WHERE pr.intPersonID = ?
 				AND pr.intPersonRegistrationID = $dref->{intPersonRegistrationID}
 			) as t ON t.intDocumentTypeID = RI.intID 
         WHERE
@@ -766,7 +770,7 @@ sub getRegistrationData	{
             #AND RI.intOriginLevel = $Data->{'clientValues'}{'authLevel'}
 
 		my $sth = $Data->{'db'}->prepare($sql);
-		$sth->execute();
+		$sth->execute($personID);
 		while(my $data_ref = $sth->fetchrow_hashref()){
 			#push @reg_docs, $data_ref;	
             $data_ref->{'DateUploaded_RAW'} = $data_ref->{'DateUploaded'};

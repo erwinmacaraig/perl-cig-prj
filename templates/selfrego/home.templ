@@ -3,17 +3,21 @@
 <p>[% Lang.txt('Welcome') %] [% Name %]</p>
 
 [% IF !Found.adult %]
-<a href = "?a=REG_NEW" class = "btn-main">[% Lang.txt('New Registration for me') %]</a>
+<a href = "?a=REG_NEW&amp;dtype=PLAYER&amp;srp=[% srp %]" class = "btn-main">[% Lang.txt('New Player Registration for me') %]</a>
+<a href = "?a=REG_NEW&amp;srp=[% srp %]" class = "btn-main">[% Lang.txt('New Non-player Registration for me') %]</a>
 [% END %]
-[% IF !Found.minor %]
-<a href = "?a=REG_NEW&amp;minor=1" class = "btn-main">[% Lang.txt('New Registration for a minor in my care') %]</a>
-[% END %]
+<a href = "?a=REG_NEW&amp;minorRego=1&amp;dtype=PLAYER&amp;srp=[% srp %]" class = "btn-main">[% Lang.txt('New Player Registration for a minor in my care') %]</a>
 
 [% IF PreviousRegistrations.size > 0 %]
 
     [% FOREACH person IN People %]
         <h4>[% person.strLocalFirstname %] [% person.strLocalSurname %] [% IF person.intMinor %]([% Lang.txt('Minor') %])[% END %]</h4>
-        <a href = "?a=REG_NEW&amp;pID=[% person.intPersonID %][% IF perosn.intMinor %]&amp;minor=1[% END %]" class = "btn-inside-panels">[% Lang.txt('Add New Registration') %]</a>
+        [% IF person.intMinor %]
+            <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;minor=1&amp;dtype=PLAYER" class = "btn-inside-panels">[% Lang.txt('Add New Player Registration') %]</a>
+        [% ELSE %]
+        <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=PLAYER" class = "btn-inside-panels">[% Lang.txt('Add New Player Registration') %]</a>
+        <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]" class = "btn-inside-panels">[% Lang.txt('Add New Non-Player Registration') %]</a>
+        [% END %]
         <table class = "table">
         [% FOREACH rego IN  PreviousRegistrations.item(person.intPersonID) %]
             <tr>

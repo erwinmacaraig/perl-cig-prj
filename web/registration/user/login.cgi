@@ -28,6 +28,7 @@ sub main {
     $Data{'cache'}  = new MCache();
     my $email = param('email') || '';
     my $password = param('pw') || '';
+    my $srp = param('srp') || '';
 
     my($sessionKey, $errors) = login(\%Data, $email, $password);
 
@@ -47,7 +48,7 @@ sub main {
 
         my $uID = $user->id() || 0;
         if ( !$uID ) {
-            $Data{'RedirectTo'} = "$Defs::base_url/registration/";
+            $Data{'RedirectTo'} = "$Defs::base_url/registration/?srp=$srp";
         }
         else    {
             my $st = qq[
@@ -67,7 +68,7 @@ sub main {
             $q->finish();
             if(!$type or !$id)  {
 
-                $Data{'RedirectTo'} = "$Defs::base_url/registration/";
+                $Data{'RedirectTo'} = "$Defs::base_url/registration/?srp=$srp";
             }
             else    {
                 #push @{$Data{'WriteCookies'}}, [
@@ -76,11 +77,11 @@ sub main {
                     #'1h',
                 #];
 
-                $Data{'RedirectTo'} = "$Defs::base_url/registration/";
+                $Data{'RedirectTo'} = "$Defs::base_url/registration/?srp=$srp";
             }
         $body = qq[
                 <SCRIPT LANGUAGE="JavaScript1.2">
-                        parent.location.href="$Defs::base_url/registration/";
+                        parent.location.href="$Defs::base_url/registration/?srp=$srp";
                         noScript = 1;
                 </SCRIPT>
         ];
@@ -91,7 +92,7 @@ sub main {
     else    {
       $body = runTemplate(
         \%Data,
-        {'errors' => $errors},
+        {'errors' => $errors, srp => $srp},
         'selfrego/user/loginerror.templ',
       );
     }

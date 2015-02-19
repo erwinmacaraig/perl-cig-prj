@@ -29,6 +29,7 @@ sub main {
     # GET INFO FROM URL
     my $client = param('client') || '';
     my $action = safe_param( 'a', 'action' ) || '';
+    my $srp = param( 'srp') || '';
     my %Data   = ();
     my $target = 'index.cgi';
     $Data{'target'} = $target;
@@ -79,12 +80,13 @@ sub main {
     $user->load();
     my $userID = $user->id() || 0;
     $Data{'UserName'} = $user->name();
+    $Data{'User'} = $user;
 
     if(!$action and $userID)  {
         $action = 'HOME';
     }
     if ( $action eq 'HOME' ) {
-        $resultHTML = showHome(\%Data, $user);
+        $resultHTML = showHome(\%Data, $user, $srp);
     }
     elsif ( $action =~ /SIGNUP_/ ) {
     }
@@ -97,12 +99,19 @@ sub main {
         my $defaultRegistrationNature = param('dnat') || '';
         my $internationalTransfer = param('itc') || '';
         my $startingStep = param('ss') || '';
+        my $minorRego = param('minorRego') || '';
+        my $entityID = 0;
 
         #specific to Transfers
         my $personRequestID = param('prid') || '';
 
         #specific to Renewals
         my $renewalTargetRegoID = param('rtargetid') || '';
+        if($srp)    {
+            my($s_type, $s_entity) = split /:/, $srp;
+            $defaultType = $s_type if $s_type;
+            $entityID = $s_entity if $s_entity;
+        }
 
         my $flow = new Flow_PersonSelfReg(
             db => $Data{'db'},
@@ -114,9 +123,11 @@ sub main {
                 dtype => $defaultType,
                 dnat => $defaultRegistrationNature,
                 itc => $internationalTransfer,
+                minorRego => $minorRego,
                 ss => $startingStep,
                 prid => $personRequestID,
                 rtargetid => $renewalTargetRegoID,
+                de => $entityID,
             },
             ID  => $personID || 0,
             UserID  => $userID || 0,
@@ -134,6 +145,7 @@ sub main {
         $resultHTML = runTemplate(
             \%Data,
             {
+                srp => $srp,
             },
             'selfrego/user/login.templ',
         );    

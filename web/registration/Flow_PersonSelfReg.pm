@@ -135,6 +135,11 @@ sub setupValues    {
     $values ||= {};
     $values->{'defaultType'} = $self->{'RunParams'}{'dtype'} || '';
     $values->{'itc'} = $self->{'RunParams'}{'itc'} || 0;
+    $values->{'minorRego'} = $self->{'RunParams'}{'minorRego'} || 0;
+    if($self->{'Data'}{'User'}) {
+        $values->{'strP1FName'} = $self->{'Data'}{'User'}->name();
+        $values->{'strP1SName'} = $self->{'Data'}{'User'}->familyname();
+    }
     my $client = $self->{'Data'}{'client'};
     $values->{'BaseURL'} = "$self->{'Data'}{'target'}?client=$client&amp;a=";
     $self->{'FieldSets'} = personFieldsSetup($self->{'Data'}, $values);
@@ -174,19 +179,14 @@ sub display_core_details    {
         if($defaultType eq $Defs::PERSON_TYPE_PLAYER and $self->{'SystemConfig'}{'allowPersonRequest'}) {
             $txt = $lang->txt('Please check that this player has not been registered with another club?')
                 .qq[ <a href = "$transfer">].$lang->txt('If yes, they need to apply for a Transfer.').'</a>'
-                .$lang->txt(' Not sure?')
-                .qq[ <a href = "$search">].$lang->txt('Then use the Search.').'</a>' ;
         }
         else {
-             $txt = $lang->txt('Has this person already been registered?')
-                .$lang->txt(' Not sure?')
-                .qq[ <a href = "$search">].$lang->txt('Then use the Search.').'</a>' ;       
         }
 
         $newRegoWarning = qq[
             <div class="alert"> 
                 <div> <span class="fa fa-info"></span> <p>$txt</p> </div> </div>
-        ];
+        ] if $txt;
         if($self->{'RunDetails'}{'FoundDuplicate'}) {
             $bypassduplicate = qq[
                 <p>
@@ -277,6 +277,27 @@ sub validate_core_details    {
         if($newreg)    { 
             $self->setID($personObj->ID()); 
             $self->addCarryField('newreg',1);
+            #Add permissions to user
+            my $st = qq[
+                INSERT INTO tblSelfUserAuth (
+                    intSelfUserID,
+                    intEntityTypeID,
+                    intEntityID,
+                    intMinor
+                )
+                VALUES (
+                    ?,
+                    $Defs::LEVEL_PERSON,
+                    ?,
+                    ?
+                )
+            ];
+            my $q = $self->{'db'}->prepare($st);
+            $q->execute(
+                $self->{'UserID'},
+                $personObj->ID(),
+                $self->{'RunParams'}{'minorRego'} || 0,
+            );
         }
         $self->{'ClientValues'}{'personID'} = $personObj->ID();
         $self->{'ClientValues'}{'currentLevel'} = $Defs::LEVEL_PERSON;
@@ -415,8 +436,7 @@ sub display_registration {
     if(!doesSelfUserHaveAccess($self->{'Data'}, $personID, $self->{'UserID'})) {
         return ('Invalid User',0);
     }
-    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
-    my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $entityID = $self->{'RunParams'}{'de'} || 0;
     my $originLevel = $Defs::LEVEL_PERSON;
 
     my $client = $self->{'Data'}->{'client'};
@@ -435,6 +455,7 @@ sub display_registration {
     my $defaultRegistrationNature = $self->{'RunParams'}{'dnat'} || '';
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $entitySelection = 1;
+    $entitySelection = 0 if $entityID;
     if($defaultRegistrationNature eq 'TRANSFER')   {
         $noContinueButton = 0;
         my %regFilter = (
@@ -535,7 +556,7 @@ sub process_registration {
     my $changeExistingReg = $self->{'RunParams'}{'changeExisting'} || 0;
     my $registrationNature = $self->{'RunParams'}{'d_nature'} || '';
     my $personRequestID = $self->{'RunParams'}{'prid'} || '';
-    my $entityID = $self->{'RunParams'}{'d_eId'} || '';
+    my $entityID = $self->{'RunParams'}{'d_eId'} || $self->{'RunParams'}{'de'} || 0;
     my $entityLevel = $self->{'RunParams'}{'d_etype'} || '';
     my $originLevel = $Defs::LEVEL_PERSON;
     my $lang = $self->{'Lang'};
@@ -737,8 +758,8 @@ sub display_products {
     if(!doesSelfUserHaveAccess($self->{'Data'}, $personID, $self->{'UserID'})) {
         return ('Invalid User',0);
     }
-    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
-    my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $entityID = 0;
+    my $entityLevel = 0;
     my $originLevel = $Defs::LEVEL_PERSON;
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
@@ -746,14 +767,8 @@ sub display_products {
     my $rego_ref = {};
     my $content = '';
     if($regoID) {
-        my $valid =0;
-        ($valid, $rego_ref) = validateRegoID(
-            $self->{'Data'}, 
-            $personID, 
-            $regoID, 
-            $entityID
-        );
-        $regoID = 0 if !$valid;
+        ($entityID, $entityLevel) = $self->getRegoEntity($regoID, $personID);
+        $regoID = 0 if !$entityID;
     }
 
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
@@ -856,21 +871,15 @@ sub process_products {
     if(!doesSelfUserHaveAccess($self->{'Data'}, $personID, $self->{'UserID'})) {
         return ('Invalid User',0);
     }
-    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
-    my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $entityID = 0;
+    my $entityLevel = 0;
     my $originLevel = $Defs::LEVEL_PERSON;
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
     my $rego_ref = {};
     if($regoID) {
-        my $valid =0;
-        ($valid, $rego_ref) = validateRegoID(
-            $self->{'Data'}, 
-            $personID, 
-            $regoID, 
-            $entityID
-        );
-        $regoID = 0 if !$valid;
+        ($entityID, $entityLevel) = $self->getRegoEntity($regoID, $personID);
+        $regoID = 0 if !$entityID;
     }
 
     my ($txnIds, $amount) = save_rego_products($self->{'Data'}, $regoID, $personID, $entityID, $entityLevel, $rego_ref, $self->{'RunParams'});
@@ -903,22 +912,16 @@ sub display_documents {
     if(!doesSelfUserHaveAccess($self->{'Data'}, $personID, $self->{'UserID'})) {
         return ('Invalid User',0);
     }
-	my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
-    my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+	my $entityID = 0;
+    my $entityLevel = 0;
     my $originLevel = $Defs::LEVEL_PERSON;
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
 	my $rego_ref = {};
     my $content = '';
     if($regoID) {
-        my $valid =0;
-        ($valid, $rego_ref) = validateRegoID(
-            $self->{'Data'}, 
-            $personID, 
-            $regoID, 
-            $entityID
-        );
-        $regoID = 0 if !$valid;
+        ($entityID, $entityLevel) = $self->getRegoEntity($regoID, $personID);
+        $regoID = 0 if !$entityID;
     }
 	my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
     $personObj->load();
@@ -977,9 +980,8 @@ sub process_documents {
         return ('Invalid User',0);
     }
 
-	
-    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
-    my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $entityID = 0;
+    my $entityLevel = 0;
     my $originLevel = $Defs::LEVEL_PERSON;
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
@@ -988,14 +990,8 @@ sub process_documents {
 	my $personObj;
     my $content = '';
     if($regoID) {
-        my $valid =0;
-        ($valid, $rego_ref) = validateRegoID(
-            $self->{'Data'}, 
-            $personID, 
-            $regoID, 
-            $entityID
-        );
-        $regoID = 0 if !$valid;
+        ($entityID, $entityLevel) = $self->getRegoEntity($regoID, $personID);
+        $regoID = 0 if !$entityID;
 		$personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
     	$personObj->load();
 		my $nationality = $personObj->getValue('strISONationality') || ''; 
@@ -1059,8 +1055,8 @@ sub display_summary {
     if(!doesSelfUserHaveAccess($self->{'Data'}, $personID, $self->{'UserID'})) {
         return ('Invalid User',0);
     }
-    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
-    my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $entityID = 0;
+    my $entityLevel = 0;
     my $originLevel = $Defs::LEVEL_PERSON;
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
@@ -1068,14 +1064,8 @@ sub display_summary {
     my $rego_ref = {};
     my $content = '';
     if($regoID) {
-        my $valid =0;
-        ($valid, $rego_ref) = validateRegoID(
-            $self->{'Data'}, 
-            $personID, 
-            $regoID, 
-            $entityID
-        );
-        $regoID = 0 if !$valid;
+        ($entityID, $entityLevel) = $self->getRegoEntity($regoID, $personID);
+        $regoID = 0 if !$entityID;
     }
 
     if($regoID) {
@@ -1131,8 +1121,8 @@ sub display_complete {
     if(!doesSelfUserHaveAccess($self->{'Data'}, $personID, $self->{'UserID'})) {
         return ('Invalid User',0);
     }
-    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
-    my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $entityID = 0;
+    my $entityLevel = 0;
     my $originLevel = $Defs::LEVEL_PERSON;
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
@@ -1141,14 +1131,8 @@ sub display_complete {
     my $content = '';
     my $gateways= '';
     if($regoID) {
-        my $valid =0;
-        ($valid, $rego_ref) = validateRegoID(
-            $self->{'Data'}, 
-            $personID, 
-            $regoID, 
-            $entityID
-        );
-        $regoID = 0 if !$valid;
+        ($entityID, $entityLevel) = $self->getRegoEntity($regoID, $personID);
+        $regoID = 0 if !$entityID;
     }
 
     if($regoID) {
@@ -1438,6 +1422,31 @@ sub moveDocuments {
 }
 
  
+sub getRegoEntity   {
+    my $self = shift;
+    my ($regoID, $personID) = @_;
+    
+    my $st = qq[
+        SELECT
+            E.intEntityID,
+            E.intEntityLevel
+        FROM
+            tblPersonRegistration_$self->{'Data'}->{'Realm'} AS PR
+            INNER JOIN tblEntity AS E
+                ON PR.intEntityID = E.intEntityID
+        WHERE
+            PR.intPersonRegistrationID = ?
+            AND PR.intPersonID = ?
+    ];
+    my $q=$self->{'Data'}->{'db'}->prepare($st);
+    $q->execute(
+        $regoID,
+        $personID,
+    );
+    my ($id, $type) = $q->fetchrow_array();
+    $q->finish();
+    return ($id, $type);
+}
 
 
 1;

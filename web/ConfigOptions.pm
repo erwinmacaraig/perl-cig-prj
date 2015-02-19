@@ -359,6 +359,7 @@ sub getFieldsList	{
         strEmergContNo2
         strEmergContRel
         strP1Salutation
+        strGuardianRelationship
         strP1FName
         strP1SName
         intP1Gender

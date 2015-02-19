@@ -13,6 +13,7 @@ use PageMain;
 use Lang;
 use TTTemplate;
 use SelfUserObj;
+use AddToPage;
 
 main();
 
@@ -26,7 +27,10 @@ sub main {
     my $target = 'signup.cgi';
     $Data{'target'} = $target;
     $Data{'cache'}  = new MCache();
+    $Data{'AddToPage'} = new AddToPage();
+
     my $action = param('a') || '';
+    my $srp = param('srp') || '';
 
     my $body = '';
     my $template = 'selfrego/user/signup.templ';
@@ -37,13 +41,16 @@ sub main {
             $template = 'selfrego/user/signupfinish.templ';
         }
     }
-  $body = runTemplate(
-    \%Data,
-    {'Errors' => $errors},
-    $template,
-  );
+    $body = runTemplate(
+        \%Data,
+        {
+            'Errors' => $errors,
+            'srp' => $srp || '',
+        },
+        $template,
+    );
 
-    my $title = 'Signup';
+    my $title = $lang->txt('Signup');
 
     regoPageForm(
               $title,
@@ -74,8 +81,6 @@ sub signup  {
             $missing_fields .= '<li>' . $fields{$f} .'</li>';
         }
     }
-use Data::Dumper;
-print STDERR Dumper(\%inputs);
     if($missing_fields) {
         push @errors, $Data->{'lang'}->txt('You must fill in the following fields:').qq[<ul>$missing_fields</ul>];
     }

@@ -105,6 +105,11 @@ sub name {
     return $self->{'Info'}{'FirstName'} || '';
 }
 
+sub familyname {
+    my $self = shift;
+    return $self->{'Info'}{'FamilyName'} || '';
+}
+
 sub fullname {
     my $self = shift;
     return join( ' ', $self->{'Info'}{'FirstName'}, $self->{'Info'}{'FamilyName'} );

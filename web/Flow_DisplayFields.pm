@@ -508,9 +508,11 @@ sub gather    {
         my $name = "d_$fieldname";
         my $fv   = $self->{'Fields'}->{'fields'}{$fieldname};
         $fv->{'old_value'} = $fv->{'value'};
+        my $active = exists($self->{'Fields'}->{'fields'}{$fieldname}{'active'}) ? $self->{'Fields'}->{'fields'}{$fieldname}{'active'} : 1;
 
         next if $self->{'Fields'}->{'fields'}{$fieldname}{'type'} eq 'htmlrow';
         next if $self->{'Fields'}->{'fields'}{$fieldname}{'SkipProcessing'};
+        next if !$active;
         next if ( $permissions and !$permissions->{$fieldname} );
         if($option eq 'add')    {
             next if $self->{'Fields'}->{'fields'}{$fieldname}{'SkipAddProcessing'};

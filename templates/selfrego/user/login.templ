@@ -9,12 +9,13 @@
                 <h3 class="form-signin-heading">[% Lang.txt('Sign into Self Registration') %]</h3>
                 <input type = "text" class="form-control" name = "email">
                 <input type = "password" class="form-control" name = "pw">
+                <input type = "hidden" name = "srp" value = "[% srp %]">
                 <input class="btn btn-sm btn-primary pull-right" type = "submit" value = "[% Lang.txt('Sign in') %]">
                 <br /><br />
-                <p><a href = "">[% Lang.txt('Forgot your password?')%]</a></p>
+                <p><a href = "?a=FORGOT&amp;srp=[% srp %]">[% Lang.txt('Forgot your password?')%]</a></p>
             </form>
             <div class="col-md-12">
-                <a href = "user/signup.cgi" class = "btn-main"> Signup</a>
+                <a href = "user/signup.cgi?srp=[% srp %]" class = "btn-main"> Signup</a>
             </div>
         </div>
     </div>
