@@ -56,7 +56,7 @@
       <div class="col-md-12">
       [% IF Data.ELevel != 3 %]
         <!--<a href="#" title=""><img class="header-logo" src="images/FAS-logo.png" alt="" /></a>-->
-        <a href="#" title=""><img class="header-logo" src="[% HeaderLogo %]" alt="" /></a>
+        <a href="#" title=""><img class="header-logo" src="[% HeaderLogo || DefaultSystemConfig.LoginError_MA_logo || DefaultSystemConfig.MA_logo  %]" alt="" /></a>
       [% END %]  
         <ul>
           <li>
@@ -66,13 +66,14 @@
             [% IF NavTree.last.ma_phone_number != '' %]
               [% NavTree.last.ma_phone_number %]
             [% ELSE %]
-              (65) 6348 3477 / 6293 1477
+                [% DefaultSystemConfig.ma_phone_number %]
             [% END %]
             </strong><br/>
             [% Lang.txt('Website') %]: <strong>
             [% IF NavTree.last.ma_website != '' %]
               [% NavTree.last.ma_website %]
             [% ELSE %]
+                [% DefaultSystemConfig.ma_website %]
               http://www.fas.org.sg
             [% END %]
             </strong>
@@ -91,14 +92,14 @@
             [% IF NavTree.last.help_desk_phone_number != '' %]
               [% NavTree.last.help_desk_phone_number %]
             [% ELSE %]
-              6880 3197
+                [% DefaultSystemConfig.help_desk_phone_number %]
             [% END %]
             </strong><br/>
             [% Lang.txt('Email') %]: <strong>
             [% IF NavTree.last.help_desk_email != '' %]
               [% NavTree.last.help_desk_email %]
             [% ELSE %]
-              support@myfas.zendesk.com
+                [% DefaultSystemConfig.help_desk_email %]
             [% END %]
             </strong><br/>
           </li>
