@@ -15,7 +15,7 @@ use Data::Dumper;
 sub handleTransferFlow {
     my ($action, $Data, $paramRef) = @_;
 
-    my $paramRef ||= undef;
+    $paramRef ||= undef;
     my $body = '';
     my $title = '';
     my $client = $Data->{'client'};

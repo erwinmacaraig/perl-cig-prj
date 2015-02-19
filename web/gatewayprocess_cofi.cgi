@@ -92,6 +92,7 @@ my ($paymentSettings, undef) = getPaymentSettings(\%Data,$Order->{'PaymentType'}
         my $str = "$Vals{'VERSION'}&$Vals{'STAMP'}&$Vals{'REFERENCE'}&$Vals{'PAYMENT'}&$Vals{'STATUS'}&$Vals{'ALGORITHM'}";
         my $digest=uc(hmac_sha256_hex($str, $paymentSettings->{'gatewayPassword'}));
         my $chkAction = 'FAILURE';
+print STDERR "$Vals{'MAC'} $str $digest |  $paymentSettings->{'gatewayPassword'}\n";
         if ($Vals{'MAC'} eq $digest)    {
             $chkAction = 'SUCCESS';
         }
@@ -117,11 +118,13 @@ print STDERR "MAC ACTION IS $chkAction\n";
         $returnVals{'Other1'} = $co_status || '';
         $returnVals{'Other2'} = param('MAC') || '';
         gatewayProcess(\%Data, $logID, $client, \%returnVals, $chkAction);
+        #print "Content-type: text/html\n\n" if (! $display_action);
     }
 
 	disconnectDB($db);
     if ($process_action eq '1')    {
         payTryContinueProcess(\%Data, $payTry, $client, $logID);
+        print "Content-type: text/html\n\n" if (! $display_action);
     }
 
     if ($display_action eq '1')    {

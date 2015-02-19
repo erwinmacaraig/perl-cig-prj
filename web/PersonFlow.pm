@@ -15,7 +15,8 @@ use Data::Dumper;
 sub handlePersonFlow {
     my ($action, $Data, $paramRef) = @_;
 
-    my $paramRef ||= undef;
+    $paramRef ||= undef;
+print STDERR Dumper($paramRef);
     my $body = '';
     my $title = '';
     my $client = $Data->{'client'};
