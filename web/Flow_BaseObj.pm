@@ -327,6 +327,10 @@ sub display {
   $templateData->{'ContinueButtonText'} ||= 'Continue';
   $templateData->{'CancelButtonURL'} = $self->{'Target'}."?rfp=_cancel&amp;".$self->stringifyURLCarryField();
   $templateData->{'SaveButtonURL'} = $self->{'Target'}."?rfp=_save&amp;".$self->stringifyURLCarryField();
+  if($self->isLastPage() and $self->{'AllowSaveState'}) {
+      $templateData->{'CancelButtonURL'} = '';
+      $templateData->{'SaveButtonURL'} = '';
+  }
   ($templateData->{'BackButtonURL'}, $templateData->{'BackButtonDestination'}) = $self->buildBackButton();
   my $output = runTemplate($self->{'Data'}, $templateData, $templateName);
   if($templateData->{'Errors'} and scalar(@{$templateData->{'Errors'}})) {
