@@ -3651,6 +3651,23 @@ sub updateTaskScreen {
     my $status;
     my $TaskType;
 
+    my $st = qq[
+        SELECT 
+            strLocalName 
+        FROM
+            tblEntity 
+        WHERE 
+            intEntityID = ?
+        LIMIT 1
+    ];
+
+    my $qt = $Data->{'db'}->prepare($st) or query_error($st);
+    my $res = $qt->execute(
+        $Data->{'clientValues'}{'regionID'}
+    ) or query_error($st);
+
+    my $raID = $qt->fetchrow_hashref();
+
     if($task->{'strWFRuleFor'} eq "ENTITY" and $task->{'intEntityLevel'} == $Defs::LEVEL_CLUB){
         $titlePrefix = $Defs::workTaskTypeLabel{$task->{'strRegistrationNature'} . "_CLUB"};
         $TaskType = $task->{'strRegistrationNature'} . "_CLUB";
@@ -3772,9 +3789,14 @@ sub updateTaskScreen {
                 $status = $Data->{'lang'}->txt("Rejected");
             }
             elsif($TaskType eq 'RENEWAL_PLAYER') {
-                $message = $Data->{'lang'}->txt("You have rejected this Player. To proceed with this Renewal, start a new Renewal.");
+                $message = $Data->{'lang'}->txt("You have rejected this Player Renewal. To proceed with this Renewal, start a new Renewal.");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
+            elsif($TaskType eq 'RENEWAL_CLUBOFFICIAL') {
+                $message = $Data->{'lang'}->txt("You have rejected this Club Renewal. ".$raID->{'strLocalName'}." will be informed. To proceed with this Renewal ".$raID->{'strLocalName'}."");
+                $status = $Data->{'lang'}->txt("Rejected");
+            }
+
         }
         case "WF_PR_S" {
             $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'Resolved');
@@ -3796,6 +3818,9 @@ sub updateTaskScreen {
         'status' => $status,
         'taskType' => $TaskType,
     );
+
+    #open (my $FH,">test.txt");
+    #print $FH  Dumper($raID->{'strLocalName'});
 
 	$body = runTemplate(
         $Data,
