@@ -68,7 +68,7 @@ sub NABProcess  {
     $chkvalue = $m->hexdigest();
        
     my $url = $Defs::gatewayReturnDemo . qq[/gatewayprocess.cgi?pa=1&amp;sa=1&amp;da=0&amp;client=$client&amp;ext=$external&amp;ci=$logID&amp;chkv=$chkvalue&amp;formID=$formID&amp;session=$session&amp;restext=$respText&amp;rescode=$respCode&amp;txnid=111&amp;authid=123];
-    my $return_link = $Defs::gatewayReturnDemo . qq[/gatewayprocess.cgi?sa=0&amp;da=1&amp;client=$client&amp;ext=$external&amp;ci=$logID&amp;chkv=$chkvalue&amp;formID=$formID&amp;session=$session&amp;restext=$respText&amp;rescode=$respCode&amp;txnid=111&amp;authid=123];
+    my $return_link = $Defs::gatewayReturnDemo . qq[/gatewayprocess.cgi?sa=1&amp;da=1&amp;client=$client&amp;ext=$external&amp;ci=$logID&amp;chkv=$chkvalue&amp;formID=$formID&amp;session=$session&amp;restext=$respText&amp;rescode=$respCode&amp;txnid=111&amp;authid=123];
 
 #    if (1==2)   {
         my $agent = LWP::UserAgent->new(env_proxy => 1,keep_alive => 1, timeout => 30); 

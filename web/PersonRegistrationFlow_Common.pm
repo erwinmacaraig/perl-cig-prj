@@ -1217,18 +1217,22 @@ sub bulkRegoCreate  {
             'MINOR'
     );
 
-	my $invoiceNumber;
-	#Generate invoice number 
-	my $stt = qq[INSERT INTO tblInvoice (tTimeStamp, intRealmID) VALUES (NOW(), $Data->{'Realm'})];
-	my $qryy=$Data->{'db'}->prepare($stt); 
-	$qryy->execute();
-	my $invoiceID =  $qryy->{mysql_insertid} || 0;	
-	$invoiceNumber = Payments::TXNtoInvoiceNum($invoiceID); 
+	#generate a single invoice number for each registration renewal	
+	my $invoiceID = 0;
+	if(!$Data->{'SystemConfig'}{'bulkRego_eachInvoice'}){		
+		my $invoiceNumber;
+		#Generate invoice number 
+		my $stt = qq[INSERT INTO tblInvoice (tTimeStamp, intRealmID) VALUES (NOW(), $Data->{'Realm'})];
+		my $qryy=$Data->{'db'}->prepare($stt); 
+		$qryy->execute();
+		$invoiceID =  $qryy->{mysql_insertid} || 0;	
+		$invoiceNumber = Payments::TXNtoInvoiceNum($invoiceID); 
 
-	$stt = qq[UPDATE tblInvoice SET strInvoiceNumber = ? WHERE intInvoiceID = ?];		
-	$qryy=$Data->{'db'}->prepare($stt); 
-	$qryy->execute($invoiceNumber,$invoiceID); 
-	$qryy->finish();
+		$stt = qq[UPDATE tblInvoice SET strInvoiceNumber = ? WHERE intInvoiceID = ?];		
+		$qryy=$Data->{'db'}->prepare($stt); 
+		$qryy->execute($invoiceNumber,$invoiceID); 
+		$qryy->finish();
+	}
 
     my %RegoIDs=();
     for my $pID (@IDs)   {
@@ -1281,7 +1285,21 @@ sub bulkRegoCreate  {
             my ($prodID, $qty) = split /-/, $prodQty;
             $Products{"prodQTY_$prodID"} =$qty;
         }
-		
+		#generate individual invoice number for each registration renewal
+		if($Data->{'SystemConfig'}{'bulkRego_eachInvoice'}){
+			my $invoiceNumber = 0;
+			#Generate invoice number 
+			my $stt = qq[INSERT INTO tblInvoice (tTimeStamp, intRealmID) VALUES (NOW(), $Data->{'Realm'})];
+			my $qryy=$Data->{'db'}->prepare($stt); 
+			$qryy->execute();
+			$invoiceID =  $qryy->{mysql_insertid} || 0;	
+			$invoiceNumber = Payments::TXNtoInvoiceNum($invoiceID); 
+
+			$stt = qq[UPDATE tblInvoice SET strInvoiceNumber = ? WHERE intInvoiceID = ?];		
+			$qryy=$Data->{'db'}->prepare($stt); 
+			$qryy->execute($invoiceNumber,$invoiceID); 
+			$qryy->finish();
+		}
 
         my ($txns_added, $amount) = insertRegoTransaction(
             $Data, 

@@ -173,6 +173,7 @@ print STDERR "IN HERE FOR EXTERNAL GATEWAY UPDATE\n";
   	my $templateBody = $template_ref->{'strFailureTemplate'} || 'payment_failure.templ';
     my $itemData;
   	if ($returnVals->{'ResponseCode'} eq 'OK')  {
+	#if ($returnVals->{'ResponseCode'} =~/^00|08|OK$/)  {
     	UpdateCart($Data, $paymentSettings, $client, undef, undef, $logID);
     	product_apply_transaction($Data,$logID);
     	EmailPaymentConfirmation($Data, $paymentSettings, $logID, $client);
@@ -180,6 +181,7 @@ print STDERR "IN HERE FOR EXTERNAL GATEWAY UPDATE\n";
   	} 
     else    {
         #processTransLogFailure($db, $logID, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text);
+		
     }
 }
 
