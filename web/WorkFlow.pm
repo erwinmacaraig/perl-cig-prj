@@ -2017,7 +2017,7 @@ sub rejectTask {
 
     setDocumentStatus($Data, $WFTaskID, 'REJECTED');
 
-    #resetRelatedTasks($Data, $WFTaskID, 'REJECTED');
+    resetRelatedTasks($Data, $WFTaskID, 'REJECTED');
 
     if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
