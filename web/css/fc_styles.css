@@ -504,13 +504,13 @@ a.btn-main, input.btn-main, button.btn-main {
 }
 a.btn-main.btn-proceed {
     padding-left:20px;
-    padding-bottom:7px;
+    position: relative;
 }
 .proceed-chevron    {
     float:right;
-    position:relative;
-    bottom:3px;
-    right:-10px;
+    position:absolute;
+    bottom:11px;
+    right:12px;
     font-weight:bold;
     margin:0 !important;
     padding:0px;
