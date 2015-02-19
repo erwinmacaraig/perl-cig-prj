@@ -30,17 +30,17 @@
         <div class="container">
           <div class="row">
             <div class="col-md-12">
-              <a href="#" title=""><img class="header-logo" src="images/FAS-logo.png" alt="" /></a>
+              <a href="#" title=""><img class="header-logo" src="[% SystemConfig.MA_logo %]" alt="" /></a>
               <ul>
                 <li>
                   <strong>[% Lang.txt('Member Association') %]</strong><br/>
-                  [% Lang.txt('Phone') %]: <strong>(65) 6348 3477 / 6293 1477</strong><br/>
-                  [% Lang.txt('Website') %]: <strong>http://www.fas.org.sg</strong>
+                  [% Lang.txt('Phone') %]: <strong>[% SystemConfig.ma_phone_number %]</strong><br/>
+                  [% Lang.txt('Website') %]: <strong>[% SystemConfig.ma_website %]</strong>
                 </li>
                 <li>
                   <strong>[% Lang.txt('Help Desk') %]</strong><br/>
-                  [% Lang.txt('Phone') %]: <strong>6880 3197</strong><br/>
-                  [% Lang.txt('Email') %]: <strong>support@myfas.zendesk.com</strong><br/>
+                  [% Lang.txt('Phone') %]: <strong>[% SystemConfig.help_desk_phone_number %]</strong><br/>
+                  [% Lang.txt('Email') %]: <strong>[% SystemConfig.help_desk_email %]</strong><br/>
                 </li>
               </ul>
             </div>
