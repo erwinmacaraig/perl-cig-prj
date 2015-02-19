@@ -80,12 +80,9 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
         $returnVals{'GATEWAY_SIG'}= param('sig') || '';
         $returnVals{'GATEWAY_SETTLEMENT_DATE'}= param('settdate') || '';
         $returnVals{'GATEWAY_RESPONSE_CODE'}= param('rescode') || '';
-<<<<<<< HEAD
-        $returnVals{'ResponseCode'} = "OK" if (param('rescode') =~ /08|00/);
-=======
         $returnVals{'ResponseCode'}= "OK" if (param('rescode') =~ /08|00/);
         $returnVals{'GatewayResponseCode'}= param('rescode') || '';
->>>>>>> 5bcb7a4ef928f3a7105ec16349bfe857aefa7d49
+
         $returnVals{'GATEWAY_RESPONSE_TEXT'}= param('restext') || '';
         $returnVals{'ResponseText'}= param('restext') || '';
         $returnVals{'Other1'} = param('restext') || '';
