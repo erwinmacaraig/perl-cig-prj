@@ -1334,8 +1334,7 @@ sub bulkRegoCreate  {
         UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $logID);
         product_apply_transaction($Data,$logID);
     }
-    my $txnIds = join(':',@total_txns_added);
-    
+    my $txnIds = join(':',@total_txns_added);    
  
     return ($totalAmount, $txnIds, \%RegoIDs);
 }
