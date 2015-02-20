@@ -30,7 +30,7 @@ sub main {
 
     $Data{'Realm'} = 1;
     $Data{'SystemConfig'} = getSystemConfig( \%Data );
-
+print STDERR "SSSSSSSSS" . $Data{'SystemConfig'}{'loginError_returnURL'};
     my $email = param('email') || '';
     my $password = param('pw') || '';
 
@@ -96,7 +96,7 @@ sub main {
     else    {
       $body = runTemplate(
         \%Data,
-        {'errors' => $errors},
+        {'returnURL'=>"$Data{'SystemConfig'}{'loginError_returnURL'}" ,'errors' => $errors},
         'user/loginerror.templ',
       );
     }
