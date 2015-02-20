@@ -1942,7 +1942,7 @@ sub resolveTask {
 	}
     setDocumentStatus($Data, $WFTaskID, 'PENDING');
 
-    resetRelatedTasks($Data, $WFTaskID, 'ACTIVE');
+    #resetRelatedTasks($Data, $WFTaskID, 'ACTIVE');
     ####
   	auditLog($WFTaskID, $Data, 'Updated Work Task', 'WFTask');
   	###
@@ -3953,7 +3953,7 @@ sub holdTask {
             $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
         }
 
-        resetRelatedTasks($Data, $WFTaskID, 'PENDING');
+        #resetRelatedTasks($Data, $WFTaskID, 'PENDING');
 
         return 1;
     }
