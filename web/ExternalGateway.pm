@@ -174,11 +174,14 @@ print STDERR "IN HERE FOR EXTERNAL GATEWAY UPDATE\n";
     my $itemData;
   	if ($returnVals->{'ResponseCode'} eq 'OK')  {
 	#if ($returnVals->{'ResponseCode'} =~/^00|08|OK$/)  {
-    	UpdateCart($Data, $paymentSettings, $client, undef, undef, $logID);
+    	UpdateCart($Data, $paymentSettings, $client, undef, 'OK', $logID);
     	product_apply_transaction($Data,$logID);
     	EmailPaymentConfirmation($Data, $paymentSettings, $logID, $client);
     	$templateBody = $template_ref->{'strSuccessTemplate'} || 'payment_success.templ';
   	} 
+    elsif ($returnVals->{'ResponseCode'} eq 'HOLD')  {
+    	UpdateCart($Data, $paymentSettings, $client, undef, 'HOLD', $logID);
+    }
     else    {
         #processTransLogFailure($db, $logID, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text);
 		

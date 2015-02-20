@@ -6,8 +6,8 @@ package TransLog;
 
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(handleTransLogs viewTransLog viewPayLaterTransLog);
-@EXPORT_OK = qw(handleTransLogs viewTransLog viewPayLaterTransLog);
+@EXPORT = qw(handleTransLogs viewTransLog viewPayLaterTransLog resolveHoldPayment resolveHoldPaymentForm);
+@EXPORT_OK = qw(handleTransLogs viewTransLog viewPayLaterTransLog resolveHoldPayment resolveHoldPaymentForm);
 
 use strict;
 use lib '.';
@@ -84,6 +84,17 @@ sub handleTransLogs {
 	if ($action =~/payVIEW/)	{
 		($body, $header) = viewTransLog($Data, $Data->{'params'}{'tlID'},$Data->{'params'}{'pID'});
 	}
+	if ($action =~/resolveHOLD/)	{
+		($body, $header) = resolveHoldPaymentForm($Data, $Data->{'params'}{'tlID'});
+	}
+	if ($action =~/RH_F/)	{
+        ## FAILURE
+		($body, $header) = resolveHoldPayment($Data, $Data->{'params'}{'tlID'}, $Defs::TXNLOG_FAILED);
+	}
+	if ($action =~/RH_P/)	{
+        ## PAID
+		($body, $header) = resolveHoldPayment($Data, $Data->{'params'}{'tlID'}, $Defs::TXNLOG_SUCCESS);
+	}
   if ($action=~/(edit|display|add)/) {
 	  ($body, $header)=entityDetails($action, $Data, $clientValues_ref, $db);
   }
@@ -108,6 +119,43 @@ sub handleTransLogs {
   return ($body, $header);
 }
 
+sub resolveHoldPayment  {
+
+    my ($Data, $logID, $resolveStatus) = @_;
+
+    return if ! $logID;
+    if ($resolveStatus == $Defs::TXNLOG_SUCCESS)   {
+        my $st = qq[
+            UPDATE tblTransactions
+            SET intStatus = 1
+            WHERE intTransLogID = ?
+        ];
+        my $query = $Data->{'db'}->prepare($st);
+        $query->execute($logID);
+        $st = qq[
+            UPDATE tblTransLog
+            SET intStatus = 1, strResponseCode = 'OK', strResponseText = 'Hold Resolved'
+            WHERE intLogID = ?
+        ];
+        $query = $Data->{'db'}->prepare($st);
+        $query->execute($logID);
+        my ($paymentSettings, $paymentTypes) = getPaymentSettings($Data, 0, 0, $Data->{'clientValues'});
+        EmailPaymentConfirmation($Data, $paymentSettings, $logID, $Data->{'client'});
+        Products::product_apply_transaction($Data,$logID);
+    }
+    if ($resolveStatus == $Defs::TXNLOG_FAILED) {
+        my $st = qq[
+            UPDATE tblTransactions
+            SET intStatus = 0, intTransLogID = 0, dtPaid = NULL
+            WHERE intTransLogID = ?
+        ];
+        my $query = $Data->{'db'}->prepare($st);
+        $query->execute($logID);
+    }
+
+    my $lang = $Data->{'lang'};
+	return ($lang->txt('Hold on this Transaction has been resolved'), $lang->txt('Hold Resolved'));
+}
 
 sub delTransLog	{
 	my ($Data) = @_;
@@ -675,64 +723,59 @@ warn("LL $hidePayment:$hidePay:$displayonly");
         $row_data->{id} = $i;
         foreach my $header (@headers) {
             if ($header->{field} eq 'StatusTextLang') {
-               my $status = $row->{intStatus};
-               $row->{StatusText} = 'Unpaid' if ($status == 0);
-               $row->{StatusText} = 'Paid' if ($status == 1);
-               $row->{StatusText} = 'Cancelled' if ($status == 2);
+               $row->{StatusText} = $Defs::TransLogStatus{$row->{'intStatus'}} || 'a';
+               $row->{StatusTextLang} = $Defs::TransLogStatus{$row->{'intStatus'}} || 'n';
+            }
+            $row_data->{$header->{field}} = $row->{$header->{field}}; 
+            $row_data->{'dtPaid_RAW'} = $row->{'dtPaid'}; 
+            $row_data->{'dtPaid'} = $Data->{'l10n'}{'date'}->TZformat($row->{'dtPaid'},'MEDIUM','SHORT'); 
+        }
+            $row_data->{SelectLink} = qq[main.cgi?client=$client&a=P_TXN_EDIT&personID=$row->{intID}&id=$row->{intTransLogID}&tID=$row->{intTransactionID}];
+            if ($row->{intStatus} == 1) {
+print STDERR "IN PAID\n";
+                $row_data->{stuff} = qq[<ul><li><a href="main.cgi?a=P_TXNLog_payVIEW&client=$client&tlID=$row->{intTransLogID}&amp;pID=$row->{intID}" class = "">].$Data->{'lang'}->txt('View Payments').qq[</a> ];
+                $row_data->{stuff} .= qq[<li><a href="printreceipt.cgi?client=$client&amp;ids=$row->{intTransLogID}&amp;pID=$row->{intID}"  target="receipt" class = "btn-dinside-panels">].$Data->{'lang'}->txt('View Receipt').qq[</a></ul>];
+               $row_data->{manual_payment} = '-';
+            }
+            elsif ($row->{intStatus} ==3) { ##HOLD
+                $row_data->{stuff} = qq[<ul><li><a href="main.cgi?a=P_TXNLog_resolveHOLD&client=$client&tlID=$row->{intTransLogID}&amp;pID=$row->{intID}" class = "">].$Data->{'lang'}->txt('Resolve Hold').qq[</a> ];
+                $row_data->{manual_payment} = '-';
 
-               $row->{StatusTextLang} = $Data->{'lang'}->txt('Unpaid') if ($status == 0);
-               $row->{StatusTextLang} = $Data->{'lang'}->txt('Paid') if ($status == 1);
-               $row->{StatusTextLang} = $Data->{'lang'}->txt('Cancelled') if ($status == 2);
-             }
-        $row_data->{$header->{field}} = $row->{$header->{field}}; 
-        $row_data->{'dtPaid_RAW'} = $row->{'dtPaid'}; 
-        $row_data->{'dtPaid'} = $Data->{'l10n'}{'date'}->TZformat($row->{'dtPaid'},'MEDIUM','SHORT'); 
+            }
+            elsif ($row->{intStatus} == 0) {
+                $row_data->{strReceipt} = qq[];
+
+                my $allowUD = 1;
+                $allowUD = 0 if $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB;
+                $allowUD = 0 if $Data->{'SystemConfig'}{'DontAllowUnpaidDelete'}; 
+
+                $row_data->{stuff} = ($allowUD) 
+                      ? qq[<a href="main.cgi?a=P_TXN_DEL&client=$client&tID=$row->{intTransactionID}">].$Data->{'lang'}->txt('Delete Transaction').qq[</a>]
+                      : '';
+                $row_data->{manual_payment} = qq[<input type="checkbox" name="act_$row->{intTransactionID}" value="" class = "paytxn_chk">];
+            }
+            else {
+              $row_data->{stuff} = '';
+              $row_data->{manual_payment} = '';
+            } 
+            if($row->{'dblTaxRate'}){
+                $row->{'dblTaxRate'} || 0;
+                my $temppricerate = 1 + $row->{'dblTaxRate'}; 
+                $row_data->{'NetAmount'} = sprintf( "%.2f",($row->{curAmount} / $temppricerate));
+                $row_data->{'TaxTotal'} =sprintf("%.2f",($row->{'dblTaxRate'} * $row_data->{'NetAmount'}));  
+            }     
+            $row_data->{'strInvoiceNumber'} = $row->{'strInvoiceNumber'};
+
+            push @rowdata, $row_data if $row_data;
+            $i++;
     }
-    $row_data->{SelectLink} = qq[main.cgi?client=$client&a=P_TXN_EDIT&personID=$row->{intID}&id=$row->{intTransLogID}&tID=$row->{intTransactionID}];
-    if ($row->{StatusText} eq 'Paid') {
-      $row_data->{stuff} = qq[<ul><li><a href="main.cgi?a=P_TXNLog_payVIEW&client=$client&tlID=$row->{intTransLogID}&amp;pID=$row->{intID}" class = "">].$Data->{'lang'}->txt('View Payments').qq[</a> ];
-      $row_data->{stuff} .= qq[<li><a href="printreceipt.cgi?client=$client&amp;ids=$row->{intTransLogID}&amp;pID=$row->{intID}"  target="receipt" class = "btn-dinside-panels">].$Data->{'lang'}->txt('View Receipt').qq[</a></ul>];
-      $row_data->{manual_payment} = '-';
-    }
-    elsif ($row->{StatusText} eq 'Unpaid') {
-      $row_data->{strReceipt} = qq[];
-
-      my $allowUD = 1;
-	  $allowUD = 0 if $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB;
-      $allowUD = 0 if $Data->{'SystemConfig'}{'DontAllowUnpaidDelete'}; 
-
-      $row_data->{stuff} = ($allowUD) 
-          ? qq[<a href="main.cgi?a=P_TXN_DEL&client=$client&tID=$row->{intTransactionID}">].$Data->{'lang'}->txt('Delete Transaction').qq[</a>]
-          : '';
-      $row_data->{manual_payment} = qq[<input type="checkbox" name="act_$row->{intTransactionID}" value="" class = "paytxn_chk">];
-    }
-    else {
-      $row_data->{stuff} = '';
-      $row_data->{manual_payment} = '';
-    } 
-   # $row_data->{TotalAmount} = $row->{intQty} * $row->{curAmount};
-   # $row_data->{curAmount} =$row_data->{TotalAmount};    
-
-
-
-    #if($row->{'dblTaxRate'}){
-        $row->{'dblTaxRate'} || 0;
-        my $temppricerate = 1 + $row->{'dblTaxRate'}; 
-        $row_data->{'NetAmount'} = sprintf( "%.2f",($row->{curAmount} / $temppricerate));
-        $row_data->{'TaxTotal'} =sprintf("%.2f",($row->{'dblTaxRate'} * $row_data->{'NetAmount'}));  
-    #}     
-    $row_data->{'strInvoiceNumber'} = $row->{'strInvoiceNumber'};
-
-    push @rowdata, $row_data if $row_data;
-    $i++;
-  }
-  my $filterfields = [
-    {
-      field => 'intStatus',
-      elementID => 'dd_intStatus',
-      allvalue => '3',
-    },
-  ];
+        my $filterfields = [
+        {
+            field => 'intStatus',
+            elementID => 'dd_intStatus',
+            allvalue => '99',
+        },
+        ];
   my $grid = showGrid(
     Data => $Data,
     columns => \@headers,
@@ -747,10 +790,11 @@ warn("LL $hidePayment:$hidePay:$displayonly");
 			<div class = "showrecoptions">
 				Filter by:
 				<select name="dd_intStatus" id="dd_intStatus">
-					<option value="3">].$Data->{'lang'}->txt('All') .qq[</option>
-					<option value="1">].$Data->{'lang'}->txt('Paid') .qq[</option>
-					<option value="0">].$Data->{'lang'}->txt('Unpaid') .qq[</option>
-					<option value="2">].$Data->{'lang'}->txt('Cancelled') .qq[</option>
+					<option value="99">].$Data->{'lang'}->txt('All') .qq[</option>
+					<option value="1">].$Data->{'lang'}->txt($Defs::TransactionStatus{1}) .qq[</option>
+					<option value="3">].$Data->{'lang'}->txt($Defs::TransactionStatus{3}) .qq[</option>
+					<option value="0">].$Data->{'lang'}->txt($Defs::TransactionStatus{0}) .qq[</option>
+					<option value="2">].$Data->{'lang'}->txt($Defs::TransactionStatus{2}) .qq[</option>
 				</select>
 			</div>
 	];
@@ -904,6 +948,7 @@ sub listTransactions {
     $filterCriterion = $filterCriterion ? substr($filterCriterion, 0, length($filterCriterion)-2) : '{show all}';
 
     my $checked_paid      = $txnStatus == $Defs::TXN_PAID      ? 'SELECTED' : '' ;
+    my $checked_hold      = $txnStatus == $Defs::TXN_HOLD      ? 'SELECTED' : '' ;
     my $checked_unpaid    = $txnStatus == $Defs::TXN_UNPAID    ? 'SELECTED' : '' ;
     my $checked_cancelled = $txnStatus == $Defs::TXN_CANCELLED ? 'SELECTED' : '' ;
     my $checked_showall   = $txnStatus == $Defs::TXN_SHOWALL   ? 'SELECTED' : '' ;
@@ -1393,7 +1438,247 @@ my (undef, undef, $id, $Data, $option, $tempClientValues_ref) = @_;
 
         return(1,$body);
 }
+sub resolveHoldPaymentForm  {
 
+	my ($Data, $intTransLogID)= @_;
+
+    my $lang = $Data->{'lang'};
+	$intTransLogID ||= 0;
+	my $db = $Data->{'db'};
+	my $dollarSymbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
+	
+        my $st = qq[
+		SELECT tblTransLog.*,(SELECT strLocalName FROM tblEntity WHERE intEntityID = tblTransLog.intEntityPaymentID) as Name, DATE_FORMAT(dtSettlement,'%d/%m/%Y') as dtSettlement
+		FROM tblTransLog INNER JOIN tblTXNLogs as TXNLog ON (TXNLog.intTLogID = tblTransLog.intLogID)
+			INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLog.intTXNID)
+			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
+			LEFT JOIN tblEntity as Entity on (Entity.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
+		WHERE intLogID = $intTransLogID 
+		AND T.intRealmID = $Data->{'Realm'}
+	];
+        
+	my $qry = $db->prepare($st);
+  	$qry->execute;
+	my $TLref = $qry->fetchrow_hashref();
+
+	my $st_trans = qq[
+		SELECT T.intTransactionID, M.strLocalSurname, M.strLocalFirstName, E.*, P.strName, P.strGroup, E.strLocalName as EntityName, T.intQty, T.curAmount, T.intTableType, I.strInvoiceNumber, T.intStatus, P.curPriceTax, P.dblTaxRate
+		FROM tblTransactions as T
+			LEFT JOIN tblInvoice I on I.intInvoiceID = T.intInvoiceID
+			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
+			LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
+			LEFT JOIN tblEntity as E ON (E.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
+		WHERE intTransLogID = $intTransLogID  
+		AND T.intRealmID = $Data->{'Realm'}
+	];
+	
+	
+	
+	
+	my $qry_trans = $db->prepare($st_trans);
+  	$qry_trans->execute;
+		
+	my $orderAmount = $TLref->{'intAmount'};
+	$TLref->{'intAmount'} = qq[$dollarSymbol $TLref->{'intAmount'}];
+	my %FieldDefs = (
+                TXNLOG => {
+                        fields => {
+				Name=>	{
+					label => 'Payment By',
+					value => $TLref->{'Name'},
+                                        readonly => '1',
+                                },
+                                intLogID=> {
+                                        label => 'Payment Reference Number',
+                                        value => $TLref->{'intLogID'},
+                                        readonly => '1',
+                                },
+                                intAmount=> {
+                                        label => 'Amount Paid',
+                                        value => $TLref->{'intAmount'},
+                                        readonly => '1',
+				},
+				dtSettlement=> {
+					label => 'Payment Settlement Date',
+					value => $TLref->{'dtSettlement'},
+					readonly => '1',
+                                },
+                                strTXN=> {
+                                        label => 'Bank Reference Number',
+                                        value => $TLref->{'strTXN'},
+                                        readonly => '1',
+                                },
+                                strResponseCode=> {
+                                        label => 'Bank response code',
+                                        value => $TLref->{'strResponseCode'},
+                                        readonly => '1',
+                                },
+                                strBSB=> {
+                                        label => 'BSB (Manual Payments)',
+                                        value => $TLref->{'strBSB'},
+                                        readonly => '1',
+                                },
+                                strBank=> {
+                                        label => 'Bank (Manual Payments)',
+                                        value => $TLref->{'strBank'},
+                                        readonly => '1',
+                                },
+                                strAccountName=> {
+                                        label => 'Account Name (Manual Payments)',
+                                        value => $TLref->{'strAccountName'},
+                                        readonly => '1',
+                                },
+                                strAccountNum=> {
+                                        label => 'Account Number (Manual Payments)',
+                                        value => $TLref->{'strAccountNum'},
+                                        readonly => '1',
+                                },
+                                Status=> {
+                                        label => 'Payment Status',
+                                        value => $Defs::TransLogStatus{$TLref->{'intStatus'}},
+                                        readonly => '1',
+                                },
+                                PaymentType=> {
+                                        label => 'Payment Type',
+                                        value => $Defs::paymentTypes{$TLref->{'intPaymentType'}},
+                                        readonly => '1',
+                                },
+				
+			},
+                order => [qw(intLogID Name intAmount Status PaymentType dtSettlement strTXN strResponseCode strResponseText strBSB strBank strAccountName strAccountNum PartialPayment)],
+                        options => {
+                                labelsuffix => ':',
+                                hideblank => 1,
+                                target => $Data->{'target'},
+                                formname => 'txnlog_form',
+                                introtext => 'auto',
+                                buttonloc => 'bottom',
+                                LocaleMakeText => $Data->{'lang'},
+                                stopAfterAction => 1,
+                        },
+                        sections => [ ['main',''], ],
+                },
+        );
+	
+        my ($resultHTML, undef )=handleHTMLForm($FieldDefs{'TXNLOG'}, undef, 'display', 1,$db);
+
+	#my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
+  my $previousAttemptsBody = qq[
+    <h2 class="section-header">].$lang->txt('Previous Payment attempts') . qq[</h2>
+    <table class="table">
+    <tr>
+      <th>].$lang->txt('Payment Type') . qq[</th>
+      <th>].$lang->txt('Date/Time') . qq[</th>
+      <th>].$lang->txt('Gateway Text') . qq[</th>
+      <th>].$lang->txt('Amount') . qq[</th>
+    </tr>
+  ];
+  my $previousCount=0;
+
+  my $st_previous = qq[
+    SELECT
+      *,
+DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
+    FROM
+      tblTransLog_Retry
+    WHERE
+      intLogID = ?
+    ORDER BY
+      intRetryLogID
+  ];
+  my $qry_previous= $db->prepare($st_previous);
+    $qry_previous->execute($intTransLogID);
+  while (my $pref = $qry_previous->fetchrow_hashref())  {
+    $previousCount++;
+    $previousAttemptsBody .= qq[
+      <tr>
+        <td>$Defs::paymentTypes{$pref->{intPaymentType}}</td>
+        <td>$pref->{AttemptDateTime}</td>
+        <td>$pref->{strResponseText}</td>
+        <td>$dollarSymbol $pref->{intAmount}</td>
+      </tr>
+    ];
+  }
+
+  $previousAttemptsBody .= qq[</table>];
+
+  $previousAttemptsBody = '' if ! $previousCount;
+
+	my $body = qq[
+    $previousAttemptsBody
+		<h2 class="section-header">].$lang->txt('Items making up this Payment Hold').qq[</h2>
+		<table class="table">
+		<tr>
+			<th>].$lang->txt('Invoice Number').qq[</th>
+			<th>].$lang->txt('Transaction Number').qq[</th>
+			<th>].$lang->txt('Item').qq[</th>
+			<th>].$lang->txt('Payment For').qq[</th>
+			<th>].$lang->txt('Quantity').qq[</th>
+			<th>].$lang->txt('Tax Rate').qq[</th>
+			<th>].$lang->txt('Tax Price').qq[</th>
+			<th>].$lang->txt('Total Amount').qq[</th>
+			<th>].$lang->txt('Status').qq[</th>
+		</tr>
+	];
+	my $client=setClient($Data->{'clientValues'});
+	my $count=0;
+	my $thisassoc=0;
+	$thisassoc=1 if ($TLref->{intEntityPaymentID} == $Data->{'clientValues'}{'assocID'});
+	while (my $dref = $qry_trans->fetchrow_hashref())	{
+		$count++;
+        my $paymentFor = '';
+        $paymentFor = qq[$dref->{strLocalSurname}, $dref->{strLocalFirstName}] if ($dref->{intTableType} == $Defs::LEVEL_PERSON);
+        $paymentFor = qq[$dref->{EntityName}] if ($dref->{intTableType} == $Defs::LEVEL_CLUB);
+		my $productname = $dref->{strName};
+		$productname = qq[$dref->{strGroup}-].$productname if ($dref->{strGroup});
+		# 	Payments::TXNtoInvoiceNum($dref->{intTransactionID})	
+		my $taxRateinPercent = $dref->{'dblTaxRate'} * 100;
+		$body .= qq[
+			<tr>
+				<td>$dref->{'strInvoiceNumber'}</td>
+				<td>$dref->{intTransactionID}</a></td>
+				<td>$productname</a></td>
+				<td>$paymentFor</a></td>
+				<td>$dref->{intQty}</a></td>
+				<td>$taxRateinPercent&#37;</a></td>
+				<td>$dollarSymbol $dref->{'curPriceTax'}</td>
+				<td>$dollarSymbol $dref->{'curAmount'}</td>
+				<td>$Defs::TransactionStatus{$dref->{intStatus}}</td>
+			</tr>
+		];
+	}
+  	$qry_trans->finish;
+
+	$body .= qq[</table>];
+	
+    my $buttons = '';
+	
+	$buttons.= qq[<a class="btn-main" href="$Data->{target}?a=P_TXNLog_RH_F&amp;client=$client&amp;tlID=$TLref->{intLogID}" onclick="return confirm(].$lang->txt('This will remove this payment and set all linked transactions to unpaid. Continue?').qq[">Cancel Hold</a>];
+
+	$buttons.= qq[<a class="btn-main" href="$Data->{target}?a=P_TXNLog_RH_P&amp;client=$client&amp;tlID=$TLref->{intLogID}" onclick="return confirm(].$lang->txt('This will mark the payment as successful and set all linked transactions to paid. Continue?').qq[">Resolve Hold as Paid</a>];
+
+	$body = $count ? qq[<h2 class="section-header">].$lang->txt('Payment Hold Summary').qq[</h2>] . $resultHTML.$body . $buttons : $resultHTML;
+
+
+	my $chgoptions='';
+	$chgoptions.= qq[<a href="$Data->{target}?a=P_TXNLog_DEL&amp;client=$client&amp;tlID=$TLref->{intLogID}" onclick="return confirm(].$lang->txt('This will remove this payment and set all linked transactions to unpaid. Continue?').qq["><img src="images/delete.png" border="0" alt="Delete Payment Record" title="Delete Payment Record"></a>] if (
+		$Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC 
+		and $thisassoc 
+		and (
+			(
+				($TLref->{intPaymentType} == $Defs::PAYMENT_ONLINEPAYPAL or $TLref->{intPaymentType} == $Defs::PAYMENT_ONLINECREDITCARD or $TLref->{intPaymentType} == $Defs::PAYMENT_ONLINENAB) 
+				and $Data->{'SystemConfig'}{'AllowTXNs_CCs_delete'}
+			) 
+			or ($TLref->{intPaymentType} != $Defs::PAYMENT_ONLINECREDITCARD and $TLref->{intPaymentType} != $Defs::PAYMENT_ONLINEPAYPAL and $TLref->{intPaymentType} != $Defs::PAYMENT_ONLINENAB)
+		)
+		) 
+		or  $orderAmount ==0;
+  $chgoptions = '' if $Data->{'ReadOnlyLogin'};
+  $chgoptions=qq[<div class="changeoptions">$chgoptions</div>] if $chgoptions;
+
+	return ($body, $chgoptions.$lang->txt("Resolve Payment Hold"));
+
+}
 sub viewTransLog	{
 
 	my ($Data, $intTransLogID, $personID)= @_;
