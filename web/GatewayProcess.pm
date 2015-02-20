@@ -134,7 +134,7 @@ print STDERR "IN GATEWAY PROCESS";
 
 
 	my ($Order, $Transactions) = gatewayTransactions($Data, $logID);
-	 $Order->{'Status'} = $Order->{'TLStatus'} >=1 ? 1 : 0;
+	 $Order->{'Status'} = $Order->{'TLStatus'} ==1 ? 1 : 0;
   $Data->{'SystemConfig'}{'PaymentConfigID'} = $Data->{'SystemConfig'}{'PaymentConfigUsedID'} ||  $Data->{'SystemConfig'}{'PaymentConfigID'};
 
   my ($paymentSettings, undef) = getPaymentSettings($Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, $external);

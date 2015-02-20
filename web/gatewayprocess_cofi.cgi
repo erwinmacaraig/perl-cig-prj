@@ -51,7 +51,6 @@ print STDERR "IN GATEWAYPROCESS_cofi\n";
 
 my $cgi=new CGI;
     my %params=$cgi->Vars();
-print STDERR Dumper(\%params);
 print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
     my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     $Data{'lang'}=$lang;
@@ -110,7 +109,8 @@ print STDERR "MAC ACTION IS $chkAction\n";
             or $co_status eq "10"
         );
         $returnVals{'GATEWAY_RESPONSE_CODE'}= "HOLD" if (
-            $co_status eq "6" 
+            $co_status eq "3"  ## Delayed Payment
+            or $co_status eq "6" 
             or $co_status eq "7" 
         );
          $returnVals{'GATEWAY_RESPONSE_TEXT'}= param('REFERENCE') || '';
