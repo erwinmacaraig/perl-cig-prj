@@ -542,33 +542,38 @@ $CREATED_BY_OTHER= -1;
 $CREATED_BY_SWCIMPORTER = 2;
 $CREATED_BY_MANUALENTRY = 3;
 
-
 $TXN_PAID = 1;
 $TXN_CANCELLED = 2;
 $TXN_UNPAID = 0;
 $TXN_SHOWALL = -1;
-%ProdTransactionStatus	=	(
-	$TXN_UNPAID => 'Unpaid',
-	$TXN_CANCELLED => 'Cancelled',
-	$TXN_PAID => 'Paid', 
+$TXN_HOLD = 3;
+%ProdTransactionStatus  =   (
+    $TXN_UNPAID => 'Unpaid',
+    $TXN_CANCELLED => 'Cancelled',
+    $TXN_PAID => 'Paid',
+    $TXN_HOLD=> 'Hold/Check',
 );
-%TransactionStatus	=	(
-	$TXN_UNPAID => 'Unpaid',
-	$TXN_CANCELLED => 'Cancelled',
-	$TXN_PAID => 'Paid', 
+%TransactionStatus  =   (
+    $TXN_UNPAID => 'Unpaid',
+    $TXN_CANCELLED => 'Cancelled',
+    $TXN_PAID => 'Paid',
+    $TXN_HOLD=> 'Hold/Check',
 );
 
 $TXNLOG_SUCCESS=1;
 $TXNLOG_CANCELLED=2;
 $TXNLOG_PENDING=0;
 $TXNLOG_FAILED= -1;
+$TXNLOG_HOLD = 3;
 
 %TransLogStatus =       (
         $TXNLOG_SUCCESS => 'Paid',
         $TXNLOG_CANCELLED => 'Cancelled',
         $TXNLOG_PENDING => 'Pending',
         $TXNLOG_FAILED => 'Failed',
+        $TXNLOG_HOLD => 'Hold/Check',
 );
+
 
 $PAYMENT_NONE = '';
 $PAYMENT_ONLINECREDITCARD= 1;
@@ -1075,21 +1080,4 @@ $DOCO_STATUS_REJECTED= "REJECTED";
     notrequired=> 'Payment Not Required',
 );
 
-%FIN_coResponseText = (
-    -10=>"Payment returned to the payer",
-    -4=>"The transaction does not exist",
-    -3 =>"Payment transaction timed out",
-    -2 =>"Payment canceled by system",
-    -1 =>"Payment canceled by user",
-    1 => "Payment incomplete",
-    2=>"Payment Successful",
-    3=>"Delayed payment",
-    4=>"",
-    5=>"Payment Successful",
-    6=>"Payment Successful",
-    7=>"A third party has approved the payment and it requires approval/activation",
-    8=>"A third party has accepted the payment/payment has been activated",
-    9=>"",
-    10=>"Payment transferred to merchant",
-);
 1;

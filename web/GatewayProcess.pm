@@ -134,7 +134,7 @@ print STDERR "IN GATEWAY PROCESS";
 
 
 	my ($Order, $Transactions) = gatewayTransactions($Data, $logID);
-	 $Order->{'Status'} = $Order->{'TLStatus'} >=1 ? 1 : 0;
+	 $Order->{'Status'} = $Order->{'TLStatus'} ==1 ? 1 : 0;
   $Data->{'SystemConfig'}{'PaymentConfigID'} = $Data->{'SystemConfig'}{'PaymentConfigUsedID'} ||  $Data->{'SystemConfig'}{'PaymentConfigID'};
 
   my ($paymentSettings, undef) = getPaymentSettings($Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, $external);
@@ -144,9 +144,9 @@ print STDERR "IN GATEWAY PROCESS";
     ### Might need IF test here per gatewayCode
   #$returnVals_ref->{'ResponseText'} = NABResponseCodes($returnVals_ref->{'GATEWAY_RESPONSE_CODE'});
   #$returnVals_ref->{'ResponseCode'} = $returnVals_ref->{'GATEWAY_RESPONSE_CODE'};
-  if ($returnVals_ref->{'GATEWAY_RESPONSE_CODE'} =~/^00|08|OK$/)  {
-    $returnVals_ref->{'ResponseCode'} = 'OK';
-  }
+  #if ($returnVals_ref->{'GATEWAY_RESPONSE_CODE'} =~/^00|08|OK$/)  {
+  #  $returnVals_ref->{'ResponseCode'} = 'OK';
+  #}
 
 
   {

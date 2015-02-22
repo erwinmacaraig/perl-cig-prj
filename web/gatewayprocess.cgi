@@ -42,7 +42,6 @@ sub main	{
     my $db=connectDB();
 	my %Data=();
 	$Data{'db'}=$db;
-    ## LOOK UP tblPayTry
     my $payTry = payTryRead(\%Data, $logID, 0);
 
 my $cgi=new CGI;
@@ -81,6 +80,7 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
         $returnVals{'GATEWAY_SETTLEMENT_DATE'}= param('settdate') || '';
         $returnVals{'GATEWAY_RESPONSE_CODE'}= param('rescode') || '';
         $returnVals{'ResponseCode'}= "OK" if (param('rescode') =~ /08|00/);
+        $returnVals{'ResponseCode'}= "HOLD" if (param('rescode') =~ /55/);
         $returnVals{'GatewayResponseCode'}= param('rescode') || '';
 
         $returnVals{'GATEWAY_RESPONSE_TEXT'}= param('restext') || '';

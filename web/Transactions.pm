@@ -291,7 +291,7 @@ sub displayTransaction	{
 			        	label => $lang->txt("Paid ?"),
 		                	value => $dref->{'intStatus'},
                 			type  => 'lookup',
-                			options=> {$Defs::TXN_PAID => $Defs::TransactionStatus{$Defs::TXN_PAID}, $Defs::TXN_CANCELLED=> $Defs::TransactionStatus{$Defs::TXN_CANCELLED}},
+                			options=> {$Defs::TXN_PAID => $Defs::TransactionStatus{$Defs::TXN_PAID}, $Defs::TXN_CANCELLED=> $Defs::TransactionStatus{$Defs::TXN_CANCELLED}, $Defs::TXN_HOLD => $Defs::TransactionStatus{$Defs::TXN_HOLD}},
 					readonly=>$readonly,
             			},
 				intDelivered=> {

@@ -54,7 +54,7 @@ sub gatewayTransactions	{
                 $Order{'Status'} = $dref->{'intStatus'};
                 $Order{'TLStatus'} = $dref->{'intStatus'};
                 $Order{'Currency'} = $dref->{'strCurrency'};
-		next if ($dref->{intStatus} >= 1);
+		next if ($dref->{intStatus} == 1 or $dref->{intStatus} == 2);
                 next if ($dref->{TXNStatus} == 1);
                 $Transactions{$count}{'name'} = $dref->{'ProductName'} || next;
                 $Transactions{$count}{'number'} =  Payments::TXNtoTXNNumber($dref->{intTransactionID}); #$dref->{'intTransactionID'};

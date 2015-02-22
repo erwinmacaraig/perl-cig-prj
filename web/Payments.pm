@@ -5,8 +5,8 @@
 package Payments;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoTXNNumber TXNNumberToTXN TXNtoInvoiceNum invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount);
-@EXPORT_OK=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoTXNNumber TXNNumberToTXN TXNtoInvoiceNum invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount);
+@EXPORT=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoTXNNumber TXNNumberToTXN TXNtoInvoiceNum invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount );
+@EXPORT_OK=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoTXNNumber TXNNumberToTXN TXNtoInvoiceNum invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount );
 
 use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 
@@ -1094,6 +1094,8 @@ sub UpdateCart	{
 
     deQuote($Data->{'db'}, \$txn);
 
+    my $status = 1;
+    $status = 3 if ($code eq 'HOLD');
 	my $st= qq[
   	SELECT 
 			intTXNID, 
@@ -1113,7 +1115,7 @@ sub UpdateCart	{
   	    UPDATE 
 			tblTransactions 
         SET 
-			intStatus = 1, 
+			intStatus = ?, 
 			dtPaid = SYSDATE(), 
 			intTransLogID = $intLogID
 		WHERE 
@@ -1138,7 +1140,7 @@ sub UpdateCart	{
 			copyTransaction($Data, $dref->{'intTXNID'}, $intLogID);
 		}
 		else	{
-   		    $qryUpdate->execute($dref->{'intTXNID'});
+   		    $qryUpdate->execute($status, $dref->{'intTXNID'});
 		}
         # if there is a intTempID associated with this transaction record then tblTempMember should be updated (set the intTransLogID for that intTempMemberID record)
         if($dref->{'intTempID'}){
@@ -1154,7 +1156,7 @@ sub UpdateCart	{
     $Data->{'db'}->do($st);
 
 
-	PaymentSplitMoneyLog::calcMoneyLog($Data, $paymentSettings, $intLogID);
+	#PaymentSplitMoneyLog::calcMoneyLog($Data, $paymentSettings, $intLogID);
 	
 }
 
@@ -1299,6 +1301,7 @@ print STDERR "DHDHDHDHDHD\n";
 	my $intStatus = $Defs::TXNLOG_FAILED;
 	#$intStatus = $Defs::TXNLOG_SUCCESS if ($responsecode eq "00" or $responsecode eq "08" or $responsecode eq "OK" or $responsecode eq "1" or $responsecode eq 'Success');
 	$intStatus = $Defs::TXNLOG_SUCCESS if ($responsecode eq "OK");
+	$intStatus = $Defs::TXNLOG_HOLD if ($responsecode eq "HOLD");
 	my $statement = qq[
 		SELECT intAmount, strResponseCode, intLogID
 		FROM tblTransLog

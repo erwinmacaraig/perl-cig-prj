@@ -51,7 +51,6 @@ print STDERR "IN GATEWAYPROCESS_cofi\n";
 
 my $cgi=new CGI;
     my %params=$cgi->Vars();
-print STDERR Dumper(\%params);
 print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
     my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     $Data{'lang'}=$lang;
@@ -105,16 +104,36 @@ print STDERR "MAC ACTION IS $chkAction\n";
         $returnVals{'GATEWAY_RESPONSE_CODE'}= "OK" if (
             $co_status eq "2" 
             or $co_status eq "5" 
-            or $co_status eq "6"
-            or $co_status eq "7"
             or $co_status eq "8"
             or $co_status eq "9"
             or $co_status eq "10"
         );
-        $returnVals{'GATEWAY_RESPONSE_TEXT'}= param('REFERENCE') || '';
+        $returnVals{'GATEWAY_RESPONSE_CODE'}= "HOLD" if (
+            $co_status eq "3"  ## Delayed Payment
+            or $co_status eq "6" 
+            or $co_status eq "7" 
+        );
+         $returnVals{'GATEWAY_RESPONSE_TEXT'}= param('REFERENCE') || '';
         $returnVals{'GatewayResponseCode'}= $co_status;
         $returnVals{'ResponseCode'}= $returnVals{'GATEWAY_RESPONSE_CODE'};
-        $returnVals{'ResponseText'}= $Defs::FIN_coResponseText{$co_status} || '';
+my %FIN_coResponseText = (
+    -10=>"Payment returned to the payer",
+    -4=>"The transaction does not exist",
+    -3 =>"Payment transaction timed out",
+    -2 =>"Payment canceled by system",
+    -1 =>"Payment canceled by user",
+    1 => "Payment incomplete",
+    2=>"Payment Successful",
+    3=>"Delayed payment",
+    4=>"",
+    5=>"Payment Successful",
+    6=>"Payment Successful",
+    7=>"A third party has approved the payment and it requires approval/activation",
+    8=>"A third party has accepted the payment/payment has been activated",
+    9=>"",
+    10=>"Payment transferred to merchant",
+);
+        $returnVals{'ResponseText'}= $FIN_coResponseText{$co_status} || '';
         $returnVals{'Other1'} = $co_status || '';
         $returnVals{'Other2'} = param('MAC') || '';
         gatewayProcess(\%Data, $logID, $client, \%returnVals, $chkAction);

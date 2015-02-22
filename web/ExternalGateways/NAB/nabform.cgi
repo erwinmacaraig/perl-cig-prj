@@ -171,6 +171,14 @@ sub displayNABCCPage    {
 					  <div class="card-field"><div class="label">CCV</div><div class="input"><input class="required" type="text" name="CCV" value="" size="5"></div><div class="label" style="text-align:left;"> <i>(3 digit code found on the back of your card)</i></div></div>
 					  <div class="card-field"><div class="label">Amount</div><div class="input">\$$NAB_ref->{'amount'}</div></div>
 				</div>
+                    <p>FOR TESTING -into CCV field<br>
+                        <ul>
+                            <li>00 = Success</li>
+                            <li>08 = Success</li>
+                            <li>55 = Place on Hold</li>
+                            <li>everything else = Failure</li>
+                        </ul>
+                    <p>
 						<div style="color:red"><b>PLEASE DO NOT DOUBLE CLICK THE PROCESS PAYMENT BUTTON.</b><br>Double clicking can result in the payment being processed twice</div>
 					  <br><br><input type="submit" name="SUBMIT" value="Process Payment" style="height:30px;width:180px;margin-left:145px;margin-top:20px;" id="btnsubmit" oonclick="javascript:this.disabled='true';">
 		<img src="images/nab-logo-registrations.png" style="float:right;padding-right:145px;"> 
