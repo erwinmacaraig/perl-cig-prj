@@ -773,6 +773,16 @@ sub display_products {
 
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
     $personObj->load();
+    if ($regoID)    {
+        my $valid =0;
+        ($valid, $rego_ref) = validateRegoID(
+            $self->{'Data'},
+            $personID,
+            $regoID,
+            $entityID
+        );
+        $regoID = 0 if ! $valid;
+    }
 
     if($regoID) {
         my $nationality = $personObj->getValue('strISONationality') || ''; 
@@ -880,6 +890,17 @@ sub process_products {
     if($regoID) {
         ($entityID, $entityLevel) = $self->getRegoEntity($regoID, $personID);
         $regoID = 0 if !$entityID;
+
+        if ($regoID)    {
+            my $valid =0;
+            ($valid, $rego_ref) = validateRegoID(
+                $self->{'Data'},
+                $personID,
+                $regoID,
+                $entityID
+            );
+            $regoID = 0 if ! $valid;
+        }
     }
 
     my ($txnIds, $amount) = save_rego_products($self->{'Data'}, $regoID, $personID, $entityID, $entityLevel, $rego_ref, $self->{'RunParams'});
@@ -1004,6 +1025,19 @@ sub process_documents {
         $regoID = 0 if !$entityID;
 		$personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
     	$personObj->load();
+
+        if ($regoID)    {
+            my $valid =0;
+            ($valid, $rego_ref) = validateRegoID(
+                $self->{'Data'},
+                $personID,
+                $regoID,
+                $entityID
+            );
+            $regoID = 0 if ! $valid;
+        }
+ 
+
 		my $nationality = $personObj->getValue('strISONationality') || ''; 
         my $itc = $personObj->getValue('intInternationalTransfer') || '';
         $rego_ref->{'Nationality'} = $nationality;
