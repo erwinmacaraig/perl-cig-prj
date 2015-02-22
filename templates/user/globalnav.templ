@@ -44,6 +44,9 @@
   				<!--<li>[% Lang.txt('Welcome') %] <a href="#" title="">[% Data.UserName %]<span class="fa fa-caret-down"></span></a></li>-->
   				<li><a href ="#">[% Lang.txt('Help') %]</a></li>
   				<li><a href="user/logout.cgi" title="[% Lang.txt('Logout') %]">[% Lang.txt('Logout') %]</a></li>
+                [% IF LanguageChooser %]
+                <li>[% LanguageChooser %]</li>
+                [% END %]
   			</ul>
 			</div>
 		</div>
