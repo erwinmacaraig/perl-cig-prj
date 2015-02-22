@@ -542,33 +542,38 @@ $CREATED_BY_OTHER= -1;
 $CREATED_BY_SWCIMPORTER = 2;
 $CREATED_BY_MANUALENTRY = 3;
 
-
 $TXN_PAID = 1;
 $TXN_CANCELLED = 2;
 $TXN_UNPAID = 0;
 $TXN_SHOWALL = -1;
-%ProdTransactionStatus	=	(
-	$TXN_UNPAID => 'Unpaid',
-	$TXN_CANCELLED => 'Cancelled',
-	$TXN_PAID => 'Paid', 
+$TXN_HOLD = 3;
+%ProdTransactionStatus  =   (
+    $TXN_UNPAID => 'Unpaid',
+    $TXN_CANCELLED => 'Cancelled',
+    $TXN_PAID => 'Paid',
+    $TXN_HOLD=> 'Hold/Check',
 );
-%TransactionStatus	=	(
-	$TXN_UNPAID => 'Unpaid',
-	$TXN_CANCELLED => 'Cancelled',
-	$TXN_PAID => 'Paid', 
+%TransactionStatus  =   (
+    $TXN_UNPAID => 'Unpaid',
+    $TXN_CANCELLED => 'Cancelled',
+    $TXN_PAID => 'Paid',
+    $TXN_HOLD=> 'Hold/Check',
 );
 
 $TXNLOG_SUCCESS=1;
 $TXNLOG_CANCELLED=2;
 $TXNLOG_PENDING=0;
 $TXNLOG_FAILED= -1;
+$TXNLOG_HOLD = 3;
 
 %TransLogStatus =       (
         $TXNLOG_SUCCESS => 'Paid',
         $TXNLOG_CANCELLED => 'Cancelled',
         $TXNLOG_PENDING => 'Pending',
         $TXNLOG_FAILED => 'Failed',
+        $TXNLOG_HOLD => 'Hold/Check',
 );
+
 
 $PAYMENT_NONE = '';
 $PAYMENT_ONLINECREDITCARD= 1;
