@@ -922,6 +922,16 @@ sub display_documents {
     if($regoID) {
         ($entityID, $entityLevel) = $self->getRegoEntity($regoID, $personID);
         $regoID = 0 if !$entityID;
+        if ($regoID)    {
+            my $valid =0;
+            ($valid, $rego_ref) = validateRegoID(
+                $self->{'Data'},
+                $personID,
+                $regoID,
+                $entityID
+            );
+            $regoID = 0 if ! $valid;
+        }
     }
 	my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
     $personObj->load();
