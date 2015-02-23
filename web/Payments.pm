@@ -36,8 +36,8 @@ sub handlePayments	{
 	my $body = '';
 	if ($action =~ /DISPLAY/)	{
 		my $intLogID = param('ci') || 0;
-        my $paySuccess =0 ;
-		($paySuccess, $body) = displayPaymentResult($Data, $intLogID, $external);
+        my $payStatus =0 ;
+		($payStatus, $body) = displayPaymentResult($Data, $intLogID, $external);
 	}	
 	if ($action =~ /LATER/)	{
 		my $intLogID = param('ci') || 0;
@@ -651,14 +651,19 @@ sub displayPaymentResult        {
     my $paymentType = $transref->{'intPaymentType'};
 
     my $body = '';
-	my $success=0;
+	my $success=$transref->{'intStatus'};;
     #if ($transref->{strResponseCode} eq "1" or $transref->{strResponseCode} eq "OK" or $transref->{strResponseCode} eq "00" or $transref->{strResponseCode} eq "08" or $transref->{strResponseCode} eq 'Success')    {
-    if ($transref->{strResponseCode} eq "OK")   {
+    if ($transref->{'intStatus'} == $Defs::TXNLOG_SUCCESS)   {
         my $ttime = time();
         $body .= qq[
             <div align="center" class="OKmsg" style="font-size:14px;">Congratulations your payment has been successful</div>
         ];
-		$success=1;
+    }
+    elsif ($transref->{'intStatus'} == $Defs::TXNLOG_HOLD)   {
+        my $ttime = time();
+        $body .= qq[
+            <div align="center" class="OKmsg" style="font-size:14px;">Your payment has been put on Hold</div>
+        ];
     }
     else    {
 		$msg = qq[ <div align="center" class="warningmsg" style="font-size:14px;">We are sorry, there was a problem with your payment !!</div> ] if (! $msg and $transref->{'intAmount'});
@@ -997,7 +1002,7 @@ sub EmailPaymentConfirmation	{
 		Transactions     => \@txns,
 		ReceiptFooter    => $Data->{'SystemConfig'}{'paymentReceiptFooterHTML'} || '',
 		PaymentAssocType => $Data->{'SystemConfig'}{'paymentAssocType'} || '',
-		DollarSymbol     => $Data->{'LocalConfig'}{'DollarSymbol'} || "\$",
+		DollarSymbol     => $Data->{'SystemConfig'}{'DollarSymbol'} || "\$",
 	);
 	
 	{

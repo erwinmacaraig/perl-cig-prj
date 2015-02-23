@@ -26,10 +26,13 @@
                         <p>[% Lang.txt("We would like to remind you that the Member Association will not approve the registration until payment is completed.") %]</p>
                     [% END %]
 	</div>
-[% IF payNowFlag and payNowSuccess %]
+                    [% IF payNowFlag and payNowStatus == 1%]
                        [% payNowMsg %]
                     [% END %]
-                    [% IF payNowFlag and !payNowSuccess %]
+                    [% IF payNowFlag and payNowStatus == 3 %]
+                        <div align="center" class="warningmsg" style="font-size:14px;">Your payment has been put on Hold.<br>Once processed you will be notified as to Payment Status.</div>
+                    [% END %]
+                    [% IF payNowFlag and (payNowStatus != 1 and payNowStatus != 3) %]
                         <div align="center" class="warningmsg" style="font-size:14px;">We are sorry, there was a problem with your payment !!</div>
                         <div class="panel-body">
                             <div class="reg-complete-wrapper">
