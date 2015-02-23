@@ -440,9 +440,9 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
     }
 	$menuoptions{'paymenthistory'} = { 
 	    name => $lang->txt('Payments History'),
-		url => $baseurl."a=TXN_PAY_HISTORY",
+		url => $baseurl."a=P_TXNLog_list",
 	}; 
-
+	# P_TXNLog_list url => $baseurl."a=TXN_PAY_HISTORY",
 
     my @menu_structure = (
         [ $lang->txt('Dashboard'), 'home','home'],
@@ -902,6 +902,7 @@ sub getClubMenuData {
 
 sub getEntityChildrenTypes  {
     my($db, $ID, $realmID) = @_;
+
     my %existingChildren = ();
 
     my $st = qq[
