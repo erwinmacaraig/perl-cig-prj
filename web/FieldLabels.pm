@@ -206,6 +206,7 @@ sub getFieldLabels	{
             strOrganisationLevel => 'Level',
             dissolved => 'Dissolved',
             intFacilityTypeID => 'Venue Type',
+            strBankAccountNumber => 'Bank Account Details',
             );
 	}
 

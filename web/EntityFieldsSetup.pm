@@ -17,6 +17,7 @@ use FieldCaseRule;
 use DefCodes;
 use PersonLanguages;
 use CustomFields;
+use Data::Dumper;
 
 
 sub clubFieldsSetup {
@@ -416,6 +417,14 @@ sub clubFieldsSetup {
                     maxsize     => '100',
                     readonly    => $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL ? 1 : 0,
                 },
+                strBankAccountNumber     => {
+                    label       => $FieldLabels->{'strBankAccountNumber'},
+                    value       => $values->{'strBankAccountNumber'},
+                    type        => 'text',
+                    size        => '40',
+                    maxsize     => '45',
+                    compulsory  => 1,
+                },
             },
             'order' => [qw(
                 strEntityType
@@ -424,6 +433,7 @@ sub clubFieldsSetup {
                 strDiscipline
                 strOrganisationLevel
                 strMANotes
+                strBankAccountNumber
             )],
             sections => [
                 [ 'main',        'Organisation Details','','',$values->{'footer-roledetails'} ],
