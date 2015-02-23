@@ -1257,56 +1257,6 @@ sub _getConfiguration {
 
             #Affilitations
 
-              strClubNumber => [
-                (
-                    (
-                        (
-                                !$SystemConfig->{'NoClubs'}
-                              or $Data->{'Permissions'}
-                              {$Defs::CONFIG_OTHEROPTIONS}{'ShowClubs'}
-                        )
-                          and $currentLevel == $Defs::LEVEL_CLUB
-                    )
-                    ? $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}
-                      . ' Default Number'
-                    : ''
-                ),
-                {
-                    displaytype => 'text',
-                    fieldtype   => 'text',
-                    allowsort   => 1,
-                    dbfield     => "CMSPN.strJumperNum",
-                    dbfrom =>
-" LEFT JOIN tblCompMatchSelectedPlayerNumbers CMSPN ON (CMSPN.intClubID=tblPerson_Clubs.intClubID and CMSPN.intPersonID=tblPerson_Clubs.intPersonID and CMSPN.intMatchID=-1 AND (CMSPN.intTeamID=-1 or CMSPN.intTeamID=0))",
-                    optiongroup   => 'otherfields',
-                    allowgrouping => 1,
-                }
-              ],
-
-              strClubName => [
-                (
-                    (
-                        (
-                                !$SystemConfig->{'NoClubs'}
-                              or $Data->{'Permissions'}
-                              {$Defs::CONFIG_OTHEROPTIONS}{'ShowClubs'}
-                        )
-                          and $currentLevel > $Defs::LEVEL_CLUB
-                    ) ? $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} . ' Name' : ''
-                ),
-                {
-                    displaytype => 'text',
-                    fieldtype   => 'text',
-                    allowsort   => 1,
-                    dbfield     => "C.strName",
-                    dbfrom =>
-"LEFT JOIN tblPerson_Clubs ON (tblPerson.intPersonID=tblPerson_Clubs.intPersonID  AND tblPerson_Clubs.intStatus=$Defs::RECSTATUS_ACTIVE) LEFT JOIN tblClub as C ON (C.intClubID=tblPerson_Clubs.intClubID ) LEFT JOIN tblAssoc_Clubs as AC ON (AC.intAssocID=tblAssoc.intAssocID AND AC.intClubID=C.intClubID)",
-                    optiongroup   => 'affiliations',
-                    allowgrouping => 1,
-                    dbwhere => 
-" AND (AC.intAssocID = tblAssoc.intAssocID OR tblPerson_Clubs.intPersonID IS NULL) AND (($PRtablename.intEntityID=C.intClubID AND $PRtablename.intEntityTypeID= $Defs::LEVEL_CLUB) or tblPerson_Clubs.intPersonID IS NULL)",
-                }
-              ],
               strZoneName => [
                 (
                       $currentLevel > $Defs::LEVEL_ZONE
@@ -1790,28 +1740,6 @@ sub _getConfiguration {
             ],
           },
           ExportFormats => {
-            MeetManager => {
-                Name => 'Meet Manager',
-                Select =>
-"strSurname, strFirstname, IF(intGender<>1,'M','F') AS Gender, DATE_FORMAT(dtDOB, '%m/%d/%Y') AS dtDOB, tblPerson.strAddress1, tblPerson.strAddress2, tblPerson.strSuburb, tblPerson.strState, tblPerson.strPostalCode, tblPerson.strCountry, strPassportNationality, strPhoneHome, strPhoneWork, tblPerson.strFax, tblPerson.strEmail",
-                Order => [
-                    'I',                      'strSurname',
-                    'strFirstname',           '',
-                    'Gender',                 'dtDOB',
-                    '',                       '',
-                    '',                       '',
-                    'strAddress1',            'strAddress2',
-                    'strSuburb',              'strState',
-                    'strPostalCode',          'strCountry',
-                    'strPassportNationality', 'strPhoneHome',
-                    'strPhoneWork',           'strFax',
-                    '',                       '',
-                    '',                       'strEmail'
-                ],
-                Headers        => 0,
-                ExportFileName => 'export.txt',
-                Delimiter      => ';',
-            },
           },
           OptionGroups => {
             details         => [ 'Personal Details', { active => 1 } ],
@@ -1822,7 +1750,6 @@ sub _getConfiguration {
             financial       => [ 'Financial',        {} ],
             otherfields     => [ 'Other Fields',     {} ],
             affiliations    => [ 'Affiliations',     {} ],
-            seasons         => [ 'Seasons',   {} ],
             records         => [ 'Member Records',   {} ],
             transactions => [
                 $txt_Transactions,
