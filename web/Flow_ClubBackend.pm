@@ -31,6 +31,7 @@ use Data::Dumper;
 use UploadFiles;
 use EntitySummaryPanel;
 use IncompleteRegistrations;
+use Transactions;
 
 
 
@@ -820,6 +821,7 @@ sub loadObjectValues    {
             strDiscipline
             strOrganisationLevel
             strMANotes
+            strBankAccountNumber
         )) {
             $values{$field} = $object->getValue($field);
         }
