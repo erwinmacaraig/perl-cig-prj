@@ -90,6 +90,7 @@ sub gatewayTransLog	{
 	my ($Data, $logID) = @_;
 
 	my %Payment=();
+	
 	my $st = qq[
 		SELECT
 			TL.*,

@@ -55,7 +55,8 @@ sub main	{
             push @transactions, $k;
         }
         if ($k eq 'a' and $params{$k} eq 'P_TXNLogstep2')   {
-            $params{'a'} = "P_TXNLog_list";
+            #$params{'a'} = "P_TXNLog_list";
+			$params{'a'} = "TXN_PAY_INV_RESULT_P"
         }
         if ($k eq 'a' and $params{$k} eq 'C_TXNLogstep2')   {
             $params{'a'} = "C_TXNLog_list";

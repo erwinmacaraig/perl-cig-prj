@@ -65,8 +65,35 @@ sub handlePayInvoice {
 	if($action eq 'TXN_PAY_INV_QUERY_INFO'){
 		$resultHTML = queryInvoiceByOtherInfo($Data, $clubID, $client);
 		if(!$resultHTML){
-			$resultHTML = '<h3> No Results Found </h3>';
+			$resultHTML = '
+			<div class="col-md-12 error-alerts">
+				<div class="alert">
+					<div>
+						<span class="fa fa-exclamation"></span>
+						No Results Found.
+					</div>
+				</div>
+		   </div>';
 		}
+	}
+
+	if($action eq 'TXN_PAY_INV_RESULT_P'){
+		use Payments;
+		my $success;
+		my $intTransLogID = param('tl') || 0;
+		($success, $resultHTML) = displayPaymentResult($Data, $intTransLogID, 0) ;
+		if(!$success){
+			use Gateway_Common;
+			my $trans_ref = gatewayTransLog($Data, $intTransLogID);
+			$trans_ref->{'Lang'} = $Data->{'lang'};
+			$resultHTML .= runTemplate(
+            $Data,
+            $trans_ref,
+            'payment/pay_invoice_payment_error.templ'
+          );
+		}		
+
+
 	}
 	
 	return ($resultHTML,$title);
@@ -146,27 +173,29 @@ sub queryInvoiceByNumber {
 			tblPerson.intPersonID, 
 			(tblTransactions.curAmount * tblTransactions.intQty) as TotalAmount 
 			FROM tblTransactions INNER JOIN tblInvoice ON tblInvoice.intInvoiceID = tblTransactions.intInvoiceID
+			INNER JOIN tblPersonRegistration_$Data->{'Realm'} ON tblPersonRegistration_$Data->{'Realm'}.intPersonRegistrationID = tblTransactions.intPersonRegistrationID	
 			INNER JOIN tblProducts ON tblProducts.intProductID = tblTransactions.intProductID
 			INNER JOIN tblPerson ON tblPerson.intPersonID = tblTransactions.intID 
 			WHERE tblTransactions.intInvoiceID = $convertedInvoiceNumberToTXNID AND intStatus = 0 
-			AND tblTransactions.intRealmID = $Data->{'Realm'} AND intTransLogID = 0
+			AND tblTransactions.intRealmID = $Data->{'Realm'} AND intTransLogID = 0 
+			AND tblPersonRegistration_$Data->{'Realm'}.strStatus <> 'INPROGRESS'			
 	];
-	
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute();
 	my $cl=setClient($Data->{'clientValues'}) || '';
     my %cv=getClient($cl);    
     $cv{'currentLevel'} = $Defs::LEVEL_PERSON;
-	
+	my $selectPay;
 	while(my $dref = $sth->fetchrow_hashref()){
 		$results = 1;
-		my $selectPay = qq[<input type="checkbox" name="act_$dref->{'intTransactionID'}" class="paytxn_chk" />];
+		#my $selectPay = qq[<input type="checkbox" checked="checked" name="act_$dref->{'intTransactionID'}" class="paytxn_chk" />];
+		$selectPay .= qq[<input type="hidden" name="act_$dref->{'intTransactionID'}" value="1" />];	
 		$cv{'personID'} = $dref->{'intPersonID'};
         my $clm=setClient(\%cv);
 		push @rowdata, {
 			id => $dref->{'intTransactionID'},
 			SelectLink => qq[$Data->{'target'}?client=$clm&amp;a=P_TXN_EDIT&personID=$dref->{'intPersonID'}&amp;tID=$dref->{intTransactionID}&amp;id=0],
-			selectpay => $selectPay,
+			#selectpay => $selectPay,
 			invoiceNum => $dref->{'strInvoiceNumber'},
 			item => $dref->{'strName'},
 			person => $dref->{'strLocalFirstname'} . ' ' . $dref->{'strLocalSurname'},
@@ -177,7 +206,93 @@ sub queryInvoiceByNumber {
 		
 	}
  	
-	my $body = displayResults($Data,\@rowdata,$client);
+	#my $body = displayResults($Data,\@rowdata,$client);
+my @headers = (
+	{
+		name => '', 
+		field => 'SelectLink', 
+	    type => 'Selector', 
+	},
+	{
+      name => $Data->{'lang'}->txt('Invoice Number'),
+      field => 'invoiceNum',
+    },
+    {
+      name =>   $Data->{'lang'}->txt('Item'),
+      field =>  'item',
+    },
+    {
+      name =>   $Data->{'lang'}->txt('Person'),
+      field =>  'person',
+    },
+	{
+		name => $Data->{'lang'}->txt('Quantity'),
+		field => 'quantity',
+	},
+	{
+		name => $Data->{'lang'}->txt('Amount'),
+		field => 'amount',
+	},
+	{
+		name => $Data->{'lang'}->txt('Status'),
+		field => 'status', 
+	}
+	);
+	 my $grid  = showGrid(
+   		 Data => $Data,
+     	 columns => \@headers,
+   		 rowdata => \@rowdata,   	    
+   	     gridid => 'grid',
+  	     width => '99%',
+    );
+
+	### payment settings ###
+	my (undef, $paymentTypes) = getPaymentSettings($Data, 0, 0, $Data->{'clientValues'}); 
+	my $gatewayCount = 0;
+	my $paymentType = 0;
+	my $gateway_body = qq[ <div id = "payment_cc" style= "display:block;"><br> ];
+	foreach my $gateway (@{$paymentTypes})  {
+    	$gatewayCount++;
+     	 my $id = $gateway->{'intPaymentConfigID'};
+   		 my $pType = $gateway->{'paymentType'};
+    	 $paymentType = $pType;
+      	 my $name = $gateway->{'gatewayName'};
+  		 $gateway_body .= qq[
+            <input type="submit" onclick="clicked='paytry.cgi'" name="cc_submit[$gatewayCount]" value="]. $Data->{'lang'}->txt("Pay Invoices Now").qq[" class = "btn-main"><br><br>
+            <input type="hidden" name="pt_submit[$gatewayCount]" value="$paymentType">
+        ];   		 
+    	}
+	 $gateway_body .= qq[
+        <div style= "clear:both;"></div>
+        </div>
+    ];
+	$gateway_body = '' if ! $gatewayCount;
+    my %Hidden = (
+        gatewayCount => $gatewayCount,		
+    );
+
+	my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
+    $Year+=1900;
+    $Month++;
+    my $currentDate="$Day/$Month/$Year";
+	$gateway_body = '' if ! $Data->{'SystemConfig'}{'AllowTXNs_CCs'};
+	for my $i (qw(intAmount strBank strBSB strAccountNum strAccountName strResponseCode strResponseText strReceiptRef strComments intPartialPayment))	{
+		  $Data->{params}{$i}='' if !defined $Data->{params}{$i};
+	}
+	my $target = 'paytry.cgi';#$Data->{'target'};
+
+	## end payment settings
+	my %PageData = (
+		grid => $grid, 
+		gateway_body => $gateway_body,
+		nextAction => 'P_TXNLogstep2', 
+        target => $target,
+        Lang => $Data->{'lang'},
+        client => $client,
+        hidden_ref => \%Hidden,
+		transactions => $selectPay,
+	);
+    my $body = runTemplate($Data, \%PageData, 'payment/bulkinvoicelisting.templ') || '';
 	return $body if($results);
 	return $results;
 	
@@ -223,11 +338,12 @@ sub queryInvoiceByOtherInfo {
 	tblPerson.intPersonID,
 	(tblTransactions.curAmount * tblTransactions.intQty) as TotalAmount 
 	FROM tblTransactions INNER JOIN tblPersonRegistration_$Data->{'Realm'}
-	ON (tblPersonRegistration_1.intPersonRegistrationID = tblTransactions.intPersonRegistrationID AND tblPersonRegistration_$Data->{'Realm'}.intPersonID = tblTransactions.intID)
+	ON (tblPersonRegistration_$Data->{'Realm'}.intPersonRegistrationID = tblTransactions.intPersonRegistrationID AND tblPersonRegistration_$Data->{'Realm'}.intPersonID = tblTransactions.intID)
 	INNER JOIN tblInvoice ON tblInvoice.intInvoiceID = tblTransactions.intInvoiceID 
 	INNER JOIN tblProducts ON tblProducts.intProductID = tblTransactions.intProductID
 	INNER JOIN tblPerson ON tblPerson.intPersonID = tblTransactions.intID 
-	WHERE intStatus = 0 AND strPersonType = '$strPersonType' 
+	WHERE intStatus = 0 AND strPersonType = '$strPersonType'  
+	AND tblPersonRegistration_$Data->{'Realm'}.strStatus <> 'INPROGRESS' 
 	@whereClause
 	];	
 
@@ -415,18 +531,4 @@ my $target = 'paytry.cgi';#$Data->{'target'};
 
 	return $body;
 }
-
-
-
-
-	
-	
-
-
-
-
-
-
-
-
 1;
