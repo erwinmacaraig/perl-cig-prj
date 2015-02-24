@@ -38,6 +38,7 @@ sub new {
 	$self->{'ReturnURL'}=$params{'ReturnURL'};
 	$self->{'SystemConfig'}=$params{'SystemConfig'};
 	$self->{'OtherOptions'}=$params{'OtherOptions'};
+	$self->{'SavedReportID'} = 0;
 	$self->{'DEBUG'} ||= 0;
 
 	return undef if !$self->{'db'};
@@ -172,6 +173,7 @@ sub deliverReport {
 			$self->{'Data'},
 			{
 				Name => $self->Name(),
+				SavedReportID => $self->IDName(),
 				DateRun => scalar(localtime()),
 				RunOrder => $self->{'RunParams'}{'FieldOrder'} || $self->{'RunParams'}{'Order'},
 				RecordCount => $self->{'RunParams'}{'RecordCount'},
@@ -183,11 +185,28 @@ sub deliverReport {
 		);
 
 	}
+	elsif($self->{'RunParams'}{'Download'} )    {
+        $self->downloadReport($reportoutput);
+    }
 	else	{
 		#just return report
 		$output = $reportoutput;
 	}
 	return $output;
+}
+
+sub downloadReport {
+    my $self = shift;
+    my ($reportoutput) = @_;
+
+    my $contenttype = 'application/download';
+    #my $size = length($reportoutput);
+    print "Content-type: $contenttype\n";
+    #print "Content-length: $size\n";
+    #print "Content-transfer-encoding: $size\n";
+    print qq[Content-disposition: attachement; filename = "report.csv"\n\n];
+    print $reportoutput;
+    exit;
 }
 
 sub formatOutput {
@@ -204,14 +223,19 @@ sub formatOutput {
 	)	{
 		$templatename = $self->{'Config'}{'TemplateEmail'} if $self->{'Config'}{'TemplateEmail'};
 	}
+	if($self->{'RunParams'}{'Download'}  == 1)  {
+		$templatename = $self->{'Config'}{'TemplateEmail'} if $self->{'Config'}{'TemplateEmail'};
+    }
 	my $debugtime = [gettimeofday];
 	warn("REPORT DEBUG: ".localtime()." Format Start ") if $self->{'DEBUG'};
   $output = runTemplate(
     $self->{'Data'},    
     {
 			Name => $self->Name(),
-      Labels => $self->{'Config'}{'Labels'},
-      ReportData => $data_array, 
+			ReportID => $self->ID(),
+			SavedReportID => $self->{'SavedReportID'},
+            Labels => $self->{'Config'}{'Labels'},
+            ReportData => $data_array, 
 			DateRun => scalar(localtime()),
 			RunOrder => $self->{'RunParams'}{'FieldOrder'} || $self->{'RunParams'}{'Order'},
 			RecordCount => $self->{'RunParams'}{'RecordCount'},

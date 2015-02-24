@@ -2214,3 +2214,7 @@ div[id*="doctab"] .documents-list table.table .task-list .status-col a.btn-insid
 .hidden-col-val {
     display:none;
 }
+
+.report-option-button-row {
+    margin-bottom:20px;
+}

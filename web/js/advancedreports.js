@@ -23,7 +23,7 @@ jQuery(function() {
 		 jQuery('#ROselectedfieldlist').val(activefields.join(','));
 	});
 	jQuery(".ROButRun").click(function () {
-		jQuery('#reportform').attr('target','_report');
+		//jQuery('#reportform').attr('target','_report');
 	});
 	loadSaved();
 	$(".dateinput").datepicker({ dateFormat: 'dd/mm/yy', autoSize: true, changeMonth: true, changeYear: true, yearRange: '1900:2020'});
