@@ -134,7 +134,7 @@ sub resolveHoldPayment  {
         $query->execute($logID);
         $st = qq[
             UPDATE tblTransLog
-            SET intStatus = 1, strResponseCode = 'OK', strResponseText = 'Hold Resolved'
+            SET intStatus = 1, strResponseCode = 'OK', strResponseText = 'PAYMENT_HOLD_RESOLVED'
             WHERE intLogID = ?
         ];
         $query = $Data->{'db'}->prepare($st);
@@ -360,6 +360,7 @@ sub step2 {
 
 
 #Make DB Changes
+    $strResponseText = 'PAYMENT_SUCCESSFUL';
 	my $statement = qq[
 			INSERT INTO tblTransLog (intEntityPaymentID, dtLog, intAmount, strResponseCode, strResponseText, strComments, intPaymentType, strBSB, strBank, strAccountName, strAccountNum, intRealmID, intCurrencyID, strReceiptRef, intStatus, intPaymentByLevel) VALUES
 	($entityID, $dtLog, $intAmount, $strResponseCode, $strResponseText, $strComments, $paymentType, $strBSB, $strBank, $strAccountName, $strAccountNum, $Data->{Realm}, $currencyID, $strReceiptRef, $Defs::TXNLOG_PENDING, $currentLevel) 
@@ -688,7 +689,7 @@ warn("LL $hidePayment:$hidePay:$displayonly");
     },
     {
         name => 'Amount', 
-        field => 'NetAmount', 
+        field => 'curAmount', 
         width => 20
     },
     {
@@ -1340,7 +1341,7 @@ my %FieldDefinitions=(
 			strResponseText => {
                                 label => 'Response Text',
 				type => 'text',
-                                value => $field->{strResponseText},
+                                value => $Defs::paymentResponseText{$field->{strResponseText}},
 				maxlength=>'100',
                         },
 			strReceiptRef => {
@@ -1594,7 +1595,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
       <tr>
         <td>$Defs::paymentTypes{$pref->{intPaymentType}}</td>
         <td>$pref->{AttemptDateTime}</td>
-        <td>$pref->{strResponseText}</td>
+        <td>$Defs::paymentResponseText{$pref->{strResponseText}}</td>
         <td>$dollarSymbol $pref->{intAmount}</td>
       </tr>
     ];
@@ -1848,7 +1849,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
       <tr>
         <td>$Defs::paymentTypes{$pref->{intPaymentType}}</td>
         <td>$pref->{AttemptDateTime}</td>
-        <td>$pref->{strResponseText}</td>
+        <td>$Defs::paymentResponseText{$pref->{strResponseText}}</td>
         <td>$dollarSymbol $pref->{intAmount}</td>
       </tr>
     ];

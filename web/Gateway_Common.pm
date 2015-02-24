@@ -141,6 +141,7 @@ sub gatewayTransLog	{
 		if ($tref->{'intTableType'} == 3)	{
 			$tref->{'MemberEntityFor'} = $tref->{'EntityName'}
 		}
+        $tref->{'ResponseText'} = $Defs::paymentResponseText{$tref->{'strResponseText'}};
 
 		push @TXNs, $tref;
 	}

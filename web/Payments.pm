@@ -709,7 +709,7 @@ sub processTransLogFailure    {
 
     my $st= qq[
         UPDATE tblTransLog
-        SET strResponseCode = "-1", strResponseText = "FAILED", intStatus = $Defs::TXNLOG_FAILED, strGatewayResponseCode = ?, strOtherRef1 = ?, strOtherRef2 = ?, strOtherRef3 = ?, strOtherRef4 = ?, strOtherRef5 = ?, strAuthID=?, strText=?
+        SET strResponseCode = "-1", strResponseText = "PAYMENT_FAILED", intStatus = $Defs::TXNLOG_FAILED, strGatewayResponseCode = ?, strOtherRef1 = ?, strOtherRef2 = ?, strOtherRef3 = ?, strOtherRef4 = ?, strOtherRef5 = ?, strAuthID=?, strText=?
         WHERE intLogID = $intLogID
 		    AND intStatus = $Defs::TXNLOG_PENDING
             AND strResponseCode IS NULL
