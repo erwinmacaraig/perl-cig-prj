@@ -1152,7 +1152,23 @@ sub save_rego_products {
 
 
 sub add_rego_record{
-    my ($Data, $personID, $entityID, $entityLevel, $originLevel, $personType, $personEntityRole, $personLevel, $sport, $ageLevel, $registrationNature, $ruleFor, $nationality, $personRequestID) =@_;
+    my (
+        $Data,
+        $personID,
+        $entityID,
+        $entityLevel,
+        $originLevel,
+        $personType,
+        $personEntityRole,
+        $personLevel,
+        $sport,
+        $ageLevel,
+        $registrationNature,
+        $ruleFor,
+        $nationality,
+        $personRequestID,
+        $MAComment
+    ) = @_;
 
     my $clientValues = $Data->{'clientValues'};
     my $rego_ref = {
@@ -1171,6 +1187,7 @@ sub add_rego_record{
         current => 1,
         ruleFor=>$ruleFor,
         personRequestID => $personRequestID,
+        MAComment => $MAComment || '',
     };
     my ($personStatus, $prStatus) = checkIsSuspended($Data, $personID, $entityID, $rego_ref->{'personType'});
     return (0, undef, 'SUSPENDED') if ($personStatus eq 'SUSPENDED' or $prStatus eq 'SUSPENDED');
