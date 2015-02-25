@@ -733,7 +733,6 @@ warn("LL $hidePayment:$hidePay:$displayonly");
         }
             $row_data->{SelectLink} = qq[main.cgi?client=$client&a=P_TXN_EDIT&personID=$row->{intID}&id=$row->{intTransLogID}&tID=$row->{intTransactionID}];
             if ($row->{intStatus} == 1) {
-print STDERR "IN PAID\n";
                 $row_data->{stuff} = qq[<ul><li><a href="main.cgi?a=P_TXNLog_payVIEW&client=$client&tlID=$row->{intTransLogID}&amp;pID=$row->{intID}" class = "">].$Data->{'lang'}->txt('View Payments').qq[</a> ];
                 $row_data->{stuff} .= qq[<li><a href="printreceipt.cgi?client=$client&amp;ids=$row->{intTransLogID}&amp;pID=$row->{intID}"  target="receipt" class = "btn-dinside-panels">].$Data->{'lang'}->txt('View Receipt').qq[</a></ul>];
                $row_data->{manual_payment} = '-';
