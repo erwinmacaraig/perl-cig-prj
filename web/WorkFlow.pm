@@ -997,7 +997,7 @@ sub addWorkFlowTasks {
             $emailNotification->setWorkTaskDetails(\%notificationData);
 
             my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
-            $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
+            $emailNotification->send($emailTemplate) if ($emailTemplate->getConfig('toEntityNotification') == 1 and $task->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_ACTIVE);
 
         }
     }
@@ -1231,47 +1231,56 @@ sub checkForOutstandingTasks {
 		return $q->errstr . '<br>' . $st
 	}
 
-	my $prev_WFTaskID = 0;
-   	my $updateThisTask = '';
-   	my $pfx = '';
-   	my $list_WFTaskID = '';
-   	my $update_count = 0;
-   	my $count = 0;
+    my $prev_WFTaskID = 0;
+    my $updateThisTask = '';
+    my $pfx = '';
+    my $list_WFTaskID = '';
+    my $update_count = 0;
+    my $count = 0;
+    my @target_WFTaskID;
 
    	#Should be a cleverer way to do this, but check all the Pending Tasks and see if all of their
    	# pre-reqs have been completed. If so, update their status from Pending to Active.
-	while(my $dref= $q->fetchrow_hashref()) {
-		$count ++;
+    while(my $dref= $q->fetchrow_hashref()) {
+        $count ++;
 
-   		if ($dref->{intWFTaskID} != $prev_WFTaskID) {
-   			if ($prev_WFTaskID != 0) {
-   				if ($updateThisTask eq 'YES') {
-   					$list_WFTaskID .= $pfx . $prev_WFTaskID;
-   					$pfx = ",";
-					$update_count ++;
-			   			}
-   			}
-   			$updateThisTask = 'YES';
-   			$prev_WFTaskID = $dref->{intWFTaskID};
-   		}
+        if ($dref->{intWFTaskID} != $prev_WFTaskID) {
+            if ($prev_WFTaskID != 0) {
+                if ($updateThisTask eq 'YES') {
+                    if(!($prev_WFTaskID ~~ @target_WFTaskID)){
+                        push @target_WFTaskID, $prev_WFTaskID;
+                    }
 
-   		if ($dref->{strTaskStatus} eq 'ACTIVE') {
-   			$updateThisTask = "nope";
-   		}
-   		if ($dref->{strTaskStatus} eq 'PENDING') {
-   			$updateThisTask = "nope";
-   		}
-   		if ($dref->{strTaskStatus} eq 'REJECTED') {
-   			$updateThisTask = "nope";
-   		}
+                    $list_WFTaskID .= $pfx . $prev_WFTaskID;
+                    $pfx = ",";
+                    $update_count ++;
+                }
+            }
+            $updateThisTask = 'YES';
+            $prev_WFTaskID = $dref->{intWFTaskID};
+        }
+
+        if ($dref->{strTaskStatus} eq 'ACTIVE') {
+            $updateThisTask = "nope";
+        }
+        if ($dref->{strTaskStatus} eq 'PENDING') {
+            $updateThisTask = "nope";
+        }
+        if ($dref->{strTaskStatus} eq 'REJECTED') {
+            $updateThisTask = "nope";
+        }
     }
 
-   	if ($prev_WFTaskID != 0) {
-   		if ($updateThisTask eq 'YES') {
-   			$list_WFTaskID .= $pfx . $prev_WFTaskID;
-			$update_count ++;
-		}
-   	}
+    if ($prev_WFTaskID != 0) {
+        if ($updateThisTask eq 'YES') {
+            if(!($prev_WFTaskID ~~ @target_WFTaskID)){
+                push @target_WFTaskID, $prev_WFTaskID;
+            }
+
+            $list_WFTaskID .= $pfx . $prev_WFTaskID;
+            $update_count ++;
+        }
+    }
 
 	my $rc = 0;
 
@@ -1291,6 +1300,40 @@ sub checkForOutstandingTasks {
 		if ($q->errstr) {
 			return $q->errstr . '<br>' . $st
 		}
+
+        foreach my $TID (@target_WFTaskID) {
+            my $emailNotification = new EmailNotifications::WorkFlow();
+            my $task = getTask($Data, $TID);
+
+            my ($workTaskType, $workTaskRule) = getWorkTaskType($Data, $task);
+            my %notificationData = (
+                'Reason' => '',
+                'WorkTaskType' => $workTaskType,
+                'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+                'PersonRegisterTo' => $task->{'registerToEntity'},
+                'Club' => $task->{'strLocalName'},
+                'Venue' => $task->{'strLocalName'},
+                'PersonRegisterTo' => $task->{'registerToEntity'},
+                'RegistrationType' => $task->{'sysConfigApprovalLockRuleFor'},
+            );
+
+            $emailNotification->setRealmID($Data->{'Realm'});
+            $emailNotification->setSubRealmID(0);
+            $emailNotification->setToEntityID($task->{'intApprovalEntityID'});
+            $emailNotification->setFromEntityID($task->{'intProblemResolutionEntityID'});
+            $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
+            $emailNotification->setDefsName($Defs::admin_email_name);
+            $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_ADDED);
+            $emailNotification->setSubject($workTaskType);
+            $emailNotification->setLang($Data->{'lang'});
+            $emailNotification->setDbh($Data->{'db'});
+            $emailNotification->setData($Data);
+            $emailNotification->setWorkTaskDetails(\%notificationData);
+
+            my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+            $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
+        }
+
 		####
   	    auditLog('', $Data, 'Updated Work Task', 'WFTask');
       	###
@@ -3563,6 +3606,7 @@ sub viewApprovalPage {
     my $c = Countries::getISOCountriesHash();
 
     $TemplateData{'TaskAction'} = \%TaskAction;
+    my $clubName = $dref->{'strLocalName'};
 
     switch($task->{'strWFRuleFor'}) {
         case 'REGO' {
@@ -3586,15 +3630,36 @@ sub viewApprovalPage {
                 case "$Defs::LEVEL_CLUB"  {
                     #TODO: add details specific to CLUB
                     $templateFile = 'workflow/result/club.templ';
+                    $title = $Data->{'lang'}->txt('New Club Registration - Approval');
                 }
                 case "$Defs::LEVEL_VENUE" {
                     #TODO: add details specific to VENUE
                     $templateFile = 'workflow/result/venue.templ';
+                    $title = $Data->{'lang'}->txt('New Facility Registration - Approval');
                 }
                 else {
 
                 }
             }
+             %TemplateData = (
+                EntityDetails => {
+                    Status => $Data->{'lang'}->txt($Defs::entityStatus{$dref->{'entityStatus'} || 0}) || '',
+                    LocalShortName => $task->{'strLocalShortName'} || '',
+                    LocalName => $task->{'strLocalName'} || '',
+                    LegalID => $task->{'strLegalID'} || '',
+                    FoundationDate => $task->{'dtFrom'} || '',
+                    ISOCountry => $c->{$task->{'strISOCountry'}} || '',
+                    Discipline => $Defs::entitySportType{$task->{'strDiscipline'}} || '',
+                    ContactPerson => $task->{'strContact'} || '',
+                    Email => $task->{'strEmail'} || '',
+                    Website => $task->{'strWebURL'} || '',
+                    EntityID => $task->{'intCreatedByEntityID'} || '',
+                    ClubName => $clubName,
+                },
+                TaskAction => \%TaskAction,
+            );
+            $TemplateData{'EntitySummaryPanel'} = entitySummaryPanel($Data, $task->{'intEntityID'});
+
         }
         case 'PERSON' {
             $templateFile = 'workflow/result/person.templ';
