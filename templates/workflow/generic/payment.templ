@@ -5,6 +5,7 @@
                 <table class="table" style="width: 100%">
                     <thead>
                         <tr>
+                            <th>[% Lang.txt('Transaction Number') %]</th>
                             <th>[% Lang.txt('Qty') %]</th>
                             <th>[% Lang.txt('Product') %]</th>
                             <th>[% Lang.txt('Product Type') %]</th>
@@ -16,6 +17,7 @@
                 <!-- loop here; -->
                 [% FOREACH row IN TXNs %]
                 <tr>
+                    <td><div class="member-data"> [% row.TransactionNumber %] </div></td>
                     <td><div class="member-data"> [% row.Qty %] </div></td>
                     <td><div class="member-data"> [% row.ProductName %] </div></td>
                     <td><div class="member-data"> [% row.ProductType %] </div></td>

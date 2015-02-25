@@ -2318,7 +2318,6 @@ sub viewTask {
     my %PaymentsData;
     my %ActionsData;
     my %fields;
-	open FH, ">dumpfile.txt";
 	
     switch($dref->{strWFRuleFor}) {
         case 'REGO' {
@@ -3159,6 +3158,7 @@ sub populateRegoPaymentsViewData {
             P.strName as ProductName,
             P.strProductType as ProductType,
             T.intStatus,
+            T.intTransactionID,
             TL.intPaymentType
         FROM
             tblTransactions as T
@@ -3182,6 +3182,8 @@ sub populateRegoPaymentsViewData {
 
     while(my $tdref = $q->fetchrow_hashref()) {
         my %row= (
+            TransactionNumber=> $tdref->{'intTransactionID'},
+            PaymentLogID=> $tdref->{'intTransLogID'},
             ProductName=> $tdref->{'ProductName'},
             ProductType=> $tdref->{'ProductType'},
             Amount=> $tdref->{'curAmount'},
