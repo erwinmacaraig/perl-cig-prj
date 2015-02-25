@@ -13,6 +13,7 @@
 [% END %]
 [% product_body %]
 [% IF mandatoryPayment %]
+	[% IF amountCheck %]
     <br>
     <h3 class="panel-header">[% Lang.txt('Payment Options') %]</h3>
     <div class="panel-body">
@@ -23,6 +24,7 @@
             <input type="radio" class="inputbox" name="payMethod" value="later"/>&nbsp;[% Lang.txt('Pay Later') %]&nbsp;[% Lang.txt('(after you submit the registration to the Member Association, the system will create an invoice for you to pay later)') %]
         </div>
     </div>
+	[% END %]
 [% END %]
 
 [% IF !NoFormFields %]

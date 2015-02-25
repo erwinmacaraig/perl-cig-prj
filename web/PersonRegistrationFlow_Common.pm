@@ -349,6 +349,7 @@ $sth = $Data->{'db'}->prepare($query);
         $hidden_ref->{'payMethod'} = 'notrequired' if (! $amountDue);
         my %PaymentConfig = (
             totalAmountDue => $amountDue,
+			totalPaymentDue => $hidden_ref->{'paymentDue'},
             dollarSymbol => $Data->{'SystemConfig'}{'DollarSymbol'} || '$',
             paymentMethodText => $Defs::paymentMethod{$hidden_ref->{'payMethod'}} || '',
         );
@@ -979,7 +980,9 @@ sub displayRegoFlowProducts {
         0,
         $rego_ref,
     );
+	
     my @prodIDs = ();
+	my $totalamountchk = 0;
     my %ProductRules=();
     foreach my $product (@{$CheckProducts})  {
         #next if($product->{'UseExistingThisEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'THIS_ENTITY'));
@@ -990,15 +993,18 @@ sub displayRegoFlowProducts {
 
         push @prodIDs, $product->{'ID'};
         $ProductRules{$product->{'ID'}} = $product;
+		
+		$totalamountchk += $product->{'ProductPrice'} if($product->{'Required'});
      }
     my $product_body='';
     if (@prodIDs)   {
         $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
+
     }
     else    {
         return '';
     }
-
+	
      my %PageData = (
         nextaction=>"PREGF_PU",
         target => $Data->{'target'},
@@ -1007,6 +1013,7 @@ sub displayRegoFlowProducts {
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
         client=>$client,
+		amountCheck => $totalamountchk,
         NoFormFields =>$noFormFields,
     );
     my $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ') || '';

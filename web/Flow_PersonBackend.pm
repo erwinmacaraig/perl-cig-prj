@@ -1019,6 +1019,7 @@ sub process_products {
             }
         }
     }
+	
     my $prodQty= join(':',@productsqty);
     $self->addCarryField('prodQty',$prodQty);
     my $prodIds= join(':',@productsselected);
@@ -1066,7 +1067,8 @@ sub process_products {
 ####
 
     $self->addCarryField('txnIds',$txnIds);
-
+	$self->addCarryField('paymentDue',$amount);
+	
     return ('',1);
 }
 

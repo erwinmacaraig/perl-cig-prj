@@ -133,13 +133,24 @@ function calculateProducts(){
     });
     $('.totalValue').html('$'+totalProduct.toFixed(2));
 }
+function updateRegoProductsTotal(id_cost,id_total){	
+	var total = parseFloat($("#"+id_total).text());
+	if( $('form#flowFormID td.col-1 input[type="checkbox"]:checked').prop("checked") == true){
+		total = total + parseFloat($("#"+id_cost).val());		
+	}
+	else {
+		total = total - parseFloat($("#"+id_cost).val());
+	}
+	$("#"+id_total).html(total.toFixed(2));
+}
+
 
 $(document).ready(function(){
     
     calculateProducts();
-
-    $('form#flowFormID td.col-1 input[type="checkbox"]').click(function(){
-        calculateProducts();
+	
+    $('form#flowFormID td.col-1 input[type="checkbox"]').click(function(){        
+		
     });
 
     $("#menu li.subnav a.menutop").mouseover(function(){
@@ -257,6 +268,7 @@ $(document).ready(function(){
     jQuery("input.search").on("keypress", function(){
 		jQuery("input.search").quicksearch();
 	});
+	
 
 });
 jQuery(document).ready(function(){
