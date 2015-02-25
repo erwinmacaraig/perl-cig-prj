@@ -32,6 +32,7 @@ sub handleReports	{
 	$action||='REP_SETUP';
 	my $reportID = param('rID') || '';
 	my $target=$Data->{'target'};
+	my $activetab = param('at') || '';
 
 	# GET CLIENT VALUES
 	my $clientValues_ref=$Data->{'clientValues'};
@@ -47,15 +48,17 @@ sub handleReports	{
 	my $title = $lang->txt('Reports Manager');
 	my $body = '';
 	if($action eq 'REP_SAVE')	{
+        $activetab = getActiveTab($db, $Data);
 		$body .= convertSavedReport($db, $Data, $clientValues_ref);
         $action = 'REP_SETUP';
 	}
 	elsif($action eq 'REP_DELETE')	{
+        $activetab = getActiveTab($db, $Data);
 		$body .= deleteSavedReport($db, $Data, $clientValues_ref);
         $action = 'REP_SETUP';
 	}
 	if($action eq 'REP_SETUP')	{
-		$body .= displayReportList($db, $Data, $clientValues_ref);
+		$body .= displayReportList($db, $Data, $clientValues_ref, $activetab);
 	}
 	else	{
 		my $reportingdb = connectDB('reporting');
@@ -174,7 +177,7 @@ sub getReportObj {
 }
 
 sub displayReportList	{
-	my($db, $Data, $clientValues) = @_;
+	my($db, $Data, $clientValues, $activetab) = @_;
 
 	my $body = '';
 	my $reports = getReportsInfo($db, $Data, $clientValues);
@@ -186,13 +189,19 @@ sub displayReportList	{
 
     my $cnt = 0;
 	for my $group (sort keys %{$reports})	{
+        my $groupkey = lc $group;
+        $groupkey =~s/[^\da-zA-Z]//g;
+        if($groupkey eq 'people') { $activetab ||= 'people'; }
+    }
+	for my $group (sort keys %{$reports})	{
         $cnt++;
+        $activetab = $group if !$activetab;
 		if($lastgroup ne $group)	{
 			my $groupkey = lc $group;
 			$groupkey =~s/[^\da-zA-Z]//g;
 			push @grouplist, [$groupkey, $group];
 			my $groupname = $l->txt($group);
-            my $active = $cnt == 1 ? 'in active' : '';
+            my $active = $groupkey eq $activetab ? 'in active' : '';
 			$groups .=qq[ 
 				<div class="tab-pane fade $active" id="repgroup-$groupkey" role = "tabpanel">
 			];
@@ -246,7 +255,7 @@ sub displayReportList	{
                             <b>$report->{'strName'}</b><br>
                             $report->{'strDescription'}
                         </td>
-                        <td style = "width:200px;">
+                        <td style = "width:250px;">
                             <a href = "$Data->{'target'}?client=$clientValues->{unesc_client}&amp;a=$newaction&amp;rID=$report->{'intReportID'}&amp;repID=$repID" class = "btn-inside-panels">$buttoncaption</a>
                             $delete
                             $run
@@ -260,8 +269,9 @@ sub displayReportList	{
 	}
 	my $tablist = '';
 	for my $g(@grouplist)	{
+        my $activeClass = $g->[0] eq $activetab ? 'active' : '';
 		$tablist .= qq[
-			<li role = "presentation"><a href = "#repgroup-$g->[0]" aria-controls="#repgroup-$g->[0]" role="tab" data-toggle="tab">$g->[1]</a></li>
+			<li role = "presentation" class = "$activeClass"><a href = "#repgroup-$g->[0]" aria-controls="#repgroup-$g->[0]" role="tab" data-toggle="tab">$g->[1]</a></li>
 		];
 	}
 	my $paramcode = qq[
@@ -686,6 +696,30 @@ sub deleteSavedReport  {
     return $alert;
 }
 
+sub getActiveTab {
+    my($db, $Data, $clientValues_ref) = @_;
 
+    my $id = param('repID') || '';
+    my $st = qq[
+        SELECT 
+            strGroup
+        FROM
+            tblSavedReports AS SR
+                INNER JOIN tblReports AS R
+            ON SR.intReportID = R.intReportID
+        WHERE
+            SR.intSavedReportID = ?
+        LIMIT 1
+    ];
+    my $q = $db->prepare($st);
+    $q->execute(
+        $id,
+    );
+    my ($group) = $q->fetchrow_array();
+    my $groupkey = lc $group;
+    $groupkey =~s/[^\da-zA-Z]//g;
+
+    return $groupkey;
+}
 1;
 
