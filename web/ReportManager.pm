@@ -32,6 +32,7 @@ sub handleReports	{
 	$action||='REP_SETUP';
 	my $reportID = param('rID') || '';
 	my $target=$Data->{'target'};
+	my $activetab = param('at') || '';
 
 	# GET CLIENT VALUES
 	my $clientValues_ref=$Data->{'clientValues'};
@@ -47,15 +48,17 @@ sub handleReports	{
 	my $title = $lang->txt('Reports Manager');
 	my $body = '';
 	if($action eq 'REP_SAVE')	{
+        $activetab = getActiveTab($db, $Data);
 		$body .= convertSavedReport($db, $Data, $clientValues_ref);
         $action = 'REP_SETUP';
 	}
 	elsif($action eq 'REP_DELETE')	{
+        $activetab = getActiveTab($db, $Data);
 		$body .= deleteSavedReport($db, $Data, $clientValues_ref);
         $action = 'REP_SETUP';
 	}
 	if($action eq 'REP_SETUP')	{
-		$body .= displayReportList($db, $Data, $clientValues_ref);
+		$body .= displayReportList($db, $Data, $clientValues_ref, $activetab);
 	}
 	else	{
 		my $reportingdb = connectDB('reporting');
@@ -174,7 +177,7 @@ sub getReportObj {
 }
 
 sub displayReportList	{
-	my($db, $Data, $clientValues) = @_;
+	my($db, $Data, $clientValues, $activetab) = @_;
 
 	my $body = '';
 	my $reports = getReportsInfo($db, $Data, $clientValues);
@@ -185,11 +188,10 @@ sub displayReportList	{
 	my $groups = '';
 
     my $cnt = 0;
-    my $activetab = '';
 	for my $group (sort keys %{$reports})	{
         my $groupkey = lc $group;
         $groupkey =~s/[^\da-zA-Z]//g;
-        if($groupkey eq 'people') { $activetab = 'people'; }
+        if($groupkey eq 'people') { $activetab ||= 'people'; }
     }
 	for my $group (sort keys %{$reports})	{
         $cnt++;
@@ -694,6 +696,30 @@ sub deleteSavedReport  {
     return $alert;
 }
 
+sub getActiveTab {
+    my($db, $Data, $clientValues_ref) = @_;
 
+    my $id = param('repID') || '';
+    my $st = qq[
+        SELECT 
+            strGroup
+        FROM
+            tblSavedReports AS SR
+                INNER JOIN tblReports AS R
+            ON SR.intReportID = R.intReportID
+        WHERE
+            SR.intSavedReportID = ?
+        LIMIT 1
+    ];
+    my $q = $db->prepare($st);
+    $q->execute(
+        $id,
+    );
+    my ($group) = $q->fetchrow_array();
+    my $groupkey = lc $group;
+    $groupkey =~s/[^\da-zA-Z]//g;
+
+    return $groupkey;
+}
 1;
 
