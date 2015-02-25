@@ -666,7 +666,7 @@ sub displayPaymentResult        {
         ];
     }
     else    {
-		$msg = qq[ <div align="center" class="warningmsg" style="font-size:14px;">We are sorry, there was a problem with your payment !!</div> ] if (! $msg and $transref->{'intAmount'});
+		$msg = qq[ <div align="center" class="warningmsg" style="font-size:14px;">We are sorry, there was a problem with your payment.</div> ] if (! $msg and $transref->{'intAmount'});
         $body .= qq[ <center>$msg<br></center> ];
 		if ($external)	{
 			$st = qq[
