@@ -3789,13 +3789,23 @@ sub updateTaskScreen {
                 $message = $Data->{'lang'}->txt("You have rejected this Amendment of Person Registration.");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
-            elsif($TaskType eq $task->{'strRegistrationNature'}.'_'.$task->{'strPersonType'}) {
+            elsif($TaskType =~ /^RENEWAL_/) {
                 if ($task->{'strPersonType'} eq 'PLAYER') {
                  $message = $Data->{'lang'}->txt("You have rejected this Player Renewal. To proceed with this Renewal, start a new Renewal.");
-                } else {
-                 $message = $Data->{'lang'}->txt("You have rejected this ".$task->{'strPersonType'}." Renewal. ".$raID->{'strLocalName'}." will be informed. To proceed with this Renewal ".$raID->{'strLocalName'}."");
-                }
-                $status = $Data->{'lang'}->txt("Rejected");
+                 $status = $Data->{'lang'}->txt("Rejected");
+                }elsif ($task->{'strPersonType'} eq 'CLUBOFFICIAL'){
+                 $message = $Data->{'lang'}->txt("You have rejected this Club Official Renewal. To proceed with this Renewal, start a new Renewal.");
+                 $status = $Data->{'lang'}->txt("Rejected");
+                }elsif($task->{'strPersonType'} eq 'MAOFFICIAL'){
+                 $message = $Data->{'lang'}->txt("You have rejected this MA Official Renewal. To proceed with this Renewal, start a new Renewal.");
+                 $status = $Data->{'lang'}->txt("Rejected");
+                }elsif($task->{'strPersonType'} eq 'TEAMOFFICIAL'){
+                 $message = $Data->{'lang'}->txt("You have rejected this Team Official Renewal. To proceed with this Renewal, start a new Renewal.");
+                 $status = $Data->{'lang'}->txt("Rejected");
+                }else{
+                 $message = $Data->{'lang'}->txt("You have rejected this ".ucfirst(lc($task->{'strPersonType'}))." Renewal. To proceed with this Renewal, start a new Renewal.");
+                 $status = $Data->{'lang'}->txt("Rejected");
+                }  
             }
         }
         case "WF_PR_S" {
@@ -3820,7 +3830,7 @@ sub updateTaskScreen {
     );
 
     #open (my $FH,">test.txt");
-    #print $FH  Dumper($TaskType, $task, $task->{'strPersonType'});
+    #print $FH  Dumper($TaskType, $task, $task->{'strPersonType'}, $raID->{'strLocalName'});
 
 	$body = runTemplate(
         $Data,
