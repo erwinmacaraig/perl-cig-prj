@@ -3796,7 +3796,14 @@ sub updateTaskScreen {
                 $message = $Data->{'lang'}->txt("You have rejected this Club Renewal. ".$raID->{'strLocalName'}." will be informed. To proceed with this Renewal ".$raID->{'strLocalName'}."");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
-
+            elsif($TaskType eq 'RENEWAL_MAOFFICIAL') {
+                $message = $Data->{'lang'}->txt("You have rejected this MA Official Renewal. ".$raID->{'strLocalName'}." will be informed. To proceed with this Renewal ".$raID->{'strLocalName'}."");
+                $status = $Data->{'lang'}->txt("Rejected");
+            }
+            elsif($TaskType eq 'RENEWAL_REFEREE') {
+                $message = $Data->{'lang'}->txt("You have rejected this Referee Renewal. ".$raID->{'strLocalName'}." will be informed. To proceed with this Renewal ".$raID->{'strLocalName'}."");
+                $status = $Data->{'lang'}->txt("Rejected");
+            }
         }
         case "WF_PR_S" {
             $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'Resolved');
@@ -3820,7 +3827,7 @@ sub updateTaskScreen {
     );
 
     #open (my $FH,">test.txt");
-    #print $FH  Dumper($raID->{'strLocalName'});
+    #print $FH  Dumper($TaskType);
 
 	$body = runTemplate(
         $Data,
