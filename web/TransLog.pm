@@ -134,7 +134,7 @@ sub resolveHoldPayment  {
         $query->execute($logID);
         $st = qq[
             UPDATE tblTransLog
-            SET intStatus = 1, strResponseCode = 'OK', strResponseText = 'Hold Resolved'
+            SET intStatus = 1, strResponseCode = 'OK', strResponseText = 'PAYMENT_HOLD_RESOLVED', strText = 'Resolved'
             WHERE intLogID = ?
         ];
         $query = $Data->{'db'}->prepare($st);
@@ -163,21 +163,6 @@ sub delTransLog	{
 	my $intLogID = $Data->{'params'}{'tlID'} || 0;
 	my $db = $Data->{'db'};
 	my $st = qq[
-		SELECT COUNT(intMoneyLogID) as ExportCount
-		FROM
-			tblMoneyLog
-		WHERE intTransLogID = $intLogID
-			AND intRealmID=$Data->{Realm}
-			AND (
-				intExportBankFileID >0
-				OR  intMYOBExportID >0
-			)
-	];
-	my $query = $db->prepare($st);
- 	$query->execute;
-	my $count = $query->fetchrow_array() || 0;
-	return "Unable to delete Transaction.  Money has been exported" if $count;
-	$st = qq[
 		DELETE FROM tblTransLog
 		WHERE intLogID = $intLogID
 	];
@@ -196,13 +181,6 @@ sub delTransLog	{
     WHERE 
       intTransLogID=$intLogID 
 		  AND intRealmID=$Data->{Realm}
-	];
-	$db->do($st);
-	$st = qq[
-		DELETE FROM tblMoneyLog
-		WHERE intTransLogID = $intLogID
-			AND intRealmID=$Data->{Realm}
-			AND intExportBankFileID = 0
 	];
 	$db->do($st);
 	return '';
@@ -360,6 +338,7 @@ sub step2 {
 
 
 #Make DB Changes
+    $strResponseText = 'PAYMENT_SUCCESSFUL';
 	my $statement = qq[
 			INSERT INTO tblTransLog (intEntityPaymentID, dtLog, intAmount, strResponseCode, strResponseText, strComments, intPaymentType, strBSB, strBank, strAccountName, strAccountNum, intRealmID, intCurrencyID, strReceiptRef, intStatus, intPaymentByLevel) VALUES
 	($entityID, $dtLog, $intAmount, $strResponseCode, $strResponseText, $strComments, $paymentType, $strBSB, $strBank, $strAccountName, $strAccountNum, $Data->{Realm}, $currencyID, $strReceiptRef, $Defs::TXNLOG_PENDING, $currentLevel) 
@@ -688,7 +667,7 @@ warn("LL $hidePayment:$hidePay:$displayonly");
     },
     {
         name => 'Amount', 
-        field => 'NetAmount', 
+        field => 'curAmount', 
         width => 20
     },
     {
@@ -732,7 +711,6 @@ warn("LL $hidePayment:$hidePay:$displayonly");
         }
             $row_data->{SelectLink} = qq[main.cgi?client=$client&a=P_TXN_EDIT&personID=$row->{intID}&id=$row->{intTransLogID}&tID=$row->{intTransactionID}];
             if ($row->{intStatus} == 1) {
-print STDERR "IN PAID\n";
                 $row_data->{stuff} = qq[<ul><li><a href="main.cgi?a=P_TXNLog_payVIEW&client=$client&tlID=$row->{intTransLogID}&amp;pID=$row->{intID}" class = "">].$Data->{'lang'}->txt('View Payments').qq[</a> ];
                 $row_data->{stuff} .= qq[<li><a href="printreceipt.cgi?client=$client&amp;ids=$row->{intTransLogID}&amp;pID=$row->{intID}"  target="receipt" class = "btn-dinside-panels">].$Data->{'lang'}->txt('View Receipt').qq[</a></ul>];
                $row_data->{manual_payment} = '-';
@@ -1340,7 +1318,7 @@ my %FieldDefinitions=(
 			strResponseText => {
                                 label => 'Response Text',
 				type => 'text',
-                                value => $field->{strResponseText},
+                                value => $Defs::paymentResponseText{$field->{strResponseText}},
 				maxlength=>'100',
                         },
 			strReceiptRef => {
@@ -1510,7 +1488,7 @@ sub resolveHoldPaymentForm  {
                                 },
                                 strResponseCode=> {
                                         label => 'Bank response code',
-                                        value => $TLref->{'strResponseCode'},
+                                        value => $TLref->{'strGatewayResponseCode'},
                                         readonly => '1',
                                 },
                                 strBSB=> {
@@ -1594,7 +1572,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
       <tr>
         <td>$Defs::paymentTypes{$pref->{intPaymentType}}</td>
         <td>$pref->{AttemptDateTime}</td>
-        <td>$pref->{strResponseText}</td>
+        <td>$Defs::paymentResponseText{$pref->{strResponseText}}</td>
         <td>$dollarSymbol $pref->{intAmount}</td>
       </tr>
     ];
@@ -1764,7 +1742,7 @@ sub viewTransLog	{
                                 },
                                 strResponseCode=> {
                                         label => 'Bank response code',
-                                        value => $TLref->{'strResponseCode'},
+                                        value => $TLref->{'strGatewayResponseCode'},
                                         readonly => '1',
                                 },
                                 strBSB=> {
@@ -1848,7 +1826,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
       <tr>
         <td>$Defs::paymentTypes{$pref->{intPaymentType}}</td>
         <td>$pref->{AttemptDateTime}</td>
-        <td>$pref->{strResponseText}</td>
+        <td>$Defs::paymentResponseText{$pref->{strResponseText}}</td>
         <td>$dollarSymbol $pref->{intAmount}</td>
       </tr>
     ];

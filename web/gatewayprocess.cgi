@@ -84,7 +84,14 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
         $returnVals{'GatewayResponseCode'}= param('rescode') || '';
 
         $returnVals{'GATEWAY_RESPONSE_TEXT'}= param('restext') || '';
-        $returnVals{'ResponseText'}= param('restext') || '';
+        my %ResponseText = (
+            "55"=>"PAYMENT_DELAYED",
+            "00"=>"PAYMENT_SUCCESSFUL",
+            "08"=>"PAYMENT_SUCCESSFUL",
+        );
+        my $code = param('rescode') || '';
+        my $respTextCode = $ResponseText{$code} || 'PAYMENT_UNSUCCESSFUL';
+        $returnVals{'ResponseText'}= $respTextCode; #$Defs::paymentResponseText{$respTextCode} || '';
         $returnVals{'Other1'} = param('restext') || '';
         $returnVals{'Other2'} = param('authid') || '';
         gatewayProcess(\%Data, $logID, $client, \%returnVals, '');
