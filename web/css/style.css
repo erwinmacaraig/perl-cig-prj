@@ -269,25 +269,25 @@ TD.total {
 	border-top:solid #000000 1px;
 }
 
-TR.ROgroupheader {
-    background-color:#BBBBBB;
+TR.ROgroupheader td{
+    background-color:#BBBBBB !important;
     vertical-align:top;
     font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
     font-weight:bold;
     padding:3px;
 }
                                                                                                         
-TR.ROgroupfooter {
+TR.ROgroupfooter td {
   vertical-align:top;
   font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
-  border-top:solid #000000 1px;
+  border-top:solid #000000 1px !important;
   font-style:italic;
 }
 
-TR.ROtotalfooter {
+TR.ROtotalfooter td {
   vertical-align:top;
   font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
-  border-top:double #000000 3px;
+  border-top:double #000000 3px !important;
   font-style:italic;
 }
 
