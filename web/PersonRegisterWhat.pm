@@ -82,6 +82,7 @@ sub displayPersonRegisterWhat   {
             ageName => $existing->{'AgeLevel'} || '',
             nature => $existing->{'strRegistrationNature'} || '',
             natureName => $existing->{'RegistrationNature'} || '',
+            MAComment => $existing->{'strShortNotes'} || '',
 
         );
         $templateData{'existing'} = \%existingRego;
