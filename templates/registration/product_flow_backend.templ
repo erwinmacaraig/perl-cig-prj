@@ -15,13 +15,21 @@
 [% IF mandatoryPayment %]
 	[% IF amountCheck %]
     <br>
-    <h3 class="panel-header">[% Lang.txt('Payment Options') %]</h3>
+    <h3 class="panel-header">[% Lang.txt('Payment Options') %] 123</h3>
     <div class="panel-body">
-        <div>
-            <input type="radio" class="inputbox" name="payMethod" value="now" checked />&nbsp;[% Lang.txt('Pay Now') %]&nbsp;[% Lang.txt('(after you submit the registration to the Member Association, the system will connect you to the payment portal)')%]
+        <div class="paymentwrapper">
+            <div class="paymentmainwrapper">
+            <span class="paymentwrapperoption"><input type="radio" class="inputbox" name="payMethod" value="now" checked /></span>
+            <b>[% Lang.txt('Pay Now') %]</b>
+            <label>[% Lang.txt('(after you submit the registration to the Member Association, the system will connect you to the payment portal)')%]</label>
+            </div>
         </div>
-        <div>
-            <input type="radio" class="inputbox" name="payMethod" value="later"/>&nbsp;[% Lang.txt('Pay Later') %]&nbsp;[% Lang.txt('(after you submit the registration to the Member Association, the system will create an invoice for you to pay later)') %]
+        <div class="paymentwrapper">
+            <div class="paymentmainwrapper">
+            <span class="paymentwrapperoption"><input type="radio" class="inputbox" name="payMethod" value="later"/></span>
+            <b>[% Lang.txt('Pay Later') %]</b>
+            <label>[% Lang.txt('(after you submit the registration to the Member Association, the system will create an invoice for you to pay later)') %]</label>
+            </div>
         </div>
     </div>
 	[% END %]

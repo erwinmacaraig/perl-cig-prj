@@ -2200,3 +2200,13 @@ div[id*="doctab"] .documents-list table.table .task-list .status-col a.btn-insid
 	float: right;
 	padding-top: 5px;
 }
+/*** payment ***/
+.paymentwrapper { float: left; width: 100%; padding-bottom: 5px; }
+.paymentmainwrapper { 
+    background-color: #fff;
+    float: left;
+    padding: 10px 5px 5px 10px;
+    width: 100%;
+}
+.paymentwrapperoption { float: left; padding-right: 10px; }
+.paymentwrapper label { font-size: 12px; }
