@@ -6,7 +6,7 @@ jQuery(function() {
 	jQuery( ".connectedSortable" ).sortable({
 		appendTo: 'body',
 		handle: '.handle',
-		cancel: ':input,button,.chzn-drop',
+		cancel: ':input,button,.chosen-drop',
 		remove: function(event, ui)	{
 			//var parent = jQuery(this).attr("id");
 			//var child = jQuery(ui.item).children(':first-child').attr("id");
@@ -38,7 +38,7 @@ jQuery(function() {
 function applyDropDownExtra(selector) {
 	jQuery(selector).each(function ()	{
 		jQuery(this).chosen({ disable_search_threshold: 5 });
-		var container = jQuery(this).parent().find('.chzn-container, .chzn-drop');
+		var container = jQuery(this).parent().find('.chosen-container, .chosen-drop');
 		container.css('width','auto');
 		container.css('min-width',container.width()+10);
 	});
