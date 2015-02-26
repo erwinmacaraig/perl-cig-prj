@@ -173,7 +173,7 @@ sub deliverReport {
 			$self->{'Data'},
 			{
 				Name => $self->Name(),
-				SavedReportID => $self->IDName(),
+				SavedReportID => $self->ID(),
 				DateRun => scalar(localtime()),
 				RunOrder => $self->{'RunParams'}{'FieldOrder'} || $self->{'RunParams'}{'Order'},
 				RecordCount => $self->{'RunParams'}{'RecordCount'},
