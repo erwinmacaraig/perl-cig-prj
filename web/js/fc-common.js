@@ -141,6 +141,12 @@ function updateRegoProductsTotal(id_cost,id_total){
 	else {
 		total = total - parseFloat($("#"+id_cost).val());
 	}
+	if(total > 0){
+		$("#payOptions").css("display","block");
+	}
+	else {
+		$("#payOptions").css("display","none");
+	}
 	$("#"+id_total).html(total.toFixed(2));
 }
 

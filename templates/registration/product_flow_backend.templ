@@ -13,7 +13,8 @@
 [% END %]
 [% product_body %]
 [% IF mandatoryPayment %]
-	[% IF amountCheck %]
+	<div id="payOptions" style="display:[% IF amountCheck %] block [% ELSE %] none [% END %];">
+	
     <br>
     <h3 class="panel-header">[% Lang.txt('Payment Options') %]</h3>
     <div class="panel-body">
@@ -32,7 +33,7 @@
             </div>
         </div>
     </div>
-	[% END %]
+	</div>
 [% END %]
 
 [% IF !NoFormFields %]

@@ -993,8 +993,8 @@ sub displayRegoFlowProducts {
 
         push @prodIDs, $product->{'ID'};
         $ProductRules{$product->{'ID'}} = $product;
-		$totalamountchk += $product->{'ProductPrice'};
-		#$totalamountchk += $product->{'ProductPrice'} if($product->{'Required'});
+		#$totalamountchk += $product->{'ProductPrice'};
+		$totalamountchk += $product->{'ProductPrice'} if($product->{'Required'} && $product->{'ProductPrice'} > 0);
      }
     my $product_body='';
     if (@prodIDs)   {
