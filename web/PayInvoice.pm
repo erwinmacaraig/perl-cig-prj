@@ -472,9 +472,7 @@ sub displayResults {
 
 	my $allowMP = 1;
     $allowMP = 0 if !$allowManualPayments;
-    #$allowMP = 0 if !$personID and $entityID;
-    $allowMP = 0 if $Data->{'SystemConfig'}{'DontAllowManualPayments'};
-    $allowMP = 0 if $Data->{'SystemConfig'}{'AssocConfig'}{'DontAllowManualPayments'}; 
+    $allowMP = 0 if $Data->{'SystemConfig'}{'DontAllowManualPayments_Invoice'};
 
 	 my $orstring = '';
      $orstring = qq[&nbsp; <b>].$Data->{'lang'}->txt('OR').qq[</b> &nbsp;] if $gateway_body and $allowMP;

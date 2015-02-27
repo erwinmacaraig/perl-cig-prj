@@ -319,7 +319,7 @@ sub displayTransaction	{
 					type => 'text',
 					size => 8,
 					value => $dref->{'intQty'} || 1,
-					readonly=>$amount_readonly,
+					readonly=>$prod_readonly,
 				},
 				curAmount=> {
 					label => $lang->txt('Amount Due'),
