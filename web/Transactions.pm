@@ -279,7 +279,7 @@ sub displayTransaction	{
 
     my $showPR = $pr_count ? 1 : 0;
 
-	my $readonly = ($dref->{intStatus} == $Defs::TXN_UNPAID) ? 1 : 0;
+	my $readonly = ($dref->{intStatus} == $Defs::TXN_UNPAID or $dref->{intStatus} == $Defs::TXN_HOLD) ? 1 : 0;
 	#my $amount_readonly = $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC ? 0: 1;
 	my $amount_readonly = ! $dref->{intStatus} ? 0: 1;
 	$amount_readonly = 1 if ! $id;
@@ -319,6 +319,7 @@ sub displayTransaction	{
 					type => 'text',
 					size => 8,
 					value => $dref->{'intQty'} || 1,
+					readonly=>$prod_readonly,
 				},
 				curAmount=> {
 					label => $lang->txt('Amount Due'),
