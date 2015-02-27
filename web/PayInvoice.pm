@@ -114,14 +114,16 @@ sub displayQueryByInvoiceField {
 sub displayQueryByOtherInfoFields {  
 	my ($Data, $client, $invoiceNumber) = @_; 
 
-	my $query = qq[SELECT intNationalPeriodID, strNationalPeriodName FROM tblNationalPeriod  WHERE intRealmID = ?];
-	my $sth = $Data->{'db'}->prepare($query);
-	$sth->execute($Data->{'Realm'});
-	my %natPeriod = ();
-	while(my $dref = $sth->fetchrow_hashref()){
-		$natPeriod{$dref->{'intNationalPeriodID'}} = $dref->{'strNationalPeriodName'};
-	}
-
+	#my $query = qq[SELECT intNationalPeriodID, strNationalPeriodName FROM tblNationalPeriod  WHERE intRealmID = ? ORDER BY strNationalPeriodName DESC];
+	#my $sth = $Data->{'db'}->prepare($query);
+	#$sth->execute($Data->{'Realm'});
+	#my %natPeriod = ();
+	#while(my $dref = $sth->fetchrow_hashref()){
+	#	$natPeriod{$dref->{'intNationalPeriodID'}} = $dref->{'strNationalPeriodName'};
+	#}
+	#use NationalReportingPeriod;
+	
+	my $natPeriod = NationalReportingPeriod::getPeriods($Data);
 	my %OtherFormFields = (
 		PersonType => {
 			options     => \%Defs::personType,
@@ -136,7 +138,7 @@ sub displayQueryByOtherInfoFields {
 			options     => \%Defs::ageLevel,
 		}, 
 		NationalPeriod => {
-			options     => \%natPeriod,			
+			options     => $natPeriod,			
 		},
 		carryfields =>  {
     		client => $client,
