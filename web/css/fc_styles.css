@@ -2266,6 +2266,7 @@ header nav.navbar-default .navbar-nav > li > a {
   td { font-size: 12px; }
   #worktasks tr td a.btn-inside-panels { font-size: 11px; }
   #worktasks #toggleGd_intTaskType a { font-size: 11px; }
+  .progressFlow .col-md-2.previous.step.step-3 { width: 100%; }
   div#content div.member-home-page div.task-actions.txtright {
   	margin-bottom: 10px;
   }
@@ -2287,6 +2288,7 @@ header nav.navbar-default .navbar-nav > li > a {
   h2.main-heading { font-size: 30px; margin-top: 0px; }
   #worktasks_length { display: none; }
   #worktasks_filter { text-align: right; }
+  .summaryPanel { display: none; }
 
 }
 @media (min-width: 250px) and (max-width: 480px) {
@@ -2311,13 +2313,14 @@ header nav.navbar-default .navbar-nav > li > a {
   .logo-area { display: none; }
   .dataTables_info, .dataTables_length, .dataTables_filter, .order-override { display: none; }
   .fa-user, .fa-clock-o { display: none; }
+  /*
   th:nth-child(2) { display: none; }
   td:nth-child(2) { display: none; }
-
-
   table.table thead tr th:nth-child(2) { display: none; }
-
   table.table thead tr th:nth-child(4) { display: none; }
+  */
+  table.listTable label { font-size: 12px; }
+  #flowFormID table.table thead tr th { font-size: 13px; }
   #content .row { margin-left: -30px; margin-right: -30px; }
   #content .container .row .tasklist-content {
     margin-top: -20px;
@@ -2348,12 +2351,19 @@ header nav.navbar-default .navbar-nav > li > a {
   }
   a.btn-main, input.btn-main, button.btn-main {
   	font-size: 13px;
-  	padding: 11px 15px;
+  	padding: 14px 15px;
+  	width: 100%;
   }
   a.btn-disabled {
   	font-size: 13px;
   	padding: 11px 15px;
+  	width: 100%;
   }
+  .fa-angle-right { display: none; }
+  a.btn-main.btn-proceed { padding-bottom: 10px; }
+  #flow-btn-back { margin-right: 0px; }
+  .summaryPanel { display: none; }
+  .toggle-type a, .toggle-type a:visited { width: 100%; }
   div#content div.member-home-page div.task-actions.txtright {
   	margin-bottom: 10px;
   }
@@ -2389,5 +2399,13 @@ header nav.navbar-default .navbar-nav > li > a {
    }
    .footer-section.section { height: 20px; }
    .navbar-nav { margin-left: -16px; }
+   .progressFlow .col-md-2.previous.step.step-3 { width: 100%; }
    .panel-body p.reg-text { font-size: 13px; }
+   .taskListCounter { left: 35%; }
+   .alert div p { margin: 5px 10px; width: 65%; }
+   .dynamic-panel p { font-size: 12px; }
+   #block-itc .alert .fa-info { margin-left: -10px; }
+   .document-upload.summary .personal-information .details-left { width: 100%; }
+   .document-upload.summary .contact-details .details-left { width: 100%; }
+   .document-upload.summary .registration-details .details-left { width: 100%; }
 }
