@@ -16,7 +16,6 @@ use CGI;
 use AddToPage;
 use TTTemplate;
 use Log;
-use Data::Dumper;
 
 sub ccPageForm  {
     my($title, $body, $clientValues_ref,$client, $Data) = @_;
@@ -252,6 +251,8 @@ sub pageMain {
         Menu => '',
         HomeURL => "$Data->{'target'}?client=$homeClient&amp;a=".$HomeAction{$Data->{'clientValues'}{'authLevel'}},
         AtLoginLevel => $atloginlevel,
+        HeaderLogo => $Data->{'SystemConfig'}{'MA_logo'},
+        HeaderSystemName => $Data->{'SystemConfig'}{'HeaderSystemName'},
     );
 
   my $globalnav = runTemplate(
@@ -526,7 +527,14 @@ sub regoPageForm {
 sub getPageCustomization{
     my ($Data) = @_;
 
-    my $nav = runTemplate( $Data, {PassportLink => ''}, 'user/globalnav.templ');
+    my $nav = runTemplate(
+        $Data,
+        {
+            PassportLink => '',
+            DefaultSystemConfig => $Data->{'SystemConfig'},
+        },
+        'user/globalnav.templ'
+    );
 
     my $html_head = $Data->{'HTMLHead'} || '';
     my $html_head_style = '';

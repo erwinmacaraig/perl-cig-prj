@@ -96,7 +96,7 @@ sub already_exists {
 sub _get_sql_details{
 
     my $field_details = {
-        'fields_to_ignore' => ['tTimestamp','strNotes','dtDOB_Format'],
+        'fields_to_ignore' => ['tTimeStamp','strNotes','dtDOB_Format'],
         'table_name' => 'tblPerson',
         'key_field' => 'intPersonID',
     };

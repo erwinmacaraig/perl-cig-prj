@@ -1,5 +1,10 @@
 package FlashMessage;
 require Exporter;
+@ISA    = qw(Exporter);
+@EXPORT = @EXPORT_OK = qw(
+    setFlashMessage
+    getFlashMessage
+);
 
 use strict;
 use lib '.', '..', 'Clearances'; #"comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
