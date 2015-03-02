@@ -363,7 +363,7 @@ sub queryInvoiceByOtherInfo {
 	while(my $dref = $sth->fetchrow_hashref()){
 		$results = 1;
 		
-		my $selectPay = qq[<input type="checkbox" name="act_$dref->{'intTransactionID'}" class="paytxn_chk" />];	
+		my $selectPay = qq[<input type="checkbox" name="act_$dref->{'intTransactionID'}" class="paytxn_chk" value="$dref->{'TotalAmount'}" />];	
 		$cv{'personID'} = $dref->{'intPersonID'};
         my $clm=setClient(\%cv);	
 		push @rowdata, {
@@ -482,7 +482,7 @@ sub displayResults {
    
 	if ($allowMP){
 	$gateway_body .= qq[
-				  <div class="sectionheader">].$Data->{'lang'}->txt('Manual Payment').qq[</div>
+				  <div class="sectionheader" id="manualpayment">].$Data->{'lang'}->txt('Manual Payment').qq[</div>
 					  <table cellpadding="2" cellspacing="0" border="0">
 						<tbody id="secmain2" >	
 						<tr>

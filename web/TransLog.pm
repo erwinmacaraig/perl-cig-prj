@@ -539,10 +539,9 @@ EOS
 	my $cl=setClient($Data->{'clientValues'}) || '';
 	my $receiptLink = "printreceipt.cgi?client=$cl&ids=$transLogID";
 
-  auditLog($transLogID, $Data, 'Confirmed Payment', 'Transactions');
-
-	return (qq[
-		<div class="OKmsg">].$lang->txt('Your payment has been Confirmed') .qq[</div>
+   auditLog($transLogID, $Data, 'Confirmed Payment', 'Transactions');
+   my ($success, $resultHTML) = displayPaymentResult($Data, $transLogID, 0) ; # <div class="OKmsg">].$lang->txt('Your payment has been Confirmed') .qq[</div>
+	return (qq[ $resultHTML
 		<br>
 		<br><a href="$receiptLink" target="receipt">]. $lang->txt('Print Receipt') .qq[</a><br>
 	<br><a href="$Data->{'target'}?client=$cl&amp;a=P_TXN_LIST">]. $lang->txt('Return to Transactions') .qq[</a><br>
@@ -1050,7 +1049,7 @@ sub listTransactions {
 					<tr>
 						<td class="label"><label for="l_intAmount">].$lang->txt('Amount (ddd.cc)').qq[</label>:</td>
 						<td class="value">
-						<input type="text" name="intAmount" value="$Data->{params}{intAmount}" id="l_intAmount" size="10"  /> </td>
+						<input type="text" id="intAmountForManualPay" name="intAmount" value="$Data->{params}{intAmount}" id="l_intAmount" size="10"  /> </td>
 					</tr>
 					<tr>
 						<td class="label"><label for="l_dtLog">].$lang->txt('Date Paid').qq[</label>:</td>

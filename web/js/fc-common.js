@@ -214,9 +214,18 @@ $(document).ready(function(){
     $(".document-upload").insertAfter($("fieldset").first());
 
      $(document).on("change", "input.paytxn_chk", function(){
+		var totalamount = 0;
         if(this.checked){
           $('#payment_manual').show();
           $('#payment_cc').show();
+		  //check if manual pay is enabled
+			if($('#manualpayment').length){
+				$('input[type="checkbox"]:checked').each(function (){
+					totalamount += parseFloat(this.value);
+				});
+				$("#l_intAmount").val(totalamount.toFixed(2));
+				console.log(totalamount);
+			}
         } else {
           $('#payment_manual').hide();
           $('#payment_cc').hide();
