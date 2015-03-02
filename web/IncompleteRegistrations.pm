@@ -131,6 +131,10 @@ sub listIncompleteRegistrations    {
             ];
 
         }
+        if($Data->{'clientValues'}{'authLevel'} != $Data->{'clientValues'}{'currentLevel'})    {
+            $resume = '';
+            $delete = '';
+        }
         
         push @rowdata, {
             id => $dref->{'intPersonRegistrationID'} || 0,

@@ -77,7 +77,7 @@ $(document).ready(function(){
 
     }
 
-    else if (param == "REP_SETUP") {
+    else if (param.match(/^REP_/))  {
       
       $("header nav ul li a[href*='REP_SETUP']").addClass("active");
     
