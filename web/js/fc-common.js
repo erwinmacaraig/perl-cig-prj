@@ -215,6 +215,8 @@ $(document).ready(function(){
 
      $(document).on("change", "input.paytxn_chk", function(){
 		var totalamount = 0;
+		$("#l_intAmount").val('');
+		$("#block-manualpay").css('display','none');
         if(this.checked){
           $('#payment_manual').show();
           $('#payment_cc').show();
@@ -222,7 +224,9 @@ $(document).ready(function(){
 			if($('#manualpayment').length){
 				$('input[type="checkbox"]:checked').each(function (){
 					totalamount += parseFloat(this.value);
+					$("#block-manualpay").css('display','block');
 				});
+				
 				$("#l_intAmount").val(totalamount.toFixed(2));
 				console.log(totalamount);
 			}
@@ -230,7 +234,7 @@ $(document).ready(function(){
           $('#payment_manual').hide();
           $('#payment_cc').hide();
         }
-     })
+     });
 
      $("#btn-manualpay").click(function() {
             if($('#paymentType').val() == '') {

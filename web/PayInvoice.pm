@@ -480,6 +480,7 @@ sub displayResults {
      $orstring = qq[&nbsp; <b>].$Data->{'lang'}->txt('OR').qq[</b> &nbsp;] if $gateway_body and $allowMP;
      if($paymentType==0){ $paymentType='';}
    
+	
 	if ($allowMP){
 	$gateway_body .= qq[
 						<h3 class="panel-header sectionheader" id="manualpayment">].$Data->{'lang'}->txt('Manual Payment').qq[</h3>
@@ -504,8 +505,8 @@ sub displayResults {
 				  			</fieldset>
 				  		</div>
 					  	<div class="button-row">
-							<div class="txtright">
-								<div class="HTbuttons"><input onclick="clicked='main.cgi'" type="submit" name="subbut" value="Submit Manual Payment" class="btn-main btn-proceed HF_submit button generic-button" id = "btn-manualpay"></div>
+							<div class="txtright" id="block-manualpay" style="display:none">
+								<input onclick="clicked='main.cgi'" type="submit" name="subbut" value="Submit Manual Payment" class="btn-main" id = "btn-manualpay" >
 								<input type="hidden" name="paymentID" value="">
 								<input type="hidden" name="dt_start_paid" value="">
 								<input type="hidden" name="dt_end_paid" value="">
