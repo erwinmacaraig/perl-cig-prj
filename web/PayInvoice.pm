@@ -482,35 +482,35 @@ sub displayResults {
    
 	if ($allowMP){
 	$gateway_body .= qq[
-				  <div class="sectionheader" id="manualpayment">].$Data->{'lang'}->txt('Manual Payment').qq[</div>
-					  <table cellpadding="2" cellspacing="0" border="0">
-						<tbody id="secmain2" >	
-						<tr>
-							<td class="label"><label for="l_intAmount">].$Data->{'lang'}->txt('Amount (ddd.cc)').qq[</label>:</td>
-							<td class="value">
-							<input type="text" name="intAmount" value="$Data->{params}{intAmount}" id="l_intAmount" size="10"  /> </td>
-						</tr>
-						<tr>
-							<td class="label"><label for="l_dtLog">].$Data->{'lang'}->txt('Date Paid').qq[</label>:</td>
-							<td class="value"><input type="text" name="dtLog" value="$currentDate" id="l_dtLog" size="10" maxlength="10" /> <span class="HTdateformat">dd/mm/yyyy</span> </td>
-						</tr>
-						<tr>
-							<td class="label"><label for="l_intPaymentType">].$Data->{'lang'}->txt('Payment Type').qq[</label>:</td>
-							<td class="value">].drop_down('paymentType',\%Defs::manualPaymentTypes, undef, $paymentType, 1, 0,'','').qq[</td>
-					</tr>
-					
-<tr>
-
-						<td class="label"><label for="l_strComments">].$Data->{'lang'}->txt('Comments').qq[</label>:</td>
-						<td class="value"><textarea name="strComments" id="l_strComments"  rows = "5"   cols = "45"  >$Data->{params}{strComments}</textarea> </td>
-					</tr>
-				    </tbody>	
-				</table>
-			
-						<div class="HTbuttons"><input onclick="clicked='main.cgi'" type="submit" name="subbut" value="Submit Manual Payment" class="HF_submit button generic-button" id = "btn-manualpay"></div>
-<input type="hidden" name="paymentID" value=""><input type="hidden" name="dt_start_paid" value=""><input type="hidden" name="dt_end_paid" value="">
-					
-				</div>
+						<h3 class="panel-header sectionheader" id="manualpayment">].$Data->{'lang'}->txt('Manual Payment').qq[</h3>
+				  		<div id="secmain2" class="panel-body fieldSectionGroup ">
+				  			<fieldset>
+				  				<div class="form-group">
+				  					<label for="l_intAmount" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Amount (ddd.cc)').qq[</label>
+				  					<div class="col-md-6"><input type="text" name="intAmount" value="$Data->{params}{intAmount}" id="l_intAmount" size="10"  /></div>
+				  				</div>
+				  				<div class="form-group">
+				  					<label for="l_dtLog" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Date Paid').qq[</label>
+				  					<div class="col-md-6"><input type="text" name="dtLog" value="$currentDate" id="l_dtLog" size="10" maxlength="10" /> <span class="HTdateformat">dd/mm/yyyy</span></div>
+				  				</div>
+				  				<div class="form-group">
+				  					<label for="l_intPaymentType" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Payment Type').qq[</label>
+				  					<div class="col-md-6">].drop_down('paymentType',\%Defs::manualPaymentTypes, undef, $paymentType, 1, 0,'','').qq[</div>
+				  				</div>
+				  				<div class="form-group">
+				  					<label for="l_strComments" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Comments').qq[</label>
+				  					<div class="col-md-6"><textarea name="strComments" id="l_strComments" style="width: 100%; height: 200px;">$Data->{params}{strComments}</textarea></div>
+				  				</div>
+				  			</fieldset>
+				  		</div>
+					  	<div class="button-row">
+							<div class="txtright">
+								<div class="HTbuttons"><input onclick="clicked='main.cgi'" type="submit" name="subbut" value="Submit Manual Payment" class="btn-main btn-proceed HF_submit button generic-button" id = "btn-manualpay"></div>
+								<input type="hidden" name="paymentID" value="">
+								<input type="hidden" name="dt_start_paid" value="">
+								<input type="hidden" name="dt_end_paid" value="">
+							</div>
+						</div>
 			] 
 
 	}
