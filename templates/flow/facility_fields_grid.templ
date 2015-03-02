@@ -4,7 +4,7 @@
     <table id="ffg_venue" class="table" cellpadding="0" style="width: 100%">
         <thead>
         <tr>
-            <!--<td></th>-->
+            <!--<td></td>-->
             <td>[% Lang.txt('Field Number') %]</td>
             <td>[% Lang.txt('Field Name') %]</td>
             <td>[% Lang.txt('Discipline') %]</td>
@@ -17,6 +17,7 @@
         [% COUNT = 0 %]
         [% FOREACH fieldRow IN FieldElements %]
         <tr>
+            [% fieldRow.intEntityFieldID %]
             <!--<td>[% fieldRow.intEntityFieldID %][% COUNT = COUNT + 1 %][% COUNT %]</td>-->
             <td>[% fieldRow.intFieldOrderNumber %]</td>
             <td>[% fieldRow.strName %]</td>

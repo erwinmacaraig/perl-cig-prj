@@ -89,7 +89,7 @@ sub capacityHtml {
     my $self = shift;
     my ($field, $prefixID) = @_;
 
-    my $existingValue = $self->getValue($field) || '';
+    my $existingValue = $self->getValue($field);
     my $inputFieldName = $self->_inputFieldName($field, $prefixID);
     my $fieldCapacityhtml = qq[<input type='text' name='$inputFieldName' value="$existingValue"/>];
     return $fieldCapacityhtml;
