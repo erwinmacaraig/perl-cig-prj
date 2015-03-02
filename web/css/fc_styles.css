@@ -2408,4 +2408,13 @@ header nav.navbar-default .navbar-nav > li > a {
    .document-upload.summary .personal-information .details-left { width: 100%; }
    .document-upload.summary .contact-details .details-left { width: 100%; }
    .document-upload.summary .registration-details .details-left { width: 100%; }
+
+   #worktasks_wrapper #worktasks th:nth-child(1) { display: none; }
+   #worktasks_wrapper #worktasks td:nth-child(2) { display: none; }
+
+   #regdetails th:nth-child(2) { display: none; }
+   #regdetails td:nth-child(2) { display: none; }
+   #regdetails th:nth-child(3) { display: none; }
+   #regdetails td:nth-child(3) { display: none; }
+
 }
