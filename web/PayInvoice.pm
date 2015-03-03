@@ -114,14 +114,16 @@ sub displayQueryByInvoiceField {
 sub displayQueryByOtherInfoFields {  
 	my ($Data, $client, $invoiceNumber) = @_; 
 
-	my $query = qq[SELECT intNationalPeriodID, strNationalPeriodName FROM tblNationalPeriod  WHERE intRealmID = ?];
-	my $sth = $Data->{'db'}->prepare($query);
-	$sth->execute($Data->{'Realm'});
-	my %natPeriod = ();
-	while(my $dref = $sth->fetchrow_hashref()){
-		$natPeriod{$dref->{'intNationalPeriodID'}} = $dref->{'strNationalPeriodName'};
-	}
-
+	#my $query = qq[SELECT intNationalPeriodID, strNationalPeriodName FROM tblNationalPeriod  WHERE intRealmID = ? ORDER BY strNationalPeriodName DESC];
+	#my $sth = $Data->{'db'}->prepare($query);
+	#$sth->execute($Data->{'Realm'});
+	#my %natPeriod = ();
+	#while(my $dref = $sth->fetchrow_hashref()){
+	#	$natPeriod{$dref->{'intNationalPeriodID'}} = $dref->{'strNationalPeriodName'};
+	#}
+	#use NationalReportingPeriod;
+	
+	my $natPeriod = NationalReportingPeriod::getPeriods($Data);
 	my %OtherFormFields = (
 		PersonType => {
 			options     => \%Defs::personType,
@@ -136,7 +138,7 @@ sub displayQueryByOtherInfoFields {
 			options     => \%Defs::ageLevel,
 		}, 
 		NationalPeriod => {
-			options     => \%natPeriod,			
+			options     => $natPeriod,			
 		},
 		carryfields =>  {
     		client => $client,
@@ -361,7 +363,7 @@ sub queryInvoiceByOtherInfo {
 	while(my $dref = $sth->fetchrow_hashref()){
 		$results = 1;
 		
-		my $selectPay = qq[<input type="checkbox" name="act_$dref->{'intTransactionID'}" class="paytxn_chk" />];	
+		my $selectPay = qq[<input type="checkbox" name="act_$dref->{'intTransactionID'}" class="paytxn_chk" value="$dref->{'TotalAmount'}" />];	
 		$cv{'personID'} = $dref->{'intPersonID'};
         my $clm=setClient(\%cv);	
 		push @rowdata, {
@@ -478,37 +480,38 @@ sub displayResults {
      $orstring = qq[&nbsp; <b>].$Data->{'lang'}->txt('OR').qq[</b> &nbsp;] if $gateway_body and $allowMP;
      if($paymentType==0){ $paymentType='';}
    
+	
 	if ($allowMP){
 	$gateway_body .= qq[
-				  <div class="sectionheader">].$Data->{'lang'}->txt('Manual Payment').qq[</div>
-					  <table cellpadding="2" cellspacing="0" border="0">
-						<tbody id="secmain2" >	
-						<tr>
-							<td class="label"><label for="l_intAmount">].$Data->{'lang'}->txt('Amount (ddd.cc)').qq[</label>:</td>
-							<td class="value">
-							<input type="text" name="intAmount" value="$Data->{params}{intAmount}" id="l_intAmount" size="10"  /> </td>
-						</tr>
-						<tr>
-							<td class="label"><label for="l_dtLog">].$Data->{'lang'}->txt('Date Paid').qq[</label>:</td>
-							<td class="value"><input type="text" name="dtLog" value="$currentDate" id="l_dtLog" size="10" maxlength="10" /> <span class="HTdateformat">dd/mm/yyyy</span> </td>
-						</tr>
-						<tr>
-							<td class="label"><label for="l_intPaymentType">].$Data->{'lang'}->txt('Payment Type').qq[</label>:</td>
-							<td class="value">].drop_down('paymentType',\%Defs::manualPaymentTypes, undef, $paymentType, 1, 0,'','').qq[</td>
-					</tr>
-					
-<tr>
-
-						<td class="label"><label for="l_strComments">].$Data->{'lang'}->txt('Comments').qq[</label>:</td>
-						<td class="value"><textarea name="strComments" id="l_strComments"  rows = "5"   cols = "45"  >$Data->{params}{strComments}</textarea> </td>
-					</tr>
-				    </tbody>	
-				</table>
-			
-						<div class="HTbuttons"><input onclick="clicked='main.cgi'" type="submit" name="subbut" value="Submit Manual Payment" class="HF_submit button generic-button" id = "btn-manualpay"></div>
-<input type="hidden" name="paymentID" value=""><input type="hidden" name="dt_start_paid" value=""><input type="hidden" name="dt_end_paid" value="">
-					
-				</div>
+						<h3 class="panel-header sectionheader" id="manualpayment">].$Data->{'lang'}->txt('Manual Payment').qq[</h3>
+				  		<div id="secmain2" class="panel-body fieldSectionGroup ">
+				  			<fieldset>
+				  				<div class="form-group">
+				  					<label for="l_intAmount" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Amount (ddd.cc)').qq[</label>
+				  					<div class="col-md-6"><input type="text" name="intAmount" value="$Data->{params}{intAmount}" id="l_intAmount" size="10"  /></div>
+				  				</div>
+				  				<div class="form-group">
+				  					<label for="l_dtLog" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Date Paid').qq[</label>
+				  					<div class="col-md-6"><input type="text" name="dtLog" value="$currentDate" id="l_dtLog" size="10" maxlength="10" /> <span class="HTdateformat">dd/mm/yyyy</span></div>
+				  				</div>
+				  				<div class="form-group">
+				  					<label for="l_intPaymentType" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Payment Type').qq[</label>
+				  					<div class="col-md-6">].drop_down('paymentType',\%Defs::manualPaymentTypes, undef, $paymentType, 1, 0,'','').qq[</div>
+				  				</div>
+				  				<div class="form-group">
+				  					<label for="l_strComments" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Comments').qq[</label>
+				  					<div class="col-md-6"><textarea name="strComments" id="l_strComments" style="width: 100%; height: 200px;">$Data->{params}{strComments}</textarea></div>
+				  				</div>
+				  			</fieldset>
+				  		</div>
+					  	<div class="button-row">
+							<div class="txtright" id="block-manualpay" style="display:none">
+								<input onclick="clicked='main.cgi'" type="submit" name="subbut" value="Submit Manual Payment" class="btn-main" id = "btn-manualpay" >
+								<input type="hidden" name="paymentID" value="">
+								<input type="hidden" name="dt_start_paid" value="">
+								<input type="hidden" name="dt_end_paid" value="">
+							</div>
+						</div>
 			] 
 
 	}

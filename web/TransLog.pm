@@ -392,77 +392,26 @@ sub step2 {
 
 	$header = $lang->txt('Confirm Payment');
 	$body.= $lang->txt("Review the payment details below, then click Confirm Payment or Cancel Payment") . qq[
-		<table cellpadding="2" cellspacing="0" border="0">
-			
-			<tbody id="secmain2" >	
-			<tr>
-				<td class="label"><label for="l_intAmount">].$lang->txt('Amount.').qq[</label>:</td>
-				<td class="value">
-				$Data->{params}{intAmount}
-</td>
-			</tr>
-
-		
-			<tr>
-				<td class="label"><label for="l_dtLog">].$lang->txt('Date Paid').qq[</label>:</td>
-				<td class="value">$Data->{params}{dtLog}</td>
-			</tr>
-	#	
-		
-			<tr>
-				<td class="label"><label for="l_intPaymentType">].$lang->txt('Payment Type').qq[</label>:</td>
-				<td class="value">$Defs::manualPaymentTypes{$Data->{params}{paymentType}}</td>
-			</tr>
-		
-			<!--<tr>
-				<td class="label"><label for="l_strBank">Bank</label>:</td>
-				<td class="value">$Data->{params}{strBank}</td>
-			</tr>
-
-			<tr>
-
-				<td class="label"><label for="l_strBSB">BSB</label>:</td>
-				<td class="value">$Data->{params}{strBSB}</td>
-			</tr>
-		
-			<tr>
-				<td class="label"><label for="l_strAccountName">Account Name</label>:</td>
-				<td class="value">$Data->{params}{strAccountName}</td>
-			</tr>
-		
-			<tr>
-				<td class="label"><label for="l_strAccountNum">Account Number</label>:</td>
-				<td class="value">$Data->{params}{strAccountNum}</td>
-			</tr>
-		
-			<tr>
-				<td class="label"><label for="l_strResponseCode">Response Code</label>:</td>
-
-				<td class="value">$Data->{params}{strResponseCode}</td>
-			</tr>
-		
-			<tr>
-				<td class="label"><label for="l_strResponseText">Response Text</label>:</td>
-				<td class="value">$Data->{params}{strResponseText}</td>
-			</tr>	
-
-			<tr>
-				<td class="label"><label for="l_strReceiptRef">Receipt Reference</label>:</td>
-				<td class="value">$Data->{params}{strReceiptRef}</td>
-			</tr>			-->
-
-			<!--<tr>
-				<td class="label"><label for="l_intPartialPayment">Partial Payment</label>:</td>
-				<td class="value">].($Data->{params}{intPartialPayment} ? 'Yes' : 'No').qq[</td>
-			</tr>	-->
-			<tr>
-
-				<td class="label"><label for="l_strComments">].$lang->txt('Comments').qq[</label>:</td>
-				<td class="value">$Data->{params}{strComments}</td>
-			</tr>
-		    </tbody>	
-		</table>
-		<br>
+				<div id="secmain2" class="panel-body fieldSectionGroup member-home-page" style="background-color: #fff; padding: 30px 20px;">
+					<div class="clearfix">
+						<span class="details-row">
+							<span class="details-left"><label for="l_intAmount">].$lang->txt('Amount.').qq[</label>:</span>
+							<span class="details-left detail-value">$Data->{params}{intAmount}</span>
+						</span>
+						<span class="details-row">
+							<span class="details-left"><label for="l_dtLog">].$lang->txt('Date Paid').qq[</label>:</span>
+							<span class="details-left detail-value">$Data->{params}{dtLog}</span>
+						</span>
+						<span class="details-row">
+							<span class="details-left"><label for="l_intPaymentType">].$lang->txt('Payment Type').qq[</label>:</span>
+							<span class="details-left detail-value">$Defs::manualPaymentTypes{$Data->{params}{paymentType}}</span>
+						</span>
+						<span class="details-row">
+							<span class="details-left"><label for="l_strComments">].$lang->txt('Comments').qq[</label>:</span>
+							<span class="details-left detail-value">$Data->{params}{strComments}</span>
+						</span>
+					</div>
+				</div>
 
 	];	
 
@@ -477,20 +426,21 @@ sub step2 {
 	my ($link, $mode, $personID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('P_TXNLoglist', $Data, $clientValues_ref);
 
 
-	$body.=qq[	<br>
-			<form action="$Data->{'target'}" method="POST">
-				<input type="hidden" name="a" value="P_TXNLogstep3">
-				<input type="hidden" name="client" value="$client">
-				<input type="hidden" name="mode" value="$mode"><input type="hidden" name="personID" value="$personID"><input type="hidden" name="client" value="$client"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="transLogID" value="$transLogID">
-				<input type="submit" name="subbut" value=" ]. $lang->txt('Confirm Payment') . qq[ " class="btn-main">
-			</form>
-			<div style="clear:both;"></div>
-			<form action="$Data->{'target'}" method="POST">
-				<input type="hidden" name="a" value="P_TXNLoglist">
-				<input type="hidden" name="client" value="$client">
-				<input type="hidden" name="mode" value="$mode"><input type="hidden" name="personID" value="$personID"><input type="hidden" name="client" value="$client"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="dt_start_paid" value="$dtStart_paid"><input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
-				<input type="submit" name="subbut" value=" ]. $lang->txt('Cancel Payment') . qq[ " class="btn-main">
-			</form>
+	$body.=qq[
+				<form action="$Data->{'target'}" method="POST" style="float: left;">
+					<input type="hidden" name="a" value="P_TXNLogstep3">
+					<input type="hidden" name="client" value="$client">
+					<input type="hidden" name="mode" value="$mode"><input type="hidden" name="personID" value="$personID"><input type="hidden" name="client" value="$client"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="transLogID" value="$transLogID">
+					<input type="submit" name="subbut" value=" ]. $lang->txt('Confirm Payment') . qq[ " class="btn-main">
+				</form>
+				<div style="clear:both;"></div>
+				<form action="$Data->{'target'}" method="POST" style="position: absolute; bottom: 50px; margin-left: 418px;">
+					<input type="hidden" name="a" value="P_TXNLoglist">
+					<input type="hidden" name="client" value="$client">
+					<input type="hidden" name="mode" value="$mode"><input type="hidden" name="personID" value="$personID"><input type="hidden" name="client" value="$client"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="dt_start_paid" value="$dtStart_paid"><input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
+					<input type="submit" name="subbut" value=" ]. $lang->txt('Cancel Payment') . qq[ " class="btn-main">
+				</form>
+
 		 ]; 
 
 	return ($body, $header);
@@ -539,10 +489,9 @@ EOS
 	my $cl=setClient($Data->{'clientValues'}) || '';
 	my $receiptLink = "printreceipt.cgi?client=$cl&ids=$transLogID";
 
-  auditLog($transLogID, $Data, 'Confirmed Payment', 'Transactions');
-
-	return (qq[
-		<div class="OKmsg">].$lang->txt('Your payment has been Confirmed') .qq[</div>
+   auditLog($transLogID, $Data, 'Confirmed Payment', 'Transactions');
+   my ($success, $resultHTML) = displayPaymentResult($Data, $transLogID, 0) ; # <div class="OKmsg">].$lang->txt('Your payment has been Confirmed') .qq[</div>
+	return (qq[ $resultHTML
 		<br>
 		<br><a href="$receiptLink" target="receipt">]. $lang->txt('Print Receipt') .qq[</a><br>
 	<br><a href="$Data->{'target'}?client=$cl&amp;a=P_TXN_LIST">]. $lang->txt('Return to Transactions') .qq[</a><br>
@@ -1050,7 +999,7 @@ sub listTransactions {
 					<tr>
 						<td class="label"><label for="l_intAmount">].$lang->txt('Amount (ddd.cc)').qq[</label>:</td>
 						<td class="value">
-						<input type="text" name="intAmount" value="$Data->{params}{intAmount}" id="l_intAmount" size="10"  /> </td>
+						<input type="text" id="intAmountForManualPay" name="intAmount" value="$Data->{params}{intAmount}" id="l_intAmount" size="10"  /> </td>
 					</tr>
 					<tr>
 						<td class="label"><label for="l_dtLog">].$lang->txt('Date Paid').qq[</label>:</td>

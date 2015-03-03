@@ -3,9 +3,10 @@
 		var clicked;
 		function AsubmitForm(){
 			document.payform.action = clicked;
+			//check if there is a transaction
 			return true;  
 	</script>
-    <form name="payform" method="POST" onsubmit="document.payform.action = clicked;" action=""> 
+    <form name="payform" method="POST" onsubmit="document.payform.action = clicked;" action="main.cgi"> 
 	[% grid %]   
     <input type="hidden" name="a" value="[% nextAction %]">
     <input type="hidden" name="client" value="[% client %]">

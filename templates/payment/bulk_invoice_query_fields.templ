@@ -63,7 +63,7 @@
 						<div class="col-md-4">
 							<select name="NationalPeriod" class="chzn-select" data-placeholder="[% Lang.txt('Select Period') %]">
 						<option value=""></option>
-							[% FOREACH opt IN NationalPeriod.options.keys %]
+							[% FOREACH opt IN NationalPeriod.options.keys.sort %]
 								<option value="[% opt %]">[% NationalPeriod.options.$opt %]</option>
 							[% END %]	
 					</select>
