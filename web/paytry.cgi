@@ -127,7 +127,9 @@ sub main	{
         $Year+=1900;
         $Month++;    
         $Month = sprintf("%02s", $Month);
+        $Day = sprintf("%02s", $Day);
         my $DeliveryDate = "$Year$Month$Day";
+print STDERR "$DeliveryDate\n";
         #my $cancelURL = $Defs::base_url . $paymentSettings->{'gatewayCancelURL'} . qq[&ci=$logID&client=$client]; 
         my $delayedURL= "http://fspotest.sportingpulseinternational.com/cofi.cgi"; #$Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=1&client=$client&ci=$logID&chkv=$chkvalue&session=$session];
         #my $delayedURL= $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=1&client=$client&ci=$logID&chkv=$chkvalue&session=$session];
