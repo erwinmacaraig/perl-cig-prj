@@ -2363,7 +2363,7 @@ header nav.navbar-default .navbar-nav > li > a {
   a.btn-main.btn-proceed { padding-bottom: 10px; }
   #flow-btn-back { margin-right: 0px; }
   .summaryPanel { display: none; }
-  .toggle-type a, .toggle-type a:visited { width: 100%; }
+  .toggle-type a, .toggle-type a:visited { width: 50%; text-align: center; }
   div#content div.member-home-page div.task-actions.txtright {
   	margin-bottom: 10px;
   }
@@ -2416,5 +2416,12 @@ header nav.navbar-default .navbar-nav > li > a {
    #regdetails td:nth-child(2) { display: none; }
    #regdetails th:nth-child(3) { display: none; }
    #regdetails td:nth-child(3) { display: none; }
-
+   .read-only ul li span.details-left { width: 100%; font-size: 12px; }
+   .read-only, .fieldSectionGroupWrapper-DisplayOnly { margin-bottom: 20px; }
+   .member-home-page .details-left { width: 100%; }
+   form#flowFormID #fsg-main label { text-align: left; }
+   #secmain .form-group { float: left; width: 100%; }
+   #secmain #l_row_strNotes .col-md-9 textarea { width: 100%; }
+   form#searchForm .btn-inside-panels { margin-left: 0; }
+   #fsg-core label.col-md-4 { text-align: left; }
 }
