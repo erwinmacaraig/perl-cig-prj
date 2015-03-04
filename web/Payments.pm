@@ -1009,29 +1009,12 @@ sub EmailPaymentConfirmation	{
 			my $clubEmail = '';
 			if($dref->{'SoldBy'} eq 'CLUB')	{
 				$from_email_to_use = 'club';
-				$orgname = $dref->{'ClubName'} || '';
-			}
-			else	{
-				$orgname = $dref->{'AssocName'} || '';
+				$orgname = $dref->{'EntityName'} || '';
+                $clubEmail = $dref->{'EntityEmail'} || '';
 			}
 
-            #don't upset the way non-regoform payemnt emails are handled
-            #if ($RegoFormObj) {
-              #  my $dbh = $Data->{'db'};
-              #  my $clubID = $dref->{'intClubID'};
-
-                #assoc & club emails dupes will already be filtered out. however, still need to be checked against the rest.
-             #   my $club_emails_aref  = ($send_to_club and $clubID)  ? get_emails_list(ContactsObj->getList(dbh=>$dbh, associd=>$assocID, clubid=>$clubID, getpayments=>1)) : ''; #will be false for a team to assoc (type 2) form
-		
-            #    if ($club_emails_aref) {
-            #        foreach my $email (@$club_emails_aref) {
-            #            $clubEmail .= check_email_address(\%EmailsUsed, $email) if $email;
-            #        }
-            #    }
-            #}
 			$TransData{'OrgName'} = $orgname || '';
-			$TransData{'strBusinessNo'} = $dref->{'PaymentBusinessNumber'} || $paymentSettings->{'paymentBusinessNumber'} || '';
-
+			#$TransData{'strBusinessNo'} = $dref->{'PaymentBusinessNumber'} || $paymentSettings->{'paymentBusinessNumber'} || '';
             my $first_club_email  = ($clubEmail)  ? extract_first($clubEmail)  : '';
 			$paymentSettings->{notification_address} =$dref->{'PaymentNotificationAddress'} || $paymentSettings->{notification_address};
 
