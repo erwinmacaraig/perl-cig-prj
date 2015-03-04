@@ -133,14 +133,18 @@ function calculateProducts(){
     });
     $('.totalValue').html('$'+totalProduct.toFixed(2));
 }
-function updateRegoProductsTotal(id_cost,id_total){	
+function updateRegoProductsTotal(chkb,id_cost,id_total){	
 	var total = parseFloat($("#"+id_total).text());
-	if( $('form#flowFormID td.col-1 input[type="checkbox"]:checked').prop("checked") == true){
+   
+	//if( $('form#flowFormID td.col-1 input[type="checkbox"]:checked').prop("checked") == true){
+	if( $('#'+chkb).prop("checked") == true){
 		total = total + parseFloat($("#"+id_cost).val());		
 	}
+	
 	else {
 		total = total - parseFloat($("#"+id_cost).val());
 	}
+	
 	if(total > 0){
 		$("#payOptions").css("display","block");
 	}
