@@ -956,8 +956,6 @@ sub EmailPaymentConfirmation	{
 	my $count=0;
 	my @txns = ();
 
-    #used for regoform only
-    my $send_to_assoc    = '';
     my $send_to_club     = '';
 
 	my %EmailsUsed=();
