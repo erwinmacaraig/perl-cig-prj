@@ -3753,7 +3753,7 @@ sub updateTaskScreen {
                      $status = $Data->{'lang'}->txt("Pending");
                     }else{
                      $message = $Data->{'lang'}->txt("You have place this ".ucfirst(lc($task->{'strPersonType'}))." Renewal On Hold, the club will be informed.");
-                     $status = $Data->{'lang'}->txt("Rejected");
+                     $status = $Data->{'lang'}->txt("Pending");
                     }
                 }
             }
