@@ -23,12 +23,12 @@ use ServicesContacts;
 use TemplateEmail;
 use RegoFormUtils;
 use ContactsObj;
-
+use Data::Dumper;
 require Products;
 require TransLog;
 require PaymentSplitMoneyLog;
 require RegoForm::RegoFormFactory;
-  
+ 
 sub handlePayments	{
 
 	my ($action, $Data, $external) = @_;
@@ -882,7 +882,7 @@ sub getTXNDetails	{
     $qry->execute or query_error($st);
     my $dref = $qry->fetchrow_hashref();
 
-
+	
 	#$dref->{'InvoiceNum'} = TXNtoInvoiceNum($dref->{intTransactionID}); 
 	#$dref->{'InvoiceNum'} = $dref->{'strInvoiceNumber'};
 
@@ -939,6 +939,7 @@ sub EmailPaymentConfirmation	{
 		WHERE intLogID = ?
 			AND intStatus = 1
 	];
+
 	my $qry = $Data->{db}->prepare($st);
 	$qry->execute($intLogID);
 	my $tref = $qry->fetchrow_hashref();
@@ -963,32 +964,9 @@ sub EmailPaymentConfirmation	{
 	while (my $trans_ref = $qry_trans->fetchrow_hashref())	{
 		$count++;
 		my $txnRef = getTXNDetails($Data, $trans_ref->{intTXNID}, 0);
-
-        if ($RegoFormObj) {
-            my $send_to_member  = '';
-            my $send_to_parents = '';
-
-            my $pay_char = $RegoFormObj->getValue('intPaymentBits') || '';
-            ($send_to_assoc, $send_to_club, $send_to_member, $send_to_parents) = get_notif_bits($pay_char) if $pay_char;
-
-            if ($RegoFormObj->getValue('intRegoType') != 2) {
-                if ($send_to_member) {
-                    $to_address .= check_email_address(\%EmailsUsed, $txnRef->{Email})  if $txnRef->{Email};
-                    $cc_address .= check_email_address(\%EmailsUsed, $txnRef->{Email2}) if $RegoFormObj and $txnRef->{Email2};
-                }
-                if ($send_to_parents) {
-                    $cc_address .= check_email_address(\%EmailsUsed, $txnRef->{P1Email})  if $txnRef->{P1Email};
-                    $cc_address .= check_email_address(\%EmailsUsed, $txnRef->{P1Email2}) if $txnRef->{P1Email2};
-                    $cc_address .= check_email_address(\%EmailsUsed, $txnRef->{P2Email})  if $txnRef->{P2Email};
-                    $cc_address .= check_email_address(\%EmailsUsed, $txnRef->{P2Email2}) if $txnRef->{P2Email2};
-                }
-            }
-        }
-        else {
-            $to_address .= check_email_address(\%EmailsUsed, $txnRef->{Email})   if $txnRef->{Email};
-            $cc_address .= check_email_address(\%EmailsUsed, $txnRef->{P1Email}) if $txnRef->{P1Email};
-        }
-
+        
+		$to_address .= check_email_address(\%EmailsUsed, $txnRef->{Email})   if $txnRef->{Email};
+        #$cc_address .= check_email_address(\%EmailsUsed, $txnRef->{P1Email}) if $txnRef->{P1Email};
 		$txnRef->{strProductNotes}=~s/\n/<br>/g;
 		push @txns, $txnRef;
 	}
@@ -1038,19 +1016,19 @@ sub EmailPaymentConfirmation	{
 			}
 
             #don't upset the way non-regoform payemnt emails are handled
-            if ($RegoFormObj) {
-                my $dbh = $Data->{'db'};
-                my $clubID = $dref->{'intClubID'};
+            #if ($RegoFormObj) {
+              #  my $dbh = $Data->{'db'};
+              #  my $clubID = $dref->{'intClubID'};
 
                 #assoc & club emails dupes will already be filtered out. however, still need to be checked against the rest.
-                my $club_emails_aref  = ($send_to_club and $clubID)  ? get_emails_list(ContactsObj->getList(dbh=>$dbh, associd=>$assocID, clubid=>$clubID, getpayments=>1)) : ''; #will be false for a team to assoc (type 2) form
+             #   my $club_emails_aref  = ($send_to_club and $clubID)  ? get_emails_list(ContactsObj->getList(dbh=>$dbh, associd=>$assocID, clubid=>$clubID, getpayments=>1)) : ''; #will be false for a team to assoc (type 2) form
 		
-                if ($club_emails_aref) {
-                    foreach my $email (@$club_emails_aref) {
-                        $clubEmail .= check_email_address(\%EmailsUsed, $email) if $email;
-                    }
-                }
-            }
+            #    if ($club_emails_aref) {
+            #        foreach my $email (@$club_emails_aref) {
+            #            $clubEmail .= check_email_address(\%EmailsUsed, $email) if $email;
+            #        }
+            #    }
+            #}
 			$TransData{'OrgName'} = $orgname || '';
 			$TransData{'strBusinessNo'} = $dref->{'PaymentBusinessNumber'} || $paymentSettings->{'paymentBusinessNumber'} || '';
 
@@ -1072,6 +1050,8 @@ sub EmailPaymentConfirmation	{
         $cc_address,
         $bcc_address,
     ) ;
+	
+	
 	return 1;
 }
 
