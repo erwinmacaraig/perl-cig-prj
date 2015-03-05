@@ -493,8 +493,20 @@ print STDERR "000OK IS $ok | $run\n\n";
        my $cl = setClient($Data->{'clientValues'}) || '';
        my %cv = getClient($cl);
        #$cv{'clubID'} = $rego_ref->{'intEntityID'};
-       $cv{'clubID'} = $clubReg;
-       $cv{'currentLevel'} = $Defs::LEVEL_CLUB;
+       if ($Data->{'clientValues'}{'clubID'} > 0)   {
+            $cv{'clubID'} = $clubReg;
+            $cv{'currentLevel'} = $Defs::LEVEL_CLUB;
+       }
+       elsif ($Data->{'clientValues'}{'regionID'} > 0)    {
+            $cv{'regionID'} = $clubReg;
+            $cv{'currentLevel'} = $Defs::LEVEL_REGION;
+
+       }
+       else {
+            $cv{'entityID'} = $clubReg; ## As its getLastEntityID
+            $cv{'currentLevel'} = $Defs::LEVEL_NATIONAL;
+        }
+
        my $clm = setClient(\%cv);
 
 
