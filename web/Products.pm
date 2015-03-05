@@ -437,7 +437,7 @@ sub detail_products  {
 	my $name=$dref->{'strName'} || '';
     my $hasPhoto = $dref->{'intPhoto'}||0;
     my $amount = currency($dref->{'curAmount'} || $dref->{'curDefaultAmount'} || $dref->{'curAmount_Adult1'} || 0);
-		my $currency_symbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
+		my $currency_symbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
     my $compulsory=qq[<img src="images/compulsory.gif" alt="Compulsory Field" title="Compulsory Field"/>];
     #$body = qq[<p>Enter the name of the product in the box provided and its default cost, then press the Update button.</p>
 		my $fulledit = (

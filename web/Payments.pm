@@ -189,7 +189,7 @@ sub checkoutConfirm	{
     my $authLevel = $Data->{'clientValues'}{'authLevel'}||=$Defs::INVALID_ID;
     my $entityID = getID($Data->{'clientValues'}, $authLevel);
 
-	my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
+	my $dollarSymbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
     
     my $compulsory = 0;
 	my $RegoFormObj = undef;

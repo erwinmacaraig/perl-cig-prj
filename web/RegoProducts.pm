@@ -29,7 +29,7 @@ sub getRegoProducts {
         $regItemRules_ref
     ) = @_;
 
-    my $currencySymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
+    my $currencySymbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
     $incExisting ||= 0; ## Set to 1 to include existing in-cart items that aren't paid for the member
 
     $multipersonType ||= ''; 
