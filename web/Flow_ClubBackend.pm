@@ -670,6 +670,7 @@ sub display_summary     {
 			legaltype => Club::getLegalTypeName($self->{'Data'},$clubObj->{'DBData'}{'intLegalTypeID'}),
 			organizationType => $clubObj->{'DBData'}{'strEntityType'},
 			organizationLevel => $clubObj->{'DBData'}{'strOrganisationLevel'},  
+			bankAccountDetails => $clubObj->{'DBData'}{'strBankAccountNumber'},
 			editlink =>  $self->{'Data'}{'target'}."?".$self->stringifyURLCarryField(),
 	);
 	
