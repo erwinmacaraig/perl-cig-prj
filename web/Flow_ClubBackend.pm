@@ -722,7 +722,7 @@ sub display_complete {
                 $self->{'Data'},
                 'ENTITY',
                 'NEW',
-                $self->{'ClientValues'}{'authLevel'} || 0,
+                $self->{'ClientValues'}{'currentLevel'} || $self->{'ClientValues'}{'authLevel'} || 0,
                 $clubObj->ID(),
                 0,
                 0,
