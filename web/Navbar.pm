@@ -396,7 +396,7 @@ sub getEntityMenuData {
                 };
 
     # for Entity menu
-    if($SystemConfig->{'menu_newclub_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+    if(($SystemConfig->{'menu_newclub_'.$Data->{'clientValues'}{'authLevel'}.'_'.$currentLevel} or $SystemConfig->{'menu_newclub_'.$Data->{'clientValues'}{'authLevel'}}) && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'addclub'} = {
              name => $lang->txt("Add $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}"),
             url => $baseurl."a=C_DTA",

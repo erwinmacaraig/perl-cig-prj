@@ -164,8 +164,8 @@ sub displayOptions {
 			) 
 			?  $options->{'defaultvalue2'} 
 			: '';
-    my $displ_1= $def_val1 ne '' ? 'block' : 'none';
-    my $displ_2= $def_val2 ne '' ? 'block' : 'none';
+    my $displ_1= $def_val1 ne '' ? 'inline' : 'none';
+    my $displ_2= $def_val2 ne '' ? 'inline' : 'none';
     if($options->{'fieldtype'} eq 'text') {
 			my $f1 = txt_field(
 				'f_'.$field_name.'_1',
