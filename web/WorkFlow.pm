@@ -3740,19 +3740,19 @@ sub updateTaskScreen {
             elsif($TaskType =~ /^RENEWAL_/) {
                 if($task->{'strTaskStatus'} eq 'HOLD'){
                     if ($task->{'strPersonType'} eq 'PLAYER') {
-                     $message = $Data->{'lang'}->txt("You have place this Player Renewal On Hold, the club will be informed.");
+                     $message = $Data->{'lang'}->txt("You have placed this Player Renewal On Hold, the ".$raID->{'strLocalName'}." will be informed.");
                      $status = $Data->{'lang'}->txt("Pending");
                     }elsif ($task->{'strPersonType'} eq 'CLUBOFFICIAL'){
-                     $message = $Data->{'lang'}->txt("You have place this Club Official Renewal On Hold, the club will be informed.");
+                     $message = $Data->{'lang'}->txt("You have placed this Club Official Renewal On Hold, the ".$raID->{'strLocalName'}." will be informed.");
                      $status = $Data->{'lang'}->txt("Pending");
                     }elsif($task->{'strPersonType'} eq 'MAOFFICIAL'){
-                     $message = $Data->{'lang'}->txt("You have place this MA Official Renewal On Hold, the club will be informed.");
+                     $message = $Data->{'lang'}->txt("You have placed this MA Official Renewal On Hold, the ".$raID->{'strLocalName'}." will be informed.");
                      $status = $Data->{'lang'}->txt("Pending");
                     }elsif($task->{'strPersonType'} eq 'TEAMOFFICIAL'){
-                     $message = $Data->{'lang'}->txt("You have place this Team Official Renewal On Hold, the club will be informed.");
+                     $message = $Data->{'lang'}->txt("You have placed this Team Official Renewal On Hold, the ".$raID->{'strLocalName'}." will be informed.");
                      $status = $Data->{'lang'}->txt("Pending");
                     }else{
-                     $message = $Data->{'lang'}->txt("You have place this ".ucfirst(lc($task->{'strPersonType'}))." Renewal On Hold, the club will be informed.");
+                     $message = $Data->{'lang'}->txt("You have placed this ".ucfirst(lc($task->{'strPersonType'}))." Renewal On Hold, the ".$raID->{'strLocalName'}." will be informed.");
                      $status = $Data->{'lang'}->txt("Pending");
                     }
                 }
@@ -3851,8 +3851,8 @@ sub updateTaskScreen {
         'taskType' => $TaskType,
     );
 
-    #open (my $FH,">test.txt");
-    #print $FH  Dumper($TaskType, $task->{'strPersonType'}, $task, $task->{'strTaskStatus'}, $raID->{'strLocalName'});
+    open (my $FH,">test.txt");
+    print $FH  Dumper($TaskType, $task->{'strPersonType'}, $task, $task->{'strTaskStatus'}, $raID->{'strLocalName'});
     #print $FH "Message: \n " . $action;
 	$body = runTemplate(
         $Data,
