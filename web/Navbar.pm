@@ -769,8 +769,9 @@ sub getClubMenuData {
         }
 		$menuoptions{'paymenthistory'} = { 
 			name => $lang->txt('Payments History'),
-			url => $baseurl."a=TXN_PAY_HISTORY",
+			url => $baseurl."a=P_TXNLog_list",
 		}; 
+		# url => $baseurl."a=TXN_PAY_HISTORY"
 
         if ($SystemConfig->{'allowPersonRequest'}) {
             $menuoptions{'requestaccess'} = {
