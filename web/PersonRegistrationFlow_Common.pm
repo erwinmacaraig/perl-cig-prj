@@ -63,10 +63,10 @@ print STDERR "BULK COMPLETE AMOUNT DUE" . $amountDue . $payMethod;
     ($payStatus, $paymentResult) = displayPaymentResult($Data, $logID, 1, '');
 
     my %PageData = (
-        payLaterFlag=> ($amountDue and $payMethod eq 'later') ? 1 : 0,
-        payNowFlag=> (! $amountDue and $payMethod eq 'now') ? 1 : 0,
+        payNowFlag=> ($payMethod eq 'now') ? 1 : 0,
         payNowMsg=> (! $amountDue and $payMethod eq 'now') ? $paymentResult : '',
         payNowStatus=> $payStatus,
+        payLaterFlag=> ($amountDue and $payMethod eq 'later') ? 1 : 0,
         target => $Data->{'target'},
         Lang => $Data->{'lang'},
         client=>$client,
@@ -499,11 +499,11 @@ print STDERR "COMPLETE RUN OK IS $ok | $run\n\n";
         my $paymentResult = '';
         my $payStatus = 0;
         ($payStatus, $paymentResult) = displayPaymentResult($Data, $logID, 1, '');
-print STDERR "AM $amountDue $payMethod\n\n\n";
 
+print STDERR "DDDDDDDDDDDDDDDDDDDDDDDDDDDDD: $payStatus $logID $payMethod $amountDue\n";
         my %PageData = (
             payLaterFlag=> ($amountDue and $payMethod eq 'later') ? 1 : 0,
-            payNowFlag=> (! $amountDue and $payMethod eq 'now') ? 1 : 0,
+            payNowFlag=> ($payMethod eq 'now') ? 1 : 0,
             payNowMsg=> (! $amountDue and $payMethod eq 'now') ? $paymentResult : '',
             payNowStatus=> $payStatus,
             person_home_url => $url,

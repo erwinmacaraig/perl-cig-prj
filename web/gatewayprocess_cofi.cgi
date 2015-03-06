@@ -145,6 +145,7 @@ print STDERR "MAC ACTION IS $chkAction\n";
 	disconnectDB($db);
     if ($process_action eq '1')    {
         payTryContinueProcess(\%Data, $payTry, $client, $logID);
+        $payTry->{'run'} = 1;
         print "Content-type: text/html\n\n" if (! $display_action);
     }
 
