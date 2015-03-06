@@ -573,8 +573,7 @@ sub getTransList {
 		$orderBy
   ];
 #
-	open FH, ">dumpfile.txt";
-	print FH "\nTo query transaction: \n $statement\n";
+	
 	    #$prodSellLevel
     $statement =~ s/AND  AND/AND/g;
     my $query = $db->prepare($statement);
