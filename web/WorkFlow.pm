@@ -3851,8 +3851,8 @@ sub updateTaskScreen {
         'taskType' => $TaskType,
     );
 
-    open (my $FH,">test.txt");
-    print $FH  Dumper($TaskType, $task->{'strPersonType'}, $task, $task->{'strTaskStatus'}, $raID->{'strLocalName'});
+    #open (my $FH,">test.txt");
+    #print $FH  Dumper($TaskType, $task->{'strPersonType'}, $task, $task->{'strTaskStatus'}, $raID->{'strLocalName'});
     #print $FH "Message: \n " . $action;
 	$body = runTemplate(
         $Data,
