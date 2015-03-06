@@ -1975,7 +1975,7 @@ sub listTransLog	{
   my($Data, $entityID, $personID) = @_;
     $entityID ||= 0;
     $personID ||= 0;
-	my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
+	my $dollarSymbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
 	my $db=$Data->{'db'};
 	my $resultHTML = '';
   my $lang = $Data->{'lang'};

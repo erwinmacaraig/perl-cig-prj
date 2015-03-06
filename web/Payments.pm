@@ -189,7 +189,7 @@ sub checkoutConfirm	{
     my $authLevel = $Data->{'clientValues'}{'authLevel'}||=$Defs::INVALID_ID;
     my $entityID = getID($Data->{'clientValues'}, $authLevel);
 
-	my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
+	my $dollarSymbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
     
     my $compulsory = 0;
 	my $RegoFormObj = undef;
@@ -988,39 +988,37 @@ sub EmailPaymentConfirmation	{
 				E.strLocalName as EntityName,
                 E.strEmail as EntityEmail,
                 E.strPaymentNotificationAddress as PaymentNotificationAddress,
-                E.strEntityPaymentBusinessNumber as PaymentBusinessNumber,
-				IF(TL.intSWMPaymentAuthLevel = 3 OR RF.intClubID >0, 'CLUB', 'MA') as SoldBy
+                TL.intPaymentByLevel,
+				IF(TL.intSWMPaymentAuthLevel = 3, 'CLUB', 'MA') as SoldBy
 			FROM
 				tblTransLog as TL
 				INNER JOIN tblEntity as E ON (E.intEntityID = TL.intEntityPaymentID)
-				LEFT JOIN tblRegoForm as RF ON (RF.intRegoFormID = TL.intRegoFormID)
 			WHERE
 				TL.intLogID = ?
 		];
-		my $qry_assoc= $Data->{db}->prepare($st);
-		$qry_assoc->execute($intLogID);
+		my $query= $Data->{db}->prepare($st);
+		$query->execute($intLogID);
 
 		my $orgname = '';
-		my $assocID=0;
-            my $from_email_to_use = '';
-		while (my $dref = $qry_assoc->fetchrow_hashref())   {
-			my $clubEmail = '';
-			if($dref->{'SoldBy'} eq 'CLUB')	{
-				$from_email_to_use = 'club';
-				$orgname = $dref->{'EntityName'} || '';
+        my $from_email_to_use = '';
+		my $dref = $query->fetchrow_hashref();
+        if (defined $dref)  {
+            my $clubEmail = '';
+            if($dref->{'SoldBy'} eq 'CLUB')	{
+                $from_email_to_use = 'club';
+                $orgname = $dref->{'EntityName'} || '';
                 $clubEmail = $dref->{'EntityEmail'} || '';
-			}
+            }
+            if ($dref->{'intPaymentByLevel'} > $Defs::LEVEL_PERSON) {
+                $to_address = $dref->{'EntityEmail'};
+            }
 
 			$TransData{'OrgName'} = $orgname || '';
-			#$TransData{'strBusinessNo'} = $dref->{'PaymentBusinessNumber'} || $paymentSettings->{'paymentBusinessNumber'} || '';
-            my $first_club_email  = ($clubEmail)  ? extract_first($clubEmail)  : '';
 			$paymentSettings->{notification_address} =$dref->{'PaymentNotificationAddress'} || $paymentSettings->{notification_address};
 
 		}
-		$Data->{'clientValues'}{'assocID'} = $assocID;
 		$Data->{'SystemConfig'}=getSystemConfig($Data);
 	}
-	$TransData{'AssocPaymentExtraDetails'} = $Data->{'SystemConfig'}{'AssocConfig'}{'AssocPaymentExtraDetails'} || '';
 	sendTemplateEmail(
         $Data,
         'payments/payment_receipt.templ',
