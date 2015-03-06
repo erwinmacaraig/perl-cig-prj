@@ -31,6 +31,7 @@ use Data::Dumper;
 use UploadFiles;
 use EntitySummaryPanel;
 use IncompleteRegistrations;
+use Transactions;
 
 
 

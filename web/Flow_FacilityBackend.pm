@@ -31,6 +31,7 @@ use FacilityFieldsSetup;
 use EntitySummaryPanel;
 use UploadFiles;
 use IncompleteRegistrations;
+use Transactions;
 
 sub setProcessOrder {
     my $self = shift;
