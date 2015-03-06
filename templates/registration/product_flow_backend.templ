@@ -22,14 +22,14 @@
             <div class="paymentmainwrapper">
             <span class="paymentwrapperoption"><input type="radio" class="inputbox" name="payMethod" value="now" checked /></span>
             <b>[% Lang.txt('Pay Now') %]</b>
-            <label>[% Lang.txt('(after you submit the registration to the Member Association, the system will connect you to the payment portal)')%]</label>
+            <label>[% Lang.txt('(after you submit the registration to the') %] [% AssociationName %] [% Lang.txt(', the system will connect you to the payment portal)')%]</label>
             </div>
         </div>
         <div class="paymentwrapper">
             <div class="paymentmainwrapper">
             <span class="paymentwrapperoption"><input type="radio" class="inputbox" name="payMethod" value="later"/></span>
             <b>[% Lang.txt('Pay Later') %]</b>
-            <label>[% Lang.txt('(after you submit the registration to the Member Association, the system will create an invoice for you to pay later)') %]</label>
+            <label>[% Lang.txt('(after you submit the registration to the') %][% AssociationName %] [% Lang.txt(', the system will create an invoice for you to pay later)') %]</label>
             </div>
         </div>
     </div>

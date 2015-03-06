@@ -470,7 +470,6 @@ print STDERR "COMPLETE RUN OK IS $ok | $run\n\n";
 		$rego_ref->{'MA'} = $maName || '';
 		
 		#$personData{''} = $personObj->getValue('') || '';
-
 		
 	
  		my $languages = PersonLanguages::getPersonLanguages( $Data, 1, 0);
@@ -1004,7 +1003,11 @@ sub displayRegoFlowProducts {
     else    {
         return '';
     }
-	
+	my $maObj = getInstanceOf($Data, 'national');
+        my $maName = $maObj
+            ? $maObj->name()
+            : '';
+		$rego_ref->{'MA'} = $maName || '';
      my %PageData = (
         nextaction=>"PREGF_PU",
         target => $Data->{'target'},
@@ -1015,7 +1018,9 @@ sub displayRegoFlowProducts {
         client=>$client,
 		amountCheck => $totalamountchk,
         NoFormFields =>$noFormFields,
+		AssociationName => $maName,
     );
+	
     my $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ') || '';
 
     return $pagedata;
