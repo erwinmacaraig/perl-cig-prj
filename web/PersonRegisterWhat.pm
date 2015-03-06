@@ -39,6 +39,8 @@ sub displayPersonRegisterWhat   {
     $entitySelection ||= 0;
     my $defaultType = param('dtype') || '';
 
+    my $systemConfig = getSystemConfig($Data);
+
     my %templateData = (
         originLevel => $originLevel || 0,
         personID => $personID || 0,
@@ -53,6 +55,7 @@ sub displayPersonRegisterWhat   {
         existingReg => $regoID || 0,
         EntitySelection => $entitySelection || 0,
         DefaultEntity => getLastEntityID($Data->{'clientValues'}) || 0,
+        AllowMAComment => $systemConfig->{'personRegoAllowMAComment'},
     );
     if($entitySelection)    {
         $templateData{'entityID'} = 0;
@@ -83,7 +86,6 @@ sub displayPersonRegisterWhat   {
             nature => $existing->{'strRegistrationNature'} || '',
             natureName => $existing->{'RegistrationNature'} || '',
             MAComment => $existing->{'strShortNotes'} || '',
-
         );
         $templateData{'existing'} = \%existingRego;
     }
