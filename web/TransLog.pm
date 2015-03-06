@@ -544,6 +544,8 @@ sub getTransList {
 	  i.strInvoiceNumber,
 	  t.dtPaid,
       intQty, 
+	  CONCAT(Person.strLocalFirstname, ' ', Person.strLocalSurname) as strPerson,
+	  PR.strPersonType,
       t.dtStart AS dtStart_RAW, 
       DATE_FORMAT(t.dtStart, '%d/%m/%Y') AS dtStart, 
       t.dtEnd as dtEnd_RAW, 
@@ -556,6 +558,7 @@ sub getTransList {
     FROM 
       tblTransactions as t
       INNER JOIN tblProducts as P ON (P.intProductID = t.intProductID)
+	  INNER JOIN tblPerson as Person ON t.intID = Person.intPersonID
 	  LEFT JOIN tblInvoice as i ON t.intInvoiceID = i.intInvoiceID
       LEFT JOIN tblTransLog as tl ON (t.intTransLogID = tl.intLogID)
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (
@@ -599,6 +602,15 @@ warn("LL $hidePayment:$hidePay:$displayonly");
         field => 'intTransactionID', 
         width => 20
     },
+	{
+		name => $Data->{'lang'}->txt('Person'),
+		field => 'strPerson'
+
+	},
+	{
+		name => $Data->{'lang'}->txt('Type'),
+		field => 'strPersonType',
+	},
     {
         name => 'Status', 
         field => 'StatusTextLang', 
@@ -2010,11 +2022,13 @@ sub listTransLog	{
 	my $statement =qq[
 		SELECT 
       DISTINCT TL.*, 
-      TL.dtLog AS dtLog_RAW
+      TL.dtLog AS dtLog_RAW,
+	  P.strLocalFirstname, P.strLocalSurname
 		FROM 
       tblTransLog as TL
 			INNER JOIN tblTXNLogs as TXNLog ON (TXNLog.intTLogID= TL.intLogID)
 			INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLog.intTXNID)
+			INNER JOIN tblPerson as P ON T.intID = P.intPersonID
 		WHERE 
       T.intRealmID= ?
       AND TL.intStatus<>0
@@ -2023,6 +2037,7 @@ sub listTransLog	{
       TL.dtLog DESC, 
       TL.intLogID
 	];
+# intID
 	my $query = $db->prepare($statement);
 	$query->execute($Data->{'Realm'});
 	my $found = 0;
@@ -2044,6 +2059,7 @@ sub listTransLog	{
 			paymentType => $dref->{'paymentType'},
            	intAmount => $dref->{'intAmount'}, 		
             status => $dref->{'status'},
+			name => $dref->{'strLocalFirstname'} . " " . $dref->{'strLocalSurname'},
 			strResponseCode => $dref->{'strResponseCode'},
 			dtLog => $Data->{'l10n'}{'date'}->TZformat($dref->{'dtLog'},'MEDIUM','SHORT'),
 			dtLog_RAW => $dref->{'dtLog_RAW'},
@@ -2068,6 +2084,10 @@ sub listTransLog	{
       name =>   $Data->{'lang'}->txt('Payment Type'),
       field =>  'paymentType',
     },
+	{
+		name => $Data->{'lang'}->txt('Name'),
+		field => 'name',
+	},
     {
       name =>   $Data->{'lang'}->txt('Amount'),
       field =>  'intAmount',

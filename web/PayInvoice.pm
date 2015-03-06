@@ -309,6 +309,9 @@ sub queryInvoiceByOtherInfo {
 
 	#get posted values 
 	my $strPersonType = param('PersonType') || '';
+	if($strPersonType){
+		push @whereClause, " AND strPersonType = '$strPersonType' ";
+	}
 		
 	my $strSport = param('Sport') || ''; 
 	if($strSport){
@@ -344,8 +347,7 @@ sub queryInvoiceByOtherInfo {
 	INNER JOIN tblInvoice ON tblInvoice.intInvoiceID = tblTransactions.intInvoiceID 
 	INNER JOIN tblProducts ON tblProducts.intProductID = tblTransactions.intProductID
 	INNER JOIN tblPerson ON tblPerson.intPersonID = tblTransactions.intID 
-	WHERE intStatus = 0 AND strPersonType = '$strPersonType'  
-	AND tblPersonRegistration_$Data->{'Realm'}.strStatus <> 'INPROGRESS' 
+	WHERE intStatus = 0 AND tblPersonRegistration_$Data->{'Realm'}.strStatus <> 'INPROGRESS' 
 	@whereClause
 	];	
 
@@ -488,7 +490,7 @@ sub displayResults {
 				  			<fieldset>
 				  				<div class="form-group">
 				  					<label for="l_intAmount" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Amount (ddd.cc)').qq[</label>
-				  					<div class="col-md-6"><input type="text" name="intAmount" value="$Data->{params}{intAmount}" id="l_intAmount" size="10"  /></div>
+				  					<div class="col-md-6"><input type="text" name="intAmount" value="$Data->{params}{intAmount}" id="l_intAmount" size="10" readonly /></div>
 				  				</div>
 				  				<div class="form-group">
 				  					<label for="l_dtLog" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Date Paid').qq[</label>
@@ -499,7 +501,7 @@ sub displayResults {
 				  					<div class="col-md-6">].drop_down('paymentType',\%Defs::manualPaymentTypes, undef, $paymentType, 1, 0,'','').qq[</div>
 				  				</div>
 				  				<div class="form-group">
-				  					<label for="l_strComments" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Comments').qq[</label>
+				  					<label for="l_strComments" class="col-md-4 control-label txtright">].$Data->{'lang'}->txt('Comments').qq[</label>
 				  					<div class="col-md-6"><textarea name="strComments" id="l_strComments" style="width: 100%; height: 200px;">$Data->{params}{strComments}</textarea></div>
 				  				</div>
 				  			</fieldset>
@@ -516,6 +518,7 @@ sub displayResults {
 
 	}
 
+#<span class="compulsory">*</span>]
 my $target = 'paytry.cgi';#$Data->{'target'};
 
 	## end payment settings
