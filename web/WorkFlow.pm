@@ -98,9 +98,9 @@ print STDERR "_____________________ NOT SURE IF LIMIT NEEDED\n";
 
     print STDERR "NEED TO CALL checkForOutstandingTasks!!!!!!!!!!!!!! $personID, $entityID, $personRegistrationID\n";
 
-    my $countActivated = 0;
+    my $countTaskSkipped= 0;
     while (my $dref = $q->fetchrow_hashref())   {
-        print STDERR "TASK ID IS $dref->{'intWFTaskID'}";
+        print STDERR "^^^^^^^^^^^^^^^^^^^TASK ID IS $dref->{'intWFTaskID'}";
         if ($dref->{'intAutoActivateOnPayment'} == 1)   {
             if ($personRegistrationID)  {
                 my $stUPD = qq[
@@ -114,12 +114,11 @@ print STDERR "_____________________ NOT SURE IF LIMIT NEEDED\n";
                 ];
                 my $qUPD= $Data->{'db'}->prepare($stUPD);
                 $qUPD->execute($personID, $entityID, $personRegistrationID);
-                $countActivated++;
             }
             if (! $personRegistrationID and $entityID)  {
                 my $stUPD = qq[
                     UPDATE tblEntity
-                    SET strStatus = 'ACTIVE'
+                    SET strStatus = 'ACTIVE', intWasActivatedByPayment = 1
                     WHERE 
                         intRealmID = ?
                         AND intEntityID = ?
@@ -127,7 +126,6 @@ print STDERR "_____________________ NOT SURE IF LIMIT NEEDED\n";
                 ];
                 my $qUPD= $Data->{'db'}->prepare($stUPD);
                 $qUPD->execute($Data->{'Realm'}, $entityID);
-                $countActivated++;
             }
         }
         if ($dref->{'intRemoveTaskOnPayment'} == 1) {
@@ -140,12 +138,13 @@ print STDERR "_____________________ NOT SURE IF LIMIT NEEDED\n";
             ];
             my $qUPD= $Data->{'db'}->prepare($stUPD);
             $qUPD->execute($Data->{'Realm'}, $dref->{'intWFTaskID'});
+            $countTaskSkipped++;
         }
     }
     my $ruleFor = 'PERSON';
     $ruleFor = 'REGO' if ($personRegistrationID);
     $ruleFor = 'ENTITY' if (! $personID and ! $personRegistrationID);
-    if ($countActivated)    {
+    if ($countTaskSkipped)    {
         my $rc = checkForOutstandingTasks($Data, $ruleFor, '', $entityID, $personID, $personRegistrationID, 0);
     }
 
