@@ -36,6 +36,7 @@ CREATE TABLE tblPersonRegistration_XX (
     intClearanceID  INT DEFAULT 0,
     strShortNotes VARCHAR(250) NULL DEFAULT NULL COMMENT 'can only be added/edited/viewed by MA level',
     `intImportId` INT NULL,
+    intWasActivatedByPayment tinyint default 0 COMMENT 'Debug flag for if record was auto activated by Payment',
 
   PRIMARY KEY  (intPersonRegistrationID),
   KEY index_intPersonID (intPersonID),

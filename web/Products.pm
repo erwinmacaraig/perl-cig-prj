@@ -23,6 +23,7 @@ use Utils;
 use MemberFunctions;
 use GridDisplay;
 use ProductPhoto;
+#use WorkFlow;
 
 require InstanceOf;
 require NationalReportingPeriod;
@@ -2262,11 +2263,12 @@ sub product_apply_transaction {
                 T.intID,
                 P.intCanResetPaymentRequired,
                 T.intPersonRegistrationID,
-                T.intStatus
+                T.intStatus,
+                PR.intEntityID
 			FROM tblTransactions as T
                 INNER JOIN tblProducts as P ON (P.intProductID=T.intProductID)
+                LEFT JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (PR.intPersonRegistrationID = T.intPersonRegistrationID AND T.intPersonRegistrationID > 0)
 			WHERE T.intTransLogID = ?
-				AND T.intTableType = 1
 		];
     my $q = $db->prepare($st);
     $q->execute($transLogID);
@@ -2294,14 +2296,16 @@ sub product_apply_transaction {
     my $qUPDEntity = $db->prepare($stUPDEntity);
    
 
-    while( my ($productID,$tableType, $ID, $resetPaymentReq, $personRegoID, $txnStatus) = $q->fetchrow_array())	{
+    while( my ($productID,$tableType, $ID, $resetPaymentReq, $personRegoID, $txnStatus, $PREntityID) = $q->fetchrow_array())	{
         apply_product_rules($Data,$productID,$ID,$transLogID);
         next if (! $ID or ! $productID or $txnStatus != 1 or ! $resetPaymentReq);
         if ($tableType = $Defs::LEVEL_PERSON and $personRegoID) {
             $qUPD->execute($ID, $personRegoID);
+            WorkFlow::checkRulePaymentFlagActions($Data, $PREntityID, $ID, $personRegoID);
         }
         if ($tableType >= $Defs::LEVEL_CLUB) {
             $qUPDEntity->execute($ID);
+            WorkFlow::checkRulePaymentFlagActions($Data, $ID, 0,0);
         }
     }
     $q->finish();

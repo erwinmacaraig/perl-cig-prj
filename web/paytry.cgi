@@ -27,6 +27,7 @@ use Email;
 use Products;
 use GatewayProcess;
 use Localisation;
+use WorkFlow;
 
 main();
 
@@ -185,9 +186,9 @@ print STDERR "DELAYED : $delayedURL\n";
 
     my $payTry = payTryRead(\%Data, $logID, $tryID);
     if (1==1)   {
-#        $Data{'clientValues'} = $payTry;
-#    my $client= setClient(\%{$payTry});
-#    $Data{'client'}=$client;
+        #$Data{'clientValues'} = $payTry;
+    my $client= setClient(\%{$payTry});
+        #$Data{'client'}=$client;
         initLocalisation(\%Data);
         payTryContinueProcess(\%Data, $payTry, $client, $logID);
 

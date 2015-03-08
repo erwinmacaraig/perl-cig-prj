@@ -61,6 +61,7 @@ print STDERR "BULK COMPLETE AMOUNT DUE" . $amountDue . $payMethod;
     my $payStatus = 0;
     my $logID = param('tl') || 0;
     ($payStatus, $paymentResult) = displayPaymentResult($Data, $logID, 1, '');
+     $payMethod = '' if (!$amountDue and $payStatus == -1);
 
     my %PageData = (
         payNowFlag=> ($payMethod eq 'now') ? 1 : 0,
@@ -500,6 +501,7 @@ print STDERR "COMPLETE RUN OK IS $ok | $run\n\n";
         ($payStatus, $paymentResult) = displayPaymentResult($Data, $logID, 1, '');
 
 print STDERR "DDDDDDDDDDDDDDDDDDDDDDDDDDDDD: $payStatus $logID $payMethod $amountDue\n";
+        $payMethod = '' if (!$amountDue and $payStatus == -1);
         my %PageData = (
             payLaterFlag=> ($amountDue and $payMethod eq 'later') ? 1 : 0,
             payNowFlag=> ($payMethod eq 'now') ? 1 : 0,

@@ -939,6 +939,7 @@ sub addRegistration {
             $personRegistrationID,
             'REGO'
         );
+print STDERR "THIS CALL\n";
   	    $rc = addWorkFlowTasks(
             $Data,
             'REGO', 
@@ -979,6 +980,7 @@ sub submitPersonRegistration    {
             'REGO'
         );
 
+print STDERR "THAT CALL\n";
             my $rc = addWorkFlowTasks(
             $Data,
             'REGO', 

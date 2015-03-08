@@ -651,7 +651,7 @@ sub displayPaymentResult        {
     my $paymentType = $transref->{'intPaymentType'};
 
     my $body = '';
-	my $success=$transref->{'intStatus'};;
+	my $success=$transref->{'intStatus'};
     #if ($transref->{strResponseCode} eq "1" or $transref->{strResponseCode} eq "OK" or $transref->{strResponseCode} eq "00" or $transref->{strResponseCode} eq "08" or $transref->{strResponseCode} eq 'Success')    {
     if ($transref->{'intStatus'} == $Defs::TXNLOG_SUCCESS)   {
         my $ttime = time();

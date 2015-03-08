@@ -1364,6 +1364,8 @@ print STDERR "~~~IN DISPLAY_COMPLETE FOR $regoID\n";
         if($self->{'RunParams'}{'newreg'} and ! $run)  {
 
 print STDERR "~~~IN DISPLAY_COMPLETE ABOUT TO ADD WORK TASKS $run\n";
+print STDERR " A CALL HEREiiiii";
+            if (!$regoID)   {
             my $rc = WorkFlow::addWorkFlowTasks(
                 $self->{'Data'},
                 'PERSON',
@@ -1375,6 +1377,7 @@ print STDERR "~~~IN DISPLAY_COMPLETE ABOUT TO ADD WORK TASKS $run\n";
                 0,
                 0
             );
+            }
         }
 
         my $hiddenFields = $self->getCarryFields();

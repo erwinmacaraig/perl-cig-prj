@@ -25,6 +25,10 @@ CREATE TABLE tblWFRule (
   strTaskStatus varchar(20) NOT NULL DEFAULT 'PENDING' COMMENT 'PENDING,ACTIVE',
   intDocumentTypeID int(11) NOT NULL DEFAULT '0',
    
+    intAutoActivateOnPayment tinyint default 0 COMMENT 'Auto Activate Person/Rego on Payment',
+    intLockTaskUntilPaid tinyint default 0 COMMENT 'Locks task until paid',
+    intRemoveTaskOnPayment tinyint default 0 COMMENT 'On Payment, remove task and either go to next one or approve person/Rego/Entity',
+
   tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (intWFRuleID),
   KEY Entity (intWFRuleID),

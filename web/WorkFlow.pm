@@ -21,6 +21,7 @@ require Exporter;
     toggleTask
     checkRelatedTasks
     deleteRegoTransactions
+    checkRulePaymentFlagActions
 );
 
 use strict;
@@ -59,6 +60,96 @@ use InstanceOf;
 
 use PersonLanguages;
 
+sub checkRulePaymentFlagActions {
+
+    my(
+        $Data,
+        $entityID,
+        $personID,
+        $personRegistrationID,
+    ) = @_;
+    $entityID ||= 0;
+    $personID ||= 0;
+    $personRegistrationID ||= 0;
+    
+    return if (! $entityID and ! $personID and ! $personRegistrationID);
+
+print STDERR "********* IN checkRulePaymentFlagActions\n";
+    my $st = qq[
+        SELECT
+            intWFTaskID,
+            intAutoActivateOnPayment,
+            intLockTaskUntilPaid,
+            intRemoveTaskOnPayment
+        FROM
+            tblWFTask as T
+            INNER JOIN tblWFRule as R ON (R.intWFRuleID = T.intWFRuleID)
+        WHERE
+            T.strTaskStatus = 'ACTIVE'
+            AND T.intPersonID = ?
+            AND T.intEntityID = ?
+            AND T.intPersonRegistrationID = ?
+        ORDER BY intWFTaskID DESC LIMIT 1
+    ];
+print STDERR "_____________________ NOT SURE IF LIMIT NEEDED\n";
+
+    my $q= $Data->{'db'}->prepare($st);
+    $q->execute($personID, $entityID, $personRegistrationID);
+
+    print STDERR "NEED TO CALL checkForOutstandingTasks!!!!!!!!!!!!!! $personID, $entityID, $personRegistrationID\n";
+
+    my $countActivated = 0;
+    while (my $dref = $q->fetchrow_hashref())   {
+        print STDERR "TASK ID IS $dref->{'intWFTaskID'}";
+        if ($dref->{'intAutoActivateOnPayment'} == 1)   {
+            if ($personRegistrationID)  {
+                my $stUPD = qq[
+                    UPDATE tblPersonRegistration_$Data->{'Realm'}
+                    SET strStatus = 'ACTIVE', intWasActivatedByPayment = 1
+                    WHERE 
+                        intPersonID = ?
+                        AND intEntityID = ?
+                        AND intPersonRegistrationID = ?
+                        AND strStatus = 'PENDING'
+                ];
+                my $qUPD= $Data->{'db'}->prepare($stUPD);
+                $qUPD->execute($personID, $entityID, $personRegistrationID);
+                $countActivated++;
+            }
+            if (! $personRegistrationID and $entityID)  {
+                my $stUPD = qq[
+                    UPDATE tblEntity
+                    SET strStatus = 'ACTIVE'
+                    WHERE 
+                        intRealmID = ?
+                        AND intEntityID = ?
+                        AND strStatus = 'PENDING'
+                ];
+                my $qUPD= $Data->{'db'}->prepare($stUPD);
+                $qUPD->execute($Data->{'Realm'}, $entityID);
+                $countActivated++;
+            }
+        }
+        if ($dref->{'intRemoveTaskOnPayment'} == 1) {
+            my $stUPD = qq[
+                UPDATE tblWFTask
+                SET strTaskStatus = 'DELETED'
+                WHERE 
+                    intRealmID = ?
+                    AND intWFTaskID = ?
+            ];
+            my $qUPD= $Data->{'db'}->prepare($stUPD);
+            $qUPD->execute($Data->{'Realm'}, $dref->{'intWFTaskID'});
+        }
+    }
+    my $ruleFor = 'PERSON';
+    $ruleFor = 'REGO' if ($personRegistrationID);
+    $ruleFor = 'ENTITY' if (! $personID and ! $personRegistrationID);
+    if ($countActivated)    {
+        my $rc = checkForOutstandingTasks($Data, $ruleFor, '', $entityID, $personID, $personRegistrationID, 0);
+    }
+
+}
 sub cleanTasks  {
 
     my ($Data, $personID, $entityID, $personRegistrationID, $ruleFor) = @_;
@@ -700,6 +791,7 @@ sub addWorkFlowTasks {
         $personRegistrationID,
         $documentID
     ) = @_;
+print STDERR "RRRRRRRRRRRRRR ADD WORK $originLevel E$entityID $personID $personRegistrationID\n";
 	
     $entityID ||= 0;
     $personID ||= 0;
