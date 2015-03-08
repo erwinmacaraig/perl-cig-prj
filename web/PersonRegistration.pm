@@ -660,7 +660,7 @@ sub getRegistrationData	{
             tblPersonRegistration_$Data->{'Realm'} AS pr
             LEFT JOIN tblTransactions as T ON (
                 T.intPersonRegistrationID = pr.intPersonRegistrationID
-                AND T.intStatus = 0
+                AND T.intStatus <> 1
             )
             LEFT JOIN tblNationalPeriod as np ON (
                 np.intNationalPeriodID = pr.intNationalPeriodID

@@ -26,6 +26,7 @@ use ConfigOptions;
 use Email;
 use Products;
 use GatewayProcess;
+use Localisation;
 
 main();
 
@@ -183,6 +184,15 @@ print STDERR "DELAYED : $delayedURL\n";
     }
 
     my $payTry = payTryRead(\%Data, $logID, $tryID);
+    if (1==1)   {
+#        $Data{'clientValues'} = $payTry;
+#    my $client= setClient(\%{$payTry});
+#    $Data{'client'}=$client;
+        initLocalisation(\%Data);
+        payTryContinueProcess(\%Data, $payTry, $client, $logID);
+
+    }
+
     my $cancelURL = payTryRedirectBack(\%Data, $payTry, $client, $logID, 0);
 
     if ($paymentSettings->{'paymentType'} == $Defs::PAYMENT_ONLINEPAYPAL) {
