@@ -17,6 +17,7 @@ use FieldCaseRule;
 use DefCodes;
 use PersonLanguages;
 use CustomFields;
+use InstanceOf;
 use Data::Dumper;
 
 
@@ -133,6 +134,12 @@ sub clubFieldsSetup {
         1 => 'On',
     );
 
+    my $regionName = '';
+    if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_REGION) {
+        my $RAObj = getInstanceOf($Data, 'region');
+        $regionName = $RAObj->name();
+    }
+
     $Data->{'FieldSets'} = {
         core => {
             'fields' => {
@@ -196,8 +203,8 @@ sub clubFieldsSetup {
                     sectionname => 'core',
                 },
                 strRegion       => {
-                    label       => $FieldLabels->{'strRegion'},
-                    value       => $values->{'strRegion'},
+                    label       => $Data->{'SystemConfig'}{'club_strRegion'} || $FieldLabels->{'strRegion'},
+                    value       => $values->{'strRegion'} || $regionName || '',
                     type        => 'text',
                     size        => '30',
                     maxsize     => '45',
