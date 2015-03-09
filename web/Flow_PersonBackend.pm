@@ -1363,21 +1363,7 @@ print STDERR "~~~IN DISPLAY_COMPLETE FOR $regoID\n";
         my $run = $self->{'RunParams'}{'run'} || 0;
         if($self->{'RunParams'}{'newreg'} and ! $run)  {
 
-print STDERR "~~~IN DISPLAY_COMPLETE ABOUT TO ADD WORK TASKS $run\n";
-print STDERR " A CALL HEREiiiii";
-            if (!$regoID)   {
-            my $rc = WorkFlow::addWorkFlowTasks(
-                $self->{'Data'},
-                'PERSON',
-                'NEW',
-                $self->{'ClientValues'}{'authLevel'} || 0,
-                getID($self->{'ClientValues'}) || 0,
-                $personID,
-                0,
-                0,
-                0
-            );
-            }
+print STDERR "~~~IN DISPLAY_COMPLETE $run\n";
         }
 
         my $hiddenFields = $self->getCarryFields();
