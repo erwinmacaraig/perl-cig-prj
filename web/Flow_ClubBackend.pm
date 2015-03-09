@@ -670,6 +670,7 @@ sub display_summary     {
 			legaltype => Club::getLegalTypeName($self->{'Data'},$clubObj->{'DBData'}{'intLegalTypeID'}),
 			organizationType => $clubObj->{'DBData'}{'strEntityType'},
 			organizationLevel => $clubObj->{'DBData'}{'strOrganisationLevel'},  
+			bankAccountDetails => $clubObj->{'DBData'}{'strBankAccountNumber'},
 			editlink =>  $self->{'Data'}{'target'}."?".$self->stringifyURLCarryField(),
 	);
 	
@@ -721,7 +722,7 @@ sub display_complete {
                 $self->{'Data'},
                 'ENTITY',
                 'NEW',
-                $self->{'ClientValues'}{'authLevel'} || 0,
+                $self->{'ClientValues'}{'currentLevel'} || $self->{'ClientValues'}{'authLevel'} || 0,
                 $clubObj->ID(),
                 0,
                 0,
@@ -821,6 +822,7 @@ sub loadObjectValues    {
             strDiscipline
             strOrganisationLevel
             strMANotes
+            strBankAccountNumber
         )) {
             $values{$field} = $object->getValue($field);
         }

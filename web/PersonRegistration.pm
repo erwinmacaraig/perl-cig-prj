@@ -865,7 +865,8 @@ sub addRegistration {
             strRegistrationNature,
             intPaymentRequired,
             intClearanceID,
-            intPersonRequestID
+            intPersonRequestID,
+            strShortNotes
 		)
 		VALUES
 		(
@@ -887,6 +888,7 @@ sub addRegistration {
             ?,
             NOW(),
             NOW(),
+            ?,
             ?,
             ?,
             ?,
@@ -922,6 +924,7 @@ sub addRegistration {
   		$Reg_ref->{'paymentRequired'} || 0,
   		$Reg_ref->{'clearanceID'} || 0,
   		$Reg_ref->{'personRequestID'} || 0,
+  		$Reg_ref->{'MAComment'} || '',
   	);
 	
 	if ($q->errstr) {

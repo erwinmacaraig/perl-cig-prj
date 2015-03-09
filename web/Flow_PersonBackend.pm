@@ -691,6 +691,7 @@ sub process_registration {
     my $personRequestID = $self->{'RunParams'}{'prid'} || '';
     my $entitySelected = $self->{'RunParams'}{'d_eId'} || '';
     my $entityTypeSelected = $self->{'RunParams'}{'d_etype'} || '';
+    my $MAComment = $self->{'RunParams'}{'d_ma_comment'} || '';
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
@@ -742,6 +743,7 @@ sub process_registration {
                 undef,
                 undef,
                 $personRequestID,
+                $MAComment,
             );
         }
         if($changeExistingReg)  {

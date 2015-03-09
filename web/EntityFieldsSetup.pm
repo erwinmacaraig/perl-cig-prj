@@ -17,6 +17,8 @@ use FieldCaseRule;
 use DefCodes;
 use PersonLanguages;
 use CustomFields;
+use InstanceOf;
+use Data::Dumper;
 
 
 sub clubFieldsSetup {
@@ -132,6 +134,12 @@ sub clubFieldsSetup {
         1 => 'On',
     );
 
+    my $regionName = '';
+    if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_REGION) {
+        my $RAObj = getInstanceOf($Data, 'region');
+        $regionName = $RAObj->name();
+    }
+
     $Data->{'FieldSets'} = {
         core => {
             'fields' => {
@@ -195,8 +203,8 @@ sub clubFieldsSetup {
                     sectionname => 'core',
                 },
                 strRegion       => {
-                    label       => $FieldLabels->{'strRegion'},
-                    value       => $values->{'strRegion'},
+                    label       => $Data->{'SystemConfig'}{'club_strRegion'} || $FieldLabels->{'strRegion'},
+                    value       => $values->{'strRegion'} || $regionName || '',
                     type        => 'text',
                     size        => '30',
                     maxsize     => '45',
@@ -433,6 +441,14 @@ sub clubFieldsSetup {
                     maxsize     => '100',
                     readonly    => $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL ? 1 : 0,
                 },
+                strBankAccountNumber     => {
+                    label       => $FieldLabels->{'strBankAccountNumber'},
+                    value       => $values->{'strBankAccountNumber'},
+                    type        => 'text',
+                    size        => '40',
+                    maxsize     => '45',
+                    compulsory  => 1,
+                },
             },
             'order' => [qw(
                 strEntityType
@@ -441,6 +457,7 @@ sub clubFieldsSetup {
                 strDiscipline
                 strOrganisationLevel
                 strMANotes
+                strBankAccountNumber
             )],
             sections => [
                 [ 'main',        'Organisation Details','','',$values->{'footer-roledetails'} ],

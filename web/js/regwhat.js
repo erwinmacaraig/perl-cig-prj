@@ -22,6 +22,10 @@ function update_options(optionType, dtype)   {
       else {
           jQuery('#flow-btn-continue').show();
       }
+
+      if(jQuery("input#l_ma_comment").length > 0){
+        jQuery("input#l_ma_comment").show();
+      }
     }
     else    {
         jQuery.getJSON('ajax/aj_person_registerwhat.cgi?otype=' + optionType + qstring, function(data)    {
