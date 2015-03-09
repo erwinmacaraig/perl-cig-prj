@@ -3758,6 +3758,8 @@ sub updateTaskScreen {
 
    switch($action) {
         case "WF_PR_H" {
+            my $SysConfigOptionSuffix = 'HOLD';
+
             $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'On-Hold');
             
             if($TaskType eq 'TRANSFER_PLAYER') {
@@ -3773,7 +3775,8 @@ sub updateTaskScreen {
                 $status = $Data->{'lang'}->txt("Pending");
             }
             elsif($TaskType eq 'NEW_REFEREE') {
-                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the Referee Registration process.");
+                $message = $Data->{'SystemConfig'}{$TaskType . '_' . $SysConfigOptionSuffix};
+                $message = $message ? $message : $Data->{'lang'}->txt("You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the Referee Registration process.");
                 $status = $Data->{'lang'}->txt("Pending");
             }
             elsif($TaskType eq 'NEW_MAOFFICIAL') {
