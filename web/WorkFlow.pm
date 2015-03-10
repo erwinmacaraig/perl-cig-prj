@@ -3783,6 +3783,10 @@ sub updateTaskScreen {
                 $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the MA Official Registration process.");
                 $status = $Data->{'lang'}->txt("Pending");
             }
+            elsif($TaskType eq 'NEW_RAOFFICIAL') {
+                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting RA resolves the issue, you would be able to verify and continue with the RA Official Registration process.");
+                $status = $Data->{'lang'}->txt("Pending");
+            }
             elsif($TaskType eq 'NEW_CLUBOFFICIAL') {
                 $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Club Official Registration process.");
                 $status = $Data->{'lang'}->txt("Pending");
@@ -3857,6 +3861,11 @@ sub updateTaskScreen {
                 $message = $Data->{'lang'}->txt("You have rejected this MA Official Registration. To proceed with this Registration, start a new Registration.");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
+            elsif($TaskType eq 'NEW_RAOFFICIAL') {
+                $message = $Data->{'lang'}->txt("You have rejected this RA Official Registration. To proceed with this Registration, start a new Registration.");
+                $status = $Data->{'lang'}->txt("Rejected");
+            }
+
             elsif($TaskType eq 'NEW_CLUBOFFICIAL') {
                 $message = $Data->{'lang'}->txt("You have rejected this Club Official Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration.");
                 $status = $Data->{'lang'}->txt("Rejected");
@@ -3893,6 +3902,9 @@ sub updateTaskScreen {
                      $status = $Data->{'lang'}->txt("Rejected");
                     }elsif($task->{'strPersonType'} eq 'MAOFFICIAL'){
                      $message = $Data->{'lang'}->txt("You have rejected this MA Official Renewal. To proceed with this Renewal, start a new Renewal.");
+                     $status = $Data->{'lang'}->txt("Rejected");
+                    }elsif($task->{'strPersonType'} eq 'RAOFFICIAL'){
+                     $message = $Data->{'lang'}->txt("You have rejected this RA Official Renewal. To proceed with this Renewal, start a new Renewal.");
                      $status = $Data->{'lang'}->txt("Rejected");
                     }elsif($task->{'strPersonType'} eq 'TEAMOFFICIAL'){
                      $message = $Data->{'lang'}->txt("You have rejected this Team Official Renewal. To proceed with this Renewal, start a new Renewal.");
