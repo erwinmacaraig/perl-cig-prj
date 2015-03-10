@@ -62,97 +62,38 @@ $Data{'db'}=$db;
 	my $ID=getID(\%clientValues);
 	$Data{'client'}=$client;
 
-
+	
 	my %receiptData= ();
+	my %ContentData = ();
 	if($txlogIDs)	{
 		my $st =qq[
-			SELECT 
-				tblTransLog.*, 
-				IF(T.intTableType = $Defs::LEVEL_CLUB, Entity.strLocalName, CONCAT(strLocalFirstname,' ',strLocalSurname)) as Name, 
-				DATE_FORMAT(dtLog,'%d/%m/%Y %h:%i') as dtLog_FMT,
-				DATE_FORMAT(dtSettlement,'%d/%m/%Y') as dtSettlement,
-				Entity.strLocalName as strEntityName
-
-			FROM tblTransLog 
-				INNER JOIN tblTXNLogs as TXNLog ON (TXNLog.intTLogID = tblTransLog.intLogID)
-				INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLog.intTXNID)
-				LEFT JOIN tblPerson as M ON (M.intPersonID= T.intID and T.intTableType=$Defs::LEVEL_MEMBER)
-				LEFT JOIN tblEntity as Entity on (Entity.intEntityID= T.intID and T.intTableType=$Defs::LEVEL_CLUB)
-			WHERE intLogID  IN (?) AND T.intID = ? 
-				AND T.intRealmID = ?
+			SELECT intTransLogID, T.intTransactionID, P.strName, P.strGroup, T.intQty, T.curAmount, T.intTableType, I.strInvoiceNumber, T.intStatus, P.curPriceTax, P.dblTaxRate, TL.intPaymentType,
+			IF(T.intTableType = $Defs::LEVEL_CLUB, E.strLocalName, CONCAT(strLocalFirstname,' ',strLocalSurname)) as Name,
+			DATE_FORMAT(TL.dtLog,'%d/%m/%Y %h:%i') as dtLog_FMT 
+		FROM tblTransactions as T
+		INNER JOIN tblTransLog as TL ON TL.intLogID = T.intTransLogID
+			LEFT JOIN tblInvoice I on I.intInvoiceID = T.intInvoiceID
+			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
+			LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
+			LEFT JOIN tblEntity as E ON (E.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
+		WHERE intTransLogID IN (?) 
+		AND T.intRealmID = ? AND T.intID = $personID		
 		];
+		# AND T.intID = ?  $personID,
+		open FH, ">dumpfile.txt";
+		print FH "\n \$st = $st\n   \n$txlogIDs";
 		my $q= $db->prepare($st);
 		$q->execute(
-			$txlogIDs,
-			$personID,
+			$txlogIDs,			
 			$Data{'Realm'},		
 		);
-		while(my $field=$q->fetchrow_hashref())	{
-			foreach my $key (keys %{$field})  { 
-				if(!defined $field->{$key}) {
-					$field->{$key}='';
-				}
-													
-
-			}
-			
-			$field->{'PaymentType'} = $Defs::paymentTypes{$field->{'intPaymentType'}} || '';
-		    $receiptData{$field->{'intLogID'}}{'Info'} = $field;
-
-			
+       	while (my $dref = $q->fetchrow_hashref()){
+			$dref->{'paymentType'} = $Defs::paymentTypes{$dref->{intPaymentType}};
+			push @{$ContentData{'receiptdetails'}}, $dref;
 		}
-		$q->finish();
+		my $filename = $Data{'SystemConfig'}{'receiptFilename'} || 'standardreceipt';
 
-		my $st_trans = qq[
-			SELECT 
-				M.strLocalSurname, 
-				M.strLocalFirstName, 
-				E.*, 
-				P.strName, 
-				P.strGroup,
-                T.intQty,
-                T.curAmount,
-				strInvoiceNumber
-			FROM tblTransactions as T
-				LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_MEMBER)
-				LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
-				LEFT JOIN tblEntity as E on (E.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB) 
-				LEFT JOIN tblInvoice ON T.intInvoiceID = tblInvoice.intInvoiceID
-			 WHERE intTransLogID IN (?) AND T.intID = ?                        
-			AND T.intRealmID = ?
-		]; 
-			
-           	my $qry_trans = $db->prepare($st_trans);
-            $qry_trans->execute(
-			$txlogIDs,
-			$personID,
-			$Data{'Realm'},
-		);
-		while(my $field=$qry_trans->fetchrow_hashref())	{
-			foreach my $key (keys %{$field})  { if(!defined $field->{$key}) {$field->{$key}='';}}
-			#$field->{'InvoiceNo'} = Payments::TXNtoTXNNumber($field->{intTransactionID});
-			$field->{'InvoiceNo'} = $field->{'strInvoiceNumber'};
-			push @{$receiptData{$field->{'intTransLogID'}}{'Items'}}, $field;
-		
-		}
-		$qry_trans->finish();
-
-		my %ContentData = ();
-                for my $k (sort keys %receiptData)	{
-			push @{$ContentData{'Receipts'}}, $receiptData{$k};
-		}
-                #$receiptData{'BodyLoad'} = qq[ onload="window.print();close();" ];
-                #print STDERR "\n======= \n** ContentData: " . Dumper(%ContentData) . "\n==========**********\n";
-		 my $filename = $Data{'SystemConfig'}{'receiptFilename'} || 'standardreceipt';
-
-                my $q = qq[SELECT strRealmName, (SELECT strLocalName FROM tblEntity WHERE intEntityID = ?) as Region, strLocalName as Club FROM tblEntity INNER JOIN tblRealms ON tblEntity.intRealmID = tblRealms.intRealmID WHERE intEntityID = ?]; 
-                my $handle = $db->prepare($q); 
-                $handle->execute($Data{clientValues}{regionID}, $Data{clientValues}{clubID}); 
-                my $handle_ref = $handle->fetchrow_hashref();
-                push @{$ContentData{'OtherInfo'}}, $handle_ref;
-
-	
-                $resultHTML = runTemplate(
+		$resultHTML = runTemplate(
 			\%Data, 
 			\%ContentData,
                         "txn_receipt/$filename.templ"

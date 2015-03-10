@@ -558,7 +558,7 @@ sub getTransList {
     FROM 
       tblTransactions as t
       INNER JOIN tblProducts as P ON (P.intProductID = t.intProductID)
-	  INNER JOIN tblPerson as Person ON t.intID = Person.intPersonID
+	  LEFT JOIN tblPerson as Person ON t.intID = Person.intPersonID
 	  LEFT JOIN tblInvoice as i ON t.intInvoiceID = i.intInvoiceID
       LEFT JOIN tblTransLog as tl ON (t.intTransLogID = tl.intLogID)
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (
@@ -738,7 +738,8 @@ warn("LL $hidePayment:$hidePay:$displayonly");
 	];
 	$filterHTML = '' if $displayonly;
   my $cl=setClient($Data->{'clientValues'}) || '';
-  my $payment_records_link=qq[<a href="$Data->{'target'}?client=$cl&amp;a=P_TXNLog_payLIST" class = "btn-main">].$Data->{'lang'}->txt('List All Payment Records')."</a>" ;
+  my $payment_records_link='';
+	#qq[<a href="$Data->{'target'}?client=$cl&amp;a=P_TXNLog_payLIST" class = "btn-main">].$Data->{'lang'}->txt('List All Payment Records')."</a>" ;
   
   $payment_records_link = '' if ($hide_list_payments_link);
   
@@ -1845,6 +1846,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 	
 	$body = $count ? qq[<h2 class="section-header">].$lang->txt('Payment Summary').qq[</h2>] . $resultHTML.$body: $resultHTML;
 	
+	$body .= qq[<a href="$Data->{target}?client=$client&amp;a=WF_" class="btn-main pull-right">Go to your Dashboard</a>];
 	my $chgoptions='';
     
 	$chgoptions.= qq[<a href="$Data->{target}?a=P_TXNLog_DEL&amp;client=$client&amp;tlID=$TLref->{intLogID}" onclick="return confirm(].$lang->txt('This will remove this payment and set all linked transactions to unpaid. Continue?').qq["><img src="images/delete.png" border="0" alt="Delete Payment Record" title="Delete Payment Record"></a>] if (
@@ -2023,12 +2025,14 @@ sub listTransLog	{
 		SELECT 
       DISTINCT TL.*, 
       TL.dtLog AS dtLog_RAW,
+	  T.curAmount,
+	  T.intID,
 	  P.strLocalFirstname, P.strLocalSurname
 		FROM 
       tblTransLog as TL
 			INNER JOIN tblTXNLogs as TXNLog ON (TXNLog.intTLogID= TL.intLogID)
 			INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLog.intTXNID)
-			INNER JOIN tblPerson as P ON T.intID = P.intPersonID
+			LEFT JOIN tblPerson as P ON T.intID = P.intPersonID
 		WHERE 
       T.intRealmID= ?
       AND TL.intStatus<>0
@@ -2038,6 +2042,7 @@ sub listTransLog	{
       TL.intLogID
 	];
 # intID
+	
 	my $query = $db->prepare($statement);
 	$query->execute($Data->{'Realm'});
 	my $found = 0;
@@ -2057,13 +2062,13 @@ sub listTransLog	{
 			id => $dref->{'intLogID'},
 			intLogID => $dref->{'intLogID'},
 			paymentType => $dref->{'paymentType'},
-           	intAmount => $dref->{'intAmount'}, 		
+           	intAmount => $dref->{'curAmount'}, 		
             status => $dref->{'status'},
 			name => $dref->{'strLocalFirstname'} . " " . $dref->{'strLocalSurname'},
 			strResponseCode => $dref->{'strResponseCode'},
 			dtLog => $Data->{'l10n'}{'date'}->TZformat($dref->{'dtLog'},'MEDIUM','SHORT'),
 			dtLog_RAW => $dref->{'dtLog_RAW'},
-			receipt => qq[<a href = "printreceipt.cgi?client=$client&ids=$dref->{intLogID}" target="receipt">].$textLabels{'viewReceipt'}."</a>",
+			receipt => qq[<a href = "printreceipt.cgi?client=$client&ids=$dref->{intLogID}&pID=$dref->{'intID'}" target="receipt">].$textLabels{'viewReceipt'}."</a>",
 			strComments => $dref->{'strComments'},
 			SelectLink => "$Data->{'target'}?client=$client&amp;a=$action&amp;tlID=$dref->{intLogID}"
 		}
@@ -2127,6 +2132,7 @@ sub listTransLog	{
 
 	$resultHTML = qq[ 
 		$grid
+		
 	];
 	my $title=$textLabels{'listOfPaymentRecords'};
  	return ($resultHTML,$title);
