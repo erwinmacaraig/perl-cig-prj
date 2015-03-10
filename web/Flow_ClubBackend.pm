@@ -763,6 +763,7 @@ sub display_complete {
         client => $self->{'Data'}->{'client'},
         target => $self->{'Data'}->{'target'},
         MA => $maName,
+        url => $Defs::base_url,
     );
     my $displayClubForApproval = runTemplate(
         $self->{'Data'},
