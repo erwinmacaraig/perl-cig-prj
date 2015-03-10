@@ -497,12 +497,14 @@ print STDERR "000OK IS $ok | $run\n\n";
        $cv{'currentLevel'} = $Defs::LEVEL_CLUB;
        my $clm = setClient(\%cv);
 
+        my $client        = unescape($client);
+        my %tempClientValues = getClient($client);
+        $tempClientValues{personID} = $personID;
+        my $tempClient = setClient(\%tempClientValues);
 
        $cv{'entityID'} = $maObj->getValue('intEntityID');
        $cv{'currentLevel'} = $Defs::LEVEL_NATIONAL;
        my $mlm = setClient(\%cv);
-
-		
 
         my %PageData = (
             person_home_url => $url,
@@ -518,6 +520,7 @@ print STDERR "000OK IS $ok | $run\n\n";
             dtype => $hidden_ref->{'dtype'} || '',
             dtypeText => $Defs::personType{$hidden_ref->{'dtype'}} || '',
             client=>$clm,
+            clientrego=>$tempClient,
             maclient => $mlm,
             originLevel => $originLevel,
             PersonSummaryPanel => personSummaryPanel($Data, $personObj->ID()),
