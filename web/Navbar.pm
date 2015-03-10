@@ -230,6 +230,12 @@ sub getEntityMenuData {
             url => $baseurl."a=PF_&amp;dtype=MAOFFICIAL",
         };
     }
+    if($SystemConfig->{'menu_newperson_RAOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+        $menuoptions{'persons_addraofficial'} = {
+             name => $lang->txt('Add RA Official'),
+            url => $baseurl."a=PF_&amp;dtype=RAOFFICIAL",
+        };
+    }
     if($currentLevel == $Defs::LEVEL_CLUB and $SystemConfig->{'menu_newperson_TEAMOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'persons_addteamofficial'} = {
             name => $lang->txt('Add Team Official'),
@@ -456,6 +462,7 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
             'persons_addclubofficial',
             'persons_addofficial',
             'persons_addmaofficial',
+            'persons_addraofficial',
             'bulk',
             'persons',
         ]],
@@ -780,6 +787,12 @@ sub getClubMenuData {
                 url => $baseurl."a=PF_&amp;dtype=MAOFFICIAL",
             };
         }
+        if($SystemConfig->{'menu_newperson_RAOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+            $menuoptions{'persons_addraofficial'} = {
+                 name => $lang->txt('Add RA Official'),
+                url => $baseurl."a=PF_&amp;dtype=RAOFFICIAL",
+            };
+        }
         if($currentLevel == $Defs::LEVEL_CLUB and $SystemConfig->{'menu_newperson_TEAMOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
             $menuoptions{'persons_addteamofficial'} = {
                 name => $lang->txt('Add Team Official'),
@@ -829,6 +842,7 @@ sub getClubMenuData {
         'persons_addclubofficial',
         'persons_addofficial',
         'persons_addmaofficial',
+        'persons_addraofficial',
 
         'requesttransfer',
         'requestaccess',
