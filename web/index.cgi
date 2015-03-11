@@ -12,6 +12,7 @@ use Utils;
 use Lang;
 use TTTemplate;
 use SystemConfig;
+use LanguageChooser;
 
 	my $lang= Lang->get_handle() || die "Can't get a language handle!";
     my ( $db, $message ) = connectDB() || die;
@@ -42,6 +43,7 @@ use SystemConfig;
         globalnav=> $nav,
         pagebody=> $pagebody,
         SystemConfig => $Data{'SystemConfig'},
+        LanguageChooser => genLanguageChooser(\%Data),
 	);
 
     disconnectDB($db);
