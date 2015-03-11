@@ -286,6 +286,7 @@ sub _processUploadFile_single	{
                    intEntityID, 
                    intPersonRegistrationID,
                    intPersonID,
+                   dtLastUpdated,
                    dtAdded
                 )
                 VALUES (
@@ -295,6 +296,7 @@ sub _processUploadFile_single	{
                    ?,
                    ?,
                    ?,
+                   NOW(),
                    NOW()
                  ) 
         ]; 

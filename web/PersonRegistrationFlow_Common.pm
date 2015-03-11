@@ -497,12 +497,14 @@ print STDERR "000OK IS $ok | $run\n\n";
        $cv{'currentLevel'} = $Defs::LEVEL_CLUB;
        my $clm = setClient(\%cv);
 
+        my $client        = unescape($client);
+        my %tempClientValues = getClient($client);
+        $tempClientValues{personID} = $personID;
+        my $tempClient = setClient(\%tempClientValues);
 
        $cv{'entityID'} = $maObj->getValue('intEntityID');
        $cv{'currentLevel'} = $Defs::LEVEL_NATIONAL;
        my $mlm = setClient(\%cv);
-
-		
 
         my %PageData = (
             person_home_url => $url,
@@ -518,6 +520,7 @@ print STDERR "000OK IS $ok | $run\n\n";
             dtype => $hidden_ref->{'dtype'} || '',
             dtypeText => $Defs::personType{$hidden_ref->{'dtype'}} || '',
             client=>$clm,
+            clientrego=>$tempClient,
             maclient => $mlm,
             originLevel => $originLevel,
             PersonSummaryPanel => personSummaryPanel($Data, $personObj->ID()),
@@ -1152,7 +1155,23 @@ sub save_rego_products {
 
 
 sub add_rego_record{
-    my ($Data, $personID, $entityID, $entityLevel, $originLevel, $personType, $personEntityRole, $personLevel, $sport, $ageLevel, $registrationNature, $ruleFor, $nationality, $personRequestID) =@_;
+    my (
+        $Data,
+        $personID,
+        $entityID,
+        $entityLevel,
+        $originLevel,
+        $personType,
+        $personEntityRole,
+        $personLevel,
+        $sport,
+        $ageLevel,
+        $registrationNature,
+        $ruleFor,
+        $nationality,
+        $personRequestID,
+        $MAComment
+    ) = @_;
 
     my $clientValues = $Data->{'clientValues'};
     my $rego_ref = {
@@ -1171,6 +1190,7 @@ sub add_rego_record{
         current => 1,
         ruleFor=>$ruleFor,
         personRequestID => $personRequestID,
+        MAComment => $MAComment || '',
     };
     my ($personStatus, $prStatus) = checkIsSuspended($Data, $personID, $entityID, $rego_ref->{'personType'});
     return (0, undef, 'SUSPENDED') if ($personStatus eq 'SUSPENDED' or $prStatus eq 'SUSPENDED');

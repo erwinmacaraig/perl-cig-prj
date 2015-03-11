@@ -50,7 +50,7 @@ sub displayAuditLog {
 		my $who = $i->{'UserName'} || '';
 		push @rowdata, {
 			id => $i->{'intAuditLogID'},
-			dtUpdated => $Data->{'l10n'}{'date'}->TZFormat($i->{'dtUpdated'},'MEDIUM','SHORT'),
+			dtUpdated => $Data->{'l10n'}{'date'}->TZformat($i->{'dtUpdated'},'MEDIUM','SHORT'),
 			dtUpdated_RAW => $i->{'dtUpdatedRaw'},
 			strUsername => $who,
 			strSection => $i->{'strSection'} || '',

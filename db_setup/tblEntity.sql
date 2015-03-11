@@ -70,6 +70,7 @@ CREATE TABLE `tblEntity` (
   `intNotifications` INT NOT NULL DEFAULT 1 COMMENT 'Flag to check whether to send notifications or not.',
   `strOrganisationLevel` VARCHAR(45) NULL,
   `intFacilityTypeID` INT NULL,
+  `strBankAccountNumber` VARCHAR(100) NULL COMMENT 'International Bank Account Number (IBAN)',
   PRIMARY KEY (`intEntityID`),
   UNIQUE KEY `strImportEntityCode_UNIQUE` (`strImportEntityCode`),
   KEY `index_intRealmID` (`intRealmID`),

@@ -29,6 +29,18 @@ sub handleFacilityFlow {
     my $facilityID = param('vID') || 0;
     $facilityID = 0 if $facilityID < 0;
 
+    my $savedFlowURL = '';
+    my $cancelFlowURL = '';
+    {
+        my %tmpCv = %{$clientValues};
+        $tmpCv{'currentLevel'} = $tmpCv{'authLevel'};
+        my $tmpC = setClient(\%tmpCv);
+        $savedFlowURL = "$Data->{'target'}?client=$tmpC&amp;a=INCOMPLPR_";
+        $tmpCv{'currentLevel'} = $entityLevel;
+        setClientValue(\%tmpCv, $entityLevel, $entityID);
+        $tmpC = setClient(\%tmpCv);
+        $cancelFlowURL = "$Data->{'target'}?client=$tmpC&amp;a=E_HOME";
+    }
 
     my $flow = new Flow_FacilityBackend(
         db => $Data->{'db'},
@@ -42,6 +54,9 @@ sub handleFacilityFlow {
         SystemConfig => $Data->{'SystemConfig'},
         ClientValues => $clientValues,
         Target => $Data->{'target'},
+        AllowSaveState => 1,
+        SavedFlowURL => $savedFlowURL,
+        CancelFlowURL => $cancelFlowURL,
         cgi => $cgi,
     );
     my ($content,  undef) = $flow->run();

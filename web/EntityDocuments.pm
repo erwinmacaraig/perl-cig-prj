@@ -295,7 +295,8 @@ sub new_doc_form {
 		<form action="uploadregofile.cgi" method="POST" enctype="multipart/form-data" class="dropzone" id = "docform">
          <script>
               Dropzone.options.docform = { 
-                  maxFilesize: 25 // MB 
+                  maxFilesize: 25, // MB 
+				  dictDefaultMessage:"] . $Data->{'lang'}->txt('Click here to upload file') . qq["	
               };
          </script>
 

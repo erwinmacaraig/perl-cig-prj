@@ -160,7 +160,17 @@ header .logo-area {
 }
 
 header .logo-area.notloginlevel    {
-    margin-top:45px;
+    margin-top:0px;
+}
+#pageholder #contentholder {
+    background-color: #fff;
+    margin-top: 20px;
+}
+#pageholder {
+	background: transparent;
+}
+#content .login-error-page {
+	padding: 20px 10px;
 }
 
 header .logo-area img.header-logo {
@@ -204,7 +214,7 @@ header .logo-area ul li strong {
 
 header nav {
 	background: #004e7e;
-	padding: 10px 0;
+	padding: 11px 0;
 	-webkit-box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
 	-moz-box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
 	box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
@@ -494,13 +504,13 @@ a.btn-main, input.btn-main, button.btn-main {
 }
 a.btn-main.btn-proceed {
     padding-left:20px;
-    padding-bottom:7px;
+    position: relative;
 }
 .proceed-chevron    {
     float:right;
-    position:relative;
-    bottom:3px;
-    right:-10px;
+    position:absolute;
+    bottom:11px;
+    right:12px;
     font-weight:bold;
     margin:0 !important;
     padding:0px;
@@ -2207,4 +2217,11 @@ div[id*="doctab"] .documents-list table.table .task-list .status-col a.btn-insid
 }
 .lang-select select{
     padding: 1px 5px;
+}
+.hidden-col-val {
+    display:none;
+}
+
+.report-option-button-row {
+    margin-bottom:20px;
 }

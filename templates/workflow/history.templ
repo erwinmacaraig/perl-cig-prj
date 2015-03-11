@@ -1,0 +1,26 @@
+<div class="tab-content">
+    <h3 class="panel-header">[% Lang.txt(worktask.TaskType) %]</h3>
+    <div class="panel-body">
+        <table class="table" cellpadding="5">
+            <tr>
+                <td>[% Lang.txt('Approving Entity') %]:</td>
+                <td><strong>[% worktask.ApprovalEntity %]</strong></td>
+            </tr>
+            <tr>
+                <td>[% Lang.txt('Problem Resolution Entity') %]:</td>
+                <td><strong>[% worktask.ProblemResolutionEntity %]</strong></td>
+            </tr>
+            <tr>
+                <td>[% Lang.txt('Registration Type') %]:</td>
+                <td><strong>[% worktask.RegistrationType %]</strong></td>
+            </tr>
+        </table>
+
+        [% IF worktask.NotesBlock  %]
+            [% worktask.NotesBlock %]
+        [% ELSE %]
+            [% Lang.txt('No available work task notes.') %]
+        [% END %]
+    </div>
+</div>
+

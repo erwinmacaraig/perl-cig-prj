@@ -49,7 +49,7 @@ warn("IN HERE $Defs::COOKIE_LOGIN");
     else    {
       $body = runTemplate(
         \%Data,
-        {'errors' => $errors},
+        {'returnURL'=>"$Data{'SystemConfig'}{'loginError_returnURL'}" ,'errors' => $errors},
         'user/loginerror.templ',
       );
     }

@@ -305,7 +305,7 @@ sub setClient {
 
 sub getClient {
 
-    my ($client) = @_;
+    my ($client, $origValues) = @_;
     my %clientValues = ();
 
     # DECRYPT HERE
@@ -383,9 +383,11 @@ sub getClient {
     }
 
     # HAS THIS LINK EXPIRED?
-    if ( $lastAccess and ( ( time() - $lastAccess ) > $Defs::expiryseconds ) ) {
-        $clientValues{authLevel}    = -1;
-        $clientValues{currentLevel} = -1;
+    if(!$origValues)    {
+        if ( $lastAccess and ( ( time() - $lastAccess ) > $Defs::expiryseconds ) ) {
+            $clientValues{authLevel}    = -1;
+            $clientValues{currentLevel} = -1;
+        }
     }
 
     return (%clientValues);

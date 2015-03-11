@@ -24,6 +24,7 @@
                     <ul class="nav nav-tabs">
                         <li class="active"><a data-toggle="tab" href="#doctab[% index %]">[% Lang.txt('Documents') %]</a></li>
                         <li><a data-toggle="tab" href="#regtab[% index %]">[% Lang.txt('Registration details') %]</a></li>
+                        <li><a data-toggle="tab" href="#wfhisttab[% index %]">[% Lang.txt('Work task history') %]</a></li>
                     </ul>
                     <div class="tab-content">
                         <div id="doctab[% index %]" class="tab-pane fade in active">
@@ -171,11 +172,50 @@
                                 </span>
                             [% END %]
 
+                            [% IF entity.intOriginLevel == 100 %]
+                                <span class="details-row">
+                                    <span class="details-left">[% Lang.txt("MA Comment") %]:</span>
+                                    <span class="details-left detail-value">[% IF entity.strShortNotes %] [% entity.strShortNotes %] [% ELSE %] - [% END %]</span>
+                                </span>
+                            [% END %]
+
                             [% IF entity.renew_link and enableRenew %]
                                 <div class="pull-right">
                                     <span class=""><a class="btn-inside-panels" href="[% entity.renew_link %]">[% Lang.txt('Renew Registration') %]</a></span>
                                 </div>
                             [% END %]
+                        </div>
+
+                        <div id="wfhisttab[% index %]" class="tab-pane fade">
+                            <div class="">
+                                [% IF entity.worktaskhistory.size > 0 %]
+                                    [% FOREACH worktask IN entity.worktaskhistory %]
+                                        <h3 class="panel-header">[% Lang.txt(worktask.TaskType) %]</h3>
+                                        <div class="panel-body">
+
+                                            <table class="table" cellpadding="5">
+                                                <tr>
+                                                    <td>[% Lang.txt('Approving Entity') %]:</td>
+                                                    <td><strong>[% worktask.ApprovalEntity %]</strong></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>[% Lang.txt('Originating Entity') %]:</td>
+                                                    <td><strong>[% worktask.ProblemResolutionEntity %]</strong></td>
+                                                </tr>
+                                            </table>
+
+                                            [% IF worktask.TaskNotes.size > 0 %]
+                                                [% worktask.NotesBlock %]
+                                            [% ELSE %]
+                                                [% Lang.txt('No available work task notes.') %]
+                                            [% END %]
+                                        </div>
+                                        <br/>
+                                    [% END %]
+                                [% ELSE %]
+                                    [% Lang.txt('No record found.') %]
+                                [% END %]
+                            </div>
                         </div>
                     </div>
                 </div>
