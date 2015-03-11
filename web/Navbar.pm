@@ -230,7 +230,7 @@ sub getEntityMenuData {
             url => $baseurl."a=PF_&amp;dtype=MAOFFICIAL",
         };
     }
-    if($SystemConfig->{'menu_newperson_RAOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+    if($SystemConfig->{'menu_newperson_RAOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}.'_'.$currentLevel} && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'persons_addraofficial'} = {
              name => $lang->txt('Add RA Official'),
             url => $baseurl."a=PF_&amp;dtype=RAOFFICIAL",
@@ -787,7 +787,7 @@ sub getClubMenuData {
                 url => $baseurl."a=PF_&amp;dtype=MAOFFICIAL",
             };
         }
-        if($SystemConfig->{'menu_newperson_RAOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+        if($SystemConfig->{'menu_newperson_RAOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}.'_'.$currentLevel} && !$Data->{'ReadOnlyLogin'}) {
             $menuoptions{'persons_addraofficial'} = {
                  name => $lang->txt('Add RA Official'),
                 url => $baseurl."a=PF_&amp;dtype=RAOFFICIAL",
