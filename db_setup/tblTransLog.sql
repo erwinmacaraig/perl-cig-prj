@@ -34,6 +34,7 @@ CREATE TABLE tblTransLog (
     intExportOK TINYINT default 0,
     intSWMPaymentAuthLevel TINYINT default 0,
     strSessionKey varchar(40) default '',
+    intSentToGateway TINYINT default 0,
   PRIMARY KEY  (intLogID),
   KEY index_realmID (intRealmID),
   KEY index_paymentType (intPaymentType),
