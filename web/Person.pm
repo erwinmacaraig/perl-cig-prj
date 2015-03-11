@@ -250,7 +250,6 @@ sub personRegistrationsHistory   {
         id => $rego->{'intPersonRegistrationID'} || 0,
         EntityLocalName=> $name,
         EntityLatinName=> $rego->{'strLatinName'} || '',
-<<<<<<< HEAD
         dtApproved=> $Data->{'l10n'}{'date'}->TZformat($rego->{'dtApproved'},'MEDIUM','SHORT') || '',
         dtApproved_RAW=> $rego->{'dtApproved'} || '',
         PersonType=> $lang->txt($rego->{'PersonType'} || ''),
@@ -260,17 +259,8 @@ sub personRegistrationsHistory   {
         Status=> $lang->txt($rego->{'Status'} || ''),
         PersonEntityRole=> $lang->txt($rego->{'strPersonEntityRole'} || ''),
         Sport=> $lang->txt($rego->{'Sport'} || ''),
-=======
         Date => $Data->{'l10n'}{'date'}->TZformat($rego->{'dtApproved'},'MEDIUM','SHORT') || $Data->{'l10n'}{'date'}->TZformat($rego->{'dtLastUpdated'},'MEDIUM','SHORT') || $Data->{'l10n'}{'date'}->TZformat($rego->{'dtAdded'},'MEDIUM','SHORT') || '',
         Date_RAW => $rego->{'dtApproved'} || $rego->{'dtLastUpdated'} || $rego->{'dtAdded'} || '',
-        PersonType=> $rego->{'PersonType'} || '',
-        PersonLevel=> $rego->{'PersonLevel'} || '',
-        AgeLevel=> $rego->{'AgeLevel'} || '',
-        RegistrationNature=> $rego->{'RegistrationNature'} || '',
-        Status=> $rego->{'Status'} || '',
-        PersonEntityRole=> $rego->{'strPersonEntityRole'} || '',
-        Sport=> $rego->{'Sport'} || '',
->>>>>>> develop
         SelectLink => "$Data->{'target'}?client=$client&amp;a=P_REGO&amp;prID=$rego->{'intPersonRegistrationID'}",
       };
     }
