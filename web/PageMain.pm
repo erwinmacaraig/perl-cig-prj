@@ -17,6 +17,7 @@ use AddToPage;
 use TTTemplate;
 use Log;
 use Data::Dumper;
+use LanguageChooser;
 
 sub ccPageForm  {
     my($title, $body, $clientValues_ref,$client, $Data) = @_;
@@ -252,6 +253,7 @@ sub pageMain {
         Menu => '',
         HomeURL => "$Data->{'target'}?client=$homeClient&amp;a=".$HomeAction{$Data->{'clientValues'}{'authLevel'}},
         AtLoginLevel => $atloginlevel,
+        LanguageChooser => genLanguageChooser($Data),
     );
 
   my $globalnav = runTemplate(

@@ -1,0 +1,6 @@
+When adding a language these are the things needed to be done
+
+  - Create translation directories
+  - Update LangBase.pm with new language
+  - Update tblPersonLanguages table
+  - make sure language pack installed on system eg. apt-get install language-pack-fi

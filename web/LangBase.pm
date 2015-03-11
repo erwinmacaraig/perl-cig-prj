@@ -13,8 +13,8 @@ sub txt (@) {
   $temp[0] =~ s/\n+$//m;
 
   my $s = $self->maketext(@temp); 
-  #return $s;
-  return qq[<span style='color:red !important;'>$s</span>];
+  return $s;
+  #return qq[<span style='color:red !important;'>$s</span>];
 } 
 
 # I decree that this project's first language is English.
@@ -69,7 +69,15 @@ package LangBase::en_us;
 use base qw(Locale::Maketext::Gettext);
 return 1;
 
+package LangBase::fi_fi;
+use base qw(Locale::Maketext::Gettext);
+return 1;
+
 package LangBase::fr_fr;
+use base qw(Locale::Maketext::Gettext);
+return 1;
+
+package LangBase::sv_se;
 use base qw(Locale::Maketext::Gettext);
 return 1;
 

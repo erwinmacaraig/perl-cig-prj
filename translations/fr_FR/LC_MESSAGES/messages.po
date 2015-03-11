@@ -1703,7 +1703,6 @@ msgstr "Décédé?"
 msgid "AUTO_INTROTEXT"
 msgstr "Modifier les données dans les cases ci-dessous tel que requis. Lorsqu"
 
-
 msgid "No outstanding tasks"
 msgstr ""
 
@@ -1712,8 +1711,6 @@ msgstr ""
 
 msgid "Registration Authorisation"
 msgstr ""
-
-"Registration constants 
 
 msgid "Player"
 msgstr ""

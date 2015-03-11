@@ -5,7 +5,7 @@ msgstr ""
 "PO-Revision-Date: \n"
 "Last-Translator: Warren Rodie <w.rodie@sportingpulseinternational.com>\n"
 "Language-Team: \n"
-"Language: FI\n"
+"Language: SV\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2001,7 +2001,7 @@ msgstr ""
 
 #: web/Navbar.pm Line:446
 msgid "People"
-msgstr "Ihmiset"
+msgstr "Människor"
 
 #: web/Navbar.pm Line:1050 Line:1107
 msgid "Person Dashboard"
@@ -2666,7 +2666,7 @@ msgstr ""
 
 #: web/PageMain.pm Line:276
 msgid "PEOPLE"
-msgstr "Ihmiset"
+msgstr "pERSONER"
 
 #: web/EntitySettings.pm Line:99
 msgid "Password Management"
@@ -5733,12 +5733,12 @@ msgstr ""
 
 #: templates/user/globalnav.templ Line:43 Line:44
 msgid "Welcome"
-msgstr "Tervetuloa"
+msgstr "Välkommen"
 
 #: templates/user/loginform.templ Line:6
 #, fuzzy
 msgid "Welcome..."
-msgstr "Tervetuloa"
+msgstr "Välkommen"
 
 #: templates/flow/facility_summary.templ Line:58
 msgid "Width of field"
