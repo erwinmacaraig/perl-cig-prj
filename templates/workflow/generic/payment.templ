@@ -6,6 +6,7 @@
                     <thead>
                         <tr>
                             <th>[% Lang.txt('Transaction Number') %]</th>
+							<th>[% Lang.txt('Invoice Number') %] </th>
                             <th>[% Lang.txt('Qty') %]</th>
                             <th>[% Lang.txt('Product') %]</th>
                             <th>[% Lang.txt('Product Type') %]</th>
@@ -18,6 +19,7 @@
                 [% FOREACH row IN TXNs %]
                 <tr>
                     <td><div class="member-data"> [% row.TransactionNumber %] </div></td>
+					<td><div class="member-data"> [% row.InvoiceNumber %] </div></td>
                     <td><div class="member-data"> [% row.Qty %] </div></td>
                     <td><div class="member-data"> [% row.ProductName %] </div></td>
                     <td><div class="member-data"> [% row.ProductType %] </div></td>

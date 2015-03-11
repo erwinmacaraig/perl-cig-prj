@@ -3250,10 +3250,12 @@ sub populateRegoPaymentsViewData {
             P.strProductType as ProductType,
             T.intStatus,
             T.intTransactionID,
-            TL.intPaymentType
+            TL.intPaymentType,
+			I.strInvoiceNumber
         FROM
             tblTransactions as T
             INNER JOIN tblProducts as P ON (P.intProductID=T.intProductID)
+			INNER JOIN tblInvoice as I ON (T.intInvoiceID = I.intInvoiceID)
             LEFT JOIN tblTransLog as TL ON (TL.intLogID=T.intTransLogID)
         WHERE
             T.intID = ?
@@ -3274,6 +3276,7 @@ sub populateRegoPaymentsViewData {
     while(my $tdref = $q->fetchrow_hashref()) {
         my %row= (
             TransactionNumber=> $tdref->{'intTransactionID'},
+			InvoiceNumber => $tdref->{'strInvoiceNumber'},
             PaymentLogID=> $tdref->{'intTransLogID'},
             ProductName=> $tdref->{'ProductName'},
             ProductType=> $tdref->{'ProductType'},
