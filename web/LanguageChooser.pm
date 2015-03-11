@@ -18,14 +18,14 @@ sub genLanguageChooser  {
 
     my $languageOptions = getPersonLanguages($Data,1,1);
     return '' if !$languageOptions;
-    return '' if scalar($languageOptions) <= 1;
+    return '' if scalar(@{$languageOptions}) <= 1;
 
     my $body = runTemplate(
         $Data,
         {
             currentLanguage => $currentLanguage,
             Languages => $languageOptions,
-            cookieName => $Defs::COOKIE_LANG,,
+            cookieName => $Defs::COOKIE_LANG,
         },
         'page_wrapper/language_chooser.templ',
     );
