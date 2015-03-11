@@ -369,7 +369,7 @@ sub step2 {
 			
 			<tbody id="secmain2" >	
 			<tr>
-				<td class="label"><label for="l_intAmount">].$lang->txt('Amount.').qq[</label>:</td>
+				<td class="label"><label for="l_intAmount">].$lang->txt('Amount').qq[</label>:</td>
 				<td class="value">
 				$Data->{params}{intAmount}
 </td>

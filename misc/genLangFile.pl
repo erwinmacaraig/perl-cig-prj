@@ -15,6 +15,27 @@ my @files = ();
 main();
 
 sub main	{
+    my %excludeFiles = (
+        'web/List.pm' => 1,
+        'web/ListMembers.pm' => 1,
+        'web/Clearances/Clearances.pm' => 1,
+        'web/Clearances/ClearancesList.pm' => 1,
+        'web/Clearances/ClearanceSettings.pm' => 1,
+        'web/Seasons.pm' => 1,
+        'web/AssocOptions.pm' => 1,
+        'web/AssocServices.pm' => 1,
+        'web/EntitySettings.pm' => 1,
+        'web/AgeGroups.pm' => 1,
+        'web/Search.pm' => 1,
+        'web/ServicesContacts.pm' => 1,
+        'web/AuthMaintenance.pm' => 1,
+        'web/RegoFormBuilder/RegoFormOptions.pm' => 1,
+        'web/RegoFormBuilder/RegoForm.pm' => 1,
+        'web/RegoForm/RegoFormBaseObj.pm' => 1,
+        'web/RegoForm/RegoForm_Member.pm' => 1,
+        'templates/user/login_orgs.templ' => 1,
+        'templates/user/linkmember.templ' => 1,
+    );
     my @params = @ARGV;
     my $outputfilepath = shift @params;
     my @files = @params;
@@ -30,6 +51,7 @@ sub main	{
             my @lines = <FILEIN>;
             my $lineNum = 0;
             my $relativefile = substr $filename, (length($Defs::fs_base)+1);
+            next if $excludeFiles{$relativefile};
             for my $line (@lines)   {
                 $lineNum++;
             #my $filecontents = join('',@lines);
@@ -37,20 +59,68 @@ sub main	{
                 my @matches =  $line=~ /\btxt\(['"]([^\)]+)['"]\)/gs;
                 if(scalar(@matches))    {
                     foreach my $i (@matches)    {
-                        push @{$LangKeys{$i}}, "#: $relativefile Line:$lineNum";
+                        next if $i =~ /^\s+$/;
+                        push @{$LangKeys{$i}}, "#:$relativefile Line:$lineNum";
                     }
                 }
             }
     }
 
     #process Field Labels
-    my $fieldlabels_p = getFieldLabels({},$Defs::LEVEL_PERSON,1);
+    my $fieldlabels_p = getFieldLabels({}, $Defs::LEVEL_PERSON,1);
     for my $k (keys $fieldlabels_p) {
-        $LangKeys{$fieldlabels_p->{$k}} = ['# :Person FieldLabels'];
+        push @{$LangKeys{$fieldlabels_p->{$k}}}, '#:Person FieldLabels';
     }
     my $fieldlabels_c = getFieldLabels({},$Defs::LEVEL_CLUB,1);
     for my $k (keys $fieldlabels_c) {
-        $LangKeys{$fieldlabels_c->{$k}} = ['#: Club Field Labels'];
+        push @{$LangKeys{$fieldlabels_c->{$k}}},  '#:Club Field Labels';
+    }
+    no strict 'refs'; 
+    for my $hash (qw(
+        wfTaskType
+        wfTaskStatus
+        wfTaskAction
+        sportType
+        entitySportType
+        personType
+        personLevel
+        entityStatus
+        registrationNature
+        personStatus
+        personRegoStatus
+        entityType
+        genderInfo
+        PersonGenderInfo
+        genderEventInfo
+        genderEntityInfo
+        DataAccessNames
+        tfInfo
+        memberTypeName
+        entityInfo
+        NationalityType
+        ProdTransactionStatus
+        TransactionStatus
+        TransLogStatus
+        paymentTypes
+        manualPaymentTypes
+        DisplayEntityLevelNames
+        LevelNames
+        ageLevel
+        ClubType
+        VenueTypes
+        memberNameFormat
+        documentFor
+        personTransferType
+        personRequest
+        personRequestResponse
+        personRequestStatus
+        person_certification_status
+        fieldGroundNatureType
+    ))  {
+        my $hashname = 'Defs::'.$hash;
+        for my $k (keys %{$hashname})   {   
+            push @{$LangKeys{$hashname->{$k}}}, '#:Defs::'.$hash;
+        }
     }
 
     foreach my $key (sort keys %LangKeys)   {

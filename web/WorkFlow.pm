@@ -1055,7 +1055,7 @@ sub approveTask {
 
     #NOTE if new approval check needs to be done, just add another condition here (increment error, concat $response)
     if($sysConfigApprovalLockPaymentRequired and $task->{'paymentRequired'}){
-        $errorStr = $Data->{'lang'}->txt("ERROR: Payment required."); 
+        $errorStr = $Data->{'lang'}->txt("Error").': '. $Data->{'lang'}->txt("Payment required"); 
         $response = qq [
             <span>$errorStr</span><br/>
         ];

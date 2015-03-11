@@ -322,7 +322,7 @@ sub getEntityMenuData {
                 url => $baseurl."a=CL_list",
             };
             $menuoptions{'clearancesettings'} = {
-                name => $lang->txt("$txt_Clr Settings"),
+                name => $lang->txt("Clearances Settings"),
                 url => $baseurl."a=CLRSET_",
             };
             if(
@@ -411,7 +411,7 @@ sub getEntityMenuData {
 
     if($SystemConfig->{'allowVenues'} && $SystemConfig->{'menu_newvenue_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'addvenue'} = {
-             name => $lang->txt("Add $Data->{'LevelNames'}{$Defs::LEVEL_VENUE}"),
+             name => $lang->txt("Add Venue"),
             url => $baseurl."a=VENUE_DTA",
         };
     }
@@ -592,7 +592,7 @@ sub getClubMenuData {
                 url => $baseurl."a=CL_list",
             };
             $menuoptions{'clearancesettings'} = {
-                name => $lang->txt("$txt_Clr Settings"),
+                name => $lang->txt("Clearances Settings"),
                 url => $baseurl."a=CLRSET_",
             };
         }
@@ -825,7 +825,7 @@ sub getClubMenuData {
 
     if($SystemConfig->{'allowVenues'} && $SystemConfig->{'menu_newvenue_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'addvenue'} = {
-             name => $lang->txt("Add $Data->{'LevelNames'}{$Defs::LEVEL_VENUE}"),
+             name => $lang->txt("Add a Venue"),
             url => $baseurl."a=VENUE_DTA",
         };
     }

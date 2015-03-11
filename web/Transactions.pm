@@ -296,7 +296,7 @@ sub displayTransaction	{
 					readonly=>$readonly,
             			},
 				intDelivered=> {
-			        	label => $lang->txt("Delivered ?"),
+			        	label => $lang->txt("Delivered"),
 		                	value => $dref->{'intDelivered'},
                 			type  => 'checkbox',
                 			displaylookup => {0=>'Undelivered', 1=>'Delivered'},
