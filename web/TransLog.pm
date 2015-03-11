@@ -585,17 +585,17 @@ sub getTransList {
 warn("LL $hidePayment:$hidePay:$displayonly");
     my @headers = (
     {
-        name => 'Invoice Number', 
-        field => 'strInvoiceNumber', 
-        width => 20
-    },
-    {
-        name => 'Select', 
+        name => 'Check', 
         field => 'manual_payment', 
         type => 'HTML', 
         width => 10, 
         hide => ($hidePayment or $hidePay), 
-        sortable => 0,
+        sortable => 0, 
+    },
+    {
+       	name => 'Invoice Number', 
+        field => 'strInvoiceNumber', 
+        width => 20
     },
     {
         name => 'Transaction Number', 
