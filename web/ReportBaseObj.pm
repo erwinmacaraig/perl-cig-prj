@@ -265,7 +265,8 @@ sub processData {
 	if($groupfield)	{
 		unshift @{$sort}, [$groupfield,'ASC','string'];
 	}
-	if($sort)	{
+
+	if($sort and scalar(@{$data_array}) )	{
 		my @sortparams = ('ST', 'ref_in', 'ref_out','no_case');
 		for my $s (@{$sort})	{
 			next if !$s->[0];
