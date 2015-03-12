@@ -239,7 +239,7 @@ sub _getConfiguration {
         {
           displaytype=>'lookup',
           fieldtype=>'dropdown',
-          dropdownoptions=>{ ''=>'&nbsp;', 1=>'Male', 2=>'Female'},
+          dropdownoptions=>{ 1=>'Male', 2=>'Female'},
           dropdownorder=>['', 1, 2],
           size=>2,
           multiple=>1,
