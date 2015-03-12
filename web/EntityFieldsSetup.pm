@@ -802,6 +802,7 @@ sub entityFieldsSetup {
                     size        => '50',
                     maxsize     => '100',
                     validate    => 'EMAIL',
+                    compulsory  => 1,
                 },
                 intNotifications => {
                     label       => $FieldLabels->{'intNotifications'},
