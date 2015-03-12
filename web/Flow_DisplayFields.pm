@@ -174,6 +174,7 @@ qq[<textarea name="d_$fieldname" id="l_$fieldname" $rows $cols $disabled $onChan
                 if ($f->{'Save_readonly'}){
                     $isReadonly = qq[ readonly = "readonly" ];
                 }
+                $val =~s/"/&quot;/g;
                 $field_html =
 qq[<input type="text" name="d_$fieldname" value="$val" $isReadonly id="l_$fieldname" $sz $ms $ph $disabled $onChange / >$txt_format\n];
             }
