@@ -19,7 +19,7 @@
 [% END %]
 	</tbody>
 	<tfoot>
-		<th colspan = "[% Labels.size %]"><span class="report-daterun">[% Lang.txt('Report Run') %] [% DateRun %]</span></th>
+		<th colspan = "[% Labels.size %]"><span class="report-daterun">[% Lang.txt('Report Run') %] [% DateFormat.TZformat(DateRun,'MEDIUM','SHORT') %]</span></th>
 	</tfoot>
 </table>
 

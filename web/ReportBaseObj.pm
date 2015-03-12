@@ -174,7 +174,7 @@ sub deliverReport {
 			{
 				Name => $self->Name(),
 				SavedReportID => $self->ID(),
-				DateRun => scalar(localtime()),
+                DateRun => $self->getRunTime(),
 				RunOrder => $self->{'RunParams'}{'FieldOrder'} || $self->{'RunParams'}{'Order'},
 				RecordCount => $self->{'RunParams'}{'RecordCount'},
 				Totals => $self->{'RunParams'}{'Totals'},
@@ -236,7 +236,7 @@ sub formatOutput {
 			SavedReportID => $self->{'SavedReportID'},
             Labels => $self->{'Config'}{'Labels'},
             ReportData => $data_array, 
-			DateRun => scalar(localtime()),
+			DateRun => $self->getRunTime(),
 			RunOrder => $self->{'RunParams'}{'FieldOrder'} || $self->{'RunParams'}{'Order'},
 			RecordCount => $self->{'RunParams'}{'RecordCount'},
 			Totals => $self->{'RunParams'}{'Totals'},
@@ -480,5 +480,13 @@ sub _runFunction	{
 	return $ret;
 }
 
+sub getRunTime {
+    my $self = shift;
+
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)=localtime(time);
+    my $nice_timestamp = sprintf ( "%04d-%02d-%02d %02d:%02d:%02d",
+                                   $year+1900,$mon+1,$mday,$hour,$min,$sec);
+    return $nice_timestamp;
+}
 
 1;
