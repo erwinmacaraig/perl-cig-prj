@@ -45,7 +45,7 @@ sub setProcessOrder {
     my $regname = $typename
         ? $typename .' Registration'
         : 'Registration';
-    $self->{'ProcessOrder'} = [       
+    my $steps1 = [       
         {
             'action' => 'cd',
             'function' => 'display_core_details',
@@ -59,18 +59,6 @@ sub setProcessOrder {
             'function' => 'validate_core_details',
             'fieldset'  => 'core',
         },        
-        #{
-            #'action' => 'minor',
-            #'function' => 'display_minor_fields',
-            #'label'  => 'Minor',
-            #'fieldset'  => 'minor',
-            #'NoNav'     => 1,
-        #},
-        #{
-            #'action' => 'minoru',
-            #'function' => 'validate_minor_fields',
-            #'fieldset'  => 'minor',
-        #},
         {
             'action' => 'cond',
             'function' => 'display_contact_details',
@@ -83,17 +71,6 @@ sub setProcessOrder {
             'function' => 'validate_contact_details',
             'fieldset'  => 'contactdetails',
         },
-        #{
-            #'action' => 'od',
-            #'function' => 'display_other_details',
-            #'label'  => 'Other Details',
-            #'fieldset'  => 'otherdetails',
-        #},
-        #{
-            #'action' => 'odu',
-            #'function' => 'validate_other_details',
-            #'fieldset'  => 'otherdetails',
-        #},
         {
             'action' => 'r',
             'function' => 'display_registration',
@@ -103,7 +80,9 @@ sub setProcessOrder {
         {
             'action' => 'ru',
             'function' => 'process_registration',
-        },
+        }
+    ];
+    my $stepscert = [
         {
             'action' => 'cert',
             'function' => 'display_certifications',
@@ -117,6 +96,8 @@ sub setProcessOrder {
             'function' => 'process_certifications',
             'fieldset'  => 'certifications',
         },
+    ];
+    my $steps2 = [
         {
             'action' => 'd',
             'function' => 'display_documents',
@@ -152,6 +133,12 @@ sub setProcessOrder {
             'NoDisplayInNav' => 1,
         },
     ];
+    my @order = @{$steps1};
+    if(($dtype eq 'COACH' or $dtype eq 'REFEREE'))   {
+        push @order, @{$stepscert};
+    }
+    push @order, @{$steps2};
+    $self->{'ProcessOrder'} = \@order;
 }
 
 sub setupValues    {
