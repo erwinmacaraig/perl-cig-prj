@@ -62,7 +62,7 @@
 		<tr class="ROtotalfooter">
 		[% FOREACH f = RunOrder %]
 			[% IF loop.first and !Totals.all.item(f) %]
-				<td>[% RecordCount %] rows [% IF SummaryCount.All != RecordCount %](Examined [% SummaryCount.All || 0 %] rows)[% END %]</td>
+				<td>[% RecordCount %] rows [% IF SummaryCount.All and SummaryCount.All != RecordCount %](Examined [% SummaryCount.All || 0 %] rows)[% END %]</td>
 			[% ELSE %]
 				<td>[% Totals.all.item(f) %]</td>
 			[% END %]
