@@ -30,6 +30,7 @@ use Log;
 use TTTemplate;
 use Person;
 use Data::Dumper;
+use PersonUtils;
 
 sub bulkPersonRollover {
     my($Data, $nextAction, $bulk_ref, $hidden_ref, $countOnly) = @_;
@@ -122,6 +123,7 @@ sub bulkPersonRollover {
     my @rowdata    = ();
 
     while (my $dref = $q->fetchrow_hashref()) {
+        $dref->{'currentAge'} = personAge($Data,$dref->{'dtDOB'});
         my $newAgeLevel = Person::calculateAgeLevel($Data, $dref->{'currentAge'});
         next if $newAgeLevel ne $bulk_ref->{'ageLevel'};
         $count++;

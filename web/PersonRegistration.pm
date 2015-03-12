@@ -29,6 +29,7 @@ use AuditLog;
 use Reg_common;
 use PersonCertifications;
 use PersonEntity;
+use PersonUtils;
 
 sub cleanPlayerPersonRegistrations  {
 
@@ -708,6 +709,7 @@ sub getRegistrationData	{
         $dref->{'AgeLevel'} = $Defs::ageLevel{$dref->{'strAgeLevel'}} || '';
         $dref->{'Status'} = $Defs::personRegoStatus{$dref->{'strStatus'}} || '';
         $dref->{'RegistrationNature'} = $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '';
+        $dref->{'currentAge'} = personAge($Data,$dref->{'dtDOB'});
 
 		my $sql = qq[
 			SELECT strApprovalStatus,strDocumentName, intFileID, strOrigFilename, pr.intPersonRegistrationID, tblDocumentType.intDocumentTypeID, strLockAtLevel,tblUploadedFiles.dtUploaded as DateUploaded FROM tblUploadedFiles INNER JOIN tblDocuments ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID  
@@ -1077,6 +1079,7 @@ sub getRegistrationDetail {
     my @RegistrationDetail = ();
       
     while(my $dref= $query->fetchrow_hashref()) {
+        $dref->{'currentAge'} = personAge($Data,$dref->{'dtDOB'});
         $dref->{'Sport'} = $Defs::sportType{$dref->{'strSport'}} || '';
         $dref->{'PersonType'} = $Defs::personType{$dref->{'strPersonType'}} || '';
         $dref->{'PersonLevel'} = $Defs::personLevel{$dref->{'strPersonLevel'}} || '';

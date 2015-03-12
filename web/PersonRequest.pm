@@ -34,6 +34,7 @@ use Switch;
 use SphinxUpdate;
 use InstanceOf;
 use PersonEntity;
+use PersonUtils;
 use TemplateEmail;
 use Flow_DisplayFields;
 
@@ -1422,6 +1423,7 @@ sub getRequests {
     my @personRequests = ();
       
     while(my $dref = $q->fetchrow_hashref()) {
+        $dref->{'currentAge'} = personAge($Data, $dref->{'dtDOB'});
         my $personCurrAgeLevel = Person::calculateAgeLevel($Data, $dref->{'currentAge'});
         $dref->{'personCurrentAgeLevel'} = $personCurrAgeLevel;
         push @personRequests, $dref;
