@@ -1047,11 +1047,6 @@ sub process_products {
         $regoID = 0 if !$valid;
     }
 
-    my ($resultHTML, $error) = checkMandatoryProducts($self->{'Data'}, $personID, $Defs::LEVEL_PERSON, $self->{'RunParams'});
-   # print STDERR $error . "-" . $resultHTML;
-   # if ($error) {
-   #     return ($resultHTML, 0);
-   # }
     my ($txnIds, $amount) = save_rego_products($self->{'Data'}, $regoID, $personID, $entityID, $entityLevel, $rego_ref, $self->{'RunParams'});
 
 ####

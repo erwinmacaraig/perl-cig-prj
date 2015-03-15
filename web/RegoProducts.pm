@@ -28,7 +28,6 @@ sub getRegoProducts {
         $multipersonType,
         $regItemRules_ref
     ) = @_;
-print STDERR "IN getRegoProducts ^^^^^^^^^\n";
 
     my $currencySymbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
     $incExisting ||= 0; ## Set to 1 to include existing in-cart items that aren't paid for the member
@@ -399,7 +398,6 @@ sub timeLocally   {
 
 sub productAllowedThroughFilter {
     my ($dref, $memdetails, $timeLocally, $productAttributes, $params) = @_;
-print STDERR "IN productAllowedThroughFilter\n";
 
     # Returns 1 if product passes filters
     # else 0 means product doesn't pass
