@@ -54,6 +54,7 @@ use MinorProtection;
 use PersonCertifications;
 use EntitySummaryPanel;
 use PersonEntity;
+use PersonUtils;
 
 use SphinxUpdate;
 use InstanceOf;
@@ -2209,6 +2210,7 @@ sub getTask {
             p.strNationalNum,
             p.strStatus as personStatus,
             DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
+            p.dtDOB AS DOB_RAW,
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             rnt.intTaskNoteID as rejectTaskNoteID,
             rnt.intCurrent as rejectCurrent,
@@ -2244,6 +2246,7 @@ sub getTask {
     );
 
     my $result = $q->fetchrow_hashref();
+    $result->{'currentAge'} = personAge($Data,$result->{'DOB_RAW'});
     return $result || undef;
 }
 
@@ -2405,6 +2408,7 @@ sub viewTask {
     my $rowCount = 0;
 
     my $dref = $q->fetchrow_hashref();
+    $dref->{'currentAge'} = personAge($Data,$dref->{'dtDOB'});
 
     if(!$dref) {
         #return (undef, "ERROR: no data retrieved/no access.");
