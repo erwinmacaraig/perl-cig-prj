@@ -240,6 +240,8 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                   $f->{'validate'};
                 $clientside_validation{$fieldname}{'compulsoryIfVisible'} =
                   $f->{'compulsoryIfVisible'};
+                $clientside_validation{$fieldname}{'validateData'} =
+                  $f->{'validateData'};
             }
             $label = qq[$label] if $label;
         }
@@ -1158,6 +1160,26 @@ sub generate_clientside_validation {
                       $self->langlookup(
                         "Please enter a valid URL" );
                 }
+                elsif ( $t eq 'REMOTE' ) {
+                    my $vdata = $validation->{$k}{'validateData'} || next;
+                    my %remote_data = ();
+                    my $otherfields =  $vdata->{'otherfields'} || [];
+                    push @{$otherfields}, $k;
+                    for my $f (@{$otherfields})    {
+                        $remote_data{$f} = "REMOVEQfunction() { return jQuery('#l_$f' ).val(); }REMOVEQ";
+                    }
+                    foreach my $k (keys %{$vdata->{'postvalues'}})    {
+                        $remote_data{$k} = $vdata->{'postvalues'}{$k} || 0;
+                    }
+
+                    $valinfo{'rules'}{ 'd_' . $k }{'remote'} = {
+                            url => $vdata->{'url'},
+                            type => "post",
+                            data => \%remote_data,
+                    };
+                    $valinfo{'messages'}{ 'd_' . $k }{'remote'} =
+                      $self->langlookup("Number is invalid", $num1, $num2 );
+                }
             }
         }
     }
@@ -1175,6 +1197,9 @@ sub generate_clientside_validation {
         $val_rules =~ s/JAVASCRIPT['"]//g;
         $val_rules =~ s/['"]JAVASCRIPT//g;
         $val_rules =~ s/SINGLEQUOTE/'/g;
+        $val_rules =~ s/"REMOVEQ//g;
+        $val_rules =~ s/REMOVEQ"//g;
+        $val_rules =~ s/REMOVEQ//g;
         $val_rules .= qq~
             ,
             ignore: ".ignore",
