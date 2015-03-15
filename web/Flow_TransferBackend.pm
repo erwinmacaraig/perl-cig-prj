@@ -34,6 +34,7 @@ use PersonRegistration;
 use PersonSummaryPanel;
 use RenewalDetails;
 
+use RegoProducts;
 
 sub setProcessOrder {
     my $self = shift;
@@ -661,16 +662,18 @@ print STDERR Dumper($self->{'RunDetails'}{'Errors'});
             {},
             1,
         );
-        #if (! $content)   {
-        #    $self->incrementCurrentProcessIndex();
-        #    return ('',2);
-        #}
     }
     else    {
-        push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
-        $self->setCurrentProcessIndex(1);
-        return ('',2);
+        if (! $self->{'RunDetails'}{'Errors'} and  ! scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+            push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
+            if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+                #There are errors - reset where we are to go back to the form again
+                $self->setCurrentProcessIndex('r');
+                return ('',2);
+            }
+        }
     }
+
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
         #$self->setCurrentProcessIndex(1);
@@ -764,6 +767,13 @@ print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~~~~PROCESS PRODUCTS";
             $entityID
         );
         $regoID = 0 if !$valid;
+    }
+
+    my ($resultHTML, $error) = checkMandatoryProducts($self->{'Data'}, $personID, $Defs::LEVEL_PERSON, $self->{'RunParams'});
+    if ($error) {
+        push @{$self->{'RunDetails'}{'Errors'}}, $resultHTML;
+        $self->setCurrentProcessIndex('p');
+        return ('',2);
     }
 
     my ($txnIds, $amount) = save_rego_products($self->{'Data'}, $regoID, $personID, $entityID, $entityLevel, $rego_ref, $self->{'RunParams'});
