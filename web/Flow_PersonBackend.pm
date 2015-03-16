@@ -914,7 +914,7 @@ sub display_products {
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
-
+	
     my $rego_ref = {};
     my $content = '';
     if($regoID) {
@@ -934,7 +934,7 @@ sub display_products {
     if($regoID) {
         my $nationality = $personObj->getValue('strISONationality') || ''; 
         $rego_ref->{'Nationality'} = $nationality;
-
+		$rego_ref->{'payMethod'} = $self->{'RunParams'}{'payMethod'} || '';
         $content = displayRegoFlowProducts(
             $self->{'Data'}, 
             $regoID, 

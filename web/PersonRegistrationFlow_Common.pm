@@ -1021,6 +1021,7 @@ sub displayRegoFlowProducts {
 		amountCheck => $totalamountchk,
         NoFormFields =>$noFormFields,
 		AssociationName => $maName,
+		payMethod => $rego_ref->{'payMethod'},
     );
 	
     my $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ') || '';
