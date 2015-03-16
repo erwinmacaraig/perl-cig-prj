@@ -137,14 +137,14 @@
 
                             [% IF PersonDetails.Address1 %]
                                 <span class="details-row">
-                                  <span class="details-left">[% Lang.txt('Address1') %]:</span>
+                                  <span class="details-left">[% Lang.txt('Address 1') %]:</span>
                                   <span class="details-left detail-value">[% PersonDetails.Address1 %]</span>
                                 </span>
                             [% END %]
 
                             [% IF PersonDetails.Address2 %]
                                 <span class="details-row">
-                                  <span class="details-left">[% Lang.txt('Address2') %]:</span>
+                                  <span class="details-left">[% Lang.txt('Address 2') %]:</span>
                                   <span class="details-left detail-value">[% PersonDetails.Address2 %]</span>
                                 </span>
                             [% END %]
@@ -249,7 +249,7 @@
                     [% IF PersonRegoDetails.Status %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Status") %]:</span>
-                            <span class="details-left detail-value">[% PersonRegoDetails.Status %]</span>
+                            <span class="details-left detail-value">[% Lang.txt(PersonRegoDetails.Status) %]</span>
                         </span>
                     [% END %]
 
@@ -271,7 +271,7 @@
                     [% IF PersonRegoDetails.Sport %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Sport") %]:</span>
-                            <span class="details-left detail-value">[% PersonRegoDetails.Sport %]</span>
+                            <span class="details-left detail-value">[% Lang.txt(PersonRegoDetails.Sport) %]</span>
                         </span>
                     [% END %]
 

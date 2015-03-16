@@ -11,7 +11,7 @@
 					<div>
 						<span class="fa fa-exclamation"></span>
                         [% IF personStatus == 'PENDING' %]
-						    <p>[% Lang.txt('Add Role process cannot continue until re-approved by ') %] [% MA %].</p>
+						    <p>[% Lang.txt('The add role process cannot continue until re-approved by [_1]',MA) %].</p>
                         [% ELSE %]
 						    <p>[% Lang.txt('Please continue with the Add Role process and submit to') %] [% MA %] [% Lang.txt('Member Association for final approval.') %]</p>
                         [% END %]

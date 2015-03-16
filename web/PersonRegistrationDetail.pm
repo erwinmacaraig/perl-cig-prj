@@ -49,6 +49,7 @@ sub personRegistrationDetail   {
                 type => 'lookup',
                 options => \%statusoptions,
                 readonly => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
+                translateLookupValues => 1,
             },
             strAgeLevel => {
                 label => 'Age Level',
@@ -64,25 +65,25 @@ sub personRegistrationDetail   {
             },
             strGender => {
                 label => 'Gender',
-                value => $Defs::genderInfo->{$RegistrationDetail->{'intGender'}},
+                value => $Data->{'lang'}->txt($Defs::genderInfo->{$RegistrationDetail->{'intGender'}}),
                 type => 'text',
                 readonly => 1,
             },
             strRegistrationNature => {
                 label => 'Registration Type',
-                value => $RegistrationDetail->{'RegistrationNature'},
+                value => $Data->{'lang'}->txt($RegistrationDetail->{'RegistrationNature'}),
                 type => 'text',
                 readonly => 1,
             },
             strPersonType => {
                 label => 'Type',
-                value => $RegistrationDetail->{'PersonType'},
+                value => $Data->{'lang'}->txt($RegistrationDetail->{'PersonType'}),
                 type => 'text',
                 readonly => 1,
             },
             strPersonLevel => {
                 label => 'Level',
-                value => $RegistrationDetail->{'PersonLevel'},
+                value => $Data->{'lang'}->txt($RegistrationDetail->{'PersonLevel'}),
                 type => 'text',
                 readonly => 1,
             },

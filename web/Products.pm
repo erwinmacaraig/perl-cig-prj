@@ -332,7 +332,7 @@ sub list_products	{
       	field =>  'amount',
     	},
     	{
-    	  name =>   $Data->{'lang'}->txt('Active ?'),
+    	  name =>   $Data->{'lang'}->txt('Active'),
     	  field =>  'active',
 				type => 'tick',
     	},

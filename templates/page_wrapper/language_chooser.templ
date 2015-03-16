@@ -1,0 +1,16 @@
+<div class="lang-select">
+<select name = "chooselanguage" id = "languageChooser">
+[% FOREACH language = Languages %]
+    <option value = "[% language.strLocale %]" [% IF language.strLocale == currentLanguage %] SELECTED [% END %] >[% language.strNameLocal %]</option>
+[% END %]
+</select>
+</div>
+<script>
+jQuery(document).ready(function() {
+     jQuery('#languageChooser').on('change', function () {
+          SetCookie('[% cookieName %]',jQuery('#languageChooser').val());
+          window.location.reload();
+          return false;
+      });
+});
+</script>

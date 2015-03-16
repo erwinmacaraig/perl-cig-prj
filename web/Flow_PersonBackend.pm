@@ -182,13 +182,13 @@ sub display_core_details    {
 
         if($defaultType eq $Defs::PERSON_TYPE_PLAYER and $self->{'SystemConfig'}{'allowPersonRequest'}) {
             $txt = $lang->txt('Please check that this player has not been registered with another club?')
-                .qq[ <a href = "$transfer">].$lang->txt('If yes, they need to apply for a Transfer.').'</a>'
-                .$lang->txt(' Not sure?')
+                .qq[ <a href = "$transfer">].$lang->txt('If yes, they need to apply for a Transfer.').'</a> '
+                .$lang->txt('Not sure?')
                 .qq[ <a href = "$search">].$lang->txt('Then use the Search.').'</a>' ;
         }
         else {
              $txt = $lang->txt('Has this person already been registered?')
-                .$lang->txt(' Not sure?')
+                .' '.$lang->txt('Not sure?')
                 .qq[ <a href = "$search">].$lang->txt('Then use the Search.').'</a>' ;       
         }
 

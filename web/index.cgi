@@ -12,12 +12,11 @@ use Utils;
 use Lang;
 use TTTemplate;
 use SystemConfig;
+use LanguageChooser;
 
 	my $lang= Lang->get_handle() || die "Can't get a language handle!";
     my ( $db, $message ) = connectDB() || die;
 	
-	my $pheading=$lang->txt('Sign in to <span class="sporange">Membership</span>');
-	my $txtexpl=$lang->txt('Here you can sign in to your SportingPulse Membership database.');
 	my $title=$lang->txt('APPNAME') || 'FIFA Connect';
 
     my %Data = (
@@ -42,6 +41,7 @@ use SystemConfig;
         globalnav=> $nav,
         pagebody=> $pagebody,
         SystemConfig => $Data{'SystemConfig'},
+        LanguageChooser => genLanguageChooser(\%Data),
 	);
 
     disconnectDB($db);

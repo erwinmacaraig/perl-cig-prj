@@ -327,7 +327,7 @@ sub listRules  {
 
     my @headers = (
         {
-            name  => $Data->{'lang'}->txt('PersonType'),
+            name  => $Data->{'lang'}->txt('Person Type'),
             field => 'PersonType',
         },
         {
@@ -335,11 +335,11 @@ sub listRules  {
             field => 'Sport',
         },
         {
-            name  => $Data->{'lang'}->txt('PersonLevel'),
+            name  => $Data->{'lang'}->txt('Person Level'),
             field => 'PersonLevel',
         },
         {
-            name  => $Data->{'lang'}->txt('AgeLevel'),
+            name  => $Data->{'lang'}->txt('Age Level'),
             field => 'AgeLevel',
         },
         {

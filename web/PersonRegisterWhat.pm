@@ -615,7 +615,7 @@ sub getPersonTypeFromMatrix {
     my @retdata=();
     while (my $dref = $query->fetchrow_hashref())   {
         push @retdata, {
-            name => $personTypeList->{$dref->{'strPersonType'}},
+            name => $Data->{'lang'}->txt($personTypeList->{$dref->{'strPersonType'}}),
             value => $dref->{'strPersonType'},
         }
         #$values{$dref->{'strPersonType'}} = $personTypeList->{$dref->{'strPersonType'}};
@@ -701,7 +701,7 @@ sub getPersonLevelFromMatrix {
 
         if($dref->{'strPersonLevel'}){
             push @retdata, {
-                name => $personLevelList->{$dref->{'strPersonLevel'}},
+                name => $Data->{'lang'}->txt($personLevelList->{$dref->{'strPersonLevel'}}),
                 value => $dref->{'strPersonLevel'},
             }
         }

@@ -31,7 +31,7 @@ sub getCustomFieldNames	{
         $query->execute($realmID);
         while (my($dbf, $name, $locked, $subtype) = $query->fetchrow_array) {
             next if($subtype and $subtype != $subtypeID);
-            $CustomFieldNames{$dbf}=[$name, $locked];
+            $CustomFieldNames{$dbf}=[$Data->{'lang'}->txt($name), $locked];
         }
 	}
 	return \%CustomFieldNames;
