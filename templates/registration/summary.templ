@@ -62,6 +62,7 @@
 				</div>
 			</div>
     [% IF DisplayPayment %]
+		[% IF payment.totalPaymentDue %]
 	        <div class="clearfix" style="clear:both;">&nbsp;</div>
 			<div class="col-md-6">
 				<div class="read-only license-details">
@@ -75,6 +76,7 @@
 				     </div>
 				</div>
 			</div>
+		[% END %]
     [% END %]
 
 	[% IF registration.documents.size %]
