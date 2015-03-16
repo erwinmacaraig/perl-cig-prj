@@ -1155,8 +1155,6 @@ sub process_documents {
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
 
-warn("OOO $regoID:$personID");
-print STDERR Dumper($self->{'RunParams'});
     my $rego_ref = {};
 	my $personObj;
     my $content = '';

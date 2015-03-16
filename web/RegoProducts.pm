@@ -64,7 +64,6 @@ sub getRegoProducts {
         $dref->{strProductNotes}=~s/\n/<br>/g;
         next if $product_seen{$dref->{'intProductID'}};
         next if $dref->{intInactive};
-print STDERR "999999999999\n";
         my $filter_display = productAllowedThroughFilter($dref, $memdetails, $timeLocally, $productAttributes, $filter_params);      
         $anyAllowQty ||= $dref->{'intAllowQtys'} || 0;
         my $amount = currency(getCorrectPrice($dref, $multipersonType)) || 0;
@@ -445,7 +444,6 @@ sub productAllowedThroughFilter {
 
                 if($productAttributes->{$dref->{'intProductID'}}{$Defs::PRODUCT_DOB_MAX}
                     and $productAttributes->{$dref->{'intProductID'}}{$Defs::PRODUCT_DOB_MAX}[0] ne 'NULL' ) {
-print STDERR "IN MAX CHECK ~~~~~~~~";
                     return 0 if ($dob gt $productAttributes->{$dref->{'intProductID'}}{$Defs::PRODUCT_DOB_MAX}[0]);
                 }
 

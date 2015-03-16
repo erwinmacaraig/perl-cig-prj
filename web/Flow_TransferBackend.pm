@@ -545,7 +545,6 @@ sub process_registration {
     my $registrationNature = $self->{'RunParams'}{'d_nature'} || '';
     my $personRequestID = $self->{'RunParams'}{'prid'} || '';
 
-print STDERR "SPORT$sport$personType$personLevel$regoID\n";
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
     }
@@ -555,7 +554,6 @@ print STDERR "SPORT$sport$personType$personLevel$regoID\n";
             $self->deleteExistingReg($existingReg, $personID);
         }
         if(! $regoID) {#!$existingReg or $changeExistingReg)    {
-print STDERR "ADD REGO WAS $regoID";
             ($regoID, undef, $msg) = add_rego_record(
                 $self->{'Data'}, 
                 $personID, 
