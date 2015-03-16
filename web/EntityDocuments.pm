@@ -295,7 +295,8 @@ sub new_doc_form {
 		<form action="uploadregofile.cgi" method="POST" enctype="multipart/form-data" class="dropzone" id = "docform">
          <script>
               Dropzone.options.docform = { 
-                  maxFilesize: 25 // MB 
+                  maxFilesize: 25, // MB 
+				  dictDefaultMessage:"] . $Data->{'lang'}->txt('Click here to upload file') . qq["	
               };
          </script>
 
@@ -314,6 +315,7 @@ sub new_doc_form {
 	<input type="hidden" name="entitydocs" value="1" />
 	<input type="hidden" name="a" value="C_DOCS_u" />
 	<input type="hidden" name="pID" value="$entityID" />
+	<input type="hidden" name="nff" value="1" />
 		</form> 
                 <br />  
                 <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS">] . $Data->{'lang'}->txt('Continue').q[</a></span>

@@ -2953,7 +2953,9 @@ sub transferDocsForm {
 	     <script>
               Dropzone.options.transferdocs = { 
                   maxFilesize: 25, // MB 
+				  dictDefaultMessage:"] . $Data->{'lang'}->txt('Click here to upload file') . qq[",
 	              maxFiles: 10
+				  
               };
          </script>
          <br /> 

@@ -58,12 +58,21 @@
 			[% IF !NoBackButton and BackButtonURL %]
 				<a href = "[% BackButtonURL %]" id = "flow-btn-back" class = "[% IF processStatus == 1 %]nudge[% END %]">[% IF BackButtonText %][% Lang.txt(BackButtonText) %][% ELSE %][% Lang.txt('Back') %][% END %]</a>
 			[% END %]
+			[% IF AllowSaveState %]
+                [% IF CancelButtonURL %]
+                <a href = "[% CancelButtonURL %]" class = "btn btn-main">[% Lang.txt('Cancel') %]</a>
+                [% END %]
+                [% IF !NoBackButton and BackButtonURL and SaveButtonURL %]
+                <a href = "[% SaveButtonURL %]" class = "btn btn-main">[% Lang.txt('Save and Exit') %]</a>
+                [% END %]
+            [% END %]
 			[% IF !NoContinueButton %]
 				<input id = "flow-btn-continue" type = "submit" value = " [% Lang.txt(ContinueButtonText) %] "  class = "btn-main btn-proceed">
 			[% END %]
 			</div>
 		</div>
     	</form>
+	</form>
 </div>
 
 [% IF FlowSummary or FlowSummaryContent %]

@@ -33,6 +33,8 @@ use PersonFieldsSetup;
 use PersonRegistration;
 use PersonSummaryPanel;
 use RenewalDetails;
+use JSON;
+use IncompleteRegistrations;
 
 use RegoProducts;
 
@@ -44,7 +46,7 @@ sub setProcessOrder {
     my $regname = $typename
         ? $typename .' Registration'
         : 'Registration';
-    $self->{'ProcessOrder'} = [       
+    my $steps1 = [       
         {
             'action' => 'cd',
             'function' => 'display_core_details',
@@ -58,18 +60,6 @@ sub setProcessOrder {
             'function' => 'validate_core_details',
             'fieldset'  => 'core',
         },        
-        #{
-            #'action' => 'minor',
-            #'function' => 'display_minor_fields',
-            #'label'  => 'Minor',
-            #'fieldset'  => 'minor',
-            #'NoNav'     => 1,
-        #},
-        #{
-            #'action' => 'minoru',
-            #'function' => 'validate_minor_fields',
-            #'fieldset'  => 'minor',
-        #},
         {
             'action' => 'cond',
             'function' => 'display_contact_details',
@@ -82,17 +72,6 @@ sub setProcessOrder {
             'function' => 'validate_contact_details',
             'fieldset'  => 'contactdetails',
         },
-        #{
-            #'action' => 'od',
-            #'function' => 'display_other_details',
-            #'label'  => 'Other Details',
-            #'fieldset'  => 'otherdetails',
-        #},
-        #{
-            #'action' => 'odu',
-            #'function' => 'validate_other_details',
-            #'fieldset'  => 'otherdetails',
-        #},
         {
             'action' => 'r',
             'function' => 'display_registration',
@@ -102,7 +81,9 @@ sub setProcessOrder {
         {
             'action' => 'ru',
             'function' => 'process_registration',
-        },
+        }
+    ];
+    my $stepscert = [
         {
             'action' => 'cert',
             'function' => 'display_certifications',
@@ -116,6 +97,8 @@ sub setProcessOrder {
             'function' => 'process_certifications',
             'fieldset'  => 'certifications',
         },
+    ];
+    my $steps2 = [
         {
             'action' => 'd',
             'function' => 'display_documents',
@@ -151,6 +134,12 @@ sub setProcessOrder {
             'NoDisplayInNav' => 1,
         },
     ];
+    my @order = @{$steps1};
+    if(($dtype eq 'COACH' or $dtype eq 'REFEREE'))   {
+        push @order, @{$stepscert};
+    }
+    push @order, @{$steps2};
+    $self->{'ProcessOrder'} = \@order;
 }
 
 sub setupValues    {
@@ -625,7 +614,7 @@ sub display_registration {
     }
     elsif($defaultRegistrationNature eq 'RENEWAL') {
         my $rawDetails;
-        ($content, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rpID'});
+        ($content, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rtargetid'});
 
         if(!$content or !$rawDetails) {
             push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt('Invalid Renewal Details');
@@ -690,6 +679,7 @@ sub process_registration {
     my $personRequestID = $self->{'RunParams'}{'prid'} || '';
     my $entitySelected = $self->{'RunParams'}{'d_eId'} || '';
     my $entityTypeSelected = $self->{'RunParams'}{'d_etype'} || '';
+    my $MAComment = $self->{'RunParams'}{'d_ma_comment'} || '';
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
@@ -741,6 +731,7 @@ sub process_registration {
                 undef,
                 undef,
                 $personRequestID,
+                $MAComment,
             );
         }
         if($changeExistingReg)  {
@@ -1161,6 +1152,8 @@ sub process_documents {
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
 
+warn("OOO $regoID:$personID");
+print STDERR Dumper($self->{'RunParams'});
     my $rego_ref = {};
 	my $personObj;
     my $content = '';
@@ -1679,4 +1672,26 @@ sub rebuildClient   {
 }
 
  
+sub getStateIds {
+    my $self = shift;
+
+    my $currentLevel = $self->{'ClientValues'}{'authLevel'} || 0;
+    my $userEntityID = getID($self->{'ClientValues'}, $currentLevel) || 0;
+
+    return (
+        'PERSON',
+        $userEntityID,
+        $self->ID(),
+        $self->{'RunParams'}{'rID'} || 0,
+        $self->{'ClientValues'}{'userID'},
+    );
+}
+
+sub cancelFlow{
+    my $self = shift;
+
+    IncompleteRegistrations::deleteRelatedRegistrationRecords($self->{'Data'}, $self->getStateIds());
+
+    return 1
+};
 

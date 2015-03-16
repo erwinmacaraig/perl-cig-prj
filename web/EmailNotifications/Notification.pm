@@ -128,7 +128,6 @@ sub send {
     my $config = $template->getConfig();
 
     my $Data = $self->getData();
-    #print STDERR Dumper "EMAIL NOTIFICATION WRAPPER " . $Data->{'SystemConfig'}{'EmailNotificationWrapperTemplate'};
     #TODO: send text template if no wrapper
 
     my ($emailsentOK, $message)  = sendTemplateEmail(
@@ -138,6 +137,7 @@ sub send {
         $templateData->{'To'}{'email'},
         $config->{'strSubjectPrefix'} . $self->getSubject(),
         $templateData->{'From'}{'email'},
+        $templateData->{'CC'}{'email'},
     );
 
     #print STDERR Dumper "SENT STATUS ". $emailsentOK;

@@ -73,7 +73,7 @@ sub getUnique {
 
         my $clubID = $self->getData()->{'clientValues'}{'clubID'} || 0;
         $clubID = 0 if $clubID == $Defs::INVALID_ID;
-		
+			
         my $st = qq[
           SELECT DISTINCT
             tblPerson.intPersonID,
@@ -89,8 +89,7 @@ sub getUnique {
             tblPerson
             INNER JOIN tblPersonRegistration_$realmID AS PR ON (
               tblPerson.intPersonID = PR.intPersonID
-              AND PR.strStatus <> 'DELETED'
-              AND PR.strStatus <> 'INPROGRESS'
+              AND PR.strStatus IN ('ACTIVE','PASSIVE','PENDING')
               AND PR.intEntityID IN ($entity_list)
             )
             INNER JOIN tblEntity AS E ON (
@@ -105,7 +104,6 @@ sub getUnique {
 		my $q = $self->getData->{'db'}->prepare($st);
         $q->execute();
         my %origClientValues = %{$self->getData()->{'clientValues'}};
-        open FH, ">../dumpfile.txt"; print FH "\nSQL : $st \n";
         my $numnotshown = ($results->{'total'} || 0) - 10;
         $numnotshown = 0 if $numnotshown < 0;
         while(my $dref = $q->fetchrow_hashref())  {
@@ -320,6 +318,20 @@ sub getPersonRegistration {
             push @persons, $r->{'doc'};
         }
     }
+	my @persontypes = ();
+	my $filterstring = '';
+	my $personTypeFilter = '';
+	my $currentLevel = $self->getData()->{'clientValues'}{'currentLevel'};
+	if($currentLevel == $Defs::LEVEL_CLUB){
+		my $filterstatement = qq[ SELECT DISTINCT strPersonType FROM tblMatrix WHERE intRealmID = ? and intEntityLevel= ?];
+		my $query = $self->getData->{'db'}->prepare($filterstatement);
+        $query->execute($self->getData()->{'Realm'},$Defs::LEVEL_CLUB);
+		while(my $dref = $query->fetchrow_hashref()){
+			push @persontypes, $dref->{'strPersonType'};
+		}
+		$filterstring = q['] . join("','",@persontypes) . q['];
+		$personTypeFilter = qq[AND PR.strPersonType IN ($filterstring) ];
+	}
 
     my @memarray = ();
     if(@persons)  {
@@ -358,12 +370,14 @@ sub getPersonRegistration {
             )
             WHERE tblPerson.intPersonID IN ($person_list)
                 AND tblPerson.strStatus IN ('REGISTERED', 'PENDING')
+                $personTypeFilter
             ORDER BY 
                 tblPerson.strLocalSurname,
                 tblPerson.strLocalFirstname,
                 tblPerson.strNationalNum
             LIMIT 100
         ];
+
         my $q = $self->getData->{'db'}->prepare($st);
         $q->execute();
         my %origClientValues = %{$self->getData()->{'clientValues'}};
@@ -399,7 +413,7 @@ sub getPersonRegistration {
                 role => $Defs::personType{$dref->{'strPersonType'}},
             };
         }
-
+		
         $self->setResultCount($count);
 
         if($raw){
@@ -407,10 +421,16 @@ sub getPersonRegistration {
         }
         else {
             my @roleFilters;
-            foreach my $role (keys %Defs::personType){
-                push @roleFilters, $Defs::personType{$role};
-            }
-
+			foreach my $role (keys %Defs::personType){
+				if(scalar @persontypes){
+					if(grep /$role/,@persontypes){
+	                	push @roleFilters, $Defs::personType{$role};
+					}
+				}
+				else {
+					push @roleFilters, $Defs::personType{$role};
+				}
+			}			
             my %filters = (
                 role => \@roleFilters,
             );

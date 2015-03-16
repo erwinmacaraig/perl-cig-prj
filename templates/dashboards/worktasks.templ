@@ -64,11 +64,11 @@
 					<select class="filter-status" id="u53_input">
 			          <option value="">-- All --</option>
                       [% IF CurrentLevel == 100 OR CurrentLevel == 20 %]
-                      <option value="Ready to Approve">Ready to Approve</option>
+                      <option value="Ready to Approve">[% Lang.txt('Ready to Approve') %]</option>
                       [% END %]
-                      <option value="Task On Hold">Task On Hold</option>
-                      <option value="Accepted">Accepted</option>
-                      <option value="Pending">Pending</option>
+                      <option value="Task On Hold">[% Lang.txt('Task On Hold') %]</option>
+                      <option value="Accepted">[% Lang.txt('Accepted') %]</option>
+                      <option value="Pending">[% Lang.txt('Pending') %]</option>
                       <!--
                       [% FOREACH taskStatus IN TaskFilters.status %]
                       <option value="[% taskStatus %]">[% taskStatus %]</option>
@@ -123,7 +123,7 @@
                             <span class="fa fa-user" style="float: left"></span>
                             <div style="float: left; word-wrap: break-word;width: 80%;">
                             [% task.RegistrationNatureLabel %]<br/>
-                            Review Transfer of [% task.Name %]<br/>
+                            [% Lang.txt('Review Transfer of') %] [% task.Name %]<br/>
                             From [% task.RequestToClub %] to [% task.RequestFromClub %]<br/>
                             </div>
                         </td>

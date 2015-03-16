@@ -202,10 +202,11 @@ sub getFieldLabels	{
             strDiscipline => 'Sport',
             #strEntityType => 'Entity Type',
             strEntityType => 'Organisation Type',
-            intNotifications => 'Notification Toggle',
+            intNotifications => 'Email Notifications',
             strOrganisationLevel => 'Level',
             dissolved => 'Dissolved',
             intFacilityTypeID => 'Venue Type',
+            strBankAccountNumber => 'Bank Account Details',
             );
 	}
 
@@ -250,7 +251,7 @@ sub getFieldLabels	{
             strGender => 'Gender',
             strDiscipline => 'Sport',
             strEntityType => 'Entity Type',
-            intNotifications => 'Notification Toggle',
+            intNotifications => 'Email Notifications',
             intEntityFieldCount => 'Number of Fields',
             intFacilityTypeID => 'Venue Type',
             );

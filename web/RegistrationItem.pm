@@ -79,7 +79,7 @@ sub getRegistrationItems    {
 	        $Rego_ref->{'currentAge'} || 0,
 	        
 		) or query_error($st);
-       my @values = (); 
+    my @values = (); 
     push @values, $Data->{'Realm'};  
     push @values,$Data->{'RealmSubType'}; 
     push @values,$ruleFor;

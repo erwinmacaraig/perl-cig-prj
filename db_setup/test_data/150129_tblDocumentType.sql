@@ -1,0 +1,3 @@
+INSERT INTO tblDocumentType (intDocumentTypeID,intRealmID, strDocumentName, intActive, strDocumentFor, strDescription, strActionPending) VALUES ('64','1', 'Location Map', '1', 'VENUE', 'Provides a specific location of the venue', 'VENUE');
+INSERT INTO tblDocumentType (intDocumentTypeID,intRealmID, strDocumentName, intActive, strDocumentFor, strDescription, strActionPending) VALUES ('65','1', 'House Rules', '1', 'VENUE', 'Specific rules to be followed for holding a sporting event for the specified venue', 'VENUE');
+INSERT INTO tblDocumentType (intDocumentTypeID,intRealmID, strDocumentName, intActive, strDocumentFor, strDescription, strActionPending) VALUES ('66','1', 'Venue Details', '1', 'VENUE', 'Description of Venue', 'VENUE');

@@ -68,11 +68,13 @@ use EntityRegistrationAllowedEdit;
 use PersonRegistrationFlow_Backend;
 use PersonRegistrationFlow_Bulk;
 use PendingRegistrations;
+use IncompleteRegistrations;
 
 use PersonRequest;
 
 use Log;
 use Data::Dumper;
+use ListAuditLog;
 
 main();
 
@@ -301,7 +303,11 @@ use TransferFlow;
         my $entityID = getID($Data{'clientValues'},$Data{'clientValues'}{'currentLevel'});
         ( $resultHTML, $pageHeading ) = handlePendingRegistrations($action, \%Data, $entityID, $prID);
        # $pageHeading = $pageHeading . "entityID = " . $entityID;    
-}
+    }
+    elsif ( $action =~ /^INCOMPLPR_/ ) {
+        my $entityID = getID($Data{'clientValues'},$Data{'clientValues'}{'currentLevel'});
+        ( $resultHTML, $pageHeading ) = handleIncompleteRegistrations($action, \%Data, $entityID);
+    }
     elsif ( $action =~ /^PRA_/) {
         ($resultHTML, $pageHeading) = handlePersonRequest($action, \%Data);
     }
@@ -319,10 +325,15 @@ use TransferFlow;
 		use ITC_TransferCertificate;
 		($resultHTML, $pageHeading) = ITC_TransferCertificate::show_itc_request_form(\%Data);
 	}
-    
+    elsif ( $action =~ /^V_HISTLOG/ ) {
+        my $venueID= safe_param( 'venueID', 'number' );
+        ($resultHTML,$pageHeading) = listEntityAuditLog(\%Data, $venueID);
+        
+    }
+
    
     # BUILD PAGE
-    if ( !$report ) {
+    #if ( !$report ) {
         $client = setClient( \%clientValues );
         $clientValues{INTERNAL_db} = $db;
         my $navbar = navBar( \%Data, $DataAccess_ref, $Data{'SystemConfig'} );
@@ -337,8 +348,8 @@ use TransferFlow;
 		] if $pageHeading;
         pageMain( $Defs::page_title, $navbar, $resultHTML, \%clientValues,
             $client, \%Data );
-    }
-    else { printReport( $resultHTML, $lang ); }
+    #}
+    #else { printReport( $resultHTML, $lang ); }
     disconnectDB($db);
 }
 

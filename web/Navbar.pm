@@ -208,7 +208,7 @@ sub getEntityMenuData {
     }
     #if(exists $children->{$Defs::LEVEL_PERSON})    {
         $menuoptions{'persons'} = {
-            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}),
+            name => $lang->txt("List $Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}"),
             url => $baseurl."a=P_L&amp;l=$Defs::LEVEL_PERSON",
         };
     #}
@@ -228,6 +228,12 @@ sub getEntityMenuData {
         $menuoptions{'persons_addmaofficial'} = {
              name => $lang->txt('Add MA Official'),
             url => $baseurl."a=PF_&amp;dtype=MAOFFICIAL",
+        };
+    }
+    if($SystemConfig->{'menu_newperson_RAOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}.'_'.$currentLevel} && !$Data->{'ReadOnlyLogin'}) {
+        $menuoptions{'persons_addraofficial'} = {
+             name => $lang->txt('Add RA Official'),
+            url => $baseurl."a=PF_&amp;dtype=RAOFFICIAL",
         };
     }
     if($currentLevel == $Defs::LEVEL_CLUB and $SystemConfig->{'menu_newperson_TEAMOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
@@ -277,6 +283,11 @@ sub getEntityMenuData {
             name => $lang->txt('Pending Registrations'),
             url => $baseurl."a=PENDPR_",
         };
+        $menuoptions{'incomplete'} = {
+            name => $lang->txt('Incomplete Registrations'),
+            url => $baseurl."a=INCOMPLPR_",
+        };
+
         if ($SystemConfig->{'allowBulkRenewals'})   {
             $menuoptions{'bulk'} = {
                 name => $lang->txt('Bulk Renewals'),
@@ -391,7 +402,7 @@ sub getEntityMenuData {
                 };
 
     # for Entity menu
-    if($SystemConfig->{'menu_newclub_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+    if(($SystemConfig->{'menu_newclub_'.$Data->{'clientValues'}{'authLevel'}.'_'.$currentLevel} or $SystemConfig->{'menu_newclub_'.$Data->{'clientValues'}{'authLevel'}}) && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'addclub'} = {
              name => $lang->txt("Add $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}"),
             url => $baseurl."a=C_DTA",
@@ -465,11 +476,14 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
             'persons_addclubofficial',
             'persons_addofficial',
             'persons_addmaofficial',
+            'persons_addraofficial',
             'bulk',
+            'persons',
         ]],
         [ $lang->txt('Work Tasks'), 'menu',[
             'approvals',
-            'pending'
+            'pending',
+            'incomplete'
         ]],
         [ $lang->txt('Transfers'), 'menu', [
         'clearances',    
@@ -709,6 +723,10 @@ sub getClubMenuData {
             name => $lang->txt('Pending Registrations'),
             url => $baseurl."a=PENDPR_",
         };
+        $menuoptions{'incomplete'} = {
+            name => $lang->txt('Incomplete Registrations'),
+            url => $baseurl."a=INCOMPLPR_",
+        };
       
         $menuoptions{'clubdocs'} = {
         url => $baseurl."a=C_DOCS",
@@ -717,7 +735,7 @@ sub getClubMenuData {
         name => $lang->txt('My Club'),
         url => $baseurl."a=EE_D",
     };
-    if (1==2 && $Data->{'clientValues'}{'authLevel'}>= $Defs::LEVEL_NATIONAL )   {
+    if ($Data->{'clientValues'}{'authLevel'}>= $Defs::LEVEL_NATIONAL )   {
         $menuoptions{'auditlog'} = {
             name => $lang->txt("Audit Trail"),
             url => $baseurl."a=C_HISTLOG",
@@ -798,6 +816,12 @@ sub getClubMenuData {
                 url => $baseurl."a=PF_&amp;dtype=MAOFFICIAL",
             };
         }
+        if($SystemConfig->{'menu_newperson_RAOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}.'_'.$currentLevel} && !$Data->{'ReadOnlyLogin'}) {
+            $menuoptions{'persons_addraofficial'} = {
+                 name => $lang->txt('Add RA Official'),
+                url => $baseurl."a=PF_&amp;dtype=RAOFFICIAL",
+            };
+        }
         if($currentLevel == $Defs::LEVEL_CLUB and $SystemConfig->{'menu_newperson_TEAMOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
             $menuoptions{'persons_addteamofficial'} = {
                 name => $lang->txt('Add Team Official'),
@@ -847,6 +871,7 @@ sub getClubMenuData {
         'persons_addclubofficial',
         'persons_addofficial',
         'persons_addmaofficial',
+        'persons_addraofficial',
 
         'requesttransfer',
         'requestaccess',
@@ -858,6 +883,7 @@ sub getClubMenuData {
         'listrequests',
         'duplicates',
         'bulk',
+        'persons',
          ]],
 
         [ $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}), 'menu',[
@@ -866,7 +892,8 @@ sub getClubMenuData {
         ]],
         [ $lang->txt('Club Work Tasks'), 'menu',[
             'approvals',
-            'pending'
+            'pending',
+            'incomplete'
         ]],
         [ $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Transactions"), 'menu','transactions',],
         [ $lang->txt('My Club'), 'menu',[
@@ -1123,12 +1150,13 @@ sub getPersonMenuData {
         $menuoptions{'auditlog'} = {
             name => $lang->txt("Audit Trail"),
             url => $baseurl."a=P_HISTLOG",
-        };
+        } if ($Data->{'clientValues'}{'authLevel'}>= $Defs::LEVEL_NATIONAL);
+
         $menuoptions{'regos'} = {
             name => $lang->txt("Registration History"),
             url => $baseurl."a=P_REGOS",
         };
-        if($clr)    {
+        if($clr and $Data->{'clientValues'}{'authLevel'}>= $Defs::LEVEL_NATIONAL)    {
             $menuoptions{'clr'} = {
                     name => $lang->txt('Transfer History'),
                  url => $baseurl."a=P_CLR",

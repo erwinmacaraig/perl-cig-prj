@@ -43,6 +43,7 @@
 					    	<li><span class="details-left">[% Lang.txt("Legal entity identification number") %]:</span> <span class="details-value">[% IF strLegalID %][% strLegalID%][% ELSE %] - [% END %]</span></li>
 					    	<li><span class="details-left">[% Lang.txt("Sport") %]:</span> <span class="details-value">[% IF sport %][% sport %][% ELSE %] - [% END %]</span></li>
 					    	<li><span class="details-left">[% Lang.txt("Level") %]:</span> <span class="details-value">[% IF organizationLevel %][% organizationLevel %][% ELSE %] - [% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Bank Account Details") %]:</span> <span class="details-value">[% IF bankAccountDetails %][% bankAccountDetails %][% ELSE %] - [% END %]</span></li>
 					    	<li><span class="details-left">[% Lang.txt("MA Comment") %]:</span> <span class="details-value">[% IF comment %][% comment %][% ELSE %] - [% END %]</span></li>
 					    </ul><br/>
 					    <a href="[% editlink %]&amp;rfp=role" class="pull-right">Edit</a>
@@ -52,7 +53,7 @@
 			
 			<div class="col-md-6">
 				<div class="read-only">
-					 <h4>Documents</h4>
+					 <h4>[% Lang.txt('Documents') %]</h4>
 					 <div class="read-only-text clearfix">
 					    <ul>  
 						[% FOREACH doc IN documents %]
