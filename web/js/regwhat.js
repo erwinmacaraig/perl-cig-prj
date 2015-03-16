@@ -51,6 +51,16 @@ function update_options(optionType, dtype)   {
               jQuery('.notavailable').show();           
              //(jQuery('#regopt_title_nooptions').html() + ": " + "<br/>" + error);
           }
+          if(optionType == 'etype' && jQuery('#clientLevel').val())   {
+              jQuery('#l_' + optionType ).val(jQuery('#clientLevel').val()); 
+              jQuery('#l_' + optionType ).fcToggle('rebuild');
+              jQuery('#l_' + optionType).trigger('change');
+          }
+          if(optionType == 'eId' && jQuery('#clientID').val())   {
+              jQuery('#l_' + optionType ).val(jQuery('#clientID').val()); 
+              jQuery('#l_' + optionType ).fcToggle('rebuild');
+              jQuery('#l_' + optionType).trigger('change');
+          }
         });
     }
 }
