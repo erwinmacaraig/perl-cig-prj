@@ -1,8 +1,8 @@
 package GatewayProcess;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT=qw(gatewayProcess payTryRead payTryRedirectBack payTryContinueProcess);
-@EXPORT_OK=qw(gatewayProcess payTryRead payTryRedirectBack payTryContinueProcess);
+@EXPORT=qw(gatewayProcess payTryRead payTryRedirectBack payTryContinueProcess markTXNSentToGateway);
+@EXPORT_OK=qw(gatewayProcess payTryRead payTryRedirectBack payTryContinueProcess markTXNSentToGateway);
 
 use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 
@@ -27,6 +27,29 @@ use TransferFlow;
 use BulkRenewalsFlow;
 
 use Data::Dumper;
+
+sub markTXNSentToGateway    {
+
+    my ($Data, $logID) = @_;
+
+    $logID ||= 0;
+    return if (! $logID);
+
+    my $st = qq[
+        UPDATE tblTransLog as TL 
+            INNER JOIN tblTXNLogs as TXNLogs ON (TXNLogs.intTLogID = TL.intLogID)
+            INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLogs.intTXNID)
+        SET
+            TL.intSentToGateway = 1, T.intSentToGateway = 1
+        WHERE
+            TL.intLogID = ?
+            AND TL.intStatus=0 
+            AND T.intStatus=0
+    ];
+
+    my $query = $Data->{'db'}->prepare($st);
+    $query->execute($logID);
+}
 
 sub payTryContinueProcess {
 

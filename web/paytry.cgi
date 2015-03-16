@@ -184,14 +184,15 @@ print STDERR "DELAYED : $delayedURL\n";
 
     }
 
+    markTXNSentToGateway(\%Data, $logID);
+
     my $payTry = payTryRead(\%Data, $logID, $tryID);
-    if (1==1)   {
+    if ($paymentSettings->{'gatewayProcessPreGateway'})  {
         #$Data{'clientValues'} = $payTry;
-    my $client= setClient(\%{$payTry});
+        my $client= setClient(\%{$payTry});
         #$Data{'client'}=$client;
         initLocalisation(\%Data);
         payTryContinueProcess(\%Data, $payTry, $client, $logID);
-
     }
 
     my $cancelURL = payTryRedirectBack(\%Data, $payTry, $client, $logID, 0);

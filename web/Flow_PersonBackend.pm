@@ -34,6 +34,7 @@ use PersonRegistration;
 use PersonSummaryPanel;
 use RenewalDetails;
 
+use RegoProducts;
 
 sub setProcessOrder {
     my $self = shift;

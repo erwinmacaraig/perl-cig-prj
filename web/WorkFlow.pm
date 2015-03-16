@@ -111,6 +111,7 @@ print STDERR "_____________________ NOT SURE IF LIMIT NEEDED\n";
                         AND intEntityID = ?
                         AND intPersonRegistrationID = ?
                         AND strStatus = 'PENDING'
+                        AND intPaymentRequired=0
                 ];
                 my $qUPD= $Data->{'db'}->prepare($stUPD);
                 $qUPD->execute($personID, $entityID, $personRegistrationID);

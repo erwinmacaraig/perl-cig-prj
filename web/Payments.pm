@@ -488,6 +488,7 @@ sub getPaymentSettings	{
         $settings{'gatewayLevel'} = $dref->{intLevelID} || 0;
         $settings{'gatewayRuleID'} = $dref->{intPaymentSplitRuleID} || 0;
         $settings{'allowPayment'} = $dref->{intAllowPayment} || 0;
+        $settings{'gatewayProcessPreGateway'} = $dref->{intProcessPreGateway} || 0;
         $settings{'onlinePayment'} = (exists $Defs::onlinePaymentTypes{$paymentType}) ? 1 : 0; 
 
         if ($external)	{
