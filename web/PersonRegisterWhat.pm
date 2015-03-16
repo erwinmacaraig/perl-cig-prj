@@ -55,6 +55,8 @@ sub displayPersonRegisterWhat   {
         existingReg => $regoID || 0,
         EntitySelection => $entitySelection || 0,
         DefaultEntity => getLastEntityID($Data->{'clientValues'}) || 0,
+        ClientID => getLastEntityID($Data->{'clientValues'}) || 0,
+        ClientLevel => getLastEntityLevel($Data->{'clientValues'}) || 0,
         AllowMAComment => $systemConfig->{'personRegoAllowMAComment'},
     );
     if($entitySelection)    {
@@ -747,6 +749,8 @@ sub _entityList {
             AND intEntityID = ?
             AND intEntityLevel = ?
             AND E.strStatus = 'ACTIVE'
+        ORDER BY
+            E.strLocalName
         )
     ];
     my $q = $Data->{'db'}->prepare($st);
