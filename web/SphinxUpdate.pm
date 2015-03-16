@@ -12,7 +12,7 @@ use DBI;
 
 sub updateSphinx {
     my ($db, $cache, $type, $actionType, $object) = @_;
-return 1;
+#return 1;
     return 0 if !$object;
     return 0 if !$object->ID();
     my $realm= $object->getValue('intRealmID') || 0;
