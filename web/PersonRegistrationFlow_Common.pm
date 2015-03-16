@@ -509,7 +509,6 @@ print STDERR "COMPLETE RUN OK IS $ok | $run\n\n";
        $cv{'currentLevel'} = $Defs::LEVEL_NATIONAL;
        my $mlm = setClient(\%cv);
 
-<<<<<<< HEAD
 	    ## PaymentMethod
         #payLaterOn	 = 1/0
         my $logID = param('tl') || 0;
@@ -517,10 +516,7 @@ print STDERR "COMPLETE RUN OK IS $ok | $run\n\n";
         my $payStatus = 0;
         ($payStatus, $paymentResult) = displayPaymentResult($Data, $logID, 1, '');
 
-print STDERR "DDDDDDDDDDDDDDDDDDDDDDDDDDDDD: $payStatus $logID $payMethod $amountDue\n";
         $payMethod = '' if (!$amountDue and $payStatus == -1);
-=======
->>>>>>> develop
         my %PageData = (
             payLaterFlag=> ($amountDue and $payMethod eq 'later') ? 1 : 0,
             payNowFlag=> ($payMethod eq 'now') ? 1 : 0,
