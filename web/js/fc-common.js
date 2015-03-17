@@ -139,8 +139,7 @@ function updateRegoProductsTotal(chkb,id_cost,id_total){
 	//if( $('form#flowFormID td.col-1 input[type="checkbox"]:checked').prop("checked") == true){
 	if( $('#'+chkb).prop("checked") == true){
 		total = total + parseFloat($("#"+id_cost).val());		
-	}
-	
+	}	
 	else {
 		total = total - parseFloat($("#"+id_cost).val());
 	}

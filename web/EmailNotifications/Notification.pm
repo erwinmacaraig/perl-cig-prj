@@ -139,7 +139,7 @@ sub send {
         $config->{'strSubjectPrefix'} . $self->getSubject(),
         $templateData->{'From'}{'email'},
     );
-
+    
     #print STDERR Dumper "SENT STATUS ". $emailsentOK;
     #print STDERR Dumper "MESSAGE ". $message;
 }

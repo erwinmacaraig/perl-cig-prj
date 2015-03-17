@@ -392,7 +392,6 @@ sub display_products {
     if (@prodIDs)   {
         $product_body= getRegoProducts($self->{'Data'}, \@prodIDs, 0, $entityID, 0, 0, 0, 0, \%ProductRules);
      }
-
      my %ProductPageData = (
          #nextaction=>"PREGF_PU",
         target => $self->{'Data'}->{'target'},
