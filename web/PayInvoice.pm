@@ -335,12 +335,12 @@ sub queryInvoiceByOtherInfo {
     SELECT 
 	tblTransactions.intTransactionID,
 	tblInvoice.strInvoiceNumber, 
-	tblTransactions.intQty, 
 	tblTransactions.intStatus,
+	tblTransactions.intQty, 
 	tblProducts.strName, 
 	tblPerson.strLocalFirstname,
 	tblPerson.strLocalSurname,
-	tblPerson.intPersonID,
+	tblPerson.intPersonID,	
 	(tblTransactions.curAmount * tblTransactions.intQty) as TotalAmount 
 	FROM tblTransactions INNER JOIN tblPersonRegistration_$Data->{'Realm'}
 	ON (tblPersonRegistration_$Data->{'Realm'}.intPersonRegistrationID = tblTransactions.intPersonRegistrationID AND tblPersonRegistration_$Data->{'Realm'}.intPersonID = tblTransactions.intID)
@@ -351,6 +351,8 @@ sub queryInvoiceByOtherInfo {
 	@whereClause
 	];	
 
+	# intStatus = 0 unpaid
+	#  
 	my $sth = $Data->{'db'}->prepare($query); 
 	$sth->execute();
 
@@ -361,10 +363,9 @@ sub queryInvoiceByOtherInfo {
 
 	my $results = 0;
 	my @rowdata = ();
-	
-	while(my $dref = $sth->fetchrow_hashref()){
-		$results = 1;
-		
+	my $isPaid = 0;
+	while(my $dref = $sth->fetchrow_hashref()){		
+		$results = 1;				
 		my $selectPay = qq[<input type="checkbox" name="act_$dref->{'intTransactionID'}" class="paytxn_chk" value="$dref->{'TotalAmount'}" />];	
 		$cv{'personID'} = $dref->{'intPersonID'};
         my $clm=setClient(\%cv);	
@@ -484,7 +485,7 @@ sub displayResults {
    
 	
 	if ($allowMP){
-	$gateway_body .= qq[
+	$gateway_body .= qq[<div  style="display:none;" id="payment_manual">
 						<h3 class="panel-header sectionheader" id="manualpayment">].$Data->{'lang'}->txt('Manual Payment').qq[</h3>
 				  		<div id="secmain2" class="panel-body fieldSectionGroup ">
 				  			<fieldset>
@@ -514,6 +515,7 @@ sub displayResults {
 								<input type="hidden" name="dt_end_paid" value="">
 							</div>
 						</div>
+					</div>
 			] 
 
 	}

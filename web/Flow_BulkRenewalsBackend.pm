@@ -285,7 +285,7 @@ print STDERR "PT INS " .$self->{'RunParams'}{'d_type'};
     my $lang = $self->{'Lang'};
 
 
-
+		 
     my $bulk_ref = {
             personType => $personType,
             personEntityRole=> $personEntityRole,
@@ -299,7 +299,7 @@ print STDERR "PT INS " .$self->{'RunParams'}{'d_type'};
             entityLevel => $entityLevel,
             current => 1,
      };
-
+	$bulk_ref->{'payMethod'} = $self->{'RunParams'}{'payMethod'} || '';
     my %Hidden=();
 
     my $content= displayRegoFlowProductsBulk($self->{'Data'}, 0, $client, $entityLevel, $originLevel, $bulk_ref, $entityID, 0, \%Hidden);

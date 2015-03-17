@@ -509,7 +509,8 @@ sub getTransList {
 	$hidePayment = 1 if($personID == -1);
 
     my $realmID = $Data->{'Realm'};
-	my $orderBy = $Data->{'SystemConfig'}{'TransListOrderBy'} || '';
+	#my $orderBy = $Data->{'SystemConfig'}{'TransListOrderBy'} || '';
+	my $orderBy = $Data->{'SystemConfig'}{'TransListOrderBy'} || 'ORDER BY t.dtPaid DESC';
     my $entityWHERE = '';
     if ($entityID)   {
         $entityWHERE = qq[ 
@@ -576,7 +577,8 @@ sub getTransList {
 		$orderBy
   ];
 #
-	
+open FH, ">dumpfile.txt";
+print FH "\n $statement \n";	
 	    #$prodSellLevel
     $statement =~ s/AND  AND/AND/g;
     my $query = $db->prepare($statement);
@@ -894,7 +896,8 @@ sub listTransactions {
 
     my $line = '';
 
-    my $entityNamePlural = 'Transactions';
+    #my $entityNamePlural = 'Transactions';
+	my $entityNamePlural = ' ';
     $entityNamePlural= ($Data->{'SystemConfig'}{'txns_link_name'}) ? $Data->{'SystemConfig'}{'txns_link_name'} : $entityNamePlural;
 
 	my $header=qq[$entityNamePlural];

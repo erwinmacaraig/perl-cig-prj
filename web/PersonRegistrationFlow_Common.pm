@@ -1065,9 +1065,11 @@ sub displayRegoFlowProductsBulk {
     );
     my @prodIDs = ();
     my %ProductRules=();
+	my $totalamountchk = 0;
     foreach my $product (@{$CheckProducts})  {
         push @prodIDs, $product->{'ID'};
         $ProductRules{$product->{'ID'}} = $product;
+		$totalamountchk += $product->{'ProductPrice'} if($product->{'Required'} && $product->{'ProductPrice'} > 0);
      }
     my $product_body='';
     if (@prodIDs)   {
@@ -1088,6 +1090,8 @@ sub displayRegoFlowProductsBulk {
         Lang => $Data->{'lang'},
         NoFormFields =>1,
         client=>$client,
+		amountCheck => $totalamountchk,
+		payMethod => $rego_ref->{'payMethod'},
     );
     my $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ') || '';
 
