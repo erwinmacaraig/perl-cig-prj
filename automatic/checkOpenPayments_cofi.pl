@@ -127,6 +127,7 @@ print STDERR "CHECK FOR $logID\n";
             
             ########
             my ($Order, $Transactions) = gatewayTransactions(\%Data, $logID);
+            #markGatewayAsResponded();
             my ($paymentSettings, undef) = getPaymentSettings(\%Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, 1);
             ########
 
