@@ -1,6 +1,6 @@
 [% FOREACH e IN errors %]
 	<div class="error login-error-page">
         <p>[% e %]</p>
-		<p><a href="/">[% Lang.txt('Click here to try again') %]</a></p>
+		<p><a href="[% returnURL || "/" %]">[% Lang.txt('Click here to try again') %]</a></p>
     </div>
 [% END %]

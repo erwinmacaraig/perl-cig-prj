@@ -94,6 +94,7 @@ $cookie_domain="emacaraig.spildevel"; ##CONFIG
 $COOKIE_MEMBER="reg_m";
 $COOKIE_LOGIN="_SP_M";
 $COOKIE_SRLOGIN="_SP_SR";
+$COOKIE_LANG ="_SP_LA";
 $COOKIE_ENTITY ="_SP_M_E";
 $COOKIE_EVENT="reg_e";
 $COOKIE_ACTSTATUS = 'SWOMREC';
@@ -182,6 +183,7 @@ $SPORT_TYPE_FUTSAL = 'FUTSAL';
         'TEAMOFFICIAL'=>'Team Official',
         'CLUBOFFICIAL'=>'Club Official',
         'MAOFFICIAL'=>'MA Official',
+        'RAOFFICIAL'=>'RA Official',
 );
 
 $PERSON_TYPE_PLAYER = 'PLAYER';
@@ -190,6 +192,7 @@ $PERSON_TYPE_REFEREE = 'REFEREE';
 $PERSON_TYPE_TEAMOFFICIAL= 'TEAMOFFICIAL';
 $PERSON_TYPE_CLUBOFFICIAL = 'CLUBOFFICIAL';
 $PERSON_TYPE_MAOFFICIAL = 'MAOFFICIAL';
+$PERSON_TYPE_RAOFFICIAL = 'RAOFFICIAL';
 
 %personLevel = (
     'AMATEUR_U_C'=>'Amateur (Under Contract)',
@@ -792,6 +795,10 @@ $MESSAGE_TYPE_SMS = 2;
 
 $PRODUCT_AGE_GROUPS = 1;
 $PRODUCT_MEMBER_TYPES = 2;
+$PRODUCT_DOB_MAX = 3;
+$PRODUCT_DOB_MIN = 4;
+$PRODUCT_AGE_MAX = 5;
+$PRODUCT_AGE_MIN = 6;
 
 $PRODUCT_PROGRAM_NEW = 5;
 $PRODUCT_PROGRAM_RETURNING = 6;
@@ -1034,6 +1041,7 @@ $GROUND_NATURE_UNKNOWN = "UNKNOWN";
     "NEW_COACH" => "New Coach Registration",
     "NEW_PLAYER" => "New Player Registration",
     "NEW_MAOFFICIAL" => "New MA Official Registration",
+    "NEW_RAOFFICIAL" => "New RA Official Registration",
     "NEW_CLUBOFFICIAL" => "New Club Official Registration",
     "NEW_TEAMOFFICIAL" => "New Team Official Registration",
     "NEW_REFEREE" => "New Referee Registration",
@@ -1045,6 +1053,7 @@ $GROUND_NATURE_UNKNOWN = "UNKNOWN";
     "RENEWAL_COACH" => "Renewal of Coach Registration",
     "RENEWAL_PLAYER" => "Renewal of Player Registration",
     "RENEWAL_MAOFFICIAL" => "Renewal of MA Official Registration",
+    "RENEWAL_RAOFFICIAL" => "Renewal of RA Official Registration",
     "RENEWAL_CLUBOFFICIAL" => "Renewal of Club Official Registration",
     "RENEWAL_TEAMOFFICIAL" => "Renewal of Team Official Registration",
     "RENEWAL_REFEREE" => "Renewal of Referee Registration",

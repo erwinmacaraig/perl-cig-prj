@@ -230,6 +230,12 @@ sub getEntityMenuData {
             url => $baseurl."a=PF_&amp;dtype=MAOFFICIAL",
         };
     }
+    if($SystemConfig->{'menu_newperson_RAOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}.'_'.$currentLevel} && !$Data->{'ReadOnlyLogin'}) {
+        $menuoptions{'persons_addraofficial'} = {
+             name => $lang->txt('Add RA Official'),
+            url => $baseurl."a=PF_&amp;dtype=RAOFFICIAL",
+        };
+    }
     if($currentLevel == $Defs::LEVEL_CLUB and $SystemConfig->{'menu_newperson_TEAMOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'persons_addteamofficial'} = {
             name => $lang->txt('Add Team Official'),
@@ -277,6 +283,11 @@ sub getEntityMenuData {
             name => $lang->txt('Pending Registrations'),
             url => $baseurl."a=PENDPR_",
         };
+        $menuoptions{'incomplete'} = {
+            name => $lang->txt('Incomplete Registrations'),
+            url => $baseurl."a=INCOMPLPR_",
+        };
+
         if ($SystemConfig->{'allowBulkRenewals'})   {
             $menuoptions{'bulk'} = {
                 name => $lang->txt('Bulk Renewals'),
@@ -311,7 +322,7 @@ sub getEntityMenuData {
                 url => $baseurl."a=CL_list",
             };
             $menuoptions{'clearancesettings'} = {
-                name => $lang->txt("$txt_Clr Settings"),
+                name => $lang->txt("Clearances Settings"),
                 url => $baseurl."a=CLRSET_",
             };
             if(
@@ -391,16 +402,16 @@ sub getEntityMenuData {
                 };
 
     # for Entity menu
-    if($SystemConfig->{'menu_newclub_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+    if(($SystemConfig->{'menu_newclub_'.$Data->{'clientValues'}{'authLevel'}.'_'.$currentLevel} or $SystemConfig->{'menu_newclub_'.$Data->{'clientValues'}{'authLevel'}}) && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'addclub'} = {
-             name => $lang->txt("Add $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}"),
+             name => $lang->txt("Add Club"),
             url => $baseurl."a=C_DTA",
         };
     }
 
     if($SystemConfig->{'allowVenues'} && $SystemConfig->{'menu_newvenue_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'addvenue'} = {
-             name => $lang->txt("Add $Data->{'LevelNames'}{$Defs::LEVEL_VENUE}"),
+             name => $lang->txt("Add Venue"),
             url => $baseurl."a=VENUE_DTA",
         };
     }
@@ -451,12 +462,14 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
             'persons_addclubofficial',
             'persons_addofficial',
             'persons_addmaofficial',
+            'persons_addraofficial',
             'bulk',
             'persons',
         ]],
         [ $lang->txt('Work Tasks'), 'menu',[
             'approvals',
-            'pending'
+            'pending',
+            'incomplete'
         ]],
         [ $lang->txt('Transfers'), 'menu', [
         'clearances',    
@@ -523,7 +536,7 @@ sub getClubMenuData {
             url => $baseurl."a=C_HOME",
         },
         persons => {
-            name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}),
+            name => $lang->txt('List Persons'),
             url => $baseurl."a=P_L&amp;l=$Defs::LEVEL_PERSON",
         },
     );
@@ -542,7 +555,7 @@ sub getClubMenuData {
     if($currentLevel != $Data->{'clientValues'}{'authLevel'})   {
         delete($menuoptions{'home'});
     }
-    my $txt_RequestCLR = $SystemConfig->{'txtRequestCLR'} || 'Request a Clearance';
+    my $txt_RequestCLR = 'Request a Transfer';
 
     if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequestClearance'} 
     ) {
@@ -579,7 +592,7 @@ sub getClubMenuData {
                 url => $baseurl."a=CL_list",
             };
             $menuoptions{'clearancesettings'} = {
-                name => $lang->txt("$txt_Clr Settings"),
+                name => $lang->txt("Clearances Settings"),
                 url => $baseurl."a=CLRSET_",
             };
         }
@@ -668,7 +681,7 @@ sub getClubMenuData {
             )
             and allowedAction($Data, 'm_e')) {
         $menuoptions{'personrollover'} = {
-            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON}.' Rollover'),
+            name => $lang->txt('Person Rollover'),
             url => $baseurl."a=P_LSRO&amp;l=$Defs::LEVEL_PERSON",
         };
     }
@@ -690,6 +703,10 @@ sub getClubMenuData {
         $menuoptions{'pending'} = {
             name => $lang->txt('Pending Registrations'),
             url => $baseurl."a=PENDPR_",
+        };
+        $menuoptions{'incomplete'} = {
+            name => $lang->txt('Incomplete Registrations'),
+            url => $baseurl."a=INCOMPLPR_",
         };
       
         $menuoptions{'clubdocs'} = {
@@ -717,7 +734,7 @@ sub getClubMenuData {
 
     if ($SystemConfig->{'allowPersonRequest'}) {
         $menuoptions{'requesttransfer'} = {
-            name => $lang->txt('Request or Start a Transfer'),
+            name => $lang->txt('Request or start a transfer'),
             url => $baseurl."a=PRA_T",
             #url => $baseurl."a=INITSRCH_P&type=transfer&amp;origin=" . $Data->{'clientValues'}{'authLevel'},
         };
@@ -770,6 +787,12 @@ sub getClubMenuData {
                 url => $baseurl."a=PF_&amp;dtype=MAOFFICIAL",
             };
         }
+        if($SystemConfig->{'menu_newperson_RAOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}.'_'.$currentLevel} && !$Data->{'ReadOnlyLogin'}) {
+            $menuoptions{'persons_addraofficial'} = {
+                 name => $lang->txt('Add RA Official'),
+                url => $baseurl."a=PF_&amp;dtype=RAOFFICIAL",
+            };
+        }
         if($currentLevel == $Defs::LEVEL_CLUB and $SystemConfig->{'menu_newperson_TEAMOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
             $menuoptions{'persons_addteamofficial'} = {
                 name => $lang->txt('Add Team Official'),
@@ -802,7 +825,7 @@ sub getClubMenuData {
 
     if($SystemConfig->{'allowVenues'} && $SystemConfig->{'menu_newvenue_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'addvenue'} = {
-             name => $lang->txt("Add $Data->{'LevelNames'}{$Defs::LEVEL_VENUE}"),
+             name => $lang->txt("Add a Venue"),
             url => $baseurl."a=VENUE_DTA",
         };
     }
@@ -819,6 +842,7 @@ sub getClubMenuData {
         'persons_addclubofficial',
         'persons_addofficial',
         'persons_addmaofficial',
+        'persons_addraofficial',
 
         'requesttransfer',
         'requestaccess',
@@ -840,9 +864,10 @@ sub getClubMenuData {
         ]],
         [ $lang->txt('Club Work Tasks'), 'menu',[
             'approvals',
-            'pending'
+            'pending',
+            'incomplete'
         ]],
-        [ $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Transactions"), 'menu','transactions',],
+        [ $lang->txt("Club Transactions"), 'menu','transactions',],
         [ $lang->txt('My Club'), 'menu',[
         'myClub',
         ]],
@@ -850,7 +875,7 @@ sub getClubMenuData {
             'auditlog'
         ]],
 
-        [ $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Documents"), 'menu','clubdocs'],
+        [ $lang->txt("Club Documents"), 'menu','clubdocs'],
         [ $lang->txt('Identifiers'), 'menu','clubidentifier'],
         [ $lang->txt('Search'), 'search',[
         'advancedsearch',
@@ -975,7 +1000,7 @@ sub GenerateTree {
                 name => $name,
                 type => $levelType,
                 url => $url,
-                levelname => $Data->{'LevelNames'}{$levelType},
+                levelname => $Data->{'lang'}->txt($Data->{'LevelNames'}{$levelType}),
                 ma_phone_number => $Data->{'SystemConfig'}{'ma_phone_number'},
                 ma_website => $Data->{'SystemConfig'}{'ma_website'},
                 ma_email => $Data->{'SystemConfig'}{'ma_email'},
@@ -1109,7 +1134,7 @@ sub getPersonMenuData {
     my @menu_structure = (
         [ $lang->txt('Person Dashboard'), 'home','home'],
         [ $lang->txt('Player Passport'), 'menu','passport'],
-        [ $lang->txt($SystemConfig->{'txns_link_name'} || 'Transactions'), 'menu','transactions'],
+        [ $lang->txt('Transactions'), 'menu','transactions'],
         [ $lang->txt('Certificates'), 'menu','certificates'],
         [ $lang->txt('History'), 'menu',[
             'regos',

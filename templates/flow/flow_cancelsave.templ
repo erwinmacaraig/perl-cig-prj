@@ -1,0 +1,32 @@
+[% IF Navigation %]
+<div class = "col-md-12">
+    <h2 class="main-heading">[% PageTitle %]</h2>
+</div>
+[% END %]
+
+<div class = "col-md-12">
+
+    <div class="alert"> 
+        <div>
+            <span class="fa fa-info"></span>
+            <p>
+    [% IF action == '_save' %]
+
+        [% Lang.txt('This registration has been saved') %]
+
+    [% ELSIF action == '_cancel' %]
+
+        
+        [% Lang.txt('This registration has been cancelled') %]
+
+    [% END %]
+            </p>
+        </div>
+    </div>
+    [% IF action == '_cancel' and CancelFlowURL %]
+        <a href = "[% CancelFlowURL %]" class = "btn-main btn-proceed">[% Lang.txt('Continue') %]</a>
+    [% END %]
+    [% IF action == '_save' and SavedFlowURL %]
+        <a href = "[% SavedFlowURL %]" class = "btn-main btn-proceed">[% Lang.txt('Continue') %]</a>
+    [% END %]
+</div>

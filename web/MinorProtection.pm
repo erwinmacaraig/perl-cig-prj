@@ -39,10 +39,10 @@ sub getMinorProtectionExplanation {
 
     my $string = '';
     if($transfer)   {
-        $string = 'Transfer of Minor Players (between 12 and 18 years old) are subject to FIFA Regulations (International Transfers involving minors Art 19).';
+        $string = 'Transfer of Minor Players (between 10 and 18 years old) are subject to FIFA Regulations (International Transfers involving minors Art 19).';
     }
     else    {
-        $string = 'First Registration of Foreign National Minor Players (between 12 and 18 years old) are subject to FIFA regulations.';
+        $string = 'First Registration of Foreign National Minor Players (between 10 and 18 years old) are subject to FIFA regulations.';
     }
 
     return $Data->{'lang'}->txt($string) || '';

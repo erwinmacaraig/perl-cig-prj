@@ -30,6 +30,8 @@ use PersonSummaryPanel;
 use Data::Dumper;
 use UploadFiles;
 use EntitySummaryPanel;
+use IncompleteRegistrations;
+use Transactions;
 
 
 
@@ -668,6 +670,7 @@ sub display_summary     {
 			legaltype => Club::getLegalTypeName($self->{'Data'},$clubObj->{'DBData'}{'intLegalTypeID'}),
 			organizationType => $clubObj->{'DBData'}{'strEntityType'},
 			organizationLevel => $clubObj->{'DBData'}{'strOrganisationLevel'},  
+			bankAccountDetails => $clubObj->{'DBData'}{'strBankAccountNumber'},
 			editlink =>  $self->{'Data'}{'target'}."?".$self->stringifyURLCarryField(),
 	);
 	
@@ -719,7 +722,7 @@ sub display_complete {
                 $self->{'Data'},
                 'ENTITY',
                 'NEW',
-                $self->{'ClientValues'}{'authLevel'} || 0,
+                $self->{'ClientValues'}{'currentLevel'} || $self->{'ClientValues'}{'authLevel'} || 0,
                 $clubObj->ID(),
                 0,
                 0,
@@ -760,6 +763,7 @@ sub display_complete {
         client => $self->{'Data'}->{'client'},
         target => $self->{'Data'}->{'target'},
         MA => $maName,
+        url => $Defs::base_url,
     );
     my $displayClubForApproval = runTemplate(
         $self->{'Data'},
@@ -819,6 +823,7 @@ sub loadObjectValues    {
             strDiscipline
             strOrganisationLevel
             strMANotes
+            strBankAccountNumber
         )) {
             $values{$field} = $object->getValue($field);
         }
@@ -826,3 +831,29 @@ sub loadObjectValues    {
     return \%values;
 }
 
+
+sub getStateIds {
+    my $self = shift;
+
+    my $currentLevel = $self->{'ClientValues'}{'authLevel'} || 0;
+    my $userEntityID = getID($self->{'ClientValues'}, $currentLevel) || 0;
+
+    return (
+        'CLUB',
+        $userEntityID,
+        $self->ID(),
+        0,
+        $self->{'ClientValues'}{'userID'},
+    );
+}
+
+sub cancelFlow{
+    my $self = shift;
+
+    IncompleteRegistrations::deleteRelatedRegistrationRecords($self->{'Data'}, $self->getStateIds());
+
+    return 1;
+}
+
+
+1;

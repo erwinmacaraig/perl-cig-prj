@@ -30,6 +30,9 @@ use Data::Dumper;
 use FacilityFieldsSetup;
 use EntitySummaryPanel;
 use UploadFiles;
+use IncompleteRegistrations;
+use Transactions;
+
 sub setProcessOrder {
     my $self = shift;
   
@@ -1039,6 +1042,30 @@ sub Navigation {
     }
     return $returnHTML || '';
 }
+
+
+sub getStateIds {
+    my $self = shift;
+
+    my $currentLevel = $self->{'ClientValues'}{'authLevel'} || 0;
+    my $userEntityID = getID($self->{'ClientValues'}, $currentLevel) || 0;
+
+    return (
+        'VENUE',
+        $userEntityID,
+        $self->ID(),
+        0,
+        $self->{'ClientValues'}{'userID'},
+    );
+}
+
+sub cancelFlow {
+    my $self = shift;
+
+    IncompleteRegistrations::deleteRelatedRegistrationRecords($self->{'Data'}, $self->getStateIds());
+
+    return 1;
+};
 
 
 1;

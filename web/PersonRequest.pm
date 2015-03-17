@@ -34,6 +34,7 @@ use Switch;
 use SphinxUpdate;
 use InstanceOf;
 use PersonEntity;
+use PersonUtils;
 use TemplateEmail;
 use Flow_DisplayFields;
 
@@ -524,7 +525,7 @@ sub initRequestPage {
     $TemplateData{'PersonSummaryPanel'}  = personSummaryPanel($Data, $personID) || '';
 
     if($transferType eq $Defs::TRANSFER_TYPE_INTERNATIONAL) {
-        $title = $Data->{'lang'}->txt("Do you have Player's International Transfer Certificate?");
+        $title = $Data->{'lang'}->txt("Do you have the player's International Transfer Certificate?");
 
         $TemplateData{'noITC'} = qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PRA_NC">]. $Data->{'lang'}->txt("No") . q[</a></span>];
         $TemplateData{'withITC'} = qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PF_&amp;dtype=PLAYER&amp;itc=1">]. $Data->{'lang'}->txt("Yes") . q[</a></span>];
@@ -827,7 +828,7 @@ sub listRequests {
         }
     }
 
-    return ("$found record found.", $title) if !$found;
+    return ($Data->{'lang'}->txt("Records found").': '. $found, $title) if !$found;
 
     my @headers = (
         {
@@ -1195,7 +1196,7 @@ sub setRequestResponse {
         if($response eq "ACCEPTED"){
             $templateFile = "personrequest/transfer/request_accepted.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
             $templateFile = "personrequest/access/request_accepted.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_ACCESS;
-            $notifDetails .= $Data->{'lang'}->txt(" You will be notified once the transfer is effective and approved by ") . $maName if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
+            $notifDetails .= $Data->{'lang'}->txt("You will be notified once the transfer is effective and approved by ") . $maName if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
         }
         elsif($response eq "DENIED"){
             $templateFile = "personrequest/transfer/request_denied.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
@@ -1422,6 +1423,7 @@ sub getRequests {
     my @personRequests = ();
       
     while(my $dref = $q->fetchrow_hashref()) {
+        $dref->{'currentAge'} = personAge($Data, $dref->{'dtDOB'});
         my $personCurrAgeLevel = Person::calculateAgeLevel($Data, $dref->{'currentAge'});
         $dref->{'personCurrentAgeLevel'} = $personCurrAgeLevel;
         push @personRequests, $dref;
@@ -1712,7 +1714,7 @@ sub itcFields {
                 	compulsory => 1,  
    		    	},
    		    	strClubName => {   		    	
-   		    		label => 'Club\'s Name',
+   		    		label => 'Club Name',
    		    		type => 'text',
    		    		value => '',
                 	compulsory => 1,  

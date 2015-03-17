@@ -3,10 +3,10 @@
         <div class="row">
             <form method = "POST" action = "user/login.cgi" class="form-signin" role="form" style="border:1px solid #CCC; border-radius:8px; box-shadow: 7px 7px 5px #888888; background-color: #FFF;">
                 <div class="welcomelogin">
-                    <span>[% Lang.txt('Welcome...') %]</span>
+                    <span>[% Lang.txt('Welcome') %]...</span>
                 </div>
                 <hr>
-                <h3 class="form-signin-heading"><!--<img src="images/img-logo.png" width="33px" alt=""/>--> [% Lang.txt('Sign into MyFAS') %]</h3>
+                <h3 class="form-signin-heading"><!--<img src="images/img-logo.png" width="33px" alt=""/>--> [% SystemConfig.loginWelcomeMessage %]</h3>
                 <input type = "text" class="form-control" name = "email">
                 <input type = "password" class="form-control" name = "pw">
                 <div class="checkbox">

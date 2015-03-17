@@ -67,6 +67,7 @@ use EntityRegistrationAllowedEdit;
 use PersonRegistrationFlow_Backend;
 use PersonRegistrationFlow_Bulk;
 use PendingRegistrations;
+use IncompleteRegistrations;
 
 use PersonRequest;
 
@@ -301,7 +302,11 @@ use TransferFlow;
         my $entityID = getID($Data{'clientValues'},$Data{'clientValues'}{'currentLevel'});
         ( $resultHTML, $pageHeading ) = handlePendingRegistrations($action, \%Data, $entityID, $prID);
        # $pageHeading = $pageHeading . "entityID = " . $entityID;    
-}
+    }
+    elsif ( $action =~ /^INCOMPLPR_/ ) {
+        my $entityID = getID($Data{'clientValues'},$Data{'clientValues'}{'currentLevel'});
+        ( $resultHTML, $pageHeading ) = handleIncompleteRegistrations($action, \%Data, $entityID);
+    }
     elsif ( $action =~ /^PRA_/) {
         ($resultHTML, $pageHeading) = handlePersonRequest($action, \%Data);
     }
@@ -327,7 +332,7 @@ use TransferFlow;
 
    
     # BUILD PAGE
-    if ( !$report ) {
+    #if ( !$report ) {
         $client = setClient( \%clientValues );
         $clientValues{INTERNAL_db} = $db;
         my $navbar = navBar( \%Data, $DataAccess_ref, $Data{'SystemConfig'} );
@@ -342,8 +347,8 @@ use TransferFlow;
 		] if $pageHeading;
         pageMain( $Defs::page_title, $navbar, $resultHTML, \%clientValues,
             $client, \%Data );
-    }
-    else { printReport( $resultHTML, $lang ); }
+    #}
+    #else { printReport( $resultHTML, $lang ); }
     disconnectDB($db);
 }
 

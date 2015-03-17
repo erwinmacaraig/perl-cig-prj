@@ -34,6 +34,7 @@ use PersonRegistration;
 use PersonSummaryPanel;
 use RenewalDetails;
 
+use RegoProducts;
 
 sub setProcessOrder {
     my $self = shift;
@@ -213,18 +214,6 @@ sub display_core_details    {
         my $transfer = $burl."PRA_T";
         my $search = $burl."INITSRCH_P";
         my $txt;
-
-        #if($defaultType eq $Defs::PERSON_TYPE_PLAYER) {
-        #    $txt = $lang->txt('Has this person already been registered?')
-        #        .qq[ <a href = "$transfer">].$lang->txt('If yes, they need to apply for a Transfer.').'</a>'
-        #        .$lang->txt(' Not sure?')
-        #        .qq[ <a href = "$search">].$lang->txt('Then use the Search.').'</a>' ;
-        #}
-        #else {
-        #     $txt = $lang->txt('Has this person already been registered?')
-        #        .$lang->txt(' Not sure?')
-        #        .qq[ <a href = "$search">].$lang->txt('Then use the Search.').'</a>' ;       
-        #}
 
         $newRegoWarning = qq[
             <div class="alert"> 
@@ -544,7 +533,6 @@ sub process_registration {
     my $registrationNature = $self->{'RunParams'}{'d_nature'} || '';
     my $personRequestID = $self->{'RunParams'}{'prid'} || '';
 
-print STDERR "SPORT$sport$personType$personLevel$regoID\n";
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
     }
@@ -554,7 +542,6 @@ print STDERR "SPORT$sport$personType$personLevel$regoID\n";
             $self->deleteExistingReg($existingReg, $personID);
         }
         if(! $regoID) {#!$existingReg or $changeExistingReg)    {
-print STDERR "ADD REGO WAS $regoID";
             ($regoID, undef, $msg) = add_rego_record(
                 $self->{'Data'}, 
                 $personID, 
@@ -661,16 +648,18 @@ print STDERR Dumper($self->{'RunDetails'}{'Errors'});
             {},
             1,
         );
-        #if (! $content)   {
-        #    $self->incrementCurrentProcessIndex();
-        #    return ('',2);
-        #}
     }
     else    {
-        push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
-        $self->setCurrentProcessIndex(1);
-        return ('',2);
+        if (! $self->{'RunDetails'}{'Errors'} and  ! scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+            push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
+            if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+                #There are errors - reset where we are to go back to the form again
+                $self->setCurrentProcessIndex('r');
+                return ('',2);
+            }
+        }
     }
+
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
         #$self->setCurrentProcessIndex(1);
@@ -764,6 +753,13 @@ print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~~~~PROCESS PRODUCTS";
             $entityID
         );
         $regoID = 0 if !$valid;
+    }
+
+    my ($resultHTML, $error) = checkMandatoryProducts($self->{'Data'}, $personID, $Defs::LEVEL_PERSON, $self->{'RunParams'});
+    if ($error) {
+        push @{$self->{'RunDetails'}{'Errors'}}, $resultHTML;
+        $self->setCurrentProcessIndex('p');
+        return ('',2);
     }
 
     my ($txnIds, $amount) = save_rego_products($self->{'Data'}, $regoID, $personID, $entityID, $entityLevel, $rego_ref, $self->{'RunParams'});

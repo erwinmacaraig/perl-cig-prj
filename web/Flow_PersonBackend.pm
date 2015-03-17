@@ -33,7 +33,10 @@ use PersonFieldsSetup;
 use PersonRegistration;
 use PersonSummaryPanel;
 use RenewalDetails;
+use JSON;
+use IncompleteRegistrations;
 
+use RegoProducts;
 
 sub setProcessOrder {
     my $self = shift;
@@ -43,7 +46,7 @@ sub setProcessOrder {
     my $regname = $typename
         ? $typename .' Registration'
         : 'Registration';
-    $self->{'ProcessOrder'} = [       
+    my $steps1 = [       
         {
             'action' => 'cd',
             'function' => 'display_core_details',
@@ -57,18 +60,6 @@ sub setProcessOrder {
             'function' => 'validate_core_details',
             'fieldset'  => 'core',
         },        
-        #{
-            #'action' => 'minor',
-            #'function' => 'display_minor_fields',
-            #'label'  => 'Minor',
-            #'fieldset'  => 'minor',
-            #'NoNav'     => 1,
-        #},
-        #{
-            #'action' => 'minoru',
-            #'function' => 'validate_minor_fields',
-            #'fieldset'  => 'minor',
-        #},
         {
             'action' => 'cond',
             'function' => 'display_contact_details',
@@ -81,17 +72,6 @@ sub setProcessOrder {
             'function' => 'validate_contact_details',
             'fieldset'  => 'contactdetails',
         },
-        #{
-            #'action' => 'od',
-            #'function' => 'display_other_details',
-            #'label'  => 'Other Details',
-            #'fieldset'  => 'otherdetails',
-        #},
-        #{
-            #'action' => 'odu',
-            #'function' => 'validate_other_details',
-            #'fieldset'  => 'otherdetails',
-        #},
         {
             'action' => 'r',
             'function' => 'display_registration',
@@ -101,7 +81,9 @@ sub setProcessOrder {
         {
             'action' => 'ru',
             'function' => 'process_registration',
-        },
+        }
+    ];
+    my $stepscert = [
         {
             'action' => 'cert',
             'function' => 'display_certifications',
@@ -115,6 +97,8 @@ sub setProcessOrder {
             'function' => 'process_certifications',
             'fieldset'  => 'certifications',
         },
+    ];
+    my $steps2 = [
         {
             'action' => 'd',
             'function' => 'display_documents',
@@ -150,6 +134,12 @@ sub setProcessOrder {
             'NoDisplayInNav' => 1,
         },
     ];
+    my @order = @{$steps1};
+    if(($dtype eq 'COACH' or $dtype eq 'REFEREE'))   {
+        push @order, @{$stepscert};
+    }
+    push @order, @{$steps2};
+    $self->{'ProcessOrder'} = \@order;
 }
 
 sub setupValues    {
@@ -193,13 +183,13 @@ sub display_core_details    {
 
         if($defaultType eq $Defs::PERSON_TYPE_PLAYER and $self->{'SystemConfig'}{'allowPersonRequest'}) {
             $txt = $lang->txt('Please check that this player has not been registered with another club?')
-                .qq[ <a href = "$transfer">].$lang->txt('If yes, they need to apply for a Transfer.').'</a>'
-                .$lang->txt(' Not sure?')
+                .qq[ <a href = "$transfer">].$lang->txt('If yes, they need to apply for a Transfer.').'</a> '
+                .$lang->txt('Not sure?')
                 .qq[ <a href = "$search">].$lang->txt('Then use the Search.').'</a>' ;
         }
         else {
              $txt = $lang->txt('Has this person already been registered?')
-                .$lang->txt(' Not sure?')
+                .' '.$lang->txt('Not sure?')
                 .qq[ <a href = "$search">].$lang->txt('Then use the Search.').'</a>' ;       
         }
 
@@ -689,6 +679,7 @@ sub process_registration {
     my $personRequestID = $self->{'RunParams'}{'prid'} || '';
     my $entitySelected = $self->{'RunParams'}{'d_eId'} || '';
     my $entityTypeSelected = $self->{'RunParams'}{'d_etype'} || '';
+    my $MAComment = $self->{'RunParams'}{'d_ma_comment'} || '';
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
@@ -740,6 +731,7 @@ sub process_registration {
                 undef,
                 undef,
                 $personRequestID,
+                $MAComment,
             );
         }
         if($changeExistingReg)  {
@@ -952,12 +944,14 @@ sub display_products {
         }
     }
     else    {
-        push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
-    }
-    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
-        #There are errors - reset where we are to go back to the form again
-        $self->decrementCurrentProcessIndex();
-        return ('',2);
+        if (! $self->{'RunDetails'}{'Errors'} and  ! scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+            push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
+            if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+                #There are errors - reset where we are to go back to the form again
+                $self->setCurrentProcessIndex('r');
+                return ('',2);
+            }
+        }
     }
     my %ManualPayPageData = (
         HiddenFields => $self->stringifyCarryField(),
@@ -1044,6 +1038,12 @@ sub process_products {
         $regoID = 0 if !$valid;
     }
 
+    my ($resultHTML, $error) = checkMandatoryProducts($self->{'Data'}, $personID, $Defs::LEVEL_PERSON, $self->{'RunParams'});
+    if ($error) {
+        push @{$self->{'RunDetails'}{'Errors'}}, $resultHTML;
+        $self->setCurrentProcessIndex('p');
+        return ('',2);
+    }
     my ($txnIds, $amount) = save_rego_products($self->{'Data'}, $regoID, $personID, $entityID, $entityLevel, $rego_ref, $self->{'RunParams'});
 
 ####
@@ -1275,7 +1275,8 @@ sub display_summary {
     }
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
-        $self->decrementCurrentProcessIndex();
+        #$self->decrementCurrentProcessIndex();
+        $self->setCurrentProcessIndex('r');
         return ('',2);
     }
     my %PageData = (
@@ -1659,4 +1660,26 @@ sub rebuildClient   {
 }
 
  
+sub getStateIds {
+    my $self = shift;
+
+    my $currentLevel = $self->{'ClientValues'}{'authLevel'} || 0;
+    my $userEntityID = getID($self->{'ClientValues'}, $currentLevel) || 0;
+
+    return (
+        'PERSON',
+        $userEntityID,
+        $self->ID(),
+        $self->{'RunParams'}{'rID'} || 0,
+        $self->{'ClientValues'}{'userID'},
+    );
+}
+
+sub cancelFlow{
+    my $self = shift;
+
+    IncompleteRegistrations::deleteRelatedRegistrationRecords($self->{'Data'}, $self->getStateIds());
+
+    return 1
+};
 

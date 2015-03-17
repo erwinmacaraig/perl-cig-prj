@@ -17,6 +17,7 @@ use AddToPage;
 use TTTemplate;
 use Log;
 use Data::Dumper;
+use LanguageChooser;
 
 sub ccPageForm  {
     my($title, $body, $clientValues_ref,$client, $Data) = @_;
@@ -252,6 +253,9 @@ sub pageMain {
         Menu => '',
         HomeURL => "$Data->{'target'}?client=$homeClient&amp;a=".$HomeAction{$Data->{'clientValues'}{'authLevel'}},
         AtLoginLevel => $atloginlevel,
+        LanguageChooser => genLanguageChooser($Data),
+        HeaderLogo => $Data->{'SystemConfig'}{'MA_logo'},
+        HeaderSystemName => $Data->{'SystemConfig'}{'HeaderSystemName'},
     );
 
   my $globalnav = runTemplate(
@@ -271,8 +275,8 @@ sub pageMain {
         StatsCounter =>  $statscounter || '',
         Content => $body || '',
         Title => $title || '',
-        MemListName => uc($Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}) || $Data->{'lang'}->txt('PEOPLE'),
-        ClubListName => uc($Data->{'LevelNames'}{$Defs::LEVEL_CLUB.'_P'}) || $Data->{'lang'}->txt('CLUBS'),
+        MemListName => uc($Data->{'lang'}->txt('Persons')),
+        ClubListName => uc($Data->{'lang'}->txt('Clubs')),
         GlobalNav => $globalnav || '',
         Header => $Data->{'SystemConfig'}{'Header'} || '',
         NavBar => $navbar || '',
@@ -525,7 +529,14 @@ sub regoPageForm {
 sub getPageCustomization{
     my ($Data) = @_;
 
-    my $nav = runTemplate( $Data, {PassportLink => ''}, 'user/globalnav.templ');
+    my $nav = runTemplate(
+        $Data,
+        {
+            PassportLink => '',
+            DefaultSystemConfig => $Data->{'SystemConfig'},
+        },
+        'user/globalnav.templ'
+    );
 
     my $html_head = $Data->{'HTMLHead'} || '';
     my $html_head_style = '';

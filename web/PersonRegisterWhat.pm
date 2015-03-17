@@ -39,6 +39,8 @@ sub displayPersonRegisterWhat   {
     $entitySelection ||= 0;
     my $defaultType = param('dtype') || '';
 
+    my $systemConfig = getSystemConfig($Data);
+
     my %templateData = (
         originLevel => $originLevel || 0,
         personID => $personID || 0,
@@ -53,6 +55,9 @@ sub displayPersonRegisterWhat   {
         existingReg => $regoID || 0,
         EntitySelection => $entitySelection || 0,
         DefaultEntity => getLastEntityID($Data->{'clientValues'}) || 0,
+        ClientID => getLastEntityID($Data->{'clientValues'}) || 0,
+        ClientLevel => getLastEntityLevel($Data->{'clientValues'}) || 0,
+        AllowMAComment => $systemConfig->{'personRegoAllowMAComment'},
     );
     if($entitySelection)    {
         $templateData{'entityID'} = 0;
@@ -82,7 +87,7 @@ sub displayPersonRegisterWhat   {
             ageName => $existing->{'AgeLevel'} || '',
             nature => $existing->{'strRegistrationNature'} || '',
             natureName => $existing->{'RegistrationNature'} || '',
-
+            MAComment => $existing->{'strShortNotes'} || '',
         );
         $templateData{'existing'} = \%existingRego;
     }
@@ -624,7 +629,7 @@ sub getPersonTypeFromMatrix {
     my @retdata=();
     while (my $dref = $query->fetchrow_hashref())   {
         push @retdata, {
-            name => $personTypeList->{$dref->{'strPersonType'}},
+            name => $Data->{'lang'}->txt($personTypeList->{$dref->{'strPersonType'}}),
             value => $dref->{'strPersonType'},
         }
         #$values{$dref->{'strPersonType'}} = $personTypeList->{$dref->{'strPersonType'}};
@@ -710,7 +715,7 @@ sub getPersonLevelFromMatrix {
 
         if($dref->{'strPersonLevel'}){
             push @retdata, {
-                name => $personLevelList->{$dref->{'strPersonLevel'}},
+                name => $Data->{'lang'}->txt($personLevelList->{$dref->{'strPersonLevel'}}),
                 value => $dref->{'strPersonLevel'},
             }
         }
@@ -761,6 +766,8 @@ sub _entityList {
                 AND intEntityID = ?
                 AND intEntityLevel = ?
                 AND E.strStatus = 'ACTIVE'
+            ORDER BY
+                E.strLocalName
             )
         ];
         $q = $Data->{'db'}->prepare($st);
@@ -785,6 +792,8 @@ sub _entityList {
                 E.intRealmID = ?
                 AND intEntityLevel = ?
                 AND E.strStatus = 'ACTIVE'
+            ORDER BY 
+                E.strLocalName
             )
         ];
         $q = $Data->{'db'}->prepare($st);

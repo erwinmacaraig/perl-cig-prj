@@ -174,6 +174,7 @@ qq[<textarea name="d_$fieldname" id="l_$fieldname" $rows $cols $disabled $onChan
                 if ($f->{'Save_readonly'}){
                     $isReadonly = qq[ readonly = "readonly" ];
                 }
+                $val =~s/"/&quot;/g;
                 $field_html =
 qq[<input type="text" name="d_$fieldname" value="$val" $isReadonly id="l_$fieldname" $sz $ms $ph $disabled $onChange / >$txt_format\n];
             }
@@ -813,15 +814,13 @@ qq[To modify this information change the information in the boxes below and when
     );
 
     my $txt = q{};
-    if ( exists $self->{'Fields'}->{'options'}{'LocaleMakeText'}
-        and $self->{'Fields'}->{'options'}{'LocaleMakeText'} )
-    {
+    if ($self->{'Lang'}) {
 
-        $txt = $self->{'Fields'}->{'options'}{'LocaleMakeText'}->txt(
+        $txt = $self->{'Lang'}->txt(
             $key,
             (
                 map {
-                    $self->{'Fields'}->{'options'}{'LocaleMakeText'}->txt($_)
+                    $self->{'Lang'}->txt($_)
                       || $_
                 } @_
             )
