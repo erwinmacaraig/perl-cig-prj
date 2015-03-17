@@ -34,7 +34,7 @@
 						</div>
 					</td>
 					<td style="width:50%;">
-						<form action="uploadregofile.cgi" method="POST" class="dropzone" enctype="multipart/form-data" id="myRegoDoc[% doc.ID %]">
+						<form action="[% url %]/uploadregofile.cgi" method="POST" class="dropzone" enctype="multipart/form-data" id="myRegoDoc[% doc.ID %]">
 							<input type="hidden" name="client" value="[% client %]" />
 							<input type="hidden" name="rID" value="[% regoID %]" />
 							<input type="hidden" name="doctypeID" value="[% doc.ID %]" />
@@ -136,7 +136,7 @@
 						</div>
 					</td>
 					<td style="width:50%;">
-						<form action="uploadregofile.cgi" method="POST" class="dropzone" enctype="multipart/form-data" id="myRegoDoc[% doc.ID %]">
+						<form action="[% url %]/uploadregofile.cgi" method="POST" class="dropzone" enctype="multipart/form-data" id="myRegoDoc[% doc.ID %]">
 							<input type="hidden" name="client" value="[% client %]" />
 							<input type="hidden" name="rID" value="[% regoID %]" />
 							<input type="hidden" name="doctypeID" value="[% doc.ID %]" />
