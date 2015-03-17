@@ -23,6 +23,7 @@ require Exporter;
     deleteRegoTransactions
     checkRulePaymentFlagActions
     getRegistrationWorkTasks
+    markGatewayAsResponded
 );
 
 use strict;
@@ -61,6 +62,23 @@ use SphinxUpdate;
 use InstanceOf;
 
 use PersonLanguages;
+
+sub markGatewayAsResponded  {
+
+    my ($Data, $taskID) = @_;
+    $taskID ||= 0;
+    return if ! $taskID;
+
+    my $stUPD = qq[
+        UPDATE tblWFTask
+            SET intPaymentGatewayResponded = 1
+        WHERE
+            intRealmID = ?
+            AND intWFTaskID = ?
+    ];
+    my $qUPD= $Data->{'db'}->prepare($stUPD);
+    $qUPD->execute($Data->{'Realm'}, $taskID);
+}
 
 sub checkRulePaymentFlagActions {
 
@@ -143,6 +161,7 @@ print STDERR "_____________________ NOT SURE IF LIMIT NEEDED\n";
             $qUPD->execute($Data->{'Realm'}, $dref->{'intWFTaskID'});
             $countTaskSkipped++;
         }
+        markGatewayAsResponded($Data, $dref->{'intWFTaskID'});
     }
     my $ruleFor = 'PERSON';
     $ruleFor = 'REGO' if ($personRegistrationID);
@@ -450,6 +469,7 @@ sub listTasks {
             preqTo.strLocalName as preqToClub,
             IF(t.strWFRuleFor = 'ENTITY', e.intCreatedByEntityID, IF(t.strWFRuleFor = 'REGO', pr.intOriginID, 0)) as CreatedByEntityID
 	    FROM tblWFTask AS t
+                LEFT JOIN tblWFRule ON (tblWFRule.intWFRuleID = t.intWFRuleID)
                 LEFT JOIN tblEntity as e ON (e.intEntityID = t.intEntityID)
 		LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (t.intPersonRegistrationID = pr.intPersonRegistrationID)
 		LEFT JOIN tblPersonRequest AS preq ON (preq.intPersonRequestID = pr.intPersonRequestID)
@@ -461,10 +481,17 @@ sub listTasks {
 		LEFT JOIN tblUserAuthRole AS uarRejected ON ( t.intProblemResolutionEntityID = uarRejected.entityID )
 		WHERE
                   t.intRealmID = $Data->{'Realm'}
+                AND tblWFRule.intLockTaskUntilPaid <> 1 
+                AND (
+                    tblWFRule.intLockTaskUntilGatewayResponse <> 1
+                    OR (
+                        tblWFRule.intLockTaskUntilGatewayResponse = 1 AND t.intPaymentGatewayResponded=1
+                    )
+                )
 		    AND (
-                      (intApprovalEntityID = ? AND (t.strTaskStatus = 'ACTIVE' OR t.strTaskStatus = 'REJECTED'))
+                      (t.intApprovalEntityID = ? AND (t.strTaskStatus = 'ACTIVE' OR t.strTaskStatus = 'REJECTED'))
                         OR
-                      (((intProblemResolutionEntityID = ?) or (intProblemResolutionEntityID = ? AND intApprovalEntityID = ?)) AND t.strTaskStatus = 'HOLD')
+                      (((t.intProblemResolutionEntityID = ?) or (t.intProblemResolutionEntityID = ? AND t.intApprovalEntityID = ?)) AND t.strTaskStatus = 'HOLD')
             )
     ];
     #OR
