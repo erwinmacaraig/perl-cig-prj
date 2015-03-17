@@ -41,7 +41,7 @@ use RegoProducts;
 sub setProcessOrder {
     my $self = shift;
   
-    my $dtype = param('dtype') || '';
+    my $dtype = param('dtype') || $self->{'RunParams'}{'dtype'} || $self->{'CarryFields'}{'dtype'} || '';
     my $typename = $Defs::personType{$dtype} || '';
     my $regname = $typename
         ? $typename .' Registration'
