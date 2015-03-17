@@ -208,6 +208,13 @@
 	                                </span>
 	                            [% END %]
 
+	                            [% IF EntityDetails.bankAccountDetails %]
+	                                <span class="details-row">
+	                                  <span class="details-left">[% Lang.txt('Bank Account Details') %]:</span>
+	                                  <span class="details-left detail-value">[% EntityDetails.bankAccountDetails %]</span>
+	                                </span>
+	                            [% END %]
+
 	                            [% IF EditDetailsLink and !ReadOnlyLogin  %]
 	                                <span style="float: right" class="">
 	                                    <a href = "[% EditDetailsLink %]&a=EE_E&e_a=roledetails&bscrn=a%3DWF_View%26TID%3D[% intWFTaskID %]%26at%3D2" class="edit-link">[% Lang.txt('Edit') %]</a>

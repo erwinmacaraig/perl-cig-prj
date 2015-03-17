@@ -1,13 +1,8 @@
-<div class = "report-wrapper">
-<table class="report-table">
+[% INCLUDE 'reports/reportoptions_header.templ' %]
+<div class = "report-wrapper table-responsive" id = "report-data-wrapper">
+<table class="sreport-table table tableboxheader table-striped table-bordered table-condensed [% IF Labels.size > 7 %]shrink-table[% END %]">
 <caption>
-	<div class="report-numrows">Returned [% RecordCount %] records </div>
-	<h1 class="RO_report_name" [% IF Options.Logo %]style =" line-height:100px;"[% END %]>
-		[% IF Options.Logo %]
-			[% Options.Logo %]
-		[% END %]
-		[% Name %]
-	</h1>
+	<div class="report-numrows">[% Lang.txt('Records returned:') %] [% RecordCount %] </div>
 </caption>
 	<thead>
 		<tr>
@@ -15,7 +10,7 @@
 		<th>[% i.1 %]</th>
 [% END %]
 [% IF Summarise %]
-		<th>Count</th>
+		<th>[% Lang.txt('Count') %]</th>
 [% END %]
 		</tr>
 	</thead>
@@ -67,7 +62,7 @@
 		<tr class="ROtotalfooter">
 		[% FOREACH f = RunOrder %]
 			[% IF loop.first and !Totals.all.item(f) %]
-				<td>[% RecordCount %] rows [% IF SummaryCount.All != RecordCount %](Examined [% SummaryCount.All || 0 %] rows)[% END %]</td>
+				<td>[% RecordCount %] rows [% IF SummaryCount.All and SummaryCount.All != RecordCount %](Examined [% SummaryCount.All || 0 %] rows)[% END %]</td>
 			[% ELSE %]
 				<td>[% Totals.all.item(f) %]</td>
 			[% END %]
@@ -77,14 +72,7 @@
 		[% END %]
 		</tr>
 	</tbody>
-	<tfoot>
-		<tr>
-			<th colspan="[% Labels.size %]"><span class="report-daterun">[% Lang.txt('Report Run') %] [% DateRun %]</span></th>
-[% IF Summarise %]
-			<th>&nbsp;</th>
-[% END %]
-		</tr>
-
 	</tfoot>
 </table>
 </div>
+<span class="report-daterun">[% Lang.txt('Report Run') %] [% DateFormat.TZformat(DateRun,'MEDIUM','SHORT') %]</span>

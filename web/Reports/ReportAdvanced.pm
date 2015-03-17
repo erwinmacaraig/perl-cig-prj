@@ -112,6 +112,7 @@ sub makeSQL {
 sub displayOptions {
 	my $self = shift;
 
+
   my $prefix = $self->{'Config'}{'FormFieldPrefix'} || '';
   my $formname = $self->{'Config'}{'FormName'} || 'updateform';
   $prefix.='_' if $prefix;
@@ -163,8 +164,8 @@ sub displayOptions {
 			) 
 			?  $options->{'defaultvalue2'} 
 			: '';
-    my $displ_1= $def_val1 ne '' ? 'block' : 'none';
-    my $displ_2= $def_val2 ne '' ? 'block' : 'none';
+    my $displ_1= $def_val1 ne '' ? 'inline' : 'none';
+    my $displ_2= $def_val2 ne '' ? 'inline' : 'none';
     if($options->{'fieldtype'} eq 'text') {
 			my $f1 = txt_field(
 				'f_'.$field_name.'_1',
@@ -468,13 +469,12 @@ sub displayOptions {
 	my $postblock = $self->{'Config'}{'PostBlock'} 
 		? qq[<div id= "ROPostBlock">$self->{'Config'}{'PostBlock'}</div>]
 		: '';
-	my $savedreports = $self->SavedReportBlock();
 	my $intro = $lang->txt('ADV_REPORT_INTRO');
 	my $returl = $self->{'ReturnURL'}
 		? qq[ <a href="$self->{'ReturnURL'}">&lt; Return to Report Manager</a>]
 		: '';
+			#$returl
     $returnstr=qq[
-			$returl
   <script type="text/javascript" src = "js/advancedreports.js"></script>
   <script type="text/javascript" src = "js/timepicker.js"></script>
 <style type="text/css">
@@ -509,11 +509,21 @@ sub displayOptions {
 					$returnstr
 					<input type="hidden" name="d_ROselectedfieldlist" id="ROselectedfieldlist">
 					$carryfields
-					$savedreports
 					$postblock
 				</form>
 			</div>
     ];
+  }
+  my $params = $self->{'FormParams'};
+  if($params->{'repID'})	{
+      my ($reportname, $reportdata) = $self->loadSavedReportData($params->{'repID'});
+      $reportname =~s/"/&quot;/g;
+      $self->{'DBData'}{'Saved'}{'strReportName'} = $reportname || '';
+      $reportdata =~s/"/&quot;/g;
+      $returnstr .= qq[
+          <input type="hidden" name="savedreportname" id = "SavedReportName" value="$reportname">
+          <input type="hidden" name="savedreportdata" id = "SavedReportData" value="$reportdata">
+      ];
   }
 
   return $returnstr;
@@ -535,38 +545,10 @@ sub processSubmission {
   my %activeWherelist=();
 
 	my $params = $self->{'FormParams'};
-	if(
-		$params->{'RO_SR_run'}
-		or $params->{'RO_SR_load'}
-		or $params->{'RO_SR_save'}
-		or $params->{'RO_SR_del'}
-	)	{
-		my $response = '';
-		if($params->{'RO_SR_run'} and $params->{'repID'})	{
-			$self->processSavedReportData($params->{'repID'});
-		}
-		elsif($params->{'RO_SR_save'})	{
-			my $newID = 0;
-			($response, $newID) = $self->saveReportData($params);
-			$params->{'RO_SR_load'} = 1;
-			$params->{'repID'} = $newID;
-			#return ('','','','','',0,$response);
-		}
-		elsif($params->{'RO_SR_del'} and $params->{'repID'})	{
-			$response = $self->deleteSavedReportData($params->{'repID'});
-			return ('','','','','',0,$response);
-		}
-		if($params->{'RO_SR_load'} and $params->{'repID'})	{
-			my ($reportname, $reportdata) = $self->loadSavedReportData($params->{'repID'});
-			$reportname =~s/"/&quot;/g;
-			$reportdata =~s/"/&quot;/g;
-			my $returnstr = qq[
-				<input type="hidden" name="savedreportname" id = "SavedReportName" value="$reportname">
-				<input type="hidden" name="savedreportdata" id = "SavedReportData" value="$reportdata">
-			]. $response;
-			return ('','','','','',0,$returnstr);
-		}
-	}
+    $self->processSavedReportData($params->{'repID'}) if $params->{'repID'};
+    my ($newID) = $self->saveReportData($params);
+    $params->{'repID'} = $newID;
+    $self->{'SavedReportID'} = $newID;
 	if($params->{'d_ROselectedfieldlist'})	{
 		my @o = split(/\s*,\s*/,$params->{'d_ROselectedfieldlist'});
 		for my $o (@o)	{
@@ -823,6 +805,7 @@ sub processSubmission {
 	$self->{'RunParams'}{'Limit'} = $params->{'limit'} || '';
 	$self->{'RunParams'}{'ViewType'} = $params->{'RO_OutputType'} || '';
 	$self->{'RunParams'}{'SendToEmail'} = $params->{'RO_OutputEmail'} || '';
+	$self->{'RunParams'}{'Download'} = $params->{'RO_download'} || '';
 	$self->{'FormParams'}{'ReturnData'} = 1 if $params->{'retprocess'};
 
   $activefields{'exformat'}= $params->{'exformat'} || '';
@@ -1065,69 +1048,6 @@ sub _getSavedReportList	{
 	return $list || '';
 }
 
-sub SavedReportBlock	{
-	my $self = shift;
-	my $db = $self->{'db'};
-	my $id = $self->{'ID'} || 0;
-	my $lang = $self->{'Lang'};
-
-	my $options = $self->_getSavedReportList();
-	my $editbutton = q[<input type="submit" name="RO_SR_load" value="Edit" class="button-small generic-button">];
-	my $runbutton = q[<input type="submit" name="RO_SR_run" value="Run" class="button-small proceed-button ROButRun">];
-	my $delbutton = q[<input type="submit" name="RO_SR_del" value="Delete" class="button-small cancel-button" onclick="return confirm('Are you sure you want to delete this report?');">];
-	if(!$options)	{
-		$editbutton = $runbutton = $delbutton = '';
-	}
-	my $body = q[
-    <script type="text/javascript">
-			jQuery(function()	{
-				jQuery('#ROSaveButton').click(function() {
-
-					var d = jQuery('#ROsavedialog').dialog({
-            modal: true,
-            autoOpen: false,
-            close: function(ev, ui) { jQuery(this).dialog('destroy'); },
-            height: 200,
-            width: 400,
-            resizable: false,
-            title: 'Enter Report Name',
-            buttons: {
-              "Cancel": function() { jQuery(this).dialog("close"); },
-              "Save": function() {
-                jQuery('#ROSaveButtonVal').val('1');
-                var newname = jQuery('#ROsavedname').val();
-                jQuery('#RO_NewReportNameID').val(newname);
-                jQuery('#reportform').submit();
-                jQuery(this).dialog("close");
-              }
-            }
-					});
-					d.dialog('open');
-					return false;
-				});
-			});
-    </script>
-		].qq[
-		<div class="ROoptionblock">
-			<h3 class="panel-header ROoptionblock-header">].$lang->txt('Saved Reports').qq[</h3>
-			<div class="panel-body">
-                $options
-                $runbutton
-                $editbutton
-                <input type="submit" name="RO_SR_savebut" value="Save" id="ROSaveButton" class="button-small generic-button">
-                <input type="hidden" name="RO_SR_save" value="0" id="ROSaveButtonVal">
-                <input type="hidden" name="RO_NewReportName" value="" id="RO_NewReportNameID">
-                $delbutton
-            </div>
-		</div>
-		<div id="ROsavedialog" style="display:none;">
-		<br><br>
-			<input id="ROsavedname" type="text" name="RO_reportname" class="text ui-widget-content ui-corner-all" size = "45">
-		</div>
-	];
-	return $body;
-}
-
 sub loadSavedReportData	{
 	my $self = shift;
 	my $db = $self->{'db'};
@@ -1139,10 +1059,14 @@ sub loadSavedReportData	{
 		FROM tblSavedReports
 		WHERE 
 			intSavedReportID = ?
+            AND intLevelID = ?
+            AND (intID = 0 OR intID = ?)
 	];
 	my $q = $db->prepare($st);
 	$q->execute(
 		$reportID,
+		$self->{'EntityTypeID'},
+		$self->{'EntityID'},
 	);
 	my ($name, $data) = $q->fetchrow_array();
 	$q->finish();
@@ -1155,6 +1079,7 @@ sub processSavedReportData	{
 	my ($reportID) = @_;
 	$self->loadSaved($reportID);
 	my ($reportname, $reportdata) = $self->loadSavedReportData($reportID);
+    $self->{'DBData'}{'Saved'}{'strReportName'} = $reportname || '';
 	return undef if !$reportdata;
 	my $json = from_json($reportdata || '');
 	for my $k (keys %{$json->{'options'}})	{
@@ -1179,6 +1104,81 @@ sub processSavedReportData	{
 }
 
 sub saveReportData	{
+	my $self = shift;
+	my $db = $self->{'db'};
+
+	my $params = $self->{'FormParams'};
+
+	my %options = ();
+	my @fields = ();
+	my @optarray = (qw(
+		RO_RecordFilter 
+		RO_SortBy1 
+		RO_SortByDir1 
+		RO_SortBy2 
+		RO_SortByDir2 
+		RO_GroupBy 
+		RO_OutputType 
+		RO_OutputEmail
+	));
+	for my $o (@optarray)	{
+		my $okey = $o;
+		$okey =~ s/^RO_//;
+		$options{$okey} = $params->{$o};
+	}
+	for my $k (keys %{$params})	{
+		if($k =~ /^_EXT/)	{
+			$options{$k} = $params->{$k};
+		}
+	}
+
+	if($params->{'d_ROselectedfieldlist'})	{
+		my @order = split(/\s*,\s*/,$params->{'d_ROselectedfieldlist'});
+		for my $o (@order)	{
+			$o=~s/^fld_//g;
+			push @fields, {
+				name => $o,
+				comp => $params->{'f_comp_'.$o},
+				display => $params->{'f_chk_'.$o},
+				v1 => $params->{'f_'.$o.'_1'},
+				v2 => $params->{'f_'.$o.'_2'},
+			};
+		}
+	}
+	my %reportdatahash = (
+		fields => \@fields,
+		options => \%options
+	);
+	my $json = to_json(\%reportdatahash);
+	return ('',0) if !$json;
+	my $st = qq[
+		INSERT INTO tblSavedReports(
+			intReportID,
+			intLevelID,
+			intID,
+			strReportData,
+            intTemporary
+		)
+		VALUES (
+			?,
+			?,
+			?,
+			?,
+            1
+		)
+	];
+	my $q=$self->{'db'}->prepare($st);
+	$q->execute(
+		$self->{'ID'},
+		$self->{'EntityTypeID'},
+		$self->{'EntityID'},
+		$json,
+	);
+	my $newID = $q->{mysql_insertid} || 0;
+	return $newID || 0;
+}
+
+sub saveReportName {
 	my $self = shift;
 	my $db = $self->{'db'};
 

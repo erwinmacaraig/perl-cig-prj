@@ -1,13 +1,5 @@
-<div class="report-wrapper">
-<table class="report-table">
-	<caption>
-  <h1 class="RO_report_name" [% IF Options.Logo %]style =" line-height:100px;"[% END %]>
-    [% IF Options.Logo %]
-      [% Options.Logo %]
-    [% END %]
-    [% Name %]
-  </h1>
-	</caption>
+<div class="report-wrapper table-responsive">
+<table class="sreport-table table tableboxheader table-striped table-bordered table-condensed [% IF Labels.size > 7 %]shrink-table[% END %]">
 	<thead>
 		<tr>
 [% FOREACH i = Labels %]
@@ -27,7 +19,7 @@
 [% END %]
 	</tbody>
 	<tfoot>
-		<th colspan = "[% Labels.size %]"><span class="report-daterun">[% Lang.txt('Report Run') %] [% DateRun %]</span></th>
+		<th colspan = "[% Labels.size %]"><span class="report-daterun">[% Lang.txt('Report Run') %] [% DateFormat.TZformat(DateRun,'MEDIUM','SHORT') %]</span></th>
 	</tfoot>
 </table>
 

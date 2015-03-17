@@ -58,6 +58,7 @@ my $fromFlow = param('nff') || 0;
 			entitydocs		=> 	$isForEntity,
 			description		=>	$docDesc,
 			fromFlow		=>  $fromFlow,
+			Lang			=>  $lang,
 			
 	};
 

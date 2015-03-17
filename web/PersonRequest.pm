@@ -34,6 +34,7 @@ use Switch;
 use SphinxUpdate;
 use InstanceOf;
 use PersonEntity;
+use PersonUtils;
 use TemplateEmail;
 use Flow_DisplayFields;
 
@@ -121,6 +122,10 @@ sub handlePersonRequest {
         }
         case 'PRA_V' {
             ($body, $title) = viewRequest($Data);
+        }
+        case 'PRA_VR' {
+            my $readonly = 1;
+            ($body, $title) = viewRequestHistory($Data, $readonly);
         }
         case 'PRA_S' {
             ($body, $title) = setRequestResponse($Data);
@@ -750,7 +755,7 @@ sub displayCompletedRequest {
             requestFrom => $request->{'requestFrom'} || '',
             requestTo => $request->{'requestTo'} || '',
             requestType => $itemRequestType,
-            requestResponse => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || "N/A",
+            requestResponse => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || $Data->{'lang'}->txt('Requested'),
             #SelectLink => $selectLink,
         };
 
@@ -787,7 +792,7 @@ sub listRequests {
 
 	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
     my $client = setClient( $Data->{'clientValues'} ) || '';
-    my $title = "Requests";
+    my $title = $Data->{'lang'}->txt('Requests');
 
     my %reqFilters =  ();
     if ($personID)  {
@@ -812,25 +817,28 @@ sub listRequests {
         push @rowdata, {
             id => $request->{'intPersonRequestID'} || 0,
             personID => $request->{'intPersonID'} || 0,
+            MAID => $request->{'strNationalNum'} || 0,
             requestFrom => $request->{'requestFrom'} || '',
             requestTo => $request->{'requestTo'} || '',
             requestType => $Defs::personRequest{$request->{'strRequestType'}},
-            requestResponse => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || "N/A",
-            SelectLink => $selectLink,
+            requestResponse => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || $Data->{'lang'}->txt('Requested'),
+            SelectLink => "$Data->{'target'}?client=$client&amp;a=PRA_VR&rid=$request->{'intPersonRequestID'}",
+            Date => $Data->{'l10n'}{'date'}->TZformat($request->{'tTimeStamp'},'MEDIUM','SHORT') || $Data->{'l10n'}{'date'}->TZformat($request->{'dtDateRequest'},'MEDIUM','SHORT') || '',
+            Name => $request->{'strLocalFirstname'} . ' ' . $request->{'strLocalSurname'},
         }
     }
 
     return ("$found record found.", $title) if !$found;
 
     my @headers = (
-        { 
-            type => 'Selector',
-            field => 'SelectLink',
+        {
+            name => $Data->{'lang'}->txt('MA ID'),
+            field => 'MAID',
         }, 
         {
-            name => $Data->{'lang'}->txt('Person ID'),
-            field => 'personID',
-        }, 
+            name => $Data->{'lang'}->txt('Name'),
+            field => 'Name',
+        },
         {
             name => $Data->{'lang'}->txt('Request From'),
             field => 'requestFrom',
@@ -847,7 +855,19 @@ sub listRequests {
             name => $Data->{'lang'}->txt('Response Status'),
             field => 'requestResponse',
         }, 
+        {
+            name => $Data->{'lang'}->txt('Date'),
+            field => 'Date',
+        }, 
+        {
+            name  => $Data->{'lang'}->txt('Task Type'),
+            field => 'SelectLink',
+            width  => 50,
+        },
+
     ); 
+
+    splice @headers, 1, 1 if $personID; #exclude name if navigated down to person
 
     my $rectype_options = '';
     my $grid = showGrid(
@@ -873,13 +893,13 @@ sub viewRequest {
     my ($Data) = @_;
 
     my $requestID = safe_param('rid', 'number') || -1;
-	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
+    my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
     my $requestType = undef;
     my $action = undef;
 
     my %regFilter = (
         'entityID' => $entityID,
-        'requestID' => $requestID
+        'requestID' => $requestID,
     );
     my $request = getRequests($Data, \%regFilter);
 
@@ -887,7 +907,7 @@ sub viewRequest {
 
     #checking of who can only access what request is already handled in the getRequests query
     # e.g. if requestTo already accepted the request, it would be able to view it again as the $request will be empty
-    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Person Request not found.")) if scalar(%{$request}) == 0;
+    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Person Request not found.")) if (!$request or scalar(%{$request}) == 0);
 
     my $templateFile = undef;
     my $error = undef;
@@ -1104,7 +1124,6 @@ sub setRequestResponse {
         }
     }
 
-    print STDERR Dumper $request;
 
     my %notificationData = (
         Reason => $notes,
@@ -1240,21 +1259,24 @@ sub getRequests {
         $Data->{'Realm'}
     );
 
-    if($filter->{'entityID'}) {
+    if($filter->{'entityID'} and !$filter->{'requestID'}) {
         $where .= "
             AND (
                     (pq.intParentMAEntityID = ? AND pq.intRequestToMAOverride = 1 AND pq.strRequestResponse is NULL)
                     OR
-                    (pq.intRequestToEntityID = ? AND pq.strRequestResponse is NULL AND pq.intRequestToMAOverride = 0)
+                    (pq.intRequestToEntityID = ?)
                     OR
-                    (pq.intRequestFromEntityID = ? AND pq.strRequestResponse in (?, ?))
+                    (pq.intRequestFromEntityID = ? AND pq.strRequestResponse in (?, ?, ?))
                 )
             ";
+            #(pq.intRequestToEntityID = ? AND pq.strRequestResponse is NULL AND pq.intRequestToMAOverride = 0)
+
         push @values, $filter->{'entityID'};
         push @values, $filter->{'entityID'};
         push @values, $filter->{'entityID'};
         push @values, $Defs::PERSON_REQUEST_RESPONSE_ACCEPTED;
         push @values, $Defs::PERSON_REQUEST_RESPONSE_DENIED;
+        push @values, $Defs::PERSON_REQUEST_RESPONSE_CANCELLED;
     }
 
     if($filter->{'personID'}) {
@@ -1263,8 +1285,18 @@ sub getRequests {
     }
 
     if($filter->{'requestID'} and $filter->{'entityID'}) {
+        my $readonlyCond = '';
+        if($filter->{'readonly'}) {
+            $readonlyCond = qq[
+                (pq.intPersonRequestID = ?)
+                OR
+            ];
+            push @values, $filter->{'requestID'};
+        }
+
         $where .= qq[
             AND (
+                    $readonlyCond
                     (pq.intParentMAEntityID = ? AND pq.intRequestToMAOverride = 1 AND pq.strRequestResponse is NULL)
                     OR
                     (pq.intRequestToEntityID = ? AND pq.strRequestResponse is NULL AND pq.intPersonRequestID = ? AND pq.intRequestToMAOverride = 0)
@@ -1296,6 +1328,7 @@ sub getRequests {
         $where .= " AND pq.intPersonRequestID IN ($placeholder_in)";
     }
 
+
     my $st = qq[
         SELECT
             pq.intPersonRequestID,
@@ -1311,6 +1344,7 @@ sub getRequests {
             pq.intRequestToMAOverride,
             pq.strRequestNotes,
             pq.dtDateRequest,
+            pq.tTimeStamp,
             DATE_FORMAT(pq.dtDateRequest,'%d %b %Y') AS prRequestDateFormatted,
             UNIX_TIMESTAMP(pq.dtDateRequest) AS prRequestTimeStamp,
             UNIX_TIMESTAMP(pq.tTimeStamp) AS prRequestUpdateTimeStamp,
@@ -1389,6 +1423,7 @@ sub getRequests {
     my @personRequests = ();
       
     while(my $dref = $q->fetchrow_hashref()) {
+        $dref->{'currentAge'} = personAge($Data, $dref->{'dtDOB'});
         my $personCurrAgeLevel = Person::calculateAgeLevel($Data, $dref->{'currentAge'});
         $dref->{'personCurrentAgeLevel'} = $personCurrAgeLevel;
         push @personRequests, $dref;
@@ -1863,6 +1898,75 @@ sub sendITC {
         #this is for test purposes of the template
         #return ($conf_template);
 	}
+}
+
+sub viewRequestHistory {
+    my ($Data, $readonly) = @_;
+
+    my $requestID = safe_param('rid', 'number') || -1;
+    #my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
+    my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
+    my $requestType = undef;
+    my $action = undef;
+
+    my %regFilter = (
+        'entityID' => $entityID,
+        'requestID' => $requestID,
+        'readonly' => $readonly || 0,
+    );
+    my $request = getRequests($Data, \%regFilter);
+
+    $request = $request->[0];
+
+    #checking of who can only access what request is already handled in the getRequests query
+    # e.g. if requestTo already accepted the request, it would be able to view it again as the $request will be empty
+    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Person Request not found.")) if (!$request or scalar(%{$request}) == 0);
+
+    my $templateFile = undef;
+    my $error = undef;
+
+    switch($request->{'strRequestType'}) {
+        case "$Defs::PERSON_REQUEST_TRANSFER" {
+            if($request->{'intPersonRequestID'} and $request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_STATUS_ACCEPTED) {
+                $templateFile = "personrequest/transfer/new_club_view.templ";
+            }
+            else {
+                $templateFile = "personrequest/transfer/current_club_view.templ";
+            }
+
+            $requestType = $Defs::PERSON_REQUEST_TRANSFER;
+        }
+        case "$Defs::PERSON_REQUEST_ACCESS" {
+            if($request->{'intPersonRequestID'} and $request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_STATUS_ACCEPTED) {
+                $templateFile = "personrequest/access/requesting_club_view.templ";
+            }
+            else {
+                $templateFile = "personrequest/access/current_club_view.templ";
+            }
+
+            $requestType = $Defs::PERSON_REQUEST_ACCESS;
+        }
+        else {
+
+        }
+    }
+
+    if($readonly) {
+        $request->{'RequestResponse'} = $Defs::personRequestResponse{$request->{'strRequestResponse'}} || $Data->{'lang'}->txt('Requested');
+        $request->{'RequestStatus'} = $Defs::personRequestResponse{$request->{'strRequestStatus'}} || $Defs::personRegoStatus{$request->{'personRegoStatus'}};
+
+        my %readonlyTemplateData = (
+            request => $request,
+            Label => $Defs::personRequest{$request->{'strRequestType'}},
+        );
+        my $readonlyHTML = runTemplate(
+            $Data,
+            \%readonlyTemplateData,
+            'personrequest/history.templ'
+        );
+
+        return ($readonlyHTML, $Data->{'lang'}->txt('Person Request History'));
+    }
 }
 
 sub displayGenericError {

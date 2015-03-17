@@ -23,6 +23,7 @@ $(document).ready(function(){
     }
 
     var param = getUrlparameter("a");
+    if(!param) { param = ''; }
     var pageHeading = $(".pageHeading").text();
 
     console.log(param);
@@ -77,7 +78,7 @@ $(document).ready(function(){
 
     }
 
-    else if (param == "REP_SETUP") {
+    else if (param.match(/^REP_/))  {
       
       $("header nav ul li a[href*='REP_SETUP']").addClass("active");
     

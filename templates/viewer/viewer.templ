@@ -17,11 +17,11 @@
         [% IF showButtons %]
         <div class = "docViewerButtons txtcenter">	
 		
-			<span>[% IF showApproveButton %]<a href="#" onclick="updateFileStatus([% intFileID %],'APPROVED','[% client %]'); return false;" class="btn-main">[% Lang.txt('APPROVE') %]</a> [% END %]</span> 
+			<span>[% IF showApproveButton %]<a href="#" onclick="updateFileStatus([% intFileID %],'APPROVED','[% client %]','[% regoID %]',1); return false;" class="btn-main">[% Lang.txt('APPROVE') %]</a> [% END %]</span> 
 
 
 		
-            <span>[% IF showRejectButton %]<a href="#" onclick="updateFileStatus([% intFileID %],'REJECTED','[% client %]'); return false;" class="btn-main">[% Lang.txt('REJECT') %]</a> [% END %]</span> 
+            <span>[% IF showRejectButton %]<a href="#" onclick="updateFileStatus([% intFileID %],'REJECTED','[% client %]',[% regoID %],1); return false;" class="btn-main">[% Lang.txt('REJECT') %]</a> [% END %]</span> 
 
         </div>
        [% END %]
@@ -58,28 +58,33 @@
         closeDocViewer();
         return false;
     });
-    function updateFileStatus(fileID,status,client){ 		
+    function updateFileStatus(fileID,status,client,regoID,mytab){ 		
 		jQuery.ajax({
 			method: "POST",
 			url:"main.cgi",
-			data:"a=WF_Verify" + "&f=" + fileID + "&status=" + status + "&client="+client,
+			data:"a=WF_Verify" + "&f=" + fileID + "&status=" + status + "&client="+client + "&regoID="+regoID,
 		}).done(
 
             function(){
                 var url = window.parent.location.href.split("?");
-
+				
                 if(url[1].indexOf("WF_View") > 0) {
                     var params = url[1].split("&");
                     var activetab = params.pop();
-
-                    if(activetab.indexOf("at=") < 0) {
+					if(activetab.indexOf("at=") < 0) {
                         window.parent.location.reload();
                     } else {
-                        params.push("at=1");
-                        window.parent.location.href = url[0] + "?" + params.join("&");
+						if(mytab){
+							params.push("at="+1);
+						}
+						else {
+							var tabindex = activetab.split('=');
+    	                    params.push("at="+tabindex[1]);    	                    
+						}
+						window.parent.location.href = url[0] + "?" + params.join("&");
                     }
                 } else {
-                    window.parent.location.reload();
+					window.parent.location.reload();
                 }
             }
         );		 

@@ -116,6 +116,12 @@
                                         [% Lang.txt('Edit') %]
                                     </a>
                                 </span>
+                            [% ELSIF parentEntityID == childEntityID %]
+                                <span style="float: right" class="">
+                                    <a href = "[% EditDetailsLink %]&e_a=core&bscrn=a%3DWF_View%26TID%3D[% WFTaskID %]%26at%3D2" class="edit-link">
+                                        [% Lang.txt('Edit') %]
+                                    </a>
+                                </span>
                             [% END %]
 
                             </div>
@@ -210,6 +216,12 @@
                                 <span style="float: right" class="">
                                     <a href = "[% EditDetailsLink %]&e_a=con&bscrn=a%3DWF_View%26TID%3D[% WFTaskID %]%26at%3D2" class="edit-link">[% Lang.txt('Edit') %]</a>
                                 </span>
+                            [% ELSIF parentEntityID == childEntityID %]
+                                <span style="float: right" class="">
+                                    <a href = "[% EditDetailsLink %]&e_a=con&bscrn=a%3DWF_View%26TID%3D[% WFTaskID %]%26at%3D2" class="edit-link">
+                                        [% Lang.txt('Edit') %]
+                                    </a>
+                                </span>
                             [% END %]
 
                             </div>
@@ -281,6 +293,13 @@
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Certifications") %]:</span>
                             <span class="details-left detail-value">[% IF PersonRegoDetails.Certifications %] [% PersonRegoDetails.Certifications %] [% ELSE %] - [% END %]</span>
+                        </span>
+                    [% END %]
+
+                    [% IF PersonRegoDetails.OriginLevel == 100 %]
+                        <span class="details-row">
+                            <span class="details-left">[% Lang.txt("MA Comment") %]:</span>
+                            <span class="details-left detail-value">[% IF PersonRegoDetails.strShortNotes %] [% PersonRegoDetails.strShortNotes %] [% ELSE %] - [% END %]</span>
                         </span>
                     [% END %]
 

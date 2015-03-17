@@ -73,12 +73,13 @@ sub listPersonAuditLog    {
     );
 	my @rowdata = ();
 	while(my $ref= $sth->fetchrow_hashref()){
+        my $dt = $Data->{'l10n'}{'date'}->TZformat($ref->{'dtUpdated'},'MEDIUM','SHORT');
 		push @rowdata,{
 			Username=> $ref->{'strUsername'},
 			UserEntity=> $ref->{'strLocalName'},
 			Type => $ref->{'strType'},
 			Section=> $ref->{'strSection'},
-			DateUpdated=> $ref->{'dtUpdated'},
+			DateUpdated=> $dt,
 		};
 	}
 	$sth->finish();
@@ -111,7 +112,7 @@ sub listEntityAuditLog {
             )
             LEFT JOIN tblEntity as E ON (
                 E.intEntityID= AL.intID 
-                AND AL.strSection IN ("Club", "Entity", "Venue")
+                AND AL.strSection IN ("Imported", "Club", "Entity", "Venue")
             )
         WHERE
             (
@@ -119,7 +120,7 @@ sub listEntityAuditLog {
                 OR WFT.intEntityID=? 
                 OR E.intEntityID=?
             )
-            AND AL.strSection IN ("Club", "Entity", "Venue", "WFTask")
+            AND AL.strSection IN ("Imported", "Club", "Entity", "Venue", "WFTask")
         ORDER BY 
             AL.dtUpdated DESC
     
@@ -132,12 +133,13 @@ sub listEntityAuditLog {
     );
 	my @rowdata = ();
 	while(my $ref= $sth->fetchrow_hashref()){
+        my $dt = $Data->{'l10n'}{'date'}->TZformat($ref->{'dtUpdated'},'MEDIUM','SHORT');
 		push @rowdata,{
 			Username=> $ref->{'strUsername'},
 			UserEntity=> $ref->{'strLocalName'},
 			Type => $ref->{'strType'},
 			Section=> $ref->{'strSection'},
-			DateUpdated=> $ref->{'dtUpdated'},
+			DateUpdated=> $dt,
 		};
 	}
 	$sth->finish();
@@ -146,7 +148,7 @@ sub listEntityAuditLog {
 		AuditLog=> \@rowdata,
 	};
 	 my $title = '';
-	 my $resultHTML = runTemplate($Data, $PageContent, 'person/auditlog.templ') || '';
+	 my $resultHTML = runTemplate($Data, $PageContent, 'entity/auditlog.templ') || '';
 	 $title = 'Audit Trail';
 	 return ($resultHTML, $title);
 }

@@ -22,6 +22,11 @@ sub savePlayerPassport{
 	my $query = "DELETE FROM tblPlayerPassport WHERE intPersonID= ? and strOrigin= 'REGO'";
 	my $sth = $Data->{'db'}->prepare($query); 
 	$sth->execute($personID);
+
+	my $query = "SELECT strLocalName FROM tblEntity WHERE intEntityLevel=100 and intRealmID=? LIMIT 1";
+	my $sth = $Data->{'db'}->prepare($query); 
+	$sth->execute($Data->{'Realm'});
+    my $MAName = $sth->fetchrow_array() || '';
 	
 	$query = qq[
         SELECT 
@@ -37,14 +42,12 @@ sub savePlayerPassport{
             DATE_FORMAT(PR.dtTo, "%Y%m%d") as dtTo_,
             DATE_FORMAT(PR.dtFrom, "%Y%m%d") as dtFrom_,
             PR.intNationalPeriodID, 
-            strRealmName, 
             PR.strAgeLevel, 
             DATE_ADD(dtDOB,INTERVAL 12 YEAR) as When12,
             E.strLocalName as EntityName,
             IF(PR.dtTo > '1900-01-01', PR.dtTo, NOW()) as PRToCalc
         FROM tblPersonRegistration_$Data->{'Realm'} as PR
         INNER JOIN tblPerson as P ON (P.intPersonID=PR.intPersonID)
-        INNER JOIN tblRealms ON (PR.intRealmID = tblRealms.intRealmID) 
         INNER JOIN tblEntity as E ON (E.intEntityID = PR.intEntityID)
         LEFT JOIN tblNationalPeriod as NP ON (NP.intNationalPeriodID = PR.intNationalPeriodID)
         WHERE 
@@ -109,9 +112,8 @@ sub savePlayerPassport{
      my $lastRealmName = '';
      my $lastEntityName = '';
      while(my $dref = $sth->fetchrow_hashref()){
+        $dref->{'strRealmName'} = $MAName;
      	
-     	###
-     	#check age 
 #     	next if( ($dref->{'yrDtTo'} - $yearBorn) < 12 );
      	if($rowCount == 0){
      		$eID = $dref->{'intEntityID'};

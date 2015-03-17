@@ -17,6 +17,8 @@ use FieldCaseRule;
 use DefCodes;
 use PersonLanguages;
 use CustomFields;
+use InstanceOf;
+use Data::Dumper;
 
 
 sub clubFieldsSetup {
@@ -127,6 +129,17 @@ sub clubFieldsSetup {
         1 => 'Yes',
     );
 
+    my %notificationToggleOptions = (
+        0 => 'Off',
+        1 => 'On',
+    );
+
+    my $regionName = '';
+    if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_REGION) {
+        my $RAObj = getInstanceOf($Data, 'region');
+        $regionName = $RAObj->name();
+    }
+
     $Data->{'FieldSets'} = {
         core => {
             'fields' => {
@@ -190,8 +203,8 @@ sub clubFieldsSetup {
                     sectionname => 'core',
                 },
                 strRegion       => {
-                    label       => $FieldLabels->{'strRegion'},
-                    value       => $values->{'strRegion'},
+                    label       => $Data->{'SystemConfig'}{'club_strRegion'} || $FieldLabels->{'strRegion'},
+                    value       => $values->{'strRegion'} || $regionName || '',
                     type        => 'text',
                     size        => '30',
                     maxsize     => '45',
@@ -345,6 +358,17 @@ sub clubFieldsSetup {
                     maxsize     => '100',
                     validate    => 'EMAIL',
                 },
+                intNotifications => {
+                    label       => $FieldLabels->{'intNotifications'},
+                    value       => $values->{'intNotifications'},
+                    type        => 'lookup',
+                    options     => \%notificationToggleOptions,
+                    class       => 'fcToggleGroup',
+                    compulsory => 1,
+                    firstoption => [ '', " " ],
+                    noadd      => 1,
+                    #noedit      => 1,
+                },                
             },
             'order' => [qw(
                 strAddress
@@ -356,6 +380,7 @@ sub clubFieldsSetup {
                 strContact
                 strPhone
                 strEmail
+                intNotifications
             )],
             sections => [
                 [ 'main',        'Contact Details','','',$values->{'footer-contactdetails'} ],
@@ -416,6 +441,14 @@ sub clubFieldsSetup {
                     maxsize     => '100',
                     readonly    => $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL ? 1 : 0,
                 },
+                strBankAccountNumber     => {
+                    label       => $FieldLabels->{'strBankAccountNumber'},
+                    value       => $values->{'strBankAccountNumber'},
+                    type        => 'text',
+                    size        => '40',
+                    maxsize     => '45',
+                    compulsory  => 1,
+                },
             },
             'order' => [qw(
                 strEntityType
@@ -424,6 +457,7 @@ sub clubFieldsSetup {
                 strDiscipline
                 strOrganisationLevel
                 strMANotes
+                strBankAccountNumber
             )],
             sections => [
                 [ 'main',        'Organisation Details','','',$values->{'footer-roledetails'} ],
@@ -544,6 +578,11 @@ sub entityFieldsSetup {
     my %dissolvedOptions = (
         0 => 'No',
         1 => 'Yes',
+    );
+
+    my %notificationToggleOptions = (
+        0 => 'Off',
+        1 => 'On',
     );
 
     $Data->{'FieldSets'} = {
@@ -763,7 +802,18 @@ sub entityFieldsSetup {
                     size        => '50',
                     maxsize     => '100',
                     validate    => 'EMAIL',
+                    compulsory  => 1,
                 },
+                intNotifications => {
+                    label       => $FieldLabels->{'intNotifications'},
+                    value       => $values->{'intNotifications'},
+                    type        => 'lookup',
+                    options     => \%notificationToggleOptions,
+                    class       => 'fcToggleGroup',
+                    compulsory => 1,
+                    firstoption => [ '', " " ],
+                    #noedit      => 1,
+                },                
             },
             'order' => [qw(
                 strAddress
@@ -775,6 +825,7 @@ sub entityFieldsSetup {
                 strContactISOCountry
                 strPhone
                 strEmail
+                intNotifications
             )],
             sections => [
                 [ 'main',        'Contact Details','','',$values->{'footer-contactdetails'} ],
