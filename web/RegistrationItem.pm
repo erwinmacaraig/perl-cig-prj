@@ -33,7 +33,8 @@ sub getRegistrationItems    {
             D.strDocumentName,
             D.strDocumentFor,
 			D.strDescription,
-            P.strName as strProductName
+            P.strName as strProductName,
+            P.strDisplayName as strProductDisplayName
         FROM
             tblRegistrationItem as RI
             LEFT JOIN tblDocumentType as D ON (intDocumentTypeID = RI.intID and strItemType='DOCUMENT')
@@ -118,7 +119,8 @@ sub getRegistrationItems    {
         }
     
         if ($itemType eq 'PRODUCT') {
-            $Item{'Name'} = $dref->{'strProductName'};
+            #$Item{'Name'} = $dref->{'strProductName'};
+            $Item{'Name'} = $dref->{'strProductDisplayName'} || $dref->{'strProductName'};
             $Item{'ProductPrice'} = getItemCost($Data, $entityID, $entityLevel, $multiPersonType, $dref->{'intID'}) || 0;
             
         }
