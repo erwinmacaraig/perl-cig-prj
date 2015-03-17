@@ -27,6 +27,7 @@ CREATE TABLE tblWFRule (
    
     intAutoActivateOnPayment tinyint default 0 COMMENT 'Auto Activate Person/Rego on Payment',
     intLockTaskUntilPaid tinyint default 0 COMMENT 'Locks task until paid',
+    intLockTaskUntilGatewayResponse tinyint default 0 COMMENT 'Locks task until response from gateway',
     intRemoveTaskOnPayment tinyint default 0 COMMENT 'On Payment, remove task and either go to next one or approve person/Rego/Entity',
 
   tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
