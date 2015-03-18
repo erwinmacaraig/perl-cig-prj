@@ -44,6 +44,12 @@ sub main	{
     my %clientValues = getClient($client);
     $Data{'clientValues'} = \%clientValues;
     ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
+
+
+    getDBConfig(\%Data);
+    $Data{'SystemConfig'}=getSystemConfig(\%Data);
+    initLocalisation(\%Data);
+
      my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     foreach my $key ( keys %clientValues) {
         $params{$key} = $clientValues{$key};
@@ -118,6 +124,7 @@ sub main	{
     my $paymentURL = '';
     my %gatewaySpecific = ();
 
+    my $currentLang = $Data{'lang'}->generateLocale($Data{'SystemConfig'});
 
     if ($paymentSettings->{'gatewayCode'} eq 'NABExt1') {
         $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;chkv=$chkvalue&amp;session=$session&amp;amount=$amount];
@@ -150,7 +157,9 @@ print STDERR "TEST BELOW WITH NO CLIENT ETC\n";
         $gatewaySpecific{'AMOUNT'} = $cents;
         $gatewaySpecific{'REFERENCE'} = $logID;
         $gatewaySpecific{'MESSAGE'} = "";
-        $gatewaySpecific{'LANGUAGE'} = "EN";
+        $gatewaySpecific{'LANGUAGE'} = "FI";
+        $gatewaySpecific{'LANGUAGE'} = "EN" if ($currentLang =~ /^en_/);
+        
         $gatewaySpecific{'MERCHANT'} = $paymentSettings->{'gatewayUsername'};
         $gatewaySpecific{'RETURN'} = $returnURL;
         $gatewaySpecific{'CANCEL'} = $cancelURL;
