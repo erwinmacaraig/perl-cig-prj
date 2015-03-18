@@ -25,7 +25,7 @@ use Gateway_Common;
 use Data::Dumper;
 use GatewayProcess;
 use Localisation;
-use WorkFlow;
+use Products;
 
 use Digest::SHA qw(hmac_sha256_hex);
 
@@ -128,7 +128,7 @@ print STDERR "CHECK FOR $logID\n";
             
             ########
             my ($Order, $Transactions) = gatewayTransactions(\%Data, $logID);
-            #markGatewayAsResponded(); ## Pass taskID ????
+            markGatewayAsResponded(\%Data, $logID); 
             my ($paymentSettings, undef) = getPaymentSettings(\%Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, 1);
             ########
 

@@ -348,6 +348,7 @@ $sth = $Data->{'db'}->prepare($query);
 
 		################################################
         $hidden_ref->{'payMethod'} = 'notrequired' if (! $amountDue);
+print STDERR "PAY METHOD = $hidden_ref->{'payMethod'}\n";
         my %PaymentConfig = (
             totalAmountDue => $amountDue,
 			totalPaymentDue => $hidden_ref->{'paymentDue'},

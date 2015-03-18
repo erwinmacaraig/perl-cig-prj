@@ -1,8 +1,8 @@
 package GatewayProcess;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT=qw(gatewayProcess payTryRead payTryRedirectBack payTryContinueProcess markTXNSentToGateway);
-@EXPORT_OK=qw(gatewayProcess payTryRead payTryRedirectBack payTryContinueProcess markTXNSentToGateway);
+@EXPORT=qw(gatewayProcess payTryRead payTryRedirectBack payTryContinueProcess markTXNSentToGateway markGatewayAsResponded);
+@EXPORT_OK=qw(gatewayProcess payTryRead payTryRedirectBack payTryContinueProcess markTXNSentToGateway markGatewayAsResponded);
 
 use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 
@@ -49,6 +49,80 @@ sub markTXNSentToGateway    {
 
     my $query = $Data->{'db'}->prepare($st);
     $query->execute($logID);
+}
+
+sub markGatewayAsResponded  {
+
+    my ($Data, $logID) = @_;
+print STDERR "^^^^^^^^^^ MARK GATEWAY AS RESPONDED\n";
+    return if ! $logID;
+
+    my $stUPD = qq[
+        UPDATE tblTransLog as TL
+            INNER JOIN tblTXNLogs as TXNLogs ON (TXNLogs.intTLogID = TL.intLogID)
+            INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLogs.intTXNID)
+        SET
+            TL.intPaymentGatewayResponded = 1, T.intPaymentGatewayResponded= 1
+        WHERE
+            TL.intLogID = ?
+    ];
+    my $query = $Data->{'db'}->prepare($stUPD);
+    $query->execute($logID);
+
+
+    my $st = qq[
+        SELECT
+            DISTINCT
+                t.intWFTaskID
+        FROM
+            tblTransLog as TL
+            INNER JOIN tblTXNLogs as TXNLogs ON (TXNLogs.intTLogID = TL.intLogID)
+            INNER JOIN tblTransactions as TXN ON (TXN.intTransactionID = TXNLogs.intTXNID)
+            INNER JOIN tblWFTask as t ON (t.intPersonRegistrationID = TXN.intPersonRegistrationID)
+        WHERE
+            TL.intLogID = ?
+            AND t.intPersonRegistrationID > 0
+            AND TXN.intTableType = $Defs::LEVEL_PERSON
+    ];
+    my $q= $Data->{'db'}->prepare($st);
+    $q->execute($logID);
+    my $dref = $q->fetchrow_hashref();
+    my $taskID = $dref->{'intWFTaskID'} || 0;
+
+    if (! $taskID)  {
+        ## Lets check if its a Club Product
+        $st = qq[
+            SELECT
+                DISTINCT
+                    t.intWFTaskID
+            FROM
+                tblTransLog as TL
+                INNER JOIN tblTXNLogs as TXNLogs ON (TXNLogs.intTLogID = TL.intLogID)
+                INNER JOIN tblTransactions as TXN ON (TXN.intTransactionID = TXNLogs.intTXNID)
+                INNER JOIN tblWFTask as t ON (t.intEntityID= TXN.intID)
+            WHERE
+                TL.intLogID = ?
+                AND TXN.intTableType = $Defs::LEVEL_CLUB
+                AND t.strTaskStatus = 'ACTIVE'
+        ];
+        $q= $Data->{'db'}->prepare($st);
+        $q->execute($logID);
+        my $dref = $q->fetchrow_hashref();
+        $taskID = $dref->{'intWFTaskID'} || 0;
+    }
+
+    if ($taskID)    {
+        $stUPD = qq[
+            UPDATE tblWFTask
+                SET intPaymentGatewayResponded = 1
+            WHERE
+                intRealmID = ?
+                AND intWFTaskID = ?
+        ];
+        my $qUPD= $Data->{'db'}->prepare($stUPD);
+        $qUPD->execute($Data->{'Realm'}, $taskID);
+    }
+
 }
 
 sub payTryContinueProcess {
@@ -163,7 +237,6 @@ print STDERR "IN GATEWAY PROCESS";
   my ($paymentSettings, undef) = getPaymentSettings($Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, $external);
 
 
-    print STDERR $paymentSettings->{'gatewayCode'};
     ### Might need IF test here per gatewayCode
   #$returnVals_ref->{'ResponseText'} = NABResponseCodes($returnVals_ref->{'GATEWAY_RESPONSE_CODE'});
   #$returnVals_ref->{'ResponseCode'} = $returnVals_ref->{'GATEWAY_RESPONSE_CODE'};
@@ -171,6 +244,8 @@ print STDERR "IN GATEWAY PROCESS";
   #  $returnVals_ref->{'ResponseCode'} = 'OK';
   #}
 
+print STDERR "ABOUT TO MARK GATEWAY AS RESPONDED!!!!!!!!!!!!!!!!!!!!!!!!\n";
+    markGatewayAsResponded($Data, $logID);
 
   {
     #my $chkvalue= param('rescode') . $Order->{'TotalAmount'}. $logID; ## NOTE: Different to one being sent
