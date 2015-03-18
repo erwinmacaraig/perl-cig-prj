@@ -111,6 +111,9 @@ print STDERR "IN checkOpenPayments\n";
     my $retval = $res->content() || '';
 print STDERR $res;
 print STDERR Dumper($retval);
+
+
+print STDERR "NEED TO GET STATUS THEN CONTINUE THIS SCRIPT !!!!!!!!\n";
     next;
         my %APIResponse = ();
         
