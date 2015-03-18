@@ -116,7 +116,7 @@ sub getRegoProducts {
         CurrencySymbol => $currencySymbol,
     );
     my $pagedata = '';
-    $pagedata = runTemplate($Data, \%PageData, 'regoform/common/products.templ');
+    $pagedata = runTemplate($Data, \%PageData, 'registration/products.templ');
     return $pagedata || '';
 }
 
