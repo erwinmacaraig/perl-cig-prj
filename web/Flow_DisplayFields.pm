@@ -812,15 +812,13 @@ qq[To modify this information change the information in the boxes below and when
     );
 
     my $txt = q{};
-    if ( exists $self->{'Fields'}->{'options'}{'LocaleMakeText'}
-        and $self->{'Fields'}->{'options'}{'LocaleMakeText'} )
-    {
+    if ($self->{'Lang'}) {
 
-        $txt = $self->{'Fields'}->{'options'}{'LocaleMakeText'}->txt(
+        $txt = $self->{'Lang'}->txt(
             $key,
             (
                 map {
-                    $self->{'Fields'}->{'options'}{'LocaleMakeText'}->txt($_)
+                    $self->{'Lang'}->txt($_)
                       || $_
                 } @_
             )

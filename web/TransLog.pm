@@ -412,7 +412,6 @@ sub step2 {
 						</span>
 					</div>
 				</div>
-
 	];	
 
 	$body.=$transHTML;
@@ -584,10 +583,19 @@ print FH "\n $statement \n";
     my $query = $db->prepare($statement);
     $query->execute or print STDERR $statement;
     my $client = setClient($Data->{clientValues});
-warn("LL $hidePayment:$hidePay:$displayonly");
+    my $lang = $Data->{'lang'};
     my @headers = (
     {
+<<<<<<< HEAD
         name => 'Check', 
+=======
+        name => $lang->txt('Invoice Number'), 
+        field => 'strInvoiceNumber', 
+        width => 20
+    },
+    {
+        name => $lang->txt('Select'), 
+>>>>>>> develop
         field => 'manual_payment', 
         type => 'HTML', 
         width => 10, 
@@ -600,7 +608,7 @@ warn("LL $hidePayment:$hidePay:$displayonly");
         width => 20
     },
     {
-        name => 'Transaction Number', 
+        name => $lang->txt('Transaction Number'), 
         field => 'intTransactionID', 
         width => 20
     },
@@ -614,26 +622,31 @@ warn("LL $hidePayment:$hidePay:$displayonly");
 		field => 'strPersonType',
 	},
     {
-        name => 'Status', 
+        name => $lang->txt('Status'), 
         field => 'StatusTextLang', 
         width => 20
     },
     {
-        name => 'Item', 
+        name => $lang->txt('Item'), 
         field => 'strName'
     },
     {
-        name => 'Quantity', 
+        name => $lang->txt('Quantity'), 
         field => 'intQty', 
         width => 15
     },
     {
+<<<<<<< HEAD
         name => 'Amount', 
         field => 'curAmount', 
+=======
+        name => $lang->txt('Amount'), 
+        field => 'NetAmount', 
+>>>>>>> develop
         width => 20
     },
     {
-        name => 'Date Paid', 
+        name => $lang->txt('Date Paid'), 
         field => 'dtPaid',
         sortdata => 'dtPaid_RAW'
     },
@@ -648,7 +661,7 @@ warn("LL $hidePayment:$hidePay:$displayonly");
         name => '', 
         field => 'SelectLink', 
         type => 'Selector', 
-        text => 'Edit', 
+        text => $lang->txt('Edit'), 
         hide => $displayonly
     }
     );
@@ -900,7 +913,7 @@ sub listTransactions {
 	my $entityNamePlural = ' ';
     $entityNamePlural= ($Data->{'SystemConfig'}{'txns_link_name'}) ? $Data->{'SystemConfig'}{'txns_link_name'} : $entityNamePlural;
 
-	my $header=qq[$entityNamePlural];
+	my $header=$Data->{'lang'}->txt($entityNamePlural);
 
         my $targetManual = $Data->{'target'};
         my $targetOnline = 'paytry.cgi';
@@ -1877,7 +1890,12 @@ sub viewPayLaterTransLog    {
 
 	$intTransLogID ||= 0;
 	my $db = $Data->{'db'};
+<<<<<<< HEAD
 	my $dollarSymbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
+=======
+	my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
+    my $lang = $Data->{'lang'};
+>>>>>>> develop
 
 	my $st = qq[
 		SELECT tblTransLog.*, IF(T.intTableType = $Defs::LEVEL_CLUB, Entity.strLocalName, CONCAT(strLocalFirstname,' ',strLocalSurname)) as Name, DATE_FORMAT(dtSettlement,'%d/%m/%Y') as dtSettlement
@@ -1951,14 +1969,14 @@ sub viewPayLaterTransLog    {
 	$headerText = $Data->{'SystemConfig'}{'regoform_PayLaterText'} if ($Data->{'SystemConfig'}{'regoform_PayLaterText'});
 	my $body = qq[
 		$headerText
-		<h2 class="section-header">Items making up this order</h2>
+		<h2 class="section-header">].$lang->txt('Items making up this order').qq[</h2>
 		<table class="listTable">
 		<tr>
-			<th>Transaction Number</th>
-			<th>Item</th>
-			<th>Quantity</th>
-			<th>Total Amount</th>
-			<th>Status</th>
+			<th>].$lang->txt('Transaction Number').qq[</th>
+			<th>].$lang->txt('Item').qq[</th>
+			<th>].$lang->txt('Quantity').qq[</th>
+			<th>].$lang->txt('Total Amount').qq[</th>
+			<th>].$lang->txt('Status').qq[</th>
 		</tr>
 	];
 	my $client=setClient($Data->{'clientValues'});

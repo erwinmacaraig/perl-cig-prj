@@ -41,7 +41,7 @@ use RegoProducts;
 sub setProcessOrder {
     my $self = shift;
   
-    my $dtype = param('dtype') || '';
+    my $dtype = param('dtype') || $self->{'RunParams'}{'dtype'} || $self->{'CarryFields'}{'dtype'} || '';
     my $typename = $Defs::personType{$dtype} || '';
     my $regname = $typename
         ? $typename .' Registration'
@@ -183,13 +183,13 @@ sub display_core_details    {
 
         if($defaultType eq $Defs::PERSON_TYPE_PLAYER and $self->{'SystemConfig'}{'allowPersonRequest'}) {
             $txt = $lang->txt('Please check that this player has not been registered with another club?')
-                .qq[ <a href = "$transfer">].$lang->txt('If yes, they need to apply for a Transfer.').'</a>'
-                .$lang->txt(' Not sure?')
+                .qq[ <a href = "$transfer">].$lang->txt('If yes, they need to apply for a Transfer.').'</a> '
+                .$lang->txt('Not sure?')
                 .qq[ <a href = "$search">].$lang->txt('Then use the Search.').'</a>' ;
         }
         else {
              $txt = $lang->txt('Has this person already been registered?')
-                .$lang->txt(' Not sure?')
+                .' '.$lang->txt('Not sure?')
                 .qq[ <a href = "$search">].$lang->txt('Then use the Search.').'</a>' ;       
         }
 
@@ -945,12 +945,14 @@ sub display_products {
         }
     }
     else    {
-        push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
-    }
-    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
-        #There are errors - reset where we are to go back to the form again
-        $self->decrementCurrentProcessIndex();
-        return ('',2);
+        if (! $self->{'RunDetails'}{'Errors'} and  ! scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+            push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
+            if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+                #There are errors - reset where we are to go back to the form again
+                $self->setCurrentProcessIndex('r');
+                return ('',2);
+            }
+        }
     }
     my %ManualPayPageData = (
         HiddenFields => $self->stringifyCarryField(),
@@ -1038,6 +1040,12 @@ sub process_products {
         $regoID = 0 if !$valid;
     }
 
+    my ($resultHTML, $error) = checkMandatoryProducts($self->{'Data'}, $personID, $Defs::LEVEL_PERSON, $self->{'RunParams'});
+    if ($error) {
+        push @{$self->{'RunDetails'}{'Errors'}}, $resultHTML;
+        $self->setCurrentProcessIndex('p');
+        return ('',2);
+    }
     my ($txnIds, $amount) = save_rego_products($self->{'Data'}, $regoID, $personID, $entityID, $entityLevel, $rego_ref, $self->{'RunParams'});
 
 ####
@@ -1152,8 +1160,6 @@ sub process_documents {
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
 
-warn("OOO $regoID:$personID");
-print STDERR Dumper($self->{'RunParams'});
     my $rego_ref = {};
 	my $personObj;
     my $content = '';
@@ -1281,7 +1287,8 @@ sub display_summary {
     }
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
-        $self->decrementCurrentProcessIndex();
+        #$self->decrementCurrentProcessIndex();
+        $self->setCurrentProcessIndex('r');
         return ('',2);
     }
     

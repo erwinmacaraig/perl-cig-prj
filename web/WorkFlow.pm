@@ -1158,7 +1158,7 @@ sub approveTask {
 
     #NOTE if new approval check needs to be done, just add another condition here (increment error, concat $response)
     if($sysConfigApprovalLockPaymentRequired and $task->{'paymentRequired'}){
-        $errorStr = $Data->{'lang'}->txt("ERROR: Payment required."); 
+        $errorStr = $Data->{'lang'}->txt("Error").': '. $Data->{'lang'}->txt("Payment required"); 
         $response = qq [
             <span>$errorStr</span><br/>
         ];
@@ -2835,11 +2835,14 @@ sub populateEntityViewData {
             PostalCode => $dref->{'entityPostalCode'} || '',
             Contact => $dref->{'entityContact'} || '',
             organizationType => $dref->{'strEntityType'},
+            organizationTypeName => $Defs::entityType{$dref->{'strEntityType'}},
             strLegalID => $dref->{'strLegalID'},
             comment => $dref->{'strMANotes'},
             sport => $dref->{'strDiscipline'},
+            sportName => $Defs::entitySportType{$dref->{'strDiscipline'}},
             strCity => $dref->{'strCity'},
             organizationLevel => $dref->{'strOrganisationLevel'},
+            organizationLevelName => $Defs::personLevel{$dref->{'strOrganisationLevel'}},
             legaltype => Club::getLegalTypeName($Data, $dref->{'intLegalTypeID'}),
             intEntityID => $dref->{'intEntityID'},
             bankAccountDetails => $dref->{'strBankAccountNumber'},

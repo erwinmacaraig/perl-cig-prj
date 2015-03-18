@@ -1091,7 +1091,7 @@ sub update_venue_fields {
 
     my %flashMessage;
     $flashMessage{'flash'}{'type'} = 'success';
-    $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt("Facility fields updated.");
+    $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt("Facility fields have been updated.");
 
     #FlashMessage::setFlashMessage($Data, 'FAC_FM', \%flashMessage);
 

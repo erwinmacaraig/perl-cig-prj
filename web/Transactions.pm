@@ -83,6 +83,7 @@ sub handleTransactions	{
 	if (! $heading)	{
 		$heading = ($Data->{'SystemConfig'}{'txns_link_name'}) ? $Data->{'SystemConfig'}{'txns_link_name'} :  'Transactions';
 	}
+    $heading = $Data->{'lang'}->trans($heading);
 	#$heading ||= $Data->{'SystemConfig'}{'txns_link_name'} || 'Transactions';
 
 	#$heading ||= 'Transactions';
@@ -295,7 +296,7 @@ sub displayTransaction	{
 					readonly=>$readonly,
             			},
 				intDelivered=> {
-			        	label => $lang->txt("Delivered ?"),
+			        	label => $lang->txt("Delivered"),
 		                	value => $dref->{'intDelivered'},
                 			type  => 'checkbox',
                 			displaylookup => {0=>'Undelivered', 1=>'Delivered'},
@@ -446,8 +447,8 @@ sub displayTransaction	{
 					$resultHTML
 				</div>
 		];
-		my $heading = $Data->{'SystemConfig'}{'txns_link_name'}  || $lang->txt('Transactions');
-		return ($resultHTML,$heading);
+		my $heading = $Data->{'SystemConfig'}{'txns_link_name'}  || 'Transactions';
+		return ($resultHTML,$Data->{'lang'}->txt($heading));
 }
 
 sub showTransactionChildren	{
