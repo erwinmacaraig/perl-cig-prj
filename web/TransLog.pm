@@ -457,13 +457,15 @@ sub step3 {
 	deQuote($db, \$transLogID);
 
     my $st = <<"EOS";
-SELECT dtLog
+SELECT dtLog,intID
 FROM   tblTransLog
 WHERE  intLogID = ?
-AND    intRealmID = ?
-AND    intStatus = ?
+AND    tblTransLog.intRealmID = ?
+AND    tblTransLog.intStatus = ?
 LIMIT 1
 EOS
+
+
     my $query = $db->prepare($st);
     $query->execute($transLogID, $Data->{Realm}, $Defs::TXNLOG_PENDING);
 
@@ -487,7 +489,13 @@ EOS
 
 	Products::product_apply_transaction($Data,$transLogID);
 	my $cl=setClient($Data->{'clientValues'}) || '';
-	my $receiptLink = "printreceipt.cgi?client=$cl&ids=$transLogID";
+
+	$st = qq[SELECT intID FROM tblTransactions WHERE intTransLogID = $transLogID AND intRealmID = $Data->{'Realm'}];
+	$query = $db->prepare($st);
+	$query->execute();
+	my $dref = $query->fetchrow_hashref();
+	
+	my $receiptLink = "printreceipt.cgi?client=$cl&ids=$transLogID&pID=$dref->{'intID'}";
 
    auditLog($transLogID, $Data, 'Confirmed Payment', 'Transactions');
    my ($success, $resultHTML) = displayPaymentResult($Data, $transLogID, 0) ; # <div class="OKmsg">].$lang->txt('Your payment has been Confirmed') .qq[</div>
