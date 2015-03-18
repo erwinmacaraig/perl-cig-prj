@@ -90,7 +90,7 @@ sub getRegoProducts {
             Status => $dref->{'intStatus'},
             ProductNotes => decode_entities($dref->{'strProductNotes'}) || '',
             Mandatory => $regItemRules_ref->{$dref->{'intProductID'}}{'Required'} || $dref->{'intIsMandatory'} || 0,
-            Name => $dref->{'strName'} || '',
+            Name => $dref->{'strDisplayName'} || $dref->{'strName'} || '',
             Photo =>$photolink,
         );
         push @unpaid_items, \%itemdata if $filter_display;
@@ -133,6 +133,7 @@ sub getAllRegoProducts {
             T.intTransactionID,
             T.curAmount as AmountCharged,
             P.intProductID,
+            P.strDisplayName,
             P.strName,
             P.curDefaultAmount,
             P.intMinChangeLevel,

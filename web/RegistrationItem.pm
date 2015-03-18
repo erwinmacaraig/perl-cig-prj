@@ -102,6 +102,7 @@ sub getRegistrationItems    {
 
     my @Items=();
     while (my $dref = $q->fetchrow_hashref())   {
+        print STDERR Dumper $dref;
         next if($itemType eq 'DOCUMENT' and $documentFor and ($documentFor ne $dref->{'strDocumentFor'}));
 
         #check if International Transfer
