@@ -1,0 +1,35 @@
+# 150308_tblWFRule.sql
+ALTER TABLE tblWFRule
+    ADD COLUMN intAutoActivateOnPayment tinyint default 0 COMMENT 'Auto Activate Person/Rego on Payment' AFTER intDocumentTypeID,
+    ADD COLUMN intLockTaskUntilPaid tinyint default 0 COMMENT 'Locks task until paid' AFTER intDocumentTypeID,
+    ADD COLUMN intRemoveTaskOnPayment tinyint default 0 COMMENT 'On Payment, remove task and either go to next one or approve person/Rego/Entity' AFTER intDocumentTypeID;
+
+# 150308_tblPersonRego.sql
+ALTER TABLE tblPersonRegistration_1 ADD COLUMN intWasActivatedByPayment tinyint default 0 COMMENT 'Debug flag for if record was auto activated by Payment';
+
+# 150308_tblEntity.sql
+ALTER TABLE tblEntity ADD COLUMN intWasActivatedByPayment tinyint default 0 COMMENT 'Debug flag for if record was auto activated by Payment';
+
+# 150311_tblTransactions.sql
+ALTER TABLE tblTransactions ADD COLUMN intSentToGateway TINYINT default 0;
+
+# 150311_tblTransLog.sql
+ALTER TABLE tblTransLog ADD COLUMN intSentToGateway TINYINT default 0;
+
+# 150311_tblPaymentConfig.sql
+ALTER TABLE tblPaymentConfig ADD COLUMN intProcessPreGateway TINYINT DEFAULT 0;
+
+# 150317_tblWFTask.sql
+ALTER TABLE tblWFTask ADD COLUMN intPaymentGatewayResponded tinyint default 0 COMMENT 'Has payment gateway responded';
+
+# 150317_tblWFRule.sql
+ALTER TABLE tblWFRule ADD COLUMN intLockTaskUntilGatewayResponse tinyint default 0 COMMENT 'Locks task until response from gateway' AFTER intRemoveTaskOnPayment;
+
+# 150318_tblTransLog.sql
+ALTER TABLE tblTransLog ADD COLUMN intPaymentGatewayResponded TINYINT default 0;
+
+# 150318_tblTransactions.sql
+ALTER TABLE tblTransactions ADD COLUMN intPaymentGatewayResponded TINYINT default 0;
+
+ALTER TABLE tblProducts ADD COLUMN strDisplayName VARCHAR(100) NULL AFTER strName;
+
