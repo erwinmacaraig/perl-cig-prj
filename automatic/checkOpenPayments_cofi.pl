@@ -28,6 +28,7 @@ use Localisation;
 use Products;
 
 use Digest::SHA qw(hmac_sha256_hex);
+use HTTP::Request::Common qw(POST);
 
 #use Crypt::CBC;
 
@@ -64,7 +65,11 @@ print STDERR "IN checkOpenPayments\n";
      
     my $st = qq[
         SELECT
-            intLogID
+            intLogID,
+            TL.intAmount,
+            PC.strGatewayUsername,
+            PC.strGatewayPassword,
+            PC.strCurrency
         FROM
             tblTransLog as TL
             INNER JOIN tblPaymentConfig as PC ON (PC.intPaymentConfigID = TL.intPaymentConfigID)
@@ -72,16 +77,40 @@ print STDERR "IN checkOpenPayments\n";
             TL.intStatus IN (0,3)
             AND TL.intSentToGateway=1
             AND PC.strGatewayCode = 'checkoutfi'
+        LIMIT 1
     ];
+    my $checkURL = 'https://rpcapi.checkout.fi/poll';
     my $query = $db->prepare($st);
     $query->execute();
     while (my $dref = $query->fetchrow_hashref())   {
 	    my $logID= $dref->{'intLogID'};
-
+        next if ! $dref->{'intAmount'};
         ## LOOK UP tblPayTry
         my $payTry = payTryRead(\%Data, $logID, 0);
+        print STDERR "CHECK FOR $logID\n";
+        my %gatewaySpecific=();
+        my $cents = $dref->{'intAmount'} * 100;
+        $gatewaySpecific{'VERSION'} = "0001";
+        $gatewaySpecific{'STAMP'} = $logID;
+        $gatewaySpecific{'REFERENCE'} = $logID;
+        $gatewaySpecific{'MERCHANT'} = $dref->{'strGatewayUsername'};
+        $gatewaySpecific{'AMOUNT'} = $cents;
+        $gatewaySpecific{'CURRENCY'} = $dref->{'strCurrency'};
+        $gatewaySpecific{'FORMAT'} = 1;
+        $gatewaySpecific{'ALGORITHM'} = 1;
+        my $m = new MD5;
+         my $coKey = $gatewaySpecific{'VERSION'} ."+". $gatewaySpecific{'STAMP'} ."+". $gatewaySpecific{'REFERENCE'} ."+". $gatewaySpecific{'MERCHANT'} ."+". $gatewaySpecific{'AMOUNT'} ."+". $gatewaySpecific{'CURRENCY'} ."+". $gatewaySpecific{'FORMAT'} ."+". $gatewaySpecific{'ALGORITHM'} . "+" . $dref->{'strGatewayPassword'};
 
-print STDERR "CHECK FOR $logID\n";
+        $m->reset();
+        $m->add($coKey);
+        my $authKey= uc($m->hexdigest());
+        $gatewaySpecific{'MAC'} = $authKey;
+         my $req = POST $checkURL, \%gatewaySpecific;
+        my $ua = LWP::UserAgent->new();
+    my $res= $ua->request($req);
+    my $retval = $res->content() || '';
+print STDERR $res;
+print STDERR Dumper($retval);
     next;
         my %APIResponse = ();
         
