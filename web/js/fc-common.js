@@ -268,22 +268,14 @@ $(document).ready(function(){
         }
     });
 
-        if ($(window).width() > 768) {  
-            jQuery("#menu .dropdown").addClass("subnav").removeClass("dropdown");
-            jQuery("#menu .subnav a.dropdown-toggle").attr('class', '').addClass("menutop").removeAttr("aria-expanded").removeAttr("role").removeAttr("data-toggle");
-            jQuery("#menu .subnav ul.dropdown-menu").removeClass("dropdown-menu").removeAttr("role");
-        }else{
+        if ($(window).width() <= 480) {  
             jQuery("#menu .subnav").addClass("dropdown").removeClass("subnav");
             jQuery("#menu .dropdown a.menutop").addClass("dropdown-toggle").removeClass("menutop").attr("aria-expanded", true).attr("role", "button").attr("data-toggle", "dropdown");
             jQuery("#menu .dropdown ul").addClass("dropdown-menu").attr("role", "menu");
         }
         
     $(window).resize(function() {
-        if ($(window).width() > 768) {  
-            jQuery("#menu .dropdown").addClass("subnav").removeClass("dropdown");
-            jQuery("#menu .subnav a.dropdown-toggle").attr('class', '').addClass("menutop").removeAttr("aria-expanded").removeAttr("role").removeAttr("data-toggle");
-            jQuery("#menu .subnav ul.dropdown-menu").removeClass("dropdown-menu").removeAttr("role");
-        }else{
+        if ($(window).width() <= 480) {  
             jQuery("#menu .subnav").addClass("dropdown").removeClass("subnav");
             jQuery("#menu .dropdown a.menutop").addClass("dropdown-toggle").removeClass("menutop").attr("aria-expanded", true).attr("role", "button").attr("data-toggle", "dropdown");
             jQuery("#menu .dropdown ul").addClass("dropdown-menu").attr("role", "menu");
@@ -291,6 +283,17 @@ $(document).ready(function(){
     });   
 
 });
+$(window).scroll(function() {
+
+    if ($(this).scrollTop()>0)
+     {
+        $('.pageHeading').fadeOut();
+     }
+    else
+     {
+      $('.pageHeading').fadeIn();
+     }
+ });
 jQuery(document).ready(function(){
 
     jQuery('a.btn-proceed').each(function() {
