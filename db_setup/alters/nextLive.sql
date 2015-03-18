@@ -1,3 +1,6 @@
+ALTER TABLE tblPayTry ADD COLUMN strContinueAction varchar(50) default '';
+ALTER TABLE tblTransLog ADD COLUMN strGatewayResponseCode varchar(10) default '';
+
 # 150308_tblWFRule.sql
 ALTER TABLE tblWFRule
     ADD COLUMN intAutoActivateOnPayment tinyint default 0 COMMENT 'Auto Activate Person/Rego on Payment' AFTER intDocumentTypeID,
