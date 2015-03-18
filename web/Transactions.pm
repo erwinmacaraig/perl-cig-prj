@@ -410,8 +410,8 @@ sub displayTransaction	{
 				stopAfterAction => 1,
 				updateOKtext => qq[
 					<div class="OKmsg">Record updated successfully</div> <br>
-					<a href="$Data->{'target'}?client=$client&amp;a=M_TXN_LIST">].$lang->txt('Return to Transaction').qq[</a>
-				],
+					<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_LIST">].$lang->txt('Return to Transaction').qq[</a>
+				], # M_TXN_LIST
 				addOKtext => qq[
 					<div class="OKmsg">Record updated successfully</div> <br>
 					<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_LIST">].$lang->txt('Return to Transaction').qq[</a>
