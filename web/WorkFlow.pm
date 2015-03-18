@@ -23,7 +23,6 @@ require Exporter;
     deleteRegoTransactions
     checkRulePaymentFlagActions
     getRegistrationWorkTasks
-    markGatewayAsResponded
 );
 
 use strict;
@@ -63,23 +62,6 @@ use InstanceOf;
 
 use PersonLanguages;
 
-sub markGatewayAsResponded  {
-
-    my ($Data, $taskID) = @_;
-    $taskID ||= 0;
-    return if ! $taskID;
-
-    my $stUPD = qq[
-        UPDATE tblWFTask
-            SET intPaymentGatewayResponded = 1
-        WHERE
-            intRealmID = ?
-            AND intWFTaskID = ?
-    ];
-    my $qUPD= $Data->{'db'}->prepare($stUPD);
-    $qUPD->execute($Data->{'Realm'}, $taskID);
-}
-
 sub checkRulePaymentFlagActions {
 
     my(
@@ -97,10 +79,10 @@ sub checkRulePaymentFlagActions {
 print STDERR "********* IN checkRulePaymentFlagActions\n";
     my $st = qq[
         SELECT
-            intWFTaskID,
-            intAutoActivateOnPayment,
-            intLockTaskUntilPaid,
-            intRemoveTaskOnPayment
+            T.intWFTaskID,
+            R.intAutoActivateOnPayment,
+            R.intLockTaskUntilPaid,
+            R.intRemoveTaskOnPayment
         FROM
             tblWFTask as T
             INNER JOIN tblWFRule as R ON (R.intWFRuleID = T.intWFRuleID)
@@ -114,7 +96,8 @@ print STDERR "********* IN checkRulePaymentFlagActions\n";
 print STDERR "_____________________ NOT SURE IF LIMIT NEEDED\n";
 
     my $q= $Data->{'db'}->prepare($st);
-    $q->execute($personID, $entityID, $personRegistrationID);
+    $q->execute($personID, $entityID, $personRegistrationID) or print STDERR "DB ERRIR";
+print STDERR $st;
 
     print STDERR "NEED TO CALL checkForOutstandingTasks!!!!!!!!!!!!!! $personID, $entityID, $personRegistrationID\n";
 
@@ -161,7 +144,7 @@ print STDERR "_____________________ NOT SURE IF LIMIT NEEDED\n";
             $qUPD->execute($Data->{'Realm'}, $dref->{'intWFTaskID'});
             $countTaskSkipped++;
         }
-        markGatewayAsResponded($Data, $dref->{'intWFTaskID'});
+        GatewayProcess::markGatewayAsResponded($Data, $dref->{'intWFTaskID'});
     }
     my $ruleFor = 'PERSON';
     $ruleFor = 'REGO' if ($personRegistrationID);
@@ -1175,7 +1158,7 @@ sub approveTask {
 
     #NOTE if new approval check needs to be done, just add another condition here (increment error, concat $response)
     if($sysConfigApprovalLockPaymentRequired and $task->{'paymentRequired'}){
-        $errorStr = $Data->{'lang'}->txt("ERROR: Payment required."); 
+        $errorStr = $Data->{'lang'}->txt("Error").': '. $Data->{'lang'}->txt("Payment required"); 
         $response = qq [
             <span>$errorStr</span><br/>
         ];
@@ -2852,11 +2835,14 @@ sub populateEntityViewData {
             PostalCode => $dref->{'entityPostalCode'} || '',
             Contact => $dref->{'entityContact'} || '',
             organizationType => $dref->{'strEntityType'},
+            organizationTypeName => $Defs::entityType{$dref->{'strEntityType'}},
             strLegalID => $dref->{'strLegalID'},
             comment => $dref->{'strMANotes'},
             sport => $dref->{'strDiscipline'},
+            sportName => $Defs::entitySportType{$dref->{'strDiscipline'}},
             strCity => $dref->{'strCity'},
             organizationLevel => $dref->{'strOrganisationLevel'},
+            organizationLevelName => $Defs::personLevel{$dref->{'strOrganisationLevel'}},
             legaltype => Club::getLegalTypeName($Data, $dref->{'intLegalTypeID'}),
             intEntityID => $dref->{'intEntityID'},
             bankAccountDetails => $dref->{'strBankAccountNumber'},

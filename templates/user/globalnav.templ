@@ -5,7 +5,7 @@
 			<div class="col-md-12">
       
         <div class="access-level">
-          <p class="viewAs">View as:</p>
+          <p class="viewAs">[% Lang.txt('View as') %]:</p>
             <div class="nav_session_menu_wrap">
               <div class="nav_session_placement">
                 <a class="nav_session_current" href="">
@@ -45,6 +45,9 @@
   				<li><a href ="#">[% Lang.txt('Help') %]</a></li>
   				<li><a href="https://www.fifaconnect.org/release_notes/FCRN-20150303.pdf" target="rn" title="[% Lang.txt('Release Notes') %]">[% Lang.txt('Release Notes') %]</a></li>
   				<li><a href="user/logout.cgi" title="[% Lang.txt('Logout') %]">[% Lang.txt('Logout') %]</a></li>
+                [% IF LanguageChooser %]
+                <li>[% LanguageChooser %]</li>
+                [% END %]
   			</ul>
 			</div>
 		</div>

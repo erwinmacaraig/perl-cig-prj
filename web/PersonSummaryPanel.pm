@@ -39,7 +39,8 @@ sub personSummaryPanel {
         next if $reg_rego_ref->{'strStatus'} ne $Defs::PERSONREGO_STATUS_ACTIVE;
 
         push @personRegistration, [ 
-            $Data->{'lang'}->txt($reg_rego_ref->{'PersonType'} . " valid to ") . $Data->{'l10n'}{'date'}->format($reg_rego_ref->{'npdtTo'},'MEDIUM'),
+            $Data->{'lang'}->txt($reg_rego_ref->{'PersonType'}) 
+            . ' ' . $Data->{'lang'}->txt("valid to") . ' ' .$Data->{'l10n'}{'date'}->format($reg_rego_ref->{'npdtTo'},'MEDIUM'),
             $reg_rego_ref->{'strPersonType'},
         ];
     }
@@ -52,7 +53,7 @@ sub personSummaryPanel {
         'FamilyName' => $personObj->getValue('strLocalSurname') || '',
         'FirstName' => $personObj->getValue('strLocalFirstname') || '',
         'dob' => $personObj->getValue('dtDOB'),
-        'gender' => $Defs::PersonGenderInfo{$personObj->getValue('intGender')},
+        'gender' => $Data->{'lang'}->txt($Defs::PersonGenderInfo{$personObj->getValue('intGender')}),
         'nationality' => $isocountries->{$personObj->getValue('strISONationality')},
         'registrations' => \@personRegistration,
     );

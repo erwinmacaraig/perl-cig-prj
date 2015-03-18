@@ -1,0 +1,5930 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2015-03-11 16:13+1000\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Warren Rodie <w.rodie@sportingpulseinternational.com>\n"
+"Language-Team: \n"
+"Language: SV\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.5.4\n"
+"X-Poedit-KeywordsList: txt\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: /home/warren/src/spil/FIFASPOnline/web\n"
+"X-Poedit-SearchPath-1: /home/warren/src/spil/FIFASPOnline/templates\n"
+
+#: web/forgotten_password.cgi Line:21 web/index.cgi Line:20 web/emailform.cgi
+#: Line:14
+msgid "APPNAME"
+msgstr ""
+
+#: Defs::personRequestResponse Defs::personRequestStatus
+#: templates/dashboards/worktasks.templ Line:70
+msgid "Accepted"
+msgstr ""
+
+#: Defs::wfTaskStatus Defs::entityStatus Defs::personRegoStatus
+#: Defs::personRequestStatus Defs::person_certification_status web/Products.pm
+#: Line:335
+msgid "Active"
+msgstr ""
+
+#: Defs::personRegoStatus
+msgid "Active (Pending Payment)"
+msgstr ""
+
+#: Person FieldLabels Club Field Labels templates/dashboards/person.templ
+#: Line:79 templates/registration/summary.templ Line:31
+#: templates/workflow/view/venue.templ Line:120
+#: templates/workflow/view/transfer.templ Line:142
+#: templates/workflow/view/club.templ Line:119
+#: templates/workflow/view/person.templ Line:126
+#: templates/workflow/view/personregistration.templ Line:140
+#: templates/flow/club_summary.templ Line:25
+#: templates/flow/facility_summary.templ Line:28
+#: templates/personrequest/access/current_club_view.templ Line:72
+#: templates/personrequest/access/requesting_club_view.templ Line:103
+#: templates/personrequest/transfer/current_club_view.templ Line:68
+#: templates/personrequest/transfer/new_club_view.templ Line:101
+#: templates/personrequest/transfer/view.templ Line:73
+msgid "Address 1"
+msgstr ""
+
+#: Person FieldLabels Club Field Labels templates/dashboards/person.templ
+#: Line:84 templates/registration/summary.templ Line:32
+#: templates/workflow/view/transfer.templ Line:147
+#: templates/workflow/view/person.templ Line:133
+#: templates/workflow/view/personregistration.templ
+#: templates/flow/facility_summary.templ Line:29
+#: templates/personrequest/access/current_club_view.templ Line:76
+#: templates/personrequest/access/requesting_club_view.templ Line:107
+#: templates/personrequest/transfer/current_club_view.templ Line:72
+#: templates/personrequest/transfer/new_club_view.templ Line:105
+#: templates/personrequest/transfer/view.templ Line:77
+msgid "Address 2"
+msgstr ""
+
+#: Defs::ageLevel
+msgid "Adult"
+msgstr ""
+
+#: Defs::entitySportType Defs::genderEntityInfo Defs::documentFor
+#: web/Person.pm Line:284 web/Club.pm Line:931 web/PendingRegistrations.pm
+#: Line:176 web/Venues.pm Line:806 web/EntityIdentifier.pm Line:335
+#: web/TransLog.pm Line:749 templates/dashboards/worktasks.templ Line:43
+#: Line:65 templates/search/grid/personregistration.templ Line:33
+#: templates/person/list.templ Line:30 Line:38 Line:46 Line:54
+msgid "All"
+msgstr ""
+
+#: Defs::personLevel
+msgid "Amateur"
+msgstr ""
+
+#: Defs::personLevel
+msgid "Amateur (Under Contract)"
+msgstr ""
+
+#: Defs::registrationNature templates/dashboards/worktasks.templ Line:197
+#: templates/workflow/view/person.templ Line:295
+msgid "Amendment"
+msgstr ""
+
+#: Defs::wfTaskType templates/viewer/viewer.templ Line:20
+#: templates/workflow/result/venue.templ Line:90
+#: templates/workflow/result/person.templ Line:93
+#: templates/workflow/generic/actions.templ Line:29
+msgid "Approve"
+msgstr ""
+
+#: Defs::fieldGroundNatureType
+msgid "Artificial Turf (Other)"
+msgstr ""
+
+#: Defs::LevelNames web/ListNotifications.pm Line:34 web/ListTransactions.pm
+#: Line:39 Line:117
+msgid "Association"
+msgstr ""
+
+#: Club Field Labels
+msgid "Association Nature"
+msgstr ""
+
+#: Club Field Labels templates/workflow/view/club.templ Line:213
+#: templates/flow/club_summary.templ Line:46
+msgid "Bank Account Details"
+msgstr ""
+
+#: Defs::paymentTypes Defs::manualPaymentTypes
+msgid "Bank Cheque"
+msgstr ""
+
+#: Defs::paymentTypes
+msgid "Bank Transfer"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Birth Certificate"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Birth Certificate Description"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Birth Certificate Validity Date From"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Birth Certificate Validity Date To"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Birth Country"
+msgstr ""
+
+#: Defs::ProdTransactionStatus Defs::TransactionStatus Defs::TransLogStatus
+#: web/PersonRequest.pm Line:1116 web/TransLog.pm Line:685 Line:752
+msgid "Cancelled"
+msgstr ""
+
+#: Defs::paymentTypes Defs::manualPaymentTypes
+msgid "Cash"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels templates/registration/certifications.templ Line:7
+msgid "Certification"
+msgstr ""
+
+#: Defs::wfTaskType
+msgid "Check Document"
+msgstr ""
+
+#: Person FieldLabels Club Field Labels templates/registration/summary.templ
+#: Line:33 templates/workflow/view/venue.templ Line:78
+#: templates/workflow/view/transfer.templ Line:152
+#: templates/workflow/view/person.templ Line:140
+#: templates/workflow/view/personregistration.templ Line:154
+#: templates/flow/facility_summary.templ Line:15 Line:30
+#: templates/personrequest/access/current_club_view.templ Line:80
+#: templates/personrequest/access/requesting_club_view.templ Line:111
+#: templates/personrequest/transfer/current_club_view.templ Line:76
+#: templates/personrequest/transfer/new_club_view.templ Line:109
+#: templates/personrequest/transfer/view.templ Line:81
+msgid "City"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "City of Birth"
+msgstr ""
+
+#: Defs::entityType Defs::entityInfo Defs::DisplayEntityLevelNames
+#: Defs::LevelNames Defs::documentFor web/IncompleteRegistrations.pm Line:265
+#: templates/dashboards/worktasks.templ Line:271
+#: templates/personrequest/access/current_club_view.templ Line:132
+#: templates/personrequest/access/requesting_club_view.templ Line:35 Line:164
+#: templates/personrequest/transfer/oldclubdetails.templ Line:8
+#: templates/personrequest/transfer/current_club_view.templ Line:140
+#: templates/personrequest/transfer/new_club_view.templ Line:31 Line:177
+msgid "Club"
+msgstr ""
+
+#: Defs::VenueTypes
+msgid "Club House"
+msgstr ""
+
+#: Defs::personType
+msgid "Club Official"
+msgstr ""
+
+#: Defs::personType Defs::memberTypeName
+#: templates/dashboards/personstatus.templ Line:104 Line:123 Line:154 Line:173
+msgid "Coach"
+msgstr ""
+
+#: Defs::entityType
+msgid "College"
+msgstr ""
+
+#: Defs::LevelNames
+msgid "Comp"
+msgstr ""
+
+#: Defs::entityInfo
+msgid "Competition"
+msgstr ""
+
+#: Defs::wfTaskStatus templates/workflow/summary/venue.templ Line:3
+#: templates/workflow/summary/transfer.templ Line:5
+#: templates/workflow/summary/club.templ
+#: templates/workflow/summary/person.templ
+#: templates/workflow/summary/personregistration.templ
+msgid "Complete"
+msgstr ""
+
+#: Defs::personRequestStatus
+msgid "Completed"
+msgstr ""
+
+#: Defs::entityType
+msgid "Confederation"
+msgstr ""
+
+#: Person FieldLabels Club Field Labels templates/workflow/view/venue.templ
+#: Line:141 templates/workflow/view/club.templ Line:147
+#: templates/flow/club_summary.templ Line:29
+msgid "Contact Email"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Contact Number"
+msgstr ""
+
+#: Club Field Labels templates/workflow/result/club.templ Line:38
+#: templates/workflow/view/venue.templ Line:134
+#: templates/workflow/view/club.templ Line:133
+#: templates/workflow/summary/club.templ templates/flow/club_summary.templ
+#: Line:27
+msgid "Contact Person"
+msgstr ""
+
+#: Club Field Labels templates/workflow/view/venue.templ Line:148
+#: templates/workflow/view/club.templ Line:140
+#: templates/flow/club_summary.templ Line:28
+msgid "Contact Phone"
+msgstr ""
+
+#: Person FieldLabels Club Field Labels templates/registration/summary.templ
+#: Line:36 templates/emails/notification/personrequest/html/request_itc.templ
+#: Line:284
+#: templates/emails/notification/personrequest/html/request_itc_content.templ
+#: Line:82 templates/workflow/view/venue.templ Line:92
+#: templates/workflow/view/transfer.templ Line:167
+#: templates/workflow/view/club.templ Line:95
+#: templates/workflow/view/person.templ Line:161
+#: templates/workflow/view/personregistration.templ Line:175
+#: templates/flow/club_summary.templ Line:14
+#: templates/flow/facility_summary.templ Line:17 Line:33
+#: templates/personrequest/access/current_club_view.templ Line:140
+#: templates/personrequest/access/requesting_club_view.templ Line:43 Line:123
+#: Line:172 templates/personrequest/transfer/oldclubdetails.templ Line:18
+#: templates/personrequest/transfer/current_club_view.templ Line:88 Line:148
+#: templates/personrequest/transfer/new_club_view.templ Line:39 Line:121
+#: Line:185 templates/personrequest/transfer/view.templ Line:93
+msgid "Country"
+msgstr ""
+
+#: Club Field Labels
+msgid "Country of Address"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels templates/registration/summary.templ Line:19
+#: templates/registration/summarybulk.templ Line:13
+#: templates/workflow/view/transfer.templ Line:114
+#: templates/workflow/view/person.templ Line:101
+#: templates/workflow/view/personregistration.templ
+#: templates/personrequest/access/current_club_view.templ Line:55
+#: templates/personrequest/access/requesting_club_view.templ Line:86
+#: templates/personrequest/transfer/current_club_view.templ Line:51
+#: templates/personrequest/transfer/new_club_view.templ Line:83
+msgid "Country of Birth"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Country of Birth (Father)"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Country of Birth (Mother)"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Date Suspended Until"
+msgstr ""
+
+#: Person FieldLabels web/BulkPersons.pm Line:166
+#: templates/dashboards/person.templ Line:43
+#: templates/search/grid/personregistration.templ Line:9
+#: templates/search/grid/people.templ Line:8
+#: templates/registration/summary.templ Line:16
+#: templates/registration/summarybulk.templ Line:10
+#: templates/emails/notification/personrequest/html/request_itc.templ Line:269
+#: templates/emails/notification/personrequest/html/request_itc_content.templ
+#: Line:61 templates/workflow/result/person.templ Line:30
+#: templates/workflow/view/person.templ Line:80
+#: templates/workflow/view/personregistration.templ
+#: templates/personrequest/access/current_club_view.templ
+#: templates/personrequest/access/requesting_club_view.templ Line:74
+#: templates/personrequest/access/view.templ Line:60 Line:207
+#: templates/personrequest/transfer/current_club_view.templ Line:39
+#: templates/personrequest/transfer/new_club_view.templ Line:71
+#: templates/personrequest/transfer/search_result.templ
+#: templates/personrequest/transfer/view.templ Line:51 Line:130
+#: templates/person/list.templ Line:7
+msgid "Date of Birth"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Date of Death"
+msgstr ""
+
+#: Defs::entityStatus templates/dashboards/personstatus.templ Line:90 Line:92
+msgid "De-registered"
+msgstr ""
+
+#: Person FieldLabels Defs::personStatus
+#: templates/dashboards/personstatus.templ Line:84 Line:86
+msgid "Deceased"
+msgstr ""
+
+#: Defs::personStatus Defs::personRegoStatus
+msgid "Deleted"
+msgstr ""
+
+#: Defs::personRequestResponse Defs::personRequestStatus
+msgid "Denied"
+msgstr ""
+
+#: Club Field Labels web/EntityIdentifier.pm Line:360
+#: templates/registration/certificate_flow_backend.templ Line:59
+#: templates/registration/document_flow_backend.templ Line:120
+#: templates/entity/required_docs.templ Line:14 Line:102
+#: templates/txn_receipt/fnswreceipt.templ Line:64
+#: templates/txn_receipt/standardreceipt.templ Line:65
+#: templates/club/required_docs.templ Line:103
+msgid "Description"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Description/Reference"
+msgstr ""
+
+#: Club Field Labels
+msgid "Dissolved"
+msgstr ""
+
+#: Defs::personTransferType templates/personrequest/generic/search_form.templ
+#: Line:32
+msgid "Domestic"
+msgstr ""
+
+#: Defs::wfTaskType
+msgid "Duplicate Resolution Issue"
+msgstr ""
+
+#: Defs::paymentTypes Defs::manualPaymentTypes
+msgid "Eftpos - Bankcard"
+msgstr ""
+
+#: Defs::paymentTypes Defs::manualPaymentTypes
+msgid "Eftpos - Mastercard"
+msgstr ""
+
+#: Defs::paymentTypes Defs::manualPaymentTypes
+msgid "Eftpos - Savings"
+msgstr ""
+
+#: Defs::paymentTypes Defs::manualPaymentTypes
+msgid "Eftpos - Visa"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Email 2"
+msgstr ""
+
+#: Club Field Labels
+msgid "Email Notifications"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Emergency Contact Name"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Emergency Contact Number"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Emergency Contact Number 2"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Emergency Contact Relationship"
+msgstr ""
+
+#: Defs::LevelNames
+msgid "Event"
+msgstr ""
+
+#: Defs::NationalityType
+msgid "Ex Patriot"
+msgstr ""
+
+#: Club Field Labels
+msgid "FIFA ID"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "FIFA Minor Protection"
+msgstr ""
+
+#: Defs::TransLogStatus
+msgid "Failed"
+msgstr ""
+
+#: Person FieldLabels web/registrationUser/signup.cgi Line:63
+#: web/user/signup.cgi web/BulkPersons.pm Line:158
+#: templates/dashboards/person.templ Line:17
+#: templates/registration/summary.templ Line:10
+#: templates/registration/summarybulk.templ Line:8
+#: templates/emails/notification/personrequest/html/request_itc.templ Line:261
+#: templates/emails/notification/personrequest/html/request_itc_content.templ
+#: Line:51 templates/auth/authlist.templ
+#: templates/workflow/view/transfer.templ Line:89
+#: templates/workflow/view/person.templ Line:59
+#: templates/workflow/view/personregistration.templ
+#: templates/user/signup.templ Line:27
+#: templates/personrequest/access/current_club_view.templ Line:35
+#: templates/personrequest/access/requesting_club_view.templ Line:66
+#: templates/personrequest/transfer/current_club_view.templ Line:31
+#: templates/personrequest/transfer/new_club_view.templ
+#: templates/personrequest/transfer/view.templ Line:43
+msgid "Family Name"
+msgstr ""
+
+#: Defs::memberNameFormat
+msgid "Family Name Only"
+msgstr ""
+
+#: Defs::memberNameFormat
+msgid "Family Name and Initial"
+msgstr ""
+
+#: Person FieldLabels Club Field Labels templates/dashboards/entity.templ
+#: Line:21 templates/dashboards/club.templ Line:23
+#: templates/workflow/result/venue.templ Line:72
+#: templates/flow/facility_summary.templ Line:36
+msgid "Fax"
+msgstr ""
+
+#: Defs::genderInfo Defs::PersonGenderInfo Defs::genderEntityInfo
+msgid "Female"
+msgstr ""
+
+#: Person FieldLabels web/registrationUser/signup.cgi Line:62
+#: web/user/signup.cgi web/BulkPersons.pm Line:162
+#: templates/dashboards/person.templ Line:29
+#: templates/registration/summary.templ Line:11
+#: templates/registration/summarybulk.templ Line:9
+#: templates/emails/notification/personrequest/html/request_itc.templ Line:265
+#: templates/emails/notification/personrequest/html/request_itc_content.templ
+#: Line:56 templates/auth/authlist.templ Line:16
+#: templates/workflow/view/transfer.templ Line:94
+#: templates/workflow/view/person.templ Line:66
+#: templates/workflow/view/personregistration.templ
+#: templates/user/signup.templ Line:23
+#: templates/personrequest/access/current_club_view.templ Line:39
+#: templates/personrequest/access/requesting_club_view.templ Line:70
+#: templates/personrequest/access/view.templ Line:44 Line:187
+#: templates/personrequest/transfer/current_club_view.templ Line:35
+#: templates/personrequest/transfer/new_club_view.templ Line:67
+#: templates/personrequest/transfer/view.templ Line:47
+#: templates/personrequest/generic/search_form.templ Line:196
+msgid "First Name"
+msgstr ""
+
+#: Defs::sportType Defs::entitySportType
+msgid "Football"
+msgstr ""
+
+#: Defs::DataAccessNames
+msgid "Full Access"
+msgstr ""
+
+#: Defs::memberNameFormat
+msgid "Full Name"
+msgstr ""
+
+#: Defs::sportType Defs::entitySportType
+msgid "Futsal"
+msgstr ""
+
+#: Person FieldLabels Club Field Labels web/EntityRegistrationAllowedEdit.pm
+#: Line:346 templates/dashboards/person.templ Line:50
+#: templates/registration/summary.templ Line:17
+#: templates/registration/summarybulk.templ Line:11
+#: templates/workflow/result/person.templ Line:23
+#: templates/workflow/view/transfer.templ Line:104
+#: templates/workflow/view/person.templ Line:87
+#: templates/workflow/view/personregistration.templ
+#: templates/personrequest/access/current_club_view.templ Line:47
+#: templates/personrequest/access/requesting_club_view.templ Line:78
+#: templates/personrequest/access/view.templ Line:56 Line:202
+#: templates/personrequest/transfer/current_club_view.templ Line:43
+#: templates/personrequest/transfer/new_club_view.templ Line:75
+#: templates/personrequest/transfer/view.templ Line:134
+msgid "Gender"
+msgstr ""
+
+#: Defs::entityType
+msgid "Grassroot Program"
+msgstr ""
+
+#: Defs::VenueTypes
+msgid "Ground"
+msgstr ""
+
+#: Defs::fieldGroundNatureType
+msgid "Hard Pitch"
+msgstr ""
+
+#: Club Field Labels web/EntityIdentifier.pm Line:348
+msgid "Identifier"
+msgstr ""
+
+#: Club Field Labels
+msgid "Identifier Type"
+msgstr ""
+
+#: Defs::entityStatus Defs::personStatus Defs::personRegoStatus
+#: Defs::personRequestStatus
+msgid "In Progress"
+msgstr ""
+
+#: Defs::entityStatus Defs::person_certification_status
+msgid "Inactive"
+msgstr ""
+
+#: Defs::NationalityType
+msgid "Indigene"
+msgstr ""
+
+#: Defs::LevelNames
+msgid "Inter Regional"
+msgstr ""
+
+#: Defs::LevelNames
+msgid "Inter Zone"
+msgstr ""
+
+#: Defs::LevelNames Defs::personTransferType
+#: templates/personrequest/generic/search_form.templ Line:33
+msgid "International"
+msgstr ""
+
+#: Defs::paymentTypes Defs::manualPaymentTypes
+msgid "International Cheque"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "International Family name"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "International First name"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels templates/workflow/view/person.templ Line:73
+#: templates/workflow/view/personregistration.templ
+msgid "Language of Name"
+msgstr ""
+
+#: Club Field Labels
+msgid "Language of Organisation Name"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Last Updated"
+msgstr ""
+
+#: Defs::entityInfo
+msgid "League"
+msgstr ""
+
+#: Club Field Labels
+msgid "Legal Entity Identification Number"
+msgstr ""
+
+#: Club Field Labels web/Person.pm Line:308 web/PendingRegistrations.pm
+#: Line:206 Line:311 web/IncompleteRegistrations.pm Line:181
+#: templates/dashboards/personregistration.templ Line:142
+#: templates/registration/what.templ Line:60
+#: templates/registration/summary.templ Line:54
+#: templates/registration/summarybulk.templ Line:37
+#: templates/registration/whatbulk.templ Line:34
+#: templates/registration/playerpassport.templ Line:11
+#: templates/workflow/view/transfer.templ Line:217
+#: templates/workflow/view/club.templ Line:199
+#: templates/workflow/view/person.templ Line:251
+#: templates/workflow/view/personregistration.templ Line:280
+#: templates/flow/club_summary.templ Line:45
+#: templates/personrequest/access/view.templ Line:75 Line:222
+#: templates/personrequest/transfer/current_club_view.templ Line:121
+#: templates/personrequest/transfer/new_club_view.templ Line:155
+#: templates/personrequest/transfer/view.templ Line:126
+#: templates/person/renewal_roledetails.templ Line:14
+#: templates/person/list.templ Line:10
+msgid "Level"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Local Middle name"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Loyalty Number"
+msgstr ""
+
+#: Defs::entityType
+msgid "MA Academy"
+msgstr ""
+
+#: Club Field Labels templates/dashboards/personregistration.templ Line:177
+#: templates/registration/what.templ Line:74
+#: templates/workflow/view/club.templ Line:206
+#: templates/workflow/view/personregistration.templ Line:301
+#: templates/flow/club_summary.templ Line:47
+msgid "MA Comment"
+msgstr ""
+
+#: Defs::personType
+msgid "MA Official"
+msgstr ""
+
+#: Club Field Labels
+msgid "MA Organisation ID"
+msgstr ""
+
+#: Person FieldLabels templates/dashboards/person.templ Line:36
+msgid "Maiden name"
+msgstr ""
+
+#: Defs::genderInfo Defs::PersonGenderInfo Defs::genderEntityInfo
+msgid "Male"
+msgstr ""
+
+#: Defs::memberTypeName
+msgid "Match Official"
+msgstr ""
+
+#: Defs::LevelNames
+msgid "Member"
+msgstr ""
+
+#: Defs::genderEventInfo
+msgid "Men"
+msgstr ""
+
+#: Defs::ageLevel
+msgid "Minor"
+msgstr ""
+
+#: Defs::memberTypeName web/EntityDocuments.pm Line:171
+#: templates/dashboards/personstatus.templ Line:106 Line:125 Line:156 Line:175
+msgid "Misc"
+msgstr ""
+
+#: Defs::genderInfo Defs::genderEventInfo
+msgid "Mixed"
+msgstr ""
+
+#: Defs::paymentTypes Defs::manualPaymentTypes
+msgid "Money Order"
+msgstr ""
+
+#: Club Field Labels
+msgid "Name (International)"
+msgstr ""
+
+#: Defs::NationalityType Defs::DisplayEntityLevelNames Defs::LevelNames
+msgid "National"
+msgstr ""
+
+#: Defs::entityType
+msgid "National Association"
+msgstr ""
+
+#: Person FieldLabels templates/team/team_staff.templ Line:27
+msgid "National Number"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels templates/dashboards/person.templ Line:57
+#: templates/registration/summary.templ Line:18
+#: templates/registration/summarybulk.templ Line:12
+#: templates/emails/notification/personrequest/html/request_itc.templ Line:273
+#: templates/emails/notification/personrequest/html/request_itc_content.templ
+#: Line:66 templates/workflow/result/person.templ Line:37
+#: templates/workflow/view/transfer.templ Line:109
+#: templates/workflow/view/person.templ Line:94
+#: templates/workflow/view/personregistration.templ
+#: templates/personrequest/access/current_club_view.templ Line:51
+#: templates/personrequest/access/requesting_club_view.templ Line:82
+#: templates/personrequest/access/view.templ Line:52 Line:197
+#: templates/personrequest/transfer/current_club_view.templ Line:47
+#: templates/personrequest/transfer/new_club_view.templ Line:79
+#: templates/personrequest/transfer/view.templ Line:60 Line:138
+msgid "Nationality"
+msgstr ""
+
+#: Defs::fieldGroundNatureType
+msgid "Natural Grass"
+msgstr ""
+
+#: Defs::registrationNature
+msgid "New Registration"
+msgstr ""
+
+#: Defs::tfInfo web/Person.pm Line:1555 web/PersonRequest.pm Line:529
+#: templates/personrequest/generic/search_form.templ Line:48
+msgid "No"
+msgstr ""
+
+#: Defs::DataAccessNames
+msgid "No Access"
+msgstr ""
+
+#: Defs::ClubType
+msgid "Non-Association"
+msgstr ""
+
+#: Defs::ClubType
+msgid "Non-Playing"
+msgstr ""
+
+#: Defs::DisplayEntityLevelNames Defs::LevelNames
+#: web/Reports/ReportAdvanced.pm Line:370
+msgid "None"
+msgstr ""
+
+#: Defs::genderInfo Defs::PersonGenderInfo
+msgid "None Specified"
+msgstr ""
+
+#: Defs::ClubType
+msgid "Normal"
+msgstr ""
+
+#: Person FieldLabels web/Transactions.pm Line:354 web/ListTransactions.pm
+#: Line:133 templates/txn_receipt/fnswreceipt.templ Line:77
+#: templates/workflow/generic/notes.templ Line:9
+msgid "Notes"
+msgstr ""
+
+#: Defs::memberTypeName
+msgid "Official"
+msgstr ""
+
+#: Defs::wfTaskStatus Defs::personRegoStatus
+msgid "On hold"
+msgstr ""
+
+#: Defs::wfTaskAction
+msgid "On-hold"
+msgstr ""
+
+#: Defs::fieldGroundNatureType
+msgid "One Star Artificial Turf"
+msgstr ""
+
+#: Defs::paymentTypes
+msgid "Online Credit Card"
+msgstr ""
+
+#: Defs::paymentTypes
+msgid "Online PayPal"
+msgstr ""
+
+#: Club Field Labels templates/workflow/view/club.templ Line:81
+msgid "Organisation Dissolution Date"
+msgstr ""
+
+#: Club Field Labels templates/workflow/view/club.templ Line:74
+msgid "Organisation Foundation Date"
+msgstr ""
+
+#: Club Field Labels templates/workflow/view/club.templ Line:60
+msgid "Organisation Name"
+msgstr ""
+
+#: Club Field Labels templates/workflow/view/club.templ Line:67
+#: templates/flow/club_summary.templ Line:11
+msgid "Organisation Short Name"
+msgstr ""
+
+#: Club Field Labels templates/registration/what.templ Line:41
+msgid "Organisation Type"
+msgstr ""
+
+#: Defs::entityType
+msgid "Other"
+msgstr ""
+
+#: Defs::paymentTypes Defs::manualPaymentTypes
+msgid "Other / Barter"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Other Identifier"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Other Identifier Description"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Other Identifier Issuance Country"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Other Identifier Type"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Other Identifier Validity Date From"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Other Identifier Validity Date To"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Pager"
+msgstr ""
+
+#: Defs::ProdTransactionStatus Defs::TransactionStatus Defs::TransLogStatus
+#: web/TransLog.pm Line:684 Line:750
+msgid "Paid"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Parent/Guardian 1 Email 2"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Parent/Guardian 1 Gender"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Parent/Guardian 1 Mobile"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Parent/Guardian 1 Phone 2"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Parent/Guardian 1 Salutation"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Parent/Guardian 2 Email"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Parent/Guardian 2 Email 2"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Parent/Guardian 2 Firstname"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Parent/Guardian 2 Gender"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Parent/Guardian 2 Mobile"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Parent/Guardian 2 Phone"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Parent/Guardian 2 Phone 2"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Parent/Guardian 2 Salutation"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Parent/Guardian 2 Surname"
+msgstr ""
+
+#: Defs::personRegoStatus
+msgid "Passive"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Passport Country of Issue"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Passport Expiry Date"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Passport Nationality"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Passport Number"
+msgstr ""
+
+#: Defs::wfTaskStatus Defs::entityStatus Defs::personStatus
+#: Defs::personRegoStatus Defs::TransLogStatus Defs::personRequestStatus
+#: Defs::person_certification_status web/WorkFlow.pm Line:3770 Line:3774
+#: Line:3778 Line:3783 Line:3787 Line:3791 Line:3795 Line:3799 Line:3803
+#: Line:3807 Line:3811 Line:3815 Line:3819 Line:3825 Line:3828 Line:3831
+#: Line:3834 Line:3837 templates/dashboards/personregistration.templ Line:60
+#: templates/dashboards/worktasks.templ Line:71
+#: templates/workflow/result/club.templ Line:3
+#: templates/workflow/result/personregistration.templ Line:5
+#: templates/workflow/view/person.templ Line:295
+#: templates/workflow/generic/document.templ Line:52
+msgid "Pending"
+msgstr ""
+
+#: Defs::documentFor web/PayInvoice.pm Line:301 web/PendingRegistrations.pm
+#: Line:187 web/IncompleteRegistrations.pm Line:157
+#: templates/emails/notification/workflow/html/wftask_added.templ Line:26
+#: Line:29 templates/emails/notification/workflow/html/wftask_rejected.templ
+#: templates/emails/notification/workflow/html/wftask_approved.templ
+#: templates/emails/notification/workflow/html/wftask_held.templ
+#: templates/emails/notification/workflow/html/wftask_resolved.templ
+#: templates/emails/notification/personrequest/html/requestaccess_accepted.templ
+#: Line:19
+#: templates/emails/notification/personrequest/html/requesttransfer_completed.templ
+#: templates/emails/notification/personrequest/html/requestaccess_completed.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_sent.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_denied.templ
+#: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_sent.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
+#: templates/emails/notification/personrequest/html/requestaccess_rejected.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_accepted.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
+msgid "Person"
+msgstr ""
+
+#: Defs::paymentTypes Defs::manualPaymentTypes
+msgid "Personal Cheque"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Phone (Mobile)"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Phone (Work)"
+msgstr ""
+
+#: Defs::personType Defs::memberTypeName
+#: templates/dashboards/personstatus.templ Line:103 Line:122 Line:153 Line:172
+#: Line:200
+msgid "Player"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Police Check Date"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Police Check Expiry Date"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Police Check Number"
+msgstr ""
+
+#: Person FieldLabels Club Field Labels templates/workflow/view/venue.templ
+#: Line:127 templates/workflow/view/club.templ Line:126
+#: templates/flow/club_summary.templ Line:26
+msgid "Postcode"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Preferred Language"
+msgstr ""
+
+#: Person FieldLabels
+msgid "Preferred name"
+msgstr ""
+
+#: Defs::entityType
+msgid "Private Academy"
+msgstr ""
+
+#: Defs::personLevel
+msgid "Professional"
+msgstr ""
+
+#: Defs::LevelNames
+msgid "Program"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Race"
+msgstr ""
+
+#: Defs::DataAccessNames
+msgid "Read Only Access"
+msgstr ""
+
+#: Defs::personType
+msgid "Referee"
+msgstr ""
+
+#: Defs::DisplayEntityLevelNames Defs::LevelNames
+#: templates/registration/summary.templ Line:20
+#: templates/workflow/result/venue.templ Line:30
+#: templates/workflow/view/venue.templ Line:85
+#: templates/workflow/view/transfer.templ Line:119
+#: templates/workflow/view/person.templ Line:108
+#: templates/workflow/view/personregistration.templ
+#: templates/flow/facility_summary.templ Line:16
+msgid "Region"
+msgstr ""
+
+#: Club Field Labels templates/workflow/view/club.templ Line:88
+msgid "Region of Organisation"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Region or State of Birth"
+msgstr ""
+
+#: Defs::entityType
+msgid "Regional Association"
+msgstr ""
+
+#: Defs::personStatus templates/dashboards/personstatus.templ Line:4 Line:18
+#: Line:33 Line:47
+msgid "Registered"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Registering Parent Email"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Registering Parent Firstname"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Registering Parent Phone"
+msgstr ""
+
+# :Person FieldLabels
+#: Person FieldLabels
+msgid "Registering Parent Surname"
+msgstr ""
+
+#: Defs::wfTaskAction templates/viewer/viewer.templ Line:24
+#: templates/workflow/result/venue.templ Line:94
+#: templates/workflow/result/person.templ Line:97
+#: templates/workflow/generic/actions.templ Line:6
+msgid "Reject"
+msgstr ""
+
+#: Defs::wfTaskStatus Defs::personRegoStatus web/WorkFlow.pm Line:3849
+#: Line:3853 Line:3857 Line:3861 Line:3865 Line:3869 Line:3874 Line:3878
+#: Line:3888 Line:3892 Line:3896 Line:3902 Line:3905 Line:3908 Line:3911
+#: Line:3914 Line:3917 web/PersonRequest.pm Line:1100
+#: templates/dashboards/personregistration.templ Line:65
+#: templates/workflow/generic/document.templ Line:58
+msgid "Rejected"
+msgstr ""
+
+#: Defs::registrationNature
+msgid "Renewal"
+msgstr ""
+
+#: Defs::personRequest
+msgid "Request Access (Add Role)"
+msgstr ""
+
+#: Defs::wfTaskAction templates/workflow/result/venue.templ Line:98
+#: templates/workflow/result/person.templ Line:101
+#: templates/workflow/generic/actions.templ Line:20
+msgid "Resolve"
+msgstr ""
+
+#: Defs::wfTaskAction
+msgid "Resume"
+msgstr ""
+
+#: Defs::personRegoStatus
+msgid "Rolled over/Renewed"
+msgstr ""
+
+#: Defs::entityType
+msgid "School"
+msgstr ""
+
+#: Club Field Labels
+msgid "Short Name (International)"
+msgstr ""
+
+#: Club Field Labels web/PersonRegistrationDetail.pm Line:289 web/Person.pm
+#: Line:303 web/PendingRegistrations.pm Line:201
+#: web/IncompleteRegistrations.pm Line:176
+#: web/EntityRegistrationAllowedEdit.pm Line:334
+#: templates/dashboards/personregistration.templ Line:121
+#: templates/registration/what.templ Line:52
+#: templates/registration/summary.templ
+#: templates/registration/summarybulk.templ Line:35
+#: templates/registration/whatbulk.templ Line:26
+#: templates/workflow/view/transfer.templ Line:212
+#: templates/workflow/view/club.templ Line:192
+#: templates/workflow/view/personregistration.templ Line:273
+#: templates/flow/club_summary.templ Line:44
+#: templates/personrequest/access/current_club_view.templ Line:136
+#: templates/personrequest/access/requesting_club_view.templ Line:39 Line:168
+#: templates/personrequest/transfer/oldclubdetails.templ Line:13
+#: templates/personrequest/transfer/current_club_view.templ Line:117 Line:144
+#: templates/personrequest/transfer/new_club_view.templ Line:181
+#: templates/personrequest/generic/reg_summary.templ Line:11
+#: templates/person/renewal_roledetails.templ Line:8
+msgid "Sport"
+msgstr ""
+
+#: Person FieldLabels Club Field Labels Defs::DisplayEntityLevelNames
+#: Defs::LevelNames templates/registration/summary.templ Line:34
+#: templates/workflow/view/transfer.templ Line:157
+#: templates/workflow/view/person.templ Line:147
+#: templates/workflow/view/personregistration.templ Line:161
+#: templates/flow/facility_summary.templ Line:31
+#: templates/personrequest/access/current_club_view.templ Line:84
+#: templates/personrequest/access/requesting_club_view.templ Line:115
+#: templates/personrequest/transfer/current_club_view.templ Line:80
+#: templates/personrequest/transfer/view.templ Line:85
+msgid "State"
+msgstr ""
+
+#: Defs::DataAccessNames
+msgid "Statistical Access"
+msgstr ""
+
+#: Person FieldLabels Club Field Labels web/ListNotifications.pm Line:38
+#: Line:101 web/Person.pm Line:316 Line:392 web/Club.pm Line:896
+#: web/PayInvoice.pm Line:313 web/EntityDocuments.pm Line:116
+#: web/PersonCertifications.pm Line:133 Line:208 web/PendingRegistrations.pm
+#: Line:216 web/ListTransactions.pm Line:44 web/Venues.pm Line:816
+#: web/TransLog.pm Line:628 Line:1586 Line:1728 Line:1774 Line:1860
+#: templates/dashboards/personregistration.templ Line:37 Line:114
+#: templates/dashboards/worktasks.templ Line:89
+#: templates/registration/certifications.templ Line:8
+#: templates/registration/certificate_flow_backend.templ Line:21
+#: templates/emails/notification/workflow/html/wftask_added.templ Line:40
+#: templates/emails/notification/workflow/html/wftask_rejected.templ Line:45
+#: templates/emails/notification/workflow/html/wftask_approved.templ
+#: templates/emails/notification/workflow/html/wftask_held.templ
+#: templates/emails/notification/workflow/html/wftask_resolved.templ
+#: templates/emails/notification/personrequest/html/requestaccess_accepted.templ
+#: Line:29
+#: templates/emails/notification/personrequest/html/requesttransfer_completed.templ
+#: Line:34
+#: templates/emails/notification/personrequest/html/requestaccess_completed.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_sent.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_denied.templ
+#: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_sent.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
+#: templates/emails/notification/personrequest/html/request_itc_content.templ
+#: Line:24
+#: templates/emails/notification/personrequest/html/requestaccess_rejected.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_accepted.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
+#: templates/entity/venue_docs_summary.templ Line:5
+#: templates/workflow/result/venue.templ Line:9
+#: templates/workflow/result/person.templ Line:67
+#: templates/workflow/view/person.templ Line:234
+#: templates/workflow/view/personregistration.templ Line:251
+#: templates/workflow/generic/document.templ Line:23
+msgid "Status"
+msgstr ""
+
+#: Defs::entityStatus Defs::personStatus Defs::personRegoStatus
+#: templates/dashboards/personstatus.templ Line:63 Line:65
+msgid "Suspended"
+msgstr ""
+
+#: Defs::entityInfo Defs::LevelNames
+msgid "Team"
+msgstr ""
+
+#: Defs::personType
+msgid "Team Official"
+msgstr ""
+
+#: Person FieldLabels web/ListNotifications.pm Line:92 web/EntityDocuments.pm
+#: Line:216 web/Documents.pm Line:197
+#: templates/registration/document_flow_backend.templ Line:114
+#: templates/entity/required_docs.templ Line:10 Line:96
+#: templates/club/required_docs.templ Line:97
+msgid "Title"
+msgstr ""
+
+#: Defs::LevelNames
+msgid "Top"
+msgstr ""
+
+#: Club Field Labels templates/workflow/result/venue.templ Line:44
+msgid "Town"
+msgstr ""
+
+#: Defs::registrationNature Defs::personRequest web/WorkFlow.pm Line:2661
+#: web/Navbar.pm Line:154 templates/dashboards/worktasks.templ Line:262
+msgid "Transfer"
+msgstr ""
+
+#: Defs::personStatus Defs::personRegoStatus
+msgid "Transferred"
+msgstr ""
+
+#: Defs::documentFor web/Navbar.pm Line:474
+#: templates/dashboards/worktasks.templ Line:195
+msgid "Transfers"
+msgstr ""
+
+#: Defs::VenueTypes
+msgid "Tribunal Venue"
+msgstr ""
+
+#: Defs::fieldGroundNatureType
+msgid "Two Star Artificial Turf"
+msgstr ""
+
+#: Club Field Labels
+msgid "Type of Legal Entity"
+msgstr ""
+
+#: Defs::entityType
+msgid "University"
+msgstr ""
+
+#: Defs::fieldGroundNatureType
+msgid "Unknown"
+msgstr ""
+
+#: Defs::ProdTransactionStatus Defs::TransactionStatus web/TransLog.pm
+#: Line:683 Line:751
+msgid "Unpaid"
+msgstr ""
+
+#: Person FieldLabels Club Field Labels web/PersonCertifications.pm Line:123
+#: web/EntityIdentifier.pm Line:352
+#: templates/dashboards/personregistration.templ Line:156
+#: templates/registration/certifications.templ Line:9
+#: templates/workflow/view/person.templ Line:261
+msgid "Valid From"
+msgstr ""
+
+#: Person FieldLabels Club Field Labels web/PersonCertifications.pm Line:128
+#: web/EntityIdentifier.pm Line:356
+#: templates/registration/certifications.templ Line:10
+msgid "Valid Until"
+msgstr ""
+
+#: Defs::entityInfo Defs::LevelNames Defs::documentFor
+#: web/IncompleteRegistrations.pm Line:264
+#: templates/dashboards/worktasks.templ Line:275
+msgid "Venue"
+msgstr ""
+
+#: Club Field Labels templates/flow/facility_summary.templ Line:14
+msgid "Venue Type"
+msgstr ""
+
+#: Defs::memberTypeName templates/dashboards/personstatus.templ Line:107
+#: Line:126 Line:157 Line:176
+msgid "Volunteer"
+msgstr ""
+
+#: Club Field Labels templates/flow/facility_summary.templ Line:37
+msgid "Web Address"
+msgstr ""
+
+#: Defs::genderEventInfo
+msgid "Women"
+msgstr ""
+
+#: Defs::entityType
+msgid "World Federation"
+msgstr ""
+
+#: Defs::tfInfo web/Person.pm Line:1555 web/PersonRequest.pm Line:530
+#: templates/personrequest/generic/search_form.templ Line:49
+msgid "Yes"
+msgstr ""
+
+#: Defs::DisplayEntityLevelNames Defs::LevelNames
+msgid "Zone"
+msgstr ""
+
+#: Defs::paymentTypes Defs::manualPaymentTypes
+msgid "[none]"
+msgstr ""
+
+#: web/regoformphoto.cgi Line:76 web/productphoto.cgi Line:60
+#: web/ProductPhoto.pm Line:167 Line:592 web/Photo.pm Line:113 Line:498
+msgid "Photo"
+msgstr ""
+
+#: web/registrationUser/signup.cgi Line:64 web/Club.pm Line:821 Line:892
+#: web/Entity.pm Line:425 Line:495 templates/dashboards/entity.templ Line:22
+#: templates/dashboards/club.templ Line:24 templates/dashboards/person.templ
+#: Line:108 templates/emails/notification/myfas-notification-template.templ
+#: Line:41 templates/emails/notification/FI-notification-template.templ
+#: templates/workflow/result/venue.templ Line:58
+#: templates/workflow/result/club.templ Line:45
+#: templates/workflow/summary/venue.templ Line:28
+#: templates/workflow/summary/club.templ
+#: templates/user/forgot_password_form.templ Line:8
+#: templates/user/globalnav.templ Line:88 Line:101 templates/user/index.templ
+#: Line:47
+msgid "Email"
+msgstr ""
+
+#: web/registrationUser/signup.cgi Line:94
+msgid "Email address already in use"
+msgstr ""
+
+#: web/registrationUser/signup.cgi Line:88 web/user/signup.cgi
+msgid "Email address is not valid"
+msgstr ""
+
+#: web/ajax/aj_search.cgi Line:346
+msgid "Organisations"
+msgstr ""
+
+#: web/registrationUser/signup.cgi Line:65 web/user/signup.cgi
+msgid "Password 1"
+msgstr ""
+
+#: web/registrationUser/signup.cgi Line:66 web/user/signup.cgi
+msgid "Password 2"
+msgstr ""
+
+#: web/registrationUser/signup.cgi Line:84 web/user/signup.cgi
+msgid "Password and Password 2 do not match"
+msgstr ""
+
+#: web/registrationUser/signup.cgi Line:80 web/user/signup.cgi
+msgid "You must fill in the following fields:"
+msgstr ""
+
+#: web/user/signup.cgi Line:64 templates/auth/authlist.templ Line:15
+#: templates/entity/auditlog.templ Line:10 templates/user/signup.templ Line:19
+#: templates/person/auditlog.templ
+msgid "Username"
+msgstr ""
+
+#: web/user/signup.cgi Line:94
+msgid "Username already in use"
+msgstr ""
+
+#: web/WorkFlow.pm Line:3170 web/Person.pm Line:273 Line:517 Line:538
+#: web/HomePerson.pm Line:254 web/Club.pm Line:950 web/EntityDocuments.pm
+#: Line:177 web/Venues.pm Line:796 web/EntityIdentifier.pm Line:325
+#: templates/auth/authlist.templ Line:21 templates/workflow/view/venue.templ
+#: Line:185 Line:189
+msgid "Add"
+msgstr ""
+
+#: web/PersonEntity.pm Line:172
+msgid "Add Person Entity"
+msgstr ""
+
+#: web/Person.pm Line:1722
+msgid "Add Registration"
+msgstr ""
+
+#: web/Person.pm Line:552
+msgid "Add a new document to this registration"
+msgstr ""
+
+#: web/PersonRegistrationDetail.pm Line:294 web/Person.pm Line:312
+#: web/PendingRegistrations.pm Line:211 web/IncompleteRegistrations.pm
+#: Line:186 web/EntityRegistrationAllowedEdit.pm Line:342
+#: templates/dashboards/personregistration.templ Line:149
+#: templates/workflow/view/person.templ Line:256
+#: templates/workflow/view/personregistration.templ Line:287
+#: templates/person/renewal_roledetails.templ Line:17
+msgid "Age Level"
+msgstr ""
+
+#: web/WorkFlow.pm Line:224 web/PersonRequest.pm Line:768
+msgid "An error has been encountered."
+msgstr ""
+
+#: web/WorkFlow.pm Line:4372
+msgid "Approval by Club"
+msgstr ""
+
+#: web/WorkFlow.pm Line:4380
+msgid "Approval by Member Association"
+msgstr ""
+
+#: web/WorkFlow.pm Line:4376
+msgid "Approval by Regional Association"
+msgstr ""
+
+#: web/PersonRegistrationDetail.pm Line:304 web/PendingRegistrations.pm
+#: Line:226
+msgid "Assigned To"
+msgstr ""
+
+#: web/PersonEntity.pm Line:63
+msgid "Close Person Entity"
+msgstr ""
+
+#: web/WorkFlow.pm Line:2757
+msgid "Club Registration"
+msgstr ""
+
+#: web/WorkFlow.pm Line:665 web/Navbar.pm Line:165 Line:445 Line:535 Line:836
+msgid "Dashboard"
+msgstr ""
+
+#: web/Person.pm Line:320 web/PersonRequest.pm Line:858 web/TransLog.pm
+#: Line:1768 Line:1868 templates/personrequest/access/view.templ Line:28
+#: Line:168
+msgid "Date"
+msgstr ""
+
+#: web/PersonRegistrationDetail.pm Line:324
+msgid "Date Registration Added"
+msgstr ""
+
+#: web/Person.pm Line:396 web/EntityDocuments.pm Line:120 Line:232
+#: web/Documents.pm Line:213 templates/entity/venue_docs_summary.templ Line:6
+msgid "Date Uploaded"
+msgstr ""
+
+#: web/ListNotifications.pm Line:96 web/TransLog.pm Line:1539
+#: templates/workflow/generic/notes.templ Line:10
+msgid "Date/Time"
+msgstr ""
+
+#: web/Person.pm Line:530 web/EntityDocuments.pm Line:169 Line:220
+#: web/Documents.pm Line:201 templates/dashboards/personregistration.templ
+#: Line:35 templates/workflow/generic/document.templ Line:21
+msgid "Document Type"
+msgstr ""
+
+#: web/WorkFlow.pm Line:1058 Line:2411 Line:4278 Line:4412 Line:4464
+#: web/ListPersons.pm Line:50 web/PersonRequest.pm Line:357 Line:364 Line:433
+#: Line:768 Line:909 Line:1184 Line:1921 Line:1973 web/Venues.pm Line:994
+#: Line:1005 Line:1038 Line:1049 Line:1138 Line:1253 Line:1264 Line:1296
+#: Line:1353 templates/entity/venue_fields.templ Line:129
+msgid "Error"
+msgstr ""
+
+#: web/PersonRegistrationDetail.pm Line:119 web/Person.pm Line:1439
+#: web/Notifications.pm Line:345 web/Club.pm Line:537 web/Entity.pm Line:288
+#: web/Transactions.pm Line:620 web/BankAccountSetup.pm Line:191 web/Venues.pm
+#: Line:540 web/EntityIdentifier.pm Line:152
+#: web/EntityRegistrationAllowedEdit.pm Line:159
+msgid "HTMLFORM_INTROTEXT"
+msgstr ""
+
+#: web/WorkFlow.pm Line:4412 web/IncompleteRegistrations.pm Line:370 Line:413
+msgid "Invalid ID"
+msgstr ""
+
+#: web/ListNotifications.pm Line:35
+msgid "List of Notifications"
+msgstr ""
+
+#: web/WorkFlow.pm Line:2657 Line:2761 Line:2772 Line:2881
+msgid "Locking Approval: Payment required."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3106
+msgid "MISSING"
+msgstr ""
+
+#: web/ListNotifications.pm Line:36 web/PersonRegistrationDetail.pm Line:284
+#: web/Club.pm Line:822 Line:879 Line:928 web/Entity.pm Line:426 Line:482
+#: web/PendingRegistrations.pm Line:306 web/Products.pm Line:327
+#: web/ListTransactions.pm Line:41 web/PersonRequest.pm Line:838
+#: web/Payments.pm Line:313 web/Venues.pm Line:803 web/EntityIdentifier.pm
+#: Line:332 web/IncompleteRegistrations.pm Line:280
+#: web/PaymentSplit/PaymentSplitList.pm Line:62
+#: templates/search/grid/personregistration.templ Line:7
+#: templates/reports/reportoptions_header.templ Line:14
+#: templates/personrequest/transfer/search_result.templ
+#: templates/person/list.templ Line:6
+msgid "Name"
+msgstr ""
+
+msgid ""
+"New ' . $Defs::personType{$task->{'strPersonType'}} . \" Registration - "
+"Approval"
+msgstr ""
+
+#: web/WorkFlow.pm Line:3545 Line:3642
+msgid "New Club Registration - Approval"
+msgstr ""
+
+#: web/WorkFlow.pm Line:3551 Line:3647
+msgid "New Facility Registration - Approval"
+msgstr ""
+
+msgid ""
+"New' . ' ' . $Defs::personType{$task->{'strPersonType'}} . \" \" . "
+"\"Registration - Approval"
+msgstr ""
+
+#: web/ListNotifications.pm Line:37
+msgid "No Notifications can be found in the database."
+msgstr ""
+
+#: web/WorkFlow.pm Line:4464
+msgid "No data retrieved/no access"
+msgstr ""
+
+#: web/WorkFlow.pm Line:2411
+msgid "No data retrieved/no access."
+msgstr ""
+
+#: web/WorkFlow.pm Line:625
+msgid "No outstanding tasks"
+msgstr ""
+
+#: web/ListNotifications.pm Line:87
+msgid "Notification ID"
+msgstr ""
+
+#: web/WorkFlow.pm Line:3109
+msgid "Optional. Not Provided."
+msgstr ""
+
+#: web/WorkFlow.pm Line:1058
+msgid "Payment required"
+msgstr ""
+
+#: web/WorkFlow.pm Line:595
+msgid "Person Request"
+msgstr ""
+
+#: web/Person.pm Line:226 web/Navbar.pm Line:1136
+msgid "Player Passport"
+msgstr ""
+
+#: web/WorkFlow.pm Line:463
+msgid "Please review this record"
+msgstr ""
+
+#: web/PersonRegistrationDetail.pm Line:309
+msgid "Problem Resolution"
+msgstr ""
+
+#: web/Person.pm Line:294 templates/dashboards/personregistration.templ
+#: Line:12 templates/personrequest/transfer/view.templ Line:29
+msgid "Registered To"
+msgstr ""
+
+#: web/WorkFlow.pm Line:2678 web/Person.pm Line:290 web/Transactions.pm
+#: Line:361
+msgid "Registration"
+msgstr ""
+
+#: web/Person.pm Line:557 templates/workflow/view/venue.templ Line:39
+#: templates/workflow/generic/document.templ Line:6
+msgid "Registration Documents"
+msgstr ""
+
+#: web/Person.pm Line:170 Line:176 Line:269 web/PendingRegistrations.pm
+#: Line:168 web/Navbar.pm Line:1122
+msgid "Registration History"
+msgstr ""
+
+#: web/PersonRegistrationDetail.pm Line:279
+#: templates/dashboards/personregistration.templ Line:107
+#: templates/workflow/history.templ Line:14
+#: templates/workflow/view/person.templ Line:229
+#: templates/workflow/view/personregistration.templ Line:244
+msgid "Registration Type"
+msgstr ""
+
+#: web/WorkFlow.pm Line:3166 web/Person.pm Line:407 Line:494 Line:500
+#: web/HomePerson.pm Line:253 Line:261 Line:267 web/EntityDocuments.pm
+#: Line:129 web/FacilityEdit.pm Line:219
+#: templates/entity/venue_docs_summary.templ Line:8
+msgid "Replace"
+msgstr ""
+
+#: web/Person.pm Line:471 Line:479 Line:485 Line:492 web/HomePerson.pm
+#: Line:259 web/EntityDocuments.pm Line:74 Line:82 Line:83 Line:89 Line:93
+msgid "Replace File"
+msgstr ""
+
+#: web/WorkFlow.pm Line:3925
+msgid "Resolved"
+msgstr ""
+
+#: web/PersonRegisterWhat.pm Line:397 Line:408 Line:500 Line:528 Line:708
+msgid "Selection Not Required"
+msgstr ""
+
+#: web/PersonRegistrationDetail.pm Line:319
+msgid "Task Assigned To"
+msgstr ""
+
+#: web/PersonRegistrationDetail.pm Line:299
+msgid "Task Status"
+msgstr ""
+
+#: web/PersonRegistrationDetail.pm Line:314 web/PersonRequest.pm Line:862
+msgid "Task Type"
+msgstr ""
+
+#: web/WorkFlow.pm Line:220
+msgid "Task has been put on-hold."
+msgstr ""
+
+#: web/WorkFlow.pm Line:2132
+msgid "Task has been resolved."
+msgstr ""
+
+#: web/WorkFlow.pm Line:628
+msgid "The following are the outstanding tasks to be authorised"
+msgstr ""
+
+#: web/WorkFlow.pm Line:465
+msgid ""
+"This person has been duplicate resolved and appears to have an incorrect "
+"Registration count"
+msgstr ""
+
+#: web/WorkFlow.pm Line:3491
+msgid "Transfer - Approved"
+msgstr ""
+
+#: web/Person.pm Line:298 Line:388 web/EntityDocuments.pm Line:112
+#: web/PendingRegistrations.pm Line:182 Line:191 web/PersonRequest.pm Line:850
+#: web/EntityIdentifier.pm Line:344 web/IncompleteRegistrations.pm Line:161
+#: Line:166 Line:284 templates/dashboards/personregistration.templ Line:128
+#: templates/entity/auditlog.templ Line:9
+#: templates/entity/venue_docs_summary.templ Line:4
+#: templates/workflow/generic/notes.templ Line:8
+#: templates/personrequest/access/view.templ Line:70 Line:217
+#: templates/person/renewal_roledetails.templ Line:5
+#: templates/person/auditlog.templ
+msgid "Type"
+msgstr ""
+
+#: web/PersonRegistrationDetail.pm Line:118 web/Notifications.pm Line:344
+#: web/Club.pm Line:536 web/Entity.pm Line:287 web/Welcome.pm Line:137
+#: web/PersonCertifications.pm Line:228 web/Venues.pm Line:539
+#: web/EntityIdentifier.pm Line:151 web/EntityRegistrationAllowedEdit.pm
+#: Line:158 web/dashboard/DashboardConfig.pm Line:95
+msgid "Update"
+msgstr ""
+
+#: web/WorkFlow.pm Line:2768
+msgid "Venue Registration"
+msgstr ""
+
+#: web/WorkFlow.pm Line:3208 Line:3209 web/Person.pm Line:401 Line:469
+#: Line:478 Line:483 Line:491 Line:493 web/HomePerson.pm Line:251 Line:258
+#: Line:260 web/EntityDocuments.pm Line:81 Line:124 Line:236 web/Documents.pm
+#: Line:218 web/UploadFiles.pm Line:86 Line:92 Line:112 web/GridDisplay.pm
+#: Line:408 Line:571 web/FacilityEdit.pm Line:206
+#: templates/dashboards/worktasks.templ Line:168
+#: templates/search/grid/personregistration.templ Line:68
+#: templates/search/grid/people.templ Line:53
+#: templates/entity/venue_docs_summary.templ Line:7
+#: templates/person/list.templ
+msgid "View"
+msgstr ""
+
+#: web/WorkFlow.pm Line:4461
+msgid "Work Flow History"
+msgstr ""
+
+#: web/WorkFlow.pm Line:1751
+msgid "Work Flow task updated."
+msgstr ""
+
+#: web/WorkFlow.pm Line:1880
+msgid "Work task Notes"
+msgstr ""
+
+#: web/WorkFlow.pm Line:1582
+msgid "Work task notes Updated"
+msgstr ""
+
+#: web/WorkFlow.pm Line:556
+msgid "You have Duplicates to resolve"
+msgstr ""
+
+#: web/WorkFlow.pm Line:549
+msgid "You have Transfers to view"
+msgstr ""
+
+msgid ""
+"You have placed this Club Official Renewal On Hold, the \".$raID-"
+">{'strLocalName'}.\" will be informed."
+msgstr ""
+
+msgid ""
+"You have placed this MA Official Renewal On Hold, the \".$raID-"
+">{'strLocalName'}.\" will be informed."
+msgstr ""
+
+msgid ""
+"You have placed this Player Renewal On Hold, the \".$raID->{'strLocalName'}."
+"\" will be informed."
+msgstr ""
+
+msgid ""
+"You have placed this Team Official Renewal On Hold, the \".$raID-"
+">{'strLocalName'}.\" will be informed."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3810
+msgid ""
+"You have put this task on-hold, once the submitting Club resolves the issue, "
+"you would be able to verify and continue with the Amendment of Person "
+"Details process."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3794
+msgid ""
+"You have put this task on-hold, once the submitting Club resolves the issue, "
+"you would be able to verify and continue with the Club Official Registration "
+"process."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3777
+msgid ""
+"You have put this task on-hold, once the submitting Club resolves the issue, "
+"you would be able to verify and continue with the Coach Registration process."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3806
+msgid ""
+"You have put this task on-hold, once the submitting Club resolves the issue, "
+"you would be able to verify and continue with the New Club Registration "
+"process."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3802
+msgid ""
+"You have put this task on-hold, once the submitting Club resolves the issue, "
+"you would be able to verify and continue with the New Facility Registration "
+"process."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3773
+msgid ""
+"You have put this task on-hold, once the submitting Club resolves the issue, "
+"you would be able to verify and continue with the Player Registration "
+"process."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3798
+msgid ""
+"You have put this task on-hold, once the submitting Club resolves the issue, "
+"you would be able to verify and continue with the Team Official Registration "
+"process."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3769
+msgid ""
+"You have put this task on-hold, once the submitting Club resolves the issue, "
+"you would be able to verify and continue with the Transfer process."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3786
+msgid ""
+"You have put this task on-hold, once the submitting MA resolves the issue, "
+"you would be able to verify and continue with the MA Official Registration "
+"process."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3782
+msgid ""
+"You have put this task on-hold, once the submitting MA resolves the issue, "
+"you would be able to verify and continue with the Referee Registration "
+"process."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3814
+msgid ""
+"You have put this task on-hold, once the submitting Organisation resolves "
+"the issue, you would be able to verify and continue with the Amendment of "
+"Club Details process."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3818
+msgid ""
+"You have put this task on-hold, once the submitting Organisation resolves "
+"the issue, you would be able to verify and continue with the Amendment of "
+"Venue Details process."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3790
+msgid ""
+"You have put this task on-hold, once the submitting RA resolves the issue, "
+"you would be able to verify and continue with the RA Official Registration "
+"process."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3895
+msgid "You have rejected this Amendment of Person Registration."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3873
+msgid ""
+"You have rejected this Club Official Registration, the club will be "
+"informed. To proceed with this Registration the club need to start a new "
+"Registration."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3904
+msgid ""
+"You have rejected this Club Official Renewal. To proceed with this Renewal, "
+"start a new Renewal."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3891
+msgid ""
+"You have rejected this Club Registration. To proceed with this Registration, "
+"start a new Registration."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3856
+msgid ""
+"You have rejected this Coach Registration, the club will be informed. To "
+"proceed with this Registration the club need to start a new Registration."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3864
+msgid ""
+"You have rejected this MA Official Registration. To proceed with this "
+"Registration, start a new Registration."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3907
+msgid ""
+"You have rejected this MA Official Renewal. To proceed with this Renewal, "
+"start a new Renewal."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3852
+msgid ""
+"You have rejected this Player Registration, the club will be informed. To "
+"proceed with this Registration the club need to start a new Registration."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3901
+msgid ""
+"You have rejected this Player Renewal. To proceed with this Renewal, start a "
+"new Renewal."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3868
+msgid ""
+"You have rejected this RA Official Registration. To proceed with this "
+"Registration, start a new Registration."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3910
+msgid ""
+"You have rejected this RA Official Renewal. To proceed with this Renewal, "
+"start a new Renewal."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3860
+msgid ""
+"You have rejected this Referee Registration. To proceed with this "
+"Registration, start a new Registration."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3877
+msgid ""
+"You have rejected this Team Official Registration, the club will be "
+"informed. To proceed with this Registration the club need to start a new "
+"Registration."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3913
+msgid ""
+"You have rejected this Team Official Renewal. To proceed with this Renewal, "
+"start a new Renewal."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3885
+msgid ""
+"You have rejected this Venue Registration, the club will be informed. To "
+"proceed with this Registration the club need to start a new Registration."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3883
+msgid ""
+"You have rejected this Venue Registration. To proceed with this Registration "
+"start a new Registration."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3848
+msgid ""
+"You have rejected this transfer, the clubs will be informed. To proceed with "
+"this transfer the clubs need to start a new transfer."
+msgstr ""
+
+#: web/WorkFlow.pm Line:3924
+msgid "You have resolved this task."
+msgstr ""
+
+#: web/Person.pm Line:425
+msgid "for"
+msgstr ""
+
+#: web/WorkFlow.pm Line:2129
+msgid "has been rejected."
+msgstr ""
+
+#: web/Person.pm Line:425
+msgid "in"
+msgstr ""
+
+#: web/Club.pm Line:820 Line:883 web/Entity.pm Line:424 Line:486
+#: templates/dashboards/entity.templ Line:19
+msgid "Contact"
+msgstr ""
+
+#: web/Entity.pm Line:338 web/Transactions.pm Line:420
+#: templates/dashboards/entity.templ Line:9 templates/dashboards/club.templ
+#: Line:4
+msgid "Details"
+msgstr ""
+
+#: web/Entity.pm Line:323 web/ReportManager.pm Line:244 web/TransLog.pm
+#: Line:662 templates/dashboards/entity.templ Line:9
+#: templates/dashboards/club.templ Line:4 Line:29
+#: templates/dashboards/person.templ Line:65 Line:116
+#: templates/registration/summary.templ Line:22 Line:40 Line:60 Line:76
+#: templates/registration/summarybulk.templ
+#: templates/workflow/result/venue.templ
+#: templates/workflow/result/person.templ Line:78
+#: templates/workflow/view/venue.templ Line:99 Line:103 Line:162 Line:166
+#: Line:185 Line:189 templates/workflow/view/transfer.templ Line:127
+#: templates/workflow/view/club.templ Line:102 Line:154 Line:220
+#: templates/workflow/view/person.templ Line:205
+#: templates/workflow/view/personregistration.templ Line:122 Line:217 Line:222
+#: templates/flow/facility_summary.templ Line:19 Line:95
+msgid "Edit"
+msgstr ""
+
+#: web/FieldConfig.pm Line:109 web/EditMemberClubs.pm Line:45
+msgid "FIELDS_intro"
+msgstr ""
+"Choose the the visibility and editing options for each of the available "
+"Member fields."
+
+#: web/FieldConfig.pm Line:327 web/Navbar.pm Line:311
+msgid "Field Configuration"
+msgstr ""
+
+#: web/FieldConfig.pm Line:435
+msgid "Fields Updated"
+msgstr ""
+
+#: web/FieldConfig.pm Line:113
+msgid "For levels below"
+msgstr ""
+
+#: web/FieldConfig.pm Line:112
+msgid "For my level"
+msgstr ""
+
+#: web/HomePerson.pm Line:226
+msgid "Optional. Not Provided"
+msgstr ""
+
+#: web/Club.pm Line:823 Line:887 web/Entity.pm Line:427 Line:490
+#: templates/dashboards/entity.templ Line:20 templates/dashboards/club.templ
+#: Line:22 templates/emails/notification/myfas-notification-template.templ
+#: Line:33 Line:40
+#: templates/emails/notification/FI-notification-template.templ
+#: templates/workflow/result/venue.templ Line:65
+#: templates/user/globalnav.templ Line:68 Line:87 Line:94
+#: templates/user/index.templ Line:41 Line:46
+#: templates/personrequest/access/current_club_view.templ Line:148
+#: templates/personrequest/access/requesting_club_view.templ Line:51 Line:180
+#: templates/personrequest/transfer/oldclubdetails.templ Line:28
+#: templates/personrequest/transfer/current_club_view.templ Line:156
+#: templates/personrequest/transfer/new_club_view.templ Line:47 Line:193
+msgid "Phone"
+msgstr ""
+
+#: web/FieldConfig.pm Line:352 web/EditMemberClubs.pm Line:264
+msgid "Problem updating Fields"
+msgstr ""
+
+#: web/FieldConfig.pm Line:114
+msgid "Registration Form"
+msgstr ""
+
+#: web/FieldConfig.pm Line:317 Line:321
+msgid "Save Options"
+msgstr ""
+
+#: web/PersonCertifications.pm Line:297 Line:310
+msgid "Add Another Certificate"
+msgstr ""
+
+#: web/PersonCertifications.pm Line:154
+msgid "Add Certification"
+msgstr ""
+
+#: web/EntityDocuments.pm Line:190
+msgid "Add a new document to this club"
+msgstr ""
+
+#: web/EntityDocuments.pm Line:266 web/Documents.pm Line:243
+msgid "All Files"
+msgstr ""
+
+#: web/PayInvoice.pm Line:309 web/ListTransactions.pm Line:121 web/TransLog.pm
+#: Line:372 Line:642 Line:1541 Line:1767 Line:1856
+msgid "Amount"
+msgstr ""
+
+#: web/PersonCertifications.pm Line:307
+msgid "Certificate Added Successfully"
+msgstr ""
+
+#: web/PersonCertifications.pm Line:294
+msgid "Certificate Updated Successfully"
+msgstr ""
+
+#: web/PersonCertifications.pm Line:119
+msgid "Certification Name"
+msgstr ""
+
+#: web/PersonCertifications.pm Line:115
+msgid "Certification Type"
+msgstr ""
+
+#: web/PersonCertifications.pm Line:160
+#: templates/dashboards/personregistration.templ Line:170
+#: templates/registration/summary.templ Line:57
+#: templates/workflow/view/person.templ Line:269
+#: templates/workflow/view/personregistration.templ Line:294
+msgid "Certifications"
+msgstr ""
+
+#: web/EntityDocuments.pm Line:299 web/Documents.pm Line:321
+#: templates/registration/document_flow_backend.templ Line:72 Line:175
+#: templates/entity/required_docs.templ Line:57 Line:144
+#: templates/club/required_docs.templ Line:58 Line:146
+#: templates/workflow/view/document_upload.templ Line:42
+msgid "Click here to upload file"
+msgstr ""
+
+#: web/PayInvoice.pm Line:392 web/TransLog.pm Line:433 Line:1075 Line:1776
+#: Line:1873
+msgid "Comments"
+msgstr ""
+
+#: web/EntityDocuments.pm Line:321 Line:372 web/Transactions.pm Line:619
+#: web/Documents.pm Line:137 Line:144 Line:348 web/PersonRequest.pm Line:1889
+#: templates/registration/product_flow_backend.templ Line:19
+#: templates/registration/certificate_flow_backend.templ Line:72
+#: templates/registration/document_flow_backend.templ Line:213
+#: templates/entity/venue_fields.templ Line:111
+#: templates/entity/add_fields_count.templ Line:36
+#: templates/flow/flow_cancelsave.templ Line:27 Line:30
+msgid "Continue"
+msgstr ""
+
+#: web/PayInvoice.pm Line:382 web/Transactions.pm Line:305 web/TransLog.pm
+#: Line:380 Line:647 Line:1032
+msgid "Date Paid"
+msgstr ""
+
+#: web/EntityDocuments.pm Line:241 web/Documents.pm Line:224
+#: web/UploadFiles.pm Line:85 Line:91 Line:96 Line:99 Line:102 Line:111
+#: web/ReportManager.pm Line:246 web/IncompleteRegistrations.pm Line:108
+#: Line:239
+msgid "Delete"
+msgstr ""
+
+#: web/EntityDocuments.pm Line:155 web/Navbar.pm Line:1144 web/FacilityEdit.pm
+#: Line:204 templates/dashboards/personregistration.templ Line:25
+#: templates/registration/summary.templ Line:67
+#: templates/workflow/view/transfer.templ Line:72
+#: templates/workflow/view/club.templ Line:38
+#: templates/workflow/view/person.templ
+#: templates/workflow/view/personregistration.templ
+#: templates/flow/club_summary.templ Line:56
+#: templates/flow/facility_summary.templ Line:85
+#: templates/personrequest/access/requesting_club_view.templ Line:26
+#: templates/personrequest/transfer/new_club_view.templ Line:21
+#: templates/personrequest/transfer/view.templ Line:22
+msgid "Documents"
+msgstr ""
+
+#: web/Welcome.pm Line:111
+msgid "Edit Welcome Message"
+msgstr ""
+
+#: web/EntityDocuments.pm Line:228 web/Documents.pm Line:209
+msgid "Extension Name"
+msgstr ""
+
+#: web/EntityDocuments.pm Line:88 Line:92
+msgid "Get File"
+msgstr ""
+
+#: web/PayInvoice.pm Line:293 web/ListTransactions.pm Line:105 web/TransLog.pm
+#: Line:610 Line:1580
+msgid "Invoice Number"
+msgstr ""
+
+#: web/PayInvoice.pm Line:297 web/Payments.pm Line:312 web/TransLog.pm
+#: Line:633 Line:1582 Line:1725 templates/txn_receipt/fnswreceipt.templ
+#: Line:62 templates/txn_receipt/standardreceipt.templ Line:63
+msgid "Item"
+msgstr ""
+
+#: web/PayInvoice.pm Line:373 web/TransLog.pm Line:1020
+msgid "Manual Payment"
+msgstr ""
+
+#: web/EntityDocuments.pm Line:288 web/Documents.pm Line:311
+msgid "New Document"
+msgstr ""
+
+#: web/PayInvoice.pm Line:368 web/TransLog.pm Line:996
+#: templates/registration/entityselect.templ Line:6
+msgid "OR"
+msgstr ""
+
+#: web/PayInvoice.pm Line:337 web/PersonRegistrationFlow_Common.pm Line:1089
+#: web/TransLog.pm Line:940
+msgid "Pay via"
+msgstr ""
+
+#: web/PayInvoice.pm Line:386 web/TransLog.pm Line:1036 Line:1538 Line:1771
+#: Line:1852 templates/txn_receipt/fnswreceipt.templ Line:51
+#: templates/txn_receipt/standardreceipt.templ Line:52
+#: templates/workflow/generic/payment.templ Line:13
+msgid "Payment Type"
+msgstr ""
+
+#: web/PersonCertifications.pm Line:278
+#: templates/registration/certificate_flow_backend.templ Line:2
+msgid "Person Certifications"
+msgstr ""
+
+#: web/PayInvoice.pm Line:305 web/Transactions.pm Line:319
+#: web/ListTransactions.pm Line:113 web/TransLog.pm Line:637 Line:1584
+#: Line:1726
+msgid "Quantity"
+msgstr ""
+
+#: web/PersonCertifications.pm Line:184
+msgid "Select Certification"
+msgstr ""
+
+#: web/Welcome.pm Line:181
+msgid "There was a problem changing the welcome message"
+msgstr ""
+
+#: web/PersonCertifications.pm Line:308
+msgid "To Return To Person Certificates"
+msgstr ""
+
+#: web/PersonCertifications.pm Line:295
+msgid "To View Certificate Details"
+msgstr ""
+
+#: web/Welcome.pm Line:95
+msgid "WELCOME"
+msgstr ""
+
+#: web/Welcome.pm Line:184
+msgid "Welcome Message Updated"
+msgstr ""
+
+#: web/PersonCertifications.pm Line:296 Line:309
+#: templates/reports/reportoptions_header.templ Line:21
+msgid "or"
+msgstr ""
+
+#: web/PersonSummaryPanel.pm Line:43
+msgid "valid to"
+msgstr ""
+
+#: web/Transactions.pm Line:332
+msgid "Amount Already Paid via Part Payments"
+msgstr ""
+
+#: web/Transactions.pm Line:325 web/ListTransactions.pm Line:37
+msgid "Amount Due"
+msgstr ""
+
+#: web/Transactions.pm Line:431
+msgid "Click to View Part Payment form"
+msgstr ""
+
+#: web/Transactions.pm Line:299
+msgid "Delivered"
+msgstr ""
+
+#: web/Transactions.pm Line:436
+msgid "Edit Details"
+msgstr ""
+
+#: web/Logo.pm Line:64
+msgid "Edit Logo"
+msgstr ""
+
+#: web/Transactions.pm Line:347 web/ListTransactions.pm Line:129
+msgid "End Date"
+msgstr ""
+
+#: web/Logo.pm Line:155
+msgid "Existing Logo"
+msgstr ""
+
+#: web/RecordTypeFilter.pm Line:79 web/GridDisplay.pm Line:427
+#: web/Reports/ReportAdvanced.pm Line:263 templates/dashboards/worktasks.templ
+#: Line:330 templates/search/grid/personregistration.templ Line:83
+#: templates/personrequest/transfer/search_result.templ Line:67
+#: templates/person/list.templ Line:107
+msgid "Filter"
+msgstr ""
+
+#: web/Logo.pm Line:116
+msgid "Logo Updated"
+msgstr ""
+
+#: web/Transactions.pm Line:440
+msgid "No Transaction were found."
+msgstr ""
+
+#: web/Transactions.pm Line:292
+msgid "Paid ?"
+msgstr ""
+
+#: web/Transactions.pm Line:312
+msgid "Part Payment for"
+msgstr ""
+
+#: web/Transactions.pm Line:370 templates/workflow/generic/payment.templ
+#: Line:9
+msgid "Product"
+msgstr ""
+
+#: web/Transactions.pm Line:413 Line:417
+msgid "Return to Transaction"
+msgstr ""
+
+#: web/EntityEdit.pm Line:146 web/ProductPhoto.pm Line:168 web/Photo.pm
+#: Line:499 web/PersonEdit.pm Line:124 web/FacilityEdit.pm Line:133
+#: templates/entity/venue_fields.templ Line:113
+#: templates/reports/reportoptions_header.templ Line:38
+msgid "Save"
+msgstr ""
+
+#: web/Transactions.pm Line:375
+msgid "Select Product"
+msgstr ""
+
+#: web/Transactions.pm Line:366
+msgid "Select Registration"
+msgstr ""
+
+#: web/RecordTypeFilter.pm Line:83
+msgid "Showing"
+msgstr ""
+
+#: web/Transactions.pm Line:341 web/ListTransactions.pm Line:125
+msgid "Start Date"
+msgstr ""
+
+#: web/Logo.pm Line:154
+msgid "Update Logo"
+msgstr ""
+
+#: web/PersonRegistrationFlow_Common.pm Line:205 Line:411
+#: web/PersonRegistrationFlow_Backend.pm Line:109 web/Flow_PersonBackend.pm
+#: Line:762 web/Flow_TransferBackend.pm Line:574
+msgid "You cannot register this combination, limit exceeded"
+msgstr ""
+
+#: web/EntityEdit.pm Line:49 Line:50 Line:51 Line:59 Line:60
+#: web/FacilityEdit.pm Line:52 Line:53
+msgid "edit"
+msgstr ""
+
+#: web/RecordTypeFilter.pm Line:73
+msgid "including"
+msgstr ""
+
+#: web/ProductPhoto.pm Line:612 web/Photo.pm Line:133
+msgid "Add Photo"
+msgstr ""
+
+#: web/Documents.pm Line:306
+msgid "All organisations to which this member is linked"
+msgstr ""
+
+#: web/ProductPhoto.pm Line:398 web/Photo.pm Line:170
+msgid "Approx. Time"
+msgstr ""
+
+#: web/ProductPhoto.pm Line:400 web/Photo.pm Line:172
+msgid "Cable"
+msgstr ""
+
+#: web/ProductPhoto.pm Line:397 web/Photo.pm Line:169
+msgid "Connection"
+msgstr ""
+
+#: web/ProductPhoto.pm Line:570 web/Photo.pm Line:105
+msgid "Delete Photo"
+msgstr ""
+
+#: web/ProductPhoto.pm Line:166 web/Photo.pm Line:497
+msgid "Modify Photo"
+msgstr ""
+
+#: web/ProductPhoto.pm Line:611 web/Photo.pm Line:132
+msgid "No Photo Found"
+msgstr ""
+
+#: web/Documents.pm Line:307
+msgid "Only to this $currentLevelName"
+msgstr ""
+
+#: web/ProductPhoto.pm Line:170 web/Photo.pm Line:501
+msgid "Original Photo"
+msgstr ""
+
+#: web/ProductPhoto.pm Line:402 web/Photo.pm Line:174
+msgid "Please be Patient"
+msgstr ""
+
+#: web/ProductPhoto.pm Line:169 web/Photo.pm Line:500
+msgid "Preview"
+msgstr ""
+
+#: web/ProductPhoto.pm Line:569
+msgid "Replace Photo"
+msgstr ""
+
+#: web/ProductPhoto.pm Line:171 web/Photo.pm Line:502
+msgid "Rotate Left"
+msgstr ""
+
+#: web/ProductPhoto.pm Line:172 web/Photo.pm Line:503
+msgid "Rotate Right"
+msgstr ""
+
+#: web/ProductPhoto.pm Line:388 web/Photo.pm Line:160
+msgid "Save Photo"
+msgstr ""
+
+#: web/Documents.pm Line:205
+msgid "Size"
+msgstr ""
+
+#: web/ProductPhoto.pm Line:395 web/Photo.pm Line:167
+msgid "The estimated time to upload a 400Kb image is"
+msgstr ""
+
+#: web/Documents.pm Line:278
+msgid "There are no documents"
+msgstr ""
+
+#: web/ProductPhoto.pm Line:401 web/Photo.pm Line:173
+msgid "Under 1 minute"
+msgstr ""
+
+#: web/ProductPhoto.pm Line:389 web/Photo.pm Line:161
+msgid "Uploading"
+msgstr ""
+
+#: web/ProductPhoto.pm Line:399 web/Photo.pm Line:171
+msgid "minutes"
+msgstr ""
+
+#: web/Navbar.pm Line:407
+msgid "Add Club"
+msgstr ""
+
+#: web/Navbar.pm Line:247 Line:804
+msgid "Add Club Official"
+msgstr ""
+
+#: web/Navbar.pm Line:223 Line:780
+msgid "Add Coach"
+msgstr ""
+
+#: web/Navbar.pm Line:229 Line:786
+msgid "Add MA Official"
+msgstr ""
+
+#: web/Navbar.pm Line:217 Line:774
+msgid "Add Player"
+msgstr ""
+
+#: web/Navbar.pm Line:235 Line:792
+msgid "Add RA Official"
+msgstr ""
+
+#: web/Navbar.pm Line:253 Line:810
+msgid "Add Referee"
+msgstr ""
+
+#: web/Navbar.pm Line:241 Line:798
+msgid "Add Team Official"
+msgstr ""
+
+#: web/Navbar.pm Line:414
+msgid "Add Venue"
+msgstr ""
+
+#: web/Navbar.pm Line:828
+msgid "Add a Venue"
+msgstr ""
+
+#: web/PendingRegistrations.pm Line:231 web/IncompleteRegistrations.pm
+#: Line:191 Line:289
+msgid "Added"
+msgstr ""
+
+#: web/Navbar.pm Line:161 Line:531 templates/dashboards/worktasks.templ
+#: Line:238
+msgid "Advanced Search"
+msgstr ""
+
+#: web/Navbar.pm Line:421 Line:693 Line:1083 web/AuditLog.pm Line:116
+msgid "Audit Log"
+msgstr ""
+
+#: web/ListAuditLog.pm Line:92 web/Navbar.pm Line:721 Line:874 Line:1117
+#: web/FacilityEdit.pm Line:236 Line:237 Line:240
+msgid "Audit Trail"
+msgstr ""
+
+#: web/Navbar.pm Line:365
+msgid "Bank File Export"
+msgstr ""
+
+#: web/Navbar.pm Line:293 Line:730 Line:755
+msgid "Bulk Renewals"
+msgstr ""
+
+#: web/Navbar.pm Line:340
+msgid "Card Printing"
+msgstr ""
+
+#: web/Navbar.pm Line:1138 templates/person/list.templ Line:11
+msgid "Certificates"
+msgstr ""
+
+#: web/Navbar.pm Line:325 Line:595
+msgid "Clearances Settings"
+msgstr ""
+
+#: web/Navbar.pm Line:878
+msgid "Club Documents"
+msgstr ""
+
+#: web/Navbar.pm Line:870
+msgid "Club Transactions"
+msgstr ""
+
+#: web/Navbar.pm Line:865
+msgid "Club Work Tasks"
+msgstr ""
+
+#: web/Navbar.pm Line:449 web/PageMain.pm Line:279
+#: web/IncompleteRegistrations.pm Line:338
+msgid "Clubs"
+msgstr ""
+
+#: web/PendingRegistrations.pm Line:221
+msgid "Current Task"
+msgstr ""
+
+#: web/Navbar.pm Line:390 Line:636
+msgid "Duplicate Resolution"
+msgstr ""
+
+#: web/Navbar.pm Line:1139
+msgid "History"
+msgstr ""
+
+#: web/AuditLog.pm Line:114
+msgid "I cannot find any records of changes"
+msgstr ""
+
+#: web/Navbar.pm Line:879
+msgid "Identifiers"
+msgstr ""
+
+#: web/Navbar.pm Line:287 Line:708 web/IncompleteRegistrations.pm Line:348
+msgid "Incomplete Registrations"
+msgstr ""
+
+#: web/Navbar.pm Line:211
+msgid "List $Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}"
+msgstr ""
+
+#: web/Navbar.pm Line:155
+msgid "List Online Transfers"
+msgstr ""
+
+#: web/Navbar.pm Line:539
+msgid "List Persons"
+msgstr ""
+
+#: web/Navbar.pm Line:747
+msgid "List Requests"
+msgstr ""
+
+#: web/Navbar.pm Line:629
+msgid "Locator"
+msgstr ""
+
+#: web/Navbar.pm Line:277 Line:479
+msgid "My Association"
+msgstr ""
+
+#: web/Navbar.pm Line:716 Line:871
+msgid "My Club"
+msgstr ""
+
+#: web/Navbar.pm Line:761
+msgid "Pay Invoice"
+msgstr ""
+
+#: web/Navbar.pm Line:266 Line:622
+msgid "Payment Configuration"
+msgstr ""
+
+#: web/Navbar.pm Line:372
+msgid "Payment Split Run"
+msgstr ""
+
+#: web/Navbar.pm Line:347
+msgid "Pending Registration"
+msgstr ""
+
+#: web/PendingRegistrations.pm Line:334 Line:369 web/Navbar.pm Line:283
+#: Line:704
+msgid "Pending Registrations"
+msgstr ""
+
+#: web/Navbar.pm Line:457
+msgid "People"
+msgstr "Människor"
+
+#: web/Navbar.pm Line:1077 Line:1135
+msgid "Person Dashboard"
+msgstr ""
+
+#: web/Navbar.pm Line:684
+msgid "Person Rollover"
+msgstr ""
+
+#: web/Navbar.pm Line:400 Line:645
+msgid "Products"
+msgstr ""
+
+#: web/Navbar.pm Line:447
+msgid "Regions"
+msgstr ""
+
+#: web/PendingRegistrations.pm Line:42
+msgid "Registration Detail"
+msgstr ""
+
+#: web/Navbar.pm Line:356 Line:666
+msgid "Registration Forms"
+msgstr ""
+
+#: web/Navbar.pm Line:298 Line:654
+msgid "Registrations Allowed"
+msgstr ""
+
+#: web/Navbar.pm Line:174 Line:496 Line:545 Line:884 web/PageMain.pm Line:350
+#: templates/dashboards/worktasks.templ Line:213 Line:225
+msgid "Reports"
+msgstr ""
+
+#: web/Navbar.pm Line:767
+msgid "Request for Person Details"
+msgstr ""
+
+#: web/Navbar.pm Line:737
+msgid "Request or start a transfer"
+msgstr ""
+
+#: web/PendingRegistrations.pm Line:196 web/IncompleteRegistrations.pm
+#: Line:171 templates/dashboards/personregistration.templ Line:135
+#: templates/dashboards/worktasks.templ Line:242 Line:289
+#: templates/search/grid/personregistration.templ Line:10
+#: templates/registration/what.templ Line:36
+#: templates/registration/whatbulk.templ Line:22
+#: templates/person/renewal_roledetails.templ Line:11
+#: templates/person/list.templ Line:8
+msgid "Role"
+msgstr ""
+
+#: web/Navbar.pm Line:259 Line:482 Line:816 Line:880 web/Search/Handler.pm
+#: Line:18 templates/search/form.templ Line:6 Line:11
+#: templates/personrequest/generic/search_form.templ Line:67 Line:267
+msgid "Search"
+msgstr ""
+
+msgid "Search ALL Online $txt_Clr\".\"s"
+msgstr ""
+
+#: web/Navbar.pm Line:446
+msgid "States"
+msgstr ""
+
+#: web/Navbar.pm Line:486 Line:886 Line:1147
+msgid "System"
+msgstr ""
+
+#: web/Navbar.pm Line:699 Line:1094 Line:1137
+msgid "Transactions"
+msgstr ""
+
+#: web/Navbar.pm Line:1127 Line:1146
+msgid "Transfer History"
+msgstr ""
+
+#: web/Navbar.pm Line:615
+msgid "Transfer Person"
+msgstr ""
+
+#: web/Navbar.pm Line:304 Line:608
+msgid "User Management"
+msgstr ""
+
+#: web/Navbar.pm Line:453 web/Venues.pm Line:793
+#: web/IncompleteRegistrations.pm Line:338
+msgid "Venues"
+msgstr ""
+
+#: web/Navbar.pm Line:273 Line:469 Line:650
+msgid "Work Tasks"
+msgstr ""
+
+#: web/Navbar.pm Line:448
+msgid "Zones"
+msgstr ""
+
+#: web/Products.pm Line:1040
+msgid "Any"
+msgstr ""
+
+#: web/Products.pm Line:344
+msgid "Copy Product"
+msgstr ""
+
+#: web/Products.pm Line:340
+msgid "Created By"
+msgstr ""
+
+#: web/Photo.pm Line:104
+msgid "Edit Photo"
+msgstr ""
+
+#: web/Products.pm Line:664
+msgid "First Adult"
+msgstr ""
+
+#: web/Products.pm Line:669
+msgid "First Child"
+msgstr ""
+
+#: web/Products.pm Line:323 templates/team/team_staff.templ Line:25
+msgid "Group"
+msgstr ""
+
+#: web/PersonRegistrationFlow_Backend.pm Line:112 web/Flow_PersonBackend.pm
+#: Line:765
+msgid ""
+"New failed, existing registration found.  In order to continue, a Transfer "
+"from the existing Entity must be organised."
+msgstr ""
+
+#: web/MinorProtection.pm Line:24
+msgid ""
+"Player lives no further than 50km from the national border and the club with "
+"which the player wishes to be registered is also within 50km from the "
+"national border."
+msgstr ""
+
+#: web/Products.pm Line:331 web/Payments.pm Line:314
+msgid "Price"
+msgstr ""
+
+#: web/PersonRegistrationFlow_Backend.pm Line:115 web/Flow_PersonBackend.pm
+#: Line:768
+msgid ""
+"Renewal failed, cannot find existing registration. Might have already been "
+"renewed"
+msgstr ""
+
+#: web/Products.pm Line:665
+msgid "Second Adult"
+msgstr ""
+
+#: web/Products.pm Line:670
+msgid "Second Child"
+msgstr ""
+
+#: web/Products.pm Line:667
+msgid "Subsequent Adult"
+msgstr ""
+
+#: web/Products.pm Line:672
+msgid "Subsequent Child"
+msgstr ""
+
+#: web/Products.pm Line:666
+msgid "Third Adult"
+msgstr ""
+
+#: web/Products.pm Line:671
+msgid "Third Child"
+msgstr ""
+
+#: web/PersonRegistrationFlow_Backend.pm Line:106 web/Flow_PersonBackend.pm
+#: Line:759 web/Flow_TransferBackend.pm Line:571
+msgid "You cannot register at this time, Person is currently SUSPENDED"
+msgstr ""
+
+#: web/ReportManager.pm Line:246
+msgid "Are you sure you want to delete this saved report?"
+msgstr ""
+
+#: web/ReportManager.pm Line:238
+msgid "Build"
+msgstr ""
+
+#: web/ReportManager.pm Line:215
+msgid "Build a Report"
+msgstr ""
+
+#: web/ReportManager.pm Line:96
+msgid "Configure Report"
+msgstr ""
+
+#: web/Flow_PersonBackend.pm Line:203
+msgid "Has this person already been registered?"
+msgstr ""
+
+#: web/Flow_PersonBackend.pm Line:215
+msgid "I have validated that this person is not a duplicate"
+msgstr ""
+
+#: web/Flow_PersonBackend.pm Line:198
+msgid "If yes, they need to apply for a Transfer."
+msgstr ""
+
+#: web/Flow_ClubBackend.pm Line:747
+msgid "Invalid Club ID"
+msgstr ""
+
+#: web/Flow_PersonBackend.pm Line:959 Line:1280 Line:1370
+#: web/Flow_ClubBackend.pm Line:549 web/Flow_TransferBackend.pm Line:658
+#: Line:1023 Line:1113 web/Flow_FacilityBackend.pm Line:214 Line:638
+msgid "Invalid Registration ID"
+msgstr ""
+
+#: web/Flow_PersonBackend.pm Line:632
+msgid "Invalid Renewal Details"
+msgstr ""
+
+#: web/Flow_PersonBackend.pm Line:633 web/PersonRequest.pm Line:433
+#: templates/dashboards/personregistration.templ Line:216
+msgid "No record found."
+msgstr ""
+
+#: web/Flow_PersonBackend.pm Line:199 Line:204
+msgid "Not sure?"
+msgstr ""
+
+#: web/Flow_PersonBackend.pm Line:197
+msgid ""
+"Please check that this player has not been registered with another club?"
+msgstr ""
+
+#: web/Flow_PersonBackend.pm Line:1107 Line:1186
+msgid "Registration failed, cannot find registration."
+msgstr ""
+
+#: web/ReportManager.pm Line:48
+msgid "Reports Manager"
+msgstr ""
+
+#: web/Flow_PersonBackend.pm Line:1203 web/Flow_TransferBackend.pm Line:913
+#: web/Flow_FacilityBackend.pm Line:698
+msgid "Required Document Missing"
+msgstr ""
+
+#: web/ReportManager.pm Line:229 Line:249
+msgid "Run"
+msgstr ""
+
+#: web/ReportManager.pm Line:216
+msgid "Run a Report"
+msgstr ""
+
+#: web/Flow_PersonBackend.pm Line:1296 web/Flow_ClubBackend.pm Line:693
+#: web/Flow_TransferBackend.pm Line:1039 web/Flow_FacilityBackend.pm Line:828
+#: web/Flow_BulkRenewalsBackend.pm Line:399
+#: templates/registration/summary.templ Line:87
+msgid "Submit to Member Association"
+msgstr ""
+
+#: web/Flow_PersonBackend.pm Line:200 Line:205
+msgid "Then use the Search."
+msgstr ""
+
+#: web/Flow_PersonBackend.pm Line:270
+msgid "This person is a possible duplicate."
+msgstr ""
+
+#: web/ListTransactions.pm Line:36
+msgid "Add a Transaction"
+msgstr ""
+
+#: web/ListTransactions.pm Line:38
+msgid "Amount Paid"
+msgstr ""
+
+#: web/PersonRequest.pm Line:1108
+#: templates/dashboards/personregistration.templ Line:68
+#: templates/workflow/generic/document.templ Line:63
+msgid "Approved"
+msgstr ""
+
+#: web/PersonRequest.pm Line:542
+msgid "Confirm Request"
+msgstr ""
+
+#: web/ListPersons.pm Line:193
+msgid "DUPLICATE"
+msgstr ""
+
+#: web/PersonRequest.pm Line:527
+msgid "Do you have the player's International Transfer Certificate?"
+msgstr ""
+
+#: web/ListPersons.pm Line:48
+msgid "Entity Not Allowed To View List"
+msgstr ""
+
+#: web/GridDisplay.pm Line:431 templates/dashboards/worktasks.templ Line:330
+#: templates/personrequest/transfer/search_result.templ Line:67
+msgid "First"
+msgstr ""
+
+#: web/PersonRequest.pm Line:1887
+msgid "International Transfer Certificate request has been sent"
+msgstr ""
+
+#: web/ListPersons.pm Line:58
+msgid "Invalid page requested"
+msgstr ""
+
+#: web/ListTransactions.pm Line:109
+msgid "Item Name"
+msgstr ""
+
+#: web/GridDisplay.pm Line:432 templates/dashboards/worktasks.templ Line:330
+#: templates/personrequest/transfer/search_result.templ Line:67
+msgid "Last"
+msgstr ""
+
+#: web/ListTransactions.pm Line:40
+msgid "List of Transactions"
+msgstr ""
+
+#: web/ListPersons.pm Line:289
+msgid "List of people registered directly with the Member Association"
+msgstr ""
+
+#: web/ListPersons.pm Line:292
+msgid "List of people registered directly with the Region"
+msgstr ""
+
+#: web/ListPersons.pm Line:295
+msgid "List of people registered with the Club"
+msgstr ""
+
+#: web/PersonRequest.pm Line:834
+#: templates/search/grid/personregistration.templ Line:6
+#: templates/registration/summarybulk.templ Line:7 templates/person/list.templ
+#: Line:5
+msgid "MA ID"
+msgstr ""
+
+#: web/PersonRequest.pm Line:357
+msgid "Member is currently registered."
+msgstr ""
+
+#: web/ListPersons.pm Line:335
+msgid "N"
+msgstr ""
+
+#: web/GridDisplay.pm Line:433 templates/dashboards/worktasks.templ Line:330
+#: templates/personrequest/transfer/search_result.templ Line:67
+msgid "Next"
+msgstr ""
+
+#: web/ListTransactions.pm Line:42
+msgid "No Transactions can be found in the database."
+msgstr ""
+
+#: web/GridDisplay.pm Line:436 templates/dashboards/worktasks.templ Line:330
+#: templates/personrequest/transfer/search_result.templ Line:67
+msgid "No matching records found"
+msgstr ""
+
+#: web/PersonRequest.pm Line:364
+msgid "Pending request has been found."
+msgstr ""
+
+#: web/PersonRequest.pm Line:1966
+msgid "Person Request History"
+msgstr ""
+
+#: web/PersonRequest.pm Line:909 Line:1921
+msgid "Person Request not found."
+msgstr ""
+
+#: web/GridDisplay.pm Line:434 templates/dashboards/worktasks.templ Line:330
+#: templates/personrequest/transfer/search_result.templ Line:67
+msgid "Previous"
+msgstr ""
+
+#: web/ListTransactions.pm Line:43 templates/workflow/generic/payment.templ
+#: Line:8
+msgid "Qty"
+msgstr ""
+
+#: web/PersonRequest.pm Line:830
+msgid "Records found"
+msgstr ""
+
+#: web/PersonRequest.pm Line:441
+msgid "Request Access cannot continue until re-approved by MA."
+msgstr ""
+
+#: web/PersonRequest.pm Line:98
+msgid "Request Access to Person Details"
+msgstr ""
+
+#: web/PersonRequest.pm Line:842 templates/personrequest/access/view.templ
+#: Line:20 Line:160
+msgid "Request From"
+msgstr ""
+
+#: web/PersonRequest.pm Line:846 templates/personrequest/access/view.templ
+#: Line:24 Line:164
+msgid "Request To"
+msgstr ""
+
+#: web/PersonRequest.pm Line:712 Line:718
+msgid "Request a Transfer - Submitted to Current Club"
+msgstr ""
+
+#: web/PersonRequest.pm Line:1768 Line:1802 Line:1828
+msgid "Request for an International Transfer Certificate"
+msgstr ""
+
+#: web/PersonRequest.pm Line:62
+msgid "Request/Initiate a Transfer"
+msgstr ""
+
+#: web/PersonRequest.pm Line:757 Line:823 Line:1953
+msgid "Requested"
+msgstr ""
+
+#: web/PersonRequest.pm Line:794
+msgid "Requests"
+msgstr ""
+
+#: web/PersonRequest.pm Line:854
+msgid "Response Status"
+msgstr ""
+
+#: web/PersonRequest.pm Line:1184
+msgid "Response has been submitted already."
+msgstr ""
+
+#: web/ListPersons.pm Line:145
+msgid "SUSPENDED"
+msgstr ""
+
+#: web/PersonRequest.pm Line:216
+msgid "Search Result"
+msgstr ""
+
+#: web/PersonRequest.pm Line:1694 Line:1710
+msgid "Select Country"
+msgstr ""
+
+#: web/GridDisplay.pm Line:429 templates/dashboards/worktasks.templ Line:330
+#: templates/personrequest/transfer/search_result.templ Line:67
+msgid "Show _MENU_ entries"
+msgstr ""
+
+#: web/GridDisplay.pm Line:428 templates/dashboards/worktasks.templ Line:330
+#: templates/personrequest/transfer/search_result.templ Line:67
+msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+msgstr ""
+
+#: web/GridDisplay.pm Line:421
+msgid "Sorry there is no data to return"
+msgstr ""
+
+#: web/PersonRequest.pm Line:1763 templates/entity/venue_fields.templ Line:150
+#: templates/workflow/generic/actions.templ Line:75
+#: templates/personrequest/access/personregistration_summary.templ Line:82
+#: templates/personrequest/transfer/view.templ Line:232
+#: templates/personrequest/generic/search_form.templ Line:249
+msgid "Submit"
+msgstr ""
+
+#: web/PersonRequest.pm Line:367
+msgid "View pending"
+msgstr ""
+
+#: web/ListPersons.pm Line:335
+msgid "Y"
+msgstr ""
+
+msgid ""
+"You have \" . lc $requestResponseSuffix . \" the \" . $Defs::"
+"personRequest{$request->{'strRequestType'}} . \" of "
+msgstr ""
+
+#: web/PersonRequest.pm Line:1198
+msgid "You will be notified once the transfer is effective and approved by "
+msgstr ""
+
+#: web/BulkPersons.pm Line:188
+msgid "Bulk Registration"
+msgstr ""
+
+#: web/PageMain.pm Line:559 templates/page_wrapper/main_wrapper.templ Line:101
+#: templates/user/index.templ Line:74
+msgid "COPYRIGHT"
+msgstr ""
+"&copy;&nbsp; Copyright SportingPulse International Pty Ltd &nbsp;2014.&nbsp; "
+"All rights reserved."
+
+#: web/EditMemberClubs.pm Line:457
+msgid "Clubs Updated"
+msgstr ""
+
+#: web/PageMain.pm Line:126
+msgid "NO_BODY"
+msgstr ""
+
+#: web/BulkPersons.pm Line:154
+msgid "National Num."
+msgstr ""
+
+#: web/PageMain.pm Line:278 web/IncompleteRegistrations.pm Line:321
+msgid "Persons"
+msgstr ""
+
+#: web/Payments.pm Line:346
+msgid ""
+"Please confirm the details above, then click the <b>Pay Now</b> button to "
+"make an online payment"
+msgstr ""
+
+#: web/Flow_TransferBackend.pm Line:231 Line:326 Line:699 Line:849
+msgid "Save & Continue"
+msgstr ""
+
+#: web/Payments.pm Line:320
+msgid "Total"
+msgstr ""
+
+#: web/Payments.pm Line:311 web/TransLog.pm Line:623 Line:1581 Line:1724
+msgid "Transaction Number"
+msgstr ""
+
+#: web/Flow_TransferBackend.pm Line:1128
+msgid "Transfer Submitted to MA"
+msgstr ""
+
+#: web/Flow_TransferBackend.pm Line:576 Line:627 Line:811 Line:894 Line:975
+#: Line:1010
+msgid "Transfer failed, cannot find registration."
+msgstr ""
+
+#: web/Flow_TransferBackend.pm Line:983
+msgid "Transfer failed, you must step through Payments screen."
+msgstr ""
+
+#: web/Flow_TransferBackend.pm Line:1412
+msgid "Use the Continue button to go to the next page"
+msgstr ""
+
+#: web/Payments.pm Line:254
+msgid "We Accept"
+msgstr ""
+
+#: web/Venues.pm Line:1136 templates/workflow/generic/actions.templ Line:36
+msgid "Add Fields"
+msgstr ""
+
+#: web/EntityRegistrationAllowedEdit.pm Line:228
+msgid "Add New Registration Type"
+msgstr ""
+
+#: web/EntityRegistrationAllowedEdit.pm Line:388 Line:400
+msgid "Add another Registration Type"
+msgstr ""
+
+#: web/EntityRegistrationAllowedEdit.pm Line:321
+msgid "Add new Rule"
+msgstr ""
+
+#: web/IncompleteRegistrations.pm Line:108 Line:239
+msgid "Are you sure you want to delete this registration?"
+msgstr ""
+
+#: web/EntityRegistrationAllowedEdit.pm Line:230
+msgid "Click here"
+msgstr ""
+
+#: web/Venues.pm Line:1256
+msgid "Delete Fields"
+msgstr ""
+
+#: web/EntityRegistrationAllowedEdit.pm Line:315
+msgid "Delete Rule"
+msgstr ""
+
+#: web/Venues.pm Line:997 Line:1041 templates/workflow/generic/actions.templ
+#: Line:42
+msgid "Edit Fields"
+msgstr ""
+
+#: web/Venues.pm Line:602 web/EntityIdentifier.pm Line:204
+msgid "Edit Venue"
+msgstr ""
+
+#: web/Venues.pm Line:1094 Line:1219 Line:1315
+msgid "Facility fields have been updated."
+msgstr ""
+
+#: web/FacilityEdit.pm Line:167 templates/entity/venue_fields.templ Line:41
+#: templates/workflow/view/venue.templ Line:42
+#: templates/workflow/generic/facility_fields.templ Line:5
+#: templates/flow/facility_summary.templ Line:48
+#: templates/flow/facility_fields_grid.templ Line:2
+msgid "Fields"
+msgstr ""
+
+#: web/IncompleteRegistrations.pm Line:406
+msgid "Incomplete registration has been delete"
+msgstr ""
+
+#: web/Flow_FacilityBackend.pm Line:873
+msgid "Invalid Facility ID"
+msgstr ""
+
+#: web/Venues.pm Line:994 Line:1038 Line:1049 Line:1138 Line:1253 Line:1264
+msgid "Invalid Venue/Facility ID."
+msgstr ""
+
+#: web/Venues.pm Line:1296
+msgid "Invalid number of fields to be deleted."
+msgstr ""
+
+#: web/IncompleteRegistrations.pm Line:346
+msgid "No Incomplete Registrations"
+msgstr ""
+
+#: web/Venues.pm Line:1330
+msgid "Number of Fields"
+msgstr ""
+
+#: web/Venues.pm Line:1130
+msgid "Number of Fields: invalid input"
+msgstr ""
+
+#: web/Venues.pm Line:1126
+msgid "Number of Fields: required"
+msgstr ""
+
+#: web/EntityRegistrationAllowedEdit.pm Line:338
+#: templates/personrequest/generic/reg_summary.templ Line:14
+msgid "Person Level"
+msgstr ""
+
+#: web/EntityRegistrationAllowedEdit.pm Line:330
+#: templates/workflow/view/transfer.templ Line:207
+#: templates/workflow/view/person.templ Line:239
+#: templates/workflow/view/personregistration.templ Line:258
+#: templates/personrequest/generic/reg_summary.templ Line:8
+msgid "Person Type"
+msgstr ""
+
+#: web/EntityRegistrationAllowedEdit.pm Line:205
+msgid "Registration Rule Deleted"
+msgstr ""
+
+#: web/EntityRegistrationAllowedEdit.pm Line:233
+msgid "Registration rule deleted"
+msgstr ""
+
+#: web/EntityRegistrationAllowedEdit.pm Line:399
+msgid "Registration rule deleted."
+msgstr ""
+
+#: web/EntityRegistrationAllowedEdit.pm Line:387
+msgid "Registration type added successfully"
+msgstr ""
+
+#: web/EntityRegistrationAllowedEdit.pm Line:322
+msgid "Registrations accepted by my organisation"
+msgstr ""
+
+#: web/RegistrationAllowed.pm Line:59
+msgid "The system does not allow this combination"
+msgstr ""
+
+#: web/Venues.pm Line:812 templates/workflow/view/venue.templ Line:64
+#: templates/workflow/summary/venue.templ Line:21
+#: templates/flow/facility_summary.templ Line:11
+msgid "Venue Name"
+msgstr ""
+
+#: web/IncompleteRegistrations.pm Line:126 Line:257
+msgid "View & Resume"
+msgstr ""
+
+#: web/PersonFieldsSetup.pm Line:490
+msgid "You must choose one of the following options"
+msgstr ""
+
+#: web/EntityRegistrationAllowedEdit.pm Line:230
+msgid "to return to list of current registration types accepted"
+msgstr ""
+
+#: web/TransLog.pm Line:870
+msgid "Add Transaction"
+msgstr ""
+
+#: web/TransLog.pm Line:465
+msgid "Cancel Payment"
+msgstr ""
+
+#: web/dashboard/DashboardConfig.pm Line:45
+msgid "Configure Dashboard"
+msgstr ""
+
+#: web/TransLog.pm Line:366 Line:458
+msgid "Confirm Payment"
+msgstr ""
+
+#: web/dashboard/DashboardConfig.pm Line:168
+msgid "Dashboard Updated"
+msgstr ""
+
+#: web/TransLog.pm Line:705
+msgid "Delete Transaction"
+msgstr ""
+
+#: web/TransLog.pm Line:1540
+msgid "Gateway Text"
+msgstr ""
+
+#: web/TransLog.pm Line:478
+msgid "Invalid Transaction"
+msgstr ""
+
+#: web/TransLog.pm Line:1577
+msgid "Items making up this Payment"
+msgstr ""
+
+#: web/TransLog.pm Line:1721
+msgid "Items making up this order"
+msgstr ""
+
+#: web/TransLog.pm Line:758
+msgid "List All Payment Records"
+msgstr ""
+
+#: web/TransLog.pm Line:1769
+msgid "List of Payment Records"
+msgstr ""
+
+#: web/TransLog.pm Line:1770
+msgid "No Payment Records can be found in the database."
+msgstr ""
+
+#: web/TransLog.pm Line:762
+msgid "No records were found with this filter"
+msgstr ""
+
+#: web/TransLog.pm Line:1583 templates/txn_receipt/fnswreceipt.templ Line:43
+#: templates/txn_receipt/standardreceipt.templ Line:44
+msgid "Payment For"
+msgstr ""
+
+#: web/TransLog.pm Line:1636
+msgid "Payment Record"
+msgstr ""
+
+#: web/TransLog.pm Line:1617
+msgid "Payment Summary"
+msgstr ""
+
+#: web/TransLog.pm Line:295
+msgid "Payments Checkout"
+msgstr ""
+
+#: web/TransLog.pm Line:446
+msgid "Potential Problems"
+msgstr ""
+
+#: web/TransLog.pm Line:1535
+msgid "Previous Payment attempts"
+msgstr ""
+
+#: web/TransLog.pm Line:520
+msgid "Print Receipt"
+msgstr ""
+
+#: web/TransLog.pm Line:1772 Line:1848
+msgid "Ref. No."
+msgstr ""
+
+#: web/TransLog.pm Line:1773 Line:1864
+msgid "Response Code"
+msgstr ""
+
+#: web/TransLog.pm Line:521
+msgid "Return to Transactions"
+msgstr ""
+
+#: web/TransLog.pm Line:367
+msgid ""
+"Review the payment details below, then click Confirm Payment or Cancel "
+"Payment"
+msgstr ""
+
+#: web/TransLog.pm Line:615
+#: templates/personrequest/transfer/search_result.templ Line:54
+msgid "Select"
+msgstr ""
+
+#: web/TransLog.pm Line:346
+msgid "The total of the transactions"
+msgstr ""
+
+#: web/dashboard/DashboardConfig.pm Line:165
+msgid "There was a problem updating your Dashboard"
+msgstr ""
+
+#: web/TransLog.pm Line:1621
+msgid ""
+"This will remove this payment and set all linked transactions to unpaid. "
+"Continue?"
+msgstr ""
+
+#: web/TransLog.pm Line:193
+msgid ""
+"To process an unpaid transaction select it by checking the box in the Pay "
+"column"
+msgstr ""
+
+#: web/TransLog.pm Line:1585 Line:1727
+msgid "Total Amount"
+msgstr ""
+
+#: web/TransLog.pm Line:693
+msgid "View Payments"
+msgstr ""
+
+#: web/TransLog.pm Line:694 Line:1775
+msgid "View Receipt"
+msgstr ""
+
+#: web/TransLog.pm Line:518
+msgid "Your payment has been Confirmed"
+msgstr ""
+
+#: web/TransLog.pm Line:346
+msgid "amount does not equal the amount of the payment"
+msgstr ""
+
+#: web/TransLog.pm Line:209
+msgid "is not a valid Amount"
+msgstr ""
+
+#: web/TransLog.pm Line:220
+msgid "is not valid for Date Paid"
+msgstr ""
+
+#: web/Search/Handler.pm Line:23
+msgid "Request for Person Details Search"
+msgstr ""
+
+#: web/Reports/ReportAdvanced.pm Line:338
+msgid "All Records"
+msgstr ""
+
+#: web/Reports/ReportAdvanced.pm Line:368
+msgid "Ascending"
+msgstr ""
+
+#: web/Reports/ReportAdvanced.pm Line:435
+msgid "Choose how you want to receive the data from this report."
+msgstr ""
+
+#: web/Reports/ReportAdvanced.pm Line:369
+msgid "Descending"
+msgstr ""
+
+#: web/Reports/ReportAdvanced.pm Line:262
+msgid "Display"
+msgstr ""
+
+#: web/Reports/ReportAdvanced.pm Line:260
+msgid "Filter Only"
+msgstr ""
+
+#: web/Reports/ReportAdvanced.pm Line:413
+msgid "Group By"
+msgstr ""
+
+#: web/Reports/ReportAdvanced.pm Line:424
+msgid "No Grouping"
+msgstr ""
+
+#: web/Reports/ReportAdvanced.pm Line:347
+msgid "Options"
+msgstr ""
+
+#: web/Reports/ReportAdvanced.pm Line:434
+msgid "Output"
+msgstr ""
+
+#: web/Reports/ReportAdvanced.pm Line:264
+msgid "Remove"
+msgstr ""
+
+#: web/Reports/ReportAdvanced.pm Line:367
+msgid "Secondary sort by"
+msgstr ""
+
+#: web/Reports/ReportAdvanced.pm Line:348
+msgid "Show"
+msgstr ""
+
+#: web/Reports/ReportAdvanced.pm Line:366
+msgid "Sort by"
+msgstr ""
+
+#: web/Reports/ReportAdvanced.pm Line:336
+msgid "Summary Data"
+msgstr ""
+
+#: web/Reports/ReportAdvanced.pm Line:332
+msgid "Unique Records Only"
+msgstr ""
+
+#: web/registrationUser/RegoLogin.pm Line:72 Line:128 web/user/Login.pm
+msgid "I'm sorry but we can't find you as a registered user."
+msgstr ""
+
+#: web/registrationUser/RegoLogin.pm Line:124
+msgid "Invalid Email/Password"
+msgstr ""
+
+#: web/registrationUser/RegoLogin.pm Line:38 web/user/Login.pm
+msgid "You must enter a password"
+msgstr ""
+
+#: web/registrationUser/RegoLogin.pm Line:35
+msgid "You must enter an email address"
+msgstr ""
+
+#: web/registrationUser/RegoLogin.pm Line:173 web/user/Login.pm
+msgid "Your user account has been deleted."
+msgstr ""
+
+#: web/registrationUser/RegoLogin.pm Line:151 web/user/Login.pm
+msgid "Your user account is currently suspended"
+msgstr ""
+
+#: web/registrationUser/RegoLogin.pm Line:162
+msgid ""
+"Your user account is currently suspended because your email address is "
+"incorrect."
+msgstr ""
+
+#: web/registrationUser/RegoLogin.pm Line:140 web/user/Login.pm
+msgid "Your user account is not yet confirmed"
+msgstr ""
+
+#: web/user/Login.pm Line:124
+msgid "Invalid Usercode/Password"
+msgstr ""
+
+#: web/user/Login.pm Line:35
+msgid "You must enter an username address"
+msgstr ""
+
+#: web/user/Login.pm Line:162
+msgid ""
+"Your user account is currently suspended because your username address is "
+"incorrect."
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:38 Line:90
+msgid "Actions"
+msgstr ""
+
+#: templates/dashboards/person.templ Line:147
+msgid "Add New Role"
+msgstr ""
+
+#: templates/dashboards/entity.templ Line:12 templates/dashboards/club.templ
+#: templates/workflow/result/venue.templ Line:37
+#: templates/workflow/result/person.templ Line:44
+#: templates/personrequest/access/current_club_view.templ Line:144
+#: templates/personrequest/access/requesting_club_view.templ Line:47 Line:176
+#: templates/personrequest/transfer/oldclubdetails.templ Line:23
+#: templates/personrequest/transfer/current_club_view.templ Line:152
+#: templates/personrequest/transfer/new_club_view.templ Line:43 Line:189
+msgid "Address"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:81
+msgid "All tasks"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:266
+msgid "Amendment of Person Details"
+msgstr ""
+
+#: templates/dashboards/personregistration.templ Line:198
+#: templates/workflow/history.templ Line:6
+msgid "Approving Entity"
+msgstr ""
+
+#: templates/dashboards/personstatus.templ Line:77 Line:79
+msgid "Cleared Out"
+msgstr ""
+
+#: templates/dashboards/person.templ Line:75
+#: templates/registration/summary.templ Line:28
+#: templates/workflow/view/venue.templ Line:114
+#: templates/workflow/view/transfer.templ Line:138
+#: templates/workflow/view/club.templ Line:113
+#: templates/workflow/view/person.templ Line:120
+#: templates/workflow/view/personregistration.templ Line:134
+#: templates/flow/facility_summary.templ Line:25
+#: templates/personrequest/access/requesting_club_view.templ Line:99
+#: templates/personrequest/transfer/current_club_view.templ Line:64
+#: templates/personrequest/transfer/new_club_view.templ Line:97
+#: templates/personrequest/transfer/view.templ Line:69
+msgid "Contact Details"
+msgstr ""
+
+#: templates/dashboards/club.templ Line:29
+msgid "Contacts"
+msgstr ""
+
+#: templates/dashboards/personstatus.templ Line:70 Line:72
+msgid "Defaulter"
+msgstr ""
+
+#: templates/dashboards/personstatus.templ Line:140 Line:190
+msgid "Edit Registration"
+msgstr ""
+
+msgid "Enter a person's name or Member ID"
+msgstr ""
+
+#: templates/dashboards/person.templ Line:94
+msgid "Home Phone"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:59
+#: templates/personrequest/transfer/search_result.templ Line:25
+msgid "Latest"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:212 Line:224
+msgid "List Pending Registrations"
+msgstr ""
+
+#: templates/dashboards/person.templ Line:153
+msgid "Mark as Duplicate"
+msgstr ""
+
+#: templates/dashboards/person.templ Line:158
+msgid "Member Cards"
+msgstr ""
+
+#: templates/dashboards/person.templ Line:101
+msgid "Mobile"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:260
+msgid "New Club Official Registration"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:256
+msgid "New Club Registration"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:257
+msgid "New Coach Registration"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:258
+msgid "New Facility Registration"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:261
+msgid "New MA Official Registration"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:255
+msgid "New Player Registration"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:254
+msgid "New Referee Registration"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:193
+msgid "New Registrations"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:259
+msgid "New Team Official Registration"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:82
+msgid "New task"
+msgstr ""
+
+#: templates/dashboards/personregistration.templ Line:210
+#: templates/workflow/history.templ Line:22
+msgid "No available work task notes."
+msgstr ""
+
+#: templates/search/wrapper.templ Line:8
+msgid "No result found"
+msgstr ""
+
+#: templates/dashboards/personstatus.templ Line:11 Line:25 Line:40 Line:54
+msgid "Not Registered"
+msgstr ""
+
+#: templates/dashboards/personstatus.templ Line:13 Line:27 Line:42 Line:56
+msgid "Not Registered and Inactive"
+msgstr ""
+
+#: templates/dashboards/entity.templ Line:28 templates/dashboards/club.templ
+#: Line:47
+msgid "Notifications"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:60
+#: templates/search/grid/personregistration.templ Line:27
+#: templates/personrequest/transfer/search_result.templ Line:26
+#: templates/person/list.templ Line:25
+msgid "Oldest"
+msgstr ""
+
+#: templates/dashboards/personregistration.templ Line:202
+msgid "Originating Entity"
+msgstr ""
+
+#: templates/dashboards/personstatus.templ Line:197
+msgid "Other Clubs"
+msgstr ""
+
+#: templates/dashboards/person.templ Line:129
+msgid "Other Details"
+msgstr ""
+
+#: templates/dashboards/personstatus.templ Line:108 Line:127 Line:158 Line:177
+msgid "Other1"
+msgstr ""
+
+#: templates/dashboards/personstatus.templ Line:109 Line:128 Line:159 Line:178
+msgid "Other2"
+msgstr ""
+
+#: templates/dashboards/personregistration.templ Line:94
+msgid "Payment Still Required"
+msgstr ""
+
+#: templates/search/form.templ Line:4
+msgid "Person Details"
+msgstr ""
+
+#: templates/dashboards/person.templ Line:7
+#: templates/registration/summary.templ templates/workflow/view/transfer.templ
+#: Line:73 Line:85 templates/workflow/view/person.templ Line:53
+#: templates/workflow/view/personregistration.templ
+#: templates/personrequest/access/current_club_view.templ Line:31
+#: templates/personrequest/access/requesting_club_view.templ Line:62
+#: templates/personrequest/transfer/current_club_view.templ Line:27
+#: templates/personrequest/transfer/new_club_view.templ Line:59
+#: templates/personrequest/transfer/view.templ Line:39
+msgid "Personal Information"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:208 Line:218
+msgid "Quick Links"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:230
+msgid "Quick Search"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:67
+msgid "Ready to Approve"
+msgstr ""
+
+#: templates/dashboards/personstatus.templ Line:136 Line:138 Line:186 Line:188
+msgid "Register"
+msgstr ""
+
+#: templates/dashboards/personstatus.templ Line:6 Line:20 Line:35 Line:49
+msgid "Registered but Inactive"
+msgstr ""
+
+#: templates/dashboards/personregistration.templ Line:100
+#: templates/workflow/view/person.templ Line:224
+msgid "Registration Period"
+msgstr ""
+
+#: templates/dashboards/personregistration.templ Line:26
+msgid "Registration details"
+msgstr ""
+
+#: templates/dashboards/personregistration.templ Line:1
+#: templates/workflow/view/person.templ Line:42
+msgid "Registrations"
+msgstr ""
+
+#: templates/dashboards/personregistration.templ Line:184
+msgid "Renew Registration"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:265
+msgid "Renewal of Coach Registration"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:263
+msgid "Renewal of Player Registration"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:264
+msgid "Renewal of Referee Registration"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:194
+msgid "Renewals"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:196
+msgid "Request Access"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:211 Line:222
+msgid "Request or Start a Transfer"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:126
+msgid "Review Transfer of"
+msgstr ""
+
+#: templates/search/form.templ Line:29
+msgid "Search keyword is required."
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:58
+#: templates/search/grid/personregistration.templ Line:25
+#: templates/personrequest/transfer/search_result.templ Line:24
+#: templates/person/list.templ Line:23
+msgid "Sort"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:210
+msgid "Start a New Player Registration"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:220
+msgid "Start a New Registration"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:36 Line:88
+msgid "Started"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:251
+msgid "Task"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:69
+msgid "Task On Hold"
+msgstr ""
+
+#: templates/dashboards/entity.templ Line:111 templates/dashboards/club.templ
+#: Line:134 templates/dashboards/worktasks.templ Line:191
+msgid "Task at a Glance"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:35 Line:87
+#: templates/search/grid/people.templ Line:6
+msgid "Tasklist"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:253
+msgid "Tasks"
+msgstr ""
+
+#: templates/search/form.templ Line:3
+msgid "To add a role to a person not at your club, search below"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:200
+msgid "Total Task Active"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:201
+msgid "Total Task On Hold"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:202
+msgid "Total Task Pending"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:203
+msgid "Total Task Rejected"
+msgstr ""
+
+#: templates/dashboards/personregistration.templ Line:163
+#: templates/workflow/view/person.templ Line:265
+msgid "Valid To"
+msgstr ""
+
+#: templates/dashboards/personregistration.templ Line:71
+#: templates/workflow/generic/document.templ Line:68
+msgid "Verified"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:166 Line:174
+msgid "View and Approve"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:176
+msgid "View and Process"
+msgstr ""
+
+#: templates/dashboards/personregistration.templ Line:27
+msgid "Work task history"
+msgstr ""
+
+#: templates/dashboards/personregistration.templ Line:14
+msgid "as"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:103 Line:115
+msgid "has accepted request for"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:105
+#: templates/personrequest/transfer/current_club_view.templ Line:8
+#: templates/personrequest/transfer/view.templ
+msgid "has requested a transfer for"
+msgstr ""
+
+#: templates/dashboards/worktasks.templ Line:117
+msgid "has requested access for"
+msgstr ""
+
+#: templates/registration/what.templ Line:64
+#: templates/registration/whatbulk.templ Line:38
+msgid "Age group"
+msgstr ""
+
+#: templates/registration/completebulk.templ Line:4
+msgid "Bulk Registration is complete"
+msgstr ""
+
+#: templates/registration/certificate_flow_backend.templ Line:10
+msgid "Certifcation Type"
+msgstr ""
+
+#: templates/registration/error.templ Line:2
+msgid "Click here to select new combination"
+msgstr ""
+
+#: templates/search/grid/people.templ Line:7
+msgid "Date Added"
+msgstr ""
+
+#: templates/registration/certificate_flow_backend.templ Line:31
+msgid "Date Valid From"
+msgstr ""
+
+#: templates/registration/certificate_flow_backend.templ Line:45
+msgid "Date Valid Until"
+msgstr ""
+
+#: templates/registration/summary.templ Line:38
+#: templates/workflow/view/transfer.templ Line:177
+#: templates/workflow/view/person.templ Line:175
+#: templates/workflow/view/personregistration.templ Line:189
+#: templates/flow/facility_summary.templ Line:34
+#: templates/personrequest/access/current_club_view.templ Line:100
+#: templates/personrequest/access/requesting_club_view.templ Line:131
+#: templates/personrequest/transfer/current_club_view.templ Line:96
+#: templates/personrequest/transfer/new_club_view.templ Line:129
+#: templates/personrequest/transfer/view.templ Line:101
+msgid "Email Address"
+msgstr ""
+
+#: templates/registration/certifications.templ Line:2
+msgid "Existing Certifications"
+msgstr ""
+
+#: templates/registration/show_gateways.templ Line:9
+msgid "Generate Invoice"
+msgstr ""
+
+#: templates/registration/completebulk.templ Line:9
+#: templates/registration/complete.templ Line:26 Line:28 Line:30
+#: templates/entity/complete.templ Line:16 templates/club/complete.templ
+#: Line:23 templates/workflow/result/page.templ
+#: templates/workflow/result/club.templ Line:59
+#: templates/workflow/result/personregistration.templ Line:58
+#: templates/workflow/summary/venue.templ Line:49
+#: templates/workflow/summary/transfer.templ Line:57
+#: templates/workflow/summary/club.templ
+#: templates/workflow/summary/person.templ Line:27
+#: templates/workflow/summary/personregistration.templ Line:63
+#: templates/workflow/generic/hold_reject_taskscreen.templ
+#: templates/personrequest/access/request_cancelled.templ Line:18
+#: templates/personrequest/access/request_accepted.templ Line:22
+#: templates/personrequest/access/request_denied.templ
+#: templates/personrequest/transfer/request_cancelled.templ
+#: templates/personrequest/transfer/request_accepted.templ
+#: templates/personrequest/transfer/request_denied.templ
+#: templates/personrequest/transfer/complete.templ
+#: templates/personrequest/generic/itc_confirmation.templ Line:24
+msgid "Go to your dashboard"
+msgstr ""
+
+#: templates/registration/summary.templ Line:15
+#: templates/workflow/view/transfer.templ Line:99
+msgid "Language of name"
+msgstr ""
+
+#: templates/registration/summary.templ Line:13
+msgid "Maiden Name"
+msgstr ""
+
+#: templates/registration/what.templ Line:68
+#: templates/registration/whatbulk.templ Line:42
+msgid "Nature of Registration"
+msgstr ""
+
+#: templates/registration/certificate_flow_backend.templ Line:66
+msgid "No Certification Required"
+msgstr ""
+
+#: templates/registration/no_prev_certification.templ Line:6
+msgid "No Previous Certifications found"
+msgstr ""
+
+#: templates/search/grid/personregistration.templ Line:8
+#: templates/registration/what.templ Line:45
+#: templates/emails/notification/workflow/html/wftask_added.templ Line:26
+#: Line:29 templates/emails/notification/workflow/html/wftask_rejected.templ
+#: templates/emails/notification/workflow/html/wftask_approved.templ
+#: templates/emails/notification/workflow/html/wftask_held.templ
+#: templates/emails/notification/workflow/html/wftask_resolved.templ
+#: templates/emails/notification/personrequest/html/requestaccess_accepted.templ
+#: Line:19
+#: templates/emails/notification/personrequest/html/requestaccess_completed.templ
+#: templates/emails/notification/personrequest/html/requestaccess_denied.templ
+#: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_sent.templ
+#: templates/emails/notification/personrequest/html/requestaccess_rejected.templ
+#: templates/entity/auditlog.templ Line:11
+#: templates/personrequest/transfer/search_result.templ
+#: templates/person/auditlog.templ
+msgid "Organisation"
+msgstr ""
+
+#: templates/registration/summary.templ Line:37
+#: templates/workflow/view/transfer.templ Line:172
+#: templates/workflow/view/person.templ Line:168
+#: templates/workflow/view/personregistration.templ Line:182
+#: templates/flow/facility_summary.templ Line:35
+#: templates/personrequest/access/current_club_view.templ Line:96
+#: templates/personrequest/access/requesting_club_view.templ Line:127
+#: templates/personrequest/transfer/current_club_view.templ Line:92
+#: templates/personrequest/transfer/new_club_view.templ Line:125
+#: templates/personrequest/transfer/view.templ Line:97
+msgid "Phone Number"
+msgstr ""
+
+#: templates/registration/bulkpersons.templ Line:1
+msgid ""
+"Please select the people you wish to register from the list below and click "
+"on the update button to commit your change."
+msgstr ""
+
+#: templates/registration/summary.templ Line:35
+#: templates/workflow/view/transfer.templ Line:162
+#: templates/workflow/view/person.templ Line:154
+#: templates/workflow/view/personregistration.templ Line:168
+#: templates/flow/facility_summary.templ Line:32
+#: templates/personrequest/access/current_club_view.templ Line:88
+#: templates/personrequest/access/requesting_club_view.templ Line:119
+#: templates/personrequest/transfer/current_club_view.templ Line:84
+#: templates/personrequest/transfer/new_club_view.templ Line:117
+#: templates/personrequest/transfer/view.templ Line:89
+msgid "Postal Code"
+msgstr ""
+
+#: templates/registration/summary.templ Line:51
+#: templates/registration/summarybulk.templ Line:34
+#: templates/personrequest/transfer/current_club_view.templ Line:113
+#: templates/personrequest/transfer/new_club_view.templ Line:147
+#: templates/personrequest/transfer/view.templ Line:118
+msgid "Register as"
+msgstr ""
+
+#: templates/registration/summary.templ Line:50
+#: templates/registration/summarybulk.templ Line:33
+#: templates/personrequest/transfer/view.templ Line:114
+msgid "Register to"
+msgstr ""
+
+#: templates/search/grid/people.templ Line:9
+msgid "Registered as"
+msgstr ""
+
+#: templates/registration/summary.templ Line:47
+#: templates/registration/summarybulk.templ Line:30
+#: templates/workflow/result/venue.templ Line:4
+#: templates/workflow/result/club.templ Line:13
+#: templates/workflow/result/person.templ
+#: templates/workflow/result/personregistration.templ
+#: templates/workflow/view/venue.templ Line:41
+#: templates/workflow/view/transfer.templ Line:198
+#: templates/workflow/view/club.templ Line:40
+#: templates/workflow/view/personregistration.templ Line:42
+#: templates/workflow/summary/venue.templ Line:17
+#: templates/workflow/summary/club.templ
+#: templates/workflow/summary/personregistration.templ Line:32
+#: templates/personrequest/access/requesting_club_view.templ Line:140 Line:160
+#: templates/personrequest/transfer/new_club_view.templ Line:173
+#: templates/personrequest/transfer/view.templ Line:110
+msgid "Registration Details"
+msgstr ""
+
+#: templates/search/grid/personregistration.templ Line:64
+#: templates/person/list.templ Line:88
+msgid "Request Access for approval"
+msgstr ""
+
+#: templates/search/grid/personregistration.templ Line:62
+#: templates/person/list.templ Line:86
+msgid "Request Access sent to Club"
+msgstr ""
+
+#: templates/registration/what.templ Line:31
+#: templates/registration/whatbulk.templ Line:18
+msgid "Reset Registration"
+msgstr ""
+
+#: templates/registration/entityselect.templ Line:7
+msgid "SEARCH/FIND A CLUB"
+msgstr ""
+
+#: templates/search/grid/personregistration.templ Line:15
+#: templates/personrequest/transfer/search_result.templ Line:14
+#: templates/person/list.templ Line:16
+msgid "Search MA ID"
+msgstr ""
+
+#: templates/search/grid/personregistration.templ Line:18
+#: templates/personrequest/transfer/search_result.templ Line:17
+#: templates/person/list.templ Line:19
+msgid "Search Name"
+msgstr ""
+
+#: templates/search/grid/personregistration.templ Line:21
+#: templates/personrequest/transfer/search_result.templ Line:20
+msgid "Search Organisation"
+msgstr ""
+
+#: templates/registration/product_flow_backend.templ Line:8
+#: templates/registration/person_flow_manual_pay.templ Line:6
+msgid "Select Payment Type"
+msgstr ""
+
+#: templates/registration/what.templ Line:56
+#: templates/registration/whatbulk.templ Line:30
+msgid "Sub Role"
+msgstr ""
+
+#: templates/registration/summary.templ Line:2
+#: templates/flow/facility_summary.templ Line:3
+msgid "Summary"
+msgstr ""
+
+#: templates/registration/what.templ Line:15 templates/flow/default.templ
+#: Line:43
+msgid "This type of registration is not available"
+msgstr ""
+
+#: templates/search/grid/personregistration.templ Line:66
+#: templates/personrequest/transfer/search_result.templ Line:52
+#: templates/person/list.templ Line:90
+msgid "View Request"
+msgstr ""
+
+#: templates/registration/entityselect.templ Line:8
+msgid "Warriors"
+msgstr ""
+
+#: templates/registration/entityselect.templ Line:2
+msgid "Who do you wish to add a New To"
+msgstr ""
+
+#: templates/search/grid/personregistration.templ Line:26
+#: templates/person/list.templ Line:24
+msgid "Youngest"
+msgstr ""
+
+#: templates/registration/what.templ Line:28
+#: templates/registration/whatbulk.templ Line:15
+msgid ""
+"Your registration details are already set. To change the values on this page "
+"press the 'Reset Registration' button below."
+msgstr ""
+
+#: templates/registration/playerpassport.templ Line:8
+msgid "Beginning Of Registration"
+msgstr ""
+
+#: templates/registration/document_flow_backend.templ Line:45 Line:70 Line:147
+#: Line:173 templates/entity/required_docs.templ Line:36 Line:123
+#: templates/club/required_docs.templ Line:125
+msgid "Click here to update this file"
+msgstr ""
+
+#: templates/registration/playerpassport.templ Line:10
+#: templates/emails/notification/workflow/html/wftask_added.templ Line:20
+#: templates/emails/notification/workflow/html/wftask_rejected.templ
+#: templates/emails/notification/workflow/html/wftask_approved.templ
+#: templates/emails/notification/workflow/html/wftask_held.templ
+#: templates/emails/notification/workflow/html/wftask_resolved.templ
+#: templates/workflow/result/club.templ Line:17
+#: templates/workflow/summary/club.templ
+msgid "Club Name"
+msgstr ""
+
+#: templates/emails/notification/myfas-notification-template.templ Line:49
+#: templates/emails/notification/FI-notification-template.templ
+msgid "Copyright text goes here"
+msgstr ""
+
+#: templates/emails/notification/workflow/html/wftask_added.templ Line:5
+#: templates/emails/notification/workflow/html/wftask_rejected.templ
+#: templates/emails/notification/workflow/html/wftask_approved.templ
+#: templates/emails/notification/workflow/html/wftask_held.templ
+#: templates/emails/notification/workflow/html/wftask_resolved.templ
+#: templates/emails/notification/personrequest/html/requestaccess_accepted.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_completed.templ
+#: templates/emails/notification/personrequest/html/requestaccess_completed.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_sent.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_denied.templ
+#: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_sent.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
+#: templates/emails/notification/personrequest/html/request_itc_content.templ
+#: templates/emails/notification/personrequest/html/requestaccess_rejected.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_accepted.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
+msgid "Dear"
+msgstr ""
+
+#: templates/registration/playerpassport.templ Line:9
+msgid "End of Registration"
+msgstr ""
+
+#: templates/emails/notification/workflow/html/wftask_added.templ Line:23
+#: templates/emails/notification/workflow/html/wftask_rejected.templ
+#: templates/emails/notification/workflow/html/wftask_approved.templ
+#: templates/emails/notification/workflow/html/wftask_held.templ
+#: templates/emails/notification/workflow/html/wftask_resolved.templ
+msgid "Facility/Venue Name"
+msgstr ""
+
+#: templates/emails/notification/myfas-notification-template.templ Line:39
+#: templates/emails/notification/FI-notification-template.templ
+#: templates/user/globalnav.templ Line:93 templates/user/index.templ Line:45
+msgid "Help Desk"
+msgstr ""
+
+#: templates/emails/notification/myfas-notification-template.templ Line:32
+#: templates/emails/notification/FI-notification-template.templ
+#: templates/user/globalnav.templ Line:67 templates/user/index.templ Line:40
+msgid "Member Association"
+msgstr ""
+
+#: templates/emails/notification/workflow/html/wftask_added.templ Line:55
+#: templates/emails/notification/workflow/html/wftask_rejected.templ Line:60
+#: templates/emails/notification/workflow/html/wftask_approved.templ
+#: templates/emails/notification/workflow/html/wftask_held.templ
+#: templates/emails/notification/workflow/html/wftask_resolved.templ
+#: templates/emails/notification/personrequest/html/requestaccess_accepted.templ
+#: Line:44
+#: templates/emails/notification/personrequest/html/requesttransfer_completed.templ
+#: Line:49
+#: templates/emails/notification/personrequest/html/requestaccess_completed.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_sent.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_denied.templ
+#: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_sent.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
+#: templates/emails/notification/personrequest/html/request_itc_content.templ
+#: Line:39
+#: templates/emails/notification/personrequest/html/requestaccess_rejected.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_accepted.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
+#: templates/personrequest/history.templ Line:15
+msgid "N/A"
+msgstr ""
+
+#: templates/registration/playerpassport.templ Line:33
+#: templates/entity/auditlog.templ Line:31 templates/person/auditlog.templ
+msgid "No Record Found"
+msgstr ""
+
+#: templates/registration/complete.templ Line:18
+msgid "Once processing has taken place, the outcome will be emailed to the "
+msgstr ""
+
+#: templates/registration/document_flow_backend.templ Line:104
+#: templates/entity/required_docs.templ Line:86
+#: templates/club/required_docs.templ Line:87
+msgid "Optional Documents"
+msgstr ""
+
+#: templates/emails/notification/workflow/html/wftask_added.templ Line:35
+#: templates/emails/notification/workflow/html/wftask_rejected.templ
+#: templates/emails/notification/workflow/html/wftask_approved.templ
+#: templates/emails/notification/workflow/html/wftask_held.templ
+#: templates/emails/notification/workflow/html/wftask_resolved.templ
+#: templates/emails/notification/personrequest/html/requestaccess_accepted.templ
+#: Line:24
+#: templates/emails/notification/personrequest/html/requestaccess_completed.templ
+#: templates/emails/notification/personrequest/html/requestaccess_denied.templ
+#: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_sent.templ
+#: templates/emails/notification/personrequest/html/requestaccess_rejected.templ
+msgid "Originator"
+msgstr ""
+
+#: templates/emails/notification/workflow/html/wftask_rejected.templ Line:40
+#: templates/emails/notification/workflow/html/wftask_held.templ
+#: templates/emails/notification/workflow/html/wftask_resolved.templ Line:61
+#: templates/emails/notification/personrequest/html/requestaccess_completed.templ
+#: Line:50
+#: templates/emails/notification/personrequest/html/requesttransfer_sent.templ
+#: Line:55
+#: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_denied.templ
+#: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_sent.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
+#: templates/emails/notification/personrequest/html/requestaccess_rejected.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
+msgid "Reason"
+msgstr ""
+
+#: templates/emails/notification/workflow/html/wftask_added.templ Line:62
+#: templates/emails/notification/workflow/html/wftask_rejected.templ Line:67
+#: templates/emails/notification/workflow/html/wftask_resumed.templ Line:9
+#: templates/emails/notification/workflow/html/wftask_approved.templ
+#: templates/emails/notification/workflow/html/wftask_held.templ
+#: templates/emails/notification/workflow/html/wftask_resolved.templ Line:68
+#: templates/emails/notification/personrequest/html/requestaccess_accepted.templ
+#: Line:52
+#: templates/emails/notification/personrequest/html/requesttransfer_completed.templ
+#: Line:57
+#: templates/emails/notification/personrequest/html/requestaccess_completed.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_sent.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_denied.templ
+#: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_sent.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
+#: templates/emails/notification/personrequest/html/request_itc_content.templ
+#: Line:94
+#: templates/emails/notification/personrequest/html/requestaccess_rejected.templ
+#: templates/emails/notification/personrequest/html/requestaccess_overridden.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_accepted.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
+msgid "Regards"
+msgstr ""
+
+#: templates/registration/complete.templ Line:35
+msgid "Register another "
+msgstr ""
+
+#: templates/registration/complete.templ Line:37
+msgid "Register another person"
+msgstr ""
+
+#: templates/registration/playerpassport.templ Line:12
+msgid "Registration Member Association"
+msgstr ""
+
+#: templates/registration/complete.templ Line:17
+#: templates/entity/complete.templ Line:10 templates/club/complete.templ
+#: Line:16
+msgid "Registration has been submitted to"
+msgstr ""
+
+#: templates/registration/document_flow_backend.templ Line:4
+msgid "Required Documents"
+msgstr ""
+
+#: templates/registration/complete.templ Line:14
+#: templates/personrequest/transfer/complete.templ Line:13
+#: templates/personrequest/generic/itc_confirmation.templ Line:15
+msgid "Thank you"
+msgstr ""
+
+#: templates/emails/notification/workflow/html/wftask_added.templ Line:9
+msgid "The following task has been ASSIGNED to you for action"
+msgstr ""
+
+#: templates/emails/notification/workflow/html/wftask_rejected.templ Line:9
+msgid ""
+"The following task has been REJECTED. The reason for the rejection is "
+"detailed below. Please note that when a task is rejected it cannot be "
+"resumed. You would need start over and resubmit a new task through"
+msgstr ""
+
+#: templates/registration/document_flow_backend.templ Line:48 Line:53 Line:150
+#: Line:155 templates/entity/required_docs.templ Line:39 Line:44 Line:126
+#: Line:131 templates/club/required_docs.templ Line:128 Line:133
+msgid "Upload"
+msgstr ""
+
+#: templates/registration/document_flow_backend.templ Line:45 Line:70 Line:147
+#: Line:173 templates/entity/required_docs.templ Line:36 Line:123
+#: templates/club/required_docs.templ Line:125
+msgid "Uploaded"
+msgstr ""
+
+#: templates/registration/complete.templ Line:33
+#: templates/entity/complete.templ Line:17 templates/club/complete.templ
+#: Line:24 templates/personrequest/transfer/complete.templ Line:27
+msgid "View all currently submitted registrations"
+msgstr ""
+
+#: templates/emails/notification/myfas-notification-template.templ Line:34
+#: templates/emails/notification/FI-notification-template.templ
+#: templates/workflow/summary/venue.templ Line:35
+#: templates/user/globalnav.templ Line:76 Line:89 templates/user/index.templ
+#: Line:42
+msgid "Website"
+msgstr ""
+
+#: templates/emails/notification/workflow/html/wftask_added.templ Line:14
+#: templates/emails/notification/workflow/html/wftask_rejected.templ
+#: templates/emails/notification/workflow/html/wftask_approved.templ
+#: templates/emails/notification/workflow/html/wftask_held.templ
+#: templates/emails/notification/workflow/html/wftask_resolved.templ
+#: templates/emails/notification/personrequest/html/requestaccess_accepted.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_completed.templ
+#: templates/emails/notification/personrequest/html/requestaccess_completed.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_sent.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_denied.templ
+#: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_sent.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
+#: templates/emails/notification/personrequest/html/request_itc_content.templ
+#: templates/emails/notification/personrequest/html/requestaccess_rejected.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_accepted.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
+msgid "Work Task"
+msgstr ""
+
+msgid "Club's Name"
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/requesttransfer_sent.templ
+#: Line:24
+#: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_accepted.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
+#: templates/personrequest/access/personregistration_summary.templ Line:26
+#: templates/personrequest/generic/reg_summary.templ Line:5
+msgid "Current Club"
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
+#: Line:9
+msgid "For further information please contact"
+msgstr ""
+
+#: templates/emails/notification/workflow/html/wftask_resumed.templ Line:3
+#: templates/emails/notification/personrequest/html/requestaccess_overridden.templ
+msgid "Greetings"
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/requesttransfer_completed.templ
+#: Line:29
+msgid "New Club"
+msgstr ""
+
+msgid "Player's Data"
+msgstr ""
+
+msgid "Player's ID"
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/requesttransfer_completed.templ
+#: Line:24 templates/emails/notification/personrequest/html/request_itc.templ
+#: Line:281
+#: templates/emails/notification/personrequest/html/request_itc_content.templ
+#: Line:78
+msgid "Previous Club"
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/request_itc.templ Line:253
+msgid "REQUEST FOR AN INTERNATIONAL TRANSFER CERTIFICATE"
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/requestaccess_completed.templ
+#: Line:9
+msgid "Request Access Completed"
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/requesttransfer_sent.templ
+#: Line:29
+#: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
+#: templates/emails/notification/personrequest/html/request_itc_content.templ
+#: Line:19
+#: templates/emails/notification/personrequest/html/requesttransfer_accepted.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
+msgid "Requesting Club"
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
+#: Line:9
+msgid "The"
+msgstr ""
+
+#: templates/emails/notification/workflow/html/wftask_approved.templ Line:9
+msgid ""
+"The following task has been APPROVED. This email is for notification only, "
+"no further action is required."
+msgstr ""
+
+#: templates/emails/notification/workflow/html/wftask_held.templ Line:9
+msgid ""
+"The following task has been placed ON HOLD. The reason and further action "
+"you are required to take are detailed below. Please action this as soon as "
+"possible."
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/requesttransfer_completed.templ
+#: Line:9
+msgid ""
+"The request for transfer for the player listed below has been APPROVED by "
+"all necessary organisations. The player record is now assigned to the new "
+"club"
+msgstr ""
+
+#: templates/emails/notification/workflow/html/wftask_resumed.templ Line:5
+msgid "Work task has been resumed."
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/requestaccess_sent.templ
+#: Line:9
+msgid "You are required to take action on this request"
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/requestaccess_denied.templ
+#: Line:9
+msgid ""
+"has REJECTED the access to the following record for the reason specified "
+"below. If you still wish to access the record for the purpose or "
+"registration or renewal you will need to contact"
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
+#: Line:9
+msgid ""
+"has REJECTED this transfer. The reason for this is detailed below. This "
+"transaction is now cancelled. Please note that when a task is rejected it "
+"cannot be resumed. You would need start over and resubmit a new task through"
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/requestaccess_sent.templ
+#: Line:9
+msgid ""
+"has REQUESTED access to the person listed below, for the purpose of "
+"registration with a different role with"
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/requesttransfer_sent.templ
+#: Line:9
+msgid ""
+"has REQUESTED the transfer of the following player. You are required to take "
+"action on this request within 7 days."
+msgstr ""
+
+#: templates/emails/notification/workflow/html/wftask_resolved.templ Line:9
+msgid ""
+"has UPDATED the following task, which was  previously on hold. It is now "
+"availble for you review and approval."
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/requestaccess_accepted.templ
+#: Line:9
+msgid ""
+"has accepted your request to access the following record, which you now have "
+"full access to"
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
+#: Line:9
+msgid ""
+"has decided to cancel this request for transfer. The player remains with "
+"your organisation."
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
+#: Line:9
+msgid ""
+"has decided to cancel this request. They no longer require access to the "
+"person record"
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/request_itc_content.templ
+#: Line:9
+msgid "has submitted an ITC request for the person listed below."
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/requestaccess_denied.templ
+#: Line:9
+#: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
+msgid "help desk"
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/requestaccess_overridden.templ
+#: Line:5
+msgid "Person Request access has been re-assigned."
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/requestaccess_rejected.templ
+#: Line:9
+msgid "Request Access Rejected"
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/requesttransfer_accepted.templ
+#: Line:9
+msgid ""
+"has APPROVED the player transfer as detailed below.  You can now continue "
+"with the transfer or cancel this transfer request"
+msgstr ""
+
+#: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
+#: Line:9
+msgid ""
+"has REJECTED the transfer of the player listed below. The reason for the "
+"rejection is detailed below. If you think there is a problem with this "
+"rejection you will need to contact"
+msgstr ""
+
+#: templates/entity/complete.templ Line:18
+msgid "Add another venue"
+msgstr ""
+
+#: templates/entity/venue_fields.templ Line:7
+#: templates/entity/add_fields_count.templ
+msgid "An error occured"
+msgstr ""
+
+#: templates/entity/venue_fields.templ Line:57
+#: templates/entity/venue_fields_summary.templ Line:10
+#: templates/workflow/generic/facility_fields.templ Line:17
+#: templates/flow/facility_fields_grid.templ Line:14
+msgid "Capacity of Field"
+msgstr ""
+
+#: templates/viewer/viewer.templ Line:36
+msgid "Click here to download the file"
+msgstr ""
+
+#: templates/entity/venue_fields.templ Line:149
+#: templates/workflow/generic/actions.templ Line:58 Line:74
+#: templates/personrequest/access/personregistration_summary.templ Line:81
+#: templates/personrequest/transfer/view.templ Line:231
+#: templates/personrequest/generic/search_form.templ Line:234 Line:248
+msgid "Close"
+msgstr ""
+
+#: templates/entity/venue_fields.templ Line:140
+msgid "Confirm delete fields"
+msgstr ""
+
+#: templates/auth/authlist.templ Line:14
+msgid "Create a new user"
+msgstr ""
+
+#: templates/entity/auditlog.templ Line:8 templates/person/auditlog.templ
+msgid "Date Last Updated"
+msgstr ""
+
+#: templates/entity/venue_fields.templ Line:53
+#: templates/entity/venue_fields_summary.templ Line:6
+#: templates/workflow/result/club.templ Line:24
+#: templates/workflow/summary/club.templ
+#: templates/workflow/generic/facility_fields.templ Line:13
+#: templates/flow/facility_fields_grid.templ Line:10
+msgid "Discipline"
+msgstr ""
+
+#: templates/viewer/viewer.templ Line:46
+msgid "Download the file"
+msgstr ""
+
+#: templates/entity/add_fields_count.templ Line:31
+msgid "Enter the number of additional fields"
+msgstr ""
+
+#: templates/entity/venue_fields.templ Line:52
+#: templates/entity/venue_fields_summary.templ Line:5
+#: templates/workflow/generic/facility_fields.templ Line:12
+#: templates/flow/facility_fields_grid.templ Line:9
+msgid "Field Name"
+msgstr ""
+
+#: templates/entity/venue_fields.templ Line:51
+#: templates/entity/venue_fields_summary.templ Line:4
+#: templates/workflow/generic/facility_fields.templ Line:11
+#: templates/flow/facility_fields_grid.templ Line:8
+msgid "Field Number"
+msgstr ""
+
+#: templates/viewer/viewer.templ Line:11
+msgid "ID"
+msgstr ""
+
+#: templates/viewer/viewer.templ Line:35
+msgid "It appears you don't have a PDF plugin for this browser."
+msgstr ""
+
+#: templates/entity/venue_fields_summary.templ Line:8
+#: templates/workflow/generic/facility_fields.templ Line:15
+msgid "Length of Field"
+msgstr ""
+
+#: templates/entity/summarypanel.templ Line:3
+msgid "MA venue ID"
+msgstr ""
+
+#: templates/auth/authlist.templ Line:18 templates/user/signup.templ Line:30
+msgid "Password"
+msgstr ""
+
+#: templates/entity/venue_fields.templ Line:145
+msgid "Please click 'Submit' to proceed, 'Close' otherwise."
+msgstr ""
+
+#: templates/entity/venue_fields.templ Line:133
+msgid "Please select from the list of fields."
+msgstr ""
+
+#: templates/auth/authlist.templ Line:19 templates/user/signup.templ Line:33
+msgid "Re-enter Password"
+msgstr ""
+
+#: templates/entity/required_docs.templ Line:2
+msgid "Required Venue Documents"
+msgstr ""
+
+#: templates/auth/authlist.templ Line:20
+msgid "Restricted Access"
+msgstr ""
+
+#: templates/entity/venue_fields.templ Line:30
+msgid "Successfully updated."
+msgstr ""
+
+#: templates/entity/complete.templ Line:7 templates/club/complete.templ
+#: Line:13
+msgid "Thank You"
+msgstr ""
+
+#: templates/auth/authlist.templ Line:2
+msgid "The following users are authorised to login"
+msgstr ""
+
+#: templates/viewer/viewer.templ Line:45
+msgid "There is no viewer for this type of file."
+msgstr ""
+
+#: templates/entity/venue_fields.templ Line:54
+#: templates/entity/venue_fields_summary.templ Line:7
+#: templates/workflow/generic/facility_fields.templ Line:14
+#: templates/flow/facility_fields_grid.templ Line:11
+msgid "Type of Field"
+msgstr ""
+
+#: templates/entity/venue_fields_summary.templ Line:9
+#: templates/workflow/generic/facility_fields.templ Line:16
+msgid "Width of Field"
+msgstr ""
+
+#: templates/txn_receipt/fnswreceipt.templ Line:65
+#: templates/txn_receipt/standardreceipt.templ Line:66
+msgid "Cost"
+msgstr ""
+
+#: templates/txn_receipt/fnswreceipt.templ Line:47
+#: templates/txn_receipt/standardreceipt.templ Line:48
+msgid "Payment Date"
+msgstr ""
+
+#: templates/txn_receipt/fnswreceipt.templ Line:83
+#: templates/txn_receipt/standardreceipt.templ Line:77
+msgid "Payment Total"
+msgstr ""
+
+#: templates/txn_receipt/fnswreceipt.templ Line:63
+#: templates/txn_receipt/standardreceipt.templ Line:64
+msgid "QTY"
+msgstr ""
+
+#: templates/txn_receipt/fnswreceipt.templ Line:55
+#: templates/txn_receipt/standardreceipt.templ Line:56
+msgid "Receipt No"
+msgstr ""
+
+#: templates/reports/reportoptions_header.templ Line:2
+msgid "Back to Configure"
+msgstr ""
+
+#: templates/reports/reportoptions_header.templ Line:37
+#: templates/flow/default.templ Line:65
+msgid "Cancel"
+msgstr ""
+
+#: templates/team/invite_teammates.templ Line:11
+msgid "Choose competition"
+msgstr ""
+
+#: templates/team/invite_teammates.templ Line:19
+msgid "Choose form"
+msgstr ""
+
+#: templates/team/invite_teammates.templ Line:3
+msgid "Choose season"
+msgstr ""
+
+#: templates/reports/default_adv.templ Line:13
+msgid "Count"
+msgstr ""
+
+#: templates/reports/reportoptions_header.templ Line:5
+msgid "Download CSV"
+msgstr ""
+
+#: templates/team/invite_teammates.templ Line:29
+msgid ""
+"Enter the email addresses of all your proposed teammates. Put a comma after "
+"each email address"
+msgstr ""
+
+#: templates/team/invite_teammates.templ Line:27
+msgid "Invite teammates"
+msgstr ""
+
+#: templates/team/team_staff.templ Line:26
+msgid "Position"
+msgstr ""
+
+#: templates/reports/default_adv.templ Line:5
+msgid "Records returned:"
+msgstr ""
+
+#: templates/reports/reportoptions_header.templ Line:25
+msgid "Replace Existing Report"
+msgstr ""
+
+#: templates/reports/default.templ Line:22 templates/reports/default_adv.templ
+#: Line:78 templates/reports/ladder.templ Line:6
+msgid "Report Run"
+msgstr ""
+
+#: templates/reports/reportoptions_header.templ Line:6
+msgid "Save Report"
+msgstr ""
+
+#: templates/reports/reportoptions_header.templ Line:10
+msgid "Save the report"
+msgstr ""
+
+#: templates/team/invite_teammates.templ Line:13
+msgid ""
+"Select the competition that you would like to invite your teammates to join"
+msgstr ""
+
+#: templates/team/invite_teammates.templ Line:22
+msgid "Select the registration form that should be used"
+msgstr ""
+
+#: templates/team/invite_teammates.templ Line:5
+msgid ""
+"Select the season of the competition that you would like to invite your "
+"teammates to join"
+msgstr ""
+
+#: templates/team/team_staff.templ Line:28
+msgid "Staff Member"
+msgstr ""
+
+#: templates/reports/email_confirmation.templ Line:7
+msgid "The data contains"
+msgstr ""
+
+#: templates/team/invite_teammates.templ Line:21
+msgid ""
+"The email that will be sent to your teammates, will contain a link to a "
+"registration form"
+msgstr ""
+
+#: templates/team/invite_teammates.templ Line:31
+msgid "When you have finished click 'Invite Teammates Now'"
+msgstr ""
+
+#: templates/reports/email_confirmation.templ Line:3
+msgid "Your data export has been processed and emailed to"
+msgstr ""
+
+#: templates/reports/email_confirmation.templ Line:7
+msgid "rows"
+msgstr ""
+
+#: templates/mapfinder/searchresults_aru.templ Line:128
+#: templates/mapfinder/searchresults_default.templ Line:127
+#: templates/mapfinder/searchresults_soccer.templ Line:126
+#: templates/mapfinder/searchresults_program_default.templ Line:117
+#: templates/mapfinder/searchresults_default_2014.templ
+#: templates/mapfinder/searchresults_afl9s.templ Line:167
+msgid "More Information"
+msgstr ""
+
+#: templates/workflow/result/club.templ Line:31
+#: templates/workflow/summary/club.templ
+msgid "Foundation Date"
+msgstr ""
+
+#: templates/workflow/result/venue.templ Line:23
+#: templates/workflow/result/person.templ Line:16
+msgid "Local Name"
+msgstr ""
+
+#: templates/workflow/result/page.templ Line:6
+#: templates/personrequest/access/current_club_view.templ Line:24
+#: templates/personrequest/access/requesting_club_view.templ Line:25
+msgid "Member Details"
+msgstr ""
+
+#: templates/workflow/history.templ Line:10
+msgid "Problem Resolution Entity"
+msgstr ""
+
+#: templates/mapfinder/searchresults_afl9s.templ Line:168
+msgid "Register Your Team Now"
+msgstr ""
+
+#: templates/club/complete.templ Line:25
+msgid "Register another Club"
+msgstr ""
+
+#: templates/workflow/result/venue.templ Line:16
+msgid "Short Name"
+msgstr ""
+
+#: templates/workflow/result/club.templ Line:9
+#: templates/workflow/summary/venue.templ Line:10 Line:12
+#: templates/workflow/summary/club.templ
+#: templates/workflow/summary/personregistration.templ Line:29
+msgid "The following registration has been approved."
+msgstr ""
+
+#: templates/workflow/result/page.templ Line:29
+#: templates/personrequest/transfer/complete.templ Line:28
+msgid "Transfer another player"
+msgstr ""
+
+#: templates/workflow/result/page.templ Line:8
+msgid "Upload Profile Image"
+msgstr ""
+
+#: templates/mapfinder/aussiehoops-searchresults.templ Line:250
+msgid "View Available Program Details"
+msgstr ""
+
+#: templates/workflow/result/club.templ Line:58
+#: templates/workflow/result/personregistration.templ Line:57
+#: templates/workflow/summary/venue.templ Line:48
+#: templates/workflow/summary/transfer.templ
+#: templates/workflow/summary/club.templ
+#: templates/workflow/summary/person.templ Line:26
+#: templates/workflow/summary/personregistration.templ Line:62
+msgid "View next available task"
+msgstr ""
+
+#: templates/workflow/result/venue.templ Line:51
+msgid "WebUrl"
+msgstr ""
+
+#: templates/workflow/result/page.templ Line:27
+#: templates/workflow/result/club.templ Line:56
+#: templates/workflow/result/personregistration.templ Line:55
+#: templates/workflow/summary/venue.templ Line:46
+#: templates/workflow/summary/transfer.templ
+#: templates/workflow/summary/club.templ
+#: templates/workflow/summary/person.templ Line:24
+#: templates/workflow/summary/personregistration.templ Line:60
+msgid "What would you like to do now?"
+msgstr ""
+
+#: templates/workflow/result/club.templ Line:9
+#: templates/workflow/result/personregistration.templ Line:27
+#: templates/workflow/summary/venue.templ Line:12
+#: templates/workflow/summary/club.templ
+#: templates/workflow/summary/person.templ Line:14
+#: templates/workflow/summary/personregistration.templ Line:29
+msgid "has been notified."
+msgstr ""
+
+#: templates/workflow/view/transfer.templ Line:222
+#: templates/personrequest/access/current_club_view.templ Line:117
+#: templates/personrequest/access/requesting_club_view.templ Line:147
+#: templates/personrequest/transfer/current_club_view.templ Line:125
+#: templates/personrequest/transfer/new_club_view.templ Line:159
+msgid "Additional Comments"
+msgstr ""
+
+#: templates/workflow/view/club.templ Line:54
+msgid "Club Details"
+msgstr ""
+
+#: templates/workflow/view/club.templ Line:39
+msgid "Club Information"
+msgstr ""
+
+#: templates/workflow/view/venue.templ Line:155
+msgid "Fax Number"
+msgstr ""
+
+#: templates/workflow/result/person.templ Line:58
+#: templates/workflow/view/person.templ Line:196
+#: templates/workflow/view/personregistration.templ Line:210
+msgid "Last Update"
+msgstr ""
+
+#: templates/workflow/view/club.templ Line:185
+#: templates/flow/club_summary.templ Line:43
+msgid "Legal entity identification number"
+msgstr ""
+
+#: templates/workflow/result/personregistration.templ Line:45
+#: templates/workflow/summary/personregistration.templ Line:47
+msgid "Level:"
+msgstr ""
+
+#: templates/workflow/result/person.templ Line:78
+#: templates/workflow/view/venue.templ Line:199
+#: templates/workflow/view/transfer.templ Line:234
+#: templates/workflow/view/club.templ
+#: templates/workflow/view/personregistration.templ Line:309
+#: templates/workflow/generic/payment.templ Line:3
+msgid "License and Payment Details"
+msgstr ""
+
+#: templates/workflow/view/person.templ Line:41
+#: templates/workflow/view/personregistration.templ
+msgid "Member Detail Summary"
+msgstr ""
+
+#: templates/workflow/view/transfer.templ Line:43
+#: templates/workflow/summary/transfer.templ Line:19
+#: templates/personrequest/transfer/search_result.templ Line:6
+#: templates/personrequest/generic/search_form.templ Line:184
+#: templates/person/summarypanel.templ Line:3
+msgid "Member ID"
+msgstr ""
+
+#: templates/workflow/view/person.templ Line:182
+#: templates/workflow/view/personregistration.templ Line:196
+msgid "Minor Protection"
+msgstr ""
+
+#: templates/workflow/view/club.templ Line:165
+msgid "Organisation Details"
+msgstr ""
+
+#: templates/workflow/view/club.templ Line:171
+#: templates/flow/club_summary.templ Line:41
+msgid "Organisation type"
+msgstr ""
+
+#: templates/workflow/generic/payment.templ Line:12
+msgid "Payment Status"
+msgstr ""
+
+#: templates/workflow/generic/document.templ Line:10
+msgid "Person Documents"
+msgstr ""
+
+#: templates/workflow/view/person.templ Line:245
+#: templates/workflow/view/personregistration.templ Line:265
+msgid "Person Role"
+msgstr ""
+
+#: templates/workflow/generic/payment.templ Line:10
+msgid "Product Type"
+msgstr ""
+
+#: templates/workflow/view/transfer.templ Line:202
+#: templates/workflow/view/personregistration.templ Line:236
+msgid "Register To"
+msgstr ""
+
+#: templates/workflow/result/personregistration.templ Line:37
+#: templates/workflow/summary/personregistration.templ Line:39
+msgid "Register as:"
+msgstr ""
+
+#: templates/workflow/result/personregistration.templ Line:33
+#: templates/workflow/summary/personregistration.templ Line:35
+msgid "Register to:"
+msgstr ""
+
+#: templates/workflow/summary/transfer.templ Line:27
+msgid "Registration Date From"
+msgstr ""
+
+#: templates/workflow/view/transfer.templ Line:53
+msgid "Registration Date from"
+msgstr ""
+
+#: templates/workflow/view/transfer.templ Line:58
+#: templates/workflow/summary/transfer.templ Line:31
+msgid "Registration Date to"
+msgstr ""
+
+#: templates/workflow/view/transfer.templ Line:48
+#: templates/workflow/summary/transfer.templ Line:23
+msgid "Registration Status"
+msgstr ""
+
+#: templates/workflow/result/personregistration.templ Line:41
+#: templates/workflow/summary/personregistration.templ Line:43
+msgid "Sport:"
+msgstr ""
+
+#: templates/workflow/view/transfer.templ Line:63
+#: templates/workflow/summary/transfer.templ Line:39
+msgid "Summary Clubs transfer"
+msgstr ""
+
+#: templates/workflow/result/person.templ Line:51
+#: templates/workflow/view/person.templ Line:189
+#: templates/workflow/view/personregistration.templ Line:203
+msgid "Suspended Until"
+msgstr ""
+
+#: templates/workflow/result/personregistration.templ Line:27
+msgid ""
+"The following registration has been approved but with tasks that are still "
+"to be completed."
+msgstr ""
+
+#: templates/workflow/summary/transfer.templ Line:13
+msgid "The following transfer has been"
+msgstr ""
+
+#: templates/workflow/summary/person.templ Line:14
+msgid "This request has been approved."
+msgstr ""
+
+#: templates/workflow/generic/payment.templ Line:11
+msgid "Total Cost"
+msgstr ""
+
+#: templates/workflow/view/transfer.templ Line:39 Line:74
+#: templates/workflow/summary/transfer.templ Line:16
+#: templates/personrequest/transfer/current_club_view.templ Line:105
+#: templates/personrequest/transfer/new_club_view.templ Line:139
+#: templates/personrequest/generic/search_form.templ Line:19
+msgid "Transfer Details"
+msgstr ""
+
+#: templates/workflow/view/transfer.templ Line:258
+msgid "Transfer Status: Accepted"
+msgstr ""
+
+#: templates/workflow/summary/transfer.templ Line:35
+msgid "Transfer fee"
+msgstr ""
+
+#: templates/workflow/view/club.templ Line:178
+#: templates/flow/club_summary.templ Line:42
+msgid "Type of Legal entity"
+msgstr ""
+
+#: templates/workflow/view/venue.templ Line:58
+#: templates/flow/facility_summary.templ Line:8
+msgid "Venue Details"
+msgstr ""
+
+#: templates/workflow/view/venue.templ Line:71
+#: templates/flow/facility_summary.templ Line:12
+msgid "Venue Short Name"
+msgstr ""
+
+#: templates/workflow/view/venue.templ Line:44 Line:207
+#: templates/workflow/view/transfer.templ Line:242
+#: templates/workflow/view/club.templ templates/workflow/view/person.templ
+#: Line:278 templates/workflow/view/personregistration.templ Line:317
+#: templates/workflow/generic/notes.templ Line:3
+msgid "Work History"
+msgstr ""
+
+#: templates/workflow/summary/transfer.templ Line:13
+msgid "and"
+msgstr ""
+
+#: templates/workflow/summary/transfer.templ Line:13
+msgid "approved"
+msgstr ""
+
+#: templates/workflow/summary/transfer.templ Line:13
+msgid "have been notified"
+msgstr ""
+
+#: templates/workflow/generic/actions.templ Line:27
+#: templates/personrequest/transfer/view.templ Line:157
+msgid "Accept"
+msgstr ""
+
+#: templates/workflow/generic/hold_reject_taskscreen.templ Line:13
+msgid "Approval Status"
+msgstr ""
+
+#: templates/user/loginerror.templ Line:4
+msgid "Click here to try again"
+msgstr ""
+
+#: templates/user/globalnav.templ Line:86
+msgid "Club Contact"
+msgstr ""
+
+#: templates/workflow/generic/notes.templ Line:12
+msgid "Date/Time Resolved"
+msgstr ""
+
+#: templates/user/loginform.templ Line:21
+msgid "Forgot your password? Please contact Help Desk to reset your password"
+msgstr ""
+
+#: templates/user/globalnav.templ Line:45
+msgid "Help"
+msgstr ""
+
+#: templates/user/update_password_msg.templ Line:9
+msgid "Login"
+msgstr ""
+
+#: templates/user/globalnav.templ Line:47
+msgid "Logout"
+msgstr ""
+
+#: templates/user/signupfinish.templ Line:15
+msgid ""
+"Make sure you click the link to confirm your email address and complete your "
+"signup"
+msgstr ""
+
+#: templates/user/modify_user_password.templ Line:10
+msgid "New Password"
+msgstr ""
+
+#: templates/user/signup.templ Line:79
+#: templates/user/modify_user_password.templ Line:50
+msgid "Passwords do not match"
+msgstr ""
+
+#: templates/user/url_link_reminder.templ Line:5
+msgid ""
+"Please click on the link below to create a new password for your "
+"SportingPulse account."
+msgstr ""
+
+#: templates/workflow/generic/actions.templ Line:64
+msgid "Please enter Work task notes"
+msgstr ""
+
+#: templates/user/signup.templ Line:71
+msgid "Please enter your Family Name"
+msgstr ""
+
+#: templates/user/signup.templ Line:70
+msgid "Please enter your First Name"
+msgstr ""
+
+#: templates/user/signup.templ Line:73 Line:77
+#: templates/user/modify_user_password.templ Line:44 Line:48
+msgid "Please provide a password"
+msgstr ""
+
+#: templates/workflow/generic/actions.templ Line:13
+msgid "Put on-hold"
+msgstr ""
+
+#: templates/user/globalnav.templ Line:46
+msgid "Release Notes"
+msgstr ""
+
+#: templates/user/loginform.templ Line:14
+msgid "Remember me on this computer"
+msgstr ""
+
+#: templates/workflow/generic/notes.templ Line:11
+msgid "Resolution Notes"
+msgstr ""
+
+#: templates/user/modify_user_password.templ Line:15
+msgid "Retype Password"
+msgstr ""
+
+#: templates/user/forgot_password_form.templ Line:9
+msgid "Send Me The Link"
+msgstr ""
+
+#: templates/user/loginform.templ Line:17
+msgid "Sign in"
+msgstr ""
+
+#: templates/user/signup.templ Line:36
+msgid "Signup"
+msgstr ""
+
+#: templates/user/forgot_password_nav.templ Line:11
+msgid "Support"
+msgstr ""
+
+#: templates/user/signupfinish.templ Line:11
+msgid "Thanks for signing up"
+msgstr ""
+
+#: templates/workflow/generic/hold_reject_taskscreen.templ Line:11
+msgid "Transfer Status"
+msgstr ""
+
+#: templates/user/modify_user_password.templ Line:20
+msgid "Update Password"
+msgstr ""
+
+#: templates/user/globalnav.templ Line:8
+msgid "View as"
+msgstr ""
+
+#: templates/user/signupfinish.templ Line:15
+msgid "We've sent you an email to welcome you to the system."
+msgstr ""
+
+#: templates/user/globalnav.templ Line:43 Line:44
+#: templates/user/loginform.templ Line:6
+msgid "Welcome"
+msgstr "Välkommen"
+
+#: templates/workflow/generic/actions.templ Line:59
+msgid "Work task notes"
+msgstr ""
+
+#: templates/user/url_link_reminder.templ Line:4
+msgid "You have requested for a new password."
+msgstr ""
+
+#: templates/user/update_password_msg.templ Line:8
+msgid "Your password has successfully been updated."
+msgstr ""
+
+#: templates/user/signup.templ Line:74 Line:78
+#: templates/user/modify_user_password.templ Line:45 Line:49
+msgid "must be at least 6 characters long"
+msgstr ""
+
+#: templates/personrequest/access/current_club_view.templ Line:173
+msgid "Approve access"
+msgstr ""
+
+#: templates/personrequest/access/current_club_view.templ Line:203
+#: templates/personrequest/transfer/current_club_view.templ Line:180 Line:209
+msgid "Approve transfer"
+msgstr ""
+
+#: templates/flow/default.templ Line:61 templates/flow/transfer.templ Line:59
+msgid "Back"
+msgstr ""
+
+#: templates/personrequest/access/current_club_view.templ Line:161
+#: templates/personrequest/access/requesting_club_view.templ Line:194
+#: templates/personrequest/transfer/current_club_view.templ Line:169
+#: templates/personrequest/transfer/new_club_view.templ Line:207
+msgid "Back to Dashboard"
+msgstr ""
+
+#: templates/personrequest/access/current_club_view.templ Line:16
+#: templates/personrequest/transfer/current_club_view.templ Line:13
+#: templates/personrequest/transfer/view.templ
+msgid "By approving you are giving access to all of"
+msgstr ""
+
+#: templates/flow/facility_summary.templ Line:59
+msgid "Capactity of field"
+msgstr ""
+
+#: templates/flow/facility_summary.templ Line:55
+msgid "Field Discipline"
+msgstr ""
+
+#: templates/flow/facility_summary.templ Line:54
+msgid "Field name"
+msgstr ""
+
+#: templates/flow/facility_summary.templ Line:53
+msgid "Field number"
+msgstr ""
+
+#: templates/flow/facility_summary.templ Line:13
+msgid "Language"
+msgstr ""
+
+#: templates/flow/facility_summary.templ Line:57
+msgid "Length of field"
+msgstr ""
+
+#: templates/flow/club_summary.templ Line:13
+msgid "Organisation dissolution date"
+msgstr ""
+
+#: templates/flow/club_summary.templ Line:12
+msgid "Organisation foundation date"
+msgstr ""
+
+#: templates/flow/club_summary.templ Line:10
+msgid "Organisation name"
+msgstr ""
+
+#: templates/personrequest/access/current_club_view.templ Line:8
+#: templates/personrequest/transfer/current_club_view.templ
+msgid "Please approve or reject the request."
+msgstr ""
+
+#: templates/flow/transfer.templ Line:8
+msgid ""
+"Please check and update all details before submitting to the Member "
+"Association for final approval."
+msgstr ""
+
+#: templates/personrequest/access/current_club_view.templ Line:230
+msgid "Please specify why request access was rejected."
+msgstr ""
+
+#: templates/personrequest/access/current_club_view.templ Line:59
+#: templates/personrequest/access/requesting_club_view.templ Line:90
+#: templates/personrequest/transfer/current_club_view.templ Line:55
+#: templates/personrequest/transfer/new_club_view.templ Line:87
+msgid "Region of Birth"
+msgstr ""
+
+#: templates/personrequest/access/current_club_view.templ Line:178
+msgid "Reject access"
+msgstr ""
+
+#: templates/personrequest/access/current_club_view.templ Line:209
+#: templates/personrequest/transfer/current_club_view.templ Line:184 Line:215
+msgid "Reject transfer"
+msgstr ""
+
+#: templates/personrequest/access/current_club_view.templ Line:225
+msgid "Request Access rejected"
+msgstr ""
+
+#: templates/personrequest/access/request_accepted.templ Line:5
+#: templates/personrequest/access/requesting_club_view.templ Line:247
+msgid "Request Access: Approved"
+msgstr ""
+
+#: templates/personrequest/access/request_cancelled.templ Line:5
+msgid "Request Access: Cancelled"
+msgstr ""
+
+#: templates/personrequest/history.templ Line:27
+msgid "Request Added"
+msgstr ""
+
+#: templates/personrequest/history.templ Line:26
+#: templates/personrequest/access/view.templ Line:80 Line:227
+msgid "Request Notes"
+msgstr ""
+
+#: templates/personrequest/access/current_club_view.templ Line:190
+msgid "Request Status: Pending"
+msgstr ""
+
+#: templates/personrequest/history.templ Line:18
+msgid "Request approval status"
+msgstr ""
+
+#: templates/personrequest/history.templ Line:10
+#: templates/personrequest/access/current_club_view.templ Line:113
+#: templates/personrequest/access/requesting_club_view.templ Line:144
+msgid "Request from"
+msgstr ""
+
+#: templates/personrequest/history.templ Line:14
+msgid "Request response"
+msgstr ""
+
+#: templates/personrequest/history.templ Line:6
+msgid "Request to"
+msgstr ""
+
+#: templates/personrequest/access/current_club_view.templ Line:25 Line:128
+msgid "Requesting Club Details"
+msgstr ""
+
+#: templates/personrequest/history.templ Line:28
+#: templates/personrequest/access/view.templ Line:84 Line:232
+msgid "Response Notes"
+msgstr ""
+
+#: templates/flow/default.templ Line:68
+msgid "Save and Exit"
+msgstr ""
+
+#: templates/flow/flow_cancelsave.templ Line:20
+msgid "This registration has been cancelled"
+msgstr ""
+
+#: templates/flow/flow_cancelsave.templ Line:15
+msgid "This registration has been saved"
+msgstr ""
+
+#: templates/flow/transfer.templ Line:85
+#: templates/personrequest/transfer/request_accepted.templ Line:5
+#: templates/personrequest/transfer/new_club_view.templ Line:248
+msgid "Transfer Status: Released"
+msgstr ""
+
+#: templates/flow/facility_summary.templ Line:56
+msgid "Type of field"
+msgstr ""
+
+#: templates/personrequest/history.templ Line:29
+msgid "Updated"
+msgstr ""
+
+#: templates/flow/facility_summary.templ Line:58
+msgid "Width of field"
+msgstr ""
+
+#: templates/personrequest/access/current_club_view.templ Line:16
+msgid "details to"
+msgstr ""
+
+#: templates/personrequest/access/current_club_view.templ Line:8
+msgid "has requested data access for"
+msgstr ""
+
+#: templates/personrequest/history.templ Line:2
+msgid "of"
+msgstr ""
+
+#: templates/personrequest/access/requesting_club_view.templ Line:202
+msgid "Cancel Access"
+msgstr ""
+
+#: templates/personrequest/transfer/new_club_view.templ Line:215
+msgid "Cancel Transfer"
+msgstr ""
+
+#: templates/personrequest/access/requesting_club_view.templ Line:24 Line:31
+msgid "Current Club Details"
+msgstr ""
+
+#: templates/personrequest/access/personregistration_summary.templ Line:31
+msgid "Current Registrations"
+msgstr ""
+
+#: templates/personrequest/access/personregistration_summary.templ Line:36
+msgid "Current Sport"
+msgstr ""
+
+#: templates/personrequest/transfer/view.templ Line:162
+msgid "Deny"
+msgstr ""
+
+#: templates/personrequest/access/view.templ Line:48 Line:192
+#: templates/personrequest/generic/search_form.templ Line:190
+msgid "Last Name"
+msgstr ""
+
+#: templates/personrequest/access/requesting_club_view.templ Line:16
+#: templates/personrequest/transfer/new_club_view.templ Line:12
+msgid "Member Association for final approval."
+msgstr ""
+
+#: templates/personrequest/transfer/current_club_view.templ Line:21 Line:136
+msgid "New Club Details"
+msgstr ""
+
+#: templates/personrequest/transfer/oldclubdetails.templ Line:4
+#: templates/personrequest/transfer/new_club_view.templ Line:19 Line:27
+#: templates/personrequest/transfer/view.templ Line:20
+msgid "Old Club Details"
+msgstr ""
+
+#: templates/personrequest/access/view.templ Line:40 Line:182
+msgid "Person Registration Status"
+msgstr ""
+
+#: templates/personrequest/access/view.templ Line:65 Line:212
+msgid "Person Status"
+msgstr ""
+
+#: templates/personrequest/transfer/current_club_view.templ Line:20
+#: templates/personrequest/transfer/new_club_view.templ
+#: templates/personrequest/transfer/view.templ Line:21
+msgid "Player Details"
+msgstr ""
+
+#: templates/personrequest/transfer/view.templ Line:258
+#: templates/personrequest/generic/search_form.templ Line:310
+msgid "Please add notes"
+msgstr ""
+
+#: templates/personrequest/access/personregistration_summary.templ Line:110
+msgid "Please add notes."
+msgstr ""
+
+#: templates/personrequest/transfer/view.templ Line:8
+msgid "Please approve or reject the request"
+msgstr ""
+
+#: templates/personrequest/transfer/new_club_view.templ Line:12
+msgid "Please check and update all details before submitting to"
+msgstr ""
+
+#: templates/personrequest/transfer/new_club_view.templ Line:7
+msgid "Please continue the transfer process."
+msgstr ""
+
+#: templates/personrequest/access/requesting_club_view.templ Line:16
+msgid "Please continue with the Add Role process and submit to"
+msgstr ""
+
+#: templates/personrequest/access/personregistration_summary.templ Line:69
+#: templates/personrequest/generic/search_form.templ Line:240
+msgid "Please enter request notes"
+msgstr ""
+
+#: templates/personrequest/access/requesting_club_view.templ Line:263
+msgid "Please specify why request access was cancelled."
+msgstr ""
+
+#: templates/personrequest/transfer/new_club_view.templ Line:265
+msgid "Please specify why transfer was cancelled."
+msgstr ""
+
+#: templates/personrequest/transfer/current_club_view.templ Line:236
+msgid "Please specify why transfer was rejected."
+msgstr ""
+
+#: templates/personrequest/transfer/view.templ Line:218
+msgid ""
+"Please specify why transfer was rejected. All documents will be available "
+"for all parties involved."
+msgstr ""
+
+#: templates/personrequest/access/personregistration_summary.templ Line:23
+msgid "Registration Summary"
+msgstr ""
+
+#: templates/personrequest/access/request_denied.templ Line:5
+msgid "Request Access: Rejected"
+msgstr ""
+
+#: templates/personrequest/access/view.templ Line:150
+msgid "Request Details"
+msgstr ""
+
+#: templates/personrequest/access/view.templ Line:32 Line:172
+msgid "Request Response"
+msgstr ""
+
+#: templates/personrequest/transfer/search_result.templ Line:50
+msgid "Request Transfer for approval"
+msgstr ""
+
+#: templates/personrequest/transfer/search_result.templ Line:48
+msgid "Request Transfer sent to Club"
+msgstr ""
+
+#: templates/personrequest/access/view.templ Line:16 Line:155
+msgid "Request Type"
+msgstr ""
+
+#: templates/personrequest/access/requesting_club_view.templ Line:258
+msgid "Request access cancelled"
+msgstr ""
+
+#: templates/personrequest/access/view.templ Line:36 Line:177
+msgid "Response By"
+msgstr ""
+
+#: templates/personrequest/access/personregistration_summary.templ Line:50
+#: templates/personrequest/transfer/selection.templ Line:25
+#: templates/personrequest/generic/search_form.templ Line:171
+msgid "Send Request"
+msgstr ""
+
+#: templates/personrequest/transfer/current_club_view.templ Line:196
+msgid "Transfer Status: Requested"
+msgstr ""
+
+#: templates/personrequest/transfer/new_club_view.templ Line:260
+msgid "Transfer cancelled"
+msgstr ""
+
+#: templates/personrequest/transfer/current_club_view.templ Line:231
+#: templates/personrequest/transfer/view.templ Line:213
+msgid "Transfer rejected"
+msgstr ""
+
+#: templates/personrequest/transfer/request_cancelled.templ Line:5
+msgid "Transfer: Cancelled"
+msgstr ""
+
+#: templates/personrequest/transfer/request_denied.templ Line:5
+msgid "Transfer: Rejected"
+msgstr ""
+
+#: templates/personrequest/transfer/current_club_view.templ Line:109
+#: templates/personrequest/transfer/new_club_view.templ Line:143
+msgid "Transferring to"
+msgstr ""
+
+#: templates/personrequest/transfer/complete.templ Line:20
+msgid "You will be notified when this becomes effective."
+msgstr ""
+
+#: templates/personrequest/transfer/complete.templ Line:17
+msgid "Your transfer request has been submitted to"
+msgstr ""
+
+#: templates/personrequest/access/requesting_club_view.templ Line:8
+msgid "details."
+msgstr ""
+
+#: templates/personrequest/transfer/complete.templ Line:17
+msgid "for final approval."
+msgstr ""
+
+#: templates/personrequest/access/requesting_club_view.templ Line:8
+msgid "has approved access of"
+msgstr ""
+
+#: templates/personrequest/transfer/new_club_view.templ Line:7
+msgid "has released"
+msgstr ""
+
+#: templates/personrequest/transfer/current_club_view.templ Line:13
+msgid "player details to"
+msgstr ""
+
+#: templates/personrequest/generic/search_form.templ Line:45
+msgid "Does the Player have an ITC?"
+msgstr ""
+
+#: templates/personrequest/generic/search_form.templ Line:61
+msgid "Enter name or Member ID"
+msgstr ""
+
+#: templates/personrequest/generic/itc_confirmation.templ Line:2
+msgid "ITC Request submitted to MA"
+msgstr ""
+
+#: templates/personrequest/generic/search_form.templ Line:160
+msgid "No result found for keyword"
+msgstr ""
+
+#: templates/personrequest/generic/search_form.templ Line:235
+msgid "Request Transfer Notes"
+msgstr ""
+
+#: templates/personrequest/generic/search_form.templ Line:23
+msgid "Required fields"
+msgstr ""
+
+#: templates/personrequest/generic/reg_summary.templ Line:2
+#: templates/person/renewal_roledetails.templ
+msgid "Review Role Details"
+msgstr ""
+
+#: templates/personrequest/generic/completed.templ Line:5
+msgid "Status: Requested"
+msgstr ""
+
+#: templates/person/list.templ Line:9
+msgid "Sub-Role"
+msgstr ""
+
+#: templates/personrequest/generic/search_form.templ Line:114
+msgid ""
+"This person has more than one registration. Please select ones apply to this "
+"transfer."
+msgstr ""
+
+#: templates/personrequest/generic/search_form.templ Line:179
+msgid "Transfer Summary"
+msgstr ""
+
+#: templates/personrequest/generic/search_form.templ Line:202
+msgid "Transfer to club"
+msgstr ""
+
+#: templates/personrequest/generic/search_form.templ Line:29
+msgid "Transfer type"
+msgstr ""
+
+#: templates/personrequest/generic/itc_confirmation.templ Line:19
+msgid ""
+"Your ITC Request has been submitted to Football Association of Singapore"
+msgstr ""
+
+#~ msgid "REPORT_INTRO_DESC_TEXT"
+#~ msgstr ""
+#~ "<p>There are two types of reports present in the system. </"
+#~ "p><br><ol><li><b>Quick Reports</b> - Indicated by the 'Run' button, they "
+#~ "are predefined and allow you a quick look at your data.<br></"
+#~ "li><li><b>Advanced Reports</b> - Indicated by the 'Configure' button, "
+#~ "they allow you to define which fields you want to display and add custom "
+#~ "filters to your report.<br></li></ol>"
+
+#~ msgid ""
+#~ "These configuration options allow you to modify the data and behaviour of "
+#~ "the system."
+#~ msgstr ""
+#~ "These configuration options allow you to modify the data and behaviour of "
+#~ "the system."
+
+#~ msgid "PEOPLE"
+#~ msgstr "pERSONER"
+
+#, fuzzy
+#~ msgid "Welcome..."
+#~ msgstr "Välkommen"
+
+#~ msgid "AUTO_INTROTEXT"
+#~ msgstr ""
+#~ "To modify this information change the information in the boxes below and "
+#~ "whe"
+
+#~ msgid ""
+#~ "Please enter your username and password below and then press the Sign in "
+#~ "button."
+#~ msgstr ""
+#~ "Please enter your username and password below and then press the Sign in "
+#~ "button."
+
+#~ msgid "CHOOSE_AND_REPORT"
+#~ msgstr ""
+#~ "Choose which fields you want on your report and any filters you wish to "
+#~ "apply"
+
+#~ msgid "MARK_AS_DUPLICATE_WARNING"
+#~ msgstr ""
+#~ "NOTE: Only mark the extra [_1], not the [_1] you believe may be the "
+#~ "original"
+
+#~ msgid "TO_UPD_WELCOME"
+#~ msgstr ""
+#~ "<p>To update the welcome message to display when you log in, fill in the "
+#~ "box and press the <b>[_1]</b> button.</p>"
+
+#~ msgid "TO_UPD_DASHBOARD"
+#~ msgstr ""
+#~ "<p>Choose what data you want to display in each dashboard item.</"
+#~ "p><p>Click <b>Update</b> to save.</p>"
+
+#~ msgid "EXPORT_WARNING"
+#~ msgstr ""
+#~ "This option has a specified set of fields that it exports, however "
+#~ "filters ar"
+
+#~ msgid "DATA_EXPORT_EMAIL_PROMPT"
+#~ msgstr ""
+#~ "The data will be emailed as an attachment to an email address. Enter the "
+#~ "email"
+
+#~ msgid "EMAIL_REPORT"
+#~ msgstr ""
+#~ "Email the report in a format suitable to be imported into another product"

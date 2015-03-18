@@ -284,7 +284,7 @@ sub listPersons {
     }
 
 
-    $title = $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'} in $Data->{'LevelNames'}{$type}");
+    $title = $lang->txt("Persons in [_1]",$Data->{'LevelNames'}{$type});
     if ($type == $Defs::LEVEL_NATIONAL) {
         $title = $lang->txt("List of people registered directly with the Member Association");
     }

@@ -11,6 +11,7 @@ use Reg_common;
 use CGI qw(:cgi unescape);
 use Flow_PersonBackend;
 use Data::Dumper;
+use PersonRegistration;
 
 sub handlePersonFlow {
     my ($action, $Data, $paramRef) = @_;
@@ -57,6 +58,13 @@ sub handlePersonFlow {
         $tmpC = setClient(\%tmpCv);
         $cancelFlowURL = "$Data->{'target'}?client=$tmpC&amp;a=E_HOME";
     }
+    if($renewalTargetRegoID)    {
+        my $rego = getRegistrationDetail($Data, $renewalTargetRegoID) || {};
+        if($rego and $rego->[0] and $rego->[0]{'personType'} and !$defaultType)   {
+            $defaultType = $rego->[0]{'personType'};
+        }
+    }
+
 
     my $flow = new Flow_PersonBackend(
         db => $Data->{'db'},

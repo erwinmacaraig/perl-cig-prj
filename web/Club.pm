@@ -943,7 +943,7 @@ sub listClubs   {
       $currentname = $obj->getValue('strLocalName') || '';
   }
   my $title=$Data->{'SystemConfig'}{"PageTitle_List_".$Defs::LEVEL_CLUB}
-    || $Data->{'lang'}->txt("$Data->{'LevelNames'}{$Defs::LEVEL_CLUB.'_P'} in $currentname"); ###needs translation ->  WHAT in WHAT?
+    || $Data->{'lang'}->txt("Clubs in [_1]",$currentname); ###needs translation ->  WHAT in WHAT?
 
   my $addlink='';
   #{

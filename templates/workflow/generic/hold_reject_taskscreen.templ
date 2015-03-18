@@ -8,9 +8,9 @@
         [% END %]
         <div class="[% IF status == 'Rejected' %]transfer-rejected[% ELSE %]transfer-pending[% END %]">
             [% IF taskType == 'TRANSFER_PLAYER' %]
-                [% Lang.txt('Transfer Status:') %] [% status %]
+                [% Lang.txt('Transfer Status') %]: [% status %]
             [% ELSE %]
-                [% Lang.txt('Approval Status:') %] [% status %]
+                [% Lang.txt('Approval Status') %]: [% status %]
             [% END %]
         </div>
     </div>

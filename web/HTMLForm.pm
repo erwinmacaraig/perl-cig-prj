@@ -204,13 +204,17 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 my $otheroptions = '';
                 $otheroptions = qq[style="width:$f->{'width'}"]
                   if ( exists $f->{'width'} and $f->{'width'} );
+                my $trans = undef;
+                if($f->{'translateLookupValues'})   {
+                    $trans = $fields_ref;
+                }
                 $field_html = drop_down(
                     "$fieldname",      $f->{'options'},
                     $f->{'order'},       $f->{'value'},
                     $f->{'size'},        $f->{'multiple'},
                     $f->{'firstoption'}, $otheroptions,
                     $onChange,           $f->{'class'},
-                    $f->{'disable'},
+                    $f->{'disable'},   $trans,
                 );
             }
             elsif ( $type eq 'date' ) {
@@ -534,7 +538,7 @@ sub drop_down {
     my (
         $name , $options_ref, $order_ref,    $default,  $size,
         $multi, $pre,         $otheroptions, $onChange, $class,
-        $disabled
+        $disabled, $trans
     ) = @_;
     #DEBUG "genereate dropdown for $name";
     return '' if ( !$name or !$options_ref );
@@ -578,8 +582,12 @@ sub drop_down {
             }
         }
         else { $selected = 'SELECTED' if $val eq $default; }
+        my $opt = $options_ref->{$val};
+        if($trans)  {
+            $opt = langlookup($trans,$opt);
+        }
         $subBody .=
-          qq[ <option $selected value="$val">$options_ref->{$val}</option>];
+          qq[ <option $selected value="$val">$opt</option>];
     }
     $multi = ' multiple ' if $multi;
     $size = min($size, scalar (keys %$options_ref) + 1);

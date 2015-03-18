@@ -359,10 +359,10 @@ sub getMemFields {
         
 		my $val = $FieldDefinitions->{'fields'}{$f}{'value'} || $personObj->getValue($f) || '';
 		if($FieldDefinitions->{'fields'}{$f}{'options'})	{
-			$val = $FieldDefinitions->{'fields'}{$f}{'options'}{$val} || $val;
+			$val = $Data->{'lang'}->txt($FieldDefinitions->{'fields'}{$f}{'options'}{$val} || $val);
 		}
 		if($FieldDefinitions->{'fields'}{$f}{'displaylookup'})	{
-			$val = $FieldDefinitions->{'fields'}{$f}{'displaylookup'}{$val} || $val;
+			$val = $Data->{'lang'}->txt($FieldDefinitions->{'fields'}{$f}{'displaylookup'}{$val} || $val);
 		}
 		push @{$fields_grouped{$group}}, [$f, $label];
 		my $string = '';
@@ -375,8 +375,8 @@ sub getMemFields {
             }
         }
 		if (($val and $val ne '00/00/0000') or ($is_header))	{
-			$string .= qq[<div class="mfloat"><span class = "details-left">$label:</span>] if !$nolabelfields{$f};
-			if(length($label) >= 46)  {
+			$string .= qq[<div class=""><span class = "details-left">$label:</span>] if !$nolabelfields{$f};
+			if(length($label) >= 100)  {
 				$string .= '<span class="detail-value"><br/>'.$val.'</span></div>';
 			}else{
 				$string .= '<span class="detail-value">'.$val.'</span></div>';
