@@ -65,6 +65,7 @@ sub markGatewayAsResponded  {
             TL.intPaymentGatewayResponded = 1, T.intPaymentGatewayResponded= 1
         WHERE
             TL.intLogID = ?
+	    AND TL.intStatus NOT IN (3)
     ];
     my $query = $Data->{'db'}->prepare($stUPD);
     $query->execute($logID);
@@ -83,6 +84,7 @@ sub markGatewayAsResponded  {
             TL.intLogID = ?
             AND t.intPersonRegistrationID > 0
             AND TXN.intTableType = $Defs::LEVEL_PERSON
+	    AND TL.intStatus NOT IN (3)
     ];
     my $q= $Data->{'db'}->prepare($st);
     $q->execute($logID);
@@ -104,6 +106,7 @@ sub markGatewayAsResponded  {
                 TL.intLogID = ?
                 AND TXN.intTableType = $Defs::LEVEL_CLUB
                 AND t.strTaskStatus = 'ACTIVE'
+	    	AND TL.intStatus NOT IN (3)
         ];
         $q= $Data->{'db'}->prepare($st);
         $q->execute($logID);
