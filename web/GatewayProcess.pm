@@ -194,8 +194,8 @@ sub payTryRead  {
     my $where = qq[intTransLogID = ?];
     my $id = $logID;
     if (! $logID and $try)  {
-        $where = qq[intTryID = ?];
-        $id = $try;;
+        $where = qq[strPayReference = ?];
+        $id = $try;
     }
     return undef if (! $logID and ! $try);
     my $st = qq[

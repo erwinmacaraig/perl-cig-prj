@@ -72,21 +72,23 @@ print STDERR "IN checkOpenPayments\n";
             tblTransLog as TL
             INNER JOIN tblPaymentConfig as PC ON (PC.intPaymentConfigID = TL.intPaymentConfigID)
         WHERE
-            TL.intStatus IN (0,3)
+            TL.intStatus IN (1)
             AND PC.strGatewayCode = 'checkoutfi'
-			AND  TL.intSentToGateway = 1 
-            AND TL.intPaymentGatewayResponded = 0
+	AND  TL.intSentToGateway = 1 
     ];
-            #TL.intStatus IN (1)
-		#TL.intLogID=10063
+            #TL.intStatus IN (0,3)
+         #   AND TL.intPaymentGatewayResponded = 0
     my $checkURL = 'https://rpcapi.checkout.fi/poll';
     my $query = $db->prepare($st);
     $query->execute();
     while (my $dref = $query->fetchrow_hashref())   {
 	my %Data=();
 	$Data{'db'}=$db;
+        $Data{'Realm'} = 1;
+        $Data{'SystemConfig'}=getSystemConfig(\%Data);
 
 	my $logID= $dref->{'intLogID'};
+	$logID =~ s/$Data{'SystemConfig'}{'paymentPrefix'}//;
         next if ! $dref->{'intAmount'};
         ## LOOK UP tblPayTry
         my $payTry = payTryRead(\%Data, $logID, 0);
@@ -94,14 +96,13 @@ print STDERR "IN checkOpenPayments\n";
         my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
         $Data{'lang'}=$lang;
         getDBConfig(\%Data);
+        ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
 
         $Data{'clientValues'} = $payTry;
         my $client= setClient(\%{$payTry});
         $Data{'client'}=$client;
 
         $Data{'sessionKey'} = $payTry->{'session'};
-        ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
-        $Data{'SystemConfig'}=getSystemConfig(\%Data);
         initLocalisation(\%Data);
 
 
@@ -109,7 +110,7 @@ print STDERR "IN checkOpenPayments\n";
         my %APIResponse=();
         my $cents = $dref->{'intAmount'} * 100;
         $APIResponse{'VERSION'} = "0001";
-        $APIResponse{'STAMP'} = $logID;
+        $APIResponse{'STAMP'} = $Data{'SystemConfig'}{'paymentPrefix'}.$logID;
         $APIResponse{'REFERENCE'} = $logID;
         $APIResponse{'MERCHANT'} = $dref->{'strGatewayUsername'};
         $APIResponse{'AMOUNT'} = $cents;
@@ -141,6 +142,7 @@ print STDERR Dumper($retval);
         
         $APIResponse{'STATUS'} = $dataIN->{'status'}; 
 print STDERR "API STATUS IS " . $APIResponse{'STATUS'};
+next;
 
         
         $APIResponse{'sa'} = 1;

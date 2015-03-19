@@ -38,15 +38,19 @@ sub main	{
     ## Need one of these PER gateway
 print STDERR "IN GATEWAYPROCESS_cofi\n";
 
-	my $logID= param('STAMP') || param('ci') || 0;
-	my $submit_action= param('sa') || '';
-	my $display_action= param('da') || '';
-    my $process_action= param('pa') || '';
-
     my $db=connectDB();
 	my %Data=();
 	$Data{'db'}=$db;
 	$Data{'Realm'}=1;
+    getDBConfig(\%Data);
+    $Data{'SystemConfig'}=getSystemConfig(\%Data);
+
+	my $logID= param('STAMP') || param('ci') || 0;
+	$logID =~ s/$Data{'SystemConfig'}{'paymentPrefix'}//;
+	my $submit_action= param('sa') || '';
+	my $display_action= param('da') || '';
+    my $process_action= param('pa') || '';
+
     ## LOOK UP tblPayTry
     my $payTry = payTryRead(\%Data, $logID, 0);
 
@@ -64,8 +68,6 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
     #$Data{'clientValues'} = \%clientValues;
 
     $Data{'sessionKey'} = $payTry->{'session'};
-    getDBConfig(\%Data);
-    $Data{'SystemConfig'}=getSystemConfig(\%Data);
     initLocalisation(\%Data);
 
     # Do they update

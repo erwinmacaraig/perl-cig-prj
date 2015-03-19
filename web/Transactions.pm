@@ -83,7 +83,7 @@ sub handleTransactions	{
 	if (! $heading)	{
 		$heading = ($Data->{'SystemConfig'}{'txns_link_name'}) ? $Data->{'SystemConfig'}{'txns_link_name'} :  'Transactions';
 	}
-    $heading = $Data->{'lang'}->trans($heading);
+    $heading = $Data->{'lang'}->txt($heading);
 	#$heading ||= $Data->{'SystemConfig'}{'txns_link_name'} || 'Transactions';
 
 	#$heading ||= 'Transactions';

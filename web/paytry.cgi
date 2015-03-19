@@ -145,7 +145,7 @@ sub main	{
         my $rejectURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=1&ci=$logID];
 
         $gatewaySpecific{'VERSION'} = "0001";
-        $gatewaySpecific{'STAMP'} = $logID;
+        $gatewaySpecific{'STAMP'} = $Data{'SystemConfig'}{'paymentPrefix'}.$logID;
         $gatewaySpecific{'AMOUNT'} = $cents;
         $gatewaySpecific{'REFERENCE'} = $logID;
         $gatewaySpecific{'MESSAGE'} = "";
