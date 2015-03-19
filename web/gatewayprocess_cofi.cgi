@@ -83,7 +83,7 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
 
         my %Vals = ();
         $Vals{'VERSION'}= param('VERSION') || '';
-        $Vals{'STAMP'}= param('STAMP') || '';
+        $Vals{'STAMP'}= $payRef; #param('STAMP') || '';
         $Vals{'REFERENCE'}= param('REFERENCE') || '';
         $Vals{'PAYMENT'}= param('PAYMENT') || '';
         $Vals{'STATUS'}= param('STATUS') || '';
