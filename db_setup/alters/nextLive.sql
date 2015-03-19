@@ -1,3 +1,6 @@
+# 150219_tblPerson.sql
+ALTER TABLE tblPerson ADD COLUMN strGuardianRelationship VARCHAR(50);
+
 ALTER TABLE tblPayTry ADD COLUMN strContinueAction varchar(50) default '';
 ALTER TABLE tblTransLog ADD COLUMN strGatewayResponseCode varchar(10) default '';
 
