@@ -71,7 +71,7 @@ print STDERR "IN checkOpenPayments\n";
             tblTransLog as TL
             INNER JOIN tblPaymentConfig as PC ON (PC.intPaymentConfigID = TL.intPaymentConfigID)
         WHERE
-		TL.intLogID=10062
+		TL.intLogID=10063
 		AND  TL.intSentToGateway = 1 
             AND PC.strGatewayCode = 'checkoutfi'
         LIMIT 1
