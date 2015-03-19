@@ -4,7 +4,7 @@ require Exporter;
 @EXPORT=qw(gatewayProcess payTryRead payTryRedirectBack payTryContinueProcess markTXNSentToGateway markGatewayAsResponded);
 @EXPORT_OK=qw(gatewayProcess payTryRead payTryRedirectBack payTryContinueProcess markTXNSentToGateway markGatewayAsResponded);
 
-use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
+use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user" ;
 
 use strict;
 use DBI;
@@ -281,7 +281,8 @@ sub gatewayProcess {
 		}
 	}
 	elsif ($action eq '1' or $action eq 'S')	{ ## WAS 'S'
-		$body = ExternalGatewayUpdate($Data, $paymentSettings, $client, $returnVals_ref, $logID, $Order->{'AssocID'}); #, $Order, $external, $encryptedID);
+print STDERR "IN AAAAAAAAAAAAAA\n";
+		$body = ExternalGateway::ExternalGatewayUpdate($Data, $paymentSettings, $client, $returnVals_ref, $logID, $Order->{'AssocID'}); #, $Order, $external, $encryptedID);
 	}
 	#disconnectDB($db);
 

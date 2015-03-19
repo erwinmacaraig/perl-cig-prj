@@ -29,7 +29,7 @@ use Products;
 
 use Digest::SHA qw(hmac_sha256_hex);
 use HTTP::Request::Common qw(POST);
-#use XML::Simple;
+use XML::Simple;
 
 #use Crypt::CBC;
 
@@ -71,8 +71,8 @@ print STDERR "IN checkOpenPayments\n";
             tblTransLog as TL
             INNER JOIN tblPaymentConfig as PC ON (PC.intPaymentConfigID = TL.intPaymentConfigID)
         WHERE
-            TL.intLogID=10053
-            AND TL.intSentToGateway = 1 
+		TL.intLogID=10062
+		AND  TL.intSentToGateway = 1 
             AND PC.strGatewayCode = 'checkoutfi'
         LIMIT 1
     ];
@@ -86,7 +86,7 @@ print STDERR "IN checkOpenPayments\n";
 	my %Data=();
 	$Data{'db'}=$db;
 
-	    my $logID= $dref->{'intLogID'};
+	my $logID= $dref->{'intLogID'};
         next if ! $dref->{'intAmount'};
         ## LOOK UP tblPayTry
         my $payTry = payTryRead(\%Data, $logID, 0);
@@ -103,7 +103,6 @@ print STDERR "IN checkOpenPayments\n";
         ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
         $Data{'SystemConfig'}=getSystemConfig(\%Data);
         initLocalisation(\%Data);
-
 
 
         print STDERR "CHECK FOR $logID\n";
@@ -124,18 +123,24 @@ print STDERR "IN checkOpenPayments\n";
         $m->add($coKey);
         my $authKey= uc($m->hexdigest());
         $APIResponse{'MAC'} = $authKey;
+print STDERR Dumper(\%APIResponse);
         my $req = POST $checkURL, \%APIResponse;
         my $ua = LWP::UserAgent->new();
         my $res= $ua->request($req);
         my $retval = $res->content() || '';
+	next if $retval =~/error/;
+	next if $retval !~/status/;
+
 
 print STDERR Dumper($retval);
 
-        #my $dataIN= XML::Simple($retval);
+        #my $dataIN= XMLin($retval);
+	my $dataIN= XMLin($retval);
 
-        #print STDERR Dumper($dataIN);
+        print STDERR Dumper($dataIN);
         
-        $APIResponse{'STATUS'} = 2; 
+        $APIResponse{'STATUS'} = $dataIN->{'status'}; 
+print STDERR "API STATUS IS " . $APIResponse{'STATUS'};
 
         
         $APIResponse{'sa'} = 1;
@@ -200,7 +205,8 @@ print STDERR "ABOUT TO CALL GATEWAY PROCESS!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
         }
 
         if ($process_action eq '1')    {
-            payTryContinueProcess(\%Data, $payTry, $client, $logID);
+#print STDERR "ABOUT TO CONTINUE PROCESS !!!!!!!!!!!!!!\n";
+#            payTryContinueProcess(\%Data, $payTry, $client, $logID);
         }
 
     }
