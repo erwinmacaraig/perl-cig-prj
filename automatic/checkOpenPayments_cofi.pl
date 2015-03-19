@@ -86,7 +86,6 @@ print STDERR "IN checkOpenPayments\n";
 	$Data{'db'}=$db;
         $Data{'Realm'} = 1;
         $Data{'SystemConfig'}=getSystemConfig(\%Data);
-
 	my $logID= $dref->{'intLogID'};
 	$logID =~ s/$Data{'SystemConfig'}{'paymentPrefix'}//;
         next if ! $dref->{'intAmount'};
