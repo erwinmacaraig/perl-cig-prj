@@ -1247,7 +1247,6 @@ sub logRetry	{
 sub processTransLog    {
 
     my ($db, $txn, $responsecode, $gatewayresponsecode, $responsetext, $intLogID, $paymentSettings, $passedChkValue, $settlement_date, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text, $exportOK) = @_;
-print STDERR "DHDHDHDHDHD\n";
 
 	$exportOK ||= 0;
     my %fields=();
@@ -1289,7 +1288,6 @@ print STDERR "DHDHDHDHDHD\n";
 
 #    deQuote($db, \%fields);
 	if (! $responsecode)	{
-print STDERR "IN NOT";
 		processTransLogFailure($db, $intLogID, $gatewayresponsecode, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text);
 	}
 	else	{
@@ -1302,7 +1300,6 @@ print STDERR "IN NOT";
         	WHERE intLogID = $intLogID
 			    AND intStatus<> 1
     	];
-print STDERR $statement;
     	$query = $db->prepare($statement) or query_error($statement);
     	$query->execute(
             $fields{txn},

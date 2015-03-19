@@ -155,7 +155,6 @@ sub ExternalGatewayUpdate {
 
   my ($Data, $paymentSettings, $client, $returnVals, $logID, $assocID)= @_;
 
-print STDERR "IN HERE FOR EXTERNAL GATEWAY UPDATE\n";
   $logID ||= 0;
   $assocID ||= 0;
   my $txn = $returnVals->{'GATEWAY_TXN_ID'} || '';

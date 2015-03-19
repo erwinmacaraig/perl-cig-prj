@@ -592,7 +592,13 @@ sub getTransList {
     my $client = setClient($Data->{clientValues});
     my $lang = $Data->{'lang'};
     my @headers = (
-	 {
+    {
+        name => 'Check', 
+        name => $lang->txt('Invoice Number'), 
+        field => 'strInvoiceNumber', 
+        width => 20
+    },
+    {
         name => $lang->txt('Select'), 
         field => 'manual_payment', 
         type => 'HTML', 
@@ -1592,8 +1598,8 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 				<td>$paymentFor</a></td>
 				<td>$dref->{intQty}</a></td>
 				<td>$taxRateinPercent&#37;</a></td>
-				<td>$dollarSymbol $dref->{'curPriceTax'}</td>
-				<td>$dollarSymbol $dref->{'curAmount'}</td>
+				<td>].$Data->{'l10n'}{'currency'}->format($dref->{'curPriceTax'}) . qq[</td>
+				<td>].$Data->{'l10n'}{'currency'}->format($dref->{'curAmount'}) . qq[</td>
 				<td>$Defs::TransactionStatus{$dref->{intStatus}}</td>
 			</tr>
 		];
@@ -1684,7 +1690,7 @@ sub viewTransLog	{
   	$qry_trans->execute;
 		
 	my $orderAmount = $TLref->{'intAmount'};
-	$TLref->{'intAmount'} = qq[$dollarSymbol $TLref->{'intAmount'}];
+	$TLref->{'intAmount'} = $Data->{'l10n'}{'currency'}->format($TLref->{'intAmount'});
 	my %FieldDefs = (
                 TXNLOG => {
                         fields => {
@@ -1800,7 +1806,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
         <td>$Defs::paymentTypes{$pref->{intPaymentType}}</td>
         <td>$pref->{AttemptDateTime}</td>
         <td>$Defs::paymentResponseText{$pref->{strResponseText}}</td>
-        <td>$dollarSymbol $pref->{intAmount}</td>
+        <td>].  $Data->{'l10n'}{'currency'}->format($pref->{'intAmount'}).qq[
       </tr>
     ];
   }
@@ -1846,8 +1852,8 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 				<td>$paymentFor</a></td>
 				<td>$dref->{intQty}</a></td>
 				<td>$taxRateinPercent&#37;</a></td>
-				<td>$dollarSymbol $dref->{'curPriceTax'}</td>
-				<td>$dollarSymbol $dref->{'curAmount'}</td>
+				<td>].$Data->{'l10n'}{'currency'}->format($dref->{'curPriceTax'}) . qq[</td>
+				<td>].$Data->{'l10n'}{'currency'}->format($dref->{'curAmount'}) . qq[</td>
 				<td>$Defs::TransactionStatus{$dref->{intStatus}}</td>
 			</tr>
 		];
@@ -1886,9 +1892,9 @@ sub viewPayLaterTransLog    {
 
 	$intTransLogID ||= 0;
 	my $db = $Data->{'db'};
-
 	my $dollarSymbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
  	my $lang = $Data->{'lang'};
+
 
 
 	my $st = qq[
@@ -1919,7 +1925,7 @@ sub viewPayLaterTransLog    {
 	my $qry_trans = $db->prepare($st_trans);
   	$qry_trans->execute;
 		
-	$TLref->{'intAmount'} = qq[$dollarSymbol $TLref->{'intAmount'}];
+	$TLref->{'intAmount'} = $Data->{'l10n'}{'currency'}->format($TLref->{'intAmount'});
 	my %FieldDefs = (
                 TXNLOG => {
                     fields => {
@@ -2077,7 +2083,7 @@ sub listTransLog	{
 			id => $dref->{'intLogID'},
 			intLogID => $dref->{'intLogID'},
 			paymentType => $dref->{'paymentType'},
-           	intAmount => $dref->{'curAmount'}, 		
+           	intAmount => $Data->{'l10n'}{'currency'}->format($dref->{'curAmount'}), 		
             status => $dref->{'status'},
 			name => $dref->{'strLocalFirstname'} . " " . $dref->{'strLocalSurname'},
 			strResponseCode => $dref->{'strResponseCode'},

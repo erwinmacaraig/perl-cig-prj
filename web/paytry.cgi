@@ -44,6 +44,12 @@ sub main	{
     my %clientValues = getClient($client);
     $Data{'clientValues'} = \%clientValues;
     ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
+
+
+    getDBConfig(\%Data);
+    $Data{'SystemConfig'}=getSystemConfig(\%Data);
+    initLocalisation(\%Data);
+
      my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     foreach my $key ( keys %clientValues) {
         $params{$key} = $clientValues{$key};
@@ -118,6 +124,7 @@ sub main	{
     my $paymentURL = '';
     my %gatewaySpecific = ();
 
+    my $currentLang = $Data{'lang'}->generateLocale($Data{'SystemConfig'});
 
     if ($paymentSettings->{'gatewayCode'} eq 'NABExt1') {
         $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;chkv=$chkvalue&amp;session=$session&amp;amount=$amount];
@@ -131,15 +138,7 @@ sub main	{
         $Month = sprintf("%02s", $Month);
         $Day = sprintf("%02s", $Day);
         my $DeliveryDate = "$Year$Month$Day";
-print STDERR "$DeliveryDate\n";
-        #my $cancelURL = $Defs::base_url . $paymentSettings->{'gatewayCancelURL'} . qq[&ci=$logID&client=$client]; 
-        my $delayedURL= "http://fspotest.sportingpulseinternational.com/cofi.cgi"; #$Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=1&client=$client&ci=$logID&chkv=$chkvalue&session=$session];
-        #my $delayedURL= $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=1&client=$client&ci=$logID&chkv=$chkvalue&session=$session];
-        #my $cancelURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=0&da=1&client=$client&ci=$logID&chkv=$chkvalue&session=$session];
-        #my $returnURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&client=$client&ci=$logID&chkv=$chkvalue&session=$session];
-        #my $rejectURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&client=$client&ci=$logID&chkv=$chkvalue&session=$session];
 
-print STDERR "TEST BELOW WITH NO CLIENT ETC\n";
         my $delayedURL= $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&pa=1&ci=$logID];
         my $cancelURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&ci=$logID];
         my $returnURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=1&ci=$logID];
@@ -150,7 +149,9 @@ print STDERR "TEST BELOW WITH NO CLIENT ETC\n";
         $gatewaySpecific{'AMOUNT'} = $cents;
         $gatewaySpecific{'REFERENCE'} = $logID;
         $gatewaySpecific{'MESSAGE'} = "";
-        $gatewaySpecific{'LANGUAGE'} = "EN";
+        $gatewaySpecific{'LANGUAGE'} = "FI";
+        $gatewaySpecific{'LANGUAGE'} = "EN" if ($currentLang =~ /^en_/);
+        
         $gatewaySpecific{'MERCHANT'} = $paymentSettings->{'gatewayUsername'};
         $gatewaySpecific{'RETURN'} = $returnURL;
         $gatewaySpecific{'CANCEL'} = $cancelURL;
@@ -170,7 +171,6 @@ print STDERR "TEST BELOW WITH NO CLIENT ETC\n";
         $gatewaySpecific{'POSTCODE'} = "";
         $gatewaySpecific{'POSTOFFICE'} = "";
 
-print STDERR "DELAYED : $delayedURL\n";
         my $m = new MD5;
         my $coKey = $gatewaySpecific{'VERSION'} ."+". $gatewaySpecific{'STAMP'} ."+". $gatewaySpecific{'AMOUNT'} ."+". $gatewaySpecific{'REFERENCE'} ."+". $gatewaySpecific{'MESSAGE'} ."+". $gatewaySpecific{'LANGUAGE'} ."+". $gatewaySpecific{'MERCHANT'} ."+". $gatewaySpecific{'RETURN'} ."+". $gatewaySpecific{'CANCEL'} ."+". $gatewaySpecific{'REJECT'} ."+". $gatewaySpecific{'DELAYED'} ."+". $gatewaySpecific{'COUNTRY'} ."+". $gatewaySpecific{'CURRENCY'} ."+". $gatewaySpecific{'DEVICE'} ."+". $gatewaySpecific{'CONTENT'} ."+". $gatewaySpecific{'TYPE'} ."+". $gatewaySpecific{'ALGORITHM'} ."+". $gatewaySpecific{'DELIVERY_DATE'} ."+". $gatewaySpecific{'FIRSTNAME'} ."+". $gatewaySpecific{'FAMILYNAME'} ."+". $gatewaySpecific{'ADDRESS'} ."+". $gatewaySpecific{'POSTCODE'} ."+". $gatewaySpecific{'POSTOFFICE'} ."+". $paymentSettings->{'gatewayPassword'};
     
