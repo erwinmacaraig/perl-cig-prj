@@ -171,12 +171,16 @@ print STDERR "IN HERE FOR EXTERNAL GATEWAY UPDATE\n";
   	processTransLog($Data->{'db'}, $txn, $returnVals->{'ResponseCode'}, $returnVals->{'GatewayResponseCode'}, $responseText, $logID, $paymentSettings, undef, $settlement_date, $otherRef1, $otherRef2, $otherRef3, $otherRef4, '', $returnVals->{'GATEWAY_AUTH_ID'}, $returnVals->{'GATEWAY_RESPONSE_TEXT'}, $exportOK);
   	my $template_ref = getPaymentTemplate($Data, $assocID);
   	my $templateBody = $template_ref->{'strFailureTemplate'} || 'payment_failure.templ';
-    my $itemData;
+    my $itemData; 
+	open FH, ">dumpfile.txt";
+	print FH "\n ================= \n returnVals->{'ResponseCode'} = $returnVals->{'ResponseCode'} \n ===========================";	
+	use Data::Dumper;		
+	#print FH "\n \$paymentSettings " . Dumper($paymentSettings); 	#if ($returnVals->{'ResponseCode'} =~/^00|08|OK$/)  {
   	if ($returnVals->{'ResponseCode'} eq 'OK')  {
-	#if ($returnVals->{'ResponseCode'} =~/^00|08|OK$/)  {
     	UpdateCart($Data, $paymentSettings, $client, undef, 'OK', $logID);
     	product_apply_transaction($Data,$logID);
     	EmailPaymentConfirmation($Data, $paymentSettings, $logID, $client);
+		print FH "\n \$paymentSettings \n ========================================== \n" . Dumper($paymentSettings);
     	$templateBody = $template_ref->{'strSuccessTemplate'} || 'payment_success.templ';
   	} 
     elsif ($returnVals->{'ResponseCode'} eq 'HOLD')  {

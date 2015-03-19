@@ -456,7 +456,7 @@ sub step3 {
 	deQuote($db, \$transLogID);
 
     my $st = <<"EOS";
-SELECT dtLog,intID
+SELECT dtLog
 FROM   tblTransLog
 WHERE  intLogID = ?
 AND    tblTransLog.intRealmID = ?
@@ -584,8 +584,7 @@ sub getTransList {
 		$orderBy
   ];
 #
-open FH, ">dumpfile.txt";
-print FH "\n $statement \n";	
+	
 	    #$prodSellLevel
     $statement =~ s/AND  AND/AND/g;
     my $query = $db->prepare($statement);
@@ -593,17 +592,8 @@ print FH "\n $statement \n";
     my $client = setClient($Data->{clientValues});
     my $lang = $Data->{'lang'};
     my @headers = (
-    {
-<<<<<<< HEAD
-        name => 'Check', 
-=======
-        name => $lang->txt('Invoice Number'), 
-        field => 'strInvoiceNumber', 
-        width => 20
-    },
-    {
+	 {
         name => $lang->txt('Select'), 
->>>>>>> develop
         field => 'manual_payment', 
         type => 'HTML', 
         width => 10, 
@@ -611,10 +601,12 @@ print FH "\n $statement \n";
         sortable => 0, 
     },
     {
-       	name => 'Invoice Number', 
+        name => 'Check', 
+        name => $lang->txt('Invoice Number'), 
         field => 'strInvoiceNumber', 
         width => 20
-    },
+    },  
+   
     {
         name => $lang->txt('Transaction Number'), 
         field => 'intTransactionID', 
@@ -644,13 +636,9 @@ print FH "\n $statement \n";
         width => 15
     },
     {
-<<<<<<< HEAD
-        name => 'Amount', 
         field => 'curAmount', 
-=======
         name => $lang->txt('Amount'), 
         field => 'NetAmount', 
->>>>>>> develop
         width => 20
     },
     {
@@ -1898,12 +1886,10 @@ sub viewPayLaterTransLog    {
 
 	$intTransLogID ||= 0;
 	my $db = $Data->{'db'};
-<<<<<<< HEAD
+
 	my $dollarSymbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
-=======
-	my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
-    my $lang = $Data->{'lang'};
->>>>>>> develop
+ 	my $lang = $Data->{'lang'};
+
 
 	my $st = qq[
 		SELECT tblTransLog.*, IF(T.intTableType = $Defs::LEVEL_CLUB, Entity.strLocalName, CONCAT(strLocalFirstname,' ',strLocalSurname)) as Name, DATE_FORMAT(dtSettlement,'%d/%m/%Y') as dtSettlement

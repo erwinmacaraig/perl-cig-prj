@@ -13,7 +13,7 @@ use PersonUtils;
 use ConfigOptions;
 use InstanceOf;
 use Countries;
-use PersonRegisterWhat;
+#use PersonRegisterWhat;
 use Reg_common;
 use FieldCaseRule;
 use WorkFlow;
@@ -35,7 +35,6 @@ use PersonSummaryPanel;
 use RenewalDetails;
 use JSON;
 use IncompleteRegistrations;
-
 use RegoProducts;
 
 sub setProcessOrder {
@@ -629,7 +628,8 @@ sub display_registration {
         $self->addCarryField('d_role', $rawDetails->{'strPersonEntityRole'});
     }
     else {
-         $content = displayPersonRegisterWhat(
+		
+         $content = PersonRegisterWhat::displayPersonRegisterWhat(
             $self->{'Data'},
             $personID,
             $entityID,

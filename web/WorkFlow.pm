@@ -61,7 +61,7 @@ use SphinxUpdate;
 use InstanceOf;
 
 use PersonLanguages;
-
+use GatewayProcess;
 sub checkRulePaymentFlagActions {
 
     my(

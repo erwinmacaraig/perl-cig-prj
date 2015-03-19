@@ -413,7 +413,7 @@ print STDERR "COMPLETE RUN OK IS $ok | $run\n\n";
     }
     $rego_ref->{'personTypeText'} = $Defs::personType{$rego_ref->{'personType'}} || $Defs::personType{$rego_ref->{'strPersonType'}} || '';
     if ($ok)   {
-        submitPersonRegistration(
+        PersonRegistration::submitPersonRegistration(
             $Data, 
             $personID,
             $regoID,
@@ -876,7 +876,7 @@ AND tblRegistrationItem.strPersonType IN ('', ?)
     $PersonRef{'strPersonType'} = $rego_ref->{'strPersonType'} || '';
     $PersonRef{'strAgeLevel'} = $rego_ref->{'strAgeLevel'} || '';
     my $personRegoNature = 'NEW';
-    my $pref = loadPersonDetails($Data->{'db'}, $personID);
+    my $pref = Person::loadPersonDetails($Data->{'db'}, $personID);
 
     if ($pref->{'strStatus'} ne $Defs::PERSON_STATUS_INPROGRESS){
         $personRegoNature = 'RENEWAL';
@@ -1151,7 +1151,7 @@ sub validateRegoID {
         personRegistrationID => $regoID,
         entityID => $entityID || 0,
     );
-    my ($count, $regs) = getRegistrationData(
+    my ($count, $regs) = PersonRegistration::getRegistrationData(
         $Data, 
         $personID,
         \%Reg
@@ -1223,7 +1223,7 @@ sub add_rego_record{
         personRequestID => $personRequestID,
         MAComment => $MAComment || '',
     };
-    my ($personStatus, $prStatus) = checkIsSuspended($Data, $personID, $entityID, $rego_ref->{'personType'});
+    my ($personStatus, $prStatus) = PersonRegistration::checkIsSuspended($Data, $personID, $entityID, $rego_ref->{'personType'});
     return (0, undef, 'SUSPENDED') if ($personStatus eq 'SUSPENDED' or $prStatus eq 'SUSPENDED');
     	
     warn "REGISTRATION NATURE $rego_ref->{'registrationNature'}";
@@ -1237,10 +1237,10 @@ sub add_rego_record{
         return (0, undef, 'RENEWAL_FAILED') if (!$ok);
     }
     if ($rego_ref->{'registrationNature'} eq 'NEW') {
-        my $ok = checkNewRegoOK($Data, $personID, $rego_ref);
+        my $ok = PersonRegistration::checkNewRegoOK($Data, $personID, $rego_ref);
         return (0, undef, 'NEW_FAILED') if (!$ok);
     }
-    my ($regID,$rc) = addRegistration($Data,$rego_ref);
+    my ($regID,$rc) = PersonRegistration::addRegistration($Data,$rego_ref);
     if ($regID)     {
         return ($regID, $rego_ref, '');
     }
