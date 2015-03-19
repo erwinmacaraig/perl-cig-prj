@@ -129,7 +129,7 @@ sub main	{
 	$logID
 	);
     #disconnectDB($db);
-    my $cancelPayPalURL = $Defs::base_url . $paymentSettings->{'gatewayCancelURL'} . qq[&amp;ci=$logID&client=$client]; ##$Defs::paypal_CANCEL_URL;
+    my $cancelPayPalURL = $Defs::base_url . $paymentSettings->{'gatewayCancelURL'} . qq[&amp;ci=$payRef&client=$client]; ##$Defs::paypal_CANCEL_URL;
 
     ## In here I will build up URL per Gateway -- intPaymentConfigID or have a GATEWAYCODE ?
     ## Pass control to gateway
@@ -139,10 +139,10 @@ sub main	{
     my $currentLang = $Data{'lang'}->generateLocale($Data{'SystemConfig'});
 
     if ($paymentSettings->{'gatewayCode'} eq 'NABExt1') {
-        $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;chkv=$chkvalue&amp;session=$session&amp;amount=$amount];
+        $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$payRef&amp;chkv=$chkvalue&amp;session=$session&amp;amount=$amount&amp;logID=$logID];
     }
     if ($paymentSettings->{'gatewayCode'} eq 'checkoutfi')  {
-        $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;chkv=$chkvalue&amp;session=$session];
+        $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$payRef&amp;chkv=$chkvalue&amp;session=$session];
         my $cents = $amount * 100;
         my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
         $Year+=1900;
@@ -222,7 +222,8 @@ sub main	{
         <p>If you are not automatically redirected to the payment page within 30 seconds then you can <a href = "$paymentURL">proceed manually by pressing this link</a>.</p>
         <form action = "$paymentURL" method = "POST" name = "sform" id = "sform">
             <input type = "hidden" name = "a" value = "P">
-            <input type = "hidden" name = "ci" value = "$logID">
+            <input type = "hidden" name = "ci" value = "$payRef">
+            <input type = "hidden" name = "logID" value = "$logID">
             <input type = "hidden" name = "chkv" value = "$chkvalue">
             <input type = "hidden" name = "sessions" value = "$session">
     ];

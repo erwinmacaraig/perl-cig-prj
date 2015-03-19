@@ -35,14 +35,15 @@ sub main	{
 
     ## Need one of these PER gateway
 
-	my $logID= param('ci') || 0;
+	my $payRef= param('ci') || 0;
 	my $submit_action= param('sa') || '';
 	my $display_action= param('da') || '';
 	my $process_action= param('pa') || '';
     my $db=connectDB();
 	my %Data=();
 	$Data{'db'}=$db;
-    my $payTry = payTryRead(\%Data, $logID, 0);
+    my $payTry = payTryRead(\%Data, $payRef, 1);
+	my $logID = $payTry->{'intTransLogID'};
 
 my $cgi=new CGI;
     my %params=$cgi->Vars();
@@ -66,6 +67,8 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
     $Data{'SystemConfig'}=getSystemConfig(\%Data);
     initLocalisation(\%Data);
 
+my ($Order, $Transactions) = gatewayTransactions(\%Data, $logID);
+my ($paymentSettings, undef) = getPaymentSettings(\%Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, 1);
     # Do they update
     if ($submit_action eq '1') {
         my %returnVals = ();
@@ -98,7 +101,7 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
     }
 
 	disconnectDB($db);
-    if ($process_action eq '1')    {
+if (! $paymentSettings->{'gatewayProcessPreGateway'} and $process_action eq '1')    {
         payTryContinueProcess(\%Data, $payTry, $client, $logID, 1);
     }
 

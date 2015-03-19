@@ -74,6 +74,10 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
     $Data{'sessionKey'} = $payTry->{'session'};
     initLocalisation(\%Data);
 
+########
+my ($Order, $Transactions) = gatewayTransactions(\%Data, $logID);
+my ($paymentSettings, undef) = getPaymentSettings(\%Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, 1);
+########
     # Do they update
     if ($submit_action eq '1') {
         my %returnVals = ();
@@ -90,10 +94,6 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
         $Vals{'ALGORITHM'}= param('ALGORITHM') || '';
         $Vals{'MAC'}= param('MAC') || '';
         
-########
-my ($Order, $Transactions) = gatewayTransactions(\%Data, $logID);
-my ($paymentSettings, undef) = getPaymentSettings(\%Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, 1);
-########
 
         my $str = "$Vals{'VERSION'}&$Vals{'STAMP'}&$Vals{'REFERENCE'}&$Vals{'PAYMENT'}&$Vals{'STATUS'}&$Vals{'ALGORITHM'}";
         my $digest=uc(hmac_sha256_hex($str, $paymentSettings->{'gatewayPassword'}));
@@ -150,7 +150,7 @@ print STDERR "MAC ACTION IS $chkAction\n";
     }
 
 	disconnectDB($db);
-    if ($process_action eq '1')    {
+    if (! $paymentSettings->{'gatewayProcessPreGateway'} and $process_action eq '1')    {
         payTryContinueProcess(\%Data, $payTry, $client, $logID);
         $payTry->{'run'} = 1;
         print "Content-type: text/html\n\n" if (! $display_action);

@@ -1048,7 +1048,7 @@ sub display_summary {
         Target => $self->{'Data'}{'target'},
         ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
     );
-    if ($payMethod eq 'now')    {
+    if ($gatewayConfig->{'amountDue'} and $payMethod eq 'now')    {
         ## Change Target etc
         %Config = (
             HiddenFields => $gatewayConfig->{'HiddenFields'},
