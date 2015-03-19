@@ -1,8 +1,8 @@
 package GatewayProcess;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT=qw(gatewayProcess payTryRead payTryRedirectBack payTryContinueProcess markTXNSentToGateway markGatewayAsResponded);
-@EXPORT_OK=qw(gatewayProcess payTryRead payTryRedirectBack payTryContinueProcess markTXNSentToGateway markGatewayAsResponded);
+@EXPORT=qw(gatewayProcess payTryRead payTryRedirectBack payTryContinueProcess markTXNSentToGateway markGatewayAsResponded calcPayTryRef);
+@EXPORT_OK=qw(gatewayProcess payTryRead payTryRedirectBack payTryContinueProcess markTXNSentToGateway markGatewayAsResponded calcPayTryRef);
 
 use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user" ;
 
@@ -27,6 +27,15 @@ use TransferFlow;
 use BulkRenewalsFlow;
 
 use Data::Dumper;
+
+sub calcPayTryRef	{
+	my ($prefix, $logID) = @_;
+
+	$prefix ||= '';
+	my $value = $prefix.$logID;
+	
+	return $value;
+}
 
 sub markTXNSentToGateway    {
 
@@ -193,9 +202,9 @@ sub payTryRead  {
 
     my $where = qq[intTransLogID = ?];
     my $id = $logID;
-    if (! $logID and $try)  {
+    if ($logID and $try)  {
         $where = qq[strPayReference = ?];
-        $id = $try;
+        #$id = $try;
     }
     return undef if (! $logID and ! $try);
     my $st = qq[
@@ -211,6 +220,8 @@ sub payTryRead  {
     my $href = $query->fetchrow_hashref();
     my $values = JSON::from_json($href->{'strLog'});
     $values->{'strContinueAction'} = $href->{'strContinueAction'};
+    $values->{'intTransLogID'} = $href->{'intTransLogID'};
+    $values->{'strPayReference'} = $href->{'strPayReference'};
     return $values;
 }
 

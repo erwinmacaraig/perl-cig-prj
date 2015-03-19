@@ -62,15 +62,18 @@ print STDERR "IN checkOpenPayments\n";
      
     my $st = qq[
         SELECT
-            intLogID,
+	DISTINCT
+            TL.intLogID,
             TL.intAmount,
             PC.strGatewayUsername,
             PC.strGatewayPassword,
             PC.strCurrency,
-			PC.intProcessPreGateway	
+			PC.intProcessPreGateway	,
+		PT.strPayReference
         FROM
             tblTransLog as TL
             INNER JOIN tblPaymentConfig as PC ON (PC.intPaymentConfigID = TL.intPaymentConfigID)
+	    INNER JOIN tblPayTry as PT ON (PT.intTransLogID = TL.intLogID)
         WHERE
             TL.intStatus IN (1)
             AND PC.strGatewayCode = 'checkoutfi'
@@ -86,11 +89,11 @@ print STDERR "IN checkOpenPayments\n";
 	$Data{'db'}=$db;
         $Data{'Realm'} = 1;
         $Data{'SystemConfig'}=getSystemConfig(\%Data);
-	my $logID= $dref->{'intLogID'};
-	$logID =~ s/$Data{'SystemConfig'}{'paymentPrefix'}//;
+        my $payTry = payTryRead(\%Data, $dref->{'strPayReference'}, 1);
+	my $logID= $payTry->{'intTransLogID'};
+	next if ! $logID;
         next if ! $dref->{'intAmount'};
         ## LOOK UP tblPayTry
-        my $payTry = payTryRead(\%Data, $logID, 0);
 
         my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
         $Data{'lang'}=$lang;

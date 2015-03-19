@@ -45,14 +45,18 @@ print STDERR "IN GATEWAYPROCESS_cofi\n";
     getDBConfig(\%Data);
     $Data{'SystemConfig'}=getSystemConfig(\%Data);
 
-	my $logID= param('STAMP') || param('ci') || 0;
-	$logID =~ s/$Data{'SystemConfig'}{'paymentPrefix'}//;
+	my $payRef= param('STAMP') || param('ci') || '';
 	my $submit_action= param('sa') || '';
 	my $display_action= param('da') || '';
     my $process_action= param('pa') || '';
 
     ## LOOK UP tblPayTry
-    my $payTry = payTryRead(\%Data, $logID, 0);
+    my $payTry = payTryRead(\%Data, $payRef, 1);
+use Data::Dumper;
+print STDERR Dumper($payTry);
+	my $logID = $payTry->{'intTransLogID'};
+
+print STDERR "LOG IS $logID\n";
 
 my $cgi=new CGI;
     my %params=$cgi->Vars();

@@ -108,9 +108,10 @@ sub main	{
         )
     ];
     my $qry= $db->prepare($st) or query_error($st);
+	my $payRef = calcPayTryRef($Data{'SystemConfig'}{'paymentPrefix'},$logID);
     $qry->execute(
         $Data{'Realm'},
-        '',
+        $payRef,
         $logID,
         $datalog,
         $continueAction
@@ -139,13 +140,13 @@ sub main	{
         $Day = sprintf("%02s", $Day);
         my $DeliveryDate = "$Year$Month$Day";
 
-        my $delayedURL= $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&pa=1&ci=$logID];
-        my $cancelURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&ci=$logID];
-        my $returnURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=1&ci=$logID];
-        my $rejectURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=1&ci=$logID];
+        my $delayedURL= $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&pa=1&ci=$payRef];
+        my $cancelURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&ci=$payRef];
+        my $returnURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=1&ci=$payRef];
+        my $rejectURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=1&ci=$payRef];
 
         $gatewaySpecific{'VERSION'} = "0001";
-        $gatewaySpecific{'STAMP'} = $Data{'SystemConfig'}{'paymentPrefix'}.$logID;
+        $gatewaySpecific{'STAMP'} = $payRef;
         $gatewaySpecific{'AMOUNT'} = $cents;
         $gatewaySpecific{'REFERENCE'} = $logID;
         $gatewaySpecific{'MESSAGE'} = "";
@@ -186,7 +187,7 @@ sub main	{
 
     markTXNSentToGateway(\%Data, $logID);
 
-    my $payTry = payTryRead(\%Data, $logID, $tryID);
+    my $payTry = payTryRead(\%Data, $logID, 0);
     if ($paymentSettings->{'gatewayProcessPreGateway'})  {
         #$Data{'clientValues'} = $payTry;
         my $client= setClient(\%{$payTry});
