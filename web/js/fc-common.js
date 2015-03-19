@@ -287,11 +287,13 @@ $(window).scroll(function() {
 
     if ($(this).scrollTop()>0)
      {
-        $('.pageHeading').fadeOut();
-     }
-    else
-     {
-      $('.pageHeading').fadeIn();
+        if ($(window).width() <= 480) {  
+            $('.pageHeading').fadeOut();
+        }
+     }else{
+        if ($(window).width() <= 480) { 
+            $('.pageHeading').fadeIn();
+        }
      }
  });
 jQuery(document).ready(function(){

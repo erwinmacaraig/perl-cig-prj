@@ -2305,7 +2305,26 @@ header nav.navbar-default .navbar-nav > li > a {
   #worktasks #toggleGd_intTaskType a { font-size: 12px; }
   .utilities { display: none; }
   .logo-area { display: none; }
-  .dataTables_info, .dataTables_length, .dataTables_filter, .order-override { display: none; }
+  .dataTables_info, .dataTables_length, .order-override { display: none; }
+	div#worktasks_filter {
+	    background-color: #1870a5;
+	    padding: 10px 0;
+	}
+	div#worktasks_filter label input {
+    padding: 5px;
+    text-align: left;
+    width: 90%;
+	}
+	div#grid_filter {
+	    background-color: #1870a5;
+	    padding: 10px 0;
+	}
+	div#grid_filter label input {
+    padding: 5px;
+    text-align: left;
+    width: 90%;
+	}
+
   .fa-user, .fa-clock-o { display: none; }
   /*
   th:nth-child(2) { display: none; }
@@ -2371,7 +2390,8 @@ header nav.navbar-default .navbar-nav > li > a {
   h3.panel-header { font-size: 12px; }
   .progressFlow .col-md-2{ width: 100%; }
   h2.main-heading { font-size: 18px; margin-top: 0px; }
-
+  table#worktasks.dataTable { margin-top: 0px !important; }
+  div.dataTables_filter label { color: #fff; }
   .sidebar-box:nth-child(0) { display: none; }
   .sidebar-box:nth-child(1) { display: none; }
   .sidebar-box:nth-child(3) { display: none; }
