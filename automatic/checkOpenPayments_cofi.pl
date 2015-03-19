@@ -66,14 +66,15 @@ print STDERR "IN checkOpenPayments\n";
             TL.intAmount,
             PC.strGatewayUsername,
             PC.strGatewayPassword,
-            PC.strCurrency
+            PC.strCurrency,
+			PC.intProcessPreGateway	
         FROM
             tblTransLog as TL
             INNER JOIN tblPaymentConfig as PC ON (PC.intPaymentConfigID = TL.intPaymentConfigID)
         WHERE
             TL.intStatus IN (0,3)
             AND PC.strGatewayCode = 'checkoutfi'
-	AND  TL.intSentToGateway = 1 
+			AND  TL.intSentToGateway = 1 
             AND TL.intPaymentGatewayResponded = 0
     ];
             #TL.intStatus IN (1)
@@ -203,9 +204,9 @@ print STDERR "ABOUT TO CALL GATEWAY PROCESS!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
             gatewayProcess(\%Data, $logID, $client, \%returnVals, $chkAction);
         }
 
-        if ($process_action eq '1')    {
-#print STDERR "ABOUT TO CONTINUE PROCESS !!!!!!!!!!!!!!\n";
-#            payTryContinueProcess(\%Data, $payTry, $client, $logID);
+        if ($process_action eq '1' and ! $dref->{'intProcessPreGateway'})    {
+print STDERR "ABOUT TO CONTINUE PROCESS !!!!!!!!!!!!!!\n";
+            payTryContinueProcess(\%Data, $payTry, $client, $logID);
         }
 
     }
