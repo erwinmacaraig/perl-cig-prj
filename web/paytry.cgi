@@ -117,7 +117,18 @@ sub main	{
         $continueAction
         ) or query_error($st);
     my $tryID= $qry->{mysql_insertid};
-    disconnectDB($db);
+    $st = qq[
+	UPDATE tblTransLog
+		SET strOnlinePayReference= ?
+		WHERE intLogID = ?
+		LIMIT 1
+	];
+    my $qryTXNUPD= $db->prepare($st) or query_error($st);
+    $qryTXNUPD->execute(
+	$payRef,
+	$logID
+	);
+    #disconnectDB($db);
     my $cancelPayPalURL = $Defs::base_url . $paymentSettings->{'gatewayCancelURL'} . qq[&amp;ci=$logID&client=$client]; ##$Defs::paypal_CANCEL_URL;
 
     ## In here I will build up URL per Gateway -- intPaymentConfigID or have a GATEWAYCODE ?
