@@ -77,10 +77,7 @@ sub gatewayTransactions	{
                 $count ++;
         }
         $totalAmount= sprintf("%.2f", $totalAmount);
-warn("TTTTM".$Order{'TotalAmount'} . "--" . $totalAmount);
 		$Order{'Status'}=-1 if ($Order{'TotalAmount'} != $totalAmount);
-warn("STATUS: " . $Order{'Status'});
-#print STDERR "LOGGGGG:$logID $Order{'ClubFormOwner'} | $Data->{'clientValues'}{'authLevel'}\n";
 	return (\%Order, \%Transactions);
 
 }

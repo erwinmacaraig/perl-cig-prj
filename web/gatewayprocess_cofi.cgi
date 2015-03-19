@@ -46,6 +46,7 @@ print STDERR "IN GATEWAYPROCESS_cofi\n";
     my $db=connectDB();
 	my %Data=();
 	$Data{'db'}=$db;
+	$Data{'Realm'}=1;
     ## LOOK UP tblPayTry
     my $payTry = payTryRead(\%Data, $logID, 0);
 

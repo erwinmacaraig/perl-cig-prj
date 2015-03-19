@@ -54,7 +54,7 @@ sub markTXNSentToGateway    {
 sub markGatewayAsResponded  {
 
     my ($Data, $logID) = @_;
-print STDERR "^^^^^^^^^^ MARK GATEWAY AS RESPONDED\n";
+#print STDERR "^^^^^^^^^^ MARK GATEWAY AS RESPONDED\n";
     return if ! $logID;
 
     my $stUPD = qq[
@@ -128,7 +128,7 @@ print STDERR "^^^^^^^^^^ MARK GATEWAY AS RESPONDED\n";
 sub payTryContinueProcess {
 
     my ($Data, $payTry, $client, $logID) = @_;
-print STDERR "********** IN payTryContinueProcess FOR $logID for $payTry->{'strContinueAction'}\n";
+#print STDERR "********** IN payTryContinueProcess FOR $logID for $payTry->{'strContinueAction'}\n";
 
     $payTry->{'return'} = 1;
     if ($payTry->{'strContinueAction'} eq 'REGOFLOW')   {
@@ -144,7 +144,7 @@ print STDERR "********** IN payTryContinueProcess FOR $logID for $payTry->{'strC
 }
 
 sub payTryRedirectBack  {
-print STDERR "IN REDIRECT BACK!!\n";
+#print STDERR "IN REDIRECT BACK!!\n";
 
     my ($Data, $payTry, $client, $logID, $autoRun) = @_;
 
@@ -214,7 +214,7 @@ sub payTryRead  {
 sub gatewayProcess {
 
     my ($Data, $logID, $client, $returnVals_ref, $check_action) = @_;
-print STDERR "IN GATEWAY PROCESS";
+#print STDERR "IN GATEWAY PROCESS";
 
     my $db = $Data->{'db'};
 	my $action = $returnVals_ref->{'action'} || '';
@@ -244,7 +244,6 @@ print STDERR "IN GATEWAY PROCESS";
   #  $returnVals_ref->{'ResponseCode'} = 'OK';
   #}
 
-print STDERR "ABOUT TO MARK GATEWAY AS RESPONDED!!!!!!!!!!!!!!!!!!!!!!!!\n";
     markGatewayAsResponded($Data, $logID);
 
   {
@@ -255,7 +254,7 @@ print STDERR "ABOUT TO MARK GATEWAY AS RESPONDED!!!!!!!!!!!!!!!!!!!!!!!!\n";
     $m->reset();
     $m->add($paymentSettings->{'gatewaySalt'}, $chkvalue);
     $chkvalue = $m->hexdigest();
-    warn "chkv VS. chkvalue :: $chkv :::::  $chkvalue ";
+    #warn "chkv VS. chkvalue :: $chkv :::::  $chkvalue ";
     unless ($check_action eq 'SUCCESS') {
         $Order->{'Status'} = -1 if ($chkv ne $chkvalue);
     }
@@ -284,7 +283,7 @@ print STDERR "ABOUT TO MARK GATEWAY AS RESPONDED!!!!!!!!!!!!!!!!!!!!!!!!\n";
 	elsif ($action eq '1' or $action eq 'S')	{ ## WAS 'S'
 		$body = ExternalGatewayUpdate($Data, $paymentSettings, $client, $returnVals_ref, $logID, $Order->{'AssocID'}); #, $Order, $external, $encryptedID);
 	}
-	disconnectDB($db);
+	#disconnectDB($db);
 
  	#print "Content-type: text/html\n\n";
   	#print $body;

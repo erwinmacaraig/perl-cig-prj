@@ -850,7 +850,6 @@ my $warning_note = $Data->{'SystemConfig'}{'ProductEditNote'} || '';
 								next if ($splitName =~ /Club/ and $Data->{'SystemConfig'}{'dontAllowClubsSplits'});
 				$hasSplits++;
                 $splitID = $paymentSplit->{'intSplitID'};
-								print STDERR $splitName;
                 $splits{$splitID} = $splitName;
             }
 						$splits{''} = '';
@@ -2054,7 +2053,6 @@ my $entityTypeID = $Data->{'currentLevel'};
         AND pd.intProductID IN ($productID)
         ORDER BY strGroup, strName
     ];
-print STDERR $query;
 
     my $sth = $Data->{'db'}->prepare($query);
 
@@ -2091,7 +2089,6 @@ my $entityTypeID = $Data->{'currentLevel'};
       AND intLevel IN (0, ?)
       AND intAttributeType = ?
   ];
-print STDERR $query;
   my $sth = $Data->{'db'}->prepare($query);
   $sth->execute(
     $productID,
@@ -2456,8 +2453,6 @@ sub apply_product_rules {
 		);
     }
 
-    warn("PERSON REGO RECORD HERE ?");
-
 }
 
 sub getFormProductAttributes {
@@ -2484,7 +2479,6 @@ sub getFormProductAttributes {
             WHERE 
                 intProductID in ( $productID_str)
         ];
-print STDERR "$query\n";
         my $sth = $Data->{'db'}->prepare($query);
         $sth->execute(@product_list);
         

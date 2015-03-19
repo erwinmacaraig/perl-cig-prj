@@ -29,6 +29,7 @@ use Products;
 
 use Digest::SHA qw(hmac_sha256_hex);
 use HTTP::Request::Common qw(POST);
+#use XML::Simple;
 
 #use Crypt::CBC;
 
@@ -40,10 +41,6 @@ sub main	{
 print STDERR "IN checkOpenPayments\n";
 
     my $db=connectDB();
-	my %Data=();
-	$Data{'db'}=$db;
-    my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
-    $Data{'lang'}=$lang;
 
     my %FIN_coResponseText = (
             -10=>"PAYMENT_RETURNED",
@@ -74,80 +71,88 @@ print STDERR "IN checkOpenPayments\n";
             tblTransLog as TL
             INNER JOIN tblPaymentConfig as PC ON (PC.intPaymentConfigID = TL.intPaymentConfigID)
         WHERE
-            TL.intStatus IN (0,3)
-            AND TL.intSentToGateway=1
+            TL.intLogID=10053
+            AND TL.intSentToGateway = 1 
             AND PC.strGatewayCode = 'checkoutfi'
         LIMIT 1
     ];
+            #TL.intStatus IN (1)
+            #AND TL.intPaymentGatewayResponded = 0
+            #TL.intStatus IN (0,3)
     my $checkURL = 'https://rpcapi.checkout.fi/poll';
     my $query = $db->prepare($st);
     $query->execute();
     while (my $dref = $query->fetchrow_hashref())   {
+	my %Data=();
+	$Data{'db'}=$db;
+
 	    my $logID= $dref->{'intLogID'};
         next if ! $dref->{'intAmount'};
         ## LOOK UP tblPayTry
         my $payTry = payTryRead(\%Data, $logID, 0);
-        print STDERR "CHECK FOR $logID\n";
-        my %gatewaySpecific=();
-        my $cents = $dref->{'intAmount'} * 100;
-        $gatewaySpecific{'VERSION'} = "0001";
-        $gatewaySpecific{'STAMP'} = $logID;
-        $gatewaySpecific{'REFERENCE'} = $logID;
-        $gatewaySpecific{'MERCHANT'} = $dref->{'strGatewayUsername'};
-        $gatewaySpecific{'AMOUNT'} = $cents;
-        $gatewaySpecific{'CURRENCY'} = $dref->{'strCurrency'};
-        $gatewaySpecific{'FORMAT'} = 1;
-        $gatewaySpecific{'ALGORITHM'} = 1;
-        my $m = new MD5;
-         my $coKey = $gatewaySpecific{'VERSION'} ."+". $gatewaySpecific{'STAMP'} ."+". $gatewaySpecific{'REFERENCE'} ."+". $gatewaySpecific{'MERCHANT'} ."+". $gatewaySpecific{'AMOUNT'} ."+". $gatewaySpecific{'CURRENCY'} ."+". $gatewaySpecific{'FORMAT'} ."+". $gatewaySpecific{'ALGORITHM'} . "+" . $dref->{'strGatewayPassword'};
 
-        $m->reset();
-        $m->add($coKey);
-        my $authKey= uc($m->hexdigest());
-        $gatewaySpecific{'MAC'} = $authKey;
-         my $req = POST $checkURL, \%gatewaySpecific;
-        my $ua = LWP::UserAgent->new();
-    my $res= $ua->request($req);
-    my $retval = $res->content() || '';
-print STDERR $res;
-print STDERR Dumper($retval);
+        my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
+        $Data{'lang'}=$lang;
+        getDBConfig(\%Data);
 
-
-print STDERR "NEED TO GET STATUS THEN CONTINUE THIS SCRIPT !!!!!!!!\n";
-    next;
-        my %APIResponse = ();
-        
-        $APIResponse{'sa'} = 1;
-        $APIResponse{'pa'} = 1;
-        $APIResponse{'ext'} = 0;
-        $APIResponse{'VERSION'} = '';
-        $APIResponse{'STAMP'} = '';
-        $APIResponse{'REFERENCE'} = '';
-        $APIResponse{'PAYMENT'} = '';
-        $APIResponse{'STATUS'} = '';
-        $APIResponse{'ALGORITHM'} = '';
-        $APIResponse{'MAC'} = '';
-    
-	    my $submit_action= $APIResponse{'sa'} || '';
-        my $process_action= $APIResponse{'pa'} || '';
-
-
-        my $cgi=new CGI;
-        my %params=$cgi->Vars();
         $Data{'clientValues'} = $payTry;
         my $client= setClient(\%{$payTry});
         $Data{'client'}=$client;
 
         $Data{'sessionKey'} = $payTry->{'session'};
-        getDBConfig(\%Data);
+        ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
         $Data{'SystemConfig'}=getSystemConfig(\%Data);
         initLocalisation(\%Data);
 
-        # Do they update
+
+
+        print STDERR "CHECK FOR $logID\n";
+        my %APIResponse=();
+        my $cents = $dref->{'intAmount'} * 100;
+        $APIResponse{'VERSION'} = "0001";
+        $APIResponse{'STAMP'} = $logID;
+        $APIResponse{'REFERENCE'} = $logID;
+        $APIResponse{'MERCHANT'} = $dref->{'strGatewayUsername'};
+        $APIResponse{'AMOUNT'} = $cents;
+        $APIResponse{'CURRENCY'} = $dref->{'strCurrency'};
+        $APIResponse{'FORMAT'} = 1;
+        $APIResponse{'ALGORITHM'} = 1;
+        my $m = new MD5;
+        my $coKey = $APIResponse{'VERSION'} ."+". $APIResponse{'STAMP'} ."+". $APIResponse{'REFERENCE'} ."+". $APIResponse{'MERCHANT'} ."+". $APIResponse{'AMOUNT'} ."+". $APIResponse{'CURRENCY'} ."+". $APIResponse{'FORMAT'} ."+". $APIResponse{'ALGORITHM'} . "+" . $dref->{'strGatewayPassword'};
+
+        $m->reset();
+        $m->add($coKey);
+        my $authKey= uc($m->hexdigest());
+        $APIResponse{'MAC'} = $authKey;
+        my $req = POST $checkURL, \%APIResponse;
+        my $ua = LWP::UserAgent->new();
+        my $res= $ua->request($req);
+        my $retval = $res->content() || '';
+
+print STDERR Dumper($retval);
+
+        #my $dataIN= XML::Simple($retval);
+
+        #print STDERR Dumper($dataIN);
+        
+        $APIResponse{'STATUS'} = 2; 
+
+        
+        $APIResponse{'sa'} = 1;
+        $APIResponse{'pa'} = 1;
+        $APIResponse{'ext'} = 0;
+    
+	    my $submit_action= $APIResponse{'sa'} || '';
+        my $process_action= $APIResponse{'pa'} || '';
+
+        #my $cgi=new CGI;
+        #my %params=$cgi->Vars();
+                # Do they update
         if ($submit_action eq '1') {
             my %returnVals = ();
             $returnVals{'ext'} = $APIResponse{'ext'} || 0;
             $returnVals{'chkv'} = $APIResponse{'chkv'} || 0;
+            $returnVals{'action'} = $APIResponse{'sa'} || 0;
 
             my %Vals = ();
             $Vals{'VERSION'}= $APIResponse{'VERSION'} || '';
@@ -164,14 +169,7 @@ print STDERR "NEED TO GET STATUS THEN CONTINUE THIS SCRIPT !!!!!!!!\n";
             my ($paymentSettings, undef) = getPaymentSettings(\%Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, 1);
             ########
 
-            my $str = "$Vals{'VERSION'}&$Vals{'STAMP'}&$Vals{'REFERENCE'}&$Vals{'PAYMENT'}&$Vals{'STATUS'}&$Vals{'ALGORITHM'}";
-            my $digest=uc(hmac_sha256_hex($str, $paymentSettings->{'gatewayPassword'}));
-            my $chkAction = 'FAILURE';
-    print STDERR "$Vals{'MAC'} $str $digest |  $paymentSettings->{'gatewayPassword'}\n";
-            if ($Vals{'MAC'} eq $digest)    {
-                $chkAction = 'SUCCESS';
-            }
-    print STDERR "MAC ACTION IS $chkAction\n";
+            my $chkAction = 'SUCCESS'; ## Otherwise it wpuldn't have gotten this far
 
             $returnVals{'GATEWAY_TXN_ID'}= $APIResponse{'PAYMENT'} || '';
             $returnVals{'GATEWAY_AUTH_ID'}= $APIResponse{'REFERENCE'} || '';
@@ -197,6 +195,7 @@ print STDERR "NEED TO GET STATUS THEN CONTINUE THIS SCRIPT !!!!!!!!\n";
             $returnVals{'ResponseText'}= $respTextCode; 
             $returnVals{'Other1'} = $co_status || '';
             $returnVals{'Other2'} = $APIResponse{'MAC'} || '';
+print STDERR "ABOUT TO CALL GATEWAY PROCESS!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
             gatewayProcess(\%Data, $logID, $client, \%returnVals, $chkAction);
         }
 
@@ -205,7 +204,7 @@ print STDERR "NEED TO GET STATUS THEN CONTINUE THIS SCRIPT !!!!!!!!\n";
         }
 
     }
-	disconnectDB($db);
+	#disconnectDB($db);
 
 }
 

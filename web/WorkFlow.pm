@@ -76,7 +76,6 @@ sub checkRulePaymentFlagActions {
     
     return if (! $entityID and ! $personID and ! $personRegistrationID);
 
-print STDERR "********* IN checkRulePaymentFlagActions\n";
     my $st = qq[
         SELECT
             T.intWFTaskID,
@@ -93,17 +92,13 @@ print STDERR "********* IN checkRulePaymentFlagActions\n";
             AND T.intPersonRegistrationID = ?
         ORDER BY intWFTaskID DESC LIMIT 1
     ];
-print STDERR "_____________________ NOT SURE IF LIMIT NEEDED\n";
 
     my $q= $Data->{'db'}->prepare($st);
     $q->execute($personID, $entityID, $personRegistrationID) or print STDERR "DB ERRIR";
-print STDERR $st;
 
-    print STDERR "NEED TO CALL checkForOutstandingTasks!!!!!!!!!!!!!! $personID, $entityID, $personRegistrationID\n";
 
     my $countTaskSkipped= 0;
     while (my $dref = $q->fetchrow_hashref())   {
-        print STDERR "^^^^^^^^^^^^^^^^^^^TASK ID IS $dref->{'intWFTaskID'}";
         if ($dref->{'intAutoActivateOnPayment'} == 1)   {
             if ($personRegistrationID)  {
                 my $stUPD = qq[
@@ -814,7 +809,7 @@ sub addWorkFlowTasks {
         $personRegistrationID,
         $documentID
     ) = @_;
-print STDERR "RRRRRRRRRRRRRR ADD WORK $originLevel E$entityID $personID $personRegistrationID\n";
+#print STDERR "RRRRRRRRRRRRRR ADD WORK $originLevel E$entityID $personID $personRegistrationID\n";
 	
     $entityID ||= 0;
     $personID ||= 0;

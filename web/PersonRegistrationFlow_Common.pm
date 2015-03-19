@@ -55,7 +55,7 @@ sub displayRegoFlowCompleteBulk {
     my ($amountDue, $logIDs) = getRegoTXNDetails($Data, $hidden_ref->{'txnIds'});
     $hidden_ref->{'totalAmount'} = $amountDue;
     my $gateways = '';
-print STDERR "BULK COMPLETE AMOUNT DUE" . $amountDue . $payMethod;
+#print STDERR "BULK COMPLETE AMOUNT DUE" . $amountDue . $payMethod;
 
     my $paymentResult = '';
     my $payStatus = 0;
@@ -85,7 +85,7 @@ sub displayRegoFlowSummaryBulk  {
 	
     my $body = '';
 
-print STDERR "HIDDEN BULK TXNids" . $hidden_ref->{'txnIds'};
+#print STDERR "HIDDEN BULK TXNids" . $hidden_ref->{'txnIds'};
     my ($unpaid_cost, $logIDs) = getRegoTXNDetails($Data, $hidden_ref->{'txnIds'});
     $hidden_ref->{'totalAmount'} = $unpaid_cost;
     my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
@@ -112,7 +112,6 @@ print STDERR "HIDDEN BULK TXNids" . $hidden_ref->{'txnIds'};
         my ($txnCountSingle, $amountDueSingle, $logIDsSingle) = getPersonRegoTXN($Data, $pID, $regoID);
         $txnCount += $txnCountSingle;
         $amountDue += $amountDueSingle;
-        print STDERR "PREGOID $regoID\n";
         $personData{'MAID'} = $personObj->getValue('strNationalNum');
         $personData{'Name'} = $personObj->getValue('strLocalFirstname');
         $personData{'Familyname'} = $personObj->getValue('strLocalSurname');
@@ -124,7 +123,6 @@ print STDERR "HIDDEN BULK TXNids" . $hidden_ref->{'txnIds'};
         push @People, \%personData;
     }
 
-print STDERR "AMOUNT DUE: $amountDue vs $unpaid_cost\n";
     my $txn_invoice_url = $Defs::base_url."/printinvoice.cgi?client=$client&amp;rID=$hidden_ref->{'rID'}&amp;pID=$personID";
     my $gatewayConfig = undef;
     if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
@@ -145,7 +143,6 @@ print STDERR "AMOUNT DUE: $amountDue vs $unpaid_cost\n";
 
     my $editlink =  $Data->{'target'}."?".$carryString;
     $hidden_ref->{'payMethod'} = 'notrequired' if (! $amountDue);
-print STDERR "HIDDEN " . $hidden_ref->{'payMethod'};
 
     my %PaymentConfig = (
         totalAmountDue => $amountDue,
@@ -177,7 +174,7 @@ sub displayRegoFlowSummary {
     my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref, $carryString) = @_;
     my $lang=$Data->{'lang'};
 	
-print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~displayRegoFlowSummary $personID\n";
+#print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~displayRegoFlowSummary $personID\n";
     my $ok = 0;
     if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER' or $rego_ref->{'registrationNature'} eq 'TRANSFER') {
         $ok=1;
@@ -348,7 +345,6 @@ $sth = $Data->{'db'}->prepare($query);
 
 		################################################
         $hidden_ref->{'payMethod'} = 'notrequired' if (! $amountDue);
-print STDERR "PAY METHOD = $hidden_ref->{'payMethod'}\n";
         my %PaymentConfig = (
             totalAmountDue => $amountDue,
 			totalPaymentDue => $hidden_ref->{'paymentDue'},
@@ -396,7 +392,6 @@ sub displayRegoFlowComplete {
     my $ok = 1;
     my $run = $hidden_ref->{'run'} || param('run') || 0;
     my $payMethod= $hidden_ref->{'payMethod'} || param('payMethod') || '';
-print STDERR "COMPLETE RUN OK IS $ok | $run\n\n";
     my $body = '';
     my $gateways = '';
     if (!$ok)   {
@@ -585,7 +580,6 @@ sub getPersonRegoTXN    {
 
     my ($Data, $personID, $regoID) = @_;
 
-print STDERR "GETPRTXN\n";
     my $st = qq[
         SELECT curAmount, intTransLogID, intTransactionID, intStatus
         FROM tblTransactions
@@ -683,7 +677,7 @@ sub checkUploadedRegoDocuments {
         $rego_ref,
      );
 
-print STDERR "~~~~~~~~~~~~~~~CHECK UPLOADED REGO DOCUMENTS:$entityRegisteringForLevel $entityID $personID $regoID\n";
+#print STDERR "~~~~~~~~~~~~~~~CHECK UPLOADED REGO DOCUMENTS:$entityRegisteringForLevel $entityID $personID $regoID\n";
 	#check for Approved Documents that do not need to be uploaded
 	my @validdocsforallrego = ();
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
@@ -808,7 +802,7 @@ sub displayRegoFlowDocuments{
 	#				WHERE tblDocuments.intPersonID = ? AND intPersonRegistrationID = ?;	
 	#];
    
-print STDERR "~~~~~~~~~~~~~~~displayRegoFlowDocuments\n";
+#print STDERR "~~~~~~~~~~~~~~~displayRegoFlowDocuments\n";
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
     my $query = qq [
         SELECT
@@ -1383,7 +1377,6 @@ sub bulkRegoCreate  {
         $Settings{'paymentType'} = $paymentType;
         my $logID = createTransLog($Data, \%Settings, $bulk_ref->{'entityID'},\@total_txns_added, $totalAmount);
         processTransLog($Data->{'db'}, '', 'OK', 'OK', 'APPROVED', $logID, \%Settings, undef, undef, '', '', '', '', '', '','',1);
-       print STDERR "MANUAL PAYMENT $logID\n"; 
         UpdateCart($Data, undef, $Data->{'client'}, undef, 'OK', $logID);
         product_apply_transaction($Data,$logID);
     }

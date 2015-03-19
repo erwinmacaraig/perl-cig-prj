@@ -1330,7 +1330,7 @@ sub display_complete {
     my $self = shift;
     my $personObj;
     my $personID = $self->ID();
-print STDERR "~~~IN DISPLAY_COMPLETE\n";
+#print STDERR "~~~IN DISPLAY_COMPLETE\n";
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
     }
@@ -1353,7 +1353,7 @@ print STDERR "~~~IN DISPLAY_COMPLETE\n";
         );
         $regoID = 0 if !$valid;
     }
-print STDERR "~~~IN DISPLAY_COMPLETE FOR $regoID\n";
+#print STDERR "~~~IN DISPLAY_COMPLETE FOR $regoID\n";
 
     if($regoID) {
         $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
@@ -1364,7 +1364,6 @@ print STDERR "~~~IN DISPLAY_COMPLETE FOR $regoID\n";
         my $run = $self->{'RunParams'}{'run'} || 0;
         if($self->{'RunParams'}{'newreg'} and ! $run)  {
 
-print STDERR "~~~IN DISPLAY_COMPLETE $run\n";
         }
 
         my $hiddenFields = $self->getCarryFields();
