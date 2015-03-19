@@ -39,3 +39,5 @@ ALTER TABLE tblTransactions ADD COLUMN intPaymentGatewayResponded TINYINT defaul
 
 ALTER TABLE tblProducts ADD COLUMN strDisplayName VARCHAR(100) NULL AFTER strName;
 
+# 150320_tblTransLog
+ALTER TABLE tblTransLog ADD COLUMN strOnlinePayReference varchar(100) default '' AFTER strTXN;
