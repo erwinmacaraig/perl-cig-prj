@@ -80,7 +80,7 @@ sub handlePayInvoice {
 	if($action eq 'TXN_PAY_INV_RESULT_P'){
 		use Payments;
 		my $success;
-		my $intTransLogID = param('tl') || 0;
+		my $intTransLogID = param('tl') || 0;		
 		($success, $resultHTML) = displayPaymentResult($Data, $intTransLogID, 0) ;
 		if(!$success){
 			use Gateway_Common;

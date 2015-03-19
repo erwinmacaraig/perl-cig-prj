@@ -40,14 +40,16 @@ sub main	{
     $m->add('1234A', $chkvalue);
     $chkvalue = $m->hexdigest();
     my $body = '';
+	
     print qq[Content-type: text/html\n\n];
     if ($chkvalue ne $chkv) {
         $body = 'ERROR WITH CHECKSUM';
-    }
+    }	
     elsif ($action eq 's') {
         $body = NABProcess($client, $external, $amount, $clientTransRefID, $chkv, $formID, $session, $CCV);
     }
     else    {
+		
         $body = PaymentForm(\%Data, $client, $clientTransRefID, \%Order, \%Transactions, $external);
     }
     print $body;
@@ -82,6 +84,7 @@ sub NABProcess  {
         <b>RESPCODE</b> $respCode<br>
         <b>RESPTEXT</b> $respText<br>
         <b>AMOUNT</b> \$$amount<br>
+		<b>Client</b> $client <br />
         <br>$url<br>
         <a href="$return_link">RETURN</a><br>
     $return_link
@@ -106,6 +109,8 @@ sub PaymentForm  {
     $Values{'amount'} = $Order->{'amount'};
     $Values{'client'} = $client;
     $Values{'currency'} = $currency;
+	
+	
     return displayNABCCPage($Data, $logID, \%Values);
 
 }

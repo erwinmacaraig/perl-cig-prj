@@ -745,6 +745,7 @@ sub listTasks {
 		Levels => {
 			CLUB => $Defs::LEVEL_CLUB,
 			NATIONAL => $Defs::LEVEL_NATIONAL,	
+			REGION => $Defs::LEVEL_REGION
 		},
 	);
 

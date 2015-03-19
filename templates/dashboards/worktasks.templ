@@ -282,7 +282,43 @@
             </div>
         </div>
     </div>
-	
+	[% ELSIF CurrentLevel == Levels.REGION %]
+            <div class="advanced-search-fields clearfix">
+                <div>
+                    <span><input type="checkbox" class="role" value="role">[% Lang.txt('Role') %]</span>
+                    <select name="PersonType" id="PersonType" class="chosen">
+                        <option value=""> </option>
+                        [% FOREACH key IN PersonType.keys %]
+							[% NEXT IF key == 'MAOFFICIAL' %]
+                            <option value="[% key %]">[% PersonType.$key %]</option>
+                        [% END %]
+                    </select>
+                </div>
+			    <div>
+                    <span><input type="checkbox" class="task" value="task">[% Lang.txt('Task') %]</span>
+                    <select name="TaskType" id="TaskType" class="chosen">
+                        <option value="">[% Lang.txt('Tasks') %]</option>
+                        <option value="REGO-NEW-COACH">[% Lang.txt('New Coach Registration') %]</option>
+                        <option value="ENTITY-NEW-VENUE">[% Lang.txt('New Facility Registration') %]</option>
+                        <option value="REGO-RENEWAL-COACH">[% Lang.txt('Renewal of Coach Registration') %]</option>
+                    </select>
+                </div>
+
+			<div>
+                <span><input type="checkbox" class="club" value="club">[% Lang.txt('Club') %]</span>
+            </div>
+			<!--
+            <div>
+                <span><input type="checkbox" class="venue" value="venue">[% Lang.txt('Venue') %]</span>
+			</div>
+			-->
+
+           
+				
+
+            </div>
+        </div>
+    </div>
 	[% ELSIF CurrentLevel == Levels.CLUB %]
 	<div class="advanced-search-fields clearfix">
                 <div>
@@ -292,6 +328,7 @@
                         [% FOREACH key IN PersonType.keys %]
 							[% NEXT IF key == 'MAOFFICIAL' %]
 							[% NEXT IF key == 'REFEREE' %]
+							[% NEXT IF key == 'RAOFFICIAL' %]
                             <option value="[% key %]">[% PersonType.$key %]</option>
                         [% END %]
                     </select>

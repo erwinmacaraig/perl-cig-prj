@@ -163,6 +163,7 @@ sub payTryRedirectBack  {
         next if $k =~/^cc_submit/;
         next if $k =~/^pt_submit/;
         $redirect_link .= "&$k=".$payTry->{$k};
+		
     }
     return $redirect_link if ! $autoRun;
 
@@ -281,7 +282,7 @@ sub gatewayProcess {
 		}
 	}
 	elsif ($action eq '1' or $action eq 'S')	{ ## WAS 'S'
-		$body = ExternalGatewayUpdate($Data, $paymentSettings, $client, $returnVals_ref, $logID, $Order->{'AssocID'}); #, $Order, $external, $encryptedID);
+		$body = ExternalGateway::ExternalGatewayUpdate($Data, $paymentSettings, $client, $returnVals_ref, $logID, $Order->{'AssocID'}); #, $Order, $external, $encryptedID);
 	}
 	#disconnectDB($db);
 

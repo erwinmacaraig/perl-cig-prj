@@ -43,8 +43,7 @@ sub main	{
 	my %Data=();
 	$Data{'db'}=$db;
     my $payTry = payTryRead(\%Data, $logID, 0);
-
-my $cgi=new CGI;
+	my $cgi=new CGI;
     my %params=$cgi->Vars();
     print STDERR Dumper(\%params);
 	
@@ -98,6 +97,7 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
     }
 
 	disconnectDB($db);
+	
     if ($process_action eq '1')    {
         payTryContinueProcess(\%Data, $payTry, $client, $logID, 1);
     }

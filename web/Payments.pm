@@ -271,7 +271,7 @@ sub checkoutConfirm	{
 		processTransLog($Data->{'db'}, $txn, 'OK', 'OK', $responsetext, $intLogID, $paymentSettings, undef, undef, '', '', '', '', '', '','',1);
 		UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $intLogID);
 #        EmailPaymentConfirmation($Data, $paymentSettings, $intLogID, $client, $RegoFormObj);
-#        Products::product_apply_transaction($Data,$intLogID);
+         Products::product_apply_transaction($Data,$intLogID);
         return ($intLogID, 0, '', undef) if $payTryReturn;
 		return '';
 	}
@@ -654,6 +654,7 @@ sub displayPaymentResult        {
     my $body = '';
 	my $success=$transref->{'intStatus'};
     #if ($transref->{strResponseCode} eq "1" or $transref->{strResponseCode} eq "OK" or $transref->{strResponseCode} eq "00" or $transref->{strResponseCode} eq "08" or $transref->{strResponseCode} eq 'Success')    {
+	
     if ($transref->{'intStatus'} == $Defs::TXNLOG_SUCCESS)   {
         my $ttime = time();
         $body .= qq[
