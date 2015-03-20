@@ -207,7 +207,7 @@ print STDERR $url;
 
     my $defaultRegistrationNature = $self->{'RunParams'}{'dnat'} || '';
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
-    $content = displayPersonRegisterWhat(
+    $content = PersonRegisterWhat::displayPersonRegisterWhat(
         $self->{'Data'},
         $personID,
         $entityID,
