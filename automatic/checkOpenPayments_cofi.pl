@@ -75,12 +75,11 @@ print STDERR "IN checkOpenPayments\n";
             INNER JOIN tblPaymentConfig as PC ON (PC.intPaymentConfigID = TL.intPaymentConfigID)
 	    INNER JOIN tblPayTry as PT ON (PT.intTransLogID = TL.intLogID)
         WHERE
-            TL.intStatus IN (1)
+            TL.intStatus IN (0,3)
+            AND TL.intPaymentGatewayResponded = 0
             AND PC.strGatewayCode = 'checkoutfi'
 	AND  TL.intSentToGateway = 1 
     ];
-            #TL.intStatus IN (0,3)
-         #   AND TL.intPaymentGatewayResponded = 0
     my $checkURL = 'https://rpcapi.checkout.fi/poll';
     my $query = $db->prepare($st);
     $query->execute();
@@ -126,7 +125,6 @@ print STDERR "IN checkOpenPayments\n";
         $m->add($coKey);
         my $authKey= uc($m->hexdigest());
         $APIResponse{'MAC'} = $authKey;
-print STDERR Dumper(\%APIResponse);
         my $req = POST $checkURL, \%APIResponse;
         my $ua = LWP::UserAgent->new();
         my $res= $ua->request($req);
@@ -135,16 +133,14 @@ print STDERR Dumper(\%APIResponse);
 	next if $retval !~/status/;
 
 
-print STDERR Dumper($retval);
-
         #my $dataIN= XMLin($retval);
 	my $dataIN= XMLin($retval);
 
         print STDERR Dumper($dataIN);
         
         $APIResponse{'STATUS'} = $dataIN->{'status'}; 
+print STDERR Dumper(\%APIResponse);
 print STDERR "API STATUS IS " . $APIResponse{'STATUS'};
-next;
 
         
         $APIResponse{'sa'} = 1;
@@ -204,18 +200,14 @@ next;
             $returnVals{'ResponseText'}= $respTextCode; 
             $returnVals{'Other1'} = $co_status || '';
             $returnVals{'Other2'} = $APIResponse{'MAC'} || '';
-print STDERR "ABOUT TO CALL GATEWAY PROCESS!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
             gatewayProcess(\%Data, $logID, $client, \%returnVals, $chkAction);
         }
 
         if ($process_action eq '1' and ! $dref->{'intProcessPreGateway'})    {
-print STDERR "ABOUT TO CONTINUE PROCESS !!!!!!!!!!!!!!\n";
             payTryContinueProcess(\%Data, $payTry, $client, $logID);
         }
 
     }
-	#disconnectDB($db);
-
 }
 
 1;

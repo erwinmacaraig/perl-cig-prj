@@ -250,15 +250,10 @@ sub gatewayProcess {
 
   my ($paymentSettings, undef) = getPaymentSettings($Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, $external);
 
-
-    ### Might need IF test here per gatewayCode
-  #$returnVals_ref->{'ResponseText'} = NABResponseCodes($returnVals_ref->{'GATEWAY_RESPONSE_CODE'});
-  #$returnVals_ref->{'ResponseCode'} = $returnVals_ref->{'GATEWAY_RESPONSE_CODE'};
-  #if ($returnVals_ref->{'GATEWAY_RESPONSE_CODE'} =~/^00|08|OK$/)  {
-  #  $returnVals_ref->{'ResponseCode'} = 'OK';
-  #}
-
+print STDERR Dumper($paymentSettings);
+print STDERR "ORDER STATUS IS $Order->{'Status'}\n";
     markGatewayAsResponded($Data, $logID);
+	#return if ($Order->{'Status'} == -1 or $Order->{'Status'} == 1);
 
   {
     #my $chkvalue= param('rescode') . $Order->{'TotalAmount'}. $logID; ## NOTE: Different to one being sent
