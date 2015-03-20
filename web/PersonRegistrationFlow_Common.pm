@@ -45,6 +45,7 @@ use InstanceOf;
 use EntityTypeRoles;
 use PersonSummaryPanel;
 use PersonCertifications;
+use Switch;
 
 sub displayRegoFlowCompleteBulk {
 
@@ -514,10 +515,14 @@ print STDERR "000OK IS $ok | $run\n\n";
         $tempClientValues{personID} = $personID;
         my $tempClient = setClient(\%tempClientValues);
 
-       $cv{'entityID'} = $maObj->getValue('intEntityID');
-       $cv{'currentLevel'} = $Defs::LEVEL_NATIONAL;
-       my $mlm = setClient(\%cv);
+#       $cv{'entityID'} = $maObj->getValue('intEntityID');
+#       $cv{'currentLevel'} = $Defs::LEVEL_NATIONAL;
+#       my $mlm = setClient(\%cv);
 
+    $cv{'entityID'} = getID($Data->{'ClientValues'}, $Data->{'ClientValues'}{'authLevel'});
+    $cv{'currentLevel'} = $originLevel;
+    my $originClient = setClient(\%cv);
+   
         my %PageData = (
             person_home_url => $url,
 			person => \%personData,
@@ -533,8 +538,9 @@ print STDERR "000OK IS $ok | $run\n\n";
             dtypeText => $Defs::personType{$hidden_ref->{'dtype'}} || '',
             client=>$clm,
             clientrego=>$tempClient,
-            maclient => $mlm,
+            #maclient => $mlm,
             originLevel => $originLevel,
+            originClient => $originClient,
             PersonSummaryPanel => personSummaryPanel($Data, $personObj->ID()),
         );
         
