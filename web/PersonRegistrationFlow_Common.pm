@@ -146,6 +146,7 @@ sub displayRegoFlowSummaryBulk  {
 
     my %PaymentConfig = (
         totalAmountDue => $amountDue,
+			totalPaymentDue => $amountDue,
         dollarSymbol => $Data->{'SystemConfig'}{'DollarSymbol'} || '$',
         paymentMethodText => $Defs::paymentMethod{$hidden_ref->{'payMethod'}} || '',
     );
@@ -347,7 +348,7 @@ $sth = $Data->{'db'}->prepare($query);
         $hidden_ref->{'payMethod'} = 'notrequired' if (! $amountDue);
         my %PaymentConfig = (
             totalAmountDue => $amountDue,
-			totalPaymentDue => $hidden_ref->{'paymentDue'},
+			totalPaymentDue => $amountDue,
             dollarSymbol => $Data->{'SystemConfig'}{'DollarSymbol'} || '$',
             paymentMethodText => $Defs::paymentMethod{$hidden_ref->{'payMethod'}} || '',
         );

@@ -29,7 +29,7 @@ use Products;
 
 use Digest::SHA qw(hmac_sha256_hex);
 use HTTP::Request::Common qw(POST);
-#use XML::Simple;
+use XML::Simple;
 
 #use Crypt::CBC;
 
@@ -62,55 +62,56 @@ print STDERR "IN checkOpenPayments\n";
      
     my $st = qq[
         SELECT
-            intLogID,
+	DISTINCT
+            TL.intLogID,
             TL.intAmount,
             PC.strGatewayUsername,
             PC.strGatewayPassword,
-            PC.strCurrency
+            PC.strCurrency,
+			PC.intProcessPreGateway	,
+		PT.strPayReference
         FROM
             tblTransLog as TL
             INNER JOIN tblPaymentConfig as PC ON (PC.intPaymentConfigID = TL.intPaymentConfigID)
+	    INNER JOIN tblPayTry as PT ON (PT.intTransLogID = TL.intLogID)
         WHERE
-            TL.intLogID=10053
-            AND TL.intSentToGateway = 1 
+            TL.intStatus IN (0,3)
+            AND TL.intPaymentGatewayResponded = 0
             AND PC.strGatewayCode = 'checkoutfi'
-        LIMIT 1
+	AND  TL.intSentToGateway = 1 
     ];
-            #TL.intStatus IN (1)
-            #AND TL.intPaymentGatewayResponded = 0
-            #TL.intStatus IN (0,3)
     my $checkURL = 'https://rpcapi.checkout.fi/poll';
     my $query = $db->prepare($st);
     $query->execute();
     while (my $dref = $query->fetchrow_hashref())   {
 	my %Data=();
 	$Data{'db'}=$db;
-
-	    my $logID= $dref->{'intLogID'};
+        $Data{'Realm'} = 1;
+        $Data{'SystemConfig'}=getSystemConfig(\%Data);
+        my $payTry = payTryRead(\%Data, $dref->{'strPayReference'}, 1);
+	my $logID= $payTry->{'intTransLogID'};
+	next if ! $logID;
         next if ! $dref->{'intAmount'};
         ## LOOK UP tblPayTry
-        my $payTry = payTryRead(\%Data, $logID, 0);
 
         my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
         $Data{'lang'}=$lang;
         getDBConfig(\%Data);
+        ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
 
         $Data{'clientValues'} = $payTry;
         my $client= setClient(\%{$payTry});
         $Data{'client'}=$client;
 
         $Data{'sessionKey'} = $payTry->{'session'};
-        ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
-        $Data{'SystemConfig'}=getSystemConfig(\%Data);
         initLocalisation(\%Data);
-
 
 
         print STDERR "CHECK FOR $logID\n";
         my %APIResponse=();
         my $cents = $dref->{'intAmount'} * 100;
         $APIResponse{'VERSION'} = "0001";
-        $APIResponse{'STAMP'} = $logID;
+        $APIResponse{'STAMP'} = $Data{'SystemConfig'}{'paymentPrefix'}.$logID;
         $APIResponse{'REFERENCE'} = $logID;
         $APIResponse{'MERCHANT'} = $dref->{'strGatewayUsername'};
         $APIResponse{'AMOUNT'} = $cents;
@@ -128,14 +129,18 @@ print STDERR "IN checkOpenPayments\n";
         my $ua = LWP::UserAgent->new();
         my $res= $ua->request($req);
         my $retval = $res->content() || '';
+	next if $retval =~/error/;
+	next if $retval !~/status/;
 
-print STDERR Dumper($retval);
 
-        #my $dataIN= XML::Simple($retval);
+        #my $dataIN= XMLin($retval);
+	my $dataIN= XMLin($retval);
 
-        #print STDERR Dumper($dataIN);
+        print STDERR Dumper($dataIN);
         
-        $APIResponse{'STATUS'} = 2; 
+        $APIResponse{'STATUS'} = $dataIN->{'status'}; 
+print STDERR Dumper(\%APIResponse);
+print STDERR "API STATUS IS " . $APIResponse{'STATUS'};
 
         
         $APIResponse{'sa'} = 1;
@@ -165,7 +170,6 @@ print STDERR Dumper($retval);
             
             ########
             my ($Order, $Transactions) = gatewayTransactions(\%Data, $logID);
-            markGatewayAsResponded(\%Data, $logID); 
             my ($paymentSettings, undef) = getPaymentSettings(\%Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, 1);
             ########
 
@@ -190,22 +194,20 @@ print STDERR Dumper($retval);
             $returnVals{'GATEWAY_RESPONSE_TEXT'}= $APIResponse{'REFERENCE'} || '';
             $returnVals{'GatewayResponseCode'}= $co_status;
             $returnVals{'ResponseCode'}= $returnVals{'GATEWAY_RESPONSE_CODE'};
+            markGatewayAsResponded(\%Data, $logID);# if $returnVals{'GATEWAY_RESPONSE_CODE'} ne 'HOLD'; 
 
            my $respTextCode = $FIN_coResponseText{$co_status} || '';
             $returnVals{'ResponseText'}= $respTextCode; 
             $returnVals{'Other1'} = $co_status || '';
             $returnVals{'Other2'} = $APIResponse{'MAC'} || '';
-print STDERR "ABOUT TO CALL GATEWAY PROCESS!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
             gatewayProcess(\%Data, $logID, $client, \%returnVals, $chkAction);
         }
 
-        if ($process_action eq '1')    {
+        if ($process_action eq '1' and ! $dref->{'intProcessPreGateway'})    {
             payTryContinueProcess(\%Data, $payTry, $client, $logID);
         }
 
     }
-	#disconnectDB($db);
-
 }
 
 1;

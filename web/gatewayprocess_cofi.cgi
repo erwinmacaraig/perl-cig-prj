@@ -38,17 +38,25 @@ sub main	{
     ## Need one of these PER gateway
 print STDERR "IN GATEWAYPROCESS_cofi\n";
 
-	my $logID= param('STAMP') || param('ci') || 0;
-	my $submit_action= param('sa') || '';
-	my $display_action= param('da') || '';
-    my $process_action= param('pa') || '';
-
     my $db=connectDB();
 	my %Data=();
 	$Data{'db'}=$db;
 	$Data{'Realm'}=1;
+    getDBConfig(\%Data);
+    $Data{'SystemConfig'}=getSystemConfig(\%Data);
+
+	my $payRef= param('STAMP') || param('ci') || '';
+	my $submit_action= param('sa') || '';
+	my $display_action= param('da') || '';
+    my $process_action= param('pa') || '';
+
     ## LOOK UP tblPayTry
-    my $payTry = payTryRead(\%Data, $logID, 0);
+    my $payTry = payTryRead(\%Data, $payRef, 1);
+use Data::Dumper;
+print STDERR Dumper($payTry);
+	my $logID = $payTry->{'intTransLogID'};
+
+print STDERR "LOG IS $logID\n";
 
 my $cgi=new CGI;
     my %params=$cgi->Vars();
@@ -64,10 +72,12 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
     #$Data{'clientValues'} = \%clientValues;
 
     $Data{'sessionKey'} = $payTry->{'session'};
-    getDBConfig(\%Data);
-    $Data{'SystemConfig'}=getSystemConfig(\%Data);
     initLocalisation(\%Data);
 
+########
+my ($Order, $Transactions) = gatewayTransactions(\%Data, $logID);
+my ($paymentSettings, undef) = getPaymentSettings(\%Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, 1);
+########
     # Do they update
     if ($submit_action eq '1') {
         my %returnVals = ();
@@ -77,17 +87,13 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
 
         my %Vals = ();
         $Vals{'VERSION'}= param('VERSION') || '';
-        $Vals{'STAMP'}= param('STAMP') || '';
+        $Vals{'STAMP'}= $payRef; #param('STAMP') || '';
         $Vals{'REFERENCE'}= param('REFERENCE') || '';
         $Vals{'PAYMENT'}= param('PAYMENT') || '';
         $Vals{'STATUS'}= param('STATUS') || '';
         $Vals{'ALGORITHM'}= param('ALGORITHM') || '';
         $Vals{'MAC'}= param('MAC') || '';
         
-########
-my ($Order, $Transactions) = gatewayTransactions(\%Data, $logID);
-my ($paymentSettings, undef) = getPaymentSettings(\%Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, 1);
-########
 
         my $str = "$Vals{'VERSION'}&$Vals{'STAMP'}&$Vals{'REFERENCE'}&$Vals{'PAYMENT'}&$Vals{'STATUS'}&$Vals{'ALGORITHM'}";
         my $digest=uc(hmac_sha256_hex($str, $paymentSettings->{'gatewayPassword'}));
@@ -144,7 +150,7 @@ print STDERR "MAC ACTION IS $chkAction\n";
     }
 
 	disconnectDB($db);
-    if ($process_action eq '1')    {
+    if (! $paymentSettings->{'gatewayProcessPreGateway'} and $process_action eq '1')    {
         payTryContinueProcess(\%Data, $payTry, $client, $logID);
         $payTry->{'run'} = 1;
         print "Content-type: text/html\n\n" if (! $display_action);

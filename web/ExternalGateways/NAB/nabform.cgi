@@ -22,6 +22,7 @@ sub main	{
     my $client = param('client') || 0;
     my $external= param('ext') || 0;
     my $clientTransRefID= param('ci') || 0;
+    my $logID= param('logID') || 0;
     my $encryptedID= param('ei') || 0;
     my $noheader= param('nh') || 0;
     my $chkv= param('chkv') || 0;
@@ -42,15 +43,23 @@ sub main	{
     my $body = '';
 	
     print qq[Content-type: text/html\n\n];
-    if ($chkvalue ne $chkv) {
-        $body = 'ERROR WITH CHECKSUM';
-    }	
+	
     elsif ($action eq 's') {
         $body = NABProcess($client, $external, $amount, $clientTransRefID, $chkv, $formID, $session, $CCV);
     }
     else    {
 		
         $body = PaymentForm(\%Data, $client, $clientTransRefID, \%Order, \%Transactions, $external);
+
+    #if ($chkvalue ne $chkv) {
+    #    $body = 'ERROR WITH CHECKSUM';
+    #}
+    if ($action eq 's') {
+        $body = NABProcess($client, $external, $amount, $logID, $chkv, $formID, $session, $CCV, $clientTransRefID);
+    }
+    else    {
+        $body = PaymentForm(\%Data, $client, $logID, \%Order, \%Transactions, $external, $clientTransRefID);
+>>>>>>> 826f1a3a725eae89c2af6bd6fe1a9e7989214e9c
     }
     print $body;
 }
@@ -58,19 +67,20 @@ sub main	{
 sub NABProcess  {
     #call SPOnline
 
-    my ($client, $external, $amount, $logID, $chkv, $formID, $session, $CCV) = @_;
+    my ($client, $external, $amount, $logID, $chkv, $formID, $session, $CCV, $clientTransRefID) = @_;
 
     my $respCode = $CCV || '';
     my $respText = 'Approved';
     $respText = 'Error' if ($respCode !~/^00|08|11$/);
     my $chkvalue= $respCode . $amount . $logID; #Different checkvalue for way back
+print STDERR "VVVVVV $chkvalue\n";
     my $m = new MD5;
     $m->reset();
     $m->add('1234A', $chkvalue);
     $chkvalue = $m->hexdigest();
        
-    my $url = $Defs::gatewayReturnDemo . qq[/gatewayprocess.cgi?pa=1&amp;sa=1&amp;da=0&amp;client=$client&amp;ext=$external&amp;ci=$logID&amp;chkv=$chkvalue&amp;formID=$formID&amp;session=$session&amp;restext=$respText&amp;rescode=$respCode&amp;txnid=111&amp;authid=123];
-    my $return_link = $Defs::gatewayReturnDemo . qq[/gatewayprocess.cgi?sa=0&amp;da=1&amp;client=$client&amp;ext=$external&amp;ci=$logID&amp;chkv=$chkvalue&amp;formID=$formID&amp;session=$session&amp;restext=$respText&amp;rescode=$respCode&amp;txnid=111&amp;authid=123];
+    my $url = $Defs::gatewayReturnDemo . qq[/gatewayprocess.cgi?pa=1&amp;sa=1&amp;da=0&amp;client=$client&amp;ext=$external&amp;ci=$clientTransRefID&amp;chkv=$chkvalue&amp;formID=$formID&amp;session=$session&amp;restext=$respText&amp;rescode=$respCode&amp;txnid=111&amp;authid=123];
+    my $return_link = $Defs::gatewayReturnDemo . qq[/gatewayprocess.cgi?sa=0&amp;da=1&amp;client=$client&amp;ext=$external&amp;ci=$clientTransRefID&amp;chkv=$chkvalue&amp;formID=$formID&amp;session=$session&amp;restext=$respText&amp;rescode=$respCode&amp;txnid=111&amp;authid=123];
 
 #    if (1==2)   {
         my $agent = LWP::UserAgent->new(env_proxy => 1,keep_alive => 1, timeout => 30); 
@@ -93,7 +103,7 @@ sub NABProcess  {
 
 sub PaymentForm  {
 
-	my ($Data, $client, $logID, $Order, $Transactions, $external) = @_;
+	my ($Data, $client, $logID, $Order, $Transactions, $external, $clientTransRefID) = @_;
 	my $cgi = new CGI;
 
     my $currency='AUD';
@@ -109,14 +119,14 @@ sub PaymentForm  {
     $Values{'amount'} = $Order->{'amount'};
     $Values{'client'} = $client;
     $Values{'currency'} = $currency;
-	
-	
-    return displayNABCCPage($Data, $logID, \%Values);
+
+    return displayNABCCPage($Data, $logID, $clientTransRefID, \%Values);
+
 
 }
 
 sub displayNABCCPage    {
-    my ($Data, $logID, $NAB_ref) = @_;
+    my ($Data, $logID, $clientTransRefID, $NAB_ref) = @_;
     my $base_url = 'http://emacaraig.spildevel/FIFASPOnline/web';
 
   my $expiryMonth = qq[
@@ -196,7 +206,8 @@ sub displayNABCCPage    {
       		<input type="hidden" name="EPS_FINGERPRINT" value="$NAB_ref->{'EPS_FINGERPRINT'}">
       		<input type="hidden" name="EPS_RESULTURL" value="$EPS_RESULTURL">
 
-      		<input type="hidden" name="ci" value="$logID">
+      		<input type="hidden" name="logID" value="$logID">
+      		<input type="hidden" name="ci" value="$clientTransRefID">
       		<input type="hidden" name="amount" value="$NAB_ref->{'amount'}">
       		<input type="hidden" name="chkv" value="$NAB_ref->{'chkv'}">
       		<input type="hidden" name="client" value="$NAB_ref->{'client'}">

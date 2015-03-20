@@ -1,10 +1,10 @@
 package GatewayProcess;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT=qw(gatewayProcess payTryRead payTryRedirectBack payTryContinueProcess markTXNSentToGateway markGatewayAsResponded);
-@EXPORT_OK=qw(gatewayProcess payTryRead payTryRedirectBack payTryContinueProcess markTXNSentToGateway markGatewayAsResponded);
+@EXPORT=qw(gatewayProcess payTryRead payTryRedirectBack payTryContinueProcess markTXNSentToGateway markGatewayAsResponded calcPayTryRef);
+@EXPORT_OK=qw(gatewayProcess payTryRead payTryRedirectBack payTryContinueProcess markTXNSentToGateway markGatewayAsResponded calcPayTryRef);
 
-use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
+use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user" ;
 
 use strict;
 use DBI;
@@ -27,6 +27,15 @@ use TransferFlow;
 use BulkRenewalsFlow;
 
 use Data::Dumper;
+
+sub calcPayTryRef	{
+	my ($prefix, $logID) = @_;
+
+	$prefix ||= '';
+	my $value = $prefix.$logID;
+	
+	return $value;
+}
 
 sub markTXNSentToGateway    {
 
@@ -65,6 +74,7 @@ sub markGatewayAsResponded  {
             TL.intPaymentGatewayResponded = 1, T.intPaymentGatewayResponded= 1
         WHERE
             TL.intLogID = ?
+	    AND TL.intStatus NOT IN (3)
     ];
     my $query = $Data->{'db'}->prepare($stUPD);
     $query->execute($logID);
@@ -83,6 +93,7 @@ sub markGatewayAsResponded  {
             TL.intLogID = ?
             AND t.intPersonRegistrationID > 0
             AND TXN.intTableType = $Defs::LEVEL_PERSON
+	    AND TL.intStatus NOT IN (3)
     ];
     my $q= $Data->{'db'}->prepare($st);
     $q->execute($logID);
@@ -104,6 +115,7 @@ sub markGatewayAsResponded  {
                 TL.intLogID = ?
                 AND TXN.intTableType = $Defs::LEVEL_CLUB
                 AND t.strTaskStatus = 'ACTIVE'
+	    	AND TL.intStatus NOT IN (3)
         ];
         $q= $Data->{'db'}->prepare($st);
         $q->execute($logID);
@@ -191,9 +203,9 @@ sub payTryRead  {
 
     my $where = qq[intTransLogID = ?];
     my $id = $logID;
-    if (! $logID and $try)  {
-        $where = qq[intTryID = ?];
-        $id = $try;;
+    if ($logID and $try)  {
+        $where = qq[strPayReference = ?];
+        #$id = $try;
     }
     return undef if (! $logID and ! $try);
     my $st = qq[
@@ -209,6 +221,8 @@ sub payTryRead  {
     my $href = $query->fetchrow_hashref();
     my $values = JSON::from_json($href->{'strLog'});
     $values->{'strContinueAction'} = $href->{'strContinueAction'};
+    $values->{'intTransLogID'} = $href->{'intTransLogID'};
+    $values->{'strPayReference'} = $href->{'strPayReference'};
     return $values;
 }
 
@@ -237,15 +251,10 @@ sub gatewayProcess {
 
   my ($paymentSettings, undef) = getPaymentSettings($Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, $external);
 
-
-    ### Might need IF test here per gatewayCode
-  #$returnVals_ref->{'ResponseText'} = NABResponseCodes($returnVals_ref->{'GATEWAY_RESPONSE_CODE'});
-  #$returnVals_ref->{'ResponseCode'} = $returnVals_ref->{'GATEWAY_RESPONSE_CODE'};
-  #if ($returnVals_ref->{'GATEWAY_RESPONSE_CODE'} =~/^00|08|OK$/)  {
-  #  $returnVals_ref->{'ResponseCode'} = 'OK';
-  #}
-
+print STDERR Dumper($paymentSettings);
+print STDERR "ORDER STATUS IS $Order->{'Status'}\n";
     markGatewayAsResponded($Data, $logID);
+	#return if ($Order->{'Status'} == -1 or $Order->{'Status'} == 1);
 
   {
     #my $chkvalue= param('rescode') . $Order->{'TotalAmount'}. $logID; ## NOTE: Different to one being sent
@@ -282,6 +291,7 @@ sub gatewayProcess {
 		}
 	}
 	elsif ($action eq '1' or $action eq 'S')	{ ## WAS 'S'
+
 		$body = ExternalGateway::ExternalGatewayUpdate($Data, $paymentSettings, $client, $returnVals_ref, $logID, $Order->{'AssocID'}); #, $Order, $external, $encryptedID);
 	}
 	#disconnectDB($db);
