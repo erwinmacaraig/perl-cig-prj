@@ -14,6 +14,10 @@
 		[% TopJSInline %]
     <script type="text/javascript" src="js/dropzone.js"></script>
 		<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
+    
+    <link href="css/jasny-bootstrap.min.css" rel="stylesheet">
+    <link href="css/navmenu-push.css" rel="stylesheet">
+
     <link rel="stylesheet" type="text/css" href="css/style.css?2012022201">
     <link rel="stylesheet" type="text/css" href="js/chosen/chosen.min.css">
     <link rel="stylesheet" type="text/css" href="css/fc_styles.css">
@@ -54,6 +58,7 @@
 	<header>
 		[% GlobalNav %]
 		<nav class="clearfix navbar navbar-default" role="navigation">
+      <div class="defaultnav" style="display:block;">
 			<div class="container">
 				<div class="row">
           <div class="navbar-header">
@@ -70,6 +75,24 @@
 					</div>
 				</div>
 			</div>
+      </div>
+      
+      <div class="smartphonenav" style="display:block;">
+      <div class="navmenu navmenu-default navmenu-fixed-left offcanvas">
+      <div class="smartphoneheader">
+      <a title="" href="#"><img alt="" src="images/FAS-logo.png" class="header-logo"></a>
+      </div>
+      [% NavBar %]
+      </div>
+
+      <div class="navbar navbar-default navbar-fixed-top">
+        <button type="button" class="navbar-toggle" data-toggle="offcanvas" data-target=".navmenu" data-canvas="body">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+      </div>
+      </div>
 		</nav>	
 	</header>
 
@@ -118,6 +141,7 @@
           <script type="text/javascript" src="js/fc-navs.js"></script>
           <script type="text/javascript" src="js/fcToggle.js"></script>
           <script type="text/javascript" src="js/fc-quicksearch.js"></script>
+          <script src="js/jasny-bootstrap.min.js"></script>
           [% BottomJSFiles %]
           [% BottomJSInline %]
           [% StatsCounter %]

@@ -2264,7 +2264,7 @@ header nav.navbar-default .navbar-nav > li > a {
   div#content div.member-home-page div.task-actions.txtright {
   	margin-bottom: 10px;
   }
-  .dash-heading, .pageHeading {
+  .pageHeading {
   	color: #000;
     font-size: 25px;
     margin-top: 15px;
@@ -2283,6 +2283,7 @@ header nav.navbar-default .navbar-nav > li > a {
   #worktasks_length { display: none; }
   #worktasks_filter { text-align: right; }
   .summaryPanel { display: none; }
+  div.dataTables_filter label { color: #000; }
 
 }
 @media (min-width: 250px) and (max-width: 480px) {
@@ -2308,7 +2309,8 @@ header nav.navbar-default .navbar-nav > li > a {
   .dataTables_info, .dataTables_length, .order-override { display: none; }
 	div#worktasks_filter {
 	    background-color: #1870a5;
-	    padding: 10px 0;
+	    margin-top: 5px;
+    	padding: 10px 0;
 	}
 	div#worktasks_filter label input {
     padding: 5px;
@@ -2340,16 +2342,22 @@ header nav.navbar-default .navbar-nav > li > a {
     padding-left: 0;
     padding-right: 0;
   }
-  .dash-heading, .pageHeading {
-  	color: #fff;
-    font-size: 11px;
-    margin-top: 0px;
-    text-align: center;
-    position: fixed;
-    top: 10px;
-    width: 100%;
+  .dataTables_wrapper {
+    margin-top: -20px;
+    padding-left: 0;
+    padding-right: 0;
   }
-
+  .dash-heading, .pageHeading {
+    color: #fff;
+    font-size: 11px;
+    margin-left: 60px;
+    margin-top: 0;
+    position: fixed;
+    text-align: center;
+    top: 10px;
+    width: 65%;
+    z-index: 10000;
+  }
   header nav.navbar-default .navbar-header .navbar-toggle {
   	z-index: 1;
   	top: 0px;
@@ -2391,7 +2399,9 @@ header nav.navbar-default .navbar-nav > li > a {
   .progressFlow .col-md-2{ width: 100%; }
   h2.main-heading { font-size: 18px; margin-top: 0px; }
   table#worktasks.dataTable { margin-top: 0px !important; }
-  div.dataTables_filter label { color: #fff; }
+  table#grid { margin-top: 0px !important; }}
+  table th { font-size: 13px; }
+  div.dataTables_filter label { color: #000; }
   .sidebar-box:nth-child(0) { display: none; }
   .sidebar-box:nth-child(1) { display: none; }
   .sidebar-box:nth-child(3) { display: none; }
@@ -2411,8 +2421,17 @@ header nav.navbar-default .navbar-nav > li > a {
     width: 100%;
     margin-bottom: 0px;
    }
+   .smartphoneheader { 
+   		background: none repeat scroll 0 0 #085a8c;
+   		text-align: center;
+   		padding: 20px 10px;
+   		width: 105%;
+   }
+
+   
+   .smartphoneheader img.header-logo { max-width: 125px; }
    .footer-section.section { height: 20px; }
-   .navbar-nav { margin-left: -16px; }
+   .navbar-nav { margin-left: -1px; }
    .progressFlow .col-md-2.previous.step.step-3 { width: 100%; }
    .panel-body p.reg-text { font-size: 13px; }
    .taskListCounter { left: 35%; }

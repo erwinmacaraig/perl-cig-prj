@@ -272,6 +272,12 @@ $(document).ready(function(){
             jQuery("#menu .subnav").addClass("dropdown").removeClass("subnav");
             jQuery("#menu .dropdown a.menutop").addClass("dropdown-toggle").removeClass("menutop").attr("aria-expanded", true).attr("role", "button").attr("data-toggle", "dropdown");
             jQuery("#menu .dropdown ul").addClass("dropdown-menu").attr("role", "menu");
+            
+            jQuery(".defaultnav").attr("style", "display:none;");
+            jQuery(".smartphonenav").attr("style", "display:block;");
+        }else{
+            jQuery(".defaultnav").attr("style", "display:block;");
+            jQuery(".smartphonenav").attr("style", "display:none;");
         }
         
     $(window).resize(function() {
@@ -279,10 +285,17 @@ $(document).ready(function(){
             jQuery("#menu .subnav").addClass("dropdown").removeClass("subnav");
             jQuery("#menu .dropdown a.menutop").addClass("dropdown-toggle").removeClass("menutop").attr("aria-expanded", true).attr("role", "button").attr("data-toggle", "dropdown");
             jQuery("#menu .dropdown ul").addClass("dropdown-menu").attr("role", "menu");
+        
+            jQuery(".defaultnav").attr("style", "display:none;");
+            jQuery(".smartphonenav").attr("style", "display:block;");
+        }else{
+            jQuery(".defaultnav").attr("style", "display:block;");
+            jQuery(".smartphonenav").attr("style", "display:none;");
         }
     });   
 
 });
+/*
 $(window).scroll(function() {
 
     if ($(this).scrollTop()>0)
@@ -295,7 +308,8 @@ $(window).scroll(function() {
             $('.pageHeading').fadeIn();
         }
      }
- });
+});
+*/
 jQuery(document).ready(function(){
 
     jQuery('a.btn-proceed').each(function() {
