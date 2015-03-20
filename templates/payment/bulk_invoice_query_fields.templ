@@ -1,14 +1,15 @@
-
+		[% IF displayMessage %]
 				<div class="alert">
 					<div>
 						<span class="fa fa-exclamation"></span>
 						[% IF invoiceNumber.length > 0 %] 
 							[% Lang.txt('Payment Has Been Made For Invoice') %]: <strong>[% invoiceNumber %]</strong> 
 						[% ELSE %] 
-							[% Lang.txt('No such transaction for that invoice number') %]
+							[% Lang.txt('No such transaction for invoice number') %]:  <strong>[% displayMessage %]</strong>
 						[% END %]	
 					</div>
 				</div>
+		[% END %]
 		   		
 <div>
 	<div class="fieldSectionGroupWrapper">		

@@ -66,7 +66,7 @@ sub handlePayInvoice {
 	if($action eq 'TXN_PAY_INV_QUERY_INFO'){
 		$resultHTML = queryInvoiceByOtherInfo($Data, $clubID, $client);
 		if(!$resultHTML){
-			$resultHTML = '
+			$resultHTML = $Data->{'lang'}->txt('
 			<div class="col-md-12 error-alerts">
 				<div class="alert">
 					<div>
@@ -74,7 +74,7 @@ sub handlePayInvoice {
 						No Results Found.
 					</div>
 				</div>
-		   </div>';
+		   </div>');
 		}
 	}
 
@@ -115,10 +115,11 @@ sub displayQueryByInvoiceField {
 sub displayQueryByOtherInfoFields {  
 	my ($Data, $client, $invoiceNumber) = @_; 
 	
-	my $query = qq[SELECT strInvoiceNumber FROM  tblInvoice INNER JOIN tblTransactions ON tblTransactions.intInvoiceID = tblInvoice.intInvoiceID WHERE intStatus = 1 AND intTransLogID <> 0 AND tblTransactions.intRealmID = $Data->{'Realm'} AND strInvoiceNumber = '$invoiceNumber'];	
-	my $sth = $Data->{'db'}->prepare($query);
-	$sth->execute();
-	my $dref = $sth->fetchrow_hashref();
+		my $query = qq[SELECT strInvoiceNumber FROM  tblInvoice INNER JOIN tblTransactions ON tblTransactions.intInvoiceID = tblInvoice.intInvoiceID WHERE intStatus = 1 AND intTransLogID <> 0 AND tblTransactions.intRealmID = $Data->{'Realm'} AND strInvoiceNumber = '$invoiceNumber'];	
+		my $sth = $Data->{'db'}->prepare($query);
+		$sth->execute();
+		my $dref = $sth->fetchrow_hashref();
+	
 	
 	my $natPeriod = NationalReportingPeriod::getPeriods($Data);
 	my %OtherFormFields = (
@@ -142,6 +143,7 @@ sub displayQueryByOtherInfoFields {
       		a => 'TXN_PAY_INV_QUERY_INFO',
     	},
 		invoiceNumber => $dref->{'strInvoiceNumber'} || '',
+		displayMessage => $invoiceNumber,
 		Lang => $Data->{'lang'},
 	);
 
@@ -157,6 +159,7 @@ sub queryInvoiceByNumber {
 	my ($action, $Data, $invoiceNumber, $client) = @_; 
 	
 	my $convertedInvoiceNumberToTXNID = invoiceNumToTXN($invoiceNumber);
+	
 	my $content = '';
 	my $results = 0;
 	my @rowdata = ();
@@ -204,7 +207,25 @@ sub queryInvoiceByNumber {
 		};
 		
 	}
- 	
+ 	if($results){
+		#check if invoiceNumber is partially paid
+		$query = qq[SELECT strInvoiceNumber FROM  tblInvoice INNER JOIN tblTransactions ON tblTransactions.intInvoiceID = tblInvoice.intInvoiceID WHERE intStatus = 1 AND intTransLogID <> 0 AND tblTransactions.intRealmID = $Data->{'Realm'} AND strInvoiceNumber = '$invoiceNumber'];
+		$sth = $Data->{'db'}->prepare($query);
+		$sth->execute();
+	    my @darr = $sth->fetchrow_array();
+		if(scalar @darr){
+			$content = $Data->{'lang'}->txt('<div class="alert">
+					<div>
+						<span class="fa fa-exclamation"></span>
+						Invoice Partially Paid.
+					</div>
+				</div>');
+		}
+		
+
+	}
+
+
 	#my $body = displayResults($Data,\@rowdata,$client);
 my @headers = (
 	{
@@ -291,9 +312,10 @@ my @headers = (
         hidden_ref => \%Hidden,
 		transactions => $selectPay,
 	);
-    my $body = runTemplate($Data, \%PageData, 'payment/bulkinvoicelisting.templ') || '';
-	return $body if($results);
-	return $results;
+	 my $body = $content;
+     $body .= runTemplate($Data, \%PageData, 'payment/bulkinvoicelisting.templ') || '';
+	 return $body if($results);
+	 return $results;
 	
 }
 
