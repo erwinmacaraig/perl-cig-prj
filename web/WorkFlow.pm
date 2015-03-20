@@ -92,6 +92,7 @@ sub checkRulePaymentFlagActions {
             AND T.intPersonRegistrationID = ?
         ORDER BY intWFTaskID DESC LIMIT 1
     ];
+print STDERR $st;
 
     my $q= $Data->{'db'}->prepare($st);
     $q->execute($personID, $entityID, $personRegistrationID) or print STDERR "DB ERRIR";
