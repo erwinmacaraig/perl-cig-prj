@@ -593,12 +593,6 @@ sub getTransList {
     my $lang = $Data->{'lang'};
     my @headers = (
     {
-        name => 'Check', 
-        name => $lang->txt('Invoice Number'), 
-        field => 'strInvoiceNumber', 
-        width => 20
-    },
-    {
         name => $lang->txt('Select'), 
         field => 'manual_payment', 
         type => 'HTML', 
@@ -707,7 +701,7 @@ sub getTransList {
                 $row_data->{stuff} = ($allowUD) 
                       ? qq[<a href="main.cgi?a=P_TXN_DEL&client=$client&tID=$row->{intTransactionID}">].$Data->{'lang'}->txt('Delete Transaction').qq[</a>]
                       : '';
-                $row_data->{manual_payment} = qq[<input type="checkbox" name="act_$row->{intTransactionID}" value="" class = "paytxn_chk">];
+                $row_data->{manual_payment} = qq[<input type="checkbox" name="act_$row->{intTransactionID}" value="$row->{curAmount}" class = "paytxn_chk">];
             }
             else {
               $row_data->{stuff} = '';
@@ -933,7 +927,7 @@ sub listTransactions {
 	    my $paymentType = $Data->{params}{paymentType} || 0;
         my (undef, $paymentTypes) = getPaymentSettings($Data, $paymentType, 0, $tempClientValues_ref);
     
-        my $CC_body = qq[<div id = "payment_cc" style= "display:block;"><br>];
+        my $CC_body = qq[<div id="payment_cc" style="display:none;"><br>];
         my $gatewayCount = 0;
         foreach my $gateway (@{$paymentTypes})  {
             $gatewayCount++;
@@ -972,7 +966,8 @@ sub listTransactions {
       $allowMP = 0 if !$personID and $entityID;
       $allowMP = 0 if $Data->{'SystemConfig'}{'DontAllowManualPayments'};
       $allowMP = 0 if $Data->{'SystemConfig'}{'AssocConfig'}{'DontAllowManualPayments'};
-		  
+		$allowMP = 1;	 
+	#### REMOVE THE LINE ABOVE AFTER TESTING ###### 
 		$body=qq[
             <script type="text/javascript">
                 var clicked;
@@ -1018,7 +1013,7 @@ sub listTransactions {
                 </script>			  
 
         ];
-
+		# <input type="text" id="intAmountForManualPay" name="intAmount" value="$Data->{params}{intAmount}" id="l_intAmount" size="10"  />
         $body .= qq[
 			<h3 class="panel-header">].$lang->txt('Manual Payment').qq[</h3>
             <div class = "panel-body">
@@ -1029,7 +1024,7 @@ sub listTransactions {
 					<tr>
 						<td class="label"><label for="l_intAmount">].$lang->txt('Amount (ddd.cc)').qq[</label>:</td>
 						<td class="value">
-						<input type="text" id="intAmountForManualPay" name="intAmount" value="$Data->{params}{intAmount}" id="l_intAmount" size="10"  /> </td>
+						<input type="text" name="intAmount" value="" id="l_intAmount" size="10"  /> </td>
 					</tr>
 					<tr>
 						<td class="label"><label for="l_dtLog">].$lang->txt('Date Paid').qq[</label>:</td>

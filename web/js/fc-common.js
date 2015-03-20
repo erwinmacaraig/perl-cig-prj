@@ -220,11 +220,15 @@ $(document).ready(function(){
 		var totalamount = 0;
 		$("#l_intAmount").val('');
 		$("#block-manualpay").css('display','none');
-        //if(this.checked){
+		//if(this.checked){
           //$('#payment_manual').show();
+		 // } else {
+          //$('#payment_manual').hide();
+          //$('#payment_cc').hide();
+        //}
           
 		  //check if manual pay is enabled
-			if($('#manualpayment').length){
+			if($('#manualpayment').length || $('#payment_cc').length){
 				$('input[type="checkbox"]:checked').each(function (){
 					totalamount += parseFloat(this.value);
 					$("#block-manualpay").css('display','block');
@@ -241,10 +245,7 @@ $(document).ready(function(){
 				}
 				
 			}
-       // } else {
-          //$('#payment_manual').hide();
-          //$('#payment_cc').hide();
-        //}
+      
      });
 
      $("#btn-manualpay").click(function() {
