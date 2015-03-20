@@ -183,9 +183,9 @@ sub display_registration {
 
     my $bulk=1;
     my $personID = 0; #$self->ID();
-    if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
-        return ('Invalid User',0);
-    }
+#    if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
+#        return ('Invalid User',0);
+ #   }
         print STDERR "$personID PERSON IS : " . $self->{'ClientValues'}{'personID'};
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
