@@ -151,10 +151,11 @@ sub main	{
         $Day = sprintf("%02s", $Day);
         my $DeliveryDate = "$Year$Month$Day";
 
-        my $delayedURL= $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&pa=1&ci=$payRef];
+	my $pa = $paymentSettings->{'gatewayProcessPreGateway'} ==1 ? 0 : 1;
+        my $delayedURL= $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&pa=$pa&ci=$payRef];
         my $cancelURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&ci=$payRef];
-        my $returnURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=1&ci=$payRef];
-        my $rejectURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=1&ci=$payRef];
+        my $returnURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=$pa&ci=$payRef];
+        my $rejectURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=$pa&ci=$payRef];
 
         $gatewaySpecific{'VERSION'} = "0001";
         $gatewaySpecific{'STAMP'} = $payRef;

@@ -146,6 +146,7 @@ sub displayRegoFlowSummaryBulk  {
 
     my %PaymentConfig = (
         totalAmountDue => $amountDue,
+			totalPaymentDue => $amountDue,
         dollarSymbol => $Data->{'SystemConfig'}{'DollarSymbol'} || '$',
         paymentMethodText => $Defs::paymentMethod{$hidden_ref->{'payMethod'}} || '',
     );
