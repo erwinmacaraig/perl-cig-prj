@@ -1,10 +1,17 @@
+
+				<div class="alert">
+					<div>
+						<span class="fa fa-exclamation"></span>
+						[% IF invoiceNumber.length > 0 %] 
+							[% Lang.txt('Payment Has Been Made For Invoice') %]: <strong>[% invoiceNumber %]</strong> 
+						[% ELSE %] 
+							[% Lang.txt('No such transaction for that invoice number') %]
+						[% END %]	
+					</div>
+				</div>
+		   		
 <div>
-	<div class="fieldSectionGroupWrapper">
-		[% IF invoiceNumber.length > 0 %]
-	 <br /><strong>  [% Lang.txt('No such transaction for invoice number') %]: [% invoiceNumber %] </strong><br /><br /> 
-	[% END %]	
-
-
+	<div class="fieldSectionGroupWrapper">		
 		<form action="main.cgi" method="POST">
 			<h3 class="panel-header">[% Lang.txt('Transaction Details') %]</h3>
 				<div class="panel-body fieldSectionGroup">

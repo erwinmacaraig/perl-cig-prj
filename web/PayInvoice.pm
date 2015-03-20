@@ -60,6 +60,7 @@ sub handlePayInvoice {
 		}
 	}
 	if($action eq 'TXN_PAY_INV_INFO'){ 
+		#check if Invoice Number is already been paid
 		$resultHTML = displayQueryByOtherInfoFields($Data, $client, $invoiceNumber);			
 	}
 	if($action eq 'TXN_PAY_INV_QUERY_INFO'){
@@ -113,15 +114,11 @@ sub displayQueryByInvoiceField {
 
 sub displayQueryByOtherInfoFields {  
 	my ($Data, $client, $invoiceNumber) = @_; 
-
-	#my $query = qq[SELECT intNationalPeriodID, strNationalPeriodName FROM tblNationalPeriod  WHERE intRealmID = ? ORDER BY strNationalPeriodName DESC];
-	#my $sth = $Data->{'db'}->prepare($query);
-	#$sth->execute($Data->{'Realm'});
-	#my %natPeriod = ();
-	#while(my $dref = $sth->fetchrow_hashref()){
-	#	$natPeriod{$dref->{'intNationalPeriodID'}} = $dref->{'strNationalPeriodName'};
-	#}
-	#use NationalReportingPeriod;
+	
+	my $query = qq[SELECT strInvoiceNumber FROM  tblInvoice INNER JOIN tblTransactions ON tblTransactions.intInvoiceID = tblInvoice.intInvoiceID WHERE intStatus = 1 AND intTransLogID <> 0 AND tblTransactions.intRealmID = $Data->{'Realm'} AND strInvoiceNumber = '$invoiceNumber'];	
+	my $sth = $Data->{'db'}->prepare($query);
+	$sth->execute();
+	my $dref = $sth->fetchrow_hashref();
 	
 	my $natPeriod = NationalReportingPeriod::getPeriods($Data);
 	my %OtherFormFields = (
@@ -144,7 +141,7 @@ sub displayQueryByOtherInfoFields {
     		client => $client,
       		a => 'TXN_PAY_INV_QUERY_INFO',
     	},
-		invoiceNumber => $invoiceNumber,
+		invoiceNumber => $dref->{'strInvoiceNumber'} || '',
 		Lang => $Data->{'lang'},
 	);
 

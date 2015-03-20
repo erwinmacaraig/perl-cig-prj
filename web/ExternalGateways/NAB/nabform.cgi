@@ -41,16 +41,7 @@ sub main	{
     $m->add('1234A', $chkvalue);
     $chkvalue = $m->hexdigest();
     my $body = '';
-	
     print qq[Content-type: text/html\n\n];
-	
-    elsif ($action eq 's') {
-        $body = NABProcess($client, $external, $amount, $clientTransRefID, $chkv, $formID, $session, $CCV);
-    }
-    else    {
-		
-        $body = PaymentForm(\%Data, $client, $clientTransRefID, \%Order, \%Transactions, $external);
-
     #if ($chkvalue ne $chkv) {
     #    $body = 'ERROR WITH CHECKSUM';
     #}
@@ -59,7 +50,6 @@ sub main	{
     }
     else    {
         $body = PaymentForm(\%Data, $client, $logID, \%Order, \%Transactions, $external, $clientTransRefID);
->>>>>>> 826f1a3a725eae89c2af6bd6fe1a9e7989214e9c
     }
     print $body;
 }
@@ -94,7 +84,6 @@ print STDERR "VVVVVV $chkvalue\n";
         <b>RESPCODE</b> $respCode<br>
         <b>RESPTEXT</b> $respText<br>
         <b>AMOUNT</b> \$$amount<br>
-		<b>Client</b> $client <br />
         <br>$url<br>
         <a href="$return_link">RETURN</a><br>
     $return_link
@@ -119,9 +108,7 @@ sub PaymentForm  {
     $Values{'amount'} = $Order->{'amount'};
     $Values{'client'} = $client;
     $Values{'currency'} = $currency;
-
     return displayNABCCPage($Data, $logID, $clientTransRefID, \%Values);
-
 
 }
 
@@ -205,7 +192,6 @@ sub displayNABCCPage    {
       		<input type="hidden" name="EPS_REFERENCEID" value="$NAB_ref->{'EPS_REFERENCEID'}">
       		<input type="hidden" name="EPS_FINGERPRINT" value="$NAB_ref->{'EPS_FINGERPRINT'}">
       		<input type="hidden" name="EPS_RESULTURL" value="$EPS_RESULTURL">
-
       		<input type="hidden" name="logID" value="$logID">
       		<input type="hidden" name="ci" value="$clientTransRefID">
       		<input type="hidden" name="amount" value="$NAB_ref->{'amount'}">
@@ -228,7 +214,5 @@ sub displayNABCCPage    {
 	</div>
   ];
   return $body;
-
 }
-
 1;

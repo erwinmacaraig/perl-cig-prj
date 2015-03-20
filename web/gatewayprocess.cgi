@@ -42,15 +42,11 @@ sub main	{
     my $db=connectDB();
 	my %Data=();
 	$Data{'db'}=$db;
-<<<<<<< HEAD
-    my $payTry = payTryRead(\%Data, $logID, 0);
-	my $cgi=new CGI;
-=======
     my $payTry = payTryRead(\%Data, $payRef, 1);
 	my $logID = $payTry->{'intTransLogID'};
 
 my $cgi=new CGI;
->>>>>>> 826f1a3a725eae89c2af6bd6fe1a9e7989214e9c
+
     my %params=$cgi->Vars();
     print STDERR Dumper(\%params);
 	
