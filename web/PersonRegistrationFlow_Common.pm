@@ -1046,7 +1046,7 @@ sub displayRegoFlowProductsBulk {
     my $lang=$Data->{'lang'};
 
     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_PU&amp;rID=$regoID";
-    my $pref = loadPersonDetails($Data->{'db'}, $personID);
+    my $pref = Person::loadPersonDetails($Data->{'db'}, $personID);
     $rego_ref->{'Nationality'} = $pref->{'strISONationality'};
     my $CheckProducts = getRegistrationItems(
         $Data,
@@ -1228,7 +1228,7 @@ sub add_rego_record{
     }
 
     if ($rego_ref->{'registrationNature'} eq 'RENEWAL') {
-        my $ok = checkRenewalRegoOK($Data, $personID, $rego_ref);
+        my $ok = PersonRegistration::checkRenewalRegoOK($Data, $personID, $rego_ref);
         return (0, undef, 'RENEWAL_FAILED') if (!$ok);
     }
     if ($rego_ref->{'registrationNature'} eq 'NEW') {
@@ -1284,7 +1284,7 @@ sub bulkRegoCreate  {
 
     my %RegoIDs=();
     for my $pID (@IDs)   {
-        my $pref = loadPersonDetails($Data->{'db'}, $pID) if ($pID);
+        my $pref = Person::loadPersonDetails($Data->{'db'}, $pID) if ($pID);
         my $ageLevelOptions = checkRegoAgeRestrictions(
             $Data,
             $pID,
@@ -1316,7 +1316,7 @@ sub bulkRegoCreate  {
         );
         next if (! $regoID);
         $RegoIDs{$pID} = $regoID;
-        cleanTasks(
+        WorkFlow::cleanTasks(
             $Data,
             $pID,
             $bulk_ref->{'entityID'},
@@ -1394,7 +1394,7 @@ sub bulkRegoSubmit {
     my @IDs= split /\|/, $rolloverIDs;
 
     for my $pID (@IDs)   {
-        my $pref = loadPersonDetails($Data->{'db'}, $pID) if ($pID);
+        my $pref = Person::loadPersonDetails($Data->{'db'}, $pID) if ($pID);
         my $regoID=param('regoID_'.$pID);
         next if (! $regoID);
         #cleanTasks(
@@ -1404,7 +1404,7 @@ sub bulkRegoSubmit {
         #    $regoID,
         #    'REGO'
         #);
-       submitPersonRegistration(
+       PersonRegistration::submitPersonRegistration(
             $Data,
             $pID,
             $regoID,
