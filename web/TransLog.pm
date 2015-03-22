@@ -1859,7 +1859,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 	
 	$body = $count ? qq[<h2 class="section-header">].$lang->txt('Payment Summary').qq[</h2>] . $resultHTML.$body: $resultHTML;
 	
-	$body .= qq[<a href="$Data->{target}?client=$client&amp;a=WF_" class="btn-main pull-right">Go to your Dashboard</a>];
+	#$body .= qq[<a href="$Data->{target}?client=$client&amp;a=WF_" class="btn-main pull-right">Go to your Dashboard</a>];
 	my $chgoptions='';
     
 	$chgoptions.= qq[<a href="$Data->{target}?a=P_TXNLog_DEL&amp;client=$client&amp;tlID=$TLref->{intLogID}" onclick="return confirm(].$lang->txt('This will remove this payment and set all linked transactions to unpaid. Continue?').qq["><img src="images/delete.png" border="0" alt="Delete Payment Record" title="Delete Payment Record"></a>] if (

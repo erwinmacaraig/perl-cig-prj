@@ -122,6 +122,7 @@ print STDERR "IN checkOpenPayments\n";
         my $m = new MD5;
         my $coKey = $APIResponse{'VERSION'} ."+". $APIResponse{'STAMP'} ."+". $APIResponse{'REFERENCE'} ."+". $APIResponse{'MERCHANT'} ."+". $APIResponse{'AMOUNT'} ."+". $APIResponse{'CURRENCY'} ."+". $APIResponse{'FORMAT'} ."+". $APIResponse{'ALGORITHM'} . "+" . $dref->{'strGatewayPassword'};
 
+
         $m->reset();
         $m->add($coKey);
         my $authKey= uc($m->hexdigest());
@@ -130,6 +131,8 @@ print STDERR "IN checkOpenPayments\n";
         my $ua = LWP::UserAgent->new();
         my $res= $ua->request($req);
         my $retval = $res->content() || '';
+print STDERR Dumper(\%APIResponse);
+print STDERR "--- $retval\n";
 	next if $retval =~/error/;
 	next if $retval !~/status/;
 
