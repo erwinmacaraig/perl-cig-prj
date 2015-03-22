@@ -583,8 +583,6 @@ sub getTransList {
 		  t.intTransactionID
 		$orderBy
   ];
-#
-	
 	    #$prodSellLevel
     $statement =~ s/AND  AND/AND/g;
     my $query = $db->prepare($statement);
