@@ -41,3 +41,6 @@ ALTER TABLE tblProducts ADD COLUMN strDisplayName VARCHAR(100) NULL AFTER strNam
 
 # 150320_tblTransLog
 ALTER TABLE tblTransLog ADD COLUMN strOnlinePayReference varchar(100) default '' AFTER strTXN;
+
+# 150323_tblWFRule
+ALTER TABLE tblWFRule ADD COLUMN intNeededITC tinyint default 0 COMMENT 'Was an ITC needed';
