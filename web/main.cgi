@@ -167,7 +167,7 @@ sub main {
         }
     }
     elsif ( $action =~ /^P_/ ) {
-        my $personID= getID($Data{'clientValues'},$Defs::LEVEL_PERSON);
+        my $personID= param('personID') || getID($Data{'clientValues'},$Defs::LEVEL_PERSON);
         ( $resultHTML, $pageHeading ) = handlePerson( $action, \%Data, $personID);  
     }
     elsif ( $action =~ /^DOC_/ ) {  

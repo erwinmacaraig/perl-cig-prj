@@ -723,6 +723,7 @@ sub getTransList {
             allvalue => '99',
         },
         ];
+		my $sortColumn = [8,"desc"]; # dtPaid is in the 9th order
   my $grid = showGrid(
     Data => $Data,
     columns => \@headers,
@@ -732,6 +733,7 @@ sub getTransList {
     height => '',
     filters => $displayonly ? undef : $filterfields,
     class => 'trans',
+	sortColumn => $sortColumn,
   );
 	my $filterHTML = qq[
 			<div class = "showrecoptions">
@@ -1222,20 +1224,20 @@ my $currencySQL = qq[SELECT intCurrencyID, strCurrencyName from tblCurrencies WH
 	
 
 my %FieldDefinitions=(
-                fields=>        {
+                fields=>{
                         intPaymentID => {
                                 label => 'Payment Number',
                                 value => $field->{intLogID},
-				readonly=>1,
+				                readonly=>1,
                         },
-			intAmount => {
+			            intAmount => {
                                 label => 'Amount (ddd.cc)',
-				type => 'text',
-				validate => 'FLOAT',
+				                type => 'text',
+				                validate => 'FLOAT',
                                 value => $field->{intAmount},
-				maxlength=>'19',
+			                 	maxlength=>'19',
                         },
-			dtLog => {
+		            	dtLog => {
                                 value => $field->{dtLog},
                                 label => 'Date Paid',
                                 type=>'date',
@@ -1243,36 +1245,36 @@ my %FieldDefinitions=(
                                 format=> 'dd/mm/yyyy',
 
                         },
-			intCurrencyID => {
+			            intCurrencyID => {
                                 label => 'Currency',
                                 value => $field->{intCurrencyID},
                                 type  => 'lookup',
                                 options => \%currencies,
-				firstoption => ['','Select Currency'],
+			                	firstoption => ['','Select Currency'],
                         },
-			intPaymentType => {
+		             	intPaymentType => {
                                 label => 'Payment Type',
                                 value => $field->{intPaymentType} || $Defs::PAYMENT_NONE,
                                 type  => 'lookup',
                                 options => \%Defs::paymentTypes,
                         },
-			strBank => {
+			            strBank => {
                                 label => 'Bank',
-				type => 'text',
+		                 		type => 'text',
                                 value => $field->{strBank},
-				maxlength=>'100',
+			                	maxlength=>'100',
                         },
-			strBSB => {
+		            	strBSB => {
                                 label => 'BSB',
-				type => 'text',
+			                	type => 'text',
                                 value => $field->{strBSB},
-				maxlength=>'50',
+			                 	maxlength=>'50',
                         },
-			strAccountName => {
+			            strAccountName => {
                                 label => 'Account Name',
-				type => 'text',
+			                	type => 'text',
                                 value => $field->{strAccountName},
-				maxlength=>'100',
+			                 	maxlength=>'100',
                         },
 			strAccountNum => {
                                 label => 'Account Number',
