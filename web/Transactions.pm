@@ -166,6 +166,7 @@ sub displayTransaction	{
     my $lang = $Data->{'lang'};
 	my $db=$Data->{'db'} || undef;
     my $client=setClient($Data->{'clientValues'}) || '';
+	
 	my $target=$Data->{'target'} || '';
 	my $option=$edit ? ($id ? 'edit' : 'add')  :'display' ;
 	my $type2=param("ty2") || '';
@@ -194,12 +195,14 @@ sub displayTransaction	{
 		LEFT JOIN tblTransactions as tParent ON (tParent.intTransactionID= T.intParentTXNID)
 		LEFT JOIN tblProducts as PParent ON (PParent.intProductID = tParent.intProductID)
 		LEFT JOIN tblTransactions as tChildren ON (tChildren.intParentTXNID = T.intTransactionID and tChildren.intStatus=1 and tChildren.intProductID=T.intProductID)
-		WHERE T.intID =$TableID
-			AND T.intTableType=$Data->{'clientValues'}{'currentLevel'}
-			AND T.intTransactionID = $id
+		WHERE T.intID = $TableID
+			
+		AND T.intTransactionID = $id
 		GROUP BY T.intTransactionID
 	];
+	#AND T.intTableType=$Data->{'clientValues'}{'currentLevel'} 
 
+	
 	my $query = $db->prepare($statement);
 	my $RecordData={};
 	$query->execute;
