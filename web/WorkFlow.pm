@@ -961,7 +961,9 @@ sub addWorkFlowTasks {
             AND r.intEntityLevel = e.intEntityLevel
             AND (r.strISOCountry_IN IS NULL or r.strISOCountry_IN = '' OR r.strISOCountry_IN LIKE CONCAT('%|',p.strISONationality ,'|%'))
             AND (r.strISOCountry_NOTIN IS NULL or r.strISOCountry_NOTIN = '' OR r.strISOCountry_NOTIN NOT LIKE CONCAT('%|',p.strISONationality ,'|%'))
-	    AND r.intNeededITC = ?
+	    AND (r.intUsingITCFilter =0 
+		OR (r.intUsingITCFilter = 1 AND AND r.intNeededITC = ?)
+	    )
         )
 		WHERE
             pr.intPersonRegistrationID = ?
