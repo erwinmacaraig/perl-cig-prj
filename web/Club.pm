@@ -48,7 +48,7 @@ sub handleClub  {
   my $title='';
   $typeID=$Defs::LEVEL_CLUB if $typeID==$Defs::LEVEL_NONE;
   if ($action =~/^C_DTA/) {
-        ($resultHTML,$title) = handleClubFlow($action, $Data);
+        ($resultHTML,$title) = ClubFlow::handleClubFlow($action, $Data);
   }
   elsif ($action =~/^C_DT/) {
     #Club Details

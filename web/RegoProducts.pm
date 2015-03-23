@@ -2,8 +2,8 @@ package RegoProducts;
 require Exporter;
 @ISA =  qw(Exporter);
 
-@EXPORT = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction);
-@EXPORT_OK = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction);
+@EXPORT = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction cleanRegoTransactions);
+@EXPORT_OK = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction cleanRegoTransactions);
 
 use strict;
 use lib "..","../..";
@@ -488,6 +488,29 @@ sub productAllowedThroughFilter {
     return 1;
 }
 
+sub cleanRegoTransactions	{
+
+    my($Data, $regoID, $intID, $level)=@_;
+    my $db=$Data->{'db'};
+    $intID ||= 0;
+	
+print STDERR "CEAN CALLED !!!!!!!!!!!!!!!!!!!! for $level";
+    my $st= qq[
+        DELETE FROM tblTransactions 
+        WHERE 
+            intPersonRegistrationID = ? 
+	];
+	$st.= qq[ AND intPersonRegistrationID > 0 ] if $level == $Defs::LEVEL_PERSON;
+	$st.= qq[ AND intPersonRegistrationID = 0 ] if $level == $Defs::LEVEL_CLUB;
+	$st.= qq[
+            AND intID = ? 
+            AND intStatus=0 
+    ];
+    my $q= $db->prepare($st);
+    $q->execute($regoID, $intID);
+    #Get products selected
+}
+ 	
 sub insertRegoTransaction {
     my($Data, $regoID, $intID, $params, $entityID, $entityLevel, $level, $session, $rego_products, $invoiceID)=@_;
     my $db=$Data->{'db'};
@@ -498,11 +521,16 @@ sub insertRegoTransaction {
     my $multipersonType = $session ? ($session->getNextRegoType())[0] || '' : '';
     $intID ||= 0;
 	
+print STDERR "CEAN CALLED !!!!!!!!!!!!!!!!!!!! for $level";
+            #AND intPersonRegistrationID > 0 
     my $stTxnsClean = qq[
         DELETE FROM tblTransactions 
         WHERE 
             intPersonRegistrationID = ? 
-            AND intPersonRegistrationID > 0 
+	];
+	$stTxnsClean .= qq[ AND intPersonRegistrationID > 0 ] if $level == $Defs::LEVEL_PERSON;
+	$stTxnsClean .= qq[ AND intPersonRegistrationID = 0 ] if $level == $Defs::LEVEL_CLUB;
+	$stTxnsClean .= qq[
             AND intID = ? 
             AND intStatus=0 
             AND intProductID=? 
@@ -519,7 +547,6 @@ sub insertRegoTransaction {
             tblTransactions
         WHERE
             intPersonRegistrationID = ? 
-            AND intPersonRegistrationID > 0 
             AND intID = ? 
             AND intStatus=1 
     ];

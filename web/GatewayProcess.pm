@@ -22,6 +22,7 @@ use CGI qw(param unescape escape);
 use ExternalGateway;
 use Gateway_Common;
 use TTTemplate;
+use ClubFlow;
 use PersonFlow;
 use TransferFlow;
 use BulkRenewalsFlow;
@@ -143,6 +144,9 @@ sub payTryContinueProcess {
 #print STDERR "********** IN payTryContinueProcess FOR $logID for $payTry->{'strContinueAction'}\n";
 
     $payTry->{'return'} = 1;
+    if ($payTry->{'strContinueAction'} eq 'CLUBFLOW')   {
+        handleClubFlow($payTry->{'a'}, $Data, $payTry);
+    }
     if ($payTry->{'strContinueAction'} eq 'REGOFLOW')   {
         handlePersonFlow($payTry->{'a'}, $Data, $payTry);
     }
