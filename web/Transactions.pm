@@ -36,16 +36,15 @@ sub handleTransactions	{
 
   	my $resultHTML='';
 	my $heading='';
+	my $lang = $Data->{'lang'};
 
-  if ($action =~ /_TXN_LIST/) {
-        $entityID = getLastEntityID($Data->{'clientValues'});
-		($resultHTML,$heading) = TransLog::handleTransLogs('list', $Data, $entityID, $intTableID);
-  }
-  elsif ($action =~ /_TXN_EDIT/) {
+  if ($action =~ /_TXN_EDIT/) {
 		($resultHTML,$heading) = displayTransaction($Data, $intTableID, $ID, 1);
+		$action =~ s/_EDIT/_LIST/ if (defined param("HF_subbutact"));
   }
   elsif ($action =~ /_TXN_ADD/) {
 		($resultHTML,$heading) = displayTransaction($Data, $intTableID, 0, 1);
+		$action =~ s/_ADD/_LIST/ if (defined param("HF_subbutact"));
   }
   elsif ($action =~ /_TXN_DEL/) {
 		($resultHTML,$heading) = deleteTransaction($Data, $intTableID, $ID);
@@ -55,8 +54,6 @@ sub handleTransactions	{
 		($resultHTML,$heading) = queryBlkTXN($action, $Data, $intTableID); 
 		#queryBlkTXNviaInvoice($action, $Data, $intTableID) if  ($action =~ /_step2/ && param('d_strInvoiceNumber')); 
 		
-
-
 		 if($action =~ /_step2/){
 			$heading = 'This is just a test run';	
 			my $value = param('d_strInvoiceNumber') ;
@@ -74,14 +71,21 @@ sub handleTransactions	{
 		
   }
 
+  if ($action =~ /_TXN_LIST/) {
+        $entityID = getLastEntityID($Data->{'clientValues'});
+		my $resultHTML_ = '';
+		($resultHTML_,$heading) = TransLog::handleTransLogs('list', $Data, $entityID, $intTableID);
+    		$heading = $Data->{'lang'}->txt('List Transactions');
+		$resultHTML .= $resultHTML_;
+  }
   if ($action =~ /_TXN_FAILURE/) {
 	my $intLogID=param("ci") || '';
 		Payments::processTransLogFailure($Data->{'db'}, $intLogID);
-		($resultHTML,$heading) = ("There was an error processing the payment.  Please try again.", "Error with Payment");
+		($resultHTML,$heading) = ($lang->txt("There was an error processing the payment.  Please try again."), $lang->txt("Error with Payment"));
   }
 
 	if (! $heading)	{
-		$heading = ($Data->{'SystemConfig'}{'txns_link_name'}) ? $Data->{'SystemConfig'}{'txns_link_name'} :  'Transactions';
+		$heading = ($Data->{'SystemConfig'}{'txns_link_name'}) ? $Data->{'SystemConfig'}{'txns_link_name'} :  $lang->txt('Transactions');
 	}
     $heading = $Data->{'lang'}->txt($heading);
 	#$heading ||= $Data->{'SystemConfig'}{'txns_link_name'} || 'Transactions';
@@ -135,7 +139,6 @@ sub checkExistingProduct    {
 
     my $q= $Data->{'db'}->prepare($st);
     $q->execute(@values) or query_error($st);
-print STDERR $st;
     my ($count) = $q->fetchrow_array();
     return $count || 0;
 }
@@ -151,8 +154,9 @@ sub deleteTransaction	{
 	];
 	my $query = $db->prepare($st);
 	$query->execute;
+	my $lang = $Data->{'lang'};
   auditLog($id, $Data, 'Delete', 'Transaction');
-  return ("Transaction has been deleted", "Transaction deleted");	
+  return ($lang->txt("Transaction has been deleted"), $lang->txt("Transaction deleted"));	
 }
 
 sub displayTransaction	{
@@ -410,12 +414,12 @@ sub displayTransaction	{
 
 				stopAfterAction => 1,
 				updateOKtext => qq[
-					<div class="OKmsg">Record updated successfully</div> <br>
-					<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_LIST">].$lang->txt('Return to Transaction').qq[</a>
+					<div class="OKmsg">] . $lang->txt('Record updated successfully') . qq[</div> <br>
+					<!--<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_LIST">].$lang->txt('Return to Transaction').qq[</a>-->
 				], # M_TXN_LIST
 				addOKtext => qq[
-					<div class="OKmsg">Record updated successfully</div> <br>
-					<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_LIST">].$lang->txt('Return to Transaction').qq[</a>
+					<div class="OKmsg">]. $lang->txt('Record added successfully') . qq[</div> <br>
+					<!--<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_LIST">].$lang->txt('Return to Transaction').qq[</a>-->
 				],
 			},
 			sections => [ ['main',$lang->txt('Details')], ],
