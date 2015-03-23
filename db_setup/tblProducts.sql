@@ -3,6 +3,7 @@ CREATE TABLE `tblProducts` (
   `intProductID` int(11) NOT NULL AUTO_INCREMENT,
    strProductCode varchar(20) default '',
    strProductType varchar(20) default '', /*LICENCE, INSURANCE, OTHER etc..*/
+  `strDisplayName` varchar(100) DEFAULT '',
   `strName` varchar(100) DEFAULT '',
   `curDefaultAmount` decimal(12,2) DEFAULT '0.00',
   `intMinChangeLevel` int(11) DEFAULT '0',

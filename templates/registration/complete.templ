@@ -25,9 +25,9 @@
                         [% IF originLevel == 3 %]
                             <a href="[% url %]/[% target %]?client=[% client %]&amp;a=WF_" class="btn-main">[% Lang.txt("Go to your dashboard") %]</a>
                         [% ELSIF originLevel == 20 %]
-                            <a href="[% url %]/[% target %]?client=[% clientrego %]&amp;a=P_HOME" class="btn-main">[% Lang.txt("Go to your dashboard") %]</a>
+                            <a href="[% url %]/[% target %]?client=[% originClient %]&amp;a=E_HOME" class="btn-main">[% Lang.txt("Go to your dashboard") %]</a>
                         [% ELSIF originLevel == 100 %]
-                            <a href="[% url %]/[% target %]?client=[% maclient %]&amp;a=E_HOME" class="btn-main">[% Lang.txt("Go to your dashboard") %]</a>
+                            <a href="[% url %]/[% target %]?client=[% originClient %]&amp;a=E_HOME" class="btn-main">[% Lang.txt("Go to your dashboard") %]</a>
                         [% END %]
                     </li>
                     [% IF originLevel == 1 %]

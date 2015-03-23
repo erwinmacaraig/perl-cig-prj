@@ -45,6 +45,7 @@ use InstanceOf;
 use EntityTypeRoles;
 use PersonSummaryPanel;
 use PersonCertifications;
+use Switch;
 
 sub displayRegoFlowCompleteBulk {
 
@@ -512,11 +513,14 @@ sub displayRegoFlowComplete {
         $tempClientValues{personID} = $personID;
         my $tempClient = setClient(\%tempClientValues);
 
-       $cv{'entityID'} = $maObj->getValue('intEntityID');
-       $cv{'currentLevel'} = $Defs::LEVEL_NATIONAL;
-       my $mlm = setClient(\%cv);
+#       $cv{'entityID'} = $maObj->getValue('intEntityID');
+#       $cv{'currentLevel'} = $Defs::LEVEL_NATIONAL;
+#       my $mlm = setClient(\%cv);
 
-        my $DoNotDisplayRegoSummary = ($originLevel == $Defs::LEVEL_PERSON ? 1 : 0);
+    $cv{'entityID'} = getID($Data->{'ClientValues'}, $Data->{'ClientValues'}{'authLevel'});
+    $cv{'currentLevel'} = $originLevel;
+    my $originClient = setClient(\%cv);
+   
         my %PageData = (
             person_home_url => $url,
 			person => \%personData,
@@ -532,9 +536,10 @@ sub displayRegoFlowComplete {
             dtypeText => $Defs::personType{$hidden_ref->{'dtype'}} || '',
             client=>$clm,
             clientrego=>$tempClient,
-            maclient => $mlm,
+            #maclient => $mlm,
             originLevel => $originLevel,
-            PersonSummaryPanel => personSummaryPanel($Data, $personObj->ID(), $DoNotDisplayRegoSummary),
+            originClient => $originClient,
+            PersonSummaryPanel => personSummaryPanel($Data, $personObj->ID()),
         );
         
         if($rego_ref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER) {
