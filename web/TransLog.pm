@@ -964,9 +964,8 @@ sub listTransactions {
       $allowMP = 0 if !$personID and $entityID;
       $allowMP = 0 if $Data->{'SystemConfig'}{'DontAllowManualPayments'};
       $allowMP = 0 if $Data->{'SystemConfig'}{'AssocConfig'}{'DontAllowManualPayments'};
-		$allowMP = 1;	 
-	#### REMOVE THE LINE ABOVE AFTER TESTING ###### 
-		$body=qq[
+	  $allowMP = 1;
+			$body=qq[
             <script type="text/javascript">
                 var clicked;
                 function submitForm()
@@ -992,7 +991,7 @@ sub listTransactions {
 		 $orstring = qq[&nbsp; <b>].$lang->txt('OR').qq[</b> &nbsp;] if $CC_body and $allowMP;
 		 if($paymentType==0){ $paymentType='';}
         $body .= qq[
-            <div id="payment_manual" style= "display:block;">
+            <div id="payment_manual" style= "display:none;">
                 $orstring
 
                 <script type="text/javascript">
