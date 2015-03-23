@@ -657,6 +657,7 @@ sub getRegistrationData	{
             e.intEntityLevel,
             e.strLatinName,
             e.intEntityLevel,
+	p.intInternationalTransfer,
             e.intEntityID
         FROM
             tblPersonRegistration_$Data->{'Realm'} AS pr
@@ -946,6 +947,7 @@ sub addRegistration {
             'REGO'
         );
 print STDERR "THIS CALL\n";
+print STDERR "addRegistration: . $Reg_ref->{'intInternationalTransfer'}\n";
   	    $rc = addWorkFlowTasks(
             $Data,
             'REGO', 
@@ -954,7 +956,8 @@ print STDERR "THIS CALL\n";
             $Reg_ref->{'entityID'} || 0,
             $Reg_ref->{'personID'},
             $personRegistrationID, 
-            0
+            0,
+		$Reg_ref->{'intInternationalTransfer'}
         );
         personInProgressToPending($Data, $Reg_ref->{'personID'});
     }
@@ -986,7 +989,7 @@ sub submitPersonRegistration    {
             'REGO'
         );
 
-print STDERR "THAT CALL\n";
+print STDERR "THAT CALL itc is $pr_ref->{'intInternationalTransfer'}\n";
             my $rc = addWorkFlowTasks(
             $Data,
             'REGO', 
@@ -995,7 +998,8 @@ print STDERR "THAT CALL\n";
             $pr_ref->{'entityID'} || $pr_ref->{'intEntityID'} || 0,
             $personID,
             $personRegistrationID, 
-            0
+            0,
+		$pr_ref->{'intInternationalTransfer'}
         );
         personInProgressToPending($Data, $personID);
         ($count, $regs) = getRegistrationData($Data, $personID, \%Reg);

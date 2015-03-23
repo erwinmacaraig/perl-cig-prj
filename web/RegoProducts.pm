@@ -416,7 +416,6 @@ sub productAllowedThroughFilter {
             return 0 if $dref->{'intProductGender'} != $memdetails->{'Gender'};
         }
         
-        #print STDERR 'dref value is ' . $dref->{'strNationality_IN'};
         my @NOTIN_Countries = split(/\|/, $dref->{'strNationality_NOTIN'});
         my @IN_Countries = split(/\|/, $dref->{'strNationality_IN'}); 
         
@@ -494,7 +493,6 @@ sub cleanRegoTransactions	{
     my $db=$Data->{'db'};
     $intID ||= 0;
 	
-print STDERR "CEAN CALLED !!!!!!!!!!!!!!!!!!!! for $level";
     my $st= qq[
         DELETE FROM tblTransactions 
         WHERE 
@@ -521,8 +519,6 @@ sub insertRegoTransaction {
     my $multipersonType = $session ? ($session->getNextRegoType())[0] || '' : '';
     $intID ||= 0;
 	
-print STDERR "CEAN CALLED !!!!!!!!!!!!!!!!!!!! for $level";
-            #AND intPersonRegistrationID > 0 
     my $stTxnsClean = qq[
         DELETE FROM tblTransactions 
         WHERE 

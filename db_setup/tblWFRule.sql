@@ -29,6 +29,7 @@ CREATE TABLE tblWFRule (
     intLockTaskUntilPaid tinyint default 0 COMMENT 'Locks task until paid',
     intLockTaskUntilGatewayResponse tinyint default 0 COMMENT 'Locks task until response from gateway',
     intRemoveTaskOnPayment tinyint default 0 COMMENT 'On Payment, remove task and either go to next one or approve person/Rego/Entity',
+    intNeededITC tinyint default 0 COMMENT 'Was an ITC needed',
 
   tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (intWFRuleID),

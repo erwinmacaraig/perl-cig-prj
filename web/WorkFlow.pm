@@ -809,10 +809,12 @@ sub addWorkFlowTasks {
         $entityID,
         $personID,
         $personRegistrationID,
-        $documentID
+        $documentID,
+	$itc
     ) = @_;
 #print STDERR "RRRRRRRRRRRRRR ADD WORK $originLevel E$entityID $personID $personRegistrationID\n";
 	
+	$itc ||= 0;
     $entityID ||= 0;
     $personID ||= 0;
     $originLevel ||= 0;
@@ -959,6 +961,7 @@ sub addWorkFlowTasks {
             AND r.intEntityLevel = e.intEntityLevel
             AND (r.strISOCountry_IN IS NULL or r.strISOCountry_IN = '' OR r.strISOCountry_IN LIKE CONCAT('%|',p.strISONationality ,'|%'))
             AND (r.strISOCountry_NOTIN IS NULL or r.strISOCountry_NOTIN = '' OR r.strISOCountry_NOTIN NOT LIKE CONCAT('%|',p.strISONationality ,'|%'))
+	    AND r.intNeededITC = ?
         )
 		WHERE
             pr.intPersonRegistrationID = ?
@@ -971,7 +974,8 @@ sub addWorkFlowTasks {
             AND r.strPersonEntityRole IN ('', pr.strPersonEntityRole)
 		];
 	    $q = $db->prepare($st);
-  	    $q->execute($personRegistrationID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
+  	    $q->execute($itc, $personRegistrationID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
+print STDERR "WORK FLOW FOR $itc\n";
     }
     if ($ruleFor eq 'ENTITY' and $entityID)  {
         ## APPROVAL FOR ENTITY
@@ -1050,6 +1054,7 @@ sub addWorkFlowTasks {
             my $approvalEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intApprovalEntityLevel'}) || 0;
             my $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intProblemResolutionEntityLevel'});
             next if (! $approvalEntityID and ! $problemEntityID);
+print STDERR "^^^^^^^^^^^^^^^^^^^^^^^^^^^RULE ADDED WAS " . $dref->{'intWFRuleID'} . "\n\n\n";
 			
             $qINS->execute(
                 $dref->{'intWFRuleID'},

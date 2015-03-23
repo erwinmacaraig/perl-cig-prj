@@ -1315,6 +1315,7 @@ sub bulkRegoCreate  {
             "BULKREGO"
         );
         next if (! $regoID);
+	cleanRegoTransactions($Data,$regoID, $pID, $Defs::LEVEL_PERSON);
         $RegoIDs{$pID} = $regoID;
         WorkFlow::cleanTasks(
             $Data,

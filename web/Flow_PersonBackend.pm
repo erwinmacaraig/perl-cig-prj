@@ -1296,6 +1296,7 @@ sub display_summary {
     #if ($payMethod ne 'now')    {
     #    $gateways = '';
     #}
+print STDERR "ITC IS" . $self->{'RunParams'}{'itc'}. "\n";
     my %Config = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
