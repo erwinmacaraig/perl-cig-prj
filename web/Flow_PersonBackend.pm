@@ -1040,6 +1040,7 @@ sub process_products {
         $regoID = 0 if !$valid;
     }
 
+	cleanRegoTransactions($self->{'Data'},$regoID, $personID, $Defs::LEVEL_PERSON);
     my ($resultHTML, $error) = checkMandatoryProducts($self->{'Data'}, $personID, $Defs::LEVEL_PERSON, $self->{'RunParams'});
     if ($error) {
         push @{$self->{'RunDetails'}{'Errors'}}, $resultHTML;
