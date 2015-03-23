@@ -966,8 +966,6 @@ sub listTransactions {
       $allowMP = 0 if !$personID and $entityID;
       $allowMP = 0 if $Data->{'SystemConfig'}{'DontAllowManualPayments'};
       $allowMP = 0 if $Data->{'SystemConfig'}{'AssocConfig'}{'DontAllowManualPayments'};
-		$allowMP = 1;	 
-	#### REMOVE THE LINE ABOVE AFTER TESTING ###### 
 		$body=qq[
             <script type="text/javascript">
                 var clicked;
