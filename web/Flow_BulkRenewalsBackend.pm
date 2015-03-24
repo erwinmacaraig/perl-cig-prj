@@ -400,6 +400,7 @@ print STDERR "ROLLOVERIDs:" . $self->getCarryFields('rolloverIDs') . "\n";
         Target => $self->{'Data'}{'target'},
         ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
     );
+print STDERR "SSSS";
     if ($gatewayConfig->{'amountDue'} and $payMethod eq 'now')    {
         ## Change Target etc
         %Config = (

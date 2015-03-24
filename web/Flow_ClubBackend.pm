@@ -681,6 +681,7 @@ my ($txnCount, $amountDue, $logIDs) = getEntityTXN($self->{'Data'}, $clubObj->ID
             dollarSymbol => $self->{'Data'}->{'SystemConfig'}{'DollarSymbol'} || '$',
             paymentMethodText => $Defs::paymentMethod{$payMethod} || '',
         );
+my $displayPayment = ($amountDue and $payMethod) ? 1 : 0;
     my %summaryClubData = (
 			organization => $clubObj->{'DBData'}{'strLocalName'}, 
 			organizationShortName => $clubObj->{'DBData'}{'strLocalShortName'},
@@ -703,7 +704,7 @@ my ($txnCount, $amountDue, $logIDs) = getEntityTXN($self->{'Data'}, $clubObj->ID
 			organizationLevel => $clubObj->{'DBData'}{'strOrganisationLevel'},  
 			bankAccountDetails => $clubObj->{'DBData'}{'strBankAccountNumber'},
 			editlink =>  $self->{'Data'}{'target'}."?".$self->stringifyURLCarryField(),
-			DisplayPayment => $payMethod,
+			DisplayPayment => $displayPayment,
 			payment => \%PaymentConfig,
 	);
 	
