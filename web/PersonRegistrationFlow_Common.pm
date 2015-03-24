@@ -52,12 +52,9 @@ sub displayRegoFlowCompleteBulk {
     my ($Data, $client, $hidden_ref) = @_;
     my $payMethod= $hidden_ref->{'payMethod'} || param('payMethod') || '';
 
-print STDERR "---------------JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ\n";
-print STDERR Dumper($hidden_ref);
     my ($amountDue, $logIDs) = getRegoTXNDetails($Data, $hidden_ref->{'txnIds'});
     $hidden_ref->{'totalAmount'} = $amountDue;
     my $gateways = '';
-#print STDERR "BULK COMPLETE AMOUNT DUE" . $amountDue . $payMethod;
 
     my $paymentResult = '';
     my $payStatus = 0;
@@ -93,7 +90,6 @@ sub displayRegoFlowSummaryBulk  {
 	
     my $body = '';
 
-#print STDERR "HIDDEN BULK TXNids" . $hidden_ref->{'txnIds'};
     my ($unpaid_cost, $logIDs) = getRegoTXNDetails($Data, $hidden_ref->{'txnIds'});
     $hidden_ref->{'totalAmount'} = $unpaid_cost;
     my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
@@ -585,7 +581,6 @@ sub getRegoTXNDetails  {
             $amount = $amount + $dref->{'curAmount'};
         }
     }
-print STDERR "payLaterFlag - $amount\n";
     return ($amount, \%tlogIDs);
 }
 
@@ -1417,11 +1412,16 @@ sub bulkRegoSubmit {
         #    $regoID,
         #    'REGO'
         #);
+	
+       my ($txnCount, $amountDue, $logIDs) = getPersonRegoTXN($Data, $pID, $regoID);
+	my %Reg = ();
+	$Reg{'CountTXNs'} = $txnCount;
+	
        PersonRegistration::submitPersonRegistration(
             $Data,
             $pID,
             $regoID,
-        #    $bulk_ref
+            \%Reg
         );
         savePlayerPassport($Data, $pID);
     }

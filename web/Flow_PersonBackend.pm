@@ -1364,9 +1364,6 @@ sub display_complete {
         $rego_ref->{'Nationality'} = $nationality;
 
         my $run = $self->{'RunParams'}{'run'} || 0;
-        if($self->{'RunParams'}{'newreg'} and ! $run)  {
-
-        }
 
         my $hiddenFields = $self->getCarryFields();
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};

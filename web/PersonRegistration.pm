@@ -979,6 +979,7 @@ sub submitPersonRegistration    {
         $pr_ref->{'strStatus'} = 'PENDING';
         $pr_ref->{'intPaymentRequired'} = 0 if ($rego_ref->{'CountTXNs'} == 0);
         $pr_ref->{'paymentRequired'} = 0 if ($rego_ref->{'CountTXNs'} == 0);
+print STDERR "CNT " . $rego_ref->{'CountTXNs'};
 
         updatePersonRegistration($Data, $personID, $personRegistrationID, $pr_ref, $personStatus);
         cleanTasks(
