@@ -144,6 +144,7 @@ sub displayRegoFlowSummaryBulk  {
     my $editlink =  $Data->{'target'}."?".$carryString;
     $hidden_ref->{'payMethod'} = 'notrequired' if (! $amountDue);
 
+print STDERR "DDDDDSDSDS $amountDue\n";
     my %PaymentConfig = (
         totalAmountDue => $amountDue,
 			totalPaymentDue => $amountDue,
@@ -151,6 +152,7 @@ sub displayRegoFlowSummaryBulk  {
         paymentMethodText => $Defs::paymentMethod{$hidden_ref->{'payMethod'}} || '',
     );
 
+	my $displayPayment = ($amountDue and $hidden_ref->{'payMethod'}) ? 1 : 0;
     my %PageData = (
         person_home_url => $url,
         people=> \@People,
@@ -162,7 +164,7 @@ sub displayRegoFlowSummaryBulk  {
         Lang => $Data->{'lang'},
         client=>$client,
         editlink => $editlink,
-        DisplayPayment => $hidden_ref->{'payMethod'},
+        DisplayPayment => $displayPayment,
         payment => \%PaymentConfig,
     );
     
@@ -354,6 +356,7 @@ $sth = $Data->{'db'}->prepare($query);
         );
             
         my $editlink =  $Data->{'target'}."?".$carryString;
+	my $displayPayment = ($amountDue and $hidden_ref->{'payMethod'}) ? 1 : 0;
         my %PageData = (
             person_home_url => $url,
 			person => \%personData,
@@ -367,7 +370,7 @@ $sth = $Data->{'db'}->prepare($query);
             client=>$client,
             editlink => $editlink,
             certifications => join(', ', @certString),
-            DisplayPayment => $hidden_ref->{'payMethod'},
+            DisplayPayment => $displayPayment,
             payment => \%PaymentConfig,
         );
         
