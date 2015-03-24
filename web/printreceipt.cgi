@@ -30,6 +30,7 @@ sub main	{
 	my $txlogIDs= param('ids') || '';
 	my $personID = param('pID') || '';
 
+	my @intIDs = split(/,/,$personID);
 	my %clientValues = getClient($client);
 	my %Data=();
 	my $target='printreceipt.cgi';
@@ -59,50 +60,64 @@ $Data{'db'}=$db;
 
 	my $pageHeading= '';
 	my $resultHTML = '';
+	my $bodyHTML = '';
 	my $ID=getID(\%clientValues);
 	$Data{'client'}=$client;
-
 	
 	my %receiptData= ();
 	my %ContentData = ();
+	my %htmlReceiptBody = ();
 	if($txlogIDs)	{
-		my $st =qq[
-			SELECT intTransLogID, T.intTransactionID, P.strName, P.strGroup, T.intQty, T.curAmount, T.intTableType, I.strInvoiceNumber, T.intStatus, P.curPriceTax, P.dblTaxRate, TL.intPaymentType,
-			IF(T.intTableType = $Defs::LEVEL_CLUB, E.strLocalName, CONCAT(strLocalFirstname,' ',strLocalSurname)) as Name,
-			DATE_FORMAT(TL.dtLog,'%d/%m/%Y %h:%i') as dtLog_FMT 
-		FROM tblTransactions as T
-		INNER JOIN tblTransLog as TL ON TL.intLogID = T.intTransLogID
-			LEFT JOIN tblInvoice I on I.intInvoiceID = T.intInvoiceID
-			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
-			LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
-			LEFT JOIN tblEntity as E ON (E.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
-		WHERE intTransLogID IN (?) 
-		AND T.intRealmID = ? AND T.intID = $personID		
-		];
-		# AND T.intID = ?  $personID,
-		open FH, ">dumpfile.txt";
-		print FH "\n \$st = $st\n   \n$txlogIDs";
-		my $q= $db->prepare($st);
-		$q->execute(
-			$txlogIDs,			
-			$Data{'Realm'},		
-		);
-       	while (my $dref = $q->fetchrow_hashref()){
-			$dref->{'paymentType'} = $Defs::paymentTypes{$dref->{intPaymentType}};
-			push @{$ContentData{'receiptdetails'}}, $dref;
-		}
+		for my $intID (@intIDs){			
+			my $st =qq[
+				SELECT intTransLogID, T.intTransactionID, P.strName, P.strGroup, T.intQty, T.curAmount, T.intTableType, I.strInvoiceNumber, T.intStatus, P.curPriceTax, P.dblTaxRate, TL.intPaymentType,
+				IF(T.intTableType = $Defs::LEVEL_CLUB, E.strLocalName, CONCAT(strLocalFirstname,' ',strLocalSurname)) as Name,
+				DATE_FORMAT(TL.dtLog,'%d/%m/%Y %h:%i') as dtLog_FMT 
+			FROM tblTransactions as T
+			INNER JOIN tblTransLog as TL ON TL.intLogID = T.intTransLogID
+				LEFT JOIN tblInvoice I on I.intInvoiceID = T.intInvoiceID
+				LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
+				LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
+				LEFT JOIN tblEntity as E ON (E.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
+			WHERE intTransLogID IN (?) 
+			AND T.intRealmID = ? AND T.intID = $intID	
+			];
+			# AND T.intID = ?  $personID,
+			#AND T.intRealmID = ? AND T.intID = $personID
+			#open FH, ">>dumpfile.txt";
+			#print FH "\n \$st = $st\n   \n$txlogIDs";
+			my $q= $db->prepare($st);
+			$q->execute(
+				$txlogIDs,			
+				$Data{'Realm'},		
+			);
+		   	while (my $dref = $q->fetchrow_hashref()){
+				$dref->{'paymentType'} = $Defs::paymentTypes{$dref->{intPaymentType}};
+				push @{$ContentData{'receiptdetails'}}, $dref;
+			}
+			
+			
+			$bodyHTML .= runTemplate(
+				\%Data, 
+				\%ContentData,
+		        "txn_receipt/receiptbody.templ",
+			);			
+			%ContentData = ();			
+		} # end of for loop
 		my $filename = $Data{'SystemConfig'}{'receiptFilename'} || 'standardreceipt';
-
+		$htmlReceiptBody{'body'} = $bodyHTML;
 		$resultHTML = runTemplate(
-			\%Data, 
-			\%ContentData,
-                        "txn_receipt/$filename.templ"
-		);
-
+				\%Data, 
+				\%htmlReceiptBody,
+		        "txn_receipt/$filename.templ"
+		);	
 	}
 	else	{
 		$resultHTML = 'Invalid Transactions';
 	}
+	
+
+
 
 	my $title=$lang->txt($Defs::page_title || 'Receipt');
 	print "Content-type: text/html\n\n";

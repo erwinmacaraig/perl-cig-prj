@@ -1,0 +1,57 @@
+
+			<div class="receiptbox">
+     
+            <div style="text-align:center; padding-top: 50px;">
+				<h2> </h2>
+				<h3></h3>
+			</div>
+
+		
+		
+       <table class="paymentlist">
+		
+
+		<tr>
+			<td><b>[% Lang.txt('Payment For') %]:</b></td>
+			<td>[% receiptdetails .0.Name %]</td>
+		</tr>
+		<tr>
+			<td><b>[% Lang.txt('Payment Date') %]:</b></td>
+			<td>[% receiptdetails.0.dtLog_FMT %]</td>
+		</tr>
+		<tr>
+			<td><b>[% Lang.txt('Payment Type') %]:</b></td>
+			<td>[% receiptdetails.0.paymentType %]</td>
+		</tr>
+		<tr>
+			<td><b>[% Lang.txt('Receipt No') %].:</b></td>
+			<td>[% receiptdetails.0.intTransLogID %]</td>
+		</tr>		
+	</table> 
+	
+	<br><br>
+	<table class="itemlist">
+		<tr style = " border-bottom:1px solid #aaa;">
+			<td style="width:80px;">[% Lang.txt('Invoice Number') %]</td>
+			<td style="width:20px;">[% Lang.txt('QTY') %]</td>
+			<td>[% Lang.txt('Description') %]</td>
+			<td style="width:70px;">[% Lang.txt('Cost') %]</td>
+		</tr>
+	[% total = 0 %]
+	[% FOREACH i IN receiptdetails %]
+		<tr>
+			<td>[% i.strInvoiceNumber %]</td>
+			<td>[% i.intQty %]</td>
+			<td>[% i.strName %]</td>
+			<td>\$[% i.curAmount %] </td>
+		</tr>
+	[% total = total + i.curAmount %]
+	[% END %]
+		<tr style = " border-top:1px solid #aaa;">
+			<td colspan="3"><b>[% Lang.txt('Payment Total') %]:</b></td>
+			<td><b>\$[% total | format('%.2f') %]</b></td>
+		</tr>
+	</table>
+
+			</div>
+    

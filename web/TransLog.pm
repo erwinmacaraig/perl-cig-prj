@@ -492,9 +492,12 @@ EOS
 	$st = qq[SELECT intID FROM tblTransactions WHERE intTransLogID = $transLogID AND intRealmID = $Data->{'Realm'}];
 	$query = $db->prepare($st);
 	$query->execute();
-	my $dref = $query->fetchrow_hashref();
+	my @intIDs = ();
+	while(my $dref = $query->fetchrow_hashref()){
+		push @intIDs,$dref->{'intID'};
+	}
 	
-	my $receiptLink = "printreceipt.cgi?client=$cl&ids=$transLogID&pID=$dref->{'intID'}";
+	my $receiptLink = "printreceipt.cgi?client=$cl&ids=$transLogID&pID=" . join(",",@intIDs);
 
    auditLog($transLogID, $Data, 'Confirmed Payment', 'Transactions');
    my ($success, $resultHTML) = displayPaymentResult($Data, $transLogID, 0) ; # <div class="OKmsg">].$lang->txt('Your payment has been Confirmed') .qq[</div>
@@ -583,6 +586,7 @@ sub getTransList {
 		  t.intTransactionID
 		$orderBy
   ];
+	
 	    #$prodSellLevel
     $statement =~ s/AND  AND/AND/g;
     my $query = $db->prepare($statement);
@@ -636,7 +640,7 @@ sub getTransList {
     {
         field => 'curAmount', 
         name => $lang->txt('Amount'), 
-        field => 'NetAmount', 
+        field => 'curAmount', 
         width => 20
     },
     {
@@ -706,10 +710,10 @@ sub getTransList {
               $row_data->{manual_payment} = '';
             } 
             if($row->{'dblTaxRate'}){
-                $row->{'dblTaxRate'} || 0;
-                my $temppricerate = 1 + $row->{'dblTaxRate'}; 
-                $row_data->{'NetAmount'} = sprintf( "%.2f",($row->{curAmount} / $temppricerate));
-                $row_data->{'TaxTotal'} =sprintf("%.2f",($row->{'dblTaxRate'} * $row_data->{'NetAmount'}));  
+                #$row->{'dblTaxRate'} || 0;
+                #my $temppricerate = 1 + $row->{'dblTaxRate'}; 
+                #$row_data->{'NetAmount'} = sprintf( "%.2f",($row->{curAmount} / $temppricerate));
+                #$row_data->{'TaxTotal'} =sprintf("%.2f",($row->{'dblTaxRate'} * $row_data->{'NetAmount'}));  
             }     
             $row_data->{'strInvoiceNumber'} = $row->{'strInvoiceNumber'};
 
