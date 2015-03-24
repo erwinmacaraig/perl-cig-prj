@@ -174,7 +174,7 @@ sub payTryRedirectBack  {
         next if $k eq 'a';
         next if $k =~/clubID|teamID|userID|stateID|assocID|intzonID|regionID|zoneID|intregID|authLevel|natID|venueID|authLevel|currentLevel|interID/;
         next if $k =~/intAmount|dt_end_paid|strComments|paymentType|^act_|dtLog|dt_start_paid|paymentID|dd_|gatewayCount/;
-        next if $k =~/dtype/;
+        #next if $k =~/dtype/;
         next if $k =~/^ss$/;
         next if $k =~/^cc_submit/;
         next if $k =~/^pt_submit/;

@@ -144,7 +144,6 @@ sub displayRegoFlowSummaryBulk  {
     my $editlink =  $Data->{'target'}."?".$carryString;
     $hidden_ref->{'payMethod'} = 'notrequired' if (! $amountDue);
 
-print STDERR "DDDDDSDSDS $amountDue\n";
     my %PaymentConfig = (
         totalAmountDue => $amountDue,
 			totalPaymentDue => $amountDue,
@@ -391,6 +390,7 @@ $sth = $Data->{'db'}->prepare($query);
 sub displayRegoFlowComplete {
 
     my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref) = @_;
+
     my $lang=$Data->{'lang'};
 
     my $ok = 1;
