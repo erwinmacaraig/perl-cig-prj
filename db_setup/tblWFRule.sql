@@ -32,6 +32,8 @@ CREATE TABLE tblWFRule (
     intUsingITCFilter tinyint default 0 COMMENT 'Using ITC filter',
     intNeededITC tinyint default 0 COMMENT 'Was an ITC needed',
 
+  intCopiedFromRuleID INT DEFAULT 0 COMMENT 'The ID of the rule this record was copied from - used for tblWFRuleDocument setup',
+
   tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (intWFRuleID),
   KEY Entity (intWFRuleID),

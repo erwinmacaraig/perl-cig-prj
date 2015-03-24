@@ -108,6 +108,7 @@ print STDERR "IN checkOpenPayments\n";
         initLocalisation(\%Data);
 
 
+print STDERR " SHOULD WE ONLY CHECK FOR TXNs PAST 1 hr ?";
         print STDERR "CHECK FOR $logID\n";
         my %APIResponse=();
         my $cents = $dref->{'intAmount'} * 100;
