@@ -156,9 +156,9 @@ sub displayQueryByOtherInfoFields {
 }
 
 sub queryInvoiceByNumber { 
-	my ($action, $Data, $invoiceNumber, $client) = @_; 
-	
+	my ($action, $Data, $invoiceNumber, $client) = @_;	
 	my $convertedInvoiceNumberToTXNID = invoiceNumToTXN($invoiceNumber);
+	my $totalAmount = 0;
 	
 	my $content = '';
 	my $results = 0;
@@ -191,6 +191,7 @@ sub queryInvoiceByNumber {
 	my $selectPay;
 	while(my $dref = $sth->fetchrow_hashref()){
 		$results = 1;
+		$totalAmount += $dref->{'TotalAmount'};
 		#my $selectPay = qq[<input type="checkbox" checked="checked" name="act_$dref->{'intTransactionID'}" class="paytxn_chk" />];
 		$selectPay .= qq[<input type="hidden" name="act_$dref->{'intTransactionID'}" value="1" />];	
 		$cv{'personID'} = $dref->{'intPersonID'};
@@ -305,6 +306,61 @@ my @headers = (
 	for my $i (qw(intAmount strBank strBSB strAccountNum strAccountName strResponseCode strResponseText strReceiptRef strComments intPartialPayment))	{
 		  $Data->{params}{$i}='' if !defined $Data->{params}{$i};
 	}
+	#
+    my $allowManualPayments = 1;
+    $allowManualPayments = 0 if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB and ! allowedAction($Data, 'm_mp'));
+	$allowManualPayments = 0 if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB and $Data->{'clientValues'}{'currentLevel'}  == $Defs::LEVEL_PERSON and ! allowedAction($Data, 'm_mp'));
+	$allowManualPayments = 0 if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB and $Data->{'clientValues'}{'currentLevel'}  == $Defs::LEVEL_CLUB  and ! allowedAction($Data, 't_tp'));
+    $allowManualPayments = 0 if $Data->{'ReadOnlyLogin'};	
+
+	my $allowMP = 1;
+    $allowMP = 0 if !$allowManualPayments;
+    $allowMP = 0 if $Data->{'SystemConfig'}{'DontAllowManualPayments_Invoice'};
+
+	 my $orstring = '';
+     $orstring = qq[&nbsp; <b>].$Data->{'lang'}->txt('OR').qq[</b> &nbsp;] if $gateway_body and $allowMP;
+     if($paymentType==0){ $paymentType='';}
+   
+	
+	if ($allowMP){
+	$gateway_body .= qq[<div  style="display:block;" id="payment_manual">
+						<h3 class="panel-header sectionheader" id="manualpayment">].$Data->{'lang'}->txt('Manual Payment').qq[</h3>
+				  		<div id="secmain2" class="panel-body fieldSectionGroup ">
+				  			<fieldset>
+				  				<div class="form-group">
+				  					<label for="l_intAmount" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Amount (ddd.cc)').qq[</label>
+				  					<div class="col-md-6"><input type="text" name="intAmount" value="] . sprintf('%.2f',$totalAmount) . qq[" id="l_intAmount" size="10" readonly /></div>
+				  				</div>
+				  				<div class="form-group">
+				  					<label for="l_dtLog" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Date Paid').qq[</label>
+				  					<div class="col-md-6"><input type="text" name="dtLog" value="$currentDate" id="l_dtLog" size="10" maxlength="10" /> <span class="HTdateformat">dd/mm/yyyy</span></div>
+				  				</div>
+				  				<div class="form-group">
+				  					<label for="l_intPaymentType" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Payment Type').qq[</label>
+				  					<div class="col-md-6">].drop_down('paymentType',\%Defs::manualPaymentTypes, undef, $paymentType, 1, 0,'','').qq[</div>
+				  				</div>
+				  				<div class="form-group">
+				  					<label for="l_strComments" class="col-md-4 control-label txtright">].$Data->{'lang'}->txt('Comments').qq[</label>
+				  					<div class="col-md-6"><textarea name="strComments" id="l_strComments" style="width: 100%; height: 200px;">$Data->{params}{strComments}</textarea></div>
+				  				</div>
+				  			</fieldset>
+				  		</div>
+					  	<div class="button-row">
+							<div class="txtright" id="block-manualpay" style="display:block">
+								<input onclick="clicked='main.cgi'" type="submit" name="subbut" value="Submit Manual Payment" class="btn-main" id = "btn-manualpay" >
+								<input type="hidden" name="paymentID" value="">
+								<input type="hidden" name="dt_start_paid" value="">
+								<input type="hidden" name="dt_end_paid" value="">
+							</div>
+						</div>
+					</div>
+			] 
+
+	}
+
+#<span class="compulsory">*</span>]
+
+	#
 	my $target = 'paytry.cgi';#$Data->{'target'};
 
 	## end payment settings

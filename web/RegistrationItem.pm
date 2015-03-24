@@ -33,11 +33,14 @@ sub getRegistrationItems    {
             D.strDocumentName,
             D.strDocumentFor,
 			D.strDescription,
-            P.strName as strProductName
+            P.strName as strProductName,
+            P.strDisplayName as strProductDisplayName,
+            TP.intTransactionID
         FROM
             tblRegistrationItem as RI
             LEFT JOIN tblDocumentType as D ON (intDocumentTypeID = RI.intID and strItemType='DOCUMENT')
             LEFT JOIN tblProducts as P ON (P.intProductID= RI.intID and strItemType='PRODUCT')
+            LEFT JOIN tblTransactions as TP ON (TP.intProductID = P.intProductID and TP.intPersonRegistrationID = ?)
         WHERE
             RI.intRealmID = ?
             AND RI.intSubRealmID IN (0, ?)
@@ -60,6 +63,7 @@ sub getRegistrationItems    {
 
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
     $q->execute(
+	        $Rego_ref->{'intPersonRegistrationID'} || '',
 	        $Data->{'Realm'}, 
 	        $Data->{'RealmSubType'}, 
 	        $ruleFor,
@@ -119,6 +123,7 @@ sub getRegistrationItems    {
         if ($itemType eq 'PRODUCT') {
             $Item{'Name'} = $dref->{'strProductName'};
             $Item{'ProductPrice'} = getItemCost($Data, $entityID, $entityLevel, $multiPersonType, $dref->{'intID'}) || 0;
+            $Item{'TransactionID'} = $dref->{'intTransactionID'} || 0;
             
         }
         push @Items, \%Item;

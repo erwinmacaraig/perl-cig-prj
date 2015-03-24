@@ -36,6 +36,7 @@ sub getRegoProducts {
     my $cl  = setClient($Data->{'clientValues'});
 
     my $regoProducts = getAllRegoProducts($Data, $entityID, $regoID, $personID, $incExisting, $products);
+    print STDERR Dumper $regoProducts;
 
     my $productAttributes = Products::getFormProductAttributes($Data, $products) || {};
 
@@ -165,8 +166,7 @@ sub getAllRegoProducts {
                 AND T.intProductID = P.intProductID
                 AND T.intPersonRegistrationID IN (0, ?)
                 AND T.intTXNEntityID IN (0, ?)
-                AND T.intStatus = 0     
-                AND T.intStatus=$ExistingStatus
+                AND T.intStatus IN (0, $ExistingStatus)
             )
             LEFT JOIN tblProductPricing as PP ON (
                 PP.intProductID = P.intProductID
@@ -177,15 +177,23 @@ sub getAllRegoProducts {
             AND P.intProductID IN ($productID_str)
         ORDER BY P.strGroup, P.strName, intLevel
     ];
+    #AND T.intStatus = 0     
+    #AND T.intStatus=$ExistingStatus
+
     #print $sql;
     ## T.intStatus=999 to turn off existing for moment.
             #AND (P.intMinSellLevel <= ? or P.intMinSellLevel=0)
 
+    print STDERR Dumper "TXN ENTITY ID " . $entityID;
+    print STDERR Dumper "PRODUCT STR " . $productID_str;
+    print STDERR Dumper "PERSON ID " . $personID;
+    print STDERR Dumper "EXISTING STATUS " . $ExistingStatus;
     my $q = $Data->{'db'}->prepare($sql);
     $q->execute($personID, $regoID, $entityID, $Data->{'Realm'});
 
     my $regoProducts = $q->fetchall_hashref('intProductID');
 
+    print STDERR Dumper "TRANSACTION ID: " . $regoProducts->{'intTransactionID'};
     return $regoProducts;
 }
 
@@ -553,6 +561,10 @@ sub insertRegoTransaction {
         $Paid{$pref->{'intProductID'}} = 1;
     }
         
+    print STDERR Dumper %{$params};
+            print STDERR Dumper "PRODUCTS SELECTED CHECK";
+            print STDERR Dumper @productsselected;
+            print STDERR Dumper @already_in_cart_items;
     for my $k (%{$params})  {
       if($k=~/prod_/) {
         if($params->{$k}==1)  {
@@ -596,6 +608,7 @@ sub insertRegoTransaction {
     my %ExistingProducts=();
     if (scalar(@productsselected) or scalar(@already_in_cart_items)) {
         if (scalar(@productsselected)) {
+
             foreach my $product (@productsselected)    {
                 ## Lets get rid of duplicate products
                 $q_txnclean->execute($regoID, $intID, $product);
@@ -782,6 +795,10 @@ sub insertRegoTransaction {
   push @txns_added, @already_in_cart_items;
 #  @txns_added ||= [];
   return (\@txns_added, $total_amount);
+}
+
+sub getSelectedProducts {
+
 }
 
 1;
