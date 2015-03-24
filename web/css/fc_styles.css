@@ -2284,9 +2284,36 @@ header nav.navbar-default .navbar-nav > li > a {
   #worktasks_filter { text-align: right; }
   .summaryPanel { display: none; }
   div.dataTables_filter label { color: #000; }
-
+  div.row span.formw { width: 80%; }
+  #searchResult { width: 722px!important; }
+  div.dashboard-tasklist table th { font-size: 12px; }
+  div.dashboard-tasklist table td { font-size: 12px; }
 }
 @media (min-width: 250px) and (max-width: 480px) {
+  
+  #searchResult { width: 100%!important; }
+  #searchResult_wrapper table#searchResult tr.box-header th:nth-child(1) { display: none; }
+  #searchResult_wrapper table#searchResult tr.task-list td:nth-child(1) { display: none; }
+  #searchResult_wrapper table#searchResult tr.box-header th:nth-child(3) { display: none; }
+  #searchResult_wrapper table#searchResult tr.task-list td:nth-child(3) { display: none; }
+  #searchResult_wrapper table#searchResult tr.box-header th:nth-child(4) { display: none; }
+  #searchResult_wrapper table#searchResult tr.task-list td:nth-child(4) { display: none; }
+
+  #searchResult_wrapper table#searchResult tr:nth-child(2) { display: none; }
+  .search-panel input { padding: 5px 10px; }	
+  .search-panel { 
+  	margin-top: -15px;
+    padding-bottom: 5px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  div.row span.formw { width: 75%; }
+  #searchResult_filter { display: none; }
+  .panel-header { display: none; }
+  div.dashboard-tasklist table th { font-size: 10px; }
+  div.dashboard-tasklist table td { font-size: 10px; }
+
+
   header .logo-area ul li { margin: 0px 15px 0px 0px; }
   .row { margin-bottom: -18px; }
   #spmain-navbar-collapse {overflow-y: hidden; margin-bottom: 10px;}
