@@ -167,6 +167,7 @@ sub queryInvoiceByNumber {
 		SELECT 
 			tblTransactions.intTransactionID,
 			tblInvoice.strInvoiceNumber, 
+			tblInvoice.tTimeStamp as invoiceDate,
 			tblTransactions.intQty, 
 			tblTransactions.intStatus,
 			tblProducts.strName, 
@@ -199,6 +200,7 @@ sub queryInvoiceByNumber {
 			SelectLink => qq[$Data->{'target'}?client=$clm&amp;a=P_TXN_EDIT&personID=$dref->{'intPersonID'}&amp;tID=$dref->{intTransactionID}&amp;id=0],
 			#selectpay => $selectPay,
 			invoiceNum => $dref->{'strInvoiceNumber'},
+			invoiceDate =>  $Data->{'l10n'}{'date'}->TZformat($dref->{'invoiceDate'},'MEDIUM','SHORT'), 
 			item => $dref->{'strName'},
 			person => $dref->{'strLocalFirstname'} . ' ' . $dref->{'strLocalSurname'},
 			quantity => $dref->{'intQty'},
@@ -236,6 +238,10 @@ my @headers = (
 	{
       name => $Data->{'lang'}->txt('Invoice Number'),
       field => 'invoiceNum',
+    },
+	{
+      name => $Data->{'lang'}->txt('Invoice Date'),
+      field => 'invoiceDate',
     },
     {
       name =>   $Data->{'lang'}->txt('Item'),
@@ -354,6 +360,7 @@ sub queryInvoiceByOtherInfo {
     SELECT 
 	tblTransactions.intTransactionID,
 	tblInvoice.strInvoiceNumber, 
+	tblInvoice.tTimeStamp as invoiceDate,
 	tblTransactions.intStatus,
 	tblTransactions.intQty, 
 	tblProducts.strName, 
@@ -393,6 +400,7 @@ sub queryInvoiceByOtherInfo {
 			SelectLink => qq[$Data->{'target'}?client=$clm&amp;a=P_TXN_EDIT&personID=$dref->{'intPersonID'}&amp;tID=$dref->{intTransactionID}&amp;id=0],
 			selectpay => $selectPay,
 			invoiceNum => $dref->{'strInvoiceNumber'},
+			invoiceDate =>  $Data->{'l10n'}{'date'}->TZformat($dref->{'invoiceDate'},'MEDIUM','SHORT'), 
 			item => $dref->{'strName'},
 			person => $dref->{'strLocalFirstname'} . ' ' . $dref->{'strLocalSurname'},
 			quantity => $dref->{'intQty'},
@@ -424,6 +432,10 @@ sub displayResults {
     {
       name => $Data->{'lang'}->txt('Invoice Number'),
       field => 'invoiceNum',
+    },
+	{
+      name => $Data->{'lang'}->txt('Invoice Date'),
+      field => 'invoiceDate',
     },
     {
       name =>   $Data->{'lang'}->txt('Item'),
