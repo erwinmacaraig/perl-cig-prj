@@ -3393,6 +3393,7 @@ sub populateRegoPaymentsViewData {
             T.intQty,
             T.curAmount,
             P.strName as ProductName,
+            P.strDisplayName as ProductDisplayName,
             P.strProductType as ProductType,
             T.intStatus,
             T.intTransactionID,
