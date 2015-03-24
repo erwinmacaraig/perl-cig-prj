@@ -189,7 +189,18 @@ sub optionsPersonRegisterWhat {
     if($lookingFor eq 'etype' and $originLevel)  {
         my $id = getID($Data->{'clientValues'}, $originLevel);
         $id = 0 if $originLevel == $Defs::LEVEL_PERSON;
+
         my $levels = _entityTypeList($Data, $id);
+
+        my @MTXparams = (
+            $originLevel,
+            $realmID,
+            $subRealmID,
+            $personType
+        );
+
+        my $allowedToEntityLevel = getAllowedToEntityLevelFromMatrix($Data, \@MTXparams);
+
         if($originLevel == $Defs::LEVEL_PERSON) {
             push @{$levels}, $Defs::LEVEL_NATIONAL;
         }
@@ -197,10 +208,12 @@ sub optionsPersonRegisterWhat {
             push @{$levels}, $originLevel;
         }
         foreach my $l (@{$levels})  {
-            push @retdata, {
-                name => $Data->{'lang'}->txt($Data->{'LevelNames'}{$l} || $Defs::LevelNames{$l}),
-                value => $l,
-            };
+            if($l ~~ @{$allowedToEntityLevel}){
+                push @retdata, {
+                    name => $Data->{'lang'}->txt($Data->{'LevelNames'}{$l} || $Defs::LevelNames{$l}),
+                    value => $l,
+                };
+            }
         }
         return (\@retdata, '');
     }
@@ -857,6 +870,30 @@ sub _entityTypeList {
 }
 
 
+sub getAllowedToEntityLevelFromMatrix {
+    my ($Data, $values_ref) = @_;
+
+    my $st = qq[
+        SELECT DISTINCT intEntityLevel
+        FROM tblMatrix
+        WHERE
+            intOriginLevel = ?
+            AND intLocked = 0
+            AND intRealmID = ?
+            AND intSubRealmID IN (0, ?)
+            AND strPersonType = ?
+    ];
+
+    my $query = $Data->{'db'}->prepare($st);
+    $query->execute(@{$values_ref});
+
+    my @vals=();
+    while(my ($entityLevel) = $query->fetchrow_array())   {
+        push @vals, $entityLevel;
+    }
+
+    return \@vals;
+}
 
 
 1;
