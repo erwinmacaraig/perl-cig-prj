@@ -14,6 +14,7 @@ use Lang;
 use SelfUserLogin;
 use TTTemplate;
 use SelfUserSession;
+use SystemConfig;
 
 main();
 
@@ -26,6 +27,9 @@ sub main {
     $Data{'lang'} = $lang;
     $Data{'target'} = 'login.cgi';
     $Data{'cache'}  = new MCache();
+
+    $Data{'Realm'} = 1;
+    $Data{'SystemConfig'} = getSystemConfig( \%Data );
     my $email = param('email') || '';
     my $password = param('pw') || '';
     my $srp = param('srp') || '';
@@ -92,7 +96,7 @@ sub main {
     else    {
       $body = runTemplate(
         \%Data,
-        {'errors' => $errors, srp => $srp},
+        {'errors' => $errors, srp => $srp, 'returnURL'=>"$Data{'SystemConfig'}{'loginError_returnURL'}"},
         'selfrego/user/loginerror.templ',
       );
     }

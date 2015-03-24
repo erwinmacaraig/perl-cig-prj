@@ -499,6 +499,9 @@ sub regoPageForm {
       $Data,
       {
         AtLoginLevel => 1,
+        HeaderLogo => "$Defs::base_url/$Data->{'SystemConfig'}{'MA_logo'}",
+        HeaderSystemName => $Data->{'SystemConfig'}{'HeaderSystemName'},
+        DefaultSystemConfig => $Data->{'SystemConfig'},
       },
       'user/globalnav.templ',
     );
@@ -534,6 +537,7 @@ sub getPageCustomization{
         {
             PassportLink => '',
             DefaultSystemConfig => $Data->{'SystemConfig'},
+            HeaderLogo => "$Defs::base_url/$Data->{'SystemConfig'}{'MA_logo'}",
         },
         'user/globalnav.templ'
     );
