@@ -962,7 +962,7 @@ sub addWorkFlowTasks {
             AND (r.strISOCountry_IN IS NULL or r.strISOCountry_IN = '' OR r.strISOCountry_IN LIKE CONCAT('%|',p.strISONationality ,'|%'))
             AND (r.strISOCountry_NOTIN IS NULL or r.strISOCountry_NOTIN = '' OR r.strISOCountry_NOTIN NOT LIKE CONCAT('%|',p.strISONationality ,'|%'))
 	    AND (r.intUsingITCFilter =0 
-		OR (r.intUsingITCFilter = 1 AND AND r.intNeededITC = ?)
+		OR (r.intUsingITCFilter = 1 AND r.intNeededITC = ?)
 	    )
         )
 		WHERE
@@ -976,6 +976,7 @@ sub addWorkFlowTasks {
             AND r.strPersonEntityRole IN ('', pr.strPersonEntityRole)
 		];
 	    $q = $db->prepare($st);
+		$itc ||= 0;
   	    $q->execute($itc, $personRegistrationID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
 print STDERR "WORK FLOW FOR $itc\n";
     }
