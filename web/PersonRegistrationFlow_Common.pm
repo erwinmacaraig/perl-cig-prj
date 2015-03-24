@@ -52,6 +52,8 @@ sub displayRegoFlowCompleteBulk {
     my ($Data, $client, $hidden_ref) = @_;
     my $payMethod= $hidden_ref->{'payMethod'} || param('payMethod') || '';
 
+print STDERR "---------------JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ\n";
+print STDERR Dumper($hidden_ref);
     my ($amountDue, $logIDs) = getRegoTXNDetails($Data, $hidden_ref->{'txnIds'});
     $hidden_ref->{'totalAmount'} = $amountDue;
     my $gateways = '';
@@ -63,6 +65,11 @@ sub displayRegoFlowCompleteBulk {
     ($payStatus, $paymentResult) = displayPaymentResult($Data, $logID, 1, '');
      $payMethod = '' if (!$amountDue and $payStatus == -1);
 
+    my $maObj = getInstanceOf($Data, 'national');
+    my $maName = $maObj
+            ? $maObj->name()
+            : '';
+		
     my %PageData = (
         payNowFlag=> ($payMethod eq 'now') ? 1 : 0,
         payNowMsg=> (! $amountDue and $payMethod eq 'now') ? $paymentResult : '',
@@ -71,6 +78,7 @@ sub displayRegoFlowCompleteBulk {
         target => $Data->{'target'},
         Lang => $Data->{'lang'},
         client=>$client,
+	MAName => $maName
     );
         
     my $body = runTemplate($Data, \%PageData, 'registration/completebulk.templ') || '';
@@ -577,6 +585,7 @@ sub getRegoTXNDetails  {
             $amount = $amount + $dref->{'curAmount'};
         }
     }
+print STDERR "payLaterFlag - $amount\n";
     return ($amount, \%tlogIDs);
 }
 

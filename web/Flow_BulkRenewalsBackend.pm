@@ -116,7 +116,6 @@ sub display_person_select   {
 
     my $self = shift;
  
-print STDERR "d_type:" . $self->getCarryFields('d_type') . "\n";
     my $client = $self->{'Data'}->{'client'};
     my $clientValues = $self->{'Data'}->{'clientValues'};
     my $cl = setClient($clientValues);
@@ -187,14 +186,12 @@ sub display_registration {
 #    if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
 #        return ('Invalid User',0);
  #   }
-        print STDERR "$personID PERSON IS : " . $self->{'ClientValues'}{'personID'};
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
 
     my $client = $self->{'Data'}->{'client'};
     my $url = $self->{'Target'}."?rfp=".$self->getNextAction()."&".$self->stringifyURLCarryField();
-print STDERR $url;
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
     $personObj->load();
     my ($dob, $gender) = $personObj->getValue(['dtDOB','intGender']); 
@@ -265,10 +262,6 @@ sub display_products {
     my $self = shift;
     $self->addCarryField('payMethod','');
 
-print STDERR "ROLLOVERIDs:" . $self->getCarryFields('rolloverIDs') . "\n";
-
-print STDERR "PT INS " .$self->{'RunParams'}{'d_type'};
-    
     my $client = $self->{'Data'}->{'client'};
     my $clientValues = $self->{'Data'}->{'clientValues'};
     my $cl = setClient($clientValues);
@@ -366,7 +359,6 @@ sub display_summary {
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
     my $gatewayConfig = undef;
-print STDERR "ROLLOVERIDs:" . $self->getCarryFields('rolloverIDs') . "\n";
     my $rego_ref = {};
     my $content = '';
 
@@ -400,7 +392,6 @@ print STDERR "ROLLOVERIDs:" . $self->getCarryFields('rolloverIDs') . "\n";
         Target => $self->{'Data'}{'target'},
         ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
     );
-print STDERR "SSSS";
     if ($gatewayConfig->{'amountDue'} and $payMethod eq 'now')    {
         ## Change Target etc
         %Config = (
@@ -487,7 +478,6 @@ sub create_bulk_records {
            $self->addCarryField("txnIds",$txnIds);
             $totalAmount = $txnTotalAmount;
             for my $k (keys %{$regoIDs_ref})  {
-print STDERR "regoID_$k $regoIDs_ref->{$k}\n";
                 $self->addCarryField("regoID_$k",$regoIDs_ref->{$k});
             }
         $hiddenFields->{'rolloverIDs'} = $rolloverIDs;
@@ -522,11 +512,14 @@ sub display_complete {
 
     my $hiddenFields = $self->getCarryFields();
 
-    my $rolloverIDs=$self->getCarryFields('rolloverIDs');
+    my $rolloverIDs=$self->getCarryFields('rolloverIDs') || param('rolloverIDs') || '';
     my $prodIds = $self->getCarryFields('prodIds');
     my $prodQty = $self->getCarryFields('prodQty');
     my $markPaid = $self->getCarryFields('markPaid');
     my $paymentType= $self->getCarryFields('paymentType');
+
+$hiddenFields->{'txnIds'} = $hiddenFields->{'txnIds'} || param('txnIds') || '';
+$hiddenFields->{'payMethod'} = $hiddenFields->{'payMethod'} || param('payMethod') || '';
 
     #FC-145 (having duplicate entries upon page refresh.. need to check number of records upon submit)
     my $totalAmount=0;

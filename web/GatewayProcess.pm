@@ -64,7 +64,6 @@ sub markTXNSentToGateway    {
 sub markGatewayAsResponded  {
 
     my ($Data, $logID) = @_;
-#print STDERR "^^^^^^^^^^ MARK GATEWAY AS RESPONDED\n";
     return if ! $logID;
 
     my $stUPD = qq[
@@ -141,7 +140,6 @@ sub markGatewayAsResponded  {
 sub payTryContinueProcess {
 
     my ($Data, $payTry, $client, $logID) = @_;
-#print STDERR "********** IN payTryContinueProcess FOR $logID for $payTry->{'strContinueAction'}\n";
 
     $payTry->{'return'} = 1;
     if ($payTry->{'strContinueAction'} eq 'CLUBFLOW')   {
@@ -160,7 +158,6 @@ sub payTryContinueProcess {
 }
 
 sub payTryRedirectBack  {
-#print STDERR "IN REDIRECT BACK!!\n";
 
     my ($Data, $payTry, $client, $logID, $autoRun) = @_;
 
@@ -181,6 +178,7 @@ sub payTryRedirectBack  {
         $redirect_link .= "&$k=".$payTry->{$k};
 		
     }
+print STDERR $redirect_link;
     return $redirect_link if ! $autoRun;
 
     print "Status: 302 Moved Temporarily\n";
@@ -233,7 +231,6 @@ sub payTryRead  {
 sub gatewayProcess {
 
     my ($Data, $logID, $client, $returnVals_ref, $check_action) = @_;
-#print STDERR "IN GATEWAY PROCESS";
 
     my $db = $Data->{'db'};
 	my $action = $returnVals_ref->{'action'} || '';
@@ -255,8 +252,6 @@ sub gatewayProcess {
 
   my ($paymentSettings, undef) = getPaymentSettings($Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, $external);
 
-print STDERR Dumper($paymentSettings);
-print STDERR "ORDER STATUS IS $Order->{'Status'}\n";
     markGatewayAsResponded($Data, $logID);
 	#return if ($Order->{'Status'} == -1 or $Order->{'Status'} == 1);
 
