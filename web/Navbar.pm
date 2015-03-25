@@ -1128,7 +1128,13 @@ sub getPersonMenuData {
     my $txns_link_name = $lang->txt('Transactions');
     if($SystemConfig->{'AllowTXNs'}) {
        $menuoptions{'transactions'} = {
+		   name => $lang->txt('List Transactions'),
            url => $baseurl."a=P_TXNLog_list",
+       };
+	   
+	   $menuoptions{'addtransactions'} = {
+		   name => $lang->txt('Add Transactions'),
+           url => $baseurl."a=P_TXN_ADD",
        };
     }
     $menuoptions{'docs'} = {
@@ -1168,7 +1174,7 @@ sub getPersonMenuData {
     my @menu_structure = (
         [ $lang->txt('Person Dashboard'), 'home','home'],
         [ $lang->txt('Player Passport'), 'menu','passport'],
-        [ $lang->txt('Transactions'), 'menu','transactions'],
+        [ $lang->txt('Transactions'), 'menu',['transactions','addtransactions']],
         [ $lang->txt('Certificates'), 'menu','certificates'],
         [ $lang->txt('History'), 'menu',[
             'regos',
