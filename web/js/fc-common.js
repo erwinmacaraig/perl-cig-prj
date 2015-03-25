@@ -133,12 +133,12 @@ function calculateProducts(){
     });
     $('.totalValue').html('$'+totalProduct.toFixed(2));
 }
-function updateRegoProductsTotal(chkb,id_cost,id_total){	
-	var total = parseFloat($("#"+id_total).text());
+function updateRegoProductsTotal(chkb,id_cost,id_total,client){	
+	var total = parseFloat($("#"+id_total).val());
    
 	//if( $('form#flowFormID td.col-1 input[type="checkbox"]:checked').prop("checked") == true){
 	if( $('#'+chkb).prop("checked") == true){
-		total = total + parseFloat($("#"+id_cost).val());		
+		total = total + parseFloat($("#"+id_cost).val());	
 	}	
 	else {
 		total = total - parseFloat($("#"+id_cost).val());
@@ -149,8 +149,27 @@ function updateRegoProductsTotal(chkb,id_cost,id_total){
 	}
 	else {
 		$("#payOptions").css("display","none");
+		total = 0;
 	}
-	$("#"+id_total).html(total.toFixed(2));
+	//$("#totalAmountUnpaidInFlow").val(total);
+	$.ajax(
+		{
+			method: "POST",
+			url:"../formatcurrencyamount.cgi",
+			data:"amount=" + total + "&client="+ client 			
+		}).done(
+			function(formattedamount){
+				$("#totalAmountUnpaidInFlow").html(formattedamount);
+			}
+	);
+
+
+
+
+	//$("#"+id_total).html(total);
+	//total = parseFloat(total);
+	//console.log(total);
+	//alert(total);
 }
 
 
