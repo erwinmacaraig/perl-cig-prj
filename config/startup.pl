@@ -22,8 +22,8 @@ use lib qw(
 /u/current/web/Mail
 /u/current/web/PaymentSplit
 /u/current/web/admin
-/u/current/web/Registration
-/u/current/web/Registration/user
+/u/current/web/registration
+/u/current/web/registration/user
 
 );
 #Other Perl Libs
