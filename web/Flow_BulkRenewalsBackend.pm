@@ -350,9 +350,9 @@ sub display_summary {
     my $self = shift;
     my $personObj;
     my $personID = $self->ID();
-    if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
-        return ('Invalid User',0);
-    }
+    #if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
+    #    return ('Invalid User',0);
+    #}
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
