@@ -44,7 +44,9 @@
 					    	<li><span class="details-left">[% Lang.txt("Sport") %]:</span> <span class="details-value">[% IF sport %][% sport %][% ELSE %] - [% END %]</span></li>
 					    	<li><span class="details-left">[% Lang.txt("Level") %]:</span> <span class="details-value">[% IF organizationLevel %][% organizationLevel %][% ELSE %] - [% END %]</span></li>
 					    	<li><span class="details-left">[% Lang.txt("Bank Account Details") %]:</span> <span class="details-value">[% IF bankAccountDetails %][% bankAccountDetails %][% ELSE %] - [% END %]</span></li>
+                            [% IF OriginLevel == 100 %]
 					    	<li><span class="details-left">[% Lang.txt("MA Comment") %]:</span> <span class="details-value">[% IF comment %][% comment %][% ELSE %] - [% END %]</span></li>
+                            [% END %]
 					    </ul><br/>
 					    <a href="[% editlink %]&amp;rfp=role" class="pull-right">Edit</a>
 				     </div>
