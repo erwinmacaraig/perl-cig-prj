@@ -115,6 +115,7 @@ sub getRegoProducts {
         AllowedCountText => $AllowedCountText || '',
         UnPaidItems => \@unpaid_items,
         CurrencySymbol => $currencySymbol,
+		client => $cl,
     );
     my $pagedata = '';
     $pagedata = runTemplate($Data, \%PageData, 'registration/products.templ');
