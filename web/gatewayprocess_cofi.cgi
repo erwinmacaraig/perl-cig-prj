@@ -25,6 +25,7 @@ use Gateway_Common;
 use TTTemplate;
 use Data::Dumper;
 use GatewayProcess;
+use PayTry;
 use Localisation;
 
 use Digest::SHA qw(hmac_sha256_hex);

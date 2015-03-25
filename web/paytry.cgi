@@ -26,6 +26,7 @@ use ConfigOptions;
 use Email;
 use Products;
 use GatewayProcess;
+use PayTry;
 use Localisation;
 use WorkFlow;
 

@@ -22,6 +22,7 @@ use CGI qw(param unescape escape);
 
 use ExternalGateway;
 use Gateway_Common;
+use PayTry;
 use TTTemplate;
 use Data::Dumper;
 use GatewayProcess;
