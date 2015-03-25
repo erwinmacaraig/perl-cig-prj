@@ -92,10 +92,9 @@ sub checkRulePaymentFlagActions {
             AND T.intPersonRegistrationID = ?
         ORDER BY intWFTaskID DESC LIMIT 1
     ];
-print STDERR $st;
 
     my $q= $Data->{'db'}->prepare($st);
-    $q->execute($personID, $entityID, $personRegistrationID) or print STDERR "DB ERRIR";
+    $q->execute($personID, $entityID, $personRegistrationID);
 
 
     my $countTaskSkipped= 0;
@@ -978,7 +977,6 @@ sub addWorkFlowTasks {
 	    $q = $db->prepare($st);
 		$itc ||= 0;
   	    $q->execute($itc, $personRegistrationID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
-print STDERR "WORK FLOW FOR $itc\n";
     }
     if ($ruleFor eq 'ENTITY' and $entityID)  {
         ## APPROVAL FOR ENTITY
@@ -2776,7 +2774,6 @@ sub populateRegoViewData {
         );
         my $request = getRequests($Data, \%regFilter);
         $personRequestData = $request->[0];
-        #print STDERR Dumper $personRequestData;
         $TemplateData{'TransferDetails'}{'TransferTo'} = $personRequestData->{'requestFrom'} || '';
         $TemplateData{'TransferDetails'}{'TransferFrom'} = $personRequestData->{'requestTo'} || '';
         $TemplateData{'TransferDetails'}{'RegistrationDateFrom'} = $dref->{'NPdtFrom'};
