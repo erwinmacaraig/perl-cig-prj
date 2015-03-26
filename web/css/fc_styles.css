@@ -2211,6 +2211,13 @@ div[id*="doctab"] .documents-list table.table .task-list .status-col a.btn-insid
 	float: right;
 	padding-top: 5px;
 }
+.lang-select {
+    color:#000;
+    font-size: 13px;
+}
+.lang-select select{
+    padding: 1px 5px;
+}
 .hidden-col-val {
     display:none;
 }

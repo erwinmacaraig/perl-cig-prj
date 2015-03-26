@@ -25,10 +25,10 @@ sub getFieldLabels	{
 			strNationalNum => $natnumname,
 			strStatus => "Status",
 			strSalutation => 'Title',
-			strLocalFirstname => 'First name',
+			strLocalFirstname => 'First Name',
 			strLocalMiddlename => 'Local Middle name',
 			strPreferredName => 'Preferred name',
-			strLocalSurname => 'Family name',
+			strLocalSurname => 'Family Name',
 			strLatinSurname => 'International Family name',
 			strLatinFirstname=> 'International First name',
 			strMaidenName => 'Maiden name',
@@ -54,7 +54,7 @@ sub getFieldLabels	{
 			strEmail => 'Contact Email',
 			strEmail2 => 'Email 2',
 			intEthnicityID => 'Race',
-			intDeceased => 'Deceased?',
+			intDeceased => 'Deceased',
 			strLoyaltyNumber => 'Loyalty Number',
 			strPassportNationality => 'Passport Nationality',
 			strPassportNo => 'Passport Number',
@@ -206,6 +206,7 @@ sub getFieldLabels	{
             strOrganisationLevel => 'Level',
             dissolved => 'Dissolved',
             intFacilityTypeID => 'Venue Type',
+            strBankAccountNumber => 'Bank Account Details',
             );
 	}
 

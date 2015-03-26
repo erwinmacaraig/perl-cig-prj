@@ -89,7 +89,7 @@ sub listPersonAuditLog    {
 	};
 	 my $title = '';
 	 my $resultHTML = runTemplate($Data, $PageContent, 'person/auditlog.templ') || '';
-	 $title = 'Audit Trail';
+	 $title = $Data->{'lang'}->txt('Audit Trail');
 	 return ($resultHTML, $title);
 }
 sub listEntityAuditLog {

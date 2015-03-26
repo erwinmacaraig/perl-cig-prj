@@ -37,7 +37,7 @@ sub getRegoProducts {
 
     my $regoProducts = getAllRegoProducts($Data, $entityID, $regoID, $personID, $incExisting, $products);
 
-    my $productAttributes = Products::getFormProductAttributes($Data, 0) || {};
+    my $productAttributes = Products::getFormProductAttributes($Data, $products) || {};
 
     my $i            = 0;
     my $count        = 0;
@@ -90,7 +90,7 @@ sub getRegoProducts {
             Status => $dref->{'intStatus'},
             ProductNotes => decode_entities($dref->{'strProductNotes'}) || '',
             Mandatory => $regItemRules_ref->{$dref->{'intProductID'}}{'Required'} || $dref->{'intIsMandatory'} || 0,
-            Name => $dref->{'strName'} || '',
+            Name => $dref->{'strDisplayName'} || $dref->{'strName'} || '',
             Photo =>$photolink,
         );
         push @unpaid_items, \%itemdata if $filter_display;
@@ -116,7 +116,7 @@ sub getRegoProducts {
         CurrencySymbol => $currencySymbol,
     );
     my $pagedata = '';
-    $pagedata = runTemplate($Data, \%PageData, 'regoform/common/products.templ');
+    $pagedata = runTemplate($Data, \%PageData, 'registration/products.templ');
     return $pagedata || '';
 }
 
@@ -133,6 +133,7 @@ sub getAllRegoProducts {
             T.intTransactionID,
             T.curAmount as AmountCharged,
             P.intProductID,
+            P.strDisplayName,
             P.strName,
             P.curDefaultAmount,
             P.intMinChangeLevel,
@@ -276,7 +277,7 @@ Please click back on your Internet browser to return to the items selection scre
 
 sub checkMandatoryProducts      {
     my ($Data, $ID, $tableType, $params) = @_;
-    return ('', 0) if (! $Data->{'SystemConfig'}{'AllowOnlineRego_mandatoryCheck'});
+    #return ('', 0) if (! $Data->{'SystemConfig'}{'AllowOnlineRego_mandatoryCheck'});
     $ID||=0;
     $tableType||=0;
 
@@ -318,7 +319,7 @@ sub checkMandatoryProducts      {
                     INNER JOIN tblProducts as P ON (P.intProductID=T.intProductID)
                 WHERE T.intID = ?
                     AND T.intTableType = ?
-                    AND (T.intTransactionID IN($trans_list) or T.intStatus=1)
+                    AND (T.intTransactionID IN($trans_list) or T.intStatus IN (1,3))
         ];
                     #AND P.intInactive=0
         my $query = $Data->{'db'}->prepare($st);
@@ -353,7 +354,8 @@ sub checkMandatoryProducts      {
 
     $products_list = join(',', map { '?' } @products_list );
 
-    my $resultHTML = qq[<p>In order to continue with your online transaction, you must select the following mandatory items</p><br>];
+    my $lang = $Data->{'lang'};
+    my $resultHTML = qq[]. $lang->txt('In order to continue, you must select the following mandatory items') . qq[<br>];
 
     my $st = qq[
         SELECT strName, strGroup
@@ -366,11 +368,10 @@ sub checkMandatoryProducts      {
     my $mand_errors = 0;
     while (my $dref = $query->fetchrow_hashref())   {
         $mand_errors ++;
-        $resultHTML .= qq[<p>* $dref->{strName}];
+        $resultHTML .= qq[* $dref->{strName}];
         $resultHTML .= qq[($dref->{strGroup})] if ($dref->{strGroup});
-        $resultHTML .= qq[</p>];
+        #$resultHTML .= qq[</p>];
     }
-    $resultHTML .= qq[<br><p>Please press the <b>back</b> button on your browser</p>];
 
     return ($resultHTML, 1) if ($mand_errors);
     return ('',0);

@@ -332,7 +332,7 @@ sub list_products	{
       	field =>  'amount',
     	},
     	{
-    	  name =>   $Data->{'lang'}->txt('Active ?'),
+    	  name =>   $Data->{'lang'}->txt('Active'),
     	  field =>  'active',
 				type => 'tick',
     	},
@@ -2038,6 +2038,8 @@ my $entityTypeID = $Data->{'currentLevel'};
             ( pd.intLevel = $Defs::LEVEL_CLUB AND pd.intID = ? )
             OR
             ( pd.intLevel = $Defs::LEVEL_NATIONAL AND pd.intID = ? )
+            OR
+            ( pd.intLevel = 0 and pd.intID=0)
         ) 
     ];
 
@@ -2051,6 +2053,7 @@ my $entityTypeID = $Data->{'currentLevel'};
         AND pd.intProductID IN ($productID)
         ORDER BY strGroup, strName
     ];
+print STDERR $query;
 
     my $sth = $Data->{'db'}->prepare($query);
 
@@ -2083,10 +2086,11 @@ my $entityTypeID = $Data->{'currentLevel'};
     WHERE 
       intProductID = ?
       AND intRealmID = ?
-      AND intID = ?
-      AND intLevel = ?
+      AND intID IN (0, ?)
+      AND intLevel IN (0, ?)
       AND intAttributeType = ?
   ];
+print STDERR $query;
   my $sth = $Data->{'db'}->prepare($query);
   $sth->execute(
     $productID,
@@ -2494,55 +2498,17 @@ sub apply_product_rules {
 sub getFormProductAttributes {
     my (
         $Data,
-        $formID
+        $productIds
     ) = @_;
     
     my @product_list;
     my %AttributeValues=();
     
+    my $productID_str = join(',',@{$productIds});
+
     # Select products at the node level
-    my $node_search_sql = qq[
-        SELECT
-            intProductID
-        FROM
-            tblRegoFormProducts
-        WHERE
-            intRegoFormID = ?
-    ];
-    
-    my $node_search_sth = $Data->{'db'}->prepare($node_search_sql);
-    $node_search_sth->execute($formID);
-    my $node_products = $node_search_sth->fetchall_arrayref([0]);
-    
-    foreach my $ref ( @$node_products){
-        push @product_list, $ref->[0];
-    }
-    
-    # Select added products at assoc or club level
-    my $added_search_sql = qq[
-        SELECT
-            intProductID
-        FROM
-            tblRegoFormProductsAdded
-        WHERE
-            intRegoFormID = ?
-            AND intClubID = ?
-    ];
-    my $added_search_sth = $Data->{'db'}->prepare($added_search_sql);
-    
-    my $clubID = $Data->{'clientValues'}{'clubID'}>0 ? $Data->{'clientValues'}{'clubID'} : 0;
-    
-    $added_search_sth->execute($formID, $clubID);
-    
-    my $added_products = $added_search_sth->fetchall_arrayref([0]);
-    
-    foreach my $ref ( @$added_products){
-        push @product_list, $ref->[0];
-    }
-    
     # Get product attributes for our list of products
-    if (@product_list){
-        my $products_where = join (', ', map{'?'} @product_list );
+    if (@{$productIds}){
         my $query = qq[
             SELECT 
                 intProductID,
@@ -2551,8 +2517,9 @@ sub getFormProductAttributes {
             FROM 
                 tblProductAttributes
             WHERE 
-                intProductID in ( $products_where )
+                intProductID in ( $productID_str)
         ];
+print STDERR "$query\n";
         my $sth = $Data->{'db'}->prepare($query);
         $sth->execute(@product_list);
         

@@ -469,7 +469,6 @@ sub displayOptions {
 	my $postblock = $self->{'Config'}{'PostBlock'} 
 		? qq[<div id= "ROPostBlock">$self->{'Config'}{'PostBlock'}</div>]
 		: '';
-	my $intro = $lang->txt('ADV_REPORT_INTRO');
 	my $returl = $self->{'ReturnURL'}
 		? qq[ <a href="$self->{'ReturnURL'}">&lt; Return to Report Manager</a>]
 		: '';
@@ -490,7 +489,6 @@ sub displayOptions {
 .ui-timepicker-rtl dl { text-align: right; }
 .ui-timepicker-rtl dl dd { margin: 0 65px 10px 10px; }
 </style>
-		<div class="RO_adv_intro"></div>
 		<div id = "ROallfields-wrapper">
 			<div id = "ROallfields">
 			$allfields

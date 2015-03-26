@@ -22,6 +22,10 @@ function update_options(optionType, dtype)   {
       else {
           jQuery('#flow-btn-continue').show();
       }
+
+      if(jQuery("input#l_ma_comment").length > 0){
+        jQuery("input#l_ma_comment").show();
+      }
     }
     else    {
         jQuery.getJSON('ajax/aj_person_registerwhat.cgi?otype=' + optionType + qstring, function(data)    {
@@ -46,6 +50,16 @@ function update_options(optionType, dtype)   {
               error = (data.error) ? data.error : '';
               jQuery('.notavailable').show();           
              //(jQuery('#regopt_title_nooptions').html() + ": " + "<br/>" + error);
+          }
+          if(optionType == 'etype' && jQuery('#clientLevel').val())   {
+              jQuery('#l_' + optionType ).val(jQuery('#clientLevel').val()); 
+              jQuery('#l_' + optionType ).fcToggle('rebuild');
+              jQuery('#l_' + optionType).trigger('change');
+          }
+          if(optionType == 'eId' && jQuery('#clientID').val())   {
+              jQuery('#l_' + optionType ).val(jQuery('#clientID').val()); 
+              jQuery('#l_' + optionType ).fcToggle('rebuild');
+              jQuery('#l_' + optionType).trigger('change');
           }
         });
     }

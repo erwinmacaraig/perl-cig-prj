@@ -54,7 +54,7 @@ sub minorComparisonDate {
     my $today = dateatAssoc($timezone);
     my $dateAs = $Data->{'SystemConfig'}{'Age-DateAsOf'} || $today;
     my $adultAge = $Data->{'SystemConfig'}{'Age-Adult'} || 18;
-    my $tooYoungAge = $Data->{'SystemConfig'}{'Age-TooYoung'} || 12;
+    my $tooYoungAge = $Data->{'SystemConfig'}{'Age-TooYoung'} || 10;
     my($dateAs_y,$dateAs_m,$dateAs_d) = $dateAs =~/(\d\d\d\d)-(\d{1,2})-(\d{1,2})/;
     my ( $age_year, $age_month, $age_day ) = Add_Delta_Days(Add_Delta_YM( $dateAs_y, $dateAs_m, $dateAs_d, -$adultAge, 0),-1);
     $age_month = '0'.$age_month if $age_month < 10;

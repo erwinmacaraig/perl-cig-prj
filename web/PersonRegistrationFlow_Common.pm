@@ -45,6 +45,7 @@ use InstanceOf;
 use EntityTypeRoles;
 use PersonSummaryPanel;
 use PersonCertifications;
+use Switch;
 
 sub displayRegoFlowCompleteBulk {
 
@@ -493,17 +494,35 @@ print STDERR "000OK IS $ok | $run\n\n";
        my $cl = setClient($Data->{'clientValues'}) || '';
        my %cv = getClient($cl);
        #$cv{'clubID'} = $rego_ref->{'intEntityID'};
-       $cv{'clubID'} = $clubReg;
-       $cv{'currentLevel'} = $Defs::LEVEL_CLUB;
+       if ($Data->{'clientValues'}{'clubID'} > 0)   {
+            $cv{'clubID'} = $clubReg;
+            $cv{'currentLevel'} = $Defs::LEVEL_CLUB;
+       }
+       elsif ($Data->{'clientValues'}{'regionID'} > 0)    {
+            $cv{'regionID'} = $clubReg;
+            $cv{'currentLevel'} = $Defs::LEVEL_REGION;
+
+       }
+       else {
+            $cv{'entityID'} = $clubReg; ## As its getLastEntityID
+            $cv{'currentLevel'} = $Defs::LEVEL_NATIONAL;
+        }
+
        my $clm = setClient(\%cv);
 
+        my $client        = unescape($client);
+        my %tempClientValues = getClient($client);
+        $tempClientValues{personID} = $personID;
+        my $tempClient = setClient(\%tempClientValues);
 
-       $cv{'entityID'} = $maObj->getValue('intEntityID');
-       $cv{'currentLevel'} = $Defs::LEVEL_NATIONAL;
-       my $mlm = setClient(\%cv);
+#       $cv{'entityID'} = $maObj->getValue('intEntityID');
+#       $cv{'currentLevel'} = $Defs::LEVEL_NATIONAL;
+#       my $mlm = setClient(\%cv);
 
-		
-
+    $cv{'entityID'} = getID($Data->{'ClientValues'}, $Data->{'ClientValues'}{'authLevel'});
+    $cv{'currentLevel'} = $originLevel;
+    my $originClient = setClient(\%cv);
+   
         my %PageData = (
             person_home_url => $url,
 			person => \%personData,
@@ -518,8 +537,10 @@ print STDERR "000OK IS $ok | $run\n\n";
             dtype => $hidden_ref->{'dtype'} || '',
             dtypeText => $Defs::personType{$hidden_ref->{'dtype'}} || '',
             client=>$clm,
-            maclient => $mlm,
+            clientrego=>$tempClient,
+            #maclient => $mlm,
             originLevel => $originLevel,
+            originClient => $originClient,
             PersonSummaryPanel => personSummaryPanel($Data, $personObj->ID()),
         );
         
@@ -1152,7 +1173,23 @@ sub save_rego_products {
 
 
 sub add_rego_record{
-    my ($Data, $personID, $entityID, $entityLevel, $originLevel, $personType, $personEntityRole, $personLevel, $sport, $ageLevel, $registrationNature, $ruleFor, $nationality, $personRequestID) =@_;
+    my (
+        $Data,
+        $personID,
+        $entityID,
+        $entityLevel,
+        $originLevel,
+        $personType,
+        $personEntityRole,
+        $personLevel,
+        $sport,
+        $ageLevel,
+        $registrationNature,
+        $ruleFor,
+        $nationality,
+        $personRequestID,
+        $MAComment
+    ) = @_;
 
     my $clientValues = $Data->{'clientValues'};
     my $rego_ref = {
@@ -1171,6 +1208,7 @@ sub add_rego_record{
         current => 1,
         ruleFor=>$ruleFor,
         personRequestID => $personRequestID,
+        MAComment => $MAComment || '',
     };
     my ($personStatus, $prStatus) = checkIsSuspended($Data, $personID, $entityID, $rego_ref->{'personType'});
     return (0, undef, 'SUSPENDED') if ($personStatus eq 'SUSPENDED' or $prStatus eq 'SUSPENDED');

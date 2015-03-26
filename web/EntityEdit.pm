@@ -243,6 +243,7 @@ sub getFieldNames {
         intNotifications
         strOrganisationLevel
         intFacilityTypeID
+        strBankAccountNumber
     ));
     return \@fields;
 }

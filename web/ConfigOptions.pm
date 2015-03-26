@@ -482,6 +482,7 @@ sub getFieldsList	{
         dtTo
         intNotifications
         intFacilityTypeID
+        strBankAccountNumber
         ));
 
     return \@clubFields if $fieldtype eq 'Club';

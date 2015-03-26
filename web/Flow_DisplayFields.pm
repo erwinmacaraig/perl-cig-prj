@@ -174,6 +174,7 @@ qq[<textarea name="d_$fieldname" id="l_$fieldname" $rows $cols $disabled $onChan
                 if ($f->{'Save_readonly'}){
                     $isReadonly = qq[ readonly = "readonly" ];
                 }
+                $val =~s/"/&quot;/g;
                 $field_html =
 qq[<input type="text" name="d_$fieldname" value="$val" $isReadonly id="l_$fieldname" $sz $ms $ph $disabled $onChange / >$txt_format\n];
             }
@@ -239,6 +240,8 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                   $f->{'validate'};
                 $clientside_validation{$fieldname}{'compulsoryIfVisible'} =
                   $f->{'compulsoryIfVisible'};
+                $clientside_validation{$fieldname}{'validateData'} =
+                  $f->{'validateData'};
             }
             $label = qq[$label] if $label;
         }
@@ -811,15 +814,13 @@ qq[To modify this information change the information in the boxes below and when
     );
 
     my $txt = q{};
-    if ( exists $self->{'Fields'}->{'options'}{'LocaleMakeText'}
-        and $self->{'Fields'}->{'options'}{'LocaleMakeText'} )
-    {
+    if ($self->{'Lang'}) {
 
-        $txt = $self->{'Fields'}->{'options'}{'LocaleMakeText'}->txt(
+        $txt = $self->{'Lang'}->txt(
             $key,
             (
                 map {
-                    $self->{'Fields'}->{'options'}{'LocaleMakeText'}->txt($_)
+                    $self->{'Lang'}->txt($_)
                       || $_
                 } @_
             )
@@ -1157,6 +1158,26 @@ sub generate_clientside_validation {
                       $self->langlookup(
                         "Please enter a valid URL" );
                 }
+                elsif ( $t eq 'REMOTE' ) {
+                    my $vdata = $validation->{$k}{'validateData'} || next;
+                    my %remote_data = ();
+                    my $otherfields =  $vdata->{'otherfields'} || [];
+                    push @{$otherfields}, $k;
+                    for my $f (@{$otherfields})    {
+                        $remote_data{$f} = "REMOVEQfunction() { return jQuery('#l_$f' ).val(); }REMOVEQ";
+                    }
+                    foreach my $k (keys %{$vdata->{'postvalues'}})    {
+                        $remote_data{$k} = $vdata->{'postvalues'}{$k} || 0;
+                    }
+
+                    $valinfo{'rules'}{ 'd_' . $k }{'remote'} = {
+                            url => $vdata->{'url'},
+                            type => "post",
+                            data => \%remote_data,
+                    };
+                    $valinfo{'messages'}{ 'd_' . $k }{'remote'} =
+                      $self->langlookup("Number is invalid", $num1, $num2 );
+                }
             }
         }
     }
@@ -1174,6 +1195,9 @@ sub generate_clientside_validation {
         $val_rules =~ s/JAVASCRIPT['"]//g;
         $val_rules =~ s/['"]JAVASCRIPT//g;
         $val_rules =~ s/SINGLEQUOTE/'/g;
+        $val_rules =~ s/"REMOVEQ//g;
+        $val_rules =~ s/REMOVEQ"//g;
+        $val_rules =~ s/REMOVEQ//g;
         $val_rules .= qq~
             ,
             ignore: ".ignore",

@@ -31,6 +31,7 @@ use Data::Dumper;
 use UploadFiles;
 use EntitySummaryPanel;
 use IncompleteRegistrations;
+use Transactions;
 
 
 
@@ -669,7 +670,9 @@ sub display_summary     {
 			legaltype => Club::getLegalTypeName($self->{'Data'},$clubObj->{'DBData'}{'intLegalTypeID'}),
 			organizationType => $clubObj->{'DBData'}{'strEntityType'},
 			organizationLevel => $clubObj->{'DBData'}{'strOrganisationLevel'},  
+			bankAccountDetails => $clubObj->{'DBData'}{'strBankAccountNumber'},
 			editlink =>  $self->{'Data'}{'target'}."?".$self->stringifyURLCarryField(),
+            OriginLevel => $originLevel,
 	);
 	
     my $summaryClubContent = runTemplate(
@@ -720,7 +723,7 @@ sub display_complete {
                 $self->{'Data'},
                 'ENTITY',
                 'NEW',
-                $self->{'ClientValues'}{'authLevel'} || 0,
+                $self->{'ClientValues'}{'currentLevel'} || $self->{'ClientValues'}{'authLevel'} || 0,
                 $clubObj->ID(),
                 0,
                 0,
@@ -761,6 +764,7 @@ sub display_complete {
         client => $self->{'Data'}->{'client'},
         target => $self->{'Data'}->{'target'},
         MA => $maName,
+        url => $Defs::base_url,
     );
     my $displayClubForApproval = runTemplate(
         $self->{'Data'},
@@ -820,6 +824,7 @@ sub loadObjectValues    {
             strDiscipline
             strOrganisationLevel
             strMANotes
+            strBankAccountNumber
         )) {
             $values{$field} = $object->getValue($field);
         }

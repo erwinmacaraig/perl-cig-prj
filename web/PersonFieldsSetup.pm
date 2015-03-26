@@ -870,6 +870,23 @@ sub personFieldsSetup {
         };
         push @{$fieldsets->{'core'}{'order'}} , $fieldname;
     }
+    if($Data->{'SystemConfig'}{'NatCodeField'})  {
+        my $fieldname = $Data->{'SystemConfig'}{'NatCodeField'}; 
+        $fieldsets->{'core'}{'fields'}{$fieldname}{'validate'} = 'REMOTE';
+        $fieldsets->{'core'}{'fields'}{$fieldname}{'validateData'} = {
+                url => $Defs::base_url . '/ajax/aj_validate_natcode.cgi',
+                otherfields => [
+                        'dtDOB_year',
+                        'dtDOB_mon',
+                        'dtDOB_day',
+                        'intGender',
+                ],
+                postvalues=> {
+                        'f' => $fieldname,
+                },
+
+        };
+    }
 
     return $fieldsets;
 }

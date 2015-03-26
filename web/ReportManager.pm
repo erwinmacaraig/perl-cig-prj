@@ -93,7 +93,7 @@ sub handleReports	{
 				rID => $reportID,
 			});
 			$body .= $reportObj->displayOptions();
-			$title = $lang->txt('Configure Report - ').field_changetext($Data, $reportObj->Name());
+			$title = $lang->txt('Configure Report'). ' - ' .field_changetext($Data, $reportObj->Name());
 		}
 	}
 	
