@@ -29,6 +29,7 @@ use GatewayProcess;
 use PayTry;
 use Localisation;
 use WorkFlow;
+use MA_Gateways;
 
 main();
 
@@ -135,7 +136,7 @@ sub main	{
     ## In here I will build up URL per Gateway -- intPaymentConfigID or have a GATEWAYCODE ?
     ## Pass control to gateway
     my $paymentURL = '';
-    my %gatewaySpecific = ();
+    my $gatewaySpecific ='';
 
     my $currentLang = $Data{'lang'}->generateLocale($Data{'SystemConfig'});
 
@@ -143,60 +144,38 @@ sub main	{
         $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$payRef&amp;chkv=$chkvalue&amp;session=$session&amp;amount=$amount&amp;logID=$logID];
     }
     if ($paymentSettings->{'gatewayCode'} eq 'checkoutfi')  {
-        $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$payRef&amp;chkv=$chkvalue&amp;session=$session];
-        my $cents = $amount * 100;
-        my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
-        $Year+=1900;
-        $Month++;    
-        $Month = sprintf("%02s", $Month);
-        $Day = sprintf("%02s", $Day);
-        my $DeliveryDate = "$Year$Month$Day";
+	my %MAGateway= ();
+	$MAGateway{'nh'} = $Data{'noheader'};
+	$MAGateway{'client'} = $client;
+	$MAGateway{'ci'} = $payRef;
+	$MAGateway{'chkv'} = $chkvalue;
+	$MAGateway{'session'} = $session;
+	$MAGateway{'amount'} = $amount;
+	$MAGateway{'logID'} = $logID;
+	$MAGateway{'currentLang'} = $currentLang;
+	
+	$MAGateway{''} = 
 
-	my $pa = $paymentSettings->{'gatewayProcessPreGateway'} ==1 ? 0 : 1;
-        my $delayedURL= $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&pa=$pa&ci=$payRef];
-        my $cancelURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&ci=$payRef];
-        my $returnURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=$pa&ci=$payRef];
-        my $rejectURL = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=$pa&ci=$payRef];
-
-        $gatewaySpecific{'VERSION'} = "0001";
-        $gatewaySpecific{'STAMP'} = $payRef;
-        $gatewaySpecific{'AMOUNT'} = $cents;
-        $gatewaySpecific{'REFERENCE'} = $logID;
-        $gatewaySpecific{'MESSAGE'} = "";
-        $gatewaySpecific{'LANGUAGE'} = "FI";
-        $gatewaySpecific{'LANGUAGE'} = "EN" if ($currentLang =~ /^en_/);
-        
-        $gatewaySpecific{'MERCHANT'} = $paymentSettings->{'gatewayUsername'};
-        $gatewaySpecific{'RETURN'} = $returnURL;
-        $gatewaySpecific{'CANCEL'} = $cancelURL;
-        $gatewaySpecific{'REJECT'} = $rejectURL;
-        $gatewaySpecific{'DELAYED'} = $delayedURL;
-        $gatewaySpecific{'COUNTRY'} = "FIN";
-        $gatewaySpecific{'CURRENCY'} = $paymentSettings->{'currency'};
-        $gatewaySpecific{'DEVICE'} = 1;
-        $gatewaySpecific{'CONTENT'} = 1;
-        $gatewaySpecific{'TYPE'} = 0;
-        $gatewaySpecific{'ALGORITHM'} = 3;
-
-        $gatewaySpecific{'DELIVERY_DATE'} = $DeliveryDate;
-        $gatewaySpecific{'FIRSTNAME'} = "";
-        $gatewaySpecific{'FAMILYNAME'} = "";
-        $gatewaySpecific{'ADDRESS'} = "";
-        $gatewaySpecific{'POSTCODE'} = "";
-        $gatewaySpecific{'POSTOFFICE'} = "";
-
-        my $m = new MD5;
-        my $coKey = $gatewaySpecific{'VERSION'} ."+". $gatewaySpecific{'STAMP'} ."+". $gatewaySpecific{'AMOUNT'} ."+". $gatewaySpecific{'REFERENCE'} ."+". $gatewaySpecific{'MESSAGE'} ."+". $gatewaySpecific{'LANGUAGE'} ."+". $gatewaySpecific{'MERCHANT'} ."+". $gatewaySpecific{'RETURN'} ."+". $gatewaySpecific{'CANCEL'} ."+". $gatewaySpecific{'REJECT'} ."+". $gatewaySpecific{'DELAYED'} ."+". $gatewaySpecific{'COUNTRY'} ."+". $gatewaySpecific{'CURRENCY'} ."+". $gatewaySpecific{'DEVICE'} ."+". $gatewaySpecific{'CONTENT'} ."+". $gatewaySpecific{'TYPE'} ."+". $gatewaySpecific{'ALGORITHM'} ."+". $gatewaySpecific{'DELIVERY_DATE'} ."+". $gatewaySpecific{'FIRSTNAME'} ."+". $gatewaySpecific{'FAMILYNAME'} ."+". $gatewaySpecific{'ADDRESS'} ."+". $gatewaySpecific{'POSTCODE'} ."+". $gatewaySpecific{'POSTOFFICE'} ."+". $paymentSettings->{'gatewayPassword'};
-    
-        $m->reset();
-        $m->add($coKey);
-        my $authKey= uc($m->hexdigest());
-        $gatewaySpecific{'MAC'} = $authKey;
-
-        $gatewaySpecific{'EMAIL'} = "";
-        $gatewaySpecific{'PHONE'} = "";
-
+	$gatewaySpecific = MAGateway_FI_checkoutFI(\%MAGateway, $paymentSettings);
+	$paymentURL = $gatewaySpecific->{'paymentURL'};
     }
+    if ($paymentSettings->{'gatewayCode'} eq 'hk_paydollar')  {
+	my %MAGateway= ();
+	$MAGateway{'nh'} = $Data{'noheader'};
+	$MAGateway{'client'} = $client;
+	$MAGateway{'ci'} = $payRef;
+	$MAGateway{'chkv'} = $chkvalue;
+	$MAGateway{'session'} = $session;
+	$MAGateway{'amount'} = $amount;
+	$MAGateway{'logID'} = $logID;
+	$MAGateway{'currentLang'} = $currentLang;
+	
+	$MAGateway{''} = 
+
+	$gatewaySpecific = MAGateway_HKPayDollar(\%MAGateway, $paymentSettings);
+	$paymentURL = $gatewaySpecific->{'paymentURL'};
+    }
+
 
     markTXNSentToGateway(\%Data, $logID);
 
@@ -232,8 +211,8 @@ sub main	{
     if ($paymentSettings->{'gatewayCode'} eq 'NABExt1') {
         $proceed_body .= qq[ <input type = "hidden" name = "amount" value = "$amount"> ];
     }
-    foreach my $k (keys %gatewaySpecific) {
-        $proceed_body .= qq[<input type="hidden" name="$k" value="$gatewaySpecific{$k}">];
+    foreach my $k (keys %{$gatewaySpecific}) {
+        $proceed_body .= qq[<input type="hidden" name="$k" value="$gatewaySpecific->{$k}">];
     } 
     $proceed_body .= qq[
         </form>
