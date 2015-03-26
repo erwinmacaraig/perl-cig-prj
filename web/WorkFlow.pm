@@ -357,7 +357,7 @@ sub handleWorkflow {
     }
     elsif ( $action eq 'WF_Verify' ) {
         verifyDocument($Data);
-        ( $body, $title ) = viewTask( $Data );
+        #( $body, $title ) = viewTask( $Data );
     }
     elsif ( $action eq 'WF_Summary' ) {
         ( $body, $title ) = viewSummaryPreApproval( $Data );
