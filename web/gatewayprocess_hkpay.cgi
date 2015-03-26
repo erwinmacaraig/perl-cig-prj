@@ -46,7 +46,7 @@ print STDERR "IN GATEWAYPROCESS_hkpay\n";
     getDBConfig(\%Data);
     $Data{'SystemConfig'}=getSystemConfig(\%Data);
 
-	my $payRef= param('STAMP') || param('ci') || '';
+	my $payRef= param('Ref') || param('ci') || '';
 	my $submit_action= param('sa') || '';
 	my $display_action= param('da') || '';
     my $process_action= param('pa') || '';
@@ -90,17 +90,26 @@ my ($paymentSettings, undef) = getPaymentSettings(\%Data,$Order->{'PaymentType'}
         $returnVals{'chkv'} = param('chkv') || 0;
 
         my %Vals = ();
-        $Vals{'VERSION'}= param('VERSION') || '';
-        $Vals{'STAMP'}= $payRef; #param('STAMP') || '';
-        $Vals{'REFERENCE'}= param('REFERENCE') || '';
-        $Vals{'PAYMENT'}= param('PAYMENT') || '';
-        $Vals{'STATUS'}= param('STATUS') || '';
-        $Vals{'ALGORITHM'}= param('ALGORITHM') || '';
-        $Vals{'MAC'}= param('MAC') || '';
+        $Vals{'src'}= param('src') || '';
+        $Vals{'prc'}= param('prc') || '';
+        $Vals{'Ord'}= param('Ord') || '';
+        $Vals{'Holder'}= param('Holder') || '';
+        $Vals{'successcode'}= param('successcode') || '';
+        $Vals{'Ref'}= $payRef; #param('STAMP') || '';
+        $Vals{'PayRef'}= param('PayRef') || ''; ## Gateways ref number
+        $Vals{'Amt'}= param('Amt') || '';
+        $Vals{'Cur'}= param('Cur') || '';
+        $Vals{'remark'}= param('remark') || '';
+        $Vals{'secureHash'}= param('secureHash') || '';
+        $Vals{'payType'}= param('payType') || 'N';
+        $Vals{'merchantId'}= param('merchantId') || ''; ## is this same as gatewayUsername
+print STDERR "MERCHANTId " . $Vals{'merchantId'} . " is this same as gatewayUsername ?";
         
 
-        my $str = "$Vals{'VERSION'}&$Vals{'STAMP'}&$Vals{'REFERENCE'}&$Vals{'PAYMENT'}&$Vals{'STATUS'}&$Vals{'ALGORITHM'}";
-        my $digest=uc(hmac_sha256_hex($str, $paymentSettings->{'gatewayPassword'}));
+	my $coKey = $paymentSettings->{'gatewayUsername'} ."|". $Vals{'Ref'} ."|". $Vals{'Cur'} ."|". $Vals{'Amt'} ."|". $Vals{'payType'} ."|". $paymentSettings->{'gatewayPassword'};
+
+        #$gatewaySpecific{'secureHash'} = sha1($coKey);
+
         my $chkAction = 'FAILURE';
 print STDERR "$Vals{'MAC'} $str $digest |  $paymentSettings->{'gatewayPassword'}\n";
         if ($Vals{'MAC'} eq $digest)    {
@@ -109,7 +118,7 @@ print STDERR "$Vals{'MAC'} $str $digest |  $paymentSettings->{'gatewayPassword'}
 print STDERR "MAC ACTION IS $chkAction\n";
 
         $returnVals{'GATEWAY_TXN_ID'}= param('PAYMENT') || '';
-        $returnVals{'GATEWAY_AUTH_ID'}= param('REFERENCE') || '';
+        $returnVals{'GATEWAY_AUTH_ID'}= param('AuthId') || '';
         my $co_status = param('STATUS') || '';
         $returnVals{'GATEWAY_RESPONSE_CODE'}= "99";
         $returnVals{'GATEWAY_RESPONSE_CODE'}= "OK" if (
