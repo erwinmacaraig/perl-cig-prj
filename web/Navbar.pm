@@ -449,10 +449,12 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
 			    url => $baseurl."strInvoiceNumber=&amp;a=TXN_PAY_INV_NUM",
 		}; 
     }
-	$menuoptions{'paymenthistory'} = { 
-	    name => $lang->txt('Payments History'),
-		url => $baseurl."a=P_TXNLog_list",
-	}; 
+		if ($SystemConfig->{'allowPaymentsHistory'})	{
+			$menuoptions{'paymenthistory'} = { 
+			    name => $lang->txt('Payments History'),
+				url => $baseurl."a=P_TXNLog_list",
+			};
+		}
 	# P_TXNLog_list url => $baseurl."a=TXN_PAY_HISTORY",
 
     my @menu_structure = (
@@ -785,10 +787,12 @@ sub getClubMenuData {
 			    url => $baseurl."strInvoiceNumber=&amp;a=TXN_PAY_INV_NUM",
 		    }; 
         }
-		$menuoptions{'paymenthistory'} = { 
-			name => $lang->txt('Payments History'),
-			url => $baseurl."a=P_TXNLog_list",
-		}; 
+		if ($SystemConfig->{'allowPaymentsHistory'})	{
+			$menuoptions{'paymenthistory'} = { 
+				name => $lang->txt('Payments History'),
+				url => $baseurl."a=P_TXNLog_list",
+			};
+		}
 		# url => $baseurl."a=TXN_PAY_HISTORY"
 
         if ($SystemConfig->{'allowPersonRequest'}) {
