@@ -2290,7 +2290,17 @@ header nav.navbar-default .navbar-nav > li > a {
   div.dashboard-tasklist table td { font-size: 12px; }
 }
 @media (min-width: 250px) and (max-width: 480px) {
-  
+ 
+   table.table.tableboxheader thead tr th { font-size: 11px; }
+   table.table.tableboxheader thead tr td { font-size: 11px; }
+   
+   #grid_wrapper #grid th:nth-child(3) { display: none; } 
+   #grid_wrapper #grid td:nth-child(3) { display: none; } 
+   #grid_wrapper #grid th:nth-child(4) { display: none; } 
+   #grid_wrapper #grid td:nth-child(4) { display: none; } 
+   #grid_wrapper #grid th:nth-child(5) { display: none; } 
+   #grid_wrapper #grid td:nth-child(5) { display: none; }  
+
   #searchResult { width: 100%!important; }
   #searchResult_wrapper table#searchResult tr.box-header th:nth-child(1) { display: none; }
   #searchResult_wrapper table#searchResult tr.task-list td:nth-child(1) { display: none; }
@@ -2484,4 +2494,5 @@ header nav.navbar-default .navbar-nav > li > a {
    #secmain #l_row_strNotes .col-md-9 textarea { width: 100%; }
    form#searchForm .btn-inside-panels { margin-left: 0; }
    #fsg-core label.col-md-4 { text-align: left; }
+
 }
