@@ -504,7 +504,8 @@ sub listTasks {
 		$entityID,
 		$entityID,
 	) or query_error($st);
-
+	open FH, ">dumpfile.txt";
+	print FH "$st \n $entityID";
 	my @TaskList = ();
     my @taskType = ();
     my @taskStatus = ();
