@@ -519,9 +519,9 @@ sub createTransLog	{
     $fields{amount} = $amount || 0;
     
     my $authLevel = $Data->{'clientValues'}{'authLevel'}||=$Defs::INVALID_ID;
-    if (! $entityID)    {
+    #if (! $entityID)    {
         $entityID = getID($Data->{'clientValues'}, $authLevel);
-    }
+    #}
 	$entityID= 0 if $entityID== $Defs::INVALID_ID;
 
  	my $paymentConfigID= $paymentSettings->{'intPaymentConfigID'} || 0;
