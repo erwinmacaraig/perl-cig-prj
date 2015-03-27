@@ -356,7 +356,7 @@ sub handleWorkflow {
     }
     elsif ( $action eq 'WF_Verify' ) {
         verifyDocument($Data);
-        ( $body, $title ) = viewTask( $Data );
+        #( $body, $title ) = viewTask( $Data );
     }
     elsif ( $action eq 'WF_Summary' ) {
         ( $body, $title ) = viewSummaryPreApproval( $Data );
@@ -504,7 +504,8 @@ sub listTasks {
 		$entityID,
 		$entityID,
 	) or query_error($st);
-
+	open FH, ">dumpfile.txt";
+	print FH "$st \n $entityID";
 	my @TaskList = ();
     my @taskType = ();
     my @taskStatus = ();

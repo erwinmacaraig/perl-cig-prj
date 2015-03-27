@@ -82,7 +82,16 @@ sub handlePayInvoice {
 		use Payments;
 		my $success;
 		my $intTransLogID = param('tl') || 0;		
-		($success, $resultHTML) = displayPaymentResult($Data, $intTransLogID, 0) ;
+		($success, $resultHTML) = displayPaymentResult($Data, $intTransLogID, 0);
+		my $st = qq[SELECT intID FROM tblTransactions WHERE intTransLogID = $intTransLogID AND intRealmID = $Data->{'Realm'}];
+		my $query = $Data->{'db'}->prepare($st);
+		$query->execute();
+		my @intIDs = ();
+		while(my $dref = $query->fetchrow_hashref()){
+			push @intIDs,$dref->{'intID'};
+		}		
+		my $receiptLink = "printreceipt.cgi?client=$client&ids=$intTransLogID&pID=" . join(",",@intIDs);
+		
 		if(!$success){
 			use Gateway_Common;
 			my $trans_ref = gatewayTransLog($Data, $intTransLogID);
@@ -92,6 +101,12 @@ sub handlePayInvoice {
             $trans_ref,
             'payment/pay_invoice_payment_error.templ'
           );
+		}
+		else {
+			$resultHTML .= qq[<br>
+							 <br><a href="$receiptLink" target="receipt">]. $Data->{'lang'}->txt('Print Receipt') .qq[</a><br>
+							 <br><a href="$Data->{'target'}?client=$client&amp;a=P_TXN_LIST">]. $Data->{'lang'}->txt('Return to Transactions') .
+							qq[</a><br>];
 		}		
 
 

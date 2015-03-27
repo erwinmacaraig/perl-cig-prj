@@ -59,7 +59,7 @@ sub handlePersonFlow {
         $cancelFlowURL = "$Data->{'target'}?client=$tmpC&amp;a=E_HOME";
     }
     if($renewalTargetRegoID)    {
-        my $rego = getRegistrationDetail($Data, $renewalTargetRegoID) || {};
+        my $rego = PersonRegistration::getRegistrationDetail($Data, $renewalTargetRegoID) || {};
         if($rego and $rego->[0] and $rego->[0]{'personType'} and !$defaultType)   {
             $defaultType = $rego->[0]{'personType'};
         }
