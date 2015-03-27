@@ -76,9 +76,9 @@ print STDERR "IN checkOpenPayments\n";
             INNER JOIN tblPaymentConfig as PC ON (PC.intPaymentConfigID = TL.intPaymentConfigID)
 	    INNER JOIN tblPayTry as PT ON (PT.intTransLogID = TL.intLogID)
         WHERE
-            TL.intStatus IN (1)
+        TL.intStatus IN (0)
             AND PC.strGatewayCode = 'checkoutfi'
-	AND  TL.intSentToGateway = 1 
+		AND  TL.intSentToGateway = 1 
     ];
             #TL.intStatus IN (0,3)
             #AND TL.intPaymentGatewayResponded = 0
@@ -109,7 +109,6 @@ print STDERR "IN checkOpenPayments\n";
         initLocalisation(\%Data);
 
 
-print STDERR " SHOULD WE ONLY CHECK FOR TXNs PAST 1 hr ?";
         print STDERR "CHECK FOR $logID\n";
         my %APIResponse=();
         my $cents = $dref->{'intAmount'} * 100;
@@ -133,8 +132,8 @@ print STDERR " SHOULD WE ONLY CHECK FOR TXNs PAST 1 hr ?";
         my $ua = LWP::UserAgent->new();
         my $res= $ua->request($req);
         my $retval = $res->content() || '';
-print STDERR Dumper(\%APIResponse);
-print STDERR "--- $retval\n";
+#print STDERR Dumper(\%APIResponse);
+#print STDERR "--- $retval\n";
 	next if $retval =~/error/;
 	next if $retval !~/status/;
 
@@ -142,14 +141,12 @@ print STDERR "--- $retval\n";
         #my $dataIN= XMLin($retval);
 	my $dataIN= XMLin($retval);
 
-        print STDERR Dumper($dataIN);
+        #print STDERR Dumper($dataIN);
         
         $APIResponse{'STATUS'} = $dataIN->{'status'}; 
 print STDERR Dumper(\%APIResponse);
 print STDERR "API STATUS IS " . $APIResponse{'STATUS'};
 
-print STDERR "~~~~~ 10072 on should work !   FIX SQL AND REMOVE 'next;'\n";
-next;
         
         $APIResponse{'sa'} = 1;
         $APIResponse{'pa'} = 1;

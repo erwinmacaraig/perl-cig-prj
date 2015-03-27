@@ -154,6 +154,7 @@ sub gatewayProcess {
 
 	my ($Order, $Transactions) = gatewayTransactions($Data, $logID);
 	 $Order->{'Status'} = $Order->{'TLStatus'} ==1 ? 1 : 0;
+print STDERR "ORDER STATUS " . $Order->{'Status'};
   $Data->{'SystemConfig'}{'PaymentConfigID'} = $Data->{'SystemConfig'}{'PaymentConfigUsedID'} ||  $Data->{'SystemConfig'}{'PaymentConfigID'};
 
   my ($paymentSettings, undef) = getPaymentSettings($Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, $external);
@@ -167,6 +168,8 @@ sub gatewayProcess {
     my $m;
     $m = new MD5;
     $m->reset();
+	
+$paymentSettings->{'gatewaySalt'} ||='';
     $m->add($paymentSettings->{'gatewaySalt'}, $chkvalue);
     $chkvalue = $m->hexdigest();
     #warn "chkv VS. chkvalue :: $chkv :::::  $chkvalue ";
