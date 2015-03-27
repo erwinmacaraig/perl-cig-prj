@@ -1296,7 +1296,7 @@ sub display_summary {
         Title => '',
         TextTop => '',
         TextBottom => '',
-        ContinueButtonText => $self->{'Lang'}->txt('Submit to ') . $self->{'Lang'}->txt($initialTaskAssigneeLevel),
+        ContinueButtonText => $self->{'Lang'}->txt('Submit to ' . $initialTaskAssigneeLevel),
     );
     my $pagedata = $self->display(\%PageData);
 
