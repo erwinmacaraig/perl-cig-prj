@@ -470,6 +470,7 @@ my $h3eader = $o->header();
 
 sub regoPageForm {
     my($title, $body, $clientValues_ref, $client, $Data) = @_;
+
     $title ||= '';
     $body||= textMessage("Oops !<br> This shouldn't be happening!<br> Please contact <a href=\"mailto:info\@sportingpulse.com\">info\@sportingpulse.com</a>");
     $Data->{'TagManager'}=''; #getTagManager($Data);
@@ -490,7 +491,17 @@ sub regoPageForm {
             $cookies_string = join(',', @cookie_array);
         }
 
-        print $output->header(-cookie=>[$cookies_string]); # -charset=>'UTF-8');
+        if($Data->{'RedirectTo'})   {
+            print $output->redirect (-uri => $Data->{'RedirectTo'},-cookie=>[$cookies_string]);
+        }
+        else    {
+            print $output->header(-cookie=>[$cookies_string]); # -charset=>'UTF-8');
+            #$header = $output->header(-cookie=>[$cookies_string], -P3P => $p3p, -charset=>'UTF-8');
+        }
+
+    } elsif($Data->{'RedirectTo'}) {
+        my $output = new CGI;
+        print $output->redirect ($Data->{'RedirectTo'});
     } else {
         print "Content-type: text/html\n\n";
     }
