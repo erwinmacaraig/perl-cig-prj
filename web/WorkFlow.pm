@@ -27,6 +27,7 @@ require Exporter;
     updateTaskNotes
     redirectTemplate
     updateTaskScreen
+    getInitialTaskAssignee
 );
 
 use strict;
@@ -4533,6 +4534,44 @@ sub getCCRecipient {
     }
 
     return;
+}
+
+sub getInitialTaskAssignee {
+     my(
+        $Data,
+        $personID,
+        $registrationID,
+        $entityID
+    ) = @_;
+
+    if($entityID){
+    }
+    elsif($personID and $registrationID){
+        my $st = qq[
+            SELECT tr.*
+            FROM tblWFRule tr
+            INNER JOIN tblPersonRegistration_$Data->{'Realm'} tp
+            ON (
+                tp.strPersonType = tr.strPersonType
+                AND tp.strPersonLevel = tr.strPersonLevel
+                AND tp.strSport = tr.strSport
+                AND tp.strAgeLevel = tr.strAgeLevel
+                AND tr.strRegistrationNature = tp.strRegistrationNature
+                AND tr.intOriginLevel = tp.intOriginLevel
+            )
+            WHERE
+                tp.intPersonRegistrationID = ?
+                AND tr.strTaskStatus = 'ACTIVE'
+            ORDER BY
+                tr.intApprovalEntityLevel
+            LIMIT 1
+        ];
+        my $q = $Data->{'db'}->prepare($st);
+        $q->execute($registrationID);
+
+        my $dref = $q->fetchrow_hashref();
+        return $Defs::initialTaskAssignee{$dref->{'intApprovalEntityLevel'} || 100};
+    }
 }
 
 1;
