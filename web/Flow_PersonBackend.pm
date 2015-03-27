@@ -1279,6 +1279,14 @@ sub display_summary {
         $self->setCurrentProcessIndex('r');
         return ('',2);
     }
+
+    my $initialTaskAssigneeLevel = getInitialTaskAssignee(
+        $self->{'Data'},
+        $personID,
+        $regoID,
+        0
+    );
+
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -1288,7 +1296,7 @@ sub display_summary {
         Title => '',
         TextTop => '',
         TextBottom => '',
-        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+        ContinueButtonText => $self->{'Lang'}->txt('Submit to ') . $self->{'Lang'}->txt($initialTaskAssigneeLevel),
     );
     my $pagedata = $self->display(\%PageData);
 

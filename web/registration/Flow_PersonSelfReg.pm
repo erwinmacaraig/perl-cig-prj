@@ -618,6 +618,7 @@ sub process_registration {
         if(!$existingReg or $changeExistingReg)   {
             $self->addCarryField('rID',$regoID);
             $self->addCarryField('pType',$personType);
+            $self->addCarryField('d_nature',$registrationNature);
         }
     }
 
@@ -1141,6 +1142,14 @@ sub display_summary {
         $self->decrementCurrentProcessIndex();
         return ('',2);
     }
+
+    my $initialTaskAssigneeLevel = getInitialTaskAssignee(
+        $self->{'Data'},
+        $personID,
+        $regoID,
+        0
+    );
+
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -1150,8 +1159,11 @@ sub display_summary {
         Title => '',
         TextTop => '',
         TextBottom => '',
-        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+        ContinueButtonText => $self->{'Lang'}->txt('Submit to ') . $self->{'Lang'}->txt($initialTaskAssigneeLevel),
     );
+
+
+    my $registrationNature = $self->{'RunParams'}{'d_nature'} || '';
     my $pagedata = $self->display(\%PageData);
 
     return ($pagedata,0);
