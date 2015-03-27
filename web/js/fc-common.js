@@ -155,7 +155,7 @@ function updateRegoProductsTotal(chkb,id_cost,id_total,client){
 	$.ajax(
 		{
 			method: "POST",
-			url:"../formatcurrencyamount.cgi",
+			url:"formatcurrencyamount.cgi",
 			data:"amount=" + total + "&client="+ client 			
 		}).done(
 			function(formattedamount){
