@@ -918,7 +918,7 @@ sub addRegistration {
   		$Reg_ref->{'current'} || 0,  		
   		$Reg_ref->{'originLevel'} || 0,  		
   		$Reg_ref->{'originID'} || 0,  		
-        $Data->{'clientValues'}{'userID'} || 0,
+        $Reg_ref->{'originLevel'} == 1 ? $Data->{'User'}{'UserID'} || 0 : $Data->{'clientValues'}{'userID'} || 0,
   		$Reg_ref->{'dateFrom'},  		
   		$Reg_ref->{'dateTo'},  		
   		$Data->{'Realm'},
