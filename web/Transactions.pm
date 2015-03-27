@@ -72,11 +72,35 @@ sub handleTransactions	{
   }
 
   if ($action =~ /_TXN_LIST/) {
-        $entityID = getLastEntityID($Data->{'clientValues'});
+        $entityID = getLastEntityID($Data->{'clientValues'});		
+		my $cl = setClient($Data->{'clientValues'});
+        my %cv = getClient($cl);
+		if ($Data->{'clientValues'}{'clubID'} > 0)   {
+            $cv{'clubID'} = $entityID;
+            $cv{'currentLevel'} = $Defs::LEVEL_CLUB;
+       }
+       elsif ($Data->{'clientValues'}{'regionID'} > 0)    {
+            $cv{'regionID'} = $entityID;
+            $cv{'currentLevel'} = $Defs::LEVEL_REGION;
+       }
+       else {
+            $cv{'entityID'} = $entityID; ## As its getLastEntityID
+            $cv{'currentLevel'} = $Defs::LEVEL_NATIONAL;
+        }
+ 		my $clm = setClient(\%cv);
 		my $resultHTML_ = '';
 		($resultHTML_,$heading) = TransLog::handleTransLogs('list', $Data, $entityID, $intTableID);
     		$heading = $Data->{'lang'}->txt('List Transactions');
+		$resultHTML_ .= qq[
+			<div class="button-row">
+				<a href="$Data->{target}?client=$clm&amp;a=WF_" class="btn-main"> Go to your dashboard </a>
+				<a href="$Data->{target}?client=$clm&amp;a=TXN_PAY_INV_QUERY_INFO" class="btn-main pull-right">Return to Invoices </a>
+				
+			</div>
+		];
+			
 		$resultHTML .= $resultHTML_;
+
   }
   if ($action =~ /_TXN_FAILURE/) {
 	my $intLogID=param("ci") || '';
