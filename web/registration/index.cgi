@@ -21,6 +21,9 @@ use AddToPage;
 
 use SelfUserHome;
 use Flow_PersonSelfReg;
+use SelfUserWorkFlow;
+
+use Data::Dumper;
 
 main();
 
@@ -140,6 +143,9 @@ sub main {
         my ($content,  undef) = $flow->run();
         $resultHTML .= $content;
     }
+    elsif ( $action =~ /WF_/ ) {
+        ($resultHTML, $pageHeading) = handleSelfUserWorkFlow(\%Data, $user, $action);
+    }
     else {
         # Display login page
         $resultHTML = runTemplate(
@@ -154,6 +160,11 @@ sub main {
     # BUILD PAGE
     $client = setClient( \%clientValues );
     $clientValues{INTERNAL_db} = $db;
+    $resultHTML = qq[
+        <div class="pageHeading">$pageHeading</div>
+        $resultHTML
+    ] if $pageHeading;
+
     $resultHTML ||= textMessage("An invalid Action Code has been passed to me.");
 
     regoPageForm($Defs::page_title, $resultHTML, \%clientValues,$client, \%Data);
