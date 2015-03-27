@@ -393,8 +393,8 @@ sub display_products {
 
         push @prodIDs, $product->{'ID'};
         $ProductRules{$product->{'ID'}} = $product;
-	$totalamountchk += $product->{'ProductPrice'} ; #if($product->{'Required'} && $product->{'ProductPrice'} > 0);
-print STDERR "ERWIN CAN YOU CHECK.  If all products are optional needs thought on how we show Payment Options - should we adjust this in other flows";
+	$totalamountchk += $product->{'ProductPrice'} if($product->{'Required'} && $product->{'ProductPrice'} > 0);
+#print STDERR "ERWIN CAN YOU CHECK.  If all products are optional needs thought on how we show Payment Options - should we adjust this in other flows";
 	
      }
     my $product_body='';
