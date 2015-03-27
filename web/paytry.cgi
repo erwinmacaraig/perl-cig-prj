@@ -211,9 +211,11 @@ sub main	{
     if ($paymentSettings->{'gatewayCode'} eq 'NABExt1') {
         $proceed_body .= qq[ <input type = "hidden" name = "amount" value = "$amount"> ];
     }
+	if (defined $gatewaySpecific && $gatewaySpecific)	{
     foreach my $k (keys %{$gatewaySpecific}) {
         $proceed_body .= qq[<input type="hidden" name="$k" value="$gatewaySpecific->{$k}">];
     } 
+	}
     $proceed_body .= qq[
         </form>
     </body>
