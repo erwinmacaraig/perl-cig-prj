@@ -21,6 +21,7 @@ sub getRegistrationItems    {
     $ruleFor ||= '';
     $entityLevel ||= 0; # used for Products
     $multiPersonType ||= ''; ## For products, are multi regos used    
+    my $itc = $dref->{'InternationalTransfer'} || 0;
 
     return 0 if (! $itemType);
 
@@ -57,6 +58,9 @@ sub getRegistrationItems    {
         AND (RI.strISOCountry_NOTIN ='' OR RI.strISOCountry_NOTIN IS NULL OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))        
         AND (RI.intFilterFromAge = 0 OR RI.intFilterFromAge <= ?)
         AND (RI.intFilterToAge = 0 OR RI.intFilterToAge >= ?)
+	AND (RI.intItemUsingITCFilter =0
+                OR (RI.intItemUsingITCFilter = 1 AND RI.intItemNeededITC = ?)
+            )
       ]; 
 
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
@@ -78,6 +82,7 @@ sub getRegistrationItems    {
 	        $Rego_ref->{'Nationality'} || '',
 	        $Rego_ref->{'currentAge'} || 0,
 	        $Rego_ref->{'currentAge'} || 0,
+		$itc
 	        
 		) or query_error($st);
    

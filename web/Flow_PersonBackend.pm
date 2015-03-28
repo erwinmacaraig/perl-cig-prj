@@ -925,7 +925,7 @@ sub display_products {
     if($regoID) {
         my $nationality = $personObj->getValue('strISONationality') || ''; 
         $rego_ref->{'Nationality'} = $nationality;
-
+        $rego_ref->{'InternationalTransfer'} = 1 if $self->getCarryFields('itc');
         $content = displayRegoFlowProducts(
             $self->{'Data'}, 
             $regoID, 
@@ -1044,6 +1044,7 @@ sub process_products {
         $self->setCurrentProcessIndex('p');
         return ('',2);
     }
+    $rego_ref->{'InternationalTransfer'} = 1 if $self->getCarryFields('itc');
     my ($txnIds, $amount) = save_rego_products($self->{'Data'}, $regoID, $personID, $entityID, $entityLevel, $rego_ref, $self->{'RunParams'});
 
 ####

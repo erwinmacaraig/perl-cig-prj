@@ -31,6 +31,8 @@ CREATE TABLE tblRegistrationItem (
     strISOCountry_NOTIN varchar(200) DEFAULT NULL,
     intFilterFromAge INT DEFAULT 0,
     intFilterToAge INT DEFAULT 0,
+	intItemNeededITC tinyint default 0 COMMENT 'Was an ITC needed',
+	intItemUsingITCFilter tinyint default 0 COMMENT 'Using ITC filter',
     tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
 
