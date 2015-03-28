@@ -1096,6 +1096,7 @@ sub display_documents {
     $personObj->load();
 	my $nationality = $personObj->getValue('strISONationality') || ''; 
         my $itc = $personObj->getValue('intInternationalTransfer') || '';
+        #my $itc = $self->getCarryFields('itc') || '';
         $rego_ref->{'Nationality'} = $nationality;
         $rego_ref->{'InternationalTransfer'} = $itc;
 
@@ -1171,7 +1172,8 @@ sub process_documents {
 		$personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
     	$personObj->load();
 		my $nationality = $personObj->getValue('strISONationality') || ''; 
-        my $itc = $personObj->getValue('intInternationalTransfer') || '';
+         my $itc = $personObj->getValue('intInternationalTransfer') || '';
+	#my $itc = $self->{'RunParams'}{'itc'} || 0;
         $rego_ref->{'Nationality'} = $nationality;
         $rego_ref->{'InternationalTransfer'} = $itc;
     }

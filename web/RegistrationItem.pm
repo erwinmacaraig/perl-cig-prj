@@ -21,7 +21,7 @@ sub getRegistrationItems    {
     $ruleFor ||= '';
     $entityLevel ||= 0; # used for Products
     $multiPersonType ||= ''; ## For products, are multi regos used    
-    my $itc = $dref->{'InternationalTransfer'} || 0;
+    my $itc = $Rego_ref->{'InternationalTransfer'} || 0;
 
     return 0 if (! $itemType);
 
