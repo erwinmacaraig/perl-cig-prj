@@ -208,6 +208,7 @@ sub displayTransaction	{
 		SELECT 
       P.strName, 
       T.* , 
+	IF(T.intSentToGateway=1 and T.intPaymentGatewayResponded = 0, 1, 0) as GatewayLocked,
       DATE_FORMAT(T.dtTransaction ,"%d/%m/%Y") AS dtTransaction, 
       DATE_FORMAT(T.dtStart ,"%d/%m/%Y") AS dtStart, 
       DATE_FORMAT(T.dtEnd ,"%d/%m/%Y") AS dtEnd, 
@@ -232,6 +233,7 @@ sub displayTransaction	{
 	$query->execute;
 	my $dref=$query->fetchrow_hashref();
 	$dref->{'NumChildren'} ||= 0;
+	my $gatewayLocked = $dref->{'GatewayLocked'} || 0;
 	my $txnupdate=qq[
 		UPDATE tblTransactions
 			SET --VAL--
@@ -358,7 +360,7 @@ sub displayTransaction	{
 					type => 'text',
 					size => 8,
 					value => $dref->{'curAmount'},
-					readonly=>$amount_readonly,
+					readonly=>($amount_readonly or $gatewayLocked),
 				},
 				AmountAlreadyPaid=> {
 					label => $dref->{'AmountAlreadyPaid'} ? $lang->txt('Amount Already Paid via Part Payments') : '',
@@ -461,6 +463,9 @@ sub displayTransaction	{
 	my $url = getPartPayURL($Data, $id) if ($dref->{'NumChildren'});
 	if ($url)	{
 		$resultHTML.= qq[<a href=$url target="invoice_pay">].$lang->txt('Click to View Part Payment form').qq[</a><br><br>];
+	}
+	if ($gatewayLocked)	{
+		$resultHTML = qq[<p class="warningmsg">]. $lang->txt("Record locked until Payment Gateway responds") . qq[</p>] . $resultHTML;
 	}
 	$resultHTML .= showTransactionChildren($Data, $id) if ($dref->{'NumChildren'});
 
