@@ -36,7 +36,6 @@ sub getRegoProducts {
     my $cl  = setClient($Data->{'clientValues'});
 
     my $regoProducts = getAllRegoProducts($Data, $entityID, $regoID, $personID, $incExisting, $products);
-    print STDERR Dumper $regoProducts;
 
     my $productAttributes = Products::getFormProductAttributes($Data, $products) || {};
 
@@ -185,16 +184,11 @@ sub getAllRegoProducts {
     ## T.intStatus=999 to turn off existing for moment.
             #AND (P.intMinSellLevel <= ? or P.intMinSellLevel=0)
 
-    print STDERR Dumper "TXN ENTITY ID " . $entityID;
-    print STDERR Dumper "PRODUCT STR " . $productID_str;
-    print STDERR Dumper "PERSON ID " . $personID;
-    print STDERR Dumper "EXISTING STATUS " . $ExistingStatus;
     my $q = $Data->{'db'}->prepare($sql);
     $q->execute($personID, $regoID, $entityID, $Data->{'Realm'});
 
     my $regoProducts = $q->fetchall_hashref('intProductID');
 
-    print STDERR Dumper "TRANSACTION ID: " . $regoProducts->{'intTransactionID'};
     return $regoProducts;
 }
 
@@ -562,10 +556,6 @@ sub insertRegoTransaction {
         $Paid{$pref->{'intProductID'}} = 1;
     }
         
-    print STDERR Dumper %{$params};
-            print STDERR Dumper "PRODUCTS SELECTED CHECK";
-            print STDERR Dumper @productsselected;
-            print STDERR Dumper @already_in_cart_items;
     for my $k (%{$params})  {
       if($k=~/prod_/) {
         if($params->{$k}==1)  {
