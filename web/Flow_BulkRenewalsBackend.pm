@@ -298,6 +298,8 @@ sub display_products {
 
     my $content= displayRegoFlowProductsBulk($self->{'Data'}, 0, $client, $entityLevel, $originLevel, $bulk_ref, $entityID, 0, \%Hidden);
     if (! $content) {
+	$self->setCurrentProcessIndex('summ');
+	return ('',2);
     }
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
