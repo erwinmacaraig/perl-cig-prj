@@ -91,8 +91,8 @@ sub handleTransactions	{
 		my $resultHTML_ = '';
 		($resultHTML_,$heading) = TransLog::handleTransLogs('list', $Data, $entityID, $intTableID);
     		$heading = $Data->{'lang'}->txt('List Transactions');
-		$resultHTML_ .= qq[
-			<div class="button-row">
+		$resultHTML_ .= qq[<br />
+			<div>
 				<a href="$Data->{target}?client=$clm&amp;a=WF_" class="btn-main"> Go to your dashboard </a>
 				<a href="$Data->{target}?client=$clm&amp;a=TXN_PAY_INV_QUERY_INFO" class="btn-main pull-right">Return to Invoices </a>
 				
