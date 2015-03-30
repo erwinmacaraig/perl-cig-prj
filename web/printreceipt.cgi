@@ -21,6 +21,8 @@ use Lang;
 use TTTemplate;
 use Payments;
 use Data::Dumper;
+use L10n::DateFormat;
+use L10n::CurrencyFormat;
 main();
 
 sub main	{
@@ -29,7 +31,7 @@ sub main	{
 	my $client = param('client') || '';
 	my $txlogIDs= param('ids') || '';
 	my $personID = param('pID') || '';
-
+	
 	my @intIDs = split(/,/,$personID);
 	my %clientValues = getClient($client);
 	my %Data=();
@@ -63,7 +65,9 @@ $Data{'db'}=$db;
 	my $bodyHTML = '';
 	my $ID=getID(\%clientValues);
 	$Data{'client'}=$client;
-	
+	my $currencyFormat = new L10n::CurrencyFormat(\%Data);
+	$Data{'l10n'}{'currency'} = $currencyFormat;
+
 	my %receiptData= ();
 	my %ContentData = ();
 	my %htmlReceiptBody = ();
@@ -93,6 +97,7 @@ $Data{'db'}=$db;
 			);
 		   	while (my $dref = $q->fetchrow_hashref()){
 				$dref->{'paymentType'} = $Defs::paymentTypes{$dref->{intPaymentType}};
+				$dref->{'curAmountFormatted'} =  $currencyFormat->format($dref->{'curAmount'});
 				push @{$ContentData{'receiptdetails'}}, $dref;
 			}
 			

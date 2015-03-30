@@ -241,6 +241,7 @@ $(document).ready(function(){
 		var totalamount = 0;
 		$("#l_intAmount").val('');
 		$("#block-manualpay").css('display','none');
+		var client = $('#clientstr').val();
 		//if(this.checked){
           //$('#payment_manual').show();
 		 // } else {
@@ -255,6 +256,18 @@ $(document).ready(function(){
 					$("#block-manualpay").css('display','block');
 				});
 				$("#l_intAmount").val(totalamount.toFixed(2));
+				//
+				$.ajax(
+				{
+					method: "POST",
+					url:"formatcurrencyamount.cgi",
+					data:"amount=" + totalamount + "&client="+ client 			
+				}).done(
+					function(formattedamount){
+					$("#manualsum").html(formattedamount);				
+					}
+				);
+				//
 				console.log(totalamount);
 				if(totalamount > 0){
 					$('#payment_manual').css('display','block');

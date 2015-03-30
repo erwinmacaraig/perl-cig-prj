@@ -43,13 +43,13 @@
 			<td>[% i.strInvoiceNumber %]</td>
 			<td>[% i.intQty %]</td>
 			<td>[% i.strName %]</td>
-			<td>\$[% i.curAmount %] </td>
+			<td>[% i.curAmountFormatted %] </td>
 		</tr>
 	[% total = total + i.curAmount %]
 	[% END %]
 		<tr style = " border-top:1px solid #aaa;">
 			<td colspan="3"><b>[% Lang.txt('Payment Total') %]:</b></td>
-			<td><b>\$[% total | format('%.2f') %]</b></td>
+			<td><b>[% CurrencyFormat.format(total) %]</b></td>
 		</tr>
 	</table>
 

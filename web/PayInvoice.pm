@@ -225,7 +225,7 @@ sub queryInvoiceByNumber {
 			item => $dref->{'strName'},
 			person => $dref->{'strLocalFirstname'} . ' ' . $dref->{'strLocalSurname'},
 			quantity => $dref->{'intQty'},
-			amount => $dref->{'TotalAmount'},
+			amount => $Data->{'l10n'}{'currency'}->format($dref->{'TotalAmount'}),
 			status => $dref->{'GatewayLocked'} ? $Data->{'lang'}->txt("Locked") : $Defs::TransactionStatus{$dref->{'intStatus'}},			
 			gatewayLocked => $dref->{'GatewayLocked'} || 0,
 		};
@@ -350,7 +350,10 @@ my @headers = (
 				  			<fieldset>
 				  				<div class="form-group">
 				  					<label for="l_intAmount" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Amount (ddd.cc)').qq[</label>
-				  					<div class="col-md-6"><input type="text" name="intAmount" value="] . sprintf('%.2f',$totalAmount) . qq[" id="l_intAmount" size="10" readonly /></div>
+				  					<div class="col-md-6">
+										<input type="hidden" name="intAmount" value="] . sprintf('%.2f',$totalAmount) . qq[" id="l_intAmount" size="10" readonly />
+										<span>].  $Data->{'l10n'}{'currency'}->format($totalAmount) .q[</span>
+</div>
 				  				</div>
 				  				<div class="form-group">
 				  					<label for="l_dtLog" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Date Paid').qq[</label>
@@ -483,7 +486,7 @@ sub queryInvoiceByOtherInfo {
 			item => $dref->{'strName'},
 			person => $dref->{'strLocalFirstname'} . ' ' . $dref->{'strLocalSurname'},
 			quantity => $dref->{'intQty'},
-			amount => $dref->{'TotalAmount'},
+			amount => $Data->{'l10n'}{'currency'}->format($dref->{'TotalAmount'}),
 			status => $dref->{'GatewayLocked'} ? $Data->{'lang'}->txt("Locked") : $Defs::TransactionStatus{$dref->{'intStatus'}},			
 			gatewayLocked => $dref->{'GatewayLocked'} || 0,
 		};
@@ -602,7 +605,10 @@ sub displayResults {
 				  			<fieldset>
 				  				<div class="form-group">
 				  					<label for="l_intAmount" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Amount (ddd.cc)').qq[</label>
-				  					<div class="col-md-6"><input type="text" name="intAmount" value="$Data->{params}{intAmount}" id="l_intAmount" size="10" readonly /></div>
+				  					<div class="col-md-6">
+									<span id="manualsum"></span>
+									<input type="hidden" name="intAmount" value="" id="l_intAmount" /></div>
+									<input type="hidden" id="clientstr" value="$client" />
 				  				</div>
 				  				<div class="form-group">
 				  					<label for="l_dtLog" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Date Paid').qq[</label>

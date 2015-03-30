@@ -396,7 +396,7 @@ sub step2 {
 					<div class="clearfix">
 						<span class="details-row">
 							<span class="details-left"><label for="l_intAmount">].$lang->txt('Amount.').qq[</label>:</span>
-							<span class="details-left detail-value">$Data->{params}{intAmount}</span>
+							<span class="details-left detail-value">] . $Data->{'l10n'}{'currency'}->format($Data->{params}{intAmount}) . qq[</span>
 						</span>
 						<span class="details-row">
 							<span class="details-left"><label for="l_dtLog">].$lang->txt('Date Paid').qq[</label>:</span>
@@ -489,7 +489,7 @@ EOS
 	Products::product_apply_transaction($Data,$transLogID);
 	my $cl=setClient($Data->{'clientValues'}) || '';
 
-	$st = qq[SELECT intID FROM tblTransactions WHERE intTransLogID = $transLogID AND intRealmID = $Data->{'Realm'}];
+	$st = qq[SELECT DISTINCT intID FROM tblTransactions WHERE intTransLogID = $transLogID AND intRealmID = $Data->{'Realm'}];
 	$query = $db->prepare($st);
 	$query->execute();
 	my @intIDs = ();
@@ -641,7 +641,8 @@ sub getTransList {
     {
         field => 'curAmount', 
         name => $lang->txt('Amount'), 
-        field => 'curAmount', 
+        #field => 'curAmount', 
+		field => 'curAmountFormatted',
         width => 20
     },
     {
@@ -722,7 +723,7 @@ sub getTransList {
                 #$row_data->{'TaxTotal'} =sprintf("%.2f",($row->{'dblTaxRate'} * $row_data->{'NetAmount'}));  
             }     
             $row_data->{'strInvoiceNumber'} = $row->{'strInvoiceNumber'};
-
+            $row_data->{'curAmountFormatted'} = $Data->{'l10n'}{'currency'}->format($row->{'curAmount'});
             push @rowdata, $row_data if $row_data;
             $i++;
     }
