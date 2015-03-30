@@ -79,7 +79,8 @@ sub getRuleMatrix   {
             $where
         LIMIT 1
     ];
-    my $q = $Data->{'db'}->prepare($st);
+
+	my $q = $Data->{'db'}->prepare($st);
     $q->execute(@values);
     my $dref= $q->fetchrow_hashref();
     return $dref;

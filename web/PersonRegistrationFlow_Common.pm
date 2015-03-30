@@ -1242,6 +1242,7 @@ sub add_rego_record{
         my $ok = PersonRegistration::checkNewRegoOK($Data, $personID, $rego_ref);
         return (0, undef, 'NEW_FAILED') if (!$ok);
     }
+	
     my ($regID,$rc) = PersonRegistration::addRegistration($Data,$rego_ref);
     if ($regID)     {
         return ($regID, $rego_ref, '');

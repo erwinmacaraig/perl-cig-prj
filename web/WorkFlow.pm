@@ -243,6 +243,25 @@ sub addIndividualTask   {
         $task_ref->{'personRegistrationID'} || 0,
         $task_ref->{'documentID'} || 0,
     );
+open FH, ">dumpfile2.txt";
+print FH "I was called in addIndividualTask \n $stINS \n
+		\$ruleID = $ruleID,
+        \$Data->{'Realm'} = $Data->{'Realm'},
+        \$Data->{'RealmSubType'} = $Data->{'RealmSubType'},
+        \$Data->{'clientValues'}{'userID'} = $Data->{'clientValues'}{'userID'},
+        \$approvalEntityID = $approvalEntityID,
+        \$taskType = $taskType,
+        \$ruleFor = $taskType,
+        \$task_ref->{'registrationNature'} = $task_ref->{'registrationNature'},
+        \$task_ref->{'documentTypeID'} = $task_ref->{'documentTypeID'},
+        \$task_ref->{'taskStatus'} = $task_ref->{'taskStatus'},
+        \$problemEntityID = $problemEntityID,
+        \$task_ref->{'entityID'} = $task_ref->{'entityID'},
+        \$task_ref->{'personID'} = $task_ref->{'personID'},
+        \$task_ref->{'personRegistrationID'} = $task_ref->{'personRegistrationID'} ,
+        \$task_ref->{'documentID'} = $task_ref->{'documentID'},
+
+";
 }
 
 
@@ -504,8 +523,7 @@ sub listTasks {
 		$entityID,
 		$entityID,
 	) or query_error($st);
-	open FH, ">dumpfile.txt";
-	print FH "$st \n $entityID";
+	
 	my @TaskList = ();
     my @taskType = ();
     my @taskStatus = ();
@@ -1049,7 +1067,7 @@ sub addWorkFlowTasks {
 
 
     my $emailNotification = new EmailNotifications::WorkFlow();
-	
+	open FH, ">dumpfile.txt";
     if ($checkOk)   {
         while (my $dref= $q->fetchrow_hashref())    {
 			
@@ -1074,10 +1092,9 @@ print STDERR "^^^^^^^^^^^^^^^^^^^^^^^^^^^RULE ADDED WAS " . $dref->{'intWFRuleID
                 $dref->{'intPersonID'},
                 $dref->{'intPersonRegistrationID'},
                 $dref->{'DocumentID'}
-            );
-
+            );			
             my $task = getTask($Data, $qINS->{mysql_insertid});
-
+			
             my ($workTaskType, $workTaskRule) = getWorkTaskType($Data, $task);
             my %notificationData = (
                 'Reason' => '',
@@ -2295,7 +2312,7 @@ sub getTask {
             t.intOnHold,
             t.strRegistrationNature,
             e.*,
-            IF(t.strWFRuleFor = 'ENTITY', IF(e.intEntityLevel = -47, 'VENUE', IF(e.intEntityLevel = 3, 'CLUB', '')), IF(t.strWFRuleFor = 'REGO', 'REGO', ''))as sysConfigApprovalLockRuleFor,
+            IF(t.strWFRuleFor = 'ENTITY', IF(e.intEntityLevel = -47, 'VENUE', IF(e.intEntityLevel = 3, 'CLUB', '')), IF(t.strWFRuleFor = 'REGO', IF(t.strRegistrationNature = 'TRANSFER', 'TRANSFER', ''), ''))as sysConfigApprovalLockRuleFor,
             IF(t.strWFRuleFor = 'ENTITY', e.intPaymentRequired, IF(t.strWFRuleFor = 'REGO', pr.intPaymentRequired, 0)) as paymentRequired,
             pr.intPersonRegistrationID,
             pr.strPersonType,
@@ -2344,7 +2361,8 @@ sub getTask {
             t.intWFTaskID = ?
             AND t.intRealmID = ?
     ];
-
+	open FH, ">dumpfile.txt";
+	print FH "\n \$WFTaskID = $WFTaskID";
     $q = $Data->{'db'}->prepare($st);
     $q->execute(
         $WFTaskID,

@@ -706,7 +706,8 @@ sub getTransList {
                 $allowUD = 0 if $Data->{'SystemConfig'}{'DontAllowUnpaidDelete'}; 
 
                 $row_data->{stuff} = ($allowUD) 
-                      ? qq[<a href="main.cgi?a=P_TXN_DEL&client=$client&tID=$row->{intTransactionID}">].$Data->{'lang'}->txt('Delete Transaction').qq[</a>]
+                      ? ''
+						#qq[<a href="main.cgi?a=P_TXN_DEL&client=$client&tID=$row->{intTransactionID}">].$Data->{'lang'}->txt('Delete Transaction').qq[</a>]
                       : '';
                 $row_data->{manual_payment} = qq[<input type="checkbox" name="act_$row->{intTransactionID}" value="$row->{curAmount}" class = "paytxn_chk">];
             }
