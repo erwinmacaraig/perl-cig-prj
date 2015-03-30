@@ -15,7 +15,7 @@ sub validate {
 
     my $gender = $self->{'params'}{'gender'} || return 0;
     my $dob = $self->{'params'}{'dob'} || return 0;
-    my $chkgender = $data->{'id'} %2 ? 1 : 2;
+    my $chkgender = int($data->{'id'}) %2 ? 1 : 2;
     if($gender != $chkgender)       {
             return 0;
     }
@@ -37,13 +37,9 @@ sub parse_fi    {
 
     return undef if length $code != 11;
     my ($dd,$mm,$yy,$c,$zzz,$q) = $code =~/(\d\d)(\d\d)(\d\d)([\-+aA])(\d\d\d)([0-9A-X])/;
-    $dd =~s/^0//;
     return undef if !$dd;
-    $mm =~s/^0//;
     return undef if !$mm;
-    $yy =~s/^0//;
     return undef if !$yy;
-    $zzz  =~s/^0//;
     return undef if !$zzz;
     $c = uc($c);
     return undef if !$c;
@@ -51,9 +47,9 @@ sub parse_fi    {
     return undef if !$q;
 
     return {
-        dd => $dd,
-        mm => $mm,
-        yy => $yy,
+        dd => int($dd),
+        mm => int($mm),
+        yy => int($yy),
         id => $zzz,
         c => $c,
         q => $q,
@@ -67,7 +63,7 @@ sub fi_checksum {
             $fi_data->{'dd'}
             . sprintf("%02d",$fi_data->{'mm'})
             . sprintf("%02d",$fi_data->{'yy'})
-            . $fi_data->{'id'};
+            . sprintf("%03d",$fi_data->{'id'});
     my @check_digit_array = (qw(
             0 1 2 3 4 5 6 7 8 9 A B C D E F H J K L M N P R S T U V W X Y 
     ));

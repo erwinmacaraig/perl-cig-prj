@@ -672,6 +672,7 @@ sub display_summary     {
 			organizationLevel => $clubObj->{'DBData'}{'strOrganisationLevel'},  
 			bankAccountDetails => $clubObj->{'DBData'}{'strBankAccountNumber'},
 			editlink =>  $self->{'Data'}{'target'}."?".$self->stringifyURLCarryField(),
+            OriginLevel => $originLevel,
 	);
 	
     my $summaryClubContent = runTemplate(
