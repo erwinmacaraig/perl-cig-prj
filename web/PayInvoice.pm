@@ -181,6 +181,7 @@ sub queryInvoiceByNumber {
 	my $query = qq[
 		SELECT 
 			tblTransactions.intTransactionID,
+			IF(tblTransactions.intSentToGateway=1 and tblTransactions.intPaymentGatewayResponded = 0, 1, 0) as GatewayLocked,
 			tblInvoice.strInvoiceNumber, 
 			tblInvoice.tTimeStamp as invoiceDate,
 			tblTransactions.intQty, 
@@ -204,11 +205,15 @@ sub queryInvoiceByNumber {
     my %cv=getClient($cl);    
     $cv{'currentLevel'} = $Defs::LEVEL_PERSON;
 	my $selectPay;
+	my $notLocked=0;
 	while(my $dref = $sth->fetchrow_hashref()){
 		$results = 1;
 		$totalAmount += $dref->{'TotalAmount'};
 		#my $selectPay = qq[<input type="checkbox" checked="checked" name="act_$dref->{'intTransactionID'}" class="paytxn_chk" />];
-		$selectPay .= qq[<input type="hidden" name="act_$dref->{'intTransactionID'}" value="1" />];	
+		if (! $dref->{'GatewayLocked'})	{
+			$selectPay .= qq[<input type="hidden" name="act_$dref->{'intTransactionID'}" value="1" />];	
+			$notLocked++;
+		}
 		$cv{'personID'} = $dref->{'intPersonID'};
         my $clm=setClient(\%cv);
 		push @rowdata, {
@@ -221,7 +226,8 @@ sub queryInvoiceByNumber {
 			person => $dref->{'strLocalFirstname'} . ' ' . $dref->{'strLocalSurname'},
 			quantity => $dref->{'intQty'},
 			amount => $dref->{'TotalAmount'},
-			status => $Defs::TransactionStatus{$dref->{'intStatus'}},			
+			status => $dref->{'GatewayLocked'} ? $Data->{'lang'}->txt("Locked") : $Defs::TransactionStatus{$dref->{'intStatus'}},			
+			gatewayLocked => $dref->{'GatewayLocked'} || 0,
 		};
 		
 	}
@@ -308,7 +314,7 @@ my @headers = (
         <div style= "clear:both;"></div>
         </div>
     ];
-	$gateway_body = '' if ! $gatewayCount;
+	$gateway_body = '' if ! $gatewayCount or ! $notLocked;
     my %Hidden = (
         gatewayCount => $gatewayCount,		
     );
@@ -337,7 +343,7 @@ my @headers = (
      if($paymentType==0){ $paymentType='';}
    
 	
-	if ($allowMP){
+	if ($allowMP and $notLocked){
 	$gateway_body .= qq[<div  style="display:block;" id="payment_manual">
 						<h3 class="panel-header sectionheader" id="manualpayment">].$Data->{'lang'}->txt('Manual Payment').qq[</h3>
 				  		<div id="secmain2" class="panel-body fieldSectionGroup ">
@@ -438,6 +444,7 @@ sub queryInvoiceByOtherInfo {
 	tblPerson.strLocalFirstname,
 	tblPerson.strLocalSurname,
 	tblPerson.intPersonID,	
+	IF(tblTransactions.intSentToGateway=1 and tblTransactions.intPaymentGatewayResponded = 0, 1, 0) as GatewayLocked,
 	(tblTransactions.curAmount * tblTransactions.intQty) as TotalAmount 
 	FROM tblTransactions INNER JOIN tblPersonRegistration_$Data->{'Realm'}
 	ON (tblPersonRegistration_$Data->{'Realm'}.intPersonRegistrationID = tblTransactions.intPersonRegistrationID AND tblPersonRegistration_$Data->{'Realm'}.intPersonID = tblTransactions.intID)
@@ -464,6 +471,7 @@ sub queryInvoiceByOtherInfo {
 	while(my $dref = $sth->fetchrow_hashref()){		
 		$results = 1;				
 		my $selectPay = qq[<input type="checkbox" name="act_$dref->{'intTransactionID'}" class="paytxn_chk" value="$dref->{'TotalAmount'}" />];	
+		$selectPay = '' if ($dref->{'GatewayLocked'});
 		$cv{'personID'} = $dref->{'intPersonID'};
         my $clm=setClient(\%cv);	
 		push @rowdata, {
@@ -476,7 +484,8 @@ sub queryInvoiceByOtherInfo {
 			person => $dref->{'strLocalFirstname'} . ' ' . $dref->{'strLocalSurname'},
 			quantity => $dref->{'intQty'},
 			amount => $dref->{'TotalAmount'},
-			status => $Defs::TransactionStatus{$dref->{'intStatus'}},			
+			status => $dref->{'GatewayLocked'} ? $Data->{'lang'}->txt("Locked") : $Defs::TransactionStatus{$dref->{'intStatus'}},			
+			gatewayLocked => $dref->{'GatewayLocked'} || 0,
 		};
 		
 	}

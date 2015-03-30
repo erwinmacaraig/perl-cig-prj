@@ -548,6 +548,7 @@ sub getTransList {
 	my $statement = qq[
     SELECT 
       t.intTransactionID, 
+	IF(t.intSentToGateway=1 and t.intPaymentGatewayResponded = 0, 1, 0) as GatewayLocked,
       t.intStatus, 
       t.curAmount, 
       t.intTransLogID, 
@@ -678,6 +679,10 @@ sub getTransList {
                $row->{StatusText} = $Defs::TransLogStatus{$row->{'intStatus'}} || 'a';
                $row->{StatusTextLang} = $Defs::TransLogStatus{$row->{'intStatus'}} || 'n';
             }
+		if ($row->{'GatewayLocked'})	{
+			$row->{'StatusText'} = $Data->{'lang'}->txt("Locked");
+			$row->{'StatusTextLang'} = $Data->{'lang'}->txt("Locked");
+		}
             $row_data->{$header->{field}} = $row->{$header->{field}}; 
             $row_data->{'dtPaid_RAW'} = $row->{'dtPaid'}; 
             $row_data->{'dtPaid'} = $Data->{'l10n'}{'date'}->TZformat($row->{'dtPaid'},'MEDIUM','SHORT'); 
@@ -693,7 +698,7 @@ sub getTransList {
                 $row_data->{manual_payment} = '-';
 
             }
-            elsif ($row->{intStatus} == 0) {
+            elsif ($row->{intStatus} == 0 and ! $row->{'GatewayLocked'}) {
                 $row_data->{strReceipt} = qq[];
 
                 my $allowUD = 1;
