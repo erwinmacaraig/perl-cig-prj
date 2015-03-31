@@ -1096,7 +1096,7 @@ sub display_documents {
     $personObj->load();
 	my $nationality = $personObj->getValue('strISONationality') || ''; 
         #my $itc = $personObj->getValue('intInternationalTransfer') || '';
-        my $itc = $self->getCarryFields('itc') || '';
+        my $itc = $self->getCarryFields('itc') || 0;
         $rego_ref->{'Nationality'} = $nationality;
         $rego_ref->{'InternationalTransfer'} = $itc;
 
