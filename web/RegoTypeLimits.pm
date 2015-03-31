@@ -106,9 +106,10 @@ sub checkRegoTypeLimits    {
             PR.intEntityID
         FROM
             tblPersonRegistration_$Data->{'Realm'} as PR
+		INNER JOIN tblEntity as E ON (E.intEntityID = PR.intEntityID)
         WHERE
-            intPersonID = ?
-            AND intPersonRegistrationID <> ?
+            PR.intPersonID = ?
+            AND PR.intPersonRegistrationID <> ?
             AND PR.strStatus IN ('ACTIVE', 'PENDING', 'SUSPENDED')
     ];
             #AND strPersonType = ?
@@ -141,10 +142,7 @@ sub checkRegoTypeLimits    {
         if ($dref->{'strEntityType'} and $dref->{'strEntityType'} ne '')    {
             $stPRrow.= qq[ AND E.strEntityType = ? ];
             push @rowValues, $dref->{'strEntityType'};
-            #$stPErow.= qq[ AND E.strEntityType = ? ];
-            #push @PErowValues, $dref->{'strEntityType'};
         }
-
 
         if ($dref->{'strSport'} and $dref->{'strSport'} ne '')    {
             $stPRrow.= qq[ AND PR.strSport = ? ];
