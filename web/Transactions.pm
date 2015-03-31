@@ -322,7 +322,7 @@ sub displayTransaction	{
 		TXN => {
 			fields => {
 				intStatus=> {
-			        	label => $lang->txt("Paid ?"),
+			        	label => $id ? $lang->txt("Paid ?") : '',
 		                	value => $dref->{'intStatus'},
                 			type  => 'lookup',
                 			options=> {$Defs::TXN_PAID => $Defs::TransactionStatus{$Defs::TXN_PAID}, $Defs::TXN_CANCELLED=> $Defs::TransactionStatus{$Defs::TXN_CANCELLED}, $Defs::TXN_HOLD => $Defs::TransactionStatus{$Defs::TXN_HOLD}},
@@ -356,7 +356,7 @@ sub displayTransaction	{
 					readonly=>$prod_readonly,
 				},
 				curAmount=> {
-					label => $lang->txt('Amount Due'),
+					label => $id ? $lang->txt('Amount Due') : '',
 					type => 'text',
 					size => 8,
 					value => $Data->{'l10n'}{'currency'}->format($dref->{'curAmount'}),

@@ -154,12 +154,12 @@ print STDERR "MAC ACTION IS $chkAction\n";
     if (! $paymentSettings->{'gatewayProcessPreGateway'} and $process_action eq '1')    {
         payTryContinueProcess(\%Data, $payTry, $client, $logID);
         $payTry->{'run'} = 1;
-        print "Content-type: text/html\n\n" if (! $display_action);
     }
 
     if ($display_action eq '1')    {
         payTryRedirectBack(\%Data, $payTry, $client, $logID, 1);
     }
+    print "Content-type: text/html\n\nOK" if (! $display_action);
 
 }
 
