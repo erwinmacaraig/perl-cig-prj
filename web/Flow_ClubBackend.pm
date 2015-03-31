@@ -824,6 +824,8 @@ sub loadObjectValues    {
             strOrganisationLevel
             strMANotes
             strBankAccountNumber
+            intNotifications
+            intAcceptSelfRego
         )) {
             $values{$field} = $object->getValue($field);
         }

@@ -40,6 +40,7 @@ sub clubFieldsSetup {
     }
 
     my $dissDateReadOnly = 0;
+    my $displayAcceptSelfRego = 0;
 
     if ($Data->{'SystemConfig'}{'Entity_EditDissolutionDateMinLevel'} && $Data->{'SystemConfig'}{'Entity_EditDissolutionDateMinLevel'} < $Data->{'clientValues'}{'authLevel'}){
         $dissDateReadOnly = 1; ### Allow us to set custom Level that can edit. ###
@@ -125,6 +126,11 @@ sub clubFieldsSetup {
     }
 
     my %dissolvedOptions = (
+        0 => 'No',
+        1 => 'Yes',
+    );
+
+    my %acceptSelfRego = (
         0 => 'No',
         1 => 'Yes',
     );
@@ -449,6 +455,18 @@ sub clubFieldsSetup {
                     maxsize     => '45',
                     compulsory  => 1,
                 },
+                intAcceptSelfRego => {
+                    label       => $FieldLabels->{'intAcceptSelfRego'},
+                    value       => $values->{'intAcceptSelfRego'},
+                    type        => 'lookup',
+                    options     => \%acceptSelfRego,
+                    class       => 'fcToggleGroup',
+                    compulsory  => 1,
+                    firstoption => [ '', " " ],
+                    visible_for_add => $Data->{'SystemConfig'}{'allow_SelfRego'} ? 1 : 0,
+                    visible_for_edit => $Data->{'SystemConfig'}{'allow_SelfRego'} ? 1 : 0,
+                },
+
             },
             'order' => [qw(
                 strEntityType
@@ -458,6 +476,7 @@ sub clubFieldsSetup {
                 strOrganisationLevel
                 strMANotes
                 strBankAccountNumber
+                intAcceptSelfRego
             )],
             sections => [
                 [ 'main',        'Organisation Details','','',$values->{'footer-roledetails'} ],
@@ -471,6 +490,7 @@ sub entityFieldsSetup {
     $values ||= {};
 
     my $FieldLabels   = FieldLabels::getFieldLabels( $Data, $Defs::LEVEL_CLUB );
+    print STDERR Dumper $FieldLabels;
     my $isocountries  = getISOCountriesHash();
     my %countriesonly = ();
     my %Mcountriesonly = ();
@@ -576,6 +596,11 @@ sub entityFieldsSetup {
     );
 
     my %dissolvedOptions = (
+        0 => 'No',
+        1 => 'Yes',
+    );
+
+    my %acceptSelfRego = (
         0 => 'No',
         1 => 'Yes',
     );
@@ -707,6 +732,18 @@ sub entityFieldsSetup {
                     sectionname => 'core',
                     active      => $nonLatin,
                 },
+                intAcceptSelfRego => {
+                    label       => $FieldLabels->{'intAcceptSelfRego'},
+                    value       => $values->{'intAcceptSelfRego'},
+                    type        => 'lookup',
+                    options     => \%acceptSelfRego,
+                    class       => 'fcToggleGroup',
+                    compulsory  => 1,
+                    sectionname => 'core',
+                    firstoption => [ '', " " ],
+                    visible_for_edit => 1,
+                },
+
             },
             'order' => [qw(
                 strLocalName
@@ -722,6 +759,7 @@ sub entityFieldsSetup {
                 strCity
                 strRegion
                 strISOCountry
+                intAcceptSelfRego
             )],
             sections => [
                 [ 'core',        'Details','','',$values->{'footer-core'} ],

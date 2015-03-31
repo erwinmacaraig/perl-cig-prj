@@ -208,6 +208,7 @@ sub getFieldLabels	{
             dissolved => 'Dissolved',
             intFacilityTypeID => 'Venue Type',
             strBankAccountNumber => 'Bank Account Details',
+            intAcceptSelfRego => 'Accept Self Registration',
             );
 	}
 
