@@ -54,5 +54,5 @@ ALTER TABLE tblRegistrationItem ADD COLUMN intItemNeededITC tinyint default 0 CO
 ALTER TABLE tblRegistrationItem ADD COLUMN intItemUsingITCFilter tinyint default 0 COMMENT 'Using ITC filter';
 
 
-# 150401_tblRegoTypeLimits
+# 150326_tblRegoTypeLimits
 ALTER TABLE tblRegoTypeLimits ADD COLUMN strEntityType varchar(30) default '' AFTER intSubRealmID;
