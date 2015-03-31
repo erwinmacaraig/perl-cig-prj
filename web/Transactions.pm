@@ -359,8 +359,9 @@ sub displayTransaction	{
 					label => $lang->txt('Amount Due'),
 					type => 'text',
 					size => 8,
-					value => $dref->{'curAmount'},
-					readonly=>($amount_readonly or $gatewayLocked),
+					value => $Data->{'l10n'}{'currency'}->format($dref->{'curAmount'}),
+					readonly => 1,
+					#readonly=>($amount_readonly or $gatewayLocked),
 				},
 				AmountAlreadyPaid=> {
 					label => $dref->{'AmountAlreadyPaid'} ? $lang->txt('Amount Already Paid via Part Payments') : '',
