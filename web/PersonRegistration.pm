@@ -656,7 +656,7 @@ sub getRegistrationData	{
             e.strLocalName,
             e.intEntityLevel,
             e.strLatinName,
-            e.intEntityLevel,
+            e.strEntityType,
             e.intEntityID
         FROM
             tblPersonRegistration_$Data->{'Realm'} AS pr

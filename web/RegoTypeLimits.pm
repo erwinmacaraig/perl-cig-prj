@@ -25,6 +25,7 @@ sub checkRegoTypeLimits    {
     $personID ||= 0;
     $personRegistrationID ||= 0;
     $entityID ||= 0;
+	my $entityType = '';
     
     if ($personRegistrationID)  {
         my %Reg = (
@@ -44,6 +45,7 @@ sub checkRegoTypeLimits    {
             $personLevel= $regs->[0]{'strPersonLevel'};
             $ageLevel= $regs->[0]{'strAgeLevel'};
             $entityID= $regs->[0]{'intEntityID'};
+            $entityType= $regs->[0]{'strEntityType'};
         }
     }
     my $st = qq[
@@ -53,6 +55,7 @@ sub checkRegoTypeLimits    {
             IF(strPersonType = '', 0, 1) +
             IF(strPersonEntityRole = '', 0, 1) +
             IF(strPersonLevel = '', 0, 1) +
+            IF(strEntityType = '', 0, 1) +
             IF(strAgeLevel = '', 0, 1) as fieldSpecifiedExistCount
         FROM
             tblRegoTypeLimits
@@ -66,9 +69,10 @@ sub checkRegoTypeLimits    {
         $Data->{'RealmSubType'},
         #$personType,
     );
+    if (defined $entityType) {
+		$st .= qq[ AND strEntityType IN ('', '$entityType')];
+    }
     if (defined $sport) {
-        #push @limitValues, $sport;
-       # $st .= qq[ AND strSport IN ('', ?)];
 		$st .= qq[ AND strSport IN ('', '$sport')];
     }
     if (defined $personType) {
@@ -99,24 +103,26 @@ sub checkRegoTypeLimits    {
     my $stPE = qq[
         SELECT
             COUNT(intPersonRegistrationID) as CountPE,
-            intEntityID
+            PR.intEntityID
         FROM
-            tblPersonRegistration_$Data->{'Realm'}
+            tblPersonRegistration_$Data->{'Realm'} as PR
+		INNER JOIN tblEntity as E ON (E.intEntityID = PR.intEntityID)
         WHERE
-            intPersonID = ?
-            AND intPersonRegistrationID <> ?
-            AND strStatus IN ('ACTIVE', 'PENDING', 'SUSPENDED')
+            PR.intPersonID = ?
+            AND PR.intPersonRegistrationID <> ?
+            AND PR.strStatus IN ('ACTIVE', 'PENDING', 'SUSPENDED')
     ];
             #AND strPersonType = ?
     my $stPR = qq[
         SELECT
             COUNT(intPersonRegistrationID) as CountPR
         FROM
-            tblPersonRegistration_$Data->{'Realm'}
+            tblPersonRegistration_$Data->{'Realm'} as PR
+		INNER JOIN tblEntity as E ON (E.intEntityID = PR.intEntityID)
         WHERE
-            intPersonID = ?
-            AND intPersonRegistrationID <> ?
-            AND strStatus IN ('ACTIVE', 'PENDING', 'SUSPENDED')
+            PR.intPersonID = ?
+            AND PR.intPersonRegistrationID <> ?
+            AND PR.strStatus IN ('ACTIVE', 'PENDING', 'SUSPENDED')
     ];
             #AND strPersonType = ?
     my @values =();
@@ -132,33 +138,39 @@ sub checkRegoTypeLimits    {
         my @PErowValues=();
         @PErowValues=@values;
         @rowValues = @values;
+
+        if ($dref->{'strEntityType'} and $dref->{'strEntityType'} ne '')    {
+            $stPRrow.= qq[ AND E.strEntityType = ? ];
+            push @rowValues, $dref->{'strEntityType'};
+        }
+
         if ($dref->{'strSport'} and $dref->{'strSport'} ne '')    {
-            $stPRrow.= qq[ AND strSport = ? ];
+            $stPRrow.= qq[ AND PR.strSport = ? ];
             push @rowValues, $dref->{'strSport'};
-            $stPErow.= qq[ AND strSport = ? ];
+            $stPErow.= qq[ AND PR.strSport = ? ];
             push @PErowValues, $dref->{'strSport'};
         }
 
         if ($dref->{'strPersonType'} and $dref->{'strPersonType'} ne '')    {
-            $stPRrow.= qq[ AND strPersonType = ? ];
+            $stPRrow.= qq[ AND PR.strPersonType = ? ];
             push @rowValues, $dref->{'strPersonType'};
             #$stPErow.= qq[ AND strSport = ? ];
             #push @PErowValues, $dref->{'strSport'};
         }
         if (defined $dref->{'strPersonEntityRole'} and $dref->{'strPersonEntityRole'} ne '')    {
-            $stPRrow .= qq[ AND strPersonEntityRole = ?];
+            $stPRrow .= qq[ AND PR.strPersonEntityRole = ?];
             push @rowValues, $dref->{'strPersonEntityRole'};
         }
         if (defined $dref->{'strPersonLevel'} and $dref->{'strPersonLevel'} ne '')    {
-            $stPRrow .= qq[ AND strPersonLevel = ?];
+            $stPRrow .= qq[ AND PR.strPersonLevel = ?];
             push @rowValues, $dref->{'strPersonLevel'};
         }
         if (defined $dref->{'strAgeLevel'} and $dref->{'strAgeLevel'} ne '')    {
-            $stPRrow .= qq[ AND strAgeLevel = ?];
+            $stPRrow .= qq[ AND PR.strAgeLevel = ?];
             push @rowValues, $dref->{'strAgeLevel'};
         }
         #$stPErow .= qq[GROUP BY intEntityID, strPersonType, strSport];
-        $stPErow .= qq[GROUP BY intEntityID, strSport];
+        $stPErow .= qq[GROUP BY PR.intEntityID, PR.strSport];
 
         if ($dref->{'strLimitType'} eq 'PERSONENTITY_UNIQUE')  {
             ## Only runs on PersonType & Sport
