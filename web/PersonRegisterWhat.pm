@@ -220,10 +220,10 @@ sub optionsPersonRegisterWhat {
     if($lookingFor eq 'eId' and $etype)  {
         my $levels = undef;
         if($originLevel == $Defs::LEVEL_PERSON) {
-            $levels = _entityList($Data, $etype, 0);
+            $levels = _entityList($Data, $etype, 0, $originLevel);
         }
         else    {
-            $levels = _entityList($Data, $etype, getID($Data->{'clientValues'}, $originLevel));
+            $levels = _entityList($Data, $etype, getID($Data->{'clientValues'}, $originLevel), $originLevel);
         }
         return ($levels,'');
     }
@@ -745,10 +745,13 @@ sub getPersonLevelFromMatrix {
 }
 
 sub _entityList {
-    my ($Data, $etype, $currentEntityID) = @_;
+    my ($Data, $etype, $currentEntityID, $originLevel) = @_;
 
     my $st = '';
     my $q = undef;
+    my $systemConfig = getSystemConfig($Data);
+    my $acceptSelfRegoFilter = qq [ AND intAcceptSelfRego = 1 ] if ($originLevel == 1 and $systemConfig->{'allow_SelfRego'});
+
     if($currentEntityID)    {
         $st = qq[
             (
@@ -805,6 +808,7 @@ sub _entityList {
                 E.intRealmID = ?
                 AND intEntityLevel = ?
                 AND E.strStatus = 'ACTIVE'
+                $acceptSelfRegoFilter
             ORDER BY 
                 E.strLocalName
             )
