@@ -104,6 +104,7 @@ my ($paymentSettings, undef) = getPaymentSettings(\%Data,$Order->{'PaymentType'}
         $Vals{'payType'}= param('payType') || 'N';
         $Vals{'merchantId'}= param('merchantId') || ''; ## is this same as gatewayUsername
 print STDERR "MERCHANTId " . $Vals{'merchantId'} . " is this same as gatewayUsername ?";
+	print "Content-type: text/html\n\nOK";
         
 
 	my $coKey = $paymentSettings->{'gatewayUsername'} ."|". $Vals{'Ref'} ."|". $Vals{'Cur'} ."|". $Vals{'Amt'} ."|". $Vals{'payType'} ."|". $paymentSettings->{'gatewayPassword'};
@@ -167,7 +168,7 @@ print STDERR "MAC ACTION IS $chkAction\n";
         payTryContinueProcess(\%Data, $payTry, $client, $logID);
         $payTry->{'run'} = 1;
     }
-
+    
     #if ($display_action eq '1')    {
     #    payTryRedirectBack(\%Data, $payTry, $client, $logID, 1);
     #}
