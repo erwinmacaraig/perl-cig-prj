@@ -484,6 +484,7 @@ sub getFieldsList	{
         intNotifications
         intFacilityTypeID
         strBankAccountNumber
+        intAcceptSelfRego
         ));
 
     return \@clubFields if $fieldtype eq 'Club';
