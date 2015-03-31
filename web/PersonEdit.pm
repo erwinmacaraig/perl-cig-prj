@@ -169,6 +169,7 @@ sub triggerRule {
                 $personID,
                 0,
                 0,
+		$currPersonObj->getValue('intInternationalTransfer')
             );
         }
 

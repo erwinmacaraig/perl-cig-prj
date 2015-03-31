@@ -594,6 +594,7 @@ sub process_registration {
 sub display_products { 
     my $self = shift;
 
+    $self->addCarryField('payMethod','');
     $self->addCarryField('d_vstd', 1);
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
@@ -755,6 +756,7 @@ print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~~~~PROCESS PRODUCTS";
         $regoID = 0 if !$valid;
     }
 
+cleanRegoTransactions($self->{'Data'},$regoID, $personID, $Defs::LEVEL_PERSON);
     my ($resultHTML, $error) = checkMandatoryProducts($self->{'Data'}, $personID, $Defs::LEVEL_PERSON, $self->{'RunParams'});
     if ($error) {
         push @{$self->{'RunDetails'}{'Errors'}}, $resultHTML;
@@ -772,8 +774,8 @@ print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~~~~PROCESS PRODUCTS";
             my %Settings=();
             $Settings{'paymentType'} = $paymentType;
             my $logID = createTransLog($self->{'Data'}, \%Settings, $entityID,\@txnIds, $amount);
-            processTransLog($self->{'Data'}->{'db'}, '', 'OK', 'APPROVED', $logID, \%Settings, undef, undef, '', '', '', '', '', '','',1);
-            UpdateCart($self->{'Data'}, undef, $self->{'Data'}->{'client'}, undef, undef, $logID);
+            processTransLog($self->{'Data'}->{'db'}, '', 'OK', 'OK', 'APPROVED', $logID, \%Settings, undef, undef, '', '', '', '', '', '','',1);
+            UpdateCart($self->{'Data'}, undef, $self->{'Data'}->{'client'}, undef, 'OK', $logID);
             product_apply_transaction($self->{'Data'},$logID);
         }
     $self->addCarryField('paymentType',$paymentType);
@@ -963,8 +965,8 @@ sub display_summary {
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
     my $lang = $self->{'Data'}{'lang'};
+    my $gatewayConfig = undef;
 
-print STDERR "display_summary $regoID p$personID\n";
     my $rego_ref = {};
     my $content = '';
     if($regoID) {
@@ -992,16 +994,22 @@ print STDERR "display_summary $regoID p$personID\n";
      #   $self->setCurrentProcessIndex('p');
      #   return ('',2);
     #}
+    my $payMethod = '';
     if($regoID) {
         $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
         $personObj->load();
         my $nationality = $personObj->getValue('strISONationality') || ''; 
         $rego_ref->{'Nationality'} = $nationality;
+    
+        $self->addCarryField('txnIds', $self->{'RunParams'}{'txnIds'} || 0);
+        $self->addCarryField('payMethod', $self->{'RunParams'}{'payMethod'} || '');
+        $payMethod = $self->{'RunParams'}{'payMethod'} || '';
 
         my $hiddenFields = $self->getCarryFields();
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
-        $content = displayRegoFlowSummary(
+        $hiddenFields->{'cA'} = "TRANSFER";
+        ($content, $gatewayConfig) = displayRegoFlowSummary(
             $self->{'Data'}, 
             $regoID, 
             $client, 
@@ -1035,16 +1043,30 @@ print STDERR "display_summary $regoID p$personID\n";
         $self->decrementCurrentProcessIndex();
         return ('',2);
     }
-    my %PageData = (
+
+    my %Config = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
+        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+    );
+    if ($gatewayConfig->{'amountDue'} and $payMethod eq 'now')    {
+        ## Change Target etc
+        %Config = (
+            HiddenFields => $gatewayConfig->{'HiddenFields'},
+            Target => $gatewayConfig->{'Target'},
+            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to Member Association'),
+        );
+    }
+    my %PageData = (
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
         Content => '',
         Title => '',
         TextTop => $content,
         TextBottom => '',
-        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+        HiddenFields => $Config{'HiddenFields'},
+        Target => $Config{'Target'},
+        ContinueButtonText => $Config{'ContinueButtonText'},
     );
     my $pagedata = $self->display(\%PageData);
 

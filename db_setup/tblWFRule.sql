@@ -25,6 +25,15 @@ CREATE TABLE tblWFRule (
   strTaskStatus varchar(20) NOT NULL DEFAULT 'PENDING' COMMENT 'PENDING,ACTIVE',
   intDocumentTypeID int(11) NOT NULL DEFAULT '0',
    
+    intAutoActivateOnPayment tinyint default 0 COMMENT 'Auto Activate Person/Rego on Payment',
+    intLockTaskUntilPaid tinyint default 0 COMMENT 'Locks task until paid',
+    intLockTaskUntilGatewayResponse tinyint default 0 COMMENT 'Locks task until response from gateway',
+    intRemoveTaskOnPayment tinyint default 0 COMMENT 'On Payment, remove task and either go to next one or approve person/Rego/Entity',
+    intUsingITCFilter tinyint default 0 COMMENT 'Using ITC filter',
+    intNeededITC tinyint default 0 COMMENT 'Was an ITC needed',
+
+  intCopiedFromRuleID INT DEFAULT 0 COMMENT 'The ID of the rule this record was copied from - used for tblWFRuleDocument setup',
+
   tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (intWFRuleID),
   KEY Entity (intWFRuleID),

@@ -2,8 +2,8 @@ package RegoProducts;
 require Exporter;
 @ISA =  qw(Exporter);
 
-@EXPORT = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction);
-@EXPORT_OK = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction);
+@EXPORT = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction cleanRegoTransactions);
+@EXPORT_OK = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction cleanRegoTransactions);
 
 use strict;
 use lib "..","../..";
@@ -29,7 +29,7 @@ sub getRegoProducts {
         $regItemRules_ref
     ) = @_;
 
-    my $currencySymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
+    my $currencySymbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
     $incExisting ||= 0; ## Set to 1 to include existing in-cart items that aren't paid for the member
 
     $multipersonType ||= ''; 
@@ -114,6 +114,7 @@ sub getRegoProducts {
         AllowedCountText => $AllowedCountText || '',
         UnPaidItems => \@unpaid_items,
         CurrencySymbol => $currencySymbol,
+		client => $cl,
     );
     my $pagedata = '';
     $pagedata = runTemplate($Data, \%PageData, 'registration/products.templ');
@@ -166,8 +167,7 @@ sub getAllRegoProducts {
                 AND T.intProductID = P.intProductID
                 AND T.intPersonRegistrationID IN (0, ?)
                 AND T.intTXNEntityID IN (0, ?)
-                AND T.intStatus = 0     
-                AND T.intStatus=$ExistingStatus
+                AND T.intStatus IN (0, $ExistingStatus)
             )
             LEFT JOIN tblProductPricing as PP ON (
                 PP.intProductID = P.intProductID
@@ -178,6 +178,9 @@ sub getAllRegoProducts {
             AND P.intProductID IN ($productID_str)
         ORDER BY P.strGroup, P.strName, intLevel
     ];
+    #AND T.intStatus = 0     
+    #AND T.intStatus=$ExistingStatus
+
     #print $sql;
     ## T.intStatus=999 to turn off existing for moment.
             #AND (P.intMinSellLevel <= ? or P.intMinSellLevel=0)
@@ -417,7 +420,6 @@ sub productAllowedThroughFilter {
             return 0 if $dref->{'intProductGender'} != $memdetails->{'Gender'};
         }
         
-        #print STDERR 'dref value is ' . $dref->{'strNationality_IN'};
         my @NOTIN_Countries = split(/\|/, $dref->{'strNationality_NOTIN'});
         my @IN_Countries = split(/\|/, $dref->{'strNationality_IN'}); 
         
@@ -489,6 +491,28 @@ sub productAllowedThroughFilter {
     return 1;
 }
 
+sub cleanRegoTransactions	{
+
+    my($Data, $regoID, $intID, $level)=@_;
+    my $db=$Data->{'db'};
+    $intID ||= 0;
+	
+    my $st= qq[
+        DELETE FROM tblTransactions 
+        WHERE 
+            intPersonRegistrationID = ? 
+	];
+	$st.= qq[ AND intPersonRegistrationID > 0 ] if $level == $Defs::LEVEL_PERSON;
+	$st.= qq[ AND intPersonRegistrationID = 0 ] if $level == $Defs::LEVEL_CLUB;
+	$st.= qq[
+            AND intID = ? 
+            AND intStatus=0 
+    ];
+    my $q= $db->prepare($st);
+    $q->execute($regoID, $intID);
+    #Get products selected
+}
+ 	
 sub insertRegoTransaction {
     my($Data, $regoID, $intID, $params, $entityID, $entityLevel, $level, $session, $rego_products, $invoiceID)=@_;
     my $db=$Data->{'db'};
@@ -503,7 +527,10 @@ sub insertRegoTransaction {
         DELETE FROM tblTransactions 
         WHERE 
             intPersonRegistrationID = ? 
-            AND intPersonRegistrationID > 0 
+	];
+	$stTxnsClean .= qq[ AND intPersonRegistrationID > 0 ] if $level == $Defs::LEVEL_PERSON;
+	$stTxnsClean .= qq[ AND intPersonRegistrationID = 0 ] if $level == $Defs::LEVEL_CLUB;
+	$stTxnsClean .= qq[
             AND intID = ? 
             AND intStatus=0 
             AND intProductID=? 
@@ -520,7 +547,6 @@ sub insertRegoTransaction {
             tblTransactions
         WHERE
             intPersonRegistrationID = ? 
-            AND intPersonRegistrationID > 0 
             AND intID = ? 
             AND intStatus=1 
     ];
@@ -574,6 +600,7 @@ sub insertRegoTransaction {
     my %ExistingProducts=();
     if (scalar(@productsselected) or scalar(@already_in_cart_items)) {
         if (scalar(@productsselected)) {
+
             foreach my $product (@productsselected)    {
                 ## Lets get rid of duplicate products
                 $q_txnclean->execute($regoID, $intID, $product);
@@ -760,6 +787,10 @@ sub insertRegoTransaction {
   push @txns_added, @already_in_cart_items;
 #  @txns_added ||= [];
   return (\@txns_added, $total_amount);
+}
+
+sub getSelectedProducts {
+
 }
 
 1;

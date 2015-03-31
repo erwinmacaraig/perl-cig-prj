@@ -17,7 +17,7 @@ use Data::Dumper;
 sub getRenewalDetails {
     my ($Data, $regoID) = @_;
 
-    my $rego = getRegistrationDetail($Data, $regoID) || {};
+    my $rego = PersonRegistration::getRegistrationDetail($Data, $regoID) || {};
 
     $rego = $rego->[0];
 

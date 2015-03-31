@@ -6,7 +6,7 @@ use Flow_BaseObj;
 our @ISA =qw(Flow_BaseObj);
 
 use TTTemplate;
-use CGI;
+use CGI qw(param);
 use FieldLabels;
 use EntityObj;
 use EntityFields;
@@ -33,6 +33,8 @@ use EntitySummaryPanel;
 use IncompleteRegistrations;
 use Transactions;
 
+use PersonRegistrationFlow_Common;
+use Payments;
 
 
 sub setProcessOrder {
@@ -356,6 +358,7 @@ sub validate_role_details {
 sub display_products { 
     my $self = shift;
 
+	$self->addCarryField('payMethod','');
     my $facilityID = $self->ID();
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
@@ -380,6 +383,7 @@ sub display_products {
 
     my @prodIDs = ();
     my %ProductRules=();
+	my $totalamountchk = 0;
     foreach my $product (@{$CheckProducts})  {
         #next if($product->{'UseExistingThisEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'THIS_ENTITY'));
         #next if($product->{'UseExistingAnyEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'ANY_ENTITY'));
@@ -389,20 +393,25 @@ sub display_products {
 
         push @prodIDs, $product->{'ID'};
         $ProductRules{$product->{'ID'}} = $product;
+	$totalamountchk += $product->{'ProductPrice'} if($product->{'Required'} && $product->{'ProductPrice'} > 0);
+#print STDERR "ERWIN CAN YOU CHECK.  If all products are optional needs thought on how we show Payment Options - should we adjust this in other flows";
+	
      }
     my $product_body='';
     if (@prodIDs)   {
         $product_body= getRegoProducts($self->{'Data'}, \@prodIDs, 0, $entityID, 0, 0, 0, 0, \%ProductRules);
      }
-
      my %ProductPageData = (
          #nextaction=>"PREGF_PU",
         target => $self->{'Data'}->{'target'},
         product_body => $product_body,
         hidden_ref => {},
         Lang => $self->{'Data'}->{'lang'},
+	mandatoryPayment => $self->{'Data'}->{'SystemConfig'}{'AllowTXNs_CCs_clubFlow'},
+	payMethod => $self->{'RunParams'}{'payMethod'} || '',
         client => $client,
         NoFormFields => 1,
+	amountCheck=>$totalamountchk,
     );
     
     my $id = $self->ID() || 0;
@@ -472,6 +481,7 @@ use Data::Dumper;
         undef,
     );
 
+	cleanRegoTransactions($self->{'Data'},0, $self->{'RunParams'}{'newclubid'}, $Defs::LEVEL_CLUB);
     my ($txns_added, $amount) = insertRegoTransaction($self->{'Data'}, 0, $self->{'RunParams'}{'newclubid'}, $self->{'RunParams'}, $entityID, $entityLevel, $Defs::LEVEL_CLUB, '', $CheckProducts);
     $txnIds = join(':',@{$txns_added});
 
@@ -637,19 +647,41 @@ sub display_summary     {
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
     my $client = $self->{'Data'}->{'client'};
+	my $payMethod= $self->{'RunParams'}{'payMethod'} || '';
 
     my $clubObj = new EntityObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
     $clubObj->load();
 
+	my $hiddenFields = $self->getCarryFields();
+	 $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
+        $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
+        $hiddenFields->{'cA'} = "CLUBFLOW";
+
     my $content = '';
 	
     my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
-
+	
+	my $gatewayConfig = undef;
+	my $txn_invoice_url='';
+my ($txnCount, $amountDue, $logIDs) = getEntityTXN($self->{'Data'}, $clubObj->ID());
+    if ($txnCount && $self->{'Data'}->{'SystemConfig'}{'AllowTXNs_CCs_clubFlow'}) {
+        $gatewayConfig = generateRegoFlow_Gateways($self->{'Data'}, $client, "PREGF_CHECKOUT", $hiddenFields, $txn_invoice_url);
+        $gatewayConfig->{'amountDue'} = $amountDue;
+    }
     $content = ''; 
 	my $documents = getUploadedFiles( $self->{'Data'}, $Defs::LEVEL_CLUB, $id, $Defs::UPLOADFILETYPE_DOC , $client );
 	use Club;	
 	use Countries;
 	my $isocountries  = getISOCountriesHash();
+
+	$hiddenFields->{'payMethod'} = 'notrequired' if (! $amountDue);
+        my %PaymentConfig = (
+            totalAmountDue => $amountDue,
+            totalPaymentDue => $amountDue,
+            dollarSymbol => $self->{'Data'}->{'SystemConfig'}{'DollarSymbol'} || '$',
+            paymentMethodText => $Defs::paymentMethod{$payMethod} || '',
+        );
+my $displayPayment = ($amountDue and $payMethod) ? 1 : 0;
     my %summaryClubData = (
 			organization => $clubObj->{'DBData'}{'strLocalName'}, 
 			organizationShortName => $clubObj->{'DBData'}{'strLocalShortName'},
@@ -673,6 +705,8 @@ sub display_summary     {
 			bankAccountDetails => $clubObj->{'DBData'}{'strBankAccountNumber'},
 			editlink =>  $self->{'Data'}{'target'}."?".$self->stringifyURLCarryField(),
             OriginLevel => $originLevel,
+			DisplayPayment => $displayPayment,
+			payment => \%PaymentConfig,
 	);
 	
     my $summaryClubContent = runTemplate(
@@ -681,18 +715,34 @@ sub display_summary     {
         'flow/club_summary.templ',
     );
 
-	
+	$self->addCarryField('payMethod',$payMethod);
 
-    my %PageData = (
+ my %Config = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
+        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+    );
+	
+    if ($gatewayConfig->{'amountDue'} and $payMethod eq 'now')    {
+        ## Change Target etc
+        %Config = (
+            HiddenFields => $gatewayConfig->{'HiddenFields'},
+            Target => $gatewayConfig->{'Target'},
+            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to Member Association'),
+        );
+    }
+
+print STDERR Dumper($self->stringifyCarryField());
+    my %PageData = (
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         FlowSummaryContent => $entitySummaryPanel || '',
         Content => $summaryClubContent,
         Title => '',
         TextTop => '',
-        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
         TextBottom => '',
+	HiddenFields => $Config{'HiddenFields'},
+        Target => $Config{'Target'},
+        ContinueButtonText => $Config{'ContinueButtonText'},
     );
     my $pagedata = $self->display(\%PageData);
 
@@ -759,12 +809,35 @@ sub display_complete {
     my $maObj = getInstanceOf($self->{'Data'}, 'national');
     my $maName = $maObj ? $maObj->name() : '';
 
+### Payment
+my $hiddenFields = $self->getCarryFields();
+        $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
+        $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
+ my $payMethod= $hiddenFields->{'payMethod'} || param('payMethod') || '';
+ my $logID = param('tl') || 0;
+ my $paymentResult = '';
+ my $payStatus = 0;
+ my $txnCount = 0;
+ my $logIDs;
+ my $amountDue = 0;
+print STDERR "PAY METHOD $payMethod\n";
+($txnCount, $amountDue, $logIDs) = getEntityTXN($self->{'Data'}, $clubObj->ID());
+print STDERR "LOGID $amountDue $logID\n";
+ ($payStatus, $paymentResult) = displayPaymentResult($self->{'Data'}, $logID, 1, '');
+
+	$payMethod = '' if (!$amountDue and $payStatus == -1);
+print STDERR "SSSSSS: $amountDue $payMethod $paymentResult $payStatus\n";
+
     my %clubApprovalData = (
         EntitySummaryPanel => $entitySummaryPanel,
         client => $self->{'Data'}->{'client'},
         target => $self->{'Data'}->{'target'},
         MA => $maName,
         url => $Defs::base_url,
+	payLaterFlag=> ($amountDue and $payMethod eq 'later') ? 1 : 0,
+        payNowFlag=> ($payMethod eq 'now') ? 1 : 0,
+        payNowMsg=> (! $amountDue and $payMethod eq 'now') ? $paymentResult : '',
+        payNowStatus=> $payStatus,
     );
     my $displayClubForApproval = runTemplate(
         $self->{'Data'},
@@ -856,5 +929,33 @@ sub cancelFlow{
     return 1;
 }
 
+sub getEntityTXN    {
+
+    my ($Data, $entityID) = @_;
+
+    my $st = qq[
+        SELECT curAmount, intTransLogID, intTransactionID, intStatus
+        FROM tblTransactions
+        WHERE
+            intRealmID =?
+            AND intID = ?
+            AND intPersonRegistrationID = 0
+            AND intTableType = $Defs::LEVEL_CLUB
+    ];
+        my $qry = $Data->{'db'}->prepare($st);
+        $qry->execute($Data->{'Realm'}, $entityID);
+    my $count = 0;
+   my %tlogIDs=();
+    my $amount = 0;
+    while (my $dref= $qry->fetchrow_hashref())  {
+        $tlogIDs{$dref->{'intTransLogID'}} = 1 if ($dref->{'intTransLogID'} and ! exists $tlogIDs{$dref->{'intTransLogID'}});
+        if ($dref->{'intStatus'} == 0)  {
+            $amount += $dref->{'curAmount'};
+            $count++;
+        }
+    }
+print STDERR "getEntityTXM $count $amount\n";
+    return ($count, $amount, \%tlogIDs);
+}
 
 1;

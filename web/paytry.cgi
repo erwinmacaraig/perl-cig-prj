@@ -26,6 +26,10 @@ use ConfigOptions;
 use Email;
 use Products;
 use GatewayProcess;
+use PayTry;
+use Localisation;
+use WorkFlow;
+use MA_Gateways;
 
 main();
 
@@ -42,6 +46,12 @@ sub main	{
     my %clientValues = getClient($client);
     $Data{'clientValues'} = \%clientValues;
     ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
+
+
+    getDBConfig(\%Data);
+    $Data{'SystemConfig'}=getSystemConfig(\%Data);
+    initLocalisation(\%Data);
+
      my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     foreach my $key ( keys %clientValues) {
         $params{$key} = $clientValues{$key};
@@ -55,7 +65,8 @@ sub main	{
             push @transactions, $k;
         }
         if ($k eq 'a' and $params{$k} eq 'P_TXNLogstep2')   {
-            $params{'a'} = "P_TXNLog_list";
+            #$params{'a'} = "P_TXNLog_list";
+			$params{'a'} = "TXN_PAY_INV_RESULT_P"
         }
         if ($k eq 'a' and $params{$k} eq 'C_TXNLogstep2')   {
             $params{'a'} = "C_TXNLog_list";
@@ -70,6 +81,7 @@ sub main	{
     require JSON;
     my $datalog= JSON::to_json( \%params);
     my $gCount = param('gatewayCount') || 0;
+    my $continueAction = param('cA') || '';
     my $paymentType= '';
     foreach my $i (1 .. $gCount)    {
         if (param("cc_submit[$i]")) {
@@ -79,17 +91,17 @@ sub main	{
 
     my ($logID, $amount, $chkvalue, $session, $paymentSettings) = Payments::checkoutConfirm(\%Data, $paymentType, \@transactions,1,1);
     
-print STDERR "LOG: $logID\n";
-    
 	my $st = qq[
         INSERT INTO tblPayTry (
             intRealmID,
             strPayReference,
             intTransLogID,
             strLog,
+            strContinueAction,
             dtTry
         )
         VALUES (
+            ?,
             ?,
             ?,
             ?,
@@ -98,32 +110,91 @@ print STDERR "LOG: $logID\n";
         )
     ];
     my $qry= $db->prepare($st) or query_error($st);
+	my $payRef = calcPayTryRef($Data{'SystemConfig'}{'paymentPrefix'},$logID);
     $qry->execute(
         $Data{'Realm'},
-        '',
+        $payRef,
         $logID,
         $datalog,
+        $continueAction
         ) or query_error($st);
     my $tryID= $qry->{mysql_insertid};
-    disconnectDB($db);
+    $st = qq[
+	UPDATE tblTransLog
+		SET strOnlinePayReference= ?
+		WHERE intLogID = ?
+		LIMIT 1
+	];
+    my $qryTXNUPD= $db->prepare($st) or query_error($st);
+    $qryTXNUPD->execute(
+	$payRef,
+	$logID
+	);
+    #disconnectDB($db);
+    my $cancelPayPalURL = $Defs::base_url . $paymentSettings->{'gatewayCancelURL'} . qq[&amp;ci=$payRef&client=$client]; ##$Defs::paypal_CANCEL_URL;
 
     ## In here I will build up URL per Gateway -- intPaymentConfigID or have a GATEWAYCODE ?
     ## Pass control to gateway
     my $paymentURL = '';
-    if ($paymentSettings->{'gatewayCode'} eq 'NABExt1') {
-        print STDERR "YEP";
-    }
-    $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;chkv=$chkvalue&amp;session=$session&amp;amount=$amount];
+    my $gatewaySpecific ='';
 
-    my $payTry = payTryRead(\%Data, $logID, $tryID);
-    my $cancelURL = payTryRedirectBack($payTry, $client, $logID, 0);
+    my $currentLang = $Data{'lang'}->generateLocale($Data{'SystemConfig'});
+
+    if ($paymentSettings->{'gatewayCode'} eq 'NABExt1') {
+        $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$payRef&amp;chkv=$chkvalue&amp;session=$session&amp;amount=$amount&amp;logID=$logID];
+    }
+    if ($paymentSettings->{'gatewayCode'} eq 'checkoutfi')  {
+	my %MAGateway= ();
+	$MAGateway{'nh'} = $Data{'noheader'};
+	$MAGateway{'client'} = $client;
+	$MAGateway{'ci'} = $payRef;
+	$MAGateway{'chkv'} = $chkvalue;
+	$MAGateway{'session'} = $session;
+	$MAGateway{'amount'} = $amount;
+	$MAGateway{'logID'} = $logID;
+	$MAGateway{'currentLang'} = $currentLang;
+	
+	$MAGateway{''} = 
+
+	$gatewaySpecific = MAGateway_FI_checkoutFI(\%MAGateway, $paymentSettings);
+	$paymentURL = $gatewaySpecific->{'paymentURL'};
+    }
+    if ($paymentSettings->{'gatewayCode'} eq 'hk_paydollar')  {
+	my %MAGateway= ();
+	$MAGateway{'nh'} = $Data{'noheader'};
+	$MAGateway{'client'} = $client;
+	$MAGateway{'ci'} = $payRef;
+	$MAGateway{'chkv'} = $chkvalue;
+	$MAGateway{'session'} = $session;
+	$MAGateway{'amount'} = $amount;
+	$MAGateway{'logID'} = $logID;
+	$MAGateway{'currentLang'} = $currentLang;
+	
+	$MAGateway{''} = 
+
+	$gatewaySpecific = MAGateway_HKPayDollar(\%MAGateway, $paymentSettings);
+	$paymentURL = $gatewaySpecific->{'paymentURL'};
+    }
+
+
+    markTXNSentToGateway(\%Data, $logID);
+
+    my $payTry = payTryRead(\%Data, $logID, 0);
+    if ($paymentSettings->{'gatewayProcessPreGateway'})  {
+        #$Data{'clientValues'} = $payTry;
+        my $client= setClient(\%{$payTry});
+        #$Data{'client'}=$client;
+        initLocalisation(\%Data);
+        payTryContinueProcess(\%Data, $payTry, $client, $logID);
+    }
+
+    my $cancelURL = payTryRedirectBack(\%Data, $payTry, $client, $logID, 0);
 
     if ($paymentSettings->{'paymentType'} == $Defs::PAYMENT_ONLINEPAYPAL) {
         $paymentURL = qq[$Defs::base_url/paypal.cgi?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$logID&amp;session=$session];
     }
     my $gateway_body= qq[<a href="$paymentURL">Proceed to Payment</a>];
     my $cancel_body= qq[<a href="$cancelURL">Cancel Payment</a>];
-    my $cancelPayPalURL = $Defs::base_url . $paymentSettings->{'gatewayCancelURL'} . qq[&amp;ci=$logID&client=$client]; ##$Defs::paypal_CANCEL_URL;
 
     my $proceed_body = qq[
     <html>
@@ -132,16 +203,26 @@ print STDERR "LOG: $logID\n";
         <p>If you are not automatically redirected to the payment page within 30 seconds then you can <a href = "$paymentURL">proceed manually by pressing this link</a>.</p>
         <form action = "$paymentURL" method = "POST" name = "sform" id = "sform">
             <input type = "hidden" name = "a" value = "P">
-            <input type = "hidden" name = "ci" value = "$logID">
+            <input type = "hidden" name = "ci" value = "$payRef">
+            <input type = "hidden" name = "logID" value = "$logID">
             <input type = "hidden" name = "chkv" value = "$chkvalue">
             <input type = "hidden" name = "sessions" value = "$session">
-            <input type = "hidden" name = "amount" value = "$amount">
+    ];
+    if ($paymentSettings->{'gatewayCode'} eq 'NABExt1') {
+        $proceed_body .= qq[ <input type = "hidden" name = "amount" value = "$amount"> ];
+    }
+	if (defined $gatewaySpecific && $gatewaySpecific)	{
+    foreach my $k (keys %{$gatewaySpecific}) {
+        $proceed_body .= qq[<input type="hidden" name="$k" value="$gatewaySpecific->{$k}">];
+    } 
+	}
+    $proceed_body .= qq[
         </form>
     </body>
     </html>
     ];
-            #<input type = "hidden" name = "client" value = "].unescape($client).qq[">
-            #<input type = "hidden" name = "nh" value = "$Data{'noheader'}"
+
+
     my $body = '';
 if ($amount eq "0" or $amount eq "0.00" or ! $amount)   {
     print "Status: 302 Moved Temporarily\n";

@@ -657,12 +657,14 @@ sub getRegistrationData	{
             e.intEntityLevel,
             e.strLatinName,
             e.strEntityType,
+            e.intEntityLevel,
+	p.intInternationalTransfer,
             e.intEntityID
         FROM
             tblPersonRegistration_$Data->{'Realm'} AS pr
             LEFT JOIN tblTransactions as T ON (
                 T.intPersonRegistrationID = pr.intPersonRegistrationID
-                AND T.intStatus = 0
+                AND T.intStatus <> 1
             )
             LEFT JOIN tblNationalPeriod as np ON (
                 np.intNationalPeriodID = pr.intNationalPeriodID
@@ -804,8 +806,7 @@ sub getRegistrationData	{
 
 sub addRegistration {
     my($Data, $Reg_ref) = @_;
-
-    if ($Reg_ref->{'personEntityRole'} eq '-')  {
+	if ($Reg_ref->{'personEntityRole'} eq '-')  {
         $Reg_ref->{'personEntityRole'}= '';
     }
     my $status = $Reg_ref->{'status'} || 'PENDING';
@@ -817,7 +818,7 @@ sub addRegistration {
         $Reg_ref->{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
         #$Reg_ref->{'dateFrom'} = $matrix_ref->{'dtFrom'} if (! $Reg_ref->{'dtFrom'});
         #$Reg_ref->{'dateTo'} = $matrix_ref->{'dtTo'} if (! $Reg_ref->{'dtTo'});
-        $Reg_ref->{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
+        $Reg_ref->{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;		
     }
     my ($nationalPeriodID, $npFrom, $npTo) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $Reg_ref->{'sport'}, $Reg_ref->{'personType'}, $Reg_ref->{'registrationNature'});
     #$Reg_ref->{'dateFrom'} = $npFrom if (! $Reg_ref->{'dtFrom'});
@@ -945,6 +946,8 @@ sub addRegistration {
             $personRegistrationID,
             'REGO'
         );
+print STDERR "THIS CALL\n";
+print STDERR "addRegistration: . $Reg_ref->{'intInternationalTransfer'}\n";
   	    $rc = addWorkFlowTasks(
             $Data,
             'REGO', 
@@ -953,7 +956,8 @@ sub addRegistration {
             $Reg_ref->{'entityID'} || 0,
             $Reg_ref->{'personID'},
             $personRegistrationID, 
-            0
+            0,
+		$Reg_ref->{'intInternationalTransfer'}
         );
         personInProgressToPending($Data, $Reg_ref->{'personID'});
     }
@@ -975,6 +979,7 @@ sub submitPersonRegistration    {
         $pr_ref->{'strStatus'} = 'PENDING';
         $pr_ref->{'intPaymentRequired'} = 0 if ($rego_ref->{'CountTXNs'} == 0);
         $pr_ref->{'paymentRequired'} = 0 if ($rego_ref->{'CountTXNs'} == 0);
+print STDERR "CNT " . $rego_ref->{'CountTXNs'};
 
         updatePersonRegistration($Data, $personID, $personRegistrationID, $pr_ref, $personStatus);
         cleanTasks(
@@ -985,6 +990,7 @@ sub submitPersonRegistration    {
             'REGO'
         );
 
+print STDERR "THAT CALL itc is $pr_ref->{'intInternationalTransfer'}\n";
             my $rc = addWorkFlowTasks(
             $Data,
             'REGO', 
@@ -993,7 +999,8 @@ sub submitPersonRegistration    {
             $pr_ref->{'entityID'} || $pr_ref->{'intEntityID'} || 0,
             $personID,
             $personRegistrationID, 
-            0
+            0,
+		$pr_ref->{'intInternationalTransfer'}
         );
         personInProgressToPending($Data, $personID);
         ($count, $regs) = getRegistrationData($Data, $personID, \%Reg);

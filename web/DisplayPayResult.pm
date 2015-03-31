@@ -89,7 +89,7 @@ sub displayTXNToPay {
     my $invoiceList ='';
      my $allowPayment = $paymentSettings->{'allowPayment'} || 0;
     $allowPayment=0 if (! $external and $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_CLUB);
-    my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
+    my $dollarSymbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
     my $client=setClient($Data->{'clientValues'}) || '';
 
     #List the products this person is purchasing and their amounts
