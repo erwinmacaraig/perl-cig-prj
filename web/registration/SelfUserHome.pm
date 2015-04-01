@@ -55,7 +55,9 @@ sub getPreviousRegos {
             PR.*,
             E.strLocalName AS EntityName,
             P.strLocalFirstname,
-            P.strLocalSurname
+            P.strLocalSurname,
+            P.dtDOB,
+            P.intGender
         FROM
             tblSelfUserAuth AS A
             INNER JOIN tblPersonRegistration_$Data->{'Realm'} AS PR
@@ -87,12 +89,17 @@ sub getPreviousRegos {
             push @people, {
                 strLocalFirstname => $dref->{'strLocalFirstname'} || '',
                 strLocalSurname => $dref->{'strLocalSurname'} || '',
+                intGender => $dref->{'intGender'} || '',
+                dtDOB => $dref->{'dtDOB'} || '',
                 intMinor => $dref->{'intMinor'},
                 intPersonID => $pID,
             };
         }
         my $type = $dref->{'intMinor'} ? 'minor' : 'adult';
         $found{$type} = 1;
+        $dref->{'strPersonTypeName'} = $Defs::personType{$dref->{'strPersonType'}} || '';
+        $dref->{'strPersonLevelName'} = $Defs::personLevel{$dref->{'strPersonLevel'}} || '';
+
         push @{$regos{$pID}}, $dref;
     }
     
