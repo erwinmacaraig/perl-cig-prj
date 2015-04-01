@@ -36,7 +36,7 @@ sub parse_fi    {
     my($code) = @_;
 
     return undef if length $code != 11;
-    my ($dd,$mm,$yy,$c,$zzz,$q) = $code =~/(\d\d)(\d\d)(\d\d)([\-+aA])(\d\d\d)([0-9A-X])/;
+    my ($dd,$mm,$yy,$c,$zzz,$q) = $code =~/(\d\d)(\d\d)(\d\d)([\-+aA])(\d\d\d)([0-9ABCDEFHJKLMNPRSTUVWXY])/;
     return undef if !$dd;
     return undef if !$mm;
     return undef if !$yy;
