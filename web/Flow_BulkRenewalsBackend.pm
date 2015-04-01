@@ -396,7 +396,7 @@ print STDERR "ROLLOVERIDs:" . $self->getCarryFields('rolloverIDs') . "\n";
         TextTop => '',
         TextBottom => '',
         processStatus => 1,
-        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+        ContinueButtonText => $self->{'Lang'}->txt('Submit for approval'),
     );
     my $pagedata = $self->display(\%PageData);
 

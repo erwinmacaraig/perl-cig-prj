@@ -1044,7 +1044,7 @@ print STDERR "display_summary $regoID p$personID\n";
         Title => '',
         TextTop => $content,
         TextBottom => '',
-        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+        ContinueButtonText => $self->{'Lang'}->txt('Submit for approval'),
     );
     my $pagedata = $self->display(\%PageData);
 
