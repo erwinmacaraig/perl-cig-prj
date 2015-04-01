@@ -96,7 +96,14 @@ sub main {
     $Data{'clientValues'} = \%clientValues;
 
     # AUTHENTICATE
+    my $paytry = param('paytry') || '';
+    my $tl= param('tl') || '';
+    print STDERR "PAY TRY IS $paytry for $tl\n";
+    $Data{'paytry'} = $tl;
     my $db = allowedTo( \%Data );
+    if (! $db and $paytry)  {
+        return;
+    }
 
     ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
     getDBConfig( \%Data );

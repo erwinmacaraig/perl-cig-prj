@@ -178,6 +178,19 @@ sub allowedTo {
     );
     $user->load();
     my $userID = $user->id() || 0;
+
+    if ($userID != $clientValues_ref->{'userID'} and $Data->{'paytry'})   {
+        ( $Data->{'Realm'}, $Data->{'RealmSubType'} ) = getRealm( $Data );
+        getDBConfig( $Data );
+        $Data->{'SystemConfig'} = SystemConfig::getSystemConfig( $Data );
+        my $lang   = Lang->get_handle('', $Data->{'SystemConfig'}) || die "Can't get a language handle!";
+        Localisation::initLocalisation($Data);
+        print "Content-type: text/html\n\n";
+        my ($payStatus, $paybody) = Payments::displayPaymentResult($Data, $Data->{'paytry'});
+        #PageMain::pageMain("TITLE", '', $paybody, \%clientValues, $client, $Data );
+        PageMain::pageMain("TITLE", '', $paybody, undef, '', $Data );
+        return undef;
+    }
     kickThemOff() if $userID != $clientValues_ref->{'userID'};
 
     my $st = qq[

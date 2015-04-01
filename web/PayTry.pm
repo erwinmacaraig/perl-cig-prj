@@ -56,7 +56,7 @@ sub payTryRedirectBack  {
     $autoRun ||= 0;
     my $a = $payTry->{'nextPayAction'} || $payTry->{'a'};
     #my $redirect_link = "main.cgi?client=$client&amp;a=$a&amp;run=1&tl=$logID";
-    my $redirect_link = "main.cgi?client=$client&amp;a=$a&amp;payMethod=now&amp;run=0&amp;tl=$logID";
+    my $redirect_link = "main.cgi?client=$client&amp;a=$a&amp;paytry=1&amp;payMethod=now&amp;run=0&amp;tl=$logID";
 
     foreach my $k (keys %{$payTry}) {
         next if $k eq 'client';
