@@ -76,6 +76,7 @@ use Log;
 use Data::Dumper;
 use ListAuditLog;
 
+use PaymentDisplay_LoggedOff;
 main();
 
 sub main {
@@ -96,14 +97,22 @@ sub main {
     $Data{'clientValues'} = \%clientValues;
 
     # AUTHENTICATE
-    my $paytry = param('paytry') || '';
-    my $tl= param('tl') || '';
-    print STDERR "PAY TRY IS $paytry for $tl\n";
-    $Data{'paytry'} = $tl;
-    my $db = allowedTo( \%Data );
-    if (! $db and $paytry)  {
-        return;
+    my $paytry = param('ptry') || '';
+    my $EncPayTry = param('eptry') || '';
+    $Data{'ptry'} = $paytry;
+    if ($paytry)    {
+        my $m;
+        $m = new MD5;
+        $m->reset();
+        $m->add($paytry);
+        my $encLogID= uc($m->hexdigest());
+        if ($encLogID ne $EncPayTry)    {
+            $Data{'ptry'} = 0;
+            $Data{'eptry'} = 0;
+            $paytry = 0;
+        }
     }
+    my $db = allowedTo( \%Data );
 
     ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
     getDBConfig( \%Data );
@@ -113,6 +122,11 @@ sub main {
     $Data{'lang'} = $lang;
     initLocalisation(\%Data);
 
+    if ($Data{'kickoff'} and $db and $paytry)  {
+    ## Display Payment Summary if logged off
+        paymentDisplay_LoggedOff(\%Data, $paytry);
+        return;
+    }
     logPageData( \%Data, $action, $client);
 
     $clientValues{'currentLevel'} = safe_param( 'cl', 'number' )
