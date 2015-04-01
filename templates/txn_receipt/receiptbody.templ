@@ -17,7 +17,7 @@
 		</tr>
 		<tr>
 			<td><b>[% Lang.txt('Payment Date') %]:</b></td>
-			<td>[% receiptdetails.0.dtLog_FMT %]</td>
+			<td>[% DateFormat.TZformat(receiptdetails.0.dtLog_FMT,'MEDIUM','SHORT') %]</td>
 		</tr>
 		<tr>
 			<td><b>[% Lang.txt('Payment Type') %]:</b></td>
