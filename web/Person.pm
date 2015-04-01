@@ -1436,7 +1436,6 @@ sub person_details {
             target               => $Data->{'target'},
             formname             => 'm_form',
             submitlabel          => $Data->{'lang'}->txt( 'Update ' . $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} ),
-            introtext            => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
             buttonloc            => $Data->{'SystemConfig'}{'HTMLFORM_ButtonLocation'} || 'both',
             OptionAfterProcessed => 'display',
             updateSQL            => qq[
