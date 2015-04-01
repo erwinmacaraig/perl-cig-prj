@@ -376,8 +376,17 @@ my @headers = (
 </div>
 				  				</div>
 				  				<div class="form-group">
-				  					<label for="l_dtLog" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Date Paid').qq[</label>
-				  					<div class="col-md-6"><input type="text" name="dtLog" value="$currentDate" id="l_dtLog" size="10" maxlength="10" /> <span class="HTdateformat">dd/mm/yyyy</span></div>
+				  					<label for="l_dtLog" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Date Paid').qq[</label>									
+				  					<div class="col-md-6">
+										<script type="text/javascript">
+                 			  		 jQuery().ready(function() {
+                    		   			 jQuery("#l_dtLog").datepicker({
+                        			 	   dateFormat: 'dd/mm/yy',
+                        		  		  showButtonPanel: true
+                     		 	 		 });            
+                  	 				 });
+               				 </script> 
+									<input type="text" name="dtLog" value="" id="l_dtLog" size="10" maxlength="10" /> <span class="HTdateformat">dd/mm/yyyy</span></div>
 				  				</div>
 				  				<div class="form-group">
 				  					<label for="l_intPaymentType" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Payment Type').qq[</label>
@@ -475,7 +484,9 @@ sub queryInvoiceByOtherInfo {
 	INNER JOIN tblProducts ON tblProducts.intProductID = tblTransactions.intProductID
 	INNER JOIN tblPerson ON tblPerson.intPersonID = tblTransactions.intID 
 	WHERE intStatus = 0 AND tblPersonRegistration_$Data->{'Realm'}.strStatus <> 'INPROGRESS' 
-	@whereClause ];	
+	@whereClause 
+    ORDER BY invoiceDate DESC
+	];	
 
 	#filtering scheme for FC-866
 		#get authlevel
@@ -647,7 +658,18 @@ sub displayResults {
 				  				</div>
 				  				<div class="form-group">
 				  					<label for="l_dtLog" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Date Paid').qq[</label>
-				  					<div class="col-md-6"><input type="text" name="dtLog" value="$currentDate" id="l_dtLog" size="10" maxlength="10" /> <span class="HTdateformat">dd/mm/yyyy</span></div>
+				  					<div class="col-md-6">
+									<script type="text/javascript">
+                 			   jQuery().ready(function() {
+                    		    jQuery("#l_dtLog").datepicker({
+									maxDate: new Date,
+									dateFormat: 'dd/mm/yy',
+                        		    showButtonPanel: true
+                     		 	  });            
+                  	 			 });
+               				 </script> 
+
+									<input type="text" name="dtLog" value="" id="l_dtLog" size="10" maxlength="10" /> <span class="HTdateformat">dd/mm/yyyy</span></div>
 				  				</div>
 				  				<div class="form-group">
 				  					<label for="l_intPaymentType" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Payment Type').qq[</label>

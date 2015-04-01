@@ -748,7 +748,7 @@ sub getTransList {
             allvalue => '99',
         },
         ];
-		my $sortColumn = [8,"desc"]; # dtPaid is in the 9th order
+  my $sortColumn = [8,"desc"]; # dtPaid is in the 9th order
   my $grid = showGrid(
     Data => $Data,
     columns => \@headers,
@@ -758,7 +758,7 @@ sub getTransList {
     height => '',
     filters => $displayonly ? undef : $filterfields,
     class => 'trans',
-	sortColumn => $sortColumn,
+	#sortColumn => $sortColumn,
   );
 	my $filterHTML = qq[
 			<div class = "showrecoptions">
