@@ -23,6 +23,7 @@ use Utils;
 use MemberFunctions;
 use GridDisplay;
 use ProductPhoto;
+#use WorkFlow;
 
 require InstanceOf;
 require NationalReportingPeriod;
@@ -437,7 +438,7 @@ sub detail_products  {
 	my $name=$dref->{'strName'} || '';
     my $hasPhoto = $dref->{'intPhoto'}||0;
     my $amount = currency($dref->{'curAmount'} || $dref->{'curDefaultAmount'} || $dref->{'curAmount_Adult1'} || 0);
-		my $currency_symbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
+		my $currency_symbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
     my $compulsory=qq[<img src="images/compulsory.gif" alt="Compulsory Field" title="Compulsory Field"/>];
     #$body = qq[<p>Enter the name of the product in the box provided and its default cost, then press the Update button.</p>
 		my $fulledit = (
@@ -849,7 +850,6 @@ my $warning_note = $Data->{'SystemConfig'}{'ProductEditNote'} || '';
 								next if ($splitName =~ /Club/ and $Data->{'SystemConfig'}{'dontAllowClubsSplits'});
 				$hasSplits++;
                 $splitID = $paymentSplit->{'intSplitID'};
-								print STDERR $splitName;
                 $splits{$splitID} = $splitName;
             }
 						$splits{''} = '';
@@ -2053,7 +2053,6 @@ my $entityTypeID = $Data->{'currentLevel'};
         AND pd.intProductID IN ($productID)
         ORDER BY strGroup, strName
     ];
-print STDERR $query;
 
     my $sth = $Data->{'db'}->prepare($query);
 
@@ -2090,7 +2089,6 @@ my $entityTypeID = $Data->{'currentLevel'};
       AND intLevel IN (0, ?)
       AND intAttributeType = ?
   ];
-print STDERR $query;
   my $sth = $Data->{'db'}->prepare($query);
   $sth->execute(
     $productID,
@@ -2266,11 +2264,12 @@ sub product_apply_transaction {
                 T.intID,
                 P.intCanResetPaymentRequired,
                 T.intPersonRegistrationID,
-                T.intStatus
+                T.intStatus,
+                PR.intEntityID
 			FROM tblTransactions as T
                 INNER JOIN tblProducts as P ON (P.intProductID=T.intProductID)
+                LEFT JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (PR.intPersonRegistrationID = T.intPersonRegistrationID AND T.intPersonRegistrationID > 0)
 			WHERE T.intTransLogID = ?
-				AND T.intTableType = 1
 		];
     my $q = $db->prepare($st);
     $q->execute($transLogID);
@@ -2298,14 +2297,16 @@ sub product_apply_transaction {
     my $qUPDEntity = $db->prepare($stUPDEntity);
    
 
-    while( my ($productID,$tableType, $ID, $resetPaymentReq, $personRegoID, $txnStatus) = $q->fetchrow_array())	{
+    while( my ($productID,$tableType, $ID, $resetPaymentReq, $personRegoID, $txnStatus, $PREntityID) = $q->fetchrow_array())	{
         apply_product_rules($Data,$productID,$ID,$transLogID);
         next if (! $ID or ! $productID or $txnStatus != 1 or ! $resetPaymentReq);
         if ($tableType = $Defs::LEVEL_PERSON and $personRegoID) {
             $qUPD->execute($ID, $personRegoID);
+            WorkFlow::checkRulePaymentFlagActions($Data, $PREntityID, $ID, $personRegoID);
         }
         if ($tableType >= $Defs::LEVEL_CLUB) {
             $qUPDEntity->execute($ID);
+            WorkFlow::checkRulePaymentFlagActions($Data, $ID, 0,0);
         }
     }
     $q->finish();
@@ -2420,49 +2421,10 @@ sub apply_product_rules {
     
     #if($dtStart ne 'NULL' || $dtEnd ne 'NULL'){
     #print STDERR $query;
-    
     $Data->{'db'}->do($query);
     #}
     
-    # Update the Member_Associations table.
-    # - Check if we should set the members financial status or registered until date.
-    my %ColumnsValues = ();
-    my $query2 = qq[
-                        UPDATE tblPerson_Associations SET
-                        ];
-    
-    if ($product->{intProductMemberPackageID}) {
-        $ColumnsValues{'intMemberPackageID'} = $product->{intProductMemberPackageID};
-        $ColumnsValues{'dtLastRegistered'} = qq[NOW()];
-        $ColumnsValues{'dtFirstRegistered'} = qq[IF(dtFirstRegistered, dtFirstRegistered, NOW())];
-    }
-    
-    if($product->{intSetMemberFinancial}){
-        $ColumnsValues{'intFinancialActive'} = 1;
-    }
-    if($product->{intSetMemberActive}){
-        $ColumnsValues{'intRecStatus'} = 1;
-    }
-    
-    
-    if($product->{intMemberExpiryDays} > 0) {
-        $ColumnsValues{'dtRegisteredUntil'} = 'DATE_ADD(SYSDATE(), INTERVAL ' . $product->{intMemberExpiryDays} . ' DAY)';
-        }
-    elsif($product->{dtMemberExpiry} and $product->{dtMemberExpiry} ne '0000-00-00 00:00:00' and $product->{dtMemberExpiry} ne '0000-00-00' ){
-        $ColumnsValues{'dtRegisteredUntil'} = "'$product->{dtMemberExpiry}'";
-    }
-    
-    if(scalar (keys %ColumnsValues)) {
-        while(my ($column, $value) = (each %ColumnsValues)){
-            $query2 .= "$column = $value,";
-        }
-        $query2 =~s/\,$//;
-        $query2 .= " WHERE intPersonID = $personID ";
-        
-        $Data->{'db'}->do($query2);
-    }
-
-   {
+     {
 
         my $st = qq[
             UPDATE tblTransactions as T
@@ -2491,8 +2453,6 @@ sub apply_product_rules {
 		);
     }
 
-    warn("PERSON REGO RECORD HERE ?");
-
 }
 
 sub getFormProductAttributes {
@@ -2519,7 +2479,6 @@ sub getFormProductAttributes {
             WHERE 
                 intProductID in ( $productID_str)
         ];
-print STDERR "$query\n";
         my $sth = $Data->{'db'}->prepare($query);
         $sth->execute(@product_list);
         

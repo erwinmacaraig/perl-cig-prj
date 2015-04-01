@@ -70,6 +70,7 @@ CREATE TABLE `tblEntity` (
   `intNotifications` INT NOT NULL DEFAULT 1 COMMENT 'Flag to check whether to send notifications or not.',
   `strOrganisationLevel` VARCHAR(45) NULL,
   `intFacilityTypeID` INT NULL,
+  intWasActivatedByPayment tinyint default 0 COMMENT 'Debug flag for if record was auto activated by Payment',
   `strBankAccountNumber` VARCHAR(100) NULL COMMENT 'International Bank Account Number (IBAN)',
   PRIMARY KEY (`intEntityID`),
   UNIQUE KEY `strImportEntityCode_UNIQUE` (`strImportEntityCode`),

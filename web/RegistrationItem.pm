@@ -21,6 +21,7 @@ sub getRegistrationItems    {
     $ruleFor ||= '';
     $entityLevel ||= 0; # used for Products
     $multiPersonType ||= ''; ## For products, are multi regos used    
+    my $itc = $Rego_ref->{'InternationalTransfer'} || 0;
 
     return 0 if (! $itemType);
 
@@ -34,11 +35,13 @@ sub getRegistrationItems    {
             D.strDocumentFor,
 			D.strDescription,
             P.strName as strProductName,
-            P.strDisplayName as strProductDisplayName
+            P.strDisplayName as strProductDisplayName,
+            TP.intTransactionID
         FROM
             tblRegistrationItem as RI
             LEFT JOIN tblDocumentType as D ON (intDocumentTypeID = RI.intID and strItemType='DOCUMENT')
             LEFT JOIN tblProducts as P ON (P.intProductID= RI.intID and strItemType='PRODUCT')
+            LEFT JOIN tblTransactions as TP ON (TP.intProductID = P.intProductID and TP.intPersonRegistrationID = ?)
         WHERE
             RI.intRealmID = ?
             AND RI.intSubRealmID IN (0, ?)
@@ -57,10 +60,14 @@ sub getRegistrationItems    {
         AND (RI.strISOCountry_NOTIN ='' OR RI.strISOCountry_NOTIN IS NULL OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))        
         AND (RI.intFilterFromAge = 0 OR RI.intFilterFromAge <= ?)
         AND (RI.intFilterToAge = 0 OR RI.intFilterToAge >= ?)
+	AND (RI.intItemUsingITCFilter =0
+                OR (RI.intItemUsingITCFilter = 1 AND RI.intItemNeededITC = ?)
+            )
       ]; 
 
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
     $q->execute(
+	        $Rego_ref->{'intPersonRegistrationID'} || '',
 	        $Data->{'Realm'}, 
 	        $Data->{'RealmSubType'}, 
 	        $ruleFor,
@@ -78,9 +85,9 @@ sub getRegistrationItems    {
 	        $Rego_ref->{'Nationality'} || '',
 	        $Rego_ref->{'currentAge'} || 0,
 	        $Rego_ref->{'currentAge'} || 0,
+		$itc
 	        
 		) or query_error($st);
-   
     my @values = (); 
     push @values, $Data->{'Realm'};  
     push @values,$Data->{'RealmSubType'}; 
@@ -102,7 +109,6 @@ sub getRegistrationItems    {
 
     my @Items=();
     while (my $dref = $q->fetchrow_hashref())   {
-        print STDERR Dumper $dref;
         next if($itemType eq 'DOCUMENT' and $documentFor and ($documentFor ne $dref->{'strDocumentFor'}));
 
         #check if International Transfer
@@ -123,6 +129,7 @@ sub getRegistrationItems    {
             #$Item{'Name'} = $dref->{'strProductName'};
             $Item{'Name'} = $dref->{'strProductDisplayName'} || $dref->{'strProductName'};
             $Item{'ProductPrice'} = getItemCost($Data, $entityID, $entityLevel, $multiPersonType, $dref->{'intID'}) || 0;
+            $Item{'TransactionID'} = $dref->{'intTransactionID'} || 0;
             
         }
         push @Items, \%Item;

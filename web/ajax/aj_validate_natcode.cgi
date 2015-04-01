@@ -42,20 +42,19 @@ sub main {
 #$dob = '1901-01-01';
 #$gender = 1;
 
-    die "No valid parameters have been passed in!" if !$nationalCode;
-
     my $output = "Content-Type: $contentType\n\n";
-
     my $response = undef;
-    my $validator  = getNationalCodeValidator(
-        $systemConfig,
-        $nationalCode, 
-        {
-            gender => $gender,
-            dob => $dob,
-        },
-    );
-    $response = $validator->validate() if $validator;
+    if($nationalCode)   {
+        my $validator  = getNationalCodeValidator(
+            $systemConfig,
+            $nationalCode, 
+            {
+                gender => $gender,
+                dob => $dob,
+            },
+        );
+        $response = $validator->validate() if $validator;
+    }
     $output .= $response ? 'true' : 'false';
 
     print $output;

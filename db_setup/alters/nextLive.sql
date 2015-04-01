@@ -44,7 +44,15 @@ ALTER TABLE tblTransLog ADD COLUMN strOnlinePayReference varchar(100) default ''
 
 # 150323_tblWFRule
 ALTER TABLE tblWFRule ADD COLUMN intNeededITC tinyint default 0 COMMENT 'Was an ITC needed';
-ALTER TABLE tblWFRule ADD COLUMN intUsingITCFilter tinyint default 0 COMMENT 'Using ITC filter'
+ALTER TABLE tblWFRule ADD COLUMN intUsingITCFilter tinyint default 0 COMMENT 'Using ITC filter';
 
 # 150325_tblWFRule
 ALTER TABLE tblWFRule ADD COLUMN intCopiedFromRuleID INT DEFAULT 0 COMMENT 'The ID of the rule this record was copied from - used for tblWFRuleDocument setup';
+
+#  150328_tblRegistrationItem
+ALTER TABLE tblRegistrationItem ADD COLUMN intItemNeededITC tinyint default 0 COMMENT 'Was an ITC needed';
+ALTER TABLE tblRegistrationItem ADD COLUMN intItemUsingITCFilter tinyint default 0 COMMENT 'Using ITC filter';
+
+
+# 150326_tblRegoTypeLimits
+ALTER TABLE tblRegoTypeLimits ADD COLUMN strEntityType varchar(30) default '' AFTER intSubRealmID;

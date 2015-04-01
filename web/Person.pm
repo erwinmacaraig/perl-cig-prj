@@ -1745,13 +1745,13 @@ sub postPersonUpdate {
 
     my $genAgeGroup ||= new GenAgeGroup( $Data->{'db'}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $Data->{'clientValues'}{'assocID'} );
     my $st = qq[
-		SELECT DATE_FORMAT(dtDOB, "%Y%m%d"), intGender
+		SELECT DATE_FORMAT(dtDOB, "%Y%m%d"), intGender, intInternationalTransfer
 		FROM tblPerson
 		WHERE intPersonID = ?
 	];
     my $qry = $db->prepare($st);
     $qry->execute($id);
-    my ( $DOBAgeGroup, $Gender ) = $qry->fetchrow_array();
+    my ( $DOBAgeGroup, $Gender, $itc ) = $qry->fetchrow_array();
     $DOBAgeGroup ||= '';
     $Gender      ||= 0;
     my $ageGroupID = $genAgeGroup->getAgeGroup( $Gender, $DOBAgeGroup ) || 0;
@@ -1790,7 +1790,7 @@ sub postPersonUpdate {
                 $id,
                 0,
                 0,
-                0
+		$itc
             );
 
             my $body = qq[
@@ -1880,6 +1880,7 @@ sub postPersonUpdate {
                         $id,
                         0,
                         0,
+			$itc
                     );
                 }
 

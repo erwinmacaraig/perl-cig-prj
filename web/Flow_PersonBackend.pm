@@ -13,7 +13,7 @@ use PersonUtils;
 use ConfigOptions;
 use InstanceOf;
 use Countries;
-use PersonRegisterWhat;
+#use PersonRegisterWhat;
 use Reg_common;
 use FieldCaseRule;
 use WorkFlow;
@@ -35,7 +35,6 @@ use PersonSummaryPanel;
 use RenewalDetails;
 use JSON;
 use IncompleteRegistrations;
-
 use RegoProducts;
 
 sub setProcessOrder {
@@ -629,7 +628,8 @@ sub display_registration {
         $self->addCarryField('d_role', $rawDetails->{'strPersonEntityRole'});
     }
     else {
-         $content = displayPersonRegisterWhat(
+		
+         $content = PersonRegisterWhat::displayPersonRegisterWhat(
             $self->{'Data'},
             $personID,
             $entityID,
@@ -896,6 +896,7 @@ sub process_certifications {
 sub display_products { 
     my $self = shift;
 
+    $self->addCarryField('payMethod','');
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
@@ -905,7 +906,7 @@ sub display_products {
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
-
+	
     my $rego_ref = {};
     my $content = '';
     if($regoID) {
@@ -925,7 +926,8 @@ sub display_products {
     if($regoID) {
         my $nationality = $personObj->getValue('strISONationality') || ''; 
         $rego_ref->{'Nationality'} = $nationality;
-
+        $rego_ref->{'InternationalTransfer'} = 1 if $self->getCarryFields('itc');
+	$rego_ref->{'payMethod'} = $self->{'RunParams'}{'payMethod'} || '';
         $content = displayRegoFlowProducts(
             $self->{'Data'}, 
             $regoID, 
@@ -1012,6 +1014,7 @@ sub process_products {
             }
         }
     }
+	
     my $prodQty= join(':',@productsqty);
     $self->addCarryField('prodQty',$prodQty);
     my $prodIds= join(':',@productsselected);
@@ -1038,24 +1041,28 @@ sub process_products {
         $regoID = 0 if !$valid;
     }
 
+	cleanRegoTransactions($self->{'Data'},$regoID, $personID, $Defs::LEVEL_PERSON);
     my ($resultHTML, $error) = checkMandatoryProducts($self->{'Data'}, $personID, $Defs::LEVEL_PERSON, $self->{'RunParams'});
     if ($error) {
         push @{$self->{'RunDetails'}{'Errors'}}, $resultHTML;
         $self->setCurrentProcessIndex('p');
         return ('',2);
     }
+    $rego_ref->{'InternationalTransfer'} = 1 if $self->getCarryFields('itc');
     my ($txnIds, $amount) = save_rego_products($self->{'Data'}, $regoID, $personID, $entityID, $entityLevel, $rego_ref, $self->{'RunParams'});
 
 ####
     my $paymentType = $self->{'RunParams'}{'paymentType'} || 0;
+    my $payMethod= $self->{'RunParams'}{'payMethod'} || '';
+    $self->addCarryField('payMethod',$payMethod);
     my $markPaid= $self->{'RunParams'}{'markPaid'} || 0;
     my @txnIds = split ':',$txnIds ;
     if ($paymentType and $markPaid)  {
             my %Settings=();
             $Settings{'paymentType'} = $paymentType;
             my $logID = createTransLog($self->{'Data'}, \%Settings, $entityID,\@txnIds, $amount);
-            processTransLog($self->{'Data'}->{'db'}, '', 'OK', 'APPROVED', $logID, \%Settings, undef, undef, '', '', '', '', '', '','',1);
-            UpdateCart($self->{'Data'}, undef, $self->{'Data'}->{'client'}, undef, undef, $logID);
+            processTransLog($self->{'Data'}->{'db'}, '', 'OK', 'OK', 'APPROVED', $logID, \%Settings, undef, undef, '', '', '', '', '', '','',1);
+            UpdateCart($self->{'Data'}, undef, $self->{'Data'}->{'client'}, undef, 'OK', $logID);
             product_apply_transaction($self->{'Data'},$logID);
         }
     $self->addCarryField('paymentType',$paymentType);
@@ -1063,7 +1070,8 @@ sub process_products {
 ####
 
     $self->addCarryField('txnIds',$txnIds);
-
+	$self->addCarryField('paymentDue',$amount);
+	
     return ('',1);
 }
 
@@ -1094,7 +1102,8 @@ sub display_documents {
 	my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
     $personObj->load();
 	my $nationality = $personObj->getValue('strISONationality') || ''; 
-        my $itc = $personObj->getValue('intInternationalTransfer') || '';
+        #my $itc = $personObj->getValue('intInternationalTransfer') || '';
+        my $itc = $self->getCarryFields('itc') || 0;
         $rego_ref->{'Nationality'} = $nationality;
         $rego_ref->{'InternationalTransfer'} = $itc;
 
@@ -1170,7 +1179,8 @@ sub process_documents {
 		$personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
     	$personObj->load();
 		my $nationality = $personObj->getValue('strISONationality') || ''; 
-        my $itc = $personObj->getValue('intInternationalTransfer') || '';
+        #my $itc = $personObj->getValue('intInternationalTransfer') || '';
+	my $itc = $self->{'RunParams'}{'itc'} || 0;
         $rego_ref->{'Nationality'} = $nationality;
         $rego_ref->{'InternationalTransfer'} = $itc;
     }
@@ -1238,6 +1248,7 @@ sub display_summary {
 
     my $rego_ref = {};
     my $content = '';
+    my $gatewayConfig = undef;
     if($regoID) {
         my $valid =0;
         ($valid, $rego_ref) = validateRegoID(
@@ -1249,16 +1260,22 @@ sub display_summary {
         $regoID = 0 if !$valid;
     }
 
+    my $payMethod = '';
     if($regoID) {
         $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
         $personObj->load();
         my $nationality = $personObj->getValue('strISONationality') || ''; 
         $rego_ref->{'Nationality'} = $nationality;
-
+#BAFF
+        $self->addCarryField('txnIds', $self->{'RunParams'}{'txnIds'} || 0);
+        $self->addCarryField('payMethod', $self->{'RunParams'}{'payMethod'} || '');
+        $payMethod = $self->{'RunParams'}{'payMethod'} || '';
+    
         my $hiddenFields = $self->getCarryFields();
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
-        $content = displayRegoFlowSummary(
+        $hiddenFields->{'cA'} = "REGOFLOW";
+        ($content, $gatewayConfig) = displayRegoFlowSummary(
             $self->{'Data'}, 
             $regoID, 
             $client, 
@@ -1279,16 +1296,35 @@ sub display_summary {
         $self->setCurrentProcessIndex('r');
         return ('',2);
     }
-    my %PageData = (
+    
+    #if ($payMethod ne 'now')    {
+    #    $gateways = '';
+    #}
+print STDERR "ITC IS" . $self->{'RunParams'}{'itc'}. "\n";
+    my %Config = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
+        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+    );
+    if ($gatewayConfig->{'amountDue'} and $payMethod eq 'now')    {
+        ## Change Target etc
+        %Config = (
+            HiddenFields => $gatewayConfig->{'HiddenFields'},
+            Target => $gatewayConfig->{'Target'},
+            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to Member Association'),
+        );
+    }
+
+    my %PageData = (
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
         Content => $content,
         Title => '',
         TextTop => '',
         TextBottom => '',
-        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+        HiddenFields => $Config{'HiddenFields'},
+        Target => $Config{'Target'},
+        ContinueButtonText => $Config{'ContinueButtonText'},
     );
     my $pagedata = $self->display(\%PageData);
 
@@ -1300,6 +1336,7 @@ sub display_complete {
     my $self = shift;
     my $personObj;
     my $personID = $self->ID();
+#print STDERR "~~~IN DISPLAY_COMPLETE\n";
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
     }
@@ -1322,6 +1359,7 @@ sub display_complete {
         );
         $regoID = 0 if !$valid;
     }
+#print STDERR "~~~IN DISPLAY_COMPLETE FOR $regoID\n";
 
     if($regoID) {
         $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
@@ -1330,25 +1368,11 @@ sub display_complete {
         $rego_ref->{'Nationality'} = $nationality;
 
         my $run = $self->{'RunParams'}{'run'} || 0;
-        if($self->{'RunParams'}{'newreg'} and ! $run)  {
-                #$self->{'RunParams'}{'run'} = 1;
-                #$self->addCarryField('run',1);
-            my $rc = WorkFlow::addWorkFlowTasks(
-                $self->{'Data'},
-                'PERSON',
-                'NEW',
-                $self->{'ClientValues'}{'authLevel'} || 0,
-                getID($self->{'ClientValues'}) || 0,
-                $personID,
-                0,
-                0,
-                0
-            );
-        }
 
         my $hiddenFields = $self->getCarryFields();
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
+
         ($content, $gateways) = displayRegoFlowComplete(
             $self->{'Data'}, 
             $regoID, 
@@ -1373,8 +1397,6 @@ sub display_complete {
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        #FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
-        #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
         processStatus => 1,
         Content => $content,
         Title => '',

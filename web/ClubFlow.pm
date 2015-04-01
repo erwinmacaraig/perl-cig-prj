@@ -13,7 +13,7 @@ use Flow_ClubBackend;
 use Data::Dumper;
 
 sub handleClubFlow {
-    my ($action, $Data) = @_;
+    my ($action, $Data, $paramRef) = @_;
 
     my $body = '';
     my $title = '';
@@ -21,6 +21,11 @@ sub handleClubFlow {
     my $clientValues = $Data->{'clientValues'};
     my $cl = setClient($clientValues);
     my $cgi=new CGI;
+	if (defined $paramRef && $paramRef->{'return'})  {
+        foreach my $k (keys %{$paramRef})   {
+            $cgi->param(-name=>$k, -value=>$paramRef->{$k});
+        }
+    }
     my %params=$cgi->Vars();
     my $lang = $Data->{'lang'};
     my $entityID = getLastEntityID($clientValues) || 0;
@@ -57,6 +62,7 @@ sub handleClubFlow {
         cgi => $cgi,
     );
     my ($content,  undef) = $flow->run();
+	return if ($paramRef->{'return'});
 
     return $content;
 }

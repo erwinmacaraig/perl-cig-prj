@@ -1,18 +1,18 @@
-<div>
-	<div class="search-panel col-md-12">
+<div class="search-panel col-md-12">
 	<form action="main.cgi" method="POST">
-		<h3 class="panel-header">Invoice Number</h3>
+		<h3 class="panel-header">[% Lang.txt('Invoice Number') %]</h3>
 		<div class="panel-body">
-			<p class="introtext">Please enter the invoice number for transaction payment you want to process.</p> 
+			<p class="introtext">[% Lang.txt('Please enter the invoice number for transaction payment you want to process.') %]</p> 
 			<span class="formw">
-			<input type="text" name="strInvoiceNumber" value="" id="l_strInvoiceNumber" size="30" maxlength="50" size="105" placeholder="Invoice Number" /></span>		
+			<input type="text" name="strInvoiceNumber" value="" id="l_strInvoiceNumber" size="30" maxlength="50" size="105" placeholder="[% Lang.txt('Invoice Number') %]" /></span>		
 		</div>
 
-		<div class="HTbuttons"> 
-			<input type="submit" name="subbut" value="Continue" class="HF_submit button proceed-button" id="HFsubbut"> 
-		    <input type="hidden" name="a" value="[% a %]">
-			<input type="hidden" name="client" value="[% client %]"> 
+		<div class="button-row">
+					<div class="txtright">
+						<input id = "flow-btn-continue" type = "submit" value = "[% Lang.txt('Continue') %] "  class = "btn-main btn-proceed">
+						<input type="hidden" name="a" value="[% a %]">
+						<input type="hidden" name="client" value="[% client %]"> 
+					</div>
 		</div>
-	</form>             
-	</div>
-<div>
+</form>             
+</div>

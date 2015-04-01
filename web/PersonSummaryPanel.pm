@@ -58,10 +58,7 @@ sub personSummaryPanel {
         'registrations' => \@personRegistration,
     );
 
-    #open FH, ">dumpfile.txt";
-    #print FH "Group DataL \n\n" . Dumper($personObj) . "\n";
-
-    my $content = runTemplate(
+   my $content = runTemplate(
         $Data,
         \%templateData,
         'person/summarypanel.templ'

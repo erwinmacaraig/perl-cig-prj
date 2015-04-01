@@ -192,7 +192,8 @@ sub personRegistrationWorkTasks {
             ApprovalEntity.strLocalName as ApprovalLocalName,
             ApprovalEntity.strLatinName as ApprovalEntityName,
             RejectedEntity.strLocalName as RejectedLocalName,
-            RejectedEntity.strLatinName as RejectedEntityName
+            RejectedEntity.strLatinName as RejectedEntityName,
+		WR.intAutoActivateOnPayment
         FROM
             tblPersonRegistration_$Data->{'Realm'} AS pr
             LEFT JOIN tblNationalPeriod as np ON (
@@ -210,6 +211,9 @@ sub personRegistrationWorkTasks {
                 AND WFT.intPersonID = pr.intPersonID
                 #AND WFT.strTaskStatus IN ('ACTIVE')
             )
+		LEFT JOIN tblWFRule as WR ON (
+			WR.intWFRuleID = WFT.intWFRuleID
+		)
             LEFT JOIN tblEntity as ApprovalEntity ON (
                 ApprovalEntity.intEntityID = WFT.intApprovalEntityID
             )
@@ -248,6 +252,11 @@ sub personRegistrationWorkTasks {
             $taskTo.= qq[ ($dref->{'RejectedEntityName'})] if ($dref->{'RejectedEntityName'});
         }
 
+	my $status= $Defs::wfTaskStatus{$dref->{'WFTTaskStatus'}} || '';
+	if ($dref->{'intAutoActivateOnPayment'})        {
+                $status = $lang->txt('Approved upon Payment');
+                $taskTo='-';
+        }
         push @rowdata, {
             id => $dref->{'WFTTaskID'} || 0,
             dtAdded=>  $Data->{'l10n'}{'date'}->TZformat($dref->{'dtApproved'},'MEDIUM','SHORT') || '',
@@ -256,7 +265,7 @@ sub personRegistrationWorkTasks {
             PersonType=> $Defs::personType{$dref->{'strPersonType'}} || '',
             AgeLevel=> $Defs::ageLevel{$dref->{'strAgeLevel'}} || '',
             RegistrationNature=> $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '',
-            Status=> $Defs::wfTaskStatus{$dref->{'WFTTaskStatus'}} || '',
+            Status=> $status,
             PersonEntityRole=> $dref->{'strPersonEntityRole'} || '',
             Sport=> $Defs::sportType{$dref->{'strSport'}} || '',
             LocalName=>$localname,

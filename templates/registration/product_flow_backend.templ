@@ -12,6 +12,30 @@
         </select></p>
 [% END %]
 [% product_body %]
+[% IF mandatoryPayment %]
+	<div id="payOptions" style="display:[% IF amountCheck %] block [% ELSE %] none [% END %];">
+	
+    <br>
+    <h3 class="panel-header">[% Lang.txt('Payment Options') %]</h3>
+    <div class="panel-body">
+        <div class="paymentwrapper">
+            <div class="paymentmainwrapper">
+            <span class="paymentwrapperoption"><input type="radio" class="inputbox" name="payMethod" value="now" [% IF payMethod == 'now' || payMethod == '' %]checked[% END %] /></span>
+            <b>[% Lang.txt('Pay Now') %]</b>
+            <label>[% Lang.txt('(after you submit the registration to the') %] [% AssociationName %][% Lang.txt(', the system will connect you to the payment portal)')%]</label>
+            </div>
+        </div>
+        <div class="paymentwrapper">
+            <div class="paymentmainwrapper">
+            <span class="paymentwrapperoption"><input type="radio" class="inputbox" name="payMethod" value="later" [% IF payMethod == 'later' %]checked[% END %] /></span>
+            <b>[% Lang.txt('Pay Later') %]</b>
+            <label>[% Lang.txt('(after you submit the registration to the') %] [% AssociationName %][% Lang.txt(', the system will create an invoice for you to pay later)') %]</label>
+            </div>
+        </div>
+    </div>
+	</div>
+[% END %]
+
 [% IF !NoFormFields %]
 [% FOREACH h IN  hidden_ref %]
 <input type="hidden" name="[% h.key %]" value="[% h.value %]">
