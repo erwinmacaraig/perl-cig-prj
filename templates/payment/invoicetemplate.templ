@@ -1,6 +1,6 @@
   <html>
     <head>
-      <title>Receipt</title>
+      <title>[% Lang.txt('Receipt') %]</title>
       <link rel="stylesheet" type="text/css" href="css/style.css">
 			<style type="text/css">
 				h2 { font-size:16px;}
@@ -40,21 +40,21 @@
 
        <table class="paymentlist">
 		<tr>
-			<td>[% index %]<b>Payment For:</b></td>
+			<td>[% index %]<b>[% Lang.txt('Payment For') %]:</b></td>
 			<td>[% person %]</td>
 		</tr>
 		<tr>
-			<td><b>Invoice No.:</b></td>
+			<td><b>[% Lang.txt('Invoice No.') %]:</b></td>
 			<td>[% invoicenum %]</td>
 		</tr>
 	</table>
 	<br><br>
 	<table class="itemlist">
 		<tr style = " border-bottom:1px solid #aaa;">
-			<td style="width:80px;">Transaction Number</td>
-			<td>Item</td>
-			<td style="width:20px;">Quantity</td>
-			<td style="width:70px;">Cost</td>
+			<td style="width:80px;">[% Lang.txt('Transaction Number') %]</td>
+			<td>[% Lang.txt('Item') %]</td>
+			<td style="width:20px;">[% Lang.txt('Quantity') %]</td>
+			<td style="width:70px;">[% Lang.txt('Cost') %]</td>
 		</tr>
 	[% FOREACH t IN transactions %]
 		<tr>
@@ -65,7 +65,7 @@
 		</tr>
 	[% END %]
 		<tr style = " border-top:1px solid #aaa;">
-			<td colspan="3"><b>Amount To Pay:</b></td>
+			<td colspan="3"><b>[% Lang.txt('Amount To Pay') %]:</b></td>
 			<td><b>\$ [% amount %]</b></td>
 		</tr>
 	</table>

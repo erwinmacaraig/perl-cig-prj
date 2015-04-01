@@ -1,10 +1,10 @@
 <table class="confirm-details permsTable" style="width:90%;">
     <tbody>
         <tr>        
-            <th>Transaction Number</th>
-            <th>Item</th>
-            <th>Name</th>
-            <th>Amount</th>
+            <th>[% Lang.txt('Transaction Number') %]</th>
+            <th>[% Lang.txt('Item') %]</th>
+            <th>[% Lang.txt('Name') %]</th>
+            <th>[% Lang.txt('Amount') %]</th>
         </tr>
         [% FOREACH txn = TXNs %]
             <tr>
@@ -16,7 +16,7 @@
         [% END %]
         <tbody>
             <tr>
-                <td>Total</td>
+                <td>[% Lang.txt('Total') %]</td>
                 <td>&nbsp;</td>
                 <td>&nbsp;</td>
                 <td class="align-right">[% dollarSymbol %][% camount %]</td>
