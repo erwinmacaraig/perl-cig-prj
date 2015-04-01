@@ -40,7 +40,7 @@ sub MAGateway_FI_checkoutFI	{
         my $DeliveryDate = "$Year$Month$Day";
 
         my $pa = $paymentSettings->{'gatewayProcessPreGateway'} ==1 ? 0 : 1;
-        $gatewaySpecific{'delayedURL'}= $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&pa=$pa&ci=$payRef];
+        $gatewaySpecific{'delayedURL'}= $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=$pa&ci=$payRef];
         $gatewaySpecific{'cancelURL'} = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&ci=$payRef];
         $gatewaySpecific{'returnURL'} = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=$pa&ci=$payRef];
         $gatewaySpecific{'rejectURL'} = $Defs::gatewayReturnDemo . qq[/gatewayprocess_cofi.cgi?sa=1&da=1&pa=$pa&ci=$payRef];
