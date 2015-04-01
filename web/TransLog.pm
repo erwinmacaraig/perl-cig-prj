@@ -1452,6 +1452,11 @@ sub resolveHoldPaymentForm  {
 					value => $TLref->{'Name'},
                                         readonly => '1',
                                 },
+                                dtLog=> {
+                                        label => 'Date Paid',
+                                        value => $Data->{'l10n'}{'date'}->TZformat($TLref->{'dtLog'},'MEDIUM','SHORT'),
+                                        readonly => '1',
+                                },
                                 intLogID=> {
                                         label => 'Payment Reference Number',
                                         value => $TLref->{'intLogID'},
@@ -1509,7 +1514,7 @@ sub resolveHoldPaymentForm  {
                                 },
 				
 			},
-                order => [qw(intLogID Name intAmount Status PaymentType dtSettlement strTXN strResponseCode strResponseText strBSB strBank strAccountName strAccountNum PartialPayment)],
+                order => [qw(intLogID Name dtLog intAmount Status PaymentType dtSettlement strTXN strResponseCode strResponseText strBSB strBank strAccountName strAccountNum PartialPayment)],
                         options => {
                                 labelsuffix => ':',
                                 hideblank => 1,
@@ -1706,6 +1711,11 @@ sub viewTransLog	{
 					value => $TLref->{'Name'},
                                         readonly => '1',
                                 },
+                                dtLog=> {
+                                        label => 'Date Paid',
+                                        value => $Data->{'l10n'}{'date'}->TZformat($TLref->{'dtLog'},'MEDIUM','SHORT'),
+                                        readonly => '1',
+                                },
                                 intLogID=> {
                                         label => 'Payment Reference Number',
                                         value => $TLref->{'intLogID'},
@@ -1763,7 +1773,7 @@ sub viewTransLog	{
                                 },
 				
 			},
-                order => [qw(intLogID Name intAmount Status PaymentType dtSettlement strTXN strResponseCode strResponseText strBSB strBank strAccountName strAccountNum PartialPayment)],
+                order => [qw(intLogID Name dtLog intAmount Status PaymentType dtSettlement strTXN strResponseCode strResponseText strBSB strBank strAccountName strAccountNum PartialPayment)],
                         options => {
                                 labelsuffix => ':',
                                 hideblank => 1,
