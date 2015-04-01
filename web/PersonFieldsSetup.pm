@@ -199,7 +199,7 @@ sub personFieldsSetup {
                     value       => $values->{'intLocalLanguage'},
                     type        => 'lookup',
                     options     => \%languageOptions,
-                    firstoption => [ '', 'Select Language' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Language') ],
                     compulsory => 1,
                     posttext => $nonlatinscript,
                     sectionname => 'core',
@@ -270,7 +270,7 @@ sub personFieldsSetup {
                     value       => $values->{'strISONationality'} ||  $Data->{'SystemConfig'}{'DefaultNationality'} || '',
                     type        => 'lookup',
                     options     => $isocountries,
-                    firstoption => [ '', 'Select Country' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
                     compulsory => 1,
                     class       => 'chzn-select',
                     sectionname => 'core',
@@ -281,7 +281,7 @@ sub personFieldsSetup {
                     value       => $values->{'strISOCountryOfBirth'} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
                     type        => 'lookup',
                     options     => $isoHistoricalCountries,
-                    firstoption => [ '', 'Select Country' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
                     class       => 'chzn-select',
                     compulsory => 1,
                     sectionname => 'core',
@@ -311,7 +311,7 @@ sub personFieldsSetup {
                     value       => $values->{'strPreferredLang'},
                     type        => 'lookup',
                     options     => \%languageOptions,
-                    firstoption => [ '', 'Select Language' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Language') ],
                     sectionname => 'other',
                 },
                 intEthnicityID => {
@@ -337,7 +337,7 @@ sub personFieldsSetup {
                     value       => $values->{'strBirthCertCountry'},
                     type        => 'lookup',
                     options     => $isoHistoricalCountries,
-                    firstoption => [ '', 'Select Country' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
                     compulsory => 1,
                     class       => 'chzn-select',
                     sectionname => 'other',
@@ -386,7 +386,7 @@ sub personFieldsSetup {
                 	value => $values->{'strPassportNationality'},
                 	type        => 'lookup',
                     options     => $isocountries,
-                    firstoption => [ '', 'Select Country' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
                     sectionname => 'other',
                     class       => 'chzn-select',
                 },
@@ -395,7 +395,7 @@ sub personFieldsSetup {
                 	value => $values->{'strPassportIssueCountry'},
                 	type        => 'lookup',
                     options     => $isocountries,
-                    firstoption => [ '', 'Select Country' ],                	
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],                	
                     sectionname => 'other',
                     class       => 'chzn-select',
                 },
@@ -425,7 +425,7 @@ sub personFieldsSetup {
                 	value => $values->{'strOtherPersonIdentifierIssueCountry'},
                 	type        => 'lookup',
                     options     => $isocountries,
-                    firstoption => [ '', 'Select Country' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
                     sectionname => 'other',
                     class       => 'chzn-select',
                 },
@@ -509,7 +509,7 @@ sub personFieldsSetup {
                             <div class="col-md-12">
                                 <div class = "alert">
                                     <div><span class = "fa fa-info"></span>
-                                <p>].$Data->{'lang'}->txt(qq[If the player has been registered in another country before, you will need an ITC to continue with the registration.]).qq[  <a href = "$values->{'BaseURL'}PRA_T">].$Data->{'lang'}->txt(qq[If you have the ITC then please start the transfer process here.]).qq[  <a href = "$values->{'BaseURL'}PRA_NC">].$Data->{'lang'}->txt(qq[If you don't have an ITC you can request it here prior to the registration.]).qq[</a></p>
+                                <p>].$Data->{'lang'}->txt('If the player has been registered in another country before, you will need an ITC to continue with the registration.').qq[  <a href = "$values->{'BaseURL'}PRA_T">].$Data->{'lang'}->txt('If you have the ITC then please start the transfer process here.').qq[  <a href = "$values->{'BaseURL'}PRA_NC">].$Data->{'lang'}->txt("If you don't have an ITC you can request it here prior to the registration.").qq[</a></p>
                             </div> </div>
                             </div>
                         </div>
@@ -564,9 +564,9 @@ sub personFieldsSetup {
 
             )],
             sections => [
-                [ 'core',        'Personal Details' ],
-                [ 'minor',       'FIFA Minor Protection','','dynamic-panel' ],
-                [ 'other',       'Additional Information' ],
+                [ 'core',        $Data->{'lang'}->txt('Personal Details') ],
+                [ 'minor',       $Data->{'lang'}->txt('FIFA Minor Protection'),'','dynamic-panel' ],
+                [ 'other',       $Data->{'lang'}->txt('Additional Information') ],
             ],
             fieldtransform => {
                 textcase => {
@@ -610,7 +610,7 @@ sub personFieldsSetup {
                     value       => $values->{'strISOCountry'} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
                     type        => 'lookup',
                     options     => $isocountries,
-                    firstoption => [ '', 'Select Country' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
                     class       => 'chzn-select',
                 },
                 strPostalCode => {
@@ -638,7 +638,7 @@ sub personFieldsSetup {
 
             },
             sections => [
-                [ 'main',        'Contact Details' ],
+                [ 'main',        $Data->{'lang'}->txt('Contact Details') ],
             ],
             'order' => [qw(
                 strAddress1
@@ -850,7 +850,7 @@ sub personFieldsSetup {
                 strDescription
             )],
             sections => [
-                [ 'main',        'Add New Certification' ],
+                [ 'main',        $Data->{'lang'}->txt('Add New Certification') ],
             ],
         },
     };

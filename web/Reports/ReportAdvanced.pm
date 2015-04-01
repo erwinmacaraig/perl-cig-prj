@@ -303,7 +303,7 @@ sub displayOptions {
 		my $groupname = $lang->txt($self->{'Config'}->{'OptionGroups'}{$group}[0]);
 		if($grpdata)	{
 			$allfields .= qq[
-				<h3><a href="#">$groupname</a></h3>
+				<h3><a href="#">].$lang->txt($groupname).qq[</a></h3>
 				<div>
 					<ul class="" id="fieldgrouping_$group">
 						$grpdata
@@ -315,9 +315,7 @@ sub displayOptions {
   my $returnstr='';
   if ($self->{'Config'}->{'Config'}{'RunButtonLabel'}) {
 
-		my $run_button_label = $lang->txt(
-				$self->{'Config'}->{'Config'}{'RunButtonLabel'}
-		);
+		my $run_button_label = $lang->txt($self->{'Config'}->{'Config'}{'RunButtonLabel'});
 		$returnstr.=qq[
 			<div class="ROrunButton"><input type="submit" value="$run_button_label" class="btn-main ROButRun"></div>
 		];
@@ -435,16 +433,16 @@ sub displayOptions {
           ].$lang->txt('Choose how you want to receive the data from this report.').qq[
 
           <div style="padding:5px;">
-            <input type="radio" name="RO_OutputType" value="screen" class="ROnb" checked id="RO_Output_display"><label for="RO_Output_display"> <b>Display</b></label>
+            <input type="radio" name="RO_OutputType" value="screen" class="ROnb" checked id="RO_Output_display"><label for="RO_Output_display"> <b>].$lang->txt('Display').qq[</b></label>
            <div style="margin-left:20px;">
-              <i>Open the report for viewing on the screen.</i>
+              <i>].$lang->txt('Open the report for viewing on the screen.').qq[</i>
             </div>
           </div>
           <div style="padding:5px;">
-            <input type="radio" name="RO_OutputType" value="email" class="ROnb" id="RO_Output_email"><label for="RO_Output_email"> <b>Email</b></label>
+            <input type="radio" name="RO_OutputType" value="email" class="ROnb" id="RO_Output_email"><label for="RO_Output_email"> <b>].$lang->txt('Email').qq[</b></label>
             <div style="margin-left:20px;">
-              <i>Email the report in a format suitable to be imported into another product.</i><br>
-              <b>Email Address</b> <input type="text" size="45" name="RO_OutputEmail">
+              <i>].$lang->txt('Email the report in a format suitable to be imported into another product.').qq[</i><br>
+              <b>].$lang->txt('Email Address').qq[</b> <input type="text" size="45" name="RO_OutputEmail">
             </div>
           </div>
     ];
@@ -498,7 +496,7 @@ sub displayOptions {
 				$preblock_beforeform
 			<form action = "$self->{'Data'}{'target'}" method="POST" id="reportform">
 				$preblock
-                <h3 class = "panel-header">Selected Fields</h3>
+                <h3 class = "panel-header">].$lang->txt('Selected Fields').qq[</h3>
 				<div id = "ROselectedfields-wrapper" class = "panel-body">
 					<div id = "ROselectedfields">
 						<ul class="connectedSortable" id="ROselectedfields-list"> $outputfields</ul>

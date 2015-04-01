@@ -111,7 +111,7 @@ sub _getConfiguration {
                 }
             ],
             strLatinFirstname => [
-                'International First Name',
+                'International First name',
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
@@ -122,7 +122,7 @@ sub _getConfiguration {
             ],
 
             strLatinSurname => [
-                'International Family Name',
+                'International Family name',
                 {
                     displaytype   => 'text',
                     fieldtype     => 'text',

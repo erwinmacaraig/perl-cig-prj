@@ -42,15 +42,16 @@ sub setProcessOrder {
   
     my $dtype = param('dtype') || $self->{'RunParams'}{'dtype'} || $self->{'CarryFields'}{'dtype'} || '';
     my $typename = $Defs::personType{$dtype} || '';
+    my $lang = $self->{'Data'}{'lang'};
     my $regname = $typename
-        ? $typename .' Registration'
-        : 'Registration';
+        ? $lang->txt($typename .' Registration')
+        : $lang->txt('Registration');
     my $steps1 = [       
         {
             'action' => 'cd',
             'function' => 'display_core_details',
-            'label'  => 'Personal Details',
-            'title'  => "$regname - Enter Personal Information",
+            'label'  => $lang->txt('Personal Details'),
+            'title'  => $regname . ' - ' .$lang->txt('Enter Personal Information'),
             'fieldset'  => 'core',
             #'noRevisit' => 1,
         },
@@ -62,9 +63,9 @@ sub setProcessOrder {
         {
             'action' => 'cond',
             'function' => 'display_contact_details',
-            'label'  => 'Contact Details',
+            'label'  => $lang->txt('Contact Details'),
             'fieldset'  => 'contactdetails',
-            'title'  => "$regname - Enter Contact Information",
+            'title'  => $regname . ' - ' . $lang->txt('Enter Contact Information'),
         },
         {
             'action' => 'condu',
@@ -74,8 +75,8 @@ sub setProcessOrder {
         {
             'action' => 'r',
             'function' => 'display_registration',
-            'label'  => 'Registration',
-            'title'  => "$regname - Choose Registration Type",
+            'label'  => $lang->txt('Registration'),
+            'title'  => $regname . ' - ' . $lang->txt('Choose Registration Type'),
         },
         {
             'action' => 'ru',
@@ -86,9 +87,9 @@ sub setProcessOrder {
         {
             'action' => 'cert',
             'function' => 'display_certifications',
-            'label'  => 'Certifications',
+            'label'  => $lang->txt('Certifications'),
             'fieldset'  => 'certifications',
-            'title'  => "$regname - Enter Certifications",
+            'title'  => $regname . ' - '. $lang->txt('Enter Certifications'),
             'NoNav' => $dtype eq 'PLAYER' ? 1 : 0,
         },
         {
@@ -101,8 +102,8 @@ sub setProcessOrder {
         {
             'action' => 'd',
             'function' => 'display_documents',
-            'label'  => 'Documents',
-            'title'  => "$regname - Upload Documents",
+            'label'  => $lang->txt('Documents'),
+            'title'  => $regname . ' - ' . $lang->txt('Upload Documents'),
         },
         {
             'action' => 'du',
@@ -111,8 +112,8 @@ sub setProcessOrder {
          {
             'action' => 'p',
             'function' => 'display_products',
-            'label'  => 'License',
-            'title'  => "$regname - Confirm License",
+            'label'  => $lang->txt('License'),
+            'title'  => $regname . "- " . $lang->txt('Confirm License'),
         },
         {
             'action' => 'pu',
@@ -121,14 +122,14 @@ sub setProcessOrder {
        {
             'action' => 'summ',
             'function' => 'display_summary',
-            'label'  => 'Summary',
-            'title'  => "$regname - Summary",
+            'label'  => $lang->txt('Summary'),
+            'title'  => $regname . ' - ' . $lang->txt('Summary'),
         },
        {
             'action' => 'c',
             'function' => 'display_complete',
-            'label'  => 'Complete',
-            'title'  => "$regname - Submitted",
+            'label'  => $lang->txt('Complete'),
+            'title'  => $regname . ' - ' . $lang->txt('Submitted'),
             'NoGoingBack' => 1,
             'NoDisplayInNav' => 1,
         },
@@ -255,7 +256,7 @@ sub validate_core_details    {
     if(!scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         if(!$id and isPossibleDuplicate($self->{'Data'}, $userData) and !$self->{'RunParams'}{'bd'})    {
             my $msg = $lang->txt('This person is a possible duplicate.');
-            $msg .= $lang->txt(qq[  If you have checked and this person is not a duplicate, then click the button below.]);
+            $msg .= $lang->txt('If you have checked and this person is not a duplicate, then click the button below.');
             push @{$self->{'RunDetails'}{'Errors'}}, $msg;
             $self->{'RunDetails'}{'FoundDuplicate'} = 1;
         }

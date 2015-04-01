@@ -48,7 +48,7 @@
                       -->
                       [% FOREACH taskType IN TaskFilters.type %]
                           [% IF taskType %]
-                          <option value="[% taskType %]">[% taskType %]</option>
+                          <option value="[% taskType %]">[% Lang.txt(taskType) %]</option>
                           [% END %]
                       [% END %]
 			        </select>

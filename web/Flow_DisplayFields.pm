@@ -477,7 +477,7 @@ sub drop_down {
         }
         else { $selected = 'SELECTED' if $val eq $default; }
         $subBody .=
-          qq[ <option $selected value="$val">$options_ref->{$val}</option>];
+          qq[ <option $selected value="$val">].$self->langlookup($options_ref->{$val}).qq[</option>];
     }
     $multi = ' multiple ' if $multi;
     $size = min($size, scalar (keys %$options_ref) + 1);
@@ -485,8 +485,11 @@ sub drop_down {
       ( $pre and not $multi )
       ? qq{<option value="$pre->[0]">$pre->[1]</option>}
       : '';
+    my $placeholder_text = $multi
+        ? $self->langlookup('Select some options')
+        : $self->langlookup('Select an option');
     $subBody = qq[
-    <select name="d_$name" id="l_$name" size="$size" class = "$class" $multi $otheroptions $onChange $disabled>
+    <select name="d_$name" id="l_$name" size="$size" data-placeholder = "$placeholder_text" class = "$class" $multi $otheroptions $onChange $disabled>
     $preoption
     $subBody
     </select>

@@ -619,7 +619,7 @@ sub listTasks {
 			AgeLevel => $dref->{strAgeLevel},
 			RuleFor=> $dref->{strWFRuleFor},
 			RegistrationNature => $dref->{strRegistrationNature},
-			RegistrationNatureLabel => $Defs::workTaskTypeLabel{$ruleForType},
+			RegistrationNatureLabel => $Data->{'lang'}->txt($Defs::workTaskTypeLabel{$ruleForType}),
 			DocumentName => $dref->{strDocumentName},
             Name=>$name,
 			LocalEntityName=> $dref->{EntityLocalName},

@@ -633,6 +633,7 @@ sub displayPaymentResult        {
 	my $db = $Data->{'db'};
     $intLogID ||= 0;
 
+    my $lang = $Data->{'lang'};
     my $st= qq[
         SELECT TL.*, E.intSubRealmID
         FROM tblTransLog as TL
@@ -658,17 +659,17 @@ sub displayPaymentResult        {
     if ($transref->{'intStatus'} == $Defs::TXNLOG_SUCCESS)   {
         my $ttime = time();
         $body .= qq[
-            <div align="center" class="OKmsg" style="font-size:14px;">Congratulations your payment has been successful</div>
+            <div align="center" class="OKmsg" style="font-size:14px;">] . $lang->txt('Congratulations your payment has been successful') . qq[</div>
         ];
     }
     elsif ($transref->{'intStatus'} == $Defs::TXNLOG_HOLD)   {
         my $ttime = time();
         $body .= qq[
-            <div align="center" class="OKmsg" style="font-size:14px;">Your payment has been put on Hold</div>
+            <div align="center" class="OKmsg" style="font-size:14px;">] . $lang->txt('Your payment has been put on Hold') . qq[</div>
         ];
     }
     else    {
-		$msg = qq[ <div align="center" class="warningmsg" style="font-size:14px;">We are sorry, there was a problem with your payment.</div> ] if (! $msg and $transref->{'intAmount'});
+		$msg = qq[ <div align="center" class="warningmsg" style="font-size:14px;">] . $lang->txt('We are sorry, there was a problem with your payment.') . qq[</div> ] if (! $msg and $transref->{'intAmount'});
         $body .= qq[ <center>$msg<br></center> ];
 		if ($external)	{
 			$st = qq[

@@ -93,8 +93,8 @@ sub handleTransactions	{
     		$heading = $Data->{'lang'}->txt('List Transactions');
 		$resultHTML_ .= qq[<br />
 			<div>
-				<a href="$Data->{target}?client=$clm&amp;a=WF_" class="btn-main"> Go to your dashboard </a>
-				<a href="$Data->{target}?client=$clm&amp;a=TXN_PAY_INV_QUERY_INFO" class="btn-main pull-right">Return to Invoices </a>
+				<a href="$Data->{target}?client=$clm&amp;a=WF_" class="btn-main"> ] . $lang->txt('Go to your dashboard') . qq[ </a>
+				<a href="$Data->{target}?client=$clm&amp;a=TXN_PAY_INV_QUERY_INFO" class="btn-main pull-right">]. $lang->txt('Return to Invoices') . qq[ </a>
 				
 			</div>
 		];
@@ -288,15 +288,15 @@ sub displayTransaction	{
         );
         if ($pr_count) {
             foreach my $reg (@{$regs})   {
-                my $sport = $Defs::sportType{$reg->{'strSport'}} || '';
-                my $personType= $Defs::personType{$reg->{'strPersonType'}} || '';
+                my $sport = $lang->txt($Defs::sportType{$reg->{'strSport'}}) || '';
+                my $personType= $lang->txt($Defs::personType{$reg->{'strPersonType'}}) || '';
                 my $entityRole= $reg->{'strEntityRoleName'};
-                my $personLevel= $Defs::personLevel{$reg->{'strPersonLevel'}} || '';
-                my $ageLevel= $Defs::ageLevel{$reg->{'strAgeLevel'}} || '';
+                my $personLevel= $lang->txt($Defs::personLevel{$reg->{'strPersonLevel'}}) || '';
+                my $ageLevel= $lang->txt($Defs::ageLevel{$reg->{'strAgeLevel'}}) || '';
                 my $entityLocalName= $reg->{'strLocalName'};
                 my $nationalPeriodName= $reg->{'strNationalPeriodName'};
                 my $entityLatinName= $reg->{'strLatinName'};
-                my $status= $Defs::personRegoStatus{$reg->{'strStatus'}} || '';
+                my $status= $lang->txt($Defs::personRegoStatus{$reg->{'strStatus'}}) || '';
                 my $text = $entityLocalName;
                 $text .=  " ($entityLatinName)" if ($entityLatinName);
                 $text .= " -$personType" if ($personType);
@@ -417,7 +417,7 @@ sub displayTransaction	{
 				hideblank => 1,
 				target => $Data->{'target'},
 				formname => 'txn_form',
-				submitlabel => 'Update Transaction',
+				submitlabel => $lang->txt('Update Transaction'),
 				introtext => 'auto',
 				buttonloc => 'bottom',
 				updateSQL => $txnupdate,
@@ -655,7 +655,6 @@ sub queryBlkTXN {
       		target => $Data->{'target'},
       		formname => 'n_form',
       		submitlabel => $Data->{'lang'}->txt('Continue'),
-      		introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
 			 NoHTML => 1,
 		}, #end of options
 		carryfields =>  {
