@@ -434,10 +434,16 @@ sub step2 {
 				</form>
 				<div style="clear:both;"></div>
 				<form action="$Data->{'target'}" method="POST" style="position: absolute; bottom: 50px; margin-left: 418px;">
-					<input type="hidden" name="a" value="P_TXNLoglist">
+					<input type="hidden" name="a" value="P_TXNLog_list">
 					<input type="hidden" name="client" value="$client">
-					<input type="hidden" name="mode" value="$mode"><input type="hidden" name="personID" value="$personID"><input type="hidden" name="client" value="$client"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="dt_start_paid" value="$dtStart_paid"><input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
 					<input type="submit" name="subbut" value=" ]. $lang->txt('Cancel Payment') . qq[ " class="btn-main">
+					<!--
+					<input type="hidden" name="mode" value="$mode">
+					<input type="hidden" name="personID" value="$personID">					
+					<input type="hidden" name="paymentID" value="$paymentID">
+					<input type="hidden" name="dt_start_paid" value="$dtStart_paid">
+					<input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
+					-->
 				</form>
 
 		 ]; 
@@ -512,7 +518,10 @@ EOS
 sub getTransList {
 	my ($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref, $hide_list_payments_link, $displayonly, $hidePay) = @_;
 	#
-	my $intTXNEntityID = getEntityID($Data->{'clientValues'});
+	my $TXNEntityID = '';
+	if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB){
+		$TXNEntityID = qq[ AND t.intTXNEntityID = ] . getEntityID($Data->{'clientValues'});
+	}
 	#	
 	$displayonly ||= 0;
     my $hidePayment=1;
@@ -584,7 +593,7 @@ sub getTransList {
         AND (t.intPersonRegistrationID =0 or t.intStatus= 1 or PR.strStatus NOT IN ('INPROGRESS'))
 			AND P.intProductType<>2
         AND (t.intStatus<>1 or (t.intStatus=1 AND intPaymentByLevel <= $Data->{'clientValues'}{'authLevel'}))
-		AND t.intTXNEntityID = $intTXNEntityID 
+		$TXNEntityID		
       $whereClause
         $prodSellLevel
 	  GROUP BY 
@@ -1043,7 +1052,16 @@ sub listTransactions {
 					</tr>
 					<tr>
 						<td class="label"><label for="l_dtLog">].$lang->txt('Date Paid').qq[</label>:</td>
-						<td class="value"><input type="text" name="dtLog" value="$currentDate" id="l_dtLog" size="10" maxlength="10" /> <span class="HTdateformat">dd/mm/yyyy</span> </td>
+						<td class="value">
+							<script type="text/javascript">
+                 			   jQuery().ready(function() {
+                    		    jQuery("#l_dtLog").datepicker({
+                        		    dateFormat: 'dd/mm/yy',
+                        		    showButtonPanel: true
+                     		 	  });            
+                  	 			 });
+               				 </script> 
+							<input type="text" name="dtLog" value="" id="l_dtLog" size="10" maxlength="10" /> <span class="HTdateformat">dd/mm/yyyy</span> </td>
 					</tr>
 					<tr>
 						<td class="label"><label for="l_intPaymentType">].$lang->txt('Payment Type').qq[</label>:</td>

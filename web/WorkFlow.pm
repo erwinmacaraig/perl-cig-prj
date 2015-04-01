@@ -2800,6 +2800,8 @@ sub populateRegoViewData {
         $TemplateData{'TransferDetails'}{'RegistrationDateFrom'} = $dref->{'NPdtFrom'};
         $TemplateData{'TransferDetails'}{'RegistrationDateTo'} = $dref->{'NPdtTo'};
         $TemplateData{'TransferDetails'}{'Summary'} = $personRequestData->{'strRequestNotes'} || '';
+	    $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.') if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_TRANSFER'} == 1 and $dref->{'regoPaymentRequired'});
+
 
     }
     else {
