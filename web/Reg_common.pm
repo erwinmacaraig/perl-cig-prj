@@ -178,6 +178,12 @@ sub allowedTo {
     );
     $user->load();
     my $userID = $user->id() || 0;
+
+    if ($userID != $clientValues_ref->{'userID'} and $Data->{'ptry'})   {
+        $Data->{'kickoff'} = 1;
+        $Data->{'db'} = $db;
+        return $db;
+    }
     kickThemOff() if $userID != $clientValues_ref->{'userID'};
 
     my $st = qq[

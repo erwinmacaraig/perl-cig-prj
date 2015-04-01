@@ -26,6 +26,7 @@ use ClubFlow;
 use PersonFlow;
 use TransferFlow;
 use BulkRenewalsFlow;
+use MD5;
 
 use Data::Dumper;
 
@@ -56,7 +57,12 @@ sub payTryRedirectBack  {
     $autoRun ||= 0;
     my $a = $payTry->{'nextPayAction'} || $payTry->{'a'};
     #my $redirect_link = "main.cgi?client=$client&amp;a=$a&amp;run=1&tl=$logID";
-    my $redirect_link = "main.cgi?client=$client&amp;a=$a&amp;payMethod=now&amp;run=0&amp;tl=$logID";
+    my $m;
+    $m = new MD5;
+    $m->reset();
+    $m->add($logID);
+    my $encLogID= uc($m->hexdigest());
+    my $redirect_link = "main.cgi?client=$client&amp;a=$a&amp;ptry=$logID&amp;payMethod=now&amp;run=0&amp;tl=$logID&amp;eptry=$encLogID";
 
     foreach my $k (keys %{$payTry}) {
         next if $k eq 'client';
@@ -70,7 +76,6 @@ sub payTryRedirectBack  {
         $redirect_link .= "&$k=".$payTry->{$k};
 		
     }
-print STDERR $redirect_link;
     return $redirect_link if ! $autoRun;
 
     print "Status: 302 Moved Temporarily\n";
