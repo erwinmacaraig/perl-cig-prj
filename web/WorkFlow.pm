@@ -1955,7 +1955,9 @@ sub resolveTask {
 
     return if (!$task or ($task eq undef));
 
-    return 0 if($selfUserEntityID != $task->{'intProblemResolutionEntityID'} and !doesSelfUserHaveAccess($Data, $task->{'intPersonID'}, $selfUserEntityID));
+    return 0 if($selfUserEntityID
+                and $selfUserEntityID != $task->{'intProblemResolutionEntityID'}
+                and !doesSelfUserHaveAccess($Data, $task->{'intPersonID'}, $selfUserEntityID));
 
 	my $srn = qq[
         SELECT
@@ -4137,6 +4139,7 @@ sub holdTask {
             $emailNotification->setSubRealmID(0);
             $emailNotification->setToEntityID($toEntityID);
             $emailNotification->setFromEntityID($fromEntityID);
+            $emailNotification->setToOriginLevel($task->{'intOriginLevel'});
             $emailNotification->setDefsEmail($Defs::admin_email);
             $emailNotification->setDefsName($Defs::admin_email_name);
             $emailNotification->setNotificationType($nType);
