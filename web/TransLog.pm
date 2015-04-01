@@ -511,6 +511,9 @@ EOS
 
 sub getTransList {
 	my ($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref, $hide_list_payments_link, $displayonly, $hidePay) = @_;
+	#
+	my $intTXNEntityID = getEntityID($Data->{'clientValues'});
+	#	
 	$displayonly ||= 0;
     my $hidePayment=1;
     $hidePay ||= 0;
@@ -581,6 +584,7 @@ sub getTransList {
         AND (t.intPersonRegistrationID =0 or t.intStatus= 1 or PR.strStatus NOT IN ('INPROGRESS'))
 			AND P.intProductType<>2
         AND (t.intStatus<>1 or (t.intStatus=1 AND intPaymentByLevel <= $Data->{'clientValues'}{'authLevel'}))
+		AND t.intTXNEntityID = $intTXNEntityID 
       $whereClause
         $prodSellLevel
 	  GROUP BY 
