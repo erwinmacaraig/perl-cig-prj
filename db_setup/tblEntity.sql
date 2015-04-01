@@ -62,7 +62,7 @@ CREATE TABLE `tblEntity` (
   `strShortNotes` varchar(255) DEFAULT NULL,
   `strImportEntityCode` varchar(45) DEFAULT NULL COMMENT 'Reference to the imported records inputted by client',
   `intImportID` int(11) DEFAULT NULL COMMENT 'Tracking ID on which batch this record is included during import',
-  `intAcceptSelfRego` INT NULL DEFAULT 0 COMMENT 'Allow an Entity to determine if they accept self registration FC-231',
+  `intAcceptSelfRego` INT NULL DEFAULT 1 COMMENT 'Allow an Entity to determine if they accept self registration FC-231',
   `intRealmApproved` tinyint(4) DEFAULT '0',
   `strPaymentNotificationAddress` varchar(250) DEFAULT NULL,
   `strEntityPaymentBusinessNumber` varchar(100) DEFAULT NULL,
