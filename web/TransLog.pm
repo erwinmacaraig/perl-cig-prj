@@ -622,7 +622,7 @@ sub getTransList {
 	},
 	{
 		name => $Data->{'lang'}->txt('Type'),
-		field => 'strPersonType',
+		field => 'PersonType',
 	},
     {
         name => $lang->txt('Status'), 
@@ -677,8 +677,8 @@ sub getTransList {
         $row_data->{id} = $i;
         foreach my $header (@headers) {
             if ($header->{field} eq 'StatusTextLang') {
-               $row->{StatusText} = $Defs::TransLogStatus{$row->{'intStatus'}} || 'a';
-               $row->{StatusTextLang} = $Defs::TransLogStatus{$row->{'intStatus'}} || 'n';
+               $row->{StatusText} = $lang->txt($Defs::TransLogStatus{$row->{'intStatus'}}) || 'a';
+               $row->{StatusTextLang} = $lang->txt($Defs::TransLogStatus{$row->{'intStatus'}}) || 'n';
             }
 		if ($row->{'GatewayLocked'})	{
 			$row->{'StatusText'} = $Data->{'lang'}->txt("Locked");
@@ -688,6 +688,7 @@ sub getTransList {
             $row_data->{'dtPaid_RAW'} = $row->{'dtPaid'}; 
             $row_data->{'dtPaid'} = $Data->{'l10n'}{'date'}->TZformat($row->{'dtPaid'},'MEDIUM','SHORT'); 
         }
+        $row_data->{'PersonType'} = $lang->txt($Defs::personType{$row->{'strPersonType'}});
             $row_data->{SelectLink} = qq[main.cgi?client=$client&a=P_TXN_EDIT&personID=$row->{intID}&id=$row->{intTransLogID}&tID=$row->{intTransactionID}];
             if ($row->{intStatus} == 1) {
                 $row_data->{stuff} = qq[<ul><li><a href="main.cgi?a=P_TXNLog_payVIEW&client=$client&tlID=$row->{intTransLogID}&amp;pID=$row->{intID}" class = "">].$Data->{'lang'}->txt('View Payments').qq[</a> ];
@@ -1088,7 +1089,7 @@ sub listTransactions {
 				</table>
 			
 				</div><!-- panel-body -->
-						<div class="button-row"><input onclick="clicked='$targetManual'" type="submit" name="subbut" value="Submit Manual Payment" class="btn-main" id = "btn-manualpay"></div>
+						<div class="button-row"><input onclick="clicked='$targetManual'" type="submit" name="subbut" value="]. $lang->txt('Submit Manual Payment') . qq[" class="btn-main" id = "btn-manualpay"></div>
 
 						<input type="hidden" name="personID" value="$TableID"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="dt_start_paid" value="$dtStart_paid"><input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
 			] if $allowMP;
@@ -1555,10 +1556,10 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
     $previousCount++;
     $previousAttemptsBody .= qq[
       <tr>
-        <td>$Defs::paymentTypes{$pref->{intPaymentType}}</td>
+        <td>] .$lang->txt($Defs::paymentTypes{$pref->{intPaymentType}}) . qq[</td>
         <td>$pref->{AttemptDateTime}</td>
-        <td>$Defs::paymentResponseText{$pref->{strResponseText}}</td>
-        <td>$dollarSymbol $pref->{intAmount}</td>
+        <td>] . $lang->txt($Defs::paymentResponseText{$pref->{strResponseText}}) . qq[</td>
+        <td>].$Data->{'l10n'}{'currency'}->format($pref->{'intAmount'}) . qq[</td>
       </tr>
     ];
   }
@@ -1606,7 +1607,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 				<td>$taxRateinPercent&#37;</a></td>
 				<td>].$Data->{'l10n'}{'currency'}->format($dref->{'curPriceTax'}) . qq[</td>
 				<td>].$Data->{'l10n'}{'currency'}->format($dref->{'curAmount'}) . qq[</td>
-				<td>$Defs::TransactionStatus{$dref->{intStatus}}</td>
+				<td>].$lang->txt($Defs::TransactionStatus{$dref->{intStatus}}) . qq[</td>
 			</tr>
 		];
 	}
@@ -1726,7 +1727,7 @@ sub viewTransLog	{
                                         readonly => '1',
                                 },
                                 strResponseCode=> {
-                                        label => 'Bank response code',
+                                        label => 'Bank Response Code',
                                         value => $TLref->{'strGatewayResponseCode'},
                                         readonly => '1',
                                 },
@@ -1752,12 +1753,12 @@ sub viewTransLog	{
                                 },
                                 Status=> {
                                         label => 'Payment Status',
-                                        value => $Defs::TransLogStatus{$TLref->{'intStatus'}},
+                                        value => $lang->txt($Defs::TransLogStatus{$TLref->{'intStatus'}}),
                                         readonly => '1',
                                 },
                                 PaymentType=> {
                                         label => 'Payment Type',
-                                        value => $Defs::paymentTypes{$TLref->{'intPaymentType'}},
+                                        value => $lang->txt($Defs::paymentTypes{$TLref->{'intPaymentType'}}),
                                         readonly => '1',
                                 },
 				
@@ -1809,9 +1810,9 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
     $previousCount++;
     $previousAttemptsBody .= qq[
       <tr>
-        <td>$Defs::paymentTypes{$pref->{intPaymentType}}</td>
+        <td>].$lang->txt($Defs::paymentTypes{$pref->{intPaymentType}}) . qq[</td>
         <td>$pref->{AttemptDateTime}</td>
-        <td>$Defs::paymentResponseText{$pref->{strResponseText}}</td>
+        <td>].$lang->txt($Defs::paymentResponseText{$pref->{strResponseText}}) . qq[</td>
         <td>].  $Data->{'l10n'}{'currency'}->format($pref->{'intAmount'}).qq[
       </tr>
     ];
@@ -1860,7 +1861,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 				<td>$taxRateinPercent&#37;</a></td>
 				<td>].$Data->{'l10n'}{'currency'}->format($dref->{'curPriceTax'}) . qq[</td>
 				<td>].$Data->{'l10n'}{'currency'}->format($dref->{'curAmount'}) . qq[</td>
-				<td>$Defs::TransactionStatus{$dref->{intStatus}}</td>
+				<td>].$lang->txt($Defs::TransactionStatus{$dref->{intStatus}}) . qq[</td>
 			</tr>
 		];
 	}
@@ -1997,8 +1998,8 @@ sub viewPayLaterTransLog    {
 				<td>].Payments::TXNtoTXNNumber($dref->{intTransactionID}).qq[</a></td>
 				<td>$productname</a></td>
 				<td>$dref->{intQty}</a></td>
-				<td>$dollarSymbol $dref->{curAmount}</td>
-				<td><b>$Defs::TransactionStatus{$Defs::TXN_UNPAID}</b></td>
+				<td>].$Data->{'l10n'}{'currency'}->format($dref->{curAmount}) . qq[</td>
+				<td><b>].$lang->txt($Defs::TransactionStatus{$Defs::TXN_UNPAID}).qq[</b></td>
 			</tr>
 		];
 	}
