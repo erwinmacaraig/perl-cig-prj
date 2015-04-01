@@ -655,7 +655,6 @@ sub queryBlkTXN {
       		target => $Data->{'target'},
       		formname => 'n_form',
       		submitlabel => $Data->{'lang'}->txt('Continue'),
-      		introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
 			 NoHTML => 1,
 		}, #end of options
 		carryfields =>  {

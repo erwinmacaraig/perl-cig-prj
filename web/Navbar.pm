@@ -202,13 +202,13 @@ sub getEntityMenuData {
     #if(exists $children->{$Defs::LEVEL_VENUE})    {
     if($SystemConfig->{'allowVenues'})  {
         $menuoptions{'venues'} = {
-            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}),
+            name => $lang->txt('Venues'),
             url => $baseurl."a=VENUE_L&amp;l=$Defs::LEVEL_VENUE",
         };
     }
     #if(exists $children->{$Defs::LEVEL_PERSON})    {
         $menuoptions{'persons'} = {
-            name => $lang->txt("List $Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}"),
+            name => $lang->txt("List Persons"),
             url => $baseurl."a=P_L&amp;l=$Defs::LEVEL_PERSON",
         };
     #}
@@ -569,7 +569,7 @@ sub getClubMenuData {
     }
     if($SystemConfig->{'allowVenues'})  {
         $menuoptions{'venues'} = {
-            name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}),
+            name => $lang->txt('List Venues'),
             url => $baseurl."a=VENUE_L&amp;l=$Defs::LEVEL_VENUE",
         };
     }
