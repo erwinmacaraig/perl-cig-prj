@@ -1552,6 +1552,9 @@ sub checkForOutstandingTasks {
                         $personRegistrationID,
                     );
                 }
+                my $personObject = getInstanceOf($Data, 'person',$personID);
+
+                updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
                 auditLog($personID, $Data, 'Person Registered', 'Person');
 
         	#}
