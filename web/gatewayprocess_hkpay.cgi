@@ -27,6 +27,7 @@ use Data::Dumper;
 use GatewayProcess;
 use PayTry;
 use Localisation;
+use MCache;
 
 use Digest::SHA qw(hmac_sha256_hex);
 
@@ -45,6 +46,7 @@ print STDERR "IN GATEWAYPROCESS_hkpay\n";
 	$Data{'Realm'}=1;
     getDBConfig(\%Data);
     $Data{'SystemConfig'}=getSystemConfig(\%Data);
+    $Data{'cache'}  = new MCache();
 
 	my $payRef= param('Ref') || param('ci') || '';
 	my $submit_action= param('sa') || '';
