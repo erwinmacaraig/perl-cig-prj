@@ -25,6 +25,7 @@ use PayPal;
 use Gateway_Common;
 use GatewayProcess;
 use PayTry;
+use MCache;
 
 main();
 
@@ -69,6 +70,7 @@ sub main	{
   $Data{'SystemConfig'}=getSystemConfig(\%Data);
   my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
   $Data{'lang'}=$lang;
+    $Data{'cache'}  = new MCache();
 
   $Data{'LocalConfig'}=getLocalConfig(\%Data);
     my $payTry = payTryRead(\%Data, $clientTransRefID, 0);

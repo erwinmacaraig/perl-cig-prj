@@ -27,6 +27,7 @@ use TTTemplate;
 use Data::Dumper;
 use GatewayProcess;
 use Localisation;
+use MCache;
 
 #use Crypt::CBC;
 
@@ -67,6 +68,7 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
     $Data{'sessionKey'} = $payTry->{'session'};
     getDBConfig(\%Data);
     $Data{'SystemConfig'}=getSystemConfig(\%Data);
+    $Data{'cache'}  = new MCache();
     initLocalisation(\%Data);
 
 my ($Order, $Transactions) = gatewayTransactions(\%Data, $logID);
