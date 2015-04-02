@@ -30,6 +30,7 @@ use PayTry;
 use Localisation;
 use WorkFlow;
 use MA_Gateways;
+use MCache;
 
 main();
 
@@ -46,6 +47,7 @@ sub main	{
     my %clientValues = getClient($client);
     $Data{'clientValues'} = \%clientValues;
     ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
+    $Data{'cache'}  = new MCache();
 
 
     getDBConfig(\%Data);
