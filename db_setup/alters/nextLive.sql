@@ -56,3 +56,9 @@ ALTER TABLE tblRegistrationItem ADD COLUMN intItemUsingITCFilter tinyint default
 
 # 150326_tblRegoTypeLimits
 ALTER TABLE tblRegoTypeLimits ADD COLUMN strEntityType varchar(30) default '' AFTER intSubRealmID;
+
+# 150407_tblRegistrationItem
+ALTER TABLE tblRegistrationItem
+    ADD COLUMN intItemUsingActiveFilter tinyint default 0 COMMENT 'Using Active Periods filter',
+    ADD COLUMN strItemActiveFilterPeriods varchar(10) default '' COMMENT 'Which Periods to check Active on',
+    ADD COLUMN intItemActive tinyint default 0 COMMENT 'Active status if Active Periods filter on';
