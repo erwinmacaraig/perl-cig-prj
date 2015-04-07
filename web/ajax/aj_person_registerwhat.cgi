@@ -34,6 +34,9 @@ sub main	{
     my $bulk= param('bulk') || 0;
     my $defaultType = param('dtype') || '';
     my $etype = param('etype') || '';
+    my $transfer= param('transfer') || '';
+
+    $registrationNature = 'TRANSFER' if ($transfer);
 
     my %Data=();
     my $target='aj_person_registerwhat.cgi';
@@ -46,6 +49,7 @@ sub main	{
     $Data{'lang'}=$lang;
 
     ($Data{'Realm'}, $Data{'RealmSubType'})=getRealm(\%Data);
+
 
     my $options = undef;
     my $error = '';
@@ -71,6 +75,7 @@ sub main	{
             $etype,
             getLastEntityLevel(\%clientValues),
             getLastEntityID(\%clientValues),
+            $transfer
         );
 	}
 

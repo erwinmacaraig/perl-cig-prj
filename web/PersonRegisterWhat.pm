@@ -34,7 +34,9 @@ sub displayPersonRegisterWhat   {
         $bulk,
         $regoID,
         $entitySelection,
+        $transfer
     ) = @_;
+    $transfer ||=0;
     $bulk ||= 0;
     $entitySelection ||= 0;
     my $defaultType = param('dtype') || '';
@@ -42,6 +44,8 @@ sub displayPersonRegisterWhat   {
     my $systemConfig = getSystemConfig($Data);
 
     my %templateData = (
+        transfer => $transfer,
+        nat=> $transfer ? 'TRANSFER' : '',
         originLevel => $originLevel || 0,
         personID => $personID || 0,
         entityID => $entityID || 0,
@@ -88,8 +92,16 @@ sub displayPersonRegisterWhat   {
             nature => $existing->{'strRegistrationNature'} || '',
             natureName => $existing->{'RegistrationNature'} || '',
             MAComment => $existing->{'strShortNotes'} || '',
+            transfer=> $transfer,
         );
         $templateData{'existing'} = \%existingRego;
+    }
+    else    {
+    
+        if ($transfer)  {
+            $templateData{'nat'} = 'TRANSFER';
+            $templateData{'transfer'} = '1';
+        }
     }
 
     my $template = "registration/what.templ";
@@ -126,12 +138,15 @@ sub optionsPersonRegisterWhat {
         $etype,
         $currentLevel,
         $currentEntityID,
+        $transfer
     ) = @_;
     $bulk ||= 0;
 
     my $pref= undef;
     $pref = loadPersonDetails($Data->{'db'}, $personID) if ($personID);
 
+ my $q=new CGI;
+    $registrationNature='TRANSFER' if ($transfer);
     my $bulkWHERE= qq[ AND strWFRuleFor='REGO'];
     $bulkWHERE = qq[ AND strWFRuleFor='BULKREGO'] if ($bulk);
     my $role_ref = getEntityTypeRoles($Data, $sport, $personType);
@@ -186,6 +201,15 @@ sub optionsPersonRegisterWhat {
         };
         return (\@retdata, '');
     }
+    #if (!$bulk and $step==6 and $pref->{'strStatus'} eq 'INPROGRESS')  {
+    #    my $label = $Data->{'lang'}->txt($lfLabelTable{$lookingFor}{'TRANSFER'});
+    #    push @retdata, {
+    #        name => $label,
+    #        value => 'TRANSFER',
+    #    };
+    #    return (\@retdata, '');
+    #}
+
     if($lookingFor eq 'etype' and $originLevel)  {
         my $levels = _entityTypeList($Data, getID($Data->{'clientValues'}, $originLevel));
         push @{$levels}, $originLevel;
@@ -468,6 +492,11 @@ sub optionsPersonRegisterWhat {
     }
     else    {
 
+        my $NATUREwhere= qq[AND strRegistrationNature <> 'TRANSFER'];
+        if ($registrationNature eq 'TRANSFER' and $lookingForField eq 'strRegistrationNature')   {
+            $NATUREwhere= qq[AND strRegistrationNature = 'TRANSFER'];
+        }
+
         $st = qq[
             SELECT DISTINCT $lookingForField, COUNT(intMatrixID) as CountNum
             FROM tblMatrix
@@ -477,7 +506,7 @@ sub optionsPersonRegisterWhat {
                 AND intRealmID = ?
                 AND intSubRealmID IN (0,?)
                 $MATRIXwhere
-                AND strRegistrationNature <> 'TRANSFER'
+                $NATUREwhere
             GROUP BY $lookingForField
         ];
         @values = @MATRIXvalues;
