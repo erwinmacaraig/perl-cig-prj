@@ -152,9 +152,17 @@ sub resolveHoldPayment  {
         my $query = $Data->{'db'}->prepare($st);
         $query->execute($logID);
     }
-
+	my $action = '';
     my $lang = $Data->{'lang'};
-	return ($lang->txt('Hold on this Transaction has been resolved'), $lang->txt('Hold Resolved'));
+	if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB){
+		$action = 'a=C_HOME';
+	}
+	if($Data->{'clientValues'}{'currentLevel'} > $Defs::LEVEL_CLUB){
+		$action = 'a=E_HOME';
+	}
+	my $body = $lang->txt('Hold on this Transaction has been resolved');
+	$body .= qq[<br /><br /> <a class="btn-main" href="$Defs::base_url/main.cgi?client=$Data->{'client'}&amp;$action">]. $lang->txt('Go to your Dashboard') . qq[</a> <a class="btn-main" href="$Defs::base_url/main.cgi?client=$Data->{'client'}&amp;a=P_TXNLog_list">] . $lang->txt('Return to Transactions') .q[</a>];
+	return ($body, $lang->txt('Hold Resolved'));
 }
 
 sub delTransLog	{
