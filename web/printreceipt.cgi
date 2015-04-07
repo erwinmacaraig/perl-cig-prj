@@ -66,7 +66,10 @@ $Data{'db'}=$db;
 	my $ID=getID(\%clientValues);
 	$Data{'client'}=$client;
 	my $currencyFormat = new L10n::CurrencyFormat(\%Data);
+	my $dateFormat = new L10n::DateFormat(\%Data);
+
 	$Data{'l10n'}{'currency'} = $currencyFormat;
+	$Data{'l10n'}{'date'} = $dateFormat;
 
 	my %receiptData= ();
 	my %ContentData = ();
@@ -76,7 +79,7 @@ $Data{'db'}=$db;
 			my $st =qq[
 				SELECT intTransLogID, T.intTransactionID, P.strName, P.strGroup, T.intQty, T.curAmount, T.intTableType, I.strInvoiceNumber, T.intStatus, P.curPriceTax, P.dblTaxRate, TL.intPaymentType,
 				IF(T.intTableType = $Defs::LEVEL_CLUB, E.strLocalName, CONCAT(strLocalFirstname,' ',strLocalSurname)) as Name,
-				DATE_FORMAT(TL.dtLog,'%d/%m/%Y %h:%i') as dtLog_FMT 
+				TL.dtLog as dtLog_FMT 
 			FROM tblTransactions as T
 			INNER JOIN tblTransLog as TL ON TL.intLogID = T.intTransLogID
 				LEFT JOIN tblInvoice I on I.intInvoiceID = T.intInvoiceID
@@ -89,7 +92,7 @@ $Data{'db'}=$db;
 			# AND T.intID = ?  $personID,
 			#AND T.intRealmID = ? AND T.intID = $personID
 			#open FH, ">>dumpfile.txt";
-			#print FH "\n \$st = $st\n   \n$txlogIDs";
+			#print FH "\n \$st = $st\n   \n$txlogIDs"; DATE_FORMAT(TL.dtLog,'%d/%m/%Y %h:%i') as dtLog_FMT 
 			my $q= $db->prepare($st);
 			$q->execute(
 				$txlogIDs,			

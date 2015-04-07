@@ -1954,6 +1954,7 @@ sub verifyDocument {
 	my $st;
 	my $q;
 
+
     if($regoID && $documentID){
         $st = qq[
             UPDATE 
@@ -1976,6 +1977,7 @@ sub verifyDocument {
         $q = $Data->{'db'}->prepare($st);
         $q->execute($regoID,$documentID);
     }
+
 
 	if($documentID){
     	$st = qq[
@@ -2801,6 +2803,8 @@ sub populateRegoViewData {
         $TemplateData{'TransferDetails'}{'RegistrationDateFrom'} = $dref->{'NPdtFrom'};
         $TemplateData{'TransferDetails'}{'RegistrationDateTo'} = $dref->{'NPdtTo'};
         $TemplateData{'TransferDetails'}{'Summary'} = $personRequestData->{'strRequestNotes'} || '';
+	    $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.') if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_TRANSFER'} == 1 and $dref->{'regoPaymentRequired'});
+
 
     }
     else {
@@ -3332,10 +3336,12 @@ sub populateDocumentViewData {
 
             my $action = "view";
             $action = "review" if($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityAdd'} == 1);
+
 			$parameters = qq[client=$Data->{'client'}&amp;a=$action];
 			$parameters .= qq[&regoID=$registrationID] if($registrationID); 
 			$viewLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'$parameters');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];	
            	#$viewLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$Data->{'client'}&amp;a=$action');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];			
+
         }
 
         if($tdref->{'strLockAtLevel'})   {
