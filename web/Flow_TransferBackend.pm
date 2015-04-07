@@ -134,11 +134,7 @@ sub setupValues    {
     my $request = getRequests($self->{'Data'}, \%regFilter);
     $request = $request->[0];
     $self->{'RunParams'}{'nat'} = 'TRANSFER';
-    #$self->addCarryField('natureName', 'TRANSFER');
-    #$self->addCarryField('nat', 'TRANSFER');
-    #$self->addCarryField('dnature', 'TRANSFER');
-    #$self->addCarryField('d_nature', 'TRANSFER');
-    #$self->addCarryField('dlevel', $request->{'strNewPersonLevel'}); ## IF LOANS
+    $self->{'RunParams'}{'dsport'} = $request->{'strSport'};
     $self->addCarryField('dtype', $request->{'strPersonType'});
     $self->addCarryField('dsport', $request->{'strSport'});
     $self->addCarryField('dage', $request->{'personCurrentAgeLevel'});
@@ -548,7 +544,7 @@ sub display_registration {
         #$self->addCarryField('dnature', 'TRANSFER');
         #$self->addCarryField('dtype', $request->{'strPersonType'});
         ##$self->addCarryField('d_level', $request->{'strPersonLevel'});
-        #$self->addCarryField('dsport', $request->{'strSport'});
+        $self->addCarryField('dsport', $request->{'strSport'});
         #$self->addCarryField('dage', $request->{'personCurrentAgeLevel'});
 
         #$content = runTemplate(

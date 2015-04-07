@@ -150,6 +150,30 @@ sub setupValues    {
     $values->{'itc'} = $self->{'RunParams'}{'itc'} || 0;
     my $client = $self->{'Data'}{'client'};
     $values->{'BaseURL'} = "$self->{'Data'}{'target'}?client=$client&amp;a=";
+
+
+    if ($self->{'RunParams'}{'dnat'} eq 'RENEWAL')  {
+        my $lang = $self->{'Data'}->{'lang'};
+        my $rawDetails;
+        my ($content, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rtargetid'});
+
+        if(!$content or !$rawDetails) {
+            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt('Invalid Renewal Details');
+            $content = $lang->txt("No record found.");
+        }
+
+        $values->{'defaultType'} = 'PLAYER';
+        $self->addCarryField('d_nature', 'RENEWAL');
+        $self->{'RunParams'}{'dtype'} = 'PLAYER';
+        $self->{'RunParams'}{'d_type'} = 'PLAYER';
+        $self->addCarryField('dtype', 'PLAYER'); #$rawDetails->{'strPersonType'});
+        $self->addCarryField('d_type', 'PLAYER'); #$rawDetails->{'strPersonType'});
+        #$self->addCarryField('d_level', $rawDetails->{'strPersonLevel'});
+        $self->addCarryField('dsport', $rawDetails->{'strSport'});
+        $self->addCarryField('dage', $rawDetails->{'newAgeLevel'}); # if $rawDetails->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER;
+        $self->addCarryField('drole', $rawDetails->{'strPersonEntityRole'});
+    }
+
     $self->{'FieldSets'} = personFieldsSetup($self->{'Data'}, $values);
 }
 
@@ -570,6 +594,7 @@ sub display_registration {
     my $defaultRegistrationNature = $self->{'RunParams'}{'dnat'} || '';
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $entitySelection = $originLevel == $Defs::LEVEL_CLUB ? 0 : 1;
+    $entitySelection=0 if ($defaultRegistrationNature eq 'RENEWAL');
     if(
         $entitySelection 
         and exists $self->{'SystemConfig'}{'maFlowEntitySelect'}
@@ -612,7 +637,7 @@ sub display_registration {
             );
         }
     }
-    elsif($defaultRegistrationNature eq 'RENEWAL') {
+    elsif(1==2 and $defaultRegistrationNature eq 'RENEWAL') {
         my $rawDetails;
         ($content, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rtargetid'});
 

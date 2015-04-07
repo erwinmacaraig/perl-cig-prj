@@ -40,6 +40,8 @@ sub displayPersonRegisterWhat   {
     $bulk ||= 0;
     $entitySelection ||= 0;
     my $defaultType = param('dtype') || '';
+    my $defaultSport = param('dsport') || '';
+    my $defaultEntityRole= param('dentityrole') || '';
 
     my $systemConfig = getSystemConfig($Data);
 
@@ -56,6 +58,8 @@ sub displayPersonRegisterWhat   {
         realmSubTypeID => $Data->{'RealmSubType'} || 0,
         continueURL => $continueURL || '',
         dtype=> $defaultType,
+        dsport=> $defaultSport,
+        dentityrole=> $defaultEntityRole,
         existingReg => $regoID || 0,
         EntitySelection => $entitySelection || 0,
         DefaultEntity => getLastEntityID($Data->{'clientValues'}) || 0,
@@ -72,7 +76,7 @@ sub displayPersonRegisterWhat   {
         if($ref and $ref->[0])    {
             $existing = $ref->[0];
         }
-        my $role_ref = getEntityTypeRoles($Data, $existing->{'strSport'}, $existing->{'strPersonType'});
+        my $role_ref = getEntityTypeRoles($Data, $existing->{'strSport'}, $existing->{'strPersonType'}, $defaultEntityRole);
 
         my %existingRego = (
             etype => $existing->{'intEntityLevel'} || '',
@@ -101,6 +105,7 @@ sub displayPersonRegisterWhat   {
         if ($transfer)  {
             $templateData{'nat'} = 'TRANSFER';
             $templateData{'transfer'} = '1';
+            $templateData{'dsport'} = $defaultSport;
         }
     }
 
@@ -126,8 +131,10 @@ sub optionsPersonRegisterWhat {
         $personType,
         $defaultType,
         $personEntityRole,
+        $defaultEntityRole,
         $personLevel,
         $sport,
+        $defaultSport,
         $ageLevel,
         $personID,
         $entityID,
@@ -149,7 +156,7 @@ sub optionsPersonRegisterWhat {
     $registrationNature='TRANSFER' if ($transfer);
     my $bulkWHERE= qq[ AND strWFRuleFor='REGO'];
     $bulkWHERE = qq[ AND strWFRuleFor='BULKREGO'] if ($bulk);
-    my $role_ref = getEntityTypeRoles($Data, $sport, $personType);
+    my $role_ref = getEntityTypeRoles($Data, $sport, $personType, $defaultEntityRole);
     my %lfTable = (
         type => 'strPersonType',
         nature => 'strRegistrationNature',
@@ -335,6 +342,9 @@ sub optionsPersonRegisterWhat {
             #include Gender check here (checkEntityAllowed will initially look for valid gender)
             my $entityAllowed = checkEntityAllowed($Data, $ENTITYAllowedwhere, \@ENTITYAllowedValues);
             return (undef, "Please check player's gender.") if(!$entityAllowed);
+            if ($defaultSport)  {
+                $MATRIXwhere .= " AND strSport = '$defaultSport'";
+            }
 
             #based on strDiscipline value in tblEntity, identify the list to return
             #if strDiscipline == ALL, return selected distinct strSport from tblMatrix

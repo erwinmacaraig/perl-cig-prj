@@ -33,6 +33,8 @@ sub main	{
     my $subRealmIN = param('sr') || 0;
     my $bulk= param('bulk') || 0;
     my $defaultType = param('dtype') || '';
+    my $defaultSport= param('dsport') || '';
+    my $defaultEntityRole= param('dentityrole') || '';
     my $etype = param('etype') || '';
     my $transfer= param('transfer') || '';
 
@@ -63,8 +65,10 @@ sub main	{
             $personType,
             $defaultType,
             $personEntityRole,
+            $defaultEntityRole,
             $personLevel,
             $sport,
+            $defaultSport,
             $ageLevel,
             $personID,
             $entityID,
