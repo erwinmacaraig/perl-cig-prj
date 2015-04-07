@@ -62,3 +62,9 @@ ALTER TABLE tblRegistrationItem
     ADD COLUMN intItemUsingActiveFilter tinyint default 0 COMMENT 'Using Active Periods filter',
     ADD COLUMN strItemActiveFilterPeriods varchar(10) default '' COMMENT 'Which Periods to check Active on',
     ADD COLUMN intItemActive tinyint default 0 COMMENT 'Active status if Active Periods filter on';
+
+
+# 150407_tblPersonRequest
+ALTER TABLE tblPersonRequest ADD COLUMN intExistingPersonRegistrationID INT DEFAULT 0 AFTER intPersonID;
+ALTER TABLE tblPersonRequest ADD COLUMN strNewPersonLevel VARCHAR(30) NULL COMMENT 'PROFESSIONAL, AMATEUR, (blank)' AFTER strPersonLevel;
+UPDATE tblPersonRequest SET strNewPersonLevel=strPersonLevel;
