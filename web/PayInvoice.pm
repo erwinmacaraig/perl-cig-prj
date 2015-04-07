@@ -248,6 +248,7 @@ sub queryInvoiceByNumber {
 			amount => $Data->{'l10n'}{'currency'}->format($dref->{'TotalAmount'}),
 			status => $dref->{'GatewayLocked'} ? $Data->{'lang'}->txt("Locked") : $Defs::TransactionStatus{$dref->{'intStatus'}},			
 			gatewayLocked => $dref->{'GatewayLocked'} || 0,
+			invoiceDateSortColumn => $dref->{'invoiceDate'},
 		};
 		
 	}
@@ -284,6 +285,7 @@ my @headers = (
 	{
       name => $Data->{'lang'}->txt('Invoice Date'),
       field => 'invoiceDate',
+	  sortdata => 'invoiceDateSortColumn',
     },
     {
       name =>   $Data->{'lang'}->txt('Item'),
@@ -535,6 +537,7 @@ sub queryInvoiceByOtherInfo {
 			amount => $Data->{'l10n'}{'currency'}->format($dref->{'TotalAmount'}),
 			status => $dref->{'GatewayLocked'} ? $Data->{'lang'}->txt("Locked") : $Defs::TransactionStatus{$dref->{'intStatus'}},			
 			gatewayLocked => $dref->{'GatewayLocked'} || 0,
+			invoiceDateSortColumn => $dref->{'invoiceDate'},
 		};
 		
 	}
@@ -558,13 +561,14 @@ sub displayResults {
 	  width => 20,
       type => 'HTML',
     },
-    {
+	{
       name => $Data->{'lang'}->txt('Invoice Number'),
       field => 'invoiceNum',
     },
 	{
       name => $Data->{'lang'}->txt('Invoice Date'),
       field => 'invoiceDate',
+	  sortdata => 'invoiceDateSortColumn',
     },
     {
       name =>   $Data->{'lang'}->txt('Item'),
@@ -669,7 +673,7 @@ sub displayResults {
                   	 			 });
                				 </script> 
 
-									<input type="text" name="dtLog" value="" id="l_dtLog" size="10" maxlength="10" /> <span class="HTdateformat">dd/mm/yyyy</span></div>
+									<input type="text" name="dtLog" value="$currentDate" id="l_dtLog" size="10" maxlength="10" /> <span class="HTdateformat">dd/mm/yyyy</span></div>
 				  				</div>
 				  				<div class="form-group">
 				  					<label for="l_intPaymentType" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Payment Type').qq[</label>

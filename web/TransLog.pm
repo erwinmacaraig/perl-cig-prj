@@ -932,10 +932,11 @@ sub listTransactions {
     my $line = '';
 
     #my $entityNamePlural = 'Transactions';
-	my $entityNamePlural = ' ';
+	my $entityNamePlural = 'Payment History';
     $entityNamePlural= ($Data->{'SystemConfig'}{'txns_link_name'}) ? $Data->{'SystemConfig'}{'txns_link_name'} : $entityNamePlural;
 
 	my $header=$Data->{'lang'}->txt($entityNamePlural);
+	
 
         my $targetManual = $Data->{'target'};
         my $targetOnline = 'paytry.cgi';
