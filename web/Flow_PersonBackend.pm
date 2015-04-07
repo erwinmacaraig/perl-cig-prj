@@ -162,13 +162,10 @@ sub setupValues    {
             $content = $lang->txt("No record found.");
         }
 
-        $values->{'defaultType'} = 'PLAYER';
+        #$values->{'defaultType'} = 'PLAYER';
         $self->addCarryField('d_nature', 'RENEWAL');
-        $self->{'RunParams'}{'dtype'} = 'PLAYER';
-        $self->{'RunParams'}{'d_type'} = 'PLAYER';
-        $self->addCarryField('dtype', 'PLAYER'); #$rawDetails->{'strPersonType'});
-        $self->addCarryField('d_type', 'PLAYER'); #$rawDetails->{'strPersonType'});
-        #$self->addCarryField('d_level', $rawDetails->{'strPersonLevel'});
+        $self->addCarryField('dnature', 'RENEWAL');
+        $self->addCarryField('nat', 'RENEWAL');
         $self->addCarryField('dsport', $rawDetails->{'strSport'});
         $self->addCarryField('dage', $rawDetails->{'newAgeLevel'}); # if $rawDetails->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER;
         $self->addCarryField('drole', $rawDetails->{'strPersonEntityRole'});
@@ -580,6 +577,7 @@ sub display_registration {
 
     my $client = $self->{'Data'}->{'client'};
     my $url = $self->{'Target'}."?rfp=".$self->getNextAction()."&".$self->stringifyURLCarryField();
+print STDERR $url;
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
     $personObj->load();
     my ($dob, $gender) = $personObj->getValue(['dtDOB','intGender']); 
@@ -646,7 +644,7 @@ sub display_registration {
             $content = $lang->txt("No record found.");
         }
 
-        $self->addCarryField('d_nature', 'RENEWAL');
+        $self->addCarryField('dnat', 'RENEWAL');
         $self->addCarryField('d_type', $rawDetails->{'strPersonType'});
         $self->addCarryField('d_level', $rawDetails->{'strPersonLevel'});
         $self->addCarryField('d_sport', $rawDetails->{'strSport'});
@@ -666,6 +664,7 @@ sub display_registration {
             0,
             $regoID,
             $entitySelection, #display entity Selection
+            0,
         );
     }
 

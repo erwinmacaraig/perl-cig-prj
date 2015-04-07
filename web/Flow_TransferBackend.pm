@@ -134,6 +134,7 @@ sub setupValues    {
     my $request = getRequests($self->{'Data'}, \%regFilter);
     $request = $request->[0];
     $self->{'RunParams'}{'nat'} = 'TRANSFER';
+    $self->{'RunParams'}{'dnat'} = 'TRANSFER';
     $self->{'RunParams'}{'dsport'} = $request->{'strSport'};
     $self->addCarryField('dtype', $request->{'strPersonType'});
     $self->addCarryField('dsport', $request->{'strSport'});
@@ -541,7 +542,7 @@ sub display_registration {
         $request->{'sport'} = $Defs::sportType{$request->{'strSport'}};
         #$request->{'personLevel'} = $Defs::personLevel{$request->{'strPersonLevel'}};
 
-        #$self->addCarryField('dnature', 'TRANSFER');
+        $self->addCarryField('dnat', 'TRANSFER');
         #$self->addCarryField('dtype', $request->{'strPersonType'});
         ##$self->addCarryField('d_level', $request->{'strPersonLevel'});
         $self->addCarryField('dsport', $request->{'strSport'});

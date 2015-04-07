@@ -35,10 +35,11 @@ sub main	{
     my $defaultType = param('dtype') || '';
     my $defaultSport= param('dsport') || '';
     my $defaultEntityRole= param('dentityrole') || '';
+    my $defaultNature= param('dnat') || '';
     my $etype = param('etype') || '';
-    my $transfer= param('transfer') || '';
 
-    $registrationNature = 'TRANSFER' if ($transfer);
+    $registrationNature = 'TRANSFER' if ($defaultNature eq 'TRANSFER');
+    $registrationNature = 'RENEWAL' if ($defaultNature eq 'RENEWAL');
 
     my %Data=();
     my $target='aj_person_registerwhat.cgi';
@@ -79,7 +80,6 @@ sub main	{
             $etype,
             getLastEntityLevel(\%clientValues),
             getLastEntityID(\%clientValues),
-            $transfer
         );
 	}
 

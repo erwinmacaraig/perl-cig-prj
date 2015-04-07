@@ -111,10 +111,10 @@ sub rolloverExistingPersonRegistrations {
         sport=> $reg_ref->[0]{'strSport'} || '',
         personType=> $reg_ref->[0]{'strPersonType'} || '',
         personEntityRole=> $reg_ref->[0]{'strPersonEntityRole'} || '',
-        personLevel=> $reg_ref->[0]{'strPersonLevel'} || '',
         entityID=> $reg_ref->[0]{'intEntityID'} || 0,
         status=> $Defs::PERSONREGO_STATUS_ACTIVE,
     );
+        #personLevel=> $reg_ref->[0]{'strPersonLevel'} || '',
         #ageLevel=> $reg_ref->[0]{'strAgeLevel'} || '',
     my ($countRecords, $regs_ref) = getRegistrationData(
         $Data,
@@ -234,8 +234,10 @@ sub checkRenewalRegoOK  {
         $rego_ref->{'personType'} || '',
         '',
         $rego_ref->{'personEntityRole'} || '',
+        '',
         $rego_ref->{'personLevel'} || '',
         $rego_ref->{'sport'} || '',
+        '',
         $rego_ref->{'ageLevel'} || '',
         $rego_ref->{'personID'},
         $rego_ref->{'entityID'},
@@ -260,10 +262,10 @@ sub checkRenewalRegoOK  {
         sport=> $rego_ref->{'sport'} || '',
         personType=> $rego_ref->{'personType'} || '',
         personEntityRole=> $rego_ref->{'personEntityRole'} || '',
-        personLevel=> $rego_ref->{'personLevel'} || '',
         statusIN => \@statusIN,
         entityID=> $rego_ref->{'entityID'} || 0,
     );
+        #personLevel=> $rego_ref->{'personLevel'} || '',
 
 
     my ($count, undef) = getRegistrationData(
@@ -946,8 +948,6 @@ sub addRegistration {
             $personRegistrationID,
             'REGO'
         );
-print STDERR "THIS CALL\n";
-print STDERR "addRegistration: . $Reg_ref->{'intInternationalTransfer'}\n";
   	    $rc = addWorkFlowTasks(
             $Data,
             'REGO', 
@@ -979,7 +979,6 @@ sub submitPersonRegistration    {
         $pr_ref->{'strStatus'} = 'PENDING';
         $pr_ref->{'intPaymentRequired'} = 0 if ($rego_ref->{'CountTXNs'} == 0);
         $pr_ref->{'paymentRequired'} = 0 if ($rego_ref->{'CountTXNs'} == 0);
-print STDERR "CNT " . $rego_ref->{'CountTXNs'};
 
         updatePersonRegistration($Data, $personID, $personRegistrationID, $pr_ref, $personStatus);
         cleanTasks(
@@ -990,7 +989,6 @@ print STDERR "CNT " . $rego_ref->{'CountTXNs'};
             'REGO'
         );
 
-print STDERR "THAT CALL itc is $pr_ref->{'intInternationalTransfer'}\n";
             my $rc = addWorkFlowTasks(
             $Data,
             'REGO', 

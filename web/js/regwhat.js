@@ -17,6 +17,7 @@ function update_options(optionType, dtype)   {
     qstring = qstring + '&transfer=' + jQuery('#transfer').val();
     qstring = qstring + '&dsport=' + jQuery('#dsport').val();
     qstring = qstring + '&dentityrole=' + jQuery('#dentityrole').val();
+    qstring = qstring + '&dnat=' + jQuery('#dnat').val();
 
     if(optionType == 'complete')    {
       if(jQuery('#replacedflow-btn-continue').length>0) {

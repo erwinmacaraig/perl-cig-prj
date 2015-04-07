@@ -34,20 +34,18 @@ sub displayPersonRegisterWhat   {
         $bulk,
         $regoID,
         $entitySelection,
-        $transfer
     ) = @_;
-    $transfer ||=0;
+    #$transfer ||=0;
     $bulk ||= 0;
     $entitySelection ||= 0;
     my $defaultType = param('dtype') || '';
     my $defaultSport = param('dsport') || '';
     my $defaultEntityRole= param('dentityrole') || '';
+    my $defaultNature= param('dnat') || '';
 
     my $systemConfig = getSystemConfig($Data);
 
     my %templateData = (
-        transfer => $transfer,
-        nat=> $transfer ? 'TRANSFER' : '',
         originLevel => $originLevel || 0,
         personID => $personID || 0,
         entityID => $entityID || 0,
@@ -59,6 +57,7 @@ sub displayPersonRegisterWhat   {
         continueURL => $continueURL || '',
         dtype=> $defaultType,
         dsport=> $defaultSport,
+        dnat=>$defaultNature,
         dentityrole=> $defaultEntityRole,
         existingReg => $regoID || 0,
         EntitySelection => $entitySelection || 0,
@@ -70,6 +69,7 @@ sub displayPersonRegisterWhat   {
     if($entitySelection)    {
         $templateData{'entityID'} = 0;
     }
+            #$templateData{'transfer'} = 0;
     if($regoID) {
         my $ref = getRegistrationDetail($Data, $regoID) || {};
         my $existing = {};
@@ -96,15 +96,13 @@ sub displayPersonRegisterWhat   {
             nature => $existing->{'strRegistrationNature'} || '',
             natureName => $existing->{'RegistrationNature'} || '',
             MAComment => $existing->{'strShortNotes'} || '',
-            transfer=> $transfer,
+            dnat=>$defaultNature,
         );
         $templateData{'existing'} = \%existingRego;
     }
     else    {
-    
-        if ($transfer)  {
+        if ($defaultNature eq 'TRANSFER')  {
             $templateData{'nat'} = 'TRANSFER';
-            $templateData{'transfer'} = '1';
             $templateData{'dsport'} = $defaultSport;
         }
     }
@@ -145,7 +143,6 @@ sub optionsPersonRegisterWhat {
         $etype,
         $currentLevel,
         $currentEntityID,
-        $transfer
     ) = @_;
     $bulk ||= 0;
 
@@ -153,7 +150,7 @@ sub optionsPersonRegisterWhat {
     $pref = loadPersonDetails($Data->{'db'}, $personID) if ($personID);
 
  my $q=new CGI;
-    $registrationNature='TRANSFER' if ($transfer);
+    #$registrationNature='TRANSFER' if ($transfer==1);
     my $bulkWHERE= qq[ AND strWFRuleFor='REGO'];
     $bulkWHERE = qq[ AND strWFRuleFor='BULKREGO'] if ($bulk);
     my $role_ref = getEntityTypeRoles($Data, $sport, $personType, $defaultEntityRole);
@@ -505,6 +502,9 @@ sub optionsPersonRegisterWhat {
         my $NATUREwhere= qq[AND strRegistrationNature <> 'TRANSFER'];
         if ($registrationNature eq 'TRANSFER' and $lookingForField eq 'strRegistrationNature')   {
             $NATUREwhere= qq[AND strRegistrationNature = 'TRANSFER'];
+        }
+        if ($registrationNature eq 'RENEWAL' and $lookingForField eq 'strRegistrationNature')   {
+            $NATUREwhere= qq[AND strRegistrationNature = 'RENEWAL'];
         }
 
         $st = qq[
