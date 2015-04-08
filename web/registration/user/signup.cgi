@@ -148,6 +148,7 @@ sub _sendConfirmationEmail {
         MA_HelpDeskEmail => $Data->{'SystemConfig'}{'help_desk_email'},
         MA_Website => $Data->{'SystemConfig'}{'ma_website'},
         MA_HeaderName => $Data->{'SystemConfig'}{'EmailNotificationSysName'},
+        LoginURL => $Defs::base_url . "/registration",
     );
 
     my ($emailsentOK, $message)  = sendTemplateEmail(
