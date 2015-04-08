@@ -118,11 +118,14 @@ sub payTryRead  {
     my $query = $Data->{'db'}->prepare($st);
     $query->execute($id);
     my $href = $query->fetchrow_hashref();
-    my $values = JSON::from_json($href->{'strLog'});
-    $values->{'strContinueAction'} = $href->{'strContinueAction'};
-    $values->{'intTransLogID'} = $href->{'intTransLogID'};
-    $values->{'strPayReference'} = $href->{'strPayReference'};
-    return $values;
+    if ($href and $href->{'intTryID'})  {
+        my $values = JSON::from_json($href->{'strLog'});
+        $values->{'strContinueAction'} = $href->{'strContinueAction'};
+        $values->{'intTransLogID'} = $href->{'intTransLogID'};
+        $values->{'strPayReference'} = $href->{'strPayReference'};
+        return $values;
+    }
+    return undef;
 }
 
 1;
