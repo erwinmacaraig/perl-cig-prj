@@ -230,7 +230,7 @@ sub checkRenewalRegoOK  {
         $Data->{'Realm'},
         $Data->{'RealmSubType'},
         $rego_ref->{'originLevel'},
-        '',
+        'RENEWAL',
         $rego_ref->{'personType'} || '',
         '',
         $rego_ref->{'personEntityRole'} || '',
@@ -710,6 +710,8 @@ sub getRegistrationData	{
         $dref->{'Sport'} = $Defs::sportType{$dref->{'strSport'}} || '';
         $dref->{'PersonType'} = $Defs::personType{$dref->{'strPersonType'}} || '';
         $dref->{'PersonLevel'} = $Defs::personLevel{$dref->{'strPersonLevel'}} || '';
+        $dref->{'changeLevel'} = $dref->{'intPersonLevelChanged'} || 0;
+        $dref->{'PreviousPersonLevel'} = $Defs::personLevel{$dref->{'strPreviousPersonLevel'}} || '';
         $dref->{'AgeLevel'} = $Defs::ageLevel{$dref->{'strAgeLevel'}} || '';
         $dref->{'Status'} = $Defs::personRegoStatus{$dref->{'strStatus'}} || '';
         $dref->{'RegistrationNature'} = $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '';

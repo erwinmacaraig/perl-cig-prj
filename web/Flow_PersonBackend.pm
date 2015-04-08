@@ -170,6 +170,14 @@ sub setupValues    {
         $self->addCarryField('dage', $rawDetails->{'newAgeLevel'}); # if $rawDetails->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER;
         $self->addCarryField('drole', $rawDetails->{'strPersonEntityRole'});
     }
+    else    {
+print STDERR "OLD LEVEL: " . param('oldlevel');
+        $self->addCarryField('oldlevel', $self->{'RunParams'}{'oldlevel'});
+print STDERR "OLD LEVEL IS : " . $self->{'RunParams'}{'oldlevel'};
+        $self->addCarryField('d_nature', 'NEW');
+        $self->addCarryField('dnature', 'NEW');
+        $self->addCarryField('nat', 'NEW');
+    }
 
     $self->{'FieldSets'} = personFieldsSetup($self->{'Data'}, $values);
 }
@@ -761,7 +769,7 @@ sub process_registration {
         if($changeExistingReg)  {
             $self->moveDocuments($existingReg, $regoID, $personID);
         }
-        if ($regoID && $self->{'RunParams'}{'rtargetid'})   {
+        if ($regoID && ($self->{'RunParams'}{'rtargetid'} or $self->{'RunParams'}{'oldlevel'}))   {
             my $stChange = qq[
                 UPDATE tblPersonRegistration_$self->{'Data'}->{'Realm'}
                 SET strPreviousPersonLevel = '', intPersonLevelChanged=0
@@ -773,28 +781,48 @@ sub process_registration {
             $q->execute(
                 $regoID,
             );
-
-            $stChange = qq[
-                UPDATE
-                    tblPersonRegistration_$self->{'Data'}->{'Realm'} as PR
-                    INNER JOIN tblPersonRegistration_$self->{'Data'}->{'Realm'} as PR_exisiting ON ( 
-                        PR.intPersonID = PR_exisiting.intPersonID
-                    )
-                SET
-                    PR.strPreviousPersonLevel = PR_exisiting.strPersonLevel,
-                    PR.intPersonLevelChanged = 1
-                WHERE
-                    PR_exisiting.strPersonLevel <> ''
-                    AND PR.strPersonLevel <> ''
-                    AND PR_exisiting.strPersonLevel <> PR.strPersonLevel
-                    AND PR.intPersonRegistrationID = ?
-                    AND PR_exisiting.intPersonRegistrationID = ?
-            ];
-            $q = $self->{'Data'}->{'db'}->prepare($stChange) or query_error($stChange);
-            $q->execute(
-                $regoID,
-                $self->{'RunParams'}{'rtargetid'}
-            ); 
+            if ($self->{'RunParams'}{'rtargetid'})  {
+                $stChange = qq[
+                    UPDATE
+                        tblPersonRegistration_$self->{'Data'}->{'Realm'} as PR
+                        INNER JOIN tblPersonRegistration_$self->{'Data'}->{'Realm'} as PR_exisiting ON ( 
+                            PR.intPersonID = PR_exisiting.intPersonID
+                        )
+                    SET
+                        PR.strPreviousPersonLevel = PR_exisiting.strPersonLevel,
+                        PR.intPersonLevelChanged = 1
+                    WHERE
+                        PR_exisiting.strPersonLevel <> ''
+                        AND PR.strPersonLevel <> ''
+                        AND PR_exisiting.strPersonLevel <> PR.strPersonLevel
+                        AND PR.intPersonRegistrationID = ?
+                        AND PR_exisiting.intPersonRegistrationID = ?
+                ];
+                $q = $self->{'Data'}->{'db'}->prepare($stChange) or query_error($stChange);
+                $q->execute(
+                    $regoID,
+                    $self->{'RunParams'}{'rtargetid'}
+                ); 
+            }
+            if ($self->{'RunParams'}{'oldlevel'} and defined $self->{'RunParams'}{'oldlevel'})   {
+                $stChange = qq[
+                    UPDATE
+                        tblPersonRegistration_$self->{'Data'}->{'Realm'} as PR
+                    SET
+                        PR.strPreviousPersonLevel = ?,
+                        PR.intPersonLevelChanged = 1
+                    WHERE
+                        PR.strPersonLevel <> ''
+                        AND PR.intPersonRegistrationID = ?
+                        AND PR.strPersonLevel <> ?
+                ];
+                $q = $self->{'Data'}->{'db'}->prepare($stChange) or query_error($stChange);
+                $q->execute(
+                    $self->{'RunParams'}{'oldlevel'},
+                    $regoID,
+                    $self->{'RunParams'}{'oldlevel'}
+                ); 
+            }
         }
     }
 
