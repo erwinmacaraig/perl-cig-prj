@@ -998,7 +998,7 @@ sub submitPersonRegistration    {
             $personID,
             $personRegistrationID, 
             0,
-		$pr_ref->{'intInternationalTransfer'}
+$pr_ref->{'intInternationalTransfer'}
         );
         personInProgressToPending($Data, $personID);
         ($count, $regs) = getRegistrationData($Data, $personID, \%Reg);

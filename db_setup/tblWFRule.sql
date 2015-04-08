@@ -31,6 +31,8 @@ CREATE TABLE tblWFRule (
     intRemoveTaskOnPayment tinyint default 0 COMMENT 'On Payment, remove task and either go to next one or approve person/Rego/Entity',
     intUsingITCFilter tinyint default 0 COMMENT 'Using ITC filter',
     intNeededITC tinyint default 0 COMMENT 'Was an ITC needed',
+    intUsingPersonLevelChangeFilter tinyint default 0 COMMENT 'Using Person Level change filter',
+    intPersonLevelChange tinyint default 0 COMMENT 'Was Person Level changed',
 
   intCopiedFromRuleID INT DEFAULT 0 COMMENT 'The ID of the rule this record was copied from - used for tblWFRuleDocument setup',
 

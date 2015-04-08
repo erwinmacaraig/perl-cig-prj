@@ -695,6 +695,43 @@ sub process_registration {
                 undef,
                 $personRequestID,
             );
+            if ($regoID && $personRequestID)    {
+                my $stChange = qq[
+                    UPDATE tblPersonRegistration_$self->{'Data'}->{'Realm'}
+                    SET strPreviousPersonLevel = '', intPersonLevelChanged=0
+                    WHERE
+                        intPersonRegistrationID = ?
+                    LIMIT 1
+                ];
+                my $q = $self->{'Data'}->{'db'}->prepare($stChange) or query_error($stChange);
+                $q->execute(
+                    $regoID,
+                );
+
+                $stChange = qq[
+                    UPDATE
+                        tblPersonRegistration_$self->{'Data'}->{'Realm'} as PR
+                        INNER JOIN tblPersonRequest as Req ON (
+                            PR.intPersonRequestID = Req.intPersonRequestID
+                        )
+                    SET
+                        strPreviousPersonLevel = Req.strPersonLevel,
+                        intPersonLevelChanged = 1
+                    WHERE
+                        Req.strPersonLevel <> ''
+                        AND Req.strNewPersonLevel <> ''
+                        AND Req.strPersonLevel <> Req.strNewPersonLevel
+                        AND PR.intPersonRegistrationID = ?
+                        AND Req.intPersonRequestID = ?
+                ];
+                $q = $self->{'Data'}->{'db'}->prepare($stChange) or query_error($stChange);
+                $q->execute(
+                    $regoID,
+                    $personRequestID
+                );
+            }
+        
+            
             #$self->moveDocuments($existingReg, $regoID, $personID);
         }
     }
