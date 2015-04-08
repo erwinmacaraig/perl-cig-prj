@@ -29,7 +29,8 @@ use PayTry;
 use Localisation;
 use MCache;
 
-#use Digest::SHA qw(hmac_sha256_hex);
+use Digest::SHA qw(hmac_sha256_hex);
+#
 
 #use Crypt::CBC;
 
@@ -50,19 +51,22 @@ print STDERR "IN GATEWAYPROCESS_hkpay\n";
 
 	my $payRef= param('Ref') || param('ci') || '';
 	my $submit_action= param('sa') || '';
+	$submit_action  =1;
 	my $display_action= param('da') || '';
+	$submit_action  =0 if ($display_action eq '1');
     my $process_action= param('pa') || '';
 
     ## LOOK UP tblPayTry
     my $payTry = payTryRead(\%Data, $payRef, 1);
-use Data::Dumper;
-print STDERR Dumper($payTry);
+#use Data::Dumper;
+#print STDERR Dumper($payTry);
 	my $logID = $payTry->{'intTransLogID'};
 
 print STDERR "LOG IS $logID\n";
 
 my $cgi=new CGI;
     my %params=$cgi->Vars();
+print STDERR Dumper(\%params);
 print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
     my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     $Data{'lang'}=$lang;
@@ -77,10 +81,12 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
     $Data{'sessionKey'} = $payTry->{'session'};
     initLocalisation(\%Data);
 
+	if ($submit_action)	{
     print "Content-type: text/html\n\n";
 	print "OK";
+	}
     return if (! $logID);
-return;
+print STDERR "STILL AROUND IN G\n";
 
 ########
 my ($Order, $Transactions) = gatewayTransactions(\%Data, $logID);
@@ -88,8 +94,9 @@ my ($paymentSettings, undef) = getPaymentSettings(\%Data,$Order->{'PaymentType'}
 ########
     # Do they update
     if ($submit_action eq '1') {
+print STDERR "IN SUBMIT ACTION";
         my %returnVals = ();
-        $returnVals{'action'} = param('sa') || 0;
+        $returnVals{'action'} = $submit_action;
         $returnVals{'ext'} = param('ext') || 0;
         $returnVals{'chkv'} = param('chkv') || 0;
 
@@ -107,60 +114,42 @@ my ($paymentSettings, undef) = getPaymentSettings(\%Data,$Order->{'PaymentType'}
         $Vals{'secureHash'}= param('secureHash') || '';
         $Vals{'payType'}= param('payType') || 'N';
         $Vals{'merchantId'}= param('merchantId') || ''; ## is this same as gatewayUsername
-print STDERR "MERCHANTId " . $Vals{'merchantId'} . " is this same as gatewayUsername ?";
 	print "Content-type: text/html\n\nOK";
         
-return;
 
 	my $coKey = $paymentSettings->{'gatewayUsername'} ."|". $Vals{'Ref'} ."|". $Vals{'Cur'} ."|". $Vals{'Amt'} ."|". $Vals{'payType'} ."|". $paymentSettings->{'gatewayPassword'};
 
-        #$gatewaySpecific{'secureHash'} = sha1($coKey);
+       my $secureHash = 1;#sha1($coKey);
 
         my $chkAction = 'FAILURE';
-#print STDERR "$Vals{'MAC'} $str $digest |  $paymentSettings->{'gatewayPassword'}\n";
-#        if ($Vals{'MAC'} eq $digest)    {
-#            $chkAction = 'SUCCESS';
-#        }
+print STDERR "$Vals{'secureHash'} | " . $secureHash;
+	if ($Vals{'secureHash'}  && $Vals{'secureHash'} eq $secureHash)	{
+            $chkAction = 'SUCCESS';
+	}
+            $chkAction = 'SUCCESS';
 print STDERR "MAC ACTION IS $chkAction\n";
 
         $returnVals{'GATEWAY_TXN_ID'}= param('PAYMENT') || '';
         $returnVals{'GATEWAY_AUTH_ID'}= param('AuthId') || '';
-        my $co_status = param('STATUS') || '';
+        my $co_status = param('successcode');
         $returnVals{'GATEWAY_RESPONSE_CODE'}= "99";
         $returnVals{'GATEWAY_RESPONSE_CODE'}= "OK" if (
-            $co_status eq "2" 
-            or $co_status eq "5" 
-            or $co_status eq "8"
-            or $co_status eq "9"
-            or $co_status eq "10"
+            $co_status eq "0" 
         );
-        $returnVals{'GATEWAY_RESPONSE_CODE'}= "HOLD" if (
-            $co_status eq "3"  ## Delayed Payment
-            or $co_status eq "6" 
-            or $co_status eq "7" 
-        );
+        #$returnVals{'GATEWAY_RESPONSE_CODE'}= "HOLD" if (
+        #    $co_status eq "3"  ## Delayed Payment
+        #    or $co_status eq "6" 
+        #    or $co_status eq "7" 
+        #);
          $returnVals{'GATEWAY_RESPONSE_TEXT'}= param('REFERENCE') || '';
         $returnVals{'GatewayResponseCode'}= $co_status;
         $returnVals{'ResponseCode'}= $returnVals{'GATEWAY_RESPONSE_CODE'};
 
-        my %FIN_coResponseText = (
-            -10=>"PAYMENT_RETURNED",
-            -4=>"PAYMENT_TXN_NOT_FOUND",
-            -3 =>"PAYMENT_TIMEDOUT",
-            -2 =>"PAYMENT_CANCELED",
-            -1 =>"PAYMENT_CANCELED",
-            1 => "PAYMENT_UNSUCCESSFUL",
-            2=>"PAYMENT_SUCCESSFUL",
-            3=>"PAYMENT_DELAYED",
-            4=>"",
-            5=>"PAYMENT_SUCCESSFUL",
-            6=>"PAYMENT_SUCCESSFUL",
-            7=>"PAYMENT_TO_THIRD_PARTY",
-            8=>"PAYMENT_THIRD_PARTY_ACCEPTED",
-            9=>"",
-            10=>"PAYMENT_SENT_TO_MERCHANT",
+        my %_coResponseText = (
+            -1 => "PAYMENT_UNSUCCESSFUL",
+            0=>"PAYMENT_SUCCESSFUL",
         );
-        my $respTextCode = $FIN_coResponseText{$co_status} || '';
+        my $respTextCode = $_coResponseText{$co_status} || '';
         $returnVals{'ResponseText'}= $respTextCode; #$Defs::paymentResponseText{$respTextCode} || '';
         $returnVals{'Other1'} = $co_status || '';
         $returnVals{'Other2'} = param('MAC') || '';
@@ -174,9 +163,9 @@ print STDERR "MAC ACTION IS $chkAction\n";
         $payTry->{'run'} = 1;
     }
     
-    #if ($display_action eq '1')    {
-    #    payTryRedirectBack(\%Data, $payTry, $client, $logID, 1);
-    #}
+    if ($display_action eq '1')    {
+        payTryRedirectBack(\%Data, $payTry, $client, $logID, 1);
+    }
 
 }
 

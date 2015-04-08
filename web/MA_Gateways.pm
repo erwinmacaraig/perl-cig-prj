@@ -12,7 +12,7 @@ use Lang;
 use Utils;
 use CGI qw(param unescape escape);
 
-#use Digest::SHA1  qw(sha1); # sha1_hex sha1_base64);
+use Digest::SHA1  qw(sha1); # sha1_hex sha1_base64);
 use MD5;
 
 sub MAGateway_FI_checkoutFI	{
@@ -139,8 +139,7 @@ print STDER "HK PAY GATEWAY -- NEED TO IMPLEMENT OTHER LANGS\n";
 	
         my $coKey = $gatewaySpecific{'merchantId'} ."|". $gatewaySpecific{'orderRef'} ."|". $gatewaySpecific{'currCode'} ."|". $gatewaySpecific{'amount'} ."|". $gatewaySpecific{'payType'} ."|". $paymentSettings->{'gatewayPassword'};
 
-        #$gatewaySpecific{'secureHash'} = sha1($coKey);
-print STDERR "DIGEST::SHA1 to be swicthed on\n\n\n\n\n\n\n";
+        $gatewaySpecific{'secureHash'} = sha1($coKey);
         $gatewaySpecific{'Ref'} = $payRef;
 
 
