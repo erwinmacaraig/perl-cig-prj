@@ -762,6 +762,42 @@ sub process_registration {
         if($changeExistingReg)  {
             $self->moveDocuments($existingReg, $regoID, $personID);
         }
+        print STDERR "RENE: " . $self->{'RunParams'}{'rtargetid'} . "|" . $regoID;
+        if ($regoID && $self->{'RunParams'}{'rtargetid'})   {
+            my $stChange = qq[
+                UPDATE tblPersonRegistration_$self->{'Data'}->{'Realm'}
+                SET strPreviousPersonLevel = '', intPersonLevelChanged=0
+                WHERE
+                    intPersonRegistrationID = ?
+                LIMIT 1
+            ];
+            my $q = $self->{'Data'}->{'db'}->prepare($stChange) or query_error($stChange);
+            $q->execute(
+                $regoID,
+            );
+
+            $stChange = qq[
+                UPDATE
+                    tblPersonRegistration_$self->{'Data'}->{'Realm'} as PR
+                    INNER JOIN tblPersonRegistration_$self->{'Data'}->{'Realm'} as PR_exisiting ON ( 
+                        PR.intPersonID = PR_exisiting.intPersonID
+                    )
+                SET
+                    PR.strPreviousPersonLevel = PR_exisiting.strPersonLevel,
+                    PR.intPersonLevelChanged = 1
+                WHERE
+                    PR_exisiting.strPersonLevel <> ''
+                    AND PR.strPersonLevel <> ''
+                    AND PR_exisiting.strPersonLevel <> PR.strPersonLevel
+                    AND PR.intPersonRegistrationID = ?
+                    AND PR_exisiting.intPersonRegistrationID = ?
+            ];
+            $q = $self->{'Data'}->{'db'}->prepare($stChange) or query_error($stChange);
+            $q->execute(
+                $regoID,
+                $self->{'RunParams'}{'rtargetid'}
+            ); 
+        }
     }
 
     if(!$personID)    {

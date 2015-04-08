@@ -992,6 +992,11 @@ sub addWorkFlowTasks {
             AND r.strEntityType IN ('', e.strEntityType)
 			AND r.strRegistrationNature = ?
             AND r.strPersonEntityRole IN ('', pr.strPersonEntityRole)
+            AND (
+                r.intUsingPersonLevelChangeFilter = 0
+                OR 
+                (r.intUsingPersonLevelChangeFilter = 1 AND r.intPersonLevelChange = pr.intPersonLevelChanged)
+            )
 		];
 	    $q = $db->prepare($st);
 		$itc ||= 0;
