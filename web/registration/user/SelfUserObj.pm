@@ -6,6 +6,8 @@ use lib "..","../..";
 use Defs;
 use UserHash;
 use Utils;
+use Data::Dumper;
+use SystemConfig;
 
 use strict;
 
@@ -74,25 +76,26 @@ sub write {
   else  {
     # Add New SelfUser
     
-    #my $confirmkey = newHash(time());
-    #$confirmkey =~ s/[^0-9a-zA-Z]//g;
-    #$confirmkey = substr($confirmkey,0,20);
-    #$self->{'DBData'}{'confirmKey'} = $confirmkey || '';
+    my $confirmkey = newHash(time());
+    $confirmkey =~ s/[^0-9a-zA-Z]//g;
+    $confirmkey = substr($confirmkey,0,20);
+    $self->{'DBData'}{'strConfirmKey'} = $confirmkey || '';
+
     my $st=qq[
       INSERT INTO tblSelfUser (
         strEmail,
         strFirstName,
         strFamilyName,
         strStatus,
-        dtConfirmed,
+        strConfirmKey,
         dtCreated
       )
       VALUES (
         ?,
         ?,
         ?,
-        $Defs::USER_STATUS_CONFIRMED,
-        NOW(),
+        $Defs::USER_STATUS_NOTCONFIRMED,
+        ?,
         NOW()
       )
     ];
@@ -101,6 +104,7 @@ sub write {
       $self->{'DBData'}{'strEmail'},
       $self->{'DBData'}{'strFirstName'},
       $self->{'DBData'}{'strFamilyName'},
+      $self->{'DBData'}{'strConfirmKey'},
     );
     $self->{'ID'}=$q->{'mysql_insertid'};
     $self->{'DBData'}{'intSelfUserID'} = $q->{'mysql_insertid'};
@@ -205,6 +209,11 @@ sub Email  {
   return $self->{'DBData'}{'strEmail'} || '';
 }
 
+sub ConfirmKey  {
+  my $self = shift;
+  return $self->{'DBData'}{'strConfirmKey'} || '';
+}
+
 sub Status {
   my $self = shift;
   return $self->{'DBData'}{'strStatus'} || $Defs::USER_STATUS_INVALID
@@ -281,7 +290,5 @@ sub _generateConfirmKey {
   $confirmkey=substr($confirmkey,0,30);
   return $confirmkey;
 }
-
-
 
 1;
