@@ -51,9 +51,10 @@ print STDERR "IN GATEWAYPROCESS_hkpay\n";
 
 	my $payRef= param('Ref') || param('ci') || '';
 	my $submit_action= param('sa') || '';
+print STDERR "SA IS $submit_action\n";
 	$submit_action  =1;
 	my $display_action= param('da') || '';
-	$submit_action  =0 if ($display_action eq '1' or ! param('PayRef'));
+#	$submit_action  =0 if ($display_action eq '1' or ! param('PayRef'));
     my $process_action= param('pa') || '';
 
     ## LOOK UP tblPayTry
@@ -65,7 +66,7 @@ print STDERR "IN GATEWAYPROCESS_hkpay\n";
 print STDERR "LOG IS $logID\n";
 
 my $cgi=new CGI;
-    my %params=$cgi->Vars();
+my %params=$cgi->Vars();
 print STDERR Dumper(\%params);
 print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
     my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
@@ -73,10 +74,6 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
     $Data{'clientValues'} = $payTry;
     my $client= setClient(\%{$payTry});
     $Data{'client'}=$client;
-    #my %clientValues = getClient($payTry->{'client'});
-    #my $client= setClient(\%clientValues);
-    #$Data{'client'}=$client;
-    #$Data{'clientValues'} = \%clientValues;
 
     $Data{'sessionKey'} = $payTry->{'session'};
     initLocalisation(\%Data);
@@ -86,7 +83,7 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
 	print "OK";
 	}
     return if (! $logID);
-print STDERR "STILL AROUND IN G\n";
+print STDERR "STILL AROUND IN GATEWAY - $submit_action\n";
 
 ########
 my ($Order, $Transactions) = gatewayTransactions(\%Data, $logID);
@@ -101,25 +98,25 @@ print STDERR "IN SUBMIT ACTION";
         $returnVals{'chkv'} = param('chkv') || 0;
 
         my %Vals = ();
-        $Vals{'src'}= param('src') || '';
-        $Vals{'prc'}= param('prc') || '';
-        $Vals{'Ord'}= param('Ord') || '';
+        $Vals{'src'}= param('src');
+        $Vals{'prc'}= param('prc');
+        $Vals{'Ord'}= param('Ord');
         $Vals{'Holder'}= param('Holder') || '';
-        $Vals{'successcode'}= param('successcode') || '';
+        $Vals{'successcode'}= param('successcode');
         $Vals{'Ref'}= $payRef; #param('STAMP') || '';
-        $Vals{'PayRef'}= param('PayRef') || ''; ## Gateways ref number
-        $Vals{'Amt'}= param('Amt') || '';
-        $Vals{'Cur'}= param('Cur') || '';
-        $Vals{'remark'}= param('remark') || '';
-        $Vals{'secureHash'}= param('secureHash') || '';
+        $Vals{'PayRef'}= param('PayRef'); ## Gateways ref number
+        $Vals{'Amt'}= param('Amt');
+        $Vals{'Cur'}= param('Cur');
+        $Vals{'remark'}= param('remark');
+        $Vals{'secureHash'}= param('secureHash');
         $Vals{'payType'}= param('payType') || 'N';
-        $Vals{'merchantId'}= param('merchantId') || ''; ## is this same as gatewayUsername
-	print "Content-type: text/html\n\nOK";
+        $Vals{'merchantId'}= param('merchantId'); ## is this same as gatewayUsername
+#	print "Content-type: text/html\n\nOK";
         
 
 	my $coKey = $paymentSettings->{'gatewayUsername'} ."|". $Vals{'Ref'} ."|". $Vals{'Cur'} ."|". $Vals{'Amt'} ."|". $Vals{'payType'} ."|". $paymentSettings->{'gatewayPassword'};
 
-       my $secureHash = 1;#sha1($coKey);
+       my $secureHash = sha1($coKey);
 
         my $chkAction = 'FAILURE';
 print STDERR "$Vals{'secureHash'} | " . $secureHash;
@@ -133,7 +130,7 @@ print STDERR "MAC ACTION IS $chkAction\n";
         my $co_status = param('successcode');
         $returnVals{'GATEWAY_RESPONSE_CODE'}= "99";
         $returnVals{'GATEWAY_RESPONSE_CODE'}= "OK" if (
-            $co_status eq "0" 
+            $co_status eq "0" and $Vals{'prc'} eq "0"
         );
         #$returnVals{'GATEWAY_RESPONSE_CODE'}= "HOLD" if (
         #    $co_status eq "3"  ## Delayed Payment
