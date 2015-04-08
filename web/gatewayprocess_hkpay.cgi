@@ -77,8 +77,9 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
     $Data{'sessionKey'} = $payTry->{'session'};
     initLocalisation(\%Data);
 
-        print "Content-type: text/html\n\n";
+    print "Content-type: text/html\n\n";
 	print "OK";
+    return if (! $logID);
 return;
 
 ########
