@@ -607,7 +607,7 @@ sub submitRequestPage {
                         strSport,
                         strPersonType,
                         strPersonLevel,
-                        strPersonLevel,
+                        strNewPersonLevel,
                         strPersonEntityRole,
                         intRealmID,
                         intRequestFromEntityID,
