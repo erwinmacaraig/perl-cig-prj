@@ -29,7 +29,7 @@ use PayTry;
 use Localisation;
 use MCache;
 
-use Digest::SHA qw(hmac_sha256_hex);
+#use Digest::SHA qw(hmac_sha256_hex);
 
 #use Crypt::CBC;
 
@@ -108,16 +108,17 @@ my ($paymentSettings, undef) = getPaymentSettings(\%Data,$Order->{'PaymentType'}
 print STDERR "MERCHANTId " . $Vals{'merchantId'} . " is this same as gatewayUsername ?";
 	print "Content-type: text/html\n\nOK";
         
+return;
 
 	my $coKey = $paymentSettings->{'gatewayUsername'} ."|". $Vals{'Ref'} ."|". $Vals{'Cur'} ."|". $Vals{'Amt'} ."|". $Vals{'payType'} ."|". $paymentSettings->{'gatewayPassword'};
 
         #$gatewaySpecific{'secureHash'} = sha1($coKey);
 
         my $chkAction = 'FAILURE';
-print STDERR "$Vals{'MAC'} $str $digest |  $paymentSettings->{'gatewayPassword'}\n";
-        if ($Vals{'MAC'} eq $digest)    {
-            $chkAction = 'SUCCESS';
-        }
+#print STDERR "$Vals{'MAC'} $str $digest |  $paymentSettings->{'gatewayPassword'}\n";
+#        if ($Vals{'MAC'} eq $digest)    {
+#            $chkAction = 'SUCCESS';
+#        }
 print STDERR "MAC ACTION IS $chkAction\n";
 
         $returnVals{'GATEWAY_TXN_ID'}= param('PAYMENT') || '';
