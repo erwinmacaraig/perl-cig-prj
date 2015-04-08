@@ -68,3 +68,11 @@ ALTER TABLE tblRegistrationItem
 ALTER TABLE tblPersonRequest ADD COLUMN intExistingPersonRegistrationID INT DEFAULT 0 AFTER intPersonID;
 ALTER TABLE tblPersonRequest ADD COLUMN strNewPersonLevel VARCHAR(30) NULL COMMENT 'PROFESSIONAL, AMATEUR, (blank)' AFTER strPersonLevel;
 UPDATE tblPersonRequest SET strNewPersonLevel=strPersonLevel;
+
+# 150408_tblWFRule, 150408_tblPersonRegistration.sql
+ALTER TABLE tblPersonRegistration_1 
+    ADD COLUMN intPersonLevelChanged TINYINT DEFAULT 0,
+    ADD COLUMN strPreviousPersonLevel varchar(30) DEFAULT '';
+ALTER TABLE tblWFRule
+    ADD COLUMN intUsingPersonLevelChangeFilter tinyint default 0 COMMENT 'Using Person Level change filter',
+    ADD COLUMN intPersonLevelChange tinyint default 0 COMMENT 'Was Person Level changed';
