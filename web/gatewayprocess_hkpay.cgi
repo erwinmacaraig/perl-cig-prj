@@ -79,6 +79,7 @@ print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
 
         print "Content-type: text/html\n\n";
 	print "OK";
+return;
 
 ########
 my ($Order, $Transactions) = gatewayTransactions(\%Data, $logID);
