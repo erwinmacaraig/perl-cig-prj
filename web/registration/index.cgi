@@ -22,6 +22,7 @@ use AddToPage;
 use SelfUserHome;
 use Flow_PersonSelfReg;
 use SelfUserWorkFlow;
+use AccountActivation;
 
 use Data::Dumper;
 
@@ -145,6 +146,9 @@ sub main {
     }
     elsif ( $action =~ /WF_/ ) {
         ($resultHTML, $pageHeading) = handleSelfUserWorkFlow(\%Data, $user, $action);
+    }
+    elsif ($action =~ /activate/) {
+        ($resultHTML, $pageHeading) = handleAccountActivation(\%Data, $action);
     }
     else {
         # Display login page
