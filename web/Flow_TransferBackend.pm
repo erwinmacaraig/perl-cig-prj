@@ -781,8 +781,6 @@ sub display_products {
     my $client = $self->{'Data'}->{'client'};
 print STDERR "DISPLAY_PRODUCTS FOR $personID $regoID\n";
 
-print STDERR Dumper($self->{'RunDetails'}{'Errors'});
-
     my $rego_ref = {};
     my $content = '';
     if($regoID) {

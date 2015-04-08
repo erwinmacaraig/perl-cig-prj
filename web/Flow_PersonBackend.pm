@@ -577,7 +577,6 @@ sub display_registration {
 
     my $client = $self->{'Data'}->{'client'};
     my $url = $self->{'Target'}."?rfp=".$self->getNextAction()."&".$self->stringifyURLCarryField();
-print STDERR $url;
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
     $personObj->load();
     my ($dob, $gender) = $personObj->getValue(['dtDOB','intGender']); 
@@ -762,7 +761,6 @@ sub process_registration {
         if($changeExistingReg)  {
             $self->moveDocuments($existingReg, $regoID, $personID);
         }
-        print STDERR "RENE: " . $self->{'RunParams'}{'rtargetid'} . "|" . $regoID;
         if ($regoID && $self->{'RunParams'}{'rtargetid'})   {
             my $stChange = qq[
                 UPDATE tblPersonRegistration_$self->{'Data'}->{'Realm'}
@@ -1361,7 +1359,6 @@ sub display_summary {
     #if ($payMethod ne 'now')    {
     #    $gateways = '';
     #}
-print STDERR "ITC IS" . $self->{'RunParams'}{'itc'}. "\n";
     my %Config = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
