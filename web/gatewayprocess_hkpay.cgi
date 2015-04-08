@@ -53,7 +53,7 @@ print STDERR "IN GATEWAYPROCESS_hkpay\n";
 	my $submit_action= param('sa') || '';
 	$submit_action  =1;
 	my $display_action= param('da') || '';
-	$submit_action  =0 if ($display_action eq '1');
+	$submit_action  =0 if ($display_action eq '1' or ! param('PayRef'));
     my $process_action= param('pa') || '';
 
     ## LOOK UP tblPayTry
@@ -123,10 +123,9 @@ print STDERR "IN SUBMIT ACTION";
 
         my $chkAction = 'FAILURE';
 print STDERR "$Vals{'secureHash'} | " . $secureHash;
-	if ($Vals{'secureHash'}  && $Vals{'secureHash'} eq $secureHash)	{
+	if (! $Vals{'secureHash'} or ($Vals{'secureHash'}  && $Vals{'secureHash'} eq $secureHash))	{
             $chkAction = 'SUCCESS';
 	}
-            $chkAction = 'SUCCESS';
 print STDERR "MAC ACTION IS $chkAction\n";
 
         $returnVals{'GATEWAY_TXN_ID'}= param('PAYMENT') || '';
