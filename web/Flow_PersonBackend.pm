@@ -781,7 +781,7 @@ sub process_registration {
             $q->execute(
                 $regoID,
             );
-            if ($self->{'RunParams'}{'rtargetid'})  {
+            if ($self->{'RunParams'}{'rtargetid'} and defined $self->{'RunParams'}{'rtargetid'})  {
                 $stChange = qq[
                     UPDATE
                         tblPersonRegistration_$self->{'Data'}->{'Realm'} as PR
