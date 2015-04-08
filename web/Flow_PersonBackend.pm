@@ -150,6 +150,27 @@ sub setupValues    {
     $values->{'itc'} = $self->{'RunParams'}{'itc'} || 0;
     my $client = $self->{'Data'}{'client'};
     $values->{'BaseURL'} = "$self->{'Data'}{'target'}?client=$client&amp;a=";
+
+
+    if ($self->{'RunParams'}{'dnat'} eq 'RENEWAL')  {
+        my $lang = $self->{'Data'}->{'lang'};
+        my $rawDetails;
+        my ($content, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rtargetid'});
+
+        if(!$content or !$rawDetails) {
+            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt('Invalid Renewal Details');
+            $content = $lang->txt("No record found.");
+        }
+
+        #$values->{'defaultType'} = 'PLAYER';
+        $self->addCarryField('d_nature', 'RENEWAL');
+        $self->addCarryField('dnature', 'RENEWAL');
+        $self->addCarryField('nat', 'RENEWAL');
+        $self->addCarryField('dsport', $rawDetails->{'strSport'});
+        $self->addCarryField('dage', $rawDetails->{'newAgeLevel'}); # if $rawDetails->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER;
+        $self->addCarryField('drole', $rawDetails->{'strPersonEntityRole'});
+    }
+
     $self->{'FieldSets'} = personFieldsSetup($self->{'Data'}, $values);
 }
 
@@ -570,6 +591,7 @@ sub display_registration {
     my $defaultRegistrationNature = $self->{'RunParams'}{'dnat'} || '';
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $entitySelection = $originLevel == $Defs::LEVEL_CLUB ? 0 : 1;
+    $entitySelection=0 if ($defaultRegistrationNature eq 'RENEWAL');
     if(
         $entitySelection 
         and exists $self->{'SystemConfig'}{'maFlowEntitySelect'}
@@ -612,7 +634,7 @@ sub display_registration {
             );
         }
     }
-    elsif($defaultRegistrationNature eq 'RENEWAL') {
+    elsif(1==2 and $defaultRegistrationNature eq 'RENEWAL') {
         my $rawDetails;
         ($content, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rtargetid'});
 
@@ -621,7 +643,7 @@ sub display_registration {
             $content = $lang->txt("No record found.");
         }
 
-        $self->addCarryField('d_nature', 'RENEWAL');
+        $self->addCarryField('dnat', 'RENEWAL');
         $self->addCarryField('d_type', $rawDetails->{'strPersonType'});
         $self->addCarryField('d_level', $rawDetails->{'strPersonLevel'});
         $self->addCarryField('d_sport', $rawDetails->{'strSport'});
@@ -641,6 +663,7 @@ sub display_registration {
             0,
             $regoID,
             $entitySelection, #display entity Selection
+            0,
         );
     }
 
@@ -737,6 +760,41 @@ sub process_registration {
         }
         if($changeExistingReg)  {
             $self->moveDocuments($existingReg, $regoID, $personID);
+        }
+        if ($regoID && $self->{'RunParams'}{'rtargetid'})   {
+            my $stChange = qq[
+                UPDATE tblPersonRegistration_$self->{'Data'}->{'Realm'}
+                SET strPreviousPersonLevel = '', intPersonLevelChanged=0
+                WHERE
+                    intPersonRegistrationID = ?
+                LIMIT 1
+            ];
+            my $q = $self->{'Data'}->{'db'}->prepare($stChange) or query_error($stChange);
+            $q->execute(
+                $regoID,
+            );
+
+            $stChange = qq[
+                UPDATE
+                    tblPersonRegistration_$self->{'Data'}->{'Realm'} as PR
+                    INNER JOIN tblPersonRegistration_$self->{'Data'}->{'Realm'} as PR_exisiting ON ( 
+                        PR.intPersonID = PR_exisiting.intPersonID
+                    )
+                SET
+                    PR.strPreviousPersonLevel = PR_exisiting.strPersonLevel,
+                    PR.intPersonLevelChanged = 1
+                WHERE
+                    PR_exisiting.strPersonLevel <> ''
+                    AND PR.strPersonLevel <> ''
+                    AND PR_exisiting.strPersonLevel <> PR.strPersonLevel
+                    AND PR.intPersonRegistrationID = ?
+                    AND PR_exisiting.intPersonRegistrationID = ?
+            ];
+            $q = $self->{'Data'}->{'db'}->prepare($stChange) or query_error($stChange);
+            $q->execute(
+                $regoID,
+                $self->{'RunParams'}{'rtargetid'}
+            ); 
         }
     }
 
@@ -1301,7 +1359,6 @@ sub display_summary {
     #if ($payMethod ne 'now')    {
     #    $gateways = '';
     #}
-print STDERR "ITC IS" . $self->{'RunParams'}{'itc'}. "\n";
     my %Config = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
