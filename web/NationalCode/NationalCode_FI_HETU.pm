@@ -44,7 +44,8 @@ sub parse_fi    {
     $c = uc($c);
     return undef if !$c;
     $q = uc($q);
-    return undef if !$q;
+    return undef if !defined $q;
+    return undef if $q eq '';
 
     return {
         dd => int($dd),
