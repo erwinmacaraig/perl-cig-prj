@@ -499,12 +499,16 @@ sub optionsPersonRegisterWhat {
     }
     else    {
 
-        my $NATUREwhere= qq[AND strRegistrationNature <> 'TRANSFER'];
+        #my $NATUREwhere= qq[AND strRegistrationNature <> 'TRANSFER'];
+        my $NATUREwhere= qq[AND strRegistrationNature = 'NEW'];
         if ($registrationNature eq 'TRANSFER' and $lookingForField eq 'strRegistrationNature')   {
             $NATUREwhere= qq[AND strRegistrationNature = 'TRANSFER'];
         }
         if ($registrationNature eq 'RENEWAL' and $lookingForField eq 'strRegistrationNature')   {
             $NATUREwhere= qq[AND strRegistrationNature = 'RENEWAL'];
+        }
+        if ($registrationNature eq 'NEW' and $lookingForField eq 'strRegistrationNature')   {
+            $NATUREwhere= qq[AND strRegistrationNature = 'NEW'];
         }
 
         $st = qq[
@@ -519,6 +523,7 @@ sub optionsPersonRegisterWhat {
                 $NATUREwhere
             GROUP BY $lookingForField
         ];
+print STDERR $st;
         @values = @MATRIXvalues;
     }
     

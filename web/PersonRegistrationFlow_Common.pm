@@ -1241,6 +1241,7 @@ sub add_rego_record{
     }
 
     if ($rego_ref->{'registrationNature'} eq 'RENEWAL') {
+print STDERR "ABOUT TO CHECKRENEWAL\n";
         my $ok = PersonRegistration::checkRenewalRegoOK($Data, $personID, $rego_ref);
         return (0, undef, 'RENEWAL_FAILED') if (!$ok);
     }
