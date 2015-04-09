@@ -522,7 +522,7 @@ sub listTasks {
 		$entityID,
 		$entityID,
 		$entityID,
-	) or query_error($st);
+	) or query_error($st); open FH, ">dumpfile.txt"; print FH "\$entityID = $entityID \n \$st = $st";
 	
 	my @TaskList = ();
     my @taskType = ();

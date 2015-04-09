@@ -38,6 +38,7 @@ sub displayPersonRegisterWhat   {
     #$transfer ||=0;
     $bulk ||= 0;
     $entitySelection ||= 0;
+
     my $defaultType = param('dtype') || '';
     my $defaultSport = param('dsport') || '';
     my $defaultEntityRole= param('dentityrole') || '';
@@ -71,6 +72,8 @@ sub displayPersonRegisterWhat   {
     }
             #$templateData{'transfer'} = 0;
     if($regoID) {
+		
+		
         my $ref = getRegistrationDetail($Data, $regoID) || {};
         my $existing = {};
         if($ref and $ref->[0])    {
