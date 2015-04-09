@@ -54,7 +54,7 @@ print STDERR "IN GATEWAYPROCESS_hkpay\n";
 print STDERR "SA IS $submit_action\n";
 	$submit_action  =1;
 	my $display_action= param('da') || '';
-#	$submit_action  =0 if ($display_action eq '1' or ! param('PayRef'));
+	$submit_action  =0 if ($display_action eq '1' or ! param('PayRef'));
     my $process_action= param('pa') || '';
 
     ## LOOK UP tblPayTry
