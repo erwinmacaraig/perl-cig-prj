@@ -837,7 +837,7 @@ sub process_registration {
             push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("You cannot register this combination, limit exceeded");
         }
         if ($msg eq 'NEW_FAILED')   {
-            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("New failed, existing registration found.  In order to continue, a Transfer from the existing Entity must be organised.");
+            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("New failed, existing registration found. In order to continue, a Transfer from the existing Entity must be organised or select another Level");
         }
         if ($msg eq 'RENEWAL_FAILED')   {
             push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Renewal failed, cannot find existing registration. Might have already been renewed");
