@@ -65,7 +65,7 @@ sub displayRegoFlowCompleteBulk {
 	my $receiptLink = qq[printreceipt.cgi?client=$client&ids=$logID&pID=$intID];
 	$paymentResult .= qq[
 	<div class="row">
-         <div class="col-md-12"><a href="$receiptLink" target="receipt">Print Receipt</a></div>
+         <div class="col-md-12"><a href="$receiptLink" target="receipt">] . $Data->{'lang'}->txt('Print Receipt') . qq[</a></div>
     </div>];
      $payMethod = '' if (!$amountDue and $payStatus == -1);
 
