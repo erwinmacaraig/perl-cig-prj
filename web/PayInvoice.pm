@@ -486,14 +486,12 @@ sub queryInvoiceByOtherInfo {
 	INNER JOIN tblProducts ON tblProducts.intProductID = tblTransactions.intProductID
 	INNER JOIN tblPerson ON tblPerson.intPersonID = tblTransactions.intID 
 	WHERE intStatus = 0 AND tblPersonRegistration_$Data->{'Realm'}.strStatus <> 'INPROGRESS' 
-	@whereClause 
-    ORDER BY invoiceDate DESC
-	];	
+	@whereClause ];	
 
 	#filtering scheme for FC-866
 		#get authlevel
 		if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB){			
-			$query .= qq[ AND tblTransactions.intTXNEntityID = $intTXNEntityID ];			
+			$query .= qq[ AND tblTransactions.intTXNEntityID = $intTXNEntityID ORDER BY invoiceDate DESC];			
 		}
 		elsif($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_REGION){
 			my $subquery = qq[SELECT intChildEntityID FROM tblEntityLinks WHERE intParentEntityID = $intTXNEntityID];
@@ -503,7 +501,7 @@ sub queryInvoiceByOtherInfo {
 			while(my $dref = $st->fetchrow_hashref()){
 				push @clubs, $dref->{'intChildEntityID'};
 			}
-			$query .= qq[ AND tblTransactions.intTXNEntityID IN ('', ] . join(',',@clubs) . q[)];
+			$query .= qq[ AND tblTransactions.intTXNEntityID IN ('', ] . join(',',@clubs) . q[) ORDER BY invoiceDate DESC];
 		}
 	#
 	# intStatus = 0 unpaid

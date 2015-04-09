@@ -37,7 +37,7 @@ sub displayPersonRegisterWhat   {
     ) = @_;
     $bulk ||= 0;
     $entitySelection ||= 0;
-    my $defaultType = param('dtype') || '';
+    my $defaultType = param('dtype') || ''; 
 
     my $systemConfig = getSystemConfig($Data);
 
@@ -63,6 +63,8 @@ sub displayPersonRegisterWhat   {
         $templateData{'entityID'} = 0;
     }
     if($regoID) {
+		
+		
         my $ref = getRegistrationDetail($Data, $regoID) || {};
         my $existing = {};
         if($ref and $ref->[0])    {
