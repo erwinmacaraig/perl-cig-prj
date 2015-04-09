@@ -63,10 +63,10 @@ sub displayRegoFlowCompleteBulk {
 	my $intID = param('rolloverIDs') || 0;
     ($payStatus, $paymentResult) = displayPaymentResult($Data, $logID, 1, '');
 	my $receiptLink = qq[printreceipt.cgi?client=$client&ids=$logID&pID=$intID];
-	$paymentResult .= qq[<br />
+	$paymentResult .= qq[
 	<div class="row">
-    <div class="col-md-6"><a href="$receiptLink" target="receipt">Print Receipt</a></div><div class="col-md-6"><a href="$Defs::base_url/main.cgi?client=$client&a=PFB_" class="btn-main pull-right">Return To Bulk Renewals</a></div>
-  </div>];
+         <div class="col-md-12"><a href="$receiptLink" target="receipt">] . $Data->{'lang'}->txt('Print Receipt') . qq[</a></div>
+    </div>];
      $payMethod = '' if (!$amountDue and $payStatus == -1);
 
     my $maObj = getInstanceOf($Data, 'national');
