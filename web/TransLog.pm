@@ -269,6 +269,8 @@ sub fixDate  {
     if($year > 20 and $year < 100)  {$year+=1900;}
     elsif($year <=20) {$year+=2000;}
     $date="$year-$month-$day";
+	my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
+	$date .= qq[ $Hour:$Minute:$Second];
   }
   else  { $date='';}
   return $date;
@@ -293,7 +295,8 @@ sub step2 {
 	$dtLog=fixDate($dtLog);
 	deQuote($db, (\$currencyID, \$intAmount, \$dtLog, \$paymentType, \$strBSB, \$strAccountName, \$strAccountNum, \$strResponseCode, \$strResponseText, \$strComments, \$strBank, \$strReceiptRef));
 
-
+open FH, ">dumpfile2.txt";
+print FH "\$dtLog = $dtLog";
 #Load transactions, update them to point to this payment
 	my @transactionIDs;
 	foreach my $k (keys %{$Data->{params}}) {
@@ -478,10 +481,10 @@ AND    tblTransLog.intStatus = ?
 LIMIT 1
 EOS
 
-
+    open FH, ">dumpfile.txt";
     my $query = $db->prepare($st);
     $query->execute($transLogID, $Data->{Realm}, $Defs::TXNLOG_PENDING);
-
+    print FH "\$transLogID = $transLogID, \$Data->{Realm} = $Data->{Realm}, \$Defs::TXNLOG_PENDING = $Defs::TXNLOG_PENDING\n";
     my($dtLog) = $query->fetchrow_array;
 
     if ($dtLog) {
@@ -495,10 +498,12 @@ EOS
 			UPDATE tblTransLog SET intStatus=$Defs::TXNLOG_SUCCESS WHERE intLogID=$transLogID and intRealmID=$Data->{Realm}
 			AND intStatus = $Defs::TXNLOG_PENDING 
 	];
+	print FH "\n \$st at this point = \n $st";
 	$db->do($st);
 
 	$st = qq[UPDATE tblTransactions as T INNER JOIN tblTXNLogs as TXNLog ON (T.intTransactionID = TXNLog.intTXNID) SET T.dtPaid=$dtLog, T.intStatus=$Defs::TXN_PAID, T.intTransLogID=$transLogID WHERE intTLogID = $transLogID and T.intRealmID=$Data->{Realm} AND T.intStatus = $Defs::TXN_UNPAID];
-	$db->do($st);
+	$db->do($st);  
+    print FH "\n \$st at another point = \n $st";
 
 	Products::product_apply_transaction($Data,$transLogID);
 	my $cl=setClient($Data->{'clientValues'}) || '';
