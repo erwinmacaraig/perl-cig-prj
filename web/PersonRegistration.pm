@@ -236,6 +236,7 @@ sub checkRenewalRegoOK  {
         $rego_ref->{'personEntityRole'} || '',
         '',
         $rego_ref->{'personLevel'} || '',
+        '',
         $rego_ref->{'sport'} || '',
         '',
         $rego_ref->{'ageLevel'} || '',

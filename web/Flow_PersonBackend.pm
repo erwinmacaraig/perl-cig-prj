@@ -167,13 +167,12 @@ sub setupValues    {
         $self->addCarryField('dnature', 'RENEWAL');
         $self->addCarryField('nat', 'RENEWAL');
         $self->addCarryField('dsport', $rawDetails->{'strSport'});
+        $self->addCarryField('dlevel', $self->{'RunParams'}{'dlevel'}) if (defined $self->{'RunParams'}{'dlevel'} and $self->{'RunParams'}{'dlevel'} ne '');
         $self->addCarryField('dage', $rawDetails->{'newAgeLevel'}); # if $rawDetails->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER;
         $self->addCarryField('drole', $rawDetails->{'strPersonEntityRole'});
     }
     else    {
-print STDERR "OLD LEVEL: " . param('oldlevel');
         $self->addCarryField('oldlevel', $self->{'RunParams'}{'oldlevel'});
-print STDERR "OLD LEVEL IS : " . $self->{'RunParams'}{'oldlevel'};
         $self->addCarryField('d_nature', 'NEW');
         $self->addCarryField('dnature', 'NEW');
         $self->addCarryField('nat', 'NEW');
