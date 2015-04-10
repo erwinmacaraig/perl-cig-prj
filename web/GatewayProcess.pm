@@ -159,7 +159,7 @@ print STDERR "ORDER STATUS " . $Order->{'Status'};
 
   my ($paymentSettings, undef) = getPaymentSettings($Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, $external);
 
-    markGatewayAsResponded($Data, $logID);
+    markGatewayAsResponded($Data, $logID) if ($returnVals_ref->{'GATEWAY_RESPONSE_CODE'} ne 'HOLD');
 	#return if ($Order->{'Status'} == -1 or $Order->{'Status'} == 1);
 
   {
