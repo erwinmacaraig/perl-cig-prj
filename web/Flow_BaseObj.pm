@@ -331,7 +331,12 @@ sub display {
       $templateData->{'CancelButtonURL'} = '';
       $templateData->{'SaveButtonURL'} = '';
   }
-  ($templateData->{'BackButtonURL'}, $templateData->{'BackButtonDestination'}) = $self->buildBackButton();
+	if(exists($templateData->{'BackButtonURLOverride'})){
+		$templateData->{'BackButtonURL'} = $templateData->{'BackButtonURLOverride'};
+	}	
+    else {
+		($templateData->{'BackButtonURL'}, $templateData->{'BackButtonDestination'}) = $self->buildBackButton();
+	}
   my $output = runTemplate($self->{'Data'}, $templateData, $templateName);
   if($templateData->{'Errors'} and scalar(@{$templateData->{'Errors'}})) {
     my $filledin = HTML::FillInForm->fill(\$output, $self->{'RunParams'});
