@@ -199,7 +199,7 @@ print STDERR "API STATUS IS " . $APIResponse{'STATUS'};
             $returnVals{'GATEWAY_RESPONSE_TEXT'}= $APIResponse{'REFERENCE'} || '';
             $returnVals{'GatewayResponseCode'}= $co_status;
             $returnVals{'ResponseCode'}= $returnVals{'GATEWAY_RESPONSE_CODE'};
-            markGatewayAsResponded(\%Data, $logID);# if $returnVals{'GATEWAY_RESPONSE_CODE'} ne 'HOLD'; 
+            markGatewayAsResponded(\%Data, $logID) if $returnVals{'GATEWAY_RESPONSE_CODE'} ne 'HOLD'; 
 
            my $respTextCode = $FIN_coResponseText{$co_status} || '';
             $returnVals{'ResponseText'}= $respTextCode; 
