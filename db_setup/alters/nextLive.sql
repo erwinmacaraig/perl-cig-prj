@@ -41,3 +41,38 @@ ALTER TABLE tblProducts ADD COLUMN strDisplayName VARCHAR(100) NULL AFTER strNam
 
 # 150320_tblTransLog
 ALTER TABLE tblTransLog ADD COLUMN strOnlinePayReference varchar(100) default '' AFTER strTXN;
+
+# 150323_tblWFRule
+ALTER TABLE tblWFRule ADD COLUMN intNeededITC tinyint default 0 COMMENT 'Was an ITC needed';
+ALTER TABLE tblWFRule ADD COLUMN intUsingITCFilter tinyint default 0 COMMENT 'Using ITC filter';
+
+# 150325_tblWFRule
+ALTER TABLE tblWFRule ADD COLUMN intCopiedFromRuleID INT DEFAULT 0 COMMENT 'The ID of the rule this record was copied from - used for tblWFRuleDocument setup';
+
+#  150328_tblRegistrationItem
+ALTER TABLE tblRegistrationItem ADD COLUMN intItemNeededITC tinyint default 0 COMMENT 'Was an ITC needed';
+ALTER TABLE tblRegistrationItem ADD COLUMN intItemUsingITCFilter tinyint default 0 COMMENT 'Using ITC filter';
+
+
+# 150326_tblRegoTypeLimits
+ALTER TABLE tblRegoTypeLimits ADD COLUMN strEntityType varchar(30) default '' AFTER intSubRealmID;
+
+# 150407_tblRegistrationItem
+ALTER TABLE tblRegistrationItem
+    ADD COLUMN intItemUsingActiveFilter tinyint default 0 COMMENT 'Using Active Periods filter',
+    ADD COLUMN strItemActiveFilterPeriods varchar(10) default '' COMMENT 'Which Periods to check Active on',
+    ADD COLUMN intItemActive tinyint default 0 COMMENT 'Active status if Active Periods filter on';
+
+
+# 150407_tblPersonRequest
+ALTER TABLE tblPersonRequest ADD COLUMN intExistingPersonRegistrationID INT DEFAULT 0 AFTER intPersonID;
+ALTER TABLE tblPersonRequest ADD COLUMN strNewPersonLevel VARCHAR(30) NULL COMMENT 'PROFESSIONAL, AMATEUR, (blank)' AFTER strPersonLevel;
+UPDATE tblPersonRequest SET strNewPersonLevel=strPersonLevel;
+
+# 150408_tblWFRule, 150408_tblPersonRegistration.sql
+ALTER TABLE tblPersonRegistration_1 
+    ADD COLUMN intPersonLevelChanged TINYINT DEFAULT 0,
+    ADD COLUMN strPreviousPersonLevel varchar(30) DEFAULT '';
+ALTER TABLE tblWFRule
+    ADD COLUMN intUsingPersonLevelChangeFilter tinyint default 0 COMMENT 'Using Person Level change filter',
+    ADD COLUMN intPersonLevelChange tinyint default 0 COMMENT 'Was Person Level changed';

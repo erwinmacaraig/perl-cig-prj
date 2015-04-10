@@ -33,7 +33,14 @@ sub main	{
     my $subRealmIN = param('sr') || 0;
     my $bulk= param('bulk') || 0;
     my $defaultType = param('dtype') || '';
+    my $defaultSport= param('dsport') || '';
+    my $defaultLevel= param('dlevel') || '';
+    my $defaultEntityRole= param('dentityrole') || '';
+    my $defaultNature= param('dnat') || '';
     my $etype = param('etype') || '';
+
+    $registrationNature = 'TRANSFER' if ($defaultNature eq 'TRANSFER');
+    $registrationNature = 'RENEWAL' if ($defaultNature eq 'RENEWAL');
 
     my %Data=();
     my $target='aj_person_registerwhat.cgi';
@@ -48,6 +55,7 @@ sub main	{
     ($Data{'Realm'}, $Data{'RealmSubType'})=getRealm(\%Data);
     $Data{'Realm'} ||= 1;
 
+
     my $options = undef;
     my $error = '';
 	if($db)	{
@@ -60,8 +68,11 @@ sub main	{
             $personType,
             $defaultType,
             $personEntityRole,
+            $defaultEntityRole,
             $personLevel,
+            $defaultLevel,
             $sport,
+            $defaultSport,
             $ageLevel,
             $personID,
             $entityID,

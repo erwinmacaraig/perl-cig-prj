@@ -221,7 +221,7 @@ sub clubFieldsSetup {
                     value       => $values->{strISOCountry} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
                     type        => 'lookup',
                     options     => $isocountries,
-                    firstoption => [ '', 'Select Country' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
                     compulsory => 1,
                     sectionname => 'core',
                     class       => 'chzn-select',
@@ -231,7 +231,7 @@ sub clubFieldsSetup {
                     value       => $values->{'intLocalLanguage'},
                     type        => 'lookup',
                     options     => \%languageOptions,
-                    firstoption => [ '', 'Select Language' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Language') ],
                     compulsory => 1,
                     posttext => $nonlatinscript,
                     sectionname => 'core',
@@ -285,7 +285,7 @@ sub clubFieldsSetup {
                 strISOCountry
             )],
             sections => [
-                [ 'core',        'Club Details','','',$values->{'footer-core'} ],
+                [ 'core',        $Data->{'lang'}->txt('Club Details'),'','',$values->{'footer-core'} ],
             ],
             fieldtransform => {
                 textcase => {
@@ -338,7 +338,7 @@ sub clubFieldsSetup {
                     value       => $values->{'strContactISOCountry'} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
                     type        => 'lookup',
                     options     => $isocountries,
-                    firstoption => [ '', 'Select Country' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
                     compulsory => 0,
                     class       => 'chzn-select',
                 },
@@ -389,7 +389,7 @@ sub clubFieldsSetup {
                 intNotifications
             )],
             sections => [
-                [ 'main',        'Contact Details','','',$values->{'footer-contactdetails'} ],
+                [ 'main',        $Data->{'lang'}->txt('Contact Details'),'','',$values->{'footer-contactdetails'} ],
             ],
             #fieldtransform => {
                 #textcase => {
@@ -404,7 +404,7 @@ sub clubFieldsSetup {
                     value       => $values->{strEntityType} || '',
                     type        => 'lookup',
                     options     => \%entityTypeOptions,
-                    firstoption => [ '', 'Select Type of Organisation' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Type of Organisation') ],
                     compulsory => 1,
                 },
                 intLegalTypeID  => {
@@ -412,7 +412,7 @@ sub clubFieldsSetup {
                     value       => $values->{'intLegalTypeID'},
                     type        => 'lookup',
                     options     => \%legalTypeOptions,
-                    firstoption => [ '', 'Select Legal Entity Type' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Legal Entity Type') ],
                     compulsory  => 1,
                 },
                 strLegalID      => {
@@ -428,7 +428,7 @@ sub clubFieldsSetup {
                     value       => $values->{'strDiscipline'},
                     type        => 'lookup',
                     options     => \%Defs::entitySportType,
-                    firstoption => [ '', 'Select Sport' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Sport') ],
                     compulsory  => 1,
                 },
                 strOrganisationLevel    => {
@@ -436,7 +436,7 @@ sub clubFieldsSetup {
                     value       => $values->{'strOrganisationLevel'},
                     type        => 'lookup',
                     options     => \%Defs::organisationLevel,
-                    firstoption => [ '', 'Select Level' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Level') ],
                     compulsory  => 1,
                 },
                 strMANotes      => {
@@ -479,7 +479,7 @@ sub clubFieldsSetup {
                 intAcceptSelfRego
             )],
             sections => [
-                [ 'main',        'Organisation Details','','',$values->{'footer-roledetails'} ],
+                [ 'main',        $Data->{'lang'}->txt('Organisation Details'),'','',$values->{'footer-roledetails'} ],
             ],
         },
     };
@@ -590,14 +590,14 @@ sub entityFieldsSetup {
     }
 
     my %organisationLevel = (
-        PROFESSIONAL => 'Professional',
-        AMATEUR => 'Amateur',
-        BOTH => 'Both',
+        PROFESSIONAL => $Data->{'lang'}->txt('Professional'),
+        AMATEUR => $Data->{'lang'}->txt('Amateur'),
+        BOTH => $Data->{'lang'}->txt('Both'),
     );
 
     my %dissolvedOptions = (
-        0 => 'No',
-        1 => 'Yes',
+        0 => $Data->{'lang'}->txt('No'),
+        1 => $Data->{'lang'}->txt('Yes'),
     );
 
     my %acceptSelfRego = (
@@ -606,8 +606,8 @@ sub entityFieldsSetup {
     );
 
     my %notificationToggleOptions = (
-        0 => 'Off',
-        1 => 'On',
+        0 => $Data->{'lang'}->txt('Off'),
+        1 => $Data->{'lang'}->txt('On'),
     );
 
     $Data->{'FieldSets'} = {
@@ -685,7 +685,7 @@ sub entityFieldsSetup {
                     value       => $values->{strISOCountry} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
                     type        => 'lookup',
                     options     => \%Mcountriesonly,
-                    firstoption => [ '', 'Select Country' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
                     compulsory => 1,
                     sectionname => 'core',
                     class       => 'chzn-select',
@@ -695,7 +695,7 @@ sub entityFieldsSetup {
                     value       => $values->{'intLocalLanguage'},
                     type        => 'lookup',
                     options     => \%languageOptions,
-                    firstoption => [ '', 'Select Language' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Language') ],
                     compulsory => 1,
                     posttext => $nonlatinscript,
                     sectionname => 'core',
@@ -815,7 +815,7 @@ sub entityFieldsSetup {
                     value       => $values->{'strContactISOCountry'} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
                     type        => 'lookup',
                     options     => $isocountries,
-                    firstoption => [ '', 'Select Country' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
                     compulsory => 0,
                     class       => 'chzn-select',
                 },

@@ -48,7 +48,7 @@ sub handleClub  {
   my $title='';
   $typeID=$Defs::LEVEL_CLUB if $typeID==$Defs::LEVEL_NONE;
   if ($action =~/^C_DTA/) {
-        ($resultHTML,$title) = handleClubFlow($action, $Data);
+        ($resultHTML,$title) = ClubFlow::handleClubFlow($action, $Data);
   }
   elsif ($action =~/^C_DT/) {
     #Club Details
@@ -534,7 +534,6 @@ sub club_details  {
       target => $Data->{'target'},
       formname => 'n_form',
       submitlabel => $Data->{'lang'}->txt('Update'),
-      introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
       NoHTML => 1,
       updateSQL => qq[
         UPDATE tblEntity

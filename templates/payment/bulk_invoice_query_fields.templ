@@ -1,75 +1,95 @@
-<div class="col-md-12">
-	
-	[% IF invoiceNumber.length > 0 %]
-	 <br /><strong>  No such transaction for invoice number: [% invoiceNumber %] </strong><br /><br /> 
-	[% END %]
+		[% IF displayMessage %]
+				<div class="alert">
+					<div>
+						<span class="fa fa-exclamation"></span>
+						[% IF invoiceNumber.length > 0 %] 
+							[% Lang.txt('Payment Has Been Made For Invoice') %]: <strong>[% invoiceNumber %]</strong> 
+						[% ELSE %] 
+							[% Lang.txt('No such transaction for invoice number') %]:  <strong>[% displayMessage %]</strong>
+						[% END %]	
+					</div>
+				</div>
+		[% END %]
+		   		
+<div>
+	<div class="fieldSectionGroupWrapper">		
+		<form action="main.cgi" method="POST">
+			<h3 class="panel-header">[% Lang.txt('Transaction Details') %]</h3>
+				<div class="panel-body fieldSectionGroup">
+					<p class="introtext">[% Lang.txt('Please enter the information for transaction you want to process.') %]</p> 
+				
+					<div id="l_row_"intEthnicityID" class="form-group">
+						<label class="col-md-4 control-label txtright" for="PersonType" style="margin-top: 6px;">[% Lang.txt('Person Type') %]</label>
+						<div class="col-md-4">
+							<select name="PersonType" id="PersonType" class="chzn-select" size="1" data-placeholder="[% Lang.txt('Select Person Type') %]"> 
+								<option value=""></option>
+								[% FOREACH opt IN PersonType.options.keys %]
+									<option value="[% opt %]">[% PersonType.options.$opt %]</option>
+								[% END %]					
+							</select>
+						</div>
+					</div>	
 
-	<form action="main.cgi" method="POST" id="invoiceFormQry"> 
-	     <p class="introtext">Please enter the information for transaction you want to process.</p> 
-	    	<p id="errorMsg"></p>
-	    <table cellpadding="2" cellspacing="0" border="0"  class="HTF_table">  
-			<tr>
-				<td>Person Type</td>
-				<td class="form-group">
-					<select name="PersonType"> 
-						<option value="">Select Person Type</option>
-						[% FOREACH opt IN PersonType.options.keys %]
-							<option value="[% opt %]">[% PersonType.options.$opt %]</option>
-						[% END %]					
-					</select>
-				</td>
-			</tr>
-			<tr> 
-				<td>Sport</td> 
-				<td class="form-group">
-					<select name="Sport">
-						<option value="">Select Sport</option>
-							[% FOREACH opt IN Sport.options.keys %]
-								<option value="[% opt %]">[% Sport.options.$opt %]</option>
-							[% END %]	
-					</select>
-				</td>
-			</tr>
-			<tr> 
-				<td>Person Level</td>
-				<td class="form-group">
-					<select name="PersonLevel">
-						<option value="">Select Person Level</option>
+					<div class="form-group">
+						<label class="col-md-4 control-label txtright" for="Sport" style="margin-top: 6px;">[% Lang.txt('Sport') %]</label>
+						<div class="col-md-4">
+							<select name="Sport" id="Sport" class="chzn-select" data-placeholder="[% Lang.txt('Select Sport') %]">
+								<option value=""></option>
+								[% FOREACH opt IN Sport.options.keys %]
+									<option value="[% opt %]">[% Sport.options.$opt %]</option>
+								[% END %]	
+							</select>
+						</div>
+					</div>	
+
+					<div class="form-group">
+						<label class="col-md-4 control-label txtright" style="margin-top: 6px;">[% Lang.txt('Person Level') %]</label>
+						<div class="col-md-4">
+							<select name="PersonLevel" class="chzn-select" data-placeholder="[% Lang.txt('Select Person Level') %]">
+						<option value=""></option>
 							[% FOREACH opt IN PersonLevel.options.keys %]
 								<option value="[% opt %]">[% PersonLevel.options.$opt %]</option>
 							[% END %]	
 					</select>
-				</td>
-			</tr> 
-			<tr> 
-				<td>Age Level</td>
-				<td class="form-group">
-					<select name="AgeLevel">
-						<option value="">Select Age Level</option>
+						</div>
+					</div>	
+
+					<div class="form-group">
+						<label class="col-md-4 control-label txtright" style="margin-top: 6px;">[% Lang.txt('Age Level') %]</label>
+						<div class="col-md-4">
+							<select name="AgeLevel" class="chzn-select" data-placeholder="[% Lang.txt('Select Age Level') %]">
+						<option value=""></option>
 							[% FOREACH opt IN AgeLevel.options.keys %]
 								<option value="[% opt %]">[% AgeLevel.options.$opt %]</option>
 							[% END %]	
 					</select>
-				</td>
-			</tr> 
-
-			<tr> 
-				<td>National Period</td>
-				<td class="form-group">
-					<select name="NationalPeriod">
-						<option value="">Select Period</option>
-							[% FOREACH opt IN NationalPeriod.options.keys %]
+						</div>
+					</div>	
+					
+					<div class="form-group">
+						<label class="col-md-4 control-label txtright" style="margin-top: 6px;">[% Lang.txt('National Period') %]</label>
+						<div class="col-md-4">
+							<select name="NationalPeriod" class="chzn-select" data-placeholder="[% Lang.txt('Select Period') %]">
+						<option value=""></option>
+							[% FOREACH opt IN NationalPeriod.options.keys.sort %]
 								<option value="[% opt %]">[% NationalPeriod.options.$opt %]</option>
 							[% END %]	
 					</select>
-				</td>
-			</tr> 
-		</table>
+						</div>
+					</div>		
 
-		[% FOREACH hidden IN carryfields.keys %]
-			<input type="hidden" name="[% hidden %]" value="[% carryfields.$hidden %]" /> 		
-		[% END %]
-		<br />
-		<div class="HTbuttons"><input type="submit" name="subbut" value="Continue" class="HF_submit button proceed-button" id="HFsubbut"></div>
-	</form>
+				</div>
+
+			[% FOREACH hidden IN carryfields.keys %]
+				<input type="hidden" name="[% hidden %]" value="[% carryfields.$hidden %]" /> 		
+			[% END %]
+
+				<div class="button-row">
+					<div class="txtright">
+						<input id = "flow-btn-continue" type = "submit" value = "[% Lang.txt('Continue') %] "  class = "btn-main btn-proceed">
+					</div>
+				</div>
+		</form>
+	</div>
 </div>
+

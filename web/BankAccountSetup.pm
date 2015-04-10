@@ -188,7 +188,6 @@ sub bankaccount_details	{
 			formname => 'ba_form',
             FormEncoding =>'multipart/form-data',
       submitlabel => "Update",
-      introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
 			NoHTML => 1, 
 			updateSQL => qq[
         UPDATE tblBankAccount

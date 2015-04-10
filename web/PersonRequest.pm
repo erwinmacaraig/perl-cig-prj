@@ -603,9 +603,11 @@ sub submitRequestPage {
                     (
                         strRequestType,
                         intPersonID,
+                        intExistingPersonRegistrationID,
                         strSport,
                         strPersonType,
                         strPersonLevel,
+                        strNewPersonLevel,
                         strPersonEntityRole,
                         intRealmID,
                         intRequestFromEntityID,
@@ -630,6 +632,8 @@ sub submitRequestPage {
                         ?,
                         ?,
                         ?,
+                        ?,
+                        ?,
                         NOW(),
                         NOW()
                     )
@@ -642,8 +646,10 @@ sub submitRequestPage {
             $q->execute(
                 $requestType,
                 $personID,
+                $regDetails->{'intPersonRegistrationID'} || 0,
                 $regDetails->{'strSport'},
                 $regDetails->{'strPersonType'},
+                $regDetails->{'strPersonLevel'},
                 $regDetails->{'strPersonLevel'},
                 $regDetails->{'strPersonEntityRole'},
                 $Data->{'Realm'},
@@ -700,7 +706,12 @@ sub submitRequestPage {
 
     my $query = new CGI;
     my $rType = getRequestType();
+		open FH, ">dumpfile3.txt";
+		print FH "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=PRA_F&rtype=$rType&pr=" . join(',', @requestIDs);
     print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=PRA_F&rtype=$rType&pr=" . join(',', @requestIDs));
+
+
+
     #my $resultHTML;
     #return ($resultHTML, 'Request Summary');
 }
@@ -1337,6 +1348,7 @@ sub getRequests {
             pq.strSport,
             pq.strPersonType,
             pq.strPersonLevel,
+            pq.strNewPersonLevel,
             pq.strPersonEntityRole,
             pq.intRealmID,
             pq.intRequestFromEntityID,
@@ -1467,18 +1479,16 @@ sub finaliseTransfer {
         WHERE
             intEntityID = ?
             AND strPersonType = ?
-            AND strPersonLevel= ?
             AND strSport = ?
             AND intPersonID = ?
             AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
 	];
-            #dtTo= IF(dtTo>NOW(), NOW(), dtTo)
-            #dtFrom = IF(dtFrom>NOW(), NOW(), dtFrom),
+       #AND strPersonLevel= ?
+       #$personRequest->{'strPersonLevel'},
     my $query = $db->prepare($stDates) or query_error($stDates);
     $query->execute(
        $personRequest->{'intRequestToEntityID'},
        $personRequest->{'strPersonType'},
-       $personRequest->{'strPersonLevel'},
        $personRequest->{'strSport'},
        $personRequest->{'intPersonID'}
     ) or query_error($stDates);
@@ -1504,7 +1514,6 @@ sub finaliseTransfer {
             R.intEntityID = ?
             AND R.intNationalPeriodID = ?
             AND R.strPersonType = ?
-            AND R.strPersonLevel= ?
             AND R.strSport = ?
             AND R.intPersonID = ?
             AND R.strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
@@ -1514,12 +1523,13 @@ sub finaliseTransfer {
 
     my $qryNP= $db->prepare($stPeriods) or query_error($stPeriods);
     $qryNP->execute($Data->{'Realm'});
+            #AND R.strPersonLevel= ?
+           #$personRequest->{'strPersonLevel'},
     while (my $pref = $qryNP->fetchrow_hashref) {
         $query->execute(
            $personRequest->{'intRequestToEntityID'},
             $pref->{'intNationalPeriodID'},
            $personRequest->{'strPersonType'},
-           $personRequest->{'strPersonLevel'},
            $personRequest->{'strSport'},
            $personRequest->{'intPersonID'}
         ) or query_error($stDates);
@@ -1536,11 +1546,12 @@ sub finaliseTransfer {
         WHERE
             intEntityID = ?
             AND strPersonType = ?
-            AND strPersonLevel = ?
             AND strSport = ?
             AND intPersonID = ?
             AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
 	];
+            #AND strPersonLevel = ?
+       #$personRequest->{'strPersonLevel'},
 
 ## Basically Set dtTo = NOW if they left before end of peiod.
 ## If dtFrom is in future (if they never started) that period won't be included in Passport
@@ -1551,7 +1562,6 @@ sub finaliseTransfer {
        $Defs::PERSONREGO_STATUS_TRANSFERRED,
        $personRequest->{'intRequestToEntityID'},
        $personRequest->{'strPersonType'},
-       $personRequest->{'strPersonLevel'},
        $personRequest->{'strSport'},
        $personRequest->{'intPersonID'}
     ) or query_error($st);

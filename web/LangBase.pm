@@ -11,6 +11,7 @@ sub txt (@) {
   my @temp = @_;
   $temp[0] =~ s/^\n+//m;
   $temp[0] =~ s/\n+$//m;
+  return $temp[0] if($temp[0] =~ /[^\0-\x7f]/); #return key if key is non-ascii
 
   my $s = $self->maketext(@temp); 
   return $s;

@@ -340,6 +340,9 @@ sub showGrid {
 	my $groupby                  = $params{'groupby'}                  || '';
 	my $coloredTopClass          = $params{'coloredTop'}               || 'yes';
 	my $groupby_collection_name  = $params{'groupby_collection_name'}  || 'items';
+	#
+	my $sortColumn				 = $params{'sortColumn'} || [];
+	#
 	my $display_pager            = exists $params{'display_pager'} 
 		? $params{'display_pager'} 
 		: 1;
@@ -436,6 +439,7 @@ sub showGrid {
     $gridConfig{'language'}{'sZeroRecords'} = $Data->{'lang'}->txt("No matching records found");
 	my ($columndefs , $headerInfo) = processFieldHeaders($columninfo);
     $gridConfig{'columns'} = $columndefs;
+	$gridConfig{'order'} =  $sortColumn;
 	my $config_str = to_json(\%gridConfig);
 	$config_str =~s/"(false|true)"/$1/g;
     my $js = qq[

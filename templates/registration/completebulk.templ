@@ -4,7 +4,32 @@
 		<p>[% Lang.txt('Bulk Registration is complete') %]</p>
 	</div>
 </div>
-[% gateways %]
+
+[% IF payLaterFlag %]
+    <br><br><br>
+    <p>[% Lang.txt("An invoice for this registration has been created.  You can find all your invoices under the 'Payments' Menu.") %]</p>
+    <p>[% Lang.txt("We would like to remind you that the Member Association will not approve the renewals until payment is completed.") %]</p>
+[% END %]
+
+ [% IF payNowFlag and payNowStatus == 1 %]
+                       [% payNowMsg %]
+                    [% END %]
+                    [% IF payNowFlag and payNowStatus == 3 %]
+                        <div align="center" class="warningmsg" style="font-size:14px;">Your payment has been put on Hold.<br>Once processed you will be notified as to Payment Status.</div>
+                    [% END %]
+                    [% IF payNowFlag and (payNowStatus != 1 and payNowStatus != 3) %]
+                        <div align="center" class="warningmsg" style="font-size:14px;">We are sorry, there was a problem with your payment.</div>
+                        <div class="panel-body">
+                            <div class="reg-complete-wrapper">
+                                <p class="reg-complete-text">[% Lang.txt('Registrations have been submitted to') %]: <strong>[% MAName %]</strong> [% Lang.txt('and an invoice has been created.  You can pay anytime by going to the Payments Menu and choose the corresponding invoice') %]<br /><br /></p>
+                            </div>
+                        </div>
+                    [% END %]
+<!--
 <div class = "button-row">
     <a href="[% target %]?client=[% client %]&amp;a=WF_" class="pull-right btn-main">[% Lang.txt("Go to your dashboard") %]</a>
+</div> 
+-->
+<div class = "button-row">
+	<a href="[% target %]?client=[% client %]&amp;a=PFB_" class="btn-main pull-right">[% Lang.txt("Return to Bulk Renewals") %]</a></div>
 </div>

@@ -81,6 +81,7 @@ sub listPendingRegistrations    {
             DATE_FORMAT(pr.dtLastUpdated, "%Y%m%d%H%i") as dtLastUpdated_,
             er.strEntityRoleName,
             WFT.strTaskType as WFTTaskType,
+		WR.intAutoActivateOnPayment,
             ApprovalEntity.strLocalName as ApprovalLocalName,
             ApprovalEntity.strLatinName as ApprovalEntityName,
             RejectedEntity.strLocalName as RejectedLocalName,
@@ -102,6 +103,9 @@ sub listPendingRegistrations    {
                 AND WFT.intPersonID = pr.intPersonID
                 AND WFT.strTaskStatus IN ('ACTIVE')
             )
+		LEFT JOIN tblWFRule as WR ON (
+			WR.intWFRuleID = WFT.intWFRuleID
+		)
             LEFT JOIN tblEntity as ApprovalEntity ON (
                 ApprovalEntity.intEntityID = WFT.intApprovalEntityID
             )
@@ -140,6 +144,11 @@ sub listPendingRegistrations    {
             $taskTo= $entitylocalname;
             $taskTo.= qq[ ($dref->{'RejectedEntityName'})] if ($dref->{'RejectedEntityName'});
         }
+	my $status = $lang->txt($Defs::personRegoStatus{$dref->{'displayStatus'}});
+	if ($dref->{'intAutoActivateOnPayment'})	{
+		$status = $lang->txt('Approved upon Payment');
+		$taskTo='-';
+	}
         push @rowdata, {
             id => $dref->{'intPersonRegistrationID'} || 0,
             dtAdded=> $Data->{'l10n'}{'date'}->TZformat($dref->{'dtAdded'}|| '' , 'MEDIUM','SHORT'),
@@ -149,7 +158,7 @@ sub listPendingRegistrations    {
             AgeLevel=> $lang->txt($Defs::ageLevel{$dref->{'strAgeLevel'}}) || '',
             RegistrationNature=> $lang->txt($Defs::registrationNature{$dref->{'strRegistrationNature'}}) || '',
             #Status=> $Defs::wfTaskStatus{$dref->{'strStatus'}} || '',
-            Status=> $lang->txt($Defs::personRegoStatus{$dref->{'displayStatus'}}) || '',
+            Status=> $status,
             PersonEntityRole=> $lang->txt($dref->{'strEntityRoleName'} || $dref->{'strPersonEntityRole'}) || '',
             Sport=> $lang->txt($Defs::sportType{$dref->{'strSport'}}) || '',
             LocalName=>$localname,

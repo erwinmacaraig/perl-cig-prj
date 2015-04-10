@@ -202,13 +202,13 @@ sub getEntityMenuData {
     #if(exists $children->{$Defs::LEVEL_VENUE})    {
     if($SystemConfig->{'allowVenues'})  {
         $menuoptions{'venues'} = {
-            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}),
+            name => $lang->txt('Venues'),
             url => $baseurl."a=VENUE_L&amp;l=$Defs::LEVEL_VENUE",
         };
     }
     #if(exists $children->{$Defs::LEVEL_PERSON})    {
         $menuoptions{'persons'} = {
-            name => $lang->txt("List $Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}"),
+            name => $lang->txt("List Persons"),
             url => $baseurl."a=P_L&amp;l=$Defs::LEVEL_PERSON",
         };
     #}
@@ -439,8 +439,24 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
             };
         }
     }
+    if ($SystemConfig->{'allowPayInvoice'}) {
+		$menuoptions{'bulkpayment'} = { 
+			name => $lang->txt('Pay Invoice'),
+			url => $baseurl."a=TXN_PAY_INV",
+		}; 
+		$menuoptions{'payinvoice'} = { 
+			name => $lang->txt('Invoices'),
+			    url => $baseurl."strInvoiceNumber=&amp;a=TXN_PAY_INV_NUM",
+		}; 
+    }
+		if ($SystemConfig->{'allowPaymentsHistory'})	{
+			$menuoptions{'paymenthistory'} = { 
+			    name => $lang->txt('Payments History'),
+				url => $baseurl."a=P_TXNLog_list",
+			};
+		}
+	# P_TXNLog_list url => $baseurl."a=TXN_PAY_HISTORY",
 
-    
     my @menu_structure = (
         [ $lang->txt('Dashboard'), 'home','home'],
         [ $lang->txt('States'), 'menu','states'],
@@ -452,6 +468,7 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
         ]],
         [ $lang->txt('Venues'), 'menu',[
             'venues',
+
             'addvenue'
         ]],
         [ $lang->txt('People'), 'menu',[
@@ -478,6 +495,11 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
         ]],
         [ $lang->txt('My Association'), 'menu',[
         'myAssociation',
+        ]],
+        [ $lang->txt('Payments'), 'menu',[
+		    'payinvoice',
+		    'bulkpayment',
+		    'paymenthistory',
         ]],
         [ $lang->txt('Search'), 'search',[
         'advancedsearch',
@@ -548,7 +570,7 @@ sub getClubMenuData {
     }
     if($SystemConfig->{'allowVenues'})  {
         $menuoptions{'venues'} = {
-            name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}),
+            name => $lang->txt('List Venues'),
             url => $baseurl."a=VENUE_L&amp;l=$Defs::LEVEL_VENUE",
         };
     }
@@ -757,11 +779,23 @@ sub getClubMenuData {
             };
         }
         if ($SystemConfig->{'allowPayInvoice'}) {
-		$menuoptions{'bulkpayment'} = { 
-			name => $lang->txt('Pay Invoice'),
-			url => $baseurl."a=TXN_PAY_INV",
-		}; 
+		    $menuoptions{'bulkpayment'} = { 
+			    name => $lang->txt('Pay Invoice'),
+			    url => $baseurl."a=TXN_PAY_INV",
+		    }; 
+		    $menuoptions{'payinvoice'} = { 
+			    name => $lang->txt('Invoices'),
+			    url => $baseurl."strInvoiceNumber=&amp;a=TXN_PAY_INV_NUM",
+		    }; 
         }
+		if ($SystemConfig->{'allowPaymentsHistory'})	{
+			$menuoptions{'paymenthistory'} = { 
+				name => $lang->txt('Payments History'),
+				url => $baseurl."a=P_TXNLog_list",
+			};
+		}
+		# url => $baseurl."a=TXN_PAY_HISTORY"
+
         if ($SystemConfig->{'allowPersonRequest'}) {
             $menuoptions{'requestaccess'} = {
             name => $lang->txt('Request for Person Details'),
@@ -854,7 +888,6 @@ sub getClubMenuData {
         'listrequests',
         'duplicates',
         'bulk',
-		'bulkpayment',
         'persons',
          ]],
 
@@ -873,6 +906,12 @@ sub getClubMenuData {
         ]],
          [ $lang->txt('Audit Trail'), 'menu',[
             'auditlog'
+        ]],
+         [ $lang->txt('Payments'), 'menu',[
+		    'payinvoice',
+		    'bulkpayment',
+		    'paymenthistory',
+
         ]],
 
         [ $lang->txt("Club Documents"), 'menu','clubdocs'],
@@ -897,6 +936,7 @@ sub getClubMenuData {
 
 sub getEntityChildrenTypes  {
     my($db, $ID, $realmID) = @_;
+
     my %existingChildren = ();
 
     my $st = qq[
@@ -1094,7 +1134,13 @@ sub getPersonMenuData {
     my $txns_link_name = $lang->txt('Transactions');
     if($SystemConfig->{'AllowTXNs'}) {
        $menuoptions{'transactions'} = {
+		   name => $lang->txt('List Transactions'),
            url => $baseurl."a=P_TXNLog_list",
+       };
+	   
+	   $menuoptions{'addtransactions'} = {
+		   name => $lang->txt('Add Transactions'),
+           url => $baseurl."a=P_TXN_ADD",
        };
     }
     $menuoptions{'docs'} = {
@@ -1134,7 +1180,7 @@ sub getPersonMenuData {
     my @menu_structure = (
         [ $lang->txt('Person Dashboard'), 'home','home'],
         [ $lang->txt('Player Passport'), 'menu','passport'],
-        [ $lang->txt('Transactions'), 'menu','transactions'],
+        [ $lang->txt('Transactions'), 'menu',['transactions','addtransactions']],
         [ $lang->txt('Certificates'), 'menu','certificates'],
         [ $lang->txt('History'), 'menu',[
             'regos',

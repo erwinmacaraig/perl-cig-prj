@@ -16,6 +16,7 @@ require Exporter;
     save_rego_products
     add_rego_record
     bulkRegoSubmit
+    bulkRegoCreate
     checkUploadedRegoDocuments
     getRegoTXNDetails
 );
@@ -50,34 +51,41 @@ use Switch;
 sub displayRegoFlowCompleteBulk {
 
     my ($Data, $client, $hidden_ref) = @_;
-    my ($unpaid_cost, $logIDs) = getRegoTXNDetails($Data, $hidden_ref->{'txnIds'});
-    $hidden_ref->{'totalAmount'} = $unpaid_cost;
+    my $payMethod= $hidden_ref->{'payMethod'} || param('payMethod') || '';
+
+    my ($amountDue, $logIDs) = getRegoTXNDetails($Data, $hidden_ref->{'txnIds'});
+    $hidden_ref->{'totalAmount'} = $amountDue;
     my $gateways = '';
 
-    #if ($Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'} && $hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0)   {
-    #	if ($hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0) {
+    my $paymentResult = '';
+    my $payStatus = 0;
+    my $logID = param('tl') || 0;
+	my $intID = param('rolloverIDs') || 0;
+    ($payStatus, $paymentResult) = displayPaymentResult($Data, $logID, 1, '');
+	my $receiptLink = qq[printreceipt.cgi?client=$client&ids=$logID&pID=$intID];
+	$paymentResult .= qq[
+	<div class="row">
+         <div class="col-md-12"><a href="$receiptLink" target="receipt">] . $Data->{'lang'}->txt('Print Receipt') . qq[</a></div>
+    </div>];
+     $payMethod = '' if (!$amountDue and $payStatus == -1);
 
-    if ($Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'} && $unpaid_cost)  { #hidden_ref->{'totalAmount'} && $hidden_ref->{'totalAmount'} > 0)   {
-    print STDERR "SSS";    
-
-        $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, '');
-    }
+    my $maObj = getInstanceOf($Data, 'national');
+    my $maName = $maObj
+            ? $maObj->name()
+            : '';
+		
     my %PageData = (
+        payNowFlag=> ($payMethod eq 'now') ? 1 : 0,
+        payNowMsg=> (! $amountDue and $payMethod eq 'now') ? $paymentResult : '',
+        payNowStatus=> $payStatus,
+        payLaterFlag=> ($amountDue and $payMethod eq 'later') ? 1 : 0,
         target => $Data->{'target'},
         Lang => $Data->{'lang'},
         client=>$client,
-        gateways => $gateways,
+	MAName => $maName
     );
-
+        
     my $body = runTemplate($Data, \%PageData, 'registration/completebulk.templ') || '';
-
-    my $logID = param('tl') || 0;
-    $logIDs->{$logID}=1;
-    foreach my $id (keys %{$logIDs}) {
-        next if ! $id;
-#        $body .= displayPayResult($Data, $id);
-        $body .= displayPaymentResult($Data, $id, 1, '');
-    }
     
     return ($body, $gateways);
 }
@@ -88,6 +96,11 @@ sub displayRegoFlowSummaryBulk  {
     my $lang=$Data->{'lang'};
 	
     my $body = '';
+
+    my ($unpaid_cost, $logIDs) = getRegoTXNDetails($Data, $hidden_ref->{'txnIds'});
+    $hidden_ref->{'totalAmount'} = $unpaid_cost;
+    my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
+    my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
 
     my @products= split /:/, $hidden_ref->{'prodIds'};
     foreach my $prod (@products){ $hidden_ref->{"prod_$prod"} =1;}
@@ -100,55 +113,36 @@ sub displayRegoFlowSummaryBulk  {
 		my $c = Countries::getISOCountriesHash();
     
     my @People=();
+    my $txnCount = 0;
+    my $amountDue = 0;
+    my $logIDs;
     for my $pID (@IDs)   {
         my $personObj = getInstanceOf($Data, 'person', $pID);
         my %personData = ();
+        $regoID = $hidden_ref->{"regoID_$pID"} || 0;
+        my ($txnCountSingle, $amountDueSingle, $logIDsSingle) = getPersonRegoTXN($Data, $pID, $regoID);
+        $txnCount += $txnCountSingle;
+        $amountDue += $amountDueSingle;
         $personData{'MAID'} = $personObj->getValue('strNationalNum');
         $personData{'Name'} = $personObj->getValue('strLocalFirstname');
         $personData{'Familyname'} = $personObj->getValue('strLocalSurname');
-        $personData{'Maidenname'} = $personObj->getValue('strMaidenName');
         $personData{'DOB'} = $personObj->getValue('dtDOB');
         $personData{'Gender'} = $Data->{'lang'}->txt($Defs::genderInfo{$personObj->getValue('intGender') || 0}) || '';
         $personData{'Nationality'} = $c->{$personObj->getValue('strISONationality')};
         $personData{'Country'} = $c->{$personObj->getValue('strISOCountryOfBirth')} || '';
-        $personData{'Region'} = $personObj->getValue('strRegionOfBirth') || '';
-
-        $personData{'Addressone'} = $personObj->getValue('strAddress1') || '';
-        $personData{'Addresstwo'} = $personObj->getValue('strAddress2') || '';
-        $personData{'City'} = $personObj->getValue('strSuburb') || '';
-        $personData{'State'} = $personObj->getValue('strState') || '';
-        $personData{'Postal'} = $personObj->getValue('strPostalCode') || '';
-        $personData{'Phone'} = $personObj->getValue('strPhoneHome') || '';
-        $personData{'Countryaddress'} = $c->{$personObj->getValue('strISOCountry')} || '';
-        $personData{'Email'} = $personObj->getValue('strEmail') || '';
+        $personData{'AmountDue'} = $amountDueSingle || 0;
         push @People, \%personData;
     }
 
-
-    my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
-    my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
-    my $gateways = '';
-    my $txnCount = 0;
-    my $logIDs;
     my $txn_invoice_url = $Defs::base_url."/printinvoice.cgi?client=$client&amp;rID=$hidden_ref->{'rID'}&amp;pID=$personID";
-    ($txnCount, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
-     if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
-        $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
-     }
-     
+    my $gatewayConfig = undef;
+    if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
+        $gatewayConfig = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
+        $gatewayConfig->{'amountDue'} = $amountDue;
+    }
       
-    my $personObj = getInstanceOf($Data, 'person');
-    
-    my $languages = PersonLanguages::getPersonLanguages( $Data, 1, 0);
-    #for my $l ( @{$languages} ) {
-    #    if($l->{intLanguageID} == $personObj->getValue('intLocalLanguage')){
-    #        $personData{'Language'} = $l->{'language'};			
-    #        last;	
-    #    }
-    #}
     my $role_ref = getEntityTypeRoles($Data, $hidden_ref->{'d_sport'}, $hidden_ref->{'d_type'});
     $rego_ref->{'roleName'} = $role_ref->{$hidden_ref->{'d_role'}};
-
     $rego_ref->{'Sport'} = $Defs::sportType{$hidden_ref->{'d_sport'}} || '';
     $rego_ref->{'PersonType'} = $Defs::personType{$hidden_ref->{'d_type'}} || '';
     $rego_ref->{'PersonLevel'} = $Defs::personLevel{$hidden_ref->{'d_level'}} || '';
@@ -156,17 +150,23 @@ sub displayRegoFlowSummaryBulk  {
     $rego_ref->{'RegistrationNature'} = $Defs::registrationNature{$hidden_ref->{'d_nat'}} || '';
 
     my $entityObj = getInstanceOf($Data, 'entity', $entityID);
-    if ($entityObj) {
-        $rego_ref->{'strLocalName'} = $entityObj->getValue('strLocalName');
-    }
-
+    if ($entityObj) { $rego_ref->{'strLocalName'} = $entityObj->getValue('strLocalName'); }
 
     my $editlink =  $Data->{'target'}."?".$carryString;
+    $hidden_ref->{'payMethod'} = 'notrequired' if (! $amountDue);
+
+    my %PaymentConfig = (
+        totalAmountDue => $amountDue,
+			totalPaymentDue => $amountDue,
+        dollarSymbol => $Data->{'SystemConfig'}{'DollarSymbol'} || '$',
+        paymentMethodText => $Defs::paymentMethod{$hidden_ref->{'payMethod'}} || '',
+    );
+
+	my $displayPayment = ($amountDue and $hidden_ref->{'payMethod'}) ? 1 : 0;
     my %PageData = (
         person_home_url => $url,
         people=> \@People,
         registration => $rego_ref,
-        gateways => $gateways,
         txnCount => $txnCount,
         target => $Data->{'target'},
         RegoStatus => $rego_ref->{'strStatus'},
@@ -174,18 +174,12 @@ sub displayRegoFlowSummaryBulk  {
         Lang => $Data->{'lang'},
         client=>$client,
         editlink => $editlink,
+        DisplayPayment => $displayPayment,
+        payment => \%PaymentConfig,
     );
     
     $body = runTemplate($Data, \%PageData, 'registration/summarybulk.templ') || '';
-    my $logID = param('tl') || 0;
-    $logIDs->{$logID}=1;
-    foreach my $id (keys %{$logIDs}) {
-        next if ! $id;
-   #     $body .= displayPayResult($Data, $id);
-        $body .= displayPaymentResult($Data, $id, 1, '');
-    }
-
-    return $body;
+    return ($body, $gatewayConfig);
 }
 
 sub displayRegoFlowSummary {
@@ -193,7 +187,7 @@ sub displayRegoFlowSummary {
     my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref, $carryString) = @_;
     my $lang=$Data->{'lang'};
 	
-print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~displayRegoFlowSummary $personID\n";
+#print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~displayRegoFlowSummary $personID\n";
     my $ok = 0;
     if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER' or $rego_ref->{'registrationNature'} eq 'TRANSFER') {
         $ok=1;
@@ -214,6 +208,8 @@ print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~displayRegoFlowSummary $personID\n";
         );
         $body = runTemplate($Data, \%PageData, 'registration/error.templ') || '';
     }
+        my $gatewayConfig = undef;
+    my $amountDue = 0;
     if ($ok)   {
         my @products= split /:/, $hidden_ref->{'prodIds'};
         foreach my $prod (@products){ $hidden_ref->{"prod_$prod"} =1;}
@@ -226,14 +222,14 @@ print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~displayRegoFlowSummary $personID\n";
 
         my $url = $Data->{'target'}."?client=$client&amp;a=P_HOME;";
         my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
-        my $gateways = '';
 	 	my $txnCount = 0;
 		my $logIDs;
 		my $txn_invoice_url = $Defs::base_url."/printinvoice.cgi?client=$client&amp;rID=$hidden_ref->{'rID'}&amp;pID=$personID";
-        ($txnCount, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
+        ($txnCount, $amountDue, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
          if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
-            $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
+            $gatewayConfig = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
          }
+        $gatewayConfig->{'amountDue'} = $amountDue;
          
           
 	    my $personObj = getInstanceOf($Data, 'person');
@@ -361,13 +357,21 @@ $sth = $Data->{'db'}->prepare($query);
 		} 
 
 		################################################
+        $hidden_ref->{'payMethod'} = 'notrequired' if (! $amountDue);
+        my %PaymentConfig = (
+            totalAmountDue => $amountDue,
+			totalPaymentDue => $amountDue,
+            dollarSymbol => $Data->{'SystemConfig'}{'DollarSymbol'} || '$',
+            paymentMethodText => $Defs::paymentMethod{$hidden_ref->{'payMethod'}} || '',
+        );
+            
         my $editlink =  $Data->{'target'}."?".$carryString;
+	my $displayPayment = ($amountDue and $hidden_ref->{'payMethod'}) ? 1 : 0;
         my %PageData = (
             person_home_url => $url,
 			person => \%personData,
 			registration => $rego_ref,
 			alldocs => \%existingDocuments,
-            gateways => $gateways,
 			txnCount => $txnCount,
             target => $Data->{'target'},
             RegoStatus => $rego_ref->{'strStatus'},
@@ -376,6 +380,8 @@ $sth = $Data->{'db'}->prepare($query);
             client=>$client,
             editlink => $editlink,
             certifications => join(', ', @certString),
+            DisplayPayment => $displayPayment,
+            payment => \%PaymentConfig,
         );
         
         $body = runTemplate($Data, \%PageData, 'registration/summary.templ') || '';
@@ -384,19 +390,21 @@ $sth = $Data->{'db'}->prepare($query);
         foreach my $id (keys %{$logIDs}) {
             next if ! $id;
        #     $body .= displayPayResult($Data, $id);
-            $body .= displayPaymentResult($Data, $id, 1, '');
+            #$body .= displayPaymentResult($Data, $id, 1, '');
         }
     }
 	
-    return $body;
+    #return $body;
+    return ($body, $gatewayConfig);
 }
     
 sub displayRegoFlowComplete {
 
     my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref) = @_;
+
     my $lang=$Data->{'lang'};
 
-    my $ok = 0;
+    my $ok = 1;
     my $run = $hidden_ref->{'run'} || param('run') || 0;
     if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER' or $rego_ref->{'registrationNature'} eq 'TRANSFER') {
         $ok=1;
@@ -404,6 +412,7 @@ sub displayRegoFlowComplete {
     else    {
         $ok = $run ? 1 : checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'strSport'}, $rego_ref->{'strPersonType'}, $rego_ref->{'strPersonEntityRole'}, $rego_ref->{'strPersonLevel'}, $rego_ref->{'strAgeLevel'});
     }
+    my $payMethod= $hidden_ref->{'payMethod'} || param('payMethod') || '';
     my $body = '';
     my $gateways = '';
     if (!$ok)   {
@@ -420,7 +429,7 @@ sub displayRegoFlowComplete {
     }
     $rego_ref->{'personTypeText'} = $Defs::personType{$rego_ref->{'personType'}} || $Defs::personType{$rego_ref->{'strPersonType'}} || '';
     if ($ok)   {
-        submitPersonRegistration(
+        PersonRegistration::submitPersonRegistration(
             $Data, 
             $personID,
             $regoID,
@@ -441,13 +450,14 @@ sub displayRegoFlowComplete {
         my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
 	 	my $txnCount = 0;
 		my $logIDs;
+        my $amountDue = 0;
 		my $txn_invoice_url = $Defs::base_url."/printinvoice.cgi?client=$client&amp;rID=$hidden_ref->{'rID'}&amp;pID=$personID";
-        ($txnCount, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
+        ($txnCount, $amountDue, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
         savePlayerPassport($Data, $personID) if (! $run);
         $hidden_ref->{'run'} = 1;
-         if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
-            $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
-         }
+         #if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
+         #   $gateways = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
+         #}
          
        
 	    my $personObj = getInstanceOf($Data, 'person', $personID);
@@ -478,7 +488,6 @@ sub displayRegoFlowComplete {
 		$rego_ref->{'MA'} = $maName || '';
 		
 		#$personData{''} = $personObj->getValue('') || '';
-
 		
 	
  		my $languages = PersonLanguages::getPersonLanguages( $Data, 1, 0);
@@ -521,7 +530,19 @@ sub displayRegoFlowComplete {
     $cv{'currentLevel'} = $originLevel;
     my $originClient = setClient(\%cv);
    
+	    ## PaymentMethod
+        #payLaterOn	 = 1/0
+        my $logID = param('tl') || 0;
+        my $paymentResult = '';
+        my $payStatus = 0;
+        ($payStatus, $paymentResult) = displayPaymentResult($Data, $logID, 1, '');
+
+        $payMethod = '' if (!$amountDue and $payStatus == -1);
         my %PageData = (
+            payLaterFlag=> ($amountDue and $payMethod eq 'later') ? 1 : 0,
+            payNowFlag=> ($payMethod eq 'now') ? 1 : 0,
+            payNowMsg=> (! $amountDue and $payMethod eq 'now') ? $paymentResult : '',
+            payNowStatus=> $payStatus,
             person_home_url => $url,
 			person => \%personData,
 			registration => $rego_ref,
@@ -547,13 +568,6 @@ sub displayRegoFlowComplete {
         }
         else {
             $body = runTemplate($Data, \%PageData, 'registration/complete.templ') || '';
-        }
-        my $logID = param('tl') || 0;
-        $logIDs->{$logID}=1;
-        foreach my $id (keys %{$logIDs}) {
-            next if ! $id;
-       #     $body .= displayPayResult($Data, $id);
-            $body .= displayPaymentResult($Data, $id, 1, '');
         }
     }
     return ($body, $gateways);
@@ -593,7 +607,7 @@ sub getPersonRegoTXN    {
     my ($Data, $personID, $regoID) = @_;
 
     my $st = qq[
-        SELECT intTransLogID, intTransactionID, intStatus
+        SELECT curAmount, intTransLogID, intTransactionID, intStatus
         FROM tblTransactions
         WHERE
             intRealmID =?
@@ -606,13 +620,15 @@ sub getPersonRegoTXN    {
 	$qry->execute($Data->{'Realm'}, $personID, $regoID);
     my $count = 0;
    my %tlogIDs=();
+    my $amount = 0;
     while (my $dref= $qry->fetchrow_hashref())  {
         $tlogIDs{$dref->{'intTransLogID'}} = 1 if ($dref->{'intTransLogID'} and ! exists $tlogIDs{$dref->{'intTransLogID'}});
         if ($dref->{'intStatus'} == 0)  {
+            $amount += $dref->{'curAmount'};
             $count++;
         }
     }
-    return ($count, \%tlogIDs);
+    return ($count, $amount, \%tlogIDs);
 }
 
 sub displayRegoFlowCheckout {
@@ -687,7 +703,7 @@ sub checkUploadedRegoDocuments {
         $rego_ref,
      );
 
-print STDERR "~~~~~~~~~~~~~~~CHECK UPLOADED REGO DOCUMENTS:$entityRegisteringForLevel $entityID $personID $regoID\n";
+#print STDERR "~~~~~~~~~~~~~~~CHECK UPLOADED REGO DOCUMENTS:$entityRegisteringForLevel $entityID $personID $regoID\n";
 	#check for Approved Documents that do not need to be uploaded
 	my @validdocsforallrego = ();
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
@@ -812,7 +828,7 @@ sub displayRegoFlowDocuments{
 	#				WHERE tblDocuments.intPersonID = ? AND intPersonRegistrationID = ?;	
 	#];
    
-print STDERR "~~~~~~~~~~~~~~~displayRegoFlowDocuments\n";
+#print STDERR "~~~~~~~~~~~~~~~displayRegoFlowDocuments\n";
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
     my $query = qq [
         SELECT
@@ -880,7 +896,7 @@ AND tblRegistrationItem.strPersonType IN ('', ?)
     $PersonRef{'strPersonType'} = $rego_ref->{'strPersonType'} || '';
     $PersonRef{'strAgeLevel'} = $rego_ref->{'strAgeLevel'} || '';
     my $personRegoNature = 'NEW';
-    my $pref = loadPersonDetails($Data->{'db'}, $personID);
+    my $pref = Person::loadPersonDetails($Data->{'db'}, $personID);
 
     if ($pref->{'strStatus'} ne $Defs::PERSON_STATUS_INPROGRESS){
         $personRegoNature = 'RENEWAL';
@@ -989,7 +1005,6 @@ sub displayRegoFlowProducts {
     my $lang=$Data->{'lang'};
 
     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_PU&amp;rID=$regoID";
-print STDERR "SSS: $entityRegisteringForLevel\n";
 #    my $pref = loadPersonDetails($Data->{'db'}, $personID);
  #   $rego_ref->{'Nationality'} = $pref->{'strISONationality'};
     my $CheckProducts = getRegistrationItems(
@@ -1003,7 +1018,9 @@ print STDERR "SSS: $entityRegisteringForLevel\n";
         0,
         $rego_ref,
     );
+	
     my @prodIDs = ();
+	my $totalamountchk = 0;
     my %ProductRules=();
     foreach my $product (@{$CheckProducts})  {
         #next if($product->{'UseExistingThisEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'THIS_ENTITY'));
@@ -1014,24 +1031,36 @@ print STDERR "SSS: $entityRegisteringForLevel\n";
 
         push @prodIDs, $product->{'ID'};
         $ProductRules{$product->{'ID'}} = $product;
+		#$totalamountchk += $product->{'ProductPrice'};
+		$totalamountchk += $product->{'ProductPrice'} if($product->{'Required'} && $product->{'ProductPrice'} > 0);
      }
     my $product_body='';
     if (@prodIDs)   {
         $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
+
     }
     else    {
         return '';
     }
-
+	my $maObj = getInstanceOf($Data, 'national');
+        my $maName = $maObj
+            ? $maObj->name()
+            : '';
+		$rego_ref->{'MA'} = $maName || '';
      my %PageData = (
         nextaction=>"PREGF_PU",
         target => $Data->{'target'},
         product_body => $product_body,
+        mandatoryPayment => $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'},
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
         client=>$client,
+		amountCheck => $totalamountchk,
         NoFormFields =>$noFormFields,
+		AssociationName => $maName,
+		payMethod => $rego_ref->{'payMethod'},
     );
+	
     my $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ') || '';
 
     return $pagedata;
@@ -1042,7 +1071,7 @@ sub displayRegoFlowProductsBulk {
     my $lang=$Data->{'lang'};
 
     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_PU&amp;rID=$regoID";
-    my $pref = loadPersonDetails($Data->{'db'}, $personID);
+    my $pref = Person::loadPersonDetails($Data->{'db'}, $personID);
     $rego_ref->{'Nationality'} = $pref->{'strISONationality'};
     my $CheckProducts = getRegistrationItems(
         $Data,
@@ -1057,9 +1086,11 @@ sub displayRegoFlowProductsBulk {
     );
     my @prodIDs = ();
     my %ProductRules=();
+	my $totalamountchk = 0;
     foreach my $product (@{$CheckProducts})  {
         push @prodIDs, $product->{'ID'};
         $ProductRules{$product->{'ID'}} = $product;
+		$totalamountchk += $product->{'ProductPrice'} if($product->{'Required'} && $product->{'ProductPrice'} > 0);
      }
     my $product_body='';
     if (@prodIDs)   {
@@ -1074,11 +1105,14 @@ sub displayRegoFlowProductsBulk {
         target => $Data->{'target'},
         product_body => $product_body,
         allowManualPay=> 0,
+        mandatoryPayment => $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'},
         manualPaymentTypes => \%Defs::manualPaymentTypes,
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
         NoFormFields =>1,
         client=>$client,
+		amountCheck => $totalamountchk,
+		payMethod => $rego_ref->{'payMethod'},
     );
     my $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ') || '';
 
@@ -1092,41 +1126,42 @@ sub generateRegoFlow_Gateways   {
 
     my $lang = $Data->{'lang'};
     my ($paymentSettings, $paymentTypes) = getPaymentSettings($Data, 0, 0, $Data->{'clientValues'});
-    my $gateway_body = '';
+    my %gatewayBtns = ();
     my $gatewayCount = 0;
     my $paymentType = 0;
     foreach my $gateway (@{$paymentTypes})  {
         $gatewayCount++;
-        my $id = $gateway->{'intPaymentConfigID'};
         my $pType = $gateway->{'paymentType'};
         $paymentType = $pType;
-        my $name = $gateway->{'gatewayName'};
-        $gateway_body .= qq[
-            <input type="submit" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "btn-main"><br><br>
-        ];
+        last;
     }
-    $gateway_body = '' if ! $gatewayCount;
     my $target = 'paytry.cgi';#$Data->{'target'};
 
     my $txnList = displayTXNToPay($Data, $hidden_ref->{'txnIds'}, $paymentSettings);
-    my %PageData = (
-        nextaction=>$nextAction,
-        target => $target,
-        txnList =>$txnList,
-        gateway_body => $gateway_body,
-        hidden_ref=> $hidden_ref,
-        Lang => $Data->{'lang'},
-        client=>$client,
-		txn_invoice_url => $txn_invoice_url,
-    );
     if ($gatewayCount == 1) {
         $hidden_ref->{"pt_submit[1]"} = $paymentType; 
+        $hidden_ref->{"cc_submit[1]"} = $paymentType; 
         $hidden_ref->{"gatewayCount"} = 1;
     }
     else    {
         $hidden_ref->{"gatewayCount"} = $gatewayCount;
     }
-    return runTemplate($Data, \%PageData, 'registration/show_gateways.templ') || '';
+    $hidden_ref->{"client"} = $client;
+    my $HiddenFields = '';
+    foreach my $hf (keys %{$hidden_ref})    {
+        next if $hf eq 'rfp';
+        $HiddenFields .= qq[<input type="hidden" name="$hf" value="$hidden_ref->{$hf}">\n];
+    }
+    my %GatewayConfig= (
+        nextaction=>$nextAction,
+        Target => $target,
+        txnList =>$txnList,
+        ContinueBtns=> \%gatewayBtns,
+        HiddenFields=> $HiddenFields,
+        client=>$client,
+		txn_invoice_url => $txn_invoice_url,
+    );
+    return \%GatewayConfig;
 }
 
 sub validateRegoID {
@@ -1136,7 +1171,7 @@ sub validateRegoID {
         personRegistrationID => $regoID,
         entityID => $entityID || 0,
     );
-    my ($count, $regs) = getRegistrationData(
+    my ($count, $regs) = PersonRegistration::getRegistrationData(
         $Data, 
         $personID,
         \%Reg
@@ -1208,7 +1243,7 @@ sub add_rego_record{
         personRequestID => $personRequestID,
         MAComment => $MAComment || '',
     };
-    my ($personStatus, $prStatus) = checkIsSuspended($Data, $personID, $entityID, $rego_ref->{'personType'});
+    my ($personStatus, $prStatus) = PersonRegistration::checkIsSuspended($Data, $personID, $entityID, $rego_ref->{'personType'});
     return (0, undef, 'SUSPENDED') if ($personStatus eq 'SUSPENDED' or $prStatus eq 'SUSPENDED');
     	
     warn "REGISTRATION NATURE $rego_ref->{'registrationNature'}";
@@ -1218,21 +1253,22 @@ sub add_rego_record{
     }
 
     if ($rego_ref->{'registrationNature'} eq 'RENEWAL') {
-        my $ok = checkRenewalRegoOK($Data, $personID, $rego_ref);
+print STDERR "ABOUT TO CHECKRENEWAL\n";
+        my $ok = PersonRegistration::checkRenewalRegoOK($Data, $personID, $rego_ref);
         return (0, undef, 'RENEWAL_FAILED') if (!$ok);
     }
     if ($rego_ref->{'registrationNature'} eq 'NEW') {
-        my $ok = checkNewRegoOK($Data, $personID, $rego_ref);
+        my $ok = PersonRegistration::checkNewRegoOK($Data, $personID, $rego_ref);
         return (0, undef, 'NEW_FAILED') if (!$ok);
     }
-    my ($regID,$rc) = addRegistration($Data,$rego_ref);
+	
+    my ($regID,$rc) = PersonRegistration::addRegistration($Data,$rego_ref);
     if ($regID)     {
         return ($regID, $rego_ref, '');
     }
     return (0, undef, '');
 }
- 
-sub bulkRegoSubmit {
+sub bulkRegoCreate  {
 
     my ($Data, $bulk_ref, $rolloverIDs, $productIDs, $productQtys, $markPaid, $paymentType) = @_;
 
@@ -1256,21 +1292,26 @@ sub bulkRegoSubmit {
             'MINOR'
     );
 
-	my $invoiceNumber;
-	#Generate invoice number 
-	my $stt = qq[INSERT INTO tblInvoice (tTimeStamp, intRealmID) VALUES (NOW(), $Data->{'Realm'})];
-	my $qryy=$Data->{'db'}->prepare($stt); 
-	$qryy->execute();
-	my $invoiceID =  $qryy->{mysql_insertid} || 0;	
-	$invoiceNumber = Payments::TXNtoInvoiceNum($invoiceID); 
+	#generate a single invoice number for each registration renewal	
+	my $invoiceID = 0;
+	if(!$Data->{'SystemConfig'}{'bulkRego_eachInvoice'}){		
+		my $invoiceNumber;
+		#Generate invoice number 
+		my $stt = qq[INSERT INTO tblInvoice (tTimeStamp, intRealmID) VALUES (NOW(), $Data->{'Realm'})];
+		my $qryy=$Data->{'db'}->prepare($stt); 
+		$qryy->execute();
+		$invoiceID =  $qryy->{mysql_insertid} || 0;	
+		$invoiceNumber = Payments::TXNtoInvoiceNum($invoiceID); 
 
-	$stt = qq[UPDATE tblInvoice SET strInvoiceNumber = ? WHERE intInvoiceID = ?];		
-	$qryy=$Data->{'db'}->prepare($stt); 
-	$qryy->execute($invoiceNumber,$invoiceID); 
-	$qryy->finish();
+		$stt = qq[UPDATE tblInvoice SET strInvoiceNumber = ? WHERE intInvoiceID = ?];		
+		$qryy=$Data->{'db'}->prepare($stt); 
+		$qryy->execute($invoiceNumber,$invoiceID); 
+		$qryy->finish();
+	}
 
+    my %RegoIDs=();
     for my $pID (@IDs)   {
-        my $pref = loadPersonDetails($Data->{'db'}, $pID) if ($pID);
+        my $pref = Person::loadPersonDetails($Data->{'db'}, $pID) if ($pID);
         my $ageLevelOptions = checkRegoAgeRestrictions(
             $Data,
             $pID,
@@ -1301,18 +1342,14 @@ sub bulkRegoSubmit {
             "BULKREGO"
         );
         next if (! $regoID);
-        #cleanTasks(
-        #    $Data,
-        #    $pID,
-        #    $bulk_ref->{'entityID'},
-        #    $regoID,
-        #    'REGO'
-        #);
-        submitPersonRegistration(
+	cleanRegoTransactions($Data,$regoID, $pID, $Defs::LEVEL_PERSON);
+        $RegoIDs{$pID} = $regoID;
+        WorkFlow::cleanTasks(
             $Data,
             $pID,
+            $bulk_ref->{'entityID'},
             $regoID,
-            $bulk_ref
+            'REGO'
         );
         my @products = split /\:/, $productIDs;
         my %Products=();
@@ -1324,7 +1361,21 @@ sub bulkRegoSubmit {
             my ($prodID, $qty) = split /-/, $prodQty;
             $Products{"prodQTY_$prodID"} =$qty;
         }
-		
+		#generate individual invoice number for each registration renewal
+		if($Data->{'SystemConfig'}{'bulkRego_eachInvoice'}){
+			my $invoiceNumber = 0;
+			#Generate invoice number 
+			my $stt = qq[INSERT INTO tblInvoice (tTimeStamp, intRealmID) VALUES (NOW(), $Data->{'Realm'})];
+			my $qryy=$Data->{'db'}->prepare($stt); 
+			$qryy->execute();
+			$invoiceID =  $qryy->{mysql_insertid} || 0;	
+			$invoiceNumber = Payments::TXNtoInvoiceNum($invoiceID); 
+
+			$stt = qq[UPDATE tblInvoice SET strInvoiceNumber = ? WHERE intInvoiceID = ?];		
+			$qryy=$Data->{'db'}->prepare($stt); 
+			$qryy->execute($invoiceNumber,$invoiceID); 
+			$qryy->finish();
+		}
 
         my ($txns_added, $amount) = insertRegoTransaction(
             $Data, 
@@ -1348,21 +1399,52 @@ sub bulkRegoSubmit {
         #    UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $logID);
         #    product_apply_transaction($Data,$logID);
         #}
-          savePlayerPassport($Data, $pID);
+        #  savePlayerPassport($Data, $pID);
     }
     if (scalar(@total_txns_added) and $paymentType and $markPaid)  {
         my %Settings=();
         $Settings{'paymentType'} = $paymentType;
         my $logID = createTransLog($Data, \%Settings, $bulk_ref->{'entityID'},\@total_txns_added, $totalAmount);
-        processTransLog($Data->{'db'}, '', 'OK', 'APPROVED', $logID, \%Settings, undef, undef, '', '', '', '', '', '','',1);
-       print STDERR "MANUAL PAYMENT $logID\n"; 
-        UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $logID);
+        processTransLog($Data->{'db'}, '', 'OK', 'OK', 'APPROVED', $logID, \%Settings, undef, undef, '', '', '', '', '', '','',1);
+        UpdateCart($Data, undef, $Data->{'client'}, undef, 'OK', $logID);
         product_apply_transaction($Data,$logID);
     }
-    my $txnIds = join(':',@total_txns_added);
-    
+    my $txnIds = join(':',@total_txns_added);    
  
-    return ($totalAmount, $txnIds);
+    return ($totalAmount, $txnIds, \%RegoIDs);
+}
+
+sub bulkRegoSubmit {
+
+    my ($Data, $bulk_ref, $rolloverIDs) = @_;
+
+    my $body = 'Submitting';
+    my @IDs= split /\|/, $rolloverIDs;
+
+    for my $pID (@IDs)   {
+        my $pref = Person::loadPersonDetails($Data->{'db'}, $pID) if ($pID);
+        my $regoID=param('regoID_'.$pID);
+        next if (! $regoID);
+        #cleanTasks(
+        #    $Data,
+        #    $pID,
+        #    $bulk_ref->{'entityID'},
+        #    $regoID,
+        #    'REGO'
+        #);
+	
+       my ($txnCount, $amountDue, $logIDs) = getPersonRegoTXN($Data, $pID, $regoID);
+	my %Reg = ();
+	$Reg{'CountTXNs'} = $txnCount;
+	
+       PersonRegistration::submitPersonRegistration(
+            $Data,
+            $pID,
+            $regoID,
+            \%Reg
+        );
+        savePlayerPassport($Data, $pID);
+    }
 }
 1;
 

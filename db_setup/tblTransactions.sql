@@ -28,6 +28,8 @@ CREATE TABLE tblTransactions (
     intParentTXNID INT default 0,
     strPayeeName VARCHAR(100) default '',
     strPayeeNotes text,
+    intSentToGateway TINYINT default 0,
+
   PRIMARY KEY  (intTransactionID),
   KEY index_intStatus (intStatus),
   KEY index_intTXNEntityID(intTXNEntityID),

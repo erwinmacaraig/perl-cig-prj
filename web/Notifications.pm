@@ -342,7 +342,6 @@ sub notification_details	{
 			target => $Data->{'target'},
 			formname => 'n_form',
       submitlabel => $Data->{'lang'}->txt('Update'),
-      introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
 			NoHTML => 1, 
 			updateSQL => qq[
         UPDATE tblNotifications

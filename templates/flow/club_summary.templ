@@ -44,7 +44,9 @@
 					    	<li><span class="details-left">[% Lang.txt("Sport") %]:</span> <span class="details-value">[% IF sport %][% sport %][% ELSE %] - [% END %]</span></li>
 					    	<li><span class="details-left">[% Lang.txt("Level") %]:</span> <span class="details-value">[% IF organizationLevel %][% organizationLevel %][% ELSE %] - [% END %]</span></li>
 					    	<li><span class="details-left">[% Lang.txt("Bank Account Details") %]:</span> <span class="details-value">[% IF bankAccountDetails %][% bankAccountDetails %][% ELSE %] - [% END %]</span></li>
+                            [% IF OriginLevel == 100 %]
 					    	<li><span class="details-left">[% Lang.txt("MA Comment") %]:</span> <span class="details-value">[% IF comment %][% comment %][% ELSE %] - [% END %]</span></li>
+                            [% END %]
 					    </ul><br/>
 					    <a href="[% editlink %]&amp;rfp=role" class="pull-right">Edit</a>
 				     </div>
@@ -67,6 +69,23 @@
 				     </div>
 				</div>
 			</div>
+			  [% IF DisplayPayment %]
+                [% IF payment.totalPaymentDue %]
+                <div class="clearfix" style="clear:both;">&nbsp;</div>
+                        <div class="col-md-6">
+                                <div class="read-only license-details">
+                                         <h4>[% Lang.txt('Payment Options') %]</h4>
+                                     <div class="read-only-text clearfix">
+                                            <ul>
+                                                <li><span class="details-left">[% Lang.txt("Total") %]:</span> <span class="detail-value">[% CurrencyFormat.format(payment.totalPaymentDue) %]</span></li>
+                                                <li><span class="details-left">[% Lang.txt("Payment Method") %]:</span> <span class="detail-value">[% Lang.txt(payment.paymentMethodText) %]</span></li>
+                                            </ul>
+                                            <a href="[% editlink %]&amp;rfp=p" class="pull-right">[% Lang.txt('Edit') %]</a>
+                                     </div>
+                                </div>
+                        </div>
+                [% END %]
+    [% END %]
 		</div>
 	</div>
 </div>

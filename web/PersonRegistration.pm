@@ -111,10 +111,10 @@ sub rolloverExistingPersonRegistrations {
         sport=> $reg_ref->[0]{'strSport'} || '',
         personType=> $reg_ref->[0]{'strPersonType'} || '',
         personEntityRole=> $reg_ref->[0]{'strPersonEntityRole'} || '',
-        personLevel=> $reg_ref->[0]{'strPersonLevel'} || '',
         entityID=> $reg_ref->[0]{'intEntityID'} || 0,
         status=> $Defs::PERSONREGO_STATUS_ACTIVE,
     );
+        #personLevel=> $reg_ref->[0]{'strPersonLevel'} || '',
         #ageLevel=> $reg_ref->[0]{'strAgeLevel'} || '',
     my ($countRecords, $regs_ref) = getRegistrationData(
         $Data,
@@ -230,12 +230,15 @@ sub checkRenewalRegoOK  {
         $Data->{'Realm'},
         $Data->{'RealmSubType'},
         $rego_ref->{'originLevel'},
-        '',
+        'RENEWAL',
         $rego_ref->{'personType'} || '',
         '',
         $rego_ref->{'personEntityRole'} || '',
+        '',
         $rego_ref->{'personLevel'} || '',
+        '',
         $rego_ref->{'sport'} || '',
+        '',
         $rego_ref->{'ageLevel'} || '',
         $rego_ref->{'personID'},
         $rego_ref->{'entityID'},
@@ -260,10 +263,10 @@ sub checkRenewalRegoOK  {
         sport=> $rego_ref->{'sport'} || '',
         personType=> $rego_ref->{'personType'} || '',
         personEntityRole=> $rego_ref->{'personEntityRole'} || '',
-        personLevel=> $rego_ref->{'personLevel'} || '',
         statusIN => \@statusIN,
         entityID=> $rego_ref->{'entityID'} || 0,
     );
+        #personLevel=> $rego_ref->{'personLevel'} || '',
 
 
     my ($count, undef) = getRegistrationData(
@@ -660,13 +663,15 @@ sub getRegistrationData	{
             e.strLocalName,
             e.intEntityLevel,
             e.strLatinName,
+            e.strEntityType,
             e.intEntityLevel,
+	p.intInternationalTransfer,
             e.intEntityID
         FROM
             tblPersonRegistration_$Data->{'Realm'} AS pr
             LEFT JOIN tblTransactions as T ON (
                 T.intPersonRegistrationID = pr.intPersonRegistrationID
-                AND T.intStatus = 0
+                AND T.intStatus <> 1
             )
             LEFT JOIN tblNationalPeriod as np ON (
                 np.intNationalPeriodID = pr.intNationalPeriodID
@@ -710,6 +715,8 @@ sub getRegistrationData	{
         $dref->{'Sport'} = $Defs::sportType{$dref->{'strSport'}} || '';
         $dref->{'PersonType'} = $Defs::personType{$dref->{'strPersonType'}} || '';
         $dref->{'PersonLevel'} = $Defs::personLevel{$dref->{'strPersonLevel'}} || '';
+        $dref->{'changeLevel'} = $dref->{'intPersonLevelChanged'} || 0;
+        $dref->{'PreviousPersonLevel'} = $Defs::personLevel{$dref->{'strPreviousPersonLevel'}} || '';
         $dref->{'AgeLevel'} = $Defs::ageLevel{$dref->{'strAgeLevel'}} || '';
         $dref->{'Status'} = $Defs::personRegoStatus{$dref->{'strStatus'}} || '';
         $dref->{'RegistrationNature'} = $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '';
@@ -808,8 +815,7 @@ sub getRegistrationData	{
 
 sub addRegistration {
     my($Data, $Reg_ref) = @_;
-
-    if ($Reg_ref->{'personEntityRole'} eq '-')  {
+	if ($Reg_ref->{'personEntityRole'} eq '-')  {
         $Reg_ref->{'personEntityRole'}= '';
     }
     my $status = $Reg_ref->{'status'} || 'PENDING';
@@ -821,7 +827,7 @@ sub addRegistration {
         $Reg_ref->{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
         #$Reg_ref->{'dateFrom'} = $matrix_ref->{'dtFrom'} if (! $Reg_ref->{'dtFrom'});
         #$Reg_ref->{'dateTo'} = $matrix_ref->{'dtTo'} if (! $Reg_ref->{'dtTo'});
-        $Reg_ref->{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
+        $Reg_ref->{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;		
     }
     my ($nationalPeriodID, $npFrom, $npTo) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $Reg_ref->{'sport'}, $Reg_ref->{'personType'}, $Reg_ref->{'registrationNature'});
     #$Reg_ref->{'dateFrom'} = $npFrom if (! $Reg_ref->{'dtFrom'});
@@ -957,7 +963,8 @@ sub addRegistration {
             $Reg_ref->{'entityID'} || 0,
             $Reg_ref->{'personID'},
             $personRegistrationID, 
-            0
+            0,
+		$Reg_ref->{'intInternationalTransfer'}
         );
         personInProgressToPending($Data, $Reg_ref->{'personID'});
     }
@@ -997,7 +1004,8 @@ sub submitPersonRegistration    {
             $pr_ref->{'entityID'} || $pr_ref->{'intEntityID'} || 0,
             $personID,
             $personRegistrationID, 
-            0
+            0,
+$pr_ref->{'intInternationalTransfer'}
         );
         personInProgressToPending($Data, $personID);
         ($count, $regs) = getRegistrationData($Data, $personID, \%Reg);

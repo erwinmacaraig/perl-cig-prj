@@ -13,8 +13,9 @@ use Flow_BulkRenewalsBackend;
 use Data::Dumper;
 
 sub handleBulkRenewalsFlow  {
-    my ($action, $Data) = @_;
+    my ($action, $Data, $paramRef) = @_;
 
+    $paramRef ||= undef;
     my $body = '';
     my $title = '';
     my $client = $Data->{'client'};
@@ -22,6 +23,12 @@ sub handleBulkRenewalsFlow  {
     my $cl = setClient($clientValues);
     my $rego_ref = {};
     my $cgi=new CGI;
+
+    if (defined $paramRef && $paramRef->{'return'})  {
+        foreach my $k (keys %{$paramRef})   {
+            $cgi->param(-name=>$k, -value=>$paramRef->{$k});
+        }
+    }
     my %params=$cgi->Vars();
     my $lang = $Data->{'lang'};
     my $entityID = getLastEntityID($clientValues) || 0;
@@ -53,6 +60,7 @@ sub handleBulkRenewalsFlow  {
     );
 
     my ($content,  undef) = $flow->run();
+    return if ($paramRef->{'return'});
 
     return $content;
 }

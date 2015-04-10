@@ -5,8 +5,8 @@
 package Payments;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoTXNNumber TXNNumberToTXN TXNtoInvoiceNum invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount);
-@EXPORT_OK=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoTXNNumber TXNNumberToTXN TXNtoInvoiceNum invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount);
+@EXPORT=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoTXNNumber TXNNumberToTXN TXNtoInvoiceNum invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount );
+@EXPORT_OK=qw(handlePayments checkoutConfirm getPaymentSettings processTransLogFailure invoiceNumToTXN TXNtoTXNNumber TXNNumberToTXN TXNtoInvoiceNum invoiceNumForm getTXNDetails displayPaymentResult EmailPaymentConfirmation UpdateCart processTransLog getSoftDescriptor createTransLog getCheckoutAmount );
 
 use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 
@@ -23,12 +23,12 @@ use ServicesContacts;
 use TemplateEmail;
 #use RegoFormUtils;
 use ContactsObj;
-
+use Data::Dumper;
 require Products;
 require TransLog;
 require PaymentSplitMoneyLog;
-#require RegoForm::RegoFormFactory;
-  
+require RegoForm::RegoFormFactory;
+ 
 sub handlePayments	{
 
 	my ($action, $Data, $external) = @_;
@@ -36,7 +36,8 @@ sub handlePayments	{
 	my $body = '';
 	if ($action =~ /DISPLAY/)	{
 		my $intLogID = param('ci') || 0;
-		$body = displayPaymentResult($Data, $intLogID, $external);
+        my $payStatus =0 ;
+		($payStatus, $body) = displayPaymentResult($Data, $intLogID, $external);
 	}	
 	if ($action =~ /LATER/)	{
 		my $intLogID = param('ci') || 0;
@@ -188,7 +189,7 @@ sub checkoutConfirm	{
     my $authLevel = $Data->{'clientValues'}{'authLevel'}||=$Defs::INVALID_ID;
     my $entityID = getID($Data->{'clientValues'}, $authLevel);
 
-	my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
+	my $dollarSymbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
     
     my $compulsory = 0;
 	my $RegoFormObj = undef;
@@ -239,7 +240,7 @@ sub checkoutConfirm	{
 	];
 
     my $chkvalue= $amount . $intLogID . $paymentSettings->{'currency'};
-    if ($paymentType == $Defs::PAYMENT_ONLINENAB)    {
+    if ($paymentType == $Defs::PAYMENT_ONLINENAB or $paymentType == $Defs::PAYMENT_ONLINECREDITCARD)    {
         my $m;
 #warn("AM:$amount $intLogID " . $paymentSettings->{'currency'} . "#######" . $paymentSettings->{'gatewaySalt'});
         $m = new MD5;
@@ -267,10 +268,10 @@ sub checkoutConfirm	{
 	if (($onlinePayment) and $amount eq '0.00')	{
 	    my $responsetext = 'Zero paid';
         my $txn = 'Zero-' . time(); 
-		processTransLog($Data->{'db'}, $txn, 'OK', $responsetext, $intLogID, $paymentSettings, undef, undef, '', '', '', '', '', '','',1);
+		processTransLog($Data->{'db'}, $txn, 'OK', 'OK', $responsetext, $intLogID, $paymentSettings, undef, undef, '', '', '', '', '', '','',1);
 		UpdateCart($Data, undef, $Data->{'client'}, undef, undef, $intLogID);
 #        EmailPaymentConfirmation($Data, $paymentSettings, $intLogID, $client, $RegoFormObj);
-#        Products::product_apply_transaction($Data,$intLogID);
+         Products::product_apply_transaction($Data,$intLogID);
         return ($intLogID, 0, '', undef) if $payTryReturn;
 		return '';
 	}
@@ -487,6 +488,7 @@ sub getPaymentSettings	{
         $settings{'gatewayLevel'} = $dref->{intLevelID} || 0;
         $settings{'gatewayRuleID'} = $dref->{intPaymentSplitRuleID} || 0;
         $settings{'allowPayment'} = $dref->{intAllowPayment} || 0;
+        $settings{'gatewayProcessPreGateway'} = $dref->{intProcessPreGateway} || 0;
         $settings{'onlinePayment'} = (exists $Defs::onlinePaymentTypes{$paymentType}) ? 1 : 0; 
 
         if ($external)	{
@@ -517,9 +519,9 @@ sub createTransLog	{
     $fields{amount} = $amount || 0;
     
     my $authLevel = $Data->{'clientValues'}{'authLevel'}||=$Defs::INVALID_ID;
-    if (! $entityID)    {
+    #if (! $entityID)    {
         $entityID = getID($Data->{'clientValues'}, $authLevel);
-    }
+    #}
 	$entityID= 0 if $entityID== $Defs::INVALID_ID;
 
  	my $paymentConfigID= $paymentSettings->{'intPaymentConfigID'} || 0;
@@ -631,6 +633,7 @@ sub displayPaymentResult        {
 	my $db = $Data->{'db'};
     $intLogID ||= 0;
 
+    my $lang = $Data->{'lang'};
     my $st= qq[
         SELECT TL.*, E.intSubRealmID
         FROM tblTransLog as TL
@@ -642,7 +645,7 @@ sub displayPaymentResult        {
     $qry->execute or query_error($st);
     my $transref = $qry->fetchrow_hashref();
 
-    return '' if (! $transref); ## Don't display if no TLog found.... Note Amount must be > 0
+    return (-1, '') if (! $transref); ## Don't display if no TLog found.... Note Amount must be > 0
 
 	$Data->{'RegoFormID'} = $transref->{'intRegoFormID'} || 0;
 	$Data->{'RealmSubType'} ||= $transref->{'intSubRealmID'} || 0;
@@ -650,16 +653,23 @@ sub displayPaymentResult        {
     my $paymentType = $transref->{'intPaymentType'};
 
     my $body = '';
-	my $success=0;
-    if ($transref->{strResponseCode} eq "1" or $transref->{strResponseCode} eq "OK" or $transref->{strResponseCode} eq "00" or $transref->{strResponseCode} eq "08" or $transref->{strResponseCode} eq 'Success')    {
+	my $success=$transref->{'intStatus'};
+    #if ($transref->{strResponseCode} eq "1" or $transref->{strResponseCode} eq "OK" or $transref->{strResponseCode} eq "00" or $transref->{strResponseCode} eq "08" or $transref->{strResponseCode} eq 'Success')    {
+	
+    if ($transref->{'intStatus'} == $Defs::TXNLOG_SUCCESS)   {
         my $ttime = time();
         $body .= qq[
-            <div align="center" class="OKmsg" style="font-size:14px;">Congratulations payment has been successful</div>
+            <div align="center" class="OKmsg" style="font-size:14px;">] . $lang->txt('Congratulations your payment has been successful') . qq[</div>
         ];
-		$success=1;
+    }
+    elsif ($transref->{'intStatus'} == $Defs::TXNLOG_HOLD)   {
+        my $ttime = time();
+        $body .= qq[
+            <div align="center" class="OKmsg" style="font-size:14px;">] . $lang->txt('Your payment has been put on Hold') . qq[</div>
+        ];
     }
     else    {
-		$msg = qq[ <div align="center" class="warningmsg" style="font-size:14px;">There was an error with your transaction</div> ] if (! $msg and $transref->{'intAmount'});
+		$msg = qq[ <div align="center" class="warningmsg" style="font-size:14px;">] . $lang->txt('We are sorry, there was a problem with your payment.') . qq[</div> ] if (! $msg and $transref->{'intAmount'});
         $body .= qq[ <center>$msg<br></center> ];
 		if ($external)	{
 			$st = qq[
@@ -680,16 +690,17 @@ sub displayPaymentResult        {
 		}
     }
 	my ($viewTLBody, $header) = TransLog::viewTransLog($Data, $intLogID);
-	$body .= $viewTLBody;
-	return $body;
+	$body .= $viewTLBody if ($success);
+	return ($success, $body);
 }
 
 sub processTransLogFailure    {
 
-    my ($db, $intLogID, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text) = @_;
+    my ($db, $intLogID, $gatewayResponseCode, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text) = @_;
     $intLogID ||= 0;
 
     my %fields=();
+    $fields{gatewayResponseCode} = $gatewayResponseCode || '';
     $fields{otherRef1} = $otherRef1 || '';
     $fields{otherRef2} = $otherRef2 || '';
     $fields{otherRef3} = $otherRef3 || '';
@@ -701,13 +712,13 @@ sub processTransLogFailure    {
 
     my $st= qq[
         UPDATE tblTransLog
-        SET strResponseCode = "-1", strResponseText = "FAILED", intStatus = $Defs::TXNLOG_FAILED, strOtherRef1 = ?, strOtherRef2 = ?, strOtherRef3 = ?, strOtherRef4 = ?, strOtherRef5 = ?, strAuthID=?, strText=?
+        SET strResponseCode = "-1", strResponseText = "PAYMENT_FAILED", intStatus = $Defs::TXNLOG_FAILED, strGatewayResponseCode = ?, strOtherRef1 = ?, strOtherRef2 = ?, strOtherRef3 = ?, strOtherRef4 = ?, strOtherRef5 = ?, strAuthID=?, strText=?
         WHERE intLogID = $intLogID
 		    AND intStatus = $Defs::TXNLOG_PENDING
             AND strResponseCode IS NULL
     ];
     my $query = $db->prepare($st) or query_error($st);
-    $query->execute($fields{otherRef1}, $fields{otherRef2}, $fields{otherRef3}, $fields{otherRef4}, $fields{otherRef5}, $fields{GATEWAY_AUTH_ID}, $fields{GATEWAY_RESPONSE_TEXT}) or query_error($st);
+    $query->execute($fields{'gatewayResponseCode'}, $fields{otherRef1}, $fields{otherRef2}, $fields{otherRef3}, $fields{otherRef4}, $fields{otherRef5}, $fields{GATEWAY_AUTH_ID}, $fields{GATEWAY_RESPONSE_TEXT}) or query_error($st);
 }
 
 sub calcTXNInvoiceNum       {
@@ -728,7 +739,7 @@ sub TXNNumberToTXN	{
 
 	my ($invoice_num) = @_;
 
-	my $txnID = $invoice_num - 100000000; ## 1 more to handle checksum
+	my $txnID = $invoice_num - 800000000; ## 1 more to handle checksum
 	$txnID = substr($txnID, 0, length($txnID)-1);
 	if ($invoice_num == TXNtoTXNNumber($txnID))	{
 		return $txnID;
@@ -741,7 +752,7 @@ sub invoiceNumToTXN	{
 
 	my ($invoice_num) = @_;
 
-	my $txnID = $invoice_num - 100000000; ## 1 more to handle checksum
+	my $txnID = $invoice_num - 800000000; ## 1 more to handle checksum
 	$txnID = substr($txnID, 0, length($txnID)-1);
 	if ($invoice_num == TXNtoTXNNumber($txnID))	{
 		return $txnID;
@@ -874,7 +885,7 @@ sub getTXNDetails	{
     $qry->execute or query_error($st);
     my $dref = $qry->fetchrow_hashref();
 
-
+	
 	#$dref->{'InvoiceNum'} = TXNtoInvoiceNum($dref->{intTransactionID}); 
 	#$dref->{'InvoiceNum'} = $dref->{'strInvoiceNumber'};
 
@@ -931,6 +942,7 @@ sub EmailPaymentConfirmation	{
 		WHERE intLogID = ?
 			AND intStatus = 1
 	];
+
 	my $qry = $Data->{db}->prepare($st);
 	$qry->execute($intLogID);
 	my $tref = $qry->fetchrow_hashref();
@@ -947,40 +959,15 @@ sub EmailPaymentConfirmation	{
 	my $count=0;
 	my @txns = ();
 
-    #used for regoform only
-    my $send_to_assoc    = '';
     my $send_to_club     = '';
 
 	my %EmailsUsed=();
 	while (my $trans_ref = $qry_trans->fetchrow_hashref())	{
 		$count++;
 		my $txnRef = getTXNDetails($Data, $trans_ref->{intTXNID}, 0);
-
-        if ($RegoFormObj) {
-            my $send_to_member  = '';
-            my $send_to_parents = '';
-
-            my $pay_char = $RegoFormObj->getValue('intPaymentBits') || '';
-            ($send_to_assoc, $send_to_club, $send_to_member, $send_to_parents) = get_notif_bits($pay_char) if $pay_char;
-
-            if ($RegoFormObj->getValue('intRegoType') != 2) {
-                if ($send_to_member) {
-                    $to_address .= check_email_address(\%EmailsUsed, $txnRef->{Email})  if $txnRef->{Email};
-                    $cc_address .= check_email_address(\%EmailsUsed, $txnRef->{Email2}) if $RegoFormObj and $txnRef->{Email2};
-                }
-                if ($send_to_parents) {
-                    $cc_address .= check_email_address(\%EmailsUsed, $txnRef->{P1Email})  if $txnRef->{P1Email};
-                    $cc_address .= check_email_address(\%EmailsUsed, $txnRef->{P1Email2}) if $txnRef->{P1Email2};
-                    $cc_address .= check_email_address(\%EmailsUsed, $txnRef->{P2Email})  if $txnRef->{P2Email};
-                    $cc_address .= check_email_address(\%EmailsUsed, $txnRef->{P2Email2}) if $txnRef->{P2Email2};
-                }
-            }
-        }
-        else {
-            $to_address .= check_email_address(\%EmailsUsed, $txnRef->{Email})   if $txnRef->{Email};
-            $cc_address .= check_email_address(\%EmailsUsed, $txnRef->{P1Email}) if $txnRef->{P1Email};
-        }
-
+        
+		$to_address .= check_email_address(\%EmailsUsed, $txnRef->{Email})   if $txnRef->{Email};
+        #$cc_address .= check_email_address(\%EmailsUsed, $txnRef->{P1Email}) if $txnRef->{P1Email};
 		$txnRef->{strProductNotes}=~s/\n/<br>/g;
 		push @txns, $txnRef;
 	}
@@ -994,7 +981,7 @@ sub EmailPaymentConfirmation	{
 		Transactions     => \@txns,
 		ReceiptFooter    => $Data->{'SystemConfig'}{'paymentReceiptFooterHTML'} || '',
 		PaymentAssocType => $Data->{'SystemConfig'}{'paymentAssocType'} || '',
-		DollarSymbol     => $Data->{'LocalConfig'}{'DollarSymbol'} || "\$",
+		DollarSymbol     => $Data->{'SystemConfig'}{'DollarSymbol'} || "\$",
 	);
 	
 	{
@@ -1004,56 +991,37 @@ sub EmailPaymentConfirmation	{
 				E.strLocalName as EntityName,
                 E.strEmail as EntityEmail,
                 E.strPaymentNotificationAddress as PaymentNotificationAddress,
-                E.strEntityPaymentBusinessNumber as PaymentBusinessNumber,
-				IF(TL.intSWMPaymentAuthLevel = 3 OR RF.intClubID >0, 'CLUB', 'MA') as SoldBy
+                TL.intPaymentByLevel,
+				IF(TL.intSWMPaymentAuthLevel = 3, 'CLUB', 'MA') as SoldBy
 			FROM
 				tblTransLog as TL
 				INNER JOIN tblEntity as E ON (E.intEntityID = TL.intEntityPaymentID)
-				LEFT JOIN tblRegoForm as RF ON (RF.intRegoFormID = TL.intRegoFormID)
 			WHERE
 				TL.intLogID = ?
 		];
-		my $qry_assoc= $Data->{db}->prepare($st);
-		$qry_assoc->execute($intLogID);
+		my $query= $Data->{db}->prepare($st);
+		$query->execute($intLogID);
 
 		my $orgname = '';
-		my $assocID=0;
-            my $from_email_to_use = '';
-		while (my $dref = $qry_assoc->fetchrow_hashref())   {
-			my $clubEmail = '';
-			if($dref->{'SoldBy'} eq 'CLUB')	{
-				$from_email_to_use = 'club';
-				$orgname = $dref->{'ClubName'} || '';
-			}
-			else	{
-				$orgname = $dref->{'AssocName'} || '';
-			}
-
-            #don't upset the way non-regoform payemnt emails are handled
-            if ($RegoFormObj) {
-                my $dbh = $Data->{'db'};
-                my $clubID = $dref->{'intClubID'};
-
-                #assoc & club emails dupes will already be filtered out. however, still need to be checked against the rest.
-                my $club_emails_aref  = ($send_to_club and $clubID)  ? get_emails_list(ContactsObj->getList(dbh=>$dbh, associd=>$assocID, clubid=>$clubID, getpayments=>1)) : ''; #will be false for a team to assoc (type 2) form
-		
-                if ($club_emails_aref) {
-                    foreach my $email (@$club_emails_aref) {
-                        $clubEmail .= check_email_address(\%EmailsUsed, $email) if $email;
-                    }
-                }
+        my $from_email_to_use = '';
+		my $dref = $query->fetchrow_hashref();
+        if (defined $dref)  {
+            my $clubEmail = '';
+            if($dref->{'SoldBy'} eq 'CLUB')	{
+                $from_email_to_use = 'club';
+                $orgname = $dref->{'EntityName'} || '';
+                $clubEmail = $dref->{'EntityEmail'} || '';
             }
-			$TransData{'OrgName'} = $orgname || '';
-			$TransData{'strBusinessNo'} = $dref->{'PaymentBusinessNumber'} || $paymentSettings->{'paymentBusinessNumber'} || '';
+            if ($dref->{'intPaymentByLevel'} > $Defs::LEVEL_PERSON) {
+                $to_address = $dref->{'EntityEmail'};
+            }
 
-            my $first_club_email  = ($clubEmail)  ? extract_first($clubEmail)  : '';
+			$TransData{'OrgName'} = $orgname || '';
 			$paymentSettings->{notification_address} =$dref->{'PaymentNotificationAddress'} || $paymentSettings->{notification_address};
 
 		}
-		$Data->{'clientValues'}{'assocID'} = $assocID;
 		$Data->{'SystemConfig'}=getSystemConfig($Data);
 	}
-	$TransData{'AssocPaymentExtraDetails'} = $Data->{'SystemConfig'}{'AssocConfig'}{'AssocPaymentExtraDetails'} || '';
 	sendTemplateEmail(
         $Data,
         'payments/payment_receipt.templ',
@@ -1064,6 +1032,8 @@ sub EmailPaymentConfirmation	{
         $cc_address,
         $bcc_address,
     ) ;
+	
+	
 	return 1;
 }
 
@@ -1091,6 +1061,8 @@ sub UpdateCart	{
 
     deQuote($Data->{'db'}, \$txn);
 
+    my $status = 1;
+    $status = 3 if ($code eq 'HOLD');
 	my $st= qq[
   	SELECT 
 			intTXNID, 
@@ -1110,7 +1082,7 @@ sub UpdateCart	{
   	    UPDATE 
 			tblTransactions 
         SET 
-			intStatus = 1, 
+			intStatus = ?, 
 			dtPaid = SYSDATE(), 
 			intTransLogID = $intLogID
 		WHERE 
@@ -1135,7 +1107,7 @@ sub UpdateCart	{
 			copyTransaction($Data, $dref->{'intTXNID'}, $intLogID);
 		}
 		else	{
-   		    $qryUpdate->execute($dref->{'intTXNID'});
+   		    $qryUpdate->execute($status, $dref->{'intTXNID'});
 		}
         # if there is a intTempID associated with this transaction record then tblTempMember should be updated (set the intTransLogID for that intTempMemberID record)
         if($dref->{'intTempID'}){
@@ -1151,7 +1123,7 @@ sub UpdateCart	{
     $Data->{'db'}->do($st);
 
 
-	PaymentSplitMoneyLog::calcMoneyLog($Data, $paymentSettings, $intLogID);
+	#PaymentSplitMoneyLog::calcMoneyLog($Data, $paymentSettings, $intLogID);
 	
 }
 
@@ -1167,7 +1139,6 @@ sub copyTransaction	{
       dtTransaction,
       dtPaid,
       intDelivered,
-      intAssocID,
       intRealmID,
       intRealmSubTypeID,
       intID,
@@ -1177,12 +1148,14 @@ sub copyTransaction	{
       intTransLogID,
       intCurrencyID,
       intTempLogID,
-			intExportAssocBankFileID,
+	intExportAssocBankFileID,
       dtStart,
       dtEnd,
       curPerItem,
       intTXNEntityID,
-      intRenewed
+      intRenewed,
+        intPersonRegistrationID,
+        intInvoiceID
 		)
 		SELECT
 			1,
@@ -1192,7 +1165,6 @@ sub copyTransaction	{
       dtTransaction,
       NOW(),
       intDelivered,
-      intAssocID,
       intRealmID,
       intRealmSubTypeID,
       intID,
@@ -1207,7 +1179,9 @@ sub copyTransaction	{
       dtEnd,
       curPerItem,
       intTXNEntityID,
-      intRenewed
+      intRenewed,
+        intPersonRegistrationID,
+        intInvoiceID
 		FROM
 			tblTransactions
 		WHERE
@@ -1274,13 +1248,13 @@ sub logRetry	{
 
 sub processTransLog    {
 
-    my ($db, $txn, $responsecode, $responsetext, $intLogID, $paymentSettings, $passedChkValue, $settlement_date, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text, $exportOK) = @_;
-print STDERR "DHDHDHDHDHD\n";
+    my ($db, $txn, $responsecode, $gatewayresponsecode, $responsetext, $intLogID, $paymentSettings, $passedChkValue, $settlement_date, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text, $exportOK) = @_;
 
 	$exportOK ||= 0;
     my %fields=();
     $intLogID ||= 0;
     $fields{txn} = $txn || '';
+    $fields{gatewayresponsecode} = $gatewayresponsecode || '';
     $fields{responsecode} = $responsecode || '';
     $fields{responsetext} = $responsetext || '';
     $fields{settlement_date} = $settlement_date || '';
@@ -1291,7 +1265,9 @@ print STDERR "DHDHDHDHDHD\n";
     $fields{otherRef5} = $otherRef5 || '';
 
 	my $intStatus = $Defs::TXNLOG_FAILED;
-	$intStatus = $Defs::TXNLOG_SUCCESS if ($responsecode eq "00" or $responsecode eq "08" or $responsecode eq "OK" or $responsecode eq "1" or $responsecode eq 'Success');
+	#$intStatus = $Defs::TXNLOG_SUCCESS if ($responsecode eq "00" or $responsecode eq "08" or $responsecode eq "OK" or $responsecode eq "1" or $responsecode eq 'Success');
+	$intStatus = $Defs::TXNLOG_SUCCESS if ($responsecode eq "OK");
+	$intStatus = $Defs::TXNLOG_HOLD if ($responsecode eq "HOLD");
 	my $statement = qq[
 		SELECT intAmount, strResponseCode, intLogID
 		FROM tblTransLog
@@ -1314,8 +1290,7 @@ print STDERR "DHDHDHDHDHD\n";
 
 #    deQuote($db, \%fields);
 	if (! $responsecode)	{
-print STDERR "IN NOT";
-		processTransLogFailure($db, $intLogID, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text);
+		processTransLogFailure($db, $intLogID, $gatewayresponsecode, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text);
 	}
 	else	{
 		if ($existingResponseCode and $existingLogID)	{
@@ -1323,17 +1298,17 @@ print STDERR "IN NOT";
 		}
     	$statement = qq[
             UPDATE tblTransLog
-        	SET dtLog=SYSDATE(), strTXN = ?, strResponseCode = ?, strResponseText = ?, intStatus = $intStatus, dtSettlement=?, strOtherRef1 = ?, strOtherRef2 = ?, strOtherRef3 = ?, strOtherRef4 = ?, strOtherRef5 = ? , intExportOK = $exportOK, strAuthID=?, strText=?
+        	SET dtLog=SYSDATE(), strTXN = ?, strResponseCode = ?, strResponseText = ?, intStatus = $intStatus, dtSettlement=?, strGatewayResponseCode = ?, strOtherRef1 = ?, strOtherRef2 = ?, strOtherRef3 = ?, strOtherRef4 = ?, strOtherRef5 = ? , intExportOK = $exportOK, strAuthID=?, strText=?
         	WHERE intLogID = $intLogID
 			    AND intStatus<> 1
     	];
-print STDERR $statement;
     	$query = $db->prepare($statement) or query_error($statement);
     	$query->execute(
             $fields{txn},
             $fields{responsecode},
             $fields{responsetext},
             $fields{settlement_date},
+            $fields{gatewayresponsecode},
             $fields{otherRef1},
             $fields{otherRef2},
             $fields{otherRef3},
