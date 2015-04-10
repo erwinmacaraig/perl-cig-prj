@@ -76,7 +76,7 @@ print STDERR "IN checkOpenPayments\n";
             INNER JOIN tblPaymentConfig as PC ON (PC.intPaymentConfigID = TL.intPaymentConfigID)
 	    INNER JOIN tblPayTry as PT ON (PT.intTransLogID = TL.intLogID)
         WHERE
-        TL.intStatus IN (0)
+        TL.intStatus IN (0,3)
             AND PC.strGatewayCode = 'checkoutfi'
 		AND  TL.intSentToGateway = 1 
     ];
