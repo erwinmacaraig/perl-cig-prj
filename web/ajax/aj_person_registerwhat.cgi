@@ -34,6 +34,7 @@ sub main	{
     my $bulk= param('bulk') || 0;
     my $defaultType = param('dtype') || '';
     my $defaultSport= param('dsport') || '';
+    my $defaultLevel= param('dlevel') || '';
     my $defaultEntityRole= param('dentityrole') || '';
     my $defaultNature= param('dnat') || '';
     my $etype = param('etype') || '';
@@ -68,6 +69,7 @@ sub main	{
             $personEntityRole,
             $defaultEntityRole,
             $personLevel,
+            $defaultLevel,
             $sport,
             $defaultSport,
             $ageLevel,
