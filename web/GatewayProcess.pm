@@ -201,6 +201,7 @@ $paymentSettings->{'gatewaySalt'} ||='';
 	elsif ($action eq '1' or $action eq 'S')	{ ## WAS 'S'
 
 		$body = ExternalGateway::ExternalGatewayUpdate($Data, $paymentSettings, $client, $returnVals_ref, $logID, $Order->{'AssocID'}); #, $Order, $external, $encryptedID);
+        markGatewayAsResponded($Data, $logID) if ($returnVals_ref->{'GATEWAY_RESPONSE_CODE'} ne 'HOLD');
 	}
 	#disconnectDB($db);
 
