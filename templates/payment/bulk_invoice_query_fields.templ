@@ -24,6 +24,9 @@
 							<select name="PersonType" id="PersonType" class="chzn-select" size="1" data-placeholder="[% Lang.txt('Select Person Type') %]"> 
 								<option value=""></option>
 								[% FOREACH opt IN PersonType.options.keys %]
+									[% NEXT IF opt == 'RAOFFICIAL' and Level < 20 %]
+									[% NEXT IF opt == 'MAOFFICIAL' and Level < 20 %]
+									[% NEXT IF opt == 'REFEREE' and Level < 20 %]
 									<option value="[% opt %]">[% PersonType.options.$opt %]</option>
 								[% END %]					
 							</select>
