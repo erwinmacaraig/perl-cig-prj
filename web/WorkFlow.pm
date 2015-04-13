@@ -617,7 +617,7 @@ sub listTasks {
         if ($dref->{'intPersonLevelChanged'} and $dref->{'strPersonLevel'} ne $dref->{'strPreviousPersonLevel'})    {
             my $fromLevel = $Data->{'lang'}->txt($Defs::personLevel{$dref->{'strPreviousPersonLevel'}});
             my $newLevel = $Data->{'lang'}->txt($Defs::personLevel{$dref->{'strPersonLevel'}});
-            $changeLevelDescription = $Data->{'lang'}->txt('with Level change from ') . $fromLevel . " " . $Data->{'lang'}->txt("to") . " " . $newLevel;
+            $changeLevelDescription = $Data->{'lang'}->txt("with Level change from [_1] to [_2]", $fromLevel, $newLevel);# . $fromLevel . " " . $Data->{'lang'}->txt("to") . " " . $newLevel;
         }
 
 	 my %single_row = (

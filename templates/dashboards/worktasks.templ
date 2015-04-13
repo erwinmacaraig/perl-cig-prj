@@ -125,6 +125,9 @@
                             [% task.RegistrationNatureLabel %]<br/>
                             [% Lang.txt('Review Transfer of') %] [% task.Name %]<br/>
                             From [% task.RequestToClub %] to [% task.RequestFromClub %]<br/>
+                            [% IF task.changeLevelDescription %]
+                                [% task.changeLevelDescription %]
+                            [% END %]
                             </div>
                         </td>
                     [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'REGO' AND task.RegistrationNature != 'TRANSFER' %]
