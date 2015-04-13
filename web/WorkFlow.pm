@@ -464,6 +464,8 @@ sub listTasks {
             t.intOnHold as OnHold,
             preqFrom.strLocalName as preqFromClub,
             preqTo.strLocalName as preqToClub,
+            pr.intPersonLevelChanged,
+            pr.strPreviousPersonLevel,
             IF(t.strWFRuleFor = 'ENTITY', e.intCreatedByEntityID, IF(t.strWFRuleFor = 'REGO', pr.intOriginID, 0)) as CreatedByEntityID
 	    FROM tblWFTask AS t
                 LEFT JOIN tblWFRule ON (tblWFRule.intWFRuleID = t.intWFRuleID)
@@ -611,6 +613,13 @@ sub listTasks {
             $ruleForType = $dref->{'strRegistrationNature'} . "_PERSON";
         }
 
+        my $changeLevelDescription = '';
+        if ($dref->{'intPersonLevelChanged'} and $dref->{'strPersonLevel'} ne $dref->{'strPreviousPersonLevel'})    {
+            my $fromLevel = $Data->{'lang'}->txt($Defs::personLevel{$dref->{'strPreviousPersonLevel'}});
+            my $newLevel = $Data->{'lang'}->txt($Defs::personLevel{$dref->{'strPersonLevel'}});
+            $changeLevelDescription = $Data->{'lang'}->txt('with Level change from ') . $fromLevel . " " . $Data->{'lang'}->txt("to") . " " . $newLevel;
+        }
+
 	 my %single_row = (
 			WFTaskID => $dref->{intWFTaskID},
             TaskDescription => $taskDescription,
@@ -641,6 +650,7 @@ sub listTasks {
             RequestFromClub => $dref->{'preqFromClub'},
             taskTimeStamp => $dref->{'taskTimeStamp'},
             newTask => $newTask,
+            changeLevelDescription => $changeLevelDescription
 		);
         #print STDERR Dumper \%single_row;
    

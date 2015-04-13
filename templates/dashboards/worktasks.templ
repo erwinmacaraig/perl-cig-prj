@@ -134,6 +134,9 @@
                             [% task.RegistrationNatureLabel %]<br/>
                             [% task.Name %]<br/>
                             [% task.LocalEntityName %]
+                            [% IF task.changeLevelDescription %]
+                                <br/>[% task.changeLevelDescription %]
+                            [% END %]
                             </div>
                         </td>
                     [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'ENTITY' %]
