@@ -1614,7 +1614,6 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 			<th>].$lang->txt('Item').qq[</th>
 			<th>].$lang->txt('Payment For').qq[</th>
 			<th>].$lang->txt('Quantity').qq[</th>
-			<th>].$lang->txt('Tax Rate').qq[</th>
 			<th>].$lang->txt('Tax Price').qq[</th>
 			<th>].$lang->txt('Total Amount').qq[</th>
 			<th>].$lang->txt('Status').qq[</th>
@@ -1640,7 +1639,6 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 				<td>$productname</a></td>
 				<td>$paymentFor</a></td>
 				<td>$dref->{intQty}</a></td>
-				<td>$taxRateinPercent&#37;</a></td>
 				<td>].$Data->{'l10n'}{'currency'}->format($dref->{'curPriceTax'}) . qq[</td>
 				<td>].$Data->{'l10n'}{'currency'}->format($dref->{'curAmount'}) . qq[</td>
 				<td>].$lang->txt($Defs::TransactionStatus{$dref->{intStatus}}) . qq[</td>
@@ -1821,6 +1819,7 @@ sub viewTransLog	{
 	
         my ($resultHTML, undef )=handleHTMLForm($FieldDefs{'TXNLOG'}, undef, 'display', 1,$db);
 
+	return ($resultHTML, $lang->txt("Payment Record")) if ($Data->{'SelfRego'});
 	#my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
   my $previousAttemptsBody = qq[
     <h2 class="section-header">].$lang->txt('Previous Payment attempts') . qq[</h2>
@@ -1873,7 +1872,6 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 			<th>].$lang->txt('Item').qq[</th>
 			<th>].$lang->txt('Payment For').qq[</th>
 			<th>].$lang->txt('Quantity').qq[</th>
-			<th>].$lang->txt('Tax Rate').qq[</th>
 			<th>].$lang->txt('Tax Price').qq[</th>
 			<th>].$lang->txt('Total Amount').qq[</th>
 			<th>].$lang->txt('Status').qq[</th>
@@ -1899,7 +1897,6 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 				<td>$productname</a></td>
 				<td>$paymentFor</a></td>
 				<td>$dref->{intQty}</a></td>
-				<td>$taxRateinPercent&#37;</a></td>
 				<td>].$Data->{'l10n'}{'currency'}->format($dref->{'curPriceTax'}) . qq[</td>
 				<td>].$Data->{'l10n'}{'currency'}->format($dref->{'curAmount'}) . qq[</td>
 				<td>].$lang->txt($Defs::TransactionStatus{$dref->{intStatus}}) . qq[</td>

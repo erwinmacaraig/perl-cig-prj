@@ -367,6 +367,7 @@ $sth = $Data->{'db'}->prepare($query);
             
         my $editlink =  $Data->{'target'}."?".$carryString;
 	my $displayPayment = ($amountDue and $hidden_ref->{'payMethod'}) ? 1 : 0;
+        $displayPayment = 0 if ($Data->{'SelfRego'} and ! $Data->{'SystemConfig'}{'SelfRego_PaymentOn'});
         my %PageData = (
             person_home_url => $url,
 			person => \%personData,
@@ -1042,6 +1043,8 @@ sub displayRegoFlowProducts {
     else    {
         return '';
     }
+        my $displayPayment = $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'};
+        $displayPayment = 0 if ($Data->{'SelfRego'} and ! $Data->{'SystemConfig'}{'SelfRego_PaymentOn'});
 	my $maObj = getInstanceOf($Data, 'national');
         my $maName = $maObj
             ? $maObj->name()
@@ -1051,7 +1054,7 @@ sub displayRegoFlowProducts {
         nextaction=>"PREGF_PU",
         target => $Data->{'target'},
         product_body => $product_body,
-        mandatoryPayment => $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'},
+        mandatoryPayment => $displayPayment,
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
         client=>$client,

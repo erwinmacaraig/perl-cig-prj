@@ -56,7 +56,6 @@ sub handleSelfUserFlow  {
     );
     $user->load();
     my $userID = $user->id() || 0;
-print STDERR "USERID $userID\n";
     $Data->{'UserName'} = $user->name();
     $Data->{'User'} = $user;
 

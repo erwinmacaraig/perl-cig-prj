@@ -41,6 +41,7 @@ sub main {
     $Data{'target'} = $target;
     $Data{'cache'}  = new MCache();
     $Data{'AddToPage'} = new AddToPage();
+    $Data{'SelfRego'} = 1;
 
     my %clientValues = getClient($client);
     $Data{'clientValues'} = \%clientValues;
@@ -97,7 +98,6 @@ sub main {
     elsif ( $action =~ /SIGNUP_/ ) {
     }
     elsif ( $action =~ /REG_/ ) {
-print STDERR "FLOW$action\n";
         my $content = handleSelfUserFlow($action, \%Data, undef);
         $resultHTML .= $content;
     }

@@ -433,6 +433,7 @@ sub validate_person_identifier_details    {
 sub display_registration { 
     my $self = shift;
 
+    #$self->addCarryField('','');
     my $personID = $self->ID();
     if(!doesSelfUserHaveAccess($self->{'Data'}, $personID, $self->{'UserID'})) {
         return ('Invalid User',0);
@@ -556,14 +557,14 @@ sub process_registration {
     my $existingReg = $self->{'RunParams'}{'existingReg'} || 0;
     my $changeExistingReg = $self->{'RunParams'}{'changeExisting'} || 0;
     my $registrationNature = $self->{'RunParams'}{'d_nature'} || '';
+#    $registrationNature =~ s/,.*$//g;
     my $personRequestID = $self->{'RunParams'}{'prid'} || '';
-    my $entityID = $self->{'RunParams'}{'d_eId'} || $self->{'RunParams'}{'de'} || 0;
+    my (undef, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rtargetid'});
+    my $entityID = $self->{'RunParams'}{'d_eId'} || $self->{'RunParams'}{'de'} || $rawDetails->{'intEntityID'};
     my $entityLevel = $self->{'RunParams'}{'d_etype'} || '';
     my $originLevel = $Defs::LEVEL_PERSON;
     my $lang = $self->{'Lang'};
 
-    my (undef, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rtargetid'});
-    $entityID = $rawDetails->{'intEntityID'};
     my $personID = $self->ID() || 0;
     if(!doesSelfUserHaveAccess($self->{'Data'}, $personID, $self->{'UserID'})) {
         return ('Invalid User',0);

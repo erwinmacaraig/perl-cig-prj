@@ -171,6 +171,7 @@ sub checkIsSuspended    {
 sub checkNewRegoOK  {
 
     my ($Data, $personID, $rego_ref) = @_;
+print STDERR "CHECKING NEW\n";
     my %Reg = (
         sport=> $rego_ref->{'sport'} || '',
         personType=> $rego_ref->{'personType'} || '',
