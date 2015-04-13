@@ -197,9 +197,7 @@ sub display_old_club {
         TextTop => '',
         TextBottom => '',
     );
-	open FH, ">dumpfile.txt";
-	print FH Dumper(%PageData);
-    my $pagedata = $self->display(\%PageData);
+	my $pagedata = $self->display(\%PageData);
 
     return ($pagedata,0);
 
