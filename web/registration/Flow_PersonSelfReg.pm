@@ -1178,7 +1178,6 @@ print STDERR "SUMM$regoID\n";
         ContinueButtonText => $self->{'Lang'}->txt('Submit to ' . $initialTaskAssigneeLevel),
     );
     $gatewayConfig->{'Target'} = "$Defs::base_url/".$gatewayConfig->{'Target'};
-print STDERR "TARGET $gatewayConfig->{'Target'}";
     if ($gatewayConfig->{'amountDue'} and $payMethod eq 'now')    {
         ## Change Target etc
         %Config = (
