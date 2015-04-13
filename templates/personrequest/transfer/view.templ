@@ -5,7 +5,7 @@
             <h3 class = "panel-header">[% personFirstname %] [% personSurname %]</h3>
 				<div class="panel-body">
 
-				<p class="transfer-text">[% requestFrom %] [% Lang.txt('has requested a transfer for') %] [% personFirstname %] [% personSurname %]. [% Lang.txt('Please approve or reject the request') %].</p>
+				<p class="transfer-text">[% requestFrom %] [% Lang.txt('[_1] have requested a transfer for [_2]',requestFrom,  personFirstname _ ' ' _ personSurname) %]. [% Lang.txt('Please approve or reject the request') %].</p>
 
 				<div class="alert">
 					<div>

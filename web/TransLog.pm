@@ -940,10 +940,10 @@ sub listTransactions {
     my $line = '';
 
     #my $entityNamePlural = 'Transactions';
-	my $entityNamePlural = 'Payment History';
+	my $entityNamePlural = $Data->{'lang'}->txt('Payment History');
     $entityNamePlural= ($Data->{'SystemConfig'}{'txns_link_name'}) ? $Data->{'SystemConfig'}{'txns_link_name'} : $entityNamePlural;
 
-	my $header=$Data->{'lang'}->txt($entityNamePlural);
+	my $header=$entityNamePlural;
 	
 
         my $targetManual = $Data->{'target'};
