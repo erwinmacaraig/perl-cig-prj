@@ -127,8 +127,10 @@ sub getRegistrationItems    {
         next if($dref->{'strDocumentFor'} eq 'TRANSFERITC' and !$Rego_ref->{'InternationalTransfer'});
 
         ## Lets see if the person was active in the appropriate periods
-        if ($dref->{'intItemUsingActiveFilter'})    {
-            $ActiveFilter_ref->{$dref->{'strItemActiveFilterPeriods'}} ||= 0;
+        if ($Data->{'SystemConfig'}{$sysConfigActiveFilter} && $dref->{'intItemUsingActiveFilter'})    {
+            if (! defined $ActiveFilter_ref->{$dref->{'strItemActiveFilterPeriods'}})   {
+                $ActiveFilter_ref->{$dref->{'strItemActiveFilterPeriods'}} ||= 0; # was outside of if
+            }
             next if ($dref->{'intItemActive'} != $ActiveFilter_ref->{$dref->{'strItemActiveFilterPeriods'}});
         }
 
