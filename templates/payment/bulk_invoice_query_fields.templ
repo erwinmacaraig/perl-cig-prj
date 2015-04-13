@@ -27,7 +27,7 @@
 									[% NEXT IF opt == 'RAOFFICIAL' and Level < 20 %]
 									[% NEXT IF opt == 'MAOFFICIAL' and Level < 20 %]
 									[% NEXT IF opt == 'REFEREE' and Level < 20 %]
-									<option value="[% opt %]">[% PersonType.options.$opt %]</option>
+									<option value="[% opt %]">[% Lang.txt(PersonType.options.$opt) %]</option>
 								[% END %]					
 							</select>
 						</div>
@@ -39,7 +39,7 @@
 							<select name="Sport" id="Sport" class="chzn-select" data-placeholder="[% Lang.txt('Select Sport') %]">
 								<option value=""></option>
 								[% FOREACH opt IN Sport.options.keys %]
-									<option value="[% opt %]">[% Sport.options.$opt %]</option>
+									<option value="[% opt %]">[% Lang.txt(Sport.options.$opt) %]</option>
 								[% END %]	
 							</select>
 						</div>
@@ -51,7 +51,7 @@
 							<select name="PersonLevel" class="chzn-select" data-placeholder="[% Lang.txt('Select Person Level') %]">
 						<option value=""></option>
 							[% FOREACH opt IN PersonLevel.options.keys %]
-								<option value="[% opt %]">[% PersonLevel.options.$opt %]</option>
+								<option value="[% opt %]">[% Lang.txt(PersonLevel.options.$opt) %]</option>
 							[% END %]	
 					</select>
 						</div>
@@ -63,7 +63,7 @@
 							<select name="AgeLevel" class="chzn-select" data-placeholder="[% Lang.txt('Select Age Level') %]">
 						<option value=""></option>
 							[% FOREACH opt IN AgeLevel.options.keys %]
-								<option value="[% opt %]">[% AgeLevel.options.$opt %]</option>
+								<option value="[% opt %]">[% Lang.txt(AgeLevel.options.$opt) %]</option>
 							[% END %]	
 					</select>
 						</div>
@@ -75,7 +75,7 @@
 							<select name="NationalPeriod" class="chzn-select" data-placeholder="[% Lang.txt('Select Period') %]">
 						<option value=""></option>
 							[% FOREACH opt IN NationalPeriod.options.keys.sort %]
-								<option value="[% opt %]">[% NationalPeriod.options.$opt %]</option>
+								<option value="[% opt %]">[% Lang.txt(NationalPeriod.options.$opt) %]</option>
 							[% END %]	
 					</select>
 						</div>
