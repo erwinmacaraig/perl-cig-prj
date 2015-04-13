@@ -197,6 +197,8 @@ sub display_old_club {
         TextTop => '',
         TextBottom => '',
     );
+	open FH, ">dumpfile.txt";
+	print FH Dumper(%PageData);
     my $pagedata = $self->display(\%PageData);
 
     return ($pagedata,0);
@@ -1613,9 +1615,9 @@ sub Navigation {
             if($step_in_future) {
                 $js = qq[onclick="alert('].$lang->txt('Use the Continue button to go to the next page').qq[');return false;" ];
             }
-            my $link = qq[<a href="$linkURL" class = "$currentclass" $js>$name</a>];
+            my $link = qq[<a href="$linkURL" class = "$currentclass" $js><small>$name</small></a>];
 
-            $navstring .= qq[ <li class = "$currentclass">$link</li> ];
+            $navstring .= qq[<li class = "$currentclass">$link</li>];
             $step_in_future = 2 if $current;
             $step++;
         }
