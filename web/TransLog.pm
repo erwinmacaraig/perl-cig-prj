@@ -269,6 +269,8 @@ sub fixDate  {
     if($year > 20 and $year < 100)  {$year+=1900;}
     elsif($year <=20) {$year+=2000;}
     $date="$year-$month-$day";
+	my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
+	$date .= qq[ $Hour:$Minute:$Second];
   }
   else  { $date='';}
   return $date;
@@ -292,8 +294,6 @@ sub step2 {
 	#$dtLog=convertDateToYYYYMMDD($dtLog);
 	$dtLog=fixDate($dtLog);
 	deQuote($db, (\$currencyID, \$intAmount, \$dtLog, \$paymentType, \$strBSB, \$strAccountName, \$strAccountNum, \$strResponseCode, \$strResponseText, \$strComments, \$strBank, \$strReceiptRef));
-
-
 #Load transactions, update them to point to this payment
 	my @transactionIDs;
 	foreach my $k (keys %{$Data->{params}}) {
@@ -478,7 +478,7 @@ AND    tblTransLog.intStatus = ?
 LIMIT 1
 EOS
 
-
+   
     my $query = $db->prepare($st);
     $query->execute($transLogID, $Data->{Realm}, $Defs::TXNLOG_PENDING);
 
@@ -495,10 +495,12 @@ EOS
 			UPDATE tblTransLog SET intStatus=$Defs::TXNLOG_SUCCESS WHERE intLogID=$transLogID and intRealmID=$Data->{Realm}
 			AND intStatus = $Defs::TXNLOG_PENDING 
 	];
+
 	$db->do($st);
 
 	$st = qq[UPDATE tblTransactions as T INNER JOIN tblTXNLogs as TXNLog ON (T.intTransactionID = TXNLog.intTXNID) SET T.dtPaid=$dtLog, T.intStatus=$Defs::TXN_PAID, T.intTransLogID=$transLogID WHERE intTLogID = $transLogID and T.intRealmID=$Data->{Realm} AND T.intStatus = $Defs::TXN_UNPAID];
-	$db->do($st);
+	$db->do($st);  
+
 
 	Products::product_apply_transaction($Data,$transLogID);
 	my $cl=setClient($Data->{'clientValues'}) || '';
@@ -707,7 +709,7 @@ sub getTransList {
 		}
             $row_data->{$header->{field}} = $row->{$header->{field}}; 
             $row_data->{'dtPaid_RAW'} = $row->{'dtPaid'}; 
-            $row_data->{'dtPaid'} = $Data->{'l10n'}{'date'}->TZformat($row->{'dtPaid'},'MEDIUM','SHORT'); 
+            $row_data->{'dtPaid'} = $Data->{'l10n'}{'date'}->format($row->{'dtPaid'},'MEDIUM','SHORT'); 
         }
         $row_data->{'PersonType'} = $lang->txt($Defs::personType{$row->{'strPersonType'}});
             $row_data->{SelectLink} = qq[main.cgi?client=$client&a=P_TXN_EDIT&personID=$row->{intID}&id=$row->{intTransLogID}&tID=$row->{intTransactionID}];
@@ -1485,7 +1487,7 @@ sub resolveHoldPaymentForm  {
                                 },
                                 dtLog=> {
                                         label => 'Date Paid',
-                                        value => $Data->{'l10n'}{'date'}->TZformat($TLref->{'dtLog'},'MEDIUM','SHORT'),
+                                        value => $Data->{'l10n'}{'date'}->format($TLref->{'dtLog'},'MEDIUM','SHORT'),
                                         readonly => '1',
                                 },
                                 intLogID=> {
@@ -1744,7 +1746,7 @@ sub viewTransLog	{
                                 },
                                 dtLog=> {
                                         label => 'Date Paid',
-                                        value => $Data->{'l10n'}{'date'}->TZformat($TLref->{'dtLog'},'MEDIUM','SHORT'),
+                                        value => $Data->{'l10n'}{'date'}->format($TLref->{'dtLog'},'MEDIUM','SHORT'),
                                         readonly => '1',
                                 },
                                 intLogID=> {
@@ -2135,7 +2137,7 @@ sub listTransLog	{
             status => $dref->{'status'},
 			name => $dref->{'strLocalFirstname'} . " " . $dref->{'strLocalSurname'},
 			strResponseCode => $dref->{'strResponseCode'},
-			dtLog => $Data->{'l10n'}{'date'}->TZformat($dref->{'dtLog'},'MEDIUM','SHORT'),
+			dtLog => $Data->{'l10n'}{'date'}->format($dref->{'dtLog'},'MEDIUM','SHORT'),
 			dtLog_RAW => $dref->{'dtLog_RAW'},
 			receipt => qq[<a href = "printreceipt.cgi?client=$client&ids=$dref->{intLogID}&pID=$dref->{'intID'}" target="receipt">].$textLabels{'viewReceipt'}."</a>",
 			strComments => $dref->{'strComments'},
