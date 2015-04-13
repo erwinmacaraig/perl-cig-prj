@@ -568,7 +568,9 @@ sub displayRegoFlowComplete {
             $body = runTemplate($Data, \%PageData, 'personrequest/transfer/complete.templ') || '';
         }
         else {
-            $body = runTemplate($Data, \%PageData, 'registration/complete.templ') || '';
+            my $template = 'registration/complete.templ';
+            $template = 'registration/complete_sr.templ' if ($Data->{'SelfRego'});
+            $body = runTemplate($Data, \%PageData, $template) || '';
         }
     }
     return ($body, $gateways);
