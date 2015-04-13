@@ -33,6 +33,7 @@ use PersonFieldsSetup;
 use PersonRegistration;
 use PersonSummaryPanel;
 use RenewalDetails;
+use RegoProducts;
 
 
 sub setProcessOrder {
@@ -561,6 +562,8 @@ sub process_registration {
     my $originLevel = $Defs::LEVEL_PERSON;
     my $lang = $self->{'Lang'};
 
+    my (undef, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rtargetid'});
+    $entityID = $rawDetails->{'intEntityID'};
     my $personID = $self->ID() || 0;
     if(!doesSelfUserHaveAccess($self->{'Data'}, $personID, $self->{'UserID'})) {
         return ('Invalid User',0);
@@ -574,6 +577,7 @@ sub process_registration {
         if($changeExistingReg)    {
             $self->deleteExistingReg($existingReg, $personID);
         }
+print STDERR "ENTITY IS $entityID\n";
         if(!$existingReg or $changeExistingReg)    {
             ($regoID, undef, $msg) = add_rego_record(
                 $self->{'Data'}, 
@@ -755,6 +759,7 @@ sub process_certifications {
 sub display_products { 
     my $self = shift;
 
+    $self->addCarryField('payMethod','');
     my $personID = $self->ID();
     if(!doesSelfUserHaveAccess($self->{'Data'}, $personID, $self->{'UserID'})) {
         return ('Invalid User',0);
@@ -802,8 +807,8 @@ sub display_products {
             1,
         );
         if (! $content)   {
-            $self->incrementCurrentProcessIndex();
-            return ('',2);
+            #$self->incrementCurrentProcessIndex();
+            #return ('',2);
         }
     }
     else    {
@@ -904,12 +909,21 @@ sub process_products {
         }
     }
 
+    cleanRegoTransactions($self->{'Data'},$regoID, $personID, $Defs::LEVEL_PERSON);
+    my ($resultHTML, $error) = checkMandatoryProducts($self->{'Data'}, $personID, $Defs::LEVEL_PERSON, $self->{'RunParams'});
+    if ($error) {
+        push @{$self->{'RunDetails'}{'Errors'}}, $resultHTML;
+        $self->setCurrentProcessIndex('p');
+        return ('',2);
+    }
+
     my ($txnIds, $amount) = save_rego_products($self->{'Data'}, $regoID, $personID, $entityID, $entityLevel, $rego_ref, $self->{'RunParams'});
 
 ####
     my $paymentType = $self->{'RunParams'}{'paymentType'} || 0;
     my $markPaid= $self->{'RunParams'}{'markPaid'} || 0;
     my @txnIds = split ':',$txnIds ;
+print STDERR "TXNID: $txnIds\n";
     if ($paymentType and $markPaid)  {
             my %Settings=();
             $Settings{'paymentType'} = $paymentType;
@@ -1108,21 +1122,29 @@ sub display_summary {
 
     my $rego_ref = {};
     my $content = '';
+    my $gatewayConfig = undef;
     if($regoID) {
         ($entityID, $entityLevel) = $self->getRegoEntity($regoID, $personID);
         $regoID = 0 if !$entityID;
     }
 
+    my $payMethod = '';
+print STDERR "SUMM$regoID\n";
     if($regoID) {
         $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
         $personObj->load();
         my $nationality = $personObj->getValue('strISONationality') || ''; 
         $rego_ref->{'Nationality'} = $nationality;
+        $self->addCarryField('txnIds', $self->{'RunParams'}{'txnIds'} || 0);
+        $self->addCarryField('payMethod', $self->{'RunParams'}{'payMethod'} || '');
+        $payMethod = $self->{'RunParams'}{'payMethod'} || '';
 
         my $hiddenFields = $self->getCarryFields();
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
-        $content = displayRegoFlowSummary(
+        $hiddenFields->{'cA'} = "SELFREGOFLOW";
+        $hiddenFields->{'selfRego'} = "1";
+        ($content, $gatewayConfig)= displayRegoFlowSummary(
             $self->{'Data'}, 
             $regoID, 
             $client, 
@@ -1150,17 +1172,47 @@ sub display_summary {
         0
     );
 
-    my %PageData = (
+    my %Config = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
+        ContinueButtonText => $self->{'Lang'}->txt('Submit to ' . $initialTaskAssigneeLevel),
+    );
+    $gatewayConfig->{'Target'} = "$Defs::base_url/".$gatewayConfig->{'Target'};
+print STDERR "TARGET $gatewayConfig->{'Target'}";
+    if ($gatewayConfig->{'amountDue'} and $payMethod eq 'now')    {
+        ## Change Target etc
+        %Config = (
+            HiddenFields => $gatewayConfig->{'HiddenFields'},
+            Target => $gatewayConfig->{'Target'},
+            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to '. $initialTaskAssigneeLevel),
+        );
+    }
+
+    my %PageData = (
         Errors => $self->{'RunDetails'}{'Errors'} || [],
-        FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID(),1) || '',
+        FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
         Content => $content,
         Title => '',
         TextTop => '',
         TextBottom => '',
-        ContinueButtonText => $self->{'Lang'}->txt('Submit to ' . $initialTaskAssigneeLevel),
-    );
+        HiddenFields => $Config{'HiddenFields'},
+        Target => $Config{'Target'},
+        ContinueButtonText => $Config{'ContinueButtonText'},
+    );    
+
+
+
+    #my %PageData = (
+    #    HiddenFields => $self->stringifyCarryField(),
+    #    Target => $self->{'Data'}{'target'},
+    #    Errors => $self->{'RunDetails'}{'Errors'} || [],
+    #    FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID(),1) || '',
+    #    Content => $content,
+    #    Title => '',
+    #    TextTop => '',
+    #    TextBottom => '',
+    #    ContinueButtonText => $self->{'Lang'}->txt('Submit to ' . $initialTaskAssigneeLevel),
+    #);
 
 
     my $registrationNature = $self->{'RunParams'}{'d_nature'} || '';
@@ -1217,6 +1269,7 @@ sub display_complete {
         my $hiddenFields = $self->getCarryFields();
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
+print STDERR "COMPLETE: $regoID | Perso: $personID\n";
         ($content, $gateways) = displayRegoFlowComplete(
             $self->{'Data'}, 
             $regoID, 

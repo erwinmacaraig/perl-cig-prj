@@ -17,6 +17,8 @@ require Exporter;
     cleanPlayerPersonRegistrations
 );
 use strict;
+use lib "..",".";
+
 use WorkFlow;
 #use Log;
 use RuleMatrix;
@@ -223,6 +225,7 @@ sub checkRenewalRegoOK  {
     $pref = Person::loadPersonDetails($Data->{'db'}, $personID) if ($personID);
     return 0 if (defined $pref and ($pref->{'strStatus'} eq $Defs::PERSON_STATUS_SUSPENDED));
     my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $rego_ref->{'sport'}, $rego_ref->{'personType'}, 'RENEWAL');
+print STDERR Dumper($rego_ref);
 
     $rego_ref->{'ruleFor'} = 'REGO';
     my ($personRegisterWhat, $errorMsg) = PersonRegisterWhat::optionsPersonRegisterWhat(
@@ -274,6 +277,7 @@ sub checkRenewalRegoOK  {
         $personID,
         \%Reg
     );
+print STDERR "COUNT $count\n";
     my @statusNOTIN = ();
     @statusNOTIN = ($Defs::PERSONREGO_STATUS_INPROGRESS, $Defs::PERSONREGO_STATUS_REJECTED);
 
@@ -988,7 +992,7 @@ sub submitPersonRegistration    {
         $pr_ref->{'paymentRequired'} = 0 if ($rego_ref->{'CountTXNs'} == 0);
 
         updatePersonRegistration($Data, $personID, $personRegistrationID, $pr_ref, $personStatus);
-        cleanTasks(
+        WorkFlow::cleanTasks(
             $Data,
             $personID,
             $pr_ref->{'entityID'} || $pr_ref->{'intEntityID'} || 0,
@@ -996,7 +1000,7 @@ sub submitPersonRegistration    {
             'REGO'
         );
 
-            my $rc = addWorkFlowTasks(
+            my $rc = WorkFlow::addWorkFlowTasks(
             $Data,
             'REGO', 
             $pr_ref->{'registrationNature'} || $pr_ref->{'strRegistrationNature'} || '', 

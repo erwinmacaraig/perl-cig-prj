@@ -4,7 +4,7 @@ require Exporter;
 @EXPORT=qw(payTryRead payTryRedirectBack payTryContinueProcess);
 @EXPORT_OK=qw(payTryRead payTryRedirectBack payTryContinueProcess);
 
-use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user" ;
+use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user", "registration", "registration/user";
 
 use strict;
 use DBI;
@@ -24,6 +24,7 @@ use Gateway_Common;
 use TTTemplate;
 use ClubFlow;
 use PersonFlow;
+use SelfUserFlow;
 use TransferFlow;
 use BulkRenewalsFlow;
 use MD5;
@@ -40,6 +41,9 @@ sub payTryContinueProcess {
     }
     if ($payTry->{'strContinueAction'} eq 'REGOFLOW')   {
         handlePersonFlow($payTry->{'a'}, $Data, $payTry);
+    }
+    if ($payTry->{'strContinueAction'} eq 'SELFREGOFLOW')   {
+        handleSelfUserFlow($payTry->{'a'}, $Data, $payTry);
     }
     if ($payTry->{'strContinueAction'} eq 'TRANSFER')   {
         handleTransferFlow($payTry->{'a'}, $Data, $payTry);
@@ -62,7 +66,9 @@ sub payTryRedirectBack  {
     $m->reset();
     $m->add($logID);
     my $encLogID= uc($m->hexdigest());
-    my $redirect_link = "main.cgi?client=$client&amp;a=$a&amp;ptry=$logID&amp;payMethod=now&amp;run=0&amp;tl=$logID&amp;eptry=$encLogID";
+    my $link="main.cgi";
+    $link = "registration/index.cgi" if ($payTry->{'selfRego'});
+    my $redirect_link = "$link?client=$client&amp;a=$a&amp;ptry=$logID&amp;payMethod=now&amp;run=0&amp;tl=$logID&amp;eptry=$encLogID";
 
     foreach my $k (keys %{$payTry}) {
         next if $k eq 'client';
@@ -116,10 +122,11 @@ sub payTryRead  {
             $where
     ];
     my $query = $Data->{'db'}->prepare($st);
-    $query->execute($id);
+    $query->execute($id) or print STDERR "DB ERROR";
     my $href = $query->fetchrow_hashref();
     if ($href and $href->{'intTryID'})  {
         my $values = JSON::from_json($href->{'strLog'});
+        $values->{'selfRego'} = $href->{'intSelfRego'};
         $values->{'strContinueAction'} = $href->{'strContinueAction'};
         $values->{'intTransLogID'} = $href->{'intTransLogID'};
         $values->{'strPayReference'} = $href->{'strPayReference'};

@@ -24,6 +24,8 @@ use Flow_PersonSelfReg;
 use SelfUserWorkFlow;
 use AccountActivation;
 
+use SelfUserFlow;
+#use WorkFlow;
 use Data::Dumper;
 
 main();
@@ -95,53 +97,8 @@ sub main {
     elsif ( $action =~ /SIGNUP_/ ) {
     }
     elsif ( $action =~ /REG_/ ) {
-
-        my $cgi=new CGI;
-        my $personID = param('pID') || 0;
-        $personID = 0 if $personID < 0;
-        my $defaultType = param('dtype') || '';
-        my $defaultRegistrationNature = param('dnat') || '';
-        my $internationalTransfer = param('itc') || '';
-        my $startingStep = param('ss') || '';
-        my $minorRego = param('minorRego') || '';
-        my $entityID = 0;
-
-        #specific to Transfers
-        my $personRequestID = param('prid') || '';
-
-        #specific to Renewals
-        my $renewalTargetRegoID = param('rtargetid') || '';
-        if($srp)    {
-            my($s_type, $s_entity) = split /:/, $srp;
-            $defaultType = $s_type if $s_type;
-            $entityID = $s_entity if $s_entity;
-        }
-
-        my $flow = new Flow_PersonSelfReg(
-            db => $Data{'db'},
-            Data => \%Data,
-            Lang => $lang,
-            CarryFields => {
-                client => $client,
-                a => $action,
-                dtype => $defaultType,
-                dnat => $defaultRegistrationNature,
-                itc => $internationalTransfer,
-                minorRego => $minorRego,
-                ss => $startingStep,
-                prid => $personRequestID,
-                rtargetid => $renewalTargetRegoID,
-                de => $entityID,
-            },
-            ID  => $personID || 0,
-            UserID  => $userID || 0,
-            SystemConfig => $Data{'SystemConfig'},
-            ClientValues => \%clientValues,
-            Target => $Data{'target'},
-            cgi => $cgi,
-        );
-
-        my ($content,  undef) = $flow->run();
+print STDERR "FLOW$action\n";
+        my $content = handleSelfUserFlow($action, \%Data, undef);
         $resultHTML .= $content;
     }
     elsif ( $action =~ /WF_/ ) {

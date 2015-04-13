@@ -22,7 +22,7 @@ require Exporter;
 );
 
 use strict;
-use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
+use lib '../..', '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 use PersonRegistration;
 use RegistrationItem;
 use PersonRegisterWhat;
@@ -232,7 +232,7 @@ sub displayRegoFlowSummary {
         $gatewayConfig->{'amountDue'} = $amountDue;
          
           
-	    my $personObj = getInstanceOf($Data, 'person');
+	    my $personObj = getInstanceOf($Data, 'person', $personID);
         return if (! $personObj);
 		my $c = Countries::getISOCountriesHash();
 		
@@ -1253,7 +1253,6 @@ sub add_rego_record{
     }
 
     if ($rego_ref->{'registrationNature'} eq 'RENEWAL') {
-print STDERR "ABOUT TO CHECKRENEWAL\n";
         my $ok = PersonRegistration::checkRenewalRegoOK($Data, $personID, $rego_ref);
         return (0, undef, 'RENEWAL_FAILED') if (!$ok);
     }
