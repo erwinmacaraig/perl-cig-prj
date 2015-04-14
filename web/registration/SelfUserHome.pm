@@ -24,11 +24,18 @@ sub showHome {
 	) = @_;
 
     my (
-        $previousRegos ,
+        $previousRegos,
         $people,
         $found,
     ) = getPreviousRegos($Data, $user->id());
 
+	#
+	open ff, ">test.txt";
+	use Data::Dumper;
+	print ff Dumper $previousRegos; # this is a hash that contains an array
+	print ff "\n===\n" . Dumper $people; # this is a hash that contains an array
+	my $documents = getUploadedDocuments($Data, $previousRegos, $people);
+	#
     my $resultHTML = runTemplate(
         $Data,
         {
@@ -44,6 +51,14 @@ sub showHome {
     return $resultHTML;
 }
 
+sub getUploadedDocuments {
+	my ($Data, $previousRegos, $people ) = @_; 
+	# get registration IDs per intPersonID
+	my %registrationIDs = ();
+	foreach $person (@{$people}){
+		next if(exists($registrationIDs{$person->{'intPersonID'}}));
+	}
+}
 sub getPreviousRegos {
     my (
 		$Data,
