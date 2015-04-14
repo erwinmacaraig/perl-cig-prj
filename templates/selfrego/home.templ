@@ -39,12 +39,16 @@
                                     <tr>
                                         <td class = "">[% Lang.txt(rego.strPersonTypeName) %] [% IF rego.strPersonEntityRole %] ([% Lang.txt(rego.strPersonEntityRole) %])[% END %][% IF rego.strPersonLevel %] ([% Lang.txt(rego.strPersonLevelName) %])[% END %]</td>
                                         <td>[% rego.EntityName %]</td>
-                                        <td> [% Lang.txt('valid until') %] [% DateFormat.format(rego.dtTo,'MEDIUM','NONE') %]</td>
+                                        <td> [% Lang.txt('valid until') %] [% DateFormat.format(rego.NPdtTo,'MEDIUM','NONE') %]</td>
+                                        <td>[% rego.PRStatus %]</td>
                                         <td>
                                         [% IF rego.renewlink %]
                                             <a href = "[% rego.renewlink %]" class = "btn-inside-panels">[% Lang.txt('Renew') %]</a>
                                         [% ELSE %]
                                             &nbsp;
+                                        [% END %]
+                                        [% IF rego.allowTransfer %]
+                                            <a href = "#" class="btn-inside-panels">[% Lang.txt('Transfer') %]</a><br>
                                         [% END %]
                                     </tr>
                                 [% END %]
@@ -58,7 +62,6 @@
                                     <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=PLAYER" class = "btn-inside-panels">[% Lang.txt('Add Player Role') %]</a><br>
                                     <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=COACH" class = "btn-inside-panels">[% Lang.txt('Add Coach Role') %]</a><br>
                                     <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=REFEREE" class = "btn-inside-panels">[% Lang.txt('Add Referee Role') %]</a><br>
-                                    <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=REFEREE" class = "btn-inside-panels">[% Lang.txt('Transfer') %]</a><br>
                                 [% END %]
                             </div>
 

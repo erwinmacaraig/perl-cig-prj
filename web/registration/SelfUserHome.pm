@@ -59,7 +59,9 @@ sub getPreviousRegos {
             P.strLocalSurname,
             P.dtDOB,
             P.intGender,
-            P.strStatus as PersonStatus
+            P.strStatus as PersonStatus,
+            NP.strNationalPeriodName,
+            NP.dtTo as NPdtTo
         FROM
             tblSelfUserAuth AS A
             INNER JOIN tblPersonRegistration_$Data->{'Realm'} AS PR
@@ -67,6 +69,9 @@ sub getPreviousRegos {
                     A.intEntityTypeID = $Defs::LEVEL_PERSON
                     AND A.intEntityID = PR.intPersonID
                 )
+            INNER JOIN tblNationalPeriod as NP ON (
+                NP.intNationalPeriodID = PR.intNationalPeriodID
+            )
             INNER JOIN tblEntity AS E
                 ON PR.intEntityID = E.intEntityID
             INNER JOIN tblPerson AS P
@@ -86,9 +91,11 @@ sub getPreviousRegos {
     my %regos = ();
     my %found = ();
     my @people = ();
+    my $allowTransferShown=0;
     while(my $dref = $q->fetchrow_hashref())    {
         my $pID = $dref->{'intPersonID'} || next;
         if(!exists $regos{$pID})    {
+            $allowTransferShown=0;
             push @people, {
                 strLocalFirstname => $dref->{'strLocalFirstname'} || '',
                 strLocalSurname => $dref->{'strLocalSurname'} || '',
@@ -104,6 +111,16 @@ sub getPreviousRegos {
         $dref->{'strPersonLevelName'} = $Defs::personLevel{$dref->{'strPersonLevel'}} || '';
         
         $dref->{'renewlink'} = '';
+        $dref->{'allowTransfer'} =0;
+        $dref->{'PRStatus'} = $Defs::personRegoStatus{$dref->{'strStatus'}} || '';
+        if (
+            ! $allowTransferShown
+            and $Data->{'SystemConfig'}{'selfRego_' . $dref->{'strPersonLevel'} . '_allowTransfer'} 
+            and ($dref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE or $dref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PASSIVE)
+            and $dref->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER)    {
+            $dref->{'allowTransfer'} =1;
+            $allowTransferShown=1;
+        }
         if ($Data->{'SystemConfig'}{'selfRego_RENEW_'.$dref->{'strPersonType'}} 
             and ($dref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE or $dref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PASSIVE) 
             and $dref->{'PersonStatus'} eq $Defs::PERSON_STATUS_REGISTERED
