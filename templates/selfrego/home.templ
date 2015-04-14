@@ -39,7 +39,8 @@
                                     <tr>
                                         <td class = "">[% Lang.txt(rego.strPersonTypeName) %] [% IF rego.strPersonEntityRole %] ([% Lang.txt(rego.strPersonEntityRole) %])[% END %][% IF rego.strPersonLevel %] ([% Lang.txt(rego.strPersonLevelName) %])[% END %]</td>
                                         <td>[% rego.EntityName %]</td>
-                                        <td> [% Lang.txt('valid until') %] [% DateFormat.format(rego.dtTo,'MEDIUM','NONE') %]</td>
+                                        <td> [% Lang.txt('valid until') %] [% DateFormat.format(rego.NPdtTo,'MEDIUM','NONE') %]</td>
+                                        <td>[% rego.PRStatus %]</td>
                                         <td>
                                         [% IF rego.renewlink %]
                                             <a href = "[% rego.renewlink %]" class = "btn-inside-panels">[% Lang.txt('Renew') %]</a>
