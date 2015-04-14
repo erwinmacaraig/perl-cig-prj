@@ -104,6 +104,13 @@ sub getPreviousRegos {
         $dref->{'strPersonLevelName'} = $Defs::personLevel{$dref->{'strPersonLevel'}} || '';
         
         $dref->{'renewlink'} = '';
+        $dref->{'allowTransfer'} =0;
+        if (
+            $Data->{'SystemConfig'}{'selfRego_' . $dref->{'strPersonLevel'} . '_allowTransfer'} 
+            and ($dref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE or $dref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PASSIVE)
+            and $dref->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER)    {
+            $dref->{'allowTransfer'} =1;
+        }
         if ($Data->{'SystemConfig'}{'selfRego_RENEW_'.$dref->{'strPersonType'}} 
             and ($dref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE or $dref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PASSIVE) 
             and $dref->{'PersonStatus'} eq $Defs::PERSON_STATUS_REGISTERED
