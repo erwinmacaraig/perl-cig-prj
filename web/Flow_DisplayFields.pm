@@ -51,7 +51,7 @@ sub build {
     my $tabs           = '';
     my %sections       = ();
     my %sectioncount   = ();
-    my $txt_compulsory = $self->langlookup( 'Compulsory Field' );
+    my $txt_compulsory = $self->txt( 'Compulsory Field' );
     my $compulsory = qq[<span class="compulsory">*</span>];
     #my $compulsory = qq[];
     if($action eq 'display')    { $compulsory = ''; }
@@ -71,7 +71,7 @@ sub build {
 
         my $active = exists($f->{'active'}) ? $f->{'active'} : 1;
         my $sname = $f->{'sectionname'} || 'main';
-        my $label = $self->langlookup( $f->{'label'} ) || $f->{'label'} || '';
+        my $label = $self->txt( $f->{'label'} ) || $f->{'label'} || '';
         my $val        = defined $f->{'value'} ? $f->{'value'} : '';
         my $field_html = '';
         my $row_class = '';
@@ -247,7 +247,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
         }
         else {
             if ( $type eq 'lookup' ) {
-                $field_html = $f->{'options'}{$val} || "&nbsp;";
+                $field_html = $self->txt($f->{'options'}{$val}) || "&nbsp;";
             }
             elsif ( $type eq 'htmlrow' ) {
                 $sections{$sname} .= $val || '';
@@ -255,7 +255,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
             }
             elsif ( $f->{'displaylookup'} ) {
                 $field_html =
-                  $self->langlookup( $f->{'displaylookup'}{$val} );
+                  $self->txt( $f->{'displaylookup'}{$val} );
             }
             elsif ( $f->{'displayFunction'} ) {
                 my @p = ();
@@ -343,8 +343,8 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
     my %usedsections = ();
     for my $s ( @{$sectionlist} ) {
 
-        my $sectionheader = $self->{'Data'}->{'lang'}->txt($self->langlookup( $s->[1] )) || '';
-        my $requiredfield = $self->langlookup('Required fields') || '';
+        my $sectionheader = $self->{'Data'}->{'lang'}->txt($self->txt( $s->[1] )) || '';
+        my $requiredfield = $self->txt('Required fields') || '';
         my $ROSectionclass = '';
         if($action eq 'display')    {
             $requiredfield = ''; 
@@ -477,7 +477,7 @@ sub drop_down {
         }
         else { $selected = 'SELECTED' if $val eq $default; }
         $subBody .=
-          qq[ <option $selected value="$val">].$self->langlookup($options_ref->{$val}).qq[</option>];
+          qq[ <option $selected value="$val">].$self->txt($options_ref->{$val}).qq[</option>];
     }
     $multi = ' multiple ' if $multi;
     $size = min($size, scalar (keys %$options_ref) + 1);
@@ -486,8 +486,8 @@ sub drop_down {
       ? qq{<option value="$pre->[0]">$pre->[1]</option>}
       : '';
     my $placeholder_text = $multi
-        ? $self->langlookup('Select some options')
-        : $self->langlookup('Select an option');
+        ? $self->txt('Select some options')
+        : $self->txt('Select an option');
     $subBody = qq[
     <select name="d_$name" id="l_$name" size="$size" data-placeholder = "$placeholder_text" class = "$class" $multi $otheroptions $onChange $disabled>
     $preoption
@@ -605,7 +605,7 @@ sub gather    {
             next if $fv->{'readonly'};
             next if ( $permissions    and !$permissions->{$fieldname} );
             if($fv->{'label'})  {
-                push @problems, $fv->{'label'} . ' : ' . $self->langlookup('Required');
+                push @problems, $fv->{'label'} . ' : ' . $self->txt('Required');
             }
             next;
         }
@@ -648,56 +648,56 @@ sub _validate {
         }
 
         if ( $t eq 'NUMBER' ) {
-            push @errors, $self->langlookup( 'is not a valid number' )
+            push @errors, $self->txt( 'is not a valid number' )
               if $val !~ /^\d+$/;
         }
         if ( $t eq 'FLOAT' ) {
-            push @errors, $self->langlookup( 'is not a valid number' )
+            push @errors, $self->txt( 'is not a valid number' )
               if $val !~ /^[\d\.]+$/;
         }
         elsif ( $t eq 'NOSPACE' ) {
-            push @errors, $self->langlookup( 'cannot have spaces' )
+            push @errors, $self->txt( 'cannot have spaces' )
               if $val =~ /\s/;
         }
         elsif ( $t eq 'NOHTML' ) {
-            push @errors, $self->langlookup( 'cannot contain HTML' )
+            push @errors, $self->txt( 'cannot contain HTML' )
               if $val =~ /[<>]/;
         }
         elsif ( $t eq 'DATE' ) {
-            push @errors, $self->langlookup( 'is not a valid date' )
+            push @errors, $self->txt( 'is not a valid date' )
               if !$self->check_valid_date($val);
         }
         elsif ( $t eq 'MORETHAN' ) {
             push @errors,
-              $self->langlookup( "is not more than [_1]", $num1 )
+              $self->txt( "is not more than [_1]", $num1 )
               if $val <= $num1;
         }
         elsif ( $t eq 'MORETHANEQUAL' ) {
             push @errors,
-              $self->langlookup( "is not more than or equal to [_1]",
+              $self->txt( "is not more than or equal to [_1]",
                 $num1 )
               if $val < $num1;
         }
         elsif ( $t eq 'LESSTHAN' ) {
             push @errors,
-              $self->langlookup( "is not less than [_1]", $num1 )
+              $self->txt( "is not less than [_1]", $num1 )
               if $val >= $num1;
         }
         elsif ( $t eq 'LESSTHANEQUAL' ) {
             push @errors,
-              $self->langlookup( "is not less than or equal to [_1]",
+              $self->txt( "is not less than or equal to [_1]",
                 $num1 )
               if $val > $num1;
         }
         elsif ( $t eq 'BETWEEN' ) {
             push @errors,
-              $self->langlookup( "is not between [_1] and [_2]",
+              $self->txt( "is not between [_1] and [_2]",
                 $num1, $num2 )
               if ( $val < $num1 or $val > $num2 );
         }
         elsif ( $t eq 'LENGTH' ) {
             push @errors,
-              $self->langlookup( "must be [_1] characters long", $num1 )
+              $self->txt( "must be [_1] characters long", $num1 )
               if length($val) != $num1;
         }
         elsif ( $t eq 'EMAIL' ) {
@@ -705,7 +705,7 @@ sub _validate {
             my @emails = split /;/, $val;
             foreach (@emails) {
                 push @errors,
-                  $self->langlookup( 'is not a valid email address' )
+                  $self->txt( 'is not a valid email address' )
                   if !Mail::RFC822::Address::valid($_);
             }
         }
@@ -757,7 +757,7 @@ sub _fix_date {
     if ( exists $extra{NODAY} and $extra{NODAY} ) {
         my ( $mm, $yyyy ) = $date =~ m:(\d+)/(\d+):;
         if ( !$mm or !$yyyy ) {
-            return ( $self->langlookup( "Invalid Date" ), '' );
+            return ( $self->txt( "Invalid Date" ), '' );
         }
         if    ( $yyyy < 10 )  { $yyyy += 2000; }
         elsif ( $yyyy < 100 ) { $yyyy += 1900; }
@@ -765,7 +765,7 @@ sub _fix_date {
     }
     my ( $dd, $mm, $yyyy ) = $date =~ m:(\d+)/(\d+)/(\d+):;
     if ( !$dd or !$mm or !$yyyy ) {
-        return ( $self->langlookup( "Invalid Date" ), '' );
+        return ( $self->txt( "Invalid Date" ), '' );
     }
     if    ( $mm < 10 )  { $mm = "0$mm"; }
     if    ( $dd < 10 )  { $dd = "0$dd"; }
@@ -783,7 +783,7 @@ sub check_valid_date {
     return Date::Calc::check_date( $y, $m, $d );
 }
 
-sub langlookup {
+sub txt {
     my $self = shift;
     my $key        = shift;
     return '' if !$key;
@@ -909,27 +909,27 @@ s/onChange=(['"])(.*)\1/onMouseOut=$1 if (changed_$fieldname==1) { $2 } $1/i;
     $otherinfo ||= '';
 
     my %days = map { $_ => $_ } ( 1 .. 31 );
-    $days{0} = $self->langlookup( 'Day' );
+    $days{0} = $self->txt('Day');
 
     my %months = (
-        0  => $self->langlookup( 'Month' ),
-        1  => $self->langlookup( 'Jan' ),
-        2  => $self->langlookup( 'Feb' ),
-        3  => $self->langlookup( 'Mar' ),
-        4  => $self->langlookup( 'Apr' ),
-        5  => $self->langlookup( 'May' ),
-        6  => $self->langlookup( 'Jun' ),
-        7  => $self->langlookup( 'Jul' ),
-        8  => $self->langlookup( 'Aug' ),
-        9  => $self->langlookup( 'Sep' ),
-        10 => $self->langlookup( 'Oct' ),
-        11 => $self->langlookup( 'Nov' ),
-        12 => $self->langlookup( 'Dec' ),
+        0  => $self->txt('Month'),
+        1  => $self->txt('Jan'),
+        2  => $self->txt('Feb'),
+        3  => $self->txt('Mar'),
+        4  => $self->txt('Apr'),
+        5  => $self->txt('May'),
+        6  => $self->txt('Jun'),
+        7  => $self->txt('Jul'),
+        8  => $self->txt('Aug'),
+        9  => $self->txt('Sep'),
+        10 => $self->txt('Oct'),
+        11 => $self->txt('Nov'),
+        12 => $self->txt('Dec'),
     );
     $maxyear ||= (localtime)[5] + 1900 + 5;
     $minyear ||= 1900;
     my %years = map { $_ => $_ } ( $minyear .. $maxyear );
-    $years{0} = $self->langlookup( 'Year' );
+    $years{0} = $self->txt('Year');
 
     $val ||= '';
     my ( $val_y, $val_m, $val_d ) = split /\-/, $val;
@@ -1109,12 +1109,12 @@ sub generate_clientside_validation {
         if ( $validation->{$k}{'compulsory'} ) {
             $valinfo{'rules'}{ $field_prefix . $k }{'required'} = 'true';
             $valinfo{'messages'}{ $field_prefix . $k }{'required'} =
-              $self->langlookup( 'Field required' );
+              $self->txt("Field required");
         }
         if ( $validation->{$k}{'compulsoryIfVisible'} ) {
             $valinfo{'rules'}{ $field_prefix . $k }{'required'} = qq[JAVASCRIPTfunction(element){if(jQuery('#].$validation->{$k}{'compulsoryIfVisible'}.qq[').is(SINGLEQUOTE:visibleSINGLEQUOTE)){return true;} return false;}JAVASCRIPT];
             $valinfo{'messages'}{ $field_prefix . $k }{'required'} =
-              $self->langlookup( 'Field required' );
+              $self->txt("Field required");
         }
         if ( $validation->{$k}{'validate'} ) {
             for my $t ( split /\s*,\s*/, $validation->{$k}{'validate'} ) {
@@ -1127,39 +1127,34 @@ sub generate_clientside_validation {
                 if ( $t eq 'LENGTH' ) {
                     $valinfo{'rules'}{ $field_prefix . $k }{'minlength'} = $num1;
                     $valinfo{'messages'}{ $field_prefix . $k }{'minlength'} =
-                      $self->langlookup(
-                        "This must be [_1] characters long", $num1 );
+                      $self->txt("This must be [_1] characters long", $num1);
                 }
                 elsif ( $t eq 'EMAIL' ) {
                     $valinfo{'rules'}{ $field_prefix . $k }{'email'} = 'true';
                     $valinfo{'messages'}{ $field_prefix . $k }{'email'} =
-                      $self->langlookup(
-                        "Please enter a valid email address" );
+                      $self->txt("Please enter a valid email address");
                 }
                 elsif ( $t eq 'BETWEEN' ) {
                     $valinfo{'rules'}{ $field_prefix . $k }{'range'} =
                       [ $num1, $num2 ];
                     $valinfo{'messages'}{ $field_prefix . $k }{'range'} =
-                      $self->langlookup(
-                        "Please enter a value between [_1] and [_2]",
-                        $num1, $num2 );
+                      $self->txt("Please enter a value between [_1] and [_2]", $num1, $num2 );
                 }
                 elsif ( $t eq 'NUMBER' ) {
                     $valinfo{'rules'}{ $field_prefix . $k }{'digits'} = 'true';
                     $valinfo{'messages'}{ $field_prefix . $k }{'digits'} =
-                      $self->langlookup( "Please enter only digits" );
+                      $self->txt("Please enter only digits");
                 }
                 elsif ( $t eq 'FLOAT' ) {
                     $valinfo{'rules'}{ $field_prefix . $k }{'number'} = 'true';
                     $valinfo{'messages'}{ $field_prefix . $k }{'number'} =
-                      $self->langlookup( "Please enter a valid number",
+                      $self->txt("Please enter a valid number",
                         $num1, $num2 );
                 }
                 elsif ( $t eq 'URL' ) {
                     $valinfo{'rules'}{ $field_prefix . $k }{'url'} = 'true';
                     $valinfo{'messages'}{ $field_prefix . $k }{'url'} =
-                      $self->langlookup(
-                        "Please enter a valid URL" );
+                      $self->txt("Please enter a valid URL");
                 }
                 elsif ( $t eq 'REMOTE' ) {
                     my $vdata = $validation->{$k}{'validateData'} || next;
@@ -1179,7 +1174,7 @@ sub generate_clientside_validation {
                             data => \%remote_data,
                     };
                     $valinfo{'messages'}{ 'd_' . $k }{'remote'} =
-                      $self->langlookup("Number is invalid", $num1, $num2 );
+                      $self->txt("Number is invalid", $num1, $num2 );
                 }
             }
         }

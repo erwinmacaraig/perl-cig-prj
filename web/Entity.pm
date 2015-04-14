@@ -514,7 +514,7 @@ sub listEntities {
   ];
 
   my $title=$Data->{'SystemConfig'}{"PageTitle_List_$newentityLevel"} 
-    || "$Data->{'LevelNames'}{$newentityLevel.'_P'} in $currentname"; ###needs translation ->  WHAT in WHAT? 
+    || $Data->{'lang'}->txt("Regions in [_1]",$currentname); ###needs translation ->  WHAT in WHAT? 
     $title = $Data->{'lang'}->txt($title);
   return ($resultHTML,$title);
 }

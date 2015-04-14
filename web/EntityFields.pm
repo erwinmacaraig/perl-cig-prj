@@ -221,14 +221,14 @@ sub generateSingleRowField {
     #$entityFieldObj->load() if $entityFieldID;
 
     my %row = (
-        intEntityFieldID => $entityFieldID ? $entityFieldObj->getHtml('intEntityFieldID', $prefixID) : '',
-        intFieldOrderNumber => $entityFieldObj->getHtml('intFieldOrderNumber', $prefixID),
-        strName => $entityFieldObj->getHtml('strName', $prefixID),
-        strDiscipline => $entityFieldObj->getHtml('strDiscipline', $prefixID),
-        intCapacity => $entityFieldObj->getHtml('intCapacity', $prefixID),
-        strGroundNature => $entityFieldObj->getHtml('strGroundNature', $prefixID),
-        dblLength => $entityFieldObj->getHtml('dblLength', $prefixID),
-        dblWidth => $entityFieldObj->getHtml('dblWidth', $prefixID),
+        intEntityFieldID => $entityFieldID ? $entityFieldObj->getHtml('intEntityFieldID', $prefixID, $self->getData()->{'lang'}) : '',
+        intFieldOrderNumber => $entityFieldObj->getHtml('intFieldOrderNumber', $prefixID, $self->getData()->{'lang'}),
+        strName => $entityFieldObj->getHtml('strName', $prefixID, $self->getData()->{'lang'}),
+        strDiscipline => $entityFieldObj->getHtml('strDiscipline', $prefixID, $self->getData()->{'lang'}),
+        intCapacity => $entityFieldObj->getHtml('intCapacity', $prefixID, $self->getData()->{'lang'}),
+        strGroundNature => $entityFieldObj->getHtml('strGroundNature', $prefixID, $self->getData()->{'lang'}),
+        dblLength => $entityFieldObj->getHtml('dblLength', $prefixID, $self->getData()->{'lang'}),
+        dblWidth => $entityFieldObj->getHtml('dblWidth', $prefixID, $self->getData()->{'lang'}),
     );
 
     return \%row;
@@ -246,40 +246,41 @@ sub retrieveFormFieldData {
     my @facilityFieldDataCluster;
     my @errors;
     my @htmlElements = ();
+    my $lang = $self->getData()->{'lang'};
     my %fields = (
         'intEntityFieldID' => {
-            label => 'Field ID',
+            label => $lang->txt('Field ID'),
         },
         'intFieldOrderNumber' => {
-            label => 'Field Number',
+            label => $lang->txt('Field Number'),
             validate => 'NUMBER',
         },
         'strName' => {
-            label => 'Field Name',
+            label => $lang->txt('Field Name'),
         },
         'strDiscipline' => {
-            label => 'FieldDiscipline',
+            label => $lang->txt('FieldDiscipline'),
         },
         'strGroundNature' => {
-            label => 'Type of Field',
+            label => $lang->txt('Type of Field'),
         },
         'intCapacity' => {
-            label => 'Capacity',
+            label => $lang->txt('Capacity'),
             validate => 'NUMBER',
         },
         'dblLength' => {
-            label => 'Length of Field',
+            label => $lang->txt('Length of Field'),
             validate => 'FLOAT',
         },
         'dblWidth' => {
-            label => 'Width of Field',
+            label => $lang->txt('Width of Field'),
             validate => 'FLOAT',
         },
     );
 
     my $obj = new Flow_DisplayFields(
         Data => $self->getData(),
-        Lang => $self->getData()->{'Lang'},
+        Lang => $self->getData()->{'lang'},
         SystemConfig => $self->getData()->{'SystemConfig'},
         Fields => undef,
     );
@@ -293,7 +294,7 @@ sub retrieveFormFieldData {
             my $fieldlabel = $fields{$field}{'label'};
 
             if(($field ne 'intEntityFieldID') and !$params->{$fieldname}){
-                push @errors, $fieldlabel . " " . $index . ": " . $obj->langlookup('Field required') if $fieldname eq 'intCapacity';
+                push @errors, $fieldlabel . " " . $index . ": " . $obj->txt('Field required') if $fieldname eq 'intCapacity';
             }
 
             my $sysconfigLenRange = $self->getData()->{'SystemConfig'}{$params->{"strDiscipline_" . $index} . '_FIELD_LENGTH_RANGE'};

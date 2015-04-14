@@ -233,7 +233,7 @@
                                         <input type="hidden" name="prid" value="[% requestID %]">
                                         <input type="hidden" name="dnat" value="[% RequestAction.request_type %]">
 
-                                        <input style="border: 0px solid" class="btn-main btn-proceed" type="submit" name="submitbtn" value="Continue Transfer">
+                                        <input style="border: 0px solid" class="btn-main btn-proceed" type="submit" name="submitbtn" value="[% Lang.txt('Continue Transfer') %]">
                                     </form>
 
                                 </div>
@@ -245,7 +245,7 @@
 	<div class="col-md-3">
         <div id = "">
             [% PersonSummaryPanel %]
-			<div class="transfer-pending">[% Lang.txt('Transfer Status: Released') %]</div>
+			<div class="transfer-pending">[% Lang.txt('Transfer Status') %] : [% Lang.txt('Released') %]</div>
             <br/>
 
         </div>
@@ -275,8 +275,8 @@
           </div>
 
           <div class="modal-footer">
-            <a class="btn-main" data-dismiss="modal">Close</a>
-            <input class="btn-main" type="submit" name="submitbtn" value="Submit">
+            <a class="btn-main" data-dismiss="modal">[% Lang.txt('Close') %]</a>
+            <input class="btn-main" type="submit" name="submitbtn" value="[% Lang.txt('Submit') %]">
           </div>
       </form>
       
@@ -302,7 +302,7 @@
                 }
             },
             messages: {
-                request_notes: "Please add notes."
+                request_notes: "[% Lang.txt('Please add notes') %]"
             }
         });
     });

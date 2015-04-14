@@ -449,7 +449,7 @@ sub displayOptions {
   }
   $returnstr .='</div></div><br>';
   $returnstr.=qq[
-      <div class="ROrunButton"><input type="submit" value="$self->{'Config'}->{'Config'}{'RunButtonLabel'}" class="btn-main ROButRun"></div>
+      <div class="ROrunButton"><input type="submit" value="].$lang->txt($self->{'Config'}->{'Config'}{'RunButtonLabel'}).qq[" class="btn-main ROButRun"></div>
   ] if $self->{'Config'}->{'Config'}{'RunButtonLabel'};
   if($returnstr)  {
 		my $carryfields = '';

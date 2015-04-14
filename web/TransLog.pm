@@ -942,10 +942,10 @@ sub listTransactions {
     my $line = '';
 
     #my $entityNamePlural = 'Transactions';
-	my $entityNamePlural = 'Payment History';
+	my $entityNamePlural = $Data->{'lang'}->txt('Payment History');
     $entityNamePlural= ($Data->{'SystemConfig'}{'txns_link_name'}) ? $Data->{'SystemConfig'}{'txns_link_name'} : $entityNamePlural;
 
-	my $header=$Data->{'lang'}->txt($entityNamePlural);
+	my $header=$entityNamePlural;
 	
 
         my $targetManual = $Data->{'target'};
@@ -1367,7 +1367,7 @@ my %FieldDefinitions=(
                         formname => 'n_form',
 			stopAfterAction=>1,
       			submitlabel => "Update",
-      			introtext => 'auto',
+      			introtext => '',
                         NoHTML => 1,
       updateSQL => qq[
 	UPDATE tblTransLog
@@ -1553,7 +1553,7 @@ sub resolveHoldPaymentForm  {
                                 hideblank => 1,
                                 target => $Data->{'target'},
                                 formname => 'txnlog_form',
-                                introtext => 'auto',
+                                introtext => '',
                                 buttonloc => 'bottom',
                                 LocaleMakeText => $Data->{'lang'},
                                 stopAfterAction => 1,
@@ -1812,7 +1812,7 @@ sub viewTransLog	{
                                 hideblank => 1,
                                 target => $Data->{'target'},
                                 formname => 'txnlog_form',
-                                introtext => 'auto',
+                                introtext => '',
                                 buttonloc => 'bottom',
                                 LocaleMakeText => $Data->{'lang'},
                                 stopAfterAction => 1,
@@ -2002,7 +2002,7 @@ sub viewPayLaterTransLog    {
                                 hideblank => 1,
                                 target => $Data->{'target'},
                                 formname => 'txnlog_form',
-                                introtext => 'auto',
+                                introtext => '',
                                 buttonloc => 'bottom',
                                 stopAfterAction => 1,
                         },
