@@ -193,7 +193,7 @@
 	<div class="col-md-3">
         <div id = "">
             [% PersonSummaryPanel %]
-			<div class="transfer-pending">[% Lang.txt('Transfer Status: Requested') %]</div>
+			<div class="transfer-pending">[% Lang.txt('Transfer Status') %]: [% Lang.txt('Requested') %]</div>
             <br/>
 
             <!--
@@ -246,8 +246,8 @@
           </div>
 
           <div class="modal-footer">
-            <a class="btn-main" data-dismiss="modal">Close</a>
-            <input class="btn-main" type="submit" name="submitb" value="Submit">
+            <a class="btn-main" data-dismiss="modal">[% Lang.txt('Close') %]</a>
+            <input class="btn-main" type="submit" name="submitb" value="[% Lang.txt('Submit') %]">
           </div>
       </form>
       
@@ -273,7 +273,7 @@
                 }
             },
             messages: {
-                request_notes: "Please add notes."
+                request_notes: "[% Lang.txt('Please add notes') %]."
             }
         });
     });

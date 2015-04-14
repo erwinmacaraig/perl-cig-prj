@@ -203,7 +203,7 @@ sub displayProdTransaction	{
 				target => $Data->{'target'},
 				formname => 'txn_form',
 				submitlabel => 'Update Member Transaction',
-				introtext => 'auto',
+				introtext => '',
 				buttonloc => 'bottom',
 				updateSQL => $txnupdate,
 				addSQL => $txnadd,

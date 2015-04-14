@@ -40,13 +40,14 @@ use Payments;
 sub setProcessOrder {
     my $self = shift;
   
+    my $lang = $self->{'Data'}{'lang'};
     $self->{'ProcessOrder'} = [       
         {
             'action' => 'cd',
             'function' => 'display_core_details',
-            'label'  => 'Club Details',
+            'label'  => $lang->txt('Club Details'),
             'fieldset'  => 'core',
-            'title'  => 'Club - Enter Club Information',
+            'title'  => $lang->txt('Club') . ' - ' . $lang->txt('Enter Club Information'),
         },
         {
             'action' => 'cdu',
@@ -56,9 +57,9 @@ sub setProcessOrder {
         {
             'action' => 'cond',
             'function' => 'display_contact_details',
-            'label'  => 'Contact Details',
+            'label'  => $lang->txt('Contact Details'),
             'fieldset'  => 'contactdetails',
-            'title'  => 'Club - Enter Contact Information',
+            'title'  => $lang->txt('Club') . ' - ' . $lang->txt('Enter Contact Information'),
         },
         {
             'action' => 'condu',
@@ -68,9 +69,9 @@ sub setProcessOrder {
         {
             'action' => 'role',
             'function' => 'display_role_details',
-            'label'  => 'Organisation Details',
+            'label'  => $lang->txt('Organisation Details'),
             'fieldset' => 'roledetails',
-            'title'  => 'Club - Enter Organisation Information',
+            'title'  => $lang->txt('Club') . ' - ' . $lang->txt('Enter Organisation Information'),
         },
         {
             'action' => 'roleu',
@@ -80,8 +81,8 @@ sub setProcessOrder {
         {
             'action' => 'd',
             'function' => 'display_documents',
-            'label'  => 'Documents',
-            'title'  => 'Club - Upload Documents',
+            'label'  => $lang->txt('Documents'),
+            'title'  => $lang->txt('Club') . ' - ' . $lang->txt('Upload Documents'),
         },
         {
             'action' => 'du',
@@ -90,8 +91,8 @@ sub setProcessOrder {
         {
             'action' => 'p',
             'function' => 'display_products',
-            'label'  => 'Products',
-            'title'  => 'Club - Choose Products',
+            'label'  => $lang->txt('Products'),
+            'title'  => $lang->txt('Club') . ' - ' . $lang->txt('Choose Products'),
         },
         {
             'action' => 'pu',
@@ -100,14 +101,14 @@ sub setProcessOrder {
         {
             'action' => 'summ',
             'function' => 'display_summary',
-            'label'  => 'Summary',
-            'title'  => 'Club - Summary',
+            'label'  => $lang->txt('Summary'),
+            'title'  => $lang->txt('Club') . ' - ' . $lang->txt('Summary'),
         },
         {
             'action' => 'c',
             'function' => 'display_complete',
-            'label'  => 'Complete',
-            'title'  => 'Club - Submitted',
+            'label'  => $lang->txt('Complete'),
+            'title'  => $lang->txt('Club') . ' - ' . $lang->txt('Submitted'),
             'NoDisplayInNav' => 1,
             'NoGoingBack' => 1,
         },
@@ -620,7 +621,7 @@ sub process_documents {
 	}		
 
 	my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $clubID, \@required_docs_listing, $ctrl);
-	my $errStringPrepend = 'Required Document Missing <ul>';
+	my $errStringPrepend = $self->{'Data'}{'lang'}->txt('Required Document Missing') .' <ul>';
 	foreach my $dc (@{$diff}){ 
         $errStringPrepend .= '<li>' . $dc->{'Name'} . '</li>';		
 	}
@@ -685,11 +686,12 @@ my $displayPayment = ($amountDue and $payMethod) ? 1 : 0;
     my %summaryClubData = (
 			organization => $clubObj->{'DBData'}{'strLocalName'}, 
 			organizationShortName => $clubObj->{'DBData'}{'strLocalShortName'},
-			foundingdate => $self->{'Data'}{'l10n'}{'date'}->format($clubObj->{'DBData'}{'dtFrom'},'LONG'),
-			dissolutiondate => $self->{'Data'}{'l10n'}{'date'}->format($clubObj->{'DBData'}{'dtTo'},'LONG'),
+			foundingdate => $self->{'Data'}{'l10n'}{'date'}->format($clubObj->{'DBData'}{'dtFrom'},'MEDIUM'),
+			dissolutiondate => $self->{'Data'}{'l10n'}{'date'}->format($clubObj->{'DBData'}{'dtTo'},'MEDIUM'),
 			country => $isocountries->{$clubObj->{'DBData'}{'strISOCountry'}},
 			strLegalID => $clubObj->{'DBData'}{'strLegalID'},
 			sport => $clubObj->{'DBData'}{'strDiscipline'},
+			sportName => $Defs::entitySportType{$clubObj->{'DBData'}{'strDiscipline'}},
 			comment => $clubObj->{'DBData'}{'strMANotes'},
 			contactEmail => $clubObj->{'DBData'}{'strEmail'},
 			postalcode => $clubObj->{'DBData'}{'strPostalCode'},
@@ -698,10 +700,13 @@ my $displayPayment = ($amountDue and $payMethod) ? 1 : 0;
 			contactAddress => $clubObj->{'DBData'}{'strAddress'},
 			comment => $clubObj->{'DBData'}{'strMANotes'},
 			entityType => $clubObj->{'DBData'}{'strEntityType'},
+			entityTypeName => $Defs::entityType{$clubObj->{'DBData'}{'strEntityType'}},
 			documents => $documents,
 			legaltype => Club::getLegalTypeName($self->{'Data'},$clubObj->{'DBData'}{'intLegalTypeID'}),
 			organizationType => $clubObj->{'DBData'}{'strEntityType'},
+			organizationTypeName => $Defs::entityType{$clubObj->{'DBData'}{'strEntityType'}},
 			organizationLevel => $clubObj->{'DBData'}{'strOrganisationLevel'},  
+			organizationLevelName => $Defs::personLevel{$clubObj->{'DBData'}{'strOrganisationLevel'}},  
 			bankAccountDetails => $clubObj->{'DBData'}{'strBankAccountNumber'},
 			editlink =>  $self->{'Data'}{'target'}."?".$self->stringifyURLCarryField(),
             OriginLevel => $originLevel,

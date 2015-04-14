@@ -243,7 +243,7 @@ sub getFieldLabels	{
             strAssocNature => 'Association Nature',
             strMANotes => 'MA Comment',
             intLegalTypeID => 'Legal Entity Type', 
-            intLocalLanguage => 'Language of Venue Name',
+            intLocalLanguage => 'Language of Name',
             strLegalID => "Legal Type Number",
             strMAID => 'MA ID',
             dtFrom => 'Foundation Date',
