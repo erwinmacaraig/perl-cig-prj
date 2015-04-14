@@ -491,7 +491,8 @@ sub validate_other_details    {
 
 sub display_registration { 
     my $self = shift;
-
+	
+	$self->addCarryField('r_vstd', 1);
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
@@ -1565,8 +1566,8 @@ sub moveDocuments {
  
 sub Navigation {
     #May need to be overriden in child class to define correct order of steps
-  my $self = shift;
-
+    my $self = shift;
+	
     my $lang = $self->{'Data'}{'lang'};
     my $navstring = '';
     my $meter = '';
@@ -1583,6 +1584,7 @@ sub Navigation {
         my $current = 0;
         my $name = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'label'} || '');
         my $action = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'action'} || ''); 
+		
         $name .= qq[<span class="circleBg"><i class="fa fa-check tab-ticked"></i></span>] if ($name and $self->{'RunParams'}{$action . '_vstd'});
 
         if($startingStep and $self->{'ProcessOrder'}[$i]{'action'} eq $startingStep)   {
