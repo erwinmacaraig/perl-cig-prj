@@ -762,6 +762,14 @@ sub getClubMenuData {
         };
     }
 
+    if ($SystemConfig->{'allowPersonRequest'}) {
+        $menuoptions{'requestloan'} = {
+            name => $lang->txt('Request a Player loan'),
+            url => $baseurl."a=PRA_LOAN",
+            #url => $baseurl."a=INITSRCH_P&type=transfer&amp;origin=" . $Data->{'clientValues'}{'authLevel'},
+        };
+    }
+
 
     #hide for now; list is already included in Work Tasks
     if ($SystemConfig->{'allowPersonRequest'}) {
@@ -879,6 +887,7 @@ sub getClubMenuData {
         'persons_addraofficial',
 
         'requesttransfer',
+        'requestloan',
         'requestaccess',
         'newclearance',    
         'clearances',    
