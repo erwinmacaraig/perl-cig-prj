@@ -140,6 +140,10 @@ print STDER "HK PAY GATEWAY -- NEED TO IMPLEMENT OTHER LANGS\n";
         my $coKey = $gatewaySpecific{'merchantId'} ."|". $gatewaySpecific{'orderRef'} ."|". $gatewaySpecific{'currCode'} ."|". $gatewaySpecific{'amount'} ."|". $gatewaySpecific{'payType'} ."|". $paymentSettings->{'gatewayPassword'};
 
         $gatewaySpecific{'secureHash'} = sha1($coKey);
+print STDERR "SECUREHASH PAYTRY: " . $gatewaySpecific{'secureHash'} . "\n\n\n";
+print STDERR "SECUREHASH PAYTRY: " . escape($gatewaySpecific{'secureHash'}) . "\n\n\n";
+        
+        $gatewaySpecific{'secureHash'} = escape($gatewaySpecific{'secureHash'});
         $gatewaySpecific{'Ref'} = $payRef;
 
 
