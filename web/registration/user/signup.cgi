@@ -160,5 +160,5 @@ sub _sendConfirmationEmail {
         $Data->{'lang'}->txt("Confirm your email with ") . $Data->{'SystemConfig'}{'EmailNotificationSysName'},
         '',#$email_from,
     );
-
+	
 }
