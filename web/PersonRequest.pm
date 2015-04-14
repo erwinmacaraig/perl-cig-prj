@@ -96,14 +96,38 @@ sub handlePersonRequest {
         case 'PRA_R' {
             return;
 
-            $title = $Data->{'lang'}->txt('Request Access to Person Details');
-            $TemplateData{'request_type'} = 'access';
-            $TemplateData{'action'} = 'PRA_getrecord';
+            #$title = $Data->{'lang'}->txt('Request Access to Person Details');
+            #$TemplateData{'request_type'} = 'access';
+            #$TemplateData{'action'} = 'PRA_getrecord';
+            #$body = runTemplate(
+            #    $Data,
+            #    \%TemplateData,
+            #    'personrequest/generic/search_form.templ',
+            #);
+        }
+        case 'PRA_LOAN' {
+            my $loanTypeOption = undef;
+            my $defaultTypeChecked = undef;
+            foreach my $loanType (sort keys %Defs::playerLoanType) {
+                $defaultTypeChecked = 'checked="checked"' if($loanType eq $Defs::LOAN_TYPE_DOMESTIC);
+                $loanTypeOption .= "<input type='radio' name='loan_type' $defaultTypeChecked value='$loanType'>$Defs::playerLoanType{$loanType}</input>";
+                $defaultTypeChecked = '';
+            }
+
+            $title = $Data->{'lang'}->txt('Request/Initiate Player Loan');
+
+            $TemplateData{'action'} = 'PRA_search';
+            $TemplateData{'request_type'} = 'loan';
+            $TemplateData{'Lang'} = $Data->{'lang'};
+            $TemplateData{'client'} = $Data->{'client'};
+            $TemplateData{'target'} = $Data->{'target'};
+
             $body = runTemplate(
                 $Data,
                 \%TemplateData,
                 'personrequest/generic/search_form.templ',
             );
+
         }
         case 'PRA_search' {
             ($body, $title) = listPeople($Data);
@@ -149,6 +173,10 @@ sub handlePersonRequest {
 sub listPeople {
     my ($Data) = @_;
 
+	my $p = new CGI;
+	my %params = $p->Vars();
+    return if !$params{'request_type'};
+
     my $searchKeyword = safe_param('search_keyword','words') || '';
     my $sphinx = Sphinx::Search->new;
     my %results = ();
@@ -156,7 +184,7 @@ sub listPeople {
 
     my %TemplateData = (
         'action' => 'PRA_search',
-        'request_type' => '',
+        'request_type' => $params{'request_type'},
         'Lang' => $Data->{'lang'},
         'client' => $Data->{'client'},
         'target' => $Data->{'target'},
@@ -170,7 +198,7 @@ sub listPeople {
     $personSearchObj
         ->setRealmID($Data->{'Realm'})
         ->setSubRealmID(0)
-        ->setSearchType("transfer")
+        ->setSearchType($params{'request_type'})
         ->setData($Data)
         ->setKeyword($searchKeyword)
         ->setSphinx($sphinx)
