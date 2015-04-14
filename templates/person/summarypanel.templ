@@ -10,6 +10,6 @@
 
     </div>
     [% FOREACH registration IN registrations %]
-        <div class="registration-active regoType_[% registration.1 %]">[% registration.0 %]</div>
+        <div class="registration-active regoType_[% registration.1 %]">[% IF registration.1 == 'PLAYER' %][% registration.2 %] [% END %][% registration.0 %]</div>
     [% END %]
 </div>
