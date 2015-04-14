@@ -196,7 +196,7 @@ sub registrationItemActivePeriods   {
         if ($condition eq 'OR')    {
             @periods= split /\|/, $periodString;
         }
-        my @statusIN = ($Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_TRANSFERRED);
+        my @statusIN = ($Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_TRANSFERRED, $Defs::PERSONREGO_STATUS_PASSIVE);
         my $filterCount = 0;
         foreach my $natPeriodID (@periods)    {
             if (not exists $PeriodStatus{$natPeriodID}) {
