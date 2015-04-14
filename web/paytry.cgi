@@ -214,6 +214,8 @@ sub main	{
         $proceed_body .= qq[ <input type = "hidden" name = "amount" value = "$amount"> ];
     }
 	if (defined $gatewaySpecific && $gatewaySpecific)	{
+use Data::Dumper;
+print STDERR Dumper($gatewaySpecific);
     foreach my $k (keys %{$gatewaySpecific}) {
         $proceed_body .= qq[<input type="hidden" name="$k" value="$gatewaySpecific->{$k}">];
     } 
