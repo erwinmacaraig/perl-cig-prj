@@ -29,7 +29,7 @@ use PayTry;
 use Localisation;
 use MCache;
 
-use Digest::SHA qw(hmac_sha256_hex);
+use Digest::SHA qw(hmac_sha256_hex sha1_hex);
 #
 
 #use Crypt::CBC;
