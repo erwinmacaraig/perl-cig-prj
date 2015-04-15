@@ -67,7 +67,6 @@ print STDERR "LOG IS $logID\n";
 
 my $cgi=new CGI;
 my %params=$cgi->Vars();
-print STDERR Dumper(\%params);
 print STDERR "~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~\n";
     my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     $Data{'lang'}=$lang;
