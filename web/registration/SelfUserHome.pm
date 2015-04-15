@@ -15,7 +15,9 @@ use Defs;
 use Lang;
 use NationalReportingPeriod;
 use TTTemplate;
-
+use GridDisplay;
+use Reg_common;
+use Utils;
 sub showHome {
 	my (
 		$Data,
@@ -30,10 +32,7 @@ sub showHome {
     ) = getPreviousRegos($Data, $user->id());
 
 	#
-	open ff, ">test.txt";
-	use Data::Dumper;
-	print ff Dumper $previousRegos; # this is a hash that contains an array
-	print ff "\n===\n" . Dumper $people; # this is a hash that contains an array
+	
 	my $documents = getUploadedDocuments($Data, $previousRegos, $people);
 	#
     my $resultHTML = runTemplate(
@@ -44,6 +43,8 @@ sub showHome {
             People => $people,
             Found => $found,
             srp => $srp,
+			Documents => $documents,
+			baseURL => "$Defs::base_url",	
         },
         'selfrego/home.templ',
     );    
@@ -53,11 +54,39 @@ sub showHome {
 
 sub getUploadedDocuments {
 	my ($Data, $previousRegos, $people ) = @_; 
-	# get registration IDs per intPersonID
-	my %registrationIDs = ();
-	foreach $person (@{$people}){
-		next if(exists($registrationIDs{$person->{'intPersonID'}}));
+	my $lang = $Data->{'lang'};
+	my $client = $Data->{'client'};
+	my $docTable = '';
+
+	my @registrations = ();
+	my %TemplateData = ();
+	#my $query = qq[SELECT intPersonID, intPersonRegistrationID, intEntityID FROM tblPersonRegistration_$Data->{'Realm'} WHERE strStatus = '$Defs::PERSONREGO_STATUS_PENDING' AND intPersonID = ? AND intRealmID = $Data->{'Realm'}];
+	
+	my $query = qq[SELECT intFileID, strDocumentName, strApprovalStatus, strOrigFilename,tblDocumentType.intDocumentTypeID,dtUploaded FROM tblUploadedFiles INNER JOIN tblDocuments ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID INNER JOIN tblDocumentType ON tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID INNER JOIN tblPersonRegistration_$Data->{'Realm'} as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID WHERE tblDocuments.intPersonID = ? ORDER BY tblDocuments.intPersonRegistrationID];
+
+	my $q = $Data->{'db'}->prepare($query);
+	foreach my $person (@{$people}){
+		my @rowdata = ();
+		#$docTable .= qq[<br /><h2 class="section-header">]. $person->{'strLocalFirstname'} . " " . $person->{'strLocalSurname'} . qq[</h2><br />];
+		$q->execute($person->{'intPersonID'});
+		while(my $dref = $q->fetchrow_hashref()){
+			next if(!$dref->{'intFileID'});
+			my $viewLink = qq[ <span st4yle="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="selfRegoDocViewer($dref->{'intFileID'},'client=$client&amp;a=view');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];
+			push @{$TemplateData{'alldocs'}},{
+				strDocumentName => $lang->txt($dref->{'strDocumentName'}),
+				Status => $lang->txt($dref->{'strApprovalStatus'}),
+				dtUploaded => $dref->{'dtUploaded'},	
+				viewLink => $viewLink,						
+			}
+		}
+		$docTable .= runTemplate(
+			$Data,
+			\%TemplateData,
+			'selfrego/selfregodocsbody.templ',
+		);
+			
 	}
+	return $docTable;
 }
 sub getPreviousRegos {
     my (

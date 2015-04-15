@@ -1,0 +1,47 @@
+						<div class="documents-list">
+                                <table class="table" cellpadding="5" style="width:100%;">
+                                    <thead>
+                                        <tr class="document-table-header">
+                                            <th style="width: 50%">[% Lang.txt('Document Type') %]</th>
+                                            <th style="width: 15%">[% Lang.txt('Status') %]</th>
+ 											<th style="width: 25%"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>		
+									[% FOREACH doc IN alldocs %]	
+                                        <tr class="task-list">
+                                            <td>
+                                                <span class="detail-value">[% doc.strDocumentName %]:</span>
+                                            </td>
+											
+											<td class="status-col">
+												 [% IF doc.Status == 'PENDING' %]
+													<i class="fa fa-circle ver-dots yellow"></i>
+													<span class="">[% Lang.txt('Pending') %]</span>
+												[% ELSIF doc.Status == 'REJECTED' %]
+													[% rejectFlag = "1" %]
+													<input type="hidden" value = "[% rejectFlag %]" class="rejectedDocs">
+													<i class="fa fa-circle ver-dots red"></i>
+													<span class="">[% Lang.txt('Rejected') %]</span>
+												[% ELSIF doc.Status == 'APPROVED' %]
+													<i class="fa fa-circle ver-dots green"></i>
+													<span class="">[% Lang.txt('Approved') %]</span>
+												[% ELSIF doc.Status == 'VERIFIED' %]
+													<i class="fa fa-circle ver-dots green"></i>
+													<span class="">[% Lang.txt('Verified') %]</span>
+
+												[% ELSE %]
+													<i><span class="">[% Lang.txt(doc.Status) %]</span></i>
+												[% END %]           
+							                </td>
+
+											<td class="status-col">		
+											[% doc.viewLink %]
+                                            </td> 
+
+                                        </tr>
+									[% END %]
+									</tbody>
+								</table>
+							</div>
+						
