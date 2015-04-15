@@ -23,6 +23,7 @@ use SelfUserHome;
 use Flow_PersonSelfReg;
 use SelfUserWorkFlow;
 use AccountActivation;
+use AccountProfile;
 
 use SelfUserFlow;
 #use WorkFlow;
@@ -106,6 +107,9 @@ sub main {
     }
     elsif ($action =~ /activate/) {
         ($resultHTML, $pageHeading) = handleAccountActivation(\%Data, $action);
+    }
+    elsif ($action =~ /P_/) {
+        ($resultHTML, $pageHeading) = handleAccountProfile(\%Data, $action);
     }
     else {
         # Display login page
