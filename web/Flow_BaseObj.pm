@@ -82,8 +82,6 @@ sub run {
 sub _setupRun   {
     my $self = shift;
 
-    $self->getProcessOrder();
-
     my $cgi = $self->{'cgi'};
     $self->{'RunParams'} = {};
     for my $param (keys %{$cgi->Vars()}) {
@@ -97,6 +95,7 @@ sub _setupRun   {
     if($self->{'RunParams'}{'_ss'})   {
         $self->addCarryField('_ss', $self->{'RunParams'}{'_ss'});
     }
+    $self->getProcessOrder();
     $self->setCurrentProcessIndex($self->{'RunParams'}->{'rfp'});
 
     return 1;
