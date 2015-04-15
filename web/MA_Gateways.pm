@@ -143,7 +143,7 @@ print STDER "HK PAY GATEWAY -- NEED TO IMPLEMENT OTHER LANGS\n";
 print STDERR "SECUREHASH PAYTRY: " . $gatewaySpecific{'secureHash'} . "\n\n\n";
 print STDERR "SECUREHASH PAYTRY: " . escape($gatewaySpecific{'secureHash'}) . "\n\n\n";
         
-        $gatewaySpecific{'secureHash'} = escape($gatewaySpecific{'secureHash'});
+        #$gatewaySpecific{'secureHash'} = escape($gatewaySpecific{'secureHash'});
         $gatewaySpecific{'Ref'} = $payRef;
 
 
