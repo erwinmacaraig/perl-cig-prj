@@ -1105,6 +1105,7 @@ sub generate_clientside_validation {
     my $messages = '';
 
     my %valinfo = ();
+    my $remote_updates = '';
     for my $k ( keys %{$validation} ) {
         if ( $validation->{$k}{'compulsory'} ) {
             $valinfo{'rules'}{ $field_prefix . $k }{'required'} = 'true';
@@ -1163,6 +1164,7 @@ sub generate_clientside_validation {
                     push @{$otherfields}, $k;
                     for my $f (@{$otherfields})    {
                         $remote_data{$f} = "REMOVEQfunction() { return jQuery('#l_$f' ).val(); }REMOVEQ";
+                        $remote_updates .= qq[jQuery('#l_$f' ).on('change',function() { jQuery('#l_$k').removeData("previousValue");jQuery("#$formname$form_suffix").validate().element('#l_$k');}); ];
                     }
                     foreach my $k (keys %{$vdata->{'postvalues'}})    {
                         $remote_data{$k} = $vdata->{'postvalues'}{$k} || 0;
@@ -1237,6 +1239,7 @@ sub generate_clientside_validation {
         jQuery().ready(function() {
                 // validate the comment form when it is submitted
                 jQuery("#$formname$form_suffix").validate($val_rules);
+                $remote_updates
             });
         </script>
         ];
