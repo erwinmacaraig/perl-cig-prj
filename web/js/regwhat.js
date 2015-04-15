@@ -92,9 +92,11 @@ function chooseOption(val, optionType, name)  {
 jQuery('.regoptions').on('change','select',function(e) {
     var optionType = jQuery(this).attr('data-type');
     var v = jQuery(this).val();
-    var optionName = jQuery(this).text();
-    clearBelow(optionType);
-    chooseOption(v, optionType, optionName);
+    if(v)   {
+        var optionName = jQuery(this).text();
+        clearBelow(optionType);
+        chooseOption(v, optionType, optionName);
+    }
     e.preventDefault();
     return false; 
 });
