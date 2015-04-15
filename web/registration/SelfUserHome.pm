@@ -62,7 +62,7 @@ sub getUploadedDocuments {
 	my %TemplateData = ();
 	#my $query = qq[SELECT intPersonID, intPersonRegistrationID, intEntityID FROM tblPersonRegistration_$Data->{'Realm'} WHERE strStatus = '$Defs::PERSONREGO_STATUS_PENDING' AND intPersonID = ? AND intRealmID = $Data->{'Realm'}];
 	
-	my $query = qq[SELECT intFileID, strDocumentName, strApprovalStatus, strOrigFilename,tblDocumentType.intDocumentTypeID,dtUploaded FROM tblUploadedFiles INNER JOIN tblDocuments ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID INNER JOIN tblDocumentType ON tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID INNER JOIN tblPersonRegistration_$Data->{'Realm'} as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID WHERE tblDocuments.intPersonID = ? ORDER BY tblDocuments.intPersonRegistrationID];
+	my $query = qq[SELECT intFileID, strDocumentName, strApprovalStatus FROM tblUploadedFiles INNER JOIN tblDocuments ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID INNER JOIN tblDocumentType ON tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID INNER JOIN tblPersonRegistration_$Data->{'Realm'} as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID WHERE tblDocuments.intPersonID = ? ORDER BY tblDocuments.intPersonRegistrationID];
 
 	my $q = $Data->{'db'}->prepare($query);
 	foreach my $person (@{$people}){
@@ -70,13 +70,9 @@ sub getUploadedDocuments {
 		#$docTable .= qq[<br /><h2 class="section-header">]. $person->{'strLocalFirstname'} . " " . $person->{'strLocalSurname'} . qq[</h2><br />];
 		$q->execute($person->{'intPersonID'});
 		while(my $dref = $q->fetchrow_hashref()){
-			next if(!$dref->{'intFileID'});
-			my $viewLink = qq[ <span st4yle="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="selfRegoDocViewer($dref->{'intFileID'},'client=$client&amp;a=view');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];
+			next if(!$dref->{'intFileID'});			
 			push @{$TemplateData{'alldocs'}},{
-				strDocumentName => $lang->txt($dref->{'strDocumentName'}),
-				Status => $lang->txt($dref->{'strApprovalStatus'}),
-				dtUploaded => $dref->{'dtUploaded'},	
-				viewLink => $viewLink,						
+				strDocumentName => $lang->txt($dref->{'strDocumentName'}),									
 			}
 		}
 		$docTable .= runTemplate(

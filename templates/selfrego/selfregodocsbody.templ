@@ -2,18 +2,16 @@
                                 <table class="table" cellpadding="5" style="width:100%;">
                                     <thead>
                                         <tr class="document-table-header">
-                                            <th style="width: 50%">[% Lang.txt('Document Type') %]</th>
-                                            <th style="width: 15%">[% Lang.txt('Status') %]</th>
- 											<th style="width: 25%"></th>
+                                            <th style="width: 50%">[% Lang.txt('Documents') %]</th>
                                         </tr>
                                     </thead>
                                     <tbody>		
 									[% FOREACH doc IN alldocs %]	
                                         <tr class="task-list">
                                             <td>
-                                                <span class="detail-value">[% doc.strDocumentName %]:</span>
+                                                <span class="detail-value">[% doc.strDocumentName %]</span>
                                             </td>
-											
+											<!--
 											<td class="status-col">
 												 [% IF doc.Status == 'PENDING' %]
 													<i class="fa fa-circle ver-dots yellow"></i>
@@ -34,11 +32,11 @@
 													<i><span class="">[% Lang.txt(doc.Status) %]</span></i>
 												[% END %]           
 							                </td>
-
+								
 											<td class="status-col">		
 											[% doc.viewLink %]
                                             </td> 
-
+											-->
                                         </tr>
 									[% END %]
 									</tbody>
