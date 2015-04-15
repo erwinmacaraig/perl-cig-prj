@@ -42,6 +42,8 @@ sub markTXNSentToGateway    {
     $logID ||= 0;
     return if (! $logID);
 
+	return if (! $Data->{'SystemConfig'}{'MarkTXN_SentToGateway'});
+
     my $st = qq[
         UPDATE tblTransLog as TL 
             INNER JOIN tblTXNLogs as TXNLogs ON (TXNLogs.intTLogID = TL.intLogID)
