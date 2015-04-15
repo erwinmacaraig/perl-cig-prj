@@ -115,7 +115,7 @@ print STDERR "IN SUBMIT ACTION";
 
 	my $coKey = $paymentSettings->{'gatewayUsername'} ."|". $Vals{'Ref'} ."|". $Vals{'Cur'} ."|". $Vals{'Amt'} ."|". $Vals{'payType'} ."|". $paymentSettings->{'gatewayPassword'};
 
-       my $secureHash = sha1($coKey);
+       my $secureHash = sha1_hex($coKey);
 
         my $chkAction = 'FAILURE';
 print STDERR "$Vals{'secureHash'} | " . $secureHash;
