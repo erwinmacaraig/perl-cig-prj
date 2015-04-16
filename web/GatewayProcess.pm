@@ -49,7 +49,10 @@ sub markTXNSentToGateway    {
             INNER JOIN tblTXNLogs as TXNLogs ON (TXNLogs.intTLogID = TL.intLogID)
             INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLogs.intTXNID)
         SET
-            TL.intSentToGateway = 1, T.intSentToGateway = 1
+            TL.intSentToGateway = 1, 
+            T.intSentToGateway = 1, 
+            TL.intPaymentGatewayResponded = 0, 
+            T.intPaymentGatewayResponded = 0
         WHERE
             TL.intLogID = ?
             AND TL.intStatus=0 
