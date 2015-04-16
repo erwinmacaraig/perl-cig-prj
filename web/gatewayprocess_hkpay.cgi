@@ -110,16 +110,19 @@ print STDERR "IN SUBMIT ACTION";
         $Vals{'secureHash'}= param('secureHash');
         $Vals{'payType'}= param('payType') || 'N';
         $Vals{'merchantId'}= param('merchantId'); ## is this same as gatewayUsername
+        $Vals{'payerAuth'}= param('payerAuth'); # Payer Authentication Status
 #	print "Content-type: text/html\n\nOK";
         
 
 	my $coKey = $paymentSettings->{'gatewayUsername'} ."|". $Vals{'Ref'} ."|". $Vals{'Cur'} ."|". $Vals{'Amt'} ."|". $Vals{'payType'} ."|". $paymentSettings->{'gatewayPassword'};
 print STDERR "CO KEY IS $coKey\n";
+	my $coKeyReceive = $Vals{'src'} . "|" . $Vals{'prc'} . "|" . $Vals{'successcode'} . "|" . $Vals{'Ref'} . "|" . $Vals{'PayRef'} . "|" . $Vals{'Cur'} . "|" . $Vals{'Amt'} . "|" . $Vals{'payerAuth'} . "|" . $paymentSettings->{'gatewayPassword'};
 
        my $secureHash = sha1_hex($coKey);
+       my $secureHashReceive = sha1_hex($coKeyReceive);
 
         my $chkAction = 'FAILURE';
-print STDERR "$Vals{'secureHash'} | " . $secureHash;
+print STDERR "$Vals{'secureHash'} | " . $secureHash . "|" . $secureHashReceive;
 	if (! $Vals{'secureHash'} or ($Vals{'secureHash'}  && $Vals{'secureHash'} eq $secureHash))	{
             $chkAction = 'SUCCESS';
 	}
