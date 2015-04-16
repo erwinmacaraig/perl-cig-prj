@@ -113,12 +113,5 @@ jQuery(document).ready(function()  {
     });
 
 });
-function selfRegoDocViewer(id, params) {
-		jQuery('#docViewerOverlay').remove();
-  		var url = 'selfregoviewer.cgi?' + params + '&f=' + id;
-  	  	window.scrollTo(0,0);
-    	var d = jQuery('<div id = "docViewerOverlay"><iframe id="docViewerPage" src = "' + url +'" scrolling="no"></iframe>');
-		jQuery('body').append(d);
-	}
 </script>
 
