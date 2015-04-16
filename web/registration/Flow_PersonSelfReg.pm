@@ -1002,7 +1002,7 @@ sub display_documents {
         #    return ('',2);
         #}
 
-	print STDERR Dumper $content;
+	
 	my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},

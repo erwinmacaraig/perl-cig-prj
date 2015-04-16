@@ -101,27 +101,6 @@ sub getRegistrationItems    {
 	        
 		) or query_error($st); 
 
-	print STDERR "
-	$Rego_ref->{'intPersonRegistrationID'} || '',
-	        $Data->{'Realm'}, 
-	        $Data->{'RealmSubType'}, 
-	        $ruleFor,
-	        $originLevel,
-		    $regNature,
-	        $Rego_ref->{'strEntityType'} || $Rego_ref->{'entityType'} || '',
-	        $entityLevel,
-		    $Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '',
-		    $Rego_ref->{'strPersonLevel'} || $Rego_ref->{'personLevel'} || '',
-		    $Rego_ref->{'strPersonEntityRole'} || $Rego_ref->{'personEntityRole'} || '',
-		    $Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '',
-		    $Rego_ref->{'strAgeLevel'} || $Rego_ref->{'ageLevel'} || '',
-	        $itemType, 
-	        $Rego_ref->{'Nationality'} || '',
-	        $Rego_ref->{'Nationality'} || '',
-	        $Rego_ref->{'currentAge'} || 0,
-	        $Rego_ref->{'currentAge'} || 0,
-		    $itc
-	";
     my @values = (); 
     push @values, $Data->{'Realm'};  
     push @values,$Data->{'RealmSubType'}; 
@@ -139,8 +118,6 @@ sub getRegistrationItems    {
     push @values,$Rego_ref->{'Nationality'} || '';
     push @values,$Rego_ref->{'Nationality'} || '';
     
-
-
     my @Items=();
     while (my $dref = $q->fetchrow_hashref())   {
         next if($itemType eq 'DOCUMENT' and $documentFor and ($documentFor ne $dref->{'strDocumentFor'}));
