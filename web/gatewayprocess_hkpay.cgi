@@ -114,16 +114,14 @@ print STDERR "IN SUBMIT ACTION";
 #	print "Content-type: text/html\n\nOK";
         
 
-	my $coKey = $paymentSettings->{'gatewayUsername'} ."|". $Vals{'Ref'} ."|". $Vals{'Cur'} ."|". $Vals{'Amt'} ."|". $Vals{'payType'} ."|". $paymentSettings->{'gatewayPassword'};
-print STDERR "CO KEY IS $coKey\n";
+#	my $coKey = $paymentSettings->{'gatewayUsername'} ."|". $Vals{'Ref'} ."|". $Vals{'Cur'} ."|". $Vals{'Amt'} ."|". $Vals{'payType'} ."|". $paymentSettings->{'gatewayPassword'};
 	my $coKeyReceive = $Vals{'src'} . "|" . $Vals{'prc'} . "|" . $Vals{'successcode'} . "|" . $Vals{'Ref'} . "|" . $Vals{'PayRef'} . "|" . $Vals{'Cur'} . "|" . $Vals{'Amt'} . "|" . $Vals{'payerAuth'} . "|" . $paymentSettings->{'gatewayPassword'};
 
-       my $secureHash = sha1_hex($coKey);
        my $secureHashReceive = sha1_hex($coKeyReceive);
 
         my $chkAction = 'FAILURE';
-print STDERR "$Vals{'secureHash'} | " . $secureHash . "|" . $secureHashReceive;
-	if (! $Vals{'secureHash'} or ($Vals{'secureHash'}  && $Vals{'secureHash'} eq $secureHash))	{
+print STDERR "$Vals{'secureHash'} | " . $secureHashReceive;
+	if (! $Vals{'secureHash'} or ($Vals{'secureHash'}  && $Vals{'secureHash'} eq $secureHashReceive))	{
             $chkAction = 'SUCCESS';
 	}
 print STDERR "MAC ACTION IS $chkAction\n";
