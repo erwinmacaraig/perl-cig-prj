@@ -31,9 +31,17 @@ sub showHome {
         $found,
     ) = getPreviousRegos($Data, $user->id());
 
-	#
-	
-	my $documents = getUploadedDocuments($Data, $previousRegos, $people);
+	#	
+	my $lang = $Data->{'lang'};
+	my $query = qq[SELECT intFileID, strDocumentName, strApprovalStatus FROM tblUploadedFiles INNER JOIN tblDocuments ON      tblUploadedFiles.intFileID = tblDocuments.intUploadFileID INNER JOIN tblDocumentType ON tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID INNER JOIN tblPersonRegistration_$Data->{'Realm'} as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID WHERE tblDocuments.intPersonID = ? ORDER BY tblDocuments.intPersonRegistrationID];
+	my $q = $Data->{'db'}->prepare($query);
+	foreach my $person (@{$people}){		
+		$q->execute($person->{'intPersonID'});
+		while(my $dref = $q->fetchrow_hashref()){
+			next if(!$dref->{'intFileID'});	
+			push @{$person->{'alldocs'}},{strDocumentName => $lang->txt($dref->{'strDocumentName'}),};				
+		}		
+	}
 	#
     my $resultHTML = runTemplate(
         $Data,
@@ -42,9 +50,7 @@ sub showHome {
             PreviousRegistrations => $previousRegos,
             People => $people,
             Found => $found,
-            srp => $srp,
-			Documents => $documents,
-			baseURL => "$Defs::base_url",	
+            srp => $srp,			
         },
         'selfrego/home.templ',
     );    
@@ -52,38 +58,6 @@ sub showHome {
     return $resultHTML;
 }
 
-sub getUploadedDocuments {
-	my ($Data, $previousRegos, $people ) = @_; 
-	my $lang = $Data->{'lang'};
-	my $client = $Data->{'client'};
-	my $docTable = '';
-
-	my @registrations = ();
-	my %TemplateData = ();
-	#my $query = qq[SELECT intPersonID, intPersonRegistrationID, intEntityID FROM tblPersonRegistration_$Data->{'Realm'} WHERE strStatus = '$Defs::PERSONREGO_STATUS_PENDING' AND intPersonID = ? AND intRealmID = $Data->{'Realm'}];
-	
-	my $query = qq[SELECT intFileID, strDocumentName, strApprovalStatus FROM tblUploadedFiles INNER JOIN tblDocuments ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID INNER JOIN tblDocumentType ON tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID INNER JOIN tblPersonRegistration_$Data->{'Realm'} as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID WHERE tblDocuments.intPersonID = ? ORDER BY tblDocuments.intPersonRegistrationID];
-
-	my $q = $Data->{'db'}->prepare($query);
-	foreach my $person (@{$people}){
-		my @rowdata = ();
-		#$docTable .= qq[<br /><h2 class="section-header">]. $person->{'strLocalFirstname'} . " " . $person->{'strLocalSurname'} . qq[</h2><br />];
-		$q->execute($person->{'intPersonID'});
-		while(my $dref = $q->fetchrow_hashref()){
-			next if(!$dref->{'intFileID'});			
-			push @{$TemplateData{'alldocs'}},{
-				strDocumentName => $lang->txt($dref->{'strDocumentName'}),									
-			}
-		}
-		$docTable .= runTemplate(
-			$Data,
-			\%TemplateData,
-			'selfrego/selfregodocsbody.templ',
-		);
-			
-	}
-	return $docTable;
-}
 sub getPreviousRegos {
     my (
 		$Data,
