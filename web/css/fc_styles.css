@@ -2366,7 +2366,7 @@ header .navbar-brand {
 	}
 
   .fa-user, .fa-clock-o { display: none; }
-  /*
+  /* 
   th:nth-child(2) { display: none; }
   td:nth-child(2) { display: none; }
   table.table thead tr th:nth-child(2) { display: none; }
