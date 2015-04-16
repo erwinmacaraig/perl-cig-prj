@@ -363,6 +363,7 @@ div.row span.formw {
   float: left;
   vertical-align:middle;
   text-align: left;
+  width: 66%;
 }
 
 input, textarea {
@@ -1361,7 +1362,7 @@ ul#menu li.hover, ul#menu li:hover  {
   position: relative;
 }
 /* ----- Level 2 ----- */
-ul#menu ul  {
+/*ul#menu ul  {
   width: 16em;
   visibility: hidden;
   position: absolute;
@@ -1369,7 +1370,7 @@ ul#menu ul  {
   left: 0;
   z-index:10;
   padding: 0px;
-}
+}*/
 
 ul#menu ul li  {
   font-weight: normal;
@@ -1378,7 +1379,7 @@ ul#menu ul li  {
   float: none;
   z-index:10;
   background: #ddd;
-  width: 16em;
+  /*width: 16em;*/
 }
 
 /* IE 6 & 7 Needs Inline Block */
@@ -1401,7 +1402,10 @@ ul#menu ul ul {
 }
 
 ul#menu li:hover > ul {
-  visibility: visible;
+  /*display: none;*/
+}
+ul#menu li.subnav a[aria-expanded="true"]{
+	box-shadow: 0 0 4px 0px gray;
 }
 
 .system-icon,
@@ -3061,6 +3065,8 @@ body.report h1 {
 */
 .reporttabs {
 	width: 180px;
+	position: relative;
+	text-align: center;
 }
 
 .reporttab-button {
@@ -3080,7 +3086,9 @@ body.report h1 {
 }
 
 .reporttab-data {
-	margin-left: 200px;
+	float: left;
+	width: 59%;
+  	margin-left: 1%;
 }
 
 .reporttab-datacontent {

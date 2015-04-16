@@ -4,15 +4,15 @@
 [% END %]
 [% FOREACH toplevel IN MenuData.menu %]
 	[% IF toplevel.numitems == 1 %]
-	<li><a href = "[% toplevel.items.0.url %]" target="[% m.target %]">[% toplevel.name %]</a></li>
+	<li class="transitions"><a class="transitions" href = "[% toplevel.items.0.url %]" target="[% m.target %]">[% toplevel.name %]</a></li>
 	[% ELSE %]
-	<li class="subnav">
+	<li class="subnav dropdown transitions">
 
-	<a class="menutop" href="#">[% toplevel.name %]</a>
+	<a class="menutop  dropdown-toggle transitions"  data-toggle="dropdown" href="#">[% toplevel.name %]</a>
 	<!--<a href = "#" class="menutop">[% toplevel.name %]</a>-->
-		<ul class="">
+		<ul class="dropdown-menu" role="menu">
 		[% FOREACH m IN toplevel.items %]
-			<li><a href = "[% m.url %]" target="[% m.target %]">[% m.name %]</a>
+			<li><a class="transitions" href = "[% m.url %]" target="[% m.target %]">[% m.name %]</a>
 		[% END %]
 		</ul>
 	</li>
