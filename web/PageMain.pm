@@ -194,11 +194,11 @@ sub pageMain {
     #);
 
    if($Defs::DisableResponsiveLayout)    {
-        $Data->{'AddToPage'}->add( 
-            'css',
-            'file',
-            'css/noresponsive.css',
-        );
+        #$Data->{'AddToPage'}->add( 
+            #'css',
+            #'file',
+            #'css/noresponsive.css',
+        #);
     }
  
     my $helpURL=$Data->{'SystemConfig'}{'HELP'} 
