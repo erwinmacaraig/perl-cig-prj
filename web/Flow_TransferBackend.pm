@@ -145,7 +145,7 @@ sub setupValues    {
 
 sub display_old_club { 
     my $self = shift;
-
+	$self->addCarryField('club_vstd', 1);
     my $id = $self->ID() || 0;
     if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
         return ('Invalid User',0);
@@ -207,7 +207,8 @@ sub display_old_club {
 sub display_core_details    { 
     my $self = shift;
 
-    $self->addCarryField('club_vstd', 1);
+    #$self->addCarryField('club_vstd', 1);
+	$self->addCarryField('cd_vstd', 1);
     my $id = $self->ID() || 0;
     my $defaultType = $self->{'RunParams'}{'dtype'} || '';
     if($id)   {
@@ -319,7 +320,7 @@ sub validate_core_details    {
 sub display_contact_details    { 
     my $self = shift;
 
-    $self->addCarryField('cd_vstd', 1);
+    $self->addCarryField('cond_vstd', 1);
     my $id = $self->ID() || 0;
     if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
         return ('Invalid User',0);
@@ -491,7 +492,7 @@ sub validate_other_details    {
 
 sub display_registration { 
     my $self = shift;
-
+    $self->addCarryField('r_vstd', 1);
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
@@ -1620,7 +1621,7 @@ sub Navigation {
             if($step_in_future) {
                 $js = qq[onclick="alert('].$lang->txt('Use the Continue button to go to the next page').qq[');return false;" ];
             }
-            my $link = qq[<a href="$linkURL" class = "$currentclass" $js>$name</a>];
+            my $link = qq[<a href="$linkURL" class = "$currentclass" $js><small>$name</small></a>];
 
             $navstring .= qq[ <li class = "$currentclass">$link</li> ];
             $step_in_future = 2 if $current;
