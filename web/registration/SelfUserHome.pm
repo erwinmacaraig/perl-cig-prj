@@ -33,6 +33,7 @@ sub showHome {
 
 	#	
 	my $documents = getUploadedSelfRegoDocuments($Data,$people);
+	my $registrationHist = getSelfRegoHistoryRegistrations($Data, $previousRegos);
 	#
     my $resultHTML = runTemplate(
         $Data,
@@ -42,12 +43,42 @@ sub showHome {
             People => $people,
             Found => $found,
             srp => $srp,	
-			Documents => $documents,		
+			Documents => $documents,	
+			History => 	$registrationHist,
         },
         'selfrego/home.templ',
     );    
 
     return $resultHTML;
+}
+
+sub getSelfRegoHistoryRegistrations{
+	my ($Data, $previousRegos) = @_;
+	my %history = ();
+	my $registrationhistory = '';
+	foreach my $personIdKeyArr (keys %{$previousRegos}){ 
+		foreach my $regoDetail (@{$previousRegos->{$personIdKeyArr}}){
+			push @{$history{'regohist'}}, {
+				NationalPeriodName => $regoDetail->{'strNationalPeriodName'},
+				RegistrationType => $Defs::registrationNature{$regoDetail->{'strRegistrationNature'}},
+				Status => $Defs::entityStatus{$regoDetail->{'strStatus'}},
+				Sport => $Defs::sportType{$regoDetail->{'strSport'}},
+				PersonType => $Defs::personType{$regoDetail->{'strPersonType'}},
+				PersonEntityRole => $regoDetail->{'strPersonEntityRole'},
+				PersonLevel => $Defs::personLevel{$regoDetail->{'strPersonLevel'}},
+				AgeLevel => $Defs::ageLevel{$regoDetail->{'strAgeLevel'}},
+				NPdtFrom => $regoDetail->{'NPdtFrom'},
+				NPdtTo => $regoDetail->{'NPdtTo'},
+				Certifications => $regoDetail->{'regCertifications'},
+			};
+		}
+	}	
+	$registrationhistory = runTemplate(
+							$Data,
+							\%history,
+							'selfrego/selfregohistorybody.templ'			
+							);
+	return $registrationhistory;
 }
 sub getUploadedSelfRegoDocuments {
 	my($Data, $people) = @_;
