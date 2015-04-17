@@ -422,7 +422,7 @@ my @headers = (
 		$cnt++;
 		my @rowdata = ();
 		#get the documents here		
-		$grid .= qq[<br /><h2 class="section-header">].$lang->txt($registration->{'PersonType'}).' - '. $lang->txt($registration->{'Sport'}) .' - ' . $lang->txt($registration->{'PersonLevel'})  . $lang->txt('for') . qq[ $registration->{'strNationalPeriodName'} ] . $lang->txt('in') . qq[ $registration->{'strLocalName'}</h2>];
+		$grid .= qq[<br /><h2 class="section-header">].$lang->txt($registration->{'PersonType'}).' - '. $lang->txt($registration->{'Sport'}) .' - ' . $lang->txt($registration->{'PersonLevel'})  . ' ' . $lang->txt('for') . qq[ $registration->{'strNationalPeriodName'} ] . $lang->txt('in') . qq[ $registration->{'strLocalName'}</h2>];
 			
 			#loop over rego documents
 			foreach my $regodoc (@{$registration->{'documents'}}){
