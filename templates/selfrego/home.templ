@@ -67,24 +67,8 @@
 
                         </div><!-- regtab -->
                         <div id="doctab[% loop.count %]" class="tab-pane fade "><!-- Docs Tab -->
-						<div class="documents-list">
-                                <table class="table" cellpadding="5" style="width:100%;">
-                                    <thead>
-                                        <tr class="document-table-header">
-                                            <th style="width: 50%">[% Lang.txt('Documents') %]</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>	
-										[% FOREACH doc IN person.alldocs%]
-											<tr class="task-list">
-                                           	 <td>
-                                                <span class="detail-value">[% doc.strDocumentName %]</span>
-                                             </td>											
-                                       		</tr>
-										[% END %]
-									</tbody>
-								</table>
-							</div>
+							[% Documents %]
+                                
 						</div><!-- End Docs Tab -->
                         <div id="histtab[% loop.count %]" class="tab-pane fade "> 
 						<!--Registration history list to go here --> 

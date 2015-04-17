@@ -32,7 +32,7 @@ sub showHome {
     ) = getPreviousRegos($Data, $user->id());
 
 	#	
-	
+	my $documents = getUploadedSelfRegoDocuments($Data,$people);
 	#
     my $resultHTML = runTemplate(
         $Data,
@@ -41,7 +41,8 @@ sub showHome {
             PreviousRegistrations => $previousRegos,
             People => $people,
             Found => $found,
-            srp => $srp,			
+            srp => $srp,	
+			Documents => $documents,		
         },
         'selfrego/home.templ',
     );    
@@ -50,6 +51,8 @@ sub showHome {
 }
 sub getUploadedSelfRegoDocuments {
 	my($Data, $people) = @_;
+	my %TemplateData = ();
+	my $docTable = '';
 	my $lang = $Data->{'lang'};
 	my $query = qq[SELECT intFileID, strDocumentName, strApprovalStatus FROM tblUploadedFiles INNER JOIN tblDocuments ON      tblUploadedFiles.intFileID = tblDocuments.intUploadFileID INNER JOIN tblDocumentType ON tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID INNER JOIN tblPersonRegistration_$Data->{'Realm'} as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID WHERE tblDocuments.intPersonID = ? ORDER BY tblDocuments.intPersonRegistrationID];
 	my $q = $Data->{'db'}->prepare($query);
@@ -57,9 +60,17 @@ sub getUploadedSelfRegoDocuments {
 		$q->execute($person->{'intPersonID'});
 		while(my $dref = $q->fetchrow_hashref()){
 			next if(!$dref->{'intFileID'});	
-			push @{$person->{'alldocs'}},{strDocumentName => $lang->txt($dref->{'strDocumentName'}),};				
-		}		
+			push @{$TemplateData{'alldocs'}},{
+				strDocumentName => $lang->txt($dref->{'strDocumentName'}),									
+			};		
+		}
+		$docTable .= runTemplate(
+			$Data,
+			\%TemplateData,
+			'selfrego/selfregodocsbody.templ',
+		);		
 	}
+	return $docTable;
 }
 sub getPreviousRegos {
     my (
