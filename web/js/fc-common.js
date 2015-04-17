@@ -310,8 +310,10 @@ $(window).scroll(function() {
      }
 });
 */
+var columnCounter = 0;
+var options = [];
 jQuery(document).ready(function(){
-
+    var headers = "";
     jQuery('a.btn-proceed').each(function() {
         var t = jQuery(this).html();
         jQuery(this).html(jQuery(this).html() + ' <span class ="fa fa-angle-right fa-2x proceed-chevron"></span>');
@@ -337,5 +339,79 @@ jQuery(document).ready(function(){
         });
 
     });
+    $(window).resize(function() {
+        console.log( $(window).width())
+        /* find responsive-table and prepend a dropdown*/ 
+        
+        var dropdownGenerator = function(){
+             $(".res-headers th").each(function() {
 
+             headerLocation = $(this).index();
+             headers += '<li>\
+                          <a data-value="option'+headerLocation+'" class="small" tabindex="-1"  onclick="responsiveTables(\''+headerLocation+'\'\)">\
+                            <input type="checkbox" data="'+headerLocation+'">\
+                            &nbsp;'+$(this).html()+'\
+                          </a>\
+                        </li>';
+            columnCounter += 1;
+            });
+            return '<div class="button-group responsiveTablesDropDown">\
+                      <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">Items</button>\
+                          <ul style="top:inherit" class="dropdown-menu res-items-group">\
+                          '+ headers +'\
+                          </ul>\
+                    </div>';
+        }
+        if($(".res-items-group").length<=0){
+            $(".res-table").before(dropdownGenerator())
+            $(".res-items-group li a input").trigger("click")
+            $(".res-items-group li:eq(0) a input,.res-items-group li:eq(1) a input,.res-items-group li:eq(2) a input").trigger("click")
+            $(".res-table").wrap('<div class="res-wrapper"></div>'); 
+            $('.res-table thead tr th:not(.res-invisible)').each(function () {
+            $(this).css('width',90/columnCounter+"%")    
+    });   
+        }
+
+    })
 });
+function responsiveTables(headerLocation){
+
+// Get ready variables
+var $target = $(event.currentTarget), 
+    val  = $target.attr('data-value'), 
+    $inp = $target.find('input'), 
+    idx,
+    status = $('input[data="'+headerLocation+'"]').prop('checked'),
+    header = $(".res-table .res-headers th:eq("+headerLocation+") , .res-table .res-headers td:eq("+headerLocation+")");
+// Take care of checkbox values
+ if ((idx = options.indexOf(val)) > -1) {
+     options.splice(idx, 1);
+     setTimeout(function () {
+         $inp.prop('checked', true);
+     }, 0);
+ } else {
+     options.push(val);
+     setTimeout(function () {
+         $inp.prop('checked', false);
+     }, 0);
+ }
+ $(event.target).blur();
+ // Do hide/show
+ if(status === false){
+     header.removeClass('res-invisible');
+     $(".res-table tbody tr").each(function() {
+       $(this).children(':eq('+headerLocation+')').removeClass('res-invisible');
+      })
+    columnCounter += 1;
+ 
+ }else if(status === true){ 
+    header.addClass('res-invisible');
+    $(".res-table tbody tr").each(function() {
+       $(this).children(':eq('+headerLocation+')').addClass('res-invisible');
+        })
+    columnCounter -=1;
+ };
+    $('.res-table thead tr th:not(.res-invisible)').each(function () {
+        $(this).css('width',100/columnCounter+"%")    
+    });
+}

@@ -302,6 +302,43 @@ ul#menu li:hover .dropdown {
 ul#menu li.hover, ul#menu li:hover > a {
   color: #000;
 }
+/*custom responsive tables*/
+.res-invisible{
+  display: none;
+}
+.responsiveTablesDropDown{
+  position: relative;
+  width: 100%;
+  height: 29px;
+}
+.responsiveTablesDropDown button{
+  position: relative;
+  float: left;
+  width: 100%;
+  height: 45px;
+  margin: 1px;
+  box-sizing: border-box;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.responsiveTablesDropDown .dropdown-menu {
+  width: 100%;
+  font-size: 20px;
+}
+.responsiveTablesDropDown .dropdown-menu a{
+  cursor: pointer;
+}
+.res-wrapper {
+  width: 100%;
+  overflow: auto;
+  box-shadow: inset 0 0 34px 3px;
+  padding: 11px;
+  z-index: 10;
+}
+.res-table {
+  width: inherit!important;
+}
 @media only screen and (max-width:610px){
   .membership-login header .logo-area h1{
       position: relative;
