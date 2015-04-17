@@ -352,7 +352,7 @@ sub display_contact_details    {
 
 sub validate_contact_details    { 
     my $self = shift;
-
+	$self->addCarryField('cond', 1);
     my $userData = {};
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'contactdetails'}, 'Person',);
     ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
@@ -492,7 +492,7 @@ sub validate_other_details    {
 sub display_registration { 
     my $self = shift;
 	
-	$self->addCarryField('r_vstd', 1);
+	$self->addCarryField('cond_vstd', 1);
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
@@ -964,7 +964,7 @@ print STDERR "TXN IDS" . $txnIds;
 sub display_documents { 
     my $self = shift;
 	
-    $self->addCarryField('cond_vstd', 1);
+    $self->addCarryField('r_vstd', 1);
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
@@ -1586,8 +1586,7 @@ sub Navigation {
         my $action = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'action'} || ''); 
 		
         $name .= qq[<span class="circleBg"><i class="fa fa-check tab-ticked"></i></span>] if ($name and $self->{'RunParams'}{$action . '_vstd'});
-
-        if($startingStep and $self->{'ProcessOrder'}[$i]{'action'} eq $startingStep)   {
+		if($startingStep and $self->{'ProcessOrder'}[$i]{'action'} eq $startingStep)   {
             $includeStep = 1;
         }
         next if !$includeStep;
@@ -1615,7 +1614,9 @@ sub Navigation {
             if($step_in_future) {
                 $js = qq[onclick="alert('].$lang->txt('Use the Continue button to go to the next page').qq[');return false;" ];
             }
-            my $link = qq[<a href="$linkURL" class = "$currentclass" $js><small>$name</small></a>];
+			my $inlineStyle = '';
+			$inlineStyle = $currentclass eq 'previous' || $currentclass eq 'next' ? 'style="font-weight: normal;"' : '';
+            my $link = qq[<a href="$linkURL" class = "$currentclass" $inlineStyle $js><small>$name</small></a>];
 
             $navstring .= qq[<li class = "$currentclass">$link</li>];
             $step_in_future = 2 if $current;
