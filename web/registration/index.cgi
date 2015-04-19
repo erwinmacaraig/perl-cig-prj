@@ -89,7 +89,9 @@ sub main {
     my $userID = $user->id() || 0;
     $Data{'UserName'} = $user->name();
     $Data{'User'} = $user;
+    $Data{'UserID'} = $userID;
 
+    $action = 'LOGIN' if !$userID;
     if(!$action and $userID)  {
         $action = 'HOME';
     }
@@ -110,6 +112,9 @@ sub main {
     }
     elsif ($action =~ /P_/) {
         ($resultHTML, $pageHeading) = handleAccountProfile(\%Data, $action);
+        if($action eq 'P_u')    {
+            $resultHTML .= showHome(\%Data, $user, $srp);
+        }
     }
     else {
         # Display login page

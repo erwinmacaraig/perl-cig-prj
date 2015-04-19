@@ -60,6 +60,7 @@ sub write {
     my $st=qq[
       UPDATE tblSelfUser
       SET
+        strEmail = ?,
         strFirstName = ?,
         strFamilyName = ?,
         strStatus = ?
@@ -67,6 +68,7 @@ sub write {
     ];
     my $q = $self->{'db'}->prepare($st);
      $q->execute(
+      $self->{'DBData'}{'strEmail'},
       $self->{'DBData'}{'strFirstName'},
       $self->{'DBData'}{'strFamilyName'},
       $self->{'DBData'}{'strStatus'},

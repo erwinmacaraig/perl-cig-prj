@@ -53,7 +53,17 @@ sub create  {
   my $self = shift;
 
   $self->{'key'} = _newKey();
-    
+  $self->reload();
+  
+  return $self->{'key'};
+}
+
+sub reload {
+  my $self = shift;
+
+  if(!$self->{'key'})   {
+    return $self->create();
+  }
   if($self->{'UserID'}) {
     my $user = new SelfUserObj(db => $self->{'db'}, id => $self->{'UserID'});
     if($user->ID()) {
@@ -64,13 +74,14 @@ sub create  {
         FamilyName => $user->FamilyName(),
         Email => $user->Email(),       
       );
+      $self->{'Info'} = \%cdata;
 
       if($self->{'cache'})  {
         $self->{'cache'}->set('swm',"SRSESSION-".$self->{'key'}, \%cdata,'',8*60*60);
       }
     }
   }
-  return $self->{'key'};
+  return 1;
 }
 
 
@@ -83,6 +94,7 @@ sub load {
   return undef if !$sessionkey;
   my $info = '';
   my $userID = 0;
+  $self->{'key'} = $sessionkey;
   if($self->{'cache'})  {
     $info = $self->{'cache'}->get('swm',"SRSESSION-$sessionkey");
   }

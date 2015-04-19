@@ -12,7 +12,7 @@
     
 <div>
 <h3>[% Lang.txt('Update your details') %]</h3>
- <form id = "update-form" action = "[% BaseURL %]/registration/user/profile.cgi" method ="POST">
+ <form id = "update-form" action = "[% BaseURL %]/registration/" method ="POST">
     <div class = "form-group">
         <label for="email">[% Lang.txt('Email') %]</label>
         <input type = "text" name = "email" value = "[% Email %]" id = "signup-email"  class="form-control fields required" title="[% Lang.txt('Email Address') %]">
@@ -26,7 +26,7 @@
 			<input type = "text" name = "familyname" value = "[% FamilyName %]" size = "50" id = "signup-sname"  class="form-control fields required" title="[% Lang.txt('Family name') %]">
 	</div>
     <input type = "submit" class = "btn-main" value =" [% Lang.txt('Update') %] ">
-    <input type = "hidden" name = "a" value = "SIGNUP">
+    <input type = "hidden" name = "a" value = "P_u">
     <input type = "hidden" name = "srp" value = "[% srp %]">
 	
   </form>
@@ -34,10 +34,10 @@
 
 <div>
     <h3>[% Lang.txt('Change your password') %]</h3>
-    <form id = "updatepw-form" action = "[% BaseURL %]/registration/user/profile.cgi" method ="POST">
+    <form id = "updatepw-form" action = "[% BaseURL %]/registration/" method ="POST">
     <div class = "form-group">
         <label for="password">[% Lang.txt('Password') %]</label>
-       <input type = "password" name = "password" value = "" size = "15" maxsize = "50" title="[% Lang.txt('password') %]" class="form-control" id = "password1"
+       <input type = "password" name = "password" value = "" size = "15" maxsize = "50" title="[% Lang.txt('password') %]" class="form-control" id = "password1">
     </div>
     <div class = "form-group">  
         <label for="password2">[% Lang.txt('Re-enter Password') %]</label>
@@ -45,7 +45,7 @@
     </div>
 
     <input type = "submit" class = "btn-main" value =" [% Lang.txt('Update Password') %] ">
-    <input type = "hidden" name = "a" value = "SIGNUP">
+    <input type = "hidden" name = "a" value = "P_pu">
     <input type = "hidden" name = "srp" value = "[% srp %]">
 	
   </form>
@@ -54,7 +54,7 @@
 </div>
 <script type="text/javascript">
 	jQuery(document).ready(function(){
-		jQuery("#signup-form").validate({
+		jQuery("#update-form").validate({
 			rules: {
 				email : {
 					required: true,
@@ -67,7 +67,15 @@
 				familyname : {
 					required: true,
 					minlength: 2
-				},
+				}
+			},
+			messages: {
+				firstname: "[% Lang.txt('Please enter your First Name') %]",
+				familyname: "[% Lang.txt('Please enter your Family Name') %]"
+			}
+		});
+        jQuery("#updatepw-form").validate({
+			rules: {
 				password : {
 					required: true,
 					minlength: 6
@@ -75,12 +83,10 @@
 				password2 : {
 					required: true,
 					minlength: 6,
-					equalTo: "#signup-password"
-				},
+					equalTo: "#password1"
+				}
 			},
 			messages: {
-				firstname: "[% Lang.txt('Please enter your First Name') %]",
-				familyname: "[% Lang.txt('Please enter your Family Name') %]",
 				password: {
 					required: "[% Lang.txt('Please provide a password') %]",
 					minlength: "[% Lang.txt('must be at least 6 characters long') %]"
@@ -89,10 +95,10 @@
 					required: "[% Lang.txt('Please provide a password') %]",
 					minlength: "[% Lang.txt('must be at least 6 characters long') %]",
 					equalTo: "[% Lang.txt('Passwords do not match') %]"
-				},
+				}
 			}
 		});
 	});
-</script>
+    </script>
 [% END %]
 </div>
