@@ -311,7 +311,6 @@ $(window).scroll(function() {
 });
 */
 var columnCounter = 0;
-var options = [];
 jQuery(document).ready(function(){
     var headers = "";
     jQuery('a.btn-proceed').each(function() {
@@ -339,22 +338,40 @@ jQuery(document).ready(function(){
         });
 
     });
-    $(window).resize(function() {
-        console.log( $(window).width())
+    $(".res-table tr td").click(function(){
+        var index = $(this).index()
+        $(".res-table tbody tr").each(function() {
+        $(this).children(':eq('+index+')').addClass('ellipsis');
+       
+        })
+    })
+    /*Saeid*/ 
+    // $(window).resize(function(){checkWidth()}) < 800
+    if($(window).width() < 768){
         /* find responsive-table and prepend a dropdown*/ 
-        
+        // Convert "initial-cols" 's  value to array
+        var initialCols = $(".res-table").attr("initial-cols").split("-").map(Number);
+        // get length of initialCols array
+        initialColsLength = initialCols.length;
+        // dropdown generator function
         var dropdownGenerator = function(){
              $(".res-headers th").each(function() {
-
+             // location of header (Numeric)
              headerLocation = $(this).index();
+             // create li elements for our custom dropdown
+             /* selcol = boolean
+                ellipsis = boolean
+                data = integer
+                onclick = responsiveTables(int)
+             */
              headers += '<li>\
-                          <a data-value="option'+headerLocation+'" class="small" tabindex="-1"  onclick="responsiveTables(\''+headerLocation+'\'\)">\
-                            <input type="checkbox" data="'+headerLocation+'">\
+                          <a selcol="true" ellipsis="false" data="'+headerLocation+'" data-value="option'+headerLocation+'" class="small" tabindex="-1"  onclick="responsiveTables(\''+headerLocation+'\'\)">\
                             &nbsp;'+$(this).html()+'\
                           </a>\
                         </li>';
             columnCounter += 1;
             });
+             // wrap up made li's with a custom ul
             return '<div class="button-group responsiveTablesDropDown">\
                       <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">Items</button>\
                           <ul style="top:inherit" class="dropdown-menu res-items-group">\
@@ -362,56 +379,61 @@ jQuery(document).ready(function(){
                           </ul>\
                     </div>';
         }
+        // check if dropdown is empty
         if($(".res-items-group").length<=0){
+            // generate a drop down
             $(".res-table").before(dropdownGenerator())
-            $(".res-items-group li a input").trigger("click")
-            $(".res-items-group li:eq(0) a input,.res-items-group li:eq(1) a input,.res-items-group li:eq(2) a input").trigger("click")
+            // click on all dropdown for initializating purposes
+            $(".res-items-group li a").trigger("click");
+            // trigger only the columns requested in initial-cols attribute
+            for (var i = 0; i < initialColsLength; i++) {
+                // click each one of requested initial-cols
+                $(".res-items-group li:eq("+initialCols[i]+") a").trigger("click")
+            }
+            // wrap entire table with a div for width purposes
             $(".res-table").wrap('<div class="res-wrapper"></div>'); 
+            // fit the width of visible columns based on percentage
             $('.res-table thead tr th:not(.res-invisible)').each(function () {
             $(this).css('width',90/columnCounter+"%")    
-    });   
+            });   
         }
-
-    })
+    }
 });
 function responsiveTables(headerLocation){
-
 // Get ready variables
-var $target = $(event.currentTarget), 
-    val  = $target.attr('data-value'), 
-    $inp = $target.find('input'), 
-    idx,
-    status = $('input[data="'+headerLocation+'"]').prop('checked'),
+    // get status of colsel(Selected Column) 
+    status = $('a[data="'+headerLocation+'"]').attr('selcol'),
     header = $(".res-table .res-headers th:eq("+headerLocation+") , .res-table .res-headers td:eq("+headerLocation+")");
-// Take care of checkbox values
- if ((idx = options.indexOf(val)) > -1) {
-     options.splice(idx, 1);
-     setTimeout(function () {
-         $inp.prop('checked', true);
-     }, 0);
- } else {
-     options.push(val);
-     setTimeout(function () {
-         $inp.prop('checked', false);
-     }, 0);
- }
- $(event.target).blur();
  // Do hide/show
- if(status === false){
+
+ // check if a column select TO SHOW
+ if(status == 'false'){
+     // show selected header
      header.removeClass('res-invisible');
+     // show selected column (**Note that columns and header has different show/hide line of code)
      $(".res-table tbody tr").each(function() {
+       // find all related td and show them
        $(this).children(':eq('+headerLocation+')').removeClass('res-invisible');
+       // change status of NOT SELECTED to SELECTED
+       $('a[data="'+headerLocation+'"]').attr('selcol','true')
       })
+     // columnCounter is checking how many columns currently exist.
     columnCounter += 1;
- 
- }else if(status === true){ 
+
+ // check if a column select TO HIDE
+ }else if(status == 'true'){ 
     header.addClass('res-invisible');
     $(".res-table tbody tr").each(function() {
        $(this).children(':eq('+headerLocation+')').addClass('res-invisible');
+       $('a[data="'+headerLocation+'"]').attr('selcol','false') 
         })
     columnCounter -=1;
  };
+    // fit width of headers.
     $('.res-table thead tr th:not(.res-invisible)').each(function () {
-        $(this).css('width',100/columnCounter+"%")    
+        $(this).css('width',100/columnCounter+"%")
+           
     });
+    return false;
 }
+

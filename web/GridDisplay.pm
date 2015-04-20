@@ -438,9 +438,9 @@ sub showGrid {
 
     my $coloredtop = $coloredTopClass eq 'yes' ? 'tableboxheader' : '';
 	return qq[
-		<table id = "$gridID" class = "table $coloredtop zebra" style = "$width">
+		<table id = "$gridID" initial-cols="1-2-5" class = "res-table table $coloredtop zebra" style = "$width">
 			<thead>
-				<tr class = "">$headers</tr>
+				<tr class = " res-headers ">$headers</tr>
 			</thead>
 			<tbody>
 			$tabledata
