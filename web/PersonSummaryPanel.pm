@@ -44,10 +44,14 @@ sub personSummaryPanel {
             $level = $Data->{'lang'}->txt($reg_rego_ref->{'PersonLevel'}) . ' ';
             $break = "<br/>";
         }
+        my $sport = $reg_rego_ref->{'Sport'} 
+            ?  " (".$Data->{'lang'}->txt($reg_rego_ref->{'Sport'} || '').')'
+            : '';
         push @personRegistration, [ 
-            $level . $Data->{'lang'}->txt($reg_rego_ref->{'PersonType'}) 
+            $level . $Data->{'lang'}->txt($reg_rego_ref->{'PersonType'}) . $sport
             . ' ' . $break . $Data->{'lang'}->txt("valid to") . ' ' .$Data->{'l10n'}{'date'}->format($reg_rego_ref->{'npdtTo'},'MEDIUM'),
             $reg_rego_ref->{'strPersonType'},
+            $reg_rego_ref->{'strSport'},
         ];
     }
 

@@ -4,7 +4,8 @@
             [% PersonSummaryPanel %]
             <!-- DO IF TEST HERE ON registration.strStatus -->
             [% IF registration.strStatus == "PENDING" %]
-                <div class="registration-pending">[% Lang.txt(registration.personTypeText) %]: [% Lang.txt(registration.personRegoStatus) %]</div>
+                <div class="registration-pending">[% IF registration.personType == 'PLAYER' %][% Lang.txt(registration.PersonLevel) %] [% END %][% Lang.txt(registration.personTypeText) %][% IF registration.Sport %] ([% Lang.txt(registration.Sport) %]) [% END %]<br>[% Lang.txt(registration.personRegoStatus) %]</div>
+
             [% ELSIF registration.strStatus == "ACTIVE" %]
                 <div class="registration-approved">[% Lang.txt(registration.personTypeText) %]: [% Lang.txt(registration.personRegoStatus) %]</div>
             [% END %]
