@@ -709,7 +709,7 @@ sub getTransList {
 		}
             $row_data->{$header->{field}} = $row->{$header->{field}}; 
             $row_data->{'dtPaid_RAW'} = $row->{'dtPaid'}; 
-            $row_data->{'dtPaid'} = $Data->{'l10n'}{'date'}->format($row->{'dtPaid'},'MEDIUM','SHORT'); 
+            $row_data->{'dtPaid'} = $Data->{'l10n'}{'date'}->TZformat($row->{'dtPaid'},'MEDIUM','SHORT'); 
         }
         $row_data->{'PersonType'} = $lang->txt($Defs::personType{$row->{'strPersonType'}});
             $row_data->{SelectLink} = qq[main.cgi?client=$client&a=P_TXN_EDIT&personID=$row->{intID}&id=$row->{intTransLogID}&tID=$row->{intTransactionID}];
@@ -1487,7 +1487,7 @@ sub resolveHoldPaymentForm  {
                                 },
                                 dtLog=> {
                                         label => 'Date Paid',
-                                        value => $Data->{'l10n'}{'date'}->format($TLref->{'dtLog'},'MEDIUM','SHORT'),
+                                        value => $Data->{'l10n'}{'date'}->TZformat($TLref->{'dtLog'},'MEDIUM','SHORT'),
                                         readonly => '1',
                                 },
                                 intLogID=> {
@@ -1746,7 +1746,7 @@ sub viewTransLog	{
                                 },
                                 dtLog=> {
                                         label => 'Date Paid',
-                                        value => $Data->{'l10n'}{'date'}->format($TLref->{'dtLog'},'MEDIUM','SHORT'),
+                                        value => $Data->{'l10n'}{'date'}->TZformat($TLref->{'dtLog'},'MEDIUM','SHORT'),
                                         readonly => '1',
                                 },
                                 intLogID=> {
