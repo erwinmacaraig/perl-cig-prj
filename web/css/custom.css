@@ -174,7 +174,7 @@ li.peoplelookup input[type="text"] {
 {
   margin-bottom: 0px;
   border-radius: 0px;
-  padding-left: 10px;
+  /*padding-left: 10px;*/
 }
 
 hr {
@@ -360,6 +360,25 @@ a[selcol="false"] {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/*total amount view correction*/
+ul.total-view{
+  float: right;
+}
+ul.total-view li {
+  width: 28%;
+  float: left;
+  list-style: none;
+  margin: 0 11px;
+}
+/*readonly corrections*/
+.read-only-text ul li{
+  width: 100%;
+}
+/* make headers more meaningful*/
+th {
+  text-transform: uppercase;
+  text-align: center;
+}
 @media only screen and (max-width:610px){
   .membership-login header .logo-area h1{
       position: relative;
@@ -372,6 +391,10 @@ a[selcol="false"] {
       position: relative;
       left: 50%;
       margin-left: -47px;
+  }
+  .membership-login header .logo-area a.logo-container{
+    float: left;
+    width: 100%
   }
   .membership-login header .logo-area ul{
       margin-top: 0;
@@ -425,6 +448,9 @@ a[selcol="false"] {
     width: 100%!important;
     min-width: 116px;
   }
+  .btn-inside-panels {
+    width: 100%;
+  }
   /*cancel | Save and exit | Continue buttons*/
   a.btn-main, input.btn-main, button.btn-main{
     width: 100%;
@@ -446,7 +472,7 @@ a[selcol="false"] {
   width: 100%;
   }
 }
-@media only screen and (max-width:750px){
+@media only screen and (max-width:766px){
   form#searchForm .btn-inside-panels,
   div.row span.formw{
     width: 100%;
