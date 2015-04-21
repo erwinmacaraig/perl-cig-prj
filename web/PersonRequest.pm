@@ -90,7 +90,7 @@ sub handlePersonRequest {
             $body = runTemplate(
                 $Data,
                 \%TemplateData,
-                'personrequest/generic/search_form.templ',
+                'personrequest/transfer/search_form.templ',
             );
         }
         case 'PRA_R' {
@@ -117,7 +117,7 @@ sub handlePersonRequest {
             $title = $Data->{'lang'}->txt('Request/Initiate Player Loan');
 
             $TemplateData{'action'} = 'PRA_search';
-            $TemplateData{'request_type'} = 'loan';
+            $TemplateData{'request_type'} = $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN;
             $TemplateData{'Lang'} = $Data->{'lang'};
             $TemplateData{'client'} = $Data->{'client'};
             $TemplateData{'target'} = $Data->{'target'};
@@ -125,7 +125,7 @@ sub handlePersonRequest {
             $body = runTemplate(
                 $Data,
                 \%TemplateData,
-                'personrequest/generic/search_form.templ',
+                'personrequest/loan/search_form.templ',
             );
 
         }
@@ -181,6 +181,26 @@ sub listPeople {
     my $sphinx = Sphinx::Search->new;
     my %results = ();
     my $rawResult = 1;
+    my $searchTemplate = "";
+    my $resultTemplate = "";
+    my $searchType = "";
+
+    switch($params{'request_type'}) {
+        case ['loan', $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN] {
+            $searchType = "loan";
+            $resultTemplate = "personrequest/loan/search_result.templ";
+            $searchTemplate = "personrequest/loan/search_form.templ";
+        }
+        case "transfer" {
+            $searchType = "transfer";
+            $resultTemplate = "personrequest/transfer/search_result.templ";
+            $searchTemplate = "personrequest/transfer/search_form.templ";
+        }
+        else {
+
+        }
+    }
+
 
     my %TemplateData = (
         'action' => 'PRA_search',
@@ -198,11 +218,11 @@ sub listPeople {
     $personSearchObj
         ->setRealmID($Data->{'Realm'})
         ->setSubRealmID(0)
-        ->setSearchType($params{'request_type'})
+        ->setSearchType($searchType)
         ->setData($Data)
         ->setKeyword($searchKeyword)
         ->setSphinx($sphinx)
-        ->setGridTemplate("personrequest/transfer/search_result.templ");
+        ->setGridTemplate($resultTemplate);
 
     my $resultGrid = $personSearchObj->process();
 
@@ -217,10 +237,10 @@ sub listPeople {
     my $body = runTemplate(
         $Data,
         \%TemplateData,
-        'personrequest/generic/search_form.templ',
+        $searchTemplate,
     );
 
-    return ($body, "Result");
+    return ($body, $Data->{'lang'}->txt("Result"));
 }
 
 sub listPersonRecord {
@@ -286,6 +306,20 @@ sub listPersonRecord {
         ];
         #$limit = qq[ LIMIT 1 ];
     }
+    elsif($requestType eq $Defs::PERSON_REQUEST_LOAN) {
+        $joinCondition = qq [ AND PR.strPersonType = 'PLAYER' and PR.strPersonLevel = "PROFESSIONAL" ];
+        $groupBy = qq [ GROUP BY PR.strSport, PR.intEntityID ];
+        $orderBy = qq[
+            ORDER BY personLevelWeight
+        ];
+#            ORDER BY
+#                CASE WHEN PR.strPersonType = 'PLAYER' AND PR.strSport = 'FOOTBALL' THEN personLevelWeight END desc,
+#                CASE WHEN PR.strPersonType != 'PLAYER' AND PR.strSport != 'FOOTBALL' THEN PR.dtAdded END asc
+#
+        #$limit = qq[ LIMIT 1 ];
+    }
+
+
 
     my $st = qq[
         SELECT
@@ -510,9 +544,53 @@ sub listPersonRecord {
         $resultHTML = runTemplate(
             $Data,
             \%TemplateData,
-            'personrequest/generic/search_form.templ',
+            'personrequest/transfer/search_form.templ',
             #'personrequest/transfer/selection.templ',
         );
+    }
+    elsif($requestType eq $Defs::PERSON_REQUEST_LOAN) {
+        $resultHTML = ' ';
+        my %TemplateData;
+
+        my $FieldDefinitions= loanRequiredFields($Data);
+        my $obj = new Flow_DisplayFields(
+            Data => $Data,
+            Lang => $Data->{'lang'},
+            SystemConfig => $Data->{'SystemConfig'},
+            Fields =>  $FieldDefinitions,
+        );
+        my ($lReqBody, undef, $lReqHeadJS, undef) = $obj->build({},'edit',1);
+
+        $TemplateData{'groupResult'} = \%groupResult;
+        $TemplateData{'action'} = "PRA_search"; #this uses generic/search_form.templ and action should remain PRA_search
+        #$TemplateData{'action_request'} = "PRA_initRequest";
+        $TemplateData{'action_request'} = "PRA_submit";
+        $TemplateData{'request_type'} = $request_type;
+        $TemplateData{'transfer_type'} = $transferType;
+        $TemplateData{'client'} = $Data->{'client'};
+        $TemplateData{'selectedForLoanDetails'}{'currentClub'} = join(', ', @personCurrentClubs);
+        $TemplateData{'selectedForLoanDetails'}{'loanToClub'} = '';
+        $TemplateData{'selectedForLoanDetails'}{'currentSports'} = join(', ', @personCurrentSports);
+        $TemplateData{'selectedForLoanDetails'}{'currentRegistrations'} = join(', ', @personCurrentRegistrations);
+        $TemplateData{'selectedForLoanDetails'}{'firstName'} = $personFname;
+        $TemplateData{'selectedForLoanDetails'}{'lastName'} = $personLname;
+        $TemplateData{'selectedForLoanDetails'}{'memberID'} = $personMID;
+
+        $lReqBody = qq[
+            <form method="post" action="main.cgi" id = "flowFormID">
+            <div id="hiddenfields" style="display: none"></div>
+            $lReqBody
+            </form>
+        ];
+        $TemplateData{'loanRequiredFields'}{'body'} = $lReqBody;
+
+        $resultHTML = runTemplate(
+            $Data,
+            \%TemplateData,
+            'personrequest/loan/search_form.templ',
+            #'personrequest/transfer/selection.templ',
+        );
+
     }
 
     return ($resultHTML, $title);
@@ -601,6 +679,18 @@ sub submitRequestPage {
     my @rowdata = ();
 	my $p = new CGI;
 	my %params = $p->Vars();
+    my $openLoan = ($params{'request_type'} eq 'loan' or $params{'request_type'} eq $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN) ? 1 : 0;
+
+    my $FieldDefinitions= loanRequiredFields($Data);
+    my $obj = new Flow_DisplayFields(
+        Data => $Data,
+        Lang => $Data->{'lang'},
+        SystemConfig => $Data->{'SystemConfig'},
+        Fields => $FieldDefinitions,
+    );
+
+    my ($userData, $errors) = $obj->gather(\%params, {},'edit');
+
     my @requestIDs;
 
     for my $selectedRego ($p->param()) {
@@ -643,11 +733,19 @@ sub submitRequestPage {
                         intRequestToMAOverride,
                         strRequestNotes,
                         strRequestStatus,
+                        dtLoanFrom,
+                        dtLoanTo,
+                        intOpenLoan,
+                        strTMSReference,
                         dtDateRequest,
                         tTimeStamp
                     )
                     VALUES
                     (
+                        ?,
+                        ?,
+                        ?,
+                        ?,
                         ?,
                         ?,
                         ?,
@@ -686,6 +784,10 @@ sub submitRequestPage {
                 $MAOverride,
                 $notes,
                 $Defs::PERSON_REQUEST_STATUS_INPROGRESS,
+                $userData->{'dtLoanStartDate'} || '',
+                $userData->{'dtLoanEndDate'} || '',
+                $openLoan,
+                $userData->{'strTMSReference'} || '',
             );
 
             my $requestID = $db->{mysql_insertid};
@@ -972,6 +1074,17 @@ sub viewRequest {
 
             $requestType = $Defs::PERSON_REQUEST_ACCESS;
         }
+        case "$Defs::PERSON_REQUEST_LOAN" {
+            if($request->{'intPersonRequestID'} and $request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_STATUS_ACCEPTED) {
+                $templateFile = "personrequest/loan/new_club_view.templ";
+            }
+            else {
+                $templateFile = "personrequest/loan/current_club_view.templ";
+            }
+
+            $requestType = $Defs::PERSON_REQUEST_LOAN;
+        }
+
         else {
 
         }
@@ -1033,6 +1146,10 @@ sub viewRequest {
 
         'personRegistrationID' => $request->{'intPersonRegistrationID'} || 0,
         'personRegistrationStatus' => $request->{'personRegoStatus'} || 'N/A',
+
+        'loanStartDate' => $request->{'dtLoanFrom'} || '',
+        'loanEndDate' => $request->{'dtLoanTo'} || '',
+
         'MID' => $request->{'strNationalNum'},
 
         'contactAddress1' => $request->{'strAddress1'},
@@ -1086,6 +1203,9 @@ sub viewRequest {
                 $tempClient = setClient( \%tempClientValues );
                 #$action = "PREGF_T";
                 $action = "P_HOME";
+            }
+            case "$Defs::PERSON_REQUEST_LOAN" {
+                $action = "PLF_";
             }
         }
     }
@@ -1234,15 +1354,18 @@ sub setRequestResponse {
 
         if($response eq "ACCEPTED"){
             $templateFile = "personrequest/transfer/request_accepted.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
+            $templateFile = "personrequest/loan/request_accepted.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_LOAN;
             $templateFile = "personrequest/access/request_accepted.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_ACCESS;
             $notifDetails .= $Data->{'lang'}->txt("You will be notified once the transfer is effective and approved by ") . $maName if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
         }
         elsif($response eq "DENIED"){
             $templateFile = "personrequest/transfer/request_denied.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
+            $templateFile = "personrequest/loan/request_denied.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_LOAN;
             $templateFile = "personrequest/access/request_denied.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_ACCESS;
         }
         elsif($response eq "CANCELLED") {
             $templateFile = "personrequest/transfer/request_cancelled.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
+            $templateFile = "personrequest/loan/request_cancelled.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_LOAN;
             $templateFile = "personrequest/access/request_cancelled.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_ACCESS;       
         }
 
@@ -1280,6 +1403,10 @@ sub getRequestType {
             return $requestType;
         }
         case 'access' {
+            $requestType = uc($requestType);
+            return $requestType;
+        }
+        case 'loan' {
             $requestType = uc($requestType);
             return $requestType;
         }
@@ -1392,6 +1519,8 @@ sub getRequests {
             pq.strResponseNotes,
             pq.intResponseBy,
             pq.strRequestStatus,
+            pq.dtLoanFrom,
+            pq.dtLoanTo,
             p.strLocalFirstname,
             p.strLocalSurname,
             p.strStatus as personStatus,
@@ -2020,6 +2149,65 @@ sub displayGenericError {
     );
 
     return ($body, $titleHeader);
+}
+
+sub loanRequiredFields {
+    my ($Data) = @_;
+
+	my %FieldDefinitions = (		
+        fields => {
+   		    	strSourceClub => {
+   		    		label => $Data->{'lang'}->txt('Source Club'),
+   		    		type => 'text',
+   		    		size  => '50',
+                	compulsory => 1,
+   		    		name => 'strSourceClub',
+                	compulsory => 1,  
+                    sectionname => 'loanfields',
+   		    	},
+   		    	dtLoanStartDate => {
+   		    		label => $Data->{'lang'}->txt('Loan Start Date'),
+   		    		type => 'date',
+   		    		size => '20',
+					name => 'dtLoanStartDate',
+                    datetype    => 'dropdown',
+                    validate    => 'DATE',
+                	compulsory => 1,  
+                    sectionname => 'loanfields',
+   		    	},
+   		    	dtLoanEndDate => {
+   		    		label => $Data->{'lang'}->txt('Loan End Date'),
+   		    		type => 'date',
+   		    		size => '20',
+					name => 'dtLoanEndDate',
+                    datetype    => 'dropdown',
+                    validate    => 'DATE',
+                	compulsory => 1,  
+                    sectionname => 'loanfields',
+   		    	},
+   		    	strTMSReference => {
+   		    		label => $Data->{'lang'}->txt('TMS Reference'),
+   		    		type => 'text',
+   		    		size  => '50',
+                	compulsory => 1,
+   		    		name => 'strSourceClub',
+                	compulsory => 1,  
+                    sectionname => 'loanfields',
+   		    	},
+        },
+        'order' => [qw(
+            dtLoanStartDate
+            dtLoanEndDate
+            strTMSReference
+        )],
+        sections => [
+            [ 'loanfields', 'Additional Fields' ],
+        ],
+        client => $Data->{'client'},
+			
+   	); #end of FieldDefinitions
+    return \%FieldDefinitions;
+
 }
 
 1;
