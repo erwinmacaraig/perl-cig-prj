@@ -319,6 +319,10 @@ use PersonFlow;
 use TransferFlow;
         ( $resultHTML, $pageHeading ) = handleTransferFlow($action, \%Data);
     }
+    elsif ( $action =~ /^PLF_/ ) {
+use LoanFlow;
+        ( $resultHTML, $pageHeading ) = handleLoanFlow($action, \%Data);
+    }
     elsif ( $action =~ /^PENDPR_/ ) {
         my $prID = safe_param( 'prID', 'number' );
         my $entityID = getID($Data{'clientValues'},$Data{'clientValues'}{'currentLevel'});
