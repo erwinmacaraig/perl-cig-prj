@@ -896,8 +896,9 @@ table tr.new-task {
 	background-color: #e3e3e3;
 	padding-bottom: 50px;
 }
-
-
+#content .container{
+	width: 100%
+}
 #footer {
 	background-color: #085a8c;
 	background-image: none;
@@ -2283,7 +2284,7 @@ header .navbar-brand {
   h2.main-heading { font-size: 30px; margin-top: 0px; }
   #worktasks_length { display: none; }
   #worktasks_filter { text-align: right; }
-  .summaryPanel { display: none; }
+  /*.summaryPanel { display: none; }*/
   div.dataTables_filter label { color: #000; }
   div.row span.formw { width: 80%; }
 /*  #searchResult { width: 722px!important; }*/
@@ -2421,7 +2422,7 @@ header .navbar-brand {
   .fa-angle-right { display: none; }
   a.btn-main.btn-proceed { padding-bottom: 10px; }
   #flow-btn-back { margin-right: 0px; }
-  .summaryPanel { display: none; }
+  /*.summaryPanel { display: none; }*/
   .toggle-type a, .toggle-type a:visited { width: 50%; text-align: center; }
   div#content div.member-home-page div.task-actions.txtright {
   	margin-bottom: 10px;
