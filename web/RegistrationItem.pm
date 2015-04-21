@@ -294,7 +294,7 @@ sub registrationItemActiveProducts  {
         my $filterString = $pref->{'strItemActiveFilterPaidProducts'};
         my $activeResult = 0;
         my $condition = 'AND';
-        $condition = 'OR' if ($pref->{'strItemActiveFilterPeriods'} =~ /\|/);
+        $condition = 'OR' if ($pref->{'strItemActiveFilterPaidProducts'} =~ /\|/);
         my @products= ();
         if ($condition eq 'AND')    {
             @products= split /\&/, $filterString;
@@ -304,7 +304,7 @@ sub registrationItemActiveProducts  {
         }
         my $filterCount = 0;
         foreach my $prodID (@products)    {
-            $activeResult = 1 if ($ProductsPaid{$prodID} and (! $condition or $condition eq 'OR')); #If any are >0 then set activeResult as 1
+            $activeResult = 1 if ($ProductsPaid{$prodID} and $condition eq 'OR'); #If any are >0 then set activeResult as 1
             if ($condition eq 'AND')    {
                 $activeResult = 1 if ($ProductsPaid{$prodID} and $condition eq 'AND' and ! $filterCount); #Lets check first one, and set to 1 if >0
                 $activeResult = 0 if (! $ProductsPaid{$prodID} and $condition eq 'AND'); #Now only set to False if no results
