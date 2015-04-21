@@ -15,8 +15,8 @@
 			<thead>
 			<tr>
 				<th class="col-1">[% Lang.txt('Select') %]</th>
-				<th class="col_i"></th>
-				<th class="col-2">[% IF !HideQty %]Qty[% END %]</th>
+				<!--<th class="col_i"></th>-->
+				[% IF !HideQty %]<th class="col-2">Qty</th>[% END %]
 				<th class="col-3">Name</th>
 			[% IF !HideCost %]
 				<th class="col-4">Cost</th>
@@ -51,9 +51,9 @@
 					<input type="checkbox" name="prod_[% p.ProductID %]" value="1" class="nc" id = "up_prod_[% p.ProductID %]">
 				[% END %]
 				</td>
-	                        <td class="col-i">[% p.Photo %]</td>
-				<td class="col-2">
+	                        <!--<td class="col-i">[% p.Photo %]</td>-->
 	[% IF !HideQty %]
+		<td class="col-2">
 		[% IF p.AllowQty %]
 				[% IF p.TransactionID and !p.Status %]
 					<input type="text" size = "5" name="txnQTY_[% p.TransactionID %]" value="[% p.Qty %]">
@@ -92,15 +92,15 @@
 	[% END %]
 	[% loopcount = loopcount + 1 %]
 		[% END %]
-		<tr>
-			<td>&nbsp;</td>
-			<td>&nbsp;</td>
-			<td>&nbsp;</td>
-			<td class="totalFont">TOTAL:</td>
-			<td class="totalValue">&#36;0.00</td>
-		</tr>
 		</tbody>
 		</table>
+		<ul class="total-view">
+			<!--<td>&nbsp;</td>-->
+			<!--<td>&nbsp;</td>-->
+			<!--<td>&nbsp;</td>-->
+			<li class="totalFont">TOTAL:</li>
+			<li class="totalValue">&#36;0.00</li>
+		</ul>
 	[% END %]
 
 
