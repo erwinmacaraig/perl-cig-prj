@@ -353,6 +353,7 @@ sub getPlayerLoan {
                 AND
                     (PR.strPersonType = 'PLAYER')
                 AND PR.intEntityID <> $filters->{'club'}
+                AND PR.strPersonLevel = "PROFESSIONAL"
             )
             LEFT JOIN tblPersonRegistration_$realmID AS PRAlready ON (
                 tblPerson.intPersonID = PRAlready.intPersonID
@@ -365,7 +366,7 @@ sub getPlayerLoan {
                 PR.intEntityID = E.intEntityID
             )
             LEFT JOIN tblPersonRequest AS PRQinprogress ON (
-                PRQinprogress.strRequestType = "TRANSFER"
+                PRQinprogress.strRequestType IN ("LOAN")
                 AND PRQinprogress.intPersonID = tblPerson.intPersonID
                 AND PRQinprogress.strSport =  PR.strSport
                 AND PRQinprogress.strPersonType = PR.strPersonType
