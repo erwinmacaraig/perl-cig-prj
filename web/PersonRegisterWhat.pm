@@ -374,6 +374,11 @@ sub optionsPersonRegisterWhat {
             #TODO
             #handle for other steps (person role, level, age group)
 
+            if(defined $registrationNature) {
+                $MATRIXwhere .= qq[ AND strRegistrationNature = ? ];
+                push @MATRIXvalues, $registrationNature;
+            }
+
             $Data->{'Realm'} = $Data->{'Realm'} || $realmID;
             my $personLevelFromMatrix = getPersonLevelFromMatrix($Data, $MATRIXwhere, \@MATRIXvalues, $bulk, $personType, $pref);
             return ($personLevelFromMatrix, '');
@@ -513,6 +518,13 @@ sub optionsPersonRegisterWhat {
         if ($registrationNature eq 'NEW' and $lookingForField eq 'strRegistrationNature')   {
             $NATUREwhere= qq[AND strRegistrationNature = 'NEW'];
         }
+        if ($registrationNature eq $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN and $lookingForField eq 'strRegistrationNature')   {
+            $NATUREwhere= qq[AND strRegistrationNature = 'DOMESTIC_LOAN'];
+        }
+        if ($registrationNature eq $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN and $lookingForField eq 'strRegistrationNature')   {
+            $NATUREwhere= qq[AND strRegistrationNature = 'INTERNATIONAL_LOAN'];
+        }
+
 
         $st = qq[
             SELECT DISTINCT $lookingForField, COUNT(intMatrixID) as CountNum
@@ -526,7 +538,6 @@ sub optionsPersonRegisterWhat {
                 $NATUREwhere
             GROUP BY $lookingForField
         ];
-print STDERR $st;
         @values = @MATRIXvalues;
     }
     
@@ -721,6 +732,7 @@ sub getPersonLevelFromMatrix {
             $where
         GROUP BY strPersonLevel
     ];
+
 
     my $query = $Data->{'db'}->prepare($st);
     $query->execute(@{$values_ref});
