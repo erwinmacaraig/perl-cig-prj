@@ -39,7 +39,8 @@ sub handleLoanFlow {
     my $originLevel = $Data->{'clientValues'}{'authLevel'} || 0;
     my $defaultType = $params{'dtype'} || '';
     my $defaultRegistrationNature = $params{'dnat'} || '';
-    my $internationalTransfer = $params{'itc'} || '';
+    my $internationalLoan = $params{'ipl'} || '';
+    my $defaultRegistrationNature = ($internationalLoan == 1) ? $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN : $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN;
     my $startingStep = $params{'ss'} || '';
 
     #specific to Transfers
@@ -57,7 +58,7 @@ sub handleLoanFlow {
             a => $action,
             dtype => $defaultType,
             dnat => $defaultRegistrationNature,
-            itc => $internationalTransfer,
+            ipl => $internationalLoan,
             ss => $startingStep,
             prid => $personRequestID,
 
