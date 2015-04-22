@@ -76,12 +76,13 @@ print STDERR "IN checkOpenPayments\n";
             INNER JOIN tblPaymentConfig as PC ON (PC.intPaymentConfigID = TL.intPaymentConfigID)
 	    INNER JOIN tblPayTry as PT ON (PT.intTransLogID = TL.intLogID)
         WHERE
-        TL.intStatus IN (0)
+        TL.intStatus IN (0,3)
             AND PC.strGatewayCode = 'checkoutfi'
+            AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 1 hour)
 		AND  TL.intSentToGateway = 1 
+            AND TL.intPaymentGatewayResponded = 0
     ];
             #TL.intStatus IN (0,3)
-            #AND TL.intPaymentGatewayResponded = 0
     my $checkURL = 'https://rpcapi.checkout.fi/poll';
     my $query = $db->prepare($st);
     $query->execute();
@@ -199,7 +200,7 @@ print STDERR "API STATUS IS " . $APIResponse{'STATUS'};
             $returnVals{'GATEWAY_RESPONSE_TEXT'}= $APIResponse{'REFERENCE'} || '';
             $returnVals{'GatewayResponseCode'}= $co_status;
             $returnVals{'ResponseCode'}= $returnVals{'GATEWAY_RESPONSE_CODE'};
-            markGatewayAsResponded(\%Data, $logID);# if $returnVals{'GATEWAY_RESPONSE_CODE'} ne 'HOLD'; 
+            markGatewayAsResponded(\%Data, $logID) if $returnVals{'GATEWAY_RESPONSE_CODE'} ne 'HOLD'; 
 
            my $respTextCode = $FIN_coResponseText{$co_status} || '';
             $returnVals{'ResponseText'}= $respTextCode; 

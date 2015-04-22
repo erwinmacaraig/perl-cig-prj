@@ -137,6 +137,9 @@
                             [% task.RegistrationNatureLabel %]<br/>
                             [% Lang.txt('Review Transfer of') %] [% task.Name %]<br/>
                             From [% task.RequestToClub %] to [% task.RequestFromClub %]<br/>
+                            [% IF task.changeLevelDescription %]
+                                [% task.changeLevelDescription %]
+                            [% END %]
                             </div>
                         </td>
                     [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'REGO' AND (task.RegistrationNature == 'DOMESTIC_LOAN' OR task.RegistrationNature == 'INTERNATIONAL_LOAN') %]
@@ -155,6 +158,9 @@
                             [% task.RegistrationNatureLabel %]<br/>
                             [% task.Name %]<br/>
                             [% task.LocalEntityName %]
+                            [% IF task.changeLevelDescription %]
+                                <br/>[% task.changeLevelDescription %]
+                            [% END %]
                             </div>
                         </td>
                     [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'ENTITY' %]
@@ -386,7 +392,7 @@
             "order": [],
             "lengthMenu": [[50, 100, -1], [50, 100, "All"]],
             "dom" : "ilftpr",
-            "language":{"sInfo":"[% Lang.txt('Showing _START_ to _END_ of _TOTAL_ entries') %]","sZeroRecords":"[% Lang.txt('No matching records found') %]","sLengthMenu":"[% Lang.txt('Show _MENU_ entries') %]","oPaginate":{"sPrevious":"[% Lang.txt('Previous') %]","sFirst":"[% Lang.txt('First') %]","sNext":"[% Lang.txt('Next') %]","sLast":"[% Lang.txt('Last') %]"},"search":"[% Lang.txt('Filter') %]"},
+            "language":{"sInfo":"[% Lang.txt('Showing _START_ to _END_ of _TOTAL_ entries') %]","sZeroRecords":"[% Lang.txt('No matching records found') %]","sLengthMenu":"[% Lang.txt('Show _MENU_ entries') %]","oPaginate":{"sPrevious":"[% Lang.txt('Previous') %]","sFirst":"[% Lang.txt('First') %]","sNext":"[% Lang.txt('Next') %]","sLast":"[% Lang.txt('Last') %]"},"search":"[% Lang.txt('Filter') %]","infoFiltered":" - [% Lang.txt('filtered from _MAX_ records') %]","infoEmpty":"[% Lang.txt('No entries to show') %]"},
 
 
         });

@@ -40,7 +40,7 @@ use RegoProducts;
 sub setProcessOrder {
     my $self = shift;
   
-    my $dtype = param('dtype') || $self->{'RunParams'}{'dtype'} || $self->{'CarryFields'}{'dtype'} || '';
+    my $dtype = param('dtype') || $self->{'RunParams'}{'dtype'} || $self->{'CarryFields'}{'dtype'} || $self->{'RunParams'}{'d_type'} || $self->{'CarryFields'}{'pType'} || $self->{'RunParams'}{'pType'} || '';
     my $typename = $Defs::personType{$dtype} || '';
     my $lang = $self->{'Data'}{'lang'};
     my $regname = $typename
@@ -90,7 +90,7 @@ sub setProcessOrder {
             'label'  => $lang->txt('Certifications'),
             'fieldset'  => 'certifications',
             'title'  => $regname . ' - '. $lang->txt('Enter Certifications'),
-            'NoNav' => $dtype eq 'PLAYER' ? 1 : 0,
+            'NoNav' => $dtype eq 'PLAYER'  ? 1 : 0,
         },
         {
             'action' => 'pcert',
@@ -135,7 +135,7 @@ sub setProcessOrder {
         },
     ];
     my @order = @{$steps1};
-    if(($dtype eq 'COACH' or $dtype eq 'REFEREE'))   {
+    if(!$dtype or ($dtype eq 'COACH' or $dtype eq 'REFEREE'))   {
         push @order, @{$stepscert};
     }
     push @order, @{$steps2};
@@ -167,13 +167,12 @@ sub setupValues    {
         $self->addCarryField('dnature', 'RENEWAL');
         $self->addCarryField('nat', 'RENEWAL');
         $self->addCarryField('dsport', $rawDetails->{'strSport'});
+        $self->addCarryField('dlevel', $self->{'RunParams'}{'dlevel'}) if (defined $self->{'RunParams'}{'dlevel'} and $self->{'RunParams'}{'dlevel'} ne '');
         $self->addCarryField('dage', $rawDetails->{'newAgeLevel'}); # if $rawDetails->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER;
         $self->addCarryField('drole', $rawDetails->{'strPersonEntityRole'});
     }
     else    {
-print STDERR "OLD LEVEL: " . param('oldlevel');
         $self->addCarryField('oldlevel', $self->{'RunParams'}{'oldlevel'});
-print STDERR "OLD LEVEL IS : " . $self->{'RunParams'}{'oldlevel'};
         $self->addCarryField('d_nature', 'NEW');
         $self->addCarryField('dnature', 'NEW');
         $self->addCarryField('nat', 'NEW');
@@ -687,7 +686,6 @@ sub display_registration {
         #NoContinueButton => $noContinueButton,
     );
     my $pagedata = $self->display(\%PageData);
-
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}}) and ($defaultRegistrationNature eq 'TRANSFER' or $defaultRegistrationNature eq 'RENEWAL')) {
         #display the same step with error notification (for Transfers atm)
         return ($pagedata,0);

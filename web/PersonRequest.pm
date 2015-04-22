@@ -1100,11 +1100,12 @@ sub viewRequest {
     my $maObj = getInstanceOf($Data, 'national');
 
     my $isocountries  = getISOCountriesHash();
+    my $lang = $Data->{'lang'};
     my %TemplateData = (
         'requestID' => $request->{'intPersonRequestID'} || undef,
-        'requestType' => $Defs::personRequest{$request->{'strRequestType'}} || '',
+        'requestType' => $lang->txt($Defs::personRequest{$request->{'strRequestType'}}) || '',
         'requestFrom' => $request->{'requestFrom'} || '',
-        'requestFromDiscipline' => $Defs::entitySportType{$request->{'requestFromDiscipline'}} || '',
+        'requestFromDiscipline' => $lang->txt($Defs::entitySportType{$request->{'requestFromDiscipline'}}) || '',
         'requestFromISOCountry' => $isocountries->{$request->{'requestFromISOCountry'}} || '',
         'requestFromAddress' => $request->{'requestFromAddress'} || '',
         'requestFromAddress2' => $request->{'requestFromAddress2'} || '',
@@ -1116,7 +1117,7 @@ sub viewRequest {
         'requestFromTo' => $request->{'requestFromTo'} || '',
 
         'requestTo' => $request->{'requestTo'} || '',
-        'requestToDiscipline' => $Defs::entitySportType{$request->{'requestToDiscipline'}} || '',
+        'requestToDiscipline' => $lang->txt($Defs::entitySportType{$request->{'requestToDiscipline'}}) || '',
         'requestToISOCountry' => $isocountries->{$request->{'requestToISOCountry'}} || '',
         'requestToAddress' => $request->{'requestToAddress'} || '',
         'requestToAddress2' => $request->{'requestToAddress2'} || '',
@@ -1126,19 +1127,19 @@ sub viewRequest {
         'requestToPhone' => $request->{'requestToPhone'} || '',
 
         'dateRequest' => $request->{'dtDateRequest'} || '',
-        'requestResponse' => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || '',
+        'requestResponse' => $lang->txt($Defs::personRequestResponse{$request->{'strRequestResponse'}}) || '',
         'responseBy' => $request->{'responseBy'} || '',
         'personFirstname' => $request->{'strLocalFirstname'} || '',
         'personSurname' => $request->{'strLocalSurname'} || '',
         'ISONationality' => $isocountries->{$request->{'strISONationality'}} || '',
         'ISOCountryOfBirth' => $isocountries->{$request->{'strISOCountryOfBirth'}} || '',
         'RegionOfBirth' => $request->{'strRegionOfBirth'} || '',
-        'personGender' => $Defs::PersonGenderInfo{$request->{'intGender'} || 0} || '',
+        'personGender' => $lang->txt($Defs::PersonGenderInfo{$request->{'intGender'} || 0}) || '',
         'DOB' => $request->{'dtDOB'} || '',
         'personStatus' => $request->{'personStatus'} || '',
-        'sport' => $Defs::sportType{$request->{'strSport'}} || '',
-        'personType' => $Defs::personType{$request->{'strPersonType'}} || '',
-        'personLevel' => $Defs::personLevel{$request->{'strPersonLevel'}} || '',
+        'sport' => $lang->txt($Defs::sportType{$request->{'strSport'}}) || '',
+        'personType' => $lang->txt($Defs::personType{$request->{'strPersonType'}}) || '',
+        'personLevel' => $lang->txt($Defs::personLevel{$request->{'strPersonLevel'}}) || '',
         'requestNotes' => $request->{'strRequestNotes'} || '',
         'responseNotes' => $request->{'strResponseNotes'} || '',
 

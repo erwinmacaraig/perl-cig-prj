@@ -8,7 +8,7 @@
         <h3 class="panel-header">[% personDetails.firstname %] [% personDetails.surname %]</h3>
         <div class="panel-body">
             [% FOREACH request IN personRequests %]
-            <label>The [% request.requestType %] [% personDetails.firstname %] [% personDetails.surname %] has been sent to [% request.requestTo %].</label>
+            <label>[% Lang.txt('The [_1] for [_2] has been sent to [_3]',Lang.txt(request.requestType),personDetails.firstname _ ' ' _ personDetails.surname, request.requestTo) %].</label>
             <br/>
             [% END %]
             <div class="row top-bottom-spacer">
@@ -18,7 +18,7 @@
             </div>
         </div>
         <div class = "button-row pull-right">
-            <a href="main.cgi?client=[% client %]&amp;a=C_HOME" title="" class="btn-main">Go to your dashboard</a>
+            <a href="main.cgi?client=[% client %]&amp;a=C_HOME" title="" class="btn-main">[% Lang.txt('Go to your dashboard') %]</a>
         </div>
     </div>
 <!--</div>-->

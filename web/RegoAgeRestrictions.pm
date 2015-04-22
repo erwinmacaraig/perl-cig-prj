@@ -131,7 +131,7 @@ sub checkRegoAgeRestrictions {
         }
         elsif($personAgeLevel eq $_) {
             push @retdata, {
-                name => $Defs::ageLevel{$_},
+                name => $Data->{'lang'}->txt($Defs::ageLevel{$_}),
                 value => $_,
             };
         }

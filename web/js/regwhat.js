@@ -18,6 +18,7 @@ function update_options(optionType, dtype)   {
     qstring = qstring + '&dsport=' + jQuery('#dsport').val();
     qstring = qstring + '&dentityrole=' + jQuery('#dentityrole').val();
     qstring = qstring + '&dnat=' + jQuery('#dnat').val();
+    qstring = qstring + '&dlevel=' + jQuery('#dlevel').val();
 
     if(optionType == 'complete')    {
       if(jQuery('#replacedflow-btn-continue').length>0) {
@@ -91,9 +92,11 @@ function chooseOption(val, optionType, name)  {
 jQuery('.regoptions').on('change','select',function(e) {
     var optionType = jQuery(this).attr('data-type');
     var v = jQuery(this).val();
-    var optionName = jQuery(this).text();
-    clearBelow(optionType);
-    chooseOption(v, optionType, optionName);
+    if(v)   {
+        var optionName = jQuery(this).text();
+        clearBelow(optionType);
+        chooseOption(v, optionType, optionName);
+    }
     e.preventDefault();
     return false; 
 });

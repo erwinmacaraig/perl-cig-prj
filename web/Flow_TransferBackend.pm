@@ -39,19 +39,20 @@ use RegoProducts;
 sub setProcessOrder {
     my $self = shift;
   
+    my $lang = $self->{'Data'}{'lang'};
     $self->{'ProcessOrder'} = [       
         {
             'action' => 'club',
             'function' => 'display_old_club',
-            'label'  => 'Old Club',
             'fieldset'  => 'contactdetails',
-            'title'  => 'Transfer - Old Club Details',
+            'label'  => $lang->txt('Old Club'),
+            'title'  => $lang->txt('Transfer') .' - ' . $lang->txt('Old Club Details'),
         },
         {
             'action' => 'cd',
             'function' => 'display_core_details',
-            'label'  => 'Personal Details',
-            'title'  => 'Transfer - Check/Update Personal Details',
+            'label'  => $lang->txt('Personal Details'),
+            'title'  => $lang->txt('Transfer') .' - ' . $lang->txt('Check/Update Personal Details'),
             'fieldset'  => 'core',
             #'noRevisit' => 1,
         },
@@ -63,9 +64,9 @@ sub setProcessOrder {
         {
             'action' => 'cond',
             'function' => 'display_contact_details',
-            'label'  => 'Contact Details',
             'fieldset'  => 'contactdetails',
-            'title'  => 'Transfer - Check/Update Contact Details',
+            'label'  => $lang->txt('Contact Details'),
+            'title'  => $lang->txt('Transfer') .' - ' . $lang->txt('Check/Update Contact Details'),
         },
         {
             'action' => 'condu',
@@ -75,8 +76,8 @@ sub setProcessOrder {
         {
             'action' => 'r',
             'function' => 'display_registration',
-            'label'  => 'Registration',
-            'title'  => 'Registration - Confirm Transfer Registration',
+            'label'  => $lang->txt('Registration'),
+            'title'  => $lang->txt('Transfer') .' - ' . $lang->txt('Confirm Transfer Registration'),
         },
         {
             'action' => 'ru',
@@ -85,8 +86,8 @@ sub setProcessOrder {
         {
             'action' => 'd',
             'function' => 'display_documents',
-            'label'  => 'Documents',
-            'title'  => 'Transfer - Check/Update Documents',
+            'label'  => $lang->txt('Documents'),
+            'title'  => $lang->txt('Transfer') .' - ' . $lang->txt('Check/Update Documents'),
         },
         {
             'action' => 'du',
@@ -95,8 +96,8 @@ sub setProcessOrder {
          {
             'action' => 'p',
             'function' => 'display_products',
-            'label'  => 'Payments',
-            'title'  => 'Transfer - Confirm Transfer Fee',
+            'label'  => $lang->txt('Payments'),
+            'title'  => $lang->txt('Transfer') .' - ' . $lang->txt('Confirm Transfer Fee'),
         },
         {
             'action' => 'pu',
@@ -105,14 +106,15 @@ sub setProcessOrder {
        {
             'action' => 'summ',
             'function' => 'display_summary',
-            'label'  => 'Summary',
-            'title'  => 'Summary & Submission',
+            'label'  => $lang->txt('Summary'),
+            'title'  => $lang->txt('Summary and Submission'),
         },
        {
             'action' => 'c',
             'function' => 'display_complete',
             'label'  => 'Submit',
             'title'  => 'Transfer - Submitted',
+            'title'  => $lang->txt('Transfer') . ' - ' . $lang->txt('Submitted'),
             'NoNav' => 1,
             'NoDisplayInNav' => 1,
             'NoGoingBack' => 1,
@@ -197,7 +199,7 @@ sub display_old_club {
         TextTop => '',
         TextBottom => '',
     );
-    my $pagedata = $self->display(\%PageData);
+	my $pagedata = $self->display(\%PageData);
 
     return ($pagedata,0);
 
@@ -352,7 +354,7 @@ sub display_contact_details    {
 
 sub validate_contact_details    { 
     my $self = shift;
-
+	$self->addCarryField('cond', 1);
     my $userData = {};
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'contactdetails'}, 'Person',);
     ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
@@ -491,7 +493,8 @@ sub validate_other_details    {
 
 sub display_registration { 
     my $self = shift;
-
+	
+	$self->addCarryField('cond_vstd', 1);
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
@@ -963,7 +966,7 @@ print STDERR "TXN IDS" . $txnIds;
 sub display_documents { 
     my $self = shift;
 	
-    $self->addCarryField('cond_vstd', 1);
+    $self->addCarryField('r_vstd', 1);
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
@@ -1565,8 +1568,8 @@ sub moveDocuments {
  
 sub Navigation {
     #May need to be overriden in child class to define correct order of steps
-  my $self = shift;
-
+    my $self = shift;
+	
     my $lang = $self->{'Data'}{'lang'};
     my $navstring = '';
     my $meter = '';
@@ -1583,9 +1586,9 @@ sub Navigation {
         my $current = 0;
         my $name = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'label'} || '');
         my $action = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'action'} || ''); 
+		
         $name .= qq[<span class="circleBg"><i class="fa fa-check tab-ticked"></i></span>] if ($name and $self->{'RunParams'}{$action . '_vstd'});
-
-        if($startingStep and $self->{'ProcessOrder'}[$i]{'action'} eq $startingStep)   {
+		if($startingStep and $self->{'ProcessOrder'}[$i]{'action'} eq $startingStep)   {
             $includeStep = 1;
         }
         next if !$includeStep;
@@ -1613,9 +1616,11 @@ sub Navigation {
             if($step_in_future) {
                 $js = qq[onclick="alert('].$lang->txt('Use the Continue button to go to the next page').qq[');return false;" ];
             }
-            my $link = qq[<a href="$linkURL" class = "$currentclass" $js>$name</a>];
+			my $inlineStyle = '';
+			$inlineStyle = $currentclass eq 'previous' || $currentclass eq 'next' ? 'style="font-weight: normal;"' : '';
+            my $link = qq[<a href="$linkURL" class = "$currentclass" $inlineStyle $js><small>$name</small></a>];
 
-            $navstring .= qq[ <li class = "$currentclass">$link</li> ];
+            $navstring .= qq[<li class = "$currentclass">$link</li>];
             $step_in_future = 2 if $current;
             $step++;
         }

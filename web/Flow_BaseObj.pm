@@ -82,8 +82,6 @@ sub run {
 sub _setupRun   {
     my $self = shift;
 
-    $self->getProcessOrder();
-
     my $cgi = $self->{'cgi'};
     $self->{'RunParams'} = {};
     for my $param (keys %{$cgi->Vars()}) {
@@ -97,6 +95,7 @@ sub _setupRun   {
     if($self->{'RunParams'}{'_ss'})   {
         $self->addCarryField('_ss', $self->{'RunParams'}{'_ss'});
     }
+    $self->getProcessOrder();
     $self->setCurrentProcessIndex($self->{'RunParams'}->{'rfp'});
 
     return 1;
@@ -331,7 +330,12 @@ sub display {
       $templateData->{'CancelButtonURL'} = '';
       $templateData->{'SaveButtonURL'} = '';
   }
-  ($templateData->{'BackButtonURL'}, $templateData->{'BackButtonDestination'}) = $self->buildBackButton();
+	if(exists($templateData->{'BackButtonURLOverride'})){
+		$templateData->{'BackButtonURL'} = $templateData->{'BackButtonURLOverride'};
+	}	
+    else {
+		($templateData->{'BackButtonURL'}, $templateData->{'BackButtonDestination'}) = $self->buildBackButton();
+	}
   my $output = runTemplate($self->{'Data'}, $templateData, $templateName);
   if($templateData->{'Errors'} and scalar(@{$templateData->{'Errors'}})) {
     my $filledin = HTML::FillInForm->fill(\$output, $self->{'RunParams'});

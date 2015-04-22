@@ -1,4 +1,4 @@
-<h3 class="panel-header">Required Club Documents</h3>
+<h3 class="panel-header">[% Lang.txt('Required Club Documents') %]</h3>
 <div class="panel-body">
 	<div class="document-notes">
 	[% IF documents.size %]
@@ -55,7 +55,14 @@
 							Dropzone.options.myRegoDoc[% doc.ID %] = {
 								addRemoveLinks: true,							
                                 maxFilesize: 25,
-                                dictDefaultMessage :'[% Lang.txt('Click here to upload file') %]',
+                                [% IF doc.intFileID %]
+                                dictDefaultMessage: "<i class='fa fa-check file-uploaded'></i>[% Lang.txt('Uploaded') %] <br/> <i><span class='replace-text'>[% Lang.txt('Click here to update this file') %]</span></i>",
+                                [% ELSE %]
+                                dictDefaultMessage: "[% Lang.txt('Click here to upload file') %]",
+                                [% END %]
+                                dictCancelUpload: "[% Lang.txt('Cancel Upload') %]",
+                                dictCancelUploadConfirmation: "[% Lang.txt('Are you sure you want to cancel this upload?') %]",
+                                dictRemoveFile: "[% Lang.txt('Remove file') %]",
 								init: function(){
 									this.on("success", function(file, response){										
 										doc = response;		
@@ -143,7 +150,14 @@
 							Dropzone.options.myRegoDoc[% doc.ID %] = {
 								addRemoveLinks: true,							
                                 maxFilesize: 25,
-                                dictDefaultMessage :'[% Lang.txt('Click here to upload file') %]',
+                                [% IF doc.intFileID %]
+                                dictDefaultMessage: "<i class='fa fa-check file-uploaded'></i>[% Lang.txt('Uploaded') %] <br/> <i><span class='replace-text'>[% Lang.txt('Click here to update this file') %]</span></i>",
+                                [% ELSE %]
+                                dictDefaultMessage: "[% Lang.txt('Click here to upload file') %]",
+                                [% END %]
+                                dictCancelUpload: "[% Lang.txt('Cancel Upload') %]",
+                                dictCancelUploadConfirmation: "[% Lang.txt('Are you sure you want to cancel this upload?') %]",
+                                dictRemoveFile: "[% Lang.txt('Remove file') %]",
 								init: function(){
 									this.on("success", function(file, response){										
 										doc = response;		

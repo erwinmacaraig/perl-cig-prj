@@ -1,6 +1,7 @@
 <p>[% Lang.txt('Please select the people you wish to register from the list below and click on the update button to commit your change.') %]</p>
 <script>
 jQuery().ready(function() {
+	jQuery("#flow-btn-continue").hide();
     jQuery('#grid').on('change','.grid_chk',function(){
         update_selected();
     });
@@ -11,6 +12,12 @@ jQuery().ready(function() {
                 changedIDs.push(jQuery(this).val());
         });
         jQuery('#rolloverIDs').val(changedIDs.join('|'));
+		if(jQuery.isEmptyObject(changedIDs)){
+			jQuery("#flow-btn-continue").hide();
+		}
+		else {
+			jQuery("#flow-btn-continue").show();
+		}
     }
 });
 </script>

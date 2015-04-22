@@ -31,8 +31,16 @@ sub getRegistrationItems    {
     my $sysConfigActiveFilter = 'ACTIVEPERIODS_' . $itemType . '_' . $regNature . '_' . $personType;
     if ($Data->{'SystemConfig'}{$sysConfigActiveFilter} && $Rego_ref->{'intPersonID'})    {
         #If switched on, lets pre-build up Active Results
-        $ActiveFilter_ref = registrationItemActivePeriods($Data, $Rego_ref->{'intPersonID'}, $regNature, $personType);
+        $ActiveFilter_ref = registrationItemActivePeriods($Data, $Rego_ref->{'intPersonID'}, $regNature, $personType, $Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '');
     }
+
+    my $ActiveProductsFilter_ref='';
+    my $sysConfigActiveProductsFilter = 'ACTIVEPRODUCTS_' . $itemType . '_' . $regNature . '_' . $personType;
+    if ($Data->{'SystemConfig'}{$sysConfigActiveProductsFilter} && $Rego_ref->{'intPersonID'})    {
+        #If switched on, lets pre-build up Active Results
+        $ActiveProductsFilter_ref = registrationItemActiveProducts($Data, $Rego_ref->{'intPersonID'}, $regNature, $personType);
+    }
+    
 
     my $st = qq[
    SELECT 
@@ -48,7 +56,10 @@ sub getRegistrationItems    {
             TP.intTransactionID,
             RI.intItemUsingActiveFilter,
             RI.strItemActiveFilterPeriods,
-            RI.intItemActive
+            RI.intItemActive,
+            RI.intItemUsingPaidProductFilter,
+            RI.strItemActiveFilterPaidProducts,
+            RI.intItemPaidProducts
         FROM
             tblRegistrationItem as RI
             LEFT JOIN tblDocumentType as D ON (intDocumentTypeID = RI.intID and strItemType='DOCUMENT')
@@ -127,10 +138,21 @@ sub getRegistrationItems    {
         next if($dref->{'strDocumentFor'} eq 'TRANSFERITC' and !$Rego_ref->{'InternationalTransfer'});
 
         ## Lets see if the person was active in the appropriate periods
-        if ($dref->{'intItemUsingActiveFilter'})    {
-            $ActiveFilter_ref->{$dref->{'strItemActiveFilterPeriods'}} ||= 0;
+        if ($Data->{'SystemConfig'}{$sysConfigActiveFilter} && $dref->{'intItemUsingActiveFilter'})    {
+            if (! defined $ActiveFilter_ref->{$dref->{'strItemActiveFilterPeriods'}})   {
+                $ActiveFilter_ref->{$dref->{'strItemActiveFilterPeriods'}} ||= 0; # was outside of if
+            }
             next if ($dref->{'intItemActive'} != $ActiveFilter_ref->{$dref->{'strItemActiveFilterPeriods'}});
         }
+
+        ## Lets see if the person has appropriate paid products
+        if ($Data->{'SystemConfig'}{$sysConfigActiveProductsFilter} && $dref->{'intItemUsingPaidProductFilter'})    {
+            if (! defined $ActiveProductsFilter_ref->{$dref->{'strItemActiveFilterPaidProducts'}})   {
+                $ActiveProductsFilter_ref->{$dref->{'strItemActiveFilterPeriods'}} ||= 0; # was outside of if
+            }
+            next if ($dref->{'intItemPaidProducts'} != $ActiveProductsFilter_ref->{$dref->{'strItemActiveFilterPaidProducts'}});
+        }
+
 
         my %Item=();
         $Item{'ID'} = $dref->{'intID'};
@@ -158,7 +180,7 @@ sub getRegistrationItems    {
 
 sub registrationItemActivePeriods   {
 
-    my ($Data, $personID, $regNature, $personType) = @_;
+    my ($Data, $personID, $regNature, $personType, $sport) = @_;
     $personID || return undef;
 
     my %ActiveFilter=();
@@ -194,12 +216,13 @@ sub registrationItemActivePeriods   {
         if ($condition eq 'OR')    {
             @periods= split /\|/, $periodString;
         }
-        my @statusIN = ($Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_TRANSFERRED);
+        my @statusIN = ($Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_TRANSFERRED, $Defs::PERSONREGO_STATUS_PASSIVE);
         my $filterCount = 0;
         foreach my $natPeriodID (@periods)    {
             if (not exists $PeriodStatus{$natPeriodID}) {
                 my %Reg = (
                     statusIN => \@statusIN,
+                    sport => $sport,
                     personType => $personType,
                     nationalPeriodID => $natPeriodID
 
@@ -219,6 +242,77 @@ sub registrationItemActivePeriods   {
             $filterCount ++;
         }
         $ActiveFilter{$pref->{'strItemActiveFilterPeriods'}} = $activeResult;
+    }
+
+    return \%ActiveFilter;
+}
+
+sub registrationItemActiveProducts  {
+
+    my ($Data, $personID, $regNature, $personType) = @_;
+    $personID || return undef;
+
+    my %ActiveFilter=();
+
+    my $stFilters= qq[
+        SELECT DISTINCT
+            strItemActiveFilterPaidProducts
+        FROM
+            tblRegistrationItem
+        WHERE
+            intRealmID = ?
+            AND strRegistrationNature = ?
+            AND strPersonType IN ('', ?)
+            AND intItemUsingPaidProductFilter= 1
+            AND strItemActiveFilterPaidProducts <> ''
+    ];
+    my $qryFilters = $Data->{'db'}->prepare($stFilters) or query_error($stFilters);
+    $qryFilters->execute(
+        $Data->{'Realm'},
+        $regNature,
+        $personType
+    );
+    my $stProds = qq[
+        SELECT DISTINCT
+            intProductID 
+        FROM
+            tblTransactions
+        WHERE
+            intStatus IN ($Defs::TXN_PAID, $Defs::TXN_HOLD)
+            AND intTableType = $Defs::LEVEL_PERSON
+            AND intID = ?
+    ];
+    my $qryProducts= $Data->{'db'}->prepare($stProds) or query_error($stProds);
+    $qryProducts->execute(
+        $personID
+    );
+    my %ProductsPaid=();
+    while (my $dref = $qryProducts->fetchrow_hashref())  {
+        $ProductsPaid{$dref->{'intProductID'}} = 1;
+    }
+    #Put each Products thats purchased into a hash then use that below
+    while (my $pref = $qryFilters->fetchrow_hashref())  {
+        my $filterString = $pref->{'strItemActiveFilterPaidProducts'};
+        my $activeResult = 0;
+        my $condition = 'AND';
+        $condition = 'OR' if ($pref->{'strItemActiveFilterPaidProducts'} =~ /\|/);
+        my @products= ();
+        if ($condition eq 'AND')    {
+            @products= split /\&/, $filterString;
+        }
+        if ($condition eq 'OR')    {
+            @products= split /\|/, $filterString;
+        }
+        my $filterCount = 0;
+        foreach my $prodID (@products)    {
+            $activeResult = 1 if ($ProductsPaid{$prodID} and $condition eq 'OR'); #If any are >0 then set activeResult as 1
+            if ($condition eq 'AND')    {
+                $activeResult = 1 if ($ProductsPaid{$prodID} and $condition eq 'AND' and ! $filterCount); #Lets check first one, and set to 1 if >0
+                $activeResult = 0 if (! $ProductsPaid{$prodID} and $condition eq 'AND'); #Now only set to False if no results
+            }
+            $filterCount ++;
+        }
+        $ActiveFilter{$pref->{'strItemActiveFilterPaidProducts'}} = $activeResult;
     }
 
     return \%ActiveFilter;

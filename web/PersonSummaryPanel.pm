@@ -38,10 +38,20 @@ sub personSummaryPanel {
     foreach my $reg_rego_ref (@{$regs}) {
         next if $reg_rego_ref->{'strStatus'} ne $Defs::PERSONREGO_STATUS_ACTIVE;
 
+        my $level = '';
+        my $break = '';
+        if ($reg_rego_ref->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER)    {
+            $level = $Data->{'lang'}->txt($reg_rego_ref->{'PersonLevel'}) . ' ';
+            $break = "<br/>";
+        }
+        my $sport = $reg_rego_ref->{'Sport'} 
+            ?  " (".$Data->{'lang'}->txt($reg_rego_ref->{'Sport'} || '').')'
+            : '';
         push @personRegistration, [ 
-            $Data->{'lang'}->txt($reg_rego_ref->{'PersonType'}) 
-            . ' ' . $Data->{'lang'}->txt("valid to") . ' ' .$Data->{'l10n'}{'date'}->format($reg_rego_ref->{'npdtTo'},'MEDIUM'),
+            $level . $Data->{'lang'}->txt($reg_rego_ref->{'PersonType'}) . $sport
+            . ' ' . $break . $Data->{'lang'}->txt("valid to") . ' ' .$Data->{'l10n'}{'date'}->format($reg_rego_ref->{'npdtTo'},'MEDIUM'),
             $reg_rego_ref->{'strPersonType'},
+            $reg_rego_ref->{'strSport'},
         ];
     }
 

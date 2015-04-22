@@ -129,12 +129,26 @@ sub displayQueryByInvoiceField {
 
 sub displayQueryByOtherInfoFields {  
 	my ($Data, $client, $invoiceNumber) = @_; 
-	
+		my %sports = ();
+		my %levels = ();
 		my $query = qq[SELECT strInvoiceNumber FROM  tblInvoice INNER JOIN tblTransactions ON tblTransactions.intInvoiceID = tblInvoice.intInvoiceID WHERE intStatus = 1 AND intTransLogID <> 0 AND tblTransactions.intRealmID = $Data->{'Realm'} AND strInvoiceNumber = '$invoiceNumber'];	
 		my $sth = $Data->{'db'}->prepare($query);
 		$sth->execute();
 		my $dref = $sth->fetchrow_hashref();
 	
+		$query = qq[SELECT DISTINCT strSport from tblMatrix Where strWFRuleFor='REGO' AND strSport <> '' AND intRealmID = $Data->{'Realm'}];
+		$sth = $Data->{'db'}->prepare($query);
+		$sth->execute();
+		while(my $data = $sth->fetchrow_hashref()){
+			$sports{$data->{'strSport'}} = $Defs::sportType{$data->{'strSport'}};
+		}
+		
+		$query = qq[SELECT DISTINCT strPersonLevel from tblMatrix Where strWFRuleFor='REGO' AND strPersonLevel <> '' AND intRealmID = $Data->{'Realm'}];
+		$sth = $Data->{'db'}->prepare($query);
+		$sth->execute();
+		while(my $data = $sth->fetchrow_hashref()){	
+			$levels{$data->{'strPersonLevel'}} = $Defs::personLevel{$data->{'strPersonLevel'}};			
+		}
 	
 	my $natPeriod = NationalReportingPeriod::getPeriods($Data);
 	my %OtherFormFields = (
@@ -142,10 +156,10 @@ sub displayQueryByOtherInfoFields {
 			options     => \%Defs::personType,
 		},
 		Sport => {
-			options     => \%Defs::sportType,
+			options     => \%sports ,
 		},	
 		PersonLevel => {
-			options     => \%Defs::personLevel,
+			options     => \%levels,
 		},
 		AgeLevel => {
 			options     => \%Defs::ageLevel,
@@ -160,6 +174,7 @@ sub displayQueryByOtherInfoFields {
 		invoiceNumber => $dref->{'strInvoiceNumber'} || '',
 		displayMessage => $invoiceNumber,
 		Lang => $Data->{'lang'},
+		Level => $Data->{'clientValues'}{'currentLevel'},
 	);
 
 	my $body = runTemplate($Data,\%OtherFormFields,'payment/bulk_invoice_query_fields.templ');
@@ -383,12 +398,13 @@ my @headers = (
 										<script type="text/javascript">
                  			  		 jQuery().ready(function() {
                     		   			 jQuery("#l_dtLog").datepicker({
+										   maxDate: new Date,	
                         			 	   dateFormat: 'dd/mm/yy',
-                        		  		  showButtonPanel: true
+                        		  		   showButtonPanel: true
                      		 	 		 });            
                   	 				 });
                				 </script> 
-									<input type="text" name="dtLog" value="" id="l_dtLog" size="10" maxlength="10" /> <span class="HTdateformat">dd/mm/yyyy</span></div>
+									<input type="text" name="dtLog" value="$currentDate" id="l_dtLog" size="10" maxlength="10" /> <span class="HTdateformat">dd/mm/yyyy</span></div>
 				  				</div>
 				  				<div class="form-group">
 				  					<label for="l_intPaymentType" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Payment Type').qq[</label>
@@ -491,7 +507,7 @@ sub queryInvoiceByOtherInfo {
 	#filtering scheme for FC-866
 		#get authlevel
 		if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB){			
-			$query .= qq[ AND tblTransactions.intTXNEntityID = $intTXNEntityID ORDER BY invoiceDate DESC];			
+			$query .= qq[ AND tblTransactions.intTXNEntityID = $intTXNEntityID ];			
 		}
 		elsif($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_REGION){
 			my $subquery = qq[SELECT intChildEntityID FROM tblEntityLinks WHERE intParentEntityID = $intTXNEntityID];
@@ -501,8 +517,10 @@ sub queryInvoiceByOtherInfo {
 			while(my $dref = $st->fetchrow_hashref()){
 				push @clubs, $dref->{'intChildEntityID'};
 			}
-			$query .= qq[ AND tblTransactions.intTXNEntityID IN ('', ] . join(',',@clubs) . q[) ORDER BY invoiceDate DESC];
+			$query .= qq[ AND tblTransactions.intTXNEntityID IN ('', ] . join(',',@clubs) . q[)];
 		}
+
+	$query .= qq[ORDER BY invoiceDate DESC];
 	#
 	# intStatus = 0 unpaid
 	#  

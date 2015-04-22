@@ -269,6 +269,8 @@ sub fixDate  {
     if($year > 20 and $year < 100)  {$year+=1900;}
     elsif($year <=20) {$year+=2000;}
     $date="$year-$month-$day";
+	my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
+	$date .= qq[ $Hour:$Minute:$Second];
   }
   else  { $date='';}
   return $date;
@@ -292,8 +294,6 @@ sub step2 {
 	#$dtLog=convertDateToYYYYMMDD($dtLog);
 	$dtLog=fixDate($dtLog);
 	deQuote($db, (\$currencyID, \$intAmount, \$dtLog, \$paymentType, \$strBSB, \$strAccountName, \$strAccountNum, \$strResponseCode, \$strResponseText, \$strComments, \$strBank, \$strReceiptRef));
-
-
 #Load transactions, update them to point to this payment
 	my @transactionIDs;
 	foreach my $k (keys %{$Data->{params}}) {
@@ -478,7 +478,7 @@ AND    tblTransLog.intStatus = ?
 LIMIT 1
 EOS
 
-
+   
     my $query = $db->prepare($st);
     $query->execute($transLogID, $Data->{Realm}, $Defs::TXNLOG_PENDING);
 
@@ -495,10 +495,12 @@ EOS
 			UPDATE tblTransLog SET intStatus=$Defs::TXNLOG_SUCCESS WHERE intLogID=$transLogID and intRealmID=$Data->{Realm}
 			AND intStatus = $Defs::TXNLOG_PENDING 
 	];
+
 	$db->do($st);
 
 	$st = qq[UPDATE tblTransactions as T INNER JOIN tblTXNLogs as TXNLog ON (T.intTransactionID = TXNLog.intTXNID) SET T.dtPaid=$dtLog, T.intStatus=$Defs::TXN_PAID, T.intTransLogID=$transLogID WHERE intTLogID = $transLogID and T.intRealmID=$Data->{Realm} AND T.intStatus = $Defs::TXN_UNPAID];
-	$db->do($st);
+	$db->do($st);  
+
 
 	Products::product_apply_transaction($Data,$transLogID);
 	my $cl=setClient($Data->{'clientValues'}) || '';
@@ -940,10 +942,10 @@ sub listTransactions {
     my $line = '';
 
     #my $entityNamePlural = 'Transactions';
-	my $entityNamePlural = 'Payment History';
+	my $entityNamePlural = $Data->{'lang'}->txt('Payment History');
     $entityNamePlural= ($Data->{'SystemConfig'}{'txns_link_name'}) ? $Data->{'SystemConfig'}{'txns_link_name'} : $entityNamePlural;
 
-	my $header=$Data->{'lang'}->txt($entityNamePlural);
+	my $header=$entityNamePlural;
 	
 
         my $targetManual = $Data->{'target'};
@@ -969,7 +971,7 @@ sub listTransactions {
             my $id = $gateway->{'intPaymentConfigID'};
             my $pType = $gateway->{'paymentType'};
             my $name = $gateway->{'gatewayName'};
-            $CC_body .= qq[ <input type="submit" onclick="clicked='$targetOnline'" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay via").qq[ $name" class = "btn-main"><br><br>];
+            $CC_body .= qq[ <input type="submit" onclick="clicked='$targetOnline'" name="cc_submit[$gatewayCount]" value="]. $lang->txt("Pay Now").qq[" class = "btn-main"><br><br>];
 
             $CC_body .= qq[ <input type="hidden" value="$pType" name="pt_submit[$gatewayCount]"> ];
         }
@@ -1365,7 +1367,7 @@ my %FieldDefinitions=(
                         formname => 'n_form',
 			stopAfterAction=>1,
       			submitlabel => "Update",
-      			introtext => 'auto',
+      			introtext => '',
                         NoHTML => 1,
       updateSQL => qq[
 	UPDATE tblTransLog
@@ -1551,7 +1553,7 @@ sub resolveHoldPaymentForm  {
                                 hideblank => 1,
                                 target => $Data->{'target'},
                                 formname => 'txnlog_form',
-                                introtext => 'auto',
+                                introtext => '',
                                 buttonloc => 'bottom',
                                 LocaleMakeText => $Data->{'lang'},
                                 stopAfterAction => 1,
@@ -1810,7 +1812,7 @@ sub viewTransLog	{
                                 hideblank => 1,
                                 target => $Data->{'target'},
                                 formname => 'txnlog_form',
-                                introtext => 'auto',
+                                introtext => '',
                                 buttonloc => 'bottom',
                                 LocaleMakeText => $Data->{'lang'},
                                 stopAfterAction => 1,
@@ -2000,7 +2002,7 @@ sub viewPayLaterTransLog    {
                                 hideblank => 1,
                                 target => $Data->{'target'},
                                 formname => 'txnlog_form',
-                                introtext => 'auto',
+                                introtext => '',
                                 buttonloc => 'bottom',
                                 stopAfterAction => 1,
                         },
@@ -2135,7 +2137,7 @@ sub listTransLog	{
             status => $dref->{'status'},
 			name => $dref->{'strLocalFirstname'} . " " . $dref->{'strLocalSurname'},
 			strResponseCode => $dref->{'strResponseCode'},
-			dtLog => $Data->{'l10n'}{'date'}->TZformat($dref->{'dtLog'},'MEDIUM','SHORT'),
+			dtLog => $Data->{'l10n'}{'date'}->format($dref->{'dtLog'},'MEDIUM','SHORT'),
 			dtLog_RAW => $dref->{'dtLog_RAW'},
 			receipt => qq[<a href = "printreceipt.cgi?client=$client&ids=$dref->{intLogID}&pID=$dref->{'intID'}" target="receipt">].$textLabels{'viewReceipt'}."</a>",
 			strComments => $dref->{'strComments'},

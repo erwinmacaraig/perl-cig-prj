@@ -852,8 +852,12 @@ table tr.new-task {
 	color: #fff;
 }
 
-.regoType_PLAYER {
+.regoType_PLAYER,
+.regoType_PLAYERFOOTBALL {
     background-color: #0784d4;
+}
+.regoType_PLAYERFUTSAL {
+    background-color: #0f5785;
 }
 .regoType_COACH {
     background-color: #1b94e2;

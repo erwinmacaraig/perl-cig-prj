@@ -43,6 +43,7 @@ sub displayPersonRegisterWhat   {
     my $defaultSport = param('dsport') || '';
     my $defaultEntityRole= param('dentityrole') || '';
     my $defaultNature= param('dnat') || '';
+    my $defaultLevel= param('dlevel') || '';
 
     my $systemConfig = getSystemConfig($Data);
 
@@ -58,6 +59,7 @@ sub displayPersonRegisterWhat   {
         continueURL => $continueURL || '',
         dtype=> $defaultType,
         dsport=> $defaultSport,
+        dlevel=> $defaultLevel,
         dnat=>$defaultNature,
         dentityrole=> $defaultEntityRole,
         existingReg => $regoID || 0,
@@ -134,6 +136,7 @@ sub optionsPersonRegisterWhat {
         $personEntityRole,
         $defaultEntityRole,
         $personLevel,
+        $defaultLevel,
         $sport,
         $defaultSport,
         $ageLevel,
@@ -380,7 +383,7 @@ sub optionsPersonRegisterWhat {
             }
 
             $Data->{'Realm'} = $Data->{'Realm'} || $realmID;
-            my $personLevelFromMatrix = getPersonLevelFromMatrix($Data, $MATRIXwhere, \@MATRIXvalues, $bulk, $personType, $pref);
+            my $personLevelFromMatrix = getPersonLevelFromMatrix($Data, $MATRIXwhere, \@MATRIXvalues, $bulk, $personType, $pref, $defaultLevel);
             return ($personLevelFromMatrix, '');
             #$st = qq[
             #    SELECT DISTINCT $lookingForField, COUNT(intMatrixID) as CountNum
@@ -716,10 +719,12 @@ sub getAgeLevelFromMatrix {
 }
 
 sub getPersonLevelFromMatrix {
-    my($Data, $where, $values_ref, $bulk, $personType, $pref) = @_;
+    my($Data, $where, $values_ref, $bulk, $personType, $pref, $defaultLevel) = @_;
                        
     my $systemConfig = getSystemConfig($Data);
     my $bulkWHERE='';
+    my $defaultWHERE = '';
+    $defaultWHERE = qq[ AND strPersonLevel = '$defaultLevel'] if (defined $defaultLevel and $defaultLevel and $defaultLevel ne '');
     my $st = qq[
         SELECT DISTINCT strPersonLevel, COUNT(intMatrixID) as CountNum
         FROM tblMatrix
@@ -728,6 +733,7 @@ sub getPersonLevelFromMatrix {
             AND intLocked=0
             AND intRealmID = ?
             AND intSubRealmID IN (0,?)
+            $defaultWHERE
             $bulkWHERE
             $where
         GROUP BY strPersonLevel

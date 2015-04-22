@@ -418,7 +418,6 @@ sub displayTransaction	{
 				target => $Data->{'target'},
 				formname => 'txn_form',
 				submitlabel => $lang->txt('Update Transaction'),
-				introtext => 'auto',
 				buttonloc => 'bottom',
 				updateSQL => $txnupdate,
 				addSQL => $txnadd,

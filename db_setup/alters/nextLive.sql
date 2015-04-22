@@ -76,3 +76,32 @@ ALTER TABLE tblPersonRegistration_1
 ALTER TABLE tblWFRule
     ADD COLUMN intUsingPersonLevelChangeFilter tinyint default 0 COMMENT 'Using Person Level change filter',
     ADD COLUMN intPersonLevelChange tinyint default 0 COMMENT 'Was Person Level changed';
+
+
+# 150421_tblPersonRegistration.sql - FC877
+ALTER TABLE tblPersonRegistration_1
+ADD COLUMN `intOnLoan` INT NULL DEFAULT 0 AFTER `strPreviousPersonLevel`;
+
+# 150421_tblPersonRequest.sql - FC877
+ALTER TABLE tblPersonRequest
+ADD COLUMN `dtLoanFrom` DATETIME NULL AFTER `strRequestStatus`,
+ADD COLUMN `dtLoanTo` DATETIME NULL AFTER `dtLoanFrom`,
+ADD COLUMN `intOpenLoan` INT NULL DEFAULT 0 AFTER `dtLoanTo`,
+ADD COLUMN `strTMSReference` VARCHAR(100) NULL AFTER `intOpenLoan`;
+
+# 150421_tblPerson.sql - FC877
+ALTER TABLE tblPerson
+ADD COLUMN `strInternationalTransferSourceClub` VARCHAR(150) NULL DEFAULT NULL AFTER `strGuardianRelationship`,
+ADD COLUMN `dtInternationalTransferDate` DATETIME NULL AFTER `strInternationalTransferSourceClub`,
+ADD COLUMN `strInternationalTransferTMSRef` VARCHAR(100) NULL DEFAULT NULL AFTER `dtInternationalTransferDate`,
+ADD COLUMN `strInternationalLoanSourceClub` VARCHAR(150) NULL DEFAULT NULL AFTER `strInternationalTransferTMSRef`,
+ADD COLUMN `strInternationalLoanTMSRef` VARCHAR(100) NULL DEFAULT NULL AFTER `strInternationalLoanSourceClub`,
+ADD COLUMN `dtInternationalLoanFromDate` DATETIME NULL AFTER `strInternationalLoanTMSRef`,
+ADD COLUMN `dtInternationalLoanToDate` DATETIME NULL AFTER `dtInternationalLoanFromDate`,
+ADD COLUMN `intInternationalLoan` INT NULL DEFAULT 0 AFTER `dtInternationalLoanToDate`;
+
+# 150421_tblRegistrationItem.sql - FC965
+ALTER TABLE tblRegistrationItem
+    ADD COLUMN intItemUsingPaidProductFilter tinyint default 0 COMMENT 'Using Active Products filter',
+    ADD COLUMN strItemActiveFilterPaidProducts varchar(10) default '' COMMENT 'Which Products to check Active on',
+    ADD COLUMN intItemPaidProducts tinyint default 0 COMMENT 'Active status if Active Products filter on';
