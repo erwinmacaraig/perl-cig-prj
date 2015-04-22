@@ -507,7 +507,7 @@ sub queryInvoiceByOtherInfo {
 	#filtering scheme for FC-866
 		#get authlevel
 		if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB){			
-			$query .= qq[ AND tblTransactions.intTXNEntityID = $intTXNEntityID ORDER BY invoiceDate DESC];			
+			$query .= qq[ AND tblTransactions.intTXNEntityID = $intTXNEntityID ];			
 		}
 		elsif($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_REGION){
 			my $subquery = qq[SELECT intChildEntityID FROM tblEntityLinks WHERE intParentEntityID = $intTXNEntityID];
@@ -517,8 +517,10 @@ sub queryInvoiceByOtherInfo {
 			while(my $dref = $st->fetchrow_hashref()){
 				push @clubs, $dref->{'intChildEntityID'};
 			}
-			$query .= qq[ AND tblTransactions.intTXNEntityID IN ('', ] . join(',',@clubs) . q[) ORDER BY invoiceDate DESC];
+			$query .= qq[ AND tblTransactions.intTXNEntityID IN ('', ] . join(',',@clubs) . q[)];
 		}
+
+	$query .= qq[ORDER BY invoiceDate DESC];
 	#
 	# intStatus = 0 unpaid
 	#  
