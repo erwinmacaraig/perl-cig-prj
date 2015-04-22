@@ -99,7 +99,8 @@ sub getRegistrationItems    {
 	        $Rego_ref->{'currentAge'} || 0,
 		    $itc
 	        
-		) or query_error($st);
+		) or query_error($st); 
+
     my @values = (); 
     push @values, $Data->{'Realm'};  
     push @values,$Data->{'RealmSubType'}; 
@@ -117,8 +118,6 @@ sub getRegistrationItems    {
     push @values,$Rego_ref->{'Nationality'} || '';
     push @values,$Rego_ref->{'Nationality'} || '';
     
-
-
     my @Items=();
     while (my $dref = $q->fetchrow_hashref())   {
         next if($itemType eq 'DOCUMENT' and $documentFor and ($documentFor ne $dref->{'strDocumentFor'}));

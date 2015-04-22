@@ -706,8 +706,7 @@ sub submitRequestPage {
 
     my $query = new CGI;
     my $rType = getRequestType();
-		open FH, ">dumpfile3.txt";
-		print FH "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=PRA_F&rtype=$rType&pr=" . join(',', @requestIDs);
+		
     print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=PRA_F&rtype=$rType&pr=" . join(',', @requestIDs));
 
 

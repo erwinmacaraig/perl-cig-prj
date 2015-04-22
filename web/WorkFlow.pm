@@ -250,25 +250,7 @@ sub addIndividualTask   {
         $task_ref->{'personRegistrationID'} || 0,
         $task_ref->{'documentID'} || 0,
     );
-open FH, ">dumpfile2.txt";
-print FH "I was called in addIndividualTask \n $stINS \n
-		\$ruleID = $ruleID,
-        \$Data->{'Realm'} = $Data->{'Realm'},
-        \$Data->{'RealmSubType'} = $Data->{'RealmSubType'},
-        \$Data->{'clientValues'}{'userID'} = $Data->{'clientValues'}{'userID'},
-        \$approvalEntityID = $approvalEntityID,
-        \$taskType = $taskType,
-        \$ruleFor = $taskType,
-        \$task_ref->{'registrationNature'} = $task_ref->{'registrationNature'},
-        \$task_ref->{'documentTypeID'} = $task_ref->{'documentTypeID'},
-        \$task_ref->{'taskStatus'} = $task_ref->{'taskStatus'},
-        \$problemEntityID = $problemEntityID,
-        \$task_ref->{'entityID'} = $task_ref->{'entityID'},
-        \$task_ref->{'personID'} = $task_ref->{'personID'},
-        \$task_ref->{'personRegistrationID'} = $task_ref->{'personRegistrationID'} ,
-        \$task_ref->{'documentID'} = $task_ref->{'documentID'},
 
-";
 }
 
 
@@ -529,7 +511,7 @@ sub listTasks {
 		$entityID,
 		$entityID,
 		$entityID,
-	) or query_error($st); open FH, ">dumpfile.txt"; print FH "\$entityID = $entityID \n \$st = $st";
+	) or query_error($st); 
 	
 	my @TaskList = ();
     my @taskType = ();
@@ -1099,7 +1081,7 @@ sub addWorkFlowTasks {
 
 
     my $emailNotification = new EmailNotifications::WorkFlow();
-	open FH, ">dumpfile.txt";
+	
     if ($checkOk)   {
         while (my $dref= $q->fetchrow_hashref())    {
 			
@@ -2413,8 +2395,7 @@ sub getTask {
             t.intWFTaskID = ?
             AND t.intRealmID = ?
     ];
-	open FH, ">dumpfile.txt";
-	print FH "\n \$WFTaskID = $WFTaskID";
+	
     $q = $Data->{'db'}->prepare($st);
     $q->execute(
         $WFTaskID,

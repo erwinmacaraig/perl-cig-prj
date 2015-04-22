@@ -730,9 +730,6 @@ sub checkUploadedRegoDocuments {
           AND tblRegistrationItem.intEntityLevel = ?
 			GROUP BY intDocumentTypeID];
 
-
-	#open FH, ">dumpfile.txt";
-	#print FH "\n\nQuery: \n$query \n personID = $personID \n\n";
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute(
         $personID, 
@@ -803,8 +800,8 @@ sub displayRegoFlowDocuments{
     my $lang=$Data->{'lang'};
 	$hidden_ref->{'pID'} = $personID;
 
-     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_DU&amp;rID=$regoID";
-     my $documents = getRegistrationItems(
+     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_DU&amp;rID=$regoID"; 
+	 my $documents = getRegistrationItems(
         $Data,
         'REGO',
         'DOCUMENT',
@@ -815,8 +812,8 @@ sub displayRegoFlowDocuments{
         0,
         $rego_ref,
      );
-
-
+		
+	
 	my @docos = (); 
 
     my %existingDocuments;

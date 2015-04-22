@@ -509,7 +509,7 @@ sub display_registration {
         $self->addCarryField('d_age', $rawDetails->{'newAgeLevel'}); # if $rawDetails->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER;
         $self->addCarryField('d_role', $rawDetails->{'strPersonEntityRole'});
     }
-    else {
+    else {		
          $content = displayPersonRegisterWhat(
             $self->{'Data'},
             $personID,
@@ -522,6 +522,7 @@ sub display_registration {
             $regoID,
             $entitySelection, #display entity Selection
         );
+		
     }
 
     my %PageData = (
@@ -1000,6 +1001,8 @@ sub display_documents {
         #    $self->incrementCurrentProcessIndex();
         #    return ('',2);
         #}
+
+	
 	my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},

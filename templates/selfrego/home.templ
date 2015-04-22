@@ -66,8 +66,14 @@
                             </div>
 
                         </div><!-- regtab -->
-                        <div id="doctab[% loop.count %]" class="tab-pane fade ">Document list to go here</div>
-                        <div id="histtab[% loop.count %]" class="tab-pane fade ">Registration history list to go here</div>
+                        <div id="doctab[% loop.count %]" class="tab-pane fade "><!-- Docs Tab -->
+							[% Documents %]
+                                
+						</div><!-- End Docs Tab -->
+                        <div id="histtab[% loop.count %]" class="tab-pane fade "> 
+						<!--Registration history list to go here --> 
+						[% History %]
+						</div>
                         <div id="txnstab[% loop.count %]" class="tab-pane fade ">transaction history list to go here</div>
                     </div><!-- tabcontent -->
                 </div><!-- panel-body -->
@@ -109,7 +115,7 @@ jQuery(document).ready(function()  {
         jQuery('#selfreg-myselfoptions').show();
         return false;
     });
-});
 
+});
 </script>
 

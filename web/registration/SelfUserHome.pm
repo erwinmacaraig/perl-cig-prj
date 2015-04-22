@@ -15,7 +15,9 @@ use Defs;
 use Lang;
 use NationalReportingPeriod;
 use TTTemplate;
-
+use GridDisplay;
+use Reg_common;
+use Utils;
 sub showHome {
 	my (
 		$Data,
@@ -24,11 +26,15 @@ sub showHome {
 	) = @_;
 
     my (
-        $previousRegos ,
+        $previousRegos,
         $people,
         $found,
     ) = getPreviousRegos($Data, $user->id());
 
+	#	
+	my $documents = getUploadedSelfRegoDocuments($Data,$people);
+	my $registrationHist = getSelfRegoHistoryRegistrations($Data, $previousRegos);
+	#
     my $resultHTML = runTemplate(
         $Data,
         {
@@ -36,7 +42,9 @@ sub showHome {
             PreviousRegistrations => $previousRegos,
             People => $people,
             Found => $found,
-            srp => $srp,
+            srp => $srp,	
+			Documents => $documents,	
+			History => 	$registrationHist,
         },
         'selfrego/home.templ',
     );    
@@ -44,6 +52,57 @@ sub showHome {
     return $resultHTML;
 }
 
+sub getSelfRegoHistoryRegistrations{
+	my ($Data, $previousRegos) = @_;
+	my %history = ();
+	my $registrationhistory = '';
+	foreach my $personIdKeyArr (keys %{$previousRegos}){ 
+		foreach my $regoDetail (@{$previousRegos->{$personIdKeyArr}}){
+			push @{$history{'regohist'}}, {
+				NationalPeriodName => $regoDetail->{'strNationalPeriodName'},
+				RegistrationType => $Defs::registrationNature{$regoDetail->{'strRegistrationNature'}},
+				Status => $Defs::entityStatus{$regoDetail->{'strStatus'}},
+				Sport => $Defs::sportType{$regoDetail->{'strSport'}},
+				PersonType => $Defs::personType{$regoDetail->{'strPersonType'}},
+				PersonEntityRole => $regoDetail->{'strPersonEntityRole'},
+				PersonLevel => $Defs::personLevel{$regoDetail->{'strPersonLevel'}},
+				AgeLevel => $Defs::ageLevel{$regoDetail->{'strAgeLevel'}},
+				NPdtFrom => $regoDetail->{'NPdtFrom'},
+				NPdtTo => $regoDetail->{'NPdtTo'},
+				Certifications => $regoDetail->{'regCertifications'},
+			};
+		}
+	}	
+	$registrationhistory = runTemplate(
+							$Data,
+							\%history,
+							'selfrego/selfregohistorybody.templ'			
+							);
+	return $registrationhistory;
+}
+sub getUploadedSelfRegoDocuments {
+	my($Data, $people) = @_;
+	my %TemplateData = ();
+	my $docTable = '';
+	my $lang = $Data->{'lang'};
+	my $query = qq[SELECT intFileID, strDocumentName, strApprovalStatus FROM tblUploadedFiles INNER JOIN tblDocuments ON      tblUploadedFiles.intFileID = tblDocuments.intUploadFileID INNER JOIN tblDocumentType ON tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID INNER JOIN tblPersonRegistration_$Data->{'Realm'} as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID WHERE tblDocuments.intPersonID = ? ORDER BY tblDocuments.intPersonRegistrationID];
+	my $q = $Data->{'db'}->prepare($query);
+	foreach my $person (@{$people}){		
+		$q->execute($person->{'intPersonID'});
+		while(my $dref = $q->fetchrow_hashref()){
+			next if(!$dref->{'intFileID'});	
+			push @{$TemplateData{'alldocs'}},{
+				strDocumentName => $lang->txt($dref->{'strDocumentName'}),									
+			};		
+		}
+		$docTable .= runTemplate(
+			$Data,
+			\%TemplateData,
+			'selfrego/selfregodocsbody.templ',
+		);		
+	}
+	return $docTable;
+}
 sub getPreviousRegos {
     my (
 		$Data,

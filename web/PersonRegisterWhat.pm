@@ -157,7 +157,7 @@ sub optionsPersonRegisterWhat {
 
  my $q=new CGI;
     #$registrationNature='TRANSFER' if ($transfer==1);
-    my $bulkWHERE= qq[ AND strWFRuleFor='REGO'];
+	my $bulkWHERE= qq[ AND strWFRuleFor='REGO'];
     $bulkWHERE = qq[ AND strWFRuleFor='BULKREGO'] if ($bulk);
     my $role_ref = getEntityTypeRoles($Data, $sport, $personType, $defaultEntityRole);
     my %lfTable = (
@@ -170,7 +170,7 @@ sub optionsPersonRegisterWhat {
         etype => 'entityType',
         eId => 'entityId',
     );
-
+	
     #my %genderList = (
     #    0 => 'ALL',
     #    1 => %Defs->{$Defs::GENDER_MALE},
@@ -943,7 +943,7 @@ sub getAllowedToEntityLevelFromMatrix {
 
     my $query = $Data->{'db'}->prepare($st);
     $query->execute(@{$values_ref});
-
+	
     my @vals=();
     while(my ($entityLevel) = $query->fetchrow_array())   {
         push @vals, $entityLevel;
