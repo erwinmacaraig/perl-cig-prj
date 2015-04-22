@@ -21,11 +21,11 @@ sub getRegistrationItems    {
     my $regNature_sent = $regNature;
     my $personType = $Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '';
 
-    #RegistrationItems_PLAYER_NEW_TreatAs100;
-    my $sysConfigCheck = "RegistrationItems_" . $personType . "_" . $regNature . "_TreatAs100";
+    #RegistrationItems_PLAYER_NEW_TreatAs99;
+    my $sysConfigCheck = "RegistrationItems_" . $personType . "_" . $regNature . "_TreatAs99";
     if ($itemType eq 'PRODUCT' and $Data->{'SystemConfig'}{$sysConfigCheck} == 1)   {
-        $originLevel=100;
-        $entityLevel=100;
+        $originLevel=99;
+        $entityLevel=99;
     }
     #RegistrationItems_PLAYER_TreatRenewalAsNew
     $sysConfigCheck = "RegistrationItems_" . $personType . "_TreatRenewalAsNew";
