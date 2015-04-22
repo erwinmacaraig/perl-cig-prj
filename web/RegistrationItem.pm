@@ -219,6 +219,10 @@ sub registrationItemActivePeriods   {
         my @statusIN = ($Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_TRANSFERRED, $Defs::PERSONREGO_STATUS_PASSIVE);
         my $filterCount = 0;
         foreach my $natPeriodID (@periods)    {
+            my $notCondition = 0;
+            $notCondition = 1 if ($natPeriodID =~ /^!/);
+            $natPeriodID =~ s/!//;
+    
             if (not exists $PeriodStatus{$natPeriodID}) {
                 my %Reg = (
                     statusIN => \@statusIN,
@@ -232,12 +236,22 @@ sub registrationItemActivePeriods   {
                     $personID,
                     \%Reg
                 );
+                if ($Data->{'SystemConfig'}{'ActivePeriods_IgnoreHOBBY'})   {
+                    $count = 0;
+                    foreach my $reg (@{$reg_ref})  {
+                        next if ($reg->{'strPersonLevel'} eq $Defs::PERSON_LEVEL_HOBBY);
+                        $count++;
+                    }
+                }
                 $PeriodStatus{$natPeriodID} = $count;
             }
-            $activeResult = 1 if ($PeriodStatus{$natPeriodID} and $condition eq 'OR'); #If any are >0 then set activeResult as 1
+            $activeResult = 1 if (! $notCondition and $PeriodStatus{$natPeriodID} and $condition eq 'OR'); #If any are >0 then set activeResult as 1
+            $activeResult = 1 if ($notCondition and ! $PeriodStatus{$natPeriodID} and $condition eq 'OR'); #If any are >0 then set activeResult as 1
             if ($condition eq 'AND')    {
-                $activeResult = 1 if ($PeriodStatus{$natPeriodID} and $condition eq 'AND' and ! $filterCount); #Lets check first one, and set to 1 if >0
-                $activeResult = 0 if (! $PeriodStatus{$natPeriodID} and $condition eq 'AND'); #Now only set to False if no results
+                $activeResult = 1 if (! $notCondition and $PeriodStatus{$natPeriodID} and $condition eq 'AND' and ! $filterCount); #Lets check first one, and set to 1 if >0
+                $activeResult = 1 if ($notCondition and ! $PeriodStatus{$natPeriodID} and $condition eq 'AND' and ! $filterCount); #Lets check first one, and set to 1 if >0
+                $activeResult = 0 if (! $notCondition and ! $PeriodStatus{$natPeriodID} and $condition eq 'AND'); #Now only set to False if no results
+                $activeResult = 0 if ($notCondition and $PeriodStatus{$natPeriodID} and $condition eq 'AND'); #Now only set to False if no results
             }
             $filterCount ++;
         }

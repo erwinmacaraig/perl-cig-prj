@@ -146,7 +146,7 @@ sub checkExistingProduct    {
             $prWhere
             AND t.intRealmID = ?
             AND t.intTableType = ?
-            AND t.intStatus=1
+            AND t.intStatus IN ($Defs::TXN_PAID, $Defs::TXN_HOLD)
             AND t.intProductID=?
     ];
     my @values=(
