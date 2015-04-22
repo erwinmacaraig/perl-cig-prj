@@ -17,6 +17,22 @@ use Data::Dumper;
 sub getRegistrationItems    {
     my($Data, $ruleFor, $itemType, $originLevel, $regNature, $entityID, $entityLevel, $multiPersonType, $Rego_ref, $documentFor) = @_; 
 
+    my $entityLevel_sent = $entityLevel;
+    my $regNature_sent = $regNature;
+    my $personType = $Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '';
+
+    #RegistrationItems_PLAYER_NEW_TreatAs100;
+    my $sysConfigCheck = "RegistrationItems_" . $personType . "_" . $regNature . "_TreatAs100";
+    if ($itemType eq 'PRODUCT' and $Data->{'SystemConfig'}{$sysConfigCheck} == 1)   {
+        $originLevel=100;
+        $entityLevel=100;
+    }
+    #RegistrationItems_PLAYER_TreatRenewalAsNew
+    $sysConfigCheck = "RegistrationItems_" . $personType . "_TreatRenewalAsNew";
+    if ($itemType eq 'PRODUCT' and $Data->{'SystemConfig'}{$sysConfigCheck} == 1 and $regNature eq 'RENEWAL')   {
+        $regNature = 'NEW';
+    }
+
     $itemType ||= '';
     $originLevel ||= 0; 
     $regNature ||= '';
@@ -27,15 +43,14 @@ sub getRegistrationItems    {
 
     return 0 if (! $itemType);
     my $ActiveFilter_ref='';
-    my $personType = $Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '';
-    my $sysConfigActiveFilter = 'ACTIVEPERIODS_' . $itemType . '_' . $regNature . '_' . $personType;
+    my $sysConfigActiveFilter = 'ACTIVEPERIODS_' . $itemType . '_' . $regNature_sent . '_' . $personType;
     if ($Data->{'SystemConfig'}{$sysConfigActiveFilter} && $Rego_ref->{'intPersonID'})    {
         #If switched on, lets pre-build up Active Results
         $ActiveFilter_ref = registrationItemActivePeriods($Data, $Rego_ref->{'intPersonID'}, $regNature, $personType, $Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '');
     }
 
     my $ActiveProductsFilter_ref='';
-    my $sysConfigActiveProductsFilter = 'ACTIVEPRODUCTS_' . $itemType . '_' . $regNature . '_' . $personType;
+    my $sysConfigActiveProductsFilter = 'ACTIVEPRODUCTS_' . $itemType . '_' . $regNature_sent . '_' . $personType;
     if ($Data->{'SystemConfig'}{$sysConfigActiveProductsFilter} && $Rego_ref->{'intPersonID'})    {
         #If switched on, lets pre-build up Active Results
         $ActiveProductsFilter_ref = registrationItemActiveProducts($Data, $Rego_ref->{'intPersonID'}, $regNature, $personType);
@@ -111,24 +126,6 @@ sub getRegistrationItems    {
 		    $itc
 	        
 		) or query_error($st);
-    my @values = (); 
-    push @values, $Data->{'Realm'};  
-    push @values,$Data->{'RealmSubType'}; 
-    push @values,$ruleFor;
-    push @values,$originLevel;
-    push @values,$regNature;
-    push @values,$Rego_ref->{'strEntityType'} || $Rego_ref->{'entityType'} || '';
-    push @values,$entityLevel;
-    push @values,$Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '';
-    push @values,$Rego_ref->{'strPersonLevel'} || $Rego_ref->{'personLevel'} || '';
-    push @values,$Rego_ref->{'strPersonEntityRole'} || $Rego_ref->{'personEntityRole'} || '';
-    push @values,$Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '';
-    push @values,$Rego_ref->{'strAgeLevel'} || $Rego_ref->{'ageLevel'} || '';
-    push @values,$itemType;
-    push @values,$Rego_ref->{'Nationality'} || '';
-    push @values,$Rego_ref->{'Nationality'} || '';
-    
-
 
     my @Items=();
     while (my $dref = $q->fetchrow_hashref())   {
@@ -168,7 +165,7 @@ sub getRegistrationItems    {
         if ($itemType eq 'PRODUCT') {
             #$Item{'Name'} = $dref->{'strProductName'};
             $Item{'Name'} = $dref->{'strProductDisplayName'} || $dref->{'strProductName'};
-            $Item{'ProductPrice'} = getItemCost($Data, $entityID, $entityLevel, $multiPersonType, $dref->{'intID'}) || 0;
+            $Item{'ProductPrice'} = getItemCost($Data, $entityID, $entityLevel_sent, $multiPersonType, $dref->{'intID'}) || 0;
             $Item{'TransactionID'} = $dref->{'intTransactionID'} || 0;
             
         }
