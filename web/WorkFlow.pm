@@ -548,8 +548,15 @@ sub listTasks {
         next if (defined $dref->{intSystemStatus} && $dref->{intSystemStatus} eq $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE && $dref->{strWFRuleFor} ne $Defs::WF_RULEFOR_PERSON);
 
         my $newTask = ($dref->{'taskTimeStamp'} >= $lastLoginTimeStamp) ? 1 : 0; #additional check if tTimeStamp > currentTimeStamp
+
+        if($dref->{'strRegistrationNature'} =~ /_LOAN/) {
+            $taskCounts{$Defs::PERSON_REQUEST_LOAN}++;
+        }
+        else {
+            $taskCounts{$dref->{'strRegistrationNature'}}++;
+        }
+
         $taskCounts{$dref->{'strTaskStatus'}}++;
-        $taskCounts{$dref->{'strRegistrationNature'}}++;
         $taskCounts{"newTasks"}++ if $newTask;
 
         my %tempClientValues = getClient($client);
@@ -1263,6 +1270,15 @@ sub approveTask {
         }
         elsif ($allComplete) {
             PersonRequest::finaliseTransfer($Data, $personRequestID);
+            PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+        }
+    }
+    if($registrationNature eq $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN) {
+        #check for pending tasks?
+
+        my $allComplete = checkRelatedTasks($Data);
+        if ($allComplete) {
+            #PersonRequest::finaliseTransfer($Data, $personRequestID);
             PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
         }
     }
@@ -2812,6 +2828,25 @@ sub populateRegoViewData {
 
 
     }
+    elsif($dref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN){
+        $title = $Data->{'lang'}->txt('Player Loan') . " - $LocalName";;
+        $templateFile = 'workflow/view/loan.templ';
+
+        my %regFilter = (
+            'requestID' => $dref->{'intPersonRequestID'},
+        );
+        my $request = getRequests($Data, \%regFilter);
+        $personRequestData = $request->[0];
+        $TemplateData{'PlayerLoanDetails'}{'PlayerLoanTo'} = $personRequestData->{'requestFrom'} || '';
+        $TemplateData{'PlayerLoanDetails'}{'PlayerLoanFrom'} = $personRequestData->{'requestTo'} || '';
+        $TemplateData{'PlayerLoanDetails'}{'LoanStartDate'} = $personRequestData->{'dtLoanFrom'};
+        $TemplateData{'PlayerLoanDetails'}{'LoanEndDate'} = $personRequestData->{'dtLoanTo'};
+        $TemplateData{'PlayerLoanDetails'}{'TMSReference'} = $personRequestData->{'strTMSReference'};
+        $TemplateData{'PlayerLoanDetails'}{'Summary'} = $personRequestData->{'strRequestNotes'} || '';
+	    $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.') if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_TRANSFER'} == 1 and $dref->{'regoPaymentRequired'});
+
+
+    }
     else {
         $title = $Data->{'lang'}->txt('Registration') . " - $LocalName";
         $title .= ' - ' . $PersonType if $PersonType;
@@ -3029,6 +3064,8 @@ sub populateDocumentViewData {
     #need to retrieve list of documents here
     #since a specific work flow rule can have
     #multiple entries in tblWFRuleDocuments (1:n cardinality of task to document rules)
+
+    return ({}, {}, {}) if !$dref->{'strTaskStatus'};
 
 	my @validdocsforallrego = ();
 	my %validdocs = ();
@@ -3653,6 +3690,27 @@ sub viewSummaryPage {
                 $TemplateData{'TransferDetails'}{'Fee'} = $PaymentsData->{'TXNs'}[0]{'Amount'};
                 
             }
+            if($task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN){
+                $templateFile = 'workflow/summary/loan.templ';
+                $title = $Data->{'lang'}->txt("Player Loan - Approved");
+                my %regFilter = (
+                    'requestID' => $task->{'intPersonRequestID'},
+                );
+                my $request = getRequests($Data, \%regFilter);
+                $request = $request->[0];
+
+                my ($PaymentsData) = populateRegoPaymentsViewData($Data, $task);
+        
+                $TemplateData{'PlayerLoanDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
+                $TemplateData{'PlayerLoanDetails'}{'BorrowingClub'} = $request->{'requestFrom'};
+                $TemplateData{'PlayerLoanDetails'}{'LendingClub'} = $request->{'requestTo'};
+                $TemplateData{'PlayerLoanDetails'}{'LoanStartDate'} = $request->{'dtLoanFrom'};
+                $TemplateData{'PlayerLoanDetails'}{'LoanEndDate'} = $request->{'dtLoanTo'};
+                $TemplateData{'PlayerLoanDetails'}{'TMSReference'} = $request->{'strTMSReference'};
+                $TemplateData{'PlayerLoanDetails'}{'Summary'} = $request->{'strRequestNotes'};
+                $TemplateData{'PlayerLoanDetails'}{'Fee'} = $PaymentsData->{'TXNs'}[0]{'Amount'};
+                
+            }
             elsif($task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_AMENDMENT){
                 $TemplateData{'PersonRegistrationDetails'}{'currentClub'} = $task->{'strLocalName'};
                 $templateFile = 'workflow/summary/person.templ';
@@ -3914,6 +3972,10 @@ sub updateTaskScreen {
             
             if($TaskType eq 'TRANSFER_PLAYER') {
                 $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Transfer process.");
+                $status = $Data->{'lang'}->txt("Pending");
+            }
+            if($TaskType eq 'DOMESTIC_LOAN_PLAYER') {
+                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Player Loan process.");
                 $status = $Data->{'lang'}->txt("Pending");
             }
             elsif($TaskType eq 'NEW_PLAYER') {
