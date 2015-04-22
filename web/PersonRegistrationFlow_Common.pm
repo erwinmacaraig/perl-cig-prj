@@ -189,7 +189,13 @@ sub displayRegoFlowSummary {
 	
 #print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~displayRegoFlowSummary $personID\n";
     my $ok = 0;
-    if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER' or $rego_ref->{'registrationNature'} eq 'TRANSFER') {
+    if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL'
+            or $rego_ref->{'registrationNature'} eq 'RENEWAL'
+            or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER'
+            or $rego_ref->{'registrationNature'} eq 'TRANSFER'
+            or $rego_ref->{'strRegistrationNature'} eq 'DOMESTIC_LOAN'
+            or $rego_ref->{'registrationNature'} eq 'DOMESTIC_LOAN'
+    ) {
         $ok=1;
     }
     else    {
@@ -1241,7 +1247,9 @@ sub add_rego_record{
     return (0, undef, 'SUSPENDED') if ($personStatus eq 'SUSPENDED' or $prStatus eq 'SUSPENDED');
     	
     warn "REGISTRATION NATURE $rego_ref->{'registrationNature'}";
-    if ($rego_ref->{'registrationNature'} ne 'RENEWAL' and $rego_ref->{'registrationNature'} ne 'TRANSFER') {
+    if ($rego_ref->{'registrationNature'} ne 'RENEWAL'
+        and $rego_ref->{'registrationNature'} ne 'TRANSFER'
+        and $rego_ref->{'registrationNature'} ne 'DOMESTIC_LOAN') {
         my $ok = checkRegoTypeLimits($Data, $personID, 0, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'}, $rego_ref->{'entityID'}); 
         return (0, undef, 'LIMIT_EXCEEDED') if (!$ok);
     }
