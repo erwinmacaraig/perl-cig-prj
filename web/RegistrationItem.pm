@@ -277,7 +277,7 @@ sub registrationItemActiveProducts  {
         FROM
             tblTransactions
         WHERE
-            intStatus = $Defs::TXNLOG_SUCCESS
+            intStatus IN (intStatus IN ($Defs::TXN_PAID, $Defs::TXN_HOLD)
             AND intTableType = $Defs::LEVEL_PERSON
             AND intID = ?
     ];
