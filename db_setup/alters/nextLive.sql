@@ -99,3 +99,9 @@ ADD COLUMN `strInternationalLoanTMSRef` VARCHAR(100) NULL DEFAULT NULL AFTER `st
 ADD COLUMN `dtInternationalLoanFromDate` DATETIME NULL AFTER `strInternationalLoanTMSRef`,
 ADD COLUMN `dtInternationalLoanToDate` DATETIME NULL AFTER `dtInternationalLoanFromDate`,
 ADD COLUMN `intInternationalLoan` INT NULL DEFAULT 0 AFTER `dtInternationalLoanToDate`;
+
+# 150421_tblRegistrationItem.sql - FC965
+ALTER TABLE tblRegistrationItem
+    ADD COLUMN intItemUsingPaidProductFilter tinyint default 0 COMMENT 'Using Active Products filter',
+    ADD COLUMN strItemActiveFilterPaidProducts varchar(10) default '' COMMENT 'Which Products to check Active on',
+    ADD COLUMN intItemPaidProducts tinyint default 0 COMMENT 'Active status if Active Products filter on';

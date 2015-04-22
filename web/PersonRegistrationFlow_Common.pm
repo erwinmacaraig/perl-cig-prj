@@ -1022,6 +1022,9 @@ sub displayRegoFlowProducts {
 
         $product->{'HaveForAnyEntity'} =1 if($product->{'UseExistingAnyEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'ANY_ENTITY'));
         $product->{'HaveForThisEntity'} =1 if($product->{'UseExistingThisEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'THIS_ENTITY'));
+        if ($product->{'HaveForThisEntity'} == 1 or $product->{'HaveForAnyEntity'} == 1)    {
+            next unless ($Data->{'SystemConfig'}{'Products_DontHideExisting'});
+        }
 
         push @prodIDs, $product->{'ID'};
         $ProductRules{$product->{'ID'}} = $product;

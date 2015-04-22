@@ -31,7 +31,7 @@ sub getRegistrationItems    {
     my $sysConfigActiveFilter = 'ACTIVEPERIODS_' . $itemType . '_' . $regNature . '_' . $personType;
     if ($Data->{'SystemConfig'}{$sysConfigActiveFilter} && $Rego_ref->{'intPersonID'})    {
         #If switched on, lets pre-build up Active Results
-        $ActiveFilter_ref = registrationItemActivePeriods($Data, $Rego_ref->{'intPersonID'}, $regNature, $personType);
+        $ActiveFilter_ref = registrationItemActivePeriods($Data, $Rego_ref->{'intPersonID'}, $regNature, $personType, $Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '');
     }
 
     my $ActiveProductsFilter_ref='';
@@ -180,7 +180,7 @@ sub getRegistrationItems    {
 
 sub registrationItemActivePeriods   {
 
-    my ($Data, $personID, $regNature, $personType) = @_;
+    my ($Data, $personID, $regNature, $personType, $sport) = @_;
     $personID || return undef;
 
     my %ActiveFilter=();
@@ -222,6 +222,7 @@ sub registrationItemActivePeriods   {
             if (not exists $PeriodStatus{$natPeriodID}) {
                 my %Reg = (
                     statusIN => \@statusIN,
+                    sport => $sport,
                     personType => $personType,
                     nationalPeriodID => $natPeriodID
 
