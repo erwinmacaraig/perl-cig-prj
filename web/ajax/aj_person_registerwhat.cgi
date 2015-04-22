@@ -40,6 +40,8 @@ sub main	{
 
     $registrationNature = 'TRANSFER' if ($defaultNature eq 'TRANSFER');
     $registrationNature = 'RENEWAL' if ($defaultNature eq 'RENEWAL');
+    $registrationNature = $defaultNature if ($defaultNature eq $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN or $defaultNature eq $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN);
+    $registrationNature = 'NEW' if (!$defaultNature);
 
     my %Data=();
     my $target='aj_person_registerwhat.cgi';
