@@ -139,6 +139,15 @@
                             From [% task.RequestToClub %] to [% task.RequestFromClub %]<br/>
                             </div>
                         </td>
+                    [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'REGO' AND (task.RegistrationNature == 'DOMESTIC_LOAN' OR task.RegistrationNature == 'INTERNATIONAL_LOAN') %]
+                        <td style="word-wrap: break-word;width: 280px;">
+                            <span class="fa fa-user" style="float: left"></span>
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
+                            [% task.RegistrationNatureLabel %]<br/>
+                            [% Lang.txt('Review Player loan of') %] [% task.Name %]<br/>
+                            From [% task.RequestToClub %] to [% task.RequestFromClub %]<br/>
+                            </div>
+                        </td>
                     [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'REGO' AND task.RegistrationNature != 'TRANSFER' %]
                         <td style="word-wrap: break-word;width: 280px;">
                             <span class="fa fa-user" style="float: left"></span>
