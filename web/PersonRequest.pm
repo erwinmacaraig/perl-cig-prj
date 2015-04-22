@@ -859,6 +859,7 @@ sub displayCompletedRequest {
     my $title;
     $title = $Data->{'lang'}->txt("Request a Transfer - Submitted to Current Club") if $rtype eq $Defs::PERSON_REQUEST_TRANSFER;
     $title = $Data->{'lang'}->txt("Request Access (Add Role) - Submitted to Current Club") if $rtype eq $Defs::PERSON_REQUEST_ACCESS;
+    $title = $Data->{'lang'}->txt("Player Loan - Submitted to Current Club") if $rtype eq $Defs::PERSON_REQUEST_LOAN;
 
     my %reqFilters = (
         'requestIDs' => \@prids
@@ -877,6 +878,7 @@ sub displayCompletedRequest {
     for my $request (@{$personRequests}) {
         $itemRequestType = $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}} . " Request for") if $rtype eq $Defs::PERSON_REQUEST_TRANSFER;
         $itemRequestType = $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}} . " for") if $rtype eq $Defs::PERSON_REQUEST_ACCESS;
+        $itemRequestType = $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}} . " for") if $rtype eq $Defs::PERSON_REQUEST_LOAN;
         $found = 1;
         if(!$personID) {
             $personID = $request->{'intPersonID'};
@@ -915,6 +917,7 @@ sub displayCompletedRequest {
     $TemplateData{'client'} = $Data->{'client'};
     $TemplateData{'requesttype'} = "Transfer" if $rtype eq $Defs::PERSON_REQUEST_TRANSFER;;
     $TemplateData{'requesttype'} = "Request Access" if $rtype eq $Defs::PERSON_REQUEST_ACCESS;
+    $TemplateData{'requesttype'} = "Player Loan" if $rtype eq $Defs::PERSON_REQUEST_LOAN;
 
     $TemplateData{'PersonSummaryPanel'} = personSummaryPanel($Data, $personID) || 'PSP';
 
@@ -1149,6 +1152,7 @@ sub viewRequest {
 
         'loanStartDate' => $request->{'dtLoanFrom'} || '',
         'loanEndDate' => $request->{'dtLoanTo'} || '',
+        'TMSReference' => $request->{'strTMSReference'} || '',
 
         'MID' => $request->{'strNationalNum'},
 
@@ -1521,6 +1525,7 @@ sub getRequests {
             pq.strRequestStatus,
             pq.dtLoanFrom,
             pq.dtLoanTo,
+            pq.strTMSReference,
             p.strLocalFirstname,
             p.strLocalSurname,
             p.strStatus as personStatus,
