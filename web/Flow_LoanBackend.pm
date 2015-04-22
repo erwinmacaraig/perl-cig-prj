@@ -65,7 +65,7 @@ sub setProcessOrder {
             'function' => 'display_contact_details',
             'label'  => 'Contact Details',
             'fieldset'  => 'contactdetails',
-            'title'  => 'Transfer - Check/Update Contact Details',
+            'title'  => 'Player Loan - Check/Update Contact Details',
         },
         {
             'action' => 'condu',
@@ -76,7 +76,7 @@ sub setProcessOrder {
             'action' => 'r',
             'function' => 'display_registration',
             'label'  => 'Registration',
-            'title'  => 'Registration - Confirm Transfer Registration',
+            'title'  => 'Registration - Confirm Player Loan Registration',
         },
         {
             'action' => 'ru',
@@ -86,7 +86,7 @@ sub setProcessOrder {
             'action' => 'd',
             'function' => 'display_documents',
             'label'  => 'Documents',
-            'title'  => 'Transfer - Check/Update Documents',
+            'title'  => 'Player Loan - Check/Update Documents',
         },
         {
             'action' => 'du',
@@ -96,7 +96,7 @@ sub setProcessOrder {
             'action' => 'p',
             'function' => 'display_products',
             'label'  => 'Payments',
-            'title'  => 'Transfer - Confirm Transfer Fee',
+            'title'  => 'Player Loan - Confirm Player Loan Fee',
         },
         {
             'action' => 'pu',
@@ -112,7 +112,7 @@ sub setProcessOrder {
             'action' => 'c',
             'function' => 'display_complete',
             'label'  => 'Submit',
-            'title'  => 'Transfer - Submitted',
+            'title'  => 'Player Loan - Submitted',
             'NoNav' => 1,
             'NoDisplayInNav' => 1,
             'NoGoingBack' => 1,
@@ -131,10 +131,11 @@ sub setupValues    {
         'entityID' => $entityID,
         'requestID' => $self->{'RunParams'}{'rid'},
     );
+
     my $request = getRequests($self->{'Data'}, \%regFilter);
     $request = $request->[0];
-    $self->{'RunParams'}{'nat'} = 'TRANSFER';
-    $self->{'RunParams'}{'dnat'} = 'TRANSFER';
+    $self->{'RunParams'}{'nat'} = $self->getCarryFields('dnat');
+    $self->{'RunParams'}{'dnat'} = $self->getCarryFields('dnat');
     $self->{'RunParams'}{'dsport'} = $request->{'strSport'};
     $self->addCarryField('dtype', $request->{'strPersonType'});
     $self->addCarryField('dsport', $request->{'strSport'});
@@ -496,6 +497,7 @@ sub display_registration {
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
     }
+
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
@@ -542,7 +544,7 @@ sub display_registration {
         $request->{'sport'} = $Defs::sportType{$request->{'strSport'}};
         #$request->{'personLevel'} = $Defs::personLevel{$request->{'strPersonLevel'}};
 
-        $self->addCarryField('dnat', 'TRANSFER');
+        #$self->addCarryField('dnat', 'DOMESTIC_LOAN');
         #$self->addCarryField('dtype', $request->{'strPersonType'});
         ##$self->addCarryField('d_level', $request->{'strPersonLevel'});
         $self->addCarryField('dsport', $request->{'strSport'});
@@ -586,7 +588,8 @@ sub display_registration {
     );
     my $pagedata = $self->display(\%PageData);
 
-    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}}) and ($defaultRegistrationNature eq 'TRANSFER' or $defaultRegistrationNature eq 'RENEWAL')) {
+    if($self->{'RunDetails'}{'Errors'}
+            and scalar(@{$self->{'RunDetails'}{'Errors'}}) and ($defaultRegistrationNature eq 'DOMESTIC_LOAN' or $defaultRegistrationNature eq 'RENEWAL')) {
         #display the same step with error notification (for Transfers atm)
         return ($pagedata,0);
     }
@@ -648,7 +651,7 @@ sub process_registration {
         $content = "Person Request Details not found.";
     }
     else {
-        $self->addCarryField('d_nature', 'TRANSFER');
+        $self->addCarryField('d_nature', $self->getCarryFields('dnat'));
         $self->addCarryField('d_type', $request->{'strPersonType'});
         $self->addCarryField('d_level', $request->{'strNewPersonLevel'});
         $self->addCarryField('d_sport', $request->{'strSport'});
@@ -715,13 +718,9 @@ sub process_registration {
                             PR.intPersonRequestID = Req.intPersonRequestID
                         )
                     SET
-                        strPreviousPersonLevel = Req.strPersonLevel,
-                        intPersonLevelChanged = 1
+                        intOnLoan = 1
                     WHERE
-                        Req.strPersonLevel <> ''
-                        AND Req.strNewPersonLevel <> ''
-                        AND Req.strPersonLevel <> Req.strNewPersonLevel
-                        AND PR.intPersonRegistrationID = ?
+                        PR.intPersonRegistrationID = ?
                         AND Req.intPersonRequestID = ?
                 ];
                 $q = $self->{'Data'}->{'db'}->prepare($stChange) or query_error($stChange);
@@ -746,7 +745,7 @@ sub process_registration {
         if ($msg eq 'LIMIT_EXCEEDED')   {
             push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("You cannot register this combination, limit exceeded");
         }
-        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
+        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Player loan failed, cannot find registration.");
     }
     else    {
         if(!$existingReg or $changeExistingReg)   {
@@ -779,7 +778,6 @@ sub display_products {
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
-print STDERR "DISPLAY_PRODUCTS FOR $personID $regoID\n";
 
     my $rego_ref = {};
     my $content = '';
@@ -796,7 +794,7 @@ print STDERR "DISPLAY_PRODUCTS FOR $personID $regoID\n";
 
     if (! $regoID or ! $personID)  {
         my $lang = $self->{'Data'}{'lang'};
-        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
+        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Player loan failed, cannot find registration.");
         $self->setCurrentProcessIndex(1);
         #$self->decrementCurrentProcessIndex();
         #$self->decrementCurrentProcessIndex();
@@ -990,7 +988,7 @@ sub display_documents {
     }
     if (! $regoID or ! $personID)  {
         my $lang = $self->{'Data'}{'lang'};
-        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
+        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Player loan failed, cannot find registration.");
         $self->setCurrentProcessIndex(1);
         #$self->decrementCurrentProcessIndex();
         return ('',2);
@@ -1073,7 +1071,7 @@ sub process_documents {
     }
     if (! $regoID or ! $personID)  {
         my $lang = $self->{'Data'}{'lang'};
-        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
+        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Player loan failed, cannot find registration.");
         $self->setCurrentProcessIndex(1);
         #$self->decrementCurrentProcessIndex();
         return ('',2);
@@ -1154,7 +1152,7 @@ sub display_summary {
 
     if (! $regoID or ! $personID)  {
         my $lang = $self->{'Data'}{'lang'};
-        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
+        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Player loan failed, cannot find registration.");
         $self->setCurrentProcessIndex(1);
         #$self->decrementCurrentProcessIndex();
         #$self->decrementCurrentProcessIndex();
@@ -1180,7 +1178,7 @@ sub display_summary {
         my $hiddenFields = $self->getCarryFields();
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
-        $hiddenFields->{'cA'} = "TRANSFER";
+        $hiddenFields->{'cA'} = $self->getCarryFields('dnat');
         ($content, $gatewayConfig) = displayRegoFlowSummary(
             $self->{'Data'}, 
             $regoID, 
@@ -1195,7 +1193,7 @@ sub display_summary {
         $content = '' if ! $content;
         if (! $content)  {
             my $lang = $self->{'Data'}{'lang'};
-            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, cannot find registration.");
+            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Player loan failed, cannot find registration.");
         $self->setCurrentProcessIndex(1);
         #    $self->decrementCurrentProcessIndex();
         #    $self->decrementCurrentProcessIndex();
@@ -1327,7 +1325,7 @@ sub display_complete {
         #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
         processStatus => 1,
         Content => '',
-        Title => $self->{'Data'}{'lang'}->txt('Transfer Submitted to MA'),
+        Title => $self->{'Data'}{'lang'}->txt('Player loan Submitted to MA'),
         TextTop => $content,
         TextBottom => '',
         NoContinueButton => 1,
