@@ -22,13 +22,13 @@ sub getRegistrationItems    {
     my $personType = $Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '';
 
     #RegistrationItems_PLAYER_NEW_TreatAs99;
-    my $sysConfigCheck = "RegistrationItems_" . $personType . "_" . $regNature . "_TreatAs99";
-    if ($itemType eq 'PRODUCT' and $Data->{'SystemConfig'}{$sysConfigCheck} == 1)   {
-        $originLevel=99;
-        $entityLevel=99;
-    }
+    #my $sysConfigCheck = "RegistrationItems_" . $personType . "_" . $regNature . "_TreatAs99";
+    #if ($itemType eq 'PRODUCT' and $Data->{'SystemConfig'}{$sysConfigCheck} == 1)   {
+    #    $originLevel=99;
+    #    $entityLevel=99;
+    #}
     #RegistrationItems_PLAYER_TreatRenewalAsNew
-    $sysConfigCheck = "RegistrationItems_" . $personType . "_TreatRenewalAsNew";
+    my $sysConfigCheck = "RegistrationItems_" . $personType . "_TreatRenewalAsNew";
     if ($itemType eq 'PRODUCT' and $Data->{'SystemConfig'}{$sysConfigCheck} == 1 and $regNature eq 'RENEWAL')   {
         $regNature = 'NEW';
     }
@@ -84,10 +84,10 @@ sub getRegistrationItems    {
             RI.intRealmID = ?
             AND RI.intSubRealmID IN (0, ?)
             AND RI.strRuleFor = ?
-            AND RI.intOriginLevel = ?
+            AND RI.intOriginLevel IN (99, ?)
 	    AND RI.strRegistrationNature = ?
             AND RI.strEntityType IN ('', ?)
-            AND RI.intEntityLevel IN (0, ?)
+            AND RI.intEntityLevel IN (0, 99, ?)
 	    AND RI.strPersonType IN ('', ?)
 	    AND RI.strPersonLevel IN ('', ?)
         AND RI.strPersonEntityRole IN ('', ?)
