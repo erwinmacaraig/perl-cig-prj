@@ -75,6 +75,12 @@ sub personRegistrationDetail   {
                 type => 'text',
                 readonly => 1,
             },
+            strNationalPeriodName=> {
+                label => 'Registration Period',
+                value => $Data->{'lang'}->txt($RegistrationDetail->{'strNationalPeriodName'}),
+                type => 'text',
+                readonly => 1,
+            },
             strPersonType => {
                 label => 'Type',
                 value => $Data->{'lang'}->txt($RegistrationDetail->{'PersonType'}),
@@ -101,6 +107,7 @@ sub personRegistrationDetail   {
             },
         },
         order => [qw(
+            strNationalPeriodName
             strStatus
             strAgeLevel
             strSport
