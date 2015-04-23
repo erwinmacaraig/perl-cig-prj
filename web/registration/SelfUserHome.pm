@@ -31,10 +31,11 @@ sub showHome {
         $found,
     ) = getPreviousRegos($Data, $user->id());
 
-	#	
+	#		
+	my $transactions = getSelfRegoTransactionHistory($Data, $previousRegos);
+	#
 	my $documents = getUploadedSelfRegoDocuments($Data,$people);
 	my $registrationHist = getSelfRegoHistoryRegistrations($Data, $previousRegos);
-	#
     my $resultHTML = runTemplate(
         $Data,
         {
@@ -45,11 +46,65 @@ sub showHome {
             srp => $srp,	
 			Documents => $documents,	
 			History => 	$registrationHist,
+			Transactions => $transactions,
         },
         'selfrego/home.templ',
     );    
 
     return $resultHTML;
+}
+sub getSelfRegoTransactionHistory{
+	my ($Data, $previousRegos) = @_; 
+	my $txns = '';
+	my %transactions = ();
+	my $sth;
+	foreach my $personIdKeyArr (keys %{$previousRegos}){ 
+		foreach my $regoDetail (@{$previousRegos->{$personIdKeyArr}}){
+			my $query = qq[ SELECT
+            T.intQty,
+            T.curAmount,
+            P.strName as ProductName,
+            P.strDisplayName as ProductDisplayName,
+            P.strProductType as ProductType,
+            T.intStatus,
+            T.intTransactionID,
+            TL.intPaymentType,
+			I.strInvoiceNumber
+        FROM
+            tblTransactions as T
+            INNER JOIN tblProducts as P ON (P.intProductID=T.intProductID)
+			INNER JOIN tblInvoice as I ON (T.intInvoiceID = I.intInvoiceID)
+            LEFT JOIN tblTransLog as TL ON (TL.intLogID=T.intTransLogID)
+        WHERE
+            T.intID = ?
+            AND T.intTableType = $Defs::LEVEL_PERSON
+            AND T.intPersonRegistrationID = ?];			
+			$sth = $Data->{'db'}->prepare($query);
+			$sth->execute($personIdKeyArr, $regoDetail->{'intPersonRegistrationID'});
+			while(my $dref = $sth->fetchrow_hashref()){
+				push @{$transactions{'txn'}},{
+					TransactionNumber => $dref->{'intTransactionID'},
+					InvoiceNumber => $dref->{'strInvoiceNumber'},
+           			PaymentLogID=> $dref->{'intTransLogID'},
+                    ProductName=> $dref->{'ProductName'},
+                    ProductType=> $dref->{'ProductType'},
+                    Amount=> $dref->{'curAmount'},
+                    TXNStatus => $Defs::TransactionStatus{$dref->{'intStatus'}},
+                    PaymentType=> $Defs::paymentTypes{$dref->{'intPaymentType'}} || '-',
+                    Qty=> $dref->{'intQty'},				
+				}
+			}
+
+		}
+	}
+	$transactions{'CurrencySymbol'} = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
+	$txns = runTemplate(
+				$Data,
+				\%transactions,
+				'selfrego/selfregotxnbody.templ'			
+			);
+	return $txns;
+	
 }
 
 sub getSelfRegoHistoryRegistrations{
