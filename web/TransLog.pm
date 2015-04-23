@@ -567,6 +567,7 @@ sub getTransList {
 
     $prodSellLevel = '' if $Data->{'SystemConfig'}{'IgnoreMinSellLevelForTransList'};
 
+    my $locale = $Data->{'lang'}->generateLocale();
 	my $statement = qq[
     SELECT 
       t.intTransactionID, 
@@ -585,7 +586,7 @@ sub getTransList {
       t.dtEnd as dtEnd_RAW, 
       DATE_FORMAT( t.dtEnd, '%d/%m/%Y') AS dtEnd, 
       IF(strGroup <> '', 
-      CONCAT(strGroup,'-',P.strName), P.strName) as strName,
+          CONCAT(strGroup,'-',COALESCE (LT_P.strString1,P.strName)), COALESCE (LT_P.strString1,P.strName)) as strName,
       P.strGSTText,
       P.dblTaxRate, 
       t.strNotes
@@ -598,6 +599,12 @@ sub getTransList {
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (
             PR.intPersonRegistrationID = t.intPersonRegistrationID
         )
+        LEFT JOIN tblLocalTranslations AS LT_P ON (
+            LT_P.strType = 'PRODUCT'
+            AND LT_P.intID = P.intProductID
+            AND LT_P.strLocale = '$locale'
+        )
+
     WHERE
       t.intRealmID = $Data->{Realm}
         AND (t.intPersonRegistrationID =0 or t.intStatus= 1 or PR.strStatus NOT IN ('INPROGRESS'))
@@ -1458,13 +1465,34 @@ sub resolveHoldPaymentForm  {
   	$qry->execute;
 	my $TLref = $qry->fetchrow_hashref();
 
+    my $locale = $Data->{'lang'}->generateLocale();
 	my $st_trans = qq[
-		SELECT T.intTransactionID, M.strLocalSurname, M.strLocalFirstName, E.*, P.strName, P.strGroup, E.strLocalName as EntityName, T.intQty, T.curAmount, T.intTableType, I.strInvoiceNumber, T.intStatus, P.curPriceTax, P.dblTaxRate
+		SELECT T.intTransactionID,
+             M.strLocalSurname,
+             M.strLocalFirstName,
+             E.*,
+             P.strName,
+             COALESCE (LT_P.strString1,P.strName) as strName,
+             P.strGroup,
+             E.strLocalName as EntityName,
+             T.intQty,
+             T.curAmount,
+             T.intTableType,
+             I.strInvoiceNumber,
+             T.intStatus,
+             P.curPriceTax,
+             P.dblTaxRate
 		FROM tblTransactions as T
 			LEFT JOIN tblInvoice I on I.intInvoiceID = T.intInvoiceID
 			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
 			LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
 			LEFT JOIN tblEntity as E ON (E.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
+            LEFT JOIN tblLocalTranslations AS LT_P ON (
+                LT_P.strType = 'PRODUCT'
+                AND LT_P.intID = P.intProductID
+                AND LT_P.strLocale = '$locale'
+            )
+
 		WHERE intTransLogID = $intTransLogID  
 		AND T.intRealmID = $Data->{'Realm'}
 	];
@@ -1717,13 +1745,33 @@ sub viewTransLog	{
   	$qry->execute;
 	my $TLref = $qry->fetchrow_hashref();
 
+    my $locale = $Data->{'lang'}->generateLocale();
 	my $st_trans = qq[
-		SELECT T.intTransactionID, M.strLocalSurname, M.strLocalFirstName, E.*, P.strName, P.strGroup, E.strLocalName as EntityName, T.intQty, T.curAmount, T.intTableType, I.strInvoiceNumber, T.intStatus, P.curPriceTax, P.dblTaxRate
+		SELECT T.intTransactionID,
+             M.strLocalSurname,
+             M.strLocalFirstName,
+             E.*,
+             P.strName,
+             COALESCE (LT_P.strString1,P.strName) as strName,
+             P.strGroup,
+             E.strLocalName as EntityName,
+             T.intQty,
+             T.curAmount,
+             T.intTableType,
+             I.strInvoiceNumber,
+             T.intStatus,
+             P.curPriceTax,
+             P.dblTaxRate
 		FROM tblTransactions as T
 			LEFT JOIN tblInvoice I on I.intInvoiceID = T.intInvoiceID
 			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
 			LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
 			LEFT JOIN tblEntity as E ON (E.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
+            LEFT JOIN tblLocalTranslations AS LT_P ON (
+                LT_P.strType = 'PRODUCT'
+                AND LT_P.intID = P.intProductID
+                AND LT_P.strLocale = '$locale'
+            )
 		WHERE intTransLogID = $intTransLogID  
 		AND T.intRealmID = $Data->{'Realm'}
 	];

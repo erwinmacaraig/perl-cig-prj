@@ -62,6 +62,7 @@ sub main	{
   my $resultHTML = '';
   if($fileID)   {
 
+    my $locale = $Data{'lang'}->generateLocale();
     my $st = qq[
       SELECT 
           UF.*,
@@ -69,13 +70,19 @@ sub main	{
           tblDocuments.intDocumentTypeID,
 		  tblDocuments.strApprovalStatus,
           tblDocumentType.strLockAtLevel,
-          tblDocumentType.strDocumentName
+          COALESCE (LT_D.strString1,tblDocumentType.strDocumentName) as strDocumentName
       FROM  
           tblUploadedFiles AS UF 
           LEFT JOIN tblDocuments 
               ON UF.intFileID = tblDocuments.intUploadFileID 
           LEFT JOIN tblDocumentType 
               ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID  
+            LEFT JOIN tblLocalTranslations AS LT_D ON (
+                LT_D.strType = 'DOCUMENT'
+                AND LT_D.intID = tblDocuments.intDocumentTypeID
+                AND LT_D.strLocale = '$locale'
+            )
+
       WHERE 
           UF.intFileID = ?
     ];

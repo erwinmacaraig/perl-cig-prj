@@ -74,11 +74,23 @@ $Data{'db'}=$db;
 	my %receiptData= ();
 	my %ContentData = ();
 	my %htmlReceiptBody = ();
+    my $locale = $Data{'lang'}->generateLocale();
 	if($txlogIDs)	{
 		for my $intID (@intIDs){			
 			my $st =qq[
-				SELECT intTransLogID, T.intTransactionID, P.strName, P.strGroup, T.intQty, T.curAmount, T.intTableType, I.strInvoiceNumber, T.intStatus, P.curPriceTax, P.dblTaxRate, TL.intPaymentType,
-				IF(T.intTableType = $Defs::LEVEL_CLUB, E.strLocalName, CONCAT(strLocalFirstname,' ',strLocalSurname)) as Name,
+				SELECT intTransLogID,
+                 T.intTransactionID,
+                 COALESCE (LT_P.strString1,P.strName) as strName,
+                 P.strGroup,
+                 T.intQty,
+                 T.curAmount,
+                 T.intTableType,
+                 I.strInvoiceNumber,
+                 T.intStatus,
+                 P.curPriceTax,
+                 P.dblTaxRate,
+                 TL.intPaymentType,
+				IF(T.intTableType = $Defs::LEVEL_CLUB, E.strLocalName, CONCAT(strLocalFirstname, ' ', strLocalSurname)) as Name,
 				TL.dtLog as dtLog_FMT 
 			FROM tblTransactions as T
 			INNER JOIN tblTransLog as TL ON TL.intLogID = T.intTransLogID
@@ -86,6 +98,12 @@ $Data{'db'}=$db;
 				LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
 				LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
 				LEFT JOIN tblEntity as E ON (E.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
+                LEFT JOIN tblLocalTranslations AS LT_P ON (
+                    LT_P.strType = 'PRODUCT'
+                    AND LT_P.intID = P.intProductID
+                    AND LT_P.strLocale = '$locale'
+                )
+
 			WHERE intTransLogID IN (?) 
 			AND T.intRealmID = ? AND T.intID = $intID	
 			];

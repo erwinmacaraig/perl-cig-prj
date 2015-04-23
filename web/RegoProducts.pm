@@ -128,14 +128,15 @@ sub getAllRegoProducts {
     return [] if !$productID_str;
 
     my $ExistingStatus = $incExisting ? 0 : 9999; ## Obviously none will have 9999
+    my $locale = $Data->{'lang'}->generateLocale();
     my $sql = qq[
         SELECT DISTINCT 
             T.intStatus,
             T.intTransactionID,
             T.curAmount as AmountCharged,
             P.intProductID,
-            P.strDisplayName,
-            P.strName,
+            COALESCE (LT.strString1,P.strName) as strName,
+            COALESCE(LT.strString2,P.strDisplayName) as strDisplayName,
             P.curDefaultAmount,
             P.intMinChangeLevel,
             P.intCreatedLevel,
@@ -168,6 +169,11 @@ sub getAllRegoProducts {
                 AND T.intPersonRegistrationID IN (0, ?)
                 AND T.intTXNEntityID IN (0, ?)
                 AND T.intStatus IN (0, $ExistingStatus)
+            )
+            LEFT JOIN tblLocalTranslations AS LT ON (
+                LT.strType = 'PRODUCT'
+                AND LT.intID = P.intProductID
+                AND strLocale = '$locale'
             )
             LEFT JOIN tblProductPricing as PP ON (
                 PP.intProductID = P.intProductID
