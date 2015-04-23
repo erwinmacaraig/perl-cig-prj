@@ -111,6 +111,15 @@ sub getFieldLabels	{
             dtOtherPersonIdentifierValidDateTo => $Data->{'SystemConfig'}{'dtOtherPersonIdentifierValidDateTo_Text'} ? $Data->{'SystemConfig'}{'dtOtherPersonIdentifierValidDateTo_Text'} : 'Other Identifier Validity Date To',
             strOtherPersonIdentifierDesc => $Data->{'SystemConfig'}{'strOtherPersonIdentifierDesc_Text'} ? $Data->{'SystemConfig'}{'strOtherPersonIdentifierDesc_Text'} : 'Other Identifier Description',
             intOtherPersonIdentifierTypeID=> $Data->{'SystemConfig'}{'intOtherPersonIdentifierTypeID_Text'} ? $Data->{'SystemConfig'}{'intOtherPersonIdentifierTypeID_Text'} : 'Other Identifier Type',
+
+            strInternationalTransferSourceClub => $Data->{'SystemConfig'}{'strInternationalTransferSourceClub_Text'} || 'Transfer Source Club',
+            dtInternationalTransferDate => $Data->{'SystemConfig'}{'dtInternationalTransferDate_Text'} || 'Transfer Date',
+            strInternationalTransferTMSRef => $Data->{'SystemConfig'}{'strInternationalTransferTMSRef_Text'} || 'Transfer TMS Reference',
+            strInternationalLoanSourceClub => $Data->{'SystemConfig'}{'strInternationalLoanSourceClub_Text'} || 'Player Loan Source Club',
+            strInternationalLoanTMSRef => $Data->{'SystemConfig'}{'strInternationalLoanTMSRef_Text'} || 'Player Loan TMS Reference',
+            dtInternationalLoanFromDate => $Data->{'SystemConfig'}{'dtInternationalLoanFromDate_Text'} || 'Player Loan Start Date',
+            dtInternationalLoanToDate => $Data->{'SystemConfig'}{'dtInternationalLoanToDate_Text'} || 'Player Loan End Date',
+
             strNatCustomStr1 => $customFieldNames->{'strNatCustomStr1'}[0] || '',
             strNatCustomStr2 => $customFieldNames->{'strNatCustomStr2'}[0] || '',
             strNatCustomStr3 => $customFieldNames->{'strNatCustomStr3'}[0] || '',
