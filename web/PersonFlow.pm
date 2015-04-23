@@ -38,7 +38,8 @@ sub handlePersonFlow {
     my $originLevel = $Data->{'clientValues'}{'authLevel'} || 0;
     my $defaultType = $params{'dtype'} || '';
     my $defaultRegistrationNature = $params{'dnat'} || '';
-    my $internationalTransfer = $params{'itc'} || '';
+    my $itc = $params{'itc'} || '';
+    my $preqtype = $params{'preqtype'} || '';
     my $startingStep = $params{'ss'} || '';
 
     #specific to Transfers
@@ -75,9 +76,10 @@ sub handlePersonFlow {
             a => $action,
             dtype => $defaultType,
             dnat => $defaultRegistrationNature,
-            itc => $internationalTransfer,
+            itc => $itc,
             ss => $startingStep,
             prid => $personRequestID,
+            preqtype => $preqtype,
 
             rtargetid => $renewalTargetRegoID,
         },

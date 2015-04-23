@@ -148,6 +148,7 @@ sub setupValues    {
     $values ||= {};
     $values->{'defaultType'} = $self->{'RunParams'}{'dtype'} || '';
     $values->{'itc'} = $self->{'RunParams'}{'itc'} || 0;
+    $values->{'preqtype'} = $self->{'RunParams'}{'preqtype'} || 0;
     my $client = $self->{'Data'}{'client'};
     $values->{'BaseURL'} = "$self->{'Data'}{'target'}?client=$client&amp;a=";
 
@@ -1572,6 +1573,13 @@ sub loadObjectValues    {
             intNatCustomLU10
 
             intInternationalTransfer
+            strInternationalTransferSourceClub
+            dtInternationalTransferDate
+            strInternationalTransferTMSRef
+            strInternationalLoanSourceClub
+            strInternationalLoanTMSRef
+            dtInternationalLoanFromDate
+            dtInternationalLoanToDate
 
 strLocalTitle
 strPreferredName
