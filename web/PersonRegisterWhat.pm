@@ -555,7 +555,6 @@ sub optionsPersonRegisterWhat {
                 $NATUREwhere
             GROUP BY $lookingForField
         ];
-print STDERR $st;
         @values = @MATRIXvalues;
     }
     
