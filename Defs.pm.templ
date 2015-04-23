@@ -87,6 +87,7 @@ $salesimage_url = "$base_url/../salesimg";
 $fs_formdir="$fs_base/forms";
 $fs_salesimage_dir = "$fs_base/salesimg";
 $fs_customreports_dir="$fs_base/customreports";
+$selfreg_activation_url = "$base_url/registration?a=activate";
 
 $mail_log_file="/var/log/sp-mail/mail.log";
 
@@ -94,6 +95,7 @@ $mail_log_file="/var/log/sp-mail/mail.log";
 $cookie_domain="emacaraig.spildevel"; ##CONFIG
 $COOKIE_MEMBER="reg_m";
 $COOKIE_LOGIN="_SP_M";
+$COOKIE_SRLOGIN="_SP_SR";
 $COOKIE_LANG ="_SP_LA";
 $COOKIE_ENTITY ="_SP_M_E";
 $COOKIE_EVENT="reg_e";
@@ -1114,5 +1116,11 @@ $DOCO_STATUS_REJECTED= "REJECTED";
     "PAYMENT_TO_THIRD_PARTY"=>"A third party has approved the payment and it requires approval/activation",
     "PAYMENT_THIRD_PARTY_ACCEPTED"=>"A third party has accepted the payment/payment has been activated",
     "PAYMENT_SENT_TO_MERCHANT"=>"Payment transferred to merchant",
+);
+
+%initialTaskAssignee = (
+    $LEVEL_CLUB => 'Club',
+    $LEVEL_REGION => 'Regional Association',
+    $LEVEL_NATIONAL => 'Member Association',
 );
 1;

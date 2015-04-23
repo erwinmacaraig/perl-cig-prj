@@ -1,0 +1,123 @@
+<h2 class="main-heading">[% Lang.txt('Self Registration Dashboard') %]</h2>
+
+<p>[% Lang.txt('Welcome') %] [% Name %] ( <a href = "?a=P_">[% Lang.txt('Update Profile') %]</a>)
+</p>
+
+[% IF PreviousRegistrations.size > 0 %]
+
+<div id = "accordion" class = "panel-group"  role="tablist" aria-multiselectable="true">
+    [% FOREACH person IN People %]
+        <div class = "panel panel-default">
+            <div class = "panel-heading" role = "tab" id = "heading[% loop.count %]">
+                <h4 class="panel-title"><a href="#panel[% loop.count %]" data-toggle="collapse" data-parent="#accordion" aria-expanded="[% IF loop.count == 1 %]true[% ELSE %]false[% END %]" aria-controls="panel[% loop.count %]">[% person.strLocalFirstname _ ' ' _ person.strLocalSurname %] [% IF person.intMinor %]([% Lang.txt('Minor') %])[% END %]<i class="indicator fa fa-chevron-right pull-right"></i></a></h4>
+            </div>
+            <div id = "panel[% loop.count %]" class = "panel-collapse collapse [% IF loop.count == 1 %]in[% END %]">
+                <div class = "panel-body">
+
+                    <ul class="nav nav-tabs">
+                        <li class = "active"><a data-toggle="tab" href="#regtab[% loop.count %]">[% Lang.txt('Registration details') %]</a></li>
+                        <li><a data-toggle="tab" href="#doctab[% loop.count %]">[% Lang.txt('Documents') %]</a></li>
+                        <li><a data-toggle="tab" href="#histtab[% loop.count %]">[% Lang.txt('Registration History') %]</a></li>
+                        <li><a data-toggle="tab" href="#txnstab[% loop.count %]">[% Lang.txt('Transaction History') %]</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="regtab[% loop.count %]" class="tab-pane fade in active">
+                            <div class = "selfreg-details col-md-8">
+                                <dl class="dl-horizontal">
+                                  <dt>[% Lang.txt('First name') %]</dt>
+                                  <dd>[% person.strLocalFirstname %]</dd>
+                                  <dt>[% Lang.txt('Family name') %]</dt>
+                                  <dd>[% person.strLocalSurname %]</dd>
+                                  <dt>[% Lang.txt('DOB') %]</dt>
+                                  <dd>[% DateFormat.format(person.dtDOB,'MEDIUM') %]</dd>
+                                  <dt>[% Lang.txt('Gender') %]</dt>
+                                  <dd>[% IF person.intGender  == 1 %][% Lang.txt('Male') %][% ELSIF person.intGender == 2 %][% Lang.txt('Female') %][% END %]</dd>
+                                </dl>
+
+                                <table class = "table ">
+                                [% FOREACH rego IN  PreviousRegistrations.item(person.intPersonID) %]
+                                    <tr>
+                                        <td class = "">[% Lang.txt(rego.strPersonTypeName) %] [% IF rego.strPersonEntityRole %] ([% Lang.txt(rego.strPersonEntityRole) %])[% END %][% IF rego.strPersonLevel %] ([% Lang.txt(rego.strPersonLevelName) %])[% END %]</td>
+                                        <td>[% rego.EntityName %]</td>
+                                        <td> [% Lang.txt('valid until') %] [% DateFormat.format(rego.NPdtTo,'MEDIUM','NONE') %]</td>
+                                        <td>[% rego.PRStatus %]</td>
+                                        <td>
+                                        [% IF rego.renewlink %]
+                                            <a href = "[% rego.renewlink %]" class = "btn-inside-panels">[% Lang.txt('Renew') %]</a>
+                                        [% ELSE %]
+                                            &nbsp;
+                                        [% END %]
+                                        [% IF rego.allowTransfer %]
+                                            <a href = "#" class="btn-inside-panels">[% Lang.txt('Transfer') %]</a><br>
+                                        [% END %]
+                                    </tr>
+                                [% END %]
+                                </table>
+
+                            </div>
+                            <div class = "selfreg-actions col-md-4 text-center">
+                                [% IF person.intMinor %]
+                                    <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;minor=1&amp;dtype=PLAYER" class = "btn-inside-panels">[% Lang.txt('Add Player Role') %]</a>
+                                [% ELSE %]
+                                    <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=PLAYER" class = "btn-inside-panels">[% Lang.txt('Add Player Role') %]</a><br>
+                                    <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=COACH" class = "btn-inside-panels">[% Lang.txt('Add Coach Role') %]</a><br>
+                                    <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=REFEREE" class = "btn-inside-panels">[% Lang.txt('Add Referee Role') %]</a><br>
+                                [% END %]
+                            </div>
+
+                        </div><!-- regtab -->
+                        <div id="doctab[% loop.count %]" class="tab-pane fade "><!-- Docs Tab -->
+							[% Documents %]
+                                
+						</div><!-- End Docs Tab -->
+                        <div id="histtab[% loop.count %]" class="tab-pane fade "> 
+						<!--Registration history list to go here --> 
+						[% History %]
+						</div>
+                        <div id="txnstab[% loop.count %]" class="tab-pane fade "><!-- transaction history list to go here --> 
+							[% Transactions %]
+						</div>
+                    </div><!-- tabcontent -->
+                </div><!-- panel-body -->
+            </div><!-- panel-collapse -->
+        </div><!-- panel -->
+    [% END %]
+</div> <!-- panel-group -->
+<h2>[% Lang.txt('Add an additional person?') %]</h2>
+[% ELSE %]
+<h2>[% Lang.txt('Who are you registering for?') %]</h2>
+
+[% END %]
+<div class = "row">
+    <div class = "selfreg-regwho col-md-7">
+        [% IF !Found.adult %]
+            <a href = "#" id = "btn-myself" class = "btn-main">[% Lang.txt('Myself') %]</a>
+        [% END %]
+        [% IF !Found.minor %]
+        <a href = "?a=REG_NEW&amp;minorRego=1&amp;dtype=PLAYER&amp;srp=[% srp %]" class = "btn-main">[% Lang.txt('A minor in my care') %]</a>
+        [% ELSE %]
+        <a href = "?a=REG_NEW&amp;minorRego=1&amp;dtype=PLAYER&amp;srp=[% srp %]" class = "btn-main">[% Lang.txt('Another minor in my care') %]</a>
+        [% END %]
+    </div>
+    <div class = "col-md-5">&nbsp;</div>
+</div>
+[% IF !Found.adult %]
+    <div id = "selfreg-myselfoptions">
+    <h3>[% Lang.txt('What type of registration do you want?') %]</h3>
+    <div class = "col-md-5">
+        <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;dtype=PLAYER" class = "btn-main">[% Lang.txt('Player') %]</a><br>
+        <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;dtype=COACH" class = "btn-main">[% Lang.txt('Coach') %]</a><br>
+        <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;dtype=REFEREE" class = "btn-main">[% Lang.txt('Referee') %]</a><br>
+    </div>
+[% END %]
+ 
+<script>
+jQuery(document).ready(function()  {
+    jQuery('#btn-myself').click(function()  {
+        jQuery('#selfreg-myselfoptions').show();
+        return false;
+    });
+
+});
+</script>
+

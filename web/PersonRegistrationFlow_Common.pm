@@ -22,7 +22,7 @@ require Exporter;
 );
 
 use strict;
-use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
+use lib '../..', '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 use PersonRegistration;
 use RegistrationItem;
 use PersonRegisterWhat;
@@ -232,7 +232,7 @@ sub displayRegoFlowSummary {
         $gatewayConfig->{'amountDue'} = $amountDue;
          
           
-	    my $personObj = getInstanceOf($Data, 'person');
+	    my $personObj = getInstanceOf($Data, 'person', $personID);
         return if (! $personObj);
 		my $c = Countries::getISOCountriesHash();
 		
@@ -367,6 +367,7 @@ $sth = $Data->{'db'}->prepare($query);
             
         my $editlink =  $Data->{'target'}."?".$carryString;
 	my $displayPayment = ($amountDue and $hidden_ref->{'payMethod'}) ? 1 : 0;
+        $displayPayment = 0 if ($Data->{'SelfRego'} and ! $Data->{'SystemConfig'}{'SelfRego_PaymentOn'});
         my %PageData = (
             person_home_url => $url,
 			person => \%personData,
@@ -406,6 +407,12 @@ sub displayRegoFlowComplete {
 
     my $ok = 1;
     my $run = $hidden_ref->{'run'} || param('run') || 0;
+    if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER' or $rego_ref->{'registrationNature'} eq 'TRANSFER') {
+        $ok=1;
+    }
+    else    {
+        $ok = $run ? 1 : checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'strSport'}, $rego_ref->{'strPersonType'}, $rego_ref->{'strPersonEntityRole'}, $rego_ref->{'strPersonLevel'}, $rego_ref->{'strAgeLevel'});
+    }
     my $payMethod= $hidden_ref->{'payMethod'} || param('payMethod') || '';
     my $body = '';
     my $gateways = '';
@@ -454,8 +461,8 @@ sub displayRegoFlowComplete {
          #}
          
        
-	    my $personObj = getInstanceOf($Data, 'person');
-	    my $maObj = getInstanceOf($Data, 'national');
+	    my $personObj = getInstanceOf($Data, 'person', $personID);
+	    my $maObj = getInstanceOf($Data, 'national', 0, $entityID);
         my $maName = $maObj
             ? $maObj->name()
             : '';
@@ -561,7 +568,9 @@ sub displayRegoFlowComplete {
             $body = runTemplate($Data, \%PageData, 'personrequest/transfer/complete.templ') || '';
         }
         else {
-            $body = runTemplate($Data, \%PageData, 'registration/complete.templ') || '';
+            my $template = 'registration/complete.templ';
+            $template = 'registration/complete_sr.templ' if ($Data->{'SelfRego'});
+            $body = runTemplate($Data, \%PageData, $template) || '';
         }
     }
     return ($body, $gateways);
@@ -721,9 +730,6 @@ sub checkUploadedRegoDocuments {
           AND tblRegistrationItem.intEntityLevel = ?
 			GROUP BY intDocumentTypeID];
 
-
-	#open FH, ">dumpfile.txt";
-	#print FH "\n\nQuery: \n$query \n personID = $personID \n\n";
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute(
         $personID, 
@@ -794,8 +800,8 @@ sub displayRegoFlowDocuments{
     my $lang=$Data->{'lang'};
 	$hidden_ref->{'pID'} = $personID;
 
-     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_DU&amp;rID=$regoID";
-     my $documents = getRegistrationItems(
+     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_DU&amp;rID=$regoID"; 
+	 my $documents = getRegistrationItems(
         $Data,
         'REGO',
         'DOCUMENT',
@@ -806,8 +812,8 @@ sub displayRegoFlowDocuments{
         0,
         $rego_ref,
      );
-
-
+		
+	
 	my @docos = (); 
 
     my %existingDocuments;
@@ -1039,6 +1045,8 @@ sub displayRegoFlowProducts {
     else    {
         return '';
     }
+        my $displayPayment = $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'};
+        $displayPayment = 0 if ($Data->{'SelfRego'} and ! $Data->{'SystemConfig'}{'SelfRego_PaymentOn'});
 	my $maObj = getInstanceOf($Data, 'national');
         my $maName = $maObj
             ? $maObj->name()
@@ -1048,7 +1056,7 @@ sub displayRegoFlowProducts {
         nextaction=>"PREGF_PU",
         target => $Data->{'target'},
         product_body => $product_body,
-        mandatoryPayment => $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'},
+        mandatoryPayment => $displayPayment,
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
         client=>$client,
@@ -1250,7 +1258,6 @@ sub add_rego_record{
     }
 
     if ($rego_ref->{'registrationNature'} eq 'RENEWAL') {
-print STDERR "ABOUT TO CHECKRENEWAL\n";
         my $ok = PersonRegistration::checkRenewalRegoOK($Data, $personID, $rego_ref);
         return (0, undef, 'RENEWAL_FAILED') if (!$ok);
     }

@@ -124,9 +124,25 @@ sub getRegistrationItems    {
 	        $Rego_ref->{'currentAge'} || 0,
 	        $Rego_ref->{'currentAge'} || 0,
 		    $itc
-	        
-		) or query_error($st);
+		) or query_error($st); 
 
+    my @values = (); 
+    push @values, $Data->{'Realm'};  
+    push @values,$Data->{'RealmSubType'}; 
+    push @values,$ruleFor;
+    push @values,$originLevel;
+    push @values,$regNature;
+    push @values,$Rego_ref->{'strEntityType'} || $Rego_ref->{'entityType'} || '';
+    push @values,$entityLevel;
+    push @values,$Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '';
+    push @values,$Rego_ref->{'strPersonLevel'} || $Rego_ref->{'personLevel'} || '';
+    push @values,$Rego_ref->{'strPersonEntityRole'} || $Rego_ref->{'personEntityRole'} || '';
+    push @values,$Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '';
+    push @values,$Rego_ref->{'strAgeLevel'} || $Rego_ref->{'ageLevel'} || '';
+    push @values,$itemType;
+    push @values,$Rego_ref->{'Nationality'} || '';
+    push @values,$Rego_ref->{'Nationality'} || '';
+    
     my @Items=();
     while (my $dref = $q->fetchrow_hashref())   {
         next if($itemType eq 'DOCUMENT' and $documentFor and ($documentFor ne $dref->{'strDocumentFor'}));

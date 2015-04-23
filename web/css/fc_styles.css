@@ -2239,3 +2239,13 @@ div[id*="doctab"] .documents-list table.table .task-list .status-col a.btn-insid
 .report-option-button-row {
     margin-bottom:20px;
 }
+/* Self Reg */
+.selfreg-actions a.btn-inside-panels,
+.selfreg-regwho a.btn-main,
+#selfreg-myselfoptions a.btn-main {
+    width:47%;
+    margin:4px;
+}
+
+
+#selfreg-myselfoptions { display:none; }

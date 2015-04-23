@@ -29,6 +29,7 @@ sub getRenewalDetails {
     $rego->{'newAgeLevel'} = $newAgeLevel;
 
     my %templateData = (
+        'entityLocalName' => $rego->{'strLocalName'} || '',
         'personType' => $Defs::personType{$rego->{'strPersonType'}} || '',
         'sport' => $Defs::sportType{$rego->{'strSport'}} || '',
         'personRole' => $personRoles->{$rego->{'strPersonEntityRole'}} || '-',

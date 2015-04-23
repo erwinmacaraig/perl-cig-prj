@@ -21,7 +21,7 @@ use Email;
 use PaymentSplitExport;
 use ServicesContacts;
 use TemplateEmail;
-use RegoFormUtils;
+#use RegoFormUtils;
 use ContactsObj;
 use Data::Dumper;
 require Products;
@@ -517,7 +517,6 @@ sub createTransLog	{
 	my $db = $Data->{'db'};
     my %fields=();
     $fields{amount} = $amount || 0;
-    
     my $authLevel = $Data->{'clientValues'}{'authLevel'}||=$Defs::INVALID_ID;
     #if (! $entityID)    {
         $entityID = getID($Data->{'clientValues'}, $authLevel);

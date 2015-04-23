@@ -5,6 +5,7 @@ require Exporter;
 	handleWorkflow
   	addWorkFlowTasks
   	approveTask
+  	resolveTask
   	checkForOutstandingTasks
     addIndividualTask
     cleanTasks
@@ -23,6 +24,11 @@ require Exporter;
     deleteRegoTransactions
     checkRulePaymentFlagActions
     getRegistrationWorkTasks
+    displayGenericError
+    updateTaskNotes
+    redirectTemplate
+    updateTaskScreen
+    getInitialTaskAssignee
 );
 
 use strict;
@@ -56,6 +62,7 @@ use PersonCertifications;
 use EntitySummaryPanel;
 use PersonEntity;
 use PersonUtils;
+use PersonUserAccess;
 
 use SphinxUpdate;
 use InstanceOf;
@@ -243,25 +250,7 @@ sub addIndividualTask   {
         $task_ref->{'personRegistrationID'} || 0,
         $task_ref->{'documentID'} || 0,
     );
-open FH, ">dumpfile2.txt";
-print FH "I was called in addIndividualTask \n $stINS \n
-		\$ruleID = $ruleID,
-        \$Data->{'Realm'} = $Data->{'Realm'},
-        \$Data->{'RealmSubType'} = $Data->{'RealmSubType'},
-        \$Data->{'clientValues'}{'userID'} = $Data->{'clientValues'}{'userID'},
-        \$approvalEntityID = $approvalEntityID,
-        \$taskType = $taskType,
-        \$ruleFor = $taskType,
-        \$task_ref->{'registrationNature'} = $task_ref->{'registrationNature'},
-        \$task_ref->{'documentTypeID'} = $task_ref->{'documentTypeID'},
-        \$task_ref->{'taskStatus'} = $task_ref->{'taskStatus'},
-        \$problemEntityID = $problemEntityID,
-        \$task_ref->{'entityID'} = $task_ref->{'entityID'},
-        \$task_ref->{'personID'} = $task_ref->{'personID'},
-        \$task_ref->{'personRegistrationID'} = $task_ref->{'personRegistrationID'} ,
-        \$task_ref->{'documentID'} = $task_ref->{'documentID'},
 
-";
 }
 
 
@@ -524,7 +513,7 @@ sub listTasks {
 		$entityID,
 		$entityID,
 		$entityID,
-	) or query_error($st); open FH, ">dumpfile.txt"; print FH "\$entityID = $entityID \n \$st = $st";
+	) or query_error($st); 
 	
 	my @TaskList = ();
     my @taskType = ();
@@ -828,6 +817,24 @@ sub getEntityParentID   {
     return  $q->fetchrow_array() || 0;
 
 }
+
+sub getSelfUserParentID {
+    my ($Data, $CreatedByUserID, $PersonID, $PersonRegistrationID) = @_;
+
+    my $st = qq[
+        SELECT
+            intSelfUserID
+        FROM
+            tblSelfUserAuth
+        WHERE
+            intEntityTypeID = $Defs::LEVEL_PERSON
+            AND intEntityID = ?
+            AND intSelfUserID = ?
+    ];
+
+
+}
+
 sub addWorkFlowTasks {
      my(
         $Data,
@@ -852,6 +859,7 @@ sub addWorkFlowTasks {
 	my $q = '';
 	my $db=$Data->{'db'};
     my $checkOk = 1;
+
 
     if ($ruleFor ne 'DOCUMENT') {
         my $stCheck = qq[
@@ -975,6 +983,7 @@ sub addWorkFlowTasks {
 			pr.intPersonID,
 			pr.intPersonRegistrationID,
             pr.intEntityID as RegoEntity,
+            pr.intCreatedByUserID,
             0 as DocumentID
 		FROM tblPersonRegistration_$Data->{'Realm'} AS pr
         INNER JOIN tblPerson as p ON (p.intPersonID = pr.intPersonID)
@@ -1082,12 +1091,20 @@ sub addWorkFlowTasks {
 
 
     my $emailNotification = new EmailNotifications::WorkFlow();
-	open FH, ">dumpfile.txt";
+	
     if ($checkOk)   {
         while (my $dref= $q->fetchrow_hashref())    {
 			
             my $approvalEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intApprovalEntityLevel'}) || 0;
-            my $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intProblemResolutionEntityLevel'});
+            my $problemEntityID = 0;
+
+            if($originLevel == 1) {
+                $problemEntityID = doesSelfUserHaveAccess($Data, $dref->{'intPersonID'}, $dref->{'intCreatedByUserID'}) ? $dref->{'intCreatedByUserID'} : 0;
+            }
+            else {
+                $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intProblemResolutionEntityLevel'});
+            }
+
             next if (! $approvalEntityID and ! $problemEntityID);
 print STDERR "^^^^^^^^^^^^^^^^^^^^^^^^^^^RULE ADDED WAS " . $dref->{'intWFRuleID'} . "\n\n\n";
 			
@@ -1715,7 +1732,7 @@ sub setDocumentStatus  {
 
 sub updateTaskNotes {
 
-    my( $Data) = @_;
+    my($Data, $selfUserAsEntityID) = @_;
 
     my $WFTaskID = safe_param('TID','number') || '';
     my $notes= safe_param('notes','words') || '';
@@ -1728,7 +1745,7 @@ sub updateTaskNotes {
     my $targetTemplate = "",
 
     #identify type of action (rejection or resolution based on intApprovalEntityID and intProblemResolutionID)
-    my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+    my $entityID = $selfUserAsEntityID || getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
     #my $type = ($entityID == $task->{'intApprovalEntityID'}) ? 'REJECT' : ($entityID == $task->{'intProblemResolutionEntityID'}) ? 'RESOLVE' : '';
     my $WFRejectCurrentNoteID = $task->{'rejectTaskNoteID'} || 0;
     my $WFToggleCurrentNoteID = $task->{'toggleTaskNoteID'} || 0;
@@ -2045,7 +2062,9 @@ sub addTaskNotes    {
 sub resolveTask {
     my(
         $Data,
-        $emailNotification
+        $emailNotification,
+        $WFTaskID,
+        $selfUserEntityID
     ) = @_;
 
 	my $st = '';
@@ -2053,10 +2072,16 @@ sub resolveTask {
 	my $db=$Data->{'db'};
 
 	#Get values from the QS
-    my $WFTaskID = safe_param('TID','number') || '';
+    $WFTaskID ||= safe_param('TID','number') || '';
 
     #FC-144 get current task based on taskid param
     my $task = getTask($Data, $WFTaskID);
+
+    return if (!$task or ($task eq undef));
+
+    return 0 if($selfUserEntityID
+                and $selfUserEntityID != $task->{'intProblemResolutionEntityID'}
+                and !doesSelfUserHaveAccess($Data, $task->{'intPersonID'}, $selfUserEntityID));
 
 	my $srn = qq[
         SELECT
@@ -2086,7 +2111,6 @@ sub resolveTask {
         'RegistrationType' => $task->{'sysConfigApprovalLockRuleFor'},
     );
 
-    return if (!$task or ($task eq undef));
 
     #if($task->{strWFRuleFor} eq 'ENTITY') {
     #    #setEntityStatus($Data, $WFTaskID, $Defs::WF_TASK_STATUS_REJECTED);
@@ -2121,7 +2145,7 @@ sub resolveTask {
   	$q = $db->prepare($st);
   	$q->execute(
   		$WFTaskID,
-        getLastEntityID($Data->{'clientValues'}),
+        $selfUserEntityID || getLastEntityID($Data->{'clientValues'}),
         $Data->{'Realm'}
   	);
 	if ($q->errstr) {
@@ -2381,8 +2405,7 @@ sub getTask {
             t.intWFTaskID = ?
             AND t.intRealmID = ?
     ];
-	open FH, ">dumpfile.txt";
-	print FH "\n \$WFTaskID = $WFTaskID";
+	
     $q = $Data->{'db'}->prepare($st);
     $q->execute(
         $WFTaskID,
@@ -2395,7 +2418,7 @@ sub getTask {
 }
 
 sub viewTask {
-    my ($Data, $WFTID) = @_;
+    my ($Data, $WFTID, $entityID) = @_;
 
     #TODO
     #retrieve all necessary details here
@@ -2410,8 +2433,8 @@ sub viewTask {
     #   - check strStatus
     #       - if COMPLETED (final approval as per comment in JIRA), display a summary page
 
-    my $WFTaskID = safe_param('TID','number') || $WFTID || '';
-    my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+    my $WFTaskID = $WFTID || safe_param('TID','number') || '';
+    $entityID ||= getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
     my $st;
 
@@ -2552,13 +2575,12 @@ sub viewTask {
     my $rowCount = 0;
 
     my $dref = $q->fetchrow_hashref();
-    $dref->{'currentAge'} = personAge($Data,$dref->{'dtDOB'});
-
     if(!$dref) {
         #return (undef, "ERROR: no data retrieved/no access.");
         return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("No data retrieved/no access."));
     }
 
+    $dref->{'currentAge'} = personAge($Data,$dref->{'dtDOB'});
 
     my %TemplateData;
     my %DocumentData;
@@ -3865,10 +3887,10 @@ sub viewApprovalPage {
 }
 
 sub updateTaskScreen {
-    my ($Data, $action) = @_;
+    my ($Data, $action, $selfUserAsEntityID) = @_;
 
     my $WFTaskID = safe_param('TID','number') || '';
-    my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+    my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'}) || $selfUserAsEntityID;
 
     my $task = getTask($Data, $WFTaskID);
 
@@ -4083,6 +4105,8 @@ sub updateTaskScreen {
         }
     }
 
+    my $currentViewLevel = ($Data->{'clientValues'}{'currentLevel'} > 1) ? $Data->{'clientValues'}{'currentLevel'} : 1;
+
     my %TemplateData = (
         'client' => $Data->{'client'},
         'PersonSummaryPanel' => personSummaryPanel($Data, $task->{'intPersonID'}),
@@ -4095,6 +4119,7 @@ sub updateTaskScreen {
         },
         'status' => $status,
         'taskType' => $TaskType,
+        'CurrentViewLevel' => $currentViewLevel
     );
 
     #open (my $FH,">test.txt");
@@ -4247,6 +4272,7 @@ sub holdTask {
             $emailNotification->setSubRealmID(0);
             $emailNotification->setToEntityID($toEntityID);
             $emailNotification->setFromEntityID($fromEntityID);
+            $emailNotification->setToOriginLevel($task->{'intOriginLevel'});
             $emailNotification->setDefsEmail($Defs::admin_email);
             $emailNotification->setDefsName($Defs::admin_email_name);
             $emailNotification->setNotificationType($nType);
@@ -4644,6 +4670,44 @@ sub getCCRecipient {
     }
 
     return;
+}
+
+sub getInitialTaskAssignee {
+     my(
+        $Data,
+        $personID,
+        $registrationID,
+        $entityID
+    ) = @_;
+
+    if($entityID){
+    }
+    elsif($personID and $registrationID){
+        my $st = qq[
+            SELECT tr.*
+            FROM tblWFRule tr
+            INNER JOIN tblPersonRegistration_$Data->{'Realm'} tp
+            ON (
+                tp.strPersonType = tr.strPersonType
+                AND tp.strPersonLevel = tr.strPersonLevel
+                AND tp.strSport = tr.strSport
+                AND tp.strAgeLevel = tr.strAgeLevel
+                AND tr.strRegistrationNature = tp.strRegistrationNature
+                AND tr.intOriginLevel = tp.intOriginLevel
+            )
+            WHERE
+                tp.intPersonRegistrationID = ?
+                AND tr.strTaskStatus = 'ACTIVE'
+            ORDER BY
+                tr.intApprovalEntityLevel
+            LIMIT 1
+        ];
+        my $q = $Data->{'db'}->prepare($st);
+        $q->execute($registrationID);
+
+        my $dref = $q->fetchrow_hashref();
+        return $Defs::initialTaskAssignee{$dref->{'intApprovalEntityLevel'} || 100};
+    }
 }
 
 1;

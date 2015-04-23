@@ -16,7 +16,7 @@ use Data::Dumper;
 
 
 sub personSummaryPanel {
-    my ($Data, $personID) = @_;
+    my ($Data, $personID, $noRego) = @_;
 
     my $personObj = new PersonObj(
         db => $Data->{'db'}, 
@@ -26,7 +26,7 @@ sub personSummaryPanel {
     $personObj->load();
     return '' if !$personObj;
     return '' if !$personObj->ID();
-
+    $noRego ||= 0;
     my ($count, $regs) = PersonRegistration::getRegistrationData(
         $Data,
         $personID,
@@ -34,25 +34,26 @@ sub personSummaryPanel {
     );
 
     my @personRegistration = ();
+    if(!$noRego)    {
+        foreach my $reg_rego_ref (@{$regs}) {
+            next if $reg_rego_ref->{'strStatus'} ne $Defs::PERSONREGO_STATUS_ACTIVE;
 
-    foreach my $reg_rego_ref (@{$regs}) {
-        next if $reg_rego_ref->{'strStatus'} ne $Defs::PERSONREGO_STATUS_ACTIVE;
-
-        my $level = '';
-        my $break = '';
-        if ($reg_rego_ref->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER)    {
-            $level = $Data->{'lang'}->txt($reg_rego_ref->{'PersonLevel'}) . ' ';
-            $break = "<br/>";
+            my $level = '';
+            my $break = '';
+            if ($reg_rego_ref->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER)    {
+                $level = $Data->{'lang'}->txt($reg_rego_ref->{'PersonLevel'}) . ' ';
+                $break = "<br/>";
+            }
+            my $sport = $reg_rego_ref->{'Sport'} 
+                ?  " (".$Data->{'lang'}->txt($reg_rego_ref->{'Sport'} || '').')'
+                : '';
+            push @personRegistration, [ 
+                $level . $Data->{'lang'}->txt($reg_rego_ref->{'PersonType'}) . $sport
+                . ' ' . $break . $Data->{'lang'}->txt("valid to") . ' ' .$Data->{'l10n'}{'date'}->format($reg_rego_ref->{'npdtTo'},'MEDIUM'),
+                $reg_rego_ref->{'strPersonType'},
+                $reg_rego_ref->{'strSport'},
+            ];
         }
-        my $sport = $reg_rego_ref->{'Sport'} 
-            ?  " (".$Data->{'lang'}->txt($reg_rego_ref->{'Sport'} || '').')'
-            : '';
-        push @personRegistration, [ 
-            $level . $Data->{'lang'}->txt($reg_rego_ref->{'PersonType'}) . $sport
-            . ' ' . $break . $Data->{'lang'}->txt("valid to") . ' ' .$Data->{'l10n'}{'date'}->format($reg_rego_ref->{'npdtTo'},'MEDIUM'),
-            $reg_rego_ref->{'strPersonType'},
-            $reg_rego_ref->{'strSport'},
-        ];
     }
 
     my $isocountries  = getISOCountriesHash();

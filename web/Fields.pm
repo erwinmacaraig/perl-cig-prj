@@ -52,6 +52,7 @@ my $Fields = {
 		dtPassportExpiry
 		strEmergContName
 		strEmergContRel
+        strGuardianRelationship
 		strP1FName
 		strP1SName
 		strP2FName

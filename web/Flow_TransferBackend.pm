@@ -147,7 +147,7 @@ sub setupValues    {
 
 sub display_old_club { 
     my $self = shift;
-
+	$self->addCarryField('club_vstd', 1);
     my $id = $self->ID() || 0;
     if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
         return ('Invalid User',0);
@@ -209,7 +209,8 @@ sub display_old_club {
 sub display_core_details    { 
     my $self = shift;
 
-    $self->addCarryField('club_vstd', 1);
+    #$self->addCarryField('club_vstd', 1);
+	$self->addCarryField('cd_vstd', 1);
     my $id = $self->ID() || 0;
     my $defaultType = $self->{'RunParams'}{'dtype'} || '';
     if($id)   {
@@ -321,7 +322,7 @@ sub validate_core_details    {
 sub display_contact_details    { 
     my $self = shift;
 
-    $self->addCarryField('cd_vstd', 1);
+    $self->addCarryField('cond_vstd', 1);
     my $id = $self->ID() || 0;
     if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
         return ('Invalid User',0);
@@ -495,6 +496,7 @@ sub display_registration {
     my $self = shift;
 	
 	$self->addCarryField('cond_vstd', 1);
+    $self->addCarryField('r_vstd', 1);
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
@@ -1219,17 +1221,24 @@ sub display_summary {
         return ('',2);
     }
 
+    my $initialTaskAssigneeLevel = getInitialTaskAssignee(
+        $self->{'Data'},
+        $personID,
+        $regoID,
+        0
+    );
+
     my %Config = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
-        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+        ContinueButtonText => $self->{'Lang'}->txt('Submit to '. $initialTaskAssigneeLevel),
     );
     if ($gatewayConfig->{'amountDue'} and $payMethod eq 'now')    {
         ## Change Target etc
         %Config = (
             HiddenFields => $gatewayConfig->{'HiddenFields'},
             Target => $gatewayConfig->{'Target'},
-            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to Member Association'),
+            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to ' . $initialTaskAssigneeLevel),
         );
     }
     my %PageData = (

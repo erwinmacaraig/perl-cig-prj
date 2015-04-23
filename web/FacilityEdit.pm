@@ -321,7 +321,7 @@ sub getFieldNames {
         strLegalID
         strImportEntityCode
         intImportID
-        strAcceptSelfRego
+        intAcceptSelfRego
         strShortNotes
         intNotifications
         strOrganisationLevel

@@ -1381,21 +1381,28 @@ sub display_summary {
         $self->setCurrentProcessIndex('r');
         return ('',2);
     }
-    
+
+    my $initialTaskAssigneeLevel = getInitialTaskAssignee(
+        $self->{'Data'},
+        $personID,
+        $regoID,
+        0
+    );
+   
     #if ($payMethod ne 'now')    {
     #    $gateways = '';
     #}
     my %Config = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
-        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+        ContinueButtonText => $self->{'Lang'}->txt('Submit to ' . $initialTaskAssigneeLevel),
     );
     if ($gatewayConfig->{'amountDue'} and $payMethod eq 'now')    {
         ## Change Target etc
         %Config = (
             HiddenFields => $gatewayConfig->{'HiddenFields'},
             Target => $gatewayConfig->{'Target'},
-            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to Member Association'),
+            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to '. $initialTaskAssigneeLevel),
         );
     }
 

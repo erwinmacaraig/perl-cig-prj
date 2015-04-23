@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS tblPayTry;
 CREATE TABLE tblPayTry  (
     intTryID int(11) NOT NULL auto_increment,
     intRealmID INT default 0,
+    intSelfRego TINYINT default 0,
     strPayReference varchar(100) default '',
     intTransLogID INT default 0,
     strLog text,
