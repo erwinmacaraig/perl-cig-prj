@@ -65,7 +65,7 @@ sub getRegistrationItems    {
             RI.intUseExistingAnyEntity,
             COALESCE (LT_D.strString1,D.strDocumentName) as strDocumentName,
             D.strDocumentFor,
-			COALESCE(LT_D.strNote,D.strDescription) strDescription,
+			COALESCE(LT_D.strNote,D.strDescription) AS strDescription,
             COALESCE (LT_P.strString1,P.strName) as strProductName,
             COALESCE(LT_P.strString2,P.strDisplayName) as strProductDisplayName,
             TP.intTransactionID,

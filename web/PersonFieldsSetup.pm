@@ -157,6 +157,7 @@ sub personFieldsSetup {
         dbh        => $Data->{'db'},
         realmID    => $Data->{'Realm'},
         subRealmID => $Data->{'RealmSubType'},
+        locale     => $Data->{'lang'}->generateLocale(),
     );
 
     my @intNatCustomLU_DefsCodes = (undef, -53, -54, -55, -64, -65, -66, -67, -68,-69,-70);

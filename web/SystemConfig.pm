@@ -5,8 +5,8 @@
 package SystemConfig;
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(getSystemConfig getLocalConfig);
-@EXPORT_OK = qw(getSystemConfig getLocalConfig);
+@EXPORT = qw(getSystemConfig getLocalConfig updateSystemConfigTranslation);
+@EXPORT_OK = qw(getSystemConfig getLocalConfig updateSystemConfigTranslation);
 
 
 use strict;
@@ -79,6 +79,42 @@ sub getLocalConfig {
 	return \%localConfig;
 }
 
+sub updateSystemConfigTranslation {
+
+	my ($Data) = @_;
+
+	my $db=$Data->{'db'};
+	my $realmID=$Data->{'Realm'} || 0;
+	my $subtypeID=$Data->{'RealmSubType'} || 0;
+    my $locale = $Data->{'lang'}->generateLocale();
+	my $statement = qq[
+		SELECT 
+            strOption, 
+            COALESCE(LT.strString1,strValue) AS strValue, 
+            intSubTypeID, 
+            COALESCE(LT.strNote,strBlob) AS strBlob
+		FROM tblSystemConfig 
+            INNER JOIN tblLocalTranslations AS LT ON (
+                LT.strType = 'SYSTEMCONFIG'
+                AND LT.intID = tblSystemConfig.intSystemConfigID
+                AND LT.strLocale = '$locale'
+            )
+			LEFT JOIN tblSystemConfigBlob ON tblSystemConfig.intSystemConfigID = tblSystemConfigBlob.intSystemConfigID
+		WHERE intRealmID IN(?, 0)
+			ORDER BY intRealmID ASC, intSubTypeID ASC
+	];
+
+	my $query = $db->prepare($statement);
+	$query->execute($realmID);
+	while(my($DB_option, $DB_val, $DB_subtypeID, $DB_blob) = $query->fetchrow_array())  {
+		$DB_val='' if !defined $DB_val;
+		$DB_blob='' if !defined $DB_blob;
+		$DB_val =$DB_blob if $DB_blob ne '';
+		$Data->{'SystemConfig'}{$DB_option}=$DB_val;
+	}
+	$query->finish;
+	return 1;
+}
 1;
 
 
