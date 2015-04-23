@@ -60,7 +60,7 @@
       <div class="col-md-12">
       [% IF Data.ELevel != 3 %]
         <!--<a href="#" title=""><img class="header-logo" src="images/FAS-logo.png" alt="" /></a>-->
-        <a href="#" title=""><img class="header-logo" src="[% HeaderLogo || DefaultSystemConfig.LoginError_MA_logo || DefaultSystemConfig.MA_logo  %]" alt="" /></a>[% HeaderSystemName || DefaultSystemConfig.HeaderSystemName %]
+        <a href="#" title=""><img class="header-logo" src="[% HeaderLogo || DefaultSystemConfig.LoginError_MA_logo || DefaultSystemConfig.MA_logo  %]" alt="" /></a><h1>[% HeaderSystemName || DefaultSystemConfig.HeaderSystemName %]</h1>
       [% END %]  
         <ul>
           <li>
