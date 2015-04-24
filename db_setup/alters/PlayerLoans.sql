@@ -20,3 +20,9 @@ ADD COLUMN `strTMSReference` VARCHAR(100) NULL AFTER `intOpenLoan`;
 ALTER TABLE tblRegistrationItem
 ADD COLUMN `intItemForInternationalTransfer` TINYINT NULL DEFAULT 0 AFTER `intItemPaidProducts`,
 ADD COLUMN `intItemForInternationalLoan` TINYINT NULL DEFAULT 0 AFTER `intItemForInternationalTransfer`;
+
+ALTER TABLE `tblMatrix` 
+ADD COLUMN `dtOpenFrom` DATE NULL DEFAULT NULL AFTER `dtTo`,
+ADD COLUMN `dtOpenTo` DATE NULL DEFAULT NULL AFTER `dtOpenFrom`,
+ADD COLUMN `intHonourOpenDates` TINYINT NULL DEFAULT 0 AFTER `dtOpenTo`;
+
