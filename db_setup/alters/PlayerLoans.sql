@@ -16,3 +16,7 @@ ADD COLUMN `dtLoanFrom` DATE NULL AFTER `strRequestStatus`,
 ADD COLUMN `dtLoanTo` DATE NULL AFTER `dtLoanFrom`,
 ADD COLUMN `intOpenLoan` INT NULL DEFAULT 0 AFTER `dtLoanTo`,
 ADD COLUMN `strTMSReference` VARCHAR(100) NULL AFTER `intOpenLoan`;
+
+ALTER TABLE tblRegistrationItem
+ADD COLUMN `intItemForInternationalTransfer` TINYINT NULL DEFAULT 0 AFTER `intItemPaidProducts`,
+ADD COLUMN `intItemForInternationalLoan` TINYINT NULL DEFAULT 0 AFTER `intItemForInternationalTransfer`;
