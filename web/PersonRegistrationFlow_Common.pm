@@ -749,7 +749,7 @@ sub checkUploadedRegoDocuments {
 	my @required = ();
     foreach my $dc (@{$documents}){ 
 		#next if(!$dc);
-		next if(!$rego_ref->{'InternationalTransfer'} && $dc->{'DocumentFor'} eq 'TRANSFERITC');	#will only be included when there is an ITC
+        #next if(!$rego_ref->{'InternationalTransfer'} && $dc->{'DocumentFor'} eq 'TRANSFERITC');	#will only be included when there is an ITC
         next if( grep /$dc->{'ID'}/,@validdocsforallrego);
 		if( $dc->{'Required'} ) {
 			push @required,$dc;
@@ -800,6 +800,7 @@ sub displayRegoFlowDocuments{
     my $lang=$Data->{'lang'};
 	$hidden_ref->{'pID'} = $personID;
 
+    #print STDERR Dumper $rego_ref;
      my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_DU&amp;rID=$regoID";
      my $documents = getRegistrationItems(
         $Data,
@@ -886,7 +887,7 @@ AND tblRegistrationItem.strPersonType IN ('', ?)
 	#compare whats in the system and what docos are missing both required and optional
 	foreach my $doc_ref (@{$documents}){
 		next if(!$doc_ref);	
-		next if(!$rego_ref->{'InternationalTransfer'} && $doc_ref->{'DocumentFor'} eq 'TRANSFERITC');	
+        #next if(!$rego_ref->{'InternationalTransfer'} && $doc_ref->{'DocumentFor'} eq 'TRANSFERITC');	
 		if(!grep /$doc_ref->{'ID'}/,@uploaded_docs){
 			push @diff,$doc_ref;	
 		}
