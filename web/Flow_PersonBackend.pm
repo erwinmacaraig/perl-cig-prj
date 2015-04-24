@@ -303,7 +303,8 @@ sub validate_core_details    {
     if($newreg)    {
         $userData->{'strStatus'} = 'INPROGRESS';
         $userData->{'intRealmID'} = $self->{'Data'}{'Realm'};
-        $userData->{'intInternationalTransfer'} = 1 if $self->getCarryFields('itc');
+        $userData->{'intInternationalTransfer'} = 1 if ($self->getCarryFields('itc') and $self->{'RunParams'}{'preqtype'} eq $Defs::PERSON_REQUEST_TRANSFER);
+        $userData->{'intInternationalLoan'} = 1 if ($self->getCarryFields('itc') and $self->{'RunParams'}{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN);
     }
     $personObj->setValues($userData);
     $personObj->write();
