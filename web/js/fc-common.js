@@ -135,7 +135,6 @@ function calculateProducts(){
 }
 
 $(document).ready(function(){
-    
     calculateProducts();
 
     $('form#flowFormID td.col-1 input[type="checkbox"]').click(function(){
@@ -312,6 +311,29 @@ $(window).scroll(function() {
 */
 var columnCounter = 0;
 jQuery(document).ready(function(){
+    $(window).resize(function(){
+        $("body,nav").removeAttr("style")
+        // no padding for view in dashboards 
+        if($(window).width()< 612){
+        }
+    }) 
+    // fixingnav of nav in mobile sizez
+    $(".navbar-toggle").click(function(){
+        if($(window).width()>=275 && $(window).width()<313){
+            $(".navbar-fixed-top").animate({
+                'margin-left':'0'
+            })
+            $(".header ,.clearfix.navbar.navbar-default").animate({
+                "margin-left": "72%"
+            })
+            $(".navmenu-fixed-left").addClass("opend")
+            $(".offcanvas:not(.opend)").css('display','block');
+            $(".offcanvas:not(.navmenu-fixed-left)").animate({
+              "margin-left": "-34%"
+            })
+        }
+    })
+
     var headers = "";
     jQuery('a.btn-proceed').each(function() {
         var t = jQuery(this).html();

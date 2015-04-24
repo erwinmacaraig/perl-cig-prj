@@ -239,7 +239,7 @@ input[type="checkbox"]:after {
   background: #fff;
   cursor: pointer;
 }
-select {
+/*select {
   background: transparent;
   padding-right: 17px!important;
   font-size: 16px;
@@ -250,7 +250,7 @@ select {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance:none;
-}
+}*/
 /*ie defualt arrow*/
 select::-ms-expand {
     display: none;
@@ -276,12 +276,13 @@ form#searchForm{
   display: block;
 }
 .fieldSectionGroupFooter a{
-  background-color: white;
   padding: 4px 27px;
   margin-right: -15px;
   border-top-left-radius: 3px;
   border-bottom-left-radius: 5px;
-  box-shadow: 0 0 6px -1px gray;
+  text-decoration: underline;
+  color: black;
+  text-transform: capitalize;
 }
 ul#menu li:hover .dropdown {
   color: #000;
@@ -379,6 +380,40 @@ th {
   text-transform: uppercase;
   text-align: center;
 }
+.selected {
+  /*initialize hover for tablet sizes*/
+   background-color: transparent; 
+   color: white; 
+}
+/*read-only bold values*/
+.fieldSectionGroupWrapper fieldset div.col-md-6 {
+  font-weight: bold;
+}
+@media only screen and (min-width:275px) and (max-width:313px){
+  body{
+    top:0!important;
+  }
+  .navbar-fixed-top{
+    top: 0!important;
+    width:72%;
+  }
+  .offcanvas{
+    margin-left: -110%;
+    top:0!important;
+  }
+  .sidebar-box{
+    /*these vlaues will make mobile versions
+    to work properly, please do not delete
+    */
+    top: initial!important;
+    bottom: initial!important;
+    left: initial!important;
+  }
+  .navmenu-fixed-left.offcanvas{
+    width: 72%;
+    margin-left: 0%
+  }
+}
 @media only screen and (max-width:610px){
   .membership-login header .logo-area h1{
       position: relative;
@@ -470,6 +505,10 @@ th {
   /*Tabs*/
   .nav-tabs > li {
   width: 100%;
+  }
+  /*dropdowns alignment*/
+  .chosen-container{
+    width: 100%!important;
   }
 }
 @media only screen and (max-width:766px){
