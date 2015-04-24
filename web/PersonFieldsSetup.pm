@@ -527,7 +527,7 @@ sub personFieldsSetup {
                 	size => '40',
                 	maxsize => '50',                	
                     sectionname => 'other',
-                    compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0,,
+                    compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0,
                     active => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0,
                 },
                 dtInternationalTransferDate => {
@@ -540,7 +540,7 @@ sub personFieldsSetup {
                     sectionname => 'other',
                     displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
                     displayFunctionParams=> ['MEDIUM'],
-                    compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0,,
+                    compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0,
                     active => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0,
                 },
                 strInternationalTransferTMSRef => {
@@ -550,7 +550,7 @@ sub personFieldsSetup {
                 	size => '40',
                 	maxsize => '50',                	
                     sectionname => 'other',
-                    compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0,,
+                    compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0,
                     active => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0,
                 },
                 strInternationalLoanSourceClub => {
@@ -560,7 +560,7 @@ sub personFieldsSetup {
                 	size => '40',
                 	maxsize => '50',                	
                     sectionname => 'other',
-                    compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,,
+                    compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
                     active => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
                 },
                 dtInternationalLoanFromDate => {
@@ -573,7 +573,7 @@ sub personFieldsSetup {
                     sectionname => 'other',
                     displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
                     displayFunctionParams=> ['MEDIUM'],
-                    compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,,
+                    compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
                     active => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
                 },
                 dtInternationalLoanToDate => {
@@ -586,7 +586,7 @@ sub personFieldsSetup {
                     sectionname => 'other',
                     displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
                     displayFunctionParams=> ['MEDIUM'],
-                    compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,,
+                    compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
                     active => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
                 },
                 strInternationalLoanTMSRef => {
@@ -596,7 +596,7 @@ sub personFieldsSetup {
                 	size => '40',
                 	maxsize => '50',                	
                     sectionname => 'other',
-                    compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,,
+                    compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
                     active => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
                 },
 
