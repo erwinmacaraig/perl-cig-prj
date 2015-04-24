@@ -662,6 +662,7 @@ sub getRegistrationData	{
             e.strEntityType,
             e.intEntityLevel,
 	p.intInternationalTransfer,
+	p.intInternationalLoan,
             e.intEntityID
         FROM
             tblPersonRegistration_$Data->{'Realm'} AS pr
