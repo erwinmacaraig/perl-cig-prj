@@ -1192,7 +1192,8 @@ sub display_documents {
         #my $itc = $personObj->getValue('intInternationalTransfer') || '';
         my $itc = $self->getCarryFields('itc') || 0;
         $rego_ref->{'Nationality'} = $nationality;
-        $rego_ref->{'InternationalTransfer'} = $itc;
+        $rego_ref->{'InternationalTransfer'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0;
+        $rego_ref->{'InternationalLoan'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0;
 
      if (! $regoID or ! $personID)  {
         my $lang = $self->{'Data'}{'lang'};
