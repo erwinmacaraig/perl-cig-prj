@@ -2481,6 +2481,7 @@ sub viewTask {
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             p.intGender as PersonGender,
             p.intInternationalTransfer as InternationalTransfer,
+            p.intInternationalLoan as InternationalLoan,
             e.strLocalName as EntityLocalName,
             p.intPersonID,
             p.strNationalNum,
@@ -3229,6 +3230,8 @@ sub populateDocumentViewData {
                 AND (regoItem.strISOCountry_NOTIN ='' OR regoItem.strISOCountry_NOTIN IS NULL OR regoItem.strISOCountry_NOTIN NOT LIKE CONCAT('%|','$dref->{'strISONationality'}','|%'))
                 AND (regoItem.intFilterFromAge = 0 OR regoItem.intFilterFromAge <= $dref->{'currentAge'})
                 AND (regoItem.intFilterToAge = 0 OR regoItem.intFilterToAge >= $dref->{'currentAge'})
+                AND (regoItem.intItemForInternationalTransfer = 0 OR regoItem.intItemForInternationalTransfer = '$dref->{'InternationalTransfer'}')
+                AND (regoItem.intItemForInternationalLoan = 0 OR regoItem.intItemForInternationalLoan = '$dref->{'InternationalLoan'}')
                 )
         LEFT JOIN tblRegistrationItem as entityItem
             ON (
@@ -3278,7 +3281,7 @@ sub populateDocumentViewData {
         #skip if no registration item matches rego details combination (type/role/sport/rego_nature etc)
         next if (!$tdref->{'regoItemID'} and $dref->{'strWFRuleFor'} eq 'REGO');
         
-        next if((!$dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC') or ($dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC' and $dref->{'PersonStatus'} ne $Defs::PERSON_STATUS_PENDING));
+        #next if((!$dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC') or ($dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC' and $dref->{'PersonStatus'} ne $Defs::PERSON_STATUS_PENDING));
 		my $status;
         $count++;
 		$fileID = $tdref->{'intFileID'};
