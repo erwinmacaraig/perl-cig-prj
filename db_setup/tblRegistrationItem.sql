@@ -39,7 +39,7 @@ CREATE TABLE tblRegistrationItem (
 	intItemActive tinyint default 0 COMMENT 'Active status if Active Periods filter on',
 
 	intItemUsingPaidProductFilter tinyint default 0 COMMENT 'Using Active Products filter',
-	strItemActiveFilterPaidProducts varchar(10) default '' COMMENT 'Which Products to check Active on',
+	strItemActiveFilterPaidProducts varchar(100) default '' COMMENT 'Which Products to check Active on',
 	intItemPaidProducts tinyint default 0 COMMENT 'Active status if Active Products filter on',
 
     tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
