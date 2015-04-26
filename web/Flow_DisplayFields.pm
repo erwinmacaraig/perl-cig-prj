@@ -709,6 +709,22 @@ sub _validate {
                   if !Mail::RFC822::Address::valid($_);
             }
         }
+        elsif( $t eq 'DATEMORETHAN') {
+            my($year_before,$month_before,$day_before) = $num1 =~/(\d\d\d\d)-(\d{1,2})-(\d{1,2})/;
+            my($year_ahead,$month_ahead,$day_ahead) = $val =~/(\d\d\d\d)-(\d{1,2})-(\d{1,2})/;
+            my $deltaDays = -1;
+
+            if($val and $num1) {
+                $deltaDays = Date::Calc::Delta_Days($year_before, $month_before, $day_before, $year_ahead, $month_ahead, $day_ahead);
+            }
+            else {
+                return;
+            }
+
+            push @errors,
+              $self->txt( "is not more than [_1]", $num1 )
+              if ($deltaDays <= 0);
+        }
     }
 
     return ( \@errors );
