@@ -18,6 +18,7 @@ use Entity;
 use RegoAgeRestrictions;
 use PersonRegistration;
 use SystemConfig;
+use RegistrationWindow;
 use CGI qw(param);
 
 use Data::Dumper;
@@ -255,7 +256,31 @@ sub optionsPersonRegisterWhat {
         $subRealmID
     );
 
+    my @regWindowFields = (
+        'intRealmID',
+        'intSubRealmID',
+    );
+
+    my %regWindowFieldValues = (
+        'intRealmID' => $realmID,
+        'intSubRealmID' => $subRealmID,
+    );
+
     ### LETS BUILD UP THE SQL WHERE STATEMENTS TO HELP NARROW SELECTION
+
+    if($bulk) {
+        push @regWindowFields, 'strWFRuleFor';
+        $regWindowFieldValues{'strWFRuleFor'} = 'BULKREGO';
+    }
+    else {
+        push @regWindowFields, 'strWFRuleFor';
+        $regWindowFieldValues{'strWFRuleFor'} = 'REGO';
+    }
+
+    if($registrationNature) {
+        push @regWindowFields, 'strRegistrationNature';
+        $regWindowFieldValues{'strRegistrationNature'} = $registrationNature;
+    }
 
     if($step > 2) {# and defined $sport)  {
         push @MATRIXvalues, $sport;
@@ -264,16 +289,25 @@ sub optionsPersonRegisterWhat {
         $MATRIXwhere .= " AND strSport = ? ";
         $ERAwhere .= " AND strSport = ? ";
         $ENTITYAllowedwhere .= " AND (strDiscipline in ('ALL', '', ?) OR strDiscipline IS NULL) ";
+
+        push @regWindowFields, 'strSport';
+        $regWindowFieldValues{'strSport'} = $sport;
     }
     if($step > 6 and defined $registrationNature)  {
         push @MATRIXvalues, $registrationNature;
         $MATRIXwhere .= " AND strRegistrationNature = ? ";
+
+        push @regWindowFields, 'strRegistrationNature';
+        $regWindowFieldValues{'strRegistrationNature'} = $registrationNature;
     }
     if($step > 1 and defined $personType)  {
         push @MATRIXvalues, $personType;
         push @ERAvalues, $personType;
         $MATRIXwhere .= " AND strPersonType = ? ";
         $ERAwhere .= " AND strPersonType = ? ";
+
+        push @regWindowFields, 'strPersonType';
+        $regWindowFieldValues{'strPersonType'} = $personType;
     }
     if($step > 3 and defined $personEntityRole)  {
         push @MATRIXvalues, $personEntityRole;
@@ -284,6 +318,9 @@ sub optionsPersonRegisterWhat {
         push @ERAvalues, $personLevel;
         $MATRIXwhere .= " AND strPersonLevel = ? ";
         $ERAwhere .= " AND strPersonLevel = ? ";
+
+        push @regWindowFields, 'strPersonLevel';
+        $regWindowFieldValues{'strPersonLevel'} = $personLevel;
     }
     if($step > 5 and defined $ageLevel)  {
         push @MATRIXvalues, $ageLevel;
@@ -320,6 +357,11 @@ sub optionsPersonRegisterWhat {
     if (! checkMatrixOK($Data, $MATRIXwhere, \@MATRIXvalues, $bulk))   {
         return (\@retdata, '');
     }
+
+    if(!checkPersonRegistrationWindow($Data, \@regWindowFields, \%regWindowFieldValues)) {
+        return (\@retdata, $Data->{'lang'}->txt('This type of registration is not within the window.'));
+    }
+
     ### ALL OK, LETS RETURN NEXT SET OF SELECTIONS
     if ($lookingForField eq 'strPersonEntityRole')  {
         my $roledata_ref = returnEntityRoles($role_ref, $Data);
