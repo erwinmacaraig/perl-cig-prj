@@ -172,6 +172,12 @@ sub setupValues    {
         $self->addCarryField('dage', $rawDetails->{'newAgeLevel'}); # if $rawDetails->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER;
         $self->addCarryField('drole', $rawDetails->{'strPersonEntityRole'});
     }
+    elsif ($self->{'RunParams'}{'itc'} and $self->{'RunParams'}{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) {
+        #setting dnat to $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN to be used in PersonRegisterWhat
+        $self->addCarryField('dnat', $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN);
+        $self->addCarryField('dnature', 'NEW');
+        $self->addCarryField('nat', 'NEW');
+    }
     else    {
         $self->addCarryField('oldlevel', $self->{'RunParams'}{'oldlevel'});
         $self->addCarryField('d_nature', 'NEW');
