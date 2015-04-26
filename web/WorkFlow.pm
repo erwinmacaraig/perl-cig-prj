@@ -1288,7 +1288,7 @@ sub approveTask {
 
         my $allComplete = checkRelatedTasks($Data);
         if ($allComplete) {
-            #PersonRequest::finaliseTransfer($Data, $personRequestID);
+            PersonRequest::finalisePlayerLoan($Data, $personRequestID);
             PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
         }
     }
