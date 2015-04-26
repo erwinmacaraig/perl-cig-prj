@@ -19,11 +19,13 @@ use DefCodes;
 use PersonUtils;
 use AssocTime;
 use MinorProtection;
+use Flow_DisplayFields;
 use Data::Dumper;
 
 sub personFieldsSetup {
-    my ($Data, $values) = @_;
+    my ($Data, $values, $runParams) = @_;
     $values ||= {};
+    $runParams ||= {};
 
     my $FieldLabels   = FieldLabels::getFieldLabels( $Data, $Defs::LEVEL_PERSON );
     my $isocountries  = getISOCountriesHash();
@@ -33,6 +35,12 @@ sub personFieldsSetup {
         client=>$Data->{'client'}, 
         type=>'Person'
     });
+
+    my $dtLoanFromDate = _concatenateDate(
+        $runParams->{'d_dtInternationalLoanFromDate_day'},
+        $runParams->{'d_dtInternationalLoanFromDate_mon'},
+        $runParams->{'d_dtInternationalLoanFromDate_year'},
+    );
 
     my %genderoptions = ();
     for my $k ( keys %Defs::PersonGenderInfo ) {
@@ -582,7 +590,7 @@ sub personFieldsSetup {
                 	type        => 'date',
                     datetype    => 'dropdown',
                     format      => 'dd/mm/yyyy',
-                    validate    => 'DATE',
+                    validate    => 'DATE,DATEMORETHAN:' . $dtLoanFromDate,
                     sectionname => 'other',
                     displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
                     displayFunctionParams=> ['MEDIUM'],
@@ -978,6 +986,24 @@ sub personFieldsSetup {
     }
 
     return $fieldsets;
+}
+
+sub _concatenateDate {
+    my ($day, $month, $year) = @_;
+
+    $day = $day || q{};
+    $month = $month || q{};
+    $year = $year || q{};
+
+    my $datevalue;
+    my $displayField = new Flow_DisplayFields();
+
+    if ( $day and $month and $year ) {
+        $datevalue = "$day/$month/$year";
+        $datevalue =  $displayField->_fix_date($datevalue);
+    }
+
+    return $datevalue || '';
 }
 
 1;

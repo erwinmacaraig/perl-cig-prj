@@ -185,7 +185,7 @@ sub setupValues    {
         $self->addCarryField('nat', 'NEW');
     }
 
-    $self->{'FieldSets'} = personFieldsSetup($self->{'Data'}, $values);
+    $self->{'FieldSets'} = personFieldsSetup($self->{'Data'}, $values, $self->{'RunParams'});
 }
 
 sub display_core_details    { 
