@@ -8,7 +8,10 @@ require Exporter;
     getRequests
     listRequests
     finaliseTransfer
+    finalisePlayerLoan
     setRequestStatus
+    activatePlayerLoan
+    deactivatePlayerLoan
 );
 
 use lib ".", "..";
@@ -37,6 +40,8 @@ use PersonEntity;
 use PersonUtils;
 use TemplateEmail;
 use Flow_DisplayFields;
+use Date::Calc;
+use AssocTime;
 
 
 sub handlePersonRequest {
@@ -1526,6 +1531,8 @@ sub getRequests {
             pq.strRequestStatus,
             pq.dtLoanFrom,
             pq.dtLoanTo,
+            DATE_FORMAT(pq.dtLoanFrom, '%Y-%m-%d') AS dtLoanFromFormatted,
+            DATE_FORMAT(pq.dtLoanTo, '%Y-%m-%d') AS dtLoanToFormatted,
             pq.strTMSReference,
             p.strLocalFirstname,
             p.strLocalSurname,
@@ -2214,6 +2221,133 @@ sub loanRequiredFields {
    	); #end of FieldDefinitions
     return \%FieldDefinitions;
 
+}
+
+sub finalisePlayerLoan {
+    my ($Data, $requestID) = @_;
+
+    my %reqFilters = (
+        'requestID' => $requestID
+    );
+
+    my $timezone = $Data->{'SystemConfig'}{'Timezone'} || 'UTC';
+    my $today = dateatAssoc($timezone);
+    my @requestIDs;
+    my @personIDs;
+
+    my $personRequest = getRequests($Data, \%reqFilters);
+    $personRequest = $personRequest->[0];
+
+    my($year_req,$month_req,$day_req) = $personRequest->{'dtLoanFromFormatted'} =~/(\d\d\d\d)-(\d{1,2})-(\d{1,2})/;
+    my($year_today,$month_today,$day_today) = $today =~/(\d\d\d\d)-(\d{1,2})-(\d{1,2})/;
+
+    my $validLoanStart = Date::Calc::check_date( $year_req, $month_req, $day_req );
+    my $validToday = Date::Calc::check_date( $year_today, $month_today, $day_today );
+
+    if($validLoanStart and $validToday) {
+        my $deltaDays = Date::Calc::Delta_Days($year_req, $month_req, $day_req, $year_today, $month_today, $day_today);
+        if($deltaDays >= 0) {
+            #activatePlayerLoan must set current loan and record in the previous (lending) club
+            push @requestIDs, $requestID;
+            push @personIDs, $personRequest->{'intPersonID'};
+            activatePlayerLoan($Data, \@requestIDs, \@personIDs);
+        }
+        else {
+            #need to set tblPersonRegistration_ record to PENDING (check WorkFlow::checkForOutstandingTasks)
+            #cron script (activatePlayerLoan must handle other settings)
+
+            my $st = qq [
+                UPDATE tblPersonRegistration_$Data->{'Realm'}
+                SET strStatus = 'PENDING'
+                WHERE
+                    intPersonRequestID = ?
+                    AND strStatus IN ('ACTIVE', 'PENDING')
+            ];
+
+            my $db = $Data->{'db'};
+            my $query = $db->prepare($st) or query_error($st);
+            $query->execute(
+                $personRequest->{'intPersonRequestID'}
+            ) or query_error($st);
+
+            if ($personRequest->{'intPersonID'})    {
+                my $personObject = getInstanceOf($Data, 'person',$personRequest->{'intPersonID'});
+                updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
+            }
+        }
+    }
+    else {
+        return;
+    }
+}
+
+sub activatePlayerLoan {
+    my ($Data, $requestIDs, $personIDs) = @_;
+
+
+    #update records for borrowing club
+    my $db = $Data->{'db'};
+    my $idset = join(', ', @{$requestIDs});
+    my $bst = qq [
+        UPDATE
+            tblPersonRegistration_$Data->{'Realm'}
+        SET
+            strStatus = 'ACTIVE'
+        WHERE
+            intPersonRequestID IN ($idset)
+            AND strStatus = 'PENDING'
+    ];
+
+    #update records for lending club
+    my $lst = qq [
+        UPDATE
+            tblPersonRegistration_$Data->{'Realm'} PR
+        INNER JOIN
+            tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID)
+        SET
+            strStatus = 'PASSIVE'
+        WHERE
+            PRQ.intPersonRequestID IN ($idset)
+            AND PR.strStatus IN ('ACTIVE', 'PENDING', 'PASSIVE')
+    ];
+
+    my $query = $db->prepare($bst) or query_error($bst);
+    $query->execute() or query_error($bst);
+
+    $query = $db->prepare($lst) or query_error($lst);
+    $query->execute() or query_error($lst);
+
+
+
+    for my $personID (@{$personIDs}) {
+        my $personObject = getInstanceOf($Data, 'person',$personID);
+        updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
+    }
+}
+
+sub deactivatePlayerLoan {
+    my ($Data, $requestIDs, $personIDs) = @_;
+
+    my $db = $Data->{'db'};
+    my $idset = join(', ', @{$requestIDs});
+    my $bst = qq [
+        UPDATE
+            tblPersonRegistration_$Data->{'Realm'}
+        SET
+            strStatus = 'PASSIVE'
+        WHERE
+            intPersonRequestID IN ($idset)
+            AND strStatus IN ('PENDING', 'ACTIVE', 'PASSIVE')
+    ];
+
+    my $query = $db->prepare($bst) or query_error($bst);
+    $query->execute() or query_error($bst);
+
+
+    for my $personID (@{$personIDs}) {
+        my $personObject = getInstanceOf($Data, 'person',$personID);
+        updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
+    }
 }
 
 1;
