@@ -269,12 +269,14 @@ sub displayRegoFlowSummary {
 		####################################################
 
 		my %existingDocuments;
+        my $locale = $Data->{'lang'}->generateLocale();
 		my $query = qq[
 		SELECT
         tblDocuments.intDocumentTypeID as ID,  
         tblUploadedFiles.strOrigFilename,
         tblUploadedFiles.intFileID,
         tblDocumentType.strDocumentName as Name
+        COALESCE (LT_D.strString1,tblDocumentType.strDocumentName) as Name
         FROM tblDocuments
         INNER JOIN tblDocumentType
             ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
@@ -286,6 +288,12 @@ sub displayRegoFlowSummary {
         AND tblDocuments.intPersonRegistrationID = ?
         AND tblRegistrationItem.intRealmID = ?
         AND tblRegistrationItem.strItemType='DOCUMENT'
+            LEFT JOIN tblLocalTranslations AS LT_D ON (
+                LT_D.strType = 'DOCUMENT'
+                AND LT_D.intID = tblDocumentType.intDocumentTypeID
+                AND LT_D.strLocale = '$locale'
+            )
+
         ORDER BY tblDocuments.intDocumentID DESC
 		];
 	
@@ -303,11 +311,18 @@ sub displayRegoFlowSummary {
             tblDocuments.intDocumentTypeID as ID,
             tblUploadedFiles.strOrigFilename,
             tblUploadedFiles.intFileID,
-            tblDocumentType.strDocumentName as Name
+            COALESCE (LT_D.strString1,tblDocumentType.strDocumentName) as Name
+
         FROM tblDocuments
             INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID)
         INNER JOIN tblRegistrationItem ON (tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID)
         INNER JOIN tblUploadedFiles ON (tblUploadedFiles.intFileID = tblDocuments.intUploadFileID )
+            LEFT JOIN tblLocalTranslations AS LT_D ON (
+                LT_D.strType = 'DOCUMENT'
+                AND LT_D.intID = tblDocumentType.intDocumentTypeID
+                AND LT_D.strLocale = '$locale'
+            )
+
         WHERE 
             strApprovalStatus IN ('APPROVED', 'PENDING')
             AND intPersonID = ?
@@ -830,6 +845,7 @@ sub displayRegoFlowDocuments{
    
 #print STDERR "~~~~~~~~~~~~~~~displayRegoFlowDocuments\n";
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
+    my $locale = $Data->{'lang'}->generateLocale();
     my $query = qq [
         SELECT
             tblDocuments.intDocumentTypeID as ID,
@@ -838,12 +854,19 @@ sub displayRegoFlowDocuments{
             tblUploadedFiles.strOrigFilename,
             tblUploadedFiles.intFileID,
             tblUploadedFiles.intAddedByTypeID as AddedByTypeID,
-            tblDocumentType.strDocumentName as Name,
-            tblDocumentType.strDescription as Description
+            COALESCE (LT_D.strString1,tblDocumentType.strDocumentName) as Name,
+            COALESCE(LT_D.strNote,tblDocumentType.strDescription) AS Description
+
         FROM tblDocuments
         INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID)
         INNER JOIN tblRegistrationItem ON (tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID )
         INNER JOIN tblUploadedFiles ON ( tblUploadedFiles.intFileID = tblDocuments.intUploadFileID )
+        LEFT JOIN tblLocalTranslations AS LT_D ON (
+            LT_D.strType = 'DOCUMENT'
+            AND LT_D.intID = tblDocumentType.intDocumentTypeID
+            AND LT_D.strLocale = '$locale'
+        )
+
         WHERE
             tblDocuments.intPersonID = ?
             AND tblDocuments.intPersonRegistrationID = ?
@@ -914,13 +937,19 @@ AND tblRegistrationItem.strPersonType IN ('', ?)
             tblUploadedFiles.strOrigFilename,
             tblUploadedFiles.intFileID,
             tblUploadedFiles.intAddedByTypeID as AddedByTypeID,
-            tblDocumentType.strDocumentName as Name,
-            tblDocumentType.strDescription as Description
+            COALESCE (LT_D.strString1,tblDocumentType.strDocumentName) as Name,
+            COALESCE(LT_D.strNote,tblDocumentType.strDescription) AS Description
         FROM 
             tblDocuments
             INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID)
             INNER JOIN tblRegistrationItem ON (tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID )
             INNER JOIN tblUploadedFiles ON (tblUploadedFiles.intFileID = tblDocuments.intUploadFileID )
+            LEFT JOIN tblLocalTranslations AS LT_D ON (
+                LT_D.strType = 'DOCUMENT'
+                AND LT_D.intID = tblDocumentType.intDocumentTypeID
+                AND LT_D.strLocale = '$locale'
+            )
+
         WHERE 
             strApprovalStatus IN ('APPROVED', 'PENDING')
             AND intPersonID = ?

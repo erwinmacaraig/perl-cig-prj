@@ -83,6 +83,7 @@ sub facilityFieldsSetup {
         dbh        => $Data->{'db'},
         realmID    => $Data->{'Realm'},
         subRealmID => $Data->{'RealmSubType'},
+        locale     => $Data->{'lang'}->generateLocale(),
     );
 
     my %entityTypeOptions = ();

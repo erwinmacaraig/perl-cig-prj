@@ -825,6 +825,7 @@ sub person_details {
         subRealmID => $Data->{'RealmSubType'} || $field->{'intAssocTypeID'},
         assocID    => $Data->{'clientValues'}{'assocID'},
         hideCodes  => $Data->{'SystemConfig'}{'AssocConfig'}{'hideDefCodes'},
+        locale     => $Data->{'lang'}->generateLocale(),
     );
 
     my $CustomFieldNames = CustomFields::getCustomFieldNames( $Data, $field->{'intAssocTypeID'} ) || '';

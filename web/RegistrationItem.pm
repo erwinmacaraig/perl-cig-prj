@@ -12,7 +12,6 @@ use Log;
 use Products;
 
 use Data::Dumper;
-
  
 sub getRegistrationItems    {
     my($Data, $ruleFor, $itemType, $originLevel, $regNature, $entityID, $entityLevel, $multiPersonType, $Rego_ref, $documentFor) = @_; 
@@ -57,28 +56,40 @@ sub getRegistrationItems    {
     }
     
 
+    my $locale = $Data->{'lang'}->generateLocale();
     my $st = qq[
    SELECT 
             RI.intID,
             RI.intRequired,
             RI.intUseExistingThisEntity,
             RI.intUseExistingAnyEntity,
-            D.strDocumentName,
+            COALESCE (LT_D.strString1,D.strDocumentName) as strDocumentName,
             D.strDocumentFor,
-			D.strDescription,
-            P.strName as strProductName,
-            P.strDisplayName as strProductDisplayName,
+			COALESCE(LT_D.strNote,D.strDescription) AS strDescription,
+            COALESCE (LT_P.strString1,P.strName) as strProductName,
+            COALESCE(LT_P.strString2,P.strDisplayName) as strProductDisplayName,
             TP.intTransactionID,
             RI.intItemUsingActiveFilter,
             RI.strItemActiveFilterPeriods,
             RI.intItemActive,
             RI.intItemUsingPaidProductFilter,
             RI.strItemActiveFilterPaidProducts,
-            RI.intItemPaidProducts
+            RI.intItemPaidProducts,
+strItemType
         FROM
             tblRegistrationItem as RI
             LEFT JOIN tblDocumentType as D ON (intDocumentTypeID = RI.intID and strItemType='DOCUMENT')
             LEFT JOIN tblProducts as P ON (P.intProductID= RI.intID and strItemType='PRODUCT')
+            LEFT JOIN tblLocalTranslations AS LT_P ON (
+                LT_P.strType = 'PRODUCT'
+                AND LT_P.intID = P.intProductID
+                AND LT_P.strLocale = '$locale'
+            )
+            LEFT JOIN tblLocalTranslations AS LT_D ON (
+                LT_D.strType = 'DOCUMENT'
+                AND LT_D.intID = D.intDocumentTypeID
+                AND LT_D.strLocale = '$locale'
+            )
             LEFT JOIN tblTransactions as TP ON (TP.intProductID = P.intProductID and TP.intPersonRegistrationID = ?)
         WHERE
             RI.intRealmID = ?
