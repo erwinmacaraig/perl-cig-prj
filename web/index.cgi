@@ -31,6 +31,7 @@ use LanguageChooser;
 		Lang => $lang,
         SystemConfig => $Data{'SystemConfig'},
     );
+    updateSystemConfigTranslation(\%Data);
 
     my $nav = runTemplate(\%Data, \%TemplateData, 'user/globalnav.templ',);
     my $pagebody = runTemplate(\%Data, \%TemplateData, 'user/loginform.templ',);
