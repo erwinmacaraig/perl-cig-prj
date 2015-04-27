@@ -1018,8 +1018,12 @@ sub display_products {
 
     if($regoID) {
         my $nationality = $personObj->getValue('strISONationality') || ''; 
+        my $itc = $self->getCarryFields('itc');
         $rego_ref->{'Nationality'} = $nationality;
-        $rego_ref->{'InternationalTransfer'} = 1 if $self->getCarryFields('itc');
+        $rego_ref->{'InternationalTransfer'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0;
+        $rego_ref->{'InternationalLoan'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0;
+
+
 	$rego_ref->{'payMethod'} = $self->{'RunParams'}{'payMethod'} || '';
         $content = displayRegoFlowProducts(
             $self->{'Data'}, 
@@ -1141,7 +1145,11 @@ sub process_products {
         $self->setCurrentProcessIndex('p');
         return ('',2);
     }
-    $rego_ref->{'InternationalTransfer'} = 1 if $self->getCarryFields('itc');
+    my $itc = $self->getCarryFields('itc');
+    $rego_ref->{'InternationalTransfer'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0;
+    $rego_ref->{'InternationalLoan'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0;
+
+
     my ($txnIds, $amount) = save_rego_products($self->{'Data'}, $regoID, $personID, $entityID, $entityLevel, $rego_ref, $self->{'RunParams'});
 
 ####
@@ -1276,7 +1284,10 @@ sub process_documents {
         #my $itc = $personObj->getValue('intInternationalTransfer') || '';
 	my $itc = $self->{'RunParams'}{'itc'} || 0;
         $rego_ref->{'Nationality'} = $nationality;
-        $rego_ref->{'InternationalTransfer'} = $itc;
+        $rego_ref->{'InternationalTransfer'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0;
+        $rego_ref->{'InternationalLoan'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0;
+
+
     }
 
      if (! $regoID or ! $personID)  {
