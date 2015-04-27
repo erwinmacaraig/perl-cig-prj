@@ -24,6 +24,7 @@ use TemplateEmail;
 #use RegoFormUtils;
 use ContactsObj;
 use Data::Dumper;
+use TTTemplate;
 require Products;
 require TransLog;
 require PaymentSplitMoneyLog;
@@ -972,13 +973,13 @@ sub EmailPaymentConfirmation	{
 	}
 
 	my %TransData = (
-		ReceiptHeader    => $Data->{'SystemConfig'}{'paymentReceiptHeaderHTML'} || '',
+		#ReceiptHeader    => $Data->{'SystemConfig'}{'paymentReceiptHeaderHTML'} || '',
 		TotalAmount      => $tref->{'intAmount'},
 		BankRef          => $tref->{'strTXN'} || '',
 		PaymentID        => $tref->{'intLogID'},
 		DatePurchased    => $tref->{'dateLog'},
 		Transactions     => \@txns,
-		ReceiptFooter    => $Data->{'SystemConfig'}{'paymentReceiptFooterHTML'} || '',
+		#ReceiptFooter    => $Data->{'SystemConfig'}{'paymentReceiptFooterHTML'} || '',
 		PaymentAssocType => $Data->{'SystemConfig'}{'paymentAssocType'} || '',
 		DollarSymbol     => $Data->{'SystemConfig'}{'DollarSymbol'} || "\$",
 	);
@@ -1017,20 +1018,35 @@ sub EmailPaymentConfirmation	{
 
 			$TransData{'OrgName'} = $orgname || '';
 			$paymentSettings->{notification_address} =$dref->{'PaymentNotificationAddress'} || $paymentSettings->{notification_address};
-
+			
 		}
 		$Data->{'SystemConfig'}=getSystemConfig($Data);
 	}
+	my $templateWrapper = $Data->{'SystemConfig'}{'EmailNotificationWrapperTemplate'};
+	my $content = runTemplate(
+	      			  $Data,
+	       			 \%TransData,
+	                 'emails/payments/payment_receipt.templ',
+   			);
+
+	my %emailTemplateContent = (
+        content => $content,
+        MA_PhoneNumber => $Data->{'SystemConfig'}{'ma_phone_number'},
+        MA_HelpDeskPhone => $Data->{'SystemConfig'}{'help_desk_phone_number'},
+        MA_HelpDeskEmail => $Data->{'SystemConfig'}{'help_desk_email'},
+        MA_Website => $Data->{'SystemConfig'}{'ma_website'},
+        MA_HeaderName => $Data->{'SystemConfig'}{'EmailNotificationSysName'},
+    );
 	sendTemplateEmail(
-        $Data,
-        'payments/payment_receipt.templ',
-        \%TransData,
+		$Data,
+		$templateWrapper,
+		\%emailTemplateContent,
         $to_address,
         'Payment Received',
         $paymentSettings->{'notification_address'},
         $cc_address,
         $bcc_address,
-    ) ;
+	);
 	
 	
 	return 1;
