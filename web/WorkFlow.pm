@@ -4615,8 +4615,8 @@ sub getRegistrationWorkTasks {
         my %taskhistory = (
             TaskID => $tdref->{'intWFTaskID'},
             TaskType => $taskType,
-            ApprovalEntity => $approvalEntity->name(),
-            ProblemResolutionEntity => $problemResolutionEntity->name(),
+            ApprovalEntity => $approvalEntity ? $approvalEntity->name() : $Data->{'lang'}->txt("N/A"),
+            ProblemResolutionEntity => $problemResolutionEntity ? $problemResolutionEntity->name() : $Data->{'lang'}->txt("N/A"),
             TaskNotes => $workTaskNotes->{'TaskNotes'},
             NotesBlock => $notesBlock,
         );
