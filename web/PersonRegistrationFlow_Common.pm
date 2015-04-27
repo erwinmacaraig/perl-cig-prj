@@ -275,7 +275,7 @@ sub displayRegoFlowSummary {
         tblDocuments.intDocumentTypeID as ID,  
         tblUploadedFiles.strOrigFilename,
         tblUploadedFiles.intFileID,
-        tblDocumentType.strDocumentName as Name
+        tblDocumentType.strDocumentName as Name,
         COALESCE (LT_D.strString1,tblDocumentType.strDocumentName) as Name
         FROM tblDocuments
         INNER JOIN tblDocumentType

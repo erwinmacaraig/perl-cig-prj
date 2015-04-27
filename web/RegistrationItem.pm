@@ -16,6 +16,8 @@ use Data::Dumper;
 sub getRegistrationItems    {
     my($Data, $ruleFor, $itemType, $originLevel, $regNature, $entityID, $entityLevel, $multiPersonType, $Rego_ref, $documentFor) = @_; 
 
+
+
     my $entityLevel_sent = $entityLevel;
     my $regNature_sent = $regNature;
     my $personType = $Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '';
