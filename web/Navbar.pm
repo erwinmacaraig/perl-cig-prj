@@ -1133,15 +1133,17 @@ sub getPersonMenuData {
 
     my $txns_link_name = $lang->txt('Transactions');
     if($SystemConfig->{'AllowTXNs'}) {
-       $menuoptions{'transactions'} = {
+        $menuoptions{'transactions'} = {
 		   name => $lang->txt('List Transactions'),
            url => $baseurl."a=P_TXNLog_list",
-       };
+        };
 	   
-	   $menuoptions{'addtransactions'} = {
-		   name => $lang->txt('Add Transactions'),
-           url => $baseurl."a=P_TXN_ADD",
-       };
+        if ($SystemConfig->{'AddTXN_MinLevel'} >= $Data->{'clientValues'}{'authLevel'})  {
+	        $menuoptions{'addtransactions'} = {
+		        name => $lang->txt('Add Transactions'),
+                url => $baseurl."a=P_TXN_ADD",
+            };
+        }
     }
     $menuoptions{'docs'} = {
        url => $baseurl."a=P_DOCS",
