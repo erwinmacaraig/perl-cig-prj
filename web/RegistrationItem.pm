@@ -321,6 +321,7 @@ sub registrationItemActiveProducts  {
             intStatus IN ($Defs::TXN_PAID, $Defs::TXN_HOLD)
             AND intTableType = $Defs::LEVEL_PERSON
             AND intID = ?
+            AND curAmount > 0
     ];
     my $qryProducts= $Data->{'db'}->prepare($stProds) or query_error($stProds);
     $qryProducts->execute(
