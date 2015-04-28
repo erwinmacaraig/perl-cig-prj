@@ -9,4 +9,4 @@ CREATE TABLE tblLocalTranslations (
     strNote TEXT,
 
     PRIMARY KEY (strType, strLocale, intID)
-);
+) DEFAULT CHARSET=utf8;
