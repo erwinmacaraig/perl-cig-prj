@@ -1138,7 +1138,7 @@ sub getPersonMenuData {
            url => $baseurl."a=P_TXNLog_list",
         };
 	   
-        if ($SystemConfig->{'AddTXN_MinLevel'} >= $Data->{'clientValues'}{'authLevel'})  {
+        if ($Data->{'clientValues'}{'authLevel'} >= $SystemConfig->{'AddTXN_MinLevel'}) {
 	        $menuoptions{'addtransactions'} = {
 		        name => $lang->txt('Add Transactions'),
                 url => $baseurl."a=P_TXN_ADD",
