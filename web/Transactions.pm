@@ -226,6 +226,10 @@ sub displayTransaction	{
 		GROUP BY T.intTransactionID
 	];
 	#AND T.intTableType=$Data->{'clientValues'}{'currentLevel'} 
+	#
+		open FH, ">dumpfile.txt";
+		print FH $statement;
+	#
 
 	
 	my $query = $db->prepare($statement);
