@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-04-27 10:59+1000\n"
+"POT-Creation-Date: 2015-04-28 14:25+1000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Warren Rodie <w.rodie@sportingpulseinternational.com>\n"
 "Language-Team: \n"
@@ -818,7 +818,7 @@ msgstr "Non indiqué"
 msgid "Normal"
 msgstr ""
 
-#: Person FieldLabels web/Transactions.pm Line:389 web/ListTransactions.pm
+#: Person FieldLabels web/Transactions.pm Line:390 web/ListTransactions.pm
 #: Line:133 web/Reports/ReportAdvanced_MyPeople.pm Line:1210
 #: web/Reports/ReportAdvanced_BelowPeople.pm
 #: templates/txn_receipt/fnswreceipt.templ Line:77
@@ -1648,8 +1648,8 @@ msgstr ""
 #: web/Club.pm Line:821 Line:878 Line:927 web/Entity.pm Line:425 Line:481
 #: web/PendingRegistrations.pm Line:315 web/Products.pm Line:328
 #: web/ListTransactions.pm Line:41 web/PersonRequest.pm Line:849
-#: web/Payments.pm Line:314 web/Venues.pm Line:802 web/EntityIdentifier.pm
-#: Line:331 web/IncompleteRegistrations.pm Line:280 web/TransLog.pm Line:2209
+#: web/Payments.pm web/Venues.pm Line:802 web/EntityIdentifier.pm Line:331
+#: web/IncompleteRegistrations.pm Line:280 web/TransLog.pm Line:2209
 #: web/PaymentSplit/PaymentSplitList.pm Line:62
 #: templates/search/grid/personregistration.templ Line:7
 #: templates/registration/master.products.templ Line:20
@@ -1725,7 +1725,7 @@ msgid "Problem Resolution"
 msgstr "Résolution des Doublons"
 
 #: web/WorkFlow.pm Line:2848 web/Person.pm Line:290 web/Transactions.pm
-#: Line:396 web/Flow_PersonBackend.pm Line:48 Line:78
+#: Line:397 web/Flow_PersonBackend.pm Line:48 Line:78
 #: web/Flow_TransferBackend.pm Line:79 templates/registration/what.templ
 #: Line:26
 #, fuzzy
@@ -2167,7 +2167,7 @@ msgstr ""
 msgid "Optional. Not Provided"
 msgstr ""
 
-#: web/Person.pm Line:226 web/Navbar.pm Line:1182
+#: web/Person.pm Line:226 web/Navbar.pm Line:1184
 #, fuzzy
 msgid "Player Passport"
 msgstr "Their Password"
@@ -2195,7 +2195,7 @@ msgid "Registration Form"
 msgstr "Registration Number"
 
 #: web/Person.pm Line:170 Line:176 Line:269 web/PendingRegistrations.pm
-#: Line:177 web/Navbar.pm Line:1168 templates/selfrego/home.templ Line:20
+#: Line:177 web/Navbar.pm Line:1170 templates/selfrego/home.templ Line:20
 #, fuzzy
 msgid "Registration History"
 msgstr "Registration Number"
@@ -2263,7 +2263,7 @@ msgstr "Mai"
 msgid "Dec"
 msgstr "Déc"
 
-#: web/Entity.pm Line:337 web/Transactions.pm Line:454
+#: web/Entity.pm Line:337 web/Transactions.pm Line:455
 #: templates/dashboards/entity.templ Line:9 templates/dashboards/club.templ
 #: Line:4
 msgid "Details"
@@ -2502,7 +2502,7 @@ msgstr "Cliquez ici pour résoudre."
 msgid "Comments"
 msgstr "Communicator"
 
-#: web/EntityDocuments.pm Line:321 Line:372 web/Transactions.pm Line:656
+#: web/EntityDocuments.pm Line:321 Line:372 web/Transactions.pm Line:657
 #: web/Documents.pm Line:137 Line:144 Line:348 web/PersonRequest.pm Line:1901
 #: templates/registration/product_flow_backend.templ Line:43
 #: templates/registration/certificate_flow_backend.templ Line:72
@@ -2515,7 +2515,7 @@ msgstr "Communicator"
 msgid "Continue"
 msgstr ""
 
-#: web/PayInvoice.pm Line:396 Line:680 web/Transactions.pm Line:338
+#: web/PayInvoice.pm Line:396 Line:680 web/Transactions.pm Line:339
 #: web/TransLog.pm Line:410 Line:679 Line:1073
 #, fuzzy
 msgid "Date Paid"
@@ -2527,7 +2527,7 @@ msgstr "Date d'ajout"
 msgid "Delete"
 msgstr "Effacer"
 
-#: web/EntityDocuments.pm Line:155 web/Navbar.pm Line:1190
+#: web/EntityDocuments.pm Line:155 web/Navbar.pm Line:1192
 #: web/Flow_PersonBackend.pm Line:105 web/Flow_ClubBackend.pm Line:84
 #: web/Flow_TransferBackend.pm Line:89 web/Flow_FacilityBackend.pm Line:90
 #: web/FacilityEdit.pm Line:204 templates/dashboards/personregistration.templ
@@ -2586,7 +2586,7 @@ msgstr "Nombre incorrect"
 msgid "Invoice Number"
 msgstr "Nombre incorrect"
 
-#: web/PayInvoice.pm Line:306 Line:590 web/Payments.pm Line:313
+#: web/PayInvoice.pm Line:306 Line:590 web/Payments.pm Line:314
 #: web/TransLog.pm Line:663 Line:1644 Line:1922 Line:2071
 #: templates/txn_receipt/fnswreceipt.templ Line:62
 #: templates/payment/invoicetemplate.templ Line:55
@@ -2643,7 +2643,7 @@ msgstr "Identifications"
 msgid "Print Receipt"
 msgstr "View Receipt"
 
-#: web/PayInvoice.pm Line:314 Line:598 web/Transactions.pm Line:352
+#: web/PayInvoice.pm Line:314 Line:598 web/Transactions.pm Line:353
 #: web/ListTransactions.pm Line:113 web/TransLog.pm Line:667 Line:1646
 #: Line:1924 Line:2072 web/Reports/ReportAdvanced_MyPeople.pm Line:1413
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1463
@@ -2693,30 +2693,30 @@ msgstr ""
 msgid "or"
 msgstr "ou"
 
-#: web/Transactions.pm Line:367
+#: web/Transactions.pm Line:368
 msgid "Amount Already Paid via Part Payments"
 msgstr ""
 
-#: web/Transactions.pm Line:359 web/ListTransactions.pm Line:37
+#: web/Transactions.pm Line:360 web/ListTransactions.pm Line:37
 #: templates/registration/summarybulk.templ Line:14
 #, fuzzy
 msgid "Amount Due"
 msgstr "Amount"
 
-#: web/Transactions.pm Line:465
+#: web/Transactions.pm Line:466
 msgid "Click to View Part Payment form"
 msgstr ""
 
-#: web/Transactions.pm Line:332
+#: web/Transactions.pm Line:333
 #, fuzzy
 msgid "Delivered"
 msgstr "Deregistered"
 
-#: web/Transactions.pm Line:473
+#: web/Transactions.pm Line:474
 msgid "Edit Details"
 msgstr "Modifier les détails"
 
-#: web/Transactions.pm Line:382 web/ListTransactions.pm Line:129
+#: web/Transactions.pm Line:383 web/ListTransactions.pm Line:129
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1523
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1573
 msgid "End Date"
@@ -2756,36 +2756,36 @@ msgstr ""
 msgid "List Transactions"
 msgstr "Liste des rapports de paiement"
 
-#: web/Transactions.pm Line:477
+#: web/Transactions.pm Line:478
 msgid "No Transaction were found."
 msgstr ""
 
-#: web/Transactions.pm Line:325
+#: web/Transactions.pm Line:326
 msgid "Paid ?"
 msgstr ""
 
-#: web/Transactions.pm Line:345
+#: web/Transactions.pm Line:346
 #, fuzzy
 msgid "Part Payment for"
 msgstr "Liste des rapports de paiement"
 
-#: web/Transactions.pm Line:405 web/Reports/ReportAdvanced_MyPeople.pm
+#: web/Transactions.pm Line:406 web/Reports/ReportAdvanced_MyPeople.pm
 #: Line:1378 web/Reports/ReportAdvanced_BelowPeople.pm Line:1428
 #: templates/workflow/generic/payment.templ Line:11
 #, fuzzy
 msgid "Product"
 msgstr "Produits"
 
-#: web/Transactions.pm Line:450
+#: web/Transactions.pm Line:451
 #, fuzzy
 msgid "Record added successfully"
 msgstr "Record added successfully"
 
-#: web/Transactions.pm Line:468
+#: web/Transactions.pm Line:469
 msgid "Record locked until Payment Gateway responds"
 msgstr ""
 
-#: web/Transactions.pm Line:446
+#: web/Transactions.pm Line:447
 #, fuzzy
 msgid "Record updated successfully"
 msgstr "[_1] a été a mis à jour avec succès"
@@ -2795,7 +2795,7 @@ msgstr "[_1] a été a mis à jour avec succès"
 msgid "Return to Invoices"
 msgstr "Nombre incorrect"
 
-#: web/Transactions.pm Line:447 Line:451
+#: web/Transactions.pm Line:448 Line:452
 msgid "Return to Transaction"
 msgstr ""
 
@@ -2806,17 +2806,17 @@ msgstr ""
 msgid "Save"
 msgstr "Enregistrer"
 
-#: web/Transactions.pm Line:410
+#: web/Transactions.pm Line:411
 #, fuzzy
 msgid "Select Product"
 msgstr "Produits"
 
-#: web/Transactions.pm Line:401
+#: web/Transactions.pm Line:402
 #, fuzzy
 msgid "Select Registration"
 msgstr "Coach Registration No."
 
-#: web/Transactions.pm Line:376 web/ListTransactions.pm Line:125
+#: web/Transactions.pm Line:377 web/ListTransactions.pm Line:125
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1512
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1562
 msgid "Start Date"
@@ -2836,13 +2836,13 @@ msgstr "Organisation"
 msgid "Transaction has been deleted"
 msgstr "Registration Number"
 
-#: web/Transactions.pm Line:112 web/Navbar.pm Line:721 Line:1134 Line:1183
+#: web/Transactions.pm Line:112 web/Navbar.pm Line:721 Line:1134 Line:1185
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1791
 #, fuzzy
 msgid "Transactions"
 msgstr "Organisation"
 
-#: web/Transactions.pm Line:420
+#: web/Transactions.pm Line:421
 #, fuzzy
 msgid "Update Transaction"
 msgstr "Toute Organisation"
@@ -2870,7 +2870,7 @@ msgstr ""
 msgid "Approx. Time"
 msgstr "Temps Approximatif"
 
-#: web/ListAuditLog.pm Line:92 web/Navbar.pm Line:743 Line:907 Line:1163
+#: web/ListAuditLog.pm Line:92 web/Navbar.pm Line:743 Line:907 Line:1165
 #: web/FacilityEdit.pm Line:236 Line:237 Line:240
 #, fuzzy
 msgid "Audit Trail"
@@ -3025,7 +3025,7 @@ msgstr ""
 msgid "Add Team Official"
 msgstr "Officiel de Match?"
 
-#: web/Navbar.pm Line:1142
+#: web/Navbar.pm Line:1143
 #, fuzzy
 msgid "Add Transactions"
 msgstr "Toute Organisation"
@@ -3062,7 +3062,7 @@ msgstr ""
 msgid "Card Printing"
 msgstr "Cartes imprimées"
 
-#: web/Navbar.pm Line:1184 templates/person/list.templ Line:11
+#: web/Navbar.pm Line:1186 templates/person/list.templ Line:11
 #, fuzzy
 msgid "Certificates"
 msgstr "Identifications"
@@ -3100,7 +3100,7 @@ msgstr "Résolution des Doublons"
 msgid "Edit Photo"
 msgstr "Ajouter une photo"
 
-#: web/Navbar.pm Line:1185
+#: web/Navbar.pm Line:1187
 msgid "History"
 msgstr ""
 
@@ -3189,7 +3189,7 @@ msgstr "Coach Registration No."
 msgid "People"
 msgstr ""
 
-#: web/Navbar.pm Line:1117 Line:1181
+#: web/Navbar.pm Line:1117 Line:1183
 #, fuzzy
 msgid "Person Dashboard"
 msgstr "Informations personnelles"
@@ -3244,12 +3244,12 @@ msgstr ""
 msgid "States"
 msgstr "Etats"
 
-#: web/Navbar.pm Line:508 Line:925 Line:1193
+#: web/Navbar.pm Line:508 Line:925 Line:1195
 #, fuzzy
 msgid "System"
 msgstr "Numéro d'identification du système"
 
-#: web/Navbar.pm Line:1173 Line:1192
+#: web/Navbar.pm Line:1175 Line:1194
 msgid "Transfer History"
 msgstr ""
 
@@ -3466,7 +3466,7 @@ msgid ""
 "Please check that this player has not been registered with another club?"
 msgstr ""
 
-#: web/Products.pm Line:332 web/Payments.pm Line:315
+#: web/Products.pm Line:332 web/Payments.pm Line:316
 msgid "Price"
 msgstr ""
 
@@ -3756,7 +3756,7 @@ msgstr ""
 msgid "Confirm Transfer Registration"
 msgstr "Coach Registration No."
 
-#: web/Payments.pm Line:661
+#: web/Payments.pm Line:662
 msgid "Congratulations your payment has been successful"
 msgstr ""
 
@@ -3829,7 +3829,7 @@ msgstr ""
 msgid "Person Request not found."
 msgstr ""
 
-#: web/Payments.pm Line:347
+#: web/Payments.pm Line:348
 msgid ""
 "Please confirm the details above, then click the <b>Pay Now</b> button to "
 "make an online payment"
@@ -3934,7 +3934,7 @@ msgstr ""
 msgid "Summary and Submission"
 msgstr ""
 
-#: web/Payments.pm Line:321 templates/registration/products.templ Line:106
+#: web/Payments.pm Line:322 templates/registration/products.templ Line:106
 #: templates/registration/summary.templ Line:72
 #: templates/registration/summarybulk.templ Line:53
 #: templates/payment/txn_list.templ Line:19 templates/flow/club_summary.templ
@@ -3942,7 +3942,7 @@ msgstr ""
 msgid "Total"
 msgstr ""
 
-#: web/Payments.pm Line:312 web/TransLog.pm Line:644 Line:1643 Line:1921
+#: web/Payments.pm Line:313 web/TransLog.pm Line:644 Line:1643 Line:1921
 #: Line:2070 templates/payment/invoicetemplate.templ Line:54
 #: templates/payment/txn_list.templ Line:4
 #: templates/workflow/generic/payment.templ Line:8
@@ -3972,11 +3972,11 @@ msgstr ""
 msgid "View pending"
 msgstr "View Type"
 
-#: web/Payments.pm Line:255
+#: web/Payments.pm Line:256
 msgid "We Accept"
 msgstr ""
 
-#: web/Payments.pm Line:671 templates/registration/complete_sr.templ Line:37
+#: web/Payments.pm Line:672 templates/registration/complete_sr.templ Line:37
 #: templates/registration/complete.templ Line:38
 msgid "We are sorry, there was a problem with your payment."
 msgstr ""
@@ -3990,7 +3990,7 @@ msgstr ""
 msgid "You will be notified once the transfer is effective and approved by "
 msgstr ""
 
-#: web/Payments.pm Line:667
+#: web/Payments.pm Line:668
 msgid "Your payment has been put on Hold"
 msgstr ""
 
