@@ -159,7 +159,7 @@ header .logo-area {
 }
 
 header .logo-area.notloginlevel    {
-    margin-top:0px;
+    margin: 30px 0 -20px 0;
 }
 #pageholder #contentholder {
     background-color: #fff;
@@ -2343,7 +2343,7 @@ header .navbar-brand {
   #worktasks tr td a.btn-inside-panels { font-size: 11px; }
   #worktasks #toggleGd_intTaskType a { font-size: 12px; }
   .utilities { display: none; }
-  .logo-area { display: none; }
+  /*.logo-area { display: none; }*/
   .dataTables_info, .dataTables_length, .order-override { display: none; }
 	div#worktasks_filter {
 	    background-color: #1870a5;
