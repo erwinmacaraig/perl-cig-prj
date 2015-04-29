@@ -56,7 +56,14 @@ sub getRegistrationItems    {
         #If switched on, lets pre-build up Active Results
         $ActiveProductsFilter_ref = registrationItemActiveProducts($Data, $Rego_ref->{'intPersonID'}, $regNature, $personType);
     }
+
+    my $regNature2 = $regNature;
+    my $sysConfigCheck = "RegistrationItems_TransferUsesNew";
+    if ($regNature eq "TRANSFER" and $Data->{'SystemConfig'}{"RegistrationItems_TransferUsesNew"})  {
+        $regNature2 = 'NEW';
+    }
     
+print STDERR "D: $regNature | $regNature2\n";
 
     my $locale = $Data->{'lang'}->generateLocale();
     my $st = qq[
@@ -98,7 +105,7 @@ strItemType
             AND RI.intSubRealmID IN (0, ?)
             AND RI.strRuleFor = ?
             AND RI.intOriginLevel IN (99, ?)
-	    AND RI.strRegistrationNature = ?
+	    AND RI.strRegistrationNature IN (?, ?)
             AND RI.strEntityType IN ('', ?)
             AND RI.intEntityLevel IN (0, 99, ?)
 	    AND RI.strPersonType IN ('', ?)
@@ -124,6 +131,7 @@ strItemType
 	        $ruleFor,
 	        $originLevel,
 		    $regNature,
+		    $regNature2,
 	        $Rego_ref->{'strEntityType'} || $Rego_ref->{'entityType'} || '',
 	        $entityLevel,
 		    $Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '',
