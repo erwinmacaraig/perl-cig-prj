@@ -51,7 +51,7 @@ sub _getConfiguration {
     my $PRtablename = "tblPersonRegistration_$Data->{'Realm'}";
     my $txn_WHERE = '';
     if ( $clientValues->{clubID} and $clientValues->{clubID} > 0 ) {
-        $txn_WHERE = qq[ AND TX.intTXNClubID IN (0, $clientValues->{clubID})];
+        $txn_WHERE = qq[ AND TX.intTXNEntityID IN (0, $clientValues->{clubID})];
     }
 
     my $lang = $Data->{'lang'};
@@ -1247,56 +1247,6 @@ sub _getConfiguration {
 
             #Affilitations
 
-              strClubNumber => [
-                (
-                    (
-                        (
-                                !$SystemConfig->{'NoClubs'}
-                              or $Data->{'Permissions'}
-                              {$Defs::CONFIG_OTHEROPTIONS}{'ShowClubs'}
-                        )
-                          and $currentLevel == $Defs::LEVEL_CLUB
-                    )
-                    ? $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}
-                      . ' Default Number'
-                    : ''
-                ),
-                {
-                    displaytype => 'text',
-                    fieldtype   => 'text',
-                    allowsort   => 1,
-                    dbfield     => "CMSPN.strJumperNum",
-                    dbfrom =>
-" LEFT JOIN tblCompMatchSelectedPlayerNumbers CMSPN ON (CMSPN.intClubID=tblPerson_Clubs.intClubID and CMSPN.intPersonID=tblPerson_Clubs.intPersonID and CMSPN.intMatchID=-1 AND (CMSPN.intTeamID=-1 or CMSPN.intTeamID=0))",
-                    optiongroup   => 'otherfields',
-                    allowgrouping => 1,
-                }
-              ],
-
-              strClubName => [
-                (
-                    (
-                        (
-                                !$SystemConfig->{'NoClubs'}
-                              or $Data->{'Permissions'}
-                              {$Defs::CONFIG_OTHEROPTIONS}{'ShowClubs'}
-                        )
-                          and $currentLevel > $Defs::LEVEL_CLUB
-                    ) ? $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} . ' Name' : ''
-                ),
-                {
-                    displaytype => 'text',
-                    fieldtype   => 'text',
-                    allowsort   => 1,
-                    dbfield     => "C.strName",
-                    dbfrom =>
-"LEFT JOIN tblPerson_Clubs ON (tblPerson.intPersonID=tblPerson_Clubs.intPersonID  AND tblPerson_Clubs.intStatus=$Defs::RECSTATUS_ACTIVE) LEFT JOIN tblClub as C ON (C.intClubID=tblPerson_Clubs.intClubID ) LEFT JOIN tblAssoc_Clubs as AC ON (AC.intAssocID=tblAssoc.intAssocID AND AC.intClubID=C.intClubID)",
-                    optiongroup   => 'affiliations',
-                    allowgrouping => 1,
-                    dbwhere => 
-" AND (AC.intAssocID = tblAssoc.intAssocID OR tblPerson_Clubs.intPersonID IS NULL) AND (($PRtablename.intEntityID=C.intClubID AND $PRtablename.intEntityTypeID= $Defs::LEVEL_CLUB) or tblPerson_Clubs.intPersonID IS NULL)",
-                }
-              ],
               strZoneName => [
                 (
                       $currentLevel > $Defs::LEVEL_ZONE
@@ -1609,7 +1559,7 @@ sub _getConfiguration {
                     dbfield     => 'TL.strComments'
                 }
               ],
-              ClubPaymentID => [
+              EntityPaymentID => [
                 $SystemConfig->{'AllowTXNrpts'}
                 ? qq[$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Payment for]
                 : '',
@@ -1617,9 +1567,9 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     optiongroup => 'transactions',
-                    dbfield     => 'PaymentClub.strName',
+                    dbfield     => 'PaymentEntity.strLocalName',
                     dbfrom =>
-"LEFT JOIN tblClub as PaymentClub ON (PaymentClub.intClubID=intClubPaymentID)"
+"LEFT JOIN tblEntity as PaymentEntity ON (PaymentEntity.intEntityID=intEntityPaymentID)"
                 }
               ],
 
@@ -1763,7 +1713,7 @@ sub _getConfiguration {
               dtSettlement
               dtStart
               dtEnd
-              ClubPaymentID
+              EntityPaymentID
               strMemberRecordTypeList
               dtMemberRecordIn
               )
@@ -1791,7 +1741,7 @@ sub _getConfiguration {
                 $lang->txt('Transactions'),
                 {
                     from =>
-"LEFT JOIN tblTransactions AS TX ON (TX.intStatus<>-1 AND NOT (TX.intStatus IN (0,-1)) AND tblPerson.intPersonID=TX.intID AND TX.intTableType =1 AND TX.intAssocID = tblPerson_Associations.intAssocID $txn_WHERE) LEFT JOIN tblTransLog as TL ON (TL.intLogID = TX.intTransLogID)",
+"LEFT JOIN tblTransactions AS TX ON (TX.intStatus<>-1 AND NOT (TX.intStatus IN (0,-1)) AND tblPerson.intPersonID=TX.intID AND TX.intTableType =1 $txn_WHERE) LEFT JOIN tblTransLog as TL ON (TL.intLogID = TX.intTransLogID)",
                 }
             ],
           },

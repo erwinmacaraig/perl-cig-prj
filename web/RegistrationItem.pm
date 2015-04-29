@@ -56,7 +56,18 @@ sub getRegistrationItems    {
         #If switched on, lets pre-build up Active Results
         $ActiveProductsFilter_ref = registrationItemActiveProducts($Data, $Rego_ref->{'intPersonID'}, $regNature, $personType);
     }
+
+    my $regNature2 = $regNature;
+    my $sysConfigCheck = "RegistrationItems_TransferUsesNew";
+    if ($itemType eq 'PRODUCT' and $regNature eq "TRANSFER" and $Data->{'SystemConfig'}{"RegistrationItems_TransferUsesNew"} == 1)  {
+        $regNature2 = 'NEW';
+        my $sysConfigActiveProductsFilter = 'ACTIVEPRODUCTS_' . $itemType . '_TRANSFER_' . $personType;
+        if ($Data->{'SystemConfig'}{$sysConfigActiveProductsFilter} && $Rego_ref->{'intPersonID'})    {
+            $ActiveProductsFilter_ref = registrationItemActiveProducts($Data, $Rego_ref->{'intPersonID'}, $regNature2, $personType);
+        }
+    }
     
+print STDERR "D: $regNature | $regNature2\n";
 
     my $locale = $Data->{'lang'}->generateLocale();
     my $st = qq[
@@ -98,7 +109,7 @@ strItemType
             AND RI.intSubRealmID IN (0, ?)
             AND RI.strRuleFor = ?
             AND RI.intOriginLevel IN (99, ?)
-	    AND RI.strRegistrationNature = ?
+	    AND RI.strRegistrationNature IN (?, ?)
             AND RI.strEntityType IN ('', ?)
             AND RI.intEntityLevel IN (0, 99, ?)
 	    AND RI.strPersonType IN ('', ?)
@@ -124,6 +135,7 @@ strItemType
 	        $ruleFor,
 	        $originLevel,
 		    $regNature,
+		    $regNature2,
 	        $Rego_ref->{'strEntityType'} || $Rego_ref->{'entityType'} || '',
 	        $entityLevel,
 		    $Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '',
@@ -321,6 +333,7 @@ sub registrationItemActiveProducts  {
             intStatus IN ($Defs::TXN_PAID, $Defs::TXN_HOLD)
             AND intTableType = $Defs::LEVEL_PERSON
             AND intID = ?
+            AND curAmount > 0
     ];
     my $qryProducts= $Data->{'db'}->prepare($stProds) or query_error($stProds);
     $qryProducts->execute(
