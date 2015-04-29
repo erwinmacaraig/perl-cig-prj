@@ -1036,6 +1036,7 @@ sub EmailPaymentConfirmation	{
         MA_HelpDeskEmail => $Data->{'SystemConfig'}{'help_desk_email'},
         MA_Website => $Data->{'SystemConfig'}{'ma_website'},
         MA_HeaderName => $Data->{'SystemConfig'}{'EmailNotificationSysName'},
+		MA_PhoneNumber => $Data->{'SystemConfig'}{'ma_phone_number'},
     );
 	sendTemplateEmail(
 		$Data,
