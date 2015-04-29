@@ -61,6 +61,10 @@ sub getRegistrationItems    {
     my $sysConfigCheck = "RegistrationItems_TransferUsesNew";
     if ($itemType eq 'PRODUCT' and $regNature eq "TRANSFER" and $Data->{'SystemConfig'}{"RegistrationItems_TransferUsesNew"} == 1)  {
         $regNature2 = 'NEW';
+        my $sysConfigActiveProductsFilter = 'ACTIVEPRODUCTS_' . $itemType . '_TRANSFER_' . $personType;
+        if ($Data->{'SystemConfig'}{$sysConfigActiveProductsFilter} && $Rego_ref->{'intPersonID'})    {
+            $ActiveProductsFilter_ref = registrationItemActiveProducts($Data, $Rego_ref->{'intPersonID'}, $regNature2, $personType);
+        }
     }
     
 print STDERR "D: $regNature | $regNature2\n";

@@ -2236,10 +2236,11 @@ sub listTransLog	{
 sub checkPersonTransactionStatus {
 	my ($Data, $db, $entityID, $personID) = @_;
 	#check for unpaid transactions
-	my $sql = qq[SELECT count(intTransactionID) as total FROM tblTransactions WHERE intID = ? AND  dtPaid IS NULL  AND intTXNEntityID = ? AND intTransLogID = 0];
+	my $sql = qq[SELECT count(intTransactionID) as total FROM tblTransactions as T INNER JOIN tblEntity as E ON (T.intTXNEntityID = E.intEntityID) WHERE intID = ? AND  dtPaid IS NULL  AND intTransLogID = 0 and E.intEntityLevel <= $Data->{'clientValues'}{'authLevel'}];
 
 	my $sth = $db->prepare($sql);
-	$sth->execute($personID,$entityID);
+	#$sth->execute($entityID, $personID);
+	$sth->execute($personID);
 
 	my $dref = $sth->fetchrow_hashref();
 	
