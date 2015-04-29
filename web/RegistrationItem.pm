@@ -59,7 +59,7 @@ sub getRegistrationItems    {
 
     my $regNature2 = $regNature;
     my $sysConfigCheck = "RegistrationItems_TransferUsesNew";
-    if ($regNature eq "TRANSFER" and $Data->{'SystemConfig'}{"RegistrationItems_TransferUsesNew"})  {
+    if ($itemType eq 'PRODUCT' and $regNature eq "TRANSFER" and $Data->{'SystemConfig'}{"RegistrationItems_TransferUsesNew"} == 1)  {
         $regNature2 = 'NEW';
     }
     
