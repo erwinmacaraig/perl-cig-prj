@@ -543,8 +543,8 @@ th {
 }
 @media only screen and (max-width:768px){
   header nav.navbar-default .container ul li a.selected {
-    background-color: #e3e3e3;
-    color: #000;
+    /*background-color: #e3e3e3;*/
+    /*color: #000;*/
   }
   .res-table {
     width: inherit!important;

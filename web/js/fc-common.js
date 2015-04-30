@@ -323,7 +323,7 @@ jQuery(document).ready(function(){
             $(".navbar-fixed-top").animate({
                 'margin-left':'0'
             })
-            $(".header ,.clearfix.navbar.navbar-default").animate({
+            $(".header").animate({
                 "margin-left": "72%"
             })
             $(".navmenu-fixed-left").addClass("opend")

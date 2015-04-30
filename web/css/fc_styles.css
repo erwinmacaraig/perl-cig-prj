@@ -2256,7 +2256,12 @@ header .navbar-brand {
   .navbar-collapse { border-top: none; box-shadow: none; }
   header .navbar {padding-left: 0px;}
   header nav ul#menu li ul li a { font-size: 12px; }
-  .navbar-default .navbar-nav > li > a { font-size: 13px; }
+  .navbar-default .navbar-nav > li > a {
+   	font-size: 13px; 
+   	background-color: #333;
+  	color: #7d7d7d;
+  	border-bottom: 1px solid #383838;
+	}
   .dashboard-tasklist td { padding: 10px; }
   td { font-size: 12px; }
   #worktasks tr td a.btn-inside-panels { font-size: 11px; }
@@ -2330,7 +2335,7 @@ header .navbar-brand {
   .row { margin-bottom: -18px; }
   #spmain-navbar-collapse {overflow-y: hidden; margin-bottom: 10px;}
   .navbar-collapse { border-top: none; box-shadow: none; }
-  header .navbar {padding-left: 0px;}
+  header .navbar {padding-left: 0px;width: 100%}
   header nav ul#menu li a {background-color: #333;color: #7d7d7d; border-bottom: 1px solid #383838; }
   header nav ul#menu li ul li a {background-color: #c7c5c5;color: #333;}
   ul#menu li:hover > ul {position: unset;}
