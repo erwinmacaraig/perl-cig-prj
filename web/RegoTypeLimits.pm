@@ -176,7 +176,10 @@ sub checkRegoTypeLimits    {
             push @PErowValues, $dref->{'strAgeLevel'};
         }
         #$stPErow .= qq[GROUP BY intEntityID, strPersonType, strSport];
-        $stPErow .= qq[GROUP BY PR.intEntityID, PR.strSport];
+        $stPErow .= qq[GROUP BY PR.intEntityID, PR.strPersonType];
+        $stPErow .= qq[, PR.strSport] if ($dref->{'strSport'} and $dref->{'strSport'} ne '');
+        $stPErow .= qq[, PR.strPersonLevel] if (defined $dref->{'strPersonLevel'} and $dref->{'strPersonLevel'} ne '');
+        $stPErow .= qq[, PR.strAgeLevel] if (defined $dref->{'strAgeLevel'} and $dref->{'strAgeLevel'} ne '');
 
         if ($dref->{'strLimitType'} eq 'PERSONENTITY_UNIQUE')  {
             ## Only runs on PersonType & Sport
