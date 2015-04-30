@@ -43,3 +43,4 @@ ORDER BY
     M.strAgeLevel
 ;
 
+#SELECT * FROM tblMatrix WHERE intOriginLevel < intEntityLevel and intRealmID=1;
