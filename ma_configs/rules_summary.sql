@@ -29,7 +29,7 @@ FROM
     ) 
 WHERE 
     M.intRealmID=1 
-    AND M.strPersonType = 'CLUBOFFICIAL' 
+    AND M.strPersonType = 'COACH' 
     AND M.strWFRuleFor <> 'BULKREGO' 
     AND M.intOriginLevel>=M.intEntityLevel
     AND M.intEntityLevel > 0
@@ -42,5 +42,4 @@ ORDER BY
     M.strSport, 
     M.strAgeLevel
 ;
-
 
