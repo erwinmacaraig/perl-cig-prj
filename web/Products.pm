@@ -296,7 +296,7 @@ sub list_products	{
 		my $active = ! $dref->{intInactive} || 0;
 		my $shade=$i%2==0? 'class="rowshade" ' : '';
 		$i++;
-		my $amount=currency($dref->{'curAmount'}||$dref->{'curDefaultAmount'} || 0);
+		my $amount=$dref->{'curAmount'}||$dref->{'curDefaultAmount'} || 0;
 
 		   push @rowdata, {
       id => $dref->{'intProductID'} || next,
@@ -437,7 +437,7 @@ sub detail_products  {
     my $dref = get_product($Data,$id);
 	my $name=$dref->{'strName'} || '';
     my $hasPhoto = $dref->{'intPhoto'}||0;
-    my $amount = currency($dref->{'curAmount'} || $dref->{'curDefaultAmount'} || $dref->{'curAmount_Adult1'} || 0);
+    my $amount = $dref->{'curAmount'} || $dref->{'curDefaultAmount'} || $dref->{'curAmount_Adult1'} || 0;
 		my $currency_symbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
     my $compulsory=qq[<img src="images/compulsory.gif" alt="Compulsory Field" title="Compulsory Field"/>];
     #$body = qq[<p>Enter the name of the product in the box provided and its default cost, then press the Update button.</p>
@@ -681,12 +681,12 @@ my $warning_note = $Data->{'SystemConfig'}{'ProductEditNote'} || '';
 					? $amount
 					: $amounts{"curAmount_$j".$nums[$i-1]};
 				#$dref->{$k} = '' if $dref->{$k} eq '0.00';
-				$amounts{$k} = currency($dref->{$k} || $prev_amount || 0);
+				$amounts{$k} = $dref->{$k} || $prev_amount || 0;
 			}
 		}
 		
 		foreach my $field (qw/ curAmountMin  curAmountMax /){
-		    $amounts{$field} = currency($dref->{$field} || $amount || 0);
+		    $amounts{$field} = $dref->{$field} || $amount || 0;
 		}
 		
 		my $single_active = '';

@@ -294,7 +294,7 @@ sub checkoutConfirm	{
 			    next if ! $dref->{intTransactionID};
                 my $star ='';
 				$count++;
-				my $lamount=currency($dref->{'curAmount'} || 0);
+				my $lamount=$dref->{'curAmount'} || 0;
 				$invoiceList .= $invoiceList ? qq[,$dref->{'InvoiceNum'}] : $dref->{'InvoiceNum'};
 				$product_confirmation.=qq[
 					<tr>
@@ -305,7 +305,7 @@ sub checkoutConfirm	{
 					</tr>
 				];
 			}
-			my $camount=currency($amount||0);
+			my $camount=$amount||0;
 			$product_confirmation=qq[
 				<table class="table" cellspacing="0" cellpadding="0" border="0">
 					<thead>

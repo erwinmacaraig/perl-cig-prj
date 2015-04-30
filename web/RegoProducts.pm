@@ -66,7 +66,7 @@ sub getRegoProducts {
         next if $dref->{intInactive};
         my $filter_display = productAllowedThroughFilter($dref, $memdetails, $timeLocally, $productAttributes, $filter_params);      
         $anyAllowQty ||= $dref->{'intAllowQtys'} || 0;
-        my $amount = currency(getCorrectPrice($dref, $multipersonType)) || 0;
+        my $amount = getCorrectPrice($dref, $multipersonType) || 0;
         my $paid = 0;
         my $unpaid = 0;
        #next if ($paid_product{$dref->{'intProductID'}} and !$dref->{intAllowMultiPurchase});
