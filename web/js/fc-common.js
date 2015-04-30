@@ -368,14 +368,25 @@ jQuery(document).ready(function(){
         })
     })
     /*Saeid*/ 
+    function checkWidth(){
+        return $(window).width() < 800
+    }
     // $(window).resize(function(){checkWidth()}) < 800
-    if($(window).width() < 768){
+    if( checkWidth() == true  || $(".res-table thead tr th").length > 10){
         /* find responsive-table and prepend a dropdown*/ 
         // get No. of columns with res-table class
         var noOfRequests = $('.res-table').length;
         // Convert "initial-cols" 's  value to array
-        var initialCols = $(".res-table").attr("initial-cols").split("-").map(Number);   
-        
+        var initialCols = [];
+        // $(".res-table").attr("initial-cols").split("-").map(Number);   
+        $(".res-table").each(function(){
+            var key = $(this).index();
+            var val = $(this).attr("initial-cols");
+            item = {}
+            item ["val"] = val;
+
+            initialCols.push(item);
+        })
         // get length of initialCols array
         initialColsLength = initialCols.length;
         // dropdown generator function
@@ -390,9 +401,11 @@ jQuery(document).ready(function(){
                 onclick = responsiveTables(int)
              */
              if ($(this).html() != "") {
+                // check if a header is empty
+                var headerChecker = function(val){if(val == " "){return "Actions";}else{return val;}}
                  headers += '<li>\
                               <a selcol="true" ellipsis="false" data="'+headerLocation+'" data-value="'+i+'" class="small" tabindex="-1"  onclick="responsiveTables(\''+headerLocation+'\'\ ,\' '+i+'\'\)">\
-                                &nbsp;'+$(this).html()+'\
+                                &nbsp;'+headerChecker($(this).html())+'\
                               </a>\
                             </li>';
                 columnCounter += 1;
@@ -400,7 +413,7 @@ jQuery(document).ready(function(){
             });
              // wrap up made li's with a custom ul
             return '<div class="button-group responsiveTablesDropDown">\
-                      <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">Items</button>\
+                      <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">|||</button>\
                           <ul style="top:inherit" class="dropdown-menu res-items-group">\
                           '+ headers +'\
                           </ul>\
@@ -408,21 +421,29 @@ jQuery(document).ready(function(){
         }
         // check if dropdown is empty
         if($(".res-items-group").length<=0){
+            $(".res-table").wrap('<div class="res-wrapper"></div>'); 
             for(var i=0;i<noOfRequests;i++){
                 // flash headers Variable first
                 headers = "";
                 // generate a drop down
-                $(".res-table:eq("+i+")").before(dropdownGenerator(i))
+                $(".res-table:eq("+i+") ").before(dropdownGenerator(i))
             }
             // click on all dropdown for initializating purposes
             $(".res-items-group li a").trigger("click");
             // trigger only the columns requested in initial-cols attribute
             for (var i = 0; i < initialColsLength; i++) {
-                // click each one of requested initial-cols
-                $(".res-items-group li:eq("+initialCols[i]+") a").trigger("click")
+                var tableLocation = i
+                var toInitialize = $(".res-table:eq("+i+")").attr("initial-cols").split("-").map(Number);   
+                var toInitializeLength = toInitialize.length;
+                for (var v = 0; v < toInitializeLength; v++) {
+                    // click each one of requested initial-cols
+                    $(".res-items-group:eq("+tableLocation+") li:eq("+toInitialize[v]+") a").trigger("click")
+                };
+                
             }
+            console.log(initialCols)
             // wrap entire table with a div for width purposes
-            $(".res-table").wrap('<div class="res-wrapper"></div>'); 
+            
             // fit the width of visible columns based on percentage
             $('.res-table thead tr th:not(.res-invisible)').each(function () {
             $(this).css('width',90/columnCounter+"%")    
@@ -465,6 +486,5 @@ function responsiveTables(headerLocation,gridLocation){
         $(this).css('width',100/columnCounter+"%")
            
     });
-    return false;
 }
 

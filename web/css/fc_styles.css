@@ -2256,7 +2256,7 @@ header .navbar-brand {
   .navbar-collapse { border-top: none; box-shadow: none; }
   header .navbar {padding-left: 0px;}
   header nav ul#menu li ul li a { font-size: 12px; }
-  .navbar-default .navbar-nav > li > a { font-size: 12px; }
+  .navbar-default .navbar-nav > li > a { font-size: 13px; }
   .dashboard-tasklist td { padding: 10px; }
   td { font-size: 12px; }
   #worktasks tr td a.btn-inside-panels { font-size: 11px; }
@@ -2291,6 +2291,7 @@ header .navbar-brand {
   div.dashboard-tasklist table td { font-size: 12px; }
 }
 @media (min-width: 250px) and (max-width: 480px) {
+	.responsiveTablesDropDown button{margin-bottom: -43px!important;}
  
    table.table.tableboxheader thead tr th { font-size: 11px; }
    table.table.tableboxheader thead tr td { font-size: 11px; }
@@ -2357,7 +2358,7 @@ header .navbar-brand {
 	}
 	div#grid_filter {
 	    background-color: #1870a5;
-	    padding: 10px 0;
+	    padding: 16px 0;
 	}
 	div#grid_filter label input {
     padding: 5px;
