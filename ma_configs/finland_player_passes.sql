@@ -23,16 +23,16 @@ UPDATE tblRegistrationItem SET intItemUsingPaidProductFilter=1, strItemActiveFil
 
 
 #HOBBY Player pass with AMOUNT $10
-UPDATE tblRegistrationItem SET intItemUsingPaidProductFilter=1, strItemActiveFilterPaidProducts='62|74' WHERE strItemType = 'PRODUCT' and intID IN (62,74);
-UPDATE tblRegistrationItem SET intItemUsingPaidProductFilter=1, strItemActiveFilterPaidProducts='62|74', intItemPaidProducts=1 WHERE strItemType = 'PRODUCT' and intID IN (68,80);  
+UPDATE tblRegistrationItem SET intItemUsingPaidProductFilter=1, strItemActiveFilterPaidProducts='62|74|59|71|137|141|60|72|138|142|61|73' WHERE strItemType = 'PRODUCT' and intID IN (62,74);
+UPDATE tblRegistrationItem SET intItemUsingPaidProductFilter=1, strItemActiveFilterPaidProducts='62|74|59|71|137|141|60|72|138|142|61|73', intItemPaidProducts=1 WHERE strItemType = 'PRODUCT' and intID IN (68,80);  
 
 #HOBBY Player pass with AMOUNT $8
-UPDATE tblRegistrationItem SET intItemUsingPaidProductFilter=1, strItemActiveFilterPaidProducts='63|75' WHERE strItemType = 'PRODUCT' and intID IN (63,75);
-UPDATE tblRegistrationItem SET intItemUsingPaidProductFilter=1, strItemActiveFilterPaidProducts='63|75', intItemPaidProducts=1 WHERE strItemType = 'PRODUCT' and intID IN (69,81);  
+UPDATE tblRegistrationItem SET intItemUsingPaidProductFilter=1, strItemActiveFilterPaidProducts='63|75|59|71|137|141|60|72|138|142|61|73' WHERE strItemType = 'PRODUCT' and intID IN (63,75);
+UPDATE tblRegistrationItem SET intItemUsingPaidProductFilter=1, strItemActiveFilterPaidProducts='63|75|59|71|137|141|60|72|138|142|61|73', intItemPaidProducts=1 WHERE strItemType = 'PRODUCT' and intID IN (69,81);  
 
 #HOBBY Player pass with AMOUNT $5
-UPDATE tblRegistrationItem SET intItemUsingPaidProductFilter=1, strItemActiveFilterPaidProducts='64|76' WHERE strItemType = 'PRODUCT' and intID IN (64,76);
-UPDATE tblRegistrationItem SET intItemUsingPaidProductFilter=1, strItemActiveFilterPaidProducts='64|76', intItemPaidProducts=1 WHERE strItemType = 'PRODUCT' and intID IN (70,82);  
+UPDATE tblRegistrationItem SET intItemUsingPaidProductFilter=1, strItemActiveFilterPaidProducts='64|76|59|71|137|141|60|72|138|142|61|73' WHERE strItemType = 'PRODUCT' and intID IN (64,76);
+UPDATE tblRegistrationItem SET intItemUsingPaidProductFilter=1, strItemActiveFilterPaidProducts='64|76|59|71|137|141|60|72|138|142|61|73', intItemPaidProducts=1 WHERE strItemType = 'PRODUCT' and intID IN (70,82);  
 
 
 
