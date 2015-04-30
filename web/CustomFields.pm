@@ -14,7 +14,7 @@ sub getCustomFieldNames	{
     $subtypeID||=$Data->{'RealmSubType'} || 0;
 	my %CustomFieldNames=();
 	if($db)	{
-        my $locale = $Data->{'lang'}->generateLocale();
+        my $locale = $Data->{'lang'}->getLocale();
 		my $statement=qq[
 			SELECT 
                 strDBFName, 

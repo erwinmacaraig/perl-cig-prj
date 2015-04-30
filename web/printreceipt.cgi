@@ -74,7 +74,7 @@ $Data{'db'}=$db;
 	my %receiptData= ();
 	my %ContentData = ();
 	my %htmlReceiptBody = ();
-    my $locale = $Data{'lang'}->generateLocale();
+    my $locale = $Data{'lang'}->getLocale();
 	if($txlogIDs)	{
 		for my $intID (@intIDs){			
 			my $st =qq[

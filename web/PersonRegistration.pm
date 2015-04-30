@@ -709,7 +709,7 @@ sub getRegistrationData	{
 	
     my @Registrations = ();
     my @reg_docs = ();  
-    my $locale = $Data->{'lang'}->generateLocale();
+    my $locale = $Data->{'lang'}->getLocale();
     while(my $dref= $query->fetchrow_hashref()) {
         $count++;
         $dref->{'sport'} = $dref->{'strSport'} || '';

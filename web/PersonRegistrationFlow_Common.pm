@@ -269,7 +269,7 @@ sub displayRegoFlowSummary {
 		####################################################
 
 		my %existingDocuments;
-        my $locale = $Data->{'lang'}->generateLocale();
+        my $locale = $Data->{'lang'}->getLocale();
 		my $query = qq[
 		SELECT
         tblDocuments.intDocumentTypeID as ID,  
@@ -845,7 +845,7 @@ sub displayRegoFlowDocuments{
    
 #print STDERR "~~~~~~~~~~~~~~~displayRegoFlowDocuments\n";
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
-    my $locale = $Data->{'lang'}->generateLocale();
+    my $locale = $Data->{'lang'}->getLocale();
     my $query = qq [
         SELECT
             tblDocuments.intDocumentTypeID as ID,

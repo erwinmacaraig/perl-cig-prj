@@ -62,7 +62,7 @@ sub main	{
   my $resultHTML = '';
   if($fileID)   {
 
-    my $locale = $Data{'lang'}->generateLocale();
+    my $locale = $Data{'lang'}->getLocale();
     my $st = qq[
       SELECT 
           UF.*,
