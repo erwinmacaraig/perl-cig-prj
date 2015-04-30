@@ -369,7 +369,7 @@ sub displayOptions {
 
     my $sort1list = '';
 		for my $field (@sort) {
-			$sort1list .=qq[<option value="$field">$fields_ref->{$field}[0]</option>];
+			$sort1list .=qq[<option value="$field">].$lang->txt($fields_ref->{$field}[0]).qq[</option>];
 		}
     my $sort=qq[
 			<tr>
@@ -386,7 +386,7 @@ sub displayOptions {
     if(exists $self->{'Config'}->{'Config'}{'SecondarySort'} and  $self->{'Config'}->{'Config'}{'SecondarySort'} == 1)  {
 			my $sort2list = '';
 			for my $field (@sort) {
-				$sort2list .=qq[<option value="$field">$fields_ref->{$field}[0]</option>];
+				$sort2list .=qq[<option value="$field">].$lang->txt($fields_ref->{$field}[0]).qq[</option>];
 			}
       $sort.=qq[
       <tr>

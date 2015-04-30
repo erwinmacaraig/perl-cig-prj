@@ -709,6 +709,7 @@ sub getRegistrationData	{
 	
     my @Registrations = ();
     my @reg_docs = ();  
+    my $locale = $Data->{'lang'}->generateLocale();
     while(my $dref= $query->fetchrow_hashref()) {
         $count++;
         $dref->{'sport'} = $dref->{'strSport'} || '';
@@ -728,9 +729,25 @@ sub getRegistrationData	{
         $dref->{'currentAge'} = personAge($Data,$dref->{'dtDOB'});
 
 		my $sql = qq[
-			SELECT strApprovalStatus,strDocumentName, intFileID, strOrigFilename, pr.intPersonRegistrationID, tblDocumentType.intDocumentTypeID, strLockAtLevel,tblUploadedFiles.dtUploaded as DateUploaded FROM tblUploadedFiles INNER JOIN tblDocuments ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID  
-			INNER JOIN tblDocumentType ON tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID   
-			INNER JOIN tblPersonRegistration_$Data->{'Realm'} as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID 
+			SELECT 
+                strApprovalStatus,
+                COALESCE (LT_D.strString1,D.strDocumentName) as strDocumentName,
+                intFileID,
+                strOrigFilename,
+                pr.intPersonRegistrationID,
+                tblDocumentType.intDocumentTypeID,
+                strLockAtLevel,
+                tblUploadedFiles.dtUploaded as DateUploaded 
+            FROM tblUploadedFiles 
+                INNER JOIN tblDocuments ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID  
+                INNER JOIN tblDocumentType ON tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID   
+                INNER JOIN tblPersonRegistration_$Data->{'Realm'} as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID 
+                LEFT JOIN tblLocalTranslations AS LT_D ON (
+                    LT_D.strType = 'DOCUMENT'
+                    AND LT_D.intID = tblDocumentType.intDocumentTypeID
+                    AND LT_D.strLocale = '$locale'
+                )
+
 			WHERE pr.intPersonRegistrationID = $dref->{intPersonRegistrationID} AND pr.intPersonID = $personID 
 		];
 
