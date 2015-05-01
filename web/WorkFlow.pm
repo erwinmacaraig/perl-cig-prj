@@ -110,7 +110,12 @@ sub checkRulePaymentFlagActions {
             if ($personRegistrationID)  {
                 my $stUPD = qq[
                     UPDATE tblPersonRegistration_$Data->{'Realm'}
-                    SET strStatus = 'ACTIVE', intWasActivatedByPayment = 1
+                    SET 
+                        dtLastUpdated=NOW(),
+                        dtApproved=NOW(),
+                        dtFrom = NOW(),
+                        strStatus = 'ACTIVE', 
+                        intWasActivatedByPayment = 1
                     WHERE 
                         intPersonID = ?
                         AND intEntityID = ?
@@ -1352,6 +1357,7 @@ sub checkForOutstandingTasks {
 	my $q = '';
 	my $db=$Data->{'db'};
     $taskType ||= '';
+
 
 	#As a result of an update, check to see if there are any Tasks that now have all their pre-reqs completed
 	# or if all tasks have been completed
