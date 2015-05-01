@@ -69,7 +69,7 @@ sub getRegistrationItems    {
     
 print STDERR "D: $regNature | $regNature2\n";
 
-    my $locale = $Data->{'lang'}->generateLocale();
+    my $locale = $Data->{'lang'}->getLocale();
     my $st = qq[
    SELECT 
             RI.intID,
