@@ -29,7 +29,7 @@ FROM
     ) 
 WHERE 
     M.intRealmID=1 
-    AND M.strWFRuleFor = 'BULKREGO' 
+    AND M.strWFRuleFor <> 'BULKREGO' 
     AND M.intOriginLevel>=M.intEntityLevel
     AND M.intEntityLevel > 0
 ORDER BY 
