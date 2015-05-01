@@ -151,7 +151,7 @@ sub main	{
     my $paymentURL = '';
     my $gatewaySpecific ='';
 
-    my $currentLang = $Data{'lang'}->generateLocale($Data{'SystemConfig'});
+    my $currentLang = $Data{'lang'}->getLocale($Data{'SystemConfig'});
 
     if ($paymentSettings->{'gatewayCode'} eq 'NABExt1') {
         $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$payRef&amp;chkv=$chkvalue&amp;session=$session&amp;amount=$amount&amp;logID=$logID];

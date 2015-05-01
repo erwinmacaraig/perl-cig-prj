@@ -567,7 +567,7 @@ sub getTransList {
 
     $prodSellLevel = '' if $Data->{'SystemConfig'}{'IgnoreMinSellLevelForTransList'};
 
-    my $locale = $Data->{'lang'}->generateLocale();
+    my $locale = $Data->{'lang'}->getLocale();
 	my $statement = qq[
     SELECT 
       t.intTransactionID, 
@@ -1444,7 +1444,7 @@ sub resolveHoldPaymentForm  {
   	$qry->execute;
 	my $TLref = $qry->fetchrow_hashref();
 
-    my $locale = $Data->{'lang'}->generateLocale();
+    my $locale = $Data->{'lang'}->getLocale();
 	my $st_trans = qq[
 		SELECT T.intTransactionID,
              M.strLocalSurname,
@@ -1722,7 +1722,7 @@ sub viewTransLog	{
   	$qry->execute;
 	my $TLref = $qry->fetchrow_hashref();
 
-    my $locale = $Data->{'lang'}->generateLocale();
+    my $locale = $Data->{'lang'}->getLocale();
 	my $st_trans = qq[
 		SELECT T.intTransactionID,
              M.strLocalSurname,

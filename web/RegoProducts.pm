@@ -128,7 +128,7 @@ sub getAllRegoProducts {
     return [] if !$productID_str;
 
     my $ExistingStatus = $incExisting ? 0 : 9999; ## Obviously none will have 9999
-    my $locale = $Data->{'lang'}->generateLocale();
+    my $locale = $Data->{'lang'}->getLocale();
     my $sql = qq[
         SELECT DISTINCT 
             T.intStatus,

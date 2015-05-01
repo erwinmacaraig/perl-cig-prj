@@ -86,7 +86,7 @@ sub updateSystemConfigTranslation {
 	my $db=$Data->{'db'};
 	my $realmID=$Data->{'Realm'} || 0;
 	my $subtypeID=$Data->{'RealmSubType'} || 0;
-    my $locale = $Data->{'lang'}->generateLocale();
+    my $locale = $Data->{'lang'}->getLocale();
 	my $statement = qq[
 		SELECT 
             strOption, 

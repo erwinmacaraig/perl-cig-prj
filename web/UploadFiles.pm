@@ -37,7 +37,7 @@ sub getUploadedFiles	{
 	my $myCurrentLevelValue = $clientValues{'authLevel'};
 	my $obj = getInstanceOf($Data, 'entity', $currLoginID);
 	
-    my $locale = $Data->{'lang'}->generateLocale();
+    my $locale = $Data->{'lang'}->getLocale();
 	my $st = qq[
 	SELECT 
         *,
