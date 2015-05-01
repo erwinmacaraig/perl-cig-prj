@@ -252,11 +252,11 @@ sub displayReportList	{
                 $groups .= qq[
                     <tr>
                         <td>
-                            <b>$report->{'strName'}</b><br>
-                            $report->{'strDescription'}
+                            <b>].$l->txt($report->{'strName'}).qq[</b><br>
+                            ].$l->txt($report->{'strDescription'}).qq[
                         </td>
                         <td style = "width:250px;">
-                            <a href = "$Data->{'target'}?client=$clientValues->{unesc_client}&amp;a=$newaction&amp;rID=$report->{'intReportID'}&amp;repID=$repID" class = "btn-inside-panels">$buttoncaption</a>
+                            <a href = "$Data->{'target'}?client=$clientValues->{unesc_client}&amp;a=$newaction&amp;rID=$report->{'intReportID'}&amp;repID=$repID" class = "btn-inside-panels">].$l->txt($buttoncaption).qq[</a>
                             $delete
                             $run
                         </td>
@@ -271,7 +271,7 @@ sub displayReportList	{
 	for my $g(@grouplist)	{
         my $activeClass = $g->[0] eq $activetab ? 'active' : '';
 		$tablist .= qq[
-			<li role = "presentation" class = "$activeClass"><a href = "#repgroup-$g->[0]" aria-controls="#repgroup-$g->[0]" role="tab" data-toggle="tab">$g->[1]</a></li>
+			<li role = "presentation" class = "$activeClass"><a href = "#repgroup-$g->[0]" aria-controls="#repgroup-$g->[0]" role="tab" data-toggle="tab">].$l->txt($g->[1]).qq[</a></li>
 		];
 	}
 	my $paramcode = qq[

@@ -1,12 +1,12 @@
 SELECT 
     M.intMatrixID,
+    M.strRegistrationNature, 
+    M.intOriginLevel, 
+    M.intEntityLevel, 
     M.strPersonType, 
     M.strPersonLevel, 
     M.strSport, 
     M.strAgeLevel, 
-    M.strRegistrationNature, 
-    M.intOriginLevel, 
-    M.intEntityLevel, 
     R.strISOCountry_IN, 
     R.strISOCountry_NOTIN, 
     R.intApprovalEntityLevel, 
@@ -29,8 +29,7 @@ FROM
     ) 
 WHERE 
     M.intRealmID=1 
-    AND M.strPersonType = 'COACH' 
-    AND M.strWFRuleFor <> 'BULKREGO' 
+    AND M.strWFRuleFor = 'BULKREGO' 
     AND M.intOriginLevel>=M.intEntityLevel
     AND M.intEntityLevel > 0
 ORDER BY 
@@ -43,3 +42,4 @@ ORDER BY
     M.strAgeLevel
 ;
 
+#SELECT * FROM tblMatrix WHERE intOriginLevel < intEntityLevel and intRealmID=1;

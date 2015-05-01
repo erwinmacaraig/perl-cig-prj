@@ -269,7 +269,7 @@ sub displayRegoFlowSummary {
 		####################################################
 
 		my %existingDocuments;
-        my $locale = $Data->{'lang'}->generateLocale();
+        my $locale = $Data->{'lang'}->getLocale();
 		my $query = qq[
 		SELECT
         tblDocuments.intDocumentTypeID as ID,  
@@ -845,7 +845,7 @@ sub displayRegoFlowDocuments{
    
 #print STDERR "~~~~~~~~~~~~~~~displayRegoFlowDocuments\n";
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
-    my $locale = $Data->{'lang'}->generateLocale();
+    my $locale = $Data->{'lang'}->getLocale();
     my $query = qq [
         SELECT
             tblDocuments.intDocumentTypeID as ID,
@@ -1282,6 +1282,7 @@ sub add_rego_record{
     	
     warn "REGISTRATION NATURE $rego_ref->{'registrationNature'}";
     if ($rego_ref->{'registrationNature'} ne 'RENEWAL' and $rego_ref->{'registrationNature'} ne 'TRANSFER') {
+        print STDERR "ABOUT TO CHECK TYP LIMITS FOR : " . $rego_ref->{'sport'} . "|" . $rego_ref->{'personType'} . "|" . $rego_ref->{'personLevel'} . "|" . $rego_ref->{'entityID'} ."\n\n";
         my $ok = checkRegoTypeLimits($Data, $personID, 0, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'}, $rego_ref->{'entityID'}); 
         return (0, undef, 'LIMIT_EXCEEDED') if (!$ok);
     }

@@ -13,20 +13,21 @@ use Lang;
 use TTTemplate;
 use SystemConfig;
 use LanguageChooser;
+use Localisation;
 
-	my $lang= Lang->get_handle() || die "Can't get a language handle!";
     my ( $db, $message ) = connectDB() || die;
-	
-	my $title=$lang->txt('APPNAME') || 'FIFA Connect';
-
     my %Data = (
-        lang=> $lang,
         db => $db,
-        Realm => 1
+        Realm => 1,
     );
-
     $Data{'SystemConfig'} = getSystemConfig( \%Data );
 
+	my $lang= Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
+    $Data{'lang'} = $lang;
+	
+	my $title=$lang->txt('APPNAME') || 'FIFA Connect';
+    initLocalisation(\%Data);
+    updateSystemConfigTranslation(\%Data);
 	my %TemplateData = (
 		Lang => $lang,
         SystemConfig => $Data{'SystemConfig'},

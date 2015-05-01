@@ -154,23 +154,32 @@ sub checkRegoTypeLimits    {
         if ($dref->{'strPersonType'} and $dref->{'strPersonType'} ne '')    {
             $stPRrow.= qq[ AND PR.strPersonType = ? ];
             push @rowValues, $dref->{'strPersonType'};
-            #$stPErow.= qq[ AND strSport = ? ];
-            #push @PErowValues, $dref->{'strSport'};
+            $stPErow.= qq[ AND PR.strPersonType = ? ];
+            push @PErowValues, $dref->{'strPersonType'};
         }
         if (defined $dref->{'strPersonEntityRole'} and $dref->{'strPersonEntityRole'} ne '')    {
             $stPRrow .= qq[ AND PR.strPersonEntityRole = ?];
             push @rowValues, $dref->{'strPersonEntityRole'};
+            $stPErow.= qq[ AND PR.strPersonEntityRole= ? ];
+            push @PErowValues, $dref->{'strPersonEntityRole'};
         }
         if (defined $dref->{'strPersonLevel'} and $dref->{'strPersonLevel'} ne '')    {
             $stPRrow .= qq[ AND PR.strPersonLevel = ?];
             push @rowValues, $dref->{'strPersonLevel'};
+            $stPErow.= qq[ AND PR.strPersonLevel= ? ];
+            push @PErowValues, $dref->{'strPersonLevel'};
         }
         if (defined $dref->{'strAgeLevel'} and $dref->{'strAgeLevel'} ne '')    {
             $stPRrow .= qq[ AND PR.strAgeLevel = ?];
             push @rowValues, $dref->{'strAgeLevel'};
+            $stPErow.= qq[ AND PR.strAgeLevel= ? ];
+            push @PErowValues, $dref->{'strAgeLevel'};
         }
         #$stPErow .= qq[GROUP BY intEntityID, strPersonType, strSport];
-        $stPErow .= qq[GROUP BY PR.intEntityID, PR.strSport];
+        $stPErow .= qq[GROUP BY PR.intEntityID, PR.strPersonType];
+        $stPErow .= qq[, PR.strSport] if ($dref->{'strSport'} and $dref->{'strSport'} ne '');
+        $stPErow .= qq[, PR.strPersonLevel] if (defined $dref->{'strPersonLevel'} and $dref->{'strPersonLevel'} ne '');
+        $stPErow .= qq[, PR.strAgeLevel] if (defined $dref->{'strAgeLevel'} and $dref->{'strAgeLevel'} ne '');
 
         if ($dref->{'strLimitType'} eq 'PERSONENTITY_UNIQUE')  {
             ## Only runs on PersonType & Sport
