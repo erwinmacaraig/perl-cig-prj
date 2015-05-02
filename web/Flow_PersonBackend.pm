@@ -36,6 +36,7 @@ use RenewalDetails;
 use JSON;
 use IncompleteRegistrations;
 use RegoProducts;
+use Entity;
 
 sub setProcessOrder {
     my $self = shift;
@@ -723,6 +724,11 @@ sub process_registration {
         $entitySelection = 0;
     }
     if($entitySelection)    {
+        if (! $entityTypeSelected)  {
+            my $eref= loadEntityDetails($self->{'Data'}->{'db'}, $entitySelected);
+            $entityTypeSelected= $eref->{'intEntityLevel'};
+        }
+            
         if($entitySelected and $entityTypeSelected) {
             $entityID = $entitySelected;
             $entityLevel = $entityTypeSelected;
