@@ -1548,7 +1548,7 @@ sub finaliseTransfer {
             AND strPersonType = ?
             AND strSport = ?
             AND intPersonID = ?
-            AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
+            AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER')
 	];
             #AND strPersonLevel = ?
        #$personRequest->{'strPersonLevel'},
@@ -1565,6 +1565,53 @@ sub finaliseTransfer {
        $personRequest->{'strSport'},
        $personRequest->{'intPersonID'}
     ) or query_error($st);
+
+    $st = qq[
+        UPDATE
+            tblPersonRegistration_$Data->{'Realm'} as PR
+            INNER JOIN tblWFTask as WF ON (WF.intPersonRegistrationID = PR.intPersonRegistrationID)
+        SET
+            WF.strTaskStatus = ?
+        WHERE
+            PR.intEntityID = ?
+            AND WF.strRegistrationNature IN ('NEW', 'RENEWAL')
+            AND PR.strPersonType = ?
+            AND PR.strSport = ?
+            AND PR.intPersonID = ?
+            AND PR.strStatus IN ('PENDING')
+    ];
+    $query = $db->prepare($st) or query_error($st);
+    $query->execute(
+       'DELETED',
+       $personRequest->{'intRequestToEntityID'},
+       $personRequest->{'strPersonType'},
+       $personRequest->{'strSport'},
+       $personRequest->{'intPersonID'}
+    ) or query_error($st);
+
+    
+    $st = qq[
+        UPDATE
+            tblPersonRegistration_$Data->{'Realm'}
+        SET
+            strPreTransferredStatus = strStatus,
+            strStatus = ?
+        WHERE
+            intEntityID = ?
+            AND strPersonType = ?
+            AND strSport = ?
+            AND intPersonID = ?
+            AND strStatus IN ('PENDING')
+    ];
+    $query = $db->prepare($st) or query_error($st);
+    $query->execute(
+       $Defs::PERSONREGO_STATUS_DELETED,
+       $personRequest->{'intRequestToEntityID'},
+       $personRequest->{'strPersonType'},
+       $personRequest->{'strSport'},
+       $personRequest->{'intPersonID'}
+    ) or query_error($st);
+
     my %PE = ();
     {
     $PE{'personType'} = $personRequest->{'strPersonType'} || '';
