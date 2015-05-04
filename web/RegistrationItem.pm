@@ -176,7 +176,7 @@ strItemType
         next if($dref->{'strDocumentFor'} eq 'TRANSFERITC' and !$Rego_ref->{'InternationalTransfer'});
 
         ## Lets see if the person was active in the appropriate periods
-        if ($Data->{'SystemConfig'}{$sysConfigActiveFilter} && $dref->{'intItemUsingActiveFilter'})    {
+        if ($itemType eq 'PRODUCT' && $Data->{'SystemConfig'}{$sysConfigActiveFilter} && $dref->{'intItemUsingActiveFilter'})    {
             if (! defined $ActiveFilter_ref->{$dref->{'strItemActiveFilterPeriods'}})   {
                 $ActiveFilter_ref->{$dref->{'strItemActiveFilterPeriods'}} ||= 0; # was outside of if
             }
@@ -184,9 +184,9 @@ strItemType
         }
 
         ## Lets see if the person has appropriate paid products
-        if ($Data->{'SystemConfig'}{$sysConfigActiveProductsFilter} && $dref->{'intItemUsingPaidProductFilter'})    {
-            if (! defined $ActiveProductsFilter_ref->{$dref->{'strItemActiveFilterPaidProducts'}})   {
-                $ActiveProductsFilter_ref->{$dref->{'strItemActiveFilterPeriods'}} ||= 0; # was outside of if
+        if ($Rego_ref->{'intPersonID'} && $itemType eq 'PRODUCT' && $Data->{'SystemConfig'}{$sysConfigActiveProductsFilter} && $dref->{'intItemUsingPaidProductFilter'})    {
+            if (! $ActiveProductsFilter_ref or ! defined $ActiveProductsFilter_ref->{$dref->{'strItemActiveFilterPaidProducts'}})   {
+                $ActiveProductsFilter_ref->{$dref->{'strItemActiveFilterPeriods'}} = 0; # was outside of if
             }
             next if ($dref->{'intItemPaidProducts'} != $ActiveProductsFilter_ref->{$dref->{'strItemActiveFilterPaidProducts'}});
         }
