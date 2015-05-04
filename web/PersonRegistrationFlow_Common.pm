@@ -1068,7 +1068,7 @@ sub displayRegoFlowProducts {
      }
     my $product_body='';
     if (@prodIDs)   {
-        $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
+        $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules, 0, 0);
 
     }
     else    {
@@ -1128,7 +1128,7 @@ sub displayRegoFlowProductsBulk {
      }
     my $product_body='';
     if (@prodIDs)   {
-        $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
+        $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules, 0,1);
      }
     else    {
         return '';
@@ -1305,24 +1305,12 @@ sub add_rego_record{
 sub bulkRegoCreate  {
 
     my ($Data, $bulk_ref, $rolloverIDs, $productIDs, $productQtys, $markPaid, $paymentType) = @_;
-
     my $body = 'Submitting';
     my @IDs= split /\|/, $rolloverIDs;
 
     my $totalAmount=0;
     my @total_txns_added=();
-    my $CheckProducts = getRegistrationItems(
-        $Data,
-        'REGO',
-        'PRODUCT',
-        $bulk_ref->{'originLevel'},
-        $bulk_ref->{'registrationNature'},
-        $bulk_ref->{'entityID'},
-        $bulk_ref->{'entityLevel'},
-        0,
-        $bulk_ref,
-    );
-    my @Ages = ('ADULT',
+        my @Ages = ('ADULT',
             'MINOR'
     );
 
@@ -1345,6 +1333,34 @@ sub bulkRegoCreate  {
 
     my %RegoIDs=();
     for my $pID (@IDs)   {
+        my %Rego=();
+        %Rego = %{$bulk_ref};
+        $Rego{'intPersonID'} = $pID;
+        my $personObj = new PersonObj(db => $Data->{'db'}, ID => $pID, cache => $Data->{'cache'});
+        $personObj->load();
+        $Rego{'Nationality'} = $personObj->getValue('strISONationality') || '';
+        $Rego{'DOB'} = $personObj->getValue('dtDOB_Format') || '';
+        my $CheckProducts = getRegistrationItems(
+            $Data,
+            'REGO',
+            'PRODUCT',
+            $bulk_ref->{'originLevel'},
+            $bulk_ref->{'registrationNature'},
+            $bulk_ref->{'entityID'},
+            $bulk_ref->{'entityLevel'},
+            0,
+            \%Rego,
+        );
+        my %AllowedProducts=();
+        my @productIDsAllowed=();
+
+    my %ProductRules=();
+         foreach my $product (@{$CheckProducts})  {
+            #my $productPrice = $product->{'ProductPrice'};
+            push @productIDsAllowed, $product->{'ID'};
+            $ProductRules{$product->{'ID'}} = $product;
+        }
+
         my $pref = Person::loadPersonDetails($Data->{'db'}, $pID) if ($pID);
         my $ageLevelOptions = checkRegoAgeRestrictions(
             $Data,
@@ -1376,7 +1392,14 @@ sub bulkRegoCreate  {
             "BULKREGO"
         );
         next if (! $regoID);
-	cleanRegoTransactions($Data,$regoID, $pID, $Defs::LEVEL_PERSON);
+        # Now lets see what products are allowed
+        my $AllowedRegoProducts = getRegoProducts($Data, \@productIDsAllowed, 0, $bulk_ref->{'entityID'}, $regoID, $pID, \%Rego, 0, \%ProductRules, 1, 0);
+        
+        foreach my $productIDAllowed (@{$AllowedRegoProducts}) {
+            $AllowedProducts{$productIDAllowed->{'ProductID'}} = 1;
+        }
+            
+	    cleanRegoTransactions($Data,$regoID, $pID, $Defs::LEVEL_PERSON);
         $RegoIDs{$pID} = $regoID;
         WorkFlow::cleanTasks(
             $Data,
@@ -1388,6 +1411,7 @@ sub bulkRegoCreate  {
         my @products = split /\:/, $productIDs;
         my %Products=();
         foreach my $product (@products) {
+            next if ! $AllowedProducts{$product};
             $Products{'prod_'.$product} =1;
         }
         my @productQty= split /:/, $productQtys;
@@ -1480,5 +1504,22 @@ sub bulkRegoSubmit {
         savePlayerPassport($Data, $pID);
     }
 }
+
+#sub checkingBulkRenewalProducts {
+#
+#
+# my $CheckProducts = getRegistrationItems(
+#        $Data,
+#        'REGO',
+#        'PRODUCT',
+#        $originLevel,
+#        $rego_ref->{'strRegistrationNature'} || $rego_ref->{'registrationNature'},
+#        $entityID,
+#        $entityRegisteringForLevel,
+#        0,
+#        $rego_ref,
+#    );
+#
+#}
 1;
 

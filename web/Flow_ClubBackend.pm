@@ -400,7 +400,7 @@ sub display_products {
      }
     my $product_body='';
     if (@prodIDs)   {
-        $product_body= getRegoProducts($self->{'Data'}, \@prodIDs, 0, $entityID, 0, 0, 0, 0, \%ProductRules);
+        $product_body= getRegoProducts($self->{'Data'}, \@prodIDs, 0, $entityID, 0, 0, 0, 0, \%ProductRules, 0, 0);
      }
      my %ProductPageData = (
          #nextaction=>"PREGF_PU",

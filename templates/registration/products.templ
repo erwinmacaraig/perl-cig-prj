@@ -99,6 +99,7 @@
 	[% END %]
 	[% loopcount = loopcount + 1 %]
 		[% END %]
+    [% UNLESS HideTotal %]
 		<tr>
 			<td>&nbsp;</td>
 			<td>&nbsp;</td>
@@ -107,6 +108,7 @@
 			<td><span style="display:block" id="totalAmountUnpaidInFlow">[% CurrencyFormat.format(totalAmountUnpaid) %]</span></td>
 
 		</tr>
+	[% END %]
 		</tbody>
 		</table>
 	[% END %]

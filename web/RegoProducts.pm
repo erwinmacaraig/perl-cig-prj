@@ -16,6 +16,7 @@ use Utils;
 use Transactions;
 use Date::Calc qw(Today Delta_YMD);
 use Data::Dumper;
+
 sub getRegoProducts {
     my (
         $Data,
@@ -26,9 +27,13 @@ sub getRegoProducts {
         $personID,
         $memdetails,
         $multipersonType,
-        $regItemRules_ref
+        $regItemRules_ref,
+        $returnItems,
+        $hideTotal
     ) = @_;
 
+    $returnItems ||= 0;
+    $hideTotal ||= 0;
     my $currencySymbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
     $incExisting ||= 0; ## Set to 1 to include existing in-cart items that aren't paid for the member
 
@@ -100,6 +105,7 @@ sub getRegoProducts {
     }
     return '' if !$count;
 
+    return \@unpaid_items if ($returnItems);
     my $AllowedCountText = '';
     my $AllowedCount = $Data->{'SystemConfig'}{'OnlineRego_productCount'} || 0;
     my $productscount = ($AllowedCount == 1) ? 'item' : 'items';
@@ -113,6 +119,7 @@ sub getRegoProducts {
         HideGroup => $Data->{'SystemConfig'}{'regoForm_HIDE_group'} || 0,
         AllowedCountText => $AllowedCountText || '',
         UnPaidItems => \@unpaid_items,
+        HideTotal => $hideTotal,
         CurrencySymbol => $currencySymbol,
 		client => $cl,
     );
@@ -458,6 +465,7 @@ sub productAllowedThroughFilter {
 
                 if($productAttributes->{$dref->{'intProductID'}}{$Defs::PRODUCT_DOB_MIN}
                     and $productAttributes->{$dref->{'intProductID'}}{$Defs::PRODUCT_DOB_MIN}[0] ne 'NULL' ) {
+
                     return 0 if ($dob lt $productAttributes->{$dref->{'intProductID'}}{$Defs::PRODUCT_DOB_MIN}[0]);
                 }
 
