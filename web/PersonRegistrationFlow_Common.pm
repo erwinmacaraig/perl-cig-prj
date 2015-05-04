@@ -131,6 +131,7 @@ sub displayRegoFlowSummaryBulk  {
         $personData{'Nationality'} = $c->{$personObj->getValue('strISONationality')};
         $personData{'Country'} = $c->{$personObj->getValue('strISOCountryOfBirth')} || '';
         $personData{'AmountDue'} = $amountDueSingle || 0;
+        $personData{'txnCountPerson'} = $txnCountSingle || 0;
         push @People, \%personData;
     }
 
