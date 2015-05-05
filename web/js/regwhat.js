@@ -1,4 +1,9 @@
 function update_options(optionType, dtype)   {
+    jQuery('input#currentoption').val(optionType);
+
+    var currentoption = jQuery('input#currentoption').val();
+    var optiontrigger = jQuery('input#optiontrigger').val();
+
     var qstring = '';
     qstring = qstring + '&dtype=' + dtype;
     qstring = qstring + '&etype=' + jQuery('#l_etype').val();
@@ -20,7 +25,10 @@ function update_options(optionType, dtype)   {
     qstring = qstring + '&dnat=' + jQuery('#dnat').val();
     qstring = qstring + '&dlevel=' + jQuery('#dlevel').val();
 
-    if(optionType == 'complete')    {
+    if(currentoption != '' && currentoption === optionType && optiontrigger === currentoption) {
+        //do nothing to avoid duplicate call
+    }
+    else if(optionType == 'complete')    {
       if(jQuery('#replacedflow-btn-continue').length>0) {
           jQuery('#replacedflow-btn-continue').show();
       }
@@ -86,10 +94,15 @@ function chooseOption(val, optionType, name)  {
     if(next == 'etype' && jQuery('#eselect').val() == 0)    {
         next = 'sport';
     }
+
+    //jQuery('input#currentoption').val(optionType);
     update_options(next);
 }
 
 jQuery('.regoptions').on('change','select',function(e) {
+    var optionTrigger = jQuery("#" + e.target.id).attr('data-type');
+    jQuery('input#optiontrigger').val(optionTrigger);
+
     var optionType = jQuery(this).attr('data-type');
     var v = jQuery(this).val();
     if(v)   {
