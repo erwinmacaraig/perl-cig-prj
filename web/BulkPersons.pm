@@ -94,7 +94,7 @@ sub bulkPersonRollover {
                 AND PRto.strSport = PR.strSport 
                 AND PRto.strPersonLevel= PR.strPersonLevel
                 AND PRto.strPersonEntityRole= PR.strPersonEntityRole
-                AND PRto.strStatus IN ("$Defs::PERSONREGO_STATUS_ACTIVE", "$Defs::PERSONREGO_STATUS_PASSIVE", "$Defs::PERSONREGO_STATUS_PENDING")
+                AND PRto.strStatus IN ("$Defs::PERSONREGO_STATUS_ACTIVE", "$Defs::PERSONREGO_STATUS_PASSIVE", "$Defs::PERSONREGO_STATUS_PENDING", "$Defs::PERSONREGO_STATUS_ROLLED_OVER")
                 AND PRto.intEntityID = PR.intEntityID
                 AND PRto.intNationalPeriodID = ?
             )

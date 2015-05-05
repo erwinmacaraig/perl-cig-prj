@@ -559,7 +559,6 @@ sub optionsPersonRegisterWhat {
     }
     
 
-warn($st);
     my $q = $Data->{'db'}->prepare($st);
     $q->execute(@values);
 
