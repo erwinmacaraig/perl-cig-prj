@@ -91,7 +91,7 @@ sub main {
     $Data{'User'} = $user;
     $Data{'UserID'} = $userID;
 
-    $action = 'LOGIN' if !$userID;
+    $action = 'LOGIN' if(!$userID and $action ne 'activate');
     if(!$action and $userID)  {
         $action = 'HOME';
     }
