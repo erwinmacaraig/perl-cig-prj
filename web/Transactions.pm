@@ -256,11 +256,11 @@ sub displayTransaction	{
                 ];
         }
 
-  my $prodSellLevel = qq[ AND (intMinSellLevel <= $Data->{'clientValues'}{'authLevel'} or intMinSellLevel=0)];
-  $prodSellLevel .= qq[ AND (intSellLevel =0 or intSellLevel = $Data->{'clientValues'}{'currentLevel'})];
-  $prodSellLevel .= qq[ AND (intMinAddSingleTXNLevel <> 0 and $Data->{'clientValues'}{'authLevel'}>= intMinAddSingleTXNLevel) ];
+  #my $prodSellLevel = qq[ AND (intMinSellLevel <= $Data->{'clientValues'}{'authLevel'} or intMinSellLevel=0)];
+  #$prodSellLevel .= qq[ AND (intSellLevel =0 or intSellLevel = $Data->{'clientValues'}{'currentLevel'})];
+  #$prodSellLevel .= qq[ AND (intMinAddSingleTXNLevel <> 0 and $Data->{'clientValues'}{'authLevel'}>= intMinAddSingleTXNLevel) ];
 
-  my $st_prods=qq[ SELECT intProductID, strName FROM tblProducts WHERE intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) AND intRealmID = $Data->{'Realm'} and  intInactive = 0 $WHEREClub AND intProductSubRealmID IN (0, $Data->{'RealmSubType'}) $prodSellLevel];
+  my $st_prods=qq[ SELECT intProductID, strName FROM tblProducts WHERE intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) AND intRealmID = $Data->{'Realm'} and  intInactive = 0 $WHEREClub AND intProductSubRealmID IN (0, $Data->{'RealmSubType'}) ];
 
   my $st_paymenttypes=qq[ SELECT intPaymentTypeID, strPaymentType FROM tblPaymentTypes WHERE intRealmID = $Data->{'Realm'}];
   my ($prods_vals,$prods_order)=getDBdrop_down_Ref($Data->{'db'},$st_prods,'');
