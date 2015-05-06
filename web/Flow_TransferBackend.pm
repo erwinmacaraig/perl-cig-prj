@@ -495,8 +495,7 @@ sub validate_other_details    {
 sub display_registration { 
     my $self = shift;
 	
-	$self->addCarryField('cond_vstd', 1);
-    $self->addCarryField('r_vstd', 1);
+	$self->addCarryField('cond_vstd', 1);   
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
@@ -543,14 +542,14 @@ sub display_registration {
         $content = "Person Request Details not found.";
     }
     else {
-        $request->{'personType'} = $Defs::personType{$request->{'strPersonType'}};
-        $request->{'sport'} = $Defs::sportType{$request->{'strSport'}};
+        #$request->{'personType'} = $Defs::personType{$request->{'strPersonType'}};
+        #$request->{'sport'} = $Defs::sportType{$request->{'strSport'}};
         #$request->{'personLevel'} = $Defs::personLevel{$request->{'strPersonLevel'}};
 
-        $self->addCarryField('dnat', 'TRANSFER');
+        #$self->addCarryField('dnat', 'TRANSFER');
         #$self->addCarryField('dtype', $request->{'strPersonType'});
         ##$self->addCarryField('d_level', $request->{'strPersonLevel'});
-        $self->addCarryField('dsport', $request->{'strSport'});
+        #$self->addCarryField('dsport', $request->{'strSport'});
         #$self->addCarryField('dage', $request->{'personCurrentAgeLevel'});
 
         #$content = runTemplate(
@@ -653,19 +652,20 @@ sub process_registration {
         $content = "Person Request Details not found.";
     }
     else {
-        $self->addCarryField('d_nature', 'TRANSFER');
-        $self->addCarryField('d_type', $request->{'strPersonType'});
-        $self->addCarryField('d_level', $request->{'strNewPersonLevel'});
-        $self->addCarryField('d_sport', $request->{'strSport'});
-        $self->addCarryField('d_age', $request->{'personCurrentAgeLevel'});
+        #$self->addCarryField('d_nature', 'TRANSFER');
+        #$self->addCarryField('d_type', $request->{'strPersonType'});
+        #$self->addCarryField('d_level', $request->{'strNewPersonLevel'});
+        #$self->addCarryField('d_sport', $request->{'strSport'});
+        #$self->addCarryField('d_age', $request->{'personCurrentAgeLevel'});
     }
 
     ## NORMAL process_registration code
  
     my $personType = $self->{'RunParams'}{'d_type'} || '';
     my $personEntityRole= $self->{'RunParams'}{'d_role'} || '';
-    my $personLevel = $self->{'RunParams'}{'d_level'} || '';
-    my $sport = $self->{'RunParams'}{'d_sport'} || '';
+    #my $personLevel = $self->{'RunParams'}{'d_level'} || '';
+	my $personLevel = $request->{'strNewPersonLevel'} || '';    
+	my $sport = $self->{'RunParams'}{'d_sport'} || '';
     my $ageLevel = $self->{'RunParams'}{'d_age'} || '';
     my $existingReg = $self->{'RunParams'}{'existingReg'} || 0;
     my $changeExistingReg = $self->{'RunParams'}{'changeExisting'} || 0;
@@ -683,7 +683,7 @@ sub process_registration {
         if($changeExistingReg)    {
             $self->deleteExistingReg($existingReg, $personID);
         }
-        if(! $regoID) {#!$existingReg or $changeExistingReg)    {
+        if(! $regoID) {
             ($regoID, undef, $msg) = add_rego_record(
                 $self->{'Data'}, 
                 $personID, 
@@ -700,7 +700,8 @@ sub process_registration {
                 undef,
                 $personRequestID,
             );
-            if ($regoID && $personRequestID)    {
+		}
+        if ($regoID && $personRequestID)    {
                 my $stChange = qq[
                     UPDATE tblPersonRegistration_$self->{'Data'}->{'Realm'}
                     SET strPreviousPersonLevel = '', intPersonLevelChanged=0
@@ -721,11 +722,12 @@ sub process_registration {
                         )
                     SET
                         strPreviousPersonLevel = Req.strPersonLevel,
+						PR.strPersonLevel = Req.strNewPersonLevel,
                         intPersonLevelChanged = 1
                     WHERE
                         Req.strPersonLevel <> ''
                         AND Req.strNewPersonLevel <> ''
-                        AND Req.strPersonLevel <> Req.strNewPersonLevel
+                        #AND Req.strPersonLevel <> Req.strNewPersonLevel
                         AND PR.intPersonRegistrationID = ?
                         AND Req.intPersonRequestID = ?
                 ];
@@ -734,11 +736,9 @@ sub process_registration {
                     $regoID,
                     $personRequestID
                 );
-            }
-        
-            
-            #$self->moveDocuments($existingReg, $regoID, $personID);
         }
+        #$self->moveDocuments($existingReg, $regoID, $personID);
+        
     }
 
     if(!$personID)    {
