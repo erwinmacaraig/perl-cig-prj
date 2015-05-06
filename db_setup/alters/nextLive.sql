@@ -105,3 +105,11 @@ ALTER TABLE tblRegistrationItem
     ADD COLUMN intItemUsingPaidProductFilter tinyint default 0 COMMENT 'Using Active Products filter',
     ADD COLUMN strItemActiveFilterPaidProducts varchar(100) default '' COMMENT 'Which Products to check Active on',
     ADD COLUMN intItemPaidProducts tinyint default 0 COMMENT 'Active status if Active Products filter on';
+
+#150427_tblProducts.sql
+ALTER TABLE tblProducts ADD COLUMN intMinAddSingleTXNLevel TINYINT DEFAULT 0;
+
+
+ALTER TABLE tblEntity CHANGE COLUMN strAcceptSelfRego intAcceptSelfRego INT NULL DEFAULT 1 COMMENT 'Allow an Entity to determine if they accept self registration FC-231'; ## I’ve run against CITEST
+# selfRego.sql
+ALTER TABLE tblPayTry ADD COLUMN intSelfRego TINYINT default 0;
