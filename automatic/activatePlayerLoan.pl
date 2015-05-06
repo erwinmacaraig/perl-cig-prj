@@ -21,9 +21,12 @@ use strict;
             prq.*
         FROM
             tblPersonRequest prq
+        INNER JOIN
+            tblPersonRegistration_$Data{'Realm'} pr ON (pr.intPersonRequestID = prq.intPersonRequestID)
         WHERE
-            prq.strRequestType = 'LOAN'
-            AND prq.strRequestStatus IN ('COMPLETED', 'PENDING')
+            pr.strStatus = 'PENDING'
+            AND prq.strRequestType = 'LOAN'
+            AND prq.strRequestStatus IN ('COMPLETED')
             AND prq.strRequestResponse = 'ACCEPTED'
             AND DATE_FORMAT(prq.dtLoanFrom, '%Y-%m-%d') <= DATE_FORMAT(NOW(), '%Y-%m-%d') 
     ];
@@ -39,7 +42,9 @@ use strict;
         push @personIDs, $personRequest->{'intPersonID'};
     }
 
-    activatePlayerLoan(\%Data, \@personRequestIDs, \@personIDs);
+    if(scalar(@personRequestIDs) and scalar(@personIDs)) {
+        activatePlayerLoan(\%Data, \@personRequestIDs, \@personIDs);
+    }
 
 }
 1;

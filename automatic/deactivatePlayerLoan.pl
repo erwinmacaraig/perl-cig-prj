@@ -21,11 +21,20 @@ use strict;
             prq.*
         FROM
             tblPersonRequest prq
+        INNER JOIN
+            tblPersonRegistration_$Data{'Realm'} pr ON (pr.intPersonRequestID = prq.intPersonRequestID)
+        LEFT JOIN
+            tblNationalPeriod np ON (np.intNationalPeriodID = pr.intNationalPeriodID)
         WHERE
-            prq.strRequestType = 'LOAN'
-            AND prq.strRequestStatus IN ('COMPLETED', 'PENDING')
+            pr.strStatus = 'ACTIVE'
+            AND prq.strRequestType = 'LOAN'
+            AND prq.strRequestStatus IN ('COMPLETED')
             AND prq.strRequestResponse = 'ACCEPTED'
-            AND DATE_FORMAT(prq.dtLoanTo, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d') 
+            AND (
+                    DATE_FORMAT(prq.dtLoanTo, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d') 
+                    OR
+                    np.dtTo <= DATE_FORMAT(NOW(), '%Y-%m-%d')
+                )
     ];
 
     my @personRequestIDs;
@@ -35,11 +44,14 @@ use strict;
     $q->execute() or query_error($st);
 
     while(my $personRequest = $q->fetchrow_hashref()) {
+        print STDERR Dumper $personRequest;
         push @personRequestIDs, $personRequest->{'intPersonRequestID'};
         push @personIDs, $personRequest->{'intPersonID'};
     }
 
-    deactivatePlayerLoan(\%Data, \@personRequestIDs, \@personIDs);
+    if(scalar(@personRequestIDs) and scalar(@personIDs)) {
+        deactivatePlayerLoan(\%Data, \@personRequestIDs, \@personIDs);
+    }
 
 }
 1;
