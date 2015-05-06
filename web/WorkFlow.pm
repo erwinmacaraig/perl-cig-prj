@@ -1288,8 +1288,8 @@ sub approveTask {
 
         my $allComplete = checkRelatedTasks($Data);
         if ($allComplete) {
-            PersonRequest::finalisePlayerLoan($Data, $personRequestID);
             PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+            PersonRequest::finalisePlayerLoan($Data, $personRequestID);
         }
     }
     elsif($personRequestID and $registrationNature eq $Defs::REGISTRATION_NATURE_NEW) {
