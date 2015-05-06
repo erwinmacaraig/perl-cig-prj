@@ -2194,7 +2194,7 @@ sub loanRequiredFields {
    		    		size => '20',
 					name => 'dtLoanEndDate',
                     datetype    => 'dropdown',
-                    validate    => 'DATE',
+                    validate    => 'DATE,DATEMORETHAN:',
                 	compulsory => 1,  
                     sectionname => 'loanfields',
    		    	},
@@ -2288,15 +2288,26 @@ sub activatePlayerLoan {
     #update records for borrowing club
     my $db = $Data->{'db'};
     my $idset = join(', ', @{$requestIDs});
+
     my $bst = qq [
         UPDATE
-            tblPersonRegistration_$Data->{'Realm'}
+            tblPersonRegistration_$Data->{'Realm'} PR
+        INNER JOIN
+            tblPersonRequest PRQ ON (PRQ.intPersonRequestID = PR.intPersonRequestID)
+        LEFT JOIN
+            tblNationalPeriod NP ON (PRQ.dtLoanFrom BETWEEN NP.dtFrom AND NP.dtTo)
         SET
-            strStatus = 'ACTIVE'
+            PR.strStatus = IF(NP.dtTo <= DATE(NOW()), 'PASSIVE', 'ACTIVE'),
+            PR.dtFrom = PRQ.dtLoanFrom,
+            PR.dtTo = IF(PRQ.dtLoanTo <= NP.dtTo, PRQ.dtLoanTo, IF(NP.dtTo <= DATE(NOW()), NP.dtTo, NULL)),
+            PR.intNationalPeriodID = NP.intNationalPeriodID
         WHERE
-            intPersonRequestID IN ($idset)
-            AND strStatus = 'PENDING'
+            PR.intPersonRequestID IN ($idset)
+            AND PRQ.strRequestStatus = 'COMPLETED'
+            AND PR.strStatus IN ('PENDING', 'ACTIVE')
+            AND PR.strSport IN ('', NP.strSport)
     ];
+            #PR.strStatus = IF((PRQ.dtLoanTo <= NP.dtTo AND NP.dtTo < DATE(NOW())), 'PASSIVE', 'ACTIVE'),
 
     #update records for lending club
     my $lst = qq [
@@ -2305,10 +2316,11 @@ sub activatePlayerLoan {
         INNER JOIN
             tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID)
         SET
-            strStatus = 'PASSIVE'
+            PR.strStatus = 'PASSIVE',
+            PR.dtTo = NOW()
         WHERE
             PRQ.intPersonRequestID IN ($idset)
-            AND PR.strStatus IN ('ACTIVE', 'PENDING', 'PASSIVE')
+            AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
     ];
 
     my $query = $db->prepare($bst) or query_error($bst);
