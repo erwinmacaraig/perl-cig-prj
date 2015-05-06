@@ -120,7 +120,7 @@ sub displayRegoFlowSummaryBulk  {
         my $personObj = getInstanceOf($Data, 'person', $pID);
         my %personData = ();
         $regoID = $hidden_ref->{"regoID_$pID"} || 0;
-        my ($txnCountSingle, $amountDueSingle, $logIDsSingle) = getPersonRegoTXN($Data, $pID, $regoID);
+        my ($txnCountSingle, $amountDueSingle, $logIDsSingle, $originalAmount) = getPersonRegoTXN($Data, $pID, $regoID);
         $txnCount += $txnCountSingle;
         $amountDue += $amountDueSingle;
         $personData{'MAID'} = $personObj->getValue('strNationalNum');
@@ -226,7 +226,8 @@ sub displayRegoFlowSummary {
 	 	my $txnCount = 0;
 		my $logIDs;
 		my $txn_invoice_url = $Defs::base_url."/printinvoice.cgi?client=$client&amp;rID=$hidden_ref->{'rID'}&amp;pID=$personID";
-        ($txnCount, $amountDue, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
+        my $originalAmount=0;
+        ($txnCount, $amountDue, $logIDs, $originalAmount) = getPersonRegoTXN($Data, $personID, $regoID);
          if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
             $gatewayConfig = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
          }
@@ -452,7 +453,6 @@ sub displayRegoFlowComplete {
             $regoID,
             $rego_ref
          ) if ! $run;
-        $rego_ref->{'personRegoStatus'} = $Defs::personRegoStatus{$rego_ref->{'strStatus'}} || '';
          
         my @products= split /:/, $hidden_ref->{'prodIds'};
         foreach my $prod (@products){ $hidden_ref->{"prod_$prod"} =1;}
@@ -468,8 +468,24 @@ sub displayRegoFlowComplete {
 	 	my $txnCount = 0;
 		my $logIDs;
         my $amountDue = 0;
+        my $originalAmount=0;
 		my $txn_invoice_url = $Defs::base_url."/printinvoice.cgi?client=$client&amp;rID=$hidden_ref->{'rID'}&amp;pID=$personID";
-        ($txnCount, $amountDue, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
+        ($txnCount, $amountDue, $logIDs, $originalAmount) = getPersonRegoTXN($Data, $personID, $regoID);
+        if (! $originalAmount and defined $logIDs) {
+            foreach my $id (keys %{$logIDs}) {
+                next if ! $id;
+                product_apply_transaction($Data, $id);
+                my $valid =0;
+                ($valid, $rego_ref) = validateRegoID(
+                    $Data,
+                    $personID,
+                    $regoID,
+                    $entityID
+                );
+            }
+        }
+        $rego_ref->{'personTypeText'} = $Defs::personType{$rego_ref->{'personType'}} || $Defs::personType{$rego_ref->{'strPersonType'}} || '';
+        $rego_ref->{'personRegoStatus'} = $Defs::personRegoStatus{$rego_ref->{'strStatus'}} || '';
         savePlayerPassport($Data, $personID) if (! $run);
         $hidden_ref->{'run'} = 1;
          #if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
@@ -640,14 +656,16 @@ sub getPersonRegoTXN    {
     my $count = 0;
    my %tlogIDs=();
     my $amount = 0;
+    my $originalAmount= 0;
     while (my $dref= $qry->fetchrow_hashref())  {
         $tlogIDs{$dref->{'intTransLogID'}} = 1 if ($dref->{'intTransLogID'} and ! exists $tlogIDs{$dref->{'intTransLogID'}});
+        $originalAmount += $dref->{'curAmount'};
         if ($dref->{'intStatus'} == 0)  {
             $amount += $dref->{'curAmount'};
             $count++;
         }
     }
-    return ($count, $amount, \%tlogIDs);
+    return ($count, $amount, \%tlogIDs, $originalAmount);
 }
 
 sub displayRegoFlowCheckout {
@@ -1492,7 +1510,7 @@ sub bulkRegoSubmit {
         #    'REGO'
         #);
 	
-       my ($txnCount, $amountDue, $logIDs) = getPersonRegoTXN($Data, $pID, $regoID);
+       my ($txnCount, $amountDue, $logIDs, $originalAmount) = getPersonRegoTXN($Data, $pID, $regoID);
 	my %Reg = ();
 	$Reg{'CountTXNs'} = $txnCount;
 	
@@ -1503,6 +1521,12 @@ sub bulkRegoSubmit {
             \%Reg
         );
         savePlayerPassport($Data, $pID);
+            if (! $originalAmount and defined $logIDs) {
+                foreach my $id (keys %{$logIDs}) {
+                    next if ! $id;
+                    product_apply_transaction($Data, $id);
+                }
+            }
     }
 }
 
