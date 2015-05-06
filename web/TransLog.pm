@@ -726,7 +726,10 @@ sub getTransList {
                $row_data->{manual_payment} = '-';
             }
             elsif ($row->{intStatus} ==3) { ##HOLD
-                $row_data->{stuff} = qq[<ul><li><a href="main.cgi?a=P_TXNLog_resolveHOLD&client=$client&tlID=$row->{intTransLogID}&amp;pID=$row->{intID}" class = "">].$Data->{'lang'}->txt('Resolve Hold').qq[</a> ];
+                $row_data->{stuff} = '';
+                if ($Data->{'SystemConfig'}{'allowResolvePaymentHold'}) {
+                    $row_data->{stuff} = qq[<ul><li><a href="main.cgi?a=P_TXNLog_resolveHOLD&client=$client&tlID=$row->{intTransLogID}&amp;pID=$row->{intID}" class = "">].$Data->{'lang'}->txt('Resolve Hold').qq[</a> ];
+                }
                 $row_data->{manual_payment} = '-';
 
             }
@@ -1660,16 +1663,20 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 	
     my $buttons = '';
 	
-	$buttons.= qq[<a class="btn-main" href="$Data->{target}?a=P_TXNLog_RH_F&amp;client=$client&amp;tlID=$TLref->{intLogID}" onclick="return confirm(].$lang->txt('This will remove this payment and set all linked transactions to unpaid. Continue?').qq[">]. $lang->txt('Resolve Hold as Failed') . qq[</a>];
+    if ($Data->{'clientValues'}{'authLevel'} >= $Data->{'SystemConfig'}{'allowResolvePaymentHold_ResolveFailedMinLevel'}) {
+	    $buttons.= qq[<a class="btn-main" href="$Data->{target}?a=P_TXNLog_RH_F&amp;client=$client&amp;tlID=$TLref->{intLogID}" onclick="return confirm(].$lang->txt('This will remove this payment and set all linked transactions to unpaid. Continue?').qq[">]. $lang->txt('Resolve Hold as Failed') . qq[</a>];
+    }
 
-	$buttons.= qq[<a class="btn-main" href="$Data->{target}?a=P_TXNLog_RH_P&amp;client=$client&amp;tlID=$TLref->{intLogID}" onclick="return confirm(].$lang->txt('This will mark the payment as successful and set all linked transactions to paid. Continue?').qq[">]. $lang->txt('Resolve Hold as Paid') . qq[</a>];
+    if ($Data->{'clientValues'}{'authLevel'} >= $Data->{'SystemConfig'}{'allowResolvePaymentHold_ResolvePaidMinLevel'}) {
+	    $buttons.= qq[<a class="btn-main" href="$Data->{target}?a=P_TXNLog_RH_P&amp;client=$client&amp;tlID=$TLref->{intLogID}" onclick="return confirm(].$lang->txt('This will mark the payment as successful and set all linked transactions to paid. Continue?').qq[">]. $lang->txt('Resolve Hold as Paid') . qq[</a>];
+    }
 
 	$body = $count ? qq[<h2 class="section-header">].$lang->txt('Payment Hold Summary').qq[</h2>] . $resultHTML.$body . $buttons : $resultHTML;
 
 
 	my $chgoptions='';
 	$chgoptions.= qq[<a href="$Data->{target}?a=P_TXNLog_DEL&amp;client=$client&amp;tlID=$TLref->{intLogID}" onclick="return confirm(].$lang->txt('This will remove this payment and set all linked transactions to unpaid. Continue?').qq["><img src="images/delete.png" border="0" alt="Delete Payment Record" title="Delete Payment Record"></a>] if (
-		$Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC 
+		$Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL
 		and $thisassoc 
 		and (
 			(
@@ -1942,7 +1949,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 	my $chgoptions='';
     
 	$chgoptions.= qq[<a href="$Data->{target}?a=P_TXNLog_DEL&amp;client=$client&amp;tlID=$TLref->{intLogID}" onclick="return confirm(].$lang->txt('This will remove this payment and set all linked transactions to unpaid. Continue?').qq["><img src="images/delete.png" border="0" alt="Delete Payment Record" title="Delete Payment Record"></a>] if (
-		$Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC 
+		$Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL
 		and $thisassoc 
 		and (
 			(
