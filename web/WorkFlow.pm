@@ -711,7 +711,7 @@ sub listTasks {
 
             my $taskStatusLabel = $request->{'strRequestResponse'} ? $Defs::personRequestStatus{$request->{'strRequestResponse'}} : $Defs::personRequestStatus{'PENDING'};
             my %personRequest = (
-                personRequestLabel => $Defs::personRequest{$request->{'strRequestType'}},
+                personRequestLabel => $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}}),
                 TaskType => $request->{'strRequestType'},
                 TaskDescription => $Data->{'lang'}->txt('Person Request'),
                 Name => $name,
