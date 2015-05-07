@@ -5,6 +5,7 @@ require Exporter;
 
 @EXPORT = @EXPORT_OK = qw(
     doesUserHaveAccess
+    doesSelfUserHaveAccess
     doesUserHaveEntityAccess
 );
 
@@ -143,5 +144,37 @@ sub doesUserHaveEntityAccess  {
     my ($found) = $q->fetchrow_array();
     $q->finish();
     return $found || 0;
+}
+
+sub doesSelfUserHaveAccess  {
+    my (
+        $Data,
+        $personID,
+        $userID,
+    ) = @_;
+
+    return 0 if !$userID;
+    return 0 if !$personID;
+
+    my $st = qq[
+        SELECT
+            intSelfUserID
+        FROM
+            tblSelfUserAuth
+        WHERE
+            intEntityTypeID = $Defs::LEVEL_PERSON
+            AND intEntityID = ?
+            AND intSelfUserID = ?
+    ];
+
+    my $db = $Data->{'db'};
+    my $q = $db->prepare($st);
+    $q->execute(
+        $personID,
+        $userID,
+    );
+    my ($found) = $q->fetchrow_array();
+    $q->finish();
+    return $found ? 1 : 0;
 }
 1;

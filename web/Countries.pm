@@ -267,7 +267,7 @@ require Exporter;
 10004   => ['Czechoslovakia','CSHH','CSHH',  1   ],
 10005   => ['Dahomey','DYBJ','DYBJ',  1   ],
 10006   => ['Dronning Maud Land','NQAQ','NQAQ',  1   ],
-10007   => ['East Timor [note 1]','TPTL','TPTL',  1   ],
+10007   => ['East Timor','TPTL','TPTL',  1   ],
 10008   => ['France, Metropolitan','FXFR','FXFR',  1   ],
 10009   => ['French Afar and Issas','AIDJ','AIDJ',  1   ],
 10010   => ['French Southern and Antarctic Territories','FQHH','FQHH',  1   ],

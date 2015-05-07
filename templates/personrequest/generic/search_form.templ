@@ -63,7 +63,7 @@
                                     <input type="text" name="search_keyword" value="[% search_keyword %]">
                                         <div class="col-md-8 txtleft" style="padding: 5px 0px 0px 0px;"><p id="errorMsg"></p></div>
                                         <div class="col-md-4 txtright" style="padding: 5px 0px 0px 0px;">
-                                            <input class="btn-inside-panels" type="submit" name="submitb" value="Search">   
+                                            <input class="btn-inside-panels" type="submit" name="submitb" value="[% Lang.txt('Search') %]">   
                                             <input type="hidden" value="[% action %]" name="a"> <input type="hidden" value="[% client %]" name="client">
                                             <input type="hidden" value="[% request_type %]" name="request_type">
                                         </div>
@@ -110,7 +110,7 @@
                                     <div class="alert">
                                         <div>
                                         <span class="fa fa-exclamation"></span>
-                                        <p>This person has more than one registration. Please select ones apply to this transfer.
+                                        <p>[% Lang.txt('This person has more than one registration. Please select ones apply to this transfer.') %]
                                         </p>
                                     </div>
                                     </div>
@@ -125,7 +125,7 @@
                                             [% FOREACH sportOption IN result.value %]
                                                 
                                                 <input id="option_[% sportOption.id %]" name="regoselected[[% sportOption.personID %]][[% sportOption.id %]]" type="checkbox"/>
-                                                <label for="option_[% sportOption.id %]">[% sportOption.sportLabel %]</label>
+                                                <label for="option_[% sportOption.id %]">[% Lang.txt(sportOption.sportLabel) %]</label>
                                                 <br/>
 
                                             [% END %]
@@ -156,7 +156,7 @@
                         <div class="alert alert-warning" role="alert">
                             <div>
                                 <span class="fa fa-exclamation"></span>
-                                <p>No result found for keyword '[% search_keyword %]'.</p>
+                                <p>[% Lang.txt('No result found for keyword') %] '[% search_keyword %]'.</p>
                             </div>
                         </div>
                     </div>
@@ -175,50 +175,50 @@
         </div>
 
         <div class="col-md-3">
-            <h3 class="panel-header">Transfer Summary</h3>
+            <h3 class="panel-header">[% Lang.txt('Transfer Summary') %]</h3>
             <div class="panel-body transfer-summary">
                 <div class="row">
                     <div class="col-md-12">
                         <p>
-                            <label>Member ID:</label><br />
+                            <label>[% Lang.txt('Member ID') %]:</label><br />
                             <label><b>
                                 [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.memberID %][% ELSE %]&#8211;[% END %]
                             </b></label>
                         </p>
                         <p>
-                            <label>Last Name:</label><br />
+                            <label>[% Lang.txt('Last Name') %]:</label><br />
                             <label><b>
                                 [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.lastName %][% ELSE %]&#8211;[% END %]
                             </b></label>
                         </p>
                         <p>
-                            <label>First Name:</label><br />
+                            <label>[% Lang.txt('First Name') %]:</label><br />
                             <label><b>
                                 [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.firstName %][% ELSE %]&#8211;[% END %]
                             </b></label>
                         </p>
                         <p>
-                            <label>Transfer to club:</label><br />
+                            <label>[% Lang.txt('Transfer to club') %]:</label><br />
                             <label><b>
                                 [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.transferToClub %][% ELSE %]&#8211;[% END %]
                             </b></label>
                         </p>
                         <p>
-                            <label>Current club(s):</label><br />
+                            <label>[% Lang.txt('Current club') %]:</label><br />
                             <label><b>
                                 [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.currentClub %][% ELSE %]&#8211;[% END %]
                             </b></label>
                         </p>
                         <p>
-                            <label>Current registration(s):</label><br />
+                            <label>[% Lang.txt('Current registration') %]:</label><br />
                             <label><b>
-                                [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.currentRegistrations %][% ELSE %]&#8211;[% END %]
+                                [% IF(selectedForTransferDetails) %][% Lang.txt(selectedForTransferDetails.currentRegistrations) %][% ELSE %]&#8211;[% END %]
                             </b></label>
                         </p>
                         <p>
-                            <label>Current sport(s):</label><br />
+                            <label>[% Lang.txt('Current sport') %]:</label><br />
                             <label><b>
-                                [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.currentSports %][% ELSE %]&#8211;[% END %]
+                                [% IF(selectedForTransferDetails) %][% Lang.txt(selectedForTransferDetails.currentSports) %][% ELSE %]&#8211;[% END %]
                             </b></label>
                         </p>
                     </div>
@@ -230,13 +230,13 @@
   <div class="modal-dialog" style="z-index:9999;">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">[% Lang.txt('Close') %]</span></button>
         <h4 class="modal-title" id="myModalLabel">[% Lang.txt('Request Transfer Notes') %]</h4>
       </div>
       
       <form id="personRequestNotes" action="main.cgi" method="POST">
           <div class="modal-body">
-            <label>Please enter request notes</label>
+            <label>[% Lang.txt('Please enter request notes') %]</label>
             <textarea name="request_notes"></textarea>
           </div>
 
@@ -244,8 +244,8 @@
           </div>
 
           <div class="modal-footer">
-            <a class="btn-main" data-dismiss="modal">Close</a>
-            <input class="btn-main" type="submit" name="submitb" value="Submit">
+            <a class="btn-main" data-dismiss="modal">[% Lang.txt('Close') %]</a>
+            <input class="btn-main" type="submit" name="submitb" value="[% Lang.txt('Submit') %]">
           </div>
       </form>
       
@@ -263,7 +263,7 @@
             <tbody><tr><td><span class="label">Person Lookup:</span></td><td><span class="formw"><input type="text" name="search_keyword" value=""></span></td></tr>
             <tbody><tr><td><span class="label"></span></td><td><span class="label">Enter Name or Member ID</span></td></tr>
             </tbody></table>
-            <input type="submit" name="submitb" value="Search">   
+            <input type="submit" name="submitb" value="[% Lang.txt('Search') %]">   
             <input type="hidden" value="[% action %]" name="a"> <input type="hidden" value="[% client %]" name="client">
             <input type="hidden" value="[% request_type %]" name="request_type">
         </form>
@@ -306,7 +306,7 @@
                 }
             },
             messages: {
-                request_notes: "Please add notes."
+                request_notes: "[% Lang.txt('Please add notes') %]"
             }
         });
     });

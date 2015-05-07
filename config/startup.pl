@@ -21,7 +21,10 @@ use lib qw(
 /u/current/web/ExternalGateways
 /u/current/web/Mail
 /u/current/web/PaymentSplit
+/u/current/web/NationalCode
 /u/current/web/admin
+/u/current/web/registration
+/u/current/web/registration/user
 
 );
 #Other Perl Libs

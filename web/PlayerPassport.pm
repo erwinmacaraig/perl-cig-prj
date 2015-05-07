@@ -55,6 +55,7 @@ sub savePlayerPassport{
             AND PR.strPersonType = 'PLAYER' 
             AND PR.strSport = 'FOOTBALL' 
             AND PR.strStatus IN ('PASSIVE', 'ACTIVE', 'ROLLED_OVER', 'TRANSFERRED')
+            AND PR.dtFrom IS NOT NULL
         HAVING
             PRToCalc > When12
         ORDER BY PR.dtFrom, PR.intPersonRegistrationID ASC, NP.dtFrom

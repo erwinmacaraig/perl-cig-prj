@@ -121,7 +121,8 @@ warn("LLLLine: $line");
         	print $cgi->redirect($url);
 	}
 	else	{
-		my $body .= displayPaymentResult($Data, $logID, 1);
+	    my ($payStatus, $payBody) = displayPaymentResult($Data, $logID, 1);
+        $body .= $payBody;
 		$body .= qq[<br><p><a href="$Defs::base_url/main.cgi?client=$client&a=P_TXNLog_list&mode=p">Return to Membership System</a></p>] if ! $external;
 		return $body;
 	}
@@ -255,7 +256,7 @@ print STDERR "LOGID: $logID PP2: $key | $val\n";
 	my $otherRef3 = qq[TRANSACTIONID:$returnvals{'TRANSACTIONID'}];
 	my $otherRef4 = qq[CORRELATIONID:$returnvals{'CORRELATIONID'}];
 	
-	processTransLog($Data->{'db'}, $txn, $returnvals{'ResponseCode'}, $returnvals{'ResponseText'}, $logID, $paymentSettings, undef, $settlement_date, $otherRef1, $otherRef2, $otherRef3, $otherRef4, '', $returnvals{'TRANSACTIONID'}, $returnvals{'ResponseText'});
+	processTransLog($Data->{'db'}, $txn, $returnvals{'ResponseCode'}, $returnvals{'ResponseCode'}, $returnvals{'ResponseText'}, $logID, $paymentSettings, undef, $settlement_date, $otherRef1, $otherRef2, $otherRef3, $otherRef4, '', $returnvals{'TRANSACTIONID'}, $returnvals{'ResponseText'});
 	if ($returnvals{'ResponseCode'} eq 'OK')	{	
 		UpdateCart($Data, $paymentSettings, $client, undef, undef, $logID);
 print STDERR "paypal CART DONE ABOUT TO EMAIL FOR $logID\n";
@@ -278,7 +279,7 @@ print STDERR "paypal CART DONE ABOUT TO EMAIL FOR $logID\n";
 				return '';
 			}
 	}
-	my $body = displayPaymentResult($Data, $logID, 1);
+	my ($payStatus, $body) = displayPaymentResult($Data, $logID, 1);
 	$body .= qq[<br><p><a href="$Defs::base_url/main.cgi?client=$client&a=P_TXNLog_list&mode=p">Return to Membership System</a></p>] if ! $external;
 	return $body;
 }

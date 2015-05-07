@@ -103,9 +103,7 @@
     jQuery().ready(function() {
         var table = jQuery("#searchResult").DataTable({
             "dom" : "ilftpr",
-            "language" : {
-                "search": "[% Lang.txt('Filter') %]"
-            },
+            "language":{"sInfo":"[% Lang.txt('Showing _START_ to _END_ of _TOTAL_ entries') %]","sZeroRecords":"[% Lang.txt('No matching records found') %]","sLengthMenu":"[% Lang.txt('Show _MENU_ entries') %]","oPaginate":{"sPrevious":"[% Lang.txt('Previous') %]","sFirst":"[% Lang.txt('First') %]","sNext":"[% Lang.txt('Next') %]","sLast":"[% Lang.txt('Last') %]"},"search":"[% Lang.txt('Filter') %]","infoFiltered":" - [% Lang.txt('filtered from _MAX_ records') %]","infoEmpty":"[% Lang.txt('No entries to show') %]"},
             "aaSorting": [ ]
         });
 

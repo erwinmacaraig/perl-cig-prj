@@ -87,8 +87,6 @@ sub listIncompleteRegistrations    {
             p.intRealmID = ?
             AND RS.regoType = 'PERSON'
             AND RS.userEntityID = ?
-        GROUP BY 
-            pr.intPersonRegistrationID
         ORDER BY
           pr.dtAdded DESC
     ];
@@ -130,6 +128,10 @@ sub listIncompleteRegistrations    {
                 </form>
             ];
 
+        }
+        if($Data->{'clientValues'}{'authLevel'} != $Data->{'clientValues'}{'currentLevel'})    {
+            $resume = '';
+            $delete = '';
         }
         
         push @rowdata, {

@@ -237,19 +237,14 @@ body.report h1	{
 }
 
 .report-wrapper	{
+    width: 100%;
 }
 
 
-.report-table,
-	 .report-wrapper table.listTable {
-	font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
-	vertical-align:bottom;
-	border-collapse:collapse;
-	font-size:10px;
-	margin-top:10px;
-	margin-bottom:10px;
-	margin-left:auto;
-	margin-right:auto;
+table.shrink-table td,
+table.shrink-table th   {
+	font-size:10px !important;
+    padding:6px !important;
 }
 
 .report-table thead,
@@ -260,32 +255,12 @@ body.report h1	{
 }
 
 .report-numrows	{
-	font-size:8px;
+	font-size:10px;
 	color: #000;
 	vertical-align: bottom;
 	float:right;
 }
 
-.report-table th,
-	 .report-wrapper table.listTable th {
-	font-size:9px;
-	color: #000;
-	padding:5px;
-}
-.report-table td,
- .report-wrapper table.listTable td {
-	padding:3px;
-	border:1px solid #eeeeee;
-}
-
-.report-table tr.odd,
- .report-wrapper table.listTable tr.odd {
-	background-color:#FFF;
-}
-.report-table tr.even,
- .report-wrapper table.listTable tr.even {
-	background-color:#EEEEEE;
-}
 .report-daterun	{
 	font-style:italic;
 }
@@ -294,25 +269,25 @@ TD.total {
 	border-top:solid #000000 1px;
 }
 
-TR.ROgroupheader {
-    background-color:#BBBBBB;
+TR.ROgroupheader td{
+    background-color:#BBBBBB !important;
     vertical-align:top;
     font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
     font-weight:bold;
     padding:3px;
 }
                                                                                                         
-TR.ROgroupfooter {
+TR.ROgroupfooter td {
   vertical-align:top;
   font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
-  border-top:solid #000000 1px;
+  border-top:solid #000000 1px !important;
   font-style:italic;
 }
 
-TR.ROtotalfooter {
+TR.ROtotalfooter td {
   vertical-align:top;
   font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
-  border-top:double #000000 3px;
+  border-top:double #000000 3px !important;
   font-style:italic;
 }
 
@@ -1177,13 +1152,6 @@ span.move a {
 .reporttab-data	{
 	margin-left: 138px;
 }
-.reporttab-datacontent	{
-	padding:20px;
-	border: 1px solid #99bbe9;
-	border-radius: 5px;
-	-moz-border-radius: 5px;
-	clear:right;
-}
 
 .reporttab-button {
 	width: 128px;
@@ -1204,16 +1172,6 @@ span.move a {
 
 .reporttabs input:hover {
 	cursor:pointer;
-}
-
-.reportgroup {
-	clear:right;
-}
-
-.reportgroup-title	{
-	color: #0d2680;
-	font-size:1.3em;	
-	margin-bottom:1em;
 }
 
 .fieldconfig-header	{
@@ -3060,8 +3018,7 @@ body.report h1 {
 }
 
 .report-wrapper {
-	float:left;
-	width:100%;
+    overflow:scroll;
 }
 */
 .reporttabs {
@@ -3069,7 +3026,9 @@ body.report h1 {
 	position: relative;
 	text-align: center;
 }
-
+.report-wrapper {
+    overflow-x:scroll;
+}
 .reporttab-button {
 	font-family: sans-serif;
 	color: #6A6A6A;

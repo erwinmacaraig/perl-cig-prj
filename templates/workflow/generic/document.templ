@@ -30,7 +30,7 @@
             [% FOREACH document IN RelatedDocuments %]
             <tr class="task-list">
                 <td>
-                    <span class="detail-value">[% document.DocumentType %]</span>
+                    <span class="detail-value">[% Lang.txt(document.DocumentType) %]</span>
                 </td>
                 <td class="status-col">
                     [% IF document.DisplayView == 1 %]

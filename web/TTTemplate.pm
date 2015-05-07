@@ -19,6 +19,7 @@ sub runTemplate	{
 	$InData->{'Data'}=$Data;
 	$InData->{'Lang'}=$Data->{'lang'};
 	$InData->{'DateFormat'}=$Data->{'l10n'}{'date'};
+	$InData->{'CurrencyFormat'}=$Data->{'l10n'}{'currency'};
 	$InData->{'BaseURL'}=$Defs::base_url;
 	$InData->{'UploadedURL'}=$Defs::uploaded_url;
   my $config = {

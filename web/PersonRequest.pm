@@ -34,6 +34,7 @@ use Switch;
 use SphinxUpdate;
 use InstanceOf;
 use PersonEntity;
+use PersonUtils;
 use TemplateEmail;
 use Flow_DisplayFields;
 
@@ -524,7 +525,7 @@ sub initRequestPage {
     $TemplateData{'PersonSummaryPanel'}  = personSummaryPanel($Data, $personID) || '';
 
     if($transferType eq $Defs::TRANSFER_TYPE_INTERNATIONAL) {
-        $title = $Data->{'lang'}->txt("Do you have Player's International Transfer Certificate?");
+        $title = $Data->{'lang'}->txt("Do you have the player's International Transfer Certificate?");
 
         $TemplateData{'noITC'} = qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PRA_NC">]. $Data->{'lang'}->txt("No") . q[</a></span>];
         $TemplateData{'withITC'} = qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PF_&amp;dtype=PLAYER&amp;itc=1">]. $Data->{'lang'}->txt("Yes") . q[</a></span>];
@@ -602,9 +603,11 @@ sub submitRequestPage {
                     (
                         strRequestType,
                         intPersonID,
+                        intExistingPersonRegistrationID,
                         strSport,
                         strPersonType,
                         strPersonLevel,
+                        strNewPersonLevel,
                         strPersonEntityRole,
                         intRealmID,
                         intRequestFromEntityID,
@@ -629,6 +632,8 @@ sub submitRequestPage {
                         ?,
                         ?,
                         ?,
+                        ?,
+                        ?,
                         NOW(),
                         NOW()
                     )
@@ -641,8 +646,10 @@ sub submitRequestPage {
             $q->execute(
                 $requestType,
                 $personID,
+                $regDetails->{'intPersonRegistrationID'} || 0,
                 $regDetails->{'strSport'},
                 $regDetails->{'strPersonType'},
+                $regDetails->{'strPersonLevel'},
                 $regDetails->{'strPersonLevel'},
                 $regDetails->{'strPersonEntityRole'},
                 $Data->{'Realm'},
@@ -699,7 +706,11 @@ sub submitRequestPage {
 
     my $query = new CGI;
     my $rType = getRequestType();
+		
     print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=PRA_F&rtype=$rType&pr=" . join(',', @requestIDs));
+
+
+
     #my $resultHTML;
     #return ($resultHTML, 'Request Summary');
 }
@@ -827,7 +838,7 @@ sub listRequests {
         }
     }
 
-    return ("$found record found.", $title) if !$found;
+    return ($Data->{'lang'}->txt("Records found").': '. $found, $title) if !$found;
 
     my @headers = (
         {
@@ -944,11 +955,12 @@ sub viewRequest {
     my $maObj = getInstanceOf($Data, 'national');
 
     my $isocountries  = getISOCountriesHash();
+    my $lang = $Data->{'lang'};
     my %TemplateData = (
         'requestID' => $request->{'intPersonRequestID'} || undef,
-        'requestType' => $Defs::personRequest{$request->{'strRequestType'}} || '',
+        'requestType' => $lang->txt($Defs::personRequest{$request->{'strRequestType'}}) || '',
         'requestFrom' => $request->{'requestFrom'} || '',
-        'requestFromDiscipline' => $Defs::entitySportType{$request->{'requestFromDiscipline'}} || '',
+        'requestFromDiscipline' => $lang->txt($Defs::entitySportType{$request->{'requestFromDiscipline'}}) || '',
         'requestFromISOCountry' => $isocountries->{$request->{'requestFromISOCountry'}} || '',
         'requestFromAddress' => $request->{'requestFromAddress'} || '',
         'requestFromAddress2' => $request->{'requestFromAddress2'} || '',
@@ -960,7 +972,7 @@ sub viewRequest {
         'requestFromTo' => $request->{'requestFromTo'} || '',
 
         'requestTo' => $request->{'requestTo'} || '',
-        'requestToDiscipline' => $Defs::entitySportType{$request->{'requestToDiscipline'}} || '',
+        'requestToDiscipline' => $lang->txt($Defs::entitySportType{$request->{'requestToDiscipline'}}) || '',
         'requestToISOCountry' => $isocountries->{$request->{'requestToISOCountry'}} || '',
         'requestToAddress' => $request->{'requestToAddress'} || '',
         'requestToAddress2' => $request->{'requestToAddress2'} || '',
@@ -970,19 +982,19 @@ sub viewRequest {
         'requestToPhone' => $request->{'requestToPhone'} || '',
 
         'dateRequest' => $request->{'dtDateRequest'} || '',
-        'requestResponse' => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || '',
+        'requestResponse' => $lang->txt($Defs::personRequestResponse{$request->{'strRequestResponse'}}) || '',
         'responseBy' => $request->{'responseBy'} || '',
         'personFirstname' => $request->{'strLocalFirstname'} || '',
         'personSurname' => $request->{'strLocalSurname'} || '',
         'ISONationality' => $isocountries->{$request->{'strISONationality'}} || '',
         'ISOCountryOfBirth' => $isocountries->{$request->{'strISOCountryOfBirth'}} || '',
         'RegionOfBirth' => $request->{'strRegionOfBirth'} || '',
-        'personGender' => $Defs::PersonGenderInfo{$request->{'intGender'} || 0} || '',
+        'personGender' => $lang->txt($Defs::PersonGenderInfo{$request->{'intGender'} || 0}) || '',
         'DOB' => $request->{'dtDOB'} || '',
         'personStatus' => $request->{'personStatus'} || '',
-        'sport' => $Defs::sportType{$request->{'strSport'}} || '',
-        'personType' => $Defs::personType{$request->{'strPersonType'}} || '',
-        'personLevel' => $Defs::personLevel{$request->{'strPersonLevel'}} || '',
+        'sport' => $lang->txt($Defs::sportType{$request->{'strSport'}}) || '',
+        'personType' => $lang->txt($Defs::personType{$request->{'strPersonType'}}) || '',
+        'personLevel' => $lang->txt($Defs::personLevel{$request->{'strPersonLevel'}}) || '',
         'requestNotes' => $request->{'strRequestNotes'} || '',
         'responseNotes' => $request->{'strResponseNotes'} || '',
 
@@ -1195,7 +1207,7 @@ sub setRequestResponse {
         if($response eq "ACCEPTED"){
             $templateFile = "personrequest/transfer/request_accepted.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
             $templateFile = "personrequest/access/request_accepted.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_ACCESS;
-            $notifDetails .= $Data->{'lang'}->txt(" You will be notified once the transfer is effective and approved by ") . $maName if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
+            $notifDetails .= $Data->{'lang'}->txt("You will be notified once the transfer is effective and approved by ") . $maName if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
         }
         elsif($response eq "DENIED"){
             $templateFile = "personrequest/transfer/request_denied.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
@@ -1336,6 +1348,7 @@ sub getRequests {
             pq.strSport,
             pq.strPersonType,
             pq.strPersonLevel,
+            pq.strNewPersonLevel,
             pq.strPersonEntityRole,
             pq.intRealmID,
             pq.intRequestFromEntityID,
@@ -1422,6 +1435,7 @@ sub getRequests {
     my @personRequests = ();
       
     while(my $dref = $q->fetchrow_hashref()) {
+        $dref->{'currentAge'} = personAge($Data, $dref->{'dtDOB'});
         my $personCurrAgeLevel = Person::calculateAgeLevel($Data, $dref->{'currentAge'});
         $dref->{'personCurrentAgeLevel'} = $personCurrAgeLevel;
         push @personRequests, $dref;
@@ -1465,18 +1479,16 @@ sub finaliseTransfer {
         WHERE
             intEntityID = ?
             AND strPersonType = ?
-            AND strPersonLevel= ?
             AND strSport = ?
             AND intPersonID = ?
             AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
 	];
-            #dtTo= IF(dtTo>NOW(), NOW(), dtTo)
-            #dtFrom = IF(dtFrom>NOW(), NOW(), dtFrom),
+       #AND strPersonLevel= ?
+       #$personRequest->{'strPersonLevel'},
     my $query = $db->prepare($stDates) or query_error($stDates);
     $query->execute(
        $personRequest->{'intRequestToEntityID'},
        $personRequest->{'strPersonType'},
-       $personRequest->{'strPersonLevel'},
        $personRequest->{'strSport'},
        $personRequest->{'intPersonID'}
     ) or query_error($stDates);
@@ -1502,7 +1514,6 @@ sub finaliseTransfer {
             R.intEntityID = ?
             AND R.intNationalPeriodID = ?
             AND R.strPersonType = ?
-            AND R.strPersonLevel= ?
             AND R.strSport = ?
             AND R.intPersonID = ?
             AND R.strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
@@ -1512,12 +1523,13 @@ sub finaliseTransfer {
 
     my $qryNP= $db->prepare($stPeriods) or query_error($stPeriods);
     $qryNP->execute($Data->{'Realm'});
+            #AND R.strPersonLevel= ?
+           #$personRequest->{'strPersonLevel'},
     while (my $pref = $qryNP->fetchrow_hashref) {
         $query->execute(
            $personRequest->{'intRequestToEntityID'},
             $pref->{'intNationalPeriodID'},
            $personRequest->{'strPersonType'},
-           $personRequest->{'strPersonLevel'},
            $personRequest->{'strSport'},
            $personRequest->{'intPersonID'}
         ) or query_error($stDates);
@@ -1534,11 +1546,12 @@ sub finaliseTransfer {
         WHERE
             intEntityID = ?
             AND strPersonType = ?
-            AND strPersonLevel = ?
             AND strSport = ?
             AND intPersonID = ?
-            AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
+            AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER')
 	];
+            #AND strPersonLevel = ?
+       #$personRequest->{'strPersonLevel'},
 
 ## Basically Set dtTo = NOW if they left before end of peiod.
 ## If dtFrom is in future (if they never started) that period won't be included in Passport
@@ -1549,10 +1562,56 @@ sub finaliseTransfer {
        $Defs::PERSONREGO_STATUS_TRANSFERRED,
        $personRequest->{'intRequestToEntityID'},
        $personRequest->{'strPersonType'},
-       $personRequest->{'strPersonLevel'},
        $personRequest->{'strSport'},
        $personRequest->{'intPersonID'}
     ) or query_error($st);
+
+    $st = qq[
+        UPDATE
+            tblPersonRegistration_$Data->{'Realm'} as PR
+            INNER JOIN tblWFTask as WF ON (WF.intPersonRegistrationID = PR.intPersonRegistrationID)
+        SET
+            WF.strTaskStatus = ?
+        WHERE
+            PR.intEntityID = ?
+            AND WF.strRegistrationNature IN ('NEW', 'RENEWAL')
+            AND PR.strPersonType = ?
+            AND PR.strSport = ?
+            AND PR.intPersonID = ?
+            AND PR.strStatus IN ('PENDING')
+    ];
+    $query = $db->prepare($st) or query_error($st);
+    $query->execute(
+       'DELETED',
+       $personRequest->{'intRequestToEntityID'},
+       $personRequest->{'strPersonType'},
+       $personRequest->{'strSport'},
+       $personRequest->{'intPersonID'}
+    ) or query_error($st);
+
+    
+    $st = qq[
+        UPDATE
+            tblPersonRegistration_$Data->{'Realm'}
+        SET
+            strPreTransferredStatus = strStatus,
+            strStatus = ?
+        WHERE
+            intEntityID = ?
+            AND strPersonType = ?
+            AND strSport = ?
+            AND intPersonID = ?
+            AND strStatus IN ('PENDING')
+    ];
+    $query = $db->prepare($st) or query_error($st);
+    $query->execute(
+       $Defs::PERSONREGO_STATUS_DELETED,
+       $personRequest->{'intRequestToEntityID'},
+       $personRequest->{'strPersonType'},
+       $personRequest->{'strSport'},
+       $personRequest->{'intPersonID'}
+    ) or query_error($st);
+
     my %PE = ();
     {
     $PE{'personType'} = $personRequest->{'strPersonType'} || '';
@@ -1712,7 +1771,7 @@ sub itcFields {
                 	compulsory => 1,  
    		    	},
    		    	strClubName => {   		    	
-   		    		label => 'Club\'s Name',
+   		    		label => 'Club Name',
    		    		type => 'text',
    		    		value => '',
                 	compulsory => 1,  

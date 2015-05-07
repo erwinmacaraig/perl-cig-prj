@@ -213,7 +213,7 @@ header .logo-area ul li strong {
 
 header nav {
 	background: #004e7e;
-	padding: 10px 0;
+	padding: 11px 0;
 	-webkit-box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
 	-moz-box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
 	box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
@@ -502,13 +502,13 @@ a.btn-main, input.btn-main, button.btn-main {
 }
 a.btn-main.btn-proceed {
     padding-left:20px;
-    padding-bottom:7px;
+    position: relative;
 }
 .proceed-chevron    {
     float:right;
-    position:relative;
-    bottom:3px;
-    right:-10px;
+    position:absolute;
+    bottom:11px;
+    right:12px;
     font-weight:bold;
     margin:0 !important;
     padding:0px;
@@ -852,8 +852,12 @@ table tr.new-task {
 	color: #fff;
 }
 
-.regoType_PLAYER {
+.regoType_PLAYER,
+.regoType_PLAYERFOOTBALL {
     background-color: #0784d4;
+}
+.regoType_PLAYERFUTSAL {
+    background-color: #0f5785;
 }
 .regoType_COACH {
     background-color: #1b94e2;
@@ -2503,3 +2507,37 @@ header .navbar-brand {
    form#searchForm .btn-inside-panels { margin-left: 0; }
    /*#fsg-core label.col-md-4 { text-align: left; }*/
 
+/*** payment ***/
+.paymentwrapper { float: left; width: 100%; padding-bottom: 5px; }
+.paymentmainwrapper { 
+    background-color: #fff;
+    float: left;
+    padding: 10px 5px 5px 10px;
+    width: 100%;
+}
+.paymentwrapperoption { float: left; padding-right: 10px; }
+.paymentwrapper label { font-size: 12px; }
+.lang-select {
+    color:#000;
+    font-size: 13px;
+}
+.lang-select select{
+    padding: 1px 5px;
+}
+.hidden-col-val {
+    display:none;
+}
+
+.report-option-button-row {
+    margin-bottom:20px;
+}
+/* Self Reg */
+.selfreg-actions a.btn-inside-panels,
+.selfreg-regwho a.btn-main,
+#selfreg-myselfoptions a.btn-main {
+    width:47%;
+    margin:4px;
+}
+
+
+#selfreg-myselfoptions { display:none; }
