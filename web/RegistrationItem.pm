@@ -66,7 +66,15 @@ sub getRegistrationItems    {
             $ActiveProductsFilter_ref = registrationItemActiveProducts($Data, $Rego_ref->{'intPersonID'}, $regNature2, $personType);
         }
     }
-    
+    $sysConfigCheck = "RegistrationItems_DomesticLoanUsesNew";
+    if ($itemType eq 'PRODUCT' and $regNature eq "DOMESTIC_LOAN" and $Data->{'SystemConfig'}{"RegistrationItems_DomesticLoanUsesNew"} == 1)  {
+        $regNature2 = 'NEW';
+        my $sysConfigActiveProductsFilter = 'ACTIVEPRODUCTS_' . $itemType . '_DOMESTIC_LOAN_' . $personType;
+        if ($Data->{'SystemConfig'}{$sysConfigActiveProductsFilter} && $Rego_ref->{'intPersonID'})    {
+            $ActiveProductsFilter_ref = registrationItemActiveProducts($Data, $Rego_ref->{'intPersonID'}, $regNature2, $personType);
+        }
+    }
+     
 print STDERR "D: $regNature | $regNature2\n";
 
     my $locale = $Data->{'lang'}->getLocale();
