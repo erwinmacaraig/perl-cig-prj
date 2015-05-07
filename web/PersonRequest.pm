@@ -2297,7 +2297,7 @@ sub activatePlayerLoan {
         LEFT JOIN
             tblNationalPeriod NP ON (PRQ.dtLoanFrom BETWEEN NP.dtFrom AND NP.dtTo)
         SET
-            PR.strStatus = IF(NP.dtTo <= DATE(NOW()), 'PASSIVE', 'ACTIVE'),
+            PR.strStatus = IF(NP.dtTo <= DATE(NOW()), 'PASSIVE', IF(NP.dtTo = '' OR NP.dtTo IS NULL, 'PENDING', 'ACTIVE')),
             PR.dtFrom = PRQ.dtLoanFrom,
             PR.dtTo = IF(PRQ.dtLoanTo <= NP.dtTo, PRQ.dtLoanTo, IF(NP.dtTo <= DATE(NOW()), NP.dtTo, NULL)),
             PR.intNationalPeriodID = NP.intNationalPeriodID
