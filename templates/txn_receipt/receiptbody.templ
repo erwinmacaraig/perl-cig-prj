@@ -35,6 +35,7 @@
 			<td style="width:80px;">[% Lang.txt('Invoice Number') %]</td>
 			<td style="width:20px;">[% Lang.txt('QTY') %]</td>
 			<td>[% Lang.txt('Description') %]</td>
+			<td style="width:50px;">[% Lang.txt('Tax Price') %]</td>
 			<td style="width:70px;">[% Lang.txt('Cost') %]</td>
 		</tr>
 	[% total = 0 %]
@@ -43,12 +44,13 @@
 			<td>[% i.strInvoiceNumber %]</td>
 			<td>[% i.intQty %]</td>
 			<td>[% i.strName %]</td>
+			<td>[% i.curPriceTaxFormatted %]</td>
 			<td>[% i.curAmountFormatted %] </td>
 		</tr>
 	[% total = total + i.curAmount %]
 	[% END %]
 		<tr style = " border-top:1px solid #aaa;">
-			<td colspan="3"><b>[% Lang.txt('Payment Total') %]:</b></td>
+			<td colspan="4"><b>[% Lang.txt('Payment Total') %]:</b></td>
 			<td><b>[% CurrencyFormat.format(total) %]</b></td>
 		</tr>
 	</table>
