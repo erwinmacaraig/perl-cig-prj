@@ -4376,7 +4376,7 @@ ul.new_tabs li a.active, .new_tabs_wrap  a.active {
 
 /* User Signup styles */
 #signup-email-div {
-    margin: 14px 0 0 12px;
+    /*margin: 14px 0 0 12px;*/
     clear: both;
     color: #0065A4;
     font-size: 18px;
@@ -4384,19 +4384,23 @@ ul.new_tabs li a.active, .new_tabs_wrap  a.active {
 
 #signup-fname-div {
     float: left;
-    margin: 0 20px 0 0;
+    /*margin: 0 20px 0 0;*/
 }
 
 #signup-password-div {
     float: left;
-    margin: 0 20px 0 0;
+    /*margin: 0 20px 0 0;*/
 }
 
 #signup-page-wrap #signup-email-div {
     color: #464646;
-    margin: 0;
+    /*margin: 0;*/
 }
-
+div.control-fields input[type="password"] {
+  border: 1px solid #cccccc;
+  padding: 5px;
+  width: 100%;
+}
 .edit-account .privacy-text, #register-form .privacy-text {
     width:80%;
     margin:0;
