@@ -107,10 +107,7 @@ $Data{'db'}=$db;
 			WHERE intTransLogID IN (?) 
 			AND T.intRealmID = ? AND T.intID = $intID	
 			];
-			# AND T.intID = ?  $personID,
-			#AND T.intRealmID = ? AND T.intID = $personID
-			#open FH, ">>dumpfile.txt";
-			#print FH "\n \$st = $st\n   \n$txlogIDs"; DATE_FORMAT(TL.dtLog,'%d/%m/%Y %h:%i') as dtLog_FMT 
+			
 			my $q= $db->prepare($st);
 			$q->execute(
 				$txlogIDs,			
@@ -119,6 +116,7 @@ $Data{'db'}=$db;
 		   	while (my $dref = $q->fetchrow_hashref()){
 				$dref->{'paymentType'} = $Defs::paymentTypes{$dref->{intPaymentType}};
 				$dref->{'curAmountFormatted'} =  $currencyFormat->format($dref->{'curAmount'});
+				$dref->{'curPriceTaxFormatted'} =  $currencyFormat->format($dref->{'curPriceTax'});
 				push @{$ContentData{'receiptdetails'}}, $dref;
 			}
 			
