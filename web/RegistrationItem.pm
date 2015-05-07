@@ -12,10 +12,27 @@ use Log;
 use Products;
 
 use Data::Dumper;
-
  
 sub getRegistrationItems    {
     my($Data, $ruleFor, $itemType, $originLevel, $regNature, $entityID, $entityLevel, $multiPersonType, $Rego_ref, $documentFor) = @_; 
+
+
+
+    my $entityLevel_sent = $entityLevel;
+    my $regNature_sent = $regNature;
+    my $personType = $Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '';
+
+    #RegistrationItems_PLAYER_NEW_TreatAs99;
+    #my $sysConfigCheck = "RegistrationItems_" . $personType . "_" . $regNature . "_TreatAs99";
+    #if ($itemType eq 'PRODUCT' and $Data->{'SystemConfig'}{$sysConfigCheck} == 1)   {
+    #    $originLevel=99;
+    #    $entityLevel=99;
+    #}
+    #RegistrationItems_PLAYER_TreatRenewalAsNew
+    my $sysConfigCheck = "RegistrationItems_" . $personType . "_TreatRenewalAsNew";
+    if ($itemType eq 'PRODUCT' and $Data->{'SystemConfig'}{$sysConfigCheck} == 1 and $regNature eq 'RENEWAL')   {
+        $regNature = 'NEW';
+    }
 
     $itemType ||= '';
     $originLevel ||= 0; 
@@ -27,52 +44,74 @@ sub getRegistrationItems    {
 
     return 0 if (! $itemType);
     my $ActiveFilter_ref='';
-    my $personType = $Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '';
-    my $sysConfigActiveFilter = 'ACTIVEPERIODS_' . $itemType . '_' . $regNature . '_' . $personType;
+    my $sysConfigActiveFilter = 'ACTIVEPERIODS_' . $itemType . '_' . $regNature_sent . '_' . $personType;
     if ($Data->{'SystemConfig'}{$sysConfigActiveFilter} && $Rego_ref->{'intPersonID'})    {
         #If switched on, lets pre-build up Active Results
         $ActiveFilter_ref = registrationItemActivePeriods($Data, $Rego_ref->{'intPersonID'}, $regNature, $personType, $Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '');
     }
 
     my $ActiveProductsFilter_ref='';
-    my $sysConfigActiveProductsFilter = 'ACTIVEPRODUCTS_' . $itemType . '_' . $regNature . '_' . $personType;
+    my $sysConfigActiveProductsFilter = 'ACTIVEPRODUCTS_' . $itemType . '_' . $regNature_sent . '_' . $personType;
     if ($Data->{'SystemConfig'}{$sysConfigActiveProductsFilter} && $Rego_ref->{'intPersonID'})    {
         #If switched on, lets pre-build up Active Results
         $ActiveProductsFilter_ref = registrationItemActiveProducts($Data, $Rego_ref->{'intPersonID'}, $regNature, $personType);
     }
-    
 
+    my $regNature2 = $regNature;
+    my $sysConfigCheck = "RegistrationItems_TransferUsesNew";
+    if ($itemType eq 'PRODUCT' and $regNature eq "TRANSFER" and $Data->{'SystemConfig'}{"RegistrationItems_TransferUsesNew"} == 1)  {
+        $regNature2 = 'NEW';
+        my $sysConfigActiveProductsFilter = 'ACTIVEPRODUCTS_' . $itemType . '_TRANSFER_' . $personType;
+        if ($Data->{'SystemConfig'}{$sysConfigActiveProductsFilter} && $Rego_ref->{'intPersonID'})    {
+            $ActiveProductsFilter_ref = registrationItemActiveProducts($Data, $Rego_ref->{'intPersonID'}, $regNature2, $personType);
+        }
+    }
+    
+print STDERR "D: $regNature | $regNature2\n";
+
+    my $locale = $Data->{'lang'}->getLocale();
     my $st = qq[
    SELECT 
             RI.intID,
             RI.intRequired,
             RI.intUseExistingThisEntity,
             RI.intUseExistingAnyEntity,
-            D.strDocumentName,
+            COALESCE (LT_D.strString1,D.strDocumentName) as strDocumentName,
             D.strDocumentFor,
-			D.strDescription,
-            P.strName as strProductName,
-            P.strDisplayName as strProductDisplayName,
+			COALESCE(LT_D.strNote,D.strDescription) AS strDescription,
+            COALESCE (LT_P.strString1,P.strName) as strProductName,
+            COALESCE(LT_P.strString2,P.strDisplayName) as strProductDisplayName,
             TP.intTransactionID,
             RI.intItemUsingActiveFilter,
             RI.strItemActiveFilterPeriods,
             RI.intItemActive,
             RI.intItemUsingPaidProductFilter,
             RI.strItemActiveFilterPaidProducts,
-            RI.intItemPaidProducts
+            RI.intItemPaidProducts,
+strItemType
         FROM
             tblRegistrationItem as RI
             LEFT JOIN tblDocumentType as D ON (intDocumentTypeID = RI.intID and strItemType='DOCUMENT')
             LEFT JOIN tblProducts as P ON (P.intProductID= RI.intID and strItemType='PRODUCT')
+            LEFT JOIN tblLocalTranslations AS LT_P ON (
+                LT_P.strType = 'PRODUCT'
+                AND LT_P.intID = P.intProductID
+                AND LT_P.strLocale = '$locale'
+            )
+            LEFT JOIN tblLocalTranslations AS LT_D ON (
+                LT_D.strType = 'DOCUMENT'
+                AND LT_D.intID = D.intDocumentTypeID
+                AND LT_D.strLocale = '$locale'
+            )
             LEFT JOIN tblTransactions as TP ON (TP.intProductID = P.intProductID and TP.intPersonRegistrationID = ?)
         WHERE
             RI.intRealmID = ?
             AND RI.intSubRealmID IN (0, ?)
             AND RI.strRuleFor = ?
-            AND RI.intOriginLevel = ?
-	    AND RI.strRegistrationNature = ?
+            AND RI.intOriginLevel IN (99, ?)
+	    AND RI.strRegistrationNature IN (?, ?)
             AND RI.strEntityType IN ('', ?)
-            AND RI.intEntityLevel IN (0, ?)
+            AND RI.intEntityLevel IN (0, 99, ?)
 	    AND RI.strPersonType IN ('', ?)
 	    AND RI.strPersonLevel IN ('', ?)
         AND RI.strPersonEntityRole IN ('', ?)
@@ -98,6 +137,7 @@ sub getRegistrationItems    {
 	        $ruleFor,
 	        $originLevel,
 		    $regNature,
+		    $regNature2,
 	        $Rego_ref->{'strEntityType'} || $Rego_ref->{'entityType'} || '',
 	        $entityLevel,
 		    $Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '',
@@ -113,8 +153,8 @@ sub getRegistrationItems    {
             $Rego_ref->{'InternationalTransfer'} || 0,
             $Rego_ref->{'InternationalLoan'} || 0,
 		    $itc
-	        
-		) or query_error($st);
+		) or query_error($st); 
+
     my @values = (); 
     push @values, $Data->{'Realm'};  
     push @values,$Data->{'RealmSubType'}; 
@@ -132,8 +172,6 @@ sub getRegistrationItems    {
     push @values,$Rego_ref->{'Nationality'} || '';
     push @values,$Rego_ref->{'Nationality'} || '';
     
-
-
     my @Items=();
     while (my $dref = $q->fetchrow_hashref())   {
         next if($itemType eq 'DOCUMENT' and $documentFor and ($documentFor ne $dref->{'strDocumentFor'}));
@@ -142,7 +180,7 @@ sub getRegistrationItems    {
         #next if($dref->{'strDocumentFor'} eq 'TRANSFERITC' and !$Rego_ref->{'InternationalTransfer'});
 
         ## Lets see if the person was active in the appropriate periods
-        if ($Data->{'SystemConfig'}{$sysConfigActiveFilter} && $dref->{'intItemUsingActiveFilter'})    {
+        if ($itemType eq 'PRODUCT' && $Data->{'SystemConfig'}{$sysConfigActiveFilter} && $dref->{'intItemUsingActiveFilter'})    {
             if (! defined $ActiveFilter_ref->{$dref->{'strItemActiveFilterPeriods'}})   {
                 $ActiveFilter_ref->{$dref->{'strItemActiveFilterPeriods'}} ||= 0; # was outside of if
             }
@@ -150,9 +188,9 @@ sub getRegistrationItems    {
         }
 
         ## Lets see if the person has appropriate paid products
-        if ($Data->{'SystemConfig'}{$sysConfigActiveProductsFilter} && $dref->{'intItemUsingPaidProductFilter'})    {
-            if (! defined $ActiveProductsFilter_ref->{$dref->{'strItemActiveFilterPaidProducts'}})   {
-                $ActiveProductsFilter_ref->{$dref->{'strItemActiveFilterPeriods'}} ||= 0; # was outside of if
+        if ($Rego_ref->{'intPersonID'} && $itemType eq 'PRODUCT' && $Data->{'SystemConfig'}{$sysConfigActiveProductsFilter} && $dref->{'intItemUsingPaidProductFilter'})    {
+            if (! $ActiveProductsFilter_ref or ! defined $ActiveProductsFilter_ref->{$dref->{'strItemActiveFilterPaidProducts'}})   {
+                $ActiveProductsFilter_ref->{$dref->{'strItemActiveFilterPeriods'}} = 0; # was outside of if
             }
             next if ($dref->{'intItemPaidProducts'} != $ActiveProductsFilter_ref->{$dref->{'strItemActiveFilterPaidProducts'}});
         }
@@ -172,7 +210,7 @@ sub getRegistrationItems    {
         if ($itemType eq 'PRODUCT') {
             #$Item{'Name'} = $dref->{'strProductName'};
             $Item{'Name'} = $dref->{'strProductDisplayName'} || $dref->{'strProductName'};
-            $Item{'ProductPrice'} = getItemCost($Data, $entityID, $entityLevel, $multiPersonType, $dref->{'intID'}) || 0;
+            $Item{'ProductPrice'} = getItemCost($Data, $entityID, $entityLevel_sent, $multiPersonType, $dref->{'intID'}) || 0;
             $Item{'TransactionID'} = $dref->{'intTransactionID'} || 0;
             
         }
@@ -223,6 +261,10 @@ sub registrationItemActivePeriods   {
         my @statusIN = ($Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_ROLLED_OVER, $Defs::PERSONREGO_STATUS_TRANSFERRED, $Defs::PERSONREGO_STATUS_PASSIVE);
         my $filterCount = 0;
         foreach my $natPeriodID (@periods)    {
+            my $notCondition = 0;
+            $notCondition = 1 if ($natPeriodID =~ /^!/);
+            $natPeriodID =~ s/!//;
+    
             if (not exists $PeriodStatus{$natPeriodID}) {
                 my %Reg = (
                     statusIN => \@statusIN,
@@ -236,12 +278,22 @@ sub registrationItemActivePeriods   {
                     $personID,
                     \%Reg
                 );
+                if ($Data->{'SystemConfig'}{'ActivePeriods_IgnoreHOBBY'})   {
+                    $count = 0;
+                    foreach my $reg (@{$reg_ref})  {
+                        next if ($reg->{'strPersonLevel'} eq $Defs::PERSON_LEVEL_HOBBY);
+                        $count++;
+                    }
+                }
                 $PeriodStatus{$natPeriodID} = $count;
             }
-            $activeResult = 1 if ($PeriodStatus{$natPeriodID} and $condition eq 'OR'); #If any are >0 then set activeResult as 1
+            $activeResult = 1 if (! $notCondition and $PeriodStatus{$natPeriodID} and $condition eq 'OR'); #If any are >0 then set activeResult as 1
+            $activeResult = 1 if ($notCondition and ! $PeriodStatus{$natPeriodID} and $condition eq 'OR'); #If any are >0 then set activeResult as 1
             if ($condition eq 'AND')    {
-                $activeResult = 1 if ($PeriodStatus{$natPeriodID} and $condition eq 'AND' and ! $filterCount); #Lets check first one, and set to 1 if >0
-                $activeResult = 0 if (! $PeriodStatus{$natPeriodID} and $condition eq 'AND'); #Now only set to False if no results
+                $activeResult = 1 if (! $notCondition and $PeriodStatus{$natPeriodID} and $condition eq 'AND' and ! $filterCount); #Lets check first one, and set to 1 if >0
+                $activeResult = 1 if ($notCondition and ! $PeriodStatus{$natPeriodID} and $condition eq 'AND' and ! $filterCount); #Lets check first one, and set to 1 if >0
+                $activeResult = 0 if (! $notCondition and ! $PeriodStatus{$natPeriodID} and $condition eq 'AND'); #Now only set to False if no results
+                $activeResult = 0 if ($notCondition and $PeriodStatus{$natPeriodID} and $condition eq 'AND'); #Now only set to False if no results
             }
             $filterCount ++;
         }
@@ -285,6 +337,7 @@ sub registrationItemActiveProducts  {
             intStatus IN ($Defs::TXN_PAID, $Defs::TXN_HOLD)
             AND intTableType = $Defs::LEVEL_PERSON
             AND intID = ?
+            AND curAmount > 0
     ];
     my $qryProducts= $Data->{'db'}->prepare($stProds) or query_error($stProds);
     $qryProducts->execute(

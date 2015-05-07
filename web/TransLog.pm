@@ -567,6 +567,7 @@ sub getTransList {
 
     $prodSellLevel = '' if $Data->{'SystemConfig'}{'IgnoreMinSellLevelForTransList'};
 
+    my $locale = $Data->{'lang'}->getLocale();
 	my $statement = qq[
     SELECT 
       t.intTransactionID, 
@@ -585,7 +586,7 @@ sub getTransList {
       t.dtEnd as dtEnd_RAW, 
       DATE_FORMAT( t.dtEnd, '%d/%m/%Y') AS dtEnd, 
       IF(strGroup <> '', 
-      CONCAT(strGroup,'-',P.strName), P.strName) as strName,
+          CONCAT(strGroup,'-',COALESCE (LT_P.strString1,P.strName)), COALESCE (LT_P.strString1,P.strName)) as strName,
       P.strGSTText,
       P.dblTaxRate, 
       t.strNotes
@@ -598,6 +599,12 @@ sub getTransList {
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (
             PR.intPersonRegistrationID = t.intPersonRegistrationID
         )
+        LEFT JOIN tblLocalTranslations AS LT_P ON (
+            LT_P.strType = 'PRODUCT'
+            AND LT_P.intID = P.intProductID
+            AND LT_P.strLocale = '$locale'
+        )
+
     WHERE
       t.intRealmID = $Data->{Realm}
         AND (t.intPersonRegistrationID =0 or t.intStatus= 1 or PR.strStatus NOT IN ('INPROGRESS'))
@@ -719,7 +726,10 @@ sub getTransList {
                $row_data->{manual_payment} = '-';
             }
             elsif ($row->{intStatus} ==3) { ##HOLD
-                $row_data->{stuff} = qq[<ul><li><a href="main.cgi?a=P_TXNLog_resolveHOLD&client=$client&tlID=$row->{intTransLogID}&amp;pID=$row->{intID}" class = "">].$Data->{'lang'}->txt('Resolve Hold').qq[</a> ];
+                $row_data->{stuff} = '';
+                if ($Data->{'SystemConfig'}{'allowResolvePaymentHold'}) {
+                    $row_data->{stuff} = qq[<ul><li><a href="main.cgi?a=P_TXNLog_resolveHOLD&client=$client&tlID=$row->{intTransLogID}&amp;pID=$row->{intID}" class = "">].$Data->{'lang'}->txt('Resolve Hold').qq[</a> ];
+                }
                 $row_data->{manual_payment} = '-';
 
             }
@@ -873,7 +883,7 @@ sub generateTXNListLink {
 sub listTransactions {
     my ($Data, $db, $entityID, $personID, $tempClientValues_ref, $action, $resultMessage) = @_;
     my ($body, $paidLink, $unpaidLink, $cancelledLink, $query) = ('', '', '', '', '');
-    my $lang = $Data->{'lang'};
+	my $lang = $Data->{'lang'};
     my $txnStatus = $Data->{'ViewTXNStatus'} || $Defs::TXN_UNPAID;
     my ($link, $mode, $TableID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('', $Data, $tempClientValues_ref);
     my ($safeTableID, $safePaymentID) = ($TableID, $paymentID);
@@ -954,7 +964,8 @@ sub listTransactions {
 
 	my $unpaidTransactionsPresent = 0;	
 	$unpaidTransactionsPresent = checkPersonTransactionStatus($Data, $db, $entityID, $personID); 
-    if ($transCount>0 &&  $unpaidTransactionsPresent) {
+	
+    if ($transCount>0 && $unpaidTransactionsPresent) {
 	    my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
         $Year+=1900;
         $Month++;
@@ -985,7 +996,7 @@ sub listTransactions {
 	  for my $i (qw(intAmount strBank strBSB strAccountNum strAccountName strResponseCode strResponseText strReceiptRef strComments intPartialPayment))	{
 		  $Data->{params}{$i}='' if !defined $Data->{params}{$i};
 	  }
-	  if ($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB) { 
+	 if ($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB) {
 		  my $allowManualPayments = 1;
 		  $allowManualPayments = 0 if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB and ! allowedAction($Data, 'm_mp'));
 		  $allowManualPayments = 0 if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB 
@@ -997,13 +1008,13 @@ sub listTransactions {
 			  and ! allowedAction($Data, 't_tp')
 		  );
       $allowManualPayments = 0 if $Data->{'ReadOnlyLogin'};
-
+	  
       my $allowMP = 1;
       $allowMP = 0 if !$allowManualPayments;
       $allowMP = 0 if !$personID and $entityID;
       $allowMP = 0 if $Data->{'SystemConfig'}{'DontAllowManualPayments'};
       $allowMP = 0 if $Data->{'SystemConfig'}{'AssocConfig'}{'DontAllowManualPayments'};
-	  $allowMP = 1;
+	  
 			$body=qq[
             <script type="text/javascript">
                 var clicked;
@@ -1027,10 +1038,11 @@ sub listTransactions {
 			  $CC_body
 		  ];
 		 my $orstring = '';
-		 $orstring = qq[&nbsp; <b>].$lang->txt('OR').qq[</b> &nbsp;] if $CC_body and $allowMP;
+		#### $orstring = qq[&nbsp; <b>].$lang->txt('OR').qq[</b> &nbsp;] if $CC_body and $allowMP; 
 		 if($paymentType==0){ $paymentType='';}
+		### <div id="payment_manual" style= "display:block;">
         $body .= qq[
-            <div id="payment_manual" style= "display:none;">
+           
                 $orstring
 
                 <script type="text/javascript">
@@ -1049,83 +1061,60 @@ sub listTransactions {
                 </script>			  
 
         ];
-		# <input type="text" id="intAmountForManualPay" name="intAmount" value="$Data->{params}{intAmount}" id="l_intAmount" size="10"  />
+		#
+		#
+		my $isManualPaymentAllowedAtThisLevel = 0;
+		$isManualPaymentAllowedAtThisLevel = 1 if ($Data->{'clientValues'}{'authLevel'} >= $Data->{'SystemConfig'}{'allowManualPaymentsFromLevel'});
+		#
         $body .= qq[
-			<h3 class="panel-header">].$lang->txt('Manual Payment').qq[</h3>
-            <div class = "panel-body">
-				  $resultMessage
-    
-					<table cellpadding="2" cellspacing="0" border="0">
-					<tbody id="secmain2" >	
-					<tr>
-						<td class="label"><label for="l_intAmount">].$lang->txt('Amount (ddd.cc)').qq[</label>:</td>
-						<td class="value">
-						<input type="text" name="intAmount" value="" id="l_intAmount" size="10"  /> </td>
-					</tr>
-					<tr>
-						<td class="label"><label for="l_dtLog">].$lang->txt('Date Paid').qq[</label>:</td>
-						<td class="value">
-							<script type="text/javascript">
+			<div  style="display:none;" id="payment_manual">
+						<h3 class="panel-header sectionheader" id="manualpayment">].$Data->{'lang'}->txt('Manual Payment').qq[</h3>
+						
+				  		<div id="secmain2" class="panel-body fieldSectionGroup ">
+				  			<fieldset>
+				  				<div class="form-group">
+									$resultMessage
+				  					<label for="l_intAmount" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Amount (ddd.cc)').qq[</label>
+				  					<div class="col-md-6">
+									<span id="manualsum"></span>
+									<input type="hidden" name="intAmount" value="" id="l_intAmount" /></div>
+									<input type="hidden" id="clientstr" value="$client" />
+				  				</div>
+				  				<div class="form-group">
+				  					<label for="l_dtLog" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Date Paid').qq[</label>
+				  					<div class="col-md-6">
+									<script type="text/javascript">
                  			   jQuery().ready(function() {
                     		    jQuery("#l_dtLog").datepicker({
-                        		    dateFormat: 'dd/mm/yy',
+									maxDate: new Date,
+									dateFormat: 'dd/mm/yy',
                         		    showButtonPanel: true
                      		 	  });            
                   	 			 });
                				 </script> 
-							<input type="text" name="dtLog" value="" id="l_dtLog" size="10" maxlength="10" /> <span class="HTdateformat">dd/mm/yyyy</span> </td>
-					</tr>
-					<tr>
-						<td class="label"><label for="l_intPaymentType">].$lang->txt('Payment Type').qq[</label>:</td>
-						<td class="value">].drop_down('paymentType',\%Defs::manualPaymentTypes, undef, $paymentType, 1, 0,'','').qq[</td>
-					</tr>
 
-					<!--<tr>
-						<td class="label"><label for="l_strBank">Bank</label>:</td>
-						<td class="value"><input type="text" name="strBank" value="$Data->{params}{strBank}" id="l_strBank"   /></td>
-					</tr>
-					<tr>
-						<td class="label"><label for="l_strBSB">BSB</label>:</td>
-						<td class="value"><input type="text" name="strBSB" value="$Data->{params}{strBSB}" id="l_strBSB"   /></td>
-					</tr>
-					<tr>
-						<td class="label"><label for="l_strAccountName">Account Name</label>:</td>
-						<td class="value"><input type="text" name="strAccountName" value="$Data->{params}{strAccountName}" id="l_strAccountName"   /></td>
-					</tr>
-					<tr>
-						<td class="label"><label for="l_strAccountNum">Account Number</label>:</td>
-						<td class="value"><input type="text" name="strAccountNum" value="$Data->{params}{strAccountNum}" id="l_strAccountNum"   /> </td>
-					</tr>
-					<tr>
-						<td class="label"><label for="l_strResponseCode">Response Code</label>:</td>
-						<td class="value"><input type="text" name="strResponseCode" value="$Data->{params}{strResponseCode}" id="l_strResponseCode"   /> </td>
-					</tr>
-					<tr>
-						<td class="label"><label for="l_strResponseText">Response Text</label>:</td>
-						<td class="value"><input type="text" name="strResponseText" value="$Data->{params}{strResponseText}" id="l_strResponseText"   /> </td>
-					</tr>
-					<tr>
-						<td class="label"><label for="l_strReceiptRef">Receipt Reference</label>:</td>
-						<td class="value"><input type="text" name="strReceiptRef" value="$Data->{params}{strReceiptRef}" id="l_strReceiptRef"   /> </td>
-					</tr>	-->
-					<!-- <tr>
-						<td class="label"><label for="l_intPartialPayment">Partial Payment</label>:</td>
-						<td class="value"><input type="checkbox" name="intPartialPayment" value="1" id="l_intPartialPayment" ].($Data->{params}{intPartialPayment} ? 'checked' : '').qq[  /> </td>
-					</tr>	-->
-
-					<tr>
-
-						<td class="label"><label for="l_strComments">].$lang->txt('Comments').qq[</label>:</td>
-						<td class="value"><textarea name="strComments" id="l_strComments"  rows = "5"   cols = "45"  >$Data->{params}{strComments}</textarea> </td>
-					</tr>
-				    </tbody>	
-				</table>
-			
-				</div><!-- panel-body -->
-						<div class="button-row"><input onclick="clicked='$targetManual'" type="submit" name="subbut" value="]. $lang->txt('Submit Manual Payment') . qq[" class="btn-main" id = "btn-manualpay"></div>
-
-						<input type="hidden" name="personID" value="$TableID"><input type="hidden" name="paymentID" value="$paymentID"><input type="hidden" name="dt_start_paid" value="$dtStart_paid"><input type="hidden" name="dt_end_paid" value="$dtEnd_paid">
-			] if $allowMP;
+									<input type="text" name="dtLog" value="$currentDate" id="l_dtLog" size="10" maxlength="10" /> <span class="HTdateformat">dd/mm/yyyy</span></div>
+				  				</div>
+				  				<div class="form-group">
+				  					<label for="l_intPaymentType" class="col-md-4 control-label txtright"><span class="compulsory">*</span>].$Data->{'lang'}->txt('Payment Type').qq[</label>
+				  					<div class="col-md-6">].drop_down('paymentType',\%Defs::manualPaymentTypes, undef, 6, 1, 0,'','').qq[</div>
+				  				</div>
+				  				<div class="form-group">
+				  					<label for="l_strComments" class="col-md-4 control-label txtright">].$Data->{'lang'}->txt('Comments').qq[</label>
+				  					<div class="col-md-6"><textarea name="strComments" id="l_strComments" style="width: 100%; height: 200px;">$Data->{params}{strComments}</textarea></div>
+				  				</div>
+				  			</fieldset>
+				  		</div>
+					  	<div class="button-row">
+							<div class="txtright" id="block-manualpay" style="display:none">
+								<input onclick="clicked='main.cgi'" type="submit" name="subbut" value="Submit Manual Payment" class="btn-main" id = "btn-manualpay" >
+								<input type="hidden" name="paymentID" value="">
+								<input type="hidden" name="dt_start_paid" value="">
+								<input type="hidden" name="dt_end_paid" value="">
+							</div>
+						</div>
+					</div>
+			] if $allowMP and $isManualPaymentAllowedAtThisLevel;
 
 ## Removed btn-process from class of Submit Manual Payment
 
@@ -1134,7 +1123,7 @@ sub listTransactions {
 					</form> 
         ];
 	}
-  	else	{
+  	else{ 
 		  $body = qq[
 			 <form action="$Data->{target}" name="n_form" method="POST">
         		 $body
@@ -1458,13 +1447,34 @@ sub resolveHoldPaymentForm  {
   	$qry->execute;
 	my $TLref = $qry->fetchrow_hashref();
 
+    my $locale = $Data->{'lang'}->getLocale();
 	my $st_trans = qq[
-		SELECT T.intTransactionID, M.strLocalSurname, M.strLocalFirstName, E.*, P.strName, P.strGroup, E.strLocalName as EntityName, T.intQty, T.curAmount, T.intTableType, I.strInvoiceNumber, T.intStatus, P.curPriceTax, P.dblTaxRate
+		SELECT T.intTransactionID,
+             M.strLocalSurname,
+             M.strLocalFirstName,
+             E.*,
+             P.strName,
+             COALESCE (LT_P.strString1,P.strName) as strName,
+             P.strGroup,
+             E.strLocalName as EntityName,
+             T.intQty,
+             T.curAmount,
+             T.intTableType,
+             I.strInvoiceNumber,
+             T.intStatus,
+             P.curPriceTax,
+             P.dblTaxRate
 		FROM tblTransactions as T
 			LEFT JOIN tblInvoice I on I.intInvoiceID = T.intInvoiceID
 			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
 			LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
 			LEFT JOIN tblEntity as E ON (E.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
+            LEFT JOIN tblLocalTranslations AS LT_P ON (
+                LT_P.strType = 'PRODUCT'
+                AND LT_P.intID = P.intProductID
+                AND LT_P.strLocale = '$locale'
+            )
+
 		WHERE intTransLogID = $intTransLogID  
 		AND T.intRealmID = $Data->{'Realm'}
 	];
@@ -1616,7 +1626,6 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 			<th>].$lang->txt('Item').qq[</th>
 			<th>].$lang->txt('Payment For').qq[</th>
 			<th>].$lang->txt('Quantity').qq[</th>
-			<th>].$lang->txt('Tax Rate').qq[</th>
 			<th>].$lang->txt('Tax Price').qq[</th>
 			<th>].$lang->txt('Total Amount').qq[</th>
 			<th>].$lang->txt('Status').qq[</th>
@@ -1642,7 +1651,6 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 				<td>$productname</a></td>
 				<td>$paymentFor</a></td>
 				<td>$dref->{intQty}</a></td>
-				<td>$taxRateinPercent&#37;</a></td>
 				<td>].$Data->{'l10n'}{'currency'}->format($dref->{'curPriceTax'}) . qq[</td>
 				<td>].$Data->{'l10n'}{'currency'}->format($dref->{'curAmount'}) . qq[</td>
 				<td>].$lang->txt($Defs::TransactionStatus{$dref->{intStatus}}) . qq[</td>
@@ -1655,16 +1663,20 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 	
     my $buttons = '';
 	
-	$buttons.= qq[<a class="btn-main" href="$Data->{target}?a=P_TXNLog_RH_F&amp;client=$client&amp;tlID=$TLref->{intLogID}" onclick="return confirm(].$lang->txt('This will remove this payment and set all linked transactions to unpaid. Continue?').qq[">]. $lang->txt('Resolve Hold as Failed') . qq[</a>];
+    if ($Data->{'clientValues'}{'authLevel'} >= $Data->{'SystemConfig'}{'allowResolvePaymentHold_ResolveFailedMinLevel'}) {
+	    $buttons.= qq[<a class="btn-main" href="$Data->{target}?a=P_TXNLog_RH_F&amp;client=$client&amp;tlID=$TLref->{intLogID}" onclick="return confirm(].$lang->txt('This will remove this payment and set all linked transactions to unpaid. Continue?').qq[">]. $lang->txt('Resolve Hold as Failed') . qq[</a>];
+    }
 
-	$buttons.= qq[<a class="btn-main" href="$Data->{target}?a=P_TXNLog_RH_P&amp;client=$client&amp;tlID=$TLref->{intLogID}" onclick="return confirm(].$lang->txt('This will mark the payment as successful and set all linked transactions to paid. Continue?').qq[">]. $lang->txt('Resolve Hold as Paid') . qq[</a>];
+    if ($Data->{'clientValues'}{'authLevel'} >= $Data->{'SystemConfig'}{'allowResolvePaymentHold_ResolvePaidMinLevel'}) {
+	    $buttons.= qq[<a class="btn-main" href="$Data->{target}?a=P_TXNLog_RH_P&amp;client=$client&amp;tlID=$TLref->{intLogID}" onclick="return confirm(].$lang->txt('This will mark the payment as successful and set all linked transactions to paid. Continue?').qq[">]. $lang->txt('Resolve Hold as Paid') . qq[</a>];
+    }
 
 	$body = $count ? qq[<h2 class="section-header">].$lang->txt('Payment Hold Summary').qq[</h2>] . $resultHTML.$body . $buttons : $resultHTML;
 
 
 	my $chgoptions='';
 	$chgoptions.= qq[<a href="$Data->{target}?a=P_TXNLog_DEL&amp;client=$client&amp;tlID=$TLref->{intLogID}" onclick="return confirm(].$lang->txt('This will remove this payment and set all linked transactions to unpaid. Continue?').qq["><img src="images/delete.png" border="0" alt="Delete Payment Record" title="Delete Payment Record"></a>] if (
-		$Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC 
+		$Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL
 		and $thisassoc 
 		and (
 			(
@@ -1717,13 +1729,33 @@ sub viewTransLog	{
   	$qry->execute;
 	my $TLref = $qry->fetchrow_hashref();
 
+    my $locale = $Data->{'lang'}->getLocale();
 	my $st_trans = qq[
-		SELECT T.intTransactionID, M.strLocalSurname, M.strLocalFirstName, E.*, P.strName, P.strGroup, E.strLocalName as EntityName, T.intQty, T.curAmount, T.intTableType, I.strInvoiceNumber, T.intStatus, P.curPriceTax, P.dblTaxRate
+		SELECT T.intTransactionID,
+             M.strLocalSurname,
+             M.strLocalFirstName,
+             E.*,
+             P.strName,
+             COALESCE (LT_P.strString1,P.strName) as strName,
+             P.strGroup,
+             E.strLocalName as EntityName,
+             T.intQty,
+             T.curAmount,
+             T.intTableType,
+             I.strInvoiceNumber,
+             T.intStatus,
+             P.curPriceTax,
+             P.dblTaxRate
 		FROM tblTransactions as T
 			LEFT JOIN tblInvoice I on I.intInvoiceID = T.intInvoiceID
 			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
 			LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
 			LEFT JOIN tblEntity as E ON (E.intEntityID = T.intID and T.intTableType=$Defs::LEVEL_CLUB)
+            LEFT JOIN tblLocalTranslations AS LT_P ON (
+                LT_P.strType = 'PRODUCT'
+                AND LT_P.intID = P.intProductID
+                AND LT_P.strLocale = '$locale'
+            )
 		WHERE intTransLogID = $intTransLogID  
 		AND T.intRealmID = $Data->{'Realm'}
 	];
@@ -1823,6 +1855,7 @@ sub viewTransLog	{
 	
         my ($resultHTML, undef )=handleHTMLForm($FieldDefs{'TXNLOG'}, undef, 'display', 1,$db);
 
+	return ($resultHTML, $lang->txt("Payment Record")) if ($Data->{'SelfRego'});
 	#my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
   my $previousAttemptsBody = qq[
     <h2 class="section-header">].$lang->txt('Previous Payment attempts') . qq[</h2>
@@ -1875,7 +1908,6 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 			<th>].$lang->txt('Item').qq[</th>
 			<th>].$lang->txt('Payment For').qq[</th>
 			<th>].$lang->txt('Quantity').qq[</th>
-			<th>].$lang->txt('Tax Rate').qq[</th>
 			<th>].$lang->txt('Tax Price').qq[</th>
 			<th>].$lang->txt('Total Amount').qq[</th>
 			<th>].$lang->txt('Status').qq[</th>
@@ -1901,7 +1933,6 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 				<td>$productname</a></td>
 				<td>$paymentFor</a></td>
 				<td>$dref->{intQty}</a></td>
-				<td>$taxRateinPercent&#37;</a></td>
 				<td>].$Data->{'l10n'}{'currency'}->format($dref->{'curPriceTax'}) . qq[</td>
 				<td>].$Data->{'l10n'}{'currency'}->format($dref->{'curAmount'}) . qq[</td>
 				<td>].$lang->txt($Defs::TransactionStatus{$dref->{intStatus}}) . qq[</td>
@@ -1918,7 +1949,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 	my $chgoptions='';
     
 	$chgoptions.= qq[<a href="$Data->{target}?a=P_TXNLog_DEL&amp;client=$client&amp;tlID=$TLref->{intLogID}" onclick="return confirm(].$lang->txt('This will remove this payment and set all linked transactions to unpaid. Continue?').qq["><img src="images/delete.png" border="0" alt="Delete Payment Record" title="Delete Payment Record"></a>] if (
-		$Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC 
+		$Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL
 		and $thisassoc 
 		and (
 			(
@@ -2212,10 +2243,11 @@ sub listTransLog	{
 sub checkPersonTransactionStatus {
 	my ($Data, $db, $entityID, $personID) = @_;
 	#check for unpaid transactions
-	my $sql = qq[SELECT count(intTransactionID) as total FROM tblTransactions WHERE intID = ? AND  dtPaid IS NULL  AND intTXNEntityID = ? AND intTransLogID = 0];
+	my $sql = qq[SELECT count(intTransactionID) as total FROM tblTransactions as T INNER JOIN tblEntity as E ON (T.intTXNEntityID = E.intEntityID) WHERE intID = ? AND  dtPaid IS NULL  AND intTransLogID = 0 and E.intEntityLevel <= $Data->{'clientValues'}{'authLevel'}];
 
 	my $sth = $db->prepare($sql);
-	$sth->execute($personID,$entityID);
+	#$sth->execute($entityID, $personID);
+	$sth->execute($personID);
 
 	my $dref = $sth->fetchrow_hashref();
 	

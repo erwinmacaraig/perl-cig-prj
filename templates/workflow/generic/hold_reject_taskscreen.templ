@@ -25,7 +25,11 @@
             </div>
         </div>
         <div class = "button-row pull-right">
-            <a href="main.cgi?client=[% client %]&amp;a=E_HOME" title="" class="btn-main">[% Lang.txt('Go to your dashboard') %]</a>
+            [% IF CurrentViewLevel == 1 %]
+                <a href="index.cgi?&amp;a=WF_" title="" class="btn-main">[% Lang.txt('Go to your dashboard') %]</a>
+            [% ELSE %]
+                <a href="main.cgi?client=[% client %]&amp;a=E_HOME" title="" class="btn-main">[% Lang.txt('Go to your dashboard') %]</a>
+            [% END %]
         </div>
     </div>
 <!--</div>-->

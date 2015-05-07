@@ -238,12 +238,12 @@ sub getFieldNames {
         strLegalID
         strImportEntityCode
         intImportID
-        strAcceptSelfRego
         strShortNotes
         intNotifications
         strOrganisationLevel
         intFacilityTypeID
         strBankAccountNumber
+        intAcceptSelfRego
     ));
     return \@fields;
 }

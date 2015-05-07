@@ -22,7 +22,7 @@ require Exporter;
 );
 
 use strict;
-use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
+use lib '../..', '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
 use PersonRegistration;
 use RegistrationItem;
 use PersonRegisterWhat;
@@ -120,7 +120,7 @@ sub displayRegoFlowSummaryBulk  {
         my $personObj = getInstanceOf($Data, 'person', $pID);
         my %personData = ();
         $regoID = $hidden_ref->{"regoID_$pID"} || 0;
-        my ($txnCountSingle, $amountDueSingle, $logIDsSingle) = getPersonRegoTXN($Data, $pID, $regoID);
+        my ($txnCountSingle, $amountDueSingle, $logIDsSingle, $originalAmount) = getPersonRegoTXN($Data, $pID, $regoID);
         $txnCount += $txnCountSingle;
         $amountDue += $amountDueSingle;
         $personData{'MAID'} = $personObj->getValue('strNationalNum');
@@ -131,6 +131,7 @@ sub displayRegoFlowSummaryBulk  {
         $personData{'Nationality'} = $c->{$personObj->getValue('strISONationality')};
         $personData{'Country'} = $c->{$personObj->getValue('strISOCountryOfBirth')} || '';
         $personData{'AmountDue'} = $amountDueSingle || 0;
+        $personData{'txnCountPerson'} = $txnCountSingle || 0;
         push @People, \%personData;
     }
 
@@ -231,14 +232,15 @@ sub displayRegoFlowSummary {
 	 	my $txnCount = 0;
 		my $logIDs;
 		my $txn_invoice_url = $Defs::base_url."/printinvoice.cgi?client=$client&amp;rID=$hidden_ref->{'rID'}&amp;pID=$personID";
-        ($txnCount, $amountDue, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
+        my $originalAmount=0;
+        ($txnCount, $amountDue, $logIDs, $originalAmount) = getPersonRegoTXN($Data, $personID, $regoID);
          if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
             $gatewayConfig = generateRegoFlow_Gateways($Data, $client, "PREGF_CHECKOUT", $hidden_ref, $txn_invoice_url);
          }
         $gatewayConfig->{'amountDue'} = $amountDue;
          
           
-	    my $personObj = getInstanceOf($Data, 'person');
+	    my $personObj = getInstanceOf($Data, 'person', $personID);
         return if (! $personObj);
 		my $c = Countries::getISOCountriesHash();
 		
@@ -275,12 +277,14 @@ sub displayRegoFlowSummary {
 		####################################################
 
 		my %existingDocuments;
+        my $locale = $Data->{'lang'}->getLocale();
 		my $query = qq[
 		SELECT
         tblDocuments.intDocumentTypeID as ID,  
         tblUploadedFiles.strOrigFilename,
         tblUploadedFiles.intFileID,
-        tblDocumentType.strDocumentName as Name
+        tblDocumentType.strDocumentName as Name,
+        COALESCE (LT_D.strString1,tblDocumentType.strDocumentName) as Name
         FROM tblDocuments
         INNER JOIN tblDocumentType
             ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
@@ -292,6 +296,12 @@ sub displayRegoFlowSummary {
         AND tblDocuments.intPersonRegistrationID = ?
         AND tblRegistrationItem.intRealmID = ?
         AND tblRegistrationItem.strItemType='DOCUMENT'
+            LEFT JOIN tblLocalTranslations AS LT_D ON (
+                LT_D.strType = 'DOCUMENT'
+                AND LT_D.intID = tblDocumentType.intDocumentTypeID
+                AND LT_D.strLocale = '$locale'
+            )
+
         ORDER BY tblDocuments.intDocumentID DESC
 		];
 	
@@ -309,11 +319,18 @@ sub displayRegoFlowSummary {
             tblDocuments.intDocumentTypeID as ID,
             tblUploadedFiles.strOrigFilename,
             tblUploadedFiles.intFileID,
-            tblDocumentType.strDocumentName as Name
+            COALESCE (LT_D.strString1,tblDocumentType.strDocumentName) as Name
+
         FROM tblDocuments
             INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID)
         INNER JOIN tblRegistrationItem ON (tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID)
         INNER JOIN tblUploadedFiles ON (tblUploadedFiles.intFileID = tblDocuments.intUploadFileID )
+            LEFT JOIN tblLocalTranslations AS LT_D ON (
+                LT_D.strType = 'DOCUMENT'
+                AND LT_D.intID = tblDocumentType.intDocumentTypeID
+                AND LT_D.strLocale = '$locale'
+            )
+
         WHERE 
             strApprovalStatus IN ('APPROVED', 'PENDING')
             AND intPersonID = ?
@@ -373,6 +390,7 @@ $sth = $Data->{'db'}->prepare($query);
             
         my $editlink =  $Data->{'target'}."?".$carryString;
 	my $displayPayment = ($amountDue and $hidden_ref->{'payMethod'}) ? 1 : 0;
+        $displayPayment = 0 if ($Data->{'SelfRego'} and ! $Data->{'SystemConfig'}{'SelfRego_PaymentOn'});
         my %PageData = (
             person_home_url => $url,
 			person => \%personData,
@@ -412,6 +430,12 @@ sub displayRegoFlowComplete {
 
     my $ok = 1;
     my $run = $hidden_ref->{'run'} || param('run') || 0;
+    if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER' or $rego_ref->{'registrationNature'} eq 'TRANSFER') {
+        $ok=1;
+    }
+    else    {
+        $ok = $run ? 1 : checkRegoTypeLimits($Data, $personID, $regoID, $rego_ref->{'strSport'}, $rego_ref->{'strPersonType'}, $rego_ref->{'strPersonEntityRole'}, $rego_ref->{'strPersonLevel'}, $rego_ref->{'strAgeLevel'});
+    }
     my $payMethod= $hidden_ref->{'payMethod'} || param('payMethod') || '';
     my $body = '';
     my $gateways = '';
@@ -435,7 +459,6 @@ sub displayRegoFlowComplete {
             $regoID,
             $rego_ref
          ) if ! $run;
-        $rego_ref->{'personRegoStatus'} = $Defs::personRegoStatus{$rego_ref->{'strStatus'}} || '';
          
         my @products= split /:/, $hidden_ref->{'prodIds'};
         foreach my $prod (@products){ $hidden_ref->{"prod_$prod"} =1;}
@@ -451,8 +474,24 @@ sub displayRegoFlowComplete {
 	 	my $txnCount = 0;
 		my $logIDs;
         my $amountDue = 0;
+        my $originalAmount=0;
 		my $txn_invoice_url = $Defs::base_url."/printinvoice.cgi?client=$client&amp;rID=$hidden_ref->{'rID'}&amp;pID=$personID";
-        ($txnCount, $amountDue, $logIDs) = getPersonRegoTXN($Data, $personID, $regoID);
+        ($txnCount, $amountDue, $logIDs, $originalAmount) = getPersonRegoTXN($Data, $personID, $regoID);
+        if (! $originalAmount and defined $logIDs) {
+            foreach my $id (keys %{$logIDs}) {
+                next if ! $id;
+                product_apply_transaction($Data, $id);
+                my $valid =0;
+                ($valid, $rego_ref) = validateRegoID(
+                    $Data,
+                    $personID,
+                    $regoID,
+                    $entityID
+                );
+            }
+        }
+        $rego_ref->{'personTypeText'} = $Defs::personType{$rego_ref->{'personType'}} || $Defs::personType{$rego_ref->{'strPersonType'}} || '';
+        $rego_ref->{'personRegoStatus'} = $Defs::personRegoStatus{$rego_ref->{'strStatus'}} || '';
         savePlayerPassport($Data, $personID) if (! $run);
         $hidden_ref->{'run'} = 1;
          #if ($txnCount && $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'}) {
@@ -460,8 +499,8 @@ sub displayRegoFlowComplete {
          #}
          
        
-	    my $personObj = getInstanceOf($Data, 'person');
-	    my $maObj = getInstanceOf($Data, 'national');
+	    my $personObj = getInstanceOf($Data, 'person', $personID);
+	    my $maObj = getInstanceOf($Data, 'national', 0, $entityID);
         my $maName = $maObj
             ? $maObj->name()
             : '';
@@ -567,7 +606,9 @@ sub displayRegoFlowComplete {
             $body = runTemplate($Data, \%PageData, 'personrequest/transfer/complete.templ') || '';
         }
         else {
-            $body = runTemplate($Data, \%PageData, 'registration/complete.templ') || '';
+            my $template = 'registration/complete.templ';
+            $template = 'registration/complete_sr.templ' if ($Data->{'SelfRego'});
+            $body = runTemplate($Data, \%PageData, $template) || '';
         }
     }
     return ($body, $gateways);
@@ -621,14 +662,16 @@ sub getPersonRegoTXN    {
     my $count = 0;
    my %tlogIDs=();
     my $amount = 0;
+    my $originalAmount= 0;
     while (my $dref= $qry->fetchrow_hashref())  {
         $tlogIDs{$dref->{'intTransLogID'}} = 1 if ($dref->{'intTransLogID'} and ! exists $tlogIDs{$dref->{'intTransLogID'}});
+        $originalAmount += $dref->{'curAmount'};
         if ($dref->{'intStatus'} == 0)  {
             $amount += $dref->{'curAmount'};
             $count++;
         }
     }
-    return ($count, $amount, \%tlogIDs);
+    return ($count, $amount, \%tlogIDs, $originalAmount);
 }
 
 sub displayRegoFlowCheckout {
@@ -727,9 +770,6 @@ sub checkUploadedRegoDocuments {
           AND tblRegistrationItem.intEntityLevel = ?
 			GROUP BY intDocumentTypeID];
 
-
-	#open FH, ">dumpfile.txt";
-	#print FH "\n\nQuery: \n$query \n personID = $personID \n\n";
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute(
         $personID, 
@@ -800,9 +840,8 @@ sub displayRegoFlowDocuments{
     my $lang=$Data->{'lang'};
 	$hidden_ref->{'pID'} = $personID;
 
-    #print STDERR Dumper $rego_ref;
-     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_DU&amp;rID=$regoID";
-     my $documents = getRegistrationItems(
+     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_DU&amp;rID=$regoID"; 
+	 my $documents = getRegistrationItems(
         $Data,
         'REGO',
         'DOCUMENT',
@@ -813,8 +852,8 @@ sub displayRegoFlowDocuments{
         0,
         $rego_ref,
      );
-
-
+		
+	
 	my @docos = (); 
 
     my %existingDocuments;
@@ -831,6 +870,7 @@ sub displayRegoFlowDocuments{
    
 #print STDERR "~~~~~~~~~~~~~~~displayRegoFlowDocuments\n";
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
+    my $locale = $Data->{'lang'}->getLocale();
     my $query = qq [
         SELECT
             tblDocuments.intDocumentTypeID as ID,
@@ -839,12 +879,19 @@ sub displayRegoFlowDocuments{
             tblUploadedFiles.strOrigFilename,
             tblUploadedFiles.intFileID,
             tblUploadedFiles.intAddedByTypeID as AddedByTypeID,
-            tblDocumentType.strDocumentName as Name,
-            tblDocumentType.strDescription as Description
+            COALESCE (LT_D.strString1,tblDocumentType.strDocumentName) as Name,
+            COALESCE(LT_D.strNote,tblDocumentType.strDescription) AS Description
+
         FROM tblDocuments
         INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID)
         INNER JOIN tblRegistrationItem ON (tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID )
         INNER JOIN tblUploadedFiles ON ( tblUploadedFiles.intFileID = tblDocuments.intUploadFileID )
+        LEFT JOIN tblLocalTranslations AS LT_D ON (
+            LT_D.strType = 'DOCUMENT'
+            AND LT_D.intID = tblDocumentType.intDocumentTypeID
+            AND LT_D.strLocale = '$locale'
+        )
+
         WHERE
             tblDocuments.intPersonID = ?
             AND tblDocuments.intPersonRegistrationID = ?
@@ -915,13 +962,19 @@ AND tblRegistrationItem.strPersonType IN ('', ?)
             tblUploadedFiles.strOrigFilename,
             tblUploadedFiles.intFileID,
             tblUploadedFiles.intAddedByTypeID as AddedByTypeID,
-            tblDocumentType.strDocumentName as Name,
-            tblDocumentType.strDescription as Description
+            COALESCE (LT_D.strString1,tblDocumentType.strDocumentName) as Name,
+            COALESCE(LT_D.strNote,tblDocumentType.strDescription) AS Description
         FROM 
             tblDocuments
             INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID)
             INNER JOIN tblRegistrationItem ON (tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID )
             INNER JOIN tblUploadedFiles ON (tblUploadedFiles.intFileID = tblDocuments.intUploadFileID )
+            LEFT JOIN tblLocalTranslations AS LT_D ON (
+                LT_D.strType = 'DOCUMENT'
+                AND LT_D.intID = tblDocumentType.intDocumentTypeID
+                AND LT_D.strLocale = '$locale'
+            )
+
         WHERE 
             strApprovalStatus IN ('APPROVED', 'PENDING')
             AND intPersonID = ?
@@ -1040,12 +1093,14 @@ sub displayRegoFlowProducts {
      }
     my $product_body='';
     if (@prodIDs)   {
-        $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
+        $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules, 0, 0);
 
     }
     else    {
         return '';
     }
+        my $displayPayment = $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'};
+        $displayPayment = 0 if ($Data->{'SelfRego'} and ! $Data->{'SystemConfig'}{'SelfRego_PaymentOn'});
 	my $maObj = getInstanceOf($Data, 'national');
         my $maName = $maObj
             ? $maObj->name()
@@ -1055,7 +1110,7 @@ sub displayRegoFlowProducts {
         nextaction=>"PREGF_PU",
         target => $Data->{'target'},
         product_body => $product_body,
-        mandatoryPayment => $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'},
+        mandatoryPayment => $displayPayment,
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
         client=>$client,
@@ -1098,7 +1153,7 @@ sub displayRegoFlowProductsBulk {
      }
     my $product_body='';
     if (@prodIDs)   {
-        $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules);
+        $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules, 0,1);
      }
     else    {
         return '';
@@ -1254,12 +1309,12 @@ sub add_rego_record{
     if ($rego_ref->{'registrationNature'} ne 'RENEWAL'
         and $rego_ref->{'registrationNature'} ne 'TRANSFER'
         and $rego_ref->{'registrationNature'} ne 'DOMESTIC_LOAN') {
+        print STDERR "ABOUT TO CHECK TYP LIMITS FOR : " . $rego_ref->{'sport'} . "|" . $rego_ref->{'personType'} . "|" . $rego_ref->{'personLevel'} . "|" . $rego_ref->{'entityID'} ."\n\n";
         my $ok = checkRegoTypeLimits($Data, $personID, 0, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'}, $rego_ref->{'entityID'}); 
         return (0, undef, 'LIMIT_EXCEEDED') if (!$ok);
     }
 
     if ($rego_ref->{'registrationNature'} eq 'RENEWAL') {
-print STDERR "ABOUT TO CHECKRENEWAL\n";
         my $ok = PersonRegistration::checkRenewalRegoOK($Data, $personID, $rego_ref);
         return (0, undef, 'RENEWAL_FAILED') if (!$ok);
     }
@@ -1277,24 +1332,12 @@ print STDERR "ABOUT TO CHECKRENEWAL\n";
 sub bulkRegoCreate  {
 
     my ($Data, $bulk_ref, $rolloverIDs, $productIDs, $productQtys, $markPaid, $paymentType) = @_;
-
     my $body = 'Submitting';
     my @IDs= split /\|/, $rolloverIDs;
 
     my $totalAmount=0;
     my @total_txns_added=();
-    my $CheckProducts = getRegistrationItems(
-        $Data,
-        'REGO',
-        'PRODUCT',
-        $bulk_ref->{'originLevel'},
-        $bulk_ref->{'registrationNature'},
-        $bulk_ref->{'entityID'},
-        $bulk_ref->{'entityLevel'},
-        0,
-        $bulk_ref,
-    );
-    my @Ages = ('ADULT',
+        my @Ages = ('ADULT',
             'MINOR'
     );
 
@@ -1317,6 +1360,34 @@ sub bulkRegoCreate  {
 
     my %RegoIDs=();
     for my $pID (@IDs)   {
+        my %Rego=();
+        %Rego = %{$bulk_ref};
+        $Rego{'intPersonID'} = $pID;
+        my $personObj = new PersonObj(db => $Data->{'db'}, ID => $pID, cache => $Data->{'cache'});
+        $personObj->load();
+        $Rego{'Nationality'} = $personObj->getValue('strISONationality') || '';
+        $Rego{'DOB'} = $personObj->getValue('dtDOB_Format') || '';
+        my $CheckProducts = getRegistrationItems(
+            $Data,
+            'REGO',
+            'PRODUCT',
+            $bulk_ref->{'originLevel'},
+            $bulk_ref->{'registrationNature'},
+            $bulk_ref->{'entityID'},
+            $bulk_ref->{'entityLevel'},
+            0,
+            \%Rego,
+        );
+        my %AllowedProducts=();
+        my @productIDsAllowed=();
+
+    my %ProductRules=();
+         foreach my $product (@{$CheckProducts})  {
+            #my $productPrice = $product->{'ProductPrice'};
+            push @productIDsAllowed, $product->{'ID'};
+            $ProductRules{$product->{'ID'}} = $product;
+        }
+
         my $pref = Person::loadPersonDetails($Data->{'db'}, $pID) if ($pID);
         my $ageLevelOptions = checkRegoAgeRestrictions(
             $Data,
@@ -1348,7 +1419,14 @@ sub bulkRegoCreate  {
             "BULKREGO"
         );
         next if (! $regoID);
-	cleanRegoTransactions($Data,$regoID, $pID, $Defs::LEVEL_PERSON);
+        # Now lets see what products are allowed
+        my $AllowedRegoProducts = getRegoProducts($Data, \@productIDsAllowed, 0, $bulk_ref->{'entityID'}, $regoID, $pID, \%Rego, 0, \%ProductRules, 1, 0);
+        
+        foreach my $productIDAllowed (@{$AllowedRegoProducts}) {
+            $AllowedProducts{$productIDAllowed->{'ProductID'}} = 1;
+        }
+            
+	    cleanRegoTransactions($Data,$regoID, $pID, $Defs::LEVEL_PERSON);
         $RegoIDs{$pID} = $regoID;
         WorkFlow::cleanTasks(
             $Data,
@@ -1360,6 +1438,7 @@ sub bulkRegoCreate  {
         my @products = split /\:/, $productIDs;
         my %Products=();
         foreach my $product (@products) {
+            next if ! $AllowedProducts{$product};
             $Products{'prod_'.$product} =1;
         }
         my @productQty= split /:/, $productQtys;
@@ -1439,7 +1518,7 @@ sub bulkRegoSubmit {
         #    'REGO'
         #);
 	
-       my ($txnCount, $amountDue, $logIDs) = getPersonRegoTXN($Data, $pID, $regoID);
+       my ($txnCount, $amountDue, $logIDs, $originalAmount) = getPersonRegoTXN($Data, $pID, $regoID);
 	my %Reg = ();
 	$Reg{'CountTXNs'} = $txnCount;
 	
@@ -1450,7 +1529,30 @@ sub bulkRegoSubmit {
             \%Reg
         );
         savePlayerPassport($Data, $pID);
+            if (! $originalAmount and defined $logIDs) {
+                foreach my $id (keys %{$logIDs}) {
+                    next if ! $id;
+                    product_apply_transaction($Data, $id);
+                }
+            }
     }
 }
+
+#sub checkingBulkRenewalProducts {
+#
+#
+# my $CheckProducts = getRegistrationItems(
+#        $Data,
+#        'REGO',
+#        'PRODUCT',
+#        $originLevel,
+#        $rego_ref->{'strRegistrationNature'} || $rego_ref->{'registrationNature'},
+#        $entityID,
+#        $entityRegisteringForLevel,
+#        0,
+#        $rego_ref,
+#    );
+#
+#}
 1;
 

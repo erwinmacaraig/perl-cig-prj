@@ -56,7 +56,6 @@ use Logo;
 use FieldConfig;
 use EntitySettings;
 
-use RegoFormReplication;
 use AddToPage;
 use AuthMaintenance;
 use Dashboard;
@@ -121,6 +120,7 @@ sub main {
     my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     $Data{'lang'} = $lang;
     initLocalisation(\%Data);
+    updateSystemConfigTranslation(\%Data);
 
     if ($Data{'kickoff'} and $db and $paytry)  {
     ## Display Payment Summary if logged off

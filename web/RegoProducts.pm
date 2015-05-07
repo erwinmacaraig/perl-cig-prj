@@ -16,6 +16,7 @@ use Utils;
 use Transactions;
 use Date::Calc qw(Today Delta_YMD);
 use Data::Dumper;
+
 sub getRegoProducts {
     my (
         $Data,
@@ -26,9 +27,13 @@ sub getRegoProducts {
         $personID,
         $memdetails,
         $multipersonType,
-        $regItemRules_ref
+        $regItemRules_ref,
+        $returnItems,
+        $hideTotal
     ) = @_;
 
+    $returnItems ||= 0;
+    $hideTotal ||= 0;
     my $currencySymbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
     $incExisting ||= 0; ## Set to 1 to include existing in-cart items that aren't paid for the member
 
@@ -66,7 +71,7 @@ sub getRegoProducts {
         next if $dref->{intInactive};
         my $filter_display = productAllowedThroughFilter($dref, $memdetails, $timeLocally, $productAttributes, $filter_params);      
         $anyAllowQty ||= $dref->{'intAllowQtys'} || 0;
-        my $amount = currency(getCorrectPrice($dref, $multipersonType)) || 0;
+        my $amount = getCorrectPrice($dref, $multipersonType) || 0;
         my $paid = 0;
         my $unpaid = 0;
        #next if ($paid_product{$dref->{'intProductID'}} and !$dref->{intAllowMultiPurchase});
@@ -100,6 +105,7 @@ sub getRegoProducts {
     }
     return '' if !$count;
 
+    return \@unpaid_items if ($returnItems);
     my $AllowedCountText = '';
     my $AllowedCount = $Data->{'SystemConfig'}{'OnlineRego_productCount'} || 0;
     my $productscount = ($AllowedCount == 1) ? 'item' : 'items';
@@ -113,6 +119,7 @@ sub getRegoProducts {
         HideGroup => $Data->{'SystemConfig'}{'regoForm_HIDE_group'} || 0,
         AllowedCountText => $AllowedCountText || '',
         UnPaidItems => \@unpaid_items,
+        HideTotal => $hideTotal,
         CurrencySymbol => $currencySymbol,
 		client => $cl,
     );
@@ -128,14 +135,15 @@ sub getAllRegoProducts {
     return [] if !$productID_str;
 
     my $ExistingStatus = $incExisting ? 0 : 9999; ## Obviously none will have 9999
+    my $locale = $Data->{'lang'}->getLocale();
     my $sql = qq[
         SELECT DISTINCT 
             T.intStatus,
             T.intTransactionID,
             T.curAmount as AmountCharged,
             P.intProductID,
-            P.strDisplayName,
-            P.strName,
+            COALESCE (LT.strString1,P.strName) as strName,
+            COALESCE(LT.strString2,P.strDisplayName) as strDisplayName,
             P.curDefaultAmount,
             P.intMinChangeLevel,
             P.intCreatedLevel,
@@ -168,6 +176,11 @@ sub getAllRegoProducts {
                 AND T.intPersonRegistrationID IN (0, ?)
                 AND T.intTXNEntityID IN (0, ?)
                 AND T.intStatus IN (0, $ExistingStatus)
+            )
+            LEFT JOIN tblLocalTranslations AS LT ON (
+                LT.strType = 'PRODUCT'
+                AND LT.intID = P.intProductID
+                AND strLocale = '$locale'
             )
             LEFT JOIN tblProductPricing as PP ON (
                 PP.intProductID = P.intProductID
@@ -452,6 +465,7 @@ sub productAllowedThroughFilter {
 
                 if($productAttributes->{$dref->{'intProductID'}}{$Defs::PRODUCT_DOB_MIN}
                     and $productAttributes->{$dref->{'intProductID'}}{$Defs::PRODUCT_DOB_MIN}[0] ne 'NULL' ) {
+
                     return 0 if ($dob lt $productAttributes->{$dref->{'intProductID'}}{$Defs::PRODUCT_DOB_MIN}[0]);
                 }
 

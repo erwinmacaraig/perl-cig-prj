@@ -374,13 +374,16 @@ my @headers = (
 	my $allowMP = 1;
     $allowMP = 0 if !$allowManualPayments;
     $allowMP = 0 if $Data->{'SystemConfig'}{'DontAllowManualPayments_Invoice'};
-
+	
 	 my $orstring = '';
      $orstring = qq[&nbsp; <b>].$Data->{'lang'}->txt('OR').qq[</b> &nbsp;] if $gateway_body and $allowMP;
      if($paymentType==0){ $paymentType='';}
-   
+   	#
+	my $isManualPaymentAllowedAtThisLevel = 0;
+	$isManualPaymentAllowedAtThisLevel = 1 if ($Data->{'clientValues'}{'authLevel'} >= $Data->{'SystemConfig'}{'allowManualPaymentsFromLevel'});
+	#
 	
-	if ($allowMP and $notLocked){
+	if ($allowMP and $notLocked and $isManualPaymentAllowedAtThisLevel){
 	$gateway_body .= qq[<div  style="display:block;" id="payment_manual">
 						<h3 class="panel-header sectionheader" id="manualpayment">].$Data->{'lang'}->txt('Manual Payment').qq[</h3>
 				  		<div id="secmain2" class="panel-body fieldSectionGroup ">
@@ -656,15 +659,22 @@ sub displayResults {
     $allowManualPayments = 0 if $Data->{'ReadOnlyLogin'};	
 
 	my $allowMP = 1;
-    $allowMP = 0 if !$allowManualPayments;
-    $allowMP = 0 if $Data->{'SystemConfig'}{'DontAllowManualPayments_Invoice'};
+	$allowMP = 0 if !$allowManualPayments;
 
+	#
+	my $isManualPaymentAllowedAtThisLevel = 0;
+	$isManualPaymentAllowedAtThisLevel = 1 if ($Data->{'clientValues'}{'authLevel'} >= $Data->{'SystemConfig'}{'allowManualPaymentsFromLevel'});
+	#
+    
+    $allowMP = 0 if $Data->{'SystemConfig'}{'DontAllowManualPayments_Invoice'};
+	
+		
 	 my $orstring = '';
      $orstring = qq[&nbsp; <b>].$Data->{'lang'}->txt('OR').qq[</b> &nbsp;] if $gateway_body and $allowMP;
      if($paymentType==0){ $paymentType='';}
    
-	
-	if ($allowMP){
+	#
+	if ($allowMP and $isManualPaymentAllowedAtThisLevel){
 	$gateway_body .= qq[<div  style="display:none;" id="payment_manual">
 						<h3 class="panel-header sectionheader" id="manualpayment">].$Data->{'lang'}->txt('Manual Payment').qq[</h3>
 				  		<div id="secmain2" class="panel-body fieldSectionGroup ">

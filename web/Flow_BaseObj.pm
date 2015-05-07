@@ -42,6 +42,7 @@ sub new {
     $self->{'CookiesToWrite'} = ();
     $self->{'FieldSets'} = {};
     $self->{'ID'} = $params{'ID'} || 0;
+    $self->{'UserID'} = $params{'UserID'} || 0;
 
     $self->{'DEBUG'} ||= 0;
 

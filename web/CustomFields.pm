@@ -14,14 +14,20 @@ sub getCustomFieldNames	{
     $subtypeID||=$Data->{'RealmSubType'} || 0;
 	my %CustomFieldNames=();
 	if($db)	{
+        my $locale = $Data->{'lang'}->getLocale();
 		my $statement=qq[
 			SELECT 
                 strDBFName, 
-                strName, 
+                COALESCE(LT.strString1,strName) AS strName,
                 intLocked, 
                 intSubTypeID
 			FROM 
                 tblCustomFields
+                LEFT JOIN tblLocalTranslations AS LT ON (
+                    LT.strType = 'CUSTOMFIELDS'
+                    AND LT.intID = tblCustomFields.intCustomFieldsID
+                    AND LT.strLocale = '$locale'
+                )
 			WHERE 
                 intRealmID = ?
 			ORDER BY 

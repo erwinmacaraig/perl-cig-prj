@@ -16,6 +16,7 @@ sub new {
     Lang => $Data->{'lang'} || undef,
     Locale => $locale || '',
     CurrencyCode => '',
+    CustomFormat => '',
   );
 
   my $self={%fields};
@@ -30,6 +31,12 @@ sub _setupFormats {
     $currencyCode = $self->{'SystemConfig'}{'CurrencyCode'} if $self->{'SystemConfig'};
     $currencyCode ||= 'EUR';
     $self->{'CurrencyCode'} = $currencyCode;
+    my $format = '';
+    $format = $self->{'SystemConfig'}{'CurrencyCustomFormat'} if $self->{'SystemConfig'};
+    if($format) {
+        $self->{'CustomFormat'} = $format;
+    }
+    return 1;
 }
 
 sub format {
@@ -42,6 +49,9 @@ sub format {
     $name ||= 0;
     my $format = $name ? FMT_STANDARD : FMT_HTML;
 
+    if($self->{'CustomFormat'}) {
+        currency_set($self->{'CurrencyCode'}, $self->{'CustomFormat'}, FMT_COMMON);
+    }
     return currency_format($self->{'CurrencyCode'},$value, $format);
 }
 

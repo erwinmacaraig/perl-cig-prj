@@ -41,14 +41,9 @@
 				<td><!--Filter by:-->
 					<select class="filter-tasks" style="width: 100%">
 			          <option selected="" value="">-- [% Lang.txt('All') %] --</option>
-                      <!--
-			          <option value="New Registration">New Registration</option>
-			          <option value="Renewal">Renewal</option>
-			          <option value="Transfer">Transfer</option>
-                      -->
                       [% FOREACH taskType IN TaskFilters.type %]
                           [% IF taskType %]
-                          <option value="[% taskType %]">[% Lang.txt(taskType) %]</option>
+                          <option value="[% Lang.txt(taskType) %]">[% Lang.txt(taskType) %]</option>
                           [% END %]
                       [% END %]
 			        </select>
@@ -69,11 +64,6 @@
                       <option value="[% Lang.txt('Task On Hold') %]">[% Lang.txt('Task On Hold') %]</option>
                       <option value="[% Lang.txt('Accepted') %]">[% Lang.txt('Accepted') %]</option>
                       <option value="[% Lang.txt('Pending') %]">[% Lang.txt('Pending') %]</option>
-                      <!--
-                      [% FOREACH taskStatus IN TaskFilters.status %]
-                      <option value="[% taskStatus %]">[% taskStatus %]</option>
-                      [% END %]
-                        -->
 			        </select>
 				</td>
 				<td class="list-action-filter">
@@ -183,7 +173,7 @@
 		            [% ELSE %]
                         <td><span class="fa fa-user"></span>Rego [% task.Name %]</td>
 		            [% END %]
-                    <td data-order = "[% task.taskDate %]">[% DateFormat.format(task.taskDate,'MEDIUM') %]</td>
+                    <td data-order = "[% task.taskDate_RAW %]">[% task.taskDate %]</td>
 
                     <td><span class="fa fa-clock-o"></span>[% Lang.txt(task.TaskStatusLabel) %]</td>
 

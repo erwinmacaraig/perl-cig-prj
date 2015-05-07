@@ -159,6 +159,7 @@ sub personFieldsSetup {
         $showITCReminder = 1;
     }
     $showITCReminder = 0 if $values->{'itc'};
+    my $minorRego = $values->{'minorRego'} || 0;
     my $minorProtectionOptions = getMinorProtectionOptions($Data,$values->{'itc'} || 0);
     my $minorProtectionExplanation= getMinorProtectionExplanation($Data,$values->{'itc'} || 0);
 
@@ -166,6 +167,7 @@ sub personFieldsSetup {
         dbh        => $Data->{'db'},
         realmID    => $Data->{'Realm'},
         subRealmID => $Data->{'RealmSubType'},
+        locale     => $Data->{'lang'}->getLocale(),
     );
 
     my @intNatCustomLU_DefsCodes = (undef, -53, -54, -55, -64, -65, -66, -67, -68,-69,-70);
@@ -375,7 +377,7 @@ sub personFieldsSetup {
                     displayFunctionParams=> ['MEDIUM'],
         		},
         		strBirthCertDesc => {
-        			label => $FieldLabels->{'strDescription'},
+        			label => $FieldLabels->{'strBirthCertDesc'},
       	            value => $values->{'strBirthCertDesc'},
                     type => 'textarea',
                     rows => '10',
@@ -461,7 +463,7 @@ sub personFieldsSetup {
                     displayFunctionParams=> ['MEDIUM'],
                 },
                 strOtherPersonIdentifierDesc => {
-                	label => $FieldLabels->{'strDescription'},
+                	label => $FieldLabels->{'strOtherPersonIdentifierDesc'},
                 	value => $values->{'strOtherPersonIdentifierDesc'},
                     type => 'textarea',
                     rows => '10',
@@ -527,7 +529,6 @@ sub personFieldsSetup {
                     sectionname => 'core',
                     active => $showITCReminder,
                 },
-
                 strInternationalTransferSourceClub => {
                 	label => $FieldLabels->{'strInternationalTransferSourceClub'},
                 	value => $values->{'strInternationalTransferSourceClub'},
@@ -607,9 +608,48 @@ sub personFieldsSetup {
                     compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
                     active => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
                 },
-
+                parentBlock => {
+                    label       => 'parentblock',
+                    value       => qq[<p>].$Data->{'lang'}->txt('What is your relationship to the minor you are registering?').qq[</p>],
+                    type        => 'htmlrow',
+                    sectionname => 'parent',
+                    active => $minorRego,
+                },
+                strP1FName => {
+                    label       => $FieldLabels->{'strP1FName'},
+                    value       => $values->{strP1FName},
+                    type        => 'text',
+                    size        => '30',
+                    maxsize     => '50',
+                    sectionname => 'parent',
+                    active => $minorRego,
+                },
+                strP1SName => {
+                    label       => $FieldLabels->{'strP1SName'},
+                    value       => $values->{strP1SName},
+                    type        => 'text',
+                    size        => '30',
+                    maxsize     => '50',
+                    sectionname => 'parent',
+                    active => $minorRego,
+                },
+                strGuardianRelationship => {
+                    label       => $FieldLabels->{'strGuardianRelationship'},
+                    value       => $values->{strGuardianRelationship},
+                    type        => 'lookup',
+                    options     => {'Parent'=>'Parent','Legal Guardian' => 'Legal Guardian'},
+                    firstoption => [ '', " " ],
+                    class       => 'chzn-select',
+                    sectionname => 'parent',
+                    active => $minorRego,
+                },
             },
             'order' => [qw(
+                parentBlock
+                strGuardianRelationship
+                strP1FName
+                strP1SName
+
                 strLocalSurname
                 strLocalFirstname
                 intLocalLanguage
@@ -661,6 +701,7 @@ sub personFieldsSetup {
                 strInternationalLoanTMSRef
             )],
             sections => [
+                [ 'parent',      'Parent/Guardian Details' ],
                 [ 'core',        $Data->{'lang'}->txt('Personal Details') ],
                 [ 'minor',       $Data->{'lang'}->txt('FIFA Minor Protection'),'','dynamic-panel' ],
                 [ 'other',       $Data->{'lang'}->txt('Additional Information') ],

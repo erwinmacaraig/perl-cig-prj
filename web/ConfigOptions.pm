@@ -359,6 +359,7 @@ sub getFieldsList	{
         strEmergContNo2
         strEmergContRel
         strP1Salutation
+        strGuardianRelationship
         strP1FName
         strP1SName
         intP1Gender
@@ -491,6 +492,7 @@ sub getFieldsList	{
         intNotifications
         intFacilityTypeID
         strBankAccountNumber
+        intAcceptSelfRego
         ));
 
     return \@clubFields if $fieldtype eq 'Club';

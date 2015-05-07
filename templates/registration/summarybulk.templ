@@ -23,7 +23,7 @@
             <td>[% IF person.Gender %] [% person.Gender %] [% ELSE %] - [% END %]</td>
             <td>[% IF person.Nationality %] [% person.Nationality %] [% ELSE %] - [% END %]</td>
             <td>[% IF person.Country %] [% person.Country %] [% ELSE %] - [% END %]</td>
-            <td>[% IF person.AmountDue %] [% payment.dollarSymbol %][% person.AmountDue %] [% ELSE %] - [% END %]</td>
+            <td>[% IF person.txnCountPerson and person.AmountDue >= 0 %] [% CurrencyFormat.format(person.AmountDue) %][% ELSE %] - [% END %]</td>
         </tr>
     [% END %]
     </table>

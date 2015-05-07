@@ -17,6 +17,8 @@ require Exporter;
     cleanPlayerPersonRegistrations
 );
 use strict;
+use lib "..",".";
+
 use WorkFlow;
 #use Log;
 use RuleMatrix;
@@ -169,6 +171,7 @@ sub checkIsSuspended    {
 sub checkNewRegoOK  {
 
     my ($Data, $personID, $rego_ref) = @_;
+print STDERR "CHECKING NEW\n";
     my %Reg = (
         sport=> $rego_ref->{'sport'} || '',
         personType=> $rego_ref->{'personType'} || '',
@@ -223,6 +226,7 @@ sub checkRenewalRegoOK  {
     $pref = Person::loadPersonDetails($Data->{'db'}, $personID) if ($personID);
     return 0 if (defined $pref and ($pref->{'strStatus'} eq $Defs::PERSON_STATUS_SUSPENDED));
     my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $rego_ref->{'sport'}, $rego_ref->{'personType'}, 'RENEWAL');
+print STDERR Dumper($rego_ref);
 
     $rego_ref->{'ruleFor'} = 'REGO';
     my ($personRegisterWhat, $errorMsg) = PersonRegisterWhat::optionsPersonRegisterWhat(
@@ -274,6 +278,7 @@ sub checkRenewalRegoOK  {
         $personID,
         \%Reg
     );
+print STDERR "COUNT $count\n";
     my @statusNOTIN = ();
     @statusNOTIN = ($Defs::PERSONREGO_STATUS_INPROGRESS, $Defs::PERSONREGO_STATUS_REJECTED);
 
@@ -630,6 +635,10 @@ sub getRegistrationData	{
         push @values, $regFilters_ref->{'entityID'};
         $where .= " AND pr.intEntityID= ? ";
     }
+    if(exists $regFilters_ref->{'originLevel'})  {
+        push @values, $regFilters_ref->{'originLevel'};
+        $where .= " AND pr.intOriginLevel = ? ";
+    }
 
     my $st= qq[
         SELECT 
@@ -701,6 +710,7 @@ sub getRegistrationData	{
 	
     my @Registrations = ();
     my @reg_docs = ();  
+    my $locale = $Data->{'lang'}->getLocale();
     while(my $dref= $query->fetchrow_hashref()) {
         $count++;
         $dref->{'sport'} = $dref->{'strSport'} || '';
@@ -720,9 +730,25 @@ sub getRegistrationData	{
         $dref->{'currentAge'} = personAge($Data,$dref->{'dtDOB'});
 
 		my $sql = qq[
-			SELECT strApprovalStatus,strDocumentName, intFileID, strOrigFilename, pr.intPersonRegistrationID, tblDocumentType.intDocumentTypeID, strLockAtLevel,tblUploadedFiles.dtUploaded as DateUploaded FROM tblUploadedFiles INNER JOIN tblDocuments ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID  
-			INNER JOIN tblDocumentType ON tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID   
-			INNER JOIN tblPersonRegistration_$Data->{'Realm'} as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID 
+			SELECT 
+                strApprovalStatus,
+                COALESCE (LT_D.strString1,D.strDocumentName) as strDocumentName,
+                intFileID,
+                strOrigFilename,
+                pr.intPersonRegistrationID,
+                tblDocumentType.intDocumentTypeID,
+                strLockAtLevel,
+                tblUploadedFiles.dtUploaded as DateUploaded 
+            FROM tblUploadedFiles 
+                INNER JOIN tblDocuments ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID  
+                INNER JOIN tblDocumentType ON tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID   
+                INNER JOIN tblPersonRegistration_$Data->{'Realm'} as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID 
+                LEFT JOIN tblLocalTranslations AS LT_D ON (
+                    LT_D.strType = 'DOCUMENT'
+                    AND LT_D.intID = tblDocumentType.intDocumentTypeID
+                    AND LT_D.strLocale = '$locale'
+                )
+
 			WHERE pr.intPersonRegistrationID = $dref->{intPersonRegistrationID} AND pr.intPersonID = $personID 
 		];
 
@@ -751,7 +777,7 @@ sub getRegistrationData	{
 				INNER JOIN tblUploadedFiles  ON (tblUploadedFiles.intFileID = tblDocuments.intUploadFileID )
 				INNER JOIN tblPersonRegistration_$Data->{'Realm'}  as pr ON (pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID )
                 LEFT JOIN tblEntity as E ON (E.intEntityID=pr.intEntityID)
-				WHERE pr.intPersonID = $personID
+				WHERE pr.intPersonID = ?
 				AND pr.intPersonRegistrationID = $dref->{intPersonRegistrationID}
 			) as t ON t.intDocumentTypeID = RI.intID 
         WHERE
@@ -776,7 +802,7 @@ sub getRegistrationData	{
             #AND RI.intOriginLevel = $Data->{'clientValues'}{'authLevel'}
 
 		my $sth = $Data->{'db'}->prepare($sql);
-		$sth->execute();
+		$sth->execute($personID);
 		while(my $data_ref = $sth->fetchrow_hashref()){
 			#push @reg_docs, $data_ref;	
             $data_ref->{'DateUploaded_RAW'} = $data_ref->{'DateUploaded'};
@@ -921,7 +947,7 @@ sub addRegistration {
   		$Reg_ref->{'current'} || 0,  		
   		$Reg_ref->{'originLevel'} || 0,  		
   		$Reg_ref->{'originID'} || 0,  		
-        $Data->{'clientValues'}{'userID'} || 0,
+        $Reg_ref->{'originLevel'} == 1 ? $Data->{'User'}{'UserID'} || 0 : $Data->{'clientValues'}{'userID'} || 0,
   		$Reg_ref->{'dateFrom'},  		
   		$Reg_ref->{'dateTo'},  		
   		$Data->{'Realm'},
@@ -985,7 +1011,7 @@ sub submitPersonRegistration    {
         $pr_ref->{'paymentRequired'} = 0 if ($rego_ref->{'CountTXNs'} == 0);
 
         updatePersonRegistration($Data, $personID, $personRegistrationID, $pr_ref, $personStatus);
-        cleanTasks(
+        WorkFlow::cleanTasks(
             $Data,
             $personID,
             $pr_ref->{'entityID'} || $pr_ref->{'intEntityID'} || 0,
@@ -993,7 +1019,7 @@ sub submitPersonRegistration    {
             'REGO'
         );
 
-            my $rc = addWorkFlowTasks(
+            my $rc = WorkFlow::addWorkFlowTasks(
             $Data,
             'REGO', 
             $pr_ref->{'registrationNature'} || $pr_ref->{'strRegistrationNature'} || '', 

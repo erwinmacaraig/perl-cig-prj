@@ -21,9 +21,10 @@ use Email;
 use PaymentSplitExport;
 use ServicesContacts;
 use TemplateEmail;
-use RegoFormUtils;
+#use RegoFormUtils;
 use ContactsObj;
 use Data::Dumper;
+use TTTemplate;
 require Products;
 require TransLog;
 require PaymentSplitMoneyLog;
@@ -293,7 +294,7 @@ sub checkoutConfirm	{
 			    next if ! $dref->{intTransactionID};
                 my $star ='';
 				$count++;
-				my $lamount=currency($dref->{'curAmount'} || 0);
+				my $lamount=$dref->{'curAmount'} || 0;
 				$invoiceList .= $invoiceList ? qq[,$dref->{'InvoiceNum'}] : $dref->{'InvoiceNum'};
 				$product_confirmation.=qq[
 					<tr>
@@ -304,7 +305,7 @@ sub checkoutConfirm	{
 					</tr>
 				];
 			}
-			my $camount=currency($amount||0);
+			my $camount=$amount||0;
 			$product_confirmation=qq[
 				<table class="table" cellspacing="0" cellpadding="0" border="0">
 					<thead>
@@ -517,7 +518,6 @@ sub createTransLog	{
 	my $db = $Data->{'db'};
     my %fields=();
     $fields{amount} = $amount || 0;
-    
     my $authLevel = $Data->{'clientValues'}{'authLevel'}||=$Defs::INVALID_ID;
     #if (! $entityID)    {
         $entityID = getID($Data->{'clientValues'}, $authLevel);
@@ -973,13 +973,13 @@ sub EmailPaymentConfirmation	{
 	}
 
 	my %TransData = (
-		ReceiptHeader    => $Data->{'SystemConfig'}{'paymentReceiptHeaderHTML'} || '',
+		#ReceiptHeader    => $Data->{'SystemConfig'}{'paymentReceiptHeaderHTML'} || '',
 		TotalAmount      => $tref->{'intAmount'},
 		BankRef          => $tref->{'strTXN'} || '',
 		PaymentID        => $tref->{'intLogID'},
 		DatePurchased    => $tref->{'dateLog'},
 		Transactions     => \@txns,
-		ReceiptFooter    => $Data->{'SystemConfig'}{'paymentReceiptFooterHTML'} || '',
+		#ReceiptFooter    => $Data->{'SystemConfig'}{'paymentReceiptFooterHTML'} || '',
 		PaymentAssocType => $Data->{'SystemConfig'}{'paymentAssocType'} || '',
 		DollarSymbol     => $Data->{'SystemConfig'}{'DollarSymbol'} || "\$",
 	);
@@ -1018,20 +1018,36 @@ sub EmailPaymentConfirmation	{
 
 			$TransData{'OrgName'} = $orgname || '';
 			$paymentSettings->{notification_address} =$dref->{'PaymentNotificationAddress'} || $paymentSettings->{notification_address};
-
+			
 		}
 		$Data->{'SystemConfig'}=getSystemConfig($Data);
 	}
+	my $templateWrapper = $Data->{'SystemConfig'}{'EmailNotificationWrapperTemplate'};
+	my $content = runTemplate(
+	      			  $Data,
+	       			 \%TransData,
+	                 'emails/payments/payment_receipt.templ',
+   			);
+
+	my %emailTemplateContent = (
+        content => $content,
+        MA_PhoneNumber => $Data->{'SystemConfig'}{'ma_phone_number'},
+        MA_HelpDeskPhone => $Data->{'SystemConfig'}{'help_desk_phone_number'},
+        MA_HelpDeskEmail => $Data->{'SystemConfig'}{'help_desk_email'},
+        MA_Website => $Data->{'SystemConfig'}{'ma_website'},
+        MA_HeaderName => $Data->{'SystemConfig'}{'EmailNotificationSysName'},
+		MA_PhoneNumber => $Data->{'SystemConfig'}{'ma_phone_number'},
+    );
 	sendTemplateEmail(
-        $Data,
-        'payments/payment_receipt.templ',
-        \%TransData,
+		$Data,
+		$templateWrapper,
+		\%emailTemplateContent,
         $to_address,
         'Payment Received',
         $paymentSettings->{'notification_address'},
         $cc_address,
         $bcc_address,
-    ) ;
+	);
 	
 	
 	return 1;

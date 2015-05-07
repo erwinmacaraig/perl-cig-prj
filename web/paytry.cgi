@@ -9,7 +9,7 @@ use CGI qw(:cgi escape unescape);
 
 use strict;
 
-use lib "..",".",'PaymentSplit';
+use lib "..",".",'PaymentSplit'; #, "../..";
 #use lib "/u/rego_v6","/u/rego_v6/web";
 
 use Lang;
@@ -38,6 +38,7 @@ main();
 sub main	{
 
 	my $client = param('client') || 0;
+	my $selfRego= param('selfRego') || 0;
     my $cgi = new CGI;
     my %params=$cgi->Vars();
 
@@ -47,6 +48,11 @@ sub main	{
     my %clientValues = getClient($client);
     $Data{'clientValues'} = \%clientValues;
     ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
+    if ($selfRego)  {
+        $Data{'Realm'} ||= 1;
+        $Data{'clientValues'}{'authLevel'} = 1;
+    }
+
     $Data{'cache'}  = new MCache();
 
 
@@ -96,6 +102,7 @@ sub main	{
 	my $st = qq[
         INSERT INTO tblPayTry (
             intRealmID,
+            intSelfRego,
             strPayReference,
             intTransLogID,
             strLog,
@@ -108,6 +115,7 @@ sub main	{
             ?,
             ?,
             ?,
+            ?,
             NOW()
         )
     ];
@@ -115,6 +123,7 @@ sub main	{
 	my $payRef = calcPayTryRef($Data{'SystemConfig'}{'paymentPrefix'},$logID);
     $qry->execute(
         $Data{'Realm'},
+        $selfRego || 0,
         $payRef,
         $logID,
         $datalog,
@@ -133,55 +142,58 @@ sub main	{
 	$logID
 	);
     #disconnectDB($db);
-    my $cancelPayPalURL = $Defs::base_url . $paymentSettings->{'gatewayCancelURL'} . qq[&amp;ci=$payRef&client=$client]; ##$Defs::paypal_CANCEL_URL;
+    my $baseurl = $Defs::base_url;
+    $baseurl = 'registration/index.cgi' if ($selfRego);
+    my $cancelPayPalURL = $baseurl . $paymentSettings->{'gatewayCancelURL'} . qq[&amp;ci=$payRef&client=$client]; ##$Defs::paypal_CANCEL_URL;
 
     ## In here I will build up URL per Gateway -- intPaymentConfigID or have a GATEWAYCODE ?
     ## Pass control to gateway
     my $paymentURL = '';
     my $gatewaySpecific ='';
 
-    my $currentLang = $Data{'lang'}->generateLocale($Data{'SystemConfig'});
+    my $currentLang = $Data{'lang'}->getLocale($Data{'SystemConfig'});
 
     if ($paymentSettings->{'gatewayCode'} eq 'NABExt1') {
         $paymentURL = $paymentSettings->{'gateway_url'} .qq[?nh=$Data{'noheader'}&amp;a=P&amp;client=$client&amp;ci=$payRef&amp;chkv=$chkvalue&amp;session=$session&amp;amount=$amount&amp;logID=$logID];
     }
     if ($paymentSettings->{'gatewayCode'} eq 'checkoutfi')  {
-	my %MAGateway= ();
-	$MAGateway{'nh'} = $Data{'noheader'};
-	$MAGateway{'client'} = $client;
-	$MAGateway{'ci'} = $payRef;
-	$MAGateway{'chkv'} = $chkvalue;
-	$MAGateway{'session'} = $session;
-	$MAGateway{'amount'} = $amount;
-	$MAGateway{'logID'} = $logID;
-	$MAGateway{'currentLang'} = $currentLang;
-	
-	$MAGateway{''} = 
+        my %MAGateway= ();
+        $MAGateway{'nh'} = $Data{'noheader'};
+        $MAGateway{'client'} = $client;
+        $MAGateway{'ci'} = $payRef;
+        $MAGateway{'chkv'} = $chkvalue;
+        $MAGateway{'session'} = $session;
+        $MAGateway{'amount'} = $amount;
+        $MAGateway{'logID'} = $logID;
+        $MAGateway{'currentLang'} = $currentLang;
+        
+        $MAGateway{''} = 
 
-	$gatewaySpecific = MAGateway_FI_checkoutFI(\%MAGateway, $paymentSettings);
-	$paymentURL = $gatewaySpecific->{'paymentURL'};
+        $gatewaySpecific = MAGateway_FI_checkoutFI(\%MAGateway, $paymentSettings);
+        $paymentURL = $gatewaySpecific->{'paymentURL'};
     }
     if ($paymentSettings->{'gatewayCode'} eq 'hk_paydollar')  {
-	my %MAGateway= ();
-	$MAGateway{'nh'} = $Data{'noheader'};
-	$MAGateway{'client'} = $client;
-	$MAGateway{'ci'} = $payRef;
-	$MAGateway{'chkv'} = $chkvalue;
-	$MAGateway{'session'} = $session;
-	$MAGateway{'amount'} = $amount;
-	$MAGateway{'logID'} = $logID;
-	$MAGateway{'currentLang'} = $currentLang;
-	
-	$MAGateway{''} = 
+        my %MAGateway= ();
+        $MAGateway{'nh'} = $Data{'noheader'};
+        $MAGateway{'client'} = $client;
+        $MAGateway{'ci'} = $payRef;
+        $MAGateway{'chkv'} = $chkvalue;
+        $MAGateway{'session'} = $session;
+        $MAGateway{'amount'} = $amount;
+        $MAGateway{'logID'} = $logID;
+        $MAGateway{'currentLang'} = $currentLang;
+        
+        $MAGateway{''} = 
 
-	$gatewaySpecific = MAGateway_HKPayDollar(\%MAGateway, $paymentSettings);
-	$paymentURL = $gatewaySpecific->{'paymentURL'};
+        $gatewaySpecific = MAGateway_HKPayDollar(\%MAGateway, $paymentSettings);
+        $paymentURL = $gatewaySpecific->{'paymentURL'};
     }
 
 
     markTXNSentToGateway(\%Data, $logID);
 
     my $payTry = payTryRead(\%Data, $logID, 0);
+
     if ($paymentSettings->{'gatewayProcessPreGateway'})  {
         #$Data{'clientValues'} = $payTry;
         my $client= setClient(\%{$payTry});
@@ -233,9 +245,8 @@ if ($amount eq "0" or $amount eq "0.00" or ! $amount)   {
 else    {
     print qq[Content-type: text/html\n\n];
     print $proceed_body;
-    #print qq[$cancel_body<br>];
-    #print qq[$gateway_body];
-    #print qq[<br>$cancelPayPalURL];
+#print qq[Content-type: text/html\n\n];
+#print "STOP";
 }
 
 }

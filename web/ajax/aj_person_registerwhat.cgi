@@ -29,7 +29,7 @@ sub main	{
     my $dob = param('dob') || '';
     my $gender = param('gender') || '';
     my $lookingFor = param('otype') || '';
-    my $realmIN = param('r') || 0;
+    my $realmIN = param('r') || 1;
     my $subRealmIN = param('sr') || 0;
     my $bulk= param('bulk') || 0;
     my $defaultType = param('dtype') || '';
@@ -55,6 +55,7 @@ sub main	{
     $Data{'lang'}=$lang;
 
     ($Data{'Realm'}, $Data{'RealmSubType'})=getRealm(\%Data);
+    $Data{'Realm'} ||= 1;
 
 
     my $options = undef;

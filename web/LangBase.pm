@@ -82,5 +82,7 @@ package LangBase::sv_se;
 use base qw(Locale::Maketext::Gettext);
 return 1;
 
-
+package LangBase::zh_cn;
+use base qw(Locale::Maketext::Gettext);
+return 1;
 

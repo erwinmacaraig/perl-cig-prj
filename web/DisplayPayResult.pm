@@ -102,7 +102,7 @@ sub displayTXNToPay {
         my $dref = getTXNDetails($Data, $transid,1);
         next if ! $dref->{intTransactionID};
         $count++;
-        my $lamount=currency($dref->{'curAmount'} || 0);
+        my $lamount=$dref->{'curAmount'} || 0;
         $invoiceList .= $invoiceList ? qq[,$dref->{'InvoiceNum'}] : $dref->{'InvoiceNum'};
         my %TXN = ();
         $TXN{'InvoiceNum'} = $dref->{'InvoiceNum'};
@@ -111,7 +111,7 @@ sub displayTXNToPay {
         $TXN{'LineAmount'} = $lamount;
         push @templateTXNs, \%TXN;
     }
-    my $camount=currency($amount||0);
+    my $camount=$amount||0;
     my %PageData = (
         target => $Data->{'target'},
         Lang => $Data->{'lang'},
