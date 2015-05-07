@@ -390,6 +390,19 @@ th {
 .fieldSectionGroupWrapper fieldset div.col-md-6 {
   font-weight: bold;
 }
+/*spinner function class*/
+.spinner {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.57);
+  top: 0;
+  left: 0;
+  background-image: url("../images/spinner.gif");
+  background-repeat: no-repeat;
+  background-size: 2%;
+  background-position: center center;
+}
 @media only screen and (min-width:275px) and (max-width:313px){
   body{
     top:0!important;

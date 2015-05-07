@@ -487,4 +487,13 @@ function responsiveTables(headerLocation,gridLocation){
            
     });
 }
+function spinnerGenerator(command){
+    if(command == "kill"){
+        $(".spinner").remove()
+    }else if(command == "generate"){
+        $("body").append('<div class="spinner"></div>')
+    }else{
+        alert("nothing to do")
+    }
+}
 
