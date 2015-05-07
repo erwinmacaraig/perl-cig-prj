@@ -113,3 +113,6 @@ ALTER TABLE tblProducts ADD COLUMN intMinAddSingleTXNLevel TINYINT DEFAULT 0;
 ALTER TABLE tblEntity CHANGE COLUMN strAcceptSelfRego intAcceptSelfRego INT NULL DEFAULT 1 COMMENT 'Allow an Entity to determine if they accept self registration FC-231'; ## I’ve run against CITEST
 # selfRego.sql
 ALTER TABLE tblPayTry ADD COLUMN intSelfRego TINYINT default 0;
+
+#150507_tblNationalPeriod.sql
+ALTER TABLE tblNationalPeriod ADD COLUMN strImportPeriodCode varchar(30) default '';
