@@ -794,10 +794,13 @@ sub process_registration {
                     INNER JOIN tblPersonRequest as Preq ON (
                         Preq.intPersonID=PRNew.intPersonID 
                         AND Preq.intRequestFromEntityID= PRNew.intEntityID 
+                        AND Preq.strRequestType = 'LOAN'
                         AND Preq.intOpenLoan=1
                         AND Preq.strRequestStatus = 'COMPLETED'
                     ) 
-                    SET PRNew.intOnLoan = 1
+                    SET 
+                        PRNew.intOnLoan = 1, 
+                        PRNew.intPersonRequestID = PRExisting.intPersonRequestID
                 WHERE 
                     PRNew.intPersonRegistrationID = ?
                     AND PRNew.intPersonID = ?
