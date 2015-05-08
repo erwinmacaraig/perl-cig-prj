@@ -2340,7 +2340,7 @@ sub activatePlayerLoan {
             tblPersonRegistration_$Data->{'Realm'} PR
         INNER JOIN
             tblPersonRequest PRQ ON (PRQ.intPersonRequestID = PR.intPersonRequestID)
-        LEFT JOIN
+        INNER JOIN
             tblNationalPeriod NP ON (PRQ.dtLoanFrom BETWEEN NP.dtFrom AND NP.dtTo)
         SET
             PR.strStatus = IF(NP.dtTo <= DATE(NOW()), 'PASSIVE', IF(NP.dtTo = '' OR NP.dtTo IS NULL, 'PENDING', 'ACTIVE')),
@@ -2348,13 +2348,22 @@ sub activatePlayerLoan {
             PR.dtTo = IF(PRQ.dtLoanTo <= NP.dtTo, PRQ.dtLoanTo, IF(NP.dtTo <= DATE(NOW()), NP.dtTo, NULL)),
             PR.intNationalPeriodID = NP.intNationalPeriodID
         WHERE
-            PR.intPersonRequestID IN ($idset)
+            PR.intPersonRequestID = ?
             AND PRQ.strRequestStatus = 'COMPLETED'
             AND PR.strStatus IN ('PENDING', 'ACTIVE')
-            AND PR.strSport IN ('', NP.strSport)
     ];
-            #PR.strStatus = IF((PRQ.dtLoanTo <= NP.dtTo AND NP.dtTo < DATE(NOW())), 'PASSIVE', 'ACTIVE'),
 
+    foreach my $req (@{$requestIDs})  {
+        my $st = $bst . qq[ AND NP.strSport = PR.strSport];
+        my $query = $db->prepare($st) or query_error($st);
+        $query->execute($req) or query_error($st);
+        if (! $query->rows) {
+            $st = $bst . qq[ AND NP.strSport = ''];
+            $query = $db->prepare($st) or query_error($st);
+            $query->execute($req) or query_error($st);
+        }
+    }
+    
     #update records for lending club
     my $lst = qq [
         UPDATE
@@ -2369,10 +2378,8 @@ sub activatePlayerLoan {
             AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
     ];
 
-    my $query = $db->prepare($bst) or query_error($bst);
-    $query->execute() or query_error($bst);
 
-    $query = $db->prepare($lst) or query_error($lst);
+    my $query = $db->prepare($lst) or query_error($lst);
     $query->execute() or query_error($lst);
 
 
