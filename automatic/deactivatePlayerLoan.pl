@@ -30,6 +30,7 @@ use strict;
             AND prq.strRequestType = 'LOAN'
             AND prq.strRequestStatus IN ('COMPLETED')
             AND prq.strRequestResponse = 'ACCEPTED'
+            AND prq.intOpenLoan= 1
             AND (
                     DATE_FORMAT(prq.dtLoanTo, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d') 
                     OR

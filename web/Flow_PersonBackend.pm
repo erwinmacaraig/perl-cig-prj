@@ -781,6 +781,35 @@ sub process_registration {
         if($changeExistingReg)  {
             $self->moveDocuments($existingReg, $regoID, $personID);
         }
+        
+        if ($personType eq $Defs::PERSON_TYPE_PLAYER && $self->{'SystemConfig'}{'allowLoans'} && $regoID && $self->{'RunParams'}{'rtargetid'})    {
+            my $stLoan = qq[
+                UPDATE 
+                    tblPersonRegistration_$self->{'Data'}->{'Realm'} as PRNew 
+                    INNER JOIN tblPersonRegistration_$self->{'Data'}->{'Realm'} as PRExisting ON (
+                        PRExisting.intPersonID = PRNew.intPersonID 
+                        AND PRExisting.intOnLoan =1 
+                        AND PRExisting.intPersonRegistrationID = ?
+                    ) 
+                    INNER JOIN tblPersonRequest as Preq ON (
+                        Preq.intPersonID=PRNew.intPersonID 
+                        AND Preq.intRequestFromEntityID= PRNew.intEntityID 
+                        AND Preq.intOpenLoan=1
+                        AND Preq.strRequestStatus = 'COMPLETED'
+                    ) 
+                    SET PRNew.intOnLoan = 1
+                WHERE 
+                    PRNew.intPersonRegistrationID = ?
+                    AND PRNew.intPersonID = ?
+            ];
+            my $q = $self->{'Data'}->{'db'}->prepare($stLoan) or query_error($stLoan);
+            $q->execute(
+                $self->{'RunParams'}{'rtargetid'},
+                $regoID,
+                $personID
+            );
+        }
+
         if ($regoID && ($self->{'RunParams'}{'rtargetid'} or $self->{'RunParams'}{'oldlevel'}))   {
             my $stChange = qq[
                 UPDATE tblPersonRegistration_$self->{'Data'}->{'Realm'}

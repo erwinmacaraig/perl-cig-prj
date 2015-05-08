@@ -2397,9 +2397,20 @@ sub deactivatePlayerLoan {
             intPersonRequestID IN ($idset)
             AND strStatus IN ('PENDING', 'ACTIVE', 'PASSIVE')
     ];
-
     my $query = $db->prepare($bst) or query_error($bst);
     $query->execute() or query_error($bst);
+
+    my $st = qq[
+        UPDATE
+            tblPersonRequest
+        SET 
+            intOpenLoan=0
+        WHERE
+            intPersonRequestID IN ($idset)
+            AND intOpenLoan=1
+    ];
+    $query = $db->prepare($st) or query_error($st);
+    $query->execute() or query_error($st);
 
 
     for my $personID (@{$personIDs}) {
