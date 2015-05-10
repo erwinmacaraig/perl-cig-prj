@@ -2351,6 +2351,7 @@ sub activatePlayerLoan {
             PR.intPersonRequestID = ?
             AND PRQ.strRequestStatus = 'COMPLETED'
             AND PR.strStatus IN ('PENDING', 'ACTIVE')
+            AND NP.intDontUseForLoans = 0
     ];
 
     foreach my $req (@{$requestIDs})  {
