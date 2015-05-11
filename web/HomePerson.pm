@@ -201,15 +201,13 @@ sub showPersonHome	{
         $rego->{'intOriginLevel'}, 
         $rego->{'intEntityLevel'}, 
     );
+
 	while(my $dref = $sth->fetchrow_hashref()){
         next if $dref->{'strApprovalStatus'} ne 'APPROVED';
         next if exists $validdocs{$dref->{'intDocumentTypeID'}};
 		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
 		$validdocs{$dref->{'intDocumentTypeID'}} = $dref->{'intUploadFileID'};
 	}
-
-
-
 		foreach $doc (@{$rego->{'documents'}}) {			
 			$displayAdd = 0;
 			$fileID = 0;
@@ -266,10 +264,10 @@ sub showPersonHome	{
             $replaceLink = '';
             $replaceLink= qq[ <span style="position: relative"><a class="HTdisabled btn-inside-docs-panel btn-view-replace">].$Data->{'lang'}->txt('Replace'). q[</a></span>];
         }
-
-
-
-		#push @alldocs, { . " - $rego->{intPersonRegistrationID} "
+		#
+		next if(!$doc->{'strApprovalStatus'} && (!grep /$doc->{'intDocumentTypeID'}/,@validdocsforallrego) && ($doc->{'strDocumentName'} eq 'ITC'));		
+		#
+		
 		push @{$rego->{'alldocs'}},{
 				strDocumentName => $doc->{'strDocumentName'}, 
 				Status => $status,
