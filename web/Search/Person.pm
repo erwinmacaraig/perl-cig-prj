@@ -337,6 +337,14 @@ sub getPlayerLoan {
             my $periods_list = join(',',@periods);
             $periodSQL="AND PR.intNationalPeriodID IN ($periods_list)";
         }
+
+        my $allowedLevels= $self->getData()->{'SystemConfig'}{'loan_personLevels'};
+        my $levelSQL='';
+        if ($allowedLevels)    {
+            my @levels= split /\|/, $allowedLevels;
+            my $level_list = join(',',@levels);
+            $levelSQL="AND PR.strPersonLevel IN ($level_list)";
+        }
         
         my $st = qq[
             SELECT DISTINCT
@@ -361,7 +369,7 @@ sub getPlayerLoan {
                 AND
                     (PR.strPersonType = 'PLAYER')
                 AND PR.intEntityID <> $filters->{'club'}
-                AND PR.strPersonLevel IN ("PROFESSIONAL", ?, ?)
+                $levelSQL
                 $periodSQL
             )
             LEFT JOIN tblPersonRegistration_$realmID AS PRAlready ON (
@@ -411,10 +419,8 @@ sub getPlayerLoan {
                 strLocalFirstname
             LIMIT 100
         ];
-        my $personLevelExtra = $self->getData()->{'SystemConfig'}{'loan_personLevelExtra'} || 'PROFESSIONAL';
-        my $personLevelExtra2 = $self->getData()->{'SystemConfig'}{'loan_personLevelExtra2'} || 'PROFESSIONAL';
         my $q = $self->getData->{'db'}->prepare($st);
-        $q->execute($personLevelExtra, $personLevelExtra2);
+        $q->execute();
         my %origClientValues = %{$self->getData()->{'clientValues'}};
 
         my $count = 0;

@@ -1375,7 +1375,6 @@ sub checkForOutstandingTasks {
 	my $db=$Data->{'db'};
     $taskType ||= '';
 
-
 	#As a result of an update, check to see if there are any Tasks that now have all their pre-reqs completed
 	# or if all tasks have been completed
 	$st = qq[

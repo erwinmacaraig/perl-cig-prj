@@ -42,6 +42,7 @@ use TemplateEmail;
 use Flow_DisplayFields;
 use Date::Calc;
 use AssocTime;
+use PlayerPassport;
 
 
 sub handlePersonRequest {
@@ -2386,6 +2387,7 @@ sub activatePlayerLoan {
 
 
     for my $personID (@{$personIDs}) {
+        savePlayerPassport($Data, $personID);
         my $personObject = getInstanceOf($Data, 'person',$personID);
         updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
     }
@@ -2420,8 +2422,10 @@ sub deactivatePlayerLoan {
     $query = $db->prepare($st) or query_error($st);
     $query->execute() or query_error($st);
 
+    
 
     for my $personID (@{$personIDs}) {
+        savePlayerPassport($Data, $personID);
         my $personObject = getInstanceOf($Data, 'person',$personID);
         updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
     }
