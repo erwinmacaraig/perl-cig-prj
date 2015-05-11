@@ -330,6 +330,14 @@ sub getPlayerLoan {
         my $clubID = $self->getData()->{'clientValues'}{'clubID'} || 0;
         $clubID = 0 if $clubID == $Defs::INVALID_ID;
 
+        my $allowedPeriods = $self->getData()->{'SystemConfig'}{'loan_newLoanAllowedPeriods'};
+        my $periodSQL='';
+        if ($allowedPeriods)    {
+            my @periods= split /\|/, $allowedPeriods;
+            my $periods_list = join(',',@periods);
+            $periodSQL="AND PR.intNationalPeriodID IN ($periods_list)";
+        }
+        
         my $st = qq[
             SELECT DISTINCT
                 tblPerson.intPersonID,
@@ -349,11 +357,12 @@ sub getPlayerLoan {
             tblPerson
             INNER JOIN tblPersonRegistration_$realmID AS PR ON (
                 tblPerson.intPersonID = PR.intPersonID
-                AND PR.strStatus IN ('ACTIVE', 'PASSIVE','PENDING')
+                AND PR.strStatus IN ('ACTIVE', 'PASSIVE','ROLLED_OVER')
                 AND
                     (PR.strPersonType = 'PLAYER')
                 AND PR.intEntityID <> $filters->{'club'}
-                AND PR.strPersonLevel IN ("PROFESSIONAL", ?)
+                AND PR.strPersonLevel IN ("PROFESSIONAL", ?, ?)
+                $periodSQL
             )
             LEFT JOIN tblPersonRegistration_$realmID AS PRAlready ON (
                 tblPerson.intPersonID = PRAlready.intPersonID
@@ -402,11 +411,10 @@ sub getPlayerLoan {
                 strLocalFirstname
             LIMIT 100
         ];
-                #AND PRQinprogress.intRequestFromEntityID = "$clubID"
-                #AND PRQinprogress.strRequestStatus = "INPROGRESS" AND PRQinprogress.strRequestResponse IS NULL
         my $personLevelExtra = $self->getData()->{'SystemConfig'}{'loan_personLevelExtra'} || 'PROFESSIONAL';
+        my $personLevelExtra2 = $self->getData()->{'SystemConfig'}{'loan_personLevelExtra2'} || 'PROFESSIONAL';
         my $q = $self->getData->{'db'}->prepare($st);
-        $q->execute($personLevelExtra);
+        $q->execute($personLevelExtra, $personLevelExtra2);
         my %origClientValues = %{$self->getData()->{'clientValues'}};
 
         my $count = 0;
