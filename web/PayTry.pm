@@ -26,6 +26,7 @@ use ClubFlow;
 use PersonFlow;
 use SelfUserFlow;
 use TransferFlow;
+use LoanFlow;
 use BulkRenewalsFlow;
 use MD5;
 
@@ -47,6 +48,12 @@ sub payTryContinueProcess {
     }
     if ($payTry->{'strContinueAction'} eq 'TRANSFER')   {
         handleTransferFlow($payTry->{'a'}, $Data, $payTry);
+    }
+    if ($payTry->{'strContinueAction'} eq 'INTERNATIONAL_LOAN')   {
+        handleLoanFlow($payTry->{'a'}, $Data, $payTry);
+    }
+    if ($payTry->{'strContinueAction'} eq 'DOMESTIC_LOAN')   {
+        handleLoanFlow($payTry->{'a'}, $Data, $payTry);
     }
     if ($payTry->{'strContinueAction'} eq 'BULKRENEWALS')   {
         handleBulkRenewalsFlow($payTry->{'a'}, $Data, $payTry);

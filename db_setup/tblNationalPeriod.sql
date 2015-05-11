@@ -12,6 +12,7 @@ CREATE TABLE tblNationalPeriod (
   intCurrentRenewal TINYINT DEFAULT 0,
   intCurrentTransfer TINYINT DEFAULT 0,
     strImportPeriodCode varchar(30) default '',
+    intDontUseForLoans TINYINT DEFAULT 0,
 
   PRIMARY KEY (intNationalPeriodID),
   KEY index_intRealm(intRealmID, intSubRealmID, strSport, strPersonType)

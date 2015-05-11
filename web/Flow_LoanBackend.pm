@@ -1,4 +1,4 @@
-package Flow_PersonBackend;
+package Flow_LoanBackend;
 
 use strict;
 use lib '.', '..', '../..', "../dashboard", "../user";
@@ -6,14 +6,14 @@ use Flow_BaseObj;
 our @ISA =qw(Flow_BaseObj);
 
 use TTTemplate;
-use CGI qw(param);
+use CGI;
 use FieldLabels;
 use PersonObj;
 use PersonUtils;
 use ConfigOptions;
 use InstanceOf;
 use Countries;
-#use PersonRegisterWhat;
+use PersonRegisterWhat;
 use Reg_common;
 use FieldCaseRule;
 use WorkFlow;
@@ -33,26 +33,25 @@ use PersonFieldsSetup;
 use PersonRegistration;
 use PersonSummaryPanel;
 use RenewalDetails;
-use JSON;
-use IncompleteRegistrations;
+
 use RegoProducts;
-use Entity;
 
 sub setProcessOrder {
     my $self = shift;
   
-    my $dtype = param('dtype') || $self->{'RunParams'}{'dtype'} || $self->{'CarryFields'}{'dtype'} || $self->{'RunParams'}{'d_type'} || $self->{'CarryFields'}{'pType'} || $self->{'RunParams'}{'pType'} || '';
-    my $typename = $Defs::personType{$dtype} || '';
-    my $lang = $self->{'Data'}{'lang'};
-    my $regname = $typename
-        ? $lang->txt($typename .' Registration')
-        : $lang->txt('Registration');
-    my $steps1 = [       
+    $self->{'ProcessOrder'} = [       
+        {
+            'action' => 'club',
+            'function' => 'display_old_club',
+            'label'  => 'Lending Club',
+            'fieldset'  => 'contactdetails',
+            'title'  => 'Player Loan - Lending Club Details',
+        },
         {
             'action' => 'cd',
             'function' => 'display_core_details',
-            'label'  => $lang->txt('Personal Details'),
-            'title'  => $regname . ' - ' .$lang->txt('Enter Personal Information'),
+            'label'  => 'Personal Details',
+            'title'  => 'Player Loan - Check/Update Personal Details',
             'fieldset'  => 'core',
             #'noRevisit' => 1,
         },
@@ -64,9 +63,9 @@ sub setProcessOrder {
         {
             'action' => 'cond',
             'function' => 'display_contact_details',
-            'label'  => $lang->txt('Contact Details'),
+            'label'  => 'Contact Details',
             'fieldset'  => 'contactdetails',
-            'title'  => $regname . ' - ' . $lang->txt('Enter Contact Information'),
+            'title'  => 'Player Loan - Check/Update Contact Details',
         },
         {
             'action' => 'condu',
@@ -76,35 +75,18 @@ sub setProcessOrder {
         {
             'action' => 'r',
             'function' => 'display_registration',
-            'label'  => $lang->txt('Registration'),
-            'title'  => $regname . ' - ' . $lang->txt('Choose Registration Type'),
+            'label'  => 'Registration',
+            'title'  => 'Registration - Confirm Player Loan Registration',
         },
         {
             'action' => 'ru',
             'function' => 'process_registration',
-        }
-    ];
-    my $stepscert = [
-        {
-            'action' => 'cert',
-            'function' => 'display_certifications',
-            'label'  => $lang->txt('Certifications'),
-            'fieldset'  => 'certifications',
-            'title'  => $regname . ' - '. $lang->txt('Enter Certifications'),
-            'NoNav' => $dtype eq 'PLAYER'  ? 1 : 0,
         },
-        {
-            'action' => 'pcert',
-            'function' => 'process_certifications',
-            'fieldset'  => 'certifications',
-        },
-    ];
-    my $steps2 = [
         {
             'action' => 'd',
             'function' => 'display_documents',
-            'label'  => $lang->txt('Documents'),
-            'title'  => $regname . ' - ' . $lang->txt('Upload Documents'),
+            'label'  => 'Documents',
+            'title'  => 'Player Loan - Check/Update Documents',
         },
         {
             'action' => 'du',
@@ -113,8 +95,8 @@ sub setProcessOrder {
          {
             'action' => 'p',
             'function' => 'display_products',
-            'label'  => $lang->txt('License'),
-            'title'  => $regname . "- " . $lang->txt('Confirm License'),
+            'label'  => 'Payments',
+            'title'  => 'Player Loan - Confirm Player Loan Fee',
         },
         {
             'action' => 'pu',
@@ -123,24 +105,19 @@ sub setProcessOrder {
        {
             'action' => 'summ',
             'function' => 'display_summary',
-            'label'  => $lang->txt('Summary'),
-            'title'  => $regname . ' - ' . $lang->txt('Summary'),
+            'label'  => 'Summary',
+            'title'  => 'Summary & Submission',
         },
        {
             'action' => 'c',
             'function' => 'display_complete',
-            'label'  => $lang->txt('Complete'),
-            'title'  => $regname . ' - ' . $lang->txt('Submitted'),
-            'NoGoingBack' => 1,
+            'label'  => 'Submit',
+            'title'  => 'Player Loan - Submitted',
+            'NoNav' => 1,
             'NoDisplayInNav' => 1,
+            'NoGoingBack' => 1,
         },
     ];
-    my @order = @{$steps1};
-    if(!$dtype or ($dtype eq 'COACH' or $dtype eq 'REFEREE'))   {
-        push @order, @{$stepscert};
-    }
-    push @order, @{$steps2};
-    $self->{'ProcessOrder'} = \@order;
 }
 
 sub setupValues    {
@@ -148,59 +125,97 @@ sub setupValues    {
     my ($values) = @_;
     $values ||= {};
     $values->{'defaultType'} = $self->{'RunParams'}{'dtype'} || '';
-    $values->{'itc'} = $self->{'RunParams'}{'itc'} || 0;
-    $values->{'preqtype'} = $self->{'RunParams'}{'preqtype'} || 0;
-    my $client = $self->{'Data'}{'client'};
-    $values->{'BaseURL'} = "$self->{'Data'}{'target'}?client=$client&amp;a=";
 
+    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
+    my %regFilter = (
+        'entityID' => $entityID,
+        'requestID' => $self->{'RunParams'}{'rid'},
+    );
 
-    if ($self->{'RunParams'}{'dnat'} eq 'RENEWAL')  {
-        my $lang = $self->{'Data'}->{'lang'};
-        my $rawDetails;
-        my ($content, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rtargetid'});
+    my $request = getRequests($self->{'Data'}, \%regFilter);
+    $request = $request->[0];
+    $self->{'RunParams'}{'nat'} = $self->getCarryFields('dnat');
+    $self->{'RunParams'}{'dnat'} = $self->getCarryFields('dnat');
+    $self->{'RunParams'}{'dsport'} = $request->{'strSport'};
+    $self->addCarryField('dtype', $request->{'strPersonType'});
+    $self->addCarryField('dsport', $request->{'strSport'});
+    $self->addCarryField('dage', $request->{'personCurrentAgeLevel'});
 
-        if(!$content or !$rawDetails) {
-            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt('Invalid Renewal Details');
-            $content = $lang->txt("No record found.");
-        }
-
-        #$values->{'defaultType'} = 'PLAYER';
-        $self->addCarryField('d_nature', 'RENEWAL');
-        $self->addCarryField('dnature', 'RENEWAL');
-        $self->addCarryField('nat', 'RENEWAL');
-        $self->addCarryField('dsport', $rawDetails->{'strSport'});
-        $self->addCarryField('dlevel', $self->{'RunParams'}{'dlevel'}) if (defined $self->{'RunParams'}{'dlevel'} and $self->{'RunParams'}{'dlevel'} ne '');
-        $self->addCarryField('dage', $rawDetails->{'newAgeLevel'}); # if $rawDetails->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER;
-        $self->addCarryField('drole', $rawDetails->{'strPersonEntityRole'});
-    }
-    elsif ($self->{'RunParams'}{'itc'} and $self->{'RunParams'}{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) {
-        #setting dnat to $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN to be used in PersonRegisterWhat
-        $self->addCarryField('dnat', $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN);
-        $self->addCarryField('dnature', 'NEW');
-        $self->addCarryField('nat', 'NEW');
-    }
-    else    {
-        $self->addCarryField('oldlevel', $self->{'RunParams'}{'oldlevel'});
-        $self->addCarryField('d_nature', 'NEW');
-        $self->addCarryField('dnature', 'NEW');
-        $self->addCarryField('nat', 'NEW');
-    }
-
-    $self->{'FieldSets'} = personFieldsSetup($self->{'Data'}, $values, $self->{'RunParams'});
+    $self->{'FieldSets'} = personFieldsSetup($self->{'Data'}, $values);
 }
+
+sub display_old_club { 
+    my $self = shift;
+
+    my $id = $self->ID() || 0;
+    if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
+        return ('Invalid User',0);
+    }
+    my $personObj = new PersonObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
+    $personObj->load();
+    if($personObj->ID())    {
+        my $objectValues = $self->loadObjectValues($personObj);
+        $self->setupValues($objectValues);
+    }
+    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'contactdetails'}, 'Person',);
+    my $scriptContent = '';
+
+    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
+    my %regFilter = (
+        'entityID' => $entityID,
+        'requestID' => $self->{'RunParams'}{'rid'},
+    );
+    my $request = getRequests($self->{'Data'}, \%regFilter);
+    $request = $request->[0];
+
+    my $isocountries  = getISOCountriesHash();
+    my %prevClubDetails = (
+        name => $request->{'requestTo'},
+        sport => $Defs::entitySportType{$request->{'requestToDiscipline'}} || '',
+        country => $isocountries->{$request->{'requestToISOCountry'}} || '-',
+        address => $request->{'requestToAddress'} || '',
+        address2 => $request->{'requestToAddress2'} || '',
+        city => $request->{'requestToCity'} | '',
+        postal => $request->{'requestToPostal'} || '',
+        region => $request->{'requestToRegion'} || '',
+        phone => $request->{'requestToPhone'} || '-',
+    );
+
+    my $fieldsContent = runTemplate(
+        $self->{'Data'},
+        \%prevClubDetails,
+        'personrequest/loan/lendingclubdetails.templ',
+    );
+
+    my %PageData = (
+        HiddenFields => $self->stringifyCarryField(),
+        Target => $self->{'Data'}{'target'},
+        Errors => $self->{'RunDetails'}{'Errors'} || [],
+        Content => $fieldsContent || '',
+        ScriptContent => $scriptContent || '',
+        FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
+        Title => '',
+        TextTop => '',
+        TextBottom => '',
+    );
+    my $pagedata = $self->display(\%PageData);
+
+    return ($pagedata,0);
+
+}
+
 
 sub display_core_details    { 
     my $self = shift;
 
+    $self->addCarryField('club_vstd', 1);
     my $id = $self->ID() || 0;
     my $defaultType = $self->{'RunParams'}{'dtype'} || '';
-    my $itc = $self->{'RunParams'}{'itc'} || 0;
     if($id)   {
         my $personObj = new PersonObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
         $personObj->load();
         if($personObj->ID())    {
             my $objectValues = $self->loadObjectValues($personObj);
-            $objectValues->{'itc'} = $itc;
             $self->setupValues($objectValues);
         }
     }
@@ -208,7 +223,6 @@ sub display_core_details    {
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Person',);
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
     my $newRegoWarning = '';
-    my $bypassduplicate = '';
     if(!$id)    {
         my $lang = $self->{'Data'}{'lang'};
         my $client = $self->{'Data'}{'client'};
@@ -217,52 +231,21 @@ sub display_core_details    {
         my $search = $burl."INITSRCH_P";
         my $txt;
 
-        if($defaultType eq $Defs::PERSON_TYPE_PLAYER and $self->{'SystemConfig'}{'allowPersonRequest'}) {
-            $txt = $lang->txt('Please check that this player has not been registered with another club?')
-                .qq[ <a href = "$transfer">].$lang->txt('If yes, they need to apply for a Transfer.').'</a> '
-                .$lang->txt('Not sure?')
-                .qq[ <a href = "$search">].$lang->txt('Then use the Search.').'</a>' ;
-        }
-        else {
-             $txt = $lang->txt('Has this person already been registered?')
-                .' '.$lang->txt('Not sure?')
-                .qq[ <a href = "$search">].$lang->txt('Then use the Search.').'</a>' ;       
-        }
-
         $newRegoWarning = qq[
             <div class="alert"> 
                 <div> <span class="fa fa-info"></span> <p>$txt</p> </div> </div>
         ];
-        if($self->{'RunDetails'}{'FoundDuplicate'}) {
-            $bypassduplicate = qq[
-                <p>
-                <a href = "#" id = "btn-notduplicate" class = "btn-main btn-proceed">].$lang->txt('I have validated that this person is not a duplicate').qq[</a>
-                </p>
-                <script>
-                    jQuery(document).ready(function(){
-                        jQuery('#btn-notduplicate').click(function(e)   {
-                            e.preventDefault();
-                            jQuery('#flowFormID').append('<input type = "hidden" name = "bd" value = "1">');
-                            jQuery('#flowFormID').submit();
-                        });
-
-                    });
-                </script>
-            ];
-        }
     }
-    my $panel = '';
-    $panel = personSummaryPanel($self->{'Data'}, $id) if $id;
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         Content => $fieldsContent || '',
         ScriptContent => $scriptContent || '',
-        FlowSummaryContent => $panel || '',
         Title => '',
-        PageInfo => $newRegoWarning,
-        TextTop => $bypassduplicate,
+        TextTop => $newRegoWarning,
+        FlowSummaryContent => personSummaryPanel($self->{'Data'}, $id) || '',
+        ContinueButtonText => $self->{'Lang'}->txt('Save & Continue'),
         TextBottom => '',
     );
 
@@ -287,16 +270,11 @@ sub validate_core_details    {
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Person',);
     ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
 
-    my $id = $self->ID() || 0;
-    my $lang = $self->{'Data'}{'lang'};
-    if(!scalar(@{$self->{'RunDetails'}{'Errors'}})) {
-        if(!$id and isPossibleDuplicate($self->{'Data'}, $userData) and !$self->{'RunParams'}{'bd'})    {
-            my $msg = $lang->txt('This person is a possible duplicate.');
-            $msg .= $lang->txt('If you have checked and this person is not a duplicate, then click the button below.');
-            push @{$self->{'RunDetails'}{'Errors'}}, $msg;
-            $self->{'RunDetails'}{'FoundDuplicate'} = 1;
-        }
-    }
+#    if(!scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+#        if(isPossibleDuplicate($self->{'Data'}, $userData))    {
+#            push @{$self->{'RunDetails'}{'Errors'}}, 'This person is a possible duplicate';
+#        }
+#    }
 
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
@@ -304,14 +282,14 @@ sub validate_core_details    {
         return ('',2);
     }
 
+    my $id = $self->ID() || 0;
     my $newreg = $id ? 0 : 1;
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
     $personObj->load();
     if($newreg)    {
         $userData->{'strStatus'} = 'INPROGRESS';
         $userData->{'intRealmID'} = $self->{'Data'}{'Realm'};
-        $userData->{'intInternationalTransfer'} = 1 if ($self->getCarryFields('itc') and $self->{'RunParams'}{'preqtype'} eq $Defs::PERSON_REQUEST_TRANSFER);
-        $userData->{'intInternationalLoan'} = 1 if ($self->getCarryFields('itc') and $self->{'RunParams'}{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN);
+        $userData->{'intInternationalTransfer'} = 1 if $self->getCarryFields('itc');
     }
     $personObj->setValues($userData);
     $personObj->write();
@@ -328,8 +306,8 @@ sub validate_core_details    {
             auditLog(
                 $personObj->ID(),
                 $self->{'Data'},
-                'Add',
-                'Person',
+                'ADD',
+                'PERSON',
             );
         }
 #WR: SHoudl we check for duplicates here
@@ -338,81 +316,11 @@ sub validate_core_details    {
     return ('',1);
 }
 
-sub display_minor_fields { 
-    my $self = shift;
-
-    my $id = $self->ID() || 0;
-    if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
-        return ('Invalid User',0);
-    }
-    my $personObj = new PersonObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
-    $personObj->load();
-    my $dob = $personObj->getValue('dtDOB');
-    my $isMinor = personIsMinor($self->{'Data'}, $dob);
-    my $defaultType = $self->{'RunParams'}{'dtype'} || '';
-    if(!$isMinor or $defaultType ne 'PLAYER')   {
-        $self->incrementCurrentProcessIndex();
-        $self->incrementCurrentProcessIndex();
-        return ('',2);
-    }
-    if($personObj->ID())    {
-        my $objectValues = $self->loadObjectValues();
-        $self->setupValues($objectValues);
-    }
-
-    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'minor'}, 'Person',);
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
-    my %PageData = (
-        HiddenFields => $self->stringifyCarryField(),
-        Target => $self->{'Data'}{'target'},
-        Errors => $self->{'RunDetails'}{'Errors'} || [],
-        Content => $fieldsContent || '',
-        ScriptContent => $scriptContent || '',
-        FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
-        FlowSummaryTemplate => 'registration/person_flow_summary.templ',
-        Title => '',
-        TextTop => '',
-        TextBottom => '',
-    );
-    my $pagedata = $self->display(\%PageData);
-
-    return ($pagedata,0);
-
-}
-
-sub validate_minor_fields { 
-    my $self = shift;
-
-    my $userData = {};
-    my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'minor'}, 'Person',);
-    ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
-    my $id = $self->ID() || 0;
-    if(!$id)    {
-        push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person';
-    }
-    if($userData->{'intMinorNone'})   {
-        push @{$self->{'RunDetails'}{'Errors'}}, 'This person is not eligible for registration';
-    }
-    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
-        #There are errors - reset where we are to go back to the form again
-        $self->decrementCurrentProcessIndex();
-        return ('',2);
-    }
-
-    my $personObj = new PersonObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
-    $personObj->load();
-    if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
-        return ('Invalid User',0);
-    }
-    $personObj->setValues($userData);
-    $personObj->write();
-    return ('',1);
-}
-
 
 sub display_contact_details    { 
     my $self = shift;
 
+    $self->addCarryField('cd_vstd', 1);
     my $id = $self->ID() || 0;
     if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
         return ('Invalid User',0);
@@ -432,6 +340,7 @@ sub display_contact_details    {
         Content => $fieldsContent || '',
         ScriptContent => $scriptContent || '',
         FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
+        ContinueButtonText => $self->{'Lang'}->txt('Save & Continue'),
         Title => '',
         TextTop => '',
         TextBottom => '',
@@ -535,6 +444,7 @@ sub display_other_details    {
         my $objectValues = $self->loadObjectValues($personObj);
         $self->setupValues($objectValues);
     }
+
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'otherdetails'}, 'Person',);
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
     my %PageData = (
@@ -587,12 +497,13 @@ sub display_registration {
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
     }
+
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
 
     my $client = $self->{'Data'}->{'client'};
-    my $url = $self->{'Target'}."?rfp=".$self->getNextAction()."&".$self->stringifyURLCarryField();
+    my $url = $self->{'Target'}."?transfer=1&rfp=".$self->getNextAction()."&".$self->stringifyURLCarryField();
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
     $personObj->load();
     my ($dob, $gender) = $personObj->getValue(['dtDOB','intGender']); 
@@ -606,8 +517,7 @@ sub display_registration {
 
     my $defaultRegistrationNature = $self->{'RunParams'}{'dnat'} || '';
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
-    my $entitySelection = $originLevel == $Defs::LEVEL_CLUB ? 0 : 1;
-    $entitySelection=0 if ($defaultRegistrationNature eq 'RENEWAL');
+    my $entitySelection = 0;#= $originLevel == $Defs::LEVEL_CLUB ? 0 : 1;
     if(
         $entitySelection 
         and exists $self->{'SystemConfig'}{'maFlowEntitySelect'}
@@ -615,58 +525,40 @@ sub display_registration {
     )   {
         $entitySelection = 0;
     }
-    if($defaultRegistrationNature eq 'TRANSFER')   {
-        $noContinueButton = 0;
-        my %regFilter = (
-            'entityID' => $entityID,
-            'requestID' => $self->{'RunParams'}{'prid'},
-            #'requestID' => 12213,
-        );
-        my $request = getRequests($self->{'Data'}, \%regFilter);
-        $request = $request->[0];
+    $noContinueButton = 0;
+    my %regFilter = (
+        'entityID' => $entityID,
+        'requestID' => $self->{'RunParams'}{'prid'},
+        #'requestID' => 12213,
+    );
+    my $request = getRequests($self->{'Data'}, \%regFilter);
+    $request = $request->[0];
 
-        if(!$request) {
-            push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person Request';
-            $noContinueButton = 1;
-            $content = "Person Request Details not found.";
-        }
-        else {
-            $request->{'personType'} = $Defs::personType{$request->{'strPersonType'}};
-            $request->{'sport'} = $Defs::sportType{$request->{'strSport'}};
-            $request->{'personLevel'} = $Defs::personLevel{$request->{'strPersonLevel'}};
-
-            $self->addCarryField('d_nature', 'TRANSFER');
-            $self->addCarryField('d_type', $request->{'strPersonType'});
-            $self->addCarryField('d_level', $request->{'strPersonLevel'});
-            $self->addCarryField('d_sport', $request->{'strSport'});
-            $self->addCarryField('d_age', $request->{'personCurrentAgeLevel'});
-
-            $content = runTemplate(
-                $self->{'Data'},
-                {
-                    requestSummary => $request,
-                },
-                'personrequest/generic/reg_summary.templ'
-            );
-        }
-    }
-    elsif(1==2 and $defaultRegistrationNature eq 'RENEWAL') {
-        my $rawDetails;
-        ($content, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rtargetid'});
-
-        if(!$content or !$rawDetails) {
-            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt('Invalid Renewal Details');
-            $content = $lang->txt("No record found.");
-        }
-
-        $self->addCarryField('dnat', 'RENEWAL');
-        $self->addCarryField('d_type', $rawDetails->{'strPersonType'});
-        $self->addCarryField('d_level', $rawDetails->{'strPersonLevel'});
-        $self->addCarryField('d_sport', $rawDetails->{'strSport'});
-        $self->addCarryField('d_age', $rawDetails->{'newAgeLevel'}); # if $rawDetails->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER;
-        $self->addCarryField('d_role', $rawDetails->{'strPersonEntityRole'});
+    if(!$request) {
+        push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person Request';
+        $noContinueButton = 1;
+        $content = "Person Request Details not found.";
     }
     else {
+        $request->{'personType'} = $Defs::personType{$request->{'strPersonType'}};
+        $request->{'sport'} = $Defs::sportType{$request->{'strSport'}};
+        #$request->{'personLevel'} = $Defs::personLevel{$request->{'strPersonLevel'}};
+
+        #$self->addCarryField('dnat', 'DOMESTIC_LOAN');
+        #$self->addCarryField('dtype', $request->{'strPersonType'});
+        ##$self->addCarryField('d_level', $request->{'strPersonLevel'});
+        $self->addCarryField('dsport', $request->{'strSport'});
+        #$self->addCarryField('dage', $request->{'personCurrentAgeLevel'});
+
+        #$content = runTemplate(
+        #    $self->{'Data'},
+        #    {
+        #        requestSummary => $request,
+        #    },
+        #    'personrequest/generic/reg_summary.templ'
+        #);
+    }
+    #else {
 		
          $content = PersonRegisterWhat::displayPersonRegisterWhat(
             $self->{'Data'},
@@ -679,9 +571,9 @@ sub display_registration {
             0,
             $regoID,
             $entitySelection, #display entity Selection
-            0,
+            1 #Transfer on
         );
-    }
+    #}
 
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
@@ -695,7 +587,9 @@ sub display_registration {
         #NoContinueButton => $noContinueButton,
     );
     my $pagedata = $self->display(\%PageData);
-    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}}) and ($defaultRegistrationNature eq 'TRANSFER' or $defaultRegistrationNature eq 'RENEWAL')) {
+
+    if($self->{'RunDetails'}{'Errors'}
+            and scalar(@{$self->{'RunDetails'}{'Errors'}}) and ($defaultRegistrationNature eq 'DOMESTIC_LOAN' or $defaultRegistrationNature eq 'RENEWAL')) {
         #display the same step with error notification (for Transfers atm)
         return ($pagedata,0);
     }
@@ -707,6 +601,65 @@ sub process_registration {
     my $self = shift;
 
     #add rego record with types etc.
+
+    my $personID = $self->ID();
+    if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
+        return ('Invalid User',0);
+    }
+    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
+    my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
+    my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
+    my $lang = $self->{'Lang'};
+
+    my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
+    $personObj->load();
+    my ($dob, $gender) = $personObj->getValue(['dtDOB','intGender']); 
+
+    my $content = '';
+    my $noContinueButton = 1;
+
+    $self->{'Data'}->{'AddToPage'}->add('js_bottom','file','js/regwhat.js');
+
+    my $regoID = $self->{'RunParams'}{'rID'} || 0;
+
+    if ($self->{'RunParams'}{'prid'})   {
+        my $st = qq[
+            UPDATE 
+                tblPersonRequest 
+            SET 
+                strNewPersonLevel = ? 
+            WHERE 
+                intPersonRequestID = ?
+            LIMIT 1
+        ];
+        my $q = $self->{'Data'}->{'db'}->prepare($st) or query_error($st);
+        $q->execute(
+            $self->{'RunParams'}{'d_level'},
+            $self->{'RunParams'}{'prid'}
+        );
+    }
+    my %regFilter = (
+        'entityID' => $entityID,
+        'requestID' => $self->{'RunParams'}{'prid'},
+    );
+    my $request = getRequests($self->{'Data'}, \%regFilter);
+    $request = $request->[0];
+
+    if(!$request) {
+        push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person Request';
+        $noContinueButton = 1;
+        $content = "Person Request Details not found.";
+    }
+    else {
+        $self->addCarryField('d_nature', $self->getCarryFields('dnat'));
+        $self->addCarryField('d_type', $request->{'strPersonType'});
+        $self->addCarryField('d_level', $request->{'strNewPersonLevel'});
+        $self->addCarryField('d_sport', $request->{'strSport'});
+        $self->addCarryField('d_age', $request->{'personCurrentAgeLevel'});
+    }
+
+    ## NORMAL process_registration code
+ 
     my $personType = $self->{'RunParams'}{'d_type'} || '';
     my $personEntityRole= $self->{'RunParams'}{'d_role'} || '';
     my $personLevel = $self->{'RunParams'}{'d_level'} || '';
@@ -714,52 +667,21 @@ sub process_registration {
     my $ageLevel = $self->{'RunParams'}{'d_age'} || '';
     my $existingReg = $self->{'RunParams'}{'existingReg'} || 0;
     my $changeExistingReg = $self->{'RunParams'}{'changeExisting'} || 0;
+    $existingReg = $regoID ? 1 : 0;
+    $changeExistingReg= $regoID ? 1 : 0;
+    
     my $registrationNature = $self->{'RunParams'}{'d_nature'} || '';
     my $personRequestID = $self->{'RunParams'}{'prid'} || '';
-    my $entitySelected = $self->{'RunParams'}{'d_eId'} || '';
-    my $entityTypeSelected = $self->{'RunParams'}{'d_etype'} || '';
-    my $MAComment = $self->{'RunParams'}{'d_ma_comment'} || '';
-    my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
-    my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
-    my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
-    my $lang = $self->{'Lang'};
-    my $entitySelection = $originLevel == $Defs::LEVEL_CLUB ? 0 : 1;
-    if(
-        $entitySelection 
-        and exists $self->{'SystemConfig'}{'maFlowEntitySelect'}
-        and $self->{'SystemConfig'}{'maFlowEntitySelect'} == 0
-    )   {
-        $entitySelection = 0;
-    }
-    if($entitySelection)    {
-        if (! $entityTypeSelected)  {
-            my $eref= loadEntityDetails($self->{'Data'}->{'db'}, $entitySelected);
-            $entityTypeSelected= $eref->{'intEntityLevel'};
-        }
-            
-        if($entitySelected and $entityTypeSelected) {
-            $entityID = $entitySelected;
-            $entityLevel = $entityTypeSelected;
-        }
-    }
-    if($entityID != getLastEntityID($self->{'ClientValues'}))   {
-        $self->rebuildClient($entityID, $entityLevel);
-    }
 
-    my $personID = $self->ID() || 0;
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
     }
-    if(!doesUserHaveEntityAccess($self->{'Data'}, $entityID,'WRITE')) {
-        return ('Invalid User',0);
-    }
-    my $regoID = 0;
     my $msg = '';
     if($personID)   {
         if($changeExistingReg)    {
             $self->deleteExistingReg($existingReg, $personID);
         }
-        if(!$existingReg or $changeExistingReg)    {
+        if(! $regoID) {#!$existingReg or $changeExistingReg)    {
             ($regoID, undef, $msg) = add_rego_record(
                 $self->{'Data'}, 
                 $personID, 
@@ -775,98 +697,41 @@ sub process_registration {
                 undef,
                 undef,
                 $personRequestID,
-                $MAComment,
             );
-        }
-        if($changeExistingReg)  {
-            $self->moveDocuments($existingReg, $regoID, $personID);
-        }
-        
-        if ($personType eq $Defs::PERSON_TYPE_PLAYER && $self->{'SystemConfig'}{'allowLoans'} && $regoID && $self->{'RunParams'}{'rtargetid'})    {
-            my $stLoan = qq[
-                UPDATE 
-                    tblPersonRegistration_$self->{'Data'}->{'Realm'} as PRNew 
-                    INNER JOIN tblPersonRegistration_$self->{'Data'}->{'Realm'} as PRExisting ON (
-                        PRExisting.intPersonID = PRNew.intPersonID 
-                        AND PRExisting.intOnLoan =1 
-                        AND PRExisting.intPersonRegistrationID = ?
-                    ) 
-                    INNER JOIN tblPersonRequest as Preq ON (
-                        Preq.intPersonID=PRNew.intPersonID 
-                        AND Preq.intRequestFromEntityID= PRNew.intEntityID 
-                        AND Preq.strRequestType = 'LOAN'
-                        AND Preq.intOpenLoan=1
-                        AND Preq.strRequestStatus = 'COMPLETED'
-                    ) 
-                    SET 
-                        PRNew.intOnLoan = 1, 
-                        PRNew.intPersonRequestID = PRExisting.intPersonRequestID
-                WHERE 
-                    PRNew.intPersonRegistrationID = ?
-                    AND PRNew.intPersonID = ?
-            ];
-            my $q = $self->{'Data'}->{'db'}->prepare($stLoan) or query_error($stLoan);
-            $q->execute(
-                $self->{'RunParams'}{'rtargetid'},
-                $regoID,
-                $personID
-            );
-        }
+            if ($regoID && $personRequestID)    {
+                my $stChange = qq[
+                    UPDATE tblPersonRegistration_$self->{'Data'}->{'Realm'}
+                    SET strPreviousPersonLevel = '', intPersonLevelChanged=0
+                    WHERE
+                        intPersonRegistrationID = ?
+                    LIMIT 1
+                ];
+                my $q = $self->{'Data'}->{'db'}->prepare($stChange) or query_error($stChange);
+                $q->execute(
+                    $regoID,
+                );
 
-        if ($regoID && ($self->{'RunParams'}{'rtargetid'} or $self->{'RunParams'}{'oldlevel'}))   {
-            my $stChange = qq[
-                UPDATE tblPersonRegistration_$self->{'Data'}->{'Realm'}
-                SET strPreviousPersonLevel = '', intPersonLevelChanged=0
-                WHERE
-                    intPersonRegistrationID = ?
-                LIMIT 1
-            ];
-            my $q = $self->{'Data'}->{'db'}->prepare($stChange) or query_error($stChange);
-            $q->execute(
-                $regoID,
-            );
-            if ($self->{'RunParams'}{'rtargetid'} and defined $self->{'RunParams'}{'rtargetid'})  {
                 $stChange = qq[
                     UPDATE
                         tblPersonRegistration_$self->{'Data'}->{'Realm'} as PR
-                        INNER JOIN tblPersonRegistration_$self->{'Data'}->{'Realm'} as PR_exisiting ON ( 
-                            PR.intPersonID = PR_exisiting.intPersonID
+                        INNER JOIN tblPersonRequest as Req ON (
+                            PR.intPersonRequestID = Req.intPersonRequestID
                         )
                     SET
-                        PR.strPreviousPersonLevel = PR_exisiting.strPersonLevel,
-                        PR.intPersonLevelChanged = 1
+                        intOnLoan = 1
                     WHERE
-                        PR_exisiting.strPersonLevel <> ''
-                        AND PR.strPersonLevel <> ''
-                        AND PR_exisiting.strPersonLevel <> PR.strPersonLevel
-                        AND PR.intPersonRegistrationID = ?
-                        AND PR_exisiting.intPersonRegistrationID = ?
+                        PR.intPersonRegistrationID = ?
+                        AND Req.intPersonRequestID = ?
                 ];
                 $q = $self->{'Data'}->{'db'}->prepare($stChange) or query_error($stChange);
                 $q->execute(
                     $regoID,
-                    $self->{'RunParams'}{'rtargetid'}
-                ); 
+                    $personRequestID
+                );
             }
-            if ($self->{'RunParams'}{'oldlevel'} and defined $self->{'RunParams'}{'oldlevel'})   {
-                $stChange = qq[
-                    UPDATE
-                        tblPersonRegistration_$self->{'Data'}->{'Realm'} as PR
-                    SET
-                        PR.strPreviousPersonLevel = ?,
-                        PR.intPersonLevelChanged = 1
-                    WHERE
-                        PR.strPersonLevel <> ''
-                        AND PR.intPersonRegistrationID = ?
-                        AND PR.strPersonLevel <> ?
-                ];
-                $q = $self->{'Data'}->{'db'}->prepare($stChange) or query_error($stChange);
-                $q->execute(
-                    $self->{'RunParams'}{'oldlevel'},
-                    $regoID,
-                    $self->{'RunParams'}{'oldlevel'}
-                ); 
-            }
+        
+            
+            #$self->moveDocuments($existingReg, $regoID, $personID);
         }
     }
 
@@ -880,12 +745,7 @@ sub process_registration {
         if ($msg eq 'LIMIT_EXCEEDED')   {
             push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("You cannot register this combination, limit exceeded");
         }
-        if ($msg eq 'NEW_FAILED')   {
-            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("New failed, existing registration found. In order to continue, a Transfer from the existing Entity must be organised or select another Level");
-        }
-        if ($msg eq 'RENEWAL_FAILED')   {
-            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Renewal failed, cannot find existing registration. Might have already been renewed");
-        }
+        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Player loan failed, cannot find registration.");
     }
     else    {
         if(!$existingReg or $changeExistingReg)   {
@@ -897,130 +757,10 @@ sub process_registration {
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
         $self->decrementCurrentProcessIndex();
-        return ('',2);
-    }
-
-    return ('',1);
-}
-
-sub display_certifications { 
-    my $self = shift;
-
-    my $id = $self->ID() || 0;
-    if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
-        return ('Invalid User',0);
-    }
-    my $personObj = new PersonObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
-    $personObj->load();
-    my $personType = $self->{'RunParams'}{'pType'} || '';
-    if(!($personType eq 'COACH' or $personType eq 'REFEREE'))   {
-        #only continue if these types
-        $self->incrementCurrentProcessIndex();
-        $self->incrementCurrentProcessIndex();
-        return ('',2);
-    }
-
-    if($personObj->ID())    {
-        my $objectValues = $self->loadObjectValues($personObj);
-        my $certificationTypes  = getPersonCertificationTypes(
-            $self->{'Data'},
-            $personType,
-        );
-        my %ctypes = ();
-        my @certOrder=();
-        for my $type (@{$certificationTypes})   {
-            push @certOrder, $type->{'intCertificationTypeID'};
-            $ctypes{$type->{'intCertificationTypeID'}} = $type->{'strCertificationName'} || next;
-        }
-        $objectValues->{'certificationTypes'} = \%ctypes;
-        $objectValues->{'certificationTypesOrdered'} = \@certOrder;
-        $self->setupValues($objectValues);
-    }
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
-
-    my $certifications = getPersonCertifications(
-        $self->{'Data'},
-        $personObj->ID(),
-        $personType,
-        0
-    );
-
-    my $no_prev_cert;
-    my $prev_cert;
-
-    if(! scalar(@{$certifications})){
-         $no_prev_cert = runTemplate(
-            $self->{'Data'},
-            {},
-            'registration/no_prev_certification.templ'
-        );       
-    }
-    else {
-        $prev_cert = runTemplate(
-            $self->{'Data'},
-            {
-                certifications => $certifications,
-            },
-            'registration/certifications.templ'
-        );
-    }
-
-    $fieldsContent = $prev_cert . $fieldsContent;
-    my %PageData = (
-        HiddenFields => $self->stringifyCarryField(),
-        Target => $self->{'Data'}{'target'},
-        Errors => $self->{'RunDetails'}{'Errors'} || [],
-        Content => $fieldsContent || '',
-        ScriptContent => $scriptContent || '',
-        FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
-        Title => '',
-        TextTop => $no_prev_cert,
-        TextBottom => '',
-    );
-    my $pagedata = $self->display(\%PageData);
-
-    return ($pagedata,0);
-
-}
-
-sub process_certifications { 
-    my $self = shift;
-
-    my $userData = {};
-    ($userData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields();
-    my $id = $self->ID() || 0;
-    if(!$id)    {
-        push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person';
-    }
-    if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
-        return ('Invalid User',0);
-    }
-
-    if(!scalar(@{$self->{'RunDetails'}{'Errors'}}))    {
-        my $personObj = new PersonObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
-        $personObj->load();
-
-        if($userData->{'intCertificationTypeID'})   {
-           my $ret = addPersonCertification(
-                $self->{'Data'},
-                $personObj->ID(),
-                $userData->{'intCertificationTypeID'},
-                $userData->{'dtValidFrom'} || '',
-                $userData->{'dtValidUntil'} || '',
-                $userData->{'strDescription'} || '',
-                'ACTIVE',
-            ); 
-
-            if(!$ret)    {
-                push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Certification Data';
-            }
-        }
-    }
-    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
-        #There are errors - reset where we are to go back to the form again
         $self->decrementCurrentProcessIndex();
         return ('',2);
     }
+
     return ('',1);
 }
 
@@ -1028,6 +768,7 @@ sub display_products {
     my $self = shift;
 
     $self->addCarryField('payMethod','');
+    $self->addCarryField('d_vstd', 1);
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
@@ -1037,7 +778,7 @@ sub display_products {
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
-	
+
     my $rego_ref = {};
     my $content = '';
     if($regoID) {
@@ -1051,18 +792,21 @@ sub display_products {
         $regoID = 0 if !$valid;
     }
 
+    if (! $regoID or ! $personID)  {
+        my $lang = $self->{'Data'}{'lang'};
+        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Player loan failed, cannot find registration.");
+        $self->setCurrentProcessIndex(1);
+        #$self->decrementCurrentProcessIndex();
+        #$self->decrementCurrentProcessIndex();
+        return ('',2);
+    }
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
     $personObj->load();
 
     if($regoID) {
         my $nationality = $personObj->getValue('strISONationality') || ''; 
-        my $itc = $self->getCarryFields('itc');
         $rego_ref->{'Nationality'} = $nationality;
-        $rego_ref->{'InternationalTransfer'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0;
-        $rego_ref->{'InternationalLoan'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0;
 
-
-	$rego_ref->{'payMethod'} = $self->{'RunParams'}{'payMethod'} || '';
         $content = displayRegoFlowProducts(
             $self->{'Data'}, 
             $regoID, 
@@ -1075,10 +819,6 @@ sub display_products {
             {},
             1,
         );
-        if (! $content)   {
-            $self->incrementCurrentProcessIndex();
-            return ('',2);
-        }
     }
     else    {
         if (! $self->{'RunDetails'}{'Errors'} and  ! scalar(@{$self->{'RunDetails'}{'Errors'}})) {
@@ -1089,6 +829,13 @@ sub display_products {
                 return ('',2);
             }
         }
+    }
+
+    if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
+        #There are errors - reset where we are to go back to the form again
+        #$self->setCurrentProcessIndex(1);
+        #$self->decrementCurrentProcessIndex();
+        #return ('',2);
     }
     my %ManualPayPageData = (
         HiddenFields => $self->stringifyCarryField(),
@@ -1121,6 +868,7 @@ sub display_products {
         Title => '',
         TextTop => '',
         TextBottom => '',
+        ContinueButtonText => $self->{'Lang'}->txt('Save & Continue'),
     );
     my $pagedata = $self->display(\%PageData);
 
@@ -1131,6 +879,8 @@ sub display_products {
 sub process_products { 
     my $self = shift;
 
+print STDERR "~~~~~~~~~~~~~~~~~~~~~~~~~~~PROCESS PRODUCTS";
+    $self->addCarryField('seenProds', 1);
     my @productsselected=();
     my @productsqty=();
     for my $k (keys %{$self->{'RunParams'}})  {
@@ -1149,11 +899,11 @@ sub process_products {
             }
         }
     }
-	
     my $prodQty= join(':',@productsqty);
     $self->addCarryField('prodQty',$prodQty);
     my $prodIds= join(':',@productsselected);
     $self->addCarryField('prodIds', $prodIds);
+
 
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
@@ -1176,24 +926,18 @@ sub process_products {
         $regoID = 0 if !$valid;
     }
 
-	cleanRegoTransactions($self->{'Data'},$regoID, $personID, $Defs::LEVEL_PERSON);
+cleanRegoTransactions($self->{'Data'},$regoID, $personID, $Defs::LEVEL_PERSON);
     my ($resultHTML, $error) = checkMandatoryProducts($self->{'Data'}, $personID, $Defs::LEVEL_PERSON, $self->{'RunParams'});
     if ($error) {
         push @{$self->{'RunDetails'}{'Errors'}}, $resultHTML;
         $self->setCurrentProcessIndex('p');
         return ('',2);
     }
-    my $itc = $self->getCarryFields('itc');
-    $rego_ref->{'InternationalTransfer'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0;
-    $rego_ref->{'InternationalLoan'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0;
-
 
     my ($txnIds, $amount) = save_rego_products($self->{'Data'}, $regoID, $personID, $entityID, $entityLevel, $rego_ref, $self->{'RunParams'});
 
 ####
     my $paymentType = $self->{'RunParams'}{'paymentType'} || 0;
-    my $payMethod= $self->{'RunParams'}{'payMethod'} || '';
-    $self->addCarryField('payMethod',$payMethod);
     my $markPaid= $self->{'RunParams'}{'markPaid'} || 0;
     my @txnIds = split ':',$txnIds ;
     if ($paymentType and $markPaid)  {
@@ -1209,14 +953,15 @@ sub process_products {
 ####
 
     $self->addCarryField('txnIds',$txnIds);
-	$self->addCarryField('paymentDue',$amount);
-	
+print STDERR "TXN IDS" . $txnIds;
+
     return ('',1);
 }
 
 sub display_documents { 
     my $self = shift;
 	
+    $self->addCarryField('cond_vstd', 1);
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
@@ -1225,6 +970,9 @@ sub display_documents {
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
+    if (! $regoID)  {
+
+    }
     my $client = $self->{'Data'}->{'client'};
 	my $rego_ref = {};
     my $content = '';
@@ -1238,21 +986,19 @@ sub display_documents {
         );
         $regoID = 0 if !$valid;
     }
+    if (! $regoID or ! $personID)  {
+        my $lang = $self->{'Data'}{'lang'};
+        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Player loan failed, cannot find registration.");
+        $self->setCurrentProcessIndex(1);
+        #$self->decrementCurrentProcessIndex();
+        return ('',2);
+    }
 	my $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
     $personObj->load();
 	my $nationality = $personObj->getValue('strISONationality') || ''; 
-        #my $itc = $personObj->getValue('intInternationalTransfer') || '';
-        my $itc = $self->getCarryFields('itc') || 0;
+        my $itc = $personObj->getValue('intInternationalTransfer') || '';
         $rego_ref->{'Nationality'} = $nationality;
-        $rego_ref->{'InternationalTransfer'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0;
-        $rego_ref->{'InternationalLoan'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0;
-
-     if (! $regoID or ! $personID)  {
-        my $lang = $self->{'Data'}{'lang'};
-        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Registration failed, cannot find registration.");
-        $self->setCurrentProcessIndex('r');
-        return ('',2);
-    }
+        $rego_ref->{'InternationalTransfer'} = $itc;
 
         $content = displayRegoFlowDocuments(
             $self->{'Data'}, 
@@ -1277,10 +1023,10 @@ sub display_documents {
         FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
         Content => '',
         Title => '',
-        DocUploader => $content,
-        #TextTop => $content,
         TextTop => '',
+        Documents => $content,
         TextBottom => '',
+        ContinueButtonText => $self->{'Lang'}->txt('Save & Continue'),
     );
     my $pagedata = $self->display(\%PageData);
 	
@@ -1319,21 +1065,18 @@ sub process_documents {
 		$personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
     	$personObj->load();
 		my $nationality = $personObj->getValue('strISONationality') || ''; 
-        #my $itc = $personObj->getValue('intInternationalTransfer') || '';
-	my $itc = $self->{'RunParams'}{'itc'} || 0;
+        my $itc = $personObj->getValue('intInternationalTransfer') || '';
         $rego_ref->{'Nationality'} = $nationality;
-        $rego_ref->{'InternationalTransfer'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0;
-        $rego_ref->{'InternationalLoan'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0;
-
-
+        $rego_ref->{'InternationalTransfer'} = $itc;
     }
-
-     if (! $regoID or ! $personID)  {
+    if (! $regoID or ! $personID)  {
         my $lang = $self->{'Data'}{'lang'};
-        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Registration failed, cannot find registration.");
-        $self->setCurrentProcessIndex('r');
+        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Player loan failed, cannot find registration.");
+        $self->setCurrentProcessIndex(1);
+        #$self->decrementCurrentProcessIndex();
         return ('',2);
     }
+
     #check for uploaded document
     my ($error_message, $isRequiredDocPresent) = checkUploadedRegoDocuments($self->{'Data'}, 
             $regoID, 
@@ -1378,6 +1121,9 @@ sub process_documents {
 
 sub display_summary { 
     my $self = shift;
+
+    $self->addCarryField('p_vstd', 1);
+
     my $personObj;
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
@@ -1388,10 +1134,11 @@ sub display_summary {
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
+    my $lang = $self->{'Data'}{'lang'};
+    my $gatewayConfig = undef;
 
     my $rego_ref = {};
     my $content = '';
-    my $gatewayConfig = undef;
     if($regoID) {
         my $valid =0;
         ($valid, $rego_ref) = validateRegoID(
@@ -1403,21 +1150,35 @@ sub display_summary {
         $regoID = 0 if !$valid;
     }
 
+    if (! $regoID or ! $personID)  {
+        my $lang = $self->{'Data'}{'lang'};
+        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Player loan failed, cannot find registration.");
+        $self->setCurrentProcessIndex(1);
+        #$self->decrementCurrentProcessIndex();
+        #$self->decrementCurrentProcessIndex();
+        return ('',2);
+    }
+
+    #if (! $self->{'RunParams'}{'seenProds'})  {
+     #   push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Transfer failed, you must step through Payments screen.");
+     #   $self->setCurrentProcessIndex('p');
+     #   return ('',2);
+    #}
     my $payMethod = '';
     if($regoID) {
         $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
         $personObj->load();
         my $nationality = $personObj->getValue('strISONationality') || ''; 
         $rego_ref->{'Nationality'} = $nationality;
-#BAFF
+    
         $self->addCarryField('txnIds', $self->{'RunParams'}{'txnIds'} || 0);
         $self->addCarryField('payMethod', $self->{'RunParams'}{'payMethod'} || '');
         $payMethod = $self->{'RunParams'}{'payMethod'} || '';
-    
+
         my $hiddenFields = $self->getCarryFields();
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
-        $hiddenFields->{'cA'} = "REGOFLOW";
+        $hiddenFields->{'cA'} = $self->getCarryFields('dnat');
         ($content, $gatewayConfig) = displayRegoFlowSummary(
             $self->{'Data'}, 
             $regoID, 
@@ -1429,47 +1190,49 @@ sub display_summary {
             $hiddenFields,
 		    $self->stringifyURLCarryField(),
         );
+        $content = '' if ! $content;
+        if (! $content)  {
+            my $lang = $self->{'Data'}{'lang'};
+            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Player loan failed, cannot find registration.");
+        $self->setCurrentProcessIndex(1);
+        #    $self->decrementCurrentProcessIndex();
+        #    $self->decrementCurrentProcessIndex();
+        #    $self->decrementCurrentProcessIndex();
+        #    $self->decrementCurrentProcessIndex();
+            return ('',2);
+        }
+        
+
     }
     else    {
+        my $lang = $self->{'Data'}{'lang'};
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
     }
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
-        #$self->decrementCurrentProcessIndex();
-        $self->setCurrentProcessIndex('r');
+        $self->decrementCurrentProcessIndex();
         return ('',2);
     }
 
-    my $initialTaskAssigneeLevel = getInitialTaskAssignee(
-        $self->{'Data'},
-        $personID,
-        $regoID,
-        0
-    );
-   
-    #if ($payMethod ne 'now')    {
-    #    $gateways = '';
-    #}
     my %Config = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
-        ContinueButtonText => $self->{'Lang'}->txt('Submit to ' . $initialTaskAssigneeLevel),
+        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
     );
     if ($gatewayConfig->{'amountDue'} and $payMethod eq 'now')    {
         ## Change Target etc
         %Config = (
             HiddenFields => $gatewayConfig->{'HiddenFields'},
             Target => $gatewayConfig->{'Target'},
-            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to '. $initialTaskAssigneeLevel),
+            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to Member Association'),
         );
     }
-
     my %PageData = (
         Errors => $self->{'RunDetails'}{'Errors'} || [],
         FlowSummaryContent => personSummaryPanel($self->{'Data'}, $personObj->ID()) || '',
-        Content => $content,
+        Content => '',
         Title => '',
-        TextTop => '',
+        TextTop => $content,
         TextBottom => '',
         HiddenFields => $Config{'HiddenFields'},
         Target => $Config{'Target'},
@@ -1485,7 +1248,6 @@ sub display_complete {
     my $self = shift;
     my $personObj;
     my $personID = $self->ID();
-#print STDERR "~~~IN DISPLAY_COMPLETE\n";
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
     }
@@ -1497,7 +1259,7 @@ sub display_complete {
 
     my $rego_ref = {};
     my $content = '';
-    my $gateways= '';
+    my $gateways = '';
     if($regoID) {
         my $valid =0;
         ($valid, $rego_ref) = validateRegoID(
@@ -1508,7 +1270,6 @@ sub display_complete {
         );
         $regoID = 0 if !$valid;
     }
-#print STDERR "~~~IN DISPLAY_COMPLETE FOR $regoID\n";
 
     if($regoID) {
         $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
@@ -1517,11 +1278,25 @@ sub display_complete {
         $rego_ref->{'Nationality'} = $nationality;
 
         my $run = $self->{'RunParams'}{'run'} || 0;
+        if($self->{'RunParams'}{'newreg'} and ! $run)  {
+                #$self->{'RunParams'}{'run'} = 1;
+                #$self->addCarryField('run',1);
+            my $rc = WorkFlow::addWorkFlowTasks(
+                $self->{'Data'},
+                'PERSON',
+                'NEW',
+                $self->{'ClientValues'}{'authLevel'} || 0,
+                getID($self->{'ClientValues'}) || 0,
+                $personID,
+                0,
+                0,
+                0
+            );
+        }
 
         my $hiddenFields = $self->getCarryFields();
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
-
         ($content, $gateways) = displayRegoFlowComplete(
             $self->{'Data'}, 
             $regoID, 
@@ -1546,14 +1321,16 @@ sub display_complete {
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         Errors => $self->{'RunDetails'}{'Errors'} || [],
+        #FlowSummary => buildSummaryData($self->{'Data'}, $personObj) || '',
+        #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
         processStatus => 1,
-        Content => $content,
-        Title => '',
-        TextTop => '',
+        Content => '',
+        Title => $self->{'Data'}{'lang'}->txt('Player Loan Submitted to MA'),
+        TextTop => $content,
         TextBottom => '',
         NoContinueButton => 1,
-        gateways => $gateways
     );
+
     my $pagedata = $self->display(\%PageData);
 
     return ($pagedata,0);
@@ -1624,7 +1401,10 @@ sub loadObjectValues    {
             strOtherPersonIdentifierDesc
             intOtherPersonIdentifierTypeID
 
-            intMinorProtection
+            intMinorMoveOtherThanFootball
+            intMinorDistance
+            intMinorEU
+            intMinorNone
             intNatCustomLU1
             intNatCustomLU2
             intNatCustomLU3
@@ -1637,13 +1417,6 @@ sub loadObjectValues    {
             intNatCustomLU10
 
             intInternationalTransfer
-            strInternationalTransferSourceClub
-            dtInternationalTransferDate
-            strInternationalTransferTMSRef
-            strInternationalLoanSourceClub
-            strInternationalLoanTMSRef
-            dtInternationalLoanFromDate
-            dtInternationalLoanToDate
 
 strLocalTitle
 strPreferredName
@@ -1788,76 +1561,72 @@ sub moveDocuments {
 }
 
  
+sub Navigation {
+    #May need to be overriden in child class to define correct order of steps
+  my $self = shift;
 
-sub rebuildClient   {
-    # Called if inserting into entity that is not the current entity.
-    # Rebuilds and updates client string so that the entity is the
-    # current entity
-    my $self = shift;
-    my ($entityID, $entityLevel) = @_;
+    my $lang = $self->{'Data'}{'lang'};
+    my $navstring = '';
+    my $meter = '';
+    my @navoptions = ();
+    my $step = 1;
+    my $step_in_future = 0;
+    my $noNav = $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'NoNav'} || 0;
+    my $noGoingBack = $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'NoGoingBack'} || 0;
+    return '' if $noNav;
+    my $startingStep = $self->{'RunParams'}{'_ss'} || '';
+    my $includeStep = 1;
+    $includeStep = 0 if $startingStep;
+    for my $i (0 .. $#{$self->{'ProcessOrder'}})    {
+        my $current = 0;
+        my $name = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'label'} || '');
+        my $action = $self->{'Lang'}->txt($self->{'ProcessOrder'}[$i]{'action'} || ''); 
+        $name .= qq[<span class="circleBg"><i class="fa fa-check tab-ticked"></i></span>] if ($name and $self->{'RunParams'}{$action . '_vstd'});
 
-    my $clientValues = $self->{'ClientValues'};
-    my $currentLevel = $clientValues->{'currentLevel'};
-    my $authLevel = $clientValues->{'authLevel'};
-    if($currentLevel != $Defs::LEVEL_PERSON)    {
-        $clientValues->{'currentLevel'} = $entityLevel;
+        if($startingStep and $self->{'ProcessOrder'}[$i]{'action'} eq $startingStep)   {
+            $includeStep = 1;
+        }
+        next if !$includeStep;
+        next if($self->{'ProcessOrder'}[$i]{'NoNav'});
+        next if($self->{'ProcessOrder'}[$i]{'NoDisplayInNav'});
+        if($name)   {
+            $current = 1 if $i == $self->{'CurrentIndex'};
+            push @navoptions, [
+                $name,
+                $current || $step_in_future || 0,
+            ];
+            my $currentclass = '';
+            $currentclass = 'active' if $current;
+            $currentclass = 'next' if $step_in_future;
+            $currentclass ||= 'previous';
+            $meter = $step if $current;
+            my $showlink = 0;
+            $showlink = 1 if(!$current and !$step_in_future);
+            $showlink = 0 if($self->{'ProcessOrder'}[$i]{'noRevisit'});
+            $showlink = 0 if $noGoingBack;
+            my $linkURL = $self->{'Target'}."?rfp=".$self->{'ProcessOrder'}[$i]{'action'}."&".$self->stringifyURLCarryField();
+            $self->{'RunDetails'}{'DirectLinks'}[$i] = $linkURL;
+
+            my $js = '';
+            if($step_in_future) {
+                $js = qq[onclick="alert('].$lang->txt('Use the Continue button to go to the next page').qq[');return false;" ];
+            }
+            my $link = qq[<a href="$linkURL" class = "$currentclass" $js>$name</a>];
+
+            $navstring .= qq[ <li class = "$currentclass">$link</li> ];
+            $step_in_future = 2 if $current;
+            $step++;
+        }
     }
+    my $returnHTML = '';
+    $returnHTML .= qq[<ul class = "nav nav-tabs">$navstring</ul> ] if $navstring;
 
-    $clientValues->{clubID} = $Defs::INVALID_ID  if $entityLevel > $Defs::LEVEL_CLUB;
-    $clientValues->{zoneID} = $Defs::INVALID_ID if $entityLevel > $Defs::LEVEL_ZONE;
-    $clientValues->{regionID} = $Defs::INVALID_ID if $entityLevel > $Defs::LEVEL_REGION;
-    setClientValue($clientValues, $entityLevel, $entityID);
 
-    #if MA is inserting into club then need to rebuild region into client string
-    #work out regional level
-    if($entityLevel == $Defs::LEVEL_CLUB and $authLevel == $Defs::LEVEL_NATIONAL)   {
-        my $st = qq[
-            SELECT      
-                intParentID
-            FROM 
-                tblTempEntityStructure
-            WHERE
-                intParentLevel = $Defs::LEVEL_REGION
-                AND intChildID = ?
-        ];
-        my $q = $self->{'db'}->prepare($st);
-        $q->execute(
-            $entityID,
-        );
-        my ($regionID) = $q->fetchrow_array();
-        $q->finish();
-        setClientValue($clientValues, $Defs::LEVEL_REGION,$regionID) if $regionID;
+    if(wantarray)   {
+        return ($returnHTML, \@navoptions);
     }
-
-    $self->{'ClientValues'} = $clientValues;
-    $self->{'Data'}{'clientValues'} = $clientValues;
-    my $client = setClient($clientValues);
-    $self->{'Data'}{'client'} = $client;
-    $self->addCarryField('client',$client);
-    return 1;
+    return $returnHTML || '';
 }
 
  
-sub getStateIds {
-    my $self = shift;
-
-    my $currentLevel = $self->{'ClientValues'}{'authLevel'} || 0;
-    my $userEntityID = getID($self->{'ClientValues'}, $currentLevel) || 0;
-
-    return (
-        'PERSON',
-        $userEntityID,
-        $self->ID(),
-        $self->{'RunParams'}{'rID'} || 0,
-        $self->{'ClientValues'}{'userID'},
-    );
-}
-
-sub cancelFlow{
-    my $self = shift;
-
-    IncompleteRegistrations::deleteRelatedRegistrationRecords($self->{'Data'}, $self->getStateIds());
-
-    return 1
-};
 

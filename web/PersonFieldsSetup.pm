@@ -19,10 +19,13 @@ use DefCodes;
 use PersonUtils;
 use AssocTime;
 use MinorProtection;
+use Flow_DisplayFields;
+use Data::Dumper;
 
 sub personFieldsSetup {
-    my ($Data, $values) = @_;
+    my ($Data, $values, $runParams) = @_;
     $values ||= {};
+    $runParams ||= {};
 
     my $FieldLabels   = FieldLabels::getFieldLabels( $Data, $Defs::LEVEL_PERSON );
     my $isocountries  = getISOCountriesHash();
@@ -32,6 +35,12 @@ sub personFieldsSetup {
         client=>$Data->{'client'}, 
         type=>'Person'
     });
+
+    my $dtLoanFromDate = _concatenateDate(
+        $runParams->{'d_dtInternationalLoanFromDate_day'},
+        $runParams->{'d_dtInternationalLoanFromDate_mon'},
+        $runParams->{'d_dtInternationalLoanFromDate_year'},
+    );
 
     my %genderoptions = ();
     for my $k ( keys %Defs::PersonGenderInfo ) {
@@ -520,6 +529,85 @@ sub personFieldsSetup {
                     sectionname => 'core',
                     active => $showITCReminder,
                 },
+                strInternationalTransferSourceClub => {
+                	label => $FieldLabels->{'strInternationalTransferSourceClub'},
+                	value => $values->{'strInternationalTransferSourceClub'},
+                	type => 'text',
+                	size => '40',
+                	maxsize => '50',                	
+                    sectionname => 'other',
+                    compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0,
+                    active => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0,
+                },
+                dtInternationalTransferDate => {
+                	label => $FieldLabels->{'dtInternationalTransferDate'},
+                	value => $values->{'dtInternationalTransferDate'},
+                	type        => 'date',
+                    datetype    => 'dropdown',
+                    format      => 'dd/mm/yyyy',
+                    validate    => 'DATE',
+                    sectionname => 'other',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
+                    compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0,
+                    active => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0,
+                },
+                strInternationalTransferTMSRef => {
+                	label => $FieldLabels->{'strInternationalTransferTMSRef'},
+                	value => $values->{'strInternationalTransferTMSRef'},
+                	type => 'text',
+                	size => '40',
+                	maxsize => '50',                	
+                    sectionname => 'other',
+                    compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0,
+                    active => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0,
+                },
+                strInternationalLoanSourceClub => {
+                	label => $FieldLabels->{'strInternationalLoanSourceClub'},
+                	value => $values->{'strInternationalLoanSourceClub'},
+                	type => 'text',
+                	size => '40',
+                	maxsize => '50',                	
+                    sectionname => 'other',
+                    compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
+                    active => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
+                },
+                dtInternationalLoanFromDate => {
+                	label => $FieldLabels->{'dtInternationalLoanFromDate'},
+                	value => $values->{'dtInternationalLoanFromDate'},
+                	type        => 'date',
+                    datetype    => 'dropdown',
+                    format      => 'dd/mm/yyyy',
+                    validate    => 'DATE',
+                    sectionname => 'other',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
+                    compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
+                    active => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
+                },
+                dtInternationalLoanToDate => {
+                	label => $FieldLabels->{'dtInternationalLoanToDate'},
+                	value => $values->{'dtInternationalLoanToDate'},
+                	type        => 'date',
+                    datetype    => 'dropdown',
+                    format      => 'dd/mm/yyyy',
+                    validate    => 'DATE,DATEMORETHAN:' . $dtLoanFromDate,
+                    sectionname => 'other',
+                    displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
+                    displayFunctionParams=> ['MEDIUM'],
+                    compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
+                    active => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
+                },
+                strInternationalLoanTMSRef => {
+                	label => $FieldLabels->{'strInternationalLoanTMSRef'},
+                	value => $values->{'strInternationalLoanTMSRef'},
+                	type => 'text',
+                	size => '40',
+                	maxsize => '50',                	
+                    sectionname => 'other',
+                    compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
+                    active => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
+                },
                 parentBlock => {
                     label       => 'parentblock',
                     value       => qq[<p>].$Data->{'lang'}->txt('What is your relationship to the minor you are registering?').qq[</p>],
@@ -603,6 +691,14 @@ sub personFieldsSetup {
                 dtOtherPersonIdentifierValidDateTo
                 strOtherPersonIdentifierDesc
 
+                strInternationalTransferSourceClub
+                dtInternationalTransferDate
+                strInternationalTransferTMSRef
+
+                strInternationalLoanSourceClub
+                dtInternationalLoanFromDate
+                dtInternationalLoanToDate
+                strInternationalLoanTMSRef
             )],
             sections => [
                 [ 'parent',      'Parent/Guardian Details' ],
@@ -931,6 +1027,24 @@ sub personFieldsSetup {
     }
 
     return $fieldsets;
+}
+
+sub _concatenateDate {
+    my ($day, $month, $year) = @_;
+
+    $day = $day || q{};
+    $month = $month || q{};
+    $year = $year || q{};
+
+    my $datevalue;
+    my $displayField = new Flow_DisplayFields();
+
+    if ( $day and $month and $year ) {
+        $datevalue = "$day/$month/$year";
+        $datevalue =  $displayField->_fix_date($datevalue);
+    }
+
+    return $datevalue || '';
 }
 
 1;

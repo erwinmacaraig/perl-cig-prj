@@ -46,6 +46,7 @@ sub checkRegoTypeLimits    {
             $ageLevel= $regs->[0]{'strAgeLevel'};
             $entityID= $regs->[0]{'intEntityID'};
             $entityType= $regs->[0]{'strEntityType'};
+            return 1 if ($regs->[0]{'strRegistrationNature'} eq 'DOMESTIC_LOAN');
         }
     }
     my $st = qq[
