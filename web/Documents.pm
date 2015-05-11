@@ -196,10 +196,12 @@ sub list_docs {
 		{
 			name => $Data->{'lang'}->txt('Title'),
 			field => 'Title',
+            defaultShow => 1,
 		},
 		{
 			name => $Data->{'lang'}->txt('Document Type'),
 			field => 'DocumentType',
+            defaultShow => 1,
 		},
        {
             name => $Data->{'lang'}->txt('Size'),
@@ -219,6 +221,7 @@ sub list_docs {
             field => 'View',
             type => 'HTML',
             sortable => 0,
+            defaultShow => 1,
         },
          {
             name => $Data->{'lang'}->txt('Delete'),

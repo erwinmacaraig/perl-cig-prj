@@ -449,7 +449,7 @@ jQuery(document).ready(function(){
         return $(window).width() < 800
     }
     // $(window).resize(function(){checkWidth()}) < 800
-    if( checkWidth() == true  || $(".res-table thead tr th").length > 10){
+    if( checkWidth() == true  || $(".res-table thead tr th").length > 20){
         /* find responsive-table and prepend a dropdown*/ 
         // get No. of columns with res-table class
         var noOfRequests = $('.res-table').length;

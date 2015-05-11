@@ -293,11 +293,13 @@ sub personRegistrationsHistory   {
         {
             name  => $Data->{'lang'}->txt('Registered To'),
             field => 'EntityLocalName',
+            defaultShow => 1,
         },
         {
             name   => $Data->{'lang'}->txt('Type'),
             field  => 'PersonType',
             width  => 30,
+            defaultShow => 1,
         },
         {
             name   => $Data->{'lang'}->txt('Sport'),
@@ -320,6 +322,7 @@ sub personRegistrationsHistory   {
             name  => $Data->{'lang'}->txt('Date'),
             field => 'Date',
             sortdata => 'Date_RAW',
+            defaultShow => 1,
         },
         {
             type  => 'Selector',
@@ -387,6 +390,7 @@ my @headers = (
        		 {
            	 name => $lang->txt('Type'),
           	  field => 'strDocumentName',
+                defaultShow => 1,
        		 },
        		 {
       	      name => $lang->txt('Status'),
@@ -402,6 +406,7 @@ my @headers = (
        		     field => 'ViewDoc',
        		     type => 'HTML',
              sortable => 0,
+                defaultShow => 1,
       		  },
       		  {
        		 	name => $lang->txt('Replace'),
