@@ -1652,14 +1652,14 @@ sub checkForOutstandingTasks {
                     PersonRegistration::rolloverExistingPersonRegistrations($Data, $personID, $personRegistrationID);
                 }
                 {
-                    my %PE = ();
-                    $PE{'personType'} = $ppref->{'strPersonType'} || '';
-                    $PE{'personLevel'} = $ppref->{'strPersonLevel'} || '';
-                    $PE{'personEntityRole'} = $ppref->{'strPersonEntityRole'} || '';
-                    $PE{'sport'} = $ppref->{'strSport'} || '';
+                    #my %PE = ();
+                    #$PE{'personType'} = $ppref->{'strPersonType'} || '';
+                    #$PE{'personLevel'} = $ppref->{'strPersonLevel'} || '';
+                    #$PE{'personEntityRole'} = $ppref->{'strPersonEntityRole'} || '';
+                    #$PE{'sport'} = $ppref->{'strSport'} || '';
                     
-                    my $peID = doesOpenPEExist($Data, $personID, $ppref->{'intEntityID'}, \%PE);
-                    addPERecord($Data, $personID, $ppref->{'intEntityID'}, \%PE) if (! $peID);
+                    #my $peID = doesOpenPEExist($Data, $personID, $ppref->{'intEntityID'}, \%PE);
+                    #addPERecord($Data, $personID, $ppref->{'intEntityID'}, \%PE) if (! $peID);
 
                     my $personObject = getInstanceOf($Data, 'person',$personID);
                     updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);

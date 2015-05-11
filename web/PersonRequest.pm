@@ -1782,16 +1782,16 @@ sub finaliseTransfer {
        $personRequest->{'intPersonID'}
     ) or query_error($st);
 
-    my %PE = ();
-    {
-    $PE{'personType'} = $personRequest->{'strPersonType'} || '';
-    $PE{'personLevel'} = $personRequest->{'strPersonLevel'} || '';
-    $PE{'personEntityRole'} = $personRequest->{'strPersonEntityRole'} || '';
-    $PE{'sport'} = $personRequest->{'strSport'} || '';
-    closePERecord($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestToEntityID'}, '', \%PE);
-    my $peID = doesOpenPEExist($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestFromEntityID'}, \%PE);
-    addPERecord($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestFromEntityID'}, \%PE) if (! $peID)
-    }
+    #my %PE = ();
+    #{
+    #$PE{'personType'} = $personRequest->{'strPersonType'} || '';
+    #$PE{'personLevel'} = $personRequest->{'strPersonLevel'} || '';
+    #$PE{'personEntityRole'} = $personRequest->{'strPersonEntityRole'} || '';
+    #$PE{'sport'} = $personRequest->{'strSport'} || '';
+    #closePERecord($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestToEntityID'}, '', \%PE);
+    #my $peID = doesOpenPEExist($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestFromEntityID'}, \%PE);
+    #addPERecord($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestFromEntityID'}, \%PE) if (! $peID)
+    #}
     
 
     if ($personRequest->{'intPersonID'})    {
