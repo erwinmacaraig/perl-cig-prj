@@ -1325,7 +1325,7 @@ sub display_complete {
         #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
         processStatus => 1,
         Content => '',
-        Title => $self->{'Data'}{'lang'}->txt('Player loan Submitted to MA'),
+        Title => $self->{'Data'}{'lang'}->txt('Player Loan Submitted to MA'),
         TextTop => $content,
         TextBottom => '',
         NoContinueButton => 1,
