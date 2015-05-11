@@ -23,8 +23,6 @@ use strict;
             tblPersonRequest prq
         INNER JOIN
             tblPersonRegistration_$Data{'Realm'} pr ON (pr.intPersonRequestID = prq.intPersonRequestID)
-        LEFT JOIN
-            tblNationalPeriod np ON (np.intNationalPeriodID = pr.intNationalPeriodID)
         WHERE
             pr.strStatus = 'ACTIVE'
             AND prq.strRequestType = 'LOAN'
@@ -33,10 +31,13 @@ use strict;
             AND prq.intOpenLoan= 1
             AND (
                     DATE_FORMAT(prq.dtLoanTo, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d') 
-                    OR
-                    np.dtTo <= DATE_FORMAT(NOW(), '%Y-%m-%d')
                 )
     ];
+#        LEFT JOIN
+#            tblNationalPeriod np ON (np.intNationalPeriodID = pr.intNationalPeriodID)
+
+#                    OR
+#                    np.dtTo <= DATE_FORMAT(NOW(), '%Y-%m-%d')
 
     my @personRequestIDs;
     my @personIDs;
