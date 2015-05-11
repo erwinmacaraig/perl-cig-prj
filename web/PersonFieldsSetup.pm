@@ -992,6 +992,22 @@ sub personFieldsSetup {
             ],
         },
     };
+
+    for my $i (1..15) {
+        my $fieldname = "strNatCustomStr$i";
+        my $name = $CustomFieldNames->{$fieldname}[0] || '';
+        next if !$name;
+        $fieldsets->{'core'}{'fields'}{$fieldname} = {
+            label => $name,
+            value => $values->{$fieldname},
+            type => 'text',
+            size => '40',
+            maxsize => '50',
+            sectionname => 'other',
+        };
+        push @{$fieldsets->{'core'}{'order'}} , $fieldname;
+    }
+
     for my $i (1..10) {
         my $fieldname = "intNatCustomLU$i";
         my $name = $CustomFieldNames->{$fieldname}[0] || '';
