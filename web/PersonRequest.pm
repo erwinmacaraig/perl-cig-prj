@@ -313,7 +313,14 @@ sub listPersonRecord {
         #$limit = qq[ LIMIT 1 ];
     }
     elsif($requestType eq $Defs::PERSON_REQUEST_LOAN) {
-        $joinCondition = qq [ AND PR.strPersonType = 'PLAYER' and PR.strPersonLevel = "PROFESSIONAL" ];
+        my $allowedLevels= $Data->{'SystemConfig'}{'loan_personLevels'};
+        my $level_list = '""';
+        if ($allowedLevels)    {
+            my @levels= split /\|/, $allowedLevels;
+            $level_list = join(',',@levels);
+        }
+ 
+        $joinCondition = qq [ AND PR.strPersonType = 'PLAYER' and PR.strPersonLevel IN ($level_list) ];
         $groupBy = qq [ GROUP BY PR.strSport, PR.intEntityID ];
         $orderBy = qq[
             ORDER BY personLevelWeight
