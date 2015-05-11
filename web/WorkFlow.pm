@@ -1631,6 +1631,7 @@ sub checkForOutstandingTasks {
                         dtFrom = NOW()
 	    	        WHERE
                         PR.intPersonRegistrationID = ?
+                        AND PR.strRegistrationNature NOT IN ('DOMESTIC_LOAN')
                         AND PR.strStatus IN ('PENDING', 'INPROGRESS')
 	        	];
                         #dtTo = IF (dtFrom>dtTo, dtFrom, dtTo)
