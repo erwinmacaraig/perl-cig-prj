@@ -131,8 +131,9 @@ sub setupValues    {
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my %regFilter = (
         'entityID' => $entityID,
-        'requestID' => $self->{'RunParams'}{'rid'},
+        'requestID' => $self->{'RunParams'}{'prid'},
     );
+
     my $request = getRequests($self->{'Data'}, \%regFilter);
     $request = $request->[0];
     $self->{'RunParams'}{'nat'} = 'TRANSFER';
