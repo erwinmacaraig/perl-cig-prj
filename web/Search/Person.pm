@@ -353,7 +353,7 @@ sub getPlayerLoan {
                 AND
                     (PR.strPersonType = 'PLAYER')
                 AND PR.intEntityID <> $filters->{'club'}
-                AND PR.strPersonLevel = "PROFESSIONAL"
+                AND PR.strPersonLevel IN ("PROFESSIONAL", ?)
             )
             LEFT JOIN tblPersonRegistration_$realmID AS PRAlready ON (
                 tblPerson.intPersonID = PRAlready.intPersonID
@@ -404,8 +404,9 @@ sub getPlayerLoan {
         ];
                 #AND PRQinprogress.intRequestFromEntityID = "$clubID"
                 #AND PRQinprogress.strRequestStatus = "INPROGRESS" AND PRQinprogress.strRequestResponse IS NULL
+        my $personLevelExtra = $self->getData()->{'SystemConfig'}{'loan_personLevelExtra'} || 'PROFESSIONAL';
         my $q = $self->getData->{'db'}->prepare($st);
-        $q->execute();
+        $q->execute($personLevelExtra);
         my %origClientValues = %{$self->getData()->{'clientValues'}};
 
         my $count = 0;
