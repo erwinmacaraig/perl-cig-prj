@@ -149,6 +149,7 @@ sub setupValues    {
     $values ||= {};
     $values->{'defaultType'} = $self->{'RunParams'}{'dtype'} || '';
     $values->{'itc'} = $self->{'RunParams'}{'itc'} || 0;
+    $values->{'preqtype'} = $self->{'RunParams'}{'preqtype'} || 0;
     my $client = $self->{'Data'}{'client'};
     $values->{'BaseURL'} = "$self->{'Data'}{'target'}?client=$client&amp;a=";
 
@@ -172,6 +173,12 @@ sub setupValues    {
         $self->addCarryField('dage', $rawDetails->{'newAgeLevel'}); # if $rawDetails->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER;
         $self->addCarryField('drole', $rawDetails->{'strPersonEntityRole'});
     }
+    elsif ($self->{'RunParams'}{'itc'} and $self->{'RunParams'}{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) {
+        #setting dnat to $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN to be used in PersonRegisterWhat
+        $self->addCarryField('dnat', $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN);
+        $self->addCarryField('dnature', 'NEW');
+        $self->addCarryField('nat', 'NEW');
+    }
     else    {
         $self->addCarryField('oldlevel', $self->{'RunParams'}{'oldlevel'});
         $self->addCarryField('d_nature', 'NEW');
@@ -179,7 +186,7 @@ sub setupValues    {
         $self->addCarryField('nat', 'NEW');
     }
 
-    $self->{'FieldSets'} = personFieldsSetup($self->{'Data'}, $values);
+    $self->{'FieldSets'} = personFieldsSetup($self->{'Data'}, $values, $self->{'RunParams'});
 }
 
 sub display_core_details    { 
@@ -303,7 +310,8 @@ sub validate_core_details    {
     if($newreg)    {
         $userData->{'strStatus'} = 'INPROGRESS';
         $userData->{'intRealmID'} = $self->{'Data'}{'Realm'};
-        $userData->{'intInternationalTransfer'} = 1 if $self->getCarryFields('itc');
+        $userData->{'intInternationalTransfer'} = 1 if ($self->getCarryFields('itc') and $self->{'RunParams'}{'preqtype'} eq $Defs::PERSON_REQUEST_TRANSFER);
+        $userData->{'intInternationalLoan'} = 1 if ($self->getCarryFields('itc') and $self->{'RunParams'}{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN);
     }
     $personObj->setValues($userData);
     $personObj->write();
@@ -773,6 +781,38 @@ sub process_registration {
         if($changeExistingReg)  {
             $self->moveDocuments($existingReg, $regoID, $personID);
         }
+        
+        if ($personType eq $Defs::PERSON_TYPE_PLAYER && $self->{'SystemConfig'}{'allowLoans'} && $regoID && $self->{'RunParams'}{'rtargetid'})    {
+            my $stLoan = qq[
+                UPDATE 
+                    tblPersonRegistration_$self->{'Data'}->{'Realm'} as PRNew 
+                    INNER JOIN tblPersonRegistration_$self->{'Data'}->{'Realm'} as PRExisting ON (
+                        PRExisting.intPersonID = PRNew.intPersonID 
+                        AND PRExisting.intOnLoan =1 
+                        AND PRExisting.intPersonRegistrationID = ?
+                    ) 
+                    INNER JOIN tblPersonRequest as Preq ON (
+                        Preq.intPersonID=PRNew.intPersonID 
+                        AND Preq.intRequestFromEntityID= PRNew.intEntityID 
+                        AND Preq.strRequestType = 'LOAN'
+                        AND Preq.intOpenLoan=1
+                        AND Preq.strRequestStatus = 'COMPLETED'
+                    ) 
+                    SET 
+                        PRNew.intOnLoan = 1, 
+                        PRNew.intPersonRequestID = PRExisting.intPersonRequestID
+                WHERE 
+                    PRNew.intPersonRegistrationID = ?
+                    AND PRNew.intPersonID = ?
+            ];
+            my $q = $self->{'Data'}->{'db'}->prepare($stLoan) or query_error($stLoan);
+            $q->execute(
+                $self->{'RunParams'}{'rtargetid'},
+                $regoID,
+                $personID
+            );
+        }
+
         if ($regoID && ($self->{'RunParams'}{'rtargetid'} or $self->{'RunParams'}{'oldlevel'}))   {
             my $stChange = qq[
                 UPDATE tblPersonRegistration_$self->{'Data'}->{'Realm'}
@@ -1016,8 +1056,12 @@ sub display_products {
 
     if($regoID) {
         my $nationality = $personObj->getValue('strISONationality') || ''; 
+        my $itc = $self->getCarryFields('itc');
         $rego_ref->{'Nationality'} = $nationality;
-        $rego_ref->{'InternationalTransfer'} = 1 if $self->getCarryFields('itc');
+        $rego_ref->{'InternationalTransfer'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0;
+        $rego_ref->{'InternationalLoan'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0;
+
+
 	$rego_ref->{'payMethod'} = $self->{'RunParams'}{'payMethod'} || '';
         $content = displayRegoFlowProducts(
             $self->{'Data'}, 
@@ -1139,7 +1183,11 @@ sub process_products {
         $self->setCurrentProcessIndex('p');
         return ('',2);
     }
-    $rego_ref->{'InternationalTransfer'} = 1 if $self->getCarryFields('itc');
+    my $itc = $self->getCarryFields('itc');
+    $rego_ref->{'InternationalTransfer'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0;
+    $rego_ref->{'InternationalLoan'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0;
+
+
     my ($txnIds, $amount) = save_rego_products($self->{'Data'}, $regoID, $personID, $entityID, $entityLevel, $rego_ref, $self->{'RunParams'});
 
 ####
@@ -1196,7 +1244,8 @@ sub display_documents {
         #my $itc = $personObj->getValue('intInternationalTransfer') || '';
         my $itc = $self->getCarryFields('itc') || 0;
         $rego_ref->{'Nationality'} = $nationality;
-        $rego_ref->{'InternationalTransfer'} = $itc;
+        $rego_ref->{'InternationalTransfer'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0;
+        $rego_ref->{'InternationalLoan'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0;
 
      if (! $regoID or ! $personID)  {
         my $lang = $self->{'Data'}{'lang'};
@@ -1273,7 +1322,10 @@ sub process_documents {
         #my $itc = $personObj->getValue('intInternationalTransfer') || '';
 	my $itc = $self->{'RunParams'}{'itc'} || 0;
         $rego_ref->{'Nationality'} = $nationality;
-        $rego_ref->{'InternationalTransfer'} = $itc;
+        $rego_ref->{'InternationalTransfer'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0;
+        $rego_ref->{'InternationalLoan'} = ($itc and $self->getCarryFields('preqtype') eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0;
+
+
     }
 
      if (! $regoID or ! $personID)  {
@@ -1585,6 +1637,13 @@ sub loadObjectValues    {
             intNatCustomLU10
 
             intInternationalTransfer
+            strInternationalTransferSourceClub
+            dtInternationalTransferDate
+            strInternationalTransferTMSRef
+            strInternationalLoanSourceClub
+            strInternationalLoanTMSRef
+            dtInternationalLoanFromDate
+            dtInternationalLoanToDate
 
 strLocalTitle
 strPreferredName

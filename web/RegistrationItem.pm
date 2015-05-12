@@ -40,7 +40,7 @@ sub getRegistrationItems    {
     $ruleFor ||= '';
     $entityLevel ||= 0; # used for Products
     $multiPersonType ||= ''; ## For products, are multi regos used    
-    my $itc = $Rego_ref->{'InternationalTransfer'} || 0;
+    my $itc = $Rego_ref->{'InternationalTransfer'} || $Rego_ref->{'InternationalLoan'} || 0;
 
     return 0 if (! $itemType);
     my $ActiveFilter_ref='';
@@ -66,7 +66,15 @@ sub getRegistrationItems    {
             $ActiveProductsFilter_ref = registrationItemActiveProducts($Data, $Rego_ref->{'intPersonID'}, $regNature2, $personType);
         }
     }
-    
+    $sysConfigCheck = "RegistrationItems_DomesticLoanUsesNew";
+    if ($itemType eq 'PRODUCT' and $regNature eq "DOMESTIC_LOAN" and $Data->{'SystemConfig'}{"RegistrationItems_DomesticLoanUsesNew"} == 1)  {
+        $regNature2 = 'NEW';
+        my $sysConfigActiveProductsFilter = 'ACTIVEPRODUCTS_' . $itemType . '_DOMESTIC_LOAN_' . $personType;
+        if ($Data->{'SystemConfig'}{$sysConfigActiveProductsFilter} && $Rego_ref->{'intPersonID'})    {
+            $ActiveProductsFilter_ref = registrationItemActiveProducts($Data, $Rego_ref->{'intPersonID'}, $regNature2, $personType);
+        }
+    }
+     
 print STDERR "D: $regNature | $regNature2\n";
 
     my $locale = $Data->{'lang'}->getLocale();
@@ -122,6 +130,8 @@ strItemType
         AND (RI.strISOCountry_NOTIN ='' OR RI.strISOCountry_NOTIN IS NULL OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))        
         AND (RI.intFilterFromAge = 0 OR RI.intFilterFromAge <= ?)
         AND (RI.intFilterToAge = 0 OR RI.intFilterToAge >= ?)
+        AND (RI.intItemForInternationalTransfer = 0 OR RI.intItemForInternationalTransfer = ?)
+        AND (RI.intItemForInternationalLoan = 0 OR RI.intItemForInternationalLoan = ?)
 	AND (RI.intItemUsingITCFilter =0
                 OR (RI.intItemUsingITCFilter = 1 AND RI.intItemNeededITC = ?)
             )
@@ -148,6 +158,8 @@ strItemType
 	        $Rego_ref->{'Nationality'} || '',
 	        $Rego_ref->{'currentAge'} || 0,
 	        $Rego_ref->{'currentAge'} || 0,
+            $Rego_ref->{'InternationalTransfer'} || 0,
+            $Rego_ref->{'InternationalLoan'} || 0,
 		    $itc
 		) or query_error($st); 
 
@@ -173,7 +185,7 @@ strItemType
         next if($itemType eq 'DOCUMENT' and $documentFor and ($documentFor ne $dref->{'strDocumentFor'}));
 
         #check if International Transfer
-        next if($dref->{'strDocumentFor'} eq 'TRANSFERITC' and !$Rego_ref->{'InternationalTransfer'});
+        #next if($dref->{'strDocumentFor'} eq 'TRANSFERITC' and !$Rego_ref->{'InternationalTransfer'});
 
         ## Lets see if the person was active in the appropriate periods
         if ($itemType eq 'PRODUCT' && $Data->{'SystemConfig'}{$sysConfigActiveFilter} && $dref->{'intItemUsingActiveFilter'})    {

@@ -395,7 +395,6 @@ sub getFieldsList	{
         intOtherPersonIdentifierTypeID
         intMinorProtection
 
-
         strNatCustomStr1
         strNatCustomStr2
         strNatCustomStr3
@@ -441,6 +440,15 @@ sub getFieldsList	{
         intNatCustomBool3
         intNatCustomBool4
         intNatCustomBool5
+
+        strInternationalTransferSourceClub
+        dtInternationalTransferDate
+        strInternationalTransferTMSRef
+        strInternationalLoanSourceClub
+        strInternationalLoanTMSRef
+        dtInternationalLoanFromDate
+        dtInternationalLoanToDate
+
         ));
     return \@memberFields if $fieldtype eq 'Person';
 
