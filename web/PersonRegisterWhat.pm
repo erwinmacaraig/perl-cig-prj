@@ -303,10 +303,10 @@ sub optionsPersonRegisterWhat {
         $regWindowFieldValues{'strWFRuleFor'} = 'REGO';
     }
 
-    #if($registrationNature) {
-    #    push @regWindowFields, 'strRegistrationNature';
-    #    $regWindowFieldValues{'strRegistrationNature'} = $registrationNature;
-    #}
+    if($registrationNature) {
+        push @regWindowFields, 'strRegistrationNature';
+        $regWindowFieldValues{'strRegistrationNature'} = $registrationNature;
+    }
 
     if($step > 2) {# and defined $sport)  {
         push @MATRIXvalues, $sport;
