@@ -40,9 +40,9 @@ sub main	{
     my $etype = param('etype') || '';
 
     $registrationNature = 'TRANSFER' if ($defaultNature eq 'TRANSFER');
-    $registrationNature = 'RENEWAL' if ($defaultNature eq 'RENEWAL');
+    $registrationNature = 'RENEWAL' if ($defaultNature eq 'RENEWAL' or $bulk);
     $registrationNature = $defaultNature if ($defaultNature eq $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN or $defaultNature eq $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN);
-    $registrationNature = 'NEW' if (!$defaultNature);
+    $registrationNature = 'NEW' if (!$defaultNature and ! $bulk);
 
     my %Data=();
     my $target='aj_person_registerwhat.cgi';

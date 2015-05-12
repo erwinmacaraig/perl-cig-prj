@@ -609,6 +609,7 @@ sub optionsPersonRegisterWhat {
                 $NATUREwhere
             GROUP BY $lookingForField
         ];
+
         @values = @MATRIXvalues;
     }
     
@@ -792,6 +793,8 @@ sub getPersonLevelFromMatrix {
     my $systemConfig = getSystemConfig($Data);
     my $bulkWHERE='';
     my $defaultWHERE = '';
+
+    $bulkWHERE = qq[ AND strWFRuleFor='BULKREGO'] if ($bulk);
     $defaultWHERE = qq[ AND strPersonLevel = '$defaultLevel'] if (defined $defaultLevel and $defaultLevel and $defaultLevel ne '');
     my $st = qq[
         SELECT DISTINCT strPersonLevel, COUNT(intMatrixID) as CountNum
@@ -806,7 +809,6 @@ sub getPersonLevelFromMatrix {
             $where
         GROUP BY strPersonLevel
     ];
-
 
     my $query = $Data->{'db'}->prepare($st);
     $query->execute(@{$values_ref});
