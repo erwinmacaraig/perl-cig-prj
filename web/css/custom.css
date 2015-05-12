@@ -429,6 +429,9 @@ th {
   }
 }
 @media only screen and (max-width:610px){
+  .logo-area{
+    display: none;
+  }
   .membership-login header .logo-area h1{
       position: relative;
       top: auto;
@@ -562,13 +565,13 @@ th {
   .res-table {
     width: inherit!important;
   }
-  a.paginate_button.previous, a.paginate_button.next, a.paginate_button{
+  /*a.paginate_button.previous, a.paginate_button.next, a.paginate_button{
     background-color: rgb(0, 78, 126);
     margin: 4px;
     padding: 18px;
     border-radius: 11px;
     color: white;
-  }
+  }*/
 }
 @media only screen and (max-width:450px){
   header nav.navbar-default .navbar-nav > li > a {
