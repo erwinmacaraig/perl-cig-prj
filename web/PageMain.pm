@@ -287,6 +287,8 @@ sub pageMain {
         BottomJSFiles => $Data->{'AddToPage'}->get('js_bottom','file') || '',
         BottomJSInline => $Data->{'AddToPage'}->get('js_bottom','inline') || '',
         DisableResponsiveLayout => $Defs::DisableResponsiveLayout || 0,
+        HeaderLogo => $Data->{'SystemConfig'}{'MA_logo'},
+        HeaderSystemName => $Data->{'SystemConfig'}{'HeaderSystemName'},
         #FullScreen => $Data->{'FullScreen'} || 0,
     );
 
