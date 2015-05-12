@@ -523,6 +523,9 @@ th {
   .chosen-container{
     width: 100%!important;
   }
+  .dateselection-group .chosen-container{
+    width: auto !important;
+  }
 }
 @media only screen and (max-width:766px){
   form#searchForm .btn-inside-panels,
