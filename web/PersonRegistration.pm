@@ -643,6 +643,11 @@ sub getRegistrationData	{
     my $st= qq[
         SELECT 
             pr.*, 
+            prq.intPersonRequestID,
+            prq.dtLoanFrom,
+            prq.dtLoanTo,
+            prq.strRequestNotes,
+            eprq.strLocalName as requestToEntityName,
 			np.strNationalPeriodName,
 			np.dtFrom as npdtFrom,
 			np.dtTo as npdtTo,
@@ -692,6 +697,13 @@ sub getRegistrationData	{
             INNER JOIN tblPerson as p ON (
                 p.intPersonID = pr.intPersonID
             )	
+            LEFT JOIN tblPersonRequest prq ON (
+                prq.intPersonRequestID = pr.intPersonRequestID
+            )
+            LEFT JOIN tblEntity eprq ON (
+                eprq.intEntityID = prq.intRequestToEntityID
+            )
+
 			
         WHERE     
             p.intPersonID = ?
