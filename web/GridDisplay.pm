@@ -342,6 +342,7 @@ sub showGrid {
 	my $groupby_collection_name  = $params{'groupby_collection_name'}  || 'items';
 	#
 	my $sortColumn				 = $params{'sortColumn'} || [];
+	my $instanceDestroy			 = $params{'instanceDestroy'} || 'false';
 	#
 	my $display_pager            = exists $params{'display_pager'} 
 		? $params{'display_pager'} 
@@ -440,6 +441,7 @@ sub showGrid {
 	my ($columndefs , $headerInfo) = processFieldHeaders($columninfo);
     $gridConfig{'columns'} = $columndefs;
 	$gridConfig{'order'} =  $sortColumn;
+	$gridConfig{'destroy'} = $instanceDestroy;
 	my $config_str = to_json(\%gridConfig);
 	$config_str =~s/"(false|true)"/$1/g;
     my $js = qq[

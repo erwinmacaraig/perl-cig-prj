@@ -171,7 +171,7 @@ sub bulkPersonRollover {
         },
 
     );
-    my $grid = showGrid(Data=>$Data, columns=>\@headers, rowdata=>\@rowdata, gridid=>'grid', width=>'100%', height=>700);
+    my $grid = showGrid(Data=>$Data, columns=>\@headers, rowdata=>\@rowdata, gridid=>'grid', width=>'100%', height=>700, instanceDestroy=>'true');
 
     my $lang = $Data->{'lang'};
 
