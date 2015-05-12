@@ -129,7 +129,7 @@ sub setupValues    {
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my %regFilter = (
         'entityID' => $entityID,
-        'requestID' => $self->{'RunParams'}{'rid'},
+        'requestID' => $self->{'RunParams'}{'prid'},
     );
 
     my $request = getRequests($self->{'Data'}, \%regFilter);
@@ -137,9 +137,11 @@ sub setupValues    {
     $self->{'RunParams'}{'nat'} = $self->getCarryFields('dnat');
     $self->{'RunParams'}{'dnat'} = $self->getCarryFields('dnat');
     $self->{'RunParams'}{'dsport'} = $request->{'strSport'};
+    $self->{'RunParams'}{'dlevel'} = $request->{'strNewPersonLevel'};
     $self->addCarryField('dtype', $request->{'strPersonType'});
     $self->addCarryField('dsport', $request->{'strSport'});
     $self->addCarryField('dage', $request->{'personCurrentAgeLevel'});
+    $self->addCarryField('dlevel', $request->{'strNewPersonLevel'});
 
     $self->{'FieldSets'} = personFieldsSetup($self->{'Data'}, $values);
 }

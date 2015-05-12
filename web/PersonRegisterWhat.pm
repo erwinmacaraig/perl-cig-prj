@@ -303,10 +303,10 @@ sub optionsPersonRegisterWhat {
         $regWindowFieldValues{'strWFRuleFor'} = 'REGO';
     }
 
-    if($registrationNature) {
-        push @regWindowFields, 'strRegistrationNature';
-        $regWindowFieldValues{'strRegistrationNature'} = $registrationNature;
-    }
+    #if($registrationNature) {
+    #    push @regWindowFields, 'strRegistrationNature';
+    #    $regWindowFieldValues{'strRegistrationNature'} = $registrationNature;
+    #}
 
     if($step > 2) {# and defined $sport)  {
         push @MATRIXvalues, $sport;
@@ -384,9 +384,9 @@ sub optionsPersonRegisterWhat {
         return (\@retdata, '');
     }
 
-    if(!checkPersonRegistrationWindow($Data, \@regWindowFields, \%regWindowFieldValues)) {
-        return (\@retdata, $Data->{'lang'}->txt('This type of registration is not within the window.'));
-    }
+    #if(!checkPersonRegistrationWindow($Data, \@regWindowFields, \%regWindowFieldValues)) {
+    #    return (\@retdata, $Data->{'lang'}->txt('This type of registration is not within the window.'));
+    #}
 
     ### ALL OK, LETS RETURN NEXT SET OF SELECTIONS
     if ($lookingForField eq 'strPersonEntityRole')  {
