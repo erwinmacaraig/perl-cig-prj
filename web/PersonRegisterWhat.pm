@@ -384,9 +384,9 @@ sub optionsPersonRegisterWhat {
         return (\@retdata, '');
     }
 
-    if(!checkPersonRegistrationWindow($Data, \@regWindowFields, \%regWindowFieldValues)) {
-        return (\@retdata, $Data->{'lang'}->txt('This type of registration is not within the window.'));
-    }
+    #if(!checkPersonRegistrationWindow($Data, \@regWindowFields, \%regWindowFieldValues)) {
+    #    return (\@retdata, $Data->{'lang'}->txt('This type of registration is not within the window.'));
+    #}
 
     ### ALL OK, LETS RETURN NEXT SET OF SELECTIONS
     if ($lookingForField eq 'strPersonEntityRole')  {
