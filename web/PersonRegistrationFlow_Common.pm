@@ -799,29 +799,33 @@ sub checkUploadedRegoDocuments {
 	
     return ('',1) if(!$total); # no required documents
 
-     $query = qq[SELECT distinct(strDocumentName) FROM tblDocuments INNER JOIN tblDocumentType
+     $query = qq[SELECT distinct(strDocumentName),tblDocumentType.intDocumentTypeID as ID FROM tblDocuments INNER JOIN tblDocumentType
                                         ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
                                         INNER JOIN tblRegistrationItem ON tblRegistrationItem.intID = tblDocumentType.intDocumentTypeID WHERE
                                         tblDocuments.intPersonID = ? AND tblDocuments.intPersonRegistrationID = ? AND tblRegistrationItem.intRequired = 1 AND tblRegistrationItem.intRealmID=? AND tblRegistrationItem.strItemType='DOCUMENT'];
-    
-#print FH "\nGetting Uploaded Documents: \n $query \n personID = $personID, regoID = $regoID\n";
+
    my @uploaded_docs = ();
+   my %uploaded_docs_hash = ();
     $sth = $Data->{'db'}->prepare($query);
     $sth->execute($personID, $regoID, $Data->{'Realm'});
 	
 	while(my $dref = $sth->fetchrow_hashref()){
-		push @uploaded_docs,$dref->{'strDocumentName'};
+		#push @uploaded_docs,$dref->{'strDocumentName'};
+		$uploaded_docs_hash{$dref->{'ID'}} = $dref->{'strDocumentName'};		
 	}   
     
 	my @diff=();
-	
-
 	#check for document not uploaded
-	foreach my $rdc (@required){		
-		if(!grep /\Q$rdc->{'Name'}\E/,@uploaded_docs){
-			push @diff,$rdc->{'Name'};
+	foreach my $rdc (@required){
+		if(!exists $uploaded_docs_hash{$rdc->{'ID'}}){
+			push @diff, $rdc->{'Name'};
 		}
 	}
+	#foreach my $rdc (@required){		
+	#	if(!grep /\Q$rdc->{'Name'}\E/,@uploaded_docs){
+	#		push @diff,$rdc->{'Name'};
+	#	}
+	#}
 	
 	my $error_message = '<p><br /><ul>';
 	foreach my $d (@diff){		
