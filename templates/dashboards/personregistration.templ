@@ -109,6 +109,13 @@
                                 </span>
                             [% END %]
 
+                            [% IF entity.registrationNature == 'DOMESTIC_LOAN' %]
+                                <span class="details-row">
+                                    <span class="details-left">[% Lang.txt('Lending Club') %]:</span>
+                                    <span class="details-left detail-value">[% Lang.txt(entity.requestToEntityName) %]</span>
+                                </span>
+                            [% END %]
+
                             [% IF entity.Status %]
                                 <span class="details-row">
                                     <span class="details-left">[% Lang.txt('Status') %]:</span>
@@ -154,14 +161,26 @@
                             [% IF entity.npdtFrom and entity.npdtFrom != '0000-00-00' %]
                                 <span class="details-row">
                                     <span class="details-left">[% Lang.txt('Valid From') %]:</span>
-                                    <span class="details-left detail-value">[% DateFormat.format(entity.npdtFrom,'MEDIUM') %]</span>
+                                    <span class="details-left detail-value">
+                                    [% IF entity.registrationNature == 'DOMESTIC_LOAN' %]
+                                        [% DateFormat.format(entity.dtFrom,'MEDIUM') %]
+                                    [% ELSE %]
+                                        [% DateFormat.format(entity.npdtFrom,'MEDIUM') %]
+                                    [% END %]
+                                    </span>
                                 </span>
                             [% END %]
 
                             [% IF entity.npdtTo and entity.npdtTo != '0000-00-00' %]
                                 <span class="details-row">
                                     <span class="details-left">[% Lang.txt('Valid To') %]:</span>
-                                    <span class="details-left detail-value">[% DateFormat.format(entity.npdtTo,'MEDIUM') %]</span>
+                                    <span class="details-left detail-value">
+                                    [% IF entity.registrationNature == 'DOMESTIC_LOAN' %]
+                                        [% DateFormat.format(entity.dtTo,'MEDIUM') %]
+                                    [% ELSE %]
+                                        [% DateFormat.format(entity.npdtTo,'MEDIUM') %]
+                                    [% END %]
+                                    </span>
                                 </span>
                             [% END %]
 
