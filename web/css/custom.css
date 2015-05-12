@@ -387,7 +387,7 @@ th {
    color: white; 
 }
 /*read-only bold values*/
-.fieldSectionGroupWrapper fieldset div.col-md-6 {
+.fieldSectionGroupWrapper-DisplayOnly fieldset div.col-md-6 {
   font-weight: bold;
 }
 /*spinner function class*/
