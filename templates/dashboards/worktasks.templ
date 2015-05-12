@@ -151,6 +151,12 @@
                             [% IF task.changeLevelDescription %]
                                 <br/>[% task.changeLevelDescription %]
                             [% END %]
+                            [% IF task.InternationalTransferDescription AND task.NewBaseRecord %]
+                                <br/>[% task.InternationalTransferDescription %]
+                            [% END %]
+                            [% IF task.InternationalLoanDescription AND task.NewBaseRecord %]
+                                <br/>[% task.InternationalLoanDescription %]
+                            [% END %]
                             </div>
                         </td>
                     [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'ENTITY' %]
