@@ -624,7 +624,7 @@ print STDERR "ENTITY IS $entityID\n";
         if(!$existingReg or $changeExistingReg)   {
             $self->addCarryField('rID',$regoID);
             $self->addCarryField('pType',$personType);
-            $self->addCarryField('d_nature',$registrationNature);
+            #$self->addCarryField('d_nature',$registrationNature); 
         }
     }
 
@@ -841,6 +841,7 @@ sub display_products {
     if ($self->{'SystemConfig'}{'AllowTXNs_Manual_roleFlow'}) {
         $content = $pay_body . $content;
     }
+	$content = $pay_body . $content;
 
 
     my %PageData = (
@@ -945,7 +946,8 @@ print STDERR "TXNID: $txnIds\n";
 
 sub display_documents { 
     my $self = shift;
-	
+	open FH, ">test.txt";
+	print FH "\n\n Run Params: \n" . Dumper($self->{'RunParams'});
     my $personID = $self->ID();
     if(!doesSelfUserHaveAccess($self->{'Data'}, $personID, $self->{'UserID'})) {
         return ('Invalid User',0);
@@ -1001,6 +1003,16 @@ sub display_documents {
         #    $self->incrementCurrentProcessIndex();
         #    return ('',2);
         #}
+		
+		print FH " 
+				$regoID, 
+                $entityLevel, 
+            	$originLevel,             
+            $entityID, 
+            $personID, 
+		   \n"; 
+			print FH Dumper($rego_ref);
+		
 
 	
 	my %PageData = (
@@ -1025,6 +1037,7 @@ sub display_documents {
 sub process_documents { 
     my $self = shift;
     
+
     my $personID = $self->ID();
     if(!doesSelfUserHaveAccess($self->{'Data'}, $personID, $self->{'UserID'})) {
         return ('Invalid User',0);

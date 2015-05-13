@@ -162,7 +162,7 @@ strItemType
             $Rego_ref->{'InternationalLoan'} || 0,
 		    $itc
 		) or query_error($st); 
-
+	
     my @values = (); 
     push @values, $Data->{'Realm'};  
     push @values,$Data->{'RealmSubType'}; 

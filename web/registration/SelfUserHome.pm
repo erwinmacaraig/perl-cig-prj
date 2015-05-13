@@ -57,9 +57,29 @@ sub getSelfRegoTransactionHistory{
 	my ($Data, $previousRegos) = @_; 
 	my $txns = '';
 	my %transactions = ();
-	my $sth;
+	my $sth; open FH, ">test.txt";
 	foreach my $personIdKeyArr (keys %{$previousRegos}){ 
 		foreach my $regoDetail (@{$previousRegos->{$personIdKeyArr}}){
+			print FHx "\n SELECT
+            T.intQty,
+            T.curAmount,
+            P.strName as ProductName,
+            P.strDisplayName as ProductDisplayName,
+            P.strProductType as ProductType,
+            T.intStatus,
+            T.intTransactionID,
+            TL.intPaymentType,
+			I.strInvoiceNumber
+        FROM
+            tblTransactions as T
+            INNER JOIN tblProducts as P ON (P.intProductID=T.intProductID)
+			INNER JOIN tblInvoice as I ON (T.intInvoiceID = I.intInvoiceID)
+            LEFT JOIN tblTransLog as TL ON (TL.intLogID=T.intTransLogID)
+        WHERE
+            #T.intID = ? AND
+             T.intTableType = $Defs::LEVEL_PERSON
+            AND T.intPersonRegistrationID = $regoDetail->{'intPersonRegistrationID'}";
+
 			my $query = qq[ SELECT
             T.intQty,
             T.curAmount,
@@ -76,11 +96,11 @@ sub getSelfRegoTransactionHistory{
 			INNER JOIN tblInvoice as I ON (T.intInvoiceID = I.intInvoiceID)
             LEFT JOIN tblTransLog as TL ON (TL.intLogID=T.intTransLogID)
         WHERE
-            T.intID = ?
-            AND T.intTableType = $Defs::LEVEL_PERSON
+            #T.intID = ? AND
+             T.intTableType = $Defs::LEVEL_PERSON
             AND T.intPersonRegistrationID = ?];			
 			$sth = $Data->{'db'}->prepare($query);
-			$sth->execute($personIdKeyArr, $regoDetail->{'intPersonRegistrationID'});
+			$sth->execute($regoDetail->{'intPersonRegistrationID'}); #$personIdKeyArr, 
 			while(my $dref = $sth->fetchrow_hashref()){
 				push @{$transactions{'txn'}},{
 					TransactionNumber => $dref->{'intTransactionID'},
@@ -97,6 +117,8 @@ sub getSelfRegoTransactionHistory{
 
 		}
 	}
+	
+	#print FH Dumper(%transations);
 	$transactions{'CurrencySymbol'} = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
 	$txns = runTemplate(
 				$Data,
