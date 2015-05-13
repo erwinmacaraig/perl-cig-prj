@@ -759,26 +759,7 @@ sub process_registration {
         if($changeExistingReg)    {
             $self->deleteExistingReg($existingReg, $personID);
         }
-        if(!$existingReg or $changeExistingReg)    {
-            ($regoID, undef, $msg) = add_rego_record(
-                $self->{'Data'}, 
-                $personID, 
-                $entityID, 
-                $entityLevel, 
-                $originLevel, 
-                $personType, 
-                $personEntityRole, 
-                $personLevel, 
-                $sport, 
-                $ageLevel, 
-                $registrationNature,
-                undef,
-                undef,
-                $personRequestID,
-                $MAComment,
-            );
-        }
-        ## CHECKING REGO OK
+       ## CHECKING REGO OK
         {
             my (undef, $errorMsgRego) = PersonRegisterWhat::optionsPersonRegisterWhat(
                 $self->{'Data'},
@@ -808,7 +789,26 @@ sub process_registration {
                 return ('',2);
             }
         }
-
+        if(!$existingReg or $changeExistingReg)    {
+            ($regoID, undef, $msg) = add_rego_record(
+                $self->{'Data'}, 
+                $personID, 
+                $entityID, 
+                $entityLevel, 
+                $originLevel, 
+                $personType, 
+                $personEntityRole, 
+                $personLevel, 
+                $sport, 
+                $ageLevel, 
+                $registrationNature,
+                undef,
+                undef,
+                $personRequestID,
+                $MAComment,
+            );
+        }
+ 
         if($changeExistingReg)  {
             $self->moveDocuments($existingReg, $regoID, $personID);
         }
