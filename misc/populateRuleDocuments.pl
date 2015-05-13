@@ -22,12 +22,14 @@ sub main	{
 
 
     my $personType = $ARGV[0] || '';
+    my $registrationNature = $ARGV[1] || '';
 
     print "Invalid parameter.\n" if !$personType or !$Defs::personType{$personType};
     return if !$personType or !$Defs::personType{$personType};
 
+    my $regNatureCond = qq [ AND strRegistrationNature = '$registrationNature' ] if $registrationNature;
     my $sti = qq [
-        SELECT distinct intID from tblRegistrationItem where strPersonType = '$personType' and strItemType = 'DOCUMENT'
+        SELECT distinct intID from tblRegistrationItem where strPersonType = '$personType' $regNatureCond and strItemType = 'DOCUMENT'
     ];
 
     my $q = $db->prepare($sti);
@@ -38,7 +40,7 @@ sub main	{
     }
 
     my $st = qq[
-        SELECT intWFRuleID from tblWFRule where strPersonType = '$personType'
+        SELECT intWFRuleID from tblWFRule where strPersonType = '$personType' $regNatureCond
     ];
 
     $q = $db->prepare($st);
