@@ -24,9 +24,7 @@ require Exporter;
     deleteRegoTransactions
     checkRulePaymentFlagActions
     getRegistrationWorkTasks
-    displayGenericError
     updateTaskNotes
-    redirectTemplate
     updateTaskScreen
     getInitialTaskAssignee
 );
@@ -732,7 +730,8 @@ sub listTasks {
                 TaskStatusLabel => $taskStatusLabel,
                 viewURL => $viewURL,
                 showView => 1,
-                taskDate => $request->{'dtDateRequest'},
+                taskDate => $Data->{'l10n'}{'date'}->TZformat($request->{dtDateRequest},'MEDIUM'),
+                taskDate_RAW => $request->{dtDateRequest},
                 requestFrom => $request->{'requestFrom'},
                 requestTo => $request->{'requestTo'},
                 taskTimeStamp => $request->{'prRequestUpdateTimeStamp'},
@@ -2812,8 +2811,8 @@ sub populateRegoViewData {
             Gender => $Data->{'lang'}->txt($Defs::genderInfo{$dref->{'PersonGender'} || 0}) || '',
             DOB => $dref->{'dtDOB'} || '',
             LocalName => $LocalName,
-            LatinName => "$dref->{'strLatinFirstname'} $dref->{'strLatinMiddleName'} $dref->{'strLatinSurname'}" || '',
-            Address => "$dref->{'strAddress1'} $dref->{'strAddress2'} $dref->{'strAddress2'} $dref->{'strSuburb'} $dref->{'strState'} $dref->{'strPostalCode'}" || '',
+            LatinName => join(' ',[$dref->{'strLatinFirstname'} || '', $dref->{'strLatinMiddleName'} || '', $dref->{'strLatinSurname'} || '']),
+            Address => join(' ',[$dref->{'strAddress1'}||'',$dref->{'strAddress2'}||'',$dref->{'strSuburb'}||'',$dref->{'strState'}||'',$dref->{'strPostalCode'} || '']),
             Nationality => $isocountries->{$dref->{'strISONationality'}} || '',
             DateSuspendedUntil => '',
             LastUpdate => '',
