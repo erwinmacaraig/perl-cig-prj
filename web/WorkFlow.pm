@@ -24,9 +24,7 @@ require Exporter;
     deleteRegoTransactions
     checkRulePaymentFlagActions
     getRegistrationWorkTasks
-    displayGenericError
     updateTaskNotes
-    redirectTemplate
     updateTaskScreen
     getInitialTaskAssignee
 );
@@ -2812,8 +2810,8 @@ sub populateRegoViewData {
             Gender => $Data->{'lang'}->txt($Defs::genderInfo{$dref->{'PersonGender'} || 0}) || '',
             DOB => $dref->{'dtDOB'} || '',
             LocalName => $LocalName,
-            LatinName => "$dref->{'strLatinFirstname'} $dref->{'strLatinMiddleName'} $dref->{'strLatinSurname'}" || '',
-            Address => "$dref->{'strAddress1'} $dref->{'strAddress2'} $dref->{'strAddress2'} $dref->{'strSuburb'} $dref->{'strState'} $dref->{'strPostalCode'}" || '',
+            LatinName => join(' ',[$dref->{'strLatinFirstname'} || '', $dref->{'strLatinMiddleName'} || '', $dref->{'strLatinSurname'} || '']),
+            Address => join(' ',[$dref->{'strAddress1'}||'',$dref->{'strAddress2'}||'',$dref->{'strSuburb'}||'',$dref->{'strState'}||'',$dref->{'strPostalCode'} || '']),
             Nationality => $isocountries->{$dref->{'strISONationality'}} || '',
             DateSuspendedUntil => '',
             LastUpdate => '',

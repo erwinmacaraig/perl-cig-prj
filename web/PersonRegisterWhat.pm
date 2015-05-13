@@ -156,7 +156,6 @@ sub optionsPersonRegisterWhat {
     my $pref= undef;
     $pref = loadPersonDetails($Data->{'db'}, $personID) if ($personID);
 
- my $q=new CGI;
     #$registrationNature='TRANSFER' if ($transfer==1);
 	my $bulkWHERE= qq[ AND strWFRuleFor='REGO'];
     $bulkWHERE = qq[ AND strWFRuleFor='BULKREGO'] if ($bulk);
