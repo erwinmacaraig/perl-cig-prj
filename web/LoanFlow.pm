@@ -40,7 +40,7 @@ sub handleLoanFlow {
     my $defaultType = $params{'dtype'} || '';
     my $defaultRegistrationNature = $params{'dnat'} || '';
     my $internationalLoan = $params{'ipl'} || '';
-    my $defaultRegistrationNature = ($internationalLoan == 1) ? $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN : $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN;
+    $defaultRegistrationNature = ($internationalLoan == 1) ? $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN : $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN;
     my $startingStep = $params{'ss'} || '';
 
     #specific to Transfers

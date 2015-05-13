@@ -156,7 +156,6 @@ sub setupValues    {
 
     if ($self->{'RunParams'}{'dnat'} eq 'RENEWAL')  {
         my $lang = $self->{'Data'}->{'lang'};
-        my $rawDetails;
         my ($content, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rtargetid'});
 
         if(!$content or !$rawDetails) {
