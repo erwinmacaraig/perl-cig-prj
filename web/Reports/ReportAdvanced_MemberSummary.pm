@@ -114,7 +114,7 @@ sub _getConfiguration {
         dtDOB=> ['Date of Birth',{displaytype=>'date', fieldtype=>'date', dbfield=>'tblMember.dtDOB', dbformat=>' DATE_FORMAT(tblMember.dtDOB,"%d/%m/%Y")', filteronly=>1, uusehaving => 1}],
         MemberEmail=> ['Email',{displaytype=>'date', fieldtype=>'text', dbfield=>'tblMember.strEmail', filteronly=>1, uusehaving => 1}],
         MemberPostCode=> ['Postal Code',{displaytype=>'date', fieldtype=>'text', dbfield=>'tblMember.strPostalCode', filteronly=>1, uusehaving => 1}],
-        intGender=> ['Gender',{displaytype=>'lookup', fieldtype=>'dropdown', dropdownoptions=>{''=>'&nbsp;', 1=>'Male', 2=>'Female'}, dropdownorder=>['',1,2], size=>3, multiple=>1, filteronly=>1}],
+        intGender=> ['Gender',{displaytype=>'lookup', fieldtype=>'dropdown', dropdownoptions=>{1=>'Male', 2=>'Female'}, dropdownorder=>['',1,2], size=>3, multiple=>1, filteronly=>1}],
 				intPermit => [((!$SystemConfig->{'NoClubs'} and $currentLevel > $Defs::LEVEL_CLUB)? 'On Permit' :''),{displaytype=>'lookup', fieldtype=>'dropdown', dropdownoptions=>{0=>'No', 1=>'Yes'}, dropdownorder=>[0,1], allowsort=>1, dbfield=>"MC.intPermit", dbfrom=>"LEFT JOIN tblMember_Clubs AS MC ON (tblMember.intMemberID=MC.intMemberID  AND MC.intStatus=$Defs::RECSTATUS_ACTIVE)", filteronly=>1}],
 
      dtDateCreatedOnline=> [
@@ -131,7 +131,7 @@ sub _getConfiguration {
         ## ARLD CHANGE FOR QRL - ADDED 13/06/08
         ## ACTIVATED BY ADD IN A SYSCONFIG VALUE intPrimaryClub_Filter TO MAKE IT APPEAR
         intPrimaryClub=> [$Data->{'SystemConfig'}{'intPrimaryClub_Filter'} || '',{displaytype=>'lookup', fieldtype=>'dropdown', dropdownoptions=>{1=>'Yes', 0=>'No'}, dropdownorder=>[1,0], size=>2, filteronly=>1, dbfield=>'tblMember_Clubs.intPrimaryClub', dbfrom=>" LEFT JOIN tblMember_Clubs ON (tblMember.intMemberID=tblMember_Clubs.intMemberID  AND tblMember_Clubs.intStatus=$Defs::RECSTATUS_ACTIVE ) LEFT JOIN tblClub ON (tblMember_Clubs.intClubID = tblClub.intClubID) INNER JOIN tblAssoc_Clubs ON (tblAssoc_Clubs.intAssocID=tblAssoc.intAssocID AND tblAssoc_Clubs.intClubID=tblClub.intClubID) "}],
-        intMailingList=> [($Data->{'SystemConfig'}{'SystemForEvent'} ? '' : 'Mailing List'),{displaytype=>'lookup', fieldtype=>'dropdown', dropdownoptions=>{''=>'&nbsp;', 0=>'No', 1=>'Yes'}, dropdownorder=>['',0,1], size=>3, multiple=>1, filteronly=>0, allowgrouping=>1}],
+        intMailingList=> [($Data->{'SystemConfig'}{'SystemForEvent'} ? '' : 'Mailing List'),{displaytype=>'lookup', fieldtype=>'dropdown', dropdownoptions=>{0=>'No', 1=>'Yes'}, dropdownorder=>['',0,1], size=>3, multiple=>1, filteronly=>0, allowgrouping=>1}],
         strSchoolName => [($Data->{'SystemConfig'}{'rptSchools'} or $Data->{'SystemConfig'}{'Schools'}) ? 'School Name' : '',{displaytype=>'text', fieldtype=>'text', allowsort=>1, dbfield=>'tblSchool.strName', dbfrom=>'LEFT JOIN tblSchool ON (tblMember.intSchoolID = tblSchool.intSchoolID)', allowgrouping=>1}],
         strSchoolSuburb => [($Data->{'SystemConfig'}{'rptSchools'} or $Data->{'SystemConfig'}{'Schools'}) ? 'School Suburb' : '',{displaytype=>'text', fieldtype=>'text', allowsort=>1, dbfield=>'tblSchool.strSuburb', dbfrom=>'LEFT JOIN tblSchool ON (tblMember.intSchoolID = tblSchool.intSchoolID)', allowgrouping=>1}],
 

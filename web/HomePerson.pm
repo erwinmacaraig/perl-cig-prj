@@ -288,7 +288,9 @@ sub showPersonHome	{
 
 		
 		my $renew = '';
+		my $changelevel= '';
         $rego->{'renew_link'} = '';
+        $rego->{'changelevel_link'} = '';
         #next if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}) and $Data->{'authLevel'} != $Defs::LEVEL_NATIONAL);
         ## Show MA the renew link remvoed as we need them to navigate to the club level for now
         next if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}));
@@ -304,8 +306,16 @@ sub showPersonHome	{
         next if ($rego->{'intNationalPeriodID'} == $nationalPeriodID);
         #$renew = $Data->{'target'} . "?client=$client&amp;a=PREGF_TU&amp;pt=$rego->{'strPersonType'}&amp;per=$rego->{'strPersonEntityRole'}&amp;pl=$rego->{'strPersonLevel'}&amp;sp=$rego->{'strSport'}&amp;ag=$newAgeLevel&amp;nat=RENEWAL";
         #$renew = $Data->{'target'} . "?client=$client&amp;a=PF_&amp;pID=$rego->{'intPersonID'}&amp;dnat=RENEWAL&amp;rsp=$rego->{'strSport'}&amp;rpl=$rego->{'strPersonLevel'}&amp;rper=$rego->{'strPersonEntityRole'}&amp;rag=$newAgeLevel&amp;rpt=$rego->{'strPersonType'}";
-        $renew = $Data->{'target'} . "?client=$client&amp;a=PF_&amp;pID=$rego->{'intPersonID'}&amp;dnat=RENEWAL&amp;rtargetid=$rego->{'intPersonRegistrationID'}&amp;_ss=r&amp;rfp=r";
+        $renew = $Data->{'target'} . "?client=$client&amp;a=PF_&amp;pID=$rego->{'intPersonID'}&amp;dnat=RENEWAL&amp;rtargetid=$rego->{'intPersonRegistrationID'}&amp;_ss=r&amp;rfp=r&amp;dsport=$rego->{'strSport'}&amp;dtype=$rego->{'strPersonType'}&amp;dentityrole=$rego->{'strPersonEntityRole'}&amp;nat=RENEWAL"; ## TO default the PersonLevel dlevel=$rego->{'strPersonLevel'}
+        #$renew = $Data->{'target'} . "?client=$client&amp;a=PF_&amp;pID=$rego->{'intPersonID'}&amp;dnat=RENEWAL&amp;rtargetid=$rego->{'intPersonRegistrationID'}&amp;_ss=r&amp;rfp=r&amp;dsport=$rego->{'strSport'}&amp;dtype=$rego->{'strPersonType'}&amp;dentityrole=$rego->{'strPersonEntityRole'}";
+        if ($Data->{'SystemConfig'}{'changeLevel_' . $rego->{'strPersonType'}})  {
+            #$changelevel= $Data->{'target'} . "?client=$client&amp;a=PF_&amp;pID=$rego->{'intPersonID'}&amp;dnat=RENEWAL&amp;rtargetid=$rego->{'intPersonRegistrationID'}&amp;_ss=r&amp;rfp=r&amp;dsport=$rego->{'strSport'}&amp;dtype=$rego->{'strPersonType'}&amp;dentityrole=$rego->{'strPersonEntityRole'}&amp;nat=RENEWAL";
+            $changelevel= "$Data->{'target'}?client=$client&amp;a=PF_&rfp=r&amp;_ss=r&amp;es=1&amp;dtype=$rego->{'strPersonType'}&amp;dsport=$rego->{'strSport'}&amp;dentityrole=$rego->{'strPersonEntityRole'}&nat=NEW&dnat=NEW&amp;oldlevel=$rego->{'strPersonLevel'}";
+        }
         $rego->{'renew_link'} = $renew;
+        $rego->{'changelevel_link'} = $changelevel;
+        my $pType = $Data->{'lang'}->txt($Defs::personType{$rego->{'strPersonType'}});
+        $rego->{'changelevel_button'} = $Data->{'lang'}->txt("Change $pType Level");
 
         $rego->{'Status'} = (($rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE) and $rego->{'intPaymentRequired'}) ? $Defs::personRegoStatus{$Defs::PERSONREGO_STATUS_ACTIVE_PENDING_PAYMENT} : $rego->{'Status'};
     }
@@ -359,10 +369,10 @@ sub getMemFields {
         
 		my $val = $FieldDefinitions->{'fields'}{$f}{'value'} || $personObj->getValue($f) || '';
 		if($FieldDefinitions->{'fields'}{$f}{'options'})	{
-			$val = $FieldDefinitions->{'fields'}{$f}{'options'}{$val} || $val;
+			$val = $Data->{'lang'}->txt($FieldDefinitions->{'fields'}{$f}{'options'}{$val} || $val);
 		}
 		if($FieldDefinitions->{'fields'}{$f}{'displaylookup'})	{
-			$val = $FieldDefinitions->{'fields'}{$f}{'displaylookup'}{$val} || $val;
+			$val = $Data->{'lang'}->txt($FieldDefinitions->{'fields'}{$f}{'displaylookup'}{$val} || $val);
 		}
 		push @{$fields_grouped{$group}}, [$f, $label];
 		my $string = '';
@@ -375,8 +385,8 @@ sub getMemFields {
             }
         }
 		if (($val and $val ne '00/00/0000') or ($is_header))	{
-			$string .= qq[<div class="mfloat"><span class = "details-left">$label:</span>] if !$nolabelfields{$f};
-			if(length($label) >= 46)  {
+			$string .= qq[<div class=""><span class = "details-left">$label:</span>] if !$nolabelfields{$f};
+			if(length($label) >= 100)  {
 				$string .= '<span class="detail-value"><br/>'.$val.'</span></div>';
 			}else{
 				$string .= '<span class="detail-value">'.$val.'</span></div>';

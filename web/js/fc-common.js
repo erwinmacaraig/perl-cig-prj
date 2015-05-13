@@ -133,12 +133,53 @@ function calculateProducts(){
     });
     $('.totalValue').html('$'+totalProduct.toFixed(2));
 }
+function updateRegoProductsTotal(chkb,id_cost,id_total,client){	
+	var total = parseFloat($("#"+id_total).val());
+   
+	//if( $('form#flowFormID td.col-1 input[type="checkbox"]:checked').prop("checked") == true){
+	if( $('#'+chkb).prop("checked") == true){
+		total = total + parseFloat($("#"+id_cost).val());	
+	}	
+	else {
+		total = total - parseFloat($("#"+id_cost).val());
+	}
+	
+	if(total > 0){
+		$("#payOptions").css("display","block");
+	}
+	else {
+		$("#payOptions").css("display","none");
+		total = 0;
+	}
+	//$("#totalAmountUnpaidInFlow").val(total);
+	$('#TotalAmountUnformatted').val(total);
+	$.ajax(
+		{
+			method: "POST",
+			url:"formatcurrencyamount.cgi",
+			data:"amount=" + total + "&client="+ client 			
+		}).done(
+			function(formattedamount){
+				$("#totalAmountUnpaidInFlow").html(formattedamount);
+				
+			}
+	);
+
+
+
+
+	//$("#"+id_total).html(total);
+	//total = parseFloat(total);
+	//console.log(total);
+	//alert(total);
+}
+
 
 $(document).ready(function(){
     calculateProducts();
-
-    $('form#flowFormID td.col-1 input[type="checkbox"]').click(function(){
-        calculateProducts();
+	
+    $('form#flowFormID td.col-1 input[type="checkbox"]').click(function(){        
+		
     });
 
     $("#menu li.subnav a.menutop").mouseover(function(){
@@ -196,14 +237,49 @@ $(document).ready(function(){
     $(".document-upload").insertAfter($("fieldset").first());
 
      $(document).on("change", "input.paytxn_chk", function(){
-        if(this.checked){
-          $('#payment_manual').show();
-          $('#payment_cc').show();
-        } else {
-          $('#payment_manual').hide();
-          $('#payment_cc').hide();
-        }
-     })
+		var totalamount = 0;
+		$("#l_intAmount").val('');
+		$("#block-manualpay").css('display','none');
+		var client = $('#clientstr').val();
+		//if(this.checked){
+          //$('#payment_manual').show();
+		 // } else {
+          //$('#payment_manual').hide();
+          //$('#payment_cc').hide();
+        //}
+          
+		  //check if manual pay is enabled
+			if($('#manualpayment').length || $('#payment_cc').length){
+				$('input[type="checkbox"]:checked').each(function (){
+					totalamount += parseFloat(this.value);
+					$("#block-manualpay").css('display','block');
+				});
+				$("#l_intAmount").val(totalamount.toFixed(2));
+				//
+				$.ajax(
+				{
+					method: "POST",
+					url:"formatcurrencyamount.cgi",
+					data:"amount=" + totalamount + "&client="+ client 			
+				}).done(
+					function(formattedamount){
+					$("#manualsum").html(formattedamount);				
+					}
+				);
+				//
+				console.log(totalamount);
+				if(totalamount > 0){
+					$('#payment_manual').css('display','block');
+					$('#payment_cc').show();
+				}
+				else {
+					$('#payment_manual').css('display','none');
+					$('#payment_cc').hide();
+				}
+				
+			}
+      
+     });
 
      $("#btn-manualpay").click(function() {
             if($('#paymentType').val() == '') {
@@ -256,6 +332,7 @@ $(document).ready(function(){
     jQuery("input.search").on("keypress", function(){
 		jQuery("input.search").quicksearch();
 	});
+	
 
     jQuery("input[type=checkbox]#selectall").on("click", function(){
         var targetprefix = jQuery(this).data("targetprefix");
@@ -372,7 +449,7 @@ jQuery(document).ready(function(){
         return $(window).width() < 800
     }
     // $(window).resize(function(){checkWidth()}) < 800
-    if( checkWidth() == true  || $(".res-table thead tr th").length > 10){
+    if( checkWidth() == true  || $(".res-table thead tr th").length > 20){
         /* find responsive-table and prepend a dropdown*/ 
         // get No. of columns with res-table class
         var noOfRequests = $('.res-table').length;
@@ -413,7 +490,7 @@ jQuery(document).ready(function(){
             });
              // wrap up made li's with a custom ul
             return '<div class="button-group responsiveTablesDropDown">\
-                      <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">|||</button>\
+                      <button type="button" class="btn btn-default btn-sm dropdown-toggle fa fa-caret-down fa-2x" data-toggle="dropdown"></button>\
                           <ul style="top:inherit" class="dropdown-menu res-items-group">\
                           '+ headers +'\
                           </ul>\

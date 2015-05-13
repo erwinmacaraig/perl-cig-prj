@@ -2,8 +2,8 @@ package RegoProducts;
 require Exporter;
 @ISA =  qw(Exporter);
 
-@EXPORT = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction);
-@EXPORT_OK = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction);
+@EXPORT = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction cleanRegoTransactions);
+@EXPORT_OK = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction cleanRegoTransactions);
 
 use strict;
 use lib "..","../..";
@@ -16,6 +16,7 @@ use Utils;
 use Transactions;
 use Date::Calc qw(Today Delta_YMD);
 use Data::Dumper;
+
 sub getRegoProducts {
     my (
         $Data,
@@ -26,10 +27,14 @@ sub getRegoProducts {
         $personID,
         $memdetails,
         $multipersonType,
-        $regItemRules_ref
+        $regItemRules_ref,
+        $returnItems,
+        $hideTotal
     ) = @_;
 
-    my $currencySymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
+    $returnItems ||= 0;
+    $hideTotal ||= 0;
+    my $currencySymbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
     $incExisting ||= 0; ## Set to 1 to include existing in-cart items that aren't paid for the member
 
     $multipersonType ||= ''; 
@@ -37,7 +42,7 @@ sub getRegoProducts {
 
     my $regoProducts = getAllRegoProducts($Data, $entityID, $regoID, $personID, $incExisting, $products);
 
-    my $productAttributes = Products::getFormProductAttributes($Data, 0) || {};
+    my $productAttributes = Products::getFormProductAttributes($Data, $products) || {};
 
     my $i            = 0;
     my $count        = 0;
@@ -66,7 +71,7 @@ sub getRegoProducts {
         next if $dref->{intInactive};
         my $filter_display = productAllowedThroughFilter($dref, $memdetails, $timeLocally, $productAttributes, $filter_params);      
         $anyAllowQty ||= $dref->{'intAllowQtys'} || 0;
-        my $amount = currency(getCorrectPrice($dref, $multipersonType)) || 0;
+        my $amount = getCorrectPrice($dref, $multipersonType) || 0;
         my $paid = 0;
         my $unpaid = 0;
        #next if ($paid_product{$dref->{'intProductID'}} and !$dref->{intAllowMultiPurchase});
@@ -90,7 +95,7 @@ sub getRegoProducts {
             Status => $dref->{'intStatus'},
             ProductNotes => decode_entities($dref->{'strProductNotes'}) || '',
             Mandatory => $regItemRules_ref->{$dref->{'intProductID'}}{'Required'} || $dref->{'intIsMandatory'} || 0,
-            Name => $dref->{'strName'} || '',
+            Name => $dref->{'strDisplayName'} || $dref->{'strName'} || '',
             Photo =>$photolink,
         );
         push @unpaid_items, \%itemdata if $filter_display;
@@ -100,6 +105,7 @@ sub getRegoProducts {
     }
     return '' if !$count;
 
+    return \@unpaid_items if ($returnItems);
     my $AllowedCountText = '';
     my $AllowedCount = $Data->{'SystemConfig'}{'OnlineRego_productCount'} || 0;
     my $productscount = ($AllowedCount == 1) ? 'item' : 'items';
@@ -113,10 +119,12 @@ sub getRegoProducts {
         HideGroup => $Data->{'SystemConfig'}{'regoForm_HIDE_group'} || 0,
         AllowedCountText => $AllowedCountText || '',
         UnPaidItems => \@unpaid_items,
+        HideTotal => $hideTotal,
         CurrencySymbol => $currencySymbol,
+		client => $cl,
     );
     my $pagedata = '';
-    $pagedata = runTemplate($Data, \%PageData, 'regoform/common/products.templ');
+    $pagedata = runTemplate($Data, \%PageData, 'registration/products.templ');
     return $pagedata || '';
 }
 
@@ -127,13 +135,15 @@ sub getAllRegoProducts {
     return [] if !$productID_str;
 
     my $ExistingStatus = $incExisting ? 0 : 9999; ## Obviously none will have 9999
+    my $locale = $Data->{'lang'}->getLocale();
     my $sql = qq[
         SELECT DISTINCT 
             T.intStatus,
             T.intTransactionID,
             T.curAmount as AmountCharged,
             P.intProductID,
-            P.strName,
+            COALESCE (LT.strString1,P.strName) as strName,
+            COALESCE(LT.strString2,P.strDisplayName) as strDisplayName,
             P.curDefaultAmount,
             P.intMinChangeLevel,
             P.intCreatedLevel,
@@ -165,8 +175,12 @@ sub getAllRegoProducts {
                 AND T.intProductID = P.intProductID
                 AND T.intPersonRegistrationID IN (0, ?)
                 AND T.intTXNEntityID IN (0, ?)
-                AND T.intStatus = 0     
-                AND T.intStatus=$ExistingStatus
+                AND T.intStatus IN (0, $ExistingStatus)
+            )
+            LEFT JOIN tblLocalTranslations AS LT ON (
+                LT.strType = 'PRODUCT'
+                AND LT.intID = P.intProductID
+                AND strLocale = '$locale'
             )
             LEFT JOIN tblProductPricing as PP ON (
                 PP.intProductID = P.intProductID
@@ -177,6 +191,9 @@ sub getAllRegoProducts {
             AND P.intProductID IN ($productID_str)
         ORDER BY P.strGroup, P.strName, intLevel
     ];
+    #AND T.intStatus = 0     
+    #AND T.intStatus=$ExistingStatus
+
     #print $sql;
     ## T.intStatus=999 to turn off existing for moment.
             #AND (P.intMinSellLevel <= ? or P.intMinSellLevel=0)
@@ -276,7 +293,7 @@ Please click back on your Internet browser to return to the items selection scre
 
 sub checkMandatoryProducts      {
     my ($Data, $ID, $tableType, $params) = @_;
-    return ('', 0) if (! $Data->{'SystemConfig'}{'AllowOnlineRego_mandatoryCheck'});
+    #return ('', 0) if (! $Data->{'SystemConfig'}{'AllowOnlineRego_mandatoryCheck'});
     $ID||=0;
     $tableType||=0;
 
@@ -318,7 +335,7 @@ sub checkMandatoryProducts      {
                     INNER JOIN tblProducts as P ON (P.intProductID=T.intProductID)
                 WHERE T.intID = ?
                     AND T.intTableType = ?
-                    AND (T.intTransactionID IN($trans_list) or T.intStatus=1)
+                    AND (T.intTransactionID IN($trans_list) or T.intStatus IN (1,3))
         ];
                     #AND P.intInactive=0
         my $query = $Data->{'db'}->prepare($st);
@@ -353,7 +370,8 @@ sub checkMandatoryProducts      {
 
     $products_list = join(',', map { '?' } @products_list );
 
-    my $resultHTML = qq[<p>In order to continue with your online transaction, you must select the following mandatory items</p><br>];
+    my $lang = $Data->{'lang'};
+    my $resultHTML = qq[]. $lang->txt('In order to continue, you must select the following mandatory items') . qq[<br>];
 
     my $st = qq[
         SELECT strName, strGroup
@@ -366,11 +384,10 @@ sub checkMandatoryProducts      {
     my $mand_errors = 0;
     while (my $dref = $query->fetchrow_hashref())   {
         $mand_errors ++;
-        $resultHTML .= qq[<p>* $dref->{strName}];
+        $resultHTML .= qq[* $dref->{strName}];
         $resultHTML .= qq[($dref->{strGroup})] if ($dref->{strGroup});
-        $resultHTML .= qq[</p>];
+        #$resultHTML .= qq[</p>];
     }
-    $resultHTML .= qq[<br><p>Please press the <b>back</b> button on your browser</p>];
 
     return ($resultHTML, 1) if ($mand_errors);
     return ('',0);
@@ -416,7 +433,6 @@ sub productAllowedThroughFilter {
             return 0 if $dref->{'intProductGender'} != $memdetails->{'Gender'};
         }
         
-        #print STDERR 'dref value is ' . $dref->{'strNationality_IN'};
         my @NOTIN_Countries = split(/\|/, $dref->{'strNationality_NOTIN'});
         my @IN_Countries = split(/\|/, $dref->{'strNationality_IN'}); 
         
@@ -449,6 +465,7 @@ sub productAllowedThroughFilter {
 
                 if($productAttributes->{$dref->{'intProductID'}}{$Defs::PRODUCT_DOB_MIN}
                     and $productAttributes->{$dref->{'intProductID'}}{$Defs::PRODUCT_DOB_MIN}[0] ne 'NULL' ) {
+
                     return 0 if ($dob lt $productAttributes->{$dref->{'intProductID'}}{$Defs::PRODUCT_DOB_MIN}[0]);
                 }
 
@@ -488,6 +505,28 @@ sub productAllowedThroughFilter {
     return 1;
 }
 
+sub cleanRegoTransactions	{
+
+    my($Data, $regoID, $intID, $level)=@_;
+    my $db=$Data->{'db'};
+    $intID ||= 0;
+	
+    my $st= qq[
+        DELETE FROM tblTransactions 
+        WHERE 
+            intPersonRegistrationID = ? 
+	];
+	$st.= qq[ AND intPersonRegistrationID > 0 ] if $level == $Defs::LEVEL_PERSON;
+	$st.= qq[ AND intPersonRegistrationID = 0 ] if $level == $Defs::LEVEL_CLUB;
+	$st.= qq[
+            AND intID = ? 
+            AND intStatus=0 
+    ];
+    my $q= $db->prepare($st);
+    $q->execute($regoID, $intID);
+    #Get products selected
+}
+ 	
 sub insertRegoTransaction {
     my($Data, $regoID, $intID, $params, $entityID, $entityLevel, $level, $session, $rego_products, $invoiceID)=@_;
     my $db=$Data->{'db'};
@@ -502,7 +541,10 @@ sub insertRegoTransaction {
         DELETE FROM tblTransactions 
         WHERE 
             intPersonRegistrationID = ? 
-            AND intPersonRegistrationID > 0 
+	];
+	$stTxnsClean .= qq[ AND intPersonRegistrationID > 0 ] if $level == $Defs::LEVEL_PERSON;
+	$stTxnsClean .= qq[ AND intPersonRegistrationID = 0 ] if $level == $Defs::LEVEL_CLUB;
+	$stTxnsClean .= qq[
             AND intID = ? 
             AND intStatus=0 
             AND intProductID=? 
@@ -519,7 +561,6 @@ sub insertRegoTransaction {
             tblTransactions
         WHERE
             intPersonRegistrationID = ? 
-            AND intPersonRegistrationID > 0 
             AND intID = ? 
             AND intStatus=1 
     ];
@@ -573,6 +614,7 @@ sub insertRegoTransaction {
     my %ExistingProducts=();
     if (scalar(@productsselected) or scalar(@already_in_cart_items)) {
         if (scalar(@productsselected)) {
+
             foreach my $product (@productsselected)    {
                 ## Lets get rid of duplicate products
                 $q_txnclean->execute($regoID, $intID, $product);
@@ -759,6 +801,10 @@ sub insertRegoTransaction {
   push @txns_added, @already_in_cart_items;
 #  @txns_added ||= [];
   return (\@txns_added, $total_amount);
+}
+
+sub getSelectedProducts {
+
 }
 
 1;

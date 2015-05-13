@@ -213,7 +213,7 @@ header .logo-area ul li strong {
 
 header nav {
 	background: #004e7e;
-	padding: 10px 0;
+	padding: 11px 0;
 	-webkit-box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
 	-moz-box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
 	box-shadow: 9px -5px 20px -13px rgba(0,0,0,0.75);
@@ -421,7 +421,7 @@ fieldset .txtleft {
 	font-size: 13px;
 } 
 .df_date_month, .df_date_day, .df_date_year {
-	width: 100px;
+	width: 28%;
 }
 input[type="text"] {
     border: 1px solid #cccccc;
@@ -502,13 +502,13 @@ a.btn-main, input.btn-main, button.btn-main {
 }
 a.btn-main.btn-proceed {
     padding-left:20px;
-    padding-bottom:7px;
+    position: relative;
 }
 .proceed-chevron    {
     float:right;
-    position:relative;
-    bottom:3px;
-    right:-10px;
+    position:absolute;
+    bottom:11px;
+    right:12px;
     font-weight:bold;
     margin:0 !important;
     padding:0px;
@@ -631,7 +631,7 @@ a.btn-inside-panels:hover , input.btn-inside-panels:hover, span.btn-inside-panel
 /* Table styles */
 table.table thead {
 	background: #d8d8d8;
-	border: 1px solid #ccc;
+	/*border: 1px solid #ccc;*/
 	font-size: 16px;
 }
 
@@ -852,8 +852,12 @@ table tr.new-task {
 	color: #fff;
 }
 
-.regoType_PLAYER {
+.regoType_PLAYER,
+.regoType_PLAYERFOOTBALL {
     background-color: #0784d4;
+}
+.regoType_PLAYERFUTSAL {
+    background-color: #0f5785;
 }
 .regoType_COACH {
     background-color: #1b94e2;
@@ -864,6 +868,7 @@ table tr.new-task {
 .regoType_CLUBOFFICIAL, .regoType_MAOFFICIAL, .regoType_TEAMOFFICIAL {
     background-color: #33a7f2;
 }
+div.dataTables_filter label { color: #000; }
 /*----Temporary Styles-----*/
 
 
@@ -2294,10 +2299,10 @@ header .navbar-brand {
 /*  #searchResult { width: 722px!important; }*/
   div.dashboard-tasklist table th { font-size: 12px; }
   div.dashboard-tasklist table td { font-size: 12px; }
+  #grid_wrapper #grid_filter { text-align:right;padding-right:5px;}
 }
 @media (min-width: 250px) and (max-width: 480px) {
-	.responsiveTablesDropDown button{margin-bottom: -43px!important;}
- 
+	.responsiveTablesDropDown button{margin: 6px!important;}
    table.table.tableboxheader thead tr th { font-size: 11px; }
    table.table.tableboxheader thead tr td { font-size: 11px; }
    
@@ -2331,6 +2336,7 @@ header .navbar-brand {
   div.dashboard-tasklist table td { font-size: 10px; }
 
 
+  header .logo-area { display:none; }
   header .logo-area ul li { margin: 0px 15px 0px 0px; }
   .row { margin-bottom: -18px; }
   #spmain-navbar-collapse {overflow-y: hidden; margin-bottom: 10px;}
@@ -2353,8 +2359,7 @@ header .navbar-brand {
   .dataTables_info, .dataTables_length, .order-override { display: none; }
 	div#worktasks_filter {
 	    background-color: #1870a5;
-	    margin-top: 5px;
-    	padding: 10px 0;
+    	padding: 6px 0;
 	}
 	div#worktasks_filter label input {
     padding: 5px;
@@ -2363,12 +2368,12 @@ header .navbar-brand {
 	}
 	div#grid_filter {
 	    background-color: #1870a5;
-	    padding: 16px 0;
+	    padding: 5px 0;
 	}
 	div#grid_filter label input {
     padding: 5px;
     text-align: left;
-    width: 90%;
+    max-width: 90%;
 	}
 
   .fa-user, .fa-clock-o { display: none; }
@@ -2382,12 +2387,10 @@ header .navbar-brand {
   #flowFormID table.table thead tr th { font-size: 13px; }
   #content .row { margin-left: -30px; margin-right: -30px; }
   #content .container .row .tasklist-content {
-    margin-top: -20px;
     padding-left: 0;
     padding-right: 0;
   }
   .dataTables_wrapper {
-    margin-top: -20px;
     padding-left: 0;
     padding-right: 0;
   }
@@ -2401,6 +2404,7 @@ header .navbar-brand {
     top: 10px;
     width: 65%;
     z-index: 10000;
+    font-weight:bold;
   }
   header nav.navbar-default .navbar-header .navbar-toggle {
   	z-index: 1;
@@ -2444,9 +2448,13 @@ header .navbar-brand {
   .progressFlow .col-md-2{ width: 100%; }
   h2.main-heading { font-size: 18px; margin-top: 0px; }
   table#worktasks.dataTable { margin-top: 0px !important; }
-  table#grid { margin-top: 0px !important; }}
+  table#grid { margin-top: 0px !important; }
+  div.dataTables_filter label { color: #fff; }
+  #grid_wrapper #grid_filter { text-align:right;padding-right:5px;}
+  .fieldSectionGroupWrapper-DisplayOnly label.txtright { text-align:left;}
+  #pageholder #contentholder { margin-top:0px; }
+}
   table th { font-size: 13px; }
-  div.dataTables_filter label { color: #000; }
   .sidebar-box:nth-child(0) { display: none; }
   .sidebar-box:nth-child(1) { display: none; }
   .sidebar-box:nth-child(3) { display: none; }
@@ -2474,7 +2482,8 @@ header .navbar-brand {
    }
 
    
-   .smartphoneheader img.header-logo { max-width: 125px; }
+   .smartphoneheader img.header-logo { max-width: 100px; }
+   .smartphoneheader .smartphonename { color:#fff; font-size:15px; }
    .footer-section.section { height: 20px; }
    .navbar-nav { margin-left: -1px; }
    /*.progressFlow .col-md-2.previous.step.step-3 { width: 100%; }*/
@@ -2503,3 +2512,37 @@ header .navbar-brand {
    form#searchForm .btn-inside-panels { margin-left: 0; }
    /*#fsg-core label.col-md-4 { text-align: left; }*/
 
+/*** payment ***/
+.paymentwrapper { float: left; width: 100%; padding-bottom: 5px; }
+.paymentmainwrapper { 
+    background-color: #fff;
+    float: left;
+    padding: 10px 5px 5px 10px;
+    width: 100%;
+}
+.paymentwrapperoption { float: left; padding-right: 10px; }
+.paymentwrapper label { font-size: 12px; }
+.lang-select {
+    color:#000;
+    font-size: 13px;
+}
+.lang-select select{
+    padding: 1px 5px;
+}
+.hidden-col-val {
+    display:none;
+}
+
+.report-option-button-row {
+    margin-bottom:20px;
+}
+/* Self Reg */
+.selfreg-actions a.btn-inside-panels,
+.selfreg-regwho a.btn-main,
+#selfreg-myselfoptions a.btn-main {
+    width:47%;
+    margin:4px;
+}
+
+
+#selfreg-myselfoptions { display:none; }

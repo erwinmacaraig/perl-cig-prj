@@ -7,7 +7,7 @@
 				<h4>[% result.key %]</h4>
 				<div class="read-only-text">
 				[% FOREACH sportOption IN result.value %]
-                    <input id="option_[% sportOption.id %]" name="regoselected[[% sportOption.personID %]][[% sportOption.id %]]" type="checkbox"/><label for="option_[% sportOption.id %]">[% sportOption.sportLabel %]</label>
+                    <input id="option_[% sportOption.id %]" name="regoselected[[% sportOption.personID %]][[% sportOption.id %]]" type="checkbox"/><label for="option_[% sportOption.id %]">[% Lang.txt(sportOption.sportLabel) %]</label>
                     <br/>
                 [% END %]
 				</div>
@@ -22,5 +22,5 @@
     <input type="hidden" value="[% client %]" name="client">
     <input type="hidden" value="[% request_type %]" name="request_type">
     <input type="hidden" value="[% transfer_type %]" name="transfer_type">
-    <input type="submit" name="submitb" class="btn-inside-panels" value="Send Request">   
+    <input type="submit" name="submitb" class="btn-inside-panels" value="[% Lang.txt('Send Request') %]">   
 </form>

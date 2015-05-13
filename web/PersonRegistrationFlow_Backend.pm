@@ -109,7 +109,7 @@ sub handleRegistrationFlowBackend   {
                 $error = $lang->txt("You cannot register this combination, limit exceeded");
             }
             if ($msg eq 'NEW_FAILED')   {
-                $error = $lang->txt("New failed, existing registration found.  In order to continue, a Transfer from the existing Entity must be organised.");
+                $error = $lang->txt("New failed, existing registration found. In order to continue, a Transfer from the existing Entity must be organised or select another Level");
             }
             if ($msg eq 'RENEWAL_FAILED')   {
                 $error = $lang->txt("Renewal failed, cannot find existing registration. Might have already been renewed");

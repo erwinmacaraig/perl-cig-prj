@@ -150,6 +150,7 @@ sub personFieldsSetup {
         $showITCReminder = 1;
     }
     $showITCReminder = 0 if $values->{'itc'};
+    my $minorRego = $values->{'minorRego'} || 0;
     my $minorProtectionOptions = getMinorProtectionOptions($Data,$values->{'itc'} || 0);
     my $minorProtectionExplanation= getMinorProtectionExplanation($Data,$values->{'itc'} || 0);
 
@@ -157,6 +158,7 @@ sub personFieldsSetup {
         dbh        => $Data->{'db'},
         realmID    => $Data->{'Realm'},
         subRealmID => $Data->{'RealmSubType'},
+        locale     => $Data->{'lang'}->getLocale(),
     );
 
     my @intNatCustomLU_DefsCodes = (undef, -53, -54, -55, -64, -65, -66, -67, -68,-69,-70);
@@ -199,7 +201,7 @@ sub personFieldsSetup {
                     value       => $values->{'intLocalLanguage'},
                     type        => 'lookup',
                     options     => \%languageOptions,
-                    firstoption => [ '', 'Select Language' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Language') ],
                     compulsory => 1,
                     posttext => $nonlatinscript,
                     sectionname => 'core',
@@ -270,7 +272,7 @@ sub personFieldsSetup {
                     value       => $values->{'strISONationality'} ||  $Data->{'SystemConfig'}{'DefaultNationality'} || '',
                     type        => 'lookup',
                     options     => $isocountries,
-                    firstoption => [ '', 'Select Country' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
                     compulsory => 1,
                     class       => 'chzn-select',
                     sectionname => 'core',
@@ -281,7 +283,7 @@ sub personFieldsSetup {
                     value       => $values->{'strISOCountryOfBirth'} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
                     type        => 'lookup',
                     options     => $isoHistoricalCountries,
-                    firstoption => [ '', 'Select Country' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
                     class       => 'chzn-select',
                     compulsory => 1,
                     sectionname => 'core',
@@ -311,7 +313,7 @@ sub personFieldsSetup {
                     value       => $values->{'strPreferredLang'},
                     type        => 'lookup',
                     options     => \%languageOptions,
-                    firstoption => [ '', 'Select Language' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Language') ],
                     sectionname => 'other',
                 },
                 intEthnicityID => {
@@ -337,7 +339,7 @@ sub personFieldsSetup {
                     value       => $values->{'strBirthCertCountry'},
                     type        => 'lookup',
                     options     => $isoHistoricalCountries,
-                    firstoption => [ '', 'Select Country' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
                     compulsory => 1,
                     class       => 'chzn-select',
                     sectionname => 'other',
@@ -366,7 +368,7 @@ sub personFieldsSetup {
                     displayFunctionParams=> ['MEDIUM'],
         		},
         		strBirthCertDesc => {
-        			label => $FieldLabels->{'strDescription'},
+        			label => $FieldLabels->{'strBirthCertDesc'},
       	            value => $values->{'strBirthCertDesc'},
                     type => 'textarea',
                     rows => '10',
@@ -386,7 +388,7 @@ sub personFieldsSetup {
                 	value => $values->{'strPassportNationality'},
                 	type        => 'lookup',
                     options     => $isocountries,
-                    firstoption => [ '', 'Select Country' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
                     sectionname => 'other',
                     class       => 'chzn-select',
                 },
@@ -395,7 +397,7 @@ sub personFieldsSetup {
                 	value => $values->{'strPassportIssueCountry'},
                 	type        => 'lookup',
                     options     => $isocountries,
-                    firstoption => [ '', 'Select Country' ],                	
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],                	
                     sectionname => 'other',
                     class       => 'chzn-select',
                 },
@@ -425,7 +427,7 @@ sub personFieldsSetup {
                 	value => $values->{'strOtherPersonIdentifierIssueCountry'},
                 	type        => 'lookup',
                     options     => $isocountries,
-                    firstoption => [ '', 'Select Country' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
                     sectionname => 'other',
                     class       => 'chzn-select',
                 },
@@ -452,7 +454,7 @@ sub personFieldsSetup {
                     displayFunctionParams=> ['MEDIUM'],
                 },
                 strOtherPersonIdentifierDesc => {
-                	label => $FieldLabels->{'strDescription'},
+                	label => $FieldLabels->{'strOtherPersonIdentifierDesc'},
                 	value => $values->{'strOtherPersonIdentifierDesc'},
                     type => 'textarea',
                     rows => '10',
@@ -509,7 +511,7 @@ sub personFieldsSetup {
                             <div class="col-md-12">
                                 <div class = "alert">
                                     <div><span class = "fa fa-info"></span>
-                                <p>].$Data->{'lang'}->txt(qq[If the player has been registered in another country before, you will need an ITC to continue with the registration.]).qq[  <a href = "$values->{'BaseURL'}PRA_T">].$Data->{'lang'}->txt(qq[If you have the ITC then please start the transfer process here.]).qq[  <a href = "$values->{'BaseURL'}PRA_NC">].$Data->{'lang'}->txt(qq[If you don't have an ITC you can request it here prior to the registration.]).qq[</a></p>
+                                <p>].$Data->{'lang'}->txt('If the player has been registered in another country before, you will need an ITC to continue with the registration.').qq[  <a href = "$values->{'BaseURL'}PRA_T">].$Data->{'lang'}->txt('If you have the ITC then please start the transfer process here.').qq[  <a href = "$values->{'BaseURL'}PRA_NC">].$Data->{'lang'}->txt("If you don't have an ITC you can request it here prior to the registration.").qq[</a></p>
                             </div> </div>
                             </div>
                         </div>
@@ -518,9 +520,48 @@ sub personFieldsSetup {
                     sectionname => 'core',
                     active => $showITCReminder,
                 },
- 
+                parentBlock => {
+                    label       => 'parentblock',
+                    value       => qq[<p>].$Data->{'lang'}->txt('What is your relationship to the minor you are registering?').qq[</p>],
+                    type        => 'htmlrow',
+                    sectionname => 'parent',
+                    active => $minorRego,
+                },
+                strP1FName => {
+                    label       => $FieldLabels->{'strP1FName'},
+                    value       => $values->{strP1FName},
+                    type        => 'text',
+                    size        => '30',
+                    maxsize     => '50',
+                    sectionname => 'parent',
+                    active => $minorRego,
+                },
+                strP1SName => {
+                    label       => $FieldLabels->{'strP1SName'},
+                    value       => $values->{strP1SName},
+                    type        => 'text',
+                    size        => '30',
+                    maxsize     => '50',
+                    sectionname => 'parent',
+                    active => $minorRego,
+                },
+                strGuardianRelationship => {
+                    label       => $FieldLabels->{'strGuardianRelationship'},
+                    value       => $values->{strGuardianRelationship},
+                    type        => 'lookup',
+                    options     => {'Parent'=>'Parent','Legal Guardian' => 'Legal Guardian'},
+                    firstoption => [ '', " " ],
+                    class       => 'chzn-select',
+                    sectionname => 'parent',
+                    active => $minorRego,
+                },
             },
             'order' => [qw(
+                parentBlock
+                strGuardianRelationship
+                strP1FName
+                strP1SName
+
                 strLocalSurname
                 strLocalFirstname
                 intLocalLanguage
@@ -564,9 +605,10 @@ sub personFieldsSetup {
 
             )],
             sections => [
-                [ 'core',        'Personal Details' ],
-                [ 'minor',       'FIFA Minor Protection','','dynamic-panel' ],
-                [ 'other',       'Additional Information' ],
+                [ 'parent',      'Parent/Guardian Details' ],
+                [ 'core',        $Data->{'lang'}->txt('Personal Details') ],
+                [ 'minor',       $Data->{'lang'}->txt('FIFA Minor Protection'),'','dynamic-panel' ],
+                [ 'other',       $Data->{'lang'}->txt('Additional Information') ],
             ],
             fieldtransform => {
                 textcase => {
@@ -610,7 +652,7 @@ sub personFieldsSetup {
                     value       => $values->{'strISOCountry'} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
                     type        => 'lookup',
                     options     => $isocountries,
-                    firstoption => [ '', 'Select Country' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
                     class       => 'chzn-select',
                 },
                 strPostalCode => {
@@ -638,7 +680,7 @@ sub personFieldsSetup {
 
             },
             sections => [
-                [ 'main',        'Contact Details' ],
+                [ 'main',        $Data->{'lang'}->txt('Contact Details') ],
             ],
             'order' => [qw(
                 strAddress1
@@ -850,7 +892,7 @@ sub personFieldsSetup {
                 strDescription
             )],
             sections => [
-                [ 'main',        'Add New Certification' ],
+                [ 'main',        $Data->{'lang'}->txt('Add New Certification') ],
             ],
         },
     };
@@ -869,6 +911,23 @@ sub personFieldsSetup {
             firstoption => [ '', " " ],
         };
         push @{$fieldsets->{'core'}{'order'}} , $fieldname;
+    }
+    if($Data->{'SystemConfig'}{'NatCodeField'})  {
+        my $fieldname = $Data->{'SystemConfig'}{'NatCodeField'}; 
+        $fieldsets->{'core'}{'fields'}{$fieldname}{'validate'} = 'REMOTE';
+        $fieldsets->{'core'}{'fields'}{$fieldname}{'validateData'} = {
+                url => $Defs::base_url . '/ajax/aj_validate_natcode.cgi',
+                otherfields => [
+                        'dtDOB_year',
+                        'dtDOB_mon',
+                        'dtDOB_day',
+                        'intGender',
+                ],
+                postvalues=> {
+                        'f' => $fieldname,
+                },
+
+        };
     }
 
     return $fieldsets;

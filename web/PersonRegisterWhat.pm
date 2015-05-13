@@ -35,9 +35,17 @@ sub displayPersonRegisterWhat   {
         $regoID,
         $entitySelection,
     ) = @_;
+    #$transfer ||=0;
     $bulk ||= 0;
     $entitySelection ||= 0;
+
     my $defaultType = param('dtype') || '';
+    my $defaultSport = param('dsport') || '';
+    my $defaultEntityRole= param('dentityrole') || '';
+    my $defaultNature= param('dnat') || '';
+    my $defaultLevel= param('dlevel') || '';
+
+    my $systemConfig = getSystemConfig($Data);
 
     my %templateData = (
         originLevel => $originLevel || 0,
@@ -50,20 +58,30 @@ sub displayPersonRegisterWhat   {
         realmSubTypeID => $Data->{'RealmSubType'} || 0,
         continueURL => $continueURL || '',
         dtype=> $defaultType,
+        dsport=> $defaultSport,
+        dlevel=> $defaultLevel,
+        dnat=>$defaultNature,
+        dentityrole=> $defaultEntityRole,
         existingReg => $regoID || 0,
         EntitySelection => $entitySelection || 0,
         DefaultEntity => getLastEntityID($Data->{'clientValues'}) || 0,
+        ClientID => getLastEntityID($Data->{'clientValues'}) || 0,
+        ClientLevel => getLastEntityLevel($Data->{'clientValues'}) || 0,
+        AllowMAComment => $systemConfig->{'personRegoAllowMAComment'},
     );
     if($entitySelection)    {
         $templateData{'entityID'} = 0;
     }
+            #$templateData{'transfer'} = 0;
     if($regoID) {
+		
+		
         my $ref = getRegistrationDetail($Data, $regoID) || {};
         my $existing = {};
         if($ref and $ref->[0])    {
             $existing = $ref->[0];
         }
-        my $role_ref = getEntityTypeRoles($Data, $existing->{'strSport'}, $existing->{'strPersonType'});
+        my $role_ref = getEntityTypeRoles($Data, $existing->{'strSport'}, $existing->{'strPersonType'}, $defaultEntityRole);
 
         my %existingRego = (
             etype => $existing->{'intEntityLevel'} || '',
@@ -82,9 +100,16 @@ sub displayPersonRegisterWhat   {
             ageName => $existing->{'AgeLevel'} || '',
             nature => $existing->{'strRegistrationNature'} || '',
             natureName => $existing->{'RegistrationNature'} || '',
-
+            MAComment => $existing->{'strShortNotes'} || '',
+            dnat=>$defaultNature,
         );
         $templateData{'existing'} = \%existingRego;
+    }
+    else    {
+        if ($defaultNature eq 'TRANSFER')  {
+            $templateData{'nat'} = 'TRANSFER';
+            $templateData{'dsport'} = $defaultSport;
+        }
     }
 
     my $template = "registration/what.templ";
@@ -109,8 +134,11 @@ sub optionsPersonRegisterWhat {
         $personType,
         $defaultType,
         $personEntityRole,
+        $defaultEntityRole,
         $personLevel,
+        $defaultLevel,
         $sport,
+        $defaultSport,
         $ageLevel,
         $personID,
         $entityID,
@@ -127,9 +155,11 @@ sub optionsPersonRegisterWhat {
     my $pref= undef;
     $pref = loadPersonDetails($Data->{'db'}, $personID) if ($personID);
 
-    my $bulkWHERE= qq[ AND strWFRuleFor='REGO'];
+ my $q=new CGI;
+    #$registrationNature='TRANSFER' if ($transfer==1);
+	my $bulkWHERE= qq[ AND strWFRuleFor='REGO'];
     $bulkWHERE = qq[ AND strWFRuleFor='BULKREGO'] if ($bulk);
-    my $role_ref = getEntityTypeRoles($Data, $sport, $personType);
+    my $role_ref = getEntityTypeRoles($Data, $sport, $personType, $defaultEntityRole);
     my %lfTable = (
         type => 'strPersonType',
         nature => 'strRegistrationNature',
@@ -140,7 +170,7 @@ sub optionsPersonRegisterWhat {
         etype => 'entityType',
         eId => 'entityId',
     );
-
+	
     #my %genderList = (
     #    0 => 'ALL',
     #    1 => %Defs->{$Defs::GENDER_MALE},
@@ -181,19 +211,54 @@ sub optionsPersonRegisterWhat {
         };
         return (\@retdata, '');
     }
+    #if (!$bulk and $step==6 and $pref->{'strStatus'} eq 'INPROGRESS')  {
+    #    my $label = $Data->{'lang'}->txt($lfLabelTable{$lookingFor}{'TRANSFER'});
+    #    push @retdata, {
+    #        name => $label,
+    #        value => 'TRANSFER',
+    #    };
+    #    return (\@retdata, '');
+    #}
+
     if($lookingFor eq 'etype' and $originLevel)  {
-        my $levels = _entityTypeList($Data, getID($Data->{'clientValues'}, $originLevel));
-        push @{$levels}, $originLevel;
+        my $id = getID($Data->{'clientValues'}, $originLevel);
+        $id = 0 if $originLevel == $Defs::LEVEL_PERSON;
+
+        my $levels = _entityTypeList($Data, $id);
+
+        my @MTXparams = (
+            $originLevel,
+            $realmID,
+            $subRealmID,
+            $personType
+        );
+
+        my $allowedToEntityLevel = getAllowedToEntityLevelFromMatrix($Data, \@MTXparams);
+
+        if($originLevel == $Defs::LEVEL_PERSON) {
+            push @{$levels}, $Defs::LEVEL_NATIONAL;
+        }
+        else    {
+            push @{$levels}, $originLevel;
+        }
         foreach my $l (@{$levels})  {
-            push @retdata, {
-                name => $Data->{'lang'}->txt($Data->{'LevelNames'}{$l} || $Defs::LevelNames{$l}),
-                value => $l,
-            };
+            if($l ~~ @{$allowedToEntityLevel}){
+                push @retdata, {
+                    name => $Data->{'lang'}->txt($Data->{'LevelNames'}{$l} || $Defs::LevelNames{$l}),
+                    value => $l,
+                };
+            }
         }
         return (\@retdata, '');
     }
     if($lookingFor eq 'eId' and $etype)  {
-        my $levels = _entityList($Data, $etype, getID($Data->{'clientValues'}, $originLevel));
+        my $levels = undef;
+        if($originLevel == $Defs::LEVEL_PERSON) {
+            $levels = _entityList($Data, $etype, 0, $originLevel);
+        }
+        else    {
+            $levels = _entityList($Data, $etype, getID($Data->{'clientValues'}, $originLevel), $originLevel);
+        }
         return ($levels,'');
     }
 
@@ -306,6 +371,9 @@ sub optionsPersonRegisterWhat {
             #include Gender check here (checkEntityAllowed will initially look for valid gender)
             my $entityAllowed = checkEntityAllowed($Data, $ENTITYAllowedwhere, \@ENTITYAllowedValues);
             return (undef, "Please check player's gender.") if(!$entityAllowed);
+            if ($defaultSport)  {
+                $MATRIXwhere .= " AND strSport = '$defaultSport'";
+            }
 
             #based on strDiscipline value in tblEntity, identify the list to return
             #if strDiscipline == ALL, return selected distinct strSport from tblMatrix
@@ -336,7 +404,7 @@ sub optionsPersonRegisterWhat {
             #handle for other steps (person role, level, age group)
 
             $Data->{'Realm'} = $Data->{'Realm'} || $realmID;
-            my $personLevelFromMatrix = getPersonLevelFromMatrix($Data, $MATRIXwhere, \@MATRIXvalues, $bulk, $personType, $pref);
+            my $personLevelFromMatrix = getPersonLevelFromMatrix($Data, $MATRIXwhere, \@MATRIXvalues, $bulk, $personType, $pref, $defaultLevel);
             return ($personLevelFromMatrix, '');
             #$st = qq[
             #    SELECT DISTINCT $lookingForField, COUNT(intMatrixID) as CountNum
@@ -463,6 +531,18 @@ sub optionsPersonRegisterWhat {
     }
     else    {
 
+        #my $NATUREwhere= qq[AND strRegistrationNature <> 'TRANSFER'];
+        my $NATUREwhere= qq[AND strRegistrationNature = 'NEW'];
+        if ($registrationNature eq 'TRANSFER' and $lookingForField eq 'strRegistrationNature')   {
+            $NATUREwhere= qq[AND strRegistrationNature = 'TRANSFER'];
+        }
+        if ($registrationNature eq 'RENEWAL' and $lookingForField eq 'strRegistrationNature')   {
+            $NATUREwhere= qq[AND strRegistrationNature = 'RENEWAL'];
+        }
+        if ($registrationNature eq 'NEW' and $lookingForField eq 'strRegistrationNature')   {
+            $NATUREwhere= qq[AND strRegistrationNature = 'NEW'];
+        }
+
         $st = qq[
             SELECT DISTINCT $lookingForField, COUNT(intMatrixID) as CountNum
             FROM tblMatrix
@@ -472,7 +552,7 @@ sub optionsPersonRegisterWhat {
                 AND intRealmID = ?
                 AND intSubRealmID IN (0,?)
                 $MATRIXwhere
-                AND strRegistrationNature <> 'TRANSFER'
+                $NATUREwhere
             GROUP BY $lookingForField
         ];
         @values = @MATRIXvalues;
@@ -610,7 +690,7 @@ sub getPersonTypeFromMatrix {
     my @retdata=();
     while (my $dref = $query->fetchrow_hashref())   {
         push @retdata, {
-            name => $personTypeList->{$dref->{'strPersonType'}},
+            name => $Data->{'lang'}->txt($personTypeList->{$dref->{'strPersonType'}}),
             value => $dref->{'strPersonType'},
         }
         #$values{$dref->{'strPersonType'}} = $personTypeList->{$dref->{'strPersonType'}};
@@ -653,10 +733,12 @@ sub getAgeLevelFromMatrix {
 }
 
 sub getPersonLevelFromMatrix {
-    my($Data, $where, $values_ref, $bulk, $personType, $pref) = @_;
+    my($Data, $where, $values_ref, $bulk, $personType, $pref, $defaultLevel) = @_;
                        
     my $systemConfig = getSystemConfig($Data);
     my $bulkWHERE='';
+    my $defaultWHERE = '';
+    $defaultWHERE = qq[ AND strPersonLevel = '$defaultLevel'] if (defined $defaultLevel and $defaultLevel and $defaultLevel ne '');
     my $st = qq[
         SELECT DISTINCT strPersonLevel, COUNT(intMatrixID) as CountNum
         FROM tblMatrix
@@ -665,6 +747,7 @@ sub getPersonLevelFromMatrix {
             AND intLocked=0
             AND intRealmID = ?
             AND intSubRealmID IN (0,?)
+            $defaultWHERE
             $bulkWHERE
             $where
         GROUP BY strPersonLevel
@@ -696,7 +779,7 @@ sub getPersonLevelFromMatrix {
 
         if($dref->{'strPersonLevel'}){
             push @retdata, {
-                name => $personLevelList->{$dref->{'strPersonLevel'}},
+                name => $Data->{'lang'}->txt($personLevelList->{$dref->{'strPersonLevel'}}),
                 value => $dref->{'strPersonLevel'},
             }
         }
@@ -713,48 +796,80 @@ sub getPersonLevelFromMatrix {
 }
 
 sub _entityList {
-    my ($Data, $etype, $currentEntityID) = @_;
+    my ($Data, $etype, $currentEntityID, $originLevel) = @_;
 
-    my $st = qq[
-        (
-        SELECT
-            E.strLocalName,
-            E.intEntityID
-        FROM
-            tblTempEntityStructure AS TES
-            INNER JOIN tblEntity AS E
-                ON TES.intChildID = E.intEntityID
-        WHERE
-            E.intRealmID = ?
-            AND intParentID = ?
-            AND intChildLevel = ?
-            AND E.strStatus = 'ACTIVE'
-        ORDER BY
-            E.strLocalName
-        )
-        UNION
-        (
-        SELECT
-            E.strLocalName,
-            E.intEntityID
-        FROM
-            tblEntity AS E
-        WHERE
-            E.intRealmID = ?
-            AND intEntityID = ?
-            AND intEntityLevel = ?
-            AND E.strStatus = 'ACTIVE'
-        )
-    ];
-    my $q = $Data->{'db'}->prepare($st);
-    $q->execute((
-        $Data->{'Realm'},
-        $currentEntityID,
-        $etype,
-        $Data->{'Realm'},
-        $currentEntityID,
-        $etype,
-    ));
+    my $st = '';
+    my $q = undef;
+    my $systemConfig = getSystemConfig($Data);
+    my $acceptSelfRegoFilter = qq [ AND intAcceptSelfRego = 1 ] if ($originLevel == 1 and $systemConfig->{'allow_SelfRego'});
+
+    if($currentEntityID)    {
+        $st = qq[
+            (
+            SELECT
+                E.strLocalName,
+                E.intEntityID
+            FROM
+                tblTempEntityStructure AS TES
+                INNER JOIN tblEntity AS E
+                    ON TES.intChildID = E.intEntityID
+            WHERE
+                E.intRealmID = ?
+                AND intParentID = ?
+                AND intChildLevel = ?
+                AND E.strStatus = 'ACTIVE'
+            ORDER BY
+                E.strLocalName
+            )
+            UNION
+            (
+            SELECT
+                E.strLocalName,
+                E.intEntityID
+            FROM
+                tblEntity AS E
+            WHERE
+                E.intRealmID = ?
+                AND intEntityID = ?
+                AND intEntityLevel = ?
+                AND E.strStatus = 'ACTIVE'
+            ORDER BY
+                E.strLocalName
+            )
+        ];
+        $q = $Data->{'db'}->prepare($st);
+        $q->execute((
+            $Data->{'Realm'},
+            $currentEntityID,
+            $etype,
+            $Data->{'Realm'},
+            $currentEntityID,
+            $etype,
+        ));
+    }
+    else    {
+        $st = qq[
+            (
+            SELECT
+                E.strLocalName,
+                E.intEntityID
+            FROM
+                tblEntity AS E
+            WHERE
+                E.intRealmID = ?
+                AND intEntityLevel = ?
+                AND E.strStatus = 'ACTIVE'
+                $acceptSelfRegoFilter
+            ORDER BY 
+                E.strLocalName
+            )
+        ];
+        $q = $Data->{'db'}->prepare($st);
+        $q->execute((
+            $Data->{'Realm'},
+            $etype,
+        ));
+    }
     my @vals = ();
     while(my ($name, $id) = $q->fetchrow_array())   {
         push @vals, {
@@ -768,21 +883,40 @@ sub _entityList {
 sub _entityTypeList {
     my ($Data, $currentEntityID) = @_;
 
-    my $st = qq[
-        SELECT
-            DISTINCT intChildLevel
-        FROM
-            tblTempEntityStructure AS TES
-        WHERE
-            intRealmID = ?
-            AND intParentID = ?
-            AND intChildLevel > 0
-    ];
-    my $q = $Data->{'db'}->prepare($st);
-    $q->execute((
-        $Data->{'Realm'},
-        $currentEntityID,
-    ));
+    my $st = '';
+    my $q = undef;
+    if($currentEntityID)    {
+        $st = qq[
+            SELECT
+                DISTINCT intChildLevel
+            FROM
+                tblTempEntityStructure AS TES
+            WHERE
+                intRealmID = ?
+                AND intParentID = ?
+                AND intChildLevel > 0
+        ];
+        $q = $Data->{'db'}->prepare($st);
+        $q->execute((
+            $Data->{'Realm'},
+            $currentEntityID,
+        ));
+    }
+    else    {
+        $st = qq[
+            SELECT
+                DISTINCT intChildLevel
+            FROM
+                tblTempEntityStructure AS TES
+            WHERE
+                intRealmID = ?
+                AND intChildLevel > 0
+        ];
+        $q = $Data->{'db'}->prepare($st);
+        $q->execute((
+            $Data->{'Realm'}
+        ));
+    }
     my @vals = ();
     while(my ($level) = $q->fetchrow_array())   {
         push @vals, $level;
@@ -791,6 +925,30 @@ sub _entityTypeList {
 }
 
 
+sub getAllowedToEntityLevelFromMatrix {
+    my ($Data, $values_ref) = @_;
+
+    my $st = qq[
+        SELECT DISTINCT intEntityLevel
+        FROM tblMatrix
+        WHERE
+            intOriginLevel = ?
+            AND intLocked = 0
+            AND intRealmID = ?
+            AND intSubRealmID IN (0, ?)
+            AND strPersonType = ?
+    ];
+
+    my $query = $Data->{'db'}->prepare($st);
+    $query->execute(@{$values_ref});
+	
+    my @vals=();
+    while(my ($entityLevel) = $query->fetchrow_array())   {
+        push @vals, $entityLevel;
+    }
+
+    return \@vals;
+}
 
 
 1;

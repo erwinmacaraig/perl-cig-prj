@@ -5,7 +5,7 @@
 <div id = "docViewerContent">
 
     <div class = "docViewerEntityInfo">
-    <p><strong>Document description:</strong> [% description %]</p>
+    <p><strong>[% Lang.txt('Document description') %]:</strong> [% description %]</p>
         <form action="uploadregofile.cgi" method="POST" class="dropzone" id="uploaderfrm" enctype="multipart/form-data">
         <input type="hidden" name="client" value="[% client %]" />
         [% IF regoID %]
@@ -27,6 +27,8 @@
 <script type="text/javascript" src="[% url %]/js/dropzone.js"></script>
 <link rel="stylesheet" type="text/css" href="[% url %]/css/basicdropzone.css">
 <script type="text/javascript">
+	var url;
+    var urlLength;
  function closeDocViewer()   {
         \$('#docViewerOverlay',window.parent.document).remove();
     }
@@ -35,12 +37,18 @@
         return false;
     });
 
-Dropzone.options.uploaderfrm = {
+Dropzone.options.uploaderfrm = {	
     maxFilesize: 25,
 	dictDefaultMessage: "[% Lang.txt('Click here to upload file') %]",
     init: function(){
     	this.on("success", function(){
-		   window.parent.location.reload();
+		   url = window.parent.location.href;		   
+	       if(url.indexOf("at=") > 0){			
+				window.parent.location.href = url.substring(0,url.indexOf("at=")) + "at=1";	   
+		   }
+		   else {
+		   	window.parent.location.reload();
+		   }
 		});
 	}
 };

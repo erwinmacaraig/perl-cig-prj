@@ -18,6 +18,7 @@ sub getInstanceOf	{
 		$Data,
 		$type,
 		$idIN,
+        $childIDIN,
 	) = @_;
 
 	my $clientValues_ref=$Data->{'clientValues'};
@@ -122,7 +123,7 @@ sub getInstanceOf	{
 			)
 		)	{
 
-            my $lastEntityID = getLastEntityID($clientValues_ref);
+            my $lastEntityID = $childIDIN || getLastEntityID($clientValues_ref);
 			if($lastEntityID)	{
 				my $st = qq[
                     SELECT      

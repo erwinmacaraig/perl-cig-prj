@@ -13,8 +13,9 @@ use Flow_TransferBackend;
 use Data::Dumper;
 
 sub handleTransferFlow {
-    my ($action, $Data) = @_;
+    my ($action, $Data, $paramRef) = @_;
 
+    $paramRef ||= undef;
     my $body = '';
     my $title = '';
     my $client = $Data->{'client'};
@@ -22,9 +23,16 @@ sub handleTransferFlow {
     my $cl = setClient($clientValues);
     my $rego_ref = {};
     my $cgi=new CGI;
+
+    if (defined $paramRef && $paramRef->{'return'})  {
+        foreach my $k (keys %{$paramRef})   {
+            $cgi->param(-name=>$k, -value=>$paramRef->{$k});
+        }
+    }
+
     my %params=$cgi->Vars();
     my $lang = $Data->{'lang'};
-    my $personID = param('pID') || getID($clientValues, $Defs::LEVEL_PERSON) || 0;
+    my $personID = param('personID') || param('pID') || getID($clientValues, $Defs::LEVEL_PERSON) || 0;
     $personID = 0 if $personID < 0;
     my $entityID = getLastEntityID($clientValues) || 0;
     my $entityLevel = getLastEntityLevel($clientValues) || 0;
@@ -62,8 +70,8 @@ sub handleTransferFlow {
         cgi => $cgi,
         DefaultTemplate => 'flow/transfer.templ',
     );
-
     my ($content,  undef) = $flow->run();
+    return if ($paramRef->{'return'});
 
     return $content;
 }

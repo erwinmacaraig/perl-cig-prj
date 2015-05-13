@@ -15,7 +15,7 @@ use Log;
 
 
 sub getEntityTypeRoles {
-    my($Data, $sport, $personType) = @_;
+    my($Data, $sport, $personType, $default) = @_;
                        
     my $st=qq[
         SELECT 
@@ -26,6 +26,9 @@ sub getEntityTypeRoles {
             AND intSubRealmID IN (0, ?)
             AND strSport IN ('', ?)
             AND strPersonType IN ('', ?)
+    ];
+    $st .= qq[ AND strEntityRoleKey = '$default'] if $default;
+    $st .= qq[
         ORDER BY strEntityRoleName
     ];
     my $query = $Data->{'db'}->prepare($st);

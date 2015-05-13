@@ -13,6 +13,7 @@ use PageMain;
 use Lang;
 use Login;
 use TTTemplate;
+use SystemConfig;
 
 main();
 
@@ -26,6 +27,9 @@ sub main {
     my $target = 'authlist.cgi';
     $Data{'target'} = $target;
     $Data{'cache'}  = new MCache();
+
+    $Data{'Realm'} = 1;
+    $Data{'SystemConfig'} = getSystemConfig( \%Data );
     my $email = param('email') || '';
     my $password = param('pw') || '';
 
@@ -91,7 +95,7 @@ sub main {
     else    {
       $body = runTemplate(
         \%Data,
-        {'errors' => $errors},
+        {'returnURL'=>"$Data{'SystemConfig'}{'loginError_returnURL'}" ,'errors' => $errors},
         'user/loginerror.templ',
       );
     }

@@ -17,7 +17,8 @@
         [% COUNT = 0 %]
         [% FOREACH fieldRow IN FieldElements %]
         <tr>
-            <td>[% fieldRow.intEntityFieldID %][% COUNT = COUNT + 1 %][% COUNT %]</td>
+            [% fieldRow.intEntityFieldID %]
+            <!--<td>[% fieldRow.intEntityFieldID %][% COUNT = COUNT + 1 %][% COUNT %]</td>-->
             <td>[% fieldRow.intFieldOrderNumber %]</td>
             <td>[% fieldRow.strName %]</td>
             <td>[% fieldRow.strDiscipline %]</td>

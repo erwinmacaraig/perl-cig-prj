@@ -202,13 +202,13 @@ sub getEntityMenuData {
     #if(exists $children->{$Defs::LEVEL_VENUE})    {
     if($SystemConfig->{'allowVenues'})  {
         $menuoptions{'venues'} = {
-            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}),
+            name => $lang->txt('Venues'),
             url => $baseurl."a=VENUE_L&amp;l=$Defs::LEVEL_VENUE",
         };
     }
     #if(exists $children->{$Defs::LEVEL_PERSON})    {
         $menuoptions{'persons'} = {
-            name => $lang->txt("List $Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}"),
+            name => $lang->txt("List Persons"),
             url => $baseurl."a=P_L&amp;l=$Defs::LEVEL_PERSON",
         };
     #}
@@ -228,6 +228,12 @@ sub getEntityMenuData {
         $menuoptions{'persons_addmaofficial'} = {
              name => $lang->txt('Add MA Official'),
             url => $baseurl."a=PF_&amp;dtype=MAOFFICIAL",
+        };
+    }
+    if($SystemConfig->{'menu_newperson_RAOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}.'_'.$currentLevel} && !$Data->{'ReadOnlyLogin'}) {
+        $menuoptions{'persons_addraofficial'} = {
+             name => $lang->txt('Add RA Official'),
+            url => $baseurl."a=PF_&amp;dtype=RAOFFICIAL",
         };
     }
     if($currentLevel == $Defs::LEVEL_CLUB and $SystemConfig->{'menu_newperson_TEAMOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
@@ -316,7 +322,7 @@ sub getEntityMenuData {
                 url => $baseurl."a=CL_list",
             };
             $menuoptions{'clearancesettings'} = {
-                name => $lang->txt("$txt_Clr Settings"),
+                name => $lang->txt("Clearances Settings"),
                 url => $baseurl."a=CLRSET_",
             };
             if(
@@ -396,16 +402,16 @@ sub getEntityMenuData {
                 };
 
     # for Entity menu
-    if($SystemConfig->{'menu_newclub_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
+    if(($SystemConfig->{'menu_newclub_'.$Data->{'clientValues'}{'authLevel'}.'_'.$currentLevel} or $SystemConfig->{'menu_newclub_'.$Data->{'clientValues'}{'authLevel'}}) && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'addclub'} = {
-             name => $lang->txt("Add $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}"),
+             name => $lang->txt("Add Club"),
             url => $baseurl."a=C_DTA",
         };
     }
 
     if($SystemConfig->{'allowVenues'} && $SystemConfig->{'menu_newvenue_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'addvenue'} = {
-             name => $lang->txt("Add $Data->{'LevelNames'}{$Defs::LEVEL_VENUE}"),
+             name => $lang->txt("Add Venue"),
             url => $baseurl."a=VENUE_DTA",
         };
     }
@@ -433,8 +439,24 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
             };
         }
     }
+    if ($SystemConfig->{'allowPayInvoice'}) {
+		$menuoptions{'bulkpayment'} = { 
+			name => $lang->txt('Pay Invoice'),
+			url => $baseurl."a=TXN_PAY_INV",
+		}; 
+		$menuoptions{'payinvoice'} = { 
+			name => $lang->txt('Invoices'),
+			    url => $baseurl."strInvoiceNumber=&amp;a=TXN_PAY_INV_NUM",
+		}; 
+    }
+		if ($SystemConfig->{'allowPaymentsHistory'})	{
+			$menuoptions{'paymenthistory'} = { 
+			    name => $lang->txt('Payments History'),
+				url => $baseurl."a=P_TXNLog_list",
+			};
+		}
+	# P_TXNLog_list url => $baseurl."a=TXN_PAY_HISTORY",
 
-    
     my @menu_structure = (
         [ $lang->txt('Dashboard'), 'home','home'],
         [ $lang->txt('States'), 'menu','states'],
@@ -446,6 +468,7 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
         ]],
         [ $lang->txt('Venues'), 'menu',[
             'venues',
+
             'addvenue'
         ]],
         [ $lang->txt('People'), 'menu',[
@@ -456,6 +479,7 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
             'persons_addclubofficial',
             'persons_addofficial',
             'persons_addmaofficial',
+            'persons_addraofficial',
             'bulk',
             'persons',
         ]],
@@ -471,6 +495,11 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
         ]],
         [ $lang->txt('My Association'), 'menu',[
         'myAssociation',
+        ]],
+        [ $lang->txt('Payments'), 'menu',[
+		    'payinvoice',
+		    'bulkpayment',
+		    'paymenthistory',
         ]],
         [ $lang->txt('Search'), 'search',[
         'advancedsearch',
@@ -529,7 +558,7 @@ sub getClubMenuData {
             url => $baseurl."a=C_HOME",
         },
         persons => {
-            name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}),
+            name => $lang->txt('List Persons'),
             url => $baseurl."a=P_L&amp;l=$Defs::LEVEL_PERSON",
         },
     );
@@ -541,14 +570,14 @@ sub getClubMenuData {
     }
     if($SystemConfig->{'allowVenues'})  {
         $menuoptions{'venues'} = {
-            name => $lang->txt('List '.$Data->{'LevelNames'}{$Defs::LEVEL_VENUE.'_P'}),
+            name => $lang->txt('List Venues'),
             url => $baseurl."a=VENUE_L&amp;l=$Defs::LEVEL_VENUE",
         };
     }
     if($currentLevel != $Data->{'clientValues'}{'authLevel'})   {
         delete($menuoptions{'home'});
     }
-    my $txt_RequestCLR = $SystemConfig->{'txtRequestCLR'} || 'Request a Clearance';
+    my $txt_RequestCLR = 'Request a Transfer';
 
     if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequestClearance'} 
     ) {
@@ -585,7 +614,7 @@ sub getClubMenuData {
                 url => $baseurl."a=CL_list",
             };
             $menuoptions{'clearancesettings'} = {
-                name => $lang->txt("$txt_Clr Settings"),
+                name => $lang->txt("Clearances Settings"),
                 url => $baseurl."a=CLRSET_",
             };
         }
@@ -674,7 +703,7 @@ sub getClubMenuData {
             )
             and allowedAction($Data, 'm_e')) {
         $menuoptions{'personrollover'} = {
-            name => $lang->txt($Data->{'LevelNames'}{$Defs::LEVEL_PERSON}.' Rollover'),
+            name => $lang->txt('Person Rollover'),
             url => $baseurl."a=P_LSRO&amp;l=$Defs::LEVEL_PERSON",
         };
     }
@@ -727,7 +756,7 @@ sub getClubMenuData {
 
     if ($SystemConfig->{'allowPersonRequest'}) {
         $menuoptions{'requesttransfer'} = {
-            name => $lang->txt('Request or Start a Transfer'),
+            name => $lang->txt('Request or start a transfer'),
             url => $baseurl."a=PRA_T",
             #url => $baseurl."a=INITSRCH_P&type=transfer&amp;origin=" . $Data->{'clientValues'}{'authLevel'},
         };
@@ -750,11 +779,23 @@ sub getClubMenuData {
             };
         }
         if ($SystemConfig->{'allowPayInvoice'}) {
-		$menuoptions{'bulkpayment'} = { 
-			name => $lang->txt('Pay Invoice'),
-			url => $baseurl."a=TXN_PAY_INV",
-		}; 
+		    $menuoptions{'bulkpayment'} = { 
+			    name => $lang->txt('Pay Invoice'),
+			    url => $baseurl."a=TXN_PAY_INV",
+		    }; 
+		    $menuoptions{'payinvoice'} = { 
+			    name => $lang->txt('Invoices'),
+			    url => $baseurl."strInvoiceNumber=&amp;a=TXN_PAY_INV_NUM",
+		    }; 
         }
+		if ($SystemConfig->{'allowPaymentsHistory'})	{
+			$menuoptions{'paymenthistory'} = { 
+				name => $lang->txt('Payments History'),
+				url => $baseurl."a=P_TXNLog_list",
+			};
+		}
+		# url => $baseurl."a=TXN_PAY_HISTORY"
+
         if ($SystemConfig->{'allowPersonRequest'}) {
             $menuoptions{'requestaccess'} = {
             name => $lang->txt('Request for Person Details'),
@@ -778,6 +819,12 @@ sub getClubMenuData {
             $menuoptions{'persons_addmaofficial'} = {
                  name => $lang->txt('Add MA Official'),
                 url => $baseurl."a=PF_&amp;dtype=MAOFFICIAL",
+            };
+        }
+        if($SystemConfig->{'menu_newperson_RAOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}.'_'.$currentLevel} && !$Data->{'ReadOnlyLogin'}) {
+            $menuoptions{'persons_addraofficial'} = {
+                 name => $lang->txt('Add RA Official'),
+                url => $baseurl."a=PF_&amp;dtype=RAOFFICIAL",
             };
         }
         if($currentLevel == $Defs::LEVEL_CLUB and $SystemConfig->{'menu_newperson_TEAMOFFICIAL_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
@@ -812,7 +859,7 @@ sub getClubMenuData {
 
     if($SystemConfig->{'allowVenues'} && $SystemConfig->{'menu_newvenue_'.$Data->{'clientValues'}{'authLevel'}} && !$Data->{'ReadOnlyLogin'}) {
         $menuoptions{'addvenue'} = {
-             name => $lang->txt("Add $Data->{'LevelNames'}{$Defs::LEVEL_VENUE}"),
+             name => $lang->txt("Add a Venue"),
             url => $baseurl."a=VENUE_DTA",
         };
     }
@@ -829,6 +876,7 @@ sub getClubMenuData {
         'persons_addclubofficial',
         'persons_addofficial',
         'persons_addmaofficial',
+        'persons_addraofficial',
 
         'requesttransfer',
         'requestaccess',
@@ -840,7 +888,6 @@ sub getClubMenuData {
         'listrequests',
         'duplicates',
         'bulk',
-		'bulkpayment',
         'persons',
          ]],
 
@@ -853,15 +900,21 @@ sub getClubMenuData {
             'pending',
             'incomplete'
         ]],
-        [ $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Transactions"), 'menu','transactions',],
+        [ $lang->txt("Club Transactions"), 'menu','transactions',],
         [ $lang->txt('My Club'), 'menu',[
         'myClub',
         ]],
          [ $lang->txt('Audit Trail'), 'menu',[
             'auditlog'
         ]],
+         [ $lang->txt('Payments'), 'menu',[
+		    'payinvoice',
+		    'bulkpayment',
+		    'paymenthistory',
 
-        [ $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Documents"), 'menu','clubdocs'],
+        ]],
+
+        [ $lang->txt("Club Documents"), 'menu','clubdocs'],
         [ $lang->txt('Identifiers'), 'menu','clubidentifier'],
         [ $lang->txt('Search'), 'search',[
         'advancedsearch',
@@ -883,6 +936,7 @@ sub getClubMenuData {
 
 sub getEntityChildrenTypes  {
     my($db, $ID, $realmID) = @_;
+
     my %existingChildren = ();
 
     my $st = qq[
@@ -986,7 +1040,7 @@ sub GenerateTree {
                 name => $name,
                 type => $levelType,
                 url => $url,
-                levelname => $Data->{'LevelNames'}{$levelType},
+                levelname => $Data->{'lang'}->txt($Data->{'LevelNames'}{$levelType}),
                 ma_phone_number => $Data->{'SystemConfig'}{'ma_phone_number'},
                 ma_website => $Data->{'SystemConfig'}{'ma_website'},
                 ma_email => $Data->{'SystemConfig'}{'ma_email'},
@@ -1079,9 +1133,17 @@ sub getPersonMenuData {
 
     my $txns_link_name = $lang->txt('Transactions');
     if($SystemConfig->{'AllowTXNs'}) {
-       $menuoptions{'transactions'} = {
+        $menuoptions{'transactions'} = {
+		   name => $lang->txt('List Transactions'),
            url => $baseurl."a=P_TXNLog_list",
-       };
+        };
+	   
+        if ($Data->{'clientValues'}{'authLevel'} >= $SystemConfig->{'AddTXN_MinLevel'}) {
+	        $menuoptions{'addtransactions'} = {
+		        name => $lang->txt('Add Transactions'),
+                url => $baseurl."a=P_TXN_ADD",
+            };
+        }
     }
     $menuoptions{'docs'} = {
        url => $baseurl."a=P_DOCS",
@@ -1120,7 +1182,7 @@ sub getPersonMenuData {
     my @menu_structure = (
         [ $lang->txt('Person Dashboard'), 'home','home'],
         [ $lang->txt('Player Passport'), 'menu','passport'],
-        [ $lang->txt($SystemConfig->{'txns_link_name'} || 'Transactions'), 'menu','transactions'],
+        [ $lang->txt('Transactions'), 'menu',['transactions','addtransactions']],
         [ $lang->txt('Certificates'), 'menu','certificates'],
         [ $lang->txt('History'), 'menu',[
             'regos',

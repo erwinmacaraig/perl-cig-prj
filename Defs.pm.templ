@@ -63,6 +63,7 @@ $bank_export_dir_web="banksplits/";
 $RegoServerKey='df09s8h5w498y5209^&%*&T*#';
 $version='4.0';
 $base_url = 'http://emacaraig.spildevel/FIFASPOnline/web'; ##CONFIG
+$selfreg_activation_url = "$base_url/registration?a=activate";
 $duplicate_url = 'http://emacaraig.spildevel/FIFASPOnline/web'; ##CONFIG
 $sync_logs = 'http://emacaraig.spildevel/FIFASPOnline/sync/logs'; ##CONFIG
 $helpurl='http://support.sportingpulse.com';
@@ -86,6 +87,7 @@ $salesimage_url = "$base_url/../salesimg";
 $fs_formdir="$fs_base/forms";
 $fs_salesimage_dir = "$fs_base/salesimg";
 $fs_customreports_dir="$fs_base/customreports";
+$selfreg_activation_url = "$base_url/registration?a=activate";
 
 $mail_log_file="/var/log/sp-mail/mail.log";
 
@@ -93,6 +95,8 @@ $mail_log_file="/var/log/sp-mail/mail.log";
 $cookie_domain="emacaraig.spildevel"; ##CONFIG
 $COOKIE_MEMBER="reg_m";
 $COOKIE_LOGIN="_SP_M";
+$COOKIE_SRLOGIN="_SP_SR";
+$COOKIE_LANG ="_SP_LA";
 $COOKIE_ENTITY ="_SP_M_E";
 $COOKIE_EVENT="reg_e";
 $COOKIE_ACTSTATUS = 'SWOMREC';
@@ -162,16 +166,19 @@ $WF_TASK_ACTION_RESUME = "RESUME";
 %sportType = (
 	'FOOTBALL'=>'Football',		
 	'FUTSAL'=>'Futsal',		
+    'WOMENSFOOTBALL'=>"Women's Football",
 );
 
 %entitySportType = (
 	'FOOTBALL'=>'Football',		
 	'FUTSAL'=>'Futsal',	
+    'WOMENSFOOTBALL'=>"Women's Football",
 	'ALL' => 'All',
 );	
 
 $SPORT_TYPE_FOOTBALL = 'FOOTBALL';
 $SPORT_TYPE_FUTSAL = 'FUTSAL';
+$SPORT_TYPE_WOMENSFOOTBALL = "WOMENSFOOTBALL";
 
 #Registration constants
 %personType = (
@@ -181,6 +188,7 @@ $SPORT_TYPE_FUTSAL = 'FUTSAL';
         'TEAMOFFICIAL'=>'Team Official',
         'CLUBOFFICIAL'=>'Club Official',
         'MAOFFICIAL'=>'MA Official',
+        'RAOFFICIAL'=>'RA Official',
 );
 
 $PERSON_TYPE_PLAYER = 'PLAYER';
@@ -189,13 +197,16 @@ $PERSON_TYPE_REFEREE = 'REFEREE';
 $PERSON_TYPE_TEAMOFFICIAL= 'TEAMOFFICIAL';
 $PERSON_TYPE_CLUBOFFICIAL = 'CLUBOFFICIAL';
 $PERSON_TYPE_MAOFFICIAL = 'MAOFFICIAL';
+$PERSON_TYPE_RAOFFICIAL = 'RAOFFICIAL';
 
 %personLevel = (
     'AMATEUR_U_C'=>'Amateur (Under Contract)',
     'AMATEUR'=>'Amateur',
     'PROFESSIONAL'=>'Professional',
+    'HOBBY'=>'Hobby',
 );
 
+$PERSON_LEVEL_HOBBY= 'HOBBY';
 $PERSON_LEVEL_AMATEUR = 'AMATEUR';
 $PERSON_LEVEL_AMATEUR_UNDER_CONTRACT = 'AMATEUR_U_C';
 $PERSON_LEVEL_PROFESSIONAL = 'PROFESSIONAL';
@@ -223,7 +234,9 @@ $ENTITY_STATUS_HOLD = 'HOLD';
 	'NEW'=>'New Registration',	
 	'RENEWAL'=>'Renewal',	
 	'AMENDMENT'=>'Amendment',
-	'TRANSFER'=>'Transfer'
+	'TRANSFER'=>'Transfer',
+    'DOMESTIC_LOAN' => 'Domestic Player Loan',
+    'INTERNATIONAL_LOAN' => 'International Player Loan',
 );
 
 $REGISTRATION_NATURE_NEW = 'NEW';
@@ -231,6 +244,8 @@ $REGISTRATION_NATURE_RENEWAL = 'RENEWAL';
 $REGISTRATION_NATURE_AMENDMENT = 'AMENDMENT';
 $REGISTRATION_NATURE_TRANSFER = 'TRANSFER';
 $REGISTRATION_NATURE_ACCESS = 'ACCESS';
+$REGISTRATION_NATURE_DOMESTIC_LOAN = 'DOMESTIC_LOAN';
+$REGISTRATION_NATURE_INTERNATIONAL_LOAN = 'INTERNATIONAL_LOAN';
 
 
 $PERSON_STATUS_PENDING = 'PENDING';
@@ -542,33 +557,38 @@ $CREATED_BY_OTHER= -1;
 $CREATED_BY_SWCIMPORTER = 2;
 $CREATED_BY_MANUALENTRY = 3;
 
-
 $TXN_PAID = 1;
 $TXN_CANCELLED = 2;
 $TXN_UNPAID = 0;
 $TXN_SHOWALL = -1;
-%ProdTransactionStatus	=	(
-	$TXN_UNPAID => 'Unpaid',
-	$TXN_CANCELLED => 'Cancelled',
-	$TXN_PAID => 'Paid', 
+$TXN_HOLD = 3; # NEw status
+%ProdTransactionStatus  =   (
+    $TXN_UNPAID => 'Unpaid',
+    $TXN_CANCELLED => 'Cancelled',
+    $TXN_PAID => 'Paid',
+    $TXN_HOLD=> 'Hold/Check',
 );
-%TransactionStatus	=	(
-	$TXN_UNPAID => 'Unpaid',
-	$TXN_CANCELLED => 'Cancelled',
-	$TXN_PAID => 'Paid', 
+%TransactionStatus  =   (
+    $TXN_UNPAID => 'Unpaid',
+    $TXN_CANCELLED => 'Cancelled',
+    $TXN_PAID => 'Paid',
+    $TXN_HOLD=> 'Hold/Check',
 );
 
 $TXNLOG_SUCCESS=1;
 $TXNLOG_CANCELLED=2;
 $TXNLOG_PENDING=0;
 $TXNLOG_FAILED= -1;
+$TXNLOG_HOLD = 3;
 
 %TransLogStatus =       (
         $TXNLOG_SUCCESS => 'Paid',
         $TXNLOG_CANCELLED => 'Cancelled',
         $TXNLOG_PENDING => 'Pending',
         $TXNLOG_FAILED => 'Failed',
+        $TXNLOG_HOLD => 'Hold/Check',
 );
+
 
 $PAYMENT_NONE = '';
 $PAYMENT_ONLINECREDITCARD= 1;
@@ -791,6 +811,10 @@ $MESSAGE_TYPE_SMS = 2;
 
 $PRODUCT_AGE_GROUPS = 1;
 $PRODUCT_MEMBER_TYPES = 2;
+$PRODUCT_DOB_MAX = 3;
+$PRODUCT_DOB_MIN = 4;
+$PRODUCT_AGE_MAX = 5;
+$PRODUCT_AGE_MIN = 6;
 
 $PRODUCT_PROGRAM_NEW = 5;
 $PRODUCT_PROGRAM_RETURNING = 6;
@@ -926,10 +950,12 @@ $TRANSFER_TYPE_INTERNATIONAL = 'INTERNATIONAL';
 
 $PERSON_REQUEST_TRANSFER = 'TRANSFER';
 $PERSON_REQUEST_ACCESS = 'ACCESS';
+$PERSON_REQUEST_LOAN = 'LOAN';
 
 %personRequest = (
     $PERSON_REQUEST_TRANSFER => 'Transfer',
     $PERSON_REQUEST_ACCESS => 'Request Access (Add Role)',
+    $PERSON_REQUEST_LOAN => 'Player Loan',
 );
 
 $PERSON_REQUEST_RESPONSE_ACCEPTED = "ACCEPTED";
@@ -1033,6 +1059,7 @@ $GROUND_NATURE_UNKNOWN = "UNKNOWN";
     "NEW_COACH" => "New Coach Registration",
     "NEW_PLAYER" => "New Player Registration",
     "NEW_MAOFFICIAL" => "New MA Official Registration",
+    "NEW_RAOFFICIAL" => "New RA Official Registration",
     "NEW_CLUBOFFICIAL" => "New Club Official Registration",
     "NEW_TEAMOFFICIAL" => "New Team Official Registration",
     "NEW_REFEREE" => "New Referee Registration",
@@ -1044,6 +1071,7 @@ $GROUND_NATURE_UNKNOWN = "UNKNOWN";
     "RENEWAL_COACH" => "Renewal of Coach Registration",
     "RENEWAL_PLAYER" => "Renewal of Player Registration",
     "RENEWAL_MAOFFICIAL" => "Renewal of MA Official Registration",
+    "RENEWAL_RAOFFICIAL" => "Renewal of RA Official Registration",
     "RENEWAL_CLUBOFFICIAL" => "Renewal of Club Official Registration",
     "RENEWAL_TEAMOFFICIAL" => "Renewal of Team Official Registration",
     "RENEWAL_REFEREE" => "Renewal of Referee Registration",
@@ -1053,6 +1081,8 @@ $GROUND_NATURE_UNKNOWN = "UNKNOWN";
     "AMENDMENT_PERSON" => "Amendment of Person Details",
 	"AMENDMENT_CLUB" => "Amendment of Club Details",
 	"AMENDMENT_VENUE" => "Amendment of Venue Details",
+    "DOMESTIC_LOAN_PLAYER" => "Domestic Player Loan",
+    "INTERNATIONAL_LOAN_PLAYER" => "International Player Loan",
 );
 
 $DOCO_STATUS_APPROVED = "APPROVED",
@@ -1068,5 +1098,32 @@ $DOCO_STATUS_REJECTED= "REJECTED";
     PROFESSIONAL => 'Professional',
     AMATEUR => 'Amateur',
     BOTH => 'Both',
+);
+
+%paymentMethod = (
+    now => 'Pay Now',
+    later=> 'Pay Later',
+    notrequired=> 'Payment Not Required',
+);
+
+%paymentResponseText = (
+    "PAYMENT_HOLD_RESOLVED"=>"Payment Hold Resolved",
+    "PAYMENT_FAILED"=>"Payment Failed",
+    "PAYMENT_RETURNED"=>"Payment returned to the payer",
+    "PAYMENT_TXN_NOT_FOUND"=>"The transaction does not exist",
+    "PAYMENT_TIMEDOUT" =>"Payment transaction timed out",
+    "PAYMENT_CANCELED" =>"Payment canceled",
+    "PAYMENT_UNSUCCESSFUL"=> "Payment Unsuccessful",
+    "PAYMENT_SUCCESSFUL"=>"Payment Successful",
+    "PAYMENT_DELAYED"=>"Delayed payment",
+    "PAYMENT_TO_THIRD_PARTY"=>"A third party has approved the payment and it requires approval/activation",
+    "PAYMENT_THIRD_PARTY_ACCEPTED"=>"A third party has accepted the payment/payment has been activated",
+    "PAYMENT_SENT_TO_MERCHANT"=>"Payment transferred to merchant",
+);
+
+%initialTaskAssignee = (
+    $LEVEL_CLUB => 'Club',
+    $LEVEL_REGION => 'Regional Association',
+    $LEVEL_NATIONAL => 'Member Association',
 );
 1;
