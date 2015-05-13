@@ -129,7 +129,11 @@ div#navbar div.navicons	a {
 	vertical-align:middle;
 	height:32px;
 	line-height:32px;
+    text-overflow:ellipsis;
+    overflow:hidden;
+    white-space: nowrap;
 }
+
 
 table.listTable	{
 	width:99%;

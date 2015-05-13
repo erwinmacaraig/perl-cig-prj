@@ -2336,6 +2336,7 @@ header .navbar-brand {
   div.dashboard-tasklist table td { font-size: 10px; }
 
 
+  header .logo-area { display:none; }
   header .logo-area ul li { margin: 0px 15px 0px 0px; }
   .row { margin-bottom: -18px; }
   #spmain-navbar-collapse {overflow-y: hidden; margin-bottom: 10px;}
@@ -2405,6 +2406,7 @@ header .navbar-brand {
     top: 10px;
     width: 65%;
     z-index: 10000;
+    font-weight:bold;
   }
   header nav.navbar-default .navbar-header .navbar-toggle {
   	z-index: 1;
@@ -2452,6 +2454,7 @@ header .navbar-brand {
   div.dataTables_filter label { color: #fff; }
   #grid_wrapper #grid_filter { text-align:right;padding-right:5px;}
   .fieldSectionGroupWrapper-DisplayOnly label.txtright { text-align:left;}
+  #pageholder #contentholder { margin-top:0px; }
 }
   table th { font-size: 13px; }
   .sidebar-box:nth-child(0) { display: none; }
