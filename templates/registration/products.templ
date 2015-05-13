@@ -150,7 +150,7 @@
 	[% END %]
 				<td class="col-3">[% p.Name %]</td>
 	[% IF !HideCost %]
-				<td class="col-4">[% CurrencySymbol %][% p.Amount %]</td>
+				<td class="col-4">[% CurrencyFormat.format(p.Amount) %]
 	[% END %]
 			</tr>
 	[% IF !HideNotes and p.ProductNotes %]

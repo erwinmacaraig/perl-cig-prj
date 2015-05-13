@@ -23,7 +23,7 @@
                     <td><div class="member-data"> [% row.Qty %] </div></td>
                     <td><div class="member-data"> [% row.ProductName %] </div></td>
                     <td><div class="member-data"> [% row.ProductType %] </div></td>
-                    <td><div class="member-data"> [% CurrencySymbol %][% row.Amount %] </div></td>
+                    <td><div class="member-data"> [% CurrencyFormat.format(row.Amount) %] </div></td>
                     <td><div class="member-data"> [% row.TXNStatus %] </div></td>
                     <td><div class="member-data"> [% row.PaymentType %] </div></td>
                 [% END %]
