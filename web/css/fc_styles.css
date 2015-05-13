@@ -2301,8 +2301,8 @@ header .navbar-brand {
   div.dashboard-tasklist table td { font-size: 12px; }
   #grid_wrapper #grid_filter { text-align:right;padding-right:5px;}
 }
+.responsiveTablesDropDown button{margin: 6px!important;}
 @media (min-width: 250px) and (max-width: 480px) {
-	.responsiveTablesDropDown button{margin: 6px!important;}
    table.table.tableboxheader thead tr th { font-size: 11px; }
    table.table.tableboxheader thead tr td { font-size: 11px; }
    
@@ -2449,7 +2449,8 @@ header .navbar-brand {
   h2.main-heading { font-size: 18px; margin-top: 0px; }
   table#worktasks.dataTable { margin-top: 0px !important; }
   table#grid { margin-top: 0px !important; }
-  div.dataTables_filter label { color: #fff; }
+  div.dataTables_filter label { color: #fff; font-size: 11px; }
+  div.dataTables_filter label input { color: #000; }
   #grid_wrapper #grid_filter { text-align:right;padding-right:5px;}
   .fieldSectionGroupWrapper-DisplayOnly label.txtright { text-align:left;}
   #pageholder #contentholder { margin-top:0px; }
