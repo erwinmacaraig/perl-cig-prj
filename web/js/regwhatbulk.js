@@ -17,7 +17,7 @@ function update_options(optionType, dtype)   {
       jQuery('#flow-btn-continue').show();
     }
     else    {
-        jQuery.getJSON('ajax/aj_person_registerwhat.cgi?bulk=1&otype=' + optionType + qstring, function(data)    {
+        jQuery.getJSON('ajax/aj_person_registerwhat.cgi?dnat=RENEWAL&bulk=1&otype=' + optionType + qstring, function(data)    {
           var items = [];
           if(data.results == 1) {
             jQuery('#l_' + optionType ).html('<option SELECTED value = "' + data.options[0].value + '">' + data.options[0].name + '</option>');

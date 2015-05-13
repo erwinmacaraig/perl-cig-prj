@@ -598,6 +598,36 @@ print STDERR "ENTITY IS $entityID\n";
                 $personRequestID,
             );
         }
+        ## CHECKING REGO OK
+        {
+            my (undef, $errorMsgRego) = PersonRegisterWhat::optionsPersonRegisterWhat(
+                $self->{'Data'},
+                $self->{'Data'}->{'Realm'},
+                $self->{'Data'}->{'RealmSubType'},
+                $originLevel,
+                $registrationNature,
+                $personType || '',
+                '',
+                $personEntityRole || '',
+                '',
+                $personLevel || '',
+                '',
+                $sport || '',
+                '',
+                $ageLevel || '',
+                $personID,
+                $entityID,
+                '',
+                '',
+                'nature',
+                0
+            );
+            if ($errorMsgRego)  {
+                push @{$self->{'RunDetails'}{'Errors'}}, $errorMsgRego;
+                $self->setCurrentProcessIndex('r');
+                return ('',2);
+            }
+        }
         if($changeExistingReg)  {
             $self->moveDocuments($existingReg, $regoID, $personID);
         }

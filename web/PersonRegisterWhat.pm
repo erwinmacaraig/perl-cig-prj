@@ -381,7 +381,8 @@ sub optionsPersonRegisterWhat {
     }
 
     if (! checkMatrixOK($Data, $MATRIXwhere, \@MATRIXvalues, $bulk))   {
-        return (\@retdata, '');
+    #    return (\@retdata, '');
+        return (\@retdata, $Data->{'lang'}->txt('This type of registration is not available.'));
     }
 
     #if(!checkPersonRegistrationWindow($Data, \@regWindowFields, \%regWindowFieldValues)) {

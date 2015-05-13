@@ -13,7 +13,6 @@ use PersonUtils;
 use ConfigOptions;
 use InstanceOf;
 use Countries;
-#use PersonRegisterWhat;
 use Reg_common;
 use FieldCaseRule;
 use WorkFlow;
@@ -37,6 +36,7 @@ use JSON;
 use IncompleteRegistrations;
 use RegoProducts;
 use Entity;
+use PersonRegisterWhat;
 
 sub setProcessOrder {
     my $self = shift;
@@ -778,6 +778,37 @@ sub process_registration {
                 $MAComment,
             );
         }
+        ## CHECKING REGO OK
+        {
+            my (undef, $errorMsgRego) = PersonRegisterWhat::optionsPersonRegisterWhat(
+                $self->{'Data'},
+                $self->{'Data'}->{'Realm'},
+                $self->{'Data'}->{'RealmSubType'},
+                $originLevel,
+                $registrationNature,
+                $personType || '',
+                '',
+                $personEntityRole || '',
+                '',
+                $personLevel || '',
+                '',
+                $sport || '',
+                '',
+                $ageLevel || '',
+                $personID,
+                $entityID,
+                '',
+                '',
+                'nature',
+                0
+            );
+            if ($errorMsgRego)  {
+                push @{$self->{'RunDetails'}{'Errors'}}, $errorMsgRego;
+                $self->setCurrentProcessIndex('r');
+                return ('',2);
+            }
+        }
+
         if($changeExistingReg)  {
             $self->moveDocuments($existingReg, $regoID, $personID);
         }
