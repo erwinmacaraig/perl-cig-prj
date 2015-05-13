@@ -2268,7 +2268,7 @@ sub loanRequiredFields {
             strTMSReference
         )],
         sections => [
-            [ 'loanfields', 'Additional Fields' ],
+            [ 'loanfields', 'Loan Information' ],
         ],
         client => $Data->{'client'},
 			
