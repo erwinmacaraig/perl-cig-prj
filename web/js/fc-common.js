@@ -490,7 +490,7 @@ jQuery(document).ready(function(){
             });
              // wrap up made li's with a custom ul
             return '<div class="button-group responsiveTablesDropDown">\
-                      <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">Fields <i class = "fa fa-caret-down"></i></button>\
+                      <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">' + $('#label_columns').val() + ' <i class = "fa fa-caret-down"></i></button>\
                           <ul style="top:inherit" class="dropdown-menu res-items-group">\
                           '+ headers +'\
                           </ul>\
