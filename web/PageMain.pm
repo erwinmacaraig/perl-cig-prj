@@ -513,6 +513,7 @@ sub regoPageForm {
         HeaderLogo => "$Defs::base_url/$Data->{'SystemConfig'}{'MA_logo'}",
         HeaderSystemName => $Data->{'SystemConfig'}{'HeaderSystemName'},
         DefaultSystemConfig => $Data->{'SystemConfig'},
+        LanguageChooser => genLanguageChooser($Data),
       },
       'user/globalnav.templ',
     );
@@ -522,6 +523,7 @@ sub regoPageForm {
         'jQuery(".fcToggleGroup").fcToggle({ test:1 });',
     );
 
+    $Data->{'AddToPage'}->add('js_bottom','file',"$Defs::base_url/js/jscookie.js");
     print runTemplate(
         $Data,      
         {

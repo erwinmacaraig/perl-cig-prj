@@ -61,7 +61,6 @@ sub handleSelfUserFlow  {
 
 
         my $lang = $Data->{'lang'};
-        my $cgi=new CGI;
         my $personID = $params{'pID'} || 0;
         $personID = 0 if $personID < 0;
         my $srp = $params{'srp'} || '';
