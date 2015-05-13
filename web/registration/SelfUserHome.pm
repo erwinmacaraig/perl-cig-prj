@@ -96,11 +96,11 @@ sub getSelfRegoTransactionHistory{
 			INNER JOIN tblInvoice as I ON (T.intInvoiceID = I.intInvoiceID)
             LEFT JOIN tblTransLog as TL ON (TL.intLogID=T.intTransLogID)
         WHERE
-            #T.intID = ? AND
+           
              T.intTableType = $Defs::LEVEL_PERSON
             AND T.intPersonRegistrationID = ?];			
 			$sth = $Data->{'db'}->prepare($query);
-			$sth->execute($regoDetail->{'intPersonRegistrationID'}); #$personIdKeyArr, 
+			$sth->execute($regoDetail->{'intPersonRegistrationID'}); #$personIdKeyArr,  #T.intID = ? AND
 			while(my $dref = $sth->fetchrow_hashref()){
 				push @{$transactions{'txn'}},{
 					TransactionNumber => $dref->{'intTransactionID'},
@@ -118,7 +118,7 @@ sub getSelfRegoTransactionHistory{
 		}
 	}
 	
-	#print FH Dumper(%transations);
+
 	$transactions{'CurrencySymbol'} = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
 	$txns = runTemplate(
 				$Data,
