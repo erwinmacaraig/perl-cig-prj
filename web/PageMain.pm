@@ -289,6 +289,7 @@ sub pageMain {
         DisableResponsiveLayout => $Defs::DisableResponsiveLayout || 0,
         HeaderLogo => $Data->{'SystemConfig'}{'MA_logo'},
         HeaderSystemName => $Data->{'SystemConfig'}{'HeaderSystemName'},
+        NavTree => $navTree,
         #FullScreen => $Data->{'FullScreen'} || 0,
     );
 
